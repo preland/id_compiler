@@ -17,68 +17,55 @@ If a conditional does not have a valid condition statement, that is a compiler e
 
 ```id
 // Quickreturn conditional
-quickreturn true if x > 10;
+quickreturn true if number > 10
 
 // If conditional with up to 3 actions
-if x == 5 {
-    y = y + 1;
-    print("Equal to 5");
-    z = z * 2;
-}
+if number == 5
+	counter = counter + 1
+	print("Equal to 5")
+	multiplier = multiplier * 2
 
 // If-else structure
-if condition {
-    action1;
-    action2;
-} 
-else {
-    action3;
-}
+if isvalid
+	firstaction
+	secondaction
+else
+	thirdaction
 
 // If-else if-else chain
-if a > b {
-    result = "a greater";
-} 
-else if a < b {
-    result = "b greater";
-} 
-else {
-    result = "equal";
-}
+if firstvalue > secondvalue
+	outcome = "a greater"
+else if firstvalue < secondvalue
+	outcome = "b greater"
+else
+	outcome = "equal"
 ```
 
 ### Improper Syntax
 
 ```id
 // Error: No condition
-if {
-    action;
-}
+if
+	action
 
 // Error: More than 3 actions in if
-if x == 1 {
-    a = 1;
-    b = 2;
-    c = 3;
-    d = 4;  // Too many actions
-}
+if number == 1
+	first = 1
+	second = 2
+	third = 3
+	fourth = 4  // Too many actions
 
 // Error: Else without preceding if
-else {
-    action;
-}
+else
+	action
 
 // Error: Quickreturn with mismatched return type (assuming function returns int)
-quickreturn "string" if flag==true; // If function expects int
+quickreturn "string" if isvalid  // If function expects int
 
-// Error: Nesting depth 4
-if outer { // 2 (fn declaration would be depth 1)
-    if inner1 { // 3
-        if inner2 { // 4; too deep
-            if inner3 {  // This would be depth 4
-                action; // as anything within the conditional would be at depth 5, the conditional cannot exist at depth 4.
-            }
-        }
-    }
-}
+// Error: Nesting depth 4 (assuming outer contexts)
+if outer // 2 (fn declaration would be depth 1)
+	if inner1 // 3 
+		if inner2 // 4; too deep
+			if inner3  // conditionals at depth 4 cannot have valid submembers, making them impossible
+				action
 ```

@@ -18,48 +18,41 @@ If a loop is not filled with any actions, or is not properly instantiated, that 
 
 ```id
 // Foreach loop
-foreach item in collection {
-    process(item);
-    count = count + 1;
-}
+foreach currentitem in itemcollection
+	process(currentitem)
+	totalcount = totalcount + 1
 
 // While loop
-while x < 10 {
-    x = x + 1;
-    print(x);
-}
+while value < 10
+	value = value + 1
+	print(value)
 
 // Repeat loop
-repeat 5 {
-    action1;
-    action2;
-    action3;
-}
+repeat 5
+	firsttask
+	secondtask
+	thirdtask
 ```
 
 ### Improper Syntax
 
 ```id
 // Error: Empty loop
-foreach item in list {
-}
+foreach currentitem in itemlist
 
 // Error: More than 3 actions
-while condition {
-    a = 1;
-    b = 2;
-    c = 3;
-    d = 4;  // Too many
-}
+while condition
+	first = 1
+	second = 2
+	third = 3
+	fourth = 4  // Too many
 
 // Error: Potential infinite loop
-while true {
-    action;
-}
+while true
+	action
 
 // Error: Artificial iterator in while
-while i < 10 {
-    action;
-    i = i + 1;  // Creating iterator artificially
-}
+while iterator < 10
+	action
+	iterator = iterator + 1  // Creating iterator artificially
 ```

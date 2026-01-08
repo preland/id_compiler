@@ -11,20 +11,20 @@ Each file in id has at most 3 functions or a single object declaration with no f
 #stem_types
 #debug
 
-func calculate(x: int, y: int) -> int {
-    return x + y;
-}
+fn calculate(firstnumber: int, secondnumber: int)
+    int ret = firstnumber + secondnumber    
+return int ret
 
-func display(result: int) {
-    print(result);
-}
+fn display(outcome: int)
+    print(outcome)
+return nil
 ```
 
 ```id
 // File with single object
 object Calculator {
-    value: int;
-    init(value: int);
+    storedvalue: int;
+    init(storedvalue: int);
     add(amount: int) -> int;
 }
 ```
@@ -33,21 +33,23 @@ object Calculator {
 
 ```id
 // Error: More than 3 functions
-func func1() {}
-func func2() {}
-func func3() {}
-func func4() {}  // Too many
+fn function1()
+fn function2()
+fn function3()
+fn function4()  // Too many
 ```
 
 ```id
 // Error: Misplaced flag
-func test() {}
+fn testfunction()
 #invalid  // Flag after function
 ```
 
 ```id
 // Error: Object with functions (should be separate file)
-object Test {
+object TestObject {
+    fn method()  // Not allowed in object file
+```
     func method() {<impl>}  // Not allowed in object file
 }
 ```

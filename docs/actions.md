@@ -14,39 +14,36 @@ Each type of action has specific rules and stipulations. If these rules are not 
 
 ```id
 // Variable assignment
-x = 5;
+value = 5
 
 // Variable modification
-y = y + 1;
+counter = counter + 1
 
 // Function execution
-print("Hello");
+print("Hello")
 
 // Loop
-foreach item in list {
-    process(item);
-}
+foreach currentitem in itemlist
+	process(currentitem)
 
 // Conditional
-if x > 0 {
-    result = true;
-}
+if value > 0
+	result = true
 ```
 
 ### Improper Syntax
 
 ```id
 // Error: Invalid action type
-random_statement;
+random_statement
 
 // Error: Malformed assignment
-x = ;  // Incomplete
+value =   // Incomplete
 
 // Error: Undefined function call
-undefined_function();
+undefined_function()
 
 // Error: Loop with invalid syntax
-foreach {  // Missing variable
-    action;
-}
+foreach   // Missing variable
+	action
 ```
