@@ -6,4 +6,4 @@ Yes. If I believed there was a better option for my use cases, I would've chosen
 
 The goal of the Inherently Determinable language (id, pronounced "ihd") is to make a simple and strictly formatted language capable of both low and high level programming, pursuant to creating code that is more maintainable, easier to read and understand, and much more difficult to use to hide complexity.
 
-Documentation can be found in the docs folder
+Documentation can be found in the docs folder.
