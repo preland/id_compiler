@@ -30,6 +30,7 @@
 set -u
 cd "$(dirname "$0")"
 ROOT=..
+ORG=../..
 pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
@@ -70,8 +71,8 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # under it, and a main that calls the module's own ras_selftest.
 PROJ="$TMP/p"
 mkdir -p "$PROJ/font" "$PROJ/byte"
-cp -r "$ROOT/editor/lib/font/." "$PROJ/font/"
-cp "$ROOT"/editor/lib/zip/byte/*.id "$PROJ/byte/"
+cp -r "$ORG/editor/lib/font/." "$PROJ/font/"
+cp "$ORG"/editor/lib/zip/byte/*.id "$PROJ/byte/"
 cat > "$PROJ/main.id" <<'IDEOF'
 main(int argc, string[] argv) {
   ras_selftest(argv);

@@ -491,6 +491,8 @@ if [ "$NO_STD" -eq 0 ] && [ -z "${IDC_NO_STD:-}" ]; then
         STDLIB="$IDSTD_HOME"
     elif [ -d "$ROOT/../idstd" ]; then
         STDLIB="$ROOT/../idstd"
+    elif [ -d "$ROOT/../../idstd" ]; then
+        STDLIB="$ROOT/../../idstd"
     fi
 fi
 if [ -n "$STDLIB" ]; then

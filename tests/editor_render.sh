@@ -18,6 +18,7 @@
 set -u
 cd "$(dirname "$0")"
 ROOT=..
+ORG=../..
 pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
@@ -32,7 +33,7 @@ fi
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 [ -f fixtures/sample.odt ] || python3 "$ROOT/tools/mkodt.py" fixtures/sample.odt >/dev/null
 
-if ! "$ROOT/bin/idc" "$ROOT/editor" -o "$TMP/editor" >"$TMP/build.log" 2>&1; then
+if ! "$ROOT/bin/idc" "$ORG/editor" -o "$TMP/editor" >"$TMP/build.log" 2>&1; then
     bad "the editor builds ($(head -1 "$TMP/build.log"))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi

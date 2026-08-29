@@ -65,7 +65,7 @@ check_output() {
 # file is hermetic and passes no flags), so "both compilers refuse it" is a
 # pass: what is being checked is that the two compilers AGREE, and agreeing to
 # refuse is agreement. What would fail is one building and the other not.
-for prog in ../demos/*/; do
+for prog in ../../demos/*/; do
     name=$(basename "$prog")
     $IDC     "$prog" -o "$TMP/sweep_py"   >/dev/null 2>&1; py=$?
     $BIN_IDC "$prog" -o "$TMP/sweep_self" >/dev/null 2>&1; self=$?
@@ -76,11 +76,11 @@ for prog in ../demos/*/; do
     fi
 done
 
-build_pair hello ../demos/hello && check_output hello hi
-build_pair calc ../demos/calc && check_output calc
-build_pair control ../demos/control/flow.id && check_output control
+build_pair hello ../../demos/hello && check_output hello hi
+build_pair calc ../../demos/calc && check_output calc
+build_pair control ../../demos/control/flow.id && check_output control
 
-if build_pair adventure ../demos/adventure; then
+if build_pair adventure ../../demos/adventure; then
     for choices in "1 1 1" "2 2 2" "2 1 2"; do
         out_py=$(printf '%s\n' $choices | "$TMP/adventure_py" | grep -o 'ENDING [0-9]')
         out_self=$(printf '%s\n' $choices | "$TMP/adventure_self" | grep -o 'ENDING [0-9]')
@@ -94,7 +94,7 @@ fi
 
 # --emit-c byte parity through the driver (a couple of programs the
 # self-hosted compiler fully supports today -- see tools/parity.sh)
-for prog in ../demos/calc ../demos/control/flow.id ../demos/adventure; do
+for prog in ../../demos/calc ../../demos/control/flow.id ../../demos/adventure; do
     $IDC "$prog" --emit-c "$TMP/ec_py.c" >/dev/null 2>&1
     $BIN_IDC "$prog" --emit-c "$TMP/ec_self.c" >/dev/null 2>&1
     if diff "$TMP/ec_py.c" "$TMP/ec_self.c" >/dev/null; then
@@ -105,7 +105,7 @@ for prog in ../demos/calc ../demos/control/flow.id ../demos/adventure; do
 done
 
 # a no-main project (a library) must build to a .o with bin/idc too
-if $BIN_IDC ../demos/engine -o "$TMP/engine_self.o" >/dev/null 2>&1 \
+if $BIN_IDC ../../demos/engine -o "$TMP/engine_self.o" >/dev/null 2>&1 \
    && [ -f "$TMP/engine_self.o" ]; then
     ok "engine (no main -> .o) builds via bin/idc"
 else
@@ -137,7 +137,7 @@ fi
 # (b) with a backend: the emitted C must carry `extern int id_<name>();` and
 #     be byte-identical to idc.py's, which is what makes the block's contents
 #     AND its order right.
-for prog in ../demos/gfxdemo; do
+for prog in ../../demos/gfxdemo; do
     be=../backends/gfx
     if ! $IDC "$prog" --backend "$be" --emit-c "$TMP/be_py.c" >/dev/null 2>&1; then
         bad "backend emit-c: idc.py failed on $prog"
@@ -284,7 +284,7 @@ fi
 
 # bootstrap caching: a second invocation must not rebuild idlex/idparse
 cache_before=$(stat -c %Y ../.idc-cache/idlex 2>/dev/null || stat -f %m ../.idc-cache/idlex 2>/dev/null)
-$BIN_IDC ../demos/calc -o "$TMP/calc_self2" >/dev/null 2>"$TMP/cache.err"
+$BIN_IDC ../../demos/calc -o "$TMP/calc_self2" >/dev/null 2>"$TMP/cache.err"
 cache_after=$(stat -c %Y ../.idc-cache/idlex 2>/dev/null || stat -f %m ../.idc-cache/idlex 2>/dev/null)
 if [ "$cache_before" = "$cache_after" ] && ! grep -q "bootstrapping" "$TMP/cache.err"; then
     ok "bin/idc caches idlex/idparse across runs (no rebuild)"
@@ -360,7 +360,7 @@ fi
 # find one beside.
 REAL_ROOT=$(cd .. && pwd)
 STD_REAL=""
-for cand in "${IDSTD_HOME:-}" "$REAL_ROOT/../idstd"; do
+for cand in "${IDSTD_HOME:-}" "$REAL_ROOT/../idstd" "$REAL_ROOT/../../idstd"; do
     [ -n "$cand" ] && [ -d "$cand" ] && { STD_REAL=$(cd "$cand" && pwd); break; }
 done
 if [ -z "$STD_REAL" ]; then

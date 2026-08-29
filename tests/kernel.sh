@@ -19,6 +19,7 @@
 set -u
 cd "$(dirname "$0")"
 ROOT=..
+ORG=../..
 pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
@@ -117,7 +118,7 @@ fi
 # `str_of_int` produces a kernel that boots and lies.
 HOST="$TMP/host"
 mkdir -p "$HOST"
-cp -r "$ROOT/kernel/prog/app/more/show" "$HOST/show"
+cp -r "$ORG/kernel/prog/app/more/show" "$HOST/show"
 cat > "$HOST/main.id" <<'IDEOF'
 main(int argc, string[] argv) {
   show_all();

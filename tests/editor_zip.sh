@@ -18,6 +18,7 @@
 set -u
 cd "$(dirname "$0")"
 ROOT=..
+ORG=../..
 pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
@@ -28,7 +29,7 @@ for tool in python3 cc; do
         exit 0
     fi
 done
-for need in "$ROOT/bin/idc" "$ROOT/editor/lib/zip" "$ROOT/backends/fs"; do
+for need in "$ROOT/bin/idc" "$ORG/editor/lib/zip" "$ROOT/backends/fs"; do
     if [ ! -e "$need" ]; then
         echo "SKIP: editor/lib/zip tests (missing $need)"
         exit 0
@@ -49,7 +50,7 @@ ABS=$(cd "$ROOT" && pwd)
 # Both directories are at the three-entry limit `id` imposes, which is why the
 # driver is two files rather than one.
 mkdir -p "$TMP/t/zip"
-cp -r "$ABS/editor/lib/zip/." "$TMP/t/zip/"
+cp -r "$ABS/../editor/lib/zip/." "$TMP/t/zip/"
 printf 'import "%s/backends/fs"\n' "$ABS" > "$TMP/conf.id"
 cat > "$TMP/main.id" <<'IDEOF'
 // ziptest ARCHIVE NAME -- that entry's bytes on stdout, or MISSING.

@@ -18,6 +18,7 @@
 set -u
 cd "$(dirname "$0")"
 ROOT=..
+ORG=../..
 pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
@@ -25,7 +26,7 @@ bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 P="$TMP/proj"
 mkdir -p "$P/show/more"
-cp -r "$ROOT/editor/lib/doc" "$P/doc"
+cp -r "$ORG/editor/lib/doc" "$P/doc"
 
 cat > "$P/main.id" <<'IDEOF'
 main(int argc, string[] argv) {

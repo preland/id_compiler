@@ -14,7 +14,7 @@
 # direnv's .envrc). This wrapper prefers that flake dev shell so there is a
 # single source of truth; if flakes are unavailable it falls back to an
 # equivalent `nix-shell -p` invocation.
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 
 if command -v nix >/dev/null 2>&1 \
    && nix develop "path:$REPO" --command true >/dev/null 2>&1; then

@@ -25,6 +25,7 @@ export IDC_NO_STD=1
 
 cd "$(dirname "$0")"
 ROOT=".."
+ORG="../.."
 ABS_ROOT=$(cd "$ROOT" && pwd)   # for the checks that build from another cwd
 BIN_IDC=../bin/idc
 TMP=$(mktemp -d)
@@ -58,7 +59,7 @@ removed fsdemo.txt (rc 0), exists now 0
 reopening it gives -1, errno 2'
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
     name=$(basename "$c")
-    if ! $c "$ROOT/demos/fsdemo" -o "$fsout.$name" >"$TMP/fs.build" 2>&1; then
+    if ! $c "$ORG/demos/fsdemo" -o "$fsout.$name" >"$TMP/fs.build" 2>&1; then
         bad "fsdemo builds with $name"; continue
     fi
     got=$(cd "$TMP" && "$fsout.$name" 2>&1)
@@ -74,7 +75,7 @@ done
 # twice: "multiple definition" for every symbol it exports.
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
     name=$(basename "$c")
-    if $c "$ROOT/demos/fsdemo" --backend "$ROOT/backends/fs" -o "$fsout.dup.$name" \
+    if $c "$ORG/demos/fsdemo" --backend "$ROOT/backends/fs" -o "$fsout.dup.$name" \
          >"$TMP/fs.dup" 2>&1; then
         ok "a backend named by both --backend and conf.id links once ($name)"
     else
@@ -83,8 +84,8 @@ for c in "$BIN_IDC" "$ROOT/idc.py"; do
 done
 
 # emit-c parity on a backend-using project, as for the graphics demos below.
-if $ROOT/idc.py "$ROOT/demos/fsdemo" --emit-c "$TMP/fs.py.c" >/dev/null 2>&1 \
-   && $BIN_IDC "$ROOT/demos/fsdemo" --emit-c "$TMP/fs.self.c" >/dev/null 2>&1 \
+if $ROOT/idc.py "$ORG/demos/fsdemo" --emit-c "$TMP/fs.py.c" >/dev/null 2>&1 \
+   && $BIN_IDC "$ORG/demos/fsdemo" --emit-c "$TMP/fs.self.c" >/dev/null 2>&1 \
    && diff "$TMP/fs.py.c" "$TMP/fs.self.c" >/dev/null; then
     ok "fsdemo: emit-c byte parity"
 else
@@ -98,7 +99,7 @@ nocbe="$TMP/nocbe"; mkdir -p "$nocbe"
 printf '{"name":"toy","abi":[],"targets":{"interp":{"module":"toy.py"}}}\n' > "$nocbe/backend.json"
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
     name=$(basename "$c")
-    if $c "$ROOT/demos/hello" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
+    if $c "$ORG/demos/hello" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
        | grep -q "no implementation for the C target"; then
         ok "a backend with no C target is diagnosed as such ($name)"
     else
@@ -113,7 +114,7 @@ done
 # compiler). Defaulting into build/ makes that collision impossible, and keeps
 # built binaries out of the source tree.
 outdir="$TMP/outdir"; mkdir -p "$outdir"
-cp -r "$ROOT/demos/hello" "$outdir/proj"
+cp -r "$ORG/demos/hello" "$outdir/proj"
 for c in "$ABS_ROOT/bin/idc" "$ABS_ROOT/idc.py"; do
     name=$(basename "$c")
     out=$(cd "$outdir" && "$c" proj 2>&1)
@@ -212,10 +213,10 @@ fi
 # -- the graphics demos still build, and their C matches idc.py's ------------
 for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
     d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if ! $ROOT/idc.py "$ROOT/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
+    if ! $ROOT/idc.py "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
         bad "$d: idc.py --backend"; continue
     fi
-    if ! $BIN_IDC "$ROOT/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
+    if ! $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
         bad "$d: bin/idc --backend"; continue
     fi
     if diff "$TMP/py.c" "$TMP/self.c" >/dev/null; then
@@ -231,7 +232,7 @@ done
 # DISPLAY unset is the test, and it needs no display by construction.
 for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
     d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if ! $BIN_IDC "$ROOT/demos/$d" --backend "$be" -o "$TMP/$d.bin" >/dev/null 2>&1; then
+    if ! $BIN_IDC "$ORG/demos/$d" --backend "$be" -o "$TMP/$d.bin" >/dev/null 2>&1; then
         bad "$d: builds for the no-display check"; continue
     fi
     DISPLAY= timeout 5 "$TMP/$d.bin" >/dev/null 2>&1

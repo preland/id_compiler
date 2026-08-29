@@ -99,24 +99,24 @@ expect_error() { # name, file, pattern
 if want core; then
 # --- hello_world end to end (the demos/hello project bundles otherfn.id, which
 #     testfn calls, so the whole program resolves within one project)
-$IDC ../demos/hello -o "$TMP/hello" 2>/dev/null \
+$IDC ../../demos/hello -o "$TMP/hello" 2>/dev/null \
     || bad "hello_world compiles"
 expect_output "usage message"  "usage: $TMP/hello <message>" "$("$TMP/hello")"
 expect_output "hello with arg" "hello world: hi"             "$("$TMP/hello" hi)"
 
 # --- demos/ projects compile and run as documented
-$IDC ../demos/calc -o "$TMP/calc" 2>/dev/null \
+$IDC ../../demos/calc -o "$TMP/calc" 2>/dev/null \
     || bad "calc demo compiles"
 expect_output "calc demo output" "total = 42 (positive)" "$("$TMP/calc")"
 "$TMP/calc" >/dev/null; expect_output "calc demo exit code" "42" "$?"
 
-$IDC ../demos/control/flow.id -o "$TMP/flow" 2>/dev/null \
+$IDC ../../demos/control/flow.id -o "$TMP/flow" 2>/dev/null \
     || bad "control demo compiles"
 expect_output "control demo output" "7 is a big odd / medium" "$("$TMP/flow")"
 
 # --- adventure demo: input() builtin + cross-file branching to 8 endings.
 #     Feed a choice sequence on stdin and check which ending it reaches.
-$IDC ../demos/adventure -o "$TMP/adv" 2>/dev/null \
+$IDC ../../demos/adventure -o "$TMP/adv" 2>/dev/null \
     || bad "adventure demo compiles"
 expect_output "adventure path 1,1,1" "ENDING 1" \
     "$(printf '1\n1\n1\n' | "$TMP/adv" | grep -o 'ENDING [0-9]')"
@@ -190,7 +190,7 @@ expect_output "id-lexer tracks lines" "line 3" "$(printf 'a\n\nb' | "$TMP/idlex"
 
 # --- idc-in-id stage 2: the calculator (parser + evaluator + printer written
 #     in id), fed by the stage-1 lexer through a pipe
-$IDC ../demos/idc_in_id_calc -o "$TMP/idcalc" 2>/dev/null || bad "idc-in-id calc compiles"
+$IDC ../../demos/idc_in_id_calc -o "$TMP/idcalc" 2>/dev/null || bad "idc-in-id calc compiles"
 expect_output "calc parse+print" "(+ 2 (* 3 4))" \
     "$(echo '2 + 3 * 4' | "$TMP/idlex" | "$TMP/idcalc" | head -1)"
 expect_output "calc evaluate" "= 14" \
@@ -293,8 +293,8 @@ else
 fi
 # parity on a real multi-file demo: export/import, string[] params, concat,
 # nested if/else, cross-file calls
-"$IDC" ../demos/calc --emit-c "$TMP/calc_py.c" >/dev/null 2>&1
-project_cat ../demos/calc | "$TMP/idlex" | "$TMP/idparse" > "$TMP/calc_id.c"
+"$IDC" ../../demos/calc --emit-c "$TMP/calc_py.c" >/dev/null 2>&1
+project_cat ../../demos/calc | "$TMP/idlex" | "$TMP/idparse" > "$TMP/calc_id.c"
 if diff "$TMP/calc_py.c" "$TMP/calc_id.c" >/dev/null; then
     ok "codegen parity with idc.py (demos/calc)"
 else
@@ -302,8 +302,8 @@ else
 fi
 # parity on the adventure demo: string equality (strcmp), nested if/else,
 # input(), concat, void functions across several files
-"$IDC" ../demos/adventure --emit-c "$TMP/adv_py.c" >/dev/null 2>&1
-project_cat ../demos/adventure | "$TMP/idlex" | "$TMP/idparse" > "$TMP/adv_id.c"
+"$IDC" ../../demos/adventure --emit-c "$TMP/adv_py.c" >/dev/null 2>&1
+project_cat ../../demos/adventure | "$TMP/idlex" | "$TMP/idparse" > "$TMP/adv_id.c"
 if diff "$TMP/adv_py.c" "$TMP/adv_id.c" >/dev/null; then
     ok "codegen parity with idc.py (demos/adventure)"
 else
@@ -498,7 +498,7 @@ other() {
 # idview: a random source viewer written in id. It has no filesystem access,
 # so it splits a marker-delimited stream back into files -- the same protocol
 # the compiler uses for file boundaries.
-$IDC ../demos/idview -o "$TMP/idview" >/dev/null 2>&1
+$IDC ../../demos/idview -o "$TMP/idview" >/dev/null 2>&1
 view_out=$({ printf '#file a.id\n'; printf 'one\n'; printf '#file b.id\n'; printf 'two\n'; } | "$TMP/idview")
 case "$view_out" in
     "==== a.id"*one*) ok "idview picks a file and prints its body" ;;
@@ -625,12 +625,12 @@ fi
 
 # --- the game engine + the two games it drives build cleanly (real-time I/O
 #     builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
-if "$IDC" ../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
+if "$IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
     ok "moonbuggy builds (with bundled engine)"
 else
     bad "moonbuggy builds (with bundled engine)"
 fi
-if "$IDC" ../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
+if "$IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
     ok "solitaire builds (with bundled engine)"
 else
     bad "solitaire builds (with bundled engine)"
@@ -835,7 +835,7 @@ else
         else
             bin="$TMP/hello_$target"
         fi
-        if ! alt_cc "$target" ../demos/hello "$bin"; then
+        if ! alt_cc "$target" ../../demos/hello "$bin"; then
             bad "hello builds ($target)"
         else
             if [ "$target" = wasm ]; then out=$(wasmtime "$bin" hi); else out=$("$bin" hi); fi
@@ -847,7 +847,7 @@ else
         else
             bin="$TMP/calc_$target"
         fi
-        if ! alt_cc "$target" ../demos/calc "$bin"; then
+        if ! alt_cc "$target" ../../demos/calc "$bin"; then
             bad "calc builds ($target)"
         else
             if [ "$target" = wasm ]; then out=$(wasmtime "$bin"); else out=$("$bin"); fi
@@ -861,7 +861,7 @@ else
         else
             bin="$TMP/flow_$target"
         fi
-        if ! alt_cc "$target" ../demos/control/flow.id "$bin"; then
+        if ! alt_cc "$target" ../../demos/control/flow.id "$bin"; then
             bad "control builds ($target)"
         else
             if [ "$target" = wasm ]; then out=$(wasmtime "$bin"); else out=$("$bin"); fi
@@ -945,7 +945,7 @@ fi
 #     plan from a description without opening the code, so each doc opens with
 #     a `> **Status:` line and this refuses a new one that does not.
 undocumented=""
-for d in ../docs/*.md; do
+for d in ../../docs/*.md; do
     grep -q '^> \*\*Status' "$d" || undocumented="$undocumented $(basename "$d")"
 done
 if [ -z "$undocumented" ]; then

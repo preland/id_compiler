@@ -50,7 +50,7 @@ def main():
 
     # rom0 at the top, the rest one level down: three entries per directory,
     # and five files do not fit in one.
-    out = "kernel/prog/sys/gfx/font/rom"
+    out = "../kernel/prog/sys/gfx/font/rom"
     os.makedirs(out + "/more", exist_ok=True)
     chunks = [rows[i:i + PER_FN] for i in range(0, len(rows), PER_FN)]
     names = []

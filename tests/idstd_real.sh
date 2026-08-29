@@ -39,7 +39,14 @@ unset IDC_NO_STD
 
 # Locate the library the same way the compilers do, so a checkout without one
 # skips rather than reporting every project as broken.
-STD="${IDSTD_HOME:-$(cd .. && pwd)/../idstd}"
+STD="${IDSTD_HOME:-}"
+if [ -z "$STD" ]; then
+    R=$(cd .. && pwd)
+    for up in "$R/../idstd" "$R/../../idstd"; do
+        [ -d "$up" ] && { STD="$up"; break; }
+    done
+    STD="${STD:-$R/../idstd}"
+fi
 if [ ! -d "$STD" ]; then
     echo "SKIP: no standard library at '$STD' (set IDSTD_HOME to point at one)"
     exit 0
@@ -68,20 +75,24 @@ why() { "$BIN_IDC" "$1" --emit-c /dev/null 2>&1 | head -1; }
 # name, so the ledger stays the place to add a project living somewhere else.
 want_of() { sed -n "s|^$1  *\([a-z-]*\).*|\1|p" "$LEDGER" | head -1; }
 
+# demos/ lives in the umbrella repository, one level above this one.
+path_of() { case "$1" in demos/*) echo "../../$1" ;; *) echo "../$1" ;; esac; }
+
 projects=""
-for d in ../demos/*/ ../compiler/*/; do
+for d in ../../demos/*/ ../compiler/*/; do
     [ -d "$d" ] || continue
-    projects="$projects ${d#../}"
+    e=${d#../}; e=${e#../}
+    projects="$projects $e"
 done
 while read -r name _; do
     case "$name" in ''|\#*) continue ;; esac
     case " $projects " in *" $name/ "*|*" $name "*) continue ;; esac
-    [ -d "../$name" ] && projects="$projects $name"
+    [ -d "$(path_of "$name")" ] && projects="$projects $name"
 done < "$LEDGER"
 
 for p in $projects; do
     name=${p%/}
-    path="../$name"
+    path=$(path_of "$name")
     case "$name" in demos/*) name=${name#demos/} ;; esac
     want=$(want_of "$name")
     got=$(classify "$path")

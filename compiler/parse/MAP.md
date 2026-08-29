@@ -7,7 +7,7 @@ moving a function; `tests/run.sh` fails if this file is out of date.
 it runs: **lex** turns text into tokens, **front** turns tokens into an AST,
 **mid** checks the AST and answers questions about types, **back** turns it
 into C. Nothing in `front` or `mid` may emit C -- see
-[`../../docs/BACKENDS.md`](../../docs/BACKENDS.md).
+[`../../../docs/BACKENDS.md`](../../../docs/BACKENDS.md).
 
 To add a language feature, start here, not in `idc.py`. `idc.py` is stage 0
 of the bootstrap: it only has to compile *this tree's own source*, so it needs

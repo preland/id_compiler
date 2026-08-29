@@ -22,8 +22,8 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 def font():
     """The glyphs, in code-point order, as lists of 16 row bytes."""
     parts = []
-    for p in sorted(glob.glob(f"{ROOT}/kernel/prog/sys/gfx/font/rom/rom0.id")
-                    + glob.glob(f"{ROOT}/kernel/prog/sys/gfx/font/rom/more/rom*.id")):
+    for p in sorted(glob.glob(f"{ROOT}/../kernel/prog/sys/gfx/font/rom/rom0.id")
+                    + glob.glob(f"{ROOT}/../kernel/prog/sys/gfx/font/rom/more/rom*.id")):
         m = re.search(r'return string "([0-9a-f]*)"', open(p).read())
         if m:
             parts.append((p, m.group(1)))

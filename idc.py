@@ -4907,7 +4907,7 @@ def resolve_stdlib(explicit=None, no_std=False):
     """Locate the standard library, or return None when there is none.
 
     Order: --no-std / IDC_NO_STD wins over everything; then an explicit --std;
-    then $IDSTD_HOME; then a sibling of the compiler's own repository. A
+    then $IDSTD_HOME; then a sibling of this repository or of the one above. A
     checkout with no idstd beside it simply has no standard library -- that is
     not an error, because the compiler has to keep building the language's own
     bootstrap in a tree where the library does not exist yet."""
@@ -4920,10 +4920,10 @@ def resolve_stdlib(explicit=None, no_std=False):
                 raise CompileError(path, 1,
                                    f"{src} does not name a directory")
             return os.path.abspath(path)
-    sibling = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           os.pardir, STDLIB_DIR_NAME)
-    sibling = os.path.normpath(sibling)
-    return sibling if os.path.isdir(sibling) else None
+    here = os.path.dirname(os.path.abspath(__file__))
+    ups = [os.pardir, os.path.join(os.pardir, os.pardir)]
+    near = [os.path.normpath(os.path.join(here, u, STDLIB_DIR_NAME)) for u in ups]
+    return next((p for p in near if os.path.isdir(p)), None)
 
 
 def resolve_deps(root):
