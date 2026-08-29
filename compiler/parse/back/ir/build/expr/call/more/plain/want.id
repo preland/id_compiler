@@ -1,0 +1,27 @@
+// The flat store and the unsigned operations work in machine words, so every
+// argument widens into one -- which is exactly the cast the C target writes.
+// mem_of_str is the exception on both targets: its argument is a string.
+lw_bpty2(string name, int i) {
+  string t = "";
+  if(is_syscall(name) == 1 && name != "mem_of_str") {
+    t = "word";
+  } else {
+    t = lw_bpty3(name, i);
+  }
+} return string t;
+
+lw_bpty3(string name, int i) {
+  string t = "";
+  if(name == "to_int" || name == "mem_of_str" || name == "put" || name == "charat" && i == 0) {
+    t = "string";
+  } else if(name == "chr" || name == "sleep_ms" || name == "charat") {
+    t = "int";
+  }
+} return string t;
+
+// The rest of lw_barg_at, once the argument's own position is known.
+lw_barg_val(int i, int[] vals, int[] args, string name) {
+  string lw_bpty_v = lw_bpty(name, i, args[i]);
+  int lw_as_v = lw_as(args[i], lw_bpty_v);
+  int ret_i = lw_barg_push(i, vals, lw_as_v);
+} return int ret_i;

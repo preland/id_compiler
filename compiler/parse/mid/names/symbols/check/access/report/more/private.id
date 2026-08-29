@@ -1,0 +1,21 @@
+// The global is there for the taking; the reader just has to say so.
+report_var_import(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  string owner_of_v = owner_of(name);
+  var_report(loc_at_v + "variable '" + name + "' belongs to function '" + owner_of_v + "'; read it with 'import " + name + "'");
+} return void;
+
+// Nothing to import: the owner has to export it first.
+report_var_private(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  string owner_of_v = owner_of(name);
+  var_report(loc_at_v + "variable '" + name + "' belongs to function '" + owner_of_v + "' and is not exported; variables are only globally accessible if export/import is used");
+} return void;
+
+report_bad_import(string name, string owner, int ln) {
+  if(find_str((import dvname), name) < 0) {
+    report_no_export(name, owner, ln);
+  } else {
+    report_not_exported(name, owner, ln);
+  }
+} return void;

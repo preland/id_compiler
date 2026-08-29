@@ -1,0 +1,11 @@
+arity_err(int id, int fn) {
+  string name = s1_of(id);
+  string msg = arity_err_msg(id, fn, name);
+  tc_err(id, msg);
+} return void;
+
+arity_err_msg(int id, int fn, string name) {
+  int need = flat_arg_count(fn);
+  int have = flat_arg_count(id);
+  string msg = "function '" + name + "' takes " + need + " argument(s), got " + have;
+} return string msg;

@@ -1,0 +1,23 @@
+// One comparison, and the diagnostic.
+//
+// The message is idc.py's, word for word, so a program rejected by either
+// compiler is rejected with the same explanation -- including where the
+// function it collides with was defined, which is the part that makes the
+// error actionable.
+
+dup_probe(int i, int j) {
+  int found = 0 - 1;
+  if((import cfp)[i] == (import cfp)[j]) {
+    found = j;
+  }
+} return int found;
+
+report_dup(int i, int j) {
+  note_failure();
+  string name_i = fname_at(i);
+  dup_report(name_i, j);
+} return void;
+
+fname_at(int i) {
+  string ret_s = s1_of((import prog)[i]);
+} return string ret_s;

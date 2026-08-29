@@ -1,0 +1,19 @@
+decl_err(int id, string t, int e) {
+  string s2_of_v = s2_of(id);
+  string type_of_v = type_of(e);
+  tc_err(id, "cannot initialize " + t + " '" + s2_of_v + "' with a " + type_of_v + " value");
+} return void;
+
+assign_err(int id, string vt, int e) {
+  string type_of_v = type_of(e);
+  string s1_of_v = s1_of(id);
+  tc_err(id, "cannot assign a " + type_of_v + " value to " + vt + " '" + s1_of_v + "'");
+} return void;
+
+bad_store2(string want, int e) {
+  string type_of_v = type_of(e);
+  int ok = 0;
+  if(bad_init(want, type_of_v) == 1) {
+    ok = 1;
+  }
+} return int ok;

@@ -1,0 +1,11 @@
+
+emit_tail_end(int id) {
+  emit_ret(id);
+  emit_line("}");
+} return void;
+
+// `c_rettype id_NAME(params)`
+sig(int id) {
+  string s2_of_v = s2_of(id);
+  string s = c_type(s2_of_v) + " id_" + s1_of(id) + "(" + param_str(id) + ")";
+} return string s;

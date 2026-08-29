@@ -1,0 +1,7 @@
+// The blank row for `outv`, pushed after `phiof`'s: they are the same shape
+// and there is nowhere left to say both in `m2r_row` and stay under the
+// action limit.
+m2r_row2() {
+  int[] m2r_blank_v2 = m2r_blank();
+  push((import outv), m2r_blank_v2);
+} return void;

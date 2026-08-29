@@ -1,0 +1,25 @@
+// `&&` and `||`, short-circuiting. The result lands in an unnamed slot rather
+// than in a phi: the lowering does not build phis at all -- mem2reg does, from
+// exactly this shape -- so there is one way a value crosses a branch here and
+// it is a store.
+
+lw_logic(int node) {
+  int slot = lw_tmp("int");
+  int ret_i = lw_logic_seed(node, slot);
+} return int ret_i;
+
+// `a && b` starts at 0 and only the right-hand side can raise it; `a || b`
+// starts at 1 and only the right-hand side can lower it. So the two differ in
+// the seed and in which way the branch goes, and in nothing else.
+lw_ini(string op) {
+  string s = "0";
+  if(op == "||") {
+    s = "1";
+  }
+} return string s;
+
+lw_logic2(int node, int slot) {
+  int lw_fn_v = lw_fn();
+  int bdy = ir_block(lw_fn_v, "rhs");
+  int ret_i = lw_logic2_join(node, slot, bdy);
+} return int ret_i;

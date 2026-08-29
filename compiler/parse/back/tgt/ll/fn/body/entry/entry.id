@@ -1,0 +1,23 @@
+// The parameter list of a define: `<ty> %v<id>`, in order, which is also how
+// every use of a parameter inside the body spells it.
+ll_pstr(int f) {
+  string s = "";
+  int i = 0;
+  while(i < ll_pcount(f)) {
+    int[] pars = irf_par(f);
+    s = ll_pstr_step(s, i, pars[i]);
+    i = i + 1;
+  }
+} return string s;
+
+ll_sep(int i) {
+  string s = ", ";
+  if(i == 0) {
+    s = "";
+  }
+} return string s;
+
+ll_block(int b) {
+  emit_line("b" + b + ":");
+  ll_insns(b);
+} return void;

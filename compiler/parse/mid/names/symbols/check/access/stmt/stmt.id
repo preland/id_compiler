@@ -1,0 +1,26 @@
+// Statement dispatch. Each statement carries the line it began on in `nline`,
+// which is the line every name inside it is reported at -- the expressions
+// themselves have no line of their own, and a statement is small enough in
+// `id` that the two are the same line in all but the longest of them.
+
+acc_list(int[] stmts, string owner) {
+  int i = 0;
+  while(i < len(stmts)) {
+    acc_stmt(stmts[i], owner);
+    i = i + 1;
+  }
+} return void;
+
+acc_stmt(int id, string owner) {
+  if(k_of(id) == "if") {
+    acc_if(id, owner);
+  } else {
+    acc_stmt2(id, owner);
+  }
+} return void;
+
+acc_if(int id, string owner) {
+  int i1_of_v = i1_of(id);
+  acc_expr(i1_of_v, owner, (import nline)[id]);
+  acc_if_body(id, owner);
+} return void;

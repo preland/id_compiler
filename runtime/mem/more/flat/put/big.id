@@ -1,0 +1,9 @@
+// The wide half of `poke`.
+
+poke32(word a, word v) {
+  st32(a, v);
+} return void;
+
+poke64(word a, word v) {
+  st64(a, v);
+} return void;

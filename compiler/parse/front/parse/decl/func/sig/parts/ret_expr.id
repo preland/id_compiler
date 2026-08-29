@@ -1,0 +1,11 @@
+// The return expression: none for `void`, otherwise an expression. A void
+// return is recorded as -1 in the func node's int field.
+
+ret_expr(int[] pos, string rt) {
+  int e = 0 - 1;
+  if(rt != "void") {
+    e = parse_expr(pos);
+  } else {
+    void_tail(pos);
+  }
+} return int e;

@@ -1,0 +1,31 @@
+// Expression printer (S-expression). Dispatch on node kind via a helper chain.
+//   int  -> digits        var/str -> the text
+//   bin  -> (op L R)       call    -> (call name ARGS)
+
+print_expr(int id) {
+  string s = "";
+  if(k_of(id) == "int") {
+    s = "" + i1_of(id);
+  } else {
+    s = pe_op(id);
+  }
+} return string s;
+
+pe_op(int id) {
+  string s = "";
+  if(k_of(id) == "bin") {
+    int i1_of_v = i1_of(id);
+    int i2_of_v = i2_of(id);
+    s = "(" + s1_of(id) + " " + print_expr(i1_of_v) + " " + print_expr(i2_of_v) + ")";
+  } else {
+    s = pe_atom(id);
+  }
+} return string s;
+
+pe_atom(int id) {
+  string s = s1_of(id);
+  if(k_of(id) == "call") {
+    int[] l1_of_v = l1_of(id);
+    s = "(call " + s1_of(id) + pe_args(l1_of_v) + ")";
+  }
+} return string s;

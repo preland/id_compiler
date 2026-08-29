@@ -1,0 +1,14 @@
+// The rest of decl_top.id's push_func, split across two more steps to stay
+// under the action limit. decl_top.id's other two functions already fill it.
+
+push_func_line(int[] pos) {
+  int cur_ln_v = cur_ln(pos);
+  push((import pline), cur_ln_v);
+  int ret_i = push_func_body(pos);
+} return int ret_i;
+
+push_func_body(int[] pos) {
+  int parse_func_v = parse_func(pos);
+  push((import prog), parse_func_v);
+  int ret_i = take_cases(pos);
+} return int ret_i;

@@ -1,0 +1,6 @@
+
+main(int argc, string[] argv) {
+  string a = "hello";
+  string b = " world";
+  print(a + b);
+} return int 0;

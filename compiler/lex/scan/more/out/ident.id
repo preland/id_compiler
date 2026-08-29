@@ -1,0 +1,7 @@
+// An identifier's token line. `kindof` decides between `ident` and `kw`, and
+// naming its answer is what put scan_ident one action over.
+
+scan_ident_out(string ident) {
+  string kind = kindof(ident);
+  print(kind + " " + ident);
+} return void;

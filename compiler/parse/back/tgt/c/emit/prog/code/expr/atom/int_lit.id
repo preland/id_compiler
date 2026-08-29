@@ -1,0 +1,10 @@
+// An integer literal emits as the digits the source wrote; one too wide for a
+// 32-bit int gets C's `LL` suffix so the constant keeps its value, matching
+// idc.py.
+
+int_code(int id) {
+  string s = s1_of(id);
+  if(i2_of(id) == 1) {
+    s = s1_of(id) + "LL";
+  }
+} return string s;

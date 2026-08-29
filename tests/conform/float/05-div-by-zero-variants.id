@@ -1,0 +1,8 @@
+// Division by zero on floats is IEEE, not a trap: it yields an infinity.
+// 0.0/0.0 is a NaN, whose printed spelling ("nan" vs "-nan") is glibc's
+// choice of sign bit rather than the language's -- docs/SPEC.md leaves it
+// unspecified, so it is not asserted here.
+main(int argc, string[] argv) {
+  print(1.0 / 0.0);
+  print((0.0 - 1.0) / 0.0);
+} return int 0;

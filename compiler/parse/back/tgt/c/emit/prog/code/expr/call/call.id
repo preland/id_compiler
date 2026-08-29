@@ -1,0 +1,14 @@
+// Call emission: a normal call is id_NAME(args); print coerces its single
+// argument to string context, matching idc.py's id_print(to_string(...)).
+
+emit_call(int id) {
+  string s = ec2(id);
+  if(s1_of(id) == "print") {
+    s = emit_print(id);
+  }
+} return string s;
+
+emit_print(int id) {
+  int arg = l1_of(id)[0];
+  string s = "id_print(" + arg_str(arg) + ")";
+} return string s;

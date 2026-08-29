@@ -1,0 +1,31 @@
+// An array literal has no type of its own.
+//
+// It used to take one from its first element, so `word[] xs = [0, 0, 0]` was
+// an int[] literal being refused -- and there was no way to write a word[]
+// literal at all, which turned every one of the kernel's into a declaration
+// plus a function full of pushes. The type now comes from the slot the
+// literal is going into, and the elements are judged against that slot's
+// element type, one at a time, the first no differently from the rest.
+//
+// Which means the first element can be the one that is wrong, and is named
+// when it is. `int[] xs = ["a", "b"]` reports element 0.
+
+bad_arr(string want, int e) {
+  int ok = 0;
+  if(ty_known(want) == 1 && ty_is_list(want) == 0) {
+    ok = 1;
+  } else if(ty_is_list(want) == 1) {
+    ok = arr_els(want, e);
+  }
+} return int ok;
+
+// Zero, because every disagreement here has already been reported against the
+// element that caused it. Handing a 1 back to the caller would add "cannot
+// initialize int[] 'xs' with a int[] value" underneath, which names neither
+// the element nor the type it actually has.
+arr_els(string want, int e) {
+  int i = 0;
+  while(i < flat_arg_count(e)) {
+    i = arr_el_at(want, e, i);
+  }
+} return int 0;

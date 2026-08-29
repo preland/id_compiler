@@ -1,0 +1,17 @@
+
+asm_tail(int[] pos) {
+  advance(pos);
+  string rt = parse_type(pos);
+  int ret_i = asm_tail_mid(pos, rt);
+} return int ret_i;
+
+asm_fin(int[] pos) {
+  advance(pos);
+  skip_semi(pos);
+} return int 0;
+
+init_asm_all() {
+  init_asm();
+  init_asm2();
+  int ret_i = init_asm_rest();
+} return int ret_i;

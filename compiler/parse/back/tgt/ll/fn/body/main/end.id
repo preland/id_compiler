@@ -1,0 +1,6 @@
+// The rest of `ll_wrap_tail`: the two lines that close the block, after the
+// call to `id_main` itself.
+ll_wrap_end() {
+  emit_line("  ret i32 %r");
+  emit_line("}");
+} return void;

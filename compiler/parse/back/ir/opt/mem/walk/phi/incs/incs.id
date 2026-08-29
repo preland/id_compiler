@@ -1,0 +1,20 @@
+
+m2r_incs(int f, int b, int ph, int j) {
+  int i = 0;
+  while(i < m2r_pre_count(b)) {
+    i = m2r_inc(f, b, ph, j, i);
+  }
+} return void;
+
+// A block's predecessor count, composed so `blk_pre` -- a call -- does not
+// sit inside `len`'s own argument list.
+m2r_pre_count(int b) {
+  int[] blk_pre_v = blk_pre(b);
+  int n = len(blk_pre_v);
+} return int n;
+
+m2r_inc(int f, int b, int ph, int j, int i) {
+  int pb = m2r_pre_at(b, i);
+  m2r_inc_at(f, ph, j, pb);
+  int ret_i = i + 1;
+} return int ret_i;

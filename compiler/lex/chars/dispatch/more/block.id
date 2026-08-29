@@ -1,0 +1,32 @@
+// `/* ... */` is not id syntax -- the language has line comments and nothing
+// else. Left alone, the `/` and `*` lex as operators and every word inside the
+// comment lexes as an identifier, so one comment becomes a page of diagnostics
+// about names nobody wrote.
+//
+// So the comment is consumed to its end and a single `/*` token is emitted in
+// its place. The rest of the file still lexes normally, and the parser has
+// exactly one thing to report.
+
+scan_block(string src, int i) {
+  int ni = 0;
+  if(charat(src, i) == 47 && charat(src, i + 1) == 42) {
+    ni = block_tok(src, i);
+  } else {
+    ni = scan_hashop(src, i);
+  }
+} return int ni;
+
+block_tok(string src, int i) {
+  print("op /*");
+  int e = skip_block(src, i + 2);
+} return int e;
+
+// eat_space is reused for the step because it is exactly the right one: it
+// advances by a character and bumps the line counter on a newline, which is
+// what keeps the lines after a multi-line comment reported correctly.
+skip_block(string src, int i) {
+  while(charat(src, i) != -1 && (charat(src, i) != 42 || charat(src, i + 1) != 47)) {
+    i = eat_space(src, i);
+  }
+  int ret_i = i + 2;
+} return int ret_i;

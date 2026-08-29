@@ -1,0 +1,24 @@
+// An operand in string context: the runtime call that turns a value of some
+// type into a string. A string is already one.
+lw_tostr(int node) {
+  string t = lw_ety(node);
+  int v = lw_expr(node);
+  int ret_i = lw_tostr_at(v, t);
+} return int ret_i;
+
+lw_tostr_at(int v, string t) {
+  int r = v;
+  if(t != "string") {
+    string lw_strfn_v = lw_strfn(t);
+    r = lw_callf(lw_strfn_v, "string", [v]);
+  }
+} return int r;
+
+lw_strfn(string t) {
+  string s = "id_str_of_word";
+  if(t == "int") {
+    s = "id_str_of_int";
+  } else if(t == "float") {
+    s = "id_str_of_float";
+  }
+} return string s;

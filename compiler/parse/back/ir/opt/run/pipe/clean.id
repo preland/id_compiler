@@ -1,0 +1,15 @@
+// Folding and sweeping, in that order and twice: a fold turns a comparison
+// into the value it was testing, which leaves the comparison dead, and the
+// sweep that removes it can expose another fold. Two rounds reach a fixed
+// point on everything the current folds can do; a third changes nothing, which
+// is why the loop is written out rather than iterated.
+opt_clean(int f) {
+  op_fold(f);
+  op_dce(f);
+  opt_clean2(f);
+} return void;
+
+opt_clean2(int f) {
+  op_fold(f);
+  op_dce(f);
+} return void;

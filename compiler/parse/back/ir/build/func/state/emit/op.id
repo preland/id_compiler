@@ -1,0 +1,28 @@
+// The three shapes an instruction is built in. An empty list literal needs a
+// typed context and an argument position is not one, so each of these names
+// the empty operand list once instead of every call site declaring a local.
+//
+// Two locals, not one used twice: a list is a reference, so passing the same
+// empty list as both the value list and the block list makes them one list.
+// mem2reg then pushed a phi's incoming value and read it back as a block.
+
+lw_op(string op, string ty, int a, int b, string s) {
+  int[] none = [];
+  int[] bl = [];
+  int ret_i = lw_emit(op, ty, a, b, s, none, bl);
+} return int ret_i;
+
+// A terminator: no value, no operand list, and the blocks it can reach.
+lw_term(string op, int a, int[] bl) {
+  int[] none = [];
+  int ret_i = lw_emit(op, "", a, 0 - 1, "", none, bl);
+} return int ret_i;
+
+// A leaf that lives in no block -- a constant, a global, an alloca, a
+// parameter. Built rather than emitted, because none of them is a line of the
+// function body.
+ir_leaf(string op, string ty, int a, int b, string s) {
+  int[] none = [];
+  int[] bl = [];
+  int ret_i = ir_insn(op, ty, a, b, s, none, bl);
+} return int ret_i;

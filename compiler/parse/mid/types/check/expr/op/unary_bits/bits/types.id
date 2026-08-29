@@ -1,0 +1,7 @@
+bits_types(int id, int a, int b) {
+  string lt = type_of(a);
+  string rt = type_of(b);
+  if(ty_pair_known(lt, rt) == 1 && (ty_int(lt) == 0 || ty_int(rt) == 0)) {
+    bits_err(id, lt, rt);
+  }
+} return void;

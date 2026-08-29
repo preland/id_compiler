@@ -1,0 +1,25 @@
+// Emit an expression as C. int -> digits; var/str -> the text; bin -> infix
+// (or id_concat for string `+`); call -> id_NAME(args) (print wraps its arg).
+
+emit_expr(int id) {
+  string s = int_code(id);
+  if(k_of(id) != "int") {
+    s = ee2(id);
+  }
+} return string s;
+
+// Compute the recursive bin form only when the node is a bin -- evaluating it
+// eagerly would recurse into non-existent children of leaf nodes.
+ee2(int id) {
+  string s = ee3(id);
+  if(k_of(id) == "bin") {
+    s = emit_bin(id);
+  }
+} return string s;
+
+ee3(int id) {
+  string s = ee4(id);
+  if(k_of(id) == "call") {
+    s = emit_call(id);
+  }
+} return string s;

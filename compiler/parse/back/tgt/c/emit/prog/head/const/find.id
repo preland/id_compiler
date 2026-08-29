@@ -1,0 +1,20 @@
+// The declaration node a constant's name came from. Looked up by name rather
+// than by position: the export table and `cdecl` do run in step today, because
+// a constant is registered while parsing and every other export while
+// collecting, but that is an ordering nobody states and a search costs nothing
+// at the handful of constants a conf.id holds.
+
+const_decl(string name) {
+  int d = 0 - 1;
+  int i = 0;
+  while(i < len((import cdecl))) {
+    d = const_pick(i, name, d);
+    i = i + 1;
+  }
+} return int d;
+
+const_pick(int i, string name, int d) {
+  if(s2_of((import cdecl)[i]) == name) {
+    d = (import cdecl)[i];
+  }
+} return int d;

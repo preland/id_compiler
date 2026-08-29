@@ -1,0 +1,33 @@
+// The block and function columns. A block is a straight line of instructions
+// ending in a branch or a return; a function is a list of blocks, entry first.
+//
+//   bfunc   the IR function a block belongs to
+//   binsn   its instructions, in order
+//   blabel  its label
+//   bpred   its predecessors -- computed by a pass, not maintained by hand,
+//           because a branch rewrite that forgets to fix them is silent
+//
+//   fnname  the id function's name
+//   fnret   its return type
+//   fnpar   its parameters, as `param` instructions
+//   fnblk   its blocks, entry first
+//   fnnode  the AST node it was lowered from
+//   irprog  every IR function, in the order they were lowered
+
+init_ir4() {
+  export int[][] binsn = [];
+  export string[] blabel = [];
+  int ret_i = init_ir5();
+} return int ret_i;
+
+init_ir5() {
+  export string[] fnname = [];
+  export string[] fnret = [];
+  int ret_i = init_ir6();
+} return int ret_i;
+
+init_ir6() {
+  export int[][] fnblk = [];
+  export int[] fnnode = [];
+  int ret_i = init_ir8();
+} return int ret_i;

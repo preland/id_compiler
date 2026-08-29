@@ -1,0 +1,30 @@
+
+ll_asm_par(int r) {
+  string s = "";
+  int i = 0;
+  while(i < len((import afparams)[r])) {
+    string s1_of_v = s1_of((import afparams)[r][i]);
+    s = s + ll_sep(i) + ll_ty(s1_of_v) + " %a" + i;
+    i = i + 1;
+  }
+} return string s;
+
+// Volatile with a memory clobber on every block, as in the C target: a wrong
+// hand-written clobber list is a miscompile that appears months later, and the
+// whole body of an `asm` function is the block, so nothing of the caller's is
+// live across it.
+ll_asm_body(int r) {
+  string ty = ll_ty((import afret)[r]);
+  string q = chr(34);
+  ll_asm_body2(r, ty, q);
+} return void;
+
+// One `=r` for the result, one `r` per parameter, then the memory clobber.
+ll_asm_cons(int r, int i) {
+  string s = "=r";
+  while(i < len((import afparams)[r])) {
+    s = s + ",r";
+    i = i + 1;
+  }
+  string ret_s = s + ",~{memory}";
+} return string ret_s;

@@ -1,0 +1,11 @@
+lw_if_arms(int node, int thn, int alt, int jn) {
+  int[] l1_of_v = l1_of(node);
+  lw_arm(thn, l1_of_v, jn);
+  int ret_i = lw_if_arms2(node, alt, jn);
+} return int ret_i;
+
+lw_if_arms2(int node, int alt, int jn) {
+  int[] l2_of_v = l2_of(node);
+  lw_arm(alt, l2_of_v, jn);
+  int ret_i = lw_go(jn);
+} return int ret_i;

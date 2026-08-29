@@ -1,0 +1,26 @@
+// A block is `{ stmt* }`, returning the list of statement node ids.
+
+parse_block(int[] pos) {
+  int[] stmts = [];
+  expect_text(pos, "{");
+  scan_block(pos, stmts);
+} return int[] stmts;
+
+scan_block(int[] pos, int[] stmts) {
+  advance(pos);
+  fill_block(pos, stmts);
+  advance(pos);
+} return void;
+
+// Each statement records the line it began on, captured before it is parsed
+// -- afterwards the cursor has moved past it. This is the only place every
+// statement of a block passes through, so it is the one hook needed; the
+// alternative, threading a line into every constructor, would touch dozens of
+// signatures for the same result.
+fill_block(int[] pos, int[] stmts) {
+  while(cur_text(pos) != "}" && cur_kind(pos) != "eof") {
+    no_return_here(pos);
+    int stmt_at_line_v = stmt_at_line(pos);
+    push(stmts, stmt_at_line_v);
+  }
+} return void;

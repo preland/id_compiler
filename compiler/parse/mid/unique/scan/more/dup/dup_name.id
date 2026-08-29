@@ -1,0 +1,37 @@
+// The other "no two functions may be the same" rule: two functions may not
+// share a NAME. It sits with the logic-uniqueness scan because they are the
+// same rule at two strengths, and because getting this one wrong makes that
+// one lie -- two functions called `f` with identical bodies are reported by
+// the logic check as duplicates of each other, naming `f` as a duplicate of
+// `f` at its own line, which explains nothing.
+//
+// idc.py raises this while building its function table, before any other
+// check runs; here it runs first among the body checks, which is the same
+// place in the order.
+
+chk_dupfn() {
+  int i = 0;
+  while(i < len((import prog))) {
+    dupfn_at(i);
+    i = i + 1;
+  }
+} return void;
+
+// Reported against every definition after the first, so three functions of
+// one name draw two diagnostics rather than one -- the checker reports every
+// violation, and each later definition is one.
+// The reserved-name check rides this walk rather than opening its own: it is
+// the same question asked of the same name -- is this name already taken --
+// and a second pass over `prog` to ask it would be a function whose only job
+// is to call resv_at.
+dupfn_at(int i) {
+  string s1_of_v = s1_of((import prog)[i]);
+  int j = first_fn(s1_of_v);
+  dupfn_check(i, j);
+} return void;
+
+dupfn_err(int i, int j) {
+  string prog_loc_v = prog_loc(i);
+  string s1_of_v = s1_of((import prog)[i]);
+  dupfn_print(prog_loc_v, s1_of_v, j);
+} return void;

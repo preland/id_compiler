@@ -1,0 +1,16 @@
+// The line a function was declared on, from the parallel `pline` list.
+func_line(string fname) {
+  int i = 0;
+  int n = 1;
+  while(i < len((import prog))) {
+    n = func_line_at(i, fname, n);
+    i = i + 1;
+  }
+} return int n;
+
+func_line_at(int i, string fname, int n) {
+  int r = n;
+  if(s1_of((import prog)[i]) == fname && i < len((import pline))) {
+    r = (import pline)[i];
+  }
+} return int r;

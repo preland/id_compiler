@@ -1,0 +1,23 @@
+// The type of an expression. type_of answers it for everything the checks see,
+// but a constant declared in a conf.id belongs to no function and is in
+// neither prog nor the variable table -- it exists only as an export -- so a
+// read of one falls back to the export's declared type.
+lw_ety(int node) {
+  string t = type_of(node);
+  if(t == "") {
+    string s1_of_v = s1_of(node);
+    t = lw_vty(s1_of_v);
+  }
+} return string t;
+
+lw_load_at(int addr, string ty) {
+  int ret_i = lw_op("load", ty, addr, 0 - 1, "");
+} return int ret_i;
+
+// An unnamed stack slot, for a value the source never named -- the result of a
+// short-circuiting `&&`, and nothing else so far.
+lw_tmp(string ty) {
+  int v = ir_leaf("alloca", ty, 0 - 1, 0 - 1, "");
+  int lw_ent_v = lw_ent();
+  ir_add(lw_ent_v, v);
+} return int v;

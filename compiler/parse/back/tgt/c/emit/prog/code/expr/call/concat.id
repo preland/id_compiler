@@ -1,0 +1,13 @@
+// String concatenation, and an operand coerced to string context.
+
+emit_concat(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string s = "id_concat(" + arg_str(i1_of_v) + ", " + arg_str(i2_of_v) + ")";
+} return string s;
+
+arg_str(int id) {
+  string emit_expr_v = emit_expr(id);
+  string type_of_v = type_of(id);
+  string ret_s = to_str(emit_expr_v, type_of_v);
+} return string ret_s;

@@ -1,0 +1,12 @@
+
+blk_fn(int b) {
+  int ret_i = (import bfunc)[b];
+} return int ret_i;
+
+blk_ins(int b) {
+  int[] ret_li = (import binsn)[b];
+} return int[] ret_li;
+
+blk_lbl(int b) {
+  string ret_s = (import blabel)[b];
+} return string ret_s;

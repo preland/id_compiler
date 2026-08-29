@@ -1,0 +1,18 @@
+
+// Signature and return-variable declaration of one asm function's C body.
+emit_asm_one(int r) {
+  string c_type_v = c_type((import afret)[r]);
+  string list_params_v = list_params((import afparams)[r]);
+  emit_asm_header(r, c_type_v, list_params_v);
+} return void;
+
+emit_asm_header(int r, string c_type_v, string list_params_v) {
+  emit_line(c_type_v + " id_" + (import afname)[r] + "(" + list_params_v + ") {");
+  emit_asm_decl(r);
+} return void;
+
+emit_asm_decl(int r) {
+  string c_type_v2 = c_type((import afret)[r]);
+  emit_line("    " + c_type_v2 + " " + (import afretn)[r] + ";");
+  asm_stmt(r);
+} return void;

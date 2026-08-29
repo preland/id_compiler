@@ -1,0 +1,21 @@
+
+lw_rhs(int node, int slot, int bdy, int jn) {
+  lw_go(bdy);
+  int i2_of_v = i2_of(node);
+  int ret_i = lw_rhs_val(node, slot, i2_of_v, jn);
+} return int ret_i;
+
+// Continues lw_rhs: the right-hand side's value, once its block is current.
+lw_rhs_val(int node, int slot, int e2, int jn) {
+  int lw_cond_v = lw_cond(e2);
+  int lw_conv_v = lw_conv(lw_cond_v, "bool", "int");
+  int ret_i = lw_rhs_store(slot, lw_conv_v, jn);
+} return int ret_i;
+
+// Continues lw_rhs_val: store the value, then join the way lb2/lw_logic2
+// already set up.
+lw_rhs_store(int slot, int lw_conv_v, int jn) {
+  lw_store_at(slot, lw_conv_v);
+  lw_term("br", 0 - 1, [jn]);
+  int ret_i = lw_go(jn);
+} return int ret_i;

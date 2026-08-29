@@ -1,0 +1,25 @@
+// A phi for every slot in every block but the entry, before anything is
+// renamed. Placing them maximally means the walk can visit blocks in any
+// order: a block's incoming value is its own phi, never a predecessor's
+// outgoing one, so nothing depends on what has been processed yet.
+
+m2r_phis(int f) {
+  int i = 1;
+  while(i < blk_count(f)) {
+    m2r_phi_blk(f, i);
+    i = i + 1;
+  }
+} return void;
+
+m2r_phi_blk(int f, int i) {
+  int j = 0;
+  while(j < len((import pra))) {
+    j = m2r_phi_one(f, i, j);
+  }
+} return void;
+
+m2r_phi_one(int f, int i, int j) {
+  int ph = m2r_phi_make(i, j);
+  m2r_phi_place(f, i, ph);
+  int ret_i = j + 1;
+} return int ret_i;

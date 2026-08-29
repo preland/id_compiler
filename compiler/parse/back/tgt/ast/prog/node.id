@@ -1,0 +1,29 @@
+// List joiner (params or statements), node routing, and the first statement
+// form. print_node sends params to a param rendering and everything else to
+// the statement printer.
+
+print_list(int[] list) {
+  string out = "";
+  int i = 0;
+  while(i < len(list)) {
+    out = out + " " + print_node(list[i]);
+    i = i + 1;
+  }
+} return string out;
+
+print_node(int id) {
+  string s = "(param " + s1_of(id) + " " + s2_of(id) + ")";
+  if(k_of(id) != "param") {
+    s = print_stmt(id);
+  }
+} return string s;
+
+print_stmt(int id) {
+  string s = "";
+  if(k_of(id) == "decl") {
+    int i1_of_v = i1_of(id);
+    s = "(decl " + s1_of(id) + " " + s2_of(id) + " " + print_expr(i1_of_v) + ")";
+  } else {
+    s = ps2(id);
+  }
+} return string s;

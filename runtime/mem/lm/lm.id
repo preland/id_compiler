@@ -1,0 +1,37 @@
+// String lengths, remembered.
+//
+// A string is NUL-terminated, so its length is a scan, and `charat` needs the
+// length to know where the end is -- which makes walking a string O(n^2)
+// unless the length is remembered. The hosted runtime learned that twice: once
+// with a memo of one string, and again when one turned out not to be enough
+// for a program that reads its input and builds a string at the same time. A
+// megabyte of that cost 8.4 seconds with one entry and 6 milliseconds with
+// eight.
+//
+// Eight entries and a round-robin cursor, at a fixed offset in the arena:
+//
+//   heap + 8   .. + 136   eight pairs of (address, length)
+//   heap + 144 .. + 152   which pair to replace next
+//
+// In the store rather than in a list, because a list is one of the things this
+// runtime provides, and at a known offset rather than behind an initialiser,
+// because nothing is guaranteed to run before the first string is walked.
+
+lm_base() {
+  word ret_w = heap_ptr() + 8;
+} return word ret_w;
+
+lm_wipe(word a, int i) {
+  while(i < 18) {
+    st64(a + i * 8, 0);
+    i = i + 1;
+  }
+} return void;
+
+// The length of the string at `a`, scanned once and then remembered. Address
+// zero means an empty slot, and the arena never hands out zero -- exactly so
+// that it can mean nothing.
+lm_len(word a) {
+  int at = lm_find(a, 0, 0 - 1);
+  int ret_i = lm_get(a, at);
+} return int ret_i;

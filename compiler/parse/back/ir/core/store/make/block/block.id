@@ -1,0 +1,19 @@
+// A block belongs to a function from the moment it exists and is appended to
+// that function's block list in creation order, so the entry block is always
+// first.
+
+ir_block(int f, string lbl) {
+  ir_blk2(f, lbl);
+  ir_blk3();
+  int ret_i = ir_blk4(f);
+} return int ret_i;
+
+ir_blk2(int f, string lbl) {
+  push((import bfunc), f);
+  push((import blabel), lbl);
+} return void;
+
+ir_blk3() {
+  push((import binsn), []);
+  push((import bpred), []);
+} return void;

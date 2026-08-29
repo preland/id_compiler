@@ -1,0 +1,8 @@
+
+// The three lines of one asm function's body, once every piece of the
+// __asm__ statement has been assembled.
+asm_stmt_lines(int r, string asm_text_v, string chr_v, string chr_v2, string asm_in_ops_v, string chr_v3, string chr_v4) {
+  emit_line("    __asm__ __volatile__(" + asm_text_v + " : [" + (import afretn)[r] + "] " + chr_v + "=r" + chr_v2 + " (" + (import afretn)[r] + ") : " + asm_in_ops_v + " : " + chr_v3 + "memory" + chr_v4 + ");");
+  emit_line("    return " + (import afretn)[r] + ";");
+  emit_line("}");
+} return void;

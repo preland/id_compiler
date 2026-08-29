@@ -1,0 +1,16 @@
+// EXPECT: block comments are not supported
+// The same mistake as block_comment.id, but at the top of the file rather
+// than inside a function -- which is where a header comment actually goes,
+// and so the case a newcomer hits first.
+//
+// Only the statement parser asked "is this token an operator?", so at top
+// level `/*` was taken as a function *name*, the emitter wrote
+// `int id_/*(int int, int ,, IdList* argv);`, and `cc` rejected it -- which
+// bin/idc reported as "this is a bug in the self-hosted compiler; please
+// report it", inviting a bug report about the user's own typo. idc.py had
+// always got this right, so it was also a diagnostic-parity hole that
+// tests/invalid.sh could not see, because its only case was in a body.
+/* a header comment, written the way every other language spells it */
+main(int argc, string[] argv) {
+  print(1);
+} return int 0;

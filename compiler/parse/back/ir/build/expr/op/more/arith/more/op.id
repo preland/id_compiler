@@ -1,0 +1,19 @@
+// The left operand, converted to the widened type -- split out so lw_arith
+// stays within the action limit; lw_arith2 does the same for the right one.
+lw_arith_lhs(int node, string t) {
+  int i1_of_v = i1_of(node);
+  int a = lw_as(i1_of_v, t);
+} return int a;
+
+// Continues lw_arith3: whether the operator is an instruction or a runtime
+// helper. The operator string is read once by the caller and passed in,
+// rather than read again here for the helper branch.
+lw_arith3_op(int node, int a, int b, string t, string op) {
+  int v = 0 - 1;
+  if(lw_helper(op, t) == "") {
+    string lw_irop_v = lw_irop(op, t);
+    v = lw_op(lw_irop_v, t, a, b, "");
+  } else {
+    v = lw_hcall(node, a, b, t);
+  }
+} return int v;

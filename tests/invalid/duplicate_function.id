@@ -1,0 +1,3 @@
+// EXPECT: already defined at
+dup() {} return void;
+dup() {} return void;

@@ -1,0 +1,16 @@
+
+lw_iop_int(string op) {
+  string p = lw_iop_int2(op);
+  if(op == "+") {
+    p = "add";
+  } else if(op == "-") {
+    p = "sub";
+  }
+} return string p;
+
+lw_iop_int2(string op) {
+  string p = lw_iop_bits(op);
+  if(op == "*") {
+    p = "mul";
+  }
+} return string p;

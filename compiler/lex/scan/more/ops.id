@@ -1,0 +1,29 @@
+// Operator scanning: match the eight two-character operators, else a single
+// character. No loop needed -- just one char of lookahead.
+//
+// The single-character case has no whitelist: any byte the dispatch chain did
+// not classify is emitted as a one-character operator, which is why `& | ^ ~`
+// needed no change here when they were added to the language.
+
+is_two_op(string two) {
+  int ok = 0;
+  if(two == "==" || two == "!=" || two == "<=" || two == ">=" || two == "&&" || two == "||" || two == "<<" || two == ">>") {
+    ok = 1;
+  }
+} return int ok;
+
+// How many characters the operator at `i` spans (2 or 1). Used by scan_op's
+// return clause so the function body stays within the action limit.
+oplen(string src, int i) {
+  int n = 1;
+  string two = two_at(src, i);
+  if(is_two_op(two)) {
+    n = 2;
+  }
+} return int n;
+
+scan_op(string src, int i) {
+  string two = two_at(src, i);
+  scan_op_out(src, i, two);
+  int ret_i = i + oplen(src, i);
+} return int ret_i;

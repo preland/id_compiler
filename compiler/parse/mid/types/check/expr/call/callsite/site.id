@@ -1,0 +1,41 @@
+// Calling a function this program defines: the right number of arguments, of
+// the right types, and the right thing returned.
+//
+// These are the checks that need more of the callee than its return type --
+// they need its parameter list -- which is why the symbol table carries a
+// node id per function. Everything else in mid/ has only ever had to answer
+// "what does this evaluate to"; this family answers "may it be written that
+// way", and that is the difference between a diagnostic here and an
+// undeclared-function error from `cc` about generated code.
+
+chk_callsite(int id) {
+  string s1_of_v = s1_of(id);
+  int fn = func_node(s1_of_v);
+  if(fn >= 0) {
+    chk_arity(id, fn);
+  }
+} return void;
+
+// The func node behind a called name, or -1 when there is none to check
+// against: a builtin, an asm function (its parameters live in the asm
+// tables, and idc.py does not check a call to one either), or a name a
+// native backend will supply at link time.
+func_node(string name) {
+  int n = 0 - 1;
+  int idx = find_str((import fnames), name);
+  if(idx >= 0) {
+    n = (import fnodes)[idx];
+  }
+} return int n;
+
+// Arity first, and nothing else if it is wrong: pairing arguments off with
+// parameters that are not there would report a second, invented type error
+// about whichever pair happened to line up.
+chk_arity(int id, int fn) {
+  int mismatch = arity_mismatch(id, fn);
+  if(mismatch == 1) {
+    arity_err(id, fn);
+  } else {
+    chk_argtypes(id, fn);
+  }
+} return void;

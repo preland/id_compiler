@@ -1,0 +1,15 @@
+// Only names this program actually defines are added: a builtin and a
+// link-time symbol have no body to reach into, and adding them would make the
+// set grow forever on the fixpoint test.
+reach_add(string name) {
+  if(is_reach(name) == 0 && find_str((import fnames), name) >= 0) {
+    push((import rfn), name);
+  }
+} return void;
+
+// One more sweep with the imports switched on, now that the reachable set is
+// final.
+dead_final() {
+  lset((import dphase), 0, 1);
+  reach_funcs(0, 0);
+} return void;

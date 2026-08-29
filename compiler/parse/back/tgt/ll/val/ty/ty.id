@@ -1,0 +1,27 @@
+// An `id` type in LLVM's spelling. Every reference type -- a string, a list of
+// anything -- is an opaque pointer: what is behind it is the runtime's
+// business and the module never looks.
+ll_ty(string t) {
+  string s = ll_ty2(t);
+  if(t == "int") {
+    s = "i32";
+  } else if(t == "word") {
+    s = "i64";
+  }
+} return string s;
+
+ll_ty2(string t) {
+  string s = "ptr";
+  if(t == "float") {
+    s = "double";
+  } else if(t == "bool" || t == "" || t == "void") {
+    s = ll_ty3(t);
+  }
+} return string s;
+
+ll_ty3(string t) {
+  string s = "void";
+  if(t == "bool") {
+    s = "i1";
+  }
+} return string s;

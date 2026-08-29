@@ -1,0 +1,10 @@
+lw_if_join(int node, int c, int thn, int alt) {
+  int lw_fn_v = lw_fn();
+  int jn = ir_block(lw_fn_v, "join");
+  lw_if3(node, c, thn, alt, jn);
+} return void;
+
+lw_if3(int node, int c, int thn, int alt, int jn) {
+  lw_term("cbr", c, [thn, alt]);
+  int ret_i = lw_if_arms(node, thn, alt, jn);
+} return int ret_i;

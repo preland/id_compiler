@@ -1,0 +1,21 @@
+acc_stmt2(int id, string owner) {
+  if(k_of(id) == "while") {
+    acc_while(id, owner);
+  } else {
+    acc_stmt3(id, owner);
+  }
+} return void;
+
+acc_while(int id, string owner) {
+  int i1_of_v = i1_of(id);
+  acc_expr(i1_of_v, owner, (import nline)[id]);
+  acc_while_body(id, owner);
+} return void;
+
+acc_stmt3(int id, string owner) {
+  if(k_of(id) == "assign") {
+    acc_assign(id, owner);
+  } else {
+    acc_stmt4(id, owner);
+  }
+} return void;

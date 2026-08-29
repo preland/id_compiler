@@ -1,0 +1,22 @@
+// Recurse into compound statements when collecting exports.
+
+exp_nested(int id, string owner) {
+  if(k_of(id) == "if") {
+    exp_branches(id, owner);
+  } else {
+    exp_loop(id, owner);
+  }
+} return void;
+
+exp_branches(int id, string owner) {
+  int[] l1_of_v = l1_of(id);
+  exp_list(l1_of_v, owner);
+  exp_else(id, owner);
+} return void;
+
+exp_loop(int id, string owner) {
+  if(k_of(id) == "while") {
+    int[] l1_of_v = l1_of(id);
+    exp_list(l1_of_v, owner);
+  }
+} return void;

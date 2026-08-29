@@ -1,0 +1,5 @@
+// EXPECT: push expects a list
+main() {
+  int x = 3;
+  push(x, 1);
+} return int 0;

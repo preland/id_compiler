@@ -1,0 +1,30 @@
+// The two-operand shape shared by a binary operator and an index, and the
+// comma-separated argument list.
+//
+// Both operands are canonicalised into locals first rather than inside the
+// returned expression: canonicalising has a side effect (it can give a name
+// its position), and the order in which the parts of one expression are
+// evaluated is not specified.
+
+canon_pair(int a, int b) {
+  string out = canon_expr(a);
+  string val = canon_expr(b);
+  string ret_s = "(" + out + "," + val + ")";
+} return string ret_s;
+
+canon_args(int[] args) {
+  string out = "";
+  int i = 0;
+  while(i < len(args)) {
+    out = out + sep_at(",", i) + canon_expr(args[i]);
+    i = i + 1;
+  }
+} return string out;
+
+// The separator before element i of a list: nothing before the first.
+sep_at(string s, int i) {
+  string out = "";
+  if(i > 0) {
+    out = s;
+  }
+} return string out;

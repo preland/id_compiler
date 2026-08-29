@@ -1,0 +1,30 @@
+// The unit columns.
+//
+//   nunit  the unit each AST node was parsed in, parallel to nkind
+//   ucur   the unit the parser is reading now, set by every `#file` marker
+//   vunit  the unit each row of vnames/vtypes was declared in
+//
+// A variable's type is looked up by name alone, which is only sound while a
+// name keeps one type -- and it does, within a unit. So the symbol table is
+// keyed by unit as well as name, and a node carries the unit it was written
+// in so that every lookup can say which one it means.
+init_units() {
+  export int[] nunit = [];
+  export int[] ucur = [0];
+  export int[] vunit = [];
+} return int 0;
+
+// The rest of cur_file.id's take_file, split across two more steps to stay
+// under the action limit -- and a natural fit here, since the second step
+// is the one that writes ucur.
+take_file_mid(int[] pos, string file_path_v) {
+  push((import fseen), file_path_v);
+  string cur_text_v2 = cur_text(pos);
+  take_file_unit(pos, cur_text_v2);
+} return void;
+
+take_file_unit(int[] pos, string cur_text_v2) {
+  int file_unit_v = file_unit(cur_text_v2);
+  lset((import ucur), 0, file_unit_v);
+  advance(pos);
+} return void;

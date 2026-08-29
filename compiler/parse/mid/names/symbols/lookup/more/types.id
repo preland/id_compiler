@@ -1,0 +1,17 @@
+// Split from lookup_var and lookup_func so each block stays within the
+// action limit: turning a found row index into the type at that row, or ""
+// when the index missed.
+
+vtype_at(int idx) {
+  string t = "";
+  if(idx >= 0) {
+    t = (import vtypes)[idx];
+  }
+} return string t;
+
+fret_at(int idx) {
+  string t = "";
+  if(idx >= 0) {
+    t = (import frets)[idx];
+  }
+} return string t;

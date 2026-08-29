@@ -1,0 +1,29 @@
+// The source line of the token the cursor is on.
+cur_ln(int[] pos) {
+  int n = 1;
+  if(pos[0] < len((import tline))) {
+    n = (import tline)[pos[0]];
+  }
+} return int n;
+
+//   pline  the line each entry of `prog` was declared on
+//   nline  the line each AST node began on, 0 where it is not a statement
+// chkfail lives here rather than in check_program() for two reasons: the
+// parser needs to record a syntax error long before the checks run, and
+// check_program()'s block was at its 3-action limit, which made its single
+// free slot a contended resource between everything that wanted to hook in.
+init_lines2() {
+  export int[] pline = [];
+  export int[] nline = [];
+  init_lines3();
+} return void;
+
+// Writing a node's line goes through lset (mid/names/limits/shape/block/failed.id):
+// a second helper with the same body is a duplicate-logic error, and one
+// shared store-into-an-imported-list helper is the right answer anyway.
+
+stmt_at_line(int[] pos) {
+  int n = cur_ln(pos);
+  int id = parse_stmt(pos);
+  lset((import nline), id, n);
+} return int id;

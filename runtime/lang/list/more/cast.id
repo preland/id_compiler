@@ -1,0 +1,14 @@
+// A list is a header in the arena, and the language calls its address a list.
+//
+// These are the same non-instructions as `s2w`/`w2s` in runtime/mem/raw/raw.id and
+// they exist for the same reason: `id` has no cast, and giving it one so that
+// the runtime could describe its own data structures would be a language
+// change made to serve an implementation detail.
+
+asm "x86_64-unknown-none" w2l(word a) {
+  "movq %[a], %[ret]"
+} return int[] ret;
+
+asm "x86_64-unknown-none" l2w(int[] xs) {
+  "movq %[xs], %[ret]"
+} return word ret;

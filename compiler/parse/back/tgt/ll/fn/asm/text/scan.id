@@ -1,0 +1,26 @@
+// How far a token reaches. An operand reference runs to its closing bracket;
+// everything else is one character, and `%%` is two.
+ll_asm_step(string s, int i) {
+  int n = i + 1;
+  if(charat(s, i) == 37 && charat(s, i + 1) == 37) {
+    n = i + 2;
+  } else if(charat(s, i) == 37) {
+    n = ll_asm_end(s, i) + 1;
+  }
+} return int n;
+
+ll_asm_end(string s, int i) {
+  int n = i;
+  while(n < len(s) && charat(s, n) != 93) {
+    n = n + 1;
+  }
+} return int n;
+
+// Where the operand name starts: past `%[`, or past `%x[` when a modifier
+// letter comes first.
+ll_asm_nm(string s, int i) {
+  int n = i + 2;
+  if(charat(s, i + 1) != 91) {
+    n = i + 3;
+  }
+} return int n;

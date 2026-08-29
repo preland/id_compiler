@@ -1,0 +1,28 @@
+// The instruction lines are stored with their quotes, so they are emitted as
+// adjacent C string literals with a newline-tab literal between them -- C
+// concatenates those into the single string the asm statement wants.
+asm_text(int r) {
+  string out = "";
+  int i = 0;
+  while(i < len((import aflines)[r])) {
+    out = out + asm_sep(i) + (import aflines)[r][i];
+    i = i + 1;
+  }
+} return string out;
+
+asm_sep(int i) {
+  string s = "";
+  if(i > 0) {
+    s = " " + chr(34) + "\\n\\t" + chr(34) + " ";
+  }
+} return string s;
+
+// Parameters become named input operands, register-allocated.
+asm_in_ops(int[] params) {
+  string out = "";
+  int i = 0;
+  while(i < len(params)) {
+    out = out + sep_arg(i) + "[" + s2_of(params[i]) + "] " + chr(34) + "r" + chr(34) + " (" + s2_of(params[i]) + ")";
+    i = i + 1;
+  }
+} return string out;

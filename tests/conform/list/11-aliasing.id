@@ -1,0 +1,11 @@
+
+setup() {
+  int[] xs = [1, 2, 3];
+  int[] ys = xs;
+  ys[0] = 500;
+} return int[] xs;
+
+main() {
+  int[] xs = setup();
+  print("" + xs[0]);
+} return int 0;

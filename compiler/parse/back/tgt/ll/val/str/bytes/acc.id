@@ -1,0 +1,12 @@
+// The rest of `ll_bytes`: the accumulating loop, kept apart because a
+// `string` parameter is a value -- appending to it here and appending to it
+// in the caller are appends to two different copies, so the loop has to own
+// the accumulator from "" to the finished text.
+ll_bytes_acc(string s) {
+  string out = "";
+  int i = 1;
+  while(i < len(s) - 1) {
+    out = out + ll_piece(s, i);
+    i = ll_step(s, i);
+  }
+} return string out;

@@ -1,0 +1,7 @@
+// A branch built rather than emitted: it goes at the end of a block the
+// lowering is not currently in. The only one is the entry block's jump into
+// the body, appended after every alloca the function turned out to need.
+lw_brto(int b) {
+  int[] none = [];
+  int ret_i = ir_insn("br", "", 0 - 1, 0 - 1, "", none, [b]);
+} return int ret_i;

@@ -1,0 +1,18 @@
+
+lw_push(int node) {
+  int[] l1_of_v = l1_of(node);
+  string lw_ety_v = lw_ety(l1_of_v[0]);
+  int ret_i = lw_push_tail(node, l1_of_v, lw_ety_v);
+} return int ret_i;
+
+lw_push2(int node, int a, string elem) {
+  int[] l1_of_v = l1_of(node);
+  int lw_as_v = lw_as(l1_of_v[1], elem);
+  int ret_i = lw_push2_tail(a, lw_as_v, elem);
+} return int ret_i;
+
+lw_pop(int node) {
+  int[] l1_of_v = l1_of(node);
+  string lw_ety_v = lw_ety(l1_of_v[0]);
+  int ret_i = lw_pop_mid(l1_of_v, lw_ety_v);
+} return int ret_i;

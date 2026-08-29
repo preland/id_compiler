@@ -1,0 +1,16 @@
+// The i-side of report_dup's message: the location the diagnostic points at,
+// and the assembly of the two halves. Split out so that block stays within
+// the action limit -- fname_at(i) was read three times over in the original
+// and nothing between the reads could change it, so it is read once here and
+// passed through.
+
+dup_report(string name_i, int j) {
+  string loc_at_v = dup_loc(name_i);
+  string tail_v = dup_tail(j);
+  print(loc_at_v + "function '" + name_i + "' has the same signature and logic as " + tail_v);
+} return void;
+
+dup_loc(string name_i) {
+  int func_line_v = func_line(name_i);
+  string loc_at_v = loc_at(name_i, func_line_v);
+} return string loc_at_v;

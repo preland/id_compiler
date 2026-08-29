@@ -1,0 +1,6 @@
+// The last step of top.id's asm_sig -- more.id is already full.
+
+asm_sig_tail(int[] pos, int[] parse_params_v) {
+  push((import afparams), parse_params_v);
+  int ret_i = asm_lines(pos);
+} return int ret_i;

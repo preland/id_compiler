@@ -1,0 +1,8 @@
+// EXPECT: takes 1 argument
+main() {
+  int r = inc(1, 2);
+} return int r;
+
+inc(int n) {
+  int m = n + 1;
+} return int m;

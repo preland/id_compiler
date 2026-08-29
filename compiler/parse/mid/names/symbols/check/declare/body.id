@@ -1,0 +1,27 @@
+// The body walk: every declaration, including those nested in an if or a
+// while. Declarations are function-scoped in `id`, so a name declared inside a
+// loop is a declaration of the whole function and collides like any other.
+
+reg_decls(int[] stmts, string owner) {
+  int i = 0;
+  while(i < len(stmts)) {
+    reg_stmt(stmts[i], owner);
+    i = i + 1;
+  }
+} return void;
+
+reg_stmt(int id, string owner) {
+  if(k_of(id) == "decl") {
+    reg_decl_stmt(id, owner);
+  } else {
+    reg_nested(id, owner);
+  }
+} return void;
+
+reg_nested(int id, string owner) {
+  if(k_of(id) == "if") {
+    reg_branches(id, owner);
+  } else {
+    reg_loop(id, owner);
+  }
+} return void;

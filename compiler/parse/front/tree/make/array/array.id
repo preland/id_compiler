@@ -1,0 +1,20 @@
+// Constructors for the array/index nodes.
+//   index:   ni1 = base expr id, ni2 = index expr id
+//   arr:     nl1 = element node ids
+//   iassign: ni1 = base, ni2 = index (copied from the parsed index target),
+//            nl1 = a one-element list holding the value expr id
+
+node_index(int base, int idx) {
+  int ret_i = newleaf("index", base, idx, "", "");
+} return int ret_i;
+
+node_arr(int[] elems) {
+  int[] none = [];
+  int ret_i = newnode("arr", 0, 0, "", "", elems, none);
+} return int ret_i;
+
+node_iassign(int target, int value) {
+  int[] vlist = [value];
+  int[] none = [];
+  int ret_i = node_iassign_tail(target, vlist, none);
+} return int ret_i;

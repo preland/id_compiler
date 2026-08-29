@@ -1,0 +1,24 @@
+// The builtin names, as data.
+//
+// They are written once, as one space-separated literal, and split into a
+// list at startup. Both things the compiler asks -- "is this a builtin?" and
+// "what are they all?" -- are then answered from that one list, so the two
+// can never disagree about which names exist.
+
+init_bnames() {
+  export string[] bnames = [];
+  string builtin_src_v = builtin_src();
+  split_bnames(builtin_src_v, 0);
+} return void;
+
+split_bnames(string src, int i) {
+  while(i < len(src)) {
+    i = take_bname(src, i);
+  }
+} return void;
+
+take_bname(string src, int i) {
+  int e = bname_end(src, i);
+  push_bname(src, i, e);
+  int ret_i = e + 1;
+} return int ret_i;

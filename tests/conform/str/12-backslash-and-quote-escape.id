@@ -1,0 +1,5 @@
+
+main(int argc, string[] argv) {
+  string a = "back\\slash and \"quote\"";
+  print(a);
+} return int 0;

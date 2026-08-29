@@ -1,0 +1,18 @@
+// Name references, and the float-literal case of the type dispatch.
+
+// var and import both name a variable; their type is the variable's type.
+is_nameref(int id) {
+  int ok = 0;
+  if(k_of(id) == "var" || k_of(id) == "import") {
+    ok = 1;
+  }
+} return int ok;
+
+// Extends the type_of dispatch chain (type_of2 -> here -> type_of3) with the
+// float-literal case.
+type_of_float(int id) {
+  string t = type_of3(id);
+  if(k_of(id) == "float") {
+    t = "float";
+  }
+} return string t;

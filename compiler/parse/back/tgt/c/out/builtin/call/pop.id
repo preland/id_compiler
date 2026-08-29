@@ -1,0 +1,27 @@
+// pop(xs) -- removes and returns the last cell, so like every list read it
+// has to be unboxed back to the list's element type. That type is not
+// derivable from the callee name alone, which is why this takes the call node
+// and asks type_of about the argument, the same way emit_len and emit_push do.
+//
+// Without this the emitter produced `id_pop(xs)` -- a function the runtime
+// does not have. It went unnoticed because bin/idc verified its own output
+// with cc and quietly fell back to idc.py whenever it failed.
+
+ec4(int id) {
+  string s = emit_gcall(id);
+  if(s1_of(id) == "pop") {
+    s = emit_pop(id);
+  }
+} return string s;
+
+emit_pop(int id) {
+  int arg = l1_of(id)[0];
+  string type_of_v = type_of(arg);
+  string ret_s = emit_pop_tail(arg, type_of_v);
+} return string ret_s;
+
+emit_pop_tail(int arg, string type_of_v) {
+  string elem = elem_type(type_of_v);
+  string emit_expr_v = emit_expr(arg);
+  string ret_s = unbox("id_list_pop(" + emit_expr_v + ")", elem);
+} return string ret_s;

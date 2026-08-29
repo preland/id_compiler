@@ -1,0 +1,20 @@
+# build artifacts
+*.o
+*.gen.c
+*.pyc
+__pycache__/
+
+# compiled program binaries (named after the file or project; no extension).
+/idlex
+/idparse
+/idcalc
+
+# build outputs
+/out/
+/build/
+*.ll
+*.wat
+*.wasm
+
+# self-hosted driver bootstrap cache
+/.idc-cache/

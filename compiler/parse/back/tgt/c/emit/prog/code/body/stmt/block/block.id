@@ -1,0 +1,27 @@
+
+// Emit a block of statements, and the start of the statement dispatch.
+// A decl is emitted as an assignment (its C declaration was hoisted).
+
+emit_block(int[] stmts, string ind) {
+  int i = 0;
+  while(i < len(stmts)) {
+    emit_stmt(stmts[i], ind);
+    i = i + 1;
+  }
+} return void;
+
+emit_stmt(int id, string ind) {
+  if(k_of(id) == "decl") {
+    string s2_of_v = s2_of(id);
+    int i1_of_v = i1_of(id);
+    emit_decl_line(s2_of_v, i1_of_v, ind);
+  } else {
+    es2(id, ind);
+  }
+} return void;
+
+// The tail of a decl statement, once its target name and initializer are known.
+emit_decl_line(string s2_of_v, int i1_of_v, string ind) {
+  string emit_expr_v = emit_expr(i1_of_v);
+  emit_line(ind + s2_of_v + " = " + emit_expr_v + ";");
+} return void;

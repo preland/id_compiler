@@ -1,0 +1,4 @@
+// EXPECT: returns int but the expression has type string
+main() {
+  string s = "hi";
+} return int s;

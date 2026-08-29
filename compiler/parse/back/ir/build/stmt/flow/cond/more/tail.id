@@ -1,0 +1,4 @@
+lw_truth_tail(int v, string t, int z) {
+  string lw_cmpop_v = lw_cmpop(t);
+  int ret_i = lw_op(lw_cmpop_v, "bool", v, z, "!=");
+} return int ret_i;

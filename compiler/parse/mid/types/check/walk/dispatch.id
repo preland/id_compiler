@@ -1,0 +1,33 @@
+// Dispatch for one node. Written as independent guards rather than the usual
+// lazy chain: at most one of them fires, none of them returns anything, and
+// three guards fit one block -- so the whole dispatch is four functions
+// instead of one per kind.
+
+tc_node(int id) {
+  chk_voidarr(id);
+  tc_g1(id);
+  tc_g2(id);
+} return void;
+
+tc_g1(int id) {
+  if(k_of(id) == "decl") {
+    chk_decl(id);
+  }
+  if(k_of(id) == "assign") {
+    chk_assign(id);
+  }
+  if(k_of(id) == "iassign") {
+    chk_iassign(id);
+  }
+} return void;
+
+// The two conditions differ only in their message, so they share a check.
+tc_g2(int id) {
+  if(k_of(id) == "if") {
+    chk_cond(id, "condition has type void");
+  }
+  if(k_of(id) == "while") {
+    chk_cond(id, "loop condition has type void");
+  }
+  tc_g3(id);
+} return void;

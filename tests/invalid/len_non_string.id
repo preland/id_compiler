@@ -1,0 +1,4 @@
+// EXPECT: len expects a string or list, got int
+main() {
+  int n = len(42);
+} return int 0;

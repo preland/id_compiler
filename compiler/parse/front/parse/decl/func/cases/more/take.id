@@ -1,0 +1,15 @@
+// Consuming one case's tokens: `(args) : (expected) [constraints]`.
+// It moved out of cases.id when recording each case's token range put that
+// file at the three-function limit.
+
+// (args) : (expected) [constraints]
+skip_case(int[] pos) {
+  skip_paren(pos);
+  advance(pos);
+  skip_case_rhs(pos);
+} return void;
+
+skip_case_rhs(int[] pos) {
+  skip_paren(pos);
+  skip_constraints(pos);
+} return void;

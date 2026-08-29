@@ -1,0 +1,19 @@
+// The two-push tail of vidx_add, fidx_add and didx_add, split out so each of
+// those blocks stays within the action limit. The three differ only in which
+// pair of tables they push to, which is exactly the kind of difference the
+// duplicate-logic rule counts.
+
+vidx_push(int name_bucket_v, int len_v, string name) {
+  push((import vidx)[name_bucket_v], len_v);
+  push((import vnames), name);
+} return void;
+
+fidx_push(int name_bucket_v, int len_v, string name) {
+  push((import fidx)[name_bucket_v], len_v);
+  push((import fnames), name);
+} return void;
+
+didx_push(int name_bucket_v, int len_v, string name) {
+  push((import didx)[name_bucket_v], len_v);
+  push((import dvname), name);
+} return void;

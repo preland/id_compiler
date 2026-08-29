@@ -1,0 +1,17 @@
+// One past the parenthesis that closes the one at `lo`. Counted rather than
+// searched, because an argument may itself be a call.
+void_close(int at, int n, int lo) {
+  while(at < len((import ttext)) && (n > 0 || at == lo)) {
+    n = void_step(at, n);
+    at = at + 1;
+  }
+} return int at;
+
+void_step(int at, int n) {
+  int r = n;
+  if(tok_str(at) == "(") {
+    r = n + 1;
+  } else if(tok_str(at) == ")") {
+    r = n - 1;
+  }
+} return int r;

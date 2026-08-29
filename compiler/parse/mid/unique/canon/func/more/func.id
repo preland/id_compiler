@@ -1,0 +1,31 @@
+// A whole function's fingerprint: its signature and its logic, and nothing of
+// its name or of how it spells its own variables.
+//
+//     (TYPE 0,TYPE 1)->RET{body}=>return
+//
+// The parameters are canonicalised first so that they take positions 0, 1, ...
+// before any local does, as in idc.py; uq_begin empties the position map so
+// that each function is numbered from scratch.
+
+canon_func(int id) {
+  string s1_of_v = s1_of(id);
+  uq_begin(s1_of_v);
+  string ret_s = canon_func_body(id);
+} return string ret_s;
+
+canon_params(int[] params) {
+  string out = "";
+  int i = 0;
+  while(i < len(params)) {
+    out = out + sep_at(",", i) + canon_param(params[i]);
+    i = i + 1;
+  }
+} return string out;
+
+// A parameter contributes its type, which is part of the signature, and its
+// position, which is not its name: `f(int a)` and `f(int b)` are one function.
+canon_param(int id) {
+  string s2_of_v = s2_of(id);
+  string out = cn(s2_of_v);
+  string ret_s = s1_of(id) + " " + out;
+} return string ret_s;

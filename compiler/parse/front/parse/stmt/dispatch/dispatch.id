@@ -1,0 +1,29 @@
+// Statement dispatch: if / while / declaration / assignment / expression-stmt.
+// One decision per function (chain), so each block stays small.
+
+parse_stmt(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "if") {
+    node = parse_if(pos);
+  } else {
+    node = parse_stmt2(pos);
+  }
+} return int node;
+
+parse_stmt2(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "while") {
+    node = parse_while(pos);
+  } else {
+    node = parse_stmt3(pos);
+  }
+} return int node;
+
+parse_stmt3(int[] pos) {
+  int node = 0;
+  if(is_decl_start(pos)) {
+    node = parse_decl(pos);
+  } else {
+    node = parse_stmt4(pos);
+  }
+} return int node;

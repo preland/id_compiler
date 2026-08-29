@@ -1,0 +1,23 @@
+
+lw_params(int[] pars) {
+  int i = 0;
+  while(i < len(pars)) {
+    lw_param(pars[i], i);
+    i = i + 1;
+  }
+} return void;
+
+lw_param(int node, int i) {
+  string s1_of_v = s1_of(node);
+  string s2_of_v = s2_of(node);
+  lw_param_mid(node, i, s1_of_v, s2_of_v);
+} return void;
+
+// A parameter is copied into a stack slot like any other local, so that an
+// assignment to one is an ordinary store and the lowering needs no second
+// rule for it.
+lw_pslot(int node, int v) {
+  string s1_of_v = s1_of(node);
+  string s2_of_v = s2_of(node);
+  lw_pslot_tail(s1_of_v, s2_of_v, v);
+} return void;

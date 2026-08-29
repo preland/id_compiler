@@ -1,0 +1,27 @@
+// A binary operator.
+//
+// `a = b` and `a == b` are the same comparison in id -- a bare `=` inside an
+// expression is equality, since assignment is only a statement form. This
+// parser keeps whichever spelling was written and lets the emitter map it,
+// so the fingerprint has to do the mapping instead: two functions that differ
+// only in how they spell equality are the same function, and idc.py, which
+// normalises the spelling while parsing, reports them as such.
+
+canon_bin(int id) {
+  string op = bin_op(id);
+  string pair_v = bin_pair(id);
+  string ret_s = "b" + op + pair_v;
+} return string ret_s;
+
+bin_op(int id) {
+  string op = s1_of(id);
+  if(op == "=") {
+    op = "==";
+  }
+} return string op;
+
+bin_pair(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string ret_s = canon_pair(i1_of_v, i2_of_v);
+} return string ret_s;

@@ -1,0 +1,22 @@
+
+ix_hit(string[] names, int[] bucket, int i, string name, int found) {
+  int r = found;
+  if(names[bucket[i]] == name) {
+    r = bucket[i];
+  }
+} return int r;
+
+// Appending a name and indexing it are one operation, so the index cannot be
+// forgotten at a call site: the row number is the table's length *before* the
+// name goes in, which is the index the name is about to occupy.
+vidx_add(string name) {
+  int name_bucket_v = name_bucket(name);
+  int len_v = len((import vnames));
+  vidx_push(name_bucket_v, len_v, name);
+} return void;
+
+fidx_add(string name) {
+  int name_bucket_v = name_bucket(name);
+  int len_v = len((import fnames));
+  fidx_push(name_bucket_v, len_v, name);
+} return void;

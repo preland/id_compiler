@@ -1,0 +1,5 @@
+// EXPECT: remainder by zero
+main(int argc, string[] argv) {
+  int z = argc - 1;
+  print(10 % z);
+} return int 0;

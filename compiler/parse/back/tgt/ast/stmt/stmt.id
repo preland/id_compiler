@@ -1,0 +1,26 @@
+// Remaining statement forms.
+
+ps2(int id) {
+  int i1_of_v = i1_of(id);
+  string s = "(assign " + s1_of(id) + " " + print_expr(i1_of_v) + ")";
+  if(k_of(id) != "assign") {
+    s = ps3(id);
+  }
+} return string s;
+
+ps3(int id) {
+  int i1_of_v = i1_of(id);
+  string s = "(expr " + print_expr(i1_of_v) + ")";
+  if(k_of(id) != "exprstmt") {
+    s = ps4(id);
+  }
+} return string s;
+
+ps4(int id) {
+  string s = ps4_while(id);
+  if(k_of(id) == "if") {
+    int i1_of_v2 = i1_of(id);
+    int[] l1_of_v2 = l1_of(id);
+    s = ps4_if(id, i1_of_v2, l1_of_v2);
+  }
+} return string s;

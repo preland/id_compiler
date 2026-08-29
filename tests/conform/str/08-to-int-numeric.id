@@ -1,0 +1,9 @@
+main(int argc, string[] argv) {
+  show_int("42");
+  show_int("-7");
+} return int 0;
+
+show_int(string s) {
+  int v = to_int(s);
+  print(v);
+} return void;

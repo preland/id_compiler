@@ -1,0 +1,14 @@
+// Expression statement, and the start of an if. The `( expr )` of a condition
+// is read by parse_paren (shared with primary expressions -- identical logic).
+
+parse_exprstmt(int[] pos) {
+  int expr = parse_expr(pos);
+  skip_semi(pos);
+  int ret_i = node_exprstmt(expr);
+} return int ret_i;
+
+parse_if(int[] pos) {
+  advance(pos);
+  int cond = parse_paren(pos);
+  int ret_i = if_body(pos, cond);
+} return int ret_i;

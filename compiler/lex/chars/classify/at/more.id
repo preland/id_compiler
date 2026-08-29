@@ -1,0 +1,20 @@
+// The same shape for the three classes that live with the literal scanners
+// they belong to. They are here rather than there because "the class of the
+// character at i" is one idea and reads better in one place -- `id` has no
+// imports, so a function's directory is a statement about meaning and not
+// about what can see it.
+
+is_alnum_at(string src, int i) {
+  int c = charat(src, i);
+  int ok = is_alnum(c);
+} return int ok;
+
+is_hex_at(string src, int i) {
+  int c = charat(src, i);
+  int ok = is_hex(c);
+} return int ok;
+
+is_bin_at(string src, int i) {
+  int c = charat(src, i);
+  int ok = is_bin(c);
+} return int ok;

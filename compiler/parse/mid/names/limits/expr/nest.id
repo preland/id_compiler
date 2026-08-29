@@ -1,0 +1,31 @@
+// A call's arguments, each of which must be free of calls.
+//
+// Free of calls anywhere inside it, not merely at the top: `f(g(x) + 1)` hides
+// the call one level down and reads no better for it. The argument that
+// carries the call is the one reported, by position, because a call spread
+// over several lines should name the line that is wrong.
+
+chk_flat_args(int id) {
+  int i = 0;
+  while(i < flat_arg_count(id)) {
+    i = chk_flat_at(id, i);
+  }
+} return void;
+
+chk_flat_at(int id, int i) {
+  int a = l1_of(id)[i];
+  if(has_call(a) == 1) {
+    string s1_of_v = s1_of(id);
+    tc_err(a, "argument " + i + " of '" + s1_of_v + "' contains a call; give that value a name and pass the name");
+  }
+  int ret_i = i + 1;
+} return int ret_i;
+
+has_call(int e) {
+  int ok = 0;
+  if(k_of(e) == "call") {
+    ok = 1;
+  } else {
+    ok = hc_kids(e);
+  }
+} return int ok;

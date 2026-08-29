@@ -1,0 +1,16 @@
+// Extend a digit run past an optional fractional part, and pick the token
+// kind word ("int" or "float") based on whether one was found.
+
+num_end(string src, int i, int e) {
+  int fe = e;
+  if(has_frac(src, e)) {
+    fe = digit_run_end(src, e + 1);
+  }
+} return int fe;
+
+numkind(int e, int fe) {
+  string kind = "int";
+  if(fe > e) {
+    kind = "float";
+  }
+} return string kind;

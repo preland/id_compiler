@@ -1,0 +1,6 @@
+// The rest of lw_open2, once the entry block itself exists.
+lw_open2_tail(int f, int ir_block_v) {
+  lset((import lwent), 0, ir_block_v);
+  int ir_block_v2 = ir_block(f, "body");
+  lset((import lwbody), 0, ir_block_v2);
+} return void;

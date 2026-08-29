@@ -1,0 +1,19 @@
+
+// A function definition: signature, hoisted locals, body, return.
+
+emit_def(int id) {
+  string sig_v = sig(id);
+  emit_line(sig_v + " {");
+  emit_def_body(id);
+} return void;
+
+emit_def_body(int id) {
+  hoist(id);
+  emit_tail(id);
+} return void;
+
+emit_tail(int id) {
+  int[] l2_of_v = l2_of(id);
+  emit_block(l2_of_v, "    ");
+  emit_tail_end(id);
+} return void;

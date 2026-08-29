@@ -1,0 +1,23 @@
+// The string leaf, and the operator-class predicates.
+
+parse_str(int[] pos) {
+  string text = cur_text(pos);
+  advance(pos);
+  int ret_i = node_str(text);
+} return int ret_i;
+
+// `=` is included: in an expression a bare `=` means equality in id (assignment
+// is detected as a statement before we get here).
+is_relop(string s) {
+  int ok = 0;
+  if(s == "==" || s == "!=" || s == "<" || s == ">" || s == "<=" || s == ">=" || s == "=") {
+    ok = 1;
+  }
+} return int ok;
+
+is_addop(string s) {
+  int ok = 0;
+  if(s == "+" || s == "-") {
+    ok = 1;
+  }
+} return int ok;

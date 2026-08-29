@@ -1,0 +1,16 @@
+bi_sys_msg(int id) {
+  string name = s1_of(id);
+  string cw = bi_count_word(name);
+  string msg = bi_sys_msg2(id, name, cw);
+} return string msg;
+
+bi_count_word(string name) {
+  int n = bi_arity(name);
+  string plural = bi_plural(name);
+  string s = n + " argument" + plural;
+} return string s;
+
+bi_sys_msg2(int id, string name, string cw) {
+  int argn_v = flat_arg_count(id);
+  string msg = name + " takes exactly " + cw + ", got " + argn_v;
+} return string msg;

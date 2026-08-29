@@ -1,0 +1,21 @@
+// An IR function. Its block list is empty at this point; the lowering fills it.
+
+ir_func(int node, string name, string ret) {
+  ir_func2(name, ret);
+  ir_func3(node);
+  int ret_i = ir_func4();
+} return int ret_i;
+
+// The parameter list starts empty and lw_param fills it: a function's
+// parameters are instructions, and they do not exist until the lowering makes
+// them.
+ir_func2(string name, string ret) {
+  push((import fnname), name);
+  push((import fnret), ret);
+  push((import fnpar), []);
+} return void;
+
+ir_func3(int node) {
+  push((import fnblk), []);
+  push((import fnnode), node);
+} return void;

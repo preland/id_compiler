@@ -1,0 +1,6 @@
+// EXPECT: unexpected token
+// An operator where an expression belongs used to become a variable named
+// after the punctuation, reported later as an undefined variable.
+main(int argc, string[] argv) {
+  int x = 1 + ;
+} return int 0;

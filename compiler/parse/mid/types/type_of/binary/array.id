@@ -1,0 +1,13 @@
+// What an array literal answers when something asks for its type without
+// offering one. Every place a literal can legally be written supplies the
+// wanted type instead (check/store/more/arr.id), so this is a fallback for
+// diagnostics rather than the rule: a literal's type is its context's.
+
+type_arr(int id) {
+  string t = "int[]";
+  int[] l1_of_v = l1_of(id);
+  if(len(l1_of_v) > 0) {
+    int[] l1_of_v2 = l1_of(id);
+    t = type_of(l1_of_v2[0]) + "[]";
+  }
+} return string t;

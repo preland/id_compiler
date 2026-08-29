@@ -1,0 +1,13 @@
+
+asm "x86_64-unknown-none" w2s(word a) {
+  "movq %[a], %[ret]"
+} return string ret;
+
+asm "x86_64-unknown-none" ld64(word a) {
+  "movq (%[a]), %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" st64(word a, word v) {
+  "movq %[v], (%[a])"
+  "xorq %[ret], %[ret]"
+} return word ret;

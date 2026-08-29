@@ -1,0 +1,24 @@
+// A binary operator and an index both hold two expressions in the same two
+// fields, so one walker serves both.
+acc_expr3(int id, string owner, int ln) {
+  if(k_of(id) == "bin" || k_of(id) == "index") {
+    acc_pair(id, owner, ln);
+  } else {
+    acc_expr4(id, owner, ln);
+  }
+} return void;
+
+acc_pair(int id, string owner, int ln) {
+  int i1_of_v = i1_of(id);
+  acc_expr(i1_of_v, owner, ln);
+  acc_pair2(id, owner, ln);
+} return void;
+
+acc_expr4(int id, string owner, int ln) {
+  if(k_of(id) == "un") {
+    int i1_of_v = i1_of(id);
+    acc_expr(i1_of_v, owner, ln);
+  } else {
+    acc_expr5(id, owner, ln);
+  }
+} return void;

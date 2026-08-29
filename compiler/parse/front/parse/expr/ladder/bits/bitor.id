@@ -1,0 +1,29 @@
+// The bitwise levels of the precedence ladder. They sit *below* the
+// comparisons -- tighter, not looser -- so `flags & MASK != 0` groups as
+// `(flags & MASK) != 0`, which is what it reads like. C binds them the other
+// way round; id does not inherit that. Among themselves the levels follow C:
+//
+//   rel -> bitor(|) -> bitxor(^) -> bitand(&) -> shift(<< >>) -> add
+//
+// Same shape as every other level: parse the tighter level, then fold
+// left-associatively, one operator per fold step.
+
+parse_bitor(int[] pos) {
+  int left = parse_bitxor(pos);
+  while(cur_text(pos) == "|") {
+    left = fold_bitor(pos, left);
+  }
+} return int left;
+
+fold_bitor(int[] pos, int left) {
+  advance(pos);
+  int right = parse_bitxor(pos);
+  int ret_i = node_bin("|", left, right);
+} return int ret_i;
+
+parse_bitxor(int[] pos) {
+  int left = parse_bitand(pos);
+  while(cur_text(pos) == "^") {
+    left = fold_bitxor(pos, left);
+  }
+} return int left;

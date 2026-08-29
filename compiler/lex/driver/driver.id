@@ -1,0 +1,52 @@
+// idc-in-id -- a C transpiler for `id`, written in `id` itself.
+//
+// STATUS: stage 1 of N -- the LEXER. It reads id source on stdin and prints a
+// normalized token stream (one `<kind> <value>` per line). Parsing and C
+// emission are not built yet; see BLOCKERS.md.
+//
+// Run:  ./idc.py compiler/lex -o idlex && ./idlex < some.id
+//
+// Because every block (function body, branch, loop) is capped at 3 actions and
+// blocks may nest only 2 deep, dispatch cannot be one big nested if/else.
+// Instead each decision is its own function that returns the next index:
+//
+//   lex -> scan_one -> scan_word -> scan_token -> scan_numop -> scan_strop
+//
+// peeling off one token class per step (space, comment, identifier, number,
+// string, operator). Each scanner consumes a run and prints its token.
+//
+// Files (3 functions each by the per-file rule):
+//   driver/driver.id             main + lex
+//   chars/dispatch/dispatch.id       scan_one / scan_word / scan_token
+//   chars/dispatch/dispatch_tail.id  scan_numop / scan_strop / skip_comment
+//   scan/scan.id                 scan_ident / scan_number / scan_string
+//   scan/ops.id                  is_two_op / oplen / scan_op
+//   chars/classify/charclass.id  is_space / is_digit / is_alpha
+//   chars/classify/ident_kw.id   is_alnum / is_kw / kindof
+
+main(int argc, string[] argv) {
+  export int[] lexline = [1];
+  lex_all();
+  print("eof");
+} return int 0;
+
+// A `line N` marker is emitted whenever a newline is consumed, so every token
+// after it belongs to line N. Only one place in the whole lexer consumes a raw
+// newline -- the whitespace branch of scan_one -- which is why tracking costs
+// one function rather than a parameter threaded through the dispatch chain.
+eat_space(string src, int i) {
+  if(charat(src, i) == 10) {
+    bump_line();
+  }
+  int ret_i = i + 1;
+} return int ret_i;
+
+// One pass over the source: advance the cursor one token at a time. The whole
+// per-character decision tree lives in the scan_* chain, not here.
+lex(string src) {
+  int n = len(src);
+  int i = 0;
+  while(i < n) {
+    i = scan_one(src, i);
+  }
+} return void;

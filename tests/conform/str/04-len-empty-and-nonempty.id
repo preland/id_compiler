@@ -1,0 +1,10 @@
+main(int argc, string[] argv) {
+  string a = "";
+  string b = "hello";
+  show_lens(a, b);
+} return int 0;
+
+show_lens(string a, string b) {
+  int n = len(a) + len(b);
+  print(n);
+} return void;

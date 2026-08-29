@@ -1,0 +1,6 @@
+
+// The tail of main, once setup and load have already run.
+main_tail(int argc, string[] argv) {
+  run(argc, argv);
+  int ret_i = check_failed();
+} return int ret_i;

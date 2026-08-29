@@ -1,0 +1,10 @@
+main() {
+  word p = alloc(1);
+  poke8(p, 200);
+  show_byte(p);
+} return int 0;
+
+show_byte(word p) {
+  word v = peek8(p);
+  print("" + v);
+} return void;

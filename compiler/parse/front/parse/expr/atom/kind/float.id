@@ -1,0 +1,29 @@
+// Extends the primary-atom dispatch chain (parse_atom -> parse_atom2 -> here
+// -> parse_atom3) with the float-literal case, and the float leaf parse
+// itself: like parse_int, but the raw token text is kept verbatim (see
+// node_float) instead of being converted to a number, since C emission just
+// prints a float literal's spelling unchanged.
+
+parse_atom_float(int[] pos) {
+  int node = 0;
+  if(cur_kind(pos) == "float") {
+    node = parse_float(pos);
+  } else {
+    node = parse_atom3(pos);
+  }
+} return int node;
+
+parse_float(int[] pos) {
+  string text = cur_text(pos);
+  advance(pos);
+  int ret_i = node_float(text);
+} return int ret_i;
+
+// Shared by parse_ident_or_call and parse_import (atom.id, import_expr.id):
+// both read the current token's text and advance past it before doing
+// anything else with the name. Neither of those files has room left for a
+// fourth function, and this one does.
+read_name(int[] pos) {
+  string name = cur_text(pos);
+  advance(pos);
+} return string name;

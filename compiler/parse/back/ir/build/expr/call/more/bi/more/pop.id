@@ -1,0 +1,18 @@
+// The rest of lw_pop, once the popped list's element type is known.
+lw_pop_mid(int[] args, string ety) {
+  string elem = elem_type(ety);
+  int lw_expr_v = lw_expr(args[0]);
+  int ret_i = lw_pop_tail(elem, lw_expr_v);
+} return int ret_i;
+
+lw_pop_tail(string elem, int v) {
+  int c = lw_callf("id_list_pop", "word", [v]);
+  int ret_i = lw_unbox(c, elem);
+} return int ret_i;
+
+// The rest of lw_len, once the counted list's element type is known.
+lw_len_tail(int[] args, string t) {
+  int a = lw_expr(args[0]);
+  string lw_lenfn_v = lw_lenfn(t);
+  int ret_i = lw_callf(lw_lenfn_v, "int", [a]);
+} return int ret_i;

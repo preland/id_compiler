@@ -1,0 +1,19 @@
+// compound-statement + function constructors.
+// func: ns1=name, ns2=rettype, nl1=params, nl2=body, ni1=return-expr id
+//       (return-expr id is -1 for `return void`).
+
+// `elif` is 1 when the else arm was written `else if`, and 0 when it was
+// `else { ... }`. Both produce an else list holding one if node, so the AST
+// cannot tell them apart by shape -- and they emit different C.
+node_if(int cond, int[] thenl, int[] elsel, int elif) {
+  int ret_i = newnode("if", cond, elif, "", "", thenl, elsel);
+} return int ret_i;
+
+node_while(int cond, int[] bodyl) {
+  int[] none = [];
+  int ret_i = newnode("while", cond, 0, "", "", bodyl, none);
+} return int ret_i;
+
+node_func(string name, string rettype, int[] params, int[] body, int retexpr) {
+  int ret_i = newnode("func", retexpr, 0, name, rettype, params, body);
+} return int ret_i;

@@ -1,0 +1,10 @@
+
+emit_push_tail(int[] args, string type_of_v) {
+  string elem = elem_type(type_of_v);
+  string ret_s = push_code(args, elem);
+} return string ret_s;
+
+push_code(int[] args, string elem) {
+  string emit_expr_v = emit_expr(args[1]);
+  string ret_s = "id_list_push(" + emit_expr(args[0]) + ", " + box(emit_expr_v, elem) + ")";
+} return string ret_s;

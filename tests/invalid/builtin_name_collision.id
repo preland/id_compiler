@@ -1,0 +1,10 @@
+// EXPECT: collides with a runtime helper
+// The same rule catches a function named after a BUILTIN, which is the more
+// likely spelling of the mistake: the builtins are runtime helpers too, so
+// `print` was already taken.
+print(int v) {
+} return int v;
+
+main() {
+  print(1);
+} return int 0;

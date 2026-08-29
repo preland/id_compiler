@@ -1,0 +1,32 @@
+// A string literal, as LLVM wants it: every byte written as an escape, so no
+// character in the source can end the constant early, plus a trailing NUL.
+// The source form arrives with its quotes and its backslash escapes intact,
+// which is why this reads the bytes rather than the characters.
+//
+// The text is accumulated here rather than in the helper because a `string` is
+// a value: a helper that appended to a parameter would be appending to a copy,
+// and the constant would come out empty. So one helper says what the byte at a
+// position spells and another says how far that position advanced.
+
+ll_bytes(string s) {
+  string out = ll_bytes_acc(s);
+  string ret_s = out + "\\00";
+} return string ret_s;
+
+ll_piece(string s, int i) {
+  int charat_v = charat(s, i);
+  string out = ll_hex(charat_v);
+  if(charat(s, i) == 92) {
+    int charat_v2 = charat(s, i + 1);
+    int ll_escbyte_v = ll_escbyte(charat_v2);
+    out = ll_hex(ll_escbyte_v);
+  }
+} return string out;
+
+// A backslash escape spells one byte out of two source characters.
+ll_step(string s, int i) {
+  int r = i + 1;
+  if(charat(s, i) == 92) {
+    r = i + 2;
+  }
+} return int r;

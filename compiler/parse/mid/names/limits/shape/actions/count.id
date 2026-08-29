@@ -1,0 +1,34 @@
+// Counting the actions of a block, mirroring idc.py's block_actions.
+//
+// Every statement is one action. A `while` is one, like any other statement.
+// An `if` is one plus one for each `else` it chains: `if / else` is 2 and
+// `if / else if / else` is 3, so that chain fills a block on its own. The
+// return clause after the closing brace is free and is never seen here, since
+// it is not a statement of the body.
+
+count_actions(int[] stmts) {
+  int i = 0;
+  int n = 0;
+  while(i < len(stmts)) {
+    n = n + stmt_actions(stmts[i]);
+    i = i + 1;
+  }
+} return int n;
+
+stmt_actions(int id) {
+  int n = 1;
+  if(k_of(id) == "if") {
+    n = 1 + count_elses(id);
+  }
+} return int n;
+
+// ni2 is 0 when the if had no else arm at all. An *empty* `else { }` has an
+// empty else list but still costs an action, which is why the flag is asked
+// rather than the list.
+count_elses(int id) {
+  int[] els = l2_of(id);
+  int n = 0;
+  if(i2_of(id) > 0) {
+    n = 1 + chain_elses(id, els);
+  }
+} return int n;

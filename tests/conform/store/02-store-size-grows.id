@@ -1,0 +1,10 @@
+main() {
+  word before = store_size();
+  alloc(16);
+  show_grow(before);
+} return int 0;
+
+show_grow(word before) {
+  word after = store_size();
+  print("" + before + " " + after);
+} return void;

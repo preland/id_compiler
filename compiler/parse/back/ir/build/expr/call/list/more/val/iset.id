@@ -1,0 +1,7 @@
+// The value half of a list-element assignment: converted, then boxed. The
+// index shares lw_index_idx with a plain read -- same node, same computation.
+lw_iset_val(int node, string elem) {
+  int[] els = l1_of(node);
+  int v = lw_expr(els[0]);
+  int boxed = lw_box(v, elem);
+} return int boxed;

@@ -1,0 +1,31 @@
+// The declaration registry's index. dvname is the third table that is scanned
+// name-at-a-time -- declared_in asks "does this function declare it" for every
+// name a function mentions, and first_type asks "what type did it first get"
+// for every declaration -- and both were full passes over every declaration in
+// the program. On an 800-function tree those two were the top of the profile.
+//
+// It is built here rather than beside vidx/fidx because the registry itself is
+// built later, by check_names, and an index has to exist before its first row.
+
+// dvunit is declared here, beside the index rather than beside the other
+// registry columns, because init_reg2's block is full and this one is not.
+init_didx() {
+  export int[][] didx = [];
+  export int[] dvunit = [];
+  fill_didx();
+} return void;
+
+fill_didx() {
+  int i = 0;
+  while(i < idx_n()) {
+    int[] new_bucket_v = new_bucket();
+    push((import didx), new_bucket_v);
+    i = i + 1;
+  }
+} return void;
+
+didx_add(string name) {
+  int name_bucket_v = name_bucket(name);
+  int len_v = len((import dvname));
+  didx_push(name_bucket_v, len_v, name);
+} return void;

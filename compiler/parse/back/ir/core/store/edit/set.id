@@ -1,0 +1,16 @@
+// Rewriting an instruction's fields. A pass that folds `1 + 2` does it by
+// turning the `add` into a `const`, in place, rather than by building a new
+// instruction and replacing every use of the old one -- the value id stays the
+// same, so every use is already correct.
+
+ir_set_ty(int id, string ty) {
+  sset((import ity), id, ty);
+} return void;
+
+ir_set_a(int id, int v) {
+  lset((import ia), id, v);
+} return void;
+
+ir_set_b(int id, int v) {
+  lset((import ib), id, v);
+} return void;

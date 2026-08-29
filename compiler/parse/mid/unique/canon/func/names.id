@@ -1,0 +1,22 @@
+// The position map: parameters and locals of the function being canonicalised,
+// in the order they were first met. A name is answered with its position, so
+// renaming every variable in a function cannot change its fingerprint, while
+// using one name where another function used two still can.
+//
+// Only names of the function's own variables ever reach here. Called
+// functions, imported globals and exported names are kept verbatim by their
+// callers, which is what lets two otherwise identical functions differ by
+// which name they mention.
+
+cn(string name) {
+  int idx = find_str((import cnames), name);
+  if(idx < 0) {
+    idx = cn_add(name);
+  }
+  string ret_s = "" + idx;
+} return string ret_s;
+
+cn_add(string name) {
+  push((import cnames), name);
+  int ret_i = len((import cnames)) - 1;
+} return int ret_i;

@@ -1,0 +1,28 @@
+// The list header: three words in the arena -- the length, the capacity, and
+// the address of the cells. Every cell is eight bytes wide whatever the list
+// holds, which is what lets one set of helpers serve every element type and
+// what the compiler's box/unbox pair is written against.
+//
+// The header is separate from the cells so that growing a list moves the cells
+// and leaves the header where it was. That is what gives docs/SPEC.md 5 its
+// reference semantics: two names for one list are two copies of one address,
+// and neither notices when the cells are reallocated behind it.
+
+list_new() {
+  word p = mem_alloc(24);
+  list_init(p);
+  int[] ret_li = w2l(p);
+} return int[] ret_li;
+
+// Arena memory arrives with whatever the bootloader left in it, so every field
+// is written rather than assumed zero.
+list_init(word p) {
+  st64(p, 0);
+  st64(p + 8, 4);
+  list_init_cells(p);
+} return void;
+
+list_len(int[] xs) {
+  word l2w_v = l2w(xs);
+  int ret_i = ld64(l2w_v);
+} return int ret_i;

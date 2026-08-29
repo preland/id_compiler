@@ -1,0 +1,20 @@
+// Program printer: render each parsed function as a nested S-expression.
+
+print_program() {
+  int i = 0;
+  while(i < len((import prog))) {
+    show_func(i);
+    i = i + 1;
+  }
+} return void;
+
+show_func(int i) {
+  string print_func_v = print_func((import prog)[i]);
+  print(print_func_v);
+} return void;
+
+print_func(int id) {
+  int[] l1_of_v = l1_of(id);
+  string s = "(func " + s1_of(id) + " (params" + print_list(l1_of_v) + ") " + s2_of(id);
+  string ret_s = print_func_tail(id, s);
+} return string ret_s;

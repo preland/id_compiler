@@ -1,0 +1,24 @@
+// Printing a token, split out from the scanner that found its extent.
+//
+// Each of these is the tail of a scanner whose own block filled up once the
+// values it prints had to be named. The scanner keeps the part that decides
+// where the token ends, which is the part with a result.
+
+scan_num_out(string src, int i, int e, int fe) {
+  string kind = numkind(e, fe);
+  string text = slice_str(src, i, fe);
+  print(kind + " " + text);
+} return void;
+
+// The quote is reprinted around the slice, which is why it is built here and
+// not sliced with it: the token text is the raw spelling between the quotes.
+scan_str_out(string src, int i, int e) {
+  string q = chr(34);
+  string text = slice_str(src, i, e);
+  print("str " + q + text + q);
+} return void;
+
+scan_hash_out(string src, int i, int e) {
+  string text = slice_str(src, i + 1, e);
+  print(text);
+} return void;

@@ -1,0 +1,63 @@
+// Dead-code elimination: emit only what the program can reach.
+//
+// This is not an optimisation, it is what makes a standard library affordable.
+// idstd is merged into EVERY program, so without this a hello-world pays for
+// all of it. Measured on a synthetic library of trivial functions, before this
+// existed: 243 functions cost 0.36 s and a 33 KB binary against 0.18 s and
+// 16 KB with none, and 729 cost 0.75 s and 75 KB. A real standard library is
+// several hundred functions with real bodies.
+//
+// Two rules, both shared with idc.py's prune_unreachable, and the C the two
+// emit has to stay byte-identical:
+//
+//   * This runs AFTER every check, never before -- see guarded_emit. A dead
+//     function still has to obey the action limit, the nesting limit and every
+//     type rule. Code that stops being checked because nothing calls it is how
+//     a library rots, and it would stop checking a user's own dead code too.
+//   * A program with no `main` is a library, compiled to a .o, and every one of
+//     its functions is an entry point. Nothing is pruned there -- which is what
+//     the `main` test below is for. It cannot be asked of the reachable set
+//     instead, because init_reach seeds that with "main" whether or not the
+//     program has one.
+//
+// The reachable set is `rfn`, already computed by chk_dead during checking; is_reach
+// reads it. `asm` functions are not in the program list at all and are
+// unaffected, which is the conservative answer and the right one.
+//
+// Exported globals are deliberately NOT pruned. An export declared by a
+// function nothing calls costs one never-assigned C global -- nothing can read
+// it, because chk_dead has already rejected a reachable read of one.
+
+dce_prune() {
+  if(find_str((import fnames), "main") >= 0) {
+    dce_pack(0, 0);
+  }
+} return void;
+
+// Compact the program list over itself, keeping the reachable functions in
+// their original order, then drop the tail that is left over. `prog` is an
+// exported list, so it is rewritten in place through lset and pop rather
+// than rebuilt -- only its declaring function may assign it.
+//
+// The two loops are one function because a block may hold three actions and
+// this holds two: splitting them would cost a function whose only job is to
+// call the other.
+dce_pack(int i, int n) {
+  while(i < len((import prog))) {
+    n = dce_keep(i, n);
+    i = i + 1;
+  }
+  while(len((import prog)) > n) {
+    pop((import prog));
+  }
+} return int n;
+
+// Keep slot i by writing it at n, the next free slot. n only advances when
+// something was kept, which is what makes this a compaction rather than a copy.
+dce_keep(int i, int n) {
+  string s1_of_v = s1_of((import prog)[i]);
+  if(is_reach(s1_of_v) == 1) {
+    lset((import prog), n, (import prog)[i]);
+    n = n + 1;
+  }
+} return int n;

@@ -1,0 +1,28 @@
+// Dead code elimination: an instruction with no users and no effect is
+// removed. Iterated, because removing one instruction is what makes the next
+// one dead -- a chain of loads feeding a comparison that a fold has already
+// replaced goes in one sweep per link.
+
+op_dce(int f) {
+  int n = 1;
+  while(n > 0) {
+    n = dce_sweep(f, 0, 0);
+  }
+} return void;
+
+dce_sweep(int f, int i, int n) {
+  while(i < blk_count(f)) {
+    int[] irf_blk_v = irf_blk(f);
+    n = dce_blk(f, irf_blk_v[i], n);
+    i = i + 1;
+  }
+} return int n;
+
+dce_blk(int f, int b, int n) {
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] blk_ins_v = blk_ins(b);
+    n = dce_one(f, blk_ins_v[i], n);
+    i = i + 1;
+  }
+} return int n;

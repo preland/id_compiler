@@ -1,0 +1,29 @@
+// Every other builtin is a plain call to the runtime helper of the same name.
+// The helper's own return type is not always the builtin's: the flat store
+// works in machine words, so `peek8` returns an i64 that the program reads as
+// whatever `id` says the expression is.
+lw_plain(int node) {
+  string s1_of_v = s1_of(node);
+  string h = lw_bret(s1_of_v);
+  int ret_i = lw_plain_mid(node, s1_of_v, h);
+} return int ret_i;
+
+lw_bret(string name) {
+  string t = lw_bret2(name);
+  if(is_syscall(name) == 1) {
+    t = lw_sysret(name);
+  }
+} return string t;
+
+// The real-time I/O builtins have no entry in builtin_type: their result is
+// never used in an expression the type pass has to judge, so it never needed
+// one. The runtime symbols still have return types, and this is where they are
+// written down.
+lw_bret2(string name) {
+  string t = builtin_type(name);
+  if(name == "put" || name == "flush" || name == "sleep_ms") {
+    t = "void";
+  } else if(name == "getkey" || name == "ticks") {
+    t = "int";
+  }
+} return string t;

@@ -1,0 +1,17 @@
+// Digit-run scanning, and the float continuation test: a '.' immediately
+// followed by another digit. Mirrors idc.py's `\d+\.\d+` float regex, which
+// requires digits on both sides of the dot (so a bare trailing dot, with no
+// fraction digit, is not part of the number).
+
+digit_run_end(string src, int i) {
+  while(is_digit_at(src, i)) {
+    i = i + 1;
+  }
+} return int i;
+
+has_frac(string src, int e) {
+  int ok = 0;
+  if(charat(src, e) == 46 && is_digit_at(src, e + 1)) {
+    ok = 1;
+  }
+} return int ok;

@@ -1,0 +1,33 @@
+// The three shift instructions, with no range test in front of them.
+//
+// x86 takes a variable shift count in `cl` and masks it to six bits, so these
+// are correct only for counts 0..63 -- the callers above them are what makes
+// every other count mean something. Both operands go through the stack for the
+// same reason the divides do: the count's register may be the value's.
+
+asm "x86_64-unknown-none" shl_raw(word a, word z) {
+  "pushq %[a]"
+  "pushq %[z]"
+  "popq %%rcx"
+  "popq %%rax"
+  "shlq %%cl, %%rax"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" sar_raw(word a, word z) {
+  "pushq %[a]"
+  "pushq %[z]"
+  "popq %%rcx"
+  "popq %%rax"
+  "sarq %%cl, %%rax"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" ushr_raw(word a, word z) {
+  "pushq %[a]"
+  "pushq %[z]"
+  "popq %%rcx"
+  "popq %%rax"
+  "shrq %%cl, %%rax"
+  "movq %%rax, %[ret]"
+} return word ret;

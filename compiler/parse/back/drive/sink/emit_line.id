@@ -1,0 +1,17 @@
+// The one place emitted code leaves the compiler.
+//
+// Every line of the target language goes through here, so "where does output
+// happen" is a question with one answer instead of forty. Diagnostics do
+// *not*: they are mid/'s, they go out whether or not anything is emitted, and
+// a buffered emitter would reorder them behind the code they are complaining
+// about.
+//
+// It is a plain pass-through today. It exists because the next target cannot
+// be a pass-through: a WASM module needs its type and function sections
+// written before the bodies that determine them, and LLVM wants its
+// declarations gathered the same way. Both need emission to be a buffer that
+// can be filled out of order, and both need exactly one place to change.
+
+emit_line(string s) {
+  print(s);
+} return void;

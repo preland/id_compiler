@@ -1,0 +1,20 @@
+// xor's fold step, and the and level.
+
+fold_bitxor(int[] pos, int left) {
+  advance(pos);
+  int right = parse_bitand(pos);
+  int ret_i = node_bin("^", left, right);
+} return int ret_i;
+
+parse_bitand(int[] pos) {
+  int left = parse_shift(pos);
+  while(cur_text(pos) == "&") {
+    left = fold_bitand(pos, left);
+  }
+} return int left;
+
+fold_bitand(int[] pos, int left) {
+  advance(pos);
+  int right = parse_shift(pos);
+  int ret_i = node_bin("&", left, right);
+} return int ret_i;

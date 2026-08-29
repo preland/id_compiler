@@ -1,0 +1,9 @@
+
+lw_iop_bits(string op) {
+  string p = "and";
+  if(op == "|") {
+    p = "or";
+  } else if(op == "^") {
+    p = "xor";
+  }
+} return string p;

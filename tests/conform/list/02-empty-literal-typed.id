@@ -1,0 +1,6 @@
+
+main() {
+  int[] xs = [];
+  int n = len(xs);
+  print("" + n);
+} return int 0;

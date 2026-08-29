@@ -1,0 +1,23 @@
+// Identifier-continuation test and keyword recognition.
+
+is_alnum(int c) {
+  int ok = 0;
+  if(is_alpha(c) || is_digit(c)) {
+    ok = 1;
+  }
+} return int ok;
+
+// The twelve id keywords. One big boolean keeps this within the action limit.
+is_kw(string w) {
+  int ok = 0;
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm") {
+    ok = 1;
+  }
+} return int ok;
+
+kindof(string w) {
+  string kind = "ident";
+  if(is_kw(w)) {
+    kind = "kw";
+  }
+} return string kind;

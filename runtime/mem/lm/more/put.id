@@ -1,0 +1,11 @@
+// The slot `lm_put` claims, read from the cursor before `lm_keep` moves it.
+lm_put_at() {
+  word lm_base_v = lm_base();
+  int at = ld64(lm_base_v + 128);
+} return int at;
+
+// The first half of what `lm_keep` writes: the address half of the pair.
+lm_keep_addr(int at, word a) {
+  word lm_base_v = lm_base();
+  st64(lm_base_v + at * 16, a);
+} return void;

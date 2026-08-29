@@ -1,0 +1,5 @@
+
+main() {
+  word p = alloc(8);
+  print("" + p);
+} return int 0;

@@ -1,0 +1,10 @@
+main() {
+  int[] xs = [1, 2];
+  push(xs, 3);
+  show_push(xs);
+} return int 0;
+
+show_push(int[] xs) {
+  int n = len(xs);
+  print("" + n + " " + xs[2]);
+} return void;

@@ -1,0 +1,48 @@
+# How each project in this repo stands against the REAL ../idstd.
+# Read by tests/idstd_real.sh; see that file for what the states mean.
+#
+#   both       builds with the library and without it
+#   needs-std  builds only with it
+#   broken     builds only WITHOUT it -- a collision with the library
+#   neither    builds neither way (needs --backend or flags)
+#
+# Every `broken` line is work, not a permitted state: C9 in docs/IDSTD.md.
+# Measured 2026-08-19.
+
+adventure        both
+average          needs-std
+calc             both
+control          both
+fsdemo           both
+hello            both
+idc_in_id_calc   both
+idview           both
+wordcount        needs-std
+
+# Graphics demos: need --backend, which this file does not pass. Their standing
+# against the library is untested until the backend is wired in here.
+flyover          neither
+fpsmaze          neither
+galaxy           neither
+gfxdemo          neither
+gl3d             neither
+gl3dgame         neither
+
+# ---------------------------------------------------------------------------
+# The compiler's own two stages, PORTED. They each carried a private copy of
+# idstd's `lset`; both now call the library's. That is the rule working -- the
+# function existed in a dependency, so the program should not define it again --
+# and it means id_development needs an idstd checkout to build its own
+# compiler. Deliberate; see bin/idc's bootstrap comment.
+compiler/lex     needs-std
+compiler/parse   needs-std
+
+# ---------------------------------------------------------------------------
+# The work list, three left. Each defines a name idstd also defines, or a
+# function whose logic idstd already has. The duplicate should go, not the rule.
+#
+# engine, moonbuggy, solitaire -- the terminal engine and its two games, whose
+#   helpers are headed for idstd anyway.
+engine           broken
+moonbuggy        broken
+solitaire        broken

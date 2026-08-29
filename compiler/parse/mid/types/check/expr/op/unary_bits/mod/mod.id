@@ -1,0 +1,25 @@
+// `%` is the odd one: it is an arithmetic operator, so two numbers are the
+// shape it expects, and only a float among them is the error. Anything
+// non-numeric on either side is a different diagnostic in idc.py ("cannot
+// apply '%' to ..."), so both sides being numbers is part of the test rather
+// than assumed -- otherwise `"a" % 2` would draw the wrong explanation.
+
+chk_mod(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  mod_types(id, i1_of_v, i2_of_v);
+} return void;
+
+is_logop(string s) {
+  int ok = 0;
+  if(s == "&&" || s == "||") {
+    ok = 1;
+  }
+} return int ok;
+
+is_bitop(string s) {
+  int ok = 0;
+  if(s == "&" || s == "|" || s == "^" || s == "<<" || s == ">>") {
+    ok = 1;
+  }
+} return int ok;

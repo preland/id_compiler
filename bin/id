@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# `id` -- the id compiler command.
+#
+#   id <root dir>        build a project (or a single .id file)
+#
+# A project declares its dependencies -- native backends and other id-source
+# directories -- in an `import.id` manifest at its root (lines of the form
+# `import "relative/dir"`), so a build needs no --backend flag or any other
+# tooling: just the id compiler on the directory.
+#
+# This wraps bin/idc, the self-hosted driver (which transparently falls back to
+# idc.py, the reference compiler, for inputs the self-hosted stages don't yet
+# cover). NOTE: this shadows the system `id(1)` if bin/ is early on your PATH;
+# invoke as ./bin/id, or don't put bin/ ahead of /usr/bin.
+exec "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/idc" "$@"

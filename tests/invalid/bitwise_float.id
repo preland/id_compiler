@@ -1,0 +1,5 @@
+// EXPECT: '&' requires int or word operands
+main(int argc, string[] argv) {
+  float f = 1.5;
+  print("" + (f & 1));
+} return int 0;

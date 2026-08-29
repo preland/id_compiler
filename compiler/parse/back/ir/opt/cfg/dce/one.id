@@ -1,0 +1,32 @@
+
+dce_one(int f, int id, int n) {
+  string ir_op_v = ir_op(id);
+  if(dce_pure(ir_op_v) == 1 && dce_used(f, id) == 0) {
+    ir_kill(id);
+    n = n + 1;
+  }
+} return int n;
+
+// What may not be removed for having no users. A call is here because nothing
+// tells this compiler which calls are pure -- every builtin that matters is a
+// runtime call, and print's users are the point of it.
+dce_pure(string op) {
+  int r = 1;
+  if(op == "store" || op == "call" || op == "ret" || op == "br" || op == "cbr" || op == "nop" || op == "param") {
+    r = 0;
+  }
+} return int r;
+
+// How many instructions of this function name the value. An SSA value is
+// local to its function, so the whole store need not be scanned -- and at the
+// size `id` functions come in, which the 3-action limit keeps small, a scan
+// per instruction is cheaper than a use list would be to maintain.
+dce_used(int f, int id) {
+  int n = 0;
+  int i = 0;
+  while(i < blk_count(f)) {
+    int[] irf_blk_v = irf_blk(f);
+    n = dce_used_b(irf_blk_v[i], id, n);
+    i = i + 1;
+  }
+} return int n;

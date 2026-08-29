@@ -1,0 +1,9 @@
+// The flat-store writes. They return nothing, unlike every other systems
+// builtin, so they get their own membership test.
+
+is_pokefn(string name) {
+  int ok = 0;
+  if(name == "poke8" || name == "poke16" || name == "poke32" || name == "poke64") {
+    ok = 1;
+  }
+} return int ok;

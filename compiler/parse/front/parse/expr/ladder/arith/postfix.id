@@ -1,0 +1,21 @@
+// Postfix level: a primary followed by any number of `[ expr ]` index
+// suffixes (xs[i], or xs[i][j]). Sits between the multiplicative level and
+// the primary production, matching idc.py's parse_postfix.
+
+parse_postfix(int[] pos) {
+  int node = parse_primary(pos);
+  while(cur_text(pos) == "[") {
+    node = fold_index(pos, node);
+  }
+} return int node;
+
+fold_index(int[] pos, int base) {
+  advance(pos);
+  int idx = parse_expr(pos);
+  int ret_i = fold_index_tail(pos, base, idx);
+} return int ret_i;
+
+fold_index_tail(int[] pos, int base, int idx) {
+  advance(pos);
+  int ret_i = node_index(base, idx);
+} return int ret_i;

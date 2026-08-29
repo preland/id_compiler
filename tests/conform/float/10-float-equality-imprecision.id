@@ -1,0 +1,9 @@
+
+main(int argc, string[] argv) {
+  float a = 0.1 + 0.2;
+  if (a == 0.3) {
+    print("equal");
+  } else {
+    print("not equal");
+  }
+} return int 0;

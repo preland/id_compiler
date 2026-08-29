@@ -1,0 +1,19 @@
+// Loader: read the lexer's "<kind> <value>" lines from stdin into the token
+// store. Kind = text before the first space, value = text after it.
+
+load() {
+  string src = read_all();
+  load_at(src, 0);
+} return void;
+
+load_at(string src, int i) {
+  while(i < len(src)) {
+    i = take_line(src, i);
+  }
+} return void;
+
+take_line(string src, int i) {
+  int e = line_end(src, i);
+  proc_line(src, i, e);
+  int ret_i = e + 1;
+} return int ret_i;

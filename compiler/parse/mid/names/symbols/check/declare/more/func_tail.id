@@ -1,0 +1,18 @@
+// The rest of reg_func, split out so each of its blocks stays within the
+// action limit. s1_of_v is the function's own name, threaded through rather
+// than re-read: nothing between reg_func and reg_l2_decls changes the node
+// store. The body registration itself is reg_l2_decls (declare/more/
+// decl_tail.id) -- reg_branches needs the same "register id's second
+// statement list" operation, so it is not repeated here.
+reg_func_params(int id, int[] l1_of_v, string s1_of_v) {
+  int func_line_v = func_line(s1_of_v);
+  reg_params(l1_of_v, s1_of_v, func_line_v);
+  reg_l2_decls(id, s1_of_v);
+} return void;
+
+// Split from reg_params so the while's own block stays within the limit.
+reg_param_at(int[] params, int i, string owner, int ln) {
+  string s2_of_v = s2_of(params[i]);
+  string s1_of_v = s1_of(params[i]);
+  reg_var(s2_of_v, s1_of_v, owner, 0, ln, (import nunit)[params[i]]);
+} return void;

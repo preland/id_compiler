@@ -1,0 +1,23 @@
+// Emit the `/* exported variables */` block (only when there are exports),
+// matching idc.py: `TYPE name;  /* exported by OWNER() */`, then a blank line.
+
+emit_exports() {
+  if(len((import enames)) > 0) {
+    emit_export_block();
+  }
+} return void;
+
+emit_export_block() {
+  emit_line("/* exported variables */");
+  emit_export_lines();
+  emit_line("");
+} return void;
+
+emit_export_lines() {
+  int i = 0;
+  while(i < len((import enames))) {
+    string export_line_v = export_line(i);
+    emit_line(export_line_v);
+    i = i + 1;
+  }
+} return void;

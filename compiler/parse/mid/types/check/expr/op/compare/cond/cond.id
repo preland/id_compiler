@@ -1,0 +1,32 @@
+// The element store, the void condition, and the split between the two
+// comparison families.
+
+chk_iassign3(int id, string bt) {
+  int v = l1_of(id)[0];
+  string elem_type_v = elem_type(bt);
+  if(bad_store(elem_type_v, v) == 1) {
+    string type_of_v = type_of(v);
+    tc_err(id, "cannot store a " + type_of_v + " into a " + bt);
+  }
+} return void;
+
+// A condition that is a call to a void function is the one type error the
+// registry answers directly: "unit" is the kind of a type with no values, and
+// a value is exactly what a condition needs.
+chk_cond(int id, string msg) {
+  int i1_of_v = i1_of(id);
+  string type_of_v = type_of(i1_of_v);
+  if(ty_kind(type_of_v) == "unit") {
+    tc_err(id, msg);
+  }
+} return void;
+
+// `==`, `!=` and id's bare `=` compare; `< <= > >=` order. is_eqop already
+// exists (in back/, for string equality's strcmp) and says exactly this --
+// writing it again here would be duplicate logic, which is a compile error.
+// It is a fact about id's operators, not about C, so it belongs in mid/ and
+// should move here when the emitter is restructured.
+chk_bin(int id) {
+  chk_cmp(id);
+  chk_bits(id);
+} return void;

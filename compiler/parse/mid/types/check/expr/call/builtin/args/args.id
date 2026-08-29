@@ -1,0 +1,27 @@
+// The peek family, which is the only group of builtins that takes one
+// argument and is not spelled out in bi_one.
+is_peekfn(string name) {
+  int ok = 0;
+  if(name == "peek8" || name == "peek16" || name == "peek32" || name == "peek64") {
+    ok = 1;
+  }
+} return int ok;
+
+chk_bi_args(int id) {
+  int i = 0;
+  while(i < flat_arg_count(id)) {
+    chk_bi_arg(id, i);
+    i = i + 1;
+  }
+} return void;
+
+// A position with no requirement ("") is skipped, and so is a type the
+// compiler could not work out -- print and put take anything, and push's
+// second argument is judged against the list's element type by chk_push.
+chk_bi_arg(int id, int i) {
+  string t = arg_type_at(id, i);
+  string want = bi_want_for(id, i);
+  if(ty_known(t) == 1 && want != "" && bi_ok(want, t) == 0) {
+    bi_arg_err(id, i, want, t);
+  }
+} return void;

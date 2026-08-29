@@ -1,0 +1,26 @@
+
+lw_arg_at(int node, int i, int[] vals) {
+  int v = lw_arg_val(node, i);
+  push(vals, v);
+  int ret_i = i + 1;
+} return int ret_i;
+
+// The declared type of a callee's i-th parameter, or the argument's own type
+// when the callee has no parameter list to ask.
+lw_pty(string name, int i, int node) {
+  int f = find_str((import fnames), name);
+  string t = lw_pty_base(name, i, node);
+  if(f >= 0) {
+    t = lw_pty2((import fnodes)[f], i, t);
+  }
+} return string t;
+
+// The two halves of the guard are functions rather than names, because `&&`
+// skips its right side: `f` is -1 when the callee has no AST node, and a name
+// bound before the `if` would have called l1_of(-1) to compute it.
+lw_pty2(int f, int i, string t) {
+  string p = t;
+  if(f >= 0 && lw_has_par(f, i) == 1) {
+    p = param_type(f, i);
+  }
+} return string p;

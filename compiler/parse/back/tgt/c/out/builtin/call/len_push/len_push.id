@@ -1,0 +1,17 @@
+
+// len picks id_len for a string and id_list_len for a list; push boxes its
+// value to the list's element type.
+
+emit_len(int id) {
+  int arg = l1_of(id)[0];
+  string s = "id_list_len(" + emit_expr(arg) + ")";
+  if(type_of(arg) == "string") {
+    s = "id_len(" + emit_expr(arg) + ")";
+  }
+} return string s;
+
+emit_push(int id) {
+  int[] args = l1_of(id);
+  string type_of_v = type_of(args[0]);
+  string ret_s = emit_push_tail(args, type_of_v);
+} return string ret_s;

@@ -1,0 +1,31 @@
+// The type of a binary expression that is not a concatenation. Comparisons
+// and the logical operators are int; arithmetic and bitwise operators widen
+// their operands, mirroring idc.py's arith_result.
+
+tb2(int id) {
+  string t = "int";
+  string s1_of_v = s1_of(id);
+  if(is_arith(s1_of_v)) {
+    t = tb2_arith(id);
+  }
+} return string t;
+
+// The operators whose result type follows their operands. `&& ||` are not
+// here: they are predicates, and their result is always int.
+is_arith(string s) {
+  int ok = 0;
+  if(s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "&" || s == "|" || s == "^" || s == "<<" || s == ">>") {
+    ok = 1;
+  }
+} return int ok;
+
+// Widening order is int < word < float, so mixing an index with an address
+// gives an address rather than silently truncating it to 32 bits. The order
+// itself is the registry's (see ../../../registry/lookup/num/widen.id); this only
+// decides that non-numeric operands are not widened.
+arith_result(string lt, string rt) {
+  string t = "int";
+  if(ty_num(lt) == 1 && ty_num(rt) == 1) {
+    t = ty_wider(lt, rt);
+  }
+} return string t;

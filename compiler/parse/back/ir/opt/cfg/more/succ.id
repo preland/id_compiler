@@ -1,0 +1,15 @@
+// A terminator's targets and what each one gets: `b` pushed onto that
+// target's predecessor list. Composed out of `pred_succ`'s loop so the
+// length is read fresh every pass through -- `ir_bl` cannot appear inside
+// `len`'s own argument list.
+
+succ_count(int v) {
+  int[] bl = ir_bl(v);
+  int n = len(bl);
+} return int n;
+
+pred_succ_at(int b, int v, int i) {
+  int[] ir_bl_v = ir_bl(v);
+  int[] blk_pre_v = blk_pre(ir_bl_v[i]);
+  push(blk_pre_v, b);
+} return void;

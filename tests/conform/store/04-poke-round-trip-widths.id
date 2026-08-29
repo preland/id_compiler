@@ -1,0 +1,17 @@
+do_pokes(word p) {
+  poke16(p, 4000);
+  poke32(p + 8, 300000);
+  poke64(p + 16, 5000000000);
+} return void;
+
+show_widths(word p) {
+  string a = "" + peek16(p) + " " + peek32(p + 8);
+  string b = "" + peek64(p + 16);
+  print(a + " " + b);
+} return void;
+
+main() {
+  word p = alloc(24);
+  do_pokes(p);
+  show_widths(p);
+} return int 0;

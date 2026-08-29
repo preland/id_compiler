@@ -1,0 +1,12 @@
+
+// The rest of emit_if_at: the opening line, then the body and its close.
+emit_if_head(int id, string ind, string head, string emit_expr_v) {
+  emit_line(head + emit_expr_v + ") {");
+  int[] l1_of_v = l1_of(id);
+  emit_if_tail(id, ind, l1_of_v);
+} return void;
+
+emit_if_tail(int id, string ind, int[] l1_of_v) {
+  emit_block(l1_of_v, ind + "    ");
+  end_if(id, ind);
+} return void;

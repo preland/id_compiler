@@ -1,0 +1,10 @@
+main(int argc, string[] argv) {
+  string a = "hello";
+  show_at(a, 0);
+  show_at(a, 2);
+} return int 0;
+
+show_at(string a, int i) {
+  int c = charat(a, i);
+  print(c);
+} return void;

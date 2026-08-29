@@ -1,0 +1,25 @@
+// Appending, and the growth that makes it always possible.
+//
+// Capacity doubles, so the copying a long run of pushes does is proportional
+// to the list rather than to the square of it. Nothing releases the old cells:
+// there is no free (docs/SPEC.md 6), so a list that grows through n doublings
+// leaves every earlier array of cells behind it in the arena.
+
+list_push(int[] xs, word v) {
+  word l2w_v = l2w(xs);
+  word p = list_room(l2w_v);
+  list_push_at(p, v);
+} return void;
+
+list_room(word p) {
+  if(ld64(p) >= ld64(p + 8)) {
+    word ld64_v = ld64(p + 8);
+    list_grow(p, ld64_v * 2);
+  }
+} return word p;
+
+list_grow(word p, word z) {
+  word a = mem_alloc(z * 8);
+  word ld64_v = ld64(p + 16);
+  list_grow_copy(p, a, z, ld64_v);
+} return void;

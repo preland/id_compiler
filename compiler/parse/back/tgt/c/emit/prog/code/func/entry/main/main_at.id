@@ -1,0 +1,8 @@
+// Helper for find_main: keep the func id whose name is "main".
+
+main_at(int i, int m) {
+  int r = m;
+  if(s1_of((import prog)[i]) == "main") {
+    r = (import prog)[i];
+  }
+} return int r;

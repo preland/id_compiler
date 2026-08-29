@@ -1,0 +1,4 @@
+void_arr_pair(int id, string t1, string t2) {
+  void_arr_type(id, t1);
+  void_arr_type(id, t2);
+} return void;

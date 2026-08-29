@@ -1,0 +1,18 @@
+
+// Expression emission for the array/index nodes, extending the emit_expr
+// dispatch chain (... -> ee3 -> ee4 -> ee5). An index reads a cell and unboxes
+// it to the element type; an arr builds a list literal.
+
+ee4(int id) {
+  string s = ee5(id);
+  if(k_of(id) == "index") {
+    s = emit_index(id);
+  }
+} return string s;
+
+ee5(int id) {
+  string s = ee6(id);
+  if(k_of(id) == "arr") {
+    s = emit_arr(id);
+  }
+} return string s;

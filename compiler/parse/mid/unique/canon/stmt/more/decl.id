@@ -1,0 +1,30 @@
+// Declaration, and index-assignment.
+//
+// A declaration keeps its type -- `int x = 0` and `word x = 0` are different
+// functions -- and is tagged differently when it exports, because an exported
+// declaration claims a global name and is therefore not interchangeable with
+// a local one.
+
+canon_decl(int id) {
+  string out = decl_tag(id);
+  string nm = decl_name(id);
+  string ret_s = decl_tail(id, out, nm);
+} return string ret_s;
+
+// The declared name: positional for a local, verbatim for an export, since an
+// exported name is a reserved global that the rest of the program reads by
+// that name.
+decl_name(int id) {
+  string out = s2_of(id);
+  if(i2_of(id) != 1) {
+    out = cn(out);
+  }
+} return string out;
+
+// `base[index] = value`. The parser folds the parsed index target into the
+// node's two int fields and puts the value in a one-element list.
+canon_iassign(int id) {
+  int i1_of_v = i1_of(id);
+  string head = canon_expr(i1_of_v);
+  string ret_s = iassign_tail(id, head);
+} return string ret_s;

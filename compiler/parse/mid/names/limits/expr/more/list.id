@@ -1,0 +1,33 @@
+// The elements of a list literal, and what counts as plain enough to end a
+// function.
+//
+// A name, or a literal that is written where it is read. A list literal is
+// not plain: `} return int[][] [tab, row];` is the one shape the parser could
+// never read anyway, because the `[` after the type looks like another
+// dimension of it (docs/FRICTION.md 8). Naming the list in the body removes
+// the ambiguity rather than teaching the parser to guess.
+
+hc_list(int[] xs) {
+  int i = 0;
+  int ok = 0;
+  while(i < len(xs)) {
+    ok = hc_at(xs, ok, i);
+    i = i + 1;
+  }
+} return int ok;
+
+hc_at(int[] xs, int ok, int i) {
+  int hit = ok;
+  if(ok == 0) {
+    hit = has_call(xs[i]);
+  }
+} return int hit;
+
+is_plain(int e) {
+  int ok = 0;
+  if(k_of(e) == "var" || k_of(e) == "import") {
+    ok = 1;
+  } else if(k_of(e) == "int" || k_of(e) == "float" || k_of(e) == "str") {
+    ok = 1;
+  }
+} return int ok;

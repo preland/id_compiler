@@ -1,0 +1,11 @@
+// Whether the build is freestanding: no host, so no C-ABI entry point and no
+// libc behind the runtime. Like the others, a decision the driver makes rather
+// than a property of the source, so it arrives as a flag and lives in a cell.
+
+fs_set(int v) {
+  lset((import fsc), 0, v);
+} return void;
+
+is_freestanding() {
+  int ret_i = (import fsc)[0];
+} return int ret_i;

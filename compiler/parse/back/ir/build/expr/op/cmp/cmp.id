@@ -1,0 +1,30 @@
+// A comparison. Its operands widen against each other -- `int` against `word`
+// is a `word` comparison -- and its result is `bool`, the IR's own i1, which
+// widens to `int` the moment it is used as a value.
+
+lw_ispred(string op) {
+  int r = 0;
+  if(op == "=" || op == "==" || op == "!=" || op == "<" || op == ">" || op == "<=" || op == ">=") {
+    r = 1;
+  }
+} return int r;
+
+// A comparison produces the IR's own `bool`, and `id` says the expression is
+// an `int` -- so it widens here rather than at each of its users. Every
+// expression's IR type is the type lw_ety gives it; a value whose type
+// disagreed with the one the rest of the lowering reads for it is the bug this
+// prevents, and it produced a signed comparison on an i1.
+lw_cmp(int node) {
+  int i1_of_v = i1_of(node);
+  string lw_ety_v = lw_ety(i1_of_v);
+  int ret_i = lw_cmp_t2(node, lw_ety_v);
+} return int ret_i;
+
+lw_cmp2(int node, string t) {
+  int v = 0 - 1;
+  if(t == "string") {
+    v = lw_scmp(node);
+  } else {
+    v = lw_ncmp(node, t);
+  }
+} return int v;

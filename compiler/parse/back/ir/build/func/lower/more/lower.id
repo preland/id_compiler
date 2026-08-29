@@ -1,0 +1,28 @@
+// AST to IR, one function at a time.
+//
+// The result is alloca form: every local is a stack slot, every read a load,
+// every write a store, every branch explicit. That is deliberately the dumbest
+// correct lowering there is -- no phis to get wrong, and a value is always in
+// exactly one place -- so it can be trusted without an argument. Everything
+// good about the output comes from the passes afterwards, where it can be
+// tested and measured on its own.
+
+ir_lower() {
+  int i = 0;
+  while(i < len((import prog))) {
+    lw_func((import prog)[i]);
+    i = i + 1;
+  }
+} return void;
+
+lw_func(int node) {
+  string s1_of_v = s1_of(node);
+  string s2_of_v = s2_of(node);
+  lw_func_mid(node, s1_of_v, s2_of_v);
+} return void;
+
+lw_open(int f) {
+  lw_reset();
+  lw_open2(f);
+  int ret_i = lw_go((import lwbody)[0]);
+} return int ret_i;

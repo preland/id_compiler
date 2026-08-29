@@ -1,0 +1,24 @@
+// Collect exported variables (with their owning function) by scanning each
+// function's body, like hoisting but recording exports rather than locals.
+
+collect_exports() {
+  int i = 0;
+  while(i < len((import prog))) {
+    scan_func_exports((import prog)[i]);
+    i = i + 1;
+  }
+} return void;
+
+scan_func_exports(int id) {
+  int[] l2_of_v = l2_of(id);
+  string s1_of_v = s1_of(id);
+  exp_list(l2_of_v, s1_of_v);
+} return void;
+
+exp_list(int[] stmts, string owner) {
+  int i = 0;
+  while(i < len(stmts)) {
+    exp_one(stmts[i], owner);
+    i = i + 1;
+  }
+} return void;

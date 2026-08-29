@@ -1,0 +1,18 @@
+// The rest of `ll_t5` and `ll_t6`: whether an opcode is a cast, and the two
+// branches that need more than the naming rules allow inline.
+ll_t5_isc(int id) {
+  string op = ir_op(id);
+  int r = ll_iscast(op);
+} return int r;
+
+ll_t5_cmp(int id, string sym, int a) {
+  string vty = ll_vty(a);
+  int b = ir_b(id);
+  string ret_s = "%v" + id + " = " + ir_op(id) + " " + ll_pred(sym, vty) + " " + ll_op(a) + ", " + ll_val(b);
+} return string ret_s;
+
+ll_t6_bin(int id) {
+  int a = ir_a(id);
+  int b = ir_b(id);
+  string ret_s = "%v" + id + " = " + ir_op(id) + " " + ll_op(a) + ", " + ll_val(b);
+} return string ret_s;

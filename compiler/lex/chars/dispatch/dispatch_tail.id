@@ -1,0 +1,30 @@
+// Dispatch chain, part 2: the tail of the per-character decision tree.
+
+// hex literal, or hand off to the binary case. Hex is tested before the
+// decimal case because `0x1f` starts with a digit and would otherwise scan as
+// the number 0.
+scan_numop(string src, int i) {
+  int ni = 0;
+  if(hex_start(src, i)) {
+    ni = scan_hex(src, i);
+  } else {
+    ni = scan_binop(src, i);
+  }
+} return int ni;
+
+// string literal (pass the index past the opening quote), else an operator
+scan_strop(string src, int i) {
+  int ni = 0;
+  if(charat(src, i) == 34) {
+    ni = scan_string(src, i + 1);
+  } else {
+    ni = scan_op(src, i);
+  }
+} return int ni;
+
+// consume to end of line (or end of input)
+skip_comment(string src, int i) {
+  while(charat(src, i) != 10 && charat(src, i) != -1) {
+    i = i + 1;
+  }
+} return int i;

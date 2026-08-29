@@ -1,0 +1,25 @@
+// A declaration must initialise: `int x = 1`, never `int x`.
+eat_eq(int[] pos) {
+  expect_text(pos, "=");
+  advance(pos);
+} return void;
+
+//   chkfail  set by any failing check or syntax error; suppresses emission
+//   curtl    the line of the token most recently consumed, which is the line
+//            every node is stamped with as it is built
+init_lines3() {
+  export int[] chkfail = [0];
+  export int[] curtl = [0];
+  init_lines4();
+} return void;
+
+//   casefn     the function node each case was written under
+//   casestart  the case's first token index, and caseend one past its last.
+//              A case is compared to another by its tokens rather than by
+//              rebuilding its text: identical cases are rejected, and the
+//              token store is already the canonical form.
+init_lines4() {
+  export int[] casefn = [];
+  export int[] casestart = [];
+  export int[] caseend = [];
+} return void;

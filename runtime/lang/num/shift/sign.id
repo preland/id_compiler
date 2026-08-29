@@ -1,0 +1,16 @@
+// `>>`, the arithmetic shift, and the one whose over-shift is not zero.
+//
+// docs/SPEC.md 2.3 says a count at or past the width leaves the sign bit
+// smeared across the whole word: all ones for a negative value, zero
+// otherwise. A negative count would trap; here it returns zero, as it does for
+// the other two shifts, and `z >= 0` is what keeps it out of the sign-fill
+// case it would otherwise land in.
+
+sar(word a, word z) {
+  word v = 0;
+  if(ult(z, 64) == 1) {
+    v = sar_raw(a, z);
+  } else if(a < 0 && z >= 0) {
+    v = 0 - 1;
+  }
+} return word v;

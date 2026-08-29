@@ -1,0 +1,27 @@
+// Lowering state. One function is lowered at a time, so this is a handful of
+// cells rather than a stack:
+//
+//   lwcur   the block instructions are being appended to
+//   lwfn    the IR function being built
+//   lwent   its entry block, which holds nothing but allocas and one branch
+//   lwbody  the block that branch goes to, where the body starts
+//   lwvar   the names bound so far, and
+//   lwslot  the alloca each one lives in -- both cleared per function
+
+init_lw() {
+  export int[] lwcur = [0];
+  export int[] lwfn = [0];
+  int ret_i = init_lw2();
+} return int ret_i;
+
+init_lw2() {
+  export int[] lwent = [0];
+  export int[] lwbody = [0];
+  int ret_i = init_lw3();
+} return int ret_i;
+
+init_lw3() {
+  export string[] lwvar = [];
+  export int[] lwslot = [];
+  int ret_i = init_opt();
+} return int ret_i;

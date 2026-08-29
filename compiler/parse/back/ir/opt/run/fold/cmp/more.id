@@ -1,0 +1,14 @@
+// The two operands `fold_iszext` and `fold_cmp` test on the right of an
+// `&&`: neither may run unless the arm to its left already held, so each is
+// its own composition rather than a name computed ahead of the `if`.
+
+fold_isbool(int v) {
+  int a = ir_a(v);
+  string t = ir_ty(a);
+  int r = t == "bool";
+} return int r;
+
+fold_zero_of(int id) {
+  int b = ir_b(id);
+  int r = fold_zero(b);
+} return int r;

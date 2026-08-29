@@ -1,0 +1,20 @@
+// One argument against one parameter. Reported at the argument's own line,
+// as idc.py does -- a call spread over several lines names the one that is
+// actually wrong.
+//
+// A type the compiler could not work out is not judged, the rule the whole tc
+// family follows: an empty list literal is the common case here, since it has
+// no type of its own and takes the one the parameter asks for.
+
+chk_argtypes(int id, int fn) {
+  int i = 0;
+  while(i < flat_arg_count(id)) {
+    chk_arg_at(id, fn, i);
+    i = i + 1;
+  }
+} return void;
+
+chk_arg_at(int id, int fn, int i) {
+  int a = l1_of(id)[i];
+  chk_arg_typecheck(id, fn, i, a);
+} return void;

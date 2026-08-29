@@ -1,0 +1,4 @@
+// EXPECT: must keep one type
+// a name may repeat across functions, but only with a single consistent type
+main() { int count = 1; } return int 0;
+other() { string count = "hi"; } return void;

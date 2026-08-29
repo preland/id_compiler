@@ -1,0 +1,27 @@
+
+ll_blocks(int f) {
+  int i = 0;
+  while(i < blk_count(f)) {
+    int[] blks = irf_blk(f);
+    ll_block(blks[i]);
+    i = i + 1;
+  }
+} return void;
+
+ll_insns(int b) {
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] ins = blk_ins(b);
+    ll_insn(ins[i]);
+    i = i + 1;
+  }
+} return void;
+
+// A parameter is spelled in the signature and a nop is what a pass left
+// behind; neither is a line of the body.
+ll_insn(int id) {
+  if(ir_op(id) != "nop" && ir_op(id) != "param") {
+    string ll_text_v = ll_text(id);
+    emit_line("  " + ll_text_v);
+  }
+} return void;

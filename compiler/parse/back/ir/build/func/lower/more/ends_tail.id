@@ -1,0 +1,14 @@
+// The rest of lw_fin: the statements, once the parameters have their slots.
+lw_fin_tail(int node) {
+  int[] l2_of_v = l2_of(node);
+  lw_stmts(l2_of_v);
+  lw_ret(node);
+} return void;
+
+// The rest of lw_ret, once the entry block and the branch into the body are
+// in hand.
+lw_ret_tail(int node, int lw_ent_v, int lw_brto_v) {
+  ir_add(lw_ent_v, lw_brto_v);
+  string s2_of_v = s2_of(node);
+  lw_ret_val(node, s2_of_v);
+} return void;

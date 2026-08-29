@@ -1,0 +1,26 @@
+// Locating a function by its position in `prog` rather than by its name.
+//
+// func_file and func_line answer "where is the function called X", which for
+// a duplicated name is the LAST one declared -- they overwrite on every
+// match. A diagnostic about a duplicate needs both definitions, so it asks by
+// index instead.
+
+first_fn(string fname) {
+  int i = 0;
+  int n = 0 - 1;
+  while(i < len((import prog))) {
+    n = first_fn_at(i, fname, n);
+    i = i + 1;
+  }
+} return int n;
+
+first_fn_at(int i, string fname, int n) {
+  int r = n;
+  if(n < 0 && s1_of((import prog)[i]) == fname) {
+    r = i;
+  }
+} return int r;
+
+prog_loc(int i) {
+  string ret_s = (import pfile)[i] + ":" + (import pline)[i] + ": error: ";
+} return string ret_s;

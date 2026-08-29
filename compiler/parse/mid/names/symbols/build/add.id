@@ -1,0 +1,28 @@
+// Record a function's return type, and the two table-append helpers.
+
+sym_func(int id) {
+  if(k_of(id) == "func") {
+    string s1_of_v = s1_of(id);
+    string s2_of_v = s2_of(id);
+    add_func(s1_of_v, s2_of_v, id);
+  }
+} return void;
+
+// The unit comes along because the table is keyed by it: a name may be an int
+// in the program and a string in an imported library, and a lookup has to know
+// which of the two it is asking about.
+add_var(string name, string type, int unit) {
+  push((import vtypes), type);
+  push((import vunit), unit);
+  vidx_add(name);
+} return void;
+
+// The node id comes along so that a call site can reach the parameter list
+// and the return clause: a name and a return type answer "what does this
+// evaluate to", which is all the emitter ever needed, but not "may it be
+// called like that".
+add_func(string name, string ret, int id) {
+  push((import frets), ret);
+  push((import fnodes), id);
+  fidx_add(name);
+} return void;

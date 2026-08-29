@@ -1,0 +1,19 @@
+// One parameter, and the return clause after the closing brace.
+
+one_param(int[] pos) {
+  string type = parse_type(pos);
+  string name = read_name(pos);
+  int ret_i = node_param(type, name);
+} return int ret_i;
+
+func_ret(int[] pos, string name, int[] params, int[] body) {
+  advance(pos);
+  string rt = parse_type(pos);
+  int ret_i = func_done(pos, name, params, body, rt);
+} return int ret_i;
+
+func_done(int[] pos, string name, int[] params, int[] body, string rt) {
+  int rexpr = ret_expr(pos, rt);
+  skip_semi(pos);
+  int ret_i = node_func(name, rt, params, body, rexpr);
+} return int ret_i;

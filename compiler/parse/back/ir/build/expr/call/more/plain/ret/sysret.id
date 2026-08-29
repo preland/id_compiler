@@ -1,0 +1,10 @@
+// The flat store works in machine words, so its helpers return one -- a write
+// returns nothing and the two string bridges return what they are named for.
+lw_sysret(string name) {
+  string t = "word";
+  if(is_pokefn(name) == 1) {
+    t = "";
+  } else if(name == "str_of_mem") {
+    t = "string";
+  }
+} return string t;

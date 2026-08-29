@@ -1,0 +1,27 @@
+// Lower an expression and convert it to the type the context wants. C's
+// implicit conversions do this for the C target; LLVM IR has none, so every
+// widening and narrowing in the program is an instruction here.
+
+lw_as(int node, string want) {
+  string t = lw_ety(node);
+  int lw_expr_v = lw_expr(node);
+  int ret_i = lw_conv(lw_expr_v, t, want);
+} return int ret_i;
+
+lw_conv(int v, string t, string want) {
+  int r = v;
+  if(t != want) {
+    r = lw_cast(v, t, want);
+  }
+} return int r;
+
+// `bool` is the IR's own type -- the i1 a comparison produces. It never
+// appears in `id` source and only ever widens.
+lw_cast(int v, string t, string want) {
+  int r = v;
+  if(t == "bool") {
+    r = lw_op("zext", want, v, 0 - 1, "");
+  } else {
+    r = lw_cast2(v, t, want);
+  }
+} return int r;

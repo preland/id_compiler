@@ -1,0 +1,5 @@
+// EXPECT: cannot push a string onto a int[]
+main() {
+  int[] xs = [];
+  push(xs, "nope");
+} return int 0;

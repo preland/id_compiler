@@ -1,0 +1,25 @@
+// idc.py's explain_bad_var: a name nobody declared is a typo, and a name
+// someone else declared is a scope error whose fix depends on whether the
+// owner exported it.
+
+report_bad_var(string name, string owner, int ln) {
+  if(find_str((import dvname), name) < 0) {
+    report_undef_var(name, owner, ln);
+  } else {
+    report_owned_var(name, owner, ln);
+  }
+} return void;
+
+report_undef_var(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  print(loc_at_v + "undefined variable '" + name + "'");
+  note_failure();
+} return void;
+
+report_owned_var(string name, string owner, int ln) {
+  if(find_str((import enames), name) >= 0) {
+    report_var_import(name, owner, ln);
+  } else {
+    report_var_private(name, owner, ln);
+  }
+} return void;

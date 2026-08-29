@@ -1,0 +1,26 @@
+
+bi_ok2(string want, string t) {
+  int ok = bi_ok3(want, t);
+  if(want == "list" && ty_is_list(t) == 0) {
+    ok = 0;
+  }
+} return int ok;
+
+bi_ok3(string want, string t) {
+  int ok = 1;
+  if(want == "strlist" && bi_strlist(t) == 0) {
+    ok = 0;
+  } else if((want == "word" || want == "addr") && ty_int(t) == 0) {
+    ok = 0;
+  }
+} return int ok;
+
+// `len` is the one builtin that accepts two unrelated shapes, because a
+// string's length and a list's length are the same question to a reader even
+// though they are different C calls.
+bi_strlist(string t) {
+  int ok = 0;
+  if(t == "string" || ty_is_list(t) == 1) {
+    ok = 1;
+  }
+} return int ok;

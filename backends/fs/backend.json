@@ -1,0 +1,30 @@
+{
+  "name": "fs",
+  "abi": [
+    { "name": "fs_open",   "params": ["string", "string"], "returns": "int",
+      "doc": "open(path, mode) -> handle >= 0, or -1; mode is r/w/a" },
+    { "name": "fs_read",   "params": ["int", "int[]", "int"], "returns": "int",
+      "doc": "read(handle, buf, n) -> bytes read into buf, 0 at EOF, -1 on error" },
+    { "name": "fs_write",  "params": ["int", "int[]", "int"], "returns": "int",
+      "doc": "write(handle, buf, n) -> bytes written, -1 on error" },
+    { "name": "fs_close",  "params": ["int"], "returns": "int",
+      "doc": "close(handle) -> 0, or -1" },
+    { "name": "fs_size",   "params": ["string"], "returns": "int",
+      "doc": "size(path) -> bytes, or -1" },
+    { "name": "fs_exists", "params": ["string"], "returns": "int",
+      "doc": "exists(path) -> 1 or 0" },
+    { "name": "fs_remove", "params": ["string"], "returns": "int",
+      "doc": "remove(path) -> 0, or -1" },
+    { "name": "fs_error",  "params": [], "returns": "int",
+      "doc": "error() -> the errno of the last failed call, or 0" }
+  ],
+  "targets": {
+    "c": {
+      "header": "fs.h",
+      "platforms": {
+        "linux":  { "sources": ["fs_posix.c"], "cflags": [], "link": [] },
+        "darwin": { "sources": ["fs_posix.c"], "cflags": [], "link": [] }
+      }
+    }
+  }
+}

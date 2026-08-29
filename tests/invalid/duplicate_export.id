@@ -1,0 +1,11 @@
+// EXPECT: is already an exported global
+// A name may be exported only once. Two `export`s of one name are two owners
+// for one C global: the second silently re-initialises the first's state.
+main(int argc, string[] argv) {
+  export int shared = 1;
+  second();
+} return int 0;
+
+second() {
+  export int shared = 2;
+} return void;

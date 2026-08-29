@@ -1,0 +1,4 @@
+// EXPECT: mem_of_str expects a string, got int
+main(int argc, string[] argv) {
+  print("" + mem_of_str(7));
+} return int 0;

@@ -1,0 +1,26 @@
+// The C-ABI entry point: marshal argv into an `id` string list and call
+// id_main. Emitted as text rather than lowered through the IR because it is
+// not `id` code -- it is the boundary the host calls across, and it exists in
+// exactly one shape.
+
+// Freestanding has no host to be called from: the boot code jumps straight to
+// id_main, so a wrapper that marshals an argv nobody passed would be a symbol
+// named `main` in a program with no C library to call it.
+ll_entry() {
+  int f = ll_main();
+  if(f >= 0 && is_freestanding() == 0) {
+    ll_wrapper(f);
+  }
+} return int 0;
+
+ll_wrapper(int f) {
+  emit_line("");
+  emit_line("define i32 @main(i32 %argc, ptr %argv) {\nw.entry:\n  %args = call ptr @id_list_new()\n  br label %w.test\nw.test:\n  %i = phi i32 [ 0, %w.entry ], [ %i.next, %w.body ]\n  %more = icmp slt i32 %i, %argc\n  br i1 %more, label %w.body, label %w.done\nw.body:\n  %ix = sext i32 %i to i64\n  %slot = getelementptr ptr, ptr %argv, i64 %ix\n  %arg = load ptr, ptr %slot\n  %cell = ptrtoint ptr %arg to i64\n  call void @id_list_push(ptr %args, i64 %cell)\n  %i.next = add i32 %i, 1\n  br label %w.test\nw.done:");
+  ll_wrap_tail(f);
+} return void;
+
+ll_wrap_tail(int f) {
+  string mcall = ll_mcall(f);
+  emit_line(mcall);
+  ll_wrap_end();
+} return void;

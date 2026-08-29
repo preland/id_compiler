@@ -1,0 +1,28 @@
+// A comparison carries the `id` operator, and the operand type decides how
+// LLVM spells it: integers compare signed, floats compare ordered. Keeping one
+// spelling in the IR is what lets a fold read a comparison without knowing
+// which target will print it.
+ll_pred(string op, string t) {
+  string s = ll_ipred(op);
+  if(ty_kind(t) == "float") {
+    s = "o" + ll_fpred(op);
+  }
+} return string s;
+
+ll_ipred(string op) {
+  string s = "eq";
+  if(op == "!=") {
+    s = "ne";
+  } else if(op != "=" && op != "==") {
+    s = "s" + ll_rel(op);
+  }
+} return string s;
+
+ll_fpred(string op) {
+  string s = "eq";
+  if(op == "!=") {
+    s = "ne";
+  } else if(op != "=" && op != "==") {
+    s = ll_rel(op);
+  }
+} return string s;

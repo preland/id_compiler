@@ -1,0 +1,6 @@
+// EXPECT: needs a known list type
+// an empty list literal is fine on a typed declaration, but not where the
+// element type is unknown (here, as a bare argument)
+main() {
+  int n = len([]);
+} return int 0;

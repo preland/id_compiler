@@ -1,0 +1,28 @@
+// Both of these keep the *first* row that matches, so the guard is on the
+// accumulator rather than on the row: once an answer is found the rest of the
+// scan leaves it alone.
+
+owner_at(int i, string name, string s) {
+  string t = s;
+  if(s == "" && (import dvname)[i] == name) {
+    t = (import dvfunc)[i];
+  }
+} return string t;
+
+// The type a name was first given by a non-exporting declaration in this unit,
+// or "" if it has never had one there. Exported rows are skipped so that
+// `export int n` in one function and `string n` in another is reported as the
+// reuse of a reserved name -- which is what it is -- and not as a type
+// disagreement.
+first_type(string name, int unit) {
+  int[] bkt = (import didx)[name_bucket(name)];
+  string t = "";
+  t = ft_scan(bkt, name, unit, 0, t);
+} return string t;
+
+first_type_at(int i, string name, string t, int unit) {
+  string s = t;
+  if(t == "" && (import dvname)[i] == name && (import dvexp)[i] == 0 && (import dvunit)[i] == unit) {
+    s = (import dvtype)[i];
+  }
+} return string s;

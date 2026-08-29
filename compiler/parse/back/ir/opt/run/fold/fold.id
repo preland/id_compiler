@@ -1,0 +1,36 @@
+// The folds mem2reg makes visible.
+//
+// The one that matters most is the shape every branch in the language has: the
+// lowering asks "is this expression nonzero" of a comparison that already
+// produced a bit, so `icmp ne (zext b), 0` is written for every `if` a reader
+// wrote with `<`. It is `b`.
+//
+// Constant arithmetic is deliberately not folded yet. `id` specifies that
+// overflow wraps (docs/SPEC.md 2.1) and this compiler is itself compiled by a
+// C compiler for which signed overflow is undefined, so a fold of `a * b`
+// would be computed by the very rule it is supposed to implement. It needs
+// arithmetic routed through `word` first, and that is a separate change.
+
+op_fold(int f) {
+  int i = 0;
+  while(i < blk_count(f)) {
+    int[] irf_blk_v = irf_blk(f);
+    fold_blk(f, irf_blk_v[i]);
+    i = i + 1;
+  }
+} return void;
+
+fold_blk(int f, int b) {
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] blk_ins_v = blk_ins(b);
+    fold_one(f, blk_ins_v[i]);
+    i = i + 1;
+  }
+} return void;
+
+fold_one(int f, int id) {
+  if(ir_op(id) == "icmp" && ir_s(id) == "!=") {
+    fold_cmp(f, id);
+  }
+} return void;

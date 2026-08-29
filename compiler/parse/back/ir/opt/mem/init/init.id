@@ -1,0 +1,30 @@
+// mem2reg: stack slots become SSA values.
+//
+// The lowering puts every local in an alloca and every read and write through
+// it, which is obviously correct and completely opaque: no pass can see that
+// two loads of the same slot are the same value while the value lives in
+// memory. This is the pass that opens everything else up.
+//
+// It places a phi for every slot in every block and then removes the ones that
+// turned out to be one value -- Braun's construction rather than dominance
+// frontiers. The frontier algorithm needs a dominator tree, and this needs
+// nothing but the predecessor lists, reaches the same answer on the reducible
+// CFGs that `if` and `while` produce, and is a page instead of three.
+
+op_mem2reg(int f) {
+  m2r_init(f);
+  m2r_phis(f);
+  m2r_pass2(f);
+} return void;
+
+m2r_init(int f) {
+  m2r_reset();
+  m2r_collect(f);
+  m2r_rows(f, 0);
+} return void;
+
+m2r_reset() {
+  pred_wipe((import pra));
+  m2r_wipe((import phiof));
+  m2r_wipe((import outv));
+} return void;

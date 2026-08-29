@@ -1,0 +1,8 @@
+// EXPECT: division by zero
+// `int` division by zero used to be a raw SIGFPE and a core dump with no
+// message, while the same mistake on a `word` printed one line and exited 1.
+// The divisor comes from argc so no constant-folding can remove the division.
+main(int argc, string[] argv) {
+  int z = argc - 1;
+  print(10 / z);
+} return int 0;

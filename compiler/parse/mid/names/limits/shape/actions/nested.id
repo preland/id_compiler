@@ -1,0 +1,28 @@
+// The bodies of the two compound statements. A loop body and each arm of an
+// if are one level deeper than the block that holds them.
+//
+// An `else if` chain is *not* deeper: idc.py walks the whole chain at the
+// depth of the first if, checking each `then` one level down, so check_else
+// hands a chained if straight back to check_if with the depth unchanged.
+
+check_loop(int id, int depth, string fname) {
+  if(k_of(id) == "while") {
+    int[] l1_of_v = l1_of(id);
+    check_block(l1_of_v, depth + 1, fname, (import nline)[id]);
+  }
+} return void;
+
+check_if(int id, int depth, string fname) {
+  int[] l1_of_v = l1_of(id);
+  check_block(l1_of_v, depth + 1, fname, (import nline)[id]);
+  check_else(id, depth, fname);
+} return void;
+
+check_else(int id, int depth, string fname) {
+  int[] els = l2_of(id);
+  if(i2_of(id) == 1) {
+    check_if(els[0], depth, fname);
+  } else {
+    check_plain_else(els, depth, fname, (import nline)[id]);
+  }
+} return void;

@@ -1,0 +1,24 @@
+// Which numbered operand a name is. The result is operand 0 -- LLVM counts
+// outputs first -- and the parameters follow it in order.
+ll_asm_ix(int r, string nm) {
+  int n = 0;
+  if(nm != (import afretn)[r]) {
+    n = ll_asm_pix(r, nm) + 1;
+  }
+} return int n;
+
+ll_asm_pix(int r, string nm) {
+  int i = 0;
+  int found = 0 - 1;
+  while(i < len((import afparams)[r])) {
+    found = ll_asm_pm(r, i, nm, found);
+    i = i + 1;
+  }
+} return int found;
+
+ll_asm_pm(int r, int i, string nm, int found) {
+  int v = found;
+  if(s2_of((import afparams)[r][i]) == nm) {
+    v = i;
+  }
+} return int v;

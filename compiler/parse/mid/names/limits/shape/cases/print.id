@@ -1,0 +1,13 @@
+// The two messages of report.id, split out so each reporting block stays
+// within the action limit. idc.py's wording, word for word -- tests/invalid.sh
+// requires both compilers to produce the same text for the same program.
+
+cases_report(string prog_loc_v, string s1_of_v, int n) {
+  print(prog_loc_v + "function '" + s1_of_v + "' has " + n + " test case(s); --require-tests needs at least 2 (see docs/TESTS.md)");
+  note_failure();
+} return void;
+
+dup_case_report(string func_file_v, int i) {
+  print(func_file_v + ":" + (import tline)[(import casestart)[i]] + ": error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)");
+  note_failure();
+} return void;

@@ -1,0 +1,8 @@
+
+main(int argc, string[] argv) {
+  string a = "cat";
+  string b = "dog";
+  if (a != b) {
+    print("different");
+  }
+} return int 0;

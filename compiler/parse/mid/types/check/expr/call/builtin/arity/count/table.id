@@ -1,0 +1,25 @@
+// How many arguments each builtin takes. Two is the common case and so the
+// default; the other two are listed.
+
+bi_arity(string name) {
+  int n = 2;
+  if(bi_zero(name) == 1) {
+    n = 0;
+  } else if(bi_one(name) == 1) {
+    n = 1;
+  }
+} return int n;
+
+bi_zero(string name) {
+  int ok = 0;
+  if(name == "input" || name == "read_all" || name == "flush" || name == "getkey" || name == "ticks" || name == "store_size") {
+    ok = 1;
+  }
+} return int ok;
+
+bi_one(string name) {
+  int ok = 0;
+  if(name == "print" || name == "len" || name == "pop" || name == "to_int" || name == "chr" || name == "put" || name == "sleep_ms" || name == "mem_of_str" || name == "alloc" || is_peekfn(name) == 1) {
+    ok = 1;
+  }
+} return int ok;

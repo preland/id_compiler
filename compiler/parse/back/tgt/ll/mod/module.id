@@ -1,0 +1,16 @@
+// The LLVM IR target: a printer over the IR, not a second walk of the AST.
+// Everything interesting -- the CFG, the SSA values, the passes -- has already
+// happened by the time anything here runs, which is the whole point of there
+// being an IR at all.
+
+emit_llvm(string triple, int lvl) {
+  ir_lower();
+  ir_opt(lvl);
+  ll_emit(triple);
+} return void;
+
+ll_emit(string triple) {
+  ll_head(triple);
+  ll_asm_all(triple);
+  ll_body();
+} return void;

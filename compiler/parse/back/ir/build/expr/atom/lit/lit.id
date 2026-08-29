@@ -1,0 +1,20 @@
+// A literal is a constant, and a constant is not an instruction anybody emits:
+// it has no home block and prints as its text at every use. That is what LLVM
+// IR wants, and it is what makes constant folding a rewrite of one operand
+// rather than a rewrite of the instruction stream.
+lw_lit(int node) {
+  string lw_ety_v = lw_ety(node);
+  string s1_of_v = s1_of(node);
+  int ret_i = lw_const(lw_ety_v, s1_of_v);
+} return int ret_i;
+
+lw_const(string ty, string s) {
+  int ret_i = ir_leaf("const", ty, 0 - 1, 0 - 1, s);
+} return int ret_i;
+
+// Reading a name: the address, then a load from it.
+lw_name(int node) {
+  int addr = lw_name_addr(node);
+  string ety = lw_ety(node);
+  int ret_i = lw_load_at(addr, ety);
+} return int ret_i;

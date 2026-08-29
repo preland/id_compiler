@@ -1,0 +1,5 @@
+// EXPECT: same signature and logic as
+// Two functions with the same signature and the same body (up to renaming their
+// own locals) are duplicate functionality -- a compile error.
+inc(int x) { int r = x + 1; } return int r;
+bump(int y) { int q = y + 1; } return int q;

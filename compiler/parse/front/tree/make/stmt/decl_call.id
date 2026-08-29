@@ -1,0 +1,14 @@
+// decl + param + call constructors. exported is 1 for `export`, else 0.
+
+node_decl(string type, string name, int expr, int exported) {
+  int ret_i = newleaf("decl", expr, exported, type, name);
+} return int ret_i;
+
+node_param(string type, string name) {
+  int ret_i = newleaf("param", 0, 0, type, name);
+} return int ret_i;
+
+node_call(string name, int[] args) {
+  int[] none = [];
+  int ret_i = newnode("call", 0, 0, name, "", args, none);
+} return int ret_i;

@@ -1,0 +1,28 @@
+// Numbers as decimal text.
+//
+// The digits of a number come out least significant first, so they are written
+// backwards into the end of a fresh buffer and the string starts wherever they
+// stopped. Twenty-four bytes is more than the longest answer -- a minus sign
+// and nineteen digits, plus the NUL.
+//
+// A `word` prints signed, which is what the hosted runtime does with `%lld`
+// and therefore what a program compiled both ways has to see.
+
+str_of_word(word a) {
+  word p = mem_alloc(24);
+  st8(p + 23, 0);
+  string ret_s = str_of_word_at(a, p);
+} return string ret_s;
+
+str_of_int(int n) {
+  string ret_s = str_of_word(n);
+} return string ret_s;
+
+num_str(word a, word e) {
+  word q = 0;
+  if(a < 0) {
+    q = num_neg(a, e);
+  } else {
+    q = num_pos(a, e);
+  }
+} return word q;

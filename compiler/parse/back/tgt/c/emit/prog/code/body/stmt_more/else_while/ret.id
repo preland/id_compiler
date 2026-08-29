@@ -1,0 +1,12 @@
+
+// The return clause.
+
+emit_ret(int id) {
+  if(i1_of(id) >= 0) {
+    int i1_of_v = i1_of(id);
+    string emit_expr_v = emit_expr(i1_of_v);
+    emit_line("    return " + emit_expr_v + ";");
+  } else {
+    emit_line("    return;");
+  }
+} return void;

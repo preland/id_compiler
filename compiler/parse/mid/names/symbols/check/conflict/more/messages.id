@@ -1,0 +1,21 @@
+// The messages a declaration can draw, word for word as idc.py writes them,
+// so a program rejected by either compiler is rejected with the same
+// explanation.
+
+report_var_is_func(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  print(loc_at_v + "'" + name + "' is already the name of a function");
+  note_failure();
+} return void;
+
+report_var_twice(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  print(loc_at_v + "variable '" + name + "' is declared twice in function '" + owner + "'");
+  note_failure();
+} return void;
+
+report_var_exported(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  string export_owner_v = export_owner(name);
+  var_report(loc_at_v + "'" + name + "' is an exported global (by '" + export_owner_v + "'); another variable cannot reuse that name -- read the global with 'import " + name + "'");
+} return void;

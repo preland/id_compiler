@@ -1,0 +1,29 @@
+// The magnitude: digits written backwards from `e`, and the address of the
+// first one.
+//
+// The division is unsigned so that the same loop serves a negative number
+// through its two's-complement magnitude -- `0 - MIN` is `MIN` again, and read
+// as unsigned that is exactly the magnitude wanted.
+
+num_mag(word a, word e) {
+  word q = e;
+  while(a != 0) {
+    q = q - 1;
+    num_mag_write(q, a);
+    a = udiv(a, 10);
+  }
+} return word q;
+
+// Zero has no digits by that rule, so it is the one value written rather than
+// derived.
+num_pos(word a, word e) {
+  word q = num_mag(a, e);
+  if(a == 0) {
+    q = num_zero(e);
+  }
+} return word q;
+
+num_zero(word e) {
+  st8(e - 1, 48);
+  word ret_w = e - 1;
+} return word ret_w;

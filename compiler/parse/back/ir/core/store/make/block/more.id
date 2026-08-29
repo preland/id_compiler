@@ -1,0 +1,8 @@
+// The new block's own index. Its predecessors, instructions and label are
+// already in the store by the time this runs; what is left is telling the
+// owning function it exists and handing back the id the caller will use.
+ir_blk4(int f) {
+  int len_v = len((import bfunc));
+  push((import fnblk)[f], len_v - 1);
+  int ret_i = len((import bfunc)) - 1;
+} return int ret_i;

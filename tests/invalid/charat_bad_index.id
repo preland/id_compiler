@@ -1,0 +1,5 @@
+// EXPECT: charat index must be int, got string
+main() {
+  string s = "hi";
+  int c = charat(s, "no");
+} return int 0;

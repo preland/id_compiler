@@ -1,0 +1,14 @@
+
+// String equality: `a == b` on strings becomes (strcmp(a, b) == 0), matching
+// idc.py (and likewise for != and the bare `=` equality).
+
+emit_strcmp(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string s = strcmp_line(id, i1_of_v, i2_of_v);
+} return string s;
+
+strcmp_line(int id, int i1_of_v, int i2_of_v) {
+  string s1_of_v = s1_of(id);
+  string s = "(strcmp(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ") " + map_op(s1_of_v) + " 0)";
+} return string s;

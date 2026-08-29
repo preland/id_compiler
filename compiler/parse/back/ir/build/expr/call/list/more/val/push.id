@@ -1,0 +1,12 @@
+// One element of a list literal: converted to the element type, then boxed
+// for the runtime's uniform cell, then pushed.
+lw_arr_push(int node, int i, int a, string elem) {
+  int[] els = l1_of(node);
+  int v = lw_as(els[i], elem);
+  lw_arr_push2(a, v, elem);
+} return void;
+
+lw_arr_push2(int a, int v, string elem) {
+  int boxed = lw_box(v, elem);
+  lw_callf("id_list_push", "", [a, boxed]);
+} return void;

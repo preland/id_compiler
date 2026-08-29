@@ -1,0 +1,25 @@
+// The three questions asked of one bucket instead of the whole table. All
+// keep the semantics of the scans they replace: dv_count counts every matching
+// row, ft_scan keeps the first, vx_scan the last, and a bucket holds its rows
+// in insertion order, so "first" and "last" still mean the same declaration.
+
+dv_count(int[] bkt, string name, string owner, int i, int ok) {
+  while(i < len(bkt)) {
+    ok = ok + dv_hit(bkt[i], name, owner);
+    i = i + 1;
+  }
+} return int ok;
+
+ft_scan(int[] bkt, string name, int unit, int i, string t) {
+  while(i < len(bkt)) {
+    t = first_type_at(bkt[i], name, t, unit);
+    i = i + 1;
+  }
+} return string t;
+
+vx_scan(int[] bkt, string name, int unit, int i, int found) {
+  while(i < len(bkt)) {
+    found = vx_hit(bkt, i, name, unit, found);
+    i = i + 1;
+  }
+} return int found;

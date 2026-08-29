@@ -1,0 +1,19 @@
+// The one place the runtime touches the machine: COM1, at port 0x3f8.
+//
+// A port is not memory, so this cannot be a store -- x86 reaches it with `out`,
+// and `id` reaches `out` the way it reaches any instruction it has no operator
+// for: an `asm` function declared for one platform (docs/ASM.md).
+//
+// `out` takes its port in dx unless the port fits in a byte, and 0x3f8 does
+// not, so the block writes two fixed registers. That is safe here and only
+// here: the definition is emitted `noinline`, so rax and rdx are registers the
+// ABI already lets a call destroy, and the byte is read into rax *before* rdx
+// is written, so an operand the allocator happened to put in rdx has already
+// been consumed.
+
+asm "x86_64-unknown-none" com1_out(word c) {
+  "movq %[c], %%rax"
+  "movq $0x3f8, %%rdx"
+  "outb %%al, %%dx"
+  "xorq %[ret], %[ret]"
+} return word ret;

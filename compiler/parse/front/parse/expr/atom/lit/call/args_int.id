@@ -1,0 +1,21 @@
+// Argument list body + the integer leaf.
+
+fill_args(int[] pos, int[] args) {
+  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+    int parse_expr_v = parse_expr(pos);
+    push(args, parse_expr_v);
+    skip_comma(pos);
+  }
+} return void;
+
+skip_comma(int[] pos) {
+  if(cur_text(pos) == ",") {
+    advance(pos);
+  }
+} return void;
+
+parse_int(int[] pos) {
+  string text = cur_text(pos);
+  advance(pos);
+  int ret_i = finish_int(text);
+} return int ret_i;

@@ -1,0 +1,26 @@
+// Atom dispatch: integer, float, string, or identifier (which may begin a
+// call). The float case is in float.id (parse_atom_float).
+
+parse_atom(int[] pos) {
+  int node = 0;
+  if(cur_kind(pos) == "int") {
+    node = parse_int(pos);
+  } else {
+    node = parse_atom2(pos);
+  }
+} return int node;
+
+parse_atom2(int[] pos) {
+  int node = 0;
+  if(cur_kind(pos) == "str") {
+    node = parse_str(pos);
+  } else {
+    node = parse_atom_float(pos);
+  }
+} return int node;
+
+parse_ident_or_call(int[] pos) {
+  no_op_atom(pos);
+  string name = read_name(pos);
+  int ret_i = finish_atom(name, pos);
+} return int ret_i;

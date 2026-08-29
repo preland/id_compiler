@@ -1,0 +1,33 @@
+// Compatibility, guarded by knownness. Every check in this directory is
+// phrased "both types are known AND the rule is broken", never "the rule is
+// not satisfied" -- an unknown type satisfies nothing, so the second phrasing
+// turns every gap in the type pass into a false diagnostic.
+
+bad_init(string want, string got) {
+  int ok = 0;
+  if(ty_pair_known(want, got) == 1 && ty_compat(want, got) == 0) {
+    ok = 1;
+  }
+} return int ok;
+
+// Is this a type at all? Asked of the registry, not of the string: type_of
+// answers "" for a name it cannot resolve (an unknown variable, or a call to
+// a function whose return type is not in the table yet), and it can also
+// answer something that is not a type -- elem_type("int") is "i", because
+// indexing a non-list is itself the error and there is no element type to
+// have. A row that is absent cannot be mistaken for a row that is wrong,
+// which is the whole reason the registry is a table and not an if-chain.
+ty_known(string t) {
+  int ok = 0;
+  string ty_base_v = ty_base(t);
+  if(ty_row_kind(ty_base_v) != "?") {
+    ok = 1;
+  }
+} return int ok;
+
+ty_pair_known(string lt, string rt) {
+  int ok = 0;
+  if(ty_known(lt) == 1 && ty_known(rt) == 1) {
+    ok = 1;
+  }
+} return int ok;

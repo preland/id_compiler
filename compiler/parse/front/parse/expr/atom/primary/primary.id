@@ -1,0 +1,23 @@
+// multiplicative fold + the primary production.
+
+fold_mul(int[] pos, int left) {
+  string op = cur_text(pos);
+  advance(pos);
+  int ret_i = fold_mul_tail(pos, left, op);
+} return int ret_i;
+
+// primary: '(' expr ')' | '[' array literal | INT | STR | ident (var or call)
+parse_primary(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "(") {
+    node = parse_paren(pos);
+  } else {
+    node = pp2(pos);
+  }
+} return int node;
+
+parse_paren(int[] pos) {
+  advance(pos);
+  int e = parse_expr(pos);
+  advance(pos);
+} return int e;

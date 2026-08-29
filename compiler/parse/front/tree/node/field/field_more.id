@@ -1,0 +1,13 @@
+// Field accessors, part 2 (the second string field and the two child lists).
+
+s2_of(int id) {
+  string ret_s = (import ns2)[id];
+} return string ret_s;
+
+l1_of(int id) {
+  int[] ret_li = (import nl1)[id];
+} return int[] ret_li;
+
+l2_of(int id) {
+  int[] ret_li = (import nl2)[id];
+} return int[] ret_li;

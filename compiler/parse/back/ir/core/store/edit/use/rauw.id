@@ -1,0 +1,36 @@
+// Replace every use of one value with another, across one function. Passes
+// that produce a value equal to an existing one -- the trivial-phi sweep in
+// mem2reg, and every fold -- work this way rather than by editing their users,
+// which they would have to find first.
+//
+// One function and not the whole store: an SSA value is local to the function
+// that defines it, so nothing outside can name it, and the store holds every
+// function in the program.
+
+op_rauw(int f, int old, int fresh) {
+  int i = 0;
+  while(i < blk_count(f)) {
+    int[] irf_blk_v = irf_blk(f);
+    op_rauw_b(irf_blk_v[i], old, fresh);
+    i = i + 1;
+  }
+} return void;
+
+op_rauw_b(int b, int old, int fresh) {
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] blk_ins_v = blk_ins(b);
+    ir_rauw_at(blk_ins_v[i], old, fresh);
+    i = i + 1;
+  }
+} return void;
+
+ir_rauw_at(int i, int old, int fresh) {
+  if(ir_a(i) == old) {
+    ir_set_a(i, fresh);
+  }
+  if(ir_b(i) == old) {
+    ir_set_b(i, fresh);
+  }
+  ir_rauw_l(i, old, fresh);
+} return void;

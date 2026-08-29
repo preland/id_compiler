@@ -1,0 +1,9 @@
+// EXPECT: id: index 5 out of bounds (len 3)
+touch(int[] xs) {
+  xs[5] = 9;
+} return void;
+
+main() {
+  int[] xs = [1, 2, 3];
+  touch(xs);
+} return int 0;

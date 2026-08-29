@@ -1,0 +1,40 @@
+// The fifth and last place an expected type comes from: a return clause is
+// typed by the function's return type -- idc.py passes fn.rettype into
+// gen_expr there, exactly as it does for the other four.
+//
+// It cannot actually be reached today, in either compiler: parse_type takes
+// `[]` pairs greedily, so `} return int[] [];` reads the literal's brackets as
+// two more type levels and then finds a `;` where the expression should be.
+// It is here anyway because the alternative is a rule that is right for four
+// of idc.py's five cases, which is the kind of near-miss that becomes a false
+// diagnostic the moment the parser stops being greedy.
+// The func node keeps the return expression in ni1 and the return type in ns2.
+want_ret(int i, int id) {
+  string rt = s2_of(i);
+  int ok = 0;
+  if(k_of(i) == "func" && i1_of(i) == id && ty_is_list(rt) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+// One step of that search: the name, if this function's node is at or after
+// the node being placed, and "" (keep looking) otherwise.
+
+fn_covers(int i, int id) {
+  string s = "";
+  if((import prog)[i] >= id) {
+    s = s1_of((import prog)[i]);
+  }
+} return string s;
+
+// The line to report. The parser fills nline for statement nodes, which is
+// where idc.py reports all but three of these diagnostics, so those land on
+// exactly the same line. An expression node has no line of its own and falls
+// back to its function's -- the same compromise the structural checks make.
+tc_line(int id) {
+  int n = (import nline)[id];
+  if(n == 0) {
+    string node_fn_v = node_fn(id);
+    n = func_line(node_fn_v);
+  }
+} return int n;

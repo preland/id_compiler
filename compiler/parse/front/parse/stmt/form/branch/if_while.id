@@ -1,0 +1,23 @@
+// The body of an if (then block + optional else block), and while.
+
+// The else-if test has to happen before the else arm is parsed, because
+// afterwards the cursor has moved past the tokens that distinguish them.
+if_body(int[] pos, int cond) {
+  int[] thenl = parse_block(pos);
+  int elif = at_elif(pos);
+  int ret_i = if_tail(pos, cond, thenl, elif);
+} return int ret_i;
+
+parse_else(int[] pos) {
+  int[] elsel = [];
+  if(cur_text(pos) == "else") {
+    advance(pos);
+    elsel = else_body(pos);
+  }
+} return int[] elsel;
+
+parse_while(int[] pos) {
+  advance(pos);
+  int cond = parse_paren(pos);
+  int ret_i = parse_while_tail(pos, cond);
+} return int ret_i;

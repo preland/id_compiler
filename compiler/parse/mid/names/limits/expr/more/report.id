@@ -1,0 +1,29 @@
+// The diagnostic for a return clause that is not a name or a literal.
+//
+// It names what the clause *is*, because "must be a name or a literal" on its
+// own leaves the author looking for which part is the problem when the clause
+// is long.
+
+ret_shape_err(int id, int e) {
+  string s1_of_v = s1_of(id);
+  string shape_word_v = shape_word(e);
+  tc_err(e, "the return clause of '" + s1_of_v + "' is " + shape_word_v + "; it must be a name or a literal -- name the value in the body and return the name");
+} return void;
+
+shape_word(int e) {
+  string w = "an expression";
+  if(k_of(e) == "call") {
+    w = "a call";
+  } else if(k_of(e) == "arr") {
+    w = "a list literal";
+  }
+} return string w;
+
+// How many arguments a call's own argument list holds, named so the while
+// in chk_flat_args does not put a call inside len()'s argument. Placed here,
+// not beside chk_flat_args, because nest.id and expr/ were both already at
+// their 3-entry limits and this was the only file in the group with room.
+flat_arg_count(int id) {
+  int[] args = l1_of(id);
+  int n = len(args);
+} return int n;

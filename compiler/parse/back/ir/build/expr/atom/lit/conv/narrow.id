@@ -1,0 +1,9 @@
+// Both types are integral, so the direction is the only question and the
+// registry's width column answers it. `id`'s integers are signed, so widening
+// is a sign extension.
+lw_narrow(string t, string want) {
+  string op = "sext";
+  if(ty_width(t) > ty_width(want)) {
+    op = "trunc";
+  }
+} return string op;

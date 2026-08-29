@@ -1,0 +1,19 @@
+// A phi's incoming edge, in two halves: the value the predecessor left this
+// slot holding, and the predecessor block itself. `ir_l` and `ir_bl` are
+// each read once and pushed once, so the two never fight over the same list.
+
+m2r_inc_at(int f, int ph, int j, int pb) {
+  int pi = m2r_pos(f, pb);
+  m2r_inc_val(ph, j, pi);
+  m2r_inc_blk(ph, pb);
+} return void;
+
+m2r_inc_val(int ph, int j, int pi) {
+  int[] l = ir_l(ph);
+  push(l, (import outv)[pi][j]);
+} return void;
+
+m2r_inc_blk(int ph, int pb) {
+  int[] bl = ir_bl(ph);
+  push(bl, pb);
+} return void;

@@ -1,0 +1,13 @@
+// The block a phi's `i`th incoming edge comes from, and where it sits in
+// its own function's block list -- the second is what ties an incoming
+// value in `outv` back to the predecessor that produced it.
+
+m2r_pre_at(int b, int i) {
+  int[] blk_pre_v = blk_pre(b);
+  int pb = blk_pre_v[i];
+} return int pb;
+
+m2r_pos(int f, int b) {
+  int[] irf_blk_v = irf_blk(f);
+  int ret_i = lst_index_of(irf_blk_v, b);
+} return int ret_i;

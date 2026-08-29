@@ -1,0 +1,28 @@
+
+// Driver: set up state, load the token stream, parse all functions, then emit.
+// Default output is C; pass `ast` to print the parsed structure instead.
+//
+//   idlex < prog.id | idparse        # emit C
+//   idlex < prog.id | idparse ast    # print the AST as an S-expression
+
+// The exit code is whether the program broke a rule of the language: 1 if a
+// check failed, 0 otherwise. `id` has no stderr and no early exit, so this is
+// how a diagnostic reaches the driver -- and why nothing is emitted when a
+// check fails, rather than diagnostics being interleaved with C.
+main(int argc, string[] argv) {
+  setup();
+  load();
+  int ret_i = main_tail(argc, argv);
+} return int ret_i;
+
+run(int argc, string[] argv) {
+  int[] pos = [0];
+  parse_program(pos);
+  finish(argc, argv);
+} return void;
+
+finish(int argc, string[] argv) {
+  build_syms();
+  collect_exports();
+  emit_checked(argc, argv);
+} return void;

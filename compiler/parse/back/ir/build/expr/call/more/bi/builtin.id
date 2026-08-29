@@ -1,0 +1,32 @@
+// Builtins. Each becomes the runtime call the C target spells for it, with its
+// arguments converted to the types that runtime symbol actually takes -- C did
+// those conversions implicitly and LLVM IR will not do them at all.
+
+lw_builtin(int node) {
+  int v = 0 - 1;
+  if(s1_of(node) == "print") {
+    int[] l1_of_v = l1_of(node);
+    int lw_tostr_v = lw_tostr(l1_of_v[0]);
+    v = lw_callf("id_print", "", [lw_tostr_v]);
+  } else {
+    v = lb_b2(node);
+  }
+} return int v;
+
+lb_b2(int node) {
+  int v = 0 - 1;
+  if(s1_of(node) == "len") {
+    v = lw_len(node);
+  } else {
+    v = lb_b3(node);
+  }
+} return int v;
+
+lb_b3(int node) {
+  int v = 0 - 1;
+  if(s1_of(node) == "push") {
+    v = lw_push(node);
+  } else {
+    v = lb_b4(node);
+  }
+} return int v;

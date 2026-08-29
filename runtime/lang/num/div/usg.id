@@ -1,0 +1,25 @@
+// Unsigned division and remainder -- `udiv` and `umod`, the unsigned readings
+// of `/` and `%` that docs/SPEC.md 6 gives the flat store.
+//
+// The only difference from the signed pair is what fills the high half of the
+// dividend: `cqto` spreads the sign bit, and an unsigned divide wants zero.
+
+asm "x86_64-unknown-none" udiv(word a, word v) {
+  "pushq %[a]"
+  "pushq %[v]"
+  "popq %%rcx"
+  "popq %%rax"
+  "xorq %%rdx, %%rdx"
+  "divq %%rcx"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" umod(word a, word v) {
+  "pushq %[a]"
+  "pushq %[v]"
+  "popq %%rcx"
+  "popq %%rax"
+  "xorq %%rdx, %%rdx"
+  "divq %%rcx"
+  "movq %%rdx, %[ret]"
+} return word ret;

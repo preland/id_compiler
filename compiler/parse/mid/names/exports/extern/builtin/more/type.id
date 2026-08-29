@@ -1,0 +1,31 @@
+// The type of a call that no input file defines.
+//
+// The native seam types every link-time entry point `int` -- gfx.h says so,
+// and idc.py's gen_call returns "int" for exactly this case. Saying it here
+// too is what lets `"" + gfx_width()` build the string it looks like it
+// builds: without it the type pass has no answer, declines to guess (which is
+// the right instinct everywhere else), and the emitter hands a raw int to
+// id_concat where a char* belongs.
+//
+// Only under --extern-ok. With no backend attached an unresolved name is a
+// typo, already reported, and inventing a type for it would be inventing a
+// meaning for a mistake.
+extern_type(string t) {
+  string s = t;
+  if(t == "" && extern_ok() == 1) {
+    s = "int";
+  }
+} return string s;
+
+// The end of the name starting at i, and the name itself, split so that
+// take_bname needs the position only once (to compute the next start) after
+// asking for the slice.
+bname_end(string src, int i) {
+  int len_v = len(src);
+  int e = find_space(src, i, len_v);
+} return int e;
+
+push_bname(string src, int i, int e) {
+  string slice_v = slice(src, i, e);
+  push((import bnames), slice_v);
+} return void;

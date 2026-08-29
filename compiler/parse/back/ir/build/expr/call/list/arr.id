@@ -1,0 +1,19 @@
+// A list literal: a new list, then one push per element. An empty literal is
+// the same thing with no pushes, which is why `[]` needs no separate case.
+lw_arr(int node) {
+  int a = lw_arr_new(node);
+  string elem = lw_arr_elem(node);
+  lw_arr_els(node, a, elem);
+} return int a;
+
+lw_arr_els(int node, int a, string elem) {
+  int i = 0;
+  while(lw_args_more(node, i)) {
+    i = lw_arr_one(node, i, a, elem);
+  }
+} return void;
+
+lw_arr_one(int node, int i, int a, string elem) {
+  lw_arr_push(node, i, a, elem);
+  int ret_i = i + 1;
+} return int ret_i;

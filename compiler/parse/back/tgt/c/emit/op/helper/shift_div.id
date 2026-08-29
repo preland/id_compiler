@@ -1,0 +1,27 @@
+// The shift helpers, and the gate on the division helpers.
+
+hop_shift(string op) {
+  string h = hop_sar(op);
+  if(op == "<<") {
+    h = "id_shl";
+  }
+} return string h;
+
+// `>>` is the arithmetic shift; `ushr` is the logical one.
+hop_sar(string op) {
+  string h = "";
+  if(op == ">>") {
+    h = "id_sar";
+  }
+} return string h;
+
+// `int` and `word` division both go through the checked helpers; float
+// division does not, because IEEE gives it an answer rather than a signal.
+hop_div(int id) {
+  string h = "";
+  if(type_bin(id) == "word" || type_bin(id) == "int") {
+    string s1_of_v = s1_of(id);
+    string type_bin_v = type_bin(id);
+    h = hop_dw(s1_of_v, type_bin_v);
+  }
+} return string h;

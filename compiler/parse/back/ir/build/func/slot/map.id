@@ -1,0 +1,24 @@
+
+lw_bind(string name, int v) {
+  push((import lwvar), name);
+  push((import lwslot), v);
+} return int v;
+
+lw_slot(string name) {
+  int r = find_str((import lwvar), name);
+  int v = 0 - 1;
+  if(r >= 0) {
+    v = (import lwslot)[r];
+  }
+} return int v;
+
+// Where a name lives: an alloca for a local, the global itself for an export.
+// An exported name is reserved program-wide, so a name that is not a local is
+// an export and there is nothing left to disambiguate.
+lw_addr(string name) {
+  int v = lw_slot(name);
+  if(v < 0) {
+    string lw_vty_v = lw_vty(name);
+    v = ir_leaf("global", lw_vty_v, 0 - 1, 0 - 1, name);
+  }
+} return int v;

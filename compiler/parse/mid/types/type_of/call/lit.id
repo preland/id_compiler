@@ -1,0 +1,25 @@
+// The type of an integer literal: `word` when it does not fit an int (the
+// parser recorded that in ni2), otherwise `int`.
+
+lit_type(int id) {
+  string t = "int";
+  if(i2_of(id) == 1) {
+    t = "word";
+  }
+} return string t;
+
+// A call's result type. Every builtin's type follows from its name except
+// pop's, which is the element type of the list it was handed.
+call_type(int id) {
+  string s1_of_v = s1_of(id);
+  string t = type_call(s1_of_v);
+  if(s1_of(id) == "pop") {
+    t = pop_elem(id);
+  }
+} return string t;
+
+pop_elem(int id) {
+  int[] l1_of_v = l1_of(id);
+  string type_of_v = type_of(l1_of_v[0]);
+  string ret_s = elem_type(type_of_v);
+} return string ret_s;

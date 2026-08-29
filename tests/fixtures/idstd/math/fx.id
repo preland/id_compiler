@@ -1,0 +1,13 @@
+// The fixture stdlib's arithmetic. Deliberately not named like the real
+// idstd's, so that a test project cannot accidentally pass by picking up the
+// real library instead of this one.
+tfx_max(int a, int b) {
+  int m = a;
+  if (b > a) {
+    m = b;
+  }
+} return int m;
+
+tfx_abs(int a) {
+  int m = tfx_max(a, 0 - a);
+} return int m;

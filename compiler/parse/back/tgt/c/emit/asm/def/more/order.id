@@ -1,0 +1,13 @@
+// asm functions are emitted *before* the ordinary definitions, so a call to
+// one is already declared by the time it is used. Their signatures are not in
+// the forward-declaration block, which only walks the program list -- and
+// ordering is cheaper than threading the target triple through it.
+emit_asm_then_main(string triple) {
+  emit_asm_all(triple);
+  def_all();
+} return void;
+
+asm_error(string name, string triple) {
+  string asm_triples_v = asm_triples(name);
+  print("error: no 'asm' definition of '" + name + "' for target '" + triple + "'; defined for: " + asm_triples_v);
+} return void;

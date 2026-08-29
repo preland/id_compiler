@@ -1,0 +1,23 @@
+
+asm_first(int i) {
+  int r = 1;
+  if(asm_prev((import afname)[i], i) >= 0) {
+    r = 0;
+  }
+} return int r;
+
+asm_prev(string name, int n) {
+  int i = 0;
+  int found = 0 - 1;
+  while(i < n) {
+    found = asm_match2(i, name, found);
+    i = i + 1;
+  }
+} return int found;
+
+asm_match2(int i, string name, int found) {
+  int r = found;
+  if((import afname)[i] == name) {
+    r = i;
+  }
+} return int r;

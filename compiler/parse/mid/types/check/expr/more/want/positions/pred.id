@@ -1,0 +1,30 @@
+// The four positions that supply an expected type. Each asks "is node `i` a
+// context of this shape, is node `id` the child it types, and is the type it
+// wants a list type?" -- the last part matters, because `int x = [];` is
+// still an error even though a declaration is one of the four places.
+
+want_decl(int i, int id) {
+  string t = s1_of(i);
+  int ok = 0;
+  if(k_of(i) == "decl" && i1_of(i) == id && ty_is_list(t) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+want_asg(int i, int id) {
+  string vt = var_type_at(i);
+  int ok = 0;
+  if(k_of(i) == "assign" && i1_of(i) == id && ty_is_list(vt) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+// The element of a list of lists: `xss[0] = []` is fine when xss is int[][].
+want_elem(int i, int id) {
+  int ok = 0;
+  if(k_of(i) == "iassign" && l1_of(i)[0] == id) {
+    ok = want_elem_ok(i);
+  } else {
+    ok = want_push(i, id);
+  }
+} return int ok;

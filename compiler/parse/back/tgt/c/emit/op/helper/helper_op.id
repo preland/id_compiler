@@ -1,0 +1,30 @@
+// Binary operators that emit as a call to a runtime helper rather than as C
+// infix, mirroring idc.py's gen_binop. Two families:
+//
+//   << >>            always -- C leaves a shift by 64-or-more undefined
+//   / %  on `word`   -- division by zero and LLONG_MIN/-1 are undefined too
+//
+// `int` division keeps emitting plain `(a / b)`, so nothing that compiled
+// before changes shape.
+
+emit_op3(int id) {
+  string s = emit_infix(id);
+  if(helper_op(id) != "") {
+    s = emit_helper(id);
+  }
+} return string s;
+
+emit_helper(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string ret_s = helper_op(id) + "(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ")";
+} return string ret_s;
+
+// The C helper for this node, or "" when the operator emits as plain infix.
+helper_op(int id) {
+  string s1_of_v = s1_of(id);
+  string h = hop_shift(s1_of_v);
+  if(h == "") {
+    h = hop_div(id);
+  }
+} return string h;

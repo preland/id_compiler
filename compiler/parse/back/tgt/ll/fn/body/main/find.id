@@ -1,0 +1,26 @@
+
+ll_main() {
+  int r = 0 - 1;
+  int i = 0;
+  while(i < len((import irprog))) {
+    r = ll_main_at((import irprog)[i], r);
+    i = i + 1;
+  }
+} return int r;
+
+ll_main_at(int f, int r) {
+  int v = r;
+  if(irf_name(f) == "main") {
+    v = f;
+  }
+} return int v;
+
+// A main taking no arguments is called with none; the marshalled list is
+// simply unused, which costs one call and keeps the wrapper in one piece.
+ll_mcall(int f) {
+  string s = "  %r = call i32 @id_main()";
+  int[] irf_par_v = irf_par(f);
+  if(len(irf_par_v) == 2) {
+    s = "  %r = call i32 @id_main(i32 %argc, ptr %args)";
+  }
+} return string s;

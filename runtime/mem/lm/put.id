@@ -1,0 +1,22 @@
+// A slot, taken round-robin. Nothing is ever freed here, so an address never
+// stops being what it was and an entry never has to be forgotten -- which the
+// hosted runtime cannot say, because realloc moves blocks and a later string
+// can land where an earlier one was.
+lm_put(word a) {
+  int at = lm_put_at();
+  int n = len_scan(a, 0);
+  lm_keep(at, a, n);
+} return int n;
+
+lm_keep(int at, word a, int n) {
+  lm_keep_addr(at, a);
+  lm_keep_len(at, n);
+  lm_keep_next(at);
+} return void;
+
+lm_next(int at) {
+  int n = at + 1;
+  if(n >= 8) {
+    n = 0;
+  }
+} return int n;

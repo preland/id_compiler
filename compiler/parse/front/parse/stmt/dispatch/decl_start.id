@@ -1,0 +1,27 @@
+// The leaf of statement dispatch: assignment vs expression statement, plus the
+// predicates used above.
+
+parse_stmt4(int[] pos) {
+  int node = 0;
+  if(is_assign(pos)) {
+    node = parse_assign(pos);
+  } else {
+    node = parse_stmt5(pos);
+  }
+} return int node;
+
+// a declaration starts with `export` or a type keyword
+is_decl_start(int[] pos) {
+  int ok = 0;
+  string cur_text_v = cur_text(pos);
+  if(is_type(cur_text_v)) {
+    ok = 1;
+  }
+} return int ok;
+
+is_type(string w) {
+  int ok = 0;
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "word" || w == "export") {
+    ok = 1;
+  }
+} return int ok;

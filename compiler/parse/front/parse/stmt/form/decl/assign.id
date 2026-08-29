@@ -1,0 +1,19 @@
+// Declaration right-hand side, and assignment.
+
+decl_rhs(int[] pos, string type, string name, int exported) {
+  int expr = parse_expr(pos);
+  skip_semi(pos);
+  int ret_i = node_decl(type, name, expr, exported);
+} return int ret_i;
+
+parse_assign(int[] pos) {
+  string name = cur_text(pos);
+  advance(pos);
+  int ret_i = parse_assign_tail(pos, name);
+} return int ret_i;
+
+assign_rhs(int[] pos, string name) {
+  int expr = parse_expr(pos);
+  skip_semi(pos);
+  int ret_i = node_assign(name, expr);
+} return int ret_i;

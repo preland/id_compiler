@@ -1,0 +1,13 @@
+// `(import name)` reads an exported global. It emits as just the name (the C
+// global), so it reuses the var node shape with kind "import".
+
+node_import(string name) {
+  int ret_i = newleaf("import", 0, 0, name, "");
+} return int ret_i;
+
+// The float leaf: like the str leaf, its raw source text (e.g. "0.8") is kept
+// verbatim in ns1, since idc.py's C emitter prints a float literal's spelling
+// unchanged.
+node_float(string text) {
+  int ret_i = newleaf("float", 0, 0, text, "");
+} return int ret_i;

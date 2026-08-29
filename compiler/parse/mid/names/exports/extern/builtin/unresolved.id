@@ -1,0 +1,37 @@
+// The check that finds a name no function, no builtin and no variable owns.
+//
+// The check runs in the access pass rather than in the type checks, because
+// the question "is this name a variable?" is answered by the declaration
+// registry, and that is not built until check_names(). acc_callee already
+// asks it for the one case idc.py singles out ("'x' is a variable, not a
+// function"); this is the complement -- a name that is no function, no
+// builtin and nobody's variable.
+
+acc_callee2(int id, string owner, int ln) {
+  if(is_unresolved_call(id) == 1) {
+    string s1_of_v = s1_of(id);
+    report_unknown_fn(s1_of_v, owner, ln);
+  }
+} return void;
+
+// Naming the composition, not just the call inside it: a call to the right
+// of && only runs when the kind check already passed, and hoisting it before
+// the if would run it on every node, resolved or not.
+is_unresolved_call(int id) {
+  int ok = 0;
+  if(k_of(id) == "call") {
+    string s1_of_v = s1_of(id);
+    ok = unresolved_fn(s1_of_v);
+  }
+} return int ok;
+
+// Deliberately not is_unknown_fn: that one names the builtins it knows about
+// and is allowed to fall behind, because falling behind only makes *its*
+// check quieter. Here a missed builtin would be reported as a typo, so the
+// question is asked of the real list instead.
+unresolved_fn(string name) {
+  int ok = 0;
+  if(find_str((import fnames), name) < 0 && is_builtin(name) == 0 && find_str((import dvname), name) < 0) {
+    ok = 1;
+  }
+} return int ok;

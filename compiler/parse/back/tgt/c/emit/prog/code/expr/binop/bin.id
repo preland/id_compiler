@@ -1,0 +1,23 @@
+// Binary expression. Four forms: id_concat for string `+`, a strcmp for
+// string equality, a runtime-helper call for the shifts and word division
+// (see op/helper/), and ordinary infix otherwise.
+
+emit_bin(int id) {
+  string s = emit_op2(id);
+  if(is_concat(id)) {
+    s = emit_concat(id);
+  }
+} return string s;
+
+emit_op2(int id) {
+  string s = emit_op3(id);
+  if(is_strcmp(id)) {
+    s = emit_strcmp(id);
+  }
+} return string s;
+
+emit_infix(int id) {
+  int i1_of_v = i1_of(id);
+  string s1_of_v = s1_of(id);
+  string s = infix_line(id, i1_of_v, s1_of_v);
+} return string s;

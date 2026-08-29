@@ -1,0 +1,7 @@
+// The rest of cur_file.id's init_files -- that file is already full, so
+// the tail lives up at the marker/ level instead.
+
+init_files_rest() {
+  init_files2();
+  int ret_i = init_units();
+} return int ret_i;

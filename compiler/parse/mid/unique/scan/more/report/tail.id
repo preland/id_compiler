@@ -1,0 +1,14 @@
+// The j-side of report_dup's message: where the earlier, colliding function
+// was defined. Also read three times over in the original for no reason, so
+// fname_at(j) is read once and passed through.
+
+dup_tail(int j) {
+  string name_j = fname_at(j);
+  string ret_s = dup_tail2(name_j);
+} return string ret_s;
+
+dup_tail2(string name_j) {
+  string func_file_v = func_file(name_j);
+  int func_line_v2 = func_line(name_j);
+  string ret_s = "'" + name_j + "' (defined at " + func_file_v + ":" + func_line_v2 + "); functions must be unique -- remove one and call it from both places, or make them genuinely differ";
+} return string ret_s;

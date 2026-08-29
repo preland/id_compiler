@@ -1,0 +1,44 @@
+// A statement that compares instead of assigning.
+//
+// Assignment exists only as a statement, and only where the parser can see a
+// statement-shaped one: `x = v`, or `xs[i] = v` with a plain identifier at the
+// front. Anything else is an *expression* statement, and a bare `=` inside an
+// expression is equality. So `(import xs)[i] = v;` compiles to a comparison
+// whose result is discarded -- it type-checks, it links, it runs, and it does
+// nothing at all.
+//
+// This is the language's worst trap, and the reason the `lset` idiom exists.
+// Rejecting it costs nothing: a comparison evaluated for no reason is never
+// what anybody meant.
+
+chk_exprstmt(int id) {
+  int i1_of_v = i1_of(id);
+  string op = s1_of(i1_of_v);
+  if(k_of(i1_of_v) == "bin" && is_asgop(op) == 1) {
+    int i1_of_v2 = i1_of(id);
+    string disc_hint_v = disc_hint(i1_of_v2);
+    tc_err(id, "this statement compares instead of assigning: '=' in an expression is equality, so the statement has no effect" + disc_hint_v);
+  }
+} return void;
+
+// Both spellings. idc.py's parser folds `=` into `==` on the way in, so by the
+// time either compiler has an AST there is one operator; catching both here
+// keeps the two agreeing about the same programs. It is the right net anyway --
+// `x == 2;` as a statement is exactly as pointless as the assignment it is
+// usually a typo for. `!=` is left out: nobody mistypes it for an assignment.
+is_asgop(string op) {
+  int ok = 0;
+  if(op == "=" || op == "==") {
+    ok = 1;
+  }
+} return int ok;
+
+// Naming the fix is the point of the diagnostic, so an index target -- the
+// case that actually bites -- gets told what to write instead.
+disc_hint(int id) {
+  string s = "";
+  int i1_of_v = i1_of(id);
+  if(k_of(i1_of_v) == "index") {
+    s = " -- an imported list or a call result cannot be index-assigned directly; pass the list to a helper that takes it as a parameter, as lset(int[] xs, int i, int v) { xs[i] = v; }";
+  }
+} return string s;

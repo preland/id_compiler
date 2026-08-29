@@ -1,0 +1,16 @@
+{
+  "name": "gfx",
+  "abi": "gfx.h",
+  "platforms": {
+    "darwin": {
+      "sources": ["gfx_macos.m"],
+      "cflags": ["-fobjc-arc"],
+      "link": ["-framework", "Cocoa", "-framework", "QuartzCore"]
+    },
+    "linux": {
+      "sources": ["gfx_linux.c"],
+      "cflags": [],
+      "link": ["-lX11"]
+    }
+  }
+}

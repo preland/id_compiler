@@ -1,0 +1,16 @@
+// The parameter's name, read the same way as its type.
+param_name(int fn, int i) {
+  int[] ps = l1_of(fn);
+  string nm = s2_of(ps[i]);
+} return string nm;
+
+arg_err_msg(int id, int fn, int i, string t) {
+  string pname = param_name(fn, i);
+  string pt = param_type(fn, i);
+  string msg = arg_err_msg2(id, pname, pt, t);
+} return string msg;
+
+arg_err_msg2(int id, string pname, string pt, string t) {
+  string callname = s1_of(id);
+  string msg = "argument '" + pname + "' of '" + callname + "' expects " + pt + ", got " + t;
+} return string msg;

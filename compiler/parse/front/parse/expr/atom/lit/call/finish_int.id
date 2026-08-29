@@ -1,0 +1,10 @@
+// The tail of args_int.id's parse_int: building the "int" node needs both
+// the numeric value and whether the literal is wide, which is two more
+// actions than parse_int has room left for once it has read and advanced
+// past the token.
+
+finish_int(string text) {
+  int to_int_v = to_int(text);
+  int is_bigdec_v = is_bigdec(text);
+  int ret_i = node_int(text, to_int_v, is_bigdec_v);
+} return int ret_i;

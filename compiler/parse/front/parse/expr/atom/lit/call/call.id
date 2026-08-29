@@ -1,0 +1,21 @@
+// After an identifier: a '(' makes it a call, otherwise it is a variable.
+
+finish_atom(string name, int[] pos) {
+  int node = node_var(name);
+  if(cur_text(pos) == "(") {
+    node = parse_call(name, pos);
+  }
+} return int node;
+
+parse_call(string name, int[] pos) {
+  int[] args = [];
+  scan_args(pos, args);
+  int ret_i = node_call(name, args);
+} return int ret_i;
+
+// consume '(' args ')', pushing each argument node id onto `args`
+scan_args(int[] pos, int[] args) {
+  advance(pos);
+  fill_args(pos, args);
+  advance(pos);
+} return void;

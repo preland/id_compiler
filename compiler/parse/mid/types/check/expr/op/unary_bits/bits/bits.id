@@ -1,0 +1,34 @@
+// The operators that want integers on both sides: the bitwise group
+// (`& | ^ << >>`), the logical pair (`&& ||`), and `%`.
+//
+// They are one check because they ask one question -- is either side not an
+// integer -- and three messages, because idc.py words them differently and a
+// program is explained the same way by both compilers or by neither.
+
+chk_bits(int id) {
+  string s1_of_v = s1_of(id);
+  if(is_logop(s1_of_v) == 1 || is_bitop(s1_of_v) == 1) {
+    chk_bits2(id);
+  } else if(s1_of(id) == "%") {
+    chk_mod(id);
+  }
+} return void;
+
+chk_bits2(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  bits_types(id, i1_of_v, i2_of_v);
+} return void;
+
+// The logical pair names no types: `&&` on two lists is a mistake about what
+// the operator is for, not about which type it got, and idc.py says so.
+bits_err(int id, string lt, string rt) {
+  string s1_of_v = s1_of(id);
+  if(is_logop(s1_of_v) == 1) {
+    string s1_of_v2 = s1_of(id);
+    tc_err(id, "'" + s1_of_v2 + "' requires int operands");
+  } else {
+    string s1_of_v3 = s1_of(id);
+    tc_err(id, "'" + s1_of_v3 + "' requires int or word operands, got " + lt + " and " + rt);
+  }
+} return void;

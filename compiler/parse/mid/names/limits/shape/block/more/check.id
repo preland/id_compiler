@@ -1,0 +1,31 @@
+// The two structural rules of `id`, checked on the parsed AST: every block
+// performs at most 3 actions, and blocks nest at most 2 deep. Both are pure
+// tree walks over the AST and the function table -- they need no type
+// information and nothing from the backend, because they are rules of the
+// language rather than of code generation.
+//
+// check_program() is the entry point: call it after parse_program. Every
+// violation is printed (idc.py stops at the first; this reports them all) and
+// check_failed() then answers 1.
+
+check_program() {
+  check_bodies();
+  check_scopes();
+  chk_dead();
+} return void;
+
+check_funcs() {
+  int i = 0;
+  while(i < len((import prog))) {
+    check_func_body((import prog)[i]);
+    i = i + 1;
+  }
+} return void;
+
+// A function's own body is the outermost block, at depth 0. Its name labels
+// every diagnostic found anywhere inside it, as in idc.py.
+check_func_body(int id) {
+  int[] l2_of_v = l2_of(id);
+  string s1_of_v = s1_of(id);
+  check_body_at(l2_of_v, s1_of_v);
+} return void;

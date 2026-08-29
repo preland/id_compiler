@@ -1,0 +1,27 @@
+// type_of(id): the id type of an expression node. Dispatch on kind.
+//   int -> int (or word, if the literal is too wide)    str -> string
+//   float -> float    var -> its declared type    un -> its operand's type
+//   call -> callee/builtin return type
+//   bin -> string for concat, int for a predicate, else the widened operands
+
+type_of(int id) {
+  string t = lit_type(id);
+  if(k_of(id) != "int") {
+    t = type_of2(id);
+  }
+} return string t;
+
+type_of2(int id) {
+  string t = "string";
+  if(k_of(id) != "str") {
+    t = type_of_float(id);
+  }
+} return string t;
+
+type_of3(int id) {
+  string s1_of_v = s1_of(id);
+  string t = lookup_var(s1_of_v, (import nunit)[id]);
+  if(is_nameref(id) == 0) {
+    t = type_of4(id);
+  }
+} return string t;

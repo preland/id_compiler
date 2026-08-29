@@ -1,0 +1,14 @@
+want_push(int i, int id) {
+  int ok = 0;
+  if(is_push2(i) == 1 && l1_of(i)[1] == id) {
+    ok = want_push_ok(i);
+  } else {
+    ok = want_ret(i, id);
+  }
+} return int ok;
+
+want_push_ok(int i) {
+  int[] l1_of_v = l1_of(i);
+  string type_of_v = type_of(l1_of_v[0]);
+  int ok = want_elem_ok2(type_of_v);
+} return int ok;

@@ -1,0 +1,27 @@
+// Symbol tables for the type pass, plus the exported-variable table.
+// A name has one type within a compilation unit, so one global table keyed by
+// name and unit suffices:
+//   vnames/vtypes/vunit  every parameter and local declaration, and the unit
+//                  it was declared in
+//   fnames/frets   every function and its return type
+//   fnodes         the function's node id, so a call can reach its parameter
+//                  list; -1 for an asm function, which has no node
+//   enames/etypes/eowners  each exported variable, its type, and owner function
+
+init_sym() {
+  init_sym_a();
+  init_sym_b();
+  init_asm_all();
+} return void;
+
+init_sym_a() {
+  export string[] fnames = [];
+  export string[] frets = [];
+  export string[] enames = [];
+} return void;
+
+init_sym_b() {
+  export string[] etypes = [];
+  export string[] eowners = [];
+  export int[] fnodes = [];
+} return void;

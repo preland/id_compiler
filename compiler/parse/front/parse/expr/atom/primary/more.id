@@ -1,0 +1,7 @@
+// The tail of primary.id's fold_mul -- see ladder/arith/fold/more.id for
+// why the second half of a split fold function needs a file of its own.
+
+fold_mul_tail(int[] pos, int left, string op) {
+  int right = parse_unary(pos);
+  int ret_i = node_bin(op, left, right);
+} return int ret_i;

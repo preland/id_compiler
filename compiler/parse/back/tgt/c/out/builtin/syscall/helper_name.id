@@ -1,0 +1,17 @@
+// C helper name for a systems builtin: `id_` + the builtin's name, except for
+// the two store-management calls, whose helpers are named after the store
+// rather than after the id spelling.
+
+sys_helper(string name) {
+  string h = sys_helper2(name);
+  if(name == "alloc") {
+    h = "id_mem_alloc";
+  }
+} return string h;
+
+sys_helper2(string name) {
+  string h = "id_" + name;
+  if(name == "store_size") {
+    h = "id_mem_size";
+  }
+} return string h;

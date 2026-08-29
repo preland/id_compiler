@@ -1,0 +1,5 @@
+
+lw_callf(string name, string ret, int[] args) {
+  int[] none = [];
+  int ret_i = lw_emit("call", ret, 0 - 1, 0 - 1, name, args, none);
+} return int ret_i;

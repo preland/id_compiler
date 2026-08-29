@@ -1,0 +1,35 @@
+// The IR store, in the same parallel-list style as the AST -- and for the same
+// reason: `id` has no structs, and the AST has already proved the idiom at this
+// scale.
+//
+// **A value is an instruction.** The id of an instruction is the id of the
+// value it defines; an instruction that defines nothing -- a store, a branch, a
+// return -- simply has no users. That is LLVM's own model, and it removes a
+// whole table.
+//
+//   iop    the opcode
+//   ity    the id type of the value defined, "" when it defines none
+//   ia     operand A -- a value id, or -1
+//   ib     operand B -- a value id, or -1
+//   istr   auxiliary text: a call target, a literal, a compare predicate
+//   ilist  auxiliary values: call arguments, phi incoming values
+//   iblk   auxiliary blocks: branch targets, phi incoming blocks
+//   ihome  the block the instruction belongs to, -1 while it has none
+
+init_ir() {
+  export string[] iop = [];
+  export string[] ity = [];
+  int ret_i = init_ir2();
+} return int ret_i;
+
+init_ir2() {
+  export int[] ib = [];
+  export string[] istr = [];
+  int ret_i = init_ir3();
+} return int ret_i;
+
+init_ir3() {
+  export int[][] iblk = [];
+  export int[] ihome = [];
+  int ret_i = init_ir7();
+} return int ret_i;

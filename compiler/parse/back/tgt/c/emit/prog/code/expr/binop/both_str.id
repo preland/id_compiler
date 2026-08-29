@@ -1,0 +1,24 @@
+// Both operands are strings?
+
+both_str(int id) {
+  int ok = 0;
+  int i1_of_v = i1_of(id);
+  if(type_of(i1_of_v) == "string" && is_i2_str(id) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+// The second operand's type, read and compared inside one function so that
+// it is a name -- not a call -- on the right of `&&`, and so it is read only
+// when the left operand is already a string.
+is_i2_str(int id) {
+  int e = i2_of(id);
+  string t = type_of(e);
+  int ok = t == "string";
+} return int ok;
+
+// The tail of emit_infix, once the left operand and the operator are known.
+infix_line(int id, int i1_of_v, string s1_of_v) {
+  int i2_of_v = i2_of(id);
+  string s = "(" + emit_expr(i1_of_v) + " " + map_op(s1_of_v) + " " + emit_expr(i2_of_v) + ")";
+} return string s;

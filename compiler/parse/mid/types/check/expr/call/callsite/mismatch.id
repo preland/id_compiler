@@ -1,0 +1,12 @@
+arity_mismatch(int id, int fn) {
+  int a = flat_arg_count(id);
+  int b = flat_arg_count(fn);
+  int ok = ne_flag(a, b);
+} return int ok;
+
+ne_flag(int a, int b) {
+  int ok = 0;
+  if(a != b) {
+    ok = 1;
+  }
+} return int ok;

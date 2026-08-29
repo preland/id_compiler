@@ -1,0 +1,6 @@
+// EXPECT: loop condition has type void
+main() {
+  while(print("x")) {
+    int y = 1;
+  }
+} return int 0;

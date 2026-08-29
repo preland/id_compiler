@@ -1,0 +1,25 @@
+// One byte as `\XX`. Uppercase, two digits, always -- LLVM accepts a literal
+// byte in a c"..." constant, but writing every byte the same way means the
+// quote and the backslash need no case of their own.
+ll_hex(int c) {
+  string ret_s = "\\" + ll_nib(c / 16) + ll_nib(c % 16);
+} return string ret_s;
+
+ll_nib(int n) {
+  string s = chr(48 + n);
+  if(n > 9) {
+    s = chr(55 + n);
+  }
+} return string s;
+
+// A string constant needs a private global to point at. A value of string type
+// that is undefined -- what mem2reg seeds the entry block with for a slot
+// nothing has written yet -- does not: it prints as `undef` and points at
+// nothing, so building a byte array for the text "undef" would be building a
+// constant for a value that has none.
+ll_isstr(int v) {
+  int r = 0;
+  if(ir_op(v) == "const" && ir_ty(v) == "string" && ir_s(v) != "undef") {
+    r = 1;
+  }
+} return int r;

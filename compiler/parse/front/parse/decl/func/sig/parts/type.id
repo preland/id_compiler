@@ -1,0 +1,16 @@
+// Parse a type: a base keyword (int/float/string/void) plus any number of
+// `[]` suffixes. Shared by declarations, parameters, and return clauses.
+
+parse_type(int[] pos) {
+  string t = cur_text(pos);
+  advance(pos);
+  string ret_s = add_brackets(t, pos);
+} return string ret_s;
+
+add_brackets(string t, int[] pos) {
+  while(cur_text(pos) == "[") {
+    advance(pos);
+    advance(pos);
+    t = t + "[]";
+  }
+} return string t;

@@ -1,0 +1,5 @@
+
+lw_args_more(int node, int i) {
+  int[] args = l1_of(node);
+  int ok = i < len(args);
+} return int ok;

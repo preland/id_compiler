@@ -1,0 +1,28 @@
+// The one and two character operator spellings at a position, and the choice
+// between them.
+//
+// scan_op used to build both inline. It cannot now: `chr(charat(src, i))` is a
+// call inside a call, and naming both halves in scan_op's own block put it
+// over the action limit.
+
+two_at(string src, int i) {
+  int c1 = charat(src, i);
+  int c2 = charat(src, i + 1);
+  string two = chr(c1) + chr(c2);
+} return string two;
+
+one_at(string src, int i) {
+  int c = charat(src, i);
+  string one = chr(c);
+} return string one;
+
+// `one` is built whether or not it is printed. charat is a read of a byte
+// that is already in memory, so the branch would cost more than the read.
+scan_op_out(string src, int i, string two) {
+  string one = one_at(src, i);
+  if(is_two_op(two)) {
+    print("op " + two);
+  } else {
+    print("op " + one);
+  }
+} return void;

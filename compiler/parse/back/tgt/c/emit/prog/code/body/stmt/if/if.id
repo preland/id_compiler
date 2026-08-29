@@ -1,0 +1,32 @@
+
+// Close an if: emit the else arm only when there is one (a non-empty else
+// list), matching idc.py which omits `else` for a plain `if`.
+
+end_if(int id, string ind) {
+  if(i2_of(id) > 0) {
+    else_arm(id, ind);
+  } else {
+    emit_line(ind + "}");
+  }
+} return void;
+
+// An else arm holding exactly one if is an `else if`. idc.py emits those by
+// splicing the nested if's opening line onto this one, so the chain stays
+// flat in the generated C instead of nesting a block per level -- matching
+// that byte for byte is the whole point.
+else_arm(int id, string ind) {
+  int[] elsel = l2_of(id);
+  if(i2_of(id) == 1) {
+    emit_if_at(elsel[0], ind, ind + "} else if (");
+  } else {
+    emit_else(id, ind);
+  }
+} return void;
+
+// The body of an if, with its opening text supplied by the caller so that the
+// `if (` and `} else if (` forms share one implementation.
+emit_if_at(int id, string ind, string head) {
+  int i1_of_v = i1_of(id);
+  string emit_expr_v = emit_expr(i1_of_v);
+  emit_if_head(id, ind, head, emit_expr_v);
+} return void;

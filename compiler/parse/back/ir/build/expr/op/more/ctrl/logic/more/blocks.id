@@ -1,0 +1,14 @@
+// Continues lw_logic2: the join block, once the rhs block already exists.
+lw_logic2_join(int node, int slot, int bdy) {
+  int lw_fn_v2 = lw_fn();
+  int jn = ir_block(lw_fn_v2, "join");
+  int ret_i = lw_logic3(node, slot, bdy, jn);
+} return int ret_i;
+
+// Continues lw_short: the branch out of the condition block, once the
+// operator's arm order is known.
+lw_short_term(int node, int c, int bdy, int jn) {
+  string s1_of_v = s1_of(node);
+  int[] lw_arms_v = lw_arms(s1_of_v, bdy, jn);
+  lw_term("cbr", c, lw_arms_v);
+} return void;

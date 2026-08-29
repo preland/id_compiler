@@ -1,0 +1,26 @@
+// Cursor over the token store. `pos` is a one-element int[] cell passed by
+// reference. cur_kind / cur_text read the current token; advance moves past it.
+
+cur_kind(int[] pos) {
+  string k = "eof";
+  if(pos[0] < len((import tkind))) {
+    k = (import tkind)[pos[0]];
+  }
+} return string k;
+
+cur_text(int[] pos) {
+  string s = "";
+  if(pos[0] < len((import ttext))) {
+    s = (import ttext)[pos[0]];
+  }
+} return string s;
+
+// Consuming a token records its line. Every node is built immediately after
+// the tokens that make it up, so this is the line a diagnostic about that
+// node should name -- and it is the only hook that catches *expression*
+// nodes, which no statement-level bookkeeping ever sees.
+advance(int[] pos) {
+  int cur_ln_v = cur_ln(pos);
+  lset((import curtl), 0, cur_ln_v);
+  pos[0] = pos[0] + 1;
+} return void;

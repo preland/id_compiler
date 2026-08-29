@@ -1,0 +1,6 @@
+// The third header field, filled in last: the cells the other two fields
+// describe do not exist until this allocates them.
+list_init_cells(word p) {
+  word mem_alloc_v = mem_alloc(32);
+  st64(p + 16, mem_alloc_v);
+} return void;

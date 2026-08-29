@@ -1,0 +1,41 @@
+// Which code generator a build uses.
+//
+// The two targets do not share a walk: the C emitter walks the AST and the
+// LLVM one walks the IR, which is lowered from the AST first. So the choice is
+// made here, once, rather than by asking a target how to spell each construct
+// -- see docs/LLVM.md for why that seam is in this place and not that one.
+
+emit_target(int argc, string[] argv) {
+  if(arg_target(argc, argv, 1, "c") == "llvm") {
+    string arg_triple_v = arg_triple(argc, argv);
+    int arg_opt_v = arg_opt(argc, argv, 1, 1);
+    emit_llvm(arg_triple_v, arg_opt_v);
+  } else {
+    string arg_target_v = arg_target(argc, argv, 1, "c");
+    emit_target2(arg_target_v, argc, argv);
+  }
+} return void;
+
+// `crt` is not a code generator: it prints the C runtime with external
+// linkage, which is what the LLVM target links against until the runtime is
+// written in `id`. The driver asks for it once per build.
+emit_target2(string t, int argc, string[] argv) {
+  if(t == "crt") {
+    emit_crt();
+  } else {
+    string arg_triple_v = arg_triple(argc, argv);
+    emit_program(arg_triple_v);
+  }
+} return void;
+
+// `--target NAME`, scanned rather than read at a fixed position: the driver
+// also passes --triple and --extern-ok, and a flag whose meaning depends on
+// its index is a trap the next flag falls into.
+arg_target(int argc, string[] argv, int i, string t) {
+  string s = t;
+  if(i + 1 < argc && argv[i] == "--target") {
+    s = argv[i + 1];
+  } else if(i < argc) {
+    s = arg_target(argc, argv, i + 1, t);
+  }
+} return string s;

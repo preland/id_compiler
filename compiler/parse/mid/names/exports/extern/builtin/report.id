@@ -1,0 +1,30 @@
+// What to do with an unresolved name, and the message when it is an error.
+
+is_builtin(string name) {
+  int ok = 0;
+  if(find_str((import bnames), name) >= 0) {
+    ok = 1;
+  }
+} return int ok;
+
+// With a backend attached the name is the linker's to find, so it is recorded
+// for the extern block. Without one there is nowhere it could come from, so
+// it is a typo -- and saying so here is the whole point, since the
+// alternative is an undeclared-function error from `cc` about generated code.
+report_unknown_fn(string name, string owner, int ln) {
+  if(extern_ok() == 1) {
+    note_extern(name);
+  } else {
+    report_nosuchfn(name, owner, ln);
+  }
+} return void;
+
+// idc.py also offers a "did you mean the builtin 'X'?" hint here, computed
+// with Python's difflib. That is not reproduced yet, so the message is its
+// text without the hint; the builtin list, which is the part that answers the
+// question, is the same.
+report_nosuchfn(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  string builtin_list_v = builtin_list();
+  nosuchfn_report(loc_at_v, name, builtin_list_v);
+} return void;

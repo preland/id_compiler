@@ -1,0 +1,22 @@
+// The character classes, asked of a source position rather than of a byte.
+//
+// `while(is_digit(charat(src, i)))` says what it means and is no longer
+// legal: a call may not be an argument to a call (docs/SPEC.md 7.1), and the
+// obvious repair -- naming charat's value before the loop -- would compute it
+// once where the loop needs it every iteration. So the composition becomes a
+// function, which is what a loop condition wanted to be anyway.
+
+is_space_at(string src, int i) {
+  int c = charat(src, i);
+  int ok = is_space(c);
+} return int ok;
+
+is_digit_at(string src, int i) {
+  int c = charat(src, i);
+  int ok = is_digit(c);
+} return int ok;
+
+is_alpha_at(string src, int i) {
+  int c = charat(src, i);
+  int ok = is_alpha(c);
+} return int ok;

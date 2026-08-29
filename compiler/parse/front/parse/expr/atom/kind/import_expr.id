@@ -1,0 +1,16 @@
+// `import name` (usually written `(import name)`) vs a plain identifier/call.
+
+parse_atom3(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "import") {
+    node = parse_import(pos);
+  } else {
+    node = parse_ident_or_call(pos);
+  }
+} return int node;
+
+parse_import(int[] pos) {
+  advance(pos);
+  string name = read_name(pos);
+  int ret_i = node_import(name);
+} return int ret_i;

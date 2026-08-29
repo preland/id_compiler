@@ -1,0 +1,26 @@
+// Appending a node: push one cell onto each of the seven parallel lists.
+// Split into three helpers so each block stays within the 3-action limit.
+
+push_kii(string k, int a, int b) {
+  push((import nkind), k);
+  push((import ni1), a);
+  push((import ni2), b);
+} return void;
+
+// nunit rides along here for the same reason nline rides along below: every
+// node gets a slot, so the parallel lists stay aligned. It records the unit
+// the node was parsed in, which is what keeps a name's type per-unit.
+push_ss(string s1, string s2) {
+  push((import ns1), s1);
+  push((import ns2), s2);
+  push((import nunit), (import ucur)[0]);
+} return void;
+
+// nline keeps the parallel lists aligned: every node gets a line slot, filled
+// in by parse_stmt for statements and left 0 for the rest. A diagnostic needs
+// the line a *statement* began on, and nothing else has ever needed one.
+push_ll(int[] l1, int[] l2) {
+  push((import nl1), l1);
+  push((import nl2), l2);
+  push((import nline), (import curtl)[0]);
+} return void;

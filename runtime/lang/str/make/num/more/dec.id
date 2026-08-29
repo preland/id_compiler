@@ -1,0 +1,6 @@
+// The tail of `str_of_word`, once the buffer is allocated and terminated:
+// writing the digits and wrapping the address they start at as a string.
+str_of_word_at(word a, word p) {
+  word num_str_v = num_str(a, p + 23);
+  string ret_s = w2s(num_str_v);
+} return string ret_s;

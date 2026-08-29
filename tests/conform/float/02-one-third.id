@@ -1,0 +1,5 @@
+
+main(int argc, string[] argv) {
+  float x = 1.0 / 3.0;
+  print(x);
+} return int 0;

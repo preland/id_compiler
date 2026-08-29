@@ -1,0 +1,23 @@
+// String equality is strcmp against zero, as it is in the C target. strcmp is
+// the one libc name the emitted module references directly: a hosted build
+// gets it from libc and a freestanding one from the runtime written in `id`,
+// and neither has to care which.
+lw_scmp(int node) {
+  int i1_of_v = i1_of(node);
+  int a = lw_expr(i1_of_v);
+  int ret_i = lw_scmp_b(node, a);
+} return int ret_i;
+
+lw_scmp2(int node, int c) {
+  int lw_const_v = lw_const("int", "0");
+  string s1_of_v = s1_of(node);
+  int ret_i = lw_op("icmp", "bool", c, lw_const_v, s1_of_v);
+} return int ret_i;
+
+// String `+` builds a new string; each operand reaches it already converted to
+// string context.
+lw_concat(int node) {
+  int i1_of_v = i1_of(node);
+  int a = lw_tostr(i1_of_v);
+  int ret_i = lw_concat_b(node, a);
+} return int ret_i;

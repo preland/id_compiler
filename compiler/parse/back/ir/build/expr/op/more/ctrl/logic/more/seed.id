@@ -1,0 +1,13 @@
+// Continues lw_logic: the seed the slot starts at, and storing it, split
+// across two functions so lw_logic itself stays within the action limit.
+lw_logic_seed(int node, int slot) {
+  string s1_of_v = s1_of(node);
+  string lw_ini_v = lw_ini(s1_of_v);
+  int ret_i = lw_logic_store(node, slot, lw_ini_v);
+} return int ret_i;
+
+lw_logic_store(int node, int slot, string ini) {
+  int lw_const_v = lw_const("int", ini);
+  lw_store_at(slot, lw_const_v);
+  int ret_i = lw_logic2(node, slot);
+} return int ret_i;

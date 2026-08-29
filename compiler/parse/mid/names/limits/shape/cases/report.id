@@ -1,0 +1,23 @@
+// One entry of `casefn` against one function node.
+case_hit(int i, int node) {
+  int n = 0;
+  if((import casefn)[i] == node) {
+    n = 1;
+  }
+} return int n;
+
+// idc.py's message, word for word -- tests/invalid.sh requires both compilers
+// to produce the same text for the same program.
+report_cases(int i, int n) {
+  string prog_loc_v = prog_loc(i);
+  string s1_of_v = s1_of((import prog)[i]);
+  cases_report(prog_loc_v, s1_of_v, n);
+} return void;
+
+// Located by the case's own first token rather than by its function, because
+// the point of the message is the line the reader has to change.
+report_dup_case(int i) {
+  string s1_of_v = s1_of((import casefn)[i]);
+  string func_file_v = func_file(s1_of_v);
+  dup_case_report(func_file_v, i);
+} return void;

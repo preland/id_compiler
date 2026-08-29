@@ -1,0 +1,10 @@
+// EXPECT: element 0 of a word[] literal is a string
+// EXPECT-IDCPY: list element has type int, expected string
+// docs/FRICTION.md 8. The primary compiler takes the literal's type from the
+// slot it is going into, so the string is element 0 of a word[] and is named
+// as such. idc.py takes it from element 0, so it decides the literal is a
+// string[] and reports the 0 in element 1 instead. Both refuse the program.
+main() {
+  word[] xs = ["nope", 0];
+  print(len(xs));
+} return int 0;

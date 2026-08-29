@@ -1,0 +1,21 @@
+
+ll_funcs() {
+  int i = 0;
+  while(i < len((import irprog))) {
+    ll_func((import irprog)[i]);
+    i = i + 1;
+  }
+  int ret_i = ll_ends();
+} return int ret_i;
+
+ll_ends() {
+  emit_line("");
+  ll_strs();
+  int ret_i = ll_entry();
+} return int ret_i;
+
+ll_func(int f) {
+  string ret = irf_ret(f);
+  string ty = ll_ty(ret);
+  ll_func_out(f, ty);
+} return void;

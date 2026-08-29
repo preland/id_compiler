@@ -1,0 +1,29 @@
+// A binary expression. Four shapes, the same four the C target has: a
+// comparison, a string concatenation, a short-circuiting connective, and
+// ordinary arithmetic.
+
+lw_bin(int node) {
+  string op = s1_of(node);
+  int ret_i = lw_bin_op(node, op);
+} return int ret_i;
+
+lb2(int node) {
+  int v = 0 - 1;
+  if(is_concat(node) == 1) {
+    v = lw_concat(node);
+  } else {
+    v = lb3(node);
+  }
+} return int v;
+
+// `&&` and `||` emit as C infix in the C target, so they short-circuit there.
+// The IR says so explicitly rather than inheriting it from a target that
+// happens to -- which is what makes the two agree on `a != 0 && b / a > 1`.
+lb3(int node) {
+  int v = 0 - 1;
+  if(s1_of(node) == "&&" || s1_of(node) == "||") {
+    v = lw_logic(node);
+  } else {
+    v = lw_arith(node);
+  }
+} return int v;

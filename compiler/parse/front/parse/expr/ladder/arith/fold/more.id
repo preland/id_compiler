@@ -1,0 +1,23 @@
+// The tails of add_mul.id's and unary.id's fold/dispatch steps. Splitting
+// each of those functions in two to stay under the action limit still
+// leaves no room in either file for the second half, so the halves that
+// consume an already-read operator or token live here instead.
+
+fold_add_tail(int[] pos, int left, string op) {
+  int right = parse_mul(pos);
+  int ret_i = node_bin(op, left, right);
+} return int ret_i;
+
+unary_or_postfix(int[] pos, string cur_text_v) {
+  int node = 0;
+  if(is_unop(cur_text_v)) {
+    node = fold_unary(pos);
+  } else {
+    node = parse_postfix(pos);
+  }
+} return int node;
+
+fold_unary_tail(int[] pos, string op) {
+  int parse_unary_v = parse_unary(pos);
+  int ret_i = node_un(op, parse_unary_v);
+} return int ret_i;

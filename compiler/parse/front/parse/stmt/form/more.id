@@ -1,0 +1,18 @@
+// Tails of three split functions, one from each of branch/if_while.id,
+// decl/assign.id and decl/decl.id -- all three files are already full, and
+// this is their shared parent.
+
+parse_while_tail(int[] pos, int cond) {
+  int[] parse_block_v = parse_block(pos);
+  int ret_i = node_while(cond, parse_block_v);
+} return int ret_i;
+
+parse_assign_tail(int[] pos, string name) {
+  advance(pos);
+  int ret_i = assign_rhs(pos, name);
+} return int ret_i;
+
+finish_decl_tail(int[] pos, string type, string name, int exported) {
+  eat_eq(pos);
+  int ret_i = decl_rhs(pos, type, name, exported);
+} return int ret_i;

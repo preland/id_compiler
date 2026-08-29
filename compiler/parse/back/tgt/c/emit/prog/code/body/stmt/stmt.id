@@ -1,0 +1,23 @@
+// Expression statement, then the if/while split.
+
+es3(int id, string ind) {
+  if(k_of(id) == "exprstmt") {
+    int i1_of_v = i1_of(id);
+    string emit_expr_v = emit_expr(i1_of_v);
+    emit_line(ind + emit_expr_v + ";");
+  } else {
+    es3b(id, ind);
+  }
+} return void;
+
+es4(int id, string ind) {
+  if(k_of(id) == "if") {
+    emit_if(id, ind);
+  } else {
+    emit_while(id, ind);
+  }
+} return void;
+
+emit_if(int id, string ind) {
+  emit_if_at(id, ind, ind + "if (");
+} return void;

@@ -1,0 +1,22 @@
+// A name may be exported only once (idc.py's pass 1 over exported
+// declarations). Without this the second `export` silently re-initialises the
+// same C global, which is a program with two owners for one piece of state
+// and no complaint from anybody.
+
+add_export2(int id, string owner) {
+  chk_dupexp(id, owner);
+  add_export2_rec(id, owner);
+} return void;
+
+add_export2_rec(int id, string owner) {
+  string s2_of_v = s2_of(id);
+  string s1_of_v = s1_of(id);
+  add_export(s2_of_v, s1_of_v, owner);
+} return void;
+
+chk_dupexp(int id, string owner) {
+  string s2_of_v = s2_of(id);
+  if(find_str((import enames), s2_of_v) >= 0) {
+    dupexp_err(id, owner);
+  }
+} return void;

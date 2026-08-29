@@ -1,0 +1,24 @@
+
+ll_iscast(string op) {
+  int r = 0;
+  if(op == "zext" || op == "sext" || op == "trunc" || op == "sitofp" || op == "fptosi" || op == "ptrtoint" || op == "inttoptr") {
+    r = 1;
+  }
+} return int r;
+
+ll_negop(string t) {
+  string s = "sub";
+  if(ty_kind(t) == "float") {
+    s = "fsub";
+  }
+} return string s;
+
+ll_phis(int id) {
+  string s = "";
+  int i = 0;
+  while(i < ir_l_count(id)) {
+    int[] ir_l_v = ir_l(id);
+    s = s + ll_sep(i) + "[ " + ll_val(ir_l_v[i]) + ", %b" + ir_bl(id)[i] + " ]";
+    i = i + 1;
+  }
+} return string s;

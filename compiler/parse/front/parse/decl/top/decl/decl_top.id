@@ -1,0 +1,30 @@
+// A declaration is either an asm body or an ordinary function; a function is
+// recorded together with the file it came from, which is what the
+// 3-functions-per-file rule counts.
+parse_decl_top(int[] pos) {
+  no_op_atom(pos);
+  if(cur_text(pos) == "asm") {
+    parse_asm(pos);
+  } else {
+    push_func(pos);
+  }
+} return void;
+
+// Any test cases following the return clause are taken in the return clause
+// here, which is free under the action limit -- and which also runs after the
+// body, so `prog` already holds the function each case belongs to.
+push_func(int[] pos) {
+  string cur_file_v = cur_file();
+  push((import pfile), cur_file_v);
+  int ret_i = push_func_line(pos);
+} return int ret_i;
+
+//   tline   the source line of each stored token, parallel to tkind/ttext
+//   lnseen  every `line N` marker seen; the current line is the last one, a
+//           stack rather than a mutable cell for the same reason as fseen
+//   pline   the line each entry of `prog` was declared on
+init_files2() {
+  export int[] tline = [];
+  export int[] lnseen = [];
+  init_lines2();
+} return void;

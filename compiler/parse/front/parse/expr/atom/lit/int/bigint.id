@@ -1,0 +1,30 @@
+// An integer literal that does not fit a 32-bit int is a `word`, not a
+// silently truncated int -- so 0xffffffffffff means what it says. Deciding
+// that needs the literal's value at 64 bits, which is why the digits are
+// accumulated into a word here rather than through to_int.
+//
+// The lexer has already turned any hex spelling into decimal digits, so this
+// only ever sees 0-9.
+
+dec_val(string s) {
+  word dv = 0;
+  int i = 0;
+  while(i < len(s)) {
+    int charat_v = charat(s, i);
+    dv = dec_step(dv, charat_v);
+    i = i + 1;
+  }
+} return word dv;
+
+dec_step(word dv, int c) {
+  word nv = dv * 10 + c - 48;
+} return word nv;
+
+// Only ever asked about literals of 10 digits or fewer, where the accumulator
+// cannot overflow. 2147483647 is INT_MAX.
+over_max(string s) {
+  int ok = 0;
+  if(dec_val(s) > 2147483647) {
+    ok = 1;
+  }
+} return int ok;

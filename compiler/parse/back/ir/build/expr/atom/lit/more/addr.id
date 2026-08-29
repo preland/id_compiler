@@ -1,0 +1,6 @@
+
+// The stack slot a name reads from or writes to.
+lw_name_addr(int node) {
+  string name = s1_of(node);
+  int addr = lw_addr(name);
+} return int addr;

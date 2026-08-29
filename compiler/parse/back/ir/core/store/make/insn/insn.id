@@ -1,0 +1,26 @@
+// Building an instruction. The returned value id IS the instruction's index --
+// there is no separate value table -- so an operand is just an int and a use is
+// just a read of it.
+//
+// Seven parameters is more than anything else in this compiler takes, and it is
+// deliberate: an instruction has seven fields, and a constructor that took
+// fewer would mean a second call to finish the job, which is exactly how a
+// half-built instruction gets into the store.
+
+ir_insn(string op, string ty, int a, int b, string s, int[] l, int[] bl) {
+  ir_col1(op, ty, a);
+  ir_col2(b, s, l);
+  int ret_i = ir_insn_fin(bl);
+} return int ret_i;
+
+ir_col1(string op, string ty, int a) {
+  push((import iop), op);
+  push((import ity), ty);
+  push((import ia), a);
+} return void;
+
+ir_col2(int b, string s, int[] l) {
+  push((import ib), b);
+  push((import istr), s);
+  push((import ilist), l);
+} return void;

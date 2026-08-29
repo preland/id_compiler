@@ -1,0 +1,26 @@
+// Recurse into the bodies of compound statements when hoisting.
+
+// exported decls are C globals (emitted separately), so only non-exported
+// locals are hoisted into the function
+hoist_decl(int id) {
+  if(i2_of(id) == 0) {
+    string s1_of_v = s1_of(id);
+    string s2_of_v = s2_of(id);
+    hoist_decl_line(s1_of_v, s2_of_v);
+  }
+} return void;
+
+hoist_nested(int id) {
+  if(k_of(id) == "if") {
+    hoist_branches(id);
+  } else {
+    hoist_loop(id);
+  }
+} return void;
+
+hoist_branches(int id) {
+  int[] l1_of_v = l1_of(id);
+  hoist_list(l1_of_v);
+  hoist(id);
+} return void;
+

@@ -1,0 +1,23 @@
+// Every phi's incoming edges, once every block's outgoing values are known.
+// This is the second pass the maximal placement buys: nothing here has to
+// reason about order, because every value it reads was computed in the first.
+
+m2r_fill(int f, int i) {
+  while(i < blk_count(f)) {
+    m2r_fill_b(f, i);
+    i = i + 1;
+  }
+} return void;
+
+m2r_fill_b(int f, int i) {
+  int j = 0;
+  while(j < len((import pra))) {
+    j = m2r_fill_one(f, i, j);
+  }
+} return void;
+
+m2r_fill_one(int f, int i, int j) {
+  int[] irf_blk_v = irf_blk(f);
+  m2r_incs(f, irf_blk_v[i], (import phiof)[i][j], j);
+  int ret_i = j + 1;
+} return int ret_i;

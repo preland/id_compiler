@@ -1,0 +1,22 @@
+
+m2r_load(int f, int id, int i) {
+  int ir_a_v = ir_a(id);
+  int j = m2r_slot(ir_a_v);
+  if(j >= 0) {
+    m2r_drop(f, id, (import outv)[i][j], 0);
+  }
+} return void;
+
+m2r_store(int id, int i) {
+  int ir_a_v = ir_a(id);
+  int j = m2r_slot(ir_a_v);
+  if(j >= 0) {
+    m2r_kept(id, i, j);
+  }
+} return void;
+
+m2r_kept(int id, int i, int j) {
+  int ir_b_v = ir_b(id);
+  lset((import outv)[i], j, ir_b_v);
+  ir_kill(id);
+} return void;

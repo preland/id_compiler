@@ -1,0 +1,40 @@
+// Calling a builtin: the right number of arguments, of the right types.
+//
+// idc.py checks these inside gen_call, one hand-written `if` per builtin --
+// thirty of them, each with its own arity test, its own type test and its own
+// wording. The same facts are three questions here (how many, what does
+// position `i` want, how is it worded) so a builtin is described rather than
+// coded, and adding one is three list entries instead of a new branch.
+
+chk_bi(int id) {
+  string s1_of_v = s1_of(id);
+  if(is_builtin(s1_of_v) == 1) {
+    chk_bi_arity(id);
+  }
+} return void;
+
+// Arity first, and nothing else if it is wrong -- as at a call to a defined
+// function, asking what argument 2 should be when there is no argument 2
+// would abort on the bounds check rather than report anything.
+chk_bi_arity(int id) {
+  int mismatch = bi_arity_mismatch(id);
+  if(mismatch == 1) {
+    bi_arity_err(id);
+  } else {
+    chk_bi_args(id);
+  }
+} return void;
+
+// Two wordings, because idc.py has two: the flat-store and unsigned-word
+// group share one shape and say "takes exactly N argument(s), got M"; every
+// other builtin is written out by hand and spells the count as a word.
+bi_arity_err(int id) {
+  string s1_of_v = s1_of(id);
+  if(is_sysbi(s1_of_v) == 1) {
+    string msg = bi_sys_msg(id);
+    tc_err(id, msg);
+  } else {
+    string msg2 = bi_other_msg(id);
+    tc_err(id, msg2);
+  }
+} return void;

@@ -1,0 +1,11 @@
+// The rest of lw_alloca, once the entry block and the value itself exist.
+lw_alloca_tail(int lw_ent_v, int v, string name) {
+  ir_add(lw_ent_v, v);
+  int ret_i = lw_bind(name, v);
+} return int ret_i;
+
+// The rest of lw_pslot, once the parameter's type and name are in hand.
+lw_pslot_tail(string ty, string name, int v) {
+  int lw_alloca_v = lw_alloca(ty, name);
+  lw_store_at(lw_alloca_v, v);
+} return void;

@@ -1,0 +1,22 @@
+// Array literal: `[ expr (, expr)* ]` (or `[]`). Builds an "arr" node whose
+// child list holds the element node ids.
+
+parse_arr(int[] pos) {
+  int[] elems = [];
+  scan_elems(pos, elems);
+  int ret_i = node_arr(elems);
+} return int ret_i;
+
+scan_elems(int[] pos, int[] elems) {
+  advance(pos);
+  fill_elems(pos, elems);
+  advance(pos);
+} return void;
+
+fill_elems(int[] pos, int[] elems) {
+  while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
+    int parse_expr_v = parse_expr(pos);
+    push(elems, parse_expr_v);
+    skip_comma(pos);
+  }
+} return void;

@@ -1,0 +1,4 @@
+// EXPECT: '%' requires int operands
+main() {
+  float r = 5.0 % 2.0;
+} return int 0;

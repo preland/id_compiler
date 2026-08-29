@@ -1,0 +1,6 @@
+
+// The tail of wrap_body, once main's args are already marshalled.
+wrap_body_tail(int m) {
+  string main_body_v = main_body(m);
+  emit_line("    " + main_body_v + " }");
+} return void;

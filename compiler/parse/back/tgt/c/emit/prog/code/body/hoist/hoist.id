@@ -1,0 +1,24 @@
+// Hoist locals: id is function-scoped (a var declared in a branch may be used
+// after it), so every declaration in the body becomes a C declaration at the
+// top of the function, and the body emits the initializer as an assignment.
+
+hoist(int id) {
+  int[] l2_of_v = l2_of(id);
+  hoist_list(l2_of_v);
+} return void;
+
+hoist_list(int[] stmts) {
+  int i = 0;
+  while(i < len(stmts)) {
+    hoist_one(stmts[i]);
+    i = i + 1;
+  }
+} return void;
+
+hoist_one(int id) {
+  if(k_of(id) == "decl") {
+    hoist_decl(id);
+  } else {
+    hoist_nested(id);
+  }
+} return void;

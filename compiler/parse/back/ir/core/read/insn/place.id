@@ -1,0 +1,14 @@
+
+ir_bl(int id) {
+  int[] ret_li = (import iblk)[id];
+} return int[] ret_li;
+
+ir_home(int id) {
+  int ret_i = (import ihome)[id];
+} return int ret_i;
+
+// A constant is not an instruction anybody emits: it prints as its literal at
+// every use. Asking this is how the printer and the folders tell the two apart.
+ir_isconst(int id) {
+  int ret_i = ir_op(id) == "const";
+} return int ret_i;

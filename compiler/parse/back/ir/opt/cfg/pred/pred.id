@@ -1,0 +1,25 @@
+// The predecessors of every block, computed rather than maintained.
+//
+// A branch rewrite that forgets to fix a predecessor list is silent and the
+// bug shows up in a phi three passes later, so no pass edits bpred: this runs
+// again whenever the CFG has changed.
+
+op_preds(int f) {
+  pred_clear(f, 0);
+  pred_scan(f, 0);
+} return void;
+
+pred_clear(int f, int i) {
+  while(i < blk_count(f)) {
+    pred_clear_at(f, i);
+    i = i + 1;
+  }
+} return void;
+
+pred_scan(int f, int i) {
+  while(i < blk_count(f)) {
+    int[] irf_blk_v = irf_blk(f);
+    pred_of(irf_blk_v[i]);
+    i = i + 1;
+  }
+} return void;

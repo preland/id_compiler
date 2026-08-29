@@ -1,0 +1,5 @@
+// EXPECT: cannot apply '~' to a string
+main(int argc, string[] argv) {
+  string s = "hi";
+  print("" + (~s));
+} return int 0;

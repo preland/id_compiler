@@ -1,0 +1,16 @@
+setup(word p) {
+  poke8(p, 5);
+  poke64(p + 8, 4294967296);
+} return void;
+
+show_cross(word p) {
+  string a = "" + peek64(p);
+  string b = "" + peek8(p + 8);
+  print(a + " " + b);
+} return void;
+
+main() {
+  word p = alloc(16);
+  setup(p);
+  show_cross(p);
+} return int 0;

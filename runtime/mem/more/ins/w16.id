@@ -1,0 +1,15 @@
+// Sixteen-bit access to the flat store.
+//
+// A load has to say which extension it wants, and this one zero-extends: `id`
+// reads the store as a bag of bytes and decides what a value means afterwards,
+// so a fetch that invented a sign bit would be answering a question the
+// program has not asked yet.
+
+asm "x86_64-unknown-none" ld16(word a) {
+  "movzwq (%[a]), %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" st16(word a, word v) {
+  "movw %w[v], (%[a])"
+  "xorq %[ret], %[ret]"
+} return word ret;

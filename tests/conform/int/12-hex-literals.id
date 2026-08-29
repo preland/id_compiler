@@ -1,0 +1,4 @@
+
+main() {
+  print("" + 0xFF + " " + 0x10 + " " + 0x0 + " " + (0xFF + 1));
+} return int 0;

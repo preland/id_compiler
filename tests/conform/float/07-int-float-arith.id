@@ -1,0 +1,6 @@
+
+main(int argc, string[] argv) {
+  int a = 3;
+  float b = 2.0;
+  print(a + b);
+} return int 0;

@@ -1,0 +1,12 @@
+// The rest of `ll_func`: the name and parameter string, then the define.
+ll_func_out(int f, string ty) {
+  string name = irf_name(f);
+  string plist = ll_pstr(f);
+  ll_func_emit(f, ty, name, plist);
+} return void;
+
+ll_func_emit(int f, string ty, string name, string plist) {
+  emit_line("define " + ty + " @id_" + name + "(" + plist + ") {");
+  ll_blocks(f);
+  emit_line("}");
+} return void;

@@ -1,0 +1,4 @@
+// EXPECT: to_int expects a string
+main() {
+  int n = to_int(42);
+} return int 0;

@@ -1,0 +1,40 @@
+// idc-in-id, stage 2b: a parser for id FUNCTIONS and STATEMENTS, written in id.
+//
+// Pipeline:  ./idlex < prog.id | ./idparse
+//   stage-1 lexer -> token stream -> this program builds an AST in parallel
+//   lists and prints the program's structure as an indented outline.
+//
+// Shared state lives in exported lists, reached with `import` (a list is a
+// reference, so importing and pushing/reading mutates the one shared list).
+// The cursor `pos` is a one-element int[] cell, passed by reference.
+//
+// Token store:  tkind[i] = kind word ("kw"|"ident"|"int"|"str"|"op"|"eof"),
+//               ttext[i] = the token text.
+// AST node (id = index into these parallel lists):
+//   nkind  string  node kind ("int","var","str","call","bin",
+//                              "decl","assign","exprstmt","if","while",
+//                              "param","func")
+//   ni1    int     int field 1   ni2  int  int field 2
+//   ns1    string  str field 1   ns2  string str field 2
+//   nl1    int[]   child list 1  nl2  int[]  child list 2
+// prog: ids of the top-level functions, in order.
+//
+// See ABI.md for the per-kind field meanings.
+
+setup() {
+  init_a();
+  init_b();
+  int ret_i = setup_rest();
+} return int ret_i;
+
+init_a() {
+  export string[] tkind = [];
+  export string[] ttext = [];
+  export string[] nkind = [];
+} return void;
+
+init_b() {
+  export int[] ni1 = [];
+  export int[] ni2 = [];
+  export string[] ns1 = [];
+} return void;

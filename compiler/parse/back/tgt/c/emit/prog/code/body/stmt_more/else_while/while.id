@@ -1,0 +1,14 @@
+
+// The while loop.
+
+emit_while(int id, string ind) {
+  int i1_of_v = i1_of(id);
+  string emit_expr_v = emit_expr(i1_of_v);
+  emit_while_head(id, ind, emit_expr_v);
+} return void;
+
+emit_while_head(int id, string ind, string emit_expr_v) {
+  emit_line(ind + "while (" + emit_expr_v + ") {");
+  int[] l1_of_v = l1_of(id);
+  emit_body_close(l1_of_v, ind);
+} return void;

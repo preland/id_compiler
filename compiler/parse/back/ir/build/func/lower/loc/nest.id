@@ -1,0 +1,22 @@
+// An exported declaration is a global, which needs no slot.
+lw_loc_decl(int node) {
+  if(i2_of(node) == 0) {
+    string s1_of_v = s1_of(node);
+    string s2_of_v = s2_of(node);
+    lw_alloca(s1_of_v, s2_of_v);
+  }
+} return void;
+
+lw_loc_nest(int node) {
+  if(k_of(node) == "if") {
+    lw_loc_branch(node);
+  } else {
+    lw_loc_loop(node);
+  }
+} return void;
+
+lw_loc_branch(int node) {
+  int[] l1_of_v = l1_of(node);
+  lw_loc_list(l1_of_v);
+  lw_locals(node);
+} return void;

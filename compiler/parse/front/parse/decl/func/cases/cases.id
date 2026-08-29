@@ -1,0 +1,41 @@
+// Test cases, the lines that follow a function's return clause:
+//
+//   add(int a, int b) { int sum = a + b; } return int sum;
+//   (1, 2):(3)
+//   (0, 0):(0)[time:O(1)]
+//
+// See ../../../../../../../docs/TESTS.md. They are part of the declaration,
+// not source: nothing here reaches the emitted C, which is why a program
+// carrying cases compiles to exactly the same output with or without them.
+//
+// There is no ambiguity with the next declaration -- a function starts
+// `ident (`, a case starts `(` -- so this is a plain "while the next token is
+// an open paren" loop, run after the function has been pushed so each case
+// can record which function it belongs to.
+//
+// This parses and counts; it does not yet run them. idc.py runs them
+// (--tests), and until that half is here too, `bin/idc` accepts the syntax
+// and ignores it rather than rejecting a program the other compiler builds.
+
+// Returns 0 so it can be called from push_func's return clause, which is the
+// only free slot there under the action limit. The function each case belongs
+// to is the last one pushed onto `prog`, which is why this runs after it.
+take_cases(int[] pos) {
+  while(cur_kind(pos) == "op" && cur_text(pos) == "(") {
+    push_case(pos);
+  }
+} return int 0;
+
+// A case is recorded as the half-open token range it occupies, so that two
+// cases can be compared without rebuilding their text.
+push_case(int[] pos) {
+  push((import casestart), pos[0]);
+  skip_case(pos);
+  end_case(pos);
+} return void;
+
+end_case(int[] pos) {
+  push((import caseend), pos[0]);
+  int len_v = len((import prog));
+  push((import casefn), (import prog)[len_v - 1]);
+} return void;

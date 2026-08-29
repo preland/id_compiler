@@ -1,0 +1,35 @@
+// One instruction, as LLVM text. A dispatch chain in the order the shapes
+// differ: terminators name blocks, memory names an address, a call names a
+// symbol, and everything else is an operator over typed operands.
+//
+// Each level computes the rest of the chain into its declaration and then
+// overrides it -- the shape the C emitter uses -- so a level costs two tests
+// rather than a test and an else.
+
+ll_text(int id) {
+  string s = ll_t2(id);
+  if(ir_op(id) == "ret") {
+    s = ll_ret(id);
+  } else if(ir_op(id) == "br") {
+    s = "br label %b" + ir_bl(id)[0];
+  }
+} return string s;
+
+ll_ret(int id) {
+  string s = "ret void";
+  if(ir_a(id) >= 0) {
+    int ir_a_v = ir_a(id);
+    s = "ret " + ll_op(ir_a_v);
+  }
+} return string s;
+
+ll_t2(int id) {
+  string s = ll_t3(id);
+  if(ir_op(id) == "cbr") {
+    int ir_a_v = ir_a(id);
+    s = "br i1 " + ll_val(ir_a_v) + ", label %b" + ir_bl(id)[0] + ", label %b" + ir_bl(id)[1];
+  } else if(ir_op(id) == "alloca") {
+    string ir_ty_v = ir_ty(id);
+    s = "%v" + id + " = alloca " + ll_ty(ir_ty_v);
+  }
+} return string s;

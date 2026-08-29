@@ -1,0 +1,6 @@
+// EXPECT: division by zero
+main(int argc, string[] argv) {
+  word z = 0;
+  word udiv_v = udiv(5, z);
+  print("" + udiv_v);
+} return int 0;

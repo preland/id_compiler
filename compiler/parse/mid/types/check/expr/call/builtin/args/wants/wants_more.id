@@ -1,0 +1,27 @@
+
+bi_wants4(string name) {
+  string s = bi_wants5(name);
+  if(name == "len") {
+    s = "strlist";
+  }
+} return string s;
+
+bi_wants5(string name) {
+  string s = "";
+  if(is_sysbi(name) == 1) {
+    s = "word";
+  } else if(name == "str_of_mem") {
+    s = "addr";
+  }
+} return string s;
+
+// Is `t` acceptable where `want` is required? A chain rather than one
+// expression, because each link is a rule with its own diagnostic in the
+// files below, and keeping the two in step is easier when they are listed in
+// the same order.
+bi_ok(string want, string t) {
+  int ok = bi_ok2(want, t);
+  if(want == "string" && t != "string" || want == "int" && t != "int" || want == "index" && t != "int") {
+    ok = 0;
+  }
+} return int ok;

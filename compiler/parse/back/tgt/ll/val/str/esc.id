@@ -1,0 +1,27 @@
+// The byte a backslash escape denotes.
+ll_escbyte(int c) {
+  int r = ll_escbyte2(c);
+  if(c == 110) {
+    r = 10;
+  } else if(c == 116) {
+    r = 9;
+  }
+} return int r;
+
+ll_escbyte2(int c) {
+  int r = c;
+  if(c == 114) {
+    r = 13;
+  } else if(c == 48) {
+    r = 0;
+  }
+} return int r;
+
+// The count of bytes the constant holds, which is what the array type needs.
+// Every byte is written as a three-character escape, so the text is exactly
+// three times the length -- counted rather than tracked, because the two would
+// otherwise be two places to get the NUL right.
+ll_blen(string s) {
+  string ll_bytes_v = ll_bytes(s);
+  int ret_i = len(ll_bytes_v) / 3;
+} return int ret_i;

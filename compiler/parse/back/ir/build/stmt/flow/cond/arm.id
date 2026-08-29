@@ -1,0 +1,18 @@
+// One arm of a branch, or the body of a loop: a block, its statements, and the
+// jump out of whatever block the arm ended in -- which is not necessarily the
+// block it started in, because a nested if leaves the cursor on its join.
+lw_arm(int b, int[] stmts, int jn) {
+  lw_go(b);
+  lw_stmts(stmts);
+  lw_term("br", 0 - 1, [jn]);
+} return void;
+
+// The loop test. Written out rather than folded into the cbr call because the
+// condition's own instructions have to land in the head block before the
+// branch does, and relying on argument evaluation order to arrange that is the
+// kind of thing that is true until it is not.
+lw_head(int node, int bdy, int ex) {
+  int i1_of_v = i1_of(node);
+  int c = lw_cond(i1_of_v);
+  lw_term("cbr", c, [bdy, ex]);
+} return void;

@@ -1,0 +1,38 @@
+// asm functions: a function whose body is instructions rather than statements,
+// declared for one platform triple. See ../../../../../docs/ASM.md.
+//
+// They are kept out of the ordinary node store because a row needs six fields
+// and a node has room for two strings, two ints and two lists. Six parallel
+// lists, one row per declaration:
+//
+//   afname    the function's name -- repeated across platform overloads
+//   aftriple  the platform triple this body is written for
+//   afparams  parameter nodes, as for an ordinary function
+//   aflines   the instruction lines, verbatim, quotes included
+//   afret     the return type
+//   afretn    the name the return clause gives the result, which is what
+//             `%[name]` in the instruction text binds to
+
+init_asm() {
+  export string[] afname = [];
+  export string[] aftriple = [];
+  export int[][] afparams = [];
+} return void;
+
+init_asm2() {
+  export string[][] aflines = [];
+  export string[] afret = [];
+  export string[] afretn = [];
+} return void;
+
+// A string token arrives with its quotes; the triple is compared against a
+// command-line argument, so it is stored without them.
+unquote(string s) {
+  string out = "";
+  int i = 1;
+  while(i < len(s) - 1) {
+    int charat_v = charat(s, i);
+    out = out + chr(charat_v);
+    i = i + 1;
+  }
+} return string out;

@@ -1,0 +1,16 @@
+// The file a function was declared in, from the parallel `pfile` list.
+func_file(string fname) {
+  int i = 0;
+  string s = "<stdin>";
+  while(i < len((import prog))) {
+    s = func_file_at(i, fname, s);
+    i = i + 1;
+  }
+} return string s;
+
+func_file_at(int i, string fname, string s) {
+  string fpath = s;
+  if(s1_of((import prog)[i]) == fname && i < len((import pfile))) {
+    fpath = (import pfile)[i];
+  }
+} return string fpath;

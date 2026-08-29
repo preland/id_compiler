@@ -1,0 +1,22 @@
+// Reading and writing a cell.
+//
+// docs/SPEC.md 5 says an index outside the list traps. There is no stderr to
+// trap to here and nothing to exit to, so these are the address arithmetic and
+// nothing else -- the one place this runtime is less safe than the hosted one,
+// and the reason is the absence of a place to report to rather than a judgement
+// that the check is not worth it.
+
+cell_at(int[] xs, int i) {
+  word l2w_v = l2w(xs);
+  word ret_w = ld64(l2w_v + 16) + i * 8;
+} return word ret_w;
+
+list_get(int[] xs, int i) {
+  word cell_at_v = cell_at(xs, i);
+  word ret_w = ld64(cell_at_v);
+} return word ret_w;
+
+list_set(int[] xs, int i, word v) {
+  word cell_at_v = cell_at(xs, i);
+  st64(cell_at_v, v);
+} return void;

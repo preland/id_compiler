@@ -1,0 +1,27 @@
+// C emitter (stage 3). Walks the AST and prints C, mirroring idc.py:
+// id functions become `id_NAME`, locals are hoisted to function scope (id is
+// function-scoped), a runtime prelude and forward declarations come first, then
+// a C main() wrapper. The output is byte-identical to idc.py for the supported
+// subset (scalar int/void programs).
+
+emit_program(string triple) {
+  emit_head();
+  emit_asm_then_main(triple);
+  emit_main_wrapper();
+} return void;
+
+// runtime prelude, a blank line, then the declarations section, matching
+// idc.py's layout exactly
+emit_head() {
+  emit_runtime();
+  emit_line("");
+  emit_decls();
+} return void;
+
+// the link-time externs (if any), the forward declarations, then the
+// exported-variable globals (if any) -- idc.py's order
+emit_decls() {
+  emit_externs();
+  emit_fwds();
+  emit_exports();
+} return void;

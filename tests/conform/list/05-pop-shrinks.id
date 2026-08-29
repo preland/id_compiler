@@ -1,0 +1,10 @@
+main() {
+  int[] xs = [4, 5, 6];
+  int last = pop(xs);
+  show_pop(xs, last);
+} return int 0;
+
+show_pop(int[] xs, int last) {
+  int n = len(xs);
+  print("" + last + " " + n);
+} return void;

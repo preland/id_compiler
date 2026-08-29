@@ -1,0 +1,8 @@
+// The `file:line: error: ` prefix for a diagnostic about function `fname`.
+// Looked up rather than threaded: every check would otherwise need to carry a
+// file alongside the depth and the function name, and diagnostics are rare
+// enough that a linear scan costs nothing.
+//
+loc_at(string fname, int ln) {
+  string ret_s = func_file(fname) + ":" + ln + ": error: ";
+} return string ret_s;

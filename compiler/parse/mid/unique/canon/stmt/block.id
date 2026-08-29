@@ -1,0 +1,37 @@
+// The else arm, and a statement list.
+//
+// `else if` and `else { if ... }` parse to the same shape -- an else list
+// holding one if node -- and are told apart by the elif flag, exactly as
+// idc.py tells a chained IfStmt from a one-statement else block. They emit
+// different C, so they must canonicalise differently too.
+
+canon_else2(int[] els, int elif) {
+  string out = "";
+  if(elif == 1) {
+    out = "elif" + canon_stmt(els[0]);
+  } else {
+    out = canon_else3(els);
+  }
+} return string out;
+
+// An empty `else { }` adds nothing, matching idc.py, where an empty else list
+// is falsy and the arm is skipped. It costs an action, but the action limit is
+// a different rule, checked elsewhere.
+canon_else3(int[] els) {
+  string out = "";
+  if(len(els) > 0) {
+    out = "else{" + canon_body(els) + "}";
+  }
+} return string out;
+
+// Statements in order, separated by `;`. The order matters twice over: it is
+// the logic being fingerprinted, and it is what decides the position each
+// local name is given.
+canon_body(int[] stmts) {
+  string out = "";
+  int i = 0;
+  while(i < len(stmts)) {
+    out = out + sep_at(";", i) + canon_stmt(stmts[i]);
+    i = i + 1;
+  }
+} return string out;

@@ -1,0 +1,22 @@
+// The two comparison checks. Equality accepts two strings or two numbers;
+// ordering accepts only two numbers -- id has no ordering on strings, and
+// `"a" < "b"` is far more often a mistake than an intention.
+
+chk_eq(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  eq_types(id, i1_of_v, i2_of_v);
+} return void;
+
+eq_types(int id, int a, int b) {
+  string lt = type_of(a);
+  string rt = type_of(b);
+  eq_report(id, lt, rt);
+} return void;
+
+eq_report(int id, string lt, string rt) {
+  int eq_ok_v = eq_ok(lt, rt);
+  if(cmp_bad(lt, rt, eq_ok_v) == 1) {
+    tc_err(id, "cannot compare " + lt + " with " + rt);
+  }
+} return void;

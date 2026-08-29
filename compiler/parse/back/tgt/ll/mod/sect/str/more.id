@@ -1,0 +1,12 @@
+// The rest of `ll_str_at`: the length and bytes, then the constant line.
+ll_str_emit(int i) {
+  string s = ir_s(i);
+  int blen = ll_blen(s);
+  ll_str_emit2(i, s, blen);
+} return void;
+
+ll_str_emit2(int i, string s, int blen) {
+  string q = chr(34);
+  string bytes = ll_bytes(s);
+  emit_line("@.str" + i + " = private unnamed_addr constant [" + blen + " x i8] c" + q + bytes + q);
+} return void;

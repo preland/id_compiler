@@ -1,0 +1,37 @@
+// The message. Three of the eight requirements are worded specially in
+// idc.py, so they are taken off the front of the chain and the rest share one
+// sentence.
+
+bi_arg_err(int id, int i, string want, string t) {
+  if(want == "index") {
+    tc_err(id, "charat index must be int, got " + t);
+  } else {
+    bi_arg_err2(id, i, want, t);
+  }
+} return void;
+
+// str_of_mem names neither the position nor the type: both of its arguments
+// are addresses-or-lengths, and idc.py says so once.
+bi_arg_err2(int id, int i, string want, string t) {
+  if(want == "addr") {
+    tc_err(id, "str_of_mem takes an address and a length");
+  } else {
+    bi_arg_err3(id, i, want, t);
+  }
+} return void;
+
+// The flat-store group is the only family that reports at the *argument's*
+// line rather than the call's -- idc.py raises it from inside the loop over
+// the arguments, and its calls are the ones most likely to be written across
+// several lines.
+bi_arg_err3(int id, int i, string want, string t) {
+  if(want == "word") {
+    int[] l1_of_v = l1_of(id);
+    string s1_of_v = s1_of(id);
+    tc_err(l1_of_v[i], s1_of_v + " expects int or word arguments, got " + t);
+  } else {
+    string s1_of_v2 = s1_of(id);
+    string bi_verb_v = bi_verb(want);
+    tc_err(id, s1_of_v2 + " " + bi_verb_v + ", got " + t);
+  }
+} return void;

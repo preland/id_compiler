@@ -1,0 +1,15 @@
+// Composed counts, for the many passes that walk a function's blocks or a
+// block's instructions with `while(i < len(...(x)))`. A call may not sit
+// inside a call's argument, so the length needs a name -- but naming it once
+// before the loop would freeze it, and a pass that pushes or kills an
+// instruction mid-walk needs the count read fresh on every iteration.
+
+blk_count(int f) {
+  int[] blks = irf_blk(f);
+  int n = len(blks);
+} return int n;
+
+insn_count(int b) {
+  int[] ins = blk_ins(b);
+  int n = len(ins);
+} return int n;

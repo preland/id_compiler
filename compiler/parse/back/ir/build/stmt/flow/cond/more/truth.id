@@ -1,0 +1,22 @@
+// A condition in `id` is any integral value, true when it is nonzero, so a
+// branch tests `!= 0` rather than taking a bit. The comparison a reader wrote
+// has already become an icmp of its own; this one collapses in constfold.
+
+lw_cond(int node) {
+  string t = type_of(node);
+  int v = lw_expr(node);
+  int ret_i = lw_truth(v, t);
+} return int ret_i;
+
+lw_truth(int v, string t) {
+  string lw_zero_v = lw_zero(t);
+  int z = ir_leaf("const", t, 0 - 1, 0 - 1, lw_zero_v);
+  int ret_i = lw_truth_tail(v, t, z);
+} return int ret_i;
+
+lw_zero(string t) {
+  string s = "0";
+  if(ty_kind(t) == "float") {
+    s = "0.0";
+  }
+} return string s;

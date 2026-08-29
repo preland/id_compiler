@@ -1,0 +1,27 @@
+
+le4(int node) {
+  int v = 0 - 1;
+  if(k_of(node) == "call") {
+    v = lw_call(node);
+  } else {
+    v = le5(node);
+  }
+} return int v;
+
+le5(int node) {
+  int v = 0 - 1;
+  if(k_of(node) == "un") {
+    v = lw_un(node);
+  } else {
+    v = le6(node);
+  }
+} return int v;
+
+le6(int node) {
+  int v = 0 - 1;
+  if(k_of(node) == "index") {
+    v = lw_index(node);
+  } else {
+    v = lw_arr(node);
+  }
+} return int v;

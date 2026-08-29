@@ -1,0 +1,30 @@
+// Boxing a value into a uniform list cell (a long long), mirroring idc.py's
+// box(): an int widens, a float is bit-copied, a pointer (string/list) goes
+// through intptr_t. Plus elem_type, which strips a trailing `[]` to get a
+// list's element type.
+
+// A `word` boxes exactly like an `int` -- the cast is what widens a narrower
+// value into the 8-byte cell that id_list_lit's varargs read back.
+box(string code, string type) {
+  string s = box2(code, type);
+  if(type == "int" || type == "word") {
+    s = "(long long)(" + code + ")";
+  }
+} return string s;
+
+box2(string code, string type) {
+  string s = "(long long)(intptr_t)(" + code + ")";
+  if(type == "float") {
+    s = "id_box_f(" + code + ")";
+  }
+} return string s;
+
+elem_type(string t) {
+  string out = "";
+  int i = 0;
+  while(i < len(t) - 2) {
+    int charat_v = charat(t, i);
+    out = out + chr(charat_v);
+    i = i + 1;
+  }
+} return string out;

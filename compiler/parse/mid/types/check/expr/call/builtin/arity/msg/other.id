@@ -1,0 +1,5 @@
+bi_other_msg(int id) {
+  string name = s1_of(id);
+  string bc = bi_count(name);
+  string msg = name + " takes " + bc;
+} return string msg;

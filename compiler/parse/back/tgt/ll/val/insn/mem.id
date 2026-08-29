@@ -1,0 +1,34 @@
+
+ll_t3(int id) {
+  string s = ll_t4(id);
+  if(ir_op(id) == "load") {
+    string ir_ty_v = ir_ty(id);
+    int ir_a_v = ir_a(id);
+    s = "%v" + id + " = load " + ll_ty(ir_ty_v) + ", ptr " + ll_val(ir_a_v);
+  } else if(ir_op(id) == "store") {
+    int ir_b_v = ir_b(id);
+    int ir_a_v2 = ir_a(id);
+    s = "store " + ll_op(ir_b_v) + ", ptr " + ll_val(ir_a_v2);
+  }
+} return string s;
+
+ll_t4(int id) {
+  string s = ll_t5(id);
+  if(ir_op(id) == "call") {
+    s = ll_call(id);
+  } else if(ir_op(id) == "phi") {
+    string ir_ty_v = ir_ty(id);
+    s = "%v" + id + " = phi " + ll_ty(ir_ty_v) + " " + ll_phis(id);
+  }
+} return string s;
+
+// A call that produces nothing is a statement; one that produces a value names
+// it. LLVM will not accept a name for a void result, so the two really are
+// different lines rather than one with an empty prefix.
+ll_call(int id) {
+  string ir_ty_v = ir_ty(id);
+  string s = "call " + ll_ty(ir_ty_v) + " @" + ir_s(id) + "(" + ll_args(id) + ")";
+  if(ll_ty(ir_ty_v) != "void") {
+    s = "%v" + id + " = " + s;
+  }
+} return string s;

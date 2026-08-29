@@ -1,0 +1,21 @@
+// The tail of `list_push`, once the header address is resolved: writing the
+// value into the next free cell, then advancing the length.
+list_push_at(word p, word v) {
+  word addr = ld64(p + 16);
+  word count = ld64(p);
+  list_push_write(p, v, addr, count);
+} return void;
+
+list_push_write(word p, word v, word addr, word count) {
+  st64(addr + count * 8, v);
+  word ld64_v3 = ld64(p);
+  st64(p, ld64_v3 + 1);
+} return void;
+
+// The tail of `list_grow`: copying the old cells into the freshly allocated,
+// wider array before the header is updated to point at it.
+list_grow_copy(word p, word a, word z, word src) {
+  word count = ld64(p);
+  copy_bytes(src, a, count * 8);
+  list_wide(p, a, z);
+} return void;

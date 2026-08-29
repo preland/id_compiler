@@ -1,0 +1,14 @@
+// Thirty-two-bit access to the flat store.
+//
+// `movl` into a 32-bit register already clears the upper half of its 64-bit
+// register on x86-64, so the load needs no separate widening step -- the
+// zero-extension the store's contract asks for is what the instruction does.
+
+asm "x86_64-unknown-none" ld32(word a) {
+  "movl (%[a]), %k[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" st32(word a, word v) {
+  "movl %k[v], (%[a])"
+  "xorq %[ret], %[ret]"
+} return word ret;

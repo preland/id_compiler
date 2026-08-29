@@ -1,0 +1,28 @@
+// binary literal, or hand off. Tested before the decimal case for the same
+// reason hex is: `0b1010` starts with a digit and would otherwise scan as the
+// number 0.
+scan_binop(string src, int i) {
+  int ni = 0;
+  if(bin_start(src, i)) {
+    ni = scan_bin(src, i);
+  } else {
+    ni = scan_decop(src, i);
+  }
+} return int ni;
+
+// i points at the '0'; i + 2 is the first binary digit.
+scan_bin(string src, int i) {
+  int e = bin_end(src, i + 2);
+  word v = bin_val(src, i + 2, e);
+  print_uint(v);
+} return int e;
+
+// Accumulated in a `word` for the reason hex is: 64 binary digits do not fit
+// an int.
+bin_val(string src, int i, int e) {
+  word v = 0;
+  while(i < e) {
+    v = v * 2 + charat(src, i) - 48;
+    i = i + 1;
+  }
+} return word v;

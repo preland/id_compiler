@@ -1,0 +1,4 @@
+// EXPECT: peek8 takes exactly 1 argument
+main(int argc, string[] argv) {
+  print("" + peek8(1, 2));
+} return int 0;

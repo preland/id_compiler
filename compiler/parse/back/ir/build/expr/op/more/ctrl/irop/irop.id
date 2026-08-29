@@ -1,0 +1,25 @@
+// The IR opcode for an operator at a type. Float arithmetic is its own set of
+// opcodes rather than a flag on the integer ones, because that is how the
+// printer wants it and how every fold has to read it anyway.
+lw_irop(string op, string t) {
+  string p = lw_iop_int(op);
+  if(ty_kind(t) == "float") {
+    p = lw_iop_f(op);
+  }
+} return string p;
+
+lw_iop_f(string op) {
+  string p = lw_iop_f2(op);
+  if(op == "-") {
+    p = "fsub";
+  } else if(op == "*") {
+    p = "fmul";
+  }
+} return string p;
+
+lw_iop_f2(string op) {
+  string p = "fadd";
+  if(op == "/") {
+    p = "fdiv";
+  }
+} return string p;

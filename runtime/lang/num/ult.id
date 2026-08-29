@@ -1,0 +1,19 @@
+// Unsigned less-than, the unsigned reading of `<` that docs/SPEC.md 6 gives
+// the flat store.
+//
+// `id` compares integers signed, and flipping both sign bits turns the
+// unsigned order into the signed one: it maps 0 to the most negative word and
+// the largest word to the most positive, preserving order everywhere in
+// between. So this needs no instruction of its own.
+
+ult(word a, word v) {
+  word p = a ^ 0x8000000000000000;
+  word ret_w = ult_at(p, v ^ 0x8000000000000000);
+} return word ret_w;
+
+ult_at(word p, word q) {
+  word v = 0;
+  if(p < q) {
+    v = 1;
+  }
+} return word v;

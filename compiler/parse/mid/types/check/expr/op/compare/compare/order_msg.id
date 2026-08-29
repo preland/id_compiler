@@ -1,0 +1,6 @@
+ord_report(int id, string lt, string rt) {
+  int ord_ok_v = ord_ok(lt, rt);
+  if(cmp_bad(lt, rt, ord_ok_v) == 1) {
+    tc_err(id, "cannot order " + lt + " and " + rt);
+  }
+} return void;

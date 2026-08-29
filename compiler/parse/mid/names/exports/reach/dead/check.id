@@ -1,0 +1,52 @@
+// An export whose declaring function is never reached.
+//
+// `export T name = v;` is a declaration *inside a function body*: the C global
+// exists from the start, but its initializer is an assignment that runs only
+// when that function runs. A function nothing calls therefore leaves every
+// global it declares NULL, and every `(import name)` reading it gets that,
+// silently, at run time.
+//
+// `id` has no function pointers, so the call graph is exact and this is
+// decidable rather than approximate. It is worth deciding: allocation is one
+// chain of small functions -- a 3-action block holds two exports and one call,
+// so a chain is long and dropping a link is a one-line mistake. This repo
+// shipped one: demos/fpsmaze defined scene_init(), nothing called it, and the
+// game drew its maze with no walls and no targets.
+//
+// What is reported is the READ, not the dead function. A file that declares an
+// export and never wires it up is unfinished or illustrative -- demos/hello is
+// deliberately the latter, and rejecting it would be wrong. A reachable
+// `(import x)` whose owner is unreachable is neither: it is a guaranteed read
+// of an uninitialised global, at a place the program actually goes.
+
+chk_dead() {
+  init_reach();
+  reach_mark();
+  dead_final();
+} return void;
+
+// Seeded with "main" unconditionally. A project without one is a library, and
+// then no function is named main, so nothing ever matches and nothing is
+// reachable -- which is the right answer for a library, whose entry points are
+// all of its functions.
+//
+//   rfn     the reachable function names
+//   dphase  0 while reachability is still growing, 1 for the final sweep
+// "conf.id" is seeded alongside "main" because a constant has no declaring
+// function to reach: it is emitted as a static initialiser, so it holds its
+// value before main runs and can never be the uninitialised read this check
+// exists to find.
+init_reach() {
+  export string[] rfn = ["main", "conf.id"];
+  export int[] dphase = [0];
+} return void;
+
+// Fixpoint: sweep until a sweep adds nothing. The number of sweeps is the
+// depth of the call graph, which in `id` is large but the sweep is linear, and
+// this runs once per compilation.
+reach_mark() {
+  int n = 0 - 1;
+  while(n != len((import rfn))) {
+    n = reach_pass();
+  }
+} return void;

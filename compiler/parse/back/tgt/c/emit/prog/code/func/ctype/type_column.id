@@ -1,0 +1,27 @@
+// The C target's spelling column.
+//
+// One row per scalar type, IN THE SAME ORDER as mid/types/registry/ registers
+// them -- int, word, float, string, void -- because c_scalar indexes this
+// list with the row number ty_find returns. Adding a type to id is one
+// ty_row call there and one push here; getting the order wrong here spells
+// every type as its neighbour, which tests/conform.sh's first case would
+// catch immediately.
+
+init_tyc() {
+  export string[] tyc = [];
+  init_tyc_rows();
+} return void;
+
+init_tyc_rows() {
+  push((import tyc), "int");
+  push((import tyc), "long long");
+  init_tyc_rows2();
+} return void;
+
+// `string` is a char*, and `void` is C's own void. `float` is a double: id's
+// float is binary64, and C's `float` is not.
+init_tyc_rows2() {
+  push((import tyc), "double");
+  push((import tyc), "char*");
+  push((import tyc), "void");
+} return void;

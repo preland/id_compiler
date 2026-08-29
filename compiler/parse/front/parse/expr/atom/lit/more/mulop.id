@@ -1,0 +1,21 @@
+// Remaining operator-class predicate, and its lookahead wrapper alongside
+// the additive one -- a call may not sit as an argument to a call, so the
+// while loops that used to test `is_mulop(cur_text(pos))` directly now call
+// these instead.
+
+is_mulop(string s) {
+  int ok = 0;
+  if(s == "*" || s == "/" || s == "%") {
+    ok = 1;
+  }
+} return int ok;
+
+mulop_at(int[] pos) {
+  string s = cur_text(pos);
+  int ok = is_mulop(s);
+} return int ok;
+
+addop_at(int[] pos) {
+  string s = cur_text(pos);
+  int ok = is_addop(s);
+} return int ok;

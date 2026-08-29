@@ -1,0 +1,12 @@
+// The rest of canon_func, split so that block stays within the action limit.
+canon_func_body(int id) {
+  int[] l1_of_v = l1_of(id);
+  string out = canon_params(l1_of_v);
+  string ret_s = canon_func_tail(id, out);
+} return string ret_s;
+
+canon_func_tail(int id, string out) {
+  int[] l2_of_v = l2_of(id);
+  string val = canon_body(l2_of_v);
+  string ret_s = "(" + out + ")->" + s2_of(id) + "{" + val + "}=>" + canon_ret(id);
+} return string ret_s;

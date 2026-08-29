@@ -1,0 +1,12 @@
+// Argument i's own type, read the same way a defined function's parameter
+// types are.
+arg_type_at(int id, int i) {
+  int[] args = l1_of(id);
+  string t = type_of(args[i]);
+} return string t;
+
+// What position i of this builtin requires, by name.
+bi_want_for(int id, int i) {
+  string name = s1_of(id);
+  string s = bi_wants(name, i);
+} return string s;

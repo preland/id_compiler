@@ -1,0 +1,17 @@
+// The relational half of a predicate: `lt`, `gt`, `le`, `ge`. Signedness and
+// ordering are prefixes their callers add.
+ll_rel(string op) {
+  string s = ll_rel2(op);
+  if(op == "<") {
+    s = "lt";
+  } else if(op == ">") {
+    s = "gt";
+  }
+} return string s;
+
+ll_rel2(string op) {
+  string s = "ge";
+  if(op == "<=") {
+    s = "le";
+  }
+} return string s;

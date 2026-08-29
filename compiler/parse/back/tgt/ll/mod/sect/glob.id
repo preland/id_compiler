@@ -1,0 +1,25 @@
+// An exported variable is a module-level global. A constant from conf.id
+// carries its value; everything else starts zeroed and is written when its
+// declaring function runs.
+ll_globals() {
+  int i = 0;
+  while(i < len((import enames))) {
+    string ty = ll_ty((import etypes)[i]);
+    ll_global_at(i, ty);
+    i = i + 1;
+  }
+} return void;
+
+ll_global_at(int i, string ty) {
+  string init = ll_init(i);
+  emit_line("@" + (import enames)[i] + " = global " + ty + " " + init);
+} return void;
+
+ll_init(int i) {
+  string s = ll_zero((import etypes)[i]);
+  if((import eowners)[i] == "conf.id") {
+    int const_decl_v = const_decl((import enames)[i]);
+    int i1_of_v = i1_of(const_decl_v);
+    s = s1_of(i1_of_v);
+  }
+} return string s;

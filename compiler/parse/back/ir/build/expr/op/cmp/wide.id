@@ -1,0 +1,13 @@
+// Continues lw_cmp: the left operand's type is known, so the right operand's
+// is fetched next and the two are widened together.
+lw_cmp_t2(int node, string t1) {
+  int i2_of_v = i2_of(node);
+  string lw_ety_v2 = lw_ety(i2_of_v);
+  int ret_i = lw_cmp_wide(node, t1, lw_ety_v2);
+} return int ret_i;
+
+lw_cmp_wide(int node, string t1, string t2) {
+  string t = ty_wider(t1, t2);
+  int v = lw_cmp2(node, t);
+  int ret_i = lw_conv(v, "bool", "int");
+} return int ret_i;

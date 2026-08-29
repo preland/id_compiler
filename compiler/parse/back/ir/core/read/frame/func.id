@@ -1,0 +1,12 @@
+
+irf_name(int f) {
+  string ret_s = (import fnname)[f];
+} return string ret_s;
+
+irf_ret(int f) {
+  string ret_s = (import fnret)[f];
+} return string ret_s;
+
+irf_par(int f) {
+  int[] ret_li = (import fnpar)[f];
+} return int[] ret_li;

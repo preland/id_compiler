@@ -1,0 +1,26 @@
+// call/bin dispatch, and the return type of a called name.
+
+type_of4(int id) {
+  string t = type_of5(id);
+  if(k_of(id) == "call") {
+    t = call_type(id);
+  }
+} return string t;
+
+type_call(string name) {
+  string t = builtin_type(name);
+  if(t == "?") {
+    string lookup_func_v = lookup_func(name);
+    t = extern_type(lookup_func_v);
+  }
+} return string t;
+
+// return type of a builtin, or "?" if `name` is not a builtin
+builtin_type(string name) {
+  string t = "?";
+  if(name == "print") {
+    t = "void";
+  } else {
+    t = bt2(name);
+  }
+} return string t;

@@ -1,0 +1,21 @@
+// Leaf of statement dispatch (after assignment): index-assignment
+// (`xs[i] = expr`) vs a bare expression statement. Plus the primary helper
+// that routes `[` to an array literal and everything else to an atom.
+
+parse_stmt5(int[] pos) {
+  int node = 0;
+  if(is_iassign(pos)) {
+    node = parse_iassign(pos);
+  } else {
+    node = parse_exprstmt(pos);
+  }
+} return int node;
+
+pp2(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "[") {
+    node = parse_arr(pos);
+  } else {
+    node = parse_atom(pos);
+  }
+} return int node;

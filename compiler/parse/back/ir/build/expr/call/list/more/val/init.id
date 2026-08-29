@@ -1,0 +1,11 @@
+// The empty list a literal fills, and the element type its members convert
+// to on the way in.
+lw_arr_new(int node) {
+  string ty = lw_ety(node);
+  int a = lw_new(ty);
+} return int a;
+
+lw_arr_elem(int node) {
+  string ty = lw_ety(node);
+  string elem = elem_type(ty);
+} return string elem;

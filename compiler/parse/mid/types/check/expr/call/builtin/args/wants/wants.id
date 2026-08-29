@@ -1,0 +1,32 @@
+// What argument `i` of a builtin must be, as a word this file's neighbours
+// turn into a test and a message. "" means "anything".
+//
+//   string   exactly a string          list     any T[]
+//   int      exactly an int            strlist  a string or any T[]
+//   index    an int, worded as an index (charat's second argument)
+//   word     an int or a word          addr     the same, worded as an address
+
+bi_wants(string name, int i) {
+  string s = bi_wants2(name, i);
+  if(name == "to_int" || name == "mem_of_str" || name == "charat" && i == 0) {
+    s = "string";
+  }
+} return string s;
+
+// charat's first argument was taken above, so what reaches here is its
+// second: the index, which idc.py words as an index rather than as a type.
+bi_wants2(string name, int i) {
+  string s = bi_wants3(name, i);
+  if(name == "chr" || name == "sleep_ms") {
+    s = "int";
+  } else if(name == "charat") {
+    s = "index";
+  }
+} return string s;
+
+bi_wants3(string name, int i) {
+  string s = bi_wants4(name);
+  if(name == "pop" || name == "push" && i == 0) {
+    s = "list";
+  }
+} return string s;

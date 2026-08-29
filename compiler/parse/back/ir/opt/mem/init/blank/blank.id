@@ -1,0 +1,19 @@
+
+m2r_rows(int f, int i) {
+  while(i < blk_count(f)) {
+    m2r_row();
+    i = i + 1;
+  }
+} return void;
+
+m2r_row() {
+  int[] m2r_blank_v = m2r_blank();
+  push((import phiof), m2r_blank_v);
+  m2r_row2();
+} return void;
+
+m2r_blank() {
+  int[] row = [];
+  int len_v = len((import pra));
+  lst_fill(row, len_v, 0 - 1);
+} return int[] row;

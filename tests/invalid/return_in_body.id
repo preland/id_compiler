@@ -1,0 +1,5 @@
+// EXPECT: 'return' belongs after the function's closing brace
+// the return clause comes after the closing brace, not inside the body
+main() {
+  return 0;
+} return int 0;

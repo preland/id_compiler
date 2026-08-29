@@ -1,0 +1,14 @@
+// Logical-and level, between or and equality/relational.
+
+parse_and(int[] pos) {
+  int left = parse_rel(pos);
+  while(cur_text(pos) == "&&") {
+    left = fold_and(pos, left);
+  }
+} return int left;
+
+fold_and(int[] pos, int left) {
+  advance(pos);
+  int right = parse_rel(pos);
+  int ret_i = node_bin("&&", left, right);
+} return int ret_i;

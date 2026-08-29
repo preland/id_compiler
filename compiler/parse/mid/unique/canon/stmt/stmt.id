@@ -1,0 +1,45 @@
+// Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager
+// chain as the expression side: two statement kinds per link.
+//
+// Each kind is tagged, so a statement can never canonicalise to the same
+// string as a statement of another kind.
+
+canon_stmt(int id) {
+  string out = cst2(id);
+  if(k_of(id) == "decl") {
+    out = canon_decl(id);
+  }
+  if(k_of(id) == "assign") {
+    string s1_of_v = s1_of(id);
+    int i1_of_v = i1_of(id);
+    out = "a:" + cn(s1_of_v) + "=" + canon_expr(i1_of_v);
+  }
+} return string out;
+
+cst2(int id) {
+  string out = cst3(id);
+  if(k_of(id) == "iassign") {
+    out = canon_iassign(id);
+  }
+  if(k_of(id) == "exprstmt") {
+    int i1_of_v = i1_of(id);
+    out = "e:" + canon_expr(i1_of_v);
+  }
+} return string out;
+
+// The two compound statements. An if carries its else arm (which may be
+// nothing at all), and the two are told apart by their tag, so `if(c){}` and
+// `wh(c){}` over the same body are never the same statement.
+// The end of the chain; its default is an unrepeatable string for the same
+// reason as ce5's.
+cst3(int id) {
+  string out = "?" + k_of(id) + "#" + id;
+  if(k_of(id) == "if") {
+    out = cst_if(id);
+  }
+  if(k_of(id) == "while") {
+    int i1_of_v2 = i1_of(id);
+    int[] l1_of_v2 = l1_of(id);
+    out = "wh(" + canon_expr(i1_of_v2) + "){" + canon_body(l1_of_v2) + "}";
+  }
+} return string out;

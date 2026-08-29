@@ -1,0 +1,13 @@
+
+// The while form of ps4, tried before the if form takes over.
+ps4_while(int id) {
+  int i1_of_v = i1_of(id);
+  int[] l1_of_v = l1_of(id);
+  string s = "(while " + print_expr(i1_of_v) + " (body" + print_list(l1_of_v) + "))";
+} return string s;
+
+// The if form of ps4, once the condition and the then-branch are known.
+ps4_if(int id, int i1_of_v2, int[] l1_of_v2) {
+  int[] l2_of_v = l2_of(id);
+  string s = "(if " + print_expr(i1_of_v2) + " (then" + print_list(l1_of_v2) + ") (else" + print_list(l2_of_v) + "))";
+} return string s;

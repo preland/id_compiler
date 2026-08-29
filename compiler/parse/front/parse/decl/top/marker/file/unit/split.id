@@ -1,0 +1,37 @@
+// The two halves of a `#file N|PATH` marker.
+//
+// N is the source root the file came from -- the program's own tree, or one
+// imported dependency such as the standard library. A name keeps one type
+// within a unit and not across them, so the library's `string s` and the
+// program's `int s` are two different names; the marker is the only channel
+// between the driver, which knows the roots, and the compiler, which cannot
+// see the filesystem at all.
+//
+// A marker with no `|` is unit 0, which is what a stream assembled by hand
+// (tools/parity.sh, tools/idview.sh) produces. 124 is '|'.
+
+bar_at(string s, int i) {
+  while(i < len(s) && charat(s, i) != 124) {
+    i = i + 1;
+  }
+} return int i;
+
+file_unit(string s) {
+  int n = 0;
+  if(bar_at(s, 0) < len(s)) {
+    int bar_at_v = bar_at(s, 0);
+    string slice_v = slice(s, 0, bar_at_v);
+    n = to_int(slice_v);
+  }
+} return int n;
+
+// The path is what every diagnostic prints, so it is exactly the text the
+// driver was given, unit prefix removed.
+file_path(string s) {
+  string fpath = s;
+  if(bar_at(s, 0) < len(s)) {
+    int bar_at_v = bar_at(s, 0);
+    int len_v = len(s);
+    fpath = slice(s, bar_at_v + 1, len_v);
+  }
+} return string fpath;

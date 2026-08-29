@@ -1,0 +1,7 @@
+// The tail of shift.id's fold step -- see arith/fold/more.id for why the
+// second half of a split fold function needs a file of its own.
+
+fold_shift_tail(int[] pos, int left, string op) {
+  int right = parse_add(pos);
+  int ret_i = node_bin(op, left, right);
+} return int ret_i;

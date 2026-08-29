@@ -1,0 +1,15 @@
+// Hoist locals declared inside a while body.
+
+hoist_loop(int id) {
+  if(k_of(id) == "while") {
+    int[] l1_of_v = l1_of(id);
+    hoist_list(l1_of_v);
+  }
+} return void;
+
+// The tail of hoist_decl: the C type is derived from the declared type only
+// once its export flag has already gated whether to emit at all.
+hoist_decl_line(string s1_of_v, string s2_of_v) {
+  string c_type_v = c_type(s1_of_v);
+  emit_line("    " + c_type_v + " " + s2_of_v + ";");
+} return void;

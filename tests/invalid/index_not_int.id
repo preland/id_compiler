@@ -1,0 +1,5 @@
+// EXPECT: array index must be int
+main() {
+  string[] xs = ["a", "b"];
+  string first = xs["zero"];
+} return int 0;

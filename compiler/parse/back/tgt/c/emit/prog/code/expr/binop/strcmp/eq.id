@@ -1,0 +1,15 @@
+
+is_strcmp(int id) {
+  int ok = 0;
+  string s1_of_v = s1_of(id);
+  if(is_eqop(s1_of_v) && both_str(id)) {
+    ok = 1;
+  }
+} return int ok;
+
+is_eqop(string op) {
+  int ok = 0;
+  if(op == "==" || op == "!=" || op == "=") {
+    ok = 1;
+  }
+} return int ok;

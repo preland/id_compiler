@@ -1,0 +1,5 @@
+// EXPECT: cannot index a int
+main() {
+  int n = 5;
+  int first = n[0];
+} return int first;

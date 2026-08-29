@@ -1,0 +1,9 @@
+// The last unbox case: a `word` cell is already 8 bytes wide, so reading it
+// back is just the long long cast; anything else left is a list pointer.
+
+unbox4(string code, string type) {
+  string s = "(IdList*)(intptr_t)(" + code + ")";
+  if(type == "word") {
+    s = "(long long)(" + code + ")";
+  }
+} return string s;

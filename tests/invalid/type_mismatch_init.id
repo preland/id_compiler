@@ -1,0 +1,4 @@
+// EXPECT: cannot initialize int 'x' with a string value
+main() {
+  int x = "not a number";
+} return int 0;

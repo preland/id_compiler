@@ -1,0 +1,11 @@
+{
+  "name": "gl",
+  "abi": "gl.h",
+  "platforms": {
+    "linux": {
+      "sources": ["gl_linux.c"],
+      "cflags": [],
+      "link": ["-lGL", "-lX11", "-lm"]
+    }
+  }
+}

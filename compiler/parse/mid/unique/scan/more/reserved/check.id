@@ -1,0 +1,14 @@
+// Named so resv_at's condition does not put a call (resv_names(), s1_of(...))
+// inside find_str's argument list. resv_print is the split tail of resv_err,
+// kept here because reserved.id was already at the 3-function limit.
+
+is_reserved_name(int i) {
+  string s1_of_v = s1_of((import prog)[i]);
+  string[] resv_names_v = resv_names();
+  int ok = find_str(resv_names_v, s1_of_v) >= 0;
+} return int ok;
+
+resv_print(string prog_loc_v, string s1_of_v) {
+  print(prog_loc_v + "function '" + s1_of_v + "' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_" + s1_of_v + "'. Choose another name");
+  note_failure();
+} return void;

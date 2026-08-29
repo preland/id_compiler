@@ -1,0 +1,27 @@
+// The ordering operators, and the one builtin call with an element-type rule.
+
+is_ordop(string op) {
+  int ok = 0;
+  if(op == "<" || op == ">" || op == "<=" || op == ">=") {
+    ok = 1;
+  }
+} return int ok;
+
+chk_call(int id) {
+  if(is_push2(id) == 1) {
+    chk_push(id);
+  }
+  chk_callsite(id);
+  chk_bi(id);
+} return void;
+
+// A two-argument `push`. The arity is part of the test because a call written
+// with the wrong number of arguments is a different diagnostic (idc.py's
+// "push takes exactly two arguments"), and asking args[1] of a one-argument
+// call would abort on the bounds check instead of reporting anything.
+is_push2(int id) {
+  int ok = 0;
+  if(k_of(id) == "call" && s1_of(id) == "push" && flat_arg_count(id) == 2) {
+    ok = 1;
+  }
+} return int ok;

@@ -1,0 +1,26 @@
+// The real C entry point wrapping id's main(). Matches idc.py: marshals C argv
+// into an id string[] list when main takes (int, string[]), and uses the right
+// return form for the declared return type. Emitted only when a main() exists.
+
+// A project with no main compiles to a .o and gets no entry point -- but
+// idc.py still ends the file with a blank line there, because it joins its
+// output sections with newlines and the empty entry point is one of them.
+emit_main_wrapper() {
+  if(find_main() >= 0) {
+    emit_wrapper();
+  } else {
+    emit_line("");
+  }
+} return void;
+
+emit_wrapper() {
+  emit_line("int main(int argc, char** argv) { (void)argc; (void)argv;");
+  wrap_body();
+  emit_line("");
+} return void;
+
+wrap_body() {
+  int m = find_main();
+  emit_marshal(m);
+  wrap_body_tail(m);
+} return void;

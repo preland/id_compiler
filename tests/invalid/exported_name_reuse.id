@@ -1,0 +1,4 @@
+// EXPECT: is an exported global
+// an exported name is reserved program-wide; it can't double as a local
+main() { export int total = 1; } return int total;
+other() { int total = 2; } return void;

@@ -1,0 +1,12 @@
+// How many parameters a function has, named for the same reason as
+// `ll_blk_count`.
+ll_pcount(int f) {
+  int[] pars = irf_par(f);
+  int ret_i = len(pars);
+} return int ret_i;
+
+// The rest of `ll_pstr`: one parameter's text.
+ll_pstr_step(string s, int i, int pn) {
+  string ty = ir_ty(pn);
+  string ret_s = s + ll_sep(i) + ll_ty(ty) + " %v" + pn;
+} return string ret_s;

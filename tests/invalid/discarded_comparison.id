@@ -1,0 +1,12 @@
+// EXPECT: compares instead of assigning
+// `=` inside an expression is equality, and index-assignment is only
+// recognised when the target starts with a plain identifier -- so this
+// compiles to a comparison whose result is thrown away, and does nothing.
+main(int argc, string[] argv) {
+  export int[] cell = [0];
+  bump();
+} return int (import cell)[0];
+
+bump() {
+  (import cell)[0] = 7;
+} return void;

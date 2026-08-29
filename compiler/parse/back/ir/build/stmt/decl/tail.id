@@ -1,0 +1,10 @@
+lw_decl_tail(int node, int a) {
+  int i1_of_v = i1_of(node);
+  string s1_of_v = s1_of(node);
+  lw_decl_tail2(a, i1_of_v, s1_of_v);
+} return void;
+
+lw_decl_tail2(int a, int i1_of_v, string s1_of_v) {
+  int lw_as_v = lw_as(i1_of_v, s1_of_v);
+  lw_store_at(a, lw_as_v);
+} return void;

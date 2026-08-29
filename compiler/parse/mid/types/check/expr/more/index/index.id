@@ -1,0 +1,36 @@
+// Reading `base[index]`. The same two questions index-assignment asks, and
+// the first has the same answer word for word; only the index diagnostic is
+// spelled differently in idc.py ("array index" for a read, "list index" for a
+// store), so both spellings are kept rather than unified.
+//
+// This matters beyond the diagnostic: elem_type of a non-list is nonsense --
+// elem_type("int") is "i" -- so an unchecked read-index feeds a type that
+// does not exist into everything downstream. Catching it here is what stops
+// that nonsense from being reported as if it were a type.
+
+tc_g4(int id) {
+  if(k_of(id) == "arr") {
+    chk_arr(id);
+  }
+  if(k_of(id) == "index") {
+    chk_index(id);
+  }
+  tc_g5(id);
+} return void;
+
+chk_index(int id) {
+  string bt = base_type(id);
+  if(ty_known(bt) == 1 && ty_is_list(bt) == 0) {
+    ix_err(id, "cannot index a " + bt);
+  } else {
+    chk_index2(id);
+  }
+} return void;
+
+chk_index2(int id) {
+  int i2_of_v = i2_of(id);
+  string it = type_of(i2_of_v);
+  if(ty_known(it) == 1 && it != "int") {
+    ix_err(id, "array index must be int, got " + it);
+  }
+} return void;

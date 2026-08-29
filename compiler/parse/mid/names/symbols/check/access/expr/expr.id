@@ -1,0 +1,29 @@
+
+acc_elems(int[] elems, string owner, int ln) {
+  int i = 0;
+  while(i < len(elems)) {
+    acc_expr(elems[i], owner, ln);
+    i = i + 1;
+  }
+} return void;
+
+// Expression dispatch. Only two kinds name anything: `var` reads a variable of
+// the enclosing function, `import` reads an exported global. The rest are
+// operators and literals, walked for the names underneath them.
+acc_expr(int id, string owner, int ln) {
+  if(k_of(id) == "var") {
+    string s1_of_v = s1_of(id);
+    acc_name(s1_of_v, owner, ln);
+  } else {
+    acc_expr2(id, owner, ln);
+  }
+} return void;
+
+acc_expr2(int id, string owner, int ln) {
+  if(k_of(id) == "import") {
+    string s1_of_v = s1_of(id);
+    acc_import(s1_of_v, owner, ln);
+  } else {
+    acc_expr3(id, owner, ln);
+  }
+} return void;

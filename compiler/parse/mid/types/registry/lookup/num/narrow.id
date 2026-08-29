@@ -1,0 +1,13 @@
+// Does passing a `got` where a `want` is asked for lose information?
+//
+// ty_rank already orders the numeric types -- width doubled, plus one for
+// float -- so this is one comparison rather than a table of pairs: a type
+// that outranks the slot it is going into does not fit in it. word into int
+// drops 32 bits, float into int drops the fraction, float into word drops it
+// too. Everything else widens, which is exact.
+ty_narrows(string want, string got) {
+  int ok = 0;
+  if(ty_num(want) == 1 && ty_num(got) == 1 && ty_rank(want) < ty_rank(got)) {
+    ok = 1;
+  }
+} return int ok;

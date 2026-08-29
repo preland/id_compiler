@@ -1,0 +1,14 @@
+// Reading an instruction. Every pass and the printer go through these rather
+// than indexing the columns, so a column can move without a sweep of the tree.
+
+ir_op(int id) {
+  string ret_s = (import iop)[id];
+} return string ret_s;
+
+ir_ty(int id) {
+  string ret_s = (import ity)[id];
+} return string ret_s;
+
+ir_a(int id) {
+  int ret_i = (import ia)[id];
+} return int ret_i;

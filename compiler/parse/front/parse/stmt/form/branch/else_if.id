@@ -1,0 +1,32 @@
+// What follows an `else`: either a nested if (an `else if` chain) or a block.
+// Without the first case, `else if (c) { ... }` hits parse_block with `if`
+// where it expects `{`, and mis-parses into nonsense C. Wrapping the nested
+// if in a one-element list keeps the else arm a plain statement list, so
+// nothing downstream needs a new node shape.
+else_body(int[] pos) {
+  int[] elsel = [];
+  if(cur_text(pos) == "if") {
+    int parse_if_v = parse_if(pos);
+    push(elsel, parse_if_v);
+  } else {
+    elsel = parse_block(pos);
+  }
+} return int[] elsel;
+
+// 0 = no else arm, 1 = `else if`, 2 = a plain `else { ... }`. The third case
+// matters because an *empty* `else { }` still costs an action, and its else
+// list is empty too -- so the list alone cannot tell it from having no else.
+at_elif(int[] pos) {
+  int ok = 0;
+  if(cur_text(pos) == "else") {
+    ok = 2;
+  }
+  if(ok == 2 && cur2_text(pos) == "if") {
+    ok = 1;
+  }
+} return int ok;
+
+if_tail(int[] pos, int cond, int[] thenl, int elif) {
+  int[] elsel = parse_else(pos);
+  int ret_i = node_if(cond, thenl, elsel, elif);
+} return int ret_i;

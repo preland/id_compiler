@@ -1,0 +1,26 @@
+// Recording an unresolved name.
+//
+// Whether a name resolves is a property of the program, so it is answered
+// here. What the collected names turn into is C, so that lives in
+// back/emit/prog/head/decl/externs.id.
+
+// First encounter wins: a name called from five places is declared once.
+note_extern(string name) {
+  if(find_str((import xnames), name) < 0) {
+    push((import xnames), name);
+  }
+} return void;
+
+// Whether this project is the runtime. Read by the reserved-name check and by
+// the LLVM module header, which must not declare a symbol the module defines.
+is_runtime() {
+  int ret_i = (import rtc)[0];
+} return int ret_i;
+
+// Split out of report_nosuchfn so that block stays within the action limit;
+// placed here rather than beside it because builtin/report.id and builtin/
+// itself were already at their 3-entry limits.
+nosuchfn_report(string loc_at_v, string name, string builtin_list_v) {
+  print(loc_at_v + "no such function '" + name + "'; available builtins: " + builtin_list_v);
+  note_failure();
+} return void;

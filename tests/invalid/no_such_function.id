@@ -1,0 +1,8 @@
+// EXPECT: no such function 'to_flot'
+// A call to a name that is neither a function of this program nor a builtin.
+// With no native backend attached there is nowhere it could be resolved from,
+// so it is a typo -- and the message lists the builtins rather than leaving
+// it to surface as an undeclared-function error from the C compiler.
+main(int argc, string[] argv) {
+  print(to_flot("1"));
+} return int 0;

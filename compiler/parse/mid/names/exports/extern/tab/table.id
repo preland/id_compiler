@@ -1,0 +1,38 @@
+// The extern table: names a program calls that no input file defines.
+//
+// It sits beside the export table because the two are the same kind of thing
+// -- a program-wide table of names that becomes a block of C declarations
+// ahead of the forward declarations -- and because they are emitted one after
+// the other, in the order idc.py emits them.
+//
+// A call that resolves to nothing is an error (it is almost always a typo'd
+// builtin), *unless* a native backend is attached, in which case it is a name
+// the linker will supply and the C needs `extern int id_<name>();` for it.
+// idc.py decides that from `--backend`; nothing below the driver can see a
+// backend, so the driver passes `--extern-ok` and this cell remembers it.
+//
+//   xnames  the unresolved names, in first-encounter order
+//   xokc    1 when unresolved calls are allowed (a backend is attached)
+//   fsc     1 when the build is freestanding (`--freestanding`): no host, so
+//           no C-ABI entry point and no libc behind the runtime
+//   rtc     1 when this project IS the runtime (`--runtime`), which is what
+//           lets it define a function named after a runtime helper -- that is
+//           the whole point of it, and the collision the check exists to stop
+//           is a collision with a C runtime this build does not link
+//   bnames  the builtin names, split out of one literal (see builtin/more/)
+
+init_xtab() {
+  export string[] xnames = [];
+  export int[] xokc = [0];
+  init_rtc();
+} return void;
+
+init_rtc() {
+  export int[] rtc = [0];
+  export int[] fsc = [0];
+  init_bnames();
+} return void;
+
+rt_set(int v) {
+  lset((import rtc), 0, v);
+} return void;

@@ -1,0 +1,17 @@
+// Argument i converted to the type it must arrive as, and the fallback type
+// for a callee with no parameter list to ask.
+lw_arg_pty(int node, int i) {
+  int[] args = l1_of(node);
+  string name = s1_of(node);
+  string pty = lw_pty(name, i, args[i]);
+} return string pty;
+
+lw_arg_conv(int node, int i, string pty) {
+  int[] args = l1_of(node);
+  int v = lw_as(args[i], pty);
+} return int v;
+
+lw_pty_base(string name, int i, int node) {
+  string ety = lw_ety(node);
+  string t = lw_apty(name, i, ety);
+} return string t;

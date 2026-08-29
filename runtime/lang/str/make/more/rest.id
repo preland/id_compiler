@@ -1,0 +1,13 @@
+// The second half of `concat`: the other string copied in behind the first,
+// the result NUL-terminated, and the buffer wrapped as a string.
+concat_copy2(string r, word p, word a) {
+  word copy_bytes_v = concat_copy2_write(r, a);
+  st8(a + copy_bytes_v, 0);
+  string ret_s = w2s(p);
+} return string ret_s;
+
+concat_copy2_write(string r, word a) {
+  word s2w_v2 = s2w(r);
+  int len_v4 = len(r);
+  word copy_bytes_v = copy_bytes(s2w_v2, a, len_v4);
+} return word copy_bytes_v;

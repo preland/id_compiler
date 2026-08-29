@@ -1,0 +1,28 @@
+// Following an `else if` chain. The else arm of an `else if` holds exactly one
+// nested if node (that is how the parser keeps an else arm a statement list),
+// and each link of the chain is one more else action; a plain `else { ... }`
+// ends the chain and has already been counted by the caller.
+
+chain_elses(int id, int[] els) {
+  int n = 0;
+  if(i2_of(id) == 1) {
+    n = count_elses(els[0]);
+  }
+} return int n;
+
+// Descending into the compound statements of a block that fits.
+check_children(int[] body, int depth, string fname) {
+  int i = 0;
+  while(i < len(body)) {
+    check_stmt(body[i], depth, fname);
+    i = i + 1;
+  }
+} return void;
+
+check_stmt(int id, int depth, string fname) {
+  if(k_of(id) == "if") {
+    check_if(id, depth, fname);
+  } else {
+    check_loop(id, depth, fname);
+  }
+} return void;

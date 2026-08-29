@@ -1,0 +1,22 @@
+// print and put, over the serial port.
+//
+// A string is a pointer to bytes ending in a NUL, which is what `charat`
+// answers -1 past. So writing one is a loop over its bytes, and print is put
+// with a newline after it.
+
+put(string s) {
+  int i = 0;
+  while(i < len(s)) {
+    int charat_v = charat(s, i);
+    com1_out(charat_v);
+    i = i + 1;
+  }
+} return void;
+
+print(string s) {
+  put(s);
+  com1_out(10);
+} return void;
+
+flush() {
+} return void;

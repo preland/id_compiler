@@ -1,0 +1,20 @@
+
+// Index-assignment emission: `id_list_set(base, idx, box(value));`.
+
+emit_iassign(int id, string ind) {
+  int i1_of_v = i1_of(id);
+  string type_of_v = type_of(i1_of_v);
+  iassign2(id, ind, type_of_v);
+} return void;
+
+iassign2(int id, string ind, string type_of_v) {
+  string elem = elem_type(type_of_v);
+  int[] l1_of_v = l1_of(id);
+  iassign3(id, ind, elem, l1_of_v);
+} return void;
+
+iassign3(int id, string ind, string elem, int[] l1_of_v) {
+  string emit_expr_v = emit_expr(l1_of_v[0]);
+  string val = box(emit_expr_v, elem);
+  iassign4(id, ind, val);
+} return void;

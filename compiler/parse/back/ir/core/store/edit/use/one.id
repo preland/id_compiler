@@ -1,0 +1,15 @@
+
+ir_rauw_l(int i, int old, int fresh) {
+  int[] l = ir_l(i);
+  int j = 0;
+  while(j < len(l)) {
+    j = ir_rauw_one(l, j, old, fresh);
+  }
+} return void;
+
+ir_rauw_one(int[] l, int j, int old, int fresh) {
+  if(l[j] == old) {
+    lset(l, j, fresh);
+  }
+  int ret_i = j + 1;
+} return int ret_i;

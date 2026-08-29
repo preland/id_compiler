@@ -1,0 +1,4 @@
+// EXPECT: not exported
+// reading another function's variable without export/import is an error
+main() { int x = 1; } return int 0;
+other() { int y = x; } return void;

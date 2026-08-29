@@ -1,0 +1,12 @@
+
+irf_blk(int f) {
+  int[] ret_li = (import fnblk)[f];
+} return int[] ret_li;
+
+irf_node(int f) {
+  int ret_i = (import fnnode)[f];
+} return int ret_i;
+
+blk_pre(int b) {
+  int[] ret_li = (import bpred)[b];
+} return int[] ret_li;

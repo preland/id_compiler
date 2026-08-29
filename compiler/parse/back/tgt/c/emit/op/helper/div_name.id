@@ -1,0 +1,24 @@
+// Which checked division helper a `/` or `%` uses. Four names, two of which
+// differ only in the width they work on, so the name is built rather than
+// enumerated: `id_s*` for word, `id_i*` for int.
+
+hop_dw(string op, string t) {
+  string h = "";
+  if(op == "/" || op == "%") {
+    h = "id_" + div_pfx(t) + div_sfx(op);
+  }
+} return string h;
+
+div_pfx(string t) {
+  string h = "i";
+  if(t == "word") {
+    h = "s";
+  }
+} return string h;
+
+div_sfx(string op) {
+  string h = "mod";
+  if(op == "/") {
+    h = "div";
+  }
+} return string h;

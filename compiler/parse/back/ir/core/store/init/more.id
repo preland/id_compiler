@@ -1,0 +1,22 @@
+// The columns left over once the other init functions took two apiece: the
+// 3-action limit means no init function can clear three in a row, so these
+// are the odd one out from each of insn.id's and frame.id's groups, paired
+// back up by what they describe rather than by where they used to live.
+
+init_ir7() {
+  export int[] ia = [];
+  export int[][] ilist = [];
+  int ret_i = init_ir4();
+} return int ret_i;
+
+init_ir8() {
+  export int[] bfunc = [];
+  export int[][] bpred = [];
+  int ret_i = init_ir9();
+} return int ret_i;
+
+init_ir9() {
+  export int[][] fnpar = [];
+  export int[] irprog = [];
+  int ret_i = init_lw();
+} return int ret_i;

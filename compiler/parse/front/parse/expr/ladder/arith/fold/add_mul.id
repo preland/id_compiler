@@ -1,0 +1,21 @@
+// additive and multiplicative levels.
+
+parse_add(int[] pos) {
+  int left = parse_mul(pos);
+  while(addop_at(pos)) {
+    left = fold_add(pos, left);
+  }
+} return int left;
+
+fold_add(int[] pos, int left) {
+  string op = cur_text(pos);
+  advance(pos);
+  int ret_i = fold_add_tail(pos, left, op);
+} return int ret_i;
+
+parse_mul(int[] pos) {
+  int left = parse_unary(pos);
+  while(mulop_at(pos)) {
+    left = fold_mul(pos, left);
+  }
+} return int left;

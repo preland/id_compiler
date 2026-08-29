@@ -1,0 +1,30 @@
+// The return clause against the declared return type.
+//
+// Not a call check, but the same question one step out -- idc.py raises it in
+// gen_function, immediately after the body -- and it needs the same two
+// fields of the func node that the call checks read, so it sits with them.
+//
+// `return void;` records -1 in the int field and has no expression to judge.
+
+chk_retexpr(int id) {
+  if(s2_of(id) != "void" && i1_of(id) >= 0) {
+    chk_ret2(id);
+  }
+} return void;
+
+chk_ret2(int id) {
+  int e = i1_of(id);
+  string s2_of_v = s2_of(id);
+  if(bad_store(s2_of_v, e) == 1) {
+    string type_of_v = type_of(e);
+    ret_err(id, type_of_v);
+  }
+} return void;
+
+// Reported at the return expression, not at the function heading: the clause
+// is written after the closing brace and is often lines away from the name.
+ret_err(int id, string t) {
+  int i1_of_v = i1_of(id);
+  string msg = ret_err_msg(id, t);
+  tc_err(i1_of_v, msg);
+} return void;

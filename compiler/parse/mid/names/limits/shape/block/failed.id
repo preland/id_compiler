@@ -1,0 +1,17 @@
+// The "something was rejected" flag. id has no stderr and no early exit, so
+// the checker accumulates instead: every reporter sets this cell, and the
+// driver decides what to do with it. An exported scalar may only be assigned
+// by the function that declares it, so the flag is a one-element list.
+
+check_failed() {
+  int ret_i = (import chkfail)[0];
+} return int ret_i;
+
+// Writing through an imported list needs the list as a parameter: an
+// index-assignment is only recognised when the target is a plain identifier.
+// That helper used to live here under a private name; it is idstd's `lset`,
+// which this compiler's own diagnostic already names as the fix, so keeping a
+// second copy was exactly the duplication the uniqueness rule exists to catch.
+note_failure() {
+  lset((import chkfail), 0, 1);
+} return void;

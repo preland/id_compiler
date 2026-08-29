@@ -1,0 +1,13 @@
+// EXPECT: which nothing calls
+// An export is initialised when its declaring function runs. `setup` is never
+// called, so `tbl` is NULL at the read below -- a segfault at run time, and
+// nothing at compile time until this check. demos/fpsmaze shipped exactly
+// this: scene_init() was defined, nothing called it, and the game drew its
+// maze with no walls.
+main(int argc, string[] argv) {
+  print(len((import tbl)));
+} return int 0;
+
+setup() {
+  export int[] tbl = [1];
+} return void;

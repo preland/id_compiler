@@ -1,0 +1,28 @@
+// The two spellings of a count.
+
+bi_plural(string name) {
+  string s = "s";
+  if(bi_arity(name) == 1) {
+    s = "";
+  }
+} return string s;
+
+bi_count(string name) {
+  string s = "exactly two arguments";
+  if(bi_arity(name) == 0) {
+    s = "no arguments";
+  } else if(bi_arity(name) == 1) {
+    s = "exactly one argument";
+  }
+} return string s;
+
+// The flat-store and unsigned-word builtins: idc.py's STORE_BUILTINS and
+// WORD_BUILTINS, which it handles through one shared routine and which
+// therefore share a diagnostic. is_syscall is not reused -- it also counts
+// str_of_mem, which idc.py writes out by hand and words differently.
+is_sysbi(string name) {
+  int ok = 0;
+  if(is_wordfn(name) == 1 || is_pokefn(name) == 1 || name == "ult") {
+    ok = 1;
+  }
+} return int ok;

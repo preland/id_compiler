@@ -1,0 +1,32 @@
+// Descending into the kinds that have children, and naming a kind in English
+// for the diagnostic.
+//
+// The chain splits at three because a block holds three actions, which is the
+// same reason the code being checked has to.
+
+hc_kids(int e) {
+  int ok = hc_more(e);
+  if(k_of(e) == "bin" || k_of(e) == "index") {
+    int i1_of_v = i1_of(e);
+    int i2_of_v = i2_of(e);
+    ok = hc_pair(i1_of_v, i2_of_v);
+  }
+} return int ok;
+
+hc_more(int e) {
+  int ok = 0;
+  if(k_of(e) == "un") {
+    int i1_of_v = i1_of(e);
+    ok = has_call(i1_of_v);
+  } else if(k_of(e) == "arr") {
+    int[] l1_of_v = l1_of(e);
+    ok = hc_list(l1_of_v);
+  }
+} return int ok;
+
+hc_pair(int a, int b) {
+  int ok = has_call(a);
+  if(ok == 0) {
+    ok = has_call(b);
+  }
+} return int ok;

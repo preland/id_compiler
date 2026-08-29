@@ -1,0 +1,12 @@
+bi_arity_mismatch(int id) {
+  int n = flat_arg_count(id);
+  string name = s1_of(id);
+  int ok = arity_ne(n, name);
+} return int ok;
+
+arity_ne(int n, string name) {
+  int ok = 0;
+  if(n != bi_arity(name)) {
+    ok = 1;
+  }
+} return int ok;

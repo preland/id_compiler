@@ -1,0 +1,33 @@
+// The two questions the type checks actually ask of a type. Both are one
+// registry lookup rather than a list of names, so `float` became numeric and
+// `word` became integral by adding a row, not by editing a predicate.
+
+// idc.py's is_numeric.
+ty_num(string t) {
+  int ok = 0;
+  if(ty_kind(t) == "int" || ty_kind(t) == "float") {
+    ok = 1;
+  }
+} return int ok;
+
+// idc.py's is_integral: the same question with "float" left out, which is
+// what `& | ^ << >> ! ~` and the flat store accept. `word` answers yes
+// because its row says its kind is "int" -- adding a second integer type
+// needed no edit here, which is the point of the registry.
+ty_int(string t) {
+  int ok = 0;
+  if(ty_kind(t) == "int") {
+    ok = 1;
+  }
+} return int ok;
+
+// idc.py's compatible(): the same type, or two numbers (which widen into each
+// other). Note the asymmetry it does NOT have -- a narrower value is accepted
+// into a wider slot and vice versa, because id's rule is about the kind of
+// thing, not its width.
+ty_compat(string want, string got) {
+  int ok = 0;
+  if(want == got || ty_num(want) == 1 && ty_num(got) == 1) {
+    ok = 1;
+  }
+} return int ok;

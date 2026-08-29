@@ -1,0 +1,24 @@
+// Character-class predicates over byte codes (charat returns a byte code, or
+// -1 past the end). Each returns 1/0. The parameter is `c` in every one, and
+// the int flag is `ok` -- names recur freely now that they keep one type.
+
+is_space(int c) {
+  int ok = 0;
+  if(c == 32 || c == 9 || c == 10 || c == 13) {
+    ok = 1;
+  }
+} return int ok;
+
+is_digit(int c) {
+  int ok = 0;
+  if(c >= 48 && c <= 57) {
+    ok = 1;
+  }
+} return int ok;
+
+is_alpha(int c) {
+  int ok = 0;
+  if((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95) {
+    ok = 1;
+  }
+} return int ok;

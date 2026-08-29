@@ -1,0 +1,6 @@
+// A negative number: its magnitude, with a minus sign in the byte before it.
+
+num_neg(word a, word e) {
+  word q = num_mag(0 - a, e) - 1;
+  st8(q, 45);
+} return word q;

@@ -1,0 +1,10 @@
+// "a int" would be wrong and "a string or list" is not a type name, so the
+// two that do not fit "expects a <want>" are listed.
+bi_verb(string want) {
+  string s = "expects a " + want;
+  if(want == "int") {
+    s = "expects an int";
+  } else if(want == "strlist") {
+    s = "expects a string or list";
+  }
+} return string s;

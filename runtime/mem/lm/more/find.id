@@ -1,0 +1,25 @@
+
+lm_find(word a, int i, int at) {
+  while(i < 8) {
+    at = lm_at(a, i, at);
+    i = i + 1;
+  }
+} return int at;
+
+lm_at(word a, int i, int at) {
+  int hit = at;
+  word lm_base_v = lm_base();
+  if(ld64(lm_base_v + i * 16) == a) {
+    hit = i;
+  }
+} return int hit;
+
+lm_get(word a, int at) {
+  int n = 0;
+  if(at >= 0) {
+    word lm_base_v = lm_base();
+    n = ld64(lm_base_v + at * 16 + 8);
+  } else {
+    n = lm_put(a);
+  }
+} return int n;

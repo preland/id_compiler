@@ -1,0 +1,10 @@
+
+bump(int[] xs) {
+  xs[0] = xs[0] + 100;
+} return void;
+
+main() {
+  int[] xs = [1, 2, 3];
+  bump(xs);
+  print("" + xs[0]);
+} return int 0;

@@ -1,0 +1,28 @@
+// substring + token append.
+
+slice(string src, int a, int b) {
+  string out = "";
+  while(a < b) {
+    int charat_v = charat(src, a);
+    out = out + chr(charat_v);
+    a = a + 1;
+  }
+} return string out;
+
+// A `line N` marker is not a token: it updates the current line and is
+// dropped, so the cursor and everything above it are unchanged, and every
+// real token records the line it was on.
+push_tok(string kind, string text) {
+  if(kind == "line") {
+    int to_int_v = to_int(text);
+    push((import lnseen), to_int_v);
+  } else {
+    push_real(kind, text);
+  }
+} return void;
+
+push_real(string kind, string text) {
+  push((import tkind), kind);
+  push((import ttext), text);
+  push_line();
+} return void;

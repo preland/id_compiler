@@ -1,0 +1,27 @@
+// Which runtime helper an operator needs, or "" when it is an instruction.
+lw_helper(string op, string t) {
+  string h = lw_divfn(op, t);
+  if(op == "<<") {
+    h = "id_shl";
+  } else if(op == ">>") {
+    h = "id_sar";
+  }
+} return string h;
+
+// `int` and `word` division both go through a checked helper; float division
+// does not, because IEEE gives it an answer rather than a signal.
+lw_divfn(string op, string t) {
+  string h = "";
+  if(ty_int(t) == 1 && (op == "/" || op == "%")) {
+    h = "id_" + div_pfx(t) + div_sfx(op);
+  }
+} return string h;
+
+// The shift helpers work on a machine word; the division helpers work at the
+// width of the type they were chosen for.
+lw_hty(string h) {
+  string t = "word";
+  if(h == "id_idiv" || h == "id_imod") {
+    t = "int";
+  }
+} return string t;

@@ -1,0 +1,33 @@
+// `asm` functions, as LLVM inline assembly.
+//
+// The selection is the C target's -- exact triple equality, no wildcard, an
+// error naming what was available (back/tgt/c/emit/asm/select.id). What
+// differs is the spelling: GCC's extended asm names operands `%[name]` and
+// LLVM IR numbers them `$0`, `$1`, so the body is translated rather than
+// passed through. See docs/ASM.md.
+
+ll_asm_all(string triple) {
+  int i = 0;
+  while(i < asm_count()) {
+    ll_asm_row(i, triple);
+    i = i + 1;
+  }
+} return void;
+
+ll_asm_row(int i, string triple) {
+  if((import aftriple)[i] == triple) {
+    ll_asm_one(i);
+  } else {
+    asm_check(i, triple);
+  }
+} return void;
+
+// noinline, and it matters: the block clobbers whatever registers its
+// instructions name, and `id` has no way to declare that. Kept out of line, a
+// clobbered register is a caller-saved one the ABI already allows a call to
+// destroy; inlined, it would be a register the caller had a live value in.
+ll_asm_one(int r) {
+  string ty = ll_ty((import afret)[r]);
+  string par = ll_asm_par(r);
+  ll_asm_one_out(r, ty, par);
+} return void;

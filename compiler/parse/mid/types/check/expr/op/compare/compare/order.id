@@ -1,0 +1,20 @@
+// Guarded first, so `+` and `&&` -- which reach here through chk_bin's else
+// arm -- are not typed at all.
+chk_ord(int id) {
+  string s1_of_v = s1_of(id);
+  if(is_ordop(s1_of_v) == 1) {
+    chk_ord2(id);
+  }
+} return void;
+
+chk_ord2(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  ord_types(id, i1_of_v, i2_of_v);
+} return void;
+
+ord_types(int id, int a, int b) {
+  string lt = type_of(a);
+  string rt = type_of(b);
+  ord_report(id, lt, rt);
+} return void;

@@ -1,0 +1,7 @@
+// EXPECT: cannot compare
+main() {
+  string s = "x";
+  if(s == 3) {
+    print("nope");
+  }
+} return int 0;

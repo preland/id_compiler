@@ -1,0 +1,12 @@
+
+ir_set_s(int id, string s) {
+  sset((import istr), id, s);
+} return void;
+
+ir_set_bl(int id, int[] bl) {
+  lset2((import iblk), id, bl);
+} return void;
+
+ir_set_l(int id, int[] l) {
+  lset2((import ilist), id, l);
+} return void;

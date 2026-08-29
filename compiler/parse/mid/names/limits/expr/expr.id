@@ -1,0 +1,40 @@
+// Two rules about the shape of an expression. Both say the same thing: a
+// value that takes a step to compute is given a name, and the name is what
+// the reader of the line sees.
+//
+//   * a call's argument may not itself contain a call (nest.id)
+//   * a return clause is a name or a literal, nothing else
+//
+// docs/SPEC.md 7.1. Checked over the node store rather than over the tree, as
+// the type checks are: every node is visited exactly once wherever it sits,
+// including the ones inside an `else if` chain, which a tree walk has to be
+// careful about.
+//
+// The action limit is unchanged, so obeying these costs functions. That is
+// the trade the rules are: docs/FRICTION.md 14 and 15 are what a return
+// clause that could hold anything cost instead.
+
+check_shape() {
+  int i = 0;
+  while(i < len((import nkind))) {
+    shape_node(i);
+    i = i + 1;
+  }
+} return void;
+
+shape_node(int id) {
+  if(k_of(id) == "call") {
+    chk_flat_args(id);
+  }
+  if(k_of(id) == "func") {
+    chk_ret_name(id);
+  }
+} return void;
+
+// ni1 is -1 for `} return void;`, which has no expression to judge.
+chk_ret_name(int id) {
+  int e = i1_of(id);
+  if(e >= 0 && is_plain(e) == 0) {
+    ret_shape_err(id, e);
+  }
+} return void;

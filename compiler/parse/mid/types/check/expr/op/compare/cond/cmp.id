@@ -1,0 +1,8 @@
+chk_cmp(int id) {
+  string s1_of_v = s1_of(id);
+  if(is_eqop(s1_of_v) == 1) {
+    chk_eq(id);
+  } else {
+    chk_ord(id);
+  }
+} return void;

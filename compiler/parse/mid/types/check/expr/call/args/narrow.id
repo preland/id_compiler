@@ -1,0 +1,22 @@
+// docs/FRICTION.md 12: a narrowing conversion is written down, not inferred.
+//
+// A declaration may narrow. `int n = a;` names the type it is narrowing to,
+// on the line doing it, where the reader of that line sees it. An argument
+// does not: the parameter's type is in another file, so `take(a)` reads as if
+// nothing happened while it drops the top half of a word. The two used to be
+// the same rule, which made `xs[a]` -- rejected -- look inconsistent with
+// both. It is now the strict one that is consistent.
+
+chk_narrow(int id, int fn, int i, string t) {
+  int[] l1_of_v = l1_of(fn);
+  string s1_of_v = s1_of(l1_of_v[i]);
+  if(ty_narrows(s1_of_v, t) == 1) {
+    narrow_err(id, fn, i, t);
+  }
+} return void;
+
+narrow_err(int id, int fn, int i, string t) {
+  int argnode = l1_of(id)[i];
+  string msg = narrow_err_msg(id, fn, i, t);
+  tc_err(argnode, msg);
+} return void;

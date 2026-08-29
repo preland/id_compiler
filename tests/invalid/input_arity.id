@@ -1,0 +1,5 @@
+// EXPECT: input takes no arguments
+// input() reads one line from stdin and takes no arguments
+main() {
+  string s = input("oops");
+} return int 0;

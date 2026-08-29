@@ -1,0 +1,10 @@
+// The narrow half of `poke`. A write returns nothing, so the word the store
+// instruction hands back is dropped here rather than plumbed through.
+
+poke8(word a, word v) {
+  st8(a, v);
+} return void;
+
+poke16(word a, word v) {
+  st16(a, v);
+} return void;

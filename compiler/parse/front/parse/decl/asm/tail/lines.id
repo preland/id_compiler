@@ -1,0 +1,7 @@
+// The tail of asm_body.id's asm_lines -- that file's other two functions
+// (scan_asm, fill_asm) already fill it to the limit.
+
+asm_lines_tail(int[] pos, string[] alines) {
+  push((import aflines), alines);
+  int ret_i = asm_tail(pos);
+} return int ret_i;

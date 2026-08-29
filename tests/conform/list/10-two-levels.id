@@ -1,0 +1,14 @@
+
+level2(int[] xs) {
+  xs[0] = 42;
+} return void;
+
+level1(int[] xs) {
+  level2(xs);
+} return void;
+
+main() {
+  int[] xs = [1, 2, 3];
+  level1(xs);
+  print("" + xs[0]);
+} return int 0;

@@ -1,0 +1,25 @@
+// The other half of the registry, and the one question it is asked most.
+
+init_reg2() {
+  export string[] dvtype = [];
+  export int[] dvexp = [];
+  init_didx();
+} return void;
+
+// How many registry rows declare `name` inside `owner`. One scan answers two
+// questions: asked before a row is added, a hit means the name is declared
+// twice in that function; asked after every row is in, a miss means the
+// function cannot see the name at all. That second use is idc.py's build_env
+// -- parameters and hoisted locals -- which is exactly what the registry holds.
+declared_in(string name, string owner) {
+  int[] bkt = (import didx)[name_bucket(name)];
+  int ok = 0;
+  ok = dv_count(bkt, name, owner, 0, ok);
+} return int ok;
+
+dv_hit(int i, string name, string owner) {
+  int n = 0;
+  if((import dvname)[i] == name && (import dvfunc)[i] == owner) {
+    n = 1;
+  }
+} return int n;

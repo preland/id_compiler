@@ -1,0 +1,25 @@
+// The shifts and the checked divisions are runtime calls, exactly as they are
+// in the C target: a shift by more than the width and a division by zero both
+// have an answer docs/SPEC.md fixes and the machine instruction does not.
+// A shift helper takes and returns a machine word, so a narrower operand
+// widens into it and the result narrows back out.
+//
+// Split in two so that only one of the two widenings is an argument: two calls
+// that both emit instructions, written as two arguments of one call, are
+// emitted in whichever order the C compiler chose.
+lw_hcall(int node, int a, int b, string t) {
+  string s1_of_v = s1_of(node);
+  string h = lw_helper(s1_of_v, t);
+  int ret_i = lw_hcall_lhs(h, a, b, t);
+} return int ret_i;
+
+lw_hcall2(string h, int a, int b, string t) {
+  string lw_hty_v = lw_hty(h);
+  int r = lw_callf(h, lw_hty_v, [a, b]);
+  int ret_i = lw_hcall2_out(h, r, t);
+} return int ret_i;
+
+lw_hcall2_out(string h, int r, string t) {
+  string lw_hty_v2 = lw_hty(h);
+  int ret_i = lw_conv(r, lw_hty_v2, t);
+} return int ret_i;

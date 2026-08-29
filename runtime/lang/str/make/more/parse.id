@@ -1,0 +1,28 @@
+// Decimal text back into an `int`.
+//
+// The hosted runtime spells this `atoi`, which also skips leading whitespace
+// and accepts a leading `+`. Neither is reproduced here: a kernel parses the
+// text it wrote itself, and the two extra cases would be code no caller in
+// this build can reach.
+
+to_int(string s) {
+  int n = 0;
+  if(charat(s, 0) == 45) {
+    n = 1;
+  }
+  int ret_i = to_int_at(s, n);
+} return int ret_i;
+
+to_int_at(string s, int n) {
+  int c = to_digits(s, n, 0);
+  if(n == 1) {
+    c = 0 - c;
+  }
+} return int c;
+
+to_digits(string s, int n, int c) {
+  while(charat(s, n) >= 48 && charat(s, n) <= 57) {
+    c = c * 10 + charat(s, n) - 48;
+    n = n + 1;
+  }
+} return int c;

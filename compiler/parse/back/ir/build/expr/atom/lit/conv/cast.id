@@ -1,0 +1,23 @@
+// A conversion between two numbers is a real instruction; anything else --
+// a string, a list -- is the same pointer either way and needs none.
+lw_cast2(int v, string t, string want) {
+  int r = v;
+  if(ty_num(t) == 1 && ty_num(want) == 1) {
+    string lw_castop_v = lw_castop(t, want);
+    r = lw_op(lw_castop_v, want, v, 0 - 1, "");
+  }
+} return int r;
+
+lw_castop(string t, string want) {
+  string op = "sitofp";
+  if(ty_kind(want) != "float") {
+    op = lw_castop2(t, want);
+  }
+} return string op;
+
+lw_castop2(string t, string want) {
+  string op = "fptosi";
+  if(ty_kind(t) != "float") {
+    op = lw_narrow(t, want);
+  }
+} return string op;

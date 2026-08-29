@@ -1,0 +1,27 @@
+
+dce_used_b(int b, int id, int n) {
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] blk_ins_v = blk_ins(b);
+    n = dce_refs(blk_ins_v[i], id, n);
+    i = i + 1;
+  }
+} return int n;
+
+// A killed instruction keeps its operands, so it is skipped rather than read:
+// otherwise a dead chain would keep itself alive and nothing after the first
+// sweep would ever be removed. A value naming itself -- a phi whose only
+// incoming edge is its own -- does not count as a use either.
+dce_refs(int at, int id, int n) {
+  int r = n;
+  if(at != id && ir_op(at) != "nop" && dce_names(at, id) == 1) {
+    r = n + 1;
+  }
+} return int r;
+
+dce_names(int at, int id) {
+  int r = 0;
+  if(ir_a(at) == id || ir_b(at) == id || dce_lists(at, id) == 1) {
+    r = 1;
+  }
+} return int r;

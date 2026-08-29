@@ -1,0 +1,23 @@
+// Any flag that is just its own presence, anywhere in the arguments. Scanned
+// rather than tested at a position, for the reason arg_xok gives.
+arg_flag(int argc, string[] argv, int i, string name) {
+  int r = 0;
+  if(i < argc && argv[i] == name) {
+    r = 1;
+  } else if(i < argc) {
+    r = arg_flag(argc, argv, i + 1, name);
+  }
+} return int r;
+
+// `--extern-ok` anywhere in the arguments. Scanned rather than tested at a
+// fixed position, because the driver also passes `--triple` and the AST dump
+// takes a bare `ast`, and a flag whose meaning depends on its index is a trap
+// the next flag falls into.
+arg_xok(int argc, string[] argv, int i, int ok) {
+  int r = ok;
+  if(i < argc && argv[i] == "--extern-ok") {
+    r = 1;
+  } else if(i < argc) {
+    r = arg_xok(argc, argv, i + 1, ok);
+  }
+} return int r;

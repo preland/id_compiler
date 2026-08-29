@@ -1,0 +1,17 @@
+// The pieces of `xs[i]`: the base list, the index, and the element type an
+// unboxed read or a boxed write converts through.
+lw_index_base(int node) {
+  int base_node = i1_of(node);
+  int a = lw_expr(base_node);
+} return int a;
+
+lw_index_idx(int node) {
+  int idx_node = i2_of(node);
+  int i = lw_as(idx_node, "int");
+} return int i;
+
+lw_index_elem(int node) {
+  int base_node = i1_of(node);
+  string ty = lw_ety(base_node);
+  string elem = elem_type(ty);
+} return string elem;

@@ -1,0 +1,19 @@
+
+// The rest of arg_flags2, one flag at a time.
+
+arg_flags2(int argc, string[] argv) {
+  int arg_reqtests_v = arg_reqtests(argc, argv, 1, 0);
+  reqtests_set(arg_reqtests_v);
+  arg_flags3(argc, argv);
+} return void;
+
+arg_flags3(int argc, string[] argv) {
+  int arg_flag_v = arg_flag(argc, argv, 1, "--runtime");
+  rt_set(arg_flag_v);
+  arg_flags4(argc, argv);
+} return void;
+
+arg_flags4(int argc, string[] argv) {
+  int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
+  fs_set(arg_flag_v2);
+} return void;

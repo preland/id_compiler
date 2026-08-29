@@ -1,0 +1,20 @@
+// Parameter list: ( [type name (, type name)*] )
+
+parse_params(int[] pos) {
+  int[] params = [];
+  scan_params(pos, params);
+} return int[] params;
+
+scan_params(int[] pos, int[] params) {
+  advance(pos);
+  fill_params(pos, params);
+  advance(pos);
+} return void;
+
+fill_params(int[] pos, int[] params) {
+  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+    int one_param_v = one_param(pos);
+    push(params, one_param_v);
+    skip_comma(pos);
+  }
+} return void;

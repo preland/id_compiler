@@ -1,0 +1,19 @@
+// The rest of top.id's parse_asm and asm_sig, split into further steps to
+// stay under the action limit. top.id has no room left for either.
+
+parse_asm_mid(int[] pos, string cur_text_v) {
+  string unquote_v = unquote(cur_text_v);
+  push((import aftriple), unquote_v);
+  int ret_i = parse_asm_tail(pos);
+} return int ret_i;
+
+parse_asm_tail(int[] pos) {
+  advance(pos);
+  int ret_i = asm_sig(pos);
+} return int ret_i;
+
+asm_sig_mid(int[] pos) {
+  advance(pos);
+  int[] parse_params_v = parse_params(pos);
+  int ret_i = asm_sig_tail(pos, parse_params_v);
+} return int ret_i;

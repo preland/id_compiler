@@ -1,0 +1,38 @@
+// String-context coercion (idc.py's to_string): the C call that turns a
+// value of some type into a char*.
+//
+// This lived in mid/ and was the last thing there that spelled C. Whether an
+// operand needs coercing is a language question and stays in mid/
+// (is_concat); what it coerces *to* is `id_str_of_int`, which is C, and
+// belongs here.
+//
+// It is still a chain rather than a column of the type registry -- that is
+// docs/BACKENDS.md's next item, and it needs a directory with two free slots
+// under the rule of 3, which back/ does not currently have.
+
+to_str(string code, string type) {
+  string s = code;
+  if(type == "int") {
+    s = "id_str_of_int(" + code + ")";
+  } else {
+    s = to_str2(code, type);
+  }
+} return string s;
+
+// A float in string context becomes id_str_of_float; a word id_str_of_word
+// (in to_str3); a string stays as is.
+to_str2(string code, string type) {
+  string s = to_str3(code, type);
+  if(type == "float") {
+    s = "id_str_of_float(" + code + ")";
+  }
+} return string s;
+
+// A word prints as %lld and an int as %d, so they need different helpers.
+// Everything else is already a string and stays as it is.
+to_str3(string code, string type) {
+  string s = code;
+  if(type == "word") {
+    s = "id_str_of_word(" + code + ")";
+  }
+} return string s;

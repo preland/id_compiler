@@ -1,0 +1,22 @@
+// Index-assignment: an identifier followed by `[` begins a list-element
+// store `name[idx] = expr`. The lvalue is parsed with parse_postfix (an
+// "index" node), then `=`, then the value.
+
+is_iassign(int[] pos) {
+  int ok = 0;
+  if(cur_kind(pos) == "ident" && cur2_text(pos) == "[") {
+    ok = 1;
+  }
+} return int ok;
+
+parse_iassign(int[] pos) {
+  int target = parse_postfix(pos);
+  advance(pos);
+  int ret_i = iassign_rhs(pos, target);
+} return int ret_i;
+
+iassign_rhs(int[] pos, int target) {
+  int expr = parse_expr(pos);
+  skip_semi(pos);
+  int ret_i = node_iassign(target, expr);
+} return int ret_i;

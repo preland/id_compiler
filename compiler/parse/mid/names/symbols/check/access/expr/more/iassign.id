@@ -1,0 +1,18 @@
+// `base[index] = value`: the target was parsed as an index expression and its
+// two halves copied into the int fields, so all three parts are expressions.
+acc_iassign(int id, string owner) {
+  int i1_of_v = i1_of(id);
+  acc_expr(i1_of_v, owner, (import nline)[id]);
+  acc_iassign_rest(id, owner);
+} return void;
+
+acc_iassign_rest(int id, string owner) {
+  int i2_of_v = i2_of(id);
+  acc_expr(i2_of_v, owner, (import nline)[id]);
+  acc_iassign_elems(id, owner);
+} return void;
+
+acc_iassign_elems(int id, string owner) {
+  int[] l1_of_v = l1_of(id);
+  acc_elems(l1_of_v, owner, (import nline)[id]);
+} return void;

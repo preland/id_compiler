@@ -1,0 +1,15 @@
+// Logical-or level (lowest precedence), above and/equality. Mirrors idc.py:
+// parse_expr -> parse_or -> parse_and -> parse_rel(equality+relational).
+
+parse_or(int[] pos) {
+  int left = parse_and(pos);
+  while(cur_text(pos) == "||") {
+    left = fold_or(pos, left);
+  }
+} return int left;
+
+fold_or(int[] pos, int left) {
+  advance(pos);
+  int right = parse_and(pos);
+  int ret_i = node_bin("||", left, right);
+} return int ret_i;

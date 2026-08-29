@@ -1,0 +1,27 @@
+// A call's arguments and an array literal's elements are the same shape -- a
+// list of expressions in the first child list -- so one walk serves both, and
+// serves the literals too: an int, float or string leaf was built with an
+// empty child list, so walking it does nothing. What is left of a call is its
+// name, which is not a variable reference and so is judged separately.
+acc_expr5(int id, string owner, int ln) {
+  int[] l1_of_v = l1_of(id);
+  acc_elems(l1_of_v, owner, ln);
+  acc_callee(id, owner, ln);
+} return void;
+
+// A name the function did not declare. Which of the three explanations it
+// draws is the useful part of the diagnostic, so the decision is made in
+// report_bad_var rather than collapsed into one message.
+acc_name(string name, string owner, int ln) {
+  if(declared_in(name, owner) == 0) {
+    report_bad_var(name, owner, ln);
+  }
+} return void;
+
+// `(import name)` resolves against the export table and nothing else: a
+// variable that was never exported is not readable this way either.
+acc_import(string name, string owner, int ln) {
+  if(find_str((import enames), name) < 0) {
+    report_bad_import(name, owner, ln);
+  }
+} return void;

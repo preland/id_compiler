@@ -1,0 +1,33 @@
+// A function may not be named after a runtime helper.
+//
+// Every id function is emitted as `id_<name>`, and the runtime prelude already
+// defines a C function for each name in resv_names() -- so an id function
+// called `str_of_int` becomes `id_str_of_int`, which the prelude declares.
+//
+// Left unchecked this was a C error attributed to nobody: `cc` reported
+// "conflicting types for 'id_str_of_int'", idc.py passed that through as a
+// bare "C compilation failed", and bin/idc -- whose emitted C had genuinely
+// failed to compile -- reported it as "this is a bug in the self-hosted
+// compiler; please report it", inviting a user to file a bug about their own
+// typo.
+//
+// It sits with the duplicate-NAME check because it is the same kind of rule:
+// both say a name is already taken, and both are decided from the function
+// name alone. resv_names() is generated from idc.py's RUNTIME by
+// tools/gen_runtime_id.py, so the list cannot drift from the prelude it
+// describes.
+
+// Not asked of the runtime itself: `--runtime` says this project IS the
+// implementation of those helpers, so a function named `str_of_int` here is
+// the definition of `id_str_of_int` rather than a collision with one.
+resv_at(int i) {
+  if(is_runtime() == 0 && is_reserved_name(i)) {
+    resv_err(i);
+  }
+} return void;
+
+resv_err(int i) {
+  string prog_loc_v = prog_loc(i);
+  string s1_of_v = s1_of((import prog)[i]);
+  resv_print(prog_loc_v, s1_of_v);
+} return void;

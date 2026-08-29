@@ -1,0 +1,31 @@
+// Output mode: the AST dump when given `ast`, else whichever code generator
+// `--target` names (drive/target/).
+
+emit(int argc, string[] argv) {
+  if(argc > 1 && argv[1] == "ast") {
+    print_program();
+  } else {
+    emit_target(argc, argv);
+  }
+} return void;
+
+// The target triple: `idparse --triple T`, else the host default. Kept here
+// rather than in a global so nothing below the driver can change it.
+arg_triple(int argc, string[] argv) {
+  string s = "x86_64-unknown-linux-gnu";
+  if(argc > 2 && argv[1] == "--triple") {
+    s = argv[2];
+  }
+} return string s;
+
+// asm functions are not in the program list, so build_syms never sees them.
+// Registering their names and return types here lets the type pass resolve a
+// call to one -- without it, `"" + cpu_ticks()` types as int and the emitted
+// C passes a long long where a char* is expected.
+register_asm_syms() {
+  int i = 0;
+  while(i < asm_count()) {
+    push_asm_sym(i);
+    i = i + 1;
+  }
+} return void;

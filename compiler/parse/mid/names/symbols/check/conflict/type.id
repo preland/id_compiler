@@ -1,0 +1,26 @@
+// One name, one type -- within one compilation unit. The unit is the program's
+// own tree, or one imported dependency such as the standard library: the rule
+// exists so that a name cannot mean two things in the program someone is
+// reading, and a library's internals are not that program. Exported names sit
+// outside the rule as well -- an export is a single global, so there is nothing
+// for it to disagree with -- and first_type skips their rows for the same
+// reason.
+
+reg_report4(string name, string type, string owner, int exported, int ln, int unit) {
+  string prev = first_type(name, unit);
+  if(exported == 0 && prev != "" && prev != type) {
+    report_var_type(name, type, prev, owner, ln);
+  }
+} return void;
+
+reg_push(string name, string type, string owner, int exported, int unit) {
+  didx_add(name);
+  push((import dvtype), type);
+  reg_push2(owner, exported, unit);
+} return void;
+
+reg_push2(string owner, int exported, int unit) {
+  push((import dvfunc), owner);
+  push((import dvexp), exported);
+  push((import dvunit), unit);
+} return void;

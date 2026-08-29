@@ -1,0 +1,23 @@
+// The two ways an `import` can fail to resolve: the name exists as somebody's
+// private variable, or it does not exist at all.
+
+report_no_export(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  print(loc_at_v + "no exported variable named '" + name + "'");
+  note_failure();
+} return void;
+
+report_not_exported(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  string owner_of_v = owner_of(name);
+  var_report(loc_at_v + "variable '" + name + "' (in function '" + owner_of_v + "') is not exported");
+} return void;
+
+// The last two steps of every report_var_* function: print the built message
+// and flag the failure. Shared because the four call sites differ only in
+// the message text, and a literal difference does not need a different
+// function to hold it.
+var_report(string msg) {
+  print(msg);
+  note_failure();
+} return void;

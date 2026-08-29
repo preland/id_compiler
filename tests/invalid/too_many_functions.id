@@ -1,0 +1,5 @@
+// EXPECT: too many functions
+f1() {} return void;
+f2() {} return void;
+f3() {} return void;
+f4() {} return void;

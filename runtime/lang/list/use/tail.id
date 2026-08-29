@@ -1,0 +1,16 @@
+// Where a list ends: the header update that finishes a growth, and the removal
+// of the last cell.
+
+list_wide(word p, word a, word z) {
+  st64(p + 8, z);
+  st64(p + 16, a);
+} return void;
+
+// The length is decremented first so that the cell read back is the one just
+// dropped. docs/SPEC.md 5 traps on an empty list; here it walks off the front
+// of the cells instead, for the same want of anywhere to report to that leaves
+// indexing unchecked.
+list_pop(int[] xs) {
+  word p = l2w(xs);
+  word ret_w = list_pop_at(p);
+} return word ret_w;

@@ -1,0 +1,25 @@
+// Comma-separated argument list, the separator helper (shared with params),
+// and operator mapping (id's bare `=` equality becomes C `==`).
+
+emit_args(int[] args) {
+  string out = "";
+  int i = 0;
+  while(i < len(args)) {
+    out = out + sep_arg(i) + emit_expr(args[i]);
+    i = i + 1;
+  }
+} return string out;
+
+sep_arg(int i) {
+  string s = "";
+  if(i > 0) {
+    s = ", ";
+  }
+} return string s;
+
+map_op(string op) {
+  string ct = op;
+  if(op == "=") {
+    ct = "==";
+  }
+} return string ct;

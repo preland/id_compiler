@@ -1,0 +1,13 @@
+// The constraint list's closing bracket.
+//
+// Deliberately not skip_to_close with the character as a parameter: the two
+// differ by a literal, and a literal is exactly what the function-uniqueness
+// rule counts as a real difference, so they are two functions rather than one
+// parameterised one. Making it a parameter would also mean every caller
+// spelling `")"` at the call site, which is less readable, not more.
+
+skip_to_rbrack(int[] pos) {
+  while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
+    advance(pos);
+  }
+} return void;

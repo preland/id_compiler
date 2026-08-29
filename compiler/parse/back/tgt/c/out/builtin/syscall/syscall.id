@@ -1,0 +1,29 @@
+// The flat-store and unsigned-word builtins. They all take machine words, so
+// one shared shape covers every one of them: the C helper applied to each
+// argument cast to `long long`. Matches idc.py's gen_systems_call (and the
+// str_of_mem branch of gen_call, which has the same shape).
+//
+// mem_of_str is deliberately not here: its argument is a string, so it emits
+// through the ordinary emit_gcall path with no cast.
+
+emit_syscall(int id) {
+  string s1_of_v = s1_of(id);
+  int[] l1_of_v = l1_of(id);
+  string ret_s = sys_helper(s1_of_v) + "(" + cast_args(l1_of_v) + ")";
+} return string ret_s;
+
+cast_args(int[] args) {
+  string out = "";
+  int i = 0;
+  while(i < len(args)) {
+    out = out + sep_arg(i) + "(long long)(" + emit_expr(args[i]) + ")";
+    i = i + 1;
+  }
+} return string out;
+
+is_syscall(string name) {
+  int ok = 0;
+  if(is_wordfn(name) || is_pokefn(name) || name == "ult" || name == "str_of_mem") {
+    ok = 1;
+  }
+} return int ok;

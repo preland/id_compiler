@@ -1,0 +1,15 @@
+// The duplicate is recorded anyway, even though it was just rejected: the
+// export table is what the later checks read to decide what a name means, and
+// a half-built table would have them explaining a second, invented problem.
+// Nothing is emitted once a check has failed, so the extra row is never seen.
+dupexp_err(int id, string owner) {
+  string loc_at_v = loc_at(owner, (import nline)[id]);
+  string s2_of_v = s2_of(id);
+  dupexp_report(loc_at_v, s2_of_v);
+} return void;
+
+dupexp_report(string loc_at_v, string s2_of_v) {
+  string export_owner_v = export_owner(s2_of_v);
+  print(loc_at_v + "'" + s2_of_v + "' is already an exported global (exported by '" + export_owner_v + "')");
+  note_failure();
+} return void;

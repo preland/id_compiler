@@ -1,0 +1,22 @@
+// if / else if / else. Three blocks: the two arms and the join they both
+// branch to. An `else if` is already an `if` nested in the else list, so the
+// chain needs no special case here -- unlike the C target, which has to splice
+// the lines back together to keep the generated C flat.
+
+lw_if(int node) {
+  int i1_of_v = i1_of(node);
+  int c = lw_cond(i1_of_v);
+  lw_if_thn(node, c);
+} return void;
+
+lw_if_thn(int node, int c) {
+  int lw_fn_v = lw_fn();
+  int thn = ir_block(lw_fn_v, "then");
+  lw_if2(node, c, thn);
+} return void;
+
+lw_if2(int node, int c, int thn) {
+  int lw_fn_v = lw_fn();
+  int alt = ir_block(lw_fn_v, "else");
+  lw_if_join(node, c, thn, alt);
+} return void;

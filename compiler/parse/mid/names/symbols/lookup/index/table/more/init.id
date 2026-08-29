@@ -1,0 +1,34 @@
+// A hash index over the two name tables that are asked about most.
+//
+// find_str is a full scan with no early exit -- `id` has no `break`, so even a
+// hit walks the whole list -- and lookup_var alone made 568 000 of them while
+// compiling this compiler, 867 million comparisons in total and 64% of the
+// run. The tables are append-only and every push goes through one helper, so
+// an index costs one bucket append per declaration and turns each lookup into
+// a scan of the handful of names that share its hash.
+//
+// vnames and fnames are indexed and nothing else is: they are 96% of the
+// scanning, and an index that is not paid for by its lookups is just another
+// thing to keep in step.
+
+init_idx() {
+  export int[][] vidx = [];
+  export int[][] fidx = [];
+  fill_idx();
+} return void;
+
+fill_idx() {
+  int i = 0;
+  while(i < idx_n()) {
+    push_buckets();
+    i = i + 1;
+  }
+} return void;
+
+// Both indexes get their buckets in one loop: they are the same size and are
+// built at the same moment, and two loops would be the same loop twice.
+push_buckets() {
+  int[] new_bucket_v = new_bucket();
+  push((import vidx), new_bucket_v);
+  push_fbucket();
+} return void;

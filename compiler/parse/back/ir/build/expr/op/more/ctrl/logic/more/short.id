@@ -1,0 +1,19 @@
+
+lw_logic3(int node, int slot, int bdy, int jn) {
+  lw_short(node, bdy, jn);
+  lw_rhs(node, slot, bdy, jn);
+  int ret_i = lw_load_at(slot, "int");
+} return int ret_i;
+
+lw_short(int node, int bdy, int jn) {
+  int i1_of_v = i1_of(node);
+  int c = lw_cond(i1_of_v);
+  lw_short_term(node, c, bdy, jn);
+} return void;
+
+lw_arms(string op, int bdy, int jn) {
+  int[] bl = [bdy, jn];
+  if(op == "||") {
+    bl = [jn, bdy];
+  }
+} return int[] bl;

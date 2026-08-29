@@ -1,0 +1,13 @@
+// EXPECT: argument 'n' of 'take' narrows word to int; declare a int local and pass that
+// IDCPY-ACCEPTS
+// docs/FRICTION.md 12. idc.py has no rule against this: it compiles the
+// program and prints the truncated value. The marker asserts that, so the day
+// idc.py grows the rule this case fails and gets updated.
+main() {
+  word a = 4294967297;
+  take(a);
+} return int 0;
+
+take(int n) {
+  print(n);
+} return void;

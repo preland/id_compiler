@@ -1,0 +1,10 @@
+// An asm function has no AST node -- its rows are their own table -- so its
+// parameter types are looked up there. Any row of the name answers: the checks
+// already require every platform's overloads to agree on the signature.
+lw_apty(string name, int i, string t) {
+  int r = find_str((import afname), name);
+  string p = t;
+  if(r >= 0 && i < len((import afparams)[r])) {
+    p = s1_of((import afparams)[r][i]);
+  }
+} return string p;

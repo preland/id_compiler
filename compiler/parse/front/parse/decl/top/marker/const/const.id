@@ -1,0 +1,36 @@
+// A `#const` marker and the declaration after it: a constant from the
+// project's conf.id.
+//
+// The marker is a bare token; the declaration that follows is ORDINARY source,
+// so parse_decl reads it and nothing here re-implements declaration parsing
+// for a marker payload. See bin/idc's emit_sources for the injection.
+//
+// A constant belongs to no function, which is the entire point of it. An
+// `export` inside a function body does not exist until that function runs --
+// which is why idstd's 91-entry sin table needs fx_trig_init() called from
+// every program's setup chain, and why forgetting it is a compile error rather
+// than working code. A constant needs no such call: the compiler emits one
+// initialiser for all of them and calls it before main.
+//
+//   cdecl  the declaration node of each constant, in conf.id order
+
+init_consts() {
+  export int[] cdecl = [];
+} return int 0;
+
+take_const(int[] pos) {
+  advance(pos);
+  int parse_decl_v = parse_decl(pos);
+  reg_const(parse_decl_v);
+} return void;
+
+// Registered in the same export tables an in-function `export` fills, so the
+// name is reserved program-wide and a collision with a function's export is
+// caught by the ordinary duplicate check. The owner is "conf.id" -- the file
+// the constant was written in -- rather than a function name, because there is
+// no function: an identifier cannot contain a dot, so no program can define a
+// function by that name and claim to own a constant.
+reg_const(int d) {
+  add_export2(d, "conf.id");
+  push((import cdecl), d);
+} return void;

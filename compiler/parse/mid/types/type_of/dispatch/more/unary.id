@@ -1,0 +1,23 @@
+// The type of a unary expression. (The widening rule that used to live here
+// is now one function, ../../../registry/lookup/num/widen.id's ty_wider.)
+
+// Tail of the type_of dispatch chain (... -> type_of6 -> here): a unary node
+// carries its operand's type, everything left is a binary node. Written as a
+// two-armed if rather than the usual eager default because both arms recurse.
+type_of7(int id) {
+  string t = "int";
+  if(k_of(id) == "un") {
+    t = type_un(id);
+  } else {
+    t = type_bin(id);
+  }
+} return string t;
+
+// `-x` and `~x` keep the operand's type; `!x` is a truth value, so int.
+type_un(int id) {
+  int i1_of_v = i1_of(id);
+  string t = type_of(i1_of_v);
+  if(s1_of(id) == "!") {
+    t = "int";
+  }
+} return string t;

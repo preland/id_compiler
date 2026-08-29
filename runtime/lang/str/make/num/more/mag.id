@@ -1,0 +1,6 @@
+// One digit of `num_mag`'s loop: the remainder written as a byte, at the
+// position the loop has already backed `q` up to.
+num_mag_write(word q, word a) {
+  word umod_v = umod(a, 10);
+  st8(q, 48 + umod_v);
+} return void;

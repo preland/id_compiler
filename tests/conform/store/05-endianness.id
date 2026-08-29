@@ -1,0 +1,11 @@
+main() {
+  word p = alloc(4);
+  poke32(p, 67305985);
+  show_bytes(p);
+} return int 0;
+
+show_bytes(word p) {
+  string a = "" + peek8(p) + " " + peek8(p + 1);
+  string b = "" + peek8(p + 2) + " " + peek8(p + 3);
+  print(a + " " + b);
+} return void;

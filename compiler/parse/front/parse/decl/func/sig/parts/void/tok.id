@@ -1,0 +1,16 @@
+// The token store by absolute index, for the one place that has to look past
+// the cursor. Everything else reads through cur_kind and cur_text, which is
+// why these live here rather than beside them.
+tok_at(int at) {
+  string k = "eof";
+  if(at < len((import tkind))) {
+    k = (import tkind)[at];
+  }
+} return string k;
+
+tok_str(int at) {
+  string s = "";
+  if(at < len((import ttext))) {
+    s = (import ttext)[at];
+  }
+} return string s;

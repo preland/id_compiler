@@ -1,0 +1,8 @@
+// EXPECT: expects int, got string
+main() {
+  int r = inc("nope");
+} return int r;
+
+inc(int n) {
+  int m = n + 1;
+} return int m;

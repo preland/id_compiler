@@ -1,0 +1,11 @@
+tb2_arith(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string t = tb2_arith2(i1_of_v, i2_of_v);
+} return string t;
+
+tb2_arith2(int a, int b) {
+  string type_of_v = type_of(a);
+  string type_of_v2 = type_of(b);
+  string t = arith_result(type_of_v, type_of_v2);
+} return string t;

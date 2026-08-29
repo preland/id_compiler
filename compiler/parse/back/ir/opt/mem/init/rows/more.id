@@ -1,0 +1,19 @@
+// The entry block, and what `m2r_collect` needs of it: only the entry ever
+// holds an alloca, so a slot count for the whole function is really a count
+// of the entry block alone.
+
+entry_of(int f) {
+  int[] irf_blk_v = irf_blk(f);
+  int b = irf_blk_v[0];
+} return int b;
+
+entry_count(int f) {
+  int b = entry_of(f);
+  int n = insn_count(b);
+} return int n;
+
+m2r_collect_at(int f, int i) {
+  int b = entry_of(f);
+  int[] blk_ins_v = blk_ins(b);
+  m2r_take(blk_ins_v[i]);
+} return void;

@@ -1,0 +1,28 @@
+// The pass pipeline.
+//
+// `id` has no function pointers, so a pass table is a sequence of calls rather
+// than a list of them; docs/DISPATCH.md's `select` would make this a real
+// table. What matters is the order, and it is the usual one: the CFG's
+// predecessors first because mem2reg needs them, then mem2reg because every
+// other pass is blind while values live in memory, then the folds it exposes,
+// then the sweep for what the folds left behind.
+
+ir_opt(int lvl) {
+  int i = 0;
+  while(i < len((import irprog))) {
+    opt_func((import irprog)[i], lvl);
+    i = i + 1;
+  }
+} return void;
+
+opt_func(int f, int lvl) {
+  if(lvl > 0) {
+    opt_round(f);
+  }
+} return void;
+
+opt_round(int f) {
+  op_preds(f);
+  op_mem2reg(f);
+  opt_clean(f);
+} return void;

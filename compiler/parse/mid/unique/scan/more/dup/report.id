@@ -1,0 +1,14 @@
+// Split from dupfn_at and dupfn_err so each of those blocks stays within the
+// action limit.
+
+dupfn_check(int i, int j) {
+  resv_at(i);
+  if(j < i && i < len((import pfile))) {
+    dupfn_err(i, j);
+  }
+} return void;
+
+dupfn_print(string prog_loc_v, string s1_of_v, int j) {
+  print(prog_loc_v + "function '" + s1_of_v + "' already defined at " + (import pfile)[j] + ":" + (import pline)[j]);
+  note_failure();
+} return void;

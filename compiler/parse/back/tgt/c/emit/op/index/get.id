@@ -1,0 +1,22 @@
+
+// An index reads a cell and unboxes it to the element type.
+//
+// i1_of(id) is read once and shared between the element-type lookup and the
+// generated call: both need the base list, and nothing between the two reads
+// changes the store.
+emit_index(int id) {
+  int i1_of_v = i1_of(id);
+  string elem = index_elem(i1_of_v);
+  string ret_s = index_get(id, i1_of_v, elem);
+} return string ret_s;
+
+index_elem(int i1_of_v) {
+  string type_of_v = type_of(i1_of_v);
+  string elem = elem_type(type_of_v);
+} return string elem;
+
+index_get(int id, int i1_of_v, string elem) {
+  int i2_of_v = i2_of(id);
+  string g = "id_list_get(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ")";
+  string ret_s = unbox(g, elem);
+} return string ret_s;

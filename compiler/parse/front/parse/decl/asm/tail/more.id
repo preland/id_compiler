@@ -1,0 +1,19 @@
+// The rest of asm_tail.id's asm_tail, split across two more steps to stay
+// under the action limit, plus init_asm_all's own tail. asm_tail.id has no
+// room left for any of the three.
+
+asm_tail_mid(int[] pos, string rt) {
+  push((import afret), rt);
+  string name = cur_text(pos);
+  int ret_i = asm_tail_end(pos, name);
+} return int ret_i;
+
+asm_tail_end(int[] pos, string name) {
+  push((import afretn), name);
+  int ret_i = asm_fin(pos);
+} return int ret_i;
+
+init_asm_rest() {
+  init_files();
+  int ret_i = init_consts();
+} return int ret_i;

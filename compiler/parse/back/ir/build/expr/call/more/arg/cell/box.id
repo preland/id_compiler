@@ -1,0 +1,34 @@
+// A cell of a list is a uniform 64-bit word, so a value entering one is
+// widened, bit-copied or reinterpreted, and a value leaving one is the
+// reverse. This is the same contract the C target's box/unbox spell as casts.
+//
+// Each case is reached through an else rather than by computing the ordinary
+// conversion first and overriding it: the conversion emits an instruction, and
+// one that is built and then thrown away is still in the block.
+
+lw_box(int v, string t) {
+  int r = 0 - 1;
+  if(ty_num(t) == 0) {
+    r = lw_op("ptrtoint", "word", v, 0 - 1, "");
+  } else {
+    r = lw_box2(v, t);
+  }
+} return int r;
+
+lw_box2(int v, string t) {
+  int r = 0 - 1;
+  if(t == "float") {
+    r = lw_callf("id_box_f", "word", [v]);
+  } else {
+    r = lw_conv(v, t, "word");
+  }
+} return int r;
+
+lw_unbox(int v, string t) {
+  int r = 0 - 1;
+  if(ty_num(t) == 0) {
+    r = lw_op("inttoptr", t, v, 0 - 1, "");
+  } else {
+    r = lw_unbox2(v, t);
+  }
+} return int r;

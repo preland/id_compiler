@@ -1,0 +1,6 @@
+// The tail of init.id's setup -- that file is already full.
+
+setup_rest() {
+  init_rest();
+  int ret_i = init_ir();
+} return int ret_i;

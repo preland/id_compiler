@@ -1,0 +1,6 @@
+// EXPECT: store address
+main(int argc, string[] argv) {
+  word p = alloc(8);
+  word peek64_v = peek64(p + 4096);
+  print("" + peek64_v);
+} return int 0;

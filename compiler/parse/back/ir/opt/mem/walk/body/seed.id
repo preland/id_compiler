@@ -1,0 +1,23 @@
+// The value each slot holds on entry to a block: the phi placed for it, or --
+// in the entry block, which has no phi and no predecessor -- an undefined one.
+// A variable read before it is assigned is undefined in this language too, so
+// that is the honest answer rather than a convenient zero.
+m2r_seed(int i, int j) {
+  while(j < len((import pra))) {
+    j = m2r_seed1(i, j);
+  }
+} return void;
+
+m2r_seed1(int i, int j) {
+  int m2r_in_v = m2r_in(i, j);
+  lset((import outv)[i], j, m2r_in_v);
+  int ret_i = j + 1;
+} return int ret_i;
+
+m2r_in(int i, int j) {
+  int v = (import phiof)[i][j];
+  if(i == 0) {
+    string ir_ty_v = ir_ty((import pra)[j]);
+    v = ir_leaf("const", ir_ty_v, 0 - 1, 0 - 1, "undef");
+  }
+} return int v;

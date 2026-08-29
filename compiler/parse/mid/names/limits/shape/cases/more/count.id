@@ -1,0 +1,39 @@
+// The two-cases-per-function rule (docs/TESTS.md).
+//
+// A sibling of the action limit and the functions-per-file limit: a rule about
+// the shape of a declaration, checked here rather than left to a suite. It is
+// a *minimum* where the others are maxima, which is the whole point -- the
+// other rules stop code from growing, this one stops it from arriving
+// unverified.
+//
+// Off unless the build asks for it. Turning it on for a tree that has no cases
+// rejects every function in it, so it is phased in per directory: see the
+// rollout in docs/TESTS.md. `--require-tests` is what asks.
+//
+// `casefn` holds one entry per case, each the id of the function node the case
+// was written under, so a function's case count is how many times its node
+// appears there. The parser already builds it; nothing here re-parses.
+
+check_cases() {
+  int i = 0;
+  while(i < len((import prog))) {
+    check_cases_at(i);
+    i = i + 1;
+  }
+} return void;
+
+check_cases_at(int i) {
+  int n = count_cases((import prog)[i]);
+  if(n < 2) {
+    report_cases(i, n);
+  }
+} return void;
+
+count_cases(int node) {
+  int i = 0;
+  int n = 0;
+  while(i < len((import casefn))) {
+    n = n + case_hit(i, node);
+    i = i + 1;
+  }
+} return int n;

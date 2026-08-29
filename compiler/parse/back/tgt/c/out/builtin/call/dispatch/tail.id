@@ -1,0 +1,9 @@
+
+// The tail of emit_gcall: the generic id_NAME(args) form, overridden with a
+// runtime-helper call when the callee is a syscall.
+emit_gcall_tail(int id, string s) {
+  string s1_of_v = s1_of(id);
+  if(is_syscall(s1_of_v)) {
+    s = emit_syscall(id);
+  }
+} return string s;

@@ -1,0 +1,15 @@
+// A call may not be an argument to a call, so a `while` condition that reads
+// the current token and classifies it can no longer nest the read inside the
+// predicate. Naming the token before the loop would read it once instead of
+// every iteration, so each of these composes the read and the predicate into
+// a single function the loop calls instead.
+
+relop_at(int[] pos) {
+  string s = cur_text(pos);
+  int ok = is_relop(s);
+} return int ok;
+
+shiftop_at(int[] pos) {
+  string s = cur_text(pos);
+  int ok = is_shiftop(s);
+} return int ok;

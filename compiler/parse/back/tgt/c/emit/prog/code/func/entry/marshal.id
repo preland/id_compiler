@@ -1,0 +1,21 @@
+// argv marshalling (only when main takes parameters), matching idc.py.
+
+emit_marshal(int m) {
+  if(has_args(m)) {
+    print_marshal();
+  }
+} return void;
+
+print_marshal() {
+  emit_line("    IdList* id_args = id_list_new();");
+  emit_line("    for (int i = 0; i < argc; i++)");
+  emit_line("        id_list_push(id_args, (long long)(intptr_t)argv[i]);");
+} return void;
+
+has_args(int m) {
+  int ok = 0;
+  int[] l1_of_v = l1_of(m);
+  if(len(l1_of_v) > 0) {
+    ok = 1;
+  }
+} return int ok;

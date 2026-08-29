@@ -1,0 +1,27 @@
+
+reach_range(int lo, int hi) {
+  while(lo <= hi) {
+    scan_reach(lo);
+    lo = lo + 1;
+  }
+} return void;
+
+// The leaf of the walk, doing both jobs so that one walker serves both passes.
+// During the fixpoint only the calls matter; the imports cannot be judged yet,
+// because a function that is not reachable *so far* may still become so.
+scan_reach(int id) {
+  if(k_of(id) == "call") {
+    string s1_of_v = s1_of(id);
+    reach_add(s1_of_v);
+  }
+  if(k_of(id) == "import" && (import dphase)[0] == 1) {
+    chk_import_at(id);
+  }
+} return void;
+
+is_reach(string name) {
+  int ok = 0;
+  if(find_str((import rfn), name) >= 0) {
+    ok = 1;
+  }
+} return int ok;

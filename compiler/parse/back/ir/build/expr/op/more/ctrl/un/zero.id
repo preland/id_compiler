@@ -1,0 +1,19 @@
+
+lw_iszero(int v, string t) {
+  string lw_cmpop_v = lw_cmpop(t);
+  int ret_i = lw_iszero_cmp(v, t, lw_cmpop_v);
+} return int ret_i;
+
+// Continues lw_iszero: the comparison operator is known, so the zero
+// constant is built next and the two are compared.
+lw_iszero_cmp(int v, string t, string op) {
+  string lw_zero_v = lw_zero(t);
+  int lw_const_v = lw_const(t, lw_zero_v);
+  int ret_i = lw_op(op, "bool", v, lw_const_v, "==");
+} return int ret_i;
+
+lw_not(int node) {
+  int i1_of_v = i1_of(node);
+  string t = lw_ety(i1_of_v);
+  int ret_i = lw_not_val(node, i1_of_v, t);
+} return int ret_i;

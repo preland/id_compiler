@@ -1,0 +1,24 @@
+// The declared type of an exported name, or "" when the name is not exported.
+// Read from the export table rather than from the variable table because a
+// constant declared in conf.id belongs to no function and is in neither prog
+// nor vnames -- it exists only as an export.
+lw_vty(string name) {
+  int r = find_str((import enames), name);
+  string t = "";
+  if(r >= 0) {
+    t = (import etypes)[r];
+  }
+} return string t;
+
+// A local's stack slot, created in the entry block so that it dominates every
+// use however deep in the function the declaration was written. mem2reg takes
+// it away again; until then the lowering never has to reason about dominance.
+lw_alloca(string ty, string name) {
+  int v = ir_leaf("alloca", ty, 0 - 1, 0 - 1, name);
+  int lw_ent_v = lw_ent();
+  int ret_i = lw_alloca_tail(lw_ent_v, v, name);
+} return int ret_i;
+
+lw_store_at(int addr, int v) {
+  lw_op("store", "", addr, v, "");
+} return void;

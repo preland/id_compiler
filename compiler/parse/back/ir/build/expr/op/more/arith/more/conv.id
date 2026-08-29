@@ -1,0 +1,14 @@
+// Continues lw_hcall: the two widenings still run in source order across
+// two functions, so the call sequence a gcc build and a clang build both
+// take is fixed by the split itself, not by argument-evaluation order.
+lw_hcall_lhs(string h, int a, int b, string t) {
+  string lw_hty_v = lw_hty(h);
+  int r = lw_conv(a, t, lw_hty_v);
+  int ret_i = lw_hcall_rhs(h, r, b, t);
+} return int ret_i;
+
+lw_hcall_rhs(string h, int r, int b, string t) {
+  string lw_hty_v2 = lw_hty(h);
+  int lw_conv_v = lw_conv(b, t, lw_hty_v2);
+  int ret_i = lw_hcall2(h, r, lw_conv_v, t);
+} return int ret_i;

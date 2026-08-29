@@ -1,0 +1,30 @@
+// i points at the '0'; i + 2 is the first hex digit.
+scan_hex(string src, int i) {
+  int e = hex_end(src, i + 2);
+  word v = hex_val(src, i + 2, e);
+  print_uint(v);
+} return int e;
+
+// A word printed as *unsigned* decimal. Plain "" + v prints it signed, so
+// 0xffffffffffffffff would come out as -1 where idc.py gives
+// 18446744073709551615.
+//
+// The trick avoids needing a word-to-int narrowing (which the language does
+// not have): split the value at 10^10 with the unsigned operators. Both
+// halves are then small enough to be positive as signed, so ordinary
+// conversion prints them correctly, and the low half is zero-padded back to
+// the ten digits it is worth.
+udec(word v) {
+  word hi = udiv(v, 10000000000);
+  string s = "" + v;
+  if(hi != 0) {
+    word umod_v = umod(v, 10000000000);
+    s = "" + hi + pad10("" + umod_v);
+  }
+} return string s;
+
+pad10(string s) {
+  while(len(s) < 10) {
+    s = "0" + s;
+  }
+} return string s;

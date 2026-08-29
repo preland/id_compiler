@@ -1,0 +1,5 @@
+// Split from acc_while so that block stays within the action limit.
+acc_while_body(int id, string owner) {
+  int[] l1_of_v = l1_of(id);
+  acc_list(l1_of_v, owner);
+} return void;

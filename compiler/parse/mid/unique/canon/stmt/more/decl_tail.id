@@ -1,0 +1,21 @@
+// The rest of canon_decl, and the first step of canon_iassign, split so each
+// of those blocks stays within the action limit. Grouped together because
+// decl.id was already at the 3-function limit once these existed.
+
+decl_tag(int id) {
+  string out = "d:";
+  if(i2_of(id) == 1) {
+    out = "ed:";
+  }
+} return string out;
+
+decl_tail(int id, string out, string nm) {
+  int i1_of_v = i1_of(id);
+  string ret_s = out + s1_of(id) + " " + nm + "=" + canon_expr(i1_of_v);
+} return string ret_s;
+
+iassign_tail(int id, string head) {
+  int i2_of_v = i2_of(id);
+  string key = canon_expr(i2_of_v);
+  string ret_s = iassign_val(id, head, key);
+} return string ret_s;

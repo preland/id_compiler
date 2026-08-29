@@ -1,0 +1,7 @@
+// The tail of expr.id's fold_rel -- see ladder/arith/fold/more.id for why
+// the second half of a split fold function needs a file of its own.
+
+fold_rel_tail(int[] pos, int left, string op) {
+  int right = parse_bitor(pos);
+  int ret_i = node_bin(op, left, right);
+} return int ret_i;

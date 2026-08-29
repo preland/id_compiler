@@ -1,0 +1,7 @@
+mod_types(int id, int a, int b) {
+  string lt = type_of(a);
+  string rt = type_of(b);
+  if(ty_num(lt) == 1 && ty_num(rt) == 1 && (lt == "float" || rt == "float")) {
+    tc_err(id, "'%' requires int operands");
+  }
+} return void;

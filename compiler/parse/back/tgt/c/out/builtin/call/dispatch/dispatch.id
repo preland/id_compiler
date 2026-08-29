@@ -1,0 +1,28 @@
+
+// Call emission dispatch for the list builtins, extending emit_call:
+//   print -> id_print(to_string(...))   (in expr/call/call.id)
+//   len   -> id_len (string) or id_list_len (list)
+//   push  -> id_list_push with the value boxed
+//   pop   -> id_list_pop unboxed to the element type (in pop.id)
+//   everything else -> id_NAME(args)  (charat/chr/to_int/input/read_all and
+//   ordinary user calls all take this generic form, matching idc.py)
+
+ec2(int id) {
+  string s = ec3(id);
+  if(s1_of(id) == "len") {
+    s = emit_len(id);
+  }
+} return string s;
+
+ec3(int id) {
+  string s = ec4(id);
+  if(s1_of(id) == "push") {
+    s = emit_push(id);
+  }
+} return string s;
+
+emit_gcall(int id) {
+  int[] l1_of_v = l1_of(id);
+  string s = "id_" + s1_of(id) + "(" + emit_args(l1_of_v) + ")";
+  string ret_s = emit_gcall_tail(id, s);
+} return string ret_s;

@@ -1,0 +1,30 @@
+// Declaration and assignment: does the value fit the slot it is going into?
+// decl carries the written type in ns1 and the name in ns2; assign carries
+// only a name, and the declared type comes from the symbol table.
+
+chk_decl(int id) {
+  string s1_of_v = s1_of(id);
+  int i1_of_v = i1_of(id);
+  if(bad_store(s1_of_v, i1_of_v) == 1) {
+    decl_err(id, s1_of_v, i1_of_v);
+  }
+} return void;
+
+chk_assign(int id) {
+  string vt = var_type_at(id);
+  int i1_of_v = i1_of(id);
+  if(bad_store(vt, i1_of_v) == 1) {
+    assign_err(id, vt, i1_of_v);
+  }
+} return void;
+
+// The one place that decides "this value may not go here". An array literal
+// is not judged by its own type, because it has none -- see more/arr.id.
+bad_store(string want, int e) {
+  int ok = 0;
+  if(k_of(e) == "arr") {
+    ok = bad_arr(want, e);
+  } else {
+    ok = bad_store2(want, e);
+  }
+} return int ok;

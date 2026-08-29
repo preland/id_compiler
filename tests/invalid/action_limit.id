@@ -1,0 +1,8 @@
+// EXPECT: performs 4 actions
+// four top-level statements exceed the 3-action limit
+main() {
+  int a = 1;
+  int b = 2;
+  int c = 3;
+  int d = 4;
+} return int 0;

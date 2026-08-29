@@ -1,0 +1,13 @@
+// The two build flags the checks read. Neither is a property of the source:
+// whether a backend is attached and whether this project is the runtime are
+// both decisions the driver makes, so they arrive as flags and live in a cell.
+
+// An exported scalar may only be assigned by its declaring function, so the
+// flag is a one-element list written through lset, like chkfail.
+xok_set(int v) {
+  lset((import xokc), 0, v);
+} return void;
+
+extern_ok() {
+  int ret_i = (import xokc)[0];
+} return int ret_i;

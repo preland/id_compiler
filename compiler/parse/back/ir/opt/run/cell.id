@@ -1,0 +1,28 @@
+// What a pass needs to know beyond the function it is given.
+//
+//   pra    the promotable stack slots of the function being optimised
+//   phiof  one row per block, one column per slot: the phi inserted there
+//   outv   one row per block, one column per slot: its value at the block's end
+//
+// Cleared per function, like the lowering's own state, because a pass runs on
+// one function at a time and nothing crosses between them: an SSA value is
+// local to its function by construction.
+
+init_opt() {
+  export int[] pra = [];
+  export int[][] phiof = [];
+  export int[][] outv = [];
+} return int 0;
+
+// The optimisation level, from `--opt N`. Level 0 emits the lowering as it
+// stands, which is the property that makes the lowering trustworthy: a program
+// built with every pass off must still be correct, so a wrong answer at -O1 is
+// a pass's fault and can be bisected to one.
+arg_opt(int argc, string[] argv, int i, int lvl) {
+  int r = lvl;
+  if(i + 1 < argc && argv[i] == "--opt") {
+    r = to_int(argv[i + 1]);
+  } else if(i < argc) {
+    r = arg_opt(argc, argv, i + 1, lvl);
+  }
+} return int r;

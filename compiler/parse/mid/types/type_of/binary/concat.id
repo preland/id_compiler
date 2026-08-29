@@ -1,0 +1,23 @@
+// Concatenation test: whether `+` is string concatenation rather than
+// arithmetic. Whether an operand needs coercing to string is a language
+// question; what it coerces to is C, and lives in back/ (to_str).
+
+is_concat(int id) {
+  int ok = 0;
+  if(s1_of(id) == "+" && one_is_str(id)) {
+    ok = 1;
+  }
+} return int ok;
+
+one_is_str(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  int ok = is_str_pair(i1_of_v, i2_of_v);
+} return int ok;
+
+is_str_pair(int a, int b) {
+  int ok = 0;
+  if(type_of(a) == "string" || type_of(b) == "string") {
+    ok = 1;
+  }
+} return int ok;

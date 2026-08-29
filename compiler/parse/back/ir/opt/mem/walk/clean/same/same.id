@@ -1,0 +1,30 @@
+// The single value a phi is, or -1 if it has none yet and -2 if it has more
+// than one. An incoming edge that is the phi itself is not a second value: a
+// loop variable that is never reassigned reaches its own phi, and that is
+// still one value.
+m2r_same(int id) {
+  int v = 0 - 1;
+  int i = 0;
+  while(i < ir_l_count(id)) {
+    v = m2r_pick(id, i, v);
+    i = i + 1;
+  }
+} return int v;
+
+m2r_pick(int id, int i, int v) {
+  int r = 0 - 2;
+  if(ir_l(id)[i] == id || ir_l(id)[i] == v) {
+    r = v;
+  } else if(v == 0 - 1) {
+    r = ir_l(id)[i];
+  }
+} return int r;
+
+// Replace every use of a value with another and remove what defined it. The
+// same operation serves a promoted load and a collapsed phi, which is why it
+// takes a counter it may not use: the sweep needs to know something changed.
+m2r_drop(int f, int id, int v, int n) {
+  op_rauw(f, id, v);
+  ir_kill(id);
+  int ret_i = n + 1;
+} return int ret_i;

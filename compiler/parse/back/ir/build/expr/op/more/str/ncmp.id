@@ -1,0 +1,18 @@
+// A numeric comparison: both operands widen to the type they were compared
+// at, and the result is the IR's own bool.
+lw_ncmp(int node, string t) {
+  int i1_of_v = i1_of(node);
+  int a = lw_as(i1_of_v, t);
+  int ret_i = lw_ncmp_b(node, t, a);
+} return int ret_i;
+
+// libc's strcmp when there is a libc, and the runtime's own when there is not.
+// A freestanding module links nothing unprefixed, and an `id` function named
+// strcmp is emitted as id_strcmp like every other -- so the two builds ask for
+// two different symbols for the same comparison.
+lw_strcmp() {
+  string s = "strcmp";
+  if(is_freestanding() == 1) {
+    s = "id_strcmp";
+  }
+} return string s;

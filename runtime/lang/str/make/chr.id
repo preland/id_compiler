@@ -1,0 +1,24 @@
+// The two ways a new string comes into existence: one byte of it, or two
+// existing ones end to end.
+//
+// Both hand back arena space that nothing will ever reclaim, which is what
+// docs/SPEC.md 6 promises and what makes string building in a loop a memory
+// cost rather than a bug.
+
+chr(int n) {
+  word p = mem_alloc(2);
+  st8(p, n);
+  string ret_s = chr_term(p);
+} return string ret_s;
+
+// `copy_bytes` answers with the count it copied, so the address just past each
+// half falls out of the copy rather than being computed twice.
+concat(string s, string r) {
+  word p = concat_alloc(s, r);
+  string ret_s = concat_at(s, r, p);
+} return string ret_s;
+
+chr_term(word p) {
+  st8(p + 1, 0);
+  string ret_s = w2s(p);
+} return string ret_s;

@@ -1,0 +1,16 @@
+// bad_store rather than bad_init, so a list of lists recurses: the elements of
+// an int[][] literal are int[] literals, and they take their type from the
+// element type in the same way.
+arr_el_at(string want, int e, int i) {
+  int el = l1_of(e)[i];
+  arr_el_check(want, el, i);
+  int ret_i = i + 1;
+} return int ret_i;
+
+arr_el_check(string want, int el, int i) {
+  string elem_type_v = elem_type(want);
+  if(bad_store(elem_type_v, el) == 1) {
+    string type_of_v = type_of(el);
+    tc_err(el, "element " + i + " of a " + want + " literal is a " + type_of_v);
+  }
+} return void;

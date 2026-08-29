@@ -1,0 +1,11 @@
+// Printing an unsigned literal's value, shared by the hexadecimal and binary
+// scanners.
+//
+// Shared rather than written twice because it would be the same three lines
+// either way, and two functions with one body are one function -- the
+// duplicate-logic rule would refuse the second.
+
+print_uint(word v) {
+  string text = udec(v);
+  print("int " + text);
+} return void;

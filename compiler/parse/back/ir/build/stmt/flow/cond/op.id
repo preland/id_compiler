@@ -1,0 +1,9 @@
+// icmp or fcmp: which comparison an operand type takes. The predicate itself
+// stays the `id` operator -- the printer maps `<` to `slt` or `olt` from the
+// operand type, so the IR never has to carry two spellings of one comparison.
+lw_cmpop(string t) {
+  string op = "icmp";
+  if(ty_kind(t) == "float") {
+    op = "fcmp";
+  }
+} return string op;

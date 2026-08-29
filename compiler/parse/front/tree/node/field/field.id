@@ -1,0 +1,13 @@
+// Field accessors, part 1.
+
+i1_of(int id) {
+  int ret_i = (import ni1)[id];
+} return int ret_i;
+
+i2_of(int id) {
+  int ret_i = (import ni2)[id];
+} return int ret_i;
+
+s1_of(int id) {
+  string ret_s = (import ns1)[id];
+} return string ret_s;

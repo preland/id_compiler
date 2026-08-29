@@ -1,0 +1,11 @@
+// The rest of lw_param, once the parameter's type and name are in hand.
+lw_param_mid(int node, int i, string ty, string name) {
+  int v = ir_leaf("param", ty, i, 0 - 1, name);
+  int lw_fn_v = lw_fn();
+  lw_param_tail(node, v, lw_fn_v);
+} return void;
+
+lw_param_tail(int node, int v, int fn) {
+  push((import fnpar)[fn], v);
+  lw_pslot(node, v);
+} return void;

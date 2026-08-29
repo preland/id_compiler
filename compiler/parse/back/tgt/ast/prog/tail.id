@@ -1,0 +1,7 @@
+
+// The tail of print_func: the body and return clause, once the signature is
+// already rendered.
+print_func_tail(int id, string s) {
+  int[] l2_of_v = l2_of(id);
+  string ret_s = s + " (body" + print_list(l2_of_v) + ")" + print_ret(id) + ")";
+} return string ret_s;

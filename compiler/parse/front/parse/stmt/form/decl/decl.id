@@ -1,0 +1,21 @@
+// Declaration: [export] type name = expr ;
+
+parse_decl(int[] pos) {
+  int exported = take_export(pos);
+  string type = parse_type(pos);
+  int ret_i = finish_decl(pos, type, exported);
+} return int ret_i;
+
+take_export(int[] pos) {
+  int e = 0;
+  if(cur_text(pos) == "export") {
+    advance(pos);
+    e = 1;
+  }
+} return int e;
+
+finish_decl(int[] pos, string type, int exported) {
+  string name = cur_text(pos);
+  advance(pos);
+  int ret_i = finish_decl_tail(pos, type, name, exported);
+} return int ret_i;

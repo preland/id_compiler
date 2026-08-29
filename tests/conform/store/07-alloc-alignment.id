@@ -1,0 +1,17 @@
+report(word a, word b) {
+  poke64(a, 111);
+  poke64(b, 222);
+  show_pair(a, b);
+} return void;
+
+show_pair(word a, word b) {
+  string x = "" + a + " " + b;
+  string y = "" + peek64(a) + " " + peek64(b);
+  print(x + " " + y);
+} return void;
+
+main() {
+  word a = alloc(1);
+  word b = alloc(8);
+  report(a, b);
+} return int 0;

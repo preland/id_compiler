@@ -1,0 +1,22 @@
+// The parts of reg_stmt and reg_branches moved out so each of those blocks
+// stays within the action limit.
+
+reg_decl_stmt(int id, string owner) {
+  string s2_of_v = s2_of(id);
+  string s1_of_v = s1_of(id);
+  reg_decl_var(id, owner, s2_of_v, s1_of_v);
+} return void;
+
+reg_decl_var(int id, string owner, string s2_of_v, string s1_of_v) {
+  int i2_of_v = i2_of(id);
+  reg_var(s2_of_v, s1_of_v, owner, i2_of_v, (import nline)[id], (import nunit)[id]);
+} return void;
+
+// Also the tail of reg_func: both just register whatever declarations sit in
+// id's second statement list, one under the else arm's owner and one under
+// the function's own name -- the same operation under two names for the
+// caller, so it is one function here.
+reg_l2_decls(int id, string owner) {
+  int[] l2_of_v = l2_of(id);
+  reg_decls(l2_of_v, owner);
+} return void;

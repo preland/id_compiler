@@ -1,0 +1,18 @@
+// The first half of `concat`: how much room the two strings need, and the
+// first of them copied into the front of it.
+concat_alloc(string s, string r) {
+  int len_v = len(s);
+  int len_v2 = len(r);
+  word p = mem_alloc(len_v + len_v2 + 1);
+} return word p;
+
+concat_at(string s, string r, word p) {
+  word a = concat_copy1(s, p);
+  string ret_s = concat_copy2(r, p, a);
+} return string ret_s;
+
+concat_copy1(string s, word p) {
+  word s2w_v = s2w(s);
+  int len_v3 = len(s);
+  word a = p + copy_bytes(s2w_v, p, len_v3);
+} return word a;

@@ -1,0 +1,9 @@
+// The wide half of `peek`. Unchecked for the same reason as the narrow half.
+
+peek32(word a) {
+  word ret_w = ld32(a);
+} return word ret_w;
+
+peek64(word a) {
+  word ret_w = ld64(a);
+} return word ret_w;

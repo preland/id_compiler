@@ -1,0 +1,5 @@
+// Split from acc_pair so that block stays within the action limit.
+acc_pair2(int id, string owner, int ln) {
+  int i2_of_v = i2_of(id);
+  acc_expr(i2_of_v, owner, ln);
+} return void;

@@ -1,0 +1,25 @@
+// A hex literal is "0", then 'x' or 'X' (120 or 88), then at least one hex
+// digit -- the last condition is what keeps a bare `0` followed by an
+// identifier starting with x from being mistaken for one.
+hex_start(string src, int i) {
+  int ok = 0;
+  if(charat(src, i) == 48 && (charat(src, i + 1) == 120 || charat(src, i + 1) == 88) && is_hex_at(src, i + 2)) {
+    ok = 1;
+  }
+} return int ok;
+
+hex_end(string src, int i) {
+  while(is_hex_at(src, i)) {
+    i = i + 1;
+  }
+} return int i;
+
+// Accumulated in a `word`, because a 16-digit literal does not fit an int.
+hex_val(string src, int i, int e) {
+  word v = 0;
+  while(i < e) {
+    int charat_v = charat(src, i);
+    v = v * 16 + hex_digit(charat_v);
+    i = i + 1;
+  }
+} return word v;

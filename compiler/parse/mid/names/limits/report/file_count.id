@@ -1,0 +1,38 @@
+// The 3-functions-per-file rule. The pipeline concatenates every source file
+// into one stream, so this is only checkable because the driver injects
+// `#file` markers and the parser records, in `pfile`, which file each entry
+// of `prog` came from.
+//
+// The sibling rule -- 3 entries per directory -- cannot be checked here at
+// all: it is a property of the filesystem, which `id` has no access to, so it
+// lives in the driver.
+
+check_files() {
+  int i = 0;
+  while(i < len((import pfile))) {
+    check_file_at(i);
+    i = i + 1;
+  }
+} return void;
+
+// Reported once per file rather than once per function over the limit.
+//
+// The `len(fseen) > 0` guard matters: without `#file` markers every function
+// is attributed to the same placeholder, so a legal nine-function project
+// would look like one nine-function file. Absent markers the rule is simply
+// unknowable, and guessing is worse than not checking.
+check_file_at(int i) {
+  int n = count_file((import pfile)[i]);
+  if(first_of_file(i) == 1 && n > 3 && len((import fseen)) > 0) {
+    report_funcs((import pfile)[i], n);
+  }
+} return void;
+
+count_file(string name) {
+  int i = 0;
+  int n = 0;
+  while(i < len((import pfile))) {
+    n = n + file_hit(i, name);
+    i = i + 1;
+  }
+} return int n;

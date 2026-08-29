@@ -1,0 +1,14 @@
+// The line the next stored token belongs to.
+
+src_line() {
+  int n = 1;
+  if(len((import lnseen)) > 0) {
+    n = (import lnseen)[len((import lnseen)) - 1];
+  }
+} return int n;
+
+// The tail of push_tok.id's push_real -- that file is already full.
+push_line() {
+  int src_line_v = src_line();
+  push((import tline), src_line_v);
+} return void;

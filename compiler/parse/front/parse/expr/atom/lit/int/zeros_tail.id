@@ -1,0 +1,8 @@
+// The tail of is_bigdec.id's strip_zeros: slicing off the run of leading
+// zeros the while loop found is one action more than that function has
+// room for.
+
+zeros_tail(string s, int i) {
+  int len_v = len(s);
+  string ret_s = slice(s, i, len_v);
+} return string ret_s;

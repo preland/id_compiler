@@ -1,0 +1,11 @@
+// Where the arena starts.
+//
+// `heap_base` is a linker symbol, not a value the program can name -- the
+// linker script puts it at the first free byte above the kernel image. Taking
+// its address is the one thing `id` cannot spell, so it is an instruction, and
+// a RIP-relative one because the kernel is linked at a fixed address and has
+// no relocation processing behind it.
+
+asm "x86_64-unknown-none" heap_ptr() {
+  "leaq heap_base(%%rip), %[ret]"
+} return word ret;

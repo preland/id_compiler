@@ -1,0 +1,5 @@
+// EXPECT: shift by a negative amount
+main(int argc, string[] argv) {
+  word x = 1;
+  print("" + (x << (0 - 1)));
+} return int 0;

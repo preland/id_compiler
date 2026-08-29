@@ -1,0 +1,27 @@
+// Consuming the bracketed groups a case is made of.
+//
+// A case's arguments and expected value are literals, so parentheses inside
+// them never nest -- there is no call to open a second one. That makes the
+// skip a scan to the next `)` rather than a depth count, and keeps each of
+// these inside the action limit.
+
+skip_paren(int[] pos) {
+  advance(pos);
+  skip_to_close(pos);
+  advance(pos);
+} return void;
+
+skip_to_close(int[] pos) {
+  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+    advance(pos);
+  }
+} return void;
+
+// The constraint list is optional: `[time:O(n), mem:O(1)]`.
+skip_constraints(int[] pos) {
+  if(cur_text(pos) == "[") {
+    advance(pos);
+    skip_to_rbrack(pos);
+    advance(pos);
+  }
+} return void;

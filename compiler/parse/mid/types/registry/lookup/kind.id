@@ -1,0 +1,28 @@
+// Stripping list levels, and the kind column.
+
+// The scalar a list type is ultimately made of: "int[][]" -> "int". Used to
+// recognise `void[]`, which is not a type at all however deeply it is nested.
+ty_base(string t) {
+  while(ty_is_list(t) == 1) {
+    t = elem_type(t);
+  }
+} return string t;
+
+// The kind of a type: "int", "float", "ref", "unit" from the registry, "list"
+// for any T[], and "?" for a name with no row -- which is what a type the
+// compiler could not work out looks like, and every caller treats as "do not
+// judge this".
+ty_kind(string t) {
+  string s = "list";
+  if(ty_is_list(t) == 0) {
+    s = ty_row_kind(t);
+  }
+} return string s;
+
+ty_row_kind(string t) {
+  int r = ty_find(t);
+  string s = "?";
+  if(r >= 0) {
+    s = (import tykind)[r];
+  }
+} return string s;

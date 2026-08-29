@@ -1,0 +1,16 @@
+
+// The else arm.
+
+emit_else(int id, string ind) {
+  emit_line(ind + "} else {");
+  int[] l2_of_v = l2_of(id);
+  emit_body_close(l2_of_v, ind);
+} return void;
+
+// The closing lines a block shares with a while loop: the body, then the
+// brace. Shared rather than duplicated, since the two are identical once
+// their opening line has already been emitted.
+emit_body_close(int[] l2_of_v, string ind) {
+  emit_block(l2_of_v, ind + "    ");
+  emit_line(ind + "}");
+} return void;

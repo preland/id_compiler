@@ -1,0 +1,26 @@
+// The call body inside the wrapper: `return id_main(...);` for an int return,
+// `id_main(...); return 0;` otherwise; with or without the marshalled args.
+
+main_body(int m) {
+  string bd = "return " + main_call(m) + ";";
+  if(s2_of(m) != "int") {
+    bd = main_call(m) + "; return 0;";
+  }
+} return string bd;
+
+main_call(int m) {
+  string mc = "id_main()";
+  if(has_args(m)) {
+    mc = "id_main(argc, id_args)";
+  }
+} return string mc;
+
+// the func node named "main", or -1
+find_main() {
+  int i = 0;
+  int m = 0 - 1;
+  while(i < len((import prog))) {
+    m = main_at(i, m);
+    i = i + 1;
+  }
+} return int m;

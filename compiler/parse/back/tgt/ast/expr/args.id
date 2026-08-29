@@ -1,0 +1,10 @@
+// Render a child-id list as space-prefixed printed expressions.
+
+pe_args(int[] args) {
+  string out = "";
+  int i = 0;
+  while(i < len(args)) {
+    out = out + " " + print_expr(args[i]);
+    i = i + 1;
+  }
+} return string out;

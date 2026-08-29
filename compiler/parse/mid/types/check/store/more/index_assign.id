@@ -1,0 +1,27 @@
+// Index-assignment `base[index] = value`, in idc.py's order: the base must be
+// a list, then the index must be an int, then the value must fit the element
+// type. Each failure stops the ones after it, because they would be asking
+// about a type that is already known to be wrong.
+//
+// The iassign node copied the index target apart: ni1 is the base expression,
+// ni2 the index expression, and nl1 holds the one value expression.
+
+chk_iassign(int id) {
+  string bt = base_type(id);
+  if(ty_known(bt) == 1 && ty_is_list(bt) == 0) {
+    tc_err(id, "cannot index a " + bt);
+  } else {
+    chk_iassign2(id, bt);
+  }
+} return void;
+
+// `int` exactly, not "any integral type": idc.py indexes with a C int, so a
+// word index is a real narrowing and is reported rather than silently cast.
+chk_iassign2(int id, string bt) {
+  string it = index_type(id);
+  if(ty_known(it) == 1 && it != "int") {
+    tc_err(id, "list index must be int, got " + it);
+  } else {
+    chk_iassign3(id, bt);
+  }
+} return void;

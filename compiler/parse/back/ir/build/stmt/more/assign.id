@@ -1,0 +1,24 @@
+
+ls2(int node) {
+  if(k_of(node) == "assign") {
+    lw_assign(node);
+  } else {
+    ls3(node);
+  }
+} return void;
+
+lw_assign(int node) {
+  string s1_of_v = s1_of(node);
+  int a = lw_addr(s1_of_v);
+  lw_assign_tail(node, a);
+} return void;
+
+// The declared type of an assignment's target: an export's if it is one, and
+// otherwise the slot's, which the alloca recorded.
+lw_aty(string name) {
+  string t = lw_vty(name);
+  if(t == "") {
+    int lw_slot_v = lw_slot(name);
+    t = ir_ty(lw_slot_v);
+  }
+} return string t;

@@ -1,0 +1,17 @@
+// Expression-leaf constructors.
+//
+// int: ni1 = the value (for the AST dump), ni2 = 1 when the literal is too
+// wide for an int, ns1 = the digits as written -- C emission prints those
+// verbatim, since a 64-bit literal cannot survive the trip through an int.
+
+node_int(string text, int value, int big) {
+  int ret_i = newleaf("int", value, big, text, "");
+} return int ret_i;
+
+node_var(string name) {
+  int ret_i = newleaf("var", 0, 0, name, "");
+} return int ret_i;
+
+node_str(string text) {
+  int ret_i = newleaf("str", 0, 0, text, "");
+} return int ret_i;

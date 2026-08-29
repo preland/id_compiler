@@ -1,0 +1,21 @@
+// One empty bucket. A list literal builds a fresh list on every call, which is
+// what makes this a bucket factory rather than one shared list handed out
+// repeatedly -- lists are references, so the difference is the whole index.
+new_bucket() {
+  int[] bkt = [];
+} return int[] bkt;
+
+// A prime, so that the final `%` mixes all sixteen bits of the hash rather
+// than keeping the low ones. About 1300 names in this compiler, so five or so
+// per bucket.
+idx_n() {
+} return int 251;
+
+// Which bucket a name belongs in -- not a hash. It was called str_hash, which
+// was both too vague (it names the mechanism, not the answer) and a claim on a
+// name idstd defines properly; the collision was the rule doing its job.
+name_bucket(string s) {
+  int hv = 0;
+  hv = hash_loop(s, 0, hv);
+  int ret_i = hv % idx_n();
+} return int ret_i;

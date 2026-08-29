@@ -1,0 +1,23 @@
+
+fold_cmp(int f, int id) {
+  int ir_a_v = ir_a(id);
+  if(fold_iszext(ir_a_v) == 1 && fold_zero_of(id) == 1) {
+    int ir_a_v2 = ir_a(id);
+    int ir_a_v3 = ir_a(ir_a_v2);
+    fold_kill(f, id, ir_a_v3);
+  }
+} return void;
+
+fold_iszext(int v) {
+  int r = 0;
+  if(v >= 0 && ir_op(v) == "zext" && fold_isbool(v) == 1) {
+    r = 1;
+  }
+} return int r;
+
+fold_zero(int v) {
+  int r = 0;
+  if(v >= 0 && ir_op(v) == "const" && ir_s(v) == "0") {
+    r = 1;
+  }
+} return int r;

@@ -1,0 +1,14 @@
+
+lw_arg_val(int node, int i) {
+  string pty = lw_arg_pty(node, i);
+  int v = lw_arg_conv(node, i, pty);
+} return int v;
+
+// Whether function node f declares an i-th parameter. Reached only after f
+// has been shown to be a real node. The type itself is mid/'s param_type,
+// which is the same three lines -- writing them again is a compile error.
+lw_has_par(int f, int i) {
+  int[] pars = l1_of(f);
+  int n = len(pars);
+  int ok = i < n;
+} return int ok;

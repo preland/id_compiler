@@ -1,0 +1,10 @@
+// Naming the composition acc_callee's condition needs: is_unknown_fn's
+// argument was a nested call, and hoisting it before the if would call
+// s1_of(id) even on a node that is not itself a call.
+is_call_var(int id) {
+  string s1_of_v = s1_of(id);
+  int ok = 0;
+  if(is_unknown_fn(s1_of_v) && find_str((import dvname), s1_of_v) >= 0) {
+    ok = 1;
+  }
+} return int ok;

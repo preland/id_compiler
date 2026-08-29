@@ -1,0 +1,14 @@
+// The narrow half of `peek`.
+//
+// docs/SPEC.md 6 bounds-checks every store access against the high-water mark.
+// A kernel has nowhere to report a failed check to and nothing to exit to, so
+// these are the load instruction and nothing else; the address a kernel hands
+// itself is the kernel's own business.
+
+peek8(word a) {
+  word ret_w = ld8(a);
+} return word ret_w;
+
+peek16(word a) {
+  word ret_w = ld16(a);
+} return word ret_w;

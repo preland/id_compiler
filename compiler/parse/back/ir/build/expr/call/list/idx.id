@@ -1,0 +1,28 @@
+// Reading and writing a list. A list is a runtime object reached only through
+// the runtime's own calls, so the IR holds a pointer and nothing else; what a
+// cell means is decided here, by the element type, exactly as it is in C.
+//
+// The base and the index are lowered into named locals rather than written as
+// two arguments of one call. Both emit instructions, and the order two
+// arguments are evaluated in is C's business, not this program's -- so the
+// same source lowered by a gcc-built compiler and by a clang-built one came
+// out with the two loads swapped. Correct either way, and not identical, which
+// is the property this compiler is checked against.
+
+lw_index(int node) {
+  int a = lw_index_base(node);
+  int i = lw_index_idx(node);
+  int ret_i = lw_index2(node, a, i);
+} return int ret_i;
+
+lw_index2(int node, int a, int i) {
+  string elem = lw_index_elem(node);
+  int c = lw_callf("id_list_get", "word", [a, i]);
+  int ret_i = lw_unbox(c, elem);
+} return int ret_i;
+
+lw_iassign(int node) {
+  string elem = lw_index_elem(node);
+  int a = lw_index_base(node);
+  lw_iset(node, a, elem);
+} return void;

@@ -1,0 +1,21 @@
+// String ordering, in C's shape: negative, zero or positive.
+//
+// The compiler emits `@id_strcmp` for a freestanding module, which is what an
+// `id` function named `strcmp` becomes -- so this is the one runtime helper
+// whose name is chosen by the C library it is replacing rather than by `id`.
+//
+// `charat` answers -1 past the end of a string rather than the NUL that is
+// really there, and -1 sorts below every byte it could be compared against, so
+// the shorter string ends up first without the loop needing a length.
+
+strcmp(string s, string r) {
+  int n = 0;
+  while(charat(s, n) == charat(r, n) && charat(s, n) != 0 - 1) {
+    n = n + 1;
+  }
+  int ret_i = strcmp_at(s, r, n);
+} return int ret_i;
+
+strcmp_at(string s, string r, int n) {
+  int ret_i = charat(s, n) - charat(r, n);
+} return int ret_i;

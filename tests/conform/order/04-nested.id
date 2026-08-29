@@ -1,0 +1,15 @@
+
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string tri_v = tri(c);
+  print(tri_v);
+} return int 0;
+
+tri(int[] c) {
+  string s = "" + tick(c) + tick(c) + tick(c);
+} return string s;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

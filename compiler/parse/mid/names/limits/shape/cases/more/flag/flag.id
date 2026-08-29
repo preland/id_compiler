@@ -1,0 +1,19 @@
+// Whether this build asks for the two-cases-per-function rule.
+//
+// A property of the build, not of the source, so it arrives as a flag and is
+// read from a cell rather than threaded through every pass -- the same shape
+// as extern_ok (mid/names/exports/extern/table.id) and for the same reason.
+
+reqtests_init() {
+  export int[] reqc = [0];
+} return void;
+
+// An exported scalar may only be assigned by its declaring function, so the
+// flag is a one-element list written through lset, like chkfail.
+reqtests_set(int v) {
+  lset((import reqc), 0, v);
+} return void;
+
+require_tests() {
+  int ret_i = (import reqc)[0];
+} return int ret_i;

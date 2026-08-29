@@ -1,0 +1,10 @@
+
+es2(int id, string ind) {
+  if(k_of(id) == "assign") {
+    string s1_of_v = s1_of(id);
+    int i1_of_v = i1_of(id);
+    emit_decl_line(s1_of_v, i1_of_v, ind);
+  } else {
+    es3(id, ind);
+  }
+} return void;

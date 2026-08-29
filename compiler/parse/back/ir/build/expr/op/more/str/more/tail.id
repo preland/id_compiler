@@ -1,0 +1,21 @@
+// Continues lw_scmp: the right operand, once the left is already computed,
+// then the strcmp call.
+lw_scmp_b(int node, int a) {
+  int i2_of_v = i2_of(node);
+  int b = lw_expr(i2_of_v);
+  int ret_i = lw_scmp_call(node, a, b);
+} return int ret_i;
+
+lw_scmp_call(int node, int a, int b) {
+  string lw_strcmp_v = lw_strcmp();
+  int lw_callf_v = lw_callf(lw_strcmp_v, "int", [a, b]);
+  int ret_i = lw_scmp2(node, lw_callf_v);
+} return int ret_i;
+
+// Continues lw_concat: the right operand, once the left is already in
+// string context.
+lw_concat_b(int node, int a) {
+  int i2_of_v = i2_of(node);
+  int b = lw_tostr(i2_of_v);
+  int ret_i = lw_callf("id_concat", "string", [a, b]);
+} return int ret_i;

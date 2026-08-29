@@ -1,0 +1,27 @@
+
+ll_t5(int id) {
+  string s = ll_t6(id);
+  if(ir_op(id) == "icmp" || ir_op(id) == "fcmp") {
+    string sym = ir_s(id);
+    int a = ir_a(id);
+    s = ll_t5_cmp(id, sym, a);
+  } else if(ll_t5_isc(id) == 1) {
+    int a2 = ir_a(id);
+    string ty = ir_ty(id);
+    s = "%v" + id + " = " + ir_op(id) + " " + ll_op(a2) + " to " + ll_ty(ty);
+  }
+} return string s;
+
+// `neg` and `not` have no LLVM opcode of their own: negation is a subtraction
+// from zero and complement is an exclusive-or with all ones.
+ll_t6(int id) {
+  string s = ll_t6_bin(id);
+  if(ir_op(id) == "neg") {
+    string ty = ir_ty(id);
+    int a = ir_a(id);
+    s = "%v" + id + " = " + ll_negop(ty) + " " + ll_ty(ty) + " " + ll_zero(ty) + ", " + ll_val(a);
+  } else if(ir_op(id) == "not") {
+    int a2 = ir_a(id);
+    s = "%v" + id + " = xor " + ll_op(a2) + ", -1";
+  }
+} return string s;

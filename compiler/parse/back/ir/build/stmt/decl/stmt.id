@@ -1,0 +1,32 @@
+// Statement lowering. The dispatch tests the kind first and only then recurses,
+// rather than computing the fallback eagerly the way the C emitter's chain
+// does: here a fallback that is computed and discarded would leave real
+// instructions in a real block.
+
+lw_stmts(int[] stmts) {
+  int i = 0;
+  while(i < len(stmts)) {
+    lw_stmt(stmts[i]);
+    i = i + 1;
+  }
+} return void;
+
+lw_stmt(int node) {
+  if(k_of(node) == "decl") {
+    lw_decl(node);
+  } else {
+    ls2(node);
+  }
+} return void;
+
+// An exported declaration writes the global; a plain one writes its slot.
+// Both are a store, and lw_addr already knows which address to give.
+//
+// The address is taken into a local first: for an export it is a fresh
+// instruction, and two arguments that both build one are built in whichever
+// order the C compiler chose to evaluate them.
+lw_decl(int node) {
+  string s2_of_v = s2_of(node);
+  int a = lw_addr(s2_of_v);
+  lw_decl_tail(node, a);
+} return void;

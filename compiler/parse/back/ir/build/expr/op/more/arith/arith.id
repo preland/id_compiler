@@ -1,0 +1,20 @@
+// Ordinary arithmetic. The result type is the widened operand type, and both
+// operands are converted to it first -- LLVM has no implicit conversion, so
+// every widening C would have done silently is an instruction here.
+
+lw_arith(int node) {
+  string t = lw_ety(node);
+  int a = lw_arith_lhs(node, t);
+  int ret_i = lw_arith2(node, a, t);
+} return int ret_i;
+
+lw_arith2(int node, int a, string t) {
+  int i2_of_v = i2_of(node);
+  int b = lw_as(i2_of_v, t);
+  int ret_i = lw_arith3(node, a, b, t);
+} return int ret_i;
+
+lw_arith3(int node, int a, int b, string t) {
+  string s1_of_v = s1_of(node);
+  int v = lw_arith3_op(node, a, b, t, s1_of_v);
+} return int v;

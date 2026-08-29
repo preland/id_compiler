@@ -1,0 +1,6 @@
+// The tail of `str_of_mem`: the NUL past the copy, and the buffer wrapped
+// as a string.
+str_of_mem_at(word p, word copy_bytes_v) {
+  st8(p + copy_bytes_v, 0);
+  string ret_s = w2s(p);
+} return string ret_s;

@@ -1,0 +1,8 @@
+
+main(int argc, string[] argv) {
+  string a = "cat";
+  string b = "cat";
+  if (a == b) {
+    print("equal");
+  }
+} return int 0;

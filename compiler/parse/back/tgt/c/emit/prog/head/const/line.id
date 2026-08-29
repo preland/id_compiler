@@ -1,0 +1,25 @@
+// One line of the exported-variable block.
+//
+// A constant from conf.id is an exported global like any other -- the name is
+// reserved program-wide and read with `import` -- except that it has no
+// declaring function to run its initialiser. So it is emitted with the
+// initialiser attached, at file scope, where C runs it before main; every
+// other export is emitted bare and assigned when its owner runs.
+
+export_line(int i) {
+  string s = c_type((import etypes)[i]) + " " + (import enames)[i] + ";  /* exported by " + (import eowners)[i] + "() */";
+  if((import eowners)[i] == "conf.id") {
+    s = const_line((import enames)[i]);
+  }
+} return string s;
+
+const_line(string name) {
+  int d = const_decl(name);
+  string s1_of_v = s1_of(d);
+  string ret_s = const_line_tail(d, s1_of_v);
+} return string ret_s;
+
+const_line_tail(int d, string s1_of_v) {
+  int i1_of_v = i1_of(d);
+  string ret_s = c_type(s1_of_v) + " " + s2_of(d) + " = " + emit_expr(i1_of_v) + ";  /* constant from conf.id */";
+} return string ret_s;

@@ -1,0 +1,7 @@
+// The tail of array.id's node_iassign -- that file is already full.
+
+node_iassign_tail(int target, int[] vlist, int[] none) {
+  int i1_of_v = i1_of(target);
+  int i2_of_v = i2_of(target);
+  int ret_i = newnode("iassign", i1_of_v, i2_of_v, "", "", vlist, none);
+} return int ret_i;

@@ -1,0 +1,7 @@
+// Split from check_func_body so that block stays within the action limit:
+// the line the diagnostic should point at (func_line) is only needed once
+// the block is actually about to be checked.
+check_body_at(int[] l2_of_v, string s1_of_v) {
+  int func_line_v = func_line(s1_of_v);
+  check_block(l2_of_v, 0, s1_of_v, func_line_v);
+} return void;

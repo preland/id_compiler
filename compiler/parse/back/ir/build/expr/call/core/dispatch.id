@@ -1,0 +1,22 @@
+// A resolved call goes to the runtime spelling; anything else is an ordinary
+// `id_`-prefixed call, name and arguments lowered in the order they were
+// written.
+lw_call_dispatch(int node, string name) {
+  int v = 0 - 1;
+  if(is_builtin(name) == 1) {
+    v = lw_builtin(node);
+  } else {
+    v = lw_ucall(node);
+  }
+} return int v;
+
+lw_ucall_name(int node) {
+  string s1_of_v = s1_of(node);
+  string name = "id_" + s1_of_v;
+} return string name;
+
+lw_ucall_rest(int node, string name) {
+  string ety = lw_ety(node);
+  int[] args = lw_args(node);
+  int ret_i = lw_callf(name, ety, args);
+} return int ret_i;

@@ -1,0 +1,22 @@
+// The remaining rows, and the row constructor. Adding a type to id is adding
+// one ty_row call here (plus one spelling per target, once the targets read
+// their column out of this table too -- see BACKENDS.md).
+
+init_ty_rows2() {
+  ty_row("word", "int", 8, 1);
+  ty_row("float", "float", 8, 1);
+  init_ty_rows3();
+} return void;
+
+// `string` is a reference, so its width is a pointer's, not a character
+// count. `void` is the unit type: no values, so no width and no sign.
+init_ty_rows3() {
+  ty_row("string", "ref", 8, 0);
+  ty_row("void", "unit", 0, 0);
+} return void;
+
+ty_row(string tn, string tk, int tw, int ts) {
+  push((import tyname), tn);
+  push((import tykind), tk);
+  ty_row2(tw, ts);
+} return void;

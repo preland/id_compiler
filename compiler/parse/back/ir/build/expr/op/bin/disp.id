@@ -1,0 +1,9 @@
+// The first of the four shapes: whether the operator is a comparison at all.
+lw_bin_op(int node, string op) {
+  int v = 0 - 1;
+  if(lw_ispred(op) == 1) {
+    v = lw_cmp(node);
+  } else {
+    v = lb2(node);
+  }
+} return int v;

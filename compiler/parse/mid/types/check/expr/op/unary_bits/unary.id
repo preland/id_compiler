@@ -1,0 +1,36 @@
+// The last link of the dispatch chain, and the unary operators.
+//
+// `-` wants a number; `!` and `~` want an integer, because negating or
+// complementing a double is not a thing the machine does. A type the compiler
+// could not work out is not judged, as everywhere else in tc.
+
+tc_g5(int id) {
+  if(k_of(id) == "func") {
+    chk_retexpr(id);
+  }
+  if(k_of(id) == "un") {
+    chk_un(id);
+  }
+  if(k_of(id) == "exprstmt") {
+    chk_exprstmt(id);
+  }
+} return void;
+
+chk_un(int id) {
+  int i1_of_v = i1_of(id);
+  string t = type_of(i1_of_v);
+  if(ty_known(t) == 1) {
+    chk_un2(id, t);
+  }
+} return void;
+
+// Negation is the one with its own wording in idc.py; `!` and `~` share
+// theirs, and naming the operator in it is what tells them apart.
+chk_un2(int id, string t) {
+  if(s1_of(id) == "-" && ty_num(t) == 0) {
+    tc_err(id, "cannot negate a " + t);
+  } else if(s1_of(id) != "-" && ty_int(t) == 0) {
+    string s1_of_v = s1_of(id);
+    tc_err(id, "cannot apply '" + s1_of_v + "' to a " + t);
+  }
+} return void;

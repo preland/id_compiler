@@ -1,0 +1,13 @@
+// EXPECT: collides with a runtime helper
+// Every id function is emitted as id_<name>, and the runtime prelude already
+// defines id_str_of_int. Unchecked, this was a cc error attributed to nobody:
+// idc.py passed through a bare "C compilation failed", and bin/idc reported a
+// user's own name clash as "a bug in the self-hosted compiler; please report
+// it". A standard library makes it likely rather than exotic -- idstd wanted
+// str_of_int and str_of_word and could have neither.
+str_of_int(int v) {
+} return string "" + v;
+
+main() {
+  print(str_of_int(4));
+} return int 0;

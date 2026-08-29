@@ -1,0 +1,21 @@
+// Continues lw_un2's instruction arm: the operator's IR name, then the
+// converted operand it applies to.
+lw_un2_op(int node, string t) {
+  string s1_of_v = s1_of(node);
+  string lw_unop_v = lw_unop(s1_of_v);
+  int ret_i = lw_un2_apply(node, t, lw_unop_v);
+} return int ret_i;
+
+lw_un2_apply(int node, string t, string p) {
+  int i1_of_v = i1_of(node);
+  int lw_as_v = lw_as(i1_of_v, t);
+  int ret_i = lw_op(p, t, lw_as_v, 0 - 1, "");
+} return int ret_i;
+
+// Continues lw_not: the operand's type is known, so its value is fetched
+// next and tested against zero.
+lw_not_val(int node, int lhs, string t) {
+  int v = lw_expr(lhs);
+  int lw_iszero_v = lw_iszero(v, t);
+  int ret_i = lw_conv(lw_iszero_v, "bool", "int");
+} return int ret_i;

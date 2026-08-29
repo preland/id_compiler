@@ -1,0 +1,26 @@
+// The return clause, and the two pieces of state one canonicalisation needs.
+//
+// The return clause is where most id functions do their work, so it is part of
+// the fingerprint. A void return has no expression: the parser records that as
+// -1, and 0 is a real node id, so the test is against -1 alone.
+
+canon_ret(int id) {
+  string out = "void";
+  if(i1_of(id) >= 0) {
+    int i1_of_v = i1_of(id);
+    out = canon_expr(i1_of_v);
+  }
+} return string out;
+
+// Start canonicalising the function called `name`: an empty position map, and
+// the name whose calls count as recursion. Both are declared here rather than
+// in a setup function on purpose -- an export is a statement, so running it
+// again is what clears the map before each function.
+uq_begin(string name) {
+  export string[] cself = [name];
+  export string[] cnames = [];
+} return void;
+
+cur_self() {
+  string ret_s = (import cself)[0];
+} return string ret_s;

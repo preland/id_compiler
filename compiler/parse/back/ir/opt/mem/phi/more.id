@@ -1,0 +1,20 @@
+// The tail of `m2r_front`: once the phi is on the end of the block, put its
+// home on record and walk it into first position.
+m2r_front_fin(int[] l, int ph, int b) {
+  int len_v = len(l);
+  m2r_shift(l, len_v - 1);
+  lset((import ihome), ph, b);
+} return void;
+
+// The tail of `m2r_phi_one`, split at the point where the phi has a value id
+// but no home yet: making it is one concern, placing it in its block another.
+m2r_phi_make(int i, int j) {
+  string ir_ty_v = ir_ty((import pra)[j]);
+  int ph = ir_leaf("phi", ir_ty_v, 0 - 1, 0 - 1, "");
+  lset((import phiof)[i], j, ph);
+} return int ph;
+
+m2r_phi_place(int f, int i, int ph) {
+  int[] irf_blk_v = irf_blk(f);
+  m2r_front(irf_blk_v[i], ph);
+} return void;

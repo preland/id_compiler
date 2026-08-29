@@ -1,0 +1,25 @@
+// Return types of the systems builtins: the flat store, the unsigned-word
+// operations, and the two bridges between the store and id's strings.
+
+bt4(string name) {
+  string t = bt5(name);
+  if(is_wordfn(name) || name == "mem_of_str") {
+    t = "word";
+  }
+} return string t;
+
+bt5(string name) {
+  string t = "?";
+  if(is_pokefn(name)) {
+    t = "void";
+  }
+} return string t;
+
+// Builtins yielding a machine word. `ult` is not among them -- it answers a
+// question, so it is an int like every other comparison.
+is_wordfn(string name) {
+  int ok = 0;
+  if(name == "alloc" || name == "store_size" || name == "peek8" || name == "peek16" || name == "peek32" || name == "peek64" || name == "udiv" || name == "umod" || name == "ushr") {
+    ok = 1;
+  }
+} return int ok;

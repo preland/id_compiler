@@ -1,0 +1,13 @@
+// binop + simple statement constructors.
+
+node_bin(string op, int left, int right) {
+  int ret_i = newleaf("bin", left, right, op, "");
+} return int ret_i;
+
+node_assign(string name, int expr) {
+  int ret_i = newleaf("assign", expr, 0, name, "");
+} return int ret_i;
+
+node_exprstmt(int expr) {
+  int ret_i = newleaf("exprstmt", expr, 0, "", "");
+} return int ret_i;

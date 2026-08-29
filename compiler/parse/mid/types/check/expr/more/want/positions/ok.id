@@ -1,0 +1,17 @@
+// The variable's declared type, read from the symbol table by name.
+var_type_at(int i) {
+  string nm = s1_of(i);
+  string vt = lookup_var(nm, (import nunit)[i]);
+} return string vt;
+
+want_elem_ok(int i) {
+  int i1_of_v = i1_of(i);
+  string type_of_v = type_of(i1_of_v);
+  int ok = want_elem_ok2(type_of_v);
+} return int ok;
+
+// Whether a list-of-lists' element type is itself a list type.
+want_elem_ok2(string t) {
+  string elem_type_v = elem_type(t);
+  int ok = ty_is_list(elem_type_v);
+} return int ok;

@@ -1,0 +1,29 @@
+// id type -> C type. Any list type (ending in `]`) is the generic IdList*;
+// otherwise the scalar's spelling is a lookup in this target's own column of
+// the type registry, not a chain of `if`.
+//
+// docs/BACKENDS.md asks for exactly this: mid/types/registry/ holds the facts that
+// are true of a type in any target (kind, width, signedness) and each target
+// owns one column of spellings beside it. The column lives here rather than
+// in the registry because "long long" is not a fact about `word`, it is a
+// fact about C.
+
+c_type(string t) {
+  string ct = "IdList*";
+  int len_v = len(t);
+  if(charat(t, len_v - 1) != 93) {
+    ct = c_scalar(t);
+  }
+} return string ct;
+
+// A type with no registry row has no spelling either. It answers `int` for
+// the same reason the old chain ended there -- nothing upstream emits a type
+// the checks have not already accepted -- but it is now one place rather than
+// four, and it cannot be reached by forgetting a case.
+c_scalar(string t) {
+  int r = ty_find(t);
+  string ct = "int";
+  if(r >= 0) {
+    ct = (import tyc)[r];
+  }
+} return string ct;

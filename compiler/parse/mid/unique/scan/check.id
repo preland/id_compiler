@@ -1,0 +1,40 @@
+// Function-logic uniqueness: two functions with the same signature and the
+// same logic are one function written twice, and that is a compile error.
+//
+// This is the rule that most shapes how id is written -- it is why a magic
+// number gets one named accessor instead of being repeated, and why "just like
+// X but for Y" has to become a parameter. It is also the rule with the most to
+// lose from being wrong: rejecting a legal program stops real work, so the
+// comparison is deliberately conservative. Anything two functions could
+// possibly be distinguished by -- an operator, a literal, a called name, a
+// type -- is kept in the fingerprint, and only the spelling of a function's
+// own variables is thrown away.
+//
+// Everything here is decided from `prog` and the node tables, so it holds for
+// every backend.
+
+// What check_program() calls in place of check_funcs(): the per-function body
+// walks (the action and nesting limits), then the whole-program comparison.
+check_bodies() {
+  check_funcs();
+  chk_dupfn();
+  check_unique();
+} return void;
+
+check_unique() {
+  uq_fill();
+  uq_scan();
+} return void;
+
+// Fingerprint every function once. Comparing is quadratic in the number of
+// functions but canonicalising is not, and canonicalising is the expensive
+// half, so the two passes are kept apart.
+uq_fill() {
+  export string[] cfp = [];
+  int i = 0;
+  while(i < len((import prog))) {
+    string canon_func_v = canon_func((import prog)[i]);
+    push((import cfp), canon_func_v);
+    i = i + 1;
+  }
+} return void;

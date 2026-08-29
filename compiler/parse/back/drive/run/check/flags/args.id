@@ -1,0 +1,26 @@
+// What the checks need set up before they run: the asm symbols, the extern
+// table, and the one thing about the build that the AST cannot tell them.
+//
+// Whether a native backend is attached is a property of the *build*, not of
+// the source: it comes from `--backend` or a `conf.id` dependency, both of
+// which live in the driver script. So it arrives as a flag, and everything
+// below reads it from a cell rather than being handed an argument it would
+// have to thread through every pass.
+arg_setup(int argc, string[] argv) {
+  register_asm_syms();
+  init_xtab();
+  arg_flags(argc, argv);
+} return void;
+
+// Both build flags, set together: this block has the room that arg_setup's
+// does not.
+arg_flags(int argc, string[] argv) {
+  reqtests_init();
+  int arg_xok_v = arg_xok(argc, argv, 1, 0);
+  arg_flags_tail(argc, argv, arg_xok_v);
+} return void;
+
+arg_flags_tail(int argc, string[] argv, int arg_xok_v) {
+  xok_set(arg_xok_v);
+  arg_flags2(argc, argv);
+} return void;

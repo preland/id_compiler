@@ -1,0 +1,27 @@
+// Keep the index of a name match (names are unique per type, so any match is
+// fine).
+
+match_idx(string[] names, int i, string name, int found) {
+  int r = found;
+  if(names[i] == name) {
+    r = i;
+  }
+} return int r;
+
+// find_ix, restricted to the rows declared in one unit -- with the whole table
+// as the fallback. A name the unit does not declare is either an exported
+// global, which is one global for the whole program however many units it is
+// read from, or undefined; both answer exactly as they did before units.
+find_vix(int[] bucket, string name, int unit) {
+  int found = vx_scan(bucket, name, unit, 0, 0 - 1);
+  if(found < 0) {
+    found = find_ix((import vnames), bucket, name);
+  }
+} return int found;
+
+vx_hit(int[] bucket, int i, string name, int unit, int found) {
+  int r = found;
+  if((import vnames)[bucket[i]] == name && (import vunit)[bucket[i]] == unit) {
+    r = bucket[i];
+  }
+} return int r;

@@ -1,0 +1,27 @@
+// Is this literal too wide for an int? Eleven significant digits or more is
+// at least 10000000000, which already exceeds INT_MAX, so only the shorter
+// literals need their value computed -- and those are exactly the ones a
+// 64-bit accumulator can hold without wrapping, which is what makes the
+// answer exact for a literal of any length.
+
+is_bigdec(string s) {
+  string strip_zeros_v = strip_zeros(s);
+  int ret_i = wide_dec(strip_zeros_v);
+} return int ret_i;
+
+wide_dec(string s) {
+  int ok = 1;
+  if(len(s) < 11) {
+    ok = over_max(s);
+  }
+} return int ok;
+
+// Leading zeros are not significant digits; "007" is 7, not a wide literal.
+// The last digit is always kept, so "000" strips to "0" rather than "".
+strip_zeros(string s) {
+  int i = 0;
+  while(i + 1 < len(s) && charat(s, i) == 48) {
+    i = i + 1;
+  }
+  string ret_s = zeros_tail(s, i);
+} return string ret_s;

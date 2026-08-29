@@ -1,0 +1,17 @@
+// The rest of `ll_asm_tok`: which of the three token shapes this one is.
+ll_asm_tok_sel(int r, string s, int i, int c) {
+  string out = chr(c);
+  if(charat(s, i) == 36) {
+    out = "$$";
+  } else if(charat(s, i) == 37) {
+    out = ll_asm_ref(r, s, i);
+  }
+} return string out;
+
+// Where the operand name in `%[name]` (or `%x[name]`) runs, so `ll_asm_ref2`
+// can slice it out.
+ll_asm_ref2_nm(string s, int i) {
+  int nm_v = ll_asm_nm(s, i);
+  int end_v = ll_asm_end(s, i);
+  string ret_s = slice(s, nm_v, end_v);
+} return string ret_s;

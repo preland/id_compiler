@@ -1,0 +1,33 @@
+// The widening rule, driven by the registry instead of by name tests.
+//
+// It used to live in two halves in two subtrees -- arith_result (type_of/)
+// handled float, ar2 (registry/) handled word and defaulted to int -- which is one
+// rule in two representations, and the kind of split where the halves quietly
+// stop agreeing.
+//
+// Rank is width doubled, plus one for float, so float outranks an integer of
+// the same width (word and float are both 8 wide, which is why a plain width
+// comparison cannot express this). Non-numeric operands are not widened at
+// all: `string + int` is a type error the checks reject, and guessing a result
+// for it would only make the diagnostic worse.
+
+ty_width(string t) {
+  int n = 0;
+  if(ty_find(t) >= 0) {
+    n = (import tywidth)[ty_find(t)];
+  }
+} return int n;
+
+ty_rank(string t) {
+  int n = ty_width(t) * 2;
+  if(ty_kind(t) == "float") {
+    n = n + 1;
+  }
+} return int n;
+
+ty_wider(string lt, string rt) {
+  string t = rt;
+  if(ty_rank(lt) >= ty_rank(rt)) {
+    t = lt;
+  }
+} return string t;

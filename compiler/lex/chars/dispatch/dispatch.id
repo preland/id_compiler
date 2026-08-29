@@ -1,0 +1,35 @@
+// Dispatch chain, part 1. Each function makes one decision and returns the
+// index just past whatever was consumed, delegating the rest down the chain.
+// `src`/`i`/`ni` repeat across these functions -- allowed now, because a name
+// may recur as long as it always denotes the same type (src: string indices
+// i and ni: int).
+
+// whitespace, or hand off
+scan_one(string src, int i) {
+  int ni = 0;
+  if(is_space_at(src, i)) {
+    ni = eat_space(src, i);
+  } else {
+    ni = scan_word(src, i);
+  }
+} return int ni;
+
+// `//` line comment, or hand off
+scan_word(string src, int i) {
+  int ni = 0;
+  if(charat(src, i) == 47 && charat(src, i + 1) == 47) {
+    ni = skip_comment(src, i);
+  } else {
+    ni = scan_block(src, i);
+  }
+} return int ni;
+
+// identifier/keyword, or hand off
+scan_token(string src, int i) {
+  int ni = 0;
+  if(is_alpha_at(src, i)) {
+    ni = scan_ident(src, i);
+  } else {
+    ni = scan_numop(src, i);
+  }
+} return int ni;

@@ -1,0 +1,32 @@
+// How a value is written where it is used. A constant prints as its literal
+// and a global as its symbol; everything else is the SSA name of the
+// instruction that defined it, which is its index in the store.
+//
+// An absent operand -- a `neg` has no second one, an `alloca` has no first --
+// prints as `poison`. It is never reached in emitted text: the dispatch
+// computes each shape's line and keeps only the one whose opcode matched. What
+// it buys is that computing the others cannot read past the end of a column,
+// which in this language is a process abort rather than a wrong string.
+ll_val(int v) {
+  string s = "poison";
+  if(v >= 0) {
+    s = ll_val2(v);
+  }
+} return string s;
+
+ll_val2(int v) {
+  string s = "%v" + v;
+  if(ir_op(v) == "const") {
+    s = ll_lit(v);
+  } else if(ir_op(v) == "global") {
+    s = "@" + ir_s(v);
+  }
+} return string s;
+
+// The type of a value, safe on an absent operand for the same reason.
+ll_vty(int v) {
+  string t = "";
+  if(v >= 0) {
+    t = ir_ty(v);
+  }
+} return string t;

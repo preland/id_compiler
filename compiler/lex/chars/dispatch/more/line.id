@@ -1,0 +1,9 @@
+// Line tracking for diagnostics: the running line number. The store helper it
+// needs (an imported list cannot be index-assigned directly) is idstd's
+// `lset`, which the compiler's own diagnostic names as the fix; this file used
+// to carry a private copy of it.
+
+bump_line() {
+  lset((import lexline), 0, (import lexline)[0] + 1);
+  print("line " + (import lexline)[0]);
+} return void;

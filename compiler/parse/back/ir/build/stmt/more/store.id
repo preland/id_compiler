@@ -1,0 +1,11 @@
+lw_assign_tail(int node, int a) {
+  int i1_of_v = i1_of(node);
+  string s1_of_v2 = s1_of(node);
+  lw_assign_tail2(node, a, i1_of_v, s1_of_v2);
+} return void;
+
+lw_assign_tail2(int node, int a, int i1_of_v, string s1_of_v2) {
+  string lw_aty_v = lw_aty(s1_of_v2);
+  int lw_as_v = lw_as(i1_of_v, lw_aty_v);
+  lw_store_at(a, lw_as_v);
+} return void;

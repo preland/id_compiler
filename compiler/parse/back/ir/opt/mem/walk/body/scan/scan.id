@@ -1,0 +1,24 @@
+// One block, in order: a load of a slot becomes the value the slot holds here,
+// and a store to one changes what it holds from this point on. Both
+// instructions go away; what is left is the value flowing through registers.
+
+m2r_scan(int f, int b, int i) {
+  int n = 0;
+  while(n < insn_count(b)) {
+    int[] blk_ins_v = blk_ins(b);
+    m2r_step(f, blk_ins_v[n], i);
+    n = n + 1;
+  }
+} return void;
+
+m2r_step(int f, int id, int i) {
+  if(ir_op(id) == "load") {
+    m2r_load(f, id, i);
+  } else if(ir_op(id) == "store") {
+    m2r_store(id, i);
+  }
+} return void;
+
+m2r_slot(int a) {
+  int ret_i = lst_index_of((import pra), a);
+} return int ret_i;

@@ -1,0 +1,21 @@
+// The two shifts that empty a word: `<<` and the logical `ushr`.
+//
+// docs/SPEC.md 2.3 gives every count an answer -- zero at or past the width,
+// and a trap for a negative count. `ult` collapses both of those into one
+// test, because a negative count read as unsigned is enormous. The trap is the
+// deviation: it becomes zero here, since a kernel has no stderr to name the
+// mistake on and nothing to exit to.
+
+shl(word a, word z) {
+  word v = 0;
+  if(ult(z, 64) == 1) {
+    v = shl_raw(a, z);
+  }
+} return word v;
+
+ushr(word a, word z) {
+  word v = 0;
+  if(ult(z, 64) == 1) {
+    v = ushr_raw(a, z);
+  }
+} return word v;

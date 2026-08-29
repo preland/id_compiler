@@ -1,0 +1,22 @@
+// Parse every declaration in the file. An ordinary function is pushed onto
+// the program list; an asm declaration goes into its own tables (see
+// ../asm/).
+
+parse_program(int[] pos) {
+  while(cur_kind(pos) != "eof") {
+    parse_top(pos);
+  }
+} return void;
+
+// function: name ( params ) { body } return TYPE expr ;   (or `return void;`)
+parse_func(int[] pos) {
+  string name = cur_text(pos);
+  advance(pos);
+  int ret_i = func_sig(pos, name);
+} return int ret_i;
+
+func_sig(int[] pos, string name) {
+  int[] params = parse_params(pos);
+  int[] body = parse_block(pos);
+  int ret_i = func_ret(pos, name, params, body);
+} return int ret_i;

@@ -1,0 +1,23 @@
+// Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a
+// truth test, so it is a comparison against zero and widens back to `int`.
+
+lw_un(int node) {
+  string lw_ety_v = lw_ety(node);
+  int ret_i = lw_un2(node, lw_ety_v);
+} return int ret_i;
+
+lw_un2(int node, string t) {
+  int v = 0 - 1;
+  if(s1_of(node) == "!") {
+    v = lw_not(node);
+  } else {
+    v = lw_un2_op(node, t);
+  }
+} return int v;
+
+lw_unop(string op) {
+  string p = "not";
+  if(op == "-") {
+    p = "neg";
+  }
+} return string p;

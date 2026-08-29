@@ -1,0 +1,28 @@
+// String-literal helpers: find the closing quote while respecting backslash
+// escapes (so a `\"` does not end the string), and copy a raw character range
+// verbatim. Escapes are preserved as-is in the token text, mirroring idc.py,
+// which keeps the original source spelling of a string literal.
+
+str_end(string src, int i) {
+  while(charat(src, i) != 34 && charat(src, i) != -1) {
+    i = adv_str(src, i);
+  }
+} return int i;
+
+// advance one char, or two when the current char is a backslash (skipping the
+// escaped char, so an escaped quote is not mistaken for the terminator)
+adv_str(string src, int i) {
+  int n = i + 1;
+  if(charat(src, i) == 92) {
+    n = i + 2;
+  }
+} return int n;
+
+slice_str(string src, int a, int b) {
+  string out = "";
+  while(a < b) {
+    int charat_v = charat(src, a);
+    out = out + chr(charat_v);
+    a = a + 1;
+  }
+} return string out;

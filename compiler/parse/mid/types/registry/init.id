@@ -1,0 +1,48 @@
+// The type registry: id's types as DATA rather than as if-chains.
+//
+// docs/BACKENDS.md asks for this. "How wide is an int" used to be answered by
+// `if(t == "int")` chains spread across the emitter, and that shape produced
+// two silent-wrong-answer bugs: cs3 and unbox3 both fell through to a default
+// for an unknown input instead of reporting one. A row that is simply absent
+// cannot fall through -- ty_row_kind answers "?" and every caller must decide
+// what to do with an unknown type, which is why none of the checks in
+// ../check/ can fire on a type they do not recognise.
+//
+// The C target's spelling is now a column too, owned by the target rather
+// than by this table (back/emit/prog/code/func/ctype/type_column.id):
+// "long long" is not a fact about `word`, it is a fact about C. `box`,
+// `unbox` and `to_str` are still chains and are the next to move.
+//
+//   tyname[i]    "int"   "word"  "float"   "string"  "void"
+//   tykind[i]    "int"   "int"   "float"   "ref"     "unit"
+//   tywidth[i]   4       8       8         8         0
+//   tysigned[i]  1       1       1         0         0
+//
+// The one deviation from BACKENDS.md's sketch is tykind: it proposed a single
+// "num" bucket for int/word/float, but "num" cannot answer is_integral, which
+// is what `& | ^ << >> && || ! ~` need. Splitting "num" into "int" and
+// "float" answers both questions (is_numeric is "int or float"), so it is
+// strictly more informative for the same one column.
+//
+// List types get no row: they are derived (ty_is_list / ty_base), so adding a
+// scalar type stays exactly one row.
+
+init_tyreg() {
+  init_ty_cols();
+  init_ty_rows();
+} return void;
+
+// The four columns. An `export` is a statement, so the columns come into
+// existence when this runs -- which is why init_tyreg() must be called before
+// any lookup, and is the first thing ../check/ does.
+init_ty_cols() {
+  export string[] tyname = [];
+  export string[] tykind = [];
+  export int[] tywidth = [];
+} return void;
+
+init_ty_rows() {
+  export int[] tysigned = [];
+  ty_row("int", "int", 4, 1);
+  init_ty_rows2();
+} return void;

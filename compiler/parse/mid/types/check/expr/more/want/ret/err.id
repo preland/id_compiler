@@ -1,0 +1,5 @@
+ret_err_msg(int id, string t) {
+  string s1_of_v = s1_of(id);
+  string s2_of_v = s2_of(id);
+  string msg = "function '" + s1_of_v + "' returns " + s2_of_v + " but the expression has type " + t;
+} return string msg;

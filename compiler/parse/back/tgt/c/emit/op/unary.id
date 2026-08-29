@@ -1,0 +1,14 @@
+// Unary-expression emission: `(OP operand)`, e.g. `(-1)`. Extends the
+// emit_expr chain (... -> ee5 -> ee6 -> the var/str/import text default).
+
+ee6(int id) {
+  string s = s1_of(id);
+  if(k_of(id) == "un") {
+    s = emit_un(id);
+  }
+} return string s;
+
+emit_un(int id) {
+  int i1_of_v = i1_of(id);
+  string ret_s = "(" + s1_of(id) + emit_expr(i1_of_v) + ")";
+} return string ret_s;

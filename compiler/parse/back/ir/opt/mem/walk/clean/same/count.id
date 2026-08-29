@@ -1,0 +1,8 @@
+// A phi's incoming-value count, composed so `ir_l` -- a call -- does not sit
+// inside `len`'s own argument list. `m2r_same` walks every incoming edge, and
+// each pass through needs the count read fresh: nothing here mutates it, but
+// the shared list-store convention is to never trust a length across a call.
+ir_l_count(int id) {
+  int[] l = ir_l(id);
+  int n = len(l);
+} return int n;

@@ -1,0 +1,21 @@
+
+// GCC extended asm. Every block is volatile with a memory clobber: that is
+// conservative, but the alternative is trusting hand-written clobber lists,
+// and a wrong one is a miscompile that shows up under -O2 months later.
+asm_stmt(int r) {
+  string asm_text_v = asm_text(r);
+  string chr_v = chr(34);
+  asm_stmt2(r, asm_text_v, chr_v);
+} return void;
+
+asm_stmt2(int r, string asm_text_v, string chr_v) {
+  string chr_v2 = chr(34);
+  string asm_in_ops_v = asm_in_ops((import afparams)[r]);
+  asm_stmt3(r, asm_text_v, chr_v, chr_v2, asm_in_ops_v);
+} return void;
+
+asm_stmt3(int r, string asm_text_v, string chr_v, string chr_v2, string asm_in_ops_v) {
+  string chr_v3 = chr(34);
+  string chr_v4 = chr(34);
+  asm_stmt_lines(r, asm_text_v, chr_v, chr_v2, asm_in_ops_v, chr_v3, chr_v4);
+} return void;

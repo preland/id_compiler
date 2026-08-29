@@ -1,0 +1,27 @@
+// Emission of asm functions for the selected platform, and the error for a
+// name with no body on this one.
+
+emit_asm_all(string triple) {
+  int i = 0;
+  while(i < asm_count()) {
+    emit_asm_row(i, triple);
+    i = i + 1;
+  }
+} return void;
+
+emit_asm_row(int i, string triple) {
+  if((import aftriple)[i] == triple) {
+    emit_asm_one(i);
+  } else {
+    asm_check(i, triple);
+  }
+} return void;
+
+// A row written for another platform is fine, as long as some row of the same
+// name matches this one. Reported only on the first row of a name, so a
+// function declared for four platforms does not produce four diagnostics.
+asm_check(int i, string triple) {
+  if(asm_row((import afname)[i], triple) < 0 && asm_first(i) == 1) {
+    asm_error((import afname)[i], triple);
+  }
+} return void;

@@ -1,0 +1,20 @@
+// The literal, and the comma-joined spelling the diagnostic prints.
+//
+// The order is idc.py's BUILTIN_NAMES order, not alphabetical: the fourteen
+// ordinary builtins first, then the flat-store and unsigned-word group, so
+// the printed list reads the same under both compilers.
+
+builtin_src() {
+} return string "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";
+
+builtin_list() {
+  string s = (import bnames)[0];
+  string ret_s = join_bnames(s, 1);
+} return string ret_s;
+
+join_bnames(string s, int i) {
+  while(i < len((import bnames))) {
+    s = s + ", " + (import bnames)[i];
+    i = i + 1;
+  }
+} return string s;

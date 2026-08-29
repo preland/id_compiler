@@ -1,0 +1,19 @@
+
+lw_ent() {
+  int ret_i = (import lwent)[0];
+} return int ret_i;
+
+// Create an instruction and append it to the block being built. Everything
+// with an effect or a position goes through here; a constant and a global do
+// not, because neither is ever emitted -- both print as text at each use.
+lw_emit(string op, string ty, int a, int b, string s, int[] l, int[] bl) {
+  int v = ir_insn(op, ty, a, b, s, l, bl);
+  ir_add((import lwcur)[0], v);
+} return int v;
+
+lw_reset() {
+  while(len((import lwvar)) > 0) {
+    pop((import lwvar));
+    pop((import lwslot));
+  }
+} return void;

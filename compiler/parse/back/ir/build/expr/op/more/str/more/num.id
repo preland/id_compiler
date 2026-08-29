@@ -1,0 +1,13 @@
+// Continues lw_ncmp: the right operand, widened the same way as the left,
+// then the comparison itself.
+lw_ncmp_b(int node, string t, int a) {
+  int i2_of_v = i2_of(node);
+  int b = lw_as(i2_of_v, t);
+  int ret_i = lw_ncmp_op(node, t, a, b);
+} return int ret_i;
+
+lw_ncmp_op(int node, string t, int a, int b) {
+  string lw_cmpop_v = lw_cmpop(t);
+  string s1_of_v = s1_of(node);
+  int ret_i = lw_op(lw_cmpop_v, "bool", a, b, s1_of_v);
+} return int ret_i;

@@ -1,0 +1,40 @@
+// Two identical cases under one function.
+//
+// The two-case minimum is a floor on evidence, not on line count, and the
+// cheapest way to satisfy it without producing any is to write the same case
+// twice. That is the failure mode the rule exists to prevent, so a duplicate
+// is an error rather than a warning: the second case has to say something the
+// first did not.
+//
+// Compared by tokens over each case's recorded range, not by rebuilt text --
+// the token store is already the canonical form, and `(1, 2):(3)` and
+// `(1,2):(3)` are the same case.
+//
+// Unlike the two-case minimum this is checked ALWAYS, not only under
+// --require-tests: a duplicate is wrong in a program that writes cases
+// voluntarily too, and there is nothing to phase in, because a program with
+// no cases has no duplicates.
+
+check_dup_cases() {
+  int i = 0;
+  while(i < len((import casefn))) {
+    dup_scan(i);
+    i = i + 1;
+  }
+} return void;
+
+// Against every EARLIER case, so a duplicate is reported once, at the second
+// one -- the one that has to change.
+dup_scan(int i) {
+  int j = 0;
+  while(j < i) {
+    dup_hit(i, j);
+    j = j + 1;
+  }
+} return void;
+
+dup_hit(int i, int j) {
+  if((import casefn)[i] == (import casefn)[j] && case_eq(i, j) == 1) {
+    report_dup_case(i);
+  }
+} return void;

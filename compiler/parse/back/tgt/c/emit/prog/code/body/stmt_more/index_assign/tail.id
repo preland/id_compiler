@@ -1,0 +1,22 @@
+
+// The last step of emit_iassign, and the dispatch hook that routes an
+// iassign node out of the statement chain.
+
+iassign4(int id, string ind, string val) {
+  string iset_code_v = iset_code(id, val);
+  emit_line(ind + iset_code_v);
+} return void;
+
+iset_code(int id, string val) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string ret_s = "id_list_set(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ", " + val + ");";
+} return string ret_s;
+
+es3b(int id, string ind) {
+  if(k_of(id) == "iassign") {
+    emit_iassign(id, ind);
+  } else {
+    es4(id, ind);
+  }
+} return void;

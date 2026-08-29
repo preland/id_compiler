@@ -1,0 +1,23 @@
+
+ll_lit(int v) {
+  string s = ir_s(v);
+  if(ll_isstr(v) == 1) {
+    s = "@.str" + v;
+  }
+} return string s;
+
+// A typed operand: `<ty> <value>`, the form LLVM wants nearly everywhere.
+ll_op(int v) {
+  string ll_vty_v = ll_vty(v);
+  string ret_s = ll_ty(ll_vty_v) + " " + ll_val(v);
+} return string ret_s;
+
+ll_args(int id) {
+  string s = "";
+  int i = 0;
+  while(i < ir_l_count(id)) {
+    int[] ir_l_v = ir_l(id);
+    s = s + ll_sep(i) + ll_op(ir_l_v[i]);
+    i = i + 1;
+  }
+} return string s;

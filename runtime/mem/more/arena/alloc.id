@@ -1,0 +1,41 @@
+// The arena: a bump pointer, and no way to give anything back.
+//
+// docs/SPEC.md 6 already says `alloc` is a bump pointer and that nothing is
+// released before the process exits. A kernel is the case where that stops
+// being a compromise -- there is no exit, so a free list would be the only
+// reclamation there is, and this runtime does not pretend to have one.
+//
+// The pointer lives in the first eight bytes of the arena rather than in an
+// exported global, because only a global's declaring function may assign it
+// and there is no function the runtime could hang that on. Reading zero there
+// means nobody has allocated yet.
+//
+// The next 144 bytes are the string-length memo (see ../../lm/). It lives
+// here for the same reason the pointer does, and it is reserved on the first
+// allocation rather than declared anywhere: a table at a known offset needs no
+// initialiser to be called, which matters because nothing in a freestanding
+// program is guaranteed to run before the first string is walked.
+
+arena_top(word a) {
+  word p = ld64(a);
+  if(p == 0) {
+    p = arena_open(a);
+  }
+} return word p;
+
+// First use: the memo is zeroed, because whatever the firmware left above the
+// kernel image would otherwise read as a remembered length for an address
+// nobody has ever handed out.
+arena_open(word a) {
+  lm_wipe(a + 8, 0);
+  word ret_w = a + 152;
+} return word ret_w;
+
+// Rounded with `&` rather than `%`: a mask is one instruction, while `%` is a
+// call back into this same runtime, and one that would run before the arena it
+// is being asked to extend exists.
+mem_alloc(word z) {
+  word a = heap_ptr();
+  word p = arena_top(a);
+  st64(a, p + ((z + 7) & 0xfffffffffffffff8));
+} return word p;

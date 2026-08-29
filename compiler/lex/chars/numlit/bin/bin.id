@@ -1,0 +1,28 @@
+// Binary literals, the mirror of the hex case: `id` lexes 0b1010 to the
+// *integer token* 10, so the spelling is gone before anything downstream sees
+// it and a bit pattern can be written the way a register diagram draws it.
+//
+// Digit values: 48 is '0' and 49 is '1'; the prefix letter is 98 ('b') or
+// 66 ('B').
+
+is_bin(int c) {
+  int ok = 0;
+  if(c == 48 || c == 49) {
+    ok = 1;
+  }
+} return int ok;
+
+// The trailing digit test is what keeps a bare `0` followed by an identifier
+// starting with b from being mistaken for a literal.
+bin_start(string src, int i) {
+  int ok = 0;
+  if(charat(src, i) == 48 && (charat(src, i + 1) == 98 || charat(src, i + 1) == 66) && is_bin_at(src, i + 2)) {
+    ok = 1;
+  }
+} return int ok;
+
+bin_end(string src, int i) {
+  while(is_bin_at(src, i)) {
+    i = i + 1;
+  }
+} return int i;

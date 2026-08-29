@@ -1,0 +1,13 @@
+// The tail of `list_pop`, once the length has been decremented: reading the
+// cell the length now points just past, which is the one just dropped.
+list_pop_at(word p) {
+  word ld64_v = ld64(p);
+  st64(p, ld64_v - 1);
+  word ret_w = list_pop_read(p);
+} return word ret_w;
+
+list_pop_read(word p) {
+  word addr = ld64(p + 16);
+  word count = ld64(p);
+  word ret_w = ld64(addr + count * 8);
+} return word ret_w;

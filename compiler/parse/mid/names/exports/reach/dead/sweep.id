@@ -1,0 +1,29 @@
+// One sweep, and the walk it is built on.
+//
+// The node store is in creation order and a function's own node is created
+// last of all its nodes, so the nodes of function `f` are exactly the range
+// from wherever the previous function ended through prog[f]. That gives every
+// node an owner without a lookup per node -- node_fn scans the whole program
+// list, which inside a sweep over every node would be quadratic.
+
+// Returns the set's size *before* the sweep, so reach_mark stops when a sweep
+// changes nothing.
+reach_pass() {
+  int n = len((import rfn));
+  reach_funcs(0, 0);
+} return int n;
+
+reach_funcs(int f, int lo) {
+  while(f < len((import prog))) {
+    lo = reach_func(f, lo);
+    f = f + 1;
+  }
+} return void;
+
+reach_func(int f, int lo) {
+  string s1_of_v = s1_of((import prog)[f]);
+  if(is_reach(s1_of_v) == 1) {
+    reach_range(lo, (import prog)[f]);
+  }
+  int ret_i = (import prog)[f] + 1;
+} return int ret_i;

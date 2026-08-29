@@ -1,0 +1,22 @@
+// An exported declaration is recorded; other statements may nest exports.
+
+exp_one(int id, string owner) {
+  if(is_export_decl(id)) {
+    add_export2(id, owner);
+  } else {
+    exp_nested(id, owner);
+  }
+} return void;
+
+is_export_decl(int id) {
+  int ok = 0;
+  if(k_of(id) == "decl" && i2_of(id) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+add_export(string name, string type, string owner) {
+  push((import enames), name);
+  push((import etypes), type);
+  push((import eowners), owner);
+} return void;

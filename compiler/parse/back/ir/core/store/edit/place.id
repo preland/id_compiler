@@ -1,0 +1,20 @@
+// Putting an instruction into a block, and taking one out again.
+//
+// Removal is a rewrite to `nop` rather than a splice: an instruction id is a
+// value id and every operand in the function is one of them, so renumbering the
+// store would invalidate the whole program. A `nop` prints as nothing and is
+// swept out by the compaction at the end of the pipeline.
+
+ir_add(int b, int id) {
+  push((import binsn)[b], id);
+  lset((import ihome), id, b);
+} return void;
+
+ir_kill(int id) {
+  ir_set_op(id, "nop");
+  ir_set_ty(id, "");
+} return void;
+
+ir_set_op(int id, string op) {
+  sset((import iop), id, op);
+} return void;

@@ -1,0 +1,32 @@
+// Where an empty list literal is allowed. idc.py hands an expected type down
+// one level, from four places only: a typed declaration, an assignment to a
+// known variable, the value of an index-assignment, and push's second
+// argument. The AST has no parent links, so the same question is asked
+// backwards -- does any node hand THIS node a list type? A whole-store scan
+// per literal is affordable because empty literals are rare and this only
+// runs once, at check time.
+
+arr_ok(int id) {
+  int i = 0;
+  int ok = 0;
+  while(i < len((import nkind))) {
+    ok = arr_ok_at(i, id, ok);
+    i = i + 1;
+  }
+} return int ok;
+
+arr_ok_at(int i, int id, int ok) {
+  int r = ok;
+  if(want_list(i, id) == 1) {
+    r = 1;
+  }
+} return int r;
+
+want_list(int i, int id) {
+  int ok = 0;
+  if(want_decl(i, id) == 1 || want_asg(i, id) == 1) {
+    ok = 1;
+  } else {
+    ok = want_elem(i, id);
+  }
+} return int ok;

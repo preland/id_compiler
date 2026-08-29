@@ -1,0 +1,27 @@
+// Message text is idc.py's, word for word, so the two compilers explain a
+// rejected program the same way.
+tc_err(int id, string msg) {
+  string loc = tc_loc(id);
+  print(loc + msg);
+  note_failure();
+} return void;
+
+// Which function a node belongs to. Nodes are created in source order and a
+// function's own node is created last of all of them, so the enclosing
+// function is the first entry of `prog` whose node id is not below this one.
+node_fn(int id) {
+  int i = 0;
+  string s = "";
+  while(i < len((import prog)) && s == "") {
+    s = fn_covers(i, id);
+    i = i + 1;
+  }
+} return string s;
+
+// The reporting location: which function a node belongs to, and which line
+// within it.
+tc_loc(int id) {
+  string node_fn_v = node_fn(id);
+  int tc_line_v = tc_line(id);
+  string loc = loc_at(node_fn_v, tc_line_v);
+} return string loc;

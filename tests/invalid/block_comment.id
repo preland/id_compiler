@@ -1,0 +1,8 @@
+// EXPECT: block comments are not supported
+// `id` has line comments and nothing else. Left undiagnosed the `/` and `*`
+// lex as operators and the words inside lex as identifiers, so one comment
+// became a page of complaints about names nobody wrote.
+main(int argc, string[] argv) {
+  /* not a comment in id */
+  print(1);
+} return int 0;

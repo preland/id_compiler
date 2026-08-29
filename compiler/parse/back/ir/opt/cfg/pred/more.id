@@ -1,0 +1,6 @@
+// One block's predecessor list, wiped before the rescan refills it.
+pred_clear_at(int f, int i) {
+  int[] irf_blk_v = irf_blk(f);
+  int[] blk_pre_v = blk_pre(irf_blk_v[i]);
+  pred_wipe(blk_pre_v);
+} return void;

@@ -1,0 +1,31 @@
+// Calling a variable. This is the last thing the registry can answer: a
+// called name that is no function of this program and no builtin, but *is*
+// somebody's variable, is a variable used as if it were a function -- which is
+// the one case idc.py singles out from "no such function".
+
+acc_callee(int id, string owner, int ln) {
+  if(k_of(id) == "call" && is_call_var(id)) {
+    string s1_of_v = s1_of(id);
+    report_call_var(s1_of_v, owner, ln);
+  }
+  acc_callee2(id, owner, ln);
+} return void;
+
+// Not a function of this program and not a builtin. The builtins whose return
+// type ../../../../../../types/type_of/ already knows are asked there rather than
+// listed again; the rest are the ones whose type it has never needed -- the
+// list mutators, and the terminal and clock calls, which are used for their
+// effect. Should that list ever fall behind idc.py's, it falls behind in the
+// safe direction: an unlisted builtin makes this check quieter, never louder.
+is_unknown_fn(string name) {
+  int ok = 0;
+  if(find_str((import fnames), name) < 0 && builtin_type(name) == "?" && name != "push" && name != "pop" && name != "put" && name != "flush" && name != "getkey" && name != "sleep_ms" && name != "ticks") {
+    ok = 1;
+  }
+} return int ok;
+
+report_call_var(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  print(loc_at_v + "'" + name + "' is a variable, not a function");
+  note_failure();
+} return void;

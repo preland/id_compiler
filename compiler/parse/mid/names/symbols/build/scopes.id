@@ -1,0 +1,41 @@
+// The naming and scope rules of `id`, checked on the parsed AST and on the
+// tables this directory already builds: a name keeps one type across a
+// compilation unit, an exported name is reserved across the whole program, and
+// a variable is private to the function that declares it unless it is exported
+// and read back with `import`.
+//
+// Nothing here looks below `mid/`. All three are properties of the language,
+// decided from `prog`, the node tables and the export table alone, so they
+// give the same answers whether the program is later emitted as C, as Python
+// or as LLVM IR.
+
+// What check_program() calls. Its own block is already full -- the chkfail
+// export plus check_funcs -- so every pass after the first chains from this
+// one call: types/'s check_rest() (the per-file rule and the type checks), then
+// the naming and scope rules below.
+check_scopes() {
+  check_rest();
+  check_names();
+  check_cases_maybe();
+} return void;
+
+// Two passes, in idc.py's order: register every declaration (reporting what
+// each one conflicts with), then resolve every name a function mentions
+// against what that function declared.
+check_names() {
+  init_reg();
+  build_reg();
+  check_access();
+} return void;
+
+// The declaration registry: one row per parameter and per declaration, in the
+// order idc.py's register_var sees them. Every question the three rules ask is
+// a scan of these five lists, so no other bookkeeping is needed.
+//   dvname  the declared name        dvfunc  the function that declares it
+//   dvtype  the type it was given    dvexp   1 when the declaration exports
+//   dvunit  the unit it was declared in (declared beside didx, in index/)
+init_reg() {
+  export string[] dvname = [];
+  export string[] dvfunc = [];
+  init_reg2();
+} return void;

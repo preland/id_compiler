@@ -1,0 +1,20 @@
+// while. Four blocks in the usual shape: a head that tests, a body that runs
+// and branches back to the head, and an exit. `id` has no break or continue,
+// so the head is the only place the loop is left.
+
+lw_while(int node) {
+  int lw_fn_v = lw_fn();
+  int hd = ir_block(lw_fn_v, "head");
+  lw_while_go(node, hd);
+} return void;
+
+lw_while_go(int node, int hd) {
+  lw_term("br", 0 - 1, [hd]);
+  lw_while2(node, hd);
+} return void;
+
+lw_while2(int node, int hd) {
+  int lw_fn_v = lw_fn();
+  int bdy = ir_block(lw_fn_v, "body");
+  lw_while_ex(node, hd, bdy);
+} return void;

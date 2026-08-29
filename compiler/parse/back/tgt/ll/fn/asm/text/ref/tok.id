@@ -1,0 +1,26 @@
+// `$` is literal in GCC's asm and special in LLVM's, and `%` is the other way
+// round -- so an AT&T immediate `$0` becomes `$$0`, an operand reference
+// `%[name]` becomes `$N`, and a literal percent `%%` becomes `%`.
+ll_asm_tok(int r, string s, int i) {
+  int c = charat(s, i);
+  string out = ll_asm_tok_sel(r, s, i, c);
+} return string out;
+
+ll_asm_ref(int r, string s, int i) {
+  string out = "%";
+  if(charat(s, i + 1) != 37) {
+    out = ll_asm_ref2(r, s, i);
+  }
+} return string out;
+
+// `%[name]` is operand N; `%x[name]` is operand N under LLVM's modifier x,
+// which is how a byte or word view of a register is asked for -- `%b[c]` for
+// the low byte of an operand, which is what an `out` instruction needs.
+ll_asm_ref2(int r, string s, int i) {
+  string nm = ll_asm_ref2_nm(s, i);
+  string out = "$" + ll_asm_ix(r, nm);
+  if(charat(s, i + 1) != 91) {
+    int charat_v = charat(s, i + 1);
+    out = "${" + ll_asm_ix(r, nm) + ":" + chr(charat_v) + "}";
+  }
+} return string out;

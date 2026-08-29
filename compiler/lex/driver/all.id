@@ -1,0 +1,8 @@
+// Reading the source and lexing it. Two statements, in their own function
+// because main already declares the line counter and prints the terminator,
+// and a block holds three actions.
+
+lex_all() {
+  string src = read_all();
+  lex(src);
+} return void;

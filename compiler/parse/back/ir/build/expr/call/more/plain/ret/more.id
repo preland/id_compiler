@@ -1,0 +1,18 @@
+// The rest of lw_plain, once the runtime symbol's own return type is known.
+lw_plain_mid(int node, string name, string h) {
+  string sys_helper_v = sys_helper(name);
+  int[] lw_bargs_v = lw_bargs(node);
+  int ret_i = lw_plain_tail(node, h, sys_helper_v, lw_bargs_v);
+} return int ret_i;
+
+lw_plain_tail(int node, string h, string helper, int[] args) {
+  int v = lw_callf(helper, h, args);
+  string lw_ety_v = lw_ety(node);
+  int ret_i = lw_conv(v, h, lw_ety_v);
+} return int ret_i;
+
+// The rest of lw_barg_val, once the argument is converted.
+lw_barg_push(int i, int[] vals, int v) {
+  push(vals, v);
+  int ret_i = i + 1;
+} return int ret_i;

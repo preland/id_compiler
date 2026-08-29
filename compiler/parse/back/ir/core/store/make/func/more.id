@@ -1,0 +1,8 @@
+// The new function's own index, once its name, parameters and node are
+// already in the store: it is recorded in `irprog`'s creation order, which
+// is the order the pipeline lowers and later emits every function in.
+ir_func4() {
+  int len_v = len((import fnname));
+  push((import irprog), len_v - 1);
+  int ret_i = len((import fnname)) - 1;
+} return int ret_i;

@@ -1,0 +1,26 @@
+// The body, then the return clause, then the entry block's branch into the
+// body -- appended last, after every alloca the lowering created.
+lw_fin(int node) {
+  int[] l1_of_v = l1_of(node);
+  lw_params(l1_of_v);
+  lw_fin_tail(node);
+} return void;
+
+// `id` has no return statement: the return clause is an expression after the
+// closing brace, so every function has exactly one exit and the lowering never
+// has to merge one.
+lw_ret(int node) {
+  int lw_ent_v = lw_ent();
+  int lw_brto_v = lw_brto((import lwbody)[0]);
+  lw_ret_tail(node, lw_ent_v, lw_brto_v);
+} return void;
+
+lw_ret_val(int node, string ret) {
+  if(i1_of(node) >= 0) {
+    int i1_of_v = i1_of(node);
+    int lw_as_v = lw_as(i1_of_v, ret);
+    lw_op("ret", ret, lw_as_v, 0 - 1, "");
+  } else {
+    lw_op("ret", "", 0 - 1, 0 - 1, "");
+  }
+} return void;

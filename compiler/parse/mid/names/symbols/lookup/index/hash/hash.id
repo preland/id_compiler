@@ -1,0 +1,25 @@
+// The usual polynomial string hash, kept inside 16 bits at every step so the
+// running value cannot overflow an int on the multiply.
+hash_loop(string s, int i, int hv) {
+  while(i < len(s)) {
+    int charat_v = charat(s, i);
+    hv = hash_step(hv, charat_v);
+    i = i + 1;
+  }
+} return int hv;
+
+hash_step(int hv, int c) {
+  int ret_i = (hv * 31 + c) % 65536;
+} return int ret_i;
+
+// find_str's answer, over one bucket instead of the whole table. Same
+// semantics -- the last match wins, and -1 means no match -- so a caller can
+// be switched to it without anything else changing.
+find_ix(string[] names, int[] bucket, string name) {
+  int i = 0;
+  int found = 0 - 1;
+  while(i < len(bucket)) {
+    found = ix_hit(names, bucket, i, name, found);
+    i = i + 1;
+  }
+} return int found;

@@ -1,0 +1,41 @@
+// decimal number, or hand off
+scan_decop(string src, int i) {
+  int ni = 0;
+  if(is_digit_at(src, i)) {
+    ni = scan_number(src, i);
+  } else {
+    ni = scan_strop(src, i);
+  }
+} return int ni;
+
+// A `#<word> <rest>` marker, injected into the stream by the driver. `id` has
+// no filesystem access and the pipeline hands idparse one concatenated stream,
+// so anything the compiler needs to know that is NOT in the source arrives
+// this way. Two exist:
+//
+//   #file N|PATH             where one source file ends and the next begins,
+//                            which the 3-functions-per-file rule needs and
+//                            which a diagnostic needs to name a file at all
+//   #const TYPE name = ...;  a constant from conf.id, which has no declaring
+//                            function because it needs no initialiser
+//
+// A `#` cannot begin an id token otherwise, so nothing legal is shadowed.
+scan_hashop(string src, int i) {
+  int ni = 0;
+  if(charat(src, i) == 35) {
+    ni = scan_hash(src, i);
+  } else {
+    ni = scan_token(src, i);
+  }
+} return int ni;
+
+// The marker word is not parsed here: dropping the `#` and passing the rest of
+// the line through is enough, and it means a third marker needs no change to
+// the lexer at all. `#file 0|a.id` emits `file 0|a.id` -- character for
+// character what slicing past a hard-coded "#file " used to produce, which is
+// what keeps this change invisible to byte-parity.
+scan_hash(string src, int i) {
+  int e = skip_comment(src, i);
+  scan_hash_out(src, i, e);
+  lset((import lexline), 0, 0);
+} return int e;

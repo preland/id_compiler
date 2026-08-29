@@ -1,0 +1,26 @@
+// A zero of a type, for a global with no initialiser.
+ll_zero(string t) {
+  string s = "0";
+  if(ty_kind(t) == "float") {
+    s = "0.0";
+  } else if(ty_num(t) == 0) {
+    s = "null";
+  }
+} return string s;
+
+// String literals become private globals, emitted after the functions that
+// use them -- an LLVM module has no ordering rule, so nothing has to be
+// collected before the bodies are printed.
+ll_strs() {
+  int i = 0;
+  while(i < len((import iop))) {
+    ll_str_at(i);
+    i = i + 1;
+  }
+} return void;
+
+ll_str_at(int i) {
+  if(ll_isstr(i) == 1) {
+    ll_str_emit(i);
+  }
+} return void;

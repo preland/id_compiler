@@ -1,0 +1,34 @@
+// Token scanners. Each advances its index parameter inside the loop (so no
+// separate cursor declaration is needed) and prints one token. The caller uses
+// the returned index to continue. Pattern: decl(buffer) + while + print = the
+// full 3-action budget.
+
+scan_ident(string src, int i) {
+  string ident = "";
+  while(is_alnum_at(src, i)) {
+    int charat_v = charat(src, i);
+    ident = ident + chr(charat_v);
+    i = i + 1;
+  }
+  scan_ident_out(ident);
+} return int i;
+
+// An integer digit run, optionally extended with a '.' + fraction digits
+// (see chars/numlit): num_end finds where the number ends and numkind picks
+// "int" or "float" for the printed token; the text is sliced verbatim from
+// the source, matching idc.py's float/int lexing exactly.
+scan_number(string src, int i) {
+  int e = digit_run_end(src, i);
+  int fe = num_end(src, i, e);
+  scan_num_out(src, i, e, fe);
+} return int fe;
+
+// Caller passes the index of the first char *after* the opening quote, so the
+// opening quote is already skipped; we return the index past the closing one.
+// Backslash escapes are honored (see str_end), so a `\"` does not end the
+// string early; the raw spelling is preserved in the token text.
+scan_string(string src, int i) {
+  int e = str_end(src, i);
+  scan_str_out(src, i, e);
+  int ret_i = e + 1;
+} return int ret_i;

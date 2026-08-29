@@ -1,0 +1,20 @@
+// Remaining exported state: the second string field, the two child-list
+// fields, the top-level program list, and the symbol tables for the type pass.
+
+init_rest() {
+  init_c();
+  init_d();
+  init_sym();
+} return void;
+
+init_c() {
+  export string[] ns2 = [];
+  export int[][] nl1 = [];
+  export int[][] nl2 = [];
+} return void;
+
+init_d() {
+  export int[] prog = [];
+  export string[] vnames = [];
+  export string[] vtypes = [];
+} return void;

@@ -1,0 +1,9 @@
+
+lw_unbox2(int v, string t) {
+  int r = 0 - 1;
+  if(t == "float") {
+    r = lw_callf("id_unbox_f", "float", [v]);
+  } else {
+    r = lw_conv(v, "word", t);
+  }
+} return int r;

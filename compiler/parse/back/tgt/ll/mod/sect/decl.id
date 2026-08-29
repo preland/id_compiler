@@ -1,0 +1,28 @@
+// The runtime symbols the module calls. They are declarations, never
+// definitions: a hosted build links the C runtime that defines them and a
+// freestanding one links a runtime written in `id`, and the module is the same
+// either way -- unless this module IS the runtime, in which case it defines
+// them, and a declaration beside a definition of one symbol is not something
+// LLVM accepts.
+ll_declares() {
+  if(is_runtime() == 0) {
+    ll_decl_block();
+  }
+} return void;
+
+// One line is not in the block above, because it is the only symbol whose
+// *name* depends on the build: string comparison is libc's strcmp hosted and
+// the runtime's own id_strcmp freestanding (see lw_strcmp). Declaring both
+// unconditionally would work -- an unused declaration is legal -- but a module
+// that declares a libc symbol it cannot link is exactly the confusion this
+// target exists to avoid.
+ll_decl_block() {
+  ll_decl_cmp();
+  emit_line("declare ptr @id_list_new()\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)");
+  emit_line("");
+} return void;
+
+ll_decl_cmp() {
+  string lw_strcmp_v = lw_strcmp();
+  emit_line("declare i32 @" + lw_strcmp_v + "(ptr, ptr)");
+} return void;

@@ -1,0 +1,24 @@
+// Raw memory, and the two reinterpretations between an address and a string.
+//
+// These are the runtime's floor. Everything else in `runtime/` is ordinary
+// `id`; below this there is no `id` left to write, because a load from an
+// address the language has no name for is an instruction and nothing else.
+// `asm` is how the language reaches an instruction (docs/ASM.md), and the four
+// here are one instruction each.
+
+asm "x86_64-unknown-none" ld8(word a) {
+  "movzbq (%[a]), %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" st8(word a, word v) {
+  "movb %b[v], (%[a])"
+  "xorq %[ret], %[ret]"
+} return word ret;
+
+// A string is the address of its bytes; a `word` is that address as a number.
+// Neither instruction does anything -- they exist because `id` has no cast,
+// and giving it one for this pair only would be a language change to serve a
+// runtime detail.
+asm "x86_64-unknown-none" s2w(string s) {
+  "movq %[s], %[ret]"
+} return word ret;

@@ -1,0 +1,30 @@
+// The rest of the dispatch, and the `void[]` rule.
+
+tc_g3(int id) {
+  if(k_of(id) == "bin") {
+    chk_bin(id);
+  }
+  if(k_of(id) == "call") {
+    chk_call(id);
+  }
+  tc_g4(id);
+} return void;
+
+// idc.py rejects `void[]` in parse_type, so it applies to every written type:
+// a parameter's, a declaration's, and a return type. Those live in the string
+// fields of three different node kinds (param and decl in ns1, func's return
+// type in ns2), so both string fields of every node are asked instead of
+// three kinds being enumerated. Nothing else can be mistaken for it: an
+// identifier cannot contain a bracket, and a string literal's text still
+// carries its quotes.
+chk_voidarr(int id) {
+  string s1_of_v = s1_of(id);
+  string s2_of_v = s2_of(id);
+  void_arr_pair(id, s1_of_v, s2_of_v);
+} return void;
+
+void_arr_type(int id, string t) {
+  if(ty_is_list(t) == 1 && ty_base(t) == "void") {
+    tc_err(id, "'void[]' is not a valid type");
+  }
+} return void;

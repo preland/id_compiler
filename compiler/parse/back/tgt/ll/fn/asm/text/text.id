@@ -1,0 +1,28 @@
+// The instruction lines, joined with a newline and a tab, translated from the
+// operand syntax `id` writes to the one LLVM IR reads.
+
+ll_asm_text(int r) {
+  string out = "";
+  int i = 0;
+  while(i < len((import aflines)[r])) {
+    out = out + ll_asm_sep(i) + ll_asm_line(r, (import aflines)[r][i]);
+    i = i + 1;
+  }
+} return string out;
+
+ll_asm_sep(int i) {
+  string s = "";
+  if(i > 0) {
+    s = "\\0A\\09";
+  }
+} return string s;
+
+// A line arrives with its quotes, so the scan runs between them.
+ll_asm_line(int r, string s) {
+  string out = "";
+  int i = 1;
+  while(i < len(s) - 1) {
+    out = out + ll_asm_tok(r, s, i);
+    i = ll_asm_step(s, i);
+  }
+} return string out;

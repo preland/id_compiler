@@ -1,0 +1,25 @@
+// The shift level -- the tightest of the bitwise group, just above additive.
+// Two operators share it, so the fold carries the operator text like the
+// additive and multiplicative levels do.
+
+parse_shift(int[] pos) {
+  int left = parse_add(pos);
+  while(shiftop_at(pos)) {
+    left = fold_shift(pos, left);
+  }
+} return int left;
+
+fold_shift(int[] pos, int left) {
+  string op = cur_text(pos);
+  advance(pos);
+  int ret_i = fold_shift_tail(pos, left, op);
+} return int ret_i;
+
+// `>>` is the arithmetic (sign-propagating) shift; the logical one is the
+// `ushr` builtin.
+is_shiftop(string s) {
+  int ok = 0;
+  if(s == "<<" || s == ">>") {
+    ok = 1;
+  }
+} return int ok;

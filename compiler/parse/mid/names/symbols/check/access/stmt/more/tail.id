@@ -1,0 +1,20 @@
+// The parts of acc_func, acc_if and acc_while moved out so each of those
+// blocks stays within the action limit. Grouped here by that shared reason
+// rather than split across their callers' files, all three of which were
+// already at the 3-function limit.
+
+acc_func_body(int[] l2_of_v, string s1_of_v, int id) {
+  acc_list(l2_of_v, s1_of_v);
+  acc_ret(id);
+} return void;
+
+acc_if_body(int id, string owner) {
+  int[] l1_of_v = l1_of(id);
+  acc_list(l1_of_v, owner);
+  acc_if_else(id, owner);
+} return void;
+
+acc_if_else(int id, string owner) {
+  int[] l2_of_v = l2_of(id);
+  acc_list(l2_of_v, owner);
+} return void;

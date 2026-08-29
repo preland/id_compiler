@@ -1,0 +1,21 @@
+
+file_hit(int i, string name) {
+  int n = 0;
+  if((import pfile)[i] == name) {
+    n = 1;
+  }
+} return int n;
+
+first_of_file(int i) {
+  int n = 0;
+  int r = 1;
+  while(n < i) {
+    r = r - file_hit(n, (import pfile)[i]);
+    n = n + 1;
+  }
+} return int r;
+
+report_funcs(string name, int n) {
+  note_failure();
+  print(name + ":1: error: too many functions in this file (" + n + "); the limit is 3 per file");
+} return void;

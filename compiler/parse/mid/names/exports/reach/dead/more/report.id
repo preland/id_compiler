@@ -1,0 +1,24 @@
+// A read of an exported name whose owner is not reachable. Reached only from
+// the final sweep, which already established that the reading function is.
+chk_import_at(int id) {
+  string s1_of_v = s1_of(id);
+  if(find_str((import enames), s1_of_v) >= 0 && is_reach_owner(id) == 0) {
+    dead_err(id);
+  }
+} return void;
+
+// Whether the function that owns the export id reads is reachable. Named so
+// the call in chk_import_at's condition is not itself an argument to is_reach.
+is_reach_owner(int id) {
+  string s1_of_v = s1_of(id);
+  string export_owner_v = export_owner(s1_of_v);
+  int ok = is_reach(export_owner_v);
+} return int ok;
+
+// s1_of(id) and export_owner(s1_of_v) are read once and reused: nothing
+// between the reads changes the node store or the export table.
+dead_err(int id) {
+  string s1_of_v = s1_of(id);
+  string export_owner_v = export_owner(s1_of_v);
+  tc_err(id, "'" + s1_of_v + "' is exported by '" + export_owner_v + "', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call '" + export_owner_v + "' from main's setup chain");
+} return void;

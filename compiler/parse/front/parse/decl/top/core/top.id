@@ -1,0 +1,24 @@
+// Top level is a marker the driver injected -- a file boundary or a conf.id
+// constant -- or an ordinary declaration.
+parse_top(int[] pos) {
+  if(cur_kind(pos) == "file") {
+    take_file(pos);
+  } else if(cur_kind(pos) == "const") {
+    take_const(pos);
+  } else {
+    parse_decl_top(pos);
+  }
+} return void;
+
+// asm "triple" name(params) { "insn" ... } return TYPE name;
+parse_asm(int[] pos) {
+  advance(pos);
+  string cur_text_v = cur_text(pos);
+  int ret_i = parse_asm_mid(pos, cur_text_v);
+} return int ret_i;
+
+asm_sig(int[] pos) {
+  string cur_text_v = cur_text(pos);
+  push((import afname), cur_text_v);
+  int ret_i = asm_sig_mid(pos);
+} return int ret_i;

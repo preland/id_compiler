@@ -1,0 +1,31 @@
+// Expression lowering. Every stage tests the kind first and recurses only in
+// its else arm: the C emitter's chain computes its fallback eagerly and throws
+// it away, which costs nothing when the result is a string and would leave
+// real instructions in a real block here.
+
+lw_expr(int node) {
+  int v = 0 - 1;
+  if(k_of(node) == "var" || k_of(node) == "import") {
+    v = lw_name(node);
+  } else {
+    v = le2(node);
+  }
+} return int v;
+
+le2(int node) {
+  int v = 0 - 1;
+  if(k_of(node) == "int" || k_of(node) == "float" || k_of(node) == "str") {
+    v = lw_lit(node);
+  } else {
+    v = le3(node);
+  }
+} return int v;
+
+le3(int node) {
+  int v = 0 - 1;
+  if(k_of(node) == "bin") {
+    v = lw_bin(node);
+  } else {
+    v = le4(node);
+  }
+} return int v;

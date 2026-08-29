@@ -1,0 +1,31 @@
+// The four things a declaration can conflict with, tested in idc.py's order.
+// The order is itself part of the contract: a name that is both a function's
+// name and a repeat inside its own function is reported as the function-name
+// clash, because that is the one idc.py reaches first, and a program corrected
+// against one compiler must not then be told something different by the other.
+
+reg_report(string name, string type, string owner, int exported, int ln, int unit) {
+  if(find_str((import fnames), name) >= 0) {
+    report_var_is_func(name, owner, ln);
+  } else {
+    reg_report2(name, type, owner, exported, ln, unit);
+  }
+} return void;
+
+reg_report2(string name, string type, string owner, int exported, int ln, int unit) {
+  if(declared_in(name, owner) > 0) {
+    report_var_twice(name, owner, ln);
+  } else {
+    reg_report3(name, type, owner, exported, ln, unit);
+  }
+} return void;
+
+// The `export` declaration is the one that claims the name, so it is exempt;
+// every other declaration of it is the reuse the rule forbids.
+reg_report3(string name, string type, string owner, int exported, int ln, int unit) {
+  if(exported == 0 && find_str((import enames), name) >= 0) {
+    report_var_exported(name, owner, ln);
+  } else {
+    reg_report4(name, type, owner, exported, ln, unit);
+  }
+} return void;

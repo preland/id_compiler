@@ -1,0 +1,22 @@
+// `name = ...` is an assignment; anything else starting here is an expression
+// statement. `cur2_text` looks one token ahead.
+
+is_assign(int[] pos) {
+  int ok = 0;
+  if(cur_kind(pos) == "ident" && cur2_text(pos) == "=") {
+    ok = 1;
+  }
+} return int ok;
+
+cur2_text(int[] pos) {
+  string s = "";
+  if(pos[0] + 1 < len((import ttext))) {
+    s = (import ttext)[pos[0] + 1];
+  }
+} return string s;
+
+skip_semi(int[] pos) {
+  if(cur_text(pos) == ";") {
+    advance(pos);
+  }
+} return void;

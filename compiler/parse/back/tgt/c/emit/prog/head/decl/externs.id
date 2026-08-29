@@ -1,0 +1,30 @@
+// The `/* functions not defined in any input file */` block, and the one
+// declaration line per name inside it.
+//
+// The block's text and its position -- after the runtime prelude, before the
+// forward declarations -- are idc.py's, so a backend program's C is identical
+// under both compilers.
+//
+// Recording an unresolved name is a different question and stays in mid/:
+// note_extern answers "is this name resolvable", which is a property of the
+// program. Only the C these names turn into lives here.
+
+emit_externs() {
+  if(len((import xnames)) > 0) {
+    emit_extern_block();
+  }
+} return void;
+
+emit_extern_block() {
+  emit_line("/* functions not defined in any input file (resolved at link time) */");
+  emit_extern_lines();
+  emit_line("");
+} return void;
+
+emit_extern_lines() {
+  int i = 0;
+  while(i < len((import xnames))) {
+    emit_line("extern int id_" + (import xnames)[i] + "();");
+    i = i + 1;
+  }
+} return void;

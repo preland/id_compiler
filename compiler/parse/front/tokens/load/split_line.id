@@ -1,0 +1,23 @@
+// Line helpers.
+
+line_end(string src, int i) {
+  while(charat(src, i) != 10 && charat(src, i) != -1) {
+    i = i + 1;
+  }
+} return int i;
+
+// the line src[i..e) becomes a token: kind before the first space, text after
+proc_line(string src, int i, int e) {
+  int sp = find_space(src, i, e);
+  if(i < e) {
+    string slice_v = slice(src, i, sp);
+    string slice_v2 = slice(src, sp + 1, e);
+    push_tok(slice_v, slice_v2);
+  }
+} return void;
+
+find_space(string src, int i, int e) {
+  while(i < e && charat(src, i) != 32) {
+    i = i + 1;
+  }
+} return int i;

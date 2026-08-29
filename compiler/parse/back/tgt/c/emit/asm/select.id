@@ -1,0 +1,28 @@
+// Platform selection for asm functions, and the diagnostic when a target has
+// no body. See ../../../../../docs/ASM.md.
+//
+// Selection is exact string equality on the triple. There is deliberately no
+// wildcard and no generic fallback: a program that builds everywhere and is
+// wrong somewhere is the failure mode inline assembly is most known for, and
+// refusing to build is the feature.
+
+asm_count() {
+  int ret_i = len((import afname));
+} return int ret_i;
+
+// Row of the body for `name` on `triple`, or -1.
+asm_row(string name, string triple) {
+  int i = 0;
+  int found = 0 - 1;
+  while(i < asm_count()) {
+    found = asm_match(i, name, triple, found);
+    i = i + 1;
+  }
+} return int found;
+
+asm_match(int i, string name, string triple, int found) {
+  int r = found;
+  if((import afname)[i] == name && (import aftriple)[i] == triple) {
+    r = i;
+  }
+} return int r;

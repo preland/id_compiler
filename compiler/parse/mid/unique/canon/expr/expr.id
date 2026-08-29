@@ -1,0 +1,54 @@
+// Canonicalising an expression, mirroring idc.py's _canon_expr.
+//
+// The canonical string of a function is what decides whether two functions are
+// the same function written twice: they collide when their canonical strings
+// are equal. So everything that makes two functions genuinely differ has to
+// survive into the string verbatim -- operators, literals, the names of called
+// functions, of imported globals and of exported variables -- while everything
+// that is only a matter of spelling, namely the function's own parameters and
+// locals, is replaced by the position at which the name was first met (see
+// cn() in ../func/names.id).
+//
+// Nothing here reads a type or asks anything of a backend: the canonical form
+// is a property of the parsed program, so the rule means the same thing
+// whether the program is later emitted as C, as Python or as LLVM IR.
+//
+// The dispatch is an eager chain -- each link asks the next for a default and
+// then overrides it for the two kinds it owns. Only the link that recognises
+// the node descends into children, so a node still costs one walk of the
+// chain and no more.
+
+canon_expr(int id) {
+  string out = ce2(id);
+  if(k_of(id) == "int") {
+    out = "I" + s1_of(id);
+  }
+  if(k_of(id) == "float") {
+    out = "F" + s1_of(id);
+  }
+} return string out;
+
+// A literal is kept exactly as it was written, which is why `1` and `0x1` are
+// two different functions: ns1 holds the spelling, not the value.
+ce2(int id) {
+  string out = ce3(id);
+  if(k_of(id) == "str") {
+    out = "S" + s1_of(id);
+  }
+  if(k_of(id) == "var") {
+    string s1_of_v = s1_of(id);
+    out = "v" + cn(s1_of_v);
+  }
+} return string out;
+
+// An imported global keeps its name: two functions that differ only by which
+// global they read are different functions.
+ce3(int id) {
+  string out = ce4(id);
+  if(k_of(id) == "import") {
+    out = "g(" + s1_of(id) + ")";
+  }
+  if(k_of(id) == "bin") {
+    out = canon_bin(id);
+  }
+} return string out;

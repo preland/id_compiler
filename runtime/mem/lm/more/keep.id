@@ -1,0 +1,12 @@
+// The rest of what `lm_keep` writes: the length half of the pair, and the
+// cursor advanced past the slot just filled.
+lm_keep_len(int at, int n) {
+  word lm_base_v2 = lm_base();
+  st64(lm_base_v2 + at * 16 + 8, n);
+} return void;
+
+lm_keep_next(int at) {
+  word lm_base_v3 = lm_base();
+  int lm_next_v = lm_next(at);
+  st64(lm_base_v3 + 128, lm_next_v);
+} return void;

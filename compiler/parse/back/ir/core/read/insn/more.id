@@ -1,0 +1,12 @@
+
+ir_b(int id) {
+  int ret_i = (import ib)[id];
+} return int ret_i;
+
+ir_s(int id) {
+  string ret_s = (import istr)[id];
+} return string ret_s;
+
+ir_l(int id) {
+  int[] ret_li = (import ilist)[id];
+} return int[] ret_li;

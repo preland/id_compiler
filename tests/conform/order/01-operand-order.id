@@ -1,0 +1,14 @@
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string s = "a=" + bump(c) + " b=" + bump(c);
+  print(s);
+} return int 0;
+
+bump(int[] c) {
+  lset(c, 0, c[0] + 1);
+  int ret_i = c[0];
+} return int ret_i;
+
+lset(int[] xs, int i, int v) {
+  xs[i] = v;
+} return void;

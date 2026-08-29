@@ -1,0 +1,24 @@
+// What each comparison family accepts, and the knownness guard they share.
+// The guard is a parameter rather than a call so the two families differ only
+// in the rule they pass in.
+
+cmp_bad(string lt, string rt, int okk) {
+  int ok = 0;
+  if(ty_pair_known(lt, rt) == 1 && okk == 0) {
+    ok = 1;
+  }
+} return int ok;
+
+eq_ok(string lt, string rt) {
+  int ok = 0;
+  if(lt == "string" && rt == "string" || ty_num(lt) == 1 && ty_num(rt) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+ord_ok(string lt, string rt) {
+  int ok = 0;
+  if(ty_num(lt) == 1 && ty_num(rt) == 1) {
+    ok = 1;
+  }
+} return int ok;

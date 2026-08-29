@@ -1,0 +1,26 @@
+// Emission happens only if every check passed.
+//
+// The prune is here, between the last check and the first line of output, and
+// that position is the contract: every rule of the language has been checked
+// over every function by now, so throwing the unreachable ones away cannot
+// stop anything from being checked. See dce.id.
+guarded_emit(int argc, string[] argv) {
+  if(check_failed() == 0) {
+    guarded_prune();
+    init_tyc();
+    emit(argc, argv);
+  }
+} return void;
+
+// A freestanding object keeps every function, exactly as a project with no
+// main does, and for the same reason: it is not the whole program. Something
+// outside it -- a boot stub, an interrupt vector, another object -- may be the
+// only caller, and reachability from `main` cannot see that. It saw it wrongly
+// once: the kernel's fault handler is called from the interrupt stubs and
+// nothing else, so it was pruned and the link failed on a symbol the program
+// obviously needed. Deciding what is live across a link is the linker's job.
+guarded_prune() {
+  if(is_freestanding() == 0) {
+    dce_prune();
+  }
+} return void;

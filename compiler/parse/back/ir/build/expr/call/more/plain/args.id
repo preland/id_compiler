@@ -1,0 +1,24 @@
+
+lw_bargs(int node) {
+  int[] vals = [];
+  int i = 0;
+  while(lw_args_more(node, i)) {
+    i = lw_barg_at(node, i, vals);
+  }
+} return int[] vals;
+
+lw_barg_at(int node, int i, int[] vals) {
+  int[] l1_of_v = l1_of(node);
+  string s1_of_v = s1_of(node);
+  int ret_i = lw_barg_val(i, vals, l1_of_v, s1_of_v);
+} return int ret_i;
+
+// The type a builtin's i-th argument reaches its runtime helper as. "" means
+// the helper takes it as written -- print and put convert their own operand,
+// and push's element is judged against the list.
+lw_bpty(string name, int i, int node) {
+  string t = lw_bpty2(name, i);
+  if(t == "") {
+    t = lw_ety(node);
+  }
+} return string t;

@@ -1,0 +1,22 @@
+// The last step of canon_iassign, and the "if" arm of cst3, split so each of
+// those blocks stays within the action limit. Grouped together because
+// decl_tail.id, stmt.id and block.id were already at the 3-function limit
+// once these existed.
+
+iassign_val(int id, string head, string key) {
+  int[] l1_of_v = l1_of(id);
+  string val = canon_expr(l1_of_v[0]);
+  string ret_s = "ia:" + head + "[" + key + "]=" + val;
+} return string ret_s;
+
+cst_if(int id) {
+  int i1_of_v = i1_of(id);
+  int[] l1_of_v = l1_of(id);
+  string ret_s = cst_if_tail(id, i1_of_v, l1_of_v);
+} return string ret_s;
+
+cst_if_tail(int id, int i1_of_v, int[] l1_of_v) {
+  int[] l2_of_v = l2_of(id);
+  int i2_of_v = i2_of(id);
+  string out = "if(" + canon_expr(i1_of_v) + "){" + canon_body(l1_of_v) + "}" + canon_else2(l2_of_v, i2_of_v);
+} return string out;

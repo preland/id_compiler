@@ -1,0 +1,12 @@
+// The base and index types an indexing operation reads twice over (once to
+// check the base, once to check the index).
+
+base_type(int id) {
+  int i1_of_v = i1_of(id);
+  string bt = type_of(i1_of_v);
+} return string bt;
+
+index_type(int id) {
+  int i2_of_v = i2_of(id);
+  string it = type_of(i2_of_v);
+} return string it;

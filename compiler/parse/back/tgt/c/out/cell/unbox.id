@@ -1,0 +1,23 @@
+// Reading a list cell back as its element type, mirroring idc.py's unbox():
+// int narrows, string/list cast back through intptr_t, float is bit-copied.
+
+unbox(string code, string type) {
+  string s = unbox2(code, type);
+  if(type == "int") {
+    s = "(int)(" + code + ")";
+  }
+} return string s;
+
+unbox2(string code, string type) {
+  string s = unbox3(code, type);
+  if(type == "string") {
+    s = "(char*)(intptr_t)(" + code + ")";
+  }
+} return string s;
+
+unbox3(string code, string type) {
+  string s = unbox4(code, type);
+  if(type == "float") {
+    s = "id_unbox_f(" + code + ")";
+  }
+} return string s;

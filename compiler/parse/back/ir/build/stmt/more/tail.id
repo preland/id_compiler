@@ -1,0 +1,25 @@
+
+ls3(int node) {
+  if(k_of(node) == "exprstmt") {
+    int i1_of_v = i1_of(node);
+    lw_expr(i1_of_v);
+  } else {
+    ls4(node);
+  }
+} return void;
+
+ls4(int node) {
+  if(k_of(node) == "iassign") {
+    lw_iassign(node);
+  } else {
+    ls5(node);
+  }
+} return void;
+
+ls5(int node) {
+  if(k_of(node) == "if") {
+    lw_if(node);
+  } else {
+    lw_while(node);
+  }
+} return void;

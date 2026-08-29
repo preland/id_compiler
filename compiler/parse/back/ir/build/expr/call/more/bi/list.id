@@ -1,0 +1,24 @@
+
+lb_b4(int node) {
+  int v = 0 - 1;
+  if(s1_of(node) == "pop") {
+    v = lw_pop(node);
+  } else {
+    v = lw_plain(node);
+  }
+} return int v;
+
+// `len` is two different runtime calls: a string knows its own length and a
+// list keeps a count.
+lw_len(int node) {
+  int[] l1_of_v = l1_of(node);
+  string t = lw_ety(l1_of_v[0]);
+  int ret_i = lw_len_tail(l1_of_v, t);
+} return int ret_i;
+
+lw_lenfn(string t) {
+  string s = "id_list_len";
+  if(t == "string") {
+    s = "id_len";
+  }
+} return string s;

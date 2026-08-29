@@ -1,0 +1,26 @@
+// Every declaration in the body gets its slot before any statement is lowered.
+// `id` is function-scoped -- a variable declared inside a branch may be read
+// after it, or before it -- so binding names as the lowering reaches them
+// would leave an earlier read resolving to nothing. This mirrors the C
+// target's hoist, for the same reason.
+
+lw_locals(int node) {
+  int[] l2_of_v = l2_of(node);
+  lw_loc_list(l2_of_v);
+} return void;
+
+lw_loc_list(int[] stmts) {
+  int i = 0;
+  while(i < len(stmts)) {
+    lw_loc_one(stmts[i]);
+    i = i + 1;
+  }
+} return void;
+
+lw_loc_one(int node) {
+  if(k_of(node) == "decl") {
+    lw_loc_decl(node);
+  } else {
+    lw_loc_nest(node);
+  }
+} return void;

@@ -1,0 +1,26 @@
+// The parameter's declared type, for the bad-store test and reused as the
+// "expects" half of the mismatch message.
+param_type(int fn, int i) {
+  int[] ps = l1_of(fn);
+  string t = s1_of(ps[i]);
+} return string t;
+
+chk_arg_typecheck(int id, int fn, int i, int a) {
+  string pt = param_type(fn, i);
+  if(bad_store(pt, a) == 1) {
+    string type_of_v = type_of(a);
+    arg_err(id, fn, i, type_of_v);
+  } else {
+    string type_of_v2 = type_of(a);
+    chk_narrow(id, fn, i, type_of_v2);
+  }
+} return void;
+
+// The parameter node holds its type in the first string field and its name in
+// the second, so the message can say which parameter, by name, rather than by
+// position.
+arg_err(int id, int fn, int i, string t) {
+  int argnode = l1_of(id)[i];
+  string msg = arg_err_msg(id, fn, i, t);
+  tc_err(argnode, msg);
+} return void;

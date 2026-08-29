@@ -1,0 +1,12 @@
+// The rest of lw_push, once the pushed list's element type is known.
+lw_push_tail(int node, int[] args, string ety) {
+  string elem = elem_type(ety);
+  int a = lw_expr(args[0]);
+  int ret_i = lw_push2(node, a, elem);
+} return int ret_i;
+
+// The rest of lw_push2, once the value to push is converted.
+lw_push2_tail(int a, int v, string elem) {
+  int lw_box_v = lw_box(v, elem);
+  int ret_i = lw_callf("id_list_push", "", [a, lw_box_v]);
+} return int ret_i;

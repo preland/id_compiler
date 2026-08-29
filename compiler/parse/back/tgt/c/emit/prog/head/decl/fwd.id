@@ -1,0 +1,7 @@
+// The forward-declaration section header and the blank line after it.
+
+emit_fwds() {
+  emit_line("/* forward declarations */");
+  fwd_all();
+  emit_line("");
+} return void;

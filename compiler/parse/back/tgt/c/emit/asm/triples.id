@@ -1,0 +1,23 @@
+// Every triple this name is defined for, for the error message.
+asm_triples(string name) {
+  string out = "";
+  int i = 0;
+  while(i < asm_count()) {
+    out = out + asm_tsep(i, name, out);
+    i = i + 1;
+  }
+} return string out;
+
+asm_tsep(int i, string name, string out) {
+  string s = "";
+  if((import afname)[i] == name) {
+    s = asm_comma(out) + (import aftriple)[i];
+  }
+} return string s;
+
+asm_comma(string out) {
+  string s = ", ";
+  if(len(out) == 0) {
+    s = "";
+  }
+} return string s;

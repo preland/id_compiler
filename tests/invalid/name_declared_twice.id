@@ -1,0 +1,6 @@
+// EXPECT: declared twice in function
+// within a single function a name is still one variable
+main() {
+  int x = 1;
+  int x = 2;
+} return int 0;

@@ -1,0 +1,7 @@
+// The high-water mark, as an address rather than as a count of bytes used --
+// the store here *is* the machine's memory, so the mark and the first address
+// past the last allocation are the same number.
+mem_size() {
+  word heap_ptr_v = heap_ptr();
+  word ret_w = arena_top(heap_ptr_v);
+} return word ret_w;

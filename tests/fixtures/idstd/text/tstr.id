@@ -1,0 +1,5 @@
+// A string helper, to prove the stdlib is more than one file and that a
+// nested directory is reached.
+tstr_twice(string s) {
+  string t = s + s;
+} return string t;

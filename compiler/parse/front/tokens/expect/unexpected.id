@@ -1,0 +1,30 @@
+// An operator where an expression belongs.
+//
+// The atom parser's last resort is "whatever text is here is a name", which
+// for an operator token manufactures a variable called `/` -- and the first
+// complaint anyone sees is the access pass reporting an undefined variable
+// with a punctuation mark for a name, three times, for one mistake. An
+// operator is never a name, so it is reported here, once, as what it is.
+
+no_op_atom(int[] pos) {
+  if(cur_kind(pos) == "op") {
+    string cur_text_v = cur_text(pos);
+    string unexpected_msg_v = unexpected_msg(cur_text_v);
+    syn_err(pos, unexpected_msg_v);
+  }
+} return void;
+
+// The lexer folds a whole `/* ... */` into one `/*` token precisely so this
+// can say what the mistake actually was.
+unexpected_msg(string t) {
+  string s = "unexpected token '" + t + "'";
+  if(t == "/*") {
+    s = "block comments are not supported; use // for a line comment";
+  }
+} return string s;
+
+// The tail of syn_err.id's syn_err -- that file is already full.
+syn_err_tail(string cur_file_v, int cur_ln_v, string msg) {
+  print(cur_file_v + ":" + cur_ln_v + ": error: " + msg);
+  note_failure();
+} return void;

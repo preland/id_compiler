@@ -1,0 +1,31 @@
+// Signed division and remainder.
+//
+// x86 divides one fixed register pair by an operand, so both arguments have to
+// reach fixed registers -- and the register allocator may already have put one
+// of them in the register the other is about to be moved into. Going through
+// the stack is what makes the order safe without a clobber list: both operands
+// are read before either fixed register is written.
+//
+// docs/SPEC.md 8 says division by zero traps. There is no stderr to trap to
+// here, so `idivq` raises #DE, and with no IDT behind it that is a triple
+// fault -- loud, and not silently wrong, which is the property that mattered.
+
+asm "x86_64-unknown-none" sdiv(word a, word v) {
+  "pushq %[a]"
+  "pushq %[v]"
+  "popq %%rcx"
+  "popq %%rax"
+  "cqto"
+  "idivq %%rcx"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-none" smod(word a, word v) {
+  "pushq %[a]"
+  "pushq %[v]"
+  "popq %%rcx"
+  "popq %%rax"
+  "cqto"
+  "idivq %%rcx"
+  "movq %%rdx, %[ret]"
+} return word ret;

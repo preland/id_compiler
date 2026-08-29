@@ -1,0 +1,11 @@
+// The rest of lw_func, once the IR function itself exists.
+lw_func_mid(int node, string ty, string name) {
+  int ir_func_v = ir_func(node, ty, name);
+  lw_open(ir_func_v);
+  lw_func_tail(node);
+} return void;
+
+lw_func_tail(int node) {
+  lw_locals(node);
+  lw_fin(node);
+} return void;

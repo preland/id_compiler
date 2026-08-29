@@ -1,0 +1,36 @@
+// `} return void;` takes no expression, and writing one there is a mistake
+// that used to report anything but itself. The call is left in the token
+// stream, read as the start of the next top-level declaration, and comes back
+// as four errors in a file the mistake is not in:
+//
+//     error: undefined variable ')'
+//     error: undefined variable 'word'
+//     error: no such function 'con_copy'
+//     error: undefined variable '{'
+//
+// A call and a declaration look identical up to the closing parenthesis -- one
+// is followed by `{` and the other by `;` -- so the test is that lookahead
+// rather than the token in hand. Semicolons are optional in this language, so
+// a bare `} return void` followed by the next function is legal and stays
+// legal; only the `;` says an expression was meant.
+
+void_tail(int[] pos) {
+  if(void_call(pos[0]) == 1) {
+    syn_err(pos, "a 'void' return clause takes no expression; write '} return void;' and move the call into the body");
+  }
+} return void;
+
+void_call(int at) {
+  int r = 0;
+  if(tok_at(at) == "ident" && tok_str(at + 1) == "(") {
+    int void_close_v = void_close(at + 1, 0, at + 1);
+    r = void_semi(void_close_v);
+  }
+} return int r;
+
+void_semi(int at) {
+  int r = 0;
+  if(tok_str(at) == ";") {
+    r = 1;
+  }
+} return int r;

@@ -1,0 +1,24 @@
+
+m2r_sweep(int f, int i, int n) {
+  while(i < blk_count(f)) {
+    int[] irf_blk_v = irf_blk(f);
+    n = m2r_sweep_b(f, irf_blk_v[i], n);
+    i = i + 1;
+  }
+} return int n;
+
+m2r_sweep_b(int f, int b, int n) {
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] blk_ins_v = blk_ins(b);
+    n = m2r_try(f, blk_ins_v[i], n);
+    i = i + 1;
+  }
+} return int n;
+
+m2r_try(int f, int id, int n) {
+  int v = m2r_same(id);
+  if(ir_op(id) == "phi" && v >= 0) {
+    n = m2r_drop(f, id, v, n);
+  }
+} return int n;

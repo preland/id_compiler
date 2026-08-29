@@ -1,0 +1,17 @@
+
+lw_fn() {
+  int ret_i = (import lwfn)[0];
+} return int ret_i;
+
+lw_go(int b) {
+  lset((import lwcur), 0, b);
+} return int b;
+
+// Two blocks, not one: the entry block holds nothing but allocas and the
+// branch into the body, so an alloca can be appended to it at any point in the
+// lowering without landing after a terminator. simplifycfg merges the pair.
+lw_open2(int f) {
+  lset((import lwfn), 0, f);
+  int ir_block_v = ir_block(f, "entry");
+  lw_open2_tail(f, ir_block_v);
+} return void;

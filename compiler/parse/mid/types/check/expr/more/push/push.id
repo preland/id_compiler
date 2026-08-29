@@ -1,0 +1,27 @@
+// push's element type, and the untyped empty list literal.
+
+chk_push(int id) {
+  int[] args = l1_of(id);
+  string lt = type_of(args[0]);
+  chk_push2(id, args, lt);
+} return void;
+
+// Pushing onto something that is not a list is idc.py's "push expects a list"
+// -- a different check -- so a non-list first argument is left alone here.
+chk_push2(int id, int[] args, string lt) {
+  string et = elem_type(lt);
+  if(ty_is_list(lt) == 1 && bad_store(et, args[1]) == 1) {
+    string type_of_v = type_of(args[1]);
+    tc_err(id, "cannot push a " + type_of_v + " onto a " + lt);
+  }
+} return void;
+
+// `[]` carries no element type, so it is only meaningful where something else
+// supplies one. arr_ok asks whether any node in the program uses this literal
+// in such a position.
+chk_arr(int id) {
+  int[] l1_of_v = l1_of(id);
+  if(len(l1_of_v) == 0 && arr_ok(id) == 0) {
+    tc_err(id, "an empty list literal needs a known list type here (e.g. on a typed declaration)");
+  }
+} return void;

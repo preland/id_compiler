@@ -1,0 +1,27 @@
+// Expression parser (precedence climbing). Each level parses the tighter level
+// then folds left-associative operators; each fold step is its own function so
+// the loop body stays within the 3-action limit.
+//
+//   expr -> or -> and -> rel -> bitor -> bitxor -> bitand -> shift
+//        -> add -> mul -> unary -> postfix -> primary
+//
+// The four bitwise levels are in bits/; the rest are here and in the
+// neighbouring files.
+
+parse_expr(int[] pos) {
+  int ret_i = parse_or(pos);
+} return int ret_i;
+
+// relational / equality: bitor (('=='|'!='|'<'|'>'|'<='|'>=') bitor)*
+parse_rel(int[] pos) {
+  int left = parse_bitor(pos);
+  while(relop_at(pos)) {
+    left = fold_rel(pos, left);
+  }
+} return int left;
+
+fold_rel(int[] pos, int left) {
+  string op = cur_text(pos);
+  advance(pos);
+  int ret_i = fold_rel_tail(pos, left, op);
+} return int ret_i;
