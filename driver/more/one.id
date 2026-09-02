@@ -1,0 +1,25 @@
+// One name out of the listing. Names are separated by a newline and the last
+// one has a newline after it, so there is no empty name to guard against and
+// the loop lands exactly on len(buf).
+
+drv_one(string path, int[] buf, int at) {
+  int end = drv_eol(buf, at);
+  drv_entry(path, buf, at, end);
+  int ret_i = end + 1;
+} return int ret_i;
+
+drv_eol(int[] buf, int at) {
+  while(at < len(buf) && buf[at] != 10) {
+    at = at + 1;
+  }
+} return int at;
+
+// A name ending in '/' is a directory; that is how fs_list says so, and the
+// slash is dropped here rather than carried into the path.
+drv_entry(string path, int[] buf, int lo, int hi) {
+  if(buf[hi - 1] == 47) {
+    drv_sub(path, buf, lo, hi - 1);
+  } else {
+    drv_file(path, buf, lo, hi);
+  }
+} return void;

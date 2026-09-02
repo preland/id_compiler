@@ -15,6 +15,8 @@
       "doc": "exists(path) -> 1 or 0" },
     { "name": "fs_remove", "params": ["string"], "returns": "int",
       "doc": "remove(path) -> 0, or -1" },
+    { "name": "fs_list",   "params": ["string", "int[]", "int"], "returns": "int",
+      "doc": "list(path, buf, n) -> bytes the listing needs; names newline-separated, a directory ends in '/', or -1" },
     { "name": "fs_error",  "params": [], "returns": "int",
       "doc": "error() -> the errno of the last failed call, or 0" }
   ],

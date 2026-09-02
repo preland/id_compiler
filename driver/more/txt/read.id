@@ -1,0 +1,24 @@
+// The listing itself: how big it is, and the bytes of it.
+
+drv_bytes(int[] buf, word a, int lo, int hi) {
+  int i = lo;
+  while(i < hi) {
+    poke8(a + i - lo, buf[i]);
+    i = i + 1;
+  }
+} return void;
+
+// fs_list answers with the size the whole listing needs even when it wrote
+// nothing, so asking with no buffer at all is how a caller learns what to
+// allocate. This is the reason that call reports a size rather than an error
+// when the buffer is short.
+drv_size(string path) {
+  int[] buf = [];
+  int ret_i = fs_list(path, buf, 0);
+} return int ret_i;
+
+drv_read(string path, int n) {
+  int[] buf = [];
+  drv_fill(buf, n);
+  int got = fs_list(path, buf, n);
+} return int[] buf;

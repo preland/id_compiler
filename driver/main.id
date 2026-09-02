@@ -1,0 +1,49 @@
+// idsrc -- a project's source files, in the compiler's order, from `id`.
+//
+// bin/idc is a bash script for one reason: it walks a source tree, and until
+// backends/fs gained fs_list, `id` could not ask what a directory contains.
+// This is that walk, written in `id`, and it exists to be diffed against the
+// shell one:
+//
+//   idsrc PROJECT
+//   find PROJECT -mindepth 1 \( -type d -name '.*' -prune \) -o \
+//        \( -name '*.id' ! -name 'conf.id' -print \) | LC_ALL=C sort
+//
+// The two must agree byte for byte, because the order files reach the compiler
+// is the order the one-name-one-type rule reports collisions in, and a
+// compiler that read its own tree in a different order would disagree with
+// itself about which file to blame.
+//
+// They agree for a reason rather than by luck: fs_list sorts a directory's
+// names in byte order with a '/' appended to the directories, and '/' is 0x2F
+// -- below every letter and digit, above '.' and '-'. So visiting a
+// directory's entries in that order, descending into each the moment it is
+// reached, is exactly a byte-order sort of the full paths.
+//
+// Nothing here calls the standard library, and that is deliberate rather than
+// frugal: this is the driver the compiler will eventually be built by, and a
+// compiler that needs the library it compiles cannot bootstrap. The two
+// self-hosted stages under compiler/ hold to the same rule.
+
+main(int argc, string[] argv) {
+  if(argc < 2) {
+    print("usage: idsrc ROOT");
+  } else {
+    drv_walk(argv[1]);
+  }
+} return int 0;
+
+// A directory that cannot be read lists as nothing rather than as an error.
+// fs_list answers -1, the buffer stays empty, and the walk goes on -- which is
+// what `find` does with an unreadable directory too, minus the warning.
+drv_walk(string path) {
+  int n = drv_size(path);
+  int[] buf = drv_read(path, n);
+  drv_each(path, buf, 0);
+} return void;
+
+drv_each(string path, int[] buf, int at) {
+  while(at < len(buf)) {
+    at = drv_one(path, buf, at);
+  }
+} return void;

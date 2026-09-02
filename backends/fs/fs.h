@@ -71,6 +71,16 @@ extern int id_fs_remove(const char* path);
  * it does not clear it. This exists because every entry point returns `int`,
  * so a failure has exactly one bit of room to say so; the detail has to be
  * fetched separately. */
+/* One directory's entries into `buf`, newline-separated, with a trailing '/' on
+ * the names that are directories. `.` and `..` are omitted, and the listing is
+ * sorted in byte order so that two tools walking the same tree agree on it.
+ *
+ * Returns how many bytes the whole listing needs, which may be more than were
+ * written: that is what lets a caller size its buffer without a second entry
+ * point -- call, and if the answer exceeds the buffer, grow it and call again.
+ * -1 means the directory could not be read, with the reason in id_fs_error. */
+extern int id_fs_list(const char* path, IdList* buf, int n);
+
 extern int id_fs_error(void);
 
 #define FS_MAX_HANDLES 16

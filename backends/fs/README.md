@@ -9,7 +9,7 @@ the *caller* chose the files:
 ./myprog < in.txt > out.txt      # the only file I/O id had
 ```
 
-This backend supplies the missing eight functions at link time, the same way
+This backend supplies the missing nine functions at link time, the same way
 `backends/gfx` supplies a window.
 
 ```sh
@@ -27,6 +27,7 @@ bin/idc demos/fsdemo -o fsdemo && ./fsdemo
 | `fs_size(path)` | bytes, or −1 |
 | `fs_exists(path)` | `1` or `0` |
 | `fs_remove(path)` | `0`, or −1 |
+| `fs_list(path, buf, n)` | the directory's entries into `buf`, newline-separated, a directory ending in `/`. Returns the bytes the listing *needs* — grow and retry if that exceeds `n` — or −1 |
 | `fs_error()` | the `errno` of the last call that returned −1 |
 | `fs_run(cmd)` | run `cmd` through a shell; its exit status, or −1 if it could not be started |
 
@@ -41,7 +42,7 @@ buffer, but it is a `static` inside the *generated program*: a separately
 compiled object cannot reach it. A list is a pointer the `id` side already owns
 and hands over, which is the seam `gfx` already uses for a framebuffer. One
 byte per 8-byte cell is wasteful and completely portable; a store-addressed
-fast path can be added later without changing these eight names.
+fast path can be added later without changing these names.
 
 ### Why every function returns `int`
 
@@ -64,14 +65,15 @@ the callers that exist compose it from paths their own user chose.
 
 ## What is *not* here
 
-No directory listing, no `stat` beyond size/existence, no seek, no rename, no
-permissions. The eight above are what a program needs to read a file, write a
-file, and know whether it worked; everything else is an addition to
-`backend.json`'s `abi` when something actually needs it.
+No `stat` beyond size/existence, no seek, no rename, no permissions. The list
+above is what a program needs to read a file, write a file, walk a tree of them,
+and know whether it worked; everything else is an addition to `backend.json`'s
+`abi` when something actually needs it.
 
-Note what this does **not** unlock: `bin/idc` still exists because `id` cannot
-walk a directory tree, and `fs_*` does not change that — a compiler that reads
-its own source tree needs `readdir`, not `fopen`.
+`fs_list` was added for one reason: `bin/idc` is a bash script because a
+compiler that reads its own source tree needs `readdir`, not `fopen`, and until
+this call existed `id` had no way to ask what a directory contains. That is the
+last thing the driver did that `id` could not.
 
 ## Compiler-agnostic by construction
 

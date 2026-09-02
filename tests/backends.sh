@@ -83,6 +83,49 @@ for c in "$BIN_IDC" "$ROOT/idc.py"; do
     fi
 done
 
+# fs_list: a directory's entries, sorted, directories marked, and a buffer too
+# small still told what it would take. This is the call bin/idc has to have
+# before it can be an `id` program rather than a shell script, so it is checked
+# from `id` and not just from C.
+lsexp='small 15
+need 15
+a.id
+b.id
+sub/'
+for c in "$BIN_IDC" "$ROOT/idc.py"; do
+    name=$(basename "$c")
+    if ! $c "$ROOT/tests/fixtures/lsdemo" -o "$fsout.ls.$name" >"$TMP/ls.build" 2>&1; then
+        bad "lsdemo builds with $name ($(head -1 "$TMP/ls.build"))"; continue
+    fi
+    got=$(cd "$TMP" && "$fsout.ls.$name" 2>&1)
+    if [ "$got" = "$lsexp" ]; then
+        ok "fs_list lists a directory, sorted, with directories marked ($name)"
+    else
+        bad "fs_list lists a directory, sorted, with directories marked ($name): got '$got'"
+    fi
+done
+
+# What fs_list is for: driver/ is the tree walk bin/idc does with `find`, and
+# it must agree with `find` byte for byte. The order files reach the compiler
+# is the order the one-name-one-type rule reports collisions in, so a walk that
+# ordered them differently would make the compiler disagree with itself about
+# which file to blame.
+if $BIN_IDC "$ROOT/driver" -o "$TMP/idsrc" >"$TMP/drv.build" 2>&1; then
+    ok "driver/ builds"
+    for tree in "$ROOT/compiler" "$ORG/editor"; do
+        want=$(find "$tree" -mindepth 1 \( -type d -name '.*' -prune \) -o \
+                    \( -name '*.id' ! -name 'conf.id' -print \) | LC_ALL=C sort)
+        got=$("$TMP/idsrc" "$tree")
+        if [ "$got" = "$want" ]; then
+            ok "the id tree walk matches find|sort ($(basename "$tree"), $(printf '%s\n' "$want" | wc -l) files)"
+        else
+            bad "the id tree walk matches find|sort ($(basename "$tree")): $(diff <(printf '%s\n' "$got") <(printf '%s\n' "$want") | head -2 | tr '\n' ' ')"
+        fi
+    done
+else
+    bad "driver/ builds ($(head -1 "$TMP/drv.build"))"
+fi
+
 # emit-c parity on a backend-using project, as for the graphics demos below.
 if $ROOT/idc.py "$ORG/demos/fsdemo" --emit-c "$TMP/fs.py.c" >/dev/null 2>&1 \
    && $BIN_IDC "$ORG/demos/fsdemo" --emit-c "$TMP/fs.self.c" >/dev/null 2>&1 \

@@ -1,0 +1,26 @@
+// The three questions asked of a file's name, and the answer printed.
+
+// conf.id is the dependency manifest, not source, and is never compiled --
+// the same exclusion idc.py's collect_project makes.
+drv_say(string path, string name, int ok) {
+  if(ok == 1 && name != "conf.id") {
+    string p = path + "/" + name;
+    print(p);
+  }
+} return void;
+
+// Does the name end in ".id"? Asked of the bytes rather than of a string,
+// because the name is a range of the listing and building a string to throw
+// away is the expensive half of the walk. 46 is '.', 105 'i', 100 'd'.
+drv_isid(int[] buf, int lo, int hi) {
+  int ok = 0;
+  if(hi - lo > 3 && buf[hi - 3] == 46 && buf[hi - 2] == 105 && buf[hi - 1] == 100) {
+    ok = 1;
+  }
+} return int ok;
+
+drv_name(int[] buf, int lo, int hi) {
+  word a = alloc(hi - lo + 1);
+  drv_bytes(buf, a, lo, hi);
+  string ret_s = str_of_mem(a, hi - lo);
+} return string ret_s;

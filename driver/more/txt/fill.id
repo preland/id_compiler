@@ -1,0 +1,6 @@
+// `id` has no way to make a list of n zeroes in one call, so this is that.
+drv_fill(int[] buf, int n) {
+  while(len(buf) < n) {
+    push(buf, 0);
+  }
+} return void;

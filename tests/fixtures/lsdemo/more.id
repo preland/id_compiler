@@ -1,0 +1,24 @@
+// The two calls: one with a buffer too small to hold the answer, one with a
+// buffer big enough. Both report the same number, which is the whole of the
+// contract -- the caller learns what it needs without a second entry point.
+
+ls_out(string path, int[] buf) {
+  int small = fs_list(path, buf, 4);
+  print("small " + small);
+  ls_out2(path, buf);
+} return void;
+
+ls_out2(string path, int[] buf) {
+  int n = fs_list(path, buf, 64);
+  print("need " + n);
+  ls_dump(buf, n, 0);
+} return void;
+
+ls_dump(int[] buf, int n, int i) {
+  while(i < n) {
+    string ch = chr(buf[i]);
+    put(ch);
+    i = i + 1;
+  }
+  flush();
+} return void;

@@ -12,9 +12,11 @@
  */
 #include "fs.h"
 
+#include <dirent.h>
 #include <errno.h>
-#include <stdlib.h>   /* system */
+#include <stdlib.h>   /* system, qsort */
 #include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 
 static FILE* fs_handles[FS_MAX_HANDLES];
@@ -131,6 +133,93 @@ int id_fs_run(const char* cmd) {
     rc = system(cmd);
     if (rc == -1) return fs_fail(errno);
     return rc;
+}
+
+/* Byte order, which is what LC_ALL=C sort gives. Every tool that walks an `id`
+ * project has to agree on the order its files come in -- bin/idc sorts, idc.py
+ * sorts, and a listing that came back in readdir order would make the two
+ * disagree about which file is which. */
+static int fs_cmp(const void* a, const void* b) {
+    return strcmp(*(const char* const*)a, *(const char* const*)b);
+}
+
+/* Is `dir/name` itself a directory? d_type would answer without a syscall but
+ * is not in POSIX and is DT_UNKNOWN on several real filesystems, so this asks
+ * stat, which always knows. */
+static int fs_is_dir(const char* dir, const char* name) {
+    struct stat st;
+    size_t dn = strlen(dir), nn = strlen(name);
+    char* p = (char*)malloc(dn + nn + 2);
+    int ok;
+    if (!p) return 0;
+    memcpy(p, dir, dn);
+    p[dn] = '/';
+    memcpy(p + dn + 1, name, nn + 1);
+    ok = stat(p, &st) == 0 && S_ISDIR(st.st_mode);
+    free(p);
+    return ok;
+}
+
+/* One directory's entries, newline-separated, a trailing '/' on the ones that
+ * are directories themselves. `.` and `..` are left out: a walker that saw them
+ * would recurse forever, and no caller has ever wanted them.
+ *
+ * The return value is how many bytes the whole listing needs, which may be more
+ * than were written. That is the contract that lets `id` size a buffer without
+ * a second entry point: call it, and if the answer is larger than the buffer,
+ * grow the buffer and call it again. A directory that cannot be opened is -1,
+ * with the reason in fs_error.
+ *
+ * Sorted, because the compiler driver this exists for reads a project's files
+ * in sorted order and two compilers that disagree about that order disagree
+ * about the program. */
+int id_fs_list(const char* path, IdList* buf, int n) {
+    DIR* d;
+    struct dirent* e;
+    char** names = NULL;
+    int count = 0, cap = 0, need = 0, at = 0, i;
+    if (!path || !buf) return fs_fail(EINVAL);
+    if (n < 0) return fs_fail(EINVAL);
+    if (n > buf->len) n = buf->len;
+    d = opendir(path);
+    if (!d) return fs_fail(errno);
+    while ((e = readdir(d)) != NULL) {
+        size_t ln;
+        char* nm;
+        if (strcmp(e->d_name, ".") == 0 || strcmp(e->d_name, "..") == 0) continue;
+        if (count == cap) {
+            int grown = cap ? cap * 2 : 32;
+            char** bigger = (char**)realloc(names, (size_t)grown * sizeof *names);
+            if (!bigger) { count = -1; break; }
+            names = bigger; cap = grown;
+        }
+        ln = strlen(e->d_name);
+        nm = (char*)malloc(ln + 2);
+        if (!nm) { count = -1; break; }
+        memcpy(nm, e->d_name, ln);
+        if (fs_is_dir(path, e->d_name)) nm[ln++] = '/';
+        nm[ln] = '\0';
+        names[count++] = nm;
+    }
+    closedir(d);
+    if (count < 0) {
+        free(names);
+        return fs_fail(ENOMEM);
+    }
+    qsort(names, (size_t)count, sizeof *names, fs_cmp);
+    for (i = 0; i < count; i++) {
+        const char* nm = names[i];
+        size_t k;
+        for (k = 0; nm[k]; k++) {
+            if (at < n) buf->data[at] = (long long)(unsigned char)nm[k];
+            at++; need++;
+        }
+        if (at < n) buf->data[at] = (long long)'\n';
+        at++; need++;
+        free(names[i]);
+    }
+    free(names);
+    return need;
 }
 
 int id_fs_error(void) {

@@ -1,0 +1,29 @@
+// lsdemo -- asking the filesystem what a directory contains, from `id`.
+//
+// This is the fixture behind the fs_list rows in tests/backends.sh. It exists
+// as a project rather than a heredoc in that script because the thing under
+// test is that an ordinary `id` program can walk a tree: the source has to be
+// readable as `id` for that claim to mean anything.
+//
+// The tree it lists is one it makes itself, through fs_run, so the expected
+// output is fixed rather than a property of whoever checked the repo out.
+
+main(int argc, string[] argv) {
+  int rc = fs_run("rm -rf ls_t && mkdir -p ls_t/sub && touch ls_t/a.id ls_t/b.id");
+  ls_show("ls_t");
+  int gone = fs_run("rm -rf ls_t");
+} return int 0;
+
+ls_show(string path) {
+  int[] buf = [];
+  ls_fill(buf, 64);
+  ls_out(path, buf);
+} return void;
+
+// A list of the size the listing will be read into. `id` has no way to make a
+// list of n zeroes in one call, so this is that.
+ls_fill(int[] buf, int n) {
+  while(len(buf) < n) {
+    push(buf, 0);
+  }
+} return void;

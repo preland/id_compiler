@@ -1,0 +1,22 @@
+// What to do with a directory, and with a file.
+
+drv_sub(string path, int[] buf, int lo, int hi) {
+  string name = drv_name(buf, lo, hi);
+  drv_down(path, name, buf[lo]);
+} return void;
+
+// A hidden directory is pruned rather than walked: a .git beside three source
+// directories is not a fourth entry and nothing under it is source. Both
+// compilers already agree on that, so this has to as well. 46 is '.'.
+drv_down(string path, string name, int c) {
+  if(c != 46) {
+    string sub = path + "/" + name;
+    drv_walk(sub);
+  }
+} return void;
+
+drv_file(string path, int[] buf, int lo, int hi) {
+  string name = drv_name(buf, lo, hi);
+  int ok = drv_isid(buf, lo, hi);
+  drv_say(path, name, ok);
+} return void;
