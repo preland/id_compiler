@@ -88,7 +88,10 @@ if [ "${1:-}" = "--count" ]; then
     exit 0
 fi
 
-STD=../../idstd
+# The standard library the compiler would merge: $IDSTD_HOME when set, as
+# bin/idc resolves it, so a worktree counts its own idstd rather than the one
+# beside the main checkout.
+STD=${IDSTD_HOME:-../../idstd}
 C2ID=../c2id
 LINUX=../../linux_id
 
