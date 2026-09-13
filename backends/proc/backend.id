@@ -1,0 +1,13 @@
+// What a code generator needs to link the natives declared beside this file.
+// Read by idc/bin/idc and never compiled, so none of these names reaches a
+// program; docs/BACKENDS.md says what each one means.
+
+string name = "proc";
+string c_header = "proc.h";
+
+// Linux only: fork/execvp/waitpid are POSIX, but the retry loops here were
+// only ever proven on Linux. A darwin entry can be added the day something
+// needs it -- the missing-platform diagnostic already names the gap.
+string[] c_linux_sources = ["proc_linux.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
