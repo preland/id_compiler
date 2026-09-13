@@ -1235,6 +1235,58 @@ main(int argc, string[] argv) {
 EOF
 self_accept "bin/idc: a function that assigns its parameter is not a constant wrapper" --allow-untested --emit-c /dev/null
 
+# --- eprint inside a function under test ---------------------------------------
+# A case's stderr is the harness's own channel: the runtime's trap line and the
+# mismatch message come back through it, and the harness reports what it read,
+# keeping the first 4096 bytes. So a case's eprint goes where its print goes --
+# the harness's stdout, which bin/idc discards -- and never into that channel.
+# The noise below is longer than 4096 bytes, which in that channel would push
+# the trap's own line out of the report.
+cat > "$TMP/p.id" <<'EOF'
+noisy(int n) {
+  int i = 0;
+  while(i < 80) {
+    eprint("noise from the function under test, which is not part of any report");
+    i = i + 1;
+  }
+  int q = 10 / n;
+} return int q;
+(5):(2)
+(0):(0)
+EOF
+self_refuse "bin/idc: a trapping case that eprints is reported by its trap" \
+    "p.id:10: test failed: noisy(0) trapped: id: division by zero" --emit-c /dev/null
+grep -q "noise" "$TMP/log" \
+    && bad "bin/idc: a trapping case's eprint stays out of the report ($(grep -c noise "$TMP/log") lines of it)" \
+    || ok "bin/idc: a trapping case's eprint stays out of the report"
+
+cat > "$TMP/p.id" <<'EOF'
+loud(int n) {
+  eprint("loud " + n);
+  int m = n + 1;
+} return int m;
+(1):(2)
+(2):(4)
+EOF
+self_refuse "bin/idc: a mismatching case that eprints is reported by its mismatch" \
+    "p.id:6: test failed: loud(2) = 3, expected 4" --emit-c /dev/null
+grep -q "loud [12]" "$TMP/log" \
+    && bad "bin/idc: a mismatching case's eprint stays out of the report ($(tr '\n' '|' < "$TMP/log"))" \
+    || ok "bin/idc: a mismatching case's eprint stays out of the report"
+
+cat > "$TMP/p.id" <<'EOF'
+loud(int n) {
+  eprint("loud " + n);
+  int m = n + 1;
+} return int m;
+(1):(2)
+(2):(3)
+EOF
+self_accept "bin/idc: cases that eprint and pass build" --emit-c /dev/null
+grep -q "loud [12]" "$TMP/log" \
+    && bad "bin/idc: passing cases that eprint keep it out of the build's output ($(tr '\n' '|' < "$TMP/log"))" \
+    || ok "bin/idc: passing cases that eprint keep it out of the build's output"
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

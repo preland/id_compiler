@@ -1,0 +1,7 @@
+// EXPECT: error: eprint takes exactly one argument
+// EXPECT-IDCPY: no such function 'eprint'
+// eprint takes what print takes, and as many. It is a builtin of bin/idc only:
+// idc.py, which is being retired, never learned it and calls the name unknown.
+main(int argc, string[] argv) {
+  eprint("a", "b");
+} return int 0;

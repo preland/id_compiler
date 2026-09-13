@@ -1,0 +1,16 @@
+// eprint formats a value exactly as print does, so this case's stdout and
+// stderr are the same text.
+main(int argc, string[] argv) {
+  both_int(0 - 42);
+  both_str("argc = " + argc);
+} return int 0;
+
+both_int(int n) {
+  print(n);
+  eprint(n);
+} return void;
+
+both_str(string s) {
+  print(s);
+  eprint(s);
+} return void;

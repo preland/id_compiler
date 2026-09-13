@@ -1,0 +1,14 @@
+// With both streams sent to one file, the lines appear in the order the
+// program wrote them. stdout into a file is fully buffered, so this only holds
+// because eprint flushes stdout first -- including put's unfinished line.
+main(int argc, string[] argv) {
+  print("1 stdout");
+  eprint("2 stderr");
+  tail();
+} return int 0;
+
+tail() {
+  put("3 put, ");
+  eprint("4 stderr");
+  print("5 stdout");
+} return void;

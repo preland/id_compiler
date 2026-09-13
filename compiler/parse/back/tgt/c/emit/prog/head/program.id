@@ -18,9 +18,10 @@ emit_head() {
   emit_decls();
 } return void;
 
-// the forward declarations, then the exported-variable globals (if any) --
-// idc.py's order
+// eprint's helper when the program calls it (decl/eprint.id), then the forward
+// declarations, then the exported-variable globals (if any) -- idc.py's order
 emit_decls() {
+  emit_eprint_def();
   emit_fwds();
   emit_exports();
 } return void;
