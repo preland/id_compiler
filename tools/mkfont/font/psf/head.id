@@ -1,0 +1,31 @@
+// The two PC Screen Font headers, reduced to what the glyphs need:
+// [glyph offset, bytes per glyph, height, width].
+
+psf_head(int[] d) {
+  int[] hd = psf_v1(d);
+  if(psf_is2(d) == 1) {
+    hd = psf_v2(d);
+  }
+} return int[] hd;
+([54, 4, 0, 16]):([4, 16, 16, 8])
+([1, 2, 3]):([])
+
+// PSF1 has a four-byte header and fixed 8-wide glyphs whose byte count is
+// their height.
+psf_v1(int[] d) {
+  int[] hd = [];
+  if(psf_is1(d) == 1) {
+    hd = [4, d[3], d[3], 8];
+  }
+} return int[] hd;
+([54, 4, 1, 14]):([4, 14, 14, 8])
+([0, 0, 0, 0]):([])
+
+// PSF2 is seven little-endian u32s after the magic: version, header size,
+// flags, glyph count, bytes per glyph, height, width. The caller has checked
+// the magic, and with it that the header is there to read.
+psf_v2(int[] d) {
+  int[] hd = [psf_u32(d, 8), psf_u32(d, 20), psf_u32(d, 24), psf_u32(d, 28)];
+} return int[] hd;
+([114, 181, 74, 134, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 16, 0, 0, 0, 16, 0, 0, 0, 8, 0, 0, 0]):([32, 16, 16, 8])
+([114, 181, 74, 134, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 32, 0, 0, 0, 32, 0, 0, 0, 16, 0, 0, 0]):([64, 32, 32, 16])
