@@ -1143,6 +1143,9 @@ grep -qxF "exempt|$TMP/fs/io.id:12|kbd_scan" "$TMP/list" \
    && [ "$(wc -l < "$TMP/list")" -eq 3 ] \
     && ok "bin/idc: --list-untested lists the exempt and the short functions" \
     || bad "bin/idc: --list-untested lists the exempt and the short functions ($(tr '\n' '|' < "$TMP/list") $(head -1 "$TMP/log"))"
+[ "$(../tools/statusgen.sh --count "$TMP/fs" --freestanding 2>"$TMP/log")" = "4 2 1" ] \
+    && ok "statusgen: a function exempt from the minimum is not counted short" \
+    || bad "statusgen: a function exempt from the minimum is not counted short ($(../tools/statusgen.sh --count "$TMP/fs" --freestanding 2>&1 | head -1))"
 
 cat > "$TMP/fs/io.id" <<'EOF'
 asm "x86_64-unknown-none" in8(word p) {
