@@ -16,7 +16,7 @@ control          both
 fsdemo           both
 hello            both
 idc_in_id_calc   needs-std
-idview           both
+idview           needs-std
 wordcount        needs-std
 
 # Graphics demos: need --backend, which this file does not pass. Their standing

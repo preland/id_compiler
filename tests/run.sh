@@ -498,7 +498,7 @@ other() {
 # idview: a random source viewer written in id. It has no filesystem access,
 # so it splits a marker-delimited stream back into files -- the same protocol
 # the compiler uses for file boundaries.
-$IDC ../../demos/idview -o "$TMP/idview" >/dev/null 2>&1
+env -u IDC_NO_STD $IDC ../../demos/idview -o "$TMP/idview" >/dev/null 2>&1
 view_out=$({ printf '#file a.id\n'; printf 'one\n'; printf '#file b.id\n'; printf 'two\n'; } | "$TMP/idview")
 case "$view_out" in
     "==== a.id"*one*) ok "idview picks a file and prints its body" ;;
