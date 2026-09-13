@@ -10,7 +10,7 @@
 // and `id` has no inflate for a gzip member.
 //
 // NAME is the font's file name as the header should give it. A failure is
-// printed on stdout, since `id` has no way to write to stderr, and exits 1.
+// printed on stderr, so stdout is only ever the output, and exits 1.
 main(int argc, string[] argv) {
   int[] d = file_bytes(argv[1]);
   int[] hd = psf_head(d);

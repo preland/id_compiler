@@ -20,12 +20,12 @@ main(int argc, string[] argv) {
 (2, ["fbtext", "/nonexistent/ppm"]):(1)
 (2, ["fbtext", "/proc/sys/kernel/ostype"]):(1)
 
-// A file that is not a binary PPM is refused. The reason goes to stdout, since
-// `id` has no way to write to stderr, and the exit status says it failed.
+// A file that is not a binary PPM is refused. The reason goes to stderr, so
+// stdout stays the screen and nothing else, and the exit status says it failed.
 fb_run(int[] d, string text) {
   int rc = ppm_bad(d);
   if(rc == 1) {
-    print("fbtext: not a binary PPM");
+    eprint("fbtext: not a binary PPM");
   }
   if(rc == 0) {
     fb_show(d, text);
