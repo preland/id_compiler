@@ -1,0 +1,16 @@
+// A hash match is not a match. str_hash is 32 bits over bodies that are often
+// near-identical, so the fingerprints are compared in full before two
+// functions are called the same one -- a false positive here is a tool telling
+// someone to delete working code.
+rest_take(int i, int[] grp, int j) {
+  string a = ds_fp(i);
+  string b = ds_fp(j);
+  take_eq(grp, j, a, b);
+} return void;
+
+take_eq(int[] grp, int j, string a, string b) {
+  if(str_cmp(a, b) == 0) {
+    push(grp, j);
+    lset((import ds_seen), j, 1);
+  }
+} return void;

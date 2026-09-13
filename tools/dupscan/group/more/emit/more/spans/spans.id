@@ -1,0 +1,19 @@
+// Does this group cross a project boundary? Field 0 is the project label the
+// wrapper prefixed each line with.
+spans(int[] grp) {
+  string first = ds_proj(grp[0]);
+  int r = spans_loop(grp, first, 1);
+} return int r;
+
+spans_loop(int[] grp, string first, int k) {
+  int r = 0;
+  while(k < len(grp) && r == 0) {
+    r = spans_at(grp, first, k);
+    k = k + 1;
+  }
+} return int r;
+
+spans_at(int[] grp, string first, int k) {
+  string here = ds_proj(grp[k]);
+  int r = str_cmp(first, here) != 0;
+} return int r;

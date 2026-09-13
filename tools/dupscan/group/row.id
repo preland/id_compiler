@@ -1,0 +1,17 @@
+// One line's row in the tables: its fingerprint hash, and its not-yet-grouped
+// flag. A blank line hashes to 0 and is skipped by group_at.
+ds_row(int i) {
+  string fp = fld((import ds_lines)[i], (import ds_tab)[0], 1);
+  int h = str_hash(fp);
+  ds_push(h);
+} return void;
+
+ds_push(int h) {
+  push((import ds_hash), h);
+  push((import ds_seen), 0);
+} return void;
+
+// The fingerprint of line i.
+ds_fp(int i) {
+  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 1);
+} return string ret_s;

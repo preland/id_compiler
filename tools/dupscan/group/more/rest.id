@@ -1,0 +1,21 @@
+// The rest of the group: every later line with the same fingerprint. The hash
+// is compared first and the string only on a hit, so this is a scan over ints
+// with a rare string comparison, not a quadratic pile of string compares.
+group_rest(int i, int[] grp) {
+  int j = i + 1;
+  rest_loop(i, grp, j);
+  emit_group(grp);
+} return void;
+
+rest_loop(int i, int[] grp, int j) {
+  while(j < len((import ds_lines))) {
+    rest_at(i, grp, j);
+    j = j + 1;
+  }
+} return void;
+
+rest_at(int i, int[] grp, int j) {
+  if((import ds_seen)[j] == 0 && (import ds_hash)[j] == (import ds_hash)[i]) {
+    rest_take(i, grp, j);
+  }
+} return void;

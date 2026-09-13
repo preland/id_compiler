@@ -1,0 +1,21 @@
+// A group is worth printing only when it crosses a project boundary. Within
+// one project the compiler has already said it, at the point of definition and
+// with a better message; repeating it here would be noise on every build.
+emit_group(int[] grp) {
+  int n = len(grp);
+  int cross = spans(grp);
+  emit_head(grp, n, cross);
+} return void;
+
+emit_head(int[] grp, int n, int cross) {
+  if(n > 1 && cross == 1) {
+    emit_title(grp, n);
+    emit_rows(grp, 0);
+  }
+} return void;
+
+emit_title(int[] grp, int n) {
+  string name = ds_name(grp[0]);
+  string count = fmt_int(n, 0);
+  print(count + " copies of " + name + ":");
+} return void;

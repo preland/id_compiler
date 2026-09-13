@@ -1,0 +1,13 @@
+// One tab-separated field of a line. The fingerprint is field 1 and is the
+// only one the grouping looks at; the rest is what a human needs to act on it.
+fld(string line, string tab, int n) {
+  string[] parts = str_split(line, tab);
+  string out = fld_at(parts, n);
+} return string out;
+
+fld_at(string[] parts, int n) {
+  string out = "";
+  if(n < len(parts)) {
+    out = parts[n];
+  }
+} return string out;

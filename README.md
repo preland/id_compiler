@@ -95,6 +95,32 @@ and the driver that reads it, never to a program's `id` source — see
 worked example. `gfx` and `gl` predate `targets` and carry a bare `platforms`
 table, which is read as the C target's.
 
+## One copy of a function, across projects
+
+`id` rejects two functions with the same signature and the same body up to a
+consistent renaming — but only *within one compilation unit*. A program, the
+standard library and each imported tree are separate units, so the rule cannot
+see that `demos/galaxy`, `republic_beta` and `idstd` each carried their own
+`lset`. `tools/dupscan` applies the rule across projects, and is written in
+`id`:
+
+```sh
+for p in ~/git/id_development ~/git/idstd; do bin/idc $p --fingerprints; done | build/dupscan
+```
+
+It has no opinion of its own about what "the same function" means. The
+fingerprints it groups are the compiler's (`compiler/parse/mid/unique/canon/`),
+so the tool and the rule cannot disagree. It prints only groups that cross a
+project boundary; inside one project the compiler has already said so, with a
+better message.
+
+**Not yet usable end to end:** `idc --fingerprints` is not implemented. The
+grouping program builds, and is tested against hand-written fingerprint lines.
+
+A tree built `--no-std` — the kernel, the runtime, the bootstrap stages, the
+test fixtures — cannot call the standard library, so it legitimately carries
+its own copies.
+
 ## Self-hosting
 
 The `id`-written compiler (`compiler/lex` lexer + `compiler/parse`

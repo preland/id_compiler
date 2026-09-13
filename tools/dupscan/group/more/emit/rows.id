@@ -1,0 +1,12 @@
+// One printed line per member of a group.
+emit_rows(int[] grp, int k) {
+  while(k < len(grp)) {
+    emit_row(grp, k);
+    k = k + 1;
+  }
+} return void;
+
+emit_row(int[] grp, int k) {
+  string where = ds_where(grp[k]);
+  print("    " + where);
+} return void;

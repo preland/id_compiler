@@ -1,0 +1,31 @@
+// dupscan -- the same function written twice, in two different projects.
+//
+// `id` already rejects two functions with the same signature and the same
+// logic, but only *within one compilation unit*: a program, the standard
+// library and each imported tree are separate units, so the rule cannot see
+// that demos/galaxy, republic_beta and idstd each carried the same lset. This
+// closes that gap, and it does it without a second opinion about what "the
+// same function" means -- the fingerprints it reads are the compiler's own,
+// printed by `idc PATH --fingerprints` (mid/unique/canon/). A tool that
+// re-derived them could disagree with the compiler, which for a tool whose
+// whole job is finding duplicated logic would be its own punchline.
+//
+//   for p in proj1 proj2; do bin/idc $p --fingerprints; done | dupscan
+//
+// One line in, tab-separated: PROJECT, fingerprint, function name, file:line.
+main(int argc, string[] argv) {
+  string text = read_all();
+  string tab = chr(9);
+  scan_text(text, tab);
+} return int 0;
+
+scan_text(string text, string tab) {
+  string nl = chr(10);
+  string[] lines = str_split(text, nl);
+  scan_lines(lines, tab);
+} return void;
+
+scan_lines(string[] lines, string tab) {
+  ds_init(lines, tab);
+  group_all();
+} return void;

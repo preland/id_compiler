@@ -1,0 +1,23 @@
+// The state the grouping walks, as exported parallel lists -- the same shape
+// the compiler's own tables use, and the reason the functions below take an
+// index rather than six arguments.
+ds_init(string[] lines, string tab) {
+  export string[] ds_lines = lines;
+  export string[] ds_tab = [tab];
+  ds_init2();
+} return void;
+
+ds_init2() {
+  export int[] ds_seen = [];
+  export int[] ds_hash = [];
+  ds_fill(0);
+} return void;
+
+// One pass to fingerprint-hash every line. Comparing is quadratic and hashing
+// is not, so the two are kept apart -- exactly as mid/unique does it.
+ds_fill(int i) {
+  while(i < len((import ds_lines))) {
+    ds_row(i);
+    i = i + 1;
+  }
+} return void;

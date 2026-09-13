@@ -1,0 +1,23 @@
+// Every line becomes the head of at most one group: once a line has been
+// claimed it is skipped, so a group of five is printed once rather than five
+// times.
+group_all() {
+  int i = 0;
+  while(i < len((import ds_lines))) {
+    group_at(i);
+    i = i + 1;
+  }
+} return void;
+
+group_at(int i) {
+  if((import ds_seen)[i] == 0 && len((import ds_lines)[i]) > 0) {
+    int[] grp = [];
+    group_head(i, grp);
+  }
+} return void;
+
+group_head(int i, int[] grp) {
+  push(grp, i);
+  lset((import ds_seen), i, 1);
+  group_rest(i, grp);
+} return void;

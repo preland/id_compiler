@@ -1,0 +1,12 @@
+// The three human-facing fields of a line, by index.
+ds_proj(int i) {
+  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 0);
+} return string ret_s;
+
+ds_name(int i) {
+  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 2);
+} return string ret_s;
+
+ds_where(int i) {
+  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 3);
+} return string ret_s;
