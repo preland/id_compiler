@@ -138,11 +138,16 @@ consistent renaming — but only *within one compilation unit*. A program, the
 standard library and each imported tree are separate units, so the rule cannot
 see that `demos/galaxy`, `republic_beta` and `idstd` each carried their own
 `lset`. `tools/dupscan` applies the rule across projects, and is written in
-`id`:
+`id`; `tools/dupscan.sh` is the wrapper that runs it end to end:
 
 ```sh
-for p in ~/git/id_development ~/git/idstd; do bin/idc $p --fingerprints; done | build/dupscan
+tools/dupscan.sh ~/git/id_development ~/git/idstd
 ```
+
+It builds `tools/dupscan`, runs `bin/idc PROJECT --fingerprints` for each
+path given, prefixes every line with that path's own basename so the grouping
+program can tell which project a fingerprint came from, and pipes the whole
+concatenation into it.
 
 It has no opinion of its own about what "the same function" means. The
 fingerprints it groups are the compiler's (`compiler/parse/mid/unique/canon/`),
@@ -150,12 +155,13 @@ so the tool and the rule cannot disagree. It prints only groups that cross a
 project boundary; inside one project the compiler has already said so, with a
 better message.
 
-**Not yet usable end to end:** `idc --fingerprints` is not implemented. The
-grouping program builds, and is tested against hand-written fingerprint lines.
-
 A tree built `--no-std` — the kernel, the runtime, the bootstrap stages, the
 test fixtures — cannot call the standard library, so it legitimately carries
-its own copies.
+its own copies. `dupscan.sh` takes a project as bin/idc's default build
+would build it, with no `--no-std`/`--freestanding`/`--triple` of its own;
+pass such a tree already reduced to what it needs (or accept that its
+fingerprints include whatever it merges in) the same way any other build of
+it would.
 
 ## Self-hosting
 

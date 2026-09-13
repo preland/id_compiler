@@ -1,0 +1,35 @@
+// The fold chain: each link asks the next for a default and overrides it
+// for the two operators it owns, the same shape canon_expr's own dispatch
+// uses (../../../../expr.id) and for the same reason -- one walk, no more.
+// fold_op5 (../calc/link_e.id) ends the chain with "" for an operator this
+// rule does not cover (comparisons, &&, ||, and every unrecognised token).
+//
+// Both operands are non-negative (a literal has no sign of its own; `-x` is
+// a separate unary node) and no larger than INT_MAX, so a - b can never
+// itself overflow an int: id's `int` reaches down to -2147483648, and the
+// smallest a - b can be here is 0 - 2147483647.
+
+fold_op(string op, int a, int b) {
+  string ret_s = fold_op2(op, a, b);
+  if(op == "+") {
+    ret_s = compute_add(a, b);
+  }
+  if(op == "-") {
+    ret_s = compute_sub(a, b);
+  }
+} return string ret_s;
+
+// a + b overflows an int when a is more than INT_MAX - b past zero; written
+// this way so the check itself cannot overflow.
+compute_add(int a, int b) {
+  string ret_s = "";
+  if(a <= 2147483647 - b) {
+    int n = a + b;
+    ret_s = "I" + n;
+  }
+} return string ret_s;
+
+compute_sub(int a, int b) {
+  int n = a - b;
+  string ret_s = "I" + n;
+} return string ret_s;

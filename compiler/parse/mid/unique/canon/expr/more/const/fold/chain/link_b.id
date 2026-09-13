@@ -1,0 +1,32 @@
+// `*` and `/`. Multiplying can overflow an int well before either operand
+// is large (46341 * 46341 already does), so it is checked in a `word`,
+// which cannot overflow for two values this small (mul_word, ../calc/link_f.id).
+// Division never overflows here -- both operands are non-negative, so the
+// result is at most a, and id's one overflowing division, MIN / -1, needs a
+// negative dividend a literal can never be.
+
+fold_op2(string op, int a, int b) {
+  string ret_s = fold_op3(op, a, b);
+  if(op == "*") {
+    ret_s = compute_mul(a, b);
+  }
+  if(op == "/") {
+    ret_s = compute_div(a, b);
+  }
+} return string ret_s;
+
+compute_mul(int a, int b) {
+  word prod = mul_word(a, b);
+  string ret_s = fold_word(prod);
+} return string ret_s;
+
+// `/` by zero traps at runtime; folding it here would move that trap from
+// the program that wrote it to the compiler canonicalising it, so it is
+// left unfolded instead -- the program still gets its own trap when it runs.
+compute_div(int a, int b) {
+  string ret_s = "";
+  if(b != 0) {
+    int n = a / b;
+    ret_s = "I" + n;
+  }
+} return string ret_s;

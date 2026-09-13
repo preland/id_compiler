@@ -38,7 +38,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 IDC_PY="$ROOT/idc.py"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--fingerprints]" >&2
 }
 
 PATH_ARG=""
@@ -56,6 +56,7 @@ CC_EXPLICIT=0
 TRIPLE=""
 REQUIRE_TESTS=0
 EMIT_SOURCES=0
+FINGERPRINTS=0
 NO_STD=0
 STD_DIR=""
 BACKENDS=()          # from --backend flags (passed through on fallback)
@@ -89,6 +90,8 @@ while [ $# -gt 0 ]; do
             REQUIRE_TESTS=1; shift ;;
         --emit-sources)
             EMIT_SOURCES=1; shift ;;
+        --fingerprints)
+            FINGERPRINTS=1; shift ;;
         --no-std)
             NO_STD=1; shift ;;
         --std)
@@ -694,6 +697,11 @@ PARSE_ARGS+=(--triple "$TRIPLE")
 if [ "$REQUIRE_TESTS" -eq 1 ]; then
     PARSE_ARGS+=(--require-tests)
 fi
+# A report about the parsed program, not a build of it -- see the note where
+# the pipeline's exit codes are handled, below.
+if [ "$FINGERPRINTS" -eq 1 ]; then
+    PARSE_ARGS+=(--fingerprints)
+fi
 
 WORK=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
 trap 'rm -rf "$WORK"' EXIT
@@ -795,6 +803,26 @@ if mem_ceiling_hit "$parse_rc" "$PARSE_ERR"; then
     progress_clear
     mem_ceiling_error "idparse"
     exit 1
+fi
+
+# --fingerprints is a report about the parsed program, not a build of it, so
+# it does not stop at a rule the program broke the way an ordinary build
+# does: idparse prints every function's fingerprint after its diagnostics
+# (compiler/parse/back/drive/run/check/dce/guarded_emit.id) whenever parsing
+# reached that point at all, so this hands both straight to stdout and exits
+# with whatever idparse decided rather than treating parse_rc 1 as fatal.
+# parse_rc outside {0,1} is still the compiler's own bug, same as below.
+if [ "$FINGERPRINTS" -eq 1 ]; then
+    progress_clear
+    if [ "$lex_rc" -ne 0 ] || { [ "$parse_rc" -ne 0 ] && [ "$parse_rc" -ne 1 ]; }; then
+        [ -s "$LEX_ERR" ] && cat "$LEX_ERR" >&2
+        [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+        compiler_bug "idlex or idparse failed on this input"
+    fi
+    cat "$C_OUT"
+    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    rm -f "$C_OUT"
+    exit "$parse_rc"
 fi
 
 # Exit code 1 from idparse means the *program* broke a rule of the language,

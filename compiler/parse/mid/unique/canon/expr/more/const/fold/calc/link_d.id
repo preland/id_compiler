@@ -1,0 +1,23 @@
+// `|` and `^`, the same width argument as `&` (../chain/link_c.id): both
+// operands are below 2^31, so bit 31 stays clear in the result too, which
+// makes it the same value whether it is read back as an int or a word.
+
+fold_op4(string op, int a, int b) {
+  string ret_s = fold_op5(op, a, b);
+  if(op == "|") {
+    ret_s = compute_or(a, b);
+  }
+  if(op == "^") {
+    ret_s = compute_xor(a, b);
+  }
+} return string ret_s;
+
+compute_or(int a, int b) {
+  int n = a | b;
+  string ret_s = "I" + n;
+} return string ret_s;
+
+compute_xor(int a, int b) {
+  int n = a ^ b;
+  string ret_s = "I" + n;
+} return string ret_s;
