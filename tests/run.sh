@@ -985,6 +985,20 @@ else
     bad "docs/TESTS.md adoption numbers are stale -- run tools/statusgen.sh"
 fi
 
+# --- --allow-untested excuses a tree that does not have its cases yet, and
+#     nothing else. Once the adoption figure above reaches 100% there is
+#     nothing left for it to excuse, and a way out nobody needs is a way out
+#     somebody will use: so from then on this fails until the flag is deleted
+#     from bin/idc. The figure is statusgen's, read from the block it writes,
+#     which the check above has just said is current.
+adoption=$(sed -n 's/^\*\*Adoption: \([0-9.]*\)%\.\*\*.*/\1/p' ../../docs/TESTS.md)
+if [ -z "$adoption" ]; then
+    bad "no adoption figure in docs/TESTS.md -- run tools/statusgen.sh"
+elif awk -v a="$adoption" 'BEGIN { exit !(a >= 100) }' && grep -q -- '--allow-untested' ../bin/idc; then
+    bad "adoption is $adoption% and bin/idc still has --allow-untested -- delete the flag from bin/idc and every build that passes it"
+else
+    ok "--allow-untested has not outlived the migration (adoption $adoption%)"
+fi
 
 # --- idc.py obeys a lightweight form of the rules it enforces. A compiler
 #     that rejects long blocks, deep nesting and duplicated logic, in a file
