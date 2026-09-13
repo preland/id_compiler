@@ -1,0 +1,30 @@
+// Writing the archive out, and saying what happened.
+
+mo_write(string path, int[] out) {
+  int h = fs_open(path, "w");
+  int rc = mo_put(h, path, out);
+} return int rc;
+("/nonexistent/mkodt/c.odt", [1]):(1)
+("/nonexistent/mkodt/d.odt", []):(1)
+
+// A handle that did not open is a failure, reported like any other.
+mo_put(int h, string path, int[] out) {
+  int rc = 1;
+  if(h >= 0) {
+    rc = mo_save(h, out);
+  }
+  mo_say(rc, path, out);
+} return int rc;
+(-1, "p.odt", [1]):(1)
+(-1, "q.odt", []):(1)
+
+mo_say(int rc, string path, int[] out) {
+  int n = len(out);
+  if(rc == 0) {
+    print("wrote " + path + " (" + n + " bytes)");
+  } else {
+    print("mkodt: cannot write " + path);
+  }
+} return void;
+(0, "x.odt", [1]):(0, "x.odt", [1])
+(1, "y.odt", []):(1, "y.odt", [])

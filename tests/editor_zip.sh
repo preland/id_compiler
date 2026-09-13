@@ -36,8 +36,8 @@ for need in "$ROOT/bin/idc" "$ORG/editor/lib/zip" "$ROOT/backends/fs"; do
     fi
 done
 if [ ! -f fixtures/sample.odt ]; then
-    if ! python3 "$ROOT/tools/mkodt.py" fixtures/sample.odt >/dev/null 2>&1; then
-        echo "SKIP: editor/lib/zip tests (no fixtures/sample.odt and tools/mkodt.py did not run)"
+    if ! "$ROOT/tools/mkodt.sh" fixtures/sample.odt >/dev/null 2>&1; then
+        echo "SKIP: editor/lib/zip tests (no fixtures/sample.odt and tools/mkodt.sh did not run)"
         exit 0
     fi
 fi

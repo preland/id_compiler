@@ -13,29 +13,29 @@
 // printed on stderr, so stdout is only ever the output, and exits 1.
 main(int argc, string[] argv) {
   int[] d = file_bytes(argv[1]);
-  int[] hd = psf_head(d);
+  int[] hd = pcsf_head(d);
   int rc = mf_run(argv, d, hd);
 } return int rc;
 (4, ["mkfont", "/nonexistent/psf", "x.psf", "conf"]):(1)
 (4, ["mkfont", "/nonexistent/psf", "y.psf", "all"]):(1)
 
-// hd is [glyph offset, bytes per glyph, height, width], or empty for a file
-// that is not a PSF.
+// hd is idstd's pcsf_head: [glyph offset, bytes per glyph, height, width,
+// glyph count], or empty for a file that is not a PSF.
 mf_run(string[] argv, int[] d, int[] hd) {
   int rc = mf_bad(hd);
   mf_say(rc, argv, hd);
   mf_go(rc, argv, d, hd);
 } return int rc;
 (["m", "p", "x.psf", "conf"], [], []):(1)
-(["m", "p", "x.psf", "all"], [54, 4, 0, 16], [4, 16, 16, 8]):(0)
+(["m", "p", "x.psf", "all"], [54, 4, 0, 16], [4, 16, 16, 8, 256]):(0)
 
 // Only an 8-wide font fits the console's cells and its one byte per row.
 mf_bad(int[] hd) {
   int bad = 1;
-  if(len(hd) == 4) {
+  if(len(hd) == 5) {
     bad = (hd[2] != (import mf_height)) || (hd[3] != 8);
   }
 } return int bad;
-([4, 16, 16, 8]):(0)
-([4, 14, 14, 8]):(1)
+([4, 16, 16, 8, 256]):(0)
+([4, 14, 14, 8, 256]):(1)
 ([]):(1)

@@ -1,5 +1,6 @@
 // mkfont reads the PSF through the file tree and writes its glyphs through
-// the hex tree; both are shared with the other tools in idc/tools.
+// the hex tree; both are shared with the other tools in idc/tools. The header
+// is read by idstd's pcsf_head, which idem/tools/mkfont shares.
 import "../lib/file"
 import "../lib/hex"
 

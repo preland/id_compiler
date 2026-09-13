@@ -2,15 +2,15 @@
 // outputs.
 
 mf_say(int rc, string[] argv, int[] hd) {
-  if(len(hd) != 4) {
+  if(len(hd) != 5) {
     eprint(argv[2] + ": not a PSF font");
   }
-  if(len(hd) == 4 && rc == 1) {
+  if(len(hd) == 5 && rc == 1) {
     eprint(argv[2] + ": " + hd[3] + "x" + hd[2] + ", wanted 8x" + (import mf_height));
   }
 } return void;
 (1, ["m", "p", "x.psf", "conf"], []):(1, ["m", "p", "x.psf", "conf"], [])
-(0, ["m", "p", "y.psf", "all"], [4, 16, 16, 8]):(0, ["m", "p", "y.psf", "all"], [4, 16, 16, 8])
+(0, ["m", "p", "y.psf", "all"], [4, 16, 16, 8, 256]):(0, ["m", "p", "y.psf", "all"], [4, 16, 16, 8, 256])
 
 mf_go(int rc, string[] argv, int[] d, int[] hd) {
   int n = mf_nchunk((import mf_last) - (import mf_first) + 1, (import mf_per));

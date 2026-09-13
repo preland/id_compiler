@@ -1,0 +1,32 @@
+// The two headers an entry has.
+
+// Signature 0x04034b50, the fields both headers share, then the name.
+zw_local(int[] out, string name, int[] body, word crc) {
+  zw_list(out, [80, 75, 3, 4]);
+  zw_fields(out, name, body, crc);
+  zw_str(out, name);
+} return void;
+([], "a", [98], 1908338681):([80, 75, 3, 4, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 97], "a", [98], 1908338681)
+([], "", [], 0):([80, 75, 3, 4, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "", [], 0)
+
+// Signature 0x02014b50 and "made by" version 2.0 on Unix (3), as zipfile
+// writes it, then the shared fields.
+zw_central(int[] cd, string name, int[] body, word crc, int at) {
+  zw_list(cd, [80, 75, 1, 2, 20, 3]);
+  zw_fields(cd, name, body, crc);
+  zw_tail(cd, name, at);
+} return void;
+([], "a", [98], 1908338681, 0):([80, 75, 1, 2, 20, 3, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 0, 0, 0, 0, 97], "a", [98], 1908338681, 0)
+([], "", [], 0, 1):([80, 75, 1, 2, 20, 3, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 1, 0, 0, 0], "", [], 0, 1)
+
+// No comment, disk 0, no internal attributes, and external attributes
+// 0x01800000 -- mode 0600 in the high word, which zipfile gives an entry it
+// was handed as text -- then where the entry's local header starts, and the
+// name.
+zw_tail(int[] cd, string name, int at) {
+  zw_list(cd, [0, 0, 0, 0, 0, 0, 0, 0, 128, 1]);
+  zw_u32(cd, at);
+  zw_str(cd, name);
+} return void;
+([], "a", 0):([0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 0, 0, 0, 0, 97], "a", 0)
+([9], "", 258):([9, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 2, 1, 0, 0], "", 258)
