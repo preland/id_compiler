@@ -283,9 +283,9 @@ else
 fi
 
 # (c2) ...and it is read wherever it appears, not only at argv[1]. The driver
-# puts --extern-ok ahead of --triple whenever a backend is attached, and the
-# positional read this replaced then kept the default triple: the build below
-# silently produced an x86_64 binary and reported success.
+# once put another flag ahead of --triple whenever a backend was attached, and
+# the positional read this replaced then kept the default triple: the build
+# below silently produced an x86_64 binary and reported success.
 if $BIN_IDC "$TMP/asm.id" --backend ../backends/fs --triple aarch64-unknown-linux-gnu \
      -o "$TMP/asm3.bin" 2>&1 \
    | grep -q "no 'asm' definition of 'dbl' for target 'aarch64-unknown-linux-gnu'" \

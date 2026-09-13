@@ -1,7 +1,6 @@
 // A call. A builtin becomes whatever the runtime spells it as; anything else
-// is a call to `id_` + the name, which is also what an unresolved call becomes
-// -- a native backend supplies it at link time and the IR never has to know
-// that happened.
+// is a call to `id_` + the name -- including a `native` function, which a
+// backend's object file defines and the IR never has to know about.
 
 lw_call(int node) {
   string name = s1_of(node);
@@ -14,9 +13,8 @@ lw_ucall(int node) {
 } return int ret_i;
 
 // A call's arguments, each converted to the parameter type the callee
-// declared. A callee with no AST node is an `asm` function or a link-time
-// symbol; there is no parameter list to convert against, so the argument goes
-// as it was written.
+// declared. A callee with no AST node is an `asm` function, whose parameter
+// types are read from the asm tables instead.
 lw_args(int node) {
   int[] vals = [];
   int i = 0;

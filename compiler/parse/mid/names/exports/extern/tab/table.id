@@ -1,18 +1,11 @@
-// The extern table: names a program calls that no input file defines.
+// The build flags the checks read, and the builtin names a call is resolved
+// against. A call that resolves to no function and no builtin is an error --
+// a backend's functions are declared `native` in its own source, so there is
+// no build in which such a name could come from anywhere.
 //
-// It sits beside the export table because the two are the same kind of thing
-// -- a program-wide table of names that becomes a block of C declarations
-// ahead of the forward declarations -- and because they are emitted one after
-// the other, in the order idc.py emits them.
+// Neither flag is a property of the source: both are decisions the driver
+// makes, so they arrive as flags and live in cells.
 //
-// A call that resolves to nothing is an error (it is almost always a typo'd
-// builtin), *unless* a native backend is attached, in which case it is a name
-// the linker will supply and the C needs `extern int id_<name>();` for it.
-// idc.py decides that from `--backend`; nothing below the driver can see a
-// backend, so the driver passes `--extern-ok` and this cell remembers it.
-//
-//   xnames  the unresolved names, in first-encounter order
-//   xokc    1 when unresolved calls are allowed (a backend is attached)
 //   fsc     1 when the build is freestanding (`--freestanding`): no host, so
 //           no C-ABI entry point and no libc behind the runtime
 //   rtc     1 when this project IS the runtime (`--runtime`), which is what
@@ -20,12 +13,6 @@
 //           the whole point of it, and the collision the check exists to stop
 //           is a collision with a C runtime this build does not link
 //   bnames  the builtin names, split out of one literal (see builtin/more/)
-
-init_xtab() {
-  export string[] xnames = [];
-  export int[] xokc = [0];
-  init_rtc();
-} return void;
 
 init_rtc() {
   export int[] rtc = [0];

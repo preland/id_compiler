@@ -10,7 +10,7 @@
 acc_callee2(int id, string owner, int ln) {
   if(is_unresolved_call(id) == 1) {
     string s1_of_v = s1_of(id);
-    report_unknown_fn(s1_of_v, owner, ln);
+    report_nosuchfn(s1_of_v, owner, ln);
   }
 } return void;
 

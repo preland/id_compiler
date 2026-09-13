@@ -414,9 +414,9 @@ if [ ${#SRC_FILES[@]} -eq 0 ]; then
     exit 1
 fi
 
-# Dependencies from the project's conf.id, resolved TRANSITIVELY: a backend
-# dir (backend.json) is linked; any other dir is merged in as additional id
-# source and has its own conf.id read in turn. Mirrors idc.py's
+# Dependencies from the project's conf.id, resolved TRANSITIVELY: every dir is
+# merged in as additional id source and has its own conf.id read in turn, and
+# a backend dir (backend.json) is also linked. Mirrors idc.py's
 # parse_import_manifest + resolve_deps. conf.id lines are
 # `import "relative/dir"`.
 #
@@ -489,16 +489,14 @@ read_manifest() {
         deppath="$(cd "$deppath" && pwd -P)"
         seen_dep "$deppath" && continue
         SEEN_DEPS+=("$deppath")
-        if [ -f "$deppath/backend.json" ]; then
-            # A backend is a leaf: native source plus a manifest, with no
-            # conf.id of its own to follow.
-            MANIFEST_BACKENDS+=("$deppath")
-        else
-            check_entry_limit "$deppath"
-            check_nested_manifest "$deppath"
-            collect_ids "$deppath"
-            DEP_QUEUE+=("$deppath")
-        fi
+        # A backend is a dependency like any other: its .id files -- the
+        # `native` declarations of what it links -- are merged as source under
+        # the same limits, and its native sources are linked besides.
+        [ -f "$deppath/backend.json" ] && MANIFEST_BACKENDS+=("$deppath")
+        check_entry_limit "$deppath"
+        check_nested_manifest "$deppath"
+        collect_ids "$deppath"
+        DEP_QUEUE+=("$deppath")
     done < "$manifest"
 }
 
@@ -517,6 +515,20 @@ if [ -d "$PATH_ARG" ]; then
     SEEN_DEPS=("$(cd "$PATH_ARG" && pwd -P)")
     walk_deps "$PATH_ARG"
 fi
+
+# A --backend directory is merged exactly as a conf.id import of it is, so a
+# call into it is checked against its declarations however it was attached.
+# seen_dep keeps a backend named both ways to one copy of its source.
+for b in ${BACKENDS[@]+"${BACKENDS[@]}"}; do
+    [ -d "$b" ] || { echo "idc: --backend: no such directory: $b" >&2; exit 1; }
+    b="$(cd "$b" && pwd -P)"
+    seen_dep "$b" && continue
+    SEEN_DEPS+=("$b")
+    check_entry_limit "$b"
+    check_nested_manifest "$b"
+    collect_ids "$b"
+    walk_deps "$b"
+done
 
 # ---------------------------------------------------------------------------
 # The standard library, imported by DEFAULT -- no conf.id line, no flag. It
@@ -569,16 +581,7 @@ if [ "${#SRC_FILES[@]}" -gt 0 ]; then
     mapfile -t SRC_FILES < <(printf '%s\n' "${SRC_FILES[@]}" | LC_ALL=C sort -u)
 fi
 
-# Is a native backend in play? A call that no input file defines is a typo
-# when there is nowhere it could be resolved from, and a link-time symbol when
-# there is -- exactly idc.py's rule. The self-hosted stages cannot see a
-# backend (it is a property of the build, not of the source), so the answer is
-# passed to idparse, which then emits the `extern int id_<name>();` block
-# instead of rejecting the call.
 PARSE_ARGS=()
-if [ "$((${#BACKENDS[@]} + ${#MANIFEST_BACKENDS[@]}))" -gt 0 ]; then
-    PARSE_ARGS+=(--extern-ok)
-fi
 # The target triple selects among a program's `asm` overloads, and is always
 # passed: leaving it out let idparse's own default answer the question, which
 # is how the driver and the compiler came to disagree about the platform.

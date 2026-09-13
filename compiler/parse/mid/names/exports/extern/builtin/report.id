@@ -7,18 +7,6 @@ is_builtin(string name) {
   }
 } return int ok;
 
-// With a backend attached the name is the linker's to find, so it is recorded
-// for the extern block. Without one there is nowhere it could come from, so
-// it is a typo -- and saying so here is the whole point, since the
-// alternative is an undeclared-function error from `cc` about generated code.
-report_unknown_fn(string name, string owner, int ln) {
-  if(extern_ok() == 1) {
-    note_extern(name);
-  } else {
-    report_nosuchfn(name, owner, ln);
-  }
-} return void;
-
 // idc.py also offers a "did you mean the builtin 'X'?" hint here, computed
 // with Python's difflib. That is not reproduced yet, so the message is its
 // text without the hint; the builtin list, which is the part that answers the

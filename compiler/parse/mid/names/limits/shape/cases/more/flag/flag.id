@@ -2,7 +2,8 @@
 //
 // A property of the build, not of the source, so it arrives as a flag and is
 // read from a cell rather than threaded through every pass -- the same shape
-// as extern_ok (mid/names/exports/extern/table.id) and for the same reason.
+// as is_freestanding (mid/names/exports/extern/tab/fs.id) and for the same
+// reason.
 
 reqtests_init() {
   export int[] reqc = [0];

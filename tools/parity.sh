@@ -7,11 +7,10 @@
 # Exit 0 if the emitted C is byte-identical, else 1 (and shows the diff).
 #
 # Not for a project that uses a native backend (demos/gfxdemo, demos/fsdemo,
-# ...). Neither side of the comparison is told a backend is coming, so the
-# calls it provides look like calls to nothing: idc.py stops, and idparse --
-# run here without the --extern-ok that bin/idc passes it -- reports them
-# instead of emitting the extern block. Those projects are checked the same
-# way, with the backend attached, by tests/backends.sh.
+# ...). The two compilers legitimately differ there: bin/idc reads the
+# backend's `native` declarations and emits real prototypes, while idc.py
+# emits an unprototyped `extern int` block. Those projects are checked by
+# behaviour, with the backend attached, in tests/backends.sh.
 set -u
 cd "$(dirname "$0")/.."
 
