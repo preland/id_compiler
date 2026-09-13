@@ -1,0 +1,10 @@
+// type_of's cache-miss path: the dispatch entry's original body, moved here
+// because dispatch/type_of.id is already full, now storing its answer before
+// returning it so the next ask for the same node is a cache hit.
+type_of_miss(int id) {
+  string t = lit_type(id);
+  if(k_of(id) != "int") {
+    t = type_of2(id);
+  }
+  tcache_set(id, t);
+} return string t;

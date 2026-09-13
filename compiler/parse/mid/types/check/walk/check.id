@@ -29,6 +29,7 @@ check_rest() {
 
 tc_all() {
   init_tyreg();
+  init_tcache();
   tc_nodes();
 } return void;
 

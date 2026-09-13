@@ -3,11 +3,18 @@
 //   float -> float    var -> its declared type    un -> its operand's type
 //   call -> callee/builtin return type
 //   bin -> string for concat, int for a predicate, else the widened operands
+//
+// Cached per node id (see dispatch/more/tcache.id) -- a node is asked about
+// its own type from many call sites, and at every level of a binop chain,
+// so an uncached answer here is what makes the whole compiler exponential
+// in the chain's depth rather than linear in its size.
 
 type_of(int id) {
-  string t = lit_type(id);
-  if(k_of(id) != "int") {
-    t = type_of2(id);
+  string t = "";
+  if(tcache_has(id) == 1) {
+    t = (import tcache)[id];
+  } else {
+    t = type_of_miss(id);
   }
 } return string t;
 

@@ -1,0 +1,27 @@
+// A per-node cache for type_of. A bin node's type asks for both operands'
+// types twice over -- once from is_concat's check, once from the
+// arithmetic-widening path taken when it isn't concat -- so an uncached
+// type_of doubles its own cost at every level of a binop chain, which is
+// exponential in the chain's depth. Caching the first answer makes the
+// second ask free.
+
+init_tcache() {
+  export string[] tcache = [];
+  export int[] tcache_ok = [];
+} return void;
+
+tcache_has(int id) {
+  int ok = 0;
+  if(id < len((import tcache_ok))) {
+    ok = (import tcache_ok)[id];
+  }
+} return int ok;
+
+tcache_set(int id, string t) {
+  while(len((import tcache)) <= id) {
+    push((import tcache), "");
+    push((import tcache_ok), 0);
+  }
+  sset((import tcache), id, t);
+  lset((import tcache_ok), id, 1);
+} return void;
