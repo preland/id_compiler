@@ -455,12 +455,18 @@ fi
 # standard library and its dependencies), and a unit is the scope of the
 # one-type-per-name rule. The compiler cannot see the filesystem, so the unit
 # travels to it in the `#file` marker -- see emit_sources.
+#
+# ROOT/build is pruned too: it is where this driver writes a project's output
+# (BUILD_DIR), so it is never source, and a library whose build/ exists beside
+# its source -- because someone built it in place -- must compile the same as
+# one that was never built.
 collect_ids() {
     local root="$1" f
     SRC_ROOTS+=("$root")
     while IFS= read -r f; do SRC_FILES+=("$f"); done \
         < <(find "$root" -mindepth 1 \
                  \( -type d -name '.*' -prune \) -o \
+                 \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
                  \( -name '*.id' ! -name 'conf.id' -print \) \
             | LC_ALL=C sort)
 }
@@ -509,11 +515,14 @@ check_nested_manifest() {
 #
 # Hidden directories are pruned rather than counted, and nothing under them is
 # reached; `-mindepth 1` keeps the prune from applying to ROOT itself, so a
-# project whose own directory is hidden still builds.
+# project whose own directory is hidden still builds. ROOT/build, the output
+# directory, is pruned for the reason collect_ids gives: it is not source, and
+# building a library in place must not push its root over the limit.
 check_entry_limit() {
     local root="$1" over
     over=$(find "$root" -mindepth 1 \
                 \( -type d -name '.*' -prune \) -o \
+                \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
                 \( -type d -printf 'd|%h\n' \) -o \
                 \( -name '*.id' ! -name 'conf.id' -printf 'f|%h\n' \) \
            | awk -F'|' '{ n[$2]++ }
