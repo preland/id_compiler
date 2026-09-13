@@ -1,0 +1,8 @@
+// One `@name = global` line, or nothing when pruning drops it
+// (dce/export/keep.id).
+ll_global_kept(int i) {
+  if(keep_export(i) == 1) {
+    string ty = ll_ty((import etypes)[i]);
+    ll_global_at(i, ty);
+  }
+} return void;

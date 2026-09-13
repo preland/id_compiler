@@ -674,6 +674,81 @@ $IDC "$TMP/roundtrip.id" -o "$TMP/roundtrip" 2>/dev/null || bad "roundtrip compi
 expect_output "export/import roundtrip" "lucky 7" "$("$TMP/roundtrip")"
 "$TMP/roundtrip" >/dev/null; expect_output "exit code from exported var" "7" "$?"
 
+# --- dead-export pruning: an export declared by a function nothing calls is
+# dropped from emitted C and LLVM IR, exactly as the function itself is
+# (compiler/parse/back/drive/run/check/dce/export/keep.id); a reachable export
+# survives. Self-hosted only -- idc.py does not prune (docs/HACKING.md).
+mkdir -p "$TMP/exprune"
+cat > "$TMP/exprune/m.id" <<'EOF'
+main(int argc, string[] argv) {
+  keep_fn();
+  int r = (import kept);
+} return int r;
+
+keep_fn() {
+  export int kept = 1;
+} return void;
+
+drop_fn() {
+  export int dropped = 1;
+} return void;
+EOF
+$BIN_IDC "$TMP/exprune" --emit-c "$TMP/exprune_c.c" >/dev/null 2>&1
+if grep -q 'int dropped;' "$TMP/exprune_c.c"; then
+    bad "dead-export pruning: unreachable export dropped (C)"
+else
+    ok "dead-export pruning: unreachable export dropped (C)"
+fi
+if grep -q 'int kept;' "$TMP/exprune_c.c"; then
+    ok "dead-export pruning: reachable export kept (C)"
+else
+    bad "dead-export pruning: reachable export kept (C)"
+fi
+$BIN_IDC "$TMP/exprune" --target llvm --emit-llvm "$TMP/exprune_ll.ll" >/dev/null 2>&1
+if grep -q '^@dropped ' "$TMP/exprune_ll.ll"; then
+    bad "dead-export pruning: unreachable export dropped (LLVM)"
+else
+    ok "dead-export pruning: unreachable export dropped (LLVM)"
+fi
+if grep -q '^@kept ' "$TMP/exprune_ll.ll"; then
+    ok "dead-export pruning: reachable export kept (LLVM)"
+else
+    bad "dead-export pruning: reachable export kept (LLVM)"
+fi
+
+# The test harness narrows independently of the program (back/drive/target/
+# tests/): an export only a case's `given` setup reaches is kept in the
+# harness's own unit even though main() never calls it, and is still absent
+# from the program emitted beside it.
+mkdir -p "$TMP/exprune_harn"
+cat > "$TMP/exprune_harn/m.id" <<'EOF'
+main(int argc, string[] argv) {
+} return int 0;
+
+harn_setup() {
+  export int harn_only = 1;
+} return void;
+
+get_harn_only() {
+  int v = (import harn_only);
+} return int v;
+given harn_setup ():(1)
+EOF
+$BIN_IDC "$TMP/exprune_harn" --emit-sources 2>/dev/null \
+    | "$TMP/idlex" | "$TMP/idparse" --harness --natives > "$TMP/exprune_harn.c" 2>/dev/null
+harn_part=$(awk '/end of test harness/{exit} {print}' "$TMP/exprune_harn.c")
+prog_part=$(awk 'f{print} /end of test harness/{f=1}' "$TMP/exprune_harn.c")
+if printf '%s' "$harn_part" | grep -q 'int harn_only;'; then
+    ok "dead-export pruning: harness-only export kept in the harness's unit"
+else
+    bad "dead-export pruning: harness-only export kept in the harness's unit"
+fi
+if printf '%s' "$prog_part" | grep -q 'int harn_only;'; then
+    bad "dead-export pruning: harness-only export absent from the program"
+else
+    ok "dead-export pruning: harness-only export absent from the program"
+fi
+
 # --- rule violations must be compile errors
 cat > "$TMP/toomany.id" <<'EOF'
 main(int argc, string[] argv) {

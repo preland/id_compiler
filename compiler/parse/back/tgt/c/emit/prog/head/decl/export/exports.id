@@ -16,8 +16,7 @@ emit_export_block() {
 emit_export_lines() {
   int i = 0;
   while(i < len((import enames))) {
-    string export_line_v = export_line(i);
-    emit_line(export_line_v);
+    emit_export_line_kept(i);
     i = i + 1;
   }
 } return void;

@@ -500,21 +500,6 @@ int id_adv_str(char* src, int i);
 char* id_slice_str(char* src, int a, int b);
 
 /* exported variables */
-IdList* rnd_st;  /* exported by rnd_init() */
-IdList* fx_sintab;  /* exported by fx_trig_init() */
-IdList* txt_g8;  /* exported by txt_g8_init() */
-int sf_l_w;  /* exported by sf_l_init() */
-int sf_l_h;  /* exported by sf_l_init() */
-IdList* sf_l_px;  /* exported by idstd_sf_l_alloc() */
-IdList* err_n;  /* exported by err_init() */
-IdList* err_fs;  /* exported by idstd_err_keep_init() */
-IdList* err_ls;  /* exported by idstd_err_keep_init() */
-IdList* err_ms;  /* exported by idstd_err_keep_init2() */
-int term_w;  /* exported by idstd_term_scr_init() */
-int term_h;  /* exported by idstd_term_scr_init() */
-IdList* term_scr;  /* exported by idstd_term_scr_alloc() */
-IdList* term_attr;  /* exported by idstd_term_scr_alloc() */
-IdList* term_pal;  /* exported by idstd_term_pal_init() */
 IdList* lexline;  /* exported by main() */
 
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
