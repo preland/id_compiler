@@ -18,7 +18,7 @@
 // Files (3 functions each by the per-file rule):
 //   driver/driver.id             main + lex
 //   chars/dispatch/dispatch.id       scan_one / scan_word / scan_token
-//   chars/dispatch/dispatch_tail.id  scan_numop / scan_strop / skip_comment
+//   chars/dispatch/dispatch_tail.id  scan_numop / scan_strop (a comment ends at idstd's str_eol)
 //   scan/scan.id                 scan_ident / scan_number / scan_string
 //   scan/ops.id                  is_two_op / oplen / scan_op
 //   chars/classify/charclass.id  is_space / is_digit / is_alpha

@@ -21,10 +21,3 @@ scan_strop(string src, int i) {
     ni = scan_op(src, i);
   }
 } return int ni;
-
-// consume to end of line (or end of input)
-skip_comment(string src, int i) {
-  while(charat(src, i) != 10 && charat(src, i) != -1) {
-    i = i + 1;
-  }
-} return int i;

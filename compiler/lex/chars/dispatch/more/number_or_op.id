@@ -35,7 +35,7 @@ scan_hashop(string src, int i) {
 // character what slicing past a hard-coded "#file " used to produce, which is
 // what keeps this change invisible to byte-parity.
 scan_hash(string src, int i) {
-  int e = skip_comment(src, i);
+  int e = str_eol(src, i);
   scan_hash_out(src, i, e);
   lset((import lexline), 0, 0);
 } return int e;
