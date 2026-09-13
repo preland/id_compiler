@@ -1,19 +1,20 @@
-// Does this group cross a project boundary? Field 0 is the project label the
-// wrapper prefixed each line with.
-spans(int[] grp) {
-  string first = ds_proj(grp[0]);
-  int r = spans_loop(grp, first, 1);
+// Is line j's location already in the group? The standard library is merged
+// into every project's build, so one idstd function arrives once per project
+// at the same file:line -- that is one function seen twice, not a duplicate.
+has_where(int[] grp, int j) {
+  string where = ds_where(j);
+  int r = where_loop(grp, where, 0);
 } return int r;
 
-spans_loop(int[] grp, string first, int k) {
+where_loop(int[] grp, string where, int k) {
   int r = 0;
   while(k < len(grp) && r == 0) {
-    r = spans_at(grp, first, k);
+    r = where_at(grp, where, k);
     k = k + 1;
   }
 } return int r;
 
-spans_at(int[] grp, string first, int k) {
-  string here = ds_proj(grp[k]);
-  int r = str_cmp(first, here) != 0;
+where_at(int[] grp, string where, int k) {
+  string here = ds_where(grp[k]);
+  int r = str_cmp(where, here) == 0;
 } return int r;

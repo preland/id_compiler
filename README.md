@@ -151,9 +151,10 @@ concatenation into it.
 
 It has no opinion of its own about what "the same function" means. The
 fingerprints it groups are the compiler's (`compiler/parse/mid/unique/canon/`),
-so the tool and the rule cannot disagree. It prints only groups that cross a
-project boundary; inside one project the compiler has already said so, with a
-better message.
+so the tool and the rule cannot disagree. It prints a group only when the same
+logic lives at more than one location. A function merged into several
+projects' builds -- the standard library is merged into every one -- has one
+location, and is one function seen twice rather than two copies.
 
 A tree built `--no-std` — the kernel, the runtime, the bootstrap stages, the
 test fixtures — cannot call the standard library, so it legitimately carries

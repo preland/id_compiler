@@ -10,7 +10,14 @@ rest_take(int i, int[] grp, int j) {
 
 take_eq(int[] grp, int j, string a, string b) {
   if(str_cmp(a, b) == 0) {
-    push(grp, j);
     lset((import ds_seen), j, 1);
+    take_new(grp, j);
+  }
+} return void;
+
+take_new(int[] grp, int j) {
+  int dup = has_where(grp, j);
+  if(dup == 0) {
+    push(grp, j);
   }
 } return void;

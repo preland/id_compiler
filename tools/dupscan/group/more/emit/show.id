@@ -1,14 +1,12 @@
-// A group is worth printing only when it crosses a project boundary. Within
-// one project the compiler has already said it, at the point of definition and
-// with a better message; repeating it here would be noise on every build.
+// A group holds each location once, so it is worth printing only when the same
+// logic lives in more than one place.
 emit_group(int[] grp) {
   int n = len(grp);
-  int cross = spans(grp);
-  emit_head(grp, n, cross);
+  emit_head(grp, n);
 } return void;
 
-emit_head(int[] grp, int n, int cross) {
-  if(n > 1 && cross == 1) {
+emit_head(int[] grp, int n) {
+  if(n > 1) {
     emit_title(grp, n);
     emit_rows(grp, 0);
   }
