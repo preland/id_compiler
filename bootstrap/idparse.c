@@ -438,6 +438,7 @@ void id_sset(IdList* strs, int i, char* s);
 int id_lst_index_of(IdList* xs, int v);
 int id_lst_find(IdList* xs, int v);
 int id_lst_pick(int at, int i, int hit);
+int id_str_eol(char* s, int i);
 void id_check_asm_targets(int argc, IdList* argv);
 void id_asm_target_rows(char* triple);
 void id_dce_prune(void);
@@ -1552,7 +1553,6 @@ void id_push_tok(char* kind, char* text);
 void id_push_real(char* kind, char* text);
 int id_src_line(void);
 void id_push_line(void);
-int id_line_end(char* src, int i);
 void id_proc_line(char* src, int i, int e);
 int id_find_space(char* src, int i, int e);
 void id_init_rest(void);
@@ -2269,10 +2269,19 @@ int idx_n = 251;  /* constant from conf.id */
 char* builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";  /* constant from conf.id */
 IdList* rnd_st;  /* exported by rnd_init() */
 IdList* fx_sintab;  /* exported by fx_trig_init() */
+IdList* txt_g8;  /* exported by txt_g8_init() */
+int sf_l_w;  /* exported by sf_l_init() */
+int sf_l_h;  /* exported by sf_l_init() */
+IdList* sf_l_px;  /* exported by sf_l_alloc() */
 IdList* err_n;  /* exported by err_init() */
 IdList* err_fs;  /* exported by err_keep_init() */
 IdList* err_ls;  /* exported by err_keep_init() */
 IdList* err_ms;  /* exported by err_keep_init2() */
+int term_w;  /* exported by term_scr_init() */
+int term_h;  /* exported by term_scr_init() */
+IdList* term_scr;  /* exported by term_scr_alloc() */
+IdList* term_attr;  /* exported by term_scr_alloc() */
+IdList* term_pal;  /* exported by term_pal_init() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
 IdList* natrow;  /* exported by nat_lists() */
@@ -2427,6 +2436,13 @@ int id_lst_pick(int at, int i, int hit) {
         v = i;
     }
     return v;
+}
+
+int id_str_eol(char* s, int i) {
+    while (((id_charat(s, i) != 10) && (id_charat(s, i) != (-1)))) {
+        i = (i + 1);
+    }
+    return i;
 }
 
 void id_check_asm_targets(int argc, IdList* argv) {
@@ -12440,7 +12456,7 @@ void id_load_at(char* src, int i) {
 int id_take_line(char* src, int i) {
     int e;
     int ret_i;
-    e = id_line_end(src, i);
+    e = id_str_eol(src, i);
     id_proc_line(src, i, e);
     ret_i = (e + 1);
     return ret_i;
@@ -12490,13 +12506,6 @@ void id_push_line(void) {
     src_line_v = id_src_line();
     id_list_push(tline, (long long)(src_line_v));
     return;
-}
-
-int id_line_end(char* src, int i) {
-    while (((id_charat(src, i) != 10) && (id_charat(src, i) != (-1)))) {
-        i = (i + 1);
-    }
-    return i;
 }
 
 void id_proc_line(char* src, int i, int e) {
