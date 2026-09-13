@@ -19,10 +19,11 @@
  * per-OS by Metal/Vulkan, while gfx_present stays as the always-available
  * software path. The framebuffer is the floor, not the ceiling.
  *
- * ABI notes (dictated by how `idc` links unknown functions):
- *   - Every entry point is declared `extern int id_<name>()` by idc and is
- *     called as `id_<name>(args)`. So each function here is named with the
- *     `id_` prefix and returns `int`.
+ * ABI notes:
+ *   - Every entry point is a `native` declaration in this directory's .id
+ *     files, which idc emits as a prototype and calls as `id_<name>(args)`. So
+ *     each function here is named with the `id_` prefix, and its C signature
+ *     must match that declaration.
  *   - Argument lowering mirrors idc's: `id` int -> C int, `id` string -> char*,
  *     `id` int[] -> IdList* (below). These match what idc emits at the call.
  */

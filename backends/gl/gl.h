@@ -8,10 +8,10 @@
  * frame-loop shape doesn't change when it switches from the software floor to
  * the hardware path, only what it calls each frame to draw.
  *
- * ABI notes (same rules as gfx.h, dictated by how `idc` links unknown
- * functions): every entry point is declared by idc as `extern int
- * id_<name>()` (no prototype) and called as `id_<name>(args)`, so every
- * function here returns `int`, is named with the `id_` prefix, and takes only
+ * ABI notes (same rules as gfx.h): every entry point is a `native`
+ * declaration in this directory's .id files, which idc emits as a prototype
+ * and calls as `id_<name>(args)`, so every function here returns `int`, is
+ * named with the `id_` prefix, and takes only
  * argument types idc knows how to lower: `id` int -> C int, `id` int[] ->
  * IdList* (below). There is no `id` string arg on this second tier except the
  * window title, matching gfx.h.
