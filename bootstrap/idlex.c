@@ -433,6 +433,7 @@ static int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding 
 
 /* forward declarations */
 void id_lset(IdList* xs, int i, int v);
+int id_str_eol(char* s, int i);
 int id_is_space_at(char* src, int i);
 int id_is_digit_at(char* src, int i);
 int id_is_alpha_at(char* src, int i);
@@ -450,7 +451,6 @@ int id_scan_word(char* src, int i);
 int id_scan_token(char* src, int i);
 int id_scan_numop(char* src, int i);
 int id_scan_strop(char* src, int i);
-int id_skip_comment(char* src, int i);
 int id_scan_block(char* src, int i);
 int id_block_tok(char* src, int i);
 int id_skip_block(char* src, int i);
@@ -502,15 +502,31 @@ char* id_slice_str(char* src, int a, int b);
 /* exported variables */
 IdList* rnd_st;  /* exported by rnd_init() */
 IdList* fx_sintab;  /* exported by fx_trig_init() */
+IdList* txt_g8;  /* exported by txt_g8_init() */
+int sf_l_w;  /* exported by sf_l_init() */
+int sf_l_h;  /* exported by sf_l_init() */
+IdList* sf_l_px;  /* exported by sf_l_alloc() */
 IdList* err_n;  /* exported by err_init() */
 IdList* err_fs;  /* exported by err_keep_init() */
 IdList* err_ls;  /* exported by err_keep_init() */
 IdList* err_ms;  /* exported by err_keep_init2() */
+int term_w;  /* exported by term_scr_init() */
+int term_h;  /* exported by term_scr_init() */
+IdList* term_scr;  /* exported by term_scr_alloc() */
+IdList* term_attr;  /* exported by term_scr_alloc() */
+IdList* term_pal;  /* exported by term_pal_init() */
 IdList* lexline;  /* exported by main() */
 
 void id_lset(IdList* xs, int i, int v) {
     id_list_set(xs, i, (long long)(v));
     return;
+}
+
+int id_str_eol(char* s, int i) {
+    while (((id_charat(s, i) != 10) && (id_charat(s, i) != (-1)))) {
+        i = (i + 1);
+    }
+    return i;
 }
 
 int id_is_space_at(char* src, int i) {
@@ -630,7 +646,7 @@ int id_scan_word(char* src, int i) {
     int ni;
     ni = 0;
     if (((id_charat(src, i) == 47) && (id_charat(src, (i + 1)) == 47))) {
-        ni = id_skip_comment(src, i);
+        ni = id_str_eol(src, i);
     } else {
         ni = id_scan_block(src, i);
     }
@@ -668,13 +684,6 @@ int id_scan_strop(char* src, int i) {
         ni = id_scan_op(src, i);
     }
     return ni;
-}
-
-int id_skip_comment(char* src, int i) {
-    while (((id_charat(src, i) != 10) && (id_charat(src, i) != (-1)))) {
-        i = (i + 1);
-    }
-    return i;
 }
 
 int id_scan_block(char* src, int i) {
@@ -734,7 +743,7 @@ int id_scan_hashop(char* src, int i) {
 
 int id_scan_hash(char* src, int i) {
     int e;
-    e = id_skip_comment(src, i);
+    e = id_str_eol(src, i);
     id_scan_hash_out(src, i, e);
     id_lset(lexline, 0, 0);
     return e;

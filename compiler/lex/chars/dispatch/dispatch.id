@@ -18,7 +18,7 @@ scan_one(string src, int i) {
 scan_word(string src, int i) {
   int ni = 0;
   if(charat(src, i) == 47 && charat(src, i + 1) == 47) {
-    ni = skip_comment(src, i);
+    ni = str_eol(src, i);
   } else {
     ni = scan_block(src, i);
   }

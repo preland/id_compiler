@@ -38,8 +38,7 @@ compiler/lex     needs-std
 compiler/parse   needs-std
 
 # ---------------------------------------------------------------------------
-# engine, moonbuggy, solitaire -- the terminal engine and its two games, whose
-#   duplicate lset functions have been removed so they now use the one from idstd.
-engine           needs-std
+# moonbuggy, solitaire -- the two terminal games. The engine they each bundled
+#   (and demos/engine, its reference copy) is idstd's sys/io/term now.
 moonbuggy        needs-std
 solitaire        needs-std

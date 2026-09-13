@@ -13,7 +13,7 @@ load_at(string src, int i) {
 } return void;
 
 take_line(string src, int i) {
-  int e = line_end(src, i);
+  int e = str_eol(src, i);
   proc_line(src, i, e);
   int ret_i = e + 1;
 } return int ret_i;
