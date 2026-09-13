@@ -24,7 +24,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/fbtext" -o "$TMP/fbtext" >&2 \
+env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/fbtext" --allow-untested -o "$TMP/fbtext" >&2 \
     || { echo "fbtext.sh: failed to build tools/fbtext" >&2; exit 1; }
 
 "$TMP/fbtext" "$1" < "$ROOT/../kernel/prog/conf.id"

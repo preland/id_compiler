@@ -40,7 +40,7 @@ esac || { echo "mkfont.sh: cannot read $src" >&2; exit 1; }
 
 grep -q "^$MARK" "$CONF" || { echo "mkfont.sh: no '$MARK' block in $CONF" >&2; exit 1; }
 
-env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/mkfont" -o "$TMP/mkfont" >&2 \
+env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/mkfont" --allow-untested -o "$TMP/mkfont" >&2 \
     || { echo "mkfont.sh: failed to build tools/mkfont" >&2; exit 1; }
 name=$(basename "$src")
 "$TMP/mkfont" "$TMP/font.psf" "$name" conf > "$TMP/block" || { cat "$TMP/block" >&2; exit 1; }
