@@ -1,0 +1,11 @@
+// EXPECT: function 'eprint' collides with a runtime helper
+// IDCPY-ACCEPTS
+// A program's own eprint would be emitted as id_eprint, which is the helper
+// the builtin calls. idc.py has no such builtin, so the name is free there.
+eprint(string s) {
+  print(s);
+} return void;
+
+main(int argc, string[] argv) {
+  eprint("x");
+} return int 0;

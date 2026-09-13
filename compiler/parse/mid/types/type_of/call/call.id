@@ -17,7 +17,7 @@ type_call(string name) {
 // return type of a builtin, or "?" if `name` is not a builtin
 builtin_type(string name) {
   string t = "?";
-  if(name == "print") {
+  if(name == "print" || name == "eprint") {
     t = "void";
   } else {
     t = bt2(name);

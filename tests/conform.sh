@@ -22,6 +22,8 @@
 #   NN-name.expected  its exact stdout
 #   NN-name.exit      its exit code, present only when nonzero
 #   NN-name.stderr    its exact stderr, present only when it writes any
+#   NN-name.combined  stdout and stderr sent to one file, present only when the
+#                     order the two streams interleave in is what is pinned
 #
 # The expected files record what the C target does, because the C target is
 # what `docs/SPEC.md` was written from. A disagreement is therefore always
@@ -66,8 +68,12 @@ GAPS=""
 # A target that says "this is C-only" is describing a known limitation rather
 # than getting the answer wrong. The message comes from idc.py's
 # unsupported_builtin_msg and reject_word_type, so match on their wording.
+# eprint is the one builtin idc.py never learned, and it refuses it by name as
+# an external call. That refusal is the wasm target's gap for it, and only
+# wasm's: on the other targets the same name in a build log is a failure.
 is_enumerated_gap() {
-    grep -qE "is C-only|C-only|not implemented for this target" "$1"
+    grep -qE "is C-only|C-only|not implemented for this target" "$1" && return 0
+    [ "$2" = wasm ] && grep -qF "call to external function 'eprint' is not supported" "$1"
 }
 
 # A target that is known not to conform in one area, by name.
@@ -134,7 +140,7 @@ run_case() {
     esac
 
     if [ ! -e "$bin" ]; then
-        if is_enumerated_gap "$TMP/build.log"; then
+        if is_enumerated_gap "$TMP/build.log" "$target"; then
             skip "$target  $id  -- $(head -1 "$TMP/build.log")"
         else
             bad "$target  $id  -- build failed: $(head -1 "$TMP/build.log")"
@@ -161,6 +167,17 @@ run_case() {
         want_err=$(cat "$dir/$base.stderr")
         if [ "$got_err" != "$want_err" ]; then
             bad "$target  $id  -- stderr: want [$want_err] got [$got_err]"
+            return
+        fi
+    fi
+    if [ -f "$dir/$base.combined" ]; then
+        if [ "$target" = wasm ]; then
+            wasmtime "$bin" >"$TMP/both.log" 2>&1
+        else
+            "$bin" >"$TMP/both.log" 2>&1
+        fi
+        if [ "$(cat "$TMP/both.log")" != "$(cat "$dir/$base.combined")" ]; then
+            bad "$target  $id  -- stdout and stderr together: want [$(cat "$dir/$base.combined")] got [$(cat "$TMP/both.log")]"
             return
         fi
     fi

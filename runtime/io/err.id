@@ -1,0 +1,9 @@
+// eprint, over the same serial port as print.
+//
+// A kernel has one place to write, so eprint writes there rather than being
+// refused at compile time: code shared with a hosted build keeps building, and
+// a port with no buffer keeps the lines in the order they were written.
+
+eprint(string s) {
+  print(s);
+} return void;

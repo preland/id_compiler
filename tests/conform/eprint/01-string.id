@@ -1,0 +1,4 @@
+// eprint writes its argument and a newline to stderr, and nothing to stdout.
+main(int argc, string[] argv) {
+  eprint("to stderr");
+} return int 0;

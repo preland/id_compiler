@@ -51,6 +51,17 @@ if command -v llvm-nm >/dev/null 2>&1; then
     fi
 fi
 
+# A kernel has one place to write, so the runtime's eprint writes to the serial
+# port as print does (docs/SPEC.md 9), and a freestanding program that calls it
+# links against that definition rather than failing at the link.
+if command -v llvm-nm >/dev/null 2>&1; then
+    if llvm-nm --defined-only "$ELF" 2>/dev/null | grep -q ' id_eprint$'; then
+        ok "the runtime defines eprint"
+    else
+        bad "the runtime defines eprint"
+    fi
+fi
+
 # -- boot, then drive the shell over the serial port ------------------------
 # The shell reads the keyboard and the serial port through one function, so a
 # test types at it the same way a person does.

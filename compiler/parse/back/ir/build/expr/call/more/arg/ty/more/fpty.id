@@ -8,3 +8,13 @@ lw_fpty(string name, int i, int node, string t) {
     p = fn_param_at(vt, i);
   }
 } return string p;
+
+// A call whose callee is a value rather than a symbol. The value is the first
+// operand, so every pass that follows operands -- mem2reg replacing the load,
+// dce keeping it alive -- already sees it, and the printer writes it where a
+// symbol would go (back/tgt/ll/val/insn/mem/call.id).
+lw_fcall_emit(int node, int callee, int[] args) {
+  string ety = lw_ety(node);
+  int[] none = [];
+  int ret_i = lw_emit("call", ety, callee, 0 - 1, "", args, none);
+} return int ret_i;

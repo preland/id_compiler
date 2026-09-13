@@ -1,0 +1,10 @@
+// A float reaches stderr through the same lossy spelling print uses (SPEC 4).
+main(int argc, string[] argv) {
+  both_float(1.0 / 3.0);
+  both_float(2.0);
+} return int 0;
+
+both_float(float f) {
+  print(f);
+  eprint(f);
+} return void;

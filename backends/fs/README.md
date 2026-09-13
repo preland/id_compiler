@@ -1,8 +1,8 @@
 # `fs` — files for `id`
 
 `id` has no filesystem builtins. The whole of `BUILTIN_NAMES` gives a program
-stdin (`input`, `read_all`) and stdout (`print`, `put`, `flush`) and nothing
-else, so before this backend a program that worked on a file was a filter and
+stdin (`input`, `read_all`), stdout (`print`, `put`, `flush`) and stderr
+(`eprint`) and nothing else, so before this backend a program that worked on a file was a filter and
 the *caller* chose the files:
 
 ```sh

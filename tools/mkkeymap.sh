@@ -20,7 +20,7 @@ grep -q "^$MARK" "$CONF" || { echo "mkkeymap.sh: no '$MARK' block in $CONF" >&2;
 
 env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/mkkeymap" --allow-untested -o "$TMP/mkkeymap" >&2 \
     || { echo "mkkeymap.sh: failed to build tools/mkkeymap" >&2; exit 1; }
-"$TMP/mkkeymap" > "$TMP/block" || { cat "$TMP/block" >&2; exit 1; }
+"$TMP/mkkeymap" > "$TMP/block" || exit 1
 
 awk -v mark="$MARK" -v block="$TMP/block" '
     skip && $0 == "" { skip = 0 }

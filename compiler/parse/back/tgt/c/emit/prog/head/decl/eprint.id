@@ -1,0 +1,31 @@
+// eprint's runtime helper, which is not in the prelude.
+//
+// The prelude is idc.py's RUNTIME byte for byte, and a program that never calls
+// eprint must emit exactly the C idc.py emits (tools/parity.sh). So the helper
+// is emitted after the prelude, and only when some call in the build names it.
+//
+// IDTC_EPRINT_TO is where it writes: stderr, unless the test harness has
+// already said otherwise, because there stderr is the channel a case's report
+// comes back through (docs/TESTS.md, "How it runs").
+
+emit_eprint_def() {
+  if(calls_eprint() == 1) {
+    emit_line("#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nstatic void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, \"%s\\n\", s); }");
+  }
+} return void;
+
+calls_eprint() {
+  int i = 0;
+  int hit = 0;
+  while(i < len((import nkind))) {
+    hit = hit || (k_of(i) == "call" && s1_of(i) == "eprint");
+    i = i + 1;
+  }
+} return int hit;
+
+// The LLVM target's C runtime is asked for once per build and without the
+// program, so it cannot know whether eprint is called and always defines it.
+// It has no harness to answer to: the cases of any build run in the C harness.
+emit_crt_eprint() {
+  emit_line("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }");
+} return void;

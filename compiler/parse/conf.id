@@ -10,6 +10,7 @@
 // `bnames` at startup (mid/names/exports/extern/builtin/). The order is idc.py's
 // BUILTIN_NAMES order, not alphabetical: the fourteen ordinary builtins first,
 // then the flat-store and unsigned-word group, so the printed list reads the
-// same under both compilers.
+// same under both compilers -- up to eprint, which idc.py does not have and so
+// comes last.
 int idx_n = 251;
-string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";
+string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint";

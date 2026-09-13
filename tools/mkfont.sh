@@ -43,8 +43,8 @@ grep -q "^$MARK" "$CONF" || { echo "mkfont.sh: no '$MARK' block in $CONF" >&2; e
 env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/mkfont" --allow-untested -o "$TMP/mkfont" >&2 \
     || { echo "mkfont.sh: failed to build tools/mkfont" >&2; exit 1; }
 name=$(basename "$src")
-"$TMP/mkfont" "$TMP/font.psf" "$name" conf > "$TMP/block" || { cat "$TMP/block" >&2; exit 1; }
-"$TMP/mkfont" "$TMP/font.psf" "$name" all > "$TMP/all" || { cat "$TMP/all" >&2; exit 1; }
+"$TMP/mkfont" "$TMP/font.psf" "$name" conf > "$TMP/block" || exit 1
+"$TMP/mkfont" "$TMP/font.psf" "$name" all > "$TMP/all" || exit 1
 
 awk -v mark="$MARK" -v block="$TMP/block" '
     skip && $0 == "" { skip = 0 }
