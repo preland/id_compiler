@@ -1,0 +1,9 @@
+// EXPECT: variable 'done' is used on line 6, before its declaration on line 7
+// IDCPY-ACCEPTS
+// A loop condition is outside the loop body, so it cannot read a name the
+// body declares, even on the second pass.
+main(int argc, string[] argv) {
+  while(done == 0) {
+    int done = 1;
+  }
+} return int 0;

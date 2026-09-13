@@ -1,0 +1,29 @@
+// A name the function declares, used where that declaration cannot be seen.
+// The storage is hoisted to the whole function, so without this the program
+// compiles and reads whatever the storage holds.
+
+report_scope(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  string scope_msg_v = scope_msg(name, owner, ln);
+  var_report(loc_at_v + "variable '" + name + "' is used on line " + ln + scope_msg_v + "; a variable exists only from its declaration to the end of the block that declares it");
+} return void;
+
+scope_msg(string name, string owner, int ln) {
+  int dl = decl_line(name, owner);
+  string msg = ", before its declaration on line " + dl;
+  if(dl < ln) {
+    msg = ", outside the block that declares it on line " + dl;
+  }
+} return string msg;
+
+// A function declares a name at most once, so the one matching row is it.
+decl_line(string name, string owner) {
+  int i = 0;
+  int dl = 0;
+  while(i < len((import dvname))) {
+    if(dv_hit(i, name, owner) == 1) {
+      dl = (import dvline)[i];
+    }
+    i = i + 1;
+  }
+} return int dl;

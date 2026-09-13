@@ -1,0 +1,13 @@
+// EXPECT: variable 'r' is used on line 13, outside the block that declares it on line 11
+// IDCPY-ACCEPTS
+// The return clause sees what the body declares at its own top level, and
+// nothing declared inside a block of it.
+main(int argc, string[] argv) {
+  int got = pick(argc);
+} return int got;
+
+pick(int k) {
+  if(k > 0) {
+    int r = 1;
+  }
+} return int r;

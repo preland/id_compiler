@@ -22,4 +22,5 @@ reg_loop(int id, string owner) {
 reg_var(string name, string type, string owner, int exported, int ln, int unit) {
   reg_report(name, type, owner, exported, ln, unit);
   reg_push(name, type, owner, exported, unit);
+  push((import dvline), ln);
 } return void;

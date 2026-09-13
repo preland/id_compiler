@@ -34,6 +34,7 @@ check_names() {
 //   dvname  the declared name        dvfunc  the function that declares it
 //   dvtype  the type it was given    dvexp   1 when the declaration exports
 //   dvunit  the unit it was declared in (declared beside didx, in index/)
+//   dvline  the line it was declared on (declared in fill_didx, in index/)
 init_reg() {
   export string[] dvname = [];
   export string[] dvfunc = [];

@@ -1,0 +1,15 @@
+// EXPECT: variable 'v' is used on line 13, outside the block that declares it on line 11
+// IDCPY-ACCEPTS
+// docs/FRICTION.md 23. idc.py hoists every local to the function and compiles
+// this; it prints 0, read from a branch that never ran.
+main(int argc, string[] argv) {
+  pick(0);
+} return int 0;
+
+pick(int k) {
+  if(k > 0) {
+    int v = 7;
+  } else {
+    print(v);
+  }
+} return void;

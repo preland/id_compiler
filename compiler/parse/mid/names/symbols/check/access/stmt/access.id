@@ -5,6 +5,7 @@
 // function declare the name" and "does anyone" -- from the registry.
 
 check_access() {
+  export string[] scnames = [];
   int i = 0;
   while(i < len((import prog))) {
     acc_func((import prog)[i]);
