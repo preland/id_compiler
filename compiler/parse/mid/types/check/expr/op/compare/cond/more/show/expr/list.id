@@ -1,0 +1,28 @@
+// Calls and list literals: the two kinds whose operands are a list. show_arr
+// ends the chain; every expression kind the parser builds is handled before
+// its default is reached.
+
+show_list(int id) {
+  string out = show_arr(id);
+  if(k_of(id) == "call") {
+    int[] args = l1_of(id);
+    out = s1_of(id) + "(" + show_args(args) + ")";
+  }
+} return string out;
+
+show_arr(int id) {
+  string out = "...";
+  if(k_of(id) == "arr") {
+    int[] elems = l1_of(id);
+    out = "[" + show_args(elems) + "]";
+  }
+} return string out;
+
+show_args(int[] l) {
+  string out = "";
+  int i = 0;
+  while(i < len(l)) {
+    out = show_arg_at(l, i, out);
+    i = i + 1;
+  }
+} return string out;

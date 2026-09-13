@@ -1,7 +1,9 @@
 // The bitwise levels of the precedence ladder. They sit *below* the
-// comparisons -- tighter, not looser -- so `flags & MASK != 0` groups as
-// `(flags & MASK) != 0`, which is what it reads like. C binds them the other
-// way round; id does not inherit that. Among themselves the levels follow C:
+// comparisons -- tighter, not looser -- so `flags & MASK != 0` would group as
+// `(flags & MASK) != 0`. C binds them the other way round, and because the two
+// disagree, a comparison with an unparenthesized bitwise operand is a compile
+// error (mid/types/check/expr/op/compare/cond/more/). Among themselves the
+// levels follow C:
 //
 //   rel -> bitor(|) -> bitxor(^) -> bitand(&) -> shift(<< >>) -> add
 //

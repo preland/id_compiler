@@ -31,7 +31,9 @@ printf 'add(int x, int y) {\n  int sum = x + y;\n} return int sum;\n' | ./idlex 
   bare `=` meaning equality), then the bitwise group `|`, `^`, `&`, `<< >>`,
   then additive (`+ -`) and multiplicative (`* / %`), then unary (`- ! ~`).
   As in `idc.py`, the bitwise levels sit *below* the comparisons — tighter, not
-  looser — so `flags & MASK != 0` groups the way it reads.
+  looser. Because that is the opposite of C, a comparison with an
+  unparenthesized bitwise operand is a compile error here (`idc.py` accepts it);
+  write `(flags & MASK) != 0`.
 - **Systems types:** the 64-bit `word`, integer literals wider than an `int`
   (emitted with C's `LL` suffix), the flat-store builtins (`alloc`,
   `store_size`, `peek8/16/32/64`, `poke8/16/32/64`), the unsigned operations

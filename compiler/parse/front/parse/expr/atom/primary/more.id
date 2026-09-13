@@ -5,3 +5,17 @@ fold_mul_tail(int[] pos, int left, string op) {
   int right = parse_unary(pos);
   int ret_i = node_bin(op, left, right);
 } return int ret_i;
+
+// A binary operation written inside parentheses builds the same tree as one
+// written without them, so the rule that a comparison and a bitwise operator
+// are not mixed bare (mid/types/check/expr/op/compare/cond/more/) could not
+// otherwise tell `(a & b) == c` from `a & b == c`. Only this production
+// records: an `if` or `while` condition's parentheses are syntax, not
+// grouping, and reach parse_paren directly. Nothing that emits code or
+// fingerprints a function reads the record, so parentheses change neither.
+paren_primary(int[] pos) {
+  int e = parse_paren(pos);
+  if(k_of(e) == "bin") {
+    push((import nparen), e);
+  }
+} return int e;

@@ -1409,6 +1409,7 @@ int id_parse_str(IdList* pos);
 int id_is_relop(char* s);
 int id_is_addop(char* s);
 int id_fold_mul_tail(IdList* pos, int left, char* op);
+int id_paren_primary(IdList* pos);
 int id_fold_mul(IdList* pos, int left);
 int id_parse_primary(IdList* pos);
 int id_parse_paren(IdList* pos);
@@ -1928,6 +1929,27 @@ void id_chk_cmp(int id);
 void id_chk_iassign3(int id, char* bt);
 void id_chk_cond(int id, char* msg);
 void id_chk_bin(int id);
+void id_chk_mixed(int id);
+void id_mixed_pair(int id, int a, int b);
+int id_mixed_side(int id, int c);
+int id_ops_mixed(int id, int c);
+int id_mixed_ops(char* po, char* co);
+int id_paren_missing(int c);
+void id_mixed_err(int id, int c);
+void id_mixed_say(int id, char* words, char* want);
+char* id_mixed_fix(int id);
+char* id_show_list(int id);
+char* id_show_arr(int id);
+char* id_show_args(IdList* l);
+char* id_show_expr(int id);
+char* id_show_more(int id);
+char* id_show_rest(int id);
+char* id_show_arg_at(IdList* l, int i, char* out);
+char* id_show_bin(int id);
+char* id_show_side(int c);
+char* id_fix_side(int id, int c);
+char* id_mixed_words(int id, int c);
+char* id_bit_cmp_words(char* po, char* co);
 int id_cmp_bad(char* lt, char* rt, int okk);
 int id_eq_ok(char* lt, char* rt);
 int id_ord_ok(char* lt, char* rt);
@@ -2207,6 +2229,7 @@ IdList* nkind;  /* exported by init_a() */
 IdList* ni1;  /* exported by init_b() */
 IdList* ni2;  /* exported by init_b() */
 IdList* ns1;  /* exported by init_b() */
+IdList* nparen;  /* exported by setup_rest() */
 IdList* bnames;  /* exported by init_bnames() */
 IdList* rtc;  /* exported by init_rtc() */
 IdList* fsc;  /* exported by init_rtc() */
@@ -11039,6 +11062,15 @@ int id_fold_mul_tail(IdList* pos, int left, char* op) {
     return ret_i;
 }
 
+int id_paren_primary(IdList* pos) {
+    int e;
+    e = id_parse_paren(pos);
+    if ((strcmp(id_k_of(e), "bin") == 0)) {
+        id_list_push(nparen, (long long)(e));
+    }
+    return e;
+}
+
 int id_fold_mul(IdList* pos, int left) {
     char* op;
     int ret_i;
@@ -11052,7 +11084,7 @@ int id_parse_primary(IdList* pos) {
     int node;
     node = 0;
     if ((strcmp(id_cur_text(pos), "(") == 0)) {
-        node = id_parse_paren(pos);
+        node = id_paren_primary(pos);
     } else {
         node = id_pp2(pos);
     }
@@ -11934,6 +11966,7 @@ void id_init_b(void) {
 int id_setup_rest(void) {
     int ret_i;
     id_init_rest();
+    nparen = id_list_lit(0);
     ret_i = id_init_ir();
     return ret_i;
 }
@@ -15666,7 +15699,228 @@ void id_chk_cond(int id, char* msg) {
 void id_chk_bin(int id) {
     id_chk_cmp(id);
     id_chk_bits(id);
+    id_chk_mixed(id);
     return;
+}
+
+void id_chk_mixed(int id) {
+    int i1_of_v;
+    int i2_of_v;
+    i1_of_v = id_i1_of(id);
+    i2_of_v = id_i2_of(id);
+    id_mixed_pair(id, i1_of_v, i2_of_v);
+    return;
+}
+
+void id_mixed_pair(int id, int a, int b) {
+    int c;
+    c = b;
+    if ((id_mixed_side(id, a) == 1)) {
+        c = a;
+    }
+    if ((id_mixed_side(id, c) == 1)) {
+        id_mixed_err(id, c);
+    }
+    return;
+}
+
+int id_mixed_side(int id, int c) {
+    int ok;
+    ok = 0;
+    if (((strcmp(id_k_of(c), "bin") == 0) && (id_ops_mixed(id, c) == 1))) {
+        ok = id_paren_missing(c);
+    }
+    return ok;
+}
+
+int id_ops_mixed(int id, int c) {
+    char* po;
+    char* co;
+    int ok;
+    po = id_s1_of(id);
+    co = id_s1_of(c);
+    ok = id_mixed_ops(po, co);
+    return ok;
+}
+
+int id_mixed_ops(char* po, char* co) {
+    int ok;
+    ok = 0;
+    if ((((id_is_relop(po) == 1) && (id_is_bitop(co) == 1)) || ((id_is_bitop(po) == 1) && (id_is_relop(co) == 1)))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_paren_missing(int c) {
+    int i;
+    int ok;
+    i = 0;
+    ok = 1;
+    while ((i < id_list_len(nparen))) {
+        if (((int)(id_list_get(nparen, i)) == c)) {
+            ok = 0;
+        }
+        i = (i + 1);
+    }
+    return ok;
+}
+
+void id_mixed_err(int id, int c) {
+    char* words;
+    char* want;
+    words = id_mixed_words(id, c);
+    want = id_mixed_fix(id);
+    id_mixed_say(id, words, want);
+    return;
+}
+
+void id_mixed_say(int id, char* words, char* want) {
+    char* was;
+    was = id_show_bin(id);
+    id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'", was), "' mixes "), words), "; parenthesize it as the current precedence reads it: '"), want), "'"));
+    return;
+}
+
+char* id_mixed_fix(int id) {
+    int i1_of_v;
+    int i2_of_v;
+    char* ret_s;
+    i1_of_v = id_i1_of(id);
+    i2_of_v = id_i2_of(id);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_fix_side(id, i1_of_v), " "), id_s1_of(id)), " "), id_fix_side(id, i2_of_v));
+    return ret_s;
+}
+
+char* id_show_list(int id) {
+    char* out;
+    IdList* args;
+    out = id_show_arr(id);
+    if ((strcmp(id_k_of(id), "call") == 0)) {
+        args = id_l1_of(id);
+        out = id_concat(id_concat(id_concat(id_s1_of(id), "("), id_show_args(args)), ")");
+    }
+    return out;
+}
+
+char* id_show_arr(int id) {
+    char* out;
+    IdList* elems;
+    out = "...";
+    if ((strcmp(id_k_of(id), "arr") == 0)) {
+        elems = id_l1_of(id);
+        out = id_concat(id_concat("[", id_show_args(elems)), "]");
+    }
+    return out;
+}
+
+char* id_show_args(IdList* l) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(l))) {
+        out = id_show_arg_at(l, i, out);
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_show_expr(int id) {
+    char* out;
+    out = id_show_more(id);
+    if (((((strcmp(id_k_of(id), "int") == 0) || (strcmp(id_k_of(id), "float") == 0)) || (strcmp(id_k_of(id), "str") == 0)) || (strcmp(id_k_of(id), "var") == 0))) {
+        out = id_s1_of(id);
+    }
+    return out;
+}
+
+char* id_show_more(int id) {
+    char* out;
+    out = id_show_rest(id);
+    if ((strcmp(id_k_of(id), "bin") == 0)) {
+        out = id_show_bin(id);
+    }
+    if ((strcmp(id_k_of(id), "import") == 0)) {
+        out = id_concat(id_concat("(import ", id_s1_of(id)), ")");
+    }
+    return out;
+}
+
+char* id_show_rest(int id) {
+    char* out;
+    int i1_of_v;
+    int i1_of_v2;
+    int i2_of_v;
+    out = id_show_list(id);
+    if ((strcmp(id_k_of(id), "un") == 0)) {
+        i1_of_v = id_i1_of(id);
+        out = id_concat(id_s1_of(id), id_show_side(i1_of_v));
+    }
+    if ((strcmp(id_k_of(id), "index") == 0)) {
+        i1_of_v2 = id_i1_of(id);
+        i2_of_v = id_i2_of(id);
+        out = id_concat(id_concat(id_concat(id_show_side(i1_of_v2), "["), id_show_expr(i2_of_v)), "]");
+    }
+    return out;
+}
+
+char* id_show_arg_at(IdList* l, int i, char* out) {
+    char* sep;
+    char* ret_s;
+    sep = "";
+    if ((i > 0)) {
+        sep = ", ";
+    }
+    ret_s = id_concat(id_concat(out, sep), id_show_expr((int)(id_list_get(l, i))));
+    return ret_s;
+}
+
+char* id_show_bin(int id) {
+    int i1_of_v;
+    int i2_of_v;
+    char* ret_s;
+    i1_of_v = id_i1_of(id);
+    i2_of_v = id_i2_of(id);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_show_side(i1_of_v), " "), id_s1_of(id)), " "), id_show_side(i2_of_v));
+    return ret_s;
+}
+
+char* id_show_side(int c) {
+    char* out;
+    out = id_show_expr(c);
+    if (((strcmp(id_k_of(c), "bin") == 0) && (id_paren_missing(c) == 0))) {
+        out = id_concat(id_concat("(", out), ")");
+    }
+    return out;
+}
+
+char* id_fix_side(int id, int c) {
+    char* out;
+    out = id_show_side(c);
+    if ((id_mixed_side(id, c) == 1)) {
+        out = id_concat(id_concat("(", out), ")");
+    }
+    return out;
+}
+
+char* id_mixed_words(int id, int c) {
+    char* po;
+    char* co;
+    char* ret_s;
+    po = id_s1_of(id);
+    co = id_s1_of(c);
+    ret_s = id_bit_cmp_words(po, co);
+    return ret_s;
+}
+
+char* id_bit_cmp_words(char* po, char* co) {
+    char* out;
+    out = id_concat(id_concat(id_concat(id_concat("a bitwise '", co), "' with a comparison '"), po), "'");
+    if ((id_is_bitop(po) == 1)) {
+        out = id_concat(id_concat(id_concat(id_concat("a bitwise '", po), "' with a comparison '"), co), "'");
+    }
+    return out;
 }
 
 int id_cmp_bad(char* lt, char* rt, int okk) {

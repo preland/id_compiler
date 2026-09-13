@@ -29,4 +29,5 @@ chk_cond(int id, string msg) {
 chk_bin(int id) {
   chk_cmp(id);
   chk_bits(id);
+  chk_mixed(id);
 } return void;

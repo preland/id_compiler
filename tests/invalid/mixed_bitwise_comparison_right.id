@@ -1,0 +1,11 @@
+// EXPECT: error: 'n == bits[0] >> len(argv)' mixes a bitwise '>>' with a comparison '=='; parenthesize it as the current precedence reads it: 'n == (bits[0] >> len(argv))'
+// IDCPY-ACCEPTS
+// The bitwise operand on the right, inside a condition: the condition's own
+// parentheses are syntax, not grouping, so they do not count.
+main(int argc, string[] argv) {
+  int[] bits = [8, 3];
+  int n = 1;
+  if(n == bits[0] >> len(argv)) {
+    print("four");
+  }
+} return int 0;

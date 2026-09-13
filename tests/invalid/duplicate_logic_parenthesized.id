@@ -1,0 +1,6 @@
+// EXPECT: same signature and logic as
+// Parentheses the precedence already implies change what a reader sees, not
+// what the function does: the parser records them for the mixed-operator rule
+// and the fingerprint does not read that record, so these are one function.
+masked(int x) { int r = (x & 4) | 1; } return int r;
+flagged(int y) { int q = y & 4 | 1; } return int q;

@@ -1,6 +1,9 @@
 // The tail of init.id's setup -- that file is already full.
+//   nparen  the binary nodes written inside grouping parentheses, in parse
+//           order (front/parse/expr/atom/primary/more.id)
 
 setup_rest() {
   init_rest();
+  export int[] nparen = [];
   int ret_i = init_ir();
 } return int ret_i;

@@ -10,7 +10,7 @@ fold_mul(int[] pos, int left) {
 parse_primary(int[] pos) {
   int node = 0;
   if(cur_text(pos) == "(") {
-    node = parse_paren(pos);
+    node = paren_primary(pos);
   } else {
     node = pp2(pos);
   }

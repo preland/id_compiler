@@ -1,0 +1,29 @@
+// Whether an operation and its operand are one comparison and one bitwise
+// operator, and whether the operand was written inside parentheses.
+
+ops_mixed(int id, int c) {
+  string po = s1_of(id);
+  string co = s1_of(c);
+  int ok = mixed_ops(po, co);
+} return int ok;
+
+// is_relop includes id's bare `=`, which is equality inside an expression.
+mixed_ops(string po, string co) {
+  int ok = 0;
+  if(is_relop(po) == 1 && is_bitop(co) == 1 || is_bitop(po) == 1 && is_relop(co) == 1) {
+    ok = 1;
+  }
+} return int ok;
+
+// nparen holds only binary nodes that were parenthesized, so it is short; a
+// scan is cheaper than a slot on every node would be to keep aligned.
+paren_missing(int c) {
+  int i = 0;
+  int ok = 1;
+  while(i < len((import nparen))) {
+    if((import nparen)[i] == c) {
+      ok = 0;
+    }
+    i = i + 1;
+  }
+} return int ok;

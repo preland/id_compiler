@@ -1,0 +1,20 @@
+// The diagnostic shows the expression as written and as the current precedence
+// groups it, so the reader learns what it means today without looking up the
+// table, and has the spelling to paste.
+
+mixed_err(int id, int c) {
+  string words = mixed_words(id, c);
+  string want = mixed_fix(id);
+  mixed_say(id, words, want);
+} return void;
+
+mixed_say(int id, string words, string want) {
+  string was = show_bin(id);
+  tc_err(id, "'" + was + "' mixes " + words + "; parenthesize it as the current precedence reads it: '" + want + "'");
+} return void;
+
+mixed_fix(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string ret_s = fix_side(id, i1_of_v) + " " + s1_of(id) + " " + fix_side(id, i2_of_v);
+} return string ret_s;

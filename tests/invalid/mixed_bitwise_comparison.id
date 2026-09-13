@@ -1,0 +1,8 @@
+// EXPECT: mixed_bitwise_comparison.id:7: error: 'flags & 4 == 4' mixes a bitwise '&' with a comparison '=='; parenthesize it as the current precedence reads it: '(flags & 4) == 4'
+// IDCPY-ACCEPTS
+// id binds a bitwise operator tighter than a comparison and C binds it looser,
+// so which one this means depends on which table the reader has in mind.
+main(int argc, string[] argv) {
+  int flags = 6;
+  print("" + (flags & 4 == 4));
+} return int 0;

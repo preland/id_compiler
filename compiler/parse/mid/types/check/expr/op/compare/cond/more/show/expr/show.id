@@ -1,0 +1,34 @@
+// An expression's source spelling, rebuilt from the tree for a diagnostic.
+// Parentheses around a binary operation come back from the parser's record;
+// any others were redundant and are dropped. A hex or binary literal comes
+// back in decimal, because the lexer has already converted it.
+
+show_expr(int id) {
+  string out = show_more(id);
+  if(k_of(id) == "int" || k_of(id) == "float" || k_of(id) == "str" || k_of(id) == "var") {
+    out = s1_of(id);
+  }
+} return string out;
+
+show_more(int id) {
+  string out = show_rest(id);
+  if(k_of(id) == "bin") {
+    out = show_bin(id);
+  }
+  if(k_of(id) == "import") {
+    out = "(import " + s1_of(id) + ")";
+  }
+} return string out;
+
+show_rest(int id) {
+  string out = show_list(id);
+  if(k_of(id) == "un") {
+    int i1_of_v = i1_of(id);
+    out = s1_of(id) + show_side(i1_of_v);
+  }
+  if(k_of(id) == "index") {
+    int i1_of_v2 = i1_of(id);
+    int i2_of_v = i2_of(id);
+    out = show_side(i1_of_v2) + "[" + show_expr(i2_of_v) + "]";
+  }
+} return string out;

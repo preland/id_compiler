@@ -1,0 +1,23 @@
+// One element of an operand list, a binary operation, and an operand that
+// keeps the parentheses it was written with.
+
+show_arg_at(int[] l, int i, string out) {
+  string sep = "";
+  if(i > 0) {
+    sep = ", ";
+  }
+  string ret_s = out + sep + show_expr(l[i]);
+} return string ret_s;
+
+show_bin(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  string ret_s = show_side(i1_of_v) + " " + s1_of(id) + " " + show_side(i2_of_v);
+} return string ret_s;
+
+show_side(int c) {
+  string out = show_expr(c);
+  if(k_of(c) == "bin" && paren_missing(c) == 0) {
+    out = "(" + out + ")";
+  }
+} return string out;

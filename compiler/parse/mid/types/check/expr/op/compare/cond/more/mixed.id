@@ -1,0 +1,35 @@
+// A comparison with a bare bitwise operand, or a bitwise operation with a bare
+// comparison operand, can only be read by someone who knows which of the two
+// binds tighter -- and id and C answer that differently. id code is meant to
+// be understood from its own text, so the grouping has to be written.
+//
+// The second form cannot be written today: a comparison binds looser, so it
+// only ever reaches a bitwise operand through parentheses. It is asked anyway,
+// because the rule is about the reader, not about this precedence table.
+
+chk_mixed(int id) {
+  int i1_of_v = i1_of(id);
+  int i2_of_v = i2_of(id);
+  mixed_pair(id, i1_of_v, i2_of_v);
+} return void;
+
+// One report per operation, naming the left operand when both are bare; the
+// suggested spelling parenthesizes both.
+mixed_pair(int id, int a, int b) {
+  int c = b;
+  if(mixed_side(id, a) == 1) {
+    c = a;
+  }
+  if(mixed_side(id, c) == 1) {
+    mixed_err(id, c);
+  }
+} return void;
+
+// The parenthesis record is searched only once the operators already mix, so
+// the common operation costs two kind reads and nothing more.
+mixed_side(int id, int c) {
+  int ok = 0;
+  if(k_of(c) == "bin" && ops_mixed(id, c) == 1) {
+    ok = paren_missing(c);
+  }
+} return int ok;

@@ -1,0 +1,22 @@
+// An operand in the suggested spelling: parenthesized if it is the bare one.
+
+fix_side(int id, int c) {
+  string out = show_side(c);
+  if(mixed_side(id, c) == 1) {
+    out = "(" + out + ")";
+  }
+} return string out;
+
+mixed_words(int id, int c) {
+  string po = s1_of(id);
+  string co = s1_of(c);
+  string ret_s = bit_cmp_words(po, co);
+} return string ret_s;
+
+// The bitwise operator is named first whichever of the two is the operand.
+bit_cmp_words(string po, string co) {
+  string out = "a bitwise '" + co + "' with a comparison '" + po + "'";
+  if(is_bitop(po) == 1) {
+    out = "a bitwise '" + po + "' with a comparison '" + co + "'";
+  }
+} return string out;
