@@ -1,5 +1,6 @@
-// Where a case is: the file of the function it is written under, and the line
-// of its first token -- the line the reader has to change.
+// Where a case is: the file it is written in, recorded on its node when it was
+// parsed (front/parse/decl/func/cases/cases.id), and the line of its first
+// token -- the line the reader has to change.
 
 case_err(int i, string msg) {
   string case_loc_v = case_loc(i);
@@ -8,7 +9,6 @@ case_err(int i, string msg) {
 } return void;
 
 case_loc(int i) {
-  string s1_of_v = s1_of((import casefn)[i]);
-  string func_file_v = func_file(s1_of_v);
-  string ret_s = func_file_v + ":" + (import tline)[(import casestart)[i]];
+  string s1_of_v = s1_of((import casenode)[i]);
+  string ret_s = s1_of_v + ":" + (import tline)[(import casestart)[i]];
 } return string ret_s;

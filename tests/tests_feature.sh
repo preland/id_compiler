@@ -527,6 +527,25 @@ rm -f "$TMP/emitted.c"
     && ok "bin/idc: a failing case blocks --emit-c too" \
     || bad "bin/idc: a failing case blocks --emit-c too (the C was written anyway)"
 
+mkdir -p "$TMP/locp/lib"
+cat > "$TMP/locp/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  int d = dbl(argc);
+  print(d);
+} return int 0;
+EOF
+cat > "$TMP/locp/lib/dbl.id" <<'EOF'
+dbl(int a) {
+  int r = a * 2;
+} return int r;
+(1):(2)
+(4):(9)
+EOF
+env -u IDC_NO_STD ../bin/idc "$TMP/locp" -o "$TMP/locp.out" > "$TMP/locp.log" 2>&1
+grep -qF "locp/lib/dbl.id:5: test failed: dbl(4) = 8, expected 9" "$TMP/locp.log" \
+    && ok "bin/idc: a failing case names its own file with the standard library merged in" \
+    || bad "bin/idc: a failing case names its own file with the standard library merged in (got: $(head -1 "$TMP/locp.log"))"
+
 # The cases reach the harness and nothing else: the program's C is the same
 # with them and without them, and carries no counter.
 printf '%s' 'add(int a, int b) {

@@ -30,10 +30,17 @@ take_cases(int[] pos) {
 push_case(int[] pos) {
   int node = parse_case(pos);
   push((import casenode), node);
-  case_owner();
+  case_owner(node);
 } return void;
 
-case_owner() {
+// The case's file is written into its node now, while `pfile` still lines up
+// with `prog`. It cannot be looked up later by the owner's name: the harness
+// narrows `prog` to the functions a case reaches before it emits the case
+// table, `pfile` is not narrowed with it, and a lookup by name then read
+// another function's file -- a failing case under the program was reported in
+// whatever library file happened to share its index.
+case_owner(int node) {
   int len_v = len((import prog));
   push((import casefn), (import prog)[len_v - 1]);
+  sset((import ns1), node, (import pfile)[len_v - 1]);
 } return void;
