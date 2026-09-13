@@ -8,9 +8,11 @@
 // before changes shape.
 
 emit_op3(int id) {
-  string s = emit_infix(id);
+  string s = "";
   if(helper_op(id) != "") {
     s = emit_helper(id);
+  } else {
+    s = emit_infix(id);
   }
 } return string s;
 

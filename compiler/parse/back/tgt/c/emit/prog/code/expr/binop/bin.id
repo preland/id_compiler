@@ -3,16 +3,20 @@
 // (see op/helper/), and ordinary infix otherwise.
 
 emit_bin(int id) {
-  string s = emit_op2(id);
+  string s = "";
   if(is_concat(id)) {
     s = emit_concat(id);
+  } else {
+    s = emit_op2(id);
   }
 } return string s;
 
 emit_op2(int id) {
-  string s = emit_op3(id);
+  string s = "";
   if(is_strcmp(id)) {
     s = emit_strcmp(id);
+  } else {
+    s = emit_op3(id);
   }
 } return string s;
 
