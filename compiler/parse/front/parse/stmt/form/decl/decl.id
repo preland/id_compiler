@@ -15,7 +15,6 @@ take_export(int[] pos) {
 } return int e;
 
 finish_decl(int[] pos, string type, int exported) {
-  string name = cur_text(pos);
-  advance(pos);
+  string name = read_name(pos);
   int ret_i = finish_decl_tail(pos, type, name, exported);
 } return int ret_i;

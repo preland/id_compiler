@@ -1,0 +1,12 @@
+// A check's signature: no parameters, and a value to compare.
+
+then_sig(int ci, int chk_node, int cfn, string chk_nm) {
+  if(flat_arg_count(cfn) != 0) {
+    int np = flat_arg_count(cfn);
+    case_err(ci, "'then' names '" + chk_nm + "', which takes " + np + " parameter(s); a check takes none and returns the value it compares");
+  } else if(s2_of(cfn) == "void") {
+    case_err(ci, "'then' names '" + chk_nm + "', which returns void; a check takes none and returns the value it compares");
+  } else {
+    then_value_fit(ci, chk_node, cfn);
+  }
+} return void;

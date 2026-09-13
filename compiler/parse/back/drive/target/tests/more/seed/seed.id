@@ -1,5 +1,6 @@
-// Every function with a case is an entry point, and afterwards `prog` and the
-// reachable set are put back as they were.
+// Every function with a case is an entry point, and so is every setup and
+// check a case names (given.id), and afterwards `prog` and the reachable set
+// are put back as they were.
 
 seed_cases() {
   int ci = 0;
@@ -8,6 +9,7 @@ seed_cases() {
     reach_add(s1_of_v);
     ci = ci + 1;
   }
+  seed_extra();
 } return void;
 
 test_widen(int[] pkeep, string[] rkeep) {

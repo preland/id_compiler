@@ -1,0 +1,24 @@
+// The setups and checks cases name. The harness calls them directly, so they
+// are entry points whether or not any function with a case calls them.
+
+seed_extra() {
+  seed_givens();
+  seed_thens();
+} return void;
+
+seed_givens() {
+  int ci = 0;
+  while(ci < len((import casegiven))) {
+    reach_add((import casegiven)[ci]);
+    ci = ci + 1;
+  }
+} return void;
+
+seed_thens() {
+  int ti = 0;
+  while(ti < len((import thennode))) {
+    string s1_of_v = s1_of((import thennode)[ti]);
+    reach_add(s1_of_v);
+    ti = ti + 1;
+  }
+} return void;

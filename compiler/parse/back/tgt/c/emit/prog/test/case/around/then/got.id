@@ -1,0 +1,21 @@
+// One check: what it returned and what it must equal, one C local each --
+// `idtc_chkT` and `idtc_wantT`, T the check's index among all checks, so two
+// checks on one case never share a name.
+
+emit_then_got(int ci, int ti, string chk_nm, int cfn) {
+  string rt = s2_of(cfn);
+  string ct = c_type(rt);
+  emit_then_want(ci, ti, chk_nm, rt, ct);
+} return void;
+
+emit_then_want(int ci, int ti, string chk_nm, string rt, string ct) {
+  emit_line("    " + ct + " idtc_chk" + ti + " = id_" + chk_nm + "();");
+  int[] items = l1_of((import thennode)[ti]);
+  emit_then_judge(ci, ti, chk_nm, rt, items);
+} return void;
+
+emit_then_judge(int ci, int ti, string chk_nm, string rt, int[] items) {
+  string cv = tc_value(items[0], rt);
+  emit_tc_decl(rt, "idtc_want" + ti, cv);
+  emit_then_fail(ci, ti, chk_nm, rt);
+} return void;

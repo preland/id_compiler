@@ -1,21 +1,20 @@
 // One C function per case, run in the case's own process:
 //
 //   static int idtc_case_K(int idtc_fd) {
+//       the `given` setup, if any
 //       <argument>s, built at the parameter types
 //       counters to zero
 //       the call
 //       counters read
 //       <expected>s, built at the types they are compared as
 //       compare; on a mismatch print the message and return 3
+//       each `then` check, compared the same way
 //       write the counts to idtc_fd; return 0
 //   }
 //
 // The counters are read before the expected values are built: building a list
-// allocates, and that allocation is not the function's.
-//
-// Anything a case needs to set up runs in this process before the counters
-// are zeroed (emit_case_run), and anything more it asserts afterwards belongs
-// beside the comparison (emit_case_judge), before the counts are written.
+// allocates, and that allocation is not the function's. For the same reason the
+// setup runs before they are zeroed and the checks after they are read.
 
 emit_cases() {
   int ci = 0;
@@ -27,7 +26,7 @@ emit_cases() {
 
 emit_case_fn(int ci) {
   emit_line("static int idtc_case_" + ci + "(int idtc_fd) {");
-  emit_case_args(ci);
+  emit_case_pre(ci);
   emit_case_run(ci);
 } return void;
 

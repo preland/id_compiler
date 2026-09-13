@@ -1,0 +1,21 @@
+// The type each `then` check compares at: its function's return type. A check
+// returning a list needs that type's helpers even when no case compares at it.
+
+tc_collect_thens() {
+  int ti = 0;
+  while(ti < len((import thennode))) {
+    note_check(ti);
+    ti = ti + 1;
+  }
+} return void;
+
+note_check(int ti) {
+  string chk_nm = s1_of((import thennode)[ti]);
+  int cfn = func_node(chk_nm);
+  note_fn_ret(cfn);
+} return void;
+
+note_fn_ret(int cfn) {
+  string rt = s2_of(cfn);
+  note_ty(rt);
+} return void;

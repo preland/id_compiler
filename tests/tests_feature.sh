@@ -748,6 +748,234 @@ EOF
 self_refuse "bin/idc: a case argument of the wrong type is rejected" \
     "this case gives a string where a int is required" --emit-c /dev/null
 
+# --- given, then, and (import NAME) ------------------------------------------
+# A case may name a setup to run first and checks to run after, and read an
+# export the setup made. These are rules of the self-hosted compiler only:
+# idc.py does not parse them, so none of this is in tests/invalid/.
+cat > "$TMP/p.id" <<'EOF'
+buf_setup() {
+  export word gb = alloc(8);
+} return void;
+
+fill3(word p) {
+  poke8(p, 3);
+} return void;
+given buf_setup ((import gb)):((import gb)) then first_byte:(3)
+given buf_setup ((import gb)):() then first_byte:(3)
+
+first_byte() {
+  word b = peek8((import gb));
+} return word b;
+EOF
+self_accept "bin/idc: a setup's address is passed in, and a check reads it back" --emit-c /dev/null
+
+sed -i 's/((import gb)) then first_byte:(3)$/((import gb)) then first_byte:(4)/' "$TMP/p.id"
+self_refuse "bin/idc: a check that does not hold fails the case, naming the check" \
+    "p.id:8: test failed: fill3((import gb)) then first_byte() = 3, expected 4" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+err_setup() {
+  export int[] err_n = [0];
+} return void;
+
+err_report(string msg) {
+  int[] c = (import err_n);
+  c[0] = c[0] + 1;
+} return void;
+given err_setup ("x"):("x") then count:(1)
+given err_setup ("y"):() then count:(1)
+
+count() {
+  int n = (import err_n)[0];
+} return int n;
+EOF
+self_accept "bin/idc: a void function that only writes module state is tested by a check" --emit-c /dev/null
+
+sed -i 's/("x"):("x") then count:(1)/("x"):("x") then count:(2)/' "$TMP/p.id"
+self_refuse "bin/idc: ... and a check that does not hold fails it" \
+    'p.id:9: test failed: err_report("x") then count() = 1, expected 2' --emit-c /dev/null
+
+# The larger case's setup does 20000 iterations and the smaller's none, so
+# this claim holds only if a setup's work is not counted as the call's.
+cat > "$TMP/p.id" <<'EOF'
+small() {
+  export int[] ss = [0];
+} return void;
+
+big() {
+  int[] bs = [];
+  int i = 0;
+  while(i < 20000) {
+    push(bs, i);
+    i = i + 1;
+  }
+} return void;
+
+inc(int a) {
+  int b = a + 1;
+} return int b;
+given small (1):(2)[time:O(1)]
+given big (100):(101)[time:O(1)]
+EOF
+self_accept "bin/idc: a setup's work is not counted against a constraint" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+f(int a) {
+  int b = a + 1;
+} return int b;
+given f (1):(2)
+(0):(1)
+EOF
+self_refuse "bin/idc: a setup that takes parameters is rejected" \
+    "p.id:4: error: 'given' names 'f', which takes 1 parameter(s); a setup takes none and returns void" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+f(int a) {
+  int b = a + 1;
+} return int b;
+given nope (1):(2)
+(0):(1)
+EOF
+self_refuse "bin/idc: a setup that does not exist is rejected" \
+    "p.id:4: error: 'given' names 'nope', which is not a function in this build" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+st() {
+  export int g = 1;
+} return void;
+
+f(int a) {
+  int b = a + 1;
+} return int b;
+given st (1):(2) then st:(1)
+(0):(1)
+EOF
+self_refuse "bin/idc: a check that returns void is rejected" \
+    "p.id:8: error: 'then' names 'st', which returns void; a check takes none and returns the value it compares" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+st() {
+  export int g = 1;
+} return void;
+
+f(int a) {
+  int b = a + 1;
+} return int b;
+((import g)):(2)
+(0):(1)
+EOF
+self_refuse "bin/idc: (import NAME) without a setup is rejected" \
+    "p.id:8: error: (import g) needs a 'given': an export has no value in a case until a setup has run" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+st() {
+  export int g = 1;
+} return void;
+
+other() {
+  export int h = 2;
+} return void;
+
+f(int a) {
+  int b = a + 1;
+} return int b;
+given st ((import h)):(3)
+(0):(1)
+EOF
+self_refuse "bin/idc: (import NAME) of an export the setup does not reach is rejected" \
+    "p.id:12: error: (import h): 'h' is exported by 'other', which the setup 'st' does not reach, so nothing sets it before the call" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+st() {
+  export int g = 1;
+  helper();
+} return void;
+
+helper() {
+  export int hg = 3;
+} return void;
+
+f(int a) {
+  int b = a + 1;
+} return int b;
+given st ((import hg)):(4)
+given st ((import g)):(2)
+EOF
+self_accept "bin/idc: (import NAME) of an export made by a function the setup calls" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+st() {
+  export int[] xs = [1];
+} return void;
+
+f(int a) {
+  int b = a + 1;
+} return int b;
+given st ((import xs)):(2)
+(0):(1)
+EOF
+self_refuse "bin/idc: (import NAME) of the wrong type is rejected" \
+    "p.id:8: error: this case gives (import xs), a int[], where a int is required" --emit-c /dev/null
+
+# The duplicate rule compares the whole case, then clauses included.
+cat > "$TMP/p.id" <<'EOF'
+st() {
+  export int[] n = [0];
+} return void;
+
+same(int a) {
+  int b = a;
+} return int b;
+given st (1):(1) then cnt:(0)
+given st (1):(1)
+
+cnt() {
+  int v = (import n)[0];
+} return int v;
+EOF
+self_accept "bin/idc: two cases differing only in a then clause are not duplicates" --emit-c /dev/null
+
+cat > "$TMP/q.id" <<'EOF'
+st() {
+  export int[] n = [0];
+} return void;
+
+same(int a) {
+  int b = a;
+} return int b;
+given st (1):(1)
+(1):(1)
+EOF
+if ../bin/idc "$TMP/q.id" --emit-c /dev/null >"$TMP/log" 2>&1; then
+    ok "bin/idc: two cases differing only in a given are not duplicates"
+else
+    bad "bin/idc: two cases differing only in a given are not duplicates ($(head -1 "$TMP/log"))"
+fi
+
+sed -i 's/^given st (1):(1)$/given st (1):(1) then cnt:(0)/' "$TMP/p.id"
+self_refuse "bin/idc: two cases identical then clauses included are duplicates" \
+    "p.id:9: error: this test case is identical to an earlier one" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+f(int a) {
+  int given = a;
+} return int a;
+(1):(1)
+(2):(2)
+EOF
+self_refuse "bin/idc: given is not a variable name" \
+    "p.id:2: error: 'given' is a test case keyword (see docs/TESTS.md) and cannot be used as a name" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+f(int then) {
+  int b = 1;
+} return int b;
+(1):(1)
+(2):(1)
+EOF
+self_refuse "bin/idc: then is not a parameter name" \
+    "p.id:1: error: 'then' is a test case keyword (see docs/TESTS.md) and cannot be used as a name" --emit-c /dev/null
+
 # --- a build whose cases cannot run here says why ----------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {

@@ -1,0 +1,22 @@
+// `then CHECK:(value)`, after a case's expected values and before its
+// constraints, as many as the case needs: a function the case's process calls
+// once the call under test has returned, and the value it must return. Each is
+// a "then" node in `thennode` -- the check's name in s1, its value in nl1, and
+// the index of the case it is written on in i1.
+
+case_rest(int[] pos) {
+  case_thens(pos);
+  case_cons(pos);
+} return void;
+
+case_thens(int[] pos) {
+  while(cur_kind(pos) == "kw" && cur_text(pos) == "then") {
+    then_one(pos);
+  }
+} return void;
+
+then_one(int[] pos) {
+  advance(pos);
+  string chk_nm = case_fn_name(pos, "then");
+  then_value(pos, chk_nm);
+} return void;

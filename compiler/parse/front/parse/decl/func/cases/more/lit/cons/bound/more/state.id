@@ -5,6 +5,8 @@
 //   conscase   for each claim, the index of the case it is written on
 //   conskind   the claim's kind, `time` or `mem`
 //   consbound  the claim's bound as canonical text, e.g. `O(n log n)`
+//   casegiven  each case's setup function, or "" (cases/case/given/)
+//   thennode   each `then` check, as a "then" node (cases/case/then/)
 
 init_cases() {
   export int[] caseend = [];
@@ -15,5 +17,11 @@ init_cases() {
 init_cases2() {
   export int[] conscase = [];
   export string[] conskind = [];
+  init_cases3();
+} return void;
+
+init_cases3() {
   export string[] consbound = [];
+  export string[] casegiven = [];
+  export int[] thennode = [];
 } return void;

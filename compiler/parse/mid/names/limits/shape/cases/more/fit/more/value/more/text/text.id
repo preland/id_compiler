@@ -2,7 +2,7 @@
 // for the harness's failure messages, which quote the case.
 
 lit_text(int e) {
-  string lt = s1_of(e);
+  string lt = leaf_text(e);
   if(k_of(e) == "arr") {
     lt = arr_text(e);
   } else if(k_of(e) == "un") {

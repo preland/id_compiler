@@ -1,0 +1,29 @@
+// The function a `given` or a `then` names. Anything but a plain name there is
+// reported and left where it is: for `given` the case's tuples still follow
+// and are read as usual; for `then` the tokens that follow may be reported too.
+
+case_fn_name(int[] pos, string fn_word) {
+  string name = "";
+  if(cur_kind(pos) == "ident") {
+    name = read_name(pos);
+  } else {
+    string cur_text_v = cur_text(pos);
+    syn_err(pos, "expected the name of a function after '" + fn_word + "', found '" + cur_text_v + "'");
+  }
+} return string name;
+
+// Whether the next two tokens open `(import NAME)`. Bounded, because a case
+// can be the last thing in a file.
+at_case_import(int[] pos) {
+  int r = 0;
+  if(cur_text(pos) == "(" && pos[0] + 1 < len((import ttext))) {
+    r = next_is_import(pos);
+  }
+} return int r;
+
+next_is_import(int[] pos) {
+  int r = 0;
+  if((import ttext)[pos[0] + 1] == "import") {
+    r = 1;
+  }
+} return int r;

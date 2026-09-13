@@ -1,0 +1,36 @@
+// `(import NAME)` in a case: the value of an export once the case's setup has
+// run. Three things make it mean that, and each is decided from the case line
+// and the declarations it names:
+//
+//   * the case has a `given` -- without one nothing has run, and the export is
+//     the uninitialised global the dead-export check exists to stop reading;
+//   * NAME is exported by the setup or by a function the setup reaches -- the
+//     reachability that check uses, seeded from the setup instead of `main`;
+//   * the export's type is exactly the type wanted at that position. A literal
+//     is built at the type it is given, but an export already has one, and
+//     using it as another is a conversion nobody wrote.
+
+fit_import(int i, int e, string want) {
+  string imp_nm = s1_of(e);
+  int ek = find_str((import enames), imp_nm);
+  imp_check(i, imp_nm, ek, want);
+} return void;
+
+imp_check(int i, string imp_nm, int ek, string want) {
+  if((import casegiven)[i] == "") {
+    case_err(i, "(import " + imp_nm + ") needs a 'given': an export has no value in a case until a setup has run");
+  } else if(ek < 0) {
+    case_err(i, "(import " + imp_nm + "): '" + imp_nm + "' is not an exported variable");
+  } else {
+    imp_owner(i, imp_nm, ek, want);
+  }
+} return void;
+
+imp_owner(int i, string imp_nm, int ek, string want) {
+  string setup_nm = (import casegiven)[i];
+  if(func_node(setup_nm) >= 0 && reaches(setup_nm, (import eowners)[ek]) == 0) {
+    case_err(i, "(import " + imp_nm + "): '" + imp_nm + "' is exported by '" + (import eowners)[ek] + "', which the setup '" + setup_nm + "' does not reach, so nothing sets it before the call");
+  } else if((import etypes)[ek] != want) {
+    case_err(i, "this case gives (import " + imp_nm + "), a " + (import etypes)[ek] + ", where a " + want + " is required");
+  }
+} return void;

@@ -22,8 +22,10 @@ parse_float(int[] pos) {
 // Shared by parse_ident_or_call and parse_import (atom.id, import_expr.id):
 // both read the current token's text and advance past it before doing
 // anything else with the name. Neither of those files has room left for a
-// fourth function, and this one does.
+// fourth function, and this one does. A declaration's name is read here too,
+// so a name that is a test-case keyword is refused in one place.
 read_name(int[] pos) {
+  no_case_word(pos);
   string name = cur_text(pos);
   advance(pos);
 } return string name;

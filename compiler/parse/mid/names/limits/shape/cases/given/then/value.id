@@ -1,0 +1,32 @@
+// A check's function, then its value. The value is held to exactly what an
+// expected value is held to, at the check's return type -- and it is a literal:
+// `(import NAME)` is an argument or an expected value, never a check's.
+
+then_shape(int ci, int chk_node, int cfn) {
+  string chk_nm = s1_of(chk_node);
+  if(cfn < 0) {
+    case_err(ci, "'then' names '" + chk_nm + "', which is not a function in this build");
+  } else {
+    then_sig(ci, chk_node, cfn, chk_nm);
+  }
+} return void;
+
+then_value_fit(int ci, int chk_node, int cfn) {
+  int[] items = l1_of(chk_node);
+  if(len(items) != 1) {
+    int ne = len(items);
+    case_err(ci, "a 'then' check compares exactly one value, not " + ne);
+  } else {
+    then_lit(ci, items[0], cfn);
+  }
+} return void;
+
+then_lit(int ci, int e, int cfn) {
+  if(k_of(e) == "cimport") {
+    string lt = lit_text(e);
+    case_err(ci, "a 'then' check compares a literal; " + lt + " may only be an argument or an expected value");
+  } else {
+    string rt = s2_of(cfn);
+    fit_value(ci, e, rt);
+  }
+} return void;

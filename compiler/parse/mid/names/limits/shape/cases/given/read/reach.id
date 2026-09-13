@@ -1,0 +1,17 @@
+// Whether one function reaches another through the call graph: the
+// dead-export check's fixpoint (mid/names/exports/reach/dead/), seeded with a
+// single function instead of `main`. That check runs after the case checks and
+// builds its own set from scratch, so borrowing the set here leaves nothing
+// behind for it.
+
+reaches(string src_fn, string dst_fn) {
+  reach_seed(src_fn);
+  reach_mark();
+  int r = is_reach(dst_fn);
+} return int r;
+
+reach_seed(string src_fn) {
+  init_reach();
+  clear_strs((import rfn));
+  push((import rfn), src_fn);
+} return void;

@@ -1,0 +1,19 @@
+// A check's value, and the check recorded.
+
+then_value(int[] pos, string chk_nm) {
+  eat_colon(pos);
+  int[] items = case_tuple(pos);
+  then_push(chk_nm, items);
+} return void;
+
+// The case being parsed is the last one whose start has been recorded.
+then_push(string chk_nm, int[] items) {
+  int n = len((import casestart));
+  int[] no_items = [];
+  then_store(chk_nm, items, n - 1, no_items);
+} return void;
+
+then_store(string chk_nm, int[] items, int ci, int[] no_items) {
+  int node = newnode("then", ci, 0, chk_nm, "", items, no_items);
+  push((import thennode), node);
+} return void;

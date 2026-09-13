@@ -473,6 +473,9 @@ void id_test_narrow(IdList* pkeep, IdList* rkeep);
 void id_clear_strs(IdList* names);
 void id_keep_ints(IdList* ints, IdList* onto);
 void id_keep_strs(IdList* strs, IdList* names);
+void id_seed_extra(void);
+void id_seed_givens(void);
+void id_seed_thens(void);
 void id_seed_cases(void);
 void id_test_widen(IdList* pkeep, IdList* rkeep);
 void id_test_widen2(IdList* rkeep);
@@ -976,6 +979,9 @@ void id_emit_ty_protos(void);
 void id_tc_collect_case(int ci);
 void id_tc_collect_expd(int fn, IdList* expd);
 void id_note_ty(char* ty);
+void id_tc_collect_thens(void);
+void id_note_check(int ti);
+void id_note_fn_ret(int cfn);
 void id_init_tyc(void);
 void id_init_tyc_rows(void);
 void id_init_tyc_rows2(void);
@@ -1016,6 +1022,17 @@ void id_emit_decls(void);
 void id_emit_case_args(int ci);
 void id_emit_arg_lines(IdList* ps, IdList* args);
 void id_emit_arg_line(IdList* ps, IdList* args, int j);
+void id_emit_case_pre(int ci);
+void id_emit_case_given(int ci);
+void id_emit_then_fail(int ci, int ti, char* chk_nm, char* rt);
+void id_emit_then_lines(int ci, int ti, char* chk_nm, char* cnd, char* shown);
+char* id_then_tail(int ti);
+void id_emit_then_got(int ci, int ti, char* chk_nm, int cfn);
+void id_emit_then_want(int ci, int ti, char* chk_nm, char* rt, char* ct);
+void id_emit_then_judge(int ci, int ti, char* chk_nm, char* rt, IdList* items);
+void id_emit_case_thens(int ci);
+void id_then_at(int ci, int ti);
+void id_emit_then(int ci, int ti);
 void id_emit_cases(void);
 void id_emit_case_fn(int ci);
 void id_emit_case_run(int ci);
@@ -1115,6 +1132,7 @@ int id_is_syscall(char* name);
 char* id_tc_cells(IdList* xs, char* et);
 char* id_tc_scalar(int e);
 char* id_tc_neg(int e);
+char* id_tc_lit(int e, char* want);
 char* id_tc_compare(char* ga, char* gb, char* type);
 char* id_tc_show(char* code, char* type);
 char* id_show_scalar(char* code, char* type);
@@ -1254,6 +1272,24 @@ int id_asm_lines_tail(IdList* pos, IdList* alines);
 int id_asm_tail_mid(IdList* pos, char* rt);
 int id_asm_tail_end(IdList* pos, char* name);
 int id_init_asm_rest(void);
+int id_case_item(IdList* pos);
+int id_case_import(IdList* pos);
+int id_import_rest(IdList* pos);
+int id_parse_case_args(IdList* pos);
+void id_case_given(IdList* pos);
+char* id_given_name(IdList* pos);
+char* id_case_fn_name(IdList* pos, char* fn_word);
+int id_at_case_import(IdList* pos);
+int id_next_is_import(IdList* pos);
+void id_then_value(IdList* pos, char* chk_nm);
+void id_then_push(char* chk_nm, IdList* items);
+void id_then_store(char* chk_nm, IdList* items, int ci, IdList* no_items);
+void id_case_rest(IdList* pos);
+void id_case_thens(IdList* pos);
+void id_then_one(IdList* pos);
+int id_parse_case(IdList* pos);
+int id_parse_case_rhs(IdList* pos, IdList* args);
+int id_case_tail(IdList* pos, IdList* args, IdList* expd);
 int id_take_cases(IdList* pos);
 void id_push_case(IdList* pos);
 void id_case_owner(void);
@@ -1275,6 +1311,7 @@ int id_bound_known(char* so);
 void id_cons_kind(IdList* pos, char* ck);
 void id_init_cases(void);
 void id_init_cases2(void);
+void id_init_cases3(void);
 char* id_bound_parts(IdList* pos);
 char* id_bound_step(IdList* pos, char* out);
 char* id_bound_sep(char* out, char* t2);
@@ -1287,9 +1324,6 @@ void id_cons_push(int n, char* ck, char* bt);
 int id_leaf_lit(int e);
 int id_leaf_num(int e);
 int id_neg_lit(int e);
-int id_parse_case(IdList* pos);
-int id_parse_case_rhs(IdList* pos, IdList* args);
-int id_case_tail(IdList* pos, IdList* args, IdList* expd);
 void id_parse_program(IdList* pos);
 int id_parse_func(IdList* pos);
 int id_func_sig(IdList* pos, char* name);
@@ -1378,6 +1412,7 @@ int id_fold_mul_tail(IdList* pos, int left, char* op);
 int id_fold_mul(IdList* pos, int left);
 int id_parse_primary(IdList* pos);
 int id_parse_paren(IdList* pos);
+void id_no_case_word(IdList* pos);
 int id_parse_expr(IdList* pos);
 int id_parse_rel(IdList* pos);
 int id_fold_rel(IdList* pos, int left);
@@ -1611,6 +1646,21 @@ void id_check_func_body(int id);
 void id_check_main(void);
 void id_check_main_at(int m);
 void id_report_main(void);
+void id_fit_given(int i);
+void id_given_fn(int i, char* setup_nm);
+void id_given_shape(int i, char* setup_nm, int sfn);
+int id_reaches(char* src_fn, char* dst_fn);
+void id_reach_seed(char* src_fn);
+void id_fit_import(int i, int e, char* want);
+void id_imp_check(int i, char* imp_nm, int ek, char* want);
+void id_imp_owner(int i, char* imp_nm, int ek, char* want);
+void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm);
+void id_fit_thens(void);
+void id_fit_then(int ti);
+void id_then_fn(int chk_node, char* chk_nm);
+void id_then_shape(int ci, int chk_node, int cfn);
+void id_then_value_fit(int ci, int chk_node, int cfn);
+void id_then_lit(int ci, int e, int cfn);
 void id_check_dup_cases(void);
 void id_dup_scan(int i);
 void id_dup_hit(int i, int j);
@@ -1630,6 +1680,7 @@ void id_fit_expd(int i, int fn, int node);
 void id_fit_void(int i, int fn, IdList* expd);
 void id_fit_ret(int i, int fn, IdList* expd);
 char* id_items_text(IdList* xs);
+char* id_leaf_text(int e);
 void id_case_err(int i, char* msg);
 char* id_case_loc(int i);
 char* id_lit_text(int e);
@@ -2118,7 +2169,9 @@ IdList* caseend;  /* exported by init_cases() */
 IdList* casenode;  /* exported by init_cases() */
 IdList* conscase;  /* exported by init_cases2() */
 IdList* conskind;  /* exported by init_cases2() */
-IdList* consbound;  /* exported by init_cases2() */
+IdList* consbound;  /* exported by init_cases3() */
+IdList* casegiven;  /* exported by init_cases3() */
+IdList* thennode;  /* exported by init_cases3() */
 IdList* tline;  /* exported by init_files2() */
 IdList* lnseen;  /* exported by init_files2() */
 IdList* cdecl;  /* exported by init_consts() */
@@ -2521,6 +2574,34 @@ void id_keep_strs(IdList* strs, IdList* names) {
     return;
 }
 
+void id_seed_extra(void) {
+    id_seed_givens();
+    id_seed_thens();
+    return;
+}
+
+void id_seed_givens(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casegiven))) {
+        id_reach_add((char*)(intptr_t)(id_list_get(casegiven, ci)));
+        ci = (ci + 1);
+    }
+    return;
+}
+
+void id_seed_thens(void) {
+    int ti;
+    char* s1_of_v;
+    ti = 0;
+    while ((ti < id_list_len(thennode))) {
+        s1_of_v = id_s1_of((int)(id_list_get(thennode, ti)));
+        id_reach_add(s1_of_v);
+        ti = (ti + 1);
+    }
+    return;
+}
+
 void id_seed_cases(void) {
     int ci;
     char* s1_of_v;
@@ -2530,6 +2611,7 @@ void id_seed_cases(void) {
         id_reach_add(s1_of_v);
         ci = (ci + 1);
     }
+    id_seed_extra();
     return;
 }
 
@@ -6889,6 +6971,7 @@ void id_tc_collect(void) {
         id_tc_collect_case(ci);
         ci = (ci + 1);
     }
+    id_tc_collect_thens();
     return;
 }
 
@@ -7037,6 +7120,32 @@ void id_note_ty(char* ty) {
         id_note_one(ty);
         ty = id_list_elem(ty);
     }
+    return;
+}
+
+void id_tc_collect_thens(void) {
+    int ti;
+    ti = 0;
+    while ((ti < id_list_len(thennode))) {
+        id_note_check(ti);
+        ti = (ti + 1);
+    }
+    return;
+}
+
+void id_note_check(int ti) {
+    char* chk_nm;
+    int cfn;
+    chk_nm = id_s1_of((int)(id_list_get(thennode, ti)));
+    cfn = id_func_node(chk_nm);
+    id_note_fn_ret(cfn);
+    return;
+}
+
+void id_note_fn_ret(int cfn) {
+    char* rt;
+    rt = id_s2_of(cfn);
+    id_note_ty(rt);
     return;
 }
 
@@ -7380,6 +7489,98 @@ void id_emit_arg_line(IdList* ps, IdList* args, int j) {
     return;
 }
 
+void id_emit_case_pre(int ci) {
+    id_emit_case_given(ci);
+    id_emit_case_args(ci);
+    return;
+}
+
+void id_emit_case_given(int ci) {
+    char* setup_nm;
+    setup_nm = (char*)(intptr_t)(id_list_get(casegiven, ci));
+    if ((strcmp(setup_nm, "") != 0)) {
+        id_emit_line(id_concat(id_concat("    id_", setup_nm), "();"));
+    }
+    return;
+}
+
+void id_emit_then_fail(int ci, int ti, char* chk_nm, char* rt) {
+    char* cnd;
+    char* shown;
+    cnd = id_tc_compare(id_concat("idtc_chk", id_str_of_int(ti)), id_concat("idtc_want", id_str_of_int(ti)), rt);
+    shown = id_tc_show(id_concat("idtc_chk", id_str_of_int(ti)), rt);
+    id_emit_then_lines(ci, ti, chk_nm, cnd, shown);
+    return;
+}
+
+void id_emit_then_lines(int ci, int ti, char* chk_nm, char* cnd, char* shown) {
+    char* tail;
+    tail = id_then_tail(ti);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    if (!(", cnd), ")) {\n        fprintf(stderr, \"%s: test failed: %s then "), chk_nm), "() = \", idtc_where["), id_str_of_int(ci)), "], idtc_call["), id_str_of_int(ci)), "]);\n        "), shown), "\n        fputs(\""), tail), "\", stderr);\n        return 3;\n    }"));
+    return;
+}
+
+char* id_then_tail(int ti) {
+    IdList* items;
+    char* lt;
+    char* so;
+    items = id_l1_of((int)(id_list_get(thennode, ti)));
+    lt = id_lit_text((int)(id_list_get(items, 0)));
+    so = id_c_esc(id_concat(id_concat(", expected ", lt), "\n"));
+    return so;
+}
+
+void id_emit_then_got(int ci, int ti, char* chk_nm, int cfn) {
+    char* rt;
+    char* ct;
+    rt = id_s2_of(cfn);
+    ct = id_c_type(rt);
+    id_emit_then_want(ci, ti, chk_nm, rt, ct);
+    return;
+}
+
+void id_emit_then_want(int ci, int ti, char* chk_nm, char* rt, char* ct) {
+    IdList* items;
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    ", ct), " idtc_chk"), id_str_of_int(ti)), " = id_"), chk_nm), "();"));
+    items = id_l1_of((int)(id_list_get(thennode, ti)));
+    id_emit_then_judge(ci, ti, chk_nm, rt, items);
+    return;
+}
+
+void id_emit_then_judge(int ci, int ti, char* chk_nm, char* rt, IdList* items) {
+    char* cv;
+    cv = id_tc_value((int)(id_list_get(items, 0)), rt);
+    id_emit_tc_decl(rt, id_concat("idtc_want", id_str_of_int(ti)), cv);
+    id_emit_then_fail(ci, ti, chk_nm, rt);
+    return;
+}
+
+void id_emit_case_thens(int ci) {
+    int ti;
+    ti = 0;
+    while ((ti < id_list_len(thennode))) {
+        id_then_at(ci, ti);
+        ti = (ti + 1);
+    }
+    return;
+}
+
+void id_then_at(int ci, int ti) {
+    if ((id_i1_of((int)(id_list_get(thennode, ti))) == ci)) {
+        id_emit_then(ci, ti);
+    }
+    return;
+}
+
+void id_emit_then(int ci, int ti) {
+    char* chk_nm;
+    int cfn;
+    chk_nm = id_s1_of((int)(id_list_get(thennode, ti)));
+    cfn = id_func_node(chk_nm);
+    id_emit_then_got(ci, ti, chk_nm, cfn);
+    return;
+}
+
 void id_emit_cases(void) {
     int ci;
     ci = 0;
@@ -7392,7 +7593,7 @@ void id_emit_cases(void) {
 
 void id_emit_case_fn(int ci) {
     id_emit_line(id_concat(id_concat("static int idtc_case_", id_str_of_int(ci)), "(int idtc_fd) {"));
-    id_emit_case_args(ci);
+    id_emit_case_pre(ci);
     id_emit_case_run(ci);
     return;
 }
@@ -7462,6 +7663,7 @@ char* id_names_upto(int n) {
 
 void id_emit_case_end(int ci) {
     id_emit_case_fail(ci);
+    id_emit_case_thens(ci);
     id_emit_line("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
     return;
 }
@@ -8257,6 +8459,17 @@ char* id_tc_neg(int e) {
     return so;
 }
 
+char* id_tc_lit(int e, char* want) {
+    char* so;
+    so = "";
+    if ((id_ty_is_list(want) == 1)) {
+        so = id_tc_list(e, want);
+    } else {
+        so = id_tc_scalar(e);
+    }
+    return so;
+}
+
 char* id_tc_compare(char* ga, char* gb, char* type) {
     char* so;
     char* key;
@@ -8388,11 +8601,9 @@ char* id_size_neg(int e) {
 
 char* id_tc_value(int e, char* want) {
     char* so;
-    so = "";
-    if ((id_ty_is_list(want) == 1)) {
-        so = id_tc_list(e, want);
-    } else {
-        so = id_tc_scalar(e);
+    so = id_s1_of(e);
+    if ((strcmp(id_k_of(e), "cimport") != 0)) {
+        so = id_tc_lit(e, want);
     }
     return so;
 }
@@ -9621,8 +9832,163 @@ int id_init_asm_rest(void) {
     return ret_i;
 }
 
+int id_case_item(IdList* pos) {
+    int v;
+    v = 0;
+    if ((id_at_case_import(pos) == 1)) {
+        v = id_case_import(pos);
+    } else {
+        v = id_parse_expr(pos);
+        id_check_lit(v);
+    }
+    return v;
+}
+
+int id_case_import(IdList* pos) {
+    int ret_i;
+    id_advance(pos);
+    id_advance(pos);
+    ret_i = id_import_rest(pos);
+    return ret_i;
+}
+
+int id_import_rest(IdList* pos) {
+    char* name;
+    int ret_i;
+    name = id_read_name(pos);
+    id_eat_close(pos);
+    ret_i = id_newleaf("cimport", 0, 0, name, "");
+    return ret_i;
+}
+
+int id_parse_case_args(IdList* pos) {
+    IdList* args;
+    int ret_i;
+    args = id_case_tuple(pos);
+    ret_i = id_parse_case_rhs(pos, args);
+    return ret_i;
+}
+
+void id_case_given(IdList* pos) {
+    char* setup_nm;
+    setup_nm = "";
+    if (((strcmp(id_cur_kind(pos), "kw") == 0) && (strcmp(id_cur_text(pos), "given") == 0))) {
+        setup_nm = id_given_name(pos);
+    }
+    id_list_push(casegiven, (long long)(intptr_t)(setup_nm));
+    return;
+}
+
+char* id_given_name(IdList* pos) {
+    char* setup_nm;
+    id_advance(pos);
+    setup_nm = id_case_fn_name(pos, "given");
+    return setup_nm;
+}
+
+char* id_case_fn_name(IdList* pos, char* fn_word) {
+    char* name;
+    char* cur_text_v;
+    name = "";
+    if ((strcmp(id_cur_kind(pos), "ident") == 0)) {
+        name = id_read_name(pos);
+    } else {
+        cur_text_v = id_cur_text(pos);
+        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat("expected the name of a function after '", fn_word), "', found '"), cur_text_v), "'"));
+    }
+    return name;
+}
+
+int id_at_case_import(IdList* pos) {
+    int r;
+    r = 0;
+    if (((strcmp(id_cur_text(pos), "(") == 0) && (((int)(id_list_get(pos, 0)) + 1) < id_list_len(ttext)))) {
+        r = id_next_is_import(pos);
+    }
+    return r;
+}
+
+int id_next_is_import(IdList* pos) {
+    int r;
+    r = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(ttext, ((int)(id_list_get(pos, 0)) + 1))), "import") == 0)) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_then_value(IdList* pos, char* chk_nm) {
+    IdList* items;
+    id_eat_colon(pos);
+    items = id_case_tuple(pos);
+    id_then_push(chk_nm, items);
+    return;
+}
+
+void id_then_push(char* chk_nm, IdList* items) {
+    int n;
+    IdList* no_items;
+    n = id_list_len(casestart);
+    no_items = id_list_lit(0);
+    id_then_store(chk_nm, items, (n - 1), no_items);
+    return;
+}
+
+void id_then_store(char* chk_nm, IdList* items, int ci, IdList* no_items) {
+    int node;
+    node = id_newnode("then", ci, 0, chk_nm, "", items, no_items);
+    id_list_push(thennode, (long long)(node));
+    return;
+}
+
+void id_case_rest(IdList* pos) {
+    id_case_thens(pos);
+    id_case_cons(pos);
+    return;
+}
+
+void id_case_thens(IdList* pos) {
+    while (((strcmp(id_cur_kind(pos), "kw") == 0) && (strcmp(id_cur_text(pos), "then") == 0))) {
+        id_then_one(pos);
+    }
+    return;
+}
+
+void id_then_one(IdList* pos) {
+    char* chk_nm;
+    id_advance(pos);
+    chk_nm = id_case_fn_name(pos, "then");
+    id_then_value(pos, chk_nm);
+    return;
+}
+
+int id_parse_case(IdList* pos) {
+    int ret_i;
+    id_list_push(casestart, (long long)((int)(id_list_get(pos, 0))));
+    id_case_given(pos);
+    ret_i = id_parse_case_args(pos);
+    return ret_i;
+}
+
+int id_parse_case_rhs(IdList* pos, IdList* args) {
+    IdList* expd;
+    int ret_i;
+    id_eat_colon(pos);
+    expd = id_case_tuple(pos);
+    ret_i = id_case_tail(pos, args, expd);
+    return ret_i;
+}
+
+int id_case_tail(IdList* pos, IdList* args, IdList* expd) {
+    int ret_i;
+    id_case_rest(pos);
+    id_list_push(caseend, (long long)((int)(id_list_get(pos, 0))));
+    ret_i = id_newnode("case", 0, 0, "", "", args, expd);
+    return ret_i;
+}
+
 int id_take_cases(IdList* pos) {
-    while (((strcmp(id_cur_kind(pos), "op") == 0) && (strcmp(id_cur_text(pos), "(") == 0))) {
+    while ((((strcmp(id_cur_kind(pos), "op") == 0) && (strcmp(id_cur_text(pos), "(") == 0)) || ((strcmp(id_cur_kind(pos), "kw") == 0) && (strcmp(id_cur_text(pos), "given") == 0)))) {
         id_push_case(pos);
     }
     return 0;
@@ -9670,8 +10036,7 @@ void id_fill_tuple(IdList* pos, IdList* items) {
 
 void id_take_item(IdList* pos, IdList* items) {
     int v;
-    v = id_parse_expr(pos);
-    id_check_lit(v);
+    v = id_case_item(pos);
     id_list_push(items, (long long)(v));
     return;
 }
@@ -9797,7 +10162,14 @@ void id_init_cases(void) {
 void id_init_cases2(void) {
     conscase = id_list_lit(0);
     conskind = id_list_lit(0);
+    id_init_cases3();
+    return;
+}
+
+void id_init_cases3(void) {
     consbound = id_list_lit(0);
+    casegiven = id_list_lit(0);
+    thennode = id_list_lit(0);
     return;
 }
 
@@ -9909,32 +10281,6 @@ int id_neg_lit(int e) {
     return r;
 }
 
-int id_parse_case(IdList* pos) {
-    IdList* args;
-    int ret_i;
-    id_list_push(casestart, (long long)((int)(id_list_get(pos, 0))));
-    args = id_case_tuple(pos);
-    ret_i = id_parse_case_rhs(pos, args);
-    return ret_i;
-}
-
-int id_parse_case_rhs(IdList* pos, IdList* args) {
-    IdList* expd;
-    int ret_i;
-    id_eat_colon(pos);
-    expd = id_case_tuple(pos);
-    ret_i = id_case_tail(pos, args, expd);
-    return ret_i;
-}
-
-int id_case_tail(IdList* pos, IdList* args, IdList* expd) {
-    int ret_i;
-    id_case_cons(pos);
-    id_list_push(caseend, (long long)((int)(id_list_get(pos, 0))));
-    ret_i = id_newnode("case", 0, 0, "", "", args, expd);
-    return ret_i;
-}
-
 void id_parse_program(IdList* pos) {
     while ((strcmp(id_cur_kind(pos), "eof") != 0)) {
         id_parse_top(pos);
@@ -9945,8 +10291,7 @@ void id_parse_program(IdList* pos) {
 int id_parse_func(IdList* pos) {
     char* name;
     int ret_i;
-    name = id_cur_text(pos);
-    id_advance(pos);
+    name = id_read_name(pos);
     ret_i = id_func_sig(pos, name);
     return ret_i;
 }
@@ -10452,6 +10797,7 @@ int id_parse_float(IdList* pos) {
 
 char* id_read_name(IdList* pos) {
     char* name;
+    id_no_case_word(pos);
     name = id_cur_text(pos);
     id_advance(pos);
     return name;
@@ -10715,6 +11061,15 @@ int id_parse_paren(IdList* pos) {
     e = id_parse_expr(pos);
     id_advance(pos);
     return e;
+}
+
+void id_no_case_word(IdList* pos) {
+    char* cur_text_v;
+    if (((strcmp(id_cur_text(pos), "given") == 0) || (strcmp(id_cur_text(pos), "then") == 0))) {
+        cur_text_v = id_cur_text(pos);
+        id_syn_err(pos, id_concat(id_concat("'", cur_text_v), "' is a test case keyword (see docs/TESTS.md) and cannot be used as a name"));
+    }
+    return;
 }
 
 int id_parse_expr(IdList* pos) {
@@ -11261,8 +11616,7 @@ int id_take_export(IdList* pos) {
 int id_finish_decl(IdList* pos, char* type, int exported) {
     char* name;
     int ret_i;
-    name = id_cur_text(pos);
-    id_advance(pos);
+    name = id_read_name(pos);
     ret_i = id_finish_decl_tail(pos, type, name, exported);
     return ret_i;
 }
@@ -12688,6 +13042,161 @@ void id_report_main(void) {
     return;
 }
 
+void id_fit_given(int i) {
+    char* setup_nm;
+    setup_nm = (char*)(intptr_t)(id_list_get(casegiven, i));
+    if ((strcmp(setup_nm, "") != 0)) {
+        id_given_fn(i, setup_nm);
+    }
+    return;
+}
+
+void id_given_fn(int i, char* setup_nm) {
+    int sfn;
+    sfn = id_func_node(setup_nm);
+    id_given_shape(i, setup_nm, sfn);
+    return;
+}
+
+void id_given_shape(int i, char* setup_nm, int sfn) {
+    int np;
+    char* rt;
+    if ((sfn < 0)) {
+        id_case_err(i, id_concat(id_concat("'given' names '", setup_nm), "', which is not a function in this build"));
+    } else if ((id_flat_arg_count(sfn) != 0)) {
+        np = id_flat_arg_count(sfn);
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat("'given' names '", setup_nm), "', which takes "), id_str_of_int(np)), " parameter(s); a setup takes none and returns void"));
+    } else if ((strcmp(id_s2_of(sfn), "void") != 0)) {
+        rt = id_s2_of(sfn);
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat("'given' names '", setup_nm), "', which returns "), rt), "; a setup takes none and returns void"));
+    }
+    return;
+}
+
+int id_reaches(char* src_fn, char* dst_fn) {
+    int r;
+    id_reach_seed(src_fn);
+    id_reach_mark();
+    r = id_is_reach(dst_fn);
+    return r;
+}
+
+void id_reach_seed(char* src_fn) {
+    id_init_reach();
+    id_clear_strs(rfn);
+    id_list_push(rfn, (long long)(intptr_t)(src_fn));
+    return;
+}
+
+void id_fit_import(int i, int e, char* want) {
+    char* imp_nm;
+    int ek;
+    imp_nm = id_s1_of(e);
+    ek = id_find_str(enames, imp_nm);
+    id_imp_check(i, imp_nm, ek, want);
+    return;
+}
+
+void id_imp_check(int i, char* imp_nm, int ek, char* want) {
+    if ((strcmp((char*)(intptr_t)(id_list_get(casegiven, i)), "") == 0)) {
+        id_case_err(i, id_concat(id_concat("(import ", imp_nm), ") needs a 'given': an export has no value in a case until a setup has run"));
+    } else if ((ek < 0)) {
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat("(import ", imp_nm), "): '"), imp_nm), "' is not an exported variable"));
+    } else {
+        id_imp_owner(i, imp_nm, ek, want);
+    }
+    return;
+}
+
+void id_imp_owner(int i, char* imp_nm, int ek, char* want) {
+    char* setup_nm;
+    setup_nm = (char*)(intptr_t)(id_list_get(casegiven, i));
+    if (((id_func_node(setup_nm) >= 0) && (id_reaches(setup_nm, (char*)(intptr_t)(id_list_get(eowners, ek))) == 0))) {
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("(import ", imp_nm), "): '"), imp_nm), "' is exported by '"), (char*)(intptr_t)(id_list_get(eowners, ek))), "', which the setup '"), setup_nm), "' does not reach, so nothing sets it before the call"));
+    } else if ((strcmp((char*)(intptr_t)(id_list_get(etypes, ek)), want) != 0)) {
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("this case gives (import ", imp_nm), "), a "), (char*)(intptr_t)(id_list_get(etypes, ek))), ", where a "), want), " is required"));
+    }
+    return;
+}
+
+void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm) {
+    int np;
+    if ((id_flat_arg_count(cfn) != 0)) {
+        np = id_flat_arg_count(cfn);
+        id_case_err(ci, id_concat(id_concat(id_concat(id_concat("'then' names '", chk_nm), "', which takes "), id_str_of_int(np)), " parameter(s); a check takes none and returns the value it compares"));
+    } else if ((strcmp(id_s2_of(cfn), "void") == 0)) {
+        id_case_err(ci, id_concat(id_concat("'then' names '", chk_nm), "', which returns void; a check takes none and returns the value it compares"));
+    } else {
+        id_then_value_fit(ci, chk_node, cfn);
+    }
+    return;
+}
+
+void id_fit_thens(void) {
+    int ti;
+    ti = 0;
+    while ((ti < id_list_len(thennode))) {
+        id_fit_then(ti);
+        ti = (ti + 1);
+    }
+    return;
+}
+
+void id_fit_then(int ti) {
+    int chk_node;
+    char* chk_nm;
+    chk_node = (int)(id_list_get(thennode, ti));
+    chk_nm = id_s1_of(chk_node);
+    id_then_fn(chk_node, chk_nm);
+    return;
+}
+
+void id_then_fn(int chk_node, char* chk_nm) {
+    int cfn;
+    int ci;
+    cfn = id_func_node(chk_nm);
+    ci = id_i1_of(chk_node);
+    id_then_shape(ci, chk_node, cfn);
+    return;
+}
+
+void id_then_shape(int ci, int chk_node, int cfn) {
+    char* chk_nm;
+    chk_nm = id_s1_of(chk_node);
+    if ((cfn < 0)) {
+        id_case_err(ci, id_concat(id_concat("'then' names '", chk_nm), "', which is not a function in this build"));
+    } else {
+        id_then_sig(ci, chk_node, cfn, chk_nm);
+    }
+    return;
+}
+
+void id_then_value_fit(int ci, int chk_node, int cfn) {
+    IdList* items;
+    int ne;
+    items = id_l1_of(chk_node);
+    if ((id_list_len(items) != 1)) {
+        ne = id_list_len(items);
+        id_case_err(ci, id_concat("a 'then' check compares exactly one value, not ", id_str_of_int(ne)));
+    } else {
+        id_then_lit(ci, (int)(id_list_get(items, 0)), cfn);
+    }
+    return;
+}
+
+void id_then_lit(int ci, int e, int cfn) {
+    char* lt;
+    char* rt;
+    if ((strcmp(id_k_of(e), "cimport") == 0)) {
+        lt = id_lit_text(e);
+        id_case_err(ci, id_concat(id_concat("a 'then' check compares a literal; ", lt), " may only be an argument or an expected value"));
+    } else {
+        rt = id_s2_of(cfn);
+        id_fit_value(ci, e, rt);
+    }
+    return;
+}
+
 void id_check_dup_cases(void) {
     int i;
     i = 0;
@@ -12775,8 +13284,10 @@ void id_check_case_fits(void) {
     i = 0;
     while ((i < id_list_len(casenode))) {
         id_fit_case(i);
+        id_fit_given(i);
         i = (i + 1);
     }
+    id_fit_thens();
     return;
 }
 
@@ -12874,6 +13385,15 @@ char* id_items_text(IdList* xs) {
     return lt;
 }
 
+char* id_leaf_text(int e) {
+    char* lt;
+    lt = id_s1_of(e);
+    if ((strcmp(id_k_of(e), "cimport") == 0)) {
+        lt = id_concat(id_concat("(import ", lt), ")");
+    }
+    return lt;
+}
+
 void id_case_err(int i, char* msg) {
     char* case_loc_v;
     case_loc_v = id_case_loc(i);
@@ -12894,7 +13414,7 @@ char* id_case_loc(int i) {
 
 char* id_lit_text(int e) {
     char* lt;
-    lt = id_s1_of(e);
+    lt = id_leaf_text(e);
     if ((strcmp(id_k_of(e), "arr") == 0)) {
         lt = id_arr_text(e);
     } else if ((strcmp(id_k_of(e), "un") == 0)) {
@@ -12980,7 +13500,9 @@ int id_ty_fits(char* want, char* lt) {
 }
 
 void id_fit_value(int i, int e, char* want) {
-    if ((id_ty_is_list(want) == 1)) {
+    if ((strcmp(id_k_of(e), "cimport") == 0)) {
+        id_fit_import(i, e, want);
+    } else if ((id_ty_is_list(want) == 1)) {
         id_fit_list(i, e, want);
     } else {
         id_fit_scalar(i, e, want);

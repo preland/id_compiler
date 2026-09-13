@@ -1,13 +1,13 @@
-// A case literal as C, built at the type the signature declares -- the same
-// cells, boxing and id_list_lit the program's own literals use. The literal
-// has already been checked against that type (mid/.../cases/more/fit/).
+// A case value as C: a literal, built by tc_lit (lit/lit.id), or
+// `(import NAME)`, which is the export's C global, read where the value is
+// built -- after the setup for an argument, after the call for an expected
+// value. Its type was checked to be exactly the one wanted
+// (mid/.../cases/given/read/), so it needs no conversion.
 
 tc_value(int e, string want) {
-  string so = "";
-  if(ty_is_list(want) == 1) {
-    so = tc_list(e, want);
-  } else {
-    so = tc_scalar(e);
+  string so = s1_of(e);
+  if(k_of(e) != "cimport") {
+    so = tc_lit(e, want);
   }
 } return string so;
 

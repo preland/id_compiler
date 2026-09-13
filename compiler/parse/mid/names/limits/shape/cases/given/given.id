@@ -1,0 +1,30 @@
+// A case's `given`: the function it names must be a setup -- a function in the
+// build that takes nothing and returns void -- because the harness calls it
+// with no arguments, before the case's arguments are built, and has nothing to
+// compare its result with. Decided from the case and the declaration it names,
+// so a setup that is not one is an error at the case's line rather than C that
+// does not compile.
+
+fit_given(int i) {
+  string setup_nm = (import casegiven)[i];
+  if(setup_nm != "") {
+    given_fn(i, setup_nm);
+  }
+} return void;
+
+given_fn(int i, string setup_nm) {
+  int sfn = func_node(setup_nm);
+  given_shape(i, setup_nm, sfn);
+} return void;
+
+given_shape(int i, string setup_nm, int sfn) {
+  if(sfn < 0) {
+    case_err(i, "'given' names '" + setup_nm + "', which is not a function in this build");
+  } else if(flat_arg_count(sfn) != 0) {
+    int np = flat_arg_count(sfn);
+    case_err(i, "'given' names '" + setup_nm + "', which takes " + np + " parameter(s); a setup takes none and returns void");
+  } else if(s2_of(sfn) != "void") {
+    string rt = s2_of(sfn);
+    case_err(i, "'given' names '" + setup_nm + "', which returns " + rt + "; a setup takes none and returns void");
+  }
+} return void;
