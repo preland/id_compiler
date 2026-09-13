@@ -363,6 +363,30 @@ else
     bad "a nested conf.id is reported, by both compilers"
 fi
 
+# An over-full directory must not swallow a real semantic error elsewhere in
+# the same project: check_entry_limit used to exit before idlex/idparse ever
+# ran, so a project mixing the two reported only the directory violation and
+# hid everything idparse had to say about the rest -- this is exactly how
+# idem/engine's 1,115 real errors were once read as "1 error". bin/idc only:
+# idc.py still stops at the first CompileError it raises.
+mkdir -p "$TMP/mixed"
+for n in 1 2 3 4; do printf 'mx%d() {\n} return int %d;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
+cat > "$TMP/mixed/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  int r = no_such_function();
+  print(r);
+} return int 0;
+EOF
+mixed_out=$($BIN_IDC "$TMP/mixed" -o "$TMP/mixed.bin" 2>&1)
+mixed_rc=$?
+if [ "$mixed_rc" -ne 0 ] \
+   && printf '%s\n' "$mixed_out" | grep -q "at most 3 files and directories" \
+   && printf '%s\n' "$mixed_out" | grep -q "no such function 'no_such_function'"; then
+    ok "an over-full directory does not hide a real semantic error"
+else
+    bad "an over-full directory does not hide a real semantic error"
+fi
+
 # Test clauses (docs/TESTS.md) are part of a declaration, so BOTH compilers
 # must accept them and both must ignore them in codegen. When only idc.py knew
 # the syntax, a program carrying cases was a syntax error in the primary
@@ -470,6 +494,30 @@ if (ulimit -v 2000000; timeout 5 "$BIN_IDC" "$TMP/chain_str.id" -o "$TMP/chain_s
     ok "250-term string + chain compiles in linear time under a 2 GB cap"
 else
     bad "250-term string + chain compiles in linear time under a 2 GB cap: $(head -1 "$TMP/chain_str.err")"
+fi
+
+# IDC_MEM_LIMIT: a deliberately tiny ceiling, against a fresh cache so the
+# bootstrap rebuild actually exercises it, must be reported as a memory
+# failure naming the stage and the ceiling -- not the generic "bug in the
+# self-hosted compiler" block, because the compiler was refused memory, not
+# necessarily wrong.
+mem_out=$(IDC_CACHE_DIR="$TMP/memcache" IDC_MEM_LIMIT=100 $BIN_IDC ../../demos/hello -o "$TMP/mem.bin" 2>&1)
+mem_rc=$?
+if [ "$mem_rc" -ne 0 ] \
+   && printf '%s\n' "$mem_out" | grep -q "exceeded the memory ceiling (100 MB)" \
+   && ! printf '%s\n' "$mem_out" | grep -q "this is a bug in the self-hosted compiler"; then
+    ok "a tiny IDC_MEM_LIMIT is reported as a memory failure, not a compiler bug"
+else
+    bad "a tiny IDC_MEM_LIMIT is reported as a memory failure, not a compiler bug"
+fi
+
+# IDC_MEM_LIMIT=0 disables the ceiling entirely -- the same build with a
+# normal cache must still succeed.
+if IDC_MEM_LIMIT=0 $BIN_IDC ../../demos/hello -o "$TMP/mem0.bin" >/dev/null 2>&1 \
+   && [ -x "$TMP/mem0.bin" ]; then
+    ok "IDC_MEM_LIMIT=0 disables the memory ceiling"
+else
+    bad "IDC_MEM_LIMIT=0 disables the memory ceiling"
 fi
 
 echo

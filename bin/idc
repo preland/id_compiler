@@ -61,6 +61,15 @@ STD_DIR=""
 BACKENDS=()          # from --backend flags (passed through on fallback)
 MANIFEST_BACKENDS=() # from the project's conf.id (idc.py re-reads it on fallback)
 CONSTS=()            # constant declarations from every conf.id reached
+# Set by a structural check that found a real violation but could keep going
+# without losing or misattributing anything (an over-full directory, a nested
+# or legacy-named conf.id, an out-of-order conf.id line): the check prints its
+# message immediately, same as before, but no longer exits. That lets idlex
+# and idparse still run and report everything else wrong with the project --
+# otherwise the first such violation hid every one of idparse's own
+# diagnostics, which is how idem/engine's 1,115 errors were once read as "1
+# error". Checked at every success exit below; any violation turns it into 1.
+STRUCT_VIOLATIONS=0
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -171,6 +180,67 @@ if [ -z "$TRIPLE" ]; then
 fi
 
 # ---------------------------------------------------------------------------
+# IDC_MEM_LIMIT -- a virtual-memory ceiling, in megabytes, applied to every
+# subprocess that does real compilation work: idlex, idparse, and the C
+# compiler or clang. This is defense in depth against the self-hosted
+# compiler's own runaway memory use, not a fix for it -- a blowup in idparse
+# still happens, but now it dies against this ceiling with one clear line
+# instead of taking down the machine it runs on. The default was chosen with
+# ample headroom over the largest legitimate builds in this tree; see
+# idc/README.md for the measurements. 0 disables it.
+MEM_LIMIT_MB="${IDC_MEM_LIMIT:-4096}"
+case "$MEM_LIMIT_MB" in
+    ''|*[!0-9]*)
+        echo "idc: \$IDC_MEM_LIMIT must be a whole number of megabytes (0 disables it), got '$MEM_LIMIT_MB'" >&2
+        exit 2 ;;
+esac
+
+# capped CMD... -- run CMD with the ceiling applied (a plain exec when it is
+# disabled). ulimit -v is set in a subshell, so it bounds only CMD, never this
+# script or anything that runs after it.
+capped() {
+    if [ "$MEM_LIMIT_MB" -eq 0 ]; then
+        "$@"
+    else
+        ( ulimit -v $((MEM_LIMIT_MB * 1024)); exec "$@" )
+    fi
+}
+
+# mem_ceiling_hit RC [STDERR_FILE] -- true if a capped stage's failure looks
+# like the ceiling rather than a bug in its own logic. Observed by hand at a
+# few ceilings from 1 MB up: the id runtime checks its own allocations and
+# says so in words (bootstrap/idlex.c, bootstrap/idparse.c: id_alloc/
+# id_realloc); cc's cc1 also checks and exits cleanly with its own "out of
+# memory" or "virtual memory exhausted" line; tight enough that cc1 itself
+# segfaults mid-allocation, gcc catches that and reports an "internal
+# compiler error" instead; and a program that checks nothing dies by signal,
+# uncaught, when malloc returns NULL somewhere it never expected -- hence
+# RC > 128 (128 + the signal number). Always false when the ceiling is off,
+# so a signal from an unrelated cause is never misreported as this.
+#
+# Below roughly 5 MB on this machine the ceiling is too tight even for the
+# dynamic loader to map libc into a new process ("failed to map segment from
+# shared object"), which none of the above catches -- every default this
+# driver would ever choose sits far above that floor, so it is left unhandled
+# rather than grown into a pattern match that could paper over a real linker
+# problem.
+mem_ceiling_hit() {
+    [ "$MEM_LIMIT_MB" -eq 0 ] && return 1
+    [ "$1" -gt 128 ] && return 0
+    [ -n "${2:-}" ] && [ -s "$2" ] \
+        && grep -qiE 'out of memory|virtual memory exhausted|internal compiler error' "$2"
+}
+
+# mem_ceiling_error STAGE -- the one line printed in place of a generic
+# failure report once mem_ceiling_hit is true. Deliberately not the
+# "this is a bug in the self-hosted compiler" block: the compiler was not
+# necessarily wrong, it was just refused the memory to keep going.
+mem_ceiling_error() {
+    echo "idc: $1 exceeded the memory ceiling ($MEM_LIMIT_MB MB); set \$IDC_MEM_LIMIT to raise it, or to 0 to disable it" >&2
+    echo "idc: this means the compiler used more memory than allowed, not that it is broken" >&2
+}
+
+# ---------------------------------------------------------------------------
 # bootstrap idlex/idparse (from the checked-in C in bootstrap/, only when
 # missing or stale) and cache them
 # IDC_CACHE_DIR moves the bootstrap cache elsewhere, so two builds running at
@@ -233,6 +303,15 @@ progress_done() { # progress_done SUMMARY
     printf '  %s\n' "$1" >&2
 }
 
+# exit_ok -- every success path below calls this instead of `exit 0`. A
+# structural violation recorded along the way (STRUCT_VIOLATIONS) still means
+# the whole invocation failed even when everything after it went fine, because
+# the driver's own rule was broken, not idlex/idparse's.
+exit_ok() {
+    [ "$STRUCT_VIOLATIONS" -eq 1 ] && exit 1
+    exit 0
+}
+
 stale() { # stale BIN SRC_DIR -- true if BIN is missing or older than any .id under SRC_DIR
     local bin="$1" src="$2"
     [ -x "$bin" ] || return 0
@@ -271,15 +350,34 @@ stale() { # stale BIN SRC_DIR -- true if BIN is missing or older than any .id un
 # than through a second copy of that logic. IDC_STAGE_LEX/PARSE at the top of
 # the file is where the recursion stops.
 if [ -z "${IDC_STAGE_LEX:-}" ]; then
+    BOOT_ERR="$CACHE_DIR/boot.err"
     if [ ! -x "$STAGE0_LEX" ] || [ "$BOOT_DIR/idlex.c" -nt "$STAGE0_LEX" ]; then
         progress bootstrap "idlex0 (from bootstrap/idlex.c)"
-        "$CC" -std=c11 -O2 -o "$STAGE0_LEX" "$BOOT_DIR/idlex.c" >&2 \
-            || { progress_clear; echo "idc: failed to compile $BOOT_DIR/idlex.c" >&2; exit 1; }
+        capped "$CC" -std=c11 -O2 -o "$STAGE0_LEX" "$BOOT_DIR/idlex.c" 2>"$BOOT_ERR"; boot_rc=$?
+        if [ "$boot_rc" -ne 0 ]; then
+            progress_clear
+            if mem_ceiling_hit "$boot_rc" "$BOOT_ERR"; then
+                mem_ceiling_error "cc (compiling $BOOT_DIR/idlex.c)"
+            else
+                cat "$BOOT_ERR" >&2
+                echo "idc: failed to compile $BOOT_DIR/idlex.c" >&2
+            fi
+            exit 1
+        fi
     fi
     if [ ! -x "$STAGE0_PARSE" ] || [ "$BOOT_DIR/idparse.c" -nt "$STAGE0_PARSE" ]; then
         progress bootstrap "idparse0 (from bootstrap/idparse.c)"
-        "$CC" -std=c11 -O2 -o "$STAGE0_PARSE" "$BOOT_DIR/idparse.c" >&2 \
-            || { progress_clear; echo "idc: failed to compile $BOOT_DIR/idparse.c" >&2; exit 1; }
+        capped "$CC" -std=c11 -O2 -o "$STAGE0_PARSE" "$BOOT_DIR/idparse.c" 2>"$BOOT_ERR"; boot_rc=$?
+        if [ "$boot_rc" -ne 0 ]; then
+            progress_clear
+            if mem_ceiling_hit "$boot_rc" "$BOOT_ERR"; then
+                mem_ceiling_error "cc (compiling $BOOT_DIR/idparse.c)"
+            else
+                cat "$BOOT_ERR" >&2
+                echo "idc: failed to compile $BOOT_DIR/idparse.c" >&2
+            fi
+            exit 1
+        fi
     fi
     if stale "$IDLEX" "$ROOT/compiler/lex" || [ "$STAGE0_LEX" -nt "$IDLEX" ]; then
         progress bootstrap "idlex (from source, via stage 0)"
@@ -333,7 +431,7 @@ check_legacy_manifest() {
     old=$(find "$root" \( -type d -name '.*' -prune \) -o \( -name 'import.id' -print \) | LC_ALL=C sort | head -1)
     if [ -n "$old" ]; then
         echo "$old:1: error: 'import.id' is now called 'conf.id' -- it holds constants as well as dependencies. Rename it" >&2
-        exit 1
+        STRUCT_VIOLATIONS=1
     fi
 }
 
@@ -356,7 +454,7 @@ check_nested_manifest() {
                   \( -name 'conf.id' ! -path "$root/conf.id" -print \) | LC_ALL=C sort | head -1)
     [ -z "$nested" ] && return 0
     echo "$nested:1: error: 'conf.id' is the dependency manifest and is only read at the root of a project or a dependency. Here it is neither compiled nor read, so anything it defines silently does not exist; rename it" >&2
-    exit 1
+    STRUCT_VIOLATIONS=1
 }
 
 # check_entry_limit ROOT -- the 3-entries-per-directory rule over ROOT's tree.
@@ -382,7 +480,7 @@ check_entry_limit() {
     [ -z "$over" ] && return 0
     local total="${over%%|*}" d="${over#*|}"
     echo "$d:1: error: a project directory may contain at most 3 files and directories combined, but this one has $total (.id files and subdirectories); split it into subdirectories" >&2
-    exit 1
+    STRUCT_VIOLATIONS=1
 }
 
 # ---------------------------------------------------------------------------
@@ -461,8 +559,13 @@ read_manifest() {
             continue
         fi
         if [ "$seen_const" -eq 1 ]; then
+            # Ordering only, not content: the import below is perfectly
+            # resolvable, so recording this and still resolving it costs
+            # nothing -- unlike a missing directory or a malformed line, where
+            # continuing would mean guessing at a dependency that was never
+            # named.
             echo "idc: $manifest:$lineno: imports come before constants in conf.id; '$trimmed' follows a constant declaration" >&2
-            exit 2
+            STRUCT_VIOLATIONS=1
         fi
         dep=$(printf '%s' "$trimmed" \
             | sed -n 's/^import[[:space:]]*"\([^"]*\)"[[:space:]]*$/\1/p')
@@ -651,11 +754,11 @@ emit_sources() {
 # compare.
 if [ "$EMIT_SOURCES" -eq 1 ]; then
     emit_sources
-    exit 0
+    exit_ok
 fi
 
 progress compile "$(plural "${#SRC_FILES[@]}" file) -> tokens -> C"
-emit_sources | "$IDLEX" 2>"$LEX_ERR" | "$IDPARSE" "${PARSE_ARGS[@]}" > "$C_OUT" 2>"$PARSE_ERR"
+emit_sources | capped "$IDLEX" 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$C_OUT" 2>"$PARSE_ERR"
 rc=("${PIPESTATUS[@]}")
 lex_rc="${rc[1]}"
 parse_rc="${rc[2]}"
@@ -676,6 +779,20 @@ compiler_bug() { # compiler_bug REASON
     echo "idc:     python3 $IDC_PY $PATH_ARG" >&2
     exit 1
 }
+
+# Checked before parse_rc==1 below: idlex and idparse also exit 1 when their
+# own allocator gives up (see mem_ceiling_hit), which is not the program
+# breaking a language rule, and would otherwise be misread as exactly that.
+if mem_ceiling_hit "$lex_rc" "$LEX_ERR"; then
+    progress_clear
+    mem_ceiling_error "idlex"
+    exit 1
+fi
+if mem_ceiling_hit "$parse_rc" "$PARSE_ERR"; then
+    progress_clear
+    mem_ceiling_error "idparse"
+    exit 1
+fi
 
 # Exit code 1 from idparse means the *program* broke a rule of the language,
 # not that the self-hosted stages could not cope. Those diagnostics are the
@@ -763,7 +880,7 @@ if [ "$TARGET" = llvm ]; then
         progress_done "wrote $EMIT_LLVM ($(plural "${#SRC_FILES[@]}" "source file"))"
         cp "$LL_OUT" "$EMIT_LLVM" || exit 1
         echo "wrote $EMIT_LLVM"
-        exit 0
+        exit_ok
     fi
 
     # Freestanding: there is no host to link against and no C runtime to
@@ -778,21 +895,26 @@ if [ "$TARGET" = llvm ]; then
              -mno-red-zone -fno-stack-protector -fno-asynchronous-unwind-tables -Wno-unused-command-line-argument
              -target "$TRIPLE" "$LL_OUT" -o "$OUT")
         progress link "clang -> $(basename "$OUT")"
-        if ! "${cmd[@]}" 2>"$WORK/clang.err"; then
+        capped "${cmd[@]}" 2>"$WORK/clang.err"; cmd_rc=$?
+        if [ "$cmd_rc" -ne 0 ]; then
             progress_clear
-            [ -s "$WORK/clang.err" ] && sed 's/^/idc:   /' "$WORK/clang.err" >&2
-            echo "idc: freestanding compilation failed (command: ${cmd[*]})" >&2
+            if mem_ceiling_hit "$cmd_rc"; then
+                mem_ceiling_error "$LLVM_CC"
+            else
+                [ -s "$WORK/clang.err" ] && sed 's/^/idc:   /' "$WORK/clang.err" >&2
+                echo "idc: freestanding compilation failed (command: ${cmd[*]})" >&2
+            fi
             exit 1
         fi
         progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
-        exit 0
+        exit_ok
     fi
 
     have_main=0
     grep -q '^define i32 @main(' "$LL_OUT" && have_main=1
     choose_output
     RT_C="$WORK/runtime.c"
-    printf '' | "$IDLEX" | "$IDPARSE" --target crt > "$RT_C" || {
+    printf '' | capped "$IDLEX" | capped "$IDPARSE" --target crt > "$RT_C" || {
         progress_clear; echo "idc: could not obtain the C runtime from idparse" >&2; exit 1; }
 
     LLVM_CC=clang
@@ -802,14 +924,19 @@ if [ "$TARGET" = llvm ]; then
     cmd+=(-o "$OUT")
 
     progress link "clang -> $(basename "$OUT")"
-    if ! "${cmd[@]}" 2>"$WORK/clang.err"; then
+    capped "${cmd[@]}" 2>"$WORK/clang.err"; cmd_rc=$?
+    if [ "$cmd_rc" -ne 0 ]; then
         progress_clear
-        [ -s "$WORK/clang.err" ] && sed 's/^/idc:   /' "$WORK/clang.err" >&2
-        echo "idc: LLVM compilation failed (command: ${cmd[*]})" >&2
+        if mem_ceiling_hit "$cmd_rc"; then
+            mem_ceiling_error "$LLVM_CC"
+        else
+            [ -s "$WORK/clang.err" ] && sed 's/^/idc:   /' "$WORK/clang.err" >&2
+            echo "idc: LLVM compilation failed (command: ${cmd[*]})" >&2
+        fi
         exit 1
     fi
     progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
-    exit 0
+    exit_ok
 fi
 
 # idlex/idparse can exit 0 while having silently mis-lexed something (e.g. a
@@ -819,8 +946,13 @@ fi
 # cause, gate on a real C compiler's syntax check now -- cheap (no linking)
 # and it's the one authoritative way to know the self-hosted output is sound.
 progress verify "checking the emitted C"
-if ! "$CC" -std=c11 -fsyntax-only "$C_OUT" 2>"$WORK/syntax.err"; then
+capped "$CC" -std=c11 -fsyntax-only "$C_OUT" 2>"$WORK/syntax.err"; syntax_rc=$?
+if [ "$syntax_rc" -ne 0 ]; then
     progress_clear
+    if mem_ceiling_hit "$syntax_rc" "$WORK/syntax.err"; then
+        mem_ceiling_error "cc -fsyntax-only"
+        exit 1
+    fi
     # Show what the C compiler actually said. Without this the message is
     # just "emitted C that does not compile", which is true and unusable --
     # the real diagnostic (a name colliding with a libc symbol, say) is
@@ -835,7 +967,7 @@ if [ -n "$EMIT_C" ]; then
     progress_done "wrote $EMIT_C ($(plural "${#SRC_FILES[@]}" "source file"))"
     cp "$C_OUT" "$EMIT_C" || exit 1
     echo "wrote $EMIT_C"
-    exit 0
+    exit_ok
 fi
 
 # does the program have a `main`? idc.py builds a real executable when it
@@ -931,8 +1063,13 @@ PYEOF
             [ -z "$src" ] && continue
             src_path="$d/$src"
             obj="${src_path%.*}.gen.o"
-            if ! "$CC" -O2 -c "$src_path" -o "$obj" "${cflags[@]}"; then
-                echo "idc: backend compile failed for $src_path" >&2
+            capped "$CC" -O2 -c "$src_path" -o "$obj" "${cflags[@]}"; backend_rc=$?
+            if [ "$backend_rc" -ne 0 ]; then
+                if mem_ceiling_hit "$backend_rc"; then
+                    mem_ceiling_error "cc (backend: $src_path)"
+                else
+                    echo "idc: backend compile failed for $src_path" >&2
+                fi
                 for o in "${BACKEND_OBJS[@]}"; do rm -f "$o"; done
                 exit 1
             fi
@@ -972,7 +1109,7 @@ cmd=("$CC")
 cmd+=("-std=c11" "-O2" "$c_path" "${BACKEND_OBJS[@]}" "-o" "$OUT" "${BACKEND_LINK[@]}")
 
 progress link "cc -> $(basename "$OUT")"
-"${cmd[@]}" 2>"$WORK/cc.err"
+capped "${cmd[@]}" 2>"$WORK/cc.err"
 cc_rc=$?
 
 [ "$KEEP_C" -eq 1 ] || rm -f "$c_path"
@@ -988,6 +1125,10 @@ for o in "${BACKEND_OBJS[@]}"; do rm -f "$o"; done
 # describe the failure as what it is.
 if [ "$cc_rc" -ne 0 ]; then
     progress_clear
+    if mem_ceiling_hit "$cc_rc" "$WORK/cc.err"; then
+        mem_ceiling_error "cc (linking $OUT)"
+        exit 1
+    fi
     [ -s "$WORK/cc.err" ] && sed 's/^/idc:   /' "$WORK/cc.err" >&2
     echo "idc: C compilation failed (command: ${cmd[*]})" >&2
     echo "idc: the generated C passed a syntax check, so this is a link or environment" >&2
@@ -996,4 +1137,4 @@ if [ "$cc_rc" -ne 0 ]; then
     exit 1
 fi
 progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
-exit 0
+exit_ok
