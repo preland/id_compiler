@@ -1,0 +1,31 @@
+// What a callee reaches that the build host cannot run, or "". A callee
+// already marked answers with what it reaches; otherwise it is asked whether
+// it is itself something the host has no implementation of.
+
+ut_what(string callee_nm) {
+  string what_s = ut_leaf(callee_nm);
+  int ut_k = ut_at(callee_nm);
+  if(ut_k >= 0) {
+    what_s = (import utwhat)[ut_k];
+  }
+} return string what_s;
+
+// An `asm` function runs on the host only through a body for the host's own
+// triple. That body is the overload the harness selects, exactly as any build
+// for that triple selects it (docs/ASM.md), so a function with one is runnable.
+ut_leaf(string callee_nm) {
+  string what_s = ut_native(callee_nm);
+  string build_host_v = build_host();
+  if(find_str((import afname), callee_nm) >= 0 && asm_row(callee_nm, build_host_v) < 0) {
+    string asm_triples_v = asm_triples(callee_nm);
+    what_s = "asm '" + callee_nm + "', which has no body for that triple (defined for: " + asm_triples_v + ")";
+  }
+} return string what_s;
+
+ut_native(string callee_nm) {
+  string what_s = "";
+  int fn = func_node(callee_nm);
+  if(fn >= 0 && is_native(fn) == 1) {
+    what_s = "native '" + callee_nm + "', which a --freestanding build does not link: whatever the object is linked with provides it";
+  }
+} return string what_s;

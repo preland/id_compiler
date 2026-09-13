@@ -1,0 +1,25 @@
+// In a --runtime build a function named after a runtime helper is that
+// helper's definition. A harness on the build host already has one, from the
+// host's C runtime, so it would run the host's and never this tree's.
+
+ut_seed_self() {
+  int i = 0;
+  while(i < len((import prog))) {
+    ut_self_at(i);
+    i = i + 1;
+  }
+} return void;
+
+ut_self_at(int i) {
+  if(is_runtime() == 1 && is_reserved_name(i)) {
+    string s1_of_v = s1_of((import prog)[i]);
+    ut_add(s1_of_v, "the runtime helper '" + s1_of_v + "', which a harness on the build host takes from its own C runtime instead", "*");
+  }
+} return void;
+
+// A setup, a check or a function value a case names runs in the harness as
+// surely as the function under test does.
+ut_named(int ci, string lead, string name) {
+  string ut_why_v = ut_why(name);
+  case_err(ci, lead + name + "', which " + ut_why_v);
+} return void;

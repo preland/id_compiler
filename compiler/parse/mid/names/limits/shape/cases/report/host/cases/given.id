@@ -1,0 +1,28 @@
+// A case's setup and the functions it passes as values, which the harness
+// carries and calls (back/drive/target/tests/more/seed/).
+
+ut_case_given(int ci) {
+  string setup_nm = (import casegiven)[ci];
+  if(setup_nm != "" && ut_at(setup_nm) >= 0) {
+    ut_named(ci, "'given' names '", setup_nm);
+  }
+  ut_case_vals(ci);
+} return void;
+
+ut_case_vals(int ci) {
+  int[] args = l1_of((import casenode)[ci]);
+  int j = 0;
+  while(j < len(args)) {
+    ut_case_val(ci, args[j]);
+    j = j + 1;
+  }
+} return void;
+
+ut_case_val(int ci, int e) {
+  if(k_of(e) == "cfn") {
+    string s1_of_v = s1_of(e);
+    if(ut_at(s1_of_v) >= 0) {
+      ut_named(ci, "this case passes '", s1_of_v);
+    }
+  }
+} return void;

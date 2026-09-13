@@ -1,0 +1,30 @@
+// The clause after "cannot be tested on the build host (...):", from how the
+// function reaches what cannot run there.
+
+ut_because_at(string via_s, string what_s) {
+  string ret_s = "it reaches " + what_s;
+  if(via_s == "*") {
+    ret_s = "it is " + what_s;
+  } else if(via_s != "") {
+    ret_s = "it calls '" + via_s + "', which reaches " + what_s;
+  }
+} return string ret_s;
+
+// A function short of two cases that cannot be tested on the build host is not
+// short: it needs none, and a note says why rather than the minimum being
+// lifted silently. One that has a case anyway already has an error at that case
+// (../cases/cases.id), so it gets nothing more here.
+cases_short(int i, int n) {
+  string s1_of_v = s1_of((import prog)[i]);
+  if(ut_at(s1_of_v) < 0) {
+    report_cases(i, n);
+  } else if(n == 0) {
+    ut_note(i, s1_of_v);
+  }
+} return void;
+
+ut_note(int i, string name) {
+  string note_at = (import pfile)[i] + ":" + (import pline)[i] + ": note: ";
+  string ut_why_v = ut_why(name);
+  push((import utnote), note_at + "function '" + name + "' " + ut_why_v + "; it is exempt from the two-case minimum");
+} return void;

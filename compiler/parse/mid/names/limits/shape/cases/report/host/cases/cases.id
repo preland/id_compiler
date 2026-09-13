@@ -1,0 +1,26 @@
+// A case that would never run is an error at the case: one under a function
+// that cannot be tested on the build host, or one naming a setup, a check or a
+// function value that cannot. Like the other case checks it is decided whether
+// or not the minimum is on, because a case that cannot run is wrong either way.
+
+ut_cases() {
+  int ci = 0;
+  while(ci < len((import casefn))) {
+    ut_case(ci);
+    ci = ci + 1;
+  }
+  ut_thens();
+} return void;
+
+ut_case(int ci) {
+  string s1_of_v = s1_of((import casefn)[ci]);
+  ut_case_fn(ci, s1_of_v);
+  ut_case_given(ci);
+} return void;
+
+ut_case_fn(int ci, string name) {
+  if(ut_at(name) >= 0) {
+    string ut_why_v = ut_why(name);
+    case_err(ci, "'" + name + "' " + ut_why_v + "; this case would never run, and a function that cannot be tested needs none");
+  }
+} return void;

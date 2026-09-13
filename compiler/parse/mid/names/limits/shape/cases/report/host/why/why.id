@@ -1,0 +1,17 @@
+// Why a function cannot be tested on the build host, in the one wording every
+// message about it uses.
+
+ut_at(string name) {
+  int ut_k = find_str((import utname), name);
+} return int ut_k;
+
+ut_why(string name) {
+  string build_host_v = build_host();
+  string because = ut_because(name);
+  string ret_s = "cannot be tested on the build host (" + build_host_v + "): " + because;
+} return string ret_s;
+
+ut_because(string name) {
+  int ut_k = ut_at(name);
+  string ret_s = ut_because_at((import utvia)[ut_k], (import utwhat)[ut_k]);
+} return string ret_s;

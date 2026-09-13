@@ -24,6 +24,7 @@ emit_then_natives(int argc, string[] argv) {
   if((import natc)[0] == 1) {
     nat_print();
   }
+  emit_notes();
 } return void;
 
 nat_print() {

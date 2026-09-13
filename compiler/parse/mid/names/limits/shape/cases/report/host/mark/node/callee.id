@@ -1,0 +1,25 @@
+// Marking a function by what one of its callees reaches.
+
+ut_callee(string fname, string callee_nm) {
+  string ut_what_v = ut_what(callee_nm);
+  if(ut_what_v != "" && ut_at(fname) < 0) {
+    string ut_via_v = ut_via(callee_nm);
+    ut_add(fname, ut_what_v, ut_via_v);
+  }
+} return void;
+
+// A callee is named only when it is a caller itself. When it is the thing that
+// cannot run, the message names that thing directly instead.
+ut_via(string callee_nm) {
+  string via_nm = "";
+  int ut_k = ut_at(callee_nm);
+  if(ut_k >= 0 && (import utvia)[ut_k] != "*") {
+    via_nm = callee_nm;
+  }
+} return string via_nm;
+
+ut_add(string fname, string what_s, string via_s) {
+  push((import utname), fname);
+  push((import utwhat), what_s);
+  push((import utvia), via_s);
+} return void;

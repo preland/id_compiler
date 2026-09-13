@@ -16,5 +16,5 @@ arg_flags3(int argc, string[] argv) {
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
   fs_set(arg_flag_v2);
-  nat_init(argc, argv);
+  arg_flags5(argc, argv);
 } return void;

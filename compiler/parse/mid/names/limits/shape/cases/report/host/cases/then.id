@@ -1,0 +1,18 @@
+// A case's `then` checks. A check node records the case it belongs to
+// (front/parse/decl/func/cases/case/then/push.id).
+
+ut_thens() {
+  int ti = 0;
+  while(ti < len((import thennode))) {
+    ut_then((import thennode)[ti]);
+    ti = ti + 1;
+  }
+} return void;
+
+ut_then(int node) {
+  string s1_of_v = s1_of(node);
+  if(ut_at(s1_of_v) >= 0) {
+    int ci = i1_of(node);
+    ut_named(ci, "'then' names '", s1_of_v);
+  }
+} return void;
