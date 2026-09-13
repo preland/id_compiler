@@ -61,6 +61,15 @@ STD_DIR=""
 BACKENDS=()          # from --backend flags (passed through on fallback)
 MANIFEST_BACKENDS=() # from the project's conf.id (idc.py re-reads it on fallback)
 CONSTS=()            # constant declarations from every conf.id reached
+# Set by a structural check that found a real violation but could keep going
+# without losing or misattributing anything (an over-full directory, a nested
+# or legacy-named conf.id, an out-of-order conf.id line): the check prints its
+# message immediately, same as before, but no longer exits. That lets idlex
+# and idparse still run and report everything else wrong with the project --
+# otherwise the first such violation hid every one of idparse's own
+# diagnostics, which is how idem/engine's 1,115 errors were once read as "1
+# error". Checked at every success exit below; any violation turns it into 1.
+STRUCT_VIOLATIONS=0
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -233,6 +242,15 @@ progress_done() { # progress_done SUMMARY
     printf '  %s\n' "$1" >&2
 }
 
+# exit_ok -- every success path below calls this instead of `exit 0`. A
+# structural violation recorded along the way (STRUCT_VIOLATIONS) still means
+# the whole invocation failed even when everything after it went fine, because
+# the driver's own rule was broken, not idlex/idparse's.
+exit_ok() {
+    [ "$STRUCT_VIOLATIONS" -eq 1 ] && exit 1
+    exit 0
+}
+
 stale() { # stale BIN SRC_DIR -- true if BIN is missing or older than any .id under SRC_DIR
     local bin="$1" src="$2"
     [ -x "$bin" ] || return 0
@@ -333,7 +351,7 @@ check_legacy_manifest() {
     old=$(find "$root" \( -type d -name '.*' -prune \) -o \( -name 'import.id' -print \) | LC_ALL=C sort | head -1)
     if [ -n "$old" ]; then
         echo "$old:1: error: 'import.id' is now called 'conf.id' -- it holds constants as well as dependencies. Rename it" >&2
-        exit 1
+        STRUCT_VIOLATIONS=1
     fi
 }
 
@@ -356,7 +374,7 @@ check_nested_manifest() {
                   \( -name 'conf.id' ! -path "$root/conf.id" -print \) | LC_ALL=C sort | head -1)
     [ -z "$nested" ] && return 0
     echo "$nested:1: error: 'conf.id' is the dependency manifest and is only read at the root of a project or a dependency. Here it is neither compiled nor read, so anything it defines silently does not exist; rename it" >&2
-    exit 1
+    STRUCT_VIOLATIONS=1
 }
 
 # check_entry_limit ROOT -- the 3-entries-per-directory rule over ROOT's tree.
@@ -382,7 +400,7 @@ check_entry_limit() {
     [ -z "$over" ] && return 0
     local total="${over%%|*}" d="${over#*|}"
     echo "$d:1: error: a project directory may contain at most 3 files and directories combined, but this one has $total (.id files and subdirectories); split it into subdirectories" >&2
-    exit 1
+    STRUCT_VIOLATIONS=1
 }
 
 # ---------------------------------------------------------------------------
@@ -461,8 +479,13 @@ read_manifest() {
             continue
         fi
         if [ "$seen_const" -eq 1 ]; then
+            # Ordering only, not content: the import below is perfectly
+            # resolvable, so recording this and still resolving it costs
+            # nothing -- unlike a missing directory or a malformed line, where
+            # continuing would mean guessing at a dependency that was never
+            # named.
             echo "idc: $manifest:$lineno: imports come before constants in conf.id; '$trimmed' follows a constant declaration" >&2
-            exit 2
+            STRUCT_VIOLATIONS=1
         fi
         dep=$(printf '%s' "$trimmed" \
             | sed -n 's/^import[[:space:]]*"\([^"]*\)"[[:space:]]*$/\1/p')
@@ -651,7 +674,7 @@ emit_sources() {
 # compare.
 if [ "$EMIT_SOURCES" -eq 1 ]; then
     emit_sources
-    exit 0
+    exit_ok
 fi
 
 progress compile "$(plural "${#SRC_FILES[@]}" file) -> tokens -> C"
@@ -763,7 +786,7 @@ if [ "$TARGET" = llvm ]; then
         progress_done "wrote $EMIT_LLVM ($(plural "${#SRC_FILES[@]}" "source file"))"
         cp "$LL_OUT" "$EMIT_LLVM" || exit 1
         echo "wrote $EMIT_LLVM"
-        exit 0
+        exit_ok
     fi
 
     # Freestanding: there is no host to link against and no C runtime to
@@ -785,7 +808,7 @@ if [ "$TARGET" = llvm ]; then
             exit 1
         fi
         progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
-        exit 0
+        exit_ok
     fi
 
     have_main=0
@@ -809,7 +832,7 @@ if [ "$TARGET" = llvm ]; then
         exit 1
     fi
     progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
-    exit 0
+    exit_ok
 fi
 
 # idlex/idparse can exit 0 while having silently mis-lexed something (e.g. a
@@ -835,7 +858,7 @@ if [ -n "$EMIT_C" ]; then
     progress_done "wrote $EMIT_C ($(plural "${#SRC_FILES[@]}" "source file"))"
     cp "$C_OUT" "$EMIT_C" || exit 1
     echo "wrote $EMIT_C"
-    exit 0
+    exit_ok
 fi
 
 # does the program have a `main`? idc.py builds a real executable when it
@@ -996,4 +1019,4 @@ if [ "$cc_rc" -ne 0 ]; then
     exit 1
 fi
 progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
-exit 0
+exit_ok
