@@ -24,9 +24,16 @@
 // reads it. `asm` functions are not in the program list at all and are
 // unaffected, which is the conservative answer and the right one.
 //
-// Exported globals are deliberately NOT pruned. An export declared by a
-// function nothing calls costs one never-assigned C global -- nothing can read
-// it, because chk_dead has already rejected a reachable read of one.
+// Exported globals are pruned exactly as functions are, and for the same
+// reason idstd makes this affordable: a standard library export nothing in
+// the program reaches would otherwise cost one never-read C global forever,
+// on every build that merges the library, whether or not it uses that export.
+// Safe for the same reason a dead function is safe to drop: chk_dead has
+// already rejected a reachable read of an export whose declaring function is
+// unreachable, so an export dce_prune drops can never have been read by the
+// program that dropped it. See export/keep.id for exactly where this applies
+// -- not here, where `prog` is the only list rewritten -- and both targets'
+// emitters, which call it.
 
 dce_prune() {
   if(find_str((import fnames), "main") >= 0) {

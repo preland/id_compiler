@@ -1,0 +1,7 @@
+// One export line, or nothing when pruning drops it (dce/export/keep.id).
+emit_export_line_kept(int i) {
+  if(keep_export(i) == 1) {
+    string export_line_v = export_line(i);
+    emit_line(export_line_v);
+  }
+} return void;

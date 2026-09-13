@@ -4,8 +4,7 @@
 ll_globals() {
   int i = 0;
   while(i < len((import enames))) {
-    string ty = ll_ty((import etypes)[i]);
-    ll_global_at(i, ty);
+    ll_global_kept(i);
     i = i + 1;
   }
 } return void;
