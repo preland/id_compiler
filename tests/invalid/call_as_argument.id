@@ -1,0 +1,14 @@
+// EXPECT: argument 0 of 'sq' contains a call; give that value a name and pass the name
+// IDCPY-ACCEPTS
+dbl(int a) {
+  int r = a + a;
+} return int r;
+
+sq(int a) {
+  int r = a * a;
+} return int r;
+
+main(int argc, string[] argv) {
+  int v = sq(dbl(3));
+  print(v);
+} return int 0;

@@ -1,0 +1,14 @@
+// EXPECT: the return clause of 'twice' is a call; it must be a name or a literal
+// IDCPY-ACCEPTS
+dbl(int a) {
+  int r = a + a;
+} return int r;
+
+twice(int a) {
+  int b = a;
+} return int dbl(b);
+
+main(int argc, string[] argv) {
+  int v = twice(3);
+  print(v);
+} return int 0;

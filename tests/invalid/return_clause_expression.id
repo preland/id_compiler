@@ -1,0 +1,10 @@
+// EXPECT: the return clause of 'bump' is an expression; it must be a name or a literal
+// IDCPY-ACCEPTS
+bump(int i) {
+  int j = i;
+} return int j + 1;
+
+main(int argc, string[] argv) {
+  int v = bump(3);
+  print(v);
+} return int 0;
