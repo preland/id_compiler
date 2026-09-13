@@ -36,10 +36,11 @@ guarded_emit_tail(int argc, string[] argv) {
 // once: the kernel's fault handler is called from the interrupt stubs and
 // nothing else, so it was pruned and the link failed on a symbol the program
 // obviously needed. Deciding what is live across a link is the linker's job.
+//
+// The natives the kept program calls are listed just before the prune and
+// written just after the program (back/drive/sink/natives/).
 emit_all(int argc, string[] argv) {
   emit_tests_maybe(argc, argv);
-  if(is_freestanding() == 0) {
-    dce_prune();
-  }
-  emit(argc, argv);
+  natives_then_prune();
+  emit_then_natives(argc, argv);
 } return void;

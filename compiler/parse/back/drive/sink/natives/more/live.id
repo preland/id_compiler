@@ -1,0 +1,22 @@
+// --natives, and the two lists it fills. The flag lives in a cell like every
+// other build flag, because the walk that fills the harness's rows runs inside
+// the harness narrowing, which has no argv.
+nat_init(int argc, string[] argv) {
+  int nat_on = arg_flag(argc, argv, 1, "--natives");
+  export int[] natc = [nat_on];
+  nat_lists();
+} return void;
+
+//   natkey  KIND|NAME of every row, so a native is listed once per kind
+//   natrow  the rows themselves (emit.id)
+nat_lists() {
+  export string[] natkey = [];
+  export string[] natrow = [];
+} return void;
+
+// Nothing is pruned with no main or when freestanding (dce.id,
+// guarded_emit.id), so there every function is live and every native any of
+// them calls is one the object needs.
+nat_all_live() {
+  int all = is_freestanding() == 1 || find_str((import fnames), "main") < 0;
+} return int all;

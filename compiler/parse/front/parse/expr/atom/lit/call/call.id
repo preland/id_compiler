@@ -1,9 +1,15 @@
 // After an identifier: a '(' makes it a call, otherwise it is a variable.
-
+//
+// A call's line is recorded as it is parsed. Only statements carry a line in
+// `nline`, and the diagnostics that already fall back to a function's line
+// must keep doing so, so the call's line goes in a table of its own; bin/idc
+// names it when a reached native cannot be linked.
 finish_atom(string name, int[] pos) {
   int node = node_var(name);
   if(cur_text(pos) == "(") {
+    int ln = cur_ln(pos);
     node = parse_call(name, pos);
+    call_at(node, ln);
   }
 } return int node;
 

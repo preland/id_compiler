@@ -3,5 +3,22 @@
 
 init_files_rest() {
   init_files2();
+  init_calls();
   int ret_i = init_units();
 } return int ret_i;
+
+// The line each call was written on, for the natives list bin/idc reads
+// (back/drive/sink/natives/). Two columns rather than one indexed by node,
+// because only call nodes have a row.
+//
+//   cnode  a call node's id, in the order calls were parsed
+//   cline  the line its '(' was on
+init_calls() {
+  export int[] cnode = [];
+  export int[] cline = [];
+} return void;
+
+call_at(int node, int ln) {
+  push((import cnode), node);
+  push((import cline), ln);
+} return void;

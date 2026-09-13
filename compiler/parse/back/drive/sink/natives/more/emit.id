@@ -1,0 +1,36 @@
+// The natives list rides the stream the harness and the program already share,
+// after both and behind a separator of its own, and only when bin/idc asks
+// with --natives -- so without the flag the output is byte for byte what it
+// was, and with it the program part still is.
+//
+//   /* ---- natives ---- */
+//   KIND|NAME|CALLFILE:LINE|DECLFILE      one row per native per kind
+//
+// KIND is `harness` for a native a case reaches (back/drive/target/tests/) and
+// `program` for one the emitted program keeps.
+
+// The program's natives are read before the prune, for the reason scan.id
+// gives, and with the same answer to "is anything pruned" the prune gives.
+natives_then_prune() {
+  int all = nat_all_live();
+  nat_scan("program", all);
+  if(is_freestanding() == 0) {
+    dce_prune();
+  }
+} return void;
+
+emit_then_natives(int argc, string[] argv) {
+  emit(argc, argv);
+  if((import natc)[0] == 1) {
+    nat_print();
+  }
+} return void;
+
+nat_print() {
+  int i = 0;
+  emit_line("/* ---- natives ---- */");
+  while(i < len((import natrow))) {
+    emit_line((import natrow)[i]);
+    i = i + 1;
+  }
+} return void;

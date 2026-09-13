@@ -1,0 +1,27 @@
+// A live call node, and whether what it calls is a native.
+
+nat_node(string kind, int id) {
+  if(k_of(id) == "call") {
+    nat_call(kind, id);
+  }
+} return void;
+
+// func_node is -1 for a builtin or an asm function, and the && stops there,
+// so is_native is only ever asked of a func node. A native is a func node
+// like any other; this is the one question that tells it apart.
+nat_call(string kind, int id) {
+  string s1_of_v = s1_of(id);
+  int fn = func_node(s1_of_v);
+  if(fn >= 0 && is_native(fn) == 1) {
+    nat_add(kind, id, s1_of_v);
+  }
+} return void;
+
+// One row per native per kind. The walk is in source order, so the call a row
+// names is the earliest live call of that native.
+nat_add(string kind, int id, string name) {
+  string key = kind + "|" + name;
+  if(find_str((import natkey), key) < 0) {
+    nat_push(key, id, name);
+  }
+} return void;
