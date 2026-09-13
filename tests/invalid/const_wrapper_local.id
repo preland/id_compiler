@@ -1,0 +1,10 @@
+// EXPECT: const_wrapper_local.id:3: error: 'funcs_per_file' only returns the constant 3; declare it in conf.id as 'int funcs_per_file = 3;' and read it with (import funcs_per_file)
+// IDCPY-ACCEPTS
+funcs_per_file() {
+  int n = 3;
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = funcs_per_file();
+  print(c);
+} return int 0;

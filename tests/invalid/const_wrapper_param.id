@@ -1,0 +1,9 @@
+// EXPECT: const_wrapper_param.id:3: error: 'zero' only returns the constant 0; declare it in conf.id as 'int zero = 0;' and read it with (import zero)
+// IDCPY-ACCEPTS
+zero(int a) {
+} return int 0;
+
+main(int argc, string[] argv) {
+  int c = zero(argc);
+  print(c);
+} return int 0;

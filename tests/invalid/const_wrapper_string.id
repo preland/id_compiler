@@ -1,0 +1,9 @@
+// EXPECT: const_wrapper_string.id:3: error: 'greeting' only returns the constant "hi\n"; declare it in conf.id as 'string greeting = "hi\n";' and read it with (import greeting)
+// IDCPY-ACCEPTS
+greeting() {
+} return string "hi\n";
+
+main(int argc, string[] argv) {
+  string g = greeting();
+  put(g);
+} return int 0;

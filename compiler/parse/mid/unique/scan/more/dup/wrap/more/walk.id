@@ -1,0 +1,33 @@
+// The body, statement by statement. Every one must give one of the
+// function's own locals a literal value; a call, an export, a loop, a branch or
+// a write through an index is an effect or a dependency, and ends the walk.
+
+cw_walk(int id) {
+  int[] l2_of_v = l2_of(id);
+  string val = "";
+  if(cw_stmts(l2_of_v) == 1) {
+    val = cw_ret(id);
+  }
+} return string val;
+
+// The loop leaves at the first statement that is not a literal store: the flag
+// in the condition is how a loop leaves early here.
+cw_stmts(int[] stmts) {
+  int ok = 1;
+  int i = 0;
+  while(i < len(stmts) && ok == 1) {
+    ok = cw_stmt(stmts[i]);
+    i = i + 1;
+  }
+} return int ok;
+
+cw_stmt(int id) {
+  int ok = 0;
+  if(k_of(id) == "decl" && i2_of(id) != 1) {
+    string s2_of_v = s2_of(id);
+    ok = cw_put(id, s2_of_v);
+  }
+  if(k_of(id) == "assign") {
+    ok = cw_assign(id);
+  }
+} return int ok;

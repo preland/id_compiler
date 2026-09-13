@@ -1048,6 +1048,142 @@ EOF
 self_refuse "bin/idc: genuine variable redeclaration reports 'declared twice'" \
     "p.id:3: error: variable 'x' is declared twice in function 'f'" --emit-c /dev/null
 
+# =============================================================================
+# A function that only wraps one scalar constant is an error: the constant is
+# declared in conf.id and read with (import name). bin/idc only -- idc.py is
+# being retired and does not have the rule (tests/invalid/const_wrapper_*.id
+# records that it still accepts these). The shapes tests/invalid/ does not
+# cover: a value only an operator fold produces, the other scalar types, a
+# local reassigned, and the functions that are NOT constants.
+cat > "$TMP/p.id" <<'EOF'
+neg() {
+  int n = 0 - 1;
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = neg();
+  print(c);
+} return int 0;
+EOF
+self_refuse "bin/idc: a wrapper of a negative fold is spelled as the subtraction" \
+    "p.id:1: error: 'neg' only returns the constant 0 - 1; declare it in conf.id as 'int neg = 0 - 1;' and read it with (import neg)" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+half() {
+} return float 0.5;
+
+main(int argc, string[] argv) {
+  float h = half();
+  print(h);
+} return int 0;
+EOF
+self_refuse "bin/idc: a float constant wrapper is rejected" \
+    "p.id:1: error: 'half' only returns the constant 0.5; declare it in conf.id as 'float half = 0.5;'" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+big() {
+} return word 5000000000;
+
+main(int argc, string[] argv) {
+  word b = big();
+  print(b);
+} return int 0;
+EOF
+self_refuse "bin/idc: a word constant wrapper is rejected" \
+    "p.id:1: error: 'big' only returns the constant 5000000000; declare it in conf.id as 'word big = 5000000000;'" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+last() {
+  int n = 1;
+  n = 2;
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = last();
+  print(c);
+} return int 0;
+EOF
+self_refuse "bin/idc: a wrapper that reassigns its own local is rejected with the final value" \
+    "p.id:1: error: 'last' only returns the constant 2;" --emit-c /dev/null
+
+# A list is not a constant: each call builds a fresh list, so one caller's
+# write is invisible to the next call -- a shared conf.id global could not
+# behave that way. Run, to show the two lists really are distinct.
+cat > "$TMP/p.id" <<'EOF'
+primes() {
+  int[] ps = [2, 3, 5];
+} return int[] ps;
+
+bump() {
+  int[] a = primes();
+  a[0] = 9;
+} return int[] a;
+
+main(int argc, string[] argv) {
+  int[] a = bump();
+  int[] b = primes();
+  print("" + a[0] + " " + b[0]);
+} return int 0;
+EOF
+rm -f "$TMP/out"
+self_accept "bin/idc: a function returning a list literal is not a constant wrapper" -o "$TMP/out"
+[ "$("$TMP/out" 2>&1)" = "9 2" ] \
+    && ok "bin/idc: each call of a list-returning function gets its own list" \
+    || bad "bin/idc: each call of a list-returning function gets its own list"
+
+cat > "$TMP/p.id" <<'EOF'
+twice(int a) {
+  int n = a + a;
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = twice(argc);
+  print(c);
+} return int 0;
+EOF
+self_accept "bin/idc: a result that depends on a parameter is not a constant" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+width() {
+  int n = len("abcd");
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = width();
+  print(c);
+} return int 0;
+EOF
+self_accept "bin/idc: a result computed by a call is not a constant" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+pick() {
+  int n = 1;
+  if(ticks() > 0) {
+    n = 2;
+  }
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = pick();
+  print(c);
+} return int 0;
+EOF
+self_accept "bin/idc: a result chosen by a branch is not a constant" --emit-c /dev/null
+
+# Assigning a parameter is a use of it, and a parameter is not one of the
+# function's own locals, so this is outside the rule as written.
+cat > "$TMP/p.id" <<'EOF'
+reset(int a) {
+  a = 5;
+} return int a;
+
+main(int argc, string[] argv) {
+  int c = reset(argc);
+  print(c);
+} return int 0;
+EOF
+self_accept "bin/idc: a function that assigns its parameter is not a constant wrapper" --emit-c /dev/null
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

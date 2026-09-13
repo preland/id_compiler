@@ -1,0 +1,25 @@
+// Recording a local's value.
+
+// An assignment counts only when its target is a local this walk has already
+// declared. A parameter is not one: assigning it is a use of it.
+cw_assign(int id) {
+  string s1_of_v = s1_of(id);
+  int ok = 0;
+  if(cw_get(s1_of_v) != "") {
+    ok = cw_put(id, s1_of_v);
+  }
+} return int ok;
+
+cw_put(int id, string name) {
+  int i1_of_v = i1_of(id);
+  string val = canon_expr(i1_of_v);
+  int ok = cw_keep(name, val);
+} return int ok;
+
+// Appended rather than overwritten, so an assignment needs no search to write;
+// the latest entry for a name is its value (cw_get).
+cw_keep(string name, string val) {
+  push((import cw_names), name);
+  push((import cw_vals), val);
+  int ok = cw_is_lit(val);
+} return int ok;

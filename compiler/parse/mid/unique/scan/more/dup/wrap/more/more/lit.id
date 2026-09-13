@@ -1,0 +1,21 @@
+// Reading a value back out of its fingerprint.
+
+// canon_expr tags a literal with one letter -- I an integer, F a float, S a
+// string -- and no other fingerprint starts with any of the three. 73, 70 and
+// 83 are those letters.
+cw_is_lit(string fp) {
+  int tag = charat(fp, 0);
+  int ok = tag == 73 || tag == 70 || tag == 83;
+} return int ok;
+
+// The value as conf.id spells it: the fingerprint after its tag (zeros_tail is
+// the tail of a string from an index). A negative integer is always the fold
+// of a subtraction, and `-1` would be the unary operator, which the fold does
+// not reduce, so it is spelled as the subtraction that does. 45 is '-'.
+cw_spell(string val) {
+  string lit = zeros_tail(val, 1);
+  if(charat(lit, 0) == 45) {
+    string mag = zeros_tail(lit, 1);
+    lit = "0 - " + mag;
+  }
+} return string lit;
