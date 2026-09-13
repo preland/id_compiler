@@ -243,7 +243,7 @@ emitter mirrors these byte-for-byte where it's implemented at all):
 
 - `id` functions are prefixed `id_` in C (so `id` `main` becomes `id_main`,
   wrapped by a real C `main`). Exported variables become C globals.
-- A project without a `main` compiles to a `.o` object file (e.g. a library
-  like `../demos/engine`).
+- A project without a `main` compiles to a `.o` object file (a library; see
+  `tests/self_host_build.sh`).
 - String concatenation allocates and never frees; fine for now, a real
   runtime would need ownership rules or GC.

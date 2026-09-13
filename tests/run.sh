@@ -636,17 +636,17 @@ else
     echo "SKIP: self-hosting checks (no idstd resolvable; the compiler needs it)"
 fi
 
-# --- the game engine + the two games it drives build cleanly (real-time I/O
-#     builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
+# --- the two terminal games build cleanly on idstd's term_ engine (real-time
+#     I/O builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
 if env -u IDC_NO_STD "$BIN_IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
-    ok "moonbuggy builds (with bundled engine)"
+    ok "moonbuggy builds (on idstd's term_ engine)"
 else
-    bad "moonbuggy builds (with bundled engine)"
+    bad "moonbuggy builds (on idstd's term_ engine)"
 fi
 if env -u IDC_NO_STD "$BIN_IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
-    ok "solitaire builds (with bundled engine)"
+    ok "solitaire builds (on idstd's term_ engine)"
 else
-    bad "solitaire builds (with bundled engine)"
+    bad "solitaire builds (on idstd's term_ engine)"
 fi
 
 # --- export/import roundtrip at runtime
