@@ -19,20 +19,28 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
 target="${1:?usage: parity.sh <file-or-project-dir>}"
 
-# build the two compilers (lexer + parser/codegen) once. Always with the
-# standard library, whatever IDC_NO_STD says about the program under test: the
-# compiler's own source calls idstd's lset, so a bootstrap without it does not
-# build at all.
-env -u IDC_NO_STD $IDC compiler/lex   -o "$TMP/idlex"   2>/dev/null || { echo "lexer build failed"; exit 2; }
-env -u IDC_NO_STD $IDC compiler/parse -o "$TMP/idparse" 2>/dev/null || { echo "idparse build failed"; exit 2; }
+# build the id-written compiler (lexer + parser/codegen) once, with bin/idc.
+# Always with the standard library, whatever IDC_NO_STD says about the program
+# under test: the compiler's own source calls idstd's lset, so a bootstrap
+# without it does not build at all. Not with idc.py: idstd may use `given` and
+# `then`, which only bin/idc parses.
+env -u IDC_NO_STD ./bin/idc compiler/lex   -o "$TMP/idlex"   2>/dev/null || { echo "lexer build failed"; exit 2; }
+env -u IDC_NO_STD ./bin/idc compiler/parse -o "$TMP/idparse" 2>/dev/null || { echo "idparse build failed"; exit 2; }
+
+# The program under test is compiled WITHOUT the standard library, by both
+# sides. idc.py cannot read idstd once idstd holds a case written with `given`,
+# so a comparison that merges it is not one idc.py can take part in. That
+# rules out the compiler's own source, which needs lset: whether its emitted C
+# changed is tools/regen_bootstrap.sh --check, which compares it with
+# bootstrap/*.c and runs no idc.py.
+export IDC_NO_STD=1
 
 # C from idc.py
-$IDC "$target" --emit-c "$TMP/py.c" >/dev/null 2>&1 || { echo "idc.py failed on input"; exit 2; }
+$IDC "$target" --emit-c "$TMP/py.c" >/dev/null 2>&1 || { echo "idc.py failed on input (a program that needs idstd cannot be compared here -- see the comment above)"; exit 2; }
 # C from the id-written compiler, over the same source stream bin/idc feeds it:
-# every .id file of the project AND of everything its conf.id reaches,
-# including the implicit standard library, with the #file markers in place.
-# Concatenating the target's own tree is not the same stream and has not been
-# since the compiler started calling idstd's lset.
+# every .id file of the project AND of everything its conf.id reaches, with the
+# #file markers in place. Concatenating the target's own tree is not the same
+# stream once a project has a conf.id.
 ./bin/idc "$target" --emit-sources 2>/dev/null | "$TMP/idlex" | "$TMP/idparse" > "$TMP/id.c"
 
 if diff "$TMP/py.c" "$TMP/id.c" >/dev/null; then
