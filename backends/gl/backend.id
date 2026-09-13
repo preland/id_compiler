@@ -1,0 +1,10 @@
+// What a code generator needs to link the natives declared beside this file.
+// Read by idc/bin/idc and never compiled, so none of these names reaches a
+// program; docs/BACKENDS.md says what each one means.
+
+string name = "gl";
+
+// -lm is for tan, sin and cos in the matrix builders.
+string[] c_linux_sources = ["gl_linux.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = ["-lGL", "-lX11", "-lm"];

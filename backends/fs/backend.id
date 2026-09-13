@@ -1,0 +1,14 @@
+// What a code generator needs to link the natives declared beside this file.
+// Read by idc/bin/idc and never compiled, so none of these names reaches a
+// program; docs/BACKENDS.md says what each one means.
+
+string name = "fs";
+string c_header = "fs.h";
+
+// One POSIX source serves both platforms: stdio and stat are all it uses.
+string[] c_linux_sources = ["fs_posix.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] c_darwin_sources = ["fs_posix.c"];
+string[] c_darwin_cflags = [];
+string[] c_darwin_link = [];

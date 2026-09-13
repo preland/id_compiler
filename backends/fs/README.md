@@ -86,14 +86,18 @@ come from; the `.id` files here declare the contract in `id`'s own types:
 native fs_open(string path, string mode) return int;
 ```
 
-and `backend.json` says how a code generator obtains it:
+and `backend.id` says how a code generator obtains it, in `id` constant
+declarations that `idc/bin/idc` reads and never compiles:
 
-```json
-{ "name": "fs",
-  "targets": {
-    "c": { "header": "fs.h",
-           "platforms": { "linux":  { "sources": ["fs_posix.c"], "cflags": [], "link": [] },
-                          "darwin": { "sources": ["fs_posix.c"], "cflags": [], "link": [] } } } } }
+```
+string name = "fs";
+string c_header = "fs.h";
+string[] c_linux_sources = ["fs_posix.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] c_darwin_sources = ["fs_posix.c"];
+string[] c_darwin_cflags = [];
+string[] c_darwin_link = [];
 ```
 
 The split is the point. The declarations are about `id` and are the same however

@@ -49,17 +49,23 @@ crosses the boundary in a single call, not a million per-pixel ones — the same
 
 ## How it links
 
-`idc` grew a `--backend DIR` flag. It reads `DIR/backend.json`, picks the entry
-for the host platform, compiles that platform's sources to objects, and appends
-them plus the platform link flags to the final `cc` invocation. Nothing is
-hard-coded in the compiler — a backend is self-describing:
+`idc` grew a `--backend DIR` flag. It reads `DIR/backend.id`, picks the
+declarations for the build's platform, compiles that platform's sources to
+objects, and appends them plus the platform link flags to the final `cc`
+invocation. Nothing is hard-coded in the compiler — a backend is
+self-describing, in `id` constant declarations that are read and never
+compiled ([`backend.id`](backend.id)):
 
-```json
-{ "platforms": {
-    "darwin": { "sources": ["gfx_macos.m"], "cflags": ["-fobjc-arc"],
-                "link": ["-framework", "Cocoa", "-framework", "QuartzCore"] },
-    "linux":  { "sources": ["gfx_linux.c"], "cflags": [],
-                "link": ["-lX11"] } } }
+```
+string name = "gfx";
+
+string[] c_darwin_sources = ["gfx_macos.m"];
+string[] c_darwin_cflags = ["-fobjc-arc"];
+string[] c_darwin_link = ["-framework", "Cocoa", "-framework", "QuartzCore"];
+
+string[] c_linux_sources = ["gfx_linux.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = ["-lX11"];
 ```
 
 ## Platforms
@@ -78,7 +84,8 @@ hard-coded in the compiler — a backend is self-describing:
   pixel buffer; fixed as part of validating this path.)
 
 Adding Windows (GDI/`StretchDIBits`) or a Wayland backend is one more source
-file plus a `backend.json` entry — no change to `id` code or to the compiler.
+file plus its `c_windows_*` or `c_linux_*` lines in `backend.id` — no change to
+compiled `id` code or to the compiler.
 
 ## Path to true-native rendering
 
@@ -91,7 +98,7 @@ programs opt into the faster path by calling the new names; the framebuffer path
 keeps working everywhere it always did.
 
 **This second tier now exists**: [`backends/gl`](../gl/README.md) is a sibling
-backend (same `gfx_open`/`gfx_poll`/`gfx_close`, a separate `backend.json`) that
+backend (same `gfx_open`/`gfx_poll`/`gfx_close`, a separate `backend.id`) that
 adds a real GPU pipeline via GLX/OpenGL — `demos/gl3d` drives it to render a
 spinning, per-vertex-shaded cube. It's a different backend directory rather
 than new entry points bolted onto *this* header, which keeps `gfx.h` exactly as
@@ -122,7 +129,7 @@ identical either way.
   state, not events, because a click is an edge and `id` can see an edge by
   comparing frames.
 - **Audio: none.** There is no sound backend anywhere in the repo. It would be
-  a new `backend.json` beside these two (`snd_open`, `snd_queue(int[])`), and
+  a new `backend.id` beside these two (`snd_open`, `snd_queue(int[])`), and
   it should be specified before it is built.
 - `gfx_macos.m` implements the same extended contract, but **it has not been
   compiled or run**: the machine this work was done on is Linux. Treat it as a

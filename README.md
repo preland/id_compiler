@@ -33,9 +33,10 @@ working tree, so nothing but that snapshot is ever frozen and no compiler for
 project directory, sorted by full path — the same order `idc.py` uses), run
 `cat files | idlex | idparse` to get C, then hand that C to `cc` — exactly the
 pipeline `tools/parity.sh` differentially tests against `idc.py`. `-o`,
-`--emit-c`, `--keep-c`, `--cc`, and `--backend DIR` (reading `backend.json` and
-linking a native backend, mirroring `idc.py`'s `resolve_backend`) all work the
-same as in `idc.py`.
+`--emit-c`, `--keep-c`, `--cc`, and `--backend DIR` (reading `backend.id` and
+linking a native backend) all work the same as in `idc.py`, except that
+`idc.py`'s `resolve_backend` reads a `backend.json` no backend has any more, so
+`idc.py` can no longer link one.
 
 **Coverage:** there is no fallback — `bin/idc` drives the self-hosted stages
 and nothing else. They implement the whole language and all of its rules: the
@@ -111,12 +112,26 @@ See [`../docs/LLVM.md`](../docs/LLVM.md).
 
 ## Native backends
 
-A **backend** is a directory with a `backend.json`, some native source, and
+A **backend** is a directory with a `backend.id`, some native source, and
 `.id` files that declare what that source defines:
 
 ```
 native fs_open(string path, string mode) return int;
 ```
+
+`backend.id` says how to link it, as constant declarations — its `name`, and
+per compiler target and platform the sources, cflags and link flags:
+
+```
+string name = "gfx";
+string[] c_linux_sources = ["gfx_linux.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = ["-lX11"];
+```
+
+`bin/idc` reads it line by line when a native of the backend is reached, and
+never compiles it, so its names reserve nothing in a program and two backends
+never collide. See [`../docs/BACKENDS.md`](../docs/BACKENDS.md).
 
 A `native` declaration is a function whose body is native code. The directory
 is merged into the build like any other dependency, so its declarations obey

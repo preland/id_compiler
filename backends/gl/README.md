@@ -150,7 +150,7 @@ triangles, then its particle system, or vice versa.
   (`GL_RENDERER=... (radeonsi, ...) GL_VERSION=4.6 (Compatibility Profile)
   Mesa ...` in this environment) and rendering 120 frames of a spinning cube
   before exiting 0 via `GFX_MAX_FRAMES`.
-- **macOS** — not implemented. `backend.json` has no `darwin` entry, so
+- **macOS** — not implemented. `backend.id` declares no `c_darwin_sources`, so
   building `demos/gl3d --backend backends/gl` on macOS fails fast with a clear
   "backend has no support for platform 'darwin'" error rather than silently
   doing the wrong thing. The natural next step is a CGL/`NSOpenGLContext`
@@ -161,7 +161,7 @@ triangles, then its particle system, or vice versa.
 ## How it links
 
 Same mechanism as `gfx`: `idc --backend backends/gl` reads
-[`backend.json`](backend.json), compiles `gl_linux.c` on Linux, and links
+[`backend.id`](backend.id), compiles `gl_linux.c` on Linux, and links
 `-lGL -lX11 -lm` (the `-lm` is for `tan`/`sin`/`cos` in the matrix builders —
 easy to miss since desktop Linux usually auto-links libm through other
 dependencies, but not guaranteed here).

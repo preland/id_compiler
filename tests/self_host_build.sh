@@ -69,8 +69,14 @@ check_output() {
 # file is hermetic and passes no flags), so "both compilers refuse it" is a
 # pass: what is being checked is that the two compilers AGREE, and agreeing to
 # refuse is agreement. What would fail is one building and the other not.
+#
+# fsdemo is the exception, and not swept: its conf.id attaches backends/fs,
+# which idc.py can no longer link -- it reads backend.json, which backend.id
+# replaced, and idc.py is being retired and will not change. bin/idc's build
+# and run of it are checked in backends.sh.
 for prog in ../../demos/*/; do
     name=$(basename "$prog")
+    [ "$name" = fsdemo ] && continue
     $IDC     "$prog" -o "$TMP/sweep_py"   >/dev/null 2>&1; py=$?
     $BIN_IDC "$prog" -o "$TMP/sweep_self" >/dev/null 2>&1; self=$?
     if [ "$py" -eq "$self" ]; then

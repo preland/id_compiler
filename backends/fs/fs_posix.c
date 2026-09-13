@@ -2,7 +2,7 @@
  *
  * Ordinary buffered stdio behind the eight entry points in fs.h. There is no
  * platform-specific code here beyond stdio itself, which is why one file
- * serves both platform keys in backend.json; a host that needs something else
+ * serves both platform keys in backend.id; a host that needs something else
  * (a kernel target with no libc, say) adds its own source there without
  * touching this one or any `id` file.
  *

@@ -215,7 +215,9 @@ main(int argc, string[] argv) {
 } return int 0;
 EOF
 bk_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
+# bin/idc only: idc.py reads backend.json, which backend.id replaced, and
+# idc.py is being retired and will not change.
+for cc in "$BIN_IDC"; do
     $cc --no-std "$TMP/bk/app" -o "$TMP/bk/out" >/dev/null 2>&1 || { bk_ok=0; break; }
     [ "$("$TMP/bk/out")" = "0" ] || { bk_ok=0; break; }
 done
