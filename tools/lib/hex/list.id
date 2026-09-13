@@ -1,0 +1,7 @@
+// A whole list as hexadecimal text, for a table whose every cell is written.
+hex_list(int[] xs) {
+  int n = len(xs);
+  string s = hex_of(xs, 0, n);
+} return string s;
+([1, 171]):("01ab")
+([]):("")

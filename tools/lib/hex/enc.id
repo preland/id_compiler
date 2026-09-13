@@ -1,0 +1,37 @@
+// Bytes as hexadecimal text, the form the kernel carries its tables in.
+//
+// kernel/prog/conf.id holds its font and keymap as strings of hex digits,
+// because `id` has no byte-array literal and a string cannot hold a NUL. The
+// generators that write those strings (mkfont, mkkeymap) and the tool that
+// reads the font back (fbtext) are separate programs, so the encoding is
+// written once, here, and imported by each.
+
+// n bytes of xs from index at, two lowercase digits each, no separator.
+hex_of(int[] xs, int at, int n) {
+  string[] strs = [];
+  hex_parts(strs, xs, at, n);
+  string s = str_join(strs, "");
+} return string s;
+([0, 171, 255], 0, 3):("00abff")
+([1, 2, 3], 1, 1):("02")
+
+// One two-digit piece per byte, joined once by hex_of: joining is one
+// allocation, where appending in the loop would copy the string per byte.
+hex_parts(string[] strs, int[] xs, int at, int n) {
+  int i = 0;
+  while(i < n) {
+    string two = hex2(xs[at + i]);
+    push(strs, two);
+    i = i + 1;
+  }
+} return void;
+([], [1, 171], 0, 2):(["01", "ab"], [1, 171], 0, 2)
+(["x"], [5, 6], 1, 1):(["x", "06"], [5, 6], 1, 1)
+
+// The low byte of v as two digits: the last two of fmt_hex's eight.
+hex2(int v) {
+  string h8 = fmt_hex(v);
+  string two = str_slice(h8, 6, 2);
+} return string two;
+(171):("ab")
+(5):("05")
