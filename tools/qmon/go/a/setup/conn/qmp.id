@@ -1,0 +1,26 @@
+// Connect to QEMU's QMP socket, retrying while it does not exist yet
+// (sock_connect does this -- see idc/backends/sock/README.md). The
+// handshake (greet, go/a/setup/boot.id) waits until the serial socket is
+// also connected: QEMU starts running the guest the moment it is spawned,
+// with "wait=off" on both chardevs, and a socket chardev with nobody
+// connected yet has nowhere to put what the guest writes to it -- so
+// connecting late loses the earliest output, however fast this tool reads
+// afterward.
+connect_qmp() {
+  export int qm_qmph = sock_connect((import qm_qmp_path), 10000);
+  warn_if_bad_qmp();
+} return void;
+
+// A connect that timed out is reported the way qmon.py's sys.exit did
+// (go/b/qmp/line.id's byte-at-a-time read returns nothing for a bad handle,
+// so the rest of the run proceeds harmlessly rather than hanging).
+warn_if_bad_qmp() {
+  if((import qm_qmph) < 0) {
+    print("qmon: QEMU never opened its QMP socket");
+  }
+} return void;
+
+greet() {
+  string g = qmp_read_line();
+  qmp_cmd((import qm_msg_capabilities));
+} return void;

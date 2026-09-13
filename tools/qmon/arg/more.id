@@ -1,0 +1,23 @@
+// Continuing init: --keys and --type default to "" (qmon.py's argparse
+// default=""), --settle to 1 second.
+init_rest(int argc, string[] argv) {
+  export string qm_keys = scan_value(argv, argc, "--keys", 2);
+  export string qm_text = scan_value(argv, argc, "--type", 2);
+  init_settle(argc, argv);
+} return void;
+
+init_settle(int argc, string[] argv) {
+  string v = scan_value(argv, argc, "--settle", 2);
+  export int qm_settle_ms = settle_ms_of(v);
+  init_rest2(argc, argv);
+} return void;
+
+settle_ms_of(string v) {
+  int ms = 1000;
+  if(len(v) > 0) {
+    int secs = to_int(v);
+    ms = secs * 1000;
+  }
+} return int ms;
+("2"):(2000)
+(""):(1000)

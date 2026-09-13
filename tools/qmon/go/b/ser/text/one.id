@@ -1,0 +1,15 @@
+// One line, with the newline the guest's shell reads as Enter.
+send_one_line(string[] lines, int i) {
+  sock_send_str((import qm_serh), lines[i] + "\n");
+  int j = after_line(i);
+} return int j;
+
+// The same 250ms pause qmon.py's `time.sleep(0.25)` used between lines, and
+// a drain in between -- see go/a/session/phase/wait.id for why this cannot
+// wait for the phase boundary the way a background thread would not have
+// had to.
+after_line(int i) {
+  sleep_ms(250);
+  drain_serial();
+  int j = i + 1;
+} return int j;

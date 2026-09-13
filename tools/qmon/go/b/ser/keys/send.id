@@ -1,0 +1,20 @@
+// --keys: QEMU key names, space separated, matching qmon.py's
+// `for tok in args.keys.split()`.
+send_keys() {
+  string keys = (import qm_keys);
+  if(len(keys) > 0) {
+    send_keys_list(keys);
+  }
+} return void;
+
+send_keys_list(string keys) {
+  string[] toks = str_split(keys, " ");
+  send_keys_loop(toks, 0);
+} return void;
+
+send_keys_loop(string[] toks, int i) {
+  int n = len(toks);
+  while(i < n) {
+    i = key_or_pause(toks, i);
+  }
+} return void;

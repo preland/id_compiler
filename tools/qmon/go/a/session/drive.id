@@ -1,0 +1,16 @@
+// The whole run, start to finish: set up, drive the session
+// (go/a/session/phase/), tear down (go/a/teardown/). Every stage after
+// setup() runs unconditionally -- a socket that never connected makes every
+// send/recv into it fail fast and harmlessly (idc/backends/sock/README.md),
+// the same way qmon.py's background reader thread had nothing to read -- so
+// there is no separate "did setup succeed" branch to thread through here.
+run() {
+  setup();
+  phase_wait();
+} return void;
+
+drive() {
+  run();
+  cleanup();
+  int rc = (import qm_rc);
+} return int rc;

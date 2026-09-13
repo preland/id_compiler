@@ -1,0 +1,24 @@
+// Collect whatever the guest has written to the serial port so far. qmon.py
+// used a background thread that blocked in recv() and so read every byte the
+// moment it arrived; id has no threads, so go/a/session/phase/wait.id calls
+// this in a tight loop instead, and the 20ms timeout on the read below is
+// what makes each call block efficiently rather than busy-spin, while still
+// waking up as soon as something arrives -- QEMU's socket chardev drops
+// bytes it cannot write when nobody is reading (this is what a longer gap
+// between calls, or a sleep before each one, would cost), so this is called
+// with nothing in between.
+drain_serial() {
+  int[] chunk = [];
+  lst_fill(chunk, 4096, 0);
+  pull_chunk(chunk);
+} return void;
+
+pull_chunk(int[] chunk) {
+  int got = sock_recv((import qm_serh), chunk, 4096, 20);
+  handle_chunk(chunk, got);
+} return void;
+
+handle_chunk(int[] chunk, int got) {
+  append_bytes(chunk, got);
+  more_if_any(got);
+} return void;

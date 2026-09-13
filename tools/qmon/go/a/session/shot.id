@@ -1,0 +1,15 @@
+// --shot: ask QEMU to write the framebuffer out as a PPM. qmon.py passed an
+// absolute path (os.path.abspath); qmon's callers (tests/kernel.sh) already
+// pass one, since it is built from a mktemp -d directory, so this does not
+// absolutise it itself -- id has no realpath native to do that with.
+maybe_shot() {
+  string path = (import qm_shot);
+  if(len(path) > 0) {
+    do_shot(path);
+  }
+} return void;
+
+do_shot(string path) {
+  string msg = msg_screendump(path);
+  qmp_cmd(msg);
+} return void;

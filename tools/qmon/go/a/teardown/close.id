@@ -1,0 +1,21 @@
+close_sockets() {
+  sock_close((import qm_qmph));
+  sock_close((import qm_serh));
+} return void;
+
+// The whole of qm_buf (every byte drain_serial ever collected) as one
+// string, the collected serial output qmon.py wrote with
+// `sys.stdout.write(text)`.
+output() {
+  int n = len((import qm_buf));
+  string text = bytes_str((import qm_buf), n);
+  finish(text);
+} return void;
+
+// put, not print: qmon.py wrote the serial text with sys.stdout.write, which
+// adds no newline of its own, and a test diffing this output byte for byte
+// should not see one appear from here.
+finish(string text) {
+  write_serial_file(text);
+  put(text);
+} return void;

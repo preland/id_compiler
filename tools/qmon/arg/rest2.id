@@ -1,0 +1,30 @@
+// --shot and --serial default to "" (unset -- qmon.py's argparse leaves them
+// None, and "" means the same thing to every reader of qm_shot/qm_serial_out).
+init_rest2(int argc, string[] argv) {
+  export string qm_shot = scan_value(argv, argc, "--shot", 2);
+  export string qm_serial_out = scan_value(argv, argc, "--serial", 2);
+} return void;
+
+// The value right after the last argv[i] == name, for i in [start, argc), or
+// "" if name never appears. There is no break in id (TUTORIAL.md §2), so the
+// scan runs to argc regardless; qmon's own callers never pass a flag twice,
+// so "last" and "only" coincide.
+scan_value(string[] argv, int argc, string name, int start) {
+  string v = "";
+  int i = start;
+  while(i < argc) {
+    v = scan_step(argv, name, i, v);
+    i = i + 1;
+  }
+} return string v;
+(["qmon", "k.elf", "--wait", "4"], 4, "--wait", 2):("4")
+(["qmon", "k.elf"], 2, "--wait", 2):("")
+
+scan_step(string[] argv, string name, int i, string v) {
+  string r = v;
+  if(argv[i] == name) {
+    r = argv[i + 1];
+  }
+} return string r;
+(["qmon", "--wait", "4"], "--wait", 1, ""):("4")
+(["qmon", "--wait", "4"], "--keys", 1, "prev"):("prev")

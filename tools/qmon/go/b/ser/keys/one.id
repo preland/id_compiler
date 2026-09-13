@@ -1,0 +1,23 @@
+// "|" is a bare pause (qmon.py: 0.3s); anything else is a QEMU key name,
+// sent as a send-key command and followed by qmon.py's 0.03s pause.
+key_or_pause(string[] toks, int i) {
+  int j = i + 1;
+  if(toks[i] == "|") {
+    sleep_ms(300);
+    j = i + 1;
+  } else {
+    j = send_key_tok(toks, i);
+  }
+} return int j;
+
+send_key_tok(string[] toks, int i) {
+  string msg = msg_sendkey(toks[i]);
+  qmp_cmd(msg);
+  int j = after_key(i);
+} return int j;
+
+after_key(int i) {
+  sleep_ms(30);
+  drain_serial();
+  int j = i + 1;
+} return int j;

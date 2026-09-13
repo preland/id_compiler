@@ -1,0 +1,18 @@
+// Start QEMU, then connect to both sockets it will go on to create --
+// before either is read from or written to, so the serial socket is ready
+// as early as possible (go/a/setup/conn/qmp.id explains why).
+boot() {
+  mk_paths();
+  spawn_qemu();
+} return void;
+
+connect_both() {
+  connect_qmp();
+  connect_serial();
+} return void;
+
+setup() {
+  boot();
+  connect_both();
+  greet();
+} return void;

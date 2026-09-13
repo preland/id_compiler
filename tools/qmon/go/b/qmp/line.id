@@ -1,0 +1,30 @@
+// One newline-terminated QMP message, read one byte at a time. Slower than
+// buffering, but it needs no state to persist between calls (no leftover
+// bytes to carry to the next read): sock_recv leaves whatever it has not
+// been asked for sitting in the kernel's socket buffer, so the next read --
+// of this line or the next one -- just continues from there. A bad handle
+// (idc/backends/sock/README.md: sock_recv fails fast on one) makes this
+// return "" immediately rather than waiting out five timeouts.
+qmp_read_line() {
+  string line = "";
+  int b = read_one_byte();
+  while(b != 10 && b >= 0) {
+    line = line + chr(b);
+    b = read_one_byte();
+  }
+} return string line;
+
+read_one_byte() {
+  int[] buf = [0];
+  int got = sock_recv((import qm_qmph), buf, 1, 5000);
+  int b = byte_or_neg(got, buf);
+} return int b;
+
+byte_or_neg(int got, int[] buf) {
+  int b = -1;
+  if(got > 0) {
+    b = buf[0];
+  }
+} return int b;
+(1, [65]):(65)
+(0, [65]):(-1)

@@ -1,0 +1,19 @@
+// --serial: also write the collected text to a file, matching qmon.py's
+// `open(args.serial, "w").write(text)`.
+write_serial_file(string text) {
+  string path = (import qm_serial_out);
+  if(len(path) > 0) {
+    do_write_serial(path, text);
+  }
+} return void;
+
+do_write_serial(string path, string text) {
+  int h = fs_open(path, "w");
+  write_if_open(h, text);
+} return void;
+
+write_if_open(int h, string text) {
+  if(h >= 0) {
+    write_and_close(h, text);
+  }
+} return void;

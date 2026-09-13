@@ -1,0 +1,9 @@
+// 1 if either socket never connected, matching qmon.py's exit(1) on either
+// timeout; 0 otherwise, whatever the guest itself went on to do (qmon.py
+// never inspected that either).
+conn_bad() {
+  int bad = 0;
+  if((import qm_qmph) < 0 || (import qm_serh) < 0) {
+    bad = 1;
+  }
+} return int bad;

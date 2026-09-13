@@ -1,0 +1,18 @@
+// The session, phase by phase -- each phase does its own work and calls the
+// next, the same chained shape arg/init.id uses. Matches qmon.py's main():
+// sleep(wait), type each line of --text, send each --keys token.
+phase_wait() {
+  int n = (import qm_wait_ms) / 20;
+  wait_loop(n);
+  phase_text();
+} return void;
+
+phase_text() {
+  send_text();
+  phase_keys();
+} return void;
+
+phase_keys() {
+  send_keys();
+  phase_settle();
+} return void;
