@@ -1,0 +1,41 @@
+// mkodt -- the editor's test document, an OpenDocument text.
+//
+//   mkodt [OUT.odt]        (default: tests/fixtures/sample.odt)
+//
+// An .odt is a ZIP archive. This one stores every entry rather than deflating
+// it, and dates every entry at the DOS epoch (1980-01-01 00:00), so the same
+// program writes the same bytes on every run. mkodt.py went through Python's
+// zipfile, which deflated three of the entries and stamped them with the time
+// it ran, so no two of the files it wrote were alike. Stored entries also mean
+// this needs no compressor: the editor's reader handles both methods, and
+// tests/editor_zip.sh checks inflate on streams of its own.
+//
+// A failure is printed on stdout, since `id` has no way to write to stderr,
+// and exits 1.
+main(int argc, string[] argv) {
+  string path = mo_path(argc, argv);
+  string[] texts = [(import mo_mime), (import mo_manifest), (import mo_styles), (import mo_content)];
+  int rc = mo_run(path, texts);
+} return int rc;
+(2, ["mkodt", "/nonexistent/mkodt/a.odt"]):(1)
+(3, ["mkodt", "/nonexistent/mkodt/b.odt", "extra"]):(1)
+
+// The one optional argument.
+mo_path(int argc, string[] argv) {
+  string path = (import mo_out);
+  if(argc > 1) {
+    path = argv[1];
+  }
+} return string path;
+(1, ["mkodt"]):("tests/fixtures/sample.odt")
+(2, ["mkodt", "x.odt"]):("x.odt")
+
+// texts[i] is the text of the i-th name. mimetype is first because the
+// OpenDocument specification requires it there and uncompressed, so a reader
+// can identify the format from the first bytes of the file.
+mo_run(string path, string[] texts) {
+  int[] out = mo_build(["mimetype", "META-INF/manifest.xml", "styles.xml", "content.xml"], texts);
+  int rc = mo_write(path, out);
+} return int rc;
+("/nonexistent/mkodt/e.odt", ["a", "b", "c", "d"]):(1)
+("/nonexistent/mkodt/f.odt", ["", "", "", ""]):(1)

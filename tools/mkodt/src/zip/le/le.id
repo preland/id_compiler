@@ -1,0 +1,26 @@
+// Little-endian fields, appended to the archive: every number in a ZIP header
+// is one.
+
+zw_u16(int[] out, int v) {
+  push(out, v & 255);
+  push(out, (v >> 8) & 255);
+} return void;
+([], 513):([1, 2], 513)
+([9], 65535):([9, 255, 255], 65535)
+
+// A word, so a checksum with its top bit set is written as the four bytes it
+// is rather than as a negative int.
+zw_u32(int[] out, word wv) {
+  int lo = wv & 65535;
+  int hi = (wv >> 16) & 65535;
+  zw_pair(out, lo, hi);
+} return void;
+([], 4294967295):([255, 255, 255, 255], 4294967295)
+([], 67305985):([1, 2, 3, 4], 67305985)
+
+zw_pair(int[] out, int lo, int hi) {
+  zw_u16(out, lo);
+  zw_u16(out, hi);
+} return void;
+([], 1, 2):([1, 0, 2, 0], 1, 2)
+([7], 256, 0):([7, 0, 1, 0, 0], 256, 0)

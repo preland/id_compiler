@@ -2,7 +2,7 @@
 # editor/lib/doc: the XML pull parser and the OpenDocument content model.
 #
 # The fixture is the real thing -- the content.xml inside
-# tests/fixtures/sample.odt, the file tools/mkodt.py generates -- because a
+# tests/fixtures/sample.odt, the file tools/mkodt.sh generates -- because a
 # hand-written scrap of XML would test the parser against the shape the parser
 # already assumes. What is asserted is what a document editor has to get right:
 # how many paragraphs there are including the empty one, where a run of bold

@@ -1,0 +1,28 @@
+// The central directory and the end record that says where it is.
+
+// count is the number of entries the central directory holds.
+zw_end(int[] out, int[] cd, int count) {
+  int at = len(out);
+  zw_list(out, cd);
+  zw_eocd(out, cd, count, at);
+} return void;
+([], [], 0):([80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [], 0)
+([1], [2], 1):([1, 2, 80, 75, 5, 6, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [2], 1)
+
+// Signature 0x06054b50, then this disk and the directory's disk, both 0, and
+// the entry count twice: on this disk, and in all.
+zw_eocd(int[] out, int[] cd, int count, int at) {
+  zw_list(out, [80, 75, 5, 6, 0, 0, 0, 0]);
+  zw_pair(out, count, count);
+  zw_eocd2(out, cd, at);
+} return void;
+([], [2, 3], 1, 9):([80, 75, 5, 6, 0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 0, 0, 9, 0, 0, 0, 0, 0], [2, 3], 1, 9)
+([], [], 0, 0):([80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [], 0, 0)
+
+zw_eocd2(int[] out, int[] cd, int at) {
+  int n = len(cd);
+  zw_u32(out, n);
+  zw_last(out, at);
+} return void;
+([], [1], 2):([1, 0, 0, 0, 2, 0, 0, 0, 0, 0], [1], 2)
+([5], [], 0):([5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [], 0)

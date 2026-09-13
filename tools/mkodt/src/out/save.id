@@ -1,0 +1,16 @@
+// The whole archive in one write, and a close whose failure counts too: a
+// buffered write that cannot be flushed fails at the close, not at the write.
+mo_save(int h, int[] out) {
+  int n = len(out);
+  int got = fs_write(h, out, n);
+  int rc = mo_close(h, got != n);
+} return int rc;
+(-1, [1]):(1)
+(-2, []):(1)
+
+mo_close(int h, int bad) {
+  int shut = fs_close(h);
+  int rc = bad || (shut != 0);
+} return int rc;
+(-1, 0):(1)
+(-1, 1):(1)

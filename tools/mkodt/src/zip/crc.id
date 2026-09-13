@@ -1,0 +1,38 @@
+// CRC-32, the checksum every ZIP entry carries in both of its headers.
+//
+// Bit by bit rather than from a 256-entry table: the archive is a few
+// kilobytes, and a table is 256 more constants to get wrong. The register is
+// a word, because the checksum uses all 32 bits and an int would carry the top
+// one as a sign that >> would then smear.
+
+// The standard CRC-32 of xs: the register starts all ones and ends inverted.
+zc_crc(int[] xs) {
+  word crc = zc_run(0xFFFFFFFF, xs);
+  word ret_w = crc ^ 0xFFFFFFFF;
+} return word ret_w;
+([97, 98, 99]):(891568578)
+([49, 50, 51, 52, 53, 54, 55, 56, 57]):(3421780262)
+([]):(0)
+
+// Every byte into the register, first to last.
+zc_run(word crc, int[] xs) {
+  int i = 0;
+  while(i < len(xs)) {
+    crc = zc_byte(crc ^ xs[i]);
+    i = i + 1;
+  }
+} return word crc;
+(4294967295, [97]):(390611388)
+(0, [1, 2]):(4145369197)
+
+// Eight shifts: each drops the low bit, and folds in the polynomial when the
+// bit it dropped was set.
+zc_byte(word crc) {
+  int k = 0;
+  while(k < 8) {
+    crc = (crc >> 1) ^ ((import zc_poly) & (0 - (crc & 1)));
+    k = k + 1;
+  }
+} return word crc;
+(1):(1996959894)
+(255):(755167117)

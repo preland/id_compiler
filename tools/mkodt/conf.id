@@ -1,0 +1,25 @@
+// mkodt writes through the fs backend: an archive is bytes, and its headers
+// are full of the NULs a string cannot hold.
+import "../../backends/fs"
+
+// Where the document goes when no path is given, relative to the directory
+// mkodt runs in, as mkodt.py had it.
+string mo_out = "tests/fixtures/sample.odt";
+
+// CRC-32's polynomial, bit-reversed, because ZIP computes the checksum least
+// significant bit first. A word, because it uses all 32 bits.
+word zc_poly = 0xEDB88320;
+
+// The text of each entry, one constant each and one line each, because a
+// conf.id constant is one line and a list cannot be one yet: bin/idc accepts
+// the line, and the C global it emits does not compile. main.id puts them in
+// archive order.
+//
+// Together they are a minimal but real OpenDocument text: five paragraphs,
+// one of them empty, a heading in another face, a bold run inside a paragraph
+// and two entities -- what tests/editor_doc.sh and tests/editor_render.sh
+// assert against.
+string mo_mime = "application/vnd.oasis.opendocument.text";
+string mo_manifest = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"1.3\">\n <manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.text\"/>\n <manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\"/>\n <manifest:file-entry manifest:full-path=\"styles.xml\" manifest:media-type=\"text/xml\"/>\n</manifest:manifest>\n";
+string mo_styles = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<office:document-styles\n xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"\n xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"\n xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"\n office:version=\"1.3\">\n <office:styles>\n  <style:default-style style:family=\"paragraph\">\n   <style:text-properties style:font-name=\"DejaVu Sans\" fo:font-size=\"12pt\"/>\n  </style:default-style>\n </office:styles>\n</office:document-styles>\n";
+string mo_content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<office:document-content\n xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"\n xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"\n xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"\n xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"\n office:version=\"1.3\">\n <office:automatic-styles>\n  <style:style style:name=\"T1\" style:family=\"text\">\n   <style:text-properties style:font-name=\"DejaVu Sans\" fo:font-size=\"12pt\"/>\n  </style:style>\n  <style:style style:name=\"T2\" style:family=\"text\">\n   <style:text-properties style:font-name=\"DejaVu Sans\" fo:font-size=\"12pt\"\n    fo:font-weight=\"bold\"/>\n  </style:style>\n  <style:style style:name=\"T3\" style:family=\"text\">\n   <style:text-properties style:font-name=\"DejaVu Serif\" fo:font-size=\"18pt\"\n    fo:font-style=\"italic\"/>\n  </style:style>\n </office:automatic-styles>\n <office:body>\n  <office:text>\n   <text:p text:style-name=\"P1\"><text:span text:style-name=\"T3\">A document, read by id</text:span></text:p>\n   <text:p text:style-name=\"P1\"><text:span text:style-name=\"T1\">This paragraph is plain text at twelve points. It is long enough that a\n   renderer has to break it into lines rather than trusting it to fit, which is\n   the point of it being here.</text:span></text:p>\n   <text:p text:style-name=\"P1\"><text:span text:style-name=\"T1\">Styles change mid-paragraph: </text:span><text:span text:style-name=\"T2\">this run is bold</text:span><text:span text:style-name=\"T1\"> and this one is not. Entities survive too &amp; so do &lt;angle brackets&gt;.</text:span></text:p>\n   <text:p text:style-name=\"P1\"/>\n   <text:p text:style-name=\"P1\"><text:span text:style-name=\"T1\">Numbers 0123456789 and punctuation .,;:!?()-- render from the same font.</text:span></text:p>\n  </office:text>\n </office:body>\n</office:document-content>\n";

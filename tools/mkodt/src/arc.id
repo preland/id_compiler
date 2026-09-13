@@ -1,0 +1,30 @@
+// The archive: every entry, then the central directory, then its end record.
+
+// names and texts are parallel: names[i] is the entry whose text is texts[i].
+mo_build(string[] names, string[] texts) {
+  int[] out = [];
+  int[] cd = [];
+  mo_zip(out, cd, names, texts);
+} return int[] out;
+([], []):([80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+(["a"], ["b"]):([80, 75, 3, 4, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 97, 98, 80, 75, 1, 2, 20, 3, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 0, 0, 0, 0, 97, 80, 75, 5, 6, 0, 0, 0, 0, 1, 0, 1, 0, 47, 0, 0, 0, 32, 0, 0, 0, 0, 0])
+
+// cd collects the central directory while the entries are written, because
+// each record there needs the offset its entry landed at.
+mo_zip(int[] out, int[] cd, string[] names, string[] texts) {
+  int n = mo_each(out, cd, names, texts);
+  zw_end(out, cd, n);
+} return void;
+([], [], [], []):([80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [], [], [])
+([], [], [""], [""]):([80, 75, 3, 4, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 75, 1, 2, 20, 3, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 0, 0, 0, 0, 80, 75, 5, 6, 0, 0, 0, 0, 1, 0, 1, 0, 46, 0, 0, 0, 30, 0, 0, 0, 0, 0], [80, 75, 1, 2, 20, 3, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 0, 0, 0, 0], [""], [""])
+
+// Answers how many entries it wrote, which the end record states.
+mo_each(int[] out, int[] cd, string[] names, string[] texts) {
+  int i = 0;
+  while(i < len(names)) {
+    zw_entry(out, cd, names[i], texts[i]);
+    i = i + 1;
+  }
+} return int i;
+([], [], [], []):(0)
+([], [], ["a"], ["b"]):(1)

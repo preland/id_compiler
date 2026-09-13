@@ -31,7 +31,7 @@ if [ -z "${FONT:-}" ] || [ ! -f "$FONT" ]; then
 fi
 
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
-[ -f fixtures/sample.odt ] || python3 "$ROOT/tools/mkodt.py" fixtures/sample.odt >/dev/null
+[ -f fixtures/sample.odt ] || "$ROOT/tools/mkodt.sh" fixtures/sample.odt >/dev/null
 
 if ! "$ROOT/bin/idc" "$ORG/editor" --allow-untested -o "$TMP/editor" >"$TMP/build.log" 2>&1; then
     bad "the editor builds ($(head -1 "$TMP/build.log"))"

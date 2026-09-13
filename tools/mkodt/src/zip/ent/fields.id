@@ -1,0 +1,30 @@
+// The fields the local header and the central record share.
+
+// Version 2.0 needed, no flags, method 0 (stored), time 00:00 and date
+// 1980-01-01 -- the DOS epoch, one fixed stamp so two runs write the same
+// bytes -- then the checksum, both sizes and the name's length.
+zw_fields(int[] out, string name, int[] body, word crc) {
+  zw_list(out, [20, 0, 0, 0, 0, 0, 0, 0, 33, 0]);
+  zw_u32(out, crc);
+  zw_sizes(out, name, body);
+} return void;
+([], "a", [98], 1908338681):([20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], "a", [98], 1908338681)
+([5], "", [], 0):([5, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "", [], 0)
+
+zw_sizes(int[] out, string name, int[] body) {
+  int n = len(body);
+  int nlen = len(name);
+  zw_sizes2(out, n, nlen);
+} return void;
+([], "a", [98]):([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], "a", [98])
+([], "xy", []):([0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0], "xy", [])
+
+// A stored entry's compressed size is its size, so n is written twice; the
+// extra field is empty.
+zw_sizes2(int[] out, int n, int nlen) {
+  zw_u32(out, n);
+  zw_u32(out, n);
+  zw_pair(out, nlen, 0);
+} return void;
+([], 1, 1):([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], 1, 1)
+([], 300, 2):([44, 1, 0, 0, 44, 1, 0, 0, 2, 0, 0, 0], 300, 2)
