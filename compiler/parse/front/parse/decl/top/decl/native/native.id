@@ -1,0 +1,30 @@
+// `native` declarations: a function whose body is native code a backend
+// links in.
+//
+//   native NAME(TYPE p, ...) return TYPE;
+//
+// It is an ordinary func node -- in `prog`, in the symbol tables, counted by
+// the per-file rule and compared by uniqueness -- with no body, no return
+// expression, and 1 in its second int field (see is_native). Every check that
+// reads a function therefore reads this one, and only the emitters ask.
+
+parse_fn(int[] pos) {
+  int n = 0;
+  if(cur_text(pos) == "native") {
+    n = parse_native(pos);
+  } else {
+    n = parse_func(pos);
+  }
+} return int n;
+
+parse_native(int[] pos) {
+  advance(pos);
+  string name = cur_text(pos);
+  int ret_i = native_sig(pos, name);
+} return int ret_i;
+
+native_sig(int[] pos, string name) {
+  advance(pos);
+  int[] params = parse_params(pos);
+  int ret_i = native_ret(pos, name, params);
+} return int ret_i;

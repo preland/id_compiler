@@ -1,0 +1,5 @@
+// Whether a func node is a `native` declaration: the parser marks one with 1
+// in the second int field, which an ordinary function leaves 0.
+is_native(int id) {
+  int ok = i2_of(id) == 1;
+} return int ok;

@@ -1,0 +1,22 @@
+// The return clause of a `native` declaration, and its node. The clause is
+// checked token by token: a body written where none belongs would otherwise
+// be read as a return type.
+
+native_ret(int[] pos, string name, int[] params) {
+  expect_text(pos, "return");
+  advance(pos);
+  int ret_i = native_type(pos, name, params);
+} return int ret_i;
+
+native_type(int[] pos, string name, int[] params) {
+  string rt = parse_type(pos);
+  expect_text(pos, ";");
+  int ret_i = native_node(pos, name, rt, params);
+} return int ret_i;
+
+// -1 for the return expression, as for `return void`: there is none to check.
+native_node(int[] pos, string name, string rt, int[] params) {
+  skip_semi(pos);
+  int[] none = [];
+  int ret_i = newnode("func", 0 - 1, 1, name, rt, params, none);
+} return int ret_i;

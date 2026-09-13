@@ -8,7 +8,7 @@ push_func_line(int[] pos) {
 } return int ret_i;
 
 push_func_body(int[] pos) {
-  int parse_func_v = parse_func(pos);
+  int parse_func_v = parse_fn(pos);
   push((import prog), parse_func_v);
   int ret_i = take_cases(pos);
 } return int ret_i;
