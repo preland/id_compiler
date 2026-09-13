@@ -1,26 +1,22 @@
 #!/usr/bin/env bash
 # idtest.sh -- run the inline test cases of one module, in isolation.
 #
-#   tools/idtest.sh ../editor/app/edit
-#   tools/idtest.sh ../editor/app/edit ../editor/app/view/scale
+#   tools/idtest.sh ../editor/app/view/draw/fb/win/scale/w
+#   tools/idtest.sh DIR [DIR]
 #
-# Why this exists: `--tests` builds a second program out of the project and runs
-# every case in it, and that program is linked without the native backends. So
-# a project whose conf.id names one -- the editor names two -- cannot run a
-# single case, and says so:
+# Why this exists: bin/idc runs every case on every build (docs/TESTS.md, "How
+# it runs"), but only as part of building the whole project, and a project such
+# as the editor needs its native backends and its whole tree to build at all.
+# Checking one module's cases while working on it should not need either.
 #
-#   idc: the test harness did not build; this is a bug in idc unless the
-#   program needs a native backend
-#
-# The way round it is the one tests/editor_*.sh already take: copy the module
-# out into a throwaway project that needs no backend, give it a main, and test
-# that. This is that, as a command, so a module's cases are one line to run
-# rather than a shell incantation to remember.
-#
-# This used to call idc.py, because only idc.py ran cases. bin/idc now runs
-# every case on every build (docs/TESTS.md, "How it runs"), and idc.py cannot
-# build anything that merges an idstd holding a `given` case, so this is an
-# ordinary bin/idc build of the throwaway project: a failing case fails it.
+# So this copies the named modules out into a throwaway project that needs no
+# backend, gives it a main, and builds that with bin/idc: a failing case fails
+# the build, and the exit status says so. The named directories must between
+# them define everything they call, apart from idstd -- a module that calls into
+# the rest of its project, as the editor's app/view/txt/edit does, reports
+# those calls as missing functions instead. It used to call idc.py, back when
+# only idc.py ran cases; idc.py cannot build anything that merges an idstd
+# holding a `given` case.
 #
 # Exit 0 means every case in every named directory passed.
 set -uo pipefail
