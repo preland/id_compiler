@@ -224,8 +224,8 @@ fi
 # (b2) a conf.id constant becomes a program global, initialised before main
 #      runs rather than by a function nothing calls (docs/TODO.md item 4).
 #      bin/idc only: idc.py never learned conf.id constants and is not going
-#      to -- the compiler's own source declares none, so the bootstrap rule
-#      says it does not need them.
+#      to -- stage 0 is the bootstrap C, which has them, so the compiler's own
+#      source declaring some (compiler/parse/conf.id) does not need idc.py.
 proj="$TMP/consts"
 mkdir -p "$proj"
 cat > "$proj/conf.id" <<'EOF'

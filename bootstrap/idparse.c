@@ -1560,7 +1560,6 @@ void id_add_export2_rec(int id, char* owner);
 void id_chk_dupexp(int id, char* owner);
 void id_dupexp_err(int id, char* owner);
 void id_dupexp_report(char* loc_at_v, char* s2_of_v);
-char* id_builtin_src(void);
 char* id_builtin_list(void);
 char* id_join_bnames(char* s, int i);
 void id_init_bnames(void);
@@ -1804,7 +1803,6 @@ void id_build_reg(void);
 void id_reg_func(int id);
 void id_reg_params(IdList* params, char* owner, int ln);
 IdList* id_new_bucket(void);
-int id_idx_n(void);
 int id_name_bucket(char* s);
 int id_hash_loop(char* s, int i, int hv);
 int id_hash_step(int hv, int c);
@@ -2130,6 +2128,8 @@ void id_resv_at(int i);
 void id_resv_err(int i);
 
 /* exported variables */
+int idx_n = 251;  /* constant from conf.id */
+char* builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";  /* constant from conf.id */
 IdList* rnd_st;  /* exported by rnd_init() */
 IdList* fx_sintab;  /* exported by fx_trig_init() */
 IdList* err_n;  /* exported by err_init() */
@@ -12291,10 +12291,6 @@ void id_dupexp_report(char* loc_at_v, char* s2_of_v) {
     return;
 }
 
-char* id_builtin_src(void) {
-    return "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";
-}
-
 char* id_builtin_list(void) {
     char* s;
     char* ret_s;
@@ -12312,10 +12308,8 @@ char* id_join_bnames(char* s, int i) {
 }
 
 void id_init_bnames(void) {
-    char* builtin_src_v;
     bnames = id_list_lit(0);
-    builtin_src_v = id_builtin_src();
-    id_split_bnames(builtin_src_v, 0);
+    id_split_bnames(builtin_src, 0);
     return;
 }
 
@@ -14488,16 +14482,12 @@ IdList* id_new_bucket(void) {
     return bkt;
 }
 
-int id_idx_n(void) {
-    return 251;
-}
-
 int id_name_bucket(char* s) {
     int hv;
     int ret_i;
     hv = 0;
     hv = id_hash_loop(s, 0, hv);
-    ret_i = id_imod(hv, id_idx_n());
+    ret_i = id_imod(hv, idx_n);
     return ret_i;
 }
 
@@ -14619,7 +14609,7 @@ void id_fill_didx(void) {
     IdList* new_bucket_v;
     dvline = id_list_lit(0);
     i = 0;
-    while ((i < id_idx_n())) {
+    while ((i < idx_n)) {
         new_bucket_v = id_new_bucket();
         id_list_push(didx, (long long)(intptr_t)(new_bucket_v));
         i = (i + 1);
@@ -14653,7 +14643,7 @@ void id_init_idx(void) {
 void id_fill_idx(void) {
     int i;
     i = 0;
-    while ((i < id_idx_n())) {
+    while ((i < idx_n)) {
         id_push_buckets();
         i = (i + 1);
     }

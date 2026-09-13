@@ -1,11 +1,5 @@
-// The literal, and the comma-joined spelling the diagnostic prints.
-//
-// The order is idc.py's BUILTIN_NAMES order, not alphabetical: the fourteen
-// ordinary builtins first, then the flat-store and unsigned-word group, so
-// the printed list reads the same under both compilers.
-
-builtin_src() {
-} return string "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";
+// The comma-joined spelling the diagnostic prints. The literal it is split
+// from is builtin_src, a constant in compiler/parse/conf.id.
 
 builtin_list() {
   string s = (import bnames)[0];
