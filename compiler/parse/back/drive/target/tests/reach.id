@@ -8,8 +8,11 @@ test_reach() {
   test_reach_tail();
 } return void;
 
+// The harness's natives are read between the fixpoint and the narrowing, while
+// `prog` is still whole (back/drive/sink/natives/scan.id).
 test_reach_tail() {
   reach_mark();
+  nat_scan("harness", 0);
   dce_pack(0, 0);
 } return void;
 

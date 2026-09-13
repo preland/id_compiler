@@ -1,0 +1,42 @@
+// Which natives a build reaches, and from where: the list bin/idc links by.
+//
+// A backend is attached by naming it -- a conf.id import, --backend, or the
+// standard library's own conf.id -- and naming one must not cost a program
+// that never calls it. So what is linked is decided by the same reachability
+// that decides what is emitted: a native reached from main (or, for the test
+// harness, from a case) is one the build needs, and no other is. The compiler
+// cannot see backend.json, so it reports each native with the call that
+// reaches it and the file that declares it, and bin/idc decides which
+// attached backend provides it.
+//
+// The walk runs over the unpruned program, while every function's node range
+// and file are still where the parser put them: dce_pack compacts `prog` but
+// not `pfile`, and the node ranges reach_func walks assume the original
+// order. `all` is 1 where nothing is pruned -- a program with no main, or a
+// freestanding one -- and then every function counts as live.
+
+nat_scan(string kind, int all) {
+  int f = 0;
+  int lo = 0;
+  while(f < len((import prog))) {
+    lo = nat_func(kind, all, f, lo);
+    f = f + 1;
+  }
+} return void;
+
+// One function's nodes, the same range reach_func walks, when the build asked
+// for the list and the function is live.
+nat_func(string kind, int all, int f, int lo) {
+  string s1_of_v = s1_of((import prog)[f]);
+  if((import natc)[0] == 1 && (all == 1 || is_reach(s1_of_v) == 1)) {
+    nat_range(kind, lo, (import prog)[f]);
+  }
+  int ret_i = (import prog)[f] + 1;
+} return int ret_i;
+
+nat_range(string kind, int lo, int hi) {
+  while(lo <= hi) {
+    nat_node(kind, lo);
+    lo = lo + 1;
+  }
+} return void;

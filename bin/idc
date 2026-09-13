@@ -805,10 +805,14 @@ fi
 # harness. Otherwise the written cases run on every build (see run_cases):
 # idparse emits their harness ahead of the program on the same stream, so asking
 # costs no second parse, and the program part is exactly what it is without it.
+#
+# --natives appends the natives the program and the cases reach, which is what
+# decides the backends linked (see backends_for); the program part is unchanged.
 if [ "$FINGERPRINTS" -eq 1 ]; then
     PARSE_ARGS+=(--fingerprints)
 else
     PARSE_ARGS+=(--harness)
+    PARSE_ARGS+=(--natives)
 fi
 
 WORK=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
@@ -957,15 +961,35 @@ if [ "$lex_rc" -ne 0 ] || [ "$parse_rc" -ne 0 ] || [ ! -s "$RAW_OUT" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Native backends: read each backend.json for this platform and compile its
-# sources (mirrors idc.py's resolve_backend/build_c). The objects are needed by
-# the final link and by the test harness, which links the same ones so that a
-# tested function calling into a backend really runs; they are built at most
-# once per build, and removed on exit.
+# Native backends, linked by what the build reaches.
+#
+# A backend is attached by naming it -- a conf.id import, --backend, or the
+# standard library's own conf.id -- and its `native` declarations are merged as
+# source however it was named. Attaching one does not link it. idparse lists
+# every native reachable from main, and separately every one reachable from
+# the test cases, with the call that reaches it and the file that declares it
+# (--natives; compiler/parse/back/drive/sink/natives/). A backend is compiled
+# and linked only when it declares one of those: an attached backend nothing
+# calls costs no compile, no object and no link flag, which is what lets a
+# standard library name every backend without hello-world linking X11.
+#
+# What PROVIDES a native is where it is declared: the attached backend whose
+# directory holds the declaring .id file. Not backend.json's `abi` -- a header
+# name for gfx and gl and a list only for fs, typed in nothing and checked by
+# nothing -- and not the object's symbols, which do not exist until the sources
+# are compiled, and compiling them is the cost being avoided. A name is declared
+# once in a build (a second is "already defined"), so the declaring file
+# answers the question exactly, and the declaration is the one the calls were
+# type-checked against.
+#
+# The objects are built at most once per build, shared by the harness and the
+# final link, and removed on exit.
 PLATKEY_BUILD="$(triple_platform "$TRIPLE")"
 BACKEND_OBJS=()
-BACKEND_LINK=()
-BACKENDS_BUILT=0
+LINK_OBJS=()
+LINK_FLAGS=()
+declare -A BE_BUILT=() BE_OBJS=() BE_LINK=()
+BE_ERR=""
 # backends come from both --backend flags and the conf.id manifest. The same
 # backend named both ways -- the two documented ways to attach one dependency --
 # must be linked once: twice compiles its sources twice and hands cc the same
@@ -983,17 +1007,36 @@ for d in "${BACKENDS[@]}" "${MANIFEST_BACKENDS[@]}"; do
     [ "$dup" -eq 0 ] && ALL_BACKENDS+=("$d")
 done
 
-build_backends() {
-    [ "$BACKENDS_BUILT" -eq 1 ] && return 0
-    BACKENDS_BUILT=1
-    PLATKEY="$PLATKEY_BUILD"
-    for d in "${ALL_BACKENDS[@]}"; do
-        manifest="$d/backend.json"
-        if [ ! -f "$manifest" ]; then
-            echo "idc: backend has no backend.json: $manifest" >&2
-            exit 1
-        fi
-        spec_out=$(python3 - "$manifest" "$PLATKEY" "$TRIPLE" <<'PYEOF'
+# backend_of FILE -- the attached backend (as ALL_BACKENDS spells it) whose
+# directory holds FILE, or nothing. The deepest wins, so a backend nested in
+# another's tree provides its own natives.
+backend_of() {
+    local dir best="" bestlen=0 d real
+    dir="$(cd "$(dirname "$1")" 2>/dev/null && pwd -P)" || return 0
+    for d in ${ALL_BACKENDS[@]+"${ALL_BACKENDS[@]}"}; do
+        real=$(cd "$d" 2>/dev/null && pwd -P) || continue
+        case "$dir/" in
+            "$real"/*) [ "${#real}" -gt "$bestlen" ] && { best="$d"; bestlen=${#real}; } ;;
+        esac
+    done
+    printf '%s' "$best"
+}
+
+# backend_build DIR -- compile DIR's sources for this platform, once per build.
+# A manifest that cannot serve this build sets BE_ERR and returns 1, so the
+# caller can say which reached native needed it.
+backend_build() {
+    local d="$1" manifest spec_out err_line sources_line cflags_line link_line src src_path obj backend_rc
+    local -a srcs=() cflags=() objs=()
+    BE_ERR=""
+    [ -n "${BE_BUILT[$d]:-}" ] && return 0
+    manifest="$d/backend.json"
+    if [ ! -f "$manifest" ]; then
+        progress_clear
+        echo "idc: backend has no backend.json: $manifest" >&2
+        exit 1
+    fi
+    spec_out=$(python3 - "$manifest" "$PLATKEY_BUILD" "$TRIPLE" <<'PYEOF'
 import json, sys
 manifest, key, triple = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(manifest) as f:
@@ -1029,34 +1072,74 @@ print("CFLAGS", SEP.join(plat.get("cflags", [])))
 print("LINK", SEP.join(plat.get("link", [])))
 PYEOF
 ) || { echo "idc: invalid backend.json: $manifest" >&2; exit 1; }
-        err_line=$(printf '%s\n' "$spec_out" | grep '^ERR ' | cut -d' ' -f2-)
-        if [ -n "$err_line" ]; then
-            echo "idc: $err_line" >&2
+    err_line=$(printf '%s\n' "$spec_out" | grep '^ERR ' | cut -d' ' -f2-)
+    if [ -n "$err_line" ]; then
+        BE_ERR="$err_line"
+        return 1
+    fi
+    sources_line=$(printf '%s\n' "$spec_out" | grep '^SOURCES ' | cut -d' ' -f2-)
+    cflags_line=$(printf '%s\n' "$spec_out" | grep '^CFLAGS ' | cut -d' ' -f2-)
+    link_line=$(printf '%s\n' "$spec_out" | grep '^LINK ' | cut -d' ' -f2-)
+    IFS=$'\x1f' read -ra srcs <<< "$sources_line"
+    IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
+    for src in ${srcs[@]+"${srcs[@]}"}; do
+        [ -z "$src" ] && continue
+        src_path="$d/$src"
+        obj="${src_path%.*}.gen.o"
+        capped "$CC" -O2 -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
+        if [ "$backend_rc" -ne 0 ]; then
+            progress_clear
+            if mem_ceiling_hit "$backend_rc"; then
+                mem_ceiling_error "cc (backend: $src_path)"
+            else
+                echo "idc: backend compile failed for $src_path" >&2
+            fi
             exit 1
         fi
-        sources_line=$(printf '%s\n' "$spec_out" | grep '^SOURCES ' | cut -d' ' -f2-)
-        cflags_line=$(printf '%s\n' "$spec_out" | grep '^CFLAGS ' | cut -d' ' -f2-)
-        link_line=$(printf '%s\n' "$spec_out" | grep '^LINK ' | cut -d' ' -f2-)
-        IFS=$'\x1f' read -ra srcs <<< "$sources_line"
-        IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
-        IFS=$'\x1f' read -ra link <<< "$link_line"
-        for src in "${srcs[@]}"; do
-            [ -z "$src" ] && continue
-            src_path="$d/$src"
-            obj="${src_path%.*}.gen.o"
-            capped "$CC" -O2 -c "$src_path" -o "$obj" "${cflags[@]}"; backend_rc=$?
-            if [ "$backend_rc" -ne 0 ]; then
-                if mem_ceiling_hit "$backend_rc"; then
-                    mem_ceiling_error "cc (backend: $src_path)"
-                else
-                    echo "idc: backend compile failed for $src_path" >&2
-                fi
-                for o in "${BACKEND_OBJS[@]}"; do rm -f "$o"; done
-                exit 1
-            fi
-            BACKEND_OBJS+=("$obj")
-        done
-        BACKEND_LINK+=("${link[@]}")
+        BACKEND_OBJS+=("$obj")
+        objs+=("$obj")
+    done
+    BE_OBJS[$d]=$(IFS=$'\x1f'; printf '%s' "${objs[*]}")
+    BE_LINK[$d]="$link_line"
+    BE_BUILT[$d]=1
+}
+
+# backends_for KIND -- set LINK_OBJS and LINK_FLAGS to what the natives KIND
+# reaches need ("program": from main; "harness": from the cases), building any
+# backend not built yet, in the order the backends were attached. A reached
+# native nothing attached can link stops the build at the call that reaches
+# it, rather than at the linker naming id_<name>.
+backends_for() {
+    local kind="$1" from=main row_kind name site decl be d msg
+    local -A need_site=() need_name=()
+    local -a objs=() flags=()
+    [ "$kind" = harness ] && from="a test case"
+    LINK_OBJS=()
+    LINK_FLAGS=()
+    while IFS='|' read -r row_kind name site decl; do
+        [ "$row_kind" = "$kind" ] || continue
+        be=$(backend_of "$decl")
+        if [ -z "$be" ]; then
+            progress_clear
+            echo "$site: error: native '$name', reached from $from by this call, has no implementation for platform '$PLATKEY_BUILD' (building for '$TRIPLE'): it is declared in $decl, which is not in an attached backend" >&2
+            exit 1
+        fi
+        [ -n "${need_site[$be]:-}" ] && continue
+        need_site[$be]="$site"
+        need_name[$be]="$name"
+    done < "$NATIVES"
+    for d in ${ALL_BACKENDS[@]+"${ALL_BACKENDS[@]}"}; do
+        [ -n "${need_site[$d]:-}" ] || continue
+        if ! backend_build "$d"; then
+            progress_clear
+            msg="${BE_ERR/"' has "/"', which has "}"
+            echo "${need_site[$d]}: error: native '${need_name[$d]}', reached from $from by this call, is implemented by $msg" >&2
+            exit 1
+        fi
+        IFS=$'\x1f' read -ra objs <<< "${BE_OBJS[$d]}"
+        IFS=$'\x1f' read -ra flags <<< "${BE_LINK[$d]}"
+        LINK_OBJS+=(${objs[@]+"${objs[@]}"})
+        LINK_FLAGS+=(${flags[@]+"${flags[@]}"})
     done
 }
 
@@ -1076,11 +1159,23 @@ HARNESS_SEP='/* ---- end of test harness ---- */'
 # can only be the bootstrap building stage 1 from a bootstrap/*.c that predates
 # the harness, and it is said rather than skipped; any other missing separator
 # is a compiler bug.
+#
+# The natives list (see backends_for) follows the program behind a separator of
+# its own. A stage 0 older than --natives writes none, and building the
+# compiler reaches no native, so there an absent list is an empty one.
+NATIVES_SEP='/* ---- natives ---- */'
+NATIVES="$WORK/natives"
 split_harness() {
+    : > "$NATIVES"
+    if ! grep -qxF "$NATIVES_SEP" "$RAW_OUT" && [ -z "${IDC_STAGE_PARSE:-}" ]; then
+        C_OUT="$RAW_OUT"
+        compiler_bug "idparse did not emit the natives list"
+    fi
     if grep -qxF "$HARNESS_SEP" "$RAW_OUT"; then
-        awk -v sep="$HARNESS_SEP" -v h="$HARNESS_C" -v p="$C_OUT" '
-            BEGIN { o = h; printf "" > h; printf "" > p }
+        awk -v sep="$HARNESS_SEP" -v nsep="$NATIVES_SEP" -v h="$HARNESS_C" -v p="$C_OUT" -v n="$NATIVES" '
+            BEGIN { o = h; printf "" > h; printf "" > p; printf "" > n }
             o == h && $0 == sep { o = p; next }
+            o == p && $0 == nsep { o = n; next }
             { print > o }' "$RAW_OUT"
     elif [ -n "${IDC_STAGE_PARSE:-}" ]; then
         mv "$RAW_OUT" "$C_OUT"
@@ -1113,9 +1208,9 @@ run_cases() {
         echo "idc: this build has $(plural "$n" "test case"), which run on this machine ('$host'), but it is for '$TRIPLE'; build for '$host' to run them" >&2
         exit 1
     fi
-    build_backends
+    backends_for harness
     progress test "$(plural "$n" case)"
-    local hcmd=("$CC" -std=c11 -O0 "$HARNESS_C" "${BACKEND_OBJS[@]}" -o "$WORK/harness" -lm "${BACKEND_LINK[@]}")
+    local hcmd=("$CC" -std=c11 -O0 "$HARNESS_C" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$WORK/harness" -lm ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
     capped "${hcmd[@]}" 2>"$WORK/harness.err"; hbuild_rc=$?
     if [ "$hbuild_rc" -ne 0 ]; then
         progress_clear
@@ -1305,13 +1400,19 @@ grep -q '^int main(' "$C_OUT" && have_main=1
 choose_output
 
 # ---------------------------------------------------------------------------
-# --backend DIR: link the backend's objects into the program (build_backends,
-# above, compiled them if the test harness has not already)
-if [ "${#ALL_BACKENDS[@]}" -gt 0 ] && [ "$have_main" -eq 0 ]; then
-    echo "idc: backend(s) ignored: this project has no main (builds to a .o);" \
-         "link the backend into the final program" >&2
-elif [ "${#ALL_BACKENDS[@]}" -gt 0 ]; then
-    build_backends
+# The backends the program's reached natives need (backends_for, above), built
+# if the test harness has not already built them. A .o is not the whole
+# program: what its natives need is linked into whatever links it, so it is
+# named only when some function the object keeps calls one.
+LINK_OBJS=()
+LINK_FLAGS=()
+if [ "$have_main" -eq 0 ]; then
+    if grep -q '^program|' "$NATIVES"; then
+        echo "idc: backend(s) ignored: this project has no main (builds to a .o);" \
+             "link the backend into the final program" >&2
+    fi
+else
+    backends_for program
 fi
 
 # ---------------------------------------------------------------------------
@@ -1341,7 +1442,7 @@ fi
 
 cmd=("$CC")
 [ "$have_main" -eq 0 ] && cmd+=("-c")
-cmd+=("-std=c11" "-O2" "$c_path" "${BACKEND_OBJS[@]}" "-o" "$OUT" "${BACKEND_LINK[@]}")
+cmd+=("-std=c11" "-O2" "$c_path" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} "-o" "$OUT" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
 
 progress link "cc -> $(basename "$OUT")"
 capped "${cmd[@]}" 2>"$WORK/cc.err"

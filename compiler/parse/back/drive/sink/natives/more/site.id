@@ -1,0 +1,28 @@
+// A natives row: KIND|NAME, the call that reaches the native, and the file
+// that declares it -- which is what bin/idc matches against the attached
+// backends' directories.
+
+nat_push(string key, int id, string name) {
+  push((import natkey), key);
+  string site = nat_site(id) + "|" + func_file(name);
+  push((import natrow), key + "|" + site);
+} return void;
+
+// A call's file is its function's; its line is the one the parser recorded
+// (front/parse/decl/top/marker/init_more.id).
+nat_site(int id) {
+  string node_fn_v = node_fn(id);
+  int call_line_v = call_line(id);
+  string site = func_file(node_fn_v) + ":" + call_line_v;
+} return string site;
+
+// Every call node is recorded as it is parsed, so the fallback -- the
+// statement's or function's line, as a diagnostic at this node gets -- is
+// only there so that a node the table somehow lacks is still placed.
+call_line(int id) {
+  int n = tc_line(id);
+  int at = lst_index_of((import cnode), id);
+  if(at >= 0) {
+    n = (import cline)[at];
+  }
+} return int n;

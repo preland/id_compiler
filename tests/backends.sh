@@ -188,11 +188,19 @@ fi
 # A manifest that offers no C implementation must say so, in both compilers,
 # rather than reporting "no support for platform 'linux'" (which would be a
 # lie: the platform is fine, the *target* is what is missing).
+#
+# bin/idc reads a backend's manifest only once one of its natives is reached,
+# so its program calls one; idc.py reads every attached manifest up front and
+# keeps building hello.
 nocbe="$TMP/nocbe"; mkdir -p "$nocbe"
 printf '{"name":"toy","abi":[],"targets":{"interp":{"module":"toy.py"}}}\n' > "$nocbe/backend.json"
+printf 'native toy_ping() return int;\n' > "$nocbe/toy.id"
+printf 'main(int argc, string[] argv) {\n  int r = toy_ping();\n  print(r);\n} return int 0;\n' > "$TMP/toy.id"
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
     name=$(basename "${c%% *}")
-    if $c "$ORG/demos/hello" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
+    prog="$ORG/demos/hello"
+    [ "$name" = idc ] && prog="$TMP/toy.id"
+    if $c "$prog" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
        | grep -q "no implementation for the C target"; then
         ok "a backend with no C target is diagnosed as such ($name)"
     else
@@ -225,11 +233,124 @@ for c in "$ABS_ROOT/bin/idc --allow-untested" "$ABS_ROOT/idc.py"; do
     fi
 done
 
+# -- a backend is linked only when one of its natives is reached -------------
+# Attaching a backend used to mean compiling its sources and linking its flags
+# into every build, so a standard library that named gfx made hello-world link
+# X11. Now the compiler lists the natives reachable from main (and, for the
+# harness, from the cases), and only the backends declaring one of them are
+# compiled or linked. None of this needs X11: an unreached backend is never
+# compiled, which is what is being checked. cclog records every cc invocation.
+be_abs() { (cd "$ROOT/backends/$1" && pwd); }
+cclog="$TMP/cclog"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s"\nexec cc "$@"\n' "$TMP/cc.log" > "$cclog"
+chmod +x "$cclog"
+needs_lib() { readelf -d "$1" 2>/dev/null | grep -q "NEEDED.*$2"; }
+
+c7none="$TMP/c7none"; mkdir -p "$c7none"
+printf 'import "%s"\nimport "%s"\nimport "%s"\n' "$(be_abs gfx)" "$(be_abs gl)" "$(be_abs fs)" > "$c7none/conf.id"
+printf 'main(int argc, string[] argv) {\n  print(7);\n} return int 0;\n' > "$c7none/main.id"
+: > "$TMP/cc.log"
+if $BIN_IDC "$c7none" --cc "$cclog" -o "$TMP/c7none.bin" >"$TMP/c7none.err" 2>&1 \
+   && [ "$("$TMP/c7none.bin")" = "7" ] \
+   && ! grep -qE 'gfx_linux|gl_linux|fs_posix|-lX11|-lGL' "$TMP/cc.log" \
+   && ! needs_lib "$TMP/c7none.bin" libX11 && ! needs_lib "$TMP/c7none.bin" libGL; then
+    ok "three attached backends that nothing calls are neither compiled nor linked"
+else
+    bad "three attached backends that nothing calls are neither compiled nor linked: $(grep -m1 -E 'gfx_linux|gl_linux|fs_posix|-lX11' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7none.err")"
+fi
+
+# The same through a standard library whose conf.id names every backend --
+# the arrangement this exists for.
+c7std="$TMP/c7std"; mkdir -p "$c7std/win" "$TMP/c7hello" "$TMP/c7win"
+cp "$c7none/conf.id" "$c7std/conf.id"
+printf 'c7_width() {\n  int cw = gfx_width();\n} return int cw;\n' > "$c7std/win/w.id"
+printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/c7hello/main.id"
+: > "$TMP/cc.log"
+if env -u IDC_NO_STD $BIN_IDC "$TMP/c7hello" --std "$c7std" --cc "$cclog" -o "$TMP/c7hello.bin" >"$TMP/c7hello.err" 2>&1 \
+   && [ "$("$TMP/c7hello.bin")" = "hi" ] \
+   && ! grep -qE 'gfx_linux|gl_linux|fs_posix|-lX11|-lGL' "$TMP/cc.log" \
+   && ! needs_lib "$TMP/c7hello.bin" libX11; then
+    ok "a standard library naming gfx, gl and fs costs hello-world no link line"
+else
+    bad "a standard library naming gfx, gl and fs costs hello-world no link line: $(grep -m1 -E 'gfx_linux|gl_linux|-lX11' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7hello.err")"
+fi
+
+# A reached native no attached backend implements is a diagnostic at the call
+# that reaches it, never a linker error about id_twin_a.
+out=$($BIN_IDC "$TMP/twin.id" -o "$TMP/twin.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "twin.id:5: error: native 'twin_a', reached from main by this call, has no implementation for platform" \
+   && ! printf '%s\n' "$out" | grep -q "undefined reference"; then
+    ok "a reached native in no backend is diagnosed at its call, not by the linker"
+else
+    bad "a reached native in no backend is diagnosed at its call, not by the linker: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ' | cut -c1-160)"
+fi
+
+# A platform a reached backend does not support names the native, the call and
+# the triple. The same backend attached but unreached is not asked at all, so
+# the build goes on to the next question -- here, that cc cannot target darwin.
+c7gl="$TMP/c7gl"; mkdir -p "$c7gl"
+printf 'import "%s"\n' "$(be_abs gl)" > "$c7gl/conf.id"
+printf 'main(int argc, string[] argv) {\n  int gw = gl_width();\n  print(gw);\n} return int 0;\n' > "$c7gl/main.id"
+out=$($BIN_IDC "$c7gl" --triple aarch64-apple-darwin -o "$TMP/c7gl.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "c7gl/main.id:2: error: native 'gl_width', reached from main by this call, is implemented by backend 'gl', which has no support for platform 'darwin' (building for 'aarch64-apple-darwin'); it is implemented for: linux"; then
+    ok "an unsupported platform names the reached native, its call and the triple"
+else
+    bad "an unsupported platform names the reached native, its call and the triple: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ' | cut -c1-200)"
+fi
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$c7gl/main.id"
+out=$($BIN_IDC "$c7gl" --triple aarch64-apple-darwin -o "$TMP/c7gl.bin" 2>&1)
+if printf '%s\n' "$out" | grep -q "cannot build for 'aarch64-apple-darwin' here" \
+   && ! printf '%s\n' "$out" | grep -q "has no support for platform"; then
+    ok "an unreached backend's platforms are not a question the build asks"
+else
+    bad "an unreached backend's platforms are not a question the build asks: $(printf '%s\n' "$out" | head -1 | cut -c1-160)"
+fi
+
 if ! cc -fsyntax-only "$ROOT/backends/gfx/gfx_linux.c" -I"$ROOT/backends/gfx" 2>/dev/null; then
     # Only the windowed half of this file needs them; the fs and output-path
     # checks above ran and their tally still counts.
     skip "gfx/gl checks: no X11 headers (run under tools/devshell.sh)"
     echo; echo "$pass passed, $fail failed"; [ "$fail" -eq 0 ]; exit
+fi
+
+# -- the backends a build links are the ones its natives reach ---------------
+# Through the library above: calling the one function that reaches gfx links
+# gfx, and gl -- attached by the same conf.id -- stays out.
+printf 'main(int argc, string[] argv) {\n  int cw = c7_width();\n  print(cw);\n} return int 0;\n' > "$TMP/c7win/main.id"
+: > "$TMP/cc.log"
+if env -u IDC_NO_STD $BIN_IDC "$TMP/c7win" --std "$c7std" --cc "$cclog" -o "$TMP/c7win.bin" >"$TMP/c7win.err" 2>&1 \
+   && grep -q 'gfx_linux\.c' "$TMP/cc.log" && ! grep -qE 'gl_linux|fs_posix|-lGL' "$TMP/cc.log" \
+   && needs_lib "$TMP/c7win.bin" libX11 && ! needs_lib "$TMP/c7win.bin" libGL; then
+    ok "a program reaching a gfx native through the library links gfx and nothing else"
+else
+    bad "a program reaching a gfx native through the library links gfx and nothing else: $(grep -m1 -E 'gl_linux|fs_posix|-lGL' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7win.err")"
+fi
+
+# The harness links what the cases reach, not what main does: probe's cases
+# reach fs, main reaches fs and gfx.
+c7h="$TMP/c7harn"; mkdir -p "$c7h"
+printf 'import "%s"\nimport "%s"\n' "$(be_abs fs)" "$(be_abs gfx)" > "$c7h/conf.id"
+cat > "$c7h/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  int w = gfx_width();
+  int p = probe("/nonexistent-c7");
+  print(p + w);
+} return int 0;
+
+probe(string path) {
+  int found = fs_exists(path);
+} return int found;
+("/nonexistent-c7-a"):(0)
+("/nonexistent-c7-b"):(0)
+EOF
+: > "$TMP/cc.log"
+if $BIN_IDC "$c7h" --cc "$cclog" -o "$TMP/c7harn.bin" >"$TMP/c7harn.err" 2>&1 \
+   && grep 'harness\.c' "$TMP/cc.log" | grep -q 'fs_posix\.gen\.o' \
+   && ! grep 'harness\.c' "$TMP/cc.log" | grep -qE 'gfx_linux|-lX11' \
+   && grep 'final\.c' "$TMP/cc.log" | grep 'fs_posix\.gen\.o' | grep 'gfx_linux\.gen\.o' | grep -q -- '-lX11'; then
+    ok "the test harness links the backends its cases reach, the program those main reaches"
+else
+    bad "the test harness links the backends its cases reach, the program those main reaches: $(grep 'harness\.c' "$TMP/cc.log" | cut -c1-160)$(head -1 "$TMP/c7harn.err")"
 fi
 
 # -- the backends themselves compile ----------------------------------------
