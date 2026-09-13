@@ -333,6 +333,18 @@ else
     bad "--cc overrides the host-platform refusal"
 fi
 
+# (c6) --emit-c on a build that emits no C is refused. An LLVM build
+# (--freestanding, --target llvm, --emit-llvm) used to accept the flag, ignore
+# it, build an object file somewhere else, and exit 0.
+rm -f "$TMP/fs.c"
+if ! $BIN_IDC ../../demos/hello --freestanding --emit-c "$TMP/fs.c" >"$TMP/fs.log" 2>&1 \
+   && grep -q -- "--emit-c writes C, but this build targets LLVM" "$TMP/fs.log" \
+   && [ ! -f "$TMP/fs.c" ]; then
+    ok "--emit-c with an LLVM build is refused, not silently ignored"
+else
+    bad "--emit-c with an LLVM build is refused, not silently ignored ($(head -1 "$TMP/fs.log"))"
+fi
+
 # bootstrap caching: a second invocation must not rebuild idlex/idparse
 cache_before=$(stat -c %Y ../.idc-cache/idlex 2>/dev/null || stat -f %m ../.idc-cache/idlex 2>/dev/null)
 $BIN_IDC ../../demos/calc -o "$TMP/calc_self2" >/dev/null 2>"$TMP/cache.err"

@@ -135,6 +135,14 @@ if [ -z "$PATH_ARG" ]; then
     echo "idc: missing PATH" >&2; usage; exit 2
 fi
 
+# --emit-c writes the C a build compiles, and an LLVM build compiles none. The
+# LLVM path never looked at the flag: it built an object file at the default
+# output instead, printed nothing about it, and exited 0.
+if [ -n "$EMIT_C" ] && [ "$TARGET" = llvm ]; then
+    echo "idc: --emit-c writes C, but this build targets LLVM (--target llvm, --emit-llvm or --freestanding); use --emit-llvm FILE" >&2
+    exit 2
+fi
+
 # ---------------------------------------------------------------------------
 # The platform this build is for, as one triple.
 #
