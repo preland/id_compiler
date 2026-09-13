@@ -1,0 +1,40 @@
+// A constant wrapper: a function whose whole result is one scalar literal,
+// computed from nothing. `ch_nl() { } return int 10;` is the constant 10 under
+// a function's name -- a veiled reference to a constant, which a reader has to
+// open to learn that it never changes. A constant is declared as one, in
+// conf.id, and read with (import ch_nl); so a function that only wraps one is
+// a compile error.
+//
+// It sits beside the duplicate checks because it is the same complaint about
+// the same thing: one value, spelled as something it is not.
+//
+// Values are the fingerprint canonicaliser's (../../../../canon/). A literal,
+// or an operator over literals that canon_bin's constant fold already reduces,
+// fingerprints as I<n>, F<spelling> or S<spelling>; nothing else does. So the
+// rule can miss a wrapper the fold does not reduce, but it cannot reject a
+// function whose result depends on anything but literals.
+
+cw_scan() {
+  int i = 0;
+  while(i < len((import prog))) {
+    cw_at(i);
+    i = i + 1;
+  }
+} return void;
+
+cw_at(int i) {
+  int id = (import prog)[i];
+  string val = cw_value(id);
+  if(cw_is_lit(val) == 1) {
+    cw_report(id, val);
+  }
+} return void;
+
+// "" unless the function is a constant wrapper, else the constant's
+// fingerprint.
+cw_value(int id) {
+  string val = "";
+  if(cw_shape(id) == 1) {
+    val = cw_body(id);
+  }
+} return string val;

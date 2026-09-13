@@ -164,9 +164,9 @@ done
 # a -> b -> c, where only a's manifest is the project's own. Before this
 # landed, a library could not declare its own dependencies at all.
 rm -rf "$TMP/tr"; mkdir -p "$TMP/tr/app" "$TMP/tr/mid" "$TMP/tr/base"
-printf 'trbase_v() {\n} return int 41;\n'                        > "$TMP/tr/base/b.id"
+printf 'trbase_v(int a) {\n  int v = a;\n} return int v;\n'     > "$TMP/tr/base/b.id"
 printf 'import "../base"\n'                                      > "$TMP/tr/mid/conf.id"
-printf 'trmid_v() {\n  int v = trbase_v() + 1;\n} return int v;\n' > "$TMP/tr/mid/m.id"
+printf 'trmid_v() {\n  int v = trbase_v(41) + 1;\n} return int v;\n' > "$TMP/tr/mid/m.id"
 printf 'import "../mid"\n'                                       > "$TMP/tr/app/conf.id"
 printf 'main(int argc, string[] argv) {\n    int v = trmid_v();\n    print(v);\n} return int 0;\n' \
                                                                  > "$TMP/tr/app/main.id"
@@ -181,9 +181,9 @@ done
 # -- 9. a cycle in the import graph terminates -----------------------------
 rm -rf "$TMP/cy"; mkdir -p "$TMP/cy/a" "$TMP/cy/b"
 printf 'import "../b"\n'                            > "$TMP/cy/a/conf.id"
-printf 'cya_v() {\n  int v = cyb_v();\n} return int v;\n' > "$TMP/cy/a/a.id"
+printf 'cya_v() {\n  int v = cyb_v(7);\n} return int v;\n' > "$TMP/cy/a/a.id"
 printf 'import "../a"\n'                            > "$TMP/cy/b/conf.id"
-printf 'cyb_v() {\n} return int 7;\nmain(int argc, string[] argv) {\n    int v = cya_v();\n    print(v);\n} return int 0;\n' \
+printf 'cyb_v(int a) {\n  int v = a;\n} return int v;\nmain(int argc, string[] argv) {\n    int v = cya_v();\n    print(v);\n} return int 0;\n' \
                                                     > "$TMP/cy/b/b.id"
 cy_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
@@ -222,7 +222,7 @@ done
 # It is imported source like any other, so the rule applies to it -- and a
 # violation must name the stdlib's directory, not the user's project.
 rm -rf "$TMP/fat"; mkdir -p "$TMP/fat"
-for n in 1 2 3 4; do printf 'fat%d() {\n} return int %d;\n' "$n" "$n" > "$TMP/fat/f$n.id"; done
+for n in 1 2 3 4; do printf 'fat%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/fat/f$n.id"; done
 fat_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
     "$cc" --std "$TMP/fat" "$TMP/proj" -o "$TMP/x" >"$TMP/fat.err" 2>&1 && fat_ok=0
@@ -316,8 +316,8 @@ done
                     || bad "an unreachable function still obeys the action limit"
 
 cat > "$TMP/dead/never.id" <<'EOF'
-never_owner() {
-    int hidden = 5;
+never_owner(int a) {
+    int hidden = a;
 } return int hidden;
 
 never_peeker() {

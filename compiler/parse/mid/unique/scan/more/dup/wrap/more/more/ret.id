@@ -1,0 +1,27 @@
+// The result: what the return clause names. The parser allows only a literal
+// or a name there, so a literal is its own value and a name is looked up among
+// the locals walked -- a parameter's name is not among them, and answers "".
+
+cw_ret(int id) {
+  int i1_of_v = i1_of(id);
+  string val = canon_expr(i1_of_v);
+  if(k_of(i1_of_v) == "var") {
+    string s1_of_v = s1_of(i1_of_v);
+    val = cw_get(s1_of_v);
+  }
+} return string val;
+
+cw_get(string name) {
+  string val = "";
+  int i = 0;
+  while(i < len((import cw_names))) {
+    val = cw_pick(i, name, val);
+    i = i + 1;
+  }
+} return string val;
+
+cw_pick(int i, string name, string val) {
+  if((import cw_names)[i] == name) {
+    val = (import cw_vals)[i];
+  }
+} return string val;

@@ -390,9 +390,8 @@ a new construct only once this compiler uses that construct on itself.
 | `chk_dupexp` | `compiler/parse/mid/names/exports/collect/more/duplicate.id` | A name may be exported only once (idc.py's pass 1 over exported |
 | `dupexp_err` | `compiler/parse/mid/names/exports/collect/more/report.id` | The duplicate is recorded anyway, even though it was just rejected: the |
 | `dupexp_report` | `compiler/parse/mid/names/exports/collect/more/report.id` | The duplicate is recorded anyway, even though it was just rejected: the |
-| `builtin_src` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The literal, and the comma-joined spelling the diagnostic prints. |
-| `builtin_list` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The literal, and the comma-joined spelling the diagnostic prints. |
-| `join_bnames` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The literal, and the comma-joined spelling the diagnostic prints. |
+| `builtin_list` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The comma-joined spelling the diagnostic prints. The literal it is split |
+| `join_bnames` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The comma-joined spelling the diagnostic prints. The literal it is split |
 | `init_bnames` | `compiler/parse/mid/names/exports/extern/builtin/more/names.id` | The builtin names, as data. |
 | `split_bnames` | `compiler/parse/mid/names/exports/extern/builtin/more/names.id` | The builtin names, as data. |
 | `take_bname` | `compiler/parse/mid/names/exports/extern/builtin/more/names.id` | The builtin names, as data. |
@@ -634,7 +633,6 @@ a new construct only once this compiler uses that construct on itself.
 | `reg_func` | `compiler/parse/mid/names/symbols/check/declare/more/registry.id` | Parameters are declarations too, and they are registered before the body's. |
 | `reg_params` | `compiler/parse/mid/names/symbols/check/declare/more/registry.id` | Filling the registry. The walk mirrors idc.py's register_var loop, and the |
 | `new_bucket` | `compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id` | One empty bucket. A list literal builds a fresh list on every call, which is |
-| `idx_n` | `compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id` | A prime, so that the final `%` mixes all sixteen bits of the hash rather |
 | `name_bucket` | `compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id` | Which bucket a name belongs in -- not a hash. It was called str_hash, which |
 | `hash_loop` | `compiler/parse/mid/names/symbols/lookup/index/hash/hash.id` | The usual polynomial string hash, kept inside 16 bits at every step so the |
 | `hash_step` | `compiler/parse/mid/names/symbols/lookup/index/hash/hash.id` | The usual polynomial string hash, kept inside 16 bits at every step so the |
@@ -968,6 +966,26 @@ a new construct only once this compiler uses that construct on itself.
 | `dupfn_err` | `compiler/parse/mid/unique/scan/more/dup/dup_name.id` | The other "no two functions may be the same" rule: two functions may not |
 | `dupfn_check` | `compiler/parse/mid/unique/scan/more/dup/report.id` | Split from dupfn_at and dupfn_err so each of those blocks stays within the |
 | `dupfn_print` | `compiler/parse/mid/unique/scan/more/dup/report.id` | Split from dupfn_at and dupfn_err so each of those blocks stays within the |
+| `cw_shape` | `compiler/parse/mid/unique/scan/more/dup/wrap/body.id` | Only a scalar result can be a constant. main is the entry point whatever it |
+| `cw_body` | `compiler/parse/mid/unique/scan/more/dup/wrap/body.id` | Which functions can be constant wrappers, and the state one walk keeps. |
+| `cw_begin` | `compiler/parse/mid/unique/scan/more/dup/wrap/body.id` | Start the walk of function `name`: canon_expr's position map is emptied as |
+| `cw_is_lit` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/lit.id` | canon_expr tags a literal with one letter -- I an integer, F a float, S a |
+| `cw_spell` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/lit.id` | The value as conf.id spells it: the fingerprint after its tag (zeros_tail is |
+| `cw_report` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_print` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_say` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_ret` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_get` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_pick` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_assign` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/val.id` | An assignment counts only when its target is a local this walk has already |
+| `cw_put` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/val.id` | Recording a local's value. |
+| `cw_keep` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/val.id` | Appended rather than overwritten, so an assignment needs no search to write; |
+| `cw_walk` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
+| `cw_stmts` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/walk.id` | The loop leaves at the first statement that is not a literal store: the flag |
+| `cw_stmt` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
+| `cw_scan` | `compiler/parse/mid/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
+| `cw_at` | `compiler/parse/mid/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
+| `cw_value` | `compiler/parse/mid/unique/scan/more/dup/wrap/wrap.id` | "" unless the function is a constant wrapper, else the constant's |
 | `dup_report` | `compiler/parse/mid/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at, |
 | `dup_loc` | `compiler/parse/mid/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at, |
 | `dup_probe` | `compiler/parse/mid/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
@@ -1770,7 +1788,11 @@ a new construct only once this compiler uses that construct on itself.
 | `ll_globals` | `compiler/parse/back/tgt/ll/mod/sect/glob.id` | An exported variable is a module-level global. A constant from conf.id |
 | `ll_global_at` | `compiler/parse/back/tgt/ll/mod/sect/glob.id` | An exported variable is a module-level global. A constant from conf.id |
 | `ll_init` | `compiler/parse/back/tgt/ll/mod/sect/glob.id` | An exported variable is a module-level global. A constant from conf.id |
+| `ll_const_val` | `compiler/parse/back/tgt/ll/mod/sect/str/const.id` | A conf.id constant's initialiser, as a value an LLVM global can hold. |
+| `ll_const_num` | `compiler/parse/back/tgt/ll/mod/sect/str/const.id` | An integer is the value the fingerprint canonicaliser folds it to (canon_expr, |
+| `ll_const_str` | `compiler/parse/back/tgt/ll/mod/sect/str/const.id` | The bytes are emitted here, just above the global that points at them. |
 | `ll_str_emit` | `compiler/parse/back/tgt/ll/mod/sect/str/more.id` | The rest of `ll_str_at`: the length and bytes, then the constant line. |
+| `ll_str_bytes` | `compiler/parse/back/tgt/ll/mod/sect/str/more.id` | A string literal's bytes as a private global called `gname`. A literal in a |
 | `ll_str_emit2` | `compiler/parse/back/tgt/ll/mod/sect/str/more.id` | The rest of `ll_str_at`: the length and bytes, then the constant line. |
 | `ll_zero` | `compiler/parse/back/tgt/ll/mod/sect/str/str.id` | A zero of a type, for a global with no initialiser. |
 | `ll_strs` | `compiler/parse/back/tgt/ll/mod/sect/str/str.id` | String literals become private globals, emitted after the functions that |

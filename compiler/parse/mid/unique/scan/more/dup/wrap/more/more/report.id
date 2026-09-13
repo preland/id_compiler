@@ -1,0 +1,19 @@
+// The diagnostic, at the function's own line, naming the value and the
+// declaration that replaces the function -- so the fix can be copied out of it.
+
+cw_report(int id, string val) {
+  note_failure();
+  string lit = cw_spell(val);
+  cw_print(id, lit);
+} return void;
+
+cw_print(int id, string lit) {
+  string name = s1_of(id);
+  string rt = s2_of(id);
+  cw_say(name, rt, lit);
+} return void;
+
+cw_say(string name, string rt, string lit) {
+  string loc_at_v = dup_loc(name);
+  print(loc_at_v + "'" + name + "' only returns the constant " + lit + "; declare it in conf.id as '" + rt + " " + name + " = " + lit + ";' and read it with (import " + name + ")");
+} return void;

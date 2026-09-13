@@ -172,7 +172,7 @@ cat > "$proj/m.id" <<'EOF'
 main(int argc, string[] argv) { print(1); } return int 0;
 EOF
 cat > "$proj/.git/sneaky.id" <<'EOF'
-sneaky_fn() { int q = 1; } return int q;
+sneaky_fn(int a) { int q = a; } return int q;
 EOF
 $IDC     "$proj" --emit-c "$TMP/hid_py.c"   >/dev/null 2>&1; py_rc=$?
 $BIN_IDC "$proj" --emit-c "$TMP/hid_self.c" >/dev/null 2>&1; self_rc=$?
@@ -208,10 +208,10 @@ fi
 lib="$TMP/implib"; app="$TMP/impapp"
 mkdir -p "$lib" "$app"
 cat > "$lib/h.id" <<'EOF'
-imp_helper() { int q = 5; } return int q;
+imp_helper(int a) { int q = a; } return int q;
 EOF
 cat > "$app/main.id" <<'EOF'
-main(int argc, string[] argv) { int r = imp_helper(); print(r); } return int 0;
+main(int argc, string[] argv) { int r = imp_helper(5); print(r); } return int 0;
 EOF
 printf 'import "%s"\n' "$lib" > "$app/conf.id"
 if $BIN_IDC "$app" -o "$TMP/imp.bin" >/dev/null 2>&1 \
@@ -224,8 +224,8 @@ fi
 # (b2) a conf.id constant becomes a program global, initialised before main
 #      runs rather than by a function nothing calls (docs/TODO.md item 4).
 #      bin/idc only: idc.py never learned conf.id constants and is not going
-#      to -- the compiler's own source declares none, so the bootstrap rule
-#      says it does not need them.
+#      to -- stage 0 is the bootstrap C, which has them, so the compiler's own
+#      source declaring some (compiler/parse/conf.id) does not need idc.py.
 proj="$TMP/consts"
 mkdir -p "$proj"
 cat > "$proj/conf.id" <<'EOF'
@@ -265,6 +265,32 @@ if $BIN_IDC "$proj" -o "$TMP/consts.bin" 2>&1 \
     ok "conf.id: a constant reserves its name against a later export"
 else
     bad "conf.id: a constant reserves its name against a later export"
+fi
+
+# and the same constants reach the LLVM target, where a global's initialiser
+# must already be a value: a string is a pointer to bytes emitted beside it,
+# and an integer written as an operator over literals is folded. The kernel
+# builds only for LLVM, so this is the path its constants take.
+if command -v clang >/dev/null 2>&1; then
+    cat > "$proj/conf.id" <<'EOF'
+int max_depth = 7 * 3;
+int below = 0 - 2;
+string banner = "id\tok";
+EOF
+    cat > "$proj/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  print((import max_depth) + (import below));
+  print((import banner));
+} return int 0;
+EOF
+    if $BIN_IDC "$proj" --target llvm -o "$TMP/consts_ll.bin" >/dev/null 2>&1 \
+       && [ "$("$TMP/consts_ll.bin")" = "$(printf '19\nid\tok')" ]; then
+        ok "conf.id: string and folded constants build for --target llvm"
+    else
+        bad "conf.id: string and folded constants build for --target llvm"
+    fi
+else
+    echo "SKIP: conf.id constants on --target llvm (needs clang on PATH)"
 fi
 
 # (c) --triple reaches idparse, which is what selects among asm overloads.
@@ -363,13 +389,13 @@ fi
 mkdir -p "$TMP/nested/sub"
 cat > "$TMP/nested/main.id" <<'EOF'
 main(int argc, string[] argv) {
-  int r = helper();
+  int r = helper(42);
   print(r);
 } return int 0;
 EOF
 cat > "$TMP/nested/sub/conf.id" <<'EOF'
-helper() {
-  int r = 42;
+helper(int a) {
+  int r = a;
 } return int r;
 EOF
 nested_msg="is the dependency manifest and is only read at the root"
@@ -387,7 +413,7 @@ fi
 # idem/engine's 1,115 real errors were once read as "1 error". bin/idc only:
 # idc.py still stops at the first CompileError it raises.
 mkdir -p "$TMP/mixed"
-for n in 1 2 3 4; do printf 'mx%d() {\n} return int %d;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
+for n in 1 2 3 4; do printf 'mx%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
 cat > "$TMP/mixed/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int r = no_such_function();

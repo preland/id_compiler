@@ -21,14 +21,10 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 def font():
     """The glyphs, in code-point order, as lists of 16 row bytes."""
-    parts = []
-    for p in sorted(glob.glob(f"{ROOT}/../kernel/prog/sys/gfx/font/rom/rom0.id")
-                    + glob.glob(f"{ROOT}/../kernel/prog/sys/gfx/font/rom/more/rom*.id")):
-        m = re.search(r'return string "([0-9a-f]*)"', open(p).read())
-        if m:
-            parts.append((p, m.group(1)))
-    # rom0 first, then more/rom1, rom2, rom3 -- the order font_rom() joins them
-    parts.sort(key=lambda kv: int(re.search(r"rom(\d+)\.id", kv[0]).group(1)))
+    conf = open(f"{ROOT}/../kernel/prog/conf.id").read()
+    parts = re.findall(r'^string font_rom(\d+) = "([0-9a-f]*)";$', conf, re.M)
+    # font_rom0 first, then 1, 2, 3 -- the order font_rom() joins them
+    parts.sort(key=lambda kv: int(kv[0]))
     hexed = "".join(v for _, v in parts)
     b = [int(hexed[i:i + 2], 16) for i in range(0, len(hexed), 2)]
     return [b[g * 16:(g + 1) * 16] for g in range(len(b) // 16)]

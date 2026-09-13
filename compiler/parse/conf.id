@@ -1,0 +1,15 @@
+// The parser stage's constants. Each is a program global, initialised before
+// main and read with (import name); none needs a function to hold it.
+//
+// idx_n: the number of buckets in the symbol index (mid/names/symbols/lookup/).
+// A prime, so that the final `%` mixes all sixteen bits of the hash rather than
+// keeping the low ones. About 1300 names in this compiler, so five or so per
+// bucket.
+//
+// builtin_src: the builtin names, as one space-separated literal split into
+// `bnames` at startup (mid/names/exports/extern/builtin/). The order is idc.py's
+// BUILTIN_NAMES order, not alphabetical: the fourteen ordinary builtins first,
+// then the flat-store and unsigned-word group, so the printed list reads the
+// same under both compilers.
+int idx_n = 251;
+string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";

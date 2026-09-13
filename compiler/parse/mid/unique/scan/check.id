@@ -24,6 +24,7 @@ check_bodies() {
 check_unique() {
   uq_fill();
   uq_scan();
+  cw_scan();
 } return void;
 
 // Fingerprint every function once. Comparing is quadratic in the number of

@@ -1,0 +1,10 @@
+// EXPECT: const_wrapper_folded.id:3: error: 'k' only returns the constant 2000; declare it in conf.id as 'int k = 2000;' and read it with (import k)
+// IDCPY-ACCEPTS
+k() {
+  int n = 2 * 1000;
+} return int n;
+
+main(int argc, string[] argv) {
+  int c = k();
+  print(c);
+} return int 0;

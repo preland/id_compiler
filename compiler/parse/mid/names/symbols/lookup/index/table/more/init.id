@@ -19,7 +19,7 @@ init_idx() {
 
 fill_idx() {
   int i = 0;
-  while(i < idx_n()) {
+  while(i < (import idx_n)) {
     push_buckets();
     i = i + 1;
   }

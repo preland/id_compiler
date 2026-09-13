@@ -1,0 +1,9 @@
+// EXPECT: const_wrapper_literal.id:3: error: 'ch_nl' only returns the constant 10; declare it in conf.id as 'int ch_nl = 10;' and read it with (import ch_nl)
+// IDCPY-ACCEPTS
+ch_nl() {
+} return int 10;
+
+main(int argc, string[] argv) {
+  int c = ch_nl();
+  print(c);
+} return int 0;
