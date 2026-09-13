@@ -7,3 +7,12 @@ items_text(int[] xs) {
     j = j + 1;
   }
 } return string lt;
+
+// A leaf as written: its own text, or `(import NAME)` for an export a case
+// reads (front/parse/decl/func/cases/case/given/elem.id).
+leaf_text(int e) {
+  string lt = s1_of(e);
+  if(k_of(e) == "cimport") {
+    lt = "(import " + lt + ")";
+  }
+} return string lt;

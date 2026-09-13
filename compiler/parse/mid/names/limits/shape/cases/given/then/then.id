@@ -1,0 +1,24 @@
+// A case's `then` checks. Each names a function that takes nothing and returns
+// a value, and gives one literal of that function's return type: the harness
+// calls it after the call under test and compares, so a check returning void
+// would compare nothing -- the vacuous case this clause exists to replace.
+
+fit_thens() {
+  int ti = 0;
+  while(ti < len((import thennode))) {
+    fit_then(ti);
+    ti = ti + 1;
+  }
+} return void;
+
+fit_then(int ti) {
+  int chk_node = (import thennode)[ti];
+  string chk_nm = s1_of(chk_node);
+  then_fn(chk_node, chk_nm);
+} return void;
+
+then_fn(int chk_node, string chk_nm) {
+  int cfn = func_node(chk_nm);
+  int ci = i1_of(chk_node);
+  then_shape(ci, chk_node, cfn);
+} return void;

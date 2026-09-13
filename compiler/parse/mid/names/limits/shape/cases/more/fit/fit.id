@@ -10,8 +10,10 @@ check_case_fits() {
   int i = 0;
   while(i < len((import casenode))) {
     fit_case(i);
+    fit_given(i);
     i = i + 1;
   }
+  fit_thens();
 } return void;
 
 fit_case(int i) {
