@@ -432,13 +432,13 @@ static int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding 
 }
 
 /* forward declarations */
-void id_lst_fill(IdList* xs, int n, int v);
-void id_lset(IdList* xs, int i, int v);
-void id_sset(IdList* strs, int i, char* s);
-int id_lst_index_of(IdList* xs, int v);
-int id_lst_find(IdList* xs, int v);
-int id_lst_pick(int at, int i, int hit);
-int id_str_eol(char* s, int i);
+void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v);
+void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
+void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s);
+int id_lst_index_of(IdList* idstd_xs, int idstd_v);
+int id_lst_find(IdList* idstd_xs, int idstd_v);
+int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
+int id_str_eol(char* idstd_s, int idstd_i);
 void id_check_asm_targets(int argc, IdList* argv);
 void id_asm_target_rows(char* triple);
 void id_dce_prune(void);
@@ -2315,16 +2315,16 @@ IdList* fx_sintab;  /* exported by fx_trig_init() */
 IdList* txt_g8;  /* exported by txt_g8_init() */
 int sf_l_w;  /* exported by sf_l_init() */
 int sf_l_h;  /* exported by sf_l_init() */
-IdList* sf_l_px;  /* exported by sf_l_alloc() */
+IdList* sf_l_px;  /* exported by idstd_sf_l_alloc() */
 IdList* err_n;  /* exported by err_init() */
-IdList* err_fs;  /* exported by err_keep_init() */
-IdList* err_ls;  /* exported by err_keep_init() */
-IdList* err_ms;  /* exported by err_keep_init2() */
-int term_w;  /* exported by term_scr_init() */
-int term_h;  /* exported by term_scr_init() */
-IdList* term_scr;  /* exported by term_scr_alloc() */
-IdList* term_attr;  /* exported by term_scr_alloc() */
-IdList* term_pal;  /* exported by term_pal_init() */
+IdList* err_fs;  /* exported by idstd_err_keep_init() */
+IdList* err_ls;  /* exported by idstd_err_keep_init() */
+IdList* err_ms;  /* exported by idstd_err_keep_init2() */
+int term_w;  /* exported by idstd_term_scr_init() */
+int term_h;  /* exported by idstd_term_scr_init() */
+IdList* term_scr;  /* exported by idstd_term_scr_alloc() */
+IdList* term_attr;  /* exported by idstd_term_scr_alloc() */
+IdList* term_pal;  /* exported by idstd_term_pal_init() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
 IdList* natrow;  /* exported by nat_lists() */
@@ -2439,58 +2439,58 @@ IdList* cfp;  /* exported by uq_fill() */
 IdList* cw_names;  /* exported by cw_begin() */
 IdList* cw_vals;  /* exported by cw_begin() */
 
-void id_lst_fill(IdList* xs, int n, int v) {
-    int i;
-    i = 0;
-    while ((i < n)) {
-        id_list_push(xs, (long long)(v));
-        i = (i + 1);
+void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v) {
+    int idstd_i;
+    idstd_i = 0;
+    while ((idstd_i < idstd_n)) {
+        id_list_push(idstd_xs, (long long)(idstd_v));
+        idstd_i = (idstd_i + 1);
     }
     return;
 }
 
-void id_lset(IdList* xs, int i, int v) {
-    id_list_set(xs, i, (long long)(v));
+void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
+    id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;
 }
 
-void id_sset(IdList* strs, int i, char* s) {
-    id_list_set(strs, i, (long long)(intptr_t)(s));
+void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s) {
+    id_list_set(idstd_strs, idstd_i, (long long)(intptr_t)(idstd_s));
     return;
 }
 
-int id_lst_index_of(IdList* xs, int v) {
-    int at;
-    int i;
-    at = (0 - 1);
-    i = 0;
-    while ((i < id_list_len(xs))) {
-        at = id_lst_pick(at, i, ((int)(id_list_get(xs, i)) == v));
-        i = (i + 1);
+int id_lst_index_of(IdList* idstd_xs, int idstd_v) {
+    int idstd_at;
+    int idstd_i;
+    idstd_at = (0 - 1);
+    idstd_i = 0;
+    while ((idstd_i < id_list_len(idstd_xs))) {
+        idstd_at = id_lst_pick(idstd_at, idstd_i, ((int)(id_list_get(idstd_xs, idstd_i)) == idstd_v));
+        idstd_i = (idstd_i + 1);
     }
-    return at;
+    return idstd_at;
 }
 
-int id_lst_find(IdList* xs, int v) {
-    int ret_i;
-    ret_i = (id_lst_index_of(xs, v) >= 0);
-    return ret_i;
+int id_lst_find(IdList* idstd_xs, int idstd_v) {
+    int idstd_ret_i;
+    idstd_ret_i = (id_lst_index_of(idstd_xs, idstd_v) >= 0);
+    return idstd_ret_i;
 }
 
-int id_lst_pick(int at, int i, int hit) {
-    int v;
-    v = at;
-    if (((hit == 1) && (at < 0))) {
-        v = i;
+int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit) {
+    int idstd_v;
+    idstd_v = idstd_at;
+    if (((idstd_hit == 1) && (idstd_at < 0))) {
+        idstd_v = idstd_i;
     }
-    return v;
+    return idstd_v;
 }
 
-int id_str_eol(char* s, int i) {
-    while (((id_charat(s, i) != 10) && (id_charat(s, i) != (-1)))) {
-        i = (i + 1);
+int id_str_eol(char* idstd_s, int idstd_i) {
+    while (((id_charat(idstd_s, idstd_i) != 10) && (id_charat(idstd_s, idstd_i) != (-1)))) {
+        idstd_i = (idstd_i + 1);
     }
-    return i;
+    return idstd_i;
 }
 
 void id_check_asm_targets(int argc, IdList* argv) {
