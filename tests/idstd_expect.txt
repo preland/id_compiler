@@ -15,7 +15,7 @@ calc             both
 control          both
 fsdemo           both
 hello            both
-idc_in_id_calc   both
+idc_in_id_calc   needs-std
 idview           both
 wordcount        needs-std
 

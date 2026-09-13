@@ -190,7 +190,7 @@ expect_output "id-lexer tracks lines" "line 3" "$(printf 'a\n\nb' | "$TMP/idlex"
 
 # --- idc-in-id stage 2: the calculator (parser + evaluator + printer written
 #     in id), fed by the stage-1 lexer through a pipe
-$IDC ../../demos/idc_in_id_calc -o "$TMP/idcalc" 2>/dev/null || bad "idc-in-id calc compiles"
+env -u IDC_NO_STD $IDC ../../demos/idc_in_id_calc -o "$TMP/idcalc" 2>/dev/null || bad "idc-in-id calc compiles"
 expect_output "calc parse+print" "(+ 2 (* 3 4))" \
     "$(echo '2 + 3 * 4' | "$TMP/idlex" | "$TMP/idcalc" | head -1)"
 expect_output "calc evaluate" "= 14" \
