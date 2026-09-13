@@ -1135,12 +1135,12 @@ void id_skip_constraints(IdList* pos);
 void id_parse_program(IdList* pos);
 int id_parse_func(IdList* pos);
 int id_func_sig(IdList* pos, char* name);
-int id_one_param(IdList* pos);
+int id_one_param(IdList* pos, char* kind);
 int id_func_ret(IdList* pos, char* name, IdList* params, IdList* body);
 int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt);
-IdList* id_parse_params(IdList* pos);
-void id_scan_params(IdList* pos, IdList* params);
-void id_fill_params(IdList* pos, IdList* params);
+IdList* id_parse_params(IdList* pos, char* kind);
+void id_scan_params(IdList* pos, IdList* params, char* kind);
+void id_fill_params(IdList* pos, IdList* params, char* kind);
 int id_ret_expr(IdList* pos, char* rt);
 char* id_parse_type(IdList* pos);
 char* id_add_brackets(char* t, IdList* pos);
@@ -1333,7 +1333,7 @@ int id_node_bin(char* op, int left, int right);
 int id_node_assign(char* name, int expr);
 int id_node_exprstmt(int expr);
 int id_node_decl(char* type, char* name, int expr, int exported);
-int id_node_param(char* type, char* name);
+int id_node_param(char* kind, char* type, char* name);
 int id_node_call(char* name, IdList* args);
 int id_node_if(int cond, IdList* thenl, IdList* elsel, int elif);
 int id_node_while(int cond, IdList* bodyl);
@@ -5518,7 +5518,7 @@ char* id_print_list(IdList* list) {
 char* id_print_node(int id) {
     char* s;
     s = id_concat(id_concat(id_concat(id_concat("(param ", id_s1_of(id)), " "), id_s2_of(id)), ")");
-    if ((strcmp(id_k_of(id), "param") != 0)) {
+    if (((strcmp(id_k_of(id), "param") != 0) && (strcmp(id_k_of(id), "nparam") != 0))) {
         s = id_print_stmt(id);
     }
     return s;
@@ -8298,19 +8298,19 @@ int id_func_sig(IdList* pos, char* name) {
     IdList* params;
     IdList* body;
     int ret_i;
-    params = id_parse_params(pos);
+    params = id_parse_params(pos, "param");
     body = id_parse_block(pos);
     ret_i = id_func_ret(pos, name, params, body);
     return ret_i;
 }
 
-int id_one_param(IdList* pos) {
+int id_one_param(IdList* pos, char* kind) {
     char* type;
     char* name;
     int ret_i;
     type = id_parse_type(pos);
     name = id_read_name(pos);
-    ret_i = id_node_param(type, name);
+    ret_i = id_node_param(kind, type, name);
     return ret_i;
 }
 
@@ -8332,24 +8332,24 @@ int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt
     return ret_i;
 }
 
-IdList* id_parse_params(IdList* pos) {
+IdList* id_parse_params(IdList* pos, char* kind) {
     IdList* params;
     params = id_list_lit(0);
-    id_scan_params(pos, params);
+    id_scan_params(pos, params, kind);
     return params;
 }
 
-void id_scan_params(IdList* pos, IdList* params) {
+void id_scan_params(IdList* pos, IdList* params, char* kind) {
     id_advance(pos);
-    id_fill_params(pos, params);
+    id_fill_params(pos, params, kind);
     id_advance(pos);
     return;
 }
 
-void id_fill_params(IdList* pos, IdList* params) {
+void id_fill_params(IdList* pos, IdList* params, char* kind) {
     int one_param_v;
     while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
-        one_param_v = id_one_param(pos);
+        one_param_v = id_one_param(pos, kind);
         id_list_push(params, (long long)(one_param_v));
         id_skip_comma(pos);
     }
@@ -8476,7 +8476,7 @@ int id_asm_sig_mid(IdList* pos) {
     IdList* parse_params_v;
     int ret_i;
     id_advance(pos);
-    parse_params_v = id_parse_params(pos);
+    parse_params_v = id_parse_params(pos, "param");
     ret_i = id_asm_sig_tail(pos, parse_params_v);
     return ret_i;
 }
@@ -8578,7 +8578,7 @@ int id_native_sig(IdList* pos, char* name) {
     IdList* params;
     int ret_i;
     id_advance(pos);
-    params = id_parse_params(pos);
+    params = id_parse_params(pos, "nparam");
     ret_i = id_native_ret(pos, name, params);
     return ret_i;
 }
@@ -10017,9 +10017,9 @@ int id_node_decl(char* type, char* name, int expr, int exported) {
     return ret_i;
 }
 
-int id_node_param(char* type, char* name) {
+int id_node_param(char* kind, char* type, char* name) {
     int ret_i;
-    ret_i = id_newleaf("param", 0, 0, type, name);
+    ret_i = id_newleaf(kind, 0, 0, type, name);
     return ret_i;
 }
 
@@ -11837,7 +11837,9 @@ void id_reg_func(int id) {
     char* s1_of_v;
     l1_of_v = id_l1_of(id);
     s1_of_v = id_s1_of(id);
-    id_reg_func_params(id, l1_of_v, s1_of_v);
+    if ((id_is_native(id) == 0)) {
+        id_reg_func_params(id, l1_of_v, s1_of_v);
+    }
     return;
 }
 
