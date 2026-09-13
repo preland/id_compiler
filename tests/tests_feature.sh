@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Test clauses: the cases written under a function, run by the compiler.
-# See docs/TESTS.md for what they mean; this file checks that idc.py does it.
+# See docs/TESTS.md for what they mean; this file checks that idc.py does it
+# under --tests, and that bin/idc does it on every build.
 #
 # Every program here is written to $TMP and built with IDC_NO_STD=1, so what a
 # case measures is the function under test and nothing else -- a standard
@@ -150,9 +151,9 @@ self_reject "bin/idc rejects a function with one case" \
 (1, 2):(3)
 ' "function 'add' has 1 test case(s)"
 if ../bin/idc "$TMP/p.id" --emit-c /dev/null >/dev/null 2>&1; then
-    ok "bin/idc ignores cases without the flag"
+    ok "bin/idc does not require two cases without the flag"
 else
-    bad "bin/idc ignores cases without the flag"
+    bad "bin/idc does not require two cases without the flag"
 fi
 printf '%s' 'add(int a, int b) {
   int s = a + b;
@@ -456,6 +457,309 @@ add(int a, int b) {
 EOF
 expect_reject "a case argument of the wrong type is rejected" \
     "this case gives a string where a int is required" --tests
+
+# =============================================================================
+# bin/idc runs every written case on every build, with no flag and no opt-out.
+# A case that does not pass is a compile error, and the build produces nothing.
+# Each case runs in a process of its own, so one case stopping -- a trap, a
+# crash, a limit -- is reported as that case, and the others still run.
+self_build() {
+    ../bin/idc "$TMP/p.id" "$@" >"$TMP/log" 2>&1
+}
+self_accept() {   # desc, flags...
+    local desc="$1"; shift
+    if self_build "$@"; then ok "$desc"; else bad "$desc ($(head -1 "$TMP/log"))"; fi
+}
+self_refuse() {   # desc, expected message (fixed string), flags...
+    local desc="$1" want="$2"; shift 2
+    if self_build "$@"; then
+        bad "$desc (built; it should not have)"
+    elif grep -qF "$want" "$TMP/log"; then
+        ok "$desc"
+    else
+        bad "$desc (wrong message: $(head -1 "$TMP/log"))"
+    fi
+}
+
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)
+(0, 0):(0)
+
+main(int argc, string[] argv) {
+  int r = add(2, 3);
+  print("sum " + r);
+} return int 0;
+EOF
+rm -f "$TMP/out"
+self_accept "bin/idc: passing cases build" -o "$TMP/out"
+[ "$("$TMP/out" 2>&1)" = "sum 5" ] \
+    && ok "bin/idc: a program whose cases pass runs" \
+    || bad "bin/idc: a program whose cases pass runs"
+
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(4)
+(0, 0):(0)
+(2, 2):(5)
+
+main(int argc, string[] argv) {
+  int r = add(2, 3);
+  print("sum " + r);
+} return int 0;
+EOF
+rm -f "$TMP/out"
+self_refuse "bin/idc: a false case fails the build" \
+    "p.id:4: test failed: add(1, 2) = 3, expected 4" -o "$TMP/out"
+grep -qF "p.id:6: test failed: add(2, 2) = 4, expected 5" "$TMP/log" \
+    && ok "bin/idc: every failing case is reported, not only the first" \
+    || bad "bin/idc: every failing case is reported, not only the first"
+[ ! -e "$TMP/out" ] \
+    && ok "bin/idc: a failing case produces no program" \
+    || bad "bin/idc: a failing case produces no program"
+rm -f "$TMP/emitted.c"
+../bin/idc "$TMP/p.id" --emit-c "$TMP/emitted.c" >/dev/null 2>&1
+[ ! -f "$TMP/emitted.c" ] \
+    && ok "bin/idc: a failing case blocks --emit-c too" \
+    || bad "bin/idc: a failing case blocks --emit-c too (the C was written anyway)"
+
+# The cases reach the harness and nothing else: the program's C is the same
+# with them and without them, and carries no counter.
+printf '%s' 'add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)
+(0, 0):(0)
+' > "$TMP/p.id"
+printf '%s' 'add(int a, int b) {
+  int s = a + b;
+} return int s;
+' > "$TMP/q.id"
+../bin/idc "$TMP/p.id" --emit-c "$TMP/with.c" >/dev/null 2>&1
+../bin/idc "$TMP/q.id" --emit-c "$TMP/without.c" >/dev/null 2>&1
+if [ -s "$TMP/with.c" ] && cmp -s "$TMP/with.c" "$TMP/without.c" && ! grep -q "id_ctr_\|idtc_" "$TMP/with.c"; then
+    ok "bin/idc: cases do not change the program's C"
+else
+    bad "bin/idc: cases do not change the program's C"
+fi
+
+cat > "$TMP/p.id" <<'EOF'
+fill(int[] xs, int n) {
+  int i = 0;
+  while(i < n) {
+    push(xs, i);
+    i = i + 1;
+  }
+} return void;
+([], 3):([0, 1, 2])
+([], 0):([])
+EOF
+self_accept "bin/idc: a void function is tested through its list argument" --emit-c /dev/null
+cat > "$TMP/p.id" <<'EOF'
+fill(int[] xs, int n) {
+  int i = 0;
+  while(i < n) {
+    push(xs, i);
+    i = i + 1;
+  }
+} return void;
+([], 3):([0, 1, 3], 3)
+([], 0):([])
+EOF
+self_refuse "bin/idc: a void function's arguments are compared after the call" \
+    "p.id:8: test failed: fill([], 3) = ([0, 1, 2], 3), expected ([0, 1, 3], 3)" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+greet(string who) {
+  string s = "hi " + who;
+} return string s;
+("bob"):("hi bob")
+("a\"b"):("hi a\"b")
+EOF
+self_accept "bin/idc: a string case builds" --emit-c /dev/null
+cat > "$TMP/p.id" <<'EOF'
+greet(string who) {
+  string s = "hi " + who;
+} return string s;
+("bob"):("hello bob")
+(""):("hi ")
+EOF
+self_refuse "bin/idc: a string case compares by content" \
+    'test failed: greet("bob") = "hi bob", expected "hello bob"' --emit-c /dev/null
+
+# --- a case that stops on its own is that case failing -----------------------
+cat > "$TMP/p.id" <<'EOF'
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 0):(0)
+(6, 3):(2)
+(7, 0):(1)
+EOF
+self_refuse "bin/idc: a trapping case is reported at its line" \
+    "p.id:4: test failed: quot(6, 0) trapped: id: division by zero" --emit-c /dev/null
+grep -qF "p.id:6: test failed: quot(7, 0) trapped: id: division by zero" "$TMP/log" \
+    && ok "bin/idc: a trap in one case does not stop the next" \
+    || bad "bin/idc: a trap in one case does not stop the next"
+
+cat > "$TMP/p.id" <<'EOF'
+down(int n) {
+  int r = down(n + 1);
+} return int r;
+(0):(0)
+(1):(1)
+EOF
+self_refuse "bin/idc: a crashing case is reported with its signal" \
+    "p.id:4: test failed: down(0) was killed by signal" --emit-c /dev/null
+
+# Flat-store addresses are the case's own: the second case would be handed a
+# later address if the first case's allocation were still live.
+cat > "$TMP/p.id" <<'EOF'
+first_addr(word n) {
+  word a = alloc(n);
+} return word a;
+(8):(8)
+(64):(8)
+EOF
+self_accept "bin/idc: each case sees the flat store as if it ran alone" --emit-c /dev/null
+
+# --- constraints -------------------------------------------------------------
+cat > "$TMP/p.id" <<'EOF'
+total(int[] xs) {
+  int t = 0;
+  int i = 0;
+  while(i < len(xs)) {
+    t = t + xs[i];
+    i = i + 1;
+  }
+} return int t;
+([1, 2, 3]):(6)[time:O(n), mem:O(1)]
+([1, 2, 3, 4, 5, 6]):(21)[time:O(n), mem:O(1)]
+EOF
+self_accept "bin/idc: a scaling claim that holds builds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+quad(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    t = t + inner(n);
+    i = i + 1;
+  }
+} return int t;
+(2):(4)[time:O(n)]
+(30):(900)[time:O(n)]
+
+inner(int n) {
+  int j = 0;
+  int t = 0;
+  while(j < n) {
+    t = t + 1;
+    j = j + 1;
+  }
+} return int t;
+(1):(1)
+(2):(2)
+EOF
+self_refuse "bin/idc: a quadratic function cannot claim O(n)" \
+    "p.id:10: error: [time:O(n)] does not hold for 'quad'" --emit-c /dev/null
+
+# A single loop that is quadratic only because each `+` copies the string so
+# far: this fails only if the runtime's own work is counted.
+cat > "$TMP/p.id" <<'EOF'
+build(int n) {
+  string out = "";
+  int i = 0;
+  while(i < n) {
+    out = out + "x";
+    i = i + 1;
+  }
+} return string out;
+(4):("xxxx")[time:O(n)]
+(64):("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")[time:O(n)]
+EOF
+self_refuse "bin/idc: string building in a loop is caught as quadratic, with docs/TESTS.md's counts" \
+    "p.id:10: error: [time:O(n)] does not hold for 'build': time is 15 at n=4 and 2145 at n=64, where O(n) allows at most 960" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+total(int[] xs) {
+  int t = 0;
+  int i = 0;
+  while(i < len(xs)) {
+    t = t + xs[i];
+    i = i + 1;
+  }
+} return int t;
+([1, 2, 3]):(6)
+([1, 2, 3, 4, 5, 6]):(21)[mem:O(1)]
+EOF
+self_refuse "bin/idc: a claim carried by one case is rejected" \
+    "p.id:10: error: [mem:O(1)] needs a second case with a different input size to compare against" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)[time:O(n^3)]
+(0, 0):(0)
+EOF
+self_refuse "bin/idc: an unknown bound is named" "unknown bound 'O(n^3)'" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)[cpu:O(n)]
+(0, 0):(0)
+EOF
+self_refuse "bin/idc: an unknown constraint is named" "unknown constraint 'cpu'" --emit-c /dev/null
+
+# --- cases that fit their function -------------------------------------------
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(a, 2):(3)
+(0, 0):(0)
+EOF
+self_refuse "bin/idc: a case argument must be a literal" "a test case takes literals only" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1):(3)
+(0, 0):(0)
+EOF
+self_refuse "bin/idc: a case with the wrong number of arguments is rejected" \
+    "p.id:4: error: this case passes 1 argument(s) to 'add', which takes 2" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+("x", 2):(3)
+(0, 0):(0)
+EOF
+self_refuse "bin/idc: a case argument of the wrong type is rejected" \
+    "this case gives a string where a int is required" --emit-c /dev/null
+
+# --- a build whose cases cannot run here says why ----------------------------
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)
+(0, 0):(0)
+EOF
+self_refuse "bin/idc: a --freestanding build with cases is refused" \
+    "a --freestanding build has no host to run them on" --freestanding --emit-llvm /dev/null
+self_refuse "bin/idc: a build for another platform with cases is refused" \
+    "but it is for 'aarch64-unknown-linux-gnu'" --triple aarch64-unknown-linux-gnu --emit-c /dev/null
 
 echo
 echo "$pass passed, $fail failed"

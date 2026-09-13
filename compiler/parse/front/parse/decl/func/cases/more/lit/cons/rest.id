@@ -1,0 +1,20 @@
+// The rest of one claim, once its kind has been read: `: O(...)`.
+
+cons_rest(int[] pos, string ck) {
+  advance(pos);
+  eat_colon(pos);
+  cons_bound(pos, ck);
+} return void;
+
+cons_bound(int[] pos, string ck) {
+  string bt = big_o(pos);
+  int n = len((import casestart));
+  cons_push(n, ck, bt);
+} return void;
+
+// The case being parsed is the last one whose start has been recorded.
+cons_push(int n, string ck, string bt) {
+  push((import conscase), n - 1);
+  push((import conskind), ck);
+  push((import consbound), bt);
+} return void;

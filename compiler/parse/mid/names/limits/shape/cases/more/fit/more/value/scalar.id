@@ -1,0 +1,26 @@
+// A list's elements, one by one, and a scalar literal against a scalar type.
+
+fit_each(int i, int[] xs, string et) {
+  int j = 0;
+  while(j < len(xs)) {
+    fit_value(i, xs[j], et);
+    j = j + 1;
+  }
+} return void;
+
+fit_scalar(int i, int e, string want) {
+  string lt = case_lit_type(e);
+  if(k_of(e) == "arr") {
+    case_err(i, "this case gives a list where a " + want + " is required");
+  } else if(ty_fits(want, lt) == 0) {
+    case_err(i, "this case gives a " + lt + " where a " + want + " is required");
+  }
+} return void;
+
+// idc.py's `compatible`: the same type, or two numeric ones.
+ty_fits(string want, string lt) {
+  int r = 0;
+  if(want == lt || ty_num(want) + ty_num(lt) == 2) {
+    r = 1;
+  }
+} return int r;

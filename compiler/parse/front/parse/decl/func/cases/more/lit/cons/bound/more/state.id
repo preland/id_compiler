@@ -1,0 +1,19 @@
+// The case columns that follow casefn and casestart (front/tokens/expect/).
+//
+//   caseend    one past each case's last token
+//   casenode   each case's "case" node: arguments in nl1, expected in nl2
+//   conscase   for each claim, the index of the case it is written on
+//   conskind   the claim's kind, `time` or `mem`
+//   consbound  the claim's bound as canonical text, e.g. `O(n log n)`
+
+init_cases() {
+  export int[] caseend = [];
+  export int[] casenode = [];
+  init_cases2();
+} return void;
+
+init_cases2() {
+  export int[] conscase = [];
+  export string[] conskind = [];
+  export string[] consbound = [];
+} return void;

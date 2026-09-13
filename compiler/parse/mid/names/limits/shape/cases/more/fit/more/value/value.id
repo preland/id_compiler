@@ -1,0 +1,26 @@
+// A literal against the type it will be built at. The declared type decides,
+// not the literal: `[1, 2]` is a perfectly good `word[]`, and inferring the
+// type from the literal would call it a type error about a list nobody wrote.
+
+fit_value(int i, int e, string want) {
+  if(ty_is_list(want) == 1) {
+    fit_list(i, e, want);
+  } else {
+    fit_scalar(i, e, want);
+  }
+} return void;
+
+fit_list(int i, int e, string want) {
+  if(k_of(e) == "arr") {
+    fit_elems(i, e, want);
+  } else {
+    string lt = lit_text(e);
+    case_err(i, "this case gives " + lt + " where a " + want + " is required");
+  }
+} return void;
+
+fit_elems(int i, int e, string want) {
+  int[] xs = l1_of(e);
+  string et = list_elem(want);
+  fit_each(i, xs, et);
+} return void;

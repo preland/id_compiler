@@ -1,0 +1,15 @@
+// Whether the C being emitted is the harness's. Read where work is counted --
+// a function's entry and a loop's body -- and 1 only while the harness's
+// functions are emitted, so the program's C never sees a counter.
+
+harn_init() {
+  export int[] harn = [0];
+} return void;
+
+harn_set(int v) {
+  lset((import harn), 0, v);
+} return void;
+
+is_harn() {
+  int ret_i = (import harn)[0];
+} return int ret_i;

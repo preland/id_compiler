@@ -1,0 +1,15 @@
+// Each `[]` in an element type is spelled `_l`. 91 is `[`, 93 is `]`.
+
+key_at(string t, int i) {
+  int ch = charat(t, i);
+  string so = key_code(ch);
+} return string so;
+
+key_code(int ch) {
+  string so = chr(ch);
+  if(ch == 91) {
+    so = "_l";
+  } else if(ch == 93) {
+    so = "";
+  }
+} return string so;

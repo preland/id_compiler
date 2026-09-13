@@ -1,0 +1,23 @@
+// The call as the case wrote it, and a case's index among its function's
+// cases -- the pair idc.py's counts file names a case by.
+
+call_c(string f1, int[] args) {
+  string it = items_text(args);
+  string so = c_esc(f1 + "(" + it + ")");
+} return string so;
+
+case_fidx(int ci) {
+  int n = 0;
+  int j = 0;
+  while(j < ci) {
+    n = n + case_same(j, ci);
+    j = j + 1;
+  }
+} return int n;
+
+case_same(int j, int ci) {
+  int r = 0;
+  if((import casefn)[j] == (import casefn)[ci]) {
+    r = 1;
+  }
+} return int r;

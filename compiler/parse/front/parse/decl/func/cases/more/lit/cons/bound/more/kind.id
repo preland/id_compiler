@@ -1,0 +1,8 @@
+// A claim is about `time` or `mem`. idc.py's wording for both mistakes.
+cons_kind(int[] pos, string ck) {
+  if(cur_kind(pos) != "ident") {
+    syn_err(pos, "expected 'time' or 'mem', found '" + ck + "'");
+  } else if(ck != "time" && ck != "mem") {
+    syn_err(pos, "unknown constraint '" + ck + "'; a case constrains 'time' or 'mem'");
+  }
+} return void;

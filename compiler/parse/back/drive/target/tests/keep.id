@@ -1,0 +1,30 @@
+// The functions the test harness carries: the ones a case can reach.
+//
+// Emitting every function a second time cost what emitting the program costs,
+// and the self-hosted emitter's memory is not small -- a font library that
+// already needed 7 GB to emit needed 12 GB and more with a whole second copy
+// beside it. A case runs only its function and what that calls, so the rest
+// is compiled into nothing and checked by nothing.
+//
+// So for the harness, `prog` is narrowed to the functions reachable from the
+// functions that have cases -- the same reachability the dead-export check
+// computed from `main`, seeded differently -- and then put back, with the
+// reachable set it had, so the program is pruned and emitted exactly as before.
+
+emit_test_kept(string triple) {
+  int[] pkeep = [];
+  string[] rkeep = [];
+  test_kept(triple, pkeep, rkeep);
+} return void;
+
+test_kept(string triple, int[] pkeep, string[] rkeep) {
+  test_narrow(pkeep, rkeep);
+  emit_test_unit(triple);
+  test_widen(pkeep, rkeep);
+} return void;
+
+test_narrow(int[] pkeep, string[] rkeep) {
+  keep_ints((import prog), pkeep);
+  keep_strs((import rfn), rkeep);
+  test_reach();
+} return void;

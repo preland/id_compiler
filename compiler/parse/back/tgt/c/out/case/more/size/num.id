@@ -1,0 +1,23 @@
+// A number printed the way a case writes it, and a case's `n`: the largest
+// size among its arguments.
+
+show_num(string code, string type) {
+  string so = "fprintf(stderr, \"%lld\", " + code + ");";
+  if(type == "float") {
+    so = "fprintf(stderr, \"%g\", " + code + ");";
+  }
+} return string so;
+
+size_list(int[] args) {
+  string out = "";
+  int j = 0;
+  while(j < len(args)) {
+    out = out + sep_arg(j) + tc_size(args[j]);
+    j = j + 1;
+  }
+} return string out;
+
+sizes_c(int[] args) {
+  string parts = size_list(args);
+  string so = "idtc_max_of((long long[]){" + parts + "}, " + len(args) + ")";
+} return string so;

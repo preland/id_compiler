@@ -1,0 +1,30 @@
+// Whether each case fits the function it is written under: the right number of
+// arguments, the right number of expected values, and literals of the types
+// the signature declares.
+//
+// idc.py raised these while building its harness. They are properties of the
+// program, not of a harness, so here they are checks like the others, and they
+// run on every build. idc.py's wording, word for word.
+
+check_case_fits() {
+  int i = 0;
+  while(i < len((import casenode))) {
+    fit_case(i);
+    i = i + 1;
+  }
+} return void;
+
+fit_case(int i) {
+  int fn = (import casefn)[i];
+  int node = (import casenode)[i];
+  fit_arity(i, fn, node);
+} return void;
+
+fit_arity(int i, int fn, int node) {
+  if(flat_arg_count(fn) != flat_arg_count(node)) {
+    int na = flat_arg_count(node);
+    case_arity_err(i, fn, na);
+  } else {
+    fit_body(i, fn, node);
+  }
+} return void;

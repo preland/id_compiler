@@ -1,0 +1,26 @@
+// A case literal as C, built at the type the signature declares -- the same
+// cells, boxing and id_list_lit the program's own literals use. The literal
+// has already been checked against that type (mid/.../cases/more/fit/).
+
+tc_value(int e, string want) {
+  string so = "";
+  if(ty_is_list(want) == 1) {
+    so = tc_list(e, want);
+  } else {
+    so = tc_scalar(e);
+  }
+} return string so;
+
+tc_list(int e, string want) {
+  int[] xs = l1_of(e);
+  string et = list_elem(want);
+  string so = tc_list_n(xs, et);
+} return string so;
+
+tc_list_n(int[] xs, string et) {
+  string so = "id_list_lit(0)";
+  if(len(xs) > 0) {
+    string cells = tc_cells(xs, et);
+    so = "id_list_lit(" + len(xs) + ", " + cells + ")";
+  }
+} return string so;

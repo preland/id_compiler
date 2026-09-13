@@ -10,21 +10,25 @@
 // stop anything from being checked. See dce.id.
 guarded_emit(int argc, string[] argv) {
   check_asm_targets(argc, argv);
-  int fp_mode = arg_flag(argc, argv, 1, "--fingerprints");
-  guarded_emit_tail(argc, argv, fp_mode);
+  guarded_emit_tail(argc, argv);
 } return void;
 
-guarded_emit_tail(int argc, string[] argv, int fp_mode) {
+guarded_emit_tail(int argc, string[] argv) {
+  int fp_mode = arg_flag(argc, argv, 1, "--fingerprints");
   if(fp_mode == 1) {
     print_fingerprints();
   }
   if(fp_mode == 0 && check_failed() == 0) {
-    guarded_prune();
     init_tyc();
-    emit(argc, argv);
+    emit_all(argc, argv);
   }
 } return void;
 
+// The test harness comes first, while `prog` still holds every function: a
+// function with cases need not be reachable from main, and every case in the
+// build runs. Then the prune, then the program -- which is therefore emitted
+// exactly as it is without the harness.
+//
 // A freestanding object keeps every function, exactly as a project with no
 // main does, and for the same reason: it is not the whole program. Something
 // outside it -- a boot stub, an interrupt vector, another object -- may be the
@@ -32,8 +36,10 @@ guarded_emit_tail(int argc, string[] argv, int fp_mode) {
 // once: the kernel's fault handler is called from the interrupt stubs and
 // nothing else, so it was pruned and the link failed on a symbol the program
 // obviously needed. Deciding what is live across a link is the linker's job.
-guarded_prune() {
+emit_all(int argc, string[] argv) {
+  emit_tests_maybe(argc, argv);
   if(is_freestanding() == 0) {
     dce_prune();
   }
+  emit(argc, argv);
 } return void;

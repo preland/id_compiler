@@ -1,0 +1,21 @@
+// A case's arguments, one C local each: `idtc_a0`, `idtc_a1`, ...
+
+emit_case_args(int ci) {
+  int[] ps = l1_of((import casefn)[ci]);
+  int[] args = l1_of((import casenode)[ci]);
+  emit_arg_lines(ps, args);
+} return void;
+
+emit_arg_lines(int[] ps, int[] args) {
+  int j = 0;
+  while(j < len(args)) {
+    emit_arg_line(ps, args, j);
+    j = j + 1;
+  }
+} return void;
+
+emit_arg_line(int[] ps, int[] args, int j) {
+  string pt = s1_of(ps[j]);
+  string cv = tc_value(args[j], pt);
+  emit_tc_decl(pt, "idtc_a" + j, cv);
+} return void;

@@ -396,12 +396,14 @@ fi
 # must accept them and both must ignore them in codegen. When only idc.py knew
 # the syntax, a program carrying cases was a syntax error in the primary
 # compiler -- two dialects, not one language. Byte parity is the assertion that
-# matters: the cases must leave no trace in the emitted C.
+# matters: the cases must leave no trace in the emitted C. bin/idc runs the
+# cases on every build, so they have to pass, and a scaling claim has to be on
+# two cases of different sizes.
 cat > "$TMP/cases.id" <<'EOF'
 add(int a, int b) {
   int sum = a + b;
 } return int sum;
-(1, 2):(3)
+(1, 2):(3)[time:O(1)]
 (0, 0):(0)[time:O(1)]
 
 main(int argc, string[] argv) {

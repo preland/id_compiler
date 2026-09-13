@@ -1,0 +1,20 @@
+// Judging a scaling claim, and the entry point.
+//
+// A claim compares the smallest and the largest case carrying it -- the first
+// of the smallest and the last of the largest, which is where idc.py's stable
+// sort puts them -- and holds when the larger count is within the bound's
+// growth of the smaller, times 4 for the fixed cost a small case is dominated
+// by. idc.py's arithmetic, in its order, so the two agree on the boundary.
+//
+// Claims are judged only after every case has passed: a count from a case that
+// failed measures nothing.
+
+emit_tc_judge() {
+  emit_line("static long long idtc_max_of(const long long* v, int count) {\n    long long m = v[0];\n    for (int i = 1; i < count; i++) if (v[i] > m) m = v[i];\n    return m;\n}\nstatic double idtc_growth(const char* bound, long long n) {\n    double x = (double)(n < 1 ? 1 : n);\n    double lg = log2(x < 2 ? 2 : x);\n    if (strcmp(bound, \"O(1)\") == 0) return 1.0;\n    if (strcmp(bound, \"O(log n)\") == 0) return lg;\n    if (strcmp(bound, \"O(n)\") == 0) return x;\n    if (strcmp(bound, \"O(n log n)\") == 0) return x * lg;\n    return x * x;\n}\nstatic int idtc_claim(const int* g, int count, const char* kind, const char* bound) {\n    int lo = 0, hi = 0, spread = 0;\n    const long long* col = strcmp(kind, \"time\") == 0 ? idtc_t : idtc_m;\n    for (int i = 1; i < count; i++) {\n        if (idtc_n[g[i]] != idtc_n[g[0]]) spread = 1;\n        if (idtc_n[g[i]] < idtc_n[g[lo]]) lo = i;\n        if (idtc_n[g[i]] >= idtc_n[g[hi]]) hi = i;\n    }\n    if (!spread) {\n        fprintf(stderr, \"%s: error: [%s:%s] needs a second case with a different input size to compare against\\n\", idtc_where[g[0]], kind, bound);\n        return 1;\n    }\n    long long c1 = col[g[lo]], c2 = col[g[hi]], n1 = idtc_n[g[lo]], n2 = idtc_n[g[hi]];\n    double allowed = (double)(c1 > 1 ? c1 : 1) * idtc_growth(bound, n2) / idtc_growth(bound, n1) * 4;\n    if ((double)c2 <= allowed) return 0;\n    fprintf(stderr, \"%s: error: [%s:%s] does not hold for '%s': %s is %lld at n=%lld and %lld at n=%lld, where %s allows at most %lld\\n\", idtc_where[g[hi]], kind, bound, idtc_fn[g[0]], kind, c1, n1, c2, n2, bound, (long long)allowed);\n    return 1;\n}\nstatic void idtc_counts(const char* path) {\n    FILE* f = fopen(path, \"w\");\n    if (!f) return;\n    for (int k = 0; k < IDTC_N; k++) fprintf(f, \"%s %d %lld %lld\\n\", idtc_fn[k], idtc_fidx[k], idtc_t[k], idtc_m[k]);\n    fclose(f);\n}\nint main(int argc, char** argv) {\n    int bad = 0;\n    idtc_setup();\n    for (int k = 0; k < IDTC_N; k++) bad |= idtc_one(k);\n    if (bad) return 1;\n    if (argc > 1) idtc_counts(argv[1]);\n    return idtc_claims();\n}");
+} return void;
+
+emit_tc_rest() {
+  emit_cases();
+  emit_tc_setup();
+  emit_tc_claims();
+} return void;

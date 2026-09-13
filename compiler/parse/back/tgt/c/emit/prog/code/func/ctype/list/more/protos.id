@@ -1,0 +1,21 @@
+// The set of list types, in the order first met, and their prototypes.
+//
+//   tctys  every list type the harness needs helpers for
+
+note_one(string ty) {
+  if(find_str((import tctys), ty) < 0) {
+    push((import tctys), ty);
+  }
+} return void;
+
+tc_types_init() {
+  export string[] tctys = [];
+} return void;
+
+emit_ty_protos() {
+  int i = 0;
+  while(i < len((import tctys))) {
+    emit_ty_proto((import tctys)[i]);
+    i = i + 1;
+  }
+} return void;

@@ -13,9 +13,10 @@ arg_reqtests(int argc, string[] argv, int i, int ok) {
 } return int r;
 
 // Chained from check_scopes rather than check_program, whose block is full.
-// The duplicate check runs unconditionally; only the two-case minimum is
-// behind the flag.
+// The duplicate check and whether each case fits its function run
+// unconditionally; only the two-case minimum is behind the flag.
 check_cases_maybe() {
+  check_case_fits();
   check_dup_cases();
   if(require_tests() == 1) {
     check_cases();

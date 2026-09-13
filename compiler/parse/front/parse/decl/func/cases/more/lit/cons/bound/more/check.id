@@ -1,0 +1,21 @@
+// Only the bounds docs/TESTS.md defines may be claimed. Anything else is
+// named, rather than silently checked as something it does not say.
+
+bound_close(int[] pos, string bt, string parts) {
+  eat_close(pos);
+  string so = bt + "(" + parts + ")";
+  bound_check(pos, so);
+} return string so;
+
+bound_check(int[] pos, string so) {
+  if(bound_known(so) == 0) {
+    syn_err(pos, "unknown bound '" + so + "'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2)");
+  }
+} return void;
+
+bound_known(string so) {
+  int r = 0;
+  if(so == "O(1)" || so == "O(log n)" || so == "O(n)" || so == "O(n log n)" || so == "O(n^2)") {
+    r = 1;
+  }
+} return int r;

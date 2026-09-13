@@ -69,6 +69,21 @@ the ceiling, and `IDC_MEM_LIMIT` — not the generic "this is a bug in the
 self-hosted compiler" report, because the compiler was not necessarily wrong,
 it was just refused the memory to keep going.
 
+**Test cases run on every build.** Every case written under a function
+([`../docs/TESTS.md`](../docs/TESTS.md)) — in the program's tree, its
+dependencies and the standard library — runs before anything is produced, and a
+case that does not pass is a compile error reported at its own line; there is
+no flag to turn this on and none to turn it off. `idparse --harness` emits a
+test harness ahead of the program on the same stream (so the program's C is
+unchanged and `tools/parity.sh` still matches); it carries only the functions
+a case can reach. The driver splits it off, compiles it with the build's
+backends and runs it. Each case runs in a process
+of its own with 10 seconds and 1 GiB, so a case that traps or crashes is
+reported as that case. `[time:…]`/`[mem:…]` claims are counted exactly and
+judged after every case has passed. A build whose cases cannot run on this
+machine — `--freestanding`, or another platform's `--triple` — is refused,
+naming why. `--require-tests` still only adds the two-case minimum.
+
 ## Two code generators, and one of them optimises
 
 `bin/idc PATH --target llvm` compiles through an SSA intermediate
@@ -193,9 +208,7 @@ went to [`bootstrap/`](bootstrap) — the compiler as C, compiled by `cc` — an
    thing `bin/idc` does not have. `--target llvm` moved across and is now the
    self-hosted compiler's own ([`../docs/LLVM.md`](../docs/LLVM.md)); WASM is
    what is left.
-2. **Running** a `../docs/TESTS.md` case. `bin/idc --require-tests` counts
-   cases; only `idc.py` builds the entry point that executes one.
-3. **Being the other side of a differential test.** `tools/parity.sh` and half
+2. **Being the other side of a differential test.** `tools/parity.sh` and half
    of `tests/` build with both compilers on purpose. That is a use, not a
    dependency: it ends when it is decided that one implementation plus
    `../docs/SPEC.md` is enough.

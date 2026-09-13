@@ -1,0 +1,24 @@
+// What the j-th expected value is compared with, and at which type: the
+// return value for a function that has one, else the j-th argument as the call
+// left it.
+
+emit_expd_decl(int fn, int[] expd, int j) {
+  string pt = chk_type(fn, j);
+  string cv = tc_value(expd[j], pt);
+  emit_tc_decl(pt, "idtc_e" + j, cv);
+} return void;
+
+chk_name(int fn, int j) {
+  string nm = "idtc_got";
+  if(s2_of(fn) == "void") {
+    nm = "idtc_a" + j;
+  }
+} return string nm;
+
+chk_type(int fn, int j) {
+  string pt = s2_of(fn);
+  if(pt == "void") {
+    int[] ps = l1_of(fn);
+    pt = s1_of(ps[j]);
+  }
+} return string pt;

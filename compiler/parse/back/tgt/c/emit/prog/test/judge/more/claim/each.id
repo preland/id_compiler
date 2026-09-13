@@ -1,0 +1,23 @@
+// Every claim is written on a case, but judged once per function: a claim is
+// emitted at its first appearance among its function's cases.
+
+claim_of(int j, int ci) {
+  int r = 0;
+  if((import conscase)[j] == ci) {
+    r = 1;
+  }
+} return int r;
+
+claim_all() {
+  int c = 0;
+  while(c < len((import conscase))) {
+    claim_at(c);
+    c = c + 1;
+  }
+} return void;
+
+claim_at(int c) {
+  if(first_claim(c) == 1) {
+    emit_claim(c);
+  }
+} return void;

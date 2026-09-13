@@ -1,0 +1,8 @@
+// A list type's element type. How many parameters a function has, or
+// arguments a case passes -- both a node's first child list -- is
+// flat_arg_count (mid/names/limits/expr/more/report.id).
+
+list_elem(string t) {
+  int n = len(t);
+  string et = slice(t, 0, n - 2);
+} return string et;

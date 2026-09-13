@@ -1,0 +1,23 @@
+// Whether claim c is the first of its kind and bound in its function.
+
+first_claim(int c) {
+  int r = 1;
+  int j = 0;
+  while(j < c) {
+    r = r * (1 - same_claim(j, c));
+    j = j + 1;
+  }
+} return int r;
+
+same_claim(int j, int c) {
+  int r = 0;
+  if((import casefn)[(import conscase)[j]] == (import casefn)[(import conscase)[c]] && (import conskind)[j] == (import conskind)[c] && (import consbound)[j] == (import consbound)[c]) {
+    r = 1;
+  }
+} return int r;
+
+emit_claim(int c) {
+  string grp = claim_group(c);
+  int gn = claim_count(c);
+  emit_claim_line(c, grp, gn);
+} return void;

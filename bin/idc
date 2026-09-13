@@ -712,14 +712,19 @@ PARSE_ARGS+=(--triple "$TRIPLE")
 if [ "$REQUIRE_TESTS" -eq 1 ]; then
     PARSE_ARGS+=(--require-tests)
 fi
-# A report about the parsed program, not a build of it -- see the note where
-# the pipeline's exit codes are handled, below.
+# --fingerprints is a report about the parsed program, not a build of it -- see
+# the note where the pipeline's exit codes are handled, below -- so it builds no
+# harness. Otherwise the written cases run on every build (see run_cases):
+# idparse emits their harness ahead of the program on the same stream, so asking
+# costs no second parse, and the program part is exactly what it is without it.
 if [ "$FINGERPRINTS" -eq 1 ]; then
     PARSE_ARGS+=(--fingerprints)
+else
+    PARSE_ARGS+=(--harness)
 fi
 
 WORK=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
-trap 'rm -rf "$WORK"' EXIT
+trap 'rm -rf "$WORK"; for o in ${BACKEND_OBJS[@]+"${BACKEND_OBJS[@]}"}; do rm -f "$o"; done' EXIT
 
 if [ "$TARGET" = llvm ]; then
     PARSE_ARGS+=(--target llvm --opt "$OPT")
@@ -728,6 +733,8 @@ if [ "$TARGET" = llvm ]; then
 fi
 
 C_OUT="$WORK/out.c"
+RAW_OUT="$WORK/raw.out"
+HARNESS_C="$WORK/harness.c"
 LEX_ERR="$WORK/lex.err"
 PARSE_ERR="$WORK/parse.err"
 
@@ -784,7 +791,7 @@ if [ "$EMIT_SOURCES" -eq 1 ]; then
 fi
 
 progress compile "$(plural "${#SRC_FILES[@]}" file) -> tokens -> C"
-emit_sources | capped "$IDLEX" 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$C_OUT" 2>"$PARSE_ERR"
+emit_sources | capped "$IDLEX" 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
 rc=("${PIPESTATUS[@]}")
 lex_rc="${rc[1]}"
 parse_rc="${rc[2]}"
@@ -834,9 +841,9 @@ if [ "$FINGERPRINTS" -eq 1 ]; then
         [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
         compiler_bug "idlex or idparse failed on this input"
     fi
-    cat "$C_OUT"
+    cat "$RAW_OUT"
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
-    rm -f "$C_OUT"
+    rm -f "$RAW_OUT"
     exit "$parse_rc"
 fi
 
@@ -847,18 +854,202 @@ fi
 # check, quietly accept it.
 if [ "$parse_rc" -eq 1 ]; then
     progress_clear
-    cat "$C_OUT" >&2
+    cat "$RAW_OUT" >&2
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
-    rm -f "$C_OUT"
+    rm -f "$RAW_OUT"
     exit 1
 fi
 
-if [ "$lex_rc" -ne 0 ] || [ "$parse_rc" -ne 0 ] || [ ! -s "$C_OUT" ]; then
+if [ "$lex_rc" -ne 0 ] || [ "$parse_rc" -ne 0 ] || [ ! -s "$RAW_OUT" ]; then
     progress_clear
     [ -s "$LEX_ERR" ] && cat "$LEX_ERR" >&2
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    C_OUT="$RAW_OUT"
     compiler_bug "idlex or idparse failed on this input"
 fi
+
+# ---------------------------------------------------------------------------
+# Native backends: read each backend.json for this platform and compile its
+# sources (mirrors idc.py's resolve_backend/build_c). The objects are needed by
+# the final link and by the test harness, which links the same ones so that a
+# tested function calling into a backend really runs; they are built at most
+# once per build, and removed on exit.
+PLATKEY_BUILD="$(triple_platform "$TRIPLE")"
+BACKEND_OBJS=()
+BACKEND_LINK=()
+BACKENDS_BUILT=0
+# backends come from both --backend flags and the conf.id manifest. The same
+# backend named both ways -- the two documented ways to attach one dependency --
+# must be linked once: twice compiles its sources twice and hands cc the same
+# object file twice, which is "multiple definition" for every symbol it
+# exports. Collapse by resolved path, first mention winning (idc.py:
+# dedupe_backends).
+ALL_BACKENDS=()
+for d in "${BACKENDS[@]}" "${MANIFEST_BACKENDS[@]}"; do
+    real=$(cd "$d" 2>/dev/null && pwd -P) || real="$d"
+    dup=0
+    for seen in "${ALL_BACKENDS[@]}"; do
+        s=$(cd "$seen" 2>/dev/null && pwd -P) || s="$seen"
+        [ "$s" = "$real" ] && dup=1 && break
+    done
+    [ "$dup" -eq 0 ] && ALL_BACKENDS+=("$d")
+done
+
+build_backends() {
+    [ "$BACKENDS_BUILT" -eq 1 ] && return 0
+    BACKENDS_BUILT=1
+    PLATKEY="$PLATKEY_BUILD"
+    for d in "${ALL_BACKENDS[@]}"; do
+        manifest="$d/backend.json"
+        if [ ! -f "$manifest" ]; then
+            echo "idc: backend has no backend.json: $manifest" >&2
+            exit 1
+        fi
+        spec_out=$(python3 - "$manifest" "$PLATKEY" "$TRIPLE" <<'PYEOF'
+import json, sys
+manifest, key, triple = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(manifest) as f:
+    spec = json.load(f)
+name = spec.get("name", "backend")
+# Mirrors idc.py's backend_platforms: `targets` maps a *compiler* target to the
+# implementation it should build, so a future LLVM/wasm/interpreter target adds
+# a key there rather than anything changing in id. A manifest with no `targets`
+# (gfx, gl) has a bare `platforms` table, which is the C target's.
+targets = spec.get("targets")
+if targets is None:
+    plats = spec.get("platforms") or {}
+elif targets.get("c") is None:
+    have = ", ".join(sorted(targets)) or "none"
+    print("ERR", f"backend '{name}' has no implementation for the C target "
+                 f"(its manifest declares: {have})")
+    sys.exit(0)
+else:
+    plats = targets["c"].get("platforms") or {}
+plat = plats.get(key)
+if plat is None:
+    # Name the triple, not just the key: the key is derived from it, and the
+    # triple is the thing the user can change. Naming what the backend *does*
+    # have turns "unsupported" into a choice between porting it and picking a
+    # platform it already covers.
+    have = ", ".join(sorted(plats)) or "no platform at all"
+    print("ERR", f"backend '{name}' has no support for platform '{key}' "
+                 f"(building for '{triple}'); it is implemented for: {have}")
+    sys.exit(0)
+SEP = "\x1f"
+print("SOURCES", SEP.join(plat.get("sources", [])))
+print("CFLAGS", SEP.join(plat.get("cflags", [])))
+print("LINK", SEP.join(plat.get("link", [])))
+PYEOF
+) || { echo "idc: invalid backend.json: $manifest" >&2; exit 1; }
+        err_line=$(printf '%s\n' "$spec_out" | grep '^ERR ' | cut -d' ' -f2-)
+        if [ -n "$err_line" ]; then
+            echo "idc: $err_line" >&2
+            exit 1
+        fi
+        sources_line=$(printf '%s\n' "$spec_out" | grep '^SOURCES ' | cut -d' ' -f2-)
+        cflags_line=$(printf '%s\n' "$spec_out" | grep '^CFLAGS ' | cut -d' ' -f2-)
+        link_line=$(printf '%s\n' "$spec_out" | grep '^LINK ' | cut -d' ' -f2-)
+        IFS=$'\x1f' read -ra srcs <<< "$sources_line"
+        IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
+        IFS=$'\x1f' read -ra link <<< "$link_line"
+        for src in "${srcs[@]}"; do
+            [ -z "$src" ] && continue
+            src_path="$d/$src"
+            obj="${src_path%.*}.gen.o"
+            capped "$CC" -O2 -c "$src_path" -o "$obj" "${cflags[@]}"; backend_rc=$?
+            if [ "$backend_rc" -ne 0 ]; then
+                if mem_ceiling_hit "$backend_rc"; then
+                    mem_ceiling_error "cc (backend: $src_path)"
+                else
+                    echo "idc: backend compile failed for $src_path" >&2
+                fi
+                for o in "${BACKEND_OBJS[@]}"; do rm -f "$o"; done
+                exit 1
+            fi
+            BACKEND_OBJS+=("$obj")
+        done
+        BACKEND_LINK+=("${link[@]}")
+    done
+}
+
+# ---------------------------------------------------------------------------
+# The cases written under the program's functions run on every build, before
+# any output exists, and a case that does not pass fails the build -- there is
+# no flag, and no way to get a program out of a tree whose cases fail
+# (docs/TESTS.md). Every function in the build is covered: the program's own
+# tree, its dependencies and the standard library.
+#
+# idparse wrote the harness ahead of the program, up to a separator line. An
+# empty harness means no function in the build has a case, and then nothing
+# runs and nothing is required of the build.
+HARNESS_SEP='/* ---- end of test harness ---- */'
+
+# A stage 0 older than --harness ignores the flag and writes no separator. That
+# can only be the bootstrap building stage 1 from a bootstrap/*.c that predates
+# the harness, and it is said rather than skipped; any other missing separator
+# is a compiler bug.
+split_harness() {
+    if grep -qxF "$HARNESS_SEP" "$RAW_OUT"; then
+        awk -v sep="$HARNESS_SEP" -v h="$HARNESS_C" -v p="$C_OUT" '
+            BEGIN { o = h; printf "" > h; printf "" > p }
+            o == h && $0 == sep { o = p; next }
+            { print > o }' "$RAW_OUT"
+    elif [ -n "${IDC_STAGE_PARSE:-}" ]; then
+        mv "$RAW_OUT" "$C_OUT"
+        : > "$HARNESS_C"
+        progress_clear
+        echo "idc: note: stage 0 (bootstrap/idparse.c) predates the test harness, so the cases" \
+             "of this stage's build were not run; tools/regen_bootstrap.sh brings it forward" >&2
+    else
+        C_OUT="$RAW_OUT"
+        compiler_bug "idparse did not emit the test harness separator"
+    fi
+}
+
+# The harness runs every case in a process of its own, with its own time and
+# memory limits, and prints each failure as FILE:LINE. It is built for and run
+# on this machine, so a build whose cases cannot run here is refused, naming
+# why, rather than built without them.
+run_cases() {
+    [ -s "$HARNESS_C" ] || return 0
+    local n host hrc
+    n=$(grep -c '^static int idtc_case_[0-9]*(int idtc_fd) {$' "$HARNESS_C")
+    host="$(host_triple)"
+    if [ "$FREESTANDING" -eq 1 ]; then
+        progress_clear
+        echo "idc: this build has $(plural "$n" "test case"), and a --freestanding build has no host to run them on" >&2
+        exit 1
+    fi
+    if [ "$TRIPLE" != "$host" ]; then
+        progress_clear
+        echo "idc: this build has $(plural "$n" "test case"), which run on this machine ('$host'), but it is for '$TRIPLE'; build for '$host' to run them" >&2
+        exit 1
+    fi
+    build_backends
+    progress test "$(plural "$n" case)"
+    local hcmd=("$CC" -std=c11 -O0 "$HARNESS_C" "${BACKEND_OBJS[@]}" -o "$WORK/harness" -lm "${BACKEND_LINK[@]}")
+    capped "${hcmd[@]}" 2>"$WORK/harness.err"; hbuild_rc=$?
+    if [ "$hbuild_rc" -ne 0 ]; then
+        progress_clear
+        if mem_ceiling_hit "$hbuild_rc" "$WORK/harness.err"; then
+            mem_ceiling_error "cc (test harness)"
+        else
+            sed 's/^/idc:   /' "$WORK/harness.err" >&2
+            echo "idc: the test harness did not build (command: ${hcmd[*]})" >&2
+        fi
+        exit 1
+    fi
+    "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err"
+    hrc=$?
+    [ "$hrc" -eq 0 ] && return 0
+    progress_clear
+    cat "$WORK/cases.err" >&2
+    [ -s "$WORK/cases.err" ] || echo "idc: the test harness stopped (status $hrc) without saying why" >&2
+    exit 1
+}
+
+split_harness
+run_cases
 
 # The output path, chosen the same way whichever target produced the code:
 # the project directory's name or the file's stem, an executable when the
@@ -1026,103 +1217,13 @@ grep -q '^int main(' "$C_OUT" && have_main=1
 choose_output
 
 # ---------------------------------------------------------------------------
-# --backend DIR: read backend.json for this platform, compile its sources,
-# and link the resulting objects in (mirrors idc.py's resolve_backend/build_c)
-PLATKEY_BUILD="$(triple_platform "$TRIPLE")"
-BACKEND_OBJS=()
-BACKEND_LINK=()
-# backends come from both --backend flags and the conf.id manifest. The same
-# backend named both ways -- the two documented ways to attach one dependency --
-# must be linked once: twice compiles its sources twice and hands cc the same
-# object file twice, which is "multiple definition" for every symbol it
-# exports. Collapse by resolved path, first mention winning (idc.py:
-# dedupe_backends).
-ALL_BACKENDS=()
-for d in "${BACKENDS[@]}" "${MANIFEST_BACKENDS[@]}"; do
-    real=$(cd "$d" 2>/dev/null && pwd -P) || real="$d"
-    dup=0
-    for seen in "${ALL_BACKENDS[@]}"; do
-        s=$(cd "$seen" 2>/dev/null && pwd -P) || s="$seen"
-        [ "$s" = "$real" ] && dup=1 && break
-    done
-    [ "$dup" -eq 0 ] && ALL_BACKENDS+=("$d")
-done
+# --backend DIR: link the backend's objects into the program (build_backends,
+# above, compiled them if the test harness has not already)
 if [ "${#ALL_BACKENDS[@]}" -gt 0 ] && [ "$have_main" -eq 0 ]; then
     echo "idc: backend(s) ignored: this project has no main (builds to a .o);" \
          "link the backend into the final program" >&2
 elif [ "${#ALL_BACKENDS[@]}" -gt 0 ]; then
-    PLATKEY="$PLATKEY_BUILD"
-    for d in "${ALL_BACKENDS[@]}"; do
-        manifest="$d/backend.json"
-        if [ ! -f "$manifest" ]; then
-            echo "idc: backend has no backend.json: $manifest" >&2
-            exit 1
-        fi
-        spec_out=$(python3 - "$manifest" "$PLATKEY" "$TRIPLE" <<'PYEOF'
-import json, sys
-manifest, key, triple = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(manifest) as f:
-    spec = json.load(f)
-name = spec.get("name", "backend")
-# Mirrors idc.py's backend_platforms: `targets` maps a *compiler* target to the
-# implementation it should build, so a future LLVM/wasm/interpreter target adds
-# a key there rather than anything changing in id. A manifest with no `targets`
-# (gfx, gl) has a bare `platforms` table, which is the C target's.
-targets = spec.get("targets")
-if targets is None:
-    plats = spec.get("platforms") or {}
-elif targets.get("c") is None:
-    have = ", ".join(sorted(targets)) or "none"
-    print("ERR", f"backend '{name}' has no implementation for the C target "
-                 f"(its manifest declares: {have})")
-    sys.exit(0)
-else:
-    plats = targets["c"].get("platforms") or {}
-plat = plats.get(key)
-if plat is None:
-    # Name the triple, not just the key: the key is derived from it, and the
-    # triple is the thing the user can change. Naming what the backend *does*
-    # have turns "unsupported" into a choice between porting it and picking a
-    # platform it already covers.
-    have = ", ".join(sorted(plats)) or "no platform at all"
-    print("ERR", f"backend '{name}' has no support for platform '{key}' "
-                 f"(building for '{triple}'); it is implemented for: {have}")
-    sys.exit(0)
-SEP = "\x1f"
-print("SOURCES", SEP.join(plat.get("sources", [])))
-print("CFLAGS", SEP.join(plat.get("cflags", [])))
-print("LINK", SEP.join(plat.get("link", [])))
-PYEOF
-) || { echo "idc: invalid backend.json: $manifest" >&2; exit 1; }
-        err_line=$(printf '%s\n' "$spec_out" | grep '^ERR ' | cut -d' ' -f2-)
-        if [ -n "$err_line" ]; then
-            echo "idc: $err_line" >&2
-            exit 1
-        fi
-        sources_line=$(printf '%s\n' "$spec_out" | grep '^SOURCES ' | cut -d' ' -f2-)
-        cflags_line=$(printf '%s\n' "$spec_out" | grep '^CFLAGS ' | cut -d' ' -f2-)
-        link_line=$(printf '%s\n' "$spec_out" | grep '^LINK ' | cut -d' ' -f2-)
-        IFS=$'\x1f' read -ra srcs <<< "$sources_line"
-        IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
-        IFS=$'\x1f' read -ra link <<< "$link_line"
-        for src in "${srcs[@]}"; do
-            [ -z "$src" ] && continue
-            src_path="$d/$src"
-            obj="${src_path%.*}.gen.o"
-            capped "$CC" -O2 -c "$src_path" -o "$obj" "${cflags[@]}"; backend_rc=$?
-            if [ "$backend_rc" -ne 0 ]; then
-                if mem_ceiling_hit "$backend_rc"; then
-                    mem_ceiling_error "cc (backend: $src_path)"
-                else
-                    echo "idc: backend compile failed for $src_path" >&2
-                fi
-                for o in "${BACKEND_OBJS[@]}"; do rm -f "$o"; done
-                exit 1
-            fi
-            BACKEND_OBJS+=("$obj")
-        done
-        BACKEND_LINK+=("${link[@]}")
-    done
+    build_backends
 fi
 
 # ---------------------------------------------------------------------------

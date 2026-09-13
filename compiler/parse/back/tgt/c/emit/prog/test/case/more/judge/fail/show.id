@@ -1,0 +1,24 @@
+// What the call produced, printed the way a case writes it: one value, or a
+// parenthesised tuple of arguments for a void function.
+
+emit_fail_show(int fn, int[] expd) {
+  string shows = show_all(fn, expd);
+  string tail = exp_tail(expd);
+  emit_line("        " + shows + "\n        fputs(\"" + tail + "\", stderr);\n        return 3;\n    }");
+} return void;
+
+show_all(int fn, int[] expd) {
+  string so = show_parts(fn, expd);
+  if(len(expd) != 1) {
+    so = "fputs(\"(\", stderr); " + so + " fputs(\")\", stderr);";
+  }
+} return string so;
+
+show_parts(int fn, int[] expd) {
+  string out = "";
+  int j = 0;
+  while(j < len(expd)) {
+    out = out + show_part(fn, j);
+    j = j + 1;
+  }
+} return string out;

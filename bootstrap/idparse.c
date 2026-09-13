@@ -444,8 +444,8 @@ void id_dce_prune(void);
 int id_dce_pack(int i, int n);
 int id_dce_keep(int i, int n);
 void id_guarded_emit(int argc, IdList* argv);
-void id_guarded_emit_tail(int argc, IdList* argv, int fp_mode);
-void id_guarded_prune(void);
+void id_guarded_emit_tail(int argc, IdList* argv);
+void id_emit_all(int argc, IdList* argv);
 void id_push_asm_sym(int i);
 void id_push_sym_row(int i);
 void id_emit_checked(int argc, IdList* argv);
@@ -467,6 +467,18 @@ char* id_arg_flag_val(int argc, IdList* argv, int i, char* name, char* dflt);
 void id_emit_target(int argc, IdList* argv);
 void id_emit_target2(char* t, int argc, IdList* argv);
 char* id_arg_target(int argc, IdList* argv, int i, char* t);
+void id_emit_test_kept(char* triple);
+void id_test_kept(char* triple, IdList* pkeep, IdList* rkeep);
+void id_test_narrow(IdList* pkeep, IdList* rkeep);
+void id_clear_strs(IdList* names);
+void id_keep_ints(IdList* ints, IdList* onto);
+void id_keep_strs(IdList* strs, IdList* names);
+void id_seed_cases(void);
+void id_test_widen(IdList* pkeep, IdList* rkeep);
+void id_test_widen2(IdList* rkeep);
+void id_test_reach(void);
+void id_test_reach_tail(void);
+void id_seed_tested(void);
 int id_lw_expr(int node);
 int id_le2(int node);
 int id_le3(int node);
@@ -911,6 +923,7 @@ void id_emit_body_close(IdList* l2_of_v, char* ind);
 void id_emit_ret(int id);
 void id_emit_while(int id, char* ind);
 void id_emit_while_head(int id, char* ind, char* emit_expr_v);
+void id_emit_while_body(int id, char* ind);
 void id_emit_iassign(int id, char* ind);
 void id_iassign2(int id, char* ind, char* type_of_v);
 void id_iassign3(int id, char* ind, char* elem, IdList* l1_of_v);
@@ -943,6 +956,26 @@ char* id_emit_concat(int id);
 char* id_arg_str(int id);
 char* id_c_type(char* t);
 char* id_c_scalar(char* t);
+void id_emit_tc_helpers(void);
+void id_tc_emit_types(void);
+void id_tc_collect(void);
+void id_emit_ty_proto(char* ty);
+void id_emit_ty_bodies(void);
+void id_emit_ty_body(char* ty);
+void id_emit_ty_body2(char* key, char* et);
+char* id_eq_cond(char* et);
+void id_emit_eq_body(char* key, char* et);
+char* id_key_at(char* t, int i);
+char* id_key_code(int ch);
+void id_emit_show_body(char* key, char* et);
+char* id_tc_key(char* type);
+char* id_key_text(char* t);
+void id_note_one(char* ty);
+void id_tc_types_init(void);
+void id_emit_ty_protos(void);
+void id_tc_collect_case(int ci);
+void id_tc_collect_expd(int fn, IdList* expd);
+void id_note_ty(char* ty);
 void id_init_tyc(void);
 void id_init_tyc_rows(void);
 void id_init_tyc_rows2(void);
@@ -980,6 +1013,85 @@ void id_emit_fwds(void);
 void id_emit_program(char* triple);
 void id_emit_head(void);
 void id_emit_decls(void);
+void id_emit_case_args(int ci);
+void id_emit_arg_lines(IdList* ps, IdList* args);
+void id_emit_arg_line(IdList* ps, IdList* args, int j);
+void id_emit_cases(void);
+void id_emit_case_fn(int ci);
+void id_emit_case_run(int ci);
+void id_emit_case_call(int ci);
+void id_emit_call_line(int fn, char* cargs);
+void id_emit_ret_call(char* f1, char* rt, char* cargs);
+void id_emit_tc_decl(char* pt, char* nm, char* cv);
+char* id_arg_names(int fn);
+char* id_names_upto(int n);
+void id_emit_case_end(int ci);
+void id_emit_case_fail(int ci);
+void id_emit_fail_lines(int ci, int fn, IdList* expd);
+char* id_case_cond(int fn, IdList* expd);
+char* id_cond_parts(int fn, IdList* expd);
+char* id_cond_part(int fn, int j);
+char* id_show_part(int fn, int j);
+char* id_show_sep(int j);
+char* id_exp_tail(IdList* expd);
+char* id_and_sep(int j);
+void id_emit_fail_show(int fn, IdList* expd);
+char* id_show_all(int fn, IdList* expd);
+char* id_show_parts(int fn, IdList* expd);
+void id_emit_case_judge(int ci);
+void id_emit_case_expd(int ci);
+void id_emit_expd_decls(int fn, IdList* expd);
+void id_emit_expd_decl(int fn, IdList* expd, int j);
+char* id_chk_name(int fn, int j);
+char* id_chk_type(int fn, int j);
+void id_emit_tc_claims(void);
+void id_claim_body(void);
+void id_claim_sizes(void);
+int id_claim_of(int j, int ci);
+void id_claim_all(void);
+void id_claim_at(int c);
+int id_first_claim(int c);
+int id_same_claim(int j, int c);
+void id_emit_claim(int c);
+void id_emit_claim_line(int c, char* grp, int gn);
+char* id_claim_group(int c);
+char* id_group_item(char* out, int ci, int c);
+char* id_group_sep(char* out);
+int id_claim_count(int c);
+int id_carries(int ci, int c);
+int id_has_claim(int ci, int c);
+int id_claim_hit(int j, int ci, int c);
+void id_size_row(int ci);
+char* id_case_size(int ci);
+int id_case_claims(int ci);
+char* id_call_c(char* f1, IdList* args);
+int id_case_fidx(int ci);
+int id_case_same(int j, int ci);
+void id_emit_setup_line(int ci, char* cw, char* cc);
+char* id_case_where_c(int ci);
+char* id_case_call_c(int ci);
+void id_emit_tc_setup(void);
+void id_setup_rows(void);
+void id_setup_row(int ci);
+void id_harn_init(void);
+void id_harn_set(int v);
+int id_is_harn(void);
+void id_emit_count(char* ind);
+void id_emit_count_prelude(void);
+void id_emit_count_postlude(void);
+void id_emit_test_body(char* triple);
+void id_emit_test_head(void);
+void id_emit_test_decls(void);
+void id_emit_tc_judge(void);
+void id_emit_tc_rest(void);
+void id_emit_tc_support(void);
+void id_emit_tc_one(void);
+void id_emit_test_tail(void);
+void id_emit_tc_run(void);
+void id_emit_tc_proc(void);
+void id_emit_tests_maybe(int argc, IdList* argv);
+void id_emit_tests(char* triple);
+void id_emit_test_unit(char* triple);
 char* id_arr_cells(IdList* elems, char* etyp);
 char* id_emit_arr(int id);
 char* id_emit_arr_n(int id);
@@ -1000,6 +1112,24 @@ char* id_sys_helper2(char* name);
 char* id_emit_syscall(int id);
 char* id_cast_args(IdList* args);
 int id_is_syscall(char* name);
+char* id_tc_cells(IdList* xs, char* et);
+char* id_tc_scalar(int e);
+char* id_tc_neg(int e);
+char* id_tc_compare(char* ga, char* gb, char* type);
+char* id_tc_show(char* code, char* type);
+char* id_show_scalar(char* code, char* type);
+char* id_c_esc(char* t);
+char* id_esc_at(char* t, int i);
+char* id_esc_code(int ch);
+char* id_show_num(char* code, char* type);
+char* id_size_list(IdList* args);
+char* id_sizes_c(IdList* args);
+char* id_tc_size(int e);
+char* id_size_leaf(int e);
+char* id_size_neg(int e);
+char* id_tc_value(int e, char* want);
+char* id_tc_list(int e, char* want);
+char* id_tc_list_n(IdList* xs, char* et);
 char* id_box(char* code, char* type);
 char* id_box2(char* code, char* type);
 char* id_elem_type(char* t);
@@ -1126,13 +1256,40 @@ int id_asm_tail_end(IdList* pos, char* name);
 int id_init_asm_rest(void);
 int id_take_cases(IdList* pos);
 void id_push_case(IdList* pos);
-void id_end_case(IdList* pos);
-void id_skip_to_rbrack(IdList* pos);
-void id_skip_case(IdList* pos);
-void id_skip_case_rhs(IdList* pos);
-void id_skip_paren(IdList* pos);
-void id_skip_to_close(IdList* pos);
-void id_skip_constraints(IdList* pos);
+void id_case_owner(void);
+IdList* id_case_tuple(IdList* pos);
+void id_scan_tuple(IdList* pos, IdList* items);
+void id_fill_tuple(IdList* pos, IdList* items);
+void id_take_item(IdList* pos, IdList* items);
+void id_eat_colon(IdList* pos);
+void id_eat_close(IdList* pos);
+void id_check_lit(int e);
+int id_is_lit(int e);
+int id_all_lit(IdList* xs);
+char* id_big_o(IdList* pos);
+char* id_bound_body(IdList* pos, char* bt);
+char* id_bound_inner(IdList* pos, char* bt);
+char* id_bound_close(IdList* pos, char* bt, char* parts);
+void id_bound_check(IdList* pos, char* so);
+int id_bound_known(char* so);
+void id_cons_kind(IdList* pos, char* ck);
+void id_init_cases(void);
+void id_init_cases2(void);
+char* id_bound_parts(IdList* pos);
+char* id_bound_step(IdList* pos, char* out);
+char* id_bound_sep(char* out, char* t2);
+void id_case_cons(IdList* pos);
+void id_cons_list(IdList* pos);
+void id_cons_one(IdList* pos);
+void id_cons_rest(IdList* pos, char* ck);
+void id_cons_bound(IdList* pos, char* ck);
+void id_cons_push(int n, char* ck, char* bt);
+int id_leaf_lit(int e);
+int id_leaf_num(int e);
+int id_neg_lit(int e);
+int id_parse_case(IdList* pos);
+int id_parse_case_rhs(IdList* pos, IdList* args);
+int id_case_tail(IdList* pos, IdList* args, IdList* expd);
 void id_parse_program(IdList* pos);
 int id_parse_func(IdList* pos);
 int id_func_sig(IdList* pos, char* name);
@@ -1454,17 +1611,44 @@ void id_check_func_body(int id);
 void id_check_main(void);
 void id_check_main_at(int m);
 void id_report_main(void);
-void id_check_cases(void);
-void id_check_cases_at(int i);
-int id_count_cases(int node);
 void id_check_dup_cases(void);
 void id_dup_scan(int i);
 void id_dup_hit(int i, int j);
 int id_case_eq(int a, int b);
 int id_case_eq_run(int i, int off, int stop);
 int id_tok_same(int i, int j);
+void id_fit_body(int i, int fn, int node);
+void id_fit_items(int i, int fn, IdList* items);
+void id_fit_item(int i, int fn, IdList* items, int j);
+void id_check_case_fits(void);
+void id_fit_case(int i);
+void id_fit_arity(int i, int fn, int node);
+void id_case_arity_err(int i, int fn, int na);
+void id_case_void_err(int i, int fn, int ne);
+void id_case_ret_err(int i, int fn, int ne);
+void id_fit_expd(int i, int fn, int node);
+void id_fit_void(int i, int fn, IdList* expd);
+void id_fit_ret(int i, int fn, IdList* expd);
+char* id_items_text(IdList* xs);
+void id_case_err(int i, char* msg);
+char* id_case_loc(int i);
+char* id_lit_text(int e);
+char* id_neg_text(int e);
+char* id_arr_text(int e);
+char* id_case_lit_type(int e);
+char* id_leaf_type(int e);
+char* id_list_elem(char* t);
+void id_fit_each(int i, IdList* xs, char* et);
+void id_fit_scalar(int i, int e, char* want);
+int id_ty_fits(char* want, char* lt);
+void id_fit_value(int i, int e, char* want);
+void id_fit_list(int i, int e, char* want);
+void id_fit_elems(int i, int e, char* want);
 int id_arg_reqtests(int argc, IdList* argv, int i, int ok);
 void id_check_cases_maybe(void);
+void id_check_cases(void);
+void id_check_cases_at(int i);
+int id_count_cases(int node);
 void id_reqtests_init(void);
 void id_reqtests_set(int v);
 int id_require_tests(void);
@@ -1730,6 +1914,9 @@ void id_tc_nodes(void);
 void id_tc_node(int id);
 void id_tc_g1(int id);
 void id_tc_g2(int id);
+void id_tc_node_at(int id);
+int id_in_case(int id);
+int id_in_case_at(int i, int id, int ok);
 void id_void_arr_pair(int id, char* t1, char* t2);
 void id_tc_g3(int id);
 void id_chk_voidarr(int id);
@@ -1918,13 +2105,20 @@ IdList* irprog;  /* exported by init_ir9() */
 IdList* pra;  /* exported by init_opt() */
 IdList* phiof;  /* exported by init_opt() */
 IdList* outv;  /* exported by init_opt() */
+IdList* tctys;  /* exported by tc_types_init() */
 IdList* tyc;  /* exported by init_tyc() */
+IdList* harn;  /* exported by harn_init() */
 IdList* afname;  /* exported by init_asm() */
 IdList* aftriple;  /* exported by init_asm() */
 IdList* afparams;  /* exported by init_asm() */
 IdList* aflines;  /* exported by init_asm2() */
 IdList* afret;  /* exported by init_asm2() */
 IdList* afretn;  /* exported by init_asm2() */
+IdList* caseend;  /* exported by init_cases() */
+IdList* casenode;  /* exported by init_cases() */
+IdList* conscase;  /* exported by init_cases2() */
+IdList* conskind;  /* exported by init_cases2() */
+IdList* consbound;  /* exported by init_cases2() */
 IdList* tline;  /* exported by init_files2() */
 IdList* lnseen;  /* exported by init_files2() */
 IdList* cdecl;  /* exported by init_consts() */
@@ -1939,7 +2133,6 @@ IdList* chkfail;  /* exported by init_lines3() */
 IdList* curtl;  /* exported by init_lines3() */
 IdList* casefn;  /* exported by init_lines4() */
 IdList* casestart;  /* exported by init_lines4() */
-IdList* caseend;  /* exported by init_lines4() */
 IdList* ns2;  /* exported by init_c() */
 IdList* nl1;  /* exported by init_c() */
 IdList* nl2;  /* exported by init_c() */
@@ -2077,29 +2270,30 @@ int id_dce_keep(int i, int n) {
 }
 
 void id_guarded_emit(int argc, IdList* argv) {
-    int fp_mode;
     id_check_asm_targets(argc, argv);
-    fp_mode = id_arg_flag(argc, argv, 1, "--fingerprints");
-    id_guarded_emit_tail(argc, argv, fp_mode);
+    id_guarded_emit_tail(argc, argv);
     return;
 }
 
-void id_guarded_emit_tail(int argc, IdList* argv, int fp_mode) {
+void id_guarded_emit_tail(int argc, IdList* argv) {
+    int fp_mode;
+    fp_mode = id_arg_flag(argc, argv, 1, "--fingerprints");
     if ((fp_mode == 1)) {
         id_print_fingerprints();
     }
     if (((fp_mode == 0) && (id_check_failed() == 0))) {
-        id_guarded_prune();
         id_init_tyc();
-        id_emit(argc, argv);
+        id_emit_all(argc, argv);
     }
     return;
 }
 
-void id_guarded_prune(void) {
+void id_emit_all(int argc, IdList* argv) {
+    id_emit_tests_maybe(argc, argv);
     if ((id_is_freestanding() == 0)) {
         id_dce_prune();
     }
+    id_emit(argc, argv);
     return;
 }
 
@@ -2275,6 +2469,102 @@ char* id_arg_target(int argc, IdList* argv, int i, char* t) {
         s = id_arg_target(argc, argv, (i + 1), t);
     }
     return s;
+}
+
+void id_emit_test_kept(char* triple) {
+    IdList* pkeep;
+    IdList* rkeep;
+    pkeep = id_list_lit(0);
+    rkeep = id_list_lit(0);
+    id_test_kept(triple, pkeep, rkeep);
+    return;
+}
+
+void id_test_kept(char* triple, IdList* pkeep, IdList* rkeep) {
+    id_test_narrow(pkeep, rkeep);
+    id_emit_test_unit(triple);
+    id_test_widen(pkeep, rkeep);
+    return;
+}
+
+void id_test_narrow(IdList* pkeep, IdList* rkeep) {
+    id_keep_ints(prog, pkeep);
+    id_keep_strs(rfn, rkeep);
+    id_test_reach();
+    return;
+}
+
+void id_clear_strs(IdList* names) {
+    while ((id_list_len(names) > 0)) {
+        (char*)(intptr_t)(id_list_pop(names));
+    }
+    return;
+}
+
+void id_keep_ints(IdList* ints, IdList* onto) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(ints))) {
+        id_list_push(onto, (long long)((int)(id_list_get(ints, i))));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_keep_strs(IdList* strs, IdList* names) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(strs))) {
+        id_list_push(names, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(strs, i))));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_seed_cases(void) {
+    int ci;
+    char* s1_of_v;
+    ci = 0;
+    while ((ci < id_list_len(casefn))) {
+        s1_of_v = id_s1_of((int)(id_list_get(casefn, ci)));
+        id_reach_add(s1_of_v);
+        ci = (ci + 1);
+    }
+    return;
+}
+
+void id_test_widen(IdList* pkeep, IdList* rkeep) {
+    id_pred_wipe(prog);
+    id_keep_ints(pkeep, prog);
+    id_test_widen2(rkeep);
+    return;
+}
+
+void id_test_widen2(IdList* rkeep) {
+    id_clear_strs(rfn);
+    id_keep_strs(rkeep, rfn);
+    id_lset(dphase, 0, 1);
+    return;
+}
+
+void id_test_reach(void) {
+    id_lset(dphase, 0, 0);
+    id_seed_tested();
+    id_test_reach_tail();
+    return;
+}
+
+void id_test_reach_tail(void) {
+    id_reach_mark();
+    id_dce_pack(0, 0);
+    return;
+}
+
+void id_seed_tested(void) {
+    id_clear_strs(rfn);
+    id_list_push(rfn, (long long)(intptr_t)("conf.id"));
+    id_seed_cases();
+    return;
 }
 
 int id_lw_expr(int node) {
@@ -6260,8 +6550,14 @@ void id_emit_while(int id, char* ind) {
 }
 
 void id_emit_while_head(int id, char* ind, char* emit_expr_v) {
-    IdList* l1_of_v;
     id_emit_line(id_concat(id_concat(id_concat(ind, "while ("), emit_expr_v), ") {"));
+    id_emit_while_body(id, ind);
+    return;
+}
+
+void id_emit_while_body(int id, char* ind) {
+    IdList* l1_of_v;
+    id_emit_count(id_concat(ind, "    "));
     l1_of_v = id_l1_of(id);
     id_emit_body_close(l1_of_v, ind);
     return;
@@ -6573,6 +6869,177 @@ char* id_c_scalar(char* t) {
     return ct;
 }
 
+void id_emit_tc_helpers(void) {
+    id_tc_types_init();
+    id_tc_collect();
+    id_tc_emit_types();
+    return;
+}
+
+void id_tc_emit_types(void) {
+    id_emit_ty_protos();
+    id_emit_ty_bodies();
+    return;
+}
+
+void id_tc_collect(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        id_tc_collect_case(ci);
+        ci = (ci + 1);
+    }
+    return;
+}
+
+void id_emit_ty_proto(char* ty) {
+    char* key;
+    key = id_tc_key(ty);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat("static int idtc_eq_", key), "(IdList* a, IdList* b);\nstatic void idtc_show_"), key), "(IdList* a);"));
+    return;
+}
+
+void id_emit_ty_bodies(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(tctys))) {
+        id_emit_ty_body((char*)(intptr_t)(id_list_get(tctys, i)));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_emit_ty_body(char* ty) {
+    char* key;
+    char* et;
+    key = id_tc_key(ty);
+    et = id_list_elem(ty);
+    id_emit_ty_body2(key, et);
+    return;
+}
+
+void id_emit_ty_body2(char* key, char* et) {
+    id_emit_eq_body(key, et);
+    id_emit_show_body(key, et);
+    return;
+}
+
+char* id_eq_cond(char* et) {
+    char* ga;
+    char* gb;
+    char* so;
+    ga = id_unbox("a->data[i]", et);
+    gb = id_unbox("b->data[i]", et);
+    so = id_tc_compare(ga, gb, et);
+    return so;
+}
+
+void id_emit_eq_body(char* key, char* et) {
+    char* cmp;
+    cmp = id_eq_cond(et);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat("static int idtc_eq_", key), "(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!"), cmp), ") return 0;\n    return 1;\n}"));
+    return;
+}
+
+char* id_key_at(char* t, int i) {
+    int ch;
+    char* so;
+    ch = id_charat(t, i);
+    so = id_key_code(ch);
+    return so;
+}
+
+char* id_key_code(int ch) {
+    char* so;
+    so = id_chr(ch);
+    if ((ch == 91)) {
+        so = "_l";
+    } else if ((ch == 93)) {
+        so = "";
+    }
+    return so;
+}
+
+void id_emit_show_body(char* key, char* et) {
+    char* ga;
+    char* sh;
+    ga = id_unbox("a->data[i]", et);
+    sh = id_tc_show(ga, et);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat("static void idtc_show_", key), "(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        "), sh), "\n    }\n    fputs(\"]\", stderr);\n}"));
+    return;
+}
+
+char* id_tc_key(char* type) {
+    char* et;
+    char* so;
+    et = id_list_elem(type);
+    so = id_key_text(et);
+    return so;
+}
+
+char* id_key_text(char* t) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_len(t))) {
+        out = id_concat(out, id_key_at(t, i));
+        i = (i + 1);
+    }
+    return out;
+}
+
+void id_note_one(char* ty) {
+    if ((id_find_str(tctys, ty) < 0)) {
+        id_list_push(tctys, (long long)(intptr_t)(ty));
+    }
+    return;
+}
+
+void id_tc_types_init(void) {
+    tctys = id_list_lit(0);
+    return;
+}
+
+void id_emit_ty_protos(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(tctys))) {
+        id_emit_ty_proto((char*)(intptr_t)(id_list_get(tctys, i)));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_tc_collect_case(int ci) {
+    int fn;
+    IdList* expd;
+    fn = (int)(id_list_get(casefn, ci));
+    expd = id_l2_of((int)(id_list_get(casenode, ci)));
+    id_tc_collect_expd(fn, expd);
+    return;
+}
+
+void id_tc_collect_expd(int fn, IdList* expd) {
+    int j;
+    char* pt;
+    j = 0;
+    while ((j < id_list_len(expd))) {
+        pt = id_chk_type(fn, j);
+        id_note_ty(pt);
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_note_ty(char* ty) {
+    while ((id_ty_is_list(ty) == 1)) {
+        id_note_one(ty);
+        ty = id_list_elem(ty);
+    }
+    return;
+}
+
 void id_init_tyc(void) {
     tyc = id_list_lit(0);
     id_init_tyc_rows();
@@ -6603,6 +7070,7 @@ void id_emit_def(int id) {
 
 void id_emit_def_body(int id) {
     id_hoist(id);
+    id_emit_count("    ");
     id_emit_tail(id);
     return;
 }
@@ -6884,6 +7352,685 @@ void id_emit_decls(void) {
     return;
 }
 
+void id_emit_case_args(int ci) {
+    IdList* ps;
+    IdList* args;
+    ps = id_l1_of((int)(id_list_get(casefn, ci)));
+    args = id_l1_of((int)(id_list_get(casenode, ci)));
+    id_emit_arg_lines(ps, args);
+    return;
+}
+
+void id_emit_arg_lines(IdList* ps, IdList* args) {
+    int j;
+    j = 0;
+    while ((j < id_list_len(args))) {
+        id_emit_arg_line(ps, args, j);
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_emit_arg_line(IdList* ps, IdList* args, int j) {
+    char* pt;
+    char* cv;
+    pt = id_s1_of((int)(id_list_get(ps, j)));
+    cv = id_tc_value((int)(id_list_get(args, j)), pt);
+    id_emit_tc_decl(pt, id_concat("idtc_a", id_str_of_int(j)), cv);
+    return;
+}
+
+void id_emit_cases(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        id_emit_case_fn(ci);
+        ci = (ci + 1);
+    }
+    return;
+}
+
+void id_emit_case_fn(int ci) {
+    id_emit_line(id_concat(id_concat("static int idtc_case_", id_str_of_int(ci)), "(int idtc_fd) {"));
+    id_emit_case_args(ci);
+    id_emit_case_run(ci);
+    return;
+}
+
+void id_emit_case_run(int ci) {
+    id_emit_line("    id_ctr_time = 0; id_ctr_mem = 0;");
+    id_emit_case_call(ci);
+    id_emit_case_judge(ci);
+    return;
+}
+
+void id_emit_case_call(int ci) {
+    int fn;
+    char* cargs;
+    fn = (int)(id_list_get(casefn, ci));
+    cargs = id_arg_names(fn);
+    id_emit_call_line(fn, cargs);
+    return;
+}
+
+void id_emit_call_line(int fn, char* cargs) {
+    char* f1;
+    char* rt;
+    f1 = id_s1_of(fn);
+    if ((strcmp(id_s2_of(fn), "void") == 0)) {
+        id_emit_line(id_concat(id_concat(id_concat(id_concat("    id_", f1), "("), cargs), ");"));
+    } else {
+        rt = id_s2_of(fn);
+        id_emit_ret_call(f1, rt, cargs);
+    }
+    return;
+}
+
+void id_emit_ret_call(char* f1, char* rt, char* cargs) {
+    char* ct;
+    ct = id_c_type(rt);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    ", ct), " idtc_got = id_"), f1), "("), cargs), ");"));
+    return;
+}
+
+void id_emit_tc_decl(char* pt, char* nm, char* cv) {
+    char* ct;
+    ct = id_c_type(pt);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    ", ct), " "), nm), " = "), cv), ";"));
+    return;
+}
+
+char* id_arg_names(int fn) {
+    int n;
+    char* out;
+    n = id_flat_arg_count(fn);
+    out = id_names_upto(n);
+    return out;
+}
+
+char* id_names_upto(int n) {
+    char* out;
+    int j;
+    out = "";
+    j = 0;
+    while ((j < n)) {
+        out = id_concat(id_concat(id_concat(out, id_sep_arg(j)), "idtc_a"), id_str_of_int(j));
+        j = (j + 1);
+    }
+    return out;
+}
+
+void id_emit_case_end(int ci) {
+    id_emit_case_fail(ci);
+    id_emit_line("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
+    return;
+}
+
+void id_emit_case_fail(int ci) {
+    int fn;
+    IdList* expd;
+    fn = (int)(id_list_get(casefn, ci));
+    expd = id_l2_of((int)(id_list_get(casenode, ci)));
+    id_emit_fail_lines(ci, fn, expd);
+    return;
+}
+
+void id_emit_fail_lines(int ci, int fn, IdList* expd) {
+    char* cnd;
+    cnd = id_case_cond(fn, expd);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    if (!(", cnd), ")) {\n        fprintf(stderr, \"%s: test failed: %s = \", idtc_where["), id_str_of_int(ci)), "], idtc_call["), id_str_of_int(ci)), "]);"));
+    id_emit_fail_show(fn, expd);
+    return;
+}
+
+char* id_case_cond(int fn, IdList* expd) {
+    char* cnd;
+    cnd = "1";
+    if ((id_list_len(expd) > 0)) {
+        cnd = id_cond_parts(fn, expd);
+    }
+    return cnd;
+}
+
+char* id_cond_parts(int fn, IdList* expd) {
+    char* out;
+    int j;
+    out = "";
+    j = 0;
+    while ((j < id_list_len(expd))) {
+        out = id_concat(id_concat(out, id_and_sep(j)), id_cond_part(fn, j));
+        j = (j + 1);
+    }
+    return out;
+}
+
+char* id_cond_part(int fn, int j) {
+    char* nm;
+    char* pt;
+    char* so;
+    nm = id_chk_name(fn, j);
+    pt = id_chk_type(fn, j);
+    so = id_tc_compare(nm, id_concat("idtc_e", id_str_of_int(j)), pt);
+    return so;
+}
+
+char* id_show_part(int fn, int j) {
+    char* nm;
+    char* pt;
+    char* so;
+    nm = id_chk_name(fn, j);
+    pt = id_chk_type(fn, j);
+    so = id_concat(id_show_sep(j), id_tc_show(nm, pt));
+    return so;
+}
+
+char* id_show_sep(int j) {
+    char* so;
+    so = "";
+    if ((j > 0)) {
+        so = "fputs(\", \", stderr); ";
+    }
+    return so;
+}
+
+char* id_exp_tail(IdList* expd) {
+    char* et;
+    char* so;
+    et = id_items_text(expd);
+    if ((id_list_len(expd) != 1)) {
+        et = id_concat(id_concat("(", et), ")");
+    }
+    so = id_c_esc(id_concat(id_concat(", expected ", et), "\n"));
+    return so;
+}
+
+char* id_and_sep(int j) {
+    char* so;
+    so = "";
+    if ((j > 0)) {
+        so = " && ";
+    }
+    return so;
+}
+
+void id_emit_fail_show(int fn, IdList* expd) {
+    char* shows;
+    char* tail;
+    shows = id_show_all(fn, expd);
+    tail = id_exp_tail(expd);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat("        ", shows), "\n        fputs(\""), tail), "\", stderr);\n        return 3;\n    }"));
+    return;
+}
+
+char* id_show_all(int fn, IdList* expd) {
+    char* so;
+    so = id_show_parts(fn, expd);
+    if ((id_list_len(expd) != 1)) {
+        so = id_concat(id_concat("fputs(\"(\", stderr); ", so), " fputs(\")\", stderr);");
+    }
+    return so;
+}
+
+char* id_show_parts(int fn, IdList* expd) {
+    char* out;
+    int j;
+    out = "";
+    j = 0;
+    while ((j < id_list_len(expd))) {
+        out = id_concat(out, id_show_part(fn, j));
+        j = (j + 1);
+    }
+    return out;
+}
+
+void id_emit_case_judge(int ci) {
+    id_emit_line("    long long idtc_cnt[2] = { id_ctr_time, id_ctr_mem };");
+    id_emit_case_expd(ci);
+    id_emit_case_end(ci);
+    return;
+}
+
+void id_emit_case_expd(int ci) {
+    int fn;
+    IdList* expd;
+    fn = (int)(id_list_get(casefn, ci));
+    expd = id_l2_of((int)(id_list_get(casenode, ci)));
+    id_emit_expd_decls(fn, expd);
+    return;
+}
+
+void id_emit_expd_decls(int fn, IdList* expd) {
+    int j;
+    j = 0;
+    while ((j < id_list_len(expd))) {
+        id_emit_expd_decl(fn, expd, j);
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_emit_expd_decl(int fn, IdList* expd, int j) {
+    char* pt;
+    char* cv;
+    pt = id_chk_type(fn, j);
+    cv = id_tc_value((int)(id_list_get(expd, j)), pt);
+    id_emit_tc_decl(pt, id_concat("idtc_e", id_str_of_int(j)), cv);
+    return;
+}
+
+char* id_chk_name(int fn, int j) {
+    char* nm;
+    nm = "idtc_got";
+    if ((strcmp(id_s2_of(fn), "void") == 0)) {
+        nm = id_concat("idtc_a", id_str_of_int(j));
+    }
+    return nm;
+}
+
+char* id_chk_type(int fn, int j) {
+    char* pt;
+    IdList* ps;
+    pt = id_s2_of(fn);
+    if ((strcmp(pt, "void") == 0)) {
+        ps = id_l1_of(fn);
+        pt = id_s1_of((int)(id_list_get(ps, j)));
+    }
+    return pt;
+}
+
+void id_emit_tc_claims(void) {
+    id_emit_line("static int idtc_claims(void) {\n    int bad = 0;");
+    id_claim_body();
+    id_emit_line("    return bad;\n}");
+    return;
+}
+
+void id_claim_body(void) {
+    id_claim_sizes();
+    id_claim_all();
+    return;
+}
+
+void id_claim_sizes(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        id_size_row(ci);
+        ci = (ci + 1);
+    }
+    return;
+}
+
+int id_claim_of(int j, int ci) {
+    int r;
+    r = 0;
+    if (((int)(id_list_get(conscase, j)) == ci)) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_claim_all(void) {
+    int c;
+    c = 0;
+    while ((c < id_list_len(conscase))) {
+        id_claim_at(c);
+        c = (c + 1);
+    }
+    return;
+}
+
+void id_claim_at(int c) {
+    if ((id_first_claim(c) == 1)) {
+        id_emit_claim(c);
+    }
+    return;
+}
+
+int id_first_claim(int c) {
+    int r;
+    int j;
+    r = 1;
+    j = 0;
+    while ((j < c)) {
+        r = (r * (1 - id_same_claim(j, c)));
+        j = (j + 1);
+    }
+    return r;
+}
+
+int id_same_claim(int j, int c) {
+    int r;
+    r = 0;
+    if (((((int)(id_list_get(casefn, (int)(id_list_get(conscase, j)))) == (int)(id_list_get(casefn, (int)(id_list_get(conscase, c))))) && (strcmp((char*)(intptr_t)(id_list_get(conskind, j)), (char*)(intptr_t)(id_list_get(conskind, c))) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(consbound, j)), (char*)(intptr_t)(id_list_get(consbound, c))) == 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_emit_claim(int c) {
+    char* grp;
+    int gn;
+    grp = id_claim_group(c);
+    gn = id_claim_count(c);
+    id_emit_claim_line(c, grp, gn);
+    return;
+}
+
+void id_emit_claim_line(int c, char* grp, int gn) {
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    bad |= idtc_claim((int[]){", grp), "}, "), id_str_of_int(gn)), ", \""), (char*)(intptr_t)(id_list_get(conskind, c))), "\", \""), (char*)(intptr_t)(id_list_get(consbound, c))), "\");"));
+    return;
+}
+
+char* id_claim_group(int c) {
+    char* out;
+    int ci;
+    out = "";
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        out = id_concat(out, id_group_item(out, ci, c));
+        ci = (ci + 1);
+    }
+    return out;
+}
+
+char* id_group_item(char* out, int ci, int c) {
+    char* so;
+    so = "";
+    if ((id_carries(ci, c) > 0)) {
+        so = id_concat(id_group_sep(out), id_str_of_int(ci));
+    }
+    return so;
+}
+
+char* id_group_sep(char* out) {
+    char* so;
+    so = ", ";
+    if ((strcmp(out, "") == 0)) {
+        so = "";
+    }
+    return so;
+}
+
+int id_claim_count(int c) {
+    int n;
+    int ci;
+    n = 0;
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        n = (n + id_carries(ci, c));
+        ci = (ci + 1);
+    }
+    return n;
+}
+
+int id_carries(int ci, int c) {
+    int r;
+    r = 0;
+    if ((((int)(id_list_get(casefn, ci)) == (int)(id_list_get(casefn, (int)(id_list_get(conscase, c))))) && (id_has_claim(ci, c) > 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+int id_has_claim(int ci, int c) {
+    int r;
+    int j;
+    r = 0;
+    j = 0;
+    while ((j < id_list_len(conscase))) {
+        r = (r + id_claim_hit(j, ci, c));
+        j = (j + 1);
+    }
+    return r;
+}
+
+int id_claim_hit(int j, int ci, int c) {
+    int r;
+    r = 0;
+    if (((((int)(id_list_get(conscase, j)) == ci) && (strcmp((char*)(intptr_t)(id_list_get(conskind, j)), (char*)(intptr_t)(id_list_get(conskind, c))) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(consbound, j)), (char*)(intptr_t)(id_list_get(consbound, c))) == 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_size_row(int ci) {
+    char* sz;
+    if ((id_case_claims(ci) > 0)) {
+        sz = id_case_size(ci);
+        id_emit_line(id_concat(id_concat(id_concat(id_concat("    idtc_n[", id_str_of_int(ci)), "] = "), sz), ";"));
+    }
+    return;
+}
+
+char* id_case_size(int ci) {
+    IdList* args;
+    char* so;
+    args = id_l1_of((int)(id_list_get(casenode, ci)));
+    so = "0";
+    if ((id_list_len(args) > 0)) {
+        so = id_sizes_c(args);
+    }
+    return so;
+}
+
+int id_case_claims(int ci) {
+    int r;
+    int j;
+    r = 0;
+    j = 0;
+    while ((j < id_list_len(conscase))) {
+        r = (r + id_claim_of(j, ci));
+        j = (j + 1);
+    }
+    return r;
+}
+
+char* id_call_c(char* f1, IdList* args) {
+    char* it;
+    char* so;
+    it = id_items_text(args);
+    so = id_c_esc(id_concat(id_concat(id_concat(f1, "("), it), ")"));
+    return so;
+}
+
+int id_case_fidx(int ci) {
+    int n;
+    int j;
+    n = 0;
+    j = 0;
+    while ((j < ci)) {
+        n = (n + id_case_same(j, ci));
+        j = (j + 1);
+    }
+    return n;
+}
+
+int id_case_same(int j, int ci) {
+    int r;
+    r = 0;
+    if (((int)(id_list_get(casefn, j)) == (int)(id_list_get(casefn, ci)))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_emit_setup_line(int ci, char* cw, char* cc) {
+    char* f1;
+    int fx;
+    f1 = id_s1_of((int)(id_list_get(casefn, ci)));
+    fx = id_case_fidx(ci);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    idtc_where[", id_str_of_int(ci)), "] = \""), cw), "\"; idtc_call["), id_str_of_int(ci)), "] = \""), cc), "\"; idtc_fn["), id_str_of_int(ci)), "] = \""), f1), "\"; idtc_fidx["), id_str_of_int(ci)), "] = "), id_str_of_int(fx)), "; idtc_case["), id_str_of_int(ci)), "] = idtc_case_"), id_str_of_int(ci)), ";"));
+    return;
+}
+
+char* id_case_where_c(int ci) {
+    char* case_loc_v;
+    char* so;
+    case_loc_v = id_case_loc(ci);
+    so = id_c_esc(case_loc_v);
+    return so;
+}
+
+char* id_case_call_c(int ci) {
+    char* f1;
+    IdList* args;
+    char* so;
+    f1 = id_s1_of((int)(id_list_get(casefn, ci)));
+    args = id_l1_of((int)(id_list_get(casenode, ci)));
+    so = id_call_c(f1, args);
+    return so;
+}
+
+void id_emit_tc_setup(void) {
+    id_emit_line("static void idtc_setup(void) {");
+    id_setup_rows();
+    id_emit_line("}");
+    return;
+}
+
+void id_setup_rows(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        id_setup_row(ci);
+        ci = (ci + 1);
+    }
+    return;
+}
+
+void id_setup_row(int ci) {
+    char* cw;
+    char* cc;
+    cw = id_case_where_c(ci);
+    cc = id_case_call_c(ci);
+    id_emit_setup_line(ci, cw, cc);
+    return;
+}
+
+void id_harn_init(void) {
+    harn = id_list_lit(1, (long long)(0));
+    return;
+}
+
+void id_harn_set(int v) {
+    id_lset(harn, 0, v);
+    return;
+}
+
+int id_is_harn(void) {
+    int ret_i;
+    ret_i = (int)(id_list_get(harn, 0));
+    return ret_i;
+}
+
+void id_emit_count(char* ind) {
+    if ((id_is_harn() == 1)) {
+        id_emit_line(id_concat(ind, "id_ctr_time++;"));
+    }
+    return;
+}
+
+void id_emit_count_prelude(void) {
+    id_emit_line("/* test harness (idc) -- the runtime below is counted */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_mem_of_str idtc_rt_mem_of_str");
+    return;
+}
+
+void id_emit_count_postlude(void) {
+    id_emit_line("#undef id_len\n#undef id_mem_of_str\nstatic int id_len(const char* s) { return (int)strlen(s); }\nstatic long long id_mem_of_str(const char* s) {\n    long long t = id_ctr_time;\n    long long a = idtc_rt_mem_of_str(s);\n    id_ctr_time = t;\n    return a;\n}\n#undef malloc\n#undef realloc\n#undef strlen");
+    return;
+}
+
+void id_emit_test_body(char* triple) {
+    id_emit_asm_then_main(triple);
+    id_harn_set(0);
+    id_emit_test_tail();
+    return;
+}
+
+void id_emit_test_head(void) {
+    id_emit_count_prelude();
+    id_emit_runtime();
+    id_emit_test_decls();
+    return;
+}
+
+void id_emit_test_decls(void) {
+    id_emit_count_postlude();
+    id_emit_line("");
+    id_emit_decls();
+    return;
+}
+
+void id_emit_tc_judge(void) {
+    id_emit_line("static long long idtc_max_of(const long long* v, int count) {\n    long long m = v[0];\n    for (int i = 1; i < count; i++) if (v[i] > m) m = v[i];\n    return m;\n}\nstatic double idtc_growth(const char* bound, long long n) {\n    double x = (double)(n < 1 ? 1 : n);\n    double lg = log2(x < 2 ? 2 : x);\n    if (strcmp(bound, \"O(1)\") == 0) return 1.0;\n    if (strcmp(bound, \"O(log n)\") == 0) return lg;\n    if (strcmp(bound, \"O(n)\") == 0) return x;\n    if (strcmp(bound, \"O(n log n)\") == 0) return x * lg;\n    return x * x;\n}\nstatic int idtc_claim(const int* g, int count, const char* kind, const char* bound) {\n    int lo = 0, hi = 0, spread = 0;\n    const long long* col = strcmp(kind, \"time\") == 0 ? idtc_t : idtc_m;\n    for (int i = 1; i < count; i++) {\n        if (idtc_n[g[i]] != idtc_n[g[0]]) spread = 1;\n        if (idtc_n[g[i]] < idtc_n[g[lo]]) lo = i;\n        if (idtc_n[g[i]] >= idtc_n[g[hi]]) hi = i;\n    }\n    if (!spread) {\n        fprintf(stderr, \"%s: error: [%s:%s] needs a second case with a different input size to compare against\\n\", idtc_where[g[0]], kind, bound);\n        return 1;\n    }\n    long long c1 = col[g[lo]], c2 = col[g[hi]], n1 = idtc_n[g[lo]], n2 = idtc_n[g[hi]];\n    double allowed = (double)(c1 > 1 ? c1 : 1) * idtc_growth(bound, n2) / idtc_growth(bound, n1) * 4;\n    if ((double)c2 <= allowed) return 0;\n    fprintf(stderr, \"%s: error: [%s:%s] does not hold for '%s': %s is %lld at n=%lld and %lld at n=%lld, where %s allows at most %lld\\n\", idtc_where[g[hi]], kind, bound, idtc_fn[g[0]], kind, c1, n1, c2, n2, bound, (long long)allowed);\n    return 1;\n}\nstatic void idtc_counts(const char* path) {\n    FILE* f = fopen(path, \"w\");\n    if (!f) return;\n    for (int k = 0; k < IDTC_N; k++) fprintf(f, \"%s %d %lld %lld\\n\", idtc_fn[k], idtc_fidx[k], idtc_t[k], idtc_m[k]);\n    fclose(f);\n}\nint main(int argc, char** argv) {\n    int bad = 0;\n    idtc_setup();\n    for (int k = 0; k < IDTC_N; k++) bad |= idtc_one(k);\n    if (bad) return 1;\n    if (argc > 1) idtc_counts(argv[1]);\n    return idtc_claims();\n}");
+    return;
+}
+
+void id_emit_tc_rest(void) {
+    id_emit_cases();
+    id_emit_tc_setup();
+    id_emit_tc_claims();
+    return;
+}
+
+void id_emit_tc_support(void) {
+    id_emit_tc_proc();
+    id_emit_tc_one();
+    id_emit_tc_judge();
+    return;
+}
+
+void id_emit_tc_one(void) {
+    id_emit_line("static int idtc_one(int k) {\n    int err[2], cnt[2], st = 0;\n    char msg[4096], chunk[512];\n    size_t used = 0;\n    ssize_t r;\n    long long c[2] = {0, 0};\n    pid_t pid;\n    if (pipe(err) != 0 || pipe(cnt) != 0) { perror(\"idc: test harness\"); return 1; }\n    fflush(NULL);\n    pid = fork();\n    if (pid < 0) { perror(\"idc: test harness\"); return 1; }\n    if (pid == 0) {\n        close(err[0]);\n        close(cnt[0]);\n        dup2(err[1], 2);\n        idtc_limit();\n        exit(idtc_case[k](cnt[1]));\n    }\n    close(err[1]);\n    close(cnt[1]);\n    while ((r = read(err[0], chunk, sizeof chunk)) != 0) {\n        if (r < 0 && errno == EINTR) continue;\n        if (r < 0) break;\n        if ((size_t)r > sizeof msg - 1 - used) r = (ssize_t)(sizeof msg - 1 - used);\n        memcpy(msg + used, chunk, (size_t)r);\n        used += (size_t)r;\n    }\n    msg[used] = '\\0';\n    r = read(cnt[0], c, sizeof c);\n    close(err[0]);\n    close(cnt[0]);\n    while (waitpid(pid, &st, 0) < 0) {\n        if (errno != EINTR) { perror(\"idc: test harness\"); return 1; }\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 0 && r == (ssize_t)sizeof c) {\n        idtc_t[k] = c[0];\n        idtc_m[k] = c[1];\n        return 0;\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 3) {\n        fputs(msg, stderr);\n        return 1;\n    }\n    idtc_report(k, st, msg);\n    return 1;\n}");
+    return;
+}
+
+void id_emit_test_tail(void) {
+    id_emit_tc_run();
+    id_emit_tc_helpers();
+    id_emit_tc_rest();
+    return;
+}
+
+void id_emit_tc_run(void) {
+    int n;
+    n = id_list_len(casefn);
+    id_emit_line(id_concat("#define IDTC_N ", id_str_of_int(n)));
+    id_emit_tc_support();
+    return;
+}
+
+void id_emit_tc_proc(void) {
+    id_emit_line("static const char* idtc_where[IDTC_N];\nstatic const char* idtc_call[IDTC_N];\nstatic const char* idtc_fn[IDTC_N];\nstatic int idtc_fidx[IDTC_N];\nstatic int (*idtc_case[IDTC_N])(int);\nstatic long long idtc_t[IDTC_N];\nstatic long long idtc_m[IDTC_N];\nstatic long long idtc_n[IDTC_N];\nstatic void idtc_setup(void);\nstatic int idtc_claims(void);\n#define IDTC_SECONDS 10\n#define IDTC_MEMORY ((rlim_t)1 << 30)\nstatic void idtc_limit(void) {\n    struct rlimit rl;\n    alarm(IDTC_SECONDS);\n    if (getrlimit(RLIMIT_AS, &rl) == 0 && (rl.rlim_max == RLIM_INFINITY || rl.rlim_max > IDTC_MEMORY)) {\n        rl.rlim_cur = IDTC_MEMORY;\n        setrlimit(RLIMIT_AS, &rl);\n    }\n}\nstatic void idtc_report(int k, int st, char* msg) {\n    size_t n = strlen(msg);\n    while (n > 0 && msg[n - 1] == '\\n') msg[--n] = '\\0';\n    fprintf(stderr, \"%s: test failed: %s \", idtc_where[k], idtc_call[k]);\n    if (WIFSIGNALED(st) && WTERMSIG(st) == SIGALRM)\n        fprintf(stderr, \"did not finish within %d seconds\\n\", IDTC_SECONDS);\n    else if (WIFSIGNALED(st))\n        fprintf(stderr, \"was killed by signal %d (%s)\\n\", WTERMSIG(st), strsignal(WTERMSIG(st)));\n    else if (n > 0 && strstr(msg, \"out of memory\"))\n        fprintf(stderr, \"trapped: %s (a case may use at most %d MiB)\\n\", msg, (int)(IDTC_MEMORY >> 20));\n    else if (n > 0)\n        fprintf(stderr, \"trapped: %s\\n\", msg);\n    else\n        fprintf(stderr, \"exited with status %d\\n\", WEXITSTATUS(st));\n}");
+    return;
+}
+
+void id_emit_tests_maybe(int argc, IdList* argv) {
+    char* arg_triple_v;
+    id_harn_init();
+    if ((id_arg_flag(argc, argv, 1, "--harness") == 1)) {
+        arg_triple_v = id_arg_triple(argc, argv);
+        id_emit_tests(arg_triple_v);
+    }
+    return;
+}
+
+void id_emit_tests(char* triple) {
+    if ((id_list_len(casefn) > 0)) {
+        id_emit_test_kept(triple);
+    }
+    id_emit_line("/* ---- end of test harness ---- */");
+    return;
+}
+
+void id_emit_test_unit(char* triple) {
+    id_harn_set(1);
+    id_emit_test_head();
+    id_emit_test_body(triple);
+    return;
+}
+
 char* id_arr_cells(IdList* elems, char* etyp) {
     char* out;
     int i;
@@ -7077,6 +8224,198 @@ int id_is_syscall(char* name) {
         ok = 1;
     }
     return ok;
+}
+
+char* id_tc_cells(IdList* xs, char* et) {
+    char* out;
+    int i;
+    char* cv;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(xs))) {
+        cv = id_tc_value((int)(id_list_get(xs, i)), et);
+        out = id_concat(id_concat(out, id_sep_arg(i)), id_box(cv, et));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_tc_scalar(int e) {
+    char* so;
+    so = id_int_code(e);
+    if ((strcmp(id_k_of(e), "un") == 0)) {
+        so = id_tc_neg(e);
+    }
+    return so;
+}
+
+char* id_tc_neg(int e) {
+    int i1_of_v;
+    char* so;
+    i1_of_v = id_i1_of(e);
+    so = id_concat("-", id_int_code(i1_of_v));
+    return so;
+}
+
+char* id_tc_compare(char* ga, char* gb, char* type) {
+    char* so;
+    char* key;
+    so = id_concat(id_concat(id_concat(id_concat("(", ga), " == "), gb), ")");
+    if ((strcmp(type, "string") == 0)) {
+        so = id_concat(id_concat(id_concat(id_concat("(strcmp(", ga), ", "), gb), ") == 0)");
+    } else if ((id_ty_is_list(type) == 1)) {
+        key = id_tc_key(type);
+        so = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("idtc_eq_", key), "("), ga), ", "), gb), ")");
+    }
+    return so;
+}
+
+char* id_tc_show(char* code, char* type) {
+    char* so;
+    char* key;
+    so = id_show_scalar(code, type);
+    if ((id_ty_is_list(type) == 1)) {
+        key = id_tc_key(type);
+        so = id_concat(id_concat(id_concat(id_concat("idtc_show_", key), "("), code), ");");
+    }
+    return so;
+}
+
+char* id_show_scalar(char* code, char* type) {
+    char* so;
+    so = id_concat(id_concat("fprintf(stderr, \"%d\", ", code), ");");
+    if ((strcmp(type, "string") == 0)) {
+        so = id_concat(id_concat("fprintf(stderr, \"\\\"%s\\\"\", ", code), ");");
+    } else if (((strcmp(type, "float") == 0) || (strcmp(type, "word") == 0))) {
+        so = id_show_num(code, type);
+    }
+    return so;
+}
+
+char* id_c_esc(char* t) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_len(t))) {
+        out = id_concat(out, id_esc_at(t, i));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_esc_at(char* t, int i) {
+    int ch;
+    char* so;
+    ch = id_charat(t, i);
+    so = id_esc_code(ch);
+    return so;
+}
+
+char* id_esc_code(int ch) {
+    char* so;
+    so = id_chr(ch);
+    if (((ch == 92) || (ch == 34))) {
+        so = id_concat("\\", so);
+    } else if ((ch == 10)) {
+        so = "\\n";
+    }
+    return so;
+}
+
+char* id_show_num(char* code, char* type) {
+    char* so;
+    so = id_concat(id_concat("fprintf(stderr, \"%lld\", ", code), ");");
+    if ((strcmp(type, "float") == 0)) {
+        so = id_concat(id_concat("fprintf(stderr, \"%g\", ", code), ");");
+    }
+    return so;
+}
+
+char* id_size_list(IdList* args) {
+    char* out;
+    int j;
+    out = "";
+    j = 0;
+    while ((j < id_list_len(args))) {
+        out = id_concat(id_concat(out, id_sep_arg(j)), id_tc_size((int)(id_list_get(args, j))));
+        j = (j + 1);
+    }
+    return out;
+}
+
+char* id_sizes_c(IdList* args) {
+    char* parts;
+    char* so;
+    parts = id_size_list(args);
+    so = id_concat(id_concat(id_concat(id_concat("idtc_max_of((long long[]){", parts), "}, "), id_str_of_int(id_list_len(args))), ")");
+    return so;
+}
+
+char* id_tc_size(int e) {
+    char* so;
+    IdList* xs;
+    so = id_size_leaf(e);
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        xs = id_l1_of(e);
+        so = id_concat("", id_str_of_int(id_list_len(xs)));
+    } else if ((strcmp(id_k_of(e), "un") == 0)) {
+        so = id_size_neg(e);
+    }
+    return so;
+}
+
+char* id_size_leaf(int e) {
+    char* so;
+    char* int_code_v;
+    so = "0";
+    if ((strcmp(id_k_of(e), "int") == 0)) {
+        int_code_v = id_int_code(e);
+        so = id_concat(id_concat("(long long)(", int_code_v), ")");
+    } else if ((strcmp(id_k_of(e), "str") == 0)) {
+        so = id_concat(id_concat("(long long)(sizeof(", id_s1_of(e)), ") - 1)");
+    }
+    return so;
+}
+
+char* id_size_neg(int e) {
+    int i1_of_v;
+    char* so;
+    i1_of_v = id_i1_of(e);
+    so = id_concat("-", id_size_leaf(i1_of_v));
+    return so;
+}
+
+char* id_tc_value(int e, char* want) {
+    char* so;
+    so = "";
+    if ((id_ty_is_list(want) == 1)) {
+        so = id_tc_list(e, want);
+    } else {
+        so = id_tc_scalar(e);
+    }
+    return so;
+}
+
+char* id_tc_list(int e, char* want) {
+    IdList* xs;
+    char* et;
+    char* so;
+    xs = id_l1_of(e);
+    et = id_list_elem(want);
+    so = id_tc_list_n(xs, et);
+    return so;
+}
+
+char* id_tc_list_n(IdList* xs, char* et) {
+    char* so;
+    char* cells;
+    so = "id_list_lit(0)";
+    if ((id_list_len(xs) > 0)) {
+        cells = id_tc_cells(xs, et);
+        so = id_concat(id_concat(id_concat(id_concat("id_list_lit(", id_str_of_int(id_list_len(xs))), ", "), cells), ")");
+    }
+    return so;
 }
 
 char* id_box(char* code, char* type) {
@@ -8290,61 +9629,310 @@ int id_take_cases(IdList* pos) {
 }
 
 void id_push_case(IdList* pos) {
-    id_list_push(casestart, (long long)((int)(id_list_get(pos, 0))));
-    id_skip_case(pos);
-    id_end_case(pos);
+    int node;
+    node = id_parse_case(pos);
+    id_list_push(casenode, (long long)(node));
+    id_case_owner();
     return;
 }
 
-void id_end_case(IdList* pos) {
+void id_case_owner(void) {
     int len_v;
-    id_list_push(caseend, (long long)((int)(id_list_get(pos, 0))));
     len_v = id_list_len(prog);
     id_list_push(casefn, (long long)((int)(id_list_get(prog, (len_v - 1)))));
     return;
 }
 
-void id_skip_to_rbrack(IdList* pos) {
-    while (((strcmp(id_cur_text(pos), "]") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
+IdList* id_case_tuple(IdList* pos) {
+    IdList* items;
+    items = id_list_lit(0);
+    id_scan_tuple(pos, items);
+    return items;
+}
+
+void id_scan_tuple(IdList* pos, IdList* items) {
+    id_expect_text(pos, "(");
+    if ((strcmp(id_cur_text(pos), "(") == 0)) {
         id_advance(pos);
+        id_fill_tuple(pos, items);
     }
     return;
 }
 
-void id_skip_case(IdList* pos) {
-    id_skip_paren(pos);
-    id_advance(pos);
-    id_skip_case_rhs(pos);
-    return;
-}
-
-void id_skip_case_rhs(IdList* pos) {
-    id_skip_paren(pos);
-    id_skip_constraints(pos);
-    return;
-}
-
-void id_skip_paren(IdList* pos) {
-    id_advance(pos);
-    id_skip_to_close(pos);
-    id_advance(pos);
-    return;
-}
-
-void id_skip_to_close(IdList* pos) {
+void id_fill_tuple(IdList* pos, IdList* items) {
     while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
+        id_take_item(pos, items);
+        id_skip_comma(pos);
+    }
+    id_eat_close(pos);
+    return;
+}
+
+void id_take_item(IdList* pos, IdList* items) {
+    int v;
+    v = id_parse_expr(pos);
+    id_check_lit(v);
+    id_list_push(items, (long long)(v));
+    return;
+}
+
+void id_eat_colon(IdList* pos) {
+    id_expect_text(pos, ":");
+    if ((strcmp(id_cur_text(pos), ":") == 0)) {
         id_advance(pos);
     }
     return;
 }
 
-void id_skip_constraints(IdList* pos) {
+void id_eat_close(IdList* pos) {
+    id_expect_text(pos, ")");
+    id_advance(pos);
+    return;
+}
+
+void id_check_lit(int e) {
+    char* cur_file_v;
+    int ln;
+    if ((id_is_lit(e) == 0)) {
+        cur_file_v = id_cur_file();
+        ln = (int)(id_list_get(nline, e));
+        id_syn_err_tail(cur_file_v, ln, "a test case takes literals only (a number, a string, or a list of those)");
+    }
+    return;
+}
+
+int id_is_lit(int e) {
+    int r;
+    IdList* xs;
+    r = id_leaf_lit(e);
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        xs = id_l1_of(e);
+        r = id_all_lit(xs);
+    } else if ((strcmp(id_k_of(e), "un") == 0)) {
+        r = id_neg_lit(e);
+    }
+    return r;
+}
+
+int id_all_lit(IdList* xs) {
+    int r;
+    int i;
+    r = 1;
+    i = 0;
+    while ((i < id_list_len(xs))) {
+        r = (r * id_is_lit((int)(id_list_get(xs, i))));
+        i = (i + 1);
+    }
+    return r;
+}
+
+char* id_big_o(IdList* pos) {
+    char* bt;
+    char* ret_s;
+    bt = id_cur_text(pos);
+    id_advance(pos);
+    ret_s = id_bound_body(pos, bt);
+    return ret_s;
+}
+
+char* id_bound_body(IdList* pos, char* bt) {
+    char* so;
+    so = bt;
+    id_expect_text(pos, "(");
+    if ((strcmp(id_cur_text(pos), "(") == 0)) {
+        so = id_bound_inner(pos, bt);
+    }
+    return so;
+}
+
+char* id_bound_inner(IdList* pos, char* bt) {
+    char* parts;
+    char* ret_s;
+    id_advance(pos);
+    parts = id_bound_parts(pos);
+    ret_s = id_bound_close(pos, bt, parts);
+    return ret_s;
+}
+
+char* id_bound_close(IdList* pos, char* bt, char* parts) {
+    char* so;
+    id_eat_close(pos);
+    so = id_concat(id_concat(id_concat(bt, "("), parts), ")");
+    id_bound_check(pos, so);
+    return so;
+}
+
+void id_bound_check(IdList* pos, char* so) {
+    if ((id_bound_known(so) == 0)) {
+        id_syn_err(pos, id_concat(id_concat("unknown bound '", so), "'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2)"));
+    }
+    return;
+}
+
+int id_bound_known(char* so) {
+    int r;
+    r = 0;
+    if ((((((strcmp(so, "O(1)") == 0) || (strcmp(so, "O(log n)") == 0)) || (strcmp(so, "O(n)") == 0)) || (strcmp(so, "O(n log n)") == 0)) || (strcmp(so, "O(n^2)") == 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_cons_kind(IdList* pos, char* ck) {
+    if ((strcmp(id_cur_kind(pos), "ident") != 0)) {
+        id_syn_err(pos, id_concat(id_concat("expected 'time' or 'mem', found '", ck), "'"));
+    } else if (((strcmp(ck, "time") != 0) && (strcmp(ck, "mem") != 0))) {
+        id_syn_err(pos, id_concat(id_concat("unknown constraint '", ck), "'; a case constrains 'time' or 'mem'"));
+    }
+    return;
+}
+
+void id_init_cases(void) {
+    caseend = id_list_lit(0);
+    casenode = id_list_lit(0);
+    id_init_cases2();
+    return;
+}
+
+void id_init_cases2(void) {
+    conscase = id_list_lit(0);
+    conskind = id_list_lit(0);
+    consbound = id_list_lit(0);
+    return;
+}
+
+char* id_bound_parts(IdList* pos) {
+    char* out;
+    out = "";
+    while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
+        out = id_bound_step(pos, out);
+    }
+    return out;
+}
+
+char* id_bound_step(IdList* pos, char* out) {
+    char* t2;
+    char* so;
+    t2 = id_cur_text(pos);
+    so = id_concat(id_concat(out, id_bound_sep(out, t2)), t2);
+    id_advance(pos);
+    return so;
+}
+
+char* id_bound_sep(char* out, char* t2) {
+    char* gap;
+    int n;
+    gap = " ";
+    n = id_len(out);
+    if ((((n == 0) || (strcmp(t2, "^") == 0)) || (id_charat(out, (n - 1)) == 94))) {
+        gap = "";
+    }
+    return gap;
+}
+
+void id_case_cons(IdList* pos) {
     if ((strcmp(id_cur_text(pos), "[") == 0)) {
         id_advance(pos);
-        id_skip_to_rbrack(pos);
+        id_cons_list(pos);
         id_advance(pos);
     }
     return;
+}
+
+void id_cons_list(IdList* pos) {
+    id_cons_one(pos);
+    while ((strcmp(id_cur_text(pos), ",") == 0)) {
+        id_advance(pos);
+        id_cons_one(pos);
+    }
+    id_expect_text(pos, "]");
+    return;
+}
+
+void id_cons_one(IdList* pos) {
+    char* ck;
+    ck = id_cur_text(pos);
+    id_cons_kind(pos, ck);
+    id_cons_rest(pos, ck);
+    return;
+}
+
+void id_cons_rest(IdList* pos, char* ck) {
+    id_advance(pos);
+    id_eat_colon(pos);
+    id_cons_bound(pos, ck);
+    return;
+}
+
+void id_cons_bound(IdList* pos, char* ck) {
+    char* bt;
+    int n;
+    bt = id_big_o(pos);
+    n = id_list_len(casestart);
+    id_cons_push(n, ck, bt);
+    return;
+}
+
+void id_cons_push(int n, char* ck, char* bt) {
+    id_list_push(conscase, (long long)((n - 1)));
+    id_list_push(conskind, (long long)(intptr_t)(ck));
+    id_list_push(consbound, (long long)(intptr_t)(bt));
+    return;
+}
+
+int id_leaf_lit(int e) {
+    int r;
+    r = 0;
+    if ((((strcmp(id_k_of(e), "int") == 0) || (strcmp(id_k_of(e), "float") == 0)) || (strcmp(id_k_of(e), "str") == 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+int id_leaf_num(int e) {
+    int r;
+    r = 0;
+    if (((strcmp(id_k_of(e), "int") == 0) || (strcmp(id_k_of(e), "float") == 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+int id_neg_lit(int e) {
+    int r;
+    int i1_of_v;
+    r = 0;
+    i1_of_v = id_i1_of(e);
+    if (((strcmp(id_s1_of(e), "-") == 0) && (id_leaf_num(i1_of_v) == 1))) {
+        r = 1;
+    }
+    return r;
+}
+
+int id_parse_case(IdList* pos) {
+    IdList* args;
+    int ret_i;
+    id_list_push(casestart, (long long)((int)(id_list_get(pos, 0))));
+    args = id_case_tuple(pos);
+    ret_i = id_parse_case_rhs(pos, args);
+    return ret_i;
+}
+
+int id_parse_case_rhs(IdList* pos, IdList* args) {
+    IdList* expd;
+    int ret_i;
+    id_eat_colon(pos);
+    expd = id_case_tuple(pos);
+    ret_i = id_case_tail(pos, args, expd);
+    return ret_i;
+}
+
+int id_case_tail(IdList* pos, IdList* args, IdList* expd) {
+    int ret_i;
+    id_case_cons(pos);
+    id_list_push(caseend, (long long)((int)(id_list_get(pos, 0))));
+    ret_i = id_newnode("case", 0, 0, "", "", args, expd);
+    return ret_i;
 }
 
 void id_parse_program(IdList* pos) {
@@ -9770,7 +11358,7 @@ void id_init_lines3(void) {
 void id_init_lines4(void) {
     casefn = id_list_lit(0);
     casestart = id_list_lit(0);
-    caseend = id_list_lit(0);
+    id_init_cases();
     return;
 }
 
@@ -11100,37 +12688,6 @@ void id_report_main(void) {
     return;
 }
 
-void id_check_cases(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(prog))) {
-        id_check_cases_at(i);
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_check_cases_at(int i) {
-    int n;
-    n = id_count_cases((int)(id_list_get(prog, i)));
-    if (((n < 2) && (id_is_native((int)(id_list_get(prog, i))) == 0))) {
-        id_report_cases(i, n);
-    }
-    return;
-}
-
-int id_count_cases(int node) {
-    int i;
-    int n;
-    i = 0;
-    n = 0;
-    while ((i < id_list_len(casefn))) {
-        n = (n + id_case_hit(i, node));
-        i = (i + 1);
-    }
-    return n;
-}
-
 void id_check_dup_cases(void) {
     int i;
     i = 0;
@@ -11186,6 +12743,271 @@ int id_tok_same(int i, int j) {
     return r;
 }
 
+void id_fit_body(int i, int fn, int node) {
+    IdList* args;
+    args = id_l1_of(node);
+    id_fit_items(i, fn, args);
+    id_fit_expd(i, fn, node);
+    return;
+}
+
+void id_fit_items(int i, int fn, IdList* items) {
+    int j;
+    j = 0;
+    while ((j < id_list_len(items))) {
+        id_fit_item(i, fn, items, j);
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_fit_item(int i, int fn, IdList* items, int j) {
+    IdList* ps;
+    char* pt;
+    ps = id_l1_of(fn);
+    pt = id_s1_of((int)(id_list_get(ps, j)));
+    id_fit_value(i, (int)(id_list_get(items, j)), pt);
+    return;
+}
+
+void id_check_case_fits(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(casenode))) {
+        id_fit_case(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fit_case(int i) {
+    int fn;
+    int node;
+    fn = (int)(id_list_get(casefn, i));
+    node = (int)(id_list_get(casenode, i));
+    id_fit_arity(i, fn, node);
+    return;
+}
+
+void id_fit_arity(int i, int fn, int node) {
+    int na;
+    if ((id_flat_arg_count(fn) != id_flat_arg_count(node))) {
+        na = id_flat_arg_count(node);
+        id_case_arity_err(i, fn, na);
+    } else {
+        id_fit_body(i, fn, node);
+    }
+    return;
+}
+
+void id_case_arity_err(int i, int fn, int na) {
+    char* f1;
+    int np;
+    f1 = id_s1_of(fn);
+    np = id_flat_arg_count(fn);
+    id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat("this case passes ", id_str_of_int(na)), " argument(s) to '"), f1), "', which takes "), id_str_of_int(np)));
+    return;
+}
+
+void id_case_void_err(int i, int fn, int ne) {
+    char* f1;
+    int np;
+    f1 = id_s1_of(fn);
+    np = id_flat_arg_count(fn);
+    id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat("this case expects ", id_str_of_int(ne)), " argument(s) after the call, but '"), f1), "' takes "), id_str_of_int(np)));
+    return;
+}
+
+void id_case_ret_err(int i, int fn, int ne) {
+    char* f1;
+    char* rt;
+    f1 = id_s1_of(fn);
+    rt = id_s2_of(fn);
+    id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat("'", f1), "' returns "), rt), ", so its case expects exactly one value, not "), id_str_of_int(ne)));
+    return;
+}
+
+void id_fit_expd(int i, int fn, int node) {
+    IdList* expd;
+    expd = id_l2_of(node);
+    if ((strcmp(id_s2_of(fn), "void") == 0)) {
+        id_fit_void(i, fn, expd);
+    } else {
+        id_fit_ret(i, fn, expd);
+    }
+    return;
+}
+
+void id_fit_void(int i, int fn, IdList* expd) {
+    int ne;
+    if ((id_list_len(expd) > id_flat_arg_count(fn))) {
+        ne = id_list_len(expd);
+        id_case_void_err(i, fn, ne);
+    } else {
+        id_fit_items(i, fn, expd);
+    }
+    return;
+}
+
+void id_fit_ret(int i, int fn, IdList* expd) {
+    int ne;
+    char* rt;
+    if ((id_list_len(expd) != 1)) {
+        ne = id_list_len(expd);
+        id_case_ret_err(i, fn, ne);
+    } else {
+        rt = id_s2_of(fn);
+        id_fit_value(i, (int)(id_list_get(expd, 0)), rt);
+    }
+    return;
+}
+
+char* id_items_text(IdList* xs) {
+    char* lt;
+    int j;
+    lt = "";
+    j = 0;
+    while ((j < id_list_len(xs))) {
+        lt = id_concat(id_concat(lt, id_sep_arg(j)), id_lit_text((int)(id_list_get(xs, j))));
+        j = (j + 1);
+    }
+    return lt;
+}
+
+void id_case_err(int i, char* msg) {
+    char* case_loc_v;
+    case_loc_v = id_case_loc(i);
+    id_print(id_concat(id_concat(case_loc_v, ": error: "), msg));
+    id_note_failure();
+    return;
+}
+
+char* id_case_loc(int i) {
+    char* s1_of_v;
+    char* func_file_v;
+    char* ret_s;
+    s1_of_v = id_s1_of((int)(id_list_get(casefn, i)));
+    func_file_v = id_func_file(s1_of_v);
+    ret_s = id_concat(id_concat(func_file_v, ":"), id_str_of_int((int)(id_list_get(tline, (int)(id_list_get(casestart, i))))));
+    return ret_s;
+}
+
+char* id_lit_text(int e) {
+    char* lt;
+    lt = id_s1_of(e);
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        lt = id_arr_text(e);
+    } else if ((strcmp(id_k_of(e), "un") == 0)) {
+        lt = id_neg_text(e);
+    }
+    return lt;
+}
+
+char* id_neg_text(int e) {
+    int i1_of_v;
+    char* lt;
+    i1_of_v = id_i1_of(e);
+    lt = id_concat("-", id_s1_of(i1_of_v));
+    return lt;
+}
+
+char* id_arr_text(int e) {
+    IdList* xs;
+    char* lt;
+    xs = id_l1_of(e);
+    lt = id_concat(id_concat("[", id_items_text(xs)), "]");
+    return lt;
+}
+
+char* id_case_lit_type(int e) {
+    char* lt;
+    int i1_of_v;
+    lt = id_leaf_type(e);
+    if ((strcmp(id_k_of(e), "un") == 0)) {
+        i1_of_v = id_i1_of(e);
+        lt = id_leaf_type(i1_of_v);
+    }
+    return lt;
+}
+
+char* id_leaf_type(int e) {
+    char* lt;
+    lt = "string";
+    if ((strcmp(id_k_of(e), "int") == 0)) {
+        lt = id_lit_type(e);
+    } else if ((strcmp(id_k_of(e), "float") == 0)) {
+        lt = "float";
+    }
+    return lt;
+}
+
+char* id_list_elem(char* t) {
+    int n;
+    char* et;
+    n = id_len(t);
+    et = id_slice(t, 0, (n - 2));
+    return et;
+}
+
+void id_fit_each(int i, IdList* xs, char* et) {
+    int j;
+    j = 0;
+    while ((j < id_list_len(xs))) {
+        id_fit_value(i, (int)(id_list_get(xs, j)), et);
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_fit_scalar(int i, int e, char* want) {
+    char* lt;
+    lt = id_case_lit_type(e);
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        id_case_err(i, id_concat(id_concat("this case gives a list where a ", want), " is required"));
+    } else if ((id_ty_fits(want, lt) == 0)) {
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat("this case gives a ", lt), " where a "), want), " is required"));
+    }
+    return;
+}
+
+int id_ty_fits(char* want, char* lt) {
+    int r;
+    r = 0;
+    if (((strcmp(want, lt) == 0) || ((id_ty_num(want) + id_ty_num(lt)) == 2))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_fit_value(int i, int e, char* want) {
+    if ((id_ty_is_list(want) == 1)) {
+        id_fit_list(i, e, want);
+    } else {
+        id_fit_scalar(i, e, want);
+    }
+    return;
+}
+
+void id_fit_list(int i, int e, char* want) {
+    char* lt;
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        id_fit_elems(i, e, want);
+    } else {
+        lt = id_lit_text(e);
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat("this case gives ", lt), " where a "), want), " is required"));
+    }
+    return;
+}
+
+void id_fit_elems(int i, int e, char* want) {
+    IdList* xs;
+    char* et;
+    xs = id_l1_of(e);
+    et = id_list_elem(want);
+    id_fit_each(i, xs, et);
+    return;
+}
+
 int id_arg_reqtests(int argc, IdList* argv, int i, int ok) {
     int r;
     r = ok;
@@ -11198,11 +13020,43 @@ int id_arg_reqtests(int argc, IdList* argv, int i, int ok) {
 }
 
 void id_check_cases_maybe(void) {
+    id_check_case_fits();
     id_check_dup_cases();
     if ((id_require_tests() == 1)) {
         id_check_cases();
     }
     return;
+}
+
+void id_check_cases(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        id_check_cases_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_check_cases_at(int i) {
+    int n;
+    n = id_count_cases((int)(id_list_get(prog, i)));
+    if (((n < 2) && (id_is_native((int)(id_list_get(prog, i))) == 0))) {
+        id_report_cases(i, n);
+    }
+    return;
+}
+
+int id_count_cases(int node) {
+    int i;
+    int n;
+    i = 0;
+    n = 0;
+    while ((i < id_list_len(casefn))) {
+        n = (n + id_case_hit(i, node));
+        i = (i + 1);
+    }
+    return n;
 }
 
 void id_reqtests_init(void) {
@@ -13629,7 +15483,7 @@ void id_tc_nodes(void) {
     int i;
     i = 0;
     while ((i < id_list_len(nkind))) {
-        id_tc_node(i);
+        id_tc_node_at(i);
         i = (i + 1);
     }
     return;
@@ -13664,6 +15518,34 @@ void id_tc_g2(int id) {
     }
     id_tc_g3(id);
     return;
+}
+
+void id_tc_node_at(int id) {
+    if (((strcmp(id_k_of(id), "arr") != 0) || (id_in_case(id) == 0))) {
+        id_tc_node(id);
+    }
+    return;
+}
+
+int id_in_case(int id) {
+    int i;
+    int ok;
+    i = 0;
+    ok = 0;
+    while ((i < id_list_len(casenode))) {
+        ok = id_in_case_at(i, id, ok);
+        i = (i + 1);
+    }
+    return ok;
+}
+
+int id_in_case_at(int i, int id, int ok) {
+    int r;
+    r = ok;
+    if ((((int)(id_list_get(casefn, i)) < id) && (id < (int)(id_list_get(casenode, i))))) {
+        r = 1;
+    }
+    return r;
 }
 
 void id_void_arr_pair(int id, char* t1, char* t2) {

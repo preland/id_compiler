@@ -1,0 +1,20 @@
+// The harness's layout: the counted runtime, the program's declarations, the
+// program's functions with their counters, then the harness's own code.
+
+emit_test_body(string triple) {
+  emit_asm_then_main(triple);
+  harn_set(0);
+  emit_test_tail();
+} return void;
+
+emit_test_head() {
+  emit_count_prelude();
+  emit_runtime();
+  emit_test_decls();
+} return void;
+
+emit_test_decls() {
+  emit_count_postlude();
+  emit_line("");
+  emit_decls();
+} return void;

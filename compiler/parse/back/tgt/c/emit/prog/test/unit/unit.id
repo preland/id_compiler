@@ -1,0 +1,33 @@
+// The test harness: a second translation unit that runs every case written
+// under the program's functions (docs/TESTS.md, "How it runs").
+//
+// `idparse --harness` puts it in front of the program, on the same stream:
+//
+//   the harness C          nothing at all when no function has a case
+//   the separator line     always
+//   the program            byte for byte what it is without the flag
+//
+// so one parse serves both, and bin/idc splits them at the separator. The
+// harness is the functions a case can reach, counted, plus a generated entry
+// point (back/drive/target/tests/ narrows `prog` to them and restores it).
+
+emit_tests_maybe(int argc, string[] argv) {
+  harn_init();
+  if(arg_flag(argc, argv, 1, "--harness") == 1) {
+    string arg_triple_v = arg_triple(argc, argv);
+    emit_tests(arg_triple_v);
+  }
+} return void;
+
+emit_tests(string triple) {
+  if(len((import casefn)) > 0) {
+    emit_test_kept(triple);
+  }
+  emit_line("/* ---- end of test harness ---- */");
+} return void;
+
+emit_test_unit(string triple) {
+  harn_set(1);
+  emit_test_head();
+  emit_test_body(triple);
+} return void;

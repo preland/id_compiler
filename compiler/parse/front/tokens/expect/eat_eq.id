@@ -18,8 +18,9 @@ init_lines3() {
 //              A case is compared to another by its tokens rather than by
 //              rebuilding its text: identical cases are rejected, and the
 //              token store is already the canonical form.
+// The rest of the case columns are declared by init_cases.
 init_lines4() {
   export int[] casefn = [];
   export int[] casestart = [];
-  export int[] caseend = [];
+  init_cases();
 } return void;

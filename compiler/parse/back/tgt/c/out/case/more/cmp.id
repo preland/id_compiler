@@ -1,0 +1,30 @@
+// Comparing and printing a value of an id type, in C. A list goes through the
+// harness's per-type helpers (ctype/list/), which do the same element by
+// element.
+
+tc_compare(string ga, string gb, string type) {
+  string so = "(" + ga + " == " + gb + ")";
+  if(type == "string") {
+    so = "(strcmp(" + ga + ", " + gb + ") == 0)";
+  } else if(ty_is_list(type) == 1) {
+    string key = tc_key(type);
+    so = "idtc_eq_" + key + "(" + ga + ", " + gb + ")";
+  }
+} return string so;
+
+tc_show(string code, string type) {
+  string so = show_scalar(code, type);
+  if(ty_is_list(type) == 1) {
+    string key = tc_key(type);
+    so = "idtc_show_" + key + "(" + code + ");";
+  }
+} return string so;
+
+show_scalar(string code, string type) {
+  string so = "fprintf(stderr, \"%d\", " + code + ");";
+  if(type == "string") {
+    so = "fprintf(stderr, \"\\\"%s\\\"\", " + code + ");";
+  } else if(type == "float" || type == "word") {
+    so = show_num(code, type);
+  }
+} return string so;

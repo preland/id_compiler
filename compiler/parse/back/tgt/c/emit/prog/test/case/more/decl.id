@@ -1,0 +1,20 @@
+// A harness local, and the argument list that names them.
+
+emit_tc_decl(string pt, string nm, string cv) {
+  string ct = c_type(pt);
+  emit_line("    " + ct + " " + nm + " = " + cv + ";");
+} return void;
+
+arg_names(int fn) {
+  int n = flat_arg_count(fn);
+  string out = names_upto(n);
+} return string out;
+
+names_upto(int n) {
+  string out = "";
+  int j = 0;
+  while(j < n) {
+    out = out + sep_arg(j) + "idtc_a" + j;
+    j = j + 1;
+  }
+} return string out;

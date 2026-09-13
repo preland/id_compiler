@@ -1,0 +1,21 @@
+// One element of a case tuple, and the punctuation between the parts.
+
+take_item(int[] pos, int[] items) {
+  int v = parse_expr(pos);
+  check_lit(v);
+  push(items, v);
+} return void;
+
+// Consumed only when present, so a case written `(1, 2)(3)` is reported once,
+// here, rather than again at every token that follows it.
+eat_colon(int[] pos) {
+  expect_text(pos, ":");
+  if(cur_text(pos) == ":") {
+    advance(pos);
+  }
+} return void;
+
+eat_close(int[] pos) {
+  expect_text(pos, ")");
+  advance(pos);
+} return void;

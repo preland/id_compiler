@@ -1,0 +1,22 @@
+// The words between a bound's parentheses.
+
+bound_parts(int[] pos) {
+  string out = "";
+  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+    out = bound_step(pos, out);
+  }
+} return string out;
+
+bound_step(int[] pos, string out) {
+  string t2 = cur_text(pos);
+  string so = out + bound_sep(out, t2) + t2;
+  advance(pos);
+} return string so;
+
+bound_sep(string out, string t2) {
+  string gap = " ";
+  int n = len(out);
+  if(n == 0 || t2 == "^" || charat(out, n - 1) == 94) {
+    gap = "";
+  }
+} return string gap;
