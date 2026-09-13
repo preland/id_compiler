@@ -10,8 +10,7 @@ parse_program(int[] pos) {
 
 // function: name ( params ) { body } return TYPE expr ;   (or `return void;`)
 parse_func(int[] pos) {
-  string name = cur_text(pos);
-  advance(pos);
+  string name = read_name(pos);
   int ret_i = func_sig(pos, name);
 } return int ret_i;
 

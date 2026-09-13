@@ -7,10 +7,10 @@ is_alnum(int c) {
   }
 } return int ok;
 
-// The thirteen id keywords. One big boolean keeps this within the action limit.
+// The fifteen id keywords. One big boolean keeps this within the action limit.
 is_kw(string w) {
   int ok = 0;
-  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native") {
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then") {
     ok = 1;
   }
 } return int ok;
