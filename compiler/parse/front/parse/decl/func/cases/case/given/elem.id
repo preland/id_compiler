@@ -1,0 +1,31 @@
+// An element of a case tuple: a literal, or `(import NAME)` -- the value an
+// export holds once the case's setup has run.
+//
+// It is a "cimport" node, not an "import". An import is a read inside a
+// function body, and the dead-export check walks bodies by node range
+// (mid/names/exports/reach/dead/sweep.id), in which a case's nodes fall into
+// the function declared after it: an "import" here would be judged as that
+// function's read. Whether the export exists, is set up by the case's `given`
+// and has the right type is checked in mid/names/limits/shape/cases/given/.
+
+case_item(int[] pos) {
+  int v = 0;
+  if(at_case_import(pos) == 1) {
+    v = case_import(pos);
+  } else {
+    v = parse_expr(pos);
+    check_lit(v);
+  }
+} return int v;
+
+case_import(int[] pos) {
+  advance(pos);
+  advance(pos);
+  int ret_i = import_rest(pos);
+} return int ret_i;
+
+import_rest(int[] pos) {
+  string name = read_name(pos);
+  eat_close(pos);
+  int ret_i = newleaf("cimport", 0, 0, name, "");
+} return int ret_i;

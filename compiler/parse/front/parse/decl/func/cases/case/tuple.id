@@ -1,0 +1,26 @@
+// One case: `given SETUP (args) : (expected) then CHECK:(value) [constraints]`,
+// of which only the two tuples are required.
+//
+// The tuples are parsed as ordinary expressions and then held to being
+// literals, which is what lets the harness build them without running any of
+// the program. The token range is recorded around the whole case, from `given`
+// through the constraints, because that range is what the duplicate-case rule
+// compares: two cases that differ only in a `then` are two cases.
+
+parse_case(int[] pos) {
+  push((import casestart), pos[0]);
+  case_given(pos);
+  int ret_i = parse_case_args(pos);
+} return int ret_i;
+
+parse_case_rhs(int[] pos, int[] args) {
+  eat_colon(pos);
+  int[] expd = case_tuple(pos);
+  int ret_i = case_tail(pos, args, expd);
+} return int ret_i;
+
+case_tail(int[] pos, int[] args, int[] expd) {
+  case_rest(pos);
+  push((import caseend), pos[0]);
+  int ret_i = newnode("case", 0, 0, "", "", args, expd);
+} return int ret_i;

@@ -1,0 +1,22 @@
+// `given SETUP`, ahead of a case's arguments: the function the case's process
+// runs first. It is recorded by name, one entry per case in `casegiven`, and
+// "" for a case without one. Whether the name is a setup at all is a check
+// (mid/names/limits/shape/cases/given/), not a parse.
+
+parse_case_args(int[] pos) {
+  int[] args = case_tuple(pos);
+  int ret_i = parse_case_rhs(pos, args);
+} return int ret_i;
+
+case_given(int[] pos) {
+  string setup_nm = "";
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "given") {
+    setup_nm = given_name(pos);
+  }
+  push((import casegiven), setup_nm);
+} return void;
+
+given_name(int[] pos) {
+  advance(pos);
+  string setup_nm = case_fn_name(pos, "given");
+} return string setup_nm;

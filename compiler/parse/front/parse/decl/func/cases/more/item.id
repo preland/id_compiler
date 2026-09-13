@@ -1,8 +1,7 @@
 // One element of a case tuple, and the punctuation between the parts.
 
 take_item(int[] pos, int[] items) {
-  int v = parse_expr(pos);
-  check_lit(v);
+  int v = case_item(pos);
   push(items, v);
 } return void;
 
