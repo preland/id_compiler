@@ -1,7 +1,7 @@
 // Bytes in and out through an int[], one byte per cell. See fs.h.
 
-native fs_read(int handle, int[] buf, int n) return int;
+native fs_read(int file, int[] bytes, int n) return int;
 
-native fs_write(int handle, int[] buf, int n) return int;
+native fs_write(int file, int[] bytes, int n) return int;
 
-native fs_list(string path, int[] buf, int n) return int;
+native fs_list(string path, int[] bytes, int n) return int;

@@ -2,6 +2,6 @@
 
 native gl_mat_mul(int a, int b) return int;
 
-native gl_set_projection(int handle) return int;
+native gl_set_projection(int matrix) return int;
 
-native gl_set_modelview(int handle) return int;
+native gl_set_modelview(int matrix) return int;

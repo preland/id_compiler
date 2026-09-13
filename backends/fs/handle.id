@@ -2,6 +2,6 @@
 
 native fs_open(string path, string mode) return int;
 
-native fs_close(int handle) return int;
+native fs_close(int file) return int;
 
 native fs_error() return int;
