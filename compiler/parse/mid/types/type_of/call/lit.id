@@ -9,10 +9,11 @@ lit_type(int id) {
 } return string t;
 
 // A call's result type. Every builtin's type follows from its name except
-// pop's, which is the element type of the list it was handed.
+// pop's, which is the element type of the list it was handed; a call through a
+// variable of function type has that type's return type.
 call_type(int id) {
   string s1_of_v = s1_of(id);
-  string t = type_call(s1_of_v);
+  string t = call_ret(id, s1_of_v);
   if(s1_of(id) == "pop") {
     t = pop_elem(id);
   }

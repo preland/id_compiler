@@ -1,0 +1,14 @@
+// The piece after the last comma. hi is 5 exactly when nothing stands between
+// the parentheses, and an empty list has no piece at all.
+fn_last(string t, int hi, int[] st, string[] pts) {
+  if(hi > 5) {
+    string piece = slice(t, st[0], hi);
+    push(pts, piece);
+  }
+} return void;
+
+// Parameter i's type. Asked only once the arity has been checked.
+fn_param_at(string t, int i) {
+  string[] pts = fn_params(t);
+  string p = pts[i];
+} return string p;

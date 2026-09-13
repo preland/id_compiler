@@ -1,0 +1,29 @@
+// Whether a name is a function of this program, and its type.
+//
+// Asked of every name the checks, the emitters and the fingerprint read, so it
+// goes through the hash index lookup_func uses: a linear search of the
+// function table per name is a scan of every function, per name, on a
+// compiler whose own source has thousands of each.
+
+// The function node a name denotes, or -1.
+fn_node_of(string name) {
+  int b = name_bucket(name);
+  int idx = find_ix((import fnames), (import fidx)[b], name);
+  int fn = fn_node_at(idx);
+} return int fn;
+
+// -1 for a name with no row, and for an `asm` function, whose row has no node:
+// the driver registers asm symbols in the table without one, and an asm
+// function is not a value.
+fn_node_at(int idx) {
+  int fn = 0 - 1;
+  if(idx >= 0) {
+    fn = (import fnodes)[idx];
+  }
+} return int fn;
+
+// The type of the function a name denotes, or "" when it denotes none.
+fn_sig_of(string name) {
+  int fn = fn_node_of(name);
+  string t = fn_sig_at(fn);
+} return string t;

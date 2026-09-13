@@ -1,6 +1,8 @@
 // Comparing and printing a value of an id type, in C. A list goes through the
 // harness's per-type helpers (ctype/list/), which do the same element by
-// element.
+// element. A function value compares as the pointer it is, and has no
+// spelling a case could have written but its name, which the running harness
+// does not know -- so a failing case says only that it was a function.
 
 tc_compare(string ga, string gb, string type) {
   string so = "(" + ga + " == " + gb + ")";
@@ -17,6 +19,9 @@ tc_show(string code, string type) {
   if(ty_is_list(type) == 1) {
     string key = tc_key(type);
     so = "idtc_show_" + key + "(" + code + ");";
+  }
+  if(ty_is_func(type) == 1) {
+    so = "fputs(\"a function value\", stderr);";
   }
 } return string so;
 

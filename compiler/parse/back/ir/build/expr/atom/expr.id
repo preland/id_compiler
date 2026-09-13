@@ -6,7 +6,7 @@
 lw_expr(int node) {
   int v = 0 - 1;
   if(k_of(node) == "var" || k_of(node) == "import") {
-    v = lw_name(node);
+    v = lw_named(node);
   } else {
     v = le2(node);
   }

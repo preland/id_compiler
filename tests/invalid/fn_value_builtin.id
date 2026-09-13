@@ -1,0 +1,6 @@
+// EXPECT: 'print' is a builtin, not a function defined in id
+// EXPECT-IDCPY: unexpected token 'string'
+main(int argc, string[] argv) {
+  func(string) return void f = print;
+  f("x");
+} return int 0;

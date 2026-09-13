@@ -82,11 +82,22 @@ is_enumerated_gap() {
 #             does not sequence the arguments of a call. gcc evaluates them
 #             right to left; docs/SPEC.md 7 says left to right. Conforming
 #             means hoisting operands into temporaries. See SPEC 11, S11.
+#   wasm:fn   the WASM target is built by idc.py, which is being retired and
+#             has no function values: it refuses `func` as a type. See SPEC
+#             11, S12.
 known_apart() {
     case "$1:$2" in
         c:order) return 0 ;;
+        wasm:fn) return 0 ;;
     esac
     return 1
+}
+
+apart_why() {
+    case "$1:$2" in
+        c:order) echo "the C target does not sequence operands (SPEC 7)" ;;
+        wasm:fn) echo "idc.py, which builds wasm, has no function values (SPEC 11, S12)" ;;
+    esac
 }
 
 # run_case TARGET CASE_ID DIR BASE
@@ -101,7 +112,7 @@ run_case() {
     local slug="${id//\//-}"
 
     if known_apart "$target" "$(basename "$dir")"; then
-        skip "$target  $id  -- known: the C target does not sequence operands (SPEC 7)"
+        skip "$target  $id  -- known: $(apart_why "$target" "$(basename "$dir")")"
         return
     fi
 

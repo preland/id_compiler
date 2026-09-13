@@ -1,0 +1,9 @@
+// EXPECT: 'print' cannot take a function value: argument 0 is func(int) return void
+// EXPECT-IDCPY: undefined variable 'tick'
+tick(int n) {
+  print(n);
+} return void;
+
+main(int argc, string[] argv) {
+  print(tick);
+} return int 0;

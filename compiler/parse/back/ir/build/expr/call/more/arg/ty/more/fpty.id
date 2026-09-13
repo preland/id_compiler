@@ -1,0 +1,10 @@
+// Argument i of a call through a variable of function type, converted to the
+// parameter type that variable's type spells -- the conversion C's prototype
+// makes implicitly, and LLVM IR makes only when told to.
+lw_fpty(string name, int i, int node, string t) {
+  string vt = lookup_var(name, (import nunit)[node]);
+  string p = t;
+  if(ty_is_func(vt) == 1) {
+    p = fn_param_at(vt, i);
+  }
+} return string p;

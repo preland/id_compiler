@@ -1,0 +1,17 @@
+// One argument of a call through a function value: the value must fit the
+// parameter type, and must not narrow into it -- the same two rules an
+// argument to a defined function obeys (../../args/).
+
+fcall_arg_at(int id, string vt, string[] pts, int i) {
+  int a = l1_of(id)[i];
+  string t = type_of(a);
+  fcall_arg_check(id, vt, pts[i], a, i, t);
+} return void;
+
+fcall_arg_check(int id, string vt, string pt, int a, int i, string t) {
+  if(bad_store(pt, a) == 1) {
+    fcall_arg_err(id, vt, pt, a, i, t);
+  } else if(ty_narrows(pt, t) == 1) {
+    fcall_narrow_err(id, vt, pt, a, i, t);
+  }
+} return void;

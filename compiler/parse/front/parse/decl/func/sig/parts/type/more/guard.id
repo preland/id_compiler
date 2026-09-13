@@ -1,0 +1,21 @@
+// A function value is never returned and never an element of a list
+// (docs/SPEC.md), and both rules can be broken inside a function type's own
+// spelling.
+//
+// Brackets after a function type's return type belong to the return type --
+// `func(int) return int[]` returns a list -- so there is no way to write a
+// list of function values. The attempt is `func(...) return void[]`, which
+// would otherwise be reported as a function returning a type that does not
+// exist.
+
+no_fn_ret(int[] pos, string rb) {
+  if(rb == "func") {
+    syn_err(pos, "a function type cannot return a function value; pass the function, or store it in a local or an export");
+  }
+} return void;
+
+no_void_list(int[] pos, string pl, string rb, string rt) {
+  if(rb == "void" && rt != "void") {
+    syn_err(pos, "'func(" + pl + ") return " + rt + "': brackets after a function type's return type belong to the return type, and " + rt + " is not a type; a function value cannot be an element of a list");
+  }
+} return void;

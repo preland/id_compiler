@@ -1,0 +1,6 @@
+// EXPECT: brackets after a function type's return type belong to the return type
+// EXPECT-IDCPY: unexpected token 'int'
+main(int argc, string[] argv) {
+  func(int) return void[] fs = [];
+  print(argc);
+} return int 0;

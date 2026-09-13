@@ -1,0 +1,13 @@
+// EXPECT: 'step' is a func(int) return void, which takes 1 argument(s), got 2
+// EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
+tick(int n) {
+  print(n);
+} return void;
+
+run_frame(func(int) return void step, int dt) {
+  step(dt, dt);
+} return void;
+
+main(int argc, string[] argv) {
+  run_frame(tick, 16);
+} return int 0;

@@ -6,3 +6,21 @@ chk_cmp(int id) {
     chk_ord(id);
   }
 } return void;
+
+// No binary operator takes a function value (docs/SPEC.md 1.1): arithmetic on
+// one is arithmetic on an address, and comparing two tells apart functions
+// that are not named where the comparison is written. Asked of every binary
+// node, ahead of the comparison checks it hands on to.
+fv_bin(int id) {
+  fv_side(id, (import ni1)[id], "left");
+  fv_side(id, (import ni2)[id], "right");
+  chk_cmp(id);
+} return void;
+
+fv_side(int id, int e, string side) {
+  string t = type_of(e);
+  if(ty_is_func(t) == 1) {
+    string op = s1_of(id);
+    tc_err(id, "'" + op + "' cannot take a function value: its " + side + " operand is " + t + "; a function value can only be passed, stored or called");
+  }
+} return void;

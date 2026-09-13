@@ -1,0 +1,5 @@
+// EXPECT: a function type lists parameter types only
+// EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
+run_frame(func(int dt) return void step) {
+  step(16);
+} return void;

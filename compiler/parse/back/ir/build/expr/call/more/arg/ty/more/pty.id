@@ -14,4 +14,5 @@ lw_arg_conv(int node, int i, string pty) {
 lw_pty_base(string name, int i, int node) {
   string ety = lw_ety(node);
   string t = lw_apty(name, i, ety);
+  t = lw_fpty(name, i, node, t);
 } return string t;

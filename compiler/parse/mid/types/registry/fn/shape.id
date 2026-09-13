@@ -1,0 +1,35 @@
+// Function types have no row in the registry: like a list type, one is derived
+// from its spelling, which the parser makes canonical
+// (front/parse/decl/func/sig/parts/type/) -- "func(" then the parameter types
+// joined by ", ", then ") return " and the return type. A parameter type may
+// itself be a function type, so the parenthesis that ends the list is found by
+// counting rather than by searching.
+
+// 102 is `f` and 40 is `(`: no other type has a parenthesis after four letters.
+ty_is_func(string t) {
+  int ok = 0;
+  if(charat(t, 0) == 102 && charat(t, 4) == 40) {
+    ok = 1;
+  }
+} return int ok;
+
+// One past the parenthesis that closes the parameter list.
+fn_close(string t) {
+  int i = 5;
+  int d = 1;
+  while(d > 0 && i < len(t)) {
+    int c = charat(t, i);
+    d = d + fn_depth(c);
+    i = i + 1;
+  }
+} return int i;
+
+// 40 is `(` and 41 is `)`.
+fn_depth(int c) {
+  int n = 0;
+  if(c == 40) {
+    n = 1;
+  } else if(c == 41) {
+    n = 0 - 1;
+  }
+} return int n;

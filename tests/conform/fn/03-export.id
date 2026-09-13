@@ -1,0 +1,15 @@
+tock(int n) {
+  print("tock " + n);
+} return void;
+(3):(3)
+(4):(4)
+
+eng_setup() {
+  export func(int) return void eng_step = tock;
+} return void;
+
+main(int argc, string[] argv) {
+  eng_setup();
+  func(int) return void g = (import eng_step);
+  g(9);
+} return int 0;

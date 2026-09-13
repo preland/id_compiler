@@ -1,12 +1,12 @@
 // Calling a variable. This is the last thing the registry can answer: a
 // called name that is no function of this program and no builtin, but *is*
 // somebody's variable, is a variable used as if it were a function -- which is
-// the one case idc.py singles out from "no such function".
+// the one case idc.py singles out from "no such function" -- unless its type is
+// a function type, when calling it is what it is for (value.id).
 
 acc_callee(int id, string owner, int ln) {
   if(k_of(id) == "call" && is_call_var(id)) {
-    string s1_of_v = s1_of(id);
-    report_call_var(s1_of_v, owner, ln);
+    acc_call_var(id, owner, ln);
   }
   acc_callee2(id, owner, ln);
 } return void;

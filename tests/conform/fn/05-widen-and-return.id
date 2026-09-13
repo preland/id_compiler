@@ -1,0 +1,16 @@
+half(word w) {
+  word h = w / 2;
+} return word h;
+(84):(42)
+(0):(0)
+
+apply(func(word) return word f, int x) {
+  word r = f(x);
+} return word r;
+(half, 84):(42)
+(half, 2):(1)
+
+main(int argc, string[] argv) {
+  word r = apply(half, 84);
+  print(r);
+} return int 0;

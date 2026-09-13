@@ -16,11 +16,12 @@ bad_init(string want, string got) {
 // answer something that is not a type -- elem_type("int") is "i", because
 // indexing a non-list is itself the error and there is no element type to
 // have. A row that is absent cannot be mistaken for a row that is wrong,
-// which is the whole reason the registry is a table and not an if-chain.
+// which is the whole reason the registry is a table and not an if-chain. A
+// function type has no row and is known all the same: its kind is "func".
 ty_known(string t) {
   int ok = 0;
   string ty_base_v = ty_base(t);
-  if(ty_row_kind(ty_base_v) != "?") {
+  if(ty_kind(ty_base_v) != "?") {
     ok = 1;
   }
 } return int ok;

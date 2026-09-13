@@ -1,0 +1,10 @@
+// EXPECT: 'pick' returns func(int) return void; a function value cannot be a function's return type
+// EXPECT-IDCPY: unexpected token 'int'
+tick(int n) {
+  print(n);
+} return void;
+
+pick(int k) {
+  func(int) return void f = tick;
+  print(k);
+} return func(int) return void f;

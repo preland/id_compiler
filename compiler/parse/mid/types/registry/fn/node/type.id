@@ -1,0 +1,25 @@
+// The types a function value gives an expression: a name that denotes a
+// function has that function's type, and a call through a variable of
+// function type has that type's return type.
+
+name_type(string name, int unit) {
+  string t = lookup_var(name, unit);
+  if(t == "") {
+    t = fn_sig_of(name);
+  }
+} return string t;
+
+call_ret(int id, string name) {
+  string t = type_call(name);
+  if(t == "") {
+    t = fcall_ret(id);
+  }
+} return string t;
+
+fcall_ret(int id) {
+  string vt = callee_var_type(id);
+  string t = "";
+  if(ty_is_func(vt) == 1) {
+    t = fn_ret(vt);
+  }
+} return string t;

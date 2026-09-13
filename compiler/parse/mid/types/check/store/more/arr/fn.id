@@ -1,0 +1,14 @@
+// A function value is never an element of a list (docs/SPEC.md 1.1). A list is
+// data that travels, and a function value inside one could be called anywhere
+// the list reaches, with no function type written at the call. So an element
+// that is one is refused as that, rather than as an element of the wrong type.
+
+fv_typed(int e) {
+  string t = type_of(e);
+  int ok = ty_is_func(t);
+} return int ok;
+
+fv_elem_err(int el, int i) {
+  string t = type_of(el);
+  tc_err(el, "a function value cannot be an element of a list: element " + i + " is " + t);
+} return void;

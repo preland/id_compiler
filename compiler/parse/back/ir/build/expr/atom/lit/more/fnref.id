@@ -1,0 +1,20 @@
+// A function named as a value is the function's own symbol: a constant, like
+// a literal, with no home block and nothing to load. It prints as the name the
+// function is defined or declared under, `@id_<name>`, and a function type is
+// a pointer in LLVM's spelling.
+// A name read in an expression: a function's name is its symbol, and any
+// other name is a variable's slot, loaded.
+lw_named(int node) {
+  int v = 0 - 1;
+  if(is_fn_value(node) == 1) {
+    v = lw_fnref(node);
+  } else {
+    v = lw_name(node);
+  }
+} return int v;
+
+lw_fnref(int node) {
+  string ety = lw_ety(node);
+  string s1_of_v = s1_of(node);
+  int ret_i = ir_leaf("global", ety, 0 - 1, 0 - 1, "id_" + s1_of_v);
+} return int ret_i;

@@ -25,3 +25,12 @@ chk_iassign2(int id, string bt) {
     chk_iassign3(id, bt);
   }
 } return void;
+
+chk_iassign3(int id, string bt) {
+  int v = l1_of(id)[0];
+  string elem_type_v = elem_type(bt);
+  if(bad_store(elem_type_v, v) == 1) {
+    string type_of_v = type_of(v);
+    tc_err(id, "cannot store a " + type_of_v + " into a " + bt);
+  }
+} return void;

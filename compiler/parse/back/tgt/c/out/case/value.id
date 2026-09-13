@@ -1,13 +1,17 @@
 // A case value as C: a literal, built by tc_lit (lit/lit.id), or
 // `(import NAME)`, which is the export's C global, read where the value is
 // built -- after the setup for an argument, after the call for an expected
-// value. Its type was checked to be exactly the one wanted
-// (mid/.../cases/given/read/), so it needs no conversion.
+// value -- or a function's name, which is the C function id_NAME. Either type
+// was checked to be exactly the one wanted (mid/.../cases/given/read/), so it
+// needs no conversion.
 
 tc_value(int e, string want) {
   string so = s1_of(e);
   if(k_of(e) != "cimport") {
     so = tc_lit(e, want);
+  }
+  if(k_of(e) == "cfn") {
+    so = "id_" + s1_of(e);
   }
 } return string so;
 

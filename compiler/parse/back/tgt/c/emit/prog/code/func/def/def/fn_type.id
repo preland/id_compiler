@@ -1,0 +1,19 @@
+// A function type's parameters as C spells them inside a pointer-to-function
+// type: the types alone, and `void` for none, which in C is not the same as
+// an empty list.
+
+c_fn_params(string[] pts) {
+  string out = "void";
+  if(len(pts) > 0) {
+    out = c_type_list(pts);
+  }
+} return string out;
+
+c_type_list(string[] pts) {
+  string out = "";
+  int i = 0;
+  while(i < len(pts)) {
+    out = out + sep_arg(i) + c_type(pts[i]);
+    i = i + 1;
+  }
+} return string out;

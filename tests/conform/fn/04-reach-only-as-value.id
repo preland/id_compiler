@@ -1,0 +1,13 @@
+boot() {
+  export int[] booted = [42];
+} return void;
+
+run(func() return void f) {
+  f();
+} return void;
+
+main(int argc, string[] argv) {
+  run(boot);
+  int[] b = (import booted);
+  print(b[0]);
+} return int 0;

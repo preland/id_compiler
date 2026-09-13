@@ -8,4 +8,14 @@ no_case_word(int[] pos) {
     string cur_text_v = cur_text(pos);
     syn_err(pos, "'" + cur_text_v + "' is a test case keyword (see docs/TESTS.md) and cannot be used as a name");
   }
+  no_func_word(pos);
+} return void;
+
+// `func` begins a function type (docs/SPEC.md), which stands wherever a type
+// does: a statement that began with a name spelled `func` would read as a
+// declaration, and a call to one as the start of a type.
+no_func_word(int[] pos) {
+  if(cur_text(pos) == "func") {
+    syn_err(pos, "'func' is a keyword (it begins a function type, see docs/SPEC.md) and cannot be used as a name");
+  }
 } return void;

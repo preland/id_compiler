@@ -1,6 +1,6 @@
 // Every function with a case is an entry point, and so is every setup and
-// check a case names (given.id), and afterwards `prog` and the reachable set
-// are put back as they were.
+// check a case names and every function a case passes as a value (given.id),
+// and afterwards `prog` and the reachable set are put back as they were.
 
 seed_cases() {
   int ci = 0;

@@ -1,0 +1,30 @@
+// Calling through a variable of function type: the questions a call to a
+// defined function answers (../site.id) -- arity first, then each argument
+// against its parameter -- asked of the parameter types the variable's type
+// spells, since there is no function node to read them from. Every message
+// names that type: the function that runs is not visible at the call, and the
+// type is the only signature the reader of the call has.
+
+chk_fcall(int id) {
+  string vt = callee_var_type(id);
+  if(ty_is_func(vt) == 1) {
+    fcall_arity(id, vt);
+  }
+} return void;
+
+fcall_arity(int id, string vt) {
+  string[] pts = fn_params(vt);
+  if(len(pts) != flat_arg_count(id)) {
+    fcall_arity_err(id, vt, pts);
+  } else {
+    fcall_args(id, vt, pts);
+  }
+} return void;
+
+fcall_args(int id, string vt, string[] pts) {
+  int i = 0;
+  while(i < len(pts)) {
+    fcall_arg_at(id, vt, pts, i);
+    i = i + 1;
+  }
+} return void;

@@ -1,0 +1,29 @@
+// A function named in a case (front/parse/decl/func/cases/case/given/elem/fn.id)
+// is that function as a value, so it fits a position exactly when its
+// signature is the position's function type -- the rule an argument written in
+// the program obeys (docs/SPEC.md 1.1). No setup is needed: nothing runs to
+// produce a function's name. A name that is no function is the mistake a case
+// has always been able to make -- a variable where a literal belongs -- and is
+// reported in the words it always was, with what a name there would have to be.
+
+fit_named(int i, int e, string want) {
+  if(k_of(e) == "cfn") {
+    fit_fn(i, e, want);
+  } else {
+    fit_import(i, e, want);
+  }
+} return void;
+
+fit_fn(int i, int e, string want) {
+  string nm = s1_of(e);
+  string ft = fn_sig_of(nm);
+  fit_fn_type(i, nm, ft, want);
+} return void;
+
+fit_fn_type(int i, string nm, string ft, string want) {
+  if(ft == "") {
+    case_err(i, "a test case takes literals only (a number, a string, or a list of those); '" + nm + "' is not a function in this build, which is the only name a case may pass");
+  } else if(ft != want) {
+    case_err(i, "this case gives '" + nm + "', a " + ft + ", where a " + want + " is required");
+  }
+} return void;

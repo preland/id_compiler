@@ -24,10 +24,11 @@ ll_t4(int id) {
 
 // A call that produces nothing is a statement; one that produces a value names
 // it. LLVM will not accept a name for a void result, so the two really are
-// different lines rather than one with an empty prefix.
+// different lines rather than one with an empty prefix. What is called is a
+// symbol or a function value (call.id).
 ll_call(int id) {
   string ir_ty_v = ir_ty(id);
-  string s = "call " + ll_ty(ir_ty_v) + " @" + ir_s(id) + "(" + ll_args(id) + ")";
+  string s = "call " + ll_ty(ir_ty_v) + " " + ll_callee(id) + "(" + ll_args(id) + ")";
   if(ll_ty(ir_ty_v) != "void") {
     s = "%v" + id + " = " + s;
   }

@@ -1,0 +1,28 @@
+// A function type: `func(T1, T2) return R`, parameter types only.
+//
+// Every type in this compiler is a string, and types are compared by
+// equality: a name keeps one type per unit, and a value fits a slot, only when
+// the two spellings are the same. So a function type is kept as one canonical
+// spelling -- "func(int, string) return void", one space after each comma and
+// either side of `return` -- whatever spacing the source used, and
+// mid/types/registry/fn/ reads its parts back out of it.
+
+parse_fn_type(int[] pos) {
+  expect_text(pos, "(");
+  advance(pos);
+  string ret_s = fn_type_rest(pos);
+} return string ret_s;
+
+fn_type_rest(int[] pos) {
+  string pl = fn_type_params(pos, "");
+  string ret_s = fn_type_ret(pos, pl);
+} return string ret_s;
+
+// The parameter types, joined as the canonical spelling joins them, and the
+// closing parenthesis.
+fn_type_params(int[] pos, string out) {
+  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+    out = fn_type_param(pos, out);
+  }
+  advance(pos);
+} return string out;

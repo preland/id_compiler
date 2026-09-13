@@ -20,3 +20,16 @@ cn_add(string name) {
   push((import cnames), name);
   int ret_i = len((import cnames)) - 1;
 } return int ret_i;
+
+// A name read as a value. A function's name is a function value and keeps its
+// name, as a callee does: two functions that differ only in which function
+// they pass are different logic, and giving the name a position would make
+// them the same. The recursion marker applies to it for the same reason it
+// applies to a call.
+canon_var(int id) {
+  string name = s1_of(id);
+  string out = "fv(" + canon_callee(name) + ")";
+  if(is_fn_value(id) == 0) {
+    out = "v" + cn(name);
+  }
+} return string out;

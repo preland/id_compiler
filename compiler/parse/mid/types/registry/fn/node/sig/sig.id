@@ -1,0 +1,26 @@
+// A defined function's type, spelled as a function type is written. That is
+// what lets a function's name stand where a value of a function type is
+// wanted: the two types are compared as strings, so an exact match of
+// signature is an exact match of spelling.
+
+fn_sig(int fn) {
+  int[] ps = l1_of(fn);
+  string pl = fn_type_list(ps);
+  string t = "func(" + pl + ") return " + s2_of(fn);
+} return string t;
+
+fn_sig_at(int fn) {
+  string t = "";
+  if(fn >= 0) {
+    t = fn_sig(fn);
+  }
+} return string t;
+
+fn_type_list(int[] ps) {
+  string out = "";
+  int i = 0;
+  while(i < len(ps)) {
+    out = out + sep_at(", ", i) + s1_of(ps[i]);
+    i = i + 1;
+  }
+} return string out;

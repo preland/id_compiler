@@ -11,9 +11,7 @@
 chk_callsite(int id) {
   string s1_of_v = s1_of(id);
   int fn = func_node(s1_of_v);
-  if(fn >= 0) {
-    chk_arity(id, fn);
-  }
+  chk_site_at(id, fn);
 } return void;
 
 // The func node behind a called name, or -1 when there is none to check
@@ -28,14 +26,13 @@ func_node(string name) {
   }
 } return int n;
 
-// Arity first, and nothing else if it is wrong: pairing arguments off with
-// parameters that are not there would report a second, invented type error
-// about whichever pair happened to line up.
-chk_arity(int id, int fn) {
-  int mismatch = arity_mismatch(id, fn);
-  if(mismatch == 1) {
-    arity_err(id, fn);
+// A call to a function this program defines is checked against its node
+// (arity/); any other call may be through a variable of function type, which
+// fcall/ checks when it is one.
+chk_site_at(int id, int fn) {
+  if(fn >= 0) {
+    chk_arity(id, fn);
   } else {
-    chk_argtypes(id, fn);
+    chk_fcall(id);
   }
 } return void;

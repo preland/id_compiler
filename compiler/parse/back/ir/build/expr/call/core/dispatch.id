@@ -1,4 +1,5 @@
-// A resolved call goes to the runtime spelling; anything else is an ordinary
+// A resolved call goes to the runtime spelling; a call through a variable of
+// function type calls the value it holds; anything else is an ordinary
 // `id_`-prefixed call, name and arguments lowered in the order they were
 // written.
 lw_call_dispatch(int node, string name) {
@@ -6,7 +7,7 @@ lw_call_dispatch(int node, string name) {
   if(is_builtin(name) == 1) {
     v = lw_builtin(node);
   } else {
-    v = lw_ucall(node);
+    v = lw_ocall(node);
   }
 } return int v;
 

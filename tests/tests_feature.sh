@@ -1184,6 +1184,154 @@ main(int argc, string[] argv) {
 EOF
 self_accept "bin/idc: a function that assigns its parameter is not a constant wrapper" --emit-c /dev/null
 
+# --- function values (docs/SPEC.md 1.1) --------------------------------------
+# bin/idc only: idc.py has no function values. The harness builds and runs a
+# tested function that takes one, handed in through an export its setup stores.
+cat > "$TMP/p.id" <<'EOF'
+dbl(int n) {
+  int r = n * 2;
+} return int r;
+(3):(6)
+(0):(0)
+
+st() {
+  export func(int) return int g = dbl;
+} return void;
+
+apply(func(int) return int f, int x) {
+  int r = f(x);
+} return int r;
+given st ((import g), 3):(6)
+given st ((import g), 5):(10)
+EOF
+self_accept "bin/idc: a case passes a function value in through (import NAME)" --emit-c /dev/null
+
+sed -i 's/:(10)$/:(11)/' "$TMP/p.id"
+self_refuse "bin/idc: a false case that calls through a function value fails the build" \
+    "p.id:15: test failed: apply((import g), 5) = 10, expected 11" --emit-c /dev/null
+
+# Two functions that differ only in which function they pass are two
+# functions: a function named as a value keeps its name in the fingerprint,
+# while a call through a parameter is numbered like any use of it.
+mkdir -p "$TMP/fp"
+cat > "$TMP/fp/a.id" <<'EOF'
+tick(int n) {
+  print("tick " + n);
+} return void;
+(1):(1)
+(2):(2)
+
+tock(int n) {
+  print("tock " + n);
+} return void;
+(3):(3)
+(4):(4)
+
+run(func(int) return void step, int dt) {
+  step(dt);
+} return void;
+(tick, 5):(tick, 5)
+(tock, 6):(tock, 6)
+EOF
+cat > "$TMP/fp/b.id" <<'EOF'
+pass_tick(int dt) {
+  run(tick, dt);
+} return void;
+(7):(7)
+(8):(8)
+
+pass_tock(int dt) {
+  run(tock, dt);
+} return void;
+(7):(7)
+(8):(8)
+
+main(int argc, string[] argv) {
+  pass_tick(1);
+  pass_tock(2);
+} return int 0;
+EOF
+if ../bin/idc "$TMP/fp" -o "$TMP/fpbin" >"$TMP/log" 2>&1 && [ "$("$TMP/fpbin")" = "$(printf 'tick 1\ntock 2')" ]; then
+    ok "bin/idc: functions differing only in the function they pass are distinct"
+else
+    bad "bin/idc: functions differing only in the function they pass are distinct ($(head -1 "$TMP/log"))"
+fi
+../bin/idc "$TMP/fp" --fingerprints >"$TMP/log" 2>&1
+grep -qF "{e:c(run:fv(tick),v0)}" "$TMP/log" && grep -qF "{e:c(v0:v1)}" "$TMP/log" \
+    && ok "bin/idc: a fingerprint keeps a function value's name and numbers a call through a parameter" \
+    || bad "bin/idc: a fingerprint keeps a function value's name and numbers a call through a parameter"
+
+# A case names a function where a function value goes, as the program would:
+# the function's signature must be the parameter's type exactly.
+cat > "$TMP/p.id" <<'EOF'
+twice(int n) {
+  int r = n * 2;
+} return int r;
+(3):(6)
+(0):(0)
+
+apply(func(int) return int f, int x) {
+  int r = f(x);
+} return int r;
+(twice, 3):(6)
+(twice, 5):(10)
+
+apply_into(func(int) return int f, int[] xs) {
+  int v = f(xs[0]);
+  push(xs, v);
+} return void;
+(twice, [4]):(twice, [4, 8])
+(twice, [0]):(twice, [0, 0])
+EOF
+self_accept "bin/idc: a case passes a function by name" --emit-c /dev/null
+
+sed -i 's/^(twice, 5):(10)$/(twice, 5):(11)/' "$TMP/p.id"
+self_refuse "bin/idc: a false case with a function argument fails the build" \
+    "p.id:11: test failed: apply(twice, 5) = 10, expected 11" --emit-c /dev/null
+
+sed -i 's/^(twice, 5):(11)$/(twice, 5):(10)/; s/^(twice, \[0\]):(twice, \[0, 0\])$/(twice, [0]):(twice, [0, 1])/' "$TMP/p.id"
+self_refuse "bin/idc: a false case comparing a list after a function argument fails the build" \
+    "p.id:18: test failed" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+shout(string s) {
+  print(s);
+} return void;
+("a"):("a")
+("b"):("b")
+
+apply(func(int) return int f, int x) {
+  int r = f(x);
+} return int r;
+(shout, 3):(6)
+(nope, 5):(10)
+EOF
+self_refuse "bin/idc: a case naming a function of the wrong signature is rejected" \
+    "p.id:10: error: this case gives 'shout', a func(string) return void, where a func(int) return int is required" --emit-c /dev/null
+grep -qF "p.id:11: error: a test case takes literals only (a number, a string, or a list of those); 'nope' is not a function in this build" "$TMP/log" \
+    && ok "bin/idc: a case naming no function is rejected" \
+    || bad "bin/idc: a case naming no function is rejected ($(head -1 "$TMP/log"))"
+
+# --freestanding has no host to run a harness on and builds through LLVM only.
+cat > "$TMP/p.id" <<'EOF'
+run(func(int) return int step, int dt) {
+  int r = step(dt);
+} return int r;
+
+twice(int n) {
+  int r = n * 2;
+} return int r;
+
+use(int n) {
+  int r = run(twice, n);
+} return int r;
+EOF
+self_accept "bin/idc: a --freestanding object passes and calls a function value" --freestanding -o "$TMP/lib.o"
+self_build --freestanding --emit-llvm "$TMP/lib.ll"
+grep -qF "call i32 @id_run(ptr @id_twice" "$TMP/lib.ll" && grep -qE "call i32 %v[0-9]+\(i32 " "$TMP/lib.ll" \
+    && ok "bin/idc: --freestanding LLVM passes the symbol and calls the pointer" \
+    || bad "bin/idc: --freestanding LLVM passes the symbol and calls the pointer"
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

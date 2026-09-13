@@ -1,0 +1,10 @@
+// EXPECT: cannot initialize func(int) return void 'f' with a func(int, int) return void value
+// EXPECT-IDCPY: unexpected token 'int'
+pair(int a, int b) {
+  print(a + b);
+} return void;
+
+main(int argc, string[] argv) {
+  func(int) return void f = pair;
+  f(argc);
+} return int 0;
