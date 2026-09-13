@@ -93,7 +93,7 @@ int id_sock_send(int handle, IdList* buf, int n) {
         int i;
         ssize_t wrote;
         for (i = 0; i < want; i++) chunk[i] = (unsigned char)(buf->data[sent + i] & 0xff);
-        wrote = send(s->fd, chunk, (size_t)want, 0);
+        wrote = send(s->fd, chunk, (size_t)want, MSG_NOSIGNAL);
         if (wrote < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) continue;
             return sock_fail(errno);
