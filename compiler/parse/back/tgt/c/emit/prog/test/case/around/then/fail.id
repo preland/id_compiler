@@ -1,0 +1,21 @@
+// A check that does not hold fails the case the way a wrong result does, in the
+// same words, with the check named after the call:
+//
+//   FILE:LINE: test failed: f((import g)) then count() = 2, expected 1
+
+emit_then_fail(int ci, int ti, string chk_nm, string rt) {
+  string cnd = tc_compare("idtc_chk" + ti, "idtc_want" + ti, rt);
+  string shown = tc_show("idtc_chk" + ti, rt);
+  emit_then_lines(ci, ti, chk_nm, cnd, shown);
+} return void;
+
+emit_then_lines(int ci, int ti, string chk_nm, string cnd, string shown) {
+  string tail = then_tail(ti);
+  emit_line("    if (!(" + cnd + ")) {\n        fprintf(stderr, \"%s: test failed: %s then " + chk_nm + "() = \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n        " + shown + "\n        fputs(\"" + tail + "\", stderr);\n        return 3;\n    }");
+} return void;
+
+then_tail(int ti) {
+  int[] items = l1_of((import thennode)[ti]);
+  string lt = lit_text(items[0]);
+  string so = c_esc(", expected " + lt + "\n");
+} return string so;

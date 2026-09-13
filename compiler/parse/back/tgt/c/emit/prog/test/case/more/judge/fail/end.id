@@ -7,6 +7,7 @@
 
 emit_case_end(int ci) {
   emit_case_fail(ci);
+  emit_case_thens(ci);
   emit_line("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
 } return void;
 

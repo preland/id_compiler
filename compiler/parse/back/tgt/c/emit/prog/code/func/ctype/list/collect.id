@@ -21,4 +21,5 @@ tc_collect() {
     tc_collect_case(ci);
     ci = ci + 1;
   }
+  tc_collect_thens();
 } return void;

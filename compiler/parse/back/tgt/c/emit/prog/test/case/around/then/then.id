@@ -1,0 +1,23 @@
+// After the call has been compared: each `then` check written on the case, in
+// the order written. The counters were read before any of this, so a check's
+// own work is not counted as the function's.
+
+emit_case_thens(int ci) {
+  int ti = 0;
+  while(ti < len((import thennode))) {
+    then_at(ci, ti);
+    ti = ti + 1;
+  }
+} return void;
+
+then_at(int ci, int ti) {
+  if(i1_of((import thennode)[ti]) == ci) {
+    emit_then(ci, ti);
+  }
+} return void;
+
+emit_then(int ci, int ti) {
+  string chk_nm = s1_of((import thennode)[ti]);
+  int cfn = func_node(chk_nm);
+  emit_then_got(ci, ti, chk_nm, cfn);
+} return void;
