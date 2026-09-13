@@ -4,8 +4,8 @@ node_decl(string type, string name, int expr, int exported) {
   int ret_i = newleaf("decl", expr, exported, type, name);
 } return int ret_i;
 
-node_param(string type, string name) {
-  int ret_i = newleaf("param", 0, 0, type, name);
+node_param(string kind, string type, string name) {
+  int ret_i = newleaf(kind, 0, 0, type, name);
 } return int ret_i;
 
 node_call(string name, int[] args) {

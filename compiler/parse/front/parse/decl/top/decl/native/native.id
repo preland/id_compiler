@@ -7,6 +7,11 @@
 // the per-file rule and compared by uniqueness -- with no body, no return
 // expression, and 1 in its second int field (see is_native). Every check that
 // reads a function therefore reads this one, and only the emitters ask.
+//
+// Its parameters are "nparam" nodes, not "param": with no body they name
+// nothing, so they carry types for the call checks and prototypes but are not
+// variables. They enter no symbol table and reserve no name, so a program may
+// export or retype a name a backend's parameter happens to use.
 
 parse_fn(int[] pos) {
   int n = 0;
@@ -25,6 +30,6 @@ parse_native(int[] pos) {
 
 native_sig(int[] pos, string name) {
   advance(pos);
-  int[] params = parse_params(pos);
+  int[] params = parse_params(pos, "nparam");
   int ret_i = native_ret(pos, name, params);
 } return int ret_i;

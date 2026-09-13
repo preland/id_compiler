@@ -14,6 +14,6 @@ parse_asm_tail(int[] pos) {
 
 asm_sig_mid(int[] pos) {
   advance(pos);
-  int[] parse_params_v = parse_params(pos);
+  int[] parse_params_v = parse_params(pos, "param");
   int ret_i = asm_sig_tail(pos, parse_params_v);
 } return int ret_i;
