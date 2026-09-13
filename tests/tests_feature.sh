@@ -987,7 +987,7 @@ self_refuse "bin/idc: given is not a variable name" \
 
 cat > "$TMP/p.id" <<'EOF'
 f(int then) {
-  int b = 1;
+  int b = len("a");
 } return int b;
 (1):(1)
 (2):(1)
@@ -1041,7 +1041,7 @@ fi
 # --- genuine redeclaration inside a single function should still report "declared twice" --
 cat > "$TMP/p.id" <<'EOF'
 f(int a) {
-  int x = 1;
+  int x = a;
   int x = 2;
 } return int x;
 EOF

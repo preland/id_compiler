@@ -806,11 +806,12 @@ expect_output "flat store: poke/peek, widths, string bridge" "1234
 # its top 32 bits. This regressed once; it now has a test.
 mkdir -p "$TMP/wbox"
 cat > "$TMP/wbox/m.id" <<'EOF'
-wzero() {
-} return word 0;
+wof(int a) {
+  word w = a;
+} return word w;
 
 main(int argc, string[] argv) {
-  word[] xs = [wzero(), 0 - 1];
+  word[] xs = [wof(0), 0 - 1];
   print("" + xs[1] + " " + xs[0]);
 } return int 0;
 EOF

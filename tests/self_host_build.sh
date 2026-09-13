@@ -172,7 +172,7 @@ cat > "$proj/m.id" <<'EOF'
 main(int argc, string[] argv) { print(1); } return int 0;
 EOF
 cat > "$proj/.git/sneaky.id" <<'EOF'
-sneaky_fn() { int q = 1; } return int q;
+sneaky_fn(int a) { int q = a; } return int q;
 EOF
 $IDC     "$proj" --emit-c "$TMP/hid_py.c"   >/dev/null 2>&1; py_rc=$?
 $BIN_IDC "$proj" --emit-c "$TMP/hid_self.c" >/dev/null 2>&1; self_rc=$?
@@ -208,10 +208,10 @@ fi
 lib="$TMP/implib"; app="$TMP/impapp"
 mkdir -p "$lib" "$app"
 cat > "$lib/h.id" <<'EOF'
-imp_helper() { int q = 5; } return int q;
+imp_helper(int a) { int q = a; } return int q;
 EOF
 cat > "$app/main.id" <<'EOF'
-main(int argc, string[] argv) { int r = imp_helper(); print(r); } return int 0;
+main(int argc, string[] argv) { int r = imp_helper(5); print(r); } return int 0;
 EOF
 printf 'import "%s"\n' "$lib" > "$app/conf.id"
 if $BIN_IDC "$app" -o "$TMP/imp.bin" >/dev/null 2>&1 \
@@ -377,13 +377,13 @@ fi
 mkdir -p "$TMP/nested/sub"
 cat > "$TMP/nested/main.id" <<'EOF'
 main(int argc, string[] argv) {
-  int r = helper();
+  int r = helper(42);
   print(r);
 } return int 0;
 EOF
 cat > "$TMP/nested/sub/conf.id" <<'EOF'
-helper() {
-  int r = 42;
+helper(int a) {
+  int r = a;
 } return int r;
 EOF
 nested_msg="is the dependency manifest and is only read at the root"
@@ -401,7 +401,7 @@ fi
 # idem/engine's 1,115 real errors were once read as "1 error". bin/idc only:
 # idc.py still stops at the first CompileError it raises.
 mkdir -p "$TMP/mixed"
-for n in 1 2 3 4; do printf 'mx%d() {\n} return int %d;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
+for n in 1 2 3 4; do printf 'mx%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
 cat > "$TMP/mixed/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int r = no_such_function();
