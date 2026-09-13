@@ -625,12 +625,12 @@ fi
 
 # --- the game engine + the two games it drives build cleanly (real-time I/O
 #     builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
-if "$IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
+if env -u IDC_NO_STD "$IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
     ok "moonbuggy builds (with bundled engine)"
 else
     bad "moonbuggy builds (with bundled engine)"
 fi
-if "$IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
+if env -u IDC_NO_STD "$IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
     ok "solitaire builds (with bundled engine)"
 else
     bad "solitaire builds (with bundled engine)"

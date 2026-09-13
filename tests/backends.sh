@@ -21,6 +21,9 @@ set -u
 # Hermetic: these checks assert on exact diagnostics, exact emitted C, or the
 # compiler's own bootstrap, none of which may change because a standard library
 # happens to exist beside this repository. stdlib.sh covers that path instead.
+# Exception: the graphics demos (gfxdemo, gl3d, gl3dgame, fpsmaze, galaxy, flyover)
+# are user programs and get idstd implicitly, so they are built with env -u IDC_NO_STD
+# to test them the way a user would.
 export IDC_NO_STD=1
 
 cd "$(dirname "$0")"
@@ -256,10 +259,10 @@ fi
 # -- the graphics demos still build, and their C matches idc.py's ------------
 for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
     d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if ! $ROOT/idc.py "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
+    if ! env -u IDC_NO_STD $ROOT/idc.py "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
         bad "$d: idc.py --backend"; continue
     fi
-    if ! $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
+    if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
         bad "$d: bin/idc --backend"; continue
     fi
     if diff "$TMP/py.c" "$TMP/self.c" >/dev/null; then
@@ -275,7 +278,7 @@ done
 # DISPLAY unset is the test, and it needs no display by construction.
 for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
     d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if ! $BIN_IDC "$ORG/demos/$d" --backend "$be" -o "$TMP/$d.bin" >/dev/null 2>&1; then
+    if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" -o "$TMP/$d.bin" >/dev/null 2>&1; then
         bad "$d: builds for the no-display check"; continue
     fi
     DISPLAY= timeout 5 "$TMP/$d.bin" >/dev/null 2>&1

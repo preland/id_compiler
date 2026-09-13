@@ -38,11 +38,8 @@ compiler/lex     needs-std
 compiler/parse   needs-std
 
 # ---------------------------------------------------------------------------
-# The work list, three left. Each defines a name idstd also defines, or a
-# function whose logic idstd already has. The duplicate should go, not the rule.
-#
 # engine, moonbuggy, solitaire -- the terminal engine and its two games, whose
-#   helpers are headed for idstd anyway.
-engine           broken
-moonbuggy        broken
-solitaire        broken
+#   duplicate lset functions have been removed so they now use the one from idstd.
+engine           needs-std
+moonbuggy        needs-std
+solitaire        needs-std

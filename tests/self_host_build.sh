@@ -105,7 +105,7 @@ for prog in ../../demos/calc ../../demos/control/flow.id ../../demos/adventure; 
 done
 
 # a no-main project (a library) must build to a .o with bin/idc too
-if $BIN_IDC ../../demos/engine -o "$TMP/engine_self.o" >/dev/null 2>&1 \
+if env -u IDC_NO_STD $BIN_IDC ../../demos/engine -o "$TMP/engine_self.o" >/dev/null 2>&1 \
    && [ -f "$TMP/engine_self.o" ]; then
     ok "engine (no main -> .o) builds via bin/idc"
 else
