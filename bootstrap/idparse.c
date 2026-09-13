@@ -438,6 +438,8 @@ void id_sset(IdList* strs, int i, char* s);
 int id_lst_index_of(IdList* xs, int v);
 int id_lst_find(IdList* xs, int v);
 int id_lst_pick(int at, int i, int hit);
+void id_check_asm_targets(int argc, IdList* argv);
+void id_asm_target_rows(char* triple);
 void id_dce_prune(void);
 int id_dce_pack(int i, int n);
 int id_dce_keep(int i, int n);
@@ -462,6 +464,7 @@ void id_emit(int argc, IdList* argv);
 char* id_arg_triple(int argc, IdList* argv);
 void id_register_asm_syms(void);
 void id_emit_line(char* s);
+char* id_arg_flag_val(int argc, IdList* argv, int i, char* name, char* dflt);
 void id_emit_target(int argc, IdList* argv);
 void id_emit_target2(char* t, int argc, IdList* argv);
 char* id_arg_target(int argc, IdList* argv, int i, char* t);
@@ -1975,6 +1978,23 @@ int id_lst_pick(int at, int i, int hit) {
     return v;
 }
 
+void id_check_asm_targets(int argc, IdList* argv) {
+    char* arg_triple_v;
+    arg_triple_v = id_arg_triple(argc, argv);
+    id_asm_target_rows(arg_triple_v);
+    return;
+}
+
+void id_asm_target_rows(char* triple) {
+    int i;
+    i = 0;
+    while ((i < id_asm_count())) {
+        id_asm_check(i, triple);
+        i = (i + 1);
+    }
+    return;
+}
+
 void id_dce_prune(void) {
     if ((id_find_str(fnames, "main") >= 0)) {
         id_dce_pack(0, 0);
@@ -2004,6 +2024,7 @@ int id_dce_keep(int i, int n) {
 }
 
 void id_guarded_emit(int argc, IdList* argv) {
+    id_check_asm_targets(argc, argv);
     if ((id_check_failed() == 0)) {
         id_guarded_prune();
         id_init_tyc();
@@ -2145,10 +2166,7 @@ void id_emit(int argc, IdList* argv) {
 
 char* id_arg_triple(int argc, IdList* argv) {
     char* s;
-    s = "x86_64-unknown-linux-gnu";
-    if (((argc > 2) && (strcmp((char*)(intptr_t)(id_list_get(argv, 1)), "--triple") == 0))) {
-        s = (char*)(intptr_t)(id_list_get(argv, 2));
-    }
+    s = id_arg_flag_val(argc, argv, 1, "--triple", "x86_64-unknown-linux-gnu");
     return s;
 }
 
@@ -2165,6 +2183,17 @@ void id_register_asm_syms(void) {
 void id_emit_line(char* s) {
     id_print(s);
     return;
+}
+
+char* id_arg_flag_val(int argc, IdList* argv, int i, char* name, char* dflt) {
+    char* s;
+    s = dflt;
+    if ((((i + 1) < argc) && (strcmp((char*)(intptr_t)(id_list_get(argv, i)), name) == 0))) {
+        s = (char*)(intptr_t)(id_list_get(argv, (i + 1)));
+    } else if ((i < argc)) {
+        s = id_arg_flag_val(argc, argv, (i + 1), name, dflt);
+    }
+    return s;
 }
 
 void id_emit_target(int argc, IdList* argv) {
@@ -5610,8 +5639,6 @@ void id_emit_asm_all(char* triple) {
 void id_emit_asm_row(int i, char* triple) {
     if ((strcmp((char*)(intptr_t)(id_list_get(aftriple, i)), triple) == 0)) {
         id_emit_asm_one(i);
-    } else {
-        id_asm_check(i, triple);
     }
     return;
 }
@@ -5753,6 +5780,7 @@ void id_asm_error(char* name, char* triple) {
     char* asm_triples_v;
     asm_triples_v = id_asm_triples(name);
     id_print(id_concat(id_concat(id_concat(id_concat(id_concat("error: no 'asm' definition of '", name), "' for target '"), triple), "'; defined for: "), asm_triples_v));
+    id_note_failure();
     return;
 }
 
@@ -7119,8 +7147,6 @@ void id_ll_asm_all(char* triple) {
 void id_ll_asm_row(int i, char* triple) {
     if ((strcmp((char*)(intptr_t)(id_list_get(aftriple, i)), triple) == 0)) {
         id_ll_asm_one(i);
-    } else {
-        id_asm_check(i, triple);
     }
     return;
 }

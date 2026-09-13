@@ -52,6 +52,7 @@ FREESTANDING=0
 RUNTIME=0
 KEEP_C=0
 CC=cc
+CC_EXPLICIT=0
 TRIPLE=""
 REQUIRE_TESTS=0
 EMIT_SOURCES=0
@@ -70,7 +71,7 @@ while [ $# -gt 0 ]; do
         --keep-c)
             KEEP_C=1; shift ;;
         --cc)
-            CC="${2:?idc: --cc needs an argument}"; shift 2 ;;
+            CC="${2:?idc: --cc needs an argument}"; CC_EXPLICIT=1; shift 2 ;;
         --backend)
             BACKENDS+=("${2:?idc: --backend needs an argument}"); shift 2 ;;
         --triple)
@@ -120,6 +121,53 @@ if [ -n "${1:-}" ] && [ -z "$PATH_ARG" ]; then
 fi
 if [ -z "$PATH_ARG" ]; then
     echo "idc: missing PATH" >&2; usage; exit 2
+fi
+
+# ---------------------------------------------------------------------------
+# The platform this build is for, as one triple.
+#
+# It used to be asked twice and answered differently each time: idparse fell
+# back to a hard-coded x86_64-unknown-linux-gnu when --triple was not passed,
+# and the native-backend resolver ran its own `uname -s`. Neither could be
+# overridden together, so `--triple aarch64-apple-darwin` selected aarch64 asm
+# while still compiling the backend's Linux sources. One value answers both
+# now, it is derived from the host when nothing says otherwise, and --triple
+# moves the whole build rather than half of it.
+host_triple() {
+    local arch
+    arch="$(uname -m)"
+    case "$arch" in
+        x86_64|amd64)   arch=x86_64 ;;
+        aarch64|arm64)  arch=aarch64 ;;
+    esac
+    case "$(uname -s)" in
+        Linux*)   echo "$arch-unknown-linux-gnu" ;;
+        Darwin*)  echo "$arch-apple-darwin" ;;
+        *)        echo "$arch-unknown-$(uname -s | tr '[:upper:]' '[:lower:]')" ;;
+    esac
+}
+
+# The platform key a backend.json is indexed by, read out of the triple's OS
+# field. `unknown` is the vendor slot and never the OS, so it is not matched.
+triple_platform() {
+    case "$1" in
+        *-linux|*-linux-*)   echo linux ;;
+        *-darwin|*-darwin*)  echo darwin ;;
+        *-none|*-none-*)     echo none ;;
+        *)                   echo "${1##*-}" ;;
+    esac
+}
+
+# A freestanding build has no OS to name, so its default is the bare-metal
+# triple rather than the host's -- which is what the kernel's asm functions are
+# written for, and what clang was already being handed here.
+if [ -z "$TRIPLE" ]; then
+    if [ "$FREESTANDING" -eq 1 ]; then
+        TRIPLE="$(host_triple)"
+        TRIPLE="${TRIPLE%%-*}-unknown-none"
+    else
+        TRIPLE="$(host_triple)"
+    fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -531,13 +579,10 @@ PARSE_ARGS=()
 if [ "$((${#BACKENDS[@]} + ${#MANIFEST_BACKENDS[@]}))" -gt 0 ]; then
     PARSE_ARGS+=(--extern-ok)
 fi
-# The target triple selects among a program's `asm` overloads. idparse has
-# always implemented it; it just had no way through this driver, so a
-# multi-platform asm program could not be cross-targeted with the command the
-# user actually runs.
-if [ -n "$TRIPLE" ]; then
-    PARSE_ARGS+=(--triple "$TRIPLE")
-fi
+# The target triple selects among a program's `asm` overloads, and is always
+# passed: leaving it out let idparse's own default answer the question, which
+# is how the driver and the compiler came to disagree about the platform.
+PARSE_ARGS+=(--triple "$TRIPLE")
 # Every function must carry at least two test cases (docs/TESTS.md). Off by
 # default while the rollout is under way; the self-hosted compiler checks it.
 if [ "$REQUIRE_TESTS" -eq 1 ]; then
@@ -731,7 +776,7 @@ if [ "$TARGET" = llvm ]; then
         command -v clang >/dev/null 2>&1 || LLVM_CC="$CC"
         cmd=("$LLVM_CC" -c -O2 -Wno-override-module -ffreestanding -fno-builtin
              -mno-red-zone -fno-stack-protector -fno-asynchronous-unwind-tables -Wno-unused-command-line-argument
-             -target "${TRIPLE:-x86_64-unknown-none}" "$LL_OUT" -o "$OUT")
+             -target "$TRIPLE" "$LL_OUT" -o "$OUT")
         progress link "clang -> $(basename "$OUT")"
         if ! "${cmd[@]}" 2>"$WORK/clang.err"; then
             progress_clear
@@ -805,6 +850,7 @@ choose_output
 # ---------------------------------------------------------------------------
 # --backend DIR: read backend.json for this platform, compile its sources,
 # and link the resulting objects in (mirrors idc.py's resolve_backend/build_c)
+PLATKEY_BUILD="$(triple_platform "$TRIPLE")"
 BACKEND_OBJS=()
 BACKEND_LINK=()
 # backends come from both --backend flags and the conf.id manifest. The same
@@ -827,20 +873,16 @@ if [ "${#ALL_BACKENDS[@]}" -gt 0 ] && [ "$have_main" -eq 0 ]; then
     echo "idc: backend(s) ignored: this project has no main (builds to a .o);" \
          "link the backend into the final program" >&2
 elif [ "${#ALL_BACKENDS[@]}" -gt 0 ]; then
-    case "$(uname -s)" in
-        Linux*)  PLATKEY=linux ;;
-        Darwin*) PLATKEY=darwin ;;
-        *)       PLATKEY="$(uname -s)" ;;
-    esac
+    PLATKEY="$PLATKEY_BUILD"
     for d in "${ALL_BACKENDS[@]}"; do
         manifest="$d/backend.json"
         if [ ! -f "$manifest" ]; then
             echo "idc: backend has no backend.json: $manifest" >&2
             exit 1
         fi
-        spec_out=$(python3 - "$manifest" "$PLATKEY" <<'PYEOF'
+        spec_out=$(python3 - "$manifest" "$PLATKEY" "$TRIPLE" <<'PYEOF'
 import json, sys
-manifest, key = sys.argv[1], sys.argv[2]
+manifest, key, triple = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(manifest) as f:
     spec = json.load(f)
 name = spec.get("name", "backend")
@@ -860,7 +902,13 @@ else:
     plats = targets["c"].get("platforms") or {}
 plat = plats.get(key)
 if plat is None:
-    print("ERR", f"backend '{name}' has no support for platform '{key}'")
+    # Name the triple, not just the key: the key is derived from it, and the
+    # triple is the thing the user can change. Naming what the backend *does*
+    # have turns "unsupported" into a choice between porting it and picking a
+    # platform it already covers.
+    have = ", ".join(sorted(plats)) or "no platform at all"
+    print("ERR", f"backend '{name}' has no support for platform '{key}' "
+                 f"(building for '{triple}'); it is implemented for: {have}")
     sys.exit(0)
 SEP = "\x1f"
 print("SOURCES", SEP.join(plat.get("sources", [])))
@@ -901,6 +949,23 @@ if [ "$KEEP_C" -eq 1 ]; then
     c_path="${OUT%.*}.c"
 fi
 cp "$C_OUT" "$c_path" || exit 1
+
+# The triple chose the sources; it cannot choose the code generator. `cc` here
+# is the host's, so building a darwin triple on Linux would compile the darwin
+# sources -- Objective-C, Cocoa -- with a Linux compiler and, where that
+# happened to succeed, produce a host binary wearing another platform's name.
+# Refusing is the honest answer, and --cc is the way to mean it: point it at a
+# cross compiler and the build is yours. (--target llvm hands the triple to
+# clang with -target, so it is genuinely cross-capable and does not come here.)
+HOSTPLAT="$(triple_platform "$(host_triple)")"
+if [ "$CC_EXPLICIT" -eq 0 ] && [ "$PLATKEY_BUILD" != "$HOSTPLAT" ]; then
+    progress_clear
+    echo "idc: cannot build for '$TRIPLE' here: the C target compiles with the host's" \
+         "cc, which targets '$HOSTPLAT', not '$PLATKEY_BUILD'." >&2
+    echo "idc: pass --cc with a cross compiler for '$PLATKEY_BUILD', or use --target llvm," \
+         "which hands the triple to clang." >&2
+    exit 1
+fi
 
 cmd=("$CC")
 [ "$have_main" -eq 0 ] && cmd+=("-c")

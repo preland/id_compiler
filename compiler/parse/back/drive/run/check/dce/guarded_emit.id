@@ -5,6 +5,7 @@
 // over every function by now, so throwing the unreachable ones away cannot
 // stop anything from being checked. See dce.id.
 guarded_emit(int argc, string[] argv) {
+  check_asm_targets(argc, argv);
   if(check_failed() == 0) {
     guarded_prune();
     init_tyc();

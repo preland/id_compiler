@@ -282,6 +282,52 @@ else
     bad "--triple selects the asm overload, and reports a missing one"
 fi
 
+# (c2) ...and it is read wherever it appears, not only at argv[1]. The driver
+# puts --extern-ok ahead of --triple whenever a backend is attached, and the
+# positional read this replaced then kept the default triple: the build below
+# silently produced an x86_64 binary and reported success.
+if $BIN_IDC "$TMP/asm.id" --backend ../backends/fs --triple aarch64-unknown-linux-gnu \
+     -o "$TMP/asm3.bin" 2>&1 \
+   | grep -q "no 'asm' definition of 'dbl' for target 'aarch64-unknown-linux-gnu'" \
+   && [ ! -f "$TMP/asm3.bin" ]; then
+    ok "--triple is honoured with a backend attached (not just at argv[1])"
+else
+    bad "--triple is honoured with a backend attached (not just at argv[1])"
+fi
+
+# (c3) The missing-overload diagnostic is a diagnostic, not a compiler bug.
+# asm_error prints, and print shares its stream with the generated code, so
+# without a failure flag the message landed inside the C and the build died as
+# "internal error: the self-hosted compiler emitted C that does not compile".
+# One line out, and nothing about reporting it.
+asm_out=$($BIN_IDC "$TMP/asm.id" --triple aarch64-unknown-linux-gnu -o "$TMP/asm4.bin" 2>&1)
+if [ "$(printf '%s\n' "$asm_out" | wc -l)" -eq 1 ] \
+   && ! printf '%s\n' "$asm_out" | grep -q "internal error"; then
+    ok "a missing asm overload is reported, not raised as a compiler bug"
+else
+    bad "a missing asm overload is reported, not raised as a compiler bug"
+fi
+
+# (c4) A triple naming a platform the host cc cannot target is refused. It used
+# to build: the triple picked the backend's darwin sources and the host cc
+# compiled them anyway, so `--triple aarch64-apple-darwin` on Linux produced a
+# Linux ELF wearing another platform's name.
+if $BIN_IDC ../../demos/hello --triple aarch64-apple-darwin -o "$TMP/cross.bin" 2>&1 \
+   | grep -q "cannot build for 'aarch64-apple-darwin' here" \
+   && [ ! -f "$TMP/cross.bin" ]; then
+    ok "a non-host platform triple is refused rather than built for the host"
+else
+    bad "a non-host platform triple is refused rather than built for the host"
+fi
+
+# (c5) ...and --cc means the user has one, so it is trusted.
+if $BIN_IDC ../../demos/hello --triple aarch64-apple-darwin --cc cc -o "$TMP/cross2.bin" \
+     >/dev/null 2>&1 && [ -f "$TMP/cross2.bin" ]; then
+    ok "--cc overrides the host-platform refusal"
+else
+    bad "--cc overrides the host-platform refusal"
+fi
+
 # bootstrap caching: a second invocation must not rebuild idlex/idparse
 cache_before=$(stat -c %Y ../.idc-cache/idlex 2>/dev/null || stat -f %m ../.idc-cache/idlex 2>/dev/null)
 $BIN_IDC ../../demos/calc -o "$TMP/calc_self2" >/dev/null 2>"$TMP/cache.err"

@@ -7,7 +7,13 @@ emit_asm_then_main(string triple) {
   def_all();
 } return void;
 
+// Printing it is not enough: `print` writes to the same stream the generated
+// code goes to, so without the flag the message landed *inside* the C and the
+// build failed as "internal error: the self-hosted compiler emitted C that
+// does not compile". A platform this program has no code for is the program's
+// problem, and it is reported like every other one.
 asm_error(string name, string triple) {
   string asm_triples_v = asm_triples(name);
   print("error: no 'asm' definition of '" + name + "' for target '" + triple + "'; defined for: " + asm_triples_v);
+  note_failure();
 } return void;

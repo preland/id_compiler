@@ -1,0 +1,16 @@
+// The value of a `--name VALUE` flag, found anywhere in the arguments.
+//
+// Scanned rather than read at a fixed index. The driver puts `--extern-ok`
+// ahead of `--triple` whenever a native backend is attached, and the
+// positional read this replaces then took `--extern-ok` for the flag and kept
+// the default triple -- so `idc prog.id --backend B --triple aarch64-...`
+// built an x86_64 binary and reported success. A wrong platform must not be a
+// silent one.
+arg_flag_val(int argc, string[] argv, int i, string name, string dflt) {
+  string s = dflt;
+  if(i + 1 < argc && argv[i] == name) {
+    s = argv[i + 1];
+  } else if(i < argc) {
+    s = arg_flag_val(argc, argv, i + 1, name, dflt);
+  }
+} return string s;

@@ -12,10 +12,7 @@ emit(int argc, string[] argv) {
 // The target triple: `idparse --triple T`, else the host default. Kept here
 // rather than in a global so nothing below the driver can change it.
 arg_triple(int argc, string[] argv) {
-  string s = "x86_64-unknown-linux-gnu";
-  if(argc > 2 && argv[1] == "--triple") {
-    s = argv[2];
-  }
+  string s = arg_flag_val(argc, argv, 1, "--triple", "x86_64-unknown-linux-gnu");
 } return string s;
 
 // asm functions are not in the program list, so build_syms never sees them.

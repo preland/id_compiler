@@ -12,8 +12,6 @@ emit_asm_all(string triple) {
 emit_asm_row(int i, string triple) {
   if((import aftriple)[i] == triple) {
     emit_asm_one(i);
-  } else {
-    asm_check(i, triple);
   }
 } return void;
 

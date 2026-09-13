@@ -17,8 +17,6 @@ ll_asm_all(string triple) {
 ll_asm_row(int i, string triple) {
   if((import aftriple)[i] == triple) {
     ll_asm_one(i);
-  } else {
-    asm_check(i, triple);
   }
 } return void;
 
