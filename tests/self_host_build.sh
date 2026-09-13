@@ -525,6 +525,27 @@ else
     bad "IDC_MEM_LIMIT=0 disables the memory ceiling"
 fi
 
+# A caller's own tighter ulimit -v is kept, not fought: the driver used to try
+# raising it to IDC_MEM_LIMIT for every stage and printed "cannot modify limit"
+# each time.
+tight_out=$( (ulimit -v 3500000 2>/dev/null; $BIN_IDC ../../demos/hello -o "$TMP/tight.bin") 2>&1)
+if [ -x "$TMP/tight.bin" ] && ! printf '%s\n' "$tight_out" | grep -q "cannot modify limit"; then
+    ok "a caller's tighter memory limit is kept without complaint"
+else
+    bad "a caller's tighter memory limit is kept without complaint: $(printf '%s\n' "$tight_out" | head -1)"
+fi
+
+# When it is the caller's limit that a stage runs into, the message says so:
+# IDC_MEM_LIMIT cannot raise it, so telling the user to raise IDC_MEM_LIMIT
+# would be wrong.
+inh_out=$( (ulimit -v 150000; IDC_CACHE_DIR="$TMP/inhcache" $BIN_IDC ../../demos/hello -o "$TMP/inh.bin") 2>&1)
+if printf '%s\n' "$inh_out" | grep -q "exceeded the memory limit idc was started under" \
+   && ! printf '%s\n' "$inh_out" | grep -q "this is a bug in the self-hosted compiler"; then
+    ok "an inherited memory limit is reported as the caller's, not as IDC_MEM_LIMIT"
+else
+    bad "an inherited memory limit is reported as the caller's, not as IDC_MEM_LIMIT: $(printf '%s\n' "$inh_out" | head -1)"
+fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

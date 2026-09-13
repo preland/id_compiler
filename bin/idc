@@ -198,14 +198,25 @@ case "$MEM_LIMIT_MB" in
         exit 2 ;;
 esac
 
-# capped CMD... -- run CMD with the ceiling applied (a plain exec when it is
-# disabled). ulimit -v is set in a subshell, so it bounds only CMD, never this
+MEM_INHERITED=$(ulimit -v)
+MEM_CAP_KB=$((MEM_LIMIT_MB * 1024))
+MEM_CAP_FROM=IDC_MEM_LIMIT
+if [ "$MEM_INHERITED" != unlimited ] \
+   && { [ "$MEM_CAP_KB" -eq 0 ] || [ "$MEM_INHERITED" -lt "$MEM_CAP_KB" ]; }; then
+    MEM_CAP_KB=$MEM_INHERITED
+    MEM_CAP_FROM=inherited
+fi
+
+# capped CMD... -- run CMD under MEM_CAP_KB, the limit actually in force. A
+# caller's own tighter `ulimit -v` is inherited and left alone: an unprivileged
+# process cannot raise its limit, and trying printed "cannot modify limit" once
+# per stage. ulimit -v is set in a subshell, so it bounds only CMD, never this
 # script or anything that runs after it.
 capped() {
-    if [ "$MEM_LIMIT_MB" -eq 0 ]; then
-        "$@"
+    if [ "$MEM_CAP_FROM" = IDC_MEM_LIMIT ] && [ "$MEM_CAP_KB" -ne 0 ]; then
+        ( ulimit -v "$MEM_CAP_KB"; exec "$@" )
     else
-        ( ulimit -v $((MEM_LIMIT_MB * 1024)); exec "$@" )
+        "$@"
     fi
 }
 
@@ -228,7 +239,7 @@ capped() {
 # rather than grown into a pattern match that could paper over a real linker
 # problem.
 mem_ceiling_hit() {
-    [ "$MEM_LIMIT_MB" -eq 0 ] && return 1
+    [ "$MEM_CAP_KB" -eq 0 ] && return 1
     [ "$1" -gt 128 ] && return 0
     [ -n "${2:-}" ] && [ -s "$2" ] \
         && grep -qiE 'out of memory|virtual memory exhausted|internal compiler error' "$2"
@@ -239,7 +250,11 @@ mem_ceiling_hit() {
 # "this is a bug in the self-hosted compiler" block: the compiler was not
 # necessarily wrong, it was just refused the memory to keep going.
 mem_ceiling_error() {
-    echo "idc: $1 exceeded the memory ceiling ($MEM_LIMIT_MB MB); set \$IDC_MEM_LIMIT to raise it, or to 0 to disable it" >&2
+    if [ "$MEM_CAP_FROM" = inherited ]; then
+        echo "idc: $1 exceeded the memory limit idc was started under ($((MEM_CAP_KB / 1024)) MB, from ulimit -v); IDC_MEM_LIMIT cannot raise a limit set by the caller" >&2
+    else
+        echo "idc: $1 exceeded the memory ceiling ($MEM_LIMIT_MB MB); set \$IDC_MEM_LIMIT to raise it, or to 0 to disable it" >&2
+    fi
     echo "idc: this means the compiler used more memory than allowed, not that it is broken" >&2
 }
 
