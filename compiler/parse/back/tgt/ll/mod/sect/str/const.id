@@ -1,0 +1,34 @@
+// A conf.id constant's initialiser, as a value an LLVM global can hold.
+//
+// C takes the initialiser as written, because a C file-scope initialiser may be
+// a constant expression and a string literal is a pointer there. An LLVM global
+// may be neither: it holds a value, and a string is a pointer to bytes that
+// have to exist as a global of their own. Emitting the spelling instead gave
+// `@k = global i32 *` for `int k = 7 * 3;` and `global ptr "..."` for a string,
+// neither of which assembles -- and the kernel, which builds only for LLVM, is
+// where string constants are needed.
+
+ll_const_val(int e, string name) {
+  string s = ll_const_num(e);
+  if(k_of(e) == "str") {
+    s = ll_const_str(e, name);
+  }
+} return string s;
+
+// An integer is the value the fingerprint canonicaliser folds it to (canon_expr,
+// tag I -- the same reduction the constant-wrapper rule reads); anything the
+// fold leaves alone is emitted as it is spelled, as before.
+ll_const_num(int e) {
+  string s = s1_of(e);
+  string fp = canon_expr(e);
+  if(charat(fp, 0) == 73) {
+    s = zeros_tail(fp, 1);
+  }
+} return string s;
+
+// The bytes are emitted here, just above the global that points at them.
+ll_const_str(int e, string name) {
+  string spell = s1_of(e);
+  string gname = "@.cs." + name;
+  ll_str_bytes(gname, spell);
+} return string gname;

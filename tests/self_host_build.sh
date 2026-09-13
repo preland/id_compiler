@@ -267,6 +267,32 @@ else
     bad "conf.id: a constant reserves its name against a later export"
 fi
 
+# and the same constants reach the LLVM target, where a global's initialiser
+# must already be a value: a string is a pointer to bytes emitted beside it,
+# and an integer written as an operator over literals is folded. The kernel
+# builds only for LLVM, so this is the path its constants take.
+if command -v clang >/dev/null 2>&1; then
+    cat > "$proj/conf.id" <<'EOF'
+int max_depth = 7 * 3;
+int below = 0 - 2;
+string banner = "id\tok";
+EOF
+    cat > "$proj/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  print((import max_depth) + (import below));
+  print((import banner));
+} return int 0;
+EOF
+    if $BIN_IDC "$proj" --target llvm -o "$TMP/consts_ll.bin" >/dev/null 2>&1 \
+       && [ "$("$TMP/consts_ll.bin")" = "$(printf '19\nid\tok')" ]; then
+        ok "conf.id: string and folded constants build for --target llvm"
+    else
+        bad "conf.id: string and folded constants build for --target llvm"
+    fi
+else
+    echo "SKIP: conf.id constants on --target llvm (needs clang on PATH)"
+fi
+
 # (c) --triple reaches idparse, which is what selects among asm overloads.
 cat > "$TMP/asm.id" <<'EOF'
 main(int argc, string[] argv) {

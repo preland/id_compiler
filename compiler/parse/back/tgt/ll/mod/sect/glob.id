@@ -20,6 +20,6 @@ ll_init(int i) {
   if((import eowners)[i] == "conf.id") {
     int const_decl_v = const_decl((import enames)[i]);
     int i1_of_v = i1_of(const_decl_v);
-    s = s1_of(i1_of_v);
+    s = ll_const_val(i1_of_v, (import enames)[i]);
   }
 } return string s;

@@ -1216,8 +1216,12 @@ void id_ll_decl_cmp(void);
 void id_ll_globals(void);
 void id_ll_global_at(int i, char* ty);
 char* id_ll_init(int i);
+char* id_ll_const_val(int e, char* name);
+char* id_ll_const_num(int e);
+char* id_ll_const_str(int e, char* name);
 void id_ll_str_emit(int i);
-void id_ll_str_emit2(int i, char* s, int blen);
+void id_ll_str_bytes(char* gname, char* s);
+void id_ll_str_emit2(char* gname, char* s, int blen);
 char* id_ll_zero(char* t);
 void id_ll_strs(void);
 void id_ll_str_at(int i);
@@ -9261,26 +9265,60 @@ char* id_ll_init(int i) {
     if ((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), "conf.id") == 0)) {
         const_decl_v = id_const_decl((char*)(intptr_t)(id_list_get(enames, i)));
         i1_of_v = id_i1_of(const_decl_v);
-        s = id_s1_of(i1_of_v);
+        s = id_ll_const_val(i1_of_v, (char*)(intptr_t)(id_list_get(enames, i)));
     }
     return s;
 }
 
+char* id_ll_const_val(int e, char* name) {
+    char* s;
+    s = id_ll_const_num(e);
+    if ((strcmp(id_k_of(e), "str") == 0)) {
+        s = id_ll_const_str(e, name);
+    }
+    return s;
+}
+
+char* id_ll_const_num(int e) {
+    char* s;
+    char* fp;
+    s = id_s1_of(e);
+    fp = id_canon_expr(e);
+    if ((id_charat(fp, 0) == 73)) {
+        s = id_zeros_tail(fp, 1);
+    }
+    return s;
+}
+
+char* id_ll_const_str(int e, char* name) {
+    char* spell;
+    char* gname;
+    spell = id_s1_of(e);
+    gname = id_concat("@.cs.", name);
+    id_ll_str_bytes(gname, spell);
+    return gname;
+}
+
 void id_ll_str_emit(int i) {
     char* s;
-    int blen;
     s = id_ir_s(i);
-    blen = id_ll_blen(s);
-    id_ll_str_emit2(i, s, blen);
+    id_ll_str_bytes(id_concat("@.str", id_str_of_int(i)), s);
     return;
 }
 
-void id_ll_str_emit2(int i, char* s, int blen) {
+void id_ll_str_bytes(char* gname, char* s) {
+    int blen;
+    blen = id_ll_blen(s);
+    id_ll_str_emit2(gname, s, blen);
+    return;
+}
+
+void id_ll_str_emit2(char* gname, char* s, int blen) {
     char* q;
     char* bytes;
     q = id_chr(34);
     bytes = id_ll_bytes(s);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("@.str", id_str_of_int(i)), " = private unnamed_addr constant ["), id_str_of_int(blen)), " x i8] c"), q), bytes), q));
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(gname, " = private unnamed_addr constant ["), id_str_of_int(blen)), " x i8] c"), q), bytes), q));
     return;
 }
 

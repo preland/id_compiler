@@ -1,12 +1,19 @@
 // The rest of `ll_str_at`: the length and bytes, then the constant line.
 ll_str_emit(int i) {
   string s = ir_s(i);
-  int blen = ll_blen(s);
-  ll_str_emit2(i, s, blen);
+  ll_str_bytes("@.str" + i, s);
 } return void;
 
-ll_str_emit2(int i, string s, int blen) {
+// A string literal's bytes as a private global called `gname`. A literal in a
+// function body is named for its IR value; a conf.id constant's, for the
+// constant (./const.id).
+ll_str_bytes(string gname, string s) {
+  int blen = ll_blen(s);
+  ll_str_emit2(gname, s, blen);
+} return void;
+
+ll_str_emit2(string gname, string s, int blen) {
   string q = chr(34);
   string bytes = ll_bytes(s);
-  emit_line("@.str" + i + " = private unnamed_addr constant [" + blen + " x i8] c" + q + bytes + q);
+  emit_line(gname + " = private unnamed_addr constant [" + blen + " x i8] c" + q + bytes + q);
 } return void;
