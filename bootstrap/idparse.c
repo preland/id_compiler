@@ -1777,6 +1777,7 @@ void id_report_var_type(char* name, char* type, char* prev, char* owner, int ln)
 char* id_export_owner(char* name);
 char* id_owner_of(char* name);
 int id_fn_count(char* fname);
+void id_reg_twice(char* name, char* type, char* owner, int exported, int ln, int unit);
 int id_fn_count_at(int i, char* fname, int n);
 void id_report_var_is_func(char* name, char* owner, int ln);
 void id_report_var_twice(char* name, char* owner, int ln);
@@ -14172,10 +14173,8 @@ void id_reg_report(char* name, char* type, char* owner, int exported, int ln, in
 }
 
 void id_reg_report2(char* name, char* type, char* owner, int exported, int ln, int unit) {
-    int owner_count;
-    owner_count = id_fn_count(owner);
-    if (((id_declared_in(name, owner) > 0) && (owner_count < 2))) {
-        id_report_var_twice(name, owner, ln);
+    if ((id_declared_in(name, owner) > 0)) {
+        id_reg_twice(name, type, owner, exported, ln, unit);
     } else {
         id_reg_report3(name, type, owner, exported, ln, unit);
     }
@@ -14254,6 +14253,15 @@ int id_fn_count(char* fname) {
         i = (i + 1);
     }
     return n;
+}
+
+void id_reg_twice(char* name, char* type, char* owner, int exported, int ln, int unit) {
+    if ((id_fn_count(owner) < 2)) {
+        id_report_var_twice(name, owner, ln);
+    } else {
+        id_reg_report3(name, type, owner, exported, ln, unit);
+    }
+    return;
 }
 
 int id_fn_count_at(int i, char* fname, int n) {
