@@ -460,6 +460,30 @@ else
     bad "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable: $(head -2 "$TMP/boot.err" | tr '\n' ' ')"
 fi
 
+# IDC_MEM_LIMIT: a deliberately tiny ceiling, against a fresh cache so the
+# bootstrap rebuild actually exercises it, must be reported as a memory
+# failure naming the stage and the ceiling -- not the generic "bug in the
+# self-hosted compiler" block, because the compiler was refused memory, not
+# necessarily wrong.
+mem_out=$(IDC_CACHE_DIR="$TMP/memcache" IDC_MEM_LIMIT=100 $BIN_IDC ../../demos/hello -o "$TMP/mem.bin" 2>&1)
+mem_rc=$?
+if [ "$mem_rc" -ne 0 ] \
+   && printf '%s\n' "$mem_out" | grep -q "exceeded the memory ceiling (100 MB)" \
+   && ! printf '%s\n' "$mem_out" | grep -q "this is a bug in the self-hosted compiler"; then
+    ok "a tiny IDC_MEM_LIMIT is reported as a memory failure, not a compiler bug"
+else
+    bad "a tiny IDC_MEM_LIMIT is reported as a memory failure, not a compiler bug"
+fi
+
+# IDC_MEM_LIMIT=0 disables the ceiling entirely -- the same build with a
+# normal cache must still succeed.
+if IDC_MEM_LIMIT=0 $BIN_IDC ../../demos/hello -o "$TMP/mem0.bin" >/dev/null 2>&1 \
+   && [ -x "$TMP/mem0.bin" ]; then
+    ok "IDC_MEM_LIMIT=0 disables the memory ceiling"
+else
+    bad "IDC_MEM_LIMIT=0 disables the memory ceiling"
+fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

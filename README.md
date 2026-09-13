@@ -51,6 +51,24 @@ The one rule checked in the driver rather than in `id` is the
 3-entries-per-directory limit — it is a property of the filesystem, which `id`
 cannot see, which is also why the driver exists.
 
+**Memory ceiling:** every subprocess that does real compilation work —
+`idlex`, `idparse`, and the C compiler or `clang` — runs under a virtual-memory
+ceiling (`ulimit -v`), `IDC_MEM_LIMIT` megabytes, 4096 by default. This is
+defense in depth against a runaway self-hosted compiler, not a fix for one: a
+blowup in `idparse` still happens, but it now dies against this ceiling with
+one clear line instead of exhausting the machine it runs on. The default was
+chosen with ample headroom over the largest legitimate builds in this tree —
+building the compiler's own stages from a cold cache, the editor, the kernel,
+`demos/solitaire`, `demos/gl3dgame` with the `gl` backend, and even
+`idem/engine`, which currently fails to compile with over a thousand real
+errors — every one of which completes well under 512 MB. Set `IDC_MEM_LIMIT=0`
+to disable the ceiling entirely. When a stage dies against it (the `id`
+runtime reports its own allocation failures in words; a C compiler that
+doesn't dies by signal instead), `bin/idc` prints one line naming the stage,
+the ceiling, and `IDC_MEM_LIMIT` — not the generic "this is a bug in the
+self-hosted compiler" report, because the compiler was not necessarily wrong,
+it was just refused the memory to keep going.
+
 ## Two code generators, and one of them optimises
 
 `bin/idc PATH --target llvm` compiles through an SSA intermediate
