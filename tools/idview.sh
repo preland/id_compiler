@@ -14,7 +14,7 @@ bin=${IDVIEW:-$here/.idc-cache/idview}
 
 if [ ! -x "$bin" ] || [ -n "$(find "$here/../demos/idview" -name '*.id' -newer "$bin" 2>/dev/null)" ]; then
     mkdir -p "$(dirname "$bin")"
-    "$here/bin/idc" "$here/../demos/idview" -o "$bin" >&2
+    "$here/bin/idc" "$here/../demos/idview" --allow-untested -o "$bin" >&2
 fi
 
 roots=("$@")

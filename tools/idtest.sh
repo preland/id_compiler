@@ -50,7 +50,9 @@ main(int argc, string[] argv) {
 } return int 0;
 EOF
 
-out=$("$BIN_IDC" "$TMP/p" -o "$TMP/bin" 2>&1)
+# --allow-untested: the main above has no cases, and neither has all of idstd,
+# which every build merges. A module's own cases still run and still fail it.
+out=$("$BIN_IDC" "$TMP/p" --allow-untested -o "$TMP/bin" 2>&1)
 rc=$?
 # Rewrite the temp path back to the real one, so a failure names a file the
 # reader can open.

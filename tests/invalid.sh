@@ -37,10 +37,13 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 pass=0 fail=0
 
-# check_one COMPILER LABEL FILE EXPECT -- must exit nonzero and print EXPECT
+# check_one COMPILER LABEL FILE EXPECT [FLAG...] -- must exit nonzero and print
+# EXPECT. bin/idc is given --allow-untested: none of these programs has test
+# cases, and the rule each one breaks is the one on its EXPECT line, not the
+# two-case minimum. idc.py has neither the minimum nor the flag.
 check_one() {
     local cc="$1" label="$2" f="$3" expect="$4" out rc
-    out=$("$cc" "$f" -o "$TMP/out" 2>&1)
+    out=$("$cc" "$f" "${@:5}" -o "$TMP/out" 2>&1)
     rc=$?
     if [ "$rc" -eq 0 ]; then
         echo "FAIL: $label (compiled successfully; expected error '$expect')"
@@ -84,7 +87,7 @@ for f in invalid/*.id; do
     else
         check_one "$IDC" "$name [idc.py]" "$f" "${idcpy:-$expect}"
     fi
-    check_one "$BIN_IDC" "$name [bin/idc]" "$f" "$expect"
+    check_one "$BIN_IDC" "$name [bin/idc]" "$f" "$expect" --allow-untested
 done
 
 echo

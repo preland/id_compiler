@@ -10,8 +10,12 @@ OUT="${1:-build/kernel.elf}"
 TRIPLE=x86_64-unknown-none
 mkdir -p build
 
-./bin/idc runtime --no-std --runtime --triple "$TRIPLE" -o build/runtime.o
-./bin/idc ../kernel/prog --no-std --freestanding --triple "$TRIPLE" -o build/kernel.o
+# --allow-untested, and not for want of writing cases: a freestanding build
+# refuses one that has any, because there is no host to run them on, so the
+# runtime and the kernel cannot meet the two-case minimum at all. That is an
+# open question in docs/TESTS.md ("Enforcement, and the migration").
+./bin/idc runtime --no-std --runtime --allow-untested --triple "$TRIPLE" -o build/runtime.o
+./bin/idc ../kernel/prog --no-std --freestanding --allow-untested --triple "$TRIPLE" -o build/kernel.o
 clang -target "$TRIPLE" -ffreestanding -c ../kernel/boot/boot.S -o build/boot.o
 clang -target "$TRIPLE" -ffreestanding -c ../kernel/boot/isr.S -o build/isr.o
 ld.lld -n -T ../kernel/boot/kernel.ld build/boot.o build/isr.o build/runtime.o build/kernel.o -o "$OUT"

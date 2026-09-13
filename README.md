@@ -82,7 +82,15 @@ of its own with 10 seconds and 1 GiB, so a case that traps or crashes is
 reported as that case. `[time:…]`/`[mem:…]` claims are counted exactly and
 judged after every case has passed. A build whose cases cannot run on this
 machine — `--freestanding`, or another platform's `--triple` — is refused,
-naming why. `--require-tests` still only adds the two-case minimum.
+naming why.
+
+**Two cases per function are required by default.** A function with fewer is a
+compile error; `--require-tests` restates the default. `--allow-untested` turns
+the minimum off for a build whose tree does not have its cases yet, prints one
+deprecation warning on stderr, and changes nothing else; it is removed once
+every function has its cases, and `tests/run.sh` fails once adoption is 100%
+and the flag is still here. Every build in this repository passes it today.
+See [`../docs/TESTS.md`](../docs/TESTS.md), "Enforcement, and the migration".
 
 ## Two code generators, and one of them optimises
 
@@ -93,9 +101,9 @@ second walk of the syntax tree. That is what makes optimisation possible at
 all, and `-O1` (the default) already removes a third of the emitted IR.
 
 ```sh
-bin/idc ../demos/calc --target llvm -o calc     # through the IR and its passes
-bin/idc ../demos/calc --target llvm -O0         # with every pass off
-bin/idc ../demos/calc --target llvm --emit-llvm calc.ll
+bin/idc ../demos/calc --allow-untested --target llvm -o calc     # through the IR and its passes
+bin/idc ../demos/calc --allow-untested --target llvm -O0         # with every pass off
+bin/idc ../demos/calc --allow-untested --target llvm --emit-llvm calc.ll
 ```
 
 It compiles the compiler, and the compiler it builds reproduces itself exactly.

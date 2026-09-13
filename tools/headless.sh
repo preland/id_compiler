@@ -2,7 +2,7 @@
 # Run a windowed `id` program without a window reaching the real compositor.
 #
 #   tools/headless.sh ./gl3d
-#   tools/headless.sh bash -c 'bin/idc demos/gl3d --backend backends/gl -o /tmp/g && /tmp/g'
+#   tools/headless.sh bash -c 'bin/idc demos/gl3d --backend backends/gl --allow-untested -o /tmp/g && /tmp/g'
 #
 # Why: on a tiling compositor, opening a window steals focus, moves the
 # pointer, and drops whatever was fullscreen. That is correct behaviour for an

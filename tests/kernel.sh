@@ -124,7 +124,7 @@ main(int argc, string[] argv) {
   show_all();
 } return int 0;
 IDEOF
-if "$ROOT/bin/idc" "$HOST" --no-std -o "$TMP/host.bin" >"$TMP/host.log" 2>&1; then
+if "$ROOT/bin/idc" "$HOST" --no-std --allow-untested -o "$TMP/host.bin" >"$TMP/host.log" 2>&1; then
     host_out=$("$TMP/host.bin" 2>&1)
     n=$(printf '%s\n' "$host_out" | wc -l)
     kern_out=$(printf '%s\n' "$got" | tail -n +3 | head -n "$n")

@@ -28,7 +28,7 @@ for stage in lex parse; do
     # -u IDC_NO_STD for the reason bin/idc's own bootstrap does it: both stages
     # call idstd's lset, so the compiler is never built without the library,
     # whatever a caller wants for its own programs.
-    if ! env -u IDC_NO_STD bin/idc "compiler/$stage" --emit-c "$TMP/id${stage}.c" >/dev/null; then
+    if ! env -u IDC_NO_STD bin/idc "compiler/$stage" --allow-untested --emit-c "$TMP/id${stage}.c" >/dev/null; then
         echo "regen_bootstrap: emitting C for compiler/$stage failed" >&2
         exit 1
     fi
