@@ -88,9 +88,10 @@ real prototype and the LLVM target as a `declare`; the backend's objects are
 compiled per platform and linked in. Attach one with a project's `conf.id`
 (preferred) or a `--backend DIR` flag — the two are the same dependency.
 
-Its parameter names are declarations too, and an exported name is reserved
-across the whole program, so a backend's parameters must not reuse a name a
-program exports.
+A native's parameter names are documentation, not variables: with no body
+there is nothing for them to name. They carry types for the call checks and the
+prototypes, and take part in no name rule, so a program is free to export or
+retype a name that some backend's parameter happens to use.
 
 **Imports are transitive.** An imported directory's own `conf.id` is read too,
 so a library can declare the backend it needs and every program that uses it
