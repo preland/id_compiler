@@ -1,0 +1,30 @@
+// The layout: US QWERTY, by make code. A row of keys is a run of consecutive
+// codes, so each is its first code and the characters it types unshifted and
+// shifted.
+
+km_fill(int[] lo, int[] hi) {
+  km_rows(lo, hi);
+  km_rows2(lo, hi);
+  km_same(lo, hi);
+} return void;
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tsum:(7905)
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tlow:(4301)
+
+// The number row and the two letter rows above the shift keys.
+km_rows(int[] lo, int[] hi) {
+  km_row(lo, hi, 0x02, "1234567890-=", "!@#$%^&*()_+");
+  km_row(lo, hi, 0x10, "qwertyuiop[]", "QWERTYUIOP{}");
+  km_row(lo, hi, 0x1e, "asdfghjkl;'", "ASDFGHJKL:\"");
+} return void;
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tsum:(5385)
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tlow:(2984)
+
+// The backquote and backslash keys, which sit apart from their rows, and the
+// bottom letter row.
+km_rows2(int[] lo, int[] hi) {
+  km_row(lo, hi, 0x29, "`", "~");
+  km_row(lo, hi, 0x2b, "\\", "|");
+  km_row(lo, hi, 0x2c, "zxcvbnm,./", "ZXCVBNM<>?");
+} return void;
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tsum:(2088)
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tlow:(1101)

@@ -1,0 +1,25 @@
+// Read until fs_read says there is nothing more: 0 at end of file, -1 for a
+// handle that is not open. Either way the loop ends, so a bad handle leaves
+// out as it was.
+file_loop(int h, int[] buf, int[] out) {
+  int n = len(buf);
+  int got = fs_read(h, buf, n);
+  while(got > 0) {
+    file_append(out, buf, got);
+    got = fs_read(h, buf, n);
+  }
+} return void;
+(-1, [0], []):(-1, [0], [])
+(-3, [0, 0], [9]):(-3, [0, 0], [9])
+
+// The first n cells of buf onto the end of out: a read fills the buffer from
+// the front, and only its first n cells are this read's bytes.
+file_append(int[] out, int[] buf, int n) {
+  int i = 0;
+  while(i < n) {
+    push(out, buf[i]);
+    i = i + 1;
+  }
+} return void;
+([], [1, 2, 3], 2):([1, 2], [1, 2, 3], 2)
+([9], [4], 1):([9, 4], [4], 1)

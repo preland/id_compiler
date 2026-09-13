@@ -1,0 +1,39 @@
+// Whole files as bytes, for the host tools in idc/tools.
+//
+// `id` reads stdin as a string, and a string cannot hold a NUL, so a binary
+// file -- a PSF font, a PPM screenshot -- has to come in through the fs
+// backend, one byte per list cell. The tools that need it (fbtext, mkfont) are
+// separate programs, so this is one tree both import rather than a copy in
+// each: the same function in two projects is what tools/dupscan.sh reports.
+//
+// A file is read until end of file rather than to fs_size's answer, because
+// procfs and pipes report a size of 0 and still have contents.
+
+file_bytes(string path) {
+  int[] out = [];
+  file_into(path, out);
+} return int[] out;
+("/nonexistent/file_bytes"):([])
+("/proc/sys/kernel/ostype"):([76, 105, 110, 117, 120, 10])
+
+// A path that does not open leaves out empty, which the caller sees as an
+// empty file; each tool checks what it read for the format it expects.
+file_into(string path, int[] out) {
+  int h = fs_open(path, "r");
+  if(h >= 0) {
+    file_pump(h, out);
+    fs_close(h);
+  }
+} return void;
+("/nonexistent/file_into", []):("/nonexistent/file_into", [])
+("/proc/sys/kernel/ostype", []):("/proc/sys/kernel/ostype", [76, 105, 110, 117, 120, 10])
+
+// One buffer for the whole read, so a read costs one chunk of cells however
+// many times fs_read is called.
+file_pump(int h, int[] out) {
+  int[] buf = [];
+  lst_fill(buf, (import file_chunk), 0);
+  file_loop(h, buf, out);
+} return void;
+(-1, []):(-1, [])
+(-2, [7]):(-2, [7])

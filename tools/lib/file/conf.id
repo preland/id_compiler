@@ -1,0 +1,6 @@
+// Dependencies for the file tree: the fs backend supplies fs_open, fs_read
+// and fs_close at link time.
+import "../../../backends/fs"
+
+// Cells per fs_read. One buffer of this size serves a whole read.
+int file_chunk = 65536;

@@ -1,0 +1,35 @@
+// Hexadecimal text back into bytes: the inverse of enc.id, for a tool that
+// reads a table the generators wrote.
+
+hex_bytes(string s) {
+  int[] xs = [];
+  int i = 0;
+  while(charat(s, i) >= 0) {
+    int v = hex_at(s, i);
+    push(xs, v);
+    i = i + 2;
+  }
+} return int[] xs;
+("00ab"):([0, 171])
+(""):([])
+
+// The byte whose two digits start at i.
+hex_at(string s, int i) {
+  int hi = hex_nib_at(s, i);
+  int lo = hex_nib_at(s, i + 1);
+  int v = hi * 16 + lo;
+} return int v;
+("00ab", 2):(171)
+("7f", 0):(127)
+
+// One digit. Lowercase only, because the generators write only lowercase and
+// accepting more would be accepting input nothing produces.
+hex_nib_at(string s, int i) {
+  int c = charat(s, i);
+  int v = c - 48;
+  if(c >= 97) {
+    v = c - 87;
+  }
+} return int v;
+("a9", 0):(10)
+("a9", 1):(9)

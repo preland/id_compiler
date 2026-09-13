@@ -1,0 +1,30 @@
+// Full-size tables for the cases of the functions that write fixed codes.
+//
+// Those write codes up to 0x4e, so a case needs two 128-cell lists, which a
+// literal would spell out cell by cell. A setup makes them instead, and the
+// checks compare sums. The expected sums were computed outside `id`, by a shell
+// loop over the same rows whose hex output matched the committed kb_low and
+// kb_high byte for byte.
+
+km_tset() {
+  export int[] km_t1 = km_zeros((import km_size));
+  export int[] km_t2 = km_zeros((import km_size));
+} return void;
+():() then km_tsum:(0)
+given km_tset ():() then km_tlow:(0)
+
+// Both tables together.
+km_tsum() {
+  int lsum = km_tlow();
+  int hsum = lst_sum((import km_t2));
+  int total = lsum + hsum;
+} return int total;
+given km_tset ():(0)
+given km_tset ():(0) then km_tlow:(0)
+
+// The unshifted table alone, so a swap between the tables is caught.
+km_tlow() {
+  int lsum = lst_sum((import km_t1));
+} return int lsum;
+given km_tset ():(0)
+given km_tset ():(0) then km_tsum:(0)

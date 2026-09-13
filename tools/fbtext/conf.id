@@ -1,0 +1,19 @@
+// fbtext reads the screenshot through the file tree and decodes the font
+// through the hex tree; both are shared with the other tools in idc/tools.
+import "../lib/file"
+import "../lib/hex"
+
+// The console: 80 columns of 30 rows, each cell 8 pixels by 16.
+int fb_ncols = 80;
+int fb_nrows = 30;
+int fb_cw = 8;
+int fb_ch = 16;
+
+// The font's first glyph is this code point.
+int fb_first = 32;
+
+// A pixel is lit when the mean of its channels is above this.
+int fb_on = 96;
+
+// A distance no cell can reach, so the first glyph tried always improves on it.
+int fb_far = 1000000000;

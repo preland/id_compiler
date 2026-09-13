@@ -1,0 +1,33 @@
+// mkkeymap -- scancode set 1 to ASCII, as the kernel's keymap constants.
+//
+//   mkkeymap    the keymap block of kernel/prog/conf.id, on stdout
+//
+// Two tables of 128 bytes, unshifted and shifted, as hexadecimal text for the
+// same reason the font is (tools/mkfont): `id` has no byte-array literal, and
+// a keymap is mostly zeros, which a string cannot hold. Zero means "no
+// character" -- a modifier, a function key, or a code this layout does not
+// use -- and the driver treats it as nothing happening rather than as a NUL.
+//
+// This program only prints; tools/mkkeymap.sh puts the block into conf.id.
+main(int argc, string[] argv) {
+  int[] lo = km_zeros((import km_size));
+  int[] hi = km_zeros((import km_size));
+  km_emit(lo, hi);
+} return int 0;
+(1, ["mkkeymap"]):(0)
+(2, ["mkkeymap", "x"]):(0)
+
+km_emit(int[] lo, int[] hi) {
+  km_fill(lo, hi);
+  km_print(lo, hi);
+} return void;
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tsum:(7905)
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tlow:(4301)
+
+km_print(int[] lo, int[] hi) {
+  string low = hex_list(lo);
+  string high = hex_list(hi);
+  put((import km_head) + "string kb_low = \"" + low + "\";\n" + (import km_tail) + "string kb_high = \"" + high + "\";\n");
+} return void;
+([1], [171]):([1], [171])
+([], []):([], [])

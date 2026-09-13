@@ -1,0 +1,43 @@
+// fbtext -- read the kernel's framebuffer back as text.
+//
+//   fbtext shot.ppm < kernel/prog/conf.id
+//
+// The kernel draws its console with the 8x16 font in kernel/prog/conf.id, so a
+// screenshot can be turned back into the characters that produced it by
+// matching each cell against that same font. That is what makes a graphical
+// shell testable: without it the only thing a test can check is the serial
+// port, and the serial port is not the screen.
+//
+// Matching is exact where it can be and nearest-Hamming otherwise; anti-aliasing
+// does not come into it, because the console blits whole bits. The screenshot
+// is binary, so it is read through the fs backend; conf.id is text, so it
+// arrives on stdin. tools/fbtext.sh supplies both.
+main(int argc, string[] argv) {
+  string text = read_all();
+  int[] d = file_bytes(argv[1]);
+  int rc = fb_run(d, text);
+} return int rc;
+(2, ["fbtext", "/nonexistent/ppm"]):(1)
+(2, ["fbtext", "/proc/sys/kernel/ostype"]):(1)
+
+// A file that is not a binary PPM is refused. The reason goes to stdout, since
+// `id` has no way to write to stderr, and the exit status says it failed.
+fb_run(int[] d, string text) {
+  int rc = ppm_bad(d);
+  if(rc == 1) {
+    print("fbtext: not a binary PPM");
+  }
+  if(rc == 0) {
+    fb_show(d, text);
+  }
+} return int rc;
+([], ""):(1)
+([80, 54, 10, 48, 32, 48, 10, 50, 53, 53, 10], ""):(0)
+
+fb_show(int[] d, string text) {
+  string hex = font_hex(text);
+  int[] font = hex_bytes(hex);
+  fb_ppm(d, font);
+} return void;
+([80, 54, 10, 48, 32, 48, 10, 50, 53, 53, 10], ""):([80, 54, 10, 48, 32, 48, 10, 50, 53, 53, 10], "")
+([80, 54, 32, 48, 32, 48, 32, 50, 53, 53, 10], "string font_rom0 = \"00\";"):([80, 54, 32, 48, 32, 48, 32, 50, 53, 53, 10], "string font_rom0 = \"00\";")

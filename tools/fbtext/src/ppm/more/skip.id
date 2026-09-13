@@ -1,0 +1,27 @@
+// What may come between header numbers.
+
+// Whitespace and comments in any order, until neither is next.
+ppm_skip(int[] d, int[] pos) {
+  int more = 1;
+  while(more == 1) {
+    ppm_spaces(d, pos);
+    more = ppm_comment(d, pos);
+  }
+} return void;
+([32, 35, 120, 10, 32, 49], [0]):([32, 35, 120, 10, 32, 49], [5])
+([49], [0]):([49], [0])
+
+ppm_spaces(int[] d, int[] pos) {
+  while(ppm_is_space(d, pos[0]) == 1) {
+    pos[0] = pos[0] + 1;
+  }
+} return void;
+([32, 10, 49], [0]):([32, 10, 49], [2])
+([49], [0]):([49], [0])
+
+ppm_is_space(int[] d, int i) {
+  int c = ppm_byte_at(d, i);
+  int ok = chr_is_space(c);
+} return int ok;
+([32], 0):(1)
+([49], 0):(0)

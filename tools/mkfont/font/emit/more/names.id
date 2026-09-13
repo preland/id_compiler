@@ -1,0 +1,27 @@
+// The constants' names, and how many there are.
+
+// "(import font_rom0) + (import font_rom1) + ..." for n constants.
+mf_imports(int n) {
+  string[] strs = [];
+  mf_names(strs, n);
+  string sum = str_join(strs, " + ");
+} return string sum;
+(2):("(import font_rom0) + (import font_rom1)")
+(1):("(import font_rom0)")
+
+mf_names(string[] strs, int n) {
+  int k = 0;
+  while(k < n) {
+    push(strs, "(import font_rom" + k + ")");
+    k = k + 1;
+  }
+} return void;
+(["q"], 1):(["q", "(import font_rom0)"], 1)
+([], 0):([], 0)
+
+// Chunks needed for this many glyphs, the last one holding the remainder.
+mf_nchunk(int glyphs, int per) {
+  int n = (glyphs + per - 1) / per;
+} return int n;
+(95, 24):(4)
+(48, 24):(2)

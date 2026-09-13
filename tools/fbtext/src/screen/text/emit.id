@@ -1,0 +1,22 @@
+// Printing the screen: every line up to the last one with text, blank lines
+// between them kept, and one empty line for a blank screen.
+
+fb_print(string[] strs) {
+  int last = fb_last(strs);
+  fb_emit(strs, last);
+} return void;
+(["a", ""]):(["a", ""])
+([]):([])
+
+fb_emit(string[] strs, int last) {
+  int i = 0;
+  while(i <= last) {
+    print(strs[i]);
+    i = i + 1;
+  }
+  if(last < 0) {
+    print("");
+  }
+} return void;
+(["a"], 0):(["a"], 0)
+([""], -1):([""], -1)

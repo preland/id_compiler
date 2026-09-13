@@ -1,0 +1,31 @@
+// Writing a layout into the two tables.
+
+// Consecutive codes from first: the i-th character of low unshifted, of high
+// shifted.
+km_row(int[] lo, int[] hi, int first, string low, string high) {
+  int i = 0;
+  while(charat(low, i) >= 0) {
+    km_put(lo, first + i, low, i);
+    km_put(hi, first + i, high, i);
+    i = i + 1;
+  }
+} return void;
+([0, 0, 0], [0, 0, 0], 1, "ab", "AB"):([0, 97, 98], [0, 65, 66], 1, "ab", "AB")
+([5], [6], 0, "", ""):([5], [6], 0, "", "")
+
+km_put(int[] xs, int code, string s, int i) {
+  int c = charat(s, i);
+  xs[code] = c;
+} return void;
+([0, 0], 1, "xy", 1):([0, 121], 1, "xy", 1)
+([7], 0, "q", 0):([113], 0, "q", 0)
+
+// Keys that type the same thing with or without shift: escape, backspace,
+// tab, enter, space, and the keypad's * - +.
+km_same(int[] lo, int[] hi) {
+  int[] codes = [0x01, 0x0e, 0x0f, 0x1c, 0x39, 0x37, 0x4a, 0x4e];
+  int[] vals = [27, 8, 9, 10, 32, 42, 45, 43];
+  km_pairs(lo, hi, codes, vals);
+} return void;
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tsum:(432)
+given km_tset ((import km_t1), (import km_t2)):((import km_t1), (import km_t2)) then km_tlow:(216)

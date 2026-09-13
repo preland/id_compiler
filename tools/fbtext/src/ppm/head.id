@@ -1,0 +1,29 @@
+// A binary PPM: "P6", then width, height and maximum value as decimal text,
+// then one whitespace byte, then three bytes per pixel.
+
+// pos is the read cursor, a list so the header readers can advance it. The
+// pixels start one byte after the last header number.
+fb_ppm(int[] d, int[] font) {
+  int[] pos = [2];
+  int[] hd = ppm_head(d, pos);
+  fb_screen(d, font, hd, pos[0] + 1);
+} return void;
+([80, 54, 10, 48, 32, 48, 10, 50, 53, 53, 10], []):([80, 54, 10, 48, 32, 48, 10, 50, 53, 53, 10], [])
+([80, 54, 32, 55, 32, 49, 53, 32, 50, 53, 53, 10], [0]):([80, 54, 32, 55, 32, 49, 53, 32, 50, 53, 53, 10], [0])
+
+ppm_bad(int[] d) {
+  int ok = len(d) >= 2 && d[0] == 80 && d[1] == 54;
+  int bad = 1 - ok;
+} return int bad;
+([80, 54, 10]):(0)
+([80, 53]):(1)
+([80]):(1)
+
+// [width, height, maximum value].
+ppm_head(int[] d, int[] pos) {
+  int[] hd = [];
+  ppm_take(hd, d, pos);
+  ppm_take2(hd, d, pos);
+} return int[] hd;
+([80, 54, 10, 54, 52, 48, 32, 52, 56, 48, 10, 50, 53, 53, 10], [2]):([640, 480, 255])
+([80, 54, 10, 35, 32, 120, 10, 51, 32, 50, 10, 50, 53, 53, 10], [2]):([3, 2, 255])

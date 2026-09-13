@@ -1,0 +1,34 @@
+// What to print: a reason for a font that cannot be used, or one of the two
+// outputs.
+
+mf_say(int rc, string[] argv, int[] hd) {
+  if(len(hd) != 4) {
+    print(argv[2] + ": not a PSF font");
+  }
+  if(len(hd) == 4 && rc == 1) {
+    print(argv[2] + ": " + hd[3] + "x" + hd[2] + ", wanted 8x" + (import mf_height));
+  }
+} return void;
+(1, ["m", "p", "x.psf", "conf"], []):(1, ["m", "p", "x.psf", "conf"], [])
+(0, ["m", "p", "y.psf", "all"], [4, 16, 16, 8]):(0, ["m", "p", "y.psf", "all"], [4, 16, 16, 8])
+
+mf_go(int rc, string[] argv, int[] d, int[] hd) {
+  int n = mf_nchunk((import mf_last) - (import mf_first) + 1, (import mf_per));
+  if(rc == 0 && argv[3] == "all") {
+    mf_all(n);
+  }
+  if(rc == 0 && argv[3] == "conf") {
+    mf_conf(argv[2], d, hd, n);
+  }
+} return void;
+(1, ["m", "p", "x.psf", "conf"], [], []):(1, ["m", "p", "x.psf", "conf"], [], [])
+(0, ["m", "p", "x.psf", "all"], [], [4, 16, 16, 8]):(0, ["m", "p", "x.psf", "all"], [], [4, 16, 16, 8])
+
+// all.id: the one function that joins the constants, in order. It depends on
+// how many constants there are and on nothing else about the font.
+mf_all(int n) {
+  string sum = mf_imports(n);
+  put((import mf_allhead) + "font_rom() {\n  string ret_s = " + sum + ";\n} return string ret_s;\n");
+} return void;
+(4):(4)
+(1):(1)
