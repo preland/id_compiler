@@ -432,8 +432,8 @@ static int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding 
 }
 
 /* forward declarations */
-void id_lset(IdList* xs, int i, int v);
-int id_str_eol(char* s, int i);
+void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
+int id_str_eol(char* idstd_s, int idstd_i);
 int id_is_space_at(char* src, int i);
 int id_is_digit_at(char* src, int i);
 int id_is_alpha_at(char* src, int i);
@@ -505,28 +505,28 @@ IdList* fx_sintab;  /* exported by fx_trig_init() */
 IdList* txt_g8;  /* exported by txt_g8_init() */
 int sf_l_w;  /* exported by sf_l_init() */
 int sf_l_h;  /* exported by sf_l_init() */
-IdList* sf_l_px;  /* exported by sf_l_alloc() */
+IdList* sf_l_px;  /* exported by idstd_sf_l_alloc() */
 IdList* err_n;  /* exported by err_init() */
-IdList* err_fs;  /* exported by err_keep_init() */
-IdList* err_ls;  /* exported by err_keep_init() */
-IdList* err_ms;  /* exported by err_keep_init2() */
-int term_w;  /* exported by term_scr_init() */
-int term_h;  /* exported by term_scr_init() */
-IdList* term_scr;  /* exported by term_scr_alloc() */
-IdList* term_attr;  /* exported by term_scr_alloc() */
-IdList* term_pal;  /* exported by term_pal_init() */
+IdList* err_fs;  /* exported by idstd_err_keep_init() */
+IdList* err_ls;  /* exported by idstd_err_keep_init() */
+IdList* err_ms;  /* exported by idstd_err_keep_init2() */
+int term_w;  /* exported by idstd_term_scr_init() */
+int term_h;  /* exported by idstd_term_scr_init() */
+IdList* term_scr;  /* exported by idstd_term_scr_alloc() */
+IdList* term_attr;  /* exported by idstd_term_scr_alloc() */
+IdList* term_pal;  /* exported by idstd_term_pal_init() */
 IdList* lexline;  /* exported by main() */
 
-void id_lset(IdList* xs, int i, int v) {
-    id_list_set(xs, i, (long long)(v));
+void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
+    id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;
 }
 
-int id_str_eol(char* s, int i) {
-    while (((id_charat(s, i) != 10) && (id_charat(s, i) != (-1)))) {
-        i = (i + 1);
+int id_str_eol(char* idstd_s, int idstd_i) {
+    while (((id_charat(idstd_s, idstd_i) != 10) && (id_charat(idstd_s, idstd_i) != (-1)))) {
+        idstd_i = (idstd_i + 1);
     }
-    return i;
+    return idstd_i;
 }
 
 int id_is_space_at(char* src, int i) {
