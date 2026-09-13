@@ -24,14 +24,16 @@ DOC=../docs/TESTS.md
 BEGIN='<!-- generated: adoption -->'
 END='<!-- end generated -->'
 
-# A case is a line of the form (args):(expected); a function declaration starts
-# at column 0 with a name and an open paren. Both are counted the same way in
-# every repository so the three numbers mean the same thing.
+# A case is a line of the form (args):(expected), optionally opened by
+# `given SETUP` and with `(import NAME)` among its values; a function
+# declaration starts at column 0 with a name and an open paren. Both are
+# counted the same way in every repository so the three numbers mean the same
+# thing.
 # `build/` is excluded everywhere: the harnesses write generated `id` there, and
 # counting a compiler's throwaway output as source made this table depend on
 # whether a sibling repository had been run recently.
 ex='--exclude-dir=build'
-count_cases() { grep -rEch $ex '^\([^)]*\) *: *\(' --include='*.id' "$@" 2>/dev/null | awk '{s+=$1} END {print s+0}'; }
+count_cases() { grep -rEch $ex '^(given +[A-Za-z_][A-Za-z0-9_]* +)?\((\(import [A-Za-z_][A-Za-z0-9_]*\)|[^)])*\) *: *\(' --include='*.id' "$@" 2>/dev/null | awk '{s+=$1} END {print s+0}'; }
 count_fns()   { grep -rEh  $ex '^[a-z_][a-z0-9_]*\(' --include='*.id' "$@" 2>/dev/null | wc -l; }
 
 STD=../../idstd
