@@ -1,0 +1,34 @@
+// Counting work, for the constraints (docs/TESTS.md, "Constraints are counted,
+// not timed"): `time` is one per function call and loop iteration plus the
+// bytes the runtime's helpers touch, `mem` the bytes each allocation requests.
+//
+// idc.py splices counters into the text of its runtime. Here the runtime is a
+// generated literal (../../../../../runtime/runtime.id), so the counting is
+// wrapped around it with the preprocessor instead:
+//
+//   * every allocation the runtime makes is one malloc or realloc, inside
+//     id_alloc or id_realloc, so hooking those two charges `mem` what was
+//     requested -- less the two-pointer arena header the runtime adds;
+//   * the helpers that touch bytes measure strings with strlen -- concat both
+//     operands, a charat memo miss the whole string -- so hooking strlen
+//     charges `time` exactly that work;
+//   * `len` answers from the memo, which would hide what it costs, and
+//     `mem_of_str` measures a string idc.py does not charge for, so both are
+//     renamed out of the way before the runtime and redefined after it.
+//
+// The hooks are undone after the runtime: nothing else calls them, and the
+// harness's own bookkeeping is not the program's work.
+
+emit_count(string ind) {
+  if(is_harn() == 1) {
+    emit_line(ind + "id_ctr_time++;");
+  }
+} return void;
+
+emit_count_prelude() {
+  emit_line("/* test harness (idc) -- the runtime below is counted */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_mem_of_str idtc_rt_mem_of_str");
+} return void;
+
+emit_count_postlude() {
+  emit_line("#undef id_len\n#undef id_mem_of_str\nstatic int id_len(const char* s) { return (int)strlen(s); }\nstatic long long id_mem_of_str(const char* s) {\n    long long t = id_ctr_time;\n    long long a = idtc_rt_mem_of_str(s);\n    id_ctr_time = t;\n    return a;\n}\n#undef malloc\n#undef realloc\n#undef strlen");
+} return void;

@@ -1,0 +1,20 @@
+// One list type's prototypes, and the loop over their bodies.
+
+emit_ty_proto(string ty) {
+  string key = tc_key(ty);
+  emit_line("static int idtc_eq_" + key + "(IdList* a, IdList* b);\nstatic void idtc_show_" + key + "(IdList* a);");
+} return void;
+
+emit_ty_bodies() {
+  int i = 0;
+  while(i < len((import tctys))) {
+    emit_ty_body((import tctys)[i]);
+    i = i + 1;
+  }
+} return void;
+
+emit_ty_body(string ty) {
+  string key = tc_key(ty);
+  string et = list_elem(ty);
+  emit_ty_body2(key, et);
+} return void;

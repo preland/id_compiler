@@ -1,0 +1,23 @@
+// Every function with a case is an entry point, and afterwards `prog` and the
+// reachable set are put back as they were.
+
+seed_cases() {
+  int ci = 0;
+  while(ci < len((import casefn))) {
+    string s1_of_v = s1_of((import casefn)[ci]);
+    reach_add(s1_of_v);
+    ci = ci + 1;
+  }
+} return void;
+
+test_widen(int[] pkeep, string[] rkeep) {
+  pred_wipe((import prog));
+  keep_ints(pkeep, (import prog));
+  test_widen2(rkeep);
+} return void;
+
+test_widen2(string[] rkeep) {
+  clear_strs((import rfn));
+  keep_strs(rkeep, (import rfn));
+  lset((import dphase), 0, 1);
+} return void;

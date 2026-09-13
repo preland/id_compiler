@@ -1,0 +1,22 @@
+// One shown value, and the expected side as the case wrote it.
+
+show_part(int fn, int j) {
+  string nm = chk_name(fn, j);
+  string pt = chk_type(fn, j);
+  string so = show_sep(j) + tc_show(nm, pt);
+} return string so;
+
+show_sep(int j) {
+  string so = "";
+  if(j > 0) {
+    so = "fputs(\", \", stderr); ";
+  }
+} return string so;
+
+exp_tail(int[] expd) {
+  string et = items_text(expd);
+  if(len(expd) != 1) {
+    et = "(" + et + ")";
+  }
+  string so = c_esc(", expected " + et + "\n");
+} return string so;

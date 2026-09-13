@@ -1,0 +1,19 @@
+// Copying a list onto the end of another. An exported list
+// may only be assigned by its declaring function, so this works in place;
+// emptying one is pred_wipe (back/ir/opt/cfg/more/more.id).
+
+keep_ints(int[] ints, int[] onto) {
+  int i = 0;
+  while(i < len(ints)) {
+    push(onto, ints[i]);
+    i = i + 1;
+  }
+} return void;
+
+keep_strs(string[] strs, string[] names) {
+  int i = 0;
+  while(i < len(strs)) {
+    push(names, strs[i]);
+    i = i + 1;
+  }
+} return void;

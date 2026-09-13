@@ -1,0 +1,23 @@
+// The types one case compares at.
+
+tc_collect_case(int ci) {
+  int fn = (import casefn)[ci];
+  int[] expd = l2_of((import casenode)[ci]);
+  tc_collect_expd(fn, expd);
+} return void;
+
+tc_collect_expd(int fn, int[] expd) {
+  int j = 0;
+  while(j < len(expd)) {
+    string pt = chk_type(fn, j);
+    note_ty(pt);
+    j = j + 1;
+  }
+} return void;
+
+note_ty(string ty) {
+  while(ty_is_list(ty) == 1) {
+    note_one(ty);
+    ty = list_elem(ty);
+  }
+} return void;

@@ -1,0 +1,29 @@
+// The `n` a case argument contributes to a scaling claim, as a C expression:
+// the length of a list or a string, or the value of an integer. A float has no
+// size. A string's length is taken by the C compiler from the literal, so its
+// escapes count as the bytes they are.
+
+tc_size(int e) {
+  string so = size_leaf(e);
+  if(k_of(e) == "arr") {
+    int[] xs = l1_of(e);
+    so = "" + len(xs);
+  } else if(k_of(e) == "un") {
+    so = size_neg(e);
+  }
+} return string so;
+
+size_leaf(int e) {
+  string so = "0";
+  if(k_of(e) == "int") {
+    string int_code_v = int_code(e);
+    so = "(long long)(" + int_code_v + ")";
+  } else if(k_of(e) == "str") {
+    so = "(long long)(sizeof(" + s1_of(e) + ") - 1)";
+  }
+} return string so;
+
+size_neg(int e) {
+  int i1_of_v = i1_of(e);
+  string so = "-" + size_leaf(i1_of_v);
+} return string so;

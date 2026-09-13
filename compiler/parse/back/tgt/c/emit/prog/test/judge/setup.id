@@ -1,0 +1,23 @@
+// The case table, filled in before the first fork: where each case is, the
+// call it makes as the case wrote it, its function and its index among that
+// function's cases, and the C function that runs it.
+
+emit_tc_setup() {
+  emit_line("static void idtc_setup(void) {");
+  setup_rows();
+  emit_line("}");
+} return void;
+
+setup_rows() {
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    setup_row(ci);
+    ci = ci + 1;
+  }
+} return void;
+
+setup_row(int ci) {
+  string cw = case_where_c(ci);
+  string cc = case_call_c(ci);
+  emit_setup_line(ci, cw, cc);
+} return void;

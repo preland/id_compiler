@@ -1,0 +1,25 @@
+// A case's `n`, recorded only for a case that carries a claim.
+
+size_row(int ci) {
+  if(case_claims(ci) > 0) {
+    string sz = case_size(ci);
+    emit_line("    idtc_n[" + ci + "] = " + sz + ";");
+  }
+} return void;
+
+case_size(int ci) {
+  int[] args = l1_of((import casenode)[ci]);
+  string so = "0";
+  if(len(args) > 0) {
+    so = sizes_c(args);
+  }
+} return string so;
+
+case_claims(int ci) {
+  int r = 0;
+  int j = 0;
+  while(j < len((import conscase))) {
+    r = r + claim_of(j, ci);
+    j = j + 1;
+  }
+} return int r;

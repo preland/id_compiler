@@ -1,0 +1,24 @@
+// Whether case ci belongs to claim c's group, and how many do.
+
+group_sep(string out) {
+  string so = ", ";
+  if(out == "") {
+    so = "";
+  }
+} return string so;
+
+claim_count(int c) {
+  int n = 0;
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    n = n + carries(ci, c);
+    ci = ci + 1;
+  }
+} return int n;
+
+carries(int ci, int c) {
+  int r = 0;
+  if((import casefn)[ci] == (import casefn)[(import conscase)[c]] && has_claim(ci, c) > 0) {
+    r = 1;
+  }
+} return int r;

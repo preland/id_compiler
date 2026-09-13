@@ -1,0 +1,22 @@
+// A claim's group: the cases of its function that carry the same claim, in
+// case order.
+
+emit_claim_line(int c, string grp, int gn) {
+  emit_line("    bad |= idtc_claim((int[]){" + grp + "}, " + gn + ", \"" + (import conskind)[c] + "\", \"" + (import consbound)[c] + "\");");
+} return void;
+
+claim_group(int c) {
+  string out = "";
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    out = out + group_item(out, ci, c);
+    ci = ci + 1;
+  }
+} return string out;
+
+group_item(string out, int ci, int c) {
+  string so = "";
+  if(carries(ci, c) > 0) {
+    so = group_sep(out) + ci;
+  }
+} return string so;

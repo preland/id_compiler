@@ -1,0 +1,24 @@
+// The harness's helpers for list types: `idtc_eq_K` compares two lists and
+// `idtc_show_K` prints one, where K spells the element type (`int`, `int_l`
+// for `int[]`, ...). One pair per list type a case compares, and per element
+// list type inside it, emitted once each -- prototypes first, so a list of
+// lists may call its element's helpers in either order.
+
+emit_tc_helpers() {
+  tc_types_init();
+  tc_collect();
+  tc_emit_types();
+} return void;
+
+tc_emit_types() {
+  emit_ty_protos();
+  emit_ty_bodies();
+} return void;
+
+tc_collect() {
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    tc_collect_case(ci);
+    ci = ci + 1;
+  }
+} return void;

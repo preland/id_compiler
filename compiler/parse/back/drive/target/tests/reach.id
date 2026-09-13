@@ -1,0 +1,20 @@
+// Reachability from the tested functions. The import sweep is switched off
+// again first: its diagnostics were given during checking, and a reachable set
+// seeded from anywhere but `main` is not what they are about.
+
+test_reach() {
+  lset((import dphase), 0, 0);
+  seed_tested();
+  test_reach_tail();
+} return void;
+
+test_reach_tail() {
+  reach_mark();
+  dce_pack(0, 0);
+} return void;
+
+seed_tested() {
+  clear_strs((import rfn));
+  push((import rfn), "conf.id");
+  seed_cases();
+} return void;

@@ -1,0 +1,26 @@
+// Text as the body of a C string literal: the harness's messages quote id
+// source verbatim, string literals and their escapes included.
+
+c_esc(string t) {
+  string out = "";
+  int i = 0;
+  while(i < len(t)) {
+    out = out + esc_at(t, i);
+    i = i + 1;
+  }
+} return string out;
+
+esc_at(string t, int i) {
+  int ch = charat(t, i);
+  string so = esc_code(ch);
+} return string so;
+
+// 92 is a backslash, 34 a double quote, 10 a newline.
+esc_code(int ch) {
+  string so = chr(ch);
+  if(ch == 92 || ch == 34) {
+    so = "\\" + so;
+  } else if(ch == 10) {
+    so = "\\n";
+  }
+} return string so;

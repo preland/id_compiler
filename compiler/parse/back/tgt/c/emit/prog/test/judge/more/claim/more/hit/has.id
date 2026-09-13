@@ -1,0 +1,18 @@
+// Whether case ci is written with claim c's kind and bound -- counted, since a
+// case may repeat a claim.
+
+has_claim(int ci, int c) {
+  int r = 0;
+  int j = 0;
+  while(j < len((import conscase))) {
+    r = r + claim_hit(j, ci, c);
+    j = j + 1;
+  }
+} return int r;
+
+claim_hit(int j, int ci, int c) {
+  int r = 0;
+  if((import conscase)[j] == ci && (import conskind)[j] == (import conskind)[c] && (import consbound)[j] == (import consbound)[c]) {
+    r = 1;
+  }
+} return int r;

@@ -1,0 +1,24 @@
+// A list literal's cells, and a scalar: the digits or text as written, with a
+// leading minus when the case negated it.
+
+tc_cells(int[] xs, string et) {
+  string out = "";
+  int i = 0;
+  while(i < len(xs)) {
+    string cv = tc_value(xs[i], et);
+    out = out + sep_arg(i) + box(cv, et);
+    i = i + 1;
+  }
+} return string out;
+
+tc_scalar(int e) {
+  string so = int_code(e);
+  if(k_of(e) == "un") {
+    so = tc_neg(e);
+  }
+} return string so;
+
+tc_neg(int e) {
+  int i1_of_v = i1_of(e);
+  string so = "-" + int_code(i1_of_v);
+} return string so;

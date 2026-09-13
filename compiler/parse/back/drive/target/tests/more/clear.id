@@ -1,0 +1,6 @@
+// Emptying a list of names in place.
+clear_strs(string[] names) {
+  while(len(names) > 0) {
+    pop(names);
+  }
+} return void;

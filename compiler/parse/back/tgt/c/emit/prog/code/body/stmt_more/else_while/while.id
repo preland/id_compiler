@@ -9,6 +9,13 @@ emit_while(int id, string ind) {
 
 emit_while_head(int id, string ind, string emit_expr_v) {
   emit_line(ind + "while (" + emit_expr_v + ") {");
+  emit_while_body(id, ind);
+} return void;
+
+// A loop iteration is one unit of `time` in the test harness; emit_count says
+// nothing outside it.
+emit_while_body(int id, string ind) {
+  emit_count(ind + "    ");
   int[] l1_of_v = l1_of(id);
   emit_body_close(l1_of_v, ind);
 } return void;

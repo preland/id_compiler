@@ -1,0 +1,18 @@
+// Two lists are equal when they are the same length and every pair of cells,
+// read back at the element type, is equal at that type.
+
+emit_ty_body2(string key, string et) {
+  emit_eq_body(key, et);
+  emit_show_body(key, et);
+} return void;
+
+eq_cond(string et) {
+  string ga = unbox("a->data[i]", et);
+  string gb = unbox("b->data[i]", et);
+  string so = tc_compare(ga, gb, et);
+} return string so;
+
+emit_eq_body(string key, string et) {
+  string cmp = eq_cond(et);
+  emit_line("static int idtc_eq_" + key + "(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!" + cmp + ") return 0;\n    return 1;\n}");
+} return void;

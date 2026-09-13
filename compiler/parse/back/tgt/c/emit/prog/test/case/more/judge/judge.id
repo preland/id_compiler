@@ -1,0 +1,22 @@
+// After the call: the counts, then the expected values, one local each --
+// `idtc_e0`, `idtc_e1`, ... -- then the comparison.
+
+emit_case_judge(int ci) {
+  emit_line("    long long idtc_cnt[2] = { id_ctr_time, id_ctr_mem };");
+  emit_case_expd(ci);
+  emit_case_end(ci);
+} return void;
+
+emit_case_expd(int ci) {
+  int fn = (import casefn)[ci];
+  int[] expd = l2_of((import casenode)[ci]);
+  emit_expd_decls(fn, expd);
+} return void;
+
+emit_expd_decls(int fn, int[] expd) {
+  int j = 0;
+  while(j < len(expd)) {
+    emit_expd_decl(fn, expd, j);
+    j = j + 1;
+  }
+} return void;

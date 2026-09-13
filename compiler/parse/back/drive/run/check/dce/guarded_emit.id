@@ -7,9 +7,8 @@
 guarded_emit(int argc, string[] argv) {
   check_asm_targets(argc, argv);
   if(check_failed() == 0) {
-    guarded_prune();
     init_tyc();
-    emit(argc, argv);
+    emit_all(argc, argv);
   }
 } return void;
 
@@ -24,4 +23,14 @@ guarded_prune() {
   if(is_freestanding() == 0) {
     dce_prune();
   }
+} return void;
+
+// The test harness comes first, while `prog` still holds every function: a
+// function with cases need not be reachable from main, and every case in the
+// build runs. Then the prune, then the program -- which is therefore emitted
+// exactly as it is without the harness.
+emit_all(int argc, string[] argv) {
+  emit_tests_maybe(argc, argv);
+  guarded_prune();
+  emit(argc, argv);
 } return void;

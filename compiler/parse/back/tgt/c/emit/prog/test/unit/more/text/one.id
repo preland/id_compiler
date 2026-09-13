@@ -1,0 +1,16 @@
+// Running one case: fork, run it in the child with its limits, and read back
+// what it wrote to stderr and the two counts it measured.
+//
+// A case function returns 0 when it passed, having written its counts; 3 when
+// its result did not match, having printed the message; anything else, or a
+// signal, is the case stopping on its own -- a runtime trap, a crash, a limit.
+
+emit_tc_support() {
+  emit_tc_proc();
+  emit_tc_one();
+  emit_tc_judge();
+} return void;
+
+emit_tc_one() {
+  emit_line("static int idtc_one(int k) {\n    int err[2], cnt[2], st = 0;\n    char msg[4096], chunk[512];\n    size_t used = 0;\n    ssize_t r;\n    long long c[2] = {0, 0};\n    pid_t pid;\n    if (pipe(err) != 0 || pipe(cnt) != 0) { perror(\"idc: test harness\"); return 1; }\n    fflush(NULL);\n    pid = fork();\n    if (pid < 0) { perror(\"idc: test harness\"); return 1; }\n    if (pid == 0) {\n        close(err[0]);\n        close(cnt[0]);\n        dup2(err[1], 2);\n        idtc_limit();\n        exit(idtc_case[k](cnt[1]));\n    }\n    close(err[1]);\n    close(cnt[1]);\n    while ((r = read(err[0], chunk, sizeof chunk)) != 0) {\n        if (r < 0 && errno == EINTR) continue;\n        if (r < 0) break;\n        if ((size_t)r > sizeof msg - 1 - used) r = (ssize_t)(sizeof msg - 1 - used);\n        memcpy(msg + used, chunk, (size_t)r);\n        used += (size_t)r;\n    }\n    msg[used] = '\\0';\n    r = read(cnt[0], c, sizeof c);\n    close(err[0]);\n    close(cnt[0]);\n    while (waitpid(pid, &st, 0) < 0) {\n        if (errno != EINTR) { perror(\"idc: test harness\"); return 1; }\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 0 && r == (ssize_t)sizeof c) {\n        idtc_t[k] = c[0];\n        idtc_m[k] = c[1];\n        return 0;\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 3) {\n        fputs(msg, stderr);\n        return 1;\n    }\n    idtc_report(k, st, msg);\n    return 1;\n}");
+} return void;

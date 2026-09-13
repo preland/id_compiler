@@ -1,0 +1,23 @@
+// The call under test. A value is kept in `idtc_got`; a void function's result
+// is its arguments, which are already named.
+
+emit_case_call(int ci) {
+  int fn = (import casefn)[ci];
+  string cargs = arg_names(fn);
+  emit_call_line(fn, cargs);
+} return void;
+
+emit_call_line(int fn, string cargs) {
+  string f1 = s1_of(fn);
+  if(s2_of(fn) == "void") {
+    emit_line("    id_" + f1 + "(" + cargs + ");");
+  } else {
+    string rt = s2_of(fn);
+    emit_ret_call(f1, rt, cargs);
+  }
+} return void;
+
+emit_ret_call(string f1, string rt, string cargs) {
+  string ct = c_type(rt);
+  emit_line("    " + ct + " idtc_got = id_" + f1 + "(" + cargs + ");");
+} return void;

@@ -1,0 +1,24 @@
+// Whether the call produced what the case expects: every compared value
+// matches. A void case that names no arguments compares nothing.
+
+case_cond(int fn, int[] expd) {
+  string cnd = "1";
+  if(len(expd) > 0) {
+    cnd = cond_parts(fn, expd);
+  }
+} return string cnd;
+
+cond_parts(int fn, int[] expd) {
+  string out = "";
+  int j = 0;
+  while(j < len(expd)) {
+    out = out + and_sep(j) + cond_part(fn, j);
+    j = j + 1;
+  }
+} return string out;
+
+cond_part(int fn, int j) {
+  string nm = chk_name(fn, j);
+  string pt = chk_type(fn, j);
+  string so = tc_compare(nm, "idtc_e" + j, pt);
+} return string so;

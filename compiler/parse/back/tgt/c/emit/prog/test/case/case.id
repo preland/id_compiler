@@ -1,0 +1,38 @@
+// One C function per case, run in the case's own process:
+//
+//   static int idtc_case_K(int idtc_fd) {
+//       <argument>s, built at the parameter types
+//       counters to zero
+//       the call
+//       counters read
+//       <expected>s, built at the types they are compared as
+//       compare; on a mismatch print the message and return 3
+//       write the counts to idtc_fd; return 0
+//   }
+//
+// The counters are read before the expected values are built: building a list
+// allocates, and that allocation is not the function's.
+//
+// Anything a case needs to set up runs in this process before the counters
+// are zeroed (emit_case_run), and anything more it asserts afterwards belongs
+// beside the comparison (emit_case_judge), before the counts are written.
+
+emit_cases() {
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    emit_case_fn(ci);
+    ci = ci + 1;
+  }
+} return void;
+
+emit_case_fn(int ci) {
+  emit_line("static int idtc_case_" + ci + "(int idtc_fd) {");
+  emit_case_args(ci);
+  emit_case_run(ci);
+} return void;
+
+emit_case_run(int ci) {
+  emit_line("    id_ctr_time = 0; id_ctr_mem = 0;");
+  emit_case_call(ci);
+  emit_case_judge(ci);
+} return void;

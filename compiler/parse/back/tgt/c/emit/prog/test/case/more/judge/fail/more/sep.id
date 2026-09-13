@@ -1,0 +1,7 @@
+// Between two comparisons.
+and_sep(int j) {
+  string so = "";
+  if(j > 0) {
+    so = " && ";
+  }
+} return string so;

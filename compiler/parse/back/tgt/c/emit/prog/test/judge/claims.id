@@ -1,0 +1,22 @@
+// The scaling claims, judged once every case has passed: first each claiming
+// case's `n`, then one idtc_claim per distinct claim of each function, in the
+// order the claims first appear.
+
+emit_tc_claims() {
+  emit_line("static int idtc_claims(void) {\n    int bad = 0;");
+  claim_body();
+  emit_line("    return bad;\n}");
+} return void;
+
+claim_body() {
+  claim_sizes();
+  claim_all();
+} return void;
+
+claim_sizes() {
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    size_row(ci);
+    ci = ci + 1;
+  }
+} return void;
