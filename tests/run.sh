@@ -74,7 +74,11 @@ mark_done() { mkdir -p "$(dirname "$STATE")"; printf '%s ' "$1" >> "$STATE"; }
 export IDC_NO_STD=1
 
 IDC=../idc.py
-BIN_IDC=../bin/idc
+# Nothing this file builds with bin/idc has two cases per function -- not the
+# compiler, not the demos -- so every such build passes --allow-untested.
+# docs/TESTS.md, "Enforcement, and the migration"; the check near the end of
+# `core` fails once adoption is complete and the flag is still here.
+BIN_IDC="../bin/idc --allow-untested"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 pass=0 fail=0
@@ -611,9 +615,9 @@ fi
 # self_host_build.sh, that says stage 0, stage 1 and the compiler built from
 # stage 1 all emit the same C for the compiler. What is lost is a second,
 # independent implementation agreeing with them on it.
-if env -u IDC_NO_STD "$BIN_IDC" ../compiler/lex --emit-c /dev/null >/dev/null 2>&1; then
+if env -u IDC_NO_STD $BIN_IDC ../compiler/lex --emit-c /dev/null >/dev/null 2>&1; then
     for src in lex parse; do
-        env -u IDC_NO_STD "$BIN_IDC" ../compiler/$src --emit-c "$TMP/${src}_bin.c" >/dev/null 2>&1
+        env -u IDC_NO_STD $BIN_IDC ../compiler/$src --emit-c "$TMP/${src}_bin.c" >/dev/null 2>&1
         env -u IDC_NO_STD ../bin/idc ../compiler/$src --emit-sources 2>/dev/null \
             | "$TMP/idlex" | "$TMP/idparse" > "$TMP/${src}_id.c"
         if [ -s "$TMP/${src}_bin.c" ] && diff "$TMP/${src}_bin.c" "$TMP/${src}_id.c" >/dev/null; then
@@ -638,12 +642,12 @@ fi
 
 # --- the game engine + the two games it drives build cleanly (real-time I/O
 #     builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
-if env -u IDC_NO_STD "$BIN_IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
+if env -u IDC_NO_STD $BIN_IDC ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
     ok "moonbuggy builds (with bundled engine)"
 else
     bad "moonbuggy builds (with bundled engine)"
 fi
-if env -u IDC_NO_STD "$BIN_IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
+if env -u IDC_NO_STD $BIN_IDC ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
     ok "solitaire builds (with bundled engine)"
 else
     bad "solitaire builds (with bundled engine)"
@@ -841,7 +845,7 @@ else
     # llvm is the self-hosted target (bin/idc); wasm is still idc.py's, and is
     # the last thing holding that file here.
     alt_cc() { # alt_cc TARGET SRC OUT
-        if [ "$1" = llvm ]; then "$BIN_IDC" "$2" --target llvm -o "$3" 2>/dev/null
+        if [ "$1" = llvm ]; then $BIN_IDC "$2" --target llvm -o "$3" 2>/dev/null
         else "$IDC" "$2" --target "$1" -o "$3" 2>/dev/null; fi
     }
     for target in llvm wasm; do
@@ -980,6 +984,7 @@ if ../tools/statusgen.sh --check >/dev/null 2>&1; then
 else
     bad "docs/TESTS.md adoption numbers are stale -- run tools/statusgen.sh"
 fi
+
 
 # --- idc.py obeys a lightweight form of the rules it enforces. A compiler
 #     that rejects long blocks, deep nesting and duplicated logic, in a file

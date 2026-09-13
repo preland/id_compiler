@@ -17,7 +17,11 @@
 set -u
 cd "$(dirname "$0")"
 ROOT=".."
-BIN_IDC=../bin/idc
+# bin/idc takes --allow-untested throughout: neither these programs nor the
+# fixture library has two cases per function, and what is under test is how
+# the library is found. The flag is part of the word, so one loop still runs
+# both compilers; idc.py has no such flag.
+BIN_IDC="../bin/idc --allow-untested"
 IDC_PY=../idc.py
 FIXTURE=$(cd fixtures/idstd && pwd)
 TMP=$(mktemp -d)
@@ -38,7 +42,7 @@ run_both() {
 
     for cc_name in idc idc.py; do
         case "$cc_name" in
-            idc)    build=("$BIN_IDC" --std "$FIXTURE" "$TMP/proj" -o "$TMP/out.$cc_name") ;;
+            idc)    build=($BIN_IDC --std "$FIXTURE" "$TMP/proj" -o "$TMP/out.$cc_name") ;;
             idc.py) build=("$IDC_PY"  --std "$FIXTURE" "$TMP/proj" -o "$TMP/out.$cc_name") ;;
         esac
         if ! "${build[@]}" >"$TMP/build.err" 2>&1; then
@@ -52,7 +56,7 @@ run_both() {
         fi
     done
 
-    "$BIN_IDC" --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/a.c" >/dev/null 2>&1
+    $BIN_IDC --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/a.c" >/dev/null 2>&1
     "$IDC_PY"  --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/b.c" >/dev/null 2>&1
     if cmp -s "$TMP/a.c" "$TMP/b.c"; then
         ok "$desc"
@@ -94,7 +98,7 @@ main(int argc, string[] argv) {
 EOF
 sf_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --std "$FIXTURE" "$TMP/single.id" -o "$TMP/single.bin" >/dev/null 2>&1 \
+    $cc --std "$FIXTURE" "$TMP/single.id" -o "$TMP/single.bin" >/dev/null 2>&1 \
         || { sf_ok=0; break; }
     [ "$("$TMP/single.bin")" = "7" ] || { sf_ok=0; break; }
 done
@@ -114,7 +118,7 @@ main(int argc, string[] argv) {
 EOF
 ns_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    if "$cc" --no-std --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
+    if $cc --no-std --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
         ns_ok=0   # it built, so the stdlib was still there
     elif ! grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
         ns_ok=0   # it failed for the wrong reason
@@ -126,7 +130,7 @@ done
 # -- 5. IDC_NO_STD does the same, for scripts that cannot pass a flag ------
 env_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    if IDC_NO_STD=1 "$cc" --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
+    if IDC_NO_STD=1 $cc --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
         env_ok=0
     elif ! grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
         env_ok=0
@@ -145,7 +149,7 @@ main(int argc, string[] argv) {
 EOF
 home_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    IDSTD_HOME="$FIXTURE" "$cc" "$TMP/proj" -o "$TMP/h" >/dev/null 2>&1 || { home_ok=0; break; }
+    IDSTD_HOME="$FIXTURE" $cc "$TMP/proj" -o "$TMP/h" >/dev/null 2>&1 || { home_ok=0; break; }
     [ "$("$TMP/h")" = "5" ] || { home_ok=0; break; }
 done
 [ "$home_ok" -eq 1 ] && ok "\$IDSTD_HOME locates the stdlib" \
@@ -154,7 +158,7 @@ done
 # -- 7. a bad --std is reported, not ignored -------------------------------
 bad_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --std "$TMP/nope" "$TMP/proj" -o "$TMP/x" >"$TMP/x.err" 2>&1 && bad_ok=0
+    $cc --std "$TMP/nope" "$TMP/proj" -o "$TMP/x" >"$TMP/x.err" 2>&1 && bad_ok=0
     grep -qi "not a directory\|does not name a directory" "$TMP/x.err" || bad_ok=0
 done
 [ "$bad_ok" -eq 1 ] && ok "a --std that is not a directory is reported" \
@@ -172,7 +176,7 @@ printf 'main(int argc, string[] argv) {\n    int v = trmid_v();\n    print(v);\n
                                                                  > "$TMP/tr/app/main.id"
 tr_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --no-std "$TMP/tr/app" -o "$TMP/tr/out" >/dev/null 2>&1 || { tr_ok=0; break; }
+    $cc --no-std "$TMP/tr/app" -o "$TMP/tr/out" >/dev/null 2>&1 || { tr_ok=0; break; }
     [ "$("$TMP/tr/out")" = "42" ] || { tr_ok=0; break; }
 done
 [ "$tr_ok" -eq 1 ] && ok "an imported directory's own conf.id is followed" \
@@ -187,7 +191,7 @@ printf 'cyb_v(int a) {\n  int v = a;\n} return int v;\nmain(int argc, string[] a
                                                     > "$TMP/cy/b/b.id"
 cy_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    timeout 30 "$cc" --no-std "$TMP/cy/b" -o "$TMP/cy/out" >/dev/null 2>&1 || { cy_ok=0; break; }
+    timeout 30 $cc --no-std "$TMP/cy/b" -o "$TMP/cy/out" >/dev/null 2>&1 || { cy_ok=0; break; }
     [ "$("$TMP/cy/out")" = "7" ] || { cy_ok=0; break; }
 done
 [ "$cy_ok" -eq 1 ] && ok "a cycle in the import graph terminates" \
@@ -212,7 +216,7 @@ main(int argc, string[] argv) {
 EOF
 bk_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --no-std "$TMP/bk/app" -o "$TMP/bk/out" >/dev/null 2>&1 || { bk_ok=0; break; }
+    $cc --no-std "$TMP/bk/app" -o "$TMP/bk/out" >/dev/null 2>&1 || { bk_ok=0; break; }
     [ "$("$TMP/bk/out")" = "0" ] || { bk_ok=0; break; }
 done
 [ "$bk_ok" -eq 1 ] && ok "a backend named by an imported library is linked" \
@@ -225,7 +229,7 @@ rm -rf "$TMP/fat"; mkdir -p "$TMP/fat"
 for n in 1 2 3 4; do printf 'fat%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/fat/f$n.id"; done
 fat_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --std "$TMP/fat" "$TMP/proj" -o "$TMP/x" >"$TMP/fat.err" 2>&1 && fat_ok=0
+    $cc --std "$TMP/fat" "$TMP/proj" -o "$TMP/x" >"$TMP/fat.err" 2>&1 && fat_ok=0
     grep -q "at most 3 files and directories" "$TMP/fat.err" || fat_ok=0
     grep -q "$TMP/fat" "$TMP/fat.err" || fat_ok=0
 done
@@ -245,7 +249,7 @@ main(int argc, string[] argv) {
 EOF
 dce_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/dce.c" >/dev/null 2>&1 || dce_ok=0
+    $cc --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/dce.c" >/dev/null 2>&1 || dce_ok=0
     # tstr_twice is in the stdlib and nothing calls it
     grep -q "id_tstr_twice" "$TMP/dce.c" && dce_ok=0
     # tfx_max is called, and tfx_abs is not -- but tfx_max is reached, so it stays
@@ -256,7 +260,7 @@ done
                     || bad "an unreachable stdlib function is not emitted"
 
 # -- 13. and the two compilers agree about exactly what survives ------------
-"$BIN_IDC" --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/p1.c" >/dev/null 2>&1
+$BIN_IDC --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/p1.c" >/dev/null 2>&1
 "$IDC_PY"  --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/p2.c" >/dev/null 2>&1
 cmp -s "$TMP/p1.c" "$TMP/p2.c" \
     && ok "both compilers eliminate exactly the same code" \
@@ -277,7 +281,7 @@ libx_b(int a) {
 EOF
 lib_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --no-std "$TMP/lib" --emit-c "$TMP/lib.c" >/dev/null 2>&1 || lib_ok=0
+    $cc --no-std "$TMP/lib" --emit-c "$TMP/lib.c" >/dev/null 2>&1 || lib_ok=0
     grep -q "id_libx_a" "$TMP/lib.c" || lib_ok=0
     grep -q "id_libx_b" "$TMP/lib.c" || lib_ok=0
 done
@@ -309,7 +313,7 @@ never_called(int a) {
 EOF
 act_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 && act_ok=0
+    $cc --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 && act_ok=0
     grep -q "the limit is 3" "$TMP/d.err" || act_ok=0
 done
 [ "$act_ok" -eq 1 ] && ok "an unreachable function still obeys the action limit" \
@@ -326,7 +330,7 @@ never_peeker() {
 EOF
 acc_ok=1
 for cc in "$BIN_IDC" "$IDC_PY"; do
-    "$cc" --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 && acc_ok=0
+    $cc --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 && acc_ok=0
     grep -qi "not exported" "$TMP/d.err" || acc_ok=0
 done
 [ "$acc_ok" -eq 1 ] && ok "an unreachable function still obeys the export rules" \
@@ -397,7 +401,7 @@ for cc_name in idc idc.py; do
         idc)    cc="$BIN_IDC" ;;
         idc.py) cc="$IDC_PY" ;;
     esac
-    "$cc" --std "$FIXTURE" "$TMP/two" -o "$TMP/two.out" >"$TMP/two.$cc_name" 2>&1 && one_ok=0
+    $cc --std "$FIXTURE" "$TMP/two" -o "$TMP/two.out" >"$TMP/two.$cc_name" 2>&1 && one_ok=0
     grep -m1 "must keep one type" "$TMP/two.$cc_name" > "$TMP/msg.$cc_name" || one_ok=0
 done
 cmp -s "$TMP/msg.idc" "$TMP/msg.idc.py" || one_ok=0

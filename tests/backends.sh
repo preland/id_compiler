@@ -30,7 +30,10 @@ cd "$(dirname "$0")"
 ROOT=".."
 ORG="../.."
 ABS_ROOT=$(cd "$ROOT" && pwd)   # for the checks that build from another cwd
-BIN_IDC=../bin/idc
+# bin/idc takes --allow-untested throughout: none of the programs built here has
+# test cases, and what is under test is the backends. It is part of the word so
+# the loops below run both compilers as before; idc.py has no such flag.
+BIN_IDC="../bin/idc --allow-untested"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 pass=0 fail=0
@@ -61,7 +64,7 @@ the lazy dog
 removed fsdemo.txt (rc 0), exists now 0
 reopening it gives -1, errno 2'
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
-    name=$(basename "$c")
+    name=$(basename "${c%% *}")
     if ! $c "$ORG/demos/fsdemo" -o "$fsout.$name" >"$TMP/fs.build" 2>&1; then
         bad "fsdemo builds with $name"; continue
     fi
@@ -77,7 +80,7 @@ done
 # ways -- used to compile its sources twice and hand cc the same object file
 # twice: "multiple definition" for every symbol it exports.
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
-    name=$(basename "$c")
+    name=$(basename "${c%% *}")
     if $c "$ORG/demos/fsdemo" --backend "$ROOT/backends/fs" -o "$fsout.dup.$name" \
          >"$TMP/fs.dup" 2>&1; then
         ok "a backend named by both --backend and conf.id links once ($name)"
@@ -96,7 +99,7 @@ a.id
 b.id
 sub/'
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
-    name=$(basename "$c")
+    name=$(basename "${c%% *}")
     if ! $c "$ROOT/tests/fixtures/lsdemo" -o "$fsout.ls.$name" >"$TMP/ls.build" 2>&1; then
         bad "lsdemo builds with $name ($(head -1 "$TMP/ls.build"))"; continue
     fi
@@ -188,7 +191,7 @@ fi
 nocbe="$TMP/nocbe"; mkdir -p "$nocbe"
 printf '{"name":"toy","abi":[],"targets":{"interp":{"module":"toy.py"}}}\n' > "$nocbe/backend.json"
 for c in "$BIN_IDC" "$ROOT/idc.py"; do
-    name=$(basename "$c")
+    name=$(basename "${c%% *}")
     if $c "$ORG/demos/hello" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
        | grep -q "no implementation for the C target"; then
         ok "a backend with no C target is diagnosed as such ($name)"
@@ -205,9 +208,9 @@ done
 # built binaries out of the source tree.
 outdir="$TMP/outdir"; mkdir -p "$outdir"
 cp -r "$ORG/demos/hello" "$outdir/proj"
-for c in "$ABS_ROOT/bin/idc" "$ABS_ROOT/idc.py"; do
-    name=$(basename "$c")
-    out=$(cd "$outdir" && "$c" proj 2>&1)
+for c in "$ABS_ROOT/bin/idc --allow-untested" "$ABS_ROOT/idc.py"; do
+    name=$(basename "${c%% *}")
+    out=$(cd "$outdir" && $c proj 2>&1)
     if [ -x "$outdir/build/proj" ] && [ ! -e "$outdir/proj.out" ]; then
         ok "a default build lands in build/ ($name)"
     else
@@ -215,7 +218,7 @@ for c in "$ABS_ROOT/bin/idc" "$ABS_ROOT/idc.py"; do
     fi
     rm -rf "$outdir/build"
     # An explicit -o is the user's choice and is reported, not second-guessed.
-    if (cd "$outdir" && "$c" proj -o proj 2>&1) | grep -q "is a directory"; then
+    if (cd "$outdir" && $c proj -o proj 2>&1) | grep -q "is a directory"; then
         ok "-o naming a directory is reported ($name)"
     else
         bad "-o naming a directory is reported ($name)"

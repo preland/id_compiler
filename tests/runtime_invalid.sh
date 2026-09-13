@@ -34,9 +34,11 @@ for f in runtime_invalid/*.id; do
         echo "FAIL: $name (no '// EXPECT:' line in $f)"; fail=$((fail+1)); continue
     fi
 
-    for cc_pair in "idc.py|$IDC" "bin/idc|$BIN_IDC"; do
+    # bin/idc takes --allow-untested: these programs have no test cases, and
+    # what is under test is the abort they compile to. idc.py has no such flag.
+    for cc_pair in "idc.py|$IDC" "bin/idc|$BIN_IDC --allow-untested"; do
         label="$name [${cc_pair%%|*}]"; cc="${cc_pair#*|}"
-        if ! "$cc" "$f" -o "$TMP/$name" 2>"$TMP/$name.compile_err"; then
+        if ! $cc "$f" -o "$TMP/$name" 2>"$TMP/$name.compile_err"; then
             echo "FAIL: $label (failed to compile; expected it to compile and abort at run time)"
             echo "      compiler said: $(head -1 "$TMP/$name.compile_err")"
             fail=$((fail+1)); continue

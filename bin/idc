@@ -38,7 +38,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 IDC_PY="$ROOT/idc.py"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--fingerprints]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--fingerprints]" >&2
 }
 
 PATH_ARG=""
@@ -54,7 +54,8 @@ KEEP_C=0
 CC=cc
 CC_EXPLICIT=0
 TRIPLE=""
-REQUIRE_TESTS=0
+REQUIRE_TESTS=1
+ALLOW_UNTESTED=0
 EMIT_SOURCES=0
 FINGERPRINTS=0
 NO_STD=0
@@ -88,6 +89,8 @@ while [ $# -gt 0 ]; do
             TRIPLE="${2:?idc: --triple needs an argument}"; shift 2 ;;
         --require-tests)
             REQUIRE_TESTS=1; shift ;;
+        --allow-untested)
+            ALLOW_UNTESTED=1; shift ;;
         --emit-sources)
             EMIT_SOURCES=1; shift ;;
         --fingerprints)
@@ -133,6 +136,19 @@ if [ -n "${1:-}" ] && [ -z "$PATH_ARG" ]; then
 fi
 if [ -z "$PATH_ARG" ]; then
     echo "idc: missing PATH" >&2; usage; exit 2
+fi
+
+# Every function carries at least two test cases, on every build, so that what
+# a function does is pinned where it is declared and cannot drift unnoticed
+# (docs/TESTS.md). --require-tests is that default restated. --allow-untested
+# is the one way out, and it exists only until the tree has its cases: it says
+# so once per build, on stderr, and changes neither stdout nor the exit status.
+# The driver's own re-entry to build its compiler stages (IDC_STAGE_LEX, below)
+# passes it silently -- a build that did not ask for it is not told it did.
+if [ "$ALLOW_UNTESTED" -eq 1 ]; then
+    REQUIRE_TESTS=0
+    [ -z "${IDC_STAGE_LEX:-}" ] \
+        && echo "idc: warning: --allow-untested is deprecated and will be removed once every function has its test cases" >&2
 fi
 
 # --emit-c writes the C a build compiles, and an LLVM build compiles none. The
@@ -408,13 +424,13 @@ if [ -z "${IDC_STAGE_LEX:-}" ]; then
     if stale "$IDLEX" "$ROOT/compiler/lex" || [ "$STAGE0_LEX" -nt "$IDLEX" ]; then
         progress bootstrap "idlex (from source, via stage 0)"
         env -u IDC_NO_STD IDC_STAGE_LEX="$STAGE0_LEX" IDC_STAGE_PARSE="$STAGE0_PARSE" \
-            "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" "$ROOT/compiler/lex" -o "$IDLEX" >&2 \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" --allow-untested "$ROOT/compiler/lex" -o "$IDLEX" >&2 \
             || { progress_clear; echo "idc: failed to bootstrap idlex (needs idstd -- see --std)" >&2; exit 1; }
     fi
     if stale "$IDPARSE" "$ROOT/compiler/parse" || [ "$STAGE0_PARSE" -nt "$IDPARSE" ]; then
         progress bootstrap "idparse (from source, via stage 0)"
         env -u IDC_NO_STD IDC_STAGE_LEX="$STAGE0_LEX" IDC_STAGE_PARSE="$STAGE0_PARSE" \
-            "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" "$ROOT/compiler/parse" -o "$IDPARSE" >&2 \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" --allow-untested "$ROOT/compiler/parse" -o "$IDPARSE" >&2 \
             || { progress_clear; echo "idc: failed to bootstrap idparse (needs idstd -- see --std)" >&2; exit 1; }
     fi
 else
@@ -715,8 +731,8 @@ PARSE_ARGS=()
 # passed: leaving it out let idparse's own default answer the question, which
 # is how the driver and the compiler came to disagree about the platform.
 PARSE_ARGS+=(--triple "$TRIPLE")
-# Every function must carry at least two test cases (docs/TESTS.md). Off by
-# default while the rollout is under way; the self-hosted compiler checks it.
+# Every function must carry at least two test cases (docs/TESTS.md). On unless
+# --allow-untested turned it off; the self-hosted compiler checks it.
 if [ "$REQUIRE_TESTS" -eq 1 ]; then
     PARSE_ARGS+=(--require-tests)
 fi

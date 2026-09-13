@@ -150,11 +150,6 @@ self_reject "bin/idc rejects a function with one case" \
 } return int s;
 (1, 2):(3)
 ' "function 'add' has 1 test case(s)"
-if ../bin/idc "$TMP/p.id" --emit-c /dev/null >/dev/null 2>&1; then
-    ok "bin/idc does not require two cases without the flag"
-else
-    bad "bin/idc does not require two cases without the flag"
-fi
 printf '%s' 'add(int a, int b) {
   int s = a + b;
 } return int s;
@@ -481,6 +476,62 @@ self_refuse() {   # desc, expected message (fixed string), flags...
     fi
 }
 
+# --- two cases per function, by default ---------------------------------------
+# Every build of bin/idc applies the two-case minimum, with the diagnostic
+# --require-tests gives. --allow-untested is the deprecated way out while the
+# tree is catching up: it turns the minimum off and says so once on stderr, and
+# changes nothing else -- not the exit status, and not stdout, which can be the
+# program's C.
+DEPRECATED="idc: warning: --allow-untested is deprecated and will be removed once every function has its test cases"
+printf '%s' 'add(int a, int b) {
+  int s = a + b;
+} return int s;
+' > "$TMP/p.id"
+self_refuse "bin/idc: a function with no cases fails a default build" \
+    "function 'add' has 0 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)" --emit-c /dev/null
+../bin/idc "$TMP/p.id" --allow-untested -o "$TMP/out" >"$TMP/stdout" 2>"$TMP/stderr"
+[ $? -eq 0 ] \
+    && ok "bin/idc: --allow-untested builds a function with no cases" \
+    || bad "bin/idc: --allow-untested builds a function with no cases ($(head -1 "$TMP/stderr"))"
+[ "$(cat "$TMP/stderr")" = "$DEPRECATED" ] \
+    && ok "bin/idc: --allow-untested prints its deprecation warning exactly once, and nothing else" \
+    || bad "bin/idc: --allow-untested prints its deprecation warning exactly once, and nothing else (stderr: $(tr '\n' '|' < "$TMP/stderr"))"
+[ -e "$TMP/out" ] && [ ! -s "$TMP/stdout" ] \
+    && ok "bin/idc: the deprecation warning is not on stdout" \
+    || bad "bin/idc: the deprecation warning is not on stdout"
+
+printf '%s' 'add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)
+' > "$TMP/p.id"
+self_refuse "bin/idc: a function with one case fails a default build" \
+    "function 'add' has 1 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)" --emit-c /dev/null
+self_accept "bin/idc: --allow-untested builds a function with one case" --allow-untested --emit-c /dev/null
+[ "$(grep -cF "$DEPRECATED" "$TMP/log")" = 1 ] \
+    && ok "bin/idc: --allow-untested warns once on a one-case build" \
+    || bad "bin/idc: --allow-untested warns once on a one-case build"
+
+printf '%s' 'add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(4)
+(0, 0):(0)
+' > "$TMP/p.id"
+self_refuse "bin/idc: --allow-untested does not turn a failing case into a build" \
+    "p.id:4: test failed: add(1, 2) = 3, expected 4" --allow-untested --emit-c /dev/null
+
+printf '%s' 'add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)
+(0, 0):(0)
+' > "$TMP/p.id"
+../bin/idc "$TMP/p.id" --emit-c /dev/null >"$TMP/stdout" 2>"$TMP/stderr"
+[ $? -eq 0 ] && [ ! -s "$TMP/stderr" ] \
+    && ok "bin/idc: a fully cased program builds by default, with no warning" \
+    || bad "bin/idc: a fully cased program builds by default, with no warning ($(head -1 "$TMP/stderr"))"
+
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
   int s = a + b;
@@ -494,7 +545,7 @@ main(int argc, string[] argv) {
 } return int 0;
 EOF
 rm -f "$TMP/out"
-self_accept "bin/idc: passing cases build" -o "$TMP/out"
+self_accept "bin/idc: passing cases build" --allow-untested -o "$TMP/out"
 [ "$("$TMP/out" 2>&1)" = "sum 5" ] \
     && ok "bin/idc: a program whose cases pass runs" \
     || bad "bin/idc: a program whose cases pass runs"
@@ -514,7 +565,7 @@ main(int argc, string[] argv) {
 EOF
 rm -f "$TMP/out"
 self_refuse "bin/idc: a false case fails the build" \
-    "p.id:4: test failed: add(1, 2) = 3, expected 4" -o "$TMP/out"
+    "p.id:4: test failed: add(1, 2) = 3, expected 4" --allow-untested -o "$TMP/out"
 grep -qF "p.id:6: test failed: add(2, 2) = 4, expected 5" "$TMP/log" \
     && ok "bin/idc: every failing case is reported, not only the first" \
     || bad "bin/idc: every failing case is reported, not only the first"
@@ -522,7 +573,7 @@ grep -qF "p.id:6: test failed: add(2, 2) = 4, expected 5" "$TMP/log" \
     && ok "bin/idc: a failing case produces no program" \
     || bad "bin/idc: a failing case produces no program"
 rm -f "$TMP/emitted.c"
-../bin/idc "$TMP/p.id" --emit-c "$TMP/emitted.c" >/dev/null 2>&1
+../bin/idc "$TMP/p.id" --allow-untested --emit-c "$TMP/emitted.c" >/dev/null 2>&1
 [ ! -f "$TMP/emitted.c" ] \
     && ok "bin/idc: a failing case blocks --emit-c too" \
     || bad "bin/idc: a failing case blocks --emit-c too (the C was written anyway)"
@@ -541,7 +592,7 @@ dbl(int a) {
 (1):(2)
 (4):(9)
 EOF
-env -u IDC_NO_STD ../bin/idc "$TMP/locp" -o "$TMP/locp.out" > "$TMP/locp.log" 2>&1
+env -u IDC_NO_STD ../bin/idc "$TMP/locp" --allow-untested -o "$TMP/locp.out" > "$TMP/locp.log" 2>&1
 grep -qF "locp/lib/dbl.id:5: test failed: dbl(4) = 8, expected 9" "$TMP/locp.log" \
     && ok "bin/idc: a failing case names its own file with the standard library merged in" \
     || bad "bin/idc: a failing case names its own file with the standard library merged in (got: $(head -1 "$TMP/locp.log"))"
@@ -559,7 +610,7 @@ printf '%s' 'add(int a, int b) {
 } return int s;
 ' > "$TMP/q.id"
 ../bin/idc "$TMP/p.id" --emit-c "$TMP/with.c" >/dev/null 2>&1
-../bin/idc "$TMP/q.id" --emit-c "$TMP/without.c" >/dev/null 2>&1
+../bin/idc "$TMP/q.id" --allow-untested --emit-c "$TMP/without.c" >/dev/null 2>&1
 if [ -s "$TMP/with.c" ] && cmp -s "$TMP/with.c" "$TMP/without.c" && ! grep -q "id_ctr_\|idtc_" "$TMP/with.c"; then
     ok "bin/idc: cases do not change the program's C"
 else
@@ -786,11 +837,11 @@ first_byte() {
   word b = peek8((import gb));
 } return word b;
 EOF
-self_accept "bin/idc: a setup's address is passed in, and a check reads it back" --emit-c /dev/null
+self_accept "bin/idc: a setup's address is passed in, and a check reads it back" --allow-untested --emit-c /dev/null
 
 sed -i 's/((import gb)) then first_byte:(3)$/((import gb)) then first_byte:(4)/' "$TMP/p.id"
 self_refuse "bin/idc: a check that does not hold fails the case, naming the check" \
-    "p.id:8: test failed: fill3((import gb)) then first_byte() = 3, expected 4" --emit-c /dev/null
+    "p.id:8: test failed: fill3((import gb)) then first_byte() = 3, expected 4" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 err_setup() {
@@ -808,11 +859,11 @@ count() {
   int n = (import err_n)[0];
 } return int n;
 EOF
-self_accept "bin/idc: a void function that only writes module state is tested by a check" --emit-c /dev/null
+self_accept "bin/idc: a void function that only writes module state is tested by a check" --allow-untested --emit-c /dev/null
 
 sed -i 's/("x"):("x") then count:(1)/("x"):("x") then count:(2)/' "$TMP/p.id"
 self_refuse "bin/idc: ... and a check that does not hold fails it" \
-    'p.id:9: test failed: err_report("x") then count() = 1, expected 2' --emit-c /dev/null
+    'p.id:9: test failed: err_report("x") then count() = 1, expected 2' --allow-untested --emit-c /dev/null
 
 # The larger case's setup does 20000 iterations and the smaller's none, so
 # this claim holds only if a setup's work is not counted as the call's.
@@ -836,7 +887,7 @@ inc(int a) {
 given small (1):(2)[time:O(1)]
 given big (100):(101)[time:O(1)]
 EOF
-self_accept "bin/idc: a setup's work is not counted against a constraint" --emit-c /dev/null
+self_accept "bin/idc: a setup's work is not counted against a constraint" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 f(int a) {
@@ -920,7 +971,7 @@ f(int a) {
 given st ((import hg)):(4)
 given st ((import g)):(2)
 EOF
-self_accept "bin/idc: (import NAME) of an export made by a function the setup calls" --emit-c /dev/null
+self_accept "bin/idc: (import NAME) of an export made by a function the setup calls" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 st() {
@@ -952,7 +1003,7 @@ cnt() {
   int v = (import n)[0];
 } return int v;
 EOF
-self_accept "bin/idc: two cases differing only in a then clause are not duplicates" --emit-c /dev/null
+self_accept "bin/idc: two cases differing only in a then clause are not duplicates" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/q.id" <<'EOF'
 st() {
@@ -965,7 +1016,7 @@ same(int a) {
 given st (1):(1)
 (1):(1)
 EOF
-if ../bin/idc "$TMP/q.id" --emit-c /dev/null >"$TMP/log" 2>&1; then
+if ../bin/idc "$TMP/q.id" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     ok "bin/idc: two cases differing only in a given are not duplicates"
 else
     bad "bin/idc: two cases differing only in a given are not duplicates ($(head -1 "$TMP/log"))"
@@ -1126,7 +1177,7 @@ main(int argc, string[] argv) {
 } return int 0;
 EOF
 rm -f "$TMP/out"
-self_accept "bin/idc: a function returning a list literal is not a constant wrapper" -o "$TMP/out"
+self_accept "bin/idc: a function returning a list literal is not a constant wrapper" --allow-untested -o "$TMP/out"
 [ "$("$TMP/out" 2>&1)" = "9 2" ] \
     && ok "bin/idc: each call of a list-returning function gets its own list" \
     || bad "bin/idc: each call of a list-returning function gets its own list"
@@ -1141,7 +1192,7 @@ main(int argc, string[] argv) {
   print(c);
 } return int 0;
 EOF
-self_accept "bin/idc: a result that depends on a parameter is not a constant" --emit-c /dev/null
+self_accept "bin/idc: a result that depends on a parameter is not a constant" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 width() {
@@ -1153,7 +1204,7 @@ main(int argc, string[] argv) {
   print(c);
 } return int 0;
 EOF
-self_accept "bin/idc: a result computed by a call is not a constant" --emit-c /dev/null
+self_accept "bin/idc: a result computed by a call is not a constant" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 pick() {
@@ -1168,7 +1219,7 @@ main(int argc, string[] argv) {
   print(c);
 } return int 0;
 EOF
-self_accept "bin/idc: a result chosen by a branch is not a constant" --emit-c /dev/null
+self_accept "bin/idc: a result chosen by a branch is not a constant" --allow-untested --emit-c /dev/null
 
 # Assigning a parameter is a use of it, and a parameter is not one of the
 # function's own locals, so this is outside the rule as written.
@@ -1182,7 +1233,7 @@ main(int argc, string[] argv) {
   print(c);
 } return int 0;
 EOF
-self_accept "bin/idc: a function that assigns its parameter is not a constant wrapper" --emit-c /dev/null
+self_accept "bin/idc: a function that assigns its parameter is not a constant wrapper" --allow-untested --emit-c /dev/null
 
 echo
 echo "$pass passed, $fail failed"

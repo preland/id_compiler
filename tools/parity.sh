@@ -24,8 +24,8 @@ target="${1:?usage: parity.sh <file-or-project-dir>}"
 # under test: the compiler's own source calls idstd's lset, so a bootstrap
 # without it does not build at all. Not with idc.py: idstd may use `given` and
 # `then`, which only bin/idc parses.
-env -u IDC_NO_STD ./bin/idc compiler/lex   -o "$TMP/idlex"   2>/dev/null || { echo "lexer build failed"; exit 2; }
-env -u IDC_NO_STD ./bin/idc compiler/parse -o "$TMP/idparse" 2>/dev/null || { echo "idparse build failed"; exit 2; }
+env -u IDC_NO_STD ./bin/idc compiler/lex   --allow-untested -o "$TMP/idlex"   2>/dev/null || { echo "lexer build failed"; exit 2; }
+env -u IDC_NO_STD ./bin/idc compiler/parse --allow-untested -o "$TMP/idparse" 2>/dev/null || { echo "idparse build failed"; exit 2; }
 
 # The program under test is compiled WITHOUT the standard library, by both
 # sides. idc.py cannot read idstd once idstd holds a case written with `given`,

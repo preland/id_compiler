@@ -19,7 +19,11 @@ export IDC_NO_STD=1
 
 cd "$(dirname "$0")"
 IDC=../idc.py
-BIN_IDC=../bin/idc
+# bin/idc takes --allow-untested throughout: the demos and the programs below
+# have no test cases, and what is compared here is what the two compilers
+# build. It is part of the word, so every $BIN_IDC below carries it; idc.py
+# has no such flag.
+BIN_IDC="../bin/idc --allow-untested"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 pass=0 fail=0
@@ -330,8 +334,9 @@ fi
 # asm_error prints, and print shares its stream with the generated code, so
 # without a failure flag the message landed inside the C and the build died as
 # "internal error: the self-hosted compiler emitted C that does not compile".
-# One line out, and nothing about reporting it.
-asm_out=$($BIN_IDC "$TMP/asm.id" --triple aarch64-unknown-linux-gnu -o "$TMP/asm4.bin" 2>&1)
+# One line out, and nothing about reporting it -- not counting --allow-untested's
+# deprecation warning, which is the build's line and not the diagnostic's.
+asm_out=$($BIN_IDC "$TMP/asm.id" --triple aarch64-unknown-linux-gnu -o "$TMP/asm4.bin" 2>&1 | grep -v '^idc: warning: --allow-untested')
 if [ "$(printf '%s\n' "$asm_out" | wc -l)" -eq 1 ] \
    && ! printf '%s\n' "$asm_out" | grep -q "internal error"; then
     ok "a missing asm overload is reported, not raised as a compiler bug"
@@ -497,12 +502,21 @@ printf 'main(int argc, string[] argv) {\n  print("bootstrapped");\n} return int 
     > "$TMP/hello_boot.id"
 if [ -z "$STD_REAL" ]; then
     echo "SKIP: cold bootstrap (no idstd checkout to build the compiler against)"
-elif IDC_CACHE_DIR="$TMP/bootcache" "$BOOTROOT/bin/idc" --std "$STD_REAL" \
+elif IDC_CACHE_DIR="$TMP/bootcache" "$BOOTROOT/bin/idc" --std "$STD_REAL" --allow-untested \
          "$TMP/hello_boot.id" -o "$TMP/hello_boot" >"$TMP/boot.err" 2>&1 \
      && [ "$("$TMP/hello_boot")" = "bootstrapped" ]; then
     ok "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable"
 else
     bad "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable: $(head -2 "$TMP/boot.err" | tr '\n' ' ')"
+fi
+# That cold build re-entered bin/idc twice to build the compiler's stages, each
+# with --allow-untested. The deprecation warning belongs to the build that
+# asked, so it is printed once, not once per stage.
+if [ -n "$STD_REAL" ]; then
+    n_warn=$(grep -cF -- "--allow-untested is deprecated" "$TMP/boot.err")
+    [ "$n_warn" = 1 ] \
+        && ok "a cold bootstrap prints the --allow-untested warning once" \
+        || bad "a cold bootstrap prints the --allow-untested warning once (printed $n_warn times)"
 fi
 
 # -- expression compilation is linear, not exponential ----------------------
@@ -527,14 +541,14 @@ printf 'main(int argc, string[] argv) {\n  int x = %s;\n  print(x);\n} return in
 printf 'main(int argc, string[] argv) {\n  string x = %s;\n  print(x);\n} return int 0;\n' \
     "$str_chain" > "$TMP/chain_str.id"
 
-if (ulimit -v 2000000; timeout 5 "$BIN_IDC" "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
+if (ulimit -v 2000000; timeout 5 $BIN_IDC "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
         >"$TMP/chain_int.err" 2>&1; then
     ok "250-term int + chain compiles in linear time under a 2 GB cap"
 else
     bad "250-term int + chain compiles in linear time under a 2 GB cap: $(head -1 "$TMP/chain_int.err")"
 fi
 
-if (ulimit -v 2000000; timeout 5 "$BIN_IDC" "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
+if (ulimit -v 2000000; timeout 5 $BIN_IDC "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
         >"$TMP/chain_str.err" 2>&1; then
     ok "250-term string + chain compiles in linear time under a 2 GB cap"
 else

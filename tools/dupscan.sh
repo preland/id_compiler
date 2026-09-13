@@ -30,7 +30,7 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
 DUPSCAN="$TMP/dupscan"
-"$ROOT/bin/idc" "$ROOT/tools/dupscan" -o "$DUPSCAN" >&2 \
+"$ROOT/bin/idc" "$ROOT/tools/dupscan" --allow-untested -o "$DUPSCAN" >&2 \
     || { echo "dupscan.sh: failed to build tools/dupscan" >&2; exit 1; }
 
 LINES="$TMP/lines"
@@ -38,7 +38,7 @@ LINES="$TMP/lines"
 for p in "$@"; do
     [ -e "$p" ] || { echo "dupscan.sh: no such path: $p" >&2; exit 2; }
     name=$(basename "$p")
-    "$ROOT/bin/idc" "$p" --fingerprints 2>"$TMP/err" \
+    "$ROOT/bin/idc" "$p" --allow-untested --fingerprints 2>"$TMP/err" \
         | awk -v name="$name" -F'\t' 'NF >= 3 { print name "\t" $0 }' >> "$LINES"
     [ -s "$TMP/err" ] && cat "$TMP/err" >&2
 done

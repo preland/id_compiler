@@ -73,7 +73,7 @@ main(int argc, string[] argv) {
 IDEOF
 printf 'import "%s/backends/fs"\n' "$(cd "$ROOT" && pwd)" > "$PROJ/conf.id"
 
-if ! "$ROOT/bin/idc" "$PROJ" -o "$TMP/ttf" >"$TMP/build.log" 2>&1; then
+if ! "$ROOT/bin/idc" "$PROJ" --allow-untested -o "$TMP/ttf" >"$TMP/build.log" 2>&1; then
     bad "the font module builds ($(head -3 "$TMP/build.log" | tr '\n' ' '))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi

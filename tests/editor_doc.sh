@@ -114,7 +114,7 @@ show_key_line(string key, string font, int size) {
 } return void;
 IDEOF
 
-if ! "$ROOT/bin/idc" "$P" -o "$TMP/doctest" >"$TMP/build.log" 2>&1; then
+if ! "$ROOT/bin/idc" "$P" --allow-untested -o "$TMP/doctest" >"$TMP/build.log" 2>&1; then
     bad "editor/lib/doc builds ($(head -1 "$TMP/build.log"))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi

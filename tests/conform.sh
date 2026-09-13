@@ -109,11 +109,13 @@ run_case() {
     want_exit=0
     [ -f "$dir/$base.exit" ] && want_exit=$(cat "$dir/$base.exit")
 
+    # The conformance programs carry no test cases: what they pin is their
+    # output on every target, so bin/idc builds them with --allow-untested.
     case "$target" in
         c)    bin="$TMP/$slug.c.bin"
-              "$BIN_IDC" "$src" -o "$bin" >"$TMP/build.log" 2>&1 ;;
+              "$BIN_IDC" "$src" --allow-untested -o "$bin" >"$TMP/build.log" 2>&1 ;;
         llvm) bin="$TMP/$slug.llvm.bin"
-              "$BIN_IDC" "$src" --target llvm -o "$bin" \
+              "$BIN_IDC" "$src" --allow-untested --target llvm -o "$bin" \
                   >"$TMP/build.log" 2>&1 ;;
         wasm) bin="$TMP/$slug.wasm"
               python3 "$IDC_PY" "$src" --target wasm -o "$bin" \

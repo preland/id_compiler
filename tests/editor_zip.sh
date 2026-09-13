@@ -106,7 +106,7 @@ blit(int[] buf, word a) {
 IDEOF
 
 BIN="$TMP/ziptest"
-if ! "$ROOT/bin/idc" "$TMP" -o "$BIN" >"$TMP/build.log" 2>&1; then
+if ! "$ROOT/bin/idc" "$TMP" --allow-untested -o "$BIN" >"$TMP/build.log" 2>&1; then
     bad "editor/lib/zip builds ($(head -1 "$TMP/build.log"))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi
