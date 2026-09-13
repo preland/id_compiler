@@ -1,0 +1,33 @@
+// The screen, a row of cells at a time.
+//
+// g carries the geometry every level below needs: [image width, offset of the
+// first pixel byte, columns, rows, cell width, cell height].
+
+fb_screen(int[] d, int[] font, int[] hd, int base) {
+  int[] g = fb_geom(hd, base);
+  string[] strs = fb_lines(d, font, g);
+  fb_print(strs);
+} return void;
+([], [], [0, 0, 255], 15):([], [], [0, 0, 255], 15)
+([1], [2], [7, 15, 255], 0):([1], [2], [7, 15, 255], 0)
+
+// Only whole cells are read, and never more than the console has.
+fb_geom(int[] hd, int base) {
+  int ncol = fx_min(hd[0] / (import fb_cw), (import fb_ncols));
+  int nrow = fx_min(hd[1] / (import fb_ch), (import fb_nrows));
+  int[] g = [hd[0], base, ncol, nrow, (import fb_cw), (import fb_ch)];
+} return int[] g;
+([640, 480, 255], 15):([640, 15, 80, 30, 8, 16])
+([100, 40, 255], 3):([100, 3, 12, 2, 8, 16])
+
+fb_lines(int[] d, int[] font, int[] g) {
+  string[] strs = [];
+  int cy = 0;
+  while(cy < g[3]) {
+    string ln = fb_line(d, font, g, cy);
+    push(strs, ln);
+    cy = cy + 1;
+  }
+} return string[] strs;
+([0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255], [0, 1], [2, 0, 2, 2, 1, 1]):(["", "!!"])
+([0, 0, 0, 0, 0, 0], [0, 1], [2, 0, 2, 1, 1, 1]):([""])

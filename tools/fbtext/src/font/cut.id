@@ -1,0 +1,19 @@
+// A constant's value: from the end of its declaration's opening quote to the
+// closing one.
+
+font_cut(string text, int at, string key) {
+  string one = "";
+  if(at >= 0) {
+    int start = at + len(key);
+    one = font_run(text, start);
+  }
+} return string one;
+("xx\"ab\"", -1, "k"):("")
+("k\"ab\"", 0, "k\""):("ab")
+
+font_run(string text, int start) {
+  int end = str_findat(text, "\"", start);
+  string one = str_slice(text, start, end - start);
+} return string one;
+("ab\"", 0):("ab")
+("x=\"12\"", 3):("12")

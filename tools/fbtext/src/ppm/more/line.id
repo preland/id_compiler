@@ -1,0 +1,30 @@
+// A comment: '#' to the end of its line. The newline itself is left for
+// ppm_spaces, which is what ends the comment.
+
+// 1 if a comment was skipped, so ppm_skip knows to look again.
+ppm_comment(int[] d, int[] pos) {
+  int hit = 0;
+  if(ppm_byte_at(d, pos[0]) == 35) {
+    ppm_line(d, pos);
+    hit = 1;
+  }
+} return int hit;
+([35, 120, 10], [0]):(1)
+([49], [0]):(0)
+
+ppm_line(int[] d, int[] pos) {
+  while(ppm_in_line(d, pos[0]) == 1) {
+    pos[0] = pos[0] + 1;
+  }
+} return void;
+([35, 120, 10, 49], [0]):([35, 120, 10, 49], [2])
+([35, 120], [0]):([35, 120], [2])
+
+// Still inside the line: not a newline, and not past the end of the file.
+ppm_in_line(int[] d, int i) {
+  int c = ppm_byte_at(d, i);
+  int ok = c >= 0 && c != 10;
+} return int ok;
+([120], 0):(1)
+([10], 0):(0)
+([10], 1):(0)

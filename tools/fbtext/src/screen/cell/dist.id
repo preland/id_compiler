@@ -1,0 +1,36 @@
+// Distance from a cell to a glyph: the pixels that differ.
+
+// Strictly nearer only, so of two equally near glyphs the lower code wins.
+fb_try(int[] bs, int[] rows, int[] font, int gi) {
+  int at = gi * len(rows);
+  int dist = fb_dist(rows, font, at);
+  if(dist < bs[1]) {
+    bs[0] = (import fb_first) + gi;
+    bs[1] = dist;
+  }
+} return void;
+([32, 5], [2], [1, 2], 1):([33, 0], [2], [1, 2], 1)
+([33, 0], [2], [1, 2], 0):([33, 0], [2], [1, 2], 0)
+
+fb_dist(int[] rows, int[] font, int at) {
+  int dist = 0;
+  int r = 0;
+  while(r < len(rows)) {
+    dist = dist + fb_pop(rows[r] ^ font[at + r]);
+    r = r + 1;
+  }
+} return int dist;
+([3, 0], [0, 0, 1, 255], 2):(9)
+([1], [1], 0):(0)
+
+// Set bits in a non-negative v.
+fb_pop(int v) {
+  int n = 0;
+  while(v > 0) {
+    n = n + (v & 1);
+    v = v >> 1;
+  }
+} return int n;
+(255):(8)
+(0):(0)
+(5):(2)

@@ -1,0 +1,30 @@
+// Decimal digits, and reading a byte that may be past the end.
+
+ppm_digits(int[] d, int[] pos) {
+  int v = 0;
+  while(ppm_is_digit(d, pos[0]) == 1) {
+    v = v * 10 + d[pos[0]] - 48;
+    pos[0] = pos[0] + 1;
+  }
+} return int v;
+([52, 50, 32], [0]):(42)
+([32], [0]):(0)
+
+ppm_is_digit(int[] d, int i) {
+  int c = ppm_byte_at(d, i);
+  int ok = chr_is_digit(c);
+} return int ok;
+([48], 0):(1)
+([48], 1):(0)
+
+// -1 past the end, the way charat answers for a string, so a truncated header
+// ends a scan instead of aborting on an out-of-range read.
+ppm_byte_at(int[] d, int i) {
+  int c = 0 - 1;
+  int n = len(d);
+  if(i >= 0 && i < n) {
+    c = d[i];
+  }
+} return int c;
+([7, 8], 1):(8)
+([7, 8], 2):(-1)

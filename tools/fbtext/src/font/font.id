@@ -1,0 +1,34 @@
+// The font, as conf.id holds it: font_rom0, font_rom1, ... in that order,
+// each a string constant of hexadecimal digits, joined the way font_rom()
+// joins them in the kernel.
+
+// A newline in front so a constant on conf.id's first line starts a line too.
+font_hex(string text) {
+  string[] strs = [];
+  font_parts(strs, "\n" + text);
+  string hex = str_join(strs, "");
+} return string hex;
+("string font_rom0 = \"0a\";\nstring font_rom1 = \"0b\";\n"):("0a0b")
+("x"):("")
+
+// Constants are taken in order until one is missing.
+font_parts(string[] strs, string text) {
+  int k = 0;
+  string one = font_part(text, 0);
+  while(one != "") {
+    push(strs, one);
+    k = k + 1;
+    one = font_part(text, k);
+  }
+} return void;
+([], "\nstring font_rom0 = \"ab\";"):(["ab"], "\nstring font_rom0 = \"ab\";")
+([], "\nnothing"):([], "\nnothing")
+
+// The digits of font_rom<k>, or "" when conf.id declares no such constant.
+font_part(string text, int k) {
+  string key = "\nstring font_rom" + k + " = \"";
+  int at = str_find(text, key);
+  string one = font_cut(text, at, key);
+} return string one;
+("\nstring font_rom1 = \"cd\";", 1):("cd")
+("\nstring font_rom1 = \"cd\";", 0):("")

@@ -1,0 +1,33 @@
+// Trimming a line, and finding where the screen's text ends.
+
+fb_rstrip(string s) {
+  int n = fb_end(s);
+  string ln = str_slice(s, 0, n);
+} return string ln;
+("ab  "):("ab")
+("  "):("")
+(" a"):(" a")
+
+// The length of s without its trailing spaces.
+fb_end(string s) {
+  int n = len(s);
+  while(n > 0 && charat(s, n - 1) == 32) {
+    n = n - 1;
+  }
+} return int n;
+("ab  "):(2)
+(""):(0)
+
+// The index of the last line with anything on it, or -1 for a blank screen.
+fb_last(string[] strs) {
+  int last = 0 - 1;
+  int i = 0;
+  while(i < len(strs)) {
+    if(strs[i] != "") {
+      last = i;
+    }
+    i = i + 1;
+  }
+} return int last;
+(["", "a", ""]):(1)
+(["", ""]):(-1)

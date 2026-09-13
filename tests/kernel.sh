@@ -10,7 +10,7 @@
 #
 #   * the serial port, which is what the kernel says;
 #   * the framebuffer, read back through the kernel's own font by
-#     tools/fbtext.py, which is what the kernel drew -- a graphical shell whose
+#     tools/fbtext.sh, which is what the kernel drew -- a graphical shell whose
 #     only test is its serial output is not a tested graphical shell;
 #   * the same `id` source run hosted, on the C runtime, which is what says the
 #     `id`-written runtime is *right* rather than merely present.
@@ -93,12 +93,12 @@ else
 fi
 
 # -- the screen, not the serial port ----------------------------------------
-# tools/fbtext.py matches each 8x16 cell of the framebuffer against the font
+# tools/fbtext.sh matches each 8x16 cell of the framebuffer against the font
 # the kernel drew it with, so this asserts on pixels that happen to spell
 # words. A console that wrote to the serial port and drew nothing would pass
 # every check above and fail this one.
 if [ -f "$TMP/screen.ppm" ]; then
-    screen=$(python3 "$ROOT/tools/fbtext.py" "$TMP/screen.ppm" 2>/dev/null)
+    screen=$("$ROOT/tools/fbtext.sh" "$TMP/screen.ppm" 2>/dev/null)
     if printf '%s\n' "$screen" | grep -q "id kernel -- x86_64, no libc" \
        && printf '%s\n' "$screen" | grep -q "frobnicate: not a command"; then
         ok "the framebuffer shows what the shell printed"

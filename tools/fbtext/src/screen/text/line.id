@@ -1,0 +1,33 @@
+// One text line of the screen.
+
+// Trailing blanks are dropped, so a line reads as what was printed on it.
+fb_line(int[] d, int[] font, int[] g, int cy) {
+  string[] strs = fb_chars(d, font, g, cy);
+  string raw = str_join(strs, "");
+  string ln = fb_rstrip(raw);
+} return string ln;
+([255, 255, 255, 0, 0, 0], [0, 1], [2, 0, 2, 1, 1, 1], 0):("!")
+([0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255], [0, 1], [2, 0, 2, 2, 1, 1], 1):("!!")
+
+// Each cell's character. A cell's top-left pixel is cy cell-heights down and
+// cx cell-widths across.
+fb_chars(int[] d, int[] font, int[] g, int cy) {
+  string[] strs = [];
+  int cx = 0;
+  while(cx < g[2]) {
+    string one = fb_char(d, font, g, (cy * g[5] * g[0]) + cx * g[4]);
+    push(strs, one);
+    cx = cx + 1;
+  }
+} return string[] strs;
+([255, 255, 255, 0, 0, 0], [0, 1], [2, 0, 2, 1, 1, 1], 0):(["!", " "])
+([0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255], [0, 1], [2, 0, 2, 2, 1, 1], 1):(["!", "!"])
+
+// The cell whose top-left pixel is o, as the glyph it is nearest to.
+fb_char(int[] d, int[] font, int[] g, int o) {
+  int[] rows = fb_rows(d, g, o);
+  int ch = fb_match(rows, font);
+  string one = chr(ch);
+} return string one;
+([200, 200, 200, 0, 0, 0, 0, 0, 0, 200, 200, 200], [0, 0, 2, 1], [2, 0, 1, 2, 2, 2], 0):("!")
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 2, 1], [2, 0, 1, 2, 2, 2], 0):(" ")
