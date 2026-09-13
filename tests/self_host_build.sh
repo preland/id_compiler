@@ -436,6 +436,42 @@ else
     bad "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable: $(head -2 "$TMP/boot.err" | tr '\n' ' ')"
 fi
 
+# -- expression compilation is linear, not exponential ----------------------
+# A left-leaning `+` chain used to double the work at every level of the
+# tree: type_of and emit_bin each answered "is this concat/strcmp/a helper
+# op" by recomputing both operands' types or C text from scratch instead of
+# reusing what the level below had already worked out, which is exponential
+# in the chain's depth. A 250-term chain drove this compiler to tens of GB;
+# it must now build in a couple of seconds under a tight cap. See the fix in
+# mid/types/type_of/ (a per-node type cache) and back/tgt/c/emit/.../binop/
+# and .../op/helper/ (if/else in place of compute-then-override).
+int_chain="1"
+str_chain='"a1"'
+i=2
+while [ "$i" -le 250 ]; do
+    int_chain="$int_chain + $i"
+    str_chain="$str_chain + \"a$i\""
+    i=$((i + 1))
+done
+printf 'main(int argc, string[] argv) {\n  int x = %s;\n  print(x);\n} return int 0;\n' \
+    "$int_chain" > "$TMP/chain_int.id"
+printf 'main(int argc, string[] argv) {\n  string x = %s;\n  print(x);\n} return int 0;\n' \
+    "$str_chain" > "$TMP/chain_str.id"
+
+if (ulimit -v 2000000; timeout 5 "$BIN_IDC" "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
+        >"$TMP/chain_int.err" 2>&1; then
+    ok "250-term int + chain compiles in linear time under a 2 GB cap"
+else
+    bad "250-term int + chain compiles in linear time under a 2 GB cap: $(head -1 "$TMP/chain_int.err")"
+fi
+
+if (ulimit -v 2000000; timeout 5 "$BIN_IDC" "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
+        >"$TMP/chain_str.err" 2>&1; then
+    ok "250-term string + chain compiles in linear time under a 2 GB cap"
+else
+    bad "250-term string + chain compiles in linear time under a 2 GB cap: $(head -1 "$TMP/chain_str.err")"
+fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
