@@ -439,14 +439,15 @@ int id_lst_index_of(IdList* xs, int v);
 int id_lst_find(IdList* xs, int v);
 int id_lst_pick(int at, int i, int hit);
 int id_str_eol(char* s, int i);
-void id_check_asm_targets(int argc, IdList* argv);
-void id_asm_target_rows(char* triple);
 void id_dce_prune(void);
 int id_dce_pack(int i, int n);
 int id_dce_keep(int i, int n);
+void id_check_asm_targets(int argc, IdList* argv);
+void id_asm_target_rows(char* triple);
 void id_guarded_emit(int argc, IdList* argv);
 void id_guarded_emit_tail(int argc, IdList* argv);
 void id_emit_all(int argc, IdList* argv);
+int id_keep_export(int i);
 void id_push_asm_sym(int i);
 void id_push_sym_row(int i);
 void id_emit_checked(int argc, IdList* argv);
@@ -1045,6 +1046,7 @@ void id_emit_exports(void);
 void id_emit_export_block(void);
 void id_emit_export_lines(void);
 void id_emit_fwds(void);
+void id_emit_export_line_kept(int i);
 void id_emit_program(char* triple);
 void id_emit_head(void);
 void id_emit_decls(void);
@@ -1246,6 +1248,7 @@ void id_ll_decl_cmp(void);
 void id_ll_globals(void);
 void id_ll_global_at(int i, char* ty);
 char* id_ll_init(int i);
+void id_ll_global_kept(int i);
 char* id_ll_const_val(int e, char* name);
 char* id_ll_const_num(int e);
 char* id_ll_const_str(int e, char* name);
@@ -2267,21 +2270,6 @@ void id_resv_err(int i);
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
 char* builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";  /* constant from conf.id */
-IdList* rnd_st;  /* exported by rnd_init() */
-IdList* fx_sintab;  /* exported by fx_trig_init() */
-IdList* txt_g8;  /* exported by txt_g8_init() */
-int sf_l_w;  /* exported by sf_l_init() */
-int sf_l_h;  /* exported by sf_l_init() */
-IdList* sf_l_px;  /* exported by sf_l_alloc() */
-IdList* err_n;  /* exported by err_init() */
-IdList* err_fs;  /* exported by err_keep_init() */
-IdList* err_ls;  /* exported by err_keep_init() */
-IdList* err_ms;  /* exported by err_keep_init2() */
-int term_w;  /* exported by term_scr_init() */
-int term_h;  /* exported by term_scr_init() */
-IdList* term_scr;  /* exported by term_scr_alloc() */
-IdList* term_attr;  /* exported by term_scr_alloc() */
-IdList* term_pal;  /* exported by term_pal_init() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
 IdList* natrow;  /* exported by nat_lists() */
@@ -2445,23 +2433,6 @@ int id_str_eol(char* s, int i) {
     return i;
 }
 
-void id_check_asm_targets(int argc, IdList* argv) {
-    char* arg_triple_v;
-    arg_triple_v = id_arg_triple(argc, argv);
-    id_asm_target_rows(arg_triple_v);
-    return;
-}
-
-void id_asm_target_rows(char* triple) {
-    int i;
-    i = 0;
-    while ((i < id_asm_count())) {
-        id_asm_check(i, triple);
-        i = (i + 1);
-    }
-    return;
-}
-
 void id_dce_prune(void) {
     if ((id_find_str(fnames, "main") >= 0)) {
         id_dce_pack(0, 0);
@@ -2490,6 +2461,23 @@ int id_dce_keep(int i, int n) {
     return n;
 }
 
+void id_check_asm_targets(int argc, IdList* argv) {
+    char* arg_triple_v;
+    arg_triple_v = id_arg_triple(argc, argv);
+    id_asm_target_rows(arg_triple_v);
+    return;
+}
+
+void id_asm_target_rows(char* triple) {
+    int i;
+    i = 0;
+    while ((i < id_asm_count())) {
+        id_asm_check(i, triple);
+        i = (i + 1);
+    }
+    return;
+}
+
 void id_guarded_emit(int argc, IdList* argv) {
     id_check_asm_targets(argc, argv);
     id_guarded_emit_tail(argc, argv);
@@ -2514,6 +2502,15 @@ void id_emit_all(int argc, IdList* argv) {
     id_natives_then_prune();
     id_emit_then_natives(argc, argv);
     return;
+}
+
+int id_keep_export(int i) {
+    int ok;
+    ok = 1;
+    if (((id_is_harn() == 1) || (id_nat_all_live() == 0))) {
+        ok = id_is_reach((char*)(intptr_t)(id_list_get(eowners, i)));
+    }
+    return ok;
 }
 
 void id_push_asm_sym(int i) {
@@ -7868,11 +7865,9 @@ void id_emit_export_block(void) {
 
 void id_emit_export_lines(void) {
     int i;
-    char* export_line_v;
     i = 0;
     while ((i < id_list_len(enames))) {
-        export_line_v = id_export_line(i);
-        id_emit_line(export_line_v);
+        id_emit_export_line_kept(i);
         i = (i + 1);
     }
     return;
@@ -7882,6 +7877,15 @@ void id_emit_fwds(void) {
     id_emit_line("/* forward declarations */");
     id_fwd_all();
     id_emit_line("");
+    return;
+}
+
+void id_emit_export_line_kept(int i) {
+    char* export_line_v;
+    if ((id_keep_export(i) == 1)) {
+        export_line_v = id_export_line(i);
+        id_emit_line(export_line_v);
+    }
     return;
 }
 
@@ -9694,11 +9698,9 @@ void id_ll_decl_cmp(void) {
 
 void id_ll_globals(void) {
     int i;
-    char* ty;
     i = 0;
     while ((i < id_list_len(enames))) {
-        ty = id_ll_ty((char*)(intptr_t)(id_list_get(etypes, i)));
-        id_ll_global_at(i, ty);
+        id_ll_global_kept(i);
         i = (i + 1);
     }
     return;
@@ -9722,6 +9724,15 @@ char* id_ll_init(int i) {
         s = id_ll_const_val(i1_of_v, (char*)(intptr_t)(id_list_get(enames, i)));
     }
     return s;
+}
+
+void id_ll_global_kept(int i) {
+    char* ty;
+    if ((id_keep_export(i) == 1)) {
+        ty = id_ll_ty((char*)(intptr_t)(id_list_get(etypes, i)));
+        id_ll_global_at(i, ty);
+    }
+    return;
 }
 
 char* id_ll_const_val(int e, char* name) {
