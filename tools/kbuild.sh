@@ -10,10 +10,11 @@ OUT="${1:-build/kernel.elf}"
 TRIPLE=x86_64-unknown-none
 mkdir -p build
 
-# --allow-untested, and not for want of writing cases: a freestanding build
-# refuses one that has any, because there is no host to run them on, so the
-# runtime and the kernel cannot meet the two-case minimum at all. That is an
-# open question in docs/TESTS.md ("Enforcement, and the migration").
+# --allow-untested until their functions have cases. A freestanding build runs
+# its cases on the build host, and a function that reaches an `asm` body with no
+# host row is exempt from the minimum with a note; every other function needs
+# its two (docs/TESTS.md, "A freestanding build runs its cases on the build
+# host"). idc/tools/statusgen.sh lists both trees with these same flags.
 ./bin/idc runtime --no-std --runtime --allow-untested --triple "$TRIPLE" -o build/runtime.o
 ./bin/idc ../kernel/prog --no-std --freestanding --allow-untested --triple "$TRIPLE" -o build/kernel.o
 clang -target "$TRIPLE" -ffreestanding -c ../kernel/boot/boot.S -o build/boot.o

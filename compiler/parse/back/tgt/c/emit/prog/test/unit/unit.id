@@ -10,12 +10,16 @@
 // so one parse serves both, and bin/idc splits them at the separator. The
 // harness is the functions a case can reach, counted, plus a generated entry
 // point (back/drive/target/tests/ narrows `prog` to them and restores it).
+//
+// It is built for the build host, whatever the program is built for: a
+// --freestanding program's cases run there too, against the same source, and
+// the host's triple is what selects among its `asm` overloads.
 
 emit_tests_maybe(int argc, string[] argv) {
   harn_init();
   if(arg_flag(argc, argv, 1, "--harness") == 1) {
-    string arg_triple_v = arg_triple(argc, argv);
-    emit_tests(arg_triple_v);
+    string build_host_v = build_host();
+    emit_tests(build_host_v);
   }
 } return void;
 

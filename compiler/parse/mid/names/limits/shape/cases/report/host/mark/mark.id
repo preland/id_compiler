@@ -1,0 +1,43 @@
+// Which functions cannot be tested on the build host (docs/TESTS.md, "A
+// freestanding build runs its cases on the build host").
+//
+// A --freestanding build's cases run in a harness built for the machine doing
+// the build. A function that reaches, through the call graph, something with no
+// implementation there cannot run in it, so a case under it could never run.
+// Three things have none: an `asm` function with no body for the host's triple;
+// a `native`, because a freestanding build links no backend and its
+// implementation is whatever the object is finally linked with; and, in a
+// --runtime build, a function named after a runtime helper, because the harness
+// takes that name from the host's C runtime rather than from this tree.
+//
+// Decided from the source and the host's triple alone, once, before the case
+// checks read it. A hosted build's harness is built for the build's own triple,
+// so nothing is marked there and its rules are what they were.
+//
+//   utname  the functions that cannot be tested on the build host
+//   utwhat  for each, what it reaches, as the diagnostics name it
+//   utvia   the callee it reaches that through: "" when it calls the thing
+//           itself, "*" when it is the thing
+//   utnote  the exemption notes check_cases wrote (back/drive/sink/notes.id)
+
+ut_mark() {
+  export string[] utname = [];
+  export string[] utwhat = [];
+  ut_mark2();
+} return void;
+
+ut_mark2() {
+  export string[] utvia = [];
+  export string[] utnote = [];
+  ut_fix();
+} return void;
+
+// The runtime's own helpers first, then the call graph to a fixpoint: a sweep
+// that marks nothing new ends it, so the number of sweeps is the length of the
+// longest chain to something that cannot run.
+ut_fix() {
+  if(is_freestanding() == 1) {
+    ut_seed_self();
+    ut_loop();
+  }
+} return void;

@@ -3,6 +3,7 @@
 #
 #   tools/statusgen.sh            # rewrite the block
 #   tools/statusgen.sh --check    # exit 1 if rewriting would change anything
+#   tools/statusgen.sh --count PATH FLAGS...   # one tree's counts, built with FLAGS
 #
 # Why this exists: docs/TESTS.md carried the line "Cases written so far: 0, of
 # 6816". It was true when written and false four commits later, in the same
@@ -46,18 +47,54 @@ export FN_RE='^[a-z_][a-z0-9_]*\('
 id_files() { find "$@" -name build -prune -o -name '*.id' -type f -print 2>/dev/null | LC_ALL=C sort; }
 count_tree() {
     id_files "$@" | tr '\n' '\0' | xargs -0 -r awk '
-        BEGIN      { cre = ENVIRON["CASE_RE"]; fre = ENVIRON["FN_RE"] }
-        function close_fn() { if (infn && cases < 2) short++; infn = 0; cases = 0 }
+        BEGIN      { cre = ENVIRON["CASE_RE"]; fre = ENVIRON["FN_RE"]
+                     while ((getline row < ENVIRON["EXEMPT"]) > 0) exempt[row] = 1 }
+        function close_fn() { if (infn && cases < 2 && !(key in exempt)) short++; infn = 0; cases = 0 }
         FNR == 1   { close_fn() }
-        $0 ~ fre   { close_fn(); fns++; infn = 1; next }
+        $0 ~ fre   { close_fn(); fns++; infn = 1; key = FILENAME "|" substr($0, 1, index($0, "(") - 1); next }
         $0 ~ cre   { total++; if (infn) cases++ }
         END        { close_fn(); printf "%d %d %d\n", fns + 0, total + 0, short + 0 }
     ' | awk 'NF == 3 { f += $1; c += $2; s += $3 } END { printf "%d %d %d\n", f + 0, c + 0, s + 0 }'
 }
 
+# A function that cannot be tested on the build host needs no cases
+# (docs/TESTS.md, "A freestanding build runs its cases on the build host"), and
+# only the compiler can say which functions those are: it follows the call graph
+# to an `asm` body, a native or a runtime helper. So a freestanding tree is
+# asked, with the flags its build passes, and the functions it names as exempt
+# are not counted short.
+#
+# exempt_of PATH FLAGS... -- print FILE|NAME for each function bin/idc exempts.
+exempt_of() {
+    local rows rc
+    rows=$(./bin/idc "$@" --list-untested 2>/dev/null); rc=$?
+    if [ "$rc" -ne 0 ]; then
+        echo "statusgen: ./bin/idc $* --list-untested failed (status $rc)" >&2
+        return 1
+    fi
+    printf '%s\n' "$rows" | awk -F'|' '$1 == "exempt" { sub(/:[0-9]+$/, "", $2); print $2 "|" $3 }'
+}
+EXEMPT=$(mktemp) || exit 1
+trap 'rm -f "$EXEMPT"' EXIT
+export EXEMPT
+
+# statusgen.sh --count PATH FLAGS... -- the functions, cases and functions short
+# of two cases in PATH alone, built with FLAGS, as one line. It is the count the
+# table is made of, so a test can check it on a tree of its own.
+if [ "${1:-}" = "--count" ]; then
+    shift
+    exempt_of "$@" > "$EXEMPT" || exit 1
+    count_tree "$1"
+    exit 0
+fi
+
 STD=../../idstd
 C2ID=../c2id
 LINUX=../../linux_id
+
+# The two freestanding trees, with the flags tools/kbuild.sh builds them with.
+{ exempt_of ../kernel/prog --no-std --freestanding --triple x86_64-unknown-none \
+  && exempt_of runtime --no-std --runtime --triple x86_64-unknown-none; } > "$EXEMPT" || exit 1
 
 # Every tree a build in this checkout compiles with --allow-untested, the
 # freestanding kernel and runtime included, so the flag cannot look finished

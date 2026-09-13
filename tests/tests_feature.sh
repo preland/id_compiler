@@ -1054,10 +1054,160 @@ add(int a, int b) {
 (1, 2):(3)
 (0, 0):(0)
 EOF
-self_refuse "bin/idc: a --freestanding build with cases is refused" \
-    "a --freestanding build has no host to run them on" --freestanding --emit-llvm /dev/null
 self_refuse "bin/idc: a build for another platform with cases is refused" \
     "but it is for 'aarch64-unknown-linux-gnu'" --triple aarch64-unknown-linux-gnu --emit-c /dev/null
+
+# --- a --freestanding build runs its cases on the build host -----------------
+# The harness is the same source built for the machine doing the build, run
+# exactly as a hosted build's is; the object is built only if every case passes.
+rm -f "$TMP/fs.o"
+self_accept "bin/idc: a --freestanding build with passing cases builds its object" --freestanding -o "$TMP/fs.o"
+[ -s "$TMP/fs.o" ] \
+    && ok "bin/idc: the --freestanding object exists after its cases passed" \
+    || bad "bin/idc: the --freestanding object exists after its cases passed"
+cat > "$TMP/p.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(4)
+(0, 0):(0)
+EOF
+rm -f "$TMP/fs2.o"
+self_refuse "bin/idc: a failing case fails a --freestanding build, naming the case" \
+    "p.id:4: test failed: add(1, 2) = 3, expected 4" --freestanding -o "$TMP/fs2.o"
+[ ! -e "$TMP/fs2.o" ] \
+    && ok "bin/idc: a --freestanding build whose case fails writes no object" \
+    || bad "bin/idc: a --freestanding build whose case fails writes no object"
+
+# A function that reaches an asm body the build host has no row for cannot be
+# tested there: it is exempt from the two-case minimum, and says so.
+mkdir -p "$TMP/fs"
+cat > "$TMP/fs/io.id" <<'EOF'
+asm "x86_64-unknown-none" in8(word p) {
+  "movq %[p], %%rdx"
+  "xorq %%rax, %%rax"
+  "inb %%dx, %%al"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+port_byte(word p) {
+  word v = in8(p);
+} return word v;
+
+kbd_scan() {
+  word sc = port_byte(0x60);
+} return word sc;
+EOF
+cat > "$TMP/fs/add.id" <<'EOF'
+add(int a, int b) {
+  int s = a + b;
+} return int s;
+(1, 2):(3)
+(0, 0):(0)
+EOF
+../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs3.o" >"$TMP/log" 2>&1
+fs_rc=$?
+[ "$fs_rc" -eq 0 ] && [ -s "$TMP/fs3.o" ] \
+    && ok "bin/idc: a --freestanding function reaching a target-only asm builds without cases" \
+    || bad "bin/idc: a --freestanding function reaching a target-only asm builds without cases ($(head -1 "$TMP/log"))"
+grep -qF "fs/io.id:12: note: function 'kbd_scan' cannot be tested on the build host (" "$TMP/log" \
+   && grep -qF "): it calls 'port_byte', which reaches asm 'in8', which has no body for that triple (defined for: x86_64-unknown-none); it is exempt from the two-case minimum" "$TMP/log" \
+    && ok "bin/idc: the exemption is a note naming the function and what it reaches" \
+    || bad "bin/idc: the exemption is a note naming the function and what it reaches ($(tr '\n' '|' < "$TMP/log"))"
+grep -qF "fs/io.id:8: note: function 'port_byte' cannot be tested on the build host (" "$TMP/log" \
+   && grep -qF "): it reaches asm 'in8', which has no body for that triple" "$TMP/log" \
+    && ok "bin/idc: a direct caller of the asm is exempt too, and says so" \
+    || bad "bin/idc: a direct caller of the asm is exempt too, and says so"
+
+cat >> "$TMP/fs/add.id" <<'EOF'
+
+mul(int a, int b) {
+  int s = a * b;
+} return int s;
+EOF
+../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs4.o" >"$TMP/log" 2>&1
+fs_rc=$?
+[ "$fs_rc" -ne 0 ] && grep -qF "function 'mul' has 0 test case(s); --require-tests needs at least 2" "$TMP/log" \
+    && ok "bin/idc: a pure function without cases fails the minimum in a --freestanding build" \
+    || bad "bin/idc: a pure function without cases fails the minimum in a --freestanding build ($(head -1 "$TMP/log"))"
+! grep -qF "function 'kbd_scan' has 0 test case(s)" "$TMP/log" \
+   && grep -qF "note: function 'kbd_scan' cannot be tested on the build host" "$TMP/log" \
+    && ok "bin/idc: beside it, the exempt function is a note and not a minimum error" \
+    || bad "bin/idc: beside it, the exempt function is a note and not a minimum error ($(tr '\n' '|' < "$TMP/log"))"
+
+# The adoption count asks the compiler which functions are exempt rather than
+# guessing from the text, so they are not counted short.
+../bin/idc "$TMP/fs" --freestanding --list-untested >"$TMP/list" 2>"$TMP/log"
+grep -qxF "exempt|$TMP/fs/io.id:12|kbd_scan" "$TMP/list" \
+   && grep -qxF "short|$TMP/fs/add.id:7|mul|0" "$TMP/list" \
+   && [ "$(wc -l < "$TMP/list")" -eq 3 ] \
+    && ok "bin/idc: --list-untested lists the exempt and the short functions" \
+    || bad "bin/idc: --list-untested lists the exempt and the short functions ($(tr '\n' '|' < "$TMP/list") $(head -1 "$TMP/log"))"
+[ "$(../tools/statusgen.sh --count "$TMP/fs" --freestanding 2>"$TMP/log")" = "4 2 1" ] \
+    && ok "statusgen: a function exempt from the minimum is not counted short" \
+    || bad "statusgen: a function exempt from the minimum is not counted short ($(../tools/statusgen.sh --count "$TMP/fs" --freestanding 2>&1 | head -1))"
+
+cat > "$TMP/fs/io.id" <<'EOF'
+asm "x86_64-unknown-none" in8(word p) {
+  "movq %[p], %%rdx"
+  "xorq %%rax, %%rax"
+  "inb %%dx, %%al"
+  "movq %%rax, %[ret]"
+} return word ret;
+
+kbd_scan() {
+  word sc = in8(0x60);
+} return word sc;
+():(0)
+():(1)
+EOF
+rm -f "$TMP/fs/add.id"
+../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs5.o" >"$TMP/log" 2>&1
+fs_rc=$?
+[ "$fs_rc" -ne 0 ] && grep -qF "fs/io.id:11: error: 'kbd_scan' cannot be tested on the build host (" "$TMP/log" \
+   && grep -qF "this case would never run, and a function that cannot be tested needs none" "$TMP/log" \
+    && ok "bin/idc: cases under a function that cannot be tested on the build host are an error" \
+    || bad "bin/idc: cases under a function that cannot be tested on the build host are an error ($(head -1 "$TMP/log"))"
+
+# An asm function with a row for the build host's own triple runs there: the
+# harness selects that row, exactly as a hosted build would.
+if [ "$(uname -m)-$(uname -s)" = "x86_64-Linux" ]; then
+    cat > "$TMP/fs/io.id" <<'EOF'
+asm "x86_64-unknown-none" dbl(word a) {
+  "mov %[a], %[ret]"
+  "add %[ret], %[ret]"
+} return word ret;
+
+asm "x86_64-unknown-linux-gnu" dbl(word a) {
+  "mov %[a], %[ret]"
+  "add %[ret], %[ret]"
+} return word ret;
+
+twice(word a) {
+  word r = dbl(a);
+} return word r;
+(3):(6)
+(0):(1)
+EOF
+    ../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs6.o" >"$TMP/log" 2>&1
+    grep -qF "io.id:15: test failed: twice(0) = 0, expected 1" "$TMP/log" \
+        && ok "bin/idc: an asm function with a row for the build host runs in a --freestanding build's harness" \
+        || bad "bin/idc: an asm function with a row for the build host runs in a --freestanding build's harness ($(head -1 "$TMP/log"))"
+fi
+
+# A hosted build exempts nothing: its harness and its minimum are what they were.
+cat > "$TMP/p.id" <<'EOF'
+asm "x86_64-unknown-linux-gnu" dbl(word a) {
+  "mov %[a], %[ret]"
+  "add %[ret], %[ret]"
+} return word ret;
+
+twice(word a) {
+  word r = dbl(a);
+} return word r;
+EOF
+self_refuse "bin/idc: a hosted build does not exempt a function that reaches asm" \
+    "function 'twice' has 0 test case(s)" --triple aarch64-unknown-linux-gnu --emit-c /dev/null
 
 # --- duplicate function name should not cascade "declared twice" errors --------
 cat > "$TMP/p.id" <<'EOF'

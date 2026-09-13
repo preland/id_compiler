@@ -1,0 +1,23 @@
+// One sweep over every function, in the node ranges reach_func walks
+// (mid/names/exports/reach/dead/sweep.id): a function's nodes run from where
+// the previous function ended through its own node. Returns the set's size
+// before the sweep, so ut_loop stops when a sweep marks nothing.
+
+ut_loop() {
+  int n = 0 - 1;
+  while(n != len((import utname))) {
+    n = ut_sweep();
+  }
+} return void;
+
+ut_sweep() {
+  int n = len((import utname));
+  ut_funcs(0, 0);
+} return int n;
+
+ut_funcs(int f, int lo) {
+  while(f < len((import prog))) {
+    lo = ut_func(f, lo);
+    f = f + 1;
+  }
+} return void;

@@ -1,0 +1,27 @@
+// One function's nodes. A function already marked is skipped, so what it is
+// reported as reaching is the first thing a sweep found, in source order.
+
+ut_func(int f, int lo) {
+  string s1_of_v = s1_of((import prog)[f]);
+  if(ut_at(s1_of_v) < 0) {
+    ut_range(s1_of_v, lo, (import prog)[f]);
+  }
+  int ret_i = (import prog)[f] + 1;
+} return int ret_i;
+
+ut_range(string fname, int lo, int hi) {
+  while(lo <= hi) {
+    ut_node(fname, lo);
+    lo = lo + 1;
+  }
+} return void;
+
+// A call, or a function named as a value: the two ways scan_reach reaches a
+// function (mid/names/exports/reach/dead/more/scan.id), since a value may be
+// called wherever it is passed.
+ut_node(string fname, int id) {
+  if(k_of(id) == "call" || k_of(id) == "var") {
+    string s1_of_v = s1_of(id);
+    ut_callee(fname, s1_of_v);
+  }
+} return void;

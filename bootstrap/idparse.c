@@ -479,6 +479,9 @@ void id_nat_add(char* kind, int id, char* name);
 void id_nat_scan(char* kind, int all);
 int id_nat_func(char* kind, int all, int f, int lo);
 void id_nat_range(char* kind, int lo, int hi);
+void id_emit_or_notes(int argc, IdList* argv);
+void id_emit_notes(void);
+void id_print_notes(void);
 char* id_arg_flag_val(int argc, IdList* argv, int i, char* name, char* dflt);
 void id_emit_target(int argc, IdList* argv);
 void id_emit_target2(char* t, int argc, IdList* argv);
@@ -1629,6 +1632,9 @@ int id_is_runtime(void);
 void id_nosuchfn_report(char* loc_at_v, char* name, char* builtin_list_v);
 void id_fs_set(int v);
 int id_is_freestanding(void);
+void id_host_init(int argc, IdList* argv);
+char* id_build_host(void);
+void id_arg_flags5(int argc, IdList* argv);
 void id_init_rtc(void);
 void id_rt_set(int v);
 void id_exp_else(int id, char* owner);
@@ -1756,12 +1762,45 @@ void id_fit_list(int i, int e, char* want);
 void id_fit_elems(int i, int e, char* want);
 int id_arg_reqtests(int argc, IdList* argv, int i, int ok);
 void id_check_cases_maybe(void);
+void id_check_case_runs(void);
 void id_check_cases(void);
 void id_check_cases_at(int i);
 int id_count_cases(int node);
 void id_reqtests_init(void);
 void id_reqtests_set(int v);
 int id_require_tests(void);
+void id_ut_cases(void);
+void id_ut_case(int ci);
+void id_ut_case_fn(int ci, char* name);
+void id_ut_case_given(int ci);
+void id_ut_case_vals(int ci);
+void id_ut_case_val(int ci, int e);
+void id_ut_thens(void);
+void id_ut_then(int node);
+void id_ut_mark(void);
+void id_ut_mark2(void);
+void id_ut_fix(void);
+void id_ut_callee(char* fname, char* callee_nm);
+char* id_ut_via(char* callee_nm);
+void id_ut_add(char* fname, char* what_s, char* via_s);
+char* id_ut_what(char* callee_nm);
+char* id_ut_leaf(char* callee_nm);
+char* id_ut_native(char* callee_nm);
+int id_ut_func(int f, int lo);
+void id_ut_range(char* fname, int lo, int hi);
+void id_ut_node(char* fname, int id);
+void id_ut_loop(void);
+int id_ut_sweep(void);
+void id_ut_funcs(int f, int lo);
+char* id_ut_because_at(char* via_s, char* what_s);
+void id_cases_short(int i, int n);
+void id_ut_note(int i, char* name);
+void id_ut_seed_self(void);
+void id_ut_self_at(int i);
+void id_ut_named(int ci, char* lead, char* name);
+int id_ut_at(char* name);
+char* id_ut_why(char* name);
+char* id_ut_because(char* name);
 void id_cases_report(char* prog_loc_v, char* s1_of_v, int n);
 void id_dup_case_report(char* func_file_v, int i);
 int id_case_hit(int i, int node);
@@ -2368,11 +2407,16 @@ IdList* ni2;  /* exported by init_b() */
 IdList* ns1;  /* exported by init_b() */
 IdList* nparen;  /* exported by setup_rest() */
 IdList* bnames;  /* exported by init_bnames() */
+IdList* hostc;  /* exported by host_init() */
 IdList* rtc;  /* exported by init_rtc() */
 IdList* fsc;  /* exported by init_rtc() */
 IdList* rfn;  /* exported by init_reach() */
 IdList* dphase;  /* exported by init_reach() */
 IdList* reqc;  /* exported by reqtests_init() */
+IdList* utname;  /* exported by ut_mark() */
+IdList* utwhat;  /* exported by ut_mark() */
+IdList* utvia;  /* exported by ut_mark2() */
+IdList* utnote;  /* exported by ut_mark2() */
 IdList* dvname;  /* exported by init_reg() */
 IdList* dvfunc;  /* exported by init_reg() */
 IdList* scnames;  /* exported by check_access() */
@@ -2506,9 +2550,8 @@ void id_guarded_emit_tail(int argc, IdList* argv) {
     if ((fp_mode == 1)) {
         id_print_fingerprints();
     }
-    if (((fp_mode == 0) && (id_check_failed() == 0))) {
-        id_init_tyc();
-        id_emit_all(argc, argv);
+    if ((fp_mode == 0)) {
+        id_emit_or_notes(argc, argv);
     }
     return;
 }
@@ -2572,7 +2615,7 @@ void id_arg_flags4(int argc, IdList* argv) {
     int arg_flag_v2;
     arg_flag_v2 = id_arg_flag(argc, argv, 1, "--freestanding");
     id_fs_set(arg_flag_v2);
-    id_nat_init(argc, argv);
+    id_arg_flags5(argc, argv);
     return;
 }
 
@@ -2662,6 +2705,7 @@ void id_emit_then_natives(int argc, IdList* argv) {
     if (((int)(id_list_get(natc, 0)) == 1)) {
         id_nat_print();
     }
+    id_emit_notes();
     return;
 }
 
@@ -2779,6 +2823,36 @@ void id_nat_range(char* kind, int lo, int hi) {
     while ((lo <= hi)) {
         id_nat_node(kind, lo);
         lo = (lo + 1);
+    }
+    return;
+}
+
+void id_emit_or_notes(int argc, IdList* argv) {
+    int do_emit;
+    do_emit = ((id_check_failed() == 0) && (id_arg_flag(argc, argv, 1, "--untested") == 0));
+    if ((do_emit == 1)) {
+        id_init_tyc();
+        id_emit_all(argc, argv);
+    } else {
+        id_print_notes();
+    }
+    return;
+}
+
+void id_emit_notes(void) {
+    if ((id_list_len(utnote) > 0)) {
+        id_emit_line("/* ---- notes ---- */");
+        id_print_notes();
+    }
+    return;
+}
+
+void id_print_notes(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(utnote))) {
+        id_print((char*)(intptr_t)(id_list_get(utnote, i)));
+        i = (i + 1);
     }
     return;
 }
@@ -8691,11 +8765,11 @@ void id_emit_tc_proc(void) {
 }
 
 void id_emit_tests_maybe(int argc, IdList* argv) {
-    char* arg_triple_v;
+    char* build_host_v;
     id_harn_init();
     if ((id_arg_flag(argc, argv, 1, "--harness") == 1)) {
-        arg_triple_v = id_arg_triple(argc, argv);
-        id_emit_tests(arg_triple_v);
+        build_host_v = id_build_host();
+        id_emit_tests(build_host_v);
     }
     return;
 }
@@ -13076,6 +13150,28 @@ int id_is_freestanding(void) {
     return ret_i;
 }
 
+void id_host_init(int argc, IdList* argv) {
+    char* host_t;
+    host_t = id_arg_flag_val(argc, argv, 1, "--host-triple", "");
+    if ((strcmp(host_t, "") == 0)) {
+        host_t = id_arg_triple(argc, argv);
+    }
+    hostc = id_list_lit(1, (long long)(intptr_t)(host_t));
+    return;
+}
+
+char* id_build_host(void) {
+    char* ret_s;
+    ret_s = (char*)(intptr_t)(id_list_get(hostc, 0));
+    return ret_s;
+}
+
+void id_arg_flags5(int argc, IdList* argv) {
+    id_host_init(argc, argv);
+    id_nat_init(argc, argv);
+    return;
+}
+
 void id_init_rtc(void) {
     rtc = id_list_lit(1, (long long)(0));
     fsc = id_list_lit(1, (long long)(0));
@@ -14266,10 +14362,17 @@ int id_arg_reqtests(int argc, IdList* argv, int i, int ok) {
 
 void id_check_cases_maybe(void) {
     id_check_case_fits();
-    id_check_dup_cases();
+    id_check_case_runs();
     if ((id_require_tests() == 1)) {
         id_check_cases();
     }
+    return;
+}
+
+void id_check_case_runs(void) {
+    id_check_dup_cases();
+    id_ut_mark();
+    id_ut_cases();
     return;
 }
 
@@ -14287,7 +14390,7 @@ void id_check_cases_at(int i) {
     int n;
     n = id_count_cases((int)(id_list_get(prog, i)));
     if (((n < 2) && (id_is_native((int)(id_list_get(prog, i))) == 0))) {
-        id_report_cases(i, n);
+        id_cases_short(i, n);
     }
     return;
 }
@@ -14318,6 +14421,307 @@ int id_require_tests(void) {
     int ret_i;
     ret_i = (int)(id_list_get(reqc, 0));
     return ret_i;
+}
+
+void id_ut_cases(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casefn))) {
+        id_ut_case(ci);
+        ci = (ci + 1);
+    }
+    id_ut_thens();
+    return;
+}
+
+void id_ut_case(int ci) {
+    char* s1_of_v;
+    s1_of_v = id_s1_of((int)(id_list_get(casefn, ci)));
+    id_ut_case_fn(ci, s1_of_v);
+    id_ut_case_given(ci);
+    return;
+}
+
+void id_ut_case_fn(int ci, char* name) {
+    char* ut_why_v;
+    if ((id_ut_at(name) >= 0)) {
+        ut_why_v = id_ut_why(name);
+        id_case_err(ci, id_concat(id_concat(id_concat(id_concat("'", name), "' "), ut_why_v), "; this case would never run, and a function that cannot be tested needs none"));
+    }
+    return;
+}
+
+void id_ut_case_given(int ci) {
+    char* setup_nm;
+    setup_nm = (char*)(intptr_t)(id_list_get(casegiven, ci));
+    if (((strcmp(setup_nm, "") != 0) && (id_ut_at(setup_nm) >= 0))) {
+        id_ut_named(ci, "'given' names '", setup_nm);
+    }
+    id_ut_case_vals(ci);
+    return;
+}
+
+void id_ut_case_vals(int ci) {
+    IdList* args;
+    int j;
+    args = id_l1_of((int)(id_list_get(casenode, ci)));
+    j = 0;
+    while ((j < id_list_len(args))) {
+        id_ut_case_val(ci, (int)(id_list_get(args, j)));
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_ut_case_val(int ci, int e) {
+    char* s1_of_v;
+    if ((strcmp(id_k_of(e), "cfn") == 0)) {
+        s1_of_v = id_s1_of(e);
+        if ((id_ut_at(s1_of_v) >= 0)) {
+            id_ut_named(ci, "this case passes '", s1_of_v);
+        }
+    }
+    return;
+}
+
+void id_ut_thens(void) {
+    int ti;
+    ti = 0;
+    while ((ti < id_list_len(thennode))) {
+        id_ut_then((int)(id_list_get(thennode, ti)));
+        ti = (ti + 1);
+    }
+    return;
+}
+
+void id_ut_then(int node) {
+    char* s1_of_v;
+    int ci;
+    s1_of_v = id_s1_of(node);
+    if ((id_ut_at(s1_of_v) >= 0)) {
+        ci = id_i1_of(node);
+        id_ut_named(ci, "'then' names '", s1_of_v);
+    }
+    return;
+}
+
+void id_ut_mark(void) {
+    utname = id_list_lit(0);
+    utwhat = id_list_lit(0);
+    id_ut_mark2();
+    return;
+}
+
+void id_ut_mark2(void) {
+    utvia = id_list_lit(0);
+    utnote = id_list_lit(0);
+    id_ut_fix();
+    return;
+}
+
+void id_ut_fix(void) {
+    if ((id_is_freestanding() == 1)) {
+        id_ut_seed_self();
+        id_ut_loop();
+    }
+    return;
+}
+
+void id_ut_callee(char* fname, char* callee_nm) {
+    char* ut_what_v;
+    char* ut_via_v;
+    ut_what_v = id_ut_what(callee_nm);
+    if (((strcmp(ut_what_v, "") != 0) && (id_ut_at(fname) < 0))) {
+        ut_via_v = id_ut_via(callee_nm);
+        id_ut_add(fname, ut_what_v, ut_via_v);
+    }
+    return;
+}
+
+char* id_ut_via(char* callee_nm) {
+    char* via_nm;
+    int ut_k;
+    via_nm = "";
+    ut_k = id_ut_at(callee_nm);
+    if (((ut_k >= 0) && (strcmp((char*)(intptr_t)(id_list_get(utvia, ut_k)), "*") != 0))) {
+        via_nm = callee_nm;
+    }
+    return via_nm;
+}
+
+void id_ut_add(char* fname, char* what_s, char* via_s) {
+    id_list_push(utname, (long long)(intptr_t)(fname));
+    id_list_push(utwhat, (long long)(intptr_t)(what_s));
+    id_list_push(utvia, (long long)(intptr_t)(via_s));
+    return;
+}
+
+char* id_ut_what(char* callee_nm) {
+    char* what_s;
+    int ut_k;
+    what_s = id_ut_leaf(callee_nm);
+    ut_k = id_ut_at(callee_nm);
+    if ((ut_k >= 0)) {
+        what_s = (char*)(intptr_t)(id_list_get(utwhat, ut_k));
+    }
+    return what_s;
+}
+
+char* id_ut_leaf(char* callee_nm) {
+    char* what_s;
+    char* build_host_v;
+    char* asm_triples_v;
+    what_s = id_ut_native(callee_nm);
+    build_host_v = id_build_host();
+    if (((id_find_str(afname, callee_nm) >= 0) && (id_asm_row(callee_nm, build_host_v) < 0))) {
+        asm_triples_v = id_asm_triples(callee_nm);
+        what_s = id_concat(id_concat(id_concat(id_concat("asm '", callee_nm), "', which has no body for that triple (defined for: "), asm_triples_v), ")");
+    }
+    return what_s;
+}
+
+char* id_ut_native(char* callee_nm) {
+    char* what_s;
+    int fn;
+    what_s = "";
+    fn = id_func_node(callee_nm);
+    if (((fn >= 0) && (id_is_native(fn) == 1))) {
+        what_s = id_concat(id_concat("native '", callee_nm), "', which a --freestanding build does not link: whatever the object is linked with provides it");
+    }
+    return what_s;
+}
+
+int id_ut_func(int f, int lo) {
+    char* s1_of_v;
+    int ret_i;
+    s1_of_v = id_s1_of((int)(id_list_get(prog, f)));
+    if ((id_ut_at(s1_of_v) < 0)) {
+        id_ut_range(s1_of_v, lo, (int)(id_list_get(prog, f)));
+    }
+    ret_i = ((int)(id_list_get(prog, f)) + 1);
+    return ret_i;
+}
+
+void id_ut_range(char* fname, int lo, int hi) {
+    while ((lo <= hi)) {
+        id_ut_node(fname, lo);
+        lo = (lo + 1);
+    }
+    return;
+}
+
+void id_ut_node(char* fname, int id) {
+    char* s1_of_v;
+    if (((strcmp(id_k_of(id), "call") == 0) || (strcmp(id_k_of(id), "var") == 0))) {
+        s1_of_v = id_s1_of(id);
+        id_ut_callee(fname, s1_of_v);
+    }
+    return;
+}
+
+void id_ut_loop(void) {
+    int n;
+    n = (0 - 1);
+    while ((n != id_list_len(utname))) {
+        n = id_ut_sweep();
+    }
+    return;
+}
+
+int id_ut_sweep(void) {
+    int n;
+    n = id_list_len(utname);
+    id_ut_funcs(0, 0);
+    return n;
+}
+
+void id_ut_funcs(int f, int lo) {
+    while ((f < id_list_len(prog))) {
+        lo = id_ut_func(f, lo);
+        f = (f + 1);
+    }
+    return;
+}
+
+char* id_ut_because_at(char* via_s, char* what_s) {
+    char* ret_s;
+    ret_s = id_concat("it reaches ", what_s);
+    if ((strcmp(via_s, "*") == 0)) {
+        ret_s = id_concat("it is ", what_s);
+    } else if ((strcmp(via_s, "") != 0)) {
+        ret_s = id_concat(id_concat(id_concat("it calls '", via_s), "', which reaches "), what_s);
+    }
+    return ret_s;
+}
+
+void id_cases_short(int i, int n) {
+    char* s1_of_v;
+    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
+    if ((id_ut_at(s1_of_v) < 0)) {
+        id_report_cases(i, n);
+    } else if ((n == 0)) {
+        id_ut_note(i, s1_of_v);
+    }
+    return;
+}
+
+void id_ut_note(int i, char* name) {
+    char* note_at;
+    char* ut_why_v;
+    note_at = id_concat(id_concat(id_concat((char*)(intptr_t)(id_list_get(pfile, i)), ":"), id_str_of_int((int)(id_list_get(pline, i)))), ": note: ");
+    ut_why_v = id_ut_why(name);
+    id_list_push(utnote, (long long)(intptr_t)(id_concat(id_concat(id_concat(id_concat(id_concat(note_at, "function '"), name), "' "), ut_why_v), "; it is exempt from the two-case minimum")));
+    return;
+}
+
+void id_ut_seed_self(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        id_ut_self_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_ut_self_at(int i) {
+    char* s1_of_v;
+    if (((id_is_runtime() == 1) && id_is_reserved_name(i))) {
+        s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
+        id_ut_add(s1_of_v, id_concat(id_concat("the runtime helper '", s1_of_v), "', which a harness on the build host takes from its own C runtime instead"), "*");
+    }
+    return;
+}
+
+void id_ut_named(int ci, char* lead, char* name) {
+    char* ut_why_v;
+    ut_why_v = id_ut_why(name);
+    id_case_err(ci, id_concat(id_concat(id_concat(lead, name), "', which "), ut_why_v));
+    return;
+}
+
+int id_ut_at(char* name) {
+    int ut_k;
+    ut_k = id_find_str(utname, name);
+    return ut_k;
+}
+
+char* id_ut_why(char* name) {
+    char* build_host_v;
+    char* because;
+    char* ret_s;
+    build_host_v = id_build_host();
+    because = id_ut_because(name);
+    ret_s = id_concat(id_concat(id_concat("cannot be tested on the build host (", build_host_v), "): "), because);
+    return ret_s;
+}
+
+char* id_ut_because(char* name) {
+    int ut_k;
+    char* ret_s;
+    ut_k = id_ut_at(name);
+    ret_s = id_ut_because_at((char*)(intptr_t)(id_list_get(utvia, ut_k)), (char*)(intptr_t)(id_list_get(utwhat, ut_k)));
+    return ret_s;
 }
 
 void id_cases_report(char* prog_loc_v, char* s1_of_v, int n) {

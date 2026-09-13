@@ -1,0 +1,35 @@
+// The exemption notes (mid/names/limits/shape/cases/report/host/). A note is a
+// diagnostic, but a build that succeeds writes its code to the same stream, so
+// there the notes follow the program and the natives behind a separator of
+// their own, and bin/idc prints them:
+//
+//   /* ---- notes ---- */
+//   FILE:LINE: note: ...                 one line per exempt function
+//
+// A run that emits nothing -- a check failed, or `--untested` asked for the
+// report alone -- prints them after its errors instead.
+
+emit_or_notes(int argc, string[] argv) {
+  int do_emit = check_failed() == 0 && arg_flag(argc, argv, 1, "--untested") == 0;
+  if(do_emit == 1) {
+    init_tyc();
+    emit_all(argc, argv);
+  } else {
+    print_notes();
+  }
+} return void;
+
+emit_notes() {
+  if(len((import utnote)) > 0) {
+    emit_line("/* ---- notes ---- */");
+    print_notes();
+  }
+} return void;
+
+print_notes() {
+  int i = 0;
+  while(i < len((import utnote))) {
+    print((import utnote)[i]);
+    i = i + 1;
+  }
+} return void;
