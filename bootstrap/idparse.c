@@ -1773,12 +1773,14 @@ void id_reg_report3(char* name, char* type, char* owner, int exported, int ln, i
 char* id_owner_at(int i, char* name, char* s);
 char* id_first_type(char* name, int unit);
 char* id_first_type_at(int i, char* name, char* t, int unit);
-void id_report_var_is_func(char* name, char* owner, int ln);
-void id_report_var_twice(char* name, char* owner, int ln);
-void id_report_var_exported(char* name, char* owner, int ln);
 void id_report_var_type(char* name, char* type, char* prev, char* owner, int ln);
 char* id_export_owner(char* name);
 char* id_owner_of(char* name);
+int id_fn_count(char* fname);
+int id_fn_count_at(int i, char* fname, int n);
+void id_report_var_is_func(char* name, char* owner, int ln);
+void id_report_var_twice(char* name, char* owner, int ln);
+void id_report_var_exported(char* name, char* owner, int ln);
 void id_reg_report4(char* name, char* type, char* owner, int exported, int ln, int unit);
 void id_reg_push(char* name, char* type, char* owner, int exported, int unit);
 void id_reg_push2(char* owner, int exported, int unit);
@@ -14170,7 +14172,9 @@ void id_reg_report(char* name, char* type, char* owner, int exported, int ln, in
 }
 
 void id_reg_report2(char* name, char* type, char* owner, int exported, int ln, int unit) {
-    if ((id_declared_in(name, owner) > 0)) {
+    int owner_count;
+    owner_count = id_fn_count(owner);
+    if (((id_declared_in(name, owner) > 0) && (owner_count < 2))) {
         id_report_var_twice(name, owner, ln);
     } else {
         id_reg_report3(name, type, owner, exported, ln, unit);
@@ -14214,31 +14218,6 @@ char* id_first_type_at(int i, char* name, char* t, int unit) {
     return s;
 }
 
-void id_report_var_is_func(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' is already the name of a function"));
-    id_note_failure();
-    return;
-}
-
-void id_report_var_twice(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "variable '"), name), "' is declared twice in function '"), owner), "'"));
-    id_note_failure();
-    return;
-}
-
-void id_report_var_exported(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    char* export_owner_v;
-    loc_at_v = id_loc_at(owner, ln);
-    export_owner_v = id_export_owner(name);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' is an exported global (by '"), export_owner_v), "'); another variable cannot reuse that name -- read the global with 'import "), name), "'"));
-    return;
-}
-
 void id_report_var_type(char* name, char* type, char* prev, char* owner, int ln) {
     char* loc_at_v;
     loc_at_v = id_loc_at(owner, ln);
@@ -14263,6 +14242,52 @@ char* id_owner_of(char* name) {
         i = (i + 1);
     }
     return s;
+}
+
+int id_fn_count(char* fname) {
+    int i;
+    int n;
+    i = 0;
+    n = 0;
+    while ((i < id_list_len(prog))) {
+        n = id_fn_count_at(i, fname, n);
+        i = (i + 1);
+    }
+    return n;
+}
+
+int id_fn_count_at(int i, char* fname, int n) {
+    int r;
+    r = n;
+    if ((strcmp(id_s1_of((int)(id_list_get(prog, i))), fname) == 0)) {
+        r = (n + 1);
+    }
+    return r;
+}
+
+void id_report_var_is_func(char* name, char* owner, int ln) {
+    char* loc_at_v;
+    loc_at_v = id_loc_at(owner, ln);
+    id_print(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' is already the name of a function"));
+    id_note_failure();
+    return;
+}
+
+void id_report_var_twice(char* name, char* owner, int ln) {
+    char* loc_at_v;
+    loc_at_v = id_loc_at(owner, ln);
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "variable '"), name), "' is declared twice in function '"), owner), "'"));
+    id_note_failure();
+    return;
+}
+
+void id_report_var_exported(char* name, char* owner, int ln) {
+    char* loc_at_v;
+    char* export_owner_v;
+    loc_at_v = id_loc_at(owner, ln);
+    export_owner_v = id_export_owner(name);
+    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' is an exported global (by '"), export_owner_v), "'); another variable cannot reuse that name -- read the global with 'import "), name), "'"));
+    return;
 }
 
 void id_reg_report4(char* name, char* type, char* owner, int exported, int ln, int unit) {
