@@ -5,6 +5,7 @@
 // compile with a backend attached and dump core when run.
 native fs_open(string path, string mode) return int;
 
-main() {
+main(int argc, string[] argv) {
   int h = fs_open(1, 2, 3);
-} return int h;
+  print(h);
+} return int 0;

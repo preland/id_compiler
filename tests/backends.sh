@@ -139,33 +139,47 @@ fi
 # and dumped core when run; both are now the diagnostics an `id` function gets.
 chk="$TMP/chk"; mkdir -p "$chk"
 printf 'import "%s"\n' "$(cd "$ROOT/backends/fs" && pwd)" > "$chk/conf.id"
-printf 'main() {\n  int h = fs_opne("x", "r");\n} return int h;\n' > "$chk/main.id"
+printf 'main(int argc, string[] argv) {\n  int h = fs_opne("x", "r");\n  print(h);\n} return int 0;\n' > "$chk/main.id"
 if $BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1 | grep -qF "no such function 'fs_opne'; available builtins:"; then
     ok "a typo'd backend call is 'no such function' (bin/idc)"
 else
     bad "a typo'd backend call is 'no such function' (bin/idc)"
 fi
-printf 'main() {\n  int h = fs_open(1, 2, 3);\n} return int h;\n' > "$chk/main.id"
+printf 'main(int argc, string[] argv) {\n  int h = fs_open(1, 2, 3);\n  print(h);\n} return int 0;\n' > "$chk/main.id"
 if $BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1 | grep -qF "function 'fs_open' takes 2 argument(s), got 3"; then
     ok "a backend call with the wrong argument count is rejected (bin/idc)"
 else
     bad "a backend call with the wrong argument count is rejected (bin/idc)"
 fi
 
+# A native has no body, so its parameter names are not variables and reserve
+# nothing. A program that exports `handle` and `buf` -- names fs's declarations
+# use -- must build and run; this used to stop inside backends/fs with
+# "'handle' is an exported global".
+printf 'setup() {\n  export int handle = 1;\n  export int[] buf = [];\n} return void;\n\nmain(int argc, string[] argv) {\n  setup();\n  int ok = fs_exists("nope");\n  print(ok);\n} return int 0;\n' > "$chk/main.id"
+if $BIN_IDC "$chk" -o "$TMP/chk.bin" >"$TMP/chk.err" 2>&1 && [ "$(cd "$TMP" && ./chk.bin)" = "0" ]; then
+    ok "a program may export a name a backend's parameter uses (bin/idc)"
+else
+    bad "a program may export a name a backend's parameter uses (bin/idc): $(head -1 "$TMP/chk.err" | cut -c1-120)"
+fi
+
 # Two natives with one signature are two functions: a native has no logic to
-# compare, so its name is part of its fingerprint.
+# compare, so its name is part of its fingerprint. `n` is also a string in
+# main, which one type per name would reject if a native's parameter counted.
 cat > "$TMP/twin.id" <<'EOF'
 native twin_a(int n) return int;
 native twin_b(int n) return int;
-main() {
+main(int argc, string[] argv) {
+  string n = "sum ";
   int r = twin_a(1) + twin_b(2);
-} return int r;
+  print(n + r);
+} return int 0;
 EOF
 if $BIN_IDC "$TMP/twin.id" --emit-c "$TMP/twin.c" >/dev/null 2>&1 \
    && grep -qx "int id_twin_a(int n);" "$TMP/twin.c" && grep -qx "int id_twin_b(int n);" "$TMP/twin.c"; then
-    ok "two natives with the same signature do not collide (bin/idc)"
+    ok "two natives with the same signature do not collide, and their parameters reserve no name (bin/idc)"
 else
-    bad "two natives with the same signature do not collide (bin/idc)"
+    bad "two natives with the same signature do not collide, and their parameters reserve no name (bin/idc)"
 fi
 
 # A manifest that offers no C implementation must say so, in both compilers,

@@ -5,6 +5,7 @@
 // error as a typo'd call to any function -- not a symbol left to the linker.
 native fs_open(string path, string mode) return int;
 
-main() {
+main(int argc, string[] argv) {
   int h = fs_opne("x", "r");
-} return int h;
+  print(h);
+} return int 0;
