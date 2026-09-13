@@ -554,12 +554,13 @@ int id_lw_unbox(int v, char* t);
 int id_lw_unbox2(int v, char* t);
 int id_lw_ocall(int node);
 int id_lw_callf(char* name, char* ret, IdList* args);
-int id_lw_fcall_emit(int node, int callee, IdList* args);
+int id_lw_print(char* fn_v, int node);
 int id_lw_arg_at(int node, int i, IdList* vals);
 char* id_lw_pty(char* name, int i, int node);
 char* id_lw_pty2(int f, int i, char* t);
 char* id_lw_apty(char* name, int i, char* t);
 char* id_lw_fpty(char* name, int i, int node, char* t);
+int id_lw_fcall_emit(int node, int callee, IdList* args);
 char* id_lw_arg_pty(int node, int i);
 int id_lw_arg_conv(int node, int i, char* pty);
 char* id_lw_pty_base(char* name, int i, int node);
@@ -1041,6 +1042,9 @@ int id_const_pick(int i, char* name, int d);
 char* id_export_line(int i);
 char* id_const_line(char* name);
 char* id_const_line_tail(int d, char* s1_of_v);
+void id_emit_eprint_def(void);
+int id_calls_eprint(void);
+void id_emit_crt_eprint(void);
 void id_emit_exports(void);
 void id_emit_export_block(void);
 void id_emit_export_lines(void);
@@ -2266,7 +2270,7 @@ void id_resv_err(int i);
 
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
-char* builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str";  /* constant from conf.id */
+char* builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint";  /* constant from conf.id */
 IdList* rnd_st;  /* exported by rnd_init() */
 IdList* fx_sintab;  /* exported by fx_trig_init() */
 IdList* txt_g8;  /* exported by txt_g8_init() */
@@ -2809,6 +2813,7 @@ void id_emit_target2(char* t, int argc, IdList* argv) {
     char* arg_triple_v;
     if ((strcmp(t, "crt") == 0)) {
         id_emit_crt();
+        id_emit_crt_eprint();
     } else {
         arg_triple_v = id_arg_triple(argc, argv);
         id_emit_program(arg_triple_v);
@@ -3486,13 +3491,13 @@ int id_lw_callf(char* name, char* ret, IdList* args) {
     return ret_i;
 }
 
-int id_lw_fcall_emit(int node, int callee, IdList* args) {
-    char* ety;
-    IdList* none;
+int id_lw_print(char* fn_v, int node) {
+    IdList* l1_of_v;
+    int lw_tostr_v;
     int ret_i;
-    ety = id_lw_ety(node);
-    none = id_list_lit(0);
-    ret_i = id_lw_emit("call", ety, callee, (0 - 1), "", args, none);
+    l1_of_v = id_l1_of(node);
+    lw_tostr_v = id_lw_tostr((int)(id_list_get(l1_of_v, 0)));
+    ret_i = id_lw_callf(fn_v, "", id_list_lit(1, (long long)(lw_tostr_v)));
     return ret_i;
 }
 
@@ -3547,6 +3552,16 @@ char* id_lw_fpty(char* name, int i, int node, char* t) {
     return p;
 }
 
+int id_lw_fcall_emit(int node, int callee, IdList* args) {
+    char* ety;
+    IdList* none;
+    int ret_i;
+    ety = id_lw_ety(node);
+    none = id_list_lit(0);
+    ret_i = id_lw_emit("call", ety, callee, (0 - 1), "", args, none);
+    return ret_i;
+}
+
 char* id_lw_arg_pty(int node, int i) {
     IdList* args;
     char* name;
@@ -3594,13 +3609,11 @@ int id_lw_has_par(int f, int i) {
 
 int id_lw_builtin(int node) {
     int v;
-    IdList* l1_of_v;
-    int lw_tostr_v;
+    char* fn_v;
     v = (0 - 1);
-    if ((strcmp(id_s1_of(node), "print") == 0)) {
-        l1_of_v = id_l1_of(node);
-        lw_tostr_v = id_lw_tostr((int)(id_list_get(l1_of_v, 0)));
-        v = id_lw_callf("id_print", "", id_list_lit(1, (long long)(lw_tostr_v)));
+    if (((strcmp(id_s1_of(node), "print") == 0) || (strcmp(id_s1_of(node), "eprint") == 0))) {
+        fn_v = id_concat("id_", id_s1_of(node));
+        v = id_lw_print(fn_v, node);
     } else {
         v = id_lb_b2(node);
     }
@@ -7308,7 +7321,7 @@ char* id_map_op(char* op) {
 char* id_emit_call(int id) {
     char* s;
     s = id_ec2(id);
-    if ((strcmp(id_s1_of(id), "print") == 0)) {
+    if (((strcmp(id_s1_of(id), "print") == 0) || (strcmp(id_s1_of(id), "eprint") == 0))) {
         s = id_emit_print(id);
     }
     return s;
@@ -7318,7 +7331,7 @@ char* id_emit_print(int id) {
     int arg;
     char* s;
     arg = (int)(id_list_get(id_l1_of(id), 0));
-    s = id_concat(id_concat("id_print(", id_arg_str(arg)), ")");
+    s = id_concat(id_concat(id_concat(id_concat("id_", id_s1_of(id)), "("), id_arg_str(arg)), ")");
     return s;
 }
 
@@ -7852,6 +7865,30 @@ char* id_const_line_tail(int d, char* s1_of_v) {
     return ret_s;
 }
 
+void id_emit_eprint_def(void) {
+    if ((id_calls_eprint() == 1)) {
+        id_emit_line("#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nstatic void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, \"%s\\n\", s); }");
+    }
+    return;
+}
+
+int id_calls_eprint(void) {
+    int i;
+    int hit;
+    i = 0;
+    hit = 0;
+    while ((i < id_list_len(nkind))) {
+        hit = (hit || ((strcmp(id_k_of(i), "call") == 0) && (strcmp(id_s1_of(i), "eprint") == 0)));
+        i = (i + 1);
+    }
+    return hit;
+}
+
+void id_emit_crt_eprint(void) {
+    id_emit_line("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }");
+    return;
+}
+
 void id_emit_exports(void) {
     if ((id_list_len(enames) > 0)) {
         id_emit_export_block();
@@ -7900,6 +7937,7 @@ void id_emit_head(void) {
 }
 
 void id_emit_decls(void) {
+    id_emit_eprint_def();
     id_emit_fwds();
     id_emit_exports();
     return;
@@ -8578,7 +8616,7 @@ void id_emit_count(char* ind) {
 }
 
 void id_emit_count_prelude(void) {
-    id_emit_line("/* test harness (idc) -- the runtime below is counted */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_mem_of_str idtc_rt_mem_of_str");
+    id_emit_line("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO stdout\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_mem_of_str idtc_rt_mem_of_str");
     return;
 }
 
@@ -9680,7 +9718,7 @@ void id_ll_declares(void) {
 
 void id_ll_decl_block(void) {
     id_ll_decl_cmp();
-    id_emit_line("declare ptr @id_list_new()\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)");
+    id_emit_line("declare ptr @id_list_new()\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)");
     id_emit_line("");
     return;
 }
@@ -15755,7 +15793,7 @@ int id_bi_zero(char* name) {
 int id_bi_one(char* name) {
     int ok;
     ok = 0;
-    if (((((((((((strcmp(name, "print") == 0) || (strcmp(name, "len") == 0)) || (strcmp(name, "pop") == 0)) || (strcmp(name, "to_int") == 0)) || (strcmp(name, "chr") == 0)) || (strcmp(name, "put") == 0)) || (strcmp(name, "sleep_ms") == 0)) || (strcmp(name, "mem_of_str") == 0)) || (strcmp(name, "alloc") == 0)) || (id_is_peekfn(name) == 1))) {
+    if ((((((((((((strcmp(name, "print") == 0) || (strcmp(name, "eprint") == 0)) || (strcmp(name, "len") == 0)) || (strcmp(name, "pop") == 0)) || (strcmp(name, "to_int") == 0)) || (strcmp(name, "chr") == 0)) || (strcmp(name, "put") == 0)) || (strcmp(name, "sleep_ms") == 0)) || (strcmp(name, "mem_of_str") == 0)) || (strcmp(name, "alloc") == 0)) || (id_is_peekfn(name) == 1))) {
         ok = 1;
     }
     return ok;
@@ -17782,7 +17820,7 @@ char* id_type_call(char* name) {
 char* id_builtin_type(char* name) {
     char* t;
     t = "?";
-    if ((strcmp(name, "print") == 0)) {
+    if (((strcmp(name, "print") == 0) || (strcmp(name, "eprint") == 0))) {
         t = "void";
     } else {
         t = id_bt2(name);
@@ -19067,7 +19105,7 @@ int id_is_reserved_name(int i) {
     int ok;
     s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
     resv_names_v = id_resv_names();
-    ok = (id_find_str(resv_names_v, s1_of_v) >= 0);
+    ok = ((id_find_str(resv_names_v, s1_of_v) >= 0) || (strcmp(s1_of_v, "eprint") == 0));
     return ok;
 }
 
