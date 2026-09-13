@@ -1,5 +1,5 @@
 
-main() {
+main(int argc, string[] argv) {
   int a = 2147483647;
   print("" + (a + 1));
 } return int 0;

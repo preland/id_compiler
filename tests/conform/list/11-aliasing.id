@@ -5,7 +5,7 @@ setup() {
   ys[0] = 500;
 } return int[] xs;
 
-main() {
+main(int argc, string[] argv) {
   int[] xs = setup();
   print("" + xs[0]);
 } return int 0;

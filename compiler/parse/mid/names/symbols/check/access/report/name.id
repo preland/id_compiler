@@ -15,6 +15,8 @@ acc_expr5(int id, string owner, int ln) {
 acc_name(string name, string owner, int ln) {
   if(declared_in(name, owner) == 0) {
     report_bad_var(name, owner, ln);
+  } else if(find_str((import scnames), name) < 0) {
+    report_scope(name, owner, ln);
   }
 } return void;
 

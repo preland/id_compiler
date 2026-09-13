@@ -1,0 +1,7 @@
+// EXPECT: 'main' must be declared as main(int argc, string[] argv) and return int
+// EXPECT-IDCPY: main must take (int, string[]) or no parameters
+// docs/SPEC.md 9. bin/idc used to hand this to cc and report the failure as a
+// bug in the self-hosted compiler.
+main(int x) {
+  print(x);
+} return int 0;

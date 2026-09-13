@@ -9,7 +9,7 @@ show_cross(word p) {
   print(a + " " + b);
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   word p = alloc(16);
   setup(p);
   show_cross(p);

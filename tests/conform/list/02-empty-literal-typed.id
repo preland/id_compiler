@@ -1,5 +1,5 @@
 
-main() {
+main(int argc, string[] argv) {
   int[] xs = [];
   int n = len(xs);
   print("" + n);

@@ -1,5 +1,5 @@
 
-main() {
+main(int argc, string[] argv) {
   float[] xs = [1.5];
   push(xs, 3.25);
   print("" + xs[0] + " " + xs[1]);

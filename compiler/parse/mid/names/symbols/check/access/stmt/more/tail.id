@@ -4,17 +4,18 @@
 // already at the 3-function limit.
 
 acc_func_body(int[] l2_of_v, string s1_of_v, int id) {
+  scope_func(id);
   acc_list(l2_of_v, s1_of_v);
   acc_ret(id);
 } return void;
 
 acc_if_body(int id, string owner) {
   int[] l1_of_v = l1_of(id);
-  acc_list(l1_of_v, owner);
+  acc_block(l1_of_v, owner);
   acc_if_else(id, owner);
 } return void;
 
 acc_if_else(int id, string owner) {
   int[] l2_of_v = l2_of(id);
-  acc_list(l2_of_v, owner);
+  acc_block(l2_of_v, owner);
 } return void;

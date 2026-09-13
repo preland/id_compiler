@@ -1,5 +1,5 @@
 // EXPECT: charat index must be int, got string
-main() {
+main(int argc, string[] argv) {
   string s = "hi";
   int c = charat(s, "no");
 } return int 0;

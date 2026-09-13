@@ -9,6 +9,7 @@
 
 // dvunit is declared here, beside the index rather than beside the other
 // registry columns, because init_reg2's block is full and this one is not.
+// dvline is in fill_didx for the same reason, once this block filled too.
 init_didx() {
   export int[][] didx = [];
   export int[] dvunit = [];
@@ -16,6 +17,7 @@ init_didx() {
 } return void;
 
 fill_didx() {
+  export int[] dvline = [];
   int i = 0;
   while(i < idx_n()) {
     int[] new_bucket_v = new_bucket();

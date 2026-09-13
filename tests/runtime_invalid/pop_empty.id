@@ -1,5 +1,5 @@
 // EXPECT: id: pop from empty list
-main() {
+main(int argc, string[] argv) {
   int[] xs = [];
   int y = pop(xs);
 } return int 0;

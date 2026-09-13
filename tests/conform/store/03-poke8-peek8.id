@@ -1,4 +1,4 @@
-main() {
+main(int argc, string[] argv) {
   word p = alloc(1);
   poke8(p, 200);
   show_byte(p);

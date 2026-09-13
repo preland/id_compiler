@@ -1,0 +1,27 @@
+// What becomes visible, and when. A function starts with only its parameters;
+// its body is not cut when it ends, because the return clause reads the names
+// the body declared at its own top level.
+
+scope_func(int id) {
+  scope_cut(0);
+  int[] l1_of_v = l1_of(id);
+  scope_params(l1_of_v);
+} return void;
+
+scope_params(int[] params) {
+  int i = 0;
+  while(i < len(params)) {
+    string s2_of_v = s2_of(params[i]);
+    push((import scnames), s2_of_v);
+    i = i + 1;
+  }
+} return void;
+
+// Called after the statement's expression was walked, so `int n = n + 1;`
+// reads n before it exists.
+scope_add(int id) {
+  if(k_of(id) == "decl") {
+    string s2_of_v = s2_of(id);
+    push((import scnames), s2_of_v);
+  }
+} return void;

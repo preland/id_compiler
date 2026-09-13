@@ -1,6 +1,6 @@
 // EXPECT: nested too deeply
 // function body -> while -> if -> if is 3 levels of blocks; the max is 2
-main() {
+main(int argc, string[] argv) {
   int i = 0;
   while(i < 10) {
     if(i == 1) {

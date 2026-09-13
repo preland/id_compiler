@@ -22,5 +22,6 @@ acc_stmt4(int id, string owner) {
   } else {
     int i1_of_v = i1_of(id);
     acc_expr(i1_of_v, owner, (import nline)[id]);
+    scope_add(id);
   }
 } return void;

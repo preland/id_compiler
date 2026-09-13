@@ -1,5 +1,5 @@
 // EXPECT: loop condition has type void
-main() {
+main(int argc, string[] argv) {
   while(print("x")) {
     int y = 1;
   }

@@ -4,7 +4,7 @@
 // slot it is going into, so the string is element 0 of a word[] and is named
 // as such. idc.py takes it from element 0, so it decides the literal is a
 // string[] and reports the 0 in element 1 instead. Both refuse the program.
-main() {
+main(int argc, string[] argv) {
   word[] xs = ["nope", 0];
   print(len(xs));
 } return int 0;

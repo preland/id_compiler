@@ -1,0 +1,8 @@
+// EXPECT: variable 'n' is used on line 6, before its declaration on line 7
+// IDCPY-ACCEPTS
+// idc.py hoists the declaration, so the read sees the storage before the
+// initializer has run.
+main(int argc, string[] argv) {
+  print(n);
+  int n = 3;
+} return int 0;

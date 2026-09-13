@@ -1,0 +1,22 @@
+// Block scope. scnames holds the names visible at the point the walk has
+// reached: the parameters, then each declaration once its initializer has been
+// walked. Leaving a block cuts the list back to what was visible on entry, so a
+// name declared inside an if, an else or a while body cannot be seen after it.
+
+// Split from acc_while so that block stays within the action limit.
+acc_while_body(int id, string owner) {
+  int[] l1_of_v = l1_of(id);
+  acc_block(l1_of_v, owner);
+} return void;
+
+acc_block(int[] stmts, string owner) {
+  int keep = len((import scnames));
+  acc_list(stmts, owner);
+  scope_cut(keep);
+} return void;
+
+scope_cut(int keep) {
+  while(len((import scnames)) > keep) {
+    pop((import scnames));
+  }
+} return void;

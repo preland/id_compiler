@@ -10,7 +10,7 @@ structure instead of emitting C.
 ./idc.py compiler/parse -o idparse
 
 # emit C, then compile and run it -- the whole front+middle is written in id:
-printf 'square(int n) { int r = n * n; } return int r;\nmain() { int a = square(6); } return int a;\n' \
+printf 'square(int n) { int r = n * n; } return int r;\nmain(int argc, string[] argv) { int a = square(6); } return int a;\n' \
   | ./idlex | ./idparse > out.c
 cc out.c -o out && ./out; echo $?      # 36
 
