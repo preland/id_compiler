@@ -1,0 +1,17 @@
+// A call's fingerprint (moved out of ce5 so its body still fits in three
+// actions): the plain "c(name:args)" form, except `ushr(x, 0)` -- the
+// logical shift by zero, `id`'s spelling for the unsigned `>>` -- which is
+// a no-op at any width and fingerprints as x, the same as `x >> 0` does.
+
+call_fp(int id) {
+  string s1_of_v = s1_of(id);
+  int[] l1_of_v = l1_of(id);
+  string ret_s = call_fp2(s1_of_v, l1_of_v);
+} return string ret_s;
+
+call_fp2(string name, int[] args) {
+  string ret_s = "c(" + canon_callee(name) + ":" + canon_args(args) + ")";
+  if(name == "ushr" && len(args) == 2 && lit_is(args[1], 0) == 1) {
+    ret_s = canon_expr(args[0]);
+  }
+} return string ret_s;

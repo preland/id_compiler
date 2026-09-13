@@ -1,0 +1,22 @@
+// x-0, x<<0 and x>>0 fingerprint as x: unlike + | ^, subtraction and the
+// shifts are not symmetric, so only the literal-on-the-right spelling means
+// "no-op" -- `0-x` negates x, and there is no such rule for it here.
+
+ident_zero_right(string op, int lid, int rid) {
+  string ret_s = "";
+  if((op == "-" || op == "<<" || op == ">>") && lit_is(rid, 0) == 1) {
+    ret_s = canon_expr(lid);
+  }
+} return string ret_s;
+
+// x*1, 1*x and x/1 fingerprint as x. `1/x` is not a no-op, so it keeps its
+// own fingerprint.
+ident_one(string op, int lid, int rid) {
+  string ret_s = "";
+  if((op == "*" || op == "/") && lit_is(rid, 1) == 1) {
+    ret_s = canon_expr(lid);
+  }
+  if(op == "*" && lit_is(lid, 1) == 1) {
+    ret_s = canon_expr(rid);
+  }
+} return string ret_s;

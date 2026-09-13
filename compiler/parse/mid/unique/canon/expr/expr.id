@@ -18,18 +18,22 @@
 // the node descends into children, so a node still costs one walk of the
 // chain and no more.
 
+// A literal fingerprints by value, not spelling: the lexer already turns hex
+// and binary spellings into decimal digits (compiler/lex/chars/numlit), so
+// the only spelling left to normalise here is a decimal literal's leading
+// zeros -- `007` and `7` are the same value, reusing the same strip_zeros the
+// parser uses to size a literal (../../../front/parse/expr/atom/lit/int/is_bigdec.id).
 canon_expr(int id) {
   string out = ce2(id);
   if(k_of(id) == "int") {
-    out = "I" + s1_of(id);
+    string spell = s1_of(id);
+    out = "I" + strip_zeros(spell);
   }
   if(k_of(id) == "float") {
     out = "F" + s1_of(id);
   }
 } return string out;
 
-// A literal is kept exactly as it was written, which is why `1` and `0x1` are
-// two different functions: ns1 holds the spelling, not the value.
 ce2(int id) {
   string out = ce3(id);
   if(k_of(id) == "str") {

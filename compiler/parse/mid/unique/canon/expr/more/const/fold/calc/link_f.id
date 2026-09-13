@@ -1,0 +1,26 @@
+// compute_shl and mul_word are the two operator computations that need a
+// `word` intermediate (../core.id's fold_word turns the result back into a
+// folded int, or "" when it does not fit one).
+//
+// A shift count of 32 or more is exactly where int and word disagree: id's
+// shift is defined for every count (docs/SPEC.md 2.3), but "0 gives up"
+// only holds at width 32 -- at width 64 the same count is still a real
+// shift. So a count that reaches 32 is left unfolded, and below that,
+// shl_word (../link_e.id) computes the shift in 64 bits and fold_word only
+// keeps it if it never needed the bits an int does not have.
+
+compute_shl(int a, int b) {
+  string ret_s = "";
+  if(b < 32) {
+    word shifted = shl_word(a, b);
+    ret_s = fold_word(shifted);
+  }
+} return string ret_s;
+
+// Neither operand exceeds INT_MAX, so their product cannot exceed
+// INT_MAX * INT_MAX, well inside what a 64-bit word holds without wrapping.
+mul_word(int a, int b) {
+  word aw = a;
+  word bw = b;
+  word prod = aw * bw;
+} return word prod;

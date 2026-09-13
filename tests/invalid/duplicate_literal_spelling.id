@@ -1,0 +1,7 @@
+// EXPECT: same signature and logic as
+// A literal fingerprints by value, not spelling: 16 and 0x10 are the same
+// int. The lexer already turns hex into decimal digits before the parser
+// ever sees them (compiler/lex/chars/numlit/hex/hex.id), so both compilers
+// already agree on this one -- idc.py's lexer does the same conversion.
+decimal(int a) { int r = a + 16; } return int r;
+hex(int a) { int r = a + 0x10; } return int r;

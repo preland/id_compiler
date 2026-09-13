@@ -1,0 +1,36 @@
+// Folding two integer-literal operands to the value their operator gives.
+//
+// Only literals fold, and only ones that already fit an int: a literal too
+// wide for int (i2_of == 1) has no value stored anywhere here that is exact
+// past 2^31, and this fingerprint stage never learns whether a wide literal
+// is meant as `int` or `word`. bin_fold2 extracts the values and hands off
+// to the operator chain (./chain, ./calc); fold_op's own conservatism (never
+// folding a result that would differ between int and word width) is
+// documented where each operator is computed.
+
+bin_fold(string op, int lid, int rid) {
+  string ret_s = "";
+  if(k_of(lid) == "int" && k_of(rid) == "int") {
+    ret_s = bin_fold2(op, lid, rid);
+  }
+} return string ret_s;
+
+bin_fold2(string op, int lid, int rid) {
+  string ret_s = "";
+  if(i2_of(lid) == 0 && i2_of(rid) == 0) {
+    int a = i1_of(lid);
+    int b = i1_of(rid);
+    ret_s = fold_op(op, a, b);
+  }
+} return string ret_s;
+
+// A `word` result that turned out to still fit an int folds to it; one that
+// does not is the signal that the fold was not width-safe, so it is not
+// folded at all rather than folded to a wrapped or truncated guess.
+fold_word(word wv) {
+  string ret_s = "";
+  if(wv <= 2147483647) {
+    int n = wv;
+    ret_s = "I" + n;
+  }
+} return string ret_s;

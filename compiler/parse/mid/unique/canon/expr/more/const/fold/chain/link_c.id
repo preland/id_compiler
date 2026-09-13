@@ -1,0 +1,28 @@
+// `%` and `&`. `%` by zero traps, the same reason `/` by zero is left
+// unfolded (./link_b.id). `&` cannot overflow: both operands are below
+// 2^31, so bit 31 is clear in both, and AND-ing never sets a bit neither
+// operand has -- the result is below 2^31 too, which is the same value at
+// any width id has.
+
+fold_op3(string op, int a, int b) {
+  string ret_s = fold_op4(op, a, b);
+  if(op == "%") {
+    ret_s = compute_mod(a, b);
+  }
+  if(op == "&") {
+    ret_s = compute_and(a, b);
+  }
+} return string ret_s;
+
+compute_mod(int a, int b) {
+  string ret_s = "";
+  if(b != 0) {
+    int n = a % b;
+    ret_s = "I" + n;
+  }
+} return string ret_s;
+
+compute_and(int a, int b) {
+  int n = a & b;
+  string ret_s = "I" + n;
+} return string ret_s;

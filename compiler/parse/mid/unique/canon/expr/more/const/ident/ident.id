@@ -1,0 +1,37 @@
+// x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or
+// xor-ing with the integer literal 0 does not change the value, at either
+// width id has, so the operator contributes nothing a reader needs to tell
+// two functions apart.
+//
+// bin_identity tries the symmetric zero rules first, then the right-only
+// rules (- << >>, where the literal has to be the operand it means "no-op"
+// for), then the two `1` rules (* /). "" means none matched.
+
+bin_identity(string op, int lid, int rid) {
+  string ret_s = ident_zero_sym(op, lid, rid);
+  if(ret_s == "") {
+    ret_s = ident_zero_right(op, lid, rid);
+  }
+  if(ret_s == "") {
+    ret_s = ident_one(op, lid, rid);
+  }
+} return string ret_s;
+
+// Is node `nid` the integer literal `v`? A wide literal (too big for an
+// int) can never be 0 or 1, so it needs no separate check here.
+lit_is(int nid, int v) {
+  int ok = 0;
+  if(k_of(nid) == "int" && i1_of(nid) == v) {
+    ok = 1;
+  }
+} return int ok;
+
+ident_zero_sym(string op, int lid, int rid) {
+  string ret_s = "";
+  if((op == "+" || op == "|" || op == "^") && lit_is(rid, 0) == 1) {
+    ret_s = canon_expr(lid);
+  }
+  if((op == "+" || op == "|" || op == "^") && lit_is(lid, 0) == 1) {
+    ret_s = canon_expr(rid);
+  }
+} return string ret_s;

@@ -1,0 +1,31 @@
+// `<<` and `>>`, the last link: an operator this chain does not fold (a
+// comparison, `&&`, `||`, or anything this rule does not cover) reaches
+// here and gets "", same as ce5 falls back to the node's own id when no
+// earlier link in canon_expr's chain recognises a kind (../../../expr_more.id).
+//
+// `>>` is an arithmetic shift, but a is never negative here (see
+// ../chain/link_a.id), so sign-extension never happens and the shift only
+// ever removes bits -- safe at any width, and safe for any b, since a is
+// below 2^31 and is already 0 past 31 bits shifted out. compute_shl needs
+// the width check `>>` does not (./link_f.id).
+
+fold_op5(string op, int a, int b) {
+  string ret_s = "";
+  if(op == "<<") {
+    ret_s = compute_shl(a, b);
+  }
+  if(op == ">>") {
+    ret_s = compute_shr(a, b);
+  }
+} return string ret_s;
+
+compute_shr(int a, int b) {
+  int n = a >> b;
+  string ret_s = "I" + n;
+} return string ret_s;
+
+shl_word(int a, int b) {
+  word aw = a;
+  word bw = b;
+  word shifted = aw << bw;
+} return word shifted;
