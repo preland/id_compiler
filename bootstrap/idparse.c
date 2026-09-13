@@ -1450,6 +1450,9 @@ void id_check_body_at(IdList* l2_of_v, char* s1_of_v);
 void id_check_program(void);
 void id_check_funcs(void);
 void id_check_func_body(int id);
+void id_check_main(void);
+void id_check_main_at(int m);
+void id_report_main(void);
 void id_check_cases(void);
 void id_check_cases_at(int i);
 int id_count_cases(int node);
@@ -1510,13 +1513,21 @@ void id_acc_import(char* name, char* owner, int ln);
 void id_check_access(void);
 void id_acc_func(int id);
 void id_acc_ret(int id);
+void id_acc_while_body(int id, char* owner);
+void id_acc_block(IdList* stmts, char* owner);
+void id_scope_cut(int keep);
+void id_scope_func(int id);
+void id_scope_params(IdList* params);
+void id_scope_add(int id);
+void id_report_scope(char* name, char* owner, int ln);
+char* id_scope_msg(char* name, char* owner, int ln);
+int id_decl_line(char* name, char* owner);
 void id_acc_stmt2(int id, char* owner);
 void id_acc_while(int id, char* owner);
 void id_acc_stmt3(int id, char* owner);
 void id_acc_func_body(IdList* l2_of_v, char* s1_of_v, int id);
 void id_acc_if_body(int id, char* owner);
 void id_acc_if_else(int id, char* owner);
-void id_acc_while_body(int id, char* owner);
 void id_acc_list(IdList* stmts, char* owner);
 void id_acc_stmt(int id, char* owner);
 void id_acc_if(int id, char* owner);
@@ -1917,8 +1928,10 @@ IdList* dphase;  /* exported by init_reach() */
 IdList* reqc;  /* exported by reqtests_init() */
 IdList* dvname;  /* exported by init_reg() */
 IdList* dvfunc;  /* exported by init_reg() */
+IdList* scnames;  /* exported by check_access() */
 IdList* didx;  /* exported by init_didx() */
 IdList* dvunit;  /* exported by init_didx() */
+IdList* dvline;  /* exported by fill_didx() */
 IdList* vidx;  /* exported by init_idx() */
 IdList* fidx;  /* exported by init_idx() */
 IdList* dvtype;  /* exported by init_reg2() */
@@ -10957,6 +10970,7 @@ void id_check_program(void) {
 
 void id_check_funcs(void) {
     int i;
+    id_check_main();
     i = 0;
     while ((i < id_list_len(prog))) {
         id_check_func_body((int)(id_list_get(prog, i)));
@@ -10971,6 +10985,35 @@ void id_check_func_body(int id) {
     l2_of_v = id_l2_of(id);
     s1_of_v = id_s1_of(id);
     id_check_body_at(l2_of_v, s1_of_v);
+    return;
+}
+
+void id_check_main(void) {
+    int fi;
+    fi = id_find_str(fnames, "main");
+    if ((fi >= 0)) {
+        id_check_main_at((int)(id_list_get(fnodes, fi)));
+    }
+    return;
+}
+
+void id_check_main_at(int m) {
+    IdList* ps;
+    ps = id_l1_of(m);
+    if (((strcmp(id_s2_of(m), "int") != 0) || (id_list_len(ps) != 2))) {
+        id_report_main();
+    } else if (((strcmp(id_s1_of((int)(id_list_get(ps, 0))), "int") != 0) || (strcmp(id_s1_of((int)(id_list_get(ps, 1))), "string[]") != 0))) {
+        id_report_main();
+    }
+    return;
+}
+
+void id_report_main(void) {
+    int func_line_v;
+    char* loc_at_v;
+    func_line_v = id_func_line("main");
+    loc_at_v = id_loc_at("main", func_line_v);
+    id_var_report(id_concat(loc_at_v, "'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status"));
     return;
 }
 
@@ -11235,6 +11278,7 @@ void id_acc_stmt4(int id, char* owner) {
     } else {
         i1_of_v = id_i1_of(id);
         id_acc_expr(i1_of_v, owner, (int)(id_list_get(nline, id)));
+        id_scope_add(id);
     }
     return;
 }
@@ -11454,6 +11498,8 @@ void id_acc_expr5(int id, char* owner, int ln) {
 void id_acc_name(char* name, char* owner, int ln) {
     if ((id_declared_in(name, owner) == 0)) {
         id_report_bad_var(name, owner, ln);
+    } else if ((id_find_str(scnames, name) < 0)) {
+        id_report_scope(name, owner, ln);
     }
     return;
 }
@@ -11467,6 +11513,7 @@ void id_acc_import(char* name, char* owner, int ln) {
 
 void id_check_access(void) {
     int i;
+    scnames = id_list_lit(0);
     i = 0;
     while ((i < id_list_len(prog))) {
         id_acc_func((int)(id_list_get(prog, i)));
@@ -11493,6 +11540,91 @@ void id_acc_ret(int id) {
         id_acc_expr(i1_of_v, s1_of_v, (int)(id_list_get(nline, i1_of_v)));
     }
     return;
+}
+
+void id_acc_while_body(int id, char* owner) {
+    IdList* l1_of_v;
+    l1_of_v = id_l1_of(id);
+    id_acc_block(l1_of_v, owner);
+    return;
+}
+
+void id_acc_block(IdList* stmts, char* owner) {
+    int keep;
+    keep = id_list_len(scnames);
+    id_acc_list(stmts, owner);
+    id_scope_cut(keep);
+    return;
+}
+
+void id_scope_cut(int keep) {
+    while ((id_list_len(scnames) > keep)) {
+        (char*)(intptr_t)(id_list_pop(scnames));
+    }
+    return;
+}
+
+void id_scope_func(int id) {
+    IdList* l1_of_v;
+    id_scope_cut(0);
+    l1_of_v = id_l1_of(id);
+    id_scope_params(l1_of_v);
+    return;
+}
+
+void id_scope_params(IdList* params) {
+    int i;
+    char* s2_of_v;
+    i = 0;
+    while ((i < id_list_len(params))) {
+        s2_of_v = id_s2_of((int)(id_list_get(params, i)));
+        id_list_push(scnames, (long long)(intptr_t)(s2_of_v));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_scope_add(int id) {
+    char* s2_of_v;
+    if ((strcmp(id_k_of(id), "decl") == 0)) {
+        s2_of_v = id_s2_of(id);
+        id_list_push(scnames, (long long)(intptr_t)(s2_of_v));
+    }
+    return;
+}
+
+void id_report_scope(char* name, char* owner, int ln) {
+    char* loc_at_v;
+    char* scope_msg_v;
+    loc_at_v = id_loc_at(owner, ln);
+    scope_msg_v = id_scope_msg(name, owner, ln);
+    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "variable '"), name), "' is used on line "), id_str_of_int(ln)), scope_msg_v), "; a variable exists only from its declaration to the end of the block that declares it"));
+    return;
+}
+
+char* id_scope_msg(char* name, char* owner, int ln) {
+    int dl;
+    char* msg;
+    dl = id_decl_line(name, owner);
+    msg = id_concat(", before its declaration on line ", id_str_of_int(dl));
+    if ((dl < ln)) {
+        msg = id_concat(", outside the block that declares it on line ", id_str_of_int(dl));
+    }
+    return msg;
+}
+
+int id_decl_line(char* name, char* owner) {
+    int i;
+    int dl;
+    i = 0;
+    dl = 0;
+    while ((i < id_list_len(dvname))) {
+        if ((id_dv_hit(i, name, owner) == 1)) {
+            dl = (int)(id_list_get(dvline, i));
+        }
+        i = (i + 1);
+    }
+    return dl;
 }
 
 void id_acc_stmt2(int id, char* owner) {
@@ -11522,6 +11654,7 @@ void id_acc_stmt3(int id, char* owner) {
 }
 
 void id_acc_func_body(IdList* l2_of_v, char* s1_of_v, int id) {
+    id_scope_func(id);
     id_acc_list(l2_of_v, s1_of_v);
     id_acc_ret(id);
     return;
@@ -11530,7 +11663,7 @@ void id_acc_func_body(IdList* l2_of_v, char* s1_of_v, int id) {
 void id_acc_if_body(int id, char* owner) {
     IdList* l1_of_v;
     l1_of_v = id_l1_of(id);
-    id_acc_list(l1_of_v, owner);
+    id_acc_block(l1_of_v, owner);
     id_acc_if_else(id, owner);
     return;
 }
@@ -11538,14 +11671,7 @@ void id_acc_if_body(int id, char* owner) {
 void id_acc_if_else(int id, char* owner) {
     IdList* l2_of_v;
     l2_of_v = id_l2_of(id);
-    id_acc_list(l2_of_v, owner);
-    return;
-}
-
-void id_acc_while_body(int id, char* owner) {
-    IdList* l1_of_v;
-    l1_of_v = id_l1_of(id);
-    id_acc_list(l1_of_v, owner);
+    id_acc_block(l2_of_v, owner);
     return;
 }
 
@@ -11752,6 +11878,7 @@ void id_reg_loop(int id, char* owner) {
 void id_reg_var(char* name, char* type, char* owner, int exported, int ln, int unit) {
     id_reg_report(name, type, owner, exported, ln, unit);
     id_reg_push(name, type, owner, exported, unit);
+    id_list_push(dvline, (long long)(ln));
     return;
 }
 
@@ -11959,6 +12086,7 @@ void id_init_didx(void) {
 void id_fill_didx(void) {
     int i;
     IdList* new_bucket_v;
+    dvline = id_list_lit(0);
     i = 0;
     while ((i < id_idx_n())) {
         new_bucket_v = id_new_bucket();
