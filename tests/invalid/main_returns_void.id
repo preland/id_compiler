@@ -1,0 +1,6 @@
+// EXPECT: 'main' must be declared as main(int argc, string[] argv) and return int
+// IDCPY-ACCEPTS
+// docs/SPEC.md 9. A void main used to build and exit 0 whatever it did.
+main(int argc, string[] argv) {
+  print(argc);
+} return void;

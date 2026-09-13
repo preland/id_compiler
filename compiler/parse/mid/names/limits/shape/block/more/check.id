@@ -15,6 +15,7 @@ check_program() {
 } return void;
 
 check_funcs() {
+  check_main();
   int i = 0;
   while(i < len((import prog))) {
     check_func_body((import prog)[i]);

@@ -1,6 +1,6 @@
 // EXPECT: a block in 'main' performs 4 actions
 // a loop body has its own 3-action budget, just like the function body
-main() {
+main(int argc, string[] argv) {
   int i = 0;
   while(i < 10) {
     int a = 1;

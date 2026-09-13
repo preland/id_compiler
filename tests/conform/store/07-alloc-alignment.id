@@ -10,7 +10,7 @@ show_pair(word a, word b) {
   print(x + " " + y);
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   word a = alloc(1);
   word b = alloc(8);
   report(a, b);

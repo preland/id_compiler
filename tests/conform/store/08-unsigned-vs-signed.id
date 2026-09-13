@@ -1,4 +1,4 @@
-main() {
+main(int argc, string[] argv) {
   word neg = (0 - 1);
   show_signed(neg);
 } return int 0;

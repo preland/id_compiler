@@ -1,4 +1,4 @@
-main() {
+main(int argc, string[] argv) {
   string[] words = ["alpha", "beta", "gamma"];
   push(words, "delta");
   show_words(words);

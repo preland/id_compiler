@@ -1,4 +1,4 @@
 // EXPECT: cannot initialize int 'x' with a string value
-main() {
+main(int argc, string[] argv) {
   int x = "not a number";
 } return int 0;

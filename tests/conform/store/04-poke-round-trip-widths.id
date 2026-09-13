@@ -10,7 +10,7 @@ show_widths(word p) {
   print(a + " " + b);
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   word p = alloc(24);
   do_pokes(p);
   show_widths(p);

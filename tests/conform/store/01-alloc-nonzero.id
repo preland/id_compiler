@@ -1,5 +1,5 @@
 
-main() {
+main(int argc, string[] argv) {
   word p = alloc(8);
   print("" + p);
 } return int 0;

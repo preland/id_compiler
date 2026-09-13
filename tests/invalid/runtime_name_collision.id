@@ -8,6 +8,6 @@
 str_of_int(int v) {
 } return string "" + v;
 
-main() {
+main(int argc, string[] argv) {
   print(str_of_int(4));
 } return int 0;

@@ -5,6 +5,6 @@
 print(int v) {
 } return int v;
 
-main() {
+main(int argc, string[] argv) {
   print(1);
 } return int 0;

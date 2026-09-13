@@ -1,5 +1,5 @@
 
-main() {
+main(int argc, string[] argv) {
   int[][] grid = [[1, 2], [3, 4]];
   grid[0][1] = 42;
   print("" + grid[0][1] + " " + grid[1][0]);

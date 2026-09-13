@@ -1,5 +1,5 @@
 // EXPECT: is a variable, not a function
-main() {
+main(int argc, string[] argv) {
   int thing = 1;
   int r = thing();
 } return int r;

@@ -1,0 +1,27 @@
+// The entry point has one signature, docs/SPEC.md 9: main(int argc, string[]
+// argv), returning the exit status. The C wrapper used to accept anything
+// else -- a void main exited 0 whatever it did, and a main(int x) emitted C
+// that does not compile. Found through fnames rather than the emitter's
+// find_main, since nothing in mid/ looks at back/.
+
+check_main() {
+  int fi = find_str((import fnames), "main");
+  if(fi >= 0) {
+    check_main_at((import fnodes)[fi]);
+  }
+} return void;
+
+check_main_at(int m) {
+  int[] ps = l1_of(m);
+  if(s2_of(m) != "int" || len(ps) != 2) {
+    report_main();
+  } else if(s1_of(ps[0]) != "int" || s1_of(ps[1]) != "string[]") {
+    report_main();
+  }
+} return void;
+
+report_main() {
+  int func_line_v = func_line("main");
+  string loc_at_v = loc_at("main", func_line_v);
+  var_report(loc_at_v + "'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status");
+} return void;

@@ -7,7 +7,7 @@ level1(int[] xs) {
   level2(xs);
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   int[] xs = [1, 2, 3];
   level1(xs);
   print("" + xs[0]);

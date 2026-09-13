@@ -1,4 +1,4 @@
 // EXPECT: '%' requires int operands
-main() {
+main(int argc, string[] argv) {
   float r = 5.0 % 2.0;
 } return int 0;

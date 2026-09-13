@@ -1,5 +1,5 @@
 // EXPECT: cannot index a int
-main() {
+main(int argc, string[] argv) {
   int n = 5;
   int first = n[0];
 } return int first;

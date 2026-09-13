@@ -1,4 +1,4 @@
 // EXPECT: returns int but the expression has type string
-main() {
+main(int argc, string[] argv) {
   string s = "hi";
 } return int s;

@@ -3,7 +3,7 @@ touch(int[] xs) {
   int y = xs[5];
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   int[] xs = [1, 2, 3];
   touch(xs);
 } return int 0;

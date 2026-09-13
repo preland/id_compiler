@@ -1,4 +1,4 @@
-main() {
+main(int argc, string[] argv) {
   word before = store_size();
   alloc(16);
   show_grow(before);

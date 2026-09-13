@@ -129,7 +129,7 @@ expect_output "adventure invalid choice" ">> You freeze with indecision and your
 
 # --- while loop + string builtins (len/charat/chr)
 cat > "$TMP/scan.id" <<'EOF'
-main() {
+main(int argc, string[] argv) {
   string s = "aZ9";
   int i = 0;
   while(i < len(s)) {
@@ -165,7 +165,7 @@ done(int[] xs) {
   print("len=" + n + " xs[0]=" + xs[0] + " xs[3]=" + xs[3]);
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   int[] xs = [];
   seed(xs);
   done(xs);
@@ -240,7 +240,7 @@ square(int n) {
   int r = n * n;
 } return int r;
 
-main() {
+main(int argc, string[] argv) {
   int a = square(6);
 } return int a;
 EOF
@@ -256,7 +256,7 @@ sumto(int n) {
   }
 } return int s;
 
-main() {
+main(int argc, string[] argv) {
   int t = sumto(5);
 } return int t;
 EOF
@@ -280,7 +280,7 @@ show(int n) {
   print("n = " + n);
 } return void;
 
-main() {
+main(int argc, string[] argv) {
   show(7);
 } return int 0;
 EOF
@@ -638,7 +638,7 @@ fi
 
 # --- export/import roundtrip at runtime
 cat > "$TMP/roundtrip.id" <<'EOF'
-main() {
+main(int argc, string[] argv) {
   export int code = 7;
   string msg = describe();
   print(msg);
@@ -659,7 +659,7 @@ expect_output "export/import roundtrip" "lucky 7" "$("$TMP/roundtrip")"
 
 # --- rule violations must be compile errors
 cat > "$TMP/toomany.id" <<'EOF'
-main() {
+main(int argc, string[] argv) {
   int a = 1;
   int b = 2;
   int c = 3;
@@ -680,26 +680,26 @@ expect_error "3 functions per file" "$TMP/fourfns.id" "too many functions"
 cat > "$TMP/reuse.id" <<'EOF'
 inc(int i) { int r = i + 1; } return int r;
 dec(int i) { int r = i - 1; } return int r;
-main() { int r = inc(10) + dec(10); print("r=" + r); } return int 0;
+main(int argc, string[] argv) { int r = inc(10) + dec(10); print("r=" + r); } return int 0;
 EOF
 $IDC "$TMP/reuse.id" -o "$TMP/reuse" 2>/dev/null || bad "name reuse (same type) compiles"
 expect_output "name reuse same type" "r=20" "$("$TMP/reuse")"
 
 # ...but the same name with two different types is an error
 cat > "$TMP/typeconflict.id" <<'EOF'
-main() { int count = 1; } return int 0;
+main(int argc, string[] argv) { int count = 1; } return int 0;
 other() { string count = "hi"; } return void;
 EOF
 expect_error "name keeps one type" "$TMP/typeconflict.id" "must keep one type"
 
 cat > "$TMP/noconf.id" <<'EOF'
-main() { int x = 1; } return int 0;
+main(int argc, string[] argv) { int x = 1; } return int 0;
 other() { int y = x; } return void;
 EOF
 expect_error "cross-function use needs import" "$TMP/noconf.id" "not exported"
 
 cat > "$TMP/badconf.id" <<'EOF'
-main() { int x = 1; } return int 0;
+main(int argc, string[] argv) { int x = 1; } return int 0;
 other() { int y = (import x); } return void;
 EOF
 expect_error "import requires export" "$TMP/badconf.id" "is not exported"

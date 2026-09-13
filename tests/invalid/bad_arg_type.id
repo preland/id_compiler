@@ -1,5 +1,5 @@
 // EXPECT: expects int, got string
-main() {
+main(int argc, string[] argv) {
   int r = inc("nope");
 } return int r;
 

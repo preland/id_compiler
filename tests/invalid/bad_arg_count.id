@@ -1,5 +1,5 @@
 // EXPECT: takes 1 argument
-main() {
+main(int argc, string[] argv) {
   int r = inc(1, 2);
 } return int r;
 

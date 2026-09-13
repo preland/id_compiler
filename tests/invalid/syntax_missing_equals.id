@@ -1,5 +1,5 @@
 // EXPECT: expected '='
 // a declaration must initialize with '='
-main() {
+main(int argc, string[] argv) {
   int x 5;
 } return int 0;
