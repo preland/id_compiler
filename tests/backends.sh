@@ -142,6 +142,247 @@ fi
 # retired and will not change, emits `extern int` for the same calls. What both
 # must agree on is the behaviour checked above.
 
+# -- proc: a child process id can start, read from, wait for and kill ------
+# Deliberately above the X11 gate below, like fs: this is fork/pipe/waitpid,
+# so it needs nothing but a shell. This is the seam tools/qmon is written
+# against (idc/backends/proc/README.md).
+procdir="$TMP/proc"; mkdir -p "$procdir/out"
+printf 'import "%s"\n' "$(cd "$ROOT/backends/proc" && pwd)" > "$procdir/conf.id"
+cat > "$procdir/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  int h = proc_spawn("sh\n-c\necho hi");
+  int[] buf = mkbuf(64);
+  run_echo(h, buf);
+} return int 0;
+
+run_echo(int h, int[] buf) {
+  int got = proc_read(h, buf, 64, 2000);
+  show(buf, got);
+  finish(h);
+} return void;
+EOF
+cat > "$procdir/out/buf.id" <<'EOF'
+mkbuf(int n) {
+  int[] out = [];
+  fill(out, n);
+} return int[] out;
+
+fill(int[] out, int n) {
+  int i = 0;
+  while(i < n) {
+    push(out, 0);
+    i = i + 1;
+  }
+} return void;
+EOF
+cat > "$procdir/out/show.id" <<'EOF'
+show(int[] buf, int n) {
+  string s = tostr(buf, n);
+  print(s);
+} return void;
+
+tostr(int[] buf, int n) {
+  string s = "";
+  int i = 0;
+  while(i < n) {
+    s = s + chr(buf[i]);
+    i = i + 1;
+  }
+} return string s;
+EOF
+cat > "$procdir/out/finish.id" <<'EOF'
+finish(int h) {
+  int rc = proc_wait(h, 2000);
+  print(rc);
+  proc_close(h);
+} return void;
+EOF
+procexp='hi
+
+0'
+if $BIN_IDC "$procdir" -o "$TMP/proc.bin" >"$TMP/proc.build" 2>&1; then
+    got=$(timeout 10 "$TMP/proc.bin" 2>&1)
+    if [ "$got" = "$procexp" ]; then
+        ok "proc_spawn starts a child and proc_read reads its stdout back"
+    else
+        bad "proc_spawn starts a child and proc_read reads its stdout back: got '$got'"
+    fi
+else
+    bad "proc backend demo builds ($(head -1 "$TMP/proc.build"))"
+fi
+
+# proc_kill: a still-running child times proc_wait out (-1, ETIMEDOUT is
+# errno 110 on Linux), kill succeeds, and the second proc_wait reports it
+# killed by SIGKILL (128 + 9 = 137) rather than hanging until the sleep itself
+# would have finished.
+killdir="$TMP/prockill"; mkdir -p "$killdir"
+printf 'import "%s"\n' "$(cd "$ROOT/backends/proc" && pwd)" > "$killdir/conf.id"
+cat > "$killdir/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  int h = proc_spawn("sleep\n5");
+  run(h);
+} return int 0;
+
+run(int h) {
+  int before = proc_wait(h, 100);
+  mid(h, before);
+} return void;
+EOF
+cat > "$killdir/ctrl.id" <<'EOF'
+mid(int h, int before) {
+  int k = proc_kill(h);
+  after(h, before, k);
+} return void;
+
+after(int h, int before, int k) {
+  int rc = proc_wait(h, 2000);
+  string s = "" + before + " " + k + " " + rc;
+  print(s);
+} return void;
+EOF
+if $BIN_IDC "$killdir" -o "$TMP/prockill.bin" >"$TMP/prockill.build" 2>&1; then
+    got=$(timeout 10 "$TMP/prockill.bin" 2>&1)
+    if [ "$got" = "-1 0 137" ]; then
+        ok "proc_kill ends a running child, and proc_wait reports it killed"
+    else
+        bad "proc_kill ends a running child, and proc_wait reports it killed: got '$got'"
+    fi
+else
+    bad "proc kill demo builds ($(head -1 "$TMP/prockill.build"))"
+fi
+
+# -- sock: a Unix-domain socket id can connect to, and talk over -----------
+# Served by socat when the dev shell has it, a small C helper otherwise --
+# either way, one accept, one echo, one exit. sock_connect's retry loop is
+# exercised for real: the id binary starts trying to connect before the
+# server is necessarily listening yet.
+sockpath="$TMP/echo.sock"
+sockdir="$TMP/sock"; mkdir -p "$sockdir/out"
+printf 'import "%s"\n' "$(cd "$ROOT/backends/sock" && pwd)" > "$sockdir/conf.id"
+cat > "$sockdir/main.id" <<EOF
+main(int argc, string[] argv) {
+  int h = sock_connect("$sockpath", 3000);
+  go(h);
+} return int 0;
+
+go(int h) {
+  int[] out = mkmsg();
+  int n = len(out);
+  sendit(h, out, n);
+} return void;
+
+sendit(int h, int[] out, int n) {
+  int sent = sock_send(h, out, n);
+  print(sent);
+  recvit(h);
+} return void;
+EOF
+cat > "$sockdir/out/msg.id" <<'EOF'
+mkmsg() {
+  int[] out = [];
+  fill(out);
+} return int[] out;
+
+fill(int[] out) {
+  push(out, 104);
+  push(out, 105);
+} return void;
+EOF
+cat > "$sockdir/out/recv.id" <<'EOF'
+recvit(int h) {
+  int[] buf = mkbuf(64);
+  show(h, buf);
+} return void;
+
+mkbuf(int n) {
+  int[] out = [];
+  filln(out, n);
+} return int[] out;
+
+filln(int[] out, int n) {
+  int i = 0;
+  while(i < n) {
+    push(out, 0);
+    i = i + 1;
+  }
+} return void;
+EOF
+cat > "$sockdir/out/show.id" <<'EOF'
+show(int h, int[] buf) {
+  int got = sock_recv(h, buf, 64, 2000);
+  tell(buf, got);
+} return void;
+
+tell(int[] buf, int n) {
+  string s = tostr(buf, n);
+  print(s);
+} return void;
+
+tostr(int[] buf, int n) {
+  string s = "";
+  int i = 0;
+  while(i < n) {
+    s = s + chr(buf[i]);
+    i = i + 1;
+  }
+} return string s;
+EOF
+sock_via=""
+if command -v socat >/dev/null 2>&1; then
+    rm -f "$sockpath"
+    (socat -T3 UNIX-LISTEN:"$sockpath",fork EXEC:cat >/dev/null 2>&1 &)
+    sock_via="socat"
+else
+    cat > "$TMP/sockecho.c" <<'EOF'
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+int main(int argc, char** argv) {
+    struct sockaddr_un addr;
+    int s, c, n;
+    char buf[256];
+    if (argc < 2) return 1;
+    unlink(argv[1]);
+    s = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (s < 0) return 1;
+    memset(&addr, 0, sizeof addr);
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, argv[1], sizeof(addr.sun_path) - 1);
+    if (bind(s, (struct sockaddr*)&addr, sizeof addr) != 0) return 1;
+    if (listen(s, 1) != 0) return 1;
+    c = accept(s, 0, 0);
+    if (c < 0) return 1;
+    n = (int)read(c, buf, sizeof buf);
+    if (n > 0) write(c, buf, (size_t)n);
+    close(c); close(s); unlink(argv[1]);
+    return 0;
+}
+EOF
+    if cc -O2 "$TMP/sockecho.c" -o "$TMP/sockecho" 2>"$TMP/sockecho.err"; then
+        rm -f "$sockpath"
+        "$TMP/sockecho" "$sockpath" &
+        sock_via="a C helper"
+    else
+        skip "sock: connect/send/recv over a Unix socket (no socat, and the C helper failed to compile: $(head -1 "$TMP/sockecho.err"))"
+    fi
+fi
+if [ -n "$sock_via" ]; then
+    if $BIN_IDC "$sockdir" -o "$TMP/sock.bin" >"$TMP/sock.build" 2>&1; then
+        got=$(timeout 10 "$TMP/sock.bin" 2>&1)
+        want='2
+hi'
+        if [ "$got" = "$want" ]; then
+            ok "sock_connect, sock_send and sock_recv talk to a Unix socket ($sock_via)"
+        else
+            bad "sock_connect, sock_send and sock_recv talk to a Unix socket ($sock_via): got '$got'"
+        fi
+    else
+        bad "sock backend demo builds ($sock_via, $(head -1 "$TMP/sock.build"))"
+    fi
+fi
+wait 2>/dev/null
+
 # A call into a backend is checked like any other call. A typo used to pass
 # the compiler and fail at the C linker, and a wrong argument count compiled
 # and dumped core when run; both are now the diagnostics an `id` function gets.

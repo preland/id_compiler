@@ -1,0 +1,20 @@
+// --type: lines to send to the guest's serial port, ';' separated, matching
+// qmon.py's `for line in args.text.split(";") if args.text else []`.
+send_text() {
+  string text = (import qm_text);
+  if(len(text) > 0) {
+    send_text_lines(text);
+  }
+} return void;
+
+send_text_lines(string text) {
+  string[] lines = str_split(text, ";");
+  send_lines_loop(lines, 0);
+} return void;
+
+send_lines_loop(string[] lines, int i) {
+  int n = len(lines);
+  while(i < n) {
+    i = send_one_line(lines, i);
+  }
+} return void;

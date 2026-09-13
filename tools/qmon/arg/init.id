@@ -1,0 +1,30 @@
+// Reading argv, matching qmon.py's argparse defaults: --wait 2, --settle 1,
+// everything else unset. argv[1] is the kernel path -- required, positional,
+// first. Every exported name may be exported by exactly one function, so a
+// flag's value is found (arg/rest2.id's scan_value) and exported once here,
+// rather than exported as a default and exported again if a flag overrides
+// it.
+init(int argc, string[] argv) {
+  export string qm_kernel = argv[1];
+  init_wait(argc, argv);
+  init_rest(argc, argv);
+} return void;
+
+init_wait(int argc, string[] argv) {
+  string v = scan_value(argv, argc, "--wait", 2);
+  export int qm_wait_ms = wait_ms_of(v);
+} return void;
+
+// "" (not found) means the default; qmon.py's own default is 2.0 seconds.
+// id has no float-parsing builtin (to_int parses a leading integer, SPEC.md
+// §3), so --wait and --settle are whole seconds -- every caller, including
+// tests/kernel.sh, only ever passes an integer.
+wait_ms_of(string v) {
+  int ms = 2000;
+  if(len(v) > 0) {
+    int secs = to_int(v);
+    ms = secs * 1000;
+  }
+} return int ms;
+("4"):(4000)
+(""):(2000)

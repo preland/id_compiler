@@ -1,0 +1,17 @@
+// Sleep n steps of ~20ms by draining the serial port n times: each drain
+// call blocks in a 20ms-timeout read (go/b/ser/drain/pull.id) rather than
+// sleeping first and draining after, so a burst that arrives partway through
+// the "sleep" is caught as soon as it arrives rather than up to one whole
+// step late -- the closest this can come, with no threads, to qmon.py's
+// background reader, which never stopped reading at all.
+wait_loop(int n) {
+  int i = 0;
+  while(i < n) {
+    i = wait_step(i);
+  }
+} return void;
+
+wait_step(int i) {
+  drain_serial();
+  int j = i + 1;
+} return int j;

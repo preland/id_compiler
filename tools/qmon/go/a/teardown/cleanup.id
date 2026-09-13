@@ -1,0 +1,22 @@
+// Stop QEMU: give it 10 seconds to exit after "quit" (like qmon.py's
+// proc.wait(timeout=10)), and kill it if it has not. This always runs, quit
+// having been sent or not -- see go/a/session/drive.id.
+reap_qemu() {
+  int rc = proc_wait((import qm_qh), 10000);
+  kill_if_needed(rc);
+  proc_close((import qm_qh));
+} return void;
+
+// proc_wait returns -1 (ETIMEDOUT) for a child still running past the
+// deadline; see idc/backends/proc/README.md.
+kill_if_needed(int rc) {
+  if(rc < 0) {
+    proc_kill((import qm_qh));
+  }
+} return void;
+
+cleanup() {
+  reap_qemu();
+  close_sockets();
+  output();
+} return void;

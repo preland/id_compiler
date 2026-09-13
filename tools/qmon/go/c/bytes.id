@@ -1,0 +1,21 @@
+// bytes -> string, one byte per cell. Used for a QMP line (go/b/qmp/line.id
+// builds it byte by byte instead) and for the whole collected serial buffer
+// (go/a/teardown/close.id).
+bytes_str(int[] bs, int n) {
+  string s = "";
+  int i = 0;
+  while(i < n) {
+    s = s + chr(bs[i]);
+    i = i + 1;
+  }
+} return string s;
+([104, 105], 2):("hi")
+([], 0):("")
+
+// Send a whole string over a socket: idc/backends/sock/README.md's bytes
+// contract is int[], one byte per cell.
+sock_send_str(int h, string msg) {
+  int[] bs = str_bytes(msg);
+  int n = len(bs);
+  sock_send(h, bs, n);
+} return void;

@@ -1,0 +1,15 @@
+// QMP messages with a dynamic part -- built by hand, as much JSON as QMP
+// actually needs and no more (docs/BACKENDS.md's write-up asked for exactly
+// this). qm_msg_capabilities and qm_msg_quit (conf.id) have no dynamic part
+// and are constants instead.
+msg_sendkey(string tok) {
+  string m = "{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"" + tok + "\"}]}}\n";
+} return string m;
+("ret"):("{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"ret\"}]}}\n")
+("a"):("{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"a\"}]}}\n")
+
+msg_screendump(string path) {
+  string m = "{\"execute\": \"screendump\", \"arguments\": {\"filename\": \"" + path + "\"}}\n";
+} return string m;
+("/tmp/s.ppm"):("{\"execute\": \"screendump\", \"arguments\": {\"filename\": \"/tmp/s.ppm\"}}\n")
+(""):("{\"execute\": \"screendump\", \"arguments\": {\"filename\": \"\"}}\n")

@@ -1,0 +1,21 @@
+// The guest's serial port is a second Unix-domain socket (see
+// go/a/setup/paths.id): connect to it the same way, and this is also the
+// point at which qmon.py would have gone on to type and photograph, or
+// sys.exit if either socket never appeared -- so it is where the exit code
+// is decided (go/a/setup/conn/rc.id's conn_bad).
+connect_serial() {
+  export int qm_serh = sock_connect((import qm_ser_path), 10000);
+  warn_if_bad_serial();
+  set_rc();
+} return void;
+
+warn_if_bad_serial() {
+  if((import qm_serh) < 0) {
+    print("qmon: QEMU never opened its serial socket");
+  }
+} return void;
+
+set_rc() {
+  int bad = conn_bad();
+  export int qm_rc = bad;
+} return void;

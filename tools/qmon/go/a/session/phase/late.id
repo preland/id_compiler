@@ -1,0 +1,17 @@
+// sleep(settle), then --shot (screendump) and always quit. Matches
+// qmon.py's main() tail.
+phase_settle() {
+  int n = (import qm_settle_ms) / 20;
+  wait_loop(n);
+  phase_shot();
+} return void;
+
+phase_shot() {
+  maybe_shot();
+  phase_quit();
+} return void;
+
+phase_quit() {
+  qmp_cmd((import qm_msg_quit));
+  drain_serial();
+} return void;

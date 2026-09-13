@@ -1,0 +1,24 @@
+// Run one QMP command: send it, read the response (skipping any events --
+// go/b/qmp/resp.id), and report an error the way qmon.py's Qmp.cmd did
+// (`print(f"qmon: {name}: ...", file=sys.stderr)`) -- to stdout, since id has
+// no stderr yet; see the qmon report for where this should move to eprint.
+qmp_cmd(string msg) {
+  sock_send_str((import qm_qmph), msg);
+  string r = qmp_read_response();
+  check_error(r);
+} return void;
+
+check_error(string r) {
+  int idx = str_find(r, "\"error\"");
+  report_if_error(idx, r);
+} return void;
+("{\"return\": {}}"):("{\"return\": {}}")
+("{\"error\": {\"desc\": \"bad\"}}"):("{\"error\": {\"desc\": \"bad\"}}")
+
+report_if_error(int idx, string r) {
+  if(idx >= 0) {
+    print("qmon: " + r);
+  }
+} return void;
+(-1, "ok"):(-1, "ok")
+(0, "bad"):(0, "bad")

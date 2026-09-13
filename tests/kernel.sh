@@ -15,7 +15,7 @@
 #   * the same `id` source run hosted, on the C runtime, which is what says the
 #     `id`-written runtime is *right* rather than merely present.
 #
-# Run from anywhere: tests/kernel.sh   (needs clang, ld.lld, qemu and python3)
+# Run from anywhere: tests/kernel.sh   (needs clang, ld.lld and qemu)
 set -u
 cd "$(dirname "$0")"
 ROOT=..
@@ -24,7 +24,7 @@ pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 
-for tool in clang ld.lld qemu-system-x86_64 python3; do
+for tool in clang ld.lld qemu-system-x86_64; do
     if ! command -v "$tool" >/dev/null 2>&1; then
         echo "SKIP: kernel tests (need $tool on PATH -- run via 'tools/devshell.sh tests/kernel.sh')"
         exit 0
@@ -69,7 +69,7 @@ fi
 # Two boots, because `fault` stops the machine and the screenshot has to be
 # taken while there is still a machine to photograph.
 CMDS='ls;cd bin;pwd;cat hello;cd ..;mkdir tmp;write /tmp/note hello from a shell in id;cat /tmp/note;ls tmp;rm /tmp/note;ls /tmp;uname;frobnicate'
-python3 "$ROOT/tools/qmon.py" "$ELF" --wait 4 --type "$CMDS" --settle 2 \
+"$ROOT/tools/qmon.sh" "$ELF" --wait 4 --type "$CMDS" --settle 2 \
         --shot "$TMP/screen.ppm" >"$TMP/serial.txt" 2>"$TMP/qmon.err"
 got=$(cat "$TMP/serial.txt")
 
@@ -92,7 +92,7 @@ want_serial "an unknown command says so"          "frobnicate: not a command -- 
 # is a triple fault and a silent reboot; with one it is three lines naming the
 # vector, the error code and the instruction. docs/SPEC.md §8's traps have
 # nowhere to go in a kernel, and this is what replaces them.
-python3 "$ROOT/tools/qmon.py" "$ELF" --wait 4 --type "fault" --settle 2 \
+"$ROOT/tools/qmon.sh" "$ELF" --wait 4 --type "fault" --settle 2 \
         >"$TMP/fault.txt" 2>/dev/null
 crash=$(cat "$TMP/fault.txt")
 if printf '%s\n' "$crash" | grep -q '^\*\*\* fault: page fault (vector 14' \

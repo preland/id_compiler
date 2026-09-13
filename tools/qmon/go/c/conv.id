@@ -1,0 +1,20 @@
+// string -> bytes, the inverse of bytes_str.
+str_bytes(string s) {
+  int[] out = [];
+  int n = len(s);
+  fill_bytes(out, s, n, 0);
+} return int[] out;
+("hi"):([104, 105])
+(""):([])
+
+fill_bytes(int[] out, string s, int n, int i) {
+  while(i < n) {
+    i = push_one_byte(out, s, i);
+  }
+} return void;
+
+push_one_byte(int[] out, string s, int i) {
+  int c = charat(s, i);
+  push(out, c);
+  int j = i + 1;
+} return int j;

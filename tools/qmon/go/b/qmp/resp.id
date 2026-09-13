@@ -1,0 +1,26 @@
+// A response to a command, skipping past any asynchronous event QEMU
+// interleaved with it -- qmon.py's Qmp.cmd: `if "event" in msg: continue`.
+qmp_read_response() {
+  string line = qmp_read_line();
+  string r = check_event(line);
+} return string r;
+
+check_event(string line) {
+  int idx = str_find(line, "\"event\"");
+  string r = event_or_line(idx, line);
+} return string r;
+("{\"return\": {}}"):("{\"return\": {}}")
+("plain"):("plain")
+
+// An event is not the answer; read another line instead of returning it.
+// Only the not-an-event case (idx < 0) is covered by a case here: the other
+// branch reads another line over the real QMP socket, which a test case
+// cannot supply.
+event_or_line(int idx, string line) {
+  string r = line;
+  if(idx >= 0) {
+    r = qmp_read_response();
+  }
+} return string r;
+(-1, "a"):("a")
+(-1, "bc"):("bc")

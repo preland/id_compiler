@@ -1,0 +1,5 @@
+// Bytes in and out through an int[], one byte per cell. See sock.h.
+
+native sock_send(int handle, int[] buf, int n) return int;
+
+native sock_recv(int handle, int[] buf, int n, int timeout_ms) return int;

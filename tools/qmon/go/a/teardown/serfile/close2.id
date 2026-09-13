@@ -1,0 +1,10 @@
+write_and_close(int h, string text) {
+  int[] bs = str_bytes(text);
+  send_and_close(h, bs);
+} return void;
+
+send_and_close(int h, int[] bs) {
+  int n = len(bs);
+  fs_write(h, bs, n);
+  fs_close(h);
+} return void;

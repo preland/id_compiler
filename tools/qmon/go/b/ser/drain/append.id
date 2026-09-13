@@ -1,0 +1,19 @@
+append_bytes(int[] chunk, int got) {
+  int i = 0;
+  while(i < got) {
+    i = append_one(chunk, i);
+  }
+} return void;
+
+append_one(int[] chunk, int i) {
+  push((import qm_buf), chunk[i]);
+  int j = i + 1;
+} return int j;
+
+// A full read likely means more is waiting; keep draining until one comes
+// back empty.
+more_if_any(int got) {
+  if(got > 0) {
+    drain_serial();
+  }
+} return void;
