@@ -177,8 +177,10 @@ expect_output "lists push/get/set/to_int" "len=4 xs[0]=99 xs[3]=9" "$("$TMP/list
 # --- idc-in-id: the lexer (written in id) tokenizes id source from stdin
 # The compiler is built WITH the standard library -- both stages call idstd's
 # lset. IDC_NO_STD is exported at the top of this file for every program it
-# builds; the compiler is not one of those programs.
-env -u IDC_NO_STD $IDC ../compiler/lex -o "$TMP/idlex" 2>/dev/null || bad "idc-in-id lexer compiles"
+# builds; the compiler is not one of those programs. It is built by bin/idc,
+# like every build in this file that merges idstd: idc.py cannot parse an
+# idstd that holds a `given` case.
+env -u IDC_NO_STD $BIN_IDC ../compiler/lex -o "$TMP/idlex" 2>/dev/null || bad "idc-in-id lexer compiles"
 expect_output "id-lexer keyword"    "kw while"   "$(printf 'while' | "$TMP/idlex" | head -1)"
 expect_output "id-lexer two-char op" "op =="     "$(printf 'x == 2' | "$TMP/idlex" | sed -n 2p)"
 expect_output "id-lexer string lit" 'str "hi"'   "$(printf '"hi"'   | "$TMP/idlex" | head -1)"
@@ -190,7 +192,7 @@ expect_output "id-lexer tracks lines" "line 3" "$(printf 'a\n\nb' | "$TMP/idlex"
 
 # --- idc-in-id stage 2: the calculator (parser + evaluator + printer written
 #     in id), fed by the stage-1 lexer through a pipe
-env -u IDC_NO_STD $IDC ../../demos/idc_in_id_calc -o "$TMP/idcalc" 2>/dev/null || bad "idc-in-id calc compiles"
+env -u IDC_NO_STD $BIN_IDC ../../demos/idc_in_id_calc -o "$TMP/idcalc" 2>/dev/null || bad "idc-in-id calc compiles"
 expect_output "calc parse+print" "(+ 2 (* 3 4))" \
     "$(echo '2 + 3 * 4' | "$TMP/idlex" | "$TMP/idcalc" | head -1)"
 expect_output "calc evaluate" "= 14" \
@@ -201,7 +203,7 @@ expect_output "calc precedence/parens/unary/%" "= 13" \
 # --- idc-in-id stage 2b/3: the function/statement parser + C emitter (written
 #     in id), fed by the lexer. `idparse ast` prints the AST as an S-expression;
 #     `idparse` (no arg) emits C.
-env -u IDC_NO_STD $IDC ../compiler/parse -o "$TMP/idparse" 2>/dev/null || bad "idc-in-id parser compiles"
+env -u IDC_NO_STD $BIN_IDC ../compiler/parse -o "$TMP/idparse" 2>/dev/null || bad "idc-in-id parser compiles"
 cat > "$TMP/p_fn.id" <<'EOF'
 add(int x, int y) {
   int sum = x + y;
@@ -498,7 +500,7 @@ other() {
 # idview: a random source viewer written in id. It has no filesystem access,
 # so it splits a marker-delimited stream back into files -- the same protocol
 # the compiler uses for file boundaries.
-env -u IDC_NO_STD $IDC ../../demos/idview -o "$TMP/idview" >/dev/null 2>&1
+env -u IDC_NO_STD $BIN_IDC ../../demos/idview -o "$TMP/idview" >/dev/null 2>&1
 view_out=$({ printf '#file a.id\n'; printf 'one\n'; printf '#file b.id\n'; printf 'two\n'; } | "$TMP/idview")
 case "$view_out" in
     "==== a.id"*one*) ok "idview picks a file and prints its body" ;;
@@ -587,26 +589,37 @@ else
 fi
 
 # --- self-hosting: the id-written compiler emits byte-identical C for its OWN
-#     source (lexer + parser/codegen), and the self-compiled compiler is a
-#     fixpoint (compiling itself twice reproduces the same C exactly).
+#     source (lexer + parser/codegen) whether it is the stage bin/idc runs or
+#     the lexer and parser this file built from that stage's C, and the
+#     self-compiled compiler is a fixpoint (compiling itself twice reproduces
+#     the same C exactly).
 #
-# The compiler is the one program in this file built WITH the standard library,
-# because it uses it: both stages call idstd's `lset`. So these three checks
-# unset IDC_NO_STD, and they get their input from `bin/idc --emit-sources`
+# The compiler is one of the programs in this file built WITH the standard
+# library, because it uses it: both stages call idstd's `lset`. So these three
+# checks unset IDC_NO_STD, and they get their input from `bin/idc --emit-sources`
 # rather than from project_cat -- assembling that stream now means resolving
 # idstd, ordering its roots and numbering its compilation units, and a test
 # that re-implements all that is testing its own copy of it. Skips itself when
 # there is no standard library to resolve, because then there is no compiler
 # to check.
-if env -u IDC_NO_STD "$IDC" ../compiler/lex --emit-c /dev/null >/dev/null 2>&1; then
+#
+# The first two used to compare idc.py's C for the compiler with the
+# self-hosted compiler's. That cannot survive an idstd holding a `given` case:
+# idc.py does not parse the form, and the compiler cannot be built without
+# idstd. What replaces it is bin/idc's own --emit-c against the lexer and
+# parser built above. With tools/regen_bootstrap.sh --check in
+# self_host_build.sh, that says stage 0, stage 1 and the compiler built from
+# stage 1 all emit the same C for the compiler. What is lost is a second,
+# independent implementation agreeing with them on it.
+if env -u IDC_NO_STD "$BIN_IDC" ../compiler/lex --emit-c /dev/null >/dev/null 2>&1; then
     for src in lex parse; do
-        env -u IDC_NO_STD "$IDC" ../compiler/$src --emit-c "$TMP/${src}_py.c" >/dev/null 2>&1
+        env -u IDC_NO_STD "$BIN_IDC" ../compiler/$src --emit-c "$TMP/${src}_bin.c" >/dev/null 2>&1
         env -u IDC_NO_STD ../bin/idc ../compiler/$src --emit-sources 2>/dev/null \
             | "$TMP/idlex" | "$TMP/idparse" > "$TMP/${src}_id.c"
-        if diff "$TMP/${src}_py.c" "$TMP/${src}_id.c" >/dev/null; then
-            ok "self-hosting parity with idc.py (compiler/$src)"
+        if [ -s "$TMP/${src}_bin.c" ] && diff "$TMP/${src}_bin.c" "$TMP/${src}_id.c" >/dev/null; then
+            ok "self-hosting parity with bin/idc (compiler/$src)"
         else
-            bad "self-hosting parity with idc.py (compiler/$src)"
+            bad "self-hosting parity with bin/idc (compiler/$src)"
         fi
     done
     # build the self-compiled compiler and check it reproduces its own C
@@ -625,12 +638,12 @@ fi
 
 # --- the game engine + the two games it drives build cleanly (real-time I/O
 #     builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
-if env -u IDC_NO_STD "$IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
+if env -u IDC_NO_STD "$BIN_IDC" ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
     ok "moonbuggy builds (with bundled engine)"
 else
     bad "moonbuggy builds (with bundled engine)"
 fi
-if env -u IDC_NO_STD "$IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
+if env -u IDC_NO_STD "$BIN_IDC" ../../demos/solitaire -o "$TMP/solitaire" 2>/dev/null; then
     ok "solitaire builds (with bundled engine)"
 else
     bad "solitaire builds (with bundled engine)"

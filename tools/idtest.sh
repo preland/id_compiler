@@ -17,14 +17,16 @@
 # that. This is that, as a command, so a module's cases are one line to run
 # rather than a shell incantation to remember.
 #
-# It is the *reference* compiler that runs cases -- `bin/idc` counts them and
-# stops there (docs/TODO.md item 5). That is why this calls idc.py.
+# This used to call idc.py, because only idc.py ran cases. bin/idc now runs
+# every case on every build (docs/TESTS.md, "How it runs"), and idc.py cannot
+# build anything that merges an idstd holding a `given` case, so this is an
+# ordinary bin/idc build of the throwaway project: a failing case fails it.
 #
 # Exit 0 means every case in every named directory passed.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
-IDC_PY=${IDC_PY:-$ROOT/idc.py}
+BIN_IDC=$ROOT/bin/idc
 
 [ $# -gt 0 ] || { sed -n '2,8p' "$0"; exit 2; }
 
@@ -45,14 +47,14 @@ if [ "$n" -gt 2 ]; then
     exit 2
 fi
 
-# A main that does nothing: --tests generates its own entry point per case, and
-# a project still has to have one function called main to be a program.
+# A main that does nothing: the harness generates its own entry point per case,
+# and a project still has to have one function called main to be a program.
 cat > "$TMP/p/main.id" <<'EOF'
 main(int argc, string[] argv) {
 } return int 0;
 EOF
 
-out=$("$IDC_PY" "$TMP/p" --tests -o "$TMP/bin" 2>&1)
+out=$("$BIN_IDC" "$TMP/p" -o "$TMP/bin" 2>&1)
 rc=$?
 # Rewrite the temp path back to the real one, so a failure names a file the
 # reader can open.
