@@ -2,6 +2,6 @@
 
 native gfx_open(int w, int h, string title) return int;
 
-native gfx_present(int[] pixels) return int;
+native gfx_present(int[] fb) return int;
 
 native gfx_close() return int;

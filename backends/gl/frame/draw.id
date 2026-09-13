@@ -1,5 +1,5 @@
 // Geometry, as milli-unit coordinates and packed colors. See gl.h.
 
-native gl_draw_tris(int[] tri_verts, int[] tri_colors, int tris) return int;
+native gl_draw_tris(int[] verts, int[] colors, int count) return int;
 
-native gl_draw_points(int[] points, int[] point_colors, int point_count, int size_x1000) return int;
+native gl_draw_points(int[] positions, int[] colors, int count, int size_x1000) return int;
