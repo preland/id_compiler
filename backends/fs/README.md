@@ -46,9 +46,10 @@ fast path can be added later without changing these names.
 
 ### Why every function returns `int`
 
-`idc` resolves a call to an undefined function as `extern int id_<name>()`,
-satisfied at link time. So a failure has exactly one bit of room to say so —
-hence −1 everywhere, and `fs_error()` to fetch the detail.
+Each is declared `native … return int;` in this directory's `.id` files. That
+was once forced — `idc` declared every backend call `extern int id_<name>()` —
+and it stays because a status fits one `int`: a failure has exactly one bit of
+room to say so, hence −1 everywhere, and `fs_error()` to fetch the detail.
 
 **`fs_error` reads state that the failing call sets, so keep them in separate
 statements.** Operands of one expression are not ordered, and
@@ -67,8 +68,8 @@ the callers that exist compose it from paths their own user chose.
 
 No `stat` beyond size/existence, no seek, no rename, no permissions. The list
 above is what a program needs to read a file, write a file, walk a tree of them,
-and know whether it worked; everything else is an addition to `backend.json`'s
-`abi` when something actually needs it.
+and know whether it worked; everything else is one more `native` declaration
+beside these, and its C, when something actually needs it.
 
 `fs_list` was added for one reason: `bin/idc` is a bash script because a
 compiler that reads its own source tree needs `readdir`, not `fopen`, and until
@@ -79,19 +80,24 @@ last thing the driver did that `id` could not.
 
 Nothing about C appears above the object file. `demos/fsdemo` calls `fs_open`
 the way it calls any other function; `conf.id` says where those functions
-come from; and `backend.json` declares the contract in `id`'s own types:
+come from; the `.id` files here declare the contract in `id`'s own types:
+
+```
+native fs_open(string path, string mode) return int;
+```
+
+and `backend.json` says how a code generator obtains it:
 
 ```json
 { "name": "fs",
-  "abi": [ { "name": "fs_open", "params": ["string", "string"], "returns": "int" }, … ],
   "targets": {
     "c": { "header": "fs.h",
            "platforms": { "linux":  { "sources": ["fs_posix.c"], "cflags": [], "link": [] },
                           "darwin": { "sources": ["fs_posix.c"], "cflags": [], "link": [] } } } } }
 ```
 
-The split is the point. `abi` is about `id` and is the same however the program
-is compiled. `targets` is about a *code generator*: the C target wants sources,
+The split is the point. The declarations are about `id` and are the same however
+the program is compiled. `targets` is about a *code generator*: the C target wants sources,
 cflags and link flags; an LLVM target, a wasm target, or an interpreter wants
 something else and adds its own key beside `"c"`. Adding one changes this file
 and the driver that reads it — **no `.id` file, in this backend or in any
@@ -102,12 +108,12 @@ the same logic inline in `bin/idc`). A manifest with no `targets` at all — `gf
 and `gl` — has a bare `platforms` table, which is read as the C target's, so
 the older backends keep working unchanged.
 
-The C target does not currently *use* the `abi` declaration: it emits
-unprototyped externs and lets the linker match them, so it never needs to know
-a signature. It is declared anyway because a target that binds natively — an
-interpreter mapping `fs_read` to a host function, say — cannot parse `fs.h` to
-find out, and because it is the only machine-readable statement of what this
-backend promises.
+Every target uses the declarations: the compiler checks each call against them
+as it checks a call to any `id` function, the C target emits them as
+prototypes, and the LLVM target as typed `declare`s. A target that binds
+natively — an interpreter mapping `fs_read` to a host function, say — reads the
+signatures from the same place, since it cannot parse `fs.h`; they are the only
+machine-readable statement of what this backend promises.
 
 ## Portability
 

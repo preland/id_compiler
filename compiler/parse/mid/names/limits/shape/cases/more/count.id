@@ -24,7 +24,7 @@ check_cases() {
 
 check_cases_at(int i) {
   int n = count_cases((import prog)[i]);
-  if(n < 2) {
+  if(n < 2 && is_native((import prog)[i]) == 0) {
     report_cases(i, n);
   }
 } return void;

@@ -134,24 +134,29 @@ else
     bad "unresolved call with no backend is a 'no such function' error (got: $(printf '%s' "$typo_out" | head -1))"
 fi
 
-# (b) with a backend: the emitted C must carry `extern int id_<name>();` and
-#     be byte-identical to idc.py's, which is what makes the block's contents
-#     AND its order right.
+# (b) with a backend: its `native` declarations are merged as source, so the
+#     emitted C carries a real prototype for each call into it and no
+#     `extern int` block. This used to assert that block and byte parity with
+#     idc.py; the parity is gone by design, since idc.py, which is being retired
+#     and will not change, still emits the block. gfxdemo is a user program and
+#     calls idstd's lset, so bin/idc builds it with the standard library, as
+#     backends.sh does -- the old check passed without it only because the
+#     missing lset became one more `extern int`.
 for prog in ../../demos/gfxdemo; do
     be=../backends/gfx
     if ! $IDC "$prog" --backend "$be" --emit-c "$TMP/be_py.c" >/dev/null 2>&1; then
         bad "backend emit-c: idc.py failed on $prog"
         continue
     fi
-    if ! $BIN_IDC "$prog" --backend "$be" --emit-c "$TMP/be_self.c" >/dev/null 2>&1; then
+    if ! env -u IDC_NO_STD $BIN_IDC "$prog" --backend "$be" --emit-c "$TMP/be_self.c" >/dev/null 2>&1; then
         bad "backend emit-c: bin/idc failed on $prog"
         continue
     fi
-    if grep -q '^extern int id_gfx_open();' "$TMP/be_self.c" \
-       && diff "$TMP/be_py.c" "$TMP/be_self.c" >/dev/null; then
-        ok "backend emit-c byte parity via bin/idc ($prog)"
+    if grep -qx 'int id_gfx_open(int w, int h, char\* title);' "$TMP/be_self.c" \
+       && ! grep -q '^extern int id_' "$TMP/be_self.c"; then
+        ok "backend calls are emitted as prototypes via bin/idc ($prog)"
     else
-        bad "backend emit-c byte parity via bin/idc ($prog)"
+        bad "backend calls are emitted as prototypes via bin/idc ($prog)"
     fi
 done
 
@@ -283,9 +288,9 @@ else
 fi
 
 # (c2) ...and it is read wherever it appears, not only at argv[1]. The driver
-# puts --extern-ok ahead of --triple whenever a backend is attached, and the
-# positional read this replaced then kept the default triple: the build below
-# silently produced an x86_64 binary and reported success.
+# once put another flag ahead of --triple whenever a backend was attached, and
+# the positional read this replaced then kept the default triple: the build
+# below silently produced an x86_64 binary and reported success.
 if $BIN_IDC "$TMP/asm.id" --backend ../backends/fs --triple aarch64-unknown-linux-gnu \
      -o "$TMP/asm3.bin" 2>&1 \
    | grep -q "no 'asm' definition of 'dbl' for target 'aarch64-unknown-linux-gnu'" \

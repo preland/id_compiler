@@ -1,0 +1,18 @@
+// One declaration line, and its parameter types. A declaration names no
+// parameters, so only the types are spelled.
+
+ll_native_line(int id, string ty) {
+  int[] l1_of_v = l1_of(id);
+  string plist = ll_native_pars(l1_of_v);
+  string ret_s = "declare " + ty + " @id_" + s1_of(id) + "(" + plist + ")";
+} return string ret_s;
+
+ll_native_pars(int[] ps) {
+  string out = "";
+  int i = 0;
+  while(i < len(ps)) {
+    string s1_of_v = s1_of(ps[i]);
+    out = out + ll_sep(i) + ll_ty(s1_of_v);
+    i = i + 1;
+  }
+} return string out;

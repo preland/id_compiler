@@ -1,0 +1,7 @@
+// Pointer state as of the last poll or present. See gfx.h.
+
+native gfx_mouse_x() return int;
+
+native gfx_mouse_y() return int;
+
+native gfx_mouse_buttons() return int;

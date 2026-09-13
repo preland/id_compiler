@@ -600,7 +600,7 @@ int id_is_alnum(int c) {
 int id_is_kw(char* w) {
     int ok;
     ok = 0;
-    if (((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0))) {
+    if ((((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0)) || (strcmp(w, "native") == 0))) {
         ok = 1;
     }
     return ok;

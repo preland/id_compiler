@@ -1,8 +1,8 @@
 // The value of a `--name VALUE` flag, found anywhere in the arguments.
 //
-// Scanned rather than read at a fixed index. The driver puts `--extern-ok`
-// ahead of `--triple` whenever a native backend is attached, and the
-// positional read this replaces then took `--extern-ok` for the flag and kept
+// Scanned rather than read at a fixed index. The driver once put another flag
+// ahead of `--triple` whenever a native backend was attached, and the
+// positional read this replaces then took that flag for `--triple` and kept
 // the default triple -- so `idc prog.id --backend B --triple aarch64-...`
 // built an x86_64 binary and reported success. A wrong platform must not be a
 // silent one.

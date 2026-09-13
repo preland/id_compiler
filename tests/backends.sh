@@ -4,7 +4,7 @@
 # The backends are C, so most of what can go wrong is a link question rather
 # than a run question -- and link questions need no display. That is the point
 # of this file: the checks that matter most (do both backends coexist, do the
-# graphics demos still build, is the extern block emitted) all run headless.
+# graphics demos still build, is a backend call checked) all run headless.
 #
 # The few checks that genuinely need a window get one from tools/headless.sh,
 # a private Xvfb, so they never touch the developer's own display: a new window
@@ -129,13 +129,57 @@ else
     bad "driver/ builds ($(head -1 "$TMP/drv.build"))"
 fi
 
-# emit-c parity on a backend-using project, as for the graphics demos below.
-if $ROOT/idc.py "$ORG/demos/fsdemo" --emit-c "$TMP/fs.py.c" >/dev/null 2>&1 \
-   && $BIN_IDC "$ORG/demos/fsdemo" --emit-c "$TMP/fs.self.c" >/dev/null 2>&1 \
-   && diff "$TMP/fs.py.c" "$TMP/fs.self.c" >/dev/null; then
-    ok "fsdemo: emit-c byte parity"
+# fsdemo's emitted C is no longer compared with idc.py's: bin/idc emits the fs
+# backend's `native` declarations as prototypes, and idc.py, which is being
+# retired and will not change, emits `extern int` for the same calls. What both
+# must agree on is the behaviour checked above.
+
+# A call into a backend is checked like any other call. A typo used to pass
+# the compiler and fail at the C linker, and a wrong argument count compiled
+# and dumped core when run; both are now the diagnostics an `id` function gets.
+chk="$TMP/chk"; mkdir -p "$chk"
+printf 'import "%s"\n' "$(cd "$ROOT/backends/fs" && pwd)" > "$chk/conf.id"
+printf 'main(int argc, string[] argv) {\n  int h = fs_opne("x", "r");\n  print(h);\n} return int 0;\n' > "$chk/main.id"
+if $BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1 | grep -qF "no such function 'fs_opne'; available builtins:"; then
+    ok "a typo'd backend call is 'no such function' (bin/idc)"
 else
-    bad "fsdemo: emit-c byte parity"
+    bad "a typo'd backend call is 'no such function' (bin/idc)"
+fi
+printf 'main(int argc, string[] argv) {\n  int h = fs_open(1, 2, 3);\n  print(h);\n} return int 0;\n' > "$chk/main.id"
+if $BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1 | grep -qF "function 'fs_open' takes 2 argument(s), got 3"; then
+    ok "a backend call with the wrong argument count is rejected (bin/idc)"
+else
+    bad "a backend call with the wrong argument count is rejected (bin/idc)"
+fi
+
+# A native has no body, so its parameter names are not variables and reserve
+# nothing. A program that exports `handle` and `buf` -- names fs's declarations
+# use -- must build and run; this used to stop inside backends/fs with
+# "'handle' is an exported global".
+printf 'setup() {\n  export int handle = 1;\n  export int[] buf = [];\n} return void;\n\nmain(int argc, string[] argv) {\n  setup();\n  int ok = fs_exists("nope");\n  print(ok);\n} return int 0;\n' > "$chk/main.id"
+if $BIN_IDC "$chk" -o "$TMP/chk.bin" >"$TMP/chk.err" 2>&1 && [ "$(cd "$TMP" && ./chk.bin)" = "0" ]; then
+    ok "a program may export a name a backend's parameter uses (bin/idc)"
+else
+    bad "a program may export a name a backend's parameter uses (bin/idc): $(head -1 "$TMP/chk.err" | cut -c1-120)"
+fi
+
+# Two natives with one signature are two functions: a native has no logic to
+# compare, so its name is part of its fingerprint. `n` is also a string in
+# main, which one type per name would reject if a native's parameter counted.
+cat > "$TMP/twin.id" <<'EOF'
+native twin_a(int n) return int;
+native twin_b(int n) return int;
+main(int argc, string[] argv) {
+  string n = "sum ";
+  int r = twin_a(1) + twin_b(2);
+  print(n + r);
+} return int 0;
+EOF
+if $BIN_IDC "$TMP/twin.id" --emit-c "$TMP/twin.c" >/dev/null 2>&1 \
+   && grep -qx "int id_twin_a(int n);" "$TMP/twin.c" && grep -qx "int id_twin_b(int n);" "$TMP/twin.c"; then
+    ok "two natives with the same signature do not collide, and their parameters reserve no name (bin/idc)"
+else
+    bad "two natives with the same signature do not collide, and their parameters reserve no name (bin/idc)"
 fi
 
 # A manifest that offers no C implementation must say so, in both compilers,
@@ -256,19 +300,22 @@ else
     bad "both backends link into one binary ($(grep -m1 -i 'error\|multiple' "$TMP/dual.err" | cut -c1-90))"
 fi
 
-# -- the graphics demos still build, and their C matches idc.py's ------------
+# -- the graphics demos still build with both compilers ----------------------
+# Their C is no longer compared with idc.py's. bin/idc reads each backend's
+# `native` declarations and emits them as real prototypes; idc.py, which is
+# being retired and will not change, emits an unprototyped `extern int` block
+# for the same calls, so the two differ by design. Both must still build them.
 for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
     d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if ! env -u IDC_NO_STD $ROOT/idc.py "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
-        bad "$d: idc.py --backend"; continue
-    fi
-    if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
-        bad "$d: bin/idc --backend"; continue
-    fi
-    if diff "$TMP/py.c" "$TMP/self.c" >/dev/null; then
-        ok "$d: backend build, emit-c byte parity"
+    if env -u IDC_NO_STD $ROOT/idc.py "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
+        ok "$d: backend build (idc.py)"
     else
-        bad "$d: backend build, emit-c byte parity"
+        bad "$d: backend build (idc.py)"
+    fi
+    if env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
+        ok "$d: backend build (bin/idc)"
+    else
+        bad "$d: backend build (bin/idc)"
     fi
 done
 

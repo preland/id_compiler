@@ -10,7 +10,9 @@
 ir_lower() {
   int i = 0;
   while(i < len((import prog))) {
-    lw_func((import prog)[i]);
+    if(is_native((import prog)[i]) == 0) {
+      lw_func((import prog)[i]);
+    }
     i = i + 1;
   }
 } return void;

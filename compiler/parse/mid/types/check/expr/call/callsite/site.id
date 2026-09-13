@@ -17,9 +17,9 @@ chk_callsite(int id) {
 } return void;
 
 // The func node behind a called name, or -1 when there is none to check
-// against: a builtin, an asm function (its parameters live in the asm
-// tables, and idc.py does not check a call to one either), or a name a
-// native backend will supply at link time.
+// against: a builtin, or an asm function (its parameters live in the asm
+// tables, and idc.py does not check a call to one either). A `native`
+// declaration is a func node like any other, so a call to one is checked.
 func_node(string name) {
   int n = 0 - 1;
   int idx = find_str((import fnames), name);

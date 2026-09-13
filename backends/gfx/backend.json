@@ -1,6 +1,5 @@
 {
   "name": "gfx",
-  "abi": "gfx.h",
   "platforms": {
     "darwin": {
       "sources": ["gfx_macos.m"],

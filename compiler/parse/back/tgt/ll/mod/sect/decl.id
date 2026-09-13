@@ -8,6 +8,7 @@ ll_declares() {
   if(is_runtime() == 0) {
     ll_decl_block();
   }
+  ll_natives();
 } return void;
 
 // One line is not in the block above, because it is the only symbol whose

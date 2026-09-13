@@ -17,8 +17,12 @@ def_all() {
   }
 } return void;
 
-// each definition is followed by a blank line (idc.py joins bodies that way)
+// each definition is followed by a blank line (idc.py joins bodies that way).
+// A `native` declaration has only its forward declaration: the backend's
+// object file holds the definition.
 emit_def_nl(int id) {
-  emit_def(id);
-  emit_line("");
+  if(is_native(id) == 0) {
+    emit_def(id);
+    emit_line("");
+  }
 } return void;

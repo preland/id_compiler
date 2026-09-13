@@ -29,8 +29,8 @@ emit_target2(string t, int argc, string[] argv) {
 } return void;
 
 // `--target NAME`, scanned rather than read at a fixed position: the driver
-// also passes --triple and --extern-ok, and a flag whose meaning depends on
-// its index is a trap the next flag falls into.
+// also passes --triple and --require-tests, and a flag whose meaning depends
+// on its index is a trap the next flag falls into.
 arg_target(int argc, string[] argv, int i, string t) {
   string s = t;
   if(i + 1 < argc && argv[i] == "--target") {

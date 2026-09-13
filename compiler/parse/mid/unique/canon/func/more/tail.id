@@ -6,6 +6,15 @@ canon_func_body(int id) {
 } return string ret_s;
 
 canon_func_tail(int id, string out) {
+  string ret_s = "";
+  if(is_native(id) == 1) {
+    ret_s = canon_native(id, out);
+  } else {
+    ret_s = canon_logic(id, out);
+  }
+} return string ret_s;
+
+canon_logic(int id, string out) {
   int[] l2_of_v = l2_of(id);
   string val = canon_body(l2_of_v);
   string ret_s = "(" + out + ")->" + s2_of(id) + "{" + val + "}=>" + canon_ret(id);

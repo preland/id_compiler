@@ -1,0 +1,7 @@
+// Opening and closing a file, and why the last call failed. See fs.h.
+
+native fs_open(string path, string mode) return int;
+
+native fs_close(int handle) return int;
+
+native fs_error() return int;

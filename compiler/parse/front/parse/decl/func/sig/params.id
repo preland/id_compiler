@@ -1,19 +1,23 @@
 // Parameter list: ( [type name (, type name)*] )
+//
+// `kind` is the node kind each parameter is built as: "param" for a function
+// with a body, "nparam" for a `native` declaration, whose parameter names are
+// documentation rather than variables (see ../../../top/decl/native/).
 
-parse_params(int[] pos) {
+parse_params(int[] pos, string kind) {
   int[] params = [];
-  scan_params(pos, params);
+  scan_params(pos, params, kind);
 } return int[] params;
 
-scan_params(int[] pos, int[] params) {
+scan_params(int[] pos, int[] params, string kind) {
   advance(pos);
-  fill_params(pos, params);
+  fill_params(pos, params, kind);
   advance(pos);
 } return void;
 
-fill_params(int[] pos, int[] params) {
+fill_params(int[] pos, int[] params, string kind) {
   while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
-    int one_param_v = one_param(pos);
+    int one_param_v = one_param(pos, kind);
     push(params, one_param_v);
     skip_comma(pos);
   }

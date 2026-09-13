@@ -16,7 +16,7 @@ parse_func(int[] pos) {
 } return int ret_i;
 
 func_sig(int[] pos, string name) {
-  int[] params = parse_params(pos);
+  int[] params = parse_params(pos, "param");
   int[] body = parse_block(pos);
   int ret_i = func_ret(pos, name, params, body);
 } return int ret_i;

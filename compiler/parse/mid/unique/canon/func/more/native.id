@@ -1,0 +1,7 @@
+// A `native` declaration has no logic to compare, so its fingerprint is its
+// signature and its name -- the way an `asm` function is identified by name
+// and triple. Two natives with one signature are two functions, not one
+// written twice.
+canon_native(int id, string out) {
+  string ret_s = "(" + out + ")->" + s2_of(id) + " native " + s1_of(id);
+} return string ret_s;

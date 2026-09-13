@@ -1,0 +1,7 @@
+// Combining handles, and loading one onto a GL matrix stack. See gl.h.
+
+native gl_mat_mul(int a, int b) return int;
+
+native gl_set_projection(int handle) return int;
+
+native gl_set_modelview(int handle) return int;

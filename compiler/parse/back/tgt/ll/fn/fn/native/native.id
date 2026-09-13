@@ -1,0 +1,21 @@
+// `native` declarations, as LLVM declarations with their real types. The
+// backend's object file defines them; the module only has to agree with it
+// about the signature, which is the id signature spelled the way every
+// defined function's is.
+
+ll_natives() {
+  int i = 0;
+  while(i < len((import prog))) {
+    if(is_native((import prog)[i]) == 1) {
+      string ndecl = ll_native_decl((import prog)[i]);
+      emit_line(ndecl);
+    }
+    i = i + 1;
+  }
+} return void;
+
+ll_native_decl(int id) {
+  string s2_of_v = s2_of(id);
+  string ty = ll_ty(s2_of_v);
+  string ret_s = ll_native_line(id, ty);
+} return string ret_s;

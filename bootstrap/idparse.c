@@ -450,12 +450,10 @@ void id_push_sym_row(int i);
 void id_emit_checked(int argc, IdList* argv);
 void id_arg_setup(int argc, IdList* argv);
 void id_arg_flags(int argc, IdList* argv);
-void id_arg_flags_tail(int argc, IdList* argv, int arg_xok_v);
 void id_arg_flags2(int argc, IdList* argv);
 void id_arg_flags3(int argc, IdList* argv);
 void id_arg_flags4(int argc, IdList* argv);
 int id_arg_flag(int argc, IdList* argv, int i, char* name);
-int id_arg_xok(int argc, IdList* argv, int i, int ok);
 int id_main(int argc, IdList* argv);
 void id_run(int argc, IdList* argv);
 void id_finish(int argc, IdList* argv);
@@ -977,9 +975,6 @@ char* id_const_line_tail(int d, char* s1_of_v);
 void id_emit_exports(void);
 void id_emit_export_block(void);
 void id_emit_export_lines(void);
-void id_emit_externs(void);
-void id_emit_extern_block(void);
-void id_emit_extern_lines(void);
 void id_emit_fwds(void);
 void id_emit_program(char* triple);
 void id_emit_head(void);
@@ -1057,6 +1052,10 @@ int id_ll_ends(void);
 void id_ll_func(int f);
 void id_ll_func_out(int f, char* ty);
 void id_ll_func_emit(int f, char* ty, char* name, char* plist);
+void id_ll_natives(void);
+char* id_ll_native_decl(int id);
+char* id_ll_native_line(int id, char* ty);
+char* id_ll_native_pars(IdList* ps);
 void id_ll_head(char* triple);
 void id_ll_head_triple(char* triple, char* q);
 void id_ll_body(void);
@@ -1136,12 +1135,12 @@ void id_skip_constraints(IdList* pos);
 void id_parse_program(IdList* pos);
 int id_parse_func(IdList* pos);
 int id_func_sig(IdList* pos, char* name);
-int id_one_param(IdList* pos);
+int id_one_param(IdList* pos, char* kind);
 int id_func_ret(IdList* pos, char* name, IdList* params, IdList* body);
 int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt);
-IdList* id_parse_params(IdList* pos);
-void id_scan_params(IdList* pos, IdList* params);
-void id_fill_params(IdList* pos, IdList* params);
+IdList* id_parse_params(IdList* pos, char* kind);
+void id_scan_params(IdList* pos, IdList* params, char* kind);
+void id_fill_params(IdList* pos, IdList* params, char* kind);
 int id_ret_expr(IdList* pos, char* rt);
 char* id_parse_type(IdList* pos);
 char* id_add_brackets(char* t, IdList* pos);
@@ -1164,6 +1163,12 @@ int id_push_func(IdList* pos);
 void id_init_files2(void);
 int id_push_func_line(IdList* pos);
 int id_push_func_body(IdList* pos);
+int id_parse_fn(IdList* pos);
+int id_parse_native(IdList* pos);
+int id_native_sig(IdList* pos, char* name);
+int id_native_ret(IdList* pos, char* name, IdList* params);
+int id_native_type(IdList* pos, char* name, IdList* params);
+int id_native_node(IdList* pos, char* name, char* rt, IdList* params);
 int id_init_consts(void);
 void id_take_const(IdList* pos);
 void id_reg_const(int d);
@@ -1328,7 +1333,7 @@ int id_node_bin(char* op, int left, int right);
 int id_node_assign(char* name, int expr);
 int id_node_exprstmt(int expr);
 int id_node_decl(char* type, char* name, int expr, int exported);
-int id_node_param(char* type, char* name);
+int id_node_param(char* kind, char* type, char* name);
 int id_node_call(char* name, IdList* args);
 int id_node_if(int cond, IdList* thenl, IdList* elsel, int elif);
 int id_node_while(int cond, IdList* bodyl);
@@ -1339,6 +1344,7 @@ char* id_s1_of(int id);
 char* id_s2_of(int id);
 IdList* id_l1_of(int id);
 IdList* id_l2_of(int id);
+int id_is_native(int id);
 int id_newnode_tail(IdList* l1, IdList* l2);
 int id_newnode(char* k, int a, int b, char* s1, char* s2, IdList* l1, IdList* l2);
 int id_newleaf(char* k, int a, int b, char* s1, char* s2);
@@ -1363,23 +1369,17 @@ char* id_join_bnames(char* s, int i);
 void id_init_bnames(void);
 void id_split_bnames(char* src, int i);
 int id_take_bname(char* src, int i);
-char* id_extern_type(char* t);
 int id_bname_end(char* src, int i);
 void id_push_bname(char* src, int i, int e);
 int id_is_builtin(char* name);
-void id_report_unknown_fn(char* name, char* owner, int ln);
 void id_report_nosuchfn(char* name, char* owner, int ln);
 void id_acc_callee2(int id, char* owner, int ln);
 int id_is_unresolved_call(int id);
 int id_unresolved_fn(char* name);
-void id_note_extern(char* name);
 int id_is_runtime(void);
 void id_nosuchfn_report(char* loc_at_v, char* name, char* builtin_list_v);
-void id_xok_set(int v);
-int id_extern_ok(void);
 void id_fs_set(int v);
 int id_is_freestanding(void);
-void id_init_xtab(void);
 void id_init_rtc(void);
 void id_rt_set(int v);
 void id_exp_else(int id, char* owner);
@@ -1803,8 +1803,10 @@ char* id_bin_pair(int id);
 char* id_canon_func(int id);
 char* id_canon_params(IdList* params);
 char* id_canon_param(int id);
+char* id_canon_native(int id, char* out);
 char* id_canon_func_body(int id);
 char* id_canon_func_tail(int id, char* out);
+char* id_canon_logic(int id, char* out);
 char* id_cn(char* name);
 int id_cn_add(char* name);
 char* id_canon_ret(int id);
@@ -1923,8 +1925,6 @@ IdList* ni1;  /* exported by init_b() */
 IdList* ni2;  /* exported by init_b() */
 IdList* ns1;  /* exported by init_b() */
 IdList* bnames;  /* exported by init_bnames() */
-IdList* xnames;  /* exported by init_xtab() */
-IdList* xokc;  /* exported by init_xtab() */
 IdList* rtc;  /* exported by init_rtc() */
 IdList* fsc;  /* exported by init_rtc() */
 IdList* rfn;  /* exported by init_reach() */
@@ -2080,21 +2080,13 @@ void id_emit_checked(int argc, IdList* argv) {
 
 void id_arg_setup(int argc, IdList* argv) {
     id_register_asm_syms();
-    id_init_xtab();
+    id_init_rtc();
     id_arg_flags(argc, argv);
     return;
 }
 
 void id_arg_flags(int argc, IdList* argv) {
-    int arg_xok_v;
     id_reqtests_init();
-    arg_xok_v = id_arg_xok(argc, argv, 1, 0);
-    id_arg_flags_tail(argc, argv, arg_xok_v);
-    return;
-}
-
-void id_arg_flags_tail(int argc, IdList* argv, int arg_xok_v) {
-    id_xok_set(arg_xok_v);
     id_arg_flags2(argc, argv);
     return;
 }
@@ -2129,17 +2121,6 @@ int id_arg_flag(int argc, IdList* argv, int i, char* name) {
         r = 1;
     } else if ((i < argc)) {
         r = id_arg_flag(argc, argv, (i + 1), name);
-    }
-    return r;
-}
-
-int id_arg_xok(int argc, IdList* argv, int i, int ok) {
-    int r;
-    r = ok;
-    if (((i < argc) && (strcmp((char*)(intptr_t)(id_list_get(argv, i)), "--extern-ok") == 0))) {
-        r = 1;
-    } else if ((i < argc)) {
-        r = id_arg_xok(argc, argv, (i + 1), ok);
     }
     return r;
 }
@@ -3797,7 +3778,9 @@ void id_ir_lower(void) {
     int i;
     i = 0;
     while ((i < id_list_len(prog))) {
-        id_lw_func((int)(id_list_get(prog, i)));
+        if ((id_is_native((int)(id_list_get(prog, i))) == 0)) {
+            id_lw_func((int)(id_list_get(prog, i)));
+        }
         i = (i + 1);
     }
     return;
@@ -5554,7 +5537,7 @@ char* id_print_list(IdList* list) {
 char* id_print_node(int id) {
     char* s;
     s = id_concat(id_concat(id_concat(id_concat("(param ", id_s1_of(id)), " "), id_s2_of(id)), ")");
-    if ((strcmp(id_k_of(id), "param") != 0)) {
+    if (((strcmp(id_k_of(id), "param") != 0) && (strcmp(id_k_of(id), "nparam") != 0))) {
         s = id_print_stmt(id);
     }
     return s;
@@ -6625,8 +6608,10 @@ void id_def_all(void) {
 }
 
 void id_emit_def_nl(int id) {
-    id_emit_def(id);
-    id_emit_line("");
+    if ((id_is_native(id) == 0)) {
+        id_emit_def(id);
+        id_emit_line("");
+    }
     return;
 }
 
@@ -6828,30 +6813,6 @@ void id_emit_export_lines(void) {
     return;
 }
 
-void id_emit_externs(void) {
-    if ((id_list_len(xnames) > 0)) {
-        id_emit_extern_block();
-    }
-    return;
-}
-
-void id_emit_extern_block(void) {
-    id_emit_line("/* functions not defined in any input file (resolved at link time) */");
-    id_emit_extern_lines();
-    id_emit_line("");
-    return;
-}
-
-void id_emit_extern_lines(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(xnames))) {
-        id_emit_line(id_concat(id_concat("extern int id_", (char*)(intptr_t)(id_list_get(xnames, i))), "();"));
-        i = (i + 1);
-    }
-    return;
-}
-
 void id_emit_fwds(void) {
     id_emit_line("/* forward declarations */");
     id_fwd_all();
@@ -6874,7 +6835,6 @@ void id_emit_head(void) {
 }
 
 void id_emit_decls(void) {
-    id_emit_externs();
     id_emit_fwds();
     id_emit_exports();
     return;
@@ -7572,6 +7532,54 @@ void id_ll_func_emit(int f, char* ty, char* name, char* plist) {
     return;
 }
 
+void id_ll_natives(void) {
+    int i;
+    char* ndecl;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        if ((id_is_native((int)(id_list_get(prog, i))) == 1)) {
+            ndecl = id_ll_native_decl((int)(id_list_get(prog, i)));
+            id_emit_line(ndecl);
+        }
+        i = (i + 1);
+    }
+    return;
+}
+
+char* id_ll_native_decl(int id) {
+    char* s2_of_v;
+    char* ty;
+    char* ret_s;
+    s2_of_v = id_s2_of(id);
+    ty = id_ll_ty(s2_of_v);
+    ret_s = id_ll_native_line(id, ty);
+    return ret_s;
+}
+
+char* id_ll_native_line(int id, char* ty) {
+    IdList* l1_of_v;
+    char* plist;
+    char* ret_s;
+    l1_of_v = id_l1_of(id);
+    plist = id_ll_native_pars(l1_of_v);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("declare ", ty), " @id_"), id_s1_of(id)), "("), plist), ")");
+    return ret_s;
+}
+
+char* id_ll_native_pars(IdList* ps) {
+    char* out;
+    int i;
+    char* s1_of_v;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(ps))) {
+        s1_of_v = id_s1_of((int)(id_list_get(ps, i)));
+        out = id_concat(id_concat(out, id_ll_sep(i)), id_ll_ty(s1_of_v));
+        i = (i + 1);
+    }
+    return out;
+}
+
 void id_ll_head(char* triple) {
     char* q;
     id_emit_line("; generated by idc -- the `id` language compiler");
@@ -7611,6 +7619,7 @@ void id_ll_declares(void) {
     if ((id_is_runtime() == 0)) {
         id_ll_decl_block();
     }
+    id_ll_natives();
     return;
 }
 
@@ -8314,19 +8323,19 @@ int id_func_sig(IdList* pos, char* name) {
     IdList* params;
     IdList* body;
     int ret_i;
-    params = id_parse_params(pos);
+    params = id_parse_params(pos, "param");
     body = id_parse_block(pos);
     ret_i = id_func_ret(pos, name, params, body);
     return ret_i;
 }
 
-int id_one_param(IdList* pos) {
+int id_one_param(IdList* pos, char* kind) {
     char* type;
     char* name;
     int ret_i;
     type = id_parse_type(pos);
     name = id_read_name(pos);
-    ret_i = id_node_param(type, name);
+    ret_i = id_node_param(kind, type, name);
     return ret_i;
 }
 
@@ -8348,24 +8357,24 @@ int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt
     return ret_i;
 }
 
-IdList* id_parse_params(IdList* pos) {
+IdList* id_parse_params(IdList* pos, char* kind) {
     IdList* params;
     params = id_list_lit(0);
-    id_scan_params(pos, params);
+    id_scan_params(pos, params, kind);
     return params;
 }
 
-void id_scan_params(IdList* pos, IdList* params) {
+void id_scan_params(IdList* pos, IdList* params, char* kind) {
     id_advance(pos);
-    id_fill_params(pos, params);
+    id_fill_params(pos, params, kind);
     id_advance(pos);
     return;
 }
 
-void id_fill_params(IdList* pos, IdList* params) {
+void id_fill_params(IdList* pos, IdList* params, char* kind) {
     int one_param_v;
     while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
-        one_param_v = id_one_param(pos);
+        one_param_v = id_one_param(pos, kind);
         id_list_push(params, (long long)(one_param_v));
         id_skip_comma(pos);
     }
@@ -8492,7 +8501,7 @@ int id_asm_sig_mid(IdList* pos) {
     IdList* parse_params_v;
     int ret_i;
     id_advance(pos);
-    parse_params_v = id_parse_params(pos);
+    parse_params_v = id_parse_params(pos, "param");
     ret_i = id_asm_sig_tail(pos, parse_params_v);
     return ret_i;
 }
@@ -8564,9 +8573,64 @@ int id_push_func_line(IdList* pos) {
 int id_push_func_body(IdList* pos) {
     int parse_func_v;
     int ret_i;
-    parse_func_v = id_parse_func(pos);
+    parse_func_v = id_parse_fn(pos);
     id_list_push(prog, (long long)(parse_func_v));
     ret_i = id_take_cases(pos);
+    return ret_i;
+}
+
+int id_parse_fn(IdList* pos) {
+    int n;
+    n = 0;
+    if ((strcmp(id_cur_text(pos), "native") == 0)) {
+        n = id_parse_native(pos);
+    } else {
+        n = id_parse_func(pos);
+    }
+    return n;
+}
+
+int id_parse_native(IdList* pos) {
+    char* name;
+    int ret_i;
+    id_advance(pos);
+    name = id_cur_text(pos);
+    ret_i = id_native_sig(pos, name);
+    return ret_i;
+}
+
+int id_native_sig(IdList* pos, char* name) {
+    IdList* params;
+    int ret_i;
+    id_advance(pos);
+    params = id_parse_params(pos, "nparam");
+    ret_i = id_native_ret(pos, name, params);
+    return ret_i;
+}
+
+int id_native_ret(IdList* pos, char* name, IdList* params) {
+    int ret_i;
+    id_expect_text(pos, "return");
+    id_advance(pos);
+    ret_i = id_native_type(pos, name, params);
+    return ret_i;
+}
+
+int id_native_type(IdList* pos, char* name, IdList* params) {
+    char* rt;
+    int ret_i;
+    rt = id_parse_type(pos);
+    id_expect_text(pos, ";");
+    ret_i = id_native_node(pos, name, rt, params);
+    return ret_i;
+}
+
+int id_native_node(IdList* pos, char* name, char* rt, IdList* params) {
+    IdList* none;
+    int ret_i;
+    id_skip_semi(pos);
+    none = id_list_lit(0);
+    ret_i = id_newnode("func", (0 - 1), 1, name, rt, params, none);
     return ret_i;
 }
 
@@ -9978,9 +10042,9 @@ int id_node_decl(char* type, char* name, int expr, int exported) {
     return ret_i;
 }
 
-int id_node_param(char* type, char* name) {
+int id_node_param(char* kind, char* type, char* name) {
     int ret_i;
-    ret_i = id_newleaf("param", 0, 0, type, name);
+    ret_i = id_newleaf(kind, 0, 0, type, name);
     return ret_i;
 }
 
@@ -10046,6 +10110,12 @@ IdList* id_l2_of(int id) {
     IdList* ret_li;
     ret_li = (IdList*)(intptr_t)(id_list_get(nl2, id));
     return ret_li;
+}
+
+int id_is_native(int id) {
+    int ok;
+    ok = (id_i2_of(id) == 1);
+    return ok;
 }
 
 int id_newnode_tail(IdList* l1, IdList* l2) {
@@ -10237,15 +10307,6 @@ int id_take_bname(char* src, int i) {
     return ret_i;
 }
 
-char* id_extern_type(char* t) {
-    char* s;
-    s = t;
-    if (((strcmp(t, "") == 0) && (id_extern_ok() == 1))) {
-        s = "int";
-    }
-    return s;
-}
-
 int id_bname_end(char* src, int i) {
     int len_v;
     int e;
@@ -10270,15 +10331,6 @@ int id_is_builtin(char* name) {
     return ok;
 }
 
-void id_report_unknown_fn(char* name, char* owner, int ln) {
-    if ((id_extern_ok() == 1)) {
-        id_note_extern(name);
-    } else {
-        id_report_nosuchfn(name, owner, ln);
-    }
-    return;
-}
-
 void id_report_nosuchfn(char* name, char* owner, int ln) {
     char* loc_at_v;
     char* builtin_list_v;
@@ -10292,7 +10344,7 @@ void id_acc_callee2(int id, char* owner, int ln) {
     char* s1_of_v;
     if ((id_is_unresolved_call(id) == 1)) {
         s1_of_v = id_s1_of(id);
-        id_report_unknown_fn(s1_of_v, owner, ln);
+        id_report_nosuchfn(s1_of_v, owner, ln);
     }
     return;
 }
@@ -10317,13 +10369,6 @@ int id_unresolved_fn(char* name) {
     return ok;
 }
 
-void id_note_extern(char* name) {
-    if ((id_find_str(xnames, name) < 0)) {
-        id_list_push(xnames, (long long)(intptr_t)(name));
-    }
-    return;
-}
-
 int id_is_runtime(void) {
     int ret_i;
     ret_i = (int)(id_list_get(rtc, 0));
@@ -10336,17 +10381,6 @@ void id_nosuchfn_report(char* loc_at_v, char* name, char* builtin_list_v) {
     return;
 }
 
-void id_xok_set(int v) {
-    id_lset(xokc, 0, v);
-    return;
-}
-
-int id_extern_ok(void) {
-    int ret_i;
-    ret_i = (int)(id_list_get(xokc, 0));
-    return ret_i;
-}
-
 void id_fs_set(int v) {
     id_lset(fsc, 0, v);
     return;
@@ -10356,13 +10390,6 @@ int id_is_freestanding(void) {
     int ret_i;
     ret_i = (int)(id_list_get(fsc, 0));
     return ret_i;
-}
-
-void id_init_xtab(void) {
-    xnames = id_list_lit(0);
-    xokc = id_list_lit(1, (long long)(0));
-    id_init_rtc();
-    return;
 }
 
 void id_init_rtc(void) {
@@ -11042,7 +11069,7 @@ void id_check_cases(void) {
 void id_check_cases_at(int i) {
     int n;
     n = id_count_cases((int)(id_list_get(prog, i)));
-    if ((n < 2)) {
+    if (((n < 2) && (id_is_native((int)(id_list_get(prog, i))) == 0))) {
         id_report_cases(i, n);
     }
     return;
@@ -11949,7 +11976,9 @@ void id_reg_func(int id) {
     char* s1_of_v;
     l1_of_v = id_l1_of(id);
     s1_of_v = id_s1_of(id);
-    id_reg_func_params(id, l1_of_v, s1_of_v);
+    if ((id_is_native(id) == 0)) {
+        id_reg_func_params(id, l1_of_v, s1_of_v);
+    }
     return;
 }
 
@@ -13955,11 +13984,9 @@ char* id_type_of4(int id) {
 
 char* id_type_call(char* name) {
     char* t;
-    char* lookup_func_v;
     t = id_builtin_type(name);
     if ((strcmp(t, "?") == 0)) {
-        lookup_func_v = id_lookup_func(name);
-        t = id_extern_type(lookup_func_v);
+        t = id_lookup_func(name);
     }
     return t;
 }
@@ -14303,6 +14330,12 @@ char* id_canon_param(int id) {
     return ret_s;
 }
 
+char* id_canon_native(int id, char* out) {
+    char* ret_s;
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat("(", out), ")->"), id_s2_of(id)), " native "), id_s1_of(id));
+    return ret_s;
+}
+
 char* id_canon_func_body(int id) {
     IdList* l1_of_v;
     char* out;
@@ -14314,6 +14347,17 @@ char* id_canon_func_body(int id) {
 }
 
 char* id_canon_func_tail(int id, char* out) {
+    char* ret_s;
+    ret_s = "";
+    if ((id_is_native(id) == 1)) {
+        ret_s = id_canon_native(id, out);
+    } else {
+        ret_s = id_canon_logic(id, out);
+    }
+    return ret_s;
+}
+
+char* id_canon_logic(int id, char* out) {
     IdList* l2_of_v;
     char* val;
     char* ret_s;

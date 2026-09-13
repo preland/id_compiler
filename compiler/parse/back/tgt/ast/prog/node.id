@@ -13,7 +13,7 @@ print_list(int[] list) {
 
 print_node(int id) {
   string s = "(param " + s1_of(id) + " " + s2_of(id) + ")";
-  if(k_of(id) != "param") {
+  if(k_of(id) != "param" && k_of(id) != "nparam") {
     s = print_stmt(id);
   }
 } return string s;

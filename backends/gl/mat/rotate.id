@@ -1,0 +1,7 @@
+// Rotation about one axis, in thousandths of a degree. See gl.h.
+
+native gl_mat_rotate_x(int deg_x1000) return int;
+
+native gl_mat_rotate_y(int deg_x1000) return int;
+
+native gl_mat_rotate_z(int deg_x1000) return int;

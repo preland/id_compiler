@@ -1,5 +1,5 @@
 // `--require-tests` anywhere in the arguments. Scanned rather than tested at a
-// fixed position, for the reason arg_xok gives: the driver also passes
+// fixed position, for the reason arg_flag gives: the driver also passes
 // `--triple` and the AST dump takes a bare `ast`, and a flag whose meaning
 // depends on its index is a trap the next flag falls into.
 

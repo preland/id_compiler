@@ -1,0 +1,7 @@
+// Questions asked of a path, and removing one. See fs.h.
+
+native fs_size(string path) return int;
+
+native fs_exists(string path) return int;
+
+native fs_remove(string path) return int;

@@ -1,16 +1,3 @@
-// Recording an unresolved name.
-//
-// Whether a name resolves is a property of the program, so it is answered
-// here. What the collected names turn into is C, so that lives in
-// back/emit/prog/head/decl/externs.id.
-
-// First encounter wins: a name called from five places is declared once.
-note_extern(string name) {
-  if(find_str((import xnames), name) < 0) {
-    push((import xnames), name);
-  }
-} return void;
-
 // Whether this project is the runtime. Read by the reserved-name check and by
 // the LLVM module header, which must not declare a symbol the module defines.
 is_runtime() {

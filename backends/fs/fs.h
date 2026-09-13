@@ -1,9 +1,10 @@
 /* fs.h -- the C target's realisation of the `fs` backend ABI.
  *
- * The ABI itself lives in backend.json, written in `id`'s types, because it is
- * the part that is not about C: an interpreter or an LLVM target has to
- * provide the same eight functions with the same meanings, and reads them from
- * there. This header is one target's answer to that declaration -- the C
+ * The ABI itself lives in this directory's `native` declarations (handle.id,
+ * data.id, path/), written in `id`'s types, because it is the part that is not
+ * about C: an interpreter or an LLVM target has to provide the same functions
+ * with the same meanings, and reads them from there. The compiler checks every
+ * call against them. This header is one target's answer to that declaration -- the C
  * prototypes the object file exports -- and nothing above it (no `.id` file,
  * no compiler source) knows it exists.
  *
@@ -14,12 +15,12 @@
  * I/O" would have meant writing C into an `id` source file. As a backend the
  * implementation is C source in a C file, linked by whoever links.
  *
- * ABI notes (dictated by how idc links unknown functions -- see the README's
- * "Functions link across files"):
- *   - Every entry point is declared `extern int id_<name>()` by idc and called
- *     as `id_<name>(args)`. So each function is named with the `id_` prefix and
- *     returns `int`. A size or a count therefore tops out at INT_MAX, which is
- *     also true of every other length in `id` (`len` returns `int`).
+ * ABI notes:
+ *   - Every entry point is a `native` declaration, which idc emits as the
+ *     prototype `<ctype> id_<name>(<params>)` and calls as `id_<name>(args)`.
+ *     So each function is named with the `id_` prefix; each returns `int`, so a
+ *     size or a count tops out at INT_MAX, which is also true of every other
+ *     length in `id` (`len` returns `int`).
  *   - Argument lowering mirrors idc's: `id` int -> C int, `id` string -> char*,
  *     `id` int[] -> IdList*.
  *

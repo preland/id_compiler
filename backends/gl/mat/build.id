@@ -1,0 +1,7 @@
+// Matrix builders; each returns a handle into the native pool. See gl.h.
+
+native gl_mat_identity() return int;
+
+native gl_mat_perspective(int fov_deg_x1000, int aspect_x1000, int near_x1000, int far_x1000) return int;
+
+native gl_mat_translate(int x_x1000, int y_x1000, int z_x1000) return int;

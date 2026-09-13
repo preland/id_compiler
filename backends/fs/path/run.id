@@ -1,0 +1,4 @@
+// Running a command through a shell: its exit status, or -1. Defined in
+// fs_posix.c; see README.md.
+
+native fs_run(string cmd) return int;
