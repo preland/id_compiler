@@ -1292,7 +1292,7 @@ int id_parse_case_rhs(IdList* pos, IdList* args);
 int id_case_tail(IdList* pos, IdList* args, IdList* expd);
 int id_take_cases(IdList* pos);
 void id_push_case(IdList* pos);
-void id_case_owner(void);
+void id_case_owner(int node);
 IdList* id_case_tuple(IdList* pos);
 void id_scan_tuple(IdList* pos, IdList* items);
 void id_fill_tuple(IdList* pos, IdList* items);
@@ -9998,14 +9998,15 @@ void id_push_case(IdList* pos) {
     int node;
     node = id_parse_case(pos);
     id_list_push(casenode, (long long)(node));
-    id_case_owner();
+    id_case_owner(node);
     return;
 }
 
-void id_case_owner(void) {
+void id_case_owner(int node) {
     int len_v;
     len_v = id_list_len(prog);
     id_list_push(casefn, (long long)((int)(id_list_get(prog, (len_v - 1)))));
+    id_sset(ns1, node, (char*)(intptr_t)(id_list_get(pfile, (len_v - 1))));
     return;
 }
 
@@ -13404,11 +13405,9 @@ void id_case_err(int i, char* msg) {
 
 char* id_case_loc(int i) {
     char* s1_of_v;
-    char* func_file_v;
     char* ret_s;
-    s1_of_v = id_s1_of((int)(id_list_get(casefn, i)));
-    func_file_v = id_func_file(s1_of_v);
-    ret_s = id_concat(id_concat(func_file_v, ":"), id_str_of_int((int)(id_list_get(tline, (int)(id_list_get(casestart, i))))));
+    s1_of_v = id_s1_of((int)(id_list_get(casenode, i)));
+    ret_s = id_concat(id_concat(s1_of_v, ":"), id_str_of_int((int)(id_list_get(tline, (int)(id_list_get(casestart, i))))));
     return ret_s;
 }
 

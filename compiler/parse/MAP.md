@@ -120,7 +120,7 @@ a new construct only once this compiler uses that construct on itself.
 | `case_tail` | `compiler/parse/front/parse/decl/func/cases/case/tuple.id` | One case: `given SETUP (args) : (expected) then CHECK:(value) [constraints]`, |
 | `take_cases` | `compiler/parse/front/parse/decl/func/cases/cases.id` | Returns 0 so it can be called from push_func's return clause, which is the |
 | `push_case` | `compiler/parse/front/parse/decl/func/cases/cases.id` | A case is a "case" node -- its arguments in nl1, its expected values in nl2 |
-| `case_owner` | `compiler/parse/front/parse/decl/func/cases/cases.id` | Test cases, the lines that follow a function's return clause: |
+| `case_owner` | `compiler/parse/front/parse/decl/func/cases/cases.id` | The case's file is written into its node now, while `pfile` still lines up |
 | `case_tuple` | `compiler/parse/front/parse/decl/func/cases/more/fill.id` | A parenthesised tuple of case literals. |
 | `scan_tuple` | `compiler/parse/front/parse/decl/func/cases/more/fill.id` | A parenthesised tuple of case literals. |
 | `fill_tuple` | `compiler/parse/front/parse/decl/func/cases/more/fill.id` | A parenthesised tuple of case literals. |
@@ -514,8 +514,8 @@ a new construct only once this compiler uses that construct on itself.
 | `fit_ret` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/expd.id` | The expected side of a case. |
 | `items_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | Literals joined the way a case writes them: `1, [2, 3], "x"`. |
 | `leaf_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | A leaf as written: its own text, or `(import NAME)` for an export a case |
-| `case_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file of the function it is written under, and the line |
-| `case_loc` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file of the function it is written under, and the line |
+| `case_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file it is written in, recorded on its node when it was |
+| `case_loc` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file it is written in, recorded on its node when it was |
 | `lit_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
 | `neg_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
 | `arr_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
