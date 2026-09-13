@@ -1,0 +1,9 @@
+// EXPECT: argument 'path' of 'fs_open' expects string, got int
+// EXPECT-IDCPY: expected '(', found 'fs_open'
+// An argument of the wrong type to a `native` function draws the same
+// diagnostic as one to an `id` function (see bad_arg_type.id).
+native fs_open(string path, string mode) return int;
+
+main() {
+  int h = fs_open(1, "r");
+} return int h;

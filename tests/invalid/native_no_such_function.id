@@ -1,0 +1,10 @@
+// EXPECT: no such function 'fs_opne'
+// EXPECT-IDCPY: expected '(', found 'fs_open'
+// A typo'd call to a backend function. The backend's functions are `native`
+// declarations in its own source, so a name none of them owns is the same
+// error as a typo'd call to any function -- not a symbol left to the linker.
+native fs_open(string path, string mode) return int;
+
+main() {
+  int h = fs_opne("x", "r");
+} return int h;

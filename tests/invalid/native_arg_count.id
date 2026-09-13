@@ -1,0 +1,10 @@
+// EXPECT: function 'fs_open' takes 2 argument(s), got 3
+// EXPECT-IDCPY: expected '(', found 'fs_open'
+// A call to a `native` function is checked against its declaration exactly as
+// a call to an `id` function is (see bad_arg_count.id). This one used to
+// compile with a backend attached and dump core when run.
+native fs_open(string path, string mode) return int;
+
+main() {
+  int h = fs_open(1, 2, 3);
+} return int h;
