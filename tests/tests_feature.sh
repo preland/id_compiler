@@ -1008,6 +1008,46 @@ self_refuse "bin/idc: a --freestanding build with cases is refused" \
 self_refuse "bin/idc: a build for another platform with cases is refused" \
     "but it is for 'aarch64-unknown-linux-gnu'" --triple aarch64-unknown-linux-gnu --emit-c /dev/null
 
+# --- duplicate function name should not cascade "declared twice" errors --------
+cat > "$TMP/p.id" <<'EOF'
+f(int a) {
+  int r = a + 1;
+} return int r;
+
+f(int a) {
+  int r = a * 3;
+} return int r;
+
+main(int argc, string[] argv) {
+  int y = f(argc);
+} return int y;
+EOF
+if ../bin/idc "$TMP/p.id" >"$TMP/log" 2>&1; then
+    bad "bin/idc: duplicate function should be rejected"
+else
+    if grep -qF "function 'f' already defined" "$TMP/log"; then
+        if grep -qF "variable 'a' is declared twice in function 'f'" "$TMP/log"; then
+            bad "bin/idc: duplicate function should not cascade 'declared twice' error (got variable cascade)"
+        elif grep -qF "variable 'r' is declared twice in function 'f'" "$TMP/log"; then
+            bad "bin/idc: duplicate function should not cascade 'declared twice' error (got variable cascade)"
+        else
+            ok "bin/idc: duplicate function does not cascade 'declared twice' errors"
+        fi
+    else
+        bad "bin/idc: duplicate function should report 'already defined' ($(head -1 "$TMP/log"))"
+    fi
+fi
+
+# --- genuine redeclaration inside a single function should still report "declared twice" --
+cat > "$TMP/p.id" <<'EOF'
+f(int a) {
+  int x = 1;
+  int x = 2;
+} return int x;
+EOF
+self_refuse "bin/idc: genuine variable redeclaration reports 'declared twice'" \
+    "p.id:3: error: variable 'x' is declared twice in function 'f'" --emit-c /dev/null
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

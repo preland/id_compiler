@@ -1,0 +1,20 @@
+// Count how many functions in the program have a given name.
+// Used to suppress "declared twice" errors when the containing function
+// is actually a duplicate function name, since the root cause is the
+// duplicate function definition which is already reported.
+
+fn_count(string fname) {
+  int i = 0;
+  int n = 0;
+  while(i < len((import prog))) {
+    n = fn_count_at(i, fname, n);
+    i = i + 1;
+  }
+} return int n;
+
+fn_count_at(int i, string fname, int n) {
+  int r = n;
+  if(s1_of((import prog)[i]) == fname) {
+    r = n + 1;
+  }
+} return int r;

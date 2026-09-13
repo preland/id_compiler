@@ -13,7 +13,8 @@ reg_report(string name, string type, string owner, int exported, int ln, int uni
 } return void;
 
 reg_report2(string name, string type, string owner, int exported, int ln, int unit) {
-  if(declared_in(name, owner) > 0) {
+  int owner_count = fn_count(owner);
+  if(declared_in(name, owner) > 0 && owner_count < 2) {
     report_var_twice(name, owner, ln);
   } else {
     reg_report3(name, type, owner, exported, ln, unit);
