@@ -293,6 +293,108 @@ else
     echo "SKIP: conf.id constants on --target llvm (needs clang on PATH)"
 fi
 
+# (b3) a subdirectory imported on its own reads the constants of its enclosing
+#      root -- the nearest directory above it that has a conf.id -- so a
+#      constant keeps one home however little of its tree a project imports.
+#      idem's unit tests import single engine directories to need no window,
+#      and the engine's constants are declared once, in engine/conf.id. Only
+#      the constants come along: the root's own imports do not, because a
+#      subdirectory is imported precisely to leave the rest of its tree out.
+#      bin/idc only, as (b2).
+sub="$TMP/subconst"
+mkdir -p "$sub/lib/one" "$sub/lib/two" "$sub/extra" "$sub/app"
+cat > "$sub/lib/conf.id" <<'EOF'
+import "../extra"
+int lib_k = 7;
+EOF
+cat > "$sub/lib/one/one.id" <<'EOF'
+lib_one(int a) {
+  int r = a + (import lib_k);
+} return int r;
+EOF
+cat > "$sub/lib/two/two.id" <<'EOF'
+lib_two(int a) {
+  int r = a * (import lib_k);
+} return int r;
+EOF
+cat > "$sub/extra/extra.id" <<'EOF'
+extra_f(int a) {
+  int r = a - 1;
+} return int r;
+EOF
+
+# sub_app IMPORTS BODY -- make app/ a project whose conf.id is IMPORTS and
+# whose main is BODY, then build it into $TMP/sub.bin with its stderr in
+# $TMP/sub.err.
+sub_app() {
+    printf '%s\n' "$1" > "$sub/app/conf.id"
+    printf 'main(int argc, string[] argv) {\n%s\n} return int 0;\n' "$2" > "$sub/app/main.id"
+    rm -f "$TMP/sub.bin"
+    $BIN_IDC "$sub/app" -o "$TMP/sub.bin" >/dev/null 2>"$TMP/sub.err"
+}
+
+if sub_app 'import "../lib/one"' '  int x = lib_one(1);
+  print(x);' && [ "$("$TMP/sub.bin")" = 8 ]; then
+    ok "conf.id: a subdirectory imported on its own reads its root's constant"
+else
+    bad "conf.id: a subdirectory imported on its own reads its root's constant ($(head -1 "$TMP/sub.err"))"
+fi
+
+if ! sub_app 'import "../lib/one"' '  int x = extra_f(1);
+  print(x);' && grep -q "no such function 'extra_f'" "$TMP/sub.err"; then
+    ok "conf.id: a subdirectory imported on its own does not inherit its root's imports"
+else
+    bad "conf.id: a subdirectory imported on its own does not inherit its root's imports ($(head -1 "$TMP/sub.err"))"
+fi
+
+if sub_app 'import "../lib"' '  int x = lib_one(1);
+  int y = extra_f(x);
+  print(y);' && [ "$("$TMP/sub.bin")" = 7 ]; then
+    ok "conf.id: importing the whole root still reads its constants and imports"
+else
+    bad "conf.id: importing the whole root still reads its constants and imports ($(head -1 "$TMP/sub.err"))"
+fi
+
+if sub_app 'import "../lib/one"
+import "../lib/two"' '  int x = lib_one(1);
+  int y = lib_two(x);
+  print(y);' && [ "$("$TMP/sub.bin")" = 56 ]; then
+    ok "conf.id: two subdirectories of one root share its constant once"
+else
+    bad "conf.id: two subdirectories of one root share its constant once ($(head -1 "$TMP/sub.err"))"
+fi
+
+if sub_app 'import "../lib/two"
+import "../lib"' '  int x = lib_two(2);
+  print(x);' && [ "$("$TMP/sub.bin")" = 14 ]; then
+    ok "conf.id: a subdirectory and its whole root share its constant once"
+else
+    bad "conf.id: a subdirectory and its whole root share its constant once ($(head -1 "$TMP/sub.err"))"
+fi
+
+# A constant has one home, so the same name declared by the project and by a
+# root it reaches is an error that names both declarations. The compiler alone
+# could only say "already an exported global (exported by 'conf.id')" about
+# line 1 of no file: a constant reaches it with no file marker.
+if ! sub_app 'import "../lib/one"
+int lib_k = 1;' '  int x = lib_one(1);
+  print(x);' \
+   && grep -q "app/conf.id:2: error: constant 'lib_k' is already declared at .*lib/conf.id:2" "$TMP/sub.err"; then
+    ok "conf.id: a constant declared by the project and by an imported root is reported at both"
+else
+    bad "conf.id: a constant declared by the project and by an imported root is reported at both ($(head -1 "$TMP/sub.err"))"
+fi
+
+mkdir -p "$sub/lib/one/in"
+printf 'int lib_in = 1;\n' > "$sub/lib/one/in/conf.id"
+if ! sub_app 'import "../lib/one"' '  int x = lib_one(1);
+  print(x);' \
+   && grep -q "lib/one/in/conf.id:1: error: 'conf.id' is the dependency manifest" "$TMP/sub.err"; then
+    ok "conf.id: a nested conf.id under an imported subdirectory is still rejected"
+else
+    bad "conf.id: a nested conf.id under an imported subdirectory is still rejected ($(head -1 "$TMP/sub.err"))"
+fi
+
 # (c) --triple reaches idparse, which is what selects among asm overloads.
 cat > "$TMP/asm.id" <<'EOF'
 main(int argc, string[] argv) {

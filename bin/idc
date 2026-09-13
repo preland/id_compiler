@@ -560,16 +560,68 @@ seen_dep() { # seen_dep RESOLVED -- true if already visited
     return 1
 }
 
-# read_manifest DIR -- process DIR/conf.id, appending source dirs to the
-# queue and backends to MANIFEST_BACKENDS.
+# A constant has one home: the conf.id of the root that declares it. A root can
+# be reached more than once -- imported whole, and through one or more of its
+# subdirectories -- so CONST_ROOTS holds each resolved directory whose
+# constants are already in CONSTS, and CONST_AT holds `name|manifest:line` for
+# each constant taken, so a second declaration of a name is reported at both.
+CONST_ROOTS=()
+CONST_AT=()
+
+# seen_const_root RESOLVED -- true if its constants are already taken.
+seen_const_root() {
+    local d
+    for d in ${CONST_ROOTS+"${CONST_ROOTS[@]}"}; do
+        [ "$d" = "$1" ] && return 0
+    done
+    return 1
+}
+
+# const_declared_at NAME -- print where NAME was already declared, if it was.
+const_declared_at() {
+    local e
+    for e in ${CONST_AT+"${CONST_AT[@]}"}; do
+        [ "${e%%|*}" = "$1" ] && { printf '%s' "${e#*|}"; return 0; }
+    done
+    return 1
+}
+
+# enclosing_root DIR -- the nearest directory strictly above DIR that has a
+# conf.id, printed; nothing and false if there is none up to `/`.
+#
+# This is what "the project a subdirectory belongs to" means, decided from the
+# file tree alone: a conf.id is the only thing that marks a root. A root with no
+# conf.id declares no constants, so walking past it loses nothing a nearer
+# answer would have given. DIR is already resolved (pwd -P), so `..` and
+# symlinks cannot make one directory have two enclosing roots.
+enclosing_root() {
+    local d="$1"
+    while [ "$d" != / ]; do
+        d="$(dirname "$d")"
+        [ -f "$d/conf.id" ] && { printf '%s' "$d"; return 0; }
+    done
+    return 1
+}
+
+# read_manifest DIR [consts] -- process DIR/conf.id, appending source dirs to
+# the queue and backends to MANIFEST_BACKENDS. With `consts`, only its
+# constants are taken: that is how a subdirectory imported on its own reads
+# its enclosing root, whose imports it was imported to leave out.
 read_manifest() {
     # Separate statements, not one `local a=… b="$a/…"`: the whole `local`
     # command word-expands before it runs, so the second assignment would read
     # an unset `root` -- which under `set -u` is a hard error, not an empty
     # string.
-    local root="$1" lineno=0 line trimmed dep deppath manifest seen_const=0
+    local root="$1" mode="${2:-}" lineno=0 line trimmed dep deppath manifest seen_const=0
+    local root_key taken=0 name at up
     manifest="$root/conf.id"
     [ -f "$manifest" ] || return 0
+    root_key="$(cd "$root" && pwd -P)"
+    if seen_const_root "$root_key"; then
+        taken=1
+    else
+        CONST_ROOTS+=("$root_key")
+    fi
     while IFS= read -r line || [ -n "$line" ]; do
         lineno=$((lineno + 1))
         trimmed="${line#"${line%%[![:space:]]*}"}"
@@ -581,10 +633,18 @@ read_manifest() {
         # what checks and emits them and `id` cannot read a file.
         if printf '%s' "$trimmed" | grep -qE '^(int|word|float|string)(\[\])?[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=.*;$'; then
             seen_const=1
+            [ "$taken" -eq 1 ] && continue
+            name=$(printf '%s' "$trimmed" | sed -E 's/^[a-z]+(\[\])?[[:space:]]+([A-Za-z_][A-Za-z0-9_]*).*/\2/')
+            if at=$(const_declared_at "$name"); then
+                echo "$manifest:$lineno: error: constant '$name' is already declared at $at; a constant has one home -- rename one of them" >&2
+                STRUCT_VIOLATIONS=1
+                continue
+            fi
+            CONST_AT+=("$name|$manifest:$lineno")
             CONSTS+=("$trimmed")
             continue
         fi
-        if [ "$seen_const" -eq 1 ]; then
+        if [ "$seen_const" -eq 1 ] && [ "$taken" -eq 0 ]; then
             # Ordering only, not content: the import below is perfectly
             # resolvable, so recording this and still resolving it costs
             # nothing -- unlike a missing directory or a malformed line, where
@@ -601,6 +661,7 @@ read_manifest() {
             echo "idc: constant a line:  int name = value;" >&2
             exit 2
         fi
+        [ "$mode" = consts ] && continue
         # An absolute dependency path is used as it stands. It used to be
         # pasted onto the project root unconditionally, which turned every
         # absolute import into a path that does not exist -- reported, wrongly,
@@ -626,6 +687,9 @@ read_manifest() {
         check_nested_manifest "$deppath"
         collect_ids "$deppath"
         DEP_QUEUE+=("$deppath")
+        if [ ! -f "$deppath/conf.id" ] && up=$(enclosing_root "$deppath"); then
+            read_manifest "$up" consts
+        fi
     done < "$manifest"
 }
 
