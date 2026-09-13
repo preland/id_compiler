@@ -1,0 +1,31 @@
+// A case takes literals only: a number, a string, a negated number, or a list
+// of those. Anything else -- a variable, a call, arithmetic -- is rejected here
+// rather than when the harness is emitted, where the diagnostic would be about
+// a name that is not in scope. idc.py's wording, word for word.
+
+check_lit(int e) {
+  if(is_lit(e) == 0) {
+    string cur_file_v = cur_file();
+    int ln = (import nline)[e];
+    syn_err_tail(cur_file_v, ln, "a test case takes literals only (a number, a string, or a list of those)");
+  }
+} return void;
+
+is_lit(int e) {
+  int r = leaf_lit(e);
+  if(k_of(e) == "arr") {
+    int[] xs = l1_of(e);
+    r = all_lit(xs);
+  } else if(k_of(e) == "un") {
+    r = neg_lit(e);
+  }
+} return int r;
+
+all_lit(int[] xs) {
+  int r = 1;
+  int i = 0;
+  while(i < len(xs)) {
+    r = r * is_lit(xs[i]);
+    i = i + 1;
+  }
+} return int r;

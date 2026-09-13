@@ -1,0 +1,31 @@
+// The expected side of a case.
+
+fit_expd(int i, int fn, int node) {
+  int[] expd = l2_of(node);
+  if(s2_of(fn) == "void") {
+    fit_void(i, fn, expd);
+  } else {
+    fit_ret(i, fn, expd);
+  }
+} return void;
+
+// A void function is judged by what it left in its arguments, positionally. It
+// may stop early: only the arguments the case names are checked.
+fit_void(int i, int fn, int[] expd) {
+  if(len(expd) > flat_arg_count(fn)) {
+    int ne = len(expd);
+    case_void_err(i, fn, ne);
+  } else {
+    fit_items(i, fn, expd);
+  }
+} return void;
+
+fit_ret(int i, int fn, int[] expd) {
+  if(len(expd) != 1) {
+    int ne = len(expd);
+    case_ret_err(i, fn, ne);
+  } else {
+    string rt = s2_of(fn);
+    fit_value(i, expd[0], rt);
+  }
+} return void;

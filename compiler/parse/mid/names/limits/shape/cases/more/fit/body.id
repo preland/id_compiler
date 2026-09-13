@@ -1,0 +1,23 @@
+// The arguments against the parameters, then the expected side against what
+// the case compares: the return value, or for a void function the arguments as
+// the call leaves them.
+
+fit_body(int i, int fn, int node) {
+  int[] args = l1_of(node);
+  fit_items(i, fn, args);
+  fit_expd(i, fn, node);
+} return void;
+
+fit_items(int i, int fn, int[] items) {
+  int j = 0;
+  while(j < len(items)) {
+    fit_item(i, fn, items, j);
+    j = j + 1;
+  }
+} return void;
+
+fit_item(int i, int fn, int[] items, int j) {
+  int[] ps = l1_of(fn);
+  string pt = s1_of(ps[j]);
+  fit_value(i, items[j], pt);
+} return void;

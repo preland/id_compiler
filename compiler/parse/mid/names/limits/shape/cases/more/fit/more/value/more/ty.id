@@ -1,0 +1,20 @@
+// The type a case literal has on its own, for comparing against a scalar
+// parameter or return type. An integer literal's is lit_type's
+// (mid/types/type_of/call/lit.id): `word` when it does not fit an int.
+
+case_lit_type(int e) {
+  string lt = leaf_type(e);
+  if(k_of(e) == "un") {
+    int i1_of_v = i1_of(e);
+    lt = leaf_type(i1_of_v);
+  }
+} return string lt;
+
+leaf_type(int e) {
+  string lt = "string";
+  if(k_of(e) == "int") {
+    lt = lit_type(e);
+  } else if(k_of(e) == "float") {
+    lt = "float";
+  }
+} return string lt;

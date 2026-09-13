@@ -5,17 +5,15 @@
 //   (0, 0):(0)[time:O(1)]
 //
 // See ../../../../../../../docs/TESTS.md. They are part of the declaration,
-// not source: nothing here reaches the emitted C, which is why a program
-// carrying cases compiles to exactly the same output with or without them.
+// not source: nothing here reaches the program's emitted C, which is why a
+// program carrying cases compiles to exactly the same output with or without
+// them. They reach the test harness instead (back/tgt/c/emit/prog/test/),
+// which bin/idc builds and runs before the program on every build.
 //
 // There is no ambiguity with the next declaration -- a function starts
 // `ident (`, a case starts `(` -- so this is a plain "while the next token is
 // an open paren" loop, run after the function has been pushed so each case
 // can record which function it belongs to.
-//
-// This parses and counts; it does not yet run them. idc.py runs them
-// (--tests), and until that half is here too, `bin/idc` accepts the syntax
-// and ignores it rather than rejecting a program the other compiler builds.
 
 // Returns 0 so it can be called from push_func's return clause, which is the
 // only free slot there under the action limit. The function each case belongs
@@ -26,16 +24,16 @@ take_cases(int[] pos) {
   }
 } return int 0;
 
-// A case is recorded as the half-open token range it occupies, so that two
-// cases can be compared without rebuilding their text.
+// A case is a "case" node -- its arguments in nl1, its expected values in nl2
+// -- and it is also recorded as the half-open token range it occupies, so that
+// two cases can be compared without rebuilding their text.
 push_case(int[] pos) {
-  push((import casestart), pos[0]);
-  skip_case(pos);
-  end_case(pos);
+  int node = parse_case(pos);
+  push((import casenode), node);
+  case_owner();
 } return void;
 
-end_case(int[] pos) {
-  push((import caseend), pos[0]);
+case_owner() {
   int len_v = len((import prog));
   push((import casefn), (import prog)[len_v - 1]);
 } return void;

@@ -1,0 +1,19 @@
+// The three messages about a case's shape.
+
+case_arity_err(int i, int fn, int na) {
+  string f1 = s1_of(fn);
+  int np = flat_arg_count(fn);
+  case_err(i, "this case passes " + na + " argument(s) to '" + f1 + "', which takes " + np);
+} return void;
+
+case_void_err(int i, int fn, int ne) {
+  string f1 = s1_of(fn);
+  int np = flat_arg_count(fn);
+  case_err(i, "this case expects " + ne + " argument(s) after the call, but '" + f1 + "' takes " + np);
+} return void;
+
+case_ret_err(int i, int fn, int ne) {
+  string f1 = s1_of(fn);
+  string rt = s2_of(fn);
+  case_err(i, "'" + f1 + "' returns " + rt + ", so its case expects exactly one value, not " + ne);
+} return void;

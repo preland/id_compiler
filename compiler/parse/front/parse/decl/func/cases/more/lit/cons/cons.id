@@ -1,0 +1,28 @@
+// The constraint list: `[time:O(n), mem:O(1)]`, optional.
+//
+// Each claim is recorded in three parallel lists -- the case it is written on,
+// its kind and its bound -- because a claim is checked against the OTHER cases
+// of the same function that carry it, and that grouping is a scan of these.
+
+case_cons(int[] pos) {
+  if(cur_text(pos) == "[") {
+    advance(pos);
+    cons_list(pos);
+    advance(pos);
+  }
+} return void;
+
+cons_list(int[] pos) {
+  cons_one(pos);
+  while(cur_text(pos) == ",") {
+    advance(pos);
+    cons_one(pos);
+  }
+  expect_text(pos, "]");
+} return void;
+
+cons_one(int[] pos) {
+  string ck = cur_text(pos);
+  cons_kind(pos, ck);
+  cons_rest(pos, ck);
+} return void;

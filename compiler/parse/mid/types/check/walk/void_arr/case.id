@@ -1,0 +1,33 @@
+// A test case's literals are in the node store, and are not expressions of the
+// program. They are built at the type the signature declares -- which a list
+// literal on its own does not know, so `[]` and `[1000000000000, 2]` would be
+// judged here as an empty list with no context and a list of mixed types. The
+// case checks judge them instead, against the signature
+// (mid/names/limits/shape/cases/more/fit/).
+//
+// A case's nodes are created after the node of the function it is written
+// under and before its own "case" node, so a node lies strictly between the
+// two exactly when it belongs to a case. Only list literals are asked: they
+// are the one kind the checks here could misjudge, and they are rare.
+
+tc_node_at(int id) {
+  if(k_of(id) != "arr" || in_case(id) == 0) {
+    tc_node(id);
+  }
+} return void;
+
+in_case(int id) {
+  int i = 0;
+  int ok = 0;
+  while(i < len((import casenode))) {
+    ok = in_case_at(i, id, ok);
+    i = i + 1;
+  }
+} return int ok;
+
+in_case_at(int i, int id, int ok) {
+  int r = ok;
+  if((import casefn)[i] < id && id < (import casenode)[i]) {
+    r = 1;
+  }
+} return int r;

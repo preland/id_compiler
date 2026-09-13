@@ -1,0 +1,27 @@
+// A parenthesised tuple of case literals.
+//
+// The opening parenthesis is required before anything is consumed: without
+// it the element loop would run on to the next `)` in the file, and one
+// missing character would be reported as a cascade of errors in the function
+// after it.
+
+case_tuple(int[] pos) {
+  int[] items = [];
+  scan_tuple(pos, items);
+} return int[] items;
+
+scan_tuple(int[] pos, int[] items) {
+  expect_text(pos, "(");
+  if(cur_text(pos) == "(") {
+    advance(pos);
+    fill_tuple(pos, items);
+  }
+} return void;
+
+fill_tuple(int[] pos, int[] items) {
+  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+    take_item(pos, items);
+    skip_comma(pos);
+  }
+  eat_close(pos);
+} return void;

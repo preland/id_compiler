@@ -1,0 +1,26 @@
+// A bound, `O(n log n)`, read back as the text it spells.
+//
+// The words inside the parentheses are separate tokens, so the text is
+// rebuilt from them: joined by single spaces, with none around `^`. That is
+// idc.py's canonical form, and the form the list of accepted bounds is
+// written in.
+
+big_o(int[] pos) {
+  string bt = cur_text(pos);
+  advance(pos);
+  string ret_s = bound_body(pos, bt);
+} return string ret_s;
+
+bound_body(int[] pos, string bt) {
+  string so = bt;
+  expect_text(pos, "(");
+  if(cur_text(pos) == "(") {
+    so = bound_inner(pos, bt);
+  }
+} return string so;
+
+bound_inner(int[] pos, string bt) {
+  advance(pos);
+  string parts = bound_parts(pos);
+  string ret_s = bound_close(pos, bt, parts);
+} return string ret_s;

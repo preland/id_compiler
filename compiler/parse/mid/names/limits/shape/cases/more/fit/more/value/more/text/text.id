@@ -1,0 +1,21 @@
+// A case literal written back out the way it was written: for diagnostics, and
+// for the harness's failure messages, which quote the case.
+
+lit_text(int e) {
+  string lt = s1_of(e);
+  if(k_of(e) == "arr") {
+    lt = arr_text(e);
+  } else if(k_of(e) == "un") {
+    lt = neg_text(e);
+  }
+} return string lt;
+
+neg_text(int e) {
+  int i1_of_v = i1_of(e);
+  string lt = "-" + s1_of(i1_of_v);
+} return string lt;
+
+arr_text(int e) {
+  int[] xs = l1_of(e);
+  string lt = "[" + items_text(xs) + "]";
+} return string lt;

@@ -1,0 +1,9 @@
+// Literals joined the way a case writes them: `1, [2, 3], "x"`.
+items_text(int[] xs) {
+  string lt = "";
+  int j = 0;
+  while(j < len(xs)) {
+    lt = lt + sep_arg(j) + lit_text(xs[j]);
+    j = j + 1;
+  }
+} return string lt;
