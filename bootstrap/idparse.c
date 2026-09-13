@@ -1744,6 +1744,7 @@ void id_ty_row(char* tn, char* tk, int tw, int ts);
 char* id_tb2(int id);
 int id_is_arith(char* s);
 char* id_arith_result(char* lt, char* rt);
+char* id_type_of_miss(int id);
 char* id_tb2_arith(int id);
 char* id_tb2_arith2(int a, int b);
 char* id_type_arr(int id);
@@ -1768,6 +1769,9 @@ char* id_type_of6(int id);
 char* id_type_index(int id);
 int id_is_nameref(int id);
 char* id_type_of_float(int id);
+void id_init_tcache(void);
+int id_tcache_has(int id);
+void id_tcache_set(int id, char* t);
 char* id_type_of7(int id);
 char* id_type_un(int id);
 char* id_type_of(int id);
@@ -1927,6 +1931,8 @@ IdList* tyname;  /* exported by init_ty_cols() */
 IdList* tykind;  /* exported by init_ty_cols() */
 IdList* tywidth;  /* exported by init_ty_cols() */
 IdList* tysigned;  /* exported by init_ty_rows() */
+IdList* tcache;  /* exported by init_tcache() */
+IdList* tcache_ok;  /* exported by init_tcache() */
 IdList* cself;  /* exported by uq_begin() */
 IdList* cnames;  /* exported by uq_begin() */
 IdList* cfp;  /* exported by uq_fill() */
@@ -5870,9 +5876,11 @@ char* id_div_sfx(char* op) {
 
 char* id_emit_op3(int id) {
     char* s;
-    s = id_emit_infix(id);
+    s = "";
     if ((strcmp(id_helper_op(id), "") != 0)) {
         s = id_emit_helper(id);
+    } else {
+        s = id_emit_infix(id);
     }
     return s;
 }
@@ -6339,18 +6347,22 @@ char* id_to_str3(char* code, char* type) {
 
 char* id_emit_bin(int id) {
     char* s;
-    s = id_emit_op2(id);
+    s = "";
     if (id_is_concat(id)) {
         s = id_emit_concat(id);
+    } else {
+        s = id_emit_op2(id);
     }
     return s;
 }
 
 char* id_emit_op2(int id) {
     char* s;
-    s = id_emit_op3(id);
+    s = "";
     if (id_is_strcmp(id)) {
         s = id_emit_strcmp(id);
+    } else {
+        s = id_emit_op3(id);
     }
     return s;
 }
@@ -13407,6 +13419,7 @@ void id_check_rest(void) {
 
 void id_tc_all(void) {
     id_init_tyreg();
+    id_init_tcache();
     id_tc_nodes();
     return;
 }
@@ -13667,6 +13680,16 @@ char* id_arith_result(char* lt, char* rt) {
     return t;
 }
 
+char* id_type_of_miss(int id) {
+    char* t;
+    t = id_lit_type(id);
+    if ((strcmp(id_k_of(id), "int") != 0)) {
+        t = id_type_of2(id);
+    }
+    id_tcache_set(id, t);
+    return t;
+}
+
 char* id_tb2_arith(int id) {
     int i1_of_v;
     int i2_of_v;
@@ -13900,6 +13923,31 @@ char* id_type_of_float(int id) {
     return t;
 }
 
+void id_init_tcache(void) {
+    tcache = id_list_lit(0);
+    tcache_ok = id_list_lit(0);
+    return;
+}
+
+int id_tcache_has(int id) {
+    int ok;
+    ok = 0;
+    if ((id < id_list_len(tcache_ok))) {
+        ok = (int)(id_list_get(tcache_ok, id));
+    }
+    return ok;
+}
+
+void id_tcache_set(int id, char* t) {
+    while ((id_list_len(tcache) <= id)) {
+        id_list_push(tcache, (long long)(intptr_t)(""));
+        id_list_push(tcache_ok, (long long)(0));
+    }
+    id_sset(tcache, id, t);
+    id_lset(tcache_ok, id, 1);
+    return;
+}
+
 char* id_type_of7(int id) {
     char* t;
     t = "int";
@@ -13924,9 +13972,11 @@ char* id_type_un(int id) {
 
 char* id_type_of(int id) {
     char* t;
-    t = id_lit_type(id);
-    if ((strcmp(id_k_of(id), "int") != 0)) {
-        t = id_type_of2(id);
+    t = "";
+    if ((id_tcache_has(id) == 1)) {
+        t = (char*)(intptr_t)(id_list_get(tcache, id));
+    } else {
+        t = id_type_of_miss(id);
     }
     return t;
 }
