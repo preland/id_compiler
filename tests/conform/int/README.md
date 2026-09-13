@@ -17,5 +17,6 @@ case here exits 0 (no `.exit` file).
 - `10-logical-not` — `!` maps `0` to `1` and any nonzero value to `0`.
 - `11-comparison-operators` — `<`, `<=`, `>`, `>=`, `==`, `!=` all produce `int` `0`/`1`.
 - `12-hex-literals` — `0x` literals lex to the same integer values as decimal and participate in arithmetic normally.
-- `13-operator-precedence` — one expression per precedence question: `*` before `+` before `<<`; left-associativity of `-`; `&` before `^` before `|`; bitwise operators bind tighter than `==`; `&&` binds tighter than `||`.
+- `13-operator-precedence` — one expression per precedence question: `*` before `+` before `<<`; left-associativity of `-`; `&` before `^` before `|`; a parenthesized bitwise operand of `==`; `&&` binds tighter than `||`. Mixing a bitwise operator and a comparison without parentheses is a compile error in `bin/idc`, so which binds tighter is no longer a question a program can ask.
 - `14-binary-literals` — `0b` literals lex to the same integer values as decimal and participate in arithmetic normally.
+- `15-comparison-bitwise-parenthesized` — both groupings of a bitwise operator and a comparison, written with the parentheses the language requires, give the same answer on every target: `(6 & 3) == 2` is `1` and `6 & (3 == 2)` is `0`.

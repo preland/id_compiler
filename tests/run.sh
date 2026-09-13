@@ -733,13 +733,14 @@ $IDC "$TMP/bits" -o "$TMP/bits.out" >/dev/null 2>&1
 expect_output "bitwise operators + hex literals" "48 241 15 -241
 960 30 -4" "$("$TMP/bits.out")"
 
-# `flags & MASK != 0` groups as `(flags & MASK) != 0` -- deliberately unlike C,
-# whose precedence here is a well-known source of parenthesis bugs.
+# `flags & MASK != 0` would group as `(flags & MASK) != 0` -- unlike C, whose
+# precedence here is a well-known source of parenthesis bugs -- and because
+# the two disagree, bin/idc requires the grouping to be written.
 mkdir -p "$TMP/prec"
 cat > "$TMP/prec/m.id" <<'EOF'
 main(int argc, string[] argv) {
   int flags = 6;
-  print("" + (flags & 4 != 0));
+  print("" + ((flags & 4) != 0));
 } return int 0;
 EOF
 $IDC "$TMP/prec" -o "$TMP/prec.out" >/dev/null 2>&1
