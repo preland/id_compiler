@@ -300,18 +300,17 @@ else
     bad "both backends link into one binary ($(grep -m1 -i 'error\|multiple' "$TMP/dual.err" | cut -c1-90))"
 fi
 
-# -- the graphics demos still build with both compilers ----------------------
+# -- the graphics demos still build with bin/idc -----------------------------
 # Their C is no longer compared with idc.py's. bin/idc reads each backend's
 # `native` declarations and emits them as real prototypes; idc.py, which is
 # being retired and will not change, emits an unprototyped `extern int` block
-# for the same calls, so the two differ by design. Both must still build them.
+# for the same calls, so the two differ by design.
+#
+# idc.py no longer builds them here either. They are user programs and merge
+# idstd, and idc.py cannot parse an idstd that holds a `given` case, so a check
+# that idc.py builds them would fail on the library rather than on the demo.
 for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
     d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if env -u IDC_NO_STD $ROOT/idc.py "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/py.c" >/dev/null 2>&1; then
-        ok "$d: backend build (idc.py)"
-    else
-        bad "$d: backend build (idc.py)"
-    fi
     if env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
         ok "$d: backend build (bin/idc)"
     else
