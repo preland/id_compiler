@@ -12,6 +12,18 @@ fn_count(string fname) {
   }
 } return int n;
 
+// Asked only once a declaration already collides, so the scan over every
+// function is paid by the rare repeated name rather than by every declaration.
+// A repeat inside a function whose name is defined twice is the two definitions
+// sharing one owner, not a repeat, and is left to the checks that follow.
+reg_twice(string name, string type, string owner, int exported, int ln, int unit) {
+  if(fn_count(owner) < 2) {
+    report_var_twice(name, owner, ln);
+  } else {
+    reg_report3(name, type, owner, exported, ln, unit);
+  }
+} return void;
+
 fn_count_at(int i, string fname, int n) {
   int r = n;
   if(s1_of((import prog)[i]) == fname) {
