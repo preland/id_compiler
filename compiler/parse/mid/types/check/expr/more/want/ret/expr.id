@@ -10,6 +10,7 @@ chk_retexpr(int id) {
   if(s2_of(id) != "void" && i1_of(id) >= 0) {
     chk_ret2(id);
   }
+  fn_ret_type(id);
 } return void;
 
 chk_ret2(int id) {

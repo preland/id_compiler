@@ -1,0 +1,8 @@
+// A call through a variable of function type. The variable is a C function
+// pointer under its own name, and C calls one as it calls a function; the
+// pointer's type carries the prototype, so each argument converts to its
+// parameter's type exactly as it would at a call to id_NAME.
+emit_fcall(int id) {
+  int[] l1_of_v = l1_of(id);
+  string ret_s = s1_of(id) + "(" + emit_args(l1_of_v) + ")";
+} return string ret_s;

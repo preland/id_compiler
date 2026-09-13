@@ -1,0 +1,15 @@
+tick(int n) {
+  print("tick " + n);
+} return void;
+(1):(1)
+(2):(2)
+
+run_frame(func(int) return void step, int dt) {
+  step(dt);
+} return void;
+(tick, 16):(tick, 16)
+(tick, 0):(tick, 0)
+
+main(int argc, string[] argv) {
+  run_frame(tick, 16);
+} return int 0;

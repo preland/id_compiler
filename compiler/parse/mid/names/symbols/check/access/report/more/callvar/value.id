@@ -1,0 +1,32 @@
+// Function values, as the access pass sees them (docs/SPEC.md 1.1).
+//
+// A function's name read as a value names no variable, so it is not resolved
+// as one. A builtin's name is not a value at all: a builtin is not a function
+// written in id and has no signature of its own to be a value of -- `print`
+// takes anything -- so it is refused by name rather than reported as an
+// undefined variable, which would send the reader looking for a typo.
+
+acc_var(string name, string owner, int ln) {
+  if(fn_node_of(name) < 0 && declared_in(name, owner) == 0 && is_builtin(name) == 1) {
+    report_builtin_value(name, owner, ln);
+  } else if(fn_node_of(name) < 0) {
+    acc_name(name, owner, ln);
+  }
+} return void;
+
+// A called name that is a variable. Of a function type, it is resolved like
+// any other variable the function reads; of any other type, it is a variable
+// called as if it were a function.
+acc_call_var(int id, string owner, int ln) {
+  string s1_of_v = s1_of(id);
+  if(is_fcall(id) == 1) {
+    acc_name(s1_of_v, owner, ln);
+  } else {
+    report_call_var(s1_of_v, owner, ln);
+  }
+} return void;
+
+report_builtin_value(string name, string owner, int ln) {
+  string loc_at_v = loc_at(owner, ln);
+  var_report(loc_at_v + "'" + name + "' is a builtin, not a function defined in id; only a function written in id can be a value -- write one that calls '" + name + "' and pass that");
+} return void;

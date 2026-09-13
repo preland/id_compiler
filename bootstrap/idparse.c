@@ -488,6 +488,9 @@ void id_test_narrow(IdList* pkeep, IdList* rkeep);
 void id_clear_strs(IdList* names);
 void id_keep_ints(IdList* ints, IdList* onto);
 void id_keep_strs(IdList* strs, IdList* names);
+void id_seed_case_fns(void);
+void id_seed_fn_args(int ci);
+void id_seed_fn_arg(int e);
 void id_seed_extra(void);
 void id_seed_givens(void);
 void id_seed_thens(void);
@@ -514,10 +517,14 @@ int id_lw_name_addr(int node);
 char* id_lw_ety(int node);
 int id_lw_load_at(int addr, char* ty);
 int id_lw_tmp(char* ty);
+int id_lw_named(int node);
+int id_lw_fnref(int node);
 int id_le4(int node);
 int id_le5(int node);
 int id_le6(int node);
 int id_lw_args_more(int node, int i);
+int id_lw_fcall(int node);
+int id_lw_fcallee(int node);
 int id_lw_call(int node);
 int id_lw_ucall(int node);
 IdList* id_lw_args(int node);
@@ -544,11 +551,14 @@ int id_lw_box(int v, char* t);
 int id_lw_box2(int v, char* t);
 int id_lw_unbox(int v, char* t);
 int id_lw_unbox2(int v, char* t);
+int id_lw_ocall(int node);
 int id_lw_callf(char* name, char* ret, IdList* args);
+int id_lw_fcall_emit(int node, int callee, IdList* args);
 int id_lw_arg_at(int node, int i, IdList* vals);
 char* id_lw_pty(char* name, int i, int node);
 char* id_lw_pty2(int f, int i, char* t);
 char* id_lw_apty(char* name, int i, char* t);
+char* id_lw_fpty(char* name, int i, int node, char* t);
 char* id_lw_arg_pty(int node, int i);
 int id_lw_arg_conv(int node, int i, char* pty);
 char* id_lw_pty_base(char* name, int i, int node);
@@ -973,6 +983,7 @@ char* id_emit_print(int id);
 char* id_emit_concat(int id);
 char* id_arg_str(int id);
 char* id_c_type(char* t);
+char* id_c_fn_type(char* t);
 char* id_c_scalar(char* t);
 void id_emit_tc_helpers(void);
 void id_tc_emit_types(void);
@@ -1003,6 +1014,8 @@ void id_init_tyc_rows2(void);
 void id_emit_def(int id);
 void id_emit_def_body(int id);
 void id_emit_tail(int id);
+char* id_c_fn_params(IdList* pts);
+char* id_c_type_list(IdList* pts);
 void id_emit_tail_end(int id);
 char* id_sig(int id);
 void id_fwd_all(void);
@@ -1131,6 +1144,7 @@ char* id_arr_lit(IdList* elems, char* etyp);
 char* id_ec2(int id);
 char* id_ec3(int id);
 char* id_emit_gcall(int id);
+char* id_emit_fcall(int id);
 char* id_emit_gcall_tail(int id, char* s);
 char* id_emit_len(int id);
 char* id_emit_push(int id);
@@ -1243,6 +1257,7 @@ void id_ll_str_at(int i);
 char* id_ll_text(int id);
 char* id_ll_ret(int id);
 char* id_ll_t2(int id);
+char* id_ll_callee(int id);
 char* id_ll_t3(int id);
 char* id_ll_t4(int id);
 char* id_ll_call(int id);
@@ -1294,6 +1309,9 @@ int id_init_asm_rest(void);
 int id_case_item(IdList* pos);
 int id_case_import(IdList* pos);
 int id_import_rest(IdList* pos);
+int id_case_value(IdList* pos);
+int id_at_case_fn(IdList* pos);
+int id_case_fn(IdList* pos);
 int id_parse_case_args(IdList* pos);
 void id_case_given(IdList* pos);
 char* id_given_name(IdList* pos);
@@ -1353,7 +1371,19 @@ IdList* id_parse_params(IdList* pos, char* kind);
 void id_scan_params(IdList* pos, IdList* params, char* kind);
 void id_fill_params(IdList* pos, IdList* params, char* kind);
 int id_ret_expr(IdList* pos, char* rt);
+char* id_parse_fn_type(IdList* pos);
+char* id_fn_type_rest(IdList* pos);
+char* id_fn_type_params(IdList* pos, char* out);
+void id_no_fn_ret(IdList* pos, char* rb);
+void id_no_void_list(IdList* pos, char* pl, char* rb, char* rt);
+char* id_fn_type_param(IdList* pos, char* out);
+void id_no_param_name(IdList* pos, char* pt);
+char* id_fn_sep(char* out);
+char* id_fn_type_ret(IdList* pos, char* pl);
+char* id_fn_type_ret2(IdList* pos, char* pl);
+char* id_fn_type_ret3(IdList* pos, char* pl, char* rb);
 char* id_parse_type(IdList* pos);
+char* id_type_tail(char* t, IdList* pos);
 char* id_add_brackets(char* t, IdList* pos);
 int id_void_close(int at, int n, int lo);
 int id_void_step(int at, int n);
@@ -1435,6 +1465,7 @@ int id_fold_mul(IdList* pos, int left);
 int id_parse_primary(IdList* pos);
 int id_parse_paren(IdList* pos);
 void id_no_case_word(IdList* pos);
+void id_no_func_word(IdList* pos);
 int id_parse_expr(IdList* pos);
 int id_parse_rel(IdList* pos);
 int id_fold_rel(IdList* pos, int left);
@@ -1670,6 +1701,9 @@ void id_report_main(void);
 void id_fit_given(int i);
 void id_given_fn(int i, char* setup_nm);
 void id_given_shape(int i, char* setup_nm, int sfn);
+void id_fit_named(int i, int e, char* want);
+void id_fit_fn(int i, int e, char* want);
+void id_fit_fn_type(int i, char* nm, char* ft, char* want);
 int id_reaches(char* src_fn, char* dst_fn);
 void id_reach_seed(char* src_fn);
 void id_fit_import(int i, int e, char* want);
@@ -1758,6 +1792,9 @@ void id_acc_callee(int id, char* owner, int ln);
 int id_is_unknown_fn(char* name);
 void id_report_call_var(char* name, char* owner, int ln);
 int id_is_call_var(int id);
+void id_acc_var(char* name, char* owner, int ln);
+void id_acc_call_var(int id, char* owner, int ln);
+void id_report_builtin_value(char* name, char* owner, int ln);
 void id_report_no_export(char* name, char* owner, int ln);
 void id_report_not_exported(char* name, char* owner, int ln);
 void id_var_report(char* msg);
@@ -1869,6 +1906,8 @@ void id_chk_bi_args(int id);
 void id_chk_bi_arg(int id, int i);
 char* id_arg_type_at(int id, int i);
 char* id_bi_want_for(int id, int i);
+void id_fv_bi_args(int id);
+void id_fv_bi_arg(int id, int i);
 char* id_bi_wants(char* name, int i);
 char* id_bi_wants2(char* name, int i);
 char* id_bi_wants3(char* name, int i);
@@ -1899,11 +1938,20 @@ int id_bi_strlist(char* t);
 char* id_bi_verb(char* want);
 void id_arity_err(int id, int fn);
 char* id_arity_err_msg(int id, int fn, char* name);
+void id_chk_arity(int id, int fn);
 int id_arity_mismatch(int id, int fn);
 int id_ne_flag(int a, int b);
+void id_fcall_arg_at(int id, char* vt, IdList* pts, int i);
+void id_fcall_arg_check(int id, char* vt, char* pt, int a, int i, char* t);
+void id_chk_fcall(int id);
+void id_fcall_arity(int id, char* vt);
+void id_fcall_args(int id, char* vt, IdList* pts);
+void id_fcall_arity_err(int id, char* vt, IdList* pts);
+void id_fcall_arg_err(int id, char* vt, char* pt, int a, int i, char* t);
+void id_fcall_narrow_err(int id, char* vt, char* pt, int a, int i, char* t);
 void id_chk_callsite(int id);
 int id_func_node(char* name);
-void id_chk_arity(int id, int fn);
+void id_chk_site_at(int id, int fn);
 void id_tc_g4(int id);
 void id_chk_index(int id);
 void id_chk_index2(int id);
@@ -1937,6 +1985,7 @@ char* id_ret_err_msg(int id, char* t);
 void id_chk_retexpr(int id);
 void id_chk_ret2(int id);
 void id_ret_err(int id, char* t);
+void id_fn_ret_type(int id);
 void id_chk_eq(int id);
 void id_eq_types(int id, int a, int b);
 void id_eq_report(int id, char* lt, char* rt);
@@ -1945,8 +1994,10 @@ void id_chk_ord2(int id);
 void id_ord_types(int id, int a, int b);
 void id_ord_report(int id, char* lt, char* rt);
 void id_chk_cmp(int id);
-void id_chk_iassign3(int id, char* bt);
+void id_fv_bin(int id);
+void id_fv_side(int id, int e, char* side);
 void id_chk_cond(int id, char* msg);
+void id_cond_kind(int id, char* msg, char* t);
 void id_chk_bin(int id);
 void id_chk_mixed(int id);
 void id_mixed_pair(int id, int a, int b);
@@ -1997,10 +2048,13 @@ int id_ty_known(char* t);
 int id_ty_pair_known(char* lt, char* rt);
 int id_arr_el_at(char* want, int e, int i);
 void id_arr_el_check(char* want, int el, int i);
+int id_fv_typed(int e);
+void id_fv_elem_err(int el, int i);
 int id_bad_arr(char* want, int e);
 int id_arr_els(char* want, int e);
 void id_chk_iassign(int id);
 void id_chk_iassign2(int id, char* bt);
+void id_chk_iassign3(int id, char* bt);
 char* id_base_type(int id);
 char* id_index_type(int id);
 void id_check_rest(void);
@@ -2016,9 +2070,29 @@ void id_void_arr_pair(int id, char* t1, char* t2);
 void id_tc_g3(int id);
 void id_chk_voidarr(int id);
 void id_void_arr_type(int id, char* t);
-void id_init_tyreg(void);
-void id_init_ty_cols(void);
-void id_init_ty_rows(void);
+int id_fn_node_of(char* name);
+int id_fn_node_at(int idx);
+char* id_fn_sig_of(char* name);
+char* id_fn_sig(int fn);
+char* id_fn_sig_at(int fn);
+char* id_fn_type_list(IdList* ps);
+char* id_name_type(char* name, int unit);
+char* id_call_ret(int id, char* name);
+char* id_fcall_ret(int id);
+int id_is_fn_value(int id);
+int id_is_fcall(int id);
+char* id_callee_var_type(int id);
+int id_ty_is_func(char* t);
+int id_fn_close(char* t);
+int id_fn_depth(int c);
+void id_fn_last(char* t, int hi, IdList* st, IdList* pts);
+char* id_fn_param_at(char* t, int i);
+char* id_fn_ret(char* t);
+IdList* id_fn_params(char* t);
+void id_fn_split(char* t, int hi, IdList* pts);
+void id_fn_walk(char* t, int hi, IdList* st, IdList* pts);
+void id_fn_step(char* t, int i, IdList* st, IdList* pts);
+void id_fn_cut(char* t, int i, IdList* st, IdList* pts);
 void id_ty_row2(int tw, int ts);
 int id_ty_find(char* t);
 int id_ty_is_list(char* t);
@@ -2032,6 +2106,9 @@ int id_ty_narrows(char* want, char* got);
 int id_ty_width(char* t);
 int id_ty_rank(char* t);
 char* id_ty_wider(char* lt, char* rt);
+void id_init_tyreg(void);
+void id_init_ty_cols(void);
+void id_init_ty_rows(void);
 void id_init_ty_rows2(void);
 void id_init_ty_rows3(void);
 void id_ty_row(char* tn, char* tk, int tw, int ts);
@@ -2122,6 +2199,7 @@ char* id_canon_func_tail(int id, char* out);
 char* id_canon_logic(int id, char* out);
 char* id_cn(char* name);
 int id_cn_add(char* name);
+char* id_canon_var(int id);
 char* id_canon_ret(int id);
 void id_uq_begin(char* name);
 char* id_cur_self(void);
@@ -2783,9 +2861,41 @@ void id_keep_strs(IdList* strs, IdList* names) {
     return;
 }
 
+void id_seed_case_fns(void) {
+    int ci;
+    ci = 0;
+    while ((ci < id_list_len(casenode))) {
+        id_seed_fn_args(ci);
+        ci = (ci + 1);
+    }
+    return;
+}
+
+void id_seed_fn_args(int ci) {
+    IdList* args;
+    int j;
+    args = id_l1_of((int)(id_list_get(casenode, ci)));
+    j = 0;
+    while ((j < id_list_len(args))) {
+        id_seed_fn_arg((int)(id_list_get(args, j)));
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_seed_fn_arg(int e) {
+    char* s1_of_v;
+    if ((strcmp(id_k_of(e), "cfn") == 0)) {
+        s1_of_v = id_s1_of(e);
+        id_reach_add(s1_of_v);
+    }
+    return;
+}
+
 void id_seed_extra(void) {
     id_seed_givens();
     id_seed_thens();
+    id_seed_case_fns();
     return;
 }
 
@@ -2863,7 +2973,7 @@ int id_lw_expr(int node) {
     int v;
     v = (0 - 1);
     if (((strcmp(id_k_of(node), "var") == 0) || (strcmp(id_k_of(node), "import") == 0))) {
-        v = id_lw_name(node);
+        v = id_lw_named(node);
     } else {
         v = id_le2(node);
     }
@@ -3020,6 +3130,27 @@ int id_lw_tmp(char* ty) {
     return v;
 }
 
+int id_lw_named(int node) {
+    int v;
+    v = (0 - 1);
+    if ((id_is_fn_value(node) == 1)) {
+        v = id_lw_fnref(node);
+    } else {
+        v = id_lw_name(node);
+    }
+    return v;
+}
+
+int id_lw_fnref(int node) {
+    char* ety;
+    char* s1_of_v;
+    int ret_i;
+    ety = id_lw_ety(node);
+    s1_of_v = id_s1_of(node);
+    ret_i = id_ir_leaf("global", ety, (0 - 1), (0 - 1), id_concat("id_", s1_of_v));
+    return ret_i;
+}
+
 int id_le4(int node) {
     int v;
     v = (0 - 1);
@@ -3061,6 +3192,26 @@ int id_lw_args_more(int node, int i) {
     return ok;
 }
 
+int id_lw_fcall(int node) {
+    int callee;
+    IdList* args;
+    int ret_i;
+    callee = id_lw_fcallee(node);
+    args = id_lw_args(node);
+    ret_i = id_lw_fcall_emit(node, callee, args);
+    return ret_i;
+}
+
+int id_lw_fcallee(int node) {
+    char* vt;
+    int addr;
+    int ret_i;
+    vt = id_callee_var_type(node);
+    addr = id_lw_name_addr(node);
+    ret_i = id_lw_load_at(addr, vt);
+    return ret_i;
+}
+
 int id_lw_call(int node) {
     char* name;
     int v;
@@ -3094,7 +3245,7 @@ int id_lw_call_dispatch(int node, char* name) {
     if ((id_is_builtin(name) == 1)) {
         v = id_lw_builtin(node);
     } else {
-        v = id_lw_ucall(node);
+        v = id_lw_ocall(node);
     }
     return v;
 }
@@ -3300,11 +3451,32 @@ int id_lw_unbox2(int v, char* t) {
     return r;
 }
 
+int id_lw_ocall(int node) {
+    int v;
+    v = (0 - 1);
+    if ((id_is_fcall(node) == 1)) {
+        v = id_lw_fcall(node);
+    } else {
+        v = id_lw_ucall(node);
+    }
+    return v;
+}
+
 int id_lw_callf(char* name, char* ret, IdList* args) {
     IdList* none;
     int ret_i;
     none = id_list_lit(0);
     ret_i = id_lw_emit("call", ret, (0 - 1), (0 - 1), name, args, none);
+    return ret_i;
+}
+
+int id_lw_fcall_emit(int node, int callee, IdList* args) {
+    char* ety;
+    IdList* none;
+    int ret_i;
+    ety = id_lw_ety(node);
+    none = id_list_lit(0);
+    ret_i = id_lw_emit("call", ety, callee, (0 - 1), "", args, none);
     return ret_i;
 }
 
@@ -3348,6 +3520,17 @@ char* id_lw_apty(char* name, int i, char* t) {
     return p;
 }
 
+char* id_lw_fpty(char* name, int i, int node, char* t) {
+    char* vt;
+    char* p;
+    vt = id_lookup_var(name, (int)(id_list_get(nunit, node)));
+    p = t;
+    if ((id_ty_is_func(vt) == 1)) {
+        p = id_fn_param_at(vt, i);
+    }
+    return p;
+}
+
 char* id_lw_arg_pty(int node, int i) {
     IdList* args;
     char* name;
@@ -3371,6 +3554,7 @@ char* id_lw_pty_base(char* name, int i, int node) {
     char* t;
     ety = id_lw_ety(node);
     t = id_lw_apty(name, i, ety);
+    t = id_lw_fpty(name, i, node, t);
     return t;
 }
 
@@ -6611,6 +6795,9 @@ char* id_ee6(int id) {
     if ((strcmp(id_k_of(id), "un") == 0)) {
         s = id_emit_un(id);
     }
+    if ((id_is_fn_value(id) == 1)) {
+        s = id_concat("id_", id_s1_of(id));
+    }
     return s;
 }
 
@@ -7141,12 +7328,22 @@ char* id_arg_str(int id) {
 
 char* id_c_type(char* t) {
     char* ct;
-    int len_v;
     ct = "IdList*";
-    len_v = id_len(t);
-    if ((id_charat(t, (len_v - 1)) != 93)) {
+    if ((id_ty_is_func(t) == 1)) {
+        ct = id_c_fn_type(t);
+    } else if ((id_ty_is_list(t) == 0)) {
         ct = id_c_scalar(t);
     }
+    return ct;
+}
+
+char* id_c_fn_type(char* t) {
+    char* rt;
+    IdList* pts;
+    char* ct;
+    rt = id_fn_ret(t);
+    pts = id_fn_params(t);
+    ct = id_concat(id_concat(id_concat(id_concat("__typeof__(", id_c_type(rt)), " (*)("), id_c_fn_params(pts)), "))");
     return ct;
 }
 
@@ -7400,6 +7597,27 @@ void id_emit_tail(int id) {
     id_emit_block(l2_of_v, "    ");
     id_emit_tail_end(id);
     return;
+}
+
+char* id_c_fn_params(IdList* pts) {
+    char* out;
+    out = "void";
+    if ((id_list_len(pts) > 0)) {
+        out = id_c_type_list(pts);
+    }
+    return out;
+}
+
+char* id_c_type_list(IdList* pts) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(pts))) {
+        out = id_concat(id_concat(out, id_sep_arg(i)), id_c_type((char*)(intptr_t)(id_list_get(pts, i))));
+        i = (i + 1);
+    }
+    return out;
 }
 
 void id_emit_tail_end(int id) {
@@ -8514,11 +8732,22 @@ char* id_emit_gcall(int id) {
     return ret_s;
 }
 
+char* id_emit_fcall(int id) {
+    IdList* l1_of_v;
+    char* ret_s;
+    l1_of_v = id_l1_of(id);
+    ret_s = id_concat(id_concat(id_concat(id_s1_of(id), "("), id_emit_args(l1_of_v)), ")");
+    return ret_s;
+}
+
 char* id_emit_gcall_tail(int id, char* s) {
     char* s1_of_v;
     s1_of_v = id_s1_of(id);
     if (id_is_syscall(s1_of_v)) {
         s = id_emit_syscall(id);
+    }
+    if ((id_is_fcall(id) == 1)) {
+        s = id_emit_fcall(id);
     }
     return s;
 }
@@ -8701,6 +8930,9 @@ char* id_tc_show(char* code, char* type) {
         key = id_tc_key(type);
         so = id_concat(id_concat(id_concat(id_concat("idtc_show_", key), "("), code), ");");
     }
+    if ((id_ty_is_func(type) == 1)) {
+        so = "fputs(\"a function value\", stderr);";
+    }
     return so;
 }
 
@@ -8814,6 +9046,9 @@ char* id_tc_value(int e, char* want) {
     so = id_s1_of(e);
     if ((strcmp(id_k_of(e), "cimport") != 0)) {
         so = id_tc_lit(e, want);
+    }
+    if ((strcmp(id_k_of(e), "cfn") == 0)) {
+        so = id_concat("id_", id_s1_of(e));
     }
     return so;
 }
@@ -9590,6 +9825,17 @@ char* id_ll_t2(int id) {
     return s;
 }
 
+char* id_ll_callee(int id) {
+    char* s;
+    int ir_a_v;
+    s = id_concat("@", id_ir_s(id));
+    if ((id_ir_a(id) >= 0)) {
+        ir_a_v = id_ir_a(id);
+        s = id_ll_val(ir_a_v);
+    }
+    return s;
+}
+
 char* id_ll_t3(int id) {
     char* s;
     char* ir_ty_v;
@@ -9626,7 +9872,7 @@ char* id_ll_call(int id) {
     char* ir_ty_v;
     char* s;
     ir_ty_v = id_ir_ty(id);
-    s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("call ", id_ll_ty(ir_ty_v)), " @"), id_ir_s(id)), "("), id_ll_args(id)), ")");
+    s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("call ", id_ll_ty(ir_ty_v)), " "), id_ll_callee(id)), "("), id_ll_args(id)), ")");
     if ((strcmp(id_ll_ty(ir_ty_v), "void") != 0)) {
         s = id_concat(id_concat(id_concat("%v", id_str_of_int(id)), " = "), s);
     }
@@ -10082,8 +10328,7 @@ int id_case_item(IdList* pos) {
     if ((id_at_case_import(pos) == 1)) {
         v = id_case_import(pos);
     } else {
-        v = id_parse_expr(pos);
-        id_check_lit(v);
+        v = id_case_value(pos);
     }
     return v;
 }
@@ -10102,6 +10347,35 @@ int id_import_rest(IdList* pos) {
     name = id_read_name(pos);
     id_eat_close(pos);
     ret_i = id_newleaf("cimport", 0, 0, name, "");
+    return ret_i;
+}
+
+int id_case_value(IdList* pos) {
+    int v;
+    v = 0;
+    if ((id_at_case_fn(pos) == 1)) {
+        v = id_case_fn(pos);
+    } else {
+        v = id_parse_expr(pos);
+        id_check_lit(v);
+    }
+    return v;
+}
+
+int id_at_case_fn(IdList* pos) {
+    int ok;
+    ok = 0;
+    if (((strcmp(id_cur_kind(pos), "ident") == 0) && ((strcmp(id_cur2_text(pos), ",") == 0) || (strcmp(id_cur2_text(pos), ")") == 0)))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_case_fn(IdList* pos) {
+    char* name;
+    int ret_i;
+    name = id_read_name(pos);
+    ret_i = id_newleaf("cfn", 0, 0, name, "");
     return ret_i;
 }
 
@@ -10614,13 +10888,117 @@ int id_ret_expr(IdList* pos, char* rt) {
     return e;
 }
 
+char* id_parse_fn_type(IdList* pos) {
+    char* ret_s;
+    id_expect_text(pos, "(");
+    id_advance(pos);
+    ret_s = id_fn_type_rest(pos);
+    return ret_s;
+}
+
+char* id_fn_type_rest(IdList* pos) {
+    char* pl;
+    char* ret_s;
+    pl = id_fn_type_params(pos, "");
+    ret_s = id_fn_type_ret(pos, pl);
+    return ret_s;
+}
+
+char* id_fn_type_params(IdList* pos, char* out) {
+    while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
+        out = id_fn_type_param(pos, out);
+    }
+    id_advance(pos);
+    return out;
+}
+
+void id_no_fn_ret(IdList* pos, char* rb) {
+    if ((strcmp(rb, "func") == 0)) {
+        id_syn_err(pos, "a function type cannot return a function value; pass the function, or store it in a local or an export");
+    }
+    return;
+}
+
+void id_no_void_list(IdList* pos, char* pl, char* rb, char* rt) {
+    if (((strcmp(rb, "void") == 0) && (strcmp(rt, "void") != 0))) {
+        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'func(", pl), ") return "), rt), "': brackets after a function type's return type belong to the return type, and "), rt), " is not a type; a function value cannot be an element of a list"));
+    }
+    return;
+}
+
+char* id_fn_type_param(IdList* pos, char* out) {
+    char* pt;
+    char* ret_s;
+    pt = id_parse_type(pos);
+    id_no_param_name(pos, pt);
+    ret_s = id_concat(id_concat(out, id_fn_sep(out)), pt);
+    return ret_s;
+}
+
+void id_no_param_name(IdList* pos, char* pt) {
+    char* nm;
+    if ((strcmp(id_cur_kind(pos), "ident") == 0)) {
+        nm = id_cur_text(pos);
+        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("a function type lists parameter types only: write '", pt), "', not '"), pt), " "), nm), "'"));
+        id_advance(pos);
+    }
+    id_skip_comma(pos);
+    return;
+}
+
+char* id_fn_sep(char* out) {
+    char* s;
+    s = "";
+    if ((strcmp(out, "") != 0)) {
+        s = ", ";
+    }
+    return s;
+}
+
+char* id_fn_type_ret(IdList* pos, char* pl) {
+    char* ret_s;
+    id_expect_text(pos, "return");
+    id_advance(pos);
+    ret_s = id_fn_type_ret2(pos, pl);
+    return ret_s;
+}
+
+char* id_fn_type_ret2(IdList* pos, char* pl) {
+    char* rb;
+    char* ret_s;
+    rb = id_cur_text(pos);
+    id_no_fn_ret(pos, rb);
+    ret_s = id_fn_type_ret3(pos, pl, rb);
+    return ret_s;
+}
+
+char* id_fn_type_ret3(IdList* pos, char* pl, char* rb) {
+    char* rt;
+    char* t;
+    rt = id_parse_type(pos);
+    id_no_void_list(pos, pl, rb, rt);
+    t = id_concat(id_concat(id_concat("func(", pl), ") return "), rt);
+    return t;
+}
+
 char* id_parse_type(IdList* pos) {
     char* t;
     char* ret_s;
     t = id_cur_text(pos);
     id_advance(pos);
-    ret_s = id_add_brackets(t, pos);
+    ret_s = id_type_tail(t, pos);
     return ret_s;
+}
+
+char* id_type_tail(char* t, IdList* pos) {
+    char* s;
+    s = t;
+    if ((strcmp(t, "func") == 0)) {
+        s = id_parse_fn_type(pos);
+    } else {
+        s = id_add_brackets(t, pos);
+    }
+    return s;
 }
 
 char* id_add_brackets(char* t, IdList* pos) {
@@ -11339,6 +11717,14 @@ void id_no_case_word(IdList* pos) {
         cur_text_v = id_cur_text(pos);
         id_syn_err(pos, id_concat(id_concat("'", cur_text_v), "' is a test case keyword (see docs/TESTS.md) and cannot be used as a name"));
     }
+    id_no_func_word(pos);
+    return;
+}
+
+void id_no_func_word(IdList* pos) {
+    if ((strcmp(id_cur_text(pos), "func") == 0)) {
+        id_syn_err(pos, "'func' is a keyword (it begins a function type, see docs/SPEC.md) and cannot be used as a name");
+    }
     return;
 }
 
@@ -11670,7 +12056,7 @@ int id_is_decl_start(IdList* pos) {
 int id_is_type(char* w) {
     int ok;
     ok = 0;
-    if (((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "export") == 0))) {
+    if ((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "func") == 0))) {
         ok = 1;
     }
     return ok;
@@ -12735,7 +13121,7 @@ void id_reach_range(int lo, int hi) {
 
 void id_scan_reach(int id) {
     char* s1_of_v;
-    if ((strcmp(id_k_of(id), "call") == 0)) {
+    if (((strcmp(id_k_of(id), "call") == 0) || (strcmp(id_k_of(id), "var") == 0))) {
         s1_of_v = id_s1_of(id);
         id_reach_add(s1_of_v);
     }
@@ -13338,6 +13724,33 @@ void id_given_shape(int i, char* setup_nm, int sfn) {
     return;
 }
 
+void id_fit_named(int i, int e, char* want) {
+    if ((strcmp(id_k_of(e), "cfn") == 0)) {
+        id_fit_fn(i, e, want);
+    } else {
+        id_fit_import(i, e, want);
+    }
+    return;
+}
+
+void id_fit_fn(int i, int e, char* want) {
+    char* nm;
+    char* ft;
+    nm = id_s1_of(e);
+    ft = id_fn_sig_of(nm);
+    id_fit_fn_type(i, nm, ft, want);
+    return;
+}
+
+void id_fit_fn_type(int i, char* nm, char* ft, char* want) {
+    if ((strcmp(ft, "") == 0)) {
+        id_case_err(i, id_concat(id_concat("a test case takes literals only (a number, a string, or a list of those); '", nm), "' is not a function in this build, which is the only name a case may pass"));
+    } else if ((strcmp(ft, want) != 0)) {
+        id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("this case gives '", nm), "', a "), ft), ", where a "), want), " is required"));
+    }
+    return;
+}
+
 int id_reaches(char* src_fn, char* dst_fn) {
     int r;
     id_reach_seed(src_fn);
@@ -13763,8 +14176,8 @@ int id_ty_fits(char* want, char* lt) {
 }
 
 void id_fit_value(int i, int e, char* want) {
-    if ((strcmp(id_k_of(e), "cimport") == 0)) {
-        id_fit_import(i, e, want);
+    if (((strcmp(id_k_of(e), "cimport") == 0) || (strcmp(id_k_of(e), "cfn") == 0))) {
+        id_fit_named(i, e, want);
     } else if ((id_ty_is_list(want) == 1)) {
         id_fit_list(i, e, want);
     } else {
@@ -14019,7 +14432,7 @@ void id_acc_expr(int id, char* owner, int ln) {
     char* s1_of_v;
     if ((strcmp(id_k_of(id), "var") == 0)) {
         s1_of_v = id_s1_of(id);
-        id_acc_name(s1_of_v, owner, ln);
+        id_acc_var(s1_of_v, owner, ln);
     } else {
         id_acc_expr2(id, owner, ln);
     }
@@ -14122,10 +14535,8 @@ void id_report_owned_var(char* name, char* owner, int ln) {
 }
 
 void id_acc_callee(int id, char* owner, int ln) {
-    char* s1_of_v;
     if (((strcmp(id_k_of(id), "call") == 0) && id_is_call_var(id))) {
-        s1_of_v = id_s1_of(id);
-        id_report_call_var(s1_of_v, owner, ln);
+        id_acc_call_var(id, owner, ln);
     }
     id_acc_callee2(id, owner, ln);
     return;
@@ -14157,6 +14568,33 @@ int id_is_call_var(int id) {
         ok = 1;
     }
     return ok;
+}
+
+void id_acc_var(char* name, char* owner, int ln) {
+    if ((((id_fn_node_of(name) < 0) && (id_declared_in(name, owner) == 0)) && (id_is_builtin(name) == 1))) {
+        id_report_builtin_value(name, owner, ln);
+    } else if ((id_fn_node_of(name) < 0)) {
+        id_acc_name(name, owner, ln);
+    }
+    return;
+}
+
+void id_acc_call_var(int id, char* owner, int ln) {
+    char* s1_of_v;
+    s1_of_v = id_s1_of(id);
+    if ((id_is_fcall(id) == 1)) {
+        id_acc_name(s1_of_v, owner, ln);
+    } else {
+        id_report_call_var(s1_of_v, owner, ln);
+    }
+    return;
+}
+
+void id_report_builtin_value(char* name, char* owner, int ln) {
+    char* loc_at_v;
+    loc_at_v = id_loc_at(owner, ln);
+    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' is a builtin, not a function defined in id; only a function written in id can be a value -- write one that calls '"), name), "' and pass that"));
+    return;
 }
 
 void id_report_no_export(char* name, char* owner, int ln) {
@@ -15139,6 +15577,29 @@ char* id_bi_want_for(int id, int i) {
     return s;
 }
 
+void id_fv_bi_args(int id) {
+    int i;
+    i = 0;
+    while ((i < id_flat_arg_count(id))) {
+        id_fv_bi_arg(id, i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fv_bi_arg(int id, int i) {
+    int a;
+    char* t;
+    char* nm;
+    a = (int)(id_list_get(id_l1_of(id), i));
+    t = id_type_of(a);
+    if ((id_ty_is_func(t) == 1)) {
+        nm = id_s1_of(id);
+        id_tc_err(a, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'", nm), "' cannot take a function value: argument "), id_str_of_int(i)), " is "), t), "; a function value can only be passed to a function written in id, stored or called"));
+    }
+    return;
+}
+
 char* id_bi_wants(char* name, int i) {
     char* s;
     s = id_bi_wants2(name, i);
@@ -15202,6 +15663,7 @@ void id_chk_bi(int id) {
     s1_of_v = id_s1_of(id);
     if ((id_is_builtin(s1_of_v) == 1)) {
         id_chk_bi_arity(id);
+        id_fv_bi_args(id);
     }
     return;
 }
@@ -15441,6 +15903,17 @@ char* id_arity_err_msg(int id, int fn, char* name) {
     return msg;
 }
 
+void id_chk_arity(int id, int fn) {
+    int mismatch;
+    mismatch = id_arity_mismatch(id, fn);
+    if ((mismatch == 1)) {
+        id_arity_err(id, fn);
+    } else {
+        id_chk_argtypes(id, fn);
+    }
+    return;
+}
+
 int id_arity_mismatch(int id, int fn) {
     int a;
     int b;
@@ -15460,14 +15933,83 @@ int id_ne_flag(int a, int b) {
     return ok;
 }
 
+void id_fcall_arg_at(int id, char* vt, IdList* pts, int i) {
+    int a;
+    char* t;
+    a = (int)(id_list_get(id_l1_of(id), i));
+    t = id_type_of(a);
+    id_fcall_arg_check(id, vt, (char*)(intptr_t)(id_list_get(pts, i)), a, i, t);
+    return;
+}
+
+void id_fcall_arg_check(int id, char* vt, char* pt, int a, int i, char* t) {
+    if ((id_bad_store(pt, a) == 1)) {
+        id_fcall_arg_err(id, vt, pt, a, i, t);
+    } else if ((id_ty_narrows(pt, t) == 1)) {
+        id_fcall_narrow_err(id, vt, pt, a, i, t);
+    }
+    return;
+}
+
+void id_chk_fcall(int id) {
+    char* vt;
+    vt = id_callee_var_type(id);
+    if ((id_ty_is_func(vt) == 1)) {
+        id_fcall_arity(id, vt);
+    }
+    return;
+}
+
+void id_fcall_arity(int id, char* vt) {
+    IdList* pts;
+    pts = id_fn_params(vt);
+    if ((id_list_len(pts) != id_flat_arg_count(id))) {
+        id_fcall_arity_err(id, vt, pts);
+    } else {
+        id_fcall_args(id, vt, pts);
+    }
+    return;
+}
+
+void id_fcall_args(int id, char* vt, IdList* pts) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(pts))) {
+        id_fcall_arg_at(id, vt, pts, i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fcall_arity_err(int id, char* vt, IdList* pts) {
+    int need;
+    char* msg;
+    need = id_list_len(pts);
+    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'", id_s1_of(id)), "' is a "), vt), ", which takes "), id_str_of_int(need)), " argument(s), got "), id_str_of_int(id_flat_arg_count(id)));
+    id_tc_err(id, msg);
+    return;
+}
+
+void id_fcall_arg_err(int id, char* vt, char* pt, int a, int i, char* t) {
+    char* msg;
+    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("argument ", id_str_of_int(i)), " of '"), id_s1_of(id)), "' (a "), vt), ") expects "), pt), ", got "), t);
+    id_tc_err(a, msg);
+    return;
+}
+
+void id_fcall_narrow_err(int id, char* vt, char* pt, int a, int i, char* t) {
+    char* msg;
+    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("argument ", id_str_of_int(i)), " of '"), id_s1_of(id)), "' (a "), vt), ") narrows "), t), " to "), pt), "; declare a "), pt), " local and pass that");
+    id_tc_err(a, msg);
+    return;
+}
+
 void id_chk_callsite(int id) {
     char* s1_of_v;
     int fn;
     s1_of_v = id_s1_of(id);
     fn = id_func_node(s1_of_v);
-    if ((fn >= 0)) {
-        id_chk_arity(id, fn);
-    }
+    id_chk_site_at(id, fn);
     return;
 }
 
@@ -15482,13 +16024,11 @@ int id_func_node(char* name) {
     return n;
 }
 
-void id_chk_arity(int id, int fn) {
-    int mismatch;
-    mismatch = id_arity_mismatch(id, fn);
-    if ((mismatch == 1)) {
-        id_arity_err(id, fn);
+void id_chk_site_at(int id, int fn) {
+    if ((fn >= 0)) {
+        id_chk_arity(id, fn);
     } else {
-        id_chk_argtypes(id, fn);
+        id_chk_fcall(id);
     }
     return;
 }
@@ -15797,6 +16337,7 @@ void id_chk_retexpr(int id) {
     if (((strcmp(id_s2_of(id), "void") != 0) && (id_i1_of(id) >= 0))) {
         id_chk_ret2(id);
     }
+    id_fn_ret_type(id);
     return;
 }
 
@@ -15819,6 +16360,17 @@ void id_ret_err(int id, char* t) {
     i1_of_v = id_i1_of(id);
     msg = id_ret_err_msg(id, t);
     id_tc_err(i1_of_v, msg);
+    return;
+}
+
+void id_fn_ret_type(int id) {
+    char* rt;
+    char* nm;
+    rt = id_s2_of(id);
+    if ((id_ty_is_func(rt) == 1)) {
+        nm = id_s1_of(id);
+        id_tc_err(id, id_concat(id_concat(id_concat(id_concat("'", nm), "' returns "), rt), "; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it"));
+    }
     return;
 }
 
@@ -15896,15 +16448,20 @@ void id_chk_cmp(int id) {
     return;
 }
 
-void id_chk_iassign3(int id, char* bt) {
-    int v;
-    char* elem_type_v;
-    char* type_of_v;
-    v = (int)(id_list_get(id_l1_of(id), 0));
-    elem_type_v = id_elem_type(bt);
-    if ((id_bad_store(elem_type_v, v) == 1)) {
-        type_of_v = id_type_of(v);
-        id_tc_err(id, id_concat(id_concat(id_concat("cannot store a ", type_of_v), " into a "), bt));
+void id_fv_bin(int id) {
+    id_fv_side(id, (int)(id_list_get(ni1, id)), "left");
+    id_fv_side(id, (int)(id_list_get(ni2, id)), "right");
+    id_chk_cmp(id);
+    return;
+}
+
+void id_fv_side(int id, int e, char* side) {
+    char* t;
+    char* op;
+    t = id_type_of(e);
+    if ((id_ty_is_func(t) == 1)) {
+        op = id_s1_of(id);
+        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'", op), "' cannot take a function value: its "), side), " operand is "), t), "; a function value can only be passed, stored or called"));
     }
     return;
 }
@@ -15914,14 +16471,21 @@ void id_chk_cond(int id, char* msg) {
     char* type_of_v;
     i1_of_v = id_i1_of(id);
     type_of_v = id_type_of(i1_of_v);
-    if ((strcmp(id_ty_kind(type_of_v), "unit") == 0)) {
+    id_cond_kind(id, msg, type_of_v);
+    return;
+}
+
+void id_cond_kind(int id, char* msg, char* t) {
+    if ((strcmp(id_ty_kind(t), "unit") == 0)) {
         id_tc_err(id, msg);
+    } else if ((strcmp(id_ty_kind(t), "func") == 0)) {
+        id_tc_err(id, id_concat(id_concat("a condition cannot be a function value (", t), "); call it, and test what it returns"));
     }
     return;
 }
 
 void id_chk_bin(int id) {
-    id_chk_cmp(id);
+    id_fv_bin(id);
     id_chk_bits(id);
     id_chk_mixed(id);
     return;
@@ -16404,7 +16968,7 @@ int id_ty_known(char* t) {
     char* ty_base_v;
     ok = 0;
     ty_base_v = id_ty_base(t);
-    if ((strcmp(id_ty_row_kind(ty_base_v), "?") != 0)) {
+    if ((strcmp(id_ty_kind(ty_base_v), "?") != 0)) {
         ok = 1;
     }
     return ok;
@@ -16432,10 +16996,27 @@ void id_arr_el_check(char* want, int el, int i) {
     char* elem_type_v;
     char* type_of_v;
     elem_type_v = id_elem_type(want);
-    if ((id_bad_store(elem_type_v, el) == 1)) {
+    if ((id_fv_typed(el) == 1)) {
+        id_fv_elem_err(el, i);
+    } else if ((id_bad_store(elem_type_v, el) == 1)) {
         type_of_v = id_type_of(el);
         id_tc_err(el, id_concat(id_concat(id_concat(id_concat(id_concat("element ", id_str_of_int(i)), " of a "), want), " literal is a "), type_of_v));
     }
+    return;
+}
+
+int id_fv_typed(int e) {
+    char* t;
+    int ok;
+    t = id_type_of(e);
+    ok = id_ty_is_func(t);
+    return ok;
+}
+
+void id_fv_elem_err(int el, int i) {
+    char* t;
+    t = id_type_of(el);
+    id_tc_err(el, id_concat(id_concat(id_concat("a function value cannot be an element of a list: element ", id_str_of_int(i)), " is "), t));
     return;
 }
 
@@ -16477,6 +17058,19 @@ void id_chk_iassign2(int id, char* bt) {
         id_tc_err(id, id_concat("list index must be int, got ", it));
     } else {
         id_chk_iassign3(id, bt);
+    }
+    return;
+}
+
+void id_chk_iassign3(int id, char* bt) {
+    int v;
+    char* elem_type_v;
+    char* type_of_v;
+    v = (int)(id_list_get(id_l1_of(id), 0));
+    elem_type_v = id_elem_type(bt);
+    if ((id_bad_store(elem_type_v, v) == 1)) {
+        type_of_v = id_type_of(v);
+        id_tc_err(id, id_concat(id_concat(id_concat("cannot store a ", type_of_v), " into a "), bt));
     }
     return;
 }
@@ -16613,23 +17207,227 @@ void id_void_arr_type(int id, char* t) {
     return;
 }
 
-void id_init_tyreg(void) {
-    id_init_ty_cols();
-    id_init_ty_rows();
+int id_fn_node_of(char* name) {
+    int b;
+    int idx;
+    int fn;
+    b = id_name_bucket(name);
+    idx = id_find_ix(fnames, (IdList*)(intptr_t)(id_list_get(fidx, b)), name);
+    fn = id_fn_node_at(idx);
+    return fn;
+}
+
+int id_fn_node_at(int idx) {
+    int fn;
+    fn = (0 - 1);
+    if ((idx >= 0)) {
+        fn = (int)(id_list_get(fnodes, idx));
+    }
+    return fn;
+}
+
+char* id_fn_sig_of(char* name) {
+    int fn;
+    char* t;
+    fn = id_fn_node_of(name);
+    t = id_fn_sig_at(fn);
+    return t;
+}
+
+char* id_fn_sig(int fn) {
+    IdList* ps;
+    char* pl;
+    char* t;
+    ps = id_l1_of(fn);
+    pl = id_fn_type_list(ps);
+    t = id_concat(id_concat(id_concat("func(", pl), ") return "), id_s2_of(fn));
+    return t;
+}
+
+char* id_fn_sig_at(int fn) {
+    char* t;
+    t = "";
+    if ((fn >= 0)) {
+        t = id_fn_sig(fn);
+    }
+    return t;
+}
+
+char* id_fn_type_list(IdList* ps) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(ps))) {
+        out = id_concat(id_concat(out, id_sep_at(", ", i)), id_s1_of((int)(id_list_get(ps, i))));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_name_type(char* name, int unit) {
+    char* t;
+    t = id_lookup_var(name, unit);
+    if ((strcmp(t, "") == 0)) {
+        t = id_fn_sig_of(name);
+    }
+    return t;
+}
+
+char* id_call_ret(int id, char* name) {
+    char* t;
+    t = id_type_call(name);
+    if ((strcmp(t, "") == 0)) {
+        t = id_fcall_ret(id);
+    }
+    return t;
+}
+
+char* id_fcall_ret(int id) {
+    char* vt;
+    char* t;
+    vt = id_callee_var_type(id);
+    t = "";
+    if ((id_ty_is_func(vt) == 1)) {
+        t = id_fn_ret(vt);
+    }
+    return t;
+}
+
+int id_is_fn_value(int id) {
+    char* s1_of_v;
+    int ok;
+    s1_of_v = id_s1_of(id);
+    ok = 0;
+    if (((strcmp(id_k_of(id), "var") == 0) && (id_fn_node_of(s1_of_v) >= 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_is_fcall(int id) {
+    char* vt;
+    int ok;
+    vt = id_callee_var_type(id);
+    ok = id_ty_is_func(vt);
+    return ok;
+}
+
+char* id_callee_var_type(int id) {
+    char* s1_of_v;
+    char* t;
+    s1_of_v = id_s1_of(id);
+    t = id_lookup_var(s1_of_v, (int)(id_list_get(nunit, id)));
+    if ((id_is_builtin(s1_of_v) == 1)) {
+        t = "";
+    }
+    return t;
+}
+
+int id_ty_is_func(char* t) {
+    int ok;
+    ok = 0;
+    if (((id_charat(t, 0) == 102) && (id_charat(t, 4) == 40))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_fn_close(char* t) {
+    int i;
+    int d;
+    int c;
+    i = 5;
+    d = 1;
+    while (((d > 0) && (i < id_len(t)))) {
+        c = id_charat(t, i);
+        d = (d + id_fn_depth(c));
+        i = (i + 1);
+    }
+    return i;
+}
+
+int id_fn_depth(int c) {
+    int n;
+    n = 0;
+    if ((c == 40)) {
+        n = 1;
+    } else if ((c == 41)) {
+        n = (0 - 1);
+    }
+    return n;
+}
+
+void id_fn_last(char* t, int hi, IdList* st, IdList* pts) {
+    char* piece;
+    if ((hi > 5)) {
+        piece = id_slice(t, (int)(id_list_get(st, 0)), hi);
+        id_list_push(pts, (long long)(intptr_t)(piece));
+    }
     return;
 }
 
-void id_init_ty_cols(void) {
-    tyname = id_list_lit(0);
-    tykind = id_list_lit(0);
-    tywidth = id_list_lit(0);
+char* id_fn_param_at(char* t, int i) {
+    IdList* pts;
+    char* p;
+    pts = id_fn_params(t);
+    p = (char*)(intptr_t)(id_list_get(pts, i));
+    return p;
+}
+
+char* id_fn_ret(char* t) {
+    int e;
+    int n;
+    char* rt;
+    e = id_fn_close(t);
+    n = id_len(t);
+    rt = id_slice(t, (e + 8), n);
+    return rt;
+}
+
+IdList* id_fn_params(char* t) {
+    IdList* pts;
+    int e;
+    pts = id_list_lit(0);
+    e = id_fn_close(t);
+    id_fn_split(t, (e - 1), pts);
+    return pts;
+}
+
+void id_fn_split(char* t, int hi, IdList* pts) {
+    IdList* st;
+    st = id_list_lit(2, (long long)(5), (long long)(0));
+    id_fn_walk(t, hi, st, pts);
+    id_fn_last(t, hi, st, pts);
     return;
 }
 
-void id_init_ty_rows(void) {
-    tysigned = id_list_lit(0);
-    id_ty_row("int", "int", 4, 1);
-    id_init_ty_rows2();
+void id_fn_walk(char* t, int hi, IdList* st, IdList* pts) {
+    int i;
+    i = 5;
+    while ((i < hi)) {
+        id_fn_step(t, i, st, pts);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fn_step(char* t, int i, IdList* st, IdList* pts) {
+    int c;
+    c = id_charat(t, i);
+    if (((c == 44) && ((int)(id_list_get(st, 1)) == 0))) {
+        id_fn_cut(t, i, st, pts);
+    } else {
+        id_list_set(st, 1, (long long)(((int)(id_list_get(st, 1)) + id_fn_depth(c))));
+    }
+    return;
+}
+
+void id_fn_cut(char* t, int i, IdList* st, IdList* pts) {
+    char* piece;
+    piece = id_slice(t, (int)(id_list_get(st, 0)), i);
+    id_list_push(pts, (long long)(intptr_t)(piece));
+    id_list_set(st, 0, (long long)((i + 2)));
     return;
 }
 
@@ -16650,7 +17448,7 @@ int id_ty_is_list(char* t) {
     int n;
     ok = 0;
     n = id_len(t);
-    if (((n > 2) && (id_charat(t, (n - 1)) == 93))) {
+    if ((((n > 2) && (id_charat(t, (n - 1)) == 93)) && (id_ty_is_func(t) == 0))) {
         ok = 1;
     }
     return ok;
@@ -16668,6 +17466,9 @@ char* id_ty_kind(char* t) {
     s = "list";
     if ((id_ty_is_list(t) == 0)) {
         s = id_ty_row_kind(t);
+    }
+    if ((id_ty_is_func(t) == 1)) {
+        s = "func";
     }
     return s;
 }
@@ -16744,6 +17545,26 @@ char* id_ty_wider(char* lt, char* rt) {
         t = lt;
     }
     return t;
+}
+
+void id_init_tyreg(void) {
+    id_init_ty_cols();
+    id_init_ty_rows();
+    return;
+}
+
+void id_init_ty_cols(void) {
+    tyname = id_list_lit(0);
+    tykind = id_list_lit(0);
+    tywidth = id_list_lit(0);
+    return;
+}
+
+void id_init_ty_rows(void) {
+    tysigned = id_list_lit(0);
+    id_ty_row("int", "int", 4, 1);
+    id_init_ty_rows2();
+    return;
 }
 
 void id_init_ty_rows2(void) {
@@ -16973,7 +17794,7 @@ char* id_call_type(int id) {
     char* s1_of_v;
     char* t;
     s1_of_v = id_s1_of(id);
-    t = id_type_call(s1_of_v);
+    t = id_call_ret(id, s1_of_v);
     if ((strcmp(id_s1_of(id), "pop") == 0)) {
         t = id_pop_elem(id);
     }
@@ -17107,7 +17928,7 @@ char* id_type_of3(int id) {
     char* s1_of_v;
     char* t;
     s1_of_v = id_s1_of(id);
-    t = id_lookup_var(s1_of_v, (int)(id_list_get(nunit, id)));
+    t = id_name_type(s1_of_v, (int)(id_list_get(nunit, id)));
     if ((id_is_nameref(id) == 0)) {
         t = id_type_of4(id);
     }
@@ -17130,14 +17951,12 @@ char* id_canon_expr(int id) {
 
 char* id_ce2(int id) {
     char* out;
-    char* s1_of_v;
     out = id_ce3(id);
     if ((strcmp(id_k_of(id), "str") == 0)) {
         out = id_concat("S", id_s1_of(id));
     }
     if ((strcmp(id_k_of(id), "var") == 0)) {
-        s1_of_v = id_s1_of(id);
-        out = id_concat("v", id_cn(s1_of_v));
+        out = id_canon_var(id);
     }
     return out;
 }
@@ -17191,6 +18010,9 @@ char* id_canon_callee(char* name) {
     out = name;
     if ((strcmp(name, id_cur_self()) == 0)) {
         out = "self";
+    }
+    if ((id_find_str(cnames, name) >= 0)) {
+        out = id_concat("v", id_cn(name));
     }
     return out;
 }
@@ -17647,6 +18469,17 @@ int id_cn_add(char* name) {
     id_list_push(cnames, (long long)(intptr_t)(name));
     ret_i = (id_list_len(cnames) - 1);
     return ret_i;
+}
+
+char* id_canon_var(int id) {
+    char* name;
+    char* out;
+    name = id_s1_of(id);
+    out = id_concat(id_concat("fv(", id_canon_callee(name)), ")");
+    if ((id_is_fn_value(id) == 0)) {
+        out = id_concat("v", id_cn(name));
+    }
+    return out;
 }
 
 char* id_canon_ret(int id) {

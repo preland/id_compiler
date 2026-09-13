@@ -1,0 +1,26 @@
+// One parameter type of a function type, and what may follow it: a comma or
+// the closing parenthesis. A name there is a parameter list written where a
+// type belongs, and is reported as that rather than as a missing comma.
+
+fn_type_param(int[] pos, string out) {
+  string pt = parse_type(pos);
+  no_param_name(pos, pt);
+  string ret_s = out + fn_sep(out) + pt;
+} return string ret_s;
+
+no_param_name(int[] pos, string pt) {
+  if(cur_kind(pos) == "ident") {
+    string nm = cur_text(pos);
+    syn_err(pos, "a function type lists parameter types only: write '" + pt + "', not '" + pt + " " + nm + "'");
+    advance(pos);
+  }
+  skip_comma(pos);
+} return void;
+
+// The separator before the next parameter type: none before the first.
+fn_sep(string out) {
+  string s = "";
+  if(out != "") {
+    s = ", ";
+  }
+} return string s;

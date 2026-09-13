@@ -1,0 +1,20 @@
+tick(int n) {
+  print("tick " + n);
+} return void;
+(1):(1)
+(2):(2)
+
+tock(int n) {
+  print("tock " + n);
+} return void;
+(3):(3)
+(4):(4)
+
+main(int argc, string[] argv) {
+  func(int) return void f = tick;
+  f(7);
+  if(argc > 0) {
+    f = tock;
+    f(8);
+  }
+} return int 0;

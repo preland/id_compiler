@@ -3,3 +3,20 @@ lw_args_more(int node, int i) {
   int[] args = l1_of(node);
   int ok = i < len(args);
 } return int ok;
+
+// A call through a variable of function type: the pointer the variable holds
+// is loaded first, then the arguments, each converted to the parameter type
+// the variable's type spells (lw_fpty), then the pointer is called.
+lw_fcall(int node) {
+  int callee = lw_fcallee(node);
+  int[] args = lw_args(node);
+  int ret_i = lw_fcall_emit(node, callee, args);
+} return int ret_i;
+
+// A call node's name is the variable's, so its slot is found as a read of the
+// variable finds it; the load is at the variable's type, not the call's.
+lw_fcallee(int node) {
+  string vt = callee_var_type(node);
+  int addr = lw_name_addr(node);
+  int ret_i = lw_load_at(addr, vt);
+} return int ret_i;

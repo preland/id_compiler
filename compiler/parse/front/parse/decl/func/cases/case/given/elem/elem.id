@@ -1,5 +1,5 @@
-// An element of a case tuple: a literal, or `(import NAME)` -- the value an
-// export holds once the case's setup has run.
+// An element of a case tuple: a literal, `(import NAME)` -- the value an
+// export holds once the case's setup has run -- or a function's name (fn.id).
 //
 // It is a "cimport" node, not an "import". An import is a read inside a
 // function body, and the dead-export check walks bodies by node range
@@ -13,8 +13,7 @@ case_item(int[] pos) {
   if(at_case_import(pos) == 1) {
     v = case_import(pos);
   } else {
-    v = parse_expr(pos);
-    check_lit(v);
+    v = case_value(pos);
   }
 } return int v;
 

@@ -1,11 +1,12 @@
 // A literal against the type it will be built at. The declared type decides,
 // not the literal: `[1, 2]` is a perfectly good `word[]`, and inferring the
 // type from the literal would call it a type error about a list nobody wrote.
-// `(import NAME)` is not a literal and has a type of its own (../../../../given/read/).
+// `(import NAME)` and a function's name are not literals and have types of
+// their own (../../../../given/read/).
 
 fit_value(int i, int e, string want) {
-  if(k_of(e) == "cimport") {
-    fit_import(i, e, want);
+  if(k_of(e) == "cimport" || k_of(e) == "cfn") {
+    fit_named(i, e, want);
   } else if(ty_is_list(want) == 1) {
     fit_list(i, e, want);
   } else {

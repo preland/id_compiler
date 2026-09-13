@@ -9,8 +9,14 @@ reach_range(int lo, int hi) {
 // The leaf of the walk, doing both jobs so that one walker serves both passes.
 // During the fixpoint only the calls matter; the imports cannot be judged yet,
 // because a function that is not reachable *so far* may still become so.
+//
+// A function named as a value is reached exactly as a call reaches it: nothing
+// can tell from here where the value is called, only that it can be, so it
+// must be kept, and an export it declares is as live as one a call declares.
+// reach_add ignores a name that is not a function, so a variable's name is
+// harmless here.
 scan_reach(int id) {
-  if(k_of(id) == "call") {
+  if(k_of(id) == "call" || k_of(id) == "var") {
     string s1_of_v = s1_of(id);
     reach_add(s1_of_v);
   }

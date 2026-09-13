@@ -35,10 +35,16 @@ ce5(int id) {
 
 // A callee keeps its name -- except a call to the function being canonicalised
 // itself, which becomes a fixed marker so that two identical recursive
-// functions, each recursing into its own name, still collide.
+// functions, each recursing into its own name, still collide; and a call
+// through a parameter or local of function type, which is that variable's
+// position like any other use of it. The position map holds only the
+// function's own variables, and no variable shares a function's name.
 canon_callee(string name) {
   string out = name;
   if(name == cur_self()) {
     out = "self";
+  }
+  if(find_str((import cnames), name) >= 0) {
+    out = "v" + cn(name);
   }
 } return string out;

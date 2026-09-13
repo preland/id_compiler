@@ -1,0 +1,25 @@
+// The walk over a parameter list's characters. 44 is `,`, and the separator
+// the canonical spelling puts between two types is ", ", two characters.
+
+fn_walk(string t, int hi, int[] st, string[] pts) {
+  int i = 5;
+  while(i < hi) {
+    fn_step(t, i, st, pts);
+    i = i + 1;
+  }
+} return void;
+
+fn_step(string t, int i, int[] st, string[] pts) {
+  int c = charat(t, i);
+  if(c == 44 && st[1] == 0) {
+    fn_cut(t, i, st, pts);
+  } else {
+    st[1] = st[1] + fn_depth(c);
+  }
+} return void;
+
+fn_cut(string t, int i, int[] st, string[] pts) {
+  string piece = slice(t, st[0], i);
+  push(pts, piece);
+  st[0] = i + 2;
+} return void;

@@ -1,10 +1,14 @@
 // Unary-expression emission: `(OP operand)`, e.g. `(-1)`. Extends the
-// emit_expr chain (... -> ee5 -> ee6 -> the var/str/import text default).
+// emit_expr chain (... -> ee5 -> ee6 -> the var/str/import text default). A
+// function named as a value is the C function it is emitted as, id_NAME.
 
 ee6(int id) {
   string s = s1_of(id);
   if(k_of(id) == "un") {
     s = emit_un(id);
+  }
+  if(is_fn_value(id) == 1) {
+    s = "id_" + s1_of(id);
   }
 } return string s;
 

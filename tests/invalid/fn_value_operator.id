@@ -1,0 +1,9 @@
+// EXPECT: '+' cannot take a function value: its left operand is func(int) return void
+// EXPECT-IDCPY: undefined variable 'tick'
+tick(int n) {
+  print(n);
+} return void;
+
+main(int argc, string[] argv) {
+  int n = tick + 1;
+} return int n;

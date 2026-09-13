@@ -1,0 +1,10 @@
+// A function value cannot be a function's return type (docs/SPEC.md 1.1). A
+// value handed back by a call has an origin its caller cannot see; one stored
+// in an export or passed down is chosen at the line that stores or passes it.
+fn_ret_type(int id) {
+  string rt = s2_of(id);
+  if(ty_is_func(rt) == 1) {
+    string nm = s1_of(id);
+    tc_err(id, "'" + nm + "' returns " + rt + "; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it");
+  }
+} return void;

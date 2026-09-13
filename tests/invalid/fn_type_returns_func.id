@@ -1,0 +1,5 @@
+// EXPECT: a function type cannot return a function value
+// EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
+run_frame(func(int) return func(int) return void step) {
+  print(1);
+} return void;

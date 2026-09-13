@@ -1,0 +1,21 @@
+// The return type of a function type, which ends it. The base keyword is read
+// before parse_type takes it, because the two mistakes guard.id reports are
+// told apart by that keyword alone.
+
+fn_type_ret(int[] pos, string pl) {
+  expect_text(pos, "return");
+  advance(pos);
+  string ret_s = fn_type_ret2(pos, pl);
+} return string ret_s;
+
+fn_type_ret2(int[] pos, string pl) {
+  string rb = cur_text(pos);
+  no_fn_ret(pos, rb);
+  string ret_s = fn_type_ret3(pos, pl, rb);
+} return string ret_s;
+
+fn_type_ret3(int[] pos, string pl, string rb) {
+  string rt = parse_type(pos);
+  no_void_list(pos, pl, rb, rt);
+  string t = "func(" + pl + ") return " + rt;
+} return string t;

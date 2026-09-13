@@ -1,0 +1,11 @@
+// EXPECT: a function value cannot be an element of a list: element 0 is func(int) return void
+// EXPECT-IDCPY: undefined variable 'tick'
+tick(int n) {
+  print(n);
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [tick];
+  int n = len(xs);
+  print(n);
+} return int 0;

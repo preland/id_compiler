@@ -1,0 +1,18 @@
+// The three diagnostics of a call through a function value. A parameter of a
+// function type has no name, so an argument is named by its position.
+
+fcall_arity_err(int id, string vt, string[] pts) {
+  int need = len(pts);
+  string msg = "'" + s1_of(id) + "' is a " + vt + ", which takes " + need + " argument(s), got " + flat_arg_count(id);
+  tc_err(id, msg);
+} return void;
+
+fcall_arg_err(int id, string vt, string pt, int a, int i, string t) {
+  string msg = "argument " + i + " of '" + s1_of(id) + "' (a " + vt + ") expects " + pt + ", got " + t;
+  tc_err(a, msg);
+} return void;
+
+fcall_narrow_err(int id, string vt, string pt, int a, int i, string t) {
+  string msg = "argument " + i + " of '" + s1_of(id) + "' (a " + vt + ") narrows " + t + " to " + pt + "; declare a " + pt + " local and pass that";
+  tc_err(a, msg);
+} return void;

@@ -1,0 +1,10 @@
+// What a call calls. A call to a function names its symbol; a call through a
+// function value carries the value as its first operand (back/ir/build/expr/
+// call/core/args.id), which is written where the symbol would be.
+ll_callee(int id) {
+  string s = "@" + ir_s(id);
+  if(ir_a(id) >= 0) {
+    int ir_a_v = ir_a(id);
+    s = ll_val(ir_a_v);
+  }
+} return string s;

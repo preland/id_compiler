@@ -10,6 +10,7 @@ chk_bi(int id) {
   string s1_of_v = s1_of(id);
   if(is_builtin(s1_of_v) == 1) {
     chk_bi_arity(id);
+    fv_bi_args(id);
   }
 } return void;
 

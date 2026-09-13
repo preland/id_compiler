@@ -1,0 +1,11 @@
+// EXPECT: a condition cannot be a function value (func(int) return void)
+// EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
+tick(int n) {
+  print(n);
+} return void;
+
+run_frame(func(int) return void step, int dt) {
+  if(step) {
+    step(dt);
+  }
+} return void;

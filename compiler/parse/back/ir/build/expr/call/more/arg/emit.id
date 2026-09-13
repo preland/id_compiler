@@ -1,5 +1,26 @@
 
+// A call that is not to a builtin: through a variable of function type, or to
+// a function by name.
+lw_ocall(int node) {
+  int v = 0 - 1;
+  if(is_fcall(node) == 1) {
+    v = lw_fcall(node);
+  } else {
+    v = lw_ucall(node);
+  }
+} return int v;
+
 lw_callf(string name, string ret, int[] args) {
   int[] none = [];
   int ret_i = lw_emit("call", ret, 0 - 1, 0 - 1, name, args, none);
+} return int ret_i;
+
+// A call whose callee is a value rather than a symbol. The value is the first
+// operand, so every pass that follows operands -- mem2reg replacing the load,
+// dce keeping it alive -- already sees it, and the printer writes it where a
+// symbol would go (back/tgt/ll/val/insn/mem/call.id).
+lw_fcall_emit(int node, int callee, int[] args) {
+  string ety = lw_ety(node);
+  int[] none = [];
+  int ret_i = lw_emit("call", ety, callee, 0 - 1, "", args, none);
 } return int ret_i;

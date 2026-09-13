@@ -1,0 +1,20 @@
+// No builtin takes a function value (docs/SPEC.md 1.1). A builtin is not a
+// function written in id, and what it would do with one is never what was
+// meant: print would print an address, push would put a function in a list.
+
+fv_bi_args(int id) {
+  int i = 0;
+  while(i < flat_arg_count(id)) {
+    fv_bi_arg(id, i);
+    i = i + 1;
+  }
+} return void;
+
+fv_bi_arg(int id, int i) {
+  int a = l1_of(id)[i];
+  string t = type_of(a);
+  if(ty_is_func(t) == 1) {
+    string nm = s1_of(id);
+    tc_err(a, "'" + nm + "' cannot take a function value: argument " + i + " is " + t + "; a function value can only be passed to a function written in id, stored or called");
+  }
+} return void;

@@ -1,9 +1,11 @@
 // The setups and checks cases name. The harness calls them directly, so they
-// are entry points whether or not any function with a case calls them.
+// are entry points whether or not any function with a case calls them -- and
+// so is every function a case passes as a value (fns.id).
 
 seed_extra() {
   seed_givens();
   seed_thens();
+  seed_case_fns();
 } return void;
 
 seed_givens() {

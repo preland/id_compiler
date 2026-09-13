@@ -40,8 +40,7 @@ ce2(int id) {
     out = "S" + s1_of(id);
   }
   if(k_of(id) == "var") {
-    string s1_of_v = s1_of(id);
-    out = "v" + cn(s1_of_v);
+    out = canon_var(id);
   }
 } return string out;
 

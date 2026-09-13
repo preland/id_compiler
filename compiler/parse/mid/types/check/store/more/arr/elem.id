@@ -9,7 +9,9 @@ arr_el_at(string want, int e, int i) {
 
 arr_el_check(string want, int el, int i) {
   string elem_type_v = elem_type(want);
-  if(bad_store(elem_type_v, el) == 1) {
+  if(fv_typed(el) == 1) {
+    fv_elem_err(el, i);
+  } else if(bad_store(elem_type_v, el) == 1) {
     string type_of_v = type_of(el);
     tc_err(el, "element " + i + " of a " + want + " literal is a " + type_of_v);
   }

@@ -1,0 +1,13 @@
+// EXPECT: argument 'step' of 'run_frame' expects func(int) return void, got func(string) return void
+// EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
+shout(string s) {
+  print(s);
+} return void;
+
+run_frame(func(int) return void step, int dt) {
+  step(dt);
+} return void;
+
+main(int argc, string[] argv) {
+  run_frame(shout, 16);
+} return int 0;

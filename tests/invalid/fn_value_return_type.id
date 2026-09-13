@@ -1,0 +1,15 @@
+// EXPECT: cannot assign a func(int) return int value to func(int) return void 'f'
+// EXPECT-IDCPY: unexpected token 'int'
+twice(int n) {
+  int r = n * 2;
+} return int r;
+
+tick(int n) {
+  print(n);
+} return void;
+
+main(int argc, string[] argv) {
+  func(int) return void f = tick;
+  f = twice;
+  f(argc);
+} return int 0;

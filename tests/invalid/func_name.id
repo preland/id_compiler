@@ -1,0 +1,5 @@
+// EXPECT: 'func' is a keyword (it begins a function type, see docs/SPEC.md) and cannot be used as a name
+// IDCPY-ACCEPTS
+main(int argc, string[] argv) {
+  int func = argc;
+} return int func;

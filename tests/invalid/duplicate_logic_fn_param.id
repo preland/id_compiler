@@ -1,0 +1,11 @@
+// EXPECT: same signature and logic as
+// EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
+// A call through a parameter is canonicalised like any use of the parameter:
+// renaming the parameter does not make a second function.
+apply(func(int) return void f, int x) {
+  f(x);
+} return void;
+
+again(func(int) return void g, int y) {
+  g(y);
+} return void;

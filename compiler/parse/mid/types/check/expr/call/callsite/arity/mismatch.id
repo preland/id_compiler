@@ -1,0 +1,24 @@
+// Arity first, and nothing else if it is wrong: pairing arguments off with
+// parameters that are not there would report a second, invented type error
+// about whichever pair happened to line up.
+chk_arity(int id, int fn) {
+  int mismatch = arity_mismatch(id, fn);
+  if(mismatch == 1) {
+    arity_err(id, fn);
+  } else {
+    chk_argtypes(id, fn);
+  }
+} return void;
+
+arity_mismatch(int id, int fn) {
+  int a = flat_arg_count(id);
+  int b = flat_arg_count(fn);
+  int ok = ne_flag(a, b);
+} return int ok;
+
+ne_flag(int a, int b) {
+  int ok = 0;
+  if(a != b) {
+    ok = 1;
+  }
+} return int ok;

@@ -1,0 +1,27 @@
+// A function a case passes as an argument is called through by the function
+// under test, so the harness has to carry it whether or not anything else in
+// the build calls it.
+
+seed_case_fns() {
+  int ci = 0;
+  while(ci < len((import casenode))) {
+    seed_fn_args(ci);
+    ci = ci + 1;
+  }
+} return void;
+
+seed_fn_args(int ci) {
+  int[] args = l1_of((import casenode)[ci]);
+  int j = 0;
+  while(j < len(args)) {
+    seed_fn_arg(args[j]);
+    j = j + 1;
+  }
+} return void;
+
+seed_fn_arg(int e) {
+  if(k_of(e) == "cfn") {
+    string s1_of_v = s1_of(e);
+    reach_add(s1_of_v);
+  }
+} return void;

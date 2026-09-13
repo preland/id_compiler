@@ -1,0 +1,29 @@
+// Which names and calls are function values. A variable may not share a
+// function's name (mid/names/symbols/check/conflict/), so a name that is a
+// function of this program denotes that function wherever it is read.
+
+is_fn_value(int id) {
+  string s1_of_v = s1_of(id);
+  int ok = 0;
+  if(k_of(id) == "var" && fn_node_of(s1_of_v) >= 0) {
+    ok = 1;
+  }
+} return int ok;
+
+// A call through a variable of function type. The type is read where the call
+// is written -- by name, in the call's own unit -- which is what keeps the call
+// determinable: the function that runs is hidden, its signature is not.
+is_fcall(int id) {
+  string vt = callee_var_type(id);
+  int ok = ty_is_func(vt);
+} return int ok;
+
+// The declared type of the variable a call names, or "" when it names none. A
+// builtin's name is never such a variable: the builtin is what the call means.
+callee_var_type(int id) {
+  string s1_of_v = s1_of(id);
+  string t = lookup_var(s1_of_v, (import nunit)[id]);
+  if(is_builtin(s1_of_v) == 1) {
+    t = "";
+  }
+} return string t;

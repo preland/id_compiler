@@ -14,10 +14,11 @@ ty_find(string t) {
 
 // A list type is derived, not registered: `T[]` for any T. 93 is `]`. The
 // length test rules out the empty string, whose last character does not exist.
+// A function type whose return type is a list ends in `]` too, and is not one.
 ty_is_list(string t) {
   int ok = 0;
   int n = len(t);
-  if(n > 2 && charat(t, n - 1) == 93) {
+  if(n > 2 && charat(t, n - 1) == 93 && ty_is_func(t) == 0) {
     ok = 1;
   }
 } return int ok;

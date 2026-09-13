@@ -1,14 +1,4 @@
-// The element store, the void condition, and the split between the two
-// comparison families.
-
-chk_iassign3(int id, string bt) {
-  int v = l1_of(id)[0];
-  string elem_type_v = elem_type(bt);
-  if(bad_store(elem_type_v, v) == 1) {
-    string type_of_v = type_of(v);
-    tc_err(id, "cannot store a " + type_of_v + " into a " + bt);
-  }
-} return void;
+// The void condition, and the split between the two comparison families.
 
 // A condition that is a call to a void function is the one type error the
 // registry answers directly: "unit" is the kind of a type with no values, and
@@ -16,8 +6,16 @@ chk_iassign3(int id, string bt) {
 chk_cond(int id, string msg) {
   int i1_of_v = i1_of(id);
   string type_of_v = type_of(i1_of_v);
-  if(ty_kind(type_of_v) == "unit") {
+  cond_kind(id, msg, type_of_v);
+} return void;
+
+// A function value is a value, but not a truth: C would test the address,
+// which is never zero, so the condition would always hold.
+cond_kind(int id, string msg, string t) {
+  if(ty_kind(t) == "unit") {
     tc_err(id, msg);
+  } else if(ty_kind(t) == "func") {
+    tc_err(id, "a condition cannot be a function value (" + t + "); call it, and test what it returns");
   }
 } return void;
 
@@ -27,7 +25,7 @@ chk_cond(int id, string msg) {
 // It is a fact about id's operators, not about C, so it belongs in mid/ and
 // should move here when the emitter is restructured.
 chk_bin(int id) {
-  chk_cmp(id);
+  fv_bin(id);
   chk_bits(id);
   chk_mixed(id);
 } return void;

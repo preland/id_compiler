@@ -1,0 +1,30 @@
+// A function's name as a case element: that function, passed as a value to a
+// function that takes one (docs/SPEC.md 1.1). A function that takes a function
+// value needs its cases like any other, and its name is as fixed as a literal
+// -- nothing runs to produce it -- so it needs no setup either. It is a "cfn"
+// node rather than a "var" for the reason a case's import is a "cimport"
+// (elem.id). Anything else that is not a literal is still refused.
+
+case_value(int[] pos) {
+  int v = 0;
+  if(at_case_fn(pos) == 1) {
+    v = case_fn(pos);
+  } else {
+    v = parse_expr(pos);
+    check_lit(v);
+  }
+} return int v;
+
+// A bare name, and nothing after it but the end of the element: `f(1)` is a
+// call and `f[0]` an index, neither of which a case may hold.
+at_case_fn(int[] pos) {
+  int ok = 0;
+  if(cur_kind(pos) == "ident" && (cur2_text(pos) == "," || cur2_text(pos) == ")")) {
+    ok = 1;
+  }
+} return int ok;
+
+case_fn(int[] pos) {
+  string name = read_name(pos);
+  int ret_i = newleaf("cfn", 0, 0, name, "");
+} return int ret_i;
