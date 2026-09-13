@@ -37,9 +37,11 @@ above it (`demos/gfxdemo`) is identical on every OS.
 
 ### Why these signatures
 
-`idc` resolves a call to an undefined function as `extern int id_<name>()`,
-satisfied at link time (see the README's "Functions link across files"
-section). So every backend entry point is named `id_*`, returns `int`, and
+Each entry point is a `native` declaration in this directory's `.id` files
+(`window.id`, `events.id`, `mouse.id`). `idc` merges them into the build like
+any dependency, checks every call against them exactly as it checks a call to
+an `id` function, and emits each as a C prototype `id_<name>(…)`. So every
+backend entry point is named `id_*`, returns `int`, and
 takes arguments lowered the way `idc` lowers them (`int`→`int`, `string`→`char*`,
 `int[]`→`IdList*`). The framebuffer is passed as one `int[]` so a whole frame
 crosses the boundary in a single call, not a million per-pixel ones — the same
@@ -100,10 +102,10 @@ identical either way.
 
 ## Known rough edges (first slice)
 
-- The link-time `extern` mechanism declares backend functions K&R-style (no
-  prototype), so `cc` warns `-Wdeprecated-non-prototype` and a future C23-only
-  toolchain would reject it. The clean fix is a small `idc` feature for typed
-  external declarations; tracked as future work, not needed to run today.
+- Backend functions are `native` declarations, emitted as real prototypes
+  rather than K&R-style externs. Nothing yet checks that `gfx_linux.c`'s
+  definitions match those declarations: the generated C does not include
+  `gfx.h`, so the two are kept in agreement by hand.
 - Window resize is now followed: `pump()` handles `ConfigureNotify` and
   reallocates the surface, and `gfx_width()`/`gfx_height()` report the live
   size. An `id` program must ask each frame and re-init its framebuffer when

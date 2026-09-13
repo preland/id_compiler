@@ -168,9 +168,11 @@ dependencies, but not guaranteed here).
 
 ## Known rough edges
 
-- Same K&R-prototype-free `extern` linking as `gfx` (see its README) — a
-  future `idc` feature for typed external declarations would let `cc` fully
-  type-check backend calls instead of only checking them at the `id` side.
+- Every entry point is a `native` declaration in `win/`, `mat/` or `frame/`,
+  so `idc` checks each call against it like any call and `cc` sees a real
+  prototype. Nothing yet checks that `gl_linux.c`'s definitions match those
+  declarations: the generated C does not include `gl.h`, so the two are kept
+  in agreement by hand.
 - The matrix pool (1024 slots) is a ring buffer with no explicit free; handles
   from many frames ago silently become invalid once overwritten. Fine for a
   demo that rebuilds a handful of matrices every frame and never holds a

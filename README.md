@@ -70,10 +70,27 @@ See [`../docs/LLVM.md`](../docs/LLVM.md).
 
 ## Native backends
 
-A **backend** is a directory with a `backend.json` and some native source. It
-supplies functions no `.id` file defines; `idc` resolves those calls as
-link-time symbols and links the backend's objects into the program. Attach one
-with a project's `conf.id` (preferred) or a `--backend DIR` flag.
+A **backend** is a directory with a `backend.json`, some native source, and
+`.id` files that declare what that source defines:
+
+```
+native fs_open(string path, string mode) return int;
+```
+
+A `native` declaration is a function whose body is native code. The directory
+is merged into the build like any other dependency, so its declarations obey
+the same rules as any source — at most 3 functions per file and 3 entries per
+directory, one type per name, no duplicate names — and a call into the backend
+is resolved and checked like any call: a wrong argument count or type gets the
+diagnostic an `id` function gets, and a misspelled name is `no such function`.
+Nothing is left to the linker to discover. The C target emits each native as a
+real prototype and the LLVM target as a `declare`; the backend's objects are
+compiled per platform and linked in. Attach one with a project's `conf.id`
+(preferred) or a `--backend DIR` flag — the two are the same dependency.
+
+Its parameter names are declarations too, and an exported name is reserved
+across the whole program, so a backend's parameters must not reuse a name a
+program exports.
 
 **Imports are transitive.** An imported directory's own `conf.id` is read too,
 so a library can declare the backend it needs and every program that uses it
@@ -86,10 +103,10 @@ on its resolved path.
 | [`backends/gfx`](backends/gfx) | a window and a software framebuffer (X11 / Cocoa) |
 | [`backends/gl`](backends/gl) | a hardware-accelerated OpenGL window |
 
-The manifest separates *what* a backend promises from *how* a given compiler
-obtains it: `abi` lists the functions in `id`'s own types, and `targets` maps a
-code generator (`"c"` today; an LLVM, wasm or interpreter target tomorrow) to
-the implementation it should use. Adding a target is a change to the manifest
+A backend separates *what* it promises from *how* a given compiler obtains it:
+its `native` declarations state the functions in `id`'s own types, and the
+manifest's `targets` maps a code generator (`"c"` today; an LLVM, wasm or
+interpreter target tomorrow) to the implementation it should use. Adding a target is a change to the manifest
 and the driver that reads it, never to a program's `id` source — see
 [`backends/fs/README.md`](backends/fs/README.md), which is written up as the
 worked example. `gfx` and `gl` predate `targets` and carry a bare `platforms`
