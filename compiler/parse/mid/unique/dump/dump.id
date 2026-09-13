@@ -1,0 +1,25 @@
+// `idparse --fingerprints`: one line per function, `<fingerprint>\t<name>\t
+// <file>:<line>`, instead of a build. cfp already holds every function's
+// fingerprint, in prog order, once check_unique() has run (../scan/check.id) --
+// this is a reader of that, not a second walk of the tree.
+
+print_fingerprints() {
+  int i = 0;
+  while(i < len((import prog))) {
+    print_fp_line(i);
+    i = i + 1;
+  }
+} return void;
+
+print_fp_line(int i) {
+  string name = s1_of((import prog)[i]);
+  string line = fp_line(name, (import cfp)[i]);
+  print(line);
+} return void;
+
+// file:line, the same two facts a diagnostic's prefix names (../../names/
+// limits/report/more/prefix.id), without the ": error: " a diagnostic adds.
+fp_line(string name, string fp) {
+  string tab = chr(9);
+  string ret_s = fp + tab + name + tab + func_file(name) + ":" + func_line(name);
+} return string ret_s;
