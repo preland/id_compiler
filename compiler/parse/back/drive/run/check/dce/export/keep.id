@@ -1,20 +1,16 @@
 // Whether export i survives emission, mirroring dce.id's own test for a
-// function: kept when its owner is reachable, wherever pruning applies here.
-// Pruning applies in two independent places:
+// function: kept when its owner is reachable, but only in the program itself,
+// exactly where dce_prune decides to run at all -- a build with `main`, not
+// `--freestanding` (nat_all_live, back/drive/sink/natives/more/live.id).
 //
-//   * the test harness (back/tgt/c/emit/prog/test/unit/flag.id), which always
-//     narrows `prog` and `rfn` to what a case reaches, so `is_harn` alone
-//     decides -- the freestanding/no-main question below is about the
-//     program, not the harness built beside it;
-//   * the program itself, exactly where dce_prune decides to run at all: a
-//     build with `main`, not `--freestanding` (nat_all_live, back/drive/sink/
-//     natives/more/live.id, already answers "is anything pruned here").
-//
-// Outside both, nothing is pruned and every export survives, same as every
-// function.
+// The test harness keeps every export. It narrows `prog` to the functions a
+// case reaches, and a kept function may still read an export whose declaring
+// function no case reaches -- a setup the program runs from main. Pruning that
+// export left the harness C with an undeclared global (qmon's `qm_qmph`), and
+// the saving is one C global, where the narrowing exists to save functions.
 keep_export(int i) {
   int ok = 1;
-  if(is_harn() == 1 || nat_all_live() == 0) {
+  if(is_harn() == 0 && nat_all_live() == 0) {
     ok = is_reach((import eowners)[i]);
   }
 } return int ok;

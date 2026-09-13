@@ -2554,7 +2554,7 @@ void id_emit_all(int argc, IdList* argv) {
 int id_keep_export(int i) {
     int ok;
     ok = 1;
-    if (((id_is_harn() == 1) || (id_nat_all_live() == 0))) {
+    if (((id_is_harn() == 0) && (id_nat_all_live() == 0))) {
         ok = id_is_reach((char*)(intptr_t)(id_list_get(eowners, i)));
     }
     return ok;

@@ -749,6 +749,41 @@ else
     ok "dead-export pruning: harness-only export absent from the program"
 fi
 
+# ...and the harness keeps every export, not only the ones a case's setup
+# reaches: a function the cases reach may read an export whose declaring
+# function only main calls. Pruning it left the harness C with an undeclared
+# global, and the build failed in cc (tools/qmon's qm_qmph, 2026-09-13).
+mkdir -p "$TMP/exprune_reader"
+cat > "$TMP/exprune_reader/m.id" <<'EOF'
+main(int argc, string[] argv) {
+  boot();
+  int r = reader_twice(argc);
+} return int r;
+
+boot() {
+  export int boot_val = 7;
+} return void;
+EOF
+cat > "$TMP/exprune_reader/r.id" <<'EOF'
+peek_boot() {
+  int v = (import boot_val);
+} return int v;
+
+reader_twice(int n) {
+  int r = n * 2;
+  if(n < 0) {
+    r = peek_boot();
+  }
+} return int r;
+(1):(2)
+(2):(4)
+EOF
+if $BIN_IDC "$TMP/exprune_reader" -o "$TMP/exprune_reader.bin" >"$TMP/exprune_reader.log" 2>&1; then
+    ok "dead-export pruning: the harness declares an export a kept function reads"
+else
+    bad "dead-export pruning: the harness declares an export a kept function reads ($(grep -m1 'error' "$TMP/exprune_reader.log"))"
+fi
+
 # --- rule violations must be compile errors
 cat > "$TMP/toomany.id" <<'EOF'
 main(int argc, string[] argv) {
