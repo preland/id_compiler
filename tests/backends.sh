@@ -55,6 +55,11 @@ fi
 
 # The demo attaches the backend through its own conf.id, so no --backend
 # flag: the id-native path is the one under test.
+#
+# idc.py no longer builds a backend here, nor in the two checks after this one.
+# It reads backend.json, which backend.id replaced, and idc.py is being retired
+# and will not change: without the file it merges backends/fs as plain source
+# and stops at the 3-entries rule, which backend.id is exempt from.
 expected='wrote 44 bytes to fsdemo.txt (close 0)
 read 44 bytes back (close 0):
 the quick brown fox
@@ -63,7 +68,7 @@ the lazy dog
 
 removed fsdemo.txt (rc 0), exists now 0
 reopening it gives -1, errno 2'
-for c in "$BIN_IDC" "$ROOT/idc.py"; do
+for c in "$BIN_IDC"; do
     name=$(basename "${c%% *}")
     if ! $c "$ORG/demos/fsdemo" -o "$fsout.$name" >"$TMP/fs.build" 2>&1; then
         bad "fsdemo builds with $name"; continue
@@ -79,7 +84,7 @@ done
 # Naming one backend twice -- --backend *and* conf.id, the two documented
 # ways -- used to compile its sources twice and hand cc the same object file
 # twice: "multiple definition" for every symbol it exports.
-for c in "$BIN_IDC" "$ROOT/idc.py"; do
+for c in "$BIN_IDC"; do
     name=$(basename "${c%% *}")
     if $c "$ORG/demos/fsdemo" --backend "$ROOT/backends/fs" -o "$fsout.dup.$name" \
          >"$TMP/fs.dup" 2>&1; then
@@ -98,7 +103,7 @@ need 15
 a.id
 b.id
 sub/'
-for c in "$BIN_IDC" "$ROOT/idc.py"; do
+for c in "$BIN_IDC"; do
     name=$(basename "${c%% *}")
     if ! $c "$ROOT/tests/fixtures/lsdemo" -o "$fsout.ls.$name" >"$TMP/ls.build" 2>&1; then
         bad "lsdemo builds with $name ($(head -1 "$TMP/ls.build"))"; continue
@@ -120,7 +125,7 @@ if $BIN_IDC "$ROOT/driver" -o "$TMP/idsrc" >"$TMP/drv.build" 2>&1; then
     ok "driver/ builds"
     for tree in "$ROOT/compiler" "$ORG/editor"; do
         want=$(find "$tree" -mindepth 1 \( -type d -name '.*' -prune \) -o \
-                    \( -name '*.id' ! -name 'conf.id' -print \) | LC_ALL=C sort)
+                    \( -name '*.id' ! -name 'conf.id' ! -name 'backend.id' -print \) | LC_ALL=C sort)
         got=$("$TMP/idsrc" "$tree")
         if [ "$got" = "$want" ]; then
             ok "the id tree walk matches find|sort ($(basename "$tree"), $(printf '%s\n' "$want" | wc -l) files)"
@@ -185,28 +190,23 @@ else
     bad "two natives with the same signature do not collide, and their parameters reserve no name (bin/idc)"
 fi
 
-# A manifest that offers no C implementation must say so, in both compilers,
-# rather than reporting "no support for platform 'linux'" (which would be a
-# lie: the platform is fine, the *target* is what is missing).
+# Declarations that offer no C implementation must say so rather than
+# reporting "no support for platform 'linux'" (which would be a lie: the
+# platform is fine, the *target* is what is missing).
 #
-# bin/idc reads a backend's manifest only once one of its natives is reached,
-# so its program calls one; idc.py reads every attached manifest up front and
-# keeps building hello.
+# bin/idc reads a backend's declarations only once one of its natives is
+# reached, so the program calls one. idc.py was checked here too, and is not
+# now: it reads backend.json, which no longer exists.
 nocbe="$TMP/nocbe"; mkdir -p "$nocbe"
-printf '{"name":"toy","abi":[],"targets":{"interp":{"module":"toy.py"}}}\n' > "$nocbe/backend.json"
+printf 'string name = "toy";\nstring interp_module = "toy.py";\n' > "$nocbe/backend.id"
 printf 'native toy_ping() return int;\n' > "$nocbe/toy.id"
 printf 'main(int argc, string[] argv) {\n  int r = toy_ping();\n  print(r);\n} return int 0;\n' > "$TMP/toy.id"
-for c in "$BIN_IDC" "$ROOT/idc.py"; do
-    name=$(basename "${c%% *}")
-    prog="$ORG/demos/hello"
-    [ "$name" = idc ] && prog="$TMP/toy.id"
-    if $c "$prog" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
-       | grep -q "no implementation for the C target"; then
-        ok "a backend with no C target is diagnosed as such ($name)"
-    else
-        bad "a backend with no C target is diagnosed as such ($name)"
-    fi
-done
+if $BIN_IDC "$TMP/toy.id" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
+   | grep -qF "toy.id:2: error: native 'toy_ping', reached from main by this call, is implemented by backend 'toy', which has no implementation for the C target (its manifest declares: interp)"; then
+    ok "a backend with no C target is diagnosed as such (idc)"
+else
+    bad "a backend with no C target is diagnosed as such (idc)"
+fi
 
 # -- the default output goes to build/ ---------------------------------------
 # `idc PROJECT` names the executable after the project, so building from the
@@ -304,6 +304,84 @@ if printf '%s\n' "$out" | grep -q "cannot build for 'aarch64-apple-darwin' here"
     ok "an unreached backend's platforms are not a question the build asks"
 else
     bad "an unreached backend's platforms are not a question the build asks: $(printf '%s\n' "$out" | head -1 | cut -c1-160)"
+fi
+
+# -- backend.id: a backend's link facts, as `id` declarations ----------------
+# They are real `id`: each backend's file, as a project's conf.id, is parsed and
+# type-checked by the compiler itself, which is what keeps the driver's line
+# reader from accepting something the language does not. --fingerprints stops
+# after the checks, before any C: a list constant in conf.id does not yet emit C
+# that cc accepts ("initializer element is not constant"), and that is the
+# emitter's gap, not these declarations'. The last file proves the check can
+# fail.
+decl="$TMP/decl"; mkdir -p "$decl"
+printf 'main(int argc, string[] argv) {\n  string bn = (import name);\n  print(bn);\n} return int 0;\n' > "$decl/main.id"
+for be in fs gfx gl; do
+    cp "$ROOT/backends/$be/backend.id" "$decl/conf.id"
+    if $BIN_IDC "$decl" --fingerprints >"$TMP/decl.out" 2>&1 && ! grep -q 'error' "$TMP/decl.out"; then
+        ok "backends/$be/backend.id is valid id constant declarations"
+    else
+        bad "backends/$be/backend.id is valid id constant declarations: $(grep -m1 error "$TMP/decl.out" | cut -c1-160)"
+    fi
+done
+printf 'string name = "x";\nstring[] c_linux_sources = 3;\n' > "$decl/conf.id"
+if ! $BIN_IDC "$decl" --fingerprints >"$TMP/decl.out" 2>&1 \
+   && grep -qF "cannot initialize string[] 'c_linux_sources' with a int value" "$TMP/decl.out"; then
+    ok "a mistyped declaration fails the same check"
+else
+    bad "a mistyped declaration fails the same check"
+fi
+
+# A line that is not a fact is reported at its line, and only once a native of
+# its backend is reached: the same file attached and unreached is not read.
+bdbe="$TMP/bdbe"; mkdir -p "$bdbe"
+printf 'native bd_ping(int k) return int;\n' > "$bdbe/bd.id"
+printf 'main(int argc, string[] argv) {\n  int r = bd_ping(1);\n  print(r);\n} return int 0;\n' > "$TMP/bdcall.id"
+while IFS='|' read -r lineno body want; do
+    printf '%b' "$body" > "$bdbe/backend.id"
+    out=$($BIN_IDC "$TMP/bdcall.id" --backend "$bdbe" -o "$TMP/bd.bin" 2>&1)
+    if printf '%s\n' "$out" | grep -qxF "idc: $bdbe/backend.id:$lineno: invalid backend declarations: $want"; then
+        ok "invalid backend declarations are reported at line $lineno ($want)"
+    else
+        bad "invalid backend declarations are reported at line $lineno ($want): $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-160)"
+    fi
+done <<'EOF'
+3|string name = "bd";\n\nstring[] c_linux_sources = "bd.c";\n|'string[] c_linux_sources = "bd.c";' is not a string or string[] constant with a literal value
+2|string name = "bd";\nstring c_linux_sources = "bd.c";\n|'c_linux_sources' is a string[], not a string
+4|// bd\nstring name = "bd";\nstring[] c_linux_sources = ["bd.c"];\nstring[] c_darwin_link = ["-lm"];\n|'c_darwin_link' has no c_darwin_sources, which is what declares a platform
+3|string name = "bd";\nstring[] c_linux_sources = ["bd.c"];\nstring name = "bd2";\n|'name' is already declared at line 1
+1|int c_linux_sources = 3;\n|'int c_linux_sources = 3;' is not a string or string[] constant with a literal value
+EOF
+printf 'main(int argc, string[] argv) {\n  print(2);\n} return int 0;\n' > "$TMP/bdnocall.id"
+if [ "$($BIN_IDC "$TMP/bdnocall.id" --backend "$bdbe" -o "$TMP/bdn.bin" 2>/dev/null && "$TMP/bdn.bin")" = "2" ]; then
+    ok "an unreached backend's declarations are not read"
+else
+    bad "an unreached backend's declarations are not read"
+fi
+
+# Two attached backends declare the same names -- name, c_linux_sources,
+# c_linux_cflags and the rest -- and the same file name, val.c. Each is read on
+# its own, so each source is compiled with its own flags and both link: 3 from
+# one backend's -DBE_K, 5 from the other's.
+for be in bea:3:'[]' beb:5:'["-lm"]'; do
+    bn="${be%%:*}"; rest="${be#*:}"; k="${rest%%:*}"; lk="${rest#*:}"
+    mkdir -p "$TMP/$bn"
+    printf 'string name = "%s";\nstring[] c_linux_sources = ["val.c"];\nstring[] c_linux_cflags = ["-DBE_K=%s"];\nstring[] c_linux_link = %s;\nstring[] c_darwin_sources = ["val.c"];\nstring[] c_darwin_cflags = ["-DBE_K=%s"];\nstring[] c_darwin_link = %s;\n' \
+        "$bn" "$k" "$lk" "$k" "$lk" > "$TMP/$bn/backend.id"
+    printf 'int id_%s_val(int k) { return k * BE_K; }\n' "$bn" > "$TMP/$bn/val.c"
+    printf 'native %s_val(int k) return int;\n' "$bn" > "$TMP/$bn/val.id"
+done
+two="$TMP/two"; mkdir -p "$two"
+printf 'import "%s"\nimport "%s"\n' "$TMP/bea" "$TMP/beb" > "$two/conf.id"
+printf 'main(int argc, string[] argv) {\n  int a = bea_val(1);\n  int b = beb_val(10);\n  print(a * 100 + b);\n} return int 0;\n' > "$two/main.id"
+: > "$TMP/cc.log"
+if $BIN_IDC "$two" --cc "$cclog" -o "$TMP/two.bin" >"$TMP/two.err" 2>&1 \
+   && [ "$("$TMP/two.bin")" = "350" ] \
+   && grep -q "bea/val\.c .*-DBE_K=3$" "$TMP/cc.log" && grep -q "beb/val\.c .*-DBE_K=5$" "$TMP/cc.log" \
+   && grep 'final\.c' "$TMP/cc.log" | grep -q ' -lm$'; then
+    ok "two attached backends declaring the same names and platform keys do not collide"
+else
+    bad "two attached backends declaring the same names and platform keys do not collide: $(grep -v warning "$TMP/two.err" | head -1 | cut -c1-160)"
 fi
 
 if ! cc -fsyntax-only "$ROOT/backends/gfx/gfx_linux.c" -I"$ROOT/backends/gfx" 2>/dev/null; then

@@ -1,9 +1,10 @@
 // The three questions asked of a file's name, and the answer printed.
 
 // conf.id is the dependency manifest, not source, and is never compiled --
-// the same exclusion idc.py's collect_project makes.
+// the same exclusion idc.py's collect_project makes. backend.id is a backend's
+// link facts, read by the driver and never compiled either.
 drv_say(string path, string name, int ok) {
-  if(ok == 1 && name != "conf.id") {
+  if(ok == 1 && name != "conf.id" && name != "backend.id") {
     string p = path + "/" + name;
     print(p);
   }

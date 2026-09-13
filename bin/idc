@@ -183,7 +183,7 @@ host_triple() {
     esac
 }
 
-# The platform key a backend.json is indexed by, read out of the triple's OS
+# The platform key a backend.id is indexed by, read out of the triple's OS
 # field. `unknown` is the vendor slot and never the OS, so it is not matched.
 triple_platform() {
     case "$1" in
@@ -448,7 +448,8 @@ fi
 #
 # collect_ids ROOT -- append every .id file under ROOT to SRC_FILES, in
 # idc.py's order (sorted full path, LC_ALL=C to match Python's string sort).
-# conf.id is a dependency manifest, not source -- never compiled.
+# conf.id is a dependency manifest, not source -- never compiled. backend.id is
+# a backend's link facts (see backend_decls), and is not compiled either.
 #
 # ROOT is also recorded in SRC_ROOTS, in the order roots are added: one root is
 # one COMPILATION UNIT (the program's own tree, then each dependency, then the
@@ -461,7 +462,7 @@ collect_ids() {
     while IFS= read -r f; do SRC_FILES+=("$f"); done \
         < <(find "$root" -mindepth 1 \
                  \( -type d -name '.*' -prune \) -o \
-                 \( -name '*.id' ! -name 'conf.id' -print \) \
+                 \( -name '*.id' ! -name 'conf.id' ! -name 'backend.id' -print \) \
             | LC_ALL=C sort)
 }
 
@@ -515,7 +516,7 @@ check_entry_limit() {
     over=$(find "$root" -mindepth 1 \
                 \( -type d -name '.*' -prune \) -o \
                 \( -type d -printf 'd|%h\n' \) -o \
-                \( -name '*.id' ! -name 'conf.id' -printf 'f|%h\n' \) \
+                \( -name '*.id' ! -name 'conf.id' ! -name 'backend.id' -printf 'f|%h\n' \) \
            | awk -F'|' '{ n[$2]++ }
                         END { for (d in n) if (n[d] > 3) print n[d] "|" d }' \
            | LC_ALL=C sort -t'|' -k2 | head -1)
@@ -556,7 +557,7 @@ fi
 
 # Dependencies from the project's conf.id, resolved TRANSITIVELY: every dir is
 # merged in as additional id source and has its own conf.id read in turn, and
-# a backend dir (backend.json) is also linked. Mirrors idc.py's
+# a backend dir (backend.id) is also linked. Mirrors idc.py's
 # parse_import_manifest + resolve_deps. conf.id lines are
 # `import "relative/dir"`.
 #
@@ -698,7 +699,7 @@ read_manifest() {
         # A backend is a dependency like any other: its .id files -- the
         # `native` declarations of what it links -- are merged as source under
         # the same limits, and its native sources are linked besides.
-        [ -f "$deppath/backend.json" ] && MANIFEST_BACKENDS+=("$deppath")
+        [ -f "$deppath/backend.id" ] && MANIFEST_BACKENDS+=("$deppath")
         check_entry_limit "$deppath"
         check_nested_manifest "$deppath"
         collect_ids "$deppath"
@@ -901,7 +902,7 @@ compiler_bug() { # compiler_bug REASON
     [ -s "${C_OUT:-}" ] && echo "idc: the generated C is at $C_OUT" >&2
     echo "idc: this is a bug in the self-hosted compiler; please report it." >&2
     echo "idc: to compare against the reference implementation, run:" >&2
-    echo "idc:     python3 $IDC_PY $PATH_ARG" >&2
+    echo "idc:     $IDC_PY $PATH_ARG" >&2
     exit 1
 }
 
@@ -974,8 +975,8 @@ fi
 # standard library name every backend without hello-world linking X11.
 #
 # What PROVIDES a native is where it is declared: the attached backend whose
-# directory holds the declaring .id file. Not backend.json's `abi` -- a header
-# name for gfx and gl and a list only for fs, typed in nothing and checked by
+# directory holds the declaring .id file. Not a list of names in its backend.id
+# -- a second copy of the declarations, typed in nothing and checked by
 # nothing -- and not the object's symbols, which do not exist until the sources
 # are compiled, and compiling them is the cost being avoided. A name is declared
 # once in a build (a second is "already defined"), so the declaring file
@@ -988,7 +989,9 @@ PLATKEY_BUILD="$(triple_platform "$TRIPLE")"
 BACKEND_OBJS=()
 LINK_OBJS=()
 LINK_FLAGS=()
-declare -A BE_BUILT=() BE_OBJS=() BE_LINK=()
+declare -A BE_BUILT=() BE_OBJS=() BE_LINK=() BD=() BD_AT=()
+BD_NAMES=()
+BD_FILE=""
 BE_ERR=""
 # backends come from both --backend flags and the conf.id manifest. The same
 # backend named both ways -- the two documented ways to attach one dependency --
@@ -1022,64 +1025,129 @@ backend_of() {
     printf '%s' "$best"
 }
 
+# A backend's facts are `id` constant declarations in its backend.id: its name,
+# and per compiler target and platform key what that target needs to link it.
+#
+#   string name = "gfx";
+#   string c_header = "gfx.h";                     TARGET_FIELD
+#   string[] c_linux_sources = ["gfx_linux.c"];    TARGET_PLATFORM_sources
+#   string[] c_linux_cflags = [];                  TARGET_PLATFORM_cflags
+#   string[] c_linux_link = ["-lX11"];             TARGET_PLATFORM_link
+#
+# A platform exists for a target when its _sources is declared; _cflags and
+# _link default to empty. The target of any other name is the text before its
+# first underscore, which is how "its manifest declares" lists them.
+#
+# The file is never compiled. Were these constants, every name in it would be
+# reserved program-wide and emitted as a global in every build that attaches
+# the backend, and two backends could not both declare c_linux_sources. Read
+# here instead, one backend.id at a time, nothing in it reaches a program, and
+# no two backends can collide. It is read the way read_manifest reads conf.id:
+# a line is a string or a string[] of string literals without escapes, and any
+# other line is refused at its line rather than guessed at.
+BD_STR='^string[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=[[:space:]]*"([^"\\]*)"[[:space:]]*;$'
+BD_LIST='^string\[\][[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=[[:space:]]*\[[[:space:]]*("[^"\\]*"([[:space:]]*,[[:space:]]*"[^"\\]*")*)?[[:space:]]*\][[:space:]]*;$'
+BD_PLAT='^([A-Za-z0-9]+_.+)_(sources|cflags|link)$'
+BD_FIELD='^[A-Za-z0-9]+_[A-Za-z0-9]+$'
+
+bd_fail() { # bd_fail LINE REASON
+    progress_clear
+    echo "idc: $BD_FILE:$1: invalid backend declarations: $2" >&2
+    exit 1
+}
+
+# bd_line LINENO TRIMMED -- one declaration into BD, a list's elements joined
+# by \x1f, its line into BD_AT and its name onto BD_NAMES.
+bd_line() {
+    local n="$1" t="$2" kind want name e
+    local -a elems=()
+    if [[ "$t" =~ $BD_STR ]]; then
+        kind=string; name="${BASH_REMATCH[1]}"; BD[$name]="${BASH_REMATCH[2]}"
+    elif [[ "$t" =~ $BD_LIST ]]; then
+        kind="string[]"; name="${BASH_REMATCH[1]}"
+        while IFS= read -r e; do elems+=("${e:1:${#e}-2}"); done \
+            < <(printf '%s' "${BASH_REMATCH[2]}" | grep -o '"[^"]*"')
+        BD[$name]=$(IFS=$'\x1f'; printf '%s' "${elems[*]}")
+    else
+        bd_fail "$n" "'$t' is not a string or string[] constant with a literal value"
+    fi
+    if [ -n "${BD_AT[$name]:-}" ]; then
+        bd_fail "$n" "'$name' is already declared at line ${BD_AT[$name]}"
+    fi
+    if [ "$name" = name ] || [[ "$name" =~ $BD_FIELD ]]; then
+        want=string
+    elif [[ "$name" =~ $BD_PLAT ]]; then
+        want="string[]"
+    else
+        bd_fail "$n" "'$name' is not name, TARGET_FIELD, or TARGET_PLATFORM_sources, _cflags or _link"
+    fi
+    [ "$kind" = "$want" ] || bd_fail "$n" "'$name' is a $want, not a $kind"
+    BD_AT[$name]="$n"
+    BD_NAMES+=("$name")
+}
+
+# backend_decls FILE -- read and check a backend.id into BD, BD_AT, BD_NAMES.
+backend_decls() {
+    local lineno=0 line trimmed name
+    BD_FILE="$1"
+    BD=()
+    BD_AT=()
+    BD_NAMES=()
+    while IFS= read -r line || [ -n "$line" ]; do
+        lineno=$((lineno + 1))
+        trimmed="${line#"${line%%[![:space:]]*}"}"
+        trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+        [ -z "$trimmed" ] && continue
+        case "$trimmed" in //*) continue ;; esac
+        bd_line "$lineno" "$trimmed"
+    done < "$BD_FILE"
+    for name in ${BD_NAMES[@]+"${BD_NAMES[@]}"}; do
+        [[ "$name" =~ $BD_PLAT ]] || continue
+        [ -n "${BD_AT[${BASH_REMATCH[1]}_sources]:-}" ] \
+            || bd_fail "${BD_AT[$name]}" "'$name' has no ${BASH_REMATCH[1]}_sources, which is what declares a platform"
+    done
+}
+
 # backend_build DIR -- compile DIR's sources for this platform, once per build.
-# A manifest that cannot serve this build sets BE_ERR and returns 1, so the
+# Declarations that cannot serve this build set BE_ERR and return 1, so the
 # caller can say which reached native needed it.
 backend_build() {
-    local d="$1" manifest spec_out err_line sources_line cflags_line link_line src src_path obj backend_rc
+    local d="$1" file name have n sources_line cflags_line link_line src src_path obj backend_rc
     local -a srcs=() cflags=() objs=()
     BE_ERR=""
     [ -n "${BE_BUILT[$d]:-}" ] && return 0
-    manifest="$d/backend.json"
-    if [ ! -f "$manifest" ]; then
+    file="$d/backend.id"
+    if [ ! -f "$file" ]; then
         progress_clear
-        echo "idc: backend has no backend.json: $manifest" >&2
+        echo "idc: backend has no backend.id: $file" >&2
         exit 1
     fi
-    spec_out=$(python3 - "$manifest" "$PLATKEY_BUILD" "$TRIPLE" <<'PYEOF'
-import json, sys
-manifest, key, triple = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(manifest) as f:
-    spec = json.load(f)
-name = spec.get("name", "backend")
-# Mirrors idc.py's backend_platforms: `targets` maps a *compiler* target to the
-# implementation it should build, so a future LLVM/wasm/interpreter target adds
-# a key there rather than anything changing in id. A manifest with no `targets`
-# (gfx, gl) has a bare `platforms` table, which is the C target's.
-targets = spec.get("targets")
-if targets is None:
-    plats = spec.get("platforms") or {}
-elif targets.get("c") is None:
-    have = ", ".join(sorted(targets)) or "none"
-    print("ERR", f"backend '{name}' has no implementation for the C target "
-                 f"(its manifest declares: {have})")
-    sys.exit(0)
-else:
-    plats = targets["c"].get("platforms") or {}
-plat = plats.get(key)
-if plat is None:
-    # Name the triple, not just the key: the key is derived from it, and the
-    # triple is the thing the user can change. Naming what the backend *does*
-    # have turns "unsupported" into a choice between porting it and picking a
-    # platform it already covers.
-    have = ", ".join(sorted(plats)) or "no platform at all"
-    print("ERR", f"backend '{name}' has no support for platform '{key}' "
-                 f"(building for '{triple}'); it is implemented for: {have}")
-    sys.exit(0)
-SEP = "\x1f"
-print("SOURCES", SEP.join(plat.get("sources", [])))
-print("CFLAGS", SEP.join(plat.get("cflags", [])))
-print("LINK", SEP.join(plat.get("link", [])))
-PYEOF
-) || { echo "idc: invalid backend.json: $manifest" >&2; exit 1; }
-    err_line=$(printf '%s\n' "$spec_out" | grep '^ERR ' | cut -d' ' -f2-)
-    if [ -n "$err_line" ]; then
-        BE_ERR="$err_line"
+    backend_decls "$file"
+    name="${BD[name]-backend}"
+    if [ -z "${BD_AT[c_${PLATKEY_BUILD}_sources]:-}" ]; then
+        have=""
+        # A target is compiled for only when it declares something; the C
+        # target's absence is named before any platform is asked about.
+        if ! printf '%s\n' ${BD_NAMES[@]+"${BD_NAMES[@]}"} | grep -q '^c_'; then
+            for n in $(printf '%s\n' ${BD_NAMES[@]+"${BD_NAMES[@]}"} | grep -v '^name$' | sed 's/_.*//' | LC_ALL=C sort -u); do
+                have="${have:+$have, }$n"
+            done
+            BE_ERR="backend '$name' has no implementation for the C target (its manifest declares: ${have:-none})"
+            return 1
+        fi
+        # Name the triple, not just the key: the key is derived from it, and
+        # the triple is the thing the user can change. Naming what the backend
+        # does have turns "unsupported" into a choice between porting it and
+        # picking a platform it already covers.
+        for n in $(printf '%s\n' ${BD_NAMES[@]+"${BD_NAMES[@]}"} | sed -n 's/^c_\(.*\)_sources$/\1/p' | LC_ALL=C sort); do
+            have="${have:+$have, }$n"
+        done
+        BE_ERR="backend '$name' has no support for platform '$PLATKEY_BUILD' (building for '$TRIPLE'); it is implemented for: ${have:-no platform at all}"
         return 1
     fi
-    sources_line=$(printf '%s\n' "$spec_out" | grep '^SOURCES ' | cut -d' ' -f2-)
-    cflags_line=$(printf '%s\n' "$spec_out" | grep '^CFLAGS ' | cut -d' ' -f2-)
-    link_line=$(printf '%s\n' "$spec_out" | grep '^LINK ' | cut -d' ' -f2-)
+    sources_line="${BD[c_${PLATKEY_BUILD}_sources]}"
+    cflags_line="${BD[c_${PLATKEY_BUILD}_cflags]:-}"
+    link_line="${BD[c_${PLATKEY_BUILD}_link]:-}"
     IFS=$'\x1f' read -ra srcs <<< "$sources_line"
     IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
     for src in ${srcs[@]+"${srcs[@]}"}; do
