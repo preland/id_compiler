@@ -1,0 +1,26 @@
+// A literal node of each element kind ll_cell (build/cell.id) dispatches on,
+// with (import enames)[0] set so ll_cell_line's string branch (build/named.id)
+// has a real constant name to build "@.cs.NAME.j" from.
+
+llc_int_setup() {
+  env_init();
+  export int llc_int_e = node_int("5", 5, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+llc_str_setup() {
+  env_init();
+  push((import enames), "k");
+  export int llc_str_e = node_str("hi");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+llc_float_setup() {
+  env_init();
+  push((import enames), "m");
+  export int llc_float_e = node_float("1.5");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

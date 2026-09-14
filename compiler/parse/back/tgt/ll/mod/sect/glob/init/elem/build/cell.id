@@ -24,3 +24,5 @@ ll_cell(int i, int j, int e, string t) {
     cell = ll_cell_named(i, j, e, t);
   }
 } return string cell;
+given llc_int_setup (0, 0, (import llc_int_e), "int"):("5")
+given llc_str_setup (0, 3, (import llc_str_e), "string"):("%s0.3")

@@ -7,6 +7,8 @@ ll_cell_named(int i, int j, int e, string t) {
   string insn = ll_cell_line(i, j, e, t);
   emit_line("  " + nm + " = " + insn);
 } return string nm;
+given llc_str_setup (0, 3, (import llc_str_e), "string"):("%s0.3")
+given llc_float_setup (0, 1, (import llc_float_e), "float"):("%s0.1")
 
 ll_cell_line(int i, int j, int e, string t) {
   string insn = "ptrtoint ptr @.cs." + (import enames)[i] + "." + j + " to i64";
@@ -14,6 +16,8 @@ ll_cell_line(int i, int j, int e, string t) {
     insn = "call i64 @id_box_f(double " + s1_of(e) + ")";
   }
 } return string insn;
+given llc_str_setup (0, 3, (import llc_str_e), "string"):("ptrtoint ptr @.cs.k.3 to i64")
+given llc_float_setup (0, 1, (import llc_float_e), "float"):("call i64 @id_box_f(double 1.5)")
 
 // The finished list, once every element is pushed: stored into the global it
 // is a constant of, then locked (glob/init/each.id's ll_init_build), so a
