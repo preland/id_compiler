@@ -32,6 +32,6 @@ emit_case_fn(int ci) {
 
 emit_case_run(int ci) {
   emit_line("    id_ctr_time = 0; id_ctr_mem = 0;");
-  emit_case_call(ci);
+  emit_case_call_wrapped(ci);
   emit_case_judge(ci);
 } return void;

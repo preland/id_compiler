@@ -1,0 +1,17 @@
+// What a `prints`/`eprints` clause compares against, and what its failure
+// message calls it: `thenprints` reads back stdout (capture/io.id), and
+// `theneprints` reads back eprint's own buffer.
+
+print_var(string kind) {
+  string pv = "idtc_out_buf";
+  if(kind == "theneprints") {
+    pv = "idtc_err_buf";
+  }
+} return string pv;
+
+print_label(string kind) {
+  string lab = "prints";
+  if(kind == "theneprints") {
+    lab = "eprints";
+  }
+} return string lab;

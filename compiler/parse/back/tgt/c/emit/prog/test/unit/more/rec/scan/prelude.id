@@ -1,0 +1,13 @@
+// Global state for `calls`-clause recording (docs/TESTS.md): idtc_rec_on is
+// true only while the call under test (and whatever it calls) is running, and
+// idtc_rec_seq gives each recorded call, across every recorded name, one
+// position in the order calls actually happened -- what lets several `then
+// calls` clauses be matched as a subsequence (case/around/then/more/calls/).
+// idtc_eprint_target is eprint's own destination
+// (test/unit/more/prelude/count.id's IDTC_EPRINT_TO).
+
+emit_rec_prelude() {
+  emit_line("");
+  emit_line("static int idtc_rec_on = 0;\nstatic long long idtc_rec_seq = 0;\nstatic FILE* idtc_eprint_target = NULL;");
+  emit_rec_defs();
+} return void;

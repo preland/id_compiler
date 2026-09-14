@@ -1,0 +1,23 @@
+// A recorder for every function targeted by a `calls` clause (target.id),
+// each definition emitted once -- `prog` names every function of the build
+// exactly once, which is what a plain scan over it gets for free.
+
+emit_rec_defs() {
+  int i = 0;
+  emit_rec_scan(i);
+} return void;
+
+emit_rec_scan(int i) {
+  while(i < len((import prog))) {
+    emit_rec_at(i);
+    i = i + 1;
+  }
+} return void;
+
+emit_rec_at(int i) {
+  int fn = (import prog)[i];
+  string nm = s1_of(fn);
+  if(is_rec_target(nm) == 1) {
+    emit_rec_def(nm, fn);
+  }
+} return void;

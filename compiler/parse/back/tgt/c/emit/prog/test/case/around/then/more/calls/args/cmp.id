@@ -1,0 +1,14 @@
+// One column's comparison (build.id), and the search loop over NAME's
+// recorded rows: the first one at or after idtc_seek that matches every
+// column, or a failure naming how many calls to NAME were recorded at all
+// (docs/TESTS.md allows the count in place of showing each one).
+
+calls_row_cmp(string nm, int ti, string pt, string fld, int item, string out) {
+  string code = "idtc_rc_" + nm + "_buf[idtc_j" + ti + "]." + fld;
+  string want = tc_value(item, pt);
+  string so = out + " && " + tc_compare(code, want, pt);
+} return string so;
+
+emit_calls_args_emit(int ci, int ti, string nm, string rowcond) {
+  emit_line("    int idtc_hit" + ti + " = 0;\n    for (int idtc_j" + ti + " = 0; idtc_j" + ti + " < idtc_rc_" + nm + "_n; idtc_j" + ti + "++) {\n        if (idtc_rc_" + nm + "_seq[idtc_j" + ti + "] > idtc_seek && (" + rowcond + ")) {\n            idtc_hit" + ti + " = 1;\n            idtc_seek = idtc_rc_" + nm + "_seq[idtc_j" + ti + "];\n            break;\n        }\n    }\n    if (!idtc_hit" + ti + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "(...) did not match; %d call(s) to '" + nm + "' were recorded\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], idtc_rc_" + nm + "_n);\n        return 3;\n    }");
+} return void;

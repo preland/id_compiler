@@ -1,0 +1,9 @@
+// Either form of `calls` counts, for turning recording on around the call
+// (../pre/, ../post/).
+
+case_has_calls(int ci) {
+  int r = case_has_out(ci, "thencalls");
+  if(r == 0) {
+    r = case_has_out(ci, "thencallsn");
+  }
+} return int r;

@@ -1,0 +1,20 @@
+// `then calls NAME:[N]` -- the exact count recorded for NAME
+// (test/unit/more/rec/), regardless of when during the call under test each
+// happened.
+
+emit_calls_count(int ci, int ti, int node) {
+  string nm = s1_of(node);
+  int[] items = l1_of(node);
+  emit_calls_count_body(ci, nm, items);
+} return void;
+
+emit_calls_count_body(int ci, string nm, int[] items) {
+  string want = tc_value(items[0], "int");
+  string cntexpr = "idtc_rc_" + nm + "_n";
+  emit_calls_count_cond(ci, nm, cntexpr, want);
+} return void;
+
+emit_calls_count_cond(int ci, string nm, string cntexpr, string want) {
+  string cnd = "(" + cntexpr + " == (" + want + "))";
+  emit_line("    if (!" + cnd + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "[%d], expected %d\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], " + cntexpr + ", " + want + ");\n        return 3;\n    }");
+} return void;

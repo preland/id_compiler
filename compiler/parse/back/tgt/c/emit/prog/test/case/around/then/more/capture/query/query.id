@@ -1,0 +1,23 @@
+// Whether the case being emitted carries a `then` clause of a given kind --
+// decided once per case from thennode, the same table the clauses themselves
+// are stored in (front/.../case/then/more/).
+
+case_has_out(int ci, string kind) {
+  int ti = 0;
+  int r = 0;
+  int ret_i = out_scan(ci, kind, ti, r);
+} return int ret_i;
+
+out_scan(int ci, string kind, int ti, int r) {
+  while(ti < len((import thennode))) {
+    r = out_step(ci, kind, ti, r);
+    ti = ti + 1;
+  }
+} return int r;
+
+out_step(int ci, string kind, int ti, int r) {
+  int node = (import thennode)[ti];
+  if(i1_of(node) == ci && k_of(node) == kind) {
+    r = 1;
+  }
+} return int r;

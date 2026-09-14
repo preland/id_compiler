@@ -1,0 +1,15 @@
+// Just the parameter names, comma-separated: the arguments a NAME's body
+// passes to its own recorder (../../call.id).
+
+rec_param_names(int[] params) {
+  string out = "";
+  int i = 0;
+  string ret_s = rec_name_scan(params, out, i);
+} return string ret_s;
+
+rec_name_scan(int[] params, string out, int i) {
+  while(i < len(params)) {
+    out = out + sep_arg(i) + s2_of(params[i]);
+    i = i + 1;
+  }
+} return string out;

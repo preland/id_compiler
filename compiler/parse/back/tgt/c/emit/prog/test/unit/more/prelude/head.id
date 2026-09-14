@@ -15,6 +15,6 @@ emit_test_head() {
 
 emit_test_decls() {
   emit_count_postlude();
-  emit_line("");
+  emit_rec_prelude();
   emit_decls();
 } return void;

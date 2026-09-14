@@ -1,0 +1,22 @@
+// A recorded row's assignments, `pfx.name = name;` for each parameter --
+// `name` on the right is the recorder's own parameter (columns.id gave the
+// field the same name), and `pfx` is the row being appended
+// (../fn.id).
+
+rec_row_assigns(int[] params, string pfx) {
+  string out = "";
+  int i = 0;
+  string ret_s = rec_assign_scan(params, pfx, out, i);
+} return string ret_s;
+
+rec_assign_scan(int[] params, string pfx, string out, int i) {
+  while(i < len(params)) {
+    out = rec_assign_add(params, pfx, out, i);
+    i = i + 1;
+  }
+} return string out;
+
+rec_assign_add(int[] params, string pfx, string out, int i) {
+  string nm = s2_of(params[i]);
+  string so = out + pfx + "." + nm + " = " + nm + "; ";
+} return string so;

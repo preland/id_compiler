@@ -1027,15 +1027,17 @@ void id_emit_ty_protos(void);
 void id_tc_collect_case(int ci);
 void id_tc_collect_expd(int fn, IdList* expd);
 void id_note_ty(char* ty);
+void id_note_fn_ret(int cfn);
 void id_tc_collect_thens(void);
 void id_note_check(int ti);
-void id_note_fn_ret(int cfn);
+void id_note_check_then(int node);
 void id_init_tyc(void);
 void id_init_tyc_rows(void);
 void id_init_tyc_rows2(void);
 void id_emit_def(int id);
 void id_emit_def_body(int id);
 void id_emit_tail(int id);
+void id_emit_entry(int id);
 char* id_c_fn_params(IdList* pts);
 char* id_c_type_list(IdList* pts);
 void id_emit_tail_end(int id);
@@ -1087,12 +1089,48 @@ void id_emit_arg_lines(IdList* ps, IdList* args);
 void id_emit_arg_line(IdList* ps, IdList* args, int j);
 void id_emit_case_pre(int ci);
 void id_emit_case_given(int ci);
+void id_emit_then_kind(char* kind, int ci, int ti, int node);
+void id_emit_then_check(int ci, int ti, int node);
 void id_emit_then_fail(int ci, int ti, char* chk_nm, char* rt);
 void id_emit_then_lines(int ci, int ti, char* chk_nm, char* cnd, char* shown);
 char* id_then_tail(int ti);
 void id_emit_then_got(int ci, int ti, char* chk_nm, int cfn);
 void id_emit_then_want(int ci, int ti, char* chk_nm, char* rt, char* ct);
 void id_emit_then_judge(int ci, int ti, char* chk_nm, char* rt, IdList* items);
+void id_emit_calls_args(int ci, int ti, int node);
+void id_emit_calls_args_body(int ci, int ti, char* nm, IdList* items);
+void id_emit_calls_args_cond(int ci, int ti, char* nm, IdList* params, IdList* items);
+char* id_calls_row_cond(char* nm, int ti, IdList* params, IdList* items);
+char* id_calls_row_scan(char* nm, int ti, IdList* params, IdList* items, char* out, int i);
+char* id_calls_row_step(char* nm, int ti, IdList* params, IdList* items, char* out, int i);
+char* id_calls_row_cmp(char* nm, int ti, char* pt, char* fld, int item, char* out);
+void id_emit_calls_args_emit(int ci, int ti, char* nm, char* rowcond);
+void id_emit_calls_count(int ci, int ti, int node);
+void id_emit_calls_count_body(int ci, char* nm, IdList* items);
+void id_emit_calls_count_cond(int ci, char* nm, char* cntexpr, char* want);
+void id_emit_then_calls(int ci, int ti, int node);
+void id_emit_capture_post(int ci);
+void id_emit_out_post(int ci);
+void id_emit_capture_post2(int ci);
+void id_emit_err_post(int ci);
+void id_emit_calls_post(int ci);
+void id_emit_capture_pre(int ci);
+void id_emit_out_pre(int ci);
+void id_emit_capture_pre2(int ci);
+void id_emit_err_pre(int ci);
+void id_emit_calls_pre(int ci);
+int id_case_has_calls(int ci);
+int id_case_has_out(int ci, char* kind);
+int id_out_scan(int ci, char* kind, int ti, int r);
+int id_out_step(int ci, char* kind, int ti, int r);
+void id_emit_case_call_wrapped(int ci);
+void id_emit_print_lines(int ci, char* kind, char* cnd, char* shown, int e);
+void id_emit_print_final(int ci, char* lab, char* cnd, char* shown, char* lt);
+void id_emit_then_print(int ci, int ti, int node);
+void id_emit_print_check(int ci, char* kind, int e);
+void id_emit_print_cond(int ci, char* kind, char* var, char* want, int e);
+char* id_print_var(char* kind);
+char* id_print_label(char* kind);
 void id_emit_case_thens(int ci);
 void id_then_at(int ci, int ti);
 void id_emit_then(int ci, int ti);
@@ -1162,6 +1200,28 @@ void id_emit_count_postlude(void);
 void id_emit_test_body(char* triple);
 void id_emit_test_head(void);
 void id_emit_test_decls(void);
+void id_emit_rec_call(int id);
+void id_emit_rec_call_line(int id, char* nm);
+void id_emit_rec_def(char* nm, int fn);
+void id_emit_rec_struct(char* nm, char* sigtext, IdList* params);
+void id_emit_rec_types(char* nm, char* fields);
+void id_emit_rec_fn(char* nm, char* sigtext, IdList* params);
+void id_emit_rec_fn_body(char* nm, char* sigtext, char* assigns);
+char* id_rec_row_assigns(IdList* params, char* pfx);
+char* id_rec_assign_scan(IdList* params, char* pfx, char* out, int i);
+char* id_rec_assign_add(IdList* params, char* pfx, char* out, int i);
+char* id_rec_row_fields(IdList* params);
+char* id_rec_row_scan(IdList* params, char* out, int i);
+char* id_rec_row_add(IdList* params, char* out, int i);
+char* id_rec_param_names(IdList* params);
+char* id_rec_name_scan(IdList* params, char* out, int i);
+void id_emit_rec_defs(void);
+void id_emit_rec_scan(int i);
+void id_emit_rec_at(int i);
+void id_emit_rec_prelude(void);
+int id_is_rec_target(char* nm);
+int id_rec_target_loop(char* nm, int ti, int r);
+int id_rec_target_step(char* nm, int ti, int r);
 void id_emit_tc_judge(void);
 void id_emit_tc_rest(void);
 void id_emit_tc_support(void);
@@ -8014,6 +8074,13 @@ void id_note_ty(char* ty) {
     return;
 }
 
+void id_note_fn_ret(int cfn) {
+    char* rt;
+    rt = id_s2_of(cfn);
+    id_note_ty(rt);
+    return;
+}
+
 void id_tc_collect_thens(void) {
     int ti;
     ti = 0;
@@ -8025,18 +8092,20 @@ void id_tc_collect_thens(void) {
 }
 
 void id_note_check(int ti) {
-    char* chk_nm;
-    int cfn;
-    chk_nm = id_s1_of((int)(id_list_get(thennode, ti)));
-    cfn = id_func_node(chk_nm);
-    id_note_fn_ret(cfn);
+    int node;
+    node = (int)(id_list_get(thennode, ti));
+    if ((strcmp(id_k_of(node), "then") == 0)) {
+        id_note_check_then(node);
+    }
     return;
 }
 
-void id_note_fn_ret(int cfn) {
-    char* rt;
-    rt = id_s2_of(cfn);
-    id_note_ty(rt);
+void id_note_check_then(int node) {
+    char* chk_nm;
+    int cfn;
+    chk_nm = id_s1_of(node);
+    cfn = id_func_node(chk_nm);
+    id_note_fn_ret(cfn);
     return;
 }
 
@@ -8070,7 +8139,7 @@ void id_emit_def(int id) {
 
 void id_emit_def_body(int id) {
     id_hoist(id);
-    id_emit_count("    ");
+    id_emit_entry(id);
     id_emit_tail(id);
     return;
 }
@@ -8078,6 +8147,12 @@ void id_emit_def_body(int id) {
 void id_emit_tail(int id) {
     id_emit_main_init(id);
     id_emit_tail2(id);
+    return;
+}
+
+void id_emit_entry(int id) {
+    id_emit_count("    ");
+    id_emit_rec_call(id);
     return;
 }
 
@@ -8524,6 +8599,26 @@ void id_emit_case_given(int ci) {
     return;
 }
 
+void id_emit_then_kind(char* kind, int ci, int ti, int node) {
+    if ((strcmp(kind, "then") == 0)) {
+        id_emit_then_check(ci, ti, node);
+    } else if (((strcmp(kind, "thenprints") == 0) || (strcmp(kind, "theneprints") == 0))) {
+        id_emit_then_print(ci, ti, node);
+    } else {
+        id_emit_then_calls(ci, ti, node);
+    }
+    return;
+}
+
+void id_emit_then_check(int ci, int ti, int node) {
+    char* chk_nm;
+    int cfn;
+    chk_nm = id_s1_of(node);
+    cfn = id_func_node(chk_nm);
+    id_emit_then_got(ci, ti, chk_nm, cfn);
+    return;
+}
+
 void id_emit_then_fail(int ci, int ti, char* chk_nm, char* rt) {
     char* cnd;
     char* shown;
@@ -8575,6 +8670,280 @@ void id_emit_then_judge(int ci, int ti, char* chk_nm, char* rt, IdList* items) {
     return;
 }
 
+void id_emit_calls_args(int ci, int ti, int node) {
+    char* nm;
+    IdList* items;
+    nm = id_s1_of(node);
+    items = id_l1_of(node);
+    id_emit_calls_args_body(ci, ti, nm, items);
+    return;
+}
+
+void id_emit_calls_args_body(int ci, int ti, char* nm, IdList* items) {
+    int cfn;
+    IdList* params;
+    cfn = id_func_node(nm);
+    params = id_l1_of(cfn);
+    id_emit_calls_args_cond(ci, ti, nm, params, items);
+    return;
+}
+
+void id_emit_calls_args_cond(int ci, int ti, char* nm, IdList* params, IdList* items) {
+    char* rowcond;
+    rowcond = id_calls_row_cond(nm, ti, params, items);
+    id_emit_calls_args_emit(ci, ti, nm, rowcond);
+    return;
+}
+
+char* id_calls_row_cond(char* nm, int ti, IdList* params, IdList* items) {
+    char* out;
+    int i;
+    char* ret_s;
+    out = "1";
+    i = 0;
+    ret_s = id_calls_row_scan(nm, ti, params, items, out, i);
+    return ret_s;
+}
+
+char* id_calls_row_scan(char* nm, int ti, IdList* params, IdList* items, char* out, int i) {
+    while ((i < id_list_len(params))) {
+        out = id_calls_row_step(nm, ti, params, items, out, i);
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_calls_row_step(char* nm, int ti, IdList* params, IdList* items, char* out, int i) {
+    char* pt;
+    char* fld;
+    char* ret_s;
+    pt = id_s1_of((int)(id_list_get(params, i)));
+    fld = id_s2_of((int)(id_list_get(params, i)));
+    ret_s = id_calls_row_cmp(nm, ti, pt, fld, (int)(id_list_get(items, i)), out);
+    return ret_s;
+}
+
+char* id_calls_row_cmp(char* nm, int ti, char* pt, char* fld, int item, char* out) {
+    char* code;
+    char* want;
+    char* so;
+    code = id_concat(id_concat(id_concat(id_concat(id_concat("idtc_rc_", nm), "_buf[idtc_j"), id_str_of_int(ti)), "]."), fld);
+    want = id_tc_value(item, pt);
+    so = id_concat(id_concat(out, " && "), id_tc_compare(code, want, pt));
+    return so;
+}
+
+void id_emit_calls_args_emit(int ci, int ti, char* nm, char* rowcond) {
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    int idtc_hit", id_str_of_int(ti)), " = 0;\n    for (int idtc_j"), id_str_of_int(ti)), " = 0; idtc_j"), id_str_of_int(ti)), " < idtc_rc_"), nm), "_n; idtc_j"), id_str_of_int(ti)), "++) {\n        if (idtc_rc_"), nm), "_seq[idtc_j"), id_str_of_int(ti)), "] > idtc_seek && ("), rowcond), ")) {\n            idtc_hit"), id_str_of_int(ti)), " = 1;\n            idtc_seek = idtc_rc_"), nm), "_seq[idtc_j"), id_str_of_int(ti)), "];\n            break;\n        }\n    }\n    if (!idtc_hit"), id_str_of_int(ti)), ") {\n        fprintf(stderr, \"%s: test failed: %s calls "), nm), "(...) did not match; %d call(s) to '"), nm), "' were recorded\\n\", idtc_where["), id_str_of_int(ci)), "], idtc_call["), id_str_of_int(ci)), "], idtc_rc_"), nm), "_n);\n        return 3;\n    }"));
+    return;
+}
+
+void id_emit_calls_count(int ci, int ti, int node) {
+    char* nm;
+    IdList* items;
+    nm = id_s1_of(node);
+    items = id_l1_of(node);
+    id_emit_calls_count_body(ci, nm, items);
+    return;
+}
+
+void id_emit_calls_count_body(int ci, char* nm, IdList* items) {
+    char* want;
+    char* cntexpr;
+    want = id_tc_value((int)(id_list_get(items, 0)), "int");
+    cntexpr = id_concat(id_concat("idtc_rc_", nm), "_n");
+    id_emit_calls_count_cond(ci, nm, cntexpr, want);
+    return;
+}
+
+void id_emit_calls_count_cond(int ci, char* nm, char* cntexpr, char* want) {
+    char* cnd;
+    cnd = id_concat(id_concat(id_concat(id_concat("(", cntexpr), " == ("), want), "))");
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    if (!", cnd), ") {\n        fprintf(stderr, \"%s: test failed: %s calls "), nm), "[%d], expected %d\\n\", idtc_where["), id_str_of_int(ci)), "], idtc_call["), id_str_of_int(ci)), "], "), cntexpr), ", "), want), ");\n        return 3;\n    }"));
+    return;
+}
+
+void id_emit_then_calls(int ci, int ti, int node) {
+    char* kind;
+    kind = id_k_of(node);
+    if ((strcmp(kind, "thencalls") == 0)) {
+        id_emit_calls_args(ci, ti, node);
+    } else {
+        id_emit_calls_count(ci, ti, node);
+    }
+    return;
+}
+
+void id_emit_capture_post(int ci) {
+    id_emit_out_post(ci);
+    id_emit_capture_post2(ci);
+    return;
+}
+
+void id_emit_out_post(int ci) {
+    if ((id_case_has_out(ci, "thenprints") == 1)) {
+        id_emit_line("    fflush(stdout);\n    dup2(idtc_out_save, 1);\n    close(idtc_out_save);\n    long idtc_out_len = ftell(idtc_out_tmp);\n    fseek(idtc_out_tmp, 0, SEEK_SET);\n    char* idtc_out_buf = malloc((size_t)idtc_out_len + 1);\n    if (idtc_out_len > 0) { size_t idtc_out_rd = fread(idtc_out_buf, 1, (size_t)idtc_out_len, idtc_out_tmp); (void)idtc_out_rd; }\n    idtc_out_buf[idtc_out_len] = 0;\n    fclose(idtc_out_tmp);");
+    }
+    return;
+}
+
+void id_emit_capture_post2(int ci) {
+    id_emit_err_post(ci);
+    id_emit_calls_post(ci);
+    return;
+}
+
+void id_emit_err_post(int ci) {
+    if ((id_case_has_out(ci, "theneprints") == 1)) {
+        id_emit_line("    fflush(idtc_eprint_target);\n    long idtc_err_len = ftell(idtc_eprint_target);\n    fseek(idtc_eprint_target, 0, SEEK_SET);\n    char* idtc_err_buf = malloc((size_t)idtc_err_len + 1);\n    if (idtc_err_len > 0) { size_t idtc_err_rd = fread(idtc_err_buf, 1, (size_t)idtc_err_len, idtc_eprint_target); (void)idtc_err_rd; }\n    idtc_err_buf[idtc_err_len] = 0;\n    fclose(idtc_eprint_target);\n    idtc_eprint_target = NULL;");
+    }
+    return;
+}
+
+void id_emit_calls_post(int ci) {
+    if ((id_case_has_calls(ci) == 1)) {
+        id_emit_line("    idtc_rec_on = 0;");
+    }
+    return;
+}
+
+void id_emit_capture_pre(int ci) {
+    id_emit_out_pre(ci);
+    id_emit_capture_pre2(ci);
+    return;
+}
+
+void id_emit_out_pre(int ci) {
+    if ((id_case_has_out(ci, "thenprints") == 1)) {
+        id_emit_line("    fflush(stdout);\n    FILE* idtc_out_tmp = tmpfile();\n    int idtc_out_save = dup(1);\n    dup2(fileno(idtc_out_tmp), 1);");
+    }
+    return;
+}
+
+void id_emit_capture_pre2(int ci) {
+    id_emit_err_pre(ci);
+    id_emit_calls_pre(ci);
+    return;
+}
+
+void id_emit_err_pre(int ci) {
+    if ((id_case_has_out(ci, "theneprints") == 1)) {
+        id_emit_line("    idtc_eprint_target = tmpfile();");
+    }
+    return;
+}
+
+void id_emit_calls_pre(int ci) {
+    if ((id_case_has_calls(ci) == 1)) {
+        id_emit_line("    idtc_rec_on = 1;\n    long long idtc_seek = -1;");
+    }
+    return;
+}
+
+int id_case_has_calls(int ci) {
+    int r;
+    r = id_case_has_out(ci, "thencalls");
+    if ((r == 0)) {
+        r = id_case_has_out(ci, "thencallsn");
+    }
+    return r;
+}
+
+int id_case_has_out(int ci, char* kind) {
+    int ti;
+    int r;
+    int ret_i;
+    ti = 0;
+    r = 0;
+    ret_i = id_out_scan(ci, kind, ti, r);
+    return ret_i;
+}
+
+int id_out_scan(int ci, char* kind, int ti, int r) {
+    while ((ti < id_list_len(thennode))) {
+        r = id_out_step(ci, kind, ti, r);
+        ti = (ti + 1);
+    }
+    return r;
+}
+
+int id_out_step(int ci, char* kind, int ti, int r) {
+    int node;
+    node = (int)(id_list_get(thennode, ti));
+    if (((id_i1_of(node) == ci) && (strcmp(id_k_of(node), kind) == 0))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_emit_case_call_wrapped(int ci) {
+    id_emit_capture_pre(ci);
+    id_emit_case_call(ci);
+    id_emit_capture_post(ci);
+    return;
+}
+
+void id_emit_print_lines(int ci, char* kind, char* cnd, char* shown, int e) {
+    char* lab;
+    char* lt;
+    lab = id_print_label(kind);
+    lt = id_lit_text(e);
+    id_emit_print_final(ci, lab, cnd, shown, lt);
+    return;
+}
+
+void id_emit_print_final(int ci, char* lab, char* cnd, char* shown, char* lt) {
+    char* tail;
+    tail = id_c_esc(id_concat(id_concat(", expected ", lt), "\n"));
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("    if (!(", cnd), ")) {\n        fprintf(stderr, \"%s: test failed: %s "), lab), " = \", idtc_where["), id_str_of_int(ci)), "], idtc_call["), id_str_of_int(ci)), "]);\n        "), shown), "\n        fputs(\""), tail), "\", stderr);\n        return 3;\n    }"));
+    return;
+}
+
+void id_emit_then_print(int ci, int ti, int node) {
+    char* kind;
+    IdList* items;
+    kind = id_k_of(node);
+    items = id_l1_of(node);
+    id_emit_print_check(ci, kind, (int)(id_list_get(items, 0)));
+    return;
+}
+
+void id_emit_print_check(int ci, char* kind, int e) {
+    char* var;
+    char* want;
+    var = id_print_var(kind);
+    want = id_tc_value(e, "string");
+    id_emit_print_cond(ci, kind, var, want, e);
+    return;
+}
+
+void id_emit_print_cond(int ci, char* kind, char* var, char* want, int e) {
+    char* cnd;
+    char* shown;
+    cnd = id_tc_compare(var, want, "string");
+    shown = id_tc_show(var, "string");
+    id_emit_print_lines(ci, kind, cnd, shown, e);
+    return;
+}
+
+char* id_print_var(char* kind) {
+    char* pv;
+    pv = "idtc_out_buf";
+    if ((strcmp(kind, "theneprints") == 0)) {
+        pv = "idtc_err_buf";
+    }
+    return pv;
+}
+
+char* id_print_label(char* kind) {
+    char* lab;
+    lab = "prints";
+    if ((strcmp(kind, "theneprints") == 0)) {
+        lab = "eprints";
+    }
+    return lab;
+}
+
 void id_emit_case_thens(int ci) {
     int ti;
     ti = 0;
@@ -8593,11 +8962,11 @@ void id_then_at(int ci, int ti) {
 }
 
 void id_emit_then(int ci, int ti) {
-    char* chk_nm;
-    int cfn;
-    chk_nm = id_s1_of((int)(id_list_get(thennode, ti)));
-    cfn = id_func_node(chk_nm);
-    id_emit_then_got(ci, ti, chk_nm, cfn);
+    int node;
+    char* kind;
+    node = (int)(id_list_get(thennode, ti));
+    kind = id_k_of(node);
+    id_emit_then_kind(kind, ci, ti, node);
     return;
 }
 
@@ -8620,7 +8989,7 @@ void id_emit_case_fn(int ci) {
 
 void id_emit_case_run(int ci) {
     id_emit_line("    id_ctr_time = 0; id_ctr_mem = 0;");
-    id_emit_case_call(ci);
+    id_emit_case_call_wrapped(ci);
     id_emit_case_judge(ci);
     return;
 }
@@ -9154,7 +9523,7 @@ void id_emit_count(char* ind) {
 }
 
 void id_emit_count_prelude(void) {
-    id_emit_line("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO stdout\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_mem_of_str idtc_rt_mem_of_str");
+    id_emit_line("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target ? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_mem_of_str idtc_rt_mem_of_str");
     return;
 }
 
@@ -9179,9 +9548,195 @@ void id_emit_test_head(void) {
 
 void id_emit_test_decls(void) {
     id_emit_count_postlude();
-    id_emit_line("");
+    id_emit_rec_prelude();
     id_emit_decls();
     return;
+}
+
+void id_emit_rec_call(int id) {
+    char* nm;
+    nm = id_s1_of(id);
+    if (((id_is_harn() == 1) && (id_is_rec_target(nm) == 1))) {
+        id_emit_rec_call_line(id, nm);
+    }
+    return;
+}
+
+void id_emit_rec_call_line(int id, char* nm) {
+    IdList* params;
+    char* nmlist;
+    params = id_l1_of(id);
+    nmlist = id_rec_param_names(params);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat("    idtc_rec_", nm), "("), nmlist), ");"));
+    return;
+}
+
+void id_emit_rec_def(char* nm, int fn) {
+    char* sigtext;
+    IdList* params;
+    sigtext = id_param_str(fn);
+    params = id_l1_of(fn);
+    id_emit_rec_struct(nm, sigtext, params);
+    return;
+}
+
+void id_emit_rec_struct(char* nm, char* sigtext, IdList* params) {
+    char* fields;
+    fields = id_rec_row_fields(params);
+    id_emit_rec_types(nm, fields);
+    id_emit_rec_fn(nm, sigtext, params);
+    return;
+}
+
+void id_emit_rec_types(char* nm, char* fields) {
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("typedef struct { ", fields), "int idtc_rc_pad; } idtc_rc_"), nm), "_t;\nstatic int idtc_rc_"), nm), "_n = 0;\nstatic int idtc_rc_"), nm), "_cap = 0;\nstatic idtc_rc_"), nm), "_t* idtc_rc_"), nm), "_buf = NULL;\nstatic long long* idtc_rc_"), nm), "_seq = NULL;"));
+    return;
+}
+
+void id_emit_rec_fn(char* nm, char* sigtext, IdList* params) {
+    char* assigns;
+    assigns = id_rec_row_assigns(params, id_concat(id_concat(id_concat(id_concat("idtc_rc_", nm), "_buf[idtc_rc_"), nm), "_n]"));
+    id_emit_rec_fn_body(nm, sigtext, assigns);
+    return;
+}
+
+void id_emit_rec_fn_body(char* nm, char* sigtext, char* assigns) {
+    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("static void idtc_rec_", nm), "("), sigtext), ") {\n    if (!idtc_rec_on) return;\n    if (idtc_rc_"), nm), "_n == idtc_rc_"), nm), "_cap) {\n        idtc_rc_"), nm), "_cap = idtc_rc_"), nm), "_cap ? idtc_rc_"), nm), "_cap * 2 : 8;\n        idtc_rc_"), nm), "_buf = realloc(idtc_rc_"), nm), "_buf, sizeof(idtc_rc_"), nm), "_t) * (size_t)idtc_rc_"), nm), "_cap);\n        idtc_rc_"), nm), "_seq = realloc(idtc_rc_"), nm), "_seq, sizeof(long long) * (size_t)idtc_rc_"), nm), "_cap);\n    }\n    "), assigns), "\n    idtc_rc_"), nm), "_seq[idtc_rc_"), nm), "_n] = idtc_rec_seq++;\n    idtc_rc_"), nm), "_n++;\n}"));
+    return;
+}
+
+char* id_rec_row_assigns(IdList* params, char* pfx) {
+    char* out;
+    int i;
+    char* ret_s;
+    out = "";
+    i = 0;
+    ret_s = id_rec_assign_scan(params, pfx, out, i);
+    return ret_s;
+}
+
+char* id_rec_assign_scan(IdList* params, char* pfx, char* out, int i) {
+    while ((i < id_list_len(params))) {
+        out = id_rec_assign_add(params, pfx, out, i);
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_rec_assign_add(IdList* params, char* pfx, char* out, int i) {
+    char* nm;
+    char* so;
+    nm = id_s2_of((int)(id_list_get(params, i)));
+    so = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(out, pfx), "."), nm), " = "), nm), "; ");
+    return so;
+}
+
+char* id_rec_row_fields(IdList* params) {
+    char* out;
+    int i;
+    char* ret_s;
+    out = "";
+    i = 0;
+    ret_s = id_rec_row_scan(params, out, i);
+    return ret_s;
+}
+
+char* id_rec_row_scan(IdList* params, char* out, int i) {
+    while ((i < id_list_len(params))) {
+        out = id_rec_row_add(params, out, i);
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_rec_row_add(IdList* params, char* out, int i) {
+    char* pt;
+    char* nm;
+    char* so;
+    pt = id_s1_of((int)(id_list_get(params, i)));
+    nm = id_s2_of((int)(id_list_get(params, i)));
+    so = id_concat(id_concat(id_concat(id_concat(out, id_c_type(pt)), " "), nm), "; ");
+    return so;
+}
+
+char* id_rec_param_names(IdList* params) {
+    char* out;
+    int i;
+    char* ret_s;
+    out = "";
+    i = 0;
+    ret_s = id_rec_name_scan(params, out, i);
+    return ret_s;
+}
+
+char* id_rec_name_scan(IdList* params, char* out, int i) {
+    while ((i < id_list_len(params))) {
+        out = id_concat(id_concat(out, id_sep_arg(i)), id_s2_of((int)(id_list_get(params, i))));
+        i = (i + 1);
+    }
+    return out;
+}
+
+void id_emit_rec_defs(void) {
+    int i;
+    i = 0;
+    id_emit_rec_scan(i);
+    return;
+}
+
+void id_emit_rec_scan(int i) {
+    while ((i < id_list_len(prog))) {
+        id_emit_rec_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_emit_rec_at(int i) {
+    int fn;
+    char* nm;
+    fn = (int)(id_list_get(prog, i));
+    nm = id_s1_of(fn);
+    if ((id_is_rec_target(nm) == 1)) {
+        id_emit_rec_def(nm, fn);
+    }
+    return;
+}
+
+void id_emit_rec_prelude(void) {
+    id_emit_line("");
+    id_emit_line("static int idtc_rec_on = 0;\nstatic long long idtc_rec_seq = 0;\nstatic FILE* idtc_eprint_target = NULL;");
+    id_emit_rec_defs();
+    return;
+}
+
+int id_is_rec_target(char* nm) {
+    int ti;
+    int r;
+    int ret_i;
+    ti = 0;
+    r = 0;
+    ret_i = id_rec_target_loop(nm, ti, r);
+    return ret_i;
+}
+
+int id_rec_target_loop(char* nm, int ti, int r) {
+    while ((ti < id_list_len(thennode))) {
+        r = id_rec_target_step(nm, ti, r);
+        ti = (ti + 1);
+    }
+    return r;
+}
+
+int id_rec_target_step(char* nm, int ti, int r) {
+    int node;
+    char* kind;
+    node = (int)(id_list_get(thennode, ti));
+    kind = id_k_of(node);
+    if ((((strcmp(kind, "thencalls") == 0) || (strcmp(kind, "thencallsn") == 0)) && (strcmp(id_s1_of(node), nm) == 0))) {
+        r = 1;
+    }
+    return r;
 }
 
 void id_emit_tc_judge(void) {
