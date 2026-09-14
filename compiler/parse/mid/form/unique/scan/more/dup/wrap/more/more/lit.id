@@ -1,11 +1,13 @@
 // Reading a value back out of its fingerprint.
 
 // canon_expr tags a literal with one letter -- I an integer, F a float, S a
-// string -- and no other fingerprint starts with any of the three. 73, 70 and
-// 83 are those letters.
+// string -- and no other fingerprint starts with any of the three. cw_value_of
+// (../../../reserved/arrlit/value.id) tags a list of nothing but literals with
+// a fourth, 'A', that canon_expr itself never produces. 73, 70, 83 and 65 are
+// those letters.
 cw_is_lit(string fp) {
   int tag = charat(fp, 0);
-  int ok = tag == 73 || tag == 70 || tag == 83;
+  int ok = tag == 73 || tag == 70 || tag == 83 || tag == 65;
 } return int ok;
 
 // The value as conf.id spells it: the fingerprint after its tag (zeros_tail is

@@ -1,12 +1,12 @@
 // Which functions can be constant wrappers, and the state one walk keeps.
 
-// Only a scalar result can be a constant. main is the entry point whatever it
-// returns, and a native declaration has no body. A list is left alone on
-// purpose: a list literal builds a fresh list on every call, so each caller
-// owns what it got, and one shared conf.id global could not behave that way.
+// A scalar result, or a list one: a conf.id constant can be either now
+// (docs/PROJECT.md 5), so a function whose whole job is to build and return
+// one is the same complaint as a function that only returns a scalar. main is
+// the entry point whatever it returns, and a native declaration has no body.
 cw_shape(int id) {
   string rt = s2_of(id);
-  int ok = rt == "int" || rt == "word" || rt == "float" || rt == "string";
+  int ok = rt == "int" || rt == "word" || rt == "float" || rt == "string" || rt == "int[]" || rt == "word[]" || rt == "float[]" || rt == "string[]";
   if(is_native(id) == 1 || s1_of(id) == "main") {
     ok = 0;
   }

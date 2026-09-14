@@ -1,0 +1,25 @@
+// The spelling a report copies out (dup/wrap/more/more/report.id): the list
+// literal as conf.id would take it, e.g. '[1, 2, 3]'.
+
+cw_arr_spell(int id) {
+  int[] els = l1_of(id);
+  string out = "[" + cw_arr_spell_items(els) + "]";
+} return string out;
+
+cw_arr_spell_items(int[] els) {
+  string out = "";
+  int i = 0;
+  while(i < len(els)) {
+    out = out + sep_at(", ", i) + cw_elem_spell(els[i]);
+    i = i + 1;
+  }
+} return string out;
+
+// A string element is re-quoted; an int or a float already reads as source.
+cw_elem_spell(int e) {
+  string k = k_of(e);
+  string out = s1_of(e);
+  if(k == "str") {
+    out = "\"" + s1_of(e) + "\"";
+  }
+} return string out;

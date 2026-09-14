@@ -4,7 +4,7 @@
 
 cw_ret(int id) {
   int i1_of_v = i1_of(id);
-  string val = canon_expr(i1_of_v);
+  string val = cw_value_of(i1_of_v);
   if(k_of(i1_of_v) == "var") {
     string s1_of_v = s1_of(i1_of_v);
     val = cw_get(s1_of_v);

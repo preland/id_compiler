@@ -1,0 +1,34 @@
+// Whether a list literal is built from nothing but literal elements -- the
+// same fold the scalar rule relies on (docs/SPEC.md 7.2), but not looked
+// through for an element: `[2 * 1000, 3]` is not recognised, matching the
+// existing note that this rule can miss a wrapper the fold does not reduce.
+//
+// `[]` is not a wrapper even though it is vacuously "nothing but literal
+// elements": it carries no values a conf.id constant could hold instead, and
+// a function that hands back a fresh empty list is the "each caller owns
+// what it got" case docs/SPEC.md 7.2 already carves out -- sharing one `[]`
+// from conf.id would give every caller the *same* list, which is a behaviour
+// change, not a rewrite. `new_bucket() { int[] b = []; } return int[] b;`
+// (compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id) is exactly
+// this: every hash bucket has to be its own list.
+cw_arr_lit(int id) {
+  int[] els = l1_of(id);
+  int ok = 0;
+  if(len(els) > 0) {
+    ok = cw_arr_lit2(els);
+  }
+} return int ok;
+
+cw_arr_lit2(int[] els) {
+  int ok = 1;
+  int i = 0;
+  while(i < len(els) && ok == 1) {
+    ok = cw_arr_elem_lit(els[i]);
+    i = i + 1;
+  }
+} return int ok;
+
+cw_arr_elem_lit(int e) {
+  string k = k_of(e);
+  int ok = k == "int" || k == "float" || k == "str";
+} return int ok;

@@ -1307,12 +1307,17 @@ EOF
 self_refuse "bin/idc: a wrapper that reassigns its own local is rejected with the final value" \
     "p.id:1: error: 'last' only returns the constant 2;" --emit-c /dev/null
 
-# A list is not a constant: each call builds a fresh list, so one caller's
-# write is invisible to the next call -- a shared conf.id global could not
-# behave that way. Run, to show the two lists really are distinct.
+# A list a function builds is not a constant: each call builds a fresh list,
+# so one caller's write is invisible to the next call -- a shared conf.id
+# global could not behave that way. Run, to show the two lists really are
+# distinct. `push` keeps `primes` out of the constant-wrapper rule
+# (docs/SPEC.md 7.2): a call anywhere in the body makes it a function, same as
+# a scalar-returning wrapper -- unlike `int[] ps = [2, 3, 5]; return int[] ps;`
+# on its own, which that rule now rejects (a list has a home in conf.id).
 cat > "$TMP/p.id" <<'EOF'
 primes() {
   int[] ps = [2, 3, 5];
+  push(ps, 7);
 } return int[] ps;
 
 bump() {

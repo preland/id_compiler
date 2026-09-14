@@ -12,7 +12,7 @@ cw_assign(int id) {
 
 cw_put(int id, string name) {
   int i1_of_v = i1_of(id);
-  string val = canon_expr(i1_of_v);
+  string val = cw_value_of(i1_of_v);
   int ok = cw_keep(name, val);
 } return int ok;
 
