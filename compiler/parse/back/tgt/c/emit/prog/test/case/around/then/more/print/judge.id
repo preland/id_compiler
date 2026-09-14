@@ -1,0 +1,23 @@
+// The captured buffer against the clause's one value, compared exactly as a
+// check's value is (out/case/'s tc_compare), at type string. Shown escaped
+// (idtc_show_esc, test/unit/more/rec/scan/prelude.id -- a newline in what was
+// captured must be visible as `\n`, not printed raw into the middle of the
+// report), not with tc_show's plain %s.
+
+emit_then_print(int ci, int ti, int node) {
+  string kind = k_of(node);
+  int[] items = l1_of(node);
+  emit_print_check(ci, kind, items[0]);
+} return void;
+
+emit_print_check(int ci, string kind, int e) {
+  string var = print_var(kind);
+  string want = tc_value(e, "string");
+  emit_print_cond(ci, kind, var, want, e);
+} return void;
+
+emit_print_cond(int ci, string kind, string var, string want, int e) {
+  string cnd = tc_compare(var, want, "string");
+  string shown = "idtc_show_esc(" + var + ");";
+  emit_print_lines(ci, kind, cnd, shown, e);
+} return void;

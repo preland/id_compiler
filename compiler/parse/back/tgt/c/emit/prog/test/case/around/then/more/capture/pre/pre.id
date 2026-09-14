@@ -1,0 +1,16 @@
+// Before the call under test: redirect stdout to a temp file for a `prints`
+// clause. Declared unconditionally further down (post/) would be an unused
+// variable when the case has no such clause, which is why this is emitted at
+// all only when needed -- the declaration and its use are always emitted
+// together, by the same query, so they are always in the same scope.
+
+emit_capture_pre(int ci) {
+  emit_out_pre(ci);
+  emit_capture_pre2(ci);
+} return void;
+
+emit_out_pre(int ci) {
+  if(case_has_out(ci, "thenprints") == 1) {
+    emit_line("    fflush(stdout);\n    FILE* idtc_out_tmp = tmpfile();\n    int idtc_out_save = dup(1);\n    dup2(fileno(idtc_out_tmp), 1);");
+  }
+} return void;

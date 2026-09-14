@@ -1,0 +1,14 @@
+// A `prints`/`eprints` mismatch, in the same words a check's is:
+//
+//   FILE:LINE: test failed: f() prints = "actual", expected "expected"
+
+emit_print_lines(int ci, string kind, string cnd, string shown, int e) {
+  string lab = print_label(kind);
+  string lt = lit_text(e);
+  emit_print_final(ci, lab, cnd, shown, lt);
+} return void;
+
+emit_print_final(int ci, string lab, string cnd, string shown, string lt) {
+  string tail = c_esc(", expected " + lt + "\n");
+  emit_line("    if (!(" + cnd + ")) {\n        fprintf(stderr, \"%s: test failed: %s " + lab + " = \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n        " + shown + "\n        fputs(\"" + tail + "\", stderr);\n        return 3;\n    }");
+} return void;

@@ -9,7 +9,7 @@ emit_def(int id) {
 
 emit_def_body(int id) {
   hoist(id);
-  emit_count("    ");
+  emit_entry(id);
   emit_tail(id);
 } return void;
 

@@ -1,5 +1,11 @@
 // The type each `then` check compares at: its function's return type. A check
 // returning a list needs that type's helpers even when no case compares at it.
+//
+// A `then` node's s1 is always a function's name; the other then-family
+// kinds' is not (front/.../case/then/more/) -- "" for prints/eprints, and for
+// a calls clause the recorded function's own name, whose *parameters* would
+// need noting, not its return type, so it is skipped here too rather than
+// noted wrongly. func_node("") is -1, which is what the guard below is for.
 
 tc_collect_thens() {
   int ti = 0;
@@ -10,12 +16,14 @@ tc_collect_thens() {
 } return void;
 
 note_check(int ti) {
-  string chk_nm = s1_of((import thennode)[ti]);
-  int cfn = func_node(chk_nm);
-  note_fn_ret(cfn);
+  int node = (import thennode)[ti];
+  if(k_of(node) == "then") {
+    note_check_then(node);
+  }
 } return void;
 
-note_fn_ret(int cfn) {
-  string rt = s2_of(cfn);
-  note_ty(rt);
+note_check_then(int node) {
+  string chk_nm = s1_of(node);
+  int cfn = func_node(chk_nm);
+  note_fn_ret(cfn);
 } return void;

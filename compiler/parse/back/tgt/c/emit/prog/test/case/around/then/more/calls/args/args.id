@@ -1,0 +1,22 @@
+// `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the
+// case's shared search position, capture/pre.id), whose arguments equal ARGS.
+// A match advances idtc_seek to that call's position, so several `calls`
+// clauses on one case are matched as a subsequence, in the order written
+// (docs/TESTS.md).
+
+emit_calls_args(int ci, int ti, int node) {
+  string nm = s1_of(node);
+  int[] items = l1_of(node);
+  emit_calls_args_body(ci, ti, nm, items);
+} return void;
+
+emit_calls_args_body(int ci, int ti, string nm, int[] items) {
+  int cfn = func_node(nm);
+  int[] params = l1_of(cfn);
+  emit_calls_args_cond(ci, ti, nm, params, items);
+} return void;
+
+emit_calls_args_cond(int ci, int ti, string nm, int[] params, int[] items) {
+  string rowcond = calls_row_cond(nm, ti, params, items);
+  emit_calls_args_emit(ci, ti, nm, rowcond);
+} return void;

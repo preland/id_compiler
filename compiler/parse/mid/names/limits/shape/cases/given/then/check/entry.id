@@ -1,0 +1,14 @@
+// The entry point for a "then" (check) node: reads its name, then checks its
+// signature and value (sig.id, value.id). Split from fit_then_kind
+// (../then.id) so that dispatch stays within the action limit.
+
+then_fn_entry(int chk_node) {
+  string chk_nm = s1_of(chk_node);
+  then_fn(chk_node, chk_nm);
+} return void;
+
+then_fn(int chk_node, string chk_nm) {
+  int cfn = func_node(chk_nm);
+  int ci = i1_of(chk_node);
+  then_shape(ci, chk_node, cfn);
+} return void;

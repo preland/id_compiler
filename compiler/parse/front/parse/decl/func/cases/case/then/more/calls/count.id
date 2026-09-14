@@ -1,0 +1,21 @@
+// `then calls NAME:[N]` -- exactly N calls to NAME, during the call under
+// test. N is parsed as a case literal (case/given/elem/fn.id's case_value) so
+// a non-integer count is caught by the same literal machinery as everywhere
+// else, and held in a single-element list like the other then-family clauses.
+
+then_calls_count(int[] pos, string nm) {
+  advance(pos);
+  int v = case_value(pos);
+  then_calls_count_rest(pos, nm, v);
+} return void;
+
+then_calls_count_rest(int[] pos, string nm, int v) {
+  expect_text(pos, "]");
+  advance(pos);
+  then_calls_count_push(nm, v);
+} return void;
+
+then_calls_count_push(string nm, int v) {
+  int[] items = [v];
+  then_push_kind("thencallsn", nm, items);
+} return void;

@@ -1,0 +1,10 @@
+// `then calls NAME:(...)` (args/) or `then calls NAME:[N]` (count.id).
+
+emit_then_calls(int ci, int ti, int node) {
+  string kind = k_of(node);
+  if(kind == "thencalls") {
+    emit_calls_args(ci, ti, node);
+  } else {
+    emit_calls_count(ci, ti, node);
+  }
+} return void;

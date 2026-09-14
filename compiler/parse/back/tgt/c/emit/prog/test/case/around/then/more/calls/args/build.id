@@ -1,0 +1,24 @@
+// The row condition: every parameter of NAME compared against the clause's
+// argument at that position, the same way a case's own arguments are
+// (mid/.../more/fit/'s reasoning, out/case/'s tc_compare/tc_value doing it).
+// Vacuously "1" for a niladic NAME, so `calls f:()` only asks whether f was
+// called at all.
+
+calls_row_cond(string nm, int ti, int[] params, int[] items) {
+  string out = "1";
+  int i = 0;
+  string ret_s = calls_row_scan(nm, ti, params, items, out, i);
+} return string ret_s;
+
+calls_row_scan(string nm, int ti, int[] params, int[] items, string out, int i) {
+  while(i < len(params)) {
+    out = calls_row_step(nm, ti, params, items, out, i);
+    i = i + 1;
+  }
+} return string out;
+
+calls_row_step(string nm, int ti, int[] params, int[] items, string out, int i) {
+  string pt = s1_of(params[i]);
+  string fld = s2_of(params[i]);
+  string ret_s = calls_row_cmp(nm, ti, pt, fld, items[i], out);
+} return string ret_s;

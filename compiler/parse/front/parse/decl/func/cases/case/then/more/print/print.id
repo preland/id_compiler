@@ -1,0 +1,25 @@
+// `then prints:("...")` / `then eprints:("...")`: the bytes the call under
+// test wrote to stdout or stderr (docs/TESTS.md). Parsed exactly like a
+// check's value -- one literal tuple -- but stored as its own node kind
+// ("thenprints" / "theneprints"), since the harness compares captured output,
+// not a function's return value; s1 is unused (store.id).
+
+then_print_dispatch(int[] pos) {
+  string w = cur_text(pos);
+  if(w == "prints") {
+    then_print_clause(pos, "thenprints");
+  } else {
+    then_print_clause(pos, "theneprints");
+  }
+} return void;
+
+then_print_clause(int[] pos, string kind) {
+  advance(pos);
+  then_print_value(pos, kind);
+} return void;
+
+then_print_value(int[] pos, string kind) {
+  eat_colon(pos);
+  int[] items = case_tuple(pos);
+  then_push_kind(kind, "", items);
+} return void;

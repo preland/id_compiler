@@ -1,0 +1,22 @@
+// Whether some `calls` clause, of either form, names this function.
+
+is_rec_target(string nm) {
+  int ti = 0;
+  int r = 0;
+  int ret_i = rec_target_loop(nm, ti, r);
+} return int ret_i;
+
+rec_target_loop(string nm, int ti, int r) {
+  while(ti < len((import thennode))) {
+    r = rec_target_step(nm, ti, r);
+    ti = ti + 1;
+  }
+} return int r;
+
+rec_target_step(string nm, int ti, int r) {
+  int node = (import thennode)[ti];
+  string kind = k_of(node);
+  if((kind == "thencalls" || kind == "thencallsn") && s1_of(node) == nm) {
+    r = 1;
+  }
+} return int r;

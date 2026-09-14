@@ -1,0 +1,10 @@
+// The call under test, with whatever it needs wrapped around it: output
+// captured for a prints/eprints clause, recording turned on for a calls
+// clause (pre.id, post.id) -- or, for a case with none of these, exactly the
+// call, unchanged.
+
+emit_case_call_wrapped(int ci) {
+  emit_capture_pre(ci);
+  emit_case_call(ci);
+  emit_capture_post(ci);
+} return void;

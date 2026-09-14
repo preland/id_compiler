@@ -3,6 +3,10 @@
 // once the call under test has returned, and the value it must return. Each is
 // a "then" node in `thennode` -- the check's name in s1, its value in nl1, and
 // the index of the case it is written on in i1.
+//
+// `then` also begins three other clauses -- `prints`, `eprints` and `calls`
+// (docs/TESTS.md) -- told apart by the keyword after it; more/dispatch.id
+// routes to whichever this one is.
 
 case_rest(int[] pos) {
   case_thens(pos);
@@ -17,6 +21,5 @@ case_thens(int[] pos) {
 
 then_one(int[] pos) {
   advance(pos);
-  string chk_nm = case_fn_name(pos, "then");
-  then_value(pos, chk_nm);
+  then_dispatch(pos);
 } return void;

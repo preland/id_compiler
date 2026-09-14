@@ -1,4 +1,6 @@
-// A check's value, and the check recorded.
+// A check's value, and the check recorded. then_store's leading `kind` is
+// "then" here and a different node kind for the other `then`-family clauses
+// (more/print/store.id), which share this same storage.
 
 then_value(int[] pos, string chk_nm) {
   eat_colon(pos);
@@ -10,10 +12,10 @@ then_value(int[] pos, string chk_nm) {
 then_push(string chk_nm, int[] items) {
   int n = len((import casestart));
   int[] no_items = [];
-  then_store(chk_nm, items, n - 1, no_items);
+  then_store("then", chk_nm, items, n - 1, no_items);
 } return void;
 
-then_store(string chk_nm, int[] items, int ci, int[] no_items) {
-  int node = newnode("then", ci, 0, chk_nm, "", items, no_items);
+then_store(string kind, string chk_nm, int[] items, int ci, int[] no_items) {
+  int node = newnode(kind, ci, 0, chk_nm, "", items, no_items);
   push((import thennode), node);
 } return void;

@@ -1,0 +1,14 @@
+// The recorder itself: NAME's own parameter list (its signature, unchanged --
+// param_str(fn) in def.id). ../call.id calls it from inside NAME's body with
+// NAME's own parameters, by name (row/names.id), since that is what is in
+// scope there. Appends a row only while idtc_rec_on is set
+// (case/around/then/more/capture/).
+
+emit_rec_fn(string nm, string sigtext, int[] params) {
+  string assigns = rec_row_assigns(params, "idtc_rc_" + nm + "_buf[idtc_rc_" + nm + "_n]");
+  emit_rec_fn_body(nm, sigtext, assigns);
+} return void;
+
+emit_rec_fn_body(string nm, string sigtext, string assigns) {
+  emit_line("static void idtc_rec_" + nm + "(" + sigtext + ") {\n    if (!idtc_rec_on) return;\n    if (idtc_rc_" + nm + "_n == idtc_rc_" + nm + "_cap) {\n        idtc_rc_" + nm + "_cap = idtc_rc_" + nm + "_cap ? idtc_rc_" + nm + "_cap * 2 : 8;\n        idtc_rc_" + nm + "_buf = realloc(idtc_rc_" + nm + "_buf, sizeof(idtc_rc_" + nm + "_t) * (size_t)idtc_rc_" + nm + "_cap);\n        idtc_rc_" + nm + "_seq = realloc(idtc_rc_" + nm + "_seq, sizeof(long long) * (size_t)idtc_rc_" + nm + "_cap);\n    }\n    " + assigns + "\n    idtc_rc_" + nm + "_seq[idtc_rc_" + nm + "_n] = idtc_rec_seq++;\n    idtc_rc_" + nm + "_n++;\n}");
+} return void;

@@ -9,10 +9,22 @@ ut_thens() {
   }
 } return void;
 
+// A "thenprints"/"theneprints" node's s1 is "" (front/.../case/then/more/
+// print/print.id), which ut_at never finds, so this skips it without having
+// to name its kind here too.
 ut_then(int node) {
   string s1_of_v = s1_of(node);
   if(ut_at(s1_of_v) >= 0) {
     int ci = i1_of(node);
-    ut_named(ci, "'then' names '", s1_of_v);
+    string lead = ut_then_lead(node);
+    ut_named(ci, lead, s1_of_v);
   }
 } return void;
+
+ut_then_lead(int node) {
+  string lead = "'then' names '";
+  string kind = k_of(node);
+  if(kind == "thencalls" || kind == "thencallsn") {
+    lead = "'calls' names '";
+  }
+} return string lead;

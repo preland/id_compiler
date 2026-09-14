@@ -1,0 +1,17 @@
+// Whether function `id` gets the call-recording hook (its body is emitted
+// while is_harn() is true, same as work-counting -- code/func/def/def/
+// entry.id), and the hook itself: NAME's own parameters, by name, passed
+// straight to its recorder (def/fn.id).
+
+emit_rec_call(int id) {
+  string nm = s1_of(id);
+  if(is_harn() == 1 && is_rec_target(nm) == 1) {
+    emit_rec_call_line(id, nm);
+  }
+} return void;
+
+emit_rec_call_line(int id, string nm) {
+  int[] params = l1_of(id);
+  string nmlist = rec_param_names(params);
+  emit_line("    idtc_rec_" + nm + "(" + nmlist + ");");
+} return void;

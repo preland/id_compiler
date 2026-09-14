@@ -1,0 +1,18 @@
+// One recorded name's storage: a struct with one native-typed field per
+// parameter (row/columns.id), grown as calls come in.
+
+emit_rec_def(string nm, int fn) {
+  string sigtext = param_str(fn);
+  int[] params = l1_of(fn);
+  emit_rec_struct(nm, sigtext, params);
+} return void;
+
+emit_rec_struct(string nm, string sigtext, int[] params) {
+  string fields = rec_row_fields(params);
+  emit_rec_types(nm, fields);
+  emit_rec_fn(nm, sigtext, params);
+} return void;
+
+emit_rec_types(string nm, string fields) {
+  emit_line("typedef struct { " + fields + "int idtc_rc_pad; } idtc_rc_" + nm + "_t;\nstatic int idtc_rc_" + nm + "_n = 0;\nstatic int idtc_rc_" + nm + "_cap = 0;\nstatic idtc_rc_" + nm + "_t* idtc_rc_" + nm + "_buf = NULL;\nstatic long long* idtc_rc_" + nm + "_seq = NULL;");
+} return void;

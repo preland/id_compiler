@@ -1,0 +1,31 @@
+// The argument form's arity and types, against NAME's own parameters
+// (mid/.../more/fit/'s fit_items, the same check a case's own arguments get);
+// the count form's single value, an int.
+
+fit_calls_body(string kind, int ci, string nm, int cfn, int chk_node) {
+  int[] items = l1_of(chk_node);
+  if(kind == "thencalls") {
+    fit_calls_args(ci, nm, cfn, items);
+  } else {
+    fit_calls_count(ci, items);
+  }
+} return void;
+
+fit_calls_args(int ci, string nm, int cfn, int[] items) {
+  if(len(items) != flat_arg_count(cfn)) {
+    int na = len(items);
+    int np = flat_arg_count(cfn);
+    case_err(ci, "this case's 'calls " + nm + "' passes " + na + " argument(s), which takes " + np);
+  } else {
+    fit_items(ci, cfn, items);
+  }
+} return void;
+
+fit_calls_count(int ci, int[] items) {
+  if(len(items) != 1) {
+    int ne = len(items);
+    case_err(ci, "a 'calls NAME:[N]' check takes exactly one count, not " + ne);
+  } else {
+    fit_value(ci, items[0], "int");
+  }
+} return void;

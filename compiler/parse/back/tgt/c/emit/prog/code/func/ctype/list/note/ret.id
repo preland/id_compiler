@@ -1,0 +1,7 @@
+// A function's return type, noted the same way a case's expected value's is
+// (note.id).
+
+note_fn_ret(int cfn) {
+  string rt = s2_of(cfn);
+  note_ty(rt);
+} return void;

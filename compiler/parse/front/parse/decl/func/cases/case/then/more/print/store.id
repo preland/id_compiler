@@ -1,0 +1,9 @@
+// Recording a `then`-family clause under whichever node kind it is
+// (more/dispatch.id, more/calls/): the same storage push.id's then_push uses
+// for a check, generalised over the kind.
+
+then_push_kind(string kind, string s1v, int[] items) {
+  int n = len((import casestart));
+  int[] no_items = [];
+  then_store(kind, s1v, items, n - 1, no_items);
+} return void;

@@ -1,0 +1,9 @@
+// The function-entry prelude: work counting (harness builds only), then the
+// call-recording hook for a function named by a `calls` clause
+// (test/unit/more/rec/call.id) -- the same is_harn() gate, at a different
+// point in the body.
+
+emit_entry(int id) {
+  emit_count("    ");
+  emit_rec_call(id);
+} return void;

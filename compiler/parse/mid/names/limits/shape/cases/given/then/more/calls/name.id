@@ -1,0 +1,11 @@
+// NAME named by a `calls` clause but not a function of the build: either it
+// is a builtin, which the harness never instruments -- its effect is checked
+// with 'prints'/'eprints' instead -- or it is nothing this build declares.
+
+calls_unknown(int ci, string nm) {
+  if(is_builtin(nm) == 1) {
+    case_err(ci, "'calls' names '" + nm + "', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'");
+  } else {
+    case_err(ci, "'calls' names '" + nm + "', which is not a function in this build");
+  }
+} return void;

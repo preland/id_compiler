@@ -1,0 +1,27 @@
+// `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose
+// arguments equal ARGS, in order among however many `calls` clauses the case
+// carries (docs/TESTS.md). `then calls NAME:[N]` is the exact-count form
+// (count.id). NAME is read the same way a `given` or check name is
+// (case/given/name.id's case_fn_name); whether it really is a function, its
+// arity and its builtin-ness are checked from the node, not the parse
+// (mid/names/limits/shape/cases/).
+
+then_calls_clause(int[] pos) {
+  advance(pos);
+  string nm = case_fn_name(pos, "calls");
+  then_calls_rest(pos, nm);
+} return void;
+
+then_calls_rest(int[] pos, string nm) {
+  eat_colon(pos);
+  if(cur_text(pos) == "[") {
+    then_calls_count(pos, nm);
+  } else {
+    then_calls_args(pos, nm);
+  }
+} return void;
+
+then_calls_args(int[] pos, string nm) {
+  int[] items = case_tuple(pos);
+  then_push_kind("thencalls", nm, items);
+} return void;

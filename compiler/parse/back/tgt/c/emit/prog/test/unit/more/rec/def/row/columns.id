@@ -1,0 +1,21 @@
+// A recorded row's fields: one per parameter, native-typed and named exactly
+// as the parameter is, so ../fn.id's assignment is just `.name = name`.
+
+rec_row_fields(int[] params) {
+  string out = "";
+  int i = 0;
+  string ret_s = rec_row_scan(params, out, i);
+} return string ret_s;
+
+rec_row_scan(int[] params, string out, int i) {
+  while(i < len(params)) {
+    out = rec_row_add(params, out, i);
+    i = i + 1;
+  }
+} return string out;
+
+rec_row_add(int[] params, string out, int i) {
+  string pt = s1_of(params[i]);
+  string nm = s2_of(params[i]);
+  string so = out + c_type(pt) + " " + nm + "; ";
+} return string so;

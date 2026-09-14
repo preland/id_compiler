@@ -1,0 +1,21 @@
+// The other two: eprint's target swapped for an `eprints` clause (its default
+// is stdout, via IDTC_EPRINT_TO -- test/unit/more/prelude/count.id), and
+// recording turned on for a `calls` clause, with a fresh search position
+// (more/calls/args/ reads and advances idtc_seek).
+
+emit_capture_pre2(int ci) {
+  emit_err_pre(ci);
+  emit_calls_pre(ci);
+} return void;
+
+emit_err_pre(int ci) {
+  if(case_has_out(ci, "theneprints") == 1) {
+    emit_line("    idtc_eprint_target = tmpfile();");
+  }
+} return void;
+
+emit_calls_pre(int ci) {
+  if(case_has_calls(ci) == 1) {
+    emit_line("    idtc_rec_on = 1;\n    long long idtc_seek = -1;");
+  }
+} return void;

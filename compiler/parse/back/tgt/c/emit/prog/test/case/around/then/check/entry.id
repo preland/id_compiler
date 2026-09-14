@@ -1,0 +1,18 @@
+// Dispatch by node kind (../then.id), and the original check's own entry
+// point: what it names, then what it returns (got.id).
+
+emit_then_kind(string kind, int ci, int ti, int node) {
+  if(kind == "then") {
+    emit_then_check(ci, ti, node);
+  } else if(kind == "thenprints" || kind == "theneprints") {
+    emit_then_print(ci, ti, node);
+  } else {
+    emit_then_calls(ci, ti, node);
+  }
+} return void;
+
+emit_then_check(int ci, int ti, int node) {
+  string chk_nm = s1_of(node);
+  int cfn = func_node(chk_nm);
+  emit_then_got(ci, ti, chk_nm, cfn);
+} return void;

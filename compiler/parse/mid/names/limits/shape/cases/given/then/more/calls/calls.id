@@ -1,0 +1,27 @@
+// `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/
+// calls/): NAME must be a function of the build with a body to record calls
+// into -- not a builtin (name.id), and not a `native` (its body is a
+// backend's, not id's to instrument).
+
+fit_then_calls(string kind, int chk_node) {
+  int ci = i1_of(chk_node);
+  string nm = s1_of(chk_node);
+  fit_calls_name(kind, ci, nm, chk_node);
+} return void;
+
+fit_calls_name(string kind, int ci, string nm, int chk_node) {
+  int cfn = func_node(nm);
+  if(cfn < 0) {
+    calls_unknown(ci, nm);
+  } else {
+    fit_calls_native(kind, ci, nm, cfn, chk_node);
+  }
+} return void;
+
+fit_calls_native(string kind, int ci, string nm, int cfn, int chk_node) {
+  if(is_native(cfn) == 1) {
+    case_err(ci, "'calls' names '" + nm + "', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead");
+  } else {
+    fit_calls_body(kind, ci, nm, cfn, chk_node);
+  }
+} return void;
