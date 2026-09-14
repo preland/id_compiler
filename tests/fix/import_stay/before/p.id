@@ -1,0 +1,7 @@
+tab_init() {
+  export int[] tab = [1, 2, 3];
+} return void;
+
+pure_add(int x) {
+  int y = x + 5;
+} return int y;

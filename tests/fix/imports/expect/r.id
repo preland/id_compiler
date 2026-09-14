@@ -3,11 +3,10 @@ again(int[] c) {
   int n = bump(c);
 } return int n;
 
-// An index read can trap, and a call can change the list it reads, so it is
-// read ahead of the calls that follow it.
+// bump cannot run tab_init and touches no export, so xs[c[0]] is read where
+// it stands -- only the call nested in twice's argument has to move.
 guard(int[] c, int[] xs) {
-  int xs_v = xs[c[0]];
   int bump_v = bump(c);
-  int twice_v = twice(bump_v);
-  print(xs_v + twice_v);
+  int print_a0 = xs[c[0]] + twice(bump_v);
+  print(print_a0);
 } return void;

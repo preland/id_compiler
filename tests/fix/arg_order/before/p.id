@@ -1,0 +1,8 @@
+step(int[] c) {
+  c[0] = c[0] + 1;
+  int n = c[0];
+} return int n;
+
+mark(int x) {
+  int y = x + 100;
+} return int y;
