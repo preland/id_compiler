@@ -1,0 +1,12 @@
+inf_pow2(int n) {
+  int r = 1;
+  int i = 0;
+  while(i < n) {
+    r = r * 2;
+    i = i + 1;
+  }
+} return int r;
+
+combine(int a, int b) {
+  int s = a + b;
+} return int s;

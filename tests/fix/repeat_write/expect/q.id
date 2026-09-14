@@ -1,0 +1,11 @@
+combine(int a, int b) {
+  int s = a + b;
+} return int s;
+
+// cur_next writes into the exported cursor, so the two calls must never
+// share one name or one evaluation, however identical their text.
+use1() {
+  int cur_next_v = cur_next();
+  int cur_next_v2 = cur_next();
+  int r = combine(cur_next_v, cur_next_v2);
+} return int r;
