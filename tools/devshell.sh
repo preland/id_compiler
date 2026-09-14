@@ -7,7 +7,7 @@
 # without any pkg-config plumbing. Every build that links a graphics backend or
 # targets LLVM/WASM must run inside this shell.
 #
-#   tools/devshell.sh './idc.py demos/gfxdemo --backend backends/gfx -o /tmp/gfxdemo'
+#   tools/devshell.sh 'idc/bin/idc demos/gfxdemo --allow-untested -o /tmp/gfxdemo'
 #   tools/devshell.sh 'bash tests/run.sh'
 #
 # The toolchain is defined once in flake.nix (also used by `nix develop` and
