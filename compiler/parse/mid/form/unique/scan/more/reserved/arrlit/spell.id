@@ -1,4 +1,4 @@
-// The spelling a report copies out (dup/wrap/more/more/report.id): the list
+// The spelling a report copies out (dup/wrap/more/result/report.id): the list
 // literal as conf.id would take it, e.g. '[1, 2, 3]'.
 
 cw_arr_spell(int id) {

@@ -633,11 +633,11 @@ int id_lw_hcall2(char* h, int a, int b, char* t);
 int id_lw_hcall2_out(char* h, int r, char* t);
 int id_lw_hcall_lhs(char* h, int a, int b, char* t);
 int id_lw_hcall_rhs(char* h, int r, int b, char* t);
+int id_lw_arith_lhs(int node, char* t);
+int id_lw_arith3_op(int node, int a, int b, char* t, char* op);
 char* id_lw_helper(char* op, char* t);
 char* id_lw_divfn(char* op, char* t);
 char* id_lw_hty(char* h);
-int id_lw_arith_lhs(int node, char* t);
-int id_lw_arith3_op(int node, int a, int b, char* t, char* op);
 char* id_lw_iop_bits(char* op);
 char* id_lw_iop_int(char* op);
 char* id_lw_iop_int2(char* op);
@@ -2293,6 +2293,7 @@ void id_case_ret_err(int i, int fn, int ne);
 void id_fit_expd(int i, int fn, int node);
 void id_fit_void(int i, int fn, IdList* expd);
 void id_fit_ret(int i, int fn, IdList* expd);
+char* id_list_elem(char* t);
 char* id_items_text(IdList* xs);
 char* id_leaf_text(int e);
 void id_case_err(int i, char* msg);
@@ -2302,7 +2303,6 @@ char* id_neg_text(int e);
 char* id_arr_text(int e);
 char* id_case_lit_type(int e);
 char* id_leaf_type(int e);
-char* id_list_elem(char* t);
 void id_fit_each(int i, IdList* xs, char* et);
 void id_fit_scalar(int i, int e, char* want);
 int id_ty_fits(char* want, char* lt);
@@ -4661,6 +4661,27 @@ int id_lw_hcall_rhs(char* h, int r, int b, char* t) {
     return ret_i;
 }
 
+int id_lw_arith_lhs(int node, char* t) {
+    int i1_of_v;
+    int a;
+    i1_of_v = id_i1_of(node);
+    a = id_lw_as(i1_of_v, t);
+    return a;
+}
+
+int id_lw_arith3_op(int node, int a, int b, char* t, char* op) {
+    int v;
+    char* lw_irop_v;
+    v = (0 - 1);
+    if ((strcmp(id_lw_helper(op, t), "") == 0)) {
+        lw_irop_v = id_lw_irop(op, t);
+        v = id_lw_op(lw_irop_v, t, a, b, "");
+    } else {
+        v = id_lw_hcall(node, a, b, t);
+    }
+    return v;
+}
+
 char* id_lw_helper(char* op, char* t) {
     char* h;
     h = id_lw_divfn(op, t);
@@ -4688,27 +4709,6 @@ char* id_lw_hty(char* h) {
         t = "int";
     }
     return t;
-}
-
-int id_lw_arith_lhs(int node, char* t) {
-    int i1_of_v;
-    int a;
-    i1_of_v = id_i1_of(node);
-    a = id_lw_as(i1_of_v, t);
-    return a;
-}
-
-int id_lw_arith3_op(int node, int a, int b, char* t, char* op) {
-    int v;
-    char* lw_irop_v;
-    v = (0 - 1);
-    if ((strcmp(id_lw_helper(op, t), "") == 0)) {
-        lw_irop_v = id_lw_irop(op, t);
-        v = id_lw_op(lw_irop_v, t, a, b, "");
-    } else {
-        v = id_lw_hcall(node, a, b, t);
-    }
-    return v;
 }
 
 char* id_lw_iop_bits(char* op) {
@@ -19605,6 +19605,14 @@ void id_fit_ret(int i, int fn, IdList* expd) {
     return;
 }
 
+char* id_list_elem(char* t) {
+    int n;
+    char* et;
+    n = id_len(t);
+    et = id_slice(t, 0, (n - 2));
+    return et;
+}
+
 char* id_items_text(IdList* xs) {
     char* lt;
     int j;
@@ -19689,14 +19697,6 @@ char* id_leaf_type(int e) {
         lt = "float";
     }
     return lt;
-}
-
-char* id_list_elem(char* t) {
-    int n;
-    char* et;
-    n = id_len(t);
-    et = id_slice(t, 0, (n - 2));
-    return et;
 }
 
 void id_fit_each(int i, IdList* xs, char* et) {

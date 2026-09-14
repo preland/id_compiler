@@ -207,7 +207,68 @@ else
     bad "the entry-count rule applies to the stdlib, and names it"
 fi
 
-# -- 12. dead-code elimination: an unused stdlib function is not emitted -----
+# -- 12. the stdlib rejects a directory with the same name as its parent -----
+rm -rf "$TMP/dup"; mkdir -p "$TMP/dup/dup"
+printf 'dup_fn(int a) {\n  int v = a + 1;\n} return int v;\n' > "$TMP/dup/dup/f.id"
+if ! $BIN_IDC --std "$TMP/dup" "$TMP/proj" -o "$TMP/x" >"$TMP/dup.err" 2>&1 \
+   && grep -q "has the same name as its parent" "$TMP/dup.err" \
+   && grep -q "$TMP/dup/dup" "$TMP/dup.err"; then
+    ok "directory with same name as parent is rejected, and named in error"
+else
+    bad "directory with same name as parent is rejected, and named in error"
+fi
+
+# -- 13. the stdlib rejects a file with a generic name ----------------------
+rm -rf "$TMP/gen"; mkdir -p "$TMP/gen"
+printf 'gen_helper(int a) {\n  int v = a + 1;\n} return int v;\n' > "$TMP/gen/helper.id"
+if ! $BIN_IDC --std "$TMP/gen" "$TMP/proj" -o "$TMP/x" >"$TMP/gen.err" 2>&1 \
+   && grep -q "has a generic name" "$TMP/gen.err" \
+   && grep -q "helper.id" "$TMP/gen.err"; then
+    ok "generic filenames are rejected"
+else
+    bad "generic filenames are rejected"
+fi
+
+# -- 14. a grandparent-named directory is accepted if not the same as parent --
+rm -rf "$TMP/gran"; mkdir -p "$TMP/gran/grandparent/parent"
+printf 'gran_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/gran/grandparent/parent/f.id"
+rm -rf "$TMP/proj14"; mkdir -p "$TMP/proj14"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj14/main.id"
+if $BIN_IDC --allow-untested --std "$TMP/gran" "$TMP/proj14" -o "$TMP/x" >/dev/null 2>&1; then
+    ok "a grandparent-named directory is accepted"
+else
+    bad "a grandparent-named directory is accepted"
+fi
+
+# -- 15. a file named like its own directory (x/x.id) is accepted -----------
+# The same-name-as-parent rule (12) checks directories against their parent
+# directory; a file sharing its containing directory's name is a different
+# pattern, and not one either new rule reaches.
+rm -rf "$TMP/self"; mkdir -p "$TMP/self"
+printf 'self_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/self/self.id"
+rm -rf "$TMP/proj15"; mkdir -p "$TMP/proj15"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj15/main.id"
+if $BIN_IDC --allow-untested --std "$TMP/self" "$TMP/proj15" -o "$TMP/x" >/dev/null 2>&1; then
+    ok "a file named like its own directory (x/x.id) is accepted"
+else
+    bad "a file named like its own directory (x/x.id) is accepted"
+fi
+
+# -- 16. numbered sibling files (chunk.id, chunk2.id) are accepted ----------
+# The generic-name rule (13) checks a fixed list of names; a numbered series
+# of otherwise-descriptive names is a different pattern, and not one it reaches.
+rm -rf "$TMP/num"; mkdir -p "$TMP/num"
+printf 'num_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/num/chunk.id"
+printf 'num_fn2(int a) {\n  int v = a + 2;\n} return int v;\n(1):(3)\n' > "$TMP/num/chunk2.id"
+rm -rf "$TMP/proj16"; mkdir -p "$TMP/proj16"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj16/main.id"
+if $BIN_IDC --allow-untested --std "$TMP/num" "$TMP/proj16" -o "$TMP/x" >/dev/null 2>&1; then
+    ok "numbered sibling files (chunk.id, chunk2.id) are accepted"
+else
+    bad "numbered sibling files (chunk.id, chunk2.id) are accepted"
+fi
+
+# -- 17. dead-code elimination: an unused stdlib function is not emitted -----
 # This is what makes an always-imported library affordable. Before it existed,
 # a 729-function library cost hello-world 0.75 s and a 75 KB binary against
 # 0.18 s and 16 KB; with it, +0.007 s and +40 bytes.
@@ -228,7 +289,7 @@ grep -q "id_tfx_abs" "$TMP/dce.c" && dce_ok=0
 [ "$dce_ok" -eq 1 ] && ok "an unreachable stdlib function is not emitted" \
                     || bad "an unreachable stdlib function is not emitted"
 
-# -- 13. a library (no main) keeps everything ------------------------------
+# -- 18. a library (no main) keeps everything ------------------------------
 # Every function of a project with no main is an entry point -- it compiles to
 # a .o for something else to link, and pruning it would empty the object file.
 rm -rf "$TMP/lib"; mkdir -p "$TMP/lib"
@@ -248,7 +309,7 @@ grep -q "id_libx_b" "$TMP/lib.c" || lib_ok=0
 [ "$lib_ok" -eq 1 ] && ok "a project with no main keeps every function" \
                     || bad "a project with no main keeps every function"
 
-# -- 14. DEAD CODE IS STILL CHECKED ----------------------------------------
+# -- 19. DEAD CODE IS STILL CHECKED ----------------------------------------
 # The rule that makes dead-code elimination safe, and the one that was got
 # wrong first: a function nothing calls must still obey every rule of the
 # language. Code that stops being checked because nothing calls it is how a
@@ -293,7 +354,7 @@ else
     bad "an unreachable function still obeys the export rules"
 fi
 
-# -- 15. the reserved-name list has not drifted from the runtime -----------
+# -- 20. the reserved-name list has not drifted from the runtime -----------
 # resv_names_src, in compiler/parse/conf.id, and the runtime prelude
 # (compiler/parse/back/tgt/c/runtime/runtime.id) are both hand-maintained now
 # (docs/HACKING.md). If someone adds a helper to the prelude and forgets to add
@@ -311,7 +372,7 @@ else
     bad "the id-side reserved-name list matches the runtime prelude (drift: $(diff <(echo "$runtime_names") <(echo "$conf_names") | head -1))"
 fi
 
-# -- 16. the library does not reserve the user's local names (C4) ----------
+# -- 21. the library does not reserve the user's local names (C4) ----------
 # The one-type-per-name rule applies within a compilation unit -- the user's
 # own tree, or one imported dependency -- and not across them. `s` is a string
 # in the fixture library (tstr_twice's parameter); while the rule spanned the
@@ -330,7 +391,7 @@ main(int argc, string[] argv) {
 EOF
 run_one "a library name does not reserve the user's local name" "5"
 
-# -- 17. ...but the rule still holds inside the user's own tree ------------
+# -- 22. ...but the rule still holds inside the user's own tree ------------
 # Per-unit is not per-file: every file of one project is one unit, so a name
 # that changes type between two of them is still the error it has always been.
 rm -rf "$TMP/two"; mkdir -p "$TMP/two"

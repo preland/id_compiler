@@ -1,7 +1,7 @@
 // A statement's value, for the constant-wrapper walk (../../dup/wrap/): a
 // scalar literal fingerprints as before (canon_expr); a list literal of
 // nothing but literal elements fingerprints as its own spelling, tagged 'A'
-// so cw_is_lit (dup/wrap/more/more/lit.id) recognises it the same way it
+// so cw_is_lit (dup/wrap/more/result/lit.id) recognises it the same way it
 // recognises 'I'/'F'/'S' -- everything else, a list built from anything that
 // is not a literal included, keeps canon_expr's 'ar(...)' shape, which no tag
 // matches, so the walk correctly treats it as an effect and stops there.
