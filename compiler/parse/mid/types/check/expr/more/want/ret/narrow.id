@@ -10,6 +10,8 @@ chk_ret_narrow(int id, string t) {
     ret_narrow_err(id, t);
   }
 } return void;
+(-1, "int"):()
+(-1, "word"):()
 
 // Reported at the return expression, for the same reason ret_err is
 // (store/expr.id).
@@ -18,3 +20,5 @@ ret_narrow_err(int id, string t) {
   string msg = ret_narrow_err_msg(id, t);
   tc_err(i1_of_v, msg);
 } return void;
+(-1, "int"):()
+(-1, "word"):()

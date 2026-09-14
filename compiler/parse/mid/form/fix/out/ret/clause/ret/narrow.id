@@ -8,6 +8,8 @@ fix_ret_needs(int f, int e) {
     need = 0;
   }
 } return int need;
+(-1, -1):(1)
+(-1, -2):(1)
 
 // The same guard fix_narrow uses (plan/walk/kind/narrow/narrow.id), and the
 // same fix_narrows it judges the narrowing with -- a return clause narrows
@@ -19,3 +21,5 @@ fix_ret_narrows(int f, int e) {
     ok = 1;
   }
 } return int ok;
+(-1, -1):(0)
+(-1, -2):(0)
