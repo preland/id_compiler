@@ -1,0 +1,11 @@
+combo(int a, int b) {
+  int c = a + b;
+} return int c;
+
+// pure_add cannot write anything, so (import tab)[i] is read where it
+// stands; only pure_add(i), the call, has to move.
+use1(int i) {
+  int pure_add_v = pure_add(i);
+  int combo_v = combo((import tab)[i], pure_add_v);
+  print(combo_v);
+} return void;

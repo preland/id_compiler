@@ -1,0 +1,9 @@
+combine(int a, int b) {
+  int s = a + b;
+} return int s;
+
+use1() {
+  int cur_next_v = cur_next();
+  int cur_next_v2 = cur_next();
+  int r = combine(cur_next_v, cur_next_v2);
+} return int r;

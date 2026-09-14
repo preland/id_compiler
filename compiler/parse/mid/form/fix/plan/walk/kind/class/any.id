@@ -1,0 +1,30 @@
+// Whether the events pushed while walking a subtree, starting at lo, include
+// a plain call -- so the argument at its root has one somewhere inside it
+// (plan/walk/kind/push.id).
+fix_any_call(int lo) {
+  int i = lo;
+  int ok = 0;
+  while(i < len((import fixe_cl))) {
+    ok = fix_any_call_at(i, ok);
+    i = i + 1;
+  }
+} return int ok;
+given fix_any_call_setup (0):(1)
+given fix_any_call_setup (2):(0)
+
+fix_any_call_at(int i, int ok) {
+  int r = ok;
+  if((import fixe_cl)[i] == 1) {
+    r = 1;
+  }
+} return int r;
+given fix_any_call_setup (1, 0):(1)
+given fix_any_call_setup (0, 0):(0)
+
+// fixe_cl = [0 (not a call), 1 (a call)], so a range starting at 0 has one
+// and a range starting at 2 (past the end) does not.
+fix_any_call_setup() {
+  fix_ev_reset();
+  push((import fixe_cl), 0);
+  push((import fixe_cl), 1);
+} return void;

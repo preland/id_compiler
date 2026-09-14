@@ -1,0 +1,8 @@
+//   fixe_cl  0 pure, 1 a call, 2 an index or an operator that can trap, 3 a
+//            value that must be named, 4 an import read
+//   fixe_cd  1 inside the right operand of && or ||
+fix_ev_reset2() {
+  export int[] fixe_cl = [];
+  export int[] fixe_cd = [];
+  fix_ev_reset3();
+} return void;

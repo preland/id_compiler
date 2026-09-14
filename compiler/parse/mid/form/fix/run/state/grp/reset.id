@@ -5,21 +5,12 @@
 fix_state3() {
   export string[] fixd_used = [];
   export int[] fixd_lo = [];
+  fix_state3b();
+} return void;
+
+// The repeated-call cache (out/emit/name/pick/reuse/) is a function's own
+// too: a name good in one function says nothing about another.
+fix_state3b() {
   export int[] fixd_hi = [];
-} return void;
-
-// fixd_gcl: the closing parenthesis of the outermost grouping parentheses
-// written around each node, or -1.
-fix_gcl() {
-  export int[] fixd_gcl = [];
-  fix_gcl_fill();
-  fix_gcl_set();
-} return void;
-
-fix_gcl_fill() {
-  int i = 0;
-  while(i < len((import nkind))) {
-    push((import fixd_gcl), 0 - 1);
-    i = i + 1;
-  }
+  fix_rcache_reset();
 } return void;

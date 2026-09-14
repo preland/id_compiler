@@ -1,0 +1,24 @@
+fix_pick(int i) {
+  string t = fix_evtype(i);
+  string name = fix_pick_name(i, t);
+} return string name;
+
+fix_pick_name(int i, string t) {
+  string an = (import fixe_an)[i];
+  string name = fix_pick_name2(i, t, an);
+} return string name;
+
+// fixe_an holds a candidate name for every argument, whether or not it is
+// used (plan/walk/ev/kids/arg.id) -- it is right only for the node forced to
+// be named because it narrows or has a call inside it (fixe_cl 3), and only
+// when that node is not itself a call, which keeps the tree's <callee>_v
+// convention (fix_stem).
+fix_pick_name2(int i, string t, string an) {
+  string name = "";
+  if(an != "" && (import fixe_cl)[i] == 3 && k_of((import fixe_n)[i]) != "call") {
+    name = fix_choose_arg(an, t);
+  } else {
+    string stem = fix_stem((import fixe_n)[i]);
+    name = fix_choose(stem, t);
+  }
+} return string name;

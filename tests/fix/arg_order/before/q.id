@@ -1,0 +1,9 @@
+pair(int a, int b) {
+  int s = a + b;
+} return int s;
+
+// The first argument is a whole non-call expression with a call inside it;
+// the second is a call on its own. step must still run before mark.
+use1(int[] c, int x) {
+  int r = pair(step(c) + 1, mark(x));
+} return int r;

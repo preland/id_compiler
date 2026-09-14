@@ -1,0 +1,8 @@
+fix_walk_arr(int e, int cd) {
+  int[] l1_of_v = l1_of(e);
+  int i = 0;
+  while(i < len(l1_of_v)) {
+    fix_walk(l1_of_v[i], 0, cd, "", "");
+    i = i + 1;
+  }
+} return void;

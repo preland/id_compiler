@@ -1,0 +1,16 @@
+// The builtins that write through a value they are given, rather than only
+// reading it (docs/SPEC.md 5, 6): push and pop change a list's length, lset
+// writes one of its cells, and a poke writes the flat store.
+fix_wmut(string name) {
+  int ok = 0;
+  if(name == "push" || name == "pop" || name == "lset") {
+    ok = 1;
+  } else if(name == "poke8" || name == "poke16" || name == "poke32" || name == "poke64") {
+    ok = 1;
+  }
+} return int ok;
+("push"):(1)
+("lset"):(1)
+("poke64"):(1)
+("bump"):(0)
+("len"):(0)

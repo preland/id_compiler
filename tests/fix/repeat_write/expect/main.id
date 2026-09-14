@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  cur_init();
+  int r = use1();
+  print(r);
+} return int 0;

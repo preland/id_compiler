@@ -1,0 +1,13 @@
+f(int x) {
+  int y = x + 1;
+} return int y;
+
+g(int x) {
+  int y = x * 2;
+} return int y;
+
+// Two calls in one argument: one local for the whole argument, not one per
+// call.
+use1(int x) {
+  print("a" + f(x) + " " + g(x));
+} return void;

@@ -1,0 +1,7 @@
+//   fixe_nt  the parameter type a narrowing argument is declared as
+//   fixe_mv  1 for an event that moves before the statement
+fix_ev_reset3() {
+  export string[] fixe_nt = [];
+  export int[] fixe_mv = [];
+  fix_ev_reset4();
+} return void;

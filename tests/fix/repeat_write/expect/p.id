@@ -1,0 +1,9 @@
+cur_init() {
+  export int[] cur = [0];
+} return void;
+
+cur_next() {
+  int[] c = (import cur);
+  int v = c[0];
+  c[0] = c[0] + 1;
+} return int v;

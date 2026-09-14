@@ -5,11 +5,16 @@ fix_wrange(int lo, int hi, int ow) {
   }
 } return void;
 
+// An index-assignment writes through a plain identifier (docs/SPEC.md 5); the
+// list it names may be a parameter, and lists are references, so this can
+// change what a caller's own list holds.
 fix_wnode(int x, int ow) {
   if(k_of(x) == "decl" && i2_of(x) == 1) {
     fix_wseed(ow);
   } else if(k_of(x) == "call" || k_of(x) == "var") {
     fix_wref(x, ow);
+  } else if(k_of(x) == "iassign") {
+    fix_wseed(ow);
   }
 } return void;
 

@@ -2,7 +2,9 @@ setat(int[] xs, int i, int v) {
   xs[i] = v;
 } return void;
 
-// bump cannot run tab_init, so the import is read where it stands.
+// bump writes into c through an index-assignment, and a call is judged only
+// by whether it can write at all, not by what -- so the import moves ahead
+// of it exactly as it would ahead of a call that ran tab_init.
 keep(int[] c) {
   setat((import tab), 0, twice(bump(c)));
 } return void;

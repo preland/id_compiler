@@ -1,0 +1,10 @@
+// Division, remainder and the shifts trap (docs/SPEC.md 2.2, 2.3), except by
+// a positive literal. A trap is an effect: a call moved ahead of one would run
+// where it did not before.
+fix_traps(int e) {
+  string op = s1_of(e);
+  int ok = 0;
+  if(op == "/" || op == "%" || op == "<<" || op == ">>") {
+    ok = fix_unsafe_rhs(e);
+  }
+} return int ok;

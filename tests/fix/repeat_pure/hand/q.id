@@ -1,0 +1,4 @@
+use1(int log) {
+  int inf_pow2_v = inf_pow2(log);
+  int r = combine(inf_pow2_v, inf_pow2_v);
+} return int r;

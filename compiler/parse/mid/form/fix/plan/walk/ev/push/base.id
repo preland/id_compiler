@@ -1,0 +1,5 @@
+fix_push3(int e, int lo, int cl) {
+  push((import fixe_n), e);
+  push((import fixe_lo), lo);
+  push((import fixe_cl), cl);
+} return void;

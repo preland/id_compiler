@@ -1,0 +1,13 @@
+fix_push_ev(int e, int lo, int ca, int cd, string nt, string an) {
+  int cl = fix_class(e, ca, nt, lo);
+  fix_push_rest(e, lo, cl, cd, nt, an);
+  fix_rcache_taint(e);
+} return void;
+
+// fixe_an and fixe_ru are pushed by fix_push_ru, not here, so that neither
+// function goes past 3 actions.
+fix_push_rest(int e, int lo, int cl, int cd, string nt, string an) {
+  fix_push3(e, lo, cl);
+  fix_push4(cd, nt);
+  fix_push_ru(an);
+} return void;

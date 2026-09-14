@@ -1,0 +1,5 @@
+// inf_pow2 writes nothing, so two identical calls share one name and one
+// evaluation instead of running twice.
+use1(int log) {
+  int r = combine(inf_pow2(log), inf_pow2(log));
+} return int r;
