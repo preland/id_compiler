@@ -1,7 +1,0 @@
-// The GPU-backed window. See gl.h.
-
-native glwin_open(int w, int h, string title) return int;
-
-native glwin_poll() return int;
-
-native glwin_close() return int;

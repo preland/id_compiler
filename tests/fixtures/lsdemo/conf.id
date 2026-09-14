@@ -1,2 +1,0 @@
-// The filesystem backend, which is what this fixture exists to exercise.
-import "../../../backends/fs"

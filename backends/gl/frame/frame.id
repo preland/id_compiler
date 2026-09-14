@@ -1,7 +1,0 @@
-// A frame's start and end, and reading it back. See gl.h.
-
-native gl_begin_frame(int r, int g, int b) return int;
-
-native gl_end_frame() return int;
-
-native gl_read_pixels(int[] fb) return int;
