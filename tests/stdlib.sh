@@ -240,29 +240,32 @@ else
     bad "a grandparent-named directory is accepted"
 fi
 
-# -- 15. files named like their directory (x/x.id) are not yet rejected ------
-# measured only, not enforced
+# -- 15. a file named like its own directory (x/x.id) is accepted -----------
+# The same-name-as-parent rule (12) checks directories against their parent
+# directory; a file sharing its containing directory's name is a different
+# pattern, and not one either new rule reaches.
 rm -rf "$TMP/self"; mkdir -p "$TMP/self"
 printf 'self_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/self/self.id"
 rm -rf "$TMP/proj15"; mkdir -p "$TMP/proj15"
 printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj15/main.id"
 if $BIN_IDC --allow-untested --std "$TMP/self" "$TMP/proj15" -o "$TMP/x" >/dev/null 2>&1; then
-    ok "x/x.id is not yet rejected (measured only)"
+    ok "a file named like its own directory (x/x.id) is accepted"
 else
-    bad "x/x.id is not yet rejected (measured only)"
+    bad "a file named like its own directory (x/x.id) is accepted"
 fi
 
-# -- 16. numbered sibling files (chunk.id, chunk2.id) are not yet rejected ---
-# measured only, not enforced
+# -- 16. numbered sibling files (chunk.id, chunk2.id) are accepted ----------
+# The generic-name rule (13) checks a fixed list of names; a numbered series
+# of otherwise-descriptive names is a different pattern, and not one it reaches.
 rm -rf "$TMP/num"; mkdir -p "$TMP/num"
 printf 'num_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/num/chunk.id"
 printf 'num_fn2(int a) {\n  int v = a + 2;\n} return int v;\n(1):(3)\n' > "$TMP/num/chunk2.id"
 rm -rf "$TMP/proj16"; mkdir -p "$TMP/proj16"
 printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj16/main.id"
 if $BIN_IDC --allow-untested --std "$TMP/num" "$TMP/proj16" -o "$TMP/x" >/dev/null 2>&1; then
-    ok "numbered sibling files are not yet rejected (measured only)"
+    ok "numbered sibling files (chunk.id, chunk2.id) are accepted"
 else
-    bad "numbered sibling files are not yet rejected (measured only)"
+    bad "numbered sibling files (chunk.id, chunk2.id) are accepted"
 fi
 
 # -- 17. dead-code elimination: an unused stdlib function is not emitted -----
