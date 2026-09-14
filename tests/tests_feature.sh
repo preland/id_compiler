@@ -1544,6 +1544,206 @@ EOF
 self_accept "bin/idc: a 'given' setup's own calls are not recorded" \
     --allow-untested --emit-c /dev/null
 
+# --------------------------------------------------------------------------
+# Decomposition warnings (docs/PROJECT.md, "decomposition warnings"): a
+# violation is reported but the build still succeeds, on stderr, so every
+# case here checks the exact text with self_build + grep rather than
+# self_accept/self_refuse (which only know "built" or "did not").
+self_warn() {   # desc, expected message (fixed string), flags...
+    local desc="$1" want="$2"; shift 2
+    if self_build "$@" && grep -qF "$want" "$TMP/log"; then
+        ok "$desc"
+    else
+        bad "$desc ($(tr '\n' '|' < "$TMP/log"))"
+    fi
+}
+self_nowarn() {   # desc, message that must NOT appear, flags...
+    local desc="$1" absent="$2"; shift 2
+    if self_build "$@" && ! grep -qF "$absent" "$TMP/log"; then
+        ok "$desc"
+    else
+        bad "$desc ($(tr '\n' '|' < "$TMP/log"))"
+    fi
+}
+
+# Warning 1: a pure forwarder.
+cat > "$TMP/p.id" <<'EOF'
+callee(int x) {
+  int r = x * 2;
+} return int r;
+
+forwarder(int x) {
+  int r = callee(x);
+} return int r;
+
+main(int argc, string[] argv) {
+  int r = forwarder(3);
+  print("" + r);
+} return int 0;
+EOF
+self_warn "bin/idc: a pure forwarder warns" \
+    "p.id:5: warning: 'forwarder' only forwards to 'callee'; call 'callee' directly" \
+    --allow-untested --emit-c /dev/null
+
+# Excluded: main, even when it would otherwise match.
+cat > "$TMP/p.id" <<'EOF'
+only_main_body(int argc, string[] argv) {
+  int r = argc + 1;
+} return int r;
+
+main(int argc, string[] argv) {
+  int r = only_main_body(argc, argv);
+} return int r;
+EOF
+self_nowarn "bin/idc: 'main' is excluded from the forwarder warning" \
+    "'main' only forwards" --allow-untested --emit-c /dev/null
+
+# Excluded: a forwarder whose signature differs from its callee's (here, it
+# drops a parameter -- real_add's second argument is a literal, not a
+# parameter add_one has).
+cat > "$TMP/p.id" <<'EOF'
+real_add(int x, int y) {
+  int r = x + y;
+} return int r;
+
+add_one(int x) {
+  int r = real_add(x, 1);
+} return int r;
+
+main(int argc, string[] argv) {
+  int r = add_one(3);
+  print("" + r);
+} return int 0;
+EOF
+self_nowarn "bin/idc: a forwarder that drops a parameter (signature differs) is excluded" \
+    "only forwards" --allow-untested --emit-c /dev/null
+
+# Excluded: a forwarder-shaped function whose own name is also used as a
+# function value elsewhere -- it may exist to adapt to a func(...) type.
+mkdir -p "$TMP/fwdval"
+cat > "$TMP/fwdval/callee.id" <<'EOF'
+value_target(int x) {
+  int r = x * 3;
+} return int r;
+
+fwd_used(int x) {
+  int r = value_target(x);
+} return int r;
+EOF
+cat > "$TMP/fwdval/apply.id" <<'EOF'
+apply_fn(func(int) return int f, int x) {
+  int r = f(x);
+} return int r;
+
+main(int argc, string[] argv) {
+  int r = apply_fn(fwd_used, 2);
+  print("" + r);
+} return int 0;
+EOF
+../bin/idc "$TMP/fwdval" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1
+if [ $? -eq 0 ] && ! grep -qF "'fwd_used' only forwards" "$TMP/log"; then
+    ok "bin/idc: a forwarder whose name is used as a function value is excluded"
+else
+    bad "bin/idc: a forwarder whose name is used as a function value is excluded ($(tr '\n' '|' < "$TMP/log"))"
+fi
+rm -rf "$TMP/fwdval"
+
+# Warning 2: a literal-only near-duplicate -- the existing duplicate-logic
+# error (mid/form/unique/) does not catch this, because it keeps a literal's
+# value in the fingerprint (add10 fingerprints as "...+I10", add16 as
+# "...+I16").
+cat > "$TMP/p.id" <<'EOF'
+add10(int x) {
+  int r = x + 10;
+} return int r;
+
+add16(int x) {
+  int r = x + 16;
+} return int r;
+
+main(int argc, string[] argv) {
+  int a = add10(3);
+  int b = add16(3);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_warn "bin/idc: two functions differing only in a literal warn" \
+    "p.id:5: warning: 'add16' and 'add10' differ only in a literal value; parameterise one function" \
+    --allow-untested --emit-c /dev/null
+
+# Two functions identical in every way are still the EXISTING error, not this
+# warning -- this warning is only the gap that rule leaves.
+cat > "$TMP/p.id" <<'EOF'
+same_a(int x) {
+  int r = x + 1;
+} return int r;
+
+same_b(int x) {
+  int r = x + 1;
+} return int r;
+
+main(int argc, string[] argv) {
+  int a = same_a(3);
+  int b = same_b(3);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_refuse "bin/idc: two functions identical in every way are the existing duplicate-logic error" \
+    "has the same signature and logic as" --allow-untested --emit-c /dev/null
+if ! grep -qF "differ only in a literal value" "$TMP/log"; then
+    ok "bin/idc: ...not also this warning"
+else
+    bad "bin/idc: ...not also this warning ($(tr '\n' '|' < "$TMP/log"))"
+fi
+
+# Genuinely different logic: no warning either way.
+cat > "$TMP/p.id" <<'EOF'
+diff_a(int x) {
+  int r = x + 1;
+} return int r;
+
+diff_b(int x) {
+  int r = x * 2;
+} return int r;
+
+main(int argc, string[] argv) {
+  int a = diff_a(3);
+  int b = diff_b(3);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_nowarn "bin/idc: genuinely different logic does not warn" \
+    "differ only in a literal value" --allow-untested --emit-c /dev/null
+
+# Warning 3: a generated parameter name.
+cat > "$TMP/p.id" <<'EOF'
+helper(int asset_at_v) {
+  int r = asset_at_v + 1;
+} return int r;
+
+main(int argc, string[] argv) {
+  int r = helper(3);
+  print("" + r);
+} return int 0;
+EOF
+self_warn "bin/idc: a '--fix'-style '_v' parameter name warns" \
+    "p.id:1: warning: parameter 'asset_at_v' of 'helper' has a generated name; name it for what it holds" \
+    --allow-untested --emit-c /dev/null
+
+# Excluded: a generated name on a LOCAL, not a parameter.
+cat > "$TMP/p.id" <<'EOF'
+helper2(int width) {
+  int ret_i = width + 1;
+} return int ret_i;
+
+main(int argc, string[] argv) {
+  int r = helper2(3);
+  print("" + r);
+} return int 0;
+EOF
+self_nowarn "bin/idc: a generated-looking LOCAL name is excluded (parameters only)" \
+    "has a generated name" --allow-untested --emit-c /dev/null
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
