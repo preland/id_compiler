@@ -8,6 +8,8 @@ chk_const_mut(int id) {
     chk_const_mut2(id);
   }
 } return void;
+given cm_setup ((import cm_push_call)):() then check_failed:(1)
+given cm_other_setup ((import cm_var_node)):() then check_failed:(0)
 
 is_mut_call(int id) {
   int ok = 0;
@@ -17,6 +19,8 @@ is_mut_call(int id) {
     ok = is_mut_name(nm);
   }
 } return int ok;
+given cm_setup ((import cm_push_call)):(1)
+given cm_other_setup ((import cm_var_node)):(0)
 
 is_mut_name(string name) {
   int ok = 0;

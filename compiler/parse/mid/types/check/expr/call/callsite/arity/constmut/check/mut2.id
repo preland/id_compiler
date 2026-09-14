@@ -9,6 +9,8 @@ chk_const_mut2(int id) {
     chk_const_mut3(id, name);
   }
 } return void;
+given cm_setup ((import cm_push_call)):() then check_failed:(1)
+given cm_other_setup ((import cm_push_local_call)):() then check_failed:(0)
 
 // const_decl (back/tgt/c/emit/prog/head/const/find.id) is the one place that
 // answers "is NAME a conf.id constant, and which declaration"; reused rather
@@ -22,8 +24,12 @@ chk_const_mut3(int id, string name) {
     }
   }
 } return void;
+given cm_setup ((import cm_push_call), "clist"):() then check_failed:(1)
+given cm_scalar_setup ((import cm_push_scalar_call), "cscalar"):() then check_failed:(0)
 
 cml_report(int id, string name) {
   string op = s1_of(id);
   tc_err(id, "'" + op + "' cannot mutate '" + name + "', a list constant; pass it to a function that takes the list as a parameter instead");
 } return void;
+given cm_setup ((import cm_push_call), "clist"):() then check_failed:(1)
+given cm_scalar_setup ((import cm_push_scalar_call), "cscalar"):() then check_failed:(1)

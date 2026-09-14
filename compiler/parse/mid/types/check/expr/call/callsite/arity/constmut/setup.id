@@ -1,0 +1,21 @@
+// The two negatives fixture.id's positives are compared against: a plain
+// node that is not a call at all (cm_var_node, for is_mut_call's own k_of
+// gate), and a `push` on a local, unregistered name rather than
+// `(import NAME)` (cm_push_local_call, for chk_const_mut2's "not import"
+// gate and chk_const_mut3's "not a registered constant" one).
+
+cm_call_var(string name) {
+  int argn = node_var(name);
+  int valn = node_int("9", 9, 0);
+  int d = node_call("push", [argn, valn]);
+} return int d;
+given cm_other_setup ("locallist"):(6)
+given cm_other_setup ("other"):(6)
+
+cm_other_setup() {
+  env_init();
+  export int cm_var_node = node_var("x");
+  export int cm_push_local_call = cm_call_var("locallist");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

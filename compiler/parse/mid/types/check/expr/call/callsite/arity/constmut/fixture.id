@@ -1,0 +1,28 @@
+// A `push` call on `(import NAME)`, built the same way for every positive
+// scenario in this directory's cases: cm_setup registers a list constant,
+// cm_scalar_setup a scalar one, both calling cm_call to build the call node
+// that reads it. setup.id's cm_other_setup covers the two negatives.
+
+cm_call(string name) {
+  int argn = node_import(name);
+  int valn = node_int("9", 9, 0);
+  int d = node_call("push", [argn, valn]);
+} return int d;
+given cm_setup ("clist"):(8)
+given cm_scalar_setup ("cscalar"):(7)
+
+cm_setup() {
+  lc_env();
+  lc_reg_list1("clist", "1", 1);
+  export int cm_push_call = cm_call("clist");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+cm_scalar_setup() {
+  lc_env();
+  lc_reg_int("cscalar", "2", 2);
+  export int cm_push_scalar_call = cm_call("cscalar");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
