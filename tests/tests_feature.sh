@@ -1744,6 +1744,23 @@ EOF
 self_nowarn "bin/idc: a generated-looking LOCAL name is excluded (parameters only)" \
     "has a generated name" --allow-untested --emit-c /dev/null
 
+# An idstd_-prefixed parameter that looks generated after stripping should not warn.
+cat > "$TMP/p.id" <<'EOF'
+fill(int idstd_v) {
+  int i = 0;
+  while(i < idstd_v) {
+    i = i + 1;
+  }
+} return void;
+(3):(3)
+
+main(int argc, string[] argv) {
+  fill(5);
+} return int 0;
+EOF
+self_nowarn "bin/idc: an idstd_-prefixed parameter is not a generated name (idstd_v)" \
+    "has a generated name" --allow-untested --emit-c /dev/null
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

@@ -1766,6 +1766,9 @@ int id_fwd_stmt_id(int fid, int stmt);
 void id_genname_check(int i, IdList* params, int pk);
 void id_genname_param(int i, int pid);
 int id_is_genparam(char* name);
+void id_check_genname(void);
+void id_genname_fn(int i);
+void id_genname_loop(int i, IdList* params);
 int id_ends_v(char* name);
 int id_tdig_start(char* name);
 int id_is_retstyle(char* name);
@@ -1777,9 +1780,7 @@ void id_genname_report(int i, char* name);
 char* id_genname_msg(int i, char* name);
 int id_retstyle_check(char* rem);
 int id_is_ret_tag(char* tagbase);
-void id_check_genname(void);
-void id_genname_fn(int i);
-void id_genname_loop(int i, IdList* params);
+char* id_strip_idstd_prefix(char* name);
 char* id_lz_expr(int id);
 char* id_lz_e2(int id);
 char* id_lz_e3(int id);
@@ -14672,14 +14673,40 @@ void id_genname_param(int i, int pid) {
 
 int id_is_genparam(char* name) {
     int ok;
+    char* check;
     ok = 0;
-    if ((id_ends_v(name) == 1)) {
-        ok = 1;
-    }
-    if ((id_is_retstyle(name) == 1)) {
+    check = id_strip_idstd_prefix(name);
+    if (((id_ends_v(check) == 1) || (id_is_retstyle(check) == 1))) {
         ok = 1;
     }
     return ok;
+}
+
+void id_check_genname(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        id_genname_fn(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_genname_fn(int i) {
+    IdList* params;
+    params = id_l1_of((int)(id_list_get(prog, i)));
+    id_genname_loop(i, params);
+    return;
+}
+
+void id_genname_loop(int i, IdList* params) {
+    int pk;
+    pk = 0;
+    while ((pk < id_list_len(params))) {
+        id_genname_check(i, params, pk);
+        pk = (pk + 1);
+    }
+    return;
 }
 
 int id_ends_v(char* name) {
@@ -14786,31 +14813,15 @@ int id_is_ret_tag(char* tagbase) {
     return ok;
 }
 
-void id_check_genname(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(prog))) {
-        id_genname_fn(i);
-        i = (i + 1);
+char* id_strip_idstd_prefix(char* name) {
+    int nlen;
+    char* ret_s;
+    nlen = id_len(name);
+    ret_s = name;
+    if (((nlen > 6) && (strcmp(id_slice(name, 0, 6), "idstd_") == 0))) {
+        ret_s = id_slice(name, 6, nlen);
     }
-    return;
-}
-
-void id_genname_fn(int i) {
-    IdList* params;
-    params = id_l1_of((int)(id_list_get(prog, i)));
-    id_genname_loop(i, params);
-    return;
-}
-
-void id_genname_loop(int i, IdList* params) {
-    int pk;
-    pk = 0;
-    while ((pk < id_list_len(params))) {
-        id_genname_check(i, params, pk);
-        pk = (pk + 1);
-    }
-    return;
+    return ret_s;
 }
 
 char* id_lz_expr(int id) {

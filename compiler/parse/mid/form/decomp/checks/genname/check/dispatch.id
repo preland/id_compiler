@@ -14,15 +14,20 @@ genname_param(int i, int pid) {
 
 // The `--fix` convention (../more/match.id) or the `ret_i`/`ret_s` return-value
 // style (../more/retstyle.id) this compiler's own source uses throughout.
+// Before checking, strip a leading idstd_ prefix (stdlib names all start with
+// idstd_, so idstd_v is not generated; after stripping to v, it clearly is not).
 is_genparam(string name) {
   int ok = 0;
-  if(ends_v(name) == 1) {
-    ok = 1;
-  }
-  if(is_retstyle(name) == 1) {
+  string check = strip_idstd_prefix(name);
+  if(ends_v(check) == 1 || is_retstyle(check) == 1) {
     ok = 1;
   }
 } return int ok;
+("idstd_v"):(0)
+("idstd_str_slice_v"):(1)
+("idstd_ret_i"):(1)
 ("asset_at_v"):(1)
 ("ret_s"):(1)
+("ret_i"):(1)
+("v"):(0)
 ("width"):(0)

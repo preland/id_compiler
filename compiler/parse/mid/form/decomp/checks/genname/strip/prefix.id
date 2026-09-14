@@ -1,0 +1,12 @@
+strip_idstd_prefix(string name) {
+  int nlen = len(name);
+  string ret_s = name;
+  if(nlen > 6 && slice(name, 0, 6) == "idstd_") {
+    ret_s = slice(name, 6, nlen);
+  }
+} return string ret_s;
+("idstd_v"):("v")
+("idstd_ret_i"):("ret_i")
+("idstd_str_slice_v"):("str_slice_v")
+("v"):("v")
+("asset_at_v"):("asset_at_v")
