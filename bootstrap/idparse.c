@@ -1614,6 +1614,121 @@ char* id_k_of(int id);
 void id_push_kii(char* k, int a, int b);
 void id_push_ss(char* s1, char* s2);
 void id_push_ll(IdList* l1, IdList* l2);
+char* id_canon_expr(int id);
+char* id_ce2(int id);
+char* id_ce3(int id);
+char* id_ce4(int id);
+char* id_ce5(int id);
+char* id_canon_callee(char* name);
+char* id_canon_pair(int a, int b);
+char* id_canon_args(IdList* args);
+char* id_sep_at(char* s, int i);
+char* id_canon_bin(int id);
+char* id_bin_op(int id);
+char* id_bin_pair(int id);
+char* id_bin_simplify(int id, char* op);
+char* id_bin_const(char* op, int lid, int rid);
+char* id_bin_fallback(int id, char* op, char* simple_s);
+char* id_fold_op4(char* op, int a, int b);
+char* id_compute_or(int a, int b);
+char* id_compute_xor(int a, int b);
+char* id_fold_op5(char* op, int a, int b);
+char* id_compute_shr(int a, int b);
+long long id_shl_word(int a, int b);
+char* id_compute_shl(int a, int b);
+long long id_mul_word(int a, int b);
+char* id_fold_op(char* op, int a, int b);
+char* id_compute_add(int a, int b);
+char* id_compute_sub(int a, int b);
+char* id_fold_op2(char* op, int a, int b);
+char* id_compute_mul(int a, int b);
+char* id_compute_div(int a, int b);
+char* id_fold_op3(char* op, int a, int b);
+char* id_compute_mod(int a, int b);
+char* id_compute_and(int a, int b);
+char* id_bin_fold(char* op, int lid, int rid);
+char* id_bin_fold2(char* op, int lid, int rid);
+char* id_fold_word(long long wv);
+char* id_call_fp(int id);
+char* id_call_fp2(char* name, IdList* args);
+char* id_bin_identity(char* op, int lid, int rid);
+int id_lit_is(int nid, int v);
+char* id_ident_zero_sym(char* op, int lid, int rid);
+char* id_ident_zero_right(char* op, int lid, int rid);
+char* id_ident_one(char* op, int lid, int rid);
+char* id_canon_func(int id);
+char* id_canon_params(IdList* params);
+char* id_canon_param(int id);
+char* id_canon_native(int id, char* out);
+char* id_canon_func_body(int id);
+char* id_canon_func_tail(int id, char* out);
+char* id_canon_logic(int id, char* out);
+char* id_cn(char* name);
+int id_cn_add(char* name);
+char* id_canon_var(int id);
+char* id_canon_ret(int id);
+void id_uq_begin(char* name);
+char* id_cur_self(void);
+char* id_canon_else2(IdList* els, int elif);
+char* id_canon_else3(IdList* els);
+char* id_canon_body(IdList* stmts);
+char* id_canon_decl(int id);
+char* id_decl_name(int id);
+char* id_canon_iassign(int id);
+char* id_decl_tag(int id);
+char* id_decl_tail(int id, char* out, char* nm);
+char* id_iassign_tail(int id, char* head);
+char* id_iassign_val(int id, char* head, char* key);
+char* id_cst_if(int id);
+char* id_cst_if_tail(int id, int i1_of_v, IdList* l1_of_v);
+char* id_canon_stmt(int id);
+char* id_cst2(int id);
+char* id_cst3(int id);
+void id_print_fingerprints(void);
+void id_print_fp_line(int i);
+char* id_fp_line(char* name, char* fp);
+void id_check_bodies(void);
+void id_check_unique(void);
+void id_uq_fill(void);
+void id_uq_scan(void);
+void id_uq_at(int i);
+int id_find_dup(int i);
+void id_chk_dupfn(void);
+void id_dupfn_at(int i);
+void id_dupfn_err(int i, int j);
+void id_dupfn_check(int i, int j);
+void id_dupfn_print(char* prog_loc_v, char* s1_of_v, int j);
+int id_cw_shape(int id);
+char* id_cw_body(int id);
+void id_cw_begin(char* name);
+int id_cw_is_lit(char* fp);
+char* id_cw_spell(char* val);
+void id_cw_report(int id, char* val);
+void id_cw_print(int id, char* lit);
+void id_cw_say(char* name, char* rt, char* lit);
+char* id_cw_ret(int id);
+char* id_cw_get(char* name);
+char* id_cw_pick(int i, char* name, char* val);
+int id_cw_assign(int id);
+int id_cw_put(int id, char* name);
+int id_cw_keep(char* name, char* val);
+char* id_cw_walk(int id);
+int id_cw_stmts(IdList* stmts);
+int id_cw_stmt(int id);
+void id_cw_scan(void);
+void id_cw_at(int i);
+char* id_cw_value(int id);
+void id_dup_report(char* name_i, int j);
+char* id_dup_loc(char* name_i);
+int id_dup_probe(int i, int j);
+void id_report_dup(int i, int j);
+char* id_fname_at(int i);
+char* id_dup_tail(int j);
+char* id_dup_tail2(char* name_j);
+int id_is_reserved_name(int i);
+void id_resv_print(char* prog_loc_v, char* s1_of_v);
+void id_resv_at(int i);
+void id_resv_err(int i);
 void id_exp_one(int id, char* owner);
 int id_is_export_decl(int id);
 void id_add_export(char* name, char* type, char* owner);
@@ -2200,121 +2315,6 @@ char* id_type_un(int id);
 char* id_type_of(int id);
 char* id_type_of2(int id);
 char* id_type_of3(int id);
-char* id_canon_expr(int id);
-char* id_ce2(int id);
-char* id_ce3(int id);
-char* id_ce4(int id);
-char* id_ce5(int id);
-char* id_canon_callee(char* name);
-char* id_canon_pair(int a, int b);
-char* id_canon_args(IdList* args);
-char* id_sep_at(char* s, int i);
-char* id_canon_bin(int id);
-char* id_bin_op(int id);
-char* id_bin_pair(int id);
-char* id_bin_simplify(int id, char* op);
-char* id_bin_const(char* op, int lid, int rid);
-char* id_bin_fallback(int id, char* op, char* simple_s);
-char* id_fold_op4(char* op, int a, int b);
-char* id_compute_or(int a, int b);
-char* id_compute_xor(int a, int b);
-char* id_fold_op5(char* op, int a, int b);
-char* id_compute_shr(int a, int b);
-long long id_shl_word(int a, int b);
-char* id_compute_shl(int a, int b);
-long long id_mul_word(int a, int b);
-char* id_fold_op(char* op, int a, int b);
-char* id_compute_add(int a, int b);
-char* id_compute_sub(int a, int b);
-char* id_fold_op2(char* op, int a, int b);
-char* id_compute_mul(int a, int b);
-char* id_compute_div(int a, int b);
-char* id_fold_op3(char* op, int a, int b);
-char* id_compute_mod(int a, int b);
-char* id_compute_and(int a, int b);
-char* id_bin_fold(char* op, int lid, int rid);
-char* id_bin_fold2(char* op, int lid, int rid);
-char* id_fold_word(long long wv);
-char* id_call_fp(int id);
-char* id_call_fp2(char* name, IdList* args);
-char* id_bin_identity(char* op, int lid, int rid);
-int id_lit_is(int nid, int v);
-char* id_ident_zero_sym(char* op, int lid, int rid);
-char* id_ident_zero_right(char* op, int lid, int rid);
-char* id_ident_one(char* op, int lid, int rid);
-char* id_canon_func(int id);
-char* id_canon_params(IdList* params);
-char* id_canon_param(int id);
-char* id_canon_native(int id, char* out);
-char* id_canon_func_body(int id);
-char* id_canon_func_tail(int id, char* out);
-char* id_canon_logic(int id, char* out);
-char* id_cn(char* name);
-int id_cn_add(char* name);
-char* id_canon_var(int id);
-char* id_canon_ret(int id);
-void id_uq_begin(char* name);
-char* id_cur_self(void);
-char* id_canon_else2(IdList* els, int elif);
-char* id_canon_else3(IdList* els);
-char* id_canon_body(IdList* stmts);
-char* id_canon_decl(int id);
-char* id_decl_name(int id);
-char* id_canon_iassign(int id);
-char* id_decl_tag(int id);
-char* id_decl_tail(int id, char* out, char* nm);
-char* id_iassign_tail(int id, char* head);
-char* id_iassign_val(int id, char* head, char* key);
-char* id_cst_if(int id);
-char* id_cst_if_tail(int id, int i1_of_v, IdList* l1_of_v);
-char* id_canon_stmt(int id);
-char* id_cst2(int id);
-char* id_cst3(int id);
-void id_print_fingerprints(void);
-void id_print_fp_line(int i);
-char* id_fp_line(char* name, char* fp);
-void id_check_bodies(void);
-void id_check_unique(void);
-void id_uq_fill(void);
-void id_uq_scan(void);
-void id_uq_at(int i);
-int id_find_dup(int i);
-void id_chk_dupfn(void);
-void id_dupfn_at(int i);
-void id_dupfn_err(int i, int j);
-void id_dupfn_check(int i, int j);
-void id_dupfn_print(char* prog_loc_v, char* s1_of_v, int j);
-int id_cw_shape(int id);
-char* id_cw_body(int id);
-void id_cw_begin(char* name);
-int id_cw_is_lit(char* fp);
-char* id_cw_spell(char* val);
-void id_cw_report(int id, char* val);
-void id_cw_print(int id, char* lit);
-void id_cw_say(char* name, char* rt, char* lit);
-char* id_cw_ret(int id);
-char* id_cw_get(char* name);
-char* id_cw_pick(int i, char* name, char* val);
-int id_cw_assign(int id);
-int id_cw_put(int id, char* name);
-int id_cw_keep(char* name, char* val);
-char* id_cw_walk(int id);
-int id_cw_stmts(IdList* stmts);
-int id_cw_stmt(int id);
-void id_cw_scan(void);
-void id_cw_at(int i);
-char* id_cw_value(int id);
-void id_dup_report(char* name_i, int j);
-char* id_dup_loc(char* name_i);
-int id_dup_probe(int i, int j);
-void id_report_dup(int i, int j);
-char* id_fname_at(int i);
-char* id_dup_tail(int j);
-char* id_dup_tail2(char* name_j);
-int id_is_reserved_name(int i);
-void id_resv_print(char* prog_loc_v, char* s1_of_v);
-void id_resv_at(int i);
-void id_resv_err(int i);
 
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
@@ -2405,6 +2405,11 @@ IdList* ni1;  /* exported by init_b() */
 IdList* ni2;  /* exported by init_b() */
 IdList* ns1;  /* exported by init_b() */
 IdList* nparen;  /* exported by setup_rest() */
+IdList* cself;  /* exported by uq_begin() */
+IdList* cnames;  /* exported by uq_begin() */
+IdList* cfp;  /* exported by uq_fill() */
+IdList* cw_names;  /* exported by cw_begin() */
+IdList* cw_vals;  /* exported by cw_begin() */
 IdList* bnames;  /* exported by init_bnames() */
 IdList* hostc;  /* exported by host_init() */
 IdList* rtc;  /* exported by init_rtc() */
@@ -2432,11 +2437,6 @@ IdList* tywidth;  /* exported by init_ty_cols() */
 IdList* tysigned;  /* exported by init_ty_rows() */
 IdList* tcache;  /* exported by init_tcache() */
 IdList* tcache_ok;  /* exported by init_tcache() */
-IdList* cself;  /* exported by uq_begin() */
-IdList* cnames;  /* exported by uq_begin() */
-IdList* cfp;  /* exported by uq_fill() */
-IdList* cw_names;  /* exported by cw_begin() */
-IdList* cw_vals;  /* exported by cw_begin() */
 
 void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v) {
     int idstd_i;
@@ -13002,6 +13002,1155 @@ void id_push_ll(IdList* l1, IdList* l2) {
     return;
 }
 
+char* id_canon_expr(int id) {
+    char* out;
+    char* spell;
+    out = id_ce2(id);
+    if ((strcmp(id_k_of(id), "int") == 0)) {
+        spell = id_s1_of(id);
+        out = id_concat("I", id_strip_zeros(spell));
+    }
+    if ((strcmp(id_k_of(id), "float") == 0)) {
+        out = id_concat("F", id_s1_of(id));
+    }
+    return out;
+}
+
+char* id_ce2(int id) {
+    char* out;
+    out = id_ce3(id);
+    if ((strcmp(id_k_of(id), "str") == 0)) {
+        out = id_concat("S", id_s1_of(id));
+    }
+    if ((strcmp(id_k_of(id), "var") == 0)) {
+        out = id_canon_var(id);
+    }
+    return out;
+}
+
+char* id_ce3(int id) {
+    char* out;
+    out = id_ce4(id);
+    if ((strcmp(id_k_of(id), "import") == 0)) {
+        out = id_concat(id_concat("g(", id_s1_of(id)), ")");
+    }
+    if ((strcmp(id_k_of(id), "bin") == 0)) {
+        out = id_canon_bin(id);
+    }
+    return out;
+}
+
+char* id_ce4(int id) {
+    char* out;
+    int i1_of_v;
+    int i1_of_v2;
+    int i2_of_v;
+    out = id_ce5(id);
+    if ((strcmp(id_k_of(id), "un") == 0)) {
+        i1_of_v = id_i1_of(id);
+        out = id_concat(id_concat(id_concat(id_concat("u", id_s1_of(id)), "("), id_canon_expr(i1_of_v)), ")");
+    }
+    if ((strcmp(id_k_of(id), "index") == 0)) {
+        i1_of_v2 = id_i1_of(id);
+        i2_of_v = id_i2_of(id);
+        out = id_concat("ix", id_canon_pair(i1_of_v2, i2_of_v));
+    }
+    return out;
+}
+
+char* id_ce5(int id) {
+    char* out;
+    IdList* l1_of_v2;
+    out = id_concat(id_concat(id_concat("?", id_k_of(id)), "#"), id_str_of_int(id));
+    if ((strcmp(id_k_of(id), "call") == 0)) {
+        out = id_call_fp(id);
+    }
+    if ((strcmp(id_k_of(id), "arr") == 0)) {
+        l1_of_v2 = id_l1_of(id);
+        out = id_concat(id_concat("ar(", id_canon_args(l1_of_v2)), ")");
+    }
+    return out;
+}
+
+char* id_canon_callee(char* name) {
+    char* out;
+    out = name;
+    if ((strcmp(name, id_cur_self()) == 0)) {
+        out = "self";
+    }
+    if ((id_find_str(cnames, name) >= 0)) {
+        out = id_concat("v", id_cn(name));
+    }
+    return out;
+}
+
+char* id_canon_pair(int a, int b) {
+    char* out;
+    char* val;
+    char* ret_s;
+    out = id_canon_expr(a);
+    val = id_canon_expr(b);
+    ret_s = id_concat(id_concat(id_concat(id_concat("(", out), ","), val), ")");
+    return ret_s;
+}
+
+char* id_canon_args(IdList* args) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(args))) {
+        out = id_concat(id_concat(out, id_sep_at(",", i)), id_canon_expr((int)(id_list_get(args, i))));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_sep_at(char* s, int i) {
+    char* out;
+    out = "";
+    if ((i > 0)) {
+        out = s;
+    }
+    return out;
+}
+
+char* id_canon_bin(int id) {
+    char* op;
+    char* simple_s;
+    char* ret_s;
+    op = id_bin_op(id);
+    simple_s = id_bin_simplify(id, op);
+    ret_s = id_bin_fallback(id, op, simple_s);
+    return ret_s;
+}
+
+char* id_bin_op(int id) {
+    char* op;
+    op = id_s1_of(id);
+    if ((strcmp(op, "=") == 0)) {
+        op = "==";
+    }
+    return op;
+}
+
+char* id_bin_pair(int id) {
+    int i1_of_v;
+    int i2_of_v;
+    char* ret_s;
+    i1_of_v = id_i1_of(id);
+    i2_of_v = id_i2_of(id);
+    ret_s = id_canon_pair(i1_of_v, i2_of_v);
+    return ret_s;
+}
+
+char* id_bin_simplify(int id, char* op) {
+    int lid;
+    int rid;
+    char* ret_s;
+    lid = id_i1_of(id);
+    rid = id_i2_of(id);
+    ret_s = id_bin_const(op, lid, rid);
+    return ret_s;
+}
+
+char* id_bin_const(char* op, int lid, int rid) {
+    char* ret_s;
+    ret_s = id_bin_fold(op, lid, rid);
+    if ((strcmp(ret_s, "") == 0)) {
+        ret_s = id_bin_identity(op, lid, rid);
+    }
+    return ret_s;
+}
+
+char* id_bin_fallback(int id, char* op, char* simple_s) {
+    char* ret_s;
+    char* pair_v;
+    ret_s = simple_s;
+    if ((strcmp(simple_s, "") == 0)) {
+        pair_v = id_bin_pair(id);
+        ret_s = id_concat(id_concat("b", op), pair_v);
+    }
+    return ret_s;
+}
+
+char* id_fold_op4(char* op, int a, int b) {
+    char* ret_s;
+    ret_s = id_fold_op5(op, a, b);
+    if ((strcmp(op, "|") == 0)) {
+        ret_s = id_compute_or(a, b);
+    }
+    if ((strcmp(op, "^") == 0)) {
+        ret_s = id_compute_xor(a, b);
+    }
+    return ret_s;
+}
+
+char* id_compute_or(int a, int b) {
+    int n;
+    char* ret_s;
+    n = (a | b);
+    ret_s = id_concat("I", id_str_of_int(n));
+    return ret_s;
+}
+
+char* id_compute_xor(int a, int b) {
+    int n;
+    char* ret_s;
+    n = (a ^ b);
+    ret_s = id_concat("I", id_str_of_int(n));
+    return ret_s;
+}
+
+char* id_fold_op5(char* op, int a, int b) {
+    char* ret_s;
+    ret_s = "";
+    if ((strcmp(op, "<<") == 0)) {
+        ret_s = id_compute_shl(a, b);
+    }
+    if ((strcmp(op, ">>") == 0)) {
+        ret_s = id_compute_shr(a, b);
+    }
+    return ret_s;
+}
+
+char* id_compute_shr(int a, int b) {
+    int n;
+    char* ret_s;
+    n = id_sar(a, b);
+    ret_s = id_concat("I", id_str_of_int(n));
+    return ret_s;
+}
+
+long long id_shl_word(int a, int b) {
+    long long aw;
+    long long bw;
+    long long shifted;
+    aw = a;
+    bw = b;
+    shifted = id_shl(aw, bw);
+    return shifted;
+}
+
+char* id_compute_shl(int a, int b) {
+    char* ret_s;
+    long long shifted;
+    ret_s = "";
+    if ((b < 32)) {
+        shifted = id_shl_word(a, b);
+        ret_s = id_fold_word(shifted);
+    }
+    return ret_s;
+}
+
+long long id_mul_word(int a, int b) {
+    long long aw;
+    long long bw;
+    long long prod;
+    aw = a;
+    bw = b;
+    prod = (aw * bw);
+    return prod;
+}
+
+char* id_fold_op(char* op, int a, int b) {
+    char* ret_s;
+    ret_s = id_fold_op2(op, a, b);
+    if ((strcmp(op, "+") == 0)) {
+        ret_s = id_compute_add(a, b);
+    }
+    if ((strcmp(op, "-") == 0)) {
+        ret_s = id_compute_sub(a, b);
+    }
+    return ret_s;
+}
+
+char* id_compute_add(int a, int b) {
+    char* ret_s;
+    int n;
+    ret_s = "";
+    if ((a <= (2147483647 - b))) {
+        n = (a + b);
+        ret_s = id_concat("I", id_str_of_int(n));
+    }
+    return ret_s;
+}
+
+char* id_compute_sub(int a, int b) {
+    int n;
+    char* ret_s;
+    n = (a - b);
+    ret_s = id_concat("I", id_str_of_int(n));
+    return ret_s;
+}
+
+char* id_fold_op2(char* op, int a, int b) {
+    char* ret_s;
+    ret_s = id_fold_op3(op, a, b);
+    if ((strcmp(op, "*") == 0)) {
+        ret_s = id_compute_mul(a, b);
+    }
+    if ((strcmp(op, "/") == 0)) {
+        ret_s = id_compute_div(a, b);
+    }
+    return ret_s;
+}
+
+char* id_compute_mul(int a, int b) {
+    long long prod;
+    char* ret_s;
+    prod = id_mul_word(a, b);
+    ret_s = id_fold_word(prod);
+    return ret_s;
+}
+
+char* id_compute_div(int a, int b) {
+    char* ret_s;
+    int n;
+    ret_s = "";
+    if ((b != 0)) {
+        n = id_idiv(a, b);
+        ret_s = id_concat("I", id_str_of_int(n));
+    }
+    return ret_s;
+}
+
+char* id_fold_op3(char* op, int a, int b) {
+    char* ret_s;
+    ret_s = id_fold_op4(op, a, b);
+    if ((strcmp(op, "%") == 0)) {
+        ret_s = id_compute_mod(a, b);
+    }
+    if ((strcmp(op, "&") == 0)) {
+        ret_s = id_compute_and(a, b);
+    }
+    return ret_s;
+}
+
+char* id_compute_mod(int a, int b) {
+    char* ret_s;
+    int n;
+    ret_s = "";
+    if ((b != 0)) {
+        n = id_imod(a, b);
+        ret_s = id_concat("I", id_str_of_int(n));
+    }
+    return ret_s;
+}
+
+char* id_compute_and(int a, int b) {
+    int n;
+    char* ret_s;
+    n = (a & b);
+    ret_s = id_concat("I", id_str_of_int(n));
+    return ret_s;
+}
+
+char* id_bin_fold(char* op, int lid, int rid) {
+    char* ret_s;
+    ret_s = "";
+    if (((strcmp(id_k_of(lid), "int") == 0) && (strcmp(id_k_of(rid), "int") == 0))) {
+        ret_s = id_bin_fold2(op, lid, rid);
+    }
+    return ret_s;
+}
+
+char* id_bin_fold2(char* op, int lid, int rid) {
+    char* ret_s;
+    int a;
+    int b;
+    ret_s = "";
+    if (((id_i2_of(lid) == 0) && (id_i2_of(rid) == 0))) {
+        a = id_i1_of(lid);
+        b = id_i1_of(rid);
+        ret_s = id_fold_op(op, a, b);
+    }
+    return ret_s;
+}
+
+char* id_fold_word(long long wv) {
+    char* ret_s;
+    int n;
+    ret_s = "";
+    if ((wv <= 2147483647)) {
+        n = wv;
+        ret_s = id_concat("I", id_str_of_int(n));
+    }
+    return ret_s;
+}
+
+char* id_call_fp(int id) {
+    char* s1_of_v;
+    IdList* l1_of_v;
+    char* ret_s;
+    s1_of_v = id_s1_of(id);
+    l1_of_v = id_l1_of(id);
+    ret_s = id_call_fp2(s1_of_v, l1_of_v);
+    return ret_s;
+}
+
+char* id_call_fp2(char* name, IdList* args) {
+    char* ret_s;
+    ret_s = id_concat(id_concat(id_concat(id_concat("c(", id_canon_callee(name)), ":"), id_canon_args(args)), ")");
+    if ((((strcmp(name, "ushr") == 0) && (id_list_len(args) == 2)) && (id_lit_is((int)(id_list_get(args, 1)), 0) == 1))) {
+        ret_s = id_canon_expr((int)(id_list_get(args, 0)));
+    }
+    return ret_s;
+}
+
+char* id_bin_identity(char* op, int lid, int rid) {
+    char* ret_s;
+    ret_s = id_ident_zero_sym(op, lid, rid);
+    if ((strcmp(ret_s, "") == 0)) {
+        ret_s = id_ident_zero_right(op, lid, rid);
+    }
+    if ((strcmp(ret_s, "") == 0)) {
+        ret_s = id_ident_one(op, lid, rid);
+    }
+    return ret_s;
+}
+
+int id_lit_is(int nid, int v) {
+    int ok;
+    ok = 0;
+    if (((strcmp(id_k_of(nid), "int") == 0) && (id_i1_of(nid) == v))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+char* id_ident_zero_sym(char* op, int lid, int rid) {
+    char* ret_s;
+    ret_s = "";
+    if (((((strcmp(op, "+") == 0) || (strcmp(op, "|") == 0)) || (strcmp(op, "^") == 0)) && (id_lit_is(rid, 0) == 1))) {
+        ret_s = id_canon_expr(lid);
+    }
+    if (((((strcmp(op, "+") == 0) || (strcmp(op, "|") == 0)) || (strcmp(op, "^") == 0)) && (id_lit_is(lid, 0) == 1))) {
+        ret_s = id_canon_expr(rid);
+    }
+    return ret_s;
+}
+
+char* id_ident_zero_right(char* op, int lid, int rid) {
+    char* ret_s;
+    ret_s = "";
+    if (((((strcmp(op, "-") == 0) || (strcmp(op, "<<") == 0)) || (strcmp(op, ">>") == 0)) && (id_lit_is(rid, 0) == 1))) {
+        ret_s = id_canon_expr(lid);
+    }
+    return ret_s;
+}
+
+char* id_ident_one(char* op, int lid, int rid) {
+    char* ret_s;
+    ret_s = "";
+    if ((((strcmp(op, "*") == 0) || (strcmp(op, "/") == 0)) && (id_lit_is(rid, 1) == 1))) {
+        ret_s = id_canon_expr(lid);
+    }
+    if (((strcmp(op, "*") == 0) && (id_lit_is(lid, 1) == 1))) {
+        ret_s = id_canon_expr(rid);
+    }
+    return ret_s;
+}
+
+char* id_canon_func(int id) {
+    char* s1_of_v;
+    char* ret_s;
+    s1_of_v = id_s1_of(id);
+    id_uq_begin(s1_of_v);
+    ret_s = id_canon_func_body(id);
+    return ret_s;
+}
+
+char* id_canon_params(IdList* params) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(params))) {
+        out = id_concat(id_concat(out, id_sep_at(",", i)), id_canon_param((int)(id_list_get(params, i))));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_canon_param(int id) {
+    char* s2_of_v;
+    char* out;
+    char* ret_s;
+    s2_of_v = id_s2_of(id);
+    out = id_cn(s2_of_v);
+    ret_s = id_concat(id_concat(id_s1_of(id), " "), out);
+    return ret_s;
+}
+
+char* id_canon_native(int id, char* out) {
+    char* ret_s;
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat("(", out), ")->"), id_s2_of(id)), " native "), id_s1_of(id));
+    return ret_s;
+}
+
+char* id_canon_func_body(int id) {
+    IdList* l1_of_v;
+    char* out;
+    char* ret_s;
+    l1_of_v = id_l1_of(id);
+    out = id_canon_params(l1_of_v);
+    ret_s = id_canon_func_tail(id, out);
+    return ret_s;
+}
+
+char* id_canon_func_tail(int id, char* out) {
+    char* ret_s;
+    ret_s = "";
+    if ((id_is_native(id) == 1)) {
+        ret_s = id_canon_native(id, out);
+    } else {
+        ret_s = id_canon_logic(id, out);
+    }
+    return ret_s;
+}
+
+char* id_canon_logic(int id, char* out) {
+    IdList* l2_of_v;
+    char* val;
+    char* ret_s;
+    l2_of_v = id_l2_of(id);
+    val = id_canon_body(l2_of_v);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("(", out), ")->"), id_s2_of(id)), "{"), val), "}=>"), id_canon_ret(id));
+    return ret_s;
+}
+
+char* id_cn(char* name) {
+    int idx;
+    char* ret_s;
+    idx = id_find_str(cnames, name);
+    if ((idx < 0)) {
+        idx = id_cn_add(name);
+    }
+    ret_s = id_concat("", id_str_of_int(idx));
+    return ret_s;
+}
+
+int id_cn_add(char* name) {
+    int ret_i;
+    id_list_push(cnames, (long long)(intptr_t)(name));
+    ret_i = (id_list_len(cnames) - 1);
+    return ret_i;
+}
+
+char* id_canon_var(int id) {
+    char* name;
+    char* out;
+    name = id_s1_of(id);
+    out = id_concat(id_concat("fv(", id_canon_callee(name)), ")");
+    if ((id_is_fn_value(id) == 0)) {
+        out = id_concat("v", id_cn(name));
+    }
+    return out;
+}
+
+char* id_canon_ret(int id) {
+    char* out;
+    int i1_of_v;
+    out = "void";
+    if ((id_i1_of(id) >= 0)) {
+        i1_of_v = id_i1_of(id);
+        out = id_canon_expr(i1_of_v);
+    }
+    return out;
+}
+
+void id_uq_begin(char* name) {
+    cself = id_list_lit(1, (long long)(intptr_t)(name));
+    cnames = id_list_lit(0);
+    return;
+}
+
+char* id_cur_self(void) {
+    char* ret_s;
+    ret_s = (char*)(intptr_t)(id_list_get(cself, 0));
+    return ret_s;
+}
+
+char* id_canon_else2(IdList* els, int elif) {
+    char* out;
+    out = "";
+    if ((elif == 1)) {
+        out = id_concat("elif", id_canon_stmt((int)(id_list_get(els, 0))));
+    } else {
+        out = id_canon_else3(els);
+    }
+    return out;
+}
+
+char* id_canon_else3(IdList* els) {
+    char* out;
+    out = "";
+    if ((id_list_len(els) > 0)) {
+        out = id_concat(id_concat("else{", id_canon_body(els)), "}");
+    }
+    return out;
+}
+
+char* id_canon_body(IdList* stmts) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(stmts))) {
+        out = id_concat(id_concat(out, id_sep_at(";", i)), id_canon_stmt((int)(id_list_get(stmts, i))));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_canon_decl(int id) {
+    char* out;
+    char* nm;
+    char* ret_s;
+    out = id_decl_tag(id);
+    nm = id_decl_name(id);
+    ret_s = id_decl_tail(id, out, nm);
+    return ret_s;
+}
+
+char* id_decl_name(int id) {
+    char* out;
+    out = id_s2_of(id);
+    if ((id_i2_of(id) != 1)) {
+        out = id_cn(out);
+    }
+    return out;
+}
+
+char* id_canon_iassign(int id) {
+    int i1_of_v;
+    char* head;
+    char* ret_s;
+    i1_of_v = id_i1_of(id);
+    head = id_canon_expr(i1_of_v);
+    ret_s = id_iassign_tail(id, head);
+    return ret_s;
+}
+
+char* id_decl_tag(int id) {
+    char* out;
+    out = "d:";
+    if ((id_i2_of(id) == 1)) {
+        out = "ed:";
+    }
+    return out;
+}
+
+char* id_decl_tail(int id, char* out, char* nm) {
+    int i1_of_v;
+    char* ret_s;
+    i1_of_v = id_i1_of(id);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(out, id_s1_of(id)), " "), nm), "="), id_canon_expr(i1_of_v));
+    return ret_s;
+}
+
+char* id_iassign_tail(int id, char* head) {
+    int i2_of_v;
+    char* key;
+    char* ret_s;
+    i2_of_v = id_i2_of(id);
+    key = id_canon_expr(i2_of_v);
+    ret_s = id_iassign_val(id, head, key);
+    return ret_s;
+}
+
+char* id_iassign_val(int id, char* head, char* key) {
+    IdList* l1_of_v;
+    char* val;
+    char* ret_s;
+    l1_of_v = id_l1_of(id);
+    val = id_canon_expr((int)(id_list_get(l1_of_v, 0)));
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat("ia:", head), "["), key), "]="), val);
+    return ret_s;
+}
+
+char* id_cst_if(int id) {
+    int i1_of_v;
+    IdList* l1_of_v;
+    char* ret_s;
+    i1_of_v = id_i1_of(id);
+    l1_of_v = id_l1_of(id);
+    ret_s = id_cst_if_tail(id, i1_of_v, l1_of_v);
+    return ret_s;
+}
+
+char* id_cst_if_tail(int id, int i1_of_v, IdList* l1_of_v) {
+    IdList* l2_of_v;
+    int i2_of_v;
+    char* out;
+    l2_of_v = id_l2_of(id);
+    i2_of_v = id_i2_of(id);
+    out = id_concat(id_concat(id_concat(id_concat(id_concat("if(", id_canon_expr(i1_of_v)), "){"), id_canon_body(l1_of_v)), "}"), id_canon_else2(l2_of_v, i2_of_v));
+    return out;
+}
+
+char* id_canon_stmt(int id) {
+    char* out;
+    char* s1_of_v;
+    int i1_of_v;
+    out = id_cst2(id);
+    if ((strcmp(id_k_of(id), "decl") == 0)) {
+        out = id_canon_decl(id);
+    }
+    if ((strcmp(id_k_of(id), "assign") == 0)) {
+        s1_of_v = id_s1_of(id);
+        i1_of_v = id_i1_of(id);
+        out = id_concat(id_concat(id_concat("a:", id_cn(s1_of_v)), "="), id_canon_expr(i1_of_v));
+    }
+    return out;
+}
+
+char* id_cst2(int id) {
+    char* out;
+    int i1_of_v;
+    out = id_cst3(id);
+    if ((strcmp(id_k_of(id), "iassign") == 0)) {
+        out = id_canon_iassign(id);
+    }
+    if ((strcmp(id_k_of(id), "exprstmt") == 0)) {
+        i1_of_v = id_i1_of(id);
+        out = id_concat("e:", id_canon_expr(i1_of_v));
+    }
+    return out;
+}
+
+char* id_cst3(int id) {
+    char* out;
+    int i1_of_v2;
+    IdList* l1_of_v2;
+    out = id_concat(id_concat(id_concat("?", id_k_of(id)), "#"), id_str_of_int(id));
+    if ((strcmp(id_k_of(id), "if") == 0)) {
+        out = id_cst_if(id);
+    }
+    if ((strcmp(id_k_of(id), "while") == 0)) {
+        i1_of_v2 = id_i1_of(id);
+        l1_of_v2 = id_l1_of(id);
+        out = id_concat(id_concat(id_concat(id_concat("wh(", id_canon_expr(i1_of_v2)), "){"), id_canon_body(l1_of_v2)), "}");
+    }
+    return out;
+}
+
+void id_print_fingerprints(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        id_print_fp_line(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_print_fp_line(int i) {
+    char* name;
+    char* line;
+    name = id_s1_of((int)(id_list_get(prog, i)));
+    line = id_fp_line(name, (char*)(intptr_t)(id_list_get(cfp, i)));
+    id_print(line);
+    return;
+}
+
+char* id_fp_line(char* name, char* fp) {
+    char* tab;
+    char* ret_s;
+    tab = id_chr(9);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(fp, tab), name), tab), id_func_file(name)), ":"), id_str_of_int(id_func_line(name)));
+    return ret_s;
+}
+
+void id_check_bodies(void) {
+    id_check_funcs();
+    id_chk_dupfn();
+    id_check_unique();
+    return;
+}
+
+void id_check_unique(void) {
+    id_uq_fill();
+    id_uq_scan();
+    id_cw_scan();
+    return;
+}
+
+void id_uq_fill(void) {
+    int i;
+    char* canon_func_v;
+    cfp = id_list_lit(0);
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        canon_func_v = id_canon_func((int)(id_list_get(prog, i)));
+        id_list_push(cfp, (long long)(intptr_t)(canon_func_v));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_uq_scan(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(cfp))) {
+        id_uq_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_uq_at(int i) {
+    int j;
+    j = id_find_dup(i);
+    if ((j >= 0)) {
+        id_report_dup(i, j);
+    }
+    return;
+}
+
+int id_find_dup(int i) {
+    int j;
+    int found;
+    j = 0;
+    found = (0 - 1);
+    while (((j < i) && (found < 0))) {
+        found = id_dup_probe(i, j);
+        j = (j + 1);
+    }
+    return found;
+}
+
+void id_chk_dupfn(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        id_dupfn_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_dupfn_at(int i) {
+    char* s1_of_v;
+    int j;
+    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
+    j = id_first_fn(s1_of_v);
+    id_dupfn_check(i, j);
+    return;
+}
+
+void id_dupfn_err(int i, int j) {
+    char* prog_loc_v;
+    char* s1_of_v;
+    prog_loc_v = id_prog_loc(i);
+    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
+    id_dupfn_print(prog_loc_v, s1_of_v, j);
+    return;
+}
+
+void id_dupfn_check(int i, int j) {
+    id_resv_at(i);
+    if (((j < i) && (i < id_list_len(pfile)))) {
+        id_dupfn_err(i, j);
+    }
+    return;
+}
+
+void id_dupfn_print(char* prog_loc_v, char* s1_of_v, int j) {
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(prog_loc_v, "function '"), s1_of_v), "' already defined at "), (char*)(intptr_t)(id_list_get(pfile, j))), ":"), id_str_of_int((int)(id_list_get(pline, j)))));
+    id_note_failure();
+    return;
+}
+
+int id_cw_shape(int id) {
+    char* rt;
+    int ok;
+    rt = id_s2_of(id);
+    ok = ((((strcmp(rt, "int") == 0) || (strcmp(rt, "word") == 0)) || (strcmp(rt, "float") == 0)) || (strcmp(rt, "string") == 0));
+    if (((id_is_native(id) == 1) || (strcmp(id_s1_of(id), "main") == 0))) {
+        ok = 0;
+    }
+    return ok;
+}
+
+char* id_cw_body(int id) {
+    char* s1_of_v;
+    char* val;
+    s1_of_v = id_s1_of(id);
+    id_cw_begin(s1_of_v);
+    val = id_cw_walk(id);
+    return val;
+}
+
+void id_cw_begin(char* name) {
+    id_uq_begin(name);
+    cw_names = id_list_lit(0);
+    cw_vals = id_list_lit(0);
+    return;
+}
+
+int id_cw_is_lit(char* fp) {
+    int tag;
+    int ok;
+    tag = id_charat(fp, 0);
+    ok = (((tag == 73) || (tag == 70)) || (tag == 83));
+    return ok;
+}
+
+char* id_cw_spell(char* val) {
+    char* lit;
+    char* mag;
+    lit = id_zeros_tail(val, 1);
+    if ((id_charat(lit, 0) == 45)) {
+        mag = id_zeros_tail(lit, 1);
+        lit = id_concat("0 - ", mag);
+    }
+    return lit;
+}
+
+void id_cw_report(int id, char* val) {
+    char* lit;
+    id_note_failure();
+    lit = id_cw_spell(val);
+    id_cw_print(id, lit);
+    return;
+}
+
+void id_cw_print(int id, char* lit) {
+    char* name;
+    char* rt;
+    name = id_s1_of(id);
+    rt = id_s2_of(id);
+    id_cw_say(name, rt, lit);
+    return;
+}
+
+void id_cw_say(char* name, char* rt, char* lit) {
+    char* loc_at_v;
+    loc_at_v = id_dup_loc(name);
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' only returns the constant "), lit), "; declare it in conf.id as '"), rt), " "), name), " = "), lit), ";' and read it with (import "), name), ")"));
+    return;
+}
+
+char* id_cw_ret(int id) {
+    int i1_of_v;
+    char* val;
+    char* s1_of_v;
+    i1_of_v = id_i1_of(id);
+    val = id_canon_expr(i1_of_v);
+    if ((strcmp(id_k_of(i1_of_v), "var") == 0)) {
+        s1_of_v = id_s1_of(i1_of_v);
+        val = id_cw_get(s1_of_v);
+    }
+    return val;
+}
+
+char* id_cw_get(char* name) {
+    char* val;
+    int i;
+    val = "";
+    i = 0;
+    while ((i < id_list_len(cw_names))) {
+        val = id_cw_pick(i, name, val);
+        i = (i + 1);
+    }
+    return val;
+}
+
+char* id_cw_pick(int i, char* name, char* val) {
+    if ((strcmp((char*)(intptr_t)(id_list_get(cw_names, i)), name) == 0)) {
+        val = (char*)(intptr_t)(id_list_get(cw_vals, i));
+    }
+    return val;
+}
+
+int id_cw_assign(int id) {
+    char* s1_of_v;
+    int ok;
+    s1_of_v = id_s1_of(id);
+    ok = 0;
+    if ((strcmp(id_cw_get(s1_of_v), "") != 0)) {
+        ok = id_cw_put(id, s1_of_v);
+    }
+    return ok;
+}
+
+int id_cw_put(int id, char* name) {
+    int i1_of_v;
+    char* val;
+    int ok;
+    i1_of_v = id_i1_of(id);
+    val = id_canon_expr(i1_of_v);
+    ok = id_cw_keep(name, val);
+    return ok;
+}
+
+int id_cw_keep(char* name, char* val) {
+    int ok;
+    id_list_push(cw_names, (long long)(intptr_t)(name));
+    id_list_push(cw_vals, (long long)(intptr_t)(val));
+    ok = id_cw_is_lit(val);
+    return ok;
+}
+
+char* id_cw_walk(int id) {
+    IdList* l2_of_v;
+    char* val;
+    l2_of_v = id_l2_of(id);
+    val = "";
+    if ((id_cw_stmts(l2_of_v) == 1)) {
+        val = id_cw_ret(id);
+    }
+    return val;
+}
+
+int id_cw_stmts(IdList* stmts) {
+    int ok;
+    int i;
+    ok = 1;
+    i = 0;
+    while (((i < id_list_len(stmts)) && (ok == 1))) {
+        ok = id_cw_stmt((int)(id_list_get(stmts, i)));
+        i = (i + 1);
+    }
+    return ok;
+}
+
+int id_cw_stmt(int id) {
+    int ok;
+    char* s2_of_v;
+    ok = 0;
+    if (((strcmp(id_k_of(id), "decl") == 0) && (id_i2_of(id) != 1))) {
+        s2_of_v = id_s2_of(id);
+        ok = id_cw_put(id, s2_of_v);
+    }
+    if ((strcmp(id_k_of(id), "assign") == 0)) {
+        ok = id_cw_assign(id);
+    }
+    return ok;
+}
+
+void id_cw_scan(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        id_cw_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_cw_at(int i) {
+    int id;
+    char* val;
+    id = (int)(id_list_get(prog, i));
+    val = id_cw_value(id);
+    if ((id_cw_is_lit(val) == 1)) {
+        id_cw_report(id, val);
+    }
+    return;
+}
+
+char* id_cw_value(int id) {
+    char* val;
+    val = "";
+    if ((id_cw_shape(id) == 1)) {
+        val = id_cw_body(id);
+    }
+    return val;
+}
+
+void id_dup_report(char* name_i, int j) {
+    char* loc_at_v;
+    char* tail_v;
+    loc_at_v = id_dup_loc(name_i);
+    tail_v = id_dup_tail(j);
+    id_print(id_concat(id_concat(id_concat(id_concat(loc_at_v, "function '"), name_i), "' has the same signature and logic as "), tail_v));
+    return;
+}
+
+char* id_dup_loc(char* name_i) {
+    int func_line_v;
+    char* loc_at_v;
+    func_line_v = id_func_line(name_i);
+    loc_at_v = id_loc_at(name_i, func_line_v);
+    return loc_at_v;
+}
+
+int id_dup_probe(int i, int j) {
+    int found;
+    found = (0 - 1);
+    if ((strcmp((char*)(intptr_t)(id_list_get(cfp, i)), (char*)(intptr_t)(id_list_get(cfp, j))) == 0)) {
+        found = j;
+    }
+    return found;
+}
+
+void id_report_dup(int i, int j) {
+    char* name_i;
+    id_note_failure();
+    name_i = id_fname_at(i);
+    id_dup_report(name_i, j);
+    return;
+}
+
+char* id_fname_at(int i) {
+    char* ret_s;
+    ret_s = id_s1_of((int)(id_list_get(prog, i)));
+    return ret_s;
+}
+
+char* id_dup_tail(int j) {
+    char* name_j;
+    char* ret_s;
+    name_j = id_fname_at(j);
+    ret_s = id_dup_tail2(name_j);
+    return ret_s;
+}
+
+char* id_dup_tail2(char* name_j) {
+    char* func_file_v;
+    int func_line_v2;
+    char* ret_s;
+    func_file_v = id_func_file(name_j);
+    func_line_v2 = id_func_line(name_j);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'", name_j), "' (defined at "), func_file_v), ":"), id_str_of_int(func_line_v2)), "); functions must be unique -- remove one and call it from both places, or make them genuinely differ");
+    return ret_s;
+}
+
+int id_is_reserved_name(int i) {
+    char* s1_of_v;
+    IdList* resv_names_v;
+    int ok;
+    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
+    resv_names_v = id_resv_names();
+    ok = ((id_find_str(resv_names_v, s1_of_v) >= 0) || (strcmp(s1_of_v, "eprint") == 0));
+    return ok;
+}
+
+void id_resv_print(char* prog_loc_v, char* s1_of_v) {
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(prog_loc_v, "function '"), s1_of_v), "' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_"), s1_of_v), "'. Choose another name"));
+    id_note_failure();
+    return;
+}
+
+void id_resv_at(int i) {
+    if (((id_is_runtime() == 0) && id_is_reserved_name(i))) {
+        id_resv_err(i);
+    }
+    return;
+}
+
+void id_resv_err(int i) {
+    char* prog_loc_v;
+    char* s1_of_v;
+    prog_loc_v = id_prog_loc(i);
+    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
+    id_resv_print(prog_loc_v, s1_of_v);
+    return;
+}
+
 void id_exp_one(int id, char* owner) {
     if (id_is_export_decl(id)) {
         id_add_export2(id, owner);
@@ -18454,1155 +19603,6 @@ char* id_type_of3(int id) {
         t = id_type_of4(id);
     }
     return t;
-}
-
-char* id_canon_expr(int id) {
-    char* out;
-    char* spell;
-    out = id_ce2(id);
-    if ((strcmp(id_k_of(id), "int") == 0)) {
-        spell = id_s1_of(id);
-        out = id_concat("I", id_strip_zeros(spell));
-    }
-    if ((strcmp(id_k_of(id), "float") == 0)) {
-        out = id_concat("F", id_s1_of(id));
-    }
-    return out;
-}
-
-char* id_ce2(int id) {
-    char* out;
-    out = id_ce3(id);
-    if ((strcmp(id_k_of(id), "str") == 0)) {
-        out = id_concat("S", id_s1_of(id));
-    }
-    if ((strcmp(id_k_of(id), "var") == 0)) {
-        out = id_canon_var(id);
-    }
-    return out;
-}
-
-char* id_ce3(int id) {
-    char* out;
-    out = id_ce4(id);
-    if ((strcmp(id_k_of(id), "import") == 0)) {
-        out = id_concat(id_concat("g(", id_s1_of(id)), ")");
-    }
-    if ((strcmp(id_k_of(id), "bin") == 0)) {
-        out = id_canon_bin(id);
-    }
-    return out;
-}
-
-char* id_ce4(int id) {
-    char* out;
-    int i1_of_v;
-    int i1_of_v2;
-    int i2_of_v;
-    out = id_ce5(id);
-    if ((strcmp(id_k_of(id), "un") == 0)) {
-        i1_of_v = id_i1_of(id);
-        out = id_concat(id_concat(id_concat(id_concat("u", id_s1_of(id)), "("), id_canon_expr(i1_of_v)), ")");
-    }
-    if ((strcmp(id_k_of(id), "index") == 0)) {
-        i1_of_v2 = id_i1_of(id);
-        i2_of_v = id_i2_of(id);
-        out = id_concat("ix", id_canon_pair(i1_of_v2, i2_of_v));
-    }
-    return out;
-}
-
-char* id_ce5(int id) {
-    char* out;
-    IdList* l1_of_v2;
-    out = id_concat(id_concat(id_concat("?", id_k_of(id)), "#"), id_str_of_int(id));
-    if ((strcmp(id_k_of(id), "call") == 0)) {
-        out = id_call_fp(id);
-    }
-    if ((strcmp(id_k_of(id), "arr") == 0)) {
-        l1_of_v2 = id_l1_of(id);
-        out = id_concat(id_concat("ar(", id_canon_args(l1_of_v2)), ")");
-    }
-    return out;
-}
-
-char* id_canon_callee(char* name) {
-    char* out;
-    out = name;
-    if ((strcmp(name, id_cur_self()) == 0)) {
-        out = "self";
-    }
-    if ((id_find_str(cnames, name) >= 0)) {
-        out = id_concat("v", id_cn(name));
-    }
-    return out;
-}
-
-char* id_canon_pair(int a, int b) {
-    char* out;
-    char* val;
-    char* ret_s;
-    out = id_canon_expr(a);
-    val = id_canon_expr(b);
-    ret_s = id_concat(id_concat(id_concat(id_concat("(", out), ","), val), ")");
-    return ret_s;
-}
-
-char* id_canon_args(IdList* args) {
-    char* out;
-    int i;
-    out = "";
-    i = 0;
-    while ((i < id_list_len(args))) {
-        out = id_concat(id_concat(out, id_sep_at(",", i)), id_canon_expr((int)(id_list_get(args, i))));
-        i = (i + 1);
-    }
-    return out;
-}
-
-char* id_sep_at(char* s, int i) {
-    char* out;
-    out = "";
-    if ((i > 0)) {
-        out = s;
-    }
-    return out;
-}
-
-char* id_canon_bin(int id) {
-    char* op;
-    char* simple_s;
-    char* ret_s;
-    op = id_bin_op(id);
-    simple_s = id_bin_simplify(id, op);
-    ret_s = id_bin_fallback(id, op, simple_s);
-    return ret_s;
-}
-
-char* id_bin_op(int id) {
-    char* op;
-    op = id_s1_of(id);
-    if ((strcmp(op, "=") == 0)) {
-        op = "==";
-    }
-    return op;
-}
-
-char* id_bin_pair(int id) {
-    int i1_of_v;
-    int i2_of_v;
-    char* ret_s;
-    i1_of_v = id_i1_of(id);
-    i2_of_v = id_i2_of(id);
-    ret_s = id_canon_pair(i1_of_v, i2_of_v);
-    return ret_s;
-}
-
-char* id_bin_simplify(int id, char* op) {
-    int lid;
-    int rid;
-    char* ret_s;
-    lid = id_i1_of(id);
-    rid = id_i2_of(id);
-    ret_s = id_bin_const(op, lid, rid);
-    return ret_s;
-}
-
-char* id_bin_const(char* op, int lid, int rid) {
-    char* ret_s;
-    ret_s = id_bin_fold(op, lid, rid);
-    if ((strcmp(ret_s, "") == 0)) {
-        ret_s = id_bin_identity(op, lid, rid);
-    }
-    return ret_s;
-}
-
-char* id_bin_fallback(int id, char* op, char* simple_s) {
-    char* ret_s;
-    char* pair_v;
-    ret_s = simple_s;
-    if ((strcmp(simple_s, "") == 0)) {
-        pair_v = id_bin_pair(id);
-        ret_s = id_concat(id_concat("b", op), pair_v);
-    }
-    return ret_s;
-}
-
-char* id_fold_op4(char* op, int a, int b) {
-    char* ret_s;
-    ret_s = id_fold_op5(op, a, b);
-    if ((strcmp(op, "|") == 0)) {
-        ret_s = id_compute_or(a, b);
-    }
-    if ((strcmp(op, "^") == 0)) {
-        ret_s = id_compute_xor(a, b);
-    }
-    return ret_s;
-}
-
-char* id_compute_or(int a, int b) {
-    int n;
-    char* ret_s;
-    n = (a | b);
-    ret_s = id_concat("I", id_str_of_int(n));
-    return ret_s;
-}
-
-char* id_compute_xor(int a, int b) {
-    int n;
-    char* ret_s;
-    n = (a ^ b);
-    ret_s = id_concat("I", id_str_of_int(n));
-    return ret_s;
-}
-
-char* id_fold_op5(char* op, int a, int b) {
-    char* ret_s;
-    ret_s = "";
-    if ((strcmp(op, "<<") == 0)) {
-        ret_s = id_compute_shl(a, b);
-    }
-    if ((strcmp(op, ">>") == 0)) {
-        ret_s = id_compute_shr(a, b);
-    }
-    return ret_s;
-}
-
-char* id_compute_shr(int a, int b) {
-    int n;
-    char* ret_s;
-    n = id_sar(a, b);
-    ret_s = id_concat("I", id_str_of_int(n));
-    return ret_s;
-}
-
-long long id_shl_word(int a, int b) {
-    long long aw;
-    long long bw;
-    long long shifted;
-    aw = a;
-    bw = b;
-    shifted = id_shl(aw, bw);
-    return shifted;
-}
-
-char* id_compute_shl(int a, int b) {
-    char* ret_s;
-    long long shifted;
-    ret_s = "";
-    if ((b < 32)) {
-        shifted = id_shl_word(a, b);
-        ret_s = id_fold_word(shifted);
-    }
-    return ret_s;
-}
-
-long long id_mul_word(int a, int b) {
-    long long aw;
-    long long bw;
-    long long prod;
-    aw = a;
-    bw = b;
-    prod = (aw * bw);
-    return prod;
-}
-
-char* id_fold_op(char* op, int a, int b) {
-    char* ret_s;
-    ret_s = id_fold_op2(op, a, b);
-    if ((strcmp(op, "+") == 0)) {
-        ret_s = id_compute_add(a, b);
-    }
-    if ((strcmp(op, "-") == 0)) {
-        ret_s = id_compute_sub(a, b);
-    }
-    return ret_s;
-}
-
-char* id_compute_add(int a, int b) {
-    char* ret_s;
-    int n;
-    ret_s = "";
-    if ((a <= (2147483647 - b))) {
-        n = (a + b);
-        ret_s = id_concat("I", id_str_of_int(n));
-    }
-    return ret_s;
-}
-
-char* id_compute_sub(int a, int b) {
-    int n;
-    char* ret_s;
-    n = (a - b);
-    ret_s = id_concat("I", id_str_of_int(n));
-    return ret_s;
-}
-
-char* id_fold_op2(char* op, int a, int b) {
-    char* ret_s;
-    ret_s = id_fold_op3(op, a, b);
-    if ((strcmp(op, "*") == 0)) {
-        ret_s = id_compute_mul(a, b);
-    }
-    if ((strcmp(op, "/") == 0)) {
-        ret_s = id_compute_div(a, b);
-    }
-    return ret_s;
-}
-
-char* id_compute_mul(int a, int b) {
-    long long prod;
-    char* ret_s;
-    prod = id_mul_word(a, b);
-    ret_s = id_fold_word(prod);
-    return ret_s;
-}
-
-char* id_compute_div(int a, int b) {
-    char* ret_s;
-    int n;
-    ret_s = "";
-    if ((b != 0)) {
-        n = id_idiv(a, b);
-        ret_s = id_concat("I", id_str_of_int(n));
-    }
-    return ret_s;
-}
-
-char* id_fold_op3(char* op, int a, int b) {
-    char* ret_s;
-    ret_s = id_fold_op4(op, a, b);
-    if ((strcmp(op, "%") == 0)) {
-        ret_s = id_compute_mod(a, b);
-    }
-    if ((strcmp(op, "&") == 0)) {
-        ret_s = id_compute_and(a, b);
-    }
-    return ret_s;
-}
-
-char* id_compute_mod(int a, int b) {
-    char* ret_s;
-    int n;
-    ret_s = "";
-    if ((b != 0)) {
-        n = id_imod(a, b);
-        ret_s = id_concat("I", id_str_of_int(n));
-    }
-    return ret_s;
-}
-
-char* id_compute_and(int a, int b) {
-    int n;
-    char* ret_s;
-    n = (a & b);
-    ret_s = id_concat("I", id_str_of_int(n));
-    return ret_s;
-}
-
-char* id_bin_fold(char* op, int lid, int rid) {
-    char* ret_s;
-    ret_s = "";
-    if (((strcmp(id_k_of(lid), "int") == 0) && (strcmp(id_k_of(rid), "int") == 0))) {
-        ret_s = id_bin_fold2(op, lid, rid);
-    }
-    return ret_s;
-}
-
-char* id_bin_fold2(char* op, int lid, int rid) {
-    char* ret_s;
-    int a;
-    int b;
-    ret_s = "";
-    if (((id_i2_of(lid) == 0) && (id_i2_of(rid) == 0))) {
-        a = id_i1_of(lid);
-        b = id_i1_of(rid);
-        ret_s = id_fold_op(op, a, b);
-    }
-    return ret_s;
-}
-
-char* id_fold_word(long long wv) {
-    char* ret_s;
-    int n;
-    ret_s = "";
-    if ((wv <= 2147483647)) {
-        n = wv;
-        ret_s = id_concat("I", id_str_of_int(n));
-    }
-    return ret_s;
-}
-
-char* id_call_fp(int id) {
-    char* s1_of_v;
-    IdList* l1_of_v;
-    char* ret_s;
-    s1_of_v = id_s1_of(id);
-    l1_of_v = id_l1_of(id);
-    ret_s = id_call_fp2(s1_of_v, l1_of_v);
-    return ret_s;
-}
-
-char* id_call_fp2(char* name, IdList* args) {
-    char* ret_s;
-    ret_s = id_concat(id_concat(id_concat(id_concat("c(", id_canon_callee(name)), ":"), id_canon_args(args)), ")");
-    if ((((strcmp(name, "ushr") == 0) && (id_list_len(args) == 2)) && (id_lit_is((int)(id_list_get(args, 1)), 0) == 1))) {
-        ret_s = id_canon_expr((int)(id_list_get(args, 0)));
-    }
-    return ret_s;
-}
-
-char* id_bin_identity(char* op, int lid, int rid) {
-    char* ret_s;
-    ret_s = id_ident_zero_sym(op, lid, rid);
-    if ((strcmp(ret_s, "") == 0)) {
-        ret_s = id_ident_zero_right(op, lid, rid);
-    }
-    if ((strcmp(ret_s, "") == 0)) {
-        ret_s = id_ident_one(op, lid, rid);
-    }
-    return ret_s;
-}
-
-int id_lit_is(int nid, int v) {
-    int ok;
-    ok = 0;
-    if (((strcmp(id_k_of(nid), "int") == 0) && (id_i1_of(nid) == v))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-char* id_ident_zero_sym(char* op, int lid, int rid) {
-    char* ret_s;
-    ret_s = "";
-    if (((((strcmp(op, "+") == 0) || (strcmp(op, "|") == 0)) || (strcmp(op, "^") == 0)) && (id_lit_is(rid, 0) == 1))) {
-        ret_s = id_canon_expr(lid);
-    }
-    if (((((strcmp(op, "+") == 0) || (strcmp(op, "|") == 0)) || (strcmp(op, "^") == 0)) && (id_lit_is(lid, 0) == 1))) {
-        ret_s = id_canon_expr(rid);
-    }
-    return ret_s;
-}
-
-char* id_ident_zero_right(char* op, int lid, int rid) {
-    char* ret_s;
-    ret_s = "";
-    if (((((strcmp(op, "-") == 0) || (strcmp(op, "<<") == 0)) || (strcmp(op, ">>") == 0)) && (id_lit_is(rid, 0) == 1))) {
-        ret_s = id_canon_expr(lid);
-    }
-    return ret_s;
-}
-
-char* id_ident_one(char* op, int lid, int rid) {
-    char* ret_s;
-    ret_s = "";
-    if ((((strcmp(op, "*") == 0) || (strcmp(op, "/") == 0)) && (id_lit_is(rid, 1) == 1))) {
-        ret_s = id_canon_expr(lid);
-    }
-    if (((strcmp(op, "*") == 0) && (id_lit_is(lid, 1) == 1))) {
-        ret_s = id_canon_expr(rid);
-    }
-    return ret_s;
-}
-
-char* id_canon_func(int id) {
-    char* s1_of_v;
-    char* ret_s;
-    s1_of_v = id_s1_of(id);
-    id_uq_begin(s1_of_v);
-    ret_s = id_canon_func_body(id);
-    return ret_s;
-}
-
-char* id_canon_params(IdList* params) {
-    char* out;
-    int i;
-    out = "";
-    i = 0;
-    while ((i < id_list_len(params))) {
-        out = id_concat(id_concat(out, id_sep_at(",", i)), id_canon_param((int)(id_list_get(params, i))));
-        i = (i + 1);
-    }
-    return out;
-}
-
-char* id_canon_param(int id) {
-    char* s2_of_v;
-    char* out;
-    char* ret_s;
-    s2_of_v = id_s2_of(id);
-    out = id_cn(s2_of_v);
-    ret_s = id_concat(id_concat(id_s1_of(id), " "), out);
-    return ret_s;
-}
-
-char* id_canon_native(int id, char* out) {
-    char* ret_s;
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat("(", out), ")->"), id_s2_of(id)), " native "), id_s1_of(id));
-    return ret_s;
-}
-
-char* id_canon_func_body(int id) {
-    IdList* l1_of_v;
-    char* out;
-    char* ret_s;
-    l1_of_v = id_l1_of(id);
-    out = id_canon_params(l1_of_v);
-    ret_s = id_canon_func_tail(id, out);
-    return ret_s;
-}
-
-char* id_canon_func_tail(int id, char* out) {
-    char* ret_s;
-    ret_s = "";
-    if ((id_is_native(id) == 1)) {
-        ret_s = id_canon_native(id, out);
-    } else {
-        ret_s = id_canon_logic(id, out);
-    }
-    return ret_s;
-}
-
-char* id_canon_logic(int id, char* out) {
-    IdList* l2_of_v;
-    char* val;
-    char* ret_s;
-    l2_of_v = id_l2_of(id);
-    val = id_canon_body(l2_of_v);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("(", out), ")->"), id_s2_of(id)), "{"), val), "}=>"), id_canon_ret(id));
-    return ret_s;
-}
-
-char* id_cn(char* name) {
-    int idx;
-    char* ret_s;
-    idx = id_find_str(cnames, name);
-    if ((idx < 0)) {
-        idx = id_cn_add(name);
-    }
-    ret_s = id_concat("", id_str_of_int(idx));
-    return ret_s;
-}
-
-int id_cn_add(char* name) {
-    int ret_i;
-    id_list_push(cnames, (long long)(intptr_t)(name));
-    ret_i = (id_list_len(cnames) - 1);
-    return ret_i;
-}
-
-char* id_canon_var(int id) {
-    char* name;
-    char* out;
-    name = id_s1_of(id);
-    out = id_concat(id_concat("fv(", id_canon_callee(name)), ")");
-    if ((id_is_fn_value(id) == 0)) {
-        out = id_concat("v", id_cn(name));
-    }
-    return out;
-}
-
-char* id_canon_ret(int id) {
-    char* out;
-    int i1_of_v;
-    out = "void";
-    if ((id_i1_of(id) >= 0)) {
-        i1_of_v = id_i1_of(id);
-        out = id_canon_expr(i1_of_v);
-    }
-    return out;
-}
-
-void id_uq_begin(char* name) {
-    cself = id_list_lit(1, (long long)(intptr_t)(name));
-    cnames = id_list_lit(0);
-    return;
-}
-
-char* id_cur_self(void) {
-    char* ret_s;
-    ret_s = (char*)(intptr_t)(id_list_get(cself, 0));
-    return ret_s;
-}
-
-char* id_canon_else2(IdList* els, int elif) {
-    char* out;
-    out = "";
-    if ((elif == 1)) {
-        out = id_concat("elif", id_canon_stmt((int)(id_list_get(els, 0))));
-    } else {
-        out = id_canon_else3(els);
-    }
-    return out;
-}
-
-char* id_canon_else3(IdList* els) {
-    char* out;
-    out = "";
-    if ((id_list_len(els) > 0)) {
-        out = id_concat(id_concat("else{", id_canon_body(els)), "}");
-    }
-    return out;
-}
-
-char* id_canon_body(IdList* stmts) {
-    char* out;
-    int i;
-    out = "";
-    i = 0;
-    while ((i < id_list_len(stmts))) {
-        out = id_concat(id_concat(out, id_sep_at(";", i)), id_canon_stmt((int)(id_list_get(stmts, i))));
-        i = (i + 1);
-    }
-    return out;
-}
-
-char* id_canon_decl(int id) {
-    char* out;
-    char* nm;
-    char* ret_s;
-    out = id_decl_tag(id);
-    nm = id_decl_name(id);
-    ret_s = id_decl_tail(id, out, nm);
-    return ret_s;
-}
-
-char* id_decl_name(int id) {
-    char* out;
-    out = id_s2_of(id);
-    if ((id_i2_of(id) != 1)) {
-        out = id_cn(out);
-    }
-    return out;
-}
-
-char* id_canon_iassign(int id) {
-    int i1_of_v;
-    char* head;
-    char* ret_s;
-    i1_of_v = id_i1_of(id);
-    head = id_canon_expr(i1_of_v);
-    ret_s = id_iassign_tail(id, head);
-    return ret_s;
-}
-
-char* id_decl_tag(int id) {
-    char* out;
-    out = "d:";
-    if ((id_i2_of(id) == 1)) {
-        out = "ed:";
-    }
-    return out;
-}
-
-char* id_decl_tail(int id, char* out, char* nm) {
-    int i1_of_v;
-    char* ret_s;
-    i1_of_v = id_i1_of(id);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(out, id_s1_of(id)), " "), nm), "="), id_canon_expr(i1_of_v));
-    return ret_s;
-}
-
-char* id_iassign_tail(int id, char* head) {
-    int i2_of_v;
-    char* key;
-    char* ret_s;
-    i2_of_v = id_i2_of(id);
-    key = id_canon_expr(i2_of_v);
-    ret_s = id_iassign_val(id, head, key);
-    return ret_s;
-}
-
-char* id_iassign_val(int id, char* head, char* key) {
-    IdList* l1_of_v;
-    char* val;
-    char* ret_s;
-    l1_of_v = id_l1_of(id);
-    val = id_canon_expr((int)(id_list_get(l1_of_v, 0)));
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat("ia:", head), "["), key), "]="), val);
-    return ret_s;
-}
-
-char* id_cst_if(int id) {
-    int i1_of_v;
-    IdList* l1_of_v;
-    char* ret_s;
-    i1_of_v = id_i1_of(id);
-    l1_of_v = id_l1_of(id);
-    ret_s = id_cst_if_tail(id, i1_of_v, l1_of_v);
-    return ret_s;
-}
-
-char* id_cst_if_tail(int id, int i1_of_v, IdList* l1_of_v) {
-    IdList* l2_of_v;
-    int i2_of_v;
-    char* out;
-    l2_of_v = id_l2_of(id);
-    i2_of_v = id_i2_of(id);
-    out = id_concat(id_concat(id_concat(id_concat(id_concat("if(", id_canon_expr(i1_of_v)), "){"), id_canon_body(l1_of_v)), "}"), id_canon_else2(l2_of_v, i2_of_v));
-    return out;
-}
-
-char* id_canon_stmt(int id) {
-    char* out;
-    char* s1_of_v;
-    int i1_of_v;
-    out = id_cst2(id);
-    if ((strcmp(id_k_of(id), "decl") == 0)) {
-        out = id_canon_decl(id);
-    }
-    if ((strcmp(id_k_of(id), "assign") == 0)) {
-        s1_of_v = id_s1_of(id);
-        i1_of_v = id_i1_of(id);
-        out = id_concat(id_concat(id_concat("a:", id_cn(s1_of_v)), "="), id_canon_expr(i1_of_v));
-    }
-    return out;
-}
-
-char* id_cst2(int id) {
-    char* out;
-    int i1_of_v;
-    out = id_cst3(id);
-    if ((strcmp(id_k_of(id), "iassign") == 0)) {
-        out = id_canon_iassign(id);
-    }
-    if ((strcmp(id_k_of(id), "exprstmt") == 0)) {
-        i1_of_v = id_i1_of(id);
-        out = id_concat("e:", id_canon_expr(i1_of_v));
-    }
-    return out;
-}
-
-char* id_cst3(int id) {
-    char* out;
-    int i1_of_v2;
-    IdList* l1_of_v2;
-    out = id_concat(id_concat(id_concat("?", id_k_of(id)), "#"), id_str_of_int(id));
-    if ((strcmp(id_k_of(id), "if") == 0)) {
-        out = id_cst_if(id);
-    }
-    if ((strcmp(id_k_of(id), "while") == 0)) {
-        i1_of_v2 = id_i1_of(id);
-        l1_of_v2 = id_l1_of(id);
-        out = id_concat(id_concat(id_concat(id_concat("wh(", id_canon_expr(i1_of_v2)), "){"), id_canon_body(l1_of_v2)), "}");
-    }
-    return out;
-}
-
-void id_print_fingerprints(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(prog))) {
-        id_print_fp_line(i);
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_print_fp_line(int i) {
-    char* name;
-    char* line;
-    name = id_s1_of((int)(id_list_get(prog, i)));
-    line = id_fp_line(name, (char*)(intptr_t)(id_list_get(cfp, i)));
-    id_print(line);
-    return;
-}
-
-char* id_fp_line(char* name, char* fp) {
-    char* tab;
-    char* ret_s;
-    tab = id_chr(9);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(fp, tab), name), tab), id_func_file(name)), ":"), id_str_of_int(id_func_line(name)));
-    return ret_s;
-}
-
-void id_check_bodies(void) {
-    id_check_funcs();
-    id_chk_dupfn();
-    id_check_unique();
-    return;
-}
-
-void id_check_unique(void) {
-    id_uq_fill();
-    id_uq_scan();
-    id_cw_scan();
-    return;
-}
-
-void id_uq_fill(void) {
-    int i;
-    char* canon_func_v;
-    cfp = id_list_lit(0);
-    i = 0;
-    while ((i < id_list_len(prog))) {
-        canon_func_v = id_canon_func((int)(id_list_get(prog, i)));
-        id_list_push(cfp, (long long)(intptr_t)(canon_func_v));
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_uq_scan(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(cfp))) {
-        id_uq_at(i);
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_uq_at(int i) {
-    int j;
-    j = id_find_dup(i);
-    if ((j >= 0)) {
-        id_report_dup(i, j);
-    }
-    return;
-}
-
-int id_find_dup(int i) {
-    int j;
-    int found;
-    j = 0;
-    found = (0 - 1);
-    while (((j < i) && (found < 0))) {
-        found = id_dup_probe(i, j);
-        j = (j + 1);
-    }
-    return found;
-}
-
-void id_chk_dupfn(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(prog))) {
-        id_dupfn_at(i);
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_dupfn_at(int i) {
-    char* s1_of_v;
-    int j;
-    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
-    j = id_first_fn(s1_of_v);
-    id_dupfn_check(i, j);
-    return;
-}
-
-void id_dupfn_err(int i, int j) {
-    char* prog_loc_v;
-    char* s1_of_v;
-    prog_loc_v = id_prog_loc(i);
-    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
-    id_dupfn_print(prog_loc_v, s1_of_v, j);
-    return;
-}
-
-void id_dupfn_check(int i, int j) {
-    id_resv_at(i);
-    if (((j < i) && (i < id_list_len(pfile)))) {
-        id_dupfn_err(i, j);
-    }
-    return;
-}
-
-void id_dupfn_print(char* prog_loc_v, char* s1_of_v, int j) {
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(prog_loc_v, "function '"), s1_of_v), "' already defined at "), (char*)(intptr_t)(id_list_get(pfile, j))), ":"), id_str_of_int((int)(id_list_get(pline, j)))));
-    id_note_failure();
-    return;
-}
-
-int id_cw_shape(int id) {
-    char* rt;
-    int ok;
-    rt = id_s2_of(id);
-    ok = ((((strcmp(rt, "int") == 0) || (strcmp(rt, "word") == 0)) || (strcmp(rt, "float") == 0)) || (strcmp(rt, "string") == 0));
-    if (((id_is_native(id) == 1) || (strcmp(id_s1_of(id), "main") == 0))) {
-        ok = 0;
-    }
-    return ok;
-}
-
-char* id_cw_body(int id) {
-    char* s1_of_v;
-    char* val;
-    s1_of_v = id_s1_of(id);
-    id_cw_begin(s1_of_v);
-    val = id_cw_walk(id);
-    return val;
-}
-
-void id_cw_begin(char* name) {
-    id_uq_begin(name);
-    cw_names = id_list_lit(0);
-    cw_vals = id_list_lit(0);
-    return;
-}
-
-int id_cw_is_lit(char* fp) {
-    int tag;
-    int ok;
-    tag = id_charat(fp, 0);
-    ok = (((tag == 73) || (tag == 70)) || (tag == 83));
-    return ok;
-}
-
-char* id_cw_spell(char* val) {
-    char* lit;
-    char* mag;
-    lit = id_zeros_tail(val, 1);
-    if ((id_charat(lit, 0) == 45)) {
-        mag = id_zeros_tail(lit, 1);
-        lit = id_concat("0 - ", mag);
-    }
-    return lit;
-}
-
-void id_cw_report(int id, char* val) {
-    char* lit;
-    id_note_failure();
-    lit = id_cw_spell(val);
-    id_cw_print(id, lit);
-    return;
-}
-
-void id_cw_print(int id, char* lit) {
-    char* name;
-    char* rt;
-    name = id_s1_of(id);
-    rt = id_s2_of(id);
-    id_cw_say(name, rt, lit);
-    return;
-}
-
-void id_cw_say(char* name, char* rt, char* lit) {
-    char* loc_at_v;
-    loc_at_v = id_dup_loc(name);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "'"), name), "' only returns the constant "), lit), "; declare it in conf.id as '"), rt), " "), name), " = "), lit), ";' and read it with (import "), name), ")"));
-    return;
-}
-
-char* id_cw_ret(int id) {
-    int i1_of_v;
-    char* val;
-    char* s1_of_v;
-    i1_of_v = id_i1_of(id);
-    val = id_canon_expr(i1_of_v);
-    if ((strcmp(id_k_of(i1_of_v), "var") == 0)) {
-        s1_of_v = id_s1_of(i1_of_v);
-        val = id_cw_get(s1_of_v);
-    }
-    return val;
-}
-
-char* id_cw_get(char* name) {
-    char* val;
-    int i;
-    val = "";
-    i = 0;
-    while ((i < id_list_len(cw_names))) {
-        val = id_cw_pick(i, name, val);
-        i = (i + 1);
-    }
-    return val;
-}
-
-char* id_cw_pick(int i, char* name, char* val) {
-    if ((strcmp((char*)(intptr_t)(id_list_get(cw_names, i)), name) == 0)) {
-        val = (char*)(intptr_t)(id_list_get(cw_vals, i));
-    }
-    return val;
-}
-
-int id_cw_assign(int id) {
-    char* s1_of_v;
-    int ok;
-    s1_of_v = id_s1_of(id);
-    ok = 0;
-    if ((strcmp(id_cw_get(s1_of_v), "") != 0)) {
-        ok = id_cw_put(id, s1_of_v);
-    }
-    return ok;
-}
-
-int id_cw_put(int id, char* name) {
-    int i1_of_v;
-    char* val;
-    int ok;
-    i1_of_v = id_i1_of(id);
-    val = id_canon_expr(i1_of_v);
-    ok = id_cw_keep(name, val);
-    return ok;
-}
-
-int id_cw_keep(char* name, char* val) {
-    int ok;
-    id_list_push(cw_names, (long long)(intptr_t)(name));
-    id_list_push(cw_vals, (long long)(intptr_t)(val));
-    ok = id_cw_is_lit(val);
-    return ok;
-}
-
-char* id_cw_walk(int id) {
-    IdList* l2_of_v;
-    char* val;
-    l2_of_v = id_l2_of(id);
-    val = "";
-    if ((id_cw_stmts(l2_of_v) == 1)) {
-        val = id_cw_ret(id);
-    }
-    return val;
-}
-
-int id_cw_stmts(IdList* stmts) {
-    int ok;
-    int i;
-    ok = 1;
-    i = 0;
-    while (((i < id_list_len(stmts)) && (ok == 1))) {
-        ok = id_cw_stmt((int)(id_list_get(stmts, i)));
-        i = (i + 1);
-    }
-    return ok;
-}
-
-int id_cw_stmt(int id) {
-    int ok;
-    char* s2_of_v;
-    ok = 0;
-    if (((strcmp(id_k_of(id), "decl") == 0) && (id_i2_of(id) != 1))) {
-        s2_of_v = id_s2_of(id);
-        ok = id_cw_put(id, s2_of_v);
-    }
-    if ((strcmp(id_k_of(id), "assign") == 0)) {
-        ok = id_cw_assign(id);
-    }
-    return ok;
-}
-
-void id_cw_scan(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(prog))) {
-        id_cw_at(i);
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_cw_at(int i) {
-    int id;
-    char* val;
-    id = (int)(id_list_get(prog, i));
-    val = id_cw_value(id);
-    if ((id_cw_is_lit(val) == 1)) {
-        id_cw_report(id, val);
-    }
-    return;
-}
-
-char* id_cw_value(int id) {
-    char* val;
-    val = "";
-    if ((id_cw_shape(id) == 1)) {
-        val = id_cw_body(id);
-    }
-    return val;
-}
-
-void id_dup_report(char* name_i, int j) {
-    char* loc_at_v;
-    char* tail_v;
-    loc_at_v = id_dup_loc(name_i);
-    tail_v = id_dup_tail(j);
-    id_print(id_concat(id_concat(id_concat(id_concat(loc_at_v, "function '"), name_i), "' has the same signature and logic as "), tail_v));
-    return;
-}
-
-char* id_dup_loc(char* name_i) {
-    int func_line_v;
-    char* loc_at_v;
-    func_line_v = id_func_line(name_i);
-    loc_at_v = id_loc_at(name_i, func_line_v);
-    return loc_at_v;
-}
-
-int id_dup_probe(int i, int j) {
-    int found;
-    found = (0 - 1);
-    if ((strcmp((char*)(intptr_t)(id_list_get(cfp, i)), (char*)(intptr_t)(id_list_get(cfp, j))) == 0)) {
-        found = j;
-    }
-    return found;
-}
-
-void id_report_dup(int i, int j) {
-    char* name_i;
-    id_note_failure();
-    name_i = id_fname_at(i);
-    id_dup_report(name_i, j);
-    return;
-}
-
-char* id_fname_at(int i) {
-    char* ret_s;
-    ret_s = id_s1_of((int)(id_list_get(prog, i)));
-    return ret_s;
-}
-
-char* id_dup_tail(int j) {
-    char* name_j;
-    char* ret_s;
-    name_j = id_fname_at(j);
-    ret_s = id_dup_tail2(name_j);
-    return ret_s;
-}
-
-char* id_dup_tail2(char* name_j) {
-    char* func_file_v;
-    int func_line_v2;
-    char* ret_s;
-    func_file_v = id_func_file(name_j);
-    func_line_v2 = id_func_line(name_j);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("'", name_j), "' (defined at "), func_file_v), ":"), id_str_of_int(func_line_v2)), "); functions must be unique -- remove one and call it from both places, or make them genuinely differ");
-    return ret_s;
-}
-
-int id_is_reserved_name(int i) {
-    char* s1_of_v;
-    IdList* resv_names_v;
-    int ok;
-    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
-    resv_names_v = id_resv_names();
-    ok = ((id_find_str(resv_names_v, s1_of_v) >= 0) || (strcmp(s1_of_v, "eprint") == 0));
-    return ok;
-}
-
-void id_resv_print(char* prog_loc_v, char* s1_of_v) {
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(prog_loc_v, "function '"), s1_of_v), "' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_"), s1_of_v), "'. Choose another name"));
-    id_note_failure();
-    return;
-}
-
-void id_resv_at(int i) {
-    if (((id_is_runtime() == 0) && id_is_reserved_name(i))) {
-        id_resv_err(i);
-    }
-    return;
-}
-
-void id_resv_err(int i) {
-    char* prog_loc_v;
-    char* s1_of_v;
-    prog_loc_v = id_prog_loc(i);
-    s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
-    id_resv_print(prog_loc_v, s1_of_v);
-    return;
 }
 
 int main(int argc, char** argv) { (void)argc; (void)argv;

@@ -406,6 +406,121 @@ a new construct only once this compiler uses that construct on itself.
 
 | function | file | what |
 | --- | --- | --- |
+| `canon_expr` | `compiler/parse/mid/form/unique/canon/expr/expr.id` | A literal fingerprints by value, not spelling: the lexer already turns hex |
+| `ce2` | `compiler/parse/mid/form/unique/canon/expr/expr.id` | Canonicalising an expression, mirroring idc.py's _canon_expr. |
+| `ce3` | `compiler/parse/mid/form/unique/canon/expr/expr.id` | An imported global keeps its name: two functions that differ only by which |
+| `ce4` | `compiler/parse/mid/form/unique/canon/expr/expr_more.id` | The rest of the expression kinds. ce5 ends the chain, so its default is the |
+| `ce5` | `compiler/parse/mid/form/unique/canon/expr/expr_more.id` | The end of the chain. Its default is reached only by an expression kind |
+| `canon_callee` | `compiler/parse/mid/form/unique/canon/expr/expr_more.id` | A callee keeps its name -- except a call to the function being canonicalised |
+| `canon_pair` | `compiler/parse/mid/form/unique/canon/expr/more/args.id` | The two-operand shape shared by a binary operator and an index, and the |
+| `canon_args` | `compiler/parse/mid/form/unique/canon/expr/more/args.id` | The two-operand shape shared by a binary operator and an index, and the |
+| `sep_at` | `compiler/parse/mid/form/unique/canon/expr/more/args.id` | The separator before element i of a list: nothing before the first. |
+| `canon_bin` | `compiler/parse/mid/form/unique/canon/expr/more/binop.id` | A constant-based simplification tries first (bin_simplify, in ./const): |
+| `bin_op` | `compiler/parse/mid/form/unique/canon/expr/more/binop.id` | A binary operator. |
+| `bin_pair` | `compiler/parse/mid/form/unique/canon/expr/more/binop.id` | A binary operator. |
+| `bin_simplify` | `compiler/parse/mid/form/unique/canon/expr/more/const/dispatch.id` | Entry point for canon_bin's constant-based simplification. |
+| `bin_const` | `compiler/parse/mid/form/unique/canon/expr/more/const/dispatch.id` | Entry point for canon_bin's constant-based simplification. |
+| `bin_fallback` | `compiler/parse/mid/form/unique/canon/expr/more/const/dispatch.id` | Entry point for canon_bin's constant-based simplification. |
+| `fold_op4` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_d.id` | `|` and `^`, the same width argument as `&` (../chain/link_c.id): both |
+| `compute_or` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_d.id` | `|` and `^`, the same width argument as `&` (../chain/link_c.id): both |
+| `compute_xor` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_d.id` | `|` and `^`, the same width argument as `&` (../chain/link_c.id): both |
+| `fold_op5` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_e.id` | `<<` and `>>`, the last link: an operator this chain does not fold (a |
+| `compute_shr` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_e.id` | `<<` and `>>`, the last link: an operator this chain does not fold (a |
+| `shl_word` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_e.id` | `<<` and `>>`, the last link: an operator this chain does not fold (a |
+| `compute_shl` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_f.id` | compute_shl and mul_word are the two operator computations that need a |
+| `mul_word` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/calc/link_f.id` | Neither operand exceeds INT_MAX, so their product cannot exceed |
+| `fold_op` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_a.id` | The fold chain: each link asks the next for a default and overrides it |
+| `compute_add` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_a.id` | a + b overflows an int when a is more than INT_MAX - b past zero; written |
+| `compute_sub` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_a.id` | The fold chain: each link asks the next for a default and overrides it |
+| `fold_op2` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_b.id` | `*` and `/`. Multiplying can overflow an int well before either operand |
+| `compute_mul` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_b.id` | `*` and `/`. Multiplying can overflow an int well before either operand |
+| `compute_div` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_b.id` | `/` by zero traps at runtime; folding it here would move that trap from |
+| `fold_op3` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_c.id` | `%` and `&`. `%` by zero traps, the same reason `/` by zero is left |
+| `compute_mod` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_c.id` | `%` and `&`. `%` by zero traps, the same reason `/` by zero is left |
+| `compute_and` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/chain/link_c.id` | `%` and `&`. `%` by zero traps, the same reason `/` by zero is left |
+| `bin_fold` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/core.id` | Folding two integer-literal operands to the value their operator gives. |
+| `bin_fold2` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/core.id` | Folding two integer-literal operands to the value their operator gives. |
+| `fold_word` | `compiler/parse/mid/form/unique/canon/expr/more/const/fold/core.id` | A `word` result that turned out to still fit an int folds to it; one that |
+| `call_fp` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/call.id` | A call's fingerprint (moved out of ce5 so its body still fits in three |
+| `call_fp2` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/call.id` | A call's fingerprint (moved out of ce5 so its body still fits in three |
+| `bin_identity` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
+| `lit_is` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident.id` | Is node `nid` the integer literal `v`? A wide literal (too big for an |
+| `ident_zero_sym` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
+| `ident_zero_right` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident_more.id` | x-0, x<<0 and x>>0 fingerprint as x: unlike + | ^, subtraction and the |
+| `ident_one` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident_more.id` | x*1, 1*x and x/1 fingerprint as x. `1/x` is not a no-op, so it keeps its |
+| `canon_func` | `compiler/parse/mid/form/unique/canon/func/more/func.id` | A whole function's fingerprint: its signature and its logic, and nothing of |
+| `canon_params` | `compiler/parse/mid/form/unique/canon/func/more/func.id` | A whole function's fingerprint: its signature and its logic, and nothing of |
+| `canon_param` | `compiler/parse/mid/form/unique/canon/func/more/func.id` | A parameter contributes its type, which is part of the signature, and its |
+| `canon_native` | `compiler/parse/mid/form/unique/canon/func/more/native.id` | A `native` declaration has no logic to compare, so its fingerprint is its |
+| `canon_func_body` | `compiler/parse/mid/form/unique/canon/func/more/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
+| `canon_func_tail` | `compiler/parse/mid/form/unique/canon/func/more/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
+| `canon_logic` | `compiler/parse/mid/form/unique/canon/func/more/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
+| `cn` | `compiler/parse/mid/form/unique/canon/func/names.id` | The position map: parameters and locals of the function being canonicalised, |
+| `cn_add` | `compiler/parse/mid/form/unique/canon/func/names.id` | The position map: parameters and locals of the function being canonicalised, |
+| `canon_var` | `compiler/parse/mid/form/unique/canon/func/names.id` | A name read as a value. A function's name is a function value and keeps its |
+| `canon_ret` | `compiler/parse/mid/form/unique/canon/func/state.id` | The return clause, and the two pieces of state one canonicalisation needs. |
+| `uq_begin` | `compiler/parse/mid/form/unique/canon/func/state.id` | Start canonicalising the function called `name`: an empty position map, and |
+| `cur_self` | `compiler/parse/mid/form/unique/canon/func/state.id` | The return clause, and the two pieces of state one canonicalisation needs. |
+| `canon_else2` | `compiler/parse/mid/form/unique/canon/stmt/block.id` | The else arm, and a statement list. |
+| `canon_else3` | `compiler/parse/mid/form/unique/canon/stmt/block.id` | An empty `else { }` adds nothing, matching idc.py, where an empty else list |
+| `canon_body` | `compiler/parse/mid/form/unique/canon/stmt/block.id` | Statements in order, separated by `;`. The order matters twice over: it is |
+| `canon_decl` | `compiler/parse/mid/form/unique/canon/stmt/more/decl.id` | Declaration, and index-assignment. |
+| `decl_name` | `compiler/parse/mid/form/unique/canon/stmt/more/decl.id` | The declared name: positional for a local, verbatim for an export, since an |
+| `canon_iassign` | `compiler/parse/mid/form/unique/canon/stmt/more/decl.id` | `base[index] = value`. The parser folds the parsed index target into the |
+| `decl_tag` | `compiler/parse/mid/form/unique/canon/stmt/more/decl_tail.id` | The rest of canon_decl, and the first step of canon_iassign, split so each |
+| `decl_tail` | `compiler/parse/mid/form/unique/canon/stmt/more/decl_tail.id` | The rest of canon_decl, and the first step of canon_iassign, split so each |
+| `iassign_tail` | `compiler/parse/mid/form/unique/canon/stmt/more/decl_tail.id` | The rest of canon_decl, and the first step of canon_iassign, split so each |
+| `iassign_val` | `compiler/parse/mid/form/unique/canon/stmt/more/if_tail.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
+| `cst_if` | `compiler/parse/mid/form/unique/canon/stmt/more/if_tail.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
+| `cst_if_tail` | `compiler/parse/mid/form/unique/canon/stmt/more/if_tail.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
+| `canon_stmt` | `compiler/parse/mid/form/unique/canon/stmt/stmt.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
+| `cst2` | `compiler/parse/mid/form/unique/canon/stmt/stmt.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
+| `cst3` | `compiler/parse/mid/form/unique/canon/stmt/stmt.id` | The two compound statements. An if carries its else arm (which may be |
+| `print_fingerprints` | `compiler/parse/mid/form/unique/dump/dump.id` | `idparse --fingerprints`: one line per function, `<fingerprint>\t<name>\t |
+| `print_fp_line` | `compiler/parse/mid/form/unique/dump/dump.id` | `idparse --fingerprints`: one line per function, `<fingerprint>\t<name>\t |
+| `fp_line` | `compiler/parse/mid/form/unique/dump/dump.id` | file:line, the same two facts a diagnostic's prefix names (../../names/ |
+| `check_bodies` | `compiler/parse/mid/form/unique/scan/check.id` | What check_program() calls in place of check_funcs(): the per-function body |
+| `check_unique` | `compiler/parse/mid/form/unique/scan/check.id` | Function-logic uniqueness: two functions with the same signature and the |
+| `uq_fill` | `compiler/parse/mid/form/unique/scan/check.id` | Fingerprint every function once. Comparing is quadratic in the number of |
+| `uq_scan` | `compiler/parse/mid/form/unique/scan/compare.id` | Comparing the fingerprints. |
+| `uq_at` | `compiler/parse/mid/form/unique/scan/compare.id` | Comparing the fingerprints. |
+| `find_dup` | `compiler/parse/mid/form/unique/scan/compare.id` | The first earlier function with the same fingerprint, or -1. The search |
+| `chk_dupfn` | `compiler/parse/mid/form/unique/scan/more/dup/dup_name.id` | The other "no two functions may be the same" rule: two functions may not |
+| `dupfn_at` | `compiler/parse/mid/form/unique/scan/more/dup/dup_name.id` | Reported against every definition after the first, so three functions of |
+| `dupfn_err` | `compiler/parse/mid/form/unique/scan/more/dup/dup_name.id` | The other "no two functions may be the same" rule: two functions may not |
+| `dupfn_check` | `compiler/parse/mid/form/unique/scan/more/dup/report.id` | Split from dupfn_at and dupfn_err so each of those blocks stays within the |
+| `dupfn_print` | `compiler/parse/mid/form/unique/scan/more/dup/report.id` | Split from dupfn_at and dupfn_err so each of those blocks stays within the |
+| `cw_shape` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/body.id` | Only a scalar result can be a constant. main is the entry point whatever it |
+| `cw_body` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/body.id` | Which functions can be constant wrappers, and the state one walk keeps. |
+| `cw_begin` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/body.id` | Start the walk of function `name`: canon_expr's position map is emptied as |
+| `cw_is_lit` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/lit.id` | canon_expr tags a literal with one letter -- I an integer, F a float, S a |
+| `cw_spell` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/lit.id` | The value as conf.id spells it: the fingerprint after its tag (zeros_tail is |
+| `cw_report` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_print` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_say` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_ret` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_get` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_pick` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_assign` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/val.id` | An assignment counts only when its target is a local this walk has already |
+| `cw_put` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/val.id` | Recording a local's value. |
+| `cw_keep` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/val.id` | Appended rather than overwritten, so an assignment needs no search to write; |
+| `cw_walk` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
+| `cw_stmts` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/walk.id` | The loop leaves at the first statement that is not a literal store: the flag |
+| `cw_stmt` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
+| `cw_scan` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
+| `cw_at` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
+| `cw_value` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/wrap.id` | "" unless the function is a constant wrapper, else the constant's |
+| `dup_report` | `compiler/parse/mid/form/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at, |
+| `dup_loc` | `compiler/parse/mid/form/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at, |
+| `dup_probe` | `compiler/parse/mid/form/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
+| `report_dup` | `compiler/parse/mid/form/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
+| `fname_at` | `compiler/parse/mid/form/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
+| `dup_tail` | `compiler/parse/mid/form/unique/scan/more/report/tail.id` | The j-side of report_dup's message: where the earlier, colliding function |
+| `dup_tail2` | `compiler/parse/mid/form/unique/scan/more/report/tail.id` | The j-side of report_dup's message: where the earlier, colliding function |
+| `is_reserved_name` | `compiler/parse/mid/form/unique/scan/more/reserved/check.id` | Named so resv_at's condition does not put a call (resv_names(), s1_of(...)) |
+| `resv_print` | `compiler/parse/mid/form/unique/scan/more/reserved/check.id` | Named so resv_at's condition does not put a call (resv_names(), s1_of(...)) |
+| `resv_at` | `compiler/parse/mid/form/unique/scan/more/reserved/reserved.id` | Not asked of the runtime itself: `--runtime` says this project IS the |
+| `resv_err` | `compiler/parse/mid/form/unique/scan/more/reserved/reserved.id` | A function may not be named after a runtime helper. |
 | `exp_one` | `compiler/parse/mid/names/exports/collect/add.id` | An exported declaration is recorded; other statements may nest exports. |
 | `is_export_decl` | `compiler/parse/mid/names/exports/collect/add.id` | An exported declaration is recorded; other statements may nest exports. |
 | `add_export` | `compiler/parse/mid/names/exports/collect/add.id` | An exported declaration is recorded; other statements may nest exports. |
@@ -992,121 +1107,6 @@ a new construct only once this compiler uses that construct on itself.
 | `type_of` | `compiler/parse/mid/types/type_of/dispatch/type_of.id` | type_of(id): the id type of an expression node. Dispatch on kind. |
 | `type_of2` | `compiler/parse/mid/types/type_of/dispatch/type_of.id` | type_of(id): the id type of an expression node. Dispatch on kind. |
 | `type_of3` | `compiler/parse/mid/types/type_of/dispatch/type_of.id` | type_of(id): the id type of an expression node. Dispatch on kind. |
-| `canon_expr` | `compiler/parse/mid/unique/canon/expr/expr.id` | A literal fingerprints by value, not spelling: the lexer already turns hex |
-| `ce2` | `compiler/parse/mid/unique/canon/expr/expr.id` | Canonicalising an expression, mirroring idc.py's _canon_expr. |
-| `ce3` | `compiler/parse/mid/unique/canon/expr/expr.id` | An imported global keeps its name: two functions that differ only by which |
-| `ce4` | `compiler/parse/mid/unique/canon/expr/expr_more.id` | The rest of the expression kinds. ce5 ends the chain, so its default is the |
-| `ce5` | `compiler/parse/mid/unique/canon/expr/expr_more.id` | The end of the chain. Its default is reached only by an expression kind |
-| `canon_callee` | `compiler/parse/mid/unique/canon/expr/expr_more.id` | A callee keeps its name -- except a call to the function being canonicalised |
-| `canon_pair` | `compiler/parse/mid/unique/canon/expr/more/args.id` | The two-operand shape shared by a binary operator and an index, and the |
-| `canon_args` | `compiler/parse/mid/unique/canon/expr/more/args.id` | The two-operand shape shared by a binary operator and an index, and the |
-| `sep_at` | `compiler/parse/mid/unique/canon/expr/more/args.id` | The separator before element i of a list: nothing before the first. |
-| `canon_bin` | `compiler/parse/mid/unique/canon/expr/more/binop.id` | A constant-based simplification tries first (bin_simplify, in ./const): |
-| `bin_op` | `compiler/parse/mid/unique/canon/expr/more/binop.id` | A binary operator. |
-| `bin_pair` | `compiler/parse/mid/unique/canon/expr/more/binop.id` | A binary operator. |
-| `bin_simplify` | `compiler/parse/mid/unique/canon/expr/more/const/dispatch.id` | Entry point for canon_bin's constant-based simplification. |
-| `bin_const` | `compiler/parse/mid/unique/canon/expr/more/const/dispatch.id` | Entry point for canon_bin's constant-based simplification. |
-| `bin_fallback` | `compiler/parse/mid/unique/canon/expr/more/const/dispatch.id` | Entry point for canon_bin's constant-based simplification. |
-| `fold_op4` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_d.id` | `|` and `^`, the same width argument as `&` (../chain/link_c.id): both |
-| `compute_or` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_d.id` | `|` and `^`, the same width argument as `&` (../chain/link_c.id): both |
-| `compute_xor` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_d.id` | `|` and `^`, the same width argument as `&` (../chain/link_c.id): both |
-| `fold_op5` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_e.id` | `<<` and `>>`, the last link: an operator this chain does not fold (a |
-| `compute_shr` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_e.id` | `<<` and `>>`, the last link: an operator this chain does not fold (a |
-| `shl_word` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_e.id` | `<<` and `>>`, the last link: an operator this chain does not fold (a |
-| `compute_shl` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_f.id` | compute_shl and mul_word are the two operator computations that need a |
-| `mul_word` | `compiler/parse/mid/unique/canon/expr/more/const/fold/calc/link_f.id` | Neither operand exceeds INT_MAX, so their product cannot exceed |
-| `fold_op` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_a.id` | The fold chain: each link asks the next for a default and overrides it |
-| `compute_add` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_a.id` | a + b overflows an int when a is more than INT_MAX - b past zero; written |
-| `compute_sub` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_a.id` | The fold chain: each link asks the next for a default and overrides it |
-| `fold_op2` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_b.id` | `*` and `/`. Multiplying can overflow an int well before either operand |
-| `compute_mul` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_b.id` | `*` and `/`. Multiplying can overflow an int well before either operand |
-| `compute_div` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_b.id` | `/` by zero traps at runtime; folding it here would move that trap from |
-| `fold_op3` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_c.id` | `%` and `&`. `%` by zero traps, the same reason `/` by zero is left |
-| `compute_mod` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_c.id` | `%` and `&`. `%` by zero traps, the same reason `/` by zero is left |
-| `compute_and` | `compiler/parse/mid/unique/canon/expr/more/const/fold/chain/link_c.id` | `%` and `&`. `%` by zero traps, the same reason `/` by zero is left |
-| `bin_fold` | `compiler/parse/mid/unique/canon/expr/more/const/fold/core.id` | Folding two integer-literal operands to the value their operator gives. |
-| `bin_fold2` | `compiler/parse/mid/unique/canon/expr/more/const/fold/core.id` | Folding two integer-literal operands to the value their operator gives. |
-| `fold_word` | `compiler/parse/mid/unique/canon/expr/more/const/fold/core.id` | A `word` result that turned out to still fit an int folds to it; one that |
-| `call_fp` | `compiler/parse/mid/unique/canon/expr/more/const/ident/call.id` | A call's fingerprint (moved out of ce5 so its body still fits in three |
-| `call_fp2` | `compiler/parse/mid/unique/canon/expr/more/const/ident/call.id` | A call's fingerprint (moved out of ce5 so its body still fits in three |
-| `bin_identity` | `compiler/parse/mid/unique/canon/expr/more/const/ident/ident.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
-| `lit_is` | `compiler/parse/mid/unique/canon/expr/more/const/ident/ident.id` | Is node `nid` the integer literal `v`? A wide literal (too big for an |
-| `ident_zero_sym` | `compiler/parse/mid/unique/canon/expr/more/const/ident/ident.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
-| `ident_zero_right` | `compiler/parse/mid/unique/canon/expr/more/const/ident/ident_more.id` | x-0, x<<0 and x>>0 fingerprint as x: unlike + | ^, subtraction and the |
-| `ident_one` | `compiler/parse/mid/unique/canon/expr/more/const/ident/ident_more.id` | x*1, 1*x and x/1 fingerprint as x. `1/x` is not a no-op, so it keeps its |
-| `canon_func` | `compiler/parse/mid/unique/canon/func/more/func.id` | A whole function's fingerprint: its signature and its logic, and nothing of |
-| `canon_params` | `compiler/parse/mid/unique/canon/func/more/func.id` | A whole function's fingerprint: its signature and its logic, and nothing of |
-| `canon_param` | `compiler/parse/mid/unique/canon/func/more/func.id` | A parameter contributes its type, which is part of the signature, and its |
-| `canon_native` | `compiler/parse/mid/unique/canon/func/more/native.id` | A `native` declaration has no logic to compare, so its fingerprint is its |
-| `canon_func_body` | `compiler/parse/mid/unique/canon/func/more/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
-| `canon_func_tail` | `compiler/parse/mid/unique/canon/func/more/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
-| `canon_logic` | `compiler/parse/mid/unique/canon/func/more/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
-| `cn` | `compiler/parse/mid/unique/canon/func/names.id` | The position map: parameters and locals of the function being canonicalised, |
-| `cn_add` | `compiler/parse/mid/unique/canon/func/names.id` | The position map: parameters and locals of the function being canonicalised, |
-| `canon_var` | `compiler/parse/mid/unique/canon/func/names.id` | A name read as a value. A function's name is a function value and keeps its |
-| `canon_ret` | `compiler/parse/mid/unique/canon/func/state.id` | The return clause, and the two pieces of state one canonicalisation needs. |
-| `uq_begin` | `compiler/parse/mid/unique/canon/func/state.id` | Start canonicalising the function called `name`: an empty position map, and |
-| `cur_self` | `compiler/parse/mid/unique/canon/func/state.id` | The return clause, and the two pieces of state one canonicalisation needs. |
-| `canon_else2` | `compiler/parse/mid/unique/canon/stmt/block.id` | The else arm, and a statement list. |
-| `canon_else3` | `compiler/parse/mid/unique/canon/stmt/block.id` | An empty `else { }` adds nothing, matching idc.py, where an empty else list |
-| `canon_body` | `compiler/parse/mid/unique/canon/stmt/block.id` | Statements in order, separated by `;`. The order matters twice over: it is |
-| `canon_decl` | `compiler/parse/mid/unique/canon/stmt/more/decl.id` | Declaration, and index-assignment. |
-| `decl_name` | `compiler/parse/mid/unique/canon/stmt/more/decl.id` | The declared name: positional for a local, verbatim for an export, since an |
-| `canon_iassign` | `compiler/parse/mid/unique/canon/stmt/more/decl.id` | `base[index] = value`. The parser folds the parsed index target into the |
-| `decl_tag` | `compiler/parse/mid/unique/canon/stmt/more/decl_tail.id` | The rest of canon_decl, and the first step of canon_iassign, split so each |
-| `decl_tail` | `compiler/parse/mid/unique/canon/stmt/more/decl_tail.id` | The rest of canon_decl, and the first step of canon_iassign, split so each |
-| `iassign_tail` | `compiler/parse/mid/unique/canon/stmt/more/decl_tail.id` | The rest of canon_decl, and the first step of canon_iassign, split so each |
-| `iassign_val` | `compiler/parse/mid/unique/canon/stmt/more/if_tail.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
-| `cst_if` | `compiler/parse/mid/unique/canon/stmt/more/if_tail.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
-| `cst_if_tail` | `compiler/parse/mid/unique/canon/stmt/more/if_tail.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
-| `canon_stmt` | `compiler/parse/mid/unique/canon/stmt/stmt.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
-| `cst2` | `compiler/parse/mid/unique/canon/stmt/stmt.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
-| `cst3` | `compiler/parse/mid/unique/canon/stmt/stmt.id` | The two compound statements. An if carries its else arm (which may be |
-| `print_fingerprints` | `compiler/parse/mid/unique/dump/dump.id` | `idparse --fingerprints`: one line per function, `<fingerprint>\t<name>\t |
-| `print_fp_line` | `compiler/parse/mid/unique/dump/dump.id` | `idparse --fingerprints`: one line per function, `<fingerprint>\t<name>\t |
-| `fp_line` | `compiler/parse/mid/unique/dump/dump.id` | file:line, the same two facts a diagnostic's prefix names (../../names/ |
-| `check_bodies` | `compiler/parse/mid/unique/scan/check.id` | What check_program() calls in place of check_funcs(): the per-function body |
-| `check_unique` | `compiler/parse/mid/unique/scan/check.id` | Function-logic uniqueness: two functions with the same signature and the |
-| `uq_fill` | `compiler/parse/mid/unique/scan/check.id` | Fingerprint every function once. Comparing is quadratic in the number of |
-| `uq_scan` | `compiler/parse/mid/unique/scan/compare.id` | Comparing the fingerprints. |
-| `uq_at` | `compiler/parse/mid/unique/scan/compare.id` | Comparing the fingerprints. |
-| `find_dup` | `compiler/parse/mid/unique/scan/compare.id` | The first earlier function with the same fingerprint, or -1. The search |
-| `chk_dupfn` | `compiler/parse/mid/unique/scan/more/dup/dup_name.id` | The other "no two functions may be the same" rule: two functions may not |
-| `dupfn_at` | `compiler/parse/mid/unique/scan/more/dup/dup_name.id` | Reported against every definition after the first, so three functions of |
-| `dupfn_err` | `compiler/parse/mid/unique/scan/more/dup/dup_name.id` | The other "no two functions may be the same" rule: two functions may not |
-| `dupfn_check` | `compiler/parse/mid/unique/scan/more/dup/report.id` | Split from dupfn_at and dupfn_err so each of those blocks stays within the |
-| `dupfn_print` | `compiler/parse/mid/unique/scan/more/dup/report.id` | Split from dupfn_at and dupfn_err so each of those blocks stays within the |
-| `cw_shape` | `compiler/parse/mid/unique/scan/more/dup/wrap/body.id` | Only a scalar result can be a constant. main is the entry point whatever it |
-| `cw_body` | `compiler/parse/mid/unique/scan/more/dup/wrap/body.id` | Which functions can be constant wrappers, and the state one walk keeps. |
-| `cw_begin` | `compiler/parse/mid/unique/scan/more/dup/wrap/body.id` | Start the walk of function `name`: canon_expr's position map is emptied as |
-| `cw_is_lit` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/lit.id` | canon_expr tags a literal with one letter -- I an integer, F a float, S a |
-| `cw_spell` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/lit.id` | The value as conf.id spells it: the fingerprint after its tag (zeros_tail is |
-| `cw_report` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
-| `cw_print` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
-| `cw_say` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
-| `cw_ret` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
-| `cw_get` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
-| `cw_pick` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
-| `cw_assign` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/val.id` | An assignment counts only when its target is a local this walk has already |
-| `cw_put` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/val.id` | Recording a local's value. |
-| `cw_keep` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/val.id` | Appended rather than overwritten, so an assignment needs no search to write; |
-| `cw_walk` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
-| `cw_stmts` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/walk.id` | The loop leaves at the first statement that is not a literal store: the flag |
-| `cw_stmt` | `compiler/parse/mid/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
-| `cw_scan` | `compiler/parse/mid/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
-| `cw_at` | `compiler/parse/mid/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
-| `cw_value` | `compiler/parse/mid/unique/scan/more/dup/wrap/wrap.id` | "" unless the function is a constant wrapper, else the constant's |
-| `dup_report` | `compiler/parse/mid/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at, |
-| `dup_loc` | `compiler/parse/mid/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at, |
-| `dup_probe` | `compiler/parse/mid/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
-| `report_dup` | `compiler/parse/mid/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
-| `fname_at` | `compiler/parse/mid/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
-| `dup_tail` | `compiler/parse/mid/unique/scan/more/report/tail.id` | The j-side of report_dup's message: where the earlier, colliding function |
-| `dup_tail2` | `compiler/parse/mid/unique/scan/more/report/tail.id` | The j-side of report_dup's message: where the earlier, colliding function |
-| `is_reserved_name` | `compiler/parse/mid/unique/scan/more/reserved/check.id` | Named so resv_at's condition does not put a call (resv_names(), s1_of(...)) |
-| `resv_print` | `compiler/parse/mid/unique/scan/more/reserved/check.id` | Named so resv_at's condition does not put a call (resv_names(), s1_of(...)) |
-| `resv_at` | `compiler/parse/mid/unique/scan/more/reserved/reserved.id` | Not asked of the runtime itself: `--runtime` says this project IS the |
-| `resv_err` | `compiler/parse/mid/unique/scan/more/reserved/reserved.id` | A function may not be named after a runtime helper. |
 
 ## back -- the C target
 

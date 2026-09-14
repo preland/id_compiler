@@ -188,7 +188,7 @@ program can tell which project a fingerprint came from, and pipes the whole
 concatenation into it.
 
 It has no opinion of its own about what "the same function" means. The
-fingerprints it groups are the compiler's (`compiler/parse/mid/unique/canon/`),
+fingerprints it groups are the compiler's (`compiler/parse/mid/form/unique/canon/`),
 so the tool and the rule cannot disagree. It prints a group only when the same
 logic lives at more than one location. A function merged into several
 projects' builds -- the standard library is merged into every one -- has one

@@ -14,7 +14,7 @@ ds_init2() {
 } return void;
 
 // One pass to fingerprint-hash every line. Comparing is quadratic and hashing
-// is not, so the two are kept apart -- exactly as mid/unique does it.
+// is not, so the two are kept apart -- exactly as mid/form/unique does it.
 ds_fill(int i) {
   while(i < len((import ds_lines))) {
     ds_row(i);
