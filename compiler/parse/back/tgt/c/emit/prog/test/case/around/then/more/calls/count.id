@@ -18,3 +18,5 @@ emit_calls_count_cond(int ci, string nm, string cntexpr, string want) {
   string cnd = "(" + cntexpr + " == (" + want + "))";
   emit_line("    if (!" + cnd + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "[%d], expected %d\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], " + cntexpr + ", " + want + ");\n        return 3;\n    }");
 } return void;
+(0, "f", "idtc_rc_f_n", "3"):() then prints:("    if (!(idtc_rc_f_n == (3))) {\n        fprintf(stderr, \"%s: test failed: %s calls f[%d], expected %d\\n\", idtc_where[0], idtc_call[0], idtc_rc_f_n, 3);\n        return 3;\n    }\n")
+(1, "g", "idtc_rc_g_n", "5"):() then prints:("    if (!(idtc_rc_g_n == (5))) {\n        fprintf(stderr, \"%s: test failed: %s calls g[%d], expected %d\\n\", idtc_where[1], idtc_call[1], idtc_rc_g_n, 5);\n        return 3;\n    }\n")

@@ -7,3 +7,24 @@ emit_entry(int id) {
   emit_count("    ");
   emit_rec_call(id);
 } return void;
+given entry_fixture ((import fixture_fn)):() then prints:("    id_ctr_time++;\n")
+given entry_fixture ((import fixture_zero)):() then prints:("    id_ctr_time++;\n")
+
+// harn_init/harn_set (test/unit/more/flag.id, pre-existing) export and set
+// the flag is_harn() reads; env_init does not, since it is a
+// harness-emission concept, not a front-end one. fx_target is not itself a
+// `calls` target here (fn_fixture, not calls_node_fixture), so only
+// emit_count's line is expected -- call.id's own cases cover emit_rec_call.
+entry_fixture() {
+  fn_fixture();
+  entry_fixture_harn();
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
+entry_fixture_harn() {
+  harn_init();
+  harn_set(1);
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)

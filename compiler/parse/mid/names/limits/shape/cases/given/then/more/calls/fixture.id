@@ -1,0 +1,30 @@
+// A "thencalls" node naming fx_target with one matching int argument, and
+// one naming a function that does not exist -- for fit_then_calls/
+// fit_calls_name/fit_calls_native (calls.id), which read a node rather than
+// plain arguments the way fit/args.id's functions do. Built on
+// calls_items_fixture (fit/name.id) for fixture_calls_one and fx_target.
+
+calls_node_fixture() {
+  calls_items_fixture();
+  calls_node_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+calls_node_build() {
+  int ci = (import fixture_ci);
+  export int fixture_calls_node = newnode("thencalls", ci, 0, "fx_target", "", (import fixture_calls_one), (import fixture_calls_one));
+  calls_node_unknown();
+} return void;
+given calls_items_fixture ():() then check_failed:(0)
+given calls_items_fixture ():() then init_units:(0)
+
+// fixture_calls_node is pushed onto thennode at index 0, the same reason
+// print/fixture.id's fixture_print_node is.
+calls_node_unknown() {
+  int ci = (import fixture_ci);
+  export int fixture_calls_bad = newnode("thencalls", ci, 0, "nope", "", (import fixture_calls_none), (import fixture_calls_none));
+  push((import thennode), (import fixture_calls_node));
+} return void;
+given calls_node_fixture ():() then check_failed:(0)
+given calls_node_fixture ():() then init_units:(0)

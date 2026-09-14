@@ -2176,12 +2176,12 @@ void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm);
 void id_then_shape(int ci, int chk_node, int cfn);
 void id_then_value_fit(int ci, int chk_node, int cfn);
 void id_then_lit(int ci, int e, int cfn);
-void id_fit_calls_body(char* kind, int ci, char* nm, int cfn, int chk_node);
-void id_fit_calls_args(int ci, char* nm, int cfn, IdList* items);
-void id_fit_calls_count(int ci, IdList* items);
 void id_fit_then_calls(char* kind, int chk_node);
 void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node);
 void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node);
+void id_fit_calls_body(char* kind, int ci, char* nm, int cfn, int chk_node);
+void id_fit_calls_args(int ci, char* nm, int cfn, IdList* items);
+void id_fit_calls_count(int ci, IdList* items);
 void id_calls_unknown(int ci, char* nm);
 void id_fit_then_print(int chk_node);
 void id_fit_print_items(int ci, IdList* items);
@@ -8099,8 +8099,10 @@ void id_note_ty(char* ty) {
 
 void id_note_fn_ret(int cfn) {
     char* rt;
-    rt = id_s2_of(cfn);
-    id_note_ty(rt);
+    if ((cfn >= 0)) {
+        rt = id_s2_of(cfn);
+        id_note_ty(rt);
+    }
     return;
 }
 
@@ -18416,6 +18418,35 @@ void id_then_lit(int ci, int e, int cfn) {
     return;
 }
 
+void id_fit_then_calls(char* kind, int chk_node) {
+    int ci;
+    char* nm;
+    ci = id_i1_of(chk_node);
+    nm = id_s1_of(chk_node);
+    id_fit_calls_name(kind, ci, nm, chk_node);
+    return;
+}
+
+void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node) {
+    int cfn;
+    cfn = id_func_node(nm);
+    if ((cfn < 0)) {
+        id_calls_unknown(ci, nm);
+    } else {
+        id_fit_calls_native(kind, ci, nm, cfn, chk_node);
+    }
+    return;
+}
+
+void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node) {
+    if ((id_is_native(cfn) == 1)) {
+        id_case_err(ci, id_concat(id_concat("'calls' names '", nm), "', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead"));
+    } else {
+        id_fit_calls_body(kind, ci, nm, cfn, chk_node);
+    }
+    return;
+}
+
 void id_fit_calls_body(char* kind, int ci, char* nm, int cfn, int chk_node) {
     IdList* items;
     items = id_l1_of(chk_node);
@@ -18447,35 +18478,6 @@ void id_fit_calls_count(int ci, IdList* items) {
         id_case_err(ci, id_concat("a 'calls NAME:[N]' check takes exactly one count, not ", id_str_of_int(ne)));
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), "int");
-    }
-    return;
-}
-
-void id_fit_then_calls(char* kind, int chk_node) {
-    int ci;
-    char* nm;
-    ci = id_i1_of(chk_node);
-    nm = id_s1_of(chk_node);
-    id_fit_calls_name(kind, ci, nm, chk_node);
-    return;
-}
-
-void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node) {
-    int cfn;
-    cfn = id_func_node(nm);
-    if ((cfn < 0)) {
-        id_calls_unknown(ci, nm);
-    } else {
-        id_fit_calls_native(kind, ci, nm, cfn, chk_node);
-    }
-    return;
-}
-
-void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node) {
-    if ((id_is_native(cfn) == 1)) {
-        id_case_err(ci, id_concat(id_concat("'calls' names '", nm), "', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead"));
-    } else {
-        id_fit_calls_body(kind, ci, nm, cfn, chk_node);
     }
     return;
 }

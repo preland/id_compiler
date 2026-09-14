@@ -9,9 +9,23 @@ emit_rec_call(int id) {
     emit_rec_call_line(id, nm);
   }
 } return void;
+given call_fixture ((import fixture_fn)):() then prints:("    idtc_rec_fx_target(x);\n")
+given call_fixture ((import fixture_zero)):() then prints:("")
 
 emit_rec_call_line(int id, string nm) {
   int[] params = l1_of(id);
   string nmlist = rec_param_names(params);
   emit_line("    idtc_rec_" + nm + "(" + nmlist + ");");
 } return void;
+given fn_fixture ((import fixture_fn), "fx_target"):() then prints:("    idtc_rec_fx_target(x);\n")
+given fn_fixture ((import fixture_fn), "other"):() then prints:("    idtc_rec_other(x);\n")
+
+// is_harn() true (harn_init/harn_set, test/unit/more/flag.id) and fx_target a
+// `calls` target (calls_node_fixture) together, for emit_rec_call's own gate.
+call_fixture() {
+  calls_node_fixture();
+  harn_init();
+  harn_set(1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

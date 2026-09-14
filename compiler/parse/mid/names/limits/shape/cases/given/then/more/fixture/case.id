@@ -1,0 +1,36 @@
+// A synthetic case, for testing a function that reports at a case's line
+// (case_err, more/text/loc.id) without parsing a program: env_init
+// (../../../../../../../../types/check/expr/more/want/ret/store/env.id)
+// gives the compiler environment case_err's own machinery needs (node
+// tables, line tracking); init_cases (front/.../cases/more/lit/cons/bound/
+// more/state.id) gives the case tables themselves, empty. Data crosses these
+// niladic steps the way env_init's own chain does: as an export, not a
+// parameter, so each step keeps the setup shape (none in, void out) and can
+// carry its own cases.
+
+case_fixture() {
+  env_init();
+  case_fixture_init();
+  case_fixture_line();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// One line, and the node -- a "case" whose file is "fixture.id", so
+// case_err(0, msg) reports "fixture.id:4: error: msg" once case_fixture_add
+// puts it at index 0.
+case_fixture_line() {
+  push((import tline), 4);
+  export int fixture_node = newleaf("case", 0, 0, "fixture.id", "");
+  case_fixture_add();
+} return void;
+given case_fixture ():() then check_failed:(0)
+given case_fixture ():() then init_units:(0)
+
+case_fixture_add() {
+  push((import casenode), (import fixture_node));
+  push((import casestart), 0);
+  export int fixture_ci = 0;
+} return void;
+given case_fixture ():() then check_failed:(0)
+given case_fixture ():() then init_units:(0)

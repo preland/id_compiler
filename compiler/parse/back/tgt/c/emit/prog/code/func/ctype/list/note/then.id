@@ -27,3 +27,5 @@ note_check_then(int node) {
   int cfn = func_node(chk_nm);
   note_fn_ret(cfn);
 } return void;
+given then_node_fixture ((import fixture_then_node)):() then prints:("")
+given then_node_fixture ((import fixture_then_bad)):() then prints:("")

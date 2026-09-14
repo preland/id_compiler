@@ -8,6 +8,8 @@ fit_then_print(int chk_node) {
   int[] items = l1_of(chk_node);
   fit_print_items(ci, items);
 } return void;
+given print_fixture ((import fixture_print_node)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
+given print_fixture ((import fixture_print_empty)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
 
 fit_print_items(int ci, int[] items) {
   if(len(items) != 1) {
@@ -17,3 +19,5 @@ fit_print_items(int ci, int[] items) {
     fit_value(ci, items[0], "string");
   }
 } return void;
+given print_fixture ((import fixture_ci), (import fixture_print_two)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
+given print_fixture ((import fixture_ci), (import fixture_print_none)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")

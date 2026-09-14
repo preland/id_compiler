@@ -7,8 +7,12 @@ emit_print_lines(int ci, string kind, string cnd, string shown, int e) {
   string lt = lit_text(e);
   emit_print_final(ci, lab, cnd, shown, lt);
 } return void;
+given fn_fixture (0, "thenprints", "1", "idtc_show_esc(idtc_out_buf);", (import fixture_zero)):() then prints:("    if (!(1)) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")
+given fn_fixture (1, "theneprints", "0", "idtc_show_esc(idtc_err_buf);", (import fixture_zero)):() then prints:("    if (!(0)) {\n        fprintf(stderr, \"%s: test failed: %s eprints = \", idtc_where[1], idtc_call[1]);\n        idtc_show_esc(idtc_err_buf);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_print_final(int ci, string lab, string cnd, string shown, string lt) {
   string tail = c_esc(", expected " + lt + "\n");
   emit_line("    if (!(" + cnd + ")) {\n        fprintf(stderr, \"%s: test failed: %s " + lab + " = \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n        " + shown + "\n        fputs(\"" + tail + "\", stderr);\n        return 3;\n    }");
 } return void;
+(0, "prints", "1", "idtc_show_esc(idtc_out_buf);", "hi"):() then prints:("    if (!(1)) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected hi\\n\", stderr);\n        return 3;\n    }\n")
+(1, "eprints", "0", "idtc_show_esc(idtc_err_buf);", "bye"):() then prints:("    if (!(0)) {\n        fprintf(stderr, \"%s: test failed: %s eprints = \", idtc_where[1], idtc_call[1]);\n        idtc_show_esc(idtc_err_buf);\n        fputs(\", expected bye\\n\", stderr);\n        return 3;\n    }\n")

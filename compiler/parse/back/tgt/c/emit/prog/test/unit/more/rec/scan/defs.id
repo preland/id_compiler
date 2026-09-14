@@ -6,6 +6,8 @@ emit_rec_defs() {
   int i = 0;
   emit_rec_scan(i);
 } return void;
+given fn_fixture ():() then prints:("")
+given calls_node_fixture ():() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic int idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\nstatic void idtc_rec_fx_target(int x) {\n    if (!idtc_rec_on) return;\n    if (idtc_rc_fx_target_n == idtc_rc_fx_target_cap) {\n        idtc_rc_fx_target_cap = idtc_rc_fx_target_cap ? idtc_rc_fx_target_cap * 2 : 8;\n        idtc_rc_fx_target_buf = realloc(idtc_rc_fx_target_buf, sizeof(idtc_rc_fx_target_t) * (size_t)idtc_rc_fx_target_cap);\n        idtc_rc_fx_target_seq = realloc(idtc_rc_fx_target_seq, sizeof(long long) * (size_t)idtc_rc_fx_target_cap);\n    }\n    idtc_rc_fx_target_buf[idtc_rc_fx_target_n].x = x; \n    idtc_rc_fx_target_seq[idtc_rc_fx_target_n] = idtc_rec_seq++;\n    idtc_rc_fx_target_n++;\n}\n")
 
 emit_rec_scan(int i) {
   while(i < len((import prog))) {
@@ -13,6 +15,8 @@ emit_rec_scan(int i) {
     i = i + 1;
   }
 } return void;
+given fn_fixture (0):() then prints:("")
+given fn_fixture (1):() then prints:("")
 
 emit_rec_at(int i) {
   int fn = (import prog)[i];
@@ -21,3 +25,5 @@ emit_rec_at(int i) {
     emit_rec_def(nm, fn);
   }
 } return void;
+given fn_fixture (0):() then prints:("")
+given calls_node_fixture (0):() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic int idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\nstatic void idtc_rec_fx_target(int x) {\n    if (!idtc_rec_on) return;\n    if (idtc_rc_fx_target_n == idtc_rc_fx_target_cap) {\n        idtc_rc_fx_target_cap = idtc_rc_fx_target_cap ? idtc_rc_fx_target_cap * 2 : 8;\n        idtc_rc_fx_target_buf = realloc(idtc_rc_fx_target_buf, sizeof(idtc_rc_fx_target_t) * (size_t)idtc_rc_fx_target_cap);\n        idtc_rc_fx_target_seq = realloc(idtc_rc_fx_target_seq, sizeof(long long) * (size_t)idtc_rc_fx_target_cap);\n    }\n    idtc_rc_fx_target_buf[idtc_rc_fx_target_n].x = x; \n    idtc_rc_fx_target_seq[idtc_rc_fx_target_n] = idtc_rec_seq++;\n    idtc_rc_fx_target_n++;\n}\n")

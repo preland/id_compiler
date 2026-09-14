@@ -1,0 +1,30 @@
+// A "then" (check) node naming fx_target (whose signature never fits a
+// check: one parameter, where a check takes none -- fn_fixture,
+// ../fixture/fn.id), and one naming a function that does not exist. Empty
+// children: neither is read before the arity/existence check that fails
+// first. For check/entry.id's then_fn_entry/then_fn, which -- unlike
+// fit_then_print -- take the whole node, not its parts.
+
+then_node_fixture() {
+  fn_fixture();
+  then_node_build();
+  then_node_bad();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+then_node_build() {
+  int ci = (import fixture_ci);
+  int[] none = [];
+  export int fixture_then_node = newnode("then", ci, 0, "fx_target", "", none, none);
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
+then_node_bad() {
+  int ci = (import fixture_ci);
+  int[] none = [];
+  export int fixture_then_bad = newnode("then", ci, 0, "nope", "", none, none);
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)

@@ -5,9 +5,13 @@ emit_capture_post(int ci) {
   emit_out_post(ci);
   emit_capture_post2(ci);
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")
 
 emit_out_post(int ci) {
   if(case_has_out(ci, "thenprints") == 1) {
     emit_line("    fflush(stdout);\n    dup2(idtc_out_save, 1);\n    close(idtc_out_save);\n    long idtc_out_len = ftell(idtc_out_tmp);\n    fseek(idtc_out_tmp, 0, SEEK_SET);\n    char* idtc_out_buf = malloc((size_t)idtc_out_len + 1);\n    if (idtc_out_len > 0) { size_t idtc_out_rd = fread(idtc_out_buf, 1, (size_t)idtc_out_len, idtc_out_tmp); (void)idtc_out_rd; }\n    idtc_out_buf[idtc_out_len] = 0;\n    fclose(idtc_out_tmp);");
   }
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")

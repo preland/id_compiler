@@ -9,6 +9,8 @@ calls_row_cond(string nm, int ti, int[] params, int[] items) {
   int i = 0;
   string ret_s = calls_row_scan(nm, ti, params, items, out, i);
 } return string ret_s;
+given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_calls_one)):("1 && (idtc_rc_f_buf[idtc_j0].x == 1)")
+given calls_items_fixture ("g", 3, (import fixture_params), (import fixture_calls_one)):("1 && (idtc_rc_g_buf[idtc_j3].x == 1)")
 
 calls_row_scan(string nm, int ti, int[] params, int[] items, string out, int i) {
   while(i < len(params)) {
@@ -16,9 +18,13 @@ calls_row_scan(string nm, int ti, int[] params, int[] items, string out, int i) 
     i = i + 1;
   }
 } return string out;
+given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_calls_one), "1", 0):("1 && (idtc_rc_f_buf[idtc_j0].x == 1)")
+given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_calls_one), "1", 1):("1")
 
 calls_row_step(string nm, int ti, int[] params, int[] items, string out, int i) {
   string pt = s1_of(params[i]);
   string fld = s2_of(params[i]);
   string ret_s = calls_row_cmp(nm, ti, pt, fld, items[i], out);
 } return string ret_s;
+given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_calls_one), "1", 0):("1 && (idtc_rc_f_buf[idtc_j0].x == 1)")
+given calls_items_fixture ("g", 2, (import fixture_params), (import fixture_calls_one), "0", 0):("0 && (idtc_rc_g_buf[idtc_j2].x == 1)")

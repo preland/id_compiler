@@ -1,0 +1,32 @@
+// Two "thenprints" nodes, wrong arity both ways -- two items and none -- and
+// the item lists themselves, exported so a case can pass them as arguments
+// (a case argument is a literal or an import, never a call:
+// docs/TESTS.md). Built on fn_fixture (../fixture/fn.id) so the case they
+// are written on (fixture_ci) is there for fit_print_items to report at.
+
+print_fixture() {
+  fn_fixture();
+  print_fixture_items();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+print_fixture_items() {
+  export int[] fixture_print_two = [node_int("1", 1, 0), node_int("2", 2, 0)];
+  export int[] fixture_print_none = [];
+  print_fixture_nodes();
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
+// fixture_print_node is pushed onto thennode at index 0: emission's
+// then-chain (e.g. got.id's emit_then_want, pre-existing) reads a case's
+// then-clauses by that index, not by the node id passed around, so a case
+// testing one of them has to put it there.
+print_fixture_nodes() {
+  export int fixture_print_node = newnode("thenprints", (import fixture_ci), 0, "", "", (import fixture_print_two), (import fixture_print_two));
+  export int fixture_print_empty = newnode("thenprints", (import fixture_ci), 0, "", "", (import fixture_print_none), (import fixture_print_none));
+  push((import thennode), (import fixture_print_node));
+} return void;
+given print_fixture ():() then check_failed:(0)
+given print_fixture ():() then init_units:(0)

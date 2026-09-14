@@ -8,6 +8,8 @@ rec_row_assigns(int[] params, string pfx) {
   int i = 0;
   string ret_s = rec_assign_scan(params, pfx, out, i);
 } return string ret_s;
+given fn_fixture ((import fixture_params), "buf"):("buf.x = x; ")
+given fn_fixture ([], "buf"):("")
 
 rec_assign_scan(int[] params, string pfx, string out, int i) {
   while(i < len(params)) {
@@ -15,8 +17,12 @@ rec_assign_scan(int[] params, string pfx, string out, int i) {
     i = i + 1;
   }
 } return string out;
+given fn_fixture ((import fixture_params), "buf", "", 0):("buf.x = x; ")
+given fn_fixture ((import fixture_params), "buf", "", 1):("")
 
 rec_assign_add(int[] params, string pfx, string out, int i) {
   string nm = s2_of(params[i]);
   string so = out + pfx + "." + nm + " = " + nm + "; ";
 } return string so;
+given fn_fixture ((import fixture_params), "buf", "", 0):("buf.x = x; ")
+given fn_fixture ((import fixture_params), "buf", "pre ", 0):("pre buf.x = x; ")

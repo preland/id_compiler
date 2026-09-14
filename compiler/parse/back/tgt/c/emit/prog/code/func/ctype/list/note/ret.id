@@ -2,6 +2,10 @@
 // (note.id).
 
 note_fn_ret(int cfn) {
-  string rt = s2_of(cfn);
-  note_ty(rt);
+  if(cfn >= 0) {
+    string rt = s2_of(cfn);
+    note_ty(rt);
+  }
 } return void;
+given fn_fixture ((import fixture_fn)):()
+given fn_fixture (-1):()

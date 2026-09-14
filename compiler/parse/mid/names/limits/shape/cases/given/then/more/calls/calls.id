@@ -8,6 +8,8 @@ fit_then_calls(string kind, int chk_node) {
   string nm = s1_of(chk_node);
   fit_calls_name(kind, ci, nm, chk_node);
 } return void;
+given calls_node_fixture ("thencalls", (import fixture_calls_node)):() then prints:("")
+given calls_node_fixture ("thencalls", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")
 
 fit_calls_name(string kind, int ci, string nm, int chk_node) {
   int cfn = func_node(nm);
@@ -17,6 +19,8 @@ fit_calls_name(string kind, int ci, string nm, int chk_node) {
     fit_calls_native(kind, ci, nm, cfn, chk_node);
   }
 } return void;
+given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_calls_node)):() then prints:("")
+given calls_node_fixture ("thencalls", (import fixture_ci), "nope", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")
 
 fit_calls_native(string kind, int ci, string nm, int cfn, int chk_node) {
   if(is_native(cfn) == 1) {
@@ -25,3 +29,5 @@ fit_calls_native(string kind, int ci, string nm, int cfn, int chk_node) {
     fit_calls_body(kind, ci, nm, cfn, chk_node);
   }
 } return void;
+given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("")
+given calls_node_fixture ("thencallsn", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")

@@ -1,0 +1,22 @@
+// The two table-initialisers case_fixture needs beyond env_init: the case
+// tables (init_cases, front/.../cases/more/lit/cons/bound/more/state.id) and
+// the builtin-name list (init_bnames, mid/names/exports/extern/builtin/more/
+// names.id) -- calls_unknown (../calls/name.id) reads the latter through
+// is_builtin, which env_init does not set up.
+
+case_fixture_init() {
+  init_cases();
+  init_bnames();
+  init_tyc();
+} return void;
+given case_fixture ():() then check_failed:(0)
+given case_fixture ():() then init_units:(0)
+
+// fn.id's last step: fx_target registered where func_node/find_str look.
+fn_fixture_reg() {
+  push((import fnames), "fx_target");
+  push((import fnodes), (import fixture_fn));
+  push((import prog), (import fixture_fn));
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)

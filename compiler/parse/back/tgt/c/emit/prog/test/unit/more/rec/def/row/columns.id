@@ -6,6 +6,8 @@ rec_row_fields(int[] params) {
   int i = 0;
   string ret_s = rec_row_scan(params, out, i);
 } return string ret_s;
+given fn_fixture ((import fixture_params)):("int x; ")
+given fn_fixture ([]):("")
 
 rec_row_scan(int[] params, string out, int i) {
   while(i < len(params)) {
@@ -13,9 +15,13 @@ rec_row_scan(int[] params, string out, int i) {
     i = i + 1;
   }
 } return string out;
+given fn_fixture ((import fixture_params), "", 0):("int x; ")
+given fn_fixture ((import fixture_params), "", 1):("")
 
 rec_row_add(int[] params, string out, int i) {
   string pt = s1_of(params[i]);
   string nm = s2_of(params[i]);
   string so = out + c_type(pt) + " " + nm + "; ";
 } return string so;
+given fn_fixture ((import fixture_params), "", 0):("int x; ")
+given fn_fixture ((import fixture_params), "pre ", 0):("pre int x; ")
