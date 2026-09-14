@@ -29,3 +29,5 @@ const_line_tail(int d, string s1_of_v) {
     ret_s = c_type(s1_of_v) + " " + s2_of(d) + ";  /* constant from conf.id */";
   }
 } return string ret_s;
+given cl_scalar_setup ((import cl_scalar_d), "int"):("int m = 9;  /* constant from conf.id */")
+given cl_setup ((import cl_d), "int[]"):("IdList* k;  /* constant from conf.id */")

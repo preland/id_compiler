@@ -1,0 +1,17 @@
+// A registered list constant ("k") and a registered scalar constant ("m"),
+// for init_line (../line.id) and const_line_tail (../../line.id), which both
+// render a conf.id constant's declaration node as C.
+
+cl_setup() {
+  lc_env();
+  export int cl_d = lc_reg_list1("k", "5", 5);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+cl_scalar_setup() {
+  lc_env();
+  export int cl_scalar_d = lc_reg_int("m", "9", 9);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
