@@ -6,13 +6,17 @@ emit_rec_def(string nm, int fn) {
   int[] params = l1_of(fn);
   emit_rec_struct(nm, sigtext, params);
 } return void;
+given fn_fixture ("fx_target", (import fixture_fn)):() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic int idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\nstatic void idtc_rec_fx_target(int x) {\n    if (!idtc_rec_on) return;\n    if (idtc_rc_fx_target_n == idtc_rc_fx_target_cap) {\n        idtc_rc_fx_target_cap = idtc_rc_fx_target_cap ? idtc_rc_fx_target_cap * 2 : 8;\n        idtc_rc_fx_target_buf = realloc(idtc_rc_fx_target_buf, sizeof(idtc_rc_fx_target_t) * (size_t)idtc_rc_fx_target_cap);\n        idtc_rc_fx_target_seq = realloc(idtc_rc_fx_target_seq, sizeof(long long) * (size_t)idtc_rc_fx_target_cap);\n    }\n    idtc_rc_fx_target_buf[idtc_rc_fx_target_n].x = x; \n    idtc_rc_fx_target_seq[idtc_rc_fx_target_n] = idtc_rec_seq++;\n    idtc_rc_fx_target_n++;\n}\n")
 
 emit_rec_struct(string nm, string sigtext, int[] params) {
   string fields = rec_row_fields(params);
   emit_rec_types(nm, fields);
   emit_rec_fn(nm, sigtext, params);
 } return void;
+given fn_fixture ("fx_target", "int x", (import fixture_params)):() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic int idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\nstatic void idtc_rec_fx_target(int x) {\n    if (!idtc_rec_on) return;\n    if (idtc_rc_fx_target_n == idtc_rc_fx_target_cap) {\n        idtc_rc_fx_target_cap = idtc_rc_fx_target_cap ? idtc_rc_fx_target_cap * 2 : 8;\n        idtc_rc_fx_target_buf = realloc(idtc_rc_fx_target_buf, sizeof(idtc_rc_fx_target_t) * (size_t)idtc_rc_fx_target_cap);\n        idtc_rc_fx_target_seq = realloc(idtc_rc_fx_target_seq, sizeof(long long) * (size_t)idtc_rc_fx_target_cap);\n    }\n    idtc_rc_fx_target_buf[idtc_rc_fx_target_n].x = x; \n    idtc_rc_fx_target_seq[idtc_rc_fx_target_n] = idtc_rec_seq++;\n    idtc_rc_fx_target_n++;\n}\n")
 
 emit_rec_types(string nm, string fields) {
   emit_line("typedef struct { " + fields + "int idtc_rc_pad; } idtc_rc_" + nm + "_t;\nstatic int idtc_rc_" + nm + "_n = 0;\nstatic int idtc_rc_" + nm + "_cap = 0;\nstatic idtc_rc_" + nm + "_t* idtc_rc_" + nm + "_buf = NULL;\nstatic long long* idtc_rc_" + nm + "_seq = NULL;");
 } return void;
+("fx_target", "int x; "):() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic int idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\n")
+("g", ""):() then prints:("typedef struct { int idtc_rc_pad; } idtc_rc_g_t;\nstatic int idtc_rc_g_n = 0;\nstatic int idtc_rc_g_cap = 0;\nstatic idtc_rc_g_t* idtc_rc_g_buf = NULL;\nstatic long long* idtc_rc_g_seq = NULL;\n")

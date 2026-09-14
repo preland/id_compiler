@@ -8076,8 +8076,10 @@ void id_note_ty(char* ty) {
 
 void id_note_fn_ret(int cfn) {
     char* rt;
-    rt = id_s2_of(cfn);
-    id_note_ty(rt);
+    if ((cfn >= 0)) {
+        rt = id_s2_of(cfn);
+        id_note_ty(rt);
+    }
     return;
 }
 

@@ -2,6 +2,17 @@
 // two output clauses (more/print/), or a call clause (more/calls/). `prints`,
 // `eprints` and `calls` are keywords (lex/chars/classify/ident_kw.id), so a
 // check's own name can never collide with one.
+//
+// KNOWN GAP: none of the new parser functions here (then_dispatch through
+// more/print/'s and more/calls/'s, and push.id's then_push_kind) carry
+// inline cases. Every existing parser function that takes `pos` in this tree
+// is in the same position -- none has cases either, self-hosted or not
+// (`grep -rlE '":\("' front | xargs grep -L given` finds none carrying the
+// form) -- because a case for one would need a synthetic token stream
+// (ttext/tkind/tline, front/tokens/load/) built by hand, which is a fixture
+// this tree does not yet have anywhere. They are exercised end to end by
+// tests_feature.sh's 25 new cases, which parse real `prints`/`eprints`/
+// `calls` clauses through this exact code on every run.
 
 then_dispatch(int[] pos) {
   if(cur_kind(pos) == "kw" && (cur_text(pos) == "prints" || cur_text(pos) == "eprints")) {
