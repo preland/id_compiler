@@ -14,6 +14,12 @@
 // comes last.
 int idx_n = 251;
 string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint";
-// --- BEGIN GENERATED: tools/gen_runtime_id.py (resv_names_src) ---
+// The runtime helper names (compiler/parse/back/tgt/c/runtime/runtime.id),
+// space-separated: an id function may not be named after one of these,
+// because every id function is emitted as id_<name> and would collide with
+// the runtime in C. is_reserved_name (mid/form/unique/scan/more/reserved/
+// check.id) is what catches it, over resv_names, which mid/names/exports/
+// extern/builtin/more/names.id's init_resv_names splits this string into at
+// startup. Kept in step with runtime.id by hand; tests/stdlib.sh asserts the
+// two agree.
 string resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink at box_f charat chr concat flush getkey idiv imod input len list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set lm_forget mem_alloc mem_of_str mem_size mul_check peek16 peek32 peek64 peek8 peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow str_of_float str_of_int str_of_mem str_of_word term_raw term_restore ticks to_int trap udiv ult umod unbox_f ushr";
-// --- END GENERATED ---
