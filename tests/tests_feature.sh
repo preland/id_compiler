@@ -1604,6 +1604,249 @@ widen(int n) {
 EOF
 self_accept "bin/idc: a return clause that widens still builds" --emit-c /dev/null
 
+# --- then prints / then eprints (docs/TESTS.md) -------------------------------
+# bin/idc only: idc.py lexes `given`/`then` as ordinary identifiers and neither
+# it nor the self-hosted compiler's front end before this feature knew
+# `prints`/`eprints`/`calls`.
+cat > "$TMP/p.id" <<'EOF'
+speak(int n) {
+  print("hi " + n);
+} return int n;
+(1):(1) then prints:("hi 1\n")
+(2):(2) then prints:("hi 2\n")
+EOF
+self_accept "bin/idc: a matching 'prints' clause builds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+speak(int n) {
+  print("hi " + n);
+} return int n;
+(1):(1) then prints:("bye\n")
+(2):(2) then prints:("hi 2\n")
+EOF
+self_refuse "bin/idc: a mismatching 'prints' clause fails, showing both sides" \
+    'p.id:4: test failed: speak(1) prints = "hi 1\n", expected "bye\n"' --emit-c /dev/null
+
+# print()/puts() always ends a line, so a case can ask for that newline
+# explicitly -- this is what proves the comparison sees it rather than a
+# trimmed line.
+cat > "$TMP/p.id" <<'EOF'
+line(int n) {
+  print("x");
+} return int n;
+(1):(1) then prints:("x\n")
+(2):(2) then prints:("x\n")
+EOF
+self_accept "bin/idc: 'prints' compares the trailing newline print() always writes" --emit-c /dev/null
+
+# A function that writes nothing is tested the same way: the empty string.
+cat > "$TMP/p.id" <<'EOF'
+silent(int n) {
+  int m = n;
+} return int m;
+(1):(1) then prints:("")
+(2):(2) then prints:("")
+EOF
+self_accept "bin/idc: 'prints' of an empty string matches a function that prints nothing" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+grumble(int n) {
+  eprint("grumble " + n);
+} return int n;
+(1):(1) then eprints:("grumble 1\n")
+(2):(2) then eprints:("grumble 2\n")
+EOF
+self_accept "bin/idc: a matching 'eprints' clause builds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+grumble(int n) {
+  eprint("grumble " + n);
+} return int n;
+(1):(1) then eprints:("nope\n")
+(2):(2) then eprints:("grumble 2\n")
+EOF
+self_refuse "bin/idc: a mismatching 'eprints' clause fails, showing both sides" \
+    'p.id:4: test failed: grumble(1) eprints = "grumble 1\n", expected "nope\n"' --emit-c /dev/null
+
+# A setup's own output happens before the call under test's counters are read
+# and before the channel is captured, so it is never compared -- only the call
+# under test's own bytes are.
+cat > "$TMP/p.id" <<'EOF'
+noisy_setup() {
+  print("setup noise");
+} return void;
+
+quiet(int n) {
+  int m = n;
+} return int m;
+given noisy_setup (1):(1) then prints:("")
+given noisy_setup (2):(2) then prints:("")
+EOF
+self_accept "bin/idc: a setup's own prints are not counted, only the call under test's" \
+    --allow-untested --emit-c /dev/null
+
+# --- then calls NAME:(ARGS) / then calls NAME:[N] (docs/TESTS.md) ------------
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int h = helper(n);
+} return int h;
+(1):(2) then calls helper:(1)
+(2):(3) then calls helper:(2)
+EOF
+self_accept "bin/idc: a matching 'calls NAME:(ARGS)' clause builds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int h = helper(n);
+} return int h;
+(1):(2) then calls helper:(99)
+(2):(3) then calls helper:(2)
+EOF
+self_refuse "bin/idc: 'calls NAME:(ARGS)' with the wrong arguments fails" \
+    "p.id:10: test failed: runner(1) calls helper(...) did not match; 1 call(s) to 'helper' were recorded" \
+    --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+} return int n;
+(1):(1) then calls helper:(1)
+(2):(2) then calls helper:(2)
+EOF
+self_refuse "bin/idc: 'calls NAME:(ARGS)' fails when the function is never called" \
+    "p.id:9: test failed: runner(1) calls helper(...) did not match; 0 call(s) to 'helper' were recorded" \
+    --emit-c /dev/null
+
+# Two clauses on one case, matched as a subsequence in the order written: the
+# second helper(2) must be found AFTER the first helper(1), not before it.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int a = helper(n);
+  int b = helper(n + 1);
+} return int b;
+(1):(3) then calls helper:(1) then calls helper:(2)
+(2):(4) then calls helper:(2) then calls helper:(3)
+EOF
+self_accept "bin/idc: several 'calls' clauses are matched in the order written" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int a = helper(n);
+  int b = helper(n + 1);
+} return int b;
+(1):(3) then calls helper:(2) then calls helper:(1)
+(2):(4) then calls helper:(3) then calls helper:(2)
+EOF
+self_refuse "bin/idc: the same two 'calls' clauses out of order do not match" \
+    "test failed:" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int a = helper(n);
+  int b = helper(n + 1);
+} return int b;
+(1):(3) then calls helper:[2]
+(2):(4) then calls helper:[2]
+EOF
+self_accept "bin/idc: 'calls NAME:[N]' matches the exact count" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int a = helper(n);
+  int b = helper(n + 1);
+} return int b;
+(1):(3) then calls helper:[3]
+(2):(4) then calls helper:[3]
+EOF
+self_refuse "bin/idc: 'calls NAME:[N]' fails one call short of the count" \
+    "p.id:11: test failed: runner(1) calls helper[2], expected 3" --emit-c /dev/null
+
+# A call made two levels down (runner -> mid -> helper) is recorded exactly as
+# a direct one is: the harness instruments helper's own body, not runner's
+# call site.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+mid(int x) {
+  int y = helper(x);
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int h = mid(n);
+} return int h;
+(1):(2) then calls helper:(1)
+(2):(3) then calls helper:(2)
+EOF
+self_accept "bin/idc: a transitive call (two levels down) is recorded" --emit-c /dev/null
+
+# A `given` setup's own call to the target is never recorded either: it runs
+# before idtc_rec_on is turned on.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+warmup() {
+  int h = helper(9);
+} return void;
+
+runner(int n) {
+} return int n;
+given warmup (1):(1) then calls helper:[0]
+given warmup (2):(2) then calls helper:[0]
+EOF
+self_accept "bin/idc: a 'given' setup's own calls are not recorded" \
+    --allow-untested --emit-c /dev/null
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

@@ -1,0 +1,6 @@
+// EXPECT: this case's 'calls speak' passes 2 argument(s), which takes 1
+// EXPECT-IDCPY: expected '(', found 'calls'
+speak(int x) {
+  print("hi");
+} return int x;
+(1):(1) then calls speak:(1, 2)

@@ -8,6 +8,6 @@
 
 emit_rec_prelude() {
   emit_line("");
-  emit_line("static int idtc_rec_on = 0;\nstatic long long idtc_rec_seq = 0;\nstatic FILE* idtc_eprint_target = NULL;");
+  emit_line("static int idtc_rec_on = 0;\nstatic long long idtc_rec_seq = 0;\nstatic FILE* idtc_eprint_target = NULL;\nstatic void idtc_show_esc(const char* s) {\n    fputc('\"', stderr);\n    for (const unsigned char* p = (const unsigned char*)s; *p; p++) {\n        if (*p == '\\\\' || *p == '\"') { fputc('\\\\', stderr); fputc(*p, stderr); }\n        else if (*p == '\\n') { fputs(\"\\\\n\", stderr); }\n        else { fputc(*p, stderr); }\n    }\n    fputc('\"', stderr);\n}");
   emit_rec_defs();
 } return void;

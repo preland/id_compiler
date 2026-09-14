@@ -1,0 +1,6 @@
+// EXPECT: expected the name of a function after 'calls', found ':'
+// EXPECT-IDCPY: expected '(', found 'calls'
+speak(int x) {
+  print("hi");
+} return int x;
+(1):(1) then calls :(1)

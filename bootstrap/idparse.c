@@ -8921,7 +8921,7 @@ void id_emit_print_cond(int ci, char* kind, char* var, char* want, int e) {
     char* cnd;
     char* shown;
     cnd = id_tc_compare(var, want, "string");
-    shown = id_tc_show(var, "string");
+    shown = id_concat(id_concat("idtc_show_esc(", var), ");");
     id_emit_print_lines(ci, kind, cnd, shown, e);
     return;
 }
@@ -9705,7 +9705,7 @@ void id_emit_rec_at(int i) {
 
 void id_emit_rec_prelude(void) {
     id_emit_line("");
-    id_emit_line("static int idtc_rec_on = 0;\nstatic long long idtc_rec_seq = 0;\nstatic FILE* idtc_eprint_target = NULL;");
+    id_emit_line("static int idtc_rec_on = 0;\nstatic long long idtc_rec_seq = 0;\nstatic FILE* idtc_eprint_target = NULL;\nstatic void idtc_show_esc(const char* s) {\n    fputc('\"', stderr);\n    for (const unsigned char* p = (const unsigned char*)s; *p; p++) {\n        if (*p == '\\\\' || *p == '\"') { fputc('\\\\', stderr); fputc(*p, stderr); }\n        else if (*p == '\\n') { fputs(\"\\\\n\", stderr); }\n        else { fputc(*p, stderr); }\n    }\n    fputc('\"', stderr);\n}");
     id_emit_rec_defs();
     return;
 }
