@@ -1,0 +1,15 @@
+// EXPECT: the return clause of 'grow' narrows word to int; declare a int local, assign it, and return that
+// IDCPY-ACCEPTS
+// docs/SPEC.md 1. The return clause used to narrow silently -- idem's engine
+// relied on it as a way to narrow without spending an action -- but that made
+// it the one place in the language where a narrowing conversion went
+// unwritten. idc.py has no rule against this: it compiles the program and
+// returns the truncated value.
+main(int argc, string[] argv) {
+  word a = 4294967297;
+  int b = grow(a);
+  print(b);
+} return int 0;
+
+grow(word w) {
+} return int w;

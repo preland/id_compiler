@@ -1661,6 +1661,8 @@ char* id_fix_ret_name(char* t);
 void id_fix_ret_decl(int f, int e, char* t, char* name);
 char* id_fix_ret_pos(int f, int e);
 int id_fix_indent_line(int f);
+int id_fix_ret_needs(int f, int e);
+int id_fix_ret_narrows(int f, int e);
 void id_fix_ret(int f);
 void id_fix_ret_at(int f, int e);
 int id_fix_ret_ok(int e);
@@ -2337,11 +2339,14 @@ int id_want_push_ok(int i);
 void id_tc_err(int id, char* msg);
 char* id_node_fn(int id);
 char* id_tc_loc(int id);
-char* id_ret_err_msg(int id, char* t);
-void id_chk_retexpr(int id);
-void id_chk_ret2(int id);
-void id_ret_err(int id, char* t);
 void id_fn_ret_type(int id);
+void id_chk_ret_narrow(int id, char* t);
+void id_ret_narrow_err(int id, char* t);
+char* id_ret_err_msg(int id, char* t);
+char* id_ret_narrow_err_msg(int id, char* t);
+void id_chk_retexpr(int id);
+void id_chk_ret2(int id, int e);
+void id_ret_err(int id, char* t);
 void id_chk_eq(int id);
 void id_eq_types(int id, int a, int b);
 void id_eq_report(int id, char* lt, char* rt);
@@ -13626,10 +13631,30 @@ int id_fix_indent_line(int f) {
     return n;
 }
 
+int id_fix_ret_needs(int f, int e) {
+    int need;
+    need = 1;
+    if (((id_is_plain(e) == 1) && (id_fix_ret_narrows(f, e) == 0))) {
+        need = 0;
+    }
+    return need;
+}
+
+int id_fix_ret_narrows(int f, int e) {
+    char* rt;
+    int ok;
+    rt = id_s2_of(f);
+    ok = 0;
+    if (((id_bad_store(rt, e) == 0) && (id_fix_narrows(rt, e) == 1))) {
+        ok = 1;
+    }
+    return ok;
+}
+
 void id_fix_ret(int f) {
     int e;
     e = id_i1_of(f);
-    if (((e >= 0) && (id_is_plain(e) == 0))) {
+    if (((e >= 0) && (id_fix_ret_needs(f, e) == 1))) {
         id_fix_ret_at(f, e);
     }
     return;
@@ -19891,6 +19916,35 @@ char* id_tc_loc(int id) {
     return loc;
 }
 
+void id_fn_ret_type(int id) {
+    char* rt;
+    char* nm;
+    rt = id_s2_of(id);
+    if ((id_ty_is_func(rt) == 1)) {
+        nm = id_s1_of(id);
+        id_tc_err(id, id_concat(id_concat(id_concat(id_concat("'", nm), "' returns "), rt), "; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it"));
+    }
+    return;
+}
+
+void id_chk_ret_narrow(int id, char* t) {
+    char* s2_of_v;
+    s2_of_v = id_s2_of(id);
+    if ((id_ty_narrows(s2_of_v, t) == 1)) {
+        id_ret_narrow_err(id, t);
+    }
+    return;
+}
+
+void id_ret_narrow_err(int id, char* t) {
+    int i1_of_v;
+    char* msg;
+    i1_of_v = id_i1_of(id);
+    msg = id_ret_narrow_err_msg(id, t);
+    id_tc_err(i1_of_v, msg);
+    return;
+}
+
 char* id_ret_err_msg(int id, char* t) {
     char* s1_of_v;
     char* s2_of_v;
@@ -19901,23 +19955,37 @@ char* id_ret_err_msg(int id, char* t) {
     return msg;
 }
 
+char* id_ret_narrow_err_msg(int id, char* t) {
+    char* s1_of_v;
+    char* s2_of_v;
+    char* msg;
+    s1_of_v = id_s1_of(id);
+    s2_of_v = id_s2_of(id);
+    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("the return clause of '", s1_of_v), "' narrows "), t), " to "), s2_of_v), "; declare a "), s2_of_v), " local, assign it, and return that");
+    return msg;
+}
+
 void id_chk_retexpr(int id) {
-    if (((strcmp(id_s2_of(id), "void") != 0) && (id_i1_of(id) >= 0))) {
-        id_chk_ret2(id);
+    int e;
+    e = id_i1_of(id);
+    if (((strcmp(id_s2_of(id), "void") != 0) && (e >= 0))) {
+        id_chk_ret2(id, e);
     }
     id_fn_ret_type(id);
     return;
 }
 
-void id_chk_ret2(int id) {
-    int e;
+void id_chk_ret2(int id, int e) {
     char* s2_of_v;
     char* type_of_v;
-    e = id_i1_of(id);
+    char* type_of_v2;
     s2_of_v = id_s2_of(id);
     if ((id_bad_store(s2_of_v, e) == 1)) {
         type_of_v = id_type_of(e);
         id_ret_err(id, type_of_v);
+    } else {
+        type_of_v2 = id_type_of(e);
+        id_chk_ret_narrow(id, type_of_v2);
     }
     return;
 }
@@ -19928,17 +19996,6 @@ void id_ret_err(int id, char* t) {
     i1_of_v = id_i1_of(id);
     msg = id_ret_err_msg(id, t);
     id_tc_err(i1_of_v, msg);
-    return;
-}
-
-void id_fn_ret_type(int id) {
-    char* rt;
-    char* nm;
-    rt = id_s2_of(id);
-    if ((id_ty_is_func(rt) == 1)) {
-        nm = id_s1_of(id);
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat("'", nm), "' returns "), rt), "; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it"));
-    }
     return;
 }
 

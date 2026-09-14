@@ -1,0 +1,10 @@
+main(int argc, string[] argv) {
+  int a = grow(argc);
+  print(a);
+} return int 0;
+
+grow(int x) {
+  word w = x;
+  w = w * 3;
+  int ret_i = w;
+} return int ret_i;

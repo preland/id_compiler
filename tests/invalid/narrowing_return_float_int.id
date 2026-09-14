@@ -1,0 +1,12 @@
+// EXPECT: the return clause of 'trunc_it' narrows float to int; declare a int local, assign it, and return that
+// IDCPY-ACCEPTS
+// docs/SPEC.md 1. idc.py has no rule against this: it compiles the program
+// and returns the value with its fraction dropped.
+main(int argc, string[] argv) {
+  float f = 3.75;
+  int n = trunc_it(f);
+  print(n);
+} return int 0;
+
+trunc_it(float f) {
+} return int f;

@@ -1,0 +1,20 @@
+// The return clause narrows the same way an argument does (../call/args/
+// narrow.id): the type it declares is ns2, the value it hands back is ni1,
+// and ty_narrows judges the pair exactly as it judges a parameter and its
+// argument. The message lives with ret_err_msg (store/err.id), the other
+// diagnostic this same check can raise.
+
+chk_ret_narrow(int id, string t) {
+  string s2_of_v = s2_of(id);
+  if(ty_narrows(s2_of_v, t) == 1) {
+    ret_narrow_err(id, t);
+  }
+} return void;
+
+// Reported at the return expression, for the same reason ret_err is
+// (store/expr.id).
+ret_narrow_err(int id, string t) {
+  int i1_of_v = i1_of(id);
+  string msg = ret_narrow_err_msg(id, t);
+  tc_err(i1_of_v, msg);
+} return void;

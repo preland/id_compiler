@@ -1585,6 +1585,20 @@ grep -q "loud [12]" "$TMP/log" \
     && bad "bin/idc: passing cases that eprint keep it out of the build's output ($(tr '\n' '|' < "$TMP/log"))" \
     || ok "bin/idc: passing cases that eprint keep it out of the build's output"
 
+# --- return clause narrowing (docs/SPEC.md 1) -----------------------------------
+# The return clause narrows exactly as an argument does (tests/invalid/
+# narrowing_return_*.id cover the three rejected kinds). Widening the other
+# way is unaffected: an int returned as a wider word still builds with no
+# local needed to say so.
+cat > "$TMP/p.id" <<'EOF'
+widen(int n) {
+  word w = n;
+} return word w;
+(5):(5)
+(0):(0)
+EOF
+self_accept "bin/idc: a return clause that widens still builds" --emit-c /dev/null
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
