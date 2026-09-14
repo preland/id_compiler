@@ -462,17 +462,17 @@ once this compiler uses a construct on itself.
 | `fix_rcache_add` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | A call that cannot write is cached under its own text, so a later |
 | `fix_rcache_reset` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | fixd_rk, fixd_rn: the cached calls' text and the name each was given, this |
 | `fix_span_fixture3` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | The two token kinds fix_depth (out/span/beg/beg.id's fix_match) reads while |
-| `fix_rcache_find_at` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/at.id` |  |
-| `fix_rcache_find_at_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/at.id` |  |
-| `fix_rcache_find` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/find.id` | Only a call can be found -- a whole argument or a narrowed value is not a |
-| `fix_rcache_find_hit` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/find.id` | The call node fix_span_fixture (plan/walk/ev/push/one/ru.id) builds, with |
-| `fix_span_fixture1` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/find.id` | plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the |
-| `fix_name_pick` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/pick.id` | A name for event i: an earlier identical, still-trustworthy call's, if one |
-| `fix_name_pick_miss_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/pick.id` | fixe_n[0] as fix_pick_fixture_n (out/emit/name/pick/main/name2.id) already |
-| `fix_name_pick_miss_fixture2` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/find/pick.id` | A name for event i: an earlier identical, still-trustworthy call's, if one |
 | `fix_rkey` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/key.id` |  |
 | `fix_toktext` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/key.id` |  |
 | `fix_toktext_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/key.id` |  |
+| `fix_rcache_find_at` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/at.id` |  |
+| `fix_rcache_find_at_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/at.id` |  |
+| `fix_rcache_find` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/find.id` | Only a call can be found -- a whole argument or a narrowed value is not a |
+| `fix_rcache_find_hit` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/find.id` | The call node fix_span_fixture (plan/walk/ev/push/one/ru.id) builds, with |
+| `fix_span_fixture1` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/find.id` | plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the |
+| `fix_name_pick` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | A name for event i: an earlier identical, still-trustworthy call's, if one |
+| `fix_name_pick_miss_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | fixe_n[0] as fix_pick_fixture_n (out/emit/name/pick/main/name2.id) already |
+| `fix_name_pick_miss_fixture2` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | A name for event i: an earlier identical, still-trustworthy call's, if one |
 | `fix_stem` | `compiler/parse/mid/form/fix/out/emit/name/pick/stem.id` | The tree's convention: a call's value is <callee>_v. A value that is not a |
 | `fix_stem2` | `compiler/parse/mid/form/fix/out/emit/name/pick/stem.id` | The tree's convention: a call's value is <callee>_v. A value that is not a |
 | `fix_emit_r` | `compiler/parse/mid/form/fix/out/emit/resid/rec.id` |  |

@@ -1755,11 +1755,11 @@ char* id_fix_pick_name2(int i, char* t, char* an);
 char* id_fix_pick(int i);
 void id_fix_rcache_add(int i, char* name);
 void id_fix_rcache_reset(void);
+char* id_fix_rkey(int e);
+char* id_fix_toktext(int tok0, int tok1);
 char* id_fix_rcache_find_at(int ix);
 char* id_fix_rcache_find(int i);
 char* id_fix_name_pick(int i);
-char* id_fix_rkey(int e);
-char* id_fix_toktext(int tok0, int tok1);
 char* id_fix_stem(int e);
 char* id_fix_stem2(int e);
 void id_fix_emit_r(int e, char* text);
@@ -14519,6 +14519,28 @@ void id_fix_rcache_reset(void) {
     return;
 }
 
+char* id_fix_rkey(int e) {
+    int b;
+    int c;
+    char* key;
+    b = id_fix_nbeg(e);
+    c = id_fix_nend(e);
+    key = id_fix_toktext(b, c);
+    return key;
+}
+
+char* id_fix_toktext(int tok0, int tok1) {
+    char* s;
+    int toki;
+    s = "";
+    toki = tok0;
+    while ((toki <= tok1)) {
+        s = id_concat(id_concat(s, "|"), (char*)(intptr_t)(id_list_get(ttext, toki)));
+        toki = (toki + 1);
+    }
+    return s;
+}
+
 char* id_fix_rcache_find_at(int ix) {
     char* name;
     name = "";
@@ -14553,28 +14575,6 @@ char* id_fix_name_pick(int i) {
         id_lset(fixe_ru, i, 1);
     }
     return name;
-}
-
-char* id_fix_rkey(int e) {
-    int b;
-    int c;
-    char* key;
-    b = id_fix_nbeg(e);
-    c = id_fix_nend(e);
-    key = id_fix_toktext(b, c);
-    return key;
-}
-
-char* id_fix_toktext(int tok0, int tok1) {
-    char* s;
-    int toki;
-    s = "";
-    toki = tok0;
-    while ((toki <= tok1)) {
-        s = id_concat(id_concat(s, "|"), (char*)(intptr_t)(id_list_get(ttext, toki)));
-        toki = (toki + 1);
-    }
-    return s;
 }
 
 char* id_fix_stem(int e) {
