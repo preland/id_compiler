@@ -1,0 +1,23 @@
+// The LLVM target's initialiser for list constants (dce/export/consts.id):
+// `define internal void @idc_const_init()`, written out as text beside the
+// globals it stores into, the way the C-ABI entry point is. Two walks over
+// the constants: the bytes of every string element first, which are globals
+// and cannot sit inside a function, then the function that builds each list
+// and stores it.
+
+ll_const_init() {
+  if(list_consts_kept() > 0) {
+    ll_init_fn();
+  }
+} return void;
+
+ll_init_fn() {
+  ll_init_each("bytes");
+  emit_line("define internal void @idc_const_init() {\nentry:");
+  ll_init_rest();
+} return void;
+
+ll_init_rest() {
+  ll_init_each("build");
+  emit_line("  ret void\n}");
+} return void;

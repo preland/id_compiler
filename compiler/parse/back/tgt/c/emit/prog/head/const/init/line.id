@@ -1,0 +1,22 @@
+// One list constant built: `name = id_list_lit(...);`, the list literal as the
+// C target spells any other, then locked -- docs/SPEC.md 8's "cannot mutate a
+// constant list" trap, from the moment the constant exists.
+
+init_line_kept(int i) {
+  if(is_list_const(i) == 1) {
+    string name = (import enames)[i];
+    init_line_emit(name);
+  }
+} return void;
+
+init_line_emit(string name) {
+  string s = init_line(name);
+  emit_line(s);
+  emit_line("    id_list_lock(" + name + ");");
+} return void;
+
+init_line(string name) {
+  int d = const_decl(name);
+  int i1_of_v = i1_of(d);
+  string ret_s = "    " + name + " = " + emit_expr(i1_of_v) + ";";
+} return string ret_s;

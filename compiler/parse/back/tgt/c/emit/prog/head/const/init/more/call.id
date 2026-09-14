@@ -1,0 +1,14 @@
+// The calls that run idc_const_init: the first statement of id_main, and of
+// every test case's function, since each case runs in a process of its own.
+
+emit_main_init(int id) {
+  if(s1_of(id) == "main") {
+    emit_init_call();
+  }
+} return void;
+
+emit_init_call() {
+  if(list_consts_kept() > 0) {
+    emit_line("    idc_const_init();");
+  }
+} return void;

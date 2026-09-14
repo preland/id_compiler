@@ -14,7 +14,6 @@ emit_def_body(int id) {
 } return void;
 
 emit_tail(int id) {
-  int[] l2_of_v = l2_of(id);
-  emit_block(l2_of_v, "    ");
-  emit_tail_end(id);
+  emit_main_init(id);
+  emit_tail2(id);
 } return void;

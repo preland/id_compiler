@@ -1,0 +1,24 @@
+// The instruction that makes a string or a float element a cell, and the name
+// it defines: a string is its bytes' address as an integer, a float its bit
+// pattern, through the runtime's own id_box_f.
+
+ll_cell_named(int i, int j, int e, string t) {
+  string nm = "%s" + i + "." + j;
+  string insn = ll_cell_line(i, j, e, t);
+  emit_line("  " + nm + " = " + insn);
+} return string nm;
+
+ll_cell_line(int i, int j, int e, string t) {
+  string insn = "ptrtoint ptr @.cs." + (import enames)[i] + "." + j + " to i64";
+  if(t == "float") {
+    insn = "call i64 @id_box_f(double " + s1_of(e) + ")";
+  }
+} return string insn;
+
+// The finished list, once every element is pushed: stored into the global it
+// is a constant of, then locked (glob/init/each.id's ll_init_build), so a
+// mutation through it traps from here on (docs/SPEC.md 8).
+ll_init_store(int i) {
+  emit_line("  store ptr %c" + i + ", ptr @" + (import enames)[i]);
+  emit_line("  call void @id_list_lock(ptr %c" + i + ")");
+} return void;

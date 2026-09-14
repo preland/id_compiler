@@ -1,0 +1,23 @@
+// The C target's initialiser for list constants (dce/export/consts.id says
+// why there is one): `static void idc_const_init(void)`, one assignment per
+// kept list constant, emitted after the exported globals it assigns.
+
+emit_const_init() {
+  if(list_consts_kept() > 0) {
+    emit_init_fn();
+  }
+} return void;
+
+emit_init_fn() {
+  emit_line("static void idc_const_init(void) {");
+  init_lines();
+  emit_line("}");
+} return void;
+
+init_lines() {
+  int i = 0;
+  while(i < len((import enames))) {
+    init_line_kept(i);
+    i = i + 1;
+  }
+} return void;

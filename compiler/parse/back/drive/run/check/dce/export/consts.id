@@ -1,0 +1,24 @@
+// The list constants that survive emission.
+//
+// A scalar constant is a static initialiser. A list cannot be: building one
+// allocates, which is work, and work runs in a function. So a build with a
+// kept list constant has one initialiser that builds them all, in conf.id
+// order, and every entry point calls it before anything else runs --
+// id_main's first statement on every target, and a test case's first
+// statement in the harness, where each case is a process of its own.
+
+is_list_const(int i) {
+  int ok = 0;
+  if((import eowners)[i] == "conf.id" && ty_is_list((import etypes)[i]) == 1) {
+    ok = keep_export(i);
+  }
+} return int ok;
+
+list_consts_kept() {
+  int n = 0;
+  int i = 0;
+  while(i < len((import enames))) {
+    n = n + is_list_const(i);
+    i = i + 1;
+  }
+} return int n;

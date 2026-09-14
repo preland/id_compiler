@@ -1,0 +1,25 @@
+// One walk over the kept list constants, and one constant built: a fresh list,
+// each element pushed as a cell, the list stored into the global.
+
+ll_init_each(string pass) {
+  int i = 0;
+  while(i < len((import enames))) {
+    ll_init_one(i, pass);
+    i = i + 1;
+  }
+} return void;
+
+ll_init_one(int i, string pass) {
+  if(is_list_const(i) == 1 && pass == "bytes") {
+    ll_init_elems(i, pass);
+  }
+  if(is_list_const(i) == 1 && pass == "build") {
+    ll_init_build(i);
+  }
+} return void;
+
+ll_init_build(int i) {
+  emit_line("  %c" + i + " = call ptr @id_list_new()");
+  ll_init_elems(i, "build");
+  ll_init_store(i);
+} return void;

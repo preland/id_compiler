@@ -1,9 +1,11 @@
 // Before the call: the case's setup, if it has one, then its arguments. The
 // setup runs first because an argument may be `(import NAME)`, which holds
 // nothing until the setup has run, and both come before the counters are
-// zeroed, so a constraint counts only the call under test.
+// zeroed, so a constraint counts only the call under test. Ahead of both, the
+// list constants are built, as id_main builds them in the program.
 
 emit_case_pre(int ci) {
+  emit_init_call();
   emit_case_given(ci);
   emit_case_args(ci);
 } return void;

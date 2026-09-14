@@ -5,6 +5,7 @@ emit_exports() {
   if(len((import enames)) > 0) {
     emit_export_block();
   }
+  emit_const_init();
 } return void;
 
 emit_export_block() {

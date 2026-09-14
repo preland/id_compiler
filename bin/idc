@@ -620,11 +620,6 @@ seen_dep() { # seen_dep RESOLVED -- true if already visited
 CONST_ROOTS=()
 CONST_AT=()
 
-# Every list-typed constant declaration seen while reading a conf.id, as
-# "name|type|manifest:lineno" -- see the list-constant comment in
-# read_manifest for why this is not refused on the spot.
-LIST_CONST_AT=()
-
 # seen_const_root RESOLVED -- true if its constants are already taken.
 seen_const_root() {
     local d
@@ -670,7 +665,7 @@ read_manifest() {
     # an unset `root` -- which under `set -u` is a hard error, not an empty
     # string.
     local root="$1" mode="${2:-}" lineno=0 line trimmed dep deppath manifest seen_const=0
-    local root_key taken=0 name type at up
+    local root_key taken=0 name at up
     manifest="$root/conf.id"
     [ -f "$manifest" ] || return 0
     root_key="$(cd "$root" && pwd -P)"
@@ -692,22 +687,6 @@ read_manifest() {
             seen_const=1
             [ "$taken" -eq 1 ] && continue
             name=$(printf '%s' "$trimmed" | sed -E 's/^[a-z]+(\[\])?[[:space:]]+([A-Za-z_][A-Za-z0-9_]*).*/\2/')
-            # A list has reference semantics -- lset/push through (import name)
-            # would make a "constant" mutable, and neither the C nor the LLVM
-            # target can spell a heap-allocated list as a static/global
-            # initialiser (id_list_lit is a runtime allocator, not a constant
-            # expression). Not rejected here: a backend.id is checked by being
-            # read as a conf.id under --fingerprints (tests/backends.sh), which
-            # stops before any C is emitted and every list-typed field of a
-            # real backend.id must still parse and type-check. So this only
-            # records the real conf.id path and line, in LIST_CONST_AT; the
-            # build refuses -- unless it is a --fingerprints or
-            # --list-untested run, which never reaches emission either -- once
-            # every manifest has been read (see LIST_CONST_AT, below).
-            type=$(printf '%s' "$trimmed" | sed -E 's/^([a-z]+(\[\])?)[[:space:]]+.*/\1/')
-            case "$type" in
-            *'[]') LIST_CONST_AT+=("$name|$type|$manifest:$lineno") ;;
-            esac
             if at=$(const_declared_at "$name"); then
                 echo "$manifest:$lineno: error: constant '$name' is already declared at $at; a constant has one home -- rename one of them" >&2
                 STRUCT_VIOLATIONS=1
@@ -829,21 +808,6 @@ if [ -n "$STDLIB" ]; then
         collect_ids "$STDLIB"
         walk_deps "$STDLIB"
     fi
-fi
-
-# A list-typed conf.id constant type-checks fine (id_list_lit is an ordinary
-# call, and its list type-checks against the declaration like any other) --
-# what it cannot do is reach the C or LLVM target's constant emitter, which
-# spells every conf.id constant as a file-scope initialiser and has no way to
-# spell a heap-allocated list as one. --fingerprints and --list-untested never
-# reach that emitter (see PARSE_ARGS, below), so only an actual build refuses.
-if [ "${#LIST_CONST_AT[@]}" -gt 0 ] && [ "$FINGERPRINTS" -eq 0 ] && [ "$LIST_UNTESTED" -eq 0 ]; then
-    for entry in "${LIST_CONST_AT[@]}"; do
-        name="${entry%%|*}"; rest="${entry#*|}"
-        type="${rest%%|*}"; at="${rest#*|}"
-        echo "$at: error: '$name' is a list constant; conf.id constants may not be lists -- a list is mutable, heap-allocated state with no constant form in C or LLVM. Write a function that returns '$type' and builds the list fresh each call instead (docs/SPEC.md §7.2)." >&2
-    done
-    exit 1
 fi
 
 # One global sort over every source file, project and dependencies together,

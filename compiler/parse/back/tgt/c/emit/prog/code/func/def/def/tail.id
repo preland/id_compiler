@@ -4,6 +4,12 @@ emit_tail_end(int id) {
   emit_line("}");
 } return void;
 
+emit_tail2(int id) {
+  int[] l2_of_v = l2_of(id);
+  emit_block(l2_of_v, "    ");
+  emit_tail_end(id);
+} return void;
+
 // `c_rettype id_NAME(params)`
 sig(int id) {
   string s2_of_v = s2_of(id);

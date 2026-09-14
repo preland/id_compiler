@@ -308,95 +308,109 @@ else
     echo "SKIP: conf.id constants on --target llvm (needs clang on PATH)"
 fi
 
-# (b2-list) list-typed conf.id constants are rejected at the conf.id declaration
-#           with a clear diagnostic. A list is mutable, heap-allocated state with
-#           no constant form in C or LLVM, and this check prevents miscompilation
-#           on both targets and the test harness. bin/idc only.
+# (b2-list) a conf.id constant may be a list (docs/PROJECT.md 5): read by
+#           index and by len in a built program, and the same program's own
+#           test cases -- each case a process of its own, so the constant has
+#           to be built again for every one -- pass under the harness.
 cat > "$proj/conf.id" <<'EOF'
-string[] names = ["a","b"];
-int count = 2;
+string[] names = ["a", "b", "c"];
 EOF
 cat > "$proj/main.id" <<'EOF'
+name_at(int i) {
+  string s = (import names)[i];
+} return string s;
+(0):("a")
+(2):("c")
+
+count_plus(int extra) {
+  int n = len((import names)) + extra;
+} return int n;
+(0):(3)
+(1):(4)
+
 main(int argc, string[] argv) {
   print((import names)[0]);
-  print((import count));
+  print((import names)[2]);
 } return int 0;
+(1, ["p"]):(0)
+(2, ["p", "x"]):(0)
 EOF
-rm -f "$TMP/list_const.bin"
-if $BIN_IDC "$proj" -o "$TMP/list_const.bin" 2>&1 \
-   | grep -q "$proj/conf.id:1: error: 'names' is a list constant"; then
-    ok "conf.id: a list constant is rejected with a diagnostic naming the real conf.id line"
+if $BIN_IDC "$proj" -o "$TMP/lconst.bin" >/dev/null 2>&1 \
+   && [ "$("$TMP/lconst.bin")" = "$(printf 'a\nc')" ]; then
+    ok "conf.id: a list constant is read by index in a built program"
 else
-    bad "conf.id: a list constant is rejected with a diagnostic naming the real conf.id line"
+    bad "conf.id: a list constant is read by index in a built program"
 fi
-# 'names' is never registered, so the (import names) reading it is the
-# ordinary "no exported variable" error, and no binary comes out -- the whole
-# reason for catching this at conf.id rather than merely warning about it.
-if [ ! -e "$TMP/list_const.bin" ]; then
-    ok "conf.id: a list constant that is used leaves no binary behind"
-else
-    bad "conf.id: a list constant that is used leaves no binary behind"
-fi
+# The build above only succeeds if every case in main.id passed, which is the
+# harness proof: each of name_at's and count_plus's two cases, and main's own
+# two, ran in its own process and read (import names) built fresh.
 
-# And whether or not the rest of the project still builds (an unused list
-# constant is a manifest error but not a use-site one -- the driver still
-# links what it can, matching every other STRUCT_VIOLATIONS case), the crash
-# this guards against -- id_list_lit(...) as a file-scope C initialiser --
-# can never appear, because the rejected constant never reaches emit_sources.
-rm -f "$TMP/list_const.c"
-$BIN_IDC "$proj" -o "$TMP/list_const.bin" --emit-c "$TMP/list_const.c" >/dev/null 2>&1
-if [ ! -f "$TMP/list_const.c" ] || ! grep -q 'IdList\* names = id_list_lit' "$TMP/list_const.c"; then
-    ok "conf.id: a rejected list constant is never emitted as a broken static initialiser"
-else
-    bad "conf.id: a rejected list constant is never emitted as a broken static initialiser"
-fi
-
-# test with an int[] constant as well.
-cat > "$proj/conf.id" <<'EOF'
-int[] table = [1,2,3];
-EOF
-if $BIN_IDC "$proj" -o "$TMP/list_const.bin" 2>&1 \
-   | grep -q "is a list constant"; then
-    ok "conf.id: an int[] constant is rejected with a diagnostic"
-else
-    bad "conf.id: an int[] constant is rejected with a diagnostic"
-fi
-
-# same rejection when the list constant would be read inside a test case.
-cat > "$proj/conf.id" <<'EOF'
-string[] names = ["a","b"];
-EOF
-cat > "$proj/main.id" <<'EOF'
-test_use() {
-  string s = (import names)[0];
-} return string s;
-("x"):("x")
-EOF
-if $BIN_IDC "$proj" -o "$TMP/list_const.bin" 2>&1 \
-   | grep -q "is a list constant"; then
-    ok "conf.id: a list constant in a test case is rejected at the conf.id line"
-else
-    bad "conf.id: a list constant in a test case is rejected at the conf.id line"
-fi
-
-# and the same rejection holds for --target llvm.
+# and the same list constant reaches the LLVM target.
 if command -v clang >/dev/null 2>&1; then
-    cat > "$proj/conf.id" <<'EOF'
-int[] table = [1,2,3];
-EOF
     cat > "$proj/main.id" <<'EOF'
 main(int argc, string[] argv) {
-  print(0);
+  print((import names)[0]);
+  print((import names)[2]);
 } return int 0;
 EOF
-    if $BIN_IDC "$proj" --target llvm -o "$TMP/list_const_ll.bin" 2>&1 \
-       | grep -q "is a list constant"; then
-        ok "conf.id: a list constant is rejected on --target llvm"
+    if $BIN_IDC "$proj" --target llvm -o "$TMP/lconst_ll.bin" >/dev/null 2>&1 \
+       && [ "$("$TMP/lconst_ll.bin")" = "$(printf 'a\nc')" ]; then
+        ok "conf.id: a list constant is read by index on --target llvm"
     else
-        bad "conf.id: a list constant is rejected on --target llvm"
+        bad "conf.id: a list constant is read by index on --target llvm"
     fi
 else
-    echo "SKIP: conf.id list constant rejection on --target llvm (needs clang on PATH)"
+    echo "SKIP: conf.id list constant on --target llvm (needs clang on PATH)"
+fi
+
+# `push`/`pop` straight on `(import names)` is caught at the call, naming the
+# constant -- the case an alias cannot be caught in (below), so this is worth
+# catching separately rather than leaving every mutation to the runtime trap.
+cat > "$proj/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  push((import names), "z");
+} return int 0;
+EOF
+if $BIN_IDC "$proj" -o "$TMP/lconst.bin" 2>&1 \
+   | grep -q "'push' cannot mutate 'names', a list constant"; then
+    ok "conf.id: push directly on a list constant is a compile error naming it"
+else
+    bad "conf.id: push directly on a list constant is a compile error naming it"
+fi
+
+# An alias type-checks -- xs is an ordinary local -- so the mutation through it
+# cannot be caught here; it traps at run time instead, the moment idc_const_init
+# has locked the list, with docs/SPEC.md 8's message.
+cat > "$proj/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  string[] xs = (import names);
+  push(xs, "z");
+} return int 0;
+EOF
+out=$($BIN_IDC "$proj" -o "$TMP/lconst.bin" 2>&1 && "$TMP/lconst.bin" 2>&1)
+if printf '%s' "$out" | grep -q "id: cannot mutate a constant list"; then
+    ok "conf.id: mutating a list constant through an alias traps at run time"
+else
+    bad "conf.id: mutating a list constant through an alias traps at run time"
+fi
+
+# A function whose whole job is to build and return a list literal is the same
+# complaint as one that returns a scalar literal (docs/SPEC.md 7.2): the list
+# now has a legitimate home in conf.id, so the function is a veiled constant.
+cat > "$proj/main.id" <<'EOF'
+bad_names() {
+  int[] out = [1, 2, 3];
+} return int[] out;
+
+main(int argc, string[] argv) {
+  print((import names)[0]);
+} return int 0;
+EOF
+if $BIN_IDC "$proj" -o "$TMP/lconst.bin" 2>&1 \
+   | grep -q "'bad_names' only returns the constant \[1, 2, 3\]; declare it in conf.id as 'int\[\] bad_names = \[1, 2, 3\];'"; then
+    ok "a function that only builds and returns a list literal is rejected"
+else
+    bad "a function that only builds and returns a list literal is rejected"
 fi
 
 # (b3) a subdirectory imported on its own reads the constants of its enclosing

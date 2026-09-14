@@ -1,0 +1,22 @@
+// The elements of list constant `i`, each visited for the walk `pass` names.
+
+ll_init_elems(int i, string pass) {
+  int d = const_decl((import enames)[i]);
+  int e = i1_of(d);
+  ll_init_elems2(i, e, pass);
+} return void;
+
+ll_init_elems2(int i, int e, string pass) {
+  int[] els = l1_of(e);
+  int j = 0;
+  while(j < len(els)) {
+    ll_init_elem(i, j, els[j], pass);
+    j = j + 1;
+  }
+} return void;
+
+// A string element's bytes, named for the constant and the position.
+ll_elem_bytes(int i, int j, int e) {
+  string spell = s1_of(e);
+  ll_str_bytes("@.cs." + (import enames)[i] + "." + j, spell);
+} return void;

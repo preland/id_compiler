@@ -6,6 +6,17 @@ lw_func_mid(int node, string ty, string name) {
 } return void;
 
 lw_func_tail(int node) {
+  lw_main_init(node);
   lw_locals(node);
   lw_fin(node);
+} return void;
+
+// id_main's first instruction builds the list constants
+// (dce/export/consts.id), on every LLVM build: hosted, where the C-ABI main
+// calls id_main, and freestanding, where the boot code jumps to it.
+lw_main_init(int node) {
+  if(s1_of(node) == "main" && list_consts_kept() > 0) {
+    int[] none = [];
+    lw_callf("idc_const_init", "", none);
+  }
 } return void;
