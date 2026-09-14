@@ -1,0 +1,28 @@
+// A func node whose declared return type does not narrow the value it hands
+// back. ret_widens_fn pairs a `word` declaration with an `int` value (a
+// widening store); ret_nonplain_fn keeps ../narrows.id's narrowing pair but
+// swaps the value for one fix_ret_needs's is_plain does not accept, so the
+// narrowing check it guards is never reached.
+
+ret_widens_val() {
+  env_init();
+  int e = newleaf("int", 5, 0, "5", "");
+  export int widen_e = e;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+ret_widens_fn() {
+  ret_widens_val();
+  int[] none = [];
+  export int widen_f = node_func("f", "word", none, none, (import widen_e));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+ret_nonplain_fn() {
+  ret_narrows_fn();
+  export int nonplain_e = newleaf("bin", 0, 0, "", "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
