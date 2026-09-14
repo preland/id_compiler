@@ -1,0 +1,26 @@
+// Whether a plain return clause (ret.id's fix_ret) still needs the rewrite:
+// not for its shape, but because the type it names narrows the value it
+// hands back (docs/SPEC.md 1) -- the same repair chk_ret_narrow (mid/types/
+// check/expr/more/want/ret/narrow.id) reports as an error.
+fix_ret_needs(int f, int e) {
+  int need = 1;
+  if(is_plain(e) == 1 && fix_ret_narrows(f, e) == 0) {
+    need = 0;
+  }
+} return int need;
+given ret_narrows_fn ((import narrow_f), (import narrow_e)):(1)
+given ret_same_fn ((import same_f), (import widen_e)):(0)
+given ret_nonplain_fn ((import narrow_f), (import nonplain_e)):(1)
+
+// The same guard fix_narrow uses (plan/walk/kind/narrow/narrow.id), and the
+// same fix_narrows it judges the narrowing with -- a return clause narrows
+// exactly as an argument does.
+fix_ret_narrows(int f, int e) {
+  string rt = s2_of(f);
+  int ok = 0;
+  if(bad_store(rt, e) == 0 && fix_narrows(rt, e) == 1) {
+    ok = 1;
+  }
+} return int ok;
+given ret_narrows_fn ((import narrow_f), (import narrow_e)):(1)
+given ret_widens_fn ((import widen_f), (import widen_e)):(0)

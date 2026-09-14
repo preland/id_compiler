@@ -1,0 +1,11 @@
+// A func node declaring exactly the type its value already has: `int`
+// declared, ../widens.id's `int` value reused unchanged. Neither a narrowing
+// nor a widening store, for fix_ret_needs's "nothing to rewrite" case.
+
+ret_same_fn() {
+  ret_widens_fn();
+  int[] none = [];
+  export int same_f = node_func("f", "int", none, none, (import widen_e));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

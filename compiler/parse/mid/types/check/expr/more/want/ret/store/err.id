@@ -1,0 +1,11 @@
+ret_err_msg(int id, string t) {
+  string s1_of_v = s1_of(id);
+  string s2_of_v = s2_of(id);
+  string msg = "function '" + s1_of_v + "' returns " + s2_of_v + " but the expression has type " + t;
+} return string msg;
+
+ret_narrow_err_msg(int id, string t) {
+  string s1_of_v = s1_of(id);
+  string s2_of_v = s2_of(id);
+  string msg = "the return clause of '" + s1_of_v + "' narrows " + t + " to " + s2_of_v + "; declare a " + s2_of_v + " local, assign it, and return that";
+} return string msg;

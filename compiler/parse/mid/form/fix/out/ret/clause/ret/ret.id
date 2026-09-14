@@ -1,9 +1,10 @@
-// A return clause that is not a name or a literal: its value is declared as
-// the body's last statement, which runs exactly where the clause did, and the
-// clause returns the name -- ret_i, ret_s, ret_li, the tree's own names.
+// A return clause that is not a name or a literal, or one that is but
+// narrows (docs/SPEC.md 1, narrow.id): either way its value is declared as
+// the body's last statement, which runs exactly where the clause did, and
+// the clause returns the name -- ret_i, ret_s, ret_li, the tree's own names.
 fix_ret(int f) {
   int e = i1_of(f);
-  if(e >= 0 && is_plain(e) == 0) {
+  if(e >= 0 && fix_ret_needs(f, e) == 1) {
     fix_ret_at(f, e);
   }
 } return void;
