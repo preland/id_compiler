@@ -70,13 +70,10 @@ check_output() {
 # pass: what is being checked is that the two compilers AGREE, and agreeing to
 # refuse is agreement. What would fail is one building and the other not.
 #
-# fsdemo is the exception, and not swept: its conf.id attaches backends/fs,
-# which idc.py can no longer link -- it reads backend.json, which backend.id
-# replaced, and idc.py is being retired and will not change. bin/idc's build
-# and run of it are checked in backends.sh.
+# The native backends are the standard library's, so a demo that calls one --
+# fsdemo and the graphics demos -- is one of those refusals.
 for prog in ../../demos/*/; do
     name=$(basename "$prog")
-    [ "$name" = fsdemo ] && continue
     $IDC     "$prog" -o "$TMP/sweep_py"   >/dev/null 2>&1; py=$?
     $BIN_IDC "$prog" -o "$TMP/sweep_self" >/dev/null 2>&1; self=$?
     if [ "$py" -eq "$self" ]; then
@@ -166,8 +163,7 @@ fi
 #     idstd that holds `given` cases, so its leg here (which asserted nothing
 #     but that it ran) is gone.
 for prog in ../../demos/gfxdemo; do
-    be=../backends/gfx
-    if ! env -u IDC_NO_STD $BIN_IDC "$prog" --backend "$be" --emit-c "$TMP/be_self.c" >/dev/null 2>&1; then
+    if ! env -u IDC_NO_STD $BIN_IDC "$prog" --emit-c "$TMP/be_self.c" >/dev/null 2>&1; then
         bad "backend emit-c: bin/idc failed on $prog"
         continue
     fi
@@ -438,7 +434,8 @@ fi
 # once put another flag ahead of --triple whenever a backend was attached, and
 # the positional read this replaced then kept the default triple: the build
 # below silently produced an x86_64 binary and reported success.
-if $BIN_IDC "$TMP/asm.id" --backend ../backends/fs --triple aarch64-unknown-linux-gnu \
+mkdir -p "$TMP/tb" && printf 'string name = "tb";\n' > "$TMP/tb/backend.id"
+if $BIN_IDC "$TMP/asm.id" --backend "$TMP/tb" --triple aarch64-unknown-linux-gnu \
      -o "$TMP/asm3.bin" 2>&1 \
    | grep -q "no 'asm' definition of 'dbl' for target 'aarch64-unknown-linux-gnu'" \
    && [ ! -f "$TMP/asm3.bin" ]; then

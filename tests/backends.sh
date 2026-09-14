@@ -30,6 +30,27 @@ cd "$(dirname "$0")"
 ROOT=".."
 ORG="../.."
 ABS_ROOT=$(cd "$ROOT" && pwd)   # for the checks that build from another cwd
+# The native backends live in the standard library, inside the modules that
+# wrap them, so the checks of the real ones find it the way the compilers do.
+STD="${IDSTD_HOME:-}"
+if [ -z "$STD" ]; then
+    for up in "$ABS_ROOT/../idstd" "$ABS_ROOT/../../idstd"; do
+        [ -d "$up" ] && { STD="$up"; break; }
+    done
+fi
+if [ -n "$STD" ] && [ -d "$STD" ]; then STD=$(cd "$STD" && pwd -P); else STD=""; fi
+if [ -z "$STD" ]; then
+    echo "SKIP: backends.sh (the backends are idstd's, and no idstd was found; set IDSTD_HOME)"
+    exit 0
+fi
+# be_abs NAME -- the directory of one of idstd's backends.
+be_abs() {
+    case "$1" in
+        fs)     printf '%s' "$STD/sys/io/fs" ;;
+        proc|sock) printf '%s' "$STD/sys/io/ipc/$1" ;;
+        gfx|gl) printf '%s' "$STD/sys/win/$1" ;;
+    esac
+}
 # bin/idc takes --allow-untested throughout: none of the programs built here has
 # test cases, and what is under test is the backends. It is part of the word so
 # the loops below run both compilers as before; idc.py has no such flag.
@@ -47,19 +68,19 @@ skip() { echo "SKIP: $1"; }
 # be impossible without a display budget -- does a backend link, does the
 # extern block resolve, do both compilers agree -- are all answerable here.
 fsout="$TMP/fs"
-if cc -O2 -c "$ROOT/backends/fs/fs_posix.c" -I"$ROOT/backends/fs" -o "$TMP/fs.o" 2>"$TMP/fs.err"; then
-    ok "backends/fs/fs_posix.c compiles"
+if cc -O2 -c "$(be_abs fs)/fs_posix.c" -I"$(be_abs fs)" -o "$TMP/fs.o" 2>"$TMP/fs.err"; then
+    ok "sys/io/fs/fs_posix.c compiles"
 else
-    bad "backends/fs/fs_posix.c compiles ($(head -1 "$TMP/fs.err"))"
+    bad "sys/io/fs/fs_posix.c compiles ($(head -1 "$TMP/fs.err"))"
 fi
 
-# The demo attaches the backend through its own conf.id, so no --backend
-# flag: the id-native path is the one under test.
+# The demo names no backend: fs is the standard library's, so the demo is built
+# the way a user builds it, with idstd and no --backend flag or conf.id line.
 #
 # idc.py no longer builds a backend here, nor in the two checks after this one.
 # It reads backend.json, which backend.id replaced, and idc.py is being retired
-# and will not change: without the file it merges backends/fs as plain source
-# and stops at the 3-entries rule, which backend.id is exempt from.
+# and will not change: it cannot parse the standard library, and it counts a
+# backend.id toward the 3-entries rule, which bin/idc exempts it from.
 expected='wrote 44 bytes to fsdemo.txt (close 0)
 read 44 bytes back (close 0):
 the quick brown fox
@@ -70,7 +91,7 @@ removed fsdemo.txt (rc 0), exists now 0
 reopening it gives -1, errno 2'
 for c in "$BIN_IDC"; do
     name=$(basename "${c%% *}")
-    if ! $c "$ORG/demos/fsdemo" -o "$fsout.$name" >"$TMP/fs.build" 2>&1; then
+    if ! env -u IDC_NO_STD $c "$ORG/demos/fsdemo" -o "$fsout.$name" >"$TMP/fs.build" 2>&1; then
         bad "fsdemo builds with $name"; continue
     fi
     got=$(cd "$TMP" && "$fsout.$name" 2>&1)
@@ -81,16 +102,16 @@ for c in "$BIN_IDC"; do
     fi
 done
 
-# Naming one backend twice -- --backend *and* conf.id, the two documented
-# ways -- used to compile its sources twice and hand cc the same object file
-# twice: "multiple definition" for every symbol it exports.
+# Reaching one backend twice -- found in the library *and* named by --backend
+# -- used to compile its sources twice and hand cc the same object file twice:
+# "multiple definition" for every symbol it exports.
 for c in "$BIN_IDC"; do
     name=$(basename "${c%% *}")
-    if $c "$ORG/demos/fsdemo" --backend "$ROOT/backends/fs" -o "$fsout.dup.$name" \
+    if env -u IDC_NO_STD $c "$ORG/demos/fsdemo" --backend "$(be_abs fs)" -o "$fsout.dup.$name" \
          >"$TMP/fs.dup" 2>&1; then
-        ok "a backend named by both --backend and conf.id links once ($name)"
+        ok "a backend found in the library and named by --backend links once ($name)"
     else
-        bad "a backend named by both --backend and conf.id links once ($name): $(grep -m1 -i 'multiple definition\|error' "$TMP/fs.dup" | cut -c1-90)"
+        bad "a backend found in the library and named by --backend links once ($name): $(grep -m1 -i 'multiple definition\|error' "$TMP/fs.dup" | cut -c1-90)"
     fi
 done
 
@@ -105,7 +126,7 @@ b.id
 sub/'
 for c in "$BIN_IDC"; do
     name=$(basename "${c%% *}")
-    if ! $c "$ROOT/tests/fixtures/lsdemo" -o "$fsout.ls.$name" >"$TMP/ls.build" 2>&1; then
+    if ! env -u IDC_NO_STD $c "$ROOT/tests/fixtures/lsdemo" -o "$fsout.ls.$name" >"$TMP/ls.build" 2>&1; then
         bad "lsdemo builds with $name ($(head -1 "$TMP/ls.build"))"; continue
     fi
     got=$(cd "$TMP" && "$fsout.ls.$name" 2>&1)
@@ -121,7 +142,7 @@ done
 # is the order the one-name-one-type rule reports collisions in, so a walk that
 # ordered them differently would make the compiler disagree with itself about
 # which file to blame.
-if $BIN_IDC "$ROOT/driver" -o "$TMP/idsrc" >"$TMP/drv.build" 2>&1; then
+if env -u IDC_NO_STD $BIN_IDC "$ROOT/driver" -o "$TMP/idsrc" >"$TMP/drv.build" 2>&1; then
     ok "driver/ builds"
     for tree in "$ROOT/compiler" "$ORG/editor"; do
         want=$(find "$tree" -mindepth 1 \( -type d -name '.*' -prune \) -o \
@@ -145,9 +166,9 @@ fi
 # -- proc: a child process id can start, read from, wait for and kill ------
 # Deliberately above the X11 gate below, like fs: this is fork/pipe/waitpid,
 # so it needs nothing but a shell. This is the seam tools/qmon is written
-# against (idc/backends/proc/README.md).
+# against (idstd's sys/io/ipc/proc/README.md).
 procdir="$TMP/proc"; mkdir -p "$procdir/out"
-printf 'import "%s"\n' "$(cd "$ROOT/backends/proc" && pwd)" > "$procdir/conf.id"
+printf 'import "%s"\n' "$(be_abs proc)" > "$procdir/conf.id"
 cat > "$procdir/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int h = proc_spawn("sh\n-c\necho hi");
@@ -216,7 +237,7 @@ fi
 # killed by SIGKILL (128 + 9 = 137) rather than hanging until the sleep itself
 # would have finished.
 killdir="$TMP/prockill"; mkdir -p "$killdir"
-printf 'import "%s"\n' "$(cd "$ROOT/backends/proc" && pwd)" > "$killdir/conf.id"
+printf 'import "%s"\n' "$(be_abs proc)" > "$killdir/conf.id"
 cat > "$killdir/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int h = proc_spawn("sleep\n5");
@@ -258,7 +279,7 @@ fi
 # server is necessarily listening yet.
 sockpath="$TMP/echo.sock"
 sockdir="$TMP/sock"; mkdir -p "$sockdir/out"
-printf 'import "%s"\n' "$(cd "$ROOT/backends/sock" && pwd)" > "$sockdir/conf.id"
+printf 'import "%s"\n' "$(be_abs sock)" > "$sockdir/conf.id"
 cat > "$sockdir/main.id" <<EOF
 main(int argc, string[] argv) {
   int h = sock_connect("$sockpath", 3000);
@@ -387,7 +408,7 @@ wait 2>/dev/null
 # the compiler and fail at the C linker, and a wrong argument count compiled
 # and dumped core when run; both are now the diagnostics an `id` function gets.
 chk="$TMP/chk"; mkdir -p "$chk"
-printf 'import "%s"\n' "$(cd "$ROOT/backends/fs" && pwd)" > "$chk/conf.id"
+printf 'import "%s"\n' "$(be_abs fs)" > "$chk/conf.id"
 printf 'main(int argc, string[] argv) {\n  int h = fs_opne("x", "r");\n  print(h);\n} return int 0;\n' > "$chk/main.id"
 if $BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1 | grep -qF "no such function 'fs_opne'; available builtins:"; then
     ok "a typo'd backend call is 'no such function' (bin/idc)"
@@ -481,7 +502,6 @@ done
 # harness, from the cases), and only the backends declaring one of them are
 # compiled or linked. None of this needs X11: an unreached backend is never
 # compiled, which is what is being checked. cclog records every cc invocation.
-be_abs() { (cd "$ROOT/backends/$1" && pwd); }
 cclog="$TMP/cclog"
 printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s"\nexec cc "$@"\n' "$TMP/cc.log" > "$cclog"
 chmod +x "$cclog"
@@ -500,8 +520,7 @@ else
     bad "three attached backends that nothing calls are neither compiled nor linked: $(grep -m1 -E 'gfx_linux|gl_linux|fs_posix|-lX11' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7none.err")"
 fi
 
-# The same through a standard library whose conf.id names every backend --
-# the arrangement this exists for.
+# The same through a library whose conf.id imports every backend.
 c7std="$TMP/c7std"; mkdir -p "$c7std/win" "$TMP/c7hello" "$TMP/c7win"
 cp "$c7none/conf.id" "$c7std/conf.id"
 printf 'c7_width() {\n  int cw = gfx_width();\n} return int cw;\n' > "$c7std/win/w.id"
@@ -547,6 +566,112 @@ else
     bad "an unreached backend's platforms are not a question the build asks: $(printf '%s\n' "$out" | head -1 | cut -c1-160)"
 fi
 
+# -- a backend is attached by its backend.id, wherever a collected tree has it -
+# A standard library carries its backends inside the modules that wrap them and
+# names none of them in a conf.id: collecting a tree finds every backend.id in
+# it. dstd is such a library -- io/tick is a backend, io/now.id library code
+# calling its native. A program that never reaches tick_now compiles and links
+# nothing of it; one that does gets the sources for its triple's platform.
+dstd="$TMP/dstd"; mkdir -p "$dstd/io/tick" "$TMP/dhello" "$TMP/dcall"
+printf 'string name = "tick";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["mac.c"];\n' > "$dstd/io/tick/backend.id"
+printf 'int id_tick_now(void) { return 41; }\n' > "$dstd/io/tick/lin.c"
+printf 'int id_tick_now(void) { return 42; }\n' > "$dstd/io/tick/mac.c"
+printf 'native tick_now() return int;\n' > "$dstd/io/tick/tick.id"
+printf 'dstd_now() {\n  int t = tick_now();\n} return int t;\n' > "$dstd/io/now.id"
+dstd=$(cd "$dstd" && pwd -P)
+printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/dhello/main.id"
+printf 'main(int argc, string[] argv) {\n  int t = dstd_now();\n  print(t);\n} return int 0;\n' > "$TMP/dcall/main.id"
+: > "$TMP/cc.log"
+if env -u IDC_NO_STD $BIN_IDC "$TMP/dhello" --std "$dstd" --cc "$cclog" -o "$TMP/dhello.bin" >"$TMP/dhello.err" 2>&1 \
+   && [ "$("$TMP/dhello.bin")" = "hi" ] && ! grep -qE 'lin\.c|mac\.c' "$TMP/cc.log"; then
+    : > "$TMP/cc.log"
+    if env -u IDC_NO_STD $BIN_IDC "$TMP/dcall" --std "$dstd" --cc "$cclog" -o "$TMP/dcall.bin" >"$TMP/dcall.err" 2>&1 \
+       && [ "$("$TMP/dcall.bin")" = "41" ] && grep -q 'io/tick/lin\.c' "$TMP/cc.log" && ! grep -q 'mac\.c' "$TMP/cc.log"; then
+        ok "a backend.id inside a library attaches its backend with no conf.id, linked only where its native is reached"
+    else
+        bad "a backend.id inside a library attaches its backend with no conf.id, linked only where its native is reached: $(grep -v warning "$TMP/dcall.err" | head -1 | cut -c1-200)"
+    fi
+else
+    bad "a backend.id inside a library attaches its backend with no conf.id, linked only where its native is reached: hello $(grep -v warning "$TMP/dhello.err" | head -1 | cut -c1-160)"
+fi
+
+# The platform key the triple names picks the sources: mac.c for darwin. --cc
+# says the compiler is the user's, so the build goes ahead on this machine.
+: > "$TMP/cc.log"
+if env -u IDC_NO_STD $BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-apple-darwin --cc "$cclog" -o "$TMP/dmac.bin" >"$TMP/dmac.err" 2>&1 \
+   && grep -q 'io/tick/mac\.c' "$TMP/cc.log" && ! grep -q 'lin\.c' "$TMP/cc.log" && [ "$("$TMP/dmac.bin")" = "42" ]; then
+    ok "the triple's platform picks which sources of a library's backend are compiled"
+else
+    bad "the triple's platform picks which sources of a library's backend are compiled: $(grep -v warning "$TMP/dmac.err" | head -1 | cut -c1-200)"
+fi
+
+# A platform the backend has no sources for stops the build at the call that
+# reaches the native -- here inside the library -- in the wording it has always
+# had.
+out=$(env -u IDC_NO_STD $BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-unknown-freebsd -o "$TMP/dbsd.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qxF "$dstd/io/now.id:2: error: native 'tick_now', reached from main by this call, is implemented by backend 'tick', which has no support for platform 'freebsd' (building for 'x86_64-unknown-freebsd'); it is implemented for: darwin, linux"; then
+    ok "a library backend with no sources for the platform is diagnosed at the reaching call"
+else
+    bad "a library backend with no sources for the platform is diagnosed at the reaching call: $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-200)"
+fi
+
+# --backend is the override, not the way in. A directory holding only a
+# backend.id and its sources, whose name is that of an attached backend,
+# replaces how that backend is linked for this build; the declarations the
+# calls were checked against stay where they are. Two such directories for one
+# backend is a choice the build cannot make for you.
+tickp="$TMP/tickp"; cp -r "$dstd/io/tick" "$tickp"
+alt="$TMP/tickalt"; mkdir -p "$alt" "$TMP/tickalt2" "$TMP/ovr"
+printf 'string name = "tick";\nstring[] c_linux_sources = ["alt.c"];\nstring[] c_darwin_sources = ["alt.c"];\n' > "$alt/backend.id"
+printf 'int id_tick_now(void) { return 7; }\n' > "$alt/alt.c"
+cp "$alt/backend.id" "$alt/alt.c" "$TMP/tickalt2/"
+printf 'import "%s"\n' "$tickp" > "$TMP/ovr/conf.id"
+printf 'main(int argc, string[] argv) {\n  int t = tick_now();\n  print(t);\n} return int 0;\n' > "$TMP/ovr/main.id"
+: > "$TMP/cc.log"
+if $BIN_IDC "$TMP/ovr" --backend "$alt" --cc "$cclog" -o "$TMP/ovr.bin" >"$TMP/ovr.err" 2>&1 \
+   && [ "$("$TMP/ovr.bin")" = "7" ] && grep -q 'tickalt/alt\.c' "$TMP/cc.log" && ! grep -q 'tickp/lin\.c' "$TMP/cc.log"; then
+    ok "--backend naming an attached backend replaces how that backend is linked"
+else
+    bad "--backend naming an attached backend replaces how that backend is linked: $(grep -v warning "$TMP/ovr.err" | head -1 | cut -c1-160) got '$("$TMP/ovr.bin" 2>/dev/null)'"
+fi
+out=$($BIN_IDC "$TMP/ovr" --backend "$alt" --backend "$TMP/tickalt2" -o "$TMP/ovr2.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "both implement backend 'tick'" && [ ! -e "$TMP/ovr2.bin" ]; then
+    ok "two --backend overrides of one backend are refused"
+else
+    bad "two --backend overrides of one backend are refused: $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-160)"
+fi
+
+# The real library: it carries fs, gfx and gl, so a program with no conf.id
+# reaches fs_exists and links fs alone, and hello-world links none of them.
+# The platform diagnostic is given before the refusal to build another
+# triple's test cases here, since the library always has cases and that
+# refusal would otherwise be the only thing a cross build ever says.
+rs="$TMP/rstd"; mkdir -p "$rs/hello" "$rs/call" "$rs/gl"
+printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$rs/hello/main.id"
+printf 'main(int argc, string[] argv) {\n  int e = fs_exists("/nonexistent-bkstd");\n  print(e);\n} return int 0;\n' > "$rs/call/main.id"
+printf 'main(int argc, string[] argv) {\n  int gw = gl_width();\n  print(gw);\n} return int 0;\n' > "$rs/gl/main.id"
+: > "$TMP/cc.log"
+if env -u IDC_NO_STD $BIN_IDC "$rs/hello" --std "$STD" --cc "$cclog" -o "$TMP/rhello.bin" >"$TMP/rhello.err" 2>&1 \
+   && [ "$("$TMP/rhello.bin")" = "hi" ] && ! grep -qE 'fs_posix|gfx_linux|gl_linux|-lX11|-lGL' "$TMP/cc.log" \
+   && ! needs_lib "$TMP/rhello.bin" libX11 && ! needs_lib "$TMP/rhello.bin" libGL; then
+    : > "$TMP/cc.log"
+    if env -u IDC_NO_STD $BIN_IDC "$rs/call" --std "$STD" --cc "$cclog" -o "$TMP/rcall.bin" >"$TMP/rcall.err" 2>&1 \
+       && [ "$("$TMP/rcall.bin")" = "0" ] && grep -q 'sys/io/fs/fs_posix\.c' "$TMP/cc.log" \
+       && ! grep -qE 'gfx_linux|gl_linux|-lX11|-lGL' "$TMP/cc.log"; then
+        ok "idstd carries fs: a program calling fs_exists links fs alone, and hello-world links no backend"
+    else
+        bad "idstd carries fs: a program calling fs_exists links fs alone, and hello-world links no backend: $(grep -v warning "$TMP/rcall.err" | head -1 | cut -c1-160)"
+    fi
+else
+    bad "idstd carries fs: a program calling fs_exists links fs alone, and hello-world links no backend: hello $(grep -v warning "$TMP/rhello.err" | head -1 | cut -c1-160)"
+fi
+out=$(env -u IDC_NO_STD $BIN_IDC "$rs/gl" --std "$STD" --triple aarch64-apple-darwin -o "$TMP/rgl.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "rstd/gl/main.id:2: error: native 'gl_width', reached from main by this call, is implemented by backend 'gl', which has no support for platform 'darwin' (building for 'aarch64-apple-darwin'); it is implemented for: linux"; then
+    ok "idstd's gl reached for darwin names the native, the call and the triple, ahead of the cases"
+else
+    bad "idstd's gl reached for darwin names the native, the call and the triple, ahead of the cases: $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-200)"
+fi
+
 # -- backend.id: a backend's link facts, as `id` declarations ----------------
 # They are real `id`: each backend's file, as a project's conf.id, is parsed and
 # type-checked by the compiler itself, which is what keeps the driver's line
@@ -558,11 +683,11 @@ fi
 decl="$TMP/decl"; mkdir -p "$decl"
 printf 'main(int argc, string[] argv) {\n  string bn = (import name);\n  print(bn);\n} return int 0;\n' > "$decl/main.id"
 for be in fs gfx gl; do
-    cp "$ROOT/backends/$be/backend.id" "$decl/conf.id"
+    cp "$(be_abs "$be")/backend.id" "$decl/conf.id"
     if $BIN_IDC "$decl" --fingerprints >"$TMP/decl.out" 2>&1 && ! grep -q 'error' "$TMP/decl.out"; then
-        ok "backends/$be/backend.id is valid id constant declarations"
+        ok "$be's backend.id is valid id constant declarations"
     else
-        bad "backends/$be/backend.id is valid id constant declarations: $(grep -m1 error "$TMP/decl.out" | cut -c1-160)"
+        bad "$be's backend.id is valid id constant declarations: $(grep -m1 error "$TMP/decl.out" | cut -c1-160)"
     fi
 done
 printf 'string name = "x";\nstring[] c_linux_sources = 3;\n' > "$decl/conf.id"
@@ -625,7 +750,7 @@ else
     bad "two attached backends declaring the same names and platform keys do not collide: $(grep -v warning "$TMP/two.err" | head -1 | cut -c1-160)"
 fi
 
-if ! cc -fsyntax-only "$ROOT/backends/gfx/gfx_linux.c" -I"$ROOT/backends/gfx" 2>/dev/null; then
+if ! cc -fsyntax-only "$(be_abs gfx)/gfx_linux.c" -I"$(be_abs gfx)" 2>/dev/null; then
     # Only the windowed half of this file needs them; the fs and output-path
     # checks above ran and their tally still counts.
     skip "gfx/gl checks: no X11 headers (run under tools/devshell.sh)"
@@ -674,11 +799,11 @@ fi
 
 # -- the backends themselves compile ----------------------------------------
 for be in gfx/gfx_linux gl/gl_linux; do
-    if cc -O2 -c "$ROOT/backends/$be.c" -I"$ROOT/backends/$(dirname "$be")" \
+    if cc -O2 -c "$(be_abs "${be%%/*}")/${be#*/}.c" -I"$(be_abs "${be%%/*}")" \
          -o "$TMP/$(basename "$be").o" 2>"$TMP/cc.err"; then
-        ok "backends/$be.c compiles"
+        ok "sys/win/$be.c compiles"
     else
-        bad "backends/$be.c compiles ($(head -1 "$TMP/cc.err"))"
+        bad "sys/win/$be.c compiles ($(head -1 "$TMP/cc.err"))"
     fi
 done
 
@@ -690,7 +815,7 @@ done
 dual="$TMP/dual"
 mkdir -p "$dual/loop"
 printf 'import "%s"\nimport "%s"\n' \
-    "$(cd "$ROOT/backends/gfx" && pwd)" "$(cd "$ROOT/backends/gl" && pwd)" > "$dual/conf.id"
+    "$(be_abs gfx)" "$(be_abs gl)" > "$dual/conf.id"
 cat > "$dual/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int sw = gfx_open(64, 48, "dual soft");
@@ -752,9 +877,10 @@ fi
 # idc.py no longer builds them here either. They are user programs and merge
 # idstd, and idc.py cannot parse an idstd that holds a `given` case, so a check
 # that idc.py builds them would fail on the library rather than on the demo.
-for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
-    d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
+#
+# They name no backend: gfx and gl are the standard library's.
+for d in gfxdemo gl3d gl3dgame fpsmaze galaxy flyover; do
+    if env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
         ok "$d: backend build (bin/idc)"
     else
         bad "$d: backend build (bin/idc)"
@@ -765,9 +891,8 @@ done
 # Every one of them used to: `int ok = gfx_open(...)` was assigned and then
 # ignored, and with no display gfx_poll returns -1 forever. Running with
 # DISPLAY unset is the test, and it needs no display by construction.
-for spec in gfxdemo:gfx gl3d:gl gl3dgame:gl fpsmaze:gl galaxy:gl flyover:gl; do
-    d="${spec%%:*}"; be="$ROOT/backends/${spec##*:}"
-    if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --backend "$be" -o "$TMP/$d.bin" >/dev/null 2>&1; then
+for d in gfxdemo gl3d gl3dgame fpsmaze galaxy flyover; do
+    if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" -o "$TMP/$d.bin" >/dev/null 2>&1; then
         bad "$d: builds for the no-display check"; continue
     fi
     DISPLAY= timeout 5 "$TMP/$d.bin" >/dev/null 2>&1
@@ -806,7 +931,7 @@ else
     # Until gl_read_pixels existed there was no way to check GPU output
     # without an external window grabber.
     shot="$TMP/glshot"; mkdir -p "$shot/px"
-    printf 'import "%s"\n' "$(cd "$ROOT/backends/gl" && pwd)" > "$shot/conf.id"
+    printf 'import "%s"\n' "$(be_abs gl)" > "$shot/conf.id"
     cat > "$shot/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int ok = glwin_open(32, 24, "glshot");

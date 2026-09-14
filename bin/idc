@@ -61,8 +61,8 @@ EMIT_SOURCES=0
 FINGERPRINTS=0
 NO_STD=0
 STD_DIR=""
-BACKENDS=()          # from --backend flags (passed through on fallback)
-MANIFEST_BACKENDS=() # from the project's conf.id (idc.py re-reads it on fallback)
+BACKENDS=()          # from --backend flags: an override, or a backend of its own
+FOUND_BACKENDS=()    # every directory holding a backend.id in a collected tree
 CONSTS=()            # constant declarations from every conf.id reached
 # Set by a structural check that found a real violation but could keep going
 # without losing or misattributing anything (an over-full directory, a nested
@@ -464,14 +464,28 @@ fi
 # (BUILD_DIR), so it is never source, and a library whose build/ exists beside
 # its source -- because someone built it in place -- must compile the same as
 # one that was never built.
+#
+# A directory holding a backend.id is a backend, wherever a collected tree
+# holds it, and goes on FOUND_BACKENDS. That is how a library carries the
+# backends its modules wrap without naming them: idstd's sys/io/fs is a backend
+# because its backend.id is there, not because a manifest says so. The other
+# way -- a self-relative `import "sys/io/fs"` in the library's own conf.id --
+# is a second copy of the layout to keep in step with the tree, and would make
+# each such subdirectory a compilation unit of its own (a unit is a root; see
+# emit_sources). Finding a backend costs a program nothing: what is compiled
+# and linked is decided by the natives the build reaches (backends_for).
 collect_ids() {
     local root="$1" f
     SRC_ROOTS+=("$root")
-    while IFS= read -r f; do SRC_FILES+=("$f"); done \
-        < <(find "$root" -mindepth 1 \
+    while IFS= read -r f; do
+        case "$f" in
+            */backend.id) FOUND_BACKENDS+=("${f%/backend.id}") ;;
+            *)            SRC_FILES+=("$f") ;;
+        esac
+    done < <(find "$root" -mindepth 1 \
                  \( -type d -name '.*' -prune \) -o \
                  \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
-                 \( -name '*.id' ! -name 'conf.id' ! -name 'backend.id' -print \) \
+                 \( -name '*.id' ! -name 'conf.id' -print \) \
             | LC_ALL=C sort)
 }
 
@@ -710,8 +724,7 @@ read_manifest() {
         SEEN_DEPS+=("$deppath")
         # A backend is a dependency like any other: its .id files -- the
         # `native` declarations of what it links -- are merged as source under
-        # the same limits, and its native sources are linked besides.
-        [ -f "$deppath/backend.id" ] && MANIFEST_BACKENDS+=("$deppath")
+        # the same limits, and collect_ids finds its backend.id.
         check_entry_limit "$deppath"
         check_nested_manifest "$deppath"
         collect_ids "$deppath"
@@ -755,8 +768,9 @@ done
 # ---------------------------------------------------------------------------
 # The standard library, imported by DEFAULT -- no conf.id line, no flag. It
 # is merged exactly like a source dependency: same entry-count rule, and its
-# own conf.id is followed, so a stdlib module that needs a native backend
-# declares it once and every program gets it.
+# own conf.id is followed. The backends it carries are found by their
+# backend.id (collect_ids), so every program has them and none links one it
+# does not reach.
 #
 # Resolution order: --no-std / IDC_NO_STD, then --std, then $IDSTD_HOME, then
 # an `idstd` directory beside this repository. A checkout with no idstd beside
@@ -1012,9 +1026,10 @@ fi
 # ---------------------------------------------------------------------------
 # Native backends, linked by what the build reaches.
 #
-# A backend is attached by naming it -- a conf.id import, --backend, or the
-# standard library's own conf.id -- and its `native` declarations are merged as
-# source however it was named. Attaching one does not link it. idparse lists
+# A backend is attached by being in the build: a directory with a backend.id
+# in any collected tree -- the standard library's, a conf.id import, the
+# project's own, or a --backend directory -- and its `native` declarations are
+# merged as source however it arrived. Attaching one does not link it. idparse lists
 # every native reachable from main, and separately every one reachable from
 # the test cases, with the call that reaches it and the file that declares it
 # (--natives; compiler/parse/back/drive/sink/natives/). A backend is compiled
@@ -1041,14 +1056,13 @@ declare -A BE_BUILT=() BE_OBJS=() BE_LINK=() BD=() BD_AT=()
 BD_NAMES=()
 BD_FILE=""
 BE_ERR=""
-# backends come from both --backend flags and the conf.id manifest. The same
-# backend named both ways -- the two documented ways to attach one dependency --
-# must be linked once: twice compiles its sources twice and hands cc the same
-# object file twice, which is "multiple definition" for every symbol it
-# exports. Collapse by resolved path, first mention winning (idc.py:
-# dedupe_backends).
+# backends come from both --backend flags and the collected trees. The same
+# backend reached both ways must be linked once: twice compiles its sources
+# twice and hands cc the same object file twice, which is "multiple definition"
+# for every symbol it exports. Collapse by resolved path, first mention winning
+# (idc.py: dedupe_backends).
 ALL_BACKENDS=()
-for d in "${BACKENDS[@]}" "${MANIFEST_BACKENDS[@]}"; do
+for d in "${BACKENDS[@]}" "${FOUND_BACKENDS[@]}"; do
     real=$(cd "$d" 2>/dev/null && pwd -P) || real="$d"
     dup=0
     for seen in "${ALL_BACKENDS[@]}"; do
@@ -1071,6 +1085,49 @@ backend_of() {
         esac
     done
     printf '%s' "$best"
+}
+
+# backend_impl DIR -- set BE_IMPL to the directory whose backend.id links the
+# backend DIR is: DIR itself, unless a --backend directory declares the same
+# `name`, in which case that one.
+#
+# This is what --backend is for once the standard library carries the
+# backends. The declarations stay where they are -- they are what every call
+# was checked against -- and the platform's sources are what a build may want
+# to choose: another windowing system on the same platform, or a backend being
+# ported. So an override is a directory with a backend.id and its sources and
+# no declarations, and it applies to exactly the builds that pass it. Two for
+# one backend is refused, not ordered: a build that names both has not chosen.
+# Only a declared name matches, so two backends that both leave `name` out are
+# never taken for one.
+declare -A BE_NAME=()
+backend_impl() {
+    local d="$1" o real dreal
+    BE_IMPL="$d"
+    dreal=$(cd "$d" && pwd -P)
+    backend_name "$d"
+    for o in ${BACKENDS[@]+"${BACKENDS[@]}"}; do
+        real=$(cd "$o" && pwd -P)
+        [ "$real" = "$dreal" ] && continue
+        backend_name "$o"
+        [ -n "${BE_NAME[$o]}" ] && [ "${BE_NAME[$o]}" = "${BE_NAME[$d]}" ] || continue
+        if [ "$BE_IMPL" != "$d" ]; then
+            progress_clear
+            echo "idc: --backend: $BE_IMPL and $o both implement backend '${BE_NAME[$d]}'; pass one of them" >&2
+            exit 1
+        fi
+        BE_IMPL="$o"
+    done
+}
+
+# backend_name DIR -- BE_NAME[DIR]: the name DIR's backend.id declares, or ""
+# for none. Read once per directory.
+backend_name() {
+    [ -n "${BE_NAME[$1]+set}" ] && return 0
+    BE_NAME[$1]=""
+    [ -f "$1/backend.id" ] || return 0
+    backend_decls "$1/backend.id"
+    BE_NAME[$1]="${BD[name]-}"
 }
 
 # A backend's facts are `id` constant declarations in its backend.id: its name,
@@ -1160,10 +1217,44 @@ backend_decls() {
 # Declarations that cannot serve this build set BE_ERR and return 1, so the
 # caller can say which reached native needed it.
 backend_build() {
-    local d="$1" file name have n sources_line cflags_line link_line src src_path obj backend_rc
+    local d="$1" sources_line cflags_line link_line src src_path obj backend_rc
     local -a srcs=() cflags=() objs=()
     BE_ERR=""
     [ -n "${BE_BUILT[$d]:-}" ] && return 0
+    backend_supports "$d" || return 1
+    sources_line="${BD[c_${PLATKEY_BUILD}_sources]}"
+    cflags_line="${BD[c_${PLATKEY_BUILD}_cflags]:-}"
+    link_line="${BD[c_${PLATKEY_BUILD}_link]:-}"
+    IFS=$'\x1f' read -ra srcs <<< "$sources_line"
+    IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
+    for src in ${srcs[@]+"${srcs[@]}"}; do
+        [ -z "$src" ] && continue
+        src_path="$d/$src"
+        obj="${src_path%.*}.gen.o"
+        capped "$CC" -O2 -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
+        if [ "$backend_rc" -ne 0 ]; then
+            progress_clear
+            if mem_ceiling_hit "$backend_rc"; then
+                mem_ceiling_error "cc (backend: $src_path)"
+            else
+                echo "idc: backend compile failed for $src_path" >&2
+            fi
+            exit 1
+        fi
+        BACKEND_OBJS+=("$obj")
+        objs+=("$obj")
+    done
+    BE_OBJS[$d]=$(IFS=$'\x1f'; printf '%s' "${objs[*]}")
+    BE_LINK[$d]="$link_line"
+    BE_BUILT[$d]=1
+}
+
+# backend_supports DIR -- read DIR's backend.id into BD, and return 1 with
+# BE_ERR set when it has nothing for the C target on this build's platform.
+# Nothing is compiled, so a build can ask before it has built anything.
+backend_supports() {
+    local d="$1" file name have n
+    BE_ERR=""
     file="$d/backend.id"
     if [ ! -f "$file" ]; then
         progress_clear
@@ -1193,40 +1284,16 @@ backend_build() {
         BE_ERR="backend '$name' has no support for platform '$PLATKEY_BUILD' (building for '$TRIPLE'); it is implemented for: ${have:-no platform at all}"
         return 1
     fi
-    sources_line="${BD[c_${PLATKEY_BUILD}_sources]}"
-    cflags_line="${BD[c_${PLATKEY_BUILD}_cflags]:-}"
-    link_line="${BD[c_${PLATKEY_BUILD}_link]:-}"
-    IFS=$'\x1f' read -ra srcs <<< "$sources_line"
-    IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
-    for src in ${srcs[@]+"${srcs[@]}"}; do
-        [ -z "$src" ] && continue
-        src_path="$d/$src"
-        obj="${src_path%.*}.gen.o"
-        capped "$CC" -O2 -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
-        if [ "$backend_rc" -ne 0 ]; then
-            progress_clear
-            if mem_ceiling_hit "$backend_rc"; then
-                mem_ceiling_error "cc (backend: $src_path)"
-            else
-                echo "idc: backend compile failed for $src_path" >&2
-            fi
-            exit 1
-        fi
-        BACKEND_OBJS+=("$obj")
-        objs+=("$obj")
-    done
-    BE_OBJS[$d]=$(IFS=$'\x1f'; printf '%s' "${objs[*]}")
-    BE_LINK[$d]="$link_line"
-    BE_BUILT[$d]=1
 }
 
-# backends_for KIND -- set LINK_OBJS and LINK_FLAGS to what the natives KIND
-# reaches need ("program": from main; "harness": from the cases), building any
-# backend not built yet, in the order the backends were attached. A reached
+# backends_for KIND [check] -- set LINK_OBJS and LINK_FLAGS to what the natives
+# KIND reaches need ("program": from main; "harness": from the cases), building
+# any backend not built yet, in the order the backends were attached. A reached
 # native nothing attached can link stops the build at the call that reaches
-# it, rather than at the linker naming id_<name>.
+# it, rather than at the linker naming id_<name>. With `check`, only that
+# question is asked: backend.id files are read and nothing is compiled.
 backends_for() {
-    local kind="$1" from=main row_kind name site decl be d msg
+    local kind="$1" mode="${2:-link}" from=main row_kind name site decl be d msg
     local -A need_site=() need_name=()
     local -a objs=() flags=()
     [ "$kind" = harness ] && from="a test case"
@@ -1246,16 +1313,20 @@ backends_for() {
     done < "$NATIVES"
     for d in ${ALL_BACKENDS[@]+"${ALL_BACKENDS[@]}"}; do
         [ -n "${need_site[$d]:-}" ] || continue
-        if ! backend_build "$d"; then
-            progress_clear
-            msg="${BE_ERR/"' has "/"', which has "}"
-            echo "${need_site[$d]}: error: native '${need_name[$d]}', reached from $from by this call, is implemented by $msg" >&2
-            exit 1
+        backend_impl "$d"
+        if [ "$mode" = check ]; then
+            backend_supports "$BE_IMPL" && continue
+        elif backend_build "$BE_IMPL"; then
+            IFS=$'\x1f' read -ra objs <<< "${BE_OBJS[$BE_IMPL]}"
+            IFS=$'\x1f' read -ra flags <<< "${BE_LINK[$BE_IMPL]}"
+            LINK_OBJS+=(${objs[@]+"${objs[@]}"})
+            LINK_FLAGS+=(${flags[@]+"${flags[@]}"})
+            continue
         fi
-        IFS=$'\x1f' read -ra objs <<< "${BE_OBJS[$d]}"
-        IFS=$'\x1f' read -ra flags <<< "${BE_LINK[$d]}"
-        LINK_OBJS+=(${objs[@]+"${objs[@]}"})
-        LINK_FLAGS+=(${flags[@]+"${flags[@]}"})
+        progress_clear
+        msg="${BE_ERR/"' has "/"', which has "}"
+        echo "${need_site[$d]}: error: native '${need_name[$d]}', reached from $from by this call, is implemented by $msg" >&2
+        exit 1
     done
 }
 
@@ -1356,6 +1427,16 @@ split_harness
 if [ -s "$NOTES" ]; then
     progress_clear
     cat "$NOTES" >&2
+fi
+# A reached native the build's platform cannot link is the most specific thing
+# wrong with a build for another platform, and the one a port has to fix. The
+# refusal to run that build's cases here (run_cases) would otherwise hide it,
+# and the standard library always has cases. So the program's natives are
+# checked first -- backend.id files read, nothing compiled, so what is built
+# and in what order does not change. --emit-c writes C and links nothing, and
+# the LLVM target links no backend, so neither asks.
+if [ "$TARGET" = c ] && [ -z "$EMIT_C" ] && grep -q '^int main(' "$C_OUT"; then
+    backends_for program check
 fi
 run_cases
 

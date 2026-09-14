@@ -1,11 +1,3 @@
-// qmon drives QEMU over QMP (a JSON protocol on a Unix-domain socket) and
-// reads the guest's serial port over a second one, so it needs fs (to write
-// --serial/--shot output), proc (to start and stop QEMU) and sock (to talk
-// to both sockets). See idc/backends/{fs,proc,sock}/README.md.
-import "../../backends/fs"
-import "../../backends/proc"
-import "../../backends/sock"
-
 // The two QMP commands with no arguments. Built here, not by a function,
 // because they are values with no computation behind them -- exactly what a
 // conf.id constant is for.

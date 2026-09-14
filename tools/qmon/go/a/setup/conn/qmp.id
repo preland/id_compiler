@@ -1,5 +1,5 @@
 // Connect to QEMU's QMP socket, retrying while it does not exist yet
-// (sock_connect does this -- see idc/backends/sock/README.md). The
+// (sock_connect does this -- see idstd's sys/io/ipc/sock/README.md). The
 // handshake (greet, go/a/setup/boot.id) waits until the serial socket is
 // also connected: QEMU starts running the guest the moment it is spawned,
 // with "wait=off" on both chardevs, and a socket chardev with nobody

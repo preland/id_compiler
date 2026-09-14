@@ -3,8 +3,8 @@
 // bytes to carry to the next read): sock_recv leaves whatever it has not
 // been asked for sitting in the kernel's socket buffer, so the next read --
 // of this line or the next one -- just continues from there. A bad handle
-// (idc/backends/sock/README.md: sock_recv fails fast on one) makes this
-// return "" immediately rather than waiting out five timeouts.
+// (idstd's sys/io/ipc/sock/README.md: sock_recv fails fast on one) makes
+// this return "" immediately rather than waiting out five timeouts.
 qmp_read_line() {
   string line = "";
   int b = read_one_byte();

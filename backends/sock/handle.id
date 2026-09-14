@@ -1,8 +1,0 @@
-// Connecting to a Unix-domain socket, closing it, and why the last call
-// failed. See sock.h.
-
-native sock_connect(string path, int timeout_ms) return int;
-
-native sock_close(int handle) return int;
-
-native sock_error() return int;

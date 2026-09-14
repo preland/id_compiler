@@ -1,7 +1,7 @@
 // qmon -- drive the kernel under QEMU: type at it, photograph it, read what
 // it said. The id replacement for tools/qmon.py; see tools/qmon.sh for the
-// command line and idc/backends/{proc,sock}/README.md for the seam this is
-// written against.
+// command line and idstd's sys/io/ipc/{proc,sock}/README.md for the seam
+// this is written against.
 //
 //   qmon build/kernel.elf --wait 2 --type "ls;uname" --shot out.ppm
 //

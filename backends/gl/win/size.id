@@ -1,7 +1,0 @@
-// The window's live size and aspect ratio. See gl.h.
-
-native gl_width() return int;
-
-native gl_height() return int;
-
-native gl_aspect_x1000() return int;

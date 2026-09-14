@@ -1,5 +1,0 @@
-// Waiting for a child to exit, and ending it early. See proc.h.
-
-native proc_wait(int handle, int timeout_ms) return int;
-
-native proc_kill(int handle) return int;

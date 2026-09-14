@@ -1,7 +1,0 @@
-// Pointer state as of the last poll. See gl.h.
-
-native glwin_mouse_x() return int;
-
-native glwin_mouse_y() return int;
-
-native glwin_mouse_buttons() return int;

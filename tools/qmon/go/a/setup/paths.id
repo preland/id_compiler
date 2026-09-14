@@ -12,10 +12,10 @@ mk_paths() {
 } return void;
 
 // The full command line, one argument per line -- see
-// idc/backends/proc/README.md for why proc_spawn takes it that way. Matches
-// qmon.py's qemu list exactly: a socket chardev carries the serial port
-// (rather than a plain -serial file) so the same port can be typed at and
-// read from, and QMP is the second socket.
+// idstd's sys/io/ipc/proc/README.md for why proc_spawn takes it that way.
+// Matches qmon.py's qemu list exactly: a socket chardev carries the serial
+// port (rather than a plain -serial file) so the same port can be typed at
+// and read from, and QMP is the second socket.
 build_argv() {
   string a = "qemu-system-x86_64\n-kernel\n" + (import qm_kernel) + "\n-display\nnone\n-vga\nstd\n-no-reboot\n-chardev\nsocket,id=s0,path=" + (import qm_ser_path) + ",server=on,wait=off\n-serial\nchardev:s0\n-qmp\nunix:" + (import qm_qmp_path) + ",server,nowait";
 } return string a;

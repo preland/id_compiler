@@ -5,7 +5,7 @@
 #   tools/qmon.sh build/kernel.elf --wait 2 --type "ls;uname" --shot out.ppm
 #
 # tools/qmon (in `id`) does the driving, over QMP and the guest's serial port
-# (idc/backends/proc and idc/backends/sock). This builds it and forwards
+# (idstd's sys/io/ipc/proc and sys/io/ipc/sock). This builds it and forwards
 # every argument straight through -- tools/qmon/main.id takes the same ones
 # qmon.py did.
 #

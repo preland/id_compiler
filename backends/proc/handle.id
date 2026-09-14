@@ -1,8 +1,0 @@
-// Starting a child process, closing it, and why the last call failed. See
-// proc.h.
-
-native proc_spawn(string argv_lines) return int;
-
-native proc_close(int handle) return int;
-
-native proc_error() return int;

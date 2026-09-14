@@ -3,14 +3,13 @@
 This is the compiler submodule of [`id_development`](../README.md), the
 umbrella repository for the `id` language. It holds the self-hosted compiler
 (`compiler/lex`, `compiler/parse`), the `bin/idc` driver, the bootstrap C
-(`bootstrap/`), the legacy Python implementation (`idc.py`), the native
-backends (`backends/`), the dev tools (`tools/`), and the regression suite
-(`tests/`).
+(`bootstrap/`), the legacy Python implementation (`idc.py`), the dev tools
+(`tools/`), and the regression suite (`tests/`).
 
 For what `id` is, the language rules, and a quick start building
 `demos/hello`, see the [umbrella README](../README.md). This file covers what
-lives in this directory: the driver's internals, the two code generators, the
-native backends, self-hosting, and `idc.py`'s retirement. See
+lives in this directory: the driver's internals, the two code generators,
+idstd's native backends, self-hosting, and `idc.py`'s retirement. See
 [`../docs/SPEC.md`](../docs/SPEC.md) for the language specification and
 [`../docs/HACKING.md`](../docs/HACKING.md) before changing the compiler.
 
@@ -33,10 +32,12 @@ working tree, so nothing but that snapshot is ever frozen and no compiler for
 project directory, sorted by full path — the same order `idc.py` uses), run
 `cat files | idlex | idparse` to get C, then hand that C to `cc` — exactly the
 pipeline `tools/parity.sh` differentially tests against `idc.py`. `-o`,
-`--emit-c`, `--keep-c`, `--cc`, and `--backend DIR` (reading `backend.id` and
-linking a native backend) all work the same as in `idc.py`, except that
-`idc.py`'s `resolve_backend` reads a `backend.json` no backend has any more, so
-`idc.py` can no longer link one.
+`--emit-c`, `--keep-c`, and `--cc` all work the same as in `idc.py`. `--backend
+DIR` is now an override, not how a program gets a backend: `DIR` holds a
+`backend.id` whose `name` matches an attached backend, plus its sources and no
+declarations, and it replaces how that backend is linked for the build —
+`idc.py`'s `resolve_backend` reads a `backend.json` no backend has any more,
+so `idc.py` can no longer link one regardless.
 
 **Coverage:** there is no fallback — `bin/idc` drives the self-hosted stages
 and nothing else. They implement the whole language and all of its rules: the
@@ -141,8 +142,13 @@ is resolved and checked like any call: a wrong argument count or type gets the
 diagnostic an `id` function gets, and a misspelled name is `no such function`.
 Nothing is left to the linker to discover. The C target emits each native as a
 real prototype and the LLVM target as a `declare`; the backend's objects are
-compiled per platform and linked in. Attach one with a project's `conf.id`
-(preferred) or a `--backend DIR` flag — the two are the same dependency.
+compiled per platform and linked in. idstd's `fs`, `gfx` and `gl` backends are
+attached to every build by default, so a program calls their natives with no
+`conf.id` import and no flag; `bin/idc` finds each one by its `backend.id`,
+wherever a collected tree has one, and links it only once the build reaches
+one of its natives. `--backend DIR` is now an override for an
+already-attached backend rather than how a program attaches one to begin
+with.
 
 A native's parameter names are documentation, not variables: with no body
 there is nothing for them to name. They carry types for the call checks and the
@@ -156,18 +162,18 @@ on its resolved path.
 
 | backend | what it adds |
 | --- | --- |
-| [`backends/fs`](backends/fs) | files: open/read/write/close/size/exists/remove. Needs no system libraries |
-| [`backends/gfx`](backends/gfx) | a window and a software framebuffer (X11 / Cocoa) |
-| [`backends/gl`](backends/gl) | a hardware-accelerated OpenGL window |
+| `sys/io/fs` (idstd) | files: open/read/write/close/size/exists/remove. Needs no system libraries |
+| `sys/win/gfx` (idstd) | a window and a software framebuffer (X11 / Cocoa) |
+| `sys/win/gl` (idstd) | a hardware-accelerated OpenGL window |
 
 A backend separates *what* it promises from *how* a given compiler obtains it:
 its `native` declarations state the functions in `id`'s own types, and the
 manifest's `targets` maps a code generator (`"c"` today; an LLVM, wasm or
 interpreter target tomorrow) to the implementation it should use. Adding a target is a change to the manifest
-and the driver that reads it, never to a program's `id` source — see
-[`backends/fs/README.md`](backends/fs/README.md), which is written up as the
-worked example. `gfx` and `gl` predate `targets` and carry a bare `platforms`
-table, which is read as the C target's.
+and the driver that reads it, never to a program's `id` source — see idstd's
+`sys/io/fs/README.md`, which is written up as the worked example. `gfx` and
+`gl` predate `targets` and carry a bare `platforms` table, which is read as
+the C target's.
 
 ## One copy of a function, across projects
 

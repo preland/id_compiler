@@ -1,7 +1,0 @@
-// One input event per poll, and the surface's live size. See gfx.h.
-
-native gfx_poll() return int;
-
-native gfx_width() return int;
-
-native gfx_height() return int;

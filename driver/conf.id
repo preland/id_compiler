@@ -1,2 +1,0 @@
-// The filesystem, which is the whole reason this can exist.
-import "../backends/fs"

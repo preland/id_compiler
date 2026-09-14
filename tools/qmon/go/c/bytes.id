@@ -12,8 +12,8 @@ bytes_str(int[] bs, int n) {
 ([104, 105], 2):("hi")
 ([], 0):("")
 
-// Send a whole string over a socket: idc/backends/sock/README.md's bytes
-// contract is int[], one byte per cell.
+// Send a whole string over a socket: idstd's sys/io/ipc/sock/README.md's
+// bytes contract is int[], one byte per cell.
 sock_send_str(int h, string msg) {
   int[] bs = str_bytes(msg);
   int n = len(bs);

@@ -1,3 +1,0 @@
-// Bytes out of the child's stdout, one byte per cell. See proc.h.
-
-native proc_read(int handle, int[] buf, int n, int timeout_ms) return int;
