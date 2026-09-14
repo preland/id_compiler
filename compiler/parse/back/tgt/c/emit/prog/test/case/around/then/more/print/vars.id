@@ -8,6 +8,8 @@ print_var(string kind) {
     pv = "idtc_err_buf";
   }
 } return string pv;
+("thenprints"):("idtc_out_buf")
+("theneprints"):("idtc_err_buf")
 
 print_label(string kind) {
   string lab = "prints";
@@ -15,3 +17,5 @@ print_label(string kind) {
     lab = "eprints";
   }
 } return string lab;
+("thenprints"):("prints")
+("theneprints"):("eprints")

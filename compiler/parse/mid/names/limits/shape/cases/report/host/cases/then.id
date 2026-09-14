@@ -28,3 +28,5 @@ ut_then_lead(int node) {
     lead = "'calls' names '";
   }
 } return string lead;
+given then_node_fixture ((import fixture_then_bad)):("'then' names '")
+given calls_node_fixture ((import fixture_calls_bad)):("'calls' names '")

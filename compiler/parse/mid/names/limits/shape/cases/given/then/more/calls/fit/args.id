@@ -10,6 +10,8 @@ fit_calls_body(string kind, int ci, string nm, int cfn, int chk_node) {
     fit_calls_count(ci, items);
   }
 } return void;
+given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("")
+given calls_node_fixture ("thencallsn", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
 
 fit_calls_args(int ci, string nm, int cfn, int[] items) {
   if(len(items) != flat_arg_count(cfn)) {
@@ -20,6 +22,8 @@ fit_calls_args(int ci, string nm, int cfn, int[] items) {
     fit_items(ci, cfn, items);
   }
 } return void;
+given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_none)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1\n")
+given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_one)):() then prints:("")
 
 fit_calls_count(int ci, int[] items) {
   if(len(items) != 1) {
@@ -29,3 +33,5 @@ fit_calls_count(int ci, int[] items) {
     fit_value(ci, items[0], "int");
   }
 } return void;
+given calls_items_fixture ((import fixture_ci), (import fixture_calls_none)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
+given calls_items_fixture ((import fixture_ci), (import fixture_calls_one)):() then prints:("")

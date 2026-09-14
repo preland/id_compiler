@@ -1,0 +1,30 @@
+// A target function for `calls`-clause checks: "fx_target(int x) return
+// int", registered in the symbol tables (front/tree/init/init_sym.id) the
+// way build_reg (mid/names/symbols/build/scopes.id) would, so
+// func_node("fx_target") finds it and its one int parameter is there for
+// arity/type checks to read. Built on case_fixture, so a case that needs
+// both a case to report at and a function to check against gets both from
+// one `given fn_fixture`.
+
+fn_fixture() {
+  case_fixture();
+  fn_fixture_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fn_fixture_build() {
+  int[] params = [node_param("param", "int", "x")];
+  int retexpr = node_int("0", 0, 0);
+  fn_fixture_node(params, retexpr);
+} return void;
+given case_fixture ():() then check_failed:(0)
+given case_fixture ():() then init_units:(0)
+
+fn_fixture_node(int[] params, int retexpr) {
+  int[] none = [];
+  export int fixture_fn = node_func("fx_target", "int", params, none, retexpr);
+  fn_fixture_reg();
+} return void;
+given case_fixture ([], 0):() then check_failed:(0)
+given case_fixture ([], 0):() then init_units:(0)

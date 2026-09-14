@@ -6,9 +6,13 @@ then_fn_entry(int chk_node) {
   string chk_nm = s1_of(chk_node);
   then_fn(chk_node, chk_nm);
 } return void;
+given then_node_fixture ((import fixture_then_node)):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
+given then_node_fixture ((import fixture_then_bad)):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
 
 then_fn(int chk_node, string chk_nm) {
   int cfn = func_node(chk_nm);
   int ci = i1_of(chk_node);
   then_shape(ci, chk_node, cfn);
 } return void;
+given then_node_fixture ((import fixture_then_node), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
+given then_node_fixture ((import fixture_then_bad), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")

@@ -26,3 +26,6 @@ fit_then_kind(string kind, int chk_node) {
     fit_then_calls(kind, chk_node);
   }
 } return void;
+given then_node_fixture ("then", (import fixture_then_bad)):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
+given print_fixture ("thenprints", (import fixture_print_empty)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
+given calls_node_fixture ("thencalls", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")

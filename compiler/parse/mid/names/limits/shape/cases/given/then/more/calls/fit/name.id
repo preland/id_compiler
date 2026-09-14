@@ -1,0 +1,30 @@
+// NAME named by a `calls` clause but not a function of the build: either it
+// is a builtin, which the harness never instruments -- its effect is checked
+// with 'prints'/'eprints' instead -- or it is nothing this build declares.
+
+calls_unknown(int ci, string nm) {
+  if(is_builtin(nm) == 1) {
+    case_err(ci, "'calls' names '" + nm + "', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'");
+  } else {
+    case_err(ci, "'calls' names '" + nm + "', which is not a function in this build");
+  }
+} return void;
+given case_fixture ((import fixture_ci), "nope"):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")
+given case_fixture ((import fixture_ci), "print"):() then prints:("fixture.id:4: error: 'calls' names 'print', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'\n")
+
+// An empty argument list and a one-int list, for fit_calls_args/
+// fit_calls_count (args.id) to check against fx_target's one int parameter
+// (fn_fixture, ../fixture/fn.id) without a full "thencalls" node.
+calls_items_fixture() {
+  fn_fixture();
+  calls_items_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+calls_items_build() {
+  export int[] fixture_calls_none = [];
+  export int[] fixture_calls_one = [node_int("1", 1, 0)];
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
