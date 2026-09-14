@@ -1,28 +1,31 @@
 fix_walk_roots(int[] roots) {
   int i = 0;
   while(i < len(roots)) {
-    fix_walk(roots[i], 0, 0, "");
+    fix_walk(roots[i], 0, 0, "", "");
     i = i + 1;
   }
 } return void;
 
 // Post-order is evaluation order (docs/SPEC.md 7): an operator's operands left
 // to right and then the operator, a call's arguments left to right and then
-// the call.
-//   ca  1 inside a call's argument   cd  1 right of && or ||
-//   nt  the type to declare, when this node is an argument that narrows
-fix_walk(int e, int ca, int cd, string nt) {
+// the call. `ca` and `an` are only ever set by fix_walk_arg, for the node at
+// the top of that one argument -- they do not pass down through it, so a call
+// further inside is judged on its own, not as if it sat in the argument too.
+//   ca  1 for the node at the top of a call's argument   cd  1 right of && or ||
+//   nt  the type to declare, when this node narrows
+//   an  the whole-argument name to use, when this node narrows nothing itself
+fix_walk(int e, int ca, int cd, string nt, string an) {
   int lo = len((import fixe_n));
-  fix_walk_kids(e, ca, cd);
-  fix_push_ev(e, lo, ca, cd, nt);
+  fix_walk_kids(e, cd);
+  fix_push_ev(e, lo, ca, cd, nt, an);
 } return void;
 
-fix_walk_kids(int e, int ca, int cd) {
+fix_walk_kids(int e, int cd) {
   if(k_of(e) == "call") {
     fix_walk_args(e, cd);
   } else if(k_of(e) == "bin" || k_of(e) == "index") {
-    fix_walk_bin(e, ca, cd);
+    fix_walk_bin(e, cd);
   } else {
-    fix_walk_more(e, ca, cd);
+    fix_walk_more(e, cd);
   }
 } return void;

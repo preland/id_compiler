@@ -1,0 +1,12 @@
+fix_push_ev(int e, int lo, int ca, int cd, string nt, string an) {
+  int cl = fix_class(e, ca, nt, lo);
+  fix_push_rest(e, lo, cl, cd, nt, an);
+} return void;
+
+// fixe_an is pushed here, not by fix_push4 (plan/walk/kind/push.id), so that
+// neither function goes past 3 actions.
+fix_push_rest(int e, int lo, int cl, int cd, string nt, string an) {
+  fix_push3(e, lo, cl);
+  fix_push4(cd, nt);
+  push((import fixe_an), an);
+} return void;

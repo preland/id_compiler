@@ -1,0 +1,8 @@
+fix_walk_args(int e, int cd) {
+  int[] args = l1_of(e);
+  int i = 0;
+  while(i < len(args)) {
+    fix_walk_arg(e, i, cd);
+    i = i + 1;
+  }
+} return void;

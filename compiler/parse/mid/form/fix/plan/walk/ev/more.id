@@ -1,7 +1,7 @@
-fix_walk_rhs(int e, int ca, int cd) {
+fix_walk_rhs(int e, int cd) {
   int b = i2_of(e);
   int c2 = fix_condop(e, cd);
-  fix_walk(b, ca, c2, "");
+  fix_walk(b, 0, c2, "", "");
 } return void;
 
 fix_condop(int e, int cd) {
@@ -11,11 +11,11 @@ fix_condop(int e, int cd) {
   }
 } return int c;
 
-fix_walk_more(int e, int ca, int cd) {
+fix_walk_more(int e, int cd) {
   if(k_of(e) == "un") {
     int a = i1_of(e);
-    fix_walk(a, ca, cd, "");
+    fix_walk(a, 0, cd, "", "");
   } else if(k_of(e) == "arr") {
-    fix_walk_arr(e, ca, cd);
+    fix_walk_arr(e, cd);
   }
 } return void;

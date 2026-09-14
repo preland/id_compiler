@@ -1,0 +1,9 @@
+// An index is its list and then its position, as an operator is its two
+// operands; only && and || may leave the right one unevaluated. `ca` and `an`
+// are not threaded through: they belong only to the node fix_walk_arg calls
+// this from (plan/walk/roots/walk.id).
+fix_walk_bin(int e, int cd) {
+  int a = i1_of(e);
+  fix_walk(a, 0, cd, "", "");
+  fix_walk_rhs(e, cd);
+} return void;

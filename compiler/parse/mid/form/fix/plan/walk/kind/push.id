@@ -11,11 +11,16 @@ fix_push5() {
 } return void;
 
 // A call inside another call's argument must be named; so must an argument
-// that narrows, whatever it is. Anything else is named only if something
-// evaluated after it moves (plan/decide/).
-fix_class(int e, int ca, string nt) {
+// that narrows, whatever it is; so must an argument that is not itself a call
+// but has one somewhere inside it -- named whole, rather than naming the call
+// alone, since naming the call alone would still leave it inside the
+// argument of the call this argument belongs to. Anything else is named only
+// if something evaluated after it moves (plan/decide/).
+fix_class(int e, int ca, string nt, int lo) {
   int cl = fix_class2(e);
   if(nt != "" || cl == 1 && ca == 1) {
+    cl = 3;
+  } else if(ca == 1 && cl != 1 && fix_any_call(lo) == 1) {
     cl = 3;
   }
 } return int cl;

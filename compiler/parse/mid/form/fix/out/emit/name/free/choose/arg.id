@@ -1,0 +1,8 @@
+// A whole argument named because it has a call somewhere inside it
+// (plan/walk/kind/push.id) takes an's text plain, with no _v: <callee>_a0,
+// then <callee>_a02 if that is somehow taken too (fix_try's own numbering,
+// with an empty suffix).
+fix_choose_arg(string an, string t) {
+  string bstem = fix_prefixed(an);
+  string name = fix_choose_base(bstem, "", t);
+} return string name;

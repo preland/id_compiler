@@ -1,0 +1,9 @@
+fix_choose(string stem, string t) {
+  string bstem = fix_prefixed(stem);
+  string name = fix_choose_base(bstem, "_v", t);
+} return string name;
+
+fix_choose_base(string bstem, string sfx, string t) {
+  string name = fix_try(bstem, sfx, t);
+  fix_take(name, t);
+} return string name;

@@ -1,0 +1,12 @@
+fix_walk_arg(int e, int i, int cd) {
+  int a = l1_of(e)[i];
+  string nt = fix_narrow(e, i, a);
+  fix_walk_arg2(e, i, a, cd, nt);
+} return void;
+
+// an: the name to use if this argument narrows nothing itself but is named as
+// a whole anyway, because a call sits somewhere inside it (plan/walk/kind/).
+fix_walk_arg2(int e, int i, int a, int cd, string nt) {
+  string an = s1_of(e) + "_a" + i;
+  fix_walk(a, 1, cd, nt, an);
+} return void;

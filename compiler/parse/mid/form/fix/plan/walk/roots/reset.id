@@ -17,7 +17,10 @@ fix_ev_reset3() {
 
 //   fixe_sep  1 for a moved event that gets a declaration of its own
 //   fixe_nm   the name it is given
+//   fixe_an   set only for the node at the top of a call's argument: the
+//             whole-argument name to use if it is named as one (out/emit/).
 fix_ev_reset4() {
   export int[] fixe_sep = [];
   export string[] fixe_nm = [];
+  export string[] fixe_an = [];
 } return void;
