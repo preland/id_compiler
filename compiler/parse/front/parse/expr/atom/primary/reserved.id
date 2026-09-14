@@ -1,10 +1,12 @@
 // `given` and `then` begin the parts of a test case (docs/TESTS.md), and a
-// case may follow any function's return clause. A function, variable or
-// parameter by either name would read as a case to anyone scanning the source,
-// and after a return clause it would parse as one, so neither is a name.
+// case may follow any function's return clause. `prints`, `eprints` and
+// `calls` begin the three clauses `then` may introduce. A function, variable
+// or parameter by any of these names would read as a case to anyone scanning
+// the source, and after a return clause it would parse as one, so none is a
+// name.
 
 no_case_word(int[] pos) {
-  if(cur_text(pos) == "given" || cur_text(pos) == "then") {
+  if(cur_text(pos) == "given" || cur_text(pos) == "then" || cur_text(pos) == "prints" || cur_text(pos) == "eprints" || cur_text(pos) == "calls") {
     string cur_text_v = cur_text(pos);
     syn_err(pos, "'" + cur_text_v + "' is a test case keyword (see docs/TESTS.md) and cannot be used as a name");
   }

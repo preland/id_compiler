@@ -1,0 +1,19 @@
+// `then prints:(...)` / `then eprints:(...)`: exactly one value, a string --
+// what the channel is (stdout, or eprint's channel) does not change this
+// check, only which captured buffer the harness compares it against
+// (back/tgt/c/emit/prog/test/).
+
+fit_then_print(int chk_node) {
+  int ci = i1_of(chk_node);
+  int[] items = l1_of(chk_node);
+  fit_print_items(ci, items);
+} return void;
+
+fit_print_items(int ci, int[] items) {
+  if(len(items) != 1) {
+    int ne = len(items);
+    case_err(ci, "a 'prints' or 'eprints' check compares exactly one value, not " + ne);
+  } else {
+    fit_value(ci, items[0], "string");
+  }
+} return void;

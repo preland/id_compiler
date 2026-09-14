@@ -1,7 +1,7 @@
-// A case's `then` checks. Each names a function that takes nothing and returns
-// a value, and gives one literal of that function's return type: the harness
-// calls it after the call under test and compares, so a check returning void
-// would compare nothing -- the vacuous case this clause exists to replace.
+// A case's `then` clauses, dispatched by node kind: a check (check/), the
+// output clauses (more/print/), or a call clause (more/calls/). The kind was
+// decided when the case was parsed
+// (front/.../case/then/more/dispatch.id), so this only routes.
 
 fit_thens() {
   int ti = 0;
@@ -13,12 +13,16 @@ fit_thens() {
 
 fit_then(int ti) {
   int chk_node = (import thennode)[ti];
-  string chk_nm = s1_of(chk_node);
-  then_fn(chk_node, chk_nm);
+  string kind = k_of(chk_node);
+  fit_then_kind(kind, chk_node);
 } return void;
 
-then_fn(int chk_node, string chk_nm) {
-  int cfn = func_node(chk_nm);
-  int ci = i1_of(chk_node);
-  then_shape(ci, chk_node, cfn);
+fit_then_kind(string kind, int chk_node) {
+  if(kind == "then") {
+    then_fn_entry(chk_node);
+  } else if(kind == "thenprints" || kind == "theneprints") {
+    fit_then_print(chk_node);
+  } else {
+    fit_then_calls(kind, chk_node);
+  }
 } return void;

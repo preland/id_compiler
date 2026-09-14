@@ -1368,9 +1368,21 @@ char* id_given_name(IdList* pos);
 char* id_case_fn_name(IdList* pos, char* fn_word);
 int id_at_case_import(IdList* pos);
 int id_next_is_import(IdList* pos);
+void id_then_calls_clause(IdList* pos);
+void id_then_calls_rest(IdList* pos, char* nm);
+void id_then_calls_args(IdList* pos, char* nm);
+void id_then_calls_count(IdList* pos, char* nm);
+void id_then_calls_count_rest(IdList* pos, char* nm, int v);
+void id_then_calls_count_push(char* nm, int v);
+void id_then_dispatch(IdList* pos);
+void id_then_check_clause(IdList* pos);
+void id_then_print_dispatch(IdList* pos);
+void id_then_print_clause(IdList* pos, char* kind);
+void id_then_print_value(IdList* pos, char* kind);
+void id_then_push_kind(char* kind, char* s1v, IdList* items);
 void id_then_value(IdList* pos, char* chk_nm);
 void id_then_push(char* chk_nm, IdList* items);
-void id_then_store(char* chk_nm, IdList* items, int ci, IdList* no_items);
+void id_then_store(char* kind, char* chk_nm, IdList* items, int ci, IdList* no_items);
 void id_case_rest(IdList* pos);
 void id_case_thens(IdList* pos);
 void id_then_one(IdList* pos);
@@ -2079,13 +2091,24 @@ void id_reach_seed(char* src_fn);
 void id_fit_import(int i, int e, char* want);
 void id_imp_check(int i, char* imp_nm, int ek, char* want);
 void id_imp_owner(int i, char* imp_nm, int ek, char* want);
-void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm);
-void id_fit_thens(void);
-void id_fit_then(int ti);
+void id_then_fn_entry(int chk_node);
 void id_then_fn(int chk_node, char* chk_nm);
+void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm);
 void id_then_shape(int ci, int chk_node, int cfn);
 void id_then_value_fit(int ci, int chk_node, int cfn);
 void id_then_lit(int ci, int e, int cfn);
+void id_fit_calls_body(char* kind, int ci, char* nm, int cfn, int chk_node);
+void id_fit_calls_args(int ci, char* nm, int cfn, IdList* items);
+void id_fit_calls_count(int ci, IdList* items);
+void id_fit_then_calls(char* kind, int chk_node);
+void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node);
+void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node);
+void id_calls_unknown(int ci, char* nm);
+void id_fit_then_print(int chk_node);
+void id_fit_print_items(int ci, IdList* items);
+void id_fit_thens(void);
+void id_fit_then(int ti);
+void id_fit_then_kind(char* kind, int chk_node);
 void id_check_dup_cases(void);
 void id_dup_scan(int i);
 void id_dup_hit(int i, int j);
@@ -2137,6 +2160,7 @@ void id_ut_case_vals(int ci);
 void id_ut_case_val(int ci, int e);
 void id_ut_thens(void);
 void id_ut_then(int node);
+char* id_ut_then_lead(int node);
 void id_ut_mark(void);
 void id_ut_mark2(void);
 void id_ut_fix(void);
@@ -11132,6 +11156,105 @@ int id_next_is_import(IdList* pos) {
     return r;
 }
 
+void id_then_calls_clause(IdList* pos) {
+    char* nm;
+    id_advance(pos);
+    nm = id_case_fn_name(pos, "calls");
+    id_then_calls_rest(pos, nm);
+    return;
+}
+
+void id_then_calls_rest(IdList* pos, char* nm) {
+    id_eat_colon(pos);
+    if ((strcmp(id_cur_text(pos), "[") == 0)) {
+        id_then_calls_count(pos, nm);
+    } else {
+        id_then_calls_args(pos, nm);
+    }
+    return;
+}
+
+void id_then_calls_args(IdList* pos, char* nm) {
+    IdList* items;
+    items = id_case_tuple(pos);
+    id_then_push_kind("thencalls", nm, items);
+    return;
+}
+
+void id_then_calls_count(IdList* pos, char* nm) {
+    int v;
+    id_advance(pos);
+    v = id_case_value(pos);
+    id_then_calls_count_rest(pos, nm, v);
+    return;
+}
+
+void id_then_calls_count_rest(IdList* pos, char* nm, int v) {
+    id_expect_text(pos, "]");
+    id_advance(pos);
+    id_then_calls_count_push(nm, v);
+    return;
+}
+
+void id_then_calls_count_push(char* nm, int v) {
+    IdList* items;
+    items = id_list_lit(1, (long long)(v));
+    id_then_push_kind("thencallsn", nm, items);
+    return;
+}
+
+void id_then_dispatch(IdList* pos) {
+    if (((strcmp(id_cur_kind(pos), "kw") == 0) && ((strcmp(id_cur_text(pos), "prints") == 0) || (strcmp(id_cur_text(pos), "eprints") == 0)))) {
+        id_then_print_dispatch(pos);
+    } else if (((strcmp(id_cur_kind(pos), "kw") == 0) && (strcmp(id_cur_text(pos), "calls") == 0))) {
+        id_then_calls_clause(pos);
+    } else {
+        id_then_check_clause(pos);
+    }
+    return;
+}
+
+void id_then_check_clause(IdList* pos) {
+    char* chk_nm;
+    chk_nm = id_case_fn_name(pos, "then");
+    id_then_value(pos, chk_nm);
+    return;
+}
+
+void id_then_print_dispatch(IdList* pos) {
+    char* w;
+    w = id_cur_text(pos);
+    if ((strcmp(w, "prints") == 0)) {
+        id_then_print_clause(pos, "thenprints");
+    } else {
+        id_then_print_clause(pos, "theneprints");
+    }
+    return;
+}
+
+void id_then_print_clause(IdList* pos, char* kind) {
+    id_advance(pos);
+    id_then_print_value(pos, kind);
+    return;
+}
+
+void id_then_print_value(IdList* pos, char* kind) {
+    IdList* items;
+    id_eat_colon(pos);
+    items = id_case_tuple(pos);
+    id_then_push_kind(kind, "", items);
+    return;
+}
+
+void id_then_push_kind(char* kind, char* s1v, IdList* items) {
+    int n;
+    IdList* no_items;
+    n = id_list_len(casestart);
+    no_items = id_list_lit(0);
+    id_then_store(kind, s1v, items, (n - 1), no_items);
+    return;
+}
+
 void id_then_value(IdList* pos, char* chk_nm) {
     IdList* items;
     id_eat_colon(pos);
@@ -11145,13 +11268,13 @@ void id_then_push(char* chk_nm, IdList* items) {
     IdList* no_items;
     n = id_list_len(casestart);
     no_items = id_list_lit(0);
-    id_then_store(chk_nm, items, (n - 1), no_items);
+    id_then_store("then", chk_nm, items, (n - 1), no_items);
     return;
 }
 
-void id_then_store(char* chk_nm, IdList* items, int ci, IdList* no_items) {
+void id_then_store(char* kind, char* chk_nm, IdList* items, int ci, IdList* no_items) {
     int node;
-    node = id_newnode("then", ci, 0, chk_nm, "", items, no_items);
+    node = id_newnode(kind, ci, 0, chk_nm, "", items, no_items);
     id_list_push(thennode, (long long)(node));
     return;
 }
@@ -11170,10 +11293,8 @@ void id_case_thens(IdList* pos) {
 }
 
 void id_then_one(IdList* pos) {
-    char* chk_nm;
     id_advance(pos);
-    chk_nm = id_case_fn_name(pos, "then");
-    id_then_value(pos, chk_nm);
+    id_then_dispatch(pos);
     return;
 }
 
@@ -12412,7 +12533,7 @@ int id_parse_paren(IdList* pos) {
 
 void id_no_case_word(IdList* pos) {
     char* cur_text_v;
-    if (((strcmp(id_cur_text(pos), "given") == 0) || (strcmp(id_cur_text(pos), "then") == 0))) {
+    if ((((((strcmp(id_cur_text(pos), "given") == 0) || (strcmp(id_cur_text(pos), "then") == 0)) || (strcmp(id_cur_text(pos), "prints") == 0)) || (strcmp(id_cur_text(pos), "eprints") == 0)) || (strcmp(id_cur_text(pos), "calls") == 0))) {
         cur_text_v = id_cur_text(pos);
         id_syn_err(pos, id_concat(id_concat("'", cur_text_v), "' is a test case keyword (see docs/TESTS.md) and cannot be used as a name"));
     }
@@ -17469,33 +17590,8 @@ void id_imp_owner(int i, char* imp_nm, int ek, char* want) {
     return;
 }
 
-void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm) {
-    int np;
-    if ((id_flat_arg_count(cfn) != 0)) {
-        np = id_flat_arg_count(cfn);
-        id_case_err(ci, id_concat(id_concat(id_concat(id_concat("'then' names '", chk_nm), "', which takes "), id_str_of_int(np)), " parameter(s); a check takes none and returns the value it compares"));
-    } else if ((strcmp(id_s2_of(cfn), "void") == 0)) {
-        id_case_err(ci, id_concat(id_concat("'then' names '", chk_nm), "', which returns void; a check takes none and returns the value it compares"));
-    } else {
-        id_then_value_fit(ci, chk_node, cfn);
-    }
-    return;
-}
-
-void id_fit_thens(void) {
-    int ti;
-    ti = 0;
-    while ((ti < id_list_len(thennode))) {
-        id_fit_then(ti);
-        ti = (ti + 1);
-    }
-    return;
-}
-
-void id_fit_then(int ti) {
-    int chk_node;
+void id_then_fn_entry(int chk_node) {
     char* chk_nm;
-    chk_node = (int)(id_list_get(thennode, ti));
     chk_nm = id_s1_of(chk_node);
     id_then_fn(chk_node, chk_nm);
     return;
@@ -17507,6 +17603,19 @@ void id_then_fn(int chk_node, char* chk_nm) {
     cfn = id_func_node(chk_nm);
     ci = id_i1_of(chk_node);
     id_then_shape(ci, chk_node, cfn);
+    return;
+}
+
+void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm) {
+    int np;
+    if ((id_flat_arg_count(cfn) != 0)) {
+        np = id_flat_arg_count(cfn);
+        id_case_err(ci, id_concat(id_concat(id_concat(id_concat("'then' names '", chk_nm), "', which takes "), id_str_of_int(np)), " parameter(s); a check takes none and returns the value it compares"));
+    } else if ((strcmp(id_s2_of(cfn), "void") == 0)) {
+        id_case_err(ci, id_concat(id_concat("'then' names '", chk_nm), "', which returns void; a check takes none and returns the value it compares"));
+    } else {
+        id_then_value_fit(ci, chk_node, cfn);
+    }
     return;
 }
 
@@ -17543,6 +17652,129 @@ void id_then_lit(int ci, int e, int cfn) {
     } else {
         rt = id_s2_of(cfn);
         id_fit_value(ci, e, rt);
+    }
+    return;
+}
+
+void id_fit_calls_body(char* kind, int ci, char* nm, int cfn, int chk_node) {
+    IdList* items;
+    items = id_l1_of(chk_node);
+    if ((strcmp(kind, "thencalls") == 0)) {
+        id_fit_calls_args(ci, nm, cfn, items);
+    } else {
+        id_fit_calls_count(ci, items);
+    }
+    return;
+}
+
+void id_fit_calls_args(int ci, char* nm, int cfn, IdList* items) {
+    int na;
+    int np;
+    if ((id_list_len(items) != id_flat_arg_count(cfn))) {
+        na = id_list_len(items);
+        np = id_flat_arg_count(cfn);
+        id_case_err(ci, id_concat(id_concat(id_concat(id_concat(id_concat("this case's 'calls ", nm), "' passes "), id_str_of_int(na)), " argument(s), which takes "), id_str_of_int(np)));
+    } else {
+        id_fit_items(ci, cfn, items);
+    }
+    return;
+}
+
+void id_fit_calls_count(int ci, IdList* items) {
+    int ne;
+    if ((id_list_len(items) != 1)) {
+        ne = id_list_len(items);
+        id_case_err(ci, id_concat("a 'calls NAME:[N]' check takes exactly one count, not ", id_str_of_int(ne)));
+    } else {
+        id_fit_value(ci, (int)(id_list_get(items, 0)), "int");
+    }
+    return;
+}
+
+void id_fit_then_calls(char* kind, int chk_node) {
+    int ci;
+    char* nm;
+    ci = id_i1_of(chk_node);
+    nm = id_s1_of(chk_node);
+    id_fit_calls_name(kind, ci, nm, chk_node);
+    return;
+}
+
+void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node) {
+    int cfn;
+    cfn = id_func_node(nm);
+    if ((cfn < 0)) {
+        id_calls_unknown(ci, nm);
+    } else {
+        id_fit_calls_native(kind, ci, nm, cfn, chk_node);
+    }
+    return;
+}
+
+void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node) {
+    if ((id_is_native(cfn) == 1)) {
+        id_case_err(ci, id_concat(id_concat("'calls' names '", nm), "', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead"));
+    } else {
+        id_fit_calls_body(kind, ci, nm, cfn, chk_node);
+    }
+    return;
+}
+
+void id_calls_unknown(int ci, char* nm) {
+    if ((id_is_builtin(nm) == 1)) {
+        id_case_err(ci, id_concat(id_concat("'calls' names '", nm), "', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'"));
+    } else {
+        id_case_err(ci, id_concat(id_concat("'calls' names '", nm), "', which is not a function in this build"));
+    }
+    return;
+}
+
+void id_fit_then_print(int chk_node) {
+    int ci;
+    IdList* items;
+    ci = id_i1_of(chk_node);
+    items = id_l1_of(chk_node);
+    id_fit_print_items(ci, items);
+    return;
+}
+
+void id_fit_print_items(int ci, IdList* items) {
+    int ne;
+    if ((id_list_len(items) != 1)) {
+        ne = id_list_len(items);
+        id_case_err(ci, id_concat("a 'prints' or 'eprints' check compares exactly one value, not ", id_str_of_int(ne)));
+    } else {
+        id_fit_value(ci, (int)(id_list_get(items, 0)), "string");
+    }
+    return;
+}
+
+void id_fit_thens(void) {
+    int ti;
+    ti = 0;
+    while ((ti < id_list_len(thennode))) {
+        id_fit_then(ti);
+        ti = (ti + 1);
+    }
+    return;
+}
+
+void id_fit_then(int ti) {
+    int chk_node;
+    char* kind;
+    chk_node = (int)(id_list_get(thennode, ti));
+    kind = id_k_of(chk_node);
+    id_fit_then_kind(kind, chk_node);
+    return;
+}
+
+void id_fit_then_kind(char* kind, int chk_node) {
+    if ((strcmp(kind, "then") == 0)) {
+        id_then_fn_entry(chk_node);
+    } else if (((strcmp(kind, "thenprints") == 0) || (strcmp(kind, "theneprints") == 0))) {
+        id_fit_then_print(chk_node);
+    } else {
+        id_fit_then_calls(kind, chk_node);
     }
     return;
 }
@@ -18026,12 +18258,25 @@ void id_ut_thens(void) {
 void id_ut_then(int node) {
     char* s1_of_v;
     int ci;
+    char* lead;
     s1_of_v = id_s1_of(node);
     if ((id_ut_at(s1_of_v) >= 0)) {
         ci = id_i1_of(node);
-        id_ut_named(ci, "'then' names '", s1_of_v);
+        lead = id_ut_then_lead(node);
+        id_ut_named(ci, lead, s1_of_v);
     }
     return;
+}
+
+char* id_ut_then_lead(int node) {
+    char* lead;
+    char* kind;
+    lead = "'then' names '";
+    kind = id_k_of(node);
+    if (((strcmp(kind, "thencalls") == 0) || (strcmp(kind, "thencallsn") == 0))) {
+        lead = "'calls' names '";
+    }
+    return lead;
 }
 
 void id_ut_mark(void) {

@@ -1,0 +1,19 @@
+// Which `then` clause this is: the original check (`then NAME:(value)`), the
+// two output clauses (more/print/), or a call clause (more/calls/). `prints`,
+// `eprints` and `calls` are keywords (lex/chars/classify/ident_kw.id), so a
+// check's own name can never collide with one.
+
+then_dispatch(int[] pos) {
+  if(cur_kind(pos) == "kw" && (cur_text(pos) == "prints" || cur_text(pos) == "eprints")) {
+    then_print_dispatch(pos);
+  } else if(cur_kind(pos) == "kw" && cur_text(pos) == "calls") {
+    then_calls_clause(pos);
+  } else {
+    then_check_clause(pos);
+  }
+} return void;
+
+then_check_clause(int[] pos) {
+  string chk_nm = case_fn_name(pos, "then");
+  then_value(pos, chk_nm);
+} return void;
