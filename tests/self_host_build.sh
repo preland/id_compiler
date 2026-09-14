@@ -308,6 +308,97 @@ else
     echo "SKIP: conf.id constants on --target llvm (needs clang on PATH)"
 fi
 
+# (b2-list) list-typed conf.id constants are rejected at the conf.id declaration
+#           with a clear diagnostic. A list is mutable, heap-allocated state with
+#           no constant form in C or LLVM, and this check prevents miscompilation
+#           on both targets and the test harness. bin/idc only.
+cat > "$proj/conf.id" <<'EOF'
+string[] names = ["a","b"];
+int count = 2;
+EOF
+cat > "$proj/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  print((import names)[0]);
+  print((import count));
+} return int 0;
+EOF
+rm -f "$TMP/list_const.bin"
+if $BIN_IDC "$proj" -o "$TMP/list_const.bin" 2>&1 \
+   | grep -q "$proj/conf.id:1: error: 'names' is a list constant"; then
+    ok "conf.id: a list constant is rejected with a diagnostic naming the real conf.id line"
+else
+    bad "conf.id: a list constant is rejected with a diagnostic naming the real conf.id line"
+fi
+# 'names' is never registered, so the (import names) reading it is the
+# ordinary "no exported variable" error, and no binary comes out -- the whole
+# reason for catching this at conf.id rather than merely warning about it.
+if [ ! -e "$TMP/list_const.bin" ]; then
+    ok "conf.id: a list constant that is used leaves no binary behind"
+else
+    bad "conf.id: a list constant that is used leaves no binary behind"
+fi
+
+# And whether or not the rest of the project still builds (an unused list
+# constant is a manifest error but not a use-site one -- the driver still
+# links what it can, matching every other STRUCT_VIOLATIONS case), the crash
+# this guards against -- id_list_lit(...) as a file-scope C initialiser --
+# can never appear, because the rejected constant never reaches emit_sources.
+rm -f "$TMP/list_const.c"
+$BIN_IDC "$proj" -o "$TMP/list_const.bin" --emit-c "$TMP/list_const.c" >/dev/null 2>&1
+if [ ! -f "$TMP/list_const.c" ] || ! grep -q 'IdList\* names = id_list_lit' "$TMP/list_const.c"; then
+    ok "conf.id: a rejected list constant is never emitted as a broken static initialiser"
+else
+    bad "conf.id: a rejected list constant is never emitted as a broken static initialiser"
+fi
+
+# test with an int[] constant as well.
+cat > "$proj/conf.id" <<'EOF'
+int[] table = [1,2,3];
+EOF
+if $BIN_IDC "$proj" -o "$TMP/list_const.bin" 2>&1 \
+   | grep -q "is a list constant"; then
+    ok "conf.id: an int[] constant is rejected with a diagnostic"
+else
+    bad "conf.id: an int[] constant is rejected with a diagnostic"
+fi
+
+# same rejection when the list constant would be read inside a test case.
+cat > "$proj/conf.id" <<'EOF'
+string[] names = ["a","b"];
+EOF
+cat > "$proj/main.id" <<'EOF'
+test_use() {
+  string s = (import names)[0];
+} return string s;
+("x"):("x")
+EOF
+if $BIN_IDC "$proj" -o "$TMP/list_const.bin" 2>&1 \
+   | grep -q "is a list constant"; then
+    ok "conf.id: a list constant in a test case is rejected at the conf.id line"
+else
+    bad "conf.id: a list constant in a test case is rejected at the conf.id line"
+fi
+
+# and the same rejection holds for --target llvm.
+if command -v clang >/dev/null 2>&1; then
+    cat > "$proj/conf.id" <<'EOF'
+int[] table = [1,2,3];
+EOF
+    cat > "$proj/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  print(0);
+} return int 0;
+EOF
+    if $BIN_IDC "$proj" --target llvm -o "$TMP/list_const_ll.bin" 2>&1 \
+       | grep -q "is a list constant"; then
+        ok "conf.id: a list constant is rejected on --target llvm"
+    else
+        bad "conf.id: a list constant is rejected on --target llvm"
+    fi
+else
+    echo "SKIP: conf.id list constant rejection on --target llvm (needs clang on PATH)"
+fi
+
 # (b3) a subdirectory imported on its own reads the constants of its enclosing
 #      root -- the nearest directory above it that has a conf.id -- so a
 #      constant keeps one home however little of its tree a project imports.
