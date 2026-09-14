@@ -1,0 +1,30 @@
+// Registering a scalar or a one-element list conf.id constant in a single
+// call, for a case that only needs a name and a value to reach -- lc_reg
+// (fixture.id) still does the actual registration, this only builds the
+// node it registers. lc_env2 is lc_env's own tail, split out to stay under
+// the per-block action limit: the C target's type column (init_tyc) and the
+// build flags/builtin and reserved names (init_rtc), neither of which
+// env_init's own chain reaches.
+
+lc_env2() {
+  env_init();
+  init_rtc();
+  init_tyc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lc_reg_int(string name, string text, int nval) {
+  int e = node_int(text, nval, 0);
+  int d = lc_reg("int", name, e);
+} return int d;
+given lc_reg_setup ("qq", "1", 1):(3)
+given lc_reg_setup ("rr", "2", 2):(3)
+
+lc_reg_list1(string name, string text, int nval) {
+  int e = node_int(text, nval, 0);
+  int arr = node_arr([e]);
+  int d = lc_reg("int[]", name, arr);
+} return int d;
+given lc_reg_setup ("qq", "1", 1):(4)
+given lc_reg_setup ("rr", "2", 2):(4)

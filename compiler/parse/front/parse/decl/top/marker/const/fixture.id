@@ -1,0 +1,30 @@
+// A synthetic conf.id constant, registered the way reg_const registers a real
+// one (const.id) -- built by hand from a node the case constructs, rather
+// than parsed from a `#const` marker, so a case can give const_decl and its
+// callers a constant without a source file. lc_env runs env_init (env.id)
+// and also init_consts, which env_init's own chain never reaches: init_consts
+// is normally called only while parsing a `#const` marker.
+
+lc_env() {
+  env_init();
+  init_consts();
+  lc_env2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lc_reg(string type, string name, int expr) {
+  int d = node_decl(type, name, expr, 1);
+  add_export2(d, "conf.id");
+  push((import cdecl), d);
+} return int d;
+given lc_reg_setup ("int", "zz", (import lc_reg_e1)):(2)
+given lc_reg_setup ("int[]", "yy", (import lc_reg_e2)):(2)
+
+lc_reg_setup() {
+  lc_env();
+  export int lc_reg_e1 = node_int("1", 1, 0);
+  export int lc_reg_e2 = node_int("2", 2, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
