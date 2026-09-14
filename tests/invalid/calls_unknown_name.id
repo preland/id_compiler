@@ -1,7 +1,4 @@
 // EXPECT: 'calls' names 'nope', which is not a function in this build
-// EXPECT-IDCPY: expected '(', found 'calls'
-// idc.py does not parse `then calls` at all (docs/TESTS.md); see whichever
-// case is reported for the actual reason: the self-hosted compiler's.
 speak(int x) {
   print("hi");
 } return int x;

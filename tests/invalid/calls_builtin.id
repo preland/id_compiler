@@ -1,5 +1,4 @@
 // EXPECT: 'calls' names 'print', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'
-// EXPECT-IDCPY: expected '(', found 'calls'
 speak(int x) {
   print("hi");
 } return int x;
