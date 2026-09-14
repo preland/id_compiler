@@ -11,7 +11,7 @@ connect_serial() {
 
 warn_if_bad_serial() {
   if((import qm_serh) < 0) {
-    print("qmon: QEMU never opened its serial socket");
+    eprint("qmon: QEMU never opened its serial socket");
   }
 } return void;
 

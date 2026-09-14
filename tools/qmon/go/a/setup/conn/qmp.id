@@ -16,7 +16,7 @@ connect_qmp() {
 // so the rest of the run proceeds harmlessly rather than hanging).
 warn_if_bad_qmp() {
   if((import qm_qmph) < 0) {
-    print("qmon: QEMU never opened its QMP socket");
+    eprint("qmon: QEMU never opened its QMP socket");
   }
 } return void;
 
