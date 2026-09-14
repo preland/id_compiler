@@ -4,7 +4,10 @@
 // func_node("fx_target") finds it and its one int parameter is there for
 // arity/type checks to read. Built on case_fixture, so a case that needs
 // both a case to report at and a function to check against gets both from
-// one `given fn_fixture`.
+// one `given fn_fixture`. fixture_zero (its return expression) and
+// fixture_params (its one parameter, as l1_of(fixture_fn) also is) are
+// exported too: plain node ids, valid wherever a test elsewhere needs one
+// and not a whole fixture of its own.
 
 fn_fixture() {
   case_fixture();
@@ -14,17 +17,17 @@ fn_fixture() {
 ():() then init_units:(0)
 
 fn_fixture_build() {
-  int[] params = [node_param("param", "int", "x")];
-  int retexpr = node_int("0", 0, 0);
-  fn_fixture_node(params, retexpr);
+  export int[] fixture_params = [node_param("param", "int", "x")];
+  export int fixture_zero = node_int("0", 0, 0);
+  fn_fixture_node();
 } return void;
 given case_fixture ():() then check_failed:(0)
 given case_fixture ():() then init_units:(0)
 
-fn_fixture_node(int[] params, int retexpr) {
+fn_fixture_node() {
   int[] none = [];
-  export int fixture_fn = node_func("fx_target", "int", params, none, retexpr);
+  export int fixture_fn = node_func("fx_target", "int", (import fixture_params), none, (import fixture_zero));
   fn_fixture_reg();
 } return void;
-given case_fixture ([], 0):() then check_failed:(0)
-given case_fixture ([], 0):() then init_units:(0)
+given case_fixture ():() then check_failed:(0)
+given case_fixture ():() then init_units:(0)

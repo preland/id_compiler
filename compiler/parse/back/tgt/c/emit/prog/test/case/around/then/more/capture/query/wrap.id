@@ -3,6 +3,14 @@
 // clause (pre.id, post.id) -- or, for a case with none of these, exactly the
 // call, unchanged.
 
+// KNOWN GAP: this function's own inline cases are not written. It is a thin,
+// 3-statement wrapper -- pre, the call, post -- and each of the three is
+// cased on its own (pre/pre.id, case/more/call.id (pre-existing), post/
+// post.id); what is missing is a fixture giving it casefn/casenode state
+// (pre/fixture.id's wrap_fixture) that does not crash the harness once
+// emit_case_call_wrapped is the function under test -- pre.id's and post.id's
+// own cases, built the same way, run fine. Every other new function in this
+// tree has cases; this is the one left, with the investigation above it.
 emit_case_call_wrapped(int ci) {
   emit_capture_pre(ci);
   emit_case_call(ci);

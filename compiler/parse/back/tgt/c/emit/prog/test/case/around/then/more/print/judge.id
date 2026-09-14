@@ -9,15 +9,18 @@ emit_then_print(int ci, int ti, int node) {
   int[] items = l1_of(node);
   emit_print_check(ci, kind, items[0]);
 } return void;
+given print_fixture ((import fixture_ci), 0, (import fixture_print_node)):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_print_check(int ci, string kind, int e) {
   string var = print_var(kind);
   string want = tc_value(e, "string");
   emit_print_cond(ci, kind, var, want, e);
 } return void;
+given fn_fixture ((import fixture_ci), "thenprints", (import fixture_zero)):() then prints:("    if (!((strcmp(idtc_out_buf, 0) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_print_cond(int ci, string kind, string var, string want, int e) {
   string cnd = tc_compare(var, want, "string");
   string shown = "idtc_show_esc(" + var + ");";
   emit_print_lines(ci, kind, cnd, shown, e);
 } return void;
+given fn_fixture ((import fixture_ci), "thenprints", "idtc_out_buf", "\"0\"", (import fixture_zero)):() then prints:("    if (!((strcmp(idtc_out_buf, \"0\") == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")

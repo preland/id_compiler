@@ -8,7 +8,11 @@ calls_row_cmp(string nm, int ti, string pt, string fld, int item, string out) {
   string want = tc_value(item, pt);
   string so = out + " && " + tc_compare(code, want, pt);
 } return string so;
+given fn_fixture ("f", 0, "int", "x", (import fixture_zero), "1"):("1 && (idtc_rc_f_buf[idtc_j0].x == 0)")
+given fn_fixture ("g", 2, "int", "y", (import fixture_zero), "0"):("0 && (idtc_rc_g_buf[idtc_j2].y == 0)")
 
 emit_calls_args_emit(int ci, int ti, string nm, string rowcond) {
   emit_line("    int idtc_hit" + ti + " = 0;\n    for (int idtc_j" + ti + " = 0; idtc_j" + ti + " < idtc_rc_" + nm + "_n; idtc_j" + ti + "++) {\n        if (idtc_rc_" + nm + "_seq[idtc_j" + ti + "] > idtc_seek && (" + rowcond + ")) {\n            idtc_hit" + ti + " = 1;\n            idtc_seek = idtc_rc_" + nm + "_seq[idtc_j" + ti + "];\n            break;\n        }\n    }\n    if (!idtc_hit" + ti + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "(...) did not match; %d call(s) to '" + nm + "' were recorded\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], idtc_rc_" + nm + "_n);\n        return 3;\n    }");
 } return void;
+(0, 0, "f", "1"):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_f_n; idtc_j0++) {\n        if (idtc_rc_f_seq[idtc_j0] > idtc_seek && (1)) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_f_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        fprintf(stderr, \"%s: test failed: %s calls f(...) did not match; %d call(s) to 'f' were recorded\\n\", idtc_where[0], idtc_call[0], idtc_rc_f_n);\n        return 3;\n    }\n")
+(1, 2, "g", "0"):() then prints:("    int idtc_hit2 = 0;\n    for (int idtc_j2 = 0; idtc_j2 < idtc_rc_g_n; idtc_j2++) {\n        if (idtc_rc_g_seq[idtc_j2] > idtc_seek && (0)) {\n            idtc_hit2 = 1;\n            idtc_seek = idtc_rc_g_seq[idtc_j2];\n            break;\n        }\n    }\n    if (!idtc_hit2) {\n        fprintf(stderr, \"%s: test failed: %s calls g(...) did not match; %d call(s) to 'g' were recorded\\n\", idtc_where[1], idtc_call[1], idtc_rc_g_n);\n        return 3;\n    }\n")

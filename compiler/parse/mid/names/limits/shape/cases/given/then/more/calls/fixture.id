@@ -19,9 +19,12 @@ calls_node_build() {
 given calls_items_fixture ():() then check_failed:(0)
 given calls_items_fixture ():() then init_units:(0)
 
+// fixture_calls_node is pushed onto thennode at index 0, the same reason
+// print/fixture.id's fixture_print_node is.
 calls_node_unknown() {
   int ci = (import fixture_ci);
   export int fixture_calls_bad = newnode("thencalls", ci, 0, "nope", "", (import fixture_calls_none), (import fixture_calls_none));
+  push((import thennode), (import fixture_calls_node));
 } return void;
 given calls_node_fixture ():() then check_failed:(0)
 given calls_node_fixture ():() then init_units:(0)

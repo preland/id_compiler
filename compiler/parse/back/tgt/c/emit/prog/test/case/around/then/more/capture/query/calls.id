@@ -7,3 +7,14 @@ case_has_calls(int ci) {
     r = case_has_out(ci, "thencallsn");
   }
 } return int r;
+given case_fixture ((import fixture_ci)):(0)
+given fn_fixture ((import fixture_ci)):(0)
+
+// thennode with one entry, not empty -- for out_step (query.id), which
+// indexes it directly rather than scanning it.
+query_node_fixture() {
+  fn_fixture();
+  push((import thennode), (import fixture_fn));
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)

@@ -19,10 +19,14 @@ print_fixture_items() {
 given fn_fixture ():() then check_failed:(0)
 given fn_fixture ():() then init_units:(0)
 
+// fixture_print_node is pushed onto thennode at index 0: emission's
+// then-chain (e.g. got.id's emit_then_want, pre-existing) reads a case's
+// then-clauses by that index, not by the node id passed around, so a case
+// testing one of them has to put it there.
 print_fixture_nodes() {
-  int ci = (import fixture_ci);
-  export int fixture_print_node = newnode("thenprints", ci, 0, "", "", (import fixture_print_two), (import fixture_print_two));
-  export int fixture_print_empty = newnode("thenprints", ci, 0, "", "", (import fixture_print_none), (import fixture_print_none));
+  export int fixture_print_node = newnode("thenprints", (import fixture_ci), 0, "", "", (import fixture_print_two), (import fixture_print_two));
+  export int fixture_print_empty = newnode("thenprints", (import fixture_ci), 0, "", "", (import fixture_print_none), (import fixture_print_none));
+  push((import thennode), (import fixture_print_node));
 } return void;
 given print_fixture ():() then check_failed:(0)
 given print_fixture ():() then init_units:(0)

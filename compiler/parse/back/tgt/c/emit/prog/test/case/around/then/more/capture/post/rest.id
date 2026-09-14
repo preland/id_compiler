@@ -6,15 +6,21 @@ emit_capture_post2(int ci) {
   emit_err_post(ci);
   emit_calls_post(ci);
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")
 
 emit_err_post(int ci) {
   if(case_has_out(ci, "theneprints") == 1) {
     emit_line("    fflush(idtc_eprint_target);\n    long idtc_err_len = ftell(idtc_eprint_target);\n    fseek(idtc_eprint_target, 0, SEEK_SET);\n    char* idtc_err_buf = malloc((size_t)idtc_err_len + 1);\n    if (idtc_err_len > 0) { size_t idtc_err_rd = fread(idtc_err_buf, 1, (size_t)idtc_err_len, idtc_eprint_target); (void)idtc_err_rd; }\n    idtc_err_buf[idtc_err_len] = 0;\n    fclose(idtc_eprint_target);\n    idtc_eprint_target = NULL;");
   }
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")
 
 emit_calls_post(int ci) {
   if(case_has_calls(ci) == 1) {
     emit_line("    idtc_rec_on = 0;");
   }
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")

@@ -8,9 +8,13 @@ emit_capture_pre(int ci) {
   emit_out_pre(ci);
   emit_capture_pre2(ci);
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")
 
 emit_out_pre(int ci) {
   if(case_has_out(ci, "thenprints") == 1) {
     emit_line("    fflush(stdout);\n    FILE* idtc_out_tmp = tmpfile();\n    int idtc_out_save = dup(1);\n    dup2(fileno(idtc_out_tmp), 1);");
   }
 } return void;
+given case_fixture ((import fixture_ci)):() then prints:("")
+given case_fixture (5):() then prints:("")
