@@ -890,10 +890,9 @@ static void* id_realloc(void* p, size_t n) {
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
    type. Because a list is a pointer, passing one to a function and mutating it
-   is visible to the caller -- this is how id gets shared mutable state.
-   Every index access is bounds-checked: an out-of-range get/set/pop is a
-   clear, fatal runtime error (never silent corruption or UB), matching id's
-   contract that a bug aborts loudly instead of reading/writing garbage. */
+   is visible to the caller -- this is how id gets shared mutable state. Every
+   index access is bounds-checked: an out-of-range get/set/pop is a clear,
+   fatal runtime error, matching id's contract that a bug aborts loudly. */
 typedef struct { int len, cap; long long* data; } IdList;
 static IdList* id_list_new(void) {
     IdList* L = (IdList*)id_alloc(sizeof(IdList));
@@ -901,8 +900,9 @@ static IdList* id_list_new(void) {
     L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, "list init"));
     return L;
 }
+static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; } static void id_list_mut_check(IdList* L) { if (L->cap < 0) { fprintf(stderr, "id: cannot mutate a constant list\n"); exit(1); } }
 static void id_list_push(IdList* L, long long v) {
-    if (L->len >= L->cap) {
+    id_list_mut_check(L); if (L->len >= L->cap) {
         if (L->cap > INT_MAX / 2) {
             fprintf(stderr, "id: list capacity overflow\n");
             exit(1);
@@ -922,7 +922,7 @@ static long long id_list_get(IdList* L, int i) {
     return L->data[i];
 }
 static void id_list_set(IdList* L, int i, long long v) {
-    if (i < 0 || i >= L->len) {
+    id_list_mut_check(L); if (i < 0 || i >= L->len) {
         fprintf(stderr, "id: index %d out of bounds (len %d)\n", i, L->len);
         exit(1);
     }
@@ -930,7 +930,7 @@ static void id_list_set(IdList* L, int i, long long v) {
 }
 static int id_list_len(IdList* L) { return L->len; }
 static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
-    if (L->len <= 0) {
+    id_list_mut_check(L); if (L->len <= 0) {
         fprintf(stderr, "id: pop from empty list\n");
         exit(1);
     }

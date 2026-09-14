@@ -1,0 +1,28 @@
+// A conf.id list constant is locked at runtime (docs/SPEC.md 8), but a direct
+// `push`/`pop` on `(import NAME)` is caught here instead, at the call, with a
+// diagnostic that names the constant -- an alias cannot be caught this way
+// (docs/PROJECT.md 5), which is what the runtime lock is for.
+
+chk_const_mut(int id) {
+  if(is_mut_call(id) == 1) {
+    chk_const_mut2(id);
+  }
+} return void;
+
+is_mut_call(int id) {
+  int ok = 0;
+  string k = k_of(id);
+  if(k == "call") {
+    string nm = s1_of(id);
+    ok = is_mut_name(nm);
+  }
+} return int ok;
+
+is_mut_name(string name) {
+  int ok = 0;
+  if(name == "push" || name == "pop") {
+    ok = 1;
+  }
+} return int ok;
+("push"):(1)
+("len"):(0)

@@ -11,8 +11,7 @@ chk_call(int id) {
   if(is_push2(id) == 1) {
     chk_push(id);
   }
-  chk_callsite(id);
-  chk_bi(id);
+  chk_call2(id);
 } return void;
 
 // A two-argument `push`. The arity is part of the test because a call written

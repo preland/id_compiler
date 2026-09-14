@@ -1,0 +1,8 @@
+// The rest of chk_call's work, split out so the block stays within the
+// per-block action limit once the constant-mutation check joined it.
+
+chk_call2(int id) {
+  chk_const_mut(id);
+  chk_callsite(id);
+  chk_bi(id);
+} return void;

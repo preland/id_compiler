@@ -14,3 +14,13 @@ list_pop(int[] xs) {
   word p = l2w(xs);
   word ret_w = list_pop_at(p);
 } return word ret_w;
+
+// A conf.id list constant is locked once built on the hosted targets
+// (docs/SPEC.md 8's "cannot mutate a constant list" trap) -- but there is
+// nowhere to trap to here, the same reason list_get/list_set do not
+// bounds-check (use/more/idx.id): no stderr, and nothing to exit to. So this
+// is a no-op, kept only so the call idc_const_init makes on every target
+// still links; mutating a freestanding list constant is unchecked, silently,
+// the same as an out-of-range index here.
+list_lock(int[] xs) {
+} return void;

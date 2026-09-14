@@ -1,0 +1,29 @@
+// The list argument -- `push`'s first, `pop`'s only -- read straight, not
+// through a local: `(import NAME)` where NAME is a list constant.
+
+chk_const_mut2(int id) {
+  int[] args = l1_of(id);
+  int arg0 = args[0];
+  if(k_of(arg0) == "import") {
+    string name = s1_of(arg0);
+    chk_const_mut3(id, name);
+  }
+} return void;
+
+// const_decl (back/tgt/c/emit/prog/head/const/find.id) is the one place that
+// answers "is NAME a conf.id constant, and which declaration"; reused rather
+// than walked again here, which would be the same function twice.
+chk_const_mut3(int id, string name) {
+  int d = const_decl(name);
+  if(d >= 0) {
+    string dt = s1_of(d);
+    if(ty_is_list(dt) == 1) {
+      cml_report(id, name);
+    }
+  }
+} return void;
+
+cml_report(int id, string name) {
+  string op = s1_of(id);
+  tc_err(id, "'" + op + "' cannot mutate '" + name + "', a list constant; pass it to a function that takes the list as a parameter instead");
+} return void;
