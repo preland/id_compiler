@@ -1,0 +1,25 @@
+// The two-operand shape (mirrors mid/form/unique/canon/expr/more/args.id's
+// canon_pair), and a call -- its callee kept verbatim (canon_callee, reused:
+// two functions calling different names are different logic, not a
+// near-duplicate), its arguments walked loosely.
+
+lz_pair(int a, int eb) {
+  string out = lz_expr(a);
+  string val = lz_expr(eb);
+  string ret_s = "(" + out + "," + val + ")";
+} return string ret_s;
+
+lz_call(int id) {
+  string name = s1_of(id);
+  int[] args = l1_of(id);
+  string ret_s = "c(" + canon_callee(name) + ":" + lz_args(args) + ")";
+} return string ret_s;
+
+lz_args(int[] args) {
+  string out = "";
+  int idx = 0;
+  while(idx < len(args)) {
+    out = out + sep_at(",", idx) + lz_expr(args[idx]);
+    idx = idx + 1;
+  }
+} return string out;

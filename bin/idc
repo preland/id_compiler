@@ -1176,6 +1176,12 @@ if [ "$lex_rc" -ne 0 ] || [ "$parse_rc" -ne 0 ] || [ ! -s "$RAW_OUT" ]; then
     compiler_bug "idlex or idparse failed on this input"
 fi
 
+# idparse's own decomposition warnings (docs/PROJECT.md, "decomposition
+# warnings") are on stderr, separate from the notes embedded in RAW_OUT above:
+# a normal build reaches here having emitted real C, and this is the one place
+# on that path where PARSE_ERR is otherwise never read.
+[ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+
 # ---------------------------------------------------------------------------
 # Native backends, linked by what the build reaches.
 #

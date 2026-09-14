@@ -1,0 +1,20 @@
+// Comparing the loose fingerprints, mirroring mid/form/unique/scan/compare.id's
+// uq_scan/uq_at: each function against every earlier one, reported against
+// the first match. ./more/probe.id excludes a pair the strict duplicate-logic
+// rule (mid/form/unique/) already rejects as an error -- this warns about the
+// gap that rule leaves, not about what it already covers.
+
+lz_scan() {
+  int i = 0;
+  while(i < len((import cfp2))) {
+    lz_at(i);
+    i = i + 1;
+  }
+} return void;
+
+lz_at(int i) {
+  int j = lz_find(i);
+  if(j >= 0) {
+    lz_report(i, j);
+  }
+} return void;

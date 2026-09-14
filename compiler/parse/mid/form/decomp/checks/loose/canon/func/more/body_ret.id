@@ -1,0 +1,19 @@
+// Statements in order (mirrors canon_body), and the return clause (mirrors
+// canon_ret) -- both loose.
+
+lz_body(int[] stmts) {
+  string out = "";
+  int idx = 0;
+  while(idx < len(stmts)) {
+    out = out + sep_at(";", idx) + lz_stmt(stmts[idx]);
+    idx = idx + 1;
+  }
+} return string out;
+
+lz_ret(int id) {
+  string out = "void";
+  if(i1_of(id) >= 0) {
+    int i1 = i1_of(id);
+    out = lz_expr(i1);
+  }
+} return string out;

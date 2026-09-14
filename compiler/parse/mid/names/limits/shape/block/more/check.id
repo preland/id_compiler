@@ -11,7 +11,7 @@
 check_program() {
   check_bodies();
   check_scopes();
-  chk_dead();
+  check_program_tail();
 } return void;
 
 check_funcs() {

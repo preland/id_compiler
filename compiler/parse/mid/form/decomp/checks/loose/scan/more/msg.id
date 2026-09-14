@@ -1,0 +1,9 @@
+lz_msg(string name_i, string name_j) {
+  string loc = lz_loc(name_i);
+  string ret_s = loc + "'" + name_i + "' and '" + name_j + "' differ only in a literal value; parameterise one function";
+} return string ret_s;
+
+lz_loc(string name_i) {
+  int ln = func_line(name_i);
+  string ret_s = func_file(name_i) + ":" + ln + ": warning: ";
+} return string ret_s;

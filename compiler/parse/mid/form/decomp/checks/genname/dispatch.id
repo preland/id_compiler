@@ -1,0 +1,28 @@
+// One parameter: read its name, decide, report.
+
+genname_check(int i, int[] params, int pk) {
+  int pid = params[pk];
+  genname_param(i, pid);
+} return void;
+
+genname_param(int i, int pid) {
+  string name = s2_of(pid);
+  if(is_genparam(name) == 1) {
+    genname_report(i, name);
+  }
+} return void;
+
+// The `--fix` convention (../more/match.id) or the `ret_i`/`ret_s` return-value
+// style (../more/retstyle.id) this compiler's own source uses throughout.
+is_genparam(string name) {
+  int ok = 0;
+  if(ends_v(name) == 1) {
+    ok = 1;
+  }
+  if(is_retstyle(name) == 1) {
+    ok = 1;
+  }
+} return int ok;
+("asset_at_v"):(1)
+("ret_s"):(1)
+("width"):(0)

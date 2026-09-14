@@ -1,0 +1,15 @@
+lz_find(int i) {
+  int j = 0;
+  int found = 0 - 1;
+  while(j < i && found < 0) {
+    found = lz_probe(i, j);
+    j = j + 1;
+  }
+} return int found;
+
+lz_probe(int i, int j) {
+  int found = 0 - 1;
+  if((import cfp2)[i] == (import cfp2)[j] && (import cfp)[i] != (import cfp)[j]) {
+    found = j;
+  }
+} return int found;

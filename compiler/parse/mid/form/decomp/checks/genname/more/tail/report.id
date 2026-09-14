@@ -1,0 +1,21 @@
+// file:line: warning: parameter 'NAME' of 'FUNC' has a generated name; name it
+// for what it holds -- own diagnostic channel, on stderr (docs/PROJECT.md,
+// "decomposition warnings"): it never calls note_failure, so it cannot turn a
+// build that would otherwise succeed into one that fails.
+//
+// Both read `prog`/`pfile`/`pline` by index, so they are exercised end to end
+// by tests/tests_feature.sh rather than by a synthetic fixture here: building
+// one within the 3-action/3-function limits this module keeps everywhere else
+// costs more new surface than it proves (docs/PROJECT.md, "decomposition
+// warnings").
+
+genname_report(int i, string name) {
+  string msg = genname_msg(i, name);
+  eprint(msg);
+} return void;
+
+genname_msg(int i, string name) {
+  string fname = s1_of((import prog)[i]);
+  string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
+  string ret_s = loc + "parameter '" + name + "' of '" + fname + "' has a generated name; name it for what it holds";
+} return string ret_s;

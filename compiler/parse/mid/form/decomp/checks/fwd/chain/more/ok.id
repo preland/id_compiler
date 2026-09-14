@@ -1,0 +1,27 @@
+// Whether the call `fwd_verify` found really is a forwarder: same argument
+// count as `fid` has parameters, a different callee than `fid` itself, every
+// argument the matching parameter unchanged, and a callee whose signature
+// matches (./deep/, via fwd_sig_match).
+
+fwd_ok(int fid, int callid, string callee_name) {
+  int[] paramsl = l1_of(fid);
+  int[] argsl = l1_of(callid);
+  int ok = fwd_ok2(fid, callee_name, paramsl, argsl);
+} return int ok;
+
+fwd_ok2(int fid, string callee_name, int[] paramsl, int[] argsl) {
+  string fname = s1_of(fid);
+  int ok = 0;
+  if(len(paramsl) == len(argsl) && callee_name != fname && fwd_args_match(paramsl, argsl) == 1 && fwd_sig_match(fid, callee_name) == 1 && fwd_used_as_value(fname) == 0) {
+    ok = 1;
+  }
+} return int ok;
+
+fwd_args_match(int[] paramsl, int[] argsl) {
+  int idx = 0;
+  int ok = 1;
+  while(idx < len(argsl) && ok == 1) {
+    ok = fwd_arg_ok(paramsl, argsl, idx);
+    idx = idx + 1;
+  }
+} return int ok;

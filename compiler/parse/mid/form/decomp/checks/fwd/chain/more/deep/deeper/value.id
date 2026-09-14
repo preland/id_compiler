@@ -1,0 +1,32 @@
+// Whether `name` -- a candidate forwarder's own name -- is read anywhere in
+// the unit as a function value. Read off the STRICT fingerprint
+// (mid/form/unique/, already computed by uq_fill before check_program_tail
+// runs): canon_var tags exactly that use "fv(NAME)" (mid/form/unique/canon/
+// expr/expr.id's ce2, mid/form/unique/canon/func/names.id's canon_var), and
+// the fingerprint is built by a real walk of the reachable tree -- unlike a
+// flat scan of every node the parser ever allocated, which also finds the
+// `var` node finish_atom (front/parse/expr/atom/lit/call/call.id) builds and
+// discards for every call's own callee before it knows the callee is not a
+// local: `helper(x)` would then make `helper` look "used as a value" by
+// nothing more than being called.
+fwd_used_as_value(string name) {
+  string needle = "fv(" + name + ")";
+  int found = fwd_used_scan(needle, 0);
+} return int found;
+
+fwd_used_scan(string needle, int idx) {
+  int total = len((import cfp));
+  int found = 0;
+  while(idx < total && found == 0) {
+    found = fwd_used_step(needle, idx);
+    idx = idx + 1;
+  }
+} return int found;
+
+fwd_used_step(string needle, int idx) {
+  int hitpos = str_find((import cfp)[idx], needle);
+  int ok = 0;
+  if(hitpos >= 0) {
+    ok = 1;
+  }
+} return int ok;

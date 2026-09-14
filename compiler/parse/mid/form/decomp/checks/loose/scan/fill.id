@@ -1,0 +1,28 @@
+// Fingerprint every function once, loosely -- mirrors mid/form/unique/scan/
+// check.id's uq_fill, and runs after it, so (import cfp) (the strict
+// fingerprint) already holds one entry per `prog` index to compare against
+// (./compare.id). A native gets a fingerprint built from its own id instead,
+// which cannot equal any other function's, so it is fingerprinted without
+// ever being read by lz_func (which assumes a real body).
+
+lz_fill() {
+  export string[] cfp2 = [];
+  int i = 0;
+  while(i < len((import prog))) {
+    lz_fill_at(i);
+    i = i + 1;
+  }
+} return void;
+
+lz_fill_at(int i) {
+  int fid = (import prog)[i];
+  string fpv = lz_fp_of(fid);
+  push((import cfp2), fpv);
+} return void;
+
+lz_fp_of(int fid) {
+  string fpv = "native#" + fid;
+  if(is_native(fid) == 0) {
+    fpv = lz_func(fid);
+  }
+} return string fpv;

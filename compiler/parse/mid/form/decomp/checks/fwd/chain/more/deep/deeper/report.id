@@ -1,0 +1,23 @@
+// file:line: warning: 'F' only forwards to 'G'; call 'G' directly -- own
+// diagnostic channel, on stderr (docs/PROJECT.md, "decomposition warnings"):
+// it never calls note_failure, so it cannot turn a build that would
+// otherwise succeed into one that fails.
+fwd_report(int i, string callee_name) {
+  string msg = fwd_msg(i, callee_name);
+  eprint(msg);
+} return void;
+
+fwd_msg(int i, string callee_name) {
+  string fname = s1_of((import prog)[i]);
+  string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
+  string ret_s = loc + "'" + fname + "' only forwards to '" + callee_name + "'; call '" + callee_name + "' directly";
+} return string ret_s;
+
+// (import fwd_fids) [0] a plain function, [1] one named "main"
+// (../../../decl_ok.id's fs_build2).
+fs_fixture() {
+  env_init();
+  fs_build2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

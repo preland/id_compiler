@@ -1,0 +1,25 @@
+// The rest of fwd_stmt (../shape.id).
+
+fwd_stmt_tail(int i, int fid, int callid) {
+  if(callid >= 0) {
+    fwd_verify(i, fid, callid);
+  }
+} return void;
+
+// The non-void forwarder shape: the declared local is exactly `return` and
+// the local's init is a call.
+fwd_decl_ok(int fid, int stmt) {
+  int retvar = i1_of(fid);
+  int callid = i1_of(stmt);
+  int ok = fwd_decl_ok2(retvar, callid, stmt);
+} return int ok;
+
+// A synthetic func node named `name`, with no parameters and no body --
+// enough for fwd_should (../scan.id) and fwd_expr_ok (./more/verify.id),
+// which read only its name and its int fields (front/tree/node/newnode/,
+// mid/types/check/expr/more/want/ret/store/env.id's env_init).
+fs_build(string name) {
+  int[] noparams = [];
+  int[] nobody = [];
+  int fid = node_func(name, "int", noparams, nobody, 0 - 1);
+} return int fid;

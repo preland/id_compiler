@@ -1,0 +1,19 @@
+// Whether the character just before `dstart` in `name` is a digit -- named
+// out of tdig_start (../match.id) because a call may not be an argument to
+// another call.
+
+tdig_step(string name, int dstart) {
+  int ch = charat(name, dstart - 1);
+  int ok = is_digit_c(ch);
+} return int ok;
+("v2", 2):(1)
+("v2", 1):(0)
+
+is_digit_c(int ch) {
+  int ok = 0;
+  if(ch >= 48 && ch <= 57) {
+    ok = 1;
+  }
+} return int ok;
+(53):(1)
+(118):(0)
