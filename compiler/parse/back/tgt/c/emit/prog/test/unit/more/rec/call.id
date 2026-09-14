@@ -1,5 +1,5 @@
 // Whether function `id` gets the call-recording hook (its body is emitted
-// while is_harn() is true, same as work-counting -- code/func/def/def/
+// while is_harn() is true, same as work-counting -- code/func/def/body/
 // entry.id), and the hook itself: NAME's own parameters, by name, passed
 // straight to its recorder (def/fn.id).
 

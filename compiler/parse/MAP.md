@@ -840,14 +840,14 @@ once this compiler uses a construct on itself.
 | `cw_shape` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/body.id` | A scalar result, or a list one: a conf.id constant can be either now |
 | `cw_body` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/body.id` | Which functions can be constant wrappers, and the state one walk keeps. |
 | `cw_begin` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/body.id` | Start the walk of function `name`: canon_expr's position map is emptied as |
-| `cw_is_lit` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/lit.id` | canon_expr tags a literal with one letter -- I an integer, F a float, S a |
-| `cw_spell` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/lit.id` | The value as conf.id spells it: the fingerprint after its tag (zeros_tail is |
-| `cw_report` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
-| `cw_print` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
-| `cw_say` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/report.id` | The diagnostic, at the function's own line, naming the value and the |
-| `cw_ret` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
-| `cw_get` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
-| `cw_pick` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/more/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_is_lit` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/lit.id` | canon_expr tags a literal with one letter -- I an integer, F a float, S a |
+| `cw_spell` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/lit.id` | The value as conf.id spells it: the fingerprint after its tag (zeros_tail is |
+| `cw_report` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_print` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_say` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/report.id` | The diagnostic, at the function's own line, naming the value and the |
+| `cw_ret` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_get` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/ret.id` | The result: what the return clause names. The parser allows only a literal |
+| `cw_pick` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/result/ret.id` | The result: what the return clause names. The parser allows only a literal |
 | `cw_assign` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/val.id` | An assignment counts only when its target is a local this walk has already |
 | `cw_put` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/val.id` | Recording a local's value. |
 | `cw_keep` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/val.id` | Appended rather than overwritten, so an assignment needs no search to write; |
@@ -871,8 +871,8 @@ once this compiler uses a construct on itself.
 | `cwv_setup` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/fixture.id` | A list literal of nothing but literals (cwv_arr), and a func node whose |
 | `cwv_build` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/fixture.id` | A list literal of nothing but literals (cwv_arr), and a func node whose |
 | `cwv_build2` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/fixture.id` | A list literal of nothing but literals (cwv_arr), and a func node whose |
-| `cw_arr_spell` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/spell.id` | The spelling a report copies out (dup/wrap/more/more/report.id): the list |
-| `cw_arr_spell_items` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/spell.id` | The spelling a report copies out (dup/wrap/more/more/report.id): the list |
+| `cw_arr_spell` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/spell.id` | The spelling a report copies out (dup/wrap/more/result/report.id): the list |
+| `cw_arr_spell_items` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/spell.id` | The spelling a report copies out (dup/wrap/more/result/report.id): the list |
 | `cw_elem_spell` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/spell.id` | A string element is re-quoted; an int or a float already reads as source. |
 | `is_reserved_name` | `compiler/parse/mid/form/unique/scan/more/reserved/check.id` | resv_print is the split tail of resv_err, kept here because reserved.id was |
 | `resv_print` | `compiler/parse/mid/form/unique/scan/more/reserved/check.id` | resv_print is the split tail of resv_err, kept here because reserved.id was |
@@ -1052,6 +1052,7 @@ once this compiler uses a construct on itself.
 | `fit_expd` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/expd.id` | The expected side of a case. |
 | `fit_void` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/expd.id` | A void function is judged by what it left in its arguments, positionally. It |
 | `fit_ret` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/expd.id` | The expected side of a case. |
+| `list_elem` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/elem.id` | A list type's element type. How many parameters a function has, or |
 | `items_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | Literals joined the way a case writes them: `1, [2, 3], "x"`. |
 | `leaf_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | A leaf as written: its own text, or `(import NAME)` for an export a case |
 | `case_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file it is written in, recorded on its node when it was |
@@ -1061,7 +1062,6 @@ once this compiler uses a construct on itself.
 | `arr_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
 | `case_lit_type` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/ty.id` | The type a case literal has on its own, for comparing against a scalar |
 | `leaf_type` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/ty.id` | The type a case literal has on its own, for comparing against a scalar |
-| `list_elem` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/util.id` | A list type's element type. How many parameters a function has, or |
 | `fit_each` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/scalar.id` | A list's elements, one by one, and a scalar literal against a scalar type. |
 | `fit_scalar` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/scalar.id` | A list's elements, one by one, and a scalar literal against a scalar type. |
 | `ty_fits` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/scalar.id` | idc.py's `compatible`: the same type, or two numeric ones. |
@@ -1356,13 +1356,13 @@ once this compiler uses a construct on itself.
 | `chk_retexpr` | `compiler/parse/mid/types/check/expr/more/want/ret/store/expr.id` | The return clause against the declared return type. |
 | `chk_ret2` | `compiler/parse/mid/types/check/expr/more/want/ret/store/expr.id` | The return clause against the declared return type. |
 | `ret_err` | `compiler/parse/mid/types/check/expr/more/want/ret/store/expr.id` | Reported at the return expression, not at the function heading: the clause |
-| `chk_eq` | `compiler/parse/mid/types/check/expr/op/compare/compare/eq.id` | The two comparison checks. Equality accepts two strings or two numbers; |
-| `eq_types` | `compiler/parse/mid/types/check/expr/op/compare/compare/eq.id` | The two comparison checks. Equality accepts two strings or two numbers; |
-| `eq_report` | `compiler/parse/mid/types/check/expr/op/compare/compare/eq.id` | The two comparison checks. Equality accepts two strings or two numbers; |
-| `chk_ord` | `compiler/parse/mid/types/check/expr/op/compare/compare/order.id` | Guarded first, so `+` and `&&` -- which reach here through chk_bin's else |
-| `chk_ord2` | `compiler/parse/mid/types/check/expr/op/compare/compare/order.id` | Guarded first, so `+` and `&&` -- which reach here through chk_bin's else |
-| `ord_types` | `compiler/parse/mid/types/check/expr/op/compare/compare/order.id` | Guarded first, so `+` and `&&` -- which reach here through chk_bin's else |
-| `ord_report` | `compiler/parse/mid/types/check/expr/op/compare/compare/order_msg.id` |  |
+| `chk_eq` | `compiler/parse/mid/types/check/expr/op/compare/check/eq.id` | The two comparison checks. Equality accepts two strings or two numbers; |
+| `eq_types` | `compiler/parse/mid/types/check/expr/op/compare/check/eq.id` | The two comparison checks. Equality accepts two strings or two numbers; |
+| `eq_report` | `compiler/parse/mid/types/check/expr/op/compare/check/eq.id` | The two comparison checks. Equality accepts two strings or two numbers; |
+| `chk_ord` | `compiler/parse/mid/types/check/expr/op/compare/check/order.id` | Guarded first, so `+` and `&&` -- which reach here through chk_bin's else |
+| `chk_ord2` | `compiler/parse/mid/types/check/expr/op/compare/check/order.id` | Guarded first, so `+` and `&&` -- which reach here through chk_bin's else |
+| `ord_types` | `compiler/parse/mid/types/check/expr/op/compare/check/order.id` | Guarded first, so `+` and `&&` -- which reach here through chk_bin's else |
+| `ord_report` | `compiler/parse/mid/types/check/expr/op/compare/check/order_msg.id` |  |
 | `chk_cmp` | `compiler/parse/mid/types/check/expr/op/compare/cond/cmp.id` |  |
 | `fv_bin` | `compiler/parse/mid/types/check/expr/op/compare/cond/cmp.id` | No binary operator takes a function value (docs/SPEC.md 1.1): arithmetic on |
 | `fv_side` | `compiler/parse/mid/types/check/expr/op/compare/cond/cmp.id` |  |
@@ -1703,11 +1703,11 @@ once this compiler uses a construct on itself.
 | `lw_hcall2_out` | `compiler/parse/back/ir/build/expr/op/more/arith/hcall.id` | The shifts and the checked divisions are runtime calls, exactly as they are |
 | `lw_hcall_lhs` | `compiler/parse/back/ir/build/expr/op/more/arith/more/conv.id` | Continues lw_hcall: the two widenings still run in source order across |
 | `lw_hcall_rhs` | `compiler/parse/back/ir/build/expr/op/more/arith/more/conv.id` | Continues lw_hcall: the two widenings still run in source order across |
-| `lw_helper` | `compiler/parse/back/ir/build/expr/op/more/arith/more/helper.id` | Which runtime helper an operator needs, or "" when it is an instruction. |
-| `lw_divfn` | `compiler/parse/back/ir/build/expr/op/more/arith/more/helper.id` | `int` and `word` division both go through a checked helper; float division |
-| `lw_hty` | `compiler/parse/back/ir/build/expr/op/more/arith/more/helper.id` | The shift helpers work on a machine word; the division helpers work at the |
 | `lw_arith_lhs` | `compiler/parse/back/ir/build/expr/op/more/arith/more/op.id` | The left operand, converted to the widened type -- split out so lw_arith |
 | `lw_arith3_op` | `compiler/parse/back/ir/build/expr/op/more/arith/more/op.id` | Continues lw_arith3: whether the operator is an instruction or a runtime |
+| `lw_helper` | `compiler/parse/back/ir/build/expr/op/more/arith/more/select.id` | Which runtime helper an operator needs, or "" when it is an instruction. |
+| `lw_divfn` | `compiler/parse/back/ir/build/expr/op/more/arith/more/select.id` | `int` and `word` division both go through a checked helper; float division |
+| `lw_hty` | `compiler/parse/back/ir/build/expr/op/more/arith/more/select.id` | The shift helpers work on a machine word; the division helpers work at the |
 | `lw_iop_bits` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/bits.id` |  |
 | `lw_iop_int` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/int.id` |  |
 | `lw_iop_int2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/int.id` |  |
@@ -2095,14 +2095,14 @@ once this compiler uses a construct on itself.
 | `emit_ty_proto` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/body.id` | One list type's prototypes, and the loop over their bodies. |
 | `emit_ty_bodies` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/body.id` | One list type's prototypes, and the loop over their bodies. |
 | `emit_ty_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/body.id` | One list type's prototypes, and the loop over their bodies. |
-| `emit_ty_body2` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/eq.id` | Two lists are equal when they are the same length and every pair of cells, |
-| `eq_cond` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/eq.id` | Two lists are equal when they are the same length and every pair of cells, |
-| `emit_eq_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/eq.id` | Two lists are equal when they are the same length and every pair of cells, |
-| `key_at` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/key.id` | Each `[]` in an element type is spelled `_l`. 91 is `[`, 93 is `]`. |
-| `key_code` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/key.id` | Each `[]` in an element type is spelled `_l`. 91 is `[`, 93 is `]`. |
-| `emit_show_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/show.id` | A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers |
-| `tc_key` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/show.id` | A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers |
-| `key_text` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/more/show.id` | A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers |
+| `emit_ty_body2` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/eq.id` | Two lists are equal when they are the same length and every pair of cells, |
+| `eq_cond` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/eq.id` | Two lists are equal when they are the same length and every pair of cells, |
+| `emit_eq_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/eq.id` | Two lists are equal when they are the same length and every pair of cells, |
+| `key_at` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/key.id` | Each `[]` in an element type is spelled `_l`. 91 is `[`, 93 is `]`. |
+| `key_code` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/key.id` | Each `[]` in an element type is spelled `_l`. 91 is `[`, 93 is `]`. |
+| `emit_show_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/show.id` | A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers |
+| `tc_key` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/show.id` | A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers |
+| `key_text` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/def/show.id` | A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers |
 | `note_one` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/protos.id` | The set of list types, in the order first met, and their prototypes. |
 | `tc_types_init` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/protos.id` | The set of list types, in the order first met, and their prototypes. |
 | `emit_ty_protos` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/protos.id` | The set of list types, in the order first met, and their prototypes. |
@@ -2116,17 +2116,17 @@ once this compiler uses a construct on itself.
 | `init_tyc` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/type_column.id` | The C target's spelling column. |
 | `init_tyc_rows` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/type_column.id` | The C target's spelling column. |
 | `init_tyc_rows2` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/type_column.id` | `string` is a char*, and `void` is C's own void. `float` is a double: id's |
-| `emit_def` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/def.id` | A function definition: signature, hoisted locals, body, return. |
-| `emit_def_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/def.id` | A function definition: signature, hoisted locals, body, return. |
-| `emit_tail` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/def.id` | A function definition: signature, hoisted locals, body, return. |
-| `emit_entry` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/entry.id` | The function-entry prelude: work counting (harness builds only), then the |
-| `entry_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/entry.id` | harn_init/harn_set (test/unit/more/flag.id, pre-existing) export and set |
-| `entry_fixture_harn` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/entry.id` | The function-entry prelude: work counting (harness builds only), then the |
-| `c_fn_params` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/rest/fn_type.id` | A function type's parameters as C spells them inside a pointer-to-function |
-| `c_type_list` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/rest/fn_type.id` | A function type's parameters as C spells them inside a pointer-to-function |
-| `emit_tail_end` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/rest/tail.id` |  |
-| `emit_tail2` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/rest/tail.id` |  |
-| `sig` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/def/rest/tail.id` | `c_rettype id_NAME(params)` |
+| `emit_def` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/def.id` | A function definition: signature, hoisted locals, body, return. |
+| `emit_def_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/def.id` | A function definition: signature, hoisted locals, body, return. |
+| `emit_tail` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/def.id` | A function definition: signature, hoisted locals, body, return. |
+| `emit_entry` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/entry.id` | The function-entry prelude: work counting (harness builds only), then the |
+| `entry_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/entry.id` | harn_init/harn_set (test/unit/more/flag.id, pre-existing) export and set |
+| `entry_fixture_harn` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/entry.id` | The function-entry prelude: work counting (harness builds only), then the |
+| `c_fn_params` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/rest/fn_type.id` | A function type's parameters as C spells them inside a pointer-to-function |
+| `c_type_list` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/rest/fn_type.id` | A function type's parameters as C spells them inside a pointer-to-function |
+| `emit_tail_end` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/rest/tail.id` |  |
+| `emit_tail2` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/rest/tail.id` |  |
+| `sig` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/body/rest/tail.id` | `c_rettype id_NAME(params)` |
 | `fwd_all` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/loops.id` | Forward-declaration and definition loops over the program's functions. |
 | `def_all` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/loops.id` | Forward-declaration and definition loops over the program's functions. |
 | `emit_def_nl` | `compiler/parse/back/tgt/c/emit/prog/code/func/def/loops.id` | each definition is followed by a blank line (idc.py joins bodies that way). |
@@ -2410,15 +2410,15 @@ once this compiler uses a construct on itself.
 | `ll_entry` | `compiler/parse/back/tgt/ll/fn/body/main/wrap.id` | Freestanding has no host to be called from: the boot code jumps straight to |
 | `ll_wrapper` | `compiler/parse/back/tgt/ll/fn/body/main/wrap.id` | The C-ABI entry point: marshal argv into an `id` string list and call |
 | `ll_wrap_tail` | `compiler/parse/back/tgt/ll/fn/body/main/wrap.id` | The C-ABI entry point: marshal argv into an `id` string list and call |
-| `ll_funcs` | `compiler/parse/back/tgt/ll/fn/fn/fn.id` |  |
-| `ll_ends` | `compiler/parse/back/tgt/ll/fn/fn/fn.id` |  |
-| `ll_func` | `compiler/parse/back/tgt/ll/fn/fn/fn.id` |  |
-| `ll_func_out` | `compiler/parse/back/tgt/ll/fn/fn/more.id` | The rest of `ll_func`: the name and parameter string, then the define. |
-| `ll_func_emit` | `compiler/parse/back/tgt/ll/fn/fn/more.id` | The rest of `ll_func`: the name and parameter string, then the define. |
-| `ll_natives` | `compiler/parse/back/tgt/ll/fn/fn/native/native.id` | `native` declarations, as LLVM declarations with their real types. The |
-| `ll_native_decl` | `compiler/parse/back/tgt/ll/fn/fn/native/native.id` | `native` declarations, as LLVM declarations with their real types. The |
-| `ll_native_line` | `compiler/parse/back/tgt/ll/fn/fn/native/pars.id` | One declaration line, and its parameter types. A declaration names no |
-| `ll_native_pars` | `compiler/parse/back/tgt/ll/fn/fn/native/pars.id` | One declaration line, and its parameter types. A declaration names no |
+| `ll_funcs` | `compiler/parse/back/tgt/ll/fn/def/fn.id` |  |
+| `ll_ends` | `compiler/parse/back/tgt/ll/fn/def/fn.id` |  |
+| `ll_func` | `compiler/parse/back/tgt/ll/fn/def/fn.id` |  |
+| `ll_func_out` | `compiler/parse/back/tgt/ll/fn/def/more.id` | The rest of `ll_func`: the name and parameter string, then the define. |
+| `ll_func_emit` | `compiler/parse/back/tgt/ll/fn/def/more.id` | The rest of `ll_func`: the name and parameter string, then the define. |
+| `ll_natives` | `compiler/parse/back/tgt/ll/fn/def/native/native.id` | `native` declarations, as LLVM declarations with their real types. The |
+| `ll_native_decl` | `compiler/parse/back/tgt/ll/fn/def/native/native.id` | `native` declarations, as LLVM declarations with their real types. The |
+| `ll_native_line` | `compiler/parse/back/tgt/ll/fn/def/native/pars.id` | One declaration line, and its parameter types. A declaration names no |
+| `ll_native_pars` | `compiler/parse/back/tgt/ll/fn/def/native/pars.id` | One declaration line, and its parameter types. A declaration names no |
 | `ll_head` | `compiler/parse/back/tgt/ll/mod/head.id` | The module preamble, and the three sections that make up its body. |
 | `ll_head_triple` | `compiler/parse/back/tgt/ll/mod/head.id` | The module preamble, and the three sections that make up its body. |
 | `ll_body` | `compiler/parse/back/tgt/ll/mod/head.id` | The module preamble, and the three sections that make up its body. |
