@@ -1,0 +1,27 @@
+// Does `name` end in `_v` or `_v<digits>` -- the name `bin/idc --fix` gives a
+// hoisted call's result, built from the callee it hoisted (docs/PROJECT.md).
+
+ends_v(string name) {
+  int dstart = tdig_start(name);
+  int ok = 0;
+  if(dstart >= 2 && slice(name, dstart - 2, dstart) == "_v") {
+    ok = 1;
+  }
+} return int ok;
+("asset_at_v"):(1)
+("asset_at_v2"):(1)
+("asset_at_v12"):(1)
+("count"):(0)
+("v"):(0)
+("even"):(0)
+
+// The index where the run of trailing digits begins -- len(name) when there is
+// none, so a caller can slice off the digits without a separate empty check.
+tdig_start(string name) {
+  int dstart = len(name);
+  while(dstart > 0 && tdig_step(name, dstart) == 1) {
+    dstart = dstart - 1;
+  }
+} return int dstart;
+("abc12"):(3)
+("abc"):(3)

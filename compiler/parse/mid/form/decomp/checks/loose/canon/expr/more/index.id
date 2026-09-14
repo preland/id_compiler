@@ -1,0 +1,9 @@
+// `base[key]`, loosely -- read from an imported list often enough in
+// practice that leaving it to the unrecognised-kind default (../expr_more.id)
+// would miss real near-duplicates, e.g. idem's zst_supd2_sq1/zst_supd2_sq2,
+// which differ only in the literal index each reads and writes.
+lz_index(int id) {
+  int i1 = i1_of(id);
+  int i2 = i2_of(id);
+  string ret_s = "ix" + lz_pair(i1, i2);
+} return string ret_s;

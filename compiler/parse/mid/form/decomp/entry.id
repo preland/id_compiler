@@ -1,0 +1,17 @@
+// check_program()'s own block is full (mid/names/limits/shape/block/more/check.id),
+// so its last action calls here instead of chk_dead() directly.
+//
+// The decomposition warnings (docs/PROJECT.md, "decomposition warnings") run
+// last: they read the whole parsed program, same as the checks above, but
+// report on stderr and never call note_failure, so a violation here never
+// changes what check_failed() answers.
+check_program_tail() {
+  chk_dead();
+  check_program_tail2();
+} return void;
+
+check_program_tail2() {
+  check_genname();
+  check_fwd();
+  check_loose_dup();
+} return void;

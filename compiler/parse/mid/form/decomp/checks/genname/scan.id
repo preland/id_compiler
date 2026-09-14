@@ -1,0 +1,26 @@
+// Warning 3: a parameter whose name is one `--fix` invents rather than one a
+// person chose (docs/PROJECT.md, "decomposition warnings"). Checked over every
+// declared function's own parameter list -- a local is out of scope, because a
+// generated local inside one function is fine; only a parameter leaks the name
+// across the call.
+
+check_genname() {
+  int i = 0;
+  while(i < len((import prog))) {
+    genname_fn(i);
+    i = i + 1;
+  }
+} return void;
+
+genname_fn(int i) {
+  int[] params = l1_of((import prog)[i]);
+  genname_loop(i, params);
+} return void;
+
+genname_loop(int i, int[] params) {
+  int pk = 0;
+  while(pk < len(params)) {
+    genname_check(i, params, pk);
+    pk = pk + 1;
+  }
+} return void;

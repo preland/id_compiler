@@ -1,0 +1,18 @@
+lz_decl_tail(int id, string out, string nm) {
+  int i1 = i1_of(id);
+  string val = lz_expr(i1);
+  string ret_s = out + s1_of(id) + " " + nm + "=" + val;
+} return string ret_s;
+
+// An `assign` statement, loosely: the assigned name is positional, exactly
+// as mid/form/unique/canon/stmt/stmt.id's canon_stmt treats it.
+lz_assign(int id) {
+  string nm = s1_of(id);
+  int i1 = i1_of(id);
+  string ret_s = lz_assign_tail(nm, i1);
+} return string ret_s;
+
+lz_assign_tail(string nm, int i1) {
+  string val = lz_expr(i1);
+  string ret_s = "a:" + cn(nm) + "=" + val;
+} return string ret_s;

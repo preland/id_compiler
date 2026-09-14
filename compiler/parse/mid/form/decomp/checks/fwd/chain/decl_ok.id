@@ -1,0 +1,23 @@
+// A void return (`retvar` -1) is checked first, on its own: `id`'s `&&` does
+// not short-circuit, so folding this into one big condition with the reads
+// below it would read node -1 whenever a forwarder candidate returns void.
+fwd_decl_ok2(int retvar, int callid, int stmt) {
+  int ok = 0;
+  if(retvar >= 0) {
+    ok = fwd_decl_ok3(retvar, callid, stmt);
+  }
+} return int ok;
+
+fwd_decl_ok3(int retvar, int callid, int stmt) {
+  int ok = 0;
+  if(k_of(retvar) == "var" && s1_of(retvar) == s2_of(stmt) && k_of(callid) == "call") {
+    ok = 1;
+  }
+} return int ok;
+
+// A plain function named "plain", and one named "main" -- built with
+// fs_build (../tail.id).
+fs_build2() {
+  export int fwd_fid_plain = fs_build("plain");
+  export int fwd_fid_main = fs_build("main");
+} return void;

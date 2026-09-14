@@ -1,0 +1,24 @@
+// The end of the dispatch (../expr.id) -- a `call`, an `index` (./index.id),
+// or the default -- and a binary operator.
+
+lz_e4(int id) {
+  string out = "?" + k_of(id) + "#" + id;
+  if(k_of(id) == "call") {
+    out = lz_call(id);
+  }
+  if(k_of(id) == "index") {
+    out = lz_index(id);
+  }
+} return string out;
+
+lz_bin(int id) {
+  string op = bin_op(id);
+  string pair_s = lz_bin_pair(id);
+  string ret_s = op + pair_s;
+} return string ret_s;
+
+lz_bin_pair(int id) {
+  int i1 = i1_of(id);
+  int i2 = i2_of(id);
+  string ret_s = lz_pair(i1, i2);
+} return string ret_s;

@@ -1,0 +1,51 @@
+// Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same
+// idea (a function's own variables become positions, everything else stays
+// verbatim), except a literal fingerprints by its KIND alone, not its value --
+// "I", not "I10" -- so two functions that differ only in a literal collide
+// here even though mid/form/unique/'s duplicate-logic rule (which keeps the
+// value) does not treat them as one function written twice. Reused as-is:
+// canon_var, canon_callee, canon_params, decl_tag, decl_name, sep_at, bin_op,
+// uq_begin, cn -- none of them touch a literal or reach into a nested call
+// the strict chain would not already have canonicalised, so there is nothing
+// for the loose walk to do differently there.
+//
+// It does NOT fold an identity operation (mid/form/unique/canon/expr/more/
+// const/) or abstract which import a function reads: neither is needed by
+// the examples docs/PROJECT.md's "decomposition warnings" section measures,
+// and skipping them keeps this module a fraction of the strict one's size.
+// A function containing a node kind this walk does not recognise (`un`,
+// `index`, `arr`, `if`, `while`, `iassign`) fingerprints with its own node id
+// in the tag (lz_e4/lz_st2), which cannot equal any other function's -- it is
+// simply never flagged, not flagged wrongly.
+
+lz_expr(int id) {
+  string out = lz_e2(id);
+  if(k_of(id) == "int") {
+    out = "I";
+  }
+  if(k_of(id) == "float") {
+    out = "F";
+  }
+} return string out;
+given lz_fixture ((import lz_id_a)):("I")
+given lz_fixture ((import lz_id_b)):("I")
+
+lz_e2(int id) {
+  string out = lz_e3(id);
+  if(k_of(id) == "str") {
+    out = "S";
+  }
+  if(k_of(id) == "var") {
+    out = canon_var(id);
+  }
+} return string out;
+
+lz_e3(int id) {
+  string out = lz_e4(id);
+  if(k_of(id) == "import") {
+    out = "g(" + s1_of(id) + ")";
+  }
+  if(k_of(id) == "bin") {
+    out = lz_bin(id);
+  }
+} return string out;

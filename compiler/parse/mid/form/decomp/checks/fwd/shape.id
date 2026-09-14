@@ -1,0 +1,28 @@
+// A single-statement body, and which statement shapes can forward: a `decl`
+// whose local is the whole return clause (a non-void forwarder), or a bare
+// `exprstmt` call (a void one). Anything else -- an `if`, a `while`, a plain
+// `assign` or `iassign` as the only statement -- is not a forwarder shape.
+
+fwd_check(int i, int fid) {
+  int[] body = l2_of(fid);
+  if(len(body) == 1) {
+    fwd_stmt(i, fid, body[0]);
+  }
+} return void;
+
+fwd_stmt(int i, int fid, int stmt) {
+  int callid = fwd_stmt_id(fid, stmt);
+  fwd_stmt_tail(i, fid, callid);
+} return void;
+
+// -1 unless `stmt` is a forwarding shape, in which case the call it forwards
+// to.
+fwd_stmt_id(int fid, int stmt) {
+  int callid = 0 - 1;
+  if(k_of(stmt) == "decl" && fwd_decl_ok(fid, stmt) == 1) {
+    callid = i1_of(stmt);
+  }
+  if(k_of(stmt) == "exprstmt" && fwd_expr_ok(fid, stmt) == 1) {
+    callid = i1_of(stmt);
+  }
+} return int callid;

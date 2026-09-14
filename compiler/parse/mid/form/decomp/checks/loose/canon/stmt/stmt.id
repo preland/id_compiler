@@ -1,0 +1,34 @@
+// A statement, loosely: only `decl`, `assign` and `exprstmt` are recognised
+// (see ../expr/expr.id's header on what an unrecognised kind fingerprints
+// as) -- `if`, `while` and `iassign` never appear in the examples this
+// module was sized for, so they are left to the safe default in lz_st2
+// (./more/decl_tail.id is the rest of `decl`'s canonicalisation).
+
+lz_stmt(int id) {
+  string out = lz_st2(id);
+  if(k_of(id) == "decl") {
+    out = lz_decl(id);
+  }
+  if(k_of(id) == "assign") {
+    out = lz_assign(id);
+  }
+} return string out;
+
+lz_st2(int id) {
+  string out = "?" + k_of(id) + "#" + id;
+  if(k_of(id) == "exprstmt") {
+    int i1 = i1_of(id);
+    string val = lz_expr(i1);
+    out = "e:" + val;
+  }
+} return string out;
+
+// Reuses decl_tag and decl_name (mid/form/unique/canon/stmt/more/decl.id) as
+// they stand: the declared type, and the declared name (positional for a
+// local, verbatim for an export) -- neither ever reads a literal or an
+// import.
+lz_decl(int id) {
+  string out = decl_tag(id);
+  string nm = decl_name(id);
+  string ret_s = lz_decl_tail(id, out, nm);
+} return string ret_s;

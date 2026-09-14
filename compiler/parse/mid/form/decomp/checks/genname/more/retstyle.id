@@ -1,0 +1,32 @@
+// Does `name` have the shape this compiler's own return-value locals do --
+// `ret_i`, `ret_s`, `ret_li`, an optional trailing digit to disambiguate a
+// repeat -- rather than a `--fix`-hoisted call. A parameter named this way is
+// the same complaint: a name a mechanical rule chose, not a person.
+
+is_retstyle(string name) {
+  int ok = 0;
+  if(has_ret_prefix(name) == 1) {
+    ok = retstyle_tail(name);
+  }
+} return int ok;
+("ret_i"):(1)
+("ret_li2"):(1)
+("result"):(0)
+("retina"):(0)
+
+has_ret_prefix(string name) {
+  int nlen = len(name);
+  int ok = 0;
+  if(nlen > 4 && slice(name, 0, 4) == "ret_") {
+    ok = 1;
+  }
+} return int ok;
+("ret_i"):(1)
+("ret_"):(0)
+
+retstyle_tail(string name) {
+  string rem = zeros_tail(name, 4);
+  int ok = retstyle_check(rem);
+} return int ok;
+("ret_i"):(1)
+("ret_xy"):(0)

@@ -1,0 +1,22 @@
+// The void forwarder shape (return void, the call left unused): unlike a
+// non-void forwarder, no local to check -- just that the statement's own
+// expression is a call.
+fwd_expr_ok(int fid, int stmt) {
+  int callid = i1_of(stmt);
+  int ok = 0;
+  if(i1_of(fid) == 0 - 1 && k_of(callid) == "call") {
+    ok = 1;
+  }
+} return int ok;
+
+fwd_verify(int i, int fid, int callid) {
+  string callee_name = s1_of(callid);
+  int ok = fwd_ok(fid, callid, callee_name);
+  fwd_verify_tail(i, callee_name, ok);
+} return void;
+
+fwd_verify_tail(int i, string callee_name, int ok) {
+  if(ok == 1) {
+    fwd_report(i, callee_name);
+  }
+} return void;

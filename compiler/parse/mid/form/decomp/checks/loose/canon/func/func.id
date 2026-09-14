@@ -1,0 +1,24 @@
+// A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/
+// more/func.id's canon_func: parameters first (canon_params, reused -- a
+// parameter's position is part of the signature, not something a literal
+// abstraction touches), then the body. Never called on a native (check_fwd's
+// caller, ../../../fwd/scan.id, is the pattern this follows: the scan that
+// fills the fingerprint table skips one instead, ../../scan/fill.id).
+
+lz_func(int id) {
+  string nm = s1_of(id);
+  uq_begin(nm);
+  string ret_s = lz_func_body(id);
+} return string ret_s;
+
+lz_func_body(int id) {
+  int[] l1 = l1_of(id);
+  string out = canon_params(l1);
+  string ret_s = lz_logic(id, out);
+} return string ret_s;
+
+lz_logic(int id, string out) {
+  int[] l2 = l2_of(id);
+  string val = lz_body(l2);
+  string ret_s = "(" + out + ")->" + s2_of(id) + "{" + val + "}=>" + lz_ret(id);
+} return string ret_s;

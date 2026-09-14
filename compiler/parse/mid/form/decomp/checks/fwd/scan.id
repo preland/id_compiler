@@ -1,0 +1,31 @@
+// Warning 1: a pure forwarder -- a function whose body is exactly one
+// statement that calls another function with its own parameters, all of
+// them, unchanged, in the same order, and returns that call's result (or
+// returns void after the call). Excluded: `main`, a native, and a function
+// whose signature does not match its callee's (it adapts, e.g. narrows or
+// drops a parameter) -- see ./chain/ for the shape and signature checks, and
+// ./chain/more/deep/deeper/ for the "used as a function value" exclusion.
+
+check_fwd() {
+  int i = 0;
+  while(i < len((import prog))) {
+    fwd_at(i);
+    i = i + 1;
+  }
+} return void;
+
+fwd_at(int i) {
+  int fid = (import prog)[i];
+  if(fwd_should(fid) == 1) {
+    fwd_check(i, fid);
+  }
+} return void;
+
+fwd_should(int fid) {
+  int ok = 0;
+  if(is_native(fid) == 0 && s1_of(fid) != "main") {
+    ok = 1;
+  }
+} return int ok;
+given fs_fixture ((import fwd_fid_plain)):(1)
+given fs_fixture ((import fwd_fid_main)):(0)

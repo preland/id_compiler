@@ -1,0 +1,15 @@
+// file:line: warning: 'F' and 'G' differ only in a literal value; parameterise
+// one function -- own diagnostic channel, on stderr (docs/PROJECT.md,
+// "decomposition warnings"): it never calls note_failure, so it cannot turn a
+// build that would otherwise succeed into one that fails.
+
+lz_report(int i, int j) {
+  string name_i = fname_at(i);
+  lz_report2(name_i, j);
+} return void;
+
+lz_report2(string name_i, int j) {
+  string name_j = fname_at(j);
+  string msg = lz_msg(name_i, name_j);
+  eprint(msg);
+} return void;

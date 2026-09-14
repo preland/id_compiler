@@ -1,0 +1,21 @@
+fwd_sig_params_loop(int[] paramsl, int[] cparamsl, int idx) {
+  int ok = 1;
+  while(idx < len(paramsl) && ok == 1) {
+    ok = fwd_param_ok(paramsl, cparamsl, idx);
+    idx = idx + 1;
+  }
+} return int ok;
+
+// One parameter's type against the matching one of the callee's.
+fwd_param_ok(int[] paramsl, int[] cparamsl, int idx) {
+  int pid = paramsl[idx];
+  int cpid = cparamsl[idx];
+  int ok = fwd_param_ok2(pid, cpid);
+} return int ok;
+
+fwd_param_ok2(int pid, int cpid) {
+  int ok = 0;
+  if(s1_of(pid) == s1_of(cpid)) {
+    ok = 1;
+  }
+} return int ok;

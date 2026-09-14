@@ -1,0 +1,28 @@
+// One argument of the call fwd_args_match (../ok.id) is checking: it must be
+// a bare read of the parameter at the same position, unchanged.
+
+fwd_arg_ok(int[] paramsl, int[] argsl, int idx) {
+  int argid = argsl[idx];
+  int pid = paramsl[idx];
+  int ok = fwd_arg_ok2(argid, pid);
+} return int ok;
+
+fwd_arg_ok2(int argid, int pid) {
+  int ok = 0;
+  if(k_of(argid) == "var" && s1_of(argid) == s2_of(pid)) {
+    ok = 1;
+  }
+} return int ok;
+
+// The callee's return type and parameter types must match `fid`'s
+// (./sig.id): a forwarder whose signature differs adapts, and does not warn
+// (docs/PROJECT.md, "decomposition warnings"). `callee_fid` -1 (a builtin,
+// which has no node) is checked on its own first, for the same reason
+// fwd_decl_ok2 (../../decl_ok.id) checks a void return first.
+fwd_sig_match(int fid, string callee_name) {
+  int callee_fid = fn_node_of(callee_name);
+  int ok = 0;
+  if(callee_fid >= 0) {
+    ok = fwd_sig_match2(fid, callee_fid);
+  }
+} return int ok;

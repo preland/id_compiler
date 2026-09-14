@@ -1,0 +1,25 @@
+// The part of a `ret_`-prefixed name after the digits: is it one of the eight
+// type tags this compiler spells its own return locals with (int, word, float,
+// string, and each one's list form)?
+
+retstyle_check(string rem) {
+  int dstart = tdig_start(rem);
+  string tagbase = slice(rem, 0, dstart);
+  int ok = is_ret_tag(tagbase);
+} return int ok;
+("i"):(1)
+("li2"):(1)
+("xy"):(0)
+
+is_ret_tag(string tagbase) {
+  int ok = 0;
+  if(tagbase == "i" || tagbase == "w" || tagbase == "f" || tagbase == "s") {
+    ok = 1;
+  }
+  if(tagbase == "li" || tagbase == "lw" || tagbase == "lf" || tagbase == "ls") {
+    ok = 1;
+  }
+} return int ok;
+("s"):(1)
+("lf"):(1)
+("x"):(0)
