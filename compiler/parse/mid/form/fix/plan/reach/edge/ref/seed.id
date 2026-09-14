@@ -1,0 +1,6 @@
+fix_wseed(int ow) {
+  if(ow >= 0 && (import fixd_wm)[ow] == 0) {
+    lset((import fixd_wm), ow, 1);
+    push((import fixd_wq), ow);
+  }
+} return void;

@@ -1,0 +1,18 @@
+// A call through a name that is no function could run anything; so could a
+// direct call to push, pop, lset or a poke -- none declares an export, but
+// each writes through whatever it is given, and the value given may be a
+// parameter a caller still holds (docs/SPEC.md 5, 6).
+fix_wref2(int x, int ow, int ci, string name) {
+  if(ci >= 0) {
+    fix_wedge(ci, ow);
+  } else if(k_of(x) == "call" && is_builtin(name) == 0) {
+    fix_wseed(ow);
+  } else if(k_of(x) == "call" && fix_wmut(name) == 1) {
+    fix_wseed(ow);
+  }
+} return void;
+
+fix_wedge(int ci, int ow) {
+  int[] row = (import fixd_wadj)[ci];
+  push(row, ow);
+} return void;

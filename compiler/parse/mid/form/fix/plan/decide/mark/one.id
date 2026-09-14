@@ -3,8 +3,12 @@ fix_mark_rest(int last) {
   fix_mark_imports(last);
 } return void;
 
+// A trapping read (an index, or an operator that can trap) and an import read
+// move only when some call ahead of them that also moves could write -- the
+// only way either could see a different value (docs/PROJECT.md, --fix).
 fix_mark_imports(int last) {
   if(fix_touches(last) == 1) {
+    fix_mark_cls(last, 2);
     fix_mark_cls(last, 4);
   }
 } return void;

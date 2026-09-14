@@ -18,10 +18,9 @@ fix_last_m() {
   }
 } return int last;
 
-// Calls and trapping reads first: whether an import moves depends on which
+// Calls first: whether a trapping read or an import moves depends on which
 // calls do.
 fix_mark_moves(int last) {
   fix_mark_cls(last, 1);
-  fix_mark_cls(last, 2);
   fix_mark_rest(last);
 } return void;
