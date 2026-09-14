@@ -11,6 +11,8 @@ cw_shape(int id) {
     ok = 0;
   }
 } return int ok;
+given cwv_setup ((import cwv_func)):(1)
+given ret_widens_fn ((import widen_f)):(1)
 
 cw_body(int id) {
   string s1_of_v = s1_of(id);

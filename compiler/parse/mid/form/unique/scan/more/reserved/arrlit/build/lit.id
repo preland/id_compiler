@@ -18,6 +18,8 @@ cw_arr_lit(int id) {
     ok = cw_arr_lit2(els);
   }
 } return int ok;
+given cwv_setup ((import cwv_arr)):(1)
+given ret_widens_fn ((import widen_f)):(0)
 
 cw_arr_lit2(int[] els) {
   int ok = 1;

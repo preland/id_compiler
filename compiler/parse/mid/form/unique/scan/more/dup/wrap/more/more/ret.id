@@ -10,6 +10,8 @@ cw_ret(int id) {
     val = cw_get(s1_of_v);
   }
 } return string val;
+given cwv_setup ((import cwv_func)):("A[1, \"hi\"]")
+given ret_widens_fn ((import widen_f)):("I5")
 
 cw_get(string name) {
   string val = "";

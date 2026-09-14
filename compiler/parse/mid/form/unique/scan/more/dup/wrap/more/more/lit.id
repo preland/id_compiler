@@ -9,6 +9,8 @@ cw_is_lit(string fp) {
   int tag = charat(fp, 0);
   int ok = tag == 73 || tag == 70 || tag == 83 || tag == 65;
 } return int ok;
+("A[1, 2]"):(1)
+("ar(I1)"):(0)
 
 // The value as conf.id spells it: the fingerprint after its tag (zeros_tail is
 // the tail of a string from an index). A negative integer is always the fold

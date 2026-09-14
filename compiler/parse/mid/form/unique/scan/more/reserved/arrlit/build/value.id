@@ -12,3 +12,5 @@ cw_value_of(int e) {
     val = "A" + cw_arr_spell(e);
   }
 } return string val;
+given cwv_setup ((import cwv_arr)):("A[1, \"hi\"]")
+given ret_widens_fn ((import widen_f)):("?func#1")

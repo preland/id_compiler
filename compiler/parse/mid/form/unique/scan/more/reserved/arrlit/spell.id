@@ -5,6 +5,8 @@ cw_arr_spell(int id) {
   int[] els = l1_of(id);
   string out = "[" + cw_arr_spell_items(els) + "]";
 } return string out;
+given cwv_setup ((import cwv_arr)):("[1, \"hi\"]")
+given ret_widens_fn ((import widen_f)):("[]")
 
 cw_arr_spell_items(int[] els) {
   string out = "";

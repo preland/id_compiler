@@ -1,0 +1,26 @@
+// A list literal of nothing but literals (cwv_arr), and a func node whose
+// return expression is that list (cwv_func) -- the wrapper rule's own new
+// case (docs/PROJECT.md 5). ../../../../fix/out/ret/clause/ret/fixture/
+// widens.id's ret_widens_fn, a func node with an ordinary scalar return, is
+// this directory's negative: its params list is empty, so it is also `[]`'s
+// stand-in wherever a case here needs one.
+
+cwv_setup() {
+  env_init();
+  cw_begin("t");
+  cwv_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+cwv_build() {
+  int e0 = node_int("1", 1, 0);
+  int e1 = node_str("hi");
+  cwv_build2(e0, e1);
+} return void;
+
+cwv_build2(int e0, int e1) {
+  int[] none = [];
+  export int cwv_arr = node_arr([e0, e1]);
+  export int cwv_func = node_func("f", "int[]", none, none, (import cwv_arr));
+} return void;

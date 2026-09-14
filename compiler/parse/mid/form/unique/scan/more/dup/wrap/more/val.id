@@ -15,6 +15,8 @@ cw_put(int id, string name) {
   string val = cw_value_of(i1_of_v);
   int ok = cw_keep(name, val);
 } return int ok;
+given cwv_setup ((import cwv_func), "y"):(1)
+given cwv_setup ((import cwv_arr), "y"):(1)
 
 // Appended rather than overwritten, so an assignment needs no search to write;
 // the latest entry for a name is its value (cw_get).
