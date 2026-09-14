@@ -199,12 +199,15 @@ done
 
 # -- 10. a transitively-imported BACKEND is linked -------------------------
 # The reason transitivity had to land with the stdlib: a graphics module in a
-# library declares backends/gfx once, instead of every program naming it.
-rm -rf "$TMP/bk"; mkdir -p "$TMP/bk/lib" "$TMP/bk/app"
-printf 'import "%s"\n' "$(cd "$ROOT/backends/fs" && pwd)" > "$TMP/bk/lib/conf.id"
+# library declares its backend once, instead of every program naming it.
+rm -rf "$TMP/bk"; mkdir -p "$TMP/bk/lib" "$TMP/bk/app" "$TMP/bk/be"
+printf 'string name = "bk";\nstring[] c_linux_sources = ["bk.c"];\nstring[] c_darwin_sources = ["bk.c"];\n' > "$TMP/bk/be/backend.id"
+printf 'int id_bk_exists(char* path) { return path[0] == 0; }\n' > "$TMP/bk/be/bk.c"
+printf 'native bk_exists(string path) return int;\n' > "$TMP/bk/be/bk.id"
+printf 'import "../be"\n' > "$TMP/bk/lib/conf.id"
 cat > "$TMP/bk/lib/l.id" <<'EOF'
 bklib_has(string path) {
-  int found = fs_exists(path);
+  int found = bk_exists(path);
 } return int found;
 EOF
 printf 'import "../lib"\n' > "$TMP/bk/app/conf.id"

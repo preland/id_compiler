@@ -1,6 +1,5 @@
-// mkodt writes through the fs backend: an archive is bytes, and its headers
-// are full of the NULs a string cannot hold.
-import "../../backends/fs"
+// mkodt writes through the standard library's fs backend: an archive is
+// bytes, and its headers are full of the NULs a string cannot hold.
 
 // Where the document goes when no path is given, relative to the directory
 // mkodt runs in, as mkodt.py had it.

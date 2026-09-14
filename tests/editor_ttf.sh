@@ -61,7 +61,7 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # run. The smallest thing that can exercise tt_glyph is a program, so one is
 # built here out of the font module, the shared byte readers it depends on,
 # and a main that calls the module's own tt_selftest. The project directory
-# holds three entries plus conf.id, which is the limit.
+# holds three entries, which is the limit. fs is the standard library's.
 PROJ="$TMP/p"
 mkdir -p "$PROJ/ttf" "$PROJ/byte"
 cp -r "$ORG/editor/lib/font/ttf/." "$PROJ/ttf/"
@@ -71,7 +71,6 @@ main(int argc, string[] argv) {
   tt_selftest(argv);
 } return int 0;
 IDEOF
-printf 'import "%s/backends/fs"\n' "$(cd "$ROOT" && pwd)" > "$PROJ/conf.id"
 
 if ! "$ROOT/bin/idc" "$PROJ" --allow-untested -o "$TMP/ttf" >"$TMP/build.log" 2>&1; then
     bad "the font module builds ($(head -3 "$TMP/build.log" | tr '\n' ' '))"

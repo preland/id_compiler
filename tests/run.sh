@@ -1058,7 +1058,7 @@ fi
 #     graphics demos build at byte parity, and no windowed demo hangs when
 #     there is no display. Skips itself when the X11/GL headers are absent.
 echo
-echo "--- native backends (backends/gfx, backends/gl) ---"
+echo "--- native backends (idstd's sys/io/fs, sys/win/gfx, sys/win/gl) ---"
 bend=0
 if want backends; then
     ./backends.sh

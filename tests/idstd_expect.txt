@@ -13,20 +13,20 @@ adventure        both
 average          needs-std
 calc             both
 control          both
-fsdemo           both
+fsdemo           needs-std
 hello            both
 idc_in_id_calc   needs-std
 idview           needs-std
 wordcount        needs-std
 
-# Graphics demos: need --backend, which this file does not pass. Their standing
-# against the library is untested until the backend is wired in here.
-flyover          neither
-fpsmaze          neither
-galaxy           neither
-gfxdemo          neither
-gl3d             neither
-gl3dgame         neither
+# Graphics demos: gfx and gl are the standard library's, so they build only
+# with it. So does fsdemo, above, for fs.
+flyover          needs-std
+fpsmaze          needs-std
+galaxy           needs-std
+gfxdemo          needs-std
+gl3d             needs-std
+gl3dgame         needs-std
 
 # ---------------------------------------------------------------------------
 # The compiler's own two stages, PORTED. They each carried a private copy of
