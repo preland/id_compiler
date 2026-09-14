@@ -890,9 +890,10 @@ static void* id_realloc(void* p, size_t n) {
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
    type. Because a list is a pointer, passing one to a function and mutating it
-   is visible to the caller -- this is how id gets shared mutable state. Every
-   index access is bounds-checked: an out-of-range get/set/pop is a clear,
-   fatal runtime error, matching id's contract that a bug aborts loudly. */
+   is visible to the caller -- this is how id gets shared mutable state.
+   Every index access is bounds-checked: an out-of-range get/set/pop is a
+   clear, fatal runtime error (never silent corruption or UB), matching id's
+   contract that a bug aborts loudly instead of reading/writing garbage. */
 typedef struct { int len, cap; long long* data; } IdList;
 static IdList* id_list_new(void) {
     IdList* L = (IdList*)id_alloc(sizeof(IdList));
@@ -900,7 +901,13 @@ static IdList* id_list_new(void) {
     L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, "list init"));
     return L;
 }
-static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; } static void id_list_mut_check(IdList* L) { if (L->cap < 0) { fprintf(stderr, "id: cannot mutate a constant list\n"); exit(1); } }
+static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }
+static void id_list_mut_check(IdList* L) {
+    if (L->cap < 0) {
+        fprintf(stderr, "id: cannot mutate a constant list\n");
+        exit(1);
+    }
+}
 static void id_list_push(IdList* L, long long v) {
     id_list_mut_check(L); if (L->len >= L->cap) {
         if (L->cap > INT_MAX / 2) {
