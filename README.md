@@ -48,6 +48,20 @@ same diagnostic, so a message `idc.py` gives and `bin/idc` does not is a test
 failure. `bin/idc` also gates on `cc -fsyntax-only` before trusting its own
 output; if that ever fires it means a bug in the compiler, and it says so.
 
+**`--check` and `--fix`.** `bin/idc PATH --check` runs the lexer, the parser
+and every rule, prints exactly what a build of `PATH` prints before it emits
+anything, and exits 1 on any diagnostic — no C, no `cc`, no test harness, no
+link. `bin/idc PATH --fix` rewrites `PATH`'s own `.id` files — never a
+dependency or the standard library — to resolve what has one mechanical,
+behaviour-preserving repair: a call inside a call's argument, a return clause
+that is not a name or a literal, an argument that narrows, and a comparison
+mixed with a bare bitwise operand. It prints every edit as `FILE:LINE` with the
+lines before and after, then each violation it would not touch and why, then
+what is left by kind; run again, it makes no edit. The edits are computed by
+`idparse --fixes` from the tree and the token columns `idlex --cols` sends
+(`compiler/parse/mid/form/fix/`), and applied by `tools/fixapply.awk`.
+See [`docs/PROJECT.md`](../docs/PROJECT.md) §3.
+
 The one rule checked in the driver rather than in `id` is the
 3-entries-per-directory limit — it is a property of the filesystem, which `id`
 cannot see, which is also why the driver exists.
