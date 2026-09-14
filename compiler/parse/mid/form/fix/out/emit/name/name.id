@@ -7,9 +7,14 @@ fix_emit_stmt(int sn, int last) {
   fix_resid(last);
 } return void;
 
+// fix_rcache_taint runs again for every event here (plan/walk/ev/push/ev.id
+// already ran it once for the whole statement, during the walk): a call
+// that can write and a repeat of an earlier one can sit in the same
+// statement, and naming runs in the same order the calls do.
 fix_names(int last) {
   int i = 0;
   while(i <= last) {
+    fix_rcache_taint((import fixe_n)[i]);
     fix_name_at(i);
     i = i + 1;
   }
@@ -17,7 +22,7 @@ fix_names(int last) {
 
 fix_name_at(int i) {
   if((import fixe_sep)[i] == 1) {
-    string name = fix_pick(i);
+    string name = fix_name_pick(i);
     sset((import fixe_nm), i, name);
   }
 } return void;

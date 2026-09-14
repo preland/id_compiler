@@ -6,8 +6,11 @@ fix_decls(int sn, int last) {
   }
 } return void;
 
+// A reused event (fixe_ru, out/emit/name/pick/reuse/) is still sep -- its
+// text is still replaced by the name (fix_resid, out/emit/resid/resid.id) --
+// but the name it reused already has a declaration, so this one gets none.
 fix_decl_at(int sn, int i) {
-  if((import fixe_sep)[i] == 1) {
+  if((import fixe_sep)[i] == 1 && (import fixe_ru)[i] == 0) {
     fix_decl(sn, i);
   }
 } return void;

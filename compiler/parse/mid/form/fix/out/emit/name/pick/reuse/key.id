@@ -1,0 +1,14 @@
+fix_rkey(int e) {
+  int b = fix_nbeg(e);
+  int c = fix_nend(e);
+  string key = fix_toktext(b, c);
+} return string key;
+
+fix_toktext(int tok0, int tok1) {
+  string s = "";
+  int toki = tok0;
+  while(toki <= tok1) {
+    s = s + "|" + (import ttext)[toki];
+    toki = toki + 1;
+  }
+} return string s;

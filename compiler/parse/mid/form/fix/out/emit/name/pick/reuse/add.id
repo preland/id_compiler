@@ -1,0 +1,23 @@
+// A call that cannot write is cached under its own text, so a later
+// identical call can reuse its name instead of naming and running itself
+// again. One that can write -- a bit reader, anything that pushes, lsets or
+// pokes, declares an export, calls such a function, or is reached through a
+// function value (fix_call_touch) -- is never cached: two such calls read as
+// two, always, however identical their text.
+fix_rcache_add(int i, string name) {
+  int e = (import fixe_n)[i];
+  if(k_of(e) == "call" && fix_call_touch(e) == 0) {
+    string key = fix_rkey(e);
+    push((import fixd_rk), key);
+    push((import fixd_rn), name);
+  }
+} return void;
+
+// fixd_rk, fixd_rn: the cached calls' text and the name each was given, this
+// function's alone (run/state/grp/reset.id) -- and cleared early by any call
+// that can write (fix_rcache_taint, plan/walk/ev/push/ev.id), since nothing
+// cached before it can still be trusted after.
+fix_rcache_reset() {
+  export string[] fixd_rk = [];
+  export string[] fixd_rn = [];
+} return void;

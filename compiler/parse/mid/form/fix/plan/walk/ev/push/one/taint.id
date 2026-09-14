@@ -1,0 +1,11 @@
+// Every call in the function passes through here as the walk reaches it,
+// whether or not its own statement has anything to fix -- an earlier one
+// that writes must still clear the cache (out/emit/name/pick/reuse/) before
+// a later statement reads it. fix_names calls this again per event during
+// naming, since two reads of one call and a write between them can all sit
+// in the one statement, after the whole statement has already been walked.
+fix_rcache_taint(int e) {
+  if(k_of(e) == "call" && fix_call_touch(e) == 1) {
+    fix_rcache_reset();
+  }
+} return void;
