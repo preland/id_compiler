@@ -1,0 +1,16 @@
+fix_emit_r(int e, string text) {
+  int sq = fix_seq();
+  string spn = fix_span(e);
+  print("@R|" + (import fixd_file)[0] + "|" + spn + "|" + sq + "|" + text);
+} return void;
+
+fix_note_span(int e) {
+  int b = fix_nbeg(e);
+  int c = fix_nend(e);
+  fix_note_tok(b, c);
+} return void;
+
+fix_note_tok(int b, int c) {
+  push((import fixd_lo), b);
+  push((import fixd_hi), c);
+} return void;

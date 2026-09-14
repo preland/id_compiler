@@ -1,0 +1,19 @@
+fix_decls(int sn, int last) {
+  int i = 0;
+  while(i <= last) {
+    fix_decl_at(sn, i);
+    i = i + 1;
+  }
+} return void;
+
+fix_decl_at(int sn, int i) {
+  if((import fixe_sep)[i] == 1) {
+    fix_decl(sn, i);
+  }
+} return void;
+
+fix_decl(int sn, int i) {
+  string head = fix_decl_head(sn, i);
+  string subs = fix_subs(i);
+  print(head + subs);
+} return void;

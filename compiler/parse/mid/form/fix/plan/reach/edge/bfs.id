@@ -1,0 +1,15 @@
+fix_wbfs() {
+  while(len((import fixd_wq)) > 0) {
+    int gi = pop((import fixd_wq));
+    fix_wprop(gi);
+  }
+} return void;
+
+fix_wprop(int gi) {
+  int[] row = (import fixd_wadj)[gi];
+  int i = 0;
+  while(i < len(row)) {
+    fix_wseed(row[i]);
+    i = i + 1;
+  }
+} return void;

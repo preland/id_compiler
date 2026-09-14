@@ -1,0 +1,21 @@
+fix_walk_rhs(int e, int ca, int cd) {
+  int b = i2_of(e);
+  int c2 = fix_condop(e, cd);
+  fix_walk(b, ca, c2, "");
+} return void;
+
+fix_condop(int e, int cd) {
+  int c = cd;
+  if(s1_of(e) == "&&" || s1_of(e) == "||") {
+    c = 1;
+  }
+} return int c;
+
+fix_walk_more(int e, int ca, int cd) {
+  if(k_of(e) == "un") {
+    int a = i1_of(e);
+    fix_walk(a, ca, cd, "");
+  } else if(k_of(e) == "arr") {
+    fix_walk_arr(e, ca, cd);
+  }
+} return void;

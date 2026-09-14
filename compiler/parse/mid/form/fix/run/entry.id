@@ -1,0 +1,42 @@
+// `idparse --fixes`: after every check has run, print the source edits that
+// resolve the violations with exactly one mechanical, behaviour-preserving
+// repair, and a refusal for each one that looks repairable but is not. bin/idc
+// --fix applies them and runs again until nothing is left to print. Each line
+// starts with `@` so the driver can tell it from a diagnostic:
+//
+//   @R|FILE|L0|C0|L1|C1|SEQ|TEXT     replace from column C0 of line L0 to
+//                                    column C1 of line L1 (exclusive) by TEXT
+//   @D|FILE|L|C|SEQ|IL|HEAD|L0|C0|L1|C1[|SL0|SC0|SL1|SC1|NAME]...
+//                                    a new statement before column C of line
+//                                    L: HEAD, the source of the span with each
+//                                    sub-span replaced by its NAME, and `;`,
+//                                    indented as line IL is
+//   @N|FILE|LINE|REASON              a violation left alone, and why
+//
+// Every coordinate is in the source as it was: the edits of one run never see
+// each other, which is what lets them all be computed in one pass.
+
+report_mode(int argc, string[] argv, int mode) {
+  if(mode == 1) {
+    print_fingerprints();
+  } else {
+    fix_all(argc, argv);
+  }
+} return void;
+
+// A syntax error means the tree is not what was written, so nothing may be
+// rewritten from it.
+fix_all(int argc, string[] argv) {
+  if((import synfail)[0] == 0) {
+    fix_init(argc, argv);
+    fix_funcs();
+  } else {
+    print("@N|||the source has syntax errors; nothing was rewritten");
+  }
+} return void;
+
+fix_init(int argc, string[] argv) {
+  fix_state();
+  fix_wbuild();
+  fix_std_detect(argc, argv);
+} return void;

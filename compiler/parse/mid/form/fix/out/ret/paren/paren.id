@@ -1,0 +1,21 @@
+// Parentheses where a comparison and a bitwise operator mix bare, around the
+// operand the diagnostic names (mid/types/check/expr/op/compare/cond/more/).
+// The tree already groups it that way, so they change nothing but the text.
+fix_parens(int lo, int hi) {
+  while(lo <= hi) {
+    fix_paren_node(lo);
+    lo = lo + 1;
+  }
+} return void;
+
+fix_paren_node(int x) {
+  if(k_of(x) == "bin") {
+    fix_paren_pair(x);
+  }
+} return void;
+
+fix_paren_pair(int x) {
+  int a = i1_of(x);
+  int b = i2_of(x);
+  fix_paren_two(x, a, b);
+} return void;

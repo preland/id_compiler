@@ -1,0 +1,20 @@
+fix_walk_arr(int e, int ca, int cd) {
+  int[] l1_of_v = l1_of(e);
+  int i = 0;
+  while(i < len(l1_of_v)) {
+    fix_walk(l1_of_v[i], ca, cd, "");
+    i = i + 1;
+  }
+} return void;
+
+fix_push_ev(int e, int lo, int ca, int cd, string nt) {
+  int cl = fix_class(e, ca, nt);
+  fix_push3(e, lo, cl);
+  fix_push4(cd, nt);
+} return void;
+
+fix_push3(int e, int lo, int cl) {
+  push((import fixe_n), e);
+  push((import fixe_lo), lo);
+  push((import fixe_cl), cl);
+} return void;

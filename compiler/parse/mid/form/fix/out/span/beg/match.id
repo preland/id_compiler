@@ -1,0 +1,28 @@
+fix_ibeg4(int e) {
+  int t0 = (import ntok)[e];
+  if(k_of(e) == "un") {
+    int a = i1_of(e);
+    t0 = fix_nbeg(a) - 1;
+  } else if(k_of(e) == "import") {
+    t0 = t0 - 1;
+  }
+} return int t0;
+
+// Back from the closing token c to the opening one that matches it.
+fix_match(int c, string opn, string cls) {
+  int d = 1;
+  int t0 = c;
+  while(d > 0 && t0 > 0) {
+    t0 = t0 - 1;
+    d = d + fix_depth(t0, opn, cls);
+  }
+} return int t0;
+
+fix_depth(int t0, string opn, string cls) {
+  int d = 0;
+  if((import tkind)[t0] == "op" && (import ttext)[t0] == cls) {
+    d = 1;
+  } else if((import tkind)[t0] == "op" && (import ttext)[t0] == opn) {
+    d = 0 - 1;
+  }
+} return int d;

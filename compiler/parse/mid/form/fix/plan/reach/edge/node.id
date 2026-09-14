@@ -1,0 +1,20 @@
+fix_wrange(int lo, int hi, int ow) {
+  while(lo <= hi) {
+    fix_wnode(lo, ow);
+    lo = lo + 1;
+  }
+} return void;
+
+fix_wnode(int x, int ow) {
+  if(k_of(x) == "decl" && i2_of(x) == 1) {
+    fix_wseed(ow);
+  } else if(k_of(x) == "call" || k_of(x) == "var") {
+    fix_wref(x, ow);
+  }
+} return void;
+
+fix_wref(int x, int ow) {
+  string s1_of_v = s1_of(x);
+  int ci = fix_fnix(s1_of_v);
+  fix_wref2(x, ow, ci, s1_of_v);
+} return void;

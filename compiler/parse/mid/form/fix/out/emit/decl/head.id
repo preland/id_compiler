@@ -1,0 +1,18 @@
+fix_decl_head(int sn, int i) {
+  string where = fix_stmt_at(sn);
+  string t = fix_evtype(i);
+  string ret_s = "@D|" + (import fixd_file)[0] + "|" + where + "|" + t + " " + (import fixe_nm)[i] + " = |" + fix_span((import fixe_n)[i]);
+} return string ret_s;
+
+// A statement's new declarations go before its first token, indented as its
+// own line is.
+fix_stmt_at(int sn) {
+  int t0 = (import nst)[sn];
+  int sq = fix_seq();
+  string ret_s = (import tline)[t0] + "|" + fix_col(t0) + "|" + sq + "|" + (import tline)[t0];
+} return string ret_s;
+
+fix_subs(int i) {
+  int j = (import fixe_lo)[i];
+  string out = fix_subs_from(i, j);
+} return string out;

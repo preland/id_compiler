@@ -1,0 +1,14 @@
+// A token's start, or its end, as LINE|COL; a node's span as both.
+fix_at(int t0) {
+  string ret_s = (import tline)[t0] + "|" + fix_col(t0);
+} return string ret_s;
+
+fix_after(int t0) {
+  string ret_s = (import tline)[t0] + "|" + fix_endc(t0);
+} return string ret_s;
+
+fix_span(int e) {
+  int b = fix_nbeg(e);
+  int c = fix_nend(e);
+  string ret_s = fix_at(b) + "|" + fix_after(c);
+} return string ret_s;

@@ -1,0 +1,25 @@
+// A statement's line and first token, recorded once it is parsed: its node is
+// the last one the statement builds, so the id is only known afterwards, while
+// the token it began at was taken before.
+
+stmt_done(int id, int t0) {
+  int n = tok_ln(t0);
+  lset((import nline), id, n);
+  lset((import nst), id, t0);
+} return void;
+
+// The line of token t0, or 1 past the end of the store -- cur_ln's answer for
+// a token index rather than a cursor.
+tok_ln(int t0) {
+  int n = 1;
+  if(t0 < len((import tline))) {
+    n = (import tline)[t0];
+  }
+} return int n;
+
+// Called just after the closing parenthesis was consumed.
+grp_note(int e, int[] pos) {
+  push((import ngrp), e);
+  int c = pos[0] - 1;
+  push((import ngrpc), c);
+} return void;

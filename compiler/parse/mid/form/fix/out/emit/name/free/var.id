@@ -1,0 +1,24 @@
+fix_free_fn(string name) {
+  int ok = 0;
+  if(is_builtin(name) == 0 && fix_fnix(name) < 0 && find_str((import enames), name) < 0) {
+    ok = 1;
+  }
+} return int ok;
+
+// lookup_var answers from another unit when the name is not in this one, which
+// can only refuse a name that was free; it never accepts one that was not.
+fix_free_var(string name, string t) {
+  string vt = lookup_var(name, 0);
+  int ok = (vt == "" || vt == t) && find_str((import fixd_used), name) < 0;
+  if(ok == 1) {
+    ok = fix_free_round(name, t);
+  }
+} return int ok;
+
+fix_free_round(string name, string t) {
+  int ix = find_str((import fixd_nm), name);
+  int ok = 1;
+  if(ix >= 0 && (import fixd_ty)[ix] != t) {
+    ok = 0;
+  }
+} return int ok;

@@ -1,0 +1,21 @@
+fix_push4(int cd, string nt) {
+  push((import fixe_cd), cd);
+  push((import fixe_nt), nt);
+  fix_push5();
+} return void;
+
+fix_push5() {
+  push((import fixe_mv), 0);
+  push((import fixe_sep), 0);
+  push((import fixe_nm), "");
+} return void;
+
+// A call inside another call's argument must be named; so must an argument
+// that narrows, whatever it is. Anything else is named only if something
+// evaluated after it moves (plan/decide/).
+fix_class(int e, int ca, string nt) {
+  int cl = fix_class2(e);
+  if(nt != "" || cl == 1 && ca == 1) {
+    cl = 3;
+  }
+} return int cl;

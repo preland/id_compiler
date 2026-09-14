@@ -1,0 +1,10 @@
+fix_seq() {
+  int n = (import fixd_seq)[0] + 1;
+  lset((import fixd_seq), 0, n);
+} return int n;
+
+// A zero-width edit: text inserted at p, a LINE|COL.
+fix_emit_pt(string p, string text) {
+  int sq = fix_seq();
+  print("@R|" + (import fixd_file)[0] + "|" + p + "|" + p + "|" + sq + "|" + text);
+} return void;

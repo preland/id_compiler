@@ -15,12 +15,11 @@ guarded_emit(int argc, string[] argv) {
 } return void;
 
 guarded_emit_tail(int argc, string[] argv) {
-  int fp_mode = arg_flag(argc, argv, 1, "--fingerprints");
-  if(fp_mode == 1) {
-    print_fingerprints();
-  }
+  int fp_mode = arg_flag(argc, argv, 1, "--fingerprints") + 2 * arg_flag(argc, argv, 1, "--fixes");
   if(fp_mode == 0) {
     emit_or_notes(argc, argv);
+  } else {
+    report_mode(argc, argv, fp_mode);
   }
 } return void;
 

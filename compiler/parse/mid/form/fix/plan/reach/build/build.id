@@ -1,0 +1,26 @@
+// fixd_wm: 1 for each function, indexed as fnames is, that can run a function
+// declaring an export -- directly or through calls -- or that calls through a
+// function value, which could run anything. An import read only has to move
+// ahead of a call that can.
+//
+// Built backwards: every function whose body declares an export or calls
+// through a value is a seed, and a function that calls or names a marked one
+// is marked. One pass collects the edges, one walk follows them.
+fix_wbuild() {
+  fix_winit();
+  fix_wedges(0, 0);
+  fix_wbfs();
+} return void;
+
+//   fixd_wadj  for each function, the functions that call or name it
+//   fixd_wq    marked functions whose callers are not marked yet
+fix_winit() {
+  export int[] fixd_wm = [];
+  export int[][] fixd_wadj = [];
+  fix_winit2();
+} return void;
+
+fix_winit2() {
+  export int[] fixd_wq = [];
+  fix_wfill();
+} return void;

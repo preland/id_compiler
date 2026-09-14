@@ -1,0 +1,24 @@
+// The state of one fix run.
+//   fixd_nm, fixd_ty  every name this run introduced, and its type, so two
+//                     functions cannot give one new name two types
+//   fixd_seq          the order edits were printed in
+//   fixd_std          1 when new names take the idstd_ prefix (plan/reach/std/)
+//   fixd_file         the file of the function being fixed
+
+fix_state() {
+  fix_state1();
+  fix_state2();
+  fix_gcl();
+} return void;
+
+fix_state1() {
+  export string[] fixd_nm = [];
+  export string[] fixd_ty = [];
+  export int[] fixd_seq = [0];
+} return void;
+
+fix_state2() {
+  export int[] fixd_std = [0];
+  export string[] fixd_file = [""];
+  fix_state3();
+} return void;

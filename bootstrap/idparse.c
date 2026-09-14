@@ -439,6 +439,12 @@ int id_lst_index_of(IdList* idstd_xs, int idstd_v);
 int id_lst_find(IdList* idstd_xs, int idstd_v);
 int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
 int id_str_eol(char* idstd_s, int idstd_i);
+int id_str_eqat(char* idstd_s, int idstd_i, char* idstd_txt);
+int id_str_starts(char* idstd_s, char* idstd_txt);
+int id_str_ends(char* idstd_s, char* idstd_txt);
+int id_str_find(char* idstd_s, char* idstd_txt);
+int id_str_findat(char* idstd_s, char* idstd_txt, int idstd_i);
+int id_idstd_str_find_end(char* idstd_s, int idstd_i, char* idstd_txt);
 void id_dce_prune(void);
 int id_dce_pack(int i, int n);
 int id_dce_keep(int i, int n);
@@ -1562,7 +1568,10 @@ void id_init_pos(void);
 void id_set_span(char* text);
 void id_span_pad(void);
 void id_init_pos2(void);
+void id_init_pos3(void);
 void id_stamp_tok(IdList* pos);
+void id_stmt_done(int id, int t0);
+int id_tok_ln(int t0);
 void id_grp_note(int e, IdList* pos);
 char* id_slice(char* src, int a, int b);
 void id_push_tok(char* kind, char* text);
@@ -1608,12 +1617,192 @@ IdList* id_l1_of(int id);
 IdList* id_l2_of(int id);
 int id_is_native(int id);
 int id_newnode_tail(IdList* l1, IdList* l2);
+void id_push_pos(void);
 int id_newnode(char* k, int a, int b, char* s1, char* s2, IdList* l1, IdList* l2);
 int id_newleaf(char* k, int a, int b, char* s1, char* s2);
 char* id_k_of(int id);
 void id_push_kii(char* k, int a, int b);
 void id_push_ss(char* s1, char* s2);
 void id_push_ll(IdList* l1, IdList* l2);
+void id_fix_decls(int sn, int last);
+void id_fix_decl_at(int sn, int i);
+void id_fix_decl(int sn, int i);
+char* id_fix_decl_head(int sn, int i);
+char* id_fix_stmt_at(int sn);
+char* id_fix_subs(int i);
+char* id_fix_subs_from(int i, int j);
+char* id_fix_sub_at(int i, int j, char* out);
+char* id_fix_choose(char* stem, char* t);
+char* id_fix_choose_base(char* bstem, char* sfx, char* t);
+char* id_fix_try(char* bstem, char* sfx, char* t);
+void id_fix_take(char* name, char* t);
+char* id_fix_prefixed(char* stem);
+int id_fix_free(char* name, char* t);
+int id_fix_free_fn(char* name);
+int id_fix_free_var(char* name, char* t);
+int id_fix_free_round(char* name, char* t);
+void id_fix_emit_stmt(int sn, int last);
+void id_fix_names(int last);
+void id_fix_name_at(int i);
+char* id_fix_pick(int i);
+char* id_fix_stem(int e);
+char* id_fix_stem2(int e);
+void id_fix_emit_r(int e, char* text);
+void id_fix_note_span(int e);
+void id_fix_note_tok(int b, int c);
+void id_fix_resid(int last);
+void id_fix_resid_at(int i, int last);
+void id_fix_replace(int e, char* name);
+int id_fix_seq(void);
+void id_fix_emit_pt(char* p, char* text);
+int id_fix_close(int e);
+void id_fix_ret_emit(int f, int e, char* t);
+char* id_fix_ret_name(char* t);
+void id_fix_ret_decl(int f, int e, char* t, char* name);
+char* id_fix_ret_pos(int f, int e);
+int id_fix_indent_line(int f);
+void id_fix_ret(int f);
+void id_fix_ret_at(int f, int e);
+int id_fix_ret_ok(int e);
+char* id_fix_tletter(char* tb);
+char* id_fix_tletter2(char* tb);
+void id_fix_ret_parens(int f, int lo);
+char* id_fix_tsuf(char* t);
+void id_fix_tstrip(IdList* fixt_st);
+void id_fix_tstep(IdList* fixt_st);
+int id_fix_within(int b, int e);
+int id_fix_within_at(int i, int b, int e, int ok);
+void id_fix_paren_pts(int b, int e);
+void id_fix_paren_rec(char* p1, char* p2);
+int id_fix_in_moved(int c);
+void id_fix_parens(int lo, int hi);
+void id_fix_paren_node(int x);
+void id_fix_paren_pair(int x);
+void id_fix_paren_two(int x, int a, int b);
+void id_fix_paren_side(int x, int c);
+void id_fix_paren_emit(int c);
+int id_fix_ibeg(int e);
+int id_fix_ibeg2(int e);
+int id_fix_ibeg3(int e);
+int id_fix_ibeg4(int e);
+int id_fix_match(int c, char* opn, char* cls);
+int id_fix_depth(int t0, char* opn, char* cls);
+char* id_fix_at(int t0);
+char* id_fix_after(int t0);
+char* id_fix_span(int e);
+int id_fix_packed(int t0);
+int id_fix_col(int t0);
+int id_fix_endc(int t0);
+int id_fix_spanok(int e);
+int id_fix_nend(int e);
+int id_fix_nbeg(int e);
+void id_fix_decide(int sn, int md);
+void id_fix_decide2(int sn, int md, int last);
+void id_fix_mark(int sn, int last);
+void id_fix_check_and_emit(int sn, int last);
+int id_fix_last_m(void);
+void id_fix_mark_moves(int last);
+void id_fix_mark_rest(int last);
+void id_fix_mark_imports(int last);
+void id_fix_mark_cls(int last, int wcl);
+int id_fix_anc(IdList* fl, int i, int hi);
+int id_fix_anc_at(IdList* fl, int i, int j, int ok);
+char* id_fix_evtype(int i);
+int id_fix_touch_ix(int ci, char* name);
+void id_fix_mark_sep(int last);
+void id_fix_sep_at(int i, int last);
+int id_fix_touches(int last);
+int id_fix_touch_at(int i, int ok);
+int id_fix_call_touch(int e);
+void id_fix_refuse_md(int md, int last);
+char* id_fix_md_why(int md);
+int id_fix_type_ok(int i);
+char* id_fix_why_pos(int sn);
+void id_fix_refuse(int last, char* why);
+char* id_fix_why(int sn, int last);
+char* id_fix_why_cond(int last);
+char* id_fix_why_type(int sn, int last);
+void id_fix_wbuild(void);
+void id_fix_winit(void);
+void id_fix_winit2(void);
+void id_fix_wfill(void);
+void id_fix_wrow(void);
+void id_fix_wedges(int f, int lo);
+int id_fix_wfunc(int f, int lo);
+int id_fix_owner(int f);
+int id_fix_fnix(char* name);
+void id_fix_wbfs(void);
+void id_fix_wprop(int gi);
+void id_fix_wrange(int lo, int hi, int ow);
+void id_fix_wnode(int x, int ow);
+void id_fix_wref(int x, int ow);
+void id_fix_wref2(int x, int ow, int ci, char* name);
+void id_fix_wedge(int ci, int ow);
+void id_fix_wseed(int ow);
+void id_fix_std_row(int i, IdList* cnt);
+void id_fix_std_count(int i, IdList* cnt);
+void id_fix_std_detect(int argc, IdList* argv);
+int id_fix_std_scan(void);
+void id_fix_std_rows(IdList* cnt);
+void id_fix_walk_args(int e, int cd);
+void id_fix_walk_arg(int e, int i, int cd);
+void id_fix_walk_bin(int e, int ca, int cd);
+void id_fix_walk_rhs(int e, int ca, int cd);
+int id_fix_condop(int e, int cd);
+void id_fix_walk_more(int e, int ca, int cd);
+void id_fix_walk_arr(int e, int ca, int cd);
+void id_fix_push_ev(int e, int lo, int ca, int cd, char* nt);
+void id_fix_push3(int e, int lo, int cl);
+int id_fix_class2(int e);
+int id_fix_class3(int e);
+int id_fix_traps(int e);
+char* id_fix_fparam(int e, int i);
+char* id_fix_nth(IdList* pts, int i, int e);
+int id_fix_unsafe_rhs(int e);
+char* id_fix_narrow(int e, int i, int a);
+int id_fix_narrows(char* pt, int a);
+char* id_fix_ptype(int e, int i);
+char* id_fix_ptype2(int e, int fn, int i);
+char* id_fix_pparam(int e, int fn, int i);
+void id_fix_push4(int cd, char* nt);
+void id_fix_push5(void);
+int id_fix_class(int e, int ca, char* nt);
+void id_fix_ev_reset2(void);
+void id_fix_ev_reset3(void);
+void id_fix_ev_reset4(void);
+void id_fix_simple(int sn);
+void id_fix_iassign(int sn);
+void id_fix_plan(int sn, IdList* roots, int md);
+void id_fix_walk_roots(IdList* roots);
+void id_fix_walk(int e, int ca, int cd, char* nt);
+void id_fix_walk_kids(int e, int ca, int cd);
+void id_report_mode(int argc, IdList* argv, int mode);
+void id_fix_all(int argc, IdList* argv);
+void id_fix_init(int argc, IdList* argv);
+void id_fix_state3(void);
+void id_fix_gcl(void);
+void id_fix_gcl_fill(void);
+void id_fix_gcl_set(void);
+void id_fix_gcl_at(int i);
+void id_fix_ev_reset(void);
+void id_fix_state(void);
+void id_fix_state1(void);
+void id_fix_state2(void);
+void id_fix_enter(int i, int f, int lo);
+void id_fix_setfile(int i);
+void id_fix_used(int lo, int hi);
+void id_fix_funcs(void);
+int id_fix_func_at(int i, int lo);
+void id_fix_func(int i, int f, int lo);
+void id_fix_stmt(int sn, int md);
+void id_fix_if(int sn, int md);
+void id_fix_cond(int sn, int md);
+void id_fix_used_at(int x);
+void id_fix_body(int f);
+void id_fix_block(IdList* stmts);
+void id_fix_then(int sn);
+void id_fix_else(int sn);
+void id_fix_while(int sn);
 char* id_canon_expr(int id);
 char* id_ce2(int id);
 char* id_ce3(int id);
@@ -2385,7 +2574,9 @@ IdList* tspan;  /* exported by init_pos() */
 IdList* curtk;  /* exported by init_pos() */
 IdList* ntok;  /* exported by init_pos2() */
 IdList* ngrp;  /* exported by init_pos2() */
-IdList* ngrpc;  /* exported by init_pos2() */
+IdList* ngrpc;  /* exported by init_pos3() */
+IdList* nst;  /* exported by init_pos3() */
+IdList* synfail;  /* exported by init_pos3() */
 IdList* ns2;  /* exported by init_c() */
 IdList* nl1;  /* exported by init_c() */
 IdList* nl2;  /* exported by init_c() */
@@ -2405,6 +2596,26 @@ IdList* ni1;  /* exported by init_b() */
 IdList* ni2;  /* exported by init_b() */
 IdList* ns1;  /* exported by init_b() */
 IdList* nparen;  /* exported by setup_rest() */
+IdList* fixd_wm;  /* exported by fix_winit() */
+IdList* fixd_wadj;  /* exported by fix_winit() */
+IdList* fixd_wq;  /* exported by fix_winit2() */
+IdList* fixe_cl;  /* exported by fix_ev_reset2() */
+IdList* fixe_cd;  /* exported by fix_ev_reset2() */
+IdList* fixe_nt;  /* exported by fix_ev_reset3() */
+IdList* fixe_mv;  /* exported by fix_ev_reset3() */
+IdList* fixe_sep;  /* exported by fix_ev_reset4() */
+IdList* fixe_nm;  /* exported by fix_ev_reset4() */
+IdList* fixd_used;  /* exported by fix_state3() */
+IdList* fixd_lo;  /* exported by fix_state3() */
+IdList* fixd_hi;  /* exported by fix_state3() */
+IdList* fixd_gcl;  /* exported by fix_gcl() */
+IdList* fixe_n;  /* exported by fix_ev_reset() */
+IdList* fixe_lo;  /* exported by fix_ev_reset() */
+IdList* fixd_nm;  /* exported by fix_state1() */
+IdList* fixd_ty;  /* exported by fix_state1() */
+IdList* fixd_seq;  /* exported by fix_state1() */
+IdList* fixd_std;  /* exported by fix_state2() */
+IdList* fixd_file;  /* exported by fix_state2() */
 IdList* cself;  /* exported by uq_begin() */
 IdList* cnames;  /* exported by uq_begin() */
 IdList* cfp;  /* exported by uq_fill() */
@@ -2492,6 +2703,55 @@ int id_str_eol(char* idstd_s, int idstd_i) {
     return idstd_i;
 }
 
+int id_str_eqat(char* idstd_s, int idstd_i, char* idstd_txt) {
+    int idstd_j;
+    int idstd_ret_i;
+    idstd_j = 0;
+    while (((idstd_j < id_len(idstd_txt)) && (id_charat(idstd_s, (idstd_i + idstd_j)) == id_charat(idstd_txt, idstd_j)))) {
+        idstd_j = (idstd_j + 1);
+    }
+    idstd_ret_i = (idstd_j == id_len(idstd_txt));
+    return idstd_ret_i;
+}
+
+int id_str_starts(char* idstd_s, char* idstd_txt) {
+    int idstd_ret_i;
+    idstd_ret_i = id_str_eqat(idstd_s, 0, idstd_txt);
+    return idstd_ret_i;
+}
+
+int id_str_ends(char* idstd_s, char* idstd_txt) {
+    int idstd_i;
+    int idstd_ret_i;
+    idstd_i = (id_len(idstd_s) - id_len(idstd_txt));
+    idstd_ret_i = ((idstd_i >= 0) && id_str_eqat(idstd_s, idstd_i, idstd_txt));
+    return idstd_ret_i;
+}
+
+int id_str_find(char* idstd_s, char* idstd_txt) {
+    int idstd_ret_i;
+    idstd_ret_i = id_str_findat(idstd_s, idstd_txt, 0);
+    return idstd_ret_i;
+}
+
+int id_str_findat(char* idstd_s, char* idstd_txt, int idstd_i) {
+    int idstd_ret_i;
+    while (((id_charat(idstd_s, idstd_i) >= 0) && (id_str_eqat(idstd_s, idstd_i, idstd_txt) == 0))) {
+        idstd_i = (idstd_i + 1);
+    }
+    idstd_ret_i = id_idstd_str_find_end(idstd_s, idstd_i, idstd_txt);
+    return idstd_ret_i;
+}
+
+int id_idstd_str_find_end(char* idstd_s, int idstd_i, char* idstd_txt) {
+    int idstd_at;
+    idstd_at = idstd_i;
+    if (((id_charat(idstd_s, idstd_i) < 0) && (id_str_eqat(idstd_s, idstd_i, idstd_txt) == 0))) {
+        idstd_at = (0 - 1);
+    }
+    return idstd_at;
+}
+
 void id_dce_prune(void) {
     if ((id_find_str(fnames, "main") >= 0)) {
         id_dce_pack(0, 0);
@@ -2545,12 +2805,11 @@ void id_guarded_emit(int argc, IdList* argv) {
 
 void id_guarded_emit_tail(int argc, IdList* argv) {
     int fp_mode;
-    fp_mode = id_arg_flag(argc, argv, 1, "--fingerprints");
-    if ((fp_mode == 1)) {
-        id_print_fingerprints();
-    }
+    fp_mode = (id_arg_flag(argc, argv, 1, "--fingerprints") + (2 * id_arg_flag(argc, argv, 1, "--fixes")));
     if ((fp_mode == 0)) {
         id_emit_or_notes(argc, argv);
+    } else {
+        id_report_mode(argc, argv, fp_mode);
     }
     return;
 }
@@ -2837,7 +3096,7 @@ void id_nat_range(char* kind, int lo, int hi) {
 
 void id_emit_or_notes(int argc, IdList* argv) {
     int do_emit;
-    do_emit = ((id_check_failed() == 0) && (id_arg_flag(argc, argv, 1, "--untested") == 0));
+    do_emit = (((id_check_failed() == 0) && (id_arg_flag(argc, argv, 1, "--untested") == 0)) && (id_arg_flag(argc, argv, 1, "--check") == 0));
     if ((do_emit == 1)) {
         id_init_tyc();
         id_emit_all(argc, argv);
@@ -11447,11 +11706,11 @@ void id_init_lines2(void) {
 }
 
 int id_stmt_at_line(IdList* pos) {
-    int n;
+    int t0;
     int id;
-    n = id_cur_ln(pos);
+    t0 = (int)(id_list_get(pos, 0));
     id = id_parse_stmt(pos);
-    id_lset(nline, id, n);
+    id_stmt_done(id, t0);
     return id;
 }
 
@@ -12570,6 +12829,7 @@ char* id_unexpected_msg(char* t) {
 void id_syn_err_tail(char* cur_file_v, int cur_ln_v, char* msg) {
     id_print(id_concat(id_concat(id_concat(id_concat(cur_file_v, ":"), id_str_of_int(cur_ln_v)), ": error: "), msg));
     id_note_failure();
+    id_lset(synfail, 0, 1);
     return;
 }
 
@@ -12621,7 +12881,14 @@ void id_span_pad(void) {
 void id_init_pos2(void) {
     ntok = id_list_lit(0);
     ngrp = id_list_lit(0);
+    id_init_pos3();
+    return;
+}
+
+void id_init_pos3(void) {
     ngrpc = id_list_lit(0);
+    nst = id_list_lit(0);
+    synfail = id_list_lit(1, (long long)(0));
     return;
 }
 
@@ -12631,6 +12898,23 @@ void id_stamp_tok(IdList* pos) {
     id_lset(curtl, 0, cur_ln_v);
     id_lset(curtk, 0, (int)(id_list_get(pos, 0)));
     return;
+}
+
+void id_stmt_done(int id, int t0) {
+    int n;
+    n = id_tok_ln(t0);
+    id_lset(nline, id, n);
+    id_lset(nst, id, t0);
+    return;
+}
+
+int id_tok_ln(int t0) {
+    int n;
+    n = 1;
+    if ((t0 < id_list_len(tline))) {
+        n = (int)(id_list_get(tline, t0));
+    }
+    return n;
 }
 
 void id_grp_note(int e, IdList* pos) {
@@ -12954,9 +13238,15 @@ int id_is_native(int id) {
 int id_newnode_tail(IdList* l1, IdList* l2) {
     int ret_i;
     id_push_ll(l1, l2);
-    id_list_push(ntok, (long long)((int)(id_list_get(curtk, 0))));
+    id_push_pos();
     ret_i = (id_list_len(nkind) - 1);
     return ret_i;
+}
+
+void id_push_pos(void) {
+    id_list_push(ntok, (long long)((int)(id_list_get(curtk, 0))));
+    id_list_push(nst, (long long)((0 - 1)));
+    return;
 }
 
 int id_newnode(char* k, int a, int b, char* s1, char* s2, IdList* l1, IdList* l2) {
@@ -12999,6 +13289,1614 @@ void id_push_ll(IdList* l1, IdList* l2) {
     id_list_push(nl1, (long long)(intptr_t)(l1));
     id_list_push(nl2, (long long)(intptr_t)(l2));
     id_list_push(nline, (long long)((int)(id_list_get(curtl, 0))));
+    return;
+}
+
+void id_fix_decls(int sn, int last) {
+    int i;
+    i = 0;
+    while ((i <= last)) {
+        id_fix_decl_at(sn, i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_decl_at(int sn, int i) {
+    if (((int)(id_list_get(fixe_sep, i)) == 1)) {
+        id_fix_decl(sn, i);
+    }
+    return;
+}
+
+void id_fix_decl(int sn, int i) {
+    char* head;
+    char* subs;
+    head = id_fix_decl_head(sn, i);
+    subs = id_fix_subs(i);
+    id_print(id_concat(head, subs));
+    return;
+}
+
+char* id_fix_decl_head(int sn, int i) {
+    char* where;
+    char* t;
+    char* ret_s;
+    where = id_fix_stmt_at(sn);
+    t = id_fix_evtype(i);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("@D|", (char*)(intptr_t)(id_list_get(fixd_file, 0))), "|"), where), "|"), t), " "), (char*)(intptr_t)(id_list_get(fixe_nm, i))), " = |"), id_fix_span((int)(id_list_get(fixe_n, i))));
+    return ret_s;
+}
+
+char* id_fix_stmt_at(int sn) {
+    int t0;
+    int sq;
+    char* ret_s;
+    t0 = (int)(id_list_get(nst, sn));
+    sq = id_fix_seq();
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_str_of_int((int)(id_list_get(tline, t0))), "|"), id_str_of_int(id_fix_col(t0))), "|"), id_str_of_int(sq)), "|"), id_str_of_int((int)(id_list_get(tline, t0))));
+    return ret_s;
+}
+
+char* id_fix_subs(int i) {
+    int j;
+    char* out;
+    j = (int)(id_list_get(fixe_lo, i));
+    out = id_fix_subs_from(i, j);
+    return out;
+}
+
+char* id_fix_subs_from(int i, int j) {
+    char* out;
+    out = "";
+    while ((j < i)) {
+        out = id_fix_sub_at(i, j, out);
+        j = (j + 1);
+    }
+    return out;
+}
+
+char* id_fix_sub_at(int i, int j, char* out) {
+    char* rs;
+    rs = out;
+    if ((((int)(id_list_get(fixe_sep, j)) == 1) && (id_fix_anc(fixe_sep, j, (i - 1)) == 0))) {
+        rs = id_concat(id_concat(id_concat(id_concat(out, "|"), id_fix_span((int)(id_list_get(fixe_n, j)))), "|"), (char*)(intptr_t)(id_list_get(fixe_nm, j)));
+    }
+    return rs;
+}
+
+char* id_fix_choose(char* stem, char* t) {
+    char* bstem;
+    char* name;
+    bstem = id_fix_prefixed(stem);
+    name = id_fix_choose_base(bstem, "_v", t);
+    return name;
+}
+
+char* id_fix_choose_base(char* bstem, char* sfx, char* t) {
+    char* name;
+    name = id_fix_try(bstem, sfx, t);
+    id_fix_take(name, t);
+    return name;
+}
+
+char* id_fix_try(char* bstem, char* sfx, char* t) {
+    char* name;
+    int nn;
+    name = id_concat(bstem, sfx);
+    nn = 1;
+    while ((id_fix_free(name, t) == 0)) {
+        nn = (nn + 1);
+        name = id_concat(id_concat(bstem, sfx), id_str_of_int(nn));
+    }
+    return name;
+}
+
+void id_fix_take(char* name, char* t) {
+    id_list_push(fixd_nm, (long long)(intptr_t)(name));
+    id_list_push(fixd_ty, (long long)(intptr_t)(t));
+    id_list_push(fixd_used, (long long)(intptr_t)(name));
+    return;
+}
+
+char* id_fix_prefixed(char* stem) {
+    char* s;
+    s = stem;
+    if ((((int)(id_list_get(fixd_std, 0)) == 1) && (id_str_starts(stem, "idstd_") == 0))) {
+        s = id_concat("idstd_", stem);
+    }
+    return s;
+}
+
+int id_fix_free(char* name, char* t) {
+    int ok;
+    ok = id_fix_free_fn(name);
+    if ((ok == 1)) {
+        ok = id_fix_free_var(name, t);
+    }
+    return ok;
+}
+
+int id_fix_free_fn(char* name) {
+    int ok;
+    ok = 0;
+    if ((((id_is_builtin(name) == 0) && (id_fix_fnix(name) < 0)) && (id_find_str(enames, name) < 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_fix_free_var(char* name, char* t) {
+    char* vt;
+    int ok;
+    vt = id_lookup_var(name, 0);
+    ok = (((strcmp(vt, "") == 0) || (strcmp(vt, t) == 0)) && (id_find_str(fixd_used, name) < 0));
+    if ((ok == 1)) {
+        ok = id_fix_free_round(name, t);
+    }
+    return ok;
+}
+
+int id_fix_free_round(char* name, char* t) {
+    int ix;
+    int ok;
+    ix = id_find_str(fixd_nm, name);
+    ok = 1;
+    if (((ix >= 0) && (strcmp((char*)(intptr_t)(id_list_get(fixd_ty, ix)), t) != 0))) {
+        ok = 0;
+    }
+    return ok;
+}
+
+void id_fix_emit_stmt(int sn, int last) {
+    id_fix_names(last);
+    id_fix_decls(sn, last);
+    id_fix_resid(last);
+    return;
+}
+
+void id_fix_names(int last) {
+    int i;
+    i = 0;
+    while ((i <= last)) {
+        id_fix_name_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_name_at(int i) {
+    char* name;
+    if (((int)(id_list_get(fixe_sep, i)) == 1)) {
+        name = id_fix_pick(i);
+        id_sset(fixe_nm, i, name);
+    }
+    return;
+}
+
+char* id_fix_pick(int i) {
+    char* t;
+    char* stem;
+    char* name;
+    t = id_fix_evtype(i);
+    stem = id_fix_stem((int)(id_list_get(fixe_n, i)));
+    name = id_fix_choose(stem, t);
+    return name;
+}
+
+char* id_fix_stem(int e) {
+    char* s;
+    int a;
+    s = id_fix_stem2(e);
+    if ((((strcmp(id_k_of(e), "index") == 0) || (strcmp(id_k_of(e), "bin") == 0)) || (strcmp(id_k_of(e), "un") == 0))) {
+        a = id_i1_of(e);
+        s = id_fix_stem(a);
+    }
+    return s;
+}
+
+char* id_fix_stem2(int e) {
+    char* s;
+    s = id_s1_of(e);
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        s = "list";
+    } else if ((((strcmp(id_k_of(e), "int") == 0) || (strcmp(id_k_of(e), "float") == 0)) || (strcmp(id_k_of(e), "str") == 0))) {
+        s = "lit";
+    }
+    return s;
+}
+
+void id_fix_emit_r(int e, char* text) {
+    int sq;
+    char* spn;
+    sq = id_fix_seq();
+    spn = id_fix_span(e);
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("@R|", (char*)(intptr_t)(id_list_get(fixd_file, 0))), "|"), spn), "|"), id_str_of_int(sq)), "|"), text));
+    return;
+}
+
+void id_fix_note_span(int e) {
+    int b;
+    int c;
+    b = id_fix_nbeg(e);
+    c = id_fix_nend(e);
+    id_fix_note_tok(b, c);
+    return;
+}
+
+void id_fix_note_tok(int b, int c) {
+    id_list_push(fixd_lo, (long long)(b));
+    id_list_push(fixd_hi, (long long)(c));
+    return;
+}
+
+void id_fix_resid(int last) {
+    int i;
+    i = 0;
+    while ((i <= last)) {
+        id_fix_resid_at(i, last);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_resid_at(int i, int last) {
+    if ((((int)(id_list_get(fixe_sep, i)) == 1) && (id_fix_anc(fixe_sep, i, last) == 0))) {
+        id_fix_replace((int)(id_list_get(fixe_n, i)), (char*)(intptr_t)(id_list_get(fixe_nm, i)));
+    }
+    return;
+}
+
+void id_fix_replace(int e, char* name) {
+    id_fix_emit_r(e, name);
+    id_fix_note_span(e);
+    return;
+}
+
+int id_fix_seq(void) {
+    int n;
+    n = ((int)(id_list_get(fixd_seq, 0)) + 1);
+    id_lset(fixd_seq, 0, n);
+    return n;
+}
+
+void id_fix_emit_pt(char* p, char* text) {
+    int sq;
+    sq = id_fix_seq();
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("@R|", (char*)(intptr_t)(id_list_get(fixd_file, 0))), "|"), p), "|"), p), "|"), id_str_of_int(sq)), "|"), text));
+    return;
+}
+
+int id_fix_close(int e) {
+    int t0;
+    int cb;
+    t0 = (id_fix_nbeg(e) - 1);
+    while (((t0 > 0) && ((strcmp((char*)(intptr_t)(id_list_get(tkind, t0)), "kw") != 0) || (strcmp((char*)(intptr_t)(id_list_get(ttext, t0)), "return") != 0)))) {
+        t0 = (t0 - 1);
+    }
+    cb = (t0 - 1);
+    return cb;
+}
+
+void id_fix_ret_emit(int f, int e, char* t) {
+    char* name;
+    name = id_fix_ret_name(t);
+    id_fix_ret_decl(f, e, t, name);
+    id_fix_replace(e, name);
+    return;
+}
+
+char* id_fix_ret_name(char* t) {
+    char* sfx;
+    char* bstem;
+    char* name;
+    sfx = id_fix_tsuf(t);
+    bstem = id_fix_prefixed(id_concat("ret_", sfx));
+    name = id_fix_choose_base(bstem, "", t);
+    return name;
+}
+
+void id_fix_ret_decl(int f, int e, char* t, char* name) {
+    char* where;
+    char* spn;
+    where = id_fix_ret_pos(f, e);
+    spn = id_fix_span(e);
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat("@D|", (char*)(intptr_t)(id_list_get(fixd_file, 0))), "|"), where), "|"), t), " "), name), " = |"), spn));
+    return;
+}
+
+char* id_fix_ret_pos(int f, int e) {
+    int cb;
+    int sq;
+    char* ret_s;
+    cb = id_fix_close(e);
+    sq = id_fix_seq();
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_str_of_int((int)(id_list_get(tline, cb))), "|"), id_str_of_int(id_fix_col(cb))), "|"), id_str_of_int(sq)), "|"), id_str_of_int(id_fix_indent_line(f)));
+    return ret_s;
+}
+
+int id_fix_indent_line(int f) {
+    IdList* body;
+    int n;
+    body = id_l2_of(f);
+    n = 0;
+    if ((id_list_len(body) > 0)) {
+        n = (int)(id_list_get(nline, (int)(id_list_get(body, (id_list_len(body) - 1)))));
+    }
+    return n;
+}
+
+void id_fix_ret(int f) {
+    int e;
+    e = id_i1_of(f);
+    if (((e >= 0) && (id_is_plain(e) == 0))) {
+        id_fix_ret_at(f, e);
+    }
+    return;
+}
+
+void id_fix_ret_at(int f, int e) {
+    char* t;
+    t = id_s2_of(f);
+    if ((id_fix_ret_ok(e) == 1)) {
+        id_fix_ret_emit(f, e, t);
+    }
+    return;
+}
+
+int id_fix_ret_ok(int e) {
+    int cb;
+    int ok;
+    cb = id_fix_close(e);
+    ok = 0;
+    if ((((cb >= 0) && (id_fix_spanok(e) == 1)) && (id_fix_packed(cb) >= 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+char* id_fix_tletter(char* tb) {
+    char* tl;
+    tl = id_fix_tletter2(tb);
+    if ((strcmp(tb, "word") == 0)) {
+        tl = "w";
+    } else if ((strcmp(tb, "float") == 0)) {
+        tl = "f";
+    }
+    return tl;
+}
+
+char* id_fix_tletter2(char* tb) {
+    char* tl;
+    tl = "i";
+    if ((strcmp(tb, "string") == 0)) {
+        tl = "s";
+    }
+    return tl;
+}
+
+void id_fix_ret_parens(int f, int lo) {
+    id_fix_ret(f);
+    id_fix_parens(lo, f);
+    return;
+}
+
+char* id_fix_tsuf(char* t) {
+    IdList* fixt_st;
+    char* ret_s;
+    fixt_st = id_list_lit(2, (long long)(intptr_t)(t), (long long)(intptr_t)(""));
+    id_fix_tstrip(fixt_st);
+    ret_s = id_concat((char*)(intptr_t)(id_list_get(fixt_st, 1)), id_fix_tletter((char*)(intptr_t)(id_list_get(fixt_st, 0))));
+    return ret_s;
+}
+
+void id_fix_tstrip(IdList* fixt_st) {
+    while ((id_str_ends((char*)(intptr_t)(id_list_get(fixt_st, 0)), "[]") == 1)) {
+        id_fix_tstep(fixt_st);
+    }
+    return;
+}
+
+void id_fix_tstep(IdList* fixt_st) {
+    int n;
+    n = (id_len((char*)(intptr_t)(id_list_get(fixt_st, 0))) - 2);
+    id_list_set(fixt_st, 0, (long long)(intptr_t)(id_slice((char*)(intptr_t)(id_list_get(fixt_st, 0)), 0, n)));
+    id_list_set(fixt_st, 1, (long long)(intptr_t)(id_concat((char*)(intptr_t)(id_list_get(fixt_st, 1)), "l")));
+    return;
+}
+
+int id_fix_within(int b, int e) {
+    int i;
+    int ok;
+    i = 0;
+    ok = 0;
+    while ((i < id_list_len(fixd_lo))) {
+        ok = id_fix_within_at(i, b, e, ok);
+        i = (i + 1);
+    }
+    return ok;
+}
+
+int id_fix_within_at(int i, int b, int e, int ok) {
+    int r;
+    r = ok;
+    if ((((int)(id_list_get(fixd_lo, i)) <= b) && (e <= (int)(id_list_get(fixd_hi, i))))) {
+        r = 1;
+    }
+    return r;
+}
+
+void id_fix_paren_pts(int b, int e) {
+    char* p1;
+    char* p2;
+    p1 = id_fix_at(b);
+    p2 = id_fix_after(e);
+    id_fix_paren_rec(p1, p2);
+    return;
+}
+
+void id_fix_paren_rec(char* p1, char* p2) {
+    id_fix_emit_pt(p1, "(");
+    id_fix_emit_pt(p2, ")");
+    return;
+}
+
+int id_fix_in_moved(int c) {
+    int b;
+    int e;
+    int ok;
+    b = id_fix_nbeg(c);
+    e = id_fix_nend(c);
+    ok = id_fix_within(b, e);
+    return ok;
+}
+
+void id_fix_parens(int lo, int hi) {
+    while ((lo <= hi)) {
+        id_fix_paren_node(lo);
+        lo = (lo + 1);
+    }
+    return;
+}
+
+void id_fix_paren_node(int x) {
+    if ((strcmp(id_k_of(x), "bin") == 0)) {
+        id_fix_paren_pair(x);
+    }
+    return;
+}
+
+void id_fix_paren_pair(int x) {
+    int a;
+    int b;
+    a = id_i1_of(x);
+    b = id_i2_of(x);
+    id_fix_paren_two(x, a, b);
+    return;
+}
+
+void id_fix_paren_two(int x, int a, int b) {
+    id_fix_paren_side(x, a);
+    id_fix_paren_side(x, b);
+    return;
+}
+
+void id_fix_paren_side(int x, int c) {
+    if ((((id_mixed_side(x, c) == 1) && (id_fix_spanok(c) == 1)) && (id_fix_in_moved(c) == 0))) {
+        id_fix_paren_emit(c);
+    }
+    return;
+}
+
+void id_fix_paren_emit(int c) {
+    int b;
+    int e;
+    b = id_fix_nbeg(c);
+    e = id_fix_nend(c);
+    id_fix_paren_pts(b, e);
+    return;
+}
+
+int id_fix_ibeg(int e) {
+    int t0;
+    int c;
+    t0 = id_fix_ibeg2(e);
+    if ((strcmp(id_k_of(e), "call") == 0)) {
+        c = (int)(id_list_get(ntok, e));
+        t0 = (id_fix_match(c, "(", ")") - 1);
+    }
+    return t0;
+}
+
+int id_fix_ibeg2(int e) {
+    int t0;
+    int c;
+    t0 = id_fix_ibeg3(e);
+    if ((strcmp(id_k_of(e), "arr") == 0)) {
+        c = (int)(id_list_get(ntok, e));
+        t0 = id_fix_match(c, "[", "]");
+    }
+    return t0;
+}
+
+int id_fix_ibeg3(int e) {
+    int t0;
+    int a;
+    t0 = id_fix_ibeg4(e);
+    if (((strcmp(id_k_of(e), "index") == 0) || (strcmp(id_k_of(e), "bin") == 0))) {
+        a = id_i1_of(e);
+        t0 = id_fix_nbeg(a);
+    }
+    return t0;
+}
+
+int id_fix_ibeg4(int e) {
+    int t0;
+    int a;
+    t0 = (int)(id_list_get(ntok, e));
+    if ((strcmp(id_k_of(e), "un") == 0)) {
+        a = id_i1_of(e);
+        t0 = (id_fix_nbeg(a) - 1);
+    } else if ((strcmp(id_k_of(e), "import") == 0)) {
+        t0 = (t0 - 1);
+    }
+    return t0;
+}
+
+int id_fix_match(int c, char* opn, char* cls) {
+    int d;
+    int t0;
+    d = 1;
+    t0 = c;
+    while (((d > 0) && (t0 > 0))) {
+        t0 = (t0 - 1);
+        d = (d + id_fix_depth(t0, opn, cls));
+    }
+    return t0;
+}
+
+int id_fix_depth(int t0, char* opn, char* cls) {
+    int d;
+    d = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(tkind, t0)), "op") == 0) && (strcmp((char*)(intptr_t)(id_list_get(ttext, t0)), cls) == 0))) {
+        d = 1;
+    } else if (((strcmp((char*)(intptr_t)(id_list_get(tkind, t0)), "op") == 0) && (strcmp((char*)(intptr_t)(id_list_get(ttext, t0)), opn) == 0))) {
+        d = (0 - 1);
+    }
+    return d;
+}
+
+char* id_fix_at(int t0) {
+    char* ret_s;
+    ret_s = id_concat(id_concat(id_str_of_int((int)(id_list_get(tline, t0))), "|"), id_str_of_int(id_fix_col(t0)));
+    return ret_s;
+}
+
+char* id_fix_after(int t0) {
+    char* ret_s;
+    ret_s = id_concat(id_concat(id_str_of_int((int)(id_list_get(tline, t0))), "|"), id_str_of_int(id_fix_endc(t0)));
+    return ret_s;
+}
+
+char* id_fix_span(int e) {
+    int b;
+    int c;
+    char* ret_s;
+    b = id_fix_nbeg(e);
+    c = id_fix_nend(e);
+    ret_s = id_concat(id_concat(id_fix_at(b), "|"), id_fix_after(c));
+    return ret_s;
+}
+
+int id_fix_packed(int t0) {
+    int v;
+    v = (0 - 1);
+    if (((t0 >= 0) && (t0 < id_list_len(tspan)))) {
+        v = (int)(id_list_get(tspan, t0));
+    }
+    return v;
+}
+
+int id_fix_col(int t0) {
+    int c;
+    c = id_idiv(id_fix_packed(t0), 65536);
+    return c;
+}
+
+int id_fix_endc(int t0) {
+    int c;
+    c = id_imod(id_fix_packed(t0), 65536);
+    return c;
+}
+
+int id_fix_spanok(int e) {
+    int b;
+    int c;
+    int ok;
+    b = id_fix_nbeg(e);
+    c = id_fix_nend(e);
+    ok = ((id_fix_packed(b) >= 0) && (id_fix_packed(c) >= 0));
+    return ok;
+}
+
+int id_fix_nend(int e) {
+    int t0;
+    t0 = (int)(id_list_get(ntok, e));
+    if (((int)(id_list_get(fixd_gcl, e)) >= 0)) {
+        t0 = (int)(id_list_get(fixd_gcl, e));
+    }
+    return t0;
+}
+
+int id_fix_nbeg(int e) {
+    int t0;
+    t0 = 0;
+    if (((int)(id_list_get(fixd_gcl, e)) >= 0)) {
+        t0 = id_fix_match((int)(id_list_get(fixd_gcl, e)), "(", ")");
+    } else {
+        t0 = id_fix_ibeg(e);
+    }
+    return t0;
+}
+
+void id_fix_decide(int sn, int md) {
+    int last;
+    last = id_fix_last_m();
+    if ((last >= 0)) {
+        id_fix_decide2(sn, md, last);
+    }
+    return;
+}
+
+void id_fix_decide2(int sn, int md, int last) {
+    if ((md > 0)) {
+        id_fix_refuse_md(md, last);
+    } else {
+        id_fix_mark(sn, last);
+    }
+    return;
+}
+
+void id_fix_mark(int sn, int last) {
+    id_fix_mark_moves(last);
+    id_fix_mark_sep(last);
+    id_fix_check_and_emit(sn, last);
+    return;
+}
+
+void id_fix_check_and_emit(int sn, int last) {
+    char* why;
+    why = id_fix_why(sn, last);
+    if ((strcmp(why, "") == 0)) {
+        id_fix_emit_stmt(sn, last);
+    } else {
+        id_fix_refuse(last, why);
+    }
+    return;
+}
+
+int id_fix_last_m(void) {
+    int i;
+    int last;
+    i = 0;
+    last = (0 - 1);
+    while ((i < id_list_len(fixe_cl))) {
+        if (((int)(id_list_get(fixe_cl, i)) == 3)) {
+            last = i;
+        }
+        i = (i + 1);
+    }
+    return last;
+}
+
+void id_fix_mark_moves(int last) {
+    id_fix_mark_cls(last, 1);
+    id_fix_mark_cls(last, 2);
+    id_fix_mark_rest(last);
+    return;
+}
+
+void id_fix_mark_rest(int last) {
+    id_fix_mark_cls(last, 3);
+    id_fix_mark_imports(last);
+    return;
+}
+
+void id_fix_mark_imports(int last) {
+    if ((id_fix_touches(last) == 1)) {
+        id_fix_mark_cls(last, 4);
+    }
+    return;
+}
+
+void id_fix_mark_cls(int last, int wcl) {
+    int i;
+    i = 0;
+    while ((i <= last)) {
+        if (((int)(id_list_get(fixe_cl, i)) == wcl)) {
+            id_lset(fixe_mv, i, 1);
+        }
+        i = (i + 1);
+    }
+    return;
+}
+
+int id_fix_anc(IdList* fl, int i, int hi) {
+    int j;
+    int ok;
+    j = (i + 1);
+    ok = 0;
+    while ((j <= hi)) {
+        ok = id_fix_anc_at(fl, i, j, ok);
+        j = (j + 1);
+    }
+    return ok;
+}
+
+int id_fix_anc_at(IdList* fl, int i, int j, int ok) {
+    int r;
+    r = ok;
+    if ((((int)(id_list_get(fl, j)) == 1) && ((int)(id_list_get(fixe_lo, j)) <= i))) {
+        r = 1;
+    }
+    return r;
+}
+
+char* id_fix_evtype(int i) {
+    char* t;
+    t = (char*)(intptr_t)(id_list_get(fixe_nt, i));
+    if ((strcmp(t, "") == 0)) {
+        t = id_type_of((int)(id_list_get(fixe_n, i)));
+    }
+    return t;
+}
+
+int id_fix_touch_ix(int ci, char* name) {
+    int ok;
+    ok = 1;
+    if ((ci >= 0)) {
+        ok = (int)(id_list_get(fixd_wm, ci));
+    } else if ((id_is_builtin(name) == 1)) {
+        ok = 0;
+    }
+    return ok;
+}
+
+void id_fix_mark_sep(int last) {
+    int i;
+    i = 0;
+    while ((i <= last)) {
+        id_fix_sep_at(i, last);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_sep_at(int i, int last) {
+    if ((((int)(id_list_get(fixe_mv, i)) == 1) && (((int)(id_list_get(fixe_cl, i)) == 3) || (id_fix_anc(fixe_mv, i, last) == 0)))) {
+        id_lset(fixe_sep, i, 1);
+    }
+    return;
+}
+
+int id_fix_touches(int last) {
+    int i;
+    int ok;
+    i = 0;
+    ok = 0;
+    while ((i <= last)) {
+        ok = id_fix_touch_at(i, ok);
+        i = (i + 1);
+    }
+    return ok;
+}
+
+int id_fix_touch_at(int i, int ok) {
+    int r;
+    r = ok;
+    if ((((int)(id_list_get(fixe_mv, i)) == 1) && (strcmp(id_k_of((int)(id_list_get(fixe_n, i))), "call") == 0))) {
+        r = (r | id_fix_call_touch((int)(id_list_get(fixe_n, i))));
+    }
+    return r;
+}
+
+int id_fix_call_touch(int e) {
+    char* s1_of_v;
+    int ci;
+    int ok;
+    s1_of_v = id_s1_of(e);
+    ci = id_fix_fnix(s1_of_v);
+    ok = id_fix_touch_ix(ci, s1_of_v);
+    return ok;
+}
+
+void id_fix_refuse_md(int md, int last) {
+    char* why;
+    why = id_fix_md_why(md);
+    id_fix_refuse(last, why);
+    return;
+}
+
+char* id_fix_md_why(int md) {
+    char* why;
+    why = "a value that would have to be named is in a while condition, which runs every iteration; a name bound before the loop is computed once -- make the composition a function (docs/SPEC.md 7.1)";
+    if ((md == 2)) {
+        why = "a value that would have to be named is in an else-if condition, which runs only when every earlier branch was not taken; a name bound before the if is computed anyway -- make the composition a function (docs/SPEC.md 7.1)";
+    }
+    return why;
+}
+
+int id_fix_type_ok(int i) {
+    char* t;
+    int ok;
+    t = id_fix_evtype(i);
+    ok = 0;
+    if (((((strcmp(t, "") != 0) && (strcmp(t, "void") != 0)) && (id_str_find(t, "?") < 0)) && (id_ty_is_func(t) == 0))) {
+        ok = id_fix_spanok((int)(id_list_get(fixe_n, i)));
+    }
+    return ok;
+}
+
+char* id_fix_why_pos(int sn) {
+    char* why;
+    why = "";
+    if ((((int)(id_list_get(nst, sn)) < 0) || (id_fix_packed((int)(id_list_get(nst, sn))) < 0))) {
+        why = "the statement's position in the source is unknown";
+    }
+    return why;
+}
+
+void id_fix_refuse(int last, char* why) {
+    int e;
+    int tkn;
+    e = (int)(id_list_get(fixe_n, last));
+    tkn = (int)(id_list_get(ntok, e));
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat("@N|", (char*)(intptr_t)(id_list_get(fixd_file, 0))), "|"), id_str_of_int((int)(id_list_get(tline, tkn)))), "|"), why));
+    return;
+}
+
+char* id_fix_why(int sn, int last) {
+    char* why;
+    why = id_fix_why_cond(last);
+    if ((strcmp(why, "") == 0)) {
+        why = id_fix_why_type(sn, last);
+    }
+    return why;
+}
+
+char* id_fix_why_cond(int last) {
+    int i;
+    char* why;
+    i = 0;
+    why = "";
+    while ((i <= last)) {
+        if ((((int)(id_list_get(fixe_mv, i)) == 1) && ((int)(id_list_get(fixe_cd, i)) == 1))) {
+            why = "a value that would have to be named is to the right of && or ||, which may not evaluate it; a name bound before the statement would be computed anyway -- make the composition a function (docs/SPEC.md 7.1)";
+        }
+        i = (i + 1);
+    }
+    return why;
+}
+
+char* id_fix_why_type(int sn, int last) {
+    int i;
+    char* why;
+    i = 0;
+    why = id_fix_why_pos(sn);
+    while ((i <= last)) {
+        if ((((int)(id_list_get(fixe_sep, i)) == 1) && (id_fix_type_ok(i) == 0))) {
+            why = "the type or the position of a value that would have to be named could not be worked out";
+        }
+        i = (i + 1);
+    }
+    return why;
+}
+
+void id_fix_wbuild(void) {
+    id_fix_winit();
+    id_fix_wedges(0, 0);
+    id_fix_wbfs();
+    return;
+}
+
+void id_fix_winit(void) {
+    fixd_wm = id_list_lit(0);
+    fixd_wadj = id_list_lit(0);
+    id_fix_winit2();
+    return;
+}
+
+void id_fix_winit2(void) {
+    fixd_wq = id_list_lit(0);
+    id_fix_wfill();
+    return;
+}
+
+void id_fix_wfill(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(fnames))) {
+        id_list_push(fixd_wm, (long long)(0));
+        id_fix_wrow();
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_wrow(void) {
+    IdList* row;
+    row = id_list_lit(0);
+    id_list_push(fixd_wadj, (long long)(intptr_t)(row));
+    return;
+}
+
+void id_fix_wedges(int f, int lo) {
+    while ((f < id_list_len(prog))) {
+        lo = id_fix_wfunc(f, lo);
+        f = (f + 1);
+    }
+    return;
+}
+
+int id_fix_wfunc(int f, int lo) {
+    int ow;
+    int ret_i;
+    ow = id_fix_owner(f);
+    id_fix_wrange(lo, (int)(id_list_get(prog, f)), ow);
+    ret_i = ((int)(id_list_get(prog, f)) + 1);
+    return ret_i;
+}
+
+int id_fix_owner(int f) {
+    char* s1_of_v;
+    int ow;
+    s1_of_v = id_s1_of((int)(id_list_get(prog, f)));
+    ow = id_fix_fnix(s1_of_v);
+    return ow;
+}
+
+int id_fix_fnix(char* name) {
+    int b;
+    int ix;
+    b = id_name_bucket(name);
+    ix = id_find_ix(fnames, (IdList*)(intptr_t)(id_list_get(fidx, b)), name);
+    return ix;
+}
+
+void id_fix_wbfs(void) {
+    int gi;
+    while ((id_list_len(fixd_wq) > 0)) {
+        gi = (int)(id_list_pop(fixd_wq));
+        id_fix_wprop(gi);
+    }
+    return;
+}
+
+void id_fix_wprop(int gi) {
+    IdList* row;
+    int i;
+    row = (IdList*)(intptr_t)(id_list_get(fixd_wadj, gi));
+    i = 0;
+    while ((i < id_list_len(row))) {
+        id_fix_wseed((int)(id_list_get(row, i)));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_wrange(int lo, int hi, int ow) {
+    while ((lo <= hi)) {
+        id_fix_wnode(lo, ow);
+        lo = (lo + 1);
+    }
+    return;
+}
+
+void id_fix_wnode(int x, int ow) {
+    if (((strcmp(id_k_of(x), "decl") == 0) && (id_i2_of(x) == 1))) {
+        id_fix_wseed(ow);
+    } else if (((strcmp(id_k_of(x), "call") == 0) || (strcmp(id_k_of(x), "var") == 0))) {
+        id_fix_wref(x, ow);
+    }
+    return;
+}
+
+void id_fix_wref(int x, int ow) {
+    char* s1_of_v;
+    int ci;
+    s1_of_v = id_s1_of(x);
+    ci = id_fix_fnix(s1_of_v);
+    id_fix_wref2(x, ow, ci, s1_of_v);
+    return;
+}
+
+void id_fix_wref2(int x, int ow, int ci, char* name) {
+    if ((ci >= 0)) {
+        id_fix_wedge(ci, ow);
+    } else if (((strcmp(id_k_of(x), "call") == 0) && (id_is_builtin(name) == 0))) {
+        id_fix_wseed(ow);
+    }
+    return;
+}
+
+void id_fix_wedge(int ci, int ow) {
+    IdList* row;
+    row = (IdList*)(intptr_t)(id_list_get(fixd_wadj, ci));
+    id_list_push(row, (long long)(ow));
+    return;
+}
+
+void id_fix_wseed(int ow) {
+    if (((ow >= 0) && ((int)(id_list_get(fixd_wm, ow)) == 0))) {
+        id_lset(fixd_wm, ow, 1);
+        id_list_push(fixd_wq, (long long)(ow));
+    }
+    return;
+}
+
+void id_fix_std_row(int i, IdList* cnt) {
+    if ((((int)(id_list_get(dvunit, i)) == 0) && ((int)(id_list_get(dvexp, i)) == 0))) {
+        id_fix_std_count(i, cnt);
+    }
+    return;
+}
+
+void id_fix_std_count(int i, IdList* cnt) {
+    if ((id_str_starts((char*)(intptr_t)(id_list_get(dvname, i)), "idstd_") == 1)) {
+        id_list_set(cnt, 0, (long long)(((int)(id_list_get(cnt, 0)) + 1)));
+    } else {
+        id_list_set(cnt, 1, (long long)(((int)(id_list_get(cnt, 1)) + 1)));
+    }
+    return;
+}
+
+void id_fix_std_detect(int argc, IdList* argv) {
+    int on;
+    on = id_arg_flag(argc, argv, 1, "--fix-std");
+    if ((on == 0)) {
+        on = id_fix_std_scan();
+    }
+    id_lset(fixd_std, 0, on);
+    return;
+}
+
+int id_fix_std_scan(void) {
+    IdList* cnt;
+    int ok;
+    cnt = id_list_lit(2, (long long)(0), (long long)(0));
+    id_fix_std_rows(cnt);
+    ok = (((int)(id_list_get(cnt, 0)) > 0) && ((int)(id_list_get(cnt, 1)) == 0));
+    return ok;
+}
+
+void id_fix_std_rows(IdList* cnt) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(dvname))) {
+        id_fix_std_row(i, cnt);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_walk_args(int e, int cd) {
+    IdList* args;
+    int i;
+    args = id_l1_of(e);
+    i = 0;
+    while ((i < id_list_len(args))) {
+        id_fix_walk_arg(e, i, cd);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_walk_arg(int e, int i, int cd) {
+    int a;
+    char* nt;
+    a = (int)(id_list_get(id_l1_of(e), i));
+    nt = id_fix_narrow(e, i, a);
+    id_fix_walk(a, 1, cd, nt);
+    return;
+}
+
+void id_fix_walk_bin(int e, int ca, int cd) {
+    int a;
+    a = id_i1_of(e);
+    id_fix_walk(a, ca, cd, "");
+    id_fix_walk_rhs(e, ca, cd);
+    return;
+}
+
+void id_fix_walk_rhs(int e, int ca, int cd) {
+    int b;
+    int c2;
+    b = id_i2_of(e);
+    c2 = id_fix_condop(e, cd);
+    id_fix_walk(b, ca, c2, "");
+    return;
+}
+
+int id_fix_condop(int e, int cd) {
+    int c;
+    c = cd;
+    if (((strcmp(id_s1_of(e), "&&") == 0) || (strcmp(id_s1_of(e), "||") == 0))) {
+        c = 1;
+    }
+    return c;
+}
+
+void id_fix_walk_more(int e, int ca, int cd) {
+    int a;
+    if ((strcmp(id_k_of(e), "un") == 0)) {
+        a = id_i1_of(e);
+        id_fix_walk(a, ca, cd, "");
+    } else if ((strcmp(id_k_of(e), "arr") == 0)) {
+        id_fix_walk_arr(e, ca, cd);
+    }
+    return;
+}
+
+void id_fix_walk_arr(int e, int ca, int cd) {
+    IdList* l1_of_v;
+    int i;
+    l1_of_v = id_l1_of(e);
+    i = 0;
+    while ((i < id_list_len(l1_of_v))) {
+        id_fix_walk((int)(id_list_get(l1_of_v, i)), ca, cd, "");
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_push_ev(int e, int lo, int ca, int cd, char* nt) {
+    int cl;
+    cl = id_fix_class(e, ca, nt);
+    id_fix_push3(e, lo, cl);
+    id_fix_push4(cd, nt);
+    return;
+}
+
+void id_fix_push3(int e, int lo, int cl) {
+    id_list_push(fixe_n, (long long)(e));
+    id_list_push(fixe_lo, (long long)(lo));
+    id_list_push(fixe_cl, (long long)(cl));
+    return;
+}
+
+int id_fix_class2(int e) {
+    int cl;
+    cl = id_fix_class3(e);
+    if ((strcmp(id_k_of(e), "call") == 0)) {
+        cl = 1;
+    } else if ((strcmp(id_k_of(e), "index") == 0)) {
+        cl = 2;
+    }
+    return cl;
+}
+
+int id_fix_class3(int e) {
+    int cl;
+    cl = 0;
+    if ((strcmp(id_k_of(e), "import") == 0)) {
+        cl = 4;
+    } else if (((strcmp(id_k_of(e), "bin") == 0) && (id_fix_traps(e) == 1))) {
+        cl = 2;
+    }
+    return cl;
+}
+
+int id_fix_traps(int e) {
+    char* op;
+    int ok;
+    op = id_s1_of(e);
+    ok = 0;
+    if (((((strcmp(op, "/") == 0) || (strcmp(op, "%") == 0)) || (strcmp(op, "<<") == 0)) || (strcmp(op, ">>") == 0))) {
+        ok = id_fix_unsafe_rhs(e);
+    }
+    return ok;
+}
+
+char* id_fix_fparam(int e, int i) {
+    char* vt;
+    IdList* pts;
+    char* pt;
+    vt = id_callee_var_type(e);
+    pts = id_fn_params(vt);
+    pt = id_fix_nth(pts, i, e);
+    return pt;
+}
+
+char* id_fix_nth(IdList* pts, int i, int e) {
+    char* pt;
+    pt = "";
+    if (((i < id_list_len(pts)) && (id_list_len(pts) == id_flat_arg_count(e)))) {
+        pt = (char*)(intptr_t)(id_list_get(pts, i));
+    }
+    return pt;
+}
+
+int id_fix_unsafe_rhs(int e) {
+    int b;
+    int ok;
+    b = id_i2_of(e);
+    ok = 1;
+    if ((((strcmp(id_k_of(b), "int") == 0) && (id_i1_of(b) > 0)) && (id_i2_of(b) == 0))) {
+        ok = 0;
+    }
+    return ok;
+}
+
+char* id_fix_narrow(int e, int i, int a) {
+    char* pt;
+    char* t;
+    pt = id_fix_ptype(e, i);
+    t = "";
+    if ((((strcmp(pt, "") != 0) && (id_bad_store(pt, a) == 0)) && (id_fix_narrows(pt, a) == 1))) {
+        t = pt;
+    }
+    return t;
+}
+
+int id_fix_narrows(char* pt, int a) {
+    char* type_of_v;
+    int ok;
+    type_of_v = id_type_of(a);
+    ok = id_ty_narrows(pt, type_of_v);
+    return ok;
+}
+
+char* id_fix_ptype(int e, int i) {
+    char* s1_of_v;
+    int fn;
+    char* pt;
+    s1_of_v = id_s1_of(e);
+    fn = id_func_node(s1_of_v);
+    pt = id_fix_ptype2(e, fn, i);
+    return pt;
+}
+
+char* id_fix_ptype2(int e, int fn, int i) {
+    char* pt;
+    pt = "";
+    if ((fn >= 0)) {
+        pt = id_fix_pparam(e, fn, i);
+    } else if ((id_is_fcall(e) == 1)) {
+        pt = id_fix_fparam(e, i);
+    }
+    return pt;
+}
+
+char* id_fix_pparam(int e, int fn, int i) {
+    IdList* ps;
+    char* pt;
+    ps = id_l1_of(fn);
+    pt = "";
+    if (((i < id_list_len(ps)) && (id_list_len(ps) == id_flat_arg_count(e)))) {
+        pt = id_s1_of((int)(id_list_get(ps, i)));
+    }
+    return pt;
+}
+
+void id_fix_push4(int cd, char* nt) {
+    id_list_push(fixe_cd, (long long)(cd));
+    id_list_push(fixe_nt, (long long)(intptr_t)(nt));
+    id_fix_push5();
+    return;
+}
+
+void id_fix_push5(void) {
+    id_list_push(fixe_mv, (long long)(0));
+    id_list_push(fixe_sep, (long long)(0));
+    id_list_push(fixe_nm, (long long)(intptr_t)(""));
+    return;
+}
+
+int id_fix_class(int e, int ca, char* nt) {
+    int cl;
+    cl = id_fix_class2(e);
+    if (((strcmp(nt, "") != 0) || ((cl == 1) && (ca == 1)))) {
+        cl = 3;
+    }
+    return cl;
+}
+
+void id_fix_ev_reset2(void) {
+    fixe_cl = id_list_lit(0);
+    fixe_cd = id_list_lit(0);
+    id_fix_ev_reset3();
+    return;
+}
+
+void id_fix_ev_reset3(void) {
+    fixe_nt = id_list_lit(0);
+    fixe_mv = id_list_lit(0);
+    id_fix_ev_reset4();
+    return;
+}
+
+void id_fix_ev_reset4(void) {
+    fixe_sep = id_list_lit(0);
+    fixe_nm = id_list_lit(0);
+    return;
+}
+
+void id_fix_simple(int sn) {
+    if ((strcmp(id_k_of(sn), "iassign") == 0)) {
+        id_fix_iassign(sn);
+    } else if ((((strcmp(id_k_of(sn), "decl") == 0) || (strcmp(id_k_of(sn), "assign") == 0)) || (strcmp(id_k_of(sn), "exprstmt") == 0))) {
+        id_fix_cond(sn, 0);
+    }
+    return;
+}
+
+void id_fix_iassign(int sn) {
+    IdList* vl;
+    IdList* fixp_roots;
+    vl = id_l1_of(sn);
+    fixp_roots = id_list_lit(3, (long long)(id_i1_of(sn)), (long long)(id_i2_of(sn)), (long long)((int)(id_list_get(vl, 0))));
+    id_fix_plan(sn, fixp_roots, 0);
+    return;
+}
+
+void id_fix_plan(int sn, IdList* roots, int md) {
+    id_fix_ev_reset();
+    id_fix_walk_roots(roots);
+    id_fix_decide(sn, md);
+    return;
+}
+
+void id_fix_walk_roots(IdList* roots) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(roots))) {
+        id_fix_walk((int)(id_list_get(roots, i)), 0, 0, "");
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_walk(int e, int ca, int cd, char* nt) {
+    int lo;
+    lo = id_list_len(fixe_n);
+    id_fix_walk_kids(e, ca, cd);
+    id_fix_push_ev(e, lo, ca, cd, nt);
+    return;
+}
+
+void id_fix_walk_kids(int e, int ca, int cd) {
+    if ((strcmp(id_k_of(e), "call") == 0)) {
+        id_fix_walk_args(e, cd);
+    } else if (((strcmp(id_k_of(e), "bin") == 0) || (strcmp(id_k_of(e), "index") == 0))) {
+        id_fix_walk_bin(e, ca, cd);
+    } else {
+        id_fix_walk_more(e, ca, cd);
+    }
+    return;
+}
+
+void id_report_mode(int argc, IdList* argv, int mode) {
+    if ((mode == 1)) {
+        id_print_fingerprints();
+    } else {
+        id_fix_all(argc, argv);
+    }
+    return;
+}
+
+void id_fix_all(int argc, IdList* argv) {
+    if (((int)(id_list_get(synfail, 0)) == 0)) {
+        id_fix_init(argc, argv);
+        id_fix_funcs();
+    } else {
+        id_print("@N|||the source has syntax errors; nothing was rewritten");
+    }
+    return;
+}
+
+void id_fix_init(int argc, IdList* argv) {
+    id_fix_state();
+    id_fix_wbuild();
+    id_fix_std_detect(argc, argv);
+    return;
+}
+
+void id_fix_state3(void) {
+    fixd_used = id_list_lit(0);
+    fixd_lo = id_list_lit(0);
+    fixd_hi = id_list_lit(0);
+    return;
+}
+
+void id_fix_gcl(void) {
+    fixd_gcl = id_list_lit(0);
+    id_fix_gcl_fill();
+    id_fix_gcl_set();
+    return;
+}
+
+void id_fix_gcl_fill(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(nkind))) {
+        id_list_push(fixd_gcl, (long long)((0 - 1)));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_gcl_set(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(ngrp))) {
+        id_fix_gcl_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_gcl_at(int i) {
+    int n;
+    n = (int)(id_list_get(ngrp, i));
+    if (((int)(id_list_get(ngrpc, i)) > (int)(id_list_get(fixd_gcl, n)))) {
+        id_lset(fixd_gcl, n, (int)(id_list_get(ngrpc, i)));
+    }
+    return;
+}
+
+void id_fix_ev_reset(void) {
+    fixe_n = id_list_lit(0);
+    fixe_lo = id_list_lit(0);
+    id_fix_ev_reset2();
+    return;
+}
+
+void id_fix_state(void) {
+    id_fix_state1();
+    id_fix_state2();
+    id_fix_gcl();
+    return;
+}
+
+void id_fix_state1(void) {
+    fixd_nm = id_list_lit(0);
+    fixd_ty = id_list_lit(0);
+    fixd_seq = id_list_lit(1, (long long)(0));
+    return;
+}
+
+void id_fix_state2(void) {
+    fixd_std = id_list_lit(1, (long long)(0));
+    fixd_file = id_list_lit(1, (long long)(intptr_t)(""));
+    id_fix_state3();
+    return;
+}
+
+void id_fix_enter(int i, int f, int lo) {
+    id_fix_state3();
+    id_fix_setfile(i);
+    id_fix_used(lo, f);
+    return;
+}
+
+void id_fix_setfile(int i) {
+    (char*)(intptr_t)(id_list_pop(fixd_file));
+    id_list_push(fixd_file, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(pfile, i))));
+    return;
+}
+
+void id_fix_used(int lo, int hi) {
+    while ((lo <= hi)) {
+        id_fix_used_at(lo);
+        lo = (lo + 1);
+    }
+    return;
+}
+
+void id_fix_funcs(void) {
+    int i;
+    int lo;
+    i = 0;
+    lo = 0;
+    while ((i < id_list_len(prog))) {
+        lo = id_fix_func_at(i, lo);
+        i = (i + 1);
+    }
+    return;
+}
+
+int id_fix_func_at(int i, int lo) {
+    int f;
+    int ret_i;
+    f = (int)(id_list_get(prog, i));
+    if ((((int)(id_list_get(nunit, f)) == 0) && (id_is_native(f) == 0))) {
+        id_fix_func(i, f, lo);
+    }
+    ret_i = (f + 1);
+    return ret_i;
+}
+
+void id_fix_func(int i, int f, int lo) {
+    id_fix_enter(i, f, lo);
+    id_fix_body(f);
+    id_fix_ret_parens(f, lo);
+    return;
+}
+
+void id_fix_stmt(int sn, int md) {
+    if ((strcmp(id_k_of(sn), "if") == 0)) {
+        id_fix_if(sn, md);
+    } else if ((strcmp(id_k_of(sn), "while") == 0)) {
+        id_fix_while(sn);
+    } else {
+        id_fix_simple(sn);
+    }
+    return;
+}
+
+void id_fix_if(int sn, int md) {
+    id_fix_cond(sn, md);
+    id_fix_then(sn);
+    id_fix_else(sn);
+    return;
+}
+
+void id_fix_cond(int sn, int md) {
+    int c;
+    IdList* fixp_roots;
+    c = id_i1_of(sn);
+    fixp_roots = id_list_lit(1, (long long)(c));
+    id_fix_plan(sn, fixp_roots, md);
+    return;
+}
+
+void id_fix_used_at(int x) {
+    char* s2_of_v;
+    if (((strcmp(id_k_of(x), "decl") == 0) || (strcmp(id_k_of(x), "param") == 0))) {
+        s2_of_v = id_s2_of(x);
+        id_list_push(fixd_used, (long long)(intptr_t)(s2_of_v));
+    }
+    return;
+}
+
+void id_fix_body(int f) {
+    IdList* l2_of_v;
+    l2_of_v = id_l2_of(f);
+    id_fix_block(l2_of_v);
+    return;
+}
+
+void id_fix_block(IdList* stmts) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(stmts))) {
+        id_fix_stmt((int)(id_list_get(stmts, i)), 0);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_fix_then(int sn) {
+    IdList* l1_of_v;
+    l1_of_v = id_l1_of(sn);
+    id_fix_block(l1_of_v);
+    return;
+}
+
+void id_fix_else(int sn) {
+    IdList* els;
+    els = id_l2_of(sn);
+    if ((id_i2_of(sn) == 1)) {
+        id_fix_stmt((int)(id_list_get(els, 0)), 2);
+    } else {
+        id_fix_block(els);
+    }
+    return;
+}
+
+void id_fix_while(int sn) {
+    id_fix_cond(sn, 1);
+    id_fix_then(sn);
     return;
 }
 

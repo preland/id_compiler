@@ -1,0 +1,20 @@
+fix_mark_rest(int last) {
+  fix_mark_cls(last, 3);
+  fix_mark_imports(last);
+} return void;
+
+fix_mark_imports(int last) {
+  if(fix_touches(last) == 1) {
+    fix_mark_cls(last, 4);
+  }
+} return void;
+
+fix_mark_cls(int last, int wcl) {
+  int i = 0;
+  while(i <= last) {
+    if((import fixe_cl)[i] == wcl) {
+      lset((import fixe_mv), i, 1);
+    }
+    i = i + 1;
+  }
+} return void;

@@ -1,0 +1,18 @@
+fix_paren_two(int x, int a, int b) {
+  fix_paren_side(x, a);
+  fix_paren_side(x, b);
+} return void;
+
+// Not inside text another edit of this run moves: that text is copied from the
+// source as it was, and gets its parentheses on the next run.
+fix_paren_side(int x, int c) {
+  if(mixed_side(x, c) == 1 && fix_spanok(c) == 1 && fix_in_moved(c) == 0) {
+    fix_paren_emit(c);
+  }
+} return void;
+
+fix_paren_emit(int c) {
+  int b = fix_nbeg(c);
+  int e = fix_nend(c);
+  fix_paren_pts(b, e);
+} return void;

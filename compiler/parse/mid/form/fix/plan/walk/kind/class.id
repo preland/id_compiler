@@ -1,0 +1,30 @@
+fix_class2(int e) {
+  int cl = fix_class3(e);
+  if(k_of(e) == "call") {
+    cl = 1;
+  } else if(k_of(e) == "index") {
+    cl = 2;
+  }
+} return int cl;
+
+// An import read is judged apart: it gives the same value after a call unless
+// that call can run the function declaring the export (plan/reach/).
+fix_class3(int e) {
+  int cl = 0;
+  if(k_of(e) == "import") {
+    cl = 4;
+  } else if(k_of(e) == "bin" && fix_traps(e) == 1) {
+    cl = 2;
+  }
+} return int cl;
+
+// Division, remainder and the shifts trap (docs/SPEC.md 2.2, 2.3), except by
+// a positive literal. A trap is an effect: a call moved ahead of one would run
+// where it did not before.
+fix_traps(int e) {
+  string op = s1_of(e);
+  int ok = 0;
+  if(op == "/" || op == "%" || op == "<<" || op == ">>") {
+    ok = fix_unsafe_rhs(e);
+  }
+} return int ok;
