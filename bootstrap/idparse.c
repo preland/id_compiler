@@ -114,10 +114,9 @@ static void* id_realloc(void* p, size_t n) {
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
    type. Because a list is a pointer, passing one to a function and mutating it
-   is visible to the caller -- this is how id gets shared mutable state.
-   Every index access is bounds-checked: an out-of-range get/set/pop is a
-   clear, fatal runtime error (never silent corruption or UB), matching id's
-   contract that a bug aborts loudly instead of reading/writing garbage. */
+   is visible to the caller -- this is how id gets shared mutable state. Every
+   index access is bounds-checked: an out-of-range get/set/pop is a clear,
+   fatal runtime error, matching id's contract that a bug aborts loudly. */
 typedef struct { int len, cap; long long* data; } IdList;
 static IdList* id_list_new(void) {
     IdList* L = (IdList*)id_alloc(sizeof(IdList));
@@ -125,8 +124,9 @@ static IdList* id_list_new(void) {
     L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, "list init"));
     return L;
 }
+static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; } static void id_list_mut_check(IdList* L) { if (L->cap < 0) { fprintf(stderr, "id: cannot mutate a constant list\n"); exit(1); } }
 static void id_list_push(IdList* L, long long v) {
-    if (L->len >= L->cap) {
+    id_list_mut_check(L); if (L->len >= L->cap) {
         if (L->cap > INT_MAX / 2) {
             fprintf(stderr, "id: list capacity overflow\n");
             exit(1);
@@ -146,7 +146,7 @@ static long long id_list_get(IdList* L, int i) {
     return L->data[i];
 }
 static void id_list_set(IdList* L, int i, long long v) {
-    if (i < 0 || i >= L->len) {
+    id_list_mut_check(L); if (i < 0 || i >= L->len) {
         fprintf(stderr, "id: index %d out of bounds (len %d)\n", i, L->len);
         exit(1);
     }
@@ -154,7 +154,7 @@ static void id_list_set(IdList* L, int i, long long v) {
 }
 static int id_list_len(IdList* L) { return L->len; }
 static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
-    if (L->len <= 0) {
+    id_list_mut_check(L); if (L->len <= 0) {
         fprintf(stderr, "id: pop from empty list\n");
         exit(1);
     }
@@ -453,6 +453,8 @@ void id_asm_target_rows(char* triple);
 void id_guarded_emit(int argc, IdList* argv);
 void id_guarded_emit_tail(int argc, IdList* argv);
 void id_emit_all(int argc, IdList* argv);
+int id_is_list_const(int i);
+int id_list_consts_kept(void);
 int id_keep_export(int i);
 void id_push_asm_sym(int i);
 void id_push_sym_row(int i);
@@ -680,6 +682,7 @@ void id_lw_fin_tail(int node);
 void id_lw_ret_tail(int node, int lw_ent_v, int lw_brto_v);
 void id_lw_func_mid(int node, char* ty, char* name);
 void id_lw_func_tail(int node);
+void id_lw_main_init(int node);
 void id_ir_lower(void);
 void id_lw_func(int node);
 int id_lw_open(int f);
@@ -1029,6 +1032,7 @@ void id_emit_tail(int id);
 char* id_c_fn_params(IdList* pts);
 char* id_c_type_list(IdList* pts);
 void id_emit_tail_end(int id);
+void id_emit_tail2(int id);
 char* id_sig(int id);
 void id_fwd_all(void);
 void id_def_all(void);
@@ -1049,6 +1053,14 @@ void id_emit_wrapper(void);
 void id_wrap_body(void);
 int id_const_decl(char* name);
 int id_const_pick(int i, char* name, int d);
+void id_emit_const_init(void);
+void id_emit_init_fn(void);
+void id_init_lines(void);
+void id_init_line_kept(int i);
+void id_init_line_emit(char* name);
+char* id_init_line(char* name);
+void id_emit_main_init(int id);
+void id_emit_init_call(void);
 char* id_export_line(int i);
 char* id_const_line(char* name);
 char* id_const_line_tail(int d, char* s1_of_v);
@@ -1201,7 +1213,6 @@ char* id_unbox2(char* code, char* type);
 char* id_unbox3(char* code, char* type);
 char* id_unbox4(char* code, char* type);
 void id_emit_crt(void);
-IdList* id_resv_names(void);
 void id_emit_runtime(void);
 void id_ll_asm_all(char* triple);
 void id_ll_asm_row(int i, char* triple);
@@ -1261,6 +1272,21 @@ void id_ll_decl_cmp(void);
 void id_ll_globals(void);
 void id_ll_global_at(int i, char* ty);
 char* id_ll_init(int i);
+void id_ll_init_each(char* pass);
+void id_ll_init_one(int i, char* pass);
+void id_ll_init_build(int i);
+void id_ll_init_elem(int i, int j, int e, char* pass);
+void id_ll_init_push(int i, int j, int e, char* t);
+char* id_ll_cell(int i, int j, int e, char* t);
+void id_ll_init_elems(int i, char* pass);
+void id_ll_init_elems2(int i, int e, char* pass);
+void id_ll_elem_bytes(int i, int j, int e);
+char* id_ll_cell_named(int i, int j, int e, char* t);
+char* id_ll_cell_line(int i, int j, int e, char* t);
+void id_ll_init_store(int i);
+void id_ll_const_init(void);
+void id_ll_init_fn(void);
+void id_ll_init_rest(void);
 void id_ll_global_kept(int i);
 char* id_ll_const_val(int e, char* name);
 char* id_ll_const_num(int e);
@@ -1914,10 +1940,18 @@ void id_report_dup(int i, int j);
 char* id_fname_at(int i);
 char* id_dup_tail(int j);
 char* id_dup_tail2(char* name_j);
+int id_cw_arr_lit(int id);
+int id_cw_arr_lit2(IdList* els);
+int id_cw_arr_elem_lit(int e);
+char* id_cw_arr_spell(int id);
+char* id_cw_arr_spell_items(IdList* els);
+char* id_cw_elem_spell(int e);
+char* id_cw_value_of(int e);
 int id_is_reserved_name(int i);
 void id_resv_print(char* prog_loc_v, char* s1_of_v);
 void id_resv_at(int i);
 void id_resv_err(int i);
+void id_init_resv_names(void);
 void id_exp_one(int id, char* owner);
 int id_is_export_decl(int id);
 void id_add_export(char* name, char* type, char* owner);
@@ -1929,6 +1963,9 @@ void id_add_export2_rec(int id, char* owner);
 void id_chk_dupexp(int id, char* owner);
 void id_dupexp_err(int id, char* owner);
 void id_dupexp_report(char* loc_at_v, char* s2_of_v);
+void id_split_resv_names(char* src, int i);
+int id_take_resv_name(char* src, int i);
+void id_push_resv_name(char* src, int i, int e);
 char* id_builtin_list(void);
 char* id_join_bnames(char* s, int i);
 void id_init_bnames(void);
@@ -1949,6 +1986,7 @@ void id_host_init(int argc, IdList* argv);
 char* id_build_host(void);
 void id_arg_flags5(int argc, IdList* argv);
 void id_init_rtc(void);
+void id_init_rtc2(void);
 void id_rt_set(int v);
 void id_exp_else(int id, char* owner);
 void id_chk_dead(void);
@@ -2292,6 +2330,13 @@ int id_bi_ok2(char* want, char* t);
 int id_bi_ok3(char* want, char* t);
 int id_bi_strlist(char* t);
 char* id_bi_verb(char* want);
+void id_chk_call2(int id);
+void id_chk_const_mut(int id);
+int id_is_mut_call(int id);
+int id_is_mut_name(char* name);
+void id_chk_const_mut2(int id);
+void id_chk_const_mut3(int id, char* name);
+void id_cml_report(int id, char* name);
 void id_arity_err(int id, int fn);
 char* id_arity_err_msg(int id, int fn, char* name);
 void id_chk_arity(int id, int fn);
@@ -2508,6 +2553,7 @@ char* id_type_of3(int id);
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
 char* builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint";  /* constant from conf.id */
+char* resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink at box_f charat chr concat flush getkey idiv imod input len list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set lm_forget mem_alloc mem_of_str mem_size mul_check peek16 peek32 peek64 peek8 peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow str_of_float str_of_int str_of_mem str_of_word term_raw term_restore ticks to_int trap udiv ult umod unbox_f ushr";  /* constant from conf.id */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
 IdList* natrow;  /* exported by nat_lists() */
@@ -2621,6 +2667,7 @@ IdList* cnames;  /* exported by uq_begin() */
 IdList* cfp;  /* exported by uq_fill() */
 IdList* cw_names;  /* exported by cw_begin() */
 IdList* cw_vals;  /* exported by cw_begin() */
+IdList* resv_names;  /* exported by init_resv_names() */
 IdList* bnames;  /* exported by init_bnames() */
 IdList* hostc;  /* exported by host_init() */
 IdList* rtc;  /* exported by init_rtc() */
@@ -2819,6 +2866,27 @@ void id_emit_all(int argc, IdList* argv) {
     id_natives_then_prune();
     id_emit_then_natives(argc, argv);
     return;
+}
+
+int id_is_list_const(int i) {
+    int ok;
+    ok = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), "conf.id") == 0) && (id_ty_is_list((char*)(intptr_t)(id_list_get(etypes, i))) == 1))) {
+        ok = id_keep_export(i);
+    }
+    return ok;
+}
+
+int id_list_consts_kept(void) {
+    int n;
+    int i;
+    n = 0;
+    i = 0;
+    while ((i < id_list_len(enames))) {
+        n = (n + id_is_list_const(i));
+        i = (i + 1);
+    }
+    return n;
 }
 
 int id_keep_export(int i) {
@@ -4949,8 +5017,18 @@ void id_lw_func_mid(int node, char* ty, char* name) {
 }
 
 void id_lw_func_tail(int node) {
+    id_lw_main_init(node);
     id_lw_locals(node);
     id_lw_fin(node);
+    return;
+}
+
+void id_lw_main_init(int node) {
+    IdList* none;
+    if (((strcmp(id_s1_of(node), "main") == 0) && (id_list_consts_kept() > 0))) {
+        none = id_list_lit(0);
+        id_lw_callf("idc_const_init", "", none);
+    }
     return;
 }
 
@@ -7962,10 +8040,8 @@ void id_emit_def_body(int id) {
 }
 
 void id_emit_tail(int id) {
-    IdList* l2_of_v;
-    l2_of_v = id_l2_of(id);
-    id_emit_block(l2_of_v, "    ");
-    id_emit_tail_end(id);
+    id_emit_main_init(id);
+    id_emit_tail2(id);
     return;
 }
 
@@ -7993,6 +8069,14 @@ char* id_c_type_list(IdList* pts) {
 void id_emit_tail_end(int id) {
     id_emit_ret(id);
     id_emit_line("}");
+    return;
+}
+
+void id_emit_tail2(int id) {
+    IdList* l2_of_v;
+    l2_of_v = id_l2_of(id);
+    id_emit_block(l2_of_v, "    ");
+    id_emit_tail_end(id);
     return;
 }
 
@@ -8179,6 +8263,71 @@ int id_const_pick(int i, char* name, int d) {
     return d;
 }
 
+void id_emit_const_init(void) {
+    if ((id_list_consts_kept() > 0)) {
+        id_emit_init_fn();
+    }
+    return;
+}
+
+void id_emit_init_fn(void) {
+    id_emit_line("static void idc_const_init(void) {");
+    id_init_lines();
+    id_emit_line("}");
+    return;
+}
+
+void id_init_lines(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(enames))) {
+        id_init_line_kept(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_init_line_kept(int i) {
+    char* name;
+    if ((id_is_list_const(i) == 1)) {
+        name = (char*)(intptr_t)(id_list_get(enames, i));
+        id_init_line_emit(name);
+    }
+    return;
+}
+
+void id_init_line_emit(char* name) {
+    char* s;
+    s = id_init_line(name);
+    id_emit_line(s);
+    id_emit_line(id_concat(id_concat("    id_list_lock(", name), ");"));
+    return;
+}
+
+char* id_init_line(char* name) {
+    int d;
+    int i1_of_v;
+    char* ret_s;
+    d = id_const_decl(name);
+    i1_of_v = id_i1_of(d);
+    ret_s = id_concat(id_concat(id_concat(id_concat("    ", name), " = "), id_emit_expr(i1_of_v)), ";");
+    return ret_s;
+}
+
+void id_emit_main_init(int id) {
+    if ((strcmp(id_s1_of(id), "main") == 0)) {
+        id_emit_init_call();
+    }
+    return;
+}
+
+void id_emit_init_call(void) {
+    if ((id_list_consts_kept() > 0)) {
+        id_emit_line("    idc_const_init();");
+    }
+    return;
+}
+
 char* id_export_line(int i) {
     char* s;
     s = id_concat(id_concat(id_concat(id_concat(id_concat(id_c_type((char*)(intptr_t)(id_list_get(etypes, i))), " "), (char*)(intptr_t)(id_list_get(enames, i))), ";  /* exported by "), (char*)(intptr_t)(id_list_get(eowners, i))), "() */");
@@ -8203,6 +8352,9 @@ char* id_const_line_tail(int d, char* s1_of_v) {
     char* ret_s;
     i1_of_v = id_i1_of(d);
     ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_c_type(s1_of_v), " "), id_s2_of(d)), " = "), id_emit_expr(i1_of_v)), ";  /* constant from conf.id */");
+    if ((id_ty_is_list(s1_of_v) == 1)) {
+        ret_s = id_concat(id_concat(id_concat(id_c_type(s1_of_v), " "), id_s2_of(d)), ";  /* constant from conf.id */");
+    }
     return ret_s;
 }
 
@@ -8234,6 +8386,7 @@ void id_emit_exports(void) {
     if ((id_list_len(enames) > 0)) {
         id_emit_export_block();
     }
+    id_emit_const_init();
     return;
 }
 
@@ -8320,6 +8473,7 @@ void id_emit_arg_line(IdList* ps, IdList* args, int j) {
 }
 
 void id_emit_case_pre(int ci) {
+    id_emit_init_call();
     id_emit_case_given(ci);
     id_emit_case_args(ci);
     return;
@@ -9545,18 +9699,12 @@ char* id_unbox4(char* code, char* type) {
 }
 
 void id_emit_crt(void) {
-    id_print("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\nIdAllocHdr* id_arena_head = NULL;\nint id_arena_hooked = 0;\nvoid id_arena_free_all(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths, remembered.\n   A `string` is a NUL-terminated char*, so its length is a strlen -- and every\n   id program walks text with charat, which needs the length to know where the\n   end is. One remembered length made a single scan O(n) instead of O(n^2). It\n   did not make *two* scans O(n): a parser that reads its input and builds a\n   string alternates between two pointers, misses the memo on every call, and\n   pays a strlen of the whole input per character. Measured on an OpenDocument\n   content.xml, that was 46.8 seconds for 3.5 MB.\n   So the memo holds several. ID_LEN_MEMO is the number of strings that may be\n   walked at once before the cost comes back; eight covers a parser reading one\n   input while building a name and comparing against a keyword, with room over.\n   Raising it costs one pointer comparison per miss.\n   The real answer is a string that carries its own length, which would remove\n   the question rather than bound it -- and which means changing how a literal\n   is emitted, so it is a decision about the language rather than about this\n   file. See docs/FRICTION.md. */\n#define ID_LEN_MEMO 8\nconst char* id_lm_s[ID_LEN_MEMO];\nsize_t id_lm_n[ID_LEN_MEMO];\nunsigned id_lm_at = 0;\nsize_t id_slen(const char* s) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == s) return id_lm_n[i];\n    i = id_lm_at;\n    id_lm_at = (id_lm_at + 1) % ID_LEN_MEMO;\n    id_lm_s[i] = s;\n    id_lm_n[i] = strlen(s);\n    return id_lm_n[i];\n}\n/* A block that moved may be reused by a later string at the same address, so\n   every remembered length has to go with it. Only when it actually moved: a\n   realloc that grows in place invalidates nothing. */\nvoid id_lm_forget(void) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) id_lm_s[i] = NULL;\n}\nvoid* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    if (nh != h) id_lm_forget();\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\nIdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nint id_list_len(IdList* L) { return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = strlen(a), lb = strlen(b);\n    size_t n = id_add_check(id_add_check(la, lb, \"concat\"), 1, \"concat\");\n    char* r = (char*)id_alloc(n);\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb + 1);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%d\", x); return r;\n}\nchar* id_str_of_word(long long x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%lld\", x); return r;\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 ? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nunsigned char* id_store = NULL;\nlong long id_store_used = 1;    /* 0 is reserved for null */\nlong long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap ? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    char* r = (char*)id_alloc((size_t)n + 1);\n    memcpy(r, p, (size_t)n);\n    r[n] = '\\0';\n    return r;\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = strlen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char* r = (char*)id_alloc(64); snprintf(r, 64, \"%g\", x); return r;\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    if (!fgets(buf, sizeof(buf), stdin)) {\n        char* e = (char*)id_alloc(1); e[0] = '\\0'; return e;\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    char* r = (char*)id_alloc(n + 1); memcpy(r, buf, n + 1); return r;\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed) */\n    size_t cap = 4096, n = 0;\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + n, 1, cap - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check used to be a strlen per character, which makes walking\n   a string O(n^2) -- and walking a string with charat is how every id program\n   reads text, because there is no substr and no file I/O. Lexing a 128 KB\n   source took 378 ms; with the length of the last string remembered it takes\n   12 ms, and the answer is the same.\n   The memo is keyed on the pointer, which is sound because an id string is\n   immutable and its block is never released before exit. The one place a block\n   can be released early is id_realloc (list growth), whose freed address could\n   later be handed to a new string -- so it clears the memo. */\nint id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    char* r = (char*)id_alloc(2);\n    r[0] = (char)code; r[1] = '\\0';\n    return r;\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");
+    id_print("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\nIdAllocHdr* id_arena_head = NULL;\nint id_arena_hooked = 0;\nvoid id_arena_free_all(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths, remembered.\n   A `string` is a NUL-terminated char*, so its length is a strlen -- and every\n   id program walks text with charat, which needs the length to know where the\n   end is. One remembered length made a single scan O(n) instead of O(n^2). It\n   did not make *two* scans O(n): a parser that reads its input and builds a\n   string alternates between two pointers, misses the memo on every call, and\n   pays a strlen of the whole input per character. Measured on an OpenDocument\n   content.xml, that was 46.8 seconds for 3.5 MB.\n   So the memo holds several. ID_LEN_MEMO is the number of strings that may be\n   walked at once before the cost comes back; eight covers a parser reading one\n   input while building a name and comparing against a keyword, with room over.\n   Raising it costs one pointer comparison per miss.\n   The real answer is a string that carries its own length, which would remove\n   the question rather than bound it -- and which means changing how a literal\n   is emitted, so it is a decision about the language rather than about this\n   file. See docs/FRICTION.md. */\n#define ID_LEN_MEMO 8\nconst char* id_lm_s[ID_LEN_MEMO];\nsize_t id_lm_n[ID_LEN_MEMO];\nunsigned id_lm_at = 0;\nsize_t id_slen(const char* s) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == s) return id_lm_n[i];\n    i = id_lm_at;\n    id_lm_at = (id_lm_at + 1) % ID_LEN_MEMO;\n    id_lm_s[i] = s;\n    id_lm_n[i] = strlen(s);\n    return id_lm_n[i];\n}\n/* A block that moved may be reused by a later string at the same address, so\n   every remembered length has to go with it. Only when it actually moved: a\n   realloc that grows in place invalidates nothing. */\nvoid id_lm_forget(void) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) id_lm_s[i] = NULL;\n}\nvoid* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    if (nh != h) id_lm_forget();\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state. Every\n   index access is bounds-checked: an out-of-range get/set/pop is a clear,\n   fatal runtime error, matching id's contract that a bug aborts loudly. */\ntypedef struct { int len, cap; long long* data; } IdList;\nIdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; } static void id_list_mut_check(IdList* L) { if (L->cap < 0) { fprintf(stderr, \"id: cannot mutate a constant list\\n\"); exit(1); } }\nvoid id_list_push(IdList* L, long long v) {\n    id_list_mut_check(L); if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nint id_list_len(IdList* L) { return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = strlen(a), lb = strlen(b);\n    size_t n = id_add_check(id_add_check(la, lb, \"concat\"), 1, \"concat\");\n    char* r = (char*)id_alloc(n);\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb + 1);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%d\", x); return r;\n}\nchar* id_str_of_word(long long x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%lld\", x); return r;\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 ? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nunsigned char* id_store = NULL;\nlong long id_store_used = 1;    /* 0 is reserved for null */\nlong long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap ? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    char* r = (char*)id_alloc((size_t)n + 1);\n    memcpy(r, p, (size_t)n);\n    r[n] = '\\0';\n    return r;\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = strlen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char* r = (char*)id_alloc(64); snprintf(r, 64, \"%g\", x); return r;\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    if (!fgets(buf, sizeof(buf), stdin)) {\n        char* e = (char*)id_alloc(1); e[0] = '\\0'; return e;\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    char* r = (char*)id_alloc(n + 1); memcpy(r, buf, n + 1); return r;\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed) */\n    size_t cap = 4096, n = 0;\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + n, 1, cap - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check used to be a strlen per character, which makes walking\n   a string O(n^2) -- and walking a string with charat is how every id program\n   reads text, because there is no substr and no file I/O. Lexing a 128 KB\n   source took 378 ms; with the length of the last string remembered it takes\n   12 ms, and the answer is the same.\n   The memo is keyed on the pointer, which is sound because an id string is\n   immutable and its block is never released before exit. The one place a block\n   can be released early is id_realloc (list growth), whose freed address could\n   later be handed to a new string -- so it clears the memo. */\nint id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    char* r = (char*)id_alloc(2);\n    r[0] = (char)code; r[1] = '\\0';\n    return r;\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");
     return;
 }
 
-IdList* id_resv_names(void) {
-    IdList* rnames;
-    rnames = id_list_lit(63, (long long)(intptr_t)("add_check"), (long long)(intptr_t)("alloc"), (long long)(intptr_t)("arena_free_all"), (long long)(intptr_t)("arena_link"), (long long)(intptr_t)("arena_unlink"), (long long)(intptr_t)("at"), (long long)(intptr_t)("box_f"), (long long)(intptr_t)("charat"), (long long)(intptr_t)("chr"), (long long)(intptr_t)("concat"), (long long)(intptr_t)("flush"), (long long)(intptr_t)("getkey"), (long long)(intptr_t)("idiv"), (long long)(intptr_t)("imod"), (long long)(intptr_t)("input"), (long long)(intptr_t)("len"), (long long)(intptr_t)("list_get"), (long long)(intptr_t)("list_len"), (long long)(intptr_t)("list_lit"), (long long)(intptr_t)("list_new"), (long long)(intptr_t)("list_pop"), (long long)(intptr_t)("list_push"), (long long)(intptr_t)("list_set"), (long long)(intptr_t)("lm_forget"), (long long)(intptr_t)("mem_alloc"), (long long)(intptr_t)("mem_of_str"), (long long)(intptr_t)("mem_size"), (long long)(intptr_t)("mul_check"), (long long)(intptr_t)("peek16"), (long long)(intptr_t)("peek32"), (long long)(intptr_t)("peek64"), (long long)(intptr_t)("peek8"), (long long)(intptr_t)("peek_n"), (long long)(intptr_t)("poke16"), (long long)(intptr_t)("poke32"), (long long)(intptr_t)("poke64"), (long long)(intptr_t)("poke8"), (long long)(intptr_t)("poke_n"), (long long)(intptr_t)("print"), (long long)(intptr_t)("put"), (long long)(intptr_t)("read_all"), (long long)(intptr_t)("realloc"), (long long)(intptr_t)("sar"), (long long)(intptr_t)("sdiv"), (long long)(intptr_t)("shl"), (long long)(intptr_t)("sleep_ms"), (long long)(intptr_t)("slen"), (long long)(intptr_t)("smod"), (long long)(intptr_t)("store_grow"), (long long)(intptr_t)("str_of_float"), (long long)(intptr_t)("str_of_int"), (long long)(intptr_t)("str_of_mem"), (long long)(intptr_t)("str_of_word"), (long long)(intptr_t)("term_raw"), (long long)(intptr_t)("term_restore"), (long long)(intptr_t)("ticks"), (long long)(intptr_t)("to_int"), (long long)(intptr_t)("trap"), (long long)(intptr_t)("udiv"), (long long)(intptr_t)("ult"), (long long)(intptr_t)("umod"), (long long)(intptr_t)("unbox_f"), (long long)(intptr_t)("ushr"));
-    return rnames;
-}
-
 void id_emit_runtime(void) {
-    id_print("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\nstatic IdAllocHdr* id_arena_head = NULL;\nstatic int id_arena_hooked = 0;\nstatic void id_arena_free_all(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths, remembered.\n   A `string` is a NUL-terminated char*, so its length is a strlen -- and every\n   id program walks text with charat, which needs the length to know where the\n   end is. One remembered length made a single scan O(n) instead of O(n^2). It\n   did not make *two* scans O(n): a parser that reads its input and builds a\n   string alternates between two pointers, misses the memo on every call, and\n   pays a strlen of the whole input per character. Measured on an OpenDocument\n   content.xml, that was 46.8 seconds for 3.5 MB.\n   So the memo holds several. ID_LEN_MEMO is the number of strings that may be\n   walked at once before the cost comes back; eight covers a parser reading one\n   input while building a name and comparing against a keyword, with room over.\n   Raising it costs one pointer comparison per miss.\n   The real answer is a string that carries its own length, which would remove\n   the question rather than bound it -- and which means changing how a literal\n   is emitted, so it is a decision about the language rather than about this\n   file. See docs/FRICTION.md. */\n#define ID_LEN_MEMO 8\nstatic const char* id_lm_s[ID_LEN_MEMO];\nstatic size_t id_lm_n[ID_LEN_MEMO];\nstatic unsigned id_lm_at = 0;\nstatic size_t id_slen(const char* s) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == s) return id_lm_n[i];\n    i = id_lm_at;\n    id_lm_at = (id_lm_at + 1) % ID_LEN_MEMO;\n    id_lm_s[i] = s;\n    id_lm_n[i] = strlen(s);\n    return id_lm_n[i];\n}\n/* A block that moved may be reused by a later string at the same address, so\n   every remembered length has to go with it. Only when it actually moved: a\n   realloc that grows in place invalidates nothing. */\nstatic void id_lm_forget(void) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) id_lm_s[i] = NULL;\n}\nstatic void* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    if (nh != h) id_lm_forget();\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\nstatic IdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic int id_list_len(IdList* L) { return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = strlen(a), lb = strlen(b);\n    size_t n = id_add_check(id_add_check(la, lb, \"concat\"), 1, \"concat\");\n    char* r = (char*)id_alloc(n);\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb + 1);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%d\", x); return r;\n}\nstatic char* id_str_of_word(long long x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%lld\", x); return r;\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 ? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic unsigned char* id_store = NULL;\nstatic long long id_store_used = 1;    /* 0 is reserved for null */\nstatic long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap ? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    char* r = (char*)id_alloc((size_t)n + 1);\n    memcpy(r, p, (size_t)n);\n    r[n] = '\\0';\n    return r;\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = strlen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char* r = (char*)id_alloc(64); snprintf(r, 64, \"%g\", x); return r;\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    if (!fgets(buf, sizeof(buf), stdin)) {\n        char* e = (char*)id_alloc(1); e[0] = '\\0'; return e;\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    char* r = (char*)id_alloc(n + 1); memcpy(r, buf, n + 1); return r;\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed) */\n    size_t cap = 4096, n = 0;\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + n, 1, cap - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check used to be a strlen per character, which makes walking\n   a string O(n^2) -- and walking a string with charat is how every id program\n   reads text, because there is no substr and no file I/O. Lexing a 128 KB\n   source took 378 ms; with the length of the last string remembered it takes\n   12 ms, and the answer is the same.\n   The memo is keyed on the pointer, which is sound because an id string is\n   immutable and its block is never released before exit. The one place a block\n   can be released early is id_realloc (list growth), whose freed address could\n   later be handed to a new string -- so it clears the memo. */\nstatic int id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    char* r = (char*)id_alloc(2);\n    r[0] = (char)code; r[1] = '\\0';\n    return r;\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");
+    id_print("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\nstatic IdAllocHdr* id_arena_head = NULL;\nstatic int id_arena_hooked = 0;\nstatic void id_arena_free_all(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths, remembered.\n   A `string` is a NUL-terminated char*, so its length is a strlen -- and every\n   id program walks text with charat, which needs the length to know where the\n   end is. One remembered length made a single scan O(n) instead of O(n^2). It\n   did not make *two* scans O(n): a parser that reads its input and builds a\n   string alternates between two pointers, misses the memo on every call, and\n   pays a strlen of the whole input per character. Measured on an OpenDocument\n   content.xml, that was 46.8 seconds for 3.5 MB.\n   So the memo holds several. ID_LEN_MEMO is the number of strings that may be\n   walked at once before the cost comes back; eight covers a parser reading one\n   input while building a name and comparing against a keyword, with room over.\n   Raising it costs one pointer comparison per miss.\n   The real answer is a string that carries its own length, which would remove\n   the question rather than bound it -- and which means changing how a literal\n   is emitted, so it is a decision about the language rather than about this\n   file. See docs/FRICTION.md. */\n#define ID_LEN_MEMO 8\nstatic const char* id_lm_s[ID_LEN_MEMO];\nstatic size_t id_lm_n[ID_LEN_MEMO];\nstatic unsigned id_lm_at = 0;\nstatic size_t id_slen(const char* s) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == s) return id_lm_n[i];\n    i = id_lm_at;\n    id_lm_at = (id_lm_at + 1) % ID_LEN_MEMO;\n    id_lm_s[i] = s;\n    id_lm_n[i] = strlen(s);\n    return id_lm_n[i];\n}\n/* A block that moved may be reused by a later string at the same address, so\n   every remembered length has to go with it. Only when it actually moved: a\n   realloc that grows in place invalidates nothing. */\nstatic void id_lm_forget(void) {\n    unsigned i;\n    for (i = 0; i < ID_LEN_MEMO; i++) id_lm_s[i] = NULL;\n}\nstatic void* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    if (nh != h) id_lm_forget();\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state. Every\n   index access is bounds-checked: an out-of-range get/set/pop is a clear,\n   fatal runtime error, matching id's contract that a bug aborts loudly. */\ntypedef struct { int len, cap; long long* data; } IdList;\nstatic IdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; } static void id_list_mut_check(IdList* L) { if (L->cap < 0) { fprintf(stderr, \"id: cannot mutate a constant list\\n\"); exit(1); } }\nstatic void id_list_push(IdList* L, long long v) {\n    id_list_mut_check(L); if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic int id_list_len(IdList* L) { return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = strlen(a), lb = strlen(b);\n    size_t n = id_add_check(id_add_check(la, lb, \"concat\"), 1, \"concat\");\n    char* r = (char*)id_alloc(n);\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb + 1);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%d\", x); return r;\n}\nstatic char* id_str_of_word(long long x) {\n    char* r = (char*)id_alloc(32); snprintf(r, 32, \"%lld\", x); return r;\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 ? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic unsigned char* id_store = NULL;\nstatic long long id_store_used = 1;    /* 0 is reserved for null */\nstatic long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap ? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    char* r = (char*)id_alloc((size_t)n + 1);\n    memcpy(r, p, (size_t)n);\n    r[n] = '\\0';\n    return r;\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = strlen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char* r = (char*)id_alloc(64); snprintf(r, 64, \"%g\", x); return r;\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    if (!fgets(buf, sizeof(buf), stdin)) {\n        char* e = (char*)id_alloc(1); e[0] = '\\0'; return e;\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    char* r = (char*)id_alloc(n + 1); memcpy(r, buf, n + 1); return r;\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed) */\n    size_t cap = 4096, n = 0;\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + n, 1, cap - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check used to be a strlen per character, which makes walking\n   a string O(n^2) -- and walking a string with charat is how every id program\n   reads text, because there is no substr and no file I/O. Lexing a 128 KB\n   source took 378 ms; with the length of the last string remembered it takes\n   12 ms, and the answer is the same.\n   The memo is keyed on the pointer, which is sound because an id string is\n   immutable and its block is never released before exit. The one place a block\n   can be released early is id_realloc (list growth), whose freed address could\n   later be handed to a new string -- so it clears the memo. */\nstatic int id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    char* r = (char*)id_alloc(2);\n    r[0] = (char)code; r[1] = '\\0';\n    return r;\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}");
     return;
 }
 
@@ -10066,7 +10214,7 @@ void id_ll_declares(void) {
 
 void id_ll_decl_block(void) {
     id_ll_decl_cmp();
-    id_emit_line("declare ptr @id_list_new()\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)");
+    id_emit_line("declare ptr @id_list_new()\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)");
     id_emit_line("");
     return;
 }
@@ -10085,6 +10233,7 @@ void id_ll_globals(void) {
         id_ll_global_kept(i);
         i = (i + 1);
     }
+    id_ll_const_init();
     return;
 }
 
@@ -10100,12 +10249,139 @@ char* id_ll_init(int i) {
     int const_decl_v;
     int i1_of_v;
     s = id_ll_zero((char*)(intptr_t)(id_list_get(etypes, i)));
-    if ((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), "conf.id") == 0)) {
+    if (((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), "conf.id") == 0) && (id_ty_is_list((char*)(intptr_t)(id_list_get(etypes, i))) == 0))) {
         const_decl_v = id_const_decl((char*)(intptr_t)(id_list_get(enames, i)));
         i1_of_v = id_i1_of(const_decl_v);
         s = id_ll_const_val(i1_of_v, (char*)(intptr_t)(id_list_get(enames, i)));
     }
     return s;
+}
+
+void id_ll_init_each(char* pass) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(enames))) {
+        id_ll_init_one(i, pass);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_ll_init_one(int i, char* pass) {
+    if (((id_is_list_const(i) == 1) && (strcmp(pass, "bytes") == 0))) {
+        id_ll_init_elems(i, pass);
+    }
+    if (((id_is_list_const(i) == 1) && (strcmp(pass, "build") == 0))) {
+        id_ll_init_build(i);
+    }
+    return;
+}
+
+void id_ll_init_build(int i) {
+    id_emit_line(id_concat(id_concat("  %c", id_str_of_int(i)), " = call ptr @id_list_new()"));
+    id_ll_init_elems(i, "build");
+    id_ll_init_store(i);
+    return;
+}
+
+void id_ll_init_elem(int i, int j, int e, char* pass) {
+    char* t;
+    t = id_elem_type((char*)(intptr_t)(id_list_get(etypes, i)));
+    if (((strcmp(pass, "bytes") == 0) && (strcmp(t, "string") == 0))) {
+        id_ll_elem_bytes(i, j, e);
+    }
+    if ((strcmp(pass, "build") == 0)) {
+        id_ll_init_push(i, j, e, t);
+    }
+    return;
+}
+
+void id_ll_init_push(int i, int j, int e, char* t) {
+    char* cell;
+    cell = id_ll_cell(i, j, e, t);
+    id_emit_line(id_concat(id_concat(id_concat(id_concat("  call void @id_list_push(ptr %c", id_str_of_int(i)), ", i64 "), cell), ")"));
+    return;
+}
+
+char* id_ll_cell(int i, int j, int e, char* t) {
+    char* cell;
+    cell = id_ll_const_num(e);
+    if (((strcmp(t, "string") == 0) || (strcmp(t, "float") == 0))) {
+        cell = id_ll_cell_named(i, j, e, t);
+    }
+    return cell;
+}
+
+void id_ll_init_elems(int i, char* pass) {
+    int d;
+    int e;
+    d = id_const_decl((char*)(intptr_t)(id_list_get(enames, i)));
+    e = id_i1_of(d);
+    id_ll_init_elems2(i, e, pass);
+    return;
+}
+
+void id_ll_init_elems2(int i, int e, char* pass) {
+    IdList* els;
+    int j;
+    els = id_l1_of(e);
+    j = 0;
+    while ((j < id_list_len(els))) {
+        id_ll_init_elem(i, j, (int)(id_list_get(els, j)), pass);
+        j = (j + 1);
+    }
+    return;
+}
+
+void id_ll_elem_bytes(int i, int j, int e) {
+    char* spell;
+    spell = id_s1_of(e);
+    id_ll_str_bytes(id_concat(id_concat(id_concat("@.cs.", (char*)(intptr_t)(id_list_get(enames, i))), "."), id_str_of_int(j)), spell);
+    return;
+}
+
+char* id_ll_cell_named(int i, int j, int e, char* t) {
+    char* nm;
+    char* insn;
+    nm = id_concat(id_concat(id_concat("%s", id_str_of_int(i)), "."), id_str_of_int(j));
+    insn = id_ll_cell_line(i, j, e, t);
+    id_emit_line(id_concat(id_concat(id_concat("  ", nm), " = "), insn));
+    return nm;
+}
+
+char* id_ll_cell_line(int i, int j, int e, char* t) {
+    char* insn;
+    insn = id_concat(id_concat(id_concat(id_concat("ptrtoint ptr @.cs.", (char*)(intptr_t)(id_list_get(enames, i))), "."), id_str_of_int(j)), " to i64");
+    if ((strcmp(t, "float") == 0)) {
+        insn = id_concat(id_concat("call i64 @id_box_f(double ", id_s1_of(e)), ")");
+    }
+    return insn;
+}
+
+void id_ll_init_store(int i) {
+    id_emit_line(id_concat(id_concat(id_concat("  store ptr %c", id_str_of_int(i)), ", ptr @"), (char*)(intptr_t)(id_list_get(enames, i))));
+    id_emit_line(id_concat(id_concat("  call void @id_list_lock(ptr %c", id_str_of_int(i)), ")"));
+    return;
+}
+
+void id_ll_const_init(void) {
+    if ((id_list_consts_kept() > 0)) {
+        id_ll_init_fn();
+    }
+    return;
+}
+
+void id_ll_init_fn(void) {
+    id_ll_init_each("bytes");
+    id_emit_line("define internal void @idc_const_init() {\nentry:");
+    id_ll_init_rest();
+    return;
+}
+
+void id_ll_init_rest(void) {
+    id_ll_init_each("build");
+    id_emit_line("  ret void\n}");
+    return;
 }
 
 void id_ll_global_kept(int i) {
@@ -15765,7 +16041,7 @@ int id_cw_shape(int id) {
     char* rt;
     int ok;
     rt = id_s2_of(id);
-    ok = ((((strcmp(rt, "int") == 0) || (strcmp(rt, "word") == 0)) || (strcmp(rt, "float") == 0)) || (strcmp(rt, "string") == 0));
+    ok = ((((((((strcmp(rt, "int") == 0) || (strcmp(rt, "word") == 0)) || (strcmp(rt, "float") == 0)) || (strcmp(rt, "string") == 0)) || (strcmp(rt, "int[]") == 0)) || (strcmp(rt, "word[]") == 0)) || (strcmp(rt, "float[]") == 0)) || (strcmp(rt, "string[]") == 0));
     if (((id_is_native(id) == 1) || (strcmp(id_s1_of(id), "main") == 0))) {
         ok = 0;
     }
@@ -15792,7 +16068,7 @@ int id_cw_is_lit(char* fp) {
     int tag;
     int ok;
     tag = id_charat(fp, 0);
-    ok = (((tag == 73) || (tag == 70)) || (tag == 83));
+    ok = ((((tag == 73) || (tag == 70)) || (tag == 83)) || (tag == 65));
     return ok;
 }
 
@@ -15836,7 +16112,7 @@ char* id_cw_ret(int id) {
     char* val;
     char* s1_of_v;
     i1_of_v = id_i1_of(id);
-    val = id_canon_expr(i1_of_v);
+    val = id_cw_value_of(i1_of_v);
     if ((strcmp(id_k_of(i1_of_v), "var") == 0)) {
         s1_of_v = id_s1_of(i1_of_v);
         val = id_cw_get(s1_of_v);
@@ -15879,7 +16155,7 @@ int id_cw_put(int id, char* name) {
     char* val;
     int ok;
     i1_of_v = id_i1_of(id);
-    val = id_canon_expr(i1_of_v);
+    val = id_cw_value_of(i1_of_v);
     ok = id_cw_keep(name, val);
     return ok;
 }
@@ -16017,13 +16293,82 @@ char* id_dup_tail2(char* name_j) {
     return ret_s;
 }
 
+int id_cw_arr_lit(int id) {
+    IdList* els;
+    int ok;
+    els = id_l1_of(id);
+    ok = 0;
+    if ((id_list_len(els) > 0)) {
+        ok = id_cw_arr_lit2(els);
+    }
+    return ok;
+}
+
+int id_cw_arr_lit2(IdList* els) {
+    int ok;
+    int i;
+    ok = 1;
+    i = 0;
+    while (((i < id_list_len(els)) && (ok == 1))) {
+        ok = id_cw_arr_elem_lit((int)(id_list_get(els, i)));
+        i = (i + 1);
+    }
+    return ok;
+}
+
+int id_cw_arr_elem_lit(int e) {
+    char* k;
+    int ok;
+    k = id_k_of(e);
+    ok = (((strcmp(k, "int") == 0) || (strcmp(k, "float") == 0)) || (strcmp(k, "str") == 0));
+    return ok;
+}
+
+char* id_cw_arr_spell(int id) {
+    IdList* els;
+    char* out;
+    els = id_l1_of(id);
+    out = id_concat(id_concat("[", id_cw_arr_spell_items(els)), "]");
+    return out;
+}
+
+char* id_cw_arr_spell_items(IdList* els) {
+    char* out;
+    int i;
+    out = "";
+    i = 0;
+    while ((i < id_list_len(els))) {
+        out = id_concat(id_concat(out, id_sep_at(", ", i)), id_cw_elem_spell((int)(id_list_get(els, i))));
+        i = (i + 1);
+    }
+    return out;
+}
+
+char* id_cw_elem_spell(int e) {
+    char* k;
+    char* out;
+    k = id_k_of(e);
+    out = id_s1_of(e);
+    if ((strcmp(k, "str") == 0)) {
+        out = id_concat(id_concat("\"", id_s1_of(e)), "\"");
+    }
+    return out;
+}
+
+char* id_cw_value_of(int e) {
+    char* val;
+    val = id_canon_expr(e);
+    if (((strcmp(id_k_of(e), "arr") == 0) && (id_cw_arr_lit(e) == 1))) {
+        val = id_concat("A", id_cw_arr_spell(e));
+    }
+    return val;
+}
+
 int id_is_reserved_name(int i) {
     char* s1_of_v;
-    IdList* resv_names_v;
     int ok;
     s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
-    resv_names_v = id_resv_names();
-    ok = ((id_find_str(resv_names_v, s1_of_v) >= 0) || (strcmp(s1_of_v, "eprint") == 0));
+    ok = ((id_find_str(resv_names, s1_of_v) >= 0) || (strcmp(s1_of_v, "eprint") == 0));
     return ok;
 }
 
@@ -16046,6 +16391,12 @@ void id_resv_err(int i) {
     prog_loc_v = id_prog_loc(i);
     s1_of_v = id_s1_of((int)(id_list_get(prog, i)));
     id_resv_print(prog_loc_v, s1_of_v);
+    return;
+}
+
+void id_init_resv_names(void) {
+    resv_names = id_list_lit(0);
+    id_split_resv_names(resv_names_src, 0);
     return;
 }
 
@@ -16141,6 +16492,29 @@ void id_dupexp_report(char* loc_at_v, char* s2_of_v) {
     export_owner_v = id_export_owner(s2_of_v);
     id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "'"), s2_of_v), "' is already an exported global (exported by '"), export_owner_v), "')"));
     id_note_failure();
+    return;
+}
+
+void id_split_resv_names(char* src, int i) {
+    while ((i < id_len(src))) {
+        i = id_take_resv_name(src, i);
+    }
+    return;
+}
+
+int id_take_resv_name(char* src, int i) {
+    int e;
+    int ret_i;
+    e = id_bname_end(src, i);
+    id_push_resv_name(src, i, e);
+    ret_i = (e + 1);
+    return ret_i;
+}
+
+void id_push_resv_name(char* src, int i, int e) {
+    char* slice_v;
+    slice_v = id_slice(src, i, e);
+    id_list_push(resv_names, (long long)(intptr_t)(slice_v));
     return;
 }
 
@@ -16292,7 +16666,13 @@ void id_arg_flags5(int argc, IdList* argv) {
 void id_init_rtc(void) {
     rtc = id_list_lit(1, (long long)(0));
     fsc = id_list_lit(1, (long long)(0));
+    id_init_rtc2();
+    return;
+}
+
+void id_init_rtc2(void) {
     id_init_bnames();
+    id_init_resv_names();
     return;
 }
 
@@ -19452,6 +19832,75 @@ char* id_bi_verb(char* want) {
     return s;
 }
 
+void id_chk_call2(int id) {
+    id_chk_const_mut(id);
+    id_chk_callsite(id);
+    id_chk_bi(id);
+    return;
+}
+
+void id_chk_const_mut(int id) {
+    if ((id_is_mut_call(id) == 1)) {
+        id_chk_const_mut2(id);
+    }
+    return;
+}
+
+int id_is_mut_call(int id) {
+    int ok;
+    char* k;
+    char* nm;
+    ok = 0;
+    k = id_k_of(id);
+    if ((strcmp(k, "call") == 0)) {
+        nm = id_s1_of(id);
+        ok = id_is_mut_name(nm);
+    }
+    return ok;
+}
+
+int id_is_mut_name(char* name) {
+    int ok;
+    ok = 0;
+    if (((strcmp(name, "push") == 0) || (strcmp(name, "pop") == 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+void id_chk_const_mut2(int id) {
+    IdList* args;
+    int arg0;
+    char* name;
+    args = id_l1_of(id);
+    arg0 = (int)(id_list_get(args, 0));
+    if ((strcmp(id_k_of(arg0), "import") == 0)) {
+        name = id_s1_of(arg0);
+        id_chk_const_mut3(id, name);
+    }
+    return;
+}
+
+void id_chk_const_mut3(int id, char* name) {
+    int d;
+    char* dt;
+    d = id_const_decl(name);
+    if ((d >= 0)) {
+        dt = id_s1_of(d);
+        if ((id_ty_is_list(dt) == 1)) {
+            id_cml_report(id, name);
+        }
+    }
+    return;
+}
+
+void id_cml_report(int id, char* name) {
+    char* op;
+    op = id_s1_of(id);
+    id_tc_err(id, id_concat(id_concat(id_concat(id_concat("'", op), "' cannot mutate '"), name), "', a list constant; pass it to a function that takes the list as a parameter instead"));
+    return;
+}
+
 void id_arity_err(int id, int fn) {
     char* name;
     char* msg;
@@ -19706,8 +20155,7 @@ void id_chk_call(int id) {
     if ((id_is_push2(id) == 1)) {
         id_chk_push(id);
     }
-    id_chk_callsite(id);
-    id_chk_bi(id);
+    id_chk_call2(id);
     return;
 }
 
