@@ -1,0 +1,11 @@
+fix_refuse_md(int md, int last) {
+  string why = fix_md_why(md);
+  fix_refuse(last, why);
+} return void;
+
+fix_md_why(int md) {
+  string why = "a value that would have to be named is in a while condition, which runs every iteration; a name bound before the loop is computed once -- make the composition a function (docs/SPEC.md 7.1)";
+  if(md == 2) {
+    why = "a value that would have to be named is in an else-if condition, which runs only when every earlier branch was not taken; a name bound before the if is computed anyway -- make the composition a function (docs/SPEC.md 7.1)";
+  }
+} return string why;

@@ -1,0 +1,4 @@
+p.id:11: not fixed: a value that would have to be named is in a while condition
+q.id:2: not fixed: a value that would have to be named is to the right of && or ||
+q.id:10: not fixed: a value that would have to be named is in an else-if condition
+idc --fix: 0 edit(s) in 0 files, 1 run(s)

@@ -1,0 +1,20 @@
+// A call inside a binary expression, beside another call: the left bump runs
+// first, so it has to be named first too.
+mix(int[] c) {
+  int bump_v = bump(c);
+  int bump_v2 = bump(c);
+  int n = bump_v * 10 + twice(bump_v2);
+} return int n;
+
+// Two calls in one argument list.
+pairs(int[] c) {
+  int bump_v = bump(c);
+  int bump_v2 = bump(c);
+  int s = diff(bump_v, bump_v2);
+} return int s;
+
+// A return clause that is an expression with a call in it.
+last(int[] c) {
+  int m = bump(c);
+  int ret_i = m * 100 + bump(c);
+} return int ret_i;

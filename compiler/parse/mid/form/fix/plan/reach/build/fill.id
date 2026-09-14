@@ -1,0 +1,20 @@
+fix_wfill() {
+  int i = 0;
+  while(i < len((import fnames))) {
+    push((import fixd_wm), 0);
+    fix_wrow();
+    i = i + 1;
+  }
+} return void;
+
+fix_wrow() {
+  int[] row = [];
+  push((import fixd_wadj), row);
+} return void;
+
+fix_wedges(int f, int lo) {
+  while(f < len((import prog))) {
+    lo = fix_wfunc(f, lo);
+    f = f + 1;
+  }
+} return void;

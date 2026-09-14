@@ -1,0 +1,28 @@
+// md says how often a statement's expression is evaluated: 0 once, where it
+// stands; 1 a while condition, every iteration; 2 an else-if condition, only
+// when every earlier branch was not taken. A value named before the statement
+// is the same value only for 0.
+
+fix_stmt(int sn, int md) {
+  if(k_of(sn) == "if") {
+    fix_if(sn, md);
+  } else if(k_of(sn) == "while") {
+    fix_while(sn);
+  } else {
+    fix_simple(sn);
+  }
+} return void;
+
+fix_if(int sn, int md) {
+  fix_cond(sn, md);
+  fix_then(sn);
+  fix_else(sn);
+} return void;
+
+// A declaration, an assignment and an expression statement keep their one
+// expression where an if and a while keep their condition.
+fix_cond(int sn, int md) {
+  int c = i1_of(sn);
+  int[] fixp_roots = [c];
+  fix_plan(sn, fixp_roots, md);
+} return void;

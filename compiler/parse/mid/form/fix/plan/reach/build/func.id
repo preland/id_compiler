@@ -1,0 +1,16 @@
+fix_wfunc(int f, int lo) {
+  int ow = fix_owner(f);
+  fix_wrange(lo, (import prog)[f], ow);
+  int ret_i = (import prog)[f] + 1;
+} return int ret_i;
+
+fix_owner(int f) {
+  string s1_of_v = s1_of((import prog)[f]);
+  int ow = fix_fnix(s1_of_v);
+} return int ow;
+
+// A function's index in fnames, through the hash index lookup_func uses.
+fix_fnix(string name) {
+  int b = name_bucket(name);
+  int ix = find_ix((import fnames), (import fidx)[b], name);
+} return int ix;

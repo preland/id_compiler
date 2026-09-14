@@ -1,0 +1,15 @@
+// A return clause that is a call with a call in its arguments: named in one
+// run, and its argument in the next.
+nested(int[] c) {
+  int m = bump(c);
+} return int diff(bump(c), m);
+
+flags(int f) {
+  int ok = f & 4 == 4;
+  print(ok);
+} return void;
+
+// An argument that narrows a word to an int, and is a call inside a call.
+narrow(int[] c) {
+  take(big(c[0]));
+} return void;

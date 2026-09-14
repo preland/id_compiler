@@ -1,0 +1,28 @@
+fix_walk_roots(int[] roots) {
+  int i = 0;
+  while(i < len(roots)) {
+    fix_walk(roots[i], 0, 0, "");
+    i = i + 1;
+  }
+} return void;
+
+// Post-order is evaluation order (docs/SPEC.md 7): an operator's operands left
+// to right and then the operator, a call's arguments left to right and then
+// the call.
+//   ca  1 inside a call's argument   cd  1 right of && or ||
+//   nt  the type to declare, when this node is an argument that narrows
+fix_walk(int e, int ca, int cd, string nt) {
+  int lo = len((import fixe_n));
+  fix_walk_kids(e, ca, cd);
+  fix_push_ev(e, lo, ca, cd, nt);
+} return void;
+
+fix_walk_kids(int e, int ca, int cd) {
+  if(k_of(e) == "call") {
+    fix_walk_args(e, cd);
+  } else if(k_of(e) == "bin" || k_of(e) == "index") {
+    fix_walk_bin(e, ca, cd);
+  } else {
+    fix_walk_more(e, ca, cd);
+  }
+} return void;

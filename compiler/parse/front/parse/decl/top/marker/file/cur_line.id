@@ -23,7 +23,7 @@ init_lines2() {
 // shared store-into-an-imported-list helper is the right answer anyway.
 
 stmt_at_line(int[] pos) {
-  int n = cur_ln(pos);
+  int t0 = pos[0];
   int id = parse_stmt(pos);
-  lset((import nline), id, n);
+  stmt_done(id, t0);
 } return int id;

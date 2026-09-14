@@ -1,0 +1,13 @@
+setat(int[] xs, int i, int v) {
+  xs[i] = v;
+} return void;
+
+// bump cannot run tab_init, so the import is read where it stands.
+keep(int[] c) {
+  setat((import tab), 0, twice(bump(c)));
+} return void;
+
+// again runs tab_init, so the list is read ahead of it, as it was.
+move(int[] c) {
+  setat((import tab), 1, twice(again(c)));
+} return void;

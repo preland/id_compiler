@@ -1,0 +1,27 @@
+// A builtin runs no id code. A call through a function value, or to a name
+// that is no function, could run anything.
+fix_touch_ix(int ci, string name) {
+  int ok = 1;
+  if(ci >= 0) {
+    ok = (import fixd_wm)[ci];
+  } else if(is_builtin(name) == 1) {
+    ok = 0;
+  }
+} return int ok;
+
+// A moved event is declared on its own unless another that moves contains it
+// and carries its text -- except a value that must be named, which is declared
+// on its own wherever it is.
+fix_mark_sep(int last) {
+  int i = 0;
+  while(i <= last) {
+    fix_sep_at(i, last);
+    i = i + 1;
+  }
+} return void;
+
+fix_sep_at(int i, int last) {
+  if((import fixe_mv)[i] == 1 && ((import fixe_cl)[i] == 3 || fix_anc((import fixe_mv), i, last) == 0)) {
+    lset((import fixe_sep), i, 1);
+  }
+} return void;

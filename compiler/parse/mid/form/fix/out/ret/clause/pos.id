@@ -1,0 +1,21 @@
+fix_ret_decl(int f, int e, string t, string name) {
+  string where = fix_ret_pos(f, e);
+  string spn = fix_span(e);
+  print("@D|" + (import fixd_file)[0] + "|" + where + "|" + t + " " + name + " = |" + spn);
+} return void;
+
+// Before the closing brace, indented as the body's last statement is; an empty
+// body gives line 0, and the driver indents one step past the brace.
+fix_ret_pos(int f, int e) {
+  int cb = fix_close(e);
+  int sq = fix_seq();
+  string ret_s = (import tline)[cb] + "|" + fix_col(cb) + "|" + sq + "|" + fix_indent_line(f);
+} return string ret_s;
+
+fix_indent_line(int f) {
+  int[] body = l2_of(f);
+  int n = 0;
+  if(len(body) > 0) {
+    n = (import nline)[body[len(body) - 1]];
+  }
+} return int n;

@@ -1,0 +1,29 @@
+// Every function of the program's own tree -- unit 0, the project named on the
+// command line. Its dependencies and the standard library are never edited.
+// A function's nodes run from just after the previous function's node through
+// its own, as in mid/names/exports/reach/dead/sweep.id.
+
+fix_funcs() {
+  int i = 0;
+  int lo = 0;
+  while(i < len((import prog))) {
+    lo = fix_func_at(i, lo);
+    i = i + 1;
+  }
+} return void;
+
+fix_func_at(int i, int lo) {
+  int f = (import prog)[i];
+  if((import nunit)[f] == 0 && is_native(f) == 0) {
+    fix_func(i, f, lo);
+  }
+  int ret_i = f + 1;
+} return int ret_i;
+
+// Statements first, then the return clause, then parentheses: the last has to
+// know every range the first two replace.
+fix_func(int i, int f, int lo) {
+  fix_enter(i, f, lo);
+  fix_body(f);
+  fix_ret_parens(f, lo);
+} return void;

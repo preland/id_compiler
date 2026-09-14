@@ -1,0 +1,24 @@
+fix_gcl_set() {
+  int i = 0;
+  while(i < len((import ngrp))) {
+    fix_gcl_at(i);
+    i = i + 1;
+  }
+} return void;
+
+// Pairs are recorded inside out, so the outermost is the one that closes last.
+fix_gcl_at(int i) {
+  int n = (import ngrp)[i];
+  if((import ngrpc)[i] > (import fixd_gcl)[n]) {
+    lset((import fixd_gcl), n, (import ngrpc)[i]);
+  }
+} return void;
+
+// The events of one statement, reset by declaring them again (plan/walk/).
+//   fixe_n   each node, in the order it is evaluated
+//   fixe_lo  the index of the first event of its subtree
+fix_ev_reset() {
+  export int[] fixe_n = [];
+  export int[] fixe_lo = [];
+  fix_ev_reset2();
+} return void;

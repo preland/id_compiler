@@ -7,3 +7,23 @@ bump_line() {
   lset((import lexline), 0, (import lexline)[0] + 1);
   print("line " + (import lexline)[0]);
 } return void;
+
+// Column tracking for `idc --fix`, which rewrites source and so has to know
+// where on its line each token starts and ends. The token is printed first and
+// its extent after it, because only once the scanner has returned is the end
+// known; the parser attaches a `span` to the token just before it. The two
+// columns travel as one number, start * 65536 + end (see the parser's
+// front/tokens/load/more/pos/span.id).
+scan_tok_span(string src, int i) {
+  int ni = scan_word(src, i);
+  span_out(src, i, ni);
+} return int ni;
+
+// Only under --cols, so an ordinary build's token stream is unchanged. A `//`
+// comment prints no token, so it prints no span either.
+span_out(string src, int i, int ni) {
+  if((import lexcols)[0] == 1 && is_lcomment(src, i) == 0) {
+    int b = (import lexbol)[0];
+    print("span " + ((i - b) * 65536 + ni - b));
+  }
+} return void;

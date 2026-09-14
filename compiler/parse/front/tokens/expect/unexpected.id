@@ -27,4 +27,5 @@ unexpected_msg(string t) {
 syn_err_tail(string cur_file_v, int cur_ln_v, string msg) {
   print(cur_file_v + ":" + cur_ln_v + ": error: " + msg);
   note_failure();
+  lset((import synfail), 0, 1);
 } return void;

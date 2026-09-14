@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core invalid runtime_invalid self_host_build backends stdlib conform tests_feature idstd_real kernel editor)
+SECTIONS=(core invalid runtime_invalid self_host_build backends stdlib conform tests_feature fix idstd_real kernel editor)
 STATE=../.idc-cache/run-state
 WANTED=()
 resume=0
@@ -1214,6 +1214,18 @@ if want tests_feature; then
     [ "$tst" -eq 0 ] && mark_done tests_feature
 fi
 
+# --- bin/idc --check and --fix: each case's before/ tree, fixed, is its
+#     expect/ tree, a second --fix changes nothing, --check says what a build
+#     says, and a fixed program prints what its hand-fixed twin prints.
+echo
+echo "--- --check and --fix (tests/fix/) ---"
+fixr=0
+if want fix; then
+    ./fix.sh
+    fixr=$?
+    [ "$fixr" -eq 0 ] && mark_done fix
+fi
+
 # --- the REAL standard library against the real projects. Everything above
 #     this line runs with IDC_NO_STD=1 or against a fixture library, which is
 #     what makes it hermetic and what made a whole class of breakage --
@@ -1254,4 +1266,4 @@ fi
 
 [ "$fail" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
     && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$conf" -eq 0 ] \
-    && [ "$tst" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]
+    && [ "$tst" -eq 0 ] && [ "$fixr" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]

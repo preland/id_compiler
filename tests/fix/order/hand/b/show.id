@@ -1,0 +1,17 @@
+show1(int[] c) {
+  int x = mix(c);
+  int y = pairs(c);
+  print_two(x, y);
+} return void;
+
+show2(int[] c) {
+  int x = last(c);
+  int y = nested(c);
+  tail3(c, x, y);
+} return void;
+
+tail3(int[] c, int x, int y) {
+  print_two(x, y);
+  narrow(c);
+  flags(12);
+} return void;

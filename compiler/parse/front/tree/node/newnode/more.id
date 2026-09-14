@@ -2,5 +2,13 @@
 
 newnode_tail(int[] l1, int[] l2) {
   push_ll(l1, l2);
+  push_pos();
   int ret_i = len((import nkind)) - 1;
 } return int ret_i;
+
+// A node's last token, and its first-token slot, which only a statement fills
+// (front/tokens/load/more/pos/stmt.id).
+push_pos() {
+  push((import ntok), (import curtk)[0]);
+  push((import nst), 0 - 1);
+} return void;

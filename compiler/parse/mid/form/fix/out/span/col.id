@@ -1,0 +1,16 @@
+// A token's columns, from the packed spans idlex --cols sends
+// (front/tokens/load/more/pos/span.id); -1 when the token has none.
+fix_packed(int t0) {
+  int v = 0 - 1;
+  if(t0 >= 0 && t0 < len((import tspan))) {
+    v = (import tspan)[t0];
+  }
+} return int v;
+
+fix_col(int t0) {
+  int c = fix_packed(t0) / 65536;
+} return int c;
+
+fix_endc(int t0) {
+  int c = fix_packed(t0) % 65536;
+} return int c;

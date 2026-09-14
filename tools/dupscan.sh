@@ -10,7 +10,7 @@
 # imported tree are separate units, so the rule cannot see the same helper
 # carried in two of them. This closes that gap without a second opinion about
 # what "the same function" means: each project's fingerprints come straight
-# from `idc PATH --fingerprints` (compiler/parse/mid/unique/canon/), the exact
+# from `idc PATH --fingerprints` (compiler/parse/mid/form/unique/canon/), the exact
 # strings the compiler's own uniqueness check compares, prefixed with the
 # project's own basename so tools/dupscan (in `id`) can tell which lines came
 # from where and only report a group that crosses that boundary.

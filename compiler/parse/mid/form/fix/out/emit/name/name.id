@@ -1,0 +1,23 @@
+// A statement's edits: each value that moves is declared before it in the
+// order it was evaluated, and the outermost of them are replaced by their
+// names where they stood.
+fix_emit_stmt(int sn, int last) {
+  fix_names(last);
+  fix_decls(sn, last);
+  fix_resid(last);
+} return void;
+
+fix_names(int last) {
+  int i = 0;
+  while(i <= last) {
+    fix_name_at(i);
+    i = i + 1;
+  }
+} return void;
+
+fix_name_at(int i) {
+  if((import fixe_sep)[i] == 1) {
+    string name = fix_pick(i);
+    sset((import fixe_nm), i, name);
+  }
+} return void;

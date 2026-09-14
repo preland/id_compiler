@@ -1,0 +1,27 @@
+// Whether the names this run introduces take the idstd_ prefix. The standard
+// library spells every parameter and local idstd_<name> (idstd's README.md),
+// and a new local without it would break that rule. Two ways to know: bin/idc
+// passes --fix-std when the project it was given is the standard library it
+// resolved; and a unit whose every parameter and local -- at least one --
+// already carries the prefix is following the rule, wherever it lives.
+fix_std_detect(int argc, string[] argv) {
+  int on = arg_flag(argc, argv, 1, "--fix-std");
+  if(on == 0) {
+    on = fix_std_scan();
+  }
+  lset((import fixd_std), 0, on);
+} return void;
+
+fix_std_scan() {
+  int[] cnt = [0, 0];
+  fix_std_rows(cnt);
+  int ok = cnt[0] > 0 && cnt[1] == 0;
+} return int ok;
+
+fix_std_rows(int[] cnt) {
+  int i = 0;
+  while(i < len((import dvname))) {
+    fix_std_row(i, cnt);
+    i = i + 1;
+  }
+} return void;

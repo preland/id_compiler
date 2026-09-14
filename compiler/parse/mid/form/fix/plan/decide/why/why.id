@@ -1,0 +1,28 @@
+fix_why(int sn, int last) {
+  string why = fix_why_cond(last);
+  if(why == "") {
+    why = fix_why_type(sn, last);
+  }
+} return string why;
+
+fix_why_cond(int last) {
+  int i = 0;
+  string why = "";
+  while(i <= last) {
+    if((import fixe_mv)[i] == 1 && (import fixe_cd)[i] == 1) {
+      why = "a value that would have to be named is to the right of && or ||, which may not evaluate it; a name bound before the statement would be computed anyway -- make the composition a function (docs/SPEC.md 7.1)";
+    }
+    i = i + 1;
+  }
+} return string why;
+
+fix_why_type(int sn, int last) {
+  int i = 0;
+  string why = fix_why_pos(sn);
+  while(i <= last) {
+    if((import fixe_sep)[i] == 1 && fix_type_ok(i) == 0) {
+      why = "the type or the position of a value that would have to be named could not be worked out";
+    }
+    i = i + 1;
+  }
+} return string why;

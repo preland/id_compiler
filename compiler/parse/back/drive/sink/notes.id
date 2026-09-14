@@ -10,7 +10,7 @@
 // report alone -- prints them after its errors instead.
 
 emit_or_notes(int argc, string[] argv) {
-  int do_emit = check_failed() == 0 && arg_flag(argc, argv, 1, "--untested") == 0;
+  int do_emit = check_failed() == 0 && arg_flag(argc, argv, 1, "--untested") == 0 && arg_flag(argc, argv, 1, "--check") == 0;
   if(do_emit == 1) {
     init_tyc();
     emit_all(argc, argv);

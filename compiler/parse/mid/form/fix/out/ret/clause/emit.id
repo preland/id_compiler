@@ -1,0 +1,21 @@
+// The body's closing brace: back from the clause's value, past its type, to
+// `return`, and one more.
+fix_close(int e) {
+  int t0 = fix_nbeg(e) - 1;
+  while(t0 > 0 && ((import tkind)[t0] != "kw" || (import ttext)[t0] != "return")) {
+    t0 = t0 - 1;
+  }
+  int cb = t0 - 1;
+} return int cb;
+
+fix_ret_emit(int f, int e, string t) {
+  string name = fix_ret_name(t);
+  fix_ret_decl(f, e, t, name);
+  fix_replace(e, name);
+} return void;
+
+fix_ret_name(string t) {
+  string sfx = fix_tsuf(t);
+  string bstem = fix_prefixed("ret_" + sfx);
+  string name = fix_choose_base(bstem, "", t);
+} return string name;

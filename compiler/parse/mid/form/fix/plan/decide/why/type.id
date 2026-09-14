@@ -1,0 +1,22 @@
+fix_type_ok(int i) {
+  string t = fix_evtype(i);
+  int ok = 0;
+  if(t != "" && t != "void" && str_find(t, "?") < 0 && ty_is_func(t) == 0) {
+    ok = fix_spanok((import fixe_n)[i]);
+  }
+} return int ok;
+
+// The statement's first token has to have columns, or there is nowhere to put
+// the declarations.
+fix_why_pos(int sn) {
+  string why = "";
+  if((import nst)[sn] < 0 || fix_packed((import nst)[sn]) < 0) {
+    why = "the statement's position in the source is unknown";
+  }
+} return string why;
+
+fix_refuse(int last, string why) {
+  int e = (import fixe_n)[last];
+  int tkn = (import ntok)[e];
+  print("@N|" + (import fixd_file)[0] + "|" + (import tline)[tkn] + "|" + why);
+} return void;

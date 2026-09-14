@@ -1,0 +1,24 @@
+fix_ptype(int e, int i) {
+  string s1_of_v = s1_of(e);
+  int fn = func_node(s1_of_v);
+  string pt = fix_ptype2(e, fn, i);
+} return string pt;
+
+fix_ptype2(int e, int fn, int i) {
+  string pt = "";
+  if(fn >= 0) {
+    pt = fix_pparam(e, fn, i);
+  } else if(is_fcall(e) == 1) {
+    pt = fix_fparam(e, i);
+  }
+} return string pt;
+
+// Only when the count matches: otherwise the checks report that instead and
+// judge no argument.
+fix_pparam(int e, int fn, int i) {
+  int[] ps = l1_of(fn);
+  string pt = "";
+  if(i < len(ps) && len(ps) == flat_arg_count(e)) {
+    pt = s1_of(ps[i]);
+  }
+} return string pt;

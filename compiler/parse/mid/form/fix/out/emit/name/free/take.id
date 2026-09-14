@@ -1,0 +1,23 @@
+fix_take(string name, string t) {
+  push((import fixd_nm), name);
+  push((import fixd_ty), t);
+  push((import fixd_used), name);
+} return void;
+
+fix_prefixed(string stem) {
+  string s = stem;
+  if((import fixd_std)[0] == 1 && str_starts(stem, "idstd_") == 0) {
+    s = "idstd_" + stem;
+  }
+} return string s;
+
+// Free: not a builtin, a function or an export anywhere in the program; not
+// declared anywhere in this function; and in the unit either unused or already
+// this type -- in the tree as it was, and among the names this run gave.
+// A keyword is never a candidate: every one ends in _v or starts with ret_.
+fix_free(string name, string t) {
+  int ok = fix_free_fn(name);
+  if(ok == 1) {
+    ok = fix_free_var(name, t);
+  }
+} return int ok;

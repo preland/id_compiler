@@ -1,0 +1,27 @@
+fix_unsafe_rhs(int e) {
+  int b = i2_of(e);
+  int ok = 1;
+  if(k_of(b) == "int" && i1_of(b) > 0 && i2_of(b) == 0) {
+    ok = 0;
+  }
+} return int ok;
+
+// The parameter type an argument narrows to, or "". The test the call checks
+// make (mid/types/check/expr/call/args/err/typecheck.id, and callsite/fcall/
+// for a call through a value): not a bad store, and a narrowing. The local the
+// fix declares converts as the argument would: C converts an argument to its
+// parameter's type as if by assignment (C11 6.5.2.2p7), which is what the
+// declaration does, and an argument that narrows is the one conversion `id`
+// asks to see written (docs/SPEC.md 1).
+fix_narrow(int e, int i, int a) {
+  string pt = fix_ptype(e, i);
+  string t = "";
+  if(pt != "" && bad_store(pt, a) == 0 && fix_narrows(pt, a) == 1) {
+    t = pt;
+  }
+} return string t;
+
+fix_narrows(string pt, int a) {
+  string type_of_v = type_of(a);
+  int ok = ty_narrows(pt, type_of_v);
+} return int ok;

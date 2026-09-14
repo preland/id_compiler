@@ -1,0 +1,25 @@
+// Per function, reset by running this again (run/walk/enter.id):
+//   fixd_used         every name the function declares, and each new one
+//   fixd_lo, fixd_hi  the token ranges this run replaces, so that no other
+//                     edit lands inside text that is going away
+fix_state3() {
+  export string[] fixd_used = [];
+  export int[] fixd_lo = [];
+  export int[] fixd_hi = [];
+} return void;
+
+// fixd_gcl: the closing parenthesis of the outermost grouping parentheses
+// written around each node, or -1.
+fix_gcl() {
+  export int[] fixd_gcl = [];
+  fix_gcl_fill();
+  fix_gcl_set();
+} return void;
+
+fix_gcl_fill() {
+  int i = 0;
+  while(i < len((import nkind))) {
+    push((import fixd_gcl), 0 - 1);
+    i = i + 1;
+  }
+} return void;

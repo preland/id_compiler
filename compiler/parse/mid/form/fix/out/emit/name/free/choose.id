@@ -1,0 +1,20 @@
+fix_choose(string stem, string t) {
+  string bstem = fix_prefixed(stem);
+  string name = fix_choose_base(bstem, "_v", t);
+} return string name;
+
+fix_choose_base(string bstem, string sfx, string t) {
+  string name = fix_try(bstem, sfx, t);
+  fix_take(name, t);
+} return string name;
+
+// <stem>_v, then <stem>_v2, <stem>_v3: the numbering the tree already uses for
+// a second value of the same call. ret_i, then ret_i2, the same way.
+fix_try(string bstem, string sfx, string t) {
+  string name = bstem + sfx;
+  int nn = 1;
+  while(fix_free(name, t) == 0) {
+    nn = nn + 1;
+    name = bstem + sfx + nn;
+  }
+} return string name;

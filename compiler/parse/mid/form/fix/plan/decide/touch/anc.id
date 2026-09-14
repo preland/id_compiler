@@ -1,0 +1,23 @@
+// Whether an event after i, up to hi, is flagged in fl and contains i.
+fix_anc(int[] fl, int i, int hi) {
+  int j = i + 1;
+  int ok = 0;
+  while(j <= hi) {
+    ok = fix_anc_at(fl, i, j, ok);
+    j = j + 1;
+  }
+} return int ok;
+
+fix_anc_at(int[] fl, int i, int j, int ok) {
+  int r = ok;
+  if(fl[j] == 1 && (import fixe_lo)[j] <= i) {
+    r = 1;
+  }
+} return int r;
+
+fix_evtype(int i) {
+  string t = (import fixe_nt)[i];
+  if(t == "") {
+    t = type_of((import fixe_n)[i]);
+  }
+} return string t;

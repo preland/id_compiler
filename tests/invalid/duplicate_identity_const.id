@@ -1,7 +1,7 @@
 // EXPECT: same signature and logic as
 // IDCPY-ACCEPTS
 // `a + 0` is `a`: an identity operation over an integer literal fingerprints
-// as its surviving operand (compiler/parse/mid/unique/canon/expr/more/const),
+// as its surviving operand (compiler/parse/mid/form/unique/canon/expr/more/const),
 // so this is the same duplicate the `a` vs `a + 1` case in duplicate_logic.id
 // is, one op away. idc.py has no such rule and keeps the two functions
 // distinct.

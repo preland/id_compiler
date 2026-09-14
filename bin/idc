@@ -26,6 +26,9 @@
 # Usage:
 #   bin/idc PATH [-o OUTPUT] [--emit-c FILE] [--keep-c] [--cc CC]
 #           [--backend DIR]... [--triple TRIPLE]
+#   bin/idc PATH --check     the rules only: no C, no cc, no cases, no link
+#   bin/idc PATH --fix       rewrite PATH's own .id files to resolve what has
+#                            one mechanical, behaviour-preserving repair
 #
 # PATH is a single .id file or a project directory (its whole .id tree, in
 # the same sorted-full-path order idc.py uses).
@@ -38,7 +41,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 IDC_PY="$ROOT/idc.py"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--check] [--fix]" >&2
 }
 
 PATH_ARG=""
@@ -59,6 +62,8 @@ ALLOW_UNTESTED=0
 LIST_UNTESTED=0
 EMIT_SOURCES=0
 FINGERPRINTS=0
+CHECK=0
+FIX=0
 NO_STD=0
 STD_DIR=""
 BACKENDS=()          # from --backend flags: an override, or a backend of its own
@@ -98,6 +103,10 @@ while [ $# -gt 0 ]; do
             EMIT_SOURCES=1; shift ;;
         --fingerprints)
             FINGERPRINTS=1; shift ;;
+        --check)
+            CHECK=1; shift ;;
+        --fix)
+            FIX=1; shift ;;
         --no-std)
             NO_STD=1; shift ;;
         --std)
@@ -880,6 +889,10 @@ if [ "$FINGERPRINTS" -eq 1 ]; then
     PARSE_ARGS+=(--fingerprints)
 elif [ "$LIST_UNTESTED" -eq 1 ]; then
     PARSE_ARGS+=(--require-tests --untested)
+elif [ "$FIX" -eq 1 ]; then
+    PARSE_ARGS+=(--fixes)
+elif [ "$CHECK" -eq 1 ]; then
+    PARSE_ARGS+=(--check)
 else
     PARSE_ARGS+=(--harness)
     PARSE_ARGS+=(--natives)
@@ -952,8 +965,19 @@ if [ "$EMIT_SOURCES" -eq 1 ]; then
     exit_ok
 fi
 
+# --fix needs each token's columns (idlex --cols), and --fix-std when the
+# project it rewrites is the standard library this build resolved, whose locals
+# all take the idstd_ prefix (compiler/parse/mid/form/fix/plan/reach/std/).
+LEX_ARGS=()
+if [ "$FIX" -eq 1 ]; then
+    LEX_ARGS=(--cols)
+    if [ -n "$STDLIB" ] && [ -d "$PATH_ARG" ] && [ "$(cd "$PATH_ARG" && pwd -P)" = "$STDLIB" ]; then
+        PARSE_ARGS+=(--fix-std)
+    fi
+fi
+
 progress compile "$(plural "${#SRC_FILES[@]}" file) -> tokens -> C"
-emit_sources | capped "$IDLEX" 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
+emit_sources | capped "$IDLEX" ${LEX_ARGS[@]+"${LEX_ARGS[@]}"} 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
 rc=("${PIPESTATUS[@]}")
 lex_rc="${rc[1]}"
 parse_rc="${rc[2]}"
@@ -987,6 +1011,120 @@ if mem_ceiling_hit "$parse_rc" "$PARSE_ERR"; then
     progress_clear
     mem_ceiling_error "idparse"
     exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# --fix: idparse --fixes prints, after the diagnostics, the edits that resolve
+# the violations with one mechanical, behaviour-preserving repair, and a
+# refusal for each that looks repairable but is not
+# (compiler/parse/mid/form/fix/run/entry.id has the format). They are applied
+# with tools/fixapply.awk and the tree is checked again, until a run finds
+# nothing more to edit: a return clause named in one run can hold a call that
+# must be named in the next, and each run's edits are computed against the
+# source as that run read it. What is left is then reported, as it stands.
+FIX_MAX_ROUNDS=16
+declare -A FIX_SNAP=()
+FIX_ORDER=()
+
+fix_stage_ok() {
+    if [ "$lex_rc" -ne 0 ] || { [ "$parse_rc" -ne 0 ] && [ "$parse_rc" -ne 1 ]; }; then
+        progress_clear
+        [ -s "$LEX_ERR" ] && cat "$LEX_ERR" >&2
+        [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+        compiler_bug "idlex or idparse failed on this input"
+    fi
+    if mem_ceiling_hit "$parse_rc" "$PARSE_ERR"; then
+        progress_clear
+        mem_ceiling_error "idparse"
+        exit 1
+    fi
+}
+
+# fix_file FILE -- apply this run's edits for FILE, keeping its original the
+# first time it is touched so the report can show every edit against it. Only a
+# file of the project itself may be named; anything else is the compiler's bug.
+fix_file() {
+    local f="$1" snap
+    case "$f" in
+        "$PATH_ARG"|"${PATH_ARG%/}"/*) ;;
+        *) compiler_bug "idparse --fixes named a file outside $PATH_ARG: $f" ;;
+    esac
+    [ -f "$f" ] || compiler_bug "idparse --fixes named a file that does not exist: $f"
+    if [ -z "${FIX_SNAP[$f]:-}" ]; then
+        snap="$WORK/snap.${#FIX_ORDER[@]}"
+        cp "$f" "$snap" || exit 1
+        FIX_SNAP[$f]="$snap"
+        FIX_ORDER+=("$f")
+    fi
+    awk -F'|' -v f="$f" '$2 == f' "$WORK/edits" > "$WORK/edits.one"
+    LC_ALL=C awk -v efile="$WORK/edits.one" -f "$ROOT/tools/fixapply.awk" "$f" > "$WORK/fixed" \
+        || compiler_bug "idparse --fixes gave overlapping edits for $f"
+    cat "$WORK/fixed" > "$f" || exit 1
+}
+
+# Every edit, as FILE:LINE with the lines before and after it.
+fix_report_edits() {
+    local f
+    for f in ${FIX_ORDER[@]+"${FIX_ORDER[@]}"}; do
+        diff -U0 "${FIX_SNAP[$f]}" "$f" | awk -v f="$f" '
+            /^(---|\+\+\+) / { next }
+            /^@@/ { split($2, o, ","); n = substr(o[1], 2) + 0
+                    if (o[2] == "0") n++
+                    print f ":" n; next }
+            { print "  " $0 }'
+    done
+}
+
+# What was not fixed: each refusal with its reason, then every diagnostic left,
+# counted by kind -- the message with its names and numbers taken out.
+fix_report_rest() {
+    local nedits=0 f
+    for f in ${FIX_ORDER[@]+"${FIX_ORDER[@]}"}; do
+        nedits=$((nedits + $(diff -U0 "${FIX_SNAP[$f]}" "$f" | grep -c '^@@')))
+    done
+    echo "idc --fix: $nedits edit(s) in $(plural "${#FIX_ORDER[@]}" file), $1 run(s)"
+    grep '^@N|' "$RAW_OUT" | awk -F'|' '{ r = $0; sub(/^@N\|[^|]*\|[^|]*\|/, "", r)
+        if ($2 == "") print "not fixed: " r; else print $2 ":" $3 ": not fixed: " r }'
+    grep -v '^@' "$RAW_OUT" > "$WORK/left"
+    if [ -s "$WORK/left" ]; then
+        echo "left for a person ($(wc -l < "$WORK/left") diagnostic(s)), by kind:"
+        sed -E 's/^[^ ]*:[0-9]+: (error|note): //' "$WORK/left" \
+            | sed -E "s/'[^']*'/'_'/g; s/[0-9]+/N/g" | LC_ALL=C sort | uniq -c | sort -rn
+    fi
+}
+
+run_fix() {
+    local round=0 rc
+    while :; do
+        fix_stage_ok
+        grep -E '^@[RD]\|' "$RAW_OUT" > "$WORK/edits"
+        [ -s "$WORK/edits" ] || break
+        round=$((round + 1))
+        if [ "$round" -gt "$FIX_MAX_ROUNDS" ]; then
+            progress_clear
+            echo "idc: --fix still found edits after $FIX_MAX_ROUNDS runs; stopping, which is a bug in the fixes" >&2
+            STRUCT_VIOLATIONS=1
+            break
+        fi
+        cut -d'|' -f2 "$WORK/edits" | LC_ALL=C sort -u > "$WORK/files"
+        while IFS= read -r f; do fix_file "$f"; done < "$WORK/files"
+        progress fix "run $((round + 1))"
+        emit_sources | capped "$IDLEX" --cols 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
+        rc=("${PIPESTATUS[@]}")
+        lex_rc="${rc[1]}"
+        parse_rc="${rc[2]}"
+    done
+    progress_clear
+    fix_report_edits
+    fix_report_rest "$((round + 1))"
+    grep -v '^@' "$RAW_OUT" >&2
+    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    [ "$parse_rc" -eq 1 ] && exit 1
+    exit_ok
+}
+
+if [ "$FIX" -eq 1 ]; then
+    run_fix
 fi
 
 # --fingerprints is a report about the parsed program, not a build of it, so
@@ -1049,6 +1187,21 @@ if [ "$parse_rc" -eq 1 ]; then
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
     rm -f "$RAW_OUT"
     exit 1
+fi
+
+# --check stops here. A program that broke a rule has just been reported by the
+# same lines a build uses; one that did not has only its exemption notes, which
+# a build prints before running any case (split_harness, below).
+if [ "$CHECK" -eq 1 ]; then
+    progress_clear
+    if [ "$lex_rc" -ne 0 ] || [ "$parse_rc" -ne 0 ]; then
+        [ -s "$LEX_ERR" ] && cat "$LEX_ERR" >&2
+        [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+        compiler_bug "idlex or idparse failed on this input"
+    fi
+    [ -s "$RAW_OUT" ] && cat "$RAW_OUT" >&2
+    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    exit_ok
 fi
 
 if [ "$lex_rc" -ne 0 ] || [ "$parse_rc" -ne 0 ] || [ ! -s "$RAW_OUT" ]; then

@@ -6,7 +6,7 @@
 // that demos/galaxy, republic_beta and idstd each carried the same lset. This
 // closes that gap, and it does it without a second opinion about what "the
 // same function" means -- the fingerprints it reads are the compiler's own,
-// printed by `idc PATH --fingerprints` (mid/unique/canon/). A tool that
+// printed by `idc PATH --fingerprints` (mid/form/unique/canon/). A tool that
 // re-derived them could disagree with the compiler, which for a tool whose
 // whole job is finding duplicated logic would be its own punchline.
 //

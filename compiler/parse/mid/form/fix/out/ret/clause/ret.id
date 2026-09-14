@@ -1,0 +1,24 @@
+// A return clause that is not a name or a literal: its value is declared as
+// the body's last statement, which runs exactly where the clause did, and the
+// clause returns the name -- ret_i, ret_s, ret_li, the tree's own names.
+fix_ret(int f) {
+  int e = i1_of(f);
+  if(e >= 0 && is_plain(e) == 0) {
+    fix_ret_at(f, e);
+  }
+} return void;
+
+fix_ret_at(int f, int e) {
+  string t = s2_of(f);
+  if(fix_ret_ok(e) == 1) {
+    fix_ret_emit(f, e, t);
+  }
+} return void;
+
+fix_ret_ok(int e) {
+  int cb = fix_close(e);
+  int ok = 0;
+  if(cb >= 0 && fix_spanok(e) == 1 && fix_packed(cb) >= 0) {
+    ok = 1;
+  }
+} return int ok;

@@ -1,0 +1,21 @@
+fix_simple(int sn) {
+  if(k_of(sn) == "iassign") {
+    fix_iassign(sn);
+  } else if(k_of(sn) == "decl" || k_of(sn) == "assign" || k_of(sn) == "exprstmt") {
+    fix_cond(sn, 0);
+  }
+} return void;
+
+// `xs[i] = v` evaluates the list, then the index, then the value (docs/SPEC.md 7).
+fix_iassign(int sn) {
+  int[] vl = l1_of(sn);
+  int[] fixp_roots = [i1_of(sn), i2_of(sn), vl[0]];
+  fix_plan(sn, fixp_roots, 0);
+} return void;
+
+// One statement: its events in evaluation order, then what moves.
+fix_plan(int sn, int[] roots, int md) {
+  fix_ev_reset();
+  fix_walk_roots(roots);
+  fix_decide(sn, md);
+} return void;

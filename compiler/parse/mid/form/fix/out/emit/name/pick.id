@@ -1,0 +1,24 @@
+fix_pick(int i) {
+  string t = fix_evtype(i);
+  string stem = fix_stem((import fixe_n)[i]);
+  string name = fix_choose(stem, t);
+} return string name;
+
+// The tree's convention: a call's value is <callee>_v. A value that is not a
+// call is named after what it reads first -- a list, an import, a variable.
+fix_stem(int e) {
+  string s = fix_stem2(e);
+  if(k_of(e) == "index" || k_of(e) == "bin" || k_of(e) == "un") {
+    int a = i1_of(e);
+    s = fix_stem(a);
+  }
+} return string s;
+
+fix_stem2(int e) {
+  string s = s1_of(e);
+  if(k_of(e) == "arr") {
+    s = "list";
+  } else if(k_of(e) == "int" || k_of(e) == "float" || k_of(e) == "str") {
+    s = "lit";
+  }
+} return string s;

@@ -1,0 +1,20 @@
+fix_tletter(string tb) {
+  string tl = fix_tletter2(tb);
+  if(tb == "word") {
+    tl = "w";
+  } else if(tb == "float") {
+    tl = "f";
+  }
+} return string tl;
+
+fix_tletter2(string tb) {
+  string tl = "i";
+  if(tb == "string") {
+    tl = "s";
+  }
+} return string tl;
+
+fix_ret_parens(int f, int lo) {
+  fix_ret(f);
+  fix_parens(lo, f);
+} return void;

@@ -1,0 +1,15 @@
+nested(int[] c) {
+  int m = bump(c);
+  int k = bump(c);
+  int r = diff(k, m);
+} return int r;
+
+flags(int f) {
+  int ok = (f & 4) == 4;
+  print(ok);
+} return void;
+
+narrow(int[] c) {
+  int n = big(c[0]);
+  take(n);
+} return void;

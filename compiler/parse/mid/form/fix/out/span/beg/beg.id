@@ -1,0 +1,27 @@
+// Where each kind of node begins: a call at its name, before the parenthesis
+// matching its last token; a list literal at the bracket matching its last; an
+// index or an operator where its left operand does; a unary operator one token
+// before its operand; `import name` at `import`; anything else is one token.
+fix_ibeg(int e) {
+  int t0 = fix_ibeg2(e);
+  if(k_of(e) == "call") {
+    int c = (import ntok)[e];
+    t0 = fix_match(c, "(", ")") - 1;
+  }
+} return int t0;
+
+fix_ibeg2(int e) {
+  int t0 = fix_ibeg3(e);
+  if(k_of(e) == "arr") {
+    int c = (import ntok)[e];
+    t0 = fix_match(c, "[", "]");
+  }
+} return int t0;
+
+fix_ibeg3(int e) {
+  int t0 = fix_ibeg4(e);
+  if(k_of(e) == "index" || k_of(e) == "bin") {
+    int a = i1_of(e);
+    t0 = fix_nbeg(a);
+  }
+} return int t0;

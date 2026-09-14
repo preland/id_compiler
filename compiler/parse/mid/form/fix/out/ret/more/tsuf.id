@@ -1,0 +1,19 @@
+// The type part of a return name: one l per list level, then a letter for the
+// element type -- ret_i, ret_li, ret_s, ret_lli.
+fix_tsuf(string t) {
+  string[] fixt_st = [t, ""];
+  fix_tstrip(fixt_st);
+  string ret_s = fixt_st[1] + fix_tletter(fixt_st[0]);
+} return string ret_s;
+
+fix_tstrip(string[] fixt_st) {
+  while(str_ends(fixt_st[0], "[]") == 1) {
+    fix_tstep(fixt_st);
+  }
+} return void;
+
+fix_tstep(string[] fixt_st) {
+  int n = len(fixt_st[0]) - 2;
+  fixt_st[0] = slice(fixt_st[0], 0, n);
+  fixt_st[1] = fixt_st[1] + "l";
+} return void;

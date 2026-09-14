@@ -1,0 +1,23 @@
+// Whether a call that moves could run a function that declares an export,
+// which is the only way an import read's value can change (docs/SPEC.md 9).
+fix_touches(int last) {
+  int i = 0;
+  int ok = 0;
+  while(i <= last) {
+    ok = fix_touch_at(i, ok);
+    i = i + 1;
+  }
+} return int ok;
+
+fix_touch_at(int i, int ok) {
+  int r = ok;
+  if((import fixe_mv)[i] == 1 && k_of((import fixe_n)[i]) == "call") {
+    r = r | fix_call_touch((import fixe_n)[i]);
+  }
+} return int r;
+
+fix_call_touch(int e) {
+  string s1_of_v = s1_of(e);
+  int ci = fix_fnix(s1_of_v);
+  int ok = fix_touch_ix(ci, s1_of_v);
+} return int ok;
