@@ -13,9 +13,10 @@
 //
 // It sits with the duplicate-NAME check because it is the same kind of rule:
 // both say a name is already taken, and both are decided from the function
-// name alone. resv_names() is generated from idc.py's RUNTIME by
-// tools/gen_runtime_id.py, so the list cannot drift from the prelude it
-// describes.
+// name alone. resv_names_src (compiler/parse/conf.id) is generated from
+// idc.py's RUNTIME by tools/gen_runtime_id.py, so the list cannot drift from
+// the prelude it describes; init_resv_names splits it into resv_names, the
+// way init_bnames splits builtin_src (exports/extern/builtin/more/names.id).
 
 // Not asked of the runtime itself: `--runtime` says this project IS the
 // implementation of those helpers, so a function named `str_of_int` here is
@@ -30,4 +31,9 @@ resv_err(int i) {
   string prog_loc_v = prog_loc(i);
   string s1_of_v = s1_of((import prog)[i]);
   resv_print(prog_loc_v, s1_of_v);
+} return void;
+
+init_resv_names() {
+  export string[] resv_names = [];
+  split_resv_names((import resv_names_src), 0);
 } return void;

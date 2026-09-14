@@ -342,19 +342,19 @@ done
                     || bad "an unreachable function still obeys the export rules"
 
 # -- 16. the reserved-name list has not drifted from the runtime -----------
-# resv_names() in the self-hosted compiler is generated from idc.py's RUNTIME
-# by tools/gen_runtime_id.py. If someone adds a helper to the prelude and does
-# not regenerate, the two compilers stop agreeing about which names are taken
-# -- one accepts a program the other rejects. Regenerating is a command; this
-# is what makes forgetting it a test failure.
+# resv_names_src, in compiler/parse/conf.id, is generated from idc.py's
+# RUNTIME by tools/gen_runtime_id.py. If someone adds a helper to the prelude
+# and does not regenerate, the two compilers stop agreeing about which names
+# are taken -- one accepts a program the other rejects. Regenerating is a
+# command; this is what makes forgetting it a test failure.
 python3 - "$ROOT" <<'PY' >"$TMP/drift" 2>&1
 import os, re, sys
 root = sys.argv[1]
 sys.path.insert(0, root)
 import idc
-gen = os.path.join(root, "compiler", "parse",
-                   "back", "tgt", "c", "runtime", "reserved.gen.id")
-listed = set(re.findall(r'"([a-z_0-9]+)"', open(gen).read()))
+conf = os.path.join(root, "compiler", "parse", "conf.id")
+m = re.search(r'string resv_names_src = "([^"]*)"', open(conf).read())
+listed = set(m.group(1).split()) if m else set()
 if listed == set(idc.RUNTIME_HELPERS):
     print("OK")
 else:

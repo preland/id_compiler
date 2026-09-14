@@ -1,0 +1,22 @@
+// resv_names, split out of resv_names_src (compiler/parse/conf.id) the way
+// init_bnames splits builtin_src into bnames
+// (../../extern/builtin/more/names.id) -- bname_end is reused rather than
+// walked again here, since it only finds the next space and is not tied to
+// bnames at all.
+
+split_resv_names(string src, int i) {
+  while(i < len(src)) {
+    i = take_resv_name(src, i);
+  }
+} return void;
+
+take_resv_name(string src, int i) {
+  int e = bname_end(src, i);
+  push_resv_name(src, i, e);
+  int ret_i = e + 1;
+} return int ret_i;
+
+push_resv_name(string src, int i, int e) {
+  string slice_v = slice(src, i, e);
+  push((import resv_names), slice_v);
+} return void;
