@@ -1,0 +1,4 @@
+fix_pick(int i) {
+  string t = fix_evtype(i);
+  string name = fix_pick_name(i, t);
+} return string name;

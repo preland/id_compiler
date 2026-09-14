@@ -9,3 +9,25 @@ fix_rcache_taint(int e) {
     fix_rcache_reset();
   }
 } return void;
+given fix_rcache_taint_fixture ((import rt_e1)):() then calls fix_rcache_reset:[1]
+given fix_rcache_taint_fixture ((import rt_e2)):() then calls fix_rcache_reset:[0]
+
+// A call to a name that is no function of this build (an unregistered
+// callee, plan/reach/build/func.id's fix_fnix) could run anything, so it
+// touches; a call to a builtin (len) never runs id code, so it does not
+// (fix_touch_ix, plan/decide/touch/anc.id).
+fix_rcache_taint_fixture() {
+  fix_fixture();
+  int e1 = node_call("unknownfn", [0 - 1]);
+  fix_rcache_taint_fixture2(e1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fix_rcache_taint_fixture2(int e1) {
+  int e2 = node_call("len", [0 - 1]);
+  export int rt_e1 = e1;
+  export int rt_e2 = e2;
+} return void;
+given fix_rcache_taint_fixture (0):() then check_failed:(0)
+given fix_rcache_taint_fixture (0):() then init_units:(0)

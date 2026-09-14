@@ -3,6 +3,8 @@ fix_rkey(int e) {
   int c = fix_nend(e);
   string key = fix_toktext(b, c);
 } return string key;
+given fix_span_fixture ((import sp_e)):("|len|(|)")
+given fix_rkey_fixture_leaf (0):("|7")
 
 fix_toktext(int tok0, int tok1) {
   string s = "";
@@ -12,3 +14,13 @@ fix_toktext(int tok0, int tok1) {
     toki = toki + 1;
   }
 } return string s;
+given fix_toktext_fixture (0, 1):("|a|b")
+given fix_toktext_fixture (0, 0):("|a")
+
+fix_toktext_fixture() {
+  env_init();
+  push((import ttext), "a");
+  push((import ttext), "b");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

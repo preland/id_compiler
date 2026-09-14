@@ -12,6 +12,8 @@ fix_rcache_add(int i, string name) {
     push((import fixd_rn), name);
   }
 } return void;
+given fix_pick_fixture_n (0, "x"):() then calls fix_rkey:[0]
+given fix_span_fixture (0, "x"):() then calls fix_rkey:[1]
 
 // fixd_rk, fixd_rn: the cached calls' text and the name each was given, this
 // function's alone (run/state/grp/reset.id) -- and cleared early by any call
@@ -21,3 +23,17 @@ fix_rcache_reset() {
   export string[] fixd_rk = [];
   export string[] fixd_rn = [];
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
+
+// The two token kinds fix_depth (out/span/beg/beg.id's fix_match) reads while
+// backing up from a call's closing paren to its name: "ident" for the name
+// itself, "op" for each parenthesis (plan/walk/ev/push/one/ru.id's
+// fix_span_fixture onward).
+fix_span_fixture3(int e) {
+  push((import tkind), "ident");
+  push((import tkind), "op");
+  fix_span_fixture4(e);
+} return void;
+given fix_span_fixture (0):() then check_failed:(0)
+given fix_span_fixture (0):() then init_units:(0)

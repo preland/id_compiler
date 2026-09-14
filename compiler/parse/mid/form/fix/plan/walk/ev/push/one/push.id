@@ -11,3 +11,12 @@ fix_push_rest(int e, int lo, int cl, int cd, string nt, string an) {
   fix_push4(cd, nt);
   fix_push_ru(an);
 } return void;
+given fix_fixture (0, 5, 3, 1, "int", "myname"):() then fix_walk_arg2_an0:("myname") then fix_pr_cl0:(3)
+given fix_fixture (7, 2, 0, 0, "", ""):() then fix_walk_arg2_an0:("") then fix_pr_cl0:(0)
+
+// fixe_cl[0], the class fix_push3 (plan/walk/ev/push/base.id) recorded --
+// alongside fixe_an[0] (kids/bin.id's fix_walk_arg2_an0), the two fields
+// fix_push_rest's own three pushes are split across.
+fix_pr_cl0() {
+  int n = (import fixe_cl)[0];
+} return int n;

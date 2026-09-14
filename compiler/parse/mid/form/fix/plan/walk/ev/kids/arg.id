@@ -10,3 +10,17 @@ fix_walk_arg2(int e, int i, int a, int cd, string nt) {
   string an = s1_of(e) + "_a" + i;
   fix_walk(a, 1, cd, nt, an);
 } return void;
+given fix_walk_arg2_fixture ((import wa2_e1), 0, (import wa2_e1), 0, ""):() then fix_walk_arg2_an0:("caller_a0")
+given fix_walk_arg2_fixture ((import wa2_e2), 2, (import wa2_e2), 0, ""):() then fix_walk_arg2_an0:("other_a2")
+
+// A leaf node with a one-token span (out/emit/name/pick/reuse/key.id's
+// fix_rkey), simpler than a call's (plan/walk/ev/push/one/ru.id's
+// fix_span_fixture): fix_ibeg takes an "int" node's own last token as its
+// first too, with no closing paren to back up from.
+fix_rkey_fixture_leaf() {
+  fix_fixture();
+  int e = node_int("7", 7, 0);
+  fix_rkey_fixture_leaf2(e);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

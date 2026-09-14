@@ -5,6 +5,8 @@ fix_gcl() {
   fix_gcl_fill();
   fix_gcl_set();
 } return void;
+given env_init ():() then check_failed:(0)
+given fix_gcl_nodes ():() then check_failed:(0)
 
 fix_gcl_fill() {
   int i = 0;
@@ -13,3 +15,15 @@ fix_gcl_fill() {
     i = i + 1;
   }
 } return void;
+given fix_fixture ():() then check_failed:(0)
+given fix_gcl_fill_fixture ():() then check_failed:(0)
+
+// Two nodes, so fix_gcl's own cases have something other than an empty tree
+// to size fixd_gcl against.
+fix_gcl_nodes() {
+  env_init();
+  int e1 = node_int("1", 1, 0);
+  int e2 = node_int("2", 2, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -5,3 +5,23 @@ fix_push_ru(string an) {
   push((import fixe_an), an);
   push((import fixe_ru), 0);
 } return void;
+
+// A call node with a real 3-token span ("len", "(", ")"), for a case that
+// needs fix_rkey (out/emit/name/pick/reuse/key.id) to produce a real key.
+// Every node gets its ntok entry automatically, from curtk (front/tokens/
+// load/more/pos/stamp.id's push_pos) at the moment it is built -- so curtk is
+// set first, to the closing paren's index, rather than backfilled after.
+fix_span_fixture() {
+  fix_fixture();
+  lset((import curtk), 0, 2);
+  fix_span_fixture1();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fix_span_fixture2(int e) {
+  push((import fixd_gcl), 0 - 1);
+  fix_span_fixture3(e);
+} return void;
+given fix_span_fixture (0):() then check_failed:(0)
+given fix_span_fixture (0):() then init_units:(0)

@@ -6,3 +6,23 @@ fix_walk_arr(int e, int cd) {
     i = i + 1;
   }
 } return void;
+
+// Two more nodes on top of fix_fixture's own (run/state/grp/gcl.id's
+// fix_gcl_fill case): fixd_gcl is fix_gcl's alone to export, already used up
+// by fix_fixture's own call to it, so a case that wants fix_gcl_fill to have
+// something to fill just gives it more of the tree to size against.
+fix_gcl_fill_fixture() {
+  fix_fixture();
+  int e1 = node_int("1", 1, 0);
+  int e2 = node_int("2", 2, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fix_rkey_fixture_leaf2(int e) {
+  push((import ntok), 0);
+  push((import fixd_gcl), 0 - 1);
+  push((import ttext), "7");
+} return void;
+given fix_rkey_fixture_leaf (0):() then check_failed:(0)
+given fix_rkey_fixture_leaf (0):() then init_units:(0)

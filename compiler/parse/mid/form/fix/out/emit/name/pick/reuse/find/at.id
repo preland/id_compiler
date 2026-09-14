@@ -1,0 +1,15 @@
+fix_rcache_find_at(int ix) {
+  string name = "";
+  if(ix >= 0) {
+    name = (import fixd_rn)[ix];
+  }
+} return string name;
+given fix_fixture (-1):("")
+given fix_rcache_find_at_fixture (0):("cached")
+
+fix_rcache_find_at_fixture() {
+  fix_fixture();
+  push((import fixd_rn), "cached");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

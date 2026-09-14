@@ -1,0 +1,32 @@
+// A general fixture for a --fix function's own cases: everything fix_init
+// (run/entry.id) builds before walking a function -- state.id's tables, the
+// event arrays a statement's walk fills (run/state/more.id's fix_ev_reset),
+// the builtin names is_builtin reads, and the symbol index lookup_var needs
+// (mid/names/symbols/lookup/index/table/more/init.id) -- minus fix_wbuild and
+// fix_std_detect, which only a reachability or idstd-naming case needs of its
+// own.
+fix_fixture() {
+  env_init();
+  fix_state();
+  fix_fixture2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fix_fixture2() {
+  fix_ev_reset();
+  init_bnames();
+  init_idx();
+} return void;
+given fix_fixture ():() then check_failed:(0)
+given fix_fixture ():() then init_units:(0)
+
+// The two parenthesis tokens (plan/walk/ev/push/one/ru.id's fix_span_fixture
+// onward): "(" right after the call's name, ")" as its last token.
+fix_span_fixture5(int e) {
+  push((import ttext), "(");
+  push((import ttext), ")");
+  fix_span_fixture6(e);
+} return void;
+given fix_span_fixture (0):() then check_failed:(0)
+given fix_span_fixture (0):() then init_units:(0)

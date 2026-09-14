@@ -1,0 +1,34 @@
+// A name for event i: an earlier identical, still-trustworthy call's, if one
+// is cached (fix_rcache_find) -- in which case it gets no declaration of its
+// own (fixe_ru, out/emit/decl/decl.id), only its text replaced by the name.
+// Otherwise the tree's own convention (fix_pick), cached for a later call to
+// find in turn.
+fix_name_pick(int i) {
+  string name = fix_rcache_find(i);
+  if(name == "") {
+    name = fix_pick(i);
+    fix_rcache_add(i, name);
+  } else {
+    lset((import fixe_ru), i, 1);
+  }
+} return string name;
+given fix_rcache_find_hit (0):("cachedname") then calls fix_pick:[0]
+given fix_name_pick_miss_fixture (0):("lit_v") then calls fix_pick:[1]
+
+// fixe_n[0] as fix_pick_fixture_n (out/emit/name/pick/main/name2.id) already
+// gives it, plus the two fields fix_pick itself reads that a naming case
+// alone never has to: fixe_nt (fix_evtype, plan/decide/touch/anc.id) and
+// fixe_an (fix_pick_name, out/emit/name/pick/main/name.id).
+fix_name_pick_miss_fixture() {
+  fix_pick_fixture_n();
+  push((import fixe_nt), "int");
+  fix_name_pick_miss_fixture2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fix_name_pick_miss_fixture2() {
+  push((import fixe_an), "");
+} return void;
+given fix_name_pick_miss_fixture ():() then check_failed:(0)
+given fix_name_pick_miss_fixture ():() then init_units:(0)

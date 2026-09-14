@@ -1750,14 +1750,14 @@ int id_fix_free_round(char* name, char* t);
 void id_fix_emit_stmt(int sn, int last);
 void id_fix_names(int last);
 void id_fix_name_at(int i);
-char* id_fix_pick(int i);
 char* id_fix_pick_name(int i, char* t);
 char* id_fix_pick_name2(int i, char* t, char* an);
+char* id_fix_pick(int i);
 void id_fix_rcache_add(int i, char* name);
 void id_fix_rcache_reset(void);
-char* id_fix_name_pick(int i);
-char* id_fix_rcache_find(int i);
 char* id_fix_rcache_find_at(int ix);
+char* id_fix_rcache_find(int i);
+char* id_fix_name_pick(int i);
 char* id_fix_rkey(int e);
 char* id_fix_toktext(int tok0, int tok1);
 char* id_fix_stem(int e);
@@ -14472,14 +14472,6 @@ void id_fix_name_at(int i) {
     return;
 }
 
-char* id_fix_pick(int i) {
-    char* t;
-    char* name;
-    t = id_fix_evtype(i);
-    name = id_fix_pick_name(i, t);
-    return name;
-}
-
 char* id_fix_pick_name(int i, char* t) {
     char* an;
     char* name;
@@ -14501,6 +14493,14 @@ char* id_fix_pick_name2(int i, char* t, char* an) {
     return name;
 }
 
+char* id_fix_pick(int i) {
+    char* t;
+    char* name;
+    t = id_fix_evtype(i);
+    name = id_fix_pick_name(i, t);
+    return name;
+}
+
 void id_fix_rcache_add(int i, char* name) {
     int e;
     char* key;
@@ -14519,14 +14519,11 @@ void id_fix_rcache_reset(void) {
     return;
 }
 
-char* id_fix_name_pick(int i) {
+char* id_fix_rcache_find_at(int ix) {
     char* name;
-    name = id_fix_rcache_find(i);
-    if ((strcmp(name, "") == 0)) {
-        name = id_fix_pick(i);
-        id_fix_rcache_add(i, name);
-    } else {
-        id_lset(fixe_ru, i, 1);
+    name = "";
+    if ((ix >= 0)) {
+        name = (char*)(intptr_t)(id_list_get(fixd_rn, ix));
     }
     return name;
 }
@@ -14546,11 +14543,14 @@ char* id_fix_rcache_find(int i) {
     return name;
 }
 
-char* id_fix_rcache_find_at(int ix) {
+char* id_fix_name_pick(int i) {
     char* name;
-    name = "";
-    if ((ix >= 0)) {
-        name = (char*)(intptr_t)(id_list_get(fixd_rn, ix));
+    name = id_fix_rcache_find(i);
+    if ((strcmp(name, "") == 0)) {
+        name = id_fix_pick(i);
+        id_fix_rcache_add(i, name);
+    } else {
+        id_lset(fixe_ru, i, 1);
     }
     return name;
 }

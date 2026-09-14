@@ -1,0 +1,33 @@
+// Only a call can be found -- a whole argument or a narrowed value is not a
+// repeat of anything, whatever else shares its text.
+fix_rcache_find(int i) {
+  int e = (import fixe_n)[i];
+  string name = "";
+  if(k_of(e) == "call") {
+    string key = fix_rkey(e);
+    int ix = find_str((import fixd_rk), key);
+    name = fix_rcache_find_at(ix);
+  }
+} return string name;
+given fix_pick_fixture_n (0):("")
+given fix_rcache_find_hit (0):("cachedname")
+
+// The call node fix_span_fixture (plan/walk/ev/push/one/ru.id) builds, with
+// its own key already cached under a name -- a hit, unlike out/emit/name/
+// pick/reuse/add.id's fix_span_fixture6 alone, whose cache is still empty.
+fix_rcache_find_hit() {
+  fix_span_fixture();
+  push((import fixd_rk), "|len|(|)");
+  push((import fixd_rn), "cachedname");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the
+// node itself, and the rest of its span (fixd_gcl onward).
+fix_span_fixture1() {
+  int e = node_call("len", [0 - 1]);
+  fix_span_fixture2(e);
+} return void;
+given fix_span_fixture ():() then check_failed:(0)
+given fix_span_fixture ():() then init_units:(0)

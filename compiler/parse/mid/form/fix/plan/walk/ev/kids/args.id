@@ -6,3 +6,22 @@ fix_walk_args(int e, int cd) {
     i = i + 1;
   }
 } return void;
+
+// Two call nodes, so fix_walk_arg2's cases (kids/arg.id) can prove the
+// whole-argument name it hands to fix_walk really is <e's name>_a<i>, not a
+// constant: e1 named "caller" and e2 named "other" walk to different names.
+fix_walk_arg2_fixture() {
+  fix_fixture();
+  int[] none = [];
+  fix_walk_arg2_fixture1(none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+fix_walk_arg2_fixture1(int[] none) {
+  int e1 = node_call("caller", none);
+  int e2 = node_call("other", none);
+  fix_walk_arg2_fixture2(e1, e2);
+} return void;
+given fix_walk_arg2_fixture ([]):() then check_failed:(0)
+given fix_walk_arg2_fixture ([]):() then init_units:(0)
