@@ -1,0 +1,8 @@
+big(int x) {
+  word w = x;
+  w = w * 3;
+} return word w;
+
+take(int n) {
+  print("take " + n);
+} return void;

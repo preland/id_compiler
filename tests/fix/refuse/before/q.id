@@ -1,0 +1,13 @@
+both(int[] c, int k) {
+  if(k > 0 && twice(bump(c)) > 2) {
+    print("both");
+  }
+} return void;
+
+chain(int[] c, int k) {
+  if(k > 0) {
+    print("first");
+  } else if(twice(bump(c)) > 2) {
+    print("second");
+  }
+} return void;

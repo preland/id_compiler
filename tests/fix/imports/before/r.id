@@ -1,0 +1,10 @@
+again(int[] c) {
+  tab_init();
+  int n = bump(c);
+} return int n;
+
+// An index read can trap, and a call can change the list it reads, so it is
+// read ahead of the calls that follow it.
+guard(int[] c, int[] xs) {
+  print(xs[c[0]] + twice(bump(c)));
+} return void;

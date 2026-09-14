@@ -1,0 +1,6 @@
+// ret_i is already declared in this function.
+calc(int a) {
+  int ret_i = a + 1;
+  int b = ret_i * 2;
+  int ret_i2 = b + ret_i;
+} return int ret_i2;

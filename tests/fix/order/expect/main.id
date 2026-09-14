@@ -1,0 +1,11 @@
+// Every call to bump advances one counter, so the order calls run in is in
+// what the program prints.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  show1(c);
+  show2(c);
+} return int 0;
+
+print_two(int x, int y) {
+  print(x + " " + y);
+} return void;

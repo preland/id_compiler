@@ -1,0 +1,12 @@
+bump(int[] c) {
+  c[0] = c[0] + 1;
+  int n = c[0];
+} return int n;
+
+diff(int a, int b) {
+  int d = a - b;
+} return int d;
+
+twice(int n) {
+  int m = n * 2;
+} return int m;

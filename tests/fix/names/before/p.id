@@ -1,0 +1,13 @@
+bump(int[] c) {
+  c[0] = c[0] + 1;
+  int n = c[0];
+} return int n;
+
+twice(int n) {
+  int m = n * 2;
+} return int m;
+
+// twice_v is a string in this unit, so it cannot also be an int.
+label(int k) {
+  string twice_v = "twice " + k;
+} return string twice_v;

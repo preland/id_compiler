@@ -1,0 +1,14 @@
+// Every parameter and local here carries the idstd_ prefix, as the standard
+// library's must, so the names --fix adds carry it too.
+bump(int[] idstd_c) {
+  idstd_c[0] = idstd_c[0] + 1;
+  int idstd_n = idstd_c[0];
+} return int idstd_n;
+
+twice(int idstd_n) {
+  int idstd_m = idstd_n * 2;
+} return int idstd_m;
+
+go(int[] idstd_c) {
+  int idstd_x = twice(bump(idstd_c));
+} return int idstd_x + 1;

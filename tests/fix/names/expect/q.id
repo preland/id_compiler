@@ -1,0 +1,17 @@
+// bump_v is already declared in this function.
+go(int[] c) {
+  int bump_v = 3;
+  int bump_v3 = bump(c);
+  int x = twice(bump_v3) + bump_v;
+} return int x;
+
+// bump_v2 is a function, so it is not free either.
+bump_v2(int k) {
+  int j = k + 1;
+} return int j;
+
+run(int[] c) {
+  int bump_v = bump(c);
+  int twice_v2 = twice(bump_v);
+  print(twice_v2);
+} return void;

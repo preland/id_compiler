@@ -1,0 +1,19 @@
+// Repaired by hand, reading docs/SPEC.md 7: operands and arguments run left to
+// right, so the first bump written is the first one taken.
+mix(int[] c) {
+  int first = bump(c);
+  int second = bump(c);
+  int n = first * 10 + twice(second);
+} return int n;
+
+pairs(int[] c) {
+  int left = bump(c);
+  int right = bump(c);
+  int s = diff(left, right);
+} return int s;
+
+last(int[] c) {
+  int m = bump(c);
+  int later = bump(c);
+  int total = m * 100 + later;
+} return int total;
