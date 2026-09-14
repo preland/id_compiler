@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # Self-hosted-driver tests: bin/idc (the id-written lexer+parser driven by a
 # bash driver -- see bin/idc) must build several demos to binaries whose
-# RUNTIME OUTPUT matches the idc.py-built binary exactly, and its --emit-c
-# output must be byte-identical to idc.py's for programs the self-hosted
-# compiler fully supports.
+# RUNTIME OUTPUT matches what is documented for them, and must not raise an
+# internal error while building anything under demos/.
 #
 # There is no fallback: bin/idc drives the self-hosted stages and nothing
-# else, so every check here is a check of them. tools/parity.sh and
-# tests/run.sh's "codegen parity" section cover self-hosted/idc.py byte-parity
-# on the emitted C; this suite covers the driver end to end.
+# else, so every check here is a check of them. idc.py is frozen (see
+# docs/HACKING.md) and no longer built against here -- see git history for the
+# byte-parity checks this file used to run against it.
 #
 # Run from anywhere: tests/self_host_build.sh
 set -u
@@ -18,11 +17,8 @@ set -u
 export IDC_NO_STD=1
 
 cd "$(dirname "$0")"
-IDC=../idc.py
 # bin/idc takes --allow-untested throughout: the demos and the programs below
-# have no test cases, and what is compared here is what the two compilers
-# build. It is part of the word, so every $BIN_IDC below carries it; idc.py
-# has no such flag.
+# have no test cases.
 BIN_IDC="../bin/idc --allow-untested"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -31,32 +27,27 @@ pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 
-# build_pair NAME PROG -- builds PROG with both compilers into $TMP/NAME_py
-# and $TMP/NAME_self; returns nonzero (and records a FAIL) if either fails.
-build_pair() {
+# build_self NAME PROG -- builds PROG with bin/idc into $TMP/NAME; returns
+# nonzero (and records a FAIL) if the build fails.
+build_self() {
     local name="$1" prog="$2"
-    if ! $IDC "$prog" -o "$TMP/${name}_py" >/dev/null 2>"$TMP/${name}.pyerr"; then
-        bad "$name: idc.py build (see $(cat "$TMP/${name}.pyerr" | head -1))"
+    if ! $BIN_IDC "$prog" -o "$TMP/${name}" >/dev/null 2>"$TMP/${name}.err"; then
+        bad "$name: bin/idc build (see $(cat "$TMP/${name}.err" | head -1))"
         return 1
     fi
-    if ! $BIN_IDC "$prog" -o "$TMP/${name}_self" >/dev/null 2>"$TMP/${name}.selferr"; then
-        bad "$name: bin/idc build (see $(cat "$TMP/${name}.selferr" | head -1))"
-        return 1
-    fi
-    ok "$name: idc.py and bin/idc both build"
+    ok "$name: bin/idc builds it"
 }
 
-# check_output NAME [ARGS...] -- runs both binaries with the same args/stdin
-# behavior and compares stdout+stderr.
-check_output() {
-    local name="$1"; shift
-    local out_py out_self
-    out_py=$("$TMP/${name}_py" "$@" 2>&1)
-    out_self=$("$TMP/${name}_self" "$@" 2>&1)
-    if [ "$out_py" = "$out_self" ]; then
-        ok "$name: bin/idc binary output matches idc.py binary"
+# check_self NAME EXPECTED [ARGS...] -- runs the binary with ARGS/stdin and
+# compares stdout+stderr against the literal EXPECTED.
+check_self() {
+    local name="$1" expected="$2"; shift 2
+    local out
+    out=$("$TMP/${name}" "$@" 2>&1)
+    if [ "$out" = "$expected" ]; then
+        ok "$name: bin/idc binary output matches"
     else
-        bad "$name: output mismatch (idc.py='$out_py' bin/idc='$out_self')"
+        bad "$name: output mismatch (expected '$expected', got '$out')"
     fi
 }
 
@@ -65,51 +56,36 @@ check_output() {
 # which is the failure this replaced: the list here named four demos while
 # demos/ held eighteen.
 #
-# A demo that needs a --backend or a standard library cannot build here (this
-# file is hermetic and passes no flags), so "both compilers refuse it" is a
-# pass: what is being checked is that the two compilers AGREE, and agreeing to
-# refuse is agreement. What would fail is one building and the other not.
-#
-# The native backends are the standard library's, so a demo that calls one --
-# fsdemo and the graphics demos -- is one of those refusals.
+# This file is hermetic (no --std, no --backend), so a demo that needs the
+# standard library or a native backend -- fsdemo and the graphics demos --
+# fails to build here by design; that is not what is being checked. What is
+# checked is that bin/idc never raises an internal error over the whole
+# demos/ tree, success or refusal alike.
 for prog in ../../demos/*/; do
     name=$(basename "$prog")
-    $IDC     "$prog" -o "$TMP/sweep_py"   >/dev/null 2>&1; py=$?
-    $BIN_IDC "$prog" -o "$TMP/sweep_self" >/dev/null 2>&1; self=$?
-    if [ "$py" -eq "$self" ]; then
-        ok "sweep: $name (both compilers agree: rc=$py)"
+    sweep_out=$($BIN_IDC "$prog" -o "$TMP/sweep_self" 2>&1)
+    if ! printf '%s' "$sweep_out" | grep -q "idc: internal error:"; then
+        ok "sweep: $name (no internal error)"
     else
-        bad "sweep: $name (idc.py rc=$py, bin/idc rc=$self)"
+        bad "sweep: $name (idc: internal error: $(printf '%s' "$sweep_out" | grep "idc: internal error:" | head -1))"
     fi
 done
 
-build_pair hello ../../demos/hello && check_output hello hi
-build_pair calc ../../demos/calc && check_output calc
-build_pair control ../../demos/control/flow.id && check_output control
+build_self hello ../../demos/hello && check_self hello "hello world: hi" hi
+build_self calc ../../demos/calc && check_self calc "total = 42 (positive)"
+build_self control ../../demos/control/flow.id && check_self control "7 is a big odd / medium"
 
-if build_pair adventure ../../demos/adventure; then
-    for choices in "1 1 1" "2 2 2" "2 1 2"; do
-        out_py=$(printf '%s\n' $choices | "$TMP/adventure_py" | grep -o 'ENDING [0-9]')
-        out_self=$(printf '%s\n' $choices | "$TMP/adventure_self" | grep -o 'ENDING [0-9]')
-        if [ "$out_py" = "$out_self" ]; then
-            ok "adventure ($choices): bin/idc matches idc.py"
+if build_self adventure ../../demos/adventure; then
+    for spec in "1 1 1:ENDING 1" "2 2 2:ENDING 8" "2 1 2:ENDING 6"; do
+        choices="${spec%%:*}" expected="${spec##*:}"
+        out=$(printf '%s\n' $choices | "$TMP/adventure" | grep -o 'ENDING [0-9]')
+        if [ "$out" = "$expected" ]; then
+            ok "adventure ($choices): bin/idc reaches $expected"
         else
-            bad "adventure ($choices): mismatch (idc.py='$out_py' bin/idc='$out_self')"
+            bad "adventure ($choices): expected $expected, got $out"
         fi
     done
 fi
-
-# --emit-c byte parity through the driver (a couple of programs the
-# self-hosted compiler fully supports today -- see tools/parity.sh)
-for prog in ../../demos/calc ../../demos/control/flow.id ../../demos/adventure; do
-    $IDC "$prog" --emit-c "$TMP/ec_py.c" >/dev/null 2>&1
-    $BIN_IDC "$prog" --emit-c "$TMP/ec_self.c" >/dev/null 2>&1
-    if diff "$TMP/ec_py.c" "$TMP/ec_self.c" >/dev/null; then
-        ok "emit-c byte parity via bin/idc ($prog)"
-    else
-        bad "emit-c byte parity via bin/idc ($prog)"
-    fi
-done
 
 # a no-main project (a library) must build to a .o with bin/idc too. This used to
 # build demos/engine, the one no-main project in the tree; that engine is idstd's
@@ -153,15 +129,8 @@ fi
 
 # (b) with a backend: its `native` declarations are merged as source, so the
 #     emitted C carries a real prototype for each call into it and no
-#     `extern int` block. This used to assert that block and byte parity with
-#     idc.py; the parity is gone by design, since idc.py, which is being retired
-#     and will not change, still emits the block. gfxdemo is a user program and
-#     calls idstd's lset, so bin/idc builds it with the standard library, as
-#     backends.sh does -- the old check passed without it only because the
-#     missing lset became one more `extern int`. idc.py no longer builds it at
-#     all: gfxdemo's surface is idstd's sf_l_ now, and idc.py cannot merge an
-#     idstd that holds `given` cases, so its leg here (which asserted nothing
-#     but that it ran) is gone.
+#     `extern int` block. gfxdemo is a user program and calls idstd's lset, so
+#     bin/idc builds it with the standard library, as backends.sh does.
 for prog in ../../demos/gfxdemo; do
     if ! env -u IDC_NO_STD $BIN_IDC "$prog" --emit-c "$TMP/be_self.c" >/dev/null 2>&1; then
         bad "backend emit-c: bin/idc failed on $prog"
@@ -175,9 +144,9 @@ for prog in ../../demos/gfxdemo; do
     fi
 done
 
-# -- the driver must agree with idc.py about what a project IS ---------------
+# -- the driver's own reading of what a project IS ---------------------------
 # These are filesystem questions, answered in bash rather than in id, so they
-# are the ones most likely to drift from idc.py. Each one did.
+# are the ones most likely to be gotten wrong. Each one was, once.
 
 # (a) hidden directories are neither counted toward the 3-entry limit nor
 #     descended into for source.
@@ -189,37 +158,32 @@ EOF
 cat > "$proj/.git/sneaky.id" <<'EOF'
 sneaky_fn(int a) { int q = a; } return int q;
 EOF
-$IDC     "$proj" --emit-c "$TMP/hid_py.c"   >/dev/null 2>&1; py_rc=$?
 $BIN_IDC "$proj" --emit-c "$TMP/hid_self.c" >/dev/null 2>&1; self_rc=$?
-if [ "$py_rc" -eq 0 ] && [ "$self_rc" -eq 0 ] \
-   && diff "$TMP/hid_py.c" "$TMP/hid_self.c" >/dev/null \
-   && ! grep -q id_sneaky_fn "$TMP/hid_self.c"; then
-    ok "hidden dirs: not counted, not compiled (matches idc.py)"
+if [ "$self_rc" -eq 0 ] && ! grep -q id_sneaky_fn "$TMP/hid_self.c"; then
+    ok "hidden dirs: not counted, not compiled"
 else
-    bad "hidden dirs: not counted, not compiled (idc.py rc=$py_rc bin/idc rc=$self_rc)"
+    bad "hidden dirs: not counted, not compiled (bin/idc rc=$self_rc)"
 fi
 
 # (a2) ...including a conf.id inside one. A hidden directory is outside the
 #      project entirely, so its conf.id is not a NESTED manifest -- it is not a
 #      manifest at all, and reporting it stops a project from being built for a
-#      file it never reads. bin/idc excluded the root's own conf.id with
-#      `find -mindepth 2`, which also stops `-prune` from firing at depth 1, so
+#      file it never reads. bin/idc once excluded the root's own conf.id with
+#      `find -mindepth 2`, which also stopped `-prune` from firing at depth 1, so
 #      every hidden directory directly under a root was walked into. idstd's
 #      whole test suite lives in `.tests/` and could not be built.
 mkdir -p "$proj/.git"
 cat > "$proj/.git/conf.id" <<'EOF'
 int sneaky_depth = 7;
 EOF
-$IDC     "$proj" --emit-c "$TMP/hidconf_py.c"   >/dev/null 2>&1; py_rc=$?
 $BIN_IDC "$proj" --emit-c "$TMP/hidconf_self.c" >/dev/null 2>&1; self_rc=$?
-if [ "$py_rc" -eq 0 ] && [ "$self_rc" -eq 0 ] \
-   && diff "$TMP/hidconf_py.c" "$TMP/hidconf_self.c" >/dev/null; then
-    ok "a conf.id inside a hidden dir is not a nested manifest (matches idc.py)"
+if [ "$self_rc" -eq 0 ]; then
+    ok "a conf.id inside a hidden dir is not a nested manifest"
 else
-    bad "a conf.id inside a hidden dir is not a nested manifest (idc.py rc=$py_rc bin/idc rc=$self_rc)"
+    bad "a conf.id inside a hidden dir is not a nested manifest (bin/idc rc=$self_rc)"
 fi
 
-# (b) an absolute path in conf.id resolves, as it does under idc.py.
+# (b) an absolute path in conf.id resolves.
 lib="$TMP/implib"; app="$TMP/impapp"
 mkdir -p "$lib" "$app"
 cat > "$lib/h.id" <<'EOF'
@@ -238,9 +202,10 @@ fi
 
 # (b2) a conf.id constant becomes a program global, initialised before main
 #      runs rather than by a function nothing calls (docs/TODO.md item 4).
-#      bin/idc only: idc.py never learned conf.id constants and is not going
-#      to -- stage 0 is the bootstrap C, which has them, so the compiler's own
-#      source declaring some (compiler/parse/conf.id) does not need idc.py.
+#      bin/idc only: idc.py never learned conf.id constants and, now frozen,
+#      never will -- stage 0 is the bootstrap C, which has them, so the
+#      compiler's own source declaring some (compiler/parse/conf.id) does not
+#      need idc.py.
 proj="$TMP/consts"
 mkdir -p "$proj"
 cat > "$proj/conf.id" <<'EOF'
@@ -607,9 +572,8 @@ fi
 
 # A nested conf.id is a source file that silently does not exist: it is
 # filtered out as metadata and only a ROOT's is read as a manifest, so anything
-# it defines vanishes and the caller is blamed with "no such function". Both
-# compilers must say what actually happened. Found by a rename that happened to
-# choose the name.
+# it defines vanishes and the caller is blamed with "no such function". Found
+# by a rename that happened to choose the name.
 mkdir -p "$TMP/nested/sub"
 cat > "$TMP/nested/main.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -623,19 +587,17 @@ helper(int a) {
 } return int r;
 EOF
 nested_msg="is the dependency manifest and is only read at the root"
-if $BIN_IDC "$TMP/nested" -o "$TMP/nested.bin" 2>&1 | grep -q "$nested_msg" \
-   && $IDC "$TMP/nested" -o "$TMP/nested.bin" 2>&1 | grep -q "$nested_msg"; then
-    ok "a nested conf.id is reported, by both compilers"
+if $BIN_IDC "$TMP/nested" -o "$TMP/nested.bin" 2>&1 | grep -q "$nested_msg"; then
+    ok "a nested conf.id is reported"
 else
-    bad "a nested conf.id is reported, by both compilers"
+    bad "a nested conf.id is reported"
 fi
 
 # An over-full directory must not swallow a real semantic error elsewhere in
 # the same project: check_entry_limit used to exit before idlex/idparse ever
 # ran, so a project mixing the two reported only the directory violation and
 # hid everything idparse had to say about the rest -- this is exactly how
-# idem/engine's 1,115 real errors were once read as "1 error". bin/idc only:
-# idc.py still stops at the first CompileError it raises.
+# idem/engine's 1,115 real errors were once read as "1 error".
 mkdir -p "$TMP/mixed"
 for n in 1 2 3 4; do printf 'mx%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
 cat > "$TMP/mixed/main.id" <<'EOF'
@@ -654,13 +616,9 @@ else
     bad "an over-full directory does not hide a real semantic error"
 fi
 
-# Test clauses (docs/TESTS.md) are part of a declaration, so BOTH compilers
-# must accept them and both must ignore them in codegen. When only idc.py knew
-# the syntax, a program carrying cases was a syntax error in the primary
-# compiler -- two dialects, not one language. Byte parity is the assertion that
-# matters: the cases must leave no trace in the emitted C. bin/idc runs the
-# cases on every build, so they have to pass, and a scaling claim has to be on
-# two cases of different sizes.
+# Test clauses (docs/TESTS.md) are part of a declaration: bin/idc runs the
+# cases on every build, so they have to pass, and must leave no trace in the
+# emitted C -- a scaling claim has to be on two cases of different sizes.
 cat > "$TMP/cases.id" <<'EOF'
 add(int a, int b) {
   int sum = a + b;
@@ -673,12 +631,13 @@ main(int argc, string[] argv) {
   print(r);
 } return int 0;
 EOF
-$IDC "$TMP/cases.id" --emit-c "$TMP/cases_py.c" >/dev/null 2>&1
 $BIN_IDC "$TMP/cases.id" --emit-c "$TMP/cases_self.c" >/dev/null 2>&1
-if [ -s "$TMP/cases_self.c" ] && cmp -s "$TMP/cases_py.c" "$TMP/cases_self.c"; then
-    ok "a program with test cases builds identically under both compilers"
+if [ -s "$TMP/cases_self.c" ] && ! grep -q '\[time:' "$TMP/cases_self.c" \
+   && $BIN_IDC "$TMP/cases.id" -o "$TMP/cases.bin" >/dev/null 2>&1 \
+   && [ "$("$TMP/cases.bin")" = "5" ]; then
+    ok "a program with test cases builds, passes its cases, and leaves no trace in the C"
 else
-    bad "a program with test cases builds identically under both compilers"
+    bad "a program with test cases builds, passes its cases, and leaves no trace in the C"
 fi
 
 # -- stage 0 is C, and nothing here runs idc.py ------------------------------

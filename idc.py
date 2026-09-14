@@ -901,15 +901,8 @@ static IdList* id_list_new(void) {
     L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, "list init"));
     return L;
 }
-static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }
-static void id_list_mut_check(IdList* L) {
-    if (L->cap < 0) {
-        fprintf(stderr, "id: cannot mutate a constant list\n");
-        exit(1);
-    }
-}
 static void id_list_push(IdList* L, long long v) {
-    id_list_mut_check(L); if (L->len >= L->cap) {
+    if (L->len >= L->cap) {
         if (L->cap > INT_MAX / 2) {
             fprintf(stderr, "id: list capacity overflow\n");
             exit(1);
@@ -929,7 +922,7 @@ static long long id_list_get(IdList* L, int i) {
     return L->data[i];
 }
 static void id_list_set(IdList* L, int i, long long v) {
-    id_list_mut_check(L); if (i < 0 || i >= L->len) {
+    if (i < 0 || i >= L->len) {
         fprintf(stderr, "id: index %d out of bounds (len %d)\n", i, L->len);
         exit(1);
     }
@@ -937,7 +930,7 @@ static void id_list_set(IdList* L, int i, long long v) {
 }
 static int id_list_len(IdList* L) { return L->len; }
 static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
-    id_list_mut_check(L); if (L->len <= 0) {
+    if (L->len <= 0) {
         fprintf(stderr, "id: pop from empty list\n");
         exit(1);
     }

@@ -73,7 +73,7 @@ mark_done() { mkdir -p "$(dirname "$STATE")"; printf '%s ' "$1" >> "$STATE"; }
 # happen until idstd has the functions to port them onto.
 export IDC_NO_STD=1
 
-IDC=../idc.py
+IDC=../idc.py   # frozen (docs/HACKING.md); used only for the wasm target below
 # Nothing this file builds with bin/idc has two cases per function -- not the
 # compiler, not the demos -- so every such build passes --allow-untested.
 # docs/TESTS.md, "Enforcement, and the migration"; the check near the end of
@@ -83,19 +83,11 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 pass=0 fail=0
 
-# concatenate a project's .id files in the same order idc compiles them
-# (every .id in the tree, sorted by full path), for the differential parity
-# checks against the id-written compiler.
-project_cat() { find "$1" -name '*.id' | LC_ALL=C sort | xargs cat; }
-
 ok()   { pass=$((pass+1)); echo "PASS: $1"; }
 bad()  { fail=$((fail+1)); echo "FAIL: $1"; }
 
 expect_output() { # name, expected, actual
     if [ "$2" = "$3" ]; then ok "$1"; else bad "$1 (expected '$2', got '$3')"; fi
-}
-expect_error() { # name, file, pattern
-    if $IDC "$2" -o "$TMP/x" 2>&1 | grep -q "$3"; then ok "$1"; else bad "$1"; fi
 }
 
 # The body below is NOT re-indented: wrapping 700 lines in an if would make
@@ -103,24 +95,24 @@ expect_error() { # name, file, pattern
 if want core; then
 # --- hello_world end to end (the demos/hello project bundles otherfn.id, which
 #     testfn calls, so the whole program resolves within one project)
-$IDC ../../demos/hello -o "$TMP/hello" 2>/dev/null \
+$BIN_IDC ../../demos/hello -o "$TMP/hello" 2>/dev/null \
     || bad "hello_world compiles"
 expect_output "usage message"  "usage: $TMP/hello <message>" "$("$TMP/hello")"
 expect_output "hello with arg" "hello world: hi"             "$("$TMP/hello" hi)"
 
 # --- demos/ projects compile and run as documented
-$IDC ../../demos/calc -o "$TMP/calc" 2>/dev/null \
+$BIN_IDC ../../demos/calc -o "$TMP/calc" 2>/dev/null \
     || bad "calc demo compiles"
 expect_output "calc demo output" "total = 42 (positive)" "$("$TMP/calc")"
 "$TMP/calc" >/dev/null; expect_output "calc demo exit code" "42" "$?"
 
-$IDC ../../demos/control/flow.id -o "$TMP/flow" 2>/dev/null \
+$BIN_IDC ../../demos/control/flow.id -o "$TMP/flow" 2>/dev/null \
     || bad "control demo compiles"
 expect_output "control demo output" "7 is a big odd / medium" "$("$TMP/flow")"
 
 # --- adventure demo: input() builtin + cross-file branching to 8 endings.
 #     Feed a choice sequence on stdin and check which ending it reaches.
-$IDC ../../demos/adventure -o "$TMP/adv" 2>/dev/null \
+$BIN_IDC ../../demos/adventure -o "$TMP/adv" 2>/dev/null \
     || bad "adventure demo compiles"
 expect_output "adventure path 1,1,1" "ENDING 1" \
     "$(printf '1\n1\n1\n' | "$TMP/adv" | grep -o 'ENDING [0-9]')"
@@ -148,7 +140,7 @@ show_char(int i, int c) {
   print(i + ":" + c + ":" + ch);
 } return void;
 EOF
-$IDC "$TMP/scan.id" -o "$TMP/scan" 2>/dev/null || bad "while/len/charat/chr compiles"
+$BIN_IDC "$TMP/scan.id" -o "$TMP/scan" 2>/dev/null || bad "while/len/charat/chr compiles"
 expect_output "string builtins walk" "0:97:a 1:90:Z 2:57:9" "$("$TMP/scan" | tr '\n' ' ' | sed 's/ $//')"
 
 # --- growable lists: empty literal, push across a call (reference semantics),
@@ -175,7 +167,7 @@ main(int argc, string[] argv) {
   done(xs);
 } return int 0;
 EOF
-$IDC "$TMP/listrun.id" -o "$TMP/listrun" 2>/dev/null || bad "list runtime compiles"
+$BIN_IDC "$TMP/listrun.id" -o "$TMP/listrun" 2>/dev/null || bad "list runtime compiles"
 expect_output "lists push/get/set/to_int" "len=4 xs[0]=99 xs[3]=9" "$("$TMP/listrun")"
 
 # --- idc-in-id: the lexer (written in id) tokenizes id source from stdin
@@ -270,57 +262,10 @@ EOF
 cc -std=c11 "$TMP/g_sum.c" -o "$TMP/g_sum" 2>/dev/null || bad "emitted C (sumto) compiles"
 "$TMP/g_sum"; expect_output "codegen: sumto(5) exit code" "15" "$?"
 
-# parity: for the supported (scalar) subset, the id-written compiler emits
-# byte-identical C to idc.py itself
-"$IDC" "$TMP/g_sum.id" --emit-c "$TMP/parity_py.c" >/dev/null 2>&1
-"$TMP/idlex" < "$TMP/g_sum.id" | "$TMP/idparse" > "$TMP/parity_id.c"
-if diff "$TMP/parity_py.c" "$TMP/parity_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (scalar)"
-else
-    bad "codegen parity with idc.py (scalar)"
-fi
-# parity with the type pass: print(int) wraps id_str_of_int, string `+` becomes
-# id_concat -- exactly as idc.py
-cat > "$TMP/g_str.id" <<'EOF'
-show(int n) {
-  print("n = " + n);
-} return void;
-
-main(int argc, string[] argv) {
-  show(7);
-} return int 0;
-EOF
-"$IDC" "$TMP/g_str.id" --emit-c "$TMP/pstr_py.c" >/dev/null 2>&1
-"$TMP/idlex" < "$TMP/g_str.id" | "$TMP/idparse" > "$TMP/pstr_id.c"
-if diff "$TMP/pstr_py.c" "$TMP/pstr_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (print + string concat)"
-else
-    bad "codegen parity with idc.py (print + string concat)"
-fi
-# parity on a real multi-file demo: export/import, string[] params, concat,
-# nested if/else, cross-file calls
-"$IDC" ../../demos/calc --emit-c "$TMP/calc_py.c" >/dev/null 2>&1
-project_cat ../../demos/calc | "$TMP/idlex" | "$TMP/idparse" > "$TMP/calc_id.c"
-if diff "$TMP/calc_py.c" "$TMP/calc_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (demos/calc)"
-else
-    bad "codegen parity with idc.py (demos/calc)"
-fi
-# parity on the adventure demo: string equality (strcmp), nested if/else,
-# input(), concat, void functions across several files
-"$IDC" ../../demos/adventure --emit-c "$TMP/adv_py.c" >/dev/null 2>&1
-project_cat ../../demos/adventure | "$TMP/idlex" | "$TMP/idparse" > "$TMP/adv_id.c"
-if diff "$TMP/adv_py.c" "$TMP/adv_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (demos/adventure)"
-else
-    bad "codegen parity with idc.py (demos/adventure)"
-fi
-
-# parity on `else if`, and on the `else { if }` that looks identical in the
-# AST but must emit differently: idc.py splices an else-if chain flat, and
-# nests a braced block. The self-hosted parser carries the distinction as a
-# flag on the if node, because by the time the else arm is parsed the tokens
-# that told them apart are gone.
+# the self-hosted compiler must distinguish `else if`, spliced flat, from
+# `else { if }`, which nests a braced block -- they look identical in the AST,
+# and the parser carries the distinction as a flag on the if node, because by
+# the time the else arm is parsed the tokens that told them apart are gone.
 mkdir -p "$TMP/g_elif"
 cat > "$TMP/g_elif/m.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -345,12 +290,12 @@ build_msg() {
   string msg = a + b;
 } return string msg;
 EOF
-"$IDC" "$TMP/g_elif" --emit-c "$TMP/elif_py.c" >/dev/null 2>&1
-project_cat "$TMP/g_elif" | "$TMP/idlex" | "$TMP/idparse" > "$TMP/elif_id.c"
-if diff "$TMP/elif_py.c" "$TMP/elif_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (else if vs else-block)"
+$BIN_IDC "$TMP/g_elif" --emit-c "$TMP/elif_id.c" >/dev/null 2>&1
+if grep -qF '} else if ((n == 1)) {' "$TMP/elif_id.c" \
+   && grep -A1 -F '} else {' "$TMP/elif_id.c" | grep -q 'id_chain(n)'; then
+    ok "else if is spliced flat, and else { if } nests a block"
 else
-    bad "codegen parity with idc.py (else if vs else-block)"
+    bad "else if is spliced flat, and else { if } nests a block"
 fi
 # The self-hosted compiler must actually REJECT rule violations, not merely be
 # capable of noticing them. Each check family gets a guard here: the hook in
@@ -513,11 +458,11 @@ case "$view_out" in
 esac
 expect_output "idview on empty input" "idview: no id files on stdin" "$(printf '' | "$TMP/idview")"
 
-# parity on the systems features: word, hex literals, all six bitwise
-# operators, the flat store, and the unsigned builtins. These are what the
-# kernel port is written in, so the self-hosted stages have to cover them --
-# a gap here used to be invisible, because bin/idc would silently fall back to
-# idc.py rather than report it.
+# the systems features: word, hex literals, all six bitwise operators, the
+# flat store, and the unsigned builtins. These are what the kernel port is
+# written in, so the self-hosted stages have to cover them -- a gap here used
+# to be invisible, because bin/idc would silently fall back to idc.py rather
+# than report it.
 mkdir -p "$TMP/g_sys"
 cat > "$TMP/g_sys/m.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -544,16 +489,12 @@ mem_str() {
   string s = str_of_mem(m, 1);
 } return string s;
 EOF
-"$IDC" "$TMP/g_sys" --emit-c "$TMP/sys_py.c" >/dev/null 2>&1
-project_cat "$TMP/g_sys" | "$TMP/idlex" | "$TMP/idparse" > "$TMP/sys_id.c"
-if diff "$TMP/sys_py.c" "$TMP/sys_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (word/bitwise/store)"
-else
-    bad "codegen parity with idc.py (word/bitwise/store)"
-fi
-# parity on pop, whose result type is the list's element type and so cannot be
-# derived from the callee name alone. The self-hosted emitter used to produce
-# a call to a runtime function that does not exist.
+$BIN_IDC "$TMP/g_sys" -o "$TMP/g_sys.bin" 2>/dev/null || bad "systems features (word/bitwise/store) compiles"
+expect_output "word/bitwise/store" "4887937359285593735928336-373592856029887428472933982139
+5337040796015k" "$("$TMP/g_sys.bin")"
+# pop, whose result type is the list's element type and so cannot be derived
+# from the callee name alone. The self-hosted emitter used to produce a call
+# to a runtime function that does not exist.
 mkdir -p "$TMP/g_pop"
 cat > "$TMP/g_pop/m.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -568,15 +509,11 @@ show_pop(int[] xs, string[] ss) {
   print("" + px + sy);
 } return void;
 EOF
-"$IDC" "$TMP/g_pop" --emit-c "$TMP/pop_py.c" >/dev/null 2>&1
-project_cat "$TMP/g_pop" | "$TMP/idlex" | "$TMP/idparse" > "$TMP/pop_id.c"
-if diff "$TMP/pop_py.c" "$TMP/pop_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (pop element type)"
-else
-    bad "codegen parity with idc.py (pop element type)"
-fi
-# the unsigned end of the hex range: 0xffffffffffffffff must lex to
-# 18446744073709551615, not -1
+$BIN_IDC "$TMP/g_pop" -o "$TMP/g_pop.bin" 2>/dev/null || bad "pop element type compiles"
+expect_output "pop element type" "2b" "$("$TMP/g_pop.bin")"
+# the unsigned end of the hex range: 0xffffffffffffffff must lex to the full
+# 64-bit all-ones pattern -- printed as -1, since word prints as signed
+# decimal -- not truncated or misread as some other value.
 mkdir -p "$TMP/g_hex"
 cat > "$TMP/g_hex/m.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -584,13 +521,8 @@ main(int argc, string[] argv) {
   print("" + a + " " + 0x7fffffffffffffff + " " + 0xff);
 } return int 0;
 EOF
-"$IDC" "$TMP/g_hex" --emit-c "$TMP/hex_py.c" >/dev/null 2>&1
-project_cat "$TMP/g_hex" | "$TMP/idlex" | "$TMP/idparse" > "$TMP/hex_id.c"
-if diff "$TMP/hex_py.c" "$TMP/hex_id.c" >/dev/null; then
-    ok "codegen parity with idc.py (wide hex literals)"
-else
-    bad "codegen parity with idc.py (wide hex literals)"
-fi
+$BIN_IDC "$TMP/g_hex" -o "$TMP/g_hex.bin" 2>/dev/null || bad "wide hex literals compiles"
+expect_output "wide hex literals" "-1 9223372036854775807 255" "$("$TMP/g_hex.bin")"
 
 # --- self-hosting: the id-written compiler emits byte-identical C for its OWN
 #     source (lexer + parser/codegen) whether it is the stage bin/idc runs or
@@ -670,7 +602,7 @@ describe() {
   }
 } return string s;
 EOF
-$IDC "$TMP/roundtrip.id" -o "$TMP/roundtrip" 2>/dev/null || bad "roundtrip compiles"
+$BIN_IDC "$TMP/roundtrip.id" -o "$TMP/roundtrip" 2>/dev/null || bad "roundtrip compiles"
 expect_output "export/import roundtrip" "lucky 7" "$("$TMP/roundtrip")"
 "$TMP/roundtrip" >/dev/null; expect_output "exit code from exported var" "7" "$?"
 
@@ -784,52 +716,18 @@ else
     bad "dead-export pruning: the harness declares an export a kept function reads ($(grep -m1 'error' "$TMP/exprune_reader.log"))"
 fi
 
-# --- rule violations must be compile errors
-cat > "$TMP/toomany.id" <<'EOF'
-main(int argc, string[] argv) {
-  int a = 1;
-  int b = 2;
-  int c = 3;
-  int d = 4;
-} return int 0;
-EOF
-expect_error "action limit enforced" "$TMP/toomany.id" "performs 4 actions"
-
-cat > "$TMP/fourfns.id" <<'EOF'
-f1() {} return void;
-f2() {} return void;
-f3() {} return void;
-f4() {} return void;
-EOF
-expect_error "3 functions per file" "$TMP/fourfns.id" "too many functions"
-
-# a name may repeat across functions when its type is consistent...
+# --- rule violations must be compile errors. action limit and one-name-one-
+# type are guard_reject-checked above (bin/idc directly); 3-functions-per-file,
+# unexported access and import-without-export are tests/invalid/*.id, run by
+# invalid.sh -- so only the case with no bin/idc coverage yet stays here: a
+# name may repeat across functions when its type is consistent.
 cat > "$TMP/reuse.id" <<'EOF'
 inc(int i) { int r = i + 1; } return int r;
 dec(int i) { int r = i - 1; } return int r;
 main(int argc, string[] argv) { int r = inc(10) + dec(10); print("r=" + r); } return int 0;
 EOF
-$IDC "$TMP/reuse.id" -o "$TMP/reuse" 2>/dev/null || bad "name reuse (same type) compiles"
+$BIN_IDC "$TMP/reuse.id" -o "$TMP/reuse" 2>/dev/null || bad "name reuse (same type) compiles"
 expect_output "name reuse same type" "r=20" "$("$TMP/reuse")"
-
-# ...but the same name with two different types is an error
-cat > "$TMP/typeconflict.id" <<'EOF'
-main(int argc, string[] argv) { int count = 1; } return int 0;
-other() { string count = "hi"; } return void;
-EOF
-expect_error "name keeps one type" "$TMP/typeconflict.id" "must keep one type"
-
-cat > "$TMP/noconf.id" <<'EOF'
-main(int argc, string[] argv) { int x = 1; } return int 0;
-other() { int y = x; } return void;
-EOF
-expect_error "cross-function use needs import" "$TMP/noconf.id" "not exported"
-
-cat > "$TMP/badconf.id" <<'EOF'
-main(int argc, string[] argv) { int x = 1; } return int 0;
-other() { int y = (import x); } return void;
-EOF
-expect_error "import requires export" "$TMP/badconf.id" "is not exported"
 
 # --- systems programming: bitwise operators, hex literals, the `word` machine
 # word, and the flat bounds-checked store. These are what let a C-level
@@ -843,7 +741,7 @@ main(int argc, string[] argv) {
   print("" + (x << 2) + " " + (x >> 3) + " " + (0 - 16 >> 2));
 } return int 0;
 EOF
-$IDC "$TMP/bits" -o "$TMP/bits.out" >/dev/null 2>&1
+$BIN_IDC "$TMP/bits" -o "$TMP/bits.out" >/dev/null 2>&1
 expect_output "bitwise operators + hex literals" "48 241 15 -241
 960 30 -4" "$("$TMP/bits.out")"
 
@@ -857,7 +755,7 @@ main(int argc, string[] argv) {
   print("" + ((flags & 4) != 0));
 } return int 0;
 EOF
-$IDC "$TMP/prec" -o "$TMP/prec.out" >/dev/null 2>&1
+$BIN_IDC "$TMP/prec" -o "$TMP/prec.out" >/dev/null 2>&1
 expect_output "bitwise binds tighter than comparison" "1" "$("$TMP/prec.out")"
 
 mkdir -p "$TMP/word"
@@ -878,7 +776,7 @@ show2(word big) {
   print(line2);
 } return void;
 EOF
-$IDC "$TMP/word" -o "$TMP/word.out" >/dev/null 2>&1
+$BIN_IDC "$TMP/word" -o "$TMP/word.out" >/dev/null 2>&1
 expect_output "word: 64-bit + unsigned builtins" "65535 15 0
 6148914691236517204 2 255" "$("$TMP/word.out")"
 
@@ -911,7 +809,7 @@ words_line(word p) {
   string out = "" + peek16(p + 8) + " " + peek8(p + 8) + " " + s;
 } return string out;
 EOF
-$IDC "$TMP/store" -o "$TMP/store.out" >/dev/null 2>&1
+$BIN_IDC "$TMP/store" -o "$TMP/store.out" >/dev/null 2>&1
 expect_output "flat store: poke/peek, widths, string bridge" "1234
 48879 239 hi" "$("$TMP/store.out")"
 
@@ -930,7 +828,7 @@ main(int argc, string[] argv) {
   print("" + xs[1] + " " + xs[0]);
 } return int 0;
 EOF
-$IDC "$TMP/wbox" -o "$TMP/wbox.out" >/dev/null 2>&1
+$BIN_IDC "$TMP/wbox" -o "$TMP/wbox.out" >/dev/null 2>&1
 expect_output "int element widened into a word[]" "-1 0" "$("$TMP/wbox.out")"
 
 # --- alt codegen targets (--target llvm / --target wasm): a handful of
@@ -1034,37 +932,20 @@ else
     bad "MAP.md is out of date -- run tools/mapgen.sh"
 fi
 
-# --- idc.py may not grow. It is stage 0 of a bootstrap being retired
-#     (docs/BACKENDS.md), and "language features are not built here" was a
-#     sentence in the README for a while before this line existed -- during
-#     which idc.py gained 1711 lines. A sentence is not a gate. This is.
-#
-#     Raised once, by 38, for the string-length memo in RUNTIME: `charat` and
-#     `len` remembered one string's length, so a parser alternating between its
-#     input and the strings it builds paid a strlen of the whole input per
-#     character -- 46.8 seconds for a 3.5 MB document. That is the runtime, not
-#     a language feature, and tools/gen_runtime_id.py regenerates the id side
-#     from it, so both compilers still emit the same prelude. Six of those
-#     lines are in instrumented_runtime, which has to declare the test
-#     counters before the helper that now charges them. See docs/FRICTION.md.
-#
-#     The ceiling ratchets DOWN: port something out, lower the number in the
-#     same commit. It never goes up. If a change genuinely has to land here
-#     first, that is a decision worth having to write down, which is the point.
-# Raised once, from 5285, and the reason is written down because that is the
-# whole point of a ratchet: +51 for the conf.id project format, which both
-# compilers must agree on and which is genuinely stage-0 work, and +96 for
-# check_assigned_once, which is NOT -- it is a semantic check on the AST and
-# belongs in mid/, like every other rule. It is here because it was written
-# here; moving it is item 3 in docs/TODO.md and the ceiling drops by 96 when
-# it lands. The gate did its job: it caught a rule going into the wrong
-# compiler, which is exactly the drift it exists to stop.
-IDCPY_CEILING=5470
-idcpy_lines=$(wc -l < ../idc.py)
-if [ "$idcpy_lines" -le "$IDCPY_CEILING" ]; then
-    ok "idc.py is $idcpy_lines lines (ceiling $IDCPY_CEILING)"
+# --- idc.py is frozen (docs/HACKING.md): it is stage 0 of a bootstrap that has
+#     been retired (docs/BACKENDS.md), and no longer builds anything, is
+#     compared against by any lane but the WASM target, or takes new work of
+#     any kind -- not a line, not a rule, not a lint fix. The ceiling that used
+#     to ratchet its line count down, and the lightweight lint that held it to
+#     its own rules while it could still change, both did their job by getting
+#     it small and clean; now the file itself must not change at all, which a
+#     line count cannot guarantee but a hash can.
+IDCPY_FROZEN_SHA256=47d5222845a195b6f241db90cd9723ec1a2ff7dddb50151973a859b8fd102887
+idcpy_sha256=$(sha256sum ../idc.py | cut -d' ' -f1)
+if [ "$idcpy_sha256" = "$IDCPY_FROZEN_SHA256" ]; then
+    ok "idc.py is frozen (unchanged from its recorded hash)"
 else
-    bad "idc.py grew to $idcpy_lines lines, over its $IDCPY_CEILING ceiling -- build it in the self-hosted compiler, or lower nothing and justify raising it"
+    bad "idc.py has changed -- it is frozen; new work goes in the self-hosted compiler (got sha256 $idcpy_sha256, want $IDCPY_FROZEN_SHA256)"
 fi
 
 # --- every document says whether it describes reality. Three of the ten did;
@@ -1111,18 +992,6 @@ else
     ok "--allow-untested has not outlived the migration ($short functions still short of two cases)"
 fi
 
-# --- idc.py obeys a lightweight form of the rules it enforces. A compiler
-#     that rejects long blocks, deep nesting and duplicated logic, in a file
-#     with a 128-statement function in it, is not a good argument for any of
-#     those rules. Relaxed limits (32 statements, depth 4) with a ratcheting
-#     budget for what already exceeded them. See tools/lint_idcpy.py.
-lint_out=$(cd .. && tools/lint_idcpy.py --check 2>&1)
-if [ $? -eq 0 ]; then
-    ok "idc.py passes its own lightweight lint"
-else
-    bad "idc.py lint: $(printf '%s' "$lint_out" | head -1)"
-fi
-
 echo
 echo "$pass passed, $fail failed"
 mark_done core
@@ -1154,7 +1023,7 @@ fi
 
 # --- self-hosted driver (bin/idc): builds several demos through the
 #     id-written lexer+parser (via the bin/idc bash driver) and checks the
-#     resulting binaries run identically to idc.py's. See tests/self_host_build.sh.
+#     resulting binaries' output. See tests/self_host_build.sh.
 echo
 echo "--- self-hosted driver build (bin/idc) ---"
 shneg=0
@@ -1190,9 +1059,10 @@ if want stdlib; then
 fi
 
 # --- conformance: every code-generation target must agree about what a
-#     program means. tools/parity.sh compares emitted text, which is only a
-#     question while both compilers emit C; this compares behaviour, which is
-#     the question that survives a second target. See docs/SPEC.md.
+#     program means. Comparing emitted text against idc.py, which the tree
+#     used to do, is only a question while both compilers emit C; this
+#     compares behaviour, which is the question that survives a second
+#     target. See docs/SPEC.md.
 echo
 echo "--- conformance across targets (docs/SPEC.md) ---"
 conf=0

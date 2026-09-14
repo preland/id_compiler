@@ -1,7 +1,6 @@
 // eprint's runtime helper, which is not in the prelude.
 //
-// The prelude is idc.py's RUNTIME byte for byte, and a program that never calls
-// eprint must emit exactly the C idc.py emits (tools/parity.sh). So the helper
+// A program that never calls eprint must emit no trace of it, so the helper
 // is emitted after the prelude, and only when some call in the build names it.
 //
 // IDTC_EPRINT_TO is where it writes: stderr, unless the test harness has

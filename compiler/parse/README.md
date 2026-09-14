@@ -6,8 +6,8 @@ is built entirely in parallel lists (no structs). Pass `ast` to dump the parsed
 structure instead of emitting C.
 
 ```sh
-./idc.py compiler/lex      -o idlex
-./idc.py compiler/parse -o idparse
+../bin/idc compiler/lex      -o idlex
+../bin/idc compiler/parse -o idparse
 
 # emit C, then compile and run it -- the whole front+middle is written in id:
 printf 'square(int n) { int r = n * n; } return int r;\nmain(int argc, string[] argv) { int a = square(6); } return int a;\n' \
@@ -69,13 +69,10 @@ declarations precede definitions; a C `main()` wraps id's `main`. id's bare `=`
 equality becomes C `==`. Verified end to end: emitted C is compiled by `cc` and
 run (`square(6)` exits 36, `sumto(5)` exits 15).
 
-## Parity with idc.py
+## Emission, type-dependent
 
-The emitter is **differentially tested** against `idc.py`: for a supported
-program, `idlex | idparse` produces byte-identical C to `idc.py --emit-c`. Run
-`tools/parity.sh <file-or-dir>` to check any program. A type pass (built on id's
-one-type-per-name rule, so a single global symbol table suffices) drives the
-type-dependent emission to match idc.py exactly:
+A type pass (built on id's one-type-per-name rule, so a single global symbol
+table suffices) drives type-dependent emission:
 
 - `print(int)` → `id_print(id_str_of_int(x))`; string `+` → `id_concat(...)`
   with operands coerced; string `==`/`!=`/`=` → `(strcmp(a, b) OP 0)`
@@ -86,7 +83,7 @@ type-dependent emission to match idc.py exactly:
 - `||`/`&&` (above equality), unary `-`/`!`/`~`, array indexing `a[i]` and
   index-assignment `a[i] = v`, array literals (`[]`, `[a, b]`), and the list
   builtins — `push` → `id_list_push` and `len` → `id_list_len`/`id_len` — all
-  emit with the same boxing/unboxing casts idc.py uses for the uniform cells
+  emit with the boxing/unboxing casts the uniform cells need
 - `word` is C `long long`; `print(word)` → `id_str_of_word(x)`. Arithmetic and
   bitwise operators widen their operands (`int` < `word` < `float`), and the
   result type is what decides the shape: `a << b` and `a >> b` always become
@@ -98,25 +95,20 @@ type-dependent emission to match idc.py exactly:
   `id_` + the name for the rest. `mem_of_str` takes a string, so it is the one
   that emits with no cast
 
-Whole demos at parity today: **`demos/calc`** and **`demos/adventure`** (and the
-export/import roundtrip) emit byte-identical C under both compilers; checked in
-the test suite.
+`idc.py` is frozen (`../docs/HACKING.md`) and no longer built against here for
+comparison; correctness is checked by running the emitted C
+(`tests/self_host_build.sh`, `tests/conform.sh`) rather than by diffing it
+against a second implementation.
 
 ## Self-hosting
 
-The compiler now **compiles itself**. `idlex | idparse` emits byte-identical C
-to `idc.py` for its own source — both the stage-1 lexer (`compiler/lex`) and
-this parser/codegen (`compiler/parse`):
-
-```sh
-tools/parity.sh compiler/lex        # MATCH
-tools/parity.sh compiler/parse  # MATCH
-```
-
-And the result is a **fixpoint**: compile the compiler with `idc.py`, then use
-that binary to recompile the compiler's source, and the C it produces is
-identical to its own — so the self-compiled compiler reproduces itself exactly.
-The test suite checks both the parity and the fixpoint.
+The compiler **compiles itself**: `idlex | idparse` over its own source —
+both the stage-1 lexer (`compiler/lex`) and this parser/codegen
+(`compiler/parse`) — and the result is a **fixpoint**: compiling the compiler
+with itself and using that binary to recompile the compiler's source produces
+C identical to its own, so the self-compiled compiler reproduces itself
+exactly. The test suite checks the fixpoint (`tests/run.sh`, "self-hosting
+fixpoint").
 
 The lexer change that unblocked this was backslash-escape handling in string
 literals (so a `\"` no longer ends a string early); the runtime prelude that

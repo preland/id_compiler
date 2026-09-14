@@ -3,13 +3,13 @@
 This is the compiler submodule of [`id_development`](../README.md), the
 umbrella repository for the `id` language. It holds the self-hosted compiler
 (`compiler/lex`, `compiler/parse`), the `bin/idc` driver, the bootstrap C
-(`bootstrap/`), the legacy Python implementation (`idc.py`), the dev tools
+(`bootstrap/`), the frozen Python implementation (`idc.py`), the dev tools
 (`tools/`), and the regression suite (`tests/`).
 
 For what `id` is, the language rules, and a quick start building
 `demos/hello`, see the [umbrella README](../README.md). This file covers what
 lives in this directory: the driver's internals, the two code generators,
-idstd's native backends, self-hosting, and `idc.py`'s retirement. See
+idstd's native backends, self-hosting, and `idc.py`'s freeze. See
 [`../docs/SPEC.md`](../docs/SPEC.md) for the language specification and
 [`../docs/HACKING.md`](../docs/HACKING.md) before changing the compiler.
 
@@ -30,8 +30,7 @@ working tree, so nothing but that snapshot is ever frozen and no compiler for
 [`bootstrap/README.md`](bootstrap/README.md). From then on, building
 `PATH` means: collect its `.id` file(s) (a single file, or every `.id` under a
 project directory, sorted by full path — the same order `idc.py` uses), run
-`cat files | idlex | idparse` to get C, then hand that C to `cc` — exactly the
-pipeline `tools/parity.sh` differentially tests against `idc.py`. `-o`,
+`cat files | idlex | idparse` to get C, then hand that C to `cc`. `-o`,
 `--emit-c`, `--keep-c`, and `--cc` all work the same as in `idc.py`. `--backend
 DIR` is now an override, not how a program gets a backend: `DIR` holds a
 `backend.id` whose `name` matches an attached backend, plus its sources and no
@@ -44,10 +43,10 @@ and nothing else. They implement the whole language and all of its rules: the
 action-per-block limit, nesting depth, 3-functions-per-file, name-type
 consistency, export/import access, duplicate names, function-logic uniqueness,
 the type checks, and calls that resolve to nothing. Every case in
-`tests/invalid/` is checked against **both** compilers and must produce the
-same diagnostic, so a message `idc.py` gives and `bin/idc` does not is a test
-failure. `bin/idc` also gates on `cc -fsyntax-only` before trusting its own
-output; if that ever fires it means a bug in the compiler, and it says so.
+`tests/invalid/` is checked against `bin/idc` and must produce the diagnostic
+its `// EXPECT:` line names. `bin/idc` also gates on `cc -fsyntax-only` before
+trusting its own output; if that ever fires it means a bug in the compiler,
+and it says so.
 
 **`--check` and `--fix`.** `bin/idc PATH --check` runs the lexer, the parser
 and every rule, prints exactly what a build of `PATH` prints before it emits
@@ -90,8 +89,8 @@ it was just refused the memory to keep going.
 dependencies and the standard library — runs before anything is produced, and a
 case that does not pass is a compile error reported at its own line; there is
 no flag to turn this on and none to turn it off. `idparse --harness` emits a
-test harness ahead of the program on the same stream (so the program's C is
-unchanged and `tools/parity.sh` still matches); it carries only the functions
+test harness ahead of the program on the same stream (so the program's own C
+is unchanged); it carries only the functions
 a case can reach. The driver splits it off, compiles it with the build's
 backends and runs it. Each case runs in a process
 of its own with 10 seconds and 1 GiB, so a case that traps or crashes is
@@ -225,51 +224,50 @@ it would.
 ## Self-hosting
 
 The `id`-written compiler (`compiler/lex` lexer + `compiler/parse`
-parser/codegen) **compiles its own source** to C that is byte-identical to
-`idc.py`, and the self-compiled binary reproduces itself exactly (a fixpoint).
-`tests/run.sh` checks both. See `compiler/parse/README.md`. `bin/idc`
-is the driver that turns this pair of self-hosted binaries into `id`'s
-primary build command — see "`bin/idc`: the self-hosted driver" above.
+parser/codegen) **compiles its own source**, and the self-compiled binary
+reproduces itself exactly (a fixpoint) — `tests/run.sh` checks it. See
+`compiler/parse/README.md`. `bin/idc` is the driver that turns this pair of
+self-hosted binaries into `id`'s primary build command — see "`bin/idc`: the
+self-hosted driver" above.
 
-## The compiler: one implementation, and a bootstrap being retired
+## The compiler: one implementation, and a frozen bootstrap
 
-**`idc.py` is on its way out, as fast as the work can be done.** It is not a
-second supported compiler, not a fallback, and not a place to add anything. The
-goal is deleting it. Everything below describes what still holds it here, and
-each of those is a task, not a feature —
-[`../docs/BACKENDS.md`](../docs/BACKENDS.md) tracks the order.
+**`idc.py` is frozen.** It is not a second supported compiler, not a fallback,
+and not a place to add anything — not a line, not a rule, not a lint fix.
+`tests/run.sh` checks its sha256 against a recorded value and fails if it has
+changed at all. [`../docs/HACKING.md`](../docs/HACKING.md) says more.
 
-Until then it is the original, self-contained Python implementation: lexer →
+It is the original, self-contained Python implementation: lexer →
 recursive-descent parser → semantic checks (action limit, function-per-file
 limit, project entry-count limit, global name uniqueness, function-logic
 uniqueness, export/import access, light type checking) → C/LLVM/WASM emission
 → `cc`/`clang`/`wat2wasm`. It **used to be stage 0 of the bootstrap**; that job
 went to [`bootstrap/`](bootstrap) — the compiler as C, compiled by `cc` — and
-`bin/idc` no longer executes `idc.py` at all. What is left:
+`bin/idc` no longer executes `idc.py` at all. What still reaches it:
 
-1. **The WASM codegen target**, `--target wasm` (and `--emit-wasm`) — the last
-   thing `bin/idc` does not have. `--target llvm` moved across and is now the
-   self-hosted compiler's own ([`../docs/LLVM.md`](../docs/LLVM.md)); WASM is
-   what is left.
-2. **Being the other side of a differential test.** `tools/parity.sh` and half
-   of `tests/` build with both compilers on purpose. That is a use, not a
-   dependency: it ends when it is decided that one implementation plus
-   `../docs/SPEC.md` is enough.
+- **The WASM codegen target**, `--target wasm` (and `--emit-wasm`) — the last
+  thing `bin/idc` does not have. `--target llvm` moved across and is now the
+  self-hosted compiler's own ([`../docs/LLVM.md`](../docs/LLVM.md)); WASM is
+  what is left, and porting it is what would let `idc.py` be deleted.
+  `tests/conform.sh`'s wasm lane and the wasm half of `tests/run.sh`'s
+  alt-target checks build with it for that reason.
 
-It is also where the **C runtime prelude** lives, as one string that both
-compilers emit verbatim; `tools/gen_runtime_id.py` regenerates the `id`-side
-copy from it, so a runtime change is made in one place and parity keeps the two
-honest.
+The **C runtime prelude** used to live in `idc.py`'s `RUNTIME` string, with
+`tools/gen_runtime_id.py` regenerating the `id`-side copy
+(`compiler/parse/back/tgt/c/runtime/runtime.id` and `extern.id`) from it. Both
+are hand-maintained `id` source now, kept in step by hand rather than
+generated; `tests/stdlib.sh` checks that `compiler/parse/conf.id`'s reserved-name
+list has not drifted from `runtime.id`.
 
-**It is not where language features are built**, and a change that grows it is
-a change in the wrong direction. "Reference implementation" is what this
-section used to call it, and that reading — *the definition of correct, so
-define the feature here and port it* — is why work kept landing in Python
-instead of in `id`. Stage 0 needs a construct only once the self-hosted
-compiler's own source uses that construct — and since `bootstrap/` landed,
-"stage 0" means the checked-in C rather than the Python, so teaching the
-language a construct is `tools/regen_bootstrap.sh` and not a second
-implementation. Read
+**It was never where language features should be built**, and that is truer
+than ever now that it cannot change at all. "Reference implementation" is what
+the "one implementation" heading above used to call it, and that reading —
+*the definition of correct, so define the feature here and port it* — is why
+work kept landing in Python instead of in `id`. Stage 0 needs a construct only
+once the self-hosted compiler's own source uses that construct — and since
+`bootstrap/` landed, "stage 0" means the checked-in C rather than the Python,
+so teaching the language a construct is `tools/regen_bootstrap.sh` and not a
+second implementation. Read
 [`../docs/HACKING.md`](../docs/HACKING.md) before changing the language;
 [`compiler/parse/MAP.md`](compiler/parse/MAP.md) is the index
 that makes the self-hosted tree navigable, which was the other half of the
@@ -278,7 +276,7 @@ problem.
 **`bin/idc`** (see the umbrella [Quick start](../README.md#quick-start)) is
 the **primary** way to build a program: it drives the self-hosted
 `idlex`/`idparse` pair and does not fall back. It enforces every rule of the
-language, and its diagnostics are checked against `idc.py`'s, case by case, by
+language, checked case by case against `tests/invalid/`'s expectations by
 `tests/invalid.sh`.
 
 Generated code details (true of both implementations — the self-hosted
