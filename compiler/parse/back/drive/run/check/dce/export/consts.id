@@ -13,6 +13,8 @@ is_list_const(int i) {
     ok = keep_export(i);
   }
 } return int ok;
+given lc_dce_setup (0):(1)
+given lc_dce_setup (1):(0)
 
 list_consts_kept() {
   int n = 0;
@@ -22,3 +24,5 @@ list_consts_kept() {
     i = i + 1;
   }
 } return int n;
+given lc_dce_setup ():(1)
+given lc_dce_setup2 ():(0)

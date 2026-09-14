@@ -1,0 +1,31 @@
+// Export-table state for is_list_const/list_consts_kept, built without a
+// harness build's own export table (lc_env, const/fixture.id): a fresh
+// process with `harn` initialised (harn_init, test/unit/flag.id) but never
+// set, so keep_export's own branch is never reached (nat_all_live is 1 with
+// no `main` in this fixture's fnames) and every export it sees is kept.
+
+lc_dce_init() {
+  lc_env();
+  harn_init();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// One list constant ("a") and one scalar constant ("b"), at export indices 0
+// and 1.
+lc_dce_setup() {
+  lc_dce_init();
+  lc_reg_list1("a", "1", 1);
+  lc_reg_int("b", "2", 2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A scalar constant only -- no list constant survives, for list_consts_kept's
+// other data point.
+lc_dce_setup2() {
+  lc_dce_init();
+  lc_reg_int("b", "2", 2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
