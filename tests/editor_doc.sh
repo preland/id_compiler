@@ -57,7 +57,7 @@ tst_more() {
 } return void;
 IDEOF
 
-cat > "$P/show/helpers.id" <<'IDEOF'
+cat > "$P/show/print.id" <<'IDEOF'
 show_paras() {
   int n = odt_paras();
   print("paras " + n);
@@ -100,7 +100,7 @@ tst_key(string key) {
 } return void;
 IDEOF
 
-cat > "$P/show/more/helpers.id" <<'IDEOF'
+cat > "$P/show/more/print.id" <<'IDEOF'
 show_r_line(int r) {
   string style = odt_run_style(r);
   string text = odt_run_text(r);
