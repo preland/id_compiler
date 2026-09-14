@@ -1,0 +1,26 @@
+// The lexer's state cells and its one flag.
+//
+//   lexline  the running line number
+//   lexbol   the source index the current line begins at, so a token's column
+//            is its index minus this
+//   lexcols  1 under --cols, which prints each token's columns (line.id)
+lex_setup(int argc, string[] argv) {
+  export int[] lexline = [1];
+  export int[] lexbol = [0];
+  lex_cols(argc, argv);
+} return void;
+
+lex_cols(int argc, string[] argv) {
+  int on = 0;
+  if(argc > 1 && argv[1] == "--cols") {
+    on = 1;
+  }
+  export int[] lexcols = [on];
+} return void;
+
+is_lcomment(string src, int i) {
+  int ok = 0;
+  if(charat(src, i) == 47 && charat(src, i + 1) == 47) {
+    ok = 1;
+  }
+} return int ok;

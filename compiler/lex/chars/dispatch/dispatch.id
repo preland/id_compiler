@@ -10,7 +10,7 @@ scan_one(string src, int i) {
   if(is_space_at(src, i)) {
     ni = eat_space(src, i);
   } else {
-    ni = scan_word(src, i);
+    ni = scan_tok_span(src, i);
   }
 } return int ni;
 

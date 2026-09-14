@@ -455,6 +455,8 @@ int id_scan_block(char* src, int i);
 int id_block_tok(char* src, int i);
 int id_skip_block(char* src, int i);
 void id_bump_line(void);
+int id_scan_tok_span(char* src, int i);
+void id_span_out(char* src, int i, int ni);
 int id_scan_decop(char* src, int i);
 int id_scan_hashop(char* src, int i);
 int id_scan_hash(char* src, int i);
@@ -479,6 +481,9 @@ char* id_udec(long long v);
 char* id_pad10(char* s);
 void id_print_uint(long long v);
 void id_lex_all(void);
+void id_lex_setup(int argc, IdList* argv);
+void id_lex_cols(int argc, IdList* argv);
+int id_is_lcomment(char* src, int i);
 int id_main(int argc, IdList* argv);
 int id_eat_space(char* src, int i);
 void id_lex(char* src);
@@ -500,7 +505,9 @@ int id_adv_str(char* src, int i);
 char* id_slice_str(char* src, int a, int b);
 
 /* exported variables */
-IdList* lexline;  /* exported by main() */
+IdList* lexline;  /* exported by lex_setup() */
+IdList* lexbol;  /* exported by lex_setup() */
+IdList* lexcols;  /* exported by lex_cols() */
 
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
     id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
@@ -622,7 +629,7 @@ int id_scan_one(char* src, int i) {
     if (id_is_space_at(src, i)) {
         ni = id_eat_space(src, i);
     } else {
-        ni = id_scan_word(src, i);
+        ni = id_scan_tok_span(src, i);
     }
     return ni;
 }
@@ -701,6 +708,22 @@ int id_skip_block(char* src, int i) {
 void id_bump_line(void) {
     id_lset(lexline, 0, ((int)(id_list_get(lexline, 0)) + 1));
     id_print(id_concat("line ", id_str_of_int((int)(id_list_get(lexline, 0)))));
+    return;
+}
+
+int id_scan_tok_span(char* src, int i) {
+    int ni;
+    ni = id_scan_word(src, i);
+    id_span_out(src, i, ni);
+    return ni;
+}
+
+void id_span_out(char* src, int i, int ni) {
+    int b;
+    if ((((int)(id_list_get(lexcols, 0)) == 1) && (id_is_lcomment(src, i) == 0))) {
+        b = (int)(id_list_get(lexbol, 0));
+        id_print(id_concat("span ", id_str_of_int(((((i - b) * 65536) + ni) - b))));
+    }
     return;
 }
 
@@ -921,8 +944,34 @@ void id_lex_all(void) {
     return;
 }
 
-int id_main(int argc, IdList* argv) {
+void id_lex_setup(int argc, IdList* argv) {
     lexline = id_list_lit(1, (long long)(1));
+    lexbol = id_list_lit(1, (long long)(0));
+    id_lex_cols(argc, argv);
+    return;
+}
+
+void id_lex_cols(int argc, IdList* argv) {
+    int on;
+    on = 0;
+    if (((argc > 1) && (strcmp((char*)(intptr_t)(id_list_get(argv, 1)), "--cols") == 0))) {
+        on = 1;
+    }
+    lexcols = id_list_lit(1, (long long)(on));
+    return;
+}
+
+int id_is_lcomment(char* src, int i) {
+    int ok;
+    ok = 0;
+    if (((id_charat(src, i) == 47) && (id_charat(src, (i + 1)) == 47))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_main(int argc, IdList* argv) {
+    id_lex_setup(argc, argv);
     id_lex_all();
     id_print("eof");
     return 0;
@@ -932,6 +981,7 @@ int id_eat_space(char* src, int i) {
     int ret_i;
     if ((id_charat(src, i) == 10)) {
         id_bump_line();
+        id_lset(lexbol, 0, (i + 1));
     }
     ret_i = (i + 1);
     return ret_i;

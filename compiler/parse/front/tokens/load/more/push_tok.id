@@ -16,6 +16,8 @@ push_tok(string kind, string text) {
   if(kind == "line") {
     int to_int_v = to_int(text);
     push((import lnseen), to_int_v);
+  } else if(kind == "span") {
+    set_span(text);
   } else {
     push_real(kind, text);
   }

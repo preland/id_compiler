@@ -18,4 +18,5 @@ paren_primary(int[] pos) {
   if(k_of(e) == "bin") {
     push((import nparen), e);
   }
+  grp_note(e, pos);
 } return int e;

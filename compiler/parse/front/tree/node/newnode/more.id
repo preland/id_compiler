@@ -2,5 +2,6 @@
 
 newnode_tail(int[] l1, int[] l2) {
   push_ll(l1, l2);
+  push((import ntok), (import curtk)[0]);
   int ret_i = len((import nkind)) - 1;
 } return int ret_i;

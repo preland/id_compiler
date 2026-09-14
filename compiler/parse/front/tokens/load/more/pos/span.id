@@ -1,0 +1,29 @@
+// Where each token sits on its line, for `idc --fix`: a `span V` line from
+// `idlex --cols` gives the columns of the token just before it, packed as
+// start * 65536 + end, where end is one past its last byte. One number keeps
+// the marker one line and the store one list; a line wider than 32767 columns
+// is the price, and no source in this repository comes close. An ordinary
+// build sends no spans and the list stays empty, which nothing but the fixes
+// reads.
+//
+//   tspan  the packed columns of each token, parallel to tkind; -1 if unknown
+//   curtk  the index of the token most recently consumed (stamp.id)
+init_pos() {
+  export int[] tspan = [];
+  export int[] curtk = [0];
+  init_pos2();
+} return void;
+
+// Padded first, so a token that arrived without a span cannot shift every
+// later token's columns onto its neighbour.
+set_span(string text) {
+  span_pad();
+  int v = to_int(text);
+  push((import tspan), v);
+} return void;
+
+span_pad() {
+  while(len((import tspan)) < len((import tkind)) - 1) {
+    push((import tspan), 0 - 1);
+  }
+} return void;

@@ -1558,6 +1558,12 @@ void id_syn_err_tail(char* cur_file_v, int cur_ln_v, char* msg);
 void id_load(void);
 void id_load_at(char* src, int i);
 int id_take_line(char* src, int i);
+void id_init_pos(void);
+void id_set_span(char* text);
+void id_span_pad(void);
+void id_init_pos2(void);
+void id_stamp_tok(IdList* pos);
+void id_grp_note(int e, IdList* pos);
 char* id_slice(char* src, int a, int b);
 void id_push_tok(char* kind, char* text);
 void id_push_real(char* kind, char* text);
@@ -2375,6 +2381,11 @@ IdList* chkfail;  /* exported by init_lines3() */
 IdList* curtl;  /* exported by init_lines3() */
 IdList* casefn;  /* exported by init_lines4() */
 IdList* casestart;  /* exported by init_lines4() */
+IdList* tspan;  /* exported by init_pos() */
+IdList* curtk;  /* exported by init_pos() */
+IdList* ntok;  /* exported by init_pos2() */
+IdList* ngrp;  /* exported by init_pos2() */
+IdList* ngrpc;  /* exported by init_pos2() */
 IdList* ns2;  /* exported by init_c() */
 IdList* nl1;  /* exported by init_c() */
 IdList* nl2;  /* exported by init_c() */
@@ -11375,6 +11386,7 @@ int id_native_node(IdList* pos, char* name, char* rt, IdList* params) {
 
 int id_init_consts(void) {
     cdecl = id_list_lit(0);
+    id_init_pos();
     return 0;
 }
 
@@ -11819,6 +11831,7 @@ int id_paren_primary(IdList* pos) {
     if ((strcmp(id_k_of(e), "bin") == 0)) {
         id_list_push(nparen, (long long)(e));
     }
+    id_grp_note(e, pos);
     return e;
 }
 
@@ -12484,9 +12497,7 @@ char* id_cur_text(IdList* pos) {
 }
 
 void id_advance(IdList* pos) {
-    int cur_ln_v;
-    cur_ln_v = id_cur_ln(pos);
-    id_lset(curtl, 0, cur_ln_v);
+    id_stamp_tok(pos);
     id_list_set(pos, 0, (long long)(((int)(id_list_get(pos, 0)) + 1)));
     return;
 }
@@ -12585,6 +12596,51 @@ int id_take_line(char* src, int i) {
     return ret_i;
 }
 
+void id_init_pos(void) {
+    tspan = id_list_lit(0);
+    curtk = id_list_lit(1, (long long)(0));
+    id_init_pos2();
+    return;
+}
+
+void id_set_span(char* text) {
+    int v;
+    id_span_pad();
+    v = id_to_int(text);
+    id_list_push(tspan, (long long)(v));
+    return;
+}
+
+void id_span_pad(void) {
+    while ((id_list_len(tspan) < (id_list_len(tkind) - 1))) {
+        id_list_push(tspan, (long long)((0 - 1)));
+    }
+    return;
+}
+
+void id_init_pos2(void) {
+    ntok = id_list_lit(0);
+    ngrp = id_list_lit(0);
+    ngrpc = id_list_lit(0);
+    return;
+}
+
+void id_stamp_tok(IdList* pos) {
+    int cur_ln_v;
+    cur_ln_v = id_cur_ln(pos);
+    id_lset(curtl, 0, cur_ln_v);
+    id_lset(curtk, 0, (int)(id_list_get(pos, 0)));
+    return;
+}
+
+void id_grp_note(int e, IdList* pos) {
+    int c;
+    id_list_push(ngrp, (long long)(e));
+    c = ((int)(id_list_get(pos, 0)) - 1);
+    id_list_push(ngrpc, (long long)(c));
+    return;
+}
+
 char* id_slice(char* src, int a, int b) {
     char* out;
     int charat_v;
@@ -12602,6 +12658,8 @@ void id_push_tok(char* kind, char* text) {
     if ((strcmp(kind, "line") == 0)) {
         to_int_v = id_to_int(text);
         id_list_push(lnseen, (long long)(to_int_v));
+    } else if ((strcmp(kind, "span") == 0)) {
+        id_set_span(text);
     } else {
         id_push_real(kind, text);
     }
@@ -12896,6 +12954,7 @@ int id_is_native(int id) {
 int id_newnode_tail(IdList* l1, IdList* l2) {
     int ret_i;
     id_push_ll(l1, l2);
+    id_list_push(ntok, (long long)((int)(id_list_get(curtk, 0))));
     ret_i = (id_list_len(nkind) - 1);
     return ret_i;
 }

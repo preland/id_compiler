@@ -1,0 +1,28 @@
+// The token end of every node, and the parentheses written around one.
+//
+//   ntok   the last token of each node, parallel to nkind: every node is built
+//          just after the tokens that make it up, so it is the token most
+//          recently consumed when the node is pushed
+//   ngrp   each node written inside grouping parentheses, once per pair
+//   ngrpc  the closing parenthesis of that pair
+// A node's first token is not recorded: `idc --fix` works it out from the
+// node's kind and its children, which is what these lists are enough for.
+init_pos2() {
+  export int[] ntok = [];
+  export int[] ngrp = [];
+  export int[] ngrpc = [];
+} return void;
+
+// Consuming a token records its line and its index.
+stamp_tok(int[] pos) {
+  int cur_ln_v = cur_ln(pos);
+  lset((import curtl), 0, cur_ln_v);
+  lset((import curtk), 0, pos[0]);
+} return void;
+
+// Called just after the closing parenthesis was consumed.
+grp_note(int e, int[] pos) {
+  push((import ngrp), e);
+  int c = pos[0] - 1;
+  push((import ngrpc), c);
+} return void;

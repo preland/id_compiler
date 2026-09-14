@@ -16,6 +16,7 @@
 
 init_consts() {
   export int[] cdecl = [];
+  init_pos();
 } return int 0;
 
 take_const(int[] pos) {

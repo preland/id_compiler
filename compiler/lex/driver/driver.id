@@ -25,7 +25,7 @@
 //   chars/classify/ident_kw.id   is_alnum / is_kw / kindof
 
 main(int argc, string[] argv) {
-  export int[] lexline = [1];
+  lex_setup(argc, argv);
   lex_all();
   print("eof");
 } return int 0;
@@ -37,6 +37,7 @@ main(int argc, string[] argv) {
 eat_space(string src, int i) {
   if(charat(src, i) == 10) {
     bump_line();
+    lset((import lexbol), 0, i + 1);
   }
   int ret_i = i + 1;
 } return int ret_i;
