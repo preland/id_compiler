@@ -4,9 +4,8 @@
 #
 # `idstd` is imported by DEFAULT -- a program calls a library function with no
 # conf.id line and no flag. That is a change to how every program is built,
-# so it needs its own file of checks, and every one of them runs against BOTH
-# compilers: bin/idc and idc.py must agree about what a program's sources are,
-# or they stop emitting byte-identical C for every program at once.
+# so it needs its own file of checks, against bin/idc, the only compiler that
+# is still built.
 #
 # Everything here uses tests/fixtures/idstd rather than the real ../idstd, so
 # the suite says the same thing on a checkout that has no standard library
@@ -19,10 +18,8 @@ cd "$(dirname "$0")"
 ROOT=".."
 # bin/idc takes --allow-untested throughout: neither these programs nor the
 # fixture library has two cases per function, and what is under test is how
-# the library is found. The flag is part of the word, so one loop still runs
-# both compilers; idc.py has no such flag.
+# the library is found.
 BIN_IDC="../bin/idc --allow-untested"
-IDC_PY=../idc.py
 FIXTURE=$(cd fixtures/idstd && pwd)
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -35,33 +32,18 @@ bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 # than CI does.
 unset IDSTD_HOME IDC_NO_STD
 
-# run_both DESC EXPECTED_STDOUT -- build $TMP/proj with each compiler, run it,
-# compare output, and check the two emitted C files are byte-identical.
-run_both() {
+# run_one DESC EXPECTED_STDOUT -- build $TMP/proj, run it, compare output.
+run_one() {
     local desc="$1" want="$2" got
-
-    for cc_name in idc idc.py; do
-        case "$cc_name" in
-            idc)    build=($BIN_IDC --std "$FIXTURE" "$TMP/proj" -o "$TMP/out.$cc_name") ;;
-            idc.py) build=("$IDC_PY"  --std "$FIXTURE" "$TMP/proj" -o "$TMP/out.$cc_name") ;;
-        esac
-        if ! "${build[@]}" >"$TMP/build.err" 2>&1; then
-            bad "$desc ($cc_name: build failed: $(head -1 "$TMP/build.err"))"
-            return
-        fi
-        got=$("$TMP/out.$cc_name" 2>&1)
-        if [ "$got" != "$want" ]; then
-            bad "$desc ($cc_name: got '$got', want '$want')"
-            return
-        fi
-    done
-
-    $BIN_IDC --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/a.c" >/dev/null 2>&1
-    "$IDC_PY"  --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/b.c" >/dev/null 2>&1
-    if cmp -s "$TMP/a.c" "$TMP/b.c"; then
+    if ! $BIN_IDC --std "$FIXTURE" "$TMP/proj" -o "$TMP/out" >"$TMP/build.err" 2>&1; then
+        bad "$desc (build failed: $(head -1 "$TMP/build.err"))"
+        return
+    fi
+    got=$("$TMP/out" 2>&1)
+    if [ "$got" = "$want" ]; then
         ok "$desc"
     else
-        bad "$desc (emitted C differs between compilers)"
+        bad "$desc (got '$got', want '$want')"
     fi
 }
 
@@ -74,7 +56,7 @@ main(int argc, string[] argv) {
     print("" + a + "\n" + b);
 } return int 0;
 EOF
-run_both "a project reaches the stdlib with no conf.id" "9
+run_one "a project reaches the stdlib with no conf.id" "9
 4"
 
 # -- 2. a nested stdlib directory is reached, not just its top level --------
@@ -85,7 +67,7 @@ main(int argc, string[] argv) {
     print(r);
 } return int 0;
 EOF
-run_both "the whole stdlib tree is merged, not just its root" "abab"
+run_one "the whole stdlib tree is merged, not just its root" "abab"
 
 # -- 3. a single FILE gets the stdlib too ----------------------------------
 # The tutorial path (`idc prog.id`) is the one that most needs fx_max to
@@ -96,14 +78,12 @@ main(int argc, string[] argv) {
     print(r);
 } return int 0;
 EOF
-sf_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --std "$FIXTURE" "$TMP/single.id" -o "$TMP/single.bin" >/dev/null 2>&1 \
-        || { sf_ok=0; break; }
-    [ "$("$TMP/single.bin")" = "7" ] || { sf_ok=0; break; }
-done
-[ "$sf_ok" -eq 1 ] && ok "a single .id file gets the stdlib too" \
-                   || bad "a single .id file gets the stdlib too"
+if $BIN_IDC --std "$FIXTURE" "$TMP/single.id" -o "$TMP/single.bin" >/dev/null 2>&1 \
+   && [ "$("$TMP/single.bin")" = "7" ]; then
+    ok "a single .id file gets the stdlib too"
+else
+    bad "a single .id file gets the stdlib too"
+fi
 
 # -- 4. --no-std really means no stdlib ------------------------------------
 # This is not a nicety. idstd cannot import itself, the bootstrap stages
@@ -116,28 +96,22 @@ main(int argc, string[] argv) {
     print(r);
 } return int 0;
 EOF
-ns_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    if $cc --no-std --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
-        ns_ok=0   # it built, so the stdlib was still there
-    elif ! grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
-        ns_ok=0   # it failed for the wrong reason
-    fi
-done
-[ "$ns_ok" -eq 1 ] && ok "--no-std removes the stdlib (both compilers)" \
-                   || bad "--no-std removes the stdlib (both compilers)"
+if $BIN_IDC --no-std --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
+    bad "--no-std removes the stdlib"   # it built, so the stdlib was still there
+elif grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
+    ok "--no-std removes the stdlib"
+else
+    bad "--no-std removes the stdlib (wrong reason: $(head -1 "$TMP/ns.err"))"
+fi
 
 # -- 5. IDC_NO_STD does the same, for scripts that cannot pass a flag ------
-env_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    if IDC_NO_STD=1 $cc --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
-        env_ok=0
-    elif ! grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
-        env_ok=0
-    fi
-done
-[ "$env_ok" -eq 1 ] && ok "IDC_NO_STD=1 removes the stdlib (both compilers)" \
-                    || bad "IDC_NO_STD=1 removes the stdlib (both compilers)"
+if IDC_NO_STD=1 $BIN_IDC --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
+    bad "IDC_NO_STD=1 removes the stdlib"
+elif grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
+    ok "IDC_NO_STD=1 removes the stdlib"
+else
+    bad "IDC_NO_STD=1 removes the stdlib (wrong reason: $(head -1 "$TMP/ns.err"))"
+fi
 
 # -- 6. $IDSTD_HOME locates it ---------------------------------------------
 rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
@@ -147,22 +121,20 @@ main(int argc, string[] argv) {
     print(r);
 } return int 0;
 EOF
-home_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    IDSTD_HOME="$FIXTURE" $cc "$TMP/proj" -o "$TMP/h" >/dev/null 2>&1 || { home_ok=0; break; }
-    [ "$("$TMP/h")" = "5" ] || { home_ok=0; break; }
-done
-[ "$home_ok" -eq 1 ] && ok "\$IDSTD_HOME locates the stdlib" \
-                     || bad "\$IDSTD_HOME locates the stdlib"
+if IDSTD_HOME="$FIXTURE" $BIN_IDC "$TMP/proj" -o "$TMP/h" >/dev/null 2>&1 \
+   && [ "$("$TMP/h")" = "5" ]; then
+    ok "\$IDSTD_HOME locates the stdlib"
+else
+    bad "\$IDSTD_HOME locates the stdlib"
+fi
 
 # -- 7. a bad --std is reported, not ignored -------------------------------
-bad_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --std "$TMP/nope" "$TMP/proj" -o "$TMP/x" >"$TMP/x.err" 2>&1 && bad_ok=0
-    grep -qi "not a directory\|does not name a directory" "$TMP/x.err" || bad_ok=0
-done
-[ "$bad_ok" -eq 1 ] && ok "a --std that is not a directory is reported" \
-                    || bad "a --std that is not a directory is reported"
+if ! $BIN_IDC --std "$TMP/nope" "$TMP/proj" -o "$TMP/x" >"$TMP/x.err" 2>&1 \
+   && grep -qi "not a directory\|does not name a directory" "$TMP/x.err"; then
+    ok "a --std that is not a directory is reported"
+else
+    bad "a --std that is not a directory is reported"
+fi
 
 # -- 8. transitive source imports (C3) -------------------------------------
 # a -> b -> c, where only a's manifest is the project's own. Before this
@@ -174,13 +146,12 @@ printf 'trmid_v() {\n  int v = trbase_v(41) + 1;\n} return int v;\n' > "$TMP/tr/
 printf 'import "../mid"\n'                                       > "$TMP/tr/app/conf.id"
 printf 'main(int argc, string[] argv) {\n    int v = trmid_v();\n    print(v);\n} return int 0;\n' \
                                                                  > "$TMP/tr/app/main.id"
-tr_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --no-std "$TMP/tr/app" -o "$TMP/tr/out" >/dev/null 2>&1 || { tr_ok=0; break; }
-    [ "$("$TMP/tr/out")" = "42" ] || { tr_ok=0; break; }
-done
-[ "$tr_ok" -eq 1 ] && ok "an imported directory's own conf.id is followed" \
-                   || bad "an imported directory's own conf.id is followed"
+if $BIN_IDC --no-std "$TMP/tr/app" -o "$TMP/tr/out" >/dev/null 2>&1 \
+   && [ "$("$TMP/tr/out")" = "42" ]; then
+    ok "an imported directory's own conf.id is followed"
+else
+    bad "an imported directory's own conf.id is followed"
+fi
 
 # -- 9. a cycle in the import graph terminates -----------------------------
 rm -rf "$TMP/cy"; mkdir -p "$TMP/cy/a" "$TMP/cy/b"
@@ -189,13 +160,12 @@ printf 'cya_v() {\n  int v = cyb_v(7);\n} return int v;\n' > "$TMP/cy/a/a.id"
 printf 'import "../a"\n'                            > "$TMP/cy/b/conf.id"
 printf 'cyb_v(int a) {\n  int v = a;\n} return int v;\nmain(int argc, string[] argv) {\n    int v = cya_v();\n    print(v);\n} return int 0;\n' \
                                                     > "$TMP/cy/b/b.id"
-cy_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    timeout 30 $cc --no-std "$TMP/cy/b" -o "$TMP/cy/out" >/dev/null 2>&1 || { cy_ok=0; break; }
-    [ "$("$TMP/cy/out")" = "7" ] || { cy_ok=0; break; }
-done
-[ "$cy_ok" -eq 1 ] && ok "a cycle in the import graph terminates" \
-                   || bad "a cycle in the import graph terminates"
+if timeout 30 $BIN_IDC --no-std "$TMP/cy/b" -o "$TMP/cy/out" >/dev/null 2>&1 \
+   && [ "$("$TMP/cy/out")" = "7" ]; then
+    ok "a cycle in the import graph terminates"
+else
+    bad "a cycle in the import graph terminates"
+fi
 
 # -- 10. a transitively-imported BACKEND is linked -------------------------
 # The reason transitivity had to land with the stdlib: a graphics module in a
@@ -217,29 +187,25 @@ main(int argc, string[] argv) {
     print(has);
 } return int 0;
 EOF
-bk_ok=1
-# bin/idc only: idc.py reads backend.json, which backend.id replaced, and
-# idc.py is being retired and will not change.
-for cc in "$BIN_IDC"; do
-    $cc --no-std "$TMP/bk/app" -o "$TMP/bk/out" >/dev/null 2>&1 || { bk_ok=0; break; }
-    [ "$("$TMP/bk/out")" = "0" ] || { bk_ok=0; break; }
-done
-[ "$bk_ok" -eq 1 ] && ok "a backend named by an imported library is linked" \
-                   || bad "a backend named by an imported library is linked"
+if $BIN_IDC --no-std "$TMP/bk/app" -o "$TMP/bk/out" >/dev/null 2>&1 \
+   && [ "$("$TMP/bk/out")" = "0" ]; then
+    ok "a backend named by an imported library is linked"
+else
+    bad "a backend named by an imported library is linked"
+fi
 
 # -- 11. the stdlib obeys the 3-entries-per-directory rule -----------------
 # It is imported source like any other, so the rule applies to it -- and a
 # violation must name the stdlib's directory, not the user's project.
 rm -rf "$TMP/fat"; mkdir -p "$TMP/fat"
 for n in 1 2 3 4; do printf 'fat%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/fat/f$n.id"; done
-fat_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --std "$TMP/fat" "$TMP/proj" -o "$TMP/x" >"$TMP/fat.err" 2>&1 && fat_ok=0
-    grep -q "at most 3 files and directories" "$TMP/fat.err" || fat_ok=0
-    grep -q "$TMP/fat" "$TMP/fat.err" || fat_ok=0
-done
-[ "$fat_ok" -eq 1 ] && ok "the entry-count rule applies to the stdlib, and names it" \
-                    || bad "the entry-count rule applies to the stdlib, and names it"
+if ! $BIN_IDC --std "$TMP/fat" "$TMP/proj" -o "$TMP/x" >"$TMP/fat.err" 2>&1 \
+   && grep -q "at most 3 files and directories" "$TMP/fat.err" \
+   && grep -q "$TMP/fat" "$TMP/fat.err"; then
+    ok "the entry-count rule applies to the stdlib, and names it"
+else
+    bad "the entry-count rule applies to the stdlib, and names it"
+fi
 
 # -- 12. dead-code elimination: an unused stdlib function is not emitted -----
 # This is what makes an always-imported library affordable. Before it existed,
@@ -253,25 +219,16 @@ main(int argc, string[] argv) {
 } return int 0;
 EOF
 dce_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/dce.c" >/dev/null 2>&1 || dce_ok=0
-    # tstr_twice is in the stdlib and nothing calls it
-    grep -q "id_tstr_twice" "$TMP/dce.c" && dce_ok=0
-    # tfx_max is called, and tfx_abs is not -- but tfx_max is reached, so it stays
-    grep -q "id_tfx_max" "$TMP/dce.c" || dce_ok=0
-    grep -q "id_tfx_abs" "$TMP/dce.c" && dce_ok=0
-done
+$BIN_IDC --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/dce.c" >/dev/null 2>&1 || dce_ok=0
+# tstr_twice is in the stdlib and nothing calls it
+grep -q "id_tstr_twice" "$TMP/dce.c" && dce_ok=0
+# tfx_max is called, and tfx_abs is not -- but tfx_max is reached, so it stays
+grep -q "id_tfx_max" "$TMP/dce.c" || dce_ok=0
+grep -q "id_tfx_abs" "$TMP/dce.c" && dce_ok=0
 [ "$dce_ok" -eq 1 ] && ok "an unreachable stdlib function is not emitted" \
                     || bad "an unreachable stdlib function is not emitted"
 
-# -- 13. and the two compilers agree about exactly what survives ------------
-$BIN_IDC --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/p1.c" >/dev/null 2>&1
-"$IDC_PY"  --std "$FIXTURE" "$TMP/proj" --emit-c "$TMP/p2.c" >/dev/null 2>&1
-cmp -s "$TMP/p1.c" "$TMP/p2.c" \
-    && ok "both compilers eliminate exactly the same code" \
-    || bad "both compilers eliminate exactly the same code"
-
-# -- 14. a library (no main) keeps everything ------------------------------
+# -- 13. a library (no main) keeps everything ------------------------------
 # Every function of a project with no main is an entry point -- it compiles to
 # a .o for something else to link, and pruning it would empty the object file.
 rm -rf "$TMP/lib"; mkdir -p "$TMP/lib"
@@ -285,23 +242,20 @@ libx_b(int a) {
 } return int r;
 EOF
 lib_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --no-std "$TMP/lib" --emit-c "$TMP/lib.c" >/dev/null 2>&1 || lib_ok=0
-    grep -q "id_libx_a" "$TMP/lib.c" || lib_ok=0
-    grep -q "id_libx_b" "$TMP/lib.c" || lib_ok=0
-done
+$BIN_IDC --no-std "$TMP/lib" --emit-c "$TMP/lib.c" >/dev/null 2>&1 || lib_ok=0
+grep -q "id_libx_a" "$TMP/lib.c" || lib_ok=0
+grep -q "id_libx_b" "$TMP/lib.c" || lib_ok=0
 [ "$lib_ok" -eq 1 ] && ok "a project with no main keeps every function" \
                     || bad "a project with no main keeps every function"
 
-# -- 15. DEAD CODE IS STILL CHECKED ----------------------------------------
+# -- 14. DEAD CODE IS STILL CHECKED ----------------------------------------
 # The rule that makes dead-code elimination safe, and the one that was got
 # wrong first: a function nothing calls must still obey every rule of the
 # language. Code that stops being checked because nothing calls it is how a
 # library rots -- and it would stop checking a user's own dead code too.
 #
-# Both a structural rule (the action limit) and an access rule (which in
-# idc.py is enforced inside code generation, and so was the one that actually
-# broke) are checked here.
+# Both a structural rule (the action limit) and an access rule are checked
+# here.
 rm -rf "$TMP/dead"; mkdir -p "$TMP/dead"
 cat > "$TMP/dead/main.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -316,13 +270,12 @@ never_called(int a) {
     m = m + 3;
 } return int m;
 EOF
-act_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 && act_ok=0
-    grep -q "the limit is 3" "$TMP/d.err" || act_ok=0
-done
-[ "$act_ok" -eq 1 ] && ok "an unreachable function still obeys the action limit" \
-                    || bad "an unreachable function still obeys the action limit"
+if ! $BIN_IDC --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 \
+   && grep -q "the limit is 3" "$TMP/d.err"; then
+    ok "an unreachable function still obeys the action limit"
+else
+    bad "an unreachable function still obeys the action limit"
+fi
 
 cat > "$TMP/dead/never.id" <<'EOF'
 never_owner(int a) {
@@ -333,38 +286,32 @@ never_peeker() {
     int v = (import hidden);
 } return int v;
 EOF
-acc_ok=1
-for cc in "$BIN_IDC" "$IDC_PY"; do
-    $cc --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 && acc_ok=0
-    grep -qi "not exported" "$TMP/d.err" || acc_ok=0
-done
-[ "$acc_ok" -eq 1 ] && ok "an unreachable function still obeys the export rules" \
-                    || bad "an unreachable function still obeys the export rules"
+if ! $BIN_IDC --no-std "$TMP/dead" -o "$TMP/d" >"$TMP/d.err" 2>&1 \
+   && grep -qi "not exported" "$TMP/d.err"; then
+    ok "an unreachable function still obeys the export rules"
+else
+    bad "an unreachable function still obeys the export rules"
+fi
 
-# -- 16. the reserved-name list has not drifted from the runtime -----------
-# resv_names_src, in compiler/parse/conf.id, is generated from idc.py's
-# RUNTIME by tools/gen_runtime_id.py. If someone adds a helper to the prelude
-# and does not regenerate, the two compilers stop agreeing about which names
-# are taken -- one accepts a program the other rejects. Regenerating is a
-# command; this is what makes forgetting it a test failure.
-python3 - "$ROOT" <<'PY' >"$TMP/drift" 2>&1
-import os, re, sys
-root = sys.argv[1]
-sys.path.insert(0, root)
-import idc
-conf = os.path.join(root, "compiler", "parse", "conf.id")
-m = re.search(r'string resv_names_src = "([^"]*)"', open(conf).read())
-listed = set(m.group(1).split()) if m else set()
-if listed == set(idc.RUNTIME_HELPERS):
-    print("OK")
-else:
-    print("DRIFT", sorted(set(idc.RUNTIME_HELPERS) ^ listed))
-PY
-grep -q '^OK$' "$TMP/drift" \
-    && ok "the id-side reserved-name list matches idc.py's RUNTIME" \
-    || bad "the id-side reserved-name list matches idc.py's RUNTIME ($(head -1 "$TMP/drift"))"
+# -- 15. the reserved-name list has not drifted from the runtime -----------
+# resv_names_src, in compiler/parse/conf.id, and the runtime prelude
+# (compiler/parse/back/tgt/c/runtime/runtime.id) are both hand-maintained now
+# (docs/HACKING.md). If someone adds a helper to the prelude and forgets to add
+# its name to resv_names_src, an id function could be given that name and
+# collide with the runtime in the generated C -- this is what makes forgetting
+# it a test failure, extracting each side with grep/sed rather than a second
+# implementation of either.
+runtime_names=$(grep -oE 'id_[a-zA-Z_0-9]+\(' "$ROOT/compiler/parse/back/tgt/c/runtime/runtime.id" \
+    | sed -E 's/^id_//; s/\($//' | sort -u)
+conf_names=$(grep -oE 'string resv_names_src = "[^"]*"' "$ROOT/compiler/parse/conf.id" \
+    | sed -E 's/^string resv_names_src = "//; s/"$//' | tr ' ' '\n' | sort -u)
+if [ "$runtime_names" = "$conf_names" ]; then
+    ok "the id-side reserved-name list matches the runtime prelude"
+else
+    bad "the id-side reserved-name list matches the runtime prelude (drift: $(diff <(echo "$runtime_names") <(echo "$conf_names") | head -1))"
+fi
 
-# -- 17. the library does not reserve the user's local names (C4) ----------
+# -- 16. the library does not reserve the user's local names (C4) ----------
 # The one-type-per-name rule applies within a compilation unit -- the user's
 # own tree, or one imported dependency -- and not across them. `s` is a string
 # in the fixture library (tstr_twice's parameter); while the rule spanned the
@@ -381,12 +328,11 @@ main(int argc, string[] argv) {
   print(n);
 } return int 0;
 EOF
-run_both "a library name does not reserve the user's local name" "5"
+run_one "a library name does not reserve the user's local name" "5"
 
-# -- 18. ...but the rule still holds inside the user's own tree ------------
+# -- 17. ...but the rule still holds inside the user's own tree ------------
 # Per-unit is not per-file: every file of one project is one unit, so a name
-# that changes type between two of them is the error it has always been -- from
-# both compilers, in the same words.
+# that changes type between two of them is still the error it has always been.
 rm -rf "$TMP/two"; mkdir -p "$TMP/two"
 cat > "$TMP/two/main.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -400,18 +346,12 @@ twoname_other() {
     print(s);
 } return void;
 EOF
-one_ok=1
-for cc_name in idc idc.py; do
-    case "$cc_name" in
-        idc)    cc="$BIN_IDC" ;;
-        idc.py) cc="$IDC_PY" ;;
-    esac
-    $cc --std "$FIXTURE" "$TMP/two" -o "$TMP/two.out" >"$TMP/two.$cc_name" 2>&1 && one_ok=0
-    grep -m1 "must keep one type" "$TMP/two.$cc_name" > "$TMP/msg.$cc_name" || one_ok=0
-done
-cmp -s "$TMP/msg.idc" "$TMP/msg.idc.py" || one_ok=0
-[ "$one_ok" -eq 1 ] && ok "one type per name still holds across the user's own tree" \
-                    || bad "one type per name still holds across the user's own tree"
+if ! $BIN_IDC --std "$FIXTURE" "$TMP/two" -o "$TMP/two.out" >"$TMP/two.out.err" 2>&1 \
+   && grep -q "must keep one type" "$TMP/two.out.err"; then
+    ok "one type per name still holds across the user's own tree"
+else
+    bad "one type per name still holds across the user's own tree"
+fi
 
 echo
 echo "$pass passed, $fail failed"

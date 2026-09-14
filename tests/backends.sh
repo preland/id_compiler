@@ -52,8 +52,7 @@ be_abs() {
     esac
 }
 # bin/idc takes --allow-untested throughout: none of the programs built here has
-# test cases, and what is under test is the backends. It is part of the word so
-# the loops below run both compilers as before; idc.py has no such flag.
+# test cases, and what is under test is the backends.
 BIN_IDC="../bin/idc --allow-untested"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -78,7 +77,7 @@ fi
 # the way a user builds it, with idstd and no --backend flag or conf.id line.
 #
 # idc.py no longer builds a backend here, nor in the two checks after this one.
-# It reads backend.json, which backend.id replaced, and idc.py is being retired
+# It reads backend.json, which backend.id replaced, and idc.py is frozen
 # and will not change: it cannot parse the standard library, and it counts a
 # backend.id toward the 3-entries rule, which bin/idc exempts it from.
 expected='wrote 44 bytes to fsdemo.txt (close 0)
@@ -159,9 +158,9 @@ else
 fi
 
 # fsdemo's emitted C is no longer compared with idc.py's: bin/idc emits the fs
-# backend's `native` declarations as prototypes, and idc.py, which is being
-# retired and will not change, emits `extern int` for the same calls. What both
-# must agree on is the behaviour checked above.
+# backend's `native` declarations as prototypes, and idc.py, which is frozen
+# (docs/HACKING.md) and will not change, emits `extern int` for the same
+# calls. What both must agree on is the behaviour checked above.
 
 # -- proc: a child process id can start, read from, wait for and kill ------
 # Deliberately above the X11 gate below, like fs: this is fork/pipe/waitpid,
@@ -478,22 +477,20 @@ fi
 # built binaries out of the source tree.
 outdir="$TMP/outdir"; mkdir -p "$outdir"
 cp -r "$ORG/demos/hello" "$outdir/proj"
-for c in "$ABS_ROOT/bin/idc --allow-untested" "$ABS_ROOT/idc.py"; do
-    name=$(basename "${c%% *}")
-    out=$(cd "$outdir" && $c proj 2>&1)
-    if [ -x "$outdir/build/proj" ] && [ ! -e "$outdir/proj.out" ]; then
-        ok "a default build lands in build/ ($name)"
-    else
-        bad "a default build lands in build/ ($name): $out"
-    fi
-    rm -rf "$outdir/build"
-    # An explicit -o is the user's choice and is reported, not second-guessed.
-    if (cd "$outdir" && $c proj -o proj 2>&1) | grep -q "is a directory"; then
-        ok "-o naming a directory is reported ($name)"
-    else
-        bad "-o naming a directory is reported ($name)"
-    fi
-done
+c="$ABS_ROOT/bin/idc --allow-untested"
+out=$(cd "$outdir" && $c proj 2>&1)
+if [ -x "$outdir/build/proj" ] && [ ! -e "$outdir/proj.out" ]; then
+    ok "a default build lands in build/"
+else
+    bad "a default build lands in build/: $out"
+fi
+rm -rf "$outdir/build"
+# An explicit -o is the user's choice and is reported, not second-guessed.
+if (cd "$outdir" && $c proj -o proj 2>&1) | grep -q "is a directory"; then
+    ok "-o naming a directory is reported"
+else
+    bad "-o naming a directory is reported"
+fi
 
 # -- a backend is linked only when one of its natives is reached -------------
 # Attaching a backend used to mean compiling its sources and linking its flags
@@ -871,7 +868,7 @@ fi
 # -- the graphics demos still build with bin/idc -----------------------------
 # Their C is no longer compared with idc.py's. bin/idc reads each backend's
 # `native` declarations and emits them as real prototypes; idc.py, which is
-# being retired and will not change, emits an unprototyped `extern int` block
+# frozen and will not change (docs/HACKING.md), emits an unprototyped `extern int` block
 # for the same calls, so the two differ by design.
 #
 # idc.py no longer builds them here either. They are user programs and merge

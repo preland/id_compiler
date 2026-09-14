@@ -2,12 +2,12 @@
 # Conformance: does every code-generation target agree about what a program
 # means?
 #
-# `tools/parity.sh` compares the *text* two compilers emit, which is only a
-# question that exists while both of them emit C. It cannot say anything about
+# Comparing the *text* two compilers emit, which the tree used to do, is only
+# a question that exists while both of them emit C. It cannot say anything about
 # The `llvm` target here is `bin/idc --target llvm` -- the primary compiler's
 # own LLVM back end, which lowers to the SSA IR in compiler/parse/back/ir and
 # prints it (docs/LLVM.md). `idc.py --target llvm` is a separate, older code
-# generator that is being retired with the rest of that file; it is no longer
+# generator that idc.py is frozen with (docs/HACKING.md); it is no longer
 # what this suite holds the language to.
 #
 # `--target llvm` or `--target wasm`, and it never will. This file asks the
@@ -88,7 +88,7 @@ is_enumerated_gap() {
 #             does not sequence the arguments of a call. gcc evaluates them
 #             right to left; docs/SPEC.md 7 says left to right. Conforming
 #             means hoisting operands into temporaries. See SPEC 11, S11.
-#   wasm:fn   the WASM target is built by idc.py, which is being retired and
+#   wasm:fn   the WASM target is built by idc.py, which is frozen (docs/HACKING.md) and
 #             has no function values: it refuses `func` as a type. See SPEC
 #             11, S12.
 known_apart() {
