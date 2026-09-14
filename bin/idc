@@ -561,6 +561,42 @@ check_entry_limit() {
     STRUCT_VIOLATIONS=1
 }
 
+# check_same_name_as_parent ROOT -- reject directories with the same name as
+# their parent directory (e.g. a/loop/loop/).
+#
+# One find and awk pass. Formats each directory path and checks if the final
+# component equals the second-to-last component.
+check_same_name_as_parent() {
+    local root="$1" dup
+    dup=$(find "$root" -mindepth 1 \
+                \( -type d -name '.*' -prune \) -o \
+                \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
+                \( -type d -printf '%p\n' \) \
+           | awk -F'/' 'NF >= 2 { d=$(NF); p=$(NF-1); if (d == p && d != "") print $0 }' \
+           | head -1)
+    [ -z "$dup" ] && return 0
+    echo "$dup:1: error: directory '$dup' has the same name as its parent; name it for what it holds, or merge it into the parent" >&2
+    STRUCT_VIOLATIONS=1
+}
+
+# check_generic_names ROOT -- reject files with generic names like helper.id,
+# util.id, misc.id, common.id, stuff.id, tmp.id, temp.id.
+#
+# These names do not indicate what the file holds, making it impossible to
+# name what you are importing and encouraging developers to dump unrelated
+# functions into a single file. Uses the same filter structure as check_entry_limit.
+check_generic_names() {
+    local root="$1" generic
+    generic=$(find "$root" -mindepth 1 \
+                 \( -type d -name '.*' -prune \) -o \
+                 \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
+                 \( \( -name 'helper.id' -o -name 'helpers.id' -o -name 'util.id' -o -name 'utils.id' -o -name 'misc.id' -o -name 'common.id' -o -name 'stuff.id' -o -name 'tmp.id' -o -name 'temp.id' \) -printf '%p\n' \) \
+           | LC_ALL=C sort | head -1)
+    [ -z "$generic" ] && return 0
+    echo "$generic:1: error: file '$generic' has a generic name '$(basename "$generic")'; name it for what it holds" >&2
+    STRUCT_VIOLATIONS=1
+}
+
 # ---------------------------------------------------------------------------
 # collect .id source files: a single file is just itself; a project directory
 # is its whole tree.
@@ -583,6 +619,8 @@ if [ -d "$PATH_ARG" ]; then
     check_legacy_manifest "$PATH_ARG"
     check_entry_limit "$PATH_ARG"
     check_nested_manifest "$PATH_ARG"
+    check_same_name_as_parent "$PATH_ARG"
+    check_generic_names "$PATH_ARG"
 fi
 
 if [ ${#SRC_FILES[@]} -eq 0 ]; then
@@ -736,6 +774,8 @@ read_manifest() {
         # the same limits, and collect_ids finds its backend.id.
         check_entry_limit "$deppath"
         check_nested_manifest "$deppath"
+        check_same_name_as_parent "$deppath"
+        check_generic_names "$deppath"
         collect_ids "$deppath"
         DEP_QUEUE+=("$deppath")
         if [ ! -f "$deppath/conf.id" ] && up=$(enclosing_root "$deppath"); then
@@ -770,6 +810,8 @@ for b in ${BACKENDS[@]+"${BACKENDS[@]}"}; do
     SEEN_DEPS+=("$b")
     check_entry_limit "$b"
     check_nested_manifest "$b"
+    check_same_name_as_parent "$b"
+    check_generic_names "$b"
     collect_ids "$b"
     walk_deps "$b"
 done
@@ -805,6 +847,8 @@ if [ -n "$STDLIB" ]; then
     if ! seen_dep "$STDLIB"; then
         SEEN_DEPS+=("$STDLIB")
         check_entry_limit "$STDLIB"
+        check_same_name_as_parent "$STDLIB"
+        check_generic_names "$STDLIB"
         collect_ids "$STDLIB"
         walk_deps "$STDLIB"
     fi
