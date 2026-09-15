@@ -240,32 +240,35 @@ else
     bad "a grandparent-named directory is accepted"
 fi
 
-# -- 15. a file named like its own directory (x/x.id) is accepted -----------
-# The same-name-as-parent rule (12) checks directories against their parent
-# directory; a file sharing its containing directory's name is a different
-# pattern, and not one either new rule reaches.
+# -- 15. a file named like its own directory, directly in the root, is
+#        accepted (root/loop.id) --------------------------------------------
+# check_file_named_like_dir does not apply to a file directly in the
+# collected root: the root directory's name is just where it was checked
+# out, not a level of the tree it wrote. A nested instance of the same
+# pattern (root/a/a.id) is rejected -- see 26.
 rm -rf "$TMP/self"; mkdir -p "$TMP/self"
 printf 'self_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/self/self.id"
 rm -rf "$TMP/proj15"; mkdir -p "$TMP/proj15"
 printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj15/main.id"
 if $BIN_IDC --allow-untested --std "$TMP/self" "$TMP/proj15" -o "$TMP/x" >/dev/null 2>&1; then
-    ok "a file named like its own directory (x/x.id) is accepted"
+    ok "a file named like its own directory, directly in the root, is accepted (root/loop.id)"
 else
-    bad "a file named like its own directory (x/x.id) is accepted"
+    bad "a file named like its own directory, directly in the root, is accepted (root/loop.id)"
 fi
 
-# -- 16. numbered sibling files (chunk.id, chunk2.id) are accepted ----------
-# The generic-name rule (13) checks a fixed list of names; a numbered series
-# of otherwise-descriptive names is a different pattern, and not one it reaches.
+# -- 16. a numbered sibling file (chunk.id, chunk2.id) is rejected ----------
+# chunk2.id's name is chunk.id's followed by digits, in the same directory.
 rm -rf "$TMP/num"; mkdir -p "$TMP/num"
 printf 'num_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/num/chunk.id"
 printf 'num_fn2(int a) {\n  int v = a + 2;\n} return int v;\n(1):(3)\n' > "$TMP/num/chunk2.id"
 rm -rf "$TMP/proj16"; mkdir -p "$TMP/proj16"
 printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj16/main.id"
-if $BIN_IDC --allow-untested --std "$TMP/num" "$TMP/proj16" -o "$TMP/x" >/dev/null 2>&1; then
-    ok "numbered sibling files (chunk.id, chunk2.id) are accepted"
+if ! $BIN_IDC --allow-untested --std "$TMP/num" "$TMP/proj16" -o "$TMP/x" >"$TMP/num.err" 2>&1 \
+   && grep -q "is a numbered copy of" "$TMP/num.err" \
+   && grep -q "chunk2.id" "$TMP/num.err"; then
+    ok "a numbered sibling file (chunk.id, chunk2.id) is rejected"
 else
-    bad "numbered sibling files (chunk.id, chunk2.id) are accepted"
+    bad "a numbered sibling file (chunk.id, chunk2.id) is rejected"
 fi
 
 # -- 17. dead-code elimination: an unused stdlib function is not emitted -----
@@ -412,6 +415,75 @@ if ! $BIN_IDC --std "$FIXTURE" "$TMP/two" -o "$TMP/two.out" >"$TMP/two.out.err" 
     ok "one type per name still holds across the user's own tree"
 else
     bad "one type per name still holds across the user's own tree"
+fi
+
+# -- 23. a numbered directory sibling (pane/, pane2/) is rejected -----------
+rm -rf "$TMP/panes"; mkdir -p "$TMP/panes/pane" "$TMP/panes/pane2"
+printf 'pane_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/panes/pane/f.id"
+printf 'pane_fn2(int a) {\n  int v = a + 2;\n} return int v;\n(1):(3)\n' > "$TMP/panes/pane2/f.id"
+rm -rf "$TMP/proj23"; mkdir -p "$TMP/proj23"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj23/main.id"
+if ! $BIN_IDC --allow-untested --std "$TMP/panes" "$TMP/proj23" -o "$TMP/x" >"$TMP/panes.err" 2>&1 \
+   && grep -q "is a numbered copy of" "$TMP/panes.err" \
+   && grep -q "pane2" "$TMP/panes.err"; then
+    ok "a numbered directory sibling (pane/, pane2/) is rejected"
+else
+    bad "a numbered directory sibling (pane/, pane2/) is rejected"
+fi
+
+# -- 24. two numbered siblings with no un-numbered form (x2.id, x3.id) are
+#        rejected as numbered siblings of each other ------------------------
+# Neither is more "the real one" than the other, so both are numbered copies
+# of something, and the pair is still rejected even though neither is x.id.
+rm -rf "$TMP/xx"; mkdir -p "$TMP/xx"
+printf 'x2_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/xx/x2.id"
+printf 'x3_fn(int a) {\n  int v = a + 2;\n} return int v;\n(1):(3)\n' > "$TMP/xx/x3.id"
+rm -rf "$TMP/proj24"; mkdir -p "$TMP/proj24"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj24/main.id"
+if ! $BIN_IDC --allow-untested --std "$TMP/xx" "$TMP/proj24" -o "$TMP/x" >"$TMP/xx.err" 2>&1 \
+   && grep -q "is a numbered copy of\|numbered sibling of" "$TMP/xx.err"; then
+    ok "x2.id beside x3.id, with no x.id, is rejected (numbered siblings of each other)"
+else
+    bad "x2.id beside x3.id, with no x.id, is rejected (numbered siblings of each other)"
+fi
+
+# -- 25. a file with digits but no un-numbered sibling (md5.id) is accepted --
+rm -rf "$TMP/md5"; mkdir -p "$TMP/md5"
+printf 'md5_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/md5/md5.id"
+rm -rf "$TMP/proj25"; mkdir -p "$TMP/proj25"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj25/main.id"
+if $BIN_IDC --allow-untested --std "$TMP/md5" "$TMP/proj25" -o "$TMP/x" >/dev/null 2>&1; then
+    ok "a file with digits but no un-numbered sibling (md5.id) is accepted"
+else
+    bad "a file with digits but no un-numbered sibling (md5.id) is accepted"
+fi
+
+# -- 26. a nested file named like its own directory (root/a/a.id) is
+#        rejected -- unlike 15, a is not the collected root ----------------
+rm -rf "$TMP/nested"; mkdir -p "$TMP/nested/a"
+printf 'a_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/nested/a/a.id"
+rm -rf "$TMP/proj26"; mkdir -p "$TMP/proj26"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj26/main.id"
+if ! $BIN_IDC --allow-untested --std "$TMP/nested" "$TMP/proj26" -o "$TMP/x" >"$TMP/nested.err" 2>&1 \
+   && grep -q "has the same name as its directory" "$TMP/nested.err" \
+   && grep -q "a/a.id" "$TMP/nested.err"; then
+    ok "a nested file named like its own directory (root/a/a.id) is rejected"
+else
+    bad "a nested file named like its own directory (root/a/a.id) is rejected"
+fi
+
+# -- 27. an underscore-numbered sibling (x.id, x_2.id) is rejected too ------
+rm -rf "$TMP/under"; mkdir -p "$TMP/under"
+printf 'under_fn(int a) {\n  int v = a + 1;\n} return int v;\n(1):(2)\n' > "$TMP/under/x.id"
+printf 'under_fn2(int a) {\n  int v = a + 2;\n} return int v;\n(1):(3)\n' > "$TMP/under/x_2.id"
+rm -rf "$TMP/proj27"; mkdir -p "$TMP/proj27"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj27/main.id"
+if ! $BIN_IDC --allow-untested --std "$TMP/under" "$TMP/proj27" -o "$TMP/x" >"$TMP/under.err" 2>&1 \
+   && grep -q "is a numbered copy of" "$TMP/under.err" \
+   && grep -q "x_2.id" "$TMP/under.err"; then
+    ok "an underscore-numbered sibling (x.id, x_2.id) is rejected"
+else
+    bad "an underscore-numbered sibling (x.id, x_2.id) is rejected"
 fi
 
 echo
