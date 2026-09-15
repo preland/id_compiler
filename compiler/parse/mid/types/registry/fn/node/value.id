@@ -9,6 +9,8 @@ is_fn_value(int id) {
     ok = 1;
   }
 } return int ok;
+given fnval_fixture ((import fnval_hit)):(1)
+given fn_fixture ((import fixture_zero)):(0)
 
 // A call through a variable of function type. The type is read where the call
 // is written -- by name, in the call's own unit -- which is what keeps the call
@@ -17,6 +19,8 @@ is_fcall(int id) {
   string vt = callee_var_type(id);
   int ok = ty_is_func(vt);
 } return int ok;
+given fnval_call_fixture ((import fnval_call)):(1)
+given fnval_fixture ((import fnval_hit)):(0)
 
 // The declared type of the variable a call names, or "" when it names none. A
 // builtin's name is never such a variable: the builtin is what the call means.
@@ -27,3 +31,5 @@ callee_var_type(int id) {
     t = "";
   }
 } return string t;
+given fnval_call_fixture ((import fnval_call)):("func(int) return int")
+given fnval_fixture ((import fnval_push)):("")

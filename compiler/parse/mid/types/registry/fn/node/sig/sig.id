@@ -8,6 +8,8 @@ fn_sig(int fn) {
   string pl = fn_type_list(ps);
   string t = "func(" + pl + ") return " + s2_of(fn);
 } return string t;
+given fn_idx_fixture ((import fixture_fn)):("func(int) return int")
+given ret_narrows_fn ((import narrow_f)):("func() return int")
 
 fn_sig_at(int fn) {
   string t = "";
@@ -15,6 +17,8 @@ fn_sig_at(int fn) {
     t = fn_sig(fn);
   }
 } return string t;
+given fn_idx_fixture ((import fixture_fn)):("func(int) return int")
+(-1):("")
 
 fn_type_list(int[] ps) {
   string out = "";
@@ -24,3 +28,5 @@ fn_type_list(int[] ps) {
     i = i + 1;
   }
 } return string out;
+given fn_fixture ((import fixture_params)):("int")
+given fn_fixture ([]):("")

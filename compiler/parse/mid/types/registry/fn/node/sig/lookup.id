@@ -11,6 +11,8 @@ fn_node_of(string name) {
   int idx = find_ix((import fnames), (import fidx)[b], name);
   int fn = fn_node_at(idx);
 } return int fn;
+given fn_idx_fixture ("fx_target"):((import fixture_fn))
+given fn_idx_fixture ("nope"):(-1)
 
 // -1 for a name with no row, and for an `asm` function, whose row has no node:
 // the driver registers asm symbols in the table without one, and an asm
@@ -21,9 +23,13 @@ fn_node_at(int idx) {
     fn = (import fnodes)[idx];
   }
 } return int fn;
+given fn_idx_fixture (0):((import fixture_fn))
+given fn_idx_fixture (-1):(-1)
 
 // The type of the function a name denotes, or "" when it denotes none.
 fn_sig_of(string name) {
   int fn = fn_node_of(name);
   string t = fn_sig_at(fn);
 } return string t;
+given fn_idx_fixture ("fx_target"):("func(int) return int")
+given fn_idx_fixture ("nope"):("")
