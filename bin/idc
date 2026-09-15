@@ -42,7 +42,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 IDC_PY="$ROOT/idc.py"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--check] [--fix]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix]" >&2
 }
 
 PATH_ARG=""
@@ -63,6 +63,7 @@ ALLOW_UNTESTED=0
 LIST_UNTESTED=0
 EMIT_SOURCES=0
 FINGERPRINTS=0
+CALLS=0
 CHECK=0
 FIX=0
 NO_STD=0
@@ -104,6 +105,8 @@ while [ $# -gt 0 ]; do
             EMIT_SOURCES=1; shift ;;
         --fingerprints)
             FINGERPRINTS=1; shift ;;
+        --calls)
+            CALLS=1; shift ;;
         --check)
             CHECK=1; shift ;;
         --fix)
@@ -878,7 +881,11 @@ PARSE_ARGS=()
 PARSE_ARGS+=(--triple "$TRIPLE")
 # Every function must carry at least two test cases (docs/TESTS.md). On unless
 # --allow-untested turned it off; the self-hosted compiler checks it.
-if [ "$REQUIRE_TESTS" -eq 1 ]; then
+#
+# --calls is the exception: agents use it to find what to test next, in a
+# tree that is short of cases by construction, so requiring cases here would
+# fail on exactly the functions it exists to point at.
+if [ "$REQUIRE_TESTS" -eq 1 ] && [ "$CALLS" -eq 0 ]; then
     PARSE_ARGS+=(--require-tests)
 fi
 # --fingerprints is a report about the parsed program, not a build of it -- see
@@ -896,6 +903,8 @@ fi
 PARSE_ARGS+=(--host-triple "$(host_triple)")
 if [ "$FINGERPRINTS" -eq 1 ]; then
     PARSE_ARGS+=(--fingerprints)
+elif [ "$CALLS" -eq 1 ]; then
+    PARSE_ARGS+=(--calls)
 elif [ "$LIST_UNTESTED" -eq 1 ]; then
     PARSE_ARGS+=(--require-tests --untested)
 elif [ "$FIX" -eq 1 ]; then
@@ -1151,6 +1160,45 @@ if [ "$FINGERPRINTS" -eq 1 ]; then
         compiler_bug "idlex or idparse failed on this input"
     fi
     cat "$RAW_OUT"
+    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    rm -f "$RAW_OUT"
+    exit "$parse_rc"
+fi
+
+# --calls: every resolved call edge of the collected program, then the
+# case-count section, each sorted (LC_ALL=C) and deduplicated. print_calls
+# (compiler/parse/back/drive/run/check/dce/emit/guarded_emit.id) prints both
+# kinds of row to the same stream in traversal order; an edge row always has
+# 5 pipe-fields (caller|caller_file:line|callee|callee_file:line|kind, the
+# last field empty for kind=builtin) and a case row always has 3
+# (fn|file:line|cases), so awk routes each by field count rather than a
+# marker. Like --fingerprints, this is a report about the parsed program, not
+# a build of it, so it prints regardless of parse_rc (see the comment there)
+# -- but unlike --fingerprints, which just cats RAW_OUT as it is, this sorts
+# the two report sections apart from each other, so any OTHER diagnostic
+# print_calls' own checks did not stop (a "no such function", an action-limit
+# or argument error -- --calls turns off --require-tests, not the rest of the
+# language) is routed to stderr rather than silently dropped for matching
+# neither shape.
+if [ "$CALLS" -eq 1 ]; then
+    progress_clear
+    if [ "$lex_rc" -ne 0 ] || { [ "$parse_rc" -ne 0 ] && [ "$parse_rc" -ne 1 ]; }; then
+        [ -s "$LEX_ERR" ] && cat "$LEX_ERR" >&2
+        [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+        compiler_bug "idlex or idparse failed on this input"
+    fi
+    awk -F'|' -v e="$WORK/calls.edges" -v c="$WORK/calls.cases" -v d="$WORK/calls.diag" '
+        NF == 5 { print > e; next }
+        NF == 3 { print > c; next }
+        { print > d }
+    ' "$RAW_OUT"
+    [ -f "$WORK/calls.edges" ] || : > "$WORK/calls.edges"
+    [ -f "$WORK/calls.cases" ] || : > "$WORK/calls.cases"
+    LC_ALL=C sort -u "$WORK/calls.edges"
+    echo
+    echo "fn|file:line|cases"
+    LC_ALL=C sort -u "$WORK/calls.cases"
+    [ -s "$WORK/calls.diag" ] && cat "$WORK/calls.diag" >&2
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
     rm -f "$RAW_OUT"
     exit "$parse_rc"
