@@ -4,6 +4,8 @@ key_at(string t, int i) {
   int ch = charat(t, i);
   string so = key_code(ch);
 } return string so;
+("int[]", 3):("_l")
+("int[]", 0):("i")
 
 key_code(int ch) {
   string so = chr(ch);
@@ -13,3 +15,5 @@ key_code(int ch) {
     so = "";
   }
 } return string so;
+(91):("_l")
+(97):("a")

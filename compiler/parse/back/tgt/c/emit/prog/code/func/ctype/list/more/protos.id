@@ -7,10 +7,14 @@ note_one(string ty) {
     push((import tctys), ty);
   }
 } return void;
+given tc_types_init ("int[]"):() then tctys_len:(1)
+given tctys_note_one_setup ("int[]"):() then tctys_len:(1)
 
 tc_types_init() {
   export string[] tctys = [];
 } return void;
+given nz_env ():() then check_failed:(0)
+given nz_env ():() then init_units:(0)
 
 emit_ty_protos() {
   int i = 0;
@@ -19,3 +23,5 @@ emit_ty_protos() {
     i = i + 1;
   }
 } return void;
+given tctys_note_one_setup ():() then prints:("static int idtc_eq_int(IdList* a, IdList* b);\nstatic void idtc_show_int(IdList* a);\n")
+given tc_types_init ():() then prints:("")

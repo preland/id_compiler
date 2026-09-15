@@ -5,6 +5,8 @@ tc_collect_case(int ci) {
   int[] expd = l2_of((import casenode)[ci]);
   tc_collect_expd(fn, expd);
 } return void;
+given wrap_fixture (0):() then calls chk_type:((import fixture_fn), 0)
+given wrap_fixture (0):() then calls chk_type:[1]
 
 tc_collect_expd(int fn, int[] expd) {
   int j = 0;
@@ -14,6 +16,8 @@ tc_collect_expd(int fn, int[] expd) {
     j = j + 1;
   }
 } return void;
+given print_fixture ((import fixture_fn), (import fixture_print_two)):() then calls chk_type:[2]
+given print_fixture ((import fixture_fn), (import fixture_print_none)):() then calls chk_type:[0]
 
 note_ty(string ty) {
   while(ty_is_list(ty) == 1) {
@@ -21,3 +25,5 @@ note_ty(string ty) {
     ty = list_elem(ty);
   }
 } return void;
+given tc_types_init ("int[]"):() then tctys_len:(1)
+given tc_types_init ("int"):() then tctys_len:(0)

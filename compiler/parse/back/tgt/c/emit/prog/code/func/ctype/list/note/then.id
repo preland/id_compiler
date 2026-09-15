@@ -14,6 +14,8 @@ tc_collect_thens() {
     ti = ti + 1;
   }
 } return void;
+given print_fixture ():() then calls note_check:[1]
+given calls_node_fixture ():() then calls note_check:[1]
 
 note_check(int ti) {
   int node = (import thennode)[ti];
@@ -21,6 +23,8 @@ note_check(int ti) {
     note_check_then(node);
   }
 } return void;
+given print_fixture (0):() then prints:("")
+given calls_node_fixture (0):() then prints:("")
 
 note_check_then(int node) {
   string chk_nm = s1_of(node);

@@ -9,3 +9,19 @@ note_fn_ret(int cfn) {
 } return void;
 given fn_fixture ((import fixture_fn)):()
 given fn_fixture (-1):()
+
+// A reader for `tctys` (protos.id's note_one/tc_types_init have no other
+// observable effect a case can check).
+tctys_len() {
+  int n = len((import tctys));
+} return int n;
+given tc_types_init ():(0)
+given tctys_note_one_setup ():(1)
+
+tctys_note_one_setup() {
+  env_init();
+  tc_types_init();
+  note_one("int[]");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

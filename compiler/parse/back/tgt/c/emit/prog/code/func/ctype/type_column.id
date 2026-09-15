@@ -11,12 +11,16 @@ init_tyc() {
   export string[] tyc = [];
   init_tyc_rows();
 } return void;
+given nz_env ():() then check_failed:(0)
+given nz_env ():() then init_units:(0)
 
 init_tyc_rows() {
   push((import tyc), "int");
   push((import tyc), "long long");
   init_tyc_rows2();
 } return void;
+given lc_env2 ():() then check_failed:(0)
+given lc_env2 ():() then init_units:(0)
 
 // `string` is a char*, and `void` is C's own void. `float` is a double: id's
 // float is binary64, and C's `float` is not.
@@ -25,3 +29,5 @@ init_tyc_rows2() {
   push((import tyc), "char*");
   push((import tyc), "void");
 } return void;
+given lc_env2 ():() then check_failed:(0)
+given lc_env2 ():() then init_units:(0)
