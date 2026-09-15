@@ -6,12 +6,16 @@ iassign4(int id, string ind, string val) {
   string iset_code_v = iset_code(id, val);
   emit_line(ind + iset_code_v);
 } return void;
+given iassign_fixture ((import iassign_node), "  ", "BOXED"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);\n")
+given iassign_fixture ((import iassign_node), "", "BOXED"):() then prints:("id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);\n")
 
 iset_code(int id, string val) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   string ret_s = "id_list_set(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ", " + val + ");";
 } return string ret_s;
+given iassign_fixture ((import iassign_node), "BOXED"):("id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);")
+given iassign_fixture ((import iassign_node), "OTHER"):("id_list_set(id_list_lit(1, (long long)(1)), 0, OTHER);")
 
 es3b(int id, string ind) {
   if(k_of(id) == "iassign") {
@@ -20,3 +24,5 @@ es3b(int id, string ind) {
     es4(id, ind);
   }
 } return void;
+given iassign_fixture ((import iassign_node), "  "):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
+given nz_while_fixture ((import nz_whilen), "  "):() then prints:("  while (7) {\n  }\n")

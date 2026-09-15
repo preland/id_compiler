@@ -7,6 +7,8 @@ emit_expr(int id) {
     s = ee2(id);
   }
 } return string s;
+given nz_env ((import nz_int)):("7")
+given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
 
 // Compute the recursive bin form only when the node is a bin -- evaluating it
 // eagerly would recurse into non-existent children of leaf nodes.
@@ -16,6 +18,8 @@ ee2(int id) {
     s = emit_bin(id);
   }
 } return string s;
+given nz_env ((import nz_int)):("7")
+given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
 
 ee3(int id) {
   string s = ee4(id);
@@ -23,3 +27,5 @@ ee3(int id) {
     s = emit_call(id);
   }
 } return string s;
+given nz_call_print_fixture ((import nz_call_print)):("id_print(\"hi\")")
+given nz_env ((import nz_int)):("7")

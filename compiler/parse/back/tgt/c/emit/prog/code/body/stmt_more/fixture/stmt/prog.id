@@ -1,0 +1,27 @@
+// Two `func` nodes: one named "main" taking one int parameter, one not --
+// for the entry-point emitters, which read a function's own fields directly
+// rather than through the symbol table -- pushed onto `prog` together.
+
+nz_main_fixture() {
+  nz_main_parts();
+  int[] mainbody = [];
+  export int nz_mainfn = node_func("main", "int", (import nz_mainparams), mainbody, (import nz_int));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_plain_fixture() {
+  nz_main_fixture();
+  int[] none = [];
+  export int nz_plainfn = node_func("run", "void", none, none, 0 - 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_prog_fixture() {
+  nz_plain_fixture();
+  push((import prog), (import nz_mainfn));
+  push((import prog), (import nz_plainfn));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

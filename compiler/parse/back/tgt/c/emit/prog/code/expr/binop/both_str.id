@@ -7,6 +7,8 @@ both_str(int id) {
     ok = 1;
   }
 } return int ok;
+given nz_bin_eq_fixture ((import nz_bin_eq)):(1)
+given nz_bin_add_fixture ((import nz_bin_add)):(0)
 
 // The second operand's type, read and compared inside one function so that
 // it is a name -- not a call -- on the right of `&&`, and so it is read only
@@ -16,9 +18,13 @@ is_i2_str(int id) {
   string t = type_of(e);
   int ok = t == "string";
 } return int ok;
+given nz_bin_eq_fixture ((import nz_bin_eq)):(1)
+given nz_bin_add_fixture ((import nz_bin_add)):(0)
 
 // The tail of emit_infix, once the left operand and the operator are known.
 infix_line(int id, int i1_of_v, string s1_of_v) {
   int i2_of_v = i2_of(id);
   string s = "(" + emit_expr(i1_of_v) + " " + map_op(s1_of_v) + " " + emit_expr(i2_of_v) + ")";
 } return string s;
+given nz_bin_add_fixture ((import nz_bin_add), (import nz_int), "+"):("(7 + 3)")
+given nz_bin_eq_fixture ((import nz_bin_eq), (import nz_strn), "=="):("(\"hi\" == \"yo\")")

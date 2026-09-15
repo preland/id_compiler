@@ -7,8 +7,12 @@ emit_strcmp(int id) {
   int i2_of_v = i2_of(id);
   string s = strcmp_line(id, i1_of_v, i2_of_v);
 } return string s;
+given nz_bin_eq_fixture ((import nz_bin_eq)):("(strcmp(\"hi\", \"yo\") == 0)")
+given nz_bin_streq_fixture ((import nz_bin_streq)):("(strcmp(\"hi\", \"yo\") == 0)")
 
 strcmp_line(int id, int i1_of_v, int i2_of_v) {
   string s1_of_v = s1_of(id);
   string s = "(strcmp(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ") " + map_op(s1_of_v) + " 0)";
 } return string s;
+given nz_bin_eq_fixture ((import nz_bin_eq), (import nz_strn), (import nz_strn2)):("(strcmp(\"hi\", \"yo\") == 0)")
+given nz_bin_streq_fixture ((import nz_bin_streq), (import nz_strn2), (import nz_strn)):("(strcmp(\"yo\", \"hi\") == 0)")

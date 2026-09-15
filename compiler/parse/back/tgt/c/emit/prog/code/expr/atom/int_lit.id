@@ -8,3 +8,5 @@ int_code(int id) {
     s = s1_of(id) + "LL";
   }
 } return string s;
+given nz_env ((import nz_int)):("7")
+given nz_int_big_fixture ((import nz_int_big)):("9999999999LL")

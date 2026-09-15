@@ -1,0 +1,23 @@
+// A second string literal, and the two binary shapes built from ordinary
+// operands: int + int (plain infix) and string + string with `+` (concat).
+
+nz_str2_fixture() {
+  nz_str_fixture();
+  export int nz_strn2 = node_str("\"yo\"");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_bin_add_fixture() {
+  nz_str2_fixture();
+  export int nz_bin_add = node_bin("+", (import nz_int), (import nz_int2));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_bin_concat_fixture() {
+  nz_bin_add_fixture();
+  export int nz_bin_concat = node_bin("+", (import nz_strn), (import nz_strn2));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

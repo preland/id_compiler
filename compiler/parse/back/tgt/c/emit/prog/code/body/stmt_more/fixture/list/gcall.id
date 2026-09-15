@@ -1,0 +1,17 @@
+// A call node whose name is not one of the specially-handled builtins
+// (print/eprint/len/push/pop), so it emits through the generic `id_NAME(args)`
+// form rather than one of the special cases.
+
+nz_call_foo_fixture() {
+  nz_pair_fixture();
+  export int nz_call_foo = node_call("foo", [(import nz_int)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_call_eprint_fixture() {
+  nz_call_foo_fixture();
+  export int nz_call_eprint = node_call("eprint", [(import nz_int)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

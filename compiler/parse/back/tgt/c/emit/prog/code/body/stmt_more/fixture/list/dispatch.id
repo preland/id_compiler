@@ -1,0 +1,10 @@
+// An `exprstmt` node wrapping the int literal, for the statement-emission
+// dispatch (es3) that treats an expression-statement differently from every
+// other kind.
+
+nz_exprstmt_fixture() {
+  nz_call_eprint_fixture();
+  export int nz_exprstmtn = node_exprstmt((import nz_int));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
