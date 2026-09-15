@@ -15,3 +15,5 @@
 emit_line(string s) {
   print(s);
 } return void;
+("hello"):() then prints:("hello\n")
+("world"):() then prints:("world\n")

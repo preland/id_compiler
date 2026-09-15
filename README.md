@@ -221,6 +221,80 @@ pass such a tree already reduced to what it needs (or accept that its
 fingerprints include whatever it merges in) the same way any other build of
 it would.
 
+## The function dependency tree
+
+`bin/idc PROJECT --calls` prints every resolved call edge of the collected
+program (PROJECT and everything it merges in, `idstd` included), one per
+line:
+
+```
+caller|caller_file:line|callee|callee_file:line|kind
+```
+
+`kind` is `call` for a direct call, `value` for a function named as a value
+(an export, a parameter, a local of type `func(...) return ...` -- see
+`docs/SPEC.md` §1.1), or `builtin` for a runtime builtin with no `id` source
+(`callee_file:line` is empty for those). The edges are based on what the
+compiler actually resolved -- the same node-kind read and the same flat,
+creation-order walk over each function's nodes that dead-code elimination's
+reachability pass uses to decide what a build keeps
+(`compiler/parse/mid/names/exports/reach/dead/`,
+`compiler/parse/back/drive/run/check/dce/emit/calls/`) -- not a text grep, so
+a name that merely appears in a comment or a string is not an edge, and a
+call through a function value is attributed to the name it was written with
+there (unlike the runtime `then calls` clause of a test case, `docs/TESTS.md`,
+which records the name actually reached).
+
+After every edge, a blank line, then one row per function:
+
+```
+fn|file:line|cases
+```
+
+`cases` is how many test cases that function currently has (`docs/TESTS.md`'s
+two-case minimum), so a tree walker never has to build the program a second
+time to answer "does this one already have cases".
+
+**Known over-report.** The parser builds a `var` node for every bare
+identifier before it knows whether a `(` follows
+(`compiler/parse/front/parse/expr/atom/lit/call/call.id`'s `finish_atom`),
+and when one does, that node is not removed -- it is simply not on the tree a
+real value-read would leave, but it is still in the flat id range the walk
+above scans. So every direct call also prints a `value` row for the same
+callee. A `value` row with no matching `call` row for the same caller and
+callee is a real value use; one that has a matching `call` row is this
+artifact. `tools/calltree.sh`'s tree does not show the duplicate -- it merges
+the two kinds into one edge when it draws a node's children -- so this only
+shows up in the raw `--calls` rows.
+
+`bin/idc PROJECT --calls` does not require two cases per function (unlike a
+normal build): the whole point is to point at what to test next, in a tree
+that is short of cases by construction.
+
+`tools/calltree.sh` renders the tree from `--calls`:
+
+```
+tools/calltree.sh PROJECT NAME [--callers] [--depth N]
+tools/calltree.sh PROJECT --order FILE
+```
+
+The first form draws the tree rooted at `NAME` -- what it calls, transitively
+-- as `name  file:line  (N cases)` per line, `├──`/`└──` box-drawing, a
+builtin leaf marked `[builtin]` and a standard-library function marked
+`[idstd]`. `--callers` inverts it (who calls `NAME`, transitively) and
+`--depth N` stops expanding past N levels. A node that is its own ancestor on
+the current branch is marked `(recursive)` rather than expanded again; a node
+whose subtree was already drawn once elsewhere in the same tree is marked
+`(shown above)`, so a widely shared function is not redrawn under every
+caller.
+
+The second form takes `FILE`, one `path:line|name` per line (a batch list, as
+a coordinator hands out to backfill agents), and prints those functions
+bottom-up: a function's callees within the set before it, with a mutual
+recursion cycle grouped under a `# cycle:` line
+(`tools/callorder.awk`, Kosaraju's algorithm restricted to the given set) --
+the order an agent should write cases in, callees first.
+
 ## Self-hosting
 
 The `id`-written compiler (`compiler/lex` lexer + `compiler/parse`

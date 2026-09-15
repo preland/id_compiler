@@ -3,6 +3,8 @@ lw_iszero(int v, string t) {
   string lw_cmpop_v = lw_cmpop(t);
   int ret_i = lw_iszero_cmp(v, t, lw_cmpop_v);
 } return int ret_i;
+given bound_fixture (5, "int"):(4)
+given bound_fixture (5, "float"):(4)
 
 // Continues lw_iszero: the comparison operator is known, so the zero
 // constant is built next and the two are compared.
@@ -11,9 +13,13 @@ lw_iszero_cmp(int v, string t, string op) {
   int lw_const_v = lw_const(t, lw_zero_v);
   int ret_i = lw_op(op, "bool", v, lw_const_v, "==");
 } return int ret_i;
+given bound_fixture (5, "int", "icmp"):(4)
+given bound_fixture (5, "float", "fcmp"):(4)
 
 lw_not(int node) {
   int i1_of_v = i1_of(node);
   string t = lw_ety(i1_of_v);
   int ret_i = lw_not_val(node, i1_of_v, t);
 } return int ret_i;
+given un_fixture ((import not_node)):(6)
+given un_fixture ((import neg_node)):(6)

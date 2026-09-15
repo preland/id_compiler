@@ -1,0 +1,21 @@
+// Niladic readers of chk_id's instruction (../../../fixture/fn1.id), for
+// `then` checks on a core/store/edit case: an edit function is void, so its
+// effect is only visible through a function that returns something.
+
+chk_op() {
+  string ret_s = ir_op((import chk_id)[0]);
+} return string ret_s;
+given ir_rows ():("add")
+given ir_rows_chk1 ():("const")
+
+chk_ty() {
+  string ret_s = ir_ty((import chk_id)[0]);
+} return string ret_s;
+given ir_rows ():("int")
+given ir_rows_chk1 ():("string")
+
+chk_a() {
+  int ret_i = ir_a((import chk_id)[0]);
+} return int ret_i;
+given ir_rows ():(3)
+given ir_rows_chk1 ():(-1)

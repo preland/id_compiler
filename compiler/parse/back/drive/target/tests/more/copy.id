@@ -9,6 +9,8 @@ keep_ints(int[] ints, int[] onto) {
     i = i + 1;
   }
 } return void;
+([1, 2], []):([1, 2], [1, 2])
+([], [5]):([], [5])
 
 keep_strs(string[] strs, string[] names) {
   int i = 0;
@@ -17,3 +19,5 @@ keep_strs(string[] strs, string[] names) {
     i = i + 1;
   }
 } return void;
+(["a", "b"], []):(["a", "b"], ["a", "b"])
+([], ["z"]):([], ["z"])

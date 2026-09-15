@@ -1,17 +1,25 @@
 // Emission happens only if every check passed -- except `--fingerprints`
-// (../../../../mid/form/unique/dump/dump.id), which is a report about the parsed
+// (../../../../../mid/form/unique/dump/dump.id), which is a report about the parsed
 // program rather than a build of it, so it prints regardless: a function's
 // fingerprint does not stop meaning what it means because some other
 // function nearby broke an unrelated rule. Whatever emits nothing prints the
-// exemption notes instead (../../../sink/notes.id).
+// exemption notes instead (../../../../sink/notes.id).
 //
 // The prune is here, between the last check and the first line of output, and
 // that position is the contract: every rule of the language has been checked
 // over every function by now, so throwing the unreachable ones away cannot
 // stop anything from being checked. See dce.id.
+// --calls (../calls/) is routed here, before guarded_emit_tail's own dispatch,
+// for the same reason --fingerprints is: it is a report about the parsed
+// program, not a build of it, so it runs whether or not the rest of the
+// program would emit -- see the file comment below.
 guarded_emit(int argc, string[] argv) {
   check_asm_targets(argc, argv);
-  guarded_emit_tail(argc, argv);
+  if(arg_flag(argc, argv, 1, "--calls") == 1) {
+    print_calls();
+  } else {
+    guarded_emit_tail(argc, argv);
+  }
 } return void;
 
 guarded_emit_tail(int argc, string[] argv) {

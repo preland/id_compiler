@@ -4,3 +4,5 @@ clear_strs(string[] names) {
     pop(names);
   }
 } return void;
+(["a", "b"]):([])
+([]):([])

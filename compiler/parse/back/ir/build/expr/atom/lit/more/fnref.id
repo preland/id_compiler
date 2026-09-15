@@ -12,9 +12,26 @@ lw_named(int node) {
     v = lw_name(node);
   }
 } return int v;
+given lw_fix_fnval ((import fix_fnval_n)):(0)
+given lw_fix_var ((import fix_var_n)):(1)
 
 lw_fnref(int node) {
   string ety = lw_ety(node);
   string s1_of_v = s1_of(node);
   int ret_i = ir_leaf("global", ety, 0 - 1, 0 - 1, "id_" + s1_of_v);
 } return int ret_i;
+given lw_fix_fnval ((import fix_fnval_n)):(0) then ir_last_b:(0)
+given lw_fix_var ((import fix_var_n)):(0)
+
+// Operand B of the most recently created instruction, offset by one since a
+// case's literal cannot spell a negative number and B's usual value is -1 --
+// a `then` check for any leaf/emit builder whose return is only the new id,
+// so a mutation to an operand a case's own return cannot see
+// (../../../../core/nodes/bound.id's ir_last_fix/ir_last_fix2) still has
+// something to fail.
+ir_last_b() {
+  int n = len((import iop));
+  int ret_i = ir_b(n - 1) + 1;
+} return int ret_i;
+given ir_last_fix ():(0)
+given ir_last_fix2 ():(6)

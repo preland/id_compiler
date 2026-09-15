@@ -5,12 +5,16 @@ lw_scmp_b(int node, int a) {
   int b = lw_expr(i2_of_v);
   int ret_i = lw_scmp_call(node, a, b);
 } return int ret_i;
+given str_fixture ((import scmp_node), 5):(6)
+given str_fixture2 ((import scmp_node), 5):(6)
 
 lw_scmp_call(int node, int a, int b) {
   string lw_strcmp_v = lw_strcmp();
   int lw_callf_v = lw_callf(lw_strcmp_v, "int", [a, b]);
   int ret_i = lw_scmp2(node, lw_callf_v);
 } return int ret_i;
+given str_fixture ((import scmp_node), 3, 4):(5)
+given str_fixture2 ((import scmp_node), 3, 4):(5)
 
 // Continues lw_concat: the right operand, once the left is already in
 // string context.
@@ -19,3 +23,5 @@ lw_concat_b(int node, int a) {
   int b = lw_tostr(i2_of_v);
   int ret_i = lw_callf("id_concat", "string", [a, b]);
 } return int ret_i;
+given str_fixture2 ((import concat_node), 3):(4)
+given str_fixture2 ((import concat_node), 5):(4)
