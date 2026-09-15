@@ -4,6 +4,8 @@ drv_sub(string path, int[] buf, int lo, int hi) {
   string name = drv_name(buf, lo, hi);
   drv_down(path, name, buf[lo]);
 } return void;
+("p", [46, 103, 105, 116], 0, 4):() then prints:("")
+("p", [46, 46], 0, 2):() then prints:("")
 
 // A hidden directory is pruned rather than walked: a .git beside three source
 // directories is not a fourth entry and nothing under it is source. Both
@@ -14,9 +16,13 @@ drv_down(string path, string name, int c) {
     drv_walk(sub);
   }
 } return void;
+("p", ".git", 46):() then prints:("")
+("p", "does-not-exist-xyz", 100):() then prints:("")
 
 drv_file(string path, int[] buf, int lo, int hi) {
   string name = drv_name(buf, lo, hi);
   int ok = drv_isid(buf, lo, hi);
   drv_say(path, name, ok);
 } return void;
+("p", [97, 46, 105, 100], 0, 4):() then prints:("p/a.id\n")
+("p", [97, 46, 99], 0, 3):() then prints:("")

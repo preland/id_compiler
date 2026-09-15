@@ -1,0 +1,17 @@
+// An allocated, pre-poked buffer for drv_bytes's cases: a `given` setup
+// takes no parameters, and there is no other way to hand a case a real
+// address to poke into.
+
+drvbuf_poked_hi() {
+  export word gb = alloc(4);
+  poke8(gb, 104);
+  poke8(gb + 1, 105);
+} return void;
+():() then prints:("")
+():() then prints:("") then drvbuf_mem2:("hi")
+
+drvbuf_mem2() {
+  string s = str_of_mem((import gb), 2);
+} return string s;
+given drvbuf_poked_hi ():("hi")
+given drvbuf_poked_hi ():("hi") then prints:("")

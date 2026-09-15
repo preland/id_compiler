@@ -4,3 +4,5 @@ drv_fill(int[] buf, int n) {
     push(buf, 0);
   }
 } return void;
+([], 3):([0, 0, 0])
+([], 0):([])
