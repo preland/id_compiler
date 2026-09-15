@@ -17,6 +17,8 @@ ll_ipred(string op) {
     s = "s" + ll_rel(op);
   }
 } return string s;
+("!="):("ne")
+("<"):("slt")
 
 ll_fpred(string op) {
   string s = "eq";

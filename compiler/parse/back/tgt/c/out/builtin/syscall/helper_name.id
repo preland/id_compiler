@@ -8,6 +8,8 @@ sys_helper(string name) {
     h = "id_mem_alloc";
   }
 } return string h;
+("peek8"):("id_peek8")
+("alloc"):("id_mem_alloc")
 
 sys_helper2(string name) {
   string h = "id_" + name;
@@ -15,3 +17,5 @@ sys_helper2(string name) {
     h = "id_mem_size";
   }
 } return string h;
+("peek8"):("id_peek8")
+("store_size"):("id_mem_size")

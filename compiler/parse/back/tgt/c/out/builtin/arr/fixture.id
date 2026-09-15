@@ -1,0 +1,12 @@
+// A one-element "arr" node, alongside case/lit/fixture.id's plain ints and
+// case/more/size/fixture.id's two-element one: emit_arr_n needs a real arr
+// node (it reads elems[0] itself), and a length that differs from the
+// two-element fixture is what makes a second case say something new.
+
+arr1_fixture() {
+  lit_int_fixture();
+  int[] one = [(import lit_e)];
+  export int arr1_e = newnode("arr", 0, 0, "", "", one, one);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

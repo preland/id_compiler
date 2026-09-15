@@ -7,6 +7,8 @@ show_num(string code, string type) {
     so = "fprintf(stderr, \"%g\", " + code + ");";
   }
 } return string so;
+("x", "int"):("fprintf(stderr, \"%lld\", x);")
+("x", "float"):("fprintf(stderr, \"%g\", x);")
 
 size_list(int[] args) {
   string out = "";
@@ -16,8 +18,12 @@ size_list(int[] args) {
     j = j + 1;
   }
 } return string out;
+([]):("")
+given lit_cells_fixture ((import lit_cells_xs)):("(long long)(5), (long long)(4)")
 
 sizes_c(int[] args) {
   string parts = size_list(args);
   string so = "idtc_max_of((long long[]){" + parts + "}, " + len(args) + ")";
 } return string so;
+([]):("idtc_max_of((long long[]){}, 0)")
+given lit_cells_fixture ((import lit_cells_xs)):("idtc_max_of((long long[]){(long long)(5), (long long)(4)}, 2)")

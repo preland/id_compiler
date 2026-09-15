@@ -18,3 +18,5 @@ unbox4(string code, string type) {
     s = "(long long)(" + code + ")";
   }
 } return string s;
+("x", "word"):("(long long)(x)")
+("x", "int[]"):("(IdList*)(intptr_t)(x)")

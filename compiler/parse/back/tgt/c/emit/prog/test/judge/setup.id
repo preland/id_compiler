@@ -7,6 +7,8 @@ emit_tc_setup() {
   setup_rows();
   emit_line("}");
 } return void;
+given wrap_fixture ():() then prints:("static void idtc_setup(void) {\n    idtc_where[0] = \":4\"; idtc_call[0] = \"fx_target(0)\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n}\n")
+given case_fidx_fixture ():() then prints:("static void idtc_setup(void) {\n    idtc_where[0] = \"fixture.id:4\"; idtc_call[0] = \"fx_target()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n}\n")
 
 setup_rows() {
   int ci = 0;
@@ -15,9 +17,13 @@ setup_rows() {
     ci = ci + 1;
   }
 } return void;
+given wrap_fixture ():() then prints:("    idtc_where[0] = \":4\"; idtc_call[0] = \"fx_target(0)\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
+given case_fidx_fixture ():() then prints:("    idtc_where[0] = \"fixture.id:4\"; idtc_call[0] = \"fx_target()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
 
 setup_row(int ci) {
   string cw = case_where_c(ci);
   string cc = case_call_c(ci);
   emit_setup_line(ci, cw, cc);
 } return void;
+given wrap_fixture (0):() then prints:("    idtc_where[0] = \":4\"; idtc_call[0] = \"fx_target(0)\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
+given case_fidx_fixture (0):() then prints:("    idtc_where[0] = \"fixture.id:4\"; idtc_call[0] = \"fx_target()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")

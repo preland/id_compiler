@@ -11,3 +11,5 @@ emit_gcall_tail(int id, string s) {
     s = emit_fcall(id);
   }
 } return string s;
+given call_names_fixture ((import call_e_foo), "id_foo(5, 4)"):("id_foo(5, 4)")
+given call_sys_fixture ((import call_e_sys), "ignored"):("id_peek8((long long)(5), (long long)(4))")

@@ -1,0 +1,24 @@
+// One placeholder entry in casefn so a function that only reads its length
+// (emit_tc_run, ../text/proc.id) has something other than zero to read --
+// the value itself is never dereferenced there, so a plain 0 is enough. The
+// harn flag itself (../flag.id) is turned on by the pre-existing
+// entry_fixture_harn (code/func/def/body/entry.id).
+
+one_casefn_fixture() {
+  env_init();
+  push((import casefn), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// What ../head.id's emit_test_body needs beyond env_init: the asm tables
+// (init_asm_all), empty, so emit_asm_then_main's two loops -- over asm
+// overloads and over `prog` -- both run zero times instead of reading an
+// import that was never declared; and harn (harn_init), for harn_set(0).
+test_body_fixture() {
+  env_init();
+  init_asm_all();
+  harn_init();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

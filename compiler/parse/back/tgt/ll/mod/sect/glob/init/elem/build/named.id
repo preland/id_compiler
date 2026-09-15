@@ -26,3 +26,5 @@ ll_init_store(int i) {
   emit_line("  store ptr %c" + i + ", ptr @" + (import enames)[i]);
   emit_line("  call void @id_list_lock(ptr %c" + i + ")");
 } return void;
+given lc_dce_setup (0):() then prints:("  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n")
+given lc_dce_setup (1):() then prints:("  store ptr %c1, ptr @b\n  call void @id_list_lock(ptr %c1)\n")

@@ -7,6 +7,8 @@ ll_zero(string t) {
     s = "null";
   }
 } return string s;
+given env_init ("float"):("0.0")
+given env_init ("string"):("null")
 
 // String literals become private globals, emitted after the functions that
 // use them -- an LLVM module has no ordering rule, so nothing has to be
@@ -18,9 +20,13 @@ ll_strs() {
     i = i + 1;
   }
 } return void;
+given ir_fixture3 ():() then prints:("")
+given ll_str_fixture ():() then prints:("@.str0 = private unnamed_addr constant [1 x i8] c\"\\00\"\n@.str1 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")
 
 ll_str_at(int i) {
   if(ll_isstr(i) == 1) {
     ll_str_emit(i);
   }
 } return void;
+given ir_fixture3 ((import ir_retvoid)):() then prints:("")
+given ll_str_fixture ((import ir_str_const)):() then prints:("@.str0 = private unnamed_addr constant [1 x i8] c\"\\00\"\n")

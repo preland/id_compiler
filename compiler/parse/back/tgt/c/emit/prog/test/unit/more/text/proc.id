@@ -16,13 +16,19 @@ emit_test_tail() {
   emit_tc_helpers();
   emit_tc_rest();
 } return void;
+given env_init ():() then calls emit_tc_run:[1] then calls emit_tc_rest:[1]
+given env_init ():() then check_failed:(0)
 
 emit_tc_run() {
   int n = len((import casefn));
   emit_line("#define IDTC_N " + n);
   emit_tc_support();
 } return void;
+given env_init ():() then calls emit_line:("#define IDTC_N 0") then calls emit_tc_support:[1]
+given one_casefn_fixture ():() then calls emit_line:("#define IDTC_N 1") then calls emit_tc_support:[1]
 
 emit_tc_proc() {
   emit_line("static const char* idtc_where[IDTC_N];\nstatic const char* idtc_call[IDTC_N];\nstatic const char* idtc_fn[IDTC_N];\nstatic int idtc_fidx[IDTC_N];\nstatic int (*idtc_case[IDTC_N])(int);\nstatic long long idtc_t[IDTC_N];\nstatic long long idtc_m[IDTC_N];\nstatic long long idtc_n[IDTC_N];\nstatic void idtc_setup(void);\nstatic int idtc_claims(void);\n#define IDTC_SECONDS 10\n#define IDTC_MEMORY ((rlim_t)1 << 30)\nstatic void idtc_limit(void) {\n    struct rlimit rl;\n    alarm(IDTC_SECONDS);\n    if (getrlimit(RLIMIT_AS, &rl) == 0 && (rl.rlim_max == RLIM_INFINITY || rl.rlim_max > IDTC_MEMORY)) {\n        rl.rlim_cur = IDTC_MEMORY;\n        setrlimit(RLIMIT_AS, &rl);\n    }\n}\nstatic void idtc_report(int k, int st, char* msg) {\n    size_t n = strlen(msg);\n    while (n > 0 && msg[n - 1] == '\\n') msg[--n] = '\\0';\n    fprintf(stderr, \"%s: test failed: %s \", idtc_where[k], idtc_call[k]);\n    if (WIFSIGNALED(st) && WTERMSIG(st) == SIGALRM)\n        fprintf(stderr, \"did not finish within %d seconds\\n\", IDTC_SECONDS);\n    else if (WIFSIGNALED(st))\n        fprintf(stderr, \"was killed by signal %d (%s)\\n\", WTERMSIG(st), strsignal(WTERMSIG(st)));\n    else if (n > 0 && strstr(msg, \"out of memory\"))\n        fprintf(stderr, \"trapped: %s (a case may use at most %d MiB)\\n\", msg, (int)(IDTC_MEMORY >> 20));\n    else if (n > 0)\n        fprintf(stderr, \"trapped: %s\\n\", msg);\n    else\n        fprintf(stderr, \"exited with status %d\\n\", WEXITSTATUS(st));\n}");
 } return void;
+():() then prints:("static const char* idtc_where[IDTC_N];\nstatic const char* idtc_call[IDTC_N];\nstatic const char* idtc_fn[IDTC_N];\nstatic int idtc_fidx[IDTC_N];\nstatic int (*idtc_case[IDTC_N])(int);\nstatic long long idtc_t[IDTC_N];\nstatic long long idtc_m[IDTC_N];\nstatic long long idtc_n[IDTC_N];\nstatic void idtc_setup(void);\nstatic int idtc_claims(void);\n#define IDTC_SECONDS 10\n#define IDTC_MEMORY ((rlim_t)1 << 30)\nstatic void idtc_limit(void) {\n    struct rlimit rl;\n    alarm(IDTC_SECONDS);\n    if (getrlimit(RLIMIT_AS, &rl) == 0 && (rl.rlim_max == RLIM_INFINITY || rl.rlim_max > IDTC_MEMORY)) {\n        rl.rlim_cur = IDTC_MEMORY;\n        setrlimit(RLIMIT_AS, &rl);\n    }\n}\nstatic void idtc_report(int k, int st, char* msg) {\n    size_t n = strlen(msg);\n    while (n > 0 && msg[n - 1] == '\\n') msg[--n] = '\\0';\n    fprintf(stderr, \"%s: test failed: %s \", idtc_where[k], idtc_call[k]);\n    if (WIFSIGNALED(st) && WTERMSIG(st) == SIGALRM)\n        fprintf(stderr, \"did not finish within %d seconds\\n\", IDTC_SECONDS);\n    else if (WIFSIGNALED(st))\n        fprintf(stderr, \"was killed by signal %d (%s)\\n\", WTERMSIG(st), strsignal(WTERMSIG(st)));\n    else if (n > 0 && strstr(msg, \"out of memory\"))\n        fprintf(stderr, \"trapped: %s (a case may use at most %d MiB)\\n\", msg, (int)(IDTC_MEMORY >> 20));\n    else if (n > 0)\n        fprintf(stderr, \"trapped: %s\\n\", msg);\n    else\n        fprintf(stderr, \"exited with status %d\\n\", WEXITSTATUS(st));\n}\n")
+given env_init ():() then check_failed:(0)

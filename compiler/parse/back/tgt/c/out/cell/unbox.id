@@ -7,6 +7,8 @@ unbox(string code, string type) {
     s = "(int)(" + code + ")";
   }
 } return string s;
+("x", "int"):("(int)(x)")
+("x", "string"):("(char*)(intptr_t)(x)")
 
 unbox2(string code, string type) {
   string s = unbox3(code, type);
@@ -14,6 +16,8 @@ unbox2(string code, string type) {
     s = "(char*)(intptr_t)(" + code + ")";
   }
 } return string s;
+("x", "string"):("(char*)(intptr_t)(x)")
+("x", "float"):("id_unbox_f(x)")
 
 unbox3(string code, string type) {
   string s = unbox4(code, type);
@@ -21,3 +25,5 @@ unbox3(string code, string type) {
     s = "id_unbox_f(" + code + ")";
   }
 } return string s;
+("x", "float"):("id_unbox_f(x)")
+("x", "word"):("(long long)(x)")

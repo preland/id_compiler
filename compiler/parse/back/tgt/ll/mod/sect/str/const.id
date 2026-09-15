@@ -14,6 +14,8 @@ ll_const_val(int e, string name) {
     s = ll_const_str(e, name);
   }
 } return string s;
+given lit_int_fixture ((import lit_e), "x"):("5")
+given lit_str_fixture ((import lit_str_e), "x"):("@.cs.x")
 
 // An integer is the value the fingerprint canonicaliser folds it to (canon_expr,
 // tag I -- the same reduction the constant-wrapper rule reads); anything the
@@ -25,6 +27,8 @@ ll_const_num(int e) {
     s = zeros_tail(fp, 1);
   }
 } return string s;
+given lit_int_fixture ((import lit_e)):("5")
+given lit_int_fixture ((import lit_e2)):("4")
 
 // The bytes are emitted here, just above the global that points at them.
 ll_const_str(int e, string name) {
@@ -32,3 +36,5 @@ ll_const_str(int e, string name) {
   string gname = "@.cs." + name;
   ll_str_bytes(gname, spell);
 } return string gname;
+given lit_str_fixture ((import lit_str_e), "x"):("@.cs.x")
+given lit_str_fixture ((import lit_str_e), "y"):("@.cs.y")

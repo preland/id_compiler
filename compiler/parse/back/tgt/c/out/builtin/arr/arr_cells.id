@@ -9,3 +9,5 @@ arr_cells(int[] elems, string etyp) {
     i = i + 1;
   }
 } return string out;
+given lit_cells_fixture ((import lit_cells_xs), "int"):("(long long)(5), (long long)(4)")
+given lit_cells_fixture ((import lit_cells_xs), "string"):("(long long)(intptr_t)(5), (long long)(intptr_t)(4)")

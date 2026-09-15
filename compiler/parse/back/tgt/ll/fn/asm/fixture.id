@@ -1,0 +1,21 @@
+// "a"'s own value node (../../../mod/sect/glob/../../drive/run/check/dce/
+// export/fixture.id's lc_dce_setup registers it, but exports only the
+// name "a" is registered under, not the node) and its one element, for
+// mod/sect/glob/init/elem/elems.id's ll_init_elems2/ll_elem_bytes and
+// init/elem/build/cell.id's ll_init_elem/ll_init_push -- const_decl+i1_of
+// is exactly what ll_init_elems itself does to get from one to the other.
+
+elems2_fixture() {
+  lc_dce_setup();
+  int d = const_decl("a");
+  export int llie_e = i1_of(d);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+elems3_fixture() {
+  elems2_fixture();
+  export int llie_child = l1_of((import llie_e))[0];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

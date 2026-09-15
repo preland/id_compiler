@@ -1,0 +1,34 @@
+// Two synthetic entries in casefn (../../../fidx.id's own column, past
+// case_fixture's one real case, reused from fn_fixture rather than building
+// a node of our own): case_fidx/case_same only compare casefn's values for
+// equality, so any two real nodes stand in for "the function this case was
+// written under" -- fixture_fn both times is one function's two cases;
+// fixture_fn then fixture_zero is two different ones. casenode/casestart
+// are untouched, so case_loc (../../../row.id) still reads case_fixture's
+// own "fixture.id:4".
+
+case_fidx_fixture() {
+  fn_fixture();
+  push((import casefn), (import fixture_fn));
+  push((import casefn), (import fixture_fn));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+case_fidx_fixture2() {
+  fn_fixture();
+  push((import casefn), (import fixture_fn));
+  push((import casefn), (import fixture_zero));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// One claim, written on case_fixture's own case (ci 0): ../size.id's
+// case_claims only compares conscase's values against a case index, so it
+// needs no node of its own.
+claim_conscase_fixture() {
+  case_fixture();
+  push((import conscase), (import fixture_ci));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

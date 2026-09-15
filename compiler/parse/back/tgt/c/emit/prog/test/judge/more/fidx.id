@@ -5,6 +5,8 @@ call_c(string f1, int[] args) {
   string it = items_text(args);
   string so = c_esc(f1 + "(" + it + ")");
 } return string so;
+("foo", []):("foo()")
+("bar", []):("bar()")
 
 case_fidx(int ci) {
   int n = 0;
@@ -14,6 +16,8 @@ case_fidx(int ci) {
     j = j + 1;
   }
 } return int n;
+given case_fidx_fixture (1):(1)
+given case_fidx_fixture2 (1):(0)
 
 case_same(int j, int ci) {
   int r = 0;
@@ -21,3 +25,5 @@ case_same(int j, int ci) {
     r = 1;
   }
 } return int r;
+given case_fidx_fixture (0, 1):(1)
+given case_fidx_fixture2 (0, 1):(0)

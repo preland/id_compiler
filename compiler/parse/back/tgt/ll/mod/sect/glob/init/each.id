@@ -8,6 +8,8 @@ ll_init_each(string pass) {
     i = i + 1;
   }
 } return void;
+given lc_dce_setup ("bytes"):() then calls ll_init_one:(0, "bytes") then calls ll_init_one:(1, "bytes")
+given lc_dce_setup2 ("build"):() then calls ll_init_one:(0, "build")
 
 ll_init_one(int i, string pass) {
   if(is_list_const(i) == 1 && pass == "bytes") {
@@ -17,9 +19,13 @@ ll_init_one(int i, string pass) {
     ll_init_build(i);
   }
 } return void;
+given lc_dce_setup (0, "bytes"):() then calls ll_init_elems:(0, "bytes")
+given lc_dce_setup (1, "bytes"):() then calls ll_init_elems:[0]
 
 ll_init_build(int i) {
   emit_line("  %c" + i + " = call ptr @id_list_new()");
   ll_init_elems(i, "build");
   ll_init_store(i);
 } return void;
+given lc_dce_setup (0):() then prints:("  %c0 = call ptr @id_list_new()\n  call void @id_list_push(ptr %c0, i64 1)\n  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n")
+given lc_dce_setup (1):() then prints:("  %c1 = call ptr @id_list_new()\n  store ptr %c1, ptr @b\n  call void @id_list_lock(ptr %c1)\n")

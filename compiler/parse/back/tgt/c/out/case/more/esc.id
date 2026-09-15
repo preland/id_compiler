@@ -9,11 +9,15 @@ c_esc(string t) {
     i = i + 1;
   }
 } return string out;
+("hi"):("hi")
+("a\"b"):("a\\\"b")
 
 esc_at(string t, int i) {
   int ch = charat(t, i);
   string so = esc_code(ch);
 } return string so;
+("ab", 0):("a")
+("a\"b", 1):("\\\"")
 
 // 92 is a backslash, 34 a double quote, 10 a newline.
 esc_code(int ch) {
@@ -24,3 +28,5 @@ esc_code(int ch) {
     so = "\\n";
   }
 } return string so;
+(97):("a")
+(10):("\\n")

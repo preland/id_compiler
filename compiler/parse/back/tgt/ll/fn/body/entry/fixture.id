@@ -1,0 +1,34 @@
+// A comparison instruction (both env_init, for ty_kind's type registry
+// ll_pred reads, and init_ir, for the instruction itself -- two
+// independent stores, so both inits are needed together only here) and a
+// phi built on it, for ../../../val/insn/ops/build.id's ll_t5_cmp and
+// ../../../val/insn/ops/more/cast.id's ll_phis/../mem.id's ll_t4. The
+// comparison is its own left operand -- mechanical, not semantic, but
+// deterministic -- so no second instruction is spent building one; [9]
+// stands in for its own unread l/bl (see ../../../val/insn/mem/
+// fixture.id's note).
+
+cmp_fixture() {
+  init_ir();
+  env_init();
+  export int ir_cmp = ir_insn("icmp", "int", 0 - 1, 0 - 1, "", [9], [9]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+phi_fixture() {
+  cmp_fixture();
+  export int ir_phi = ir_insn("phi", "int", 0 - 1, 0 - 1, "", [(import ir_cmp)], [7]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The empty phi (0 incoming edges) needs a genuinely, typed-empty l/bl --
+// unlike every other instruction here, ll_phis actually reads them.
+phi_empty_fixture() {
+  phi_fixture();
+  export int[] ir_empty_phi = [];
+  export int ir_phi_empty = ir_insn("phi", "int", 0 - 1, 0 - 1, "", ir_empty_phi, ir_empty_phi);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

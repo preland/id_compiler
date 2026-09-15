@@ -15,3 +15,5 @@ emit_fcall(int id) {
   int[] l1_of_v = l1_of(id);
   string ret_s = s1_of(id) + "(" + emit_args(l1_of_v) + ")";
 } return string ret_s;
+given call_names_fixture ((import call_e_foo)):("foo(5, 4)")
+given call_names_fixture ((import call_e_len)):("len(5, 4)")

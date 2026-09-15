@@ -10,3 +10,5 @@ tc_lit(int e, string want) {
     so = tc_scalar(e);
   }
 } return string so;
+given lit_int_fixture ((import lit_e), "int"):("5")
+given lit_arr_fixture ((import lit_arr_e), "int[]"):("id_list_lit(2, (long long)(5), (long long)(4))")

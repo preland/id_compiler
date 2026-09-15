@@ -10,14 +10,20 @@ ll_const_init() {
     ll_init_fn();
   }
 } return void;
+given lc_dce_setup ():() then calls ll_init_fn:[1]
+given lc_dce_setup2 ():() then calls ll_init_fn:[0]
 
 ll_init_fn() {
   ll_init_each("bytes");
   emit_line("define internal void @idc_const_init() {\nentry:");
   ll_init_rest();
 } return void;
+given lc_dce_setup ():() then calls ll_init_each:("bytes") then calls ll_init_rest:[1]
+given lc_dce_setup2 ():() then calls ll_init_each:("bytes") then calls ll_init_rest:[1]
 
 ll_init_rest() {
   ll_init_each("build");
   emit_line("  ret void\n}");
 } return void;
+given lc_dce_setup ():() then prints:("  %c0 = call ptr @id_list_new()\n  call void @id_list_push(ptr %c0, i64 1)\n  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n  ret void\n}\n")
+given lc_dce_setup2 ():() then prints:("  ret void\n}\n")

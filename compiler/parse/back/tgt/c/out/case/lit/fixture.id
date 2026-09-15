@@ -1,0 +1,28 @@
+// Synthetic case-literal nodes for this directory's emitters: two plain
+// ints (env_init gives the node tables newleaf/node_int write into) and the
+// negated ("un") node built on top of them.
+
+lit_int_fixture() {
+  env_init();
+  export int lit_e = node_int("5", 5, 0);
+  export int lit_e2 = node_int("4", 4, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lit_un_fixture() {
+  lit_int_fixture();
+  export int lit_un_e = newleaf("un", (import lit_e), 0, "-", "");
+  export int lit_un_e2 = newleaf("un", (import lit_e2), 0, "-", "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A string leaf, for the emitters that read a "str" node's text rather than
+// a number.
+lit_str_fixture() {
+  env_init();
+  export int lit_str_e = newleaf("str", 0, 0, "hi", "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

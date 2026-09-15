@@ -5,11 +5,17 @@
 harn_init() {
   export int[] harn = [0];
 } return void;
+():() then is_harn:(0)
+():() then init_units:(0)
 
 harn_set(int v) {
   lset((import harn), 0, v);
 } return void;
+given harn_init (1):() then is_harn:(1)
+given harn_init (0):() then is_harn:(0)
 
 is_harn() {
   int ret_i = (import harn)[0];
 } return int ret_i;
+given harn_init ():(0)
+given entry_fixture_harn ():(1)

@@ -22,6 +22,8 @@ emit_tests_maybe(int argc, string[] argv) {
     emit_tests(build_host_v);
   }
 } return void;
+given env_init (1, ["prog"]):() then calls harn_init:[1] then calls emit_tests:[0]
+given env_init (3, ["prog", "a", "b"]):() then calls harn_init:[1] then calls emit_tests:[0]
 
 emit_tests(string triple) {
   if(len((import casefn)) > 0) {
@@ -29,9 +31,13 @@ emit_tests(string triple) {
   }
   emit_line("/* ---- end of test harness ---- */");
 } return void;
+given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n")
+given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then check_failed:(0)
 
 emit_test_unit(string triple) {
   harn_set(1);
   emit_test_head();
   emit_test_body(triple);
 } return void;
+given test_body_fixture ("abc"):() then calls emit_test_head:[1] then calls emit_test_body:("abc")
+given test_body_fixture ("xyz"):() then calls emit_test_head:[1] then calls emit_test_body:("xyz")

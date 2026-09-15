@@ -8,9 +8,13 @@ emit_llvm(string triple, int lvl) {
   ir_opt(lvl);
   ll_emit(triple);
 } return void;
+given ll_env_fixture2 ("x86_64", 0):() then calls ir_lower:[1] then calls ll_emit:("x86_64")
+given ll_env_fixture2 ("wasm32", 2):() then calls ir_opt:(2) then calls ll_emit:("wasm32")
 
 ll_emit(string triple) {
   ll_head(triple);
   ll_asm_all(triple);
   ll_body();
 } return void;
+given ll_env_fixture2 ("x86_64"):() then calls ll_head:("x86_64") then calls ll_body:[1]
+given ll_env_fixture2 ("wasm32"):() then calls ll_head:("wasm32") then calls ll_body:[1]

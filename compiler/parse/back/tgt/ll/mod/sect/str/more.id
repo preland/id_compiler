@@ -3,6 +3,8 @@ ll_str_emit(int i) {
   string s = ir_s(i);
   ll_str_bytes("@.str" + i, s);
 } return void;
+given ll_str_fixture ((import ir_str_const)):() then prints:("@.str0 = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
+given ll_str_fixture ((import ir_str_const2)):() then prints:("@.str1 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")
 
 // A string literal's bytes as a private global called `gname`. A literal in a
 // function body is named for its IR value; a conf.id constant's, for the
@@ -11,9 +13,13 @@ ll_str_bytes(string gname, string s) {
   int blen = ll_blen(s);
   ll_str_emit2(gname, s, blen);
 } return void;
+("@.g", "\"\""):() then prints:("@.g = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
+("@.g2", "\"a\""):() then prints:("@.g2 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")
 
 ll_str_emit2(string gname, string s, int blen) {
   string q = chr(34);
   string bytes = ll_bytes(s);
   emit_line(gname + " = private unnamed_addr constant [" + blen + " x i8] c" + q + bytes + q);
 } return void;
+("@.g", "\"\"", 1):() then prints:("@.g = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
+("@.g2", "\"a\"", 2):() then prints:("@.g2 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")

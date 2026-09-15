@@ -10,11 +10,15 @@ ll_globals() {
   }
   ll_const_init();
 } return void;
+given lc_dce_init ():() then prints:("") then calls ll_const_init:[1]
+given lc_dce_setup2 ():() then prints:("@b = global i32 2\n") then calls ll_const_init:[1]
 
 ll_global_at(int i, string ty) {
   string init = ll_init(i);
   emit_line("@" + (import enames)[i] + " = global " + ty + " " + init);
 } return void;
+given lc_dce_setup (0, "ptr"):() then prints:("@a = global ptr null\n")
+given lc_dce_setup (1, "i32"):() then prints:("@b = global i32 2\n")
 
 ll_init(int i) {
   string s = ll_zero((import etypes)[i]);
@@ -24,3 +28,5 @@ ll_init(int i) {
     s = ll_const_val(i1_of_v, (import enames)[i]);
   }
 } return string s;
+given lc_dce_setup (0):("null")
+given lc_dce_setup (1):("2")
