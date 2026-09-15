@@ -31,6 +31,8 @@ init_tyreg() {
   init_ty_cols();
   init_ty_rows();
 } return void;
+():() then reg_rows:(5)
+():() then reg_last_width:(0)
 
 // The four columns. An `export` is a statement, so the columns come into
 // existence when this runs -- which is why init_tyreg() must be called before
@@ -40,9 +42,13 @@ init_ty_cols() {
   export string[] tykind = [];
   export int[] tywidth = [];
 } return void;
+given init_tyreg ():() then reg_rows:(0)
+():() then reg_rows:(0)
 
 init_ty_rows() {
   export int[] tysigned = [];
   ty_row("int", "int", 4, 1);
   init_ty_rows2();
 } return void;
+given init_ty_cols ():() then reg_rows:(5)
+given init_ty_cols ():() then reg_last_width:(0)

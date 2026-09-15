@@ -1,0 +1,17 @@
+// One more row on top of the full registry, so reg_last_width has a second
+// state to compare against -- ty_row does not export anything, so this adds
+// no exporter of its own to conflict with init_ty_rows's.
+tyreg_extra() {
+  init_tyreg();
+  ty_row("bool", "int", 1, 1);
+} return void;
+():() then reg_rows:(6)
+():() then reg_last_width:(1)
+
+// A second such row, so reg_width_at5 has two different values to compare.
+tyreg_extra2() {
+  init_tyreg();
+  ty_row("byte", "int", 2, 0);
+} return void;
+():() then reg_rows:(6)
+():() then reg_width_at5:(2)

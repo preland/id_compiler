@@ -1,0 +1,23 @@
+// A var node naming a registered function ("fx_target", registered by
+// fn_idx_fixture -- registry/fn/node/sig/idx.id), for is_fn_value/is_fcall's
+// "yes" case. Filed alongside the table's own fixtures for lack of any
+// directory under registry/fn/node/ with room left (each is at the 3-entry
+// cap already).
+fnval_fixture() {
+  fn_idx_fixture();
+  export int fnval_hit = node_var("fx_target");
+  export int fnval_push = node_var("push");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A variable actually registered with a function type, for is_fcall's "yes"
+// case and callee_var_type's "found" one -- fnval_fixture's var nodes never
+// got added to the variable table, so lookup_var never finds them.
+fnval_call_fixture() {
+  fn_idx_fixture();
+  add_var("cv", "func(int) return int", 0);
+  export int fnval_call = node_var("cv");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

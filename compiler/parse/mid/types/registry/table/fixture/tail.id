@@ -1,0 +1,25 @@
+// Read-back helpers for the type table's own test cases: how many rows are
+// registered, and the width of the last one added.
+reg_rows() {
+  int n = len((import tyname));
+} return int n;
+given init_ty_cols ():(0)
+given init_tyreg ():(5)
+
+reg_last_width() {
+  int[] widths = (import tywidth);
+  int n = widths[len(widths) - 1];
+} return int n;
+given init_tyreg ():(0)
+given tyreg_extra ():(1)
+
+// The width at row index 5: past the registry's 5 built-in rows, so this
+// reads whatever a test appended right after them -- the interior rows
+// init_ty_rows2 adds (word, float) end up masked at the tail by whatever
+// init_ty_rows3 appends after, so a check on the tail alone cannot see them.
+reg_width_at5() {
+  int[] widths = (import tywidth);
+  int n = widths[5];
+} return int n;
+given tyreg_extra ():(1)
+given tyreg_extra2 ():(2)
