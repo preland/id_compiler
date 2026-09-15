@@ -2,8 +2,12 @@ lz_msg(string name_i, string name_j) {
   string loc = lz_loc(name_i);
   string ret_s = loc + "'" + name_i + "' and '" + name_j + "' differ only in a literal value; parameterise one function";
 } return string ret_s;
+given env_init ("dup9", "dup5"):("<stdin>:1: warning: 'dup9' and 'dup5' differ only in a literal value; parameterise one function")
+given env_init ("f2", "f1"):("<stdin>:1: warning: 'f2' and 'f1' differ only in a literal value; parameterise one function")
 
 lz_loc(string name_i) {
   int ln = func_line(name_i);
   string ret_s = func_file(name_i) + ":" + ln + ": warning: ";
 } return string ret_s;
+given env_init ("dup9"):("<stdin>:1: warning: ")
+given env_init ("f2"):("<stdin>:1: warning: ")

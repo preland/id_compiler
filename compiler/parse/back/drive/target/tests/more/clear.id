@@ -1,4 +1,13 @@
 // Emptying a list of names in place.
+// id 8: "y = 3;", an "assign" node; id 9: "foo(3);", an "exprstmt" node.
+lz_f() {
+  lz_e();
+  export int lz_assignid = node_assign("y", (import lz_i1));
+  export int lz_exprstmt = node_exprstmt((import lz_callid));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 clear_strs(string[] names) {
   while(len(names) > 0) {
     pop(names);

@@ -1,3 +1,12 @@
+// id 14: a bare read of "target" as a value (mid/form/decomp/checks/fwd/'s
+// canon_var tags exactly this "fv(target)", never a call's own callee).
+farm_j2() {
+  farm_j();
+  export int f_uvar = node_var("target");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 bits_types(int id, int a, int b) {
   string lt = type_of(a);
   string rt = type_of(b);

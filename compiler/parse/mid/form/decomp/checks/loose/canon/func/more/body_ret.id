@@ -9,6 +9,8 @@ lz_body(int[] stmts) {
     idx = idx + 1;
   }
 } return string out;
+given lz_g ([7, 9]):("d:int 0=I;e:c(foo:I)")
+given lz_e ([7]):("d:int 0=I")
 
 lz_ret(int id) {
   string out = "void";
@@ -17,3 +19,5 @@ lz_ret(int id) {
     out = lz_expr(i1);
   }
 } return string out;
+given lz_j (11):("v0")
+given lz_j (15):("void")

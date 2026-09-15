@@ -12,6 +12,15 @@
 // declarations gathered the same way. Both need emission to be a buffer that
 // can be filled out of order, and both need exactly one place to change.
 
+// id 5: "x[3]", an "index" node; the one-element arg list [3] for a call.
+lz_d() {
+  lz_c();
+  export int lz_idx = node_index((import lz_var), (import lz_i1));
+  export int[] lz_callargs = [(import lz_i1)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 emit_line(string s) {
   print(s);
 } return void;

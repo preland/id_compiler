@@ -13,9 +13,13 @@ genname_report(int i, string name) {
   string msg = genname_msg(i, name);
   eprint(msg);
 } return void;
+given farm_i (0, "v2"):() then eprints:("test.id:7: warning: parameter 'v2' of 'fwd1' has a generated name; name it for what it holds\n")
+given farm_i (0, "ret_i"):() then eprints:("test.id:7: warning: parameter 'ret_i' of 'fwd1' has a generated name; name it for what it holds\n")
 
 genname_msg(int i, string name) {
   string fname = s1_of((import prog)[i]);
   string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
   string ret_s = loc + "parameter '" + name + "' of '" + fname + "' has a generated name; name it for what it holds";
 } return string ret_s;
+given farm_i (0, "v2"):("test.id:7: warning: parameter 'v2' of 'fwd1' has a generated name; name it for what it holds")
+given farm_i (0, "ret_i"):("test.id:7: warning: parameter 'ret_i' of 'fwd1' has a generated name; name it for what it holds")

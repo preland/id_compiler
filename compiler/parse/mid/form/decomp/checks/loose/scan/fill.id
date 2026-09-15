@@ -13,12 +13,16 @@ lz_fill() {
     i = i + 1;
   }
 } return void;
+given lz_o ():() then calls lz_fill_at:[2]
+given farm_g ():() then calls lz_fill_at:[0]
 
 lz_fill_at(int i) {
   int fid = (import prog)[i];
   string fpv = lz_fp_of(fid);
   push((import cfp2), fpv);
 } return void;
+given lz_p (0):() then calls lz_fp_of:(22)
+given lz_p (1):() then calls lz_fp_of:(23)
 
 lz_fp_of(int fid) {
   string fpv = "native#" + fid;
@@ -26,3 +30,5 @@ lz_fp_of(int fid) {
     fpv = lz_func(fid);
   }
 } return string fpv;
+given lz_j (11):("()->int{d:int 0=I;e:c(foo:I)}=>v0")
+given lz_j (15):("()->void{d:int 0=I}=>void")

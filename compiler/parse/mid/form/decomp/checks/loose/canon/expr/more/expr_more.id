@@ -10,15 +10,21 @@ lz_e4(int id) {
     out = lz_index(id);
   }
 } return string out;
+given lz_e (6):("c(foo:I)")
+given lz_d (5):("ix(v0,I)")
 
 lz_bin(int id) {
   string op = bin_op(id);
   string pair_s = lz_bin_pair(id);
   string ret_s = op + pair_s;
 } return string ret_s;
+given lz_c (4):("+(v0,I)")
+given lz_i (13):("*(S,v0)")
 
 lz_bin_pair(int id) {
   int i1 = i1_of(id);
   int i2 = i2_of(id);
   string ret_s = lz_pair(i1, i2);
 } return string ret_s;
+given lz_c (4):("(v0,I)")
+given lz_i (13):("(S,v0)")

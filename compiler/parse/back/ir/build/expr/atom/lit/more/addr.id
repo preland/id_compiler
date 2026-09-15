@@ -1,5 +1,16 @@
 
 // The stack slot a name reads from or writes to.
+// id 11: "f1(int) return int { int y=3; foo(3); } => y" -- a two-statement
+// non-void function. id 12: "hi"[x], a second "index" node (a different
+// operand shape than id 5's).
+lz_h() {
+  lz_g();
+  export int lz_func1 = node_func("f1", "int", (import f_none), (import lz_body1), (import lz_retvar));
+  export int lz_idx2 = node_index((import lz_str), (import lz_var));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 lw_name_addr(int node) {
   string name = s1_of(node);
   int addr = lw_addr(name);

@@ -6,12 +6,16 @@ fwd_report(int i, string callee_name) {
   string msg = fwd_msg(i, callee_name);
   eprint(msg);
 } return void;
+given farm_i (0, "target"):() then eprints:("test.id:7: warning: 'fwd1' only forwards to 'target'; call 'target' directly\n")
+given farm_i (0, "other"):() then eprints:("test.id:7: warning: 'fwd1' only forwards to 'other'; call 'other' directly\n")
 
 fwd_msg(int i, string callee_name) {
   string fname = s1_of((import prog)[i]);
   string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
   string ret_s = loc + "'" + fname + "' only forwards to '" + callee_name + "'; call '" + callee_name + "' directly";
 } return string ret_s;
+given farm_i (0, "target"):("test.id:7: warning: 'fwd1' only forwards to 'target'; call 'target' directly")
+given farm_i (0, "other"):("test.id:7: warning: 'fwd1' only forwards to 'other'; call 'other' directly")
 
 // (import fwd_fids) [0] a plain function, [1] one named "main"
 // (../../../decl_ok.id's fs_build2).

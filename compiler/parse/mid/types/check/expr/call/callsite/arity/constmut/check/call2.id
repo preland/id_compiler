@@ -6,3 +6,24 @@ chk_call2(int id) {
   chk_callsite(id);
   chk_bi(id);
 } return void;
+
+// id 10: "vfwd(int a) return void" whose only statement is f_exprstmt (id
+// 9) -- the void forwarder shape. id 11: param "b":string, for a
+// signature/parameter mismatch.
+farm_g() {
+  farm_f();
+  export int f_vfwd = node_func("vfwd", "void", [(import f_pa)], [(import f_exprstmt)], 0 - 1);
+  export int f_pb = node_param("param", "string", "b");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// prog and pfile carry one entry, fwd1 (id 6) from "test.id" -- for
+// fwd_msg/fwd_report/fwd_at/check_fwd's cases, which read prog[i]/pfile[i].
+farm_h() {
+  farm_g();
+  push((import prog), (import f_fwd1));
+  push((import pfile), "test.id");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
