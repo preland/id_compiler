@@ -5,6 +5,8 @@ fold_bitxor(int[] pos, int left) {
   int right = parse_bitand(pos);
   int ret_i = node_bin("^", left, right);
 } return int ret_i;
+given expr_tokens ([11], 100):(1)
+given expr_tokens ([7], 100):(1)
 
 parse_bitand(int[] pos) {
   int left = parse_shift(pos);
@@ -12,9 +14,13 @@ parse_bitand(int[] pos) {
     left = fold_bitand(pos, left);
   }
 } return int left;
+given expr_tokens ([8]):(0)
+given expr_tokens ([6]):(2)
 
 fold_bitand(int[] pos, int left) {
   advance(pos);
   int right = parse_shift(pos);
   int ret_i = node_bin("&", left, right);
 } return int ret_i;
+given expr_tokens ([7], 100):(1)
+given expr_tokens ([9], 100):(1)

@@ -20,3 +20,5 @@ bound_sep(string out, string t2) {
     gap = "";
   }
 } return string gap;
+("", "n"):("")
+("O(n", "log"):(" ")

@@ -5,3 +5,20 @@ node_iassign_tail(int target, int[] vlist, int[] none) {
   int i2_of_v = i2_of(target);
   int ret_i = newnode("iassign", i1_of_v, i2_of_v, "", "", vlist, none);
 } return int ret_i;
+
+// One ordinary-width int node, for a case that needs a node to read a field
+// of (field.id/native.id's last_i2).
+fixture_zero_int() {
+  env_init();
+  node_int("9", 9, 0);
+} return void;
+():() then check_failed:(0)
+():() then last_i2:(0)
+
+// One int node too wide for `int`, its `big` field set.
+fixture_one_int() {
+  env_init();
+  node_int("99999999999999", 0, 1);
+} return void;
+():() then check_failed:(0)
+():() then last_i2:(1)

@@ -1,0 +1,20 @@
+// A hand-loaded token stream for a case to parse: the tables load() fills
+// from stdin, filled by hand instead, one token per pair, so a parser
+// function under test can be pointed at a chosen input without reading a
+// real program through the lexer.
+push_toks(string[] kinds, string[] texts) {
+  int i = 0;
+  while(i < len(kinds)) {
+    push_real(kinds[i], texts[i]);
+    i = i + 1;
+  }
+} return void;
+given env_init (["ident", "op"], ["x", "("]):() then check_failed:(0)
+given env_init (["kw"], ["int"]):() then check_failed:(0)
+
+// How many tokens are loaded right now, for a fixture's own cases below.
+tok_count() {
+  int n = len((import tkind));
+} return int n;
+given env_init ():(0)
+given expr_tokens ():(21)

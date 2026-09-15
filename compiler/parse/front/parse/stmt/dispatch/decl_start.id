@@ -25,3 +25,5 @@ is_type(string w) {
     ok = 1;
   }
 } return int ok;
+("int"):(1)
+("foo"):(0)

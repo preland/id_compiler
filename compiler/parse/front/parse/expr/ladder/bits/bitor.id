@@ -16,12 +16,16 @@ parse_bitor(int[] pos) {
     left = fold_bitor(pos, left);
   }
 } return int left;
+given expr_tokens ([10]):(2)
+given expr_tokens ([8]):(4)
 
 fold_bitor(int[] pos, int left) {
   advance(pos);
   int right = parse_bitxor(pos);
   int ret_i = node_bin("|", left, right);
 } return int ret_i;
+given expr_tokens ([9], 100):(3)
+given expr_tokens ([11], 100):(1)
 
 parse_bitxor(int[] pos) {
   int left = parse_bitand(pos);
@@ -29,3 +33,5 @@ parse_bitxor(int[] pos) {
     left = fold_bitxor(pos, left);
   }
 } return int left;
+given expr_tokens ([10]):(2)
+given expr_tokens ([8]):(0)

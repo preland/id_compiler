@@ -5,3 +5,5 @@ fold_rel_tail(int[] pos, int left, string op) {
   int right = parse_bitor(pos);
   int ret_i = node_bin(op, left, right);
 } return int ret_i;
+given expr_tokens ([14], 100, "=="):(1)
+given expr_tokens ([2], 100, "=="):(11)

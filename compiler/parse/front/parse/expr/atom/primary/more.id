@@ -5,6 +5,8 @@ fold_mul_tail(int[] pos, int left, string op) {
   int right = parse_unary(pos);
   int ret_i = node_bin(op, left, right);
 } return int ret_i;
+given expr_tokens ([4], 100, "*"):(1)
+given expr_tokens ([6], 200, "+"):(1)
 
 // A binary operation written inside parentheses builds the same tree as one
 // written without them, so the rule that a comparison and a bitwise operator
@@ -20,3 +22,5 @@ paren_primary(int[] pos) {
   }
   grp_note(e, pos);
 } return int e;
+given paren_tokens ([0]):(2)
+given decl_tokens ([1]):(0)

@@ -5,6 +5,8 @@ parse_str(int[] pos) {
   advance(pos);
   int ret_i = node_str(text);
 } return int ret_i;
+given atom_tokens ([15]):(0)
+given atom_tokens ([0]):(0)
 
 // `=` is included: in an expression a bare `=` means equality in id (assignment
 // is detected as a statement before we get here).
@@ -14,6 +16,8 @@ is_relop(string s) {
     ok = 1;
   }
 } return int ok;
+("=="):(1)
+("+"):(0)
 
 is_addop(string s) {
   int ok = 0;
@@ -21,3 +25,5 @@ is_addop(string s) {
     ok = 1;
   }
 } return int ok;
+("+"):(1)
+("*"):(0)

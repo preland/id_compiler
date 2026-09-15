@@ -3,3 +3,13 @@
 is_native(int id) {
   int ok = i2_of(id) == 1;
 } return int ok;
+
+// The second int field of the most recently created node, for a case whose
+// function under test returns a node id it cannot itself compare a field of
+// (a `then` check takes no arguments).
+last_i2() {
+  int n = len((import ni2));
+  int ret_i = (import ni2)[n - 1];
+} return int ret_i;
+given fixture_zero_int ():(0)
+given fixture_one_int ():(1)

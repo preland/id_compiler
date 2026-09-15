@@ -9,6 +9,8 @@ parse_atom(int[] pos) {
     node = parse_atom2(pos);
   }
 } return int node;
+given atom_tokens ([2]):(0)
+given atom_tokens ([0]):(3)
 
 parse_atom2(int[] pos) {
   int node = 0;
@@ -18,9 +20,13 @@ parse_atom2(int[] pos) {
     node = parse_atom_float(pos);
   }
 } return int node;
+given atom_tokens ([15]):(0)
+given atom_tokens ([0]):(3)
 
 parse_ident_or_call(int[] pos) {
   no_op_atom(pos);
   string name = read_name(pos);
   int ret_i = finish_atom(name, pos);
 } return int ret_i;
+given atom_tokens ([0]):(3)
+given atom_tokens ([25]):(0)

@@ -11,6 +11,8 @@
 parse_expr(int[] pos) {
   int ret_i = parse_or(pos);
 } return int ret_i;
+given expr_tokens ([0]):(18)
+given expr_tokens ([18]):(0)
 
 // relational / equality: bitor (('=='|'!='|'<'|'>'|'<='|'>=') bitor)*
 parse_rel(int[] pos) {
@@ -19,9 +21,13 @@ parse_rel(int[] pos) {
     left = fold_rel(pos, left);
   }
 } return int left;
+given expr_tokens ([0]):(14)
+given expr_tokens ([14]):(0)
 
 fold_rel(int[] pos, int left) {
   string op = cur_text(pos);
   advance(pos);
   int ret_i = fold_rel_tail(pos, left, op);
 } return int ret_i;
+given expr_tokens ([13], 100):(1)
+given expr_tokens ([15], 100):(1)

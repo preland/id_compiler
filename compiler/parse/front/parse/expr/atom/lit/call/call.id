@@ -12,12 +12,16 @@ finish_atom(string name, int[] pos) {
     call_at(node, ln);
   }
 } return int node;
+given atom_tokens ("foo", [1]):(3)
+given atom_tokens ("x", [26]):(0)
 
 parse_call(string name, int[] pos) {
   int[] args = [];
   scan_args(pos, args);
   int ret_i = node_call(name, args);
 } return int ret_i;
+given atom_tokens ("foo", [1]):(2)
+given atom_tokens ("g", [19]):(1)
 
 // consume '(' args ')', pushing each argument node id onto `args`
 scan_args(int[] pos, int[] args) {
@@ -25,3 +29,5 @@ scan_args(int[] pos, int[] args) {
   fill_args(pos, args);
   advance(pos);
 } return void;
+given atom_tokens ([1], []):([6], [0, 1])
+given atom_tokens ([19], []):([23], [0])

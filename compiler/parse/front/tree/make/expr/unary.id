@@ -3,3 +3,13 @@
 node_un(string op, int operand) {
   int ret_i = newleaf("un", operand, 0, op, "");
 } return int ret_i;
+
+// `-1`: a unary minus (id 1) wrapping a literal (id 0), for
+// cases/more/lit/kinds.id's neg_lit.
+fixture_neg_lit_node() {
+  env_init();
+  node_int("1", 1, 0);
+  node_un("-", 0);
+} return void;
+():() then check_failed:(0)
+():() then last_i2:(0)
