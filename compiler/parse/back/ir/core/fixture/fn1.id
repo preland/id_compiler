@@ -1,0 +1,14 @@
+ir_rows_fn1() {
+  int fn1id = ir_func(7, "two", "string");
+  int b1 = ir_block(fn1id, "body");
+  ir_rows_fn1_insn();
+} return void;
+given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then init_units:(0)
+
+ir_rows_fn1_insn() {
+  int v1 = ir_leaf("const", "string", 0 - 1, 0 - 1, "hi");
+  export int[] chk_id = [0];
+} return void;
+given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then init_units:(0)

@@ -7,13 +7,19 @@ ir_block(int f, string lbl) {
   ir_blk3();
   int ret_i = ir_blk4(f);
 } return int ret_i;
+given ir_rows (0, "third"):(2) then chk_last_blk_lbl:("third") then chk_last_blk_fn:(0)
+given ir_rows_chk1 (1, "fourth"):(2) then chk_last_blk_lbl:("fourth") then chk_last_blk_fn:(1)
 
 ir_blk2(int f, string lbl) {
   push((import bfunc), f);
   push((import blabel), lbl);
 } return void;
+given ir_rows (0, "third"):() then chk_last_blk_lbl:("third") then chk_last_blk_fn:(0)
+given ir_rows_chk1 (1, "fourth"):() then chk_last_blk_lbl:("fourth") then chk_last_blk_fn:(1)
 
 ir_blk3() {
   push((import binsn), []);
   push((import bpred), []);
 } return void;
+given ir_rows ():() then chk_last_blk_lbl:("body") then chk_last_blk_fn:(1)
+given ir_rows_chk1 ():() then chk_last_blk_lbl:("body") then chk_last_blk_fn:(1)

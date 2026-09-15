@@ -6,3 +6,22 @@ ir_func4() {
   push((import irprog), len_v - 1);
   int ret_i = len((import fnname)) - 1;
 } return int ret_i;
+given ir_rows ():(1)
+given ir_rows_chk1 ():(1)
+
+// The most recently pushed function's name and return type, for a case on
+// ir_func/ir_func2 (../func.id): a wrapper because a `then` check takes no
+// arguments, and the row a case just built is always the last one.
+chk_last_fn_name() {
+  int n = len((import fnname));
+  string ret_s = irf_name(n - 1);
+} return string ret_s;
+given ir_rows ():("two")
+given ir_rows_chk1 ():("two")
+
+chk_last_fn_ret() {
+  int n = len((import fnname));
+  string ret_s = irf_ret(n - 1);
+} return string ret_s;
+given ir_rows ():("string")
+given ir_rows_chk1 ():("string")
