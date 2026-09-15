@@ -1,0 +1,29 @@
+// The empty-but-initialised state a whole-module emitter needs: env_init's
+// `prog` (ir_lower's loop), init_ir's `irprog` (ir_opt's loop) and afname
+// (ll_asm_all's loop, via init_asm_all), and init_rtc's `rtc` (is_runtime,
+// read by ../../../../decl.id's ll_declares) -- all empty/0, so every loop
+// this reaches runs zero times and every flag reads its default.
+
+ll_env_fixture1() {
+  env_init();
+  init_ir();
+  init_rtc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+ll_env_fixture2() {
+  ll_env_fixture1();
+  init_asm_all();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// This project IS the runtime (--runtime): ll_declares (decl.id) must not
+// declare a symbol the module itself defines.
+ll_env_fixture3() {
+  ll_env_fixture1();
+  rt_set(1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
