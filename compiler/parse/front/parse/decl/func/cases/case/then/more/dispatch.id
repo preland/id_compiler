@@ -23,8 +23,12 @@ then_dispatch(int[] pos) {
     then_check_clause(pos);
   }
 } return void;
+given then_fix ([1]):()
+given then_prints_fix ([1]):()
 
 then_check_clause(int[] pos) {
   string chk_nm = case_fn_name(pos, "then");
   then_value(pos, chk_nm);
 } return void;
+given then_fix ([1]):()
+given chkname_fix ([0]):()

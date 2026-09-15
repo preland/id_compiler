@@ -1,0 +1,25 @@
+// `otherfn:(6)` -- a check name and its value with no `then` keyword before
+// it (already consumed by the time then_check_clause runs). See
+// ../../../decl/func/cases/case/given/elem/fixture.id for toks_push's other
+// callers.
+
+chkname_fix() {
+  fn_fixture();
+  toks_push(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+close_fix() {
+  env_init();
+  toks_push(["op"], [")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+given_fix() {
+  env_init();
+  toks_push(["kw", "ident"], ["given", "mysetup"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

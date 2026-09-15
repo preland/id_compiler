@@ -11,6 +11,8 @@ then_calls_clause(int[] pos) {
   string nm = case_fn_name(pos, "calls");
   then_calls_rest(pos, nm);
 } return void;
+given calls_args_fix ([0]):()
+given calls_count_fix ([0]):()
 
 then_calls_rest(int[] pos, string nm) {
   eat_colon(pos);
@@ -20,8 +22,12 @@ then_calls_rest(int[] pos, string nm) {
     then_calls_args(pos, nm);
   }
 } return void;
+given calls_args_fix ([2], "myfn"):()
+given calls_count_fix ([2], "myfn"):()
 
 then_calls_args(int[] pos, string nm) {
   int[] items = case_tuple(pos);
   then_push_kind("thencalls", nm, items);
 } return void;
+given calls_args_fix ([3], "myfn"):()
+given tup1_fix ([0], "other"):()

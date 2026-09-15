@@ -1,0 +1,27 @@
+// A registered function plus a started case (fn_fixture,
+// mid/names/limits/shape/cases/given/then/more/fixture/fn.id) with a
+// `:(6)` tuple pushed after it, for decl/func/cases/case/then/'s cases that
+// parse a check's value once its name has already been consumed.
+
+fnrhs_fix() {
+  fn_fixture();
+  toks_push(["op", "op", "int", "op"], [":", "(", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// `then myfn:(6)`, for case_thens/then_one/case_rest.
+then_fix() {
+  fn_fixture();
+  toks_push(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// `then prints:("hi")`, for the prints/eprints half of then_dispatch.
+then_prints_fix() {
+  fn_fixture();
+  toks_push(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

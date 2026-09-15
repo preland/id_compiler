@@ -6,3 +6,5 @@ cons_kind(int[] pos, string ck) {
     syn_err(pos, "unknown constraint '" + ck + "'; a case constrains 'time' or 'mem'");
   }
 } return void;
+given cons_fix1 ([0], "time"):() then prints:("")
+given cons_fix1 ([0], "bogus"):() then prints:("<stdin>:1: error: unknown constraint 'bogus'; a case constrains 'time' or 'mem'\n")

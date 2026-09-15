@@ -1,0 +1,24 @@
+// More token streams (see ../../../given/elem/fixture.id for tup1_fix and
+// friends): a bare name followed by `)` (a case-fn element), and two known
+// scaling bounds.
+
+fnname_fix() {
+  env_init();
+  toks_push(["ident", "op"], ["myfn", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+bound_n_fix() {
+  env_init();
+  toks_push(["ident", "op", "ident", "op"], ["O", "(", "n", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+bound_1_fix() {
+  env_init();
+  toks_push(["ident", "op", "int", "op"], ["O", "(", "1", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

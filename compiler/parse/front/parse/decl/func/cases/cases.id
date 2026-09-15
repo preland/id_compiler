@@ -23,6 +23,8 @@ take_cases(int[] pos) {
     push_case(pos);
   }
 } return int 0;
+given cases_full_fix ([0]):(0)
+given cases_fix ([0]):(0)
 
 // A case is a "case" node -- its arguments in nl1, its expected values in nl2
 // -- and it is also recorded as the half-open token range it occupies, so that
@@ -32,6 +34,8 @@ push_case(int[] pos) {
   push((import casenode), node);
   case_owner(node);
 } return void;
+given cases_full_fix ([0]):()
+given cases_full_fix2 ([0]):()
 
 // The case's file is written into its node now, while `pfile` still lines up
 // with `prog`. It cannot be looked up later by the owner's name: the harness
@@ -44,3 +48,5 @@ case_owner(int node) {
   push((import casefn), (import prog)[len_v - 1]);
   sset((import ns1), node, (import pfile)[len_v - 1]);
 } return void;
+given cases_fix (0):()
+given cases_fix (1):()

@@ -14,6 +14,8 @@ case_value(int[] pos) {
     check_lit(v);
   }
 } return int v;
+given fnname_fix ([0]):(0)
+given tup1_fix ([0]):(0)
 
 // A bare name, and nothing after it but the end of the element: `f(1)` is a
 // call and `f[0]` an index, neither of which a case may hold.
@@ -23,8 +25,12 @@ at_case_fn(int[] pos) {
     ok = 1;
   }
 } return int ok;
+given fnname_fix ([0]):(1)
+given tup1_fix ([0]):(0)
 
 case_fn(int[] pos) {
   string name = read_name(pos);
   int ret_i = newleaf("cfn", 0, 0, name, "");
 } return int ret_i;
+given fnname_fix ([0]):(0)
+given chkname_fix ([0]):(4)

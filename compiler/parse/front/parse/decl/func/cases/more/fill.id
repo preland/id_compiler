@@ -9,6 +9,8 @@ case_tuple(int[] pos) {
   int[] items = [];
   scan_tuple(pos, items);
 } return int[] items;
+given tup1_fix ([0]):([0])
+given tup2_fix ([0]):([0, 1])
 
 scan_tuple(int[] pos, int[] items) {
   expect_text(pos, "(");
@@ -17,6 +19,8 @@ scan_tuple(int[] pos, int[] items) {
     fill_tuple(pos, items);
   }
 } return void;
+given tup1_fix ([0], []):([3], [0])
+given tup2_fix ([0], []):([5], [0, 1])
 
 fill_tuple(int[] pos, int[] items) {
   while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
@@ -25,3 +29,5 @@ fill_tuple(int[] pos, int[] items) {
   }
   eat_close(pos);
 } return void;
+given tup1_fix ([1], []):([3], [0])
+given tup2_fix ([1], []):([5], [0, 1])

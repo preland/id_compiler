@@ -1,0 +1,18 @@
+// A single `ident` token, "time" -- for decl/func/cases/more/lit/cons/bound/
+// more/kind.id's cons_kind cases (see ../../../func/cases/case/given/elem/
+// fixture.id for the pattern this follows).
+
+cons_fix1() {
+  env_init();
+  toks_push(["ident"], ["time"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// `eprints:("hi")`, the other half of then_print_dispatch's branch.
+eprints_fix() {
+  fn_fixture();
+  toks_push(["kw", "op", "op", "str", "op"], ["eprints", ":", "(", "\"hi\"", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

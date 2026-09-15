@@ -12,14 +12,20 @@ then_print_dispatch(int[] pos) {
     then_print_clause(pos, "theneprints");
   }
 } return void;
+given then_prints_fix ([1]):()
+given eprints_fix ([0]):()
 
 then_print_clause(int[] pos, string kind) {
   advance(pos);
   then_print_value(pos, kind);
 } return void;
+given then_prints_fix ([1], "thenprints"):()
+given eprints_fix ([0], "theneprints"):()
 
 then_print_value(int[] pos, string kind) {
   eat_colon(pos);
   int[] items = case_tuple(pos);
   then_push_kind(kind, "", items);
 } return void;
+given then_prints_fix ([2], "thenprints"):()
+given eprints_fix ([1], "theneprints"):()

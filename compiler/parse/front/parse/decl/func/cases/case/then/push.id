@@ -7,6 +7,8 @@ then_value(int[] pos, string chk_nm) {
   int[] items = case_tuple(pos);
   then_push(chk_nm, items);
 } return void;
+given fnrhs_fix ([0], "chk"):()
+given fnrhs_fix ([0], "other"):()
 
 // The case being parsed is the last one whose start has been recorded.
 then_push(string chk_nm, int[] items) {
@@ -14,8 +16,12 @@ then_push(string chk_nm, int[] items) {
   int[] no_items = [];
   then_store("then", chk_nm, items, n - 1, no_items);
 } return void;
+given fn_fixture ("chk", []):()
+given fn_fixture ("chk", [1]):()
 
 then_store(string kind, string chk_nm, int[] items, int ci, int[] no_items) {
   int node = newnode(kind, ci, 0, chk_nm, "", items, no_items);
   push((import thennode), node);
 } return void;
+given fn_fixture ("then", "chk", [], 0, []):()
+given fn_fixture ("thenprints", "", [], 0, []):()

@@ -1,0 +1,25 @@
+// Token streams for a case tuple, `(5)` and `(5, 6)`, and a bare `:` -- for
+// cases under decl/func/cases/ that parse a case's ARGS/EXPECTED tuple or
+// the colon between clauses. See ../../../../../../tree/init/setup/fixture.id
+// for toks_push/tkind_len.
+
+tup1_fix() {
+  env_init();
+  toks_push(["op", "int", "op"], ["(", "5", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+tup2_fix() {
+  env_init();
+  toks_push(["op", "int", "op", "int", "op"], ["(", "5", ",", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+colon_fix() {
+  env_init();
+  toks_push(["op"], [":"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

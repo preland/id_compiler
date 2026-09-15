@@ -1,0 +1,11 @@
+// A second `given NAME` token pair, distinct from
+// ../../../decomp/../../../../front/parse/expr/ladder/arith/fixture.id's
+// given_fix, for cases that need two different `given` scenarios to tell
+// their two cases apart.
+
+given2_fix() {
+  env_init();
+  toks_push(["kw", "ident"], ["given", "othersetup"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

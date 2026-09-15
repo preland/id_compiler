@@ -1,0 +1,25 @@
+// `:(6)` and `(5):(6)` -- for decl/func/cases/case/tuple.id's cases (a
+// case's right-hand side, and a whole case). See
+// ../../../../decl/func/cases/case/given/elem/fixture.id for toks_push's
+// other callers.
+
+rhs_fix() {
+  env_init();
+  toks_push(["op", "op", "int", "op"], [":", "(", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+case_min_fix() {
+  env_init();
+  toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+import_fix() {
+  env_init();
+  toks_push(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
