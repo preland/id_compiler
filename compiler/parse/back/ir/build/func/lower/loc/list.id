@@ -8,6 +8,8 @@ lw_locals(int node) {
   int[] l2_of_v = l2_of(node);
   lw_loc_list(l2_of_v);
 } return void;
+given nest_fixture ((import if_node)):() then check_failed:(0)
+given loop_fixture ((import while_node)):() then check_failed:(0)
 
 lw_loc_list(int[] stmts) {
   int i = 0;
@@ -16,6 +18,8 @@ lw_loc_list(int[] stmts) {
     i = i + 1;
   }
 } return void;
+given bound_fixture ([1]):() then check_failed:(0)
+given bound_fixture ([]):() then check_failed:(0)
 
 lw_loc_one(int node) {
   if(k_of(node) == "decl") {
@@ -24,3 +28,5 @@ lw_loc_one(int node) {
     lw_loc_nest(node);
   }
 } return void;
+given bound_fixture ((import decl_node)):() then check_failed:(0)
+given nest_fixture ((import if_node)):() then check_failed:(0)

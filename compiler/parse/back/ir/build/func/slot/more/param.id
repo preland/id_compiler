@@ -4,8 +4,22 @@ lw_param_mid(int node, int i, string ty, string name) {
   int lw_fn_v = lw_fn();
   lw_param_tail(node, v, lw_fn_v);
 } return void;
+given lw_fixture_pnode (0, 0, "int", "x"):() then chk_lwvar_len:(1)
+given lw_fixture_pnode (1, 1, "word", "y"):() then chk_lwvar_len:(1)
 
 lw_param_tail(int node, int v, int fn) {
   push((import fnpar)[fn], v);
   lw_pslot(node, v);
 } return void;
+given lw_fixture_pnode (0, 5, 0):() then chk_lwvar_len:(1)
+given lw_fixture_pnode (1, 6, 1):() then chk_lwvar_len:(1)
+
+// lw_fixture with a global exported, for a case on lw_addr that needs a
+// non-local name to resolve through lw_vty instead of lw_slot.
+addr_export_fixture() {
+  lw_fixture();
+  push((import enames), "g");
+  push((import etypes), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

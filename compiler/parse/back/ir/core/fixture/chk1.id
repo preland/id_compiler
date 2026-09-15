@@ -1,0 +1,8 @@
+// Points chk_id (../fn1.id) at instruction 1 (fn1.id's "const"), so a
+// chk_* case can read fn 1's row with the same wrapper that reads fn 0's.
+ir_rows_chk1() {
+  ir_rows();
+  lset((import chk_id), 0, 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -7,3 +7,16 @@ lw_iop_bits(string op) {
     p = "xor";
   }
 } return string p;
+given ir_rows ("|"):("or")
+given ir_rows ("^"):("xor")
+
+// bound_fixture (../../../../../func/slot/map.id chain) plus two "un"
+// nodes over ev_node, for a case anywhere in ctrl/un that needs a real
+// unary-operator node: neg_node is "-", not_node is "!".
+un_fixture() {
+  bound_fixture();
+  export int neg_node = node_un("-", (import ev_node));
+  export int not_node = node_un("!", (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

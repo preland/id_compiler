@@ -2,11 +2,17 @@
 ir_b(int id) {
   int ret_i = (import ib)[id];
 } return int ret_i;
+given ir_rows (0):(4)
+given ir_rows (1):(-1)
 
 ir_s(int id) {
   string ret_s = (import istr)[id];
 } return string ret_s;
+given ir_rows (0):("")
+given ir_rows (1):("hi")
 
 ir_l(int id) {
   int[] ret_li = (import ilist)[id];
 } return int[] ret_li;
+given ir_rows (0):([])
+given ir_rows (1):([])

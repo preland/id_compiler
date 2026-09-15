@@ -5,6 +5,8 @@ lw_un(int node) {
   string lw_ety_v = lw_ety(node);
   int ret_i = lw_un2(node, lw_ety_v);
 } return int ret_i;
+given un_fixture ((import neg_node)):(4)
+given un_fixture ((import not_node)):(6)
 
 lw_un2(int node, string t) {
   int v = 0 - 1;
@@ -14,6 +16,8 @@ lw_un2(int node, string t) {
     v = lw_un2_op(node, t);
   }
 } return int v;
+given un_fixture ((import not_node), "int"):(6)
+given un_fixture ((import neg_node), "int"):(4)
 
 lw_unop(string op) {
   string p = "not";
@@ -21,3 +25,5 @@ lw_unop(string op) {
     p = "neg";
   }
 } return string p;
+given ir_rows ("-"):("neg")
+given ir_rows ("!"):("not")

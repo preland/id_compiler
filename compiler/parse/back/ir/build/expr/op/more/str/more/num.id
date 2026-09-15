@@ -5,9 +5,22 @@ lw_ncmp_b(int node, string t, int a) {
   int b = lw_as(i2_of_v, t);
   int ret_i = lw_ncmp_op(node, t, a, b);
 } return int ret_i;
+given str_fixture2 ((import cmp_node), "int", 3):(4)
+given str_fixture2 ((import cmp_node), "word", 3):(5)
 
 lw_ncmp_op(int node, string t, int a, int b) {
   string lw_cmpop_v = lw_cmpop(t);
   string s1_of_v = s1_of(node);
   int ret_i = lw_op(lw_cmpop_v, "bool", a, b, s1_of_v);
 } return int ret_i;
+given str_fixture2 ((import cmp_node), "int", 3, 3):(3)
+given str_fixture2 ((import cmp_node), "float", 3, 3):(3)
+
+// str_fixture (../ncmp.id) with the build/host state ready, freestanding
+// off, for a case on lw_strcmp that needs a real fsc cell to read.
+strcmp_fs0() {
+  ir_rows();
+  init_rtc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

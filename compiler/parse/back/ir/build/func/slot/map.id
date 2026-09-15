@@ -3,6 +3,8 @@ lw_bind(string name, int v) {
   push((import lwvar), name);
   push((import lwslot), v);
 } return int v;
+given lw_fixture ("x", 5):(5) then chk_lwvar_len:(1)
+given lw_fixture2 ("y", 8):(8) then chk_lwvar_len:(1)
 
 lw_slot(string name) {
   int r = find_str((import lwvar), name);
@@ -11,6 +13,8 @@ lw_slot(string name) {
     v = (import lwslot)[r];
   }
 } return int v;
+given lw_fixture_vars ("x"):(9)
+given lw_fixture_vars ("nope"):(-1)
 
 // Where a name lives: an alloca for a local, the global itself for an export.
 // An exported name is reserved program-wide, so a name that is not a local is
@@ -22,3 +26,5 @@ lw_addr(string name) {
     v = ir_leaf("global", lw_vty_v, 0 - 1, 0 - 1, name);
   }
 } return int v;
+given lw_fixture_vars ("x"):(9)
+given addr_export_fixture ("g"):(2)

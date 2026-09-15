@@ -6,6 +6,8 @@ ir_rauw_l(int i, int old, int fresh) {
     j = ir_rauw_one(l, j, old, fresh);
   }
 } return void;
+given ir_rows_lst (0, 5, 9):() then chk_l:([9, 7, 9])
+given ir_rows_lst (0, 99, 2):() then chk_l:([5, 7, 5])
 
 ir_rauw_one(int[] l, int j, int old, int fresh) {
   if(l[j] == old) {
@@ -13,3 +15,14 @@ ir_rauw_one(int[] l, int j, int old, int fresh) {
   }
   int ret_i = j + 1;
 } return int ret_i;
+([5, 7, 5], 0, 5, 9):(1)
+([5, 7, 5], 1, 5, 9):(2)
+
+// Instruction 0's aux list set to a real, repeated-value list, so
+// ir_rauw_l's while loop has more than one candidate to walk over.
+ir_rows_lst() {
+  ir_rows();
+  ir_set_l(0, [5, 7, 5]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

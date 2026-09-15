@@ -7,6 +7,8 @@ lw_irop(string op, string t) {
     p = lw_iop_f(op);
   }
 } return string p;
+given ir_rows ("+", "int"):("add")
+given ir_rows ("-", "float"):("fsub")
 
 lw_iop_f(string op) {
   string p = lw_iop_f2(op);
@@ -16,6 +18,8 @@ lw_iop_f(string op) {
     p = "fmul";
   }
 } return string p;
+given ir_rows ("-"):("fsub")
+given ir_rows ("/"):("fdiv")
 
 lw_iop_f2(string op) {
   string p = "fadd";
@@ -23,3 +27,5 @@ lw_iop_f2(string op) {
     p = "fdiv";
   }
 } return string p;
+given ir_rows ("/"):("fdiv")
+given ir_rows ("+"):("fadd")
