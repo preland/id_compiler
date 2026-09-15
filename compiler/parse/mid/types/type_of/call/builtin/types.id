@@ -8,6 +8,8 @@ bt2(string name) {
     t = bt3(name);
   }
 } return string t;
+("chr"):("string")
+("len"):("int")
 
 bt3(string name) {
   string t = bt4(name);
@@ -15,6 +17,8 @@ bt3(string name) {
     t = "int";
   }
 } return string t;
+("len"):("int")
+("alloc"):("word")
 
 // `+` with a string operand is concatenation (-> string); anything else is an
 // arithmetic/bitwise widening or a predicate, which tb2 decides.
@@ -24,3 +28,5 @@ type_bin(int id) {
     t = tb2(id);
   }
 } return string t;
+given composite_fixture ((import bin_concat)):("string")
+given composite_fixture ((import bin_plus)):("int")
