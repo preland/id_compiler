@@ -14,6 +14,8 @@ emit(int argc, string[] argv) {
 arg_triple(int argc, string[] argv) {
   string s = arg_flag_val(argc, argv, 1, "--triple", "x86_64-unknown-linux-gnu");
 } return string s;
+(1, ["prog"]):("x86_64-unknown-linux-gnu")
+(3, ["prog", "--triple", "wasm32"]):("wasm32")
 
 // asm functions are not in the program list, so build_syms never sees them.
 // Registering their names and return types here lets the type pass resolve a
@@ -26,3 +28,5 @@ register_asm_syms() {
     i = i + 1;
   }
 } return void;
+given env_init ():() then asmfx_fn_count:(0)
+given asmfx_setup ():() then asmfx_fn_count:(1)

@@ -14,3 +14,5 @@ arg_flag_val(int argc, string[] argv, int i, string name, string dflt) {
     s = arg_flag_val(argc, argv, i + 1, name, dflt);
   }
 } return string s;
+(1, ["prog"], 1, "--triple", "default"):("default")
+(3, ["prog", "--triple", "wasm32"], 1, "--triple", "default"):("wasm32")
