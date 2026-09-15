@@ -3,3 +3,21 @@ bi_other_msg(int id) {
   string bc = bi_count(name);
   string msg = name + " takes " + bc;
 } return string msg;
+given bi_mismatch_setup ((import bi_mismatch_call)):("push takes exactly two arguments")
+given bi_flush_setup ((import bi_flush_call)):("flush takes no arguments")
+
+bi_mismatch_setup() {
+  call2_setup();
+  int a = node_int("1", 1, 0);
+  export int bi_mismatch_call = node_call("push", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+bi_mismatch_sys_setup() {
+  call2_setup();
+  int a = node_int("1", 1, 0);
+  export int bi_mismatch_sys_call = node_call("ult", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

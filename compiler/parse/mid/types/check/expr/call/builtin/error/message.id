@@ -9,6 +9,8 @@ bi_arg_err(int id, int i, string want, string t) {
     bi_arg_err2(id, i, want, t);
   }
 } return void;
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "index", "string"):() then check_failed:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err2:((import bi_mismatch_call), 0, "list", "int")
 
 // str_of_mem names neither the position nor the type: both of its arguments
 // are addresses-or-lengths, and idc.py says so once.
@@ -19,6 +21,8 @@ bi_arg_err2(int id, int i, string want, string t) {
     bi_arg_err3(id, i, want, t);
   }
 } return void;
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "addr", "int"):() then check_failed:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err3:((import bi_mismatch_call), 0, "list", "int")
 
 // The flat-store group is the only family that reports at the *argument's*
 // line rather than the call's -- idc.py raises it from inside the loop over
@@ -35,3 +39,5 @@ bi_arg_err3(int id, int i, string want, string t) {
     tc_err(id, s1_of_v2 + " " + bi_verb_v + ", got " + t);
   }
 } return void;
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "word", "string"):() then check_failed:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_verb:("list")

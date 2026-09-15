@@ -12,6 +12,8 @@ bi_wants(string name, int i) {
     s = "string";
   }
 } return string s;
+("to_int", 0):("string")
+("push", 0):("list")
 
 // charat's first argument was taken above, so what reaches here is its
 // second: the index, which idc.py words as an index rather than as a type.
@@ -23,6 +25,8 @@ bi_wants2(string name, int i) {
     s = "index";
   }
 } return string s;
+("chr", 0):("int")
+("charat", 1):("index")
 
 bi_wants3(string name, int i) {
   string s = bi_wants4(name);
@@ -30,3 +34,5 @@ bi_wants3(string name, int i) {
     s = "list";
   }
 } return string s;
+("pop", 0):("list")
+("push", 1):("")

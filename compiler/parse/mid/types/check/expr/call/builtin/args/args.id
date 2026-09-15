@@ -6,6 +6,8 @@ is_peekfn(string name) {
     ok = 1;
   }
 } return int ok;
+("peek8"):(1)
+("push"):(0)
 
 chk_bi_args(int id) {
   int i = 0;
@@ -14,6 +16,8 @@ chk_bi_args(int id) {
     i = i + 1;
   }
 } return void;
+given call2_setup ((import cm_push_call)):() then calls chk_bi_arg:[2]
+given bi_mismatch_setup ((import bi_mismatch_call)):() then calls chk_bi_arg:[1]
 
 // A position with no requirement ("") is skipped, and so is a type the
 // compiler could not work out -- print and put take anything, and push's
@@ -25,3 +29,5 @@ chk_bi_arg(int id, int i) {
     bi_arg_err(id, i, want, t);
   }
 } return void;
+given call2_setup ((import cm_push_call), 1):() then check_failed:(0)
+given bi_mismatch_setup ((import bi_mismatch_call), 0):() then calls bi_arg_err:((import bi_mismatch_call), 0, "list", "int")

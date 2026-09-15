@@ -9,6 +9,8 @@ fv_bi_args(int id) {
     i = i + 1;
   }
 } return void;
+given call2_setup ((import cm_push_call)):() then calls fv_bi_arg:[2]
+given fv_fixture ((import fv_pos_call)):() then calls fv_bi_arg:[1]
 
 fv_bi_arg(int id, int i) {
   int a = l1_of(id)[i];
@@ -18,3 +20,13 @@ fv_bi_arg(int id, int i) {
     tc_err(a, "'" + nm + "' cannot take a function value: argument " + i + " is " + t + "; a function value can only be passed to a function written in id, stored or called");
   }
 } return void;
+given call2_setup ((import cm_push_call), 0):() then check_failed:(0)
+given fv_fixture ((import fv_pos_call), 0):() then check_failed:(1)
+
+fv_build() {
+  int a = node_var("f");
+  tcache_set(a, "func(int) return int");
+  export int fv_pos_call = node_call("push", [a]);
+} return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)

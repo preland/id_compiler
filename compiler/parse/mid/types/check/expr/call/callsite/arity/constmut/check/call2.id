@@ -6,3 +6,21 @@ chk_call2(int id) {
   chk_callsite(id);
   chk_bi(id);
 } return void;
+given call2_setup ((import cm_push_call)):() then calls chk_const_mut:((import cm_push_call)) then check_failed:(1)
+given call2_scalar_setup ((import cm_push_scalar_call)):() then calls chk_callsite:((import cm_push_scalar_call)) then check_failed:(0)
+
+call2_setup() {
+  cm_setup();
+  init_rtc();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+call2_scalar_setup() {
+  cm_scalar_setup();
+  init_rtc();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -8,3 +8,13 @@ bi_verb(string want) {
     s = "expects a string or list";
   }
 } return string s;
+("list"):("expects a list")
+("int"):("expects an int")
+
+bi_flush_setup() {
+  call2_setup();
+  int[] none = [];
+  export int bi_flush_call = node_call("flush", none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

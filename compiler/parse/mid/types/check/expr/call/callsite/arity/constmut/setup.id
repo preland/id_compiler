@@ -19,3 +19,10 @@ cm_other_setup() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+chk_bi_nonbuiltin_setup() {
+  cm_other_setup();
+  init_rtc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
