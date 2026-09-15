@@ -7,12 +7,16 @@ emit_const_init() {
     emit_init_fn();
   }
 } return void;
+given lc_dce_setup ():() then prints:("static void idc_const_init(void) {\n    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n}\n")
+given lc_dce_setup2 ():() then prints:("")
 
 emit_init_fn() {
   emit_line("static void idc_const_init(void) {");
   init_lines();
   emit_line("}");
 } return void;
+given lc_dce_setup ():() then prints:("static void idc_const_init(void) {\n    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n}\n")
+given lc_dce_setup2 ():() then prints:("static void idc_const_init(void) {\n}\n")
 
 init_lines() {
   int i = 0;
@@ -21,3 +25,5 @@ init_lines() {
     i = i + 1;
   }
 } return void;
+given lc_dce_setup ():() then prints:("    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n")
+given lc_dce_setup2 ():() then prints:("")

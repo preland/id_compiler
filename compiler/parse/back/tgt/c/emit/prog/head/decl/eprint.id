@@ -12,6 +12,8 @@ emit_eprint_def() {
     emit_line("#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nstatic void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, \"%s\\n\", s); }");
   }
 } return void;
+given nz_call_eprint_fixture ():() then prints:("#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nstatic void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, \"%s\\n\", s); }\n")
+given nz_env ():() then prints:("")
 
 calls_eprint() {
   int i = 0;
@@ -21,6 +23,8 @@ calls_eprint() {
     i = i + 1;
   }
 } return int hit;
+given nz_call_eprint_fixture ():(1)
+given nz_env ():(0)
 
 // The LLVM target's C runtime is asked for once per build and without the
 // program, so it cannot know whether eprint is called and always defines it.
@@ -28,3 +32,5 @@ calls_eprint() {
 emit_crt_eprint() {
   emit_line("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }");
 } return void;
+given nz_env ():() then prints:("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }\n")
+given iassign_fixture_env ():() then prints:("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }\n")

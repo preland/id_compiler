@@ -7,12 +7,16 @@ emit_exports() {
   }
   emit_const_init();
 } return void;
+given nz_env ():() then prints:("")
+given lc_dce_setup ():() then prints:("/* exported variables */\nIdList* a;  /* constant from conf.id */\nint b = 2;  /* constant from conf.id */\n\nstatic void idc_const_init(void) {\n    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n}\n")
 
 emit_export_block() {
   emit_line("/* exported variables */");
   emit_export_lines();
   emit_line("");
 } return void;
+given nz_env ():() then prints:("/* exported variables */\n\n")
+given lc_dce_setup ():() then prints:("/* exported variables */\nIdList* a;  /* constant from conf.id */\nint b = 2;  /* constant from conf.id */\n\n")
 
 emit_export_lines() {
   int i = 0;
@@ -21,3 +25,5 @@ emit_export_lines() {
     i = i + 1;
   }
 } return void;
+given lc_dce_setup ():() then prints:("IdList* a;  /* constant from conf.id */\nint b = 2;  /* constant from conf.id */\n")
+given nz_env ():() then prints:("")

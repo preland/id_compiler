@@ -9,6 +9,8 @@ emit_program(string triple) {
   emit_asm_then_main(triple);
   emit_main_wrapper();
 } return void;
+given nz_prog_fixture ("x86_64-linux"):() then calls emit_main_wrapper:()
+given nz_prog_nomain_fixture ("x86_64-linux"):() then calls def_all:()
 
 // runtime prelude, a blank line, then the declarations section, matching
 // idc.py's layout exactly
@@ -17,6 +19,8 @@ emit_head() {
   emit_line("");
   emit_decls();
 } return void;
+given nz_prog_fixture ():() then calls emit_decls:()
+given nz_prog_nomain_fixture ():() then calls emit_eprint_def:()
 
 // eprint's helper when the program calls it (decl/eprint.id), then the forward
 // declarations, then the exported-variable globals (if any) -- idc.py's order
@@ -25,3 +29,5 @@ emit_decls() {
   emit_fwds();
   emit_exports();
 } return void;
+given nz_prog_fixture ():() then prints:("/* forward declarations */\nint id_main(int argc);\nvoid id_run(void);\n\n")
+given nz_prog_nomain_fixture ():() then prints:("/* forward declarations */\nvoid id_run(void);\n\n")

@@ -8,12 +8,16 @@ init_line_kept(int i) {
     init_line_emit(name);
   }
 } return void;
+given lc_dce_setup (0):() then prints:("    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n")
+given lc_dce_setup (1):() then prints:("")
 
 init_line_emit(string name) {
   string s = init_line(name);
   emit_line(s);
   emit_line("    id_list_lock(" + name + ");");
 } return void;
+given lc_dce_setup ("a"):() then prints:("    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n")
+given cl_setup ("k"):() then prints:("    k = id_list_lit(1, (long long)(5));\n    id_list_lock(k);\n")
 
 init_line(string name) {
   int d = const_decl(name);
