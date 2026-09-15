@@ -10,13 +10,19 @@ is_space_at(string src, int i) {
   int c = charat(src, i);
   int ok = is_space(c);
 } return int ok;
+(" ", 0):(1)
+("a", 0):(0)
 
 is_digit_at(string src, int i) {
   int c = charat(src, i);
   int ok = is_digit(c);
 } return int ok;
+("5", 0):(1)
+("a", 0):(0)
 
 is_alpha_at(string src, int i) {
   int c = charat(src, i);
   int ok = is_alpha(c);
 } return int ok;
+("a", 0):(1)
+("5", 0):(0)

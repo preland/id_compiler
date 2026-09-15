@@ -7,6 +7,8 @@ num_end(string src, int i, int e) {
     fe = digit_run_end(src, e + 1);
   }
 } return int fe;
+("3.14", 0, 1):(4)
+("42", 0, 2):(2)
 
 numkind(int e, int fe) {
   string kind = "int";
@@ -14,3 +16,5 @@ numkind(int e, int fe) {
     kind = "float";
   }
 } return string kind;
+(5, 5):("int")
+(5, 8):("float")

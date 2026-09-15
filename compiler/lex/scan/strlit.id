@@ -8,6 +8,8 @@ str_end(string src, int i) {
     i = adv_str(src, i);
   }
 } return int i;
+("hi\"", 0):(2)
+("\"", 0):(0)
 
 // advance one char, or two when the current char is a backslash (skipping the
 // escaped char, so an escaped quote is not mistaken for the terminator)
@@ -17,6 +19,8 @@ adv_str(string src, int i) {
     n = i + 2;
   }
 } return int n;
+("ab", 0):(1)
+("\\x", 0):(2)
 
 slice_str(string src, int a, int b) {
   string out = "";
@@ -26,3 +30,5 @@ slice_str(string src, int a, int b) {
     a = a + 1;
   }
 } return string out;
+("hello", 1, 4):("ell")
+("hi", 0, 2):("hi")

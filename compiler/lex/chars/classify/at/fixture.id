@@ -1,0 +1,25 @@
+// Zero-arg wrappers for lex_setup, for cases under compiler/lex/driver and
+// compiler/lex/chars/dispatch/more that read lexline/lexbol/lexcols -- a
+// `given` setup takes no parameters, and lex_setup takes the program's
+// argv. Placed here rather than beside lex_setup because driver/ is already
+// at three files.
+
+lex_fix_setup() {
+  string[] argv = ["prog"];
+  lex_setup(1, argv);
+} return void;
+():() then lex_cols_now:(0)
+():() then prints:("")
+
+lex_fix_setup_cols() {
+  string[] argv = ["prog", "--cols"];
+  lex_setup(2, argv);
+} return void;
+():() then lex_cols_now:(1)
+():() then prints:("")
+
+lex_cols_now() {
+  int n = (import lexcols)[0];
+} return int n;
+given lex_fix_setup ():(0)
+given lex_fix_setup_cols ():(1)

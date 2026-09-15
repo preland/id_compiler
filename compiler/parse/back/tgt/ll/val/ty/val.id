@@ -13,6 +13,8 @@ ll_val(int v) {
     s = ll_val2(v);
   }
 } return string s;
+(-1):("poison")
+given ir_fix1 (0):("5")
 
 ll_val2(int v) {
   string s = "%v" + v;
@@ -22,6 +24,9 @@ ll_val2(int v) {
     s = "@" + ir_s(v);
   }
 } return string s;
+given ir_fix1 (0):("5")
+given ir_fix2 (2):("%v2")
+given ir_fix3 (3):("@gname")
 
 // The type of a value, safe on an absent operand for the same reason.
 ll_vty(int v) {
@@ -30,3 +35,5 @@ ll_vty(int v) {
     t = ir_ty(v);
   }
 } return string t;
+(-1):("")
+given ir_fix1 (0):("int")

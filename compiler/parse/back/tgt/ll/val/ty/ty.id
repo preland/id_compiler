@@ -9,6 +9,8 @@ ll_ty(string t) {
     s = "i64";
   }
 } return string s;
+("int"):("i32")
+("float"):("double")
 
 ll_ty2(string t) {
   string s = "ptr";
@@ -18,6 +20,9 @@ ll_ty2(string t) {
     s = ll_ty3(t);
   }
 } return string s;
+("string"):("ptr")
+("float"):("double")
+("bool"):("i1")
 
 ll_ty3(string t) {
   string s = "void";
@@ -25,3 +30,5 @@ ll_ty3(string t) {
     s = "i1";
   }
 } return string s;
+("bool"):("i1")
+(""):("void")

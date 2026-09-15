@@ -7,12 +7,16 @@ hex_start(string src, int i) {
     ok = 1;
   }
 } return int ok;
+("0xAB", 0):(1)
+("0z12", 0):(0)
 
 hex_end(string src, int i) {
   while(is_hex_at(src, i)) {
     i = i + 1;
   }
 } return int i;
+("ff", 0):(2)
+("fg", 0):(1)
 
 // Accumulated in a `word`, because a 16-digit literal does not fit an int.
 hex_val(string src, int i, int e) {
@@ -23,3 +27,5 @@ hex_val(string src, int i, int e) {
     i = i + 1;
   }
 } return word v;
+("ff", 0, 2):(255)
+("10", 0, 2):(16)

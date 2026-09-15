@@ -6,6 +6,8 @@ is_alnum(int c) {
     ok = 1;
   }
 } return int ok;
+(48):(1)
+(32):(0)
 
 // The nineteen id keywords. One big boolean keeps this within the action limit.
 is_kw(string w) {
@@ -14,6 +16,8 @@ is_kw(string w) {
     ok = 1;
   }
 } return int ok;
+("if"):(1)
+("foo"):(0)
 
 kindof(string w) {
   string kind = "ident";
@@ -21,3 +25,5 @@ kindof(string w) {
     kind = "kw";
   }
 } return string kind;
+("if"):("kw")
+("foo"):("ident")

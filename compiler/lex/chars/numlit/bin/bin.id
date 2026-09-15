@@ -11,6 +11,8 @@ is_bin(int c) {
     ok = 1;
   }
 } return int ok;
+(48):(1)
+(50):(0)
 
 // The trailing digit test is what keeps a bare `0` followed by an identifier
 // starting with b from being mistaken for a literal.
@@ -20,9 +22,13 @@ bin_start(string src, int i) {
     ok = 1;
   }
 } return int ok;
+("0b10", 0):(1)
+("0x10", 0):(0)
 
 bin_end(string src, int i) {
   while(is_bin_at(src, i)) {
     i = i + 1;
   }
 } return int i;
+("10", 0):(2)
+("1a", 0):(1)

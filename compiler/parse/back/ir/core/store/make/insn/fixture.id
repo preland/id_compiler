@@ -1,0 +1,26 @@
+// The rest of ../../../fixture.id's chain: two unary instructions and one
+// with a populated operand list, for cases that read ir_l/ir_l_count.
+
+ir_fix4() {
+  ir_fix3();
+  export int irf_n6 = ir_leaf("neg", "int", (import irf_n0), 0 - 1, "");
+  export int irf_n7 = ir_leaf("not", "int", (import irf_n0), 0 - 1, "");
+} return void;
+():() then init_units:(0)
+():() then init_opt:(0)
+
+ir_fix5() {
+  ir_fix4();
+  export int irf_n8 = ir_call_node();
+  export int irf_n9 = ir_leaf("zext", "int", (import irf_n0), 0 - 1, "");
+} return void;
+():() then init_units:(0)
+():() then init_opt:(0)
+
+ir_call_node() {
+  int a = (import irf_n0);
+  int[] bl = [];
+  int ret_i = ir_insn("call", "int", 0 - 1, 0 - 1, "f", [a], bl);
+} return int ret_i;
+given ir_fix1 ():(1)
+given ir_fix2 ():(3)

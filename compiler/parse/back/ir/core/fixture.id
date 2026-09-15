@@ -1,0 +1,30 @@
+// Synthetic IR nodes for cases in compiler/parse/back/tgt/ll/val: a handful
+// of leaf and binary instructions, built directly through ir_leaf rather than
+// through the lowering pass, since these cases only need what
+// ir_op/ir_ty/ir_a/ir_b/ir_s read back. Chained (ir_fix2 calls ir_fix1, and
+// so on) so a case can `given` the shortest prefix that has the node it
+// needs; continued in store/make/insn/fixture.id.
+
+ir_fix1() {
+  init_ir();
+  init_tyreg();
+  export int irf_n0 = ir_leaf("const", "int", 0 - 1, 0 - 1, "5");
+} return void;
+():() then init_units:(0)
+():() then init_opt:(0)
+
+ir_fix2() {
+  ir_fix1();
+  export int irf_n1 = ir_leaf("const", "string", 0 - 1, 0 - 1, "hi");
+  export int irf_n3 = ir_leaf("add", "int", (import irf_n0), (import irf_n0), "");
+} return void;
+():() then init_units:(0)
+():() then init_opt:(0)
+
+ir_fix3() {
+  ir_fix2();
+  export int irf_n4 = ir_leaf("global", "string", 0 - 1, 0 - 1, "gname");
+  export int irf_n5 = ir_leaf("icmp", "int", (import irf_n0), (import irf_n0), "<");
+} return void;
+():() then init_units:(0)
+():() then init_opt:(0)

@@ -11,6 +11,8 @@ scan_numop(string src, int i) {
     ni = scan_binop(src, i);
   }
 } return int ni;
+("0xff", 0):(4) then prints:("int 255\n")
+("5", 0):(1) then prints:("int 5\n")
 
 // string literal (pass the index past the opening quote), else an operator
 scan_strop(string src, int i) {
@@ -21,3 +23,5 @@ scan_strop(string src, int i) {
     ni = scan_op(src, i);
   }
 } return int ni;
+("\"hi\"", 0):(4) then prints:("str \"hi\"\n")
+("+x", 0):(1) then prints:("op +\n")

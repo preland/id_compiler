@@ -12,6 +12,8 @@ scan_ident(string src, int i) {
   }
   scan_ident_out(ident);
 } return int i;
+("abc", 0):(3) then prints:("ident abc\n")
+("if", 0):(2) then prints:("kw if\n")
 
 // An integer digit run, optionally extended with a '.' + fraction digits
 // (see chars/numlit): num_end finds where the number ends and numkind picks
@@ -22,6 +24,8 @@ scan_number(string src, int i) {
   int fe = num_end(src, i, e);
   scan_num_out(src, i, e, fe);
 } return int fe;
+("42", 0):(2) then prints:("int 42\n")
+("3.14", 0):(4) then prints:("float 3.14\n")
 
 // Caller passes the index of the first char *after* the opening quote, so the
 // opening quote is already skipped; we return the index past the closing one.
@@ -32,3 +36,5 @@ scan_string(string src, int i) {
   scan_str_out(src, i, e);
   int ret_i = e + 1;
 } return int ret_i;
+("hi\"", 0):(3) then prints:("str \"hi\"\n")
+("\"", 0):(1) then prints:("str \"\"\n")

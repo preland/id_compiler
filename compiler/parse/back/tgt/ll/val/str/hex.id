@@ -4,6 +4,8 @@
 ll_hex(int c) {
   string ret_s = "\\" + ll_nib(c / 16) + ll_nib(c % 16);
 } return string ret_s;
+(0):("\\00")
+(255):("\\FF")
 
 ll_nib(int n) {
   string s = chr(48 + n);
@@ -11,6 +13,8 @@ ll_nib(int n) {
     s = chr(55 + n);
   }
 } return string s;
+(5):("5")
+(10):("A")
 
 // A string constant needs a private global to point at. A value of string type
 // that is undefined -- what mem2reg seeds the entry block with for a slot
@@ -23,3 +27,5 @@ ll_isstr(int v) {
     r = 1;
   }
 } return int r;
+given ir_fix1 (0):(0)
+given ir_fix2 (1):(1)

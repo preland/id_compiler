@@ -7,6 +7,8 @@ scan_decop(string src, int i) {
     ni = scan_strop(src, i);
   }
 } return int ni;
+("5", 0):(1) then prints:("int 5\n")
+("+x", 0):(1) then prints:("op +\n")
 
 // A `#<word> <rest>` marker, injected into the stream by the driver. `id` has
 // no filesystem access and the pipeline hands idparse one concatenated stream,
@@ -28,6 +30,8 @@ scan_hashop(string src, int i) {
     ni = scan_token(src, i);
   }
 } return int ni;
+("x", 0):(1) then prints:("ident x\n")
+given lex_fix_setup ("#abc", 0):(4) then prints:("abc\n")
 
 // The marker word is not parsed here: dropping the `#` and passing the rest of
 // the line through is enough, and it means a third marker needs no change to
@@ -39,3 +43,5 @@ scan_hash(string src, int i) {
   scan_hash_out(src, i, e);
   lset((import lexline), 0, 0);
 } return int e;
+given lex_fix_setup ("#abc", 0):(4) then prints:("abc\n")
+given lex_fix_setup ("#xy", 0):(3) then prints:("xy\n")

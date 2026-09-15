@@ -9,6 +9,8 @@ scan_num_out(string src, int i, int e, int fe) {
   string text = slice_str(src, i, fe);
   print(kind + " " + text);
 } return void;
+("42", 0, 2, 2):() then prints:("int 42\n")
+("3.14", 0, 1, 4):() then prints:("float 3.14\n")
 
 // The quote is reprinted around the slice, which is why it is built here and
 // not sliced with it: the token text is the raw spelling between the quotes.
@@ -17,8 +19,12 @@ scan_str_out(string src, int i, int e) {
   string text = slice_str(src, i, e);
   print("str " + q + text + q);
 } return void;
+("hi\"", 0, 2):() then prints:("str \"hi\"\n")
+("\"", 0, 0):() then prints:("str \"\"\n")
 
 scan_hash_out(string src, int i, int e) {
   string text = slice_str(src, i + 1, e);
   print(text);
 } return void;
+("#abc", 0, 4):() then prints:("abc\n")
+("#xy", 0, 3):() then prints:("xy\n")

@@ -29,6 +29,8 @@ main(int argc, string[] argv) {
   lex_all();
   print("eof");
 } return int 0;
+(1, ["prog"]):(0) then prints:("eof\n")
+(2, ["prog", "--cols"]):(0) then prints:("eof\n")
 
 // A `line N` marker is emitted whenever a newline is consumed, so every token
 // after it belongs to line N. Only one place in the whole lexer consumes a raw
@@ -41,6 +43,8 @@ eat_space(string src, int i) {
   }
   int ret_i = i + 1;
 } return int ret_i;
+("x", 0):(1) then prints:("")
+given lex_fix_setup ("\n", 0):(1) then prints:("line 2\n")
 
 // One pass over the source: advance the cursor one token at a time. The whole
 // per-character decision tree lives in the scan_* chain, not here.
@@ -51,3 +55,5 @@ lex(string src) {
     i = scan_one(src, i);
   }
 } return void;
+(""):() then prints:("")
+given lex_fix_setup ("x"):() then prints:("ident x\n")

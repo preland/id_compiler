@@ -8,6 +8,9 @@ ll_rel(string op) {
     s = "gt";
   }
 } return string s;
+("<"):("lt")
+(">"):("gt")
+("<="):("le")
 
 ll_rel2(string op) {
   string s = "ge";
@@ -15,3 +18,5 @@ ll_rel2(string op) {
     s = "le";
   }
 } return string s;
+("<="):("le")
+(">="):("ge")

@@ -13,6 +13,8 @@ scan_one(string src, int i) {
     ni = scan_tok_span(src, i);
   }
 } return int ni;
+(" x", 0):(1) then prints:("")
+given lex_fix_setup ("x", 0):(1) then prints:("ident x\n")
 
 // `//` line comment, or hand off
 scan_word(string src, int i) {
@@ -23,6 +25,8 @@ scan_word(string src, int i) {
     ni = scan_block(src, i);
   }
 } return int ni;
+("// hi", 0):(5) then prints:("")
+("x", 0):(1) then prints:("ident x\n")
 
 // identifier/keyword, or hand off
 scan_token(string src, int i) {
@@ -33,3 +37,5 @@ scan_token(string src, int i) {
     ni = scan_numop(src, i);
   }
 } return int ni;
+("x", 0):(1) then prints:("ident x\n")
+("5", 0):(1) then prints:("int 5\n")
