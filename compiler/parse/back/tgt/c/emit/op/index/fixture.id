@@ -1,0 +1,28 @@
+// A synthetic "6 / 3" bin node, both operands plain int literals so no
+// symbol table is needed for their types. Deterministic ids: ai0=0, ai1=1,
+// ab0=2 (the "/" bin node).
+arith_fix() {
+  env_init();
+  int ai0 = node_int("6", 6, 0);
+  arith_fix2(ai0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+arith_fix2(int ai0) {
+  int ai1 = node_int("3", 3, 0);
+  int[] none = [];
+  int ab0 = newnode("bin", ai0, ai1, "/", "", none, none);
+} return void;
+given arith_fix (0):() then check_failed:(0)
+given arith_fix (0):() then init_units:(0)
+
+// ab1 = "6 << 3", for the shift-helper (rather than division-helper) path.
+// Deterministic id: ab1=3.
+arith_fix3() {
+  arith_fix();
+  int[] none = [];
+  int ab1 = newnode("bin", 0, 1, "<<", "", none, none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

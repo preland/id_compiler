@@ -15,12 +15,16 @@ emit_op3(int id) {
     s = emit_infix(id);
   }
 } return string s;
+given arith_fix (2):("id_idiv(6, 3)")
+given arith_fix3 (3):("id_shl(6, 3)")
 
 emit_helper(int id) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   string ret_s = helper_op(id) + "(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ")";
 } return string ret_s;
+given arith_fix (2):("id_idiv(6, 3)")
+given arith_fix3 (3):("id_shl(6, 3)")
 
 // The C helper for this node, or "" when the operator emits as plain infix.
 helper_op(int id) {
@@ -30,3 +34,5 @@ helper_op(int id) {
     h = hop_div(id);
   }
 } return string h;
+given arith_fix (2):("id_idiv")
+given arith_fix (0):("")
