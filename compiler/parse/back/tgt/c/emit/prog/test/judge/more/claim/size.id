@@ -6,6 +6,8 @@ size_row(int ci) {
     emit_line("    idtc_n[" + ci + "] = " + sz + ";");
   }
 } return void;
+given claim_conscase_fixture (0):() then prints:("    idtc_n[0] = 0;\n")
+given case_fixture (0):() then prints:("")
 
 case_size(int ci) {
   int[] args = l1_of((import casenode)[ci]);
@@ -23,3 +25,5 @@ case_claims(int ci) {
     j = j + 1;
   }
 } return int r;
+given case_fixture (0):(0)
+given claim_conscase_fixture (0):(1)

@@ -13,6 +13,9 @@ tc_compare(string ga, string gb, string type) {
     so = "idtc_eq_" + key + "(" + ga + ", " + gb + ")";
   }
 } return string so;
+("a", "b", "int"):("(a == b)")
+("a", "b", "string"):("(strcmp(a, b) == 0)")
+("a", "b", "int[]"):("idtc_eq_int(a, b)")
 
 tc_show(string code, string type) {
   string so = show_scalar(code, type);
@@ -24,6 +27,9 @@ tc_show(string code, string type) {
     so = "fputs(\"a function value\", stderr);";
   }
 } return string so;
+("x", "int"):("fprintf(stderr, \"%d\", x);")
+("x", "int[]"):("idtc_show_int(x);")
+("f", "func(int) return int"):("fputs(\"a function value\", stderr);")
 
 show_scalar(string code, string type) {
   string so = "fprintf(stderr, \"%d\", " + code + ");";
@@ -33,3 +39,6 @@ show_scalar(string code, string type) {
     so = show_num(code, type);
   }
 } return string so;
+("x", "int"):("fprintf(stderr, \"%d\", x);")
+("x", "string"):("fprintf(stderr, \"\\\"%s\\\"\", x);")
+("x", "float"):("fprintf(stderr, \"%g\", x);")

@@ -1,0 +1,34 @@
+// A synthetic "call" node's pieces: env_init's node tables plus the symbol
+// index (init_idx) and builtin-name list (init_bnames) is_fcall/is_syscall
+// read through callee_var_type/is_builtin -- the same combination
+// mid/form/fix/run/state/grp/fixture.id's fix_fixture2 uses for the same
+// reason. Two int-literal arguments (5 and 4) are enough for every emitter
+// under this directory: len/pop read only the first, push and cast_args read
+// both.
+
+call_env_fixture() {
+  env_init();
+  init_bnames();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+call_int_fixture() {
+  call_env_fixture();
+  export int call_e1 = node_int("5", 5, 0);
+  export int call_e2 = node_int("4", 4, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// call_args_rev is the same two nodes in the other order -- what gives
+// pop/push/len's own cases a second, differently-valued call node without a
+// second `given` chain (a case may only name one).
+call_args_fixture() {
+  call_int_fixture();
+  export int[] call_args = [(import call_e1), (import call_e2)];
+  export int[] call_args_rev = [(import call_e2), (import call_e1)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

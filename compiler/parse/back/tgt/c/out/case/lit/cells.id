@@ -10,6 +10,8 @@ tc_cells(int[] xs, string et) {
     i = i + 1;
   }
 } return string out;
+given lit_cells_fixture ((import lit_cells_xs), "int"):("(long long)(5), (long long)(4)")
+given lit_cells_fixture ((import lit_cells_xs), "string"):("(long long)(intptr_t)(5), (long long)(intptr_t)(4)")
 
 tc_scalar(int e) {
   string so = int_code(e);
@@ -17,8 +19,12 @@ tc_scalar(int e) {
     so = tc_neg(e);
   }
 } return string so;
+given lit_int_fixture ((import lit_e)):("5")
+given lit_un_fixture ((import lit_un_e)):("-5")
 
 tc_neg(int e) {
   int i1_of_v = i1_of(e);
   string so = "-" + int_code(i1_of_v);
 } return string so;
+given lit_un_fixture ((import lit_un_e)):("-5")
+given lit_un_fixture ((import lit_un_e2)):("-4")

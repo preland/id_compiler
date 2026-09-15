@@ -5,14 +5,20 @@ emit_setup_line(int ci, string cw, string cc) {
   int fx = case_fidx(ci);
   emit_line("    idtc_where[" + ci + "] = \"" + cw + "\"; idtc_call[" + ci + "] = \"" + cc + "\"; idtc_fn[" + ci + "] = \"" + f1 + "\"; idtc_fidx[" + ci + "] = " + fx + "; idtc_case[" + ci + "] = idtc_case_" + ci + ";");
 } return void;
+given wrap_fixture (0, "a.id:1", "foo()"):() then prints:("    idtc_where[0] = \"a.id:1\"; idtc_call[0] = \"foo()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
+given wrap_fixture (0, "b.id:2", "bar()"):() then prints:("    idtc_where[0] = \"b.id:2\"; idtc_call[0] = \"bar()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
 
 case_where_c(int ci) {
   string case_loc_v = case_loc(ci);
   string so = c_esc(case_loc_v);
 } return string so;
+given case_fidx_fixture (0):("fixture.id:4")
+given wrap_fixture (0):(":4")
 
 case_call_c(int ci) {
   string f1 = s1_of((import casefn)[ci]);
   int[] args = l1_of((import casenode)[ci]);
   string so = call_c(f1, args);
 } return string so;
+given wrap_fixture (0):("fx_target(0)")
+given case_fidx_fixture (0):("fx_target()")

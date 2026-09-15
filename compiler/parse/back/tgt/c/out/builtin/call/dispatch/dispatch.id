@@ -13,6 +13,8 @@ ec2(int id) {
     s = emit_len(id);
   }
 } return string s;
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+given call_names_fixture ((import call_e_len)):("id_list_len(5)")
 
 ec3(int id) {
   string s = ec4(id);
@@ -20,9 +22,13 @@ ec3(int id) {
     s = emit_push(id);
   }
 } return string s;
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+given call_names_fixture2 ((import call_e_push)):("id_list_push(5, (long long)(intptr_t)(4))")
 
 emit_gcall(int id) {
   int[] l1_of_v = l1_of(id);
   string s = "id_" + s1_of(id) + "(" + emit_args(l1_of_v) + ")";
   string ret_s = emit_gcall_tail(id, s);
 } return string ret_s;
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+given call_names_fixture ((import call_e_len)):("id_len(5, 4)")

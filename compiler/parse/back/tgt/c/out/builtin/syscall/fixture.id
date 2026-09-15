@@ -1,0 +1,33 @@
+// "call" nodes over len_push/fixture.id's two int arguments (5 and 4), one
+// per name this directory and dispatch/ need to prove a dispatcher's
+// override branch: "foo" is an ordinary call (no override anywhere), "len"
+// and "push" are what dispatch.id's ec2/ec3 each look for, "pop" is what
+// pop.id's ec4 looks for, and "peek8" is a real syscall (is_wordfn), for
+// this file's own emit_syscall/cast_args.
+
+call_names_fixture() {
+  call_args_fixture();
+  export int call_e_foo = newnode("call", 0, 0, "foo", "", (import call_args), (import call_args));
+  export int call_e_len = newnode("call", 0, 0, "len", "", (import call_args), (import call_args));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+call_names_fixture2() {
+  call_args_fixture();
+  export int call_e_push = newnode("call", 0, 0, "push", "", (import call_args), (import call_args));
+  export int call_e_pop = newnode("call", 0, 0, "pop", "", (import call_args_rev), (import call_args_rev));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// Two syscall names: "peek8" (an ordinary is_wordfn helper) and "alloc"
+// (sys_helper's own special case), so cast_args's helper-name half gets a
+// real second example too.
+call_sys_fixture() {
+  call_args_fixture();
+  export int call_e_sys = newnode("call", 0, 0, "peek8", "", (import call_args), (import call_args));
+  export int call_e_sys2 = newnode("call", 0, 0, "alloc", "", (import call_args), (import call_args));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -9,14 +9,20 @@ emit_arr(int id) {
     s = emit_arr_n(id);
   }
 } return string s;
+given lit_int_fixture ((import lit_e)):("id_list_lit(0)")
+given lit_arr_fixture ((import lit_arr_e)):("id_list_lit(2, (long long)(5), (long long)(4))")
 
 emit_arr_n(int id) {
   int[] elems = l1_of(id);
   string etyp = type_of(elems[0]);
   string ret_s = arr_lit(elems, etyp);
 } return string ret_s;
+given arr1_fixture ((import arr1_e)):("id_list_lit(1, (long long)(5))")
+given lit_arr_fixture ((import lit_arr_e)):("id_list_lit(2, (long long)(5), (long long)(4))")
 
 arr_lit(int[] elems, string etyp) {
   string cells = arr_cells(elems, etyp);
   string ret_s = "id_list_lit(" + len(elems) + ", " + cells + ")";
 } return string ret_s;
+given lit_cells_fixture ((import lit_cells_xs), "int"):("id_list_lit(2, (long long)(5), (long long)(4))")
+given lit_cells_fixture ((import lit_cells_xs), "string"):("id_list_lit(2, (long long)(intptr_t)(5), (long long)(intptr_t)(4))")

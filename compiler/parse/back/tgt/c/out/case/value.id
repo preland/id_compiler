@@ -14,12 +14,16 @@ tc_value(int e, string want) {
     so = "id_" + s1_of(e);
   }
 } return string so;
+given lit_import_fixture ((import lit_cimport_e), "int"):("gb")
+given lit_int_fixture ((import lit_e), "int"):("5")
 
 tc_list(int e, string want) {
   int[] xs = l1_of(e);
   string et = list_elem(want);
   string so = tc_list_n(xs, et);
 } return string so;
+given lit_arr_fixture ((import lit_arr_e), "int[]"):("id_list_lit(2, (long long)(5), (long long)(4))")
+given lit_arr_fixture ((import lit_arr_e), "string[]"):("id_list_lit(2, (long long)(intptr_t)(5), (long long)(intptr_t)(4))")
 
 tc_list_n(int[] xs, string et) {
   string so = "id_list_lit(0)";
@@ -28,3 +32,5 @@ tc_list_n(int[] xs, string et) {
     so = "id_list_lit(" + len(xs) + ", " + cells + ")";
   }
 } return string so;
+([], "int"):("id_list_lit(0)")
+given lit_cells_fixture ((import lit_cells_xs), "int"):("id_list_lit(2, (long long)(5), (long long)(4))")

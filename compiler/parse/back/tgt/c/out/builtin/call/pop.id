@@ -13,15 +13,21 @@ ec4(int id) {
     s = emit_pop(id);
   }
 } return string s;
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+given call_names_fixture2 ((import call_e_pop)):("(IdList*)(intptr_t)(id_list_pop(4))")
 
 emit_pop(int id) {
   int arg = l1_of(id)[0];
   string type_of_v = type_of(arg);
   string ret_s = emit_pop_tail(arg, type_of_v);
 } return string ret_s;
+given call_names_fixture ((import call_e_foo)):("(IdList*)(intptr_t)(id_list_pop(5))")
+given call_names_fixture2 ((import call_e_pop)):("(IdList*)(intptr_t)(id_list_pop(4))")
 
 emit_pop_tail(int arg, string type_of_v) {
   string elem = elem_type(type_of_v);
   string emit_expr_v = emit_expr(arg);
   string ret_s = unbox("id_list_pop(" + emit_expr_v + ")", elem);
 } return string ret_s;
+given call_int_fixture ((import call_e1), "int[]"):("(int)(id_list_pop(5))")
+given call_int_fixture ((import call_e1), "word[]"):("(long long)(id_list_pop(5))")
