@@ -1,0 +1,10 @@
+// stmt_fix plus harn_init -- emit_while_body calls emit_count, which reads
+// the harness flag (`is_harn`); env_init's chain never calls harn_init, so
+// without this the read segfaults on an export that was never declared
+// (rather than trapping cleanly on an empty one).
+harn_fix() {
+  stmt_fix();
+  harn_init();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

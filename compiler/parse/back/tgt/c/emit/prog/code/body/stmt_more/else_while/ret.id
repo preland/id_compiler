@@ -10,3 +10,5 @@ emit_ret(int id) {
     emit_line("    return;");
   }
 } return void;
+given func_fix (7):() then prints:("    return 5;\n")
+given ret_void_fix (8):() then prints:("    return;\n")
