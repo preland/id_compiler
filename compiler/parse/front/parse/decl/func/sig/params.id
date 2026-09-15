@@ -8,12 +8,16 @@ parse_params(int[] pos, string kind) {
   int[] params = [];
   scan_params(pos, params, kind);
 } return int[] params;
+given decl_tokens ([1], "param"):([0, 1])
+given decl_tokens ([1], "nparam"):([0, 1])
 
 scan_params(int[] pos, int[] params, string kind) {
   advance(pos);
   fill_params(pos, params, kind);
   advance(pos);
 } return void;
+given decl_tokens ([1], [], "param"):([8], [0, 1])
+given decl_tokens ([1], [], "nparam"):([8], [0, 1])
 
 fill_params(int[] pos, int[] params, string kind) {
   while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
@@ -22,3 +26,5 @@ fill_params(int[] pos, int[] params, string kind) {
     skip_comma(pos);
   }
 } return void;
+given decl_tokens ([2], [], "param"):([7], [0, 1])
+given decl_tokens ([2], [], "nparam"):([7], [0, 1])

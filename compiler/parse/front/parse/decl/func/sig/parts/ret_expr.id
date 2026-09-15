@@ -9,6 +9,8 @@ ret_expr(int[] pos, string rt) {
     void_tail(pos);
   }
 } return int e;
+given decl_tokens ([35], "int"):(0)
+given decl_tokens ([0], "void"):(-1)
 
 // A grouping-paren pair recorded at (7, token 5) and at (9, token 2), for
 // grp_note's own cases and for last_ngrp/last_ngrpc's.
