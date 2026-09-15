@@ -1,0 +1,32 @@
+// decl_fixture (tail.id) with "y" actually bound to a slot (lw_alloca),
+// the way a real lowering would have it by the time an assignment to "y"
+// runs: lw_assign/lw_assign_tail read the name from an "assign" node and
+// need lw_aty to resolve it, which fails for a name that was only declared
+// in the AST and never lowered.
+bound_fixture() {
+  decl_fixture();
+  int slot = lw_alloca("int", "y");
+  export int assign_node = node_assign("y", (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// bound_fixture with "g" exported, for a case on lw_decl that needs a
+// declaration whose target is a global rather than a local slot.
+bound_fixture2() {
+  bound_fixture();
+  push((import enames), "g");
+  push((import etypes), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// bound_fixture2 plus a "decl" node for the exported "g" and an "assign"
+// node targeting it.
+gdecl_fixture() {
+  bound_fixture2();
+  export int gdecl_node = node_decl("int", "g", (import ev_node), 1);
+  export int gassign_node = node_assign("g", (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
