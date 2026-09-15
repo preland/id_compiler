@@ -7,6 +7,8 @@ ll_escbyte(int c) {
     r = 9;
   }
 } return int r;
+(110):(10)
+(114):(13)
 
 ll_escbyte2(int c) {
   int r = c;
@@ -16,6 +18,8 @@ ll_escbyte2(int c) {
     r = 0;
   }
 } return int r;
+(114):(13)
+(120):(120)
 
 // The count of bytes the constant holds, which is what the array type needs.
 // Every byte is written as a three-character escape, so the text is exactly
@@ -25,3 +29,5 @@ ll_blen(string s) {
   string ll_bytes_v = ll_bytes(s);
   int ret_i = len(ll_bytes_v) / 3;
 } return int ret_i;
+("\"\""):(1)
+("\"a\""):(2)
