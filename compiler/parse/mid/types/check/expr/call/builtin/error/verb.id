@@ -1,5 +1,16 @@
 // "a int" would be wrong and "a string or list" is not a type name, so the
 // two that do not fit "expects a <want>" are listed.
+// id 8: "weird(int a) return int" whose only statement is the "if" (id 7) --
+// not a forwarder shape. id 9: "f_call;" as a bare exprstmt, the void
+// forwarder shape.
+farm_f() {
+  farm_e();
+  export int f_weird = node_func("weird", "int", [(import f_pa)], [(import f_if)], 0 - 1);
+  export int f_exprstmt = node_exprstmt((import f_call));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 bi_verb(string want) {
   string s = "expects a " + want;
   if(want == "int") {

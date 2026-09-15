@@ -18,7 +18,8 @@
 # why this driver exists.
 #
 # What this does NOT do (still idc.py's job -- see docs/GAPS.md):
-#   - --target llvm / --target wasm. Only the C target is self-hosted.
+#   - --target llvm. Only the C target and --target wasm (which is the C
+#     target, recompiled for wasm32-wasi) are self-hosted.
 #
 # Every case in tests/invalid/ is checked against BOTH compilers, so a
 # diagnostic idc.py gives and this one does not is a test failure.
@@ -41,7 +42,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 IDC_PY="$ROOT/idc.py"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--check] [--fix]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix]" >&2
 }
 
 PATH_ARG=""
@@ -62,6 +63,7 @@ ALLOW_UNTESTED=0
 LIST_UNTESTED=0
 EMIT_SOURCES=0
 FINGERPRINTS=0
+CALLS=0
 CHECK=0
 FIX=0
 NO_STD=0
@@ -103,6 +105,8 @@ while [ $# -gt 0 ]; do
             EMIT_SOURCES=1; shift ;;
         --fingerprints)
             FINGERPRINTS=1; shift ;;
+        --calls)
+            CALLS=1; shift ;;
         --check)
             CHECK=1; shift ;;
         --fix)
@@ -114,8 +118,8 @@ while [ $# -gt 0 ]; do
         --target)
             TARGET="${2:?idc: --target needs an argument}"
             case "$TARGET" in
-                c|llvm) ;;
-                *) echo "idc: unknown --target '$TARGET' (this driver has 'c' and 'llvm'; for wasm use idc.py)" >&2
+                c|llvm|wasm) ;;
+                *) echo "idc: unknown --target '$TARGET' (this driver has 'c', 'llvm' and 'wasm')" >&2
                    exit 2 ;;
             esac
             shift 2 ;;
@@ -877,7 +881,11 @@ PARSE_ARGS=()
 PARSE_ARGS+=(--triple "$TRIPLE")
 # Every function must carry at least two test cases (docs/TESTS.md). On unless
 # --allow-untested turned it off; the self-hosted compiler checks it.
-if [ "$REQUIRE_TESTS" -eq 1 ]; then
+#
+# --calls is the exception: agents use it to find what to test next, in a
+# tree that is short of cases by construction, so requiring cases here would
+# fail on exactly the functions it exists to point at.
+if [ "$REQUIRE_TESTS" -eq 1 ] && [ "$CALLS" -eq 0 ]; then
     PARSE_ARGS+=(--require-tests)
 fi
 # --fingerprints is a report about the parsed program, not a build of it -- see
@@ -895,6 +903,8 @@ fi
 PARSE_ARGS+=(--host-triple "$(host_triple)")
 if [ "$FINGERPRINTS" -eq 1 ]; then
     PARSE_ARGS+=(--fingerprints)
+elif [ "$CALLS" -eq 1 ]; then
+    PARSE_ARGS+=(--calls)
 elif [ "$LIST_UNTESTED" -eq 1 ]; then
     PARSE_ARGS+=(--require-tests --untested)
 elif [ "$FIX" -eq 1 ]; then
@@ -1150,6 +1160,45 @@ if [ "$FINGERPRINTS" -eq 1 ]; then
         compiler_bug "idlex or idparse failed on this input"
     fi
     cat "$RAW_OUT"
+    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    rm -f "$RAW_OUT"
+    exit "$parse_rc"
+fi
+
+# --calls: every resolved call edge of the collected program, then the
+# case-count section, each sorted (LC_ALL=C) and deduplicated. print_calls
+# (compiler/parse/back/drive/run/check/dce/emit/guarded_emit.id) prints both
+# kinds of row to the same stream in traversal order; an edge row always has
+# 5 pipe-fields (caller|caller_file:line|callee|callee_file:line|kind, the
+# last field empty for kind=builtin) and a case row always has 3
+# (fn|file:line|cases), so awk routes each by field count rather than a
+# marker. Like --fingerprints, this is a report about the parsed program, not
+# a build of it, so it prints regardless of parse_rc (see the comment there)
+# -- but unlike --fingerprints, which just cats RAW_OUT as it is, this sorts
+# the two report sections apart from each other, so any OTHER diagnostic
+# print_calls' own checks did not stop (a "no such function", an action-limit
+# or argument error -- --calls turns off --require-tests, not the rest of the
+# language) is routed to stderr rather than silently dropped for matching
+# neither shape.
+if [ "$CALLS" -eq 1 ]; then
+    progress_clear
+    if [ "$lex_rc" -ne 0 ] || { [ "$parse_rc" -ne 0 ] && [ "$parse_rc" -ne 1 ]; }; then
+        [ -s "$LEX_ERR" ] && cat "$LEX_ERR" >&2
+        [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+        compiler_bug "idlex or idparse failed on this input"
+    fi
+    awk -F'|' -v e="$WORK/calls.edges" -v c="$WORK/calls.cases" -v d="$WORK/calls.diag" '
+        NF == 5 { print > e; next }
+        NF == 3 { print > c; next }
+        { print > d }
+    ' "$RAW_OUT"
+    [ -f "$WORK/calls.edges" ] || : > "$WORK/calls.edges"
+    [ -f "$WORK/calls.cases" ] || : > "$WORK/calls.cases"
+    LC_ALL=C sort -u "$WORK/calls.edges"
+    echo
+    echo "fn|file:line|cases"
+    LC_ALL=C sort -u "$WORK/calls.cases"
+    [ -s "$WORK/calls.diag" ] && cat "$WORK/calls.diag" >&2
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
     rm -f "$RAW_OUT"
     exit "$parse_rc"
@@ -1796,6 +1845,103 @@ if [ -n "$EMIT_C" ]; then
     progress_done "wrote $EMIT_C ($(plural "${#SRC_FILES[@]}" "source file"))"
     cp "$C_OUT" "$EMIT_C" || exit 1
     echo "wrote $EMIT_C"
+    exit_ok
+fi
+
+# ---------------------------------------------------------------------------
+# --target wasm: the same C the C target compiles, recompiled for
+# wasm32-wasi and linked as a WASI reactor (no _start; JS calls _initialize
+# once, then the program's own functions). No new AST walk -- this is the C
+# target's own output, so it gets the C target's own test run above for free.
+#
+# The toolchain is read from env vars the umbrella flake's devshell sets
+# (IDC_WASI_CLANG/IDC_WASI_SYSROOT_INCLUDE/IDC_WASI_LIBDIR/IDC_WASI_COMPILER_RT)
+# rather than a hard-coded store path, so this only runs inside `nix develop`.
+if [ "$TARGET" = wasm ]; then
+    for v in IDC_WASI_CLANG IDC_WASI_SYSROOT_INCLUDE IDC_WASI_LIBDIR IDC_WASI_COMPILER_RT; do
+        if [ -z "${!v:-}" ]; then
+            echo "idc: --target wasm needs \$$v; run inside 'nix develop' (flake.nix sets it)" >&2
+            exit 1
+        fi
+    done
+
+    if [ -n "$OUTPUT" ]; then
+        WOUT="$OUTPUT"
+    else
+        first="${PATH_ARG%/}"
+        base="$(basename "$first")"
+        [ -f "$first" ] && base="${base%.*}"
+        WOUT="$BUILD_DIR/$base.wasm"
+        mkdir -p "$BUILD_DIR" || exit 1
+    fi
+
+    # The program's own top-level functions. SRC_FILES is every source file
+    # this build compiles, and that includes idstd -- it is "imported by
+    # DEFAULT -- no conf.id line, no flag" (above, $STDLIB), merged into
+    # SRC_FILES the same way a project dependency is. So idstd's files (and,
+    # defensively, the runtime's) are excluded by path before the scan, or
+    # every idstd function would be exported too. What is left is scanned the
+    # way the rest of this compiler reads a top-level function definition: the
+    # name at column 0, immediately followed by '(' (docs/SPEC.md). That
+    # excludes `given`/`then` case lines (a space follows `given`, not '('),
+    # `asm` bodies (a quoted triple follows `asm`), and `native` declarations
+    # the same way.
+    PROGRAM_FILES=()
+    for f in "${SRC_FILES[@]}"; do
+        case "$f" in
+            "$STDLIB"/*) ;;
+            "$ROOT"/runtime/*) ;;
+            *) PROGRAM_FILES+=("$f") ;;
+        esac
+    done
+    WEXPORTS=(id_alloc _initialize)
+    if [ "${#PROGRAM_FILES[@]}" -gt 0 ]; then
+        while IFS= read -r name; do
+            [ -n "$name" ] && WEXPORTS+=("id_$name")
+        done < <(grep -hoE '^[A-Za-z_][A-Za-z0-9_]*\(' "${PROGRAM_FILES[@]}" | tr -d '(' | sort -u)
+    fi
+
+    WEXPORT_FLAGS=()
+    for name in "${WEXPORTS[@]}"; do WEXPORT_FLAGS+=(-Wl,--export="$name"); done
+
+    c_path="$WORK/final.c"
+    if [ "$KEEP_C" -eq 1 ]; then
+        c_path="${WOUT%.*}.c"
+    fi
+    cp "$C_OUT" "$c_path" || exit 1
+
+    progress compile "clang -> wasm32-wasi"
+    ccmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -isystem "$IDC_WASI_SYSROOT_INCLUDE"
+          -O2 -ffunction-sections -fdata-sections -c "$c_path" -o "$WORK/out.o")
+    capped "${ccmd[@]}" 2>"$WORK/wasicc.err"; wcc_rc=$?
+    if [ "$wcc_rc" -ne 0 ]; then
+        progress_clear
+        if mem_ceiling_hit "$wcc_rc" "$WORK/wasicc.err"; then
+            mem_ceiling_error "$IDC_WASI_CLANG"
+        else
+            sed 's/^/idc:   /' "$WORK/wasicc.err" >&2
+            echo "idc: wasm32-wasi compilation failed (command: ${ccmd[*]})" >&2
+        fi
+        exit 1
+    fi
+
+    progress link "wasm-ld -> $(basename "$WOUT")"
+    lcmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -nostdlib "$WORK/out.o"
+          "$IDC_WASI_LIBDIR/crt1-reactor.o" -L"$IDC_WASI_LIBDIR" -lc "$IDC_WASI_COMPILER_RT"
+          -Wl,--no-entry -Wl,--gc-sections "${WEXPORT_FLAGS[@]}" -o "$WOUT")
+    capped "${lcmd[@]}" 2>"$WORK/wasild.err"; wld_rc=$?
+    [ "$KEEP_C" -eq 1 ] || rm -f "$c_path"
+    if [ "$wld_rc" -ne 0 ]; then
+        progress_clear
+        if mem_ceiling_hit "$wld_rc" "$WORK/wasild.err"; then
+            mem_ceiling_error "$IDC_WASI_CLANG (link)"
+        else
+            sed 's/^/idc:   /' "$WORK/wasild.err" >&2
+            echo "idc: wasm32-wasi link failed (command: ${lcmd[*]})" >&2
+        fi
+        exit 1
+    fi
+    progress_done "built $WOUT ($(wc -c < "$WOUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"), $(plural "${#WEXPORTS[@]}" export))"
     exit_ok
 fi
 

@@ -6,11 +6,17 @@
 ir_set_ty(int id, string ty) {
   sset((import ity), id, ty);
 } return void;
+given ir_rows (0, "word"):() then chk_ty:("word")
+given ir_rows_chk1 (1, "float"):() then chk_ty:("float")
 
 ir_set_a(int id, int v) {
   lset((import ia), id, v);
 } return void;
+given ir_rows (0, 9):() then chk_a:(9)
+given ir_rows_chk1 (1, -9):() then chk_a:(-9)
 
 ir_set_b(int id, int v) {
   lset((import ib), id, v);
 } return void;
+given ir_rows (0, 9):() then chk_b:(9)
+given ir_rows_chk1 (1, -9):() then chk_b:(-9)

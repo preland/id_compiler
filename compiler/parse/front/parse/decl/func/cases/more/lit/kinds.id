@@ -6,8 +6,8 @@ leaf_lit(int e) {
     r = 1;
   }
 } return int r;
-given fixture_lit_nodes (0):(1)
-given fixture_lit_nodes (1):(0)
+given fixture_int_leaf (0):(1)
+given mk_two_nodes (0):(0)
 
 leaf_num(int e) {
   int r = 0;
@@ -15,8 +15,8 @@ leaf_num(int e) {
     r = 1;
   }
 } return int r;
-given fixture_lit_nodes (0):(1)
-given fixture_lit_nodes (1):(0)
+given fixture_int_leaf (0):(1)
+given mk_two_nodes (0):(0)
 
 // `-1` is a unary minus applied to a literal, not a literal of its own.
 neg_lit(int e) {
@@ -27,4 +27,4 @@ neg_lit(int e) {
   }
 } return int r;
 given fixture_neg_lit_node (1):(1)
-given fixture_lit_nodes (1):(0)
+given mk_two_nodes (1):(0)

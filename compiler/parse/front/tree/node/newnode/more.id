@@ -5,6 +5,8 @@ newnode_tail(int[] l1, int[] l2) {
   push_pos();
   int ret_i = len((import nkind)) - 1;
 } return int ret_i;
+given mk_one_kind ([1, 2], [3]):(0) then calls push_ll:([1, 2], [3])
+given mk_one_kind ([], [4]):(0) then calls push_ll:([], [4])
 
 // A node's last token, and its first-token slot, which only a statement fills
 // (front/tokens/load/more/pos/stmt.id).
@@ -12,3 +14,15 @@ push_pos() {
   push((import ntok), (import curtk)[0]);
   push((import nst), 0 - 1);
 } return void;
+given mk_curtk5 ():() then last_ntok:(5) then last_nst:(-1)
+given mk_curtk9 ():() then last_ntok:(9) then last_nst:(-1)
+
+// One "shell" leaf's kind pushed to nkind, nothing else -- newnode_tail's own
+// cases need nkind non-empty before they run, the way push_kii's caller
+// always leaves it.
+mk_one_kind() {
+  full_env();
+  push_kii("shell", 9, 9);
+} return void;
+():() then last_kind:("shell")
+():() then check_failed:(0)

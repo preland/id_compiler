@@ -7,14 +7,20 @@ lw_while(int node) {
   int hd = ir_block(lw_fn_v, "head");
   lw_while_go(node, hd);
 } return void;
+given loop_fixture ((import while_node)):() then check_failed:(0)
+given nest_fixture ((import while_node)):() then check_failed:(0)
 
 lw_while_go(int node, int hd) {
   lw_term("br", 0 - 1, [hd]);
   lw_while2(node, hd);
 } return void;
+given loop_fixture ((import while_node), 2):() then check_failed:(0)
+given nest_fixture ((import while_node), 2):() then check_failed:(0)
 
 lw_while2(int node, int hd) {
   int lw_fn_v = lw_fn();
   int bdy = ir_block(lw_fn_v, "body");
   lw_while_ex(node, hd, bdy);
 } return void;
+given loop_fixture ((import while_node), 2):() then check_failed:(0)
+given nest_fixture ((import while_node), 2):() then check_failed:(0)

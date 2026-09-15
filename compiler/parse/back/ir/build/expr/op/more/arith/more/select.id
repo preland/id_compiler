@@ -7,6 +7,8 @@ lw_helper(string op, string t) {
     h = "id_sar";
   }
 } return string h;
+given ir_rows ("<<", "int"):("id_shl")
+given ir_rows ("/", "int"):("id_idiv")
 
 // `int` and `word` division both go through a checked helper; float division
 // does not, because IEEE gives it an answer rather than a signal.
@@ -16,6 +18,8 @@ lw_divfn(string op, string t) {
     h = "id_" + div_pfx(t) + div_sfx(op);
   }
 } return string h;
+given ir_rows ("/", "int"):("id_idiv")
+given ir_rows ("+", "int"):("")
 
 // The shift helpers work on a machine word; the division helpers work at the
 // width of the type they were chosen for.
@@ -25,3 +29,5 @@ lw_hty(string h) {
     t = "int";
   }
 } return string t;
+given ir_rows ("id_idiv"):("int")
+given ir_rows ("id_shl"):("word")

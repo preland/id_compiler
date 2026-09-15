@@ -39,6 +39,8 @@ lz_e2(int id) {
     out = canon_var(id);
   }
 } return string out;
+given lz_a (0):("S")
+given lz_b (1):("v0")
 
 lz_e3(int id) {
   string out = lz_e4(id);
@@ -49,3 +51,5 @@ lz_e3(int id) {
     out = lz_bin(id);
   }
 } return string out;
+given lz_c (3):("g(cfg)")
+given lz_c (4):("+(v0,I)")

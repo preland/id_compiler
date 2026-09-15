@@ -6,3 +6,21 @@ ir_blk4(int f) {
   push((import fnblk)[f], len_v - 1);
   int ret_i = len((import bfunc)) - 1;
 } return int ret_i;
+given ir_rows (1):(1)
+given ir_rows_chk1 (0):(1)
+
+// The most recently pushed block's label and owning function, for a case on
+// ir_block/ir_blk2 (../block.id).
+chk_last_blk_lbl() {
+  int n = len((import bfunc));
+  string ret_s = blk_lbl(n - 1);
+} return string ret_s;
+given ir_rows ():("body")
+given ir_rows_chk1 ():("body")
+
+chk_last_blk_fn() {
+  int n = len((import bfunc));
+  int ret_i = blk_fn(n - 1);
+} return int ret_i;
+given ir_rows ():(1)
+given ir_rows_chk1 ():(1)

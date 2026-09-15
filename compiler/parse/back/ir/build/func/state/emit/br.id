@@ -1,7 +1,27 @@
 // A branch built rather than emitted: it goes at the end of a block the
 // lowering is not currently in. The only one is the entry block's jump into
 // the body, appended after every alloca the function turned out to need.
+// The name most recently taken by fix_take, for its own cases -- it is void
+// and fixd_nm is an imported list.
+last_fixd_nm() {
+  int i = len((import fixd_nm)) - 1;
+  string ret_s = (import fixd_nm)[i];
+} return string ret_s;
+given fix_env2 ():("foo")
+given fix_env4 ():("baz_v")
+
+// fix_fixture, with fix_take("baz_v", "int") already run -- so fix_try's
+// own case, trying "baz_v" first, collides and falls back to "baz_v2".
+fix_env4() {
+  fix_fixture();
+  fix_take("baz_v", "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 lw_brto(int b) {
   int[] none = [];
   int ret_i = ir_insn("br", "", 0 - 1, 0 - 1, "", none, [b]);
 } return int ret_i;
+given ir_rows (5):(2)
+given ir_rows_chk1 (9):(2)

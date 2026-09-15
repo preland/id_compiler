@@ -7,3 +7,23 @@ fold_rel_tail(int[] pos, int left, string op) {
 } return int ret_i;
 given expr_tokens ([14], 100, "=="):(1)
 given expr_tokens ([2], 100, "=="):(11)
+
+// One "line N" marker loaded (front/tokens/load/more/push_tok.id's push_tok
+// drops it rather than storing it as a token), so src_line() -- and anything
+// that reads it, such as push_line -- sees 9 instead of the no-marker
+// default of 1.
+mk_line9() {
+  full_env();
+  push_tok("line", "9");
+} return void;
+():() then src_line:(9)
+():() then check_failed:(0)
+
+// A third real token stacked on mk_two_toks.id's two, for a case that needs
+// to tell one token count apart from another.
+mk_three_toks() {
+  mk_two_toks();
+  push_real("ident", "z");
+} return void;
+():() then last_tkind:("ident")
+():() then check_failed:(0)

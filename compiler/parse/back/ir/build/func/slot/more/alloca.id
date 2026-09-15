@@ -9,6 +9,8 @@ lw_vty(string name) {
     t = (import etypes)[r];
   }
 } return string t;
+given addr_export_fixture ("g"):("int")
+given lw_fixture ("nope"):("")
 
 // A local's stack slot, created in the entry block so that it dominates every
 // use however deep in the function the declaration was written. mem2reg takes
@@ -18,7 +20,11 @@ lw_alloca(string ty, string name) {
   int lw_ent_v = lw_ent();
   int ret_i = lw_alloca_tail(lw_ent_v, v, name);
 } return int ret_i;
+given lw_fixture ("int", "x"):(2) then chk_lwvar_len:(1)
+given lw_fixture2 ("word", "y"):(2) then chk_lwvar_len:(1)
 
 lw_store_at(int addr, int v) {
   lw_op("store", "", addr, v, "");
 } return void;
+given lw_fixture (1, 2):() then check_failed:(0)
+given lw_fixture2 (3, 4):() then check_failed:(0)

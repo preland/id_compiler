@@ -7,3 +7,5 @@ lw_cmpop(string t) {
     op = "fcmp";
   }
 } return string op;
+given ir_rows ("int"):("icmp")
+given ir_rows ("float"):("fcmp")

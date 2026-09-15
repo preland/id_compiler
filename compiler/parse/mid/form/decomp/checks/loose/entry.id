@@ -2,6 +2,8 @@ check_loose_dup() {
   lz_fill();
   lz_scan();
 } return void;
+given lz_o ():() then calls lz_report:(1, 0)
+given lz_j ():() then calls lz_report:[0]
 
 // [0] and [1] are int literal nodes with different values -- enough to show
 // lz_expr (canon/expr/expr.id) fingerprints a literal by its kind alone.
@@ -16,3 +18,5 @@ lz_build() {
   export int lz_id_a = node_int("5", 5, 0);
   export int lz_id_b = node_int("99", 99, 0);
 } return void;
+given env_init ():() then calls node_int:("5", 5, 0)
+given env_init ():() then calls node_int:("99", 99, 0)

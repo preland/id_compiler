@@ -14,6 +14,8 @@ fix_free_var(string name, string t) {
     ok = fix_free_round(name, t);
   }
 } return int ok;
+given fix_fixture ("foo", "int"):(1)
+given fix_env3 ("bar", "int"):(0)
 
 fix_free_round(string name, string t) {
   int ix = find_str((import fixd_nm), name);
@@ -22,3 +24,5 @@ fix_free_round(string name, string t) {
     ok = 0;
   }
 } return int ok;
+given fix_fixture ("foo", "int"):(1)
+given fix_env2 ("foo", "int"):(0)

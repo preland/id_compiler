@@ -7,11 +7,17 @@
 node_int(string text, int value, int big) {
   int ret_i = newleaf("int", value, big, text, "");
 } return int ret_i;
+given full_env ("5", 5, 0):(0) then calls newleaf:("int", 5, 0, "5", "")
+given full_env ("99999999999999999999", 0, 1):(0) then calls newleaf:("int", 0, 1, "99999999999999999999", "")
 
 node_var(string name) {
   int ret_i = newleaf("var", 0, 0, name, "");
 } return int ret_i;
+given full_env ("x"):(0) then calls newleaf:("var", 0, 0, "x", "")
+given full_env ("y"):(0) then calls newleaf:("var", 0, 0, "y", "")
 
 node_str(string text) {
   int ret_i = newleaf("str", 0, 0, text, "");
 } return int ret_i;
+given full_env ("hi"):(0) then calls newleaf:("str", 0, 0, "hi", "")
+given full_env (""):(0) then calls newleaf:("str", 0, 0, "", "")

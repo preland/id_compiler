@@ -3,9 +3,22 @@ lw_assign_tail(int node, int a) {
   string s1_of_v2 = s1_of(node);
   lw_assign_tail2(node, a, i1_of_v, s1_of_v2);
 } return void;
+given bound_fixture ((import assign_node), 0):() then check_failed:(0)
+given bound_fixture ((import assign_node), 1):() then check_failed:(0)
 
 lw_assign_tail2(int node, int a, int i1_of_v, string s1_of_v2) {
   string lw_aty_v = lw_aty(s1_of_v2);
   int lw_as_v = lw_as(i1_of_v, lw_aty_v);
   lw_store_at(a, lw_as_v);
 } return void;
+given bound_fixture (0, 0, (import ev_node), "y"):() then check_failed:(0)
+given bound_fixture (0, 1, (import ev_node), "y"):() then check_failed:(0)
+
+// decl_fixture (../decl/tail.id) plus an "exprstmt" wrapping ev_node, for a
+// case on lw_stmt that needs a non-"decl" statement to fall through to.
+decl_fixture2() {
+  decl_fixture();
+  export int expr_node = node_exprstmt((import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

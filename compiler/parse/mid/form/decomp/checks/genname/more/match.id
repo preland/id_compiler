@@ -1,6 +1,15 @@
 // Does `name` end in `_v` or `_v<digits>` -- the name `bin/idc --fix` gives a
 // hoisted call's result, built from the callee it hoisted (docs/PROJECT.md).
 
+// id 2: a call to "target" with the arg [f_argv]; id 3: the var "ret".
+farm_b() {
+  farm_a();
+  export int f_call = node_call("target", [(import f_argv)]);
+  export int f_ret = node_var("ret");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 ends_v(string name) {
   int dstart = tdig_start(name);
   int ok = 0;

@@ -8,6 +8,17 @@
 // function no case reaches -- a setup the program runs from main. Pruning that
 // export left the harness C with an undeclared global (qmon's `qm_qmph`), and
 // the saving is one C global, where the narrowing exists to save functions.
+// The loose-duplicate canon (mid/form/decomp/checks/loose/)'s own env and
+// id 0: a "str" leaf -- uq_begin resets the position map canon_var/
+// canon_callee/canon_param read, which env_init's own chain never reaches.
+lz_a() {
+  fwd_env();
+  uq_begin("test");
+  export int lz_str = node_str("hi");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 keep_export(int i) {
   int ok = 1;
   if(is_harn() == 0 && nat_all_live() == 0) {

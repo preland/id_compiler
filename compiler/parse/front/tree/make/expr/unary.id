@@ -3,13 +3,24 @@
 node_un(string op, int operand) {
   int ret_i = newleaf("un", operand, 0, op, "");
 } return int ret_i;
+given full_env ("-", 3):(0) then calls newleaf:("un", 3, 0, "-", "")
+given full_env ("!", 5):(0) then calls newleaf:("un", 5, 0, "!", "")
 
-// `-1`: a unary minus (id 1) wrapping a literal (id 0), for
-// cases/more/lit/kinds.id's neg_lit.
-fixture_neg_lit_node() {
-  env_init();
-  node_int("1", 1, 0);
-  node_un("-", 0);
+// curtk[0] set to a chosen token index, then push_pos() run once so both a
+// direct case of push_pos and last_ntok/last_nst's own cases can read the
+// entry it left behind.
+mk_curtk5() {
+  full_env();
+  lset((import curtk), 0, 5);
+  push_pos();
 } return void;
-():() then check_failed:(0)
-():() then last_i2:(0)
+():() then last_ntok:(5)
+():() then last_nst:(-1)
+
+mk_curtk9() {
+  full_env();
+  lset((import curtk), 0, 9);
+  push_pos();
+} return void;
+():() then last_ntok:(9)
+():() then last_nst:(-1)

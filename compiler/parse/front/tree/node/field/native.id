@@ -3,13 +3,21 @@
 is_native(int id) {
   int ok = i2_of(id) == 1;
 } return int ok;
+given mk_two_nodes (0):(0)
+given mk_two_nodes (1):(1)
 
-// The second int field of the most recently created node, for a case whose
-// function under test returns a node id it cannot itself compare a field of
-// (a `then` check takes no arguments).
-last_i2() {
-  int n = len((import ni2));
-  int ret_i = (import ni2)[n - 1];
+// The token index push_pos stamps a new node with, and the -1 it always
+// gives the node's first-token slot (only a statement fills that in).
+last_ntok() {
+  int i = len((import ntok)) - 1;
+  int ret_i = (import ntok)[i];
 } return int ret_i;
-given fixture_zero_int ():(0)
-given fixture_one_int ():(1)
+given mk_curtk5 ():(5)
+given mk_curtk9 ():(9)
+
+last_nst() {
+  int i = len((import nst)) - 1;
+  int ret_i = (import nst)[i];
+} return int ret_i;
+given mk_curtk5 ():(-1)
+given mk_curtk9 ():(-1)

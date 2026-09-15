@@ -2,6 +2,16 @@
 // 32-bit int gets C's `LL` suffix so the constant keeps its value, matching
 // idc.py.
 
+// id 23: "dup9(int) return int { int r=9; } => r" -- same shape as dup5
+// (id 22), differing only in the literal. Pushed onto prog at index 0.
+lz_n() {
+  lz_m();
+  export int lz_fn9 = node_func("dup9", "int", (import f_none), [(import lz_decl9)], (import lz_dv));
+  push((import prog), (import lz_fn5));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 int_code(int id) {
   string s = s1_of(id);
   if(i2_of(id) == 1) {

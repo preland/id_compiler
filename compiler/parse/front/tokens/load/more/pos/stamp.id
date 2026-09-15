@@ -15,12 +15,16 @@ init_pos2() {
   export int[] ngrp = [];
   init_pos3();
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 init_pos3() {
   export int[] ngrpc = [];
   export int[] nst = [];
   export int[] synfail = [0];
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 // Consuming a token records its line and its index.
 stamp_tok(int[] pos) {
@@ -28,3 +32,5 @@ stamp_tok(int[] pos) {
   lset((import curtl), 0, cur_ln_v);
   lset((import curtk), 0, pos[0]);
 } return void;
+given mk_two_toks ([0]):() then calls lset:((import curtl), 0, 1) then calls lset:((import curtk), 0, 0)
+given mk_two_toks ([1]):() then calls lset:((import curtl), 0, 1) then calls lset:((import curtk), 0, 1)

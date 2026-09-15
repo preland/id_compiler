@@ -8,6 +8,8 @@ lw_ispred(string op) {
     r = 1;
   }
 } return int r;
+("=="):(1)
+("+"):(0)
 
 // A comparison produces the IR's own `bool`, and `id` says the expression is
 // an `int` -- so it widens here rather than at each of its users. Every
@@ -19,6 +21,8 @@ lw_cmp(int node) {
   string lw_ety_v = lw_ety(i1_of_v);
   int ret_i = lw_cmp_t2(node, lw_ety_v);
 } return int ret_i;
+given lw_fix_bin ((import fix_bin_n)):(3)
+given lw_fix_bin ((import fix_bin_n)):(3) then check_failed:(0)
 
 lw_cmp2(int node, string t) {
   int v = 0 - 1;
@@ -28,3 +32,5 @@ lw_cmp2(int node, string t) {
     v = lw_ncmp(node, t);
   }
 } return int v;
+given lw_fix_bin ((import fix_bin_n), "int"):(2)
+given lw_fix_bin ((import fix_bin_n), "string"):(4)

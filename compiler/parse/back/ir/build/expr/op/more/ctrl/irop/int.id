@@ -7,6 +7,8 @@ lw_iop_int(string op) {
     p = "sub";
   }
 } return string p;
+given ir_rows ("+"):("add")
+given ir_rows ("*"):("mul")
 
 lw_iop_int2(string op) {
   string p = lw_iop_bits(op);
@@ -14,3 +16,15 @@ lw_iop_int2(string op) {
     p = "mul";
   }
 } return string p;
+given ir_rows ("*"):("mul")
+given ir_rows ("&"):("and")
+
+// str_fixture (../../str/ncmp.id) plus a "+" concat and a "<" numeric
+// comparison, for a case anywhere in str/ that needs one.
+str_fixture2() {
+  str_fixture();
+  export int concat_node = node_bin("+", (import str_node), (import str_node));
+  export int cmp_node = node_bin("<", (import ev_node), (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

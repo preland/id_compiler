@@ -13,6 +13,8 @@ init_pos() {
   export int[] curtk = [0];
   init_pos2();
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 // Padded first, so a token that arrived without a span cannot shift every
 // later token's columns onto its neighbour.
@@ -21,9 +23,13 @@ set_span(string text) {
   int v = to_int(text);
   push((import tspan), v);
 } return void;
+given full_env ("12"):() then last_tspan:(12)
+given full_env ("34"):() then last_tspan:(34)
 
 span_pad() {
   while(len((import tspan)) < len((import tkind)) - 1) {
     push((import tspan), 0 - 1);
   }
 } return void;
+given mk_two_toks ():() then last_tspan:(-1)
+given mk_three_toks ():() then last_tspan:(-1)

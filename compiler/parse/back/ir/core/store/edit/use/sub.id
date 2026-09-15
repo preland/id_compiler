@@ -2,11 +2,17 @@
 ir_set_s(int id, string s) {
   sset((import istr), id, s);
 } return void;
+given ir_rows (0, "x"):() then chk_s:("x")
+given ir_rows_chk1 (1, "y"):() then chk_s:("y")
 
 ir_set_bl(int id, int[] bl) {
   lset2((import iblk), id, bl);
 } return void;
+given ir_rows (0, [2, 3]):() then chk_bl:([2, 3])
+given ir_rows_chk1 (1, [5]):() then chk_bl:([5])
 
 ir_set_l(int id, int[] l) {
   lset2((import ilist), id, l);
 } return void;
+given ir_rows (0, [7]):() then chk_l:([7])
+given ir_rows_chk1 (1, [8, 9]):() then chk_l:([8, 9])

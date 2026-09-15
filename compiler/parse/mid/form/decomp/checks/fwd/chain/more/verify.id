@@ -8,15 +8,21 @@ fwd_expr_ok(int fid, int stmt) {
     ok = 1;
   }
 } return int ok;
+given farm_i (10, 9):(1)
+given farm_i (6, 9):(0)
 
 fwd_verify(int i, int fid, int callid) {
   string callee_name = s1_of(callid);
   int ok = fwd_ok(fid, callid, callee_name);
   fwd_verify_tail(i, callee_name, ok);
 } return void;
+given farm_k (0, 6, 2):() then calls fwd_report:(0, "target")
+given farm_k (0, 12, 2):() then calls fwd_report:[0]
 
 fwd_verify_tail(int i, string callee_name, int ok) {
   if(ok == 1) {
     fwd_report(i, callee_name);
   }
 } return void;
+given farm_i (0, "target", 1):() then calls fwd_report:(0, "target")
+given farm_i (0, "target", 0):() then calls fwd_report:[0]

@@ -7,6 +7,8 @@ cur_kind(int[] pos) {
     k = (import tkind)[pos[0]];
   }
 } return string k;
+given mk_two_toks ([0]):("op")
+given mk_two_toks ([1]):("kw")
 
 cur_text(int[] pos) {
   string s = "";
@@ -14,6 +16,8 @@ cur_text(int[] pos) {
     s = (import ttext)[pos[0]];
   }
 } return string s;
+given mk_two_toks ([0]):("=")
+given mk_two_toks ([1]):("return")
 
 // Consuming a token records its line. Every node is built immediately after
 // the tokens that make it up, so this is the line a diagnostic about that
@@ -23,3 +27,5 @@ advance(int[] pos) {
   stamp_tok(pos);
   pos[0] = pos[0] + 1;
 } return void;
+given mk_two_toks ([0]):([1])
+given mk_two_toks ([1]):([2])

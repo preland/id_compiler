@@ -5,6 +5,8 @@ lw_tostr(int node) {
   int v = lw_expr(node);
   int ret_i = lw_tostr_at(v, t);
 } return int ret_i;
+given str_fixture ((import str_node)):(3)
+given bound_fixture ((import ev_node)):(4)
 
 lw_tostr_at(int v, string t) {
   int r = v;
@@ -13,6 +15,8 @@ lw_tostr_at(int v, string t) {
     r = lw_callf(lw_strfn_v, "string", [v]);
   }
 } return int r;
+given bound_fixture (3, "string"):(3)
+given bound_fixture (3, "int"):(3)
 
 lw_strfn(string t) {
   string s = "id_str_of_word";
@@ -22,3 +26,5 @@ lw_strfn(string t) {
     s = "id_str_of_float";
   }
 } return string s;
+given ir_rows ("int"):("id_str_of_int")
+given ir_rows ("word"):("id_str_of_word")

@@ -1,0 +1,24 @@
+// The last two of insn/row_fields.id's readers: the auxiliary value list
+// and the home block.
+
+chk_l() {
+  int[] ret_li = ir_l((import chk_id)[0]);
+} return int[] ret_li;
+given ir_rows ():([])
+given ir_rows_chk1 ():([])
+
+chk_home() {
+  int ret_i = ir_home((import chk_id)[0]);
+} return int ret_i;
+given ir_rows ():(0)
+given ir_rows_chk1 ():(-1)
+
+// The most recently pushed entry of irprog (../func/more.id), for a case on
+// ir_func4: its own index arithmetic is otherwise unobserved once fnname
+// already has the row it counts.
+chk_irprog_last() {
+  int n = len((import irprog));
+  int ret_i = (import irprog)[n - 1];
+} return int ret_i;
+given ir_rows ():(1)
+given ir_rows_chk1 ():(1)

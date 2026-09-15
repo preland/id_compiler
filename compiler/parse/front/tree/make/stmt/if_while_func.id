@@ -8,12 +8,18 @@
 node_if(int cond, int[] thenl, int[] elsel, int elif) {
   int ret_i = newnode("if", cond, elif, "", "", thenl, elsel);
 } return int ret_i;
+given full_env (1, [2], [3], 0):(0) then calls newnode:("if", 1, 0, "", "", [2], [3])
+given full_env (4, [5], [], 1):(0) then calls newnode:("if", 4, 1, "", "", [5], [])
 
 node_while(int cond, int[] bodyl) {
   int[] none = [];
   int ret_i = newnode("while", cond, 0, "", "", bodyl, none);
 } return int ret_i;
+given full_env (1, [2]):(0) then calls newnode:("while", 1, 0, "", "", [2], [])
+given full_env (3, []):(0) then calls newnode:("while", 3, 0, "", "", [], [])
 
 node_func(string name, string rettype, int[] params, int[] body, int retexpr) {
   int ret_i = newnode("func", retexpr, 0, name, rettype, params, body);
 } return int ret_i;
+given full_env ("f", "int", [1], [2], 3):(0) then calls newnode:("func", 3, 0, "f", "int", [1], [2])
+given full_env ("g", "void", [], [], -1):(0) then calls newnode:("func", -1, 0, "g", "void", [], [])
