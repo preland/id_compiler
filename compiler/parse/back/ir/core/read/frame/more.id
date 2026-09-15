@@ -2,11 +2,17 @@
 irf_blk(int f) {
   int[] ret_li = (import fnblk)[f];
 } return int[] ret_li;
+given ir_rows (0):([0])
+given ir_rows (1):([1])
 
 irf_node(int f) {
   int ret_i = (import fnnode)[f];
 } return int ret_i;
+given ir_rows (0):(-1)
+given ir_rows (1):(7)
 
 blk_pre(int b) {
   int[] ret_li = (import bpred)[b];
 } return int[] ret_li;
+given ir_rows (0):([])
+given ir_rows (1):([])
