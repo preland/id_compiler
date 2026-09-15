@@ -9,3 +9,5 @@ print_uint(word v) {
   string text = udec(v);
   print("int " + text);
 } return void;
+(5):() then prints:("int 5\n")
+(255):() then prints:("int 255\n")

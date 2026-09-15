@@ -12,6 +12,8 @@ ll_bytes(string s) {
   string out = ll_bytes_acc(s);
   string ret_s = out + "\\00";
 } return string ret_s;
+("\"\""):("\\00")
+("\"a\""):("\\61\\00")
 
 ll_piece(string s, int i) {
   int charat_v = charat(s, i);
@@ -22,6 +24,8 @@ ll_piece(string s, int i) {
     out = ll_hex(ll_escbyte_v);
   }
 } return string out;
+("ab", 1):("\\62")
+("\\n", 0):("\\0A")
 
 // A backslash escape spells one byte out of two source characters.
 ll_step(string s, int i) {
@@ -30,3 +34,5 @@ ll_step(string s, int i) {
     r = i + 2;
   }
 } return int r;
+("ab", 0):(1)
+("\\n", 0):(2)

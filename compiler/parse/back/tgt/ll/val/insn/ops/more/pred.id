@@ -8,6 +8,8 @@ ll_pred(string op, string t) {
     s = "o" + ll_fpred(op);
   }
 } return string s;
+given init_tyreg ("<", "int"):("slt")
+given init_tyreg ("<", "float"):("olt")
 
 ll_ipred(string op) {
   string s = "eq";
@@ -28,3 +30,6 @@ ll_fpred(string op) {
     s = ll_rel(op);
   }
 } return string s;
+("=="):("eq")
+("!="):("ne")
+("<"):("lt")

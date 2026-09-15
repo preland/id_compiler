@@ -9,6 +9,8 @@ scan_binop(string src, int i) {
     ni = scan_decop(src, i);
   }
 } return int ni;
+("0b10", 0):(4) then prints:("int 2\n")
+("42", 0):(2) then prints:("int 42\n")
 
 // i points at the '0'; i + 2 is the first binary digit.
 scan_bin(string src, int i) {
@@ -16,6 +18,8 @@ scan_bin(string src, int i) {
   word v = bin_val(src, i + 2, e);
   print_uint(v);
 } return int e;
+("0b1010", 0):(6) then prints:("int 10\n")
+("0b11", 0):(4) then prints:("int 3\n")
 
 // Accumulated in a `word` for the reason hex is: 64 binary digits do not fit
 // an int.
@@ -26,3 +30,5 @@ bin_val(string src, int i, int e) {
     i = i + 1;
   }
 } return word v;
+("1010", 0, 4):(10)
+("11", 0, 2):(3)

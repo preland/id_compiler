@@ -18,12 +18,16 @@ init_asm() {
   export string[] aftriple = [];
   export int[][] afparams = [];
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
 
 init_asm2() {
   export string[][] aflines = [];
   export string[] afret = [];
   export string[] afretn = [];
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
 
 // A string token arrives with its quotes; the triple is compared against a
 // command-line argument, so it is stored without them.
@@ -36,3 +40,5 @@ unquote(string s) {
     i = i + 1;
   }
 } return string out;
+("\"x86_64\""):("x86_64")
+("\"\""):("")

@@ -11,6 +11,8 @@ is_two_op(string two) {
     ok = 1;
   }
 } return int ok;
+("=="):(1)
+("ab"):(0)
 
 // How many characters the operator at `i` spans (2 or 1). Used by scan_op's
 // return clause so the function body stays within the action limit.
@@ -21,9 +23,13 @@ oplen(string src, int i) {
     n = 2;
   }
 } return int n;
+("==x", 0):(2)
+("+x", 0):(1)
 
 scan_op(string src, int i) {
   string two = two_at(src, i);
   scan_op_out(src, i, two);
   int ret_i = i + oplen(src, i);
 } return int ret_i;
+("+x", 0):(1) then prints:("op +\n")
+("==x", 0):(2) then prints:("op ==\n")

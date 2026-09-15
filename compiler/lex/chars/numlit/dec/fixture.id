@@ -1,0 +1,16 @@
+// The running-line-number reader, for bump_line's cases (see
+// chars/classify/at/fixture.id for the lex_setup wrapper this builds on).
+
+lex_line_now() {
+  int n = (import lexline)[0];
+} return int n;
+given lex_fix_setup ():(1)
+given lex_fix_setup ():(1) then prints:("")
+
+// lexbol != 0 too, so a case can tell (i - b) from (i + b) in span_out.
+lex_fix_bol1() {
+  lex_fix_setup_cols();
+  int ig = eat_space("\n", 0);
+} return void;
+():() then prints:("line 2\n")
+():() then prints:("line 2\n") then lex_cols_now:(1)

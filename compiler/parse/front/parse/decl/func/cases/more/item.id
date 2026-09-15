@@ -4,6 +4,8 @@ take_item(int[] pos, int[] items) {
   int v = case_item(pos);
   push(items, v);
 } return void;
+given tup1_fix ([1], []):([2], [0])
+given tup1_fix ([1], [7]):([2], [7, 0])
 
 // Consumed only when present, so a case written `(1, 2)(3)` is reported once,
 // here, rather than again at every token that follows it.
@@ -13,8 +15,12 @@ eat_colon(int[] pos) {
     advance(pos);
   }
 } return void;
+given colon_fix ([0]):([1])
+given tup1_fix ([0]):([0])
 
 eat_close(int[] pos) {
   expect_text(pos, ")");
   advance(pos);
 } return void;
+given close_fix ([0]):([1])
+given tup1_fix ([2]):([3])

@@ -8,6 +8,8 @@ digit_run_end(string src, int i) {
     i = i + 1;
   }
 } return int i;
+("123", 0):(3)
+("12a", 0):(2)
 
 has_frac(string src, int e) {
   int ok = 0;
@@ -15,3 +17,5 @@ has_frac(string src, int e) {
     ok = 1;
   }
 } return int ok;
+("x.14", 1):(1)
+("42", 2):(0)

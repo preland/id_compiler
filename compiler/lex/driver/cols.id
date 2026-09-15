@@ -9,6 +9,8 @@ lex_setup(int argc, string[] argv) {
   export int[] lexbol = [0];
   lex_cols(argc, argv);
 } return void;
+(1, ["prog"]):() then lex_cols_now:(0)
+(2, ["prog", "--cols"]):() then lex_cols_now:(1)
 
 lex_cols(int argc, string[] argv) {
   int on = 0;
@@ -17,6 +19,8 @@ lex_cols(int argc, string[] argv) {
   }
   export int[] lexcols = [on];
 } return void;
+(1, ["prog"]):() then lex_cols_now:(0)
+(2, ["prog", "--cols"]):() then lex_cols_now:(1)
 
 is_lcomment(string src, int i) {
   int ok = 0;
@@ -24,3 +28,5 @@ is_lcomment(string src, int i) {
     ok = 1;
   }
 } return int ok;
+("// hi", 0):(1)
+("x", 0):(0)

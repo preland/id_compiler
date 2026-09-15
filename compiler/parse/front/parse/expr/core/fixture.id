@@ -1,0 +1,20 @@
+// The afretn reader for decl/asm/'s cases (see
+// ../../../tree/node/newnode/fixture.id and ../../../tree/make/array/fixture.id
+// for the afret/afretn scenarios themselves).
+
+afretn_last() {
+  string s = (import afretn)[len((import afretn)) - 1];
+} return string s;
+given asm_reg_fix1b ():("result")
+given asm_reg_fix1d ():("r")
+
+// Two literal AST nodes for decl/func/cases/more/lit/'s cases: an int
+// literal and a plain variable reference (not a literal). Node ids are
+// deterministic in a fresh case process, so lit_int is 0 and lit_var is 1.
+lit_fix() {
+  env_init();
+  export int lit_int = node_int("5", 5, 0);
+  export int lit_var = node_var("x");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -32,6 +32,8 @@ main(int argc, string[] argv) {
     drv_walk(argv[1]);
   }
 } return int 0;
+(1, ["idsrc"]):(0) then prints:("usage: idsrc ROOT\n")
+(2, ["idsrc", "does-not-exist-xyz-idsrc-test"]):(0) then prints:("")
 
 // A directory that cannot be read lists as nothing rather than as an error.
 // fs_list answers -1, the buffer stays empty, and the walk goes on -- which is
@@ -41,9 +43,13 @@ drv_walk(string path) {
   int[] buf = drv_read(path, n);
   drv_each(path, buf, 0);
 } return void;
+("does-not-exist-xyz-idsrc-test"):() then prints:("")
+("also-does-not-exist-xyz-idsrc-test"):() then prints:("")
 
 drv_each(string path, int[] buf, int at) {
   while(at < len(buf)) {
     at = drv_one(path, buf, at);
   }
 } return void;
+("p", [97, 46, 105, 100, 10], 0):() then prints:("p/a.id\n")
+("p", [], 0):() then prints:("")

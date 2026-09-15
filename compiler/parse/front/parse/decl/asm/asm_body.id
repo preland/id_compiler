@@ -4,12 +4,16 @@ asm_lines(int[] pos) {
   scan_asm(pos, alines);
   int ret_i = asm_lines_tail(pos, alines);
 } return int ret_i;
+given asm_fix_full ([0]):(0) then afret_last:("int") then afretn_last:("result")
+given asm_fix_full2 ([0]):(0) then afret_last:("word") then afretn_last:("r")
 
 scan_asm(int[] pos, string[] alines) {
   advance(pos);
   fill_asm(pos, alines);
   advance(pos);
 } return void;
+given asm_fix_full ([0], []):([2], [])
+given asm_fix_full2 ([0], []):([3], ["\"i1\""])
 
 // The body is a run of string literals and nothing else: an asm function is a
 // leaf, so there is no statement, call or import to read here.
@@ -20,3 +24,5 @@ fill_asm(int[] pos, string[] alines) {
     advance(pos);
   }
 } return void;
+given asm_fix_2str ([1], []):([3], ["\"i1\"", "\"i2\""])
+given env_init ([0], []):([0], [])

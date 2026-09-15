@@ -7,6 +7,8 @@ drv_bytes(int[] buf, word a, int lo, int hi) {
     i = i + 1;
   }
 } return void;
+given drvbuf_poked_hi ([104, 105], (import gb), 0, 2):() then drvbuf_mem2:("hi")
+given drvbuf_poked_hi ([65, 66], (import gb), 0, 2):() then drvbuf_mem2:("AB")
 
 // fs_list answers with the size the whole listing needs even when it wrote
 // nothing, so asking with no buffer at all is how a caller learns what to
@@ -16,9 +18,13 @@ drv_size(string path) {
   int[] buf = [];
   int ret_i = fs_list(path, buf, 0);
 } return int ret_i;
+("does-not-exist-xyz-idsrc-test"):(-1)
+("also-does-not-exist-xyz-idsrc-test"):(-1)
 
 drv_read(string path, int n) {
   int[] buf = [];
   drv_fill(buf, n);
   int got = fs_list(path, buf, n);
 } return int[] buf;
+("does-not-exist-xyz-idsrc-test", 0):([])
+("also-does-not-exist-xyz-idsrc-test", 0):([])

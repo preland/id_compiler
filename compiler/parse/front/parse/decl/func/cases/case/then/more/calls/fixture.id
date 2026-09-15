@@ -1,0 +1,16 @@
+// `calls myfn:(6)` and `calls myfn:[2]`, for then_calls_*'s cases. See
+// ../../given/elem/fixture.id for toks_push's other callers.
+
+calls_args_fix() {
+  fn_fixture();
+  toks_push(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "(", "6", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+calls_count_fix() {
+  fn_fixture();
+  toks_push(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

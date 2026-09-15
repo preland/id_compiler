@@ -11,6 +11,8 @@ case_fn_name(int[] pos, string fn_word) {
     syn_err(pos, "expected the name of a function after '" + fn_word + "', found '" + cur_text_v + "'");
   }
 } return string name;
+given given_fix ([1], "given"):("mysetup")
+given close_fix ([0], "then"):("") then prints:("<stdin>:1: error: expected the name of a function after 'then', found ')'\n")
 
 // Whether the next two tokens open `(import NAME)`. Bounded, because a case
 // can be the last thing in a file.
@@ -20,6 +22,8 @@ at_case_import(int[] pos) {
     r = next_is_import(pos);
   }
 } return int r;
+given import_fix ([0]):(1)
+given tup1_fix ([0]):(0)
 
 next_is_import(int[] pos) {
   int r = 0;
@@ -27,3 +31,5 @@ next_is_import(int[] pos) {
     r = 1;
   }
 } return int r;
+given import_fix ([0]):(1)
+given tup1_fix ([0]):(0)

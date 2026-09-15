@@ -10,3 +10,5 @@ ll_bytes_acc(string s) {
     i = ll_step(s, i);
   }
 } return string out;
+("\"\""):("")
+("\"a\""):("\\61")

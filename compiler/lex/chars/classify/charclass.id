@@ -8,6 +8,8 @@ is_space(int c) {
     ok = 1;
   }
 } return int ok;
+(32):(1)
+(65):(0)
 
 is_digit(int c) {
   int ok = 0;
@@ -15,6 +17,8 @@ is_digit(int c) {
     ok = 1;
   }
 } return int ok;
+(48):(1)
+(65):(0)
 
 is_alpha(int c) {
   int ok = 0;
@@ -22,3 +26,5 @@ is_alpha(int c) {
     ok = 1;
   }
 } return int ok;
+(65):(1)
+(48):(0)

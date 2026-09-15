@@ -5,3 +5,5 @@ scan_ident_out(string ident) {
   string kind = kindof(ident);
   print(kind + " " + ident);
 } return void;
+("abc"):() then prints:("ident abc\n")
+("if"):() then prints:("kw if\n")

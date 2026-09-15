@@ -12,14 +12,20 @@ case_rest(int[] pos) {
   case_thens(pos);
   case_cons(pos);
 } return void;
+given fn_fixture ([0]):()
+given then_fix ([0]):()
 
 case_thens(int[] pos) {
   while(cur_kind(pos) == "kw" && cur_text(pos) == "then") {
     then_one(pos);
   }
 } return void;
+given fn_fixture ([0]):()
+given then_fix ([0]):()
 
 then_one(int[] pos) {
   advance(pos);
   then_dispatch(pos);
 } return void;
+given then_fix ([0]):()
+given then_prints_fix ([0]):()

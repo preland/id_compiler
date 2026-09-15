@@ -7,6 +7,8 @@ parse_case_args(int[] pos) {
   int[] args = case_tuple(pos);
   int ret_i = parse_case_rhs(pos, args);
 } return int ret_i;
+given case_min_fix ([0]):(2)
+given case_min_fix ([0]):(2) then check_failed:(0)
 
 case_given(int[] pos) {
   string setup_nm = "";
@@ -15,8 +17,12 @@ case_given(int[] pos) {
   }
   push((import casegiven), setup_nm);
 } return void;
+given given_fix ([0]):()
+given tup1_fix ([0]):()
 
 given_name(int[] pos) {
   advance(pos);
   string setup_nm = case_fn_name(pos, "given");
 } return string setup_nm;
+given given_fix ([0]):("mysetup")
+given given2_fix ([0]):("othersetup")

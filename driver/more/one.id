@@ -7,12 +7,16 @@ drv_one(string path, int[] buf, int at) {
   drv_entry(path, buf, at, end);
   int ret_i = end + 1;
 } return int ret_i;
+("p", [97, 46, 105, 100, 10], 0):(5) then prints:("p/a.id\n")
+("p", [46, 103, 105, 116, 47, 10], 0):(6) then prints:("")
 
 drv_eol(int[] buf, int at) {
   while(at < len(buf) && buf[at] != 10) {
     at = at + 1;
   }
 } return int at;
+([104, 105, 10, 120], 0):(2)
+([104, 105], 0):(2)
 
 // A name ending in '/' is a directory; that is how fs_list says so, and the
 // slash is dropped here rather than carried into the path.
@@ -23,3 +27,5 @@ drv_entry(string path, int[] buf, int lo, int hi) {
     drv_file(path, buf, lo, hi);
   }
 } return void;
+("p", [46, 103, 105, 116, 47], 0, 5):() then prints:("")
+("p", [97, 46, 105, 100], 0, 4):() then prints:("p/a.id\n")

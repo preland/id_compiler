@@ -10,11 +10,15 @@ two_at(string src, int i) {
   int c2 = charat(src, i + 1);
   string two = chr(c1) + chr(c2);
 } return string two;
+("+x", 0):("+x")
+("==", 0):("==")
 
 one_at(string src, int i) {
   int c = charat(src, i);
   string one = chr(c);
 } return string one;
+("+x", 0):("+")
+("abc", 1):("b")
 
 // `one` is built whether or not it is printed. charat is a read of a byte
 // that is already in memory, so the branch would cost more than the read.
@@ -26,3 +30,5 @@ scan_op_out(string src, int i, string two) {
     print("op " + one);
   }
 } return void;
+("+x", 0, "+x"):() then prints:("op +\n")
+("==x", 0, "=="):() then prints:("op ==\n")

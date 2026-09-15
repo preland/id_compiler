@@ -10,6 +10,8 @@ check_lit(int e) {
     syn_err_tail(cur_file_v, ln, "a test case takes literals only (a number, a string, or a list of those)");
   }
 } return void;
+given lit_fix (0):() then prints:("")
+given lit_fix (1):() then prints:("<stdin>:0: error: a test case takes literals only (a number, a string, or a list of those)\n")
 
 is_lit(int e) {
   int r = leaf_lit(e);
@@ -20,6 +22,8 @@ is_lit(int e) {
     r = neg_lit(e);
   }
 } return int r;
+given lit_fix (0):(1)
+given lit_fix (1):(0)
 
 all_lit(int[] xs) {
   int r = 1;
@@ -29,3 +33,5 @@ all_lit(int[] xs) {
     i = i + 1;
   }
 } return int r;
+given lit_fix ([0, 0]):(1)
+given lit_fix ([0, 1]):(0)

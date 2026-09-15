@@ -7,3 +7,5 @@ then_push_kind(string kind, string s1v, int[] items) {
   int[] no_items = [];
   then_store(kind, s1v, items, n - 1, no_items);
 } return void;
+given fn_fixture ("thenprints", "", []):()
+given fn_fixture ("theneprints", "", [1]):()

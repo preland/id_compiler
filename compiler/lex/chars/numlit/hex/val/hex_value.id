@@ -4,6 +4,8 @@ scan_hex(string src, int i) {
   word v = hex_val(src, i + 2, e);
   print_uint(v);
 } return int e;
+("0xff", 0):(4) then prints:("int 255\n")
+("0x10", 0):(4) then prints:("int 16\n")
 
 // A word printed as *unsigned* decimal. Plain "" + v prints it signed, so
 // 0xffffffffffffffff would come out as -1 where idc.py gives
@@ -22,9 +24,13 @@ udec(word v) {
     s = "" + hi + pad10("" + umod_v);
   }
 } return string s;
+(10):("10")
+(20000000000):("20000000000")
 
 pad10(string s) {
   while(len(s) < 10) {
     s = "0" + s;
   }
 } return string s;
+("5"):("0000000005")
+("1234567890"):("1234567890")

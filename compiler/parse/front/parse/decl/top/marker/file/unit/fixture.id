@@ -1,0 +1,27 @@
+// More synthetic token streams (see ../../../../../../tree/init/setup/fixture.id
+// for toks_push/tkind_len/asm_fix_2str), for decl/asm/'s cases.
+
+// `{` `}` -- an empty asm body, no instruction lines.
+asm_fix_0str() {
+  env_init();
+  toks_push(["op", "op"], ["{", "}"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// `{` `}` "return" "int" "result" ";" -- an empty asm body, returning int.
+asm_fix_full() {
+  env_init();
+  toks_push(["op", "op", "kw", "kw", "ident", "op"], ["{", "}", "return", "int", "result", ";"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// `{` "i1" `}` "return" "word" "r" -- one instruction line, returning word,
+// with no trailing `;` (skip_semi's no-op branch).
+asm_fix_full2() {
+  env_init();
+  toks_push(["op", "str", "op", "kw", "kw", "ident"], ["{", "\"i1\"", "}", "return", "word", "r"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

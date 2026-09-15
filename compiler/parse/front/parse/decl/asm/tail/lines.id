@@ -5,6 +5,8 @@ asm_lines_tail(int[] pos, string[] alines) {
   push((import aflines), alines);
   int ret_i = asm_tail(pos);
 } return int ret_i;
+given asm_fix_full ([2], []):(0) then afret_last:("int") then afretn_last:("result")
+given asm_fix_full2 ([3], ["\"i1\""]):(0) then afret_last:("word") then afretn_last:("r")
 
 // tspan holding one column value, for set_span's and last_tspan's own cases.
 mk_span1() {

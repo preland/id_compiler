@@ -12,15 +12,21 @@ parse_case(int[] pos) {
   case_given(pos);
   int ret_i = parse_case_args(pos);
 } return int ret_i;
+given case_min_fix ([0]):(2)
+given tup1_fix ([0]):(1)
 
 parse_case_rhs(int[] pos, int[] args) {
   eat_colon(pos);
   int[] expd = case_tuple(pos);
   int ret_i = case_tail(pos, args, expd);
 } return int ret_i;
+given rhs_fix ([0], []):(1)
+given rhs_fix ([0], [9]):(1)
 
 case_tail(int[] pos, int[] args, int[] expd) {
   case_rest(pos);
   push((import caseend), pos[0]);
   int ret_i = newnode("case", 0, 0, "", "", args, expd);
 } return int ret_i;
+given env_init ([0], [], []):(0)
+given env_init ([0], [1], [2]):(0)
