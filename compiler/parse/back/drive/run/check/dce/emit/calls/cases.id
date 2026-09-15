@@ -1,0 +1,36 @@
+// `idparse --calls`: like --fingerprints, a report about the parsed program
+// rather than a build of it, so it runs from guarded_emit.id before that
+// file's own dispatch, whether or not the rest of the program would emit.
+// Edges first (edges/), then this file's case-count section.
+print_calls() {
+  call_edges_funcs(0, 0);
+  print_call_cases();
+} return void;
+given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then init_units:(0)
+
+// `--calls`'s case-count section: one row per function, printed after every
+// edge. `fn|file:line|cases` -- distinct from an edge row by field count (3
+// pipe-fields against an edge's 5), which is how idc/tools/calltree.sh tells
+// the two apart without a marker.
+print_call_cases() {
+  int i = 0;
+  while(i < len((import prog))) {
+    string line = call_case_row(i);
+    print(line);
+    i = i + 1;
+  }
+} return void;
+given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then init_units:(0)
+
+// count_cases (mid/names/limits/shape/cases/more/flag/count.id) already
+// counts a function's cases for the two-case minimum; this reads it rather
+// than re-scanning `casefn` a second time.
+call_case_row(int i) {
+  string name = s1_of((import prog)[i]);
+  int n = count_cases((import prog)[i]);
+  string ret_s = name + "|" + (import pfile)[i] + ":" + (import pline)[i] + "|" + n;
+} return string ret_s;
+given edge_fixture (0):("fx_target|fixture.id:7|0")
+given edge_fixture (1):("edge_caller|fixture.id:20|0")

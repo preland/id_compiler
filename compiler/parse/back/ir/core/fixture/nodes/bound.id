@@ -13,7 +13,7 @@ lw_fix_bound() {
 // One instruction on the store, with operand B left at its usual -1 --
 // state for ir_last_b (fnref.id) to read back.
 ir_last_fix() {
-  lw_fixture();
+  lw_env_fixture();
   int x = lw_tmp("int");
 } return void;
 ():() then check_failed:(0)
@@ -22,7 +22,7 @@ ir_last_fix() {
 // The same, but with a real operand B (5), so ir_last_b's two cases pin
 // down both a leaf's usual -1 and a real value.
 ir_last_fix2() {
-  lw_fixture();
+  lw_env_fixture();
   int x = lw_op("add", "int", 0, 5, "");
 } return void;
 ():() then check_failed:(0)

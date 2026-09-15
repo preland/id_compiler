@@ -6,7 +6,7 @@
 // every directory near expr/ is already at the 3-entry layout limit.
 
 lw_fix_un() {
-  lw_fixture();
+  lw_env_fixture();
   int x = node_int("1", 1, 0);
   export int fix_un_n = node_un("!", x);
 } return void;
@@ -14,7 +14,7 @@ lw_fix_un() {
 ():() then init_units:(0)
 
 lw_fix_index() {
-  lw_fixture();
+  lw_env_fixture();
   int b = node_int("1", 1, 0);
   lw_fix_index_tail(b);
 } return void;
@@ -25,5 +25,5 @@ lw_fix_index_tail(int b) {
   int i = node_int("0", 0, 0);
   export int fix_index_n = node_index(b, i);
 } return void;
-given lw_fixture (1):() then check_failed:(0)
-given lw_fixture (1):() then init_units:(0)
+given lw_env_fixture (1):() then check_failed:(0)
+given lw_env_fixture (1):() then init_units:(0)

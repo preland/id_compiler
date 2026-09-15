@@ -1,0 +1,29 @@
+// Walk every function's node range and print its call/value edges --
+// mirrors reach_funcs/reach_func (mid/names/exports/reach/dead/sweep.id) but
+// visits every function unconditionally, because --calls reports the whole
+// call graph a build would prune from, not what dce_prune would keep.
+call_edges_funcs(int f, int lo) {
+  while(f < len((import prog))) {
+    lo = call_edges_func(f, lo);
+    f = f + 1;
+  }
+} return void;
+given edge_fixture (0, 0):() then check_failed:(0)
+given edge_fixture (1, 0):() then check_failed:(0)
+
+call_edges_func(int f, int lo) {
+  string caller = s1_of((import prog)[f]);
+  call_edges_range(lo, (import prog)[f], caller);
+  int ret_i = (import prog)[f] + 1;
+} return int ret_i;
+given edge_fixture (0, 0):(4)
+given edge_fixture (1, 0):(8)
+
+call_edges_range(int lo, int hi, string caller) {
+  while(lo <= hi) {
+    scan_call_edge(lo, caller);
+    lo = lo + 1;
+  }
+} return void;
+given edge_fixture (0, 0, "edge_caller"):() then check_failed:(0)
+given edge_fixture (0, 1, "edge_caller"):() then check_failed:(0)

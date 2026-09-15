@@ -1,5 +1,5 @@
 // Synthetic literal/name nodes for an expr-lowering case, built on
-// ../../build/func/state/more/fixture.id's lw_fixture. fix_int_n is a plain
+// ../../../build/func/state/more/fixture/env.id's lw_env_fixture. fix_int_n is a plain
 // `int` literal; fix_var_n is a `var` node naming "x", registered as a
 // conf.id-shaped export (lw_fix_var_ty) so lw_ety's fallback (lw_vty,
 // ../../build/expr/atom/lit/more/ety.id) finds a declared type for it, the
@@ -8,14 +8,14 @@
 // init.id): type_of reads it for any non-`int` node, uninitialised or not.
 
 lw_fix_int() {
-  lw_fixture();
+  lw_env_fixture();
   export int fix_int_n = node_int("5", 5, 0);
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
 lw_fix_var() {
-  lw_fixture();
+  lw_env_fixture();
   export int fix_var_n = node_var("x");
   lw_fix_var_ty();
 } return void;

@@ -1,0 +1,56 @@
+// Classify one node of a caller's range (../walk.id) into an edge, or
+// nothing: k_of/s1_of (../../../../../../../front/tree/node/) are read here,
+// not re-derived -- the same two kinds reach_mark's scan_reach tests for the
+// same reason (mid/names/exports/reach/dead/more/scan.id), unconditionally
+// rather than gated by reachability, because --calls reports the whole graph
+// a build would prune from, not what a build would keep.
+scan_call_edge(int id, string caller) {
+  string k = k_of(id);
+  if(k == "call") {
+    call_edge_emit(caller, id, "call");
+  }
+  if(k == "var") {
+    scan_call_value(id, caller);
+  }
+} return void;
+given edge_fixture ((import edge_call_node), "edge_caller"):() then check_failed:(0)
+given edge_fixture ((import edge_var_node), "edge_caller"):() then check_failed:(0)
+
+// A name used as a value is an edge only when it names a function
+// (call_callee_loc's membership test again, ../line.id) -- reach_add ignores
+// a plain variable's name the same way, so a local that happens to share a
+// name with nothing in `fnames` is silently not an edge.
+//
+// KNOWN OVER-REPORT: finish_atom (front/parse/expr/atom/lit/call/call.id)
+// builds a "var" node for every bare identifier before it knows whether a
+// '(' follows, and when one does, that var node is never removed -- it is
+// simply not on the tree a real value-read would leave, but it is still in
+// the flat id range this file's caller (../walk.id) scans, the same range
+// scan_reach (mid/names/exports/reach/dead/more/scan.id) has always scanned
+// for reachability, where one extra name in a set is harmless. So every
+// direct call also prints a "value" row for the same callee: a value row
+// with no matching call row is a real value use (an export, a parameter, a
+// `func(...) return ...`-typed local); one that matches a call row for the
+// same caller and callee is this artifact, not a second real use. Fixing it
+// at the source means resolving a call before finish_atom decides whether to
+// keep the var node it already built, which is a parser change past this
+// task's scope; idc/README.md's "The function dependency tree" section says
+// so.
+scan_call_value(int id, string caller) {
+  string name = s1_of(id);
+  if(find_str((import fnames), name) >= 0) {
+    call_edge_emit(caller, id, "value");
+  }
+} return void;
+given edge_fixture ((import edge_var_node), "edge_caller"):() then check_failed:(0)
+given edge_fixture ((import edge_call_node), "edge_caller"):() then check_failed:(0)
+
+// One printed row, built from the callee's own node so caller and callee
+// never disagree with what k_of/s1_of already resolved.
+call_edge_emit(string caller, int id, string kind) {
+  string callee_name = s1_of(id);
+  string line = call_edge_line(caller, callee_name, kind);
+  print(line);
+} return void;
+given edge_fixture ("edge_caller", (import edge_call_node), "call"):() then check_failed:(0)
+given edge_fixture ("edge_caller", (import edge_var_node), "value"):() then check_failed:(0)

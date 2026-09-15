@@ -6,7 +6,7 @@
 // function's own name instead of to a variable read.
 
 lw_fix_fnval() {
-  lw_fixture();
+  lw_env_fixture();
   init_idx();
   lw_fix_fnval_reg();
 } return void;
@@ -25,7 +25,7 @@ given lw_fix_fnval ():() then init_units:(0)
 // reused on both sides, since lw_bin only lowers each side and never needs
 // them to be distinct nodes.
 lw_fix_bin() {
-  lw_fixture();
+  lw_env_fixture();
   int x = node_int("1", 1, 0);
   export int fix_bin_n = node_bin("+", x, x);
 } return void;

@@ -1,4 +1,4 @@
-// An open lowering state, reusing ir_rows (../../../../core/fixture/fn0.id):
+// An open lowering state, reusing ir_rows (../../../../../core/fixture/rows/fn0.id):
 // f0 already has one block from ir_rows itself, so opening it adds a second
 // entry/body pair -- block 2 (entry) and block 3 (body, the current block).
 

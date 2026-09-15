@@ -13,8 +13,8 @@ given lw_fix_var ((import fix_var_n)):(0)
 lw_const(string ty, string s) {
   int ret_i = ir_leaf("const", ty, 0 - 1, 0 - 1, s);
 } return int ret_i;
-given lw_fixture ("int", "5"):(0) then ir_last_b:(0)
-given lw_fixture ("string", "hi"):(0)
+given lw_env_fixture ("int", "5"):(0) then ir_last_b:(0)
+given lw_env_fixture ("string", "hi"):(0)
 
 // Reading a name: the address, then a load from it.
 lw_name(int node) {

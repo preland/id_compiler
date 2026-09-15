@@ -8,7 +8,7 @@ lw_cast2(int v, string t, string want) {
   }
 } return int r;
 given env_init (7, "int", "string"):(7)
-given lw_fixture (99, "int", "word"):(0)
+given lw_env_fixture (99, "int", "word"):(0)
 
 lw_castop(string t, string want) {
   string op = "sitofp";

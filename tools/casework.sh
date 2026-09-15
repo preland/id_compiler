@@ -38,9 +38,14 @@ fn_end() {
 }
 
 build() {
+    local rc
     env -u IDC_NO_STD "$IDC" "$1" --allow-untested --emit-c "$WORK/out.c" >"$WORK/build.log" 2>&1
+    rc=$?
     grep -a ': test failed' "$WORK/build.log"
     grep -aE ': error:' "$WORK/build.log" | head -20
+    if [ "$rc" -ne 0 ] && ! grep -aqE ': test failed|: error:' "$WORK/build.log"; then
+        echo "casework: the build exited $rc without a diagnostic -- last line: $(tail -1 "$WORK/build.log")"
+    fi
 }
 
 cmd_list() {
