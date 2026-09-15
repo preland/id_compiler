@@ -1,0 +1,35 @@
+// A function's file:line by name, reusing func_file/func_line
+// (../../../../../../../mid/names/limits/report/more/loc/) exactly as
+// dump.id's fp_line does for `--fingerprints` -- the same two facts, without
+// the fingerprint or the tab-separated shape.
+call_loc(string name) {
+  string file_v = func_file(name);
+  int line_v = func_line(name);
+  string ret_s = file_v + ":" + line_v;
+} return string ret_s;
+given edge_fixture ("fx_target"):("fixture.id:7")
+given edge_fixture ("edge_caller"):("fixture.id:20")
+
+// A callee's location, empty for a builtin: a name this program does not
+// define (the same membership test reach_add uses to tell a builtin from a
+// function with a body, mid/names/exports/reach/dead/more/add.id) has no
+// source for `--calls` to point a kind=builtin row at.
+call_callee_loc(string callee_name) {
+  string ret_s = "";
+  if(find_str((import fnames), callee_name) >= 0) {
+    ret_s = call_loc(callee_name);
+  }
+} return string ret_s;
+given edge_fixture ("fx_target"):("fixture.id:7")
+given edge_fixture ("print"):("")
+
+// One edge row: caller|caller_loc|callee|callee_loc|kind. callee_loc is empty
+// for kind=builtin, which is how a 5-field row still parses with one field
+// blank (idc/tools/calltree.sh; docs/TESTS.md's "--calls" section).
+call_edge_line(string caller, string callee_name, string kind) {
+  string caller_loc = call_loc(caller);
+  string callee_loc = call_callee_loc(callee_name);
+  string ret_s = caller + "|" + caller_loc + "|" + callee_name + "|" + callee_loc + "|" + kind;
+} return string ret_s;
+given edge_fixture ("edge_caller", "fx_target", "call"):("edge_caller|fixture.id:20|fx_target|fixture.id:7|call")
+given edge_fixture ("edge_caller", "print", "builtin"):("edge_caller|fixture.id:20|print||builtin")
