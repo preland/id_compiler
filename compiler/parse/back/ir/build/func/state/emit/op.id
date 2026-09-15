@@ -11,12 +11,16 @@ lw_op(string op, string ty, int a, int b, string s) {
   int[] bl = [];
   int ret_i = lw_emit(op, ty, a, b, s, none, bl);
 } return int ret_i;
+given lw_fixture ("add", "int", 1, 2, ""):(2)
+given lw_fixture2 ("sub", "word", 3, 4, ""):(2)
 
 // A terminator: no value, no operand list, and the blocks it can reach.
 lw_term(string op, int a, int[] bl) {
   int[] none = [];
   int ret_i = lw_emit(op, "", a, 0 - 1, "", none, bl);
 } return int ret_i;
+given lw_fixture ("br", 0, [3]):(2)
+given lw_fixture2 ("ret", 1, []):(2)
 
 // A leaf that lives in no block -- a constant, a global, an alloca, a
 // parameter. Built rather than emitted, because none of them is a line of the
@@ -26,3 +30,5 @@ ir_leaf(string op, string ty, int a, int b, string s) {
   int[] bl = [];
   int ret_i = ir_insn(op, ty, a, b, s, none, bl);
 } return int ret_i;
+given ir_rows ("alloca", "int", -1, -1, "x"):(2)
+given ir_rows_chk1 ("const", "string", -1, -1, "y"):(2)

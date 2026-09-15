@@ -6,8 +6,8 @@ ir_func4() {
   push((import irprog), len_v - 1);
   int ret_i = len((import fnname)) - 1;
 } return int ret_i;
-given ir_rows ():(1)
-given ir_rows_chk1 ():(1)
+given ir_rows ():(1) then chk_irprog_last:(1)
+given ir_rows_chk1 ():(1) then chk_irprog_last:(1)
 
 // The most recently pushed function's name and return type, for a case on
 // ir_func/ir_func2 (../func.id): a wrapper because a `then` check takes no

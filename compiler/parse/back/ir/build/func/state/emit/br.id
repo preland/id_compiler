@@ -5,3 +5,5 @@ lw_brto(int b) {
   int[] none = [];
   int ret_i = ir_insn("br", "", 0 - 1, 0 - 1, "", none, [b]);
 } return int ret_i;
+given ir_rows (5):(2)
+given ir_rows_chk1 (9):(2)
