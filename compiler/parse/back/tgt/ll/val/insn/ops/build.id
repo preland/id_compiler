@@ -4,15 +4,21 @@ ll_t5_isc(int id) {
   string op = ir_op(id);
   int r = ll_iscast(op);
 } return int r;
+given fixture3 ((import ir_zext)):(1)
+given fixture2 ((import ir_callee_sym)):(0)
 
 ll_t5_cmp(int id, string sym, int a) {
   string vty = ll_vty(a);
   int b = ir_b(id);
   string ret_s = "%v" + id + " = " + ir_op(id) + " " + ll_pred(sym, vty) + " " + ll_op(a) + ", " + ll_val(b);
 } return string ret_s;
+given cmp_fixture ((import ir_cmp), "<", (import ir_cmp)):("%v0 = icmp slt i32 %v0, poison")
+given cmp_fixture ((import ir_cmp), "=", (import ir_cmp)):("%v0 = icmp eq i32 %v0, poison")
 
 ll_t6_bin(int id) {
   int a = ir_a(id);
   int b = ir_b(id);
   string ret_s = "%v" + id + " = " + ir_op(id) + " " + ll_op(a) + ", " + ll_val(b);
 } return string ret_s;
+given fixture3 ((import ir_zext)):("%v4 = zext void poison, poison")
+given fixture2 ((import ir_callee_sym)):("%v2 = call void poison, poison")

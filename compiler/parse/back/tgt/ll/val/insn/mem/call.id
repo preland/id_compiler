@@ -8,3 +8,5 @@ ll_callee(int id) {
     s = ll_val(ir_a_v);
   }
 } return string s;
+given fixture2 ((import ir_callee_sym)):("@myfunc")
+given fixture3 ((import ir_callee_val)):("5")

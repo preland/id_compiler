@@ -11,6 +11,8 @@ ll_t3(int id) {
     s = "store " + ll_op(ir_b_v) + ", ptr " + ll_val(ir_a_v2);
   }
 } return string s;
+given ir_fixture3 ((import ir_load)):("%v4 = load i32, ptr poison")
+given ir_fixture3 ((import ir_store)):("store void poison, ptr poison")
 
 ll_t4(int id) {
   string s = ll_t5(id);
@@ -21,6 +23,8 @@ ll_t4(int id) {
     s = "%v" + id + " = phi " + ll_ty(ir_ty_v) + " " + ll_phis(id);
   }
 } return string s;
+given fixture2 ((import ir_callee_sym)):("call void @myfunc()")
+given phi_fixture ((import ir_phi)):("%v1 = phi i32 [ %v0, %b7 ]")
 
 // A call that produces nothing is a statement; one that produces a value names
 // it. LLVM will not accept a name for a void result, so the two really are
@@ -33,3 +37,5 @@ ll_call(int id) {
     s = "%v" + id + " = " + s;
   }
 } return string s;
+given fixture2 ((import ir_callee_sym)):("call void @myfunc()")
+given fixture3 ((import ir_callee_val)):("%v3 = call i32 5()")

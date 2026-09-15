@@ -1,0 +1,35 @@
+// Three more synthetic IR instructions, chained the same way
+// ../../insn/mem/fixture.id's are: a `const` 5 feeding a `ret` (neither
+// reads its own l/bl, so [9] stands in -- see that file's note), a direct
+// call by symbol "myfunc" (whose l genuinely must be empty: ll_args reads
+// it, so `ir_empty_call`, a typed empty int[], is declared once and reused), a
+// call through a function value (the same `const` 5 fed in as the callee
+// operand -- any value works mechanically, so building a second one would
+// only cost an action this directory has no room for), and a `zext`
+// (any op not in ll_iscast's list is ../../insn/ops/build.id's "not a
+// cast" example too, so ir_fixture1's own "call" instruction above serves
+// double duty there instead of a dedicated one).
+
+fixture1() {
+  init_ir();
+  export int ir_c = ir_insn("const", "int", 0 - 1, 0 - 1, "5", [9], [9]);
+  export int ir_retval = ir_insn("ret", "", ir_c, 0 - 1, "", [9], [9]);
+} return void;
+():() then init_units:(0)
+():() then calls ir_insn:[2]
+
+fixture2() {
+  fixture1();
+  export int[] ir_empty_call = [];
+  export int ir_callee_sym = ir_insn("call", "void", 0 - 1, 0 - 1, "myfunc", ir_empty_call, ir_empty_call);
+} return void;
+():() then init_units:(0)
+():() then calls ir_insn:[3]
+
+fixture3() {
+  fixture2();
+  export int ir_callee_val = ir_insn("call", "int", (import ir_c), 0 - 1, "ignored", (import ir_empty_call), (import ir_empty_call));
+  export int ir_zext = ir_insn("zext", "int", 0 - 1, 0 - 1, "", [9], [9]);
+} return void;
+():() then init_units:(0)
+():() then calls ir_insn:[5]
