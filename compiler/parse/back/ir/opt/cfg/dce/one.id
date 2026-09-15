@@ -6,6 +6,8 @@ dce_one(int f, int id, int n) {
     n = n + 1;
   }
 } return int n;
+given cfg_fixture (0, 0, 0):(1) then chk_op0:("nop")
+given cfg_fixture (0, 0, 5):(6) then chk_op0:("nop")
 
 // What may not be removed for having no users. A call is here because nothing
 // tells this compiler which calls are pure -- every builtin that matters is a
@@ -16,6 +18,8 @@ dce_pure(string op) {
     r = 0;
   }
 } return int r;
+("add"):(1)
+("call"):(0)
 
 // How many instructions of this function name the value. An SSA value is
 // local to its function, so the whole store need not be scanned -- and at the
@@ -30,3 +34,5 @@ dce_used(int f, int id) {
     i = i + 1;
   }
 } return int n;
+given cfg_fixture (0, 0):(0)
+given cfg_fixture_u (0, 0):(1)

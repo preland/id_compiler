@@ -7,9 +7,22 @@ succ_count(int v) {
   int[] bl = ir_bl(v);
   int n = len(bl);
 } return int n;
+given br_fixture (1):(1)
+given cfg_fixture (0):(0)
 
 pred_succ_at(int b, int v, int i) {
   int[] ir_bl_v = ir_bl(v);
   int[] blk_pre_v = blk_pre(ir_bl_v[i]);
   push(blk_pre_v, b);
 } return void;
+given br_fixture (0, 1, 0):() then chk_pred1:([0])
+given br_fixture (5, 1, 0):() then chk_pred1:([5])
+
+// br_fixture with its one edge already scanned -- block 1's predecessor
+// list already holds [0], for pred_clear/pred_clear_at's own cases.
+br_fixture_p() {
+  br_fixture();
+  pred_of(0);
+} return void;
+():() then chk_pred1:([0])
+():() then chk_blk_count:(2)

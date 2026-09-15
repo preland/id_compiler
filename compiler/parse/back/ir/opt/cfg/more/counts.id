@@ -1,0 +1,20 @@
+// No-argument readers of the fixture's shape, since a `then` check takes
+// none and blk_count/insn_count take a function or block id.
+
+chk_blk_count() {
+  int ret_i = blk_count(0);
+} return int ret_i;
+given cfg_fixture ():(2)
+given cfg_fixture ():(2) then chk_ins0_count:(1)
+
+chk_ins0_count() {
+  int ret_i = insn_count(0);
+} return int ret_i;
+given cfg_fixture ():(1)
+given cfg_fixture ():(1) then chk_blk_count:(2)
+
+chk_pred1() {
+  int[] ret_li = blk_pre(1);
+} return int[] ret_li;
+given br_fixture ():([])
+given br_fixture ():([]) then chk_blk_count:(2)
