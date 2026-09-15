@@ -8,6 +8,8 @@ c_fn_params(string[] pts) {
     out = c_type_list(pts);
   }
 } return string out;
+given lc_env2 (["int"]):("int")
+given lc_env2 ([]):("void")
 
 c_type_list(string[] pts) {
   string out = "";
@@ -17,3 +19,5 @@ c_type_list(string[] pts) {
     i = i + 1;
   }
 } return string out;
+given lc_env2 (["int", "string"]):("int, char*")
+given lc_env2 ([]):("")

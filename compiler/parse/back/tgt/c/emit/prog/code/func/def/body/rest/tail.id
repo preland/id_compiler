@@ -3,15 +3,21 @@ emit_tail_end(int id) {
   emit_ret(id);
   emit_line("}");
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")
 
 emit_tail2(int id) {
   int[] l2_of_v = l2_of(id);
   emit_block(l2_of_v, "    ");
   emit_tail_end(id);
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")
 
 // `c_rettype id_NAME(params)`
 sig(int id) {
   string s2_of_v = s2_of(id);
   string s = c_type(s2_of_v) + " id_" + s1_of(id) + "(" + param_str(id) + ")";
 } return string s;
+given nz_prog_fixture ((import nz_mainfn)):("int id_main(int argc)")
+given nz_prog_fixture ((import nz_plainfn)):("void id_run(void)")

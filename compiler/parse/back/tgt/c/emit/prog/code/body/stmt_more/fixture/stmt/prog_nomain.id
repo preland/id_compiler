@@ -3,7 +3,7 @@
 // the func node itself stays within the per-block action limit.
 
 nz_main_parts() {
-  nz_while_fixture();
+  nz_tyc_fixture();
   export int[] nz_mainparams = [node_param("param", "int", "argc")];
 } return void;
 ():() then check_failed:(0)
