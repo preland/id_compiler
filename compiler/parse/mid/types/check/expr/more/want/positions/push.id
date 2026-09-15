@@ -7,7 +7,7 @@ want_push(int i, int id) {
   }
 } return int ok;
 given push_build ((import push_call), (import lit_a)):(0)
-given decl_fixture ((import decl_scalar), (import lit_a)):(0)
+given decltype_fixture ((import decl_scalar), (import lit_a)):(0)
 
 want_push_ok(int i) {
   int[] l1_of_v = l1_of(i);

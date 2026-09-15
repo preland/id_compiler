@@ -10,8 +10,8 @@ want_decl(int i, int id) {
     ok = 1;
   }
 } return int ok;
-given decl_fixture ((import decl_list), (import lit_a)):(1)
-given decl_fixture ((import decl_scalar), (import lit_a)):(0)
+given decltype_fixture ((import decl_list), (import lit_a)):(1)
+given decltype_fixture ((import decl_scalar), (import lit_a)):(0)
 
 want_asg(int i, int id) {
   string vt = var_type_at(i);
@@ -21,7 +21,7 @@ want_asg(int i, int id) {
   }
 } return int ok;
 given assign_build ((import assign_list), (import lit_a)):(1)
-given decl_fixture ((import decl_scalar), (import lit_a)):(0)
+given decltype_fixture ((import decl_scalar), (import lit_a)):(0)
 
 // The element of a list of lists: `xss[0] = []` is fine when xss is int[][].
 want_elem(int i, int id) {
@@ -33,4 +33,4 @@ want_elem(int i, int id) {
   }
 } return int ok;
 given iassign_build ((import iassign_node), (import lit_b)):(0)
-given decl_fixture ((import decl_scalar), (import lit_a)):(0)
+given decltype_fixture ((import decl_scalar), (import lit_a)):(0)

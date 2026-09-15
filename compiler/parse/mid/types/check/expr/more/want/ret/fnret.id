@@ -26,14 +26,8 @@ given fn_fixture ((import fixture_fn)):() then check_failed:(0)
 // error branch above -- fn_fixture's own fixture_fn returns plain "int".
 fnret_fixture() {
   fn_fixture();
-  fnret_build();
-} return void;
-():() then check_failed:(0)
-():() then init_units:(0)
-
-fnret_build() {
   int[] none = [];
   export int fnret_bad = node_func("badret", "func(int) return int", none, none, (import fixture_zero));
 } return void;
-given fn_fixture ():() then check_failed:(0)
-given fn_fixture ():() then init_units:(0)
+():() then check_failed:(0)
+():() then init_units:(0)
