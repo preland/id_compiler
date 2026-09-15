@@ -6,6 +6,8 @@ push_kii(string k, int a, int b) {
   push((import ni1), a);
   push((import ni2), b);
 } return void;
+given full_env ("kw", 1, 2):() then last_kind:("kw")
+given full_env ("op", 3, 4):() then last_kind:("op")
 
 // nunit rides along here for the same reason nline rides along below: every
 // node gets a slot, so the parallel lists stay aligned. It records the unit
@@ -15,6 +17,8 @@ push_ss(string s1, string s2) {
   push((import ns2), s2);
   push((import nunit), (import ucur)[0]);
 } return void;
+given full_env ("a", "b"):() then last_s1:("a")
+given full_env ("c", "d"):() then last_s1:("c")
 
 // nline keeps the parallel lists aligned: every node gets a line slot, filled
 // in by parse_stmt for statements and left 0 for the rest. A diagnostic needs
@@ -24,3 +28,5 @@ push_ll(int[] l1, int[] l2) {
   push((import nl2), l2);
   push((import nline), (import curtl)[0]);
 } return void;
+given full_env ([1, 2], [3]):() then last_l1:([1, 2])
+given full_env ([], [4]):() then last_l1:([])

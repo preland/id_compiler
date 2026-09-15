@@ -26,15 +26,21 @@ setup() {
   init_b();
   int ret_i = setup_rest();
 } return int ret_i;
+given full_env ():(0) then check_failed:(0)
+given full_env ():(0) then init_units:(0)
 
 init_a() {
   export string[] tkind = [];
   export string[] ttext = [];
   export string[] nkind = [];
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 init_b() {
   export int[] ni1 = [];
   export int[] ni2 = [];
   export string[] ns1 = [];
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)

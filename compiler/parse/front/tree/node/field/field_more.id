@@ -3,11 +3,17 @@
 s2_of(int id) {
   string ret_s = (import ns2)[id];
 } return string ret_s;
+given mk_two_nodes (0):("")
+given mk_two_nodes (1):("z")
 
 l1_of(int id) {
   int[] ret_li = (import nl1)[id];
 } return int[] ret_li;
+given mk_list_nodes (0):([7, 8])
+given mk_list_nodes (1):([3])
 
 l2_of(int id) {
   int[] ret_li = (import nl2)[id];
 } return int[] ret_li;
+given mk_list_nodes (0):([9])
+given mk_list_nodes (1):([9, 10])

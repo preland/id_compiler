@@ -3,6 +3,8 @@ eat_eq(int[] pos) {
   expect_text(pos, "=");
   advance(pos);
 } return void;
+given mk_two_toks ([0]):([1])
+given mk_two_toks ([1]):([2]) then prints:("<stdin>:1: error: expected '=', found 'return'\n")
 
 //   chkfail  set by any failing check or syntax error; suppresses emission
 //   curtl    the line of the token most recently consumed, which is the line
@@ -12,6 +14,8 @@ init_lines3() {
   export int[] curtl = [0];
   init_lines4();
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 //   casefn     the function node each case was written under
 //   casestart  the case's first token index, and caseend one past its last.
@@ -24,3 +28,5 @@ init_lines4() {
   export int[] casestart = [];
   init_cases();
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)

@@ -1,0 +1,26 @@
+// Field readers for the most recently pushed node, used as `then` checks by
+// push_kii/push_ss/push_ll's own cases (push.id) and by other case fixtures
+// in this directory: none of the three push directly to anything a case can
+// read as a return value or a mutated argument, so a check is the only way
+// to see what they left behind.
+
+last_kind() {
+  int i = len((import nkind)) - 1;
+  string ret_s = (import nkind)[i];
+} return string ret_s;
+given mk_two_nodes ():("func")
+given mk_list_nodes ():("arr")
+
+last_s1() {
+  int i = len((import ns1)) - 1;
+  string ret_s = (import ns1)[i];
+} return string ret_s;
+given mk_two_nodes ():("y")
+given mk_list_nodes ():("")
+
+last_l1() {
+  int i = len((import nl1)) - 1;
+  int[] ret_li = (import nl1)[i];
+} return int[] ret_li;
+given mk_two_nodes ():([])
+given mk_list_nodes ():([3])
