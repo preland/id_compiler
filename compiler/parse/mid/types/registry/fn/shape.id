@@ -12,6 +12,8 @@ ty_is_func(string t) {
     ok = 1;
   }
 } return int ok;
+("func(int) return int"):(1)
+("int"):(0)
 
 // One past the parenthesis that closes the parameter list.
 fn_close(string t) {
@@ -23,6 +25,8 @@ fn_close(string t) {
     i = i + 1;
   }
 } return int i;
+("func() return void"):(6)
+("func(int) return int"):(9)
 
 // 40 is `(` and 41 is `)`.
 fn_depth(int c) {
@@ -33,3 +37,5 @@ fn_depth(int c) {
     n = 0 - 1;
   }
 } return int n;
+(40):(1)
+(41):(-1)

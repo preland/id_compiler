@@ -6,9 +6,13 @@ fn_last(string t, int hi, int[] st, string[] pts) {
     push(pts, piece);
   }
 } return void;
+("func(int) return int", 8, [5, 0], []):("func(int) return int", 8, [5, 0], ["int"])
+("func() return void", 5, [5, 0], []):("func() return void", 5, [5, 0], [])
 
 // Parameter i's type. Asked only once the arity has been checked.
 fn_param_at(string t, int i) {
   string[] pts = fn_params(t);
   string p = pts[i];
 } return string p;
+("func(int, string) return void", 0):("int")
+("func(int, string) return void", 1):("string")

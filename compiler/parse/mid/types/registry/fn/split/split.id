@@ -6,12 +6,16 @@ fn_ret(string t) {
   int n = len(t);
   string rt = slice(t, e + 8, n);
 } return string rt;
+("func(int) return int"):("int")
+("func(int, string) return void"):("void")
 
 fn_params(string t) {
   string[] pts = [];
   int e = fn_close(t);
   fn_split(t, e - 1, pts);
 } return string[] pts;
+("func(int, string) return void"):(["int", "string"])
+("func() return void"):([])
 
 // st holds where the piece being read began, and how many nested parameter
 // lists the walk is inside: a comma splits the list only outside all of them.
@@ -20,3 +24,5 @@ fn_split(string t, int hi, string[] pts) {
   fn_walk(t, hi, st, pts);
   fn_last(t, hi, st, pts);
 } return void;
+("func(int, string) return void", 16, []):("func(int, string) return void", 16, ["int", "string"])
+("func() return void", 5, []):("func() return void", 5, [])
