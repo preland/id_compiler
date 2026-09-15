@@ -1,0 +1,13 @@
+// Two "const","string" IR instructions for ../../../mod/sect/str/str.id
+// and more.id: ll_isstr requires the quotes a real string literal's own
+// text carries (front/parse/expr/atom/lit/more/str_ops.id's parse_str
+// keeps them), so ir_s here is the *quoted* text -- `""` (two quote
+// characters, the empty string) and `"a"` -- not the bare content.
+
+str_fixture() {
+  init_ir();
+  export int ir_str_const = ir_insn("const", "string", 0 - 1, 0 - 1, "\"\"", [9], [9]);
+  export int ir_str_const2 = ir_insn("const", "string", 0 - 1, 0 - 1, "\"a\"", [9], [9]);
+} return void;
+():() then init_units:(0)
+():() then calls ir_insn:[2]
