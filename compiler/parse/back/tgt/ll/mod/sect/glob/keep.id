@@ -6,3 +6,5 @@ ll_global_kept(int i) {
     ll_global_at(i, ty);
   }
 } return void;
+given lc_dce_setup (0):() then prints:("@a = global ptr null\n")
+given lc_dce_setup (1):() then prints:("@b = global i32 2\n")
