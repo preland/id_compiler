@@ -5,3 +5,18 @@ asm_lines_tail(int[] pos, string[] alines) {
   push((import aflines), alines);
   int ret_i = asm_tail(pos);
 } return int ret_i;
+
+// tspan holding one column value, for set_span's and last_tspan's own cases.
+mk_span1() {
+  full_env();
+  set_span("5");
+} return void;
+():() then last_tspan:(5)
+():() then check_failed:(0)
+
+mk_span2() {
+  full_env();
+  set_span("9");
+} return void;
+():() then last_tspan:(9)
+():() then check_failed:(0)

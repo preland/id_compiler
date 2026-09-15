@@ -6,6 +6,15 @@
 // the default triple -- so `idc prog.id --backend B --triple aarch64-...`
 // built an x86_64 binary and reported success. A wrong platform must not be a
 // silent one.
+// id 6: "foo(3)", a "call" node; id 7: "int y = 3;", a "decl" node.
+lz_e() {
+  lz_d();
+  export int lz_callid = node_call("foo", (import lz_callargs));
+  export int lz_declid = node_decl("int", "y", (import lz_i1), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 arg_flag_val(int argc, string[] argv, int i, string name, string dflt) {
   string s = dflt;
   if(i + 1 < argc && argv[i] == name) {

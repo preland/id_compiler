@@ -2,6 +2,15 @@
 // pointer under its own name, and C calls one as it calls a function; the
 // pointer's type carries the prototype, so each argument converts to its
 // parameter's type exactly as it would at a call to id_NAME.
+// The loose fingerprint pass over an empty prog -- cfp2 = [], for the
+// loose-duplicate scan's own "nothing to compare" cases.
+lz_empty() {
+  fwd_env();
+  lz_fill();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 emit_fcall(int id) {
   int[] l1_of_v = l1_of(id);
   string ret_s = s1_of(id) + "(" + emit_args(l1_of_v) + ")";

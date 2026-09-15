@@ -7,9 +7,13 @@ lz_report(int i, int j) {
   string name_i = fname_at(i);
   lz_report2(name_i, j);
 } return void;
+given lz_o (1, 0):() then eprints:("<stdin>:1: warning: 'dup9' and 'dup5' differ only in a literal value; parameterise one function\n")
+given lz_o (0, 1):() then eprints:("<stdin>:1: warning: 'dup5' and 'dup9' differ only in a literal value; parameterise one function\n")
 
 lz_report2(string name_i, int j) {
   string name_j = fname_at(j);
   string msg = lz_msg(name_i, name_j);
   eprint(msg);
 } return void;
+given lz_o ("dup9", 0):() then eprints:("<stdin>:1: warning: 'dup9' and 'dup5' differ only in a literal value; parameterise one function\n")
+given lz_o ("dup5", 1):() then eprints:("<stdin>:1: warning: 'dup5' and 'dup9' differ only in a literal value; parameterise one function\n")

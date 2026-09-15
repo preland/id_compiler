@@ -2,6 +2,17 @@
 // type tags this compiler spells its own return locals with (int, word, float,
 // string, and each one's list form)?
 
+// id 6: "fwd1(int a) return int" whose only statement is f_decl and whose
+// return clause reads f_ret -- a genuine forwarder to target(a). Registers
+// target (id 5) in the function table so fn_node_of("target") finds it.
+farm_d() {
+  farm_c();
+  export int f_fwd1 = node_func("fwd1", "int", [(import f_pa)], [(import f_decl)], (import f_ret));
+  sym_func((import f_target));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 retstyle_check(string rem) {
   int dstart = tdig_start(rem);
   string tagbase = slice(rem, 0, dstart);

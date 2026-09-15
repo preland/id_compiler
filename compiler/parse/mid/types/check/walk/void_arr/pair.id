@@ -1,3 +1,14 @@
+// id 16: "user() return void", body [f_ustmt] -- reads target's name as a
+// plain value, so uq_fill's fingerprint of it contains "fv(target)".
+// Pushed onto prog at index 2.
+farm_j4() {
+  farm_j3();
+  export int f_user = node_func("user", "void", (import f_none), [(import f_ustmt)], 0 - 1);
+  push((import prog), (import f_user));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 void_arr_pair(int id, string t1, string t2) {
   void_arr_type(id, t1);
   void_arr_type(id, t2);

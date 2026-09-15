@@ -13,6 +13,8 @@ lz_stmt(int id) {
     out = lz_assign(id);
   }
 } return string out;
+given lz_e (7):("d:int 0=I")
+given lz_f (8):("a:0=I")
 
 lz_st2(int id) {
   string out = "?" + k_of(id) + "#" + id;
@@ -22,6 +24,8 @@ lz_st2(int id) {
     out = "e:" + val;
   }
 } return string out;
+given lz_e (7):("?decl#7")
+given lz_f (9):("e:c(foo:I)")
 
 // Reuses decl_tag and decl_name (mid/form/unique/canon/stmt/more/decl.id) as
 // they stand: the declared type, and the declared name (positional for a
@@ -32,3 +36,5 @@ lz_decl(int id) {
   string nm = decl_name(id);
   string ret_s = lz_decl_tail(id, out, nm);
 } return string ret_s;
+given lz_e (7):("d:int 0=I")
+given lz_j (16):("ed:int z=I")

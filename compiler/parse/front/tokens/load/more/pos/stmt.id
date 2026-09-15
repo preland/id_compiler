@@ -7,6 +7,8 @@ stmt_done(int id, int t0) {
   lset((import nline), id, n);
   lset((import nst), id, t0);
 } return void;
+given mk_two_nodes (0, 0):() then calls lset:((import nline), 0, 1) then calls lset:((import nst), 0, 0)
+given mk_two_nodes (1, 5):() then calls lset:((import nline), 1, 1) then calls lset:((import nst), 1, 5)
 
 // The line of token t0, or 1 past the end of the store -- cur_ln's answer for
 // a token index rather than a cursor.
@@ -16,6 +18,8 @@ tok_ln(int t0) {
     n = (import tline)[t0];
   }
 } return int n;
+given mk_two_toks (0):(1)
+given mk_two_toks (5):(1)
 
 // Called just after the closing parenthesis was consumed.
 grp_note(int e, int[] pos) {
@@ -23,3 +27,5 @@ grp_note(int e, int[] pos) {
   int c = pos[0] - 1;
   push((import ngrpc), c);
 } return void;
+given full_env (7, [5]):() then last_ngrp:(7) then last_ngrpc:(4)
+given full_env (9, [2]):() then last_ngrp:(9) then last_ngrpc:(1)

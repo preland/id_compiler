@@ -1,4 +1,3 @@
-
 lw_loc_loop(int node) {
   if(k_of(node) == "while") {
     int[] l1_of_v = l1_of(node);

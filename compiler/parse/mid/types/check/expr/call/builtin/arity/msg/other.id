@@ -1,3 +1,13 @@
+// Registers fwd1 (id 6) too, and id 7: an "if" statement -- not a forwarder
+// shape, for fwd_stmt/fwd_check's non-forwarder cases.
+farm_e() {
+  farm_d();
+  sym_func((import f_fwd1));
+  export int f_if = node_if((import f_argv), (import f_none), (import f_none), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 bi_other_msg(int id) {
   string name = s1_of(id);
   string bc = bi_count(name);

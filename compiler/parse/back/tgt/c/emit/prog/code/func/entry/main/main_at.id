@@ -1,5 +1,15 @@
 // Helper for find_main: keep the func id whose name is "main".
 
+// The loose fingerprint pass over prog = [dup5, dup9]: their loose fps are
+// identical (both keep only the literal's kind), so this is
+// mid/form/decomp/checks/loose/scan/'s one genuine positive case.
+lz_p() {
+  lz_o();
+  lz_fill();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 main_at(int i, int m) {
   int r = m;
   if(s1_of((import prog)[i]) == "main") {

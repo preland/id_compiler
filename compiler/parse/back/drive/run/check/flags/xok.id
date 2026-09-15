@@ -2,6 +2,15 @@
 // rather than tested at a fixed position, because the driver also passes
 // `--triple` and the AST dump takes a bare `ast`, and a flag whose meaning
 // depends on its index is a trap the next flag falls into.
+// id 1: a "var" leaf named "x"; id 2: the int literal "3".
+lz_b() {
+  lz_a();
+  export int lz_var = node_var("x");
+  export int lz_i1 = node_int("3", 3, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 arg_flag(int argc, string[] argv, int i, string name) {
   int r = 0;
   if(i < argc && argv[i] == name) {

@@ -11,9 +11,13 @@ load_at(string src, int i) {
     i = take_line(src, i);
   }
 } return void;
+given full_env ("op =\nkw return\n", 0):() then last_tkind:("kw")
+given full_env ("ident x\n", 0):() then last_tkind:("ident")
 
 take_line(string src, int i) {
   int e = str_eol(src, i);
   proc_line(src, i, e);
   int ret_i = e + 1;
 } return int ret_i;
+given full_env ("op =\n", 0):(5) then calls proc_line:("op =\n", 0, 4)
+given full_env ("kw return\n", 0):(10) then calls proc_line:("kw return\n", 0, 9)

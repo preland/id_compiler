@@ -11,6 +11,8 @@ lz_scan() {
     i = i + 1;
   }
 } return void;
+given lz_p ():() then calls lz_at:(0) then calls lz_at:(1)
+given lz_empty ():() then calls lz_at:[0]
 
 lz_at(int i) {
   int j = lz_find(i);
@@ -18,3 +20,5 @@ lz_at(int i) {
     lz_report(i, j);
   }
 } return void;
+given lz_p (1):() then calls lz_report:(1, 0)
+given lz_p (0):() then calls lz_report:[0]

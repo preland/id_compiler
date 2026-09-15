@@ -1,3 +1,24 @@
+// The env every fwd/ (../../fwd/) case fixture builds on: env_init, the
+// symbol index (fn_node_of needs it), and a reusable typed empty list (an
+// inline `[]` argument has no type to infer here).
+fwd_env() {
+  env_init();
+  init_idx();
+  export int[] f_none = [];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// param "a":int and the var "a" that reads it -- id 0 and 1 of every fwd/
+// case fixture below.
+farm_a() {
+  fwd_env();
+  export int f_pa = node_param("param", "int", "a");
+  export int f_argv = node_var("a");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 strip_idstd_prefix(string name) {
   int nlen = len(name);
   string ret_s = name;

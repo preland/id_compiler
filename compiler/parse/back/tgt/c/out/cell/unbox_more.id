@@ -1,6 +1,17 @@
 // The last unbox case: a `word` cell is already 8 bytes wide, so reading it
 // back is just the long long cast; anything else left is a list pointer.
 
+// mid/form/fix/out/emit/name/free/'s own env, with "foo":"string" already
+// taken -- for fix_free_round's negative case (a name already given a
+// different type).
+fix_env2() {
+  fix_fixture();
+  push((import fixd_nm), "foo");
+  push((import fixd_ty), "string");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 unbox4(string code, string type) {
   string s = "(IdList*)(intptr_t)(" + code + ")";
   if(type == "word") {

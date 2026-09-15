@@ -6,6 +6,8 @@ lz_find(int i) {
     j = j + 1;
   }
 } return int found;
+given lz_p (1):(0)
+given lz_p (0):(-1)
 
 lz_probe(int i, int j) {
   int found = 0 - 1;
@@ -13,3 +15,5 @@ lz_probe(int i, int j) {
     found = j;
   }
 } return int found;
+given lz_p (1, 0):(0)
+given lz_p (0, 0):(-1)

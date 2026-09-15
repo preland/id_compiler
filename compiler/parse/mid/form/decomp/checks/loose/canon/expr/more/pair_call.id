@@ -8,12 +8,16 @@ lz_pair(int a, int eb) {
   string val = lz_expr(eb);
   string ret_s = "(" + out + "," + val + ")";
 } return string ret_s;
+given lz_b (1, 2):("(v0,I)")
+given lz_b (2, 1):("(I,v0)")
 
 lz_call(int id) {
   string name = s1_of(id);
   int[] args = l1_of(id);
   string ret_s = "c(" + canon_callee(name) + ":" + lz_args(args) + ")";
 } return string ret_s;
+given lz_e (6):("c(foo:I)")
+given lz_i (14):("c(bar:v0)")
 
 lz_args(int[] args) {
   string out = "";
@@ -23,3 +27,5 @@ lz_args(int[] args) {
     idx = idx + 1;
   }
 } return string out;
+given lz_b ([2]):("I")
+given lz_b ([2, 0]):("I,S")

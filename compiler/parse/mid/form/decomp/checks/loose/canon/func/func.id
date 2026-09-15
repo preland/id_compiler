@@ -10,15 +10,21 @@ lz_func(int id) {
   uq_begin(nm);
   string ret_s = lz_func_body(id);
 } return string ret_s;
+given lz_j (11):("()->int{d:int 0=I;e:c(foo:I)}=>v0")
+given lz_j (15):("()->void{d:int 0=I}=>void")
 
 lz_func_body(int id) {
   int[] l1 = l1_of(id);
   string out = canon_params(l1);
   string ret_s = lz_logic(id, out);
 } return string ret_s;
+given lz_j (11):("()->int{d:int 0=I;e:c(foo:I)}=>v0")
+given lz_j (15):("()->void{d:int 0=I}=>void")
 
 lz_logic(int id, string out) {
   int[] l2 = l2_of(id);
   string val = lz_body(l2);
   string ret_s = "(" + out + ")->" + s2_of(id) + "{" + val + "}=>" + lz_ret(id);
 } return string ret_s;
+given lz_j (11, ""):("()->int{d:int 0=I;e:c(foo:I)}=>v0")
+given lz_j (15, ""):("()->void{d:int 0=I}=>void")
