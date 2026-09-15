@@ -9,6 +9,17 @@ given ir_rows ():() then init_units:(0)
 ir_rows_fn1_insn() {
   int v1 = ir_leaf("const", "string", 0 - 1, 0 - 1, "hi");
   export int[] chk_id = [0];
+  ir_rows_fn1_idx();
+} return void;
+given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then init_units:(0)
+
+// Symbol-index and build-flag tables a case can otherwise segfault reading:
+// init_idx (name lookups, e.g. type_of's name_type path on any node) and
+// init_rtc (fsc/rtc, e.g. lw_strcmp's is_freestanding).
+ir_rows_fn1_idx() {
+  init_idx();
+  init_rtc();
 } return void;
 given ir_rows ():() then check_failed:(0)
 given ir_rows ():() then init_units:(0)
