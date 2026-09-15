@@ -13,6 +13,8 @@ chk_retexpr(int id) {
   }
   fn_ret_type(id);
 } return void;
+given chkret_fixture ((import fixture_fn)):() then check_failed:(0)
+given badexpr_fixture ((import badexpr_fn)):() then check_failed:(1)
 
 chk_ret2(int id, int e) {
   string s2_of_v = s2_of(id);
@@ -24,6 +26,8 @@ chk_ret2(int id, int e) {
     chk_ret_narrow(id, type_of_v2);
   }
 } return void;
+given chkret_fixture ((import fixture_fn), (import lit_str)):() then check_failed:(1)
+given chkret_fixture ((import fixture_fn), (import lit_a)):() then check_failed:(0)
 
 // Reported at the return expression, not at the function heading: the clause
 // is written after the closing brace and is often lines away from the name.
@@ -32,3 +36,5 @@ ret_err(int id, string t) {
   string msg = ret_err_msg(id, t);
   tc_err(i1_of_v, msg);
 } return void;
+given fn_fixture ((import fixture_fn), "string"):() then prints:("<stdin>:1: error: function 'fx_target' returns int but the expression has type string\n")
+given fn_fixture ((import fixture_fn), "word"):() then prints:("<stdin>:1: error: function 'fx_target' returns int but the expression has type word\n")

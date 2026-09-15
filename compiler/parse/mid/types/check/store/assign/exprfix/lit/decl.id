@@ -1,0 +1,25 @@
+// Declaration nodes on exprfix's leaves, for the want_* position checks
+// (check/expr/more/want/) -- a list-typed one and a scalar one.
+decl_fixture() {
+  leaves_fixture();
+  decl_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+decl_build() {
+  export int decl_list = node_decl("int[]", "xs", (import lit_a), 0);
+  export int decl_scalar = node_decl("int", "x", (import lit_a), 0);
+} return void;
+given leaves_fixture ():() then check_failed:(0)
+given leaves_fixture ():() then init_units:(0)
+
+// A registered variable of list type, and an assignment to it -- for
+// want_asg. Self-contained like idx_build (../shape/arr.id).
+assign_build() {
+  leaves_fixture();
+  add_var("xl", "int[]", 0);
+  export int assign_list = node_assign("xl", (import lit_a));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

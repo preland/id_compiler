@@ -5,6 +5,8 @@ tc_err(int id, string msg) {
   print(loc + msg);
   note_failure();
 } return void;
+given fn_fixture ((import fixture_zero), "boom"):() then prints:("<stdin>:1: error: boom\n") then check_failed:(1)
+given fn_fixture ((import fixture_zero), "nope"):() then prints:("<stdin>:1: error: nope\n") then check_failed:(1)
 
 // Which function a node belongs to. Nodes are created in source order and a
 // function's own node is created last of all of them, so the enclosing
@@ -17,6 +19,8 @@ node_fn(int id) {
     i = i + 1;
   }
 } return string s;
+given fn_fixture ((import fixture_zero)):("fx_target")
+given fn_fixture (999999):("")
 
 // The reporting location: which function a node belongs to, and which line
 // within it.
@@ -25,3 +29,5 @@ tc_loc(int id) {
   int tc_line_v = tc_line(id);
   string loc = loc_at(node_fn_v, tc_line_v);
 } return string loc;
+given fn_fixture ((import fixture_zero)):("<stdin>:1: error: ")
+given fn_fixture ((import fixture_fn)):("<stdin>:1: error: ")
