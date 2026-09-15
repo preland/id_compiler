@@ -13,8 +13,12 @@ lw_arith2(int node, int a, string t) {
   int b = lw_as(i2_of_v, t);
   int ret_i = lw_arith3(node, a, b, t);
 } return int ret_i;
+given lw_fix_bin ((import fix_bin_n), 0, "int"):(1)
+given lw_fix_bin ((import fix_bin_n), 0, "word"):(2)
 
 lw_arith3(int node, int a, int b, string t) {
   string s1_of_v = s1_of(node);
   int v = lw_arith3_op(node, a, b, t, s1_of_v);
 } return int v;
+given lw_fix_bin ((import fix_bin_n), 0, 0, "int"):(0)
+given lw_fix_bin ((import fix_bin_n), 0, 0, "word"):(0)
