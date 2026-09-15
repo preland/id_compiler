@@ -5,6 +5,8 @@ fwd_stmt_tail(int i, int fid, int callid) {
     fwd_verify(i, fid, callid);
   }
 } return void;
+given farm_k (0, 6, 2):() then calls fwd_verify:(0, 6, 2)
+given farm_k (0, 6, -1):() then calls fwd_verify:[0]
 
 // The non-void forwarder shape: the declared local is exactly `return` and
 // the local's init is a call.
@@ -13,6 +15,8 @@ fwd_decl_ok(int fid, int stmt) {
   int callid = i1_of(stmt);
   int ok = fwd_decl_ok2(retvar, callid, stmt);
 } return int ok;
+given farm_i (6, 4):(1)
+given farm_i (10, 4):(0)
 
 // A synthetic func node named `name`, with no parameters and no body --
 // enough for fwd_should (../scan.id) and fwd_expr_ok (./more/verify.id),
@@ -23,3 +27,5 @@ fs_build(string name) {
   int[] nobody = [];
   int fid = node_func(name, "int", noparams, nobody, 0 - 1);
 } return int fid;
+given env_init ("plain"):(0) then calls node_func:("plain", "int", [], [], -1)
+given env_init ("main"):(0) then calls node_func:("main", "int", [], [], -1)

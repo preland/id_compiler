@@ -4,6 +4,8 @@ lw_logic2_join(int node, int slot, int bdy) {
   int jn = ir_block(lw_fn_v2, "join");
   int ret_i = lw_logic3(node, slot, bdy, jn);
 } return int ret_i;
+given logic_fixture ((import and_node), 2, 0):(13)
+given logic_fixture ((import or_node), 2, 0):(13)
 
 // Continues lw_short: the branch out of the condition block, once the
 // operator's arm order is known.
@@ -12,3 +14,15 @@ lw_short_term(int node, int c, int bdy, int jn) {
   int[] lw_arms_v = lw_arms(s1_of_v, bdy, jn);
   lw_term("cbr", c, lw_arms_v);
 } return void;
+given logic_fixture ((import and_node), 5, 0, 1):() then check_failed:(0)
+given logic_fixture ((import or_node), 5, 0, 1):() then check_failed:(0)
+
+// bound_fixture plus a "&&" and a "||" node over ev_node, for a case
+// anywhere in ctrl/logic that needs a real short-circuit expression.
+logic_fixture() {
+  bound_fixture();
+  export int and_node = node_bin("&&", (import ev_node), (import ev_node));
+  export int or_node = node_bin("||", (import ev_node), (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

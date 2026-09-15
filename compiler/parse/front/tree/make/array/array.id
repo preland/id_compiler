@@ -7,14 +7,20 @@
 node_index(int base, int idx) {
   int ret_i = newleaf("index", base, idx, "", "");
 } return int ret_i;
+given full_env (1, 2):(0) then calls newleaf:("index", 1, 2, "", "")
+given full_env (3, 4):(0) then calls newleaf:("index", 3, 4, "", "")
 
 node_arr(int[] elems) {
   int[] none = [];
   int ret_i = newnode("arr", 0, 0, "", "", elems, none);
 } return int ret_i;
+given full_env ([1, 2]):(0) then calls newnode:("arr", 0, 0, "", "", [1, 2], [])
+given full_env ([]):(0) then calls newnode:("arr", 0, 0, "", "", [], [])
 
 node_iassign(int target, int value) {
   int[] vlist = [value];
   int[] none = [];
   int ret_i = node_iassign_tail(target, vlist, none);
 } return int ret_i;
+given mk_two_nodes (0, 5):(2) then calls node_iassign_tail:(0, [5], [])
+given mk_two_nodes (1, 6):(2) then calls node_iassign_tail:(1, [6], [])

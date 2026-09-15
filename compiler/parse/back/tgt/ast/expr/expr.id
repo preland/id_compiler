@@ -10,6 +10,8 @@ print_expr(int id) {
     s = pe_op(id);
   }
 } return string s;
+given bin_fix (0):("5")
+given bin_fix (2):("(+ 5 x)")
 
 pe_op(int id) {
   string s = "";
@@ -21,6 +23,8 @@ pe_op(int id) {
     s = pe_atom(id);
   }
 } return string s;
+given bin_fix (2):("(+ 5 x)")
+given bin_fix (1):("x")
 
 pe_atom(int id) {
   string s = s1_of(id);
@@ -29,3 +33,5 @@ pe_atom(int id) {
     s = "(call " + s1_of(id) + pe_args(l1_of_v) + ")";
   }
 } return string s;
+given bin_fix (1):("x")
+given call_fix (3):("(call foo 5 x)")

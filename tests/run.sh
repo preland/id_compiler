@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core invalid runtime_invalid self_host_build backends stdlib conform tests_feature fix idstd_real kernel editor)
+SECTIONS=(core invalid runtime_invalid self_host_build backends stdlib wasm conform tests_feature fix idstd_real kernel editor)
 STATE=../.idc-cache/run-state
 WANTED=()
 resume=0
@@ -1058,6 +1058,19 @@ if want stdlib; then
     [ "$std" -eq 0 ] && mark_done stdlib
 fi
 
+# --- `--target wasm`: the C target's own C, recompiled for wasm32-wasi and
+#     linked as a WASI reactor (docs/TODO.md 9b). Skips itself when the
+#     wasm32-wasi toolchain (nix develop's IDC_WASI_*) or node is absent, so a
+#     checkout run outside the umbrella's devshell still runs the rest.
+echo
+echo "--- --target wasm (docs/TODO.md 9b) ---"
+wsm=0
+if want wasm; then
+    ./wasm.sh
+    wsm=$?
+    [ "$wsm" -eq 0 ] && mark_done wasm
+fi
+
 # --- conformance: every code-generation target must agree about what a
 #     program means. Comparing emitted text against idc.py, which the tree
 #     used to do, is only a question while both compilers emit C; this
@@ -1135,5 +1148,5 @@ if want editor; then
 fi
 
 [ "$fail" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
-    && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$conf" -eq 0 ] \
+    && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$conf" -eq 0 ] \
     && [ "$tst" -eq 0 ] && [ "$fixr" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]

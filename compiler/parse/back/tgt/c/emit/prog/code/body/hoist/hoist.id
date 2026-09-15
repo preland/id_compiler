@@ -6,6 +6,8 @@ hoist(int id) {
   int[] l2_of_v = l2_of(id);
   hoist_list(l2_of_v);
 } return void;
+given tyc_fix (7):() then prints:("    int y;\n")
+given tyc_fix (4):() then prints:("")
 
 hoist_list(int[] stmts) {
   int i = 0;
@@ -14,6 +16,8 @@ hoist_list(int[] stmts) {
     i = i + 1;
   }
 } return void;
+given tyc_fix ([1]):() then prints:("    int y;\n")
+given tyc_fix ([]):() then prints:("")
 
 hoist_one(int id) {
   if(k_of(id) == "decl") {
@@ -22,3 +26,5 @@ hoist_one(int id) {
     hoist_nested(id);
   }
 } return void;
+given tyc_fix (1):() then prints:("    int y;\n")
+given tyc_fix (3):() then prints:("")

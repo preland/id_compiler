@@ -1,4 +1,13 @@
 
+// id 19: "r", the shared return var; id 20: "int r = 5;".
+lz_l() {
+  lz_k();
+  export int lz_dv = node_var("r");
+  export int lz_decl5 = node_decl("int", "r", (import lz_r5), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 es2(int id, string ind) {
   if(k_of(id) == "assign") {
     string s1_of_v = s1_of(id);
@@ -8,3 +17,5 @@ es2(int id, string ind) {
     es3(id, ind);
   }
 } return void;
+given stmt_fix (2, ""):() then prints:("z = 5;\n")
+given stmt_fix (5, ""):() then prints:("5;\n")

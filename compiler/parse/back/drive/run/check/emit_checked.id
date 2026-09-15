@@ -4,6 +4,8 @@ push_asm_sym(int i) {
     push_sym_row(i);
   }
 } return void;
+given asmfx_setup (0):() then asmfx_fn_count:(1)
+given asmfx_setup (0):() then check_failed:(0)
 
 // -1 for the node id: an asm function is not in the node store at all, and
 // the call checks read that as "nothing here can be checked", which is the
@@ -12,6 +14,8 @@ push_asm_sym(int i) {
 push_sym_row(int i) {
   add_func((import afname)[i], (import afret)[i], 0 - 1);
 } return void;
+given asmfx_setup (0):() then asmfx_fn_count:(1)
+given asmfx_setup (0):() then check_failed:(0)
 
 // Everything the checks need that is not in the AST is set up first -- see
 // arg_setup. It used to be just register_asm_syms(), and that call used to

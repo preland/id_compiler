@@ -1,6 +1,15 @@
 
 // The return clause.
 
+// id 21: "int r = 9;"; id 22: "dup5(int) return int { int r=5; } => r".
+lz_m() {
+  lz_l();
+  export int lz_decl9 = node_decl("int", "r", (import lz_r9), 0);
+  export int lz_fn5 = node_func("dup5", "int", (import f_none), [(import lz_decl5)], (import lz_dv));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 emit_ret(int id) {
   if(i1_of(id) >= 0) {
     int i1_of_v = i1_of(id);
@@ -10,3 +19,5 @@ emit_ret(int id) {
     emit_line("    return;");
   }
 } return void;
+given func_fix (7):() then prints:("    return 5;\n")
+given ret_void_fix (8):() then prints:("    return;\n")

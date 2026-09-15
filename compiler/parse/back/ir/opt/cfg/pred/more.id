@@ -4,3 +4,24 @@ pred_clear_at(int f, int i) {
   int[] blk_pre_v = blk_pre(irf_blk_v[i]);
   pred_wipe(blk_pre_v);
 } return void;
+given br_fixture_p (0, 1):() then chk_pred1:([])
+given br_fixture_p (0, 0):() then chk_pred1:([0])
+
+// cfg_fixture plus a second, branching terminator in block 0 (id 1, "br",
+// targeting block 1) -- so pred_of/pred_succ have a real edge to compute.
+// Deterministic: idbr = 1.
+br_fixture() {
+  cfg_fixture();
+  br_add();
+  ret1_add();
+} return void;
+():() then chk_pred1:([])
+():() then chk_blk_count:(2)
+
+br_add() {
+  int[] none = [];
+  int idbr = ir_insn("br", "", 0, 0, "", none, [1]);
+  ir_add(0, idbr);
+} return void;
+given cfg_fixture ():() then chk_ins0_count:(2)
+given cfg_fixture ():() then chk_blk_count:(2)

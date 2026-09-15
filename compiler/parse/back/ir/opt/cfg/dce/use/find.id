@@ -6,3 +6,24 @@ dce_lists(int at, int id) {
   int[] l = ir_l(at);
   int r = lst_find(l, id);
 } return int r;
+given dce_fixture (0, 5):(1)
+given dce_fixture (0, 99):(0)
+
+// cfg_fixture plus a second block-0 instruction that references id0 -- so a
+// use can be found beyond the first block, for dce_used's own cases.
+cfg_fixture_u() {
+  cfg_fixture();
+  cfg_fixture2(0);
+} return void;
+():() then chk_blk_count:(4)
+():() then chk_ins0_count:(1)
+
+// A terminator ("ret", no successors) for br_fixture's second block -- every
+// block pred_of visits needs one, since it reads the block's last instruction.
+ret1_add() {
+  int[] none = [];
+  int idret = ir_insn("ret", "", 0, 0, "", none, none);
+  ir_add(1, idret);
+} return void;
+given cfg_fixture ():() then chk_blk_count:(2)
+given cfg_fixture ():() then chk_ins0_count:(1)

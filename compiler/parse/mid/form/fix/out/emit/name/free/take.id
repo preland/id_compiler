@@ -3,6 +3,8 @@ fix_take(string name, string t) {
   push((import fixd_ty), t);
   push((import fixd_used), name);
 } return void;
+given fix_fixture ("baz", "int"):() then last_fixd_nm:("baz")
+given fix_fixture ("qux", "string"):() then last_fixd_nm:("qux")
 
 fix_prefixed(string stem) {
   string s = stem;
@@ -10,6 +12,8 @@ fix_prefixed(string stem) {
     s = "idstd_" + stem;
   }
 } return string s;
+given fix_fixture ("foo"):("foo")
+given fix_env_std ("foo"):("idstd_foo")
 
 // Free: not a builtin, a function or an export anywhere in the program; not
 // declared anywhere in this function; and in the unit either unused or already
@@ -21,3 +25,5 @@ fix_free(string name, string t) {
     ok = fix_free_var(name, t);
   }
 } return int ok;
+given fix_fixture ("foo", "int"):(1)
+given fix_fixture ("print", "int"):(0)

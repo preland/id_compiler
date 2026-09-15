@@ -6,7 +6,9 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <limits.h>
+#ifndef __wasi__
 #include <termios.h>
+#endif
 #include <unistd.h>
 #include <time.h>
 
@@ -94,7 +96,7 @@ static void id_lm_forget(void) {
     unsigned i;
     for (i = 0; i < ID_LEN_MEMO; i++) id_lm_s[i] = NULL;
 }
-static void* id_alloc(size_t n) {
+void* id_alloc(size_t n) {
     IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), "alloc"));
     if (!h) { fprintf(stderr, "id: out of memory (%zu bytes)\n", n); exit(1); }
     id_arena_link(h);
@@ -400,6 +402,7 @@ static char* id_chr(int code) {
    sleep. Together these let id drive an animated full-screen frame loop. */
 static void id_put(const char* s) { fputs(s, stdout); }
 static void id_flush(void) { fflush(stdout); }
+#ifndef __wasi__
 static struct termios id_saved_termios;
 static int id_raw_active = 0;
 static void id_term_restore(void) {
@@ -425,6 +428,11 @@ static int id_getkey(void) {
     if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;
     return -1;   /* no key available this poll */
 }
+#else
+static void id_term_restore(void) {}
+static void id_term_raw(void) {}
+static int id_getkey(void) { return -1; }
+#endif
 static void id_sleep_ms(int ms) {
     struct timespec ts;
     if (ms < 0) ms = 0;

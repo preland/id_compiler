@@ -4,6 +4,8 @@ lw_fin_tail(int node) {
   lw_stmts(l2_of_v);
   lw_ret(node);
 } return void;
+given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
 // The rest of lw_ret, once the entry block and the branch into the body are
 // in hand.
@@ -12,3 +14,16 @@ lw_ret_tail(int node, int lw_ent_v, int lw_brto_v) {
   string s2_of_v = s2_of(node);
   lw_ret_val(node, s2_of_v);
 } return void;
+given lw_func_fixture ((import g_fnnode), 0, 2):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode), 0, 2):() then init_units:(0)
+
+// bound_fixture plus a minimal "func" node ("g" returning int, no params,
+// one statement [decl_node], returning ev_node), for a case anywhere in
+// func/lower that needs a real function to lower.
+lw_func_fixture() {
+  bound_fixture();
+  int[] none = [];
+  export int g_fnnode = node_func("g", "int", none, [(import decl_node)], (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -3,15 +3,21 @@ lw_while_ex(int node, int hd, int bdy) {
   int ex = ir_block(lw_fn_v2, "exit");
   lw_while3(node, hd, bdy, ex);
 } return void;
+given loop_fixture ((import while_node), 0, 1):() then check_failed:(0)
+given nest_fixture ((import while_node), 0, 1):() then check_failed:(0)
 
 lw_while3(int node, int hd, int bdy, int ex) {
   lw_go(hd);
   lw_head(node, bdy, ex);
   int ret_i = lw_while_body(node, bdy, hd, ex);
 } return int ret_i;
+given loop_fixture ((import while_node), 0, 1, 4):(4)
+given nest_fixture ((import while_node), 0, 1, 4):(4)
 
 lw_while_body(int node, int bdy, int hd, int ex) {
   int[] l1_of_v = l1_of(node);
   lw_arm(bdy, l1_of_v, hd);
   int ret_i = lw_go(ex);
 } return int ret_i;
+given loop_fixture ((import while_node), 1, 4, 4):(4)
+given nest_fixture ((import while_node), 1, 4, 4):(4)

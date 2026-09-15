@@ -5,6 +5,8 @@ lw_ncmp(int node, string t) {
   int a = lw_as(i1_of_v, t);
   int ret_i = lw_ncmp_b(node, t, a);
 } return int ret_i;
+given str_fixture2 ((import cmp_node), "int"):(5)
+given str_fixture2 ((import cmp_node), "word"):(7)
 
 // libc's strcmp when there is a libc, and the runtime's own when there is not.
 // A freestanding module links nothing unprefixed, and an `id` function named
@@ -16,3 +18,15 @@ lw_strcmp() {
     s = "id_strcmp";
   }
 } return string s;
+given strcmp_fs0 ():("strcmp")
+given strcmp_fs1 ():("id_strcmp")
+
+// bound_fixture plus a "str" node and an "==" comparison of it with itself,
+// for a case anywhere in str/ that needs a real string expression.
+str_fixture() {
+  bound_fixture();
+  export int str_node = node_str("hi");
+  export int scmp_node = node_bin("==", (import str_node), (import str_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

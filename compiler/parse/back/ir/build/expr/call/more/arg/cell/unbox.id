@@ -1,4 +1,14 @@
 
+// id 15: "f2(int) return void { int y=3; }" -- a one-statement void
+// function, for lz_func/lz_ret's void-return cases.
+lz_j() {
+  lz_i();
+  export int lz_func2 = node_func("f2", "void", (import f_none), [(import lz_declid)], 0 - 1);
+  export int lz_edecl = node_decl("int", "z", (import lz_i1), 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 lw_unbox2(int v, string t) {
   int r = 0 - 1;
   if(t == "float") {

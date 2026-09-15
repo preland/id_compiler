@@ -1,0 +1,26 @@
+// Registering "edge_caller" the way build_reg (mid/names/symbols/build/) and
+// push_func (front/parse/decl/top/decl/decl_top.id) together would: its node
+// in fnames/fnodes/prog (a real call target, resolvable by name) and its file
+// and line in pfile/pline (../setup.id does the same for "fx_target").
+
+edge_fixture_caller_register() {
+  edge_fixture_caller_reg();
+  edge_fixture_caller_loc();
+} return void;
+given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then init_units:(0)
+
+edge_fixture_caller_reg() {
+  push((import fnames), "edge_caller");
+  push((import fnodes), (import edge_caller_fn));
+  push((import prog), (import edge_caller_fn));
+} return void;
+given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then init_units:(0)
+
+edge_fixture_caller_loc() {
+  push((import pfile), "fixture.id");
+  push((import pline), 20);
+} return void;
+given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then init_units:(0)

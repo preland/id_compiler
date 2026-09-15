@@ -2,10 +2,14 @@
 lw_fn() {
   int ret_i = (import lwfn)[0];
 } return int ret_i;
+given lw_fixture ():(0)
+given lw_fixture2 ():(1)
 
 lw_go(int b) {
   lset((import lwcur), 0, b);
 } return int b;
+given lw_fixture (99):(99) then chk_lwcur:(99)
+given lw_fixture2 (7):(7) then chk_lwcur:(7)
 
 // Two blocks, not one: the entry block holds nothing but allocas and the
 // branch into the body, so an alloca can be appended to it at any point in the
@@ -15,3 +19,5 @@ lw_open2(int f) {
   int ir_block_v = ir_block(f, "entry");
   lw_open2_tail(f, ir_block_v);
 } return void;
+given ir_rows (0):() then lw_fn:(0) then chk_last_blk_lbl:("body")
+given ir_rows_chk1 (1):() then lw_fn:(1) then chk_last_blk_lbl:("body")

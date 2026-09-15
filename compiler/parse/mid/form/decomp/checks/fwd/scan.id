@@ -13,6 +13,8 @@ check_fwd() {
     i = i + 1;
   }
 } return void;
+given farm_g ():() then calls fwd_check:[0]
+given farm_k ():() then calls fwd_check:[2]
 
 fwd_at(int i) {
   int fid = (import prog)[i];
@@ -20,6 +22,8 @@ fwd_at(int i) {
     fwd_check(i, fid);
   }
 } return void;
+given farm_k (0):() then calls fwd_check:(0, 6)
+given farm_j (1):() then calls fwd_check:[0]
 
 fwd_should(int fid) {
   int ok = 0;

@@ -13,6 +13,8 @@ fwd_used_as_value(string name) {
   string needle = "fv(" + name + ")";
   int found = fwd_used_scan(needle, 0);
 } return int found;
+given farm_k ("fwd1"):(0)
+given farm_k ("target"):(1)
 
 fwd_used_scan(string needle, int idx) {
   int total = len((import cfp));
@@ -22,6 +24,8 @@ fwd_used_scan(string needle, int idx) {
     idx = idx + 1;
   }
 } return int found;
+given farm_k ("fv(target)", 0):(1)
+given farm_k ("fv(nope)", 0):(0)
 
 fwd_used_step(string needle, int idx) {
   int hitpos = str_find((import cfp)[idx], needle);
@@ -30,3 +34,5 @@ fwd_used_step(string needle, int idx) {
     ok = 1;
   }
 } return int ok;
+given farm_k ("fv(target)", 2):(1)
+given farm_k ("fv(nope)", 2):(0)

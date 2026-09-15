@@ -3,11 +3,17 @@
 i1_of(int id) {
   int ret_i = (import ni1)[id];
 } return int ret_i;
+given mk_two_nodes (0):(1)
+given mk_two_nodes (1):(2)
 
 i2_of(int id) {
   int ret_i = (import ni2)[id];
 } return int ret_i;
+given mk_two_nodes (0):(0)
+given mk_two_nodes (1):(1)
 
 s1_of(int id) {
   string ret_s = (import ns1)[id];
 } return string ret_s;
+given mk_two_nodes (0):("if")
+given mk_two_nodes (1):("y")

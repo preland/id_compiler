@@ -1,7 +1,27 @@
-
 lw_loc_loop(int node) {
   if(k_of(node) == "while") {
     int[] l1_of_v = l1_of(node);
     lw_loc_list(l1_of_v);
   }
 } return void;
+given loop_fixture ((import while_node)):() then check_failed:(0)
+given bound_fixture ((import decl_node)):() then check_failed:(0)
+
+// bound_fixture (../../stmt/decl/bound.id) plus a "while" node (cond
+// ev_node, body [decl_node]), for a case on lw_loc_loop/lw_while and
+// friends that need a real loop to walk or lower.
+loop_fixture() {
+  bound_fixture();
+  export int while_node = node_while((import ev_node), [(import decl_node)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// loop_fixture plus an "if" node (cond ev_node, then [decl_node], no else).
+nest_fixture() {
+  loop_fixture();
+  int[] none = [];
+  export int if_node = node_if((import ev_node), [(import decl_node)], none, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

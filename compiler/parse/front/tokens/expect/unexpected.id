@@ -13,6 +13,8 @@ no_op_atom(int[] pos) {
     syn_err(pos, unexpected_msg_v);
   }
 } return void;
+given mk_two_toks ([0]):() then check_failed:(1) then prints:("<stdin>:1: error: unexpected token '='\n")
+given mk_two_toks ([1]):() then check_failed:(0)
 
 // The lexer folds a whole `/* ... */` into one `/*` token precisely so this
 // can say what the mistake actually was.
@@ -22,6 +24,8 @@ unexpected_msg(string t) {
     s = "block comments are not supported; use // for a line comment";
   }
 } return string s;
+("+"):("unexpected token '+'")
+("/*"):("block comments are not supported; use // for a line comment")
 
 // The tail of syn_err.id's syn_err -- that file is already full.
 syn_err_tail(string cur_file_v, int cur_ln_v, string msg) {
@@ -29,3 +33,5 @@ syn_err_tail(string cur_file_v, int cur_ln_v, string msg) {
   note_failure();
   lset((import synfail), 0, 1);
 } return void;
+given full_env ("f.id", 3, "bad"):() then prints:("f.id:3: error: bad\n") then check_failed:(1)
+given full_env ("g.id", 7, "oops"):() then prints:("g.id:7: error: oops\n") then check_failed:(1)

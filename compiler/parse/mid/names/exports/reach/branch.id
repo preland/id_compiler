@@ -1,5 +1,16 @@
 // The else side of an if, split from exp_branches so that block stays
 // within the action limit.
+// id 17: a param named "ret_i" -- the generated-name shape (is_genparam's
+// own cases confirm it) genname_check/genname_param's positive cases need,
+// that none of mid/form/decomp/checks/fwd/'s own nodes happen to have.
+gn_env() {
+  farm_i();
+  export int f_pgen = node_param("param", "int", "ret_i");
+  export int[] f_pgen_list = [(import f_pgen)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 exp_else(int id, string owner) {
   int[] l2_of_v = l2_of(id);
   exp_list(l2_of_v, owner);

@@ -1,5 +1,14 @@
 // One `@name = global` line, or nothing when pruning drops it
 // (dce/export/keep.id).
+// fix_fixture with fixd_std flipped to 1 (idstd naming), for fix_prefixed's
+// own second case.
+fix_env_std() {
+  fix_fixture();
+  lset((import fixd_std), 0, 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 ll_global_kept(int i) {
   if(keep_export(i) == 1) {
     string ty = ll_ty((import etypes)[i]);

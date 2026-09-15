@@ -7,6 +7,8 @@ ls3(int node) {
     ls4(node);
   }
 } return void;
+given decl_fixture2 ((import expr_node)):() then check_failed:(0)
+given nest_fixture ((import if_node)):() then check_failed:(0)
 
 ls4(int node) {
   if(k_of(node) == "iassign") {
@@ -15,6 +17,8 @@ ls4(int node) {
     ls5(node);
   }
 } return void;
+given nest_fixture ((import if_node)):() then check_failed:(0)
+given loop_fixture ((import while_node)):() then check_failed:(0)
 
 ls5(int node) {
   if(k_of(node) == "if") {
@@ -23,3 +27,5 @@ ls5(int node) {
     lw_while(node);
   }
 } return void;
+given nest_fixture ((import if_node)):() then check_failed:(0)
+given loop_fixture ((import while_node)):() then check_failed:(0)

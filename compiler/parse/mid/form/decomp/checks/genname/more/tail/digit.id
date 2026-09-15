@@ -2,6 +2,16 @@
 // out of tdig_start (../match.id) because a call may not be an argument to
 // another call.
 
+// id 4: "int ret = f_call;", a non-exported decl statement; id 5: the callee
+// "target(int a) return int", no body.
+farm_c() {
+  farm_b();
+  export int f_decl = node_decl("int", "ret", (import f_call), 0);
+  export int f_target = node_func("target", "int", [(import f_pa)], (import f_none), 0 - 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 tdig_step(string name, int dstart) {
   int ch = charat(name, dstart - 1);
   int ok = is_digit_c(ch);

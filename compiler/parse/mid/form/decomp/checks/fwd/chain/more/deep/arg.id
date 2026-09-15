@@ -6,6 +6,8 @@ fwd_arg_ok(int[] paramsl, int[] argsl, int idx) {
   int pid = paramsl[idx];
   int ok = fwd_arg_ok2(argid, pid);
 } return int ok;
+given farm_a ([0], [1], 0):(1)
+given farm_b ([0], [3], 0):(0)
 
 fwd_arg_ok2(int argid, int pid) {
   int ok = 0;
@@ -13,6 +15,8 @@ fwd_arg_ok2(int argid, int pid) {
     ok = 1;
   }
 } return int ok;
+given farm_a (1, 0):(1)
+given farm_b (3, 0):(0)
 
 // The callee's return type and parameter types must match `fid`'s
 // (./sig.id): a forwarder whose signature differs adapts, and does not warn
@@ -26,3 +30,5 @@ fwd_sig_match(int fid, string callee_name) {
     ok = fwd_sig_match2(fid, callee_fid);
   }
 } return int ok;
+given farm_e (6, "target"):(1)
+given farm_e (6, "nope"):(0)

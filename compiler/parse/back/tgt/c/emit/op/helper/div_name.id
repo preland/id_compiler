@@ -8,6 +8,8 @@ hop_dw(string op, string t) {
     h = "id_" + div_pfx(t) + div_sfx(op);
   }
 } return string h;
+("/", "word"):("id_sdiv")
+("%", "int"):("id_imod")
 
 div_pfx(string t) {
   string h = "i";
@@ -15,6 +17,8 @@ div_pfx(string t) {
     h = "s";
   }
 } return string h;
+("word"):("s")
+("int"):("i")
 
 div_sfx(string op) {
   string h = "mod";
@@ -22,3 +26,5 @@ div_sfx(string op) {
     h = "div";
   }
 } return string h;
+("/"):("div")
+("%"):("mod")
