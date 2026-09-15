@@ -7,7 +7,10 @@
 // init_idx() is here too: type_of (mid/types/type_of/dispatch/type_of.id)
 // reads the symbol index for any node whose kind is not "int" -- one call
 // here covers every case built on this fixture, instead of each one that
-// happens to touch a non-int node remembering it.
+// happens to touch a non-int node remembering it. init_rtc() likewise: a
+// string comparison's lowering asks is_freestanding() (lw_strcmp,
+// ../../expr/op/more/str/ncmp.id), which reads a cell only init_rtc()
+// exports.
 
 lw_fixture() {
   env_init();
@@ -28,6 +31,7 @@ given env_init ():() then init_units:(0)
 lw_fixture_open() {
   int f = ir_func((import lw_fixture_n), "t", "int");
   lw_open(f);
+  init_rtc();
 } return void;
 given env_init ():() then check_failed:(0)
 given env_init ():() then init_units:(0)
