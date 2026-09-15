@@ -11,3 +11,11 @@ ty_narrows(string want, string got) {
     ok = 1;
   }
 } return int ok;
+
+argfn_match_call() {
+  argfn_d();
+  int a = node_int("1", 1, 0);
+  export int argfn_call_match = node_call("g", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

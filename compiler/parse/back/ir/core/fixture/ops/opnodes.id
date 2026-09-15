@@ -1,0 +1,29 @@
+// Two more synthetic expr nodes for the atom/lit-style dispatch cases
+// (../../expr/atom/tail.id's le5/le6): a `un` node ("!1") and an `index`
+// node (two int literals standing in for base and index -- lw_index_base/
+// lw_index_idx only lower whatever node id is there, so a real list is not
+// needed to exercise the shape). Filed here rather than under expr/ because
+// every directory near expr/ is already at the 3-entry layout limit.
+
+lw_fix_un() {
+  lw_env_fixture();
+  int x = node_int("1", 1, 0);
+  export int fix_un_n = node_un("!", x);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lw_fix_index() {
+  lw_env_fixture();
+  int b = node_int("1", 1, 0);
+  lw_fix_index_tail(b);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lw_fix_index_tail(int b) {
+  int i = node_int("0", 0, 0);
+  export int fix_index_n = node_index(b, i);
+} return void;
+given lw_env_fixture (1):() then check_failed:(0)
+given lw_env_fixture (1):() then init_units:(0)

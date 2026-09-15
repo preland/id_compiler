@@ -16,3 +16,11 @@ type_of_float(int id) {
     t = "float";
   }
 } return string t;
+
+argfn_badtype_call() {
+  argfn_d();
+  int a = node_str("x");
+  export int argfn_call_badtype = node_call("g", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

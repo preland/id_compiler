@@ -6,6 +6,8 @@ emit_else(int id, string ind) {
   int[] l2_of_v = l2_of(id);
   emit_body_close(l2_of_v, ind);
 } return void;
+given stmt_fix (4, ""):() then prints:("} else {\n}\n")
+given stmt_fix (3, "  "):() then prints:("  } else {\n  }\n")
 
 // The closing lines a block shares with a while loop: the body, then the
 // brace. Shared rather than duplicated, since the two are identical once
@@ -14,3 +16,5 @@ emit_body_close(int[] l2_of_v, string ind) {
   emit_block(l2_of_v, ind + "    ");
   emit_line(ind + "}");
 } return void;
+given stmt_fix ([], ""):() then prints:("}\n")
+given stmt_fix ([], "  "):() then prints:("  }\n")

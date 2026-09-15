@@ -4,3 +4,19 @@ asm_sig_tail(int[] pos, int[] parse_params_v) {
   push((import afparams), parse_params_v);
   int ret_i = asm_lines(pos);
 } return int ret_i;
+
+// grp_note's two pushes, for its own cases -- it is void and ngrp/ngrpc are
+// imported lists, not arguments a case can read back.
+last_ngrp() {
+  int i = len((import ngrp)) - 1;
+  int ret_i = (import ngrp)[i];
+} return int ret_i;
+given mk_grp7 ():(7)
+given mk_grp9 ():(9)
+
+last_ngrpc() {
+  int i = len((import ngrpc)) - 1;
+  int ret_i = (import ngrpc)[i];
+} return int ret_i;
+given mk_grp7 ():(4)
+given mk_grp9 ():(1)

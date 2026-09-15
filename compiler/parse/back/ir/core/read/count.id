@@ -8,8 +8,12 @@ blk_count(int f) {
   int[] blks = irf_blk(f);
   int n = len(blks);
 } return int n;
+given ir_rows (0):(1)
+given ir_rows (1):(1)
 
 insn_count(int b) {
   int[] ins = blk_ins(b);
   int n = len(ins);
 } return int n;
+given ir_rows (0):(1)
+given ir_rows (1):(0)

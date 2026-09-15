@@ -1,0 +1,28 @@
+// State for dce.id's own cases: one registered function ("fx_target", via
+// ../../../../../mid/names/limits/shape/cases/given/then/more/fixture/fn.id's
+// fn_fixture) with "main" also in fnames, so dce_prune's own guard is true,
+// and the reachable set (rfn) seeded either with or without that function's
+// name (reach_seed, ../../../../../mid/names/limits/shape/cases/given/read/
+// reach.id) -- the two things dce_pack/dce_keep read.
+
+dce_fx_setup() {
+  fn_fixture();
+  push((import fnames), "main");
+  reach_seed("fx_target");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+dce_fx_setup_unreached() {
+  fn_fixture();
+  push((import fnames), "main");
+  reach_seed("nope");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+prog_len() {
+  int n = len((import prog));
+} return int n;
+given fn_fixture ():(1)
+given env_init ():(0)

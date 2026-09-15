@@ -3,12 +3,18 @@
 node_decl(string type, string name, int expr, int exported) {
   int ret_i = newleaf("decl", expr, exported, type, name);
 } return int ret_i;
+given full_env ("int", "x", 5, 0):(0) then calls newleaf:("decl", 5, 0, "int", "x")
+given full_env ("string", "y", 6, 1):(0) then calls newleaf:("decl", 6, 1, "string", "y")
 
 node_param(string kind, string type, string name) {
   int ret_i = newleaf(kind, 0, 0, type, name);
 } return int ret_i;
+given full_env ("param", "int", "a"):(0) then calls newleaf:("param", 0, 0, "int", "a")
+given full_env ("param", "string", "b"):(0) then calls newleaf:("param", 0, 0, "string", "b")
 
 node_call(string name, int[] args) {
   int[] none = [];
   int ret_i = newnode("call", 0, 0, name, "", args, none);
 } return int ret_i;
+given full_env ("f", [1, 2]):(0) then calls newnode:("call", 0, 0, "f", "", [1, 2], [])
+given full_env ("g", []):(0) then calls newnode:("call", 0, 0, "g", "", [], [])

@@ -7,6 +7,8 @@ arg_setup(int argc, string[] argv) {
   init_rtc();
   arg_flags(argc, argv);
 } return void;
+given env_init (1, ["prog"]):() then require_tests:(0)
+given env_init (2, ["prog", "--require-tests"]):() then require_tests:(1)
 
 // The build flags, set together: this block has the room that arg_setup's
 // does not.
@@ -14,3 +16,17 @@ arg_flags(int argc, string[] argv) {
   reqtests_init();
   arg_flags2(argc, argv);
 } return void;
+given flags_setup (1, ["prog"]):() then require_tests:(0)
+given flags_setup (2, ["prog", "--require-tests"]):() then require_tests:(1)
+
+// init_rtc() (mid/names/exports/extern/tab/table.id) and reqtests_init()
+// (mid/names/limits/shape/cases/more/flag/flag.id), both needed before a
+// case calls arg_flags/2/3/4 directly instead of through arg_setup, which
+// runs init_rtc() itself first.
+flags_setup() {
+  env_init();
+  init_rtc();
+  reqtests_init();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -29,3 +29,10 @@ arr_els(string want, int e) {
     i = arr_el_at(want, e, i);
   }
 } return int 0;
+
+neg1_setup() {
+  call2_setup();
+  export int neg1 = 0 - 1;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

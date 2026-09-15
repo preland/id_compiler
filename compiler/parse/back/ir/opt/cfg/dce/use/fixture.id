@@ -1,0 +1,23 @@
+// A synthetic "call"-like instruction (id 0) whose auxiliary values list is
+// non-empty, so dce_lists/dce_names/dce_refs have something to find a use
+// in. Deterministic in a fresh case process.
+
+dce_fixture() {
+  env_init();
+  int[] l = [5, 7];
+  int id0 = ir_insn("call", "int", 0 - 1, 0 - 1, "f", l, l);
+} return void;
+():() then chk_op0:("call")
+():() then chk_a0:(-1)
+
+chk_op0() {
+  string ret_s = ir_op(0);
+} return string ret_s;
+given dce_fixture ():("call")
+given dce_fixture ():("call") then chk_a0:(-1)
+
+chk_a0() {
+  int ret_i = ir_a(0);
+} return int ret_i;
+given dce_fixture ():(-1)
+given dce_fixture ():(-1) then chk_op0:("call")

@@ -1,0 +1,29 @@
+// A synthetic function with two blocks -- the entry (b0) holding one dead,
+// pure instruction (id0), and a second block (b1) with none -- for cases
+// across dce/pred/succ/mem2reg that need a real function's blocks and
+// instructions rather than bare ids. Deterministic in a fresh case process:
+// f=0, b0=0, b1=1, id0=0.
+
+cfg_fixture() {
+  env_init();
+  int f = ir_func(0, "f", "int");
+  cfg_fixture2(f);
+} return void;
+():() then chk_blk_count:(2)
+():() then chk_ins0_count:(1)
+
+cfg_fixture2(int f) {
+  int b0 = ir_block(f, "entry");
+  int b1 = ir_block(f, "next");
+  cfg_fixture3(b0);
+} return void;
+given cfg_fixture (0):() then chk_blk_count:(4)
+given cfg_fixture (0):() then chk_ins0_count:(1)
+
+cfg_fixture3(int b0) {
+  int[] none = [];
+  int id0 = ir_insn("add", "int", 0, 0, "", none, none);
+  ir_add(b0, id0);
+} return void;
+given cfg_fixture (0):() then chk_ins0_count:(2)
+given cfg_fixture (0):() then chk_blk_count:(2)

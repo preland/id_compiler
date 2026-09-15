@@ -5,6 +5,8 @@ fwd_sig_params_loop(int[] paramsl, int[] cparamsl, int idx) {
     idx = idx + 1;
   }
 } return int ok;
+given farm_a ([0], [0], 0):(1)
+given farm_g ([0], [11], 0):(0)
 
 // One parameter's type against the matching one of the callee's.
 fwd_param_ok(int[] paramsl, int[] cparamsl, int idx) {
@@ -12,6 +14,8 @@ fwd_param_ok(int[] paramsl, int[] cparamsl, int idx) {
   int cpid = cparamsl[idx];
   int ok = fwd_param_ok2(pid, cpid);
 } return int ok;
+given farm_a ([0], [0], 0):(1)
+given farm_g ([0], [11], 0):(0)
 
 fwd_param_ok2(int pid, int cpid) {
   int ok = 0;
@@ -19,3 +23,5 @@ fwd_param_ok2(int pid, int cpid) {
     ok = 1;
   }
 } return int ok;
+given farm_a (0, 0):(1)
+given farm_g (0, 11):(0)

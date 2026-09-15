@@ -5,9 +5,22 @@ lw_logic_seed(int node, int slot) {
   string lw_ini_v = lw_ini(s1_of_v);
   int ret_i = lw_logic_store(node, slot, lw_ini_v);
 } return int ret_i;
+given logic_fixture ((import and_node), 2):(15)
+given logic_fixture ((import or_node), 2):(15)
 
 lw_logic_store(int node, int slot, string ini) {
   int lw_const_v = lw_const("int", ini);
   lw_store_at(slot, lw_const_v);
   int ret_i = lw_logic2(node, slot);
 } return int ret_i;
+given logic_fixture ((import and_node), 2, "0"):(15)
+given logic_fixture ((import or_node), 2, "1"):(15)
+
+// strcmp_fs0 (../../str/more/num.id) with freestanding turned on, for the
+// other branch of lw_strcmp.
+strcmp_fs1() {
+  strcmp_fs0();
+  fs_set(1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

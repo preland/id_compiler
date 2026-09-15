@@ -13,15 +13,21 @@ init_sym() {
   init_sym_b();
   init_asm_all();
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 init_sym_a() {
   export string[] fnames = [];
   export string[] frets = [];
   export string[] enames = [];
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
 
 init_sym_b() {
   export string[] etypes = [];
   export string[] eowners = [];
   export int[] fnodes = [];
 } return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)

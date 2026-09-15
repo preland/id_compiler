@@ -1,9 +1,21 @@
 // Both types are integral, so the direction is the only question and the
 // registry's width column answers it. `id`'s integers are signed, so widening
 // is a sign extension.
+// id 10: a "var" leaf named "y" -- a func's `return` local, unconnected to
+// id 7's declaration of the same name.
+lz_g() {
+  lz_f();
+  export int[] lz_body1 = [(import lz_declid), (import lz_exprstmt)];
+  export int lz_retvar = node_var("y");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 lw_narrow(string t, string want) {
   string op = "sext";
   if(ty_width(t) > ty_width(want)) {
     op = "trunc";
   }
 } return string op;
+given env_init ("word", "int"):("trunc")
+given env_init ("int", "word"):("sext")

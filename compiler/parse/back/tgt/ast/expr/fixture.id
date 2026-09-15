@@ -1,0 +1,27 @@
+// A small synthetic expression tree for the printer's own cases: e0 = the
+// int literal 5, e1 = the var "x", e2 = (+ e0 e1), e3 = a call to "foo" with
+// e0 and e1 as arguments. Deterministic ids in a fresh case process.
+
+bin_fix() {
+  env_init();
+  int e0 = node_int("5", 5, 0);
+  bin_fix2(e0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+bin_fix2(int e0) {
+  int e1 = node_var("x");
+  int[] none = [];
+  int e2 = newnode("bin", e0, e1, "+", "", none, none);
+} return void;
+given bin_fix (0):() then check_failed:(0)
+given bin_fix (0):() then init_units:(0)
+
+call_fix() {
+  bin_fix();
+  int[] args = [0, 1];
+  int e3 = newnode("call", 0, 0, "foo", "", args, args);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

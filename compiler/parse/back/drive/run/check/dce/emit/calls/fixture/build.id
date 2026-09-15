@@ -1,0 +1,28 @@
+// The two nodes "edge_caller" needs: a zero-argument call to "fx_target"
+// (edge_call_node) and "fx_target" named as a value (edge_var_node) -- the
+// call and value edges ../../edges/ classifies. The node walk edges/walk.id
+// scans is a flat range over CREATION order, not `body`'s own l1/l2 child
+// lists, so a synthetic body only has to exist, not type-check.
+
+edge_fixture_caller_build() {
+  edge_fixture_caller_body();
+  edge_fixture_caller_node();
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
+edge_fixture_caller_body() {
+  export int edge_call_node = newleaf("call", 0, 0, "fx_target", "");
+  export int edge_var_node = node_var("fx_target");
+  export int[] edge_body = [(import edge_call_node), (import edge_var_node)];
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
+edge_fixture_caller_node() {
+  int zero_v = node_int("0", 0, 0);
+  int[] none = [];
+  export int edge_caller_fn = node_func("edge_caller", "int", none, (import edge_body), zero_v);
+} return void;
+given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then init_units:(0)

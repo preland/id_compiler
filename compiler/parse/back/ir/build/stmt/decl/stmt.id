@@ -10,6 +10,8 @@ lw_stmts(int[] stmts) {
     i = i + 1;
   }
 } return void;
+given bound_fixture ([1]):() then check_failed:(0)
+given bound_fixture ([]):() then check_failed:(0)
 
 lw_stmt(int node) {
   if(k_of(node) == "decl") {
@@ -18,6 +20,8 @@ lw_stmt(int node) {
     ls2(node);
   }
 } return void;
+given bound_fixture ((import decl_node)):() then check_failed:(0)
+given decl_fixture2 ((import expr_node)):() then check_failed:(0)
 
 // An exported declaration writes the global; a plain one writes its slot.
 // Both are a store, and lw_addr already knows which address to give.
@@ -30,3 +34,5 @@ lw_decl(int node) {
   int a = lw_addr(s2_of_v);
   lw_decl_tail(node, a);
 } return void;
+given bound_fixture ((import decl_node)):() then check_failed:(0)
+given gdecl_fixture ((import gdecl_node)):() then check_failed:(0)

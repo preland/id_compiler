@@ -7,12 +7,16 @@ lw_scmp(int node) {
   int a = lw_expr(i1_of_v);
   int ret_i = lw_scmp_b(node, a);
 } return int ret_i;
+given str_fixture ((import scmp_node)):(7)
+given str_fixture2 ((import scmp_node)):(7)
 
 lw_scmp2(int node, int c) {
   int lw_const_v = lw_const("int", "0");
   string s1_of_v = s1_of(node);
   int ret_i = lw_op("icmp", "bool", c, lw_const_v, s1_of_v);
 } return int ret_i;
+given str_fixture ((import scmp_node), 5):(4)
+given str_fixture2 ((import scmp_node), 5):(4)
 
 // String `+` builds a new string; each operand reaches it already converted to
 // string context.
@@ -21,3 +25,5 @@ lw_concat(int node) {
   int a = lw_tostr(i1_of_v);
   int ret_i = lw_concat_b(node, a);
 } return int ret_i;
+given str_fixture2 ((import concat_node)):(5) then check_failed:(0)
+given str_fixture2 ((import concat_node)):(5) then init_units:(0)

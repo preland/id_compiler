@@ -1,0 +1,28 @@
+// A two-function synthetic program for `--calls` (../../edges/, ../../cases.id):
+// fn_fixture's own "fx_target" (given/then/more/fixture/fn.id) as the callee,
+// and "edge_caller" here as a caller that both calls it and names it as a
+// value -- one of each edge kind `--calls` reports. fn_fixture registers
+// "fx_target" in fnames/fnodes/prog but not pfile/pline (its own cases never
+// need a location), so that is finished here rather than duplicated there.
+
+edge_fixture() {
+  fn_fixture();
+  edge_fixture_target_loc();
+  edge_fixture_caller();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+edge_fixture_target_loc() {
+  push((import pfile), "fixture.id");
+  push((import pline), 7);
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
+edge_fixture_caller() {
+  edge_fixture_caller_build();
+  edge_fixture_caller_register();
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)

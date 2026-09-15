@@ -1,6 +1,18 @@
 
 // The three lines of one asm function's body, once every piece of the
 // __asm__ statement has been assembled.
+// id 17: the int literal "5"; id 18: the int literal "9" -- two functions
+// built from these below differ only in which one they return, for the
+// loose-duplicate scan's (mid/form/decomp/checks/loose/scan/) own positive
+// case: same shape, different literal.
+lz_k() {
+  lz_j();
+  export int lz_r5 = node_int("5", 5, 0);
+  export int lz_r9 = node_int("9", 9, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 asm_stmt_lines(int r, string asm_text_v, string chr_v, string chr_v2, string asm_in_ops_v, string chr_v3, string chr_v4) {
   emit_line("    __asm__ __volatile__(" + asm_text_v + " : [" + (import afretn)[r] + "] " + chr_v + "=r" + chr_v2 + " (" + (import afretn)[r] + ") : " + asm_in_ops_v + " : " + chr_v3 + "memory" + chr_v4 + ");");
   emit_line("    return " + (import afretn)[r] + ";");

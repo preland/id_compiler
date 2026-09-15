@@ -1,3 +1,11 @@
+// id 15: "f_uvar;" as a bare exprstmt.
+farm_j3() {
+  farm_j2();
+  export int f_ustmt = node_exprstmt((import f_uvar));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 mod_types(int id, int a, int b) {
   string lt = type_of(a);
   string rt = type_of(b);

@@ -3,11 +3,17 @@
 node_bin(string op, int left, int right) {
   int ret_i = newleaf("bin", left, right, op, "");
 } return int ret_i;
+given full_env ("+", 1, 2):(0) then calls newleaf:("bin", 1, 2, "+", "")
+given full_env ("*", 3, 4):(0) then calls newleaf:("bin", 3, 4, "*", "")
 
 node_assign(string name, int expr) {
   int ret_i = newleaf("assign", expr, 0, name, "");
 } return int ret_i;
+given full_env ("x", 5):(0) then calls newleaf:("assign", 5, 0, "x", "")
+given full_env ("y", 6):(0) then calls newleaf:("assign", 6, 0, "y", "")
 
 node_exprstmt(int expr) {
   int ret_i = newleaf("exprstmt", expr, 0, "", "");
 } return int ret_i;
+given full_env (5):(0) then calls newleaf:("exprstmt", 5, 0, "", "")
+given full_env (6):(0) then calls newleaf:("exprstmt", 6, 0, "", "")

@@ -6,11 +6,15 @@ emit_while(int id, string ind) {
   string emit_expr_v = emit_expr(i1_of_v);
   emit_while_head(id, ind, emit_expr_v);
 } return void;
+given harn_fix (3, ""):() then calls emit_while_head:(3, "", "5")
+given harn_fix (3, "  "):() then calls emit_while_head:(3, "  ", "5")
 
 emit_while_head(int id, string ind, string emit_expr_v) {
   emit_line(ind + "while (" + emit_expr_v + ") {");
   emit_while_body(id, ind);
 } return void;
+given harn_fix (3, "", "5"):() then calls emit_while_body:(3, "")
+given harn_fix (3, "  ", "5"):() then calls emit_while_body:(3, "  ")
 
 // A loop iteration is one unit of `time` in the test harness; emit_count says
 // nothing outside it.
@@ -19,3 +23,5 @@ emit_while_body(int id, string ind) {
   int[] l1_of_v = l1_of(id);
   emit_body_close(l1_of_v, ind);
 } return void;
+given harn_fix (3, ""):() then calls emit_count:("    ") then calls emit_body_close:([], "")
+given harn_fix (3, "  "):() then calls emit_count:("      ") then calls emit_body_close:([], "  ")

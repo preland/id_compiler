@@ -40,6 +40,8 @@ dce_prune() {
     dce_pack(0, 0);
   }
 } return void;
+given dce_fx_setup ():() then prog_len:(1)
+given dce_fx_setup_unreached ():() then prog_len:(0)
 
 // Compact the program list over itself, keeping the reachable functions in
 // their original order, then drop the tail that is left over. `prog` is an
@@ -58,6 +60,8 @@ dce_pack(int i, int n) {
     pop((import prog));
   }
 } return int n;
+given dce_fx_setup (0, 0):(1)
+given dce_fx_setup_unreached (0, 0):(0)
 
 // Keep slot i by writing it at n, the next free slot. n only advances when
 // something was kept, which is what makes this a compaction rather than a copy.
@@ -68,3 +72,5 @@ dce_keep(int i, int n) {
     n = n + 1;
   }
 } return int n;
+given dce_fx_setup (0, 0):(1)
+given dce_fx_setup_unreached (0, 0):(0)

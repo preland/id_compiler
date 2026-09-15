@@ -9,9 +9,13 @@ check_program_tail() {
   chk_dead();
   check_program_tail2();
 } return void;
+given farm_g ():() then calls chk_dead:() then calls check_program_tail2:()
+given env_init ():() then calls chk_dead:() then calls check_program_tail2:()
 
 check_program_tail2() {
   check_genname();
   check_fwd();
   check_loose_dup();
 } return void;
+given farm_g ():() then calls check_genname:() then calls check_fwd:() then calls check_loose_dup:()
+given env_init ():() then calls check_genname:() then calls check_fwd:() then calls check_loose_dup:()

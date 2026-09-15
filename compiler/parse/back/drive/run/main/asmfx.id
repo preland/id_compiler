@@ -1,0 +1,29 @@
+// One asm row ("foo", returning "int", for the host triple), for
+// register_asm_syms' own cases (../../output_mode.id) and
+// push_asm_sym/push_sym_row's (../../check/emit_checked.id) -- filed here
+// rather than beside either because output_mode.id and check/
+// emit_checked.id are both already at the 3-function limit.
+
+asmfx_setup() {
+  env_init();
+  init_idx();
+  asmfx_push();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+asmfx_push() {
+  push((import afname), "foo");
+  push((import afret), "int");
+  push((import aftriple), "x86_64-unknown-linux-gnu");
+} return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
+
+// How many functions are registered -- a `then` check for the void
+// functions above, which otherwise leave no result to compare.
+asmfx_fn_count() {
+  int n = len((import fnames));
+} return int n;
+given env_init ():(0)
+given fn_fixture ():(1)

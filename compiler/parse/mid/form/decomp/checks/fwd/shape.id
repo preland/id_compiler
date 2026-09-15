@@ -9,11 +9,15 @@ fwd_check(int i, int fid) {
     fwd_stmt(i, fid, body[0]);
   }
 } return void;
+given farm_k (0, 6):() then calls fwd_stmt:(0, 6, 4)
+given farm_i (0, 5):() then calls fwd_stmt:[0]
 
 fwd_stmt(int i, int fid, int stmt) {
   int callid = fwd_stmt_id(fid, stmt);
   fwd_stmt_tail(i, fid, callid);
 } return void;
+given farm_k (0, 6, 4):() then calls fwd_verify:(0, 6, 2)
+given farm_i (0, 6, 7):() then calls fwd_verify:[0]
 
 // -1 unless `stmt` is a forwarding shape, in which case the call it forwards
 // to.
@@ -26,3 +30,5 @@ fwd_stmt_id(int fid, int stmt) {
     callid = i1_of(stmt);
   }
 } return int callid;
+given farm_i (6, 4):(2)
+given farm_i (6, 7):(-1)

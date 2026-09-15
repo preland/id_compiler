@@ -9,6 +9,8 @@ emit_block(int[] stmts, string ind) {
     i = i + 1;
   }
 } return void;
+given stmt_fix ([1, 2], ""):() then prints:("y = 5;\nz = 5;\n")
+given stmt_fix ([], ""):() then prints:("")
 
 emit_stmt(int id, string ind) {
   if(k_of(id) == "decl") {
@@ -19,9 +21,13 @@ emit_stmt(int id, string ind) {
     es2(id, ind);
   }
 } return void;
+given stmt_fix (1, ""):() then prints:("y = 5;\n")
+given stmt_fix (2, ""):() then prints:("z = 5;\n")
 
 // The tail of a decl statement, once its target name and initializer are known.
 emit_decl_line(string s2_of_v, int i1_of_v, string ind) {
   string emit_expr_v = emit_expr(i1_of_v);
   emit_line(ind + s2_of_v + " = " + emit_expr_v + ";");
 } return void;
+given stmt_fix ("y", 0, "  "):() then prints:("  y = 5;\n")
+given stmt_fix ("z", 0, ""):() then prints:("z = 5;\n")

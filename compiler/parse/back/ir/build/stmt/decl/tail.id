@@ -3,8 +3,23 @@ lw_decl_tail(int node, int a) {
   string s1_of_v = s1_of(node);
   lw_decl_tail2(a, i1_of_v, s1_of_v);
 } return void;
+given decl_fixture ((import decl_node), 0):() then check_failed:(0)
+given decl_fixture ((import decl_node), 1):() then check_failed:(0)
 
 lw_decl_tail2(int a, int i1_of_v, string s1_of_v) {
   int lw_as_v = lw_as(i1_of_v, s1_of_v);
   lw_store_at(a, lw_as_v);
 } return void;
+given decl_fixture (0, (import ev_node), "int"):() then check_failed:(0)
+given decl_fixture (2, (import ev_node), "word"):() then check_failed:(0)
+
+// ir_rows plus one non-exported "decl" node (type int, name "y", init 7)
+// and its initializer, for a case on lw_stmt/lw_decl/lw_decl_tail/
+// lw_loc_decl/lw_loc_one that needs a real declaration to walk.
+decl_fixture() {
+  ir_rows();
+  export int ev_node = node_int("7", 7, 0);
+  export int decl_node = node_decl("int", "y", (import ev_node), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

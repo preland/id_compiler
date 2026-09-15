@@ -7,3 +7,26 @@ setup_rest() {
   export int[] nparen = [];
   int ret_i = init_ir();
 } return int ret_i;
+given full_env ():(0) then check_failed:(0)
+given full_env ():(0) then init_units:(0)
+
+// The env a front/tokens or front/tree case needs beyond env_init's own
+// chain: env_init never reaches init_files (fseen/pfile, and its own tail's
+// tline/lnseen/cnode/cline), so cur_file() and the token loader both read an
+// uninitialised list without it.
+full_env() {
+  env_init();
+  init_files();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The column-packed value most recently pushed onto tspan, for set_span and
+// span_pad's own cases -- both are void and tspan is an imported list, not an
+// argument a case can read back.
+last_tspan() {
+  int i = len((import tspan)) - 1;
+  int ret_i = (import tspan)[i];
+} return int ret_i;
+given mk_span1 ():(5)
+given mk_span2 ():(9)

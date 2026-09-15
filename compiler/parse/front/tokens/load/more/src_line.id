@@ -6,9 +6,22 @@ src_line() {
     n = (import lnseen)[len((import lnseen)) - 1];
   }
 } return int n;
+given full_env ():(1)
+given mk_line9 ():(9)
 
 // The tail of push_tok.id's push_real -- that file is already full.
 push_line() {
   int src_line_v = src_line();
   push((import tline), src_line_v);
 } return void;
+given full_env ():() then last_tline:(1)
+given mk_line9 ():() then last_tline:(9)
+
+// The line most recently pushed onto tline, for push_line's own cases and
+// take_line/load_at's -- all three are void and tline is an imported list.
+last_tline() {
+  int i = len((import tline)) - 1;
+  int ret_i = (import tline)[i];
+} return int ret_i;
+given mk_two_toks ():(1)
+given mk_three_toks ():(1)

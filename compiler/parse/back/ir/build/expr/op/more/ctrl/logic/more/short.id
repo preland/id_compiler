@@ -4,12 +4,16 @@ lw_logic3(int node, int slot, int bdy, int jn) {
   lw_rhs(node, slot, bdy, jn);
   int ret_i = lw_load_at(slot, "int");
 } return int ret_i;
+given logic_fixture ((import and_node), 2, 0, 1):(13)
+given logic_fixture ((import or_node), 2, 1, 0):(13)
 
 lw_short(int node, int bdy, int jn) {
   int i1_of_v = i1_of(node);
   int c = lw_cond(i1_of_v);
   lw_short_term(node, c, bdy, jn);
 } return void;
+given logic_fixture ((import and_node), 0, 1):() then check_failed:(0)
+given logic_fixture ((import or_node), 1, 0):() then check_failed:(0)
 
 lw_arms(string op, int bdy, int jn) {
   int[] bl = [bdy, jn];
@@ -17,3 +21,5 @@ lw_arms(string op, int bdy, int jn) {
     bl = [jn, bdy];
   }
 } return int[] bl;
+given ir_rows ("&&", 0, 1):([0, 1])
+given ir_rows ("||", 0, 1):([1, 0])

@@ -8,6 +8,8 @@ slice(string src, int a, int b) {
     a = a + 1;
   }
 } return string out;
+("hello world", 0, 5):("hello")
+("hello world", 6, 11):("world")
 
 // A `line N` marker is not a token: it updates the current line and is
 // dropped, so the cursor and everything above it are unchanged, and every
@@ -22,9 +24,13 @@ push_tok(string kind, string text) {
     push_real(kind, text);
   }
 } return void;
+given full_env ("line", "7"):() then src_line:(7)
+given full_env ("kw", "if"):() then calls push_real:("kw", "if")
 
 push_real(string kind, string text) {
   push((import tkind), kind);
   push((import ttext), text);
   push_line();
 } return void;
+given full_env ("kw", "if"):() then last_tkind:("kw") then calls push_line:()
+given full_env ("ident", "x"):() then last_tkind:("ident") then calls push_line:()

@@ -11,3 +11,19 @@ type_arr(int id) {
     t = type_of(l1_of_v2[0]) + "[]";
   }
 } return string t;
+
+call2_setup() {
+  cm_setup();
+  init_rtc();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+call2_scalar_setup() {
+  cm_scalar_setup();
+  init_rtc();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

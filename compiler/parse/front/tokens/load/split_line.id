@@ -9,9 +9,24 @@ proc_line(string src, int i, int e) {
     push_tok(slice_v, slice_v2);
   }
 } return void;
+given full_env ("op =", 0, 4):() then last_tkind:("op")
+given full_env ("kw return", 0, 9):() then last_tkind:("kw")
 
 find_space(string src, int i, int e) {
   while(i < e && charat(src, i) != 32) {
     i = i + 1;
   }
 } return int i;
+("op =", 0, 4):(2)
+("abc def", 0, 7):(3)
+
+// Two real tokens -- "op =" then "kw return", both on the line src_line()
+// defaults to (1), since no "line N" marker was ever loaded -- for every
+// front/tokens case that needs a cursor over a small, known token stream.
+mk_two_toks() {
+  full_env();
+  push_real("op", "=");
+  push_real("kw", "return");
+} return void;
+():() then last_tkind:("kw")
+():() then check_failed:(0)

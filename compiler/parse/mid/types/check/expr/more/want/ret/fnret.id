@@ -1,6 +1,17 @@
 // A function value cannot be a function's return type (docs/SPEC.md 1.1). A
 // value handed back by a call has an origin its caller cannot see; one stored
 // in an export or passed down is chosen at the line that stores or passes it.
+// pline's matching entry (line 7), and id 12: "other(string b) return int" --
+// same return type as fwd1 but a mismatched parameter, for the signature
+// checks' negative cases.
+farm_i() {
+  farm_h();
+  push((import pline), 7);
+  export int f_other = node_func("other", "int", [(import f_pb)], (import f_none), 0 - 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 fn_ret_type(int id) {
   string rt = s2_of(id);
   if(ty_is_func(rt) == 1) {
@@ -12,14 +23,6 @@ fn_ret_type(int id) {
 argfn_d() {
   argfn_c();
   fidx_add("g");
-} return void;
-():() then check_failed:(0)
-():() then init_units:(0)
-
-argfn_badtype_call() {
-  argfn_d();
-  int a = node_str("x");
-  export int argfn_call_badtype = node_call("g", [a]);
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)

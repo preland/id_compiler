@@ -1,0 +1,32 @@
+// Two IR functions, each with a block and one instruction, distinct in
+// every field a core/read or core/store/edit case might read or rewrite:
+// fn 0 ("one"/"int", node -1) holds block 0 ("entry") with an "add"
+// instruction (operands 3, 4), added to its block; ../fn1.id's fn 1
+// ("two"/"string", node 7) holds block 1 ("body") with a "const"
+// instruction ("hi"), never added to a block, the way a literal never is.
+// chk_id (make/insn/row_fields.id and friends) starts at 0, so a chk_*
+// check reads fn 0's instruction until a case points it elsewhere.
+
+ir_rows() {
+  env_init();
+  int ret_i = init_ir();
+  ir_rows_fn0();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+ir_rows_fn0() {
+  int f0 = ir_func(0 - 1, "one", "int");
+  int b0 = ir_block(f0, "entry");
+  ir_rows_fn0_insn();
+} return void;
+given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then init_units:(0)
+
+ir_rows_fn0_insn() {
+  int v0 = ir_leaf("add", "int", 3, 4, "");
+  ir_add(0, v0);
+  ir_rows_fn1();
+} return void;
+given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then init_units:(0)

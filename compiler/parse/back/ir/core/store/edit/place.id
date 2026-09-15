@@ -9,12 +9,18 @@ ir_add(int b, int id) {
   push((import binsn)[b], id);
   lset((import ihome), id, b);
 } return void;
+given ir_rows_chk1 (1, 1):() then chk_home:(1)
+given ir_rows (1, 0):() then chk_home:(1)
 
 ir_kill(int id) {
   ir_set_op(id, "nop");
   ir_set_ty(id, "");
 } return void;
+given ir_rows (0):() then chk_op:("nop") then chk_ty:("")
+given ir_rows_chk1 (1):() then chk_op:("nop") then chk_ty:("")
 
 ir_set_op(int id, string op) {
   sset((import iop), id, op);
 } return void;
+given ir_rows (0, "mul"):() then chk_op:("mul")
+given ir_rows_chk1 (1, "xor"):() then chk_op:("xor")

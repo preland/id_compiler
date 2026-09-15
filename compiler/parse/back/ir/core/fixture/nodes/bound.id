@@ -1,0 +1,29 @@
+// lit.id's var node, but bound to a local slot (lw_bind) instead of left as
+// a bare export -- the other branch of lw_addr
+// (../../build/expr/atom/lit/more/addr.id), which reads an already-bound
+// name straight out of lwvar/lwslot instead of building a "global" leaf.
+
+lw_fix_bound() {
+  lw_fix_var();
+  lw_bind("x", 42);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// One instruction on the store, with operand B left at its usual -1 --
+// state for ir_last_b (fnref.id) to read back.
+ir_last_fix() {
+  lw_env_fixture();
+  int x = lw_tmp("int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The same, but with a real operand B (5), so ir_last_b's two cases pin
+// down both a leaf's usual -1 and a real value.
+ir_last_fix2() {
+  lw_env_fixture();
+  int x = lw_op("add", "int", 0, 5, "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

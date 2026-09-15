@@ -11,8 +11,22 @@ ee6(int id) {
     s = "id_" + s1_of(id);
   }
 } return string s;
+given un_fix (3):("(-6)")
+given arith_fix (0):("6")
 
 emit_un(int id) {
   int i1_of_v = i1_of(id);
   string ret_s = "(" + s1_of(id) + emit_expr(i1_of_v) + ")";
 } return string ret_s;
+given un_fix (3):("(-6)")
+given arith_fix (2):("(/6)")
+
+// A "-6" un node, reusing arith_fix's ai0 as the operand. Deterministic id:
+// un0=3.
+un_fix() {
+  arith_fix();
+  int[] none = [];
+  int un0 = newnode("un", 0, 0, "-", "", none, none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

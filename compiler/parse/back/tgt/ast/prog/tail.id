@@ -5,3 +5,23 @@ print_func_tail(int id, string s) {
   int[] l2_of_v = l2_of(id);
   string ret_s = s + " (body" + print_list(l2_of_v) + ")" + print_ret(id) + ")";
 } return string ret_s;
+given func_fix (7, "SIG"):("SIG (body (decl int y 5) (assign z 5)) (return 5))")
+given ret_void_fix (8, "SIG2"):("SIG2 (body (decl int y 5) (assign z 5)) (return void))")
+
+// A small synthetic statement tree: e0 = int literal 5, d0 = decl "int y" =
+// e0, a0 = assign "z" = e0. Deterministic ids: e0=0, d0=1, a0=2.
+stmt_fix() {
+  env_init();
+  int e0 = node_int("5", 5, 0);
+  stmt_fix2(e0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+stmt_fix2(int e0) {
+  int d0 = node_decl("int", "y", e0, 0);
+  int a0 = node_assign("z", e0);
+  stmt_fix3(e0);
+} return void;
+given stmt_fix (0):() then check_failed:(0)
+given stmt_fix (0):() then init_units:(0)
