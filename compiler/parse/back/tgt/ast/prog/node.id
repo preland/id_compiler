@@ -10,6 +10,8 @@ print_list(int[] list) {
     i = i + 1;
   }
 } return string out;
+given stmt_fix ([1, 2]):(" (decl int y 5) (assign z 5)")
+given stmt_fix ([]):("")
 
 print_node(int id) {
   string s = "(param " + s1_of(id) + " " + s2_of(id) + ")";
@@ -17,6 +19,8 @@ print_node(int id) {
     s = print_stmt(id);
   }
 } return string s;
+given stmt_fix (6):("(param int p)")
+given stmt_fix (1):("(decl int y 5)")
 
 print_stmt(int id) {
   string s = "";
@@ -27,3 +31,5 @@ print_stmt(int id) {
     s = ps2(id);
   }
 } return string s;
+given stmt_fix (1):("(decl int y 5)")
+given stmt_fix (2):("(assign z 5)")

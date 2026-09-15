@@ -7,14 +7,20 @@ print_program() {
     i = i + 1;
   }
 } return void;
+given func_fix ():() then prints:("(func f (params (param int p)) int (body (decl int y 5) (assign z 5)) (return 5))\n")
+given ret_void_fix ():() then prints:("(func f (params (param int p)) int (body (decl int y 5) (assign z 5)) (return 5))\n(func g (params (param int p)) void (body (decl int y 5) (assign z 5)) (return void))\n")
 
 show_func(int i) {
   string print_func_v = print_func((import prog)[i]);
   print(print_func_v);
 } return void;
+given func_fix (0):() then prints:("(func f (params (param int p)) int (body (decl int y 5) (assign z 5)) (return 5))\n")
+given ret_void_fix (1):() then prints:("(func g (params (param int p)) void (body (decl int y 5) (assign z 5)) (return void))\n")
 
 print_func(int id) {
   int[] l1_of_v = l1_of(id);
   string s = "(func " + s1_of(id) + " (params" + print_list(l1_of_v) + ") " + s2_of(id);
   string ret_s = print_func_tail(id, s);
 } return string ret_s;
+given func_fix (7):("(func f (params (param int p)) int (body (decl int y 5) (assign z 5)) (return 5))")
+given ret_void_fix (8):("(func g (params (param int p)) void (body (decl int y 5) (assign z 5)) (return void))")
