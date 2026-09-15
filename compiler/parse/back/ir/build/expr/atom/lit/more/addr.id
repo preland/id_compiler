@@ -4,3 +4,5 @@ lw_name_addr(int node) {
   string name = s1_of(node);
   int addr = lw_addr(name);
 } return int addr;
+given lw_fix_var ((import fix_var_n)):(0)
+given lw_fix_bound ((import fix_var_n)):(42)

@@ -7,12 +7,16 @@ lw_cond(int node) {
   int v = lw_expr(node);
   int ret_i = lw_truth(v, t);
 } return int ret_i;
+given bound_fixture ((import ev_node)):(5)
+given loop_fixture ((import ev_node)):(5)
 
 lw_truth(int v, string t) {
   string lw_zero_v = lw_zero(t);
   int z = ir_leaf("const", t, 0 - 1, 0 - 1, lw_zero_v);
   int ret_i = lw_truth_tail(v, t, z);
 } return int ret_i;
+given bound_fixture (2, "int"):(4)
+given bound_fixture (2, "float"):(4)
 
 lw_zero(string t) {
   string s = "0";
@@ -20,3 +24,5 @@ lw_zero(string t) {
     s = "0.0";
   }
 } return string s;
+given bound_fixture ("int"):("0")
+given bound_fixture ("float"):("0.0")

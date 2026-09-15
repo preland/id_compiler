@@ -4,6 +4,8 @@ lw_arith_lhs(int node, string t) {
   int i1_of_v = i1_of(node);
   int a = lw_as(i1_of_v, t);
 } return int a;
+given arith_fixture ((import bin_node), "int"):(3)
+given arith_fixture ((import bin_node), "word"):(4)
 
 // Continues lw_arith3: whether the operator is an instruction or a runtime
 // helper. The operator string is read once by the caller and passed in,
@@ -17,3 +19,16 @@ lw_arith3_op(int node, int a, int b, string t, string op) {
     v = lw_hcall(node, a, b, t);
   }
 } return int v;
+given arith_fixture ((import bin_node), 1, 2, "int", "+"):(3)
+given arith_fixture ((import div_node), 1, 2, "int", "/"):(3)
+
+// bound_fixture (../../../../../func/slot/map.id chain) plus a "bin" node
+// ("+", ev_node, ev_node) and a "/" variant, for a case on lw_arith_lhs/
+// lw_arith3_op/lw_hcall that needs a real binary-operator node.
+arith_fixture() {
+  bound_fixture();
+  export int bin_node = node_bin("+", (import ev_node), (import ev_node));
+  export int div_node = node_bin("/", (import ev_node), (import ev_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

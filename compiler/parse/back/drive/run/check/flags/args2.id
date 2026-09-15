@@ -6,15 +6,21 @@ arg_flags2(int argc, string[] argv) {
   reqtests_set(arg_reqtests_v);
   arg_flags3(argc, argv);
 } return void;
+given flags_setup (1, ["prog"]):() then require_tests:(0)
+given flags_setup (2, ["prog", "--require-tests"]):() then require_tests:(1)
 
 arg_flags3(int argc, string[] argv) {
   int arg_flag_v = arg_flag(argc, argv, 1, "--runtime");
   rt_set(arg_flag_v);
   arg_flags4(argc, argv);
 } return void;
+given flags_setup (1, ["prog"]):() then is_runtime:(0)
+given flags_setup (2, ["prog", "--runtime"]):() then is_runtime:(1)
 
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
   fs_set(arg_flag_v2);
   arg_flags5(argc, argv);
 } return void;
+given flags_setup (1, ["prog"]):() then is_freestanding:(0)
+given flags_setup (2, ["prog", "--freestanding"]):() then is_freestanding:(1)

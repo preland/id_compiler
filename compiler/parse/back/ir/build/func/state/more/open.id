@@ -4,3 +4,21 @@ lw_open2_tail(int f, int ir_block_v) {
   int ir_block_v2 = ir_block(f, "body");
   lset((import lwbody), 0, ir_block_v2);
 } return void;
+given ir_rows (0, 55):() then lw_ent:(55) then chk_last_blk_lbl:("body")
+given ir_rows_chk1 (1, 77):() then lw_ent:(77) then chk_last_blk_lbl:("body")
+
+// lw_fixture (lw_fixture.id) with two fake locals pushed directly, for a
+// case on lw_reset that needs something to clear.
+lw_fixture_vars() {
+  lw_fixture();
+  push((import lwvar), "x");
+  push((import lwslot), 9);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+chk_lwvar_len() {
+  int ret_i = len((import lwvar));
+} return int ret_i;
+given lw_fixture_vars ():(1)
+given lw_fixture ():(0)

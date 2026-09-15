@@ -40,3 +40,5 @@ arg_target(int argc, string[] argv, int i, string t) {
     s = arg_target(argc, argv, i + 1, t);
   }
 } return string s;
+(1, ["prog"], 1, "c"):("c")
+(3, ["prog", "--target", "llvm"], 1, "c"):("llvm")

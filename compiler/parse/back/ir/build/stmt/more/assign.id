@@ -6,12 +6,16 @@ ls2(int node) {
     ls3(node);
   }
 } return void;
+given bound_fixture ((import assign_node)):() then check_failed:(0)
+given decl_fixture2 ((import expr_node)):() then check_failed:(0)
 
 lw_assign(int node) {
   string s1_of_v = s1_of(node);
   int a = lw_addr(s1_of_v);
   lw_assign_tail(node, a);
 } return void;
+given bound_fixture ((import assign_node)):() then check_failed:(0)
+given gdecl_fixture ((import gassign_node)):() then check_failed:(0)
 
 // The declared type of an assignment's target: an export's if it is one, and
 // otherwise the slot's, which the alloca recorded.
@@ -22,3 +26,5 @@ lw_aty(string name) {
     t = ir_ty(lw_slot_v);
   }
 } return string t;
+given bound_fixture ("y"):("int")
+given gdecl_fixture ("g"):("int")
