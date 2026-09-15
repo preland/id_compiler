@@ -1,0 +1,9 @@
+// The afretn reader for decl/asm/'s cases (see
+// ../../../tree/node/newnode/fixture.id and ../../../tree/make/array/fixture.id
+// for the afret/afretn scenarios themselves).
+
+afretn_last() {
+  string s = (import afretn)[len((import afretn)) - 1];
+} return string s;
+given asm_reg_fix1b ():("result")
+given asm_reg_fix1d ():("r")

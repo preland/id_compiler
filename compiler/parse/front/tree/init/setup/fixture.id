@@ -1,0 +1,28 @@
+// A synthetic token stream for cases under decl/asm/ and decl/func/cases/:
+// env_init leaves tkind/ttext empty, and nothing else builds one by hand for
+// a case to walk with cur_kind/cur_text/advance (front/tokens/cursor.id).
+
+toks_push(string[] kinds, string[] texts) {
+  int i = 0;
+  while(i < len(kinds)) {
+    push((import tkind), kinds[i]);
+    push((import ttext), texts[i]);
+    i = i + 1;
+  }
+} return void;
+given env_init (["op"], ["{"]):() then tkind_len:(1)
+given env_init (["op", "str"], ["{", "\"a\""]):() then tkind_len:(2)
+
+tkind_len() {
+  int n = len((import tkind));
+} return int n;
+given env_init ():(0)
+given asm_fix_2str ():(4)
+
+// `{` "i1" "i2" `}` -- an asm body with two instruction lines.
+asm_fix_2str() {
+  env_init();
+  toks_push(["op", "str", "str", "op"], ["{", "\"i1\"", "\"i2\"", "}"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

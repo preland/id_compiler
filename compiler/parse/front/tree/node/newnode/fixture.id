@@ -1,0 +1,24 @@
+// Synthetic afret/afretn state (see ../../init/setup/fixture.id for the
+// token-stream half) for decl/asm/'s cases that push onto them.
+
+asm_reg_fix0() {
+  env_init();
+  init_asm();
+  init_asm2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+asm_reg_fix1() {
+  asm_reg_fix0();
+  push((import afret), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+asm_reg_fix1b() {
+  asm_reg_fix1();
+  push((import afretn), "result");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

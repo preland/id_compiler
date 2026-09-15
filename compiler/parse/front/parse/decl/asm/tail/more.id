@@ -7,13 +7,19 @@ asm_tail_mid(int[] pos, string rt) {
   string name = cur_text(pos);
   int ret_i = asm_tail_end(pos, name);
 } return int ret_i;
+given asm_fix_full ([4], "int"):(0) then afret_last:("int") then afretn_last:("result")
+given asm_fix_full2 ([5], "word"):(0) then afret_last:("word") then afretn_last:("r")
 
 asm_tail_end(int[] pos, string name) {
   push((import afretn), name);
   int ret_i = asm_fin(pos);
 } return int ret_i;
+given asm_fix_full ([4], "result"):(0) then afretn_last:("result")
+given asm_fix_full2 ([5], "r"):(0) then afretn_last:("r")
 
 init_asm_rest() {
   init_files();
   int ret_i = init_consts();
 } return int ret_i;
+given env_init ():(0) then check_failed:(0)
+given env_init ():(0) then init_units:(0)
