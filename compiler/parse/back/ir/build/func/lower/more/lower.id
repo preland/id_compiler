@@ -16,15 +16,21 @@ ir_lower() {
     i = i + 1;
   }
 } return void;
+given ir_rows ():() then check_failed:(0)
+given lw_func_fixture ():() then check_failed:(0)
 
 lw_func(int node) {
   string s1_of_v = s1_of(node);
   string s2_of_v = s2_of(node);
   lw_func_mid(node, s1_of_v, s2_of_v);
 } return void;
+given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
 lw_open(int f) {
   lw_reset();
   lw_open2(f);
   int ret_i = lw_go((import lwbody)[0]);
 } return int ret_i;
+given lw_func_fixture (0):(3)
+given lw_func_fixture (1):(3)
