@@ -573,7 +573,7 @@ dstd="$TMP/dstd"; mkdir -p "$dstd/io/tick" "$TMP/dhello" "$TMP/dcall"
 printf 'string name = "tick";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["mac.c"];\n' > "$dstd/io/tick/backend.id"
 printf 'int id_tick_now(void) { return 41; }\n' > "$dstd/io/tick/lin.c"
 printf 'int id_tick_now(void) { return 42; }\n' > "$dstd/io/tick/mac.c"
-printf 'native tick_now() return int;\n' > "$dstd/io/tick/tick.id"
+printf 'native tick_now() return int;\n' > "$dstd/io/tick/now.id"
 printf 'dstd_now() {\n  int t = tick_now();\n} return int t;\n' > "$dstd/io/now.id"
 dstd=$(cd "$dstd" && pwd -P)
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/dhello/main.id"
