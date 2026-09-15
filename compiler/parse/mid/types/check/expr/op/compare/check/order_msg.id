@@ -4,3 +4,11 @@ ord_report(int id, string lt, string rt) {
     tc_err(id, "cannot order " + lt + " and " + rt);
   }
 } return void;
+
+h_call_match() {
+  fcall_reg_b();
+  int a = node_int("1", 1, 0);
+  export int h_call_1 = node_call("h", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

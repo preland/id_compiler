@@ -5,3 +5,11 @@ mod_types(int id, int a, int b) {
     tc_err(id, "'%' requires int operands");
   }
 } return void;
+
+fcall_reg_b() {
+  fcall_reg_a();
+  push((import vunit), 0);
+  vidx_add("h");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

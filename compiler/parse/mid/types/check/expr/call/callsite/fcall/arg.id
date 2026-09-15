@@ -7,6 +7,8 @@ fcall_arg_at(int id, string vt, string[] pts, int i) {
   string t = type_of(a);
   fcall_arg_check(id, vt, pts[i], a, i, t);
 } return void;
+given h_call_match ((import h_call_1), "func(int) return int", ["int"], 0):() then check_failed:(0)
+given argfn_narrow_call ((import argfn_call_narrow), "func(int) return int", ["int"], 0):() then check_failed:(1)
 
 fcall_arg_check(int id, string vt, string pt, int a, int i, string t) {
   if(bad_store(pt, a) == 1) {
@@ -15,3 +17,13 @@ fcall_arg_check(int id, string vt, string pt, int a, int i, string t) {
     fcall_narrow_err(id, vt, pt, a, i, t);
   }
 } return void;
+given argfn_badtype_arg ((import argfn_fn), "func(int) return int", "int", (import argfn_arg_badtype), 0, "string"):() then calls fcall_arg_err:((import argfn_fn), "func(int) return int", "int", (import argfn_arg_badtype), 0, "string")
+given argfn_narrow_arg ((import argfn_fn), "func(int) return int", "int", (import argfn_arg_narrow), 0, "word"):() then calls fcall_narrow_err:((import argfn_fn), "func(int) return int", "int", (import argfn_arg_narrow), 0, "word")
+
+argfn_narrow_call() {
+  argfn_d();
+  int a = node_int("99999", 99999, 1);
+  export int argfn_call_narrow = node_call("g", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -6,13 +6,19 @@ fcall_arity_err(int id, string vt, string[] pts) {
   string msg = "'" + s1_of(id) + "' is a " + vt + ", which takes " + need + " argument(s), got " + flat_arg_count(id);
   tc_err(id, msg);
 } return void;
+given h_call_mismatch ((import h_call_0), "func(int) return int", ["int"]):() then check_failed:(1)
+given h_call_match ((import h_call_1), "func() return int", []):() then check_failed:(1)
 
 fcall_arg_err(int id, string vt, string pt, int a, int i, string t) {
   string msg = "argument " + i + " of '" + s1_of(id) + "' (a " + vt + ") expects " + pt + ", got " + t;
   tc_err(a, msg);
 } return void;
+given argfn_badtype_arg ((import argfn_fn), "func(int) return int", "int", (import argfn_arg_badtype), 0, "string"):() then check_failed:(1)
+given argfn_narrow_arg ((import argfn_fn), "func(int) return int", "int", (import argfn_arg_narrow), 0, "word"):() then check_failed:(1)
 
 fcall_narrow_err(int id, string vt, string pt, int a, int i, string t) {
   string msg = "argument " + i + " of '" + s1_of(id) + "' (a " + vt + ") narrows " + t + " to " + pt + "; declare a " + pt + " local and pass that";
   tc_err(a, msg);
 } return void;
+given argfn_narrow_arg ((import argfn_fn), "func(int) return int", "int", (import argfn_arg_narrow), 0, "word"):() then check_failed:(1)
+given argfn_badtype_arg ((import argfn_fn), "func(word) return int", "word", (import argfn_arg_badtype), 0, "string"):() then check_failed:(1)

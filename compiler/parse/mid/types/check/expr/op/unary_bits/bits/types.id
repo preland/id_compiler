@@ -5,3 +5,17 @@ bits_types(int id, int a, int b) {
     bits_err(id, lt, rt);
   }
 } return void;
+
+fcall_reg_a() {
+  call2_setup();
+  push((import vtypes), "func(int) return int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+neg1_setup() {
+  call2_setup();
+  export int neg1 = 0 - 1;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -8,3 +8,18 @@ fn_ret_type(int id) {
     tc_err(id, "'" + nm + "' returns " + rt + "; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it");
   }
 } return void;
+
+argfn_d() {
+  argfn_c();
+  fidx_add("g");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+argfn_badtype_call() {
+  argfn_d();
+  int a = node_str("x");
+  export int argfn_call_badtype = node_call("g", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

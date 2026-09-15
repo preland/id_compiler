@@ -9,3 +9,11 @@ ret_narrow_err_msg(int id, string t) {
   string s2_of_v = s2_of(id);
   string msg = "the return clause of '" + s1_of_v + "' narrows " + t + " to " + s2_of_v + "; declare a " + s2_of_v + " local, assign it, and return that";
 } return string msg;
+
+h_call_mismatch() {
+  fcall_reg_b();
+  int[] none = [];
+  export int h_call_0 = node_call("h", none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

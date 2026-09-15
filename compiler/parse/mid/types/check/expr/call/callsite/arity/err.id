@@ -3,9 +3,21 @@ arity_err(int id, int fn) {
   string msg = arity_err_msg(id, fn, name);
   tc_err(id, msg);
 } return void;
+given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls arity_err_msg:((import argfn_call_mismatch), (import argfn_fn), "g") then check_failed:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn)):() then calls arity_err_msg:((import argfn_fn), (import argfn_fn), "g") then check_failed:(1)
 
 arity_err_msg(int id, int fn, string name) {
   int need = flat_arg_count(fn);
   int have = flat_arg_count(id);
   string msg = "function '" + name + "' takes " + need + " argument(s), got " + have;
 } return string msg;
+given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn), "g"):("function 'g' takes 1 argument(s), got 0")
+given argfn_match_call ((import argfn_call_match), (import argfn_fn), "g"):("function 'g' takes 1 argument(s), got 1")
+
+argfn_mismatch_call() {
+  argfn_d();
+  int[] none = [];
+  export int argfn_call_mismatch = node_call("g", none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

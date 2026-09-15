@@ -12,3 +12,11 @@ want_push_ok(int i) {
   string type_of_v = type_of(l1_of_v[0]);
   int ok = want_elem_ok2(type_of_v);
 } return int ok;
+
+argfn_badtype_arg() {
+  argfn_d();
+  int a = node_str("x");
+  export int argfn_arg_badtype = a;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

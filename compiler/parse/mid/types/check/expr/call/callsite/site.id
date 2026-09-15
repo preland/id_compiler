@@ -13,6 +13,8 @@ chk_callsite(int id) {
   int fn = func_node(s1_of_v);
   chk_site_at(id, fn);
 } return void;
+given argfn_match_call ((import argfn_call_match)):() then calls chk_arity:((import argfn_call_match), (import argfn_fn))
+given h_call_match ((import h_call_1)):() then calls chk_fcall:((import h_call_1))
 
 // The func node behind a called name, or -1 when there is none to check
 // against: a builtin, or an asm function (its parameters live in the asm
@@ -25,6 +27,8 @@ func_node(string name) {
     n = (import fnodes)[idx];
   }
 } return int n;
+given argfn_d ("g"):((import argfn_fn))
+given neg1_setup ("push"):((import neg1))
 
 // A call to a function this program defines is checked against its node
 // (arity/); any other call may be through a variable of function type, which
@@ -36,3 +40,5 @@ chk_site_at(int id, int fn) {
     chk_fcall(id);
   }
 } return void;
+given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then calls chk_arity:((import argfn_call_match), (import argfn_fn))
+given neg1_setup ((import cm_push_call), (import neg1)):() then calls chk_fcall:((import cm_push_call))

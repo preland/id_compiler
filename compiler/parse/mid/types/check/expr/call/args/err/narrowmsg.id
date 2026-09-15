@@ -3,8 +3,19 @@ narrow_err_msg(int id, int fn, int i, string t) {
   string pt = param_type(fn, i);
   string msg = narrow_err_msg2(id, pname, pt, t);
 } return string msg;
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):("argument 'p' of 'g' narrows word to int; declare a int local and pass that")
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "float"):("argument 'p' of 'g' narrows float to int; declare a int local and pass that")
 
 narrow_err_msg2(int id, string pname, string pt, string t) {
   string callname = s1_of(id);
   string msg = "argument '" + pname + "' of '" + callname + "' narrows " + t + " to " + pt + "; declare a " + pt + " local and pass that";
 } return string msg;
+given argfn_d ((import argfn_fn), "p", "int", "word"):("argument 'p' of 'g' narrows word to int; declare a int local and pass that")
+given argfn_d ((import argfn_fn), "x", "string", "int"):("argument 'x' of 'g' narrows int to string; declare a string local and pass that")
+
+argfn_c() {
+  argfn_b();
+  push((import fnodes), (import argfn_fn));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

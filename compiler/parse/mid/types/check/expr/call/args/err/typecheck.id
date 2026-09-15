@@ -4,6 +4,8 @@ param_type(int fn, int i) {
   int[] ps = l1_of(fn);
   string t = s1_of(ps[i]);
 } return string t;
+given argfn_d ((import argfn_fn), 0):("int")
+given argfn_match_call ((import argfn_call_match), 0):("1")
 
 chk_arg_typecheck(int id, int fn, int i, int a) {
   string pt = param_type(fn, i);
@@ -15,6 +17,8 @@ chk_arg_typecheck(int id, int fn, int i, int a) {
     chk_narrow(id, fn, i, type_of_v2);
   }
 } return void;
+given argfn_badtype_arg ((import argfn_fn), (import argfn_fn), 0, (import argfn_arg_badtype)):() then calls arg_err:((import argfn_fn), (import argfn_fn), 0, "string")
+given argfn_narrow_arg ((import argfn_fn), (import argfn_fn), 0, (import argfn_arg_narrow)):() then calls chk_narrow:((import argfn_fn), (import argfn_fn), 0, "word")
 
 // The parameter node holds its type in the first string field and its name in
 // the second, so the message can say which parameter, by name, rather than by
@@ -24,3 +28,5 @@ arg_err(int id, int fn, int i, string t) {
   string msg = arg_err_msg(id, fn, i, t);
   tc_err(argnode, msg);
 } return void;
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "string"):() then check_failed:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then calls arg_err_msg:((import argfn_fn), (import argfn_fn), 0, "word")
