@@ -7,6 +7,8 @@ le4(int node) {
     v = le5(node);
   }
 } return int v;
+given lw_fix_un ((import fix_un_n)):(3)
+given lw_fix_index ((import fix_index_n)):(3)
 
 le5(int node) {
   int v = 0 - 1;
@@ -16,6 +18,8 @@ le5(int node) {
     v = le6(node);
   }
 } return int v;
+given lw_fix_un ((import fix_un_n)):(3)
+given lw_fix_index ((import fix_index_n)):(3)
 
 le6(int node) {
   int v = 0 - 1;
@@ -25,3 +29,5 @@ le6(int node) {
     v = lw_arr(node);
   }
 } return int v;
+given lw_fix_index ((import fix_index_n)):(3)
+given lw_fix_var ((import fix_var_n)):(0)

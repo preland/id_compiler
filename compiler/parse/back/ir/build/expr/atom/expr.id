@@ -11,6 +11,8 @@ lw_expr(int node) {
     v = le2(node);
   }
 } return int v;
+given lw_fix_var ((import fix_var_n)):(1)
+given lw_fix_int ((import fix_int_n)):(0)
 
 le2(int node) {
   int v = 0 - 1;
@@ -20,6 +22,8 @@ le2(int node) {
     v = le3(node);
   }
 } return int v;
+given lw_fix_int ((import fix_int_n)):(0)
+given lw_fix_bin ((import fix_bin_n)):(2)
 
 le3(int node) {
   int v = 0 - 1;
@@ -29,3 +33,5 @@ le3(int node) {
     v = le4(node);
   }
 } return int v;
+given lw_fix_bin ((import fix_bin_n)):(2)
+given lw_fix_var ((import fix_var_n)):(0)

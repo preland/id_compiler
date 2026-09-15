@@ -4,9 +4,14 @@
 // real function's statements, built by hand so a case can call a lowerer
 // directly without parsing a program. lw_fixture_n is the func node itself,
 // exported so a case needing "the node under lowering" can read it back.
+// init_idx() is here too: type_of (mid/types/type_of/dispatch/type_of.id)
+// reads the symbol index for any node whose kind is not "int" -- one call
+// here covers every case built on this fixture, instead of each one that
+// happens to touch a non-int node remembering it.
 
 lw_fixture() {
   env_init();
+  init_idx();
   lw_fixture_node();
 } return void;
 ():() then check_failed:(0)

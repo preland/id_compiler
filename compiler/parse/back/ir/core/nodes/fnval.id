@@ -20,3 +20,14 @@ lw_fix_fnval_reg() {
 } return void;
 given lw_fix_fnval ():() then check_failed:(0)
 given lw_fix_fnval ():() then init_units:(0)
+
+// A `bin` node ("1 + 1"), for the atom/tail.id dispatch cases -- one operand
+// reused on both sides, since lw_bin only lowers each side and never needs
+// them to be distinct nodes.
+lw_fix_bin() {
+  lw_fixture();
+  int x = node_int("1", 1, 0);
+  export int fix_bin_n = node_bin("+", x, x);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
