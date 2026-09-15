@@ -17,12 +17,13 @@
 #   3. Only then write them as cases, under the function.
 #   4. `verify`; then `mutate` to see that a case fails when the logic is wrong.
 #
-# `mutate` changes the N-th candidate (default 1) in the function's body: a
-# comparison or arithmetic operator is flipped, or else an integer literal is
-# increased by one. It always restores the file, even when interrupted. A
-# mutation that no case notices is reported as SURVIVED; that means the cases
-# do not pin down that part of the function (or the mutation happened to be
-# equivalent -- try N=2).
+# `mutate` changes the N-th candidate (default 1) in the function's body,
+# counting operators first, then integer literals, then statements: an
+# operator is flipped, a literal is increased by one, a statement is deleted.
+# It always restores the file, even when interrupted. A mutation that no case
+# notices is reported as SURVIVED; that means the cases do not pin down that
+# part of the function (or the mutation happened to be equivalent -- try the
+# next N).
 set -u
 
 HERE=$(cd "$(dirname "$0")/.." && pwd)
@@ -38,8 +39,8 @@ fn_end() {
 
 build() {
     env -u IDC_NO_STD "$IDC" "$1" --allow-untested --emit-c "$WORK/out.c" >"$WORK/build.log" 2>&1
-    grep ': test failed' "$WORK/build.log"
-    grep -E ': error:' "$WORK/build.log" | head -20
+    grep -a ': test failed' "$WORK/build.log"
+    grep -aE ': error:' "$WORK/build.log" | head -20
 }
 
 cmd_list() {
@@ -109,17 +110,29 @@ NR <= s || NR >= e { print; next }
     }
     print out
 }
-END { if (!done) exit 3 }'
+END { if (!done) { print k + 0 > "/dev/stderr"; exit 3 } }'
 
 mutate_lit_awk='
 NR <= s || NR >= e { print; next }
 {
-    if (!done && match($0, /[^a-zA-Z0-9_"][0-9]+([^a-zA-Z0-9_]|$)/)) {
-        lit = substr($0, RSTART + 1, RLENGTH - 1); sub(/[^0-9].*$/, "", lit)
-        $0 = substr($0, 1, RSTART) (lit + 1) substr($0, RSTART + 1 + length(lit)); done = 1
+    rest = $0; pre = ""
+    while (!done && match(rest, /[^a-zA-Z0-9_"][0-9]+([^a-zA-Z0-9_]|$)/)) {
+        lit = substr(rest, RSTART + 1, RLENGTH - 1); sub(/[^0-9].*$/, "", lit)
+        k++
+        if (k == want) {
+            rest = substr(rest, 1, RSTART) (lit + 1) substr(rest, RSTART + 1 + length(lit)); done = 1
+        } else {
+            pre = pre substr(rest, 1, RSTART + length(lit)); rest = substr(rest, RSTART + 1 + length(lit))
+        }
     }
-    print
+    print pre rest
 }
+END { if (!done) { print k + 0 > "/dev/stderr"; exit 3 } }'
+
+mutate_stmt_awk='
+NR <= s || NR >= e { print; next }
+!done && /;[ \t]*$/ && !/^[ \t]*(if|while|else)/ { k++; if (k == want) { done = 1; next } }
+{ print }
 END { if (!done) exit 3 }'
 
 cmd_mutate() {
@@ -134,22 +147,29 @@ cmd_mutate() {
     local backup="$CW_BACKUP"
     cp "$file" "$backup"
     trap 'cp "$CW_BACKUP" "$CW_FILE"; rm -rf "$WORK"' EXIT INT TERM
-    if ! awk -v s="$line" -v e="$end" -v want="$want" "$mutate_awk" "$backup" >"$WORK/m.id"; then
-        awk -v s="$line" -v e="$end" "$mutate_lit_awk" "$backup" >"$WORK/m.id" \
-            || { cp "$backup" "$file"; die "$name: nothing to mutate (no operator or integer literal in its body)"; }
+    local rest="$want" found
+    if ! awk -v s="$line" -v e="$end" -v want="$rest" "$mutate_awk" "$backup" >"$WORK/m.id" 2>"$WORK/count"; then
+        found=$(cat "$WORK/count"); rest=$((rest - ${found:-0}))
+        if ! awk -v s="$line" -v e="$end" -v want="$rest" "$mutate_lit_awk" "$backup" >"$WORK/m.id" 2>"$WORK/count"; then
+            found=$(cat "$WORK/count"); rest=$((rest - ${found:-0}))
+            if ! awk -v s="$line" -v e="$end" -v want="$rest" "$mutate_stmt_awk" "$backup" >"$WORK/m.id" 2>/dev/null; then
+                cp "$backup" "$file"
+                die "$name: nothing to mutate at N=$want (fewer candidates: operators, then integer literals, then statements)"
+            fi
+        fi
     fi
     cp "$WORK/m.id" "$file"
     echo "-- mutation in $name:"
-    diff "$backup" "$file" | grep '^[<>]'
+    diff "$backup" "$file" | grep -a '^[<>]'
     out=$(build "$path")
     cp "$backup" "$file"
-    if echo "$out" | grep -q "test failed: $name("; then
+    if echo "$out" | grep -aq "test failed: $name("; then
         echo "casework: KILLED -- a case of $name failed:"
-        echo "$out" | grep "test failed: $name(" | head -3
-    elif echo "$out" | grep -q 'test failed'; then
+        echo "$out" | grep -a "test failed: $name(" | head -3
+    elif echo "$out" | grep -aq 'test failed'; then
         echo "casework: KILLED (indirectly) -- another function's case failed:"
-        echo "$out" | grep 'test failed' | head -3
-    elif echo "$out" | grep -q ': error:'; then
+        echo "$out" | grep -a 'test failed' | head -3
+    elif echo "$out" | grep -aq ': error:'; then
         echo "casework: INVALID -- the mutation did not compile; try N=$((want + 1))"
     else
         echo "casework: SURVIVED -- no case noticed; the cases do not pin this down (or try N=$((want + 1)))"
