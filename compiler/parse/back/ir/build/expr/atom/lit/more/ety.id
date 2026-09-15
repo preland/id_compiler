@@ -9,10 +9,14 @@ lw_ety(int node) {
     t = lw_vty(s1_of_v);
   }
 } return string t;
+given lw_fix_int ((import fix_int_n)):("int")
+given lw_fix_var ((import fix_var_n)):("int")
 
 lw_load_at(int addr, string ty) {
   int ret_i = lw_op("load", ty, addr, 0 - 1, "");
 } return int ret_i;
+given lw_fixture (0, "int"):(0) then ir_last_b:(0)
+given lw_fixture (5, "word"):(0)
 
 // An unnamed stack slot, for a value the source never named -- the result of a
 // short-circuiting `&&`, and nothing else so far.
@@ -21,3 +25,5 @@ lw_tmp(string ty) {
   int lw_ent_v = lw_ent();
   ir_add(lw_ent_v, v);
 } return int v;
+given lw_fixture ("int"):(0) then ir_last_b:(0)
+given lw_fixture ("word"):(0)

@@ -100,7 +100,7 @@ NR <= s || NR >= e { print; next }
     while (i <= n) {
         c = substr(line, i, 1)
         if (c == "\"") { q = !q; out = out c; i++; continue }
-        if (!q && !done && substr(line, i, 3) ~ /^ (==|!=|<=|>=|&&|\|\|) $/) {
+        if (!q && !done && substr(line, i, 4) ~ /^ (==|!=|<=|>=|&&|\|\|) $/) {
             k++; if (k == want) { out = out " " flip(substr(line, i + 1, 2)) " "; i += 4; done = 1; continue }
         }
         if (!q && !done && substr(line, i, 3) ~ /^ [<>+*-] $/) {

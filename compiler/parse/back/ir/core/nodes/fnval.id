@@ -1,0 +1,22 @@
+// A `var` node naming a function of the build ("fx_target"), registered
+// through the real indexed path (fidx_add, ../../../mid/names/symbols/
+// lookup/index/table/add.id) rather than a raw push, so fn_node_of finds it
+// and is_fn_value (../../../mid/types/registry/fn/node/value.id) says yes --
+// the branch lw_named (../../build/expr/atom/lit/more/fnref.id) takes to a
+// function's own name instead of to a variable read.
+
+lw_fix_fnval() {
+  lw_fixture();
+  init_idx();
+  lw_fix_fnval_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lw_fix_fnval_reg() {
+  fidx_add("fx_target");
+  push((import fnodes), (import lw_fixture_n));
+  export int fix_fnval_n = node_var("fx_target");
+} return void;
+given lw_fix_fnval ():() then check_failed:(0)
+given lw_fix_fnval ():() then init_units:(0)

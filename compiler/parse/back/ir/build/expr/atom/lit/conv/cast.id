@@ -7,6 +7,8 @@ lw_cast2(int v, string t, string want) {
     r = lw_op(lw_castop_v, want, v, 0 - 1, "");
   }
 } return int r;
+given env_init (7, "int", "string"):(7)
+given lw_fixture (99, "int", "word"):(0)
 
 lw_castop(string t, string want) {
   string op = "sitofp";
@@ -14,6 +16,8 @@ lw_castop(string t, string want) {
     op = lw_castop2(t, want);
   }
 } return string op;
+given env_init ("int", "float"):("sitofp")
+given env_init ("float", "int"):("fptosi")
 
 lw_castop2(string t, string want) {
   string op = "fptosi";
@@ -21,3 +25,5 @@ lw_castop2(string t, string want) {
     op = lw_narrow(t, want);
   }
 } return string op;
+given env_init ("int", "int"):("sext")
+given env_init ("float", "int"):("fptosi")
