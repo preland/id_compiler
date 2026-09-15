@@ -21,3 +21,5 @@ asm_comma(string out) {
     s = "";
   }
 } return string s;
+(""):("")
+("x"):(", ")

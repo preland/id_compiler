@@ -9,6 +9,8 @@ end_if(int id, string ind) {
     emit_line(ind + "}");
   }
 } return void;
+given stmt_fix (4, ""):() then prints:("}\n")
+given stmt_fix (4, "  "):() then prints:("  }\n")
 
 // An else arm holding exactly one if is an `else if`. idc.py emits those by
 // splicing the nested if's opening line onto this one, so the chain stays
@@ -22,6 +24,8 @@ else_arm(int id, string ind) {
     emit_else(id, ind);
   }
 } return void;
+given stmt_fix (4, ""):() then prints:("} else {\n}\n")
+given stmt_fix (3, "  "):() then prints:("  } else {\n  }\n")
 
 // The body of an if, with its opening text supplied by the caller so that the
 // `if (` and `} else if (` forms share one implementation.
@@ -30,3 +34,5 @@ emit_if_at(int id, string ind, string head) {
   string emit_expr_v = emit_expr(i1_of_v);
   emit_if_head(id, ind, head, emit_expr_v);
 } return void;
+given stmt_fix (4, "", "if ("):() then prints:("if (5) {\n}\n")
+given stmt_fix (3, "  ", "if ("):() then prints:("if (5) {\n  }\n")

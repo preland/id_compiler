@@ -6,6 +6,8 @@ hop_shift(string op) {
     h = "id_shl";
   }
 } return string h;
+("<<"):("id_shl")
+(">>"):("id_sar")
 
 // `>>` is the arithmetic shift; `ushr` is the logical one.
 hop_sar(string op) {
@@ -14,6 +16,8 @@ hop_sar(string op) {
     h = "id_sar";
   }
 } return string h;
+(">>"):("id_sar")
+("<<"):("")
 
 // `int` and `word` division both go through the checked helpers; float
 // division does not, because IEEE gives it an answer rather than a signal.
@@ -25,3 +29,5 @@ hop_div(int id) {
     h = hop_dw(s1_of_v, type_bin_v);
   }
 } return string h;
+given arith_fix (2):("id_idiv")
+given arith_fix (0):("")

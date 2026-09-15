@@ -1,4 +1,4 @@
-// Niladic readers of chk_id's instruction (../../../fixture/fn1.id), for
+// Niladic readers of chk_id's instruction (../../../../fixture/rows/fn1.id), for
 // `then` checks on a core/store/edit case: an edit function is void, so its
 // effect is only visible through a function that returns something.
 

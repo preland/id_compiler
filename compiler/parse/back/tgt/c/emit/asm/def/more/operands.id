@@ -16,6 +16,8 @@ asm_sep(int i) {
     s = " " + chr(34) + "\\n\\t" + chr(34) + " ";
   }
 } return string s;
+(0):("")
+(1):(" \"\\n\\t\" ")
 
 // Parameters become named input operands, register-allocated.
 asm_in_ops(int[] params) {
@@ -26,3 +28,5 @@ asm_in_ops(int[] params) {
     i = i + 1;
   }
 } return string out;
+given stmt_fix ([6]):("[p] \"r\" (p)")
+given stmt_fix ([]):("")

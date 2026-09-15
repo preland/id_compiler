@@ -6,6 +6,8 @@ hoist_loop(int id) {
     hoist_list(l1_of_v);
   }
 } return void;
+given tyc_fix (3):() then calls hoist_list:[1]
+given tyc_fix (4):() then calls hoist_list:[0]
 
 // The tail of hoist_decl: the C type is derived from the declared type only
 // once its export flag has already gated whether to emit at all.
@@ -13,3 +15,5 @@ hoist_decl_line(string s1_of_v, string s2_of_v) {
   string c_type_v = c_type(s1_of_v);
   emit_line("    " + c_type_v + " " + s2_of_v + ";");
 } return void;
+given tyc_fix ("int", "y"):() then prints:("    int y;\n")
+given tyc_fix ("int", "z"):() then prints:("    int z;\n")

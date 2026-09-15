@@ -5,8 +5,12 @@ emit_if_head(int id, string ind, string head, string emit_expr_v) {
   int[] l1_of_v = l1_of(id);
   emit_if_tail(id, ind, l1_of_v);
 } return void;
+given stmt_fix (4, "", "if (", "5"):() then prints:("if (5) {\n}\n")
+given stmt_fix (3, "  ", "if (", "5"):() then prints:("if (5) {\n  }\n")
 
 emit_if_tail(int id, string ind, int[] l1_of_v) {
   emit_block(l1_of_v, ind + "    ");
   end_if(id, ind);
 } return void;
+given stmt_fix (4, "", []):() then prints:("}\n")
+given stmt_fix (3, "  ", []):() then prints:("  }\n")
