@@ -8,3 +8,14 @@ harn_fix() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// func_fix plus init_tyc -- hoist_decl_line calls c_type, which reads the C
+// type-spelling table env_init's chain does not initialise either (same
+// undeclared-export risk as harn_fix, above). Builds on func_fix (which
+// includes stmt_fix) so f0/fv0 are available too.
+tyc_fix() {
+  func_fix();
+  init_tyc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
