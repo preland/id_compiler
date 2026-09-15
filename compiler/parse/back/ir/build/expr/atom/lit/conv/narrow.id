@@ -7,3 +7,5 @@ lw_narrow(string t, string want) {
     op = "trunc";
   }
 } return string op;
+given env_init ("word", "int"):("trunc")
+given env_init ("int", "word"):("sext")

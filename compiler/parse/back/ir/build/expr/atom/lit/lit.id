@@ -7,10 +7,14 @@ lw_lit(int node) {
   string s1_of_v = s1_of(node);
   int ret_i = lw_const(lw_ety_v, s1_of_v);
 } return int ret_i;
+given lw_fix_int ((import fix_int_n)):(0)
+given lw_fix_var ((import fix_var_n)):(0)
 
 lw_const(string ty, string s) {
   int ret_i = ir_leaf("const", ty, 0 - 1, 0 - 1, s);
 } return int ret_i;
+given lw_env_fixture ("int", "5"):(0) then ir_last_b:(0)
+given lw_env_fixture ("string", "hi"):(0)
 
 // Reading a name: the address, then a load from it.
 lw_name(int node) {
@@ -18,3 +22,5 @@ lw_name(int node) {
   string ety = lw_ety(node);
   int ret_i = lw_load_at(addr, ety);
 } return int ret_i;
+given lw_fix_var ((import fix_var_n)):(1)
+given lw_fix_bound ((import fix_var_n)):(0)
