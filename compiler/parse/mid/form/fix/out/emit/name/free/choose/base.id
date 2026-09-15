@@ -2,8 +2,12 @@ fix_choose(string stem, string t) {
   string bstem = fix_prefixed(stem);
   string name = fix_choose_base(bstem, "_v", t);
 } return string name;
+given fix_fixture ("foo", "int"):("foo_v")
+given fix_fixture ("bar", "string"):("bar_v")
 
 fix_choose_base(string bstem, string sfx, string t) {
   string name = fix_try(bstem, sfx, t);
   fix_take(name, t);
 } return string name;
+given fix_fixture ("foo", "_v", "int"):("foo_v")
+given fix_fixture ("bar", "_v", "string"):("bar_v")

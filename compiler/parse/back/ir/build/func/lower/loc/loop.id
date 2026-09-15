@@ -1,4 +1,12 @@
 
+// fix_fixture with "bar" already used, for fix_free_var's negative case.
+fix_env3() {
+  fix_fixture();
+  push((import fixd_used), "bar");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 lw_loc_loop(int node) {
   if(k_of(node) == "while") {
     int[] l1_of_v = l1_of(node);

@@ -8,3 +8,5 @@ fix_try(string bstem, string sfx, string t) {
     name = bstem + sfx + nn;
   }
 } return string name;
+given fix_fixture ("foo", "_v", "int"):("foo_v")
+given fix_env4 ("baz", "_v", "int"):("baz_v2")
