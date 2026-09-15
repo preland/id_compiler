@@ -7,6 +7,8 @@ if_body(int[] pos, int cond) {
   int elif = at_elif(pos);
   int ret_i = if_tail(pos, cond, thenl, elif);
 } return int ret_i;
+given stmt_tokens ([15], 100):(4)
+given stmt_tokens ([22], 200):(2)
 
 parse_else(int[] pos) {
   int[] elsel = [];
@@ -15,9 +17,13 @@ parse_else(int[] pos) {
     elsel = else_body(pos);
   }
 } return int[] elsel;
+given stmt_tokens ([21]):([1])
+given stmt_tokens ([28]):([])
 
 parse_while(int[] pos) {
   advance(pos);
   int cond = parse_paren(pos);
   int ret_i = parse_while_tail(pos, cond);
 } return int ret_i;
+given stmt_tokens ([28]):(7)
+given stmt_tokens ([9]):(5)

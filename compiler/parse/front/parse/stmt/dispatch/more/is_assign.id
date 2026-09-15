@@ -7,6 +7,8 @@ is_assign(int[] pos) {
     ok = 1;
   }
 } return int ok;
+given stmt_tokens ([16]):(1)
+given stmt_tokens ([9]):(0)
 
 cur2_text(int[] pos) {
   string s = "";
@@ -14,9 +16,13 @@ cur2_text(int[] pos) {
     s = (import ttext)[pos[0] + 1];
   }
 } return string s;
+given stmt_tokens ([16]):("=")
+given stmt_tokens ([42]):(";")
 
 skip_semi(int[] pos) {
   if(cur_text(pos) == ";") {
     advance(pos);
   }
 } return void;
+given stmt_tokens ([4]):([5])
+given stmt_tokens ([3]):([3])

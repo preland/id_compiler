@@ -6,9 +6,13 @@ parse_exprstmt(int[] pos) {
   skip_semi(pos);
   int ret_i = node_exprstmt(expr);
 } return int ret_i;
+given stmt_tokens ([42]):(1)
+given stmt_tokens ([11]):(3)
 
 parse_if(int[] pos) {
   advance(pos);
   int cond = parse_paren(pos);
   int ret_i = if_body(pos, cond);
 } return int ret_i;
+given stmt_tokens ([9]):(7)
+given stmt_tokens ([28]):(7)
