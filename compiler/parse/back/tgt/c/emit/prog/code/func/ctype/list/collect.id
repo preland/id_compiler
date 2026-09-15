@@ -9,11 +9,15 @@ emit_tc_helpers() {
   tc_collect();
   tc_emit_types();
 } return void;
+given wrap_fixture ():() then prints:("")
+given wrap_fixture ():() then calls emit_ty_protos:[1]
 
 tc_emit_types() {
   emit_ty_protos();
   emit_ty_bodies();
 } return void;
+given tctys_note_one_setup ():() then prints:("static int idtc_eq_int(IdList* a, IdList* b);\nstatic void idtc_show_int(IdList* a);\nstatic int idtc_eq_int(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!((int)(a->data[i]) == (int)(b->data[i]))) return 0;\n    return 1;\n}\nstatic void idtc_show_int(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+given tc_types_init ():() then prints:("")
 
 tc_collect() {
   int ci = 0;
@@ -23,3 +27,5 @@ tc_collect() {
   }
   tc_collect_thens();
 } return void;
+given wrap_fixture ():() then calls chk_type:((import fixture_fn), 0)
+given wrap_fixture ():() then calls chk_type:[1]

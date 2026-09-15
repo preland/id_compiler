@@ -17,6 +17,8 @@ c_type(string t) {
     ct = c_scalar(t);
   }
 } return string ct;
+given lc_env2 ("int[]"):("IdList*")
+given lc_env2 ("func(int) return int"):("__typeof__(int (*)(int))")
 
 // C can spell a pointer to a function only around a name -- `void (*f)(int)` --
 // and every declaration this emitter writes is a type followed by a name.
@@ -27,6 +29,8 @@ c_fn_type(string t) {
   string[] pts = fn_params(t);
   string ct = "__typeof__(" + c_type(rt) + " (*)(" + c_fn_params(pts) + "))";
 } return string ct;
+given lc_env2 ("func(int) return int"):("__typeof__(int (*)(int))")
+given lc_env2 ("func() return void"):("__typeof__(void (*)(void))")
 
 // A type with no registry row has no spelling either. It answers `int` for
 // the same reason the old chain ended there -- nothing upstream emits a type
@@ -39,3 +43,5 @@ c_scalar(string t) {
     ct = (import tyc)[r];
   }
 } return string ct;
+given lc_env2 ("int"):("int")
+given lc_env2 ("string"):("char*")
