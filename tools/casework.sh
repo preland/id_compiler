@@ -135,6 +135,15 @@ NR <= s || NR >= e { print; next }
 { print }
 END { if (!done) exit 3 }'
 
+restore_mutated() {
+    [ -n "${CW_FILE:-}" ] || return 0
+    if cmp -s "$CW_MUT" "$CW_FILE"; then
+        cp "$CW_BACKUP" "$CW_FILE"
+    else
+        echo "casework: $CW_FILE changed while the mutation was being built; it was NOT restored, so those edits are kept -- undo the mutation shown above by hand" >&2
+    fi
+}
+
 cmd_mutate() {
     local path="$1" loc="$2" want="${3:-1}" line end name out
     CW_FILE=${loc%:*}; line=${loc##*:}
@@ -146,7 +155,8 @@ cmd_mutate() {
     CW_BACKUP="$WORK/backup.id"
     local backup="$CW_BACKUP"
     cp "$file" "$backup"
-    trap 'cp "$CW_BACKUP" "$CW_FILE"; rm -rf "$WORK"' EXIT INT TERM
+    CW_MUT="$WORK/m.id"
+    trap 'restore_mutated; rm -rf "$WORK"' EXIT INT TERM
     local rest="$want" found
     if ! awk -v s="$line" -v e="$end" -v want="$rest" "$mutate_awk" "$backup" >"$WORK/m.id" 2>"$WORK/count"; then
         found=$(cat "$WORK/count"); rest=$((rest - ${found:-0}))
@@ -162,7 +172,8 @@ cmd_mutate() {
     echo "-- mutation in $name:"
     diff "$backup" "$file" | grep -a '^[<>]'
     out=$(build "$path")
-    cp "$backup" "$file"
+    restore_mutated
+    CW_FILE=""
     if echo "$out" | grep -aq "test failed: $name("; then
         echo "casework: KILLED -- a case of $name failed:"
         echo "$out" | grep -a "test failed: $name(" | head -3
