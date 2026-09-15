@@ -8,12 +8,16 @@ is_concat(int id) {
     ok = 1;
   }
 } return int ok;
+given composite_fixture ((import bin_concat)):(1)
+given composite_fixture ((import bin_plus)):(0)
 
 one_is_str(int id) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   int ok = is_str_pair(i1_of_v, i2_of_v);
 } return int ok;
+given composite_fixture ((import bin_concat)):(1)
+given composite_fixture ((import bin_plus)):(0)
 
 is_str_pair(int a, int b) {
   int ok = 0;
@@ -21,3 +25,5 @@ is_str_pair(int a, int b) {
     ok = 1;
   }
 } return int ok;
+given leaves_fixture ((import lit_str), (import lit_a)):(1)
+given leaves_fixture ((import lit_a), (import lit_b)):(0)

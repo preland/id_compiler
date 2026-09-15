@@ -1,0 +1,8 @@
+// An index into the string array, against shape/arr.id's int-typed index.
+// Self-contained (see arr.id's idx_build) so it works as a bare `given`.
+stridx_build() {
+  strarr_fixture();
+  export int idx_str = node_index((import arr_strs), (import lit_a));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

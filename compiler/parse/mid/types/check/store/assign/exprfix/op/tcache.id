@@ -1,0 +1,21 @@
+// A type cache pre-seeded at id 0 -- for tcache_has/tcache_set's own tests,
+// which observe the cache without going through type_of's own miss path.
+tcache_hit_fixture() {
+  env_init();
+  tcache_set(0, "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+tcache_hit_fixture2() {
+  env_init();
+  tcache_set(0, "string");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+tcache_read0() {
+  string t = (import tcache)[0];
+} return string t;
+given tcache_hit_fixture ():("int")
+given tcache_hit_fixture2 ():("string")

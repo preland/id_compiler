@@ -1,0 +1,26 @@
+// Binary and unary expression nodes built on exprfix/lit's leaves: an
+// arithmetic `+`, a predicate `&&`, a string concatenation `+`, and the two
+// unary operators.
+composite_fixture() {
+  leaves_fixture();
+  composite_build();
+  un_call_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+composite_build() {
+  export int bin_plus = node_bin("+", (import lit_a), (import lit_b));
+  export int bin_and = node_bin("&&", (import lit_a), (import lit_b));
+  export int bin_concat = node_bin("+", (import lit_str), (import lit_a));
+} return void;
+given leaves_fixture ():() then check_failed:(0)
+given leaves_fixture ():() then init_units:(0)
+
+un_call_build() {
+  export int un_neg = node_un("-", (import lit_a));
+  export int un_not = node_un("!", (import lit_a));
+  export int un_float = node_un("-", (import lit_float));
+} return void;
+given leaves_fixture ():() then check_failed:(0)
+given leaves_fixture ():() then init_units:(0)

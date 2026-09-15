@@ -1,0 +1,27 @@
+// A registered variable ("vi", type "int"), and the two node kinds that
+// name one, for is_nameref/type_of3 and friends.
+varleaf_fixture() {
+  varleaf_init();
+  varleaf_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+varleaf_build() {
+  add_var("vi", "int", 0);
+  export int var_vi = node_var("vi");
+  export int import_vi = node_import("vi");
+} return void;
+given varleaf_init ():() then check_failed:(0)
+given varleaf_init ():() then init_units:(0)
+
+// is_builtin (callee_var_type's own gate) reads bnames, which only
+// init_bnames exports -- needed transitively by anything that can reach a
+// "call" node's callee, not only the var/import fixtures here.
+varleaf_init() {
+  env_init();
+  init_idx();
+  init_bnames();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

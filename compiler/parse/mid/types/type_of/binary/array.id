@@ -11,3 +11,5 @@ type_arr(int id) {
     t = type_of(l1_of_v2[0]) + "[]";
   }
 } return string t;
+given shapes_fixture ((import arr_ints)):("int[]")
+given strarr_fixture ((import arr_strs)):("string[]")

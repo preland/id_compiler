@@ -1,0 +1,28 @@
+// Shared expression-node fixtures for mid/types (type_of/* and the store
+// checks below): two int literals, a string literal. Filed here because no
+// directory under type_of/ has room left (each is at the 3-entry cap).
+// varleaf_init (../var.id) is env_init()+init_idx(): type_of3 always calls
+// name_type first, even for a node that is not a name, so every node
+// needs the var index ready, not only var/import ones.
+leaves_fixture() {
+  varleaf_init();
+  leaves_build();
+  leaves_build2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+leaves_build() {
+  export int lit_a = node_int("2", 2, 0);
+  export int lit_b = node_int("5", 5, 0);
+  export int lit_str = node_str("hi");
+} return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
+
+leaves_build2() {
+  export int lit_word = node_int("99", 99, 1);
+  export int lit_float = node_float("1.5");
+} return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)

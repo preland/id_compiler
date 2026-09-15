@@ -7,3 +7,5 @@ is_pokefn(string name) {
     ok = 1;
   }
 } return int ok;
+("poke32"):(1)
+("peek32"):(0)
