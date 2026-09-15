@@ -7,6 +7,8 @@ is_nameref(int id) {
     ok = 1;
   }
 } return int ok;
+given varleaf_fixture ((import var_vi)):(1)
+given allfix ((import lit_a)):(0)
 
 // Extends the type_of dispatch chain (type_of2 -> here -> type_of3) with the
 // float-literal case.
@@ -16,3 +18,5 @@ type_of_float(int id) {
     t = "float";
   }
 } return string t;
+given leaves_fixture ((import lit_float)):("float")
+given allfix ((import lit_a)):("int")
