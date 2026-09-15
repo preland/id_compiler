@@ -7,6 +7,8 @@ lw_as(int node, string want) {
   int lw_expr_v = lw_expr(node);
   int ret_i = lw_conv(lw_expr_v, t, want);
 } return int ret_i;
+given lw_fix_int ((import fix_int_n), "int"):(0)
+given lw_fix_int ((import fix_int_n), "word"):(1)
 
 lw_conv(int v, string t, string want) {
   int r = v;
@@ -14,6 +16,8 @@ lw_conv(int v, string t, string want) {
     r = lw_cast(v, t, want);
   }
 } return int r;
+(5, "string", "string"):(5)
+given lw_env_fixture (0, "int", "word"):(0)
 
 // `bool` is the IR's own type -- the i1 a comparison produces. It never
 // appears in `id` source and only ever widens.
@@ -25,3 +29,5 @@ lw_cast(int v, string t, string want) {
     r = lw_cast2(v, t, want);
   }
 } return int r;
+given lw_env_fixture (42, "bool", "int"):(0) then ir_last_b:(0)
+given lw_env_fixture (42, "string", "int"):(42)
