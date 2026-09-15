@@ -10,3 +10,5 @@ arg_flag(int argc, string[] argv, int i, string name) {
     r = arg_flag(argc, argv, i + 1, name);
   }
 } return int r;
+(2, ["a", "--x"], 0, "--x"):(1)
+(2, ["a", "b"], 0, "--x"):(0)
