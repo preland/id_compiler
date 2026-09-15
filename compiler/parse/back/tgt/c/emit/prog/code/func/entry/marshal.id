@@ -5,12 +5,16 @@ emit_marshal(int m) {
     print_marshal();
   }
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("    IdList* id_args = id_list_new();\n    for (int i = 0; i < argc; i++)\n        id_list_push(id_args, (long long)(intptr_t)argv[i]);\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("")
 
 print_marshal() {
   emit_line("    IdList* id_args = id_list_new();");
   emit_line("    for (int i = 0; i < argc; i++)");
   emit_line("        id_list_push(id_args, (long long)(intptr_t)argv[i]);");
 } return void;
+given nz_env ():() then prints:("    IdList* id_args = id_list_new();\n    for (int i = 0; i < argc; i++)\n        id_list_push(id_args, (long long)(intptr_t)argv[i]);\n")
+given iassign_fixture_env ():() then prints:("    IdList* id_args = id_list_new();\n    for (int i = 0; i < argc; i++)\n        id_list_push(id_args, (long long)(intptr_t)argv[i]);\n")
 
 has_args(int m) {
   int ok = 0;
@@ -19,3 +23,5 @@ has_args(int m) {
     ok = 1;
   }
 } return int ok;
+given nz_prog_fixture ((import nz_mainfn)):(1)
+given nz_prog_fixture ((import nz_plainfn)):(0)
