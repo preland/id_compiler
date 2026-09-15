@@ -687,14 +687,15 @@ elif IDC_CACHE_DIR="$TMP/bootcache" "$BOOTROOT/bin/idc" --std "$STD_REAL" --allo
 else
     bad "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable: $(head -2 "$TMP/boot.err" | tr '\n' ' ')"
 fi
-# That cold build re-entered bin/idc twice to build the compiler's stages, each
-# with --allow-untested. The deprecation warning belongs to the build that
-# asked, so it is printed once, not once per stage.
+# That cold build re-entered bin/idc twice to build the compiler's stages,
+# each with --allow-untested. id has no warnings, so none of those builds
+# says anything about it.
 if [ -n "$STD_REAL" ]; then
-    n_warn=$(grep -cF -- "--allow-untested is deprecated" "$TMP/boot.err")
-    [ "$n_warn" = 1 ] \
-        && ok "a cold bootstrap prints the --allow-untested warning once" \
-        || bad "a cold bootstrap prints the --allow-untested warning once (printed $n_warn times)"
+    if ! grep -qF -- "--allow-untested" "$TMP/boot.err"; then
+        ok "a cold bootstrap says nothing about --allow-untested"
+    else
+        bad "a cold bootstrap says nothing about --allow-untested (boot.err: $(tr '\n' '|' < "$TMP/boot.err"))"
+    fi
 fi
 
 # -- expression compilation is linear, not exponential ----------------------
