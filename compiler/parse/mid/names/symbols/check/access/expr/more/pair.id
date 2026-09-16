@@ -4,6 +4,13 @@ acc_pair2(int id, string owner, int ln) {
   acc_expr(i2_of_v, owner, ln);
 } return void;
 
+pushfix() {
+  call2_setup();
+  init_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 regrow_b() {
   regrow_a();
   push((import dvline), 10);

@@ -19,3 +19,10 @@ fret_at(int idx) {
 } return string t;
 given argfn_d (0):("int")
 given neg1_setup ((import neg1)):("")
+
+loopfix() {
+  whilefix();
+  check_access();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

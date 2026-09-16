@@ -7,6 +7,8 @@ scope_func(int id) {
   int[] l1_of_v = l1_of(id);
   scope_params(l1_of_v);
 } return void;
+given fnscope_fix ((import regrow_fn_node)):() then calls scope_params:((import regrow_plist))
+given scnames_fix ((import rgif_node)):() then check_failed:(0)
 
 scope_params(int[] params) {
   int i = 0;
@@ -16,6 +18,8 @@ scope_params(int[] params) {
     i = i + 1;
   }
 } return void;
+given fnscope_fix ((import regrow_plist)):() then check_failed:(0)
+given scnames_fix ([]):() then check_failed:(0)
 
 // Called after the statement's expression was walked, so `int n = n + 1;`
 // reads n before it exists.
@@ -25,3 +29,5 @@ scope_add(int id) {
     push((import scnames), s2_of_v);
   }
 } return void;
+given scnames_fix ((import rgdecl_node)):() then check_failed:(0)
+given scnames_fix ((import rgif_node)):() then check_failed:(0)

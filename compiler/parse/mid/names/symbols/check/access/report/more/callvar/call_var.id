@@ -23,9 +23,13 @@ is_unknown_fn(string name) {
     ok = 1;
   }
 } return int ok;
+given env_init ("nope"):(1)
+given env_init ("push"):(0)
 
 report_call_var(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   print(loc_at_v + "'" + name + "' is a variable, not a function");
   note_failure();
 } return void;
+given regrow_d ("z", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)

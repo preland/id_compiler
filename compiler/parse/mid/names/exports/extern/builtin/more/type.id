@@ -10,3 +10,10 @@ push_bname(string src, int i, int e) {
   string slice_v = slice(src, i, e);
   push((import bnames), slice_v);
 } return void;
+
+xvarfix() {
+  regrow_d();
+  export int xvar_node = node_var("x");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

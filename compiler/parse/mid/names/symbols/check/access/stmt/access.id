@@ -12,12 +12,16 @@ check_access() {
     i = i + 1;
   }
 } return void;
+given regrow_d ():() then check_failed:(0)
+given regrow_prog ():() then calls acc_func:((import regrow_fn_node))
 
 acc_func(int id) {
   int[] l2_of_v = l2_of(id);
   string s1_of_v = s1_of(id);
   acc_func_body(l2_of_v, s1_of_v, id);
 } return void;
+given fnscope_fix ((import regrow_fn_node)):() then calls acc_func_body:((import regrow_plist), "g2", (import regrow_fn_node))
+given fnscope_fix ((import regrow_fn_node)):() then check_failed:(0)
 
 // The return clause is not a statement of the body, so the body walk never
 // reaches it -- but it is an expression the function evaluates, and idc.py
@@ -36,3 +40,5 @@ acc_ret(int id) {
     acc_expr(i1_of_v, s1_of_v, (import nline)[i1_of_v]);
   }
 } return void;
+given fnscope_fix ((import regrow_fn_node)):() then check_failed:(0)
+given scnames_fix ((import rgif_node)):() then check_failed:(0)
