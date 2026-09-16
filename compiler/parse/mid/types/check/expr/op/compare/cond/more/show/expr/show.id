@@ -9,6 +9,8 @@ show_expr(int id) {
     out = s1_of(id);
   }
 } return string out;
+given leaves_fixture ((import lit_a)):("2")
+given shapes_fixture ((import call_len)):("len(hi)")
 
 show_more(int id) {
   string out = show_rest(id);
@@ -19,6 +21,8 @@ show_more(int id) {
     out = "(import " + s1_of(id) + ")";
   }
 } return string out;
+given cmp_fixture ((import bin_eq)):("2 == 5")
+given varleaf_fixture ((import import_vi)):("(import vi)")
 
 show_rest(int id) {
   string out = show_list(id);
@@ -32,3 +36,5 @@ show_rest(int id) {
     out = show_side(i1_of_v2) + "[" + show_expr(i2_of_v) + "]";
   }
 } return string out;
+given composite_fixture ((import un_neg)):("-2")
+given idx_build ((import idx_fix)):("[2, 5][2]")

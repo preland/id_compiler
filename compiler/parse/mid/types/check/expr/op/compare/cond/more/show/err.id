@@ -7,14 +7,20 @@ mixed_err(int id, int c) {
   string want = mixed_fix(id);
   mixed_say(id, words, want);
 } return void;
+given cmp_fixture ((import bin_mixed), (import bin_bitand)):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '&' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2'\n")
+given cmp_fixture ((import bin_mixed), (import lit_a)):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '2' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2'\n")
 
 mixed_say(int id, string words, string want) {
   string was = show_bin(id);
   tc_err(id, "'" + was + "' mixes " + words + "; parenthesize it as the current precedence reads it: '" + want + "'");
 } return void;
+given cmp_fixture ((import bin_mixed), "a bitwise '&' with a comparison '<'", "(2 & 5) < 2"):() then prints:("<stdin>:1: error: '2 & 5 < 2' mixes a bitwise '&' with a comparison '<'; parenthesize it as the current precedence reads it: '(2 & 5) < 2'\n")
+given cmp_fixture ((import bin_eq), "words", "want"):() then prints:("<stdin>:1: error: '2 == 5' mixes words; parenthesize it as the current precedence reads it: 'want'\n")
 
 mixed_fix(int id) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   string ret_s = fix_side(id, i1_of_v) + " " + s1_of(id) + " " + fix_side(id, i2_of_v);
 } return string ret_s;
+given cmp_fixture ((import bin_mixed)):("(2 & 5) < 2")
+given cmp_fixture ((import bin_eq)):("2 == 5")

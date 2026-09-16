@@ -6,12 +6,16 @@ fix_side(int id, int c) {
     out = "(" + out + ")";
   }
 } return string out;
+given cmp_fixture ((import bin_mixed), (import bin_bitand)):("(2 & 5)")
+given cmp_fixture ((import bin_mixed), (import lit_a)):("2")
 
 mixed_words(int id, int c) {
   string po = s1_of(id);
   string co = s1_of(c);
   string ret_s = bit_cmp_words(po, co);
 } return string ret_s;
+given cmp_fixture ((import bin_mixed), (import bin_bitand)):("a bitwise '&' with a comparison '<'")
+given cmp_fixture ((import bin_bitand), (import bin_mixed)):("a bitwise '&' with a comparison '<'")
 
 // The bitwise operator is named first whichever of the two is the operand.
 bit_cmp_words(string po, string co) {
@@ -20,3 +24,5 @@ bit_cmp_words(string po, string co) {
     out = "a bitwise '" + po + "' with a comparison '" + co + "'";
   }
 } return string out;
+("<", "&"):("a bitwise '&' with a comparison '<'")
+("&", "<"):("a bitwise '&' with a comparison '<'")
