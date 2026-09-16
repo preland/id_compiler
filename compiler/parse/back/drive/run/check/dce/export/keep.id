@@ -14,3 +14,6 @@ keep_export(int i) {
     ok = is_reach((import eowners)[i]);
   }
 } return int ok;
+given keep_export_fixture_harn_on (0):(1)
+given keep_export_fixture_reg (0):(0)
+given keep_export_fixture_reg (1):(1)

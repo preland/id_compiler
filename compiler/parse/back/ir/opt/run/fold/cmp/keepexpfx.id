@@ -1,0 +1,19 @@
+// keep_export_fixture (../../../cfg/dce/use/keepexpfx.id) plus is_harn()
+// forced true, for keep_export's own short-circuit case.
+
+keep_export_fixture_harn_on() {
+  keep_export_fixture();
+  harn_set(1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The rest of keep_export_fixture_reg's chain: main reachable and two
+// exported names, one unreached, one reached.
+keep_export_fixture_tail() {
+  init_reach();
+  push((import eowners), "nat_target");
+  push((import eowners), "main");
+} return void;
+given keep_export_fixture_reg ():() then check_failed:(0)
+given keep_export_fixture_reg ():() then init_units:(0)
