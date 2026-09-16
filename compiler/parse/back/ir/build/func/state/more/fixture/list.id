@@ -1,0 +1,22 @@
+// Two more AST-node fixtures for the call/list/ lowering cases: an
+// `iassign` node (`xs[i] = 9`, reusing lw_fix_index's `index` node as the
+// assignment target the way the parser itself does -- node_iassign copies
+// its base/idx) and an `arr` node (`[1]`). Filed here rather than under
+// call/list (every directory there is at the 3-entry cap) -- this
+// directory already holds this build's other fixtures.
+
+lw_fix_iassign() {
+  lw_fix_index();
+  int v = node_int("9", 9, 0);
+  export int fix_iassign_n = node_iassign((import fix_index_n), v);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lw_fix_arr() {
+  lw_env_fixture();
+  int a = node_int("1", 1, 0);
+  export int fix_arr_n = node_arr([a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

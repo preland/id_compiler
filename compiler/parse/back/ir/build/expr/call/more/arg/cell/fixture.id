@@ -1,0 +1,29 @@
+// An ordinary `call` node fixture: a function registered the same way
+// add_func registers a real one, findable by both fn_node_of and
+// lookup_func, then a call to it. Two more call-node fixtures (a builtin
+// call, and a call through a variable of function type) are at
+// ../../../../../core/fixture/ops/{bicall,fcallv}.id -- filed apart because
+// a file may hold at most 3 functions and this directory (box.id/unbox.id,
+// argument boxing) had room for only one more file. Named ocall_fixture
+// rather than call_fixture: that name is already a harness-recording
+// fixture at back/tgt/c/emit/prog/test/unit/more/rec/call.id.
+
+ocall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  ocall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// fx_target (lw_fixture_n, already the function under lowering) registered
+// as a real callable function too -- add_func keeps fnames/frets/fnodes in
+// sync, unlike lw_fix_fnval_reg's own fidx_add (fnval.id), which only
+// pushes fnodes and would leave lookup_func reading frets out of step.
+ocall_fixture_reg() {
+  int[] none = [];
+  add_func("fx_target", "int", (import lw_fixture_n));
+  export int ocall_node = node_call("fx_target", none);
+} return void;
+given ocall_fixture ():() then check_failed:(0)
+given ocall_fixture ():() then init_units:(0)

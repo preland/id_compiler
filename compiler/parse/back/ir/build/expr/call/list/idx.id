@@ -14,15 +14,21 @@ lw_index(int node) {
   int i = lw_index_idx(node);
   int ret_i = lw_index2(node, a, i);
 } return int ret_i;
+given lw_fix_index ((import fix_index_n)):(3)
+given lw_fix_iassign ((import fix_iassign_n)):(3)
 
 lw_index2(int node, int a, int i) {
   string elem = lw_index_elem(node);
   int c = lw_callf("id_list_get", "word", [a, i]);
   int ret_i = lw_unbox(c, elem);
 } return int ret_i;
+given lw_fix_index ((import fix_index_n), 0, 0):(1)
+given lw_fix_index ((import fix_index_n), 5, 5):(1)
 
 lw_iassign(int node) {
   string elem = lw_index_elem(node);
   int a = lw_index_base(node);
   lw_iset(node, a, elem);
 } return void;
+given lw_fix_iassign ((import fix_iassign_n)):() then check_failed:(0)
+given lw_fix_iassign ((import fix_iassign_n)):() then init_units:(0)

@@ -4,14 +4,20 @@ lw_index_base(int node) {
   int base_node = i1_of(node);
   int a = lw_expr(base_node);
 } return int a;
+given lw_fix_index ((import fix_index_n)):(0)
+given lw_fix_iassign ((import fix_iassign_n)):(0)
 
 lw_index_idx(int node) {
   int idx_node = i2_of(node);
   int i = lw_as(idx_node, "int");
 } return int i;
+given lw_fix_index ((import fix_index_n)):(0)
+given lw_fix_iassign ((import fix_iassign_n)):(0)
 
 lw_index_elem(int node) {
   int base_node = i1_of(node);
   string ty = lw_ety(base_node);
   string elem = elem_type(ty);
 } return string elem;
+given lw_fix_index ((import fix_index_n)):("i")
+given lw_fix_iassign ((import fix_iassign_n)):("i")

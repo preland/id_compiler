@@ -1,0 +1,21 @@
+// A builtin `call` node ("print" over one int literal), for lw_builtin's own
+// dispatch cases and everything under it. The other two call-node fixtures
+// (an ordinary call, and a call through a variable of function type) are at
+// ../../../build/expr/call/more/arg/cell/fixture.id and ./fcallv.id -- split
+// across three files (a file holds at most 3 functions) and two directories
+// (arg/cell had room for only one of them).
+
+bicall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  bicall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+bicall_fixture_reg() {
+  int x = node_int("1", 1, 0);
+  export int bicall_node = node_call("print", [x]);
+} return void;
+given bicall_fixture ():() then check_failed:(0)
+given bicall_fixture ():() then init_units:(0)

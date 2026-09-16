@@ -1,0 +1,30 @@
+// A `call` node whose name is a variable of function type ("gfunc"), for
+// lw_fcall/is_fcall's own cases -- a call through the value the variable
+// holds rather than an ordinary call. The other two call-node fixtures are
+// at ../../../build/expr/call/more/arg/cell/fixture.id and ./bicall.id.
+
+fcallv_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  fcallv_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// "gfunc" declared as a variable of function type (add_var, unlike
+// ocall_fixture_reg's add_func), so callee_var_type resolves it and
+// is_fcall says yes.
+fcallv_fixture_reg() {
+  int u = (import ucur)[0];
+  add_var("gfunc", "func(int) return int", u);
+  fcallv_fixture_node();
+} return void;
+given fcallv_fixture ():() then check_failed:(0)
+given fcallv_fixture ():() then init_units:(0)
+
+fcallv_fixture_node() {
+  int[] none = [];
+  export int fcallv_node = node_call("gfunc", none);
+} return void;
+given fcallv_fixture ():() then check_failed:(0)
+given fcallv_fixture ():() then init_units:(0)
