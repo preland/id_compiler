@@ -14,3 +14,5 @@ bits_types(int id, int a, int b) {
     bits_err(id, lt, rt);
   }
 } return void;
+given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_b)):() then check_failed:(0)
+given cmp_fixture ((import bin_bitand), (import lit_str), (import lit_a)):() then check_failed:(1)

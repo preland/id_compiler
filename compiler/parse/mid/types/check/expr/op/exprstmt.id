@@ -20,6 +20,8 @@ chk_exprstmt(int id) {
     tc_err(id, "this statement compares instead of assigning: '=' in an expression is equality, so the statement has no effect" + disc_hint_v);
   }
 } return void;
+given cmp_fixture ((import exprstmt_bin)):() then check_failed:(1)
+given cmp_fixture ((import bin_mixed)):() then check_failed:(0)
 
 // Both spellings. idc.py's parser folds `=` into `==` on the way in, so by the
 // time either compiler has an AST there is one operator; catching both here
@@ -32,6 +34,8 @@ is_asgop(string op) {
     ok = 1;
   }
 } return int ok;
+("="):(1)
+("+"):(0)
 
 // Naming the fix is the point of the diagnostic, so an index target -- the
 // case that actually bites -- gets told what to write instead.
@@ -42,3 +46,5 @@ disc_hint(int id) {
     s = " -- an imported list or a call result cannot be index-assigned directly; pass the list to a helper that takes it as a parameter, as lset(int[] xs, int i, int v) { xs[i] = v; }";
   }
 } return string s;
+given cmp_fixture ((import bin_eq)):("")
+given idx_build ((import idx_fix)):("")

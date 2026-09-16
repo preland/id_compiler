@@ -13,3 +13,5 @@ mod_types(int id, int a, int b) {
     tc_err(id, "'%' requires int operands");
   }
 } return void;
+given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_word)):() then check_failed:(0)
+given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_float)):() then check_failed:(1)
