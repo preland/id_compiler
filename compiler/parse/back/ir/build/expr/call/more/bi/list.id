@@ -7,6 +7,8 @@ lb_b4(int node) {
     v = lw_plain(node);
   }
 } return int v;
+given popcall_fixture ((import popcall_node)):(2)
+given ocall_fixture ((import ocall_node)):(0)
 
 // `len` is two different runtime calls: a string knows its own length and a
 // list keeps a count.
@@ -15,6 +17,8 @@ lw_len(int node) {
   string t = lw_ety(l1_of_v[0]);
   int ret_i = lw_len_tail(l1_of_v, t);
 } return int ret_i;
+given lencall_fixture ((import lencall_node)):(1)
+given lencall_fixture ((import lencall_node)):(1) then check_failed:(0)
 
 lw_lenfn(string t) {
   string s = "id_list_len";
@@ -22,3 +26,5 @@ lw_lenfn(string t) {
     s = "id_len";
   }
 } return string s;
+("string"):("id_len")
+("int"):("id_list_len")

@@ -11,6 +11,8 @@ lw_builtin(int node) {
     v = lb_b2(node);
   }
 } return int v;
+given bicall_fixture ((import bicall_node)):(2)
+given lencall_fixture ((import lencall_node)):(1)
 
 lb_b2(int node) {
   int v = 0 - 1;
@@ -20,6 +22,8 @@ lb_b2(int node) {
     v = lb_b3(node);
   }
 } return int v;
+given lencall_fixture ((import lencall_node)):(1)
+given pushcall_fixture ((import pushcall_node)):(3)
 
 lb_b3(int node) {
   int v = 0 - 1;
@@ -29,3 +33,5 @@ lb_b3(int node) {
     v = lb_b4(node);
   }
 } return int v;
+given pushcall_fixture ((import pushcall_node)):(3)
+given popcall_fixture ((import popcall_node)):(2)

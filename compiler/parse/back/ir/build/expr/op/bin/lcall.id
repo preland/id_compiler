@@ -1,0 +1,30 @@
+// Two more builtin `call`-node fixtures for the call/more/bi/ dispatch
+// cases: "len" over one int-literal argument, and the start of a "pop"
+// fixture (finished at ../../../../stmt/flow/loop/lcall.id -- a file holds
+// at most 3 functions and popcall_fixture needs a second one). Filed here
+// rather than under call/ (every directory there is at the 3-entry cap) --
+// this directory (bin.id/disp.id, binary-expression dispatch) had the
+// spare slot.
+
+lencall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  lencall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+lencall_fixture_reg() {
+  export int[] lencall_args = [node_int("1", 1, 0)];
+  export int lencall_node = node_call("len", lencall_args);
+} return void;
+given lencall_fixture ():() then check_failed:(0)
+given lencall_fixture ():() then init_units:(0)
+
+popcall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  popcall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

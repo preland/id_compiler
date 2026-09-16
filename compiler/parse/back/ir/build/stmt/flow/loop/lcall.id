@@ -1,0 +1,26 @@
+// Finishes ../../../expr/op/bin/lcall.id's popcall_fixture ("pop" over one
+// int-literal argument), then a "push" fixture (two arguments: the list
+// and the value) for the same dispatch cases.
+
+popcall_fixture_reg() {
+  export int[] popcall_args = [node_int("1", 1, 0)];
+  export int popcall_node = node_call("pop", popcall_args);
+} return void;
+given popcall_fixture ():() then check_failed:(0)
+given popcall_fixture ():() then init_units:(0)
+
+pushcall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  pushcall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+pushcall_fixture_reg() {
+  export int[] pushcall_args = [node_int("1", 1, 0)];
+  export int pushcall_val_n = node_int("2", 2, 0);
+  export int pushcall_node = node_call("push", [pushcall_args[0], pushcall_val_n]);
+} return void;
+given pushcall_fixture ():() then check_failed:(0)
+given pushcall_fixture ():() then init_units:(0)
