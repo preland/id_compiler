@@ -6,6 +6,8 @@ nat_init(int argc, string[] argv) {
   export int[] natc = [nat_on];
   nat_lists();
 } return void;
+given env_init (1, ["prog"]):() then nat_on_check:(0)
+given env_init (2, ["prog", "--natives"]):() then nat_on_check:(1)
 
 //   natkey  KIND|NAME of every row, so a native is listed once per kind
 //   natrow  the rows themselves (emit.id)
@@ -13,6 +15,8 @@ nat_lists() {
   export string[] natkey = [];
   export string[] natrow = [];
 } return void;
+given env_init ():() then nat_row_count:(0)
+given env_init ():() then check_failed:(0)
 
 // Nothing is pruned with no main or when freestanding (dce.id,
 // guarded_emit.id), so there every function is live and every native any of
@@ -20,3 +24,5 @@ nat_lists() {
 nat_all_live() {
   int all = is_freestanding() == 1 || find_str((import fnames), "main") < 0;
 } return int all;
+given flags_setup ():(1)
+given fs_on_fixture ():(1)

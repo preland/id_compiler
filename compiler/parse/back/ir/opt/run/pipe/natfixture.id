@@ -1,0 +1,27 @@
+// Finishes ../../../../drive/run/check/dce/emit/guard/natfixture.id's
+// natcall_fixture: natfn is "nat_target"'s func node, registered through
+// add_func and pushed into `prog` (as a real function of the build would
+// be, for nat_scan/nat_func's own cases), then a call node naming it.
+
+natcall_fixture_tail(int natfn, int[] none) {
+  add_func("nat_target", "int", natfn);
+  push((import prog), natfn);
+  export int natcall_node = node_call("nat_target", none);
+} return void;
+given natcall_fixture (0, []):() then check_failed:(0)
+given natcall_fixture (0, []):() then init_units:(0)
+
+// A `then` check for the void natives-row functions, which otherwise leave
+// no result to compare -- how many rows the walk has recorded so far.
+nat_row_count() {
+  int n = len((import natrow));
+} return int n;
+given natcall_fixture ():(0)
+given nat_row_setup ():(1)
+
+nat_row_setup() {
+  natcall_fixture();
+  nat_add("harness", (import natcall_node), "nat_target");
+} return void;
+():() then check_failed:(0)
+():() then nat_row_count:(1)

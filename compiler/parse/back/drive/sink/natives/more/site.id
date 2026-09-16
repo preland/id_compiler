@@ -7,6 +7,8 @@ nat_push(string key, int id, string name) {
   string site = nat_site(id) + "|" + func_file(name);
   push((import natrow), key + "|" + site);
 } return void;
+given natcall_fixture ("k1", (import natcall_node), "nat_target"):() then nat_row_count:(1)
+given natcall_fixture ("k2", (import natcall_node), "nat_target"):() then nat_row_count:(1)
 
 // A call's file is its function's; its line is the one the parser recorded
 // (front/parse/decl/top/marker/init_more.id).
@@ -15,6 +17,8 @@ nat_site(int id) {
   int call_line_v = call_line(id);
   string site = func_file(node_fn_v) + ":" + call_line_v;
 } return string site;
+given natcall_fixture ((import natcall_node)):("<stdin>:1")
+given natcall_fixture ((import natcall_node)):("<stdin>:1") then check_failed:(0)
 
 // Every call node is recorded as it is parsed, so the fallback -- the
 // statement's or function's line, as a diagnostic at this node gets -- is
@@ -26,3 +30,5 @@ call_line(int id) {
     n = (import cline)[at];
   }
 } return int n;
+given natcall_fixture ((import natcall_node)):(1)
+given natcall_fixture ((import natcall_node)):(1) then check_failed:(0)

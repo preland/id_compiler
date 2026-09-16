@@ -5,6 +5,8 @@ nat_node(string kind, int id) {
     nat_call(kind, id);
   }
 } return void;
+given natcall_fixture ("harness", (import natcall_node)):() then nat_row_count:(1)
+given natcall_fixture ("program", (import natcall_node)):() then nat_row_count:(1)
 
 // func_node is -1 for a builtin or an asm function, and the && stops there,
 // so is_native is only ever asked of a func node. A native is a func node
@@ -16,6 +18,8 @@ nat_call(string kind, int id) {
     nat_add(kind, id, s1_of_v);
   }
 } return void;
+given natcall_fixture ("harness", (import natcall_node)):() then nat_row_count:(1)
+given ocall_fixture ("harness", (import ocall_node)):() then check_failed:(0)
 
 // One row per native per kind. The walk is in source order, so the call a row
 // names is the earliest live call of that native.
@@ -25,3 +29,5 @@ nat_add(string kind, int id, string name) {
     nat_push(key, id, name);
   }
 } return void;
+given natcall_fixture ("harness", (import natcall_node), "nat_target"):() then nat_row_count:(1)
+given nat_row_setup ("harness", (import natcall_node), "nat_target"):() then nat_row_count:(1)
