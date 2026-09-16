@@ -5,6 +5,8 @@ fold_mul(int[] pos, int left) {
   advance(pos);
   int ret_i = fold_mul_tail(pos, left, op);
 } return int ret_i;
+given expr_tokens ([3], 100):(1)
+given expr_tokens ([5], 100):(1)
 
 // primary: '(' expr ')' | '[' array literal | INT | STR | ident (var or call)
 parse_primary(int[] pos) {
@@ -15,9 +17,13 @@ parse_primary(int[] pos) {
     node = pp2(pos);
   }
 } return int node;
+given paren_tokens ([0]):(2)
+given expr_tokens ([0]):(0)
 
 parse_paren(int[] pos) {
   advance(pos);
   int e = parse_expr(pos);
   advance(pos);
 } return int e;
+given paren_tokens ([0]):(2)
+given decl_tokens ([1]):(0)

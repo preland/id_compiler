@@ -6,12 +6,16 @@ parse_arr(int[] pos) {
   scan_elems(pos, elems);
   int ret_i = node_arr(elems);
 } return int ret_i;
+given atom_tokens ([7]):(3)
+given atom_tokens ([34]):(1)
 
 scan_elems(int[] pos, int[] elems) {
   advance(pos);
   fill_elems(pos, elems);
   advance(pos);
 } return void;
+given atom_tokens ([7], []):([14], [0, 1, 2])
+given atom_tokens ([34], []):([37], [0])
 
 fill_elems(int[] pos, int[] elems) {
   while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
@@ -20,3 +24,5 @@ fill_elems(int[] pos, int[] elems) {
     skip_comma(pos);
   }
 } return void;
+given atom_tokens ([8], []):([13], [0, 1, 2])
+given atom_tokens ([35], []):([36], [0])

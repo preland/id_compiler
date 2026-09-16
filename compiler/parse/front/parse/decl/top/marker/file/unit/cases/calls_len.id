@@ -1,0 +1,26 @@
+// How many calls have been recorded, for init_more.id's init_calls/call_at
+// cases: both are void and touch only exported lists, which a case can only
+// read back through a check.
+cnode_count() {
+  int n = len((import cnode));
+} return int n;
+given init_calls ():(0)
+given mk_one_call ():(1)
+
+// One call recorded, for cnode_count's own cases above.
+mk_one_call() {
+  env_init();
+  init_calls();
+  call_at(5, 10);
+} return void;
+():() then check_failed:(0)
+():() then cnode_count:(1)
+
+// One file marker taken, for cur_file.id's cur_file/take_file cases.
+mk_one_file() {
+  env_init();
+  init_files();
+  take_file_mid([0], "x.id");
+} return void;
+():() then check_failed:(0)
+():() then cur_file:("x.id")

@@ -17,3 +17,5 @@ assign_rhs(int[] pos, string name) {
   skip_semi(pos);
   int ret_i = node_assign(name, expr);
 } return int ret_i;
+given stmt_tokens ([7], "x"):(1)
+given stmt_tokens ([18], "x"):(1)

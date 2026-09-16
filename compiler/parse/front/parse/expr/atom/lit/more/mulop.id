@@ -9,13 +9,19 @@ is_mulop(string s) {
     ok = 1;
   }
 } return int ok;
+("*"):(1)
+("+"):(0)
 
 mulop_at(int[] pos) {
   string s = cur_text(pos);
   int ok = is_mulop(s);
 } return int ok;
+given expr_tokens ([3]):(1)
+given expr_tokens ([1]):(0)
 
 addop_at(int[] pos) {
   string s = cur_text(pos);
   int ok = is_addop(s);
 } return int ok;
+given expr_tokens ([1]):(1)
+given expr_tokens ([3]):(0)

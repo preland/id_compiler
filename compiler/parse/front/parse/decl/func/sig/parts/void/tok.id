@@ -7,6 +7,8 @@ tok_at(int at) {
     k = (import tkind)[at];
   }
 } return string k;
+given expr_tokens (0):("int")
+given expr_tokens (20):("eof")
 
 tok_str(int at) {
   string s = "";
@@ -14,3 +16,5 @@ tok_str(int at) {
     s = (import ttext)[at];
   }
 } return string s;
+given expr_tokens (0):("1")
+given expr_tokens (19):(";")

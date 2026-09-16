@@ -6,12 +6,16 @@ parse_add(int[] pos) {
     left = fold_add(pos, left);
   }
 } return int left;
+given expr_tokens ([0]):(4)
+given expr_tokens ([18]):(0)
 
 fold_add(int[] pos, int left) {
   string op = cur_text(pos);
   advance(pos);
   int ret_i = fold_add_tail(pos, left, op);
 } return int ret_i;
+given expr_tokens ([1], 100):(3)
+given expr_tokens ([13], 100):(1)
 
 parse_mul(int[] pos) {
   int left = parse_unary(pos);
@@ -19,3 +23,5 @@ parse_mul(int[] pos) {
     left = fold_mul(pos, left);
   }
 } return int left;
+given expr_tokens ([0]):(0)
+given expr_tokens ([2]):(2)

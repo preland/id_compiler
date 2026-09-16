@@ -19,3 +19,5 @@ pp2(int[] pos) {
     node = parse_atom(pos);
   }
 } return int node;
+given atom_tokens ([7]):(3)
+given atom_tokens ([2]):(0)

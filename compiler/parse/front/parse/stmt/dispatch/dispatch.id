@@ -9,6 +9,8 @@ parse_stmt(int[] pos) {
     node = parse_stmt2(pos);
   }
 } return int node;
+given stmt_tokens ([9]):(7)
+given stmt_tokens ([42]):(1)
 
 parse_stmt2(int[] pos) {
   int node = 0;
@@ -18,6 +20,8 @@ parse_stmt2(int[] pos) {
     node = parse_stmt3(pos);
   }
 } return int node;
+given stmt_tokens ([28]):(7)
+given stmt_tokens ([42]):(1)
 
 parse_stmt3(int[] pos) {
   int node = 0;
@@ -27,3 +31,5 @@ parse_stmt3(int[] pos) {
     node = parse_stmt4(pos);
   }
 } return int node;
+given stmt_tokens ([42]):(1)
+given stmt_tokens ([9]):(5)

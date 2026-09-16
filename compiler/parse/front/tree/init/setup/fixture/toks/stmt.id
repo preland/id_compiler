@@ -1,0 +1,20 @@
+// A token stream covering statement dispatch: a declaration, a plain
+// assignment, an if/else, a while and a bare expression statement --
+// `int x = 1; x = 2; if (x > 0) { x = 1; } else { x = 2; }
+//  while (x < 10) { x = x + 1; } x;`
+stmt_tokens() {
+  env_init();
+  push_toks(["kw", "ident", "op", "int", "op", "ident", "op", "int", "op", "kw", "op", "ident", "op", "int", "op", "op", "ident", "op", "int", "op", "op", "kw", "op", "ident", "op", "int", "op", "op", "kw", "op", "ident", "op", "int", "op", "op", "ident", "op", "ident", "op", "int", "op", "op", "ident", "op", "eof"], ["int", "x", "=", "1", ";", "x", "=", "2", ";", "if", "(", "x", ">", "0", ")", "{", "x", "=", "1", ";", "}", "else", "{", "x", "=", "2", ";", "}", "while", "(", "x", "<", "10", ")", "{", "x", "=", "x", "+", "1", ";", "}", "x", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(45)
+
+// A token stream for one whole function declaration:
+// `add(int a, int b) { int s = a + b * 2; if (s > 0) { s = s - 1; } }
+//  return int s;`
+decl_tokens() {
+  env_init();
+  push_toks(["ident", "op", "kw", "ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "ident", "op", "int", "op", "kw", "op", "ident", "op", "int", "op", "op", "ident", "op", "ident", "op", "int", "op", "op", "op", "kw", "kw", "ident", "op", "eof"], ["add", "(", "int", "a", ",", "int", "b", ")", "{", "int", "s", "=", "a", "+", "b", "*", "2", ";", "if", "(", "s", ">", "0", ")", "{", "s", "=", "s", "-", "1", ";", "}", "}", "return", "int", "s", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(38)

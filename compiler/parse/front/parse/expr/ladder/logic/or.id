@@ -7,9 +7,13 @@ parse_or(int[] pos) {
     left = fold_or(pos, left);
   }
 } return int left;
+given expr_tokens ([0]):(18)
+given expr_tokens ([18]):(0)
 
 fold_or(int[] pos, int left) {
   advance(pos);
   int right = parse_and(pos);
   int ret_i = node_bin("||", left, right);
 } return int ret_i;
+given expr_tokens ([17], 100):(1)
+given expr_tokens ([15], 100):(1)

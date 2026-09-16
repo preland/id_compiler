@@ -8,8 +8,12 @@ relop_at(int[] pos) {
   string s = cur_text(pos);
   int ok = is_relop(s);
 } return int ok;
+given expr_tokens ([13]):(1)
+given expr_tokens ([0]):(0)
 
 shiftop_at(int[] pos) {
   string s = cur_text(pos);
   int ok = is_shiftop(s);
 } return int ok;
+given expr_tokens ([5]):(1)
+given expr_tokens ([0]):(0)

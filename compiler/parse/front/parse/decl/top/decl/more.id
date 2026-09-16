@@ -6,9 +6,13 @@ push_func_line(int[] pos) {
   push((import pline), cur_ln_v);
   int ret_i = push_func_body(pos);
 } return int ret_i;
+given decl_tokens ([0]):(0)
+given decl_tokens ([0]):(0) then check_failed:(0)
 
 push_func_body(int[] pos) {
   int parse_func_v = parse_fn(pos);
   push((import prog), parse_func_v);
   int ret_i = take_cases(pos);
 } return int ret_i;
+given decl_tokens ([0]):(0)
+given decl_tokens ([0]):(0) then check_failed:(0)

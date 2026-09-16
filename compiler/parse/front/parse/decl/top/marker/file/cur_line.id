@@ -5,6 +5,8 @@ cur_ln(int[] pos) {
     n = (import tline)[pos[0]];
   }
 } return int n;
+given decl_tokens ([0]):(1)
+given decl_tokens ([37]):(1)
 
 //   pline  the line each entry of `prog` was declared on
 //   nline  the line each AST node began on, 0 where it is not a statement
@@ -17,6 +19,8 @@ init_lines2() {
   export int[] nline = [];
   init_lines3();
 } return void;
+():() then check_failed:(0)
+():() then init_units:(0)
 
 // Writing a node's line goes through lset (mid/names/limits/shape/block/failed.id):
 // a second helper with the same body is a duplicate-logic error, and one
@@ -27,3 +31,5 @@ stmt_at_line(int[] pos) {
   int id = parse_stmt(pos);
   stmt_done(id, t0);
 } return int id;
+given stmt_tokens ([9]):(7)
+given stmt_tokens ([42]):(1)

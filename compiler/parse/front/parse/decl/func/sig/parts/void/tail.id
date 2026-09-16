@@ -19,6 +19,8 @@ void_tail(int[] pos) {
     syn_err(pos, "a 'void' return clause takes no expression; write '} return void;' and move the call into the body");
   }
 } return void;
+given decl_tokens ([0]):() then check_failed:(0)
+given decl_tokens ([33]):() then check_failed:(0)
 
 void_call(int at) {
   int r = 0;
@@ -27,6 +29,8 @@ void_call(int at) {
     r = void_semi(void_close_v);
   }
 } return int r;
+given decl_tokens (0):(0)
+given decl_tokens (33):(0)
 
 void_semi(int at) {
   int r = 0;
@@ -34,3 +38,5 @@ void_semi(int at) {
     r = 1;
   }
 } return int r;
+given decl_tokens (8):(0)
+given decl_tokens (36):(1)

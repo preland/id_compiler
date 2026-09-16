@@ -18,12 +18,16 @@ init_consts() {
   export int[] cdecl = [];
   init_pos();
 } return int 0;
+given env_init ():(0)
+given env_init ():(0) then check_failed:(0)
 
 take_const(int[] pos) {
   advance(pos);
   int parse_decl_v = parse_decl(pos);
   reg_const(parse_decl_v);
 } return void;
+given decl_tokens ([9]):([14])
+given decl_tokens ([9]):([14]) then check_failed:(1)
 
 // Registered in the same export tables an in-function `export` fills, so the
 // name is reserved program-wide and a collision with a function's export is
@@ -35,3 +39,5 @@ reg_const(int d) {
   add_export2(d, "conf.id");
   push((import cdecl), d);
 } return void;
+given lc_reg_setup (0):() then check_failed:(0)
+given lc_reg_setup (1):() then check_failed:(0)

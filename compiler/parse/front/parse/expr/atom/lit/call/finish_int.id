@@ -8,3 +8,5 @@ finish_int(string text) {
   int is_bigdec_v = is_bigdec(text);
   int ret_i = node_int(text, to_int_v, is_bigdec_v);
 } return int ret_i;
+given env_init ("9"):(0) then last_i2:(0)
+given env_init ("99999999999999"):(0) then last_i2:(1)

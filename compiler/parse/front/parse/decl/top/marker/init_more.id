@@ -6,6 +6,8 @@ init_files_rest() {
   init_calls();
   int ret_i = init_units();
 } return int ret_i;
+():(0)
+():(0) then check_failed:(0)
 
 // The line each call was written on, for the natives list bin/idc reads
 // (back/drive/sink/natives/). Two columns rather than one indexed by node,
@@ -17,8 +19,12 @@ init_calls() {
   export int[] cnode = [];
   export int[] cline = [];
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then cnode_count:(0)
 
 call_at(int node, int ln) {
   push((import cnode), node);
   push((import cline), ln);
 } return void;
+given init_calls (5, 10):() then cnode_count:(1)
+given init_calls (7, 20):() then cnode_count:(1)

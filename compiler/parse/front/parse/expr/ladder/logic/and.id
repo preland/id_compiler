@@ -6,9 +6,13 @@ parse_and(int[] pos) {
     left = fold_and(pos, left);
   }
 } return int left;
+given expr_tokens ([0]):(16)
+given expr_tokens ([16]):(0)
 
 fold_and(int[] pos, int left) {
   advance(pos);
   int right = parse_rel(pos);
   int ret_i = node_bin("&&", left, right);
 } return int ret_i;
+given expr_tokens ([15], 100):(1)
+given expr_tokens ([17], 100):(1)

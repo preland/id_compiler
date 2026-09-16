@@ -8,3 +8,22 @@ cons_kind(int[] pos, string ck) {
 } return void;
 given cons_fix1 ([0], "time"):() then prints:("")
 given cons_fix1 ([0], "bogus"):() then prints:("<stdin>:1: error: unknown constraint 'bogus'; a case constrains 'time' or 'mem'\n")
+
+// One literal int leaf (id 0), for cases/more/lit/kinds.id's leaf_lit/
+// leaf_num true case.
+fixture_int_leaf() {
+  env_init();
+  node_int("1", 1, 0);
+} return void;
+():() then check_failed:(0)
+():() then last_i2:(0)
+
+// `-1`: a unary minus (id 1) wrapping a literal (id 0), for
+// cases/more/lit/kinds.id's neg_lit.
+fixture_neg_lit_node() {
+  env_init();
+  node_int("1", 1, 0);
+  node_un("-", 0);
+} return void;
+():() then check_failed:(0)
+():() then last_i2:(0)

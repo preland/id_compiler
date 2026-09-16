@@ -8,12 +8,16 @@ parse_shift(int[] pos) {
     left = fold_shift(pos, left);
   }
 } return int left;
+given expr_tokens ([0]):(6)
+given expr_tokens ([6]):(0)
 
 fold_shift(int[] pos, int left) {
   string op = cur_text(pos);
   advance(pos);
   int ret_i = fold_shift_tail(pos, left, op);
 } return int ret_i;
+given expr_tokens ([5], 100):(1)
+given expr_tokens ([7], 100):(1)
 
 // `>>` is the arithmetic (sign-propagating) shift; the logical one is the
 // `ushr` builtin.
@@ -23,3 +27,5 @@ is_shiftop(string s) {
     ok = 1;
   }
 } return int ok;
+("<<"):(1)
+("+"):(0)

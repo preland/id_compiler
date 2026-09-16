@@ -12,12 +12,16 @@ parse_atom_float(int[] pos) {
     node = parse_atom3(pos);
   }
 } return int node;
+given atom_tokens ([17]):(0)
+given atom_tokens ([0]):(3)
 
 parse_float(int[] pos) {
   string text = cur_text(pos);
   advance(pos);
   int ret_i = node_float(text);
 } return int ret_i;
+given atom_tokens ([17]):(0)
+given atom_tokens ([35]):(0)
 
 // Shared by parse_ident_or_call and parse_import (atom.id, import_expr.id):
 // both read the current token's text and advance past it before doing
@@ -29,3 +33,5 @@ read_name(int[] pos) {
   string name = cur_text(pos);
   advance(pos);
 } return string name;
+given atom_tokens ([0]):("foo")
+given atom_tokens ([25]):("x")

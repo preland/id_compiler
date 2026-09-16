@@ -15,10 +15,14 @@ dec_val(string s) {
     i = i + 1;
   }
 } return word dv;
+("5"):(5)
+("123"):(123)
 
 dec_step(word dv, int c) {
   word nv = dv * 10 + c - 48;
 } return word nv;
+(0, 53):(5)
+(5, 50):(52)
 
 // Only ever asked about literals of 10 digits or fewer, where the accumulator
 // cannot overflow. 2147483647 is INT_MAX.
@@ -28,3 +32,5 @@ over_max(string s) {
     ok = 1;
   }
 } return int ok;
+("2147483647"):(0)
+("9999999999"):(1)

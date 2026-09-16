@@ -1,0 +1,23 @@
+// A hand-loaded token stream for a case to parse: the tables load() fills
+// from stdin, filled by hand instead, one token per pair, so a parser
+// function under test can be pointed at a chosen input without reading a
+// real program through the lexer.
+push_toks(string[] kinds, string[] texts) {
+  int i = 0;
+  while(i < len(kinds)) {
+    push_real(kinds[i], texts[i]);
+    i = i + 1;
+  }
+} return void;
+given env_init (["ident", "op"], ["x", "("]):() then check_failed:(0)
+given env_init (["kw"], ["int"]):() then check_failed:(0)
+
+// The second int field of the most recently created node, for a case whose
+// function under test returns a node id it cannot itself compare a field of
+// (a `then` check takes no arguments).
+last_i2() {
+  int n = len((import ni2));
+  int ret_i = (import ni2)[n - 1];
+} return int ret_i;
+given fixture_neg_lit_node ():(0)
+given mk_two_nodes ():(1)

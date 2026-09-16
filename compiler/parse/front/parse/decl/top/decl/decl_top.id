@@ -9,6 +9,8 @@ parse_decl_top(int[] pos) {
     push_func(pos);
   }
 } return void;
+given decl_tokens ([0]):() then check_failed:(0)
+given decl_tokens ([0]):() then init_units:(0)
 
 // Any test cases following the return clause are taken in the return clause
 // here, which is free under the action limit -- and which also runs after the
@@ -18,6 +20,8 @@ push_func(int[] pos) {
   push((import pfile), cur_file_v);
   int ret_i = push_func_line(pos);
 } return int ret_i;
+given decl_tokens ([0]):(0)
+given decl_tokens ([0]):(0) then check_failed:(0)
 
 //   tline   the source line of each stored token, parallel to tkind/ttext
 //   lnseen  every `line N` marker seen; the current line is the last one, a
@@ -28,3 +32,5 @@ init_files2() {
   export int[] lnseen = [];
   init_lines2();
 } return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -12,6 +12,8 @@ else_body(int[] pos) {
     elsel = parse_block(pos);
   }
 } return int[] elsel;
+given stmt_tokens ([22]):([1])
+given stmt_tokens ([9]):([7])
 
 // 0 = no else arm, 1 = `else if`, 2 = a plain `else { ... }`. The third case
 // matters because an *empty* `else { }` still costs an action, and its else
@@ -25,8 +27,12 @@ at_elif(int[] pos) {
     ok = 1;
   }
 } return int ok;
+given stmt_tokens ([21]):(2)
+given stmt_tokens ([9]):(0)
 
 if_tail(int[] pos, int cond, int[] thenl, int elif) {
   int[] elsel = parse_else(pos);
   int ret_i = node_if(cond, thenl, elsel, elif);
 } return int ret_i;
+given stmt_tokens ([21], 100, [1], 2):(2)
+given stmt_tokens ([28], 200, [9], 0):(0)

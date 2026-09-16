@@ -21,6 +21,8 @@ parse_fn(int[] pos) {
     n = parse_func(pos);
   }
 } return int n;
+given decl_tokens ([0]):(17)
+given decl_tokens ([0]):(17) then check_failed:(0)
 
 parse_native(int[] pos) {
   advance(pos);

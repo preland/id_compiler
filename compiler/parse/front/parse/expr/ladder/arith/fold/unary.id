@@ -7,12 +7,16 @@ parse_unary(int[] pos) {
   string cur_text_v = cur_text(pos);
   int node = unary_or_postfix(pos, cur_text_v);
 } return int node;
+given expr_tokens ([0]):(0)
+given atom_tokens ([24]):(1)
 
 fold_unary(int[] pos) {
   string op = cur_text(pos);
   advance(pos);
   int ret_i = fold_unary_tail(pos, op);
 } return int ret_i;
+given atom_tokens ([24]):(1)
+given atom_tokens ([27]):(1)
 
 is_unop(string s) {
   int ok = 0;
@@ -20,3 +24,5 @@ is_unop(string s) {
     ok = 1;
   }
 } return int ok;
+("!"):(1)
+("+"):(0)

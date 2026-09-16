@@ -13,6 +13,8 @@ init_units() {
   export int[] ucur = [0];
   export int[] vunit = [];
 } return int 0;
+given env_init ():(0)
+given env_init ():(0) then check_failed:(0)
 
 // The rest of cur_file.id's take_file, split across two more steps to stay
 // under the action limit -- and a natural fit here, since the second step
@@ -22,9 +24,13 @@ take_file_mid(int[] pos, string file_path_v) {
   string cur_text_v2 = cur_text(pos);
   take_file_unit(pos, cur_text_v2);
 } return void;
+given full_env ([0], "src.id"):([1])
+given full_env ([0], "other.id"):([1])
 
 take_file_unit(int[] pos, string cur_text_v2) {
   int file_unit_v = file_unit(cur_text_v2);
   lset((import ucur), 0, file_unit_v);
   advance(pos);
 } return void;
+given full_env ([0], "2|foo"):([1])
+given full_env ([0], "nobar"):([1])

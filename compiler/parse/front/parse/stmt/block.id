@@ -5,12 +5,16 @@ parse_block(int[] pos) {
   expect_text(pos, "{");
   scan_block(pos, stmts);
 } return int[] stmts;
+given stmt_tokens ([15]):([1])
+given stmt_tokens ([22]):([1])
 
 scan_block(int[] pos, int[] stmts) {
   advance(pos);
   fill_block(pos, stmts);
   advance(pos);
 } return void;
+given stmt_tokens ([15], []):([21], [1])
+given stmt_tokens ([22], []):([28], [1])
 
 // Each statement records the line it began on, captured before it is parsed
 // -- afterwards the cursor has moved past it. This is the only place every
@@ -24,3 +28,5 @@ fill_block(int[] pos, int[] stmts) {
     push(stmts, stmt_at_line_v);
   }
 } return void;
+given stmt_tokens ([16], []):([20], [1])
+given stmt_tokens ([23], []):([27], [1])

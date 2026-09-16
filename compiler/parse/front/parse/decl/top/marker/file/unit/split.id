@@ -15,6 +15,8 @@ bar_at(string s, int i) {
     i = i + 1;
   }
 } return int i;
+("1|foo", 0):(1)
+("nofile", 0):(6)
 
 file_unit(string s) {
   int n = 0;
@@ -24,6 +26,8 @@ file_unit(string s) {
     n = to_int(slice_v);
   }
 } return int n;
+("1|foo"):(1)
+("foo"):(0)
 
 // The path is what every diagnostic prints, so it is exactly the text the
 // driver was given, unit prefix removed.
@@ -35,3 +39,5 @@ file_path(string s) {
     fpath = slice(s, bar_at_v + 1, len_v);
   }
 } return string fpath;
+("1|foo"):("foo")
+("foo"):("foo")

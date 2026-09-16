@@ -24,3 +24,5 @@ fn_sep(string out) {
     s = ", ";
   }
 } return string s;
+(""):("")
+("int"):(", ")

@@ -8,6 +8,8 @@ is_bigdec(string s) {
   string strip_zeros_v = strip_zeros(s);
   int ret_i = wide_dec(strip_zeros_v);
 } return int ret_i;
+("123"):(0)
+("99999999999"):(1)
 
 wide_dec(string s) {
   int ok = 1;
@@ -15,6 +17,8 @@ wide_dec(string s) {
     ok = over_max(s);
   }
 } return int ok;
+("2147483647"):(0)
+("99999999999"):(1)
 
 // Leading zeros are not significant digits; "007" is 7, not a wide literal.
 // The last digit is always kept, so "000" strips to "0" rather than "".
@@ -25,3 +29,5 @@ strip_zeros(string s) {
   }
   string ret_s = zeros_tail(s, i);
 } return string ret_s;
+("007"):("7")
+("000"):("0")

@@ -6,6 +6,8 @@ void_close(int at, int n, int lo) {
     at = at + 1;
   }
 } return int at;
+given decl_tokens (1, 0, 1):(8)
+given decl_tokens (2, 0, 2):(3)
 
 void_step(int at, int n) {
   int r = n;
@@ -15,3 +17,5 @@ void_step(int at, int n) {
     r = n - 1;
   }
 } return int r;
+given decl_tokens (1, 0):(1)
+given decl_tokens (7, 1):(0)
