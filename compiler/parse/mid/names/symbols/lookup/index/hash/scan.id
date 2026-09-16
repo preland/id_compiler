@@ -9,6 +9,8 @@ dv_count(int[] bkt, string name, string owner, int i, int ok) {
     i = i + 1;
   }
 } return int ok;
+given regrow_d ([0], "x", "f", 0, 0):(1)
+given regrow_d ([0], "y", "f", 0, 0):(0)
 
 ft_scan(int[] bkt, string name, int unit, int i, string t) {
   while(i < len(bkt)) {
@@ -16,6 +18,8 @@ ft_scan(int[] bkt, string name, int unit, int i, string t) {
     i = i + 1;
   }
 } return string t;
+given regrow_d ([0], "x", 0, 0, ""):("int")
+given regrow_d ([0], "y", 0, 0, ""):("")
 
 vx_scan(int[] bkt, string name, int unit, int i, int found) {
   while(i < len(bkt)) {
@@ -23,3 +27,5 @@ vx_scan(int[] bkt, string name, int unit, int i, int found) {
     i = i + 1;
   }
 } return int found;
+given fcall_reg_b ([0], "h", 0, 0, 99):(0)
+given fcall_reg_b ([0], "z", 0, 0, 99):(99)

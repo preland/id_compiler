@@ -7,13 +7,19 @@ vidx_push(int name_bucket_v, int len_v, string name) {
   push((import vidx)[name_bucket_v], len_v);
   push((import vnames), name);
 } return void;
+given call2_setup (0, 0, "newv"):() then vnames_len:(1)
+given fcall_reg_b (0, 1, "newv2"):() then vnames_len:(2)
 
 fidx_push(int name_bucket_v, int len_v, string name) {
   push((import fidx)[name_bucket_v], len_v);
   push((import fnames), name);
 } return void;
+given call2_setup (0, 0, "newf"):() then asmfx_fn_count:(1)
+given argfn_d (0, 1, "newf2"):() then asmfx_fn_count:(2)
 
 didx_push(int name_bucket_v, int len_v, string name) {
   push((import didx)[name_bucket_v], len_v);
   push((import dvname), name);
 } return void;
+given regrow_c (0, 0, "y"):() then dvname_len:(1)
+given regrow_d (0, 1, "z"):() then dvname_len:(2)

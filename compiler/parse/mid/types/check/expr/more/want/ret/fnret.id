@@ -23,6 +23,7 @@ fn_ret_type(int id) {
 argfn_d() {
   argfn_c();
   fidx_add("g");
+  push((import frets), "int");
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)

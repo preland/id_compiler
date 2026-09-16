@@ -8,3 +8,10 @@ is_call_var(int id) {
     ok = 1;
   }
 } return int ok;
+
+regrow_d() {
+  regrow_c();
+  didx_add("x");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -12,12 +12,16 @@ lookup_var(string name, int unit) {
   int idx = find_vix((import vidx)[name_bucket_v], name, unit);
   string t = vtype_at(idx);
 } return string t;
+given fcall_reg_b ("h", 0):("func(int) return int")
+given call2_setup ("nope", 0):("")
 
 lookup_func(string name) {
   int name_bucket_v = name_bucket(name);
   int idx = find_ix((import fnames), (import fidx)[name_bucket_v], name);
   string t = fret_at(idx);
 } return string t;
+given argfn_d ("g"):("int")
+given call2_setup ("nope"):("")
 
 find_str(string[] names, string name) {
   int i = 0;
@@ -27,3 +31,5 @@ find_str(string[] names, string name) {
     i = i + 1;
   }
 } return int found;
+given neg1_setup (["a", "b"], "b"):(1)
+given neg1_setup (["a", "b"], "c"):((import neg1))

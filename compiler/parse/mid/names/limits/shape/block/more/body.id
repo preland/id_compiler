@@ -5,3 +5,11 @@ check_body_at(int[] l2_of_v, string s1_of_v) {
   int func_line_v = func_line(s1_of_v);
   check_block(l2_of_v, 0, s1_of_v, func_line_v);
 } return void;
+
+regrow_c() {
+  regrow_b();
+  push((import dvexp), 0);
+  push((import dvunit), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -7,6 +7,8 @@ match_idx(string[] names, int i, string name, int found) {
     r = i;
   }
 } return int r;
+(["a", "b"], 0, "a", 99):(0)
+(["a", "b"], 0, "b", 99):(99)
 
 // find_ix, restricted to the rows declared in one unit -- with the whole table
 // as the fallback. A name the unit does not declare is either an exported
@@ -18,6 +20,8 @@ find_vix(int[] bucket, string name, int unit) {
     found = find_ix((import vnames), bucket, name);
   }
 } return int found;
+given fcall_reg_b ([0], "h", 0):(0)
+given fcall_reg_b ([0], "h", 5):(0)
 
 vx_hit(int[] bucket, int i, string name, int unit, int found) {
   int r = found;
@@ -25,3 +29,5 @@ vx_hit(int[] bucket, int i, string name, int unit, int found) {
     r = bucket[i];
   }
 } return int r;
+given fcall_reg_b ([0], 0, "h", 0, 99):(0)
+given fcall_reg_b ([0], 0, "z", 0, 99):(99)

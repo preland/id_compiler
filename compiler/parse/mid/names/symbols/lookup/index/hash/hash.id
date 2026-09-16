@@ -7,10 +7,14 @@ hash_loop(string s, int i, int hv) {
     i = i + 1;
   }
 } return int hv;
+("a", 0, 0):(97)
+("", 0, 5):(5)
 
 hash_step(int hv, int c) {
   int ret_i = (hv * 31 + c) % 65536;
 } return int ret_i;
+(0, 97):(97)
+(1, 98):(129)
 
 // find_str's answer, over one bucket instead of the whole table. Same
 // semantics -- the last match wins, and -1 means no match -- so a caller can
@@ -23,3 +27,5 @@ find_ix(string[] names, int[] bucket, string name) {
     i = i + 1;
   }
 } return int found;
+given neg1_setup (["a", "b"], [0, 1], "b"):(1)
+given neg1_setup (["a", "b"], [0, 1], "c"):((import neg1))

@@ -5,6 +5,8 @@ ix_hit(string[] names, int[] bucket, int i, string name, int found) {
     r = bucket[i];
   }
 } return int r;
+(["a", "b"], [0, 1], 0, "a", 99):(0)
+(["a", "b"], [0, 1], 0, "b", 99):(99)
 
 // Appending a name and indexing it are one operation, so the index cannot be
 // forgotten at a call site: the row number is the table's length *before* the
@@ -14,9 +16,13 @@ vidx_add(string name) {
   int len_v = len((import vnames));
   vidx_push(name_bucket_v, len_v, name);
 } return void;
+given call2_setup ("newv"):() then vnames_len:(1)
+given fcall_reg_b ("newv2"):() then vnames_len:(2)
 
 fidx_add(string name) {
   int name_bucket_v = name_bucket(name);
   int len_v = len((import fnames));
   fidx_push(name_bucket_v, len_v, name);
 } return void;
+given call2_setup ("newf"):() then asmfx_fn_count:(1)
+given argfn_d ("newf2"):() then asmfx_fn_count:(2)

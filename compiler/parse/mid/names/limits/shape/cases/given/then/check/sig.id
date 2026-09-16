@@ -1,5 +1,11 @@
 // A check's signature: no parameters, and a value to compare.
 
+vnames_len() {
+  int n = len((import vnames));
+} return int n;
+given call2_setup ():(0)
+given fcall_reg_b ():(1)
+
 then_sig(int ci, int chk_node, int cfn, string chk_nm) {
   if(flat_arg_count(cfn) != 0) {
     int np = flat_arg_count(cfn);

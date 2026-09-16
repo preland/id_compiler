@@ -4,6 +4,8 @@
 new_bucket() {
   int[] bkt = [];
 } return int[] bkt;
+given env_init ():([])
+given env_init ():([]) then check_failed:(0)
 
 // Which bucket a name belongs in -- not a hash. It was called str_hash, which
 // was both too vague (it names the mechanism, not the answer) and a claim on a
@@ -14,3 +16,5 @@ name_bucket(string s) {
   hv = hash_loop(s, 0, hv);
   int ret_i = hv % (import idx_n);
 } return int ret_i;
+("a"):(97)
+("b"):(98)
