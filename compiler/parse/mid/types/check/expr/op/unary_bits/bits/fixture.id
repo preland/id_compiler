@@ -15,3 +15,13 @@ push_build() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// A second, compatibly-typed assignment (exprfix/lit/decl.id's assign_build
+// is a mismatch on purpose), for chk_assign's "no error" case.
+assign_build2() {
+  assign_build();
+  add_var("xi", "int", 0);
+  export int assign_ok = node_assign("xi", (import lit_a));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

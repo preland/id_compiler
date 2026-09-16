@@ -9,6 +9,8 @@ chk_decl(int id) {
     decl_err(id, s1_of_v, i1_of_v);
   }
 } return void;
+given decltype_fixture ((import decl_list)):() then check_failed:(1)
+given decltype_fixture ((import decl_scalar)):() then check_failed:(0)
 
 chk_assign(int id) {
   string vt = var_type_at(id);
@@ -17,6 +19,8 @@ chk_assign(int id) {
     assign_err(id, vt, i1_of_v);
   }
 } return void;
+given assign_build ((import assign_list)):() then check_failed:(1)
+given assign_build2 ((import assign_ok)):() then check_failed:(0)
 
 // The one place that decides "this value may not go here". An array literal
 // is not judged by its own type, because it has none -- see more/arr.id.
@@ -28,3 +32,5 @@ bad_store(string want, int e) {
     ok = bad_store2(want, e);
   }
 } return int ok;
+given shapes_fixture ("int[]", (import arr_ints)):(0)
+given leaves_fixture ("int", (import lit_str)):(1)

@@ -6,6 +6,8 @@ arr_el_at(string want, int e, int i) {
   arr_el_check(want, el, i);
   int ret_i = i + 1;
 } return int ret_i;
+given shapes_fixture ("int[]", (import arr_ints), 0):(1) then check_failed:(0)
+given shapes_fixture ("string[]", (import arr_ints), 0):(1) then check_failed:(1)
 
 arr_el_check(string want, int el, int i) {
   string elem_type_v = elem_type(want);
@@ -16,3 +18,5 @@ arr_el_check(string want, int el, int i) {
     tc_err(el, "element " + i + " of a " + want + " literal is a " + type_of_v);
   }
 } return void;
+given fnval_call_fixture ("int[]", (import fnval_call), 0):() then check_failed:(1)
+given leaves_fixture ("int[]", (import lit_a), 0):() then check_failed:(0)
