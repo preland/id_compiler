@@ -26,12 +26,16 @@ check_rest() {
   check_shape();
   tc_all();
 } return void;
+given full_check_fixture ():() then check_failed:(1)
+given clean_check_fixture ():() then check_failed:(0)
 
 tc_all() {
   init_tyreg();
   init_tcache();
   tc_nodes();
 } return void;
+given cmp_fixture ():() then check_failed:(1)
+given leaves_fixture ():() then check_failed:(0)
 
 tc_nodes() {
   int i = 0;
@@ -40,3 +44,5 @@ tc_nodes() {
     i = i + 1;
   }
 } return void;
+given cmp_fixture ():() then check_failed:(1)
+given leaves_fixture ():() then check_failed:(0)

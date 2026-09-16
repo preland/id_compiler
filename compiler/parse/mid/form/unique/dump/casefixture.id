@@ -1,0 +1,24 @@
+// casenode/casefn (a case's node range) need init_cases, not part of
+// env_init's chain either -- for in_case/in_case_at/tc_node_at.
+incase_init() {
+  varleaf_init();
+  init_cases();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+incase_fixture() {
+  incase_init();
+  incase_setup();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// One case range, [0, 1000), well past any node id a fresh fixture builds.
+incase_setup() {
+  leaves_build();
+  push((import casefn), 0 - 1);
+  push((import casenode), 1000);
+} return void;
+given incase_init ():() then check_failed:(0)
+given incase_init ():() then init_units:(0)

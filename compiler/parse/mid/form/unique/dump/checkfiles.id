@@ -1,0 +1,27 @@
+// check_rest (check/walk/check.id) also runs check_files, which needs
+// full_env (front/tree/init/setup/more.id) rather than bare env_init --
+// check_files reads pfile, which only init_files exports. composite_fixture's
+// own nodes (via cmp_fixture) include bin_mixed, a real mixed-precedence
+// error, so a walk over this state finds one; leaves_fixture's plain leaves
+// give the clean run to compare it against.
+full_check_fixture() {
+  full_env();
+  cmp_fixture();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+clean_check_fixture() {
+  full_env();
+  leaves_fixture();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A declaration typed "void[]", for chk_voidarr's error case.
+voidarr_build() {
+  leaves_fixture();
+  export int decl_voidarr = node_decl("void[]", "y", (import lit_a), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

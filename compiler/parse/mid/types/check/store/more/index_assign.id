@@ -14,6 +14,8 @@ chk_iassign(int id) {
     chk_iassign2(id, bt);
   }
 } return void;
+given iassign_build ((import iassign_node)):() then check_failed:(0)
+given cmp_fixture ((import bin_eq)):() then check_failed:(1)
 
 // `int` exactly, not "any integral type": idc.py indexes with a C int, so a
 // word index is a real narrowing and is reported rather than silently cast.
@@ -25,6 +27,8 @@ chk_iassign2(int id, string bt) {
     chk_iassign3(id, bt);
   }
 } return void;
+given iassign_build ((import iassign_node), "int[]"):() then check_failed:(0)
+given iassign_build ((import iassign_node), "string[]"):() then check_failed:(1)
 
 chk_iassign3(int id, string bt) {
   int v = l1_of(id)[0];
@@ -34,3 +38,5 @@ chk_iassign3(int id, string bt) {
     tc_err(id, "cannot store a " + type_of_v + " into a " + bt);
   }
 } return void;
+given iassign_build ((import iassign_node), "int[]"):() then check_failed:(0)
+given iassign_build ((import iassign_node), "string[]"):() then check_failed:(1)
