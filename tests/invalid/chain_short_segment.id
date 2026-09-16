@@ -1,0 +1,9 @@
+// EXPECT: may only follow a segment that used all 3 actions
+// the first segment spends only 2 of its 3 actions, so it had room to keep
+// writing and a chain may not follow it
+main(int argc, string[] argv) {
+  int a = 1;
+  int b = 2;
+} chain (int argc, string[] argv) {
+  int c = 3;
+} return int 0;

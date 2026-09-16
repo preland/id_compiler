@@ -22,7 +22,7 @@ given full_env ([], "g", 2, [0]):() then check_failed:(0)
 
 seg_step(int[] body, string fname, int ln, int[] acc, int i) {
   if(k_of(body[i]) == "chain") {
-    seg_close(fname, ln, acc);
+    seg_close(fname, ln, acc, 1);
   } else {
     int a = stmt_actions(body[i]);
     lset(acc, 0, acc[0] + a);
@@ -31,12 +31,21 @@ seg_step(int[] body, string fname, int ln, int[] acc, int i) {
 given fn_fixture ((import fixture_params), "f", 1, [0], 0):() then check_failed:(0)
 given fn_fixture ((import fixture_params), "g", 2, [0], 0):() then check_failed:(0)
 
-// Closing a segment: report it if it ran over, then start the next at zero.
-seg_close(string fname, int ln, int[] acc) {
+// Closing a segment: report it if it ran over, report it if a chain follows a
+// segment that still had room, then start the next at zero. `at_seam` is 1
+// when a marker closed the segment and 0 when the end of the body did -- the
+// second rule applies only at a seam, because the final segment is allowed to
+// stop wherever the function stops. The two conditions cannot both hold, so
+// nothing is reported twice.
+seg_close(string fname, int ln, int[] acc, int at_seam) {
   if(acc[0] > 3) {
     report_actions(fname, acc[0], ln);
   }
+  if(at_seam == 1 && acc[0] < 3) {
+    report_short_seg(fname, acc[0], ln);
+  }
   lset(acc, 0, 0);
 } return void;
-given full_env ("f", 1, [0]):() then check_failed:(0)
-given full_env ("f", 1, [4]):() then check_failed:(1)
+given full_env ("f", 1, [0], 0):() then check_failed:(0)
+given full_env ("f", 1, [4], 0):() then check_failed:(1)
+given full_env ("f", 1, [2], 1):() then check_failed:(1)

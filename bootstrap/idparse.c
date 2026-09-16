@@ -2252,6 +2252,7 @@ char* id_func_file_at(int i, char* fname, char* s);
 int id_func_line(char* fname);
 int id_func_line_at(int i, char* fname, int n);
 char* id_loc_at(char* fname, int ln);
+void id_report_short_seg(char* fname, int n, int ln);
 void id_check_plain_else(IdList* els, int depth, char* fname, int ln);
 void id_report_actions(char* fname, int n, int ln);
 void id_report_deep(char* fname, int depth, int ln);
@@ -2279,7 +2280,7 @@ void id_check_main_at(int m);
 void id_report_main(void);
 void id_seg_walk(IdList* body, char* fname, int ln, IdList* acc);
 void id_seg_step(IdList* body, char* fname, int ln, IdList* acc, int i);
-void id_seg_close(char* fname, int ln, IdList* acc);
+void id_seg_close(char* fname, int ln, IdList* acc, int at_seam);
 void id_fit_given(int i);
 void id_given_fn(int i, char* setup_nm);
 void id_given_shape(int i, char* setup_nm, int sfn);
@@ -19160,6 +19161,14 @@ char* id_loc_at(char* fname, int ln) {
     return ret_s;
 }
 
+void id_report_short_seg(char* fname, int n, int ln) {
+    char* loc_at_v;
+    loc_at_v = id_loc_at(fname, ln);
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "a segment of '"), fname), "' performs "), id_str_of_int(n)), " actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead"));
+    id_note_failure();
+    return;
+}
+
 void id_check_plain_else(IdList* els, int depth, char* fname, int ln) {
     if ((id_list_len(els) > 0)) {
         id_check_block(els, (depth + 1), fname, ln);
@@ -19320,7 +19329,7 @@ void id_check_segs(IdList* body, char* fname, int ln) {
     IdList* acc;
     acc = id_list_lit(1, (long long)(0));
     id_seg_walk(body, fname, ln, acc);
-    id_seg_close(fname, ln, acc);
+    id_seg_close(fname, ln, acc, 0);
     return;
 }
 
@@ -19393,7 +19402,7 @@ void id_seg_walk(IdList* body, char* fname, int ln, IdList* acc) {
 void id_seg_step(IdList* body, char* fname, int ln, IdList* acc, int i) {
     int a;
     if ((strcmp(id_k_of((int)(id_list_get(body, i))), "chain") == 0)) {
-        id_seg_close(fname, ln, acc);
+        id_seg_close(fname, ln, acc, 1);
     } else {
         a = id_stmt_actions((int)(id_list_get(body, i)));
         id_lset(acc, 0, ((int)(id_list_get(acc, 0)) + a));
@@ -19401,9 +19410,12 @@ void id_seg_step(IdList* body, char* fname, int ln, IdList* acc, int i) {
     return;
 }
 
-void id_seg_close(char* fname, int ln, IdList* acc) {
+void id_seg_close(char* fname, int ln, IdList* acc, int at_seam) {
     if (((int)(id_list_get(acc, 0)) > 3)) {
         id_report_actions(fname, (int)(id_list_get(acc, 0)), ln);
+    }
+    if (((at_seam == 1) && ((int)(id_list_get(acc, 0)) < 3))) {
+        id_report_short_seg(fname, (int)(id_list_get(acc, 0)), ln);
     }
     id_lset(acc, 0, 0);
     return;

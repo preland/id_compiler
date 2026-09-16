@@ -12,3 +12,14 @@ dvname_len() {
 } return int n;
 given regrow_c ():(0)
 given regrow_d ():(1)
+
+// A chain continues a function that has run out of room, so a segment that
+// still had room should have kept writing rather than starting a new one.
+// Housed here because every file under shape/block/ and shape/actions/ is at
+// the three-function limit and this was the only slot within reach; it is an
+// imperfect fit for a file otherwise about the `file:line:` prefix.
+report_short_seg(string fname, int n, int ln) {
+  string loc_at_v = loc_at(fname, ln);
+  print(loc_at_v + "a segment of '" + fname + "' performs " + n + " actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead");
+  note_failure();
+} return void;

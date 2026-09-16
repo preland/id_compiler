@@ -15,7 +15,7 @@ check_body_at(int[] l2_of_v, string s1_of_v) {
 check_segs(int[] body, string fname, int ln) {
   int[] acc = [0];
   seg_walk(body, fname, ln, acc);
-  seg_close(fname, ln, acc);
+  seg_close(fname, ln, acc, 0);
 } return void;
 given full_env ([], "f", 1):() then check_failed:(0)
 given full_env ([], "g", 2):() then check_failed:(0)
