@@ -13,3 +13,11 @@ void_arr_pair(int id, string t1, string t2) {
   void_arr_type(id, t1);
   void_arr_type(id, t2);
 } return void;
+
+idxfix() {
+  call2_setup();
+  int b = node_int("1", 1, 0);
+  export int rgidx_node = node_index(b, b);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

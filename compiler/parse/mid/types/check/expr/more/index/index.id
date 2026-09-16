@@ -17,6 +17,8 @@ tc_g4(int id) {
   }
   tc_g5(id);
 } return void;
+given idxfix ((import rgidx_node)):() then calls chk_index:((import rgidx_node))
+given call2_setup ((import cm_push_call)):() then check_failed:(0)
 
 chk_index(int id) {
   string bt = base_type(id);
@@ -26,6 +28,8 @@ chk_index(int id) {
     chk_index2(id);
   }
 } return void;
+given idxfix ((import rgidx_node)):() then calls ix_err:((import rgidx_node), "cannot index a int")
+given idxquiet ((import idx_node3)):() then calls chk_index2:((import idx_node3))
 
 chk_index2(int id) {
   int i2_of_v = i2_of(id);
@@ -34,3 +38,5 @@ chk_index2(int id) {
     ix_err(id, "array index must be int, got " + it);
   }
 } return void;
+given idxfix ((import rgidx_node)):() then check_failed:(0)
+given idxquiet ((import idx_node3)):() then check_failed:(0)

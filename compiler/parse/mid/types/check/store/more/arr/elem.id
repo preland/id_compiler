@@ -1,6 +1,14 @@
 // bad_store rather than bad_init, so a list of lists recurses: the elements of
 // an int[][] literal are int[] literals, and they take their type from the
 // element type in the same way.
+idxquiet() {
+  call2_setup();
+  int v = node_var("q");
+  export int idx_node3 = node_index(v, v);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 arr_el_at(string want, int e, int i) {
   int el = l1_of(e)[i];
   arr_el_check(want, el, i);

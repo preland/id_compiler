@@ -12,3 +12,10 @@ fv_elem_err(int el, int i) {
   string t = type_of(el);
   tc_err(el, "a function value cannot be an element of a list: element " + i + " is " + t);
 } return void;
+
+argsfix() {
+  call2_setup();
+  export int[] args2 = [(import cm_push_call), (import cm_push_call)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

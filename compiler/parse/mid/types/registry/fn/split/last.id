@@ -12,3 +12,11 @@ fn_param_at(string t, int i) {
   string[] pts = fn_params(t);
   string p = pts[i];
 } return string p;
+
+iafix() {
+  idxfix();
+  int iaval = node_int("2", 2, 0);
+  export int ia_node = node_iassign((import rgidx_node), iaval);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
