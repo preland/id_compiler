@@ -10,6 +10,8 @@ build_reg() {
     i = i + 1;
   }
 } return void;
+given regrow_prog ():() then dvname_len:(2)
+given regrow_d ():() then dvname_len:(1)
 
 // Parameters are declarations too, and they are registered before the body's.
 // They carry no line of their own -- only statements do -- so they are
@@ -23,6 +25,8 @@ reg_func(int id) {
     reg_func_params(id, l1_of_v, s1_of_v);
   }
 } return void;
+given regrow_fn ((import regrow_fn_node)):() then dvname_len:(2)
+given regrow_param ((import regrow_p)):() then dvname_len:(1)
 
 reg_params(int[] params, string owner, int ln) {
   int i = 0;
@@ -31,3 +35,5 @@ reg_params(int[] params, string owner, int ln) {
     i = i + 1;
   }
 } return void;
+given regrow_param ((import regrow_plist), "f", 10):() then dvname_len:(2)
+given regrow_param ([], "f", 10):() then dvname_len:(1)

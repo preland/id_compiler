@@ -10,6 +10,8 @@ reg_decls(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
+given ifwhilefix ((import rgdeclist), "f"):() then dvname_len:(2)
+given regrow_d ([], "f"):() then dvname_len:(1)
 
 reg_stmt(int id, string owner) {
   if(k_of(id) == "decl") {
@@ -18,6 +20,8 @@ reg_stmt(int id, string owner) {
     reg_nested(id, owner);
   }
 } return void;
+given declfix ((import rgdecl_node), "f"):() then dvname_len:(2)
+given regrow_param ((import regrow_p), "f"):() then dvname_len:(1)
 
 reg_nested(int id, string owner) {
   if(k_of(id) == "if") {
@@ -26,3 +30,5 @@ reg_nested(int id, string owner) {
     reg_loop(id, owner);
   }
 } return void;
+given ifwhilefix ((import rgif_node), "f"):() then calls reg_branches:((import rgif_node), "f")
+given whilefix ((import rgwhile_node), "f"):() then calls reg_loop:((import rgwhile_node), "f")

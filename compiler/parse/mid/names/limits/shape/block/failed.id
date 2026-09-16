@@ -15,3 +15,10 @@ check_failed() {
 note_failure() {
   lset((import chkfail), 0, 1);
 } return void;
+
+regrow_fn() {
+  regrow_param();
+  export int regrow_fn_node = node_func("g2", "int", (import regrow_plist), (import regrow_plist), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

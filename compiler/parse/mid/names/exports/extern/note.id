@@ -11,3 +11,11 @@ nosuchfn_report(string loc_at_v, string name, string builtin_list_v) {
   print(loc_at_v + "no such function '" + name + "'; available builtins: " + builtin_list_v);
   note_failure();
 } return void;
+
+declfix() {
+  regrow_d();
+  int e = node_int("1", 1, 0);
+  export int rgdecl_node = node_decl("int", "q", e, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

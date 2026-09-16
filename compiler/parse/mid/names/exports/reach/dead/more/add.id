@@ -13,3 +13,10 @@ dead_final() {
   lset((import dphase), 0, 1);
   reach_funcs(0, 0);
 } return void;
+
+regrow_prog() {
+  regrow_fn();
+  push((import prog), (import regrow_fn_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
