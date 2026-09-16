@@ -1,0 +1,18 @@
+// A two-element list of int-literal node ids [nz_int, nz_int2], for the
+// emitters that join a node list with a separator (emit_args, list_params).
+
+nz_pair_fixture() {
+  nz_bin_eq_fixture();
+  export int[] nz_pair = [(import nz_int), (import nz_int2)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A literal too wide for a 32-bit int, matching the `big` flag a real parse
+// sets when its digits overflow -- int_code's own case for the `LL` suffix.
+nz_int_big_fixture() {
+  nz_pair_fixture();
+  export int nz_int_big = node_int("9999999999", 0, 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

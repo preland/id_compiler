@@ -1,0 +1,36 @@
+// Two leaf expressions this subtree's cases share: an int literal (`type_of`
+// and `emit_expr` need no lookup for either) and a second one so a binary
+// node has two distinct operands, plus a string literal for the string
+// cases (concat, strcmp, print's argument).
+
+// init_idx gives lookup_var (mid/types/registry/fn/node/type.id, on
+// type_of's dispatch chain) its vidx table -- without it, type_of on
+// anything but an int or str leaf reads past the end of an empty import and
+// segfaults, per docs/TESTS.md's note on synthetic node fixtures.
+nz_env() {
+  env_init();
+  init_idx();
+  export int nz_int = node_int("7", 7, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// harn_init gives is_harn() (prog/test/unit/flag.id) its `harn` cell, read by
+// emit_count wherever a loop or a function entry is emitted.
+nz_int2_fixture() {
+  nz_env();
+  harn_init();
+  export int nz_int2 = node_int("3", 3, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// init_rtc gives is_builtin (mid/names/exports/extern/builtin/report.id, on
+// callee_var_type's dispatch for a call node) its `bnames` table.
+nz_str_fixture() {
+  nz_int2_fixture();
+  init_rtc();
+  export int nz_strn = node_str("\"hi\"");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

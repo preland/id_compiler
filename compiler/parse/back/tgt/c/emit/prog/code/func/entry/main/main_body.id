@@ -7,6 +7,8 @@ main_body(int m) {
     bd = main_call(m) + "; return 0;";
   }
 } return string bd;
+given nz_prog_fixture ((import nz_mainfn)):("return id_main(argc, id_args);")
+given nz_prog_fixture ((import nz_plainfn)):("id_main(); return 0;")
 
 main_call(int m) {
   string mc = "id_main()";
@@ -14,6 +16,8 @@ main_call(int m) {
     mc = "id_main(argc, id_args)";
   }
 } return string mc;
+given nz_prog_fixture ((import nz_mainfn)):("id_main(argc, id_args)")
+given nz_prog_fixture ((import nz_plainfn)):("id_main()")
 
 // the func node named "main", or -1
 find_main() {
@@ -24,3 +28,5 @@ find_main() {
     i = i + 1;
   }
 } return int m;
+given nz_prog_fixture ():((import nz_mainfn))
+given nz_prog_nomain_fixture ():(-1)

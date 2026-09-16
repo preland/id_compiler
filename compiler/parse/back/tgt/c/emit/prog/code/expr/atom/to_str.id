@@ -18,6 +18,8 @@ to_str(string code, string type) {
     s = to_str2(code, type);
   }
 } return string s;
+("x", "int"):("id_str_of_int(x)")
+("x", "string"):("x")
 
 // A float in string context becomes id_str_of_float; a word id_str_of_word
 // (in to_str3); a string stays as is.
@@ -27,6 +29,8 @@ to_str2(string code, string type) {
     s = "id_str_of_float(" + code + ")";
   }
 } return string s;
+("x", "float"):("id_str_of_float(x)")
+("x", "word"):("id_str_of_word(x)")
 
 // A word prints as %lld and an int as %d, so they need different helpers.
 // Everything else is already a string and stays as it is.
@@ -36,3 +40,5 @@ to_str3(string code, string type) {
     s = "id_str_of_word(" + code + ")";
   }
 } return string s;
+("x", "word"):("id_str_of_word(x)")
+("x", "string"):("x")

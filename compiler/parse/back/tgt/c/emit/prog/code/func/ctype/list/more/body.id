@@ -4,6 +4,8 @@ emit_ty_proto(string ty) {
   string key = tc_key(ty);
   emit_line("static int idtc_eq_" + key + "(IdList* a, IdList* b);\nstatic void idtc_show_" + key + "(IdList* a);");
 } return void;
+("int[]"):() then prints:("static int idtc_eq_int(IdList* a, IdList* b);\nstatic void idtc_show_int(IdList* a);\n")
+("string[]"):() then prints:("static int idtc_eq_string(IdList* a, IdList* b);\nstatic void idtc_show_string(IdList* a);\n")
 
 emit_ty_bodies() {
   int i = 0;
@@ -12,9 +14,13 @@ emit_ty_bodies() {
     i = i + 1;
   }
 } return void;
+given tctys_note_one_setup ():() then prints:("static int idtc_eq_int(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!((int)(a->data[i]) == (int)(b->data[i]))) return 0;\n    return 1;\n}\nstatic void idtc_show_int(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+given tc_types_init ():() then prints:("")
 
 emit_ty_body(string ty) {
   string key = tc_key(ty);
   string et = list_elem(ty);
   emit_ty_body2(key, et);
 } return void;
+("int[]"):() then prints:("static int idtc_eq_int(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!((int)(a->data[i]) == (int)(b->data[i]))) return 0;\n    return 1;\n}\nstatic void idtc_show_int(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+("string[]"):() then prints:("static int idtc_eq_string(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!(strcmp((char*)(intptr_t)(a->data[i]), (char*)(intptr_t)(b->data[i])) == 0)) return 0;\n    return 1;\n}\nstatic void idtc_show_string(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")

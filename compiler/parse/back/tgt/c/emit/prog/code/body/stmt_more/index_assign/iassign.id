@@ -6,15 +6,21 @@ emit_iassign(int id, string ind) {
   string type_of_v = type_of(i1_of_v);
   iassign2(id, ind, type_of_v);
 } return void;
+given iassign_fixture ((import iassign_node), "  "):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
+given iassign_fixture ((import iassign_node), ""):() then prints:("id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
 
 iassign2(int id, string ind, string type_of_v) {
   string elem = elem_type(type_of_v);
   int[] l1_of_v = l1_of(id);
   iassign3(id, ind, elem, l1_of_v);
 } return void;
+given iassign_fixture ((import iassign_node), "  ", "int[]"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
+given iassign_fixture ((import iassign_node), "  ", "string[]"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(intptr_t)(7));\n")
 
 iassign3(int id, string ind, string elem, int[] l1_of_v) {
   string emit_expr_v = emit_expr(l1_of_v[0]);
   string val = box(emit_expr_v, elem);
   iassign4(id, ind, val);
 } return void;
+given iassign_fixture ((import iassign_node), "  ", "int", (import iassign_vlist)):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
+given iassign_fixture ((import iassign_node), "  ", "string", (import iassign_vlist)):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(intptr_t)(7));\n")

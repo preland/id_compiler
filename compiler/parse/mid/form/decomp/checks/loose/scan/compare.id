@@ -22,3 +22,13 @@ lz_at(int i) {
 } return void;
 given lz_p (1):() then calls lz_report:(1, 0)
 given lz_p (0):() then calls lz_report:[0]
+
+// prog = [dup5, dup9] (index 1: dup9), and the real strict fingerprint pass
+// over it: dup5/dup9's strict fps differ (they keep the literal's value).
+lz_o() {
+  lz_n();
+  push((import prog), (import lz_fn9));
+  uq_fill();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

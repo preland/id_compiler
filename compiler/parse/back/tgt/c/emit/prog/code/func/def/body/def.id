@@ -6,14 +6,20 @@ emit_def(int id) {
   emit_line(sig_v + " {");
   emit_def_body(id);
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("void id_run(void) {\n    return;\n}\n")
 
 emit_def_body(int id) {
   hoist(id);
   emit_entry(id);
   emit_tail(id);
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")
 
 emit_tail(int id) {
   emit_main_init(id);
   emit_tail2(id);
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")

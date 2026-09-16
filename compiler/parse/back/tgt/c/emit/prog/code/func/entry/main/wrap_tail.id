@@ -4,3 +4,5 @@ wrap_body_tail(int m) {
   string main_body_v = main_body(m);
   emit_line("    " + main_body_v + " }");
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return id_main(argc, id_args); }\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("    id_main(); return 0; }\n")

@@ -9,6 +9,8 @@ es3(int id, string ind) {
     es3b(id, ind);
   }
 } return void;
+given nz_exprstmt_fixture ((import nz_exprstmtn), "  "):() then prints:("  7;\n")
+given nz_while_fixture ((import nz_whilen), "  "):() then prints:("  while (7) {\n  }\n")
 
 es4(int id, string ind) {
   if(k_of(id) == "if") {
@@ -17,7 +19,11 @@ es4(int id, string ind) {
     emit_while(id, ind);
   }
 } return void;
+given nz_if_fixture ((import nz_ifn), "  "):() then prints:("  if (7) {\n  }\n")
+given nz_while_fixture ((import nz_whilen), "  "):() then prints:("  while (7) {\n  }\n")
 
 emit_if(int id, string ind) {
   emit_if_at(id, ind, ind + "if (");
 } return void;
+given nz_if_fixture ((import nz_ifn), "  "):() then prints:("  if (7) {\n  }\n")
+given nz_if_fixture ((import nz_ifn), ""):() then prints:("if (7) {\n}\n")

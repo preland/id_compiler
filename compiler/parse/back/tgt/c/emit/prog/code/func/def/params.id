@@ -4,6 +4,8 @@ param_str(int id) {
   int[] l1_of_v = l1_of(id);
   string ret_s = pstr(l1_of_v);
 } return string ret_s;
+given nz_prog_fixture ((import nz_mainfn)):("int argc")
+given nz_prog_fixture ((import nz_plainfn)):("void")
 
 pstr(int[] params) {
   string s = "void";
@@ -11,6 +13,8 @@ pstr(int[] params) {
     s = list_params(params);
   }
 } return string s;
+given nz_main_parts ((import nz_mainparams)):("int argc")
+([]):("void")
 
 list_params(int[] params) {
   string out = "";
@@ -21,3 +25,5 @@ list_params(int[] params) {
     i = i + 1;
   }
 } return string out;
+given nz_main_parts ((import nz_mainparams)):("int argc")
+([]):("")

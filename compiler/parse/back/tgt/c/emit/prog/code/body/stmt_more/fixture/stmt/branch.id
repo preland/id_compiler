@@ -1,0 +1,27 @@
+// An `if` and a `while` node, both with empty bodies, for the statement
+// dispatch this subtree branches on.
+
+nz_if_fixture() {
+  nz_call_print_fixture();
+  int[] none = [];
+  export int nz_ifn = node_if((import nz_int), none, none, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_while_fixture() {
+  nz_if_fixture();
+  int[] none = [];
+  export int nz_whilen = node_while((import nz_int), none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// init_tyc gives c_type/c_scalar (func/ctype/ctype.id) their C-spelling
+// column, needed by anything downstream that emits a function's signature.
+nz_tyc_fixture() {
+  nz_while_fixture();
+  init_tyc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

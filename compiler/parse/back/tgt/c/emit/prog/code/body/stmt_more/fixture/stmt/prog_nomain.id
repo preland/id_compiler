@@ -1,0 +1,17 @@
+// `prog` with a function but no "main", for the entry emitters' no-main
+// branch; and the one parameter "main" (below) takes, split out so building
+// the func node itself stays within the per-block action limit.
+
+nz_main_parts() {
+  nz_tyc_fixture();
+  export int[] nz_mainparams = [node_param("param", "int", "argc")];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_prog_nomain_fixture() {
+  nz_plain_fixture();
+  push((import prog), (import nz_plainfn));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

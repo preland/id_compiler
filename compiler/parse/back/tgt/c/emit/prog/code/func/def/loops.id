@@ -8,6 +8,8 @@ fwd_all() {
     i = i + 1;
   }
 } return void;
+given nz_prog_fixture ():() then prints:("int id_main(int argc);\nvoid id_run(void);\n")
+given nz_prog_nomain_fixture ():() then prints:("void id_run(void);\n")
 
 def_all() {
   int i = 0;
@@ -16,6 +18,8 @@ def_all() {
     i = i + 1;
   }
 } return void;
+given nz_prog_fixture ():() then prints:("int id_main(int argc) {\n    return 7;\n}\n\nvoid id_run(void) {\n    return;\n}\n\n")
+given nz_prog_nomain_fixture ():() then prints:("void id_run(void) {\n    return;\n}\n\n")
 
 // each definition is followed by a blank line (idc.py joins bodies that way).
 // A `native` declaration has only its forward declaration: the backend's
@@ -26,3 +30,5 @@ emit_def_nl(int id) {
     emit_line("");
   }
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n\n")
+given nz_prog_fixture ((import nz_plainfn)):() then prints:("void id_run(void) {\n    return;\n}\n\n")

@@ -1,0 +1,23 @@
+// A strcmp-shaped binary node (`==` on two strings) and a `print` call over
+// a string, chained onto bin.id's fixtures.
+
+nz_bin_eq_fixture() {
+  nz_bin_concat_fixture();
+  export int nz_bin_eq = node_bin("==", (import nz_strn), (import nz_strn2));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_call_print_fixture() {
+  nz_bin_eq_fixture();
+  export int nz_call_print = node_call("print", [(import nz_strn)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+nz_bin_streq_fixture() {
+  nz_call_print_fixture();
+  export int nz_bin_streq = node_bin("=", (import nz_strn), (import nz_strn2));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

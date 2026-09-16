@@ -16,3 +16,5 @@ main_at(int i, int m) {
     r = (import prog)[i];
   }
 } return int r;
+given nz_prog_fixture (0, -1):((import nz_mainfn))
+given nz_prog_fixture (1, -1):(-1)

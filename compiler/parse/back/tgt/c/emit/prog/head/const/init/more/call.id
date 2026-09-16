@@ -6,9 +6,13 @@ emit_main_init(int id) {
     emit_init_call();
   }
 } return void;
+given nz_prog_fixture ((import nz_mainfn)):() then calls emit_init_call:[1]
+given nz_prog_fixture ((import nz_plainfn)):() then calls emit_init_call:[0]
 
 emit_init_call() {
   if(list_consts_kept() > 0) {
     emit_line("    idc_const_init();");
   }
 } return void;
+given lc_dce_setup ():() then prints:("    idc_const_init();\n")
+given lc_dce_setup2 ():() then prints:("")

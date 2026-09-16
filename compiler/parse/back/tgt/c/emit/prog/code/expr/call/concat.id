@@ -5,9 +5,13 @@ emit_concat(int id) {
   int i2_of_v = i2_of(id);
   string s = "id_concat(" + arg_str(i1_of_v) + ", " + arg_str(i2_of_v) + ")";
 } return string s;
+given nz_bin_concat_fixture ((import nz_bin_concat)):("id_concat(\"hi\", \"yo\")")
+given nz_bin_add_fixture ((import nz_bin_add)):("id_concat(id_str_of_int(7), id_str_of_int(3))")
 
 arg_str(int id) {
   string emit_expr_v = emit_expr(id);
   string type_of_v = type_of(id);
   string ret_s = to_str(emit_expr_v, type_of_v);
 } return string ret_s;
+given nz_bin_eq_fixture ((import nz_strn)):("\"hi\"")
+given nz_bin_eq_fixture ((import nz_int)):("id_str_of_int(7)")

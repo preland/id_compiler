@@ -10,6 +10,8 @@ emit_bin(int id) {
     s = emit_op2(id);
   }
 } return string s;
+given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
+given nz_bin_concat_fixture ((import nz_bin_concat)):("id_concat(\"hi\", \"yo\")")
 
 emit_op2(int id) {
   string s = "";
@@ -19,9 +21,13 @@ emit_op2(int id) {
     s = emit_op3(id);
   }
 } return string s;
+given nz_bin_eq_fixture ((import nz_bin_eq)):("(strcmp(\"hi\", \"yo\") == 0)")
+given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
 
 emit_infix(int id) {
   int i1_of_v = i1_of(id);
   string s1_of_v = s1_of(id);
   string s = infix_line(id, i1_of_v, s1_of_v);
 } return string s;
+given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
+given nz_bin_eq_fixture ((import nz_bin_eq)):("(\"hi\" == \"yo\")")

@@ -12,15 +12,21 @@ emit_main_wrapper() {
     emit_line("");
   }
 } return void;
+given nz_prog_fixture ():() then prints:("int main(int argc, char** argv) { (void)argc; (void)argv;\n    IdList* id_args = id_list_new();\n    for (int i = 0; i < argc; i++)\n        id_list_push(id_args, (long long)(intptr_t)argv[i]);\n    return id_main(argc, id_args); }\n\n")
+given nz_prog_nomain_fixture ():() then prints:("\n")
 
 emit_wrapper() {
   emit_line("int main(int argc, char** argv) { (void)argc; (void)argv;");
   wrap_body();
   emit_line("");
 } return void;
+given nz_prog_fixture ():() then prints:("int main(int argc, char** argv) { (void)argc; (void)argv;\n    IdList* id_args = id_list_new();\n    for (int i = 0; i < argc; i++)\n        id_list_push(id_args, (long long)(intptr_t)argv[i]);\n    return id_main(argc, id_args); }\n\n")
+given nz_prog_fixture ():() then calls wrap_body_tail:((import nz_mainfn))
 
 wrap_body() {
   int m = find_main();
   emit_marshal(m);
   wrap_body_tail(m);
 } return void;
+given nz_prog_fixture ():() then prints:("    IdList* id_args = id_list_new();\n    for (int i = 0; i < argc; i++)\n        id_list_push(id_args, (long long)(intptr_t)argv[i]);\n    return id_main(argc, id_args); }\n")
+given nz_prog_fixture ():() then calls main_call:((import nz_mainfn))

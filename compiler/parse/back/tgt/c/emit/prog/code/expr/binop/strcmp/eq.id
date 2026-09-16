@@ -6,6 +6,8 @@ is_strcmp(int id) {
     ok = 1;
   }
 } return int ok;
+given nz_bin_eq_fixture ((import nz_bin_eq)):(1)
+given nz_bin_add_fixture ((import nz_bin_add)):(0)
 
 is_eqop(string op) {
   int ok = 0;
@@ -13,3 +15,5 @@ is_eqop(string op) {
     ok = 1;
   }
 } return int ok;
+("=="):(1)
+("+"):(0)

@@ -15,6 +15,8 @@ export_line(int i) {
     s = const_line((import enames)[i]);
   }
 } return string s;
+given lc_dce_setup (0):("IdList* a;  /* constant from conf.id */")
+given lc_dce_setup (1):("int b = 2;  /* constant from conf.id */")
 
 const_line(string name) {
   int d = const_decl(name);
