@@ -7,6 +7,8 @@ lw_plain(int node) {
   string h = lw_bret(s1_of_v);
   int ret_i = lw_plain_mid(node, s1_of_v, h);
 } return int ret_i;
+given ocall_fixture ((import ocall_node)):(0)
+given bicall_fixture ((import bicall_node)):(1)
 
 lw_bret(string name) {
   string t = lw_bret2(name);
@@ -14,6 +16,8 @@ lw_bret(string name) {
     t = lw_sysret(name);
   }
 } return string t;
+("str_of_mem"):("string")
+("getkey"):("int")
 
 // The real-time I/O builtins have no entry in builtin_type: their result is
 // never used in an expression the type pass has to judge, so it never needed
@@ -27,3 +31,5 @@ lw_bret2(string name) {
     t = "int";
   }
 } return string t;
+("put"):("void")
+("getkey"):("int")
