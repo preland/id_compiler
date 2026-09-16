@@ -4,8 +4,12 @@ lw_arr_new(int node) {
   string ty = lw_ety(node);
   int a = lw_new(ty);
 } return int a;
+given lw_fix_arr ((import fix_arr_n)):(0)
+given lw_fix_arr_empty ((import fix_arr_empty_n)):(0)
 
 lw_arr_elem(int node) {
   string ty = lw_ety(node);
   string elem = elem_type(ty);
 } return string elem;
+given lw_fix_arr ((import fix_arr_n)):("int")
+given lw_fix_arr_empty ((import fix_arr_empty_n)):("int")

@@ -8,3 +8,5 @@ lw_sysret(string name) {
     t = "string";
   }
 } return string t;
+("poke8"):("")
+("peek8"):("word")

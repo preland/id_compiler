@@ -1,0 +1,23 @@
+// Two `then` checks for test_widen/test_widen2 (back/drive/target/tests/
+// more/seed/seed.id), which read module state (prog, rfn, dphase) rather
+// than returning it. Filed here (an unrelated phi-node walk) rather than
+// under back/drive/, which is at its 3-entry cap.
+
+rfnfx_setup() {
+  lw_env_fixture();
+  init_reach();
+} return void;
+():() then check_failed:(0)
+():() then rfn_len:(2)
+
+rfn_len() {
+  int n = len((import rfn));
+} return int n;
+given rfnfx_setup ():(2)
+given rfnfx_setup ():(2) then check_failed:(0)
+
+dphase_check() {
+  int n = (import dphase)[0];
+} return int n;
+given rfnfx_setup ():(0)
+given rfnfx_setup ():(0) then check_failed:(0)

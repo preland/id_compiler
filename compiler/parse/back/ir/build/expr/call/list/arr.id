@@ -5,6 +5,8 @@ lw_arr(int node) {
   string elem = lw_arr_elem(node);
   lw_arr_els(node, a, elem);
 } return int a;
+given lw_fix_arr ((import fix_arr_n)):(0)
+given lw_fix_arr_empty ((import fix_arr_empty_n)):(0)
 
 lw_arr_els(int node, int a, string elem) {
   int i = 0;
@@ -12,8 +14,12 @@ lw_arr_els(int node, int a, string elem) {
     i = lw_arr_one(node, i, a, elem);
   }
 } return void;
+given lw_fix_arr ((import fix_arr_n), 0, ""):() then calls lw_arr_one:[1]
+given lw_fix_arr_empty ((import fix_arr_empty_n), 0, ""):() then calls lw_arr_one:[0]
 
 lw_arr_one(int node, int i, int a, string elem) {
   lw_arr_push(node, i, a, elem);
   int ret_i = i + 1;
 } return int ret_i;
+given lw_fix_arr ((import fix_arr_n), 0, 0, "int"):(1)
+given lw_fix_arr ((import fix_arr_n), 0, 5, "word"):(1)

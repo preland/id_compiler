@@ -1,0 +1,39 @@
+// A `call` node naming a `native` function ("nat_target"), for the
+// back/drive/sink/natives/ walk cases. A native is a plain func node with
+// 1 in its i2 field (front/parse/decl/top/decl/native/tail.id's
+// native_node -- is_native reads exactly that), built directly with
+// newnode since node_func always leaves i2 at 0. Registered through
+// add_func the same way ocall_fixture's callee is, so func_node/lookup_func
+// find it. nat_init(...--natives) stands in for nat_lists() (which it
+// calls itself): every case built on this fixture gets a real natc export
+// too, not just natkey/natrow, since nat_scan/nat_func read it. The final
+// step, natcall_fixture_tail, is at
+// ../../../../../../../ir/opt/run/pipe/cases/natfixture.id -- a file holds at
+// most 3 functions and this fixture needs four. Filed here (this
+// directory, asm_targets.id/guarded_emit.id, is otherwise unrelated)
+// rather than under sink/natives/ itself, where every directory is
+// already at the 3-entry cap.
+
+natcall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  natcall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+natcall_fixture_reg() {
+  nat_init(2, ["prog", "--natives"]);
+  int[] none = [];
+  natcall_fixture_func(none);
+} return void;
+given natcall_fixture ():() then check_failed:(0)
+given natcall_fixture ():() then init_units:(0)
+
+natcall_fixture_func(int[] none) {
+  init_reach();
+  int natfn = newnode("func", 0 - 1, 1, "nat_target", "int", none, none);
+  natcall_fixture_tail(natfn, none);
+} return void;
+given natcall_fixture ([]):() then check_failed:(0)
+given natcall_fixture ([]):() then init_units:(0)

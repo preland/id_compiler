@@ -4,6 +4,8 @@ lw_iset(int node, int a, string elem) {
   int v = lw_iset_val(node, elem);
   lw_callf("id_list_set", "", [a, i, v]);
 } return void;
+given lw_fix_iassign ((import fix_iassign_n), 0, "i"):()
+given lw_fix_iassign ((import fix_iassign_n), 5, "x"):()
 
 // A fresh list. Its own function because the runtime call takes no arguments
 // and an empty list literal needs a typed context, which an argument position
@@ -12,3 +14,5 @@ lw_new(string ty) {
   int[] none = [];
   int ret_i = lw_callf("id_list_new", ty, none);
 } return int ret_i;
+given lw_env_fixture ("int"):(0)
+given lw_env_fixture ("string"):(0)

@@ -1,0 +1,26 @@
+// Two small helpers for the back/drive/sink/natives/more/live.id cases:
+// nat_on_check reads back natc[0] (the --natives flag cell, a void
+// function's only observable effect), and natinit_fixture_off/_on run
+// nat_init with and without the flag. Filed here (an unrelated memory-init
+// optimization pass) rather than under back/drive/, which is at its
+// 3-entry cap.
+
+nat_on_check() {
+  int n = (import natc)[0];
+} return int n;
+given natinit_fixture_off ():(0)
+given natinit_fixture_on ():(1)
+
+natinit_fixture_off() {
+  env_init();
+  nat_init(1, ["prog"]);
+} return void;
+():() then check_failed:(0)
+():() then nat_on_check:(0)
+
+natinit_fixture_on() {
+  env_init();
+  nat_init(2, ["prog", "--natives"]);
+} return void;
+():() then check_failed:(0)
+():() then nat_on_check:(1)

@@ -1,0 +1,13 @@
+// The last step of ../../../../expr/op/cmp/pfixture.id's pcall_fixture: f
+// is "gparam"'s func node (one `int` param "p"), registered through
+// add_func, then a call node naming it with one argument. pcall_arg_n is
+// that argument's own node, exported for a case on lw_pty (which is handed
+// the argument's node directly, not the call node).
+
+pcall_fixture_tail(int f) {
+  add_func("gparam", "int", f);
+  export int pcall_arg_n = node_int("9", 9, 0);
+  export int pcall_node = node_call("gparam", [(import pcall_arg_n)]);
+} return void;
+given pcall_fixture (0):() then check_failed:(0)
+given pcall_fixture (0):() then init_units:(0)

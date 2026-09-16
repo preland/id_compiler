@@ -12,14 +12,20 @@ lw_hcall(int node, int a, int b, string t) {
   string h = lw_helper(s1_of_v, t);
   int ret_i = lw_hcall_lhs(h, a, b, t);
 } return int ret_i;
+given arith_fixture ((import div_node), 1, 2, "int"):(3)
+given arith_fixture ((import div_node), 1, 2, "word"):(3)
 
 lw_hcall2(string h, int a, int b, string t) {
   string lw_hty_v = lw_hty(h);
   int r = lw_callf(h, lw_hty_v, [a, b]);
   int ret_i = lw_hcall2_out(h, r, t);
 } return int ret_i;
+given arith_fixture ("id_idiv", 1, 2, "int"):(3)
+given arith_fixture ("id_idiv", 1, 2, "word"):(4)
 
 lw_hcall2_out(string h, int r, string t) {
   string lw_hty_v2 = lw_hty(h);
   int ret_i = lw_conv(r, lw_hty_v2, t);
 } return int ret_i;
+given arith_fixture ("id_idiv", 3, "int"):(3)
+given arith_fixture ("id_idiv", 3, "word"):(3)

@@ -3,7 +3,7 @@
 // through the lowering pass, since these cases only need what
 // ir_op/ir_ty/ir_a/ir_b/ir_s read back. Chained (ir_fix2 calls ir_fix1, and
 // so on) so a case can `given` the shortest prefix that has the node it
-// needs; continued in back/ir/opt/run/pipe/llval2.id. Filed here rather than
+// needs; continued in back/ir/opt/run/pipe/cases/llval2.id. Filed here rather than
 // beside ll/val/ itself because every directory near it is at the 3-entry
 // layout limit; this directory's siblings (nodes/, rows/) are another
 // batch's IR-node fixtures for the same core/ tree.

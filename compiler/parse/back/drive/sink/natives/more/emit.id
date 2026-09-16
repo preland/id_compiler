@@ -18,6 +18,8 @@ natives_then_prune() {
     dce_prune();
   }
 } return void;
+given natcall_fixture ():() then calls nat_scan:("program", 1)
+given natcall_fixture ():() then calls nat_scan:("program", 1) then check_failed:(0)
 
 emit_then_natives(int argc, string[] argv) {
   emit(argc, argv);
@@ -35,3 +37,5 @@ nat_print() {
     i = i + 1;
   }
 } return void;
+given natcall_fixture ():() then prints:("/* ---- natives ---- */\n")
+given nat_row_setup ():() then prints:("/* ---- natives ---- */\nharness|nat_target|<stdin>:1|<stdin>\n")

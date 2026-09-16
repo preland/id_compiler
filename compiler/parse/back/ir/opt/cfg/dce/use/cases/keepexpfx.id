@@ -1,0 +1,34 @@
+// A fixture for keep_export (back/drive/run/check/dce/export/keep.id):
+// "main" registered (so nat_all_live is false, the way a real pruned
+// program has it) and two exported names -- one unreached, one reached
+// (init_reach's own rfn seed includes "main"). The rest of the chain
+// (keep_export_fixture_harn_on, keep_export_fixture_tail) is at
+// ../../../../run/fold/cmp/keepexpfx.id -- a file holds at most 3 functions
+// and this fixture needs five. Filed here (an unrelated CFG dead-use-
+// elimination pass) rather than under back/drive/, which is at its
+// 3-entry cap.
+
+keep_export_fixture() {
+  env_init();
+  init_idx();
+  harn_init();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// init_rtc() is only needed on this path: is_freestanding() (nat_all_live)
+// is short-circuited away entirely when is_harn() is true.
+keep_export_fixture_reg() {
+  keep_export_fixture();
+  init_rtc();
+  keep_export_fixture_mid();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+keep_export_fixture_mid() {
+  add_func("main", "void", 0 - 1);
+  keep_export_fixture_tail();
+} return void;
+given keep_export_fixture ():() then check_failed:(0)
+given keep_export_fixture ():() then init_units:(0)

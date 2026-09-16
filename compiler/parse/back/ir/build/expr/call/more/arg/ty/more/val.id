@@ -3,6 +3,8 @@ lw_arg_val(int node, int i) {
   string pty = lw_arg_pty(node, i);
   int v = lw_arg_conv(node, i, pty);
 } return int v;
+given pcall_fixture ((import pcall_node), 0):(1)
+given bicall_fixture ((import bicall_node), 0):(0)
 
 // Whether function node f declares an i-th parameter. Reached only after f
 // has been shown to be a real node. The type itself is mid/'s param_type,
@@ -12,3 +14,5 @@ lw_has_par(int f, int i) {
   int n = len(pars);
   int ok = i < n;
 } return int ok;
+given pcall_fixture ((import pcall_fn), 0):(1)
+given pcall_fixture ((import pcall_fn), 1):(0)

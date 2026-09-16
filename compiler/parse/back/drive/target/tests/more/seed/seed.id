@@ -17,9 +17,13 @@ test_widen(int[] pkeep, string[] rkeep) {
   keep_ints(pkeep, (import prog));
   test_widen2(rkeep);
 } return void;
+given rfnfx_setup ([7, 8], []):() then prog_len:(2)
+given rfnfx_setup ([], []):() then prog_len:(0)
 
 test_widen2(string[] rkeep) {
   clear_strs((import rfn));
   keep_strs(rkeep, (import rfn));
   lset((import dphase), 0, 1);
 } return void;
+given rfnfx_setup (["a"]):() then rfn_len:(1)
+given rfnfx_setup ([]):() then dphase_check:(1)

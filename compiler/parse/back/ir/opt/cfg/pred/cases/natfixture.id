@@ -1,0 +1,10 @@
+// flags_setup (back/drive/run/check/flags/args.id) plus --freestanding
+// applied, for a case on nat_all_live (back/drive/sink/natives/more/
+// live.id) that needs is_freestanding() true.
+
+fs_on_fixture() {
+  flags_setup();
+  arg_flags4(2, ["prog", "--freestanding"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

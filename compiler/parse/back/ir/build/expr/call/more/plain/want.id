@@ -9,6 +9,8 @@ lw_bpty2(string name, int i) {
     t = lw_bpty3(name, i);
   }
 } return string t;
+("peek8", 0):("word")
+("mem_of_str", 0):("string")
 
 lw_bpty3(string name, int i) {
   string t = "";
@@ -18,6 +20,8 @@ lw_bpty3(string name, int i) {
     t = "int";
   }
 } return string t;
+("to_int", 0):("string")
+("chr", 0):("int")
 
 // The rest of lw_barg_at, once the argument's own position is known.
 lw_barg_val(int i, int[] vals, int[] args, string name) {
@@ -25,3 +29,5 @@ lw_barg_val(int i, int[] vals, int[] args, string name) {
   int lw_as_v = lw_as(args[i], lw_bpty_v);
   int ret_i = lw_barg_push(i, vals, lw_as_v);
 } return int ret_i;
+given bicall_fixture (0, [], (import bicall_args), "fx_target"):(1)
+given bicall_fixture (0, [], (import bicall_args), "chr"):(1)

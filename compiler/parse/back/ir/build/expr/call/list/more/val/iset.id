@@ -14,3 +14,5 @@ lw_iset_val(int node, string elem) {
   int v = lw_expr(els[0]);
   int boxed = lw_box(v, elem);
 } return int boxed;
+given lw_fix_iassign ((import fix_iassign_n), "i"):(1)
+given lw_fix_iassign ((import fix_iassign_n), "x"):(1)

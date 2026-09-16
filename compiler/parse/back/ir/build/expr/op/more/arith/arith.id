@@ -7,6 +7,8 @@ lw_arith(int node) {
   int a = lw_arith_lhs(node, t);
   int ret_i = lw_arith2(node, a, t);
 } return int ret_i;
+given lw_fix_bin ((import fix_bin_n)):(2)
+given arith_fixture ((import div_node)):(5)
 
 lw_arith2(int node, int a, string t) {
   int i2_of_v = i2_of(node);

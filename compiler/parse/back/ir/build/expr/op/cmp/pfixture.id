@@ -1,0 +1,35 @@
+// A `call` node whose callee has a real declared parameter ("gparam", one
+// `word` param "p" -- deliberately not the same type as the int literal
+// argument pcall_fixture_tail passes it, so a case comparing the real
+// declared type against the argument's own fallback type can tell them
+// apart), for the call/more/arg/ty/ cases that need param_type's true
+// branch (lw_has_par, lw_pty2) rather than the parameterless fallback
+// every other call-node fixture (arg/cell/fixture.id, core/fixture/ops/
+// {bicall,fcallv}.id) gives them. The final step, pcall_fixture_tail, is at
+// ../../../stmt/flow/cond/more/pfixture.id -- a file holds at most 3
+// functions and this fixture needs four. Filed here rather than under
+// call/ (every directory there is at the 3-entry cap) -- this directory
+// (cmp.id/wide.id, comparison lowering) had the spare slot.
+
+pcall_fixture() {
+  lw_env_fixture();
+  init_bnames();
+  pcall_fixture_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+pcall_fixture_reg() {
+  int[] none = [];
+  int pn = node_param("param", "word", "p");
+  pcall_fixture_func(pn, none);
+} return void;
+given pcall_fixture ():() then check_failed:(0)
+given pcall_fixture ():() then init_units:(0)
+
+pcall_fixture_func(int pn, int[] none) {
+  export int pcall_fn = node_func("t2", "int", [pn], none, 0 - 1);
+  pcall_fixture_tail((import pcall_fn));
+} return void;
+given pcall_fixture (0, []):() then check_failed:(0)
+given pcall_fixture (0, []):() then init_units:(0)

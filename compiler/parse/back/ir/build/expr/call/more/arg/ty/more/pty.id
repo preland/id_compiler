@@ -5,14 +5,20 @@ lw_arg_pty(int node, int i) {
   string name = s1_of(node);
   string pty = lw_pty(name, i, args[i]);
 } return string pty;
+given pcall_fixture ((import pcall_node), 0):("word")
+given bicall_fixture ((import bicall_node), 0):("int")
 
 lw_arg_conv(int node, int i, string pty) {
   int[] args = l1_of(node);
   int v = lw_as(args[i], pty);
 } return int v;
+given pcall_fixture ((import pcall_node), 0, "int"):(0)
+given pcall_fixture ((import pcall_node), 0, "word"):(1)
 
 lw_pty_base(string name, int i, int node) {
   string ety = lw_ety(node);
   string t = lw_apty(name, i, ety);
   t = lw_fpty(name, i, node, t);
 } return string t;
+given pcall_fixture ("gparam", 0, (import pcall_arg_n)):("int")
+given fcallv_fixture ("gfunc", 0, (import fcallv_node)):("int")

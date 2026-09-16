@@ -17,3 +17,5 @@ lw_unbox2(int v, string t) {
     r = lw_conv(v, "word", t);
   }
 } return int r;
+given lw_env_fixture (0, "float"):(0) then calls lw_callf:("id_unbox_f", "float", [0])
+given lw_env_fixture (0, "int"):(0) then calls lw_callf:[0]

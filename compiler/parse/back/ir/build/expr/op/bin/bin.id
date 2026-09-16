@@ -6,6 +6,8 @@ lw_bin(int node) {
   string op = s1_of(node);
   int ret_i = lw_bin_op(node, op);
 } return int ret_i;
+given lw_fix_bin ((import fix_bin_n)):(2)
+given str_fixture2 ((import cmp_node)):(6)
 
 lb2(int node) {
   int v = 0 - 1;
@@ -15,6 +17,8 @@ lb2(int node) {
     v = lb3(node);
   }
 } return int v;
+given str_fixture2 ((import concat_node)):(5)
+given lw_fix_bin ((import fix_bin_n)):(2)
 
 // `&&` and `||` emit as C infix in the C target, so they short-circuit there.
 // The IR says so explicitly rather than inheriting it from a target that
@@ -27,3 +31,5 @@ lb3(int node) {
     v = lw_arith(node);
   }
 } return int v;
+given arith_fixture ((import div_node)):(5)
+given lw_fix_bin ((import fix_bin_n)):(2)

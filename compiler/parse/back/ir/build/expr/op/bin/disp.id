@@ -7,3 +7,5 @@ lw_bin_op(int node, string op) {
     v = lb2(node);
   }
 } return int v;
+given str_fixture2 ((import cmp_node), "<"):(6)
+given lw_fix_bin ((import fix_bin_n), "+"):(2)
