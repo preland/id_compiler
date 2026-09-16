@@ -14,6 +14,8 @@ lw_box(int v, string t) {
     r = lw_box2(v, t);
   }
 } return int r;
+given lw_env_fixture (0, "string"):(0)
+given lw_env_fixture (0, "int"):(0)
 
 lw_box2(int v, string t) {
   int r = 0 - 1;
@@ -23,6 +25,8 @@ lw_box2(int v, string t) {
     r = lw_conv(v, t, "word");
   }
 } return int r;
+given lw_env_fixture (0, "float"):(0)
+given lw_env_fixture (0, "int"):(0)
 
 lw_unbox(int v, string t) {
   int r = 0 - 1;
@@ -32,3 +36,5 @@ lw_unbox(int v, string t) {
     r = lw_unbox2(v, t);
   }
 } return int r;
+given lw_env_fixture (0, "string"):(0)
+given lw_env_fixture (0, "int"):(0)

@@ -5,8 +5,12 @@ lw_arr_push(int node, int i, int a, string elem) {
   int v = lw_as(els[i], elem);
   lw_arr_push2(a, v, elem);
 } return void;
+given lw_fix_arr ((import fix_arr_n), 0, 0, "int"):() then calls lw_arr_push2:(0, 0, "int")
+given lw_fix_arr ((import fix_arr_n), 0, 5, "word"):() then calls lw_arr_push2:(5, 1, "word")
 
 lw_arr_push2(int a, int v, string elem) {
   int boxed = lw_box(v, elem);
   lw_callf("id_list_push", "", [a, boxed]);
 } return void;
+given lw_env_fixture (0, 0, "int"):() then calls lw_callf:("id_list_push", "", [0, 0])
+given lw_env_fixture (0, 1, "word"):() then calls lw_callf:("id_list_push", "", [0, 1])
