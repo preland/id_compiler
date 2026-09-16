@@ -8,6 +8,8 @@ type_of5(int id) {
     t = type_index(id);
   }
 } return string t;
+given idx_build ((import idx_fix)):("int")
+given composite_fixture ((import bin_concat)):("string")
 
 type_of6(int id) {
   string t = type_of7(id);
@@ -15,9 +17,13 @@ type_of6(int id) {
     t = type_arr(id);
   }
 } return string t;
+given shapes_fixture ((import arr_ints)):("int[]")
+given composite_fixture ((import bin_plus)):("int")
 
 type_index(int id) {
   int i1_of_v = i1_of(id);
   string type_of_v = type_of(i1_of_v);
   string ret_s = elem_type(type_of_v);
 } return string ret_s;
+given idx_build ((import idx_fix)):("int")
+given stridx_build ((import idx_str)):("string")

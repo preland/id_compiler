@@ -1,5 +1,5 @@
 // A second `given NAME` token pair, distinct from
-// ../../../decomp/../../../../front/parse/expr/ladder/arith/fixture.id's
+// ../../../../../front/parse/expr/ladder/arith/fixture.id's
 // given_fix, for cases that need two different `given` scenarios to tell
 // their two cases apart.
 

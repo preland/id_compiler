@@ -15,6 +15,8 @@ tc_g5(int id) {
     chk_exprstmt(id);
   }
 } return void;
+given badexpr_fixture ((import badexpr_fn)):() then check_failed:(1)
+given composite_fixture ((import un_neg)):() then check_failed:(0)
 
 chk_un(int id) {
   int i1_of_v = i1_of(id);
@@ -23,6 +25,8 @@ chk_un(int id) {
     chk_un2(id, t);
   }
 } return void;
+given composite_fixture ((import un_float)):() then check_failed:(0)
+given composite_fixture ((import un_neg)):() then check_failed:(0)
 
 // Negation is the one with its own wording in idc.py; `!` and `~` share
 // theirs, and naming the operator in it is what tells them apart.
@@ -34,3 +38,5 @@ chk_un2(int id, string t) {
     tc_err(id, "cannot apply '" + s1_of_v + "' to a " + t);
   }
 } return void;
+given composite_fixture ((import un_neg), "int"):() then check_failed:(0)
+given composite_fixture ((import un_not), "float"):() then check_failed:(1)

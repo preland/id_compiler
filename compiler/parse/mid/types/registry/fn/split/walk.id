@@ -8,6 +8,8 @@ fn_walk(string t, int hi, int[] st, string[] pts) {
     i = i + 1;
   }
 } return void;
+("func(a,b)", 8, [5, 0], []):("func(a,b)", 8, [8, 0], ["a"])
+("func()", 5, [5, 0], []):("func()", 5, [5, 0], [])
 
 fn_step(string t, int i, int[] st, string[] pts) {
   int c = charat(t, i);
@@ -17,9 +19,13 @@ fn_step(string t, int i, int[] st, string[] pts) {
     st[1] = st[1] + fn_depth(c);
   }
 } return void;
+("a,b", 1, [0, 0], []):("a,b", 1, [3, 0], ["a"])
+("(x", 0, [0, 0], []):("(x", 0, [0, 1], [])
 
 fn_cut(string t, int i, int[] st, string[] pts) {
   string piece = slice(t, st[0], i);
   push(pts, piece);
   st[0] = i + 2;
 } return void;
+("ab,cd", 2, [0, 0], []):("ab,cd", 2, [4, 0], ["ab"])
+("x,yz", 1, [0, 5], ["p"]):("x,yz", 1, [3, 5], ["p", "x"])

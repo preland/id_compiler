@@ -7,6 +7,8 @@ bt4(string name) {
     t = "word";
   }
 } return string t;
+("alloc"):("word")
+("poke32"):("void")
 
 bt5(string name) {
   string t = "?";
@@ -14,6 +16,8 @@ bt5(string name) {
     t = "void";
   }
 } return string t;
+("poke32"):("void")
+("alloc"):("?")
 
 // Builtins yielding a machine word. `ult` is not among them -- it answers a
 // question, so it is an int like every other comparison.
@@ -23,3 +27,5 @@ is_wordfn(string name) {
     ok = 1;
   }
 } return int ok;
+("alloc"):(1)
+("ult"):(0)

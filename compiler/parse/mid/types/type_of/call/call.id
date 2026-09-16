@@ -6,6 +6,8 @@ type_of4(int id) {
     t = call_type(id);
   }
 } return string t;
+given shapes_fixture ((import call_len)):("int")
+given composite_fixture ((import bin_plus)):("int")
 
 type_call(string name) {
   string t = builtin_type(name);
@@ -13,6 +15,8 @@ type_call(string name) {
     t = lookup_func(name);
   }
 } return string t;
+("len"):("int")
+given fn_idx_fixture ("nope"):("")
 
 // return type of a builtin, or "?" if `name` is not a builtin
 builtin_type(string name) {
@@ -23,3 +27,5 @@ builtin_type(string name) {
     t = bt2(name);
   }
 } return string t;
+("print"):("void")
+("len"):("int")

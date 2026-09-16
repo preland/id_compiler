@@ -12,6 +12,8 @@ type_of7(int id) {
     t = type_bin(id);
   }
 } return string t;
+given composite_fixture ((import un_float)):("float")
+given composite_fixture ((import bin_concat)):("string")
 
 // `-x` and `~x` keep the operand's type; `!x` is a truth value, so int.
 type_un(int id) {
@@ -21,3 +23,5 @@ type_un(int id) {
     t = "int";
   }
 } return string t;
+given composite_fixture ((import un_float)):("float")
+given composite_fixture ((import un_not)):("int")

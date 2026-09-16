@@ -7,6 +7,8 @@ ty_base(string t) {
     t = elem_type(t);
   }
 } return string t;
+("int[][]"):("int")
+("string"):("string")
 
 // The kind of a type: "int", "float", "ref", "unit" from the registry, "list"
 // for any T[], "func" for a function type, and "?" for a name with no row --
@@ -21,6 +23,8 @@ ty_kind(string t) {
     s = "func";
   }
 } return string s;
+given init_tyreg ("int"):("int")
+given init_tyreg ("int[]"):("list")
 
 ty_row_kind(string t) {
   int r = ty_find(t);
@@ -29,3 +33,5 @@ ty_row_kind(string t) {
     s = (import tykind)[r];
   }
 } return string s;
+given init_tyreg ("string"):("ref")
+given init_tyreg ("nope"):("?")

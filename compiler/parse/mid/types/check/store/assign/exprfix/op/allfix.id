@@ -1,0 +1,9 @@
+// Both a registered variable and the plain leaves in the same process, for
+// type_of3's "not a name" case (is_nameref needs init_idx too, which
+// leaves_fixture alone does not set up).
+allfix() {
+  varleaf_fixture();
+  leaves_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

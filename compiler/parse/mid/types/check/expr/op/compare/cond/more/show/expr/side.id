@@ -8,12 +8,16 @@ show_arg_at(int[] l, int i, string out) {
   }
   string ret_s = out + sep + show_expr(l[i]);
 } return string ret_s;
+given shapes_fixture ((import arr_elems), 0, ""):("2")
+given shapes_fixture ((import arr_elems), 1, "2"):("2, 5")
 
 show_bin(int id) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   string ret_s = show_side(i1_of_v) + " " + s1_of(id) + " " + show_side(i2_of_v);
 } return string ret_s;
+given cmp_fixture ((import bin_eq)):("2 == 5")
+given composite_fixture ((import bin_concat)):("hi + 2")
 
 show_side(int c) {
   string out = show_expr(c);
@@ -21,3 +25,5 @@ show_side(int c) {
     out = "(" + out + ")";
   }
 } return string out;
+given leaves_fixture ((import lit_a)):("2")
+given cmp_fixture ((import bin_bitand)):("2 & 5")

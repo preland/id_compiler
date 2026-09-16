@@ -1,0 +1,28 @@
+// An array literal, an index into it, and a call node -- for type_arr,
+// type_index and call_type's own tests.
+shapes_fixture() {
+  leaves_fixture();
+  shapes_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+shapes_build() {
+  export int[] arr_elems = [(import lit_a), (import lit_b)];
+  export int arr_ints = node_arr((import arr_elems));
+  export int call_len = node_call("len", [(import lit_str)]);
+} return void;
+given leaves_fixture ():() then check_failed:(0)
+given leaves_fixture ():() then init_units:(0)
+
+// Self-contained (calls shapes_fixture itself) so it can be used as another
+// function's `given` directly -- a bare `given shapes_build` would run
+// shapes_build without shapes_fixture's own leaves_fixture() first, same
+// trap strarr_fixture (../strarr.id) exists to avoid.
+idx_build() {
+  shapes_fixture();
+  export int idx_fix = node_index((import arr_ints), (import lit_a));
+  export int call_pop = node_call("pop", [(import arr_ints)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -6,6 +6,8 @@ chk_cmp(int id) {
     chk_ord(id);
   }
 } return void;
+given cmp_fixture ((import bin_eq)):() then check_failed:(0)
+given cmp_fixture ((import bin_lt)):() then check_failed:(0)
 
 // No binary operator takes a function value (docs/SPEC.md 1.1): arithmetic on
 // one is arithmetic on an address, and comparing two tells apart functions
@@ -16,6 +18,8 @@ fv_bin(int id) {
   fv_side(id, (import ni2)[id], "right");
   chk_cmp(id);
 } return void;
+given cmp_fixture ((import bin_eq)):() then check_failed:(0)
+given cmp_fixture ((import bin_lt)):() then check_failed:(0)
 
 fv_side(int id, int e, string side) {
   string t = type_of(e);
@@ -24,3 +28,5 @@ fv_side(int id, int e, string side) {
     tc_err(id, "'" + op + "' cannot take a function value: its " + side + " operand is " + t + "; a function value can only be passed, stored or called");
   }
 } return void;
+given fnval_call_fixture ((import fnval_call), (import fnval_call), "left"):() then check_failed:(1)
+given cmp_fixture ((import bin_eq), (import lit_a), "left"):() then check_failed:(0)

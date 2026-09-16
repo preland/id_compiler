@@ -1,0 +1,16 @@
+// A one-element string array, and a `pop` call on it -- pop_elem's
+// string-typed case, against shape/arr.id's int-typed one.
+strarr_fixture() {
+  shapes_fixture();
+  strarr_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+strarr_build() {
+  export int[] str_elems = [(import lit_str)];
+  export int arr_strs = node_arr((import str_elems));
+  export int call_pop_str = node_call("pop", [(import arr_strs)]);
+} return void;
+given shapes_fixture ():() then check_failed:(0)
+given shapes_fixture ():() then init_units:(0)

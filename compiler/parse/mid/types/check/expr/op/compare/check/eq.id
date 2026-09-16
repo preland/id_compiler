@@ -7,12 +7,16 @@ chk_eq(int id) {
   int i2_of_v = i2_of(id);
   eq_types(id, i1_of_v, i2_of_v);
 } return void;
+given cmp_fixture ((import bin_eq)):() then check_failed:(0)
+given composite_fixture ((import bin_concat)):() then check_failed:(1)
 
 eq_types(int id, int a, int b) {
   string lt = type_of(a);
   string rt = type_of(b);
   eq_report(id, lt, rt);
 } return void;
+given cmp_fixture ((import bin_eq), (import lit_a), (import lit_b)):() then check_failed:(0)
+given cmp_fixture ((import bin_eq), (import lit_str), (import lit_a)):() then check_failed:(1)
 
 eq_report(int id, string lt, string rt) {
   int eq_ok_v = eq_ok(lt, rt);
@@ -20,3 +24,5 @@ eq_report(int id, string lt, string rt) {
     tc_err(id, "cannot compare " + lt + " with " + rt);
   }
 } return void;
+given cmp_fixture ((import bin_eq), "int", "int"):() then check_failed:(0)
+given cmp_fixture ((import bin_eq), "string", "int"):() then check_failed:(1)

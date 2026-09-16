@@ -1,0 +1,27 @@
+// An `iassign` and a `push` call, on exprfix's leaves (check/store/assign/
+// exprfix/) -- for the want_elem/want_push position checks. Filed here
+// because exprfix/ and its three subdirectories are all at the 3-entry
+// cap already.
+iassign_build() {
+  idx_build();
+  export int idx_iassign_node = node_iassign((import idx_fix), (import lit_b));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+push_build() {
+  idx_build();
+  export int push_call = node_call("push", [(import arr_ints), (import lit_a)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A second, compatibly-typed assignment (exprfix/lit/decl.id's assign_build
+// is a mismatch on purpose), for chk_assign's "no error" case.
+assign_build2() {
+  assign_build();
+  add_var("xi", "int", 0);
+  export int assign_ok = node_assign("xi", (import lit_a));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

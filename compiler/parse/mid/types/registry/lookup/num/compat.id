@@ -9,6 +9,8 @@ ty_num(string t) {
     ok = 1;
   }
 } return int ok;
+given init_tyreg ("word"):(1)
+given init_tyreg ("string"):(0)
 
 // idc.py's is_integral: the same question with "float" left out, which is
 // what `& | ^ << >> ! ~` and the flat store accept. `word` answers yes
@@ -20,6 +22,8 @@ ty_int(string t) {
     ok = 1;
   }
 } return int ok;
+given init_tyreg ("word"):(1)
+given init_tyreg ("float"):(0)
 
 // idc.py's compatible(): the same type, or two numbers (which widen into each
 // other). Note the asymmetry it does NOT have -- a narrower value is accepted
@@ -31,3 +35,5 @@ ty_compat(string want, string got) {
     ok = 1;
   }
 } return int ok;
+given init_tyreg ("int", "word"):(1)
+given init_tyreg ("int", "string"):(0)

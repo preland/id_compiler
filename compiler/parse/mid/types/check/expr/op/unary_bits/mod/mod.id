@@ -9,6 +9,8 @@ chk_mod(int id) {
   int i2_of_v = i2_of(id);
   mod_types(id, i1_of_v, i2_of_v);
 } return void;
+given cmp_fixture ((import bin_bitand)):() then check_failed:(0)
+given cmp_fixture ((import bin_eq)):() then check_failed:(0)
 
 is_logop(string s) {
   int ok = 0;
@@ -16,6 +18,8 @@ is_logop(string s) {
     ok = 1;
   }
 } return int ok;
+("&&"):(1)
+("&"):(0)
 
 is_bitop(string s) {
   int ok = 0;
@@ -23,3 +27,5 @@ is_bitop(string s) {
     ok = 1;
   }
 } return int ok;
+("&"):(1)
+("&&"):(0)

@@ -8,7 +8,7 @@
 // stands in for its own unread l/bl (see ../../../val/insn/mem/
 // fixture.id's note).
 
-cmp_fixture() {
+ll_cmp_fixture() {
   init_ir();
   env_init();
   export int ir_cmp = ir_insn("icmp", "int", 0 - 1, 0 - 1, "", [9], [9]);
@@ -17,7 +17,7 @@ cmp_fixture() {
 ():() then init_units:(0)
 
 phi_fixture() {
-  cmp_fixture();
+  ll_cmp_fixture();
   export int ir_phi = ir_insn("phi", "int", 0 - 1, 0 - 1, "", [(import ir_cmp)], [7]);
 } return void;
 ():() then check_failed:(0)

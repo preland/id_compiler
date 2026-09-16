@@ -7,6 +7,8 @@ lit_type(int id) {
     t = "word";
   }
 } return string t;
+given leaves_fixture ((import lit_a)):("int")
+given leaves_fixture ((import lit_word)):("word")
 
 // A call's result type. Every builtin's type follows from its name except
 // pop's, which is the element type of the list it was handed; a call through a
@@ -18,9 +20,13 @@ call_type(int id) {
     t = pop_elem(id);
   }
 } return string t;
+given shapes_fixture ((import call_len)):("int")
+given idx_build ((import call_pop)):("int")
 
 pop_elem(int id) {
   int[] l1_of_v = l1_of(id);
   string type_of_v = type_of(l1_of_v[0]);
   string ret_s = elem_type(type_of_v);
 } return string ret_s;
+given idx_build ((import call_pop)):("int")
+given strarr_fixture ((import call_pop_str)):("string")

@@ -6,15 +6,21 @@ chk_ord(int id) {
     chk_ord2(id);
   }
 } return void;
+given cmp_fixture ((import bin_lt)):() then check_failed:(0)
+given cmp_fixture ((import bin_plus)):() then check_failed:(0)
 
 chk_ord2(int id) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   ord_types(id, i1_of_v, i2_of_v);
 } return void;
+given cmp_fixture ((import bin_lt)):() then check_failed:(0)
+given composite_fixture ((import bin_concat)):() then check_failed:(1)
 
 ord_types(int id, int a, int b) {
   string lt = type_of(a);
   string rt = type_of(b);
   ord_report(id, lt, rt);
 } return void;
+given cmp_fixture ((import bin_lt), (import lit_a), (import lit_b)):() then check_failed:(0)
+given cmp_fixture ((import bin_lt), (import lit_str), (import lit_a)):() then check_failed:(1)

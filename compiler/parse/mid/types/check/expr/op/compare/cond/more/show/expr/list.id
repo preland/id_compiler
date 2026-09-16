@@ -9,6 +9,8 @@ show_list(int id) {
     out = s1_of(id) + "(" + show_args(args) + ")";
   }
 } return string out;
+given shapes_fixture ((import call_len)):("len(hi)")
+given shapes_fixture ((import arr_ints)):("[2, 5]")
 
 show_arr(int id) {
   string out = "...";
@@ -17,6 +19,8 @@ show_arr(int id) {
     out = "[" + show_args(elems) + "]";
   }
 } return string out;
+given shapes_fixture ((import arr_ints)):("[2, 5]")
+given cmp_fixture ((import bin_eq)):("...")
 
 show_args(int[] l) {
   string out = "";
@@ -26,3 +30,5 @@ show_args(int[] l) {
     i = i + 1;
   }
 } return string out;
+given shapes_fixture ((import arr_elems)):("2, 5")
+given shapes_fixture ([]):("")

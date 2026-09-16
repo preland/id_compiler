@@ -8,3 +8,5 @@ type_of_miss(int id) {
   }
   tcache_set(id, t);
 } return string t;
+given leaves_fixture ((import lit_a)):("int")
+given leaves_fixture ((import lit_str)):("string")

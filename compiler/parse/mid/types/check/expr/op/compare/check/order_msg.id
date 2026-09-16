@@ -26,3 +26,5 @@ ord_report(int id, string lt, string rt) {
     tc_err(id, "cannot order " + lt + " and " + rt);
   }
 } return void;
+given cmp_fixture ((import bin_lt), "int", "int"):() then check_failed:(0)
+given cmp_fixture ((import bin_lt), "string", "int"):() then check_failed:(1)

@@ -7,8 +7,12 @@ fv_typed(int e) {
   string t = type_of(e);
   int ok = ty_is_func(t);
 } return int ok;
+given fnval_call_fixture ((import fnval_call)):(1)
+given leaves_fixture ((import lit_a)):(0)
 
 fv_elem_err(int el, int i) {
   string t = type_of(el);
   tc_err(el, "a function value cannot be an element of a list: element " + i + " is " + t);
 } return void;
+given leaves_fixture ((import lit_a), 0):() then prints:("<stdin>:1: error: a function value cannot be an element of a list: element 0 is int\n")
+given leaves_fixture ((import lit_str), 1):() then prints:("<stdin>:1: error: a function value cannot be an element of a list: element 1 is string\n")

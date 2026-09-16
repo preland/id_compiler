@@ -13,12 +13,16 @@ chk_bits(int id) {
     chk_mod(id);
   }
 } return void;
+given cmp_fixture ((import bin_and)):() then check_failed:(0)
+given cmp_fixture ((import bin_bitand)):() then check_failed:(0)
 
 chk_bits2(int id) {
   int i1_of_v = i1_of(id);
   int i2_of_v = i2_of(id);
   bits_types(id, i1_of_v, i2_of_v);
 } return void;
+given cmp_fixture ((import bin_bitand)):() then check_failed:(0)
+given composite_fixture ((import bin_concat)):() then check_failed:(1)
 
 // The logical pair names no types: `&&` on two lists is a mistake about what
 // the operator is for, not about which type it got, and idc.py says so.
@@ -32,3 +36,5 @@ bits_err(int id, string lt, string rt) {
     tc_err(id, "'" + s1_of_v3 + "' requires int or word operands, got " + lt + " and " + rt);
   }
 } return void;
+given cmp_fixture ((import bin_and), "int", "int"):() then prints:("<stdin>:1: error: '&&' requires int operands\n")
+given cmp_fixture ((import bin_bitand), "string", "int"):() then prints:("<stdin>:1: error: '&' requires int or word operands, got string and int\n")

@@ -1,0 +1,28 @@
+// fn_fixture's function node together with exprfix's leaves (check/store/
+// assign/exprfix/lit/base.id), for the return-clause checks (check/expr/
+// more/want/ret/store/expr.id) that need a declared return type and an
+// expression to compare it against in the same process. Filed here for
+// lack of room anywhere nearer.
+chkret_fixture() {
+  fn_fixture();
+  leaves_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A function returning "int" whose own return expression is a string --
+// bad_store fires but fn_ret_type does not (the declared type "int" is not
+// itself a function type), unlike fnret_fixture's fnret_bad.
+badexpr_fixture() {
+  chkret_fixture();
+  badexpr_build();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+badexpr_build() {
+  int[] none = [];
+  export int badexpr_fn = node_func("badexpr", "int", none, none, (import lit_str));
+} return void;
+given chkret_fixture ():() then check_failed:(0)
+given chkret_fixture ():() then init_units:(0)

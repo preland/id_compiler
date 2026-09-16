@@ -8,6 +8,8 @@ tc_node(int id) {
   tc_g1(id);
   tc_g2(id);
 } return void;
+given decltype_fixture ((import decl_list)):() then check_failed:(1)
+given decltype_fixture ((import decl_scalar)):() then check_failed:(0)
 
 tc_g1(int id) {
   if(k_of(id) == "decl") {
@@ -20,6 +22,8 @@ tc_g1(int id) {
     chk_iassign(id);
   }
 } return void;
+given decltype_fixture ((import decl_list)):() then check_failed:(1)
+given assign_build2 ((import assign_ok)):() then check_failed:(0)
 
 // The two conditions differ only in their message, so they share a check.
 tc_g2(int id) {
@@ -31,3 +35,5 @@ tc_g2(int id) {
   }
   tc_g3(id);
 } return void;
+given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
+given cmp_fixture ((import bin_eq)):() then check_failed:(0)

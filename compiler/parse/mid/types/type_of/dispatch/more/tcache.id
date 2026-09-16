@@ -9,6 +9,8 @@ init_tcache() {
   export string[] tcache = [];
   export int[] tcache_ok = [];
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
 
 tcache_has(int id) {
   int ok = 0;
@@ -16,6 +18,8 @@ tcache_has(int id) {
     ok = (import tcache_ok)[id];
   }
 } return int ok;
+given tcache_hit_fixture (0):(1)
+given env_init (0):(0)
 
 tcache_set(int id, string t) {
   while(len((import tcache)) <= id) {
@@ -25,3 +29,5 @@ tcache_set(int id, string t) {
   sset((import tcache), id, t);
   lset((import tcache_ok), id, 1);
 } return void;
+given env_init (0, "int"):() then tcache_read0:("int")
+given env_init (0, "string"):() then tcache_read0:("string")

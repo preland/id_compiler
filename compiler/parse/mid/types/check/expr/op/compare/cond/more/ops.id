@@ -6,6 +6,8 @@ ops_mixed(int id, int c) {
   string co = s1_of(c);
   int ok = mixed_ops(po, co);
 } return int ok;
+given cmp_fixture ((import bin_mixed), (import bin_bitand)):(1)
+given cmp_fixture ((import bin_plus), (import bin_bitand)):(0)
 
 // is_relop includes id's bare `=`, which is equality inside an expression.
 mixed_ops(string po, string co) {
@@ -14,6 +16,8 @@ mixed_ops(string po, string co) {
     ok = 1;
   }
 } return int ok;
+("<", "&"):(1)
+("+", "&"):(0)
 
 // nparen holds only binary nodes that were parenthesized, so it is short; a
 // scan is cheaper than a slot on every node would be to keep aligned.
@@ -27,3 +31,5 @@ paren_missing(int c) {
     i = i + 1;
   }
 } return int ok;
+given cmp_fixture ((import bin_bitand)):(1)
+given cmp_fixture ((import bin_eq)):(1)

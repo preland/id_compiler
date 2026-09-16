@@ -12,8 +12,8 @@ ll_t5_cmp(int id, string sym, int a) {
   int b = ir_b(id);
   string ret_s = "%v" + id + " = " + ir_op(id) + " " + ll_pred(sym, vty) + " " + ll_op(a) + ", " + ll_val(b);
 } return string ret_s;
-given cmp_fixture ((import ir_cmp), "<", (import ir_cmp)):("%v0 = icmp slt i32 %v0, poison")
-given cmp_fixture ((import ir_cmp), "=", (import ir_cmp)):("%v0 = icmp eq i32 %v0, poison")
+given ll_cmp_fixture ((import ir_cmp), "<", (import ir_cmp)):("%v0 = icmp slt i32 %v0, poison")
+given ll_cmp_fixture ((import ir_cmp), "=", (import ir_cmp)):("%v0 = icmp eq i32 %v0, poison")
 
 ll_t6_bin(int id) {
   int a = ir_a(id);

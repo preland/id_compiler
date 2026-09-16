@@ -17,6 +17,8 @@ ty_width(string t) {
     n = (import tywidth)[ty_find(t)];
   }
 } return int n;
+given init_tyreg ("int"):(4)
+given init_tyreg ("nope"):(0)
 
 ty_rank(string t) {
   int n = ty_width(t) * 2;
@@ -24,6 +26,8 @@ ty_rank(string t) {
     n = n + 1;
   }
 } return int n;
+given init_tyreg ("int"):(8)
+given init_tyreg ("float"):(17)
 
 ty_wider(string lt, string rt) {
   string t = rt;
@@ -31,3 +35,5 @@ ty_wider(string lt, string rt) {
     t = lt;
   }
 } return string t;
+given init_tyreg ("int", "word"):("word")
+given init_tyreg ("word", "int"):("word")

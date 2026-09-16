@@ -9,6 +9,8 @@ tc_g3(int id) {
   }
   tc_g4(id);
 } return void;
+given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
+given leaves_fixture ((import lit_a)):() then check_failed:(0)
 
 // idc.py rejects `void[]` in parse_type, so it applies to every written type:
 // a parameter's, a declaration's, and a return type. Those live in the string
@@ -22,9 +24,13 @@ chk_voidarr(int id) {
   string s2_of_v = s2_of(id);
   void_arr_pair(id, s1_of_v, s2_of_v);
 } return void;
+given voidarr_build ((import decl_voidarr)):() then check_failed:(1)
+given decltype_fixture ((import decl_scalar)):() then check_failed:(0)
 
 void_arr_type(int id, string t) {
   if(ty_is_list(t) == 1 && ty_base(t) == "void") {
     tc_err(id, "'void[]' is not a valid type");
   }
 } return void;
+given cmp_fixture (0, "void[]"):() then check_failed:(1)
+given cmp_fixture (0, "int[]"):() then check_failed:(0)

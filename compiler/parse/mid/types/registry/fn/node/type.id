@@ -8,6 +8,8 @@ name_type(string name, int unit) {
     t = fn_sig_of(name);
   }
 } return string t;
+given fnval_call_fixture ("cv", 0):("func(int) return int")
+given fn_idx_fixture ("fx_target", 0):("func(int) return int")
 
 call_ret(int id, string name) {
   string t = type_call(name);
@@ -15,6 +17,8 @@ call_ret(int id, string name) {
     t = fcall_ret(id);
   }
 } return string t;
+(0, "print"):("void")
+given fnval_call_fixture ((import fnval_call), "nope"):("int")
 
 fcall_ret(int id) {
   string vt = callee_var_type(id);
@@ -23,3 +27,5 @@ fcall_ret(int id) {
     t = fn_ret(vt);
   }
 } return string t;
+given fnval_call_fixture ((import fnval_call)):("int")
+given fnval_fixture ((import fnval_hit)):("")

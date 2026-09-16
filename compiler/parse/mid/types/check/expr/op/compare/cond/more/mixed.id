@@ -12,6 +12,8 @@ chk_mixed(int id) {
   int i2_of_v = i2_of(id);
   mixed_pair(id, i1_of_v, i2_of_v);
 } return void;
+given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
+given cmp_fixture ((import bin_eq)):() then check_failed:(0)
 
 // One report per operation, naming the left operand when both are bare; the
 // suggested spelling parenthesizes both.
@@ -24,6 +26,8 @@ mixed_pair(int id, int a, int b) {
     mixed_err(id, c);
   }
 } return void;
+given cmp_fixture ((import bin_mixed), (import bin_bitand), (import lit_a)):() then check_failed:(1)
+given cmp_fixture ((import bin_eq), (import lit_a), (import lit_b)):() then check_failed:(0)
 
 // The parenthesis record is searched only once the operators already mix, so
 // the common operation costs two kind reads and nothing more.
@@ -33,3 +37,5 @@ mixed_side(int id, int c) {
     ok = paren_missing(c);
   }
 } return int ok;
+given cmp_fixture ((import bin_mixed), (import bin_bitand)):(1)
+given cmp_fixture ((import bin_mixed), (import lit_a)):(0)
