@@ -6,11 +6,15 @@ reg_decl_stmt(int id, string owner) {
   string s1_of_v = s1_of(id);
   reg_decl_var(id, owner, s2_of_v, s1_of_v);
 } return void;
+given declfix ((import rgdecl_node), "f"):() then dvname_len:(2)
+given regrow_param ((import regrow_p), "f"):() then dvname_len:(2)
 
 reg_decl_var(int id, string owner, string s2_of_v, string s1_of_v) {
   int i2_of_v = i2_of(id);
   reg_var(s2_of_v, s1_of_v, owner, i2_of_v, (import nline)[id], (import nunit)[id]);
 } return void;
+given declfix ((import rgdecl_node), "f", "q", "int"):() then dvname_len:(2)
+given declfix ((import rgdecl_node), "g2", "z", "word"):() then dvname_len:(2)
 
 // Also the tail of reg_func: both just register whatever declarations sit in
 // id's second statement list, one under the else arm's owner and one under
@@ -20,3 +24,5 @@ reg_l2_decls(int id, string owner) {
   int[] l2_of_v = l2_of(id);
   reg_decls(l2_of_v, owner);
 } return void;
+given ifwhilefix ((import rgif_node), "f"):() then dvname_len:(2)
+given regrow_param ((import regrow_p), "f"):() then dvname_len:(1)

@@ -20,3 +20,11 @@ type_of_float(int id) {
 } return string t;
 given leaves_fixture ((import lit_float)):("float")
 given allfix ((import lit_a)):("int")
+
+argfn_badtype_call() {
+  argfn_d();
+  int a = node_str("x");
+  export int argfn_call_badtype = node_call("g", [a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -3,14 +3,20 @@ param_name(int fn, int i) {
   int[] ps = l1_of(fn);
   string nm = s2_of(ps[i]);
 } return string nm;
+given argfn_d ((import argfn_fn), 0):("p")
+given argfn_match_call ((import argfn_call_match), 0):("")
 
 arg_err_msg(int id, int fn, int i, string t) {
   string pname = param_name(fn, i);
   string pt = param_type(fn, i);
   string msg = arg_err_msg2(id, pname, pt, t);
 } return string msg;
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "string"):("argument 'p' of 'g' expects int, got string")
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):("argument 'p' of 'g' expects int, got word")
 
 arg_err_msg2(int id, string pname, string pt, string t) {
   string callname = s1_of(id);
   string msg = "argument '" + pname + "' of '" + callname + "' expects " + pt + ", got " + t;
 } return string msg;
+given argfn_d ((import argfn_fn), "p", "int", "string"):("argument 'p' of 'g' expects int, got string")
+given argfn_d ((import argfn_fn), "x", "word", "int"):("argument 'x' of 'g' expects word, got int")

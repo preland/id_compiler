@@ -14,9 +14,21 @@ chk_narrow(int id, int fn, int i, string t) {
     narrow_err(id, fn, i, t);
   }
 } return void;
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then check_failed:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "int"):() then check_failed:(0)
 
 narrow_err(int id, int fn, int i, string t) {
   int argnode = l1_of(id)[i];
   string msg = narrow_err_msg(id, fn, i, t);
   tc_err(argnode, msg);
 } return void;
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then check_failed:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "float"):() then calls narrow_err_msg:((import argfn_fn), (import argfn_fn), 0, "float")
+
+argfn_a() {
+  call2_setup();
+  int pnode = node_param("param", "int", "p");
+  export int argfn_param = pnode;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

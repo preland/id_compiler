@@ -7,6 +7,8 @@ report_scope(string name, string owner, int ln) {
   string scope_msg_v = scope_msg(name, owner, ln);
   var_report(loc_at_v + "variable '" + name + "' is used on line " + ln + scope_msg_v + "; a variable exists only from its declaration to the end of the block that declares it");
 } return void;
+given regrow_d ("x", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)
 
 scope_msg(string name, string owner, int ln) {
   int dl = decl_line(name, owner);
@@ -15,6 +17,8 @@ scope_msg(string name, string owner, int ln) {
     msg = ", outside the block that declares it on line " + dl;
   }
 } return string msg;
+given regrow_d ("x", "f", 5):(", before its declaration on line 10")
+given regrow_d ("x", "f", 15):(", outside the block that declares it on line 10")
 
 // A function declares a name at most once, so the one matching row is it.
 decl_line(string name, string owner) {
@@ -27,3 +31,5 @@ decl_line(string name, string owner) {
     i = i + 1;
   }
 } return int dl;
+given regrow_d ("x", "f"):(10)
+given regrow_d ("y", "f"):(0)

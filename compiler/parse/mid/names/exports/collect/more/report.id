@@ -13,3 +13,11 @@ dupexp_report(string loc_at_v, string s2_of_v) {
   print(loc_at_v + "'" + s2_of_v + "' is already an exported global (exported by '" + export_owner_v + "')");
   note_failure();
 } return void;
+
+ifwhilefix() {
+  declfix();
+  export int[] rgdeclist = [(import rgdecl_node)];
+  export int rgif_node = node_if(0, rgdeclist, rgdeclist, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

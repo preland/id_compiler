@@ -8,6 +8,8 @@ owner_at(int i, string name, string s) {
     t = (import dvfunc)[i];
   }
 } return string t;
+given regrow_d (0, "x", ""):("f")
+given regrow_d (0, "y", ""):("")
 
 // The type a name was first given by a non-exporting declaration in this unit,
 // or "" if it has never had one there. Exported rows are skipped so that
@@ -19,6 +21,8 @@ first_type(string name, int unit) {
   string t = "";
   t = ft_scan(bkt, name, unit, 0, t);
 } return string t;
+given regrow_d ("x", 0):("int")
+given regrow_d ("y", 0):("")
 
 first_type_at(int i, string name, string t, int unit) {
   string s = t;
@@ -26,3 +30,5 @@ first_type_at(int i, string name, string t, int unit) {
     s = (import dvtype)[i];
   }
 } return string s;
+given regrow_d (0, "x", "", 0):("int")
+given regrow_d (0, "y", "", 0):("")

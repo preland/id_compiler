@@ -16,3 +16,11 @@ want_push_ok(int i) {
 } return int ok;
 given push_build ((import push_call)):(0)
 given shapes_fixture ((import call_len)):(0)
+
+argfn_badtype_arg() {
+  argfn_d();
+  int a = node_str("x");
+  export int argfn_arg_badtype = a;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -3,15 +3,21 @@ var_type_at(int i) {
   string nm = s1_of(i);
   string vt = lookup_var(nm, (import nunit)[i]);
 } return string vt;
+given h_call_match ((import h_call_1)):("func(int) return int")
+given call2_setup ((import cm_push_call)):("")
 
 want_elem_ok(int i) {
   int i1_of_v = i1_of(i);
   string type_of_v = type_of(i1_of_v);
   int ok = want_elem_ok2(type_of_v);
 } return int ok;
+given idxfix ((import rgidx_node)):(0)
+given idxquiet ((import idx_node3)):(0)
 
 // Whether a list-of-lists' element type is itself a list type.
 want_elem_ok2(string t) {
   string elem_type_v = elem_type(t);
   int ok = ty_is_list(elem_type_v);
 } return int ok;
+("int[][]"):(1)
+("int[]"):(0)

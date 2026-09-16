@@ -16,6 +16,8 @@ want_ret(int i, int id) {
     ok = 1;
   }
 } return int ok;
+given argfn_d ((import argfn_fn), 0):(0)
+given argfn_d ((import argfn_fn), 99):(0)
 
 // One step of that search: the name, if this function's node is at or after
 // the node being placed, and "" (keep looking) otherwise.
@@ -26,6 +28,8 @@ fn_covers(int i, int id) {
     s = s1_of((import prog)[i]);
   }
 } return string s;
+given regrow_prog (0, (import regrow_fn_node)):("g2")
+given regrow_prog (0, 999999):("")
 
 // The line to report. The parser fills nline for statement nodes, which is
 // where idc.py reports all but three of these diagnostics, so those land on
@@ -38,3 +42,5 @@ tc_line(int id) {
     n = func_line(node_fn_v);
   }
 } return int n;
+given regrow_prog ((import regrow_fn_node)):(1)
+given regrow_prog ((import regrow_p)):(1)

@@ -6,6 +6,8 @@ chk_call2(int id) {
   chk_callsite(id);
   chk_bi(id);
 } return void;
+given call2_setup ((import cm_push_call)):() then calls chk_const_mut:((import cm_push_call)) then check_failed:(1)
+given call2_scalar_setup ((import cm_push_scalar_call)):() then calls chk_callsite:((import cm_push_scalar_call)) then check_failed:(0)
 
 // id 10: "vfwd(int a) return void" whose only statement is f_exprstmt (id
 // 9) -- the void forwarder shape. id 11: param "b":string, for a

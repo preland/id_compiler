@@ -9,3 +9,11 @@ fs_set(int v) {
 is_freestanding() {
   int ret_i = (import fsc)[0];
 } return int ret_i;
+
+regrow_param() {
+  regrow_d();
+  export int regrow_p = node_param("param", "int", "p2");
+  export int[] regrow_plist = [regrow_p];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

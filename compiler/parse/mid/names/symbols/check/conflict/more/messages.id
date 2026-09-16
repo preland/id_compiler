@@ -7,15 +7,21 @@ report_var_is_func(string name, string owner, int ln) {
   print(loc_at_v + "'" + name + "' is already the name of a function");
   note_failure();
 } return void;
+given regrow_d ("g", "f", 10):() then check_failed:(1)
+given regrow_d ("h", "g", 20):() then check_failed:(1)
 
 report_var_twice(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   print(loc_at_v + "variable '" + name + "' is declared twice in function '" + owner + "'");
   note_failure();
 } return void;
+given regrow_d ("x", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)
 
 report_var_exported(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   string export_owner_v = export_owner(name);
   var_report(loc_at_v + "'" + name + "' is an exported global (by '" + export_owner_v + "'); another variable cannot reuse that name -- read the global with 'import " + name + "'");
 } return void;
+given call2_setup ("clist", "f", 10):() then check_failed:(1)
+given call2_scalar_setup ("cscalar", "g", 20):() then check_failed:(1)

@@ -5,6 +5,8 @@ bi_wants4(string name) {
     s = "strlist";
   }
 } return string s;
+("len"):("strlist")
+("push"):("")
 
 bi_wants5(string name) {
   string s = "";
@@ -14,6 +16,8 @@ bi_wants5(string name) {
     s = "addr";
   }
 } return string s;
+("poke8"):("word")
+("push"):("")
 
 // Is `t` acceptable where `want` is required? A chain rather than one
 // expression, because each link is a rule with its own diagnostic in the
@@ -25,3 +29,5 @@ bi_ok(string want, string t) {
     ok = 0;
   }
 } return int ok;
+("string", "string"):(1)
+("string", "int"):(0)

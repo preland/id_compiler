@@ -15,6 +15,8 @@ init_didx() {
   export int[] dvunit = [];
   fill_didx();
 } return void;
+given regrow_c ():() then check_failed:(0)
+given regrow_d ():() then check_failed:(0)
 
 fill_didx() {
   export int[] dvline = [];
@@ -25,9 +27,13 @@ fill_didx() {
     i = i + 1;
   }
 } return void;
+given regrow_c ():() then check_failed:(0)
+given regrow_d ():() then check_failed:(0)
 
 didx_add(string name) {
   int name_bucket_v = name_bucket(name);
   int len_v = len((import dvname));
   didx_push(name_bucket_v, len_v, name);
 } return void;
+given regrow_c ("y"):() then dvname_len:(1)
+given regrow_d ("z"):() then dvname_len:(2)

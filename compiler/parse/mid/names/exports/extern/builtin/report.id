@@ -16,3 +16,11 @@ report_nosuchfn(string name, string owner, int ln) {
   string builtin_list_v = builtin_list();
   nosuchfn_report(loc_at_v, name, builtin_list_v);
 } return void;
+
+whilefix() {
+  ifwhilefix();
+  int[] declist2 = [(import rgdecl_node)];
+  export int rgwhile_node = node_while(0, declist2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

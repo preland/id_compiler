@@ -6,6 +6,8 @@ is_ordop(string op) {
     ok = 1;
   }
 } return int ok;
+("<"):(1)
+("+"):(0)
 
 chk_call(int id) {
   if(is_push2(id) == 1) {
@@ -13,6 +15,8 @@ chk_call(int id) {
   }
   chk_call2(id);
 } return void;
+given call2_setup ((import cm_push_call)):() then calls chk_push:((import cm_push_call))
+given argfn_match_call ((import argfn_call_match)):() then check_failed:(0)
 
 // A two-argument `push`. The arity is part of the test because a call written
 // with the wrong number of arguments is a different diagnostic (idc.py's
@@ -24,3 +28,5 @@ is_push2(int id) {
     ok = 1;
   }
 } return int ok;
+given call2_setup ((import cm_push_call)):(1)
+given argfn_match_call ((import argfn_call_match)):(0)

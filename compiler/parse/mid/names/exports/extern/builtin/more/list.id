@@ -12,3 +12,10 @@ join_bnames(string s, int i) {
     i = i + 1;
   }
 } return string s;
+
+scnames_fix() {
+  ifwhilefix();
+  check_access();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

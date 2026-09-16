@@ -33,3 +33,10 @@ arr_els(string want, int e) {
 } return int 0;
 given shapes_fixture ("int[]", (import arr_ints)):(0) then check_failed:(0)
 given shapes_fixture ("string[]", (import arr_ints)):(0) then check_failed:(1)
+
+neg1_setup() {
+  call2_setup();
+  export int neg1 = 0 - 1;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -16,6 +16,8 @@ init_idx() {
   export int[][] fidx = [];
   fill_idx();
 } return void;
+given env_init ():() then check_failed:(0)
+given call2_setup ():() then check_failed:(0)
 
 fill_idx() {
   int i = 0;
@@ -32,3 +34,5 @@ push_buckets() {
   push((import vidx), new_bucket_v);
   push_fbucket();
 } return void;
+given call2_setup ():() then check_failed:(0)
+given argfn_d ():() then check_failed:(0)

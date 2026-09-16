@@ -13,8 +13,20 @@ chk_argtypes(int id, int fn) {
     i = i + 1;
   }
 } return void;
+given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then calls chk_arg_at:[1]
+given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls chk_arg_at:[0]
 
 chk_arg_at(int id, int fn, int i) {
   int a = l1_of(id)[i];
   chk_arg_typecheck(id, fn, i, a);
 } return void;
+given argfn_match_call ((import argfn_call_match), (import argfn_fn), 0):() then check_failed:(0)
+given argfn_narrow_call ((import argfn_call_narrow), (import argfn_fn), 0):() then check_failed:(1)
+
+argfn_b() {
+  argfn_a();
+  int[] argps = [(import argfn_param)];
+  export int argfn_fn = node_func("g", "int", argps, argps, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

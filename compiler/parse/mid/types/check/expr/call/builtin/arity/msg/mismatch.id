@@ -3,6 +3,8 @@ bi_arity_mismatch(int id) {
   string name = s1_of(id);
   int ok = arity_ne(n, name);
 } return int ok;
+given call2_setup ((import cm_push_call)):(0)
+given bi_mismatch_setup ((import bi_mismatch_call)):(1)
 
 arity_ne(int n, string name) {
   int ok = 0;
@@ -10,3 +12,13 @@ arity_ne(int n, string name) {
     ok = 1;
   }
 } return int ok;
+(2, "push"):(0)
+(1, "push"):(1)
+
+bi_mismatch_sys0_setup() {
+  call2_setup();
+  int[] none = [];
+  export int bi_mismatch_sys0_call = node_call("ult", none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

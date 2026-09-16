@@ -4,6 +4,8 @@ report_var_import(string name, string owner, int ln) {
   string owner_of_v = owner_of(name);
   var_report(loc_at_v + "variable '" + name + "' belongs to function '" + owner_of_v + "'; read it with 'import " + name + "'");
 } return void;
+given regrow_d ("x", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)
 
 // Nothing to import: the owner has to export it first.
 report_var_private(string name, string owner, int ln) {
@@ -11,6 +13,8 @@ report_var_private(string name, string owner, int ln) {
   string owner_of_v = owner_of(name);
   var_report(loc_at_v + "variable '" + name + "' belongs to function '" + owner_of_v + "' and is not exported; variables are only globally accessible if export/import is used");
 } return void;
+given regrow_d ("x", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)
 
 report_bad_import(string name, string owner, int ln) {
   if(find_str((import dvname), name) < 0) {
@@ -19,3 +23,5 @@ report_bad_import(string name, string owner, int ln) {
     report_not_exported(name, owner, ln);
   }
 } return void;
+given regrow_d ("z", "f", 10):() then calls report_no_export:("z", "f", 10)
+given regrow_d ("x", "f", 10):() then calls report_not_exported:("x", "f", 10)

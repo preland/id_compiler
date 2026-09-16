@@ -9,6 +9,8 @@ bi_arity(string name) {
     n = 1;
   }
 } return int n;
+("flush"):(0)
+("push"):(2)
 
 bi_zero(string name) {
   int ok = 0;
@@ -16,6 +18,8 @@ bi_zero(string name) {
     ok = 1;
   }
 } return int ok;
+("flush"):(1)
+("push"):(0)
 
 bi_one(string name) {
   int ok = 0;
@@ -23,3 +27,5 @@ bi_one(string name) {
     ok = 1;
   }
 } return int ok;
+("print"):(1)
+("push"):(0)

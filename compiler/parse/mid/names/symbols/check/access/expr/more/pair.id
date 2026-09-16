@@ -3,3 +3,18 @@ acc_pair2(int id, string owner, int ln) {
   int i2_of_v = i2_of(id);
   acc_expr(i2_of_v, owner, ln);
 } return void;
+
+pushfix() {
+  call2_setup();
+  init_reg();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+regrow_b() {
+  regrow_a();
+  push((import dvline), 10);
+  push((import dvtype), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

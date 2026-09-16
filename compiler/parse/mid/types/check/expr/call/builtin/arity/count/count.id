@@ -6,6 +6,8 @@ bi_plural(string name) {
     s = "";
   }
 } return string s;
+("push"):("s")
+("print"):("")
 
 bi_count(string name) {
   string s = "exactly two arguments";
@@ -15,6 +17,8 @@ bi_count(string name) {
     s = "exactly one argument";
   }
 } return string s;
+("flush"):("no arguments")
+("push"):("exactly two arguments")
 
 // The flat-store and unsigned-word builtins: idc.py's STORE_BUILTINS and
 // WORD_BUILTINS, which it handles through one shared routine and which
@@ -26,3 +30,5 @@ is_sysbi(string name) {
     ok = 1;
   }
 } return int ok;
+("poke8"):(1)
+("push"):(0)

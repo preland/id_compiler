@@ -13,3 +13,19 @@ type_arr(int id) {
 } return string t;
 given shapes_fixture ((import arr_ints)):("int[]")
 given strarr_fixture ((import arr_strs)):("string[]")
+
+call2_setup() {
+  cm_setup();
+  init_rtc();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+call2_scalar_setup() {
+  cm_scalar_setup();
+  init_rtc();
+  init_idx();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

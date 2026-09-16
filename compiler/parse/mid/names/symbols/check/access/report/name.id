@@ -8,6 +8,8 @@ acc_expr5(int id, string owner, int ln) {
   acc_elems(l1_of_v, owner, ln);
   acc_callee(id, owner, ln);
 } return void;
+given call2_setup ((import cm_push_call), "f", 10):() then calls acc_callee:((import cm_push_call), "f", 10)
+given call2_scalar_setup ((import cm_push_scalar_call), "g", 20):() then calls acc_callee:((import cm_push_scalar_call), "g", 20)
 
 // A name the function did not declare. Which of the three explanations it
 // draws is the useful part of the diagnostic, so the decision is made in
@@ -19,6 +21,8 @@ acc_name(string name, string owner, int ln) {
     report_scope(name, owner, ln);
   }
 } return void;
+given scnames_fix ("z", "f", 10):() then calls report_bad_var:("z", "f", 10)
+given scnames_fix ("x", "f", 10):() then calls report_scope:("x", "f", 10)
 
 // `(import name)` resolves against the export table and nothing else: a
 // variable that was never exported is not readable this way either.
@@ -27,3 +31,5 @@ acc_import(string name, string owner, int ln) {
     report_bad_import(name, owner, ln);
   }
 } return void;
+given pushfix ("clist", "f", 10):() then check_failed:(0)
+given pushfix ("nope", "f", 10):() then calls report_bad_import:("nope", "f", 10)

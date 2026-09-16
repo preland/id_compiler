@@ -1,0 +1,11 @@
+// The last step of the argfn chain (msg/narrowmsg.id's argfn_c, and narrow.id
+// and args.id before it): "g" registered by index, with a declared return type,
+// so a case can ask about a call to a function the registry really knows.
+// Filed here rather than beside argfn_c because msg/ is full.
+argfn_d() {
+  argfn_c();
+  fidx_add("g");
+  push((import frets), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

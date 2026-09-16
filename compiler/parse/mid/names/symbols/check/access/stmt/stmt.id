@@ -10,6 +10,8 @@ acc_list(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
+given scnames_fix ((import rgdeclist), "f"):() then calls acc_stmt:[1]
+given scnames_fix ([], "f"):() then calls acc_stmt:[0]
 
 acc_stmt(int id, string owner) {
   if(k_of(id) == "if") {
@@ -18,9 +20,13 @@ acc_stmt(int id, string owner) {
     acc_stmt2(id, owner);
   }
 } return void;
+given scnames_fix ((import rgif_node), "f"):() then calls acc_if:((import rgif_node), "f")
+given loopfix ((import rgwhile_node), "f"):() then calls acc_stmt2:((import rgwhile_node), "f")
 
 acc_if(int id, string owner) {
   int i1_of_v = i1_of(id);
   acc_expr(i1_of_v, owner, (import nline)[id]);
   acc_if_body(id, owner);
 } return void;
+given scnames_fix ((import rgif_node), "f"):() then calls acc_if_body:((import rgif_node), "f")
+given scnames_fix ((import rgif_node), "g"):() then calls acc_if_body:((import rgif_node), "g")

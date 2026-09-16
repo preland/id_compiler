@@ -22,3 +22,11 @@ ret_narrow_err(int id, string t) {
 } return void;
 given ret_narrows_fn ((import narrow_f), "word"):() then check_failed:(1)
 given ret_widens_fn ((import widen_f), "int"):() then check_failed:(1)
+
+argfn_narrow_arg() {
+  argfn_d();
+  int a = node_int("99999", 99999, 1);
+  export int argfn_arg_narrow = a;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -9,12 +9,16 @@ chk_arity(int id, int fn) {
     chk_argtypes(id, fn);
   }
 } return void;
+given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then calls chk_argtypes:((import argfn_call_match), (import argfn_fn))
+given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls arity_err:((import argfn_call_mismatch), (import argfn_fn))
 
 arity_mismatch(int id, int fn) {
   int a = flat_arg_count(id);
   int b = flat_arg_count(fn);
   int ok = ne_flag(a, b);
 } return int ok;
+given argfn_match_call ((import argfn_call_match), (import argfn_fn)):(0)
+given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):(1)
 
 ne_flag(int a, int b) {
   int ok = 0;
@@ -22,3 +26,5 @@ ne_flag(int a, int b) {
     ok = 1;
   }
 } return int ok;
+(1, 1):(0)
+(0, 1):(1)

@@ -15,3 +15,10 @@ exp_else(int id, string owner) {
   int[] l2_of_v = l2_of(id);
   exp_list(l2_of_v, owner);
 } return void;
+
+fncount_setup() {
+  argfn_d();
+  push((import prog), (import argfn_fn));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

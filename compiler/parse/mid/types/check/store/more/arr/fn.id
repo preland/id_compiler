@@ -16,3 +16,10 @@ fv_elem_err(int el, int i) {
 } return void;
 given leaves_fixture ((import lit_a), 0):() then prints:("<stdin>:1: error: a function value cannot be an element of a list: element 0 is int\n")
 given leaves_fixture ((import lit_str), 1):() then prints:("<stdin>:1: error: a function value cannot be an element of a list: element 1 is string\n")
+
+argsfix() {
+  call2_setup();
+  export int[] args2 = [(import cm_push_call), (import cm_push_call)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -6,3 +6,9 @@
 loc_at(string fname, int ln) {
   string ret_s = func_file(fname) + ":" + ln + ": error: ";
 } return string ret_s;
+
+dvname_len() {
+  int n = len((import dvname));
+} return int n;
+given regrow_c ():(0)
+given regrow_d ():(1)

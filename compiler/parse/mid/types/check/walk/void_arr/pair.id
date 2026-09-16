@@ -15,3 +15,11 @@ void_arr_pair(int id, string t1, string t2) {
 } return void;
 given cmp_fixture (0, "void[]", "int"):() then check_failed:(1)
 given cmp_fixture (0, "int", "int"):() then check_failed:(0)
+
+idxfix() {
+  call2_setup();
+  int b = node_int("1", 1, 0);
+  export int rgidx_node = node_index(b, b);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

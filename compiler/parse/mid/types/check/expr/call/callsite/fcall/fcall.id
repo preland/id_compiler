@@ -11,6 +11,8 @@ chk_fcall(int id) {
     fcall_arity(id, vt);
   }
 } return void;
+given h_call_match ((import h_call_1)):() then calls fcall_arity:((import h_call_1), "func(int) return int")
+given call2_setup ((import cm_push_call)):() then check_failed:(0)
 
 fcall_arity(int id, string vt) {
   string[] pts = fn_params(vt);
@@ -20,6 +22,8 @@ fcall_arity(int id, string vt) {
     fcall_args(id, vt, pts);
   }
 } return void;
+given h_call_match ((import h_call_1), "func(int) return int"):() then calls fcall_args:((import h_call_1), "func(int) return int", ["int"])
+given h_call_mismatch ((import h_call_0), "func(int) return int"):() then calls fcall_arity_err:((import h_call_0), "func(int) return int", ["int"])
 
 fcall_args(int id, string vt, string[] pts) {
   int i = 0;
@@ -28,3 +32,5 @@ fcall_args(int id, string vt, string[] pts) {
     i = i + 1;
   }
 } return void;
+given h_call_match ((import h_call_1), "func(int) return int", ["int"]):() then calls fcall_arg_at:[1]
+given h_call_mismatch ((import h_call_0), "func() return int", []):() then calls fcall_arg_at:[0]

@@ -6,12 +6,16 @@ report_no_export(string name, string owner, int ln) {
   print(loc_at_v + "no exported variable named '" + name + "'");
   note_failure();
 } return void;
+given regrow_d ("z", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)
 
 report_not_exported(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   string owner_of_v = owner_of(name);
   var_report(loc_at_v + "variable '" + name + "' (in function '" + owner_of_v + "') is not exported");
 } return void;
+given regrow_d ("x", "f", 10):() then check_failed:(1)
+given regrow_d ("y", "g", 20):() then check_failed:(1)
 
 // The last two steps of every report_var_* function: print the built message
 // and flag the failure. Shared because the four call sites differ only in
@@ -21,3 +25,5 @@ var_report(string msg) {
   print(msg);
   note_failure();
 } return void;
+given env_init ("test"):() then check_failed:(1)
+given env_init ("other"):() then check_failed:(1)

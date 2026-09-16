@@ -16,3 +16,10 @@ bits_types(int id, int a, int b) {
 } return void;
 given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_b)):() then check_failed:(0)
 given cmp_fixture ((import bin_bitand), (import lit_str), (import lit_a)):() then check_failed:(1)
+
+fcall_reg_a() {
+  call2_setup();
+  push((import vtypes), "func(int) return int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

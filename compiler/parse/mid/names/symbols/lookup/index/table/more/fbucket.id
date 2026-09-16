@@ -3,3 +3,13 @@ push_fbucket() {
   int[] new_bucket_v2 = new_bucket();
   push((import fidx), new_bucket_v2);
 } return void;
+given call2_setup ():() then check_failed:(0)
+given argfn_d ():() then check_failed:(0)
+
+regrow_a() {
+  env_init();
+  init_reg();
+  push((import dvfunc), "f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

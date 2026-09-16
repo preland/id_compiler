@@ -13,6 +13,8 @@ chk_bi(int id) {
     fv_bi_args(id);
   }
 } return void;
+given call2_setup ((import cm_push_call)):() then calls chk_bi_arity:((import cm_push_call))
+given chk_bi_nonbuiltin_setup ((import cm_var_node)):() then check_failed:(0)
 
 // Arity first, and nothing else if it is wrong -- as at a call to a defined
 // function, asking what argument 2 should be when there is no argument 2
@@ -25,6 +27,8 @@ chk_bi_arity(int id) {
     chk_bi_args(id);
   }
 } return void;
+given call2_setup ((import cm_push_call)):() then calls chk_bi_args:((import cm_push_call))
+given bi_mismatch_setup ((import bi_mismatch_call)):() then calls bi_arity_err:((import bi_mismatch_call))
 
 // Two wordings, because idc.py has two: the flat-store and unsigned-word
 // group share one shape and say "takes exactly N argument(s), got M"; every
@@ -39,3 +43,5 @@ bi_arity_err(int id) {
     tc_err(id, msg2);
   }
 } return void;
+given bi_mismatch_setup ((import bi_mismatch_call)):() then calls bi_other_msg:((import bi_mismatch_call))
+given bi_mismatch_sys_setup ((import bi_mismatch_sys_call)):() then calls bi_sys_msg:((import bi_mismatch_sys_call))

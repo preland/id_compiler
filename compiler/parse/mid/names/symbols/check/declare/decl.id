@@ -7,6 +7,8 @@ reg_branches(int id, string owner) {
   reg_decls(l1_of_v, owner);
   reg_l2_decls(id, owner);
 } return void;
+given ifwhilefix ((import rgif_node), "f"):() then dvname_len:(3)
+given regrow_param ((import regrow_p), "f"):() then dvname_len:(1)
 
 reg_loop(int id, string owner) {
   if(k_of(id) == "while") {
@@ -14,6 +16,8 @@ reg_loop(int id, string owner) {
     reg_decls(l1_of_v, owner);
   }
 } return void;
+given whilefix ((import rgwhile_node), "f"):() then dvname_len:(2)
+given ifwhilefix ((import rgif_node), "f"):() then dvname_len:(1)
 
 // One declaration: report whatever it conflicts with, then record it anyway.
 // idc.py raises at the first conflict; recording regardless is what lets this
@@ -24,3 +28,5 @@ reg_var(string name, string type, string owner, int exported, int ln, int unit) 
   reg_push(name, type, owner, exported, unit);
   push((import dvline), ln);
 } return void;
+given regrow_d ("q", "int", "f", 0, 10, 0):() then dvname_len:(2)
+given regrow_c ("q", "int", "f", 0, 10, 0):() then dvname_len:(1)

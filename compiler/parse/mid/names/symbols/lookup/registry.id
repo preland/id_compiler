@@ -5,6 +5,8 @@ init_reg2() {
   export int[] dvexp = [];
   init_didx();
 } return void;
+given env_init ():() then check_failed:(0)
+given call2_setup ():() then check_failed:(0)
 
 // How many registry rows declare `name` inside `owner`. One scan answers two
 // questions: asked before a row is added, a hit means the name is declared
@@ -16,6 +18,8 @@ declared_in(string name, string owner) {
   int ok = 0;
   ok = dv_count(bkt, name, owner, 0, ok);
 } return int ok;
+given regrow_d ("x", "f"):(1)
+given regrow_d ("y", "f"):(0)
 
 dv_hit(int i, string name, string owner) {
   int n = 0;
@@ -23,3 +27,5 @@ dv_hit(int i, string name, string owner) {
     n = 1;
   }
 } return int n;
+given regrow_d (0, "x", "f"):(1)
+given regrow_d (0, "y", "f"):(0)
