@@ -8,3 +8,5 @@ lw_apty(string name, int i, string t) {
     p = s1_of((import afparams)[r][i]);
   }
 } return string p;
+given asmfx_setup ("nosuchasm", 0, "fallback1"):("fallback1")
+given asmfx_setup ("othername", 5, "fallback2"):("fallback2")

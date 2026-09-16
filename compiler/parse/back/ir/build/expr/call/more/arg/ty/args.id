@@ -4,6 +4,8 @@ lw_arg_at(int node, int i, int[] vals) {
   push(vals, v);
   int ret_i = i + 1;
 } return int ret_i;
+given pcall_fixture ((import pcall_node), 0, []):(1)
+given bicall_fixture ((import bicall_node), 0, []):(1)
 
 // The declared type of a callee's i-th parameter, or the argument's own type
 // when the callee has no parameter list to ask.
@@ -14,6 +16,8 @@ lw_pty(string name, int i, int node) {
     t = lw_pty2((import fnodes)[f], i, t);
   }
 } return string t;
+given pcall_fixture ("gparam", 0, (import pcall_arg_n)):("word")
+given pcall_fixture ("nosuchfn", 0, (import pcall_arg_n)):("int")
 
 // The two halves of the guard are functions rather than names, because `&&`
 // skips its right side: `f` is -1 when the callee has no AST node, and a name
@@ -24,3 +28,5 @@ lw_pty2(int f, int i, string t) {
     p = param_type(f, i);
   }
 } return string p;
+given pcall_fixture ((import pcall_fn), 0, "fallback"):("word")
+given pcall_fixture ((import pcall_fn), 1, "fallback"):("fallback")

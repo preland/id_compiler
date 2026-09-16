@@ -8,6 +8,8 @@ lw_fpty(string name, int i, int node, string t) {
     p = fn_param_at(vt, i);
   }
 } return string p;
+given fcallv_fixture ("gfunc", 0, (import fcallv_node), "fallback"):("int")
+given pcall_fixture ("gparam", 0, (import pcall_node), "fallback"):("fallback")
 
 // A call whose callee is a value rather than a symbol. The value is the first
 // operand, so every pass that follows operands -- mem2reg replacing the load,
