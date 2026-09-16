@@ -4,7 +4,21 @@
 check_body_at(int[] l2_of_v, string s1_of_v) {
   int func_line_v = func_line(s1_of_v);
   check_block(l2_of_v, 0, s1_of_v, func_line_v);
+  check_segs(l2_of_v, s1_of_v, func_line_v);
 } return void;
+
+// Each segment of a chained function is measured on its own: the seam markers
+// (front/parse/decl/func/sig/chain/tail.id) divide one body into the segments
+// the source wrote, and the three-action limit applies to each. A body with no
+// marker is one segment, which check_block already measured, so this reports
+// nothing for it.
+check_segs(int[] body, string fname, int ln) {
+  int[] acc = [0];
+  seg_walk(body, fname, ln, acc);
+  seg_close(fname, ln, acc);
+} return void;
+given full_env ([], "f", 1):() then check_failed:(0)
+given full_env ([], "g", 2):() then check_failed:(0)
 
 regrow_c() {
   regrow_b();

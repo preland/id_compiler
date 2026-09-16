@@ -1,0 +1,42 @@
+// Measuring each segment of a chained function against the three-action limit.
+//
+// A chain is a literal continuation, so the parser concatenates the segments
+// into one body with a marker node between them
+// (front/parse/decl/func/sig/chain/tail.id). The limit applies to each segment
+// as written, not to the concatenation -- that is the whole point of a chain --
+// so the body is walked once, counting actions and reporting whenever a seam
+// or the end of the body closes a segment that ran over.
+//
+// The running count lives in a one-element list because an argument is passed
+// by value: the same reason the parser threads its cursor as `int[] pos`.
+
+seg_walk(int[] body, string fname, int ln, int[] acc) {
+  int i = 0;
+  while(i < len(body)) {
+    seg_step(body, fname, ln, acc, i);
+    i = i + 1;
+  }
+} return void;
+given full_env ([], "f", 1, [0]):() then check_failed:(0)
+given full_env ([], "g", 2, [0]):() then check_failed:(0)
+
+seg_step(int[] body, string fname, int ln, int[] acc, int i) {
+  if(k_of(body[i]) == "chain") {
+    seg_close(fname, ln, acc);
+  } else {
+    int a = stmt_actions(body[i]);
+    lset(acc, 0, acc[0] + a);
+  }
+} return void;
+given fn_fixture ((import fixture_params), "f", 1, [0], 0):() then check_failed:(0)
+given fn_fixture ((import fixture_params), "g", 2, [0], 0):() then check_failed:(0)
+
+// Closing a segment: report it if it ran over, then start the next at zero.
+seg_close(string fname, int ln, int[] acc) {
+  if(acc[0] > 3) {
+    report_actions(fname, acc[0], ln);
+  }
+  lset(acc, 0, 0);
+} return void;
+given full_env ("f", 1, [0]):() then check_failed:(0)
+given full_env ("f", 1, [4]):() then check_failed:(1)

@@ -1,0 +1,33 @@
+// Appending one chain segment to the body it continues.
+//
+// The seam is recorded inline, as a node of kind "chain" pushed between the
+// segments, rather than in a table beside the function: a boundary is a
+// property of the body, and keeping it there means every walk that already
+// has the body has the seam too. The marker performs no action (count.id's
+// stmt_actions) and emits nothing.
+
+chain_tail(int[] pos, int[] params, int[] restated, int[] body) {
+  chain_same(pos, params, restated);
+  int[] seg = parse_block(pos);
+  chain_add(body, seg);
+} return void;
+given decl_tokens ([33], [], [], []):() then check_failed:(1)
+given decl_tokens ([35], [], [], []):() then check_failed:(1)
+
+chain_add(int[] body, int[] seg) {
+  int mark = newleaf("chain", 0, 0, "", "");
+  push(body, mark);
+  chain_fill(body, seg);
+} return void;
+given full_env ([], []):() then check_failed:(0)
+given full_env ([1], [2]):() then check_failed:(0)
+
+chain_fill(int[] body, int[] seg) {
+  int i = 0;
+  while(i < len(seg)) {
+    push(body, seg[i]);
+    i = i + 1;
+  }
+} return void;
+given full_env ([], []):() then check_failed:(0)
+given full_env ([1], [2]):() then check_failed:(0)

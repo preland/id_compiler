@@ -17,10 +17,13 @@ iset_code(int id, string val) {
 given iassign_fixture ((import iassign_node), "BOXED"):("id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);")
 given iassign_fixture ((import iassign_node), "OTHER"):("id_list_set(id_list_lit(1, (long long)(1)), 0, OTHER);")
 
+// A chain marker is a seam between two segments of one function, not a
+// statement: it emits nothing. Without this arm it would fall through to es4,
+// which treats anything that is not an `if` as a `while`.
 es3b(int id, string ind) {
   if(k_of(id) == "iassign") {
     emit_iassign(id, ind);
-  } else {
+  } else if(k_of(id) != "chain") {
     es4(id, ind);
   }
 } return void;

@@ -1,0 +1,17 @@
+// The end of the statement chain: the seam between two segments of a chained
+// function, and the default for anything that reaches here unrecognised.
+//
+// A seam canonicalises to a fixed string rather than to the default, because
+// the default embeds the node id: two functions chained the same way have to
+// fingerprint the same, and a node id is a numbering, not a shape. The default
+// itself stays deliberately unrepeatable for the same reason as ce5's -- a
+// statement this chain does not recognise must never compare equal to another.
+//
+// Split out of cst3 (../stmt.id), which was already at the action limit.
+
+cst4(int id) {
+  string out = "?" + k_of(id) + "#" + id;
+  if(k_of(id) == "chain") {
+    out = "|";
+  }
+} return string out;

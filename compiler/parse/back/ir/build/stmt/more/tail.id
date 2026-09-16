@@ -10,10 +10,13 @@ ls3(int node) {
 given decl_fixture2 ((import expr_node)):() then check_failed:(0)
 given nest_fixture ((import if_node)):() then check_failed:(0)
 
+// The chain marker lowers to nothing: the segments it separates are one
+// function's body, and control simply falls from one into the next. Without
+// this arm it would reach ls5, which lowers a non-`if` as a `while`.
 ls4(int node) {
   if(k_of(node) == "iassign") {
     lw_iassign(node);
-  } else {
+  } else if(k_of(node) != "chain") {
     ls5(node);
   }
 } return void;

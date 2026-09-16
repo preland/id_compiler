@@ -451,9 +451,9 @@ static int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding 
 #endif
 static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
-void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v);
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s);
+void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v);
 int id_lst_index_of(IdList* idstd_xs, int idstd_v);
 int id_lst_find(IdList* idstd_xs, int idstd_v);
 int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
@@ -467,6 +467,18 @@ int id_idstd_str_find_end(char* idstd_s, int idstd_i, char* idstd_txt);
 void id_dce_prune(void);
 int id_dce_pack(int i, int n);
 int id_dce_keep(int i, int n);
+void id_print_calls(void);
+void id_print_call_cases(void);
+char* id_call_case_row(int i);
+char* id_call_loc(char* name);
+char* id_call_callee_loc(char* callee_name);
+char* id_call_edge_line(char* caller, char* callee_name, char* kind);
+void id_scan_call_edge(int id, char* caller);
+void id_scan_call_value(int id, char* caller);
+void id_call_edge_emit(char* caller, int id, char* kind);
+void id_call_edges_funcs(int f, int lo);
+int id_call_edges_func(int f, int lo);
+void id_call_edges_range(int lo, int hi, char* caller);
 void id_check_asm_targets(int argc, IdList* argv);
 void id_asm_target_rows(char* triple);
 void id_guarded_emit(int argc, IdList* argv);
@@ -1498,12 +1510,21 @@ int id_neg_lit(int e);
 void id_parse_program(IdList* pos);
 int id_parse_func(IdList* pos);
 int id_func_sig(IdList* pos, char* name);
-int id_one_param(IdList* pos, char* kind);
-int id_func_ret(IdList* pos, char* name, IdList* params, IdList* body);
-int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt);
+IdList* id_parse_segments(IdList* pos, IdList* params);
+void id_chain_loop(IdList* pos, IdList* params, IdList* body);
+void id_take_chain(IdList* pos, IdList* params, IdList* body);
+void id_chain_same(IdList* pos, IdList* params, IdList* restated);
+void id_chain_each(IdList* pos, IdList* params, IdList* restated);
+void id_chain_one(IdList* pos, int a, int b);
+void id_chain_tail(IdList* pos, IdList* params, IdList* restated, IdList* body);
+void id_chain_add(IdList* body, IdList* seg);
+void id_chain_fill(IdList* body, IdList* seg);
 IdList* id_parse_params(IdList* pos, char* kind);
 void id_scan_params(IdList* pos, IdList* params, char* kind);
 void id_fill_params(IdList* pos, IdList* params, char* kind);
+int id_one_param(IdList* pos, char* kind);
+int id_func_ret(IdList* pos, char* name, IdList* params, IdList* body);
+int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt);
 int id_ret_expr(IdList* pos, char* rt);
 char* id_parse_fn_type(IdList* pos);
 char* id_fn_type_rest(IdList* pos);
@@ -2085,6 +2106,7 @@ char* id_canon_body(IdList* stmts);
 char* id_canon_decl(int id);
 char* id_decl_name(int id);
 char* id_canon_iassign(int id);
+char* id_cst4(int id);
 char* id_decl_tag(int id);
 char* id_decl_tail(int id, char* out, char* nm);
 char* id_iassign_tail(int id, char* head);
@@ -2244,16 +2266,20 @@ void id_check_if(int id, int depth, char* fname);
 void id_check_else(int id, int depth, char* fname);
 void id_check_block(IdList* body, int depth, char* fname, int ln);
 void id_check_fits(IdList* body, int depth, char* fname, int ln);
-void id_check_count(IdList* body, char* fname, int ln);
+void id_check_count(IdList* body, int depth, char* fname, int ln);
 int id_check_failed(void);
 void id_note_failure(void);
 void id_check_body_at(IdList* l2_of_v, char* s1_of_v);
+void id_check_segs(IdList* body, char* fname, int ln);
 void id_check_program(void);
 void id_check_funcs(void);
 void id_check_func_body(int id);
 void id_check_main(void);
 void id_check_main_at(int m);
 void id_report_main(void);
+void id_seg_walk(IdList* body, char* fname, int ln, IdList* acc);
+void id_seg_step(IdList* body, char* fname, int ln, IdList* acc, int i);
+void id_seg_close(char* fname, int ln, IdList* acc);
 void id_fit_given(int i);
 void id_given_fn(int i, char* setup_nm);
 void id_given_shape(int i, char* setup_nm, int sfn);
@@ -2911,16 +2937,6 @@ IdList* tysigned;  /* exported by init_ty_rows() */
 IdList* tcache;  /* exported by init_tcache() */
 IdList* tcache_ok;  /* exported by init_tcache() */
 
-void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v) {
-    int idstd_i;
-    idstd_i = 0;
-    while ((idstd_i < idstd_n)) {
-        id_list_push(idstd_xs, (long long)(idstd_v));
-        idstd_i = (idstd_i + 1);
-    }
-    return;
-}
-
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
     id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;
@@ -2928,6 +2944,16 @@ void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
 
 void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s) {
     id_list_set(idstd_strs, idstd_i, (long long)(intptr_t)(idstd_s));
+    return;
+}
+
+void id_lst_fill(IdList* idstd_xs, int idstd_n, int idstd_v) {
+    int idstd_i;
+    idstd_i = 0;
+    while ((idstd_i < idstd_n)) {
+        id_list_push(idstd_xs, (long long)(idstd_v));
+        idstd_i = (idstd_i + 1);
+    }
     return;
 }
 
@@ -3042,6 +3068,118 @@ int id_dce_keep(int i, int n) {
     return n;
 }
 
+void id_print_calls(void) {
+    id_call_edges_funcs(0, 0);
+    id_print_call_cases();
+    return;
+}
+
+void id_print_call_cases(void) {
+    int i;
+    char* line;
+    i = 0;
+    while ((i < id_list_len(prog))) {
+        line = id_call_case_row(i);
+        id_print(line);
+        i = (i + 1);
+    }
+    return;
+}
+
+char* id_call_case_row(int i) {
+    char* name;
+    int n;
+    char* ret_s;
+    name = id_s1_of((int)(id_list_get(prog, i)));
+    n = id_count_cases((int)(id_list_get(prog, i)));
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(name, "|"), (char*)(intptr_t)(id_list_get(pfile, i))), ":"), id_str_of_int((int)(id_list_get(pline, i)))), "|"), id_str_of_int(n));
+    return ret_s;
+}
+
+char* id_call_loc(char* name) {
+    char* file_v;
+    int line_v;
+    char* ret_s;
+    file_v = id_func_file(name);
+    line_v = id_func_line(name);
+    ret_s = id_concat(id_concat(file_v, ":"), id_str_of_int(line_v));
+    return ret_s;
+}
+
+char* id_call_callee_loc(char* callee_name) {
+    char* ret_s;
+    ret_s = "";
+    if ((id_find_str(fnames, callee_name) >= 0)) {
+        ret_s = id_call_loc(callee_name);
+    }
+    return ret_s;
+}
+
+char* id_call_edge_line(char* caller, char* callee_name, char* kind) {
+    char* caller_loc;
+    char* callee_loc;
+    char* ret_s;
+    caller_loc = id_call_loc(caller);
+    callee_loc = id_call_callee_loc(callee_name);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(caller, "|"), caller_loc), "|"), callee_name), "|"), callee_loc), "|"), kind);
+    return ret_s;
+}
+
+void id_scan_call_edge(int id, char* caller) {
+    char* k;
+    k = id_k_of(id);
+    if ((strcmp(k, "call") == 0)) {
+        id_call_edge_emit(caller, id, "call");
+    }
+    if ((strcmp(k, "var") == 0)) {
+        id_scan_call_value(id, caller);
+    }
+    return;
+}
+
+void id_scan_call_value(int id, char* caller) {
+    char* name;
+    name = id_s1_of(id);
+    if ((id_find_str(fnames, name) >= 0)) {
+        id_call_edge_emit(caller, id, "value");
+    }
+    return;
+}
+
+void id_call_edge_emit(char* caller, int id, char* kind) {
+    char* callee_name;
+    char* line;
+    callee_name = id_s1_of(id);
+    line = id_call_edge_line(caller, callee_name, kind);
+    id_print(line);
+    return;
+}
+
+void id_call_edges_funcs(int f, int lo) {
+    while ((f < id_list_len(prog))) {
+        lo = id_call_edges_func(f, lo);
+        f = (f + 1);
+    }
+    return;
+}
+
+int id_call_edges_func(int f, int lo) {
+    char* caller;
+    int ret_i;
+    caller = id_s1_of((int)(id_list_get(prog, f)));
+    id_call_edges_range(lo, (int)(id_list_get(prog, f)), caller);
+    ret_i = ((int)(id_list_get(prog, f)) + 1);
+    return ret_i;
+}
+
+void id_call_edges_range(int lo, int hi, char* caller) {
+    while ((lo <= hi)) {
+        id_scan_call_edge(lo, caller);
+        lo = (lo + 1);
+    }
+    return;
+}
+
 void id_check_asm_targets(int argc, IdList* argv) {
     char* arg_triple_v;
     arg_triple_v = id_arg_triple(argc, argv);
@@ -3061,7 +3199,11 @@ void id_asm_target_rows(char* triple) {
 
 void id_guarded_emit(int argc, IdList* argv) {
     id_check_asm_targets(argc, argv);
-    id_guarded_emit_tail(argc, argv);
+    if ((id_arg_flag(argc, argv, 1, "--calls") == 1)) {
+        id_print_calls();
+    } else {
+        id_guarded_emit_tail(argc, argv);
+    }
     return;
 }
 
@@ -5773,7 +5915,7 @@ void id_ls3(int node) {
 void id_ls4(int node) {
     if ((strcmp(id_k_of(node), "iassign") == 0)) {
         id_lw_iassign(node);
-    } else {
+    } else if ((strcmp(id_k_of(node), "chain") != 0)) {
         id_ls5(node);
     }
     return;
@@ -7752,7 +7894,7 @@ char* id_iset_code(int id, char* val) {
 void id_es3b(int id, char* ind) {
     if ((strcmp(id_k_of(id), "iassign") == 0)) {
         id_emit_iassign(id, ind);
-    } else {
+    } else if ((strcmp(id_k_of(id), "chain") != 0)) {
         id_es4(id, ind);
     }
     return;
@@ -12314,9 +12456,107 @@ int id_func_sig(IdList* pos, char* name) {
     IdList* body;
     int ret_i;
     params = id_parse_params(pos, "param");
-    body = id_parse_block(pos);
+    body = id_parse_segments(pos, params);
     ret_i = id_func_ret(pos, name, params, body);
     return ret_i;
+}
+
+IdList* id_parse_segments(IdList* pos, IdList* params) {
+    IdList* body;
+    body = id_parse_block(pos);
+    id_chain_loop(pos, params, body);
+    return body;
+}
+
+void id_chain_loop(IdList* pos, IdList* params, IdList* body) {
+    while ((strcmp(id_cur_text(pos), "chain") == 0)) {
+        id_take_chain(pos, params, body);
+    }
+    return;
+}
+
+void id_take_chain(IdList* pos, IdList* params, IdList* body) {
+    IdList* restated;
+    id_advance(pos);
+    restated = id_parse_params(pos, "param");
+    id_chain_tail(pos, params, restated, body);
+    return;
+}
+
+void id_chain_same(IdList* pos, IdList* params, IdList* restated) {
+    if ((id_list_len(params) != id_list_len(restated))) {
+        id_syn_err(pos, "a chain restates the function's parameters exactly; this one lists a different number");
+    } else {
+        id_chain_each(pos, params, restated);
+    }
+    return;
+}
+
+void id_chain_each(IdList* pos, IdList* params, IdList* restated) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(params))) {
+        id_chain_one(pos, (int)(id_list_get(params, i)), (int)(id_list_get(restated, i)));
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_chain_one(IdList* pos, int a, int b) {
+    if (((strcmp(id_s1_of(a), id_s1_of(b)) != 0) || (strcmp(id_s2_of(a), id_s2_of(b)) != 0))) {
+        id_syn_err(pos, "a chain restates the function's parameters exactly; this one differs");
+    }
+    return;
+}
+
+void id_chain_tail(IdList* pos, IdList* params, IdList* restated, IdList* body) {
+    IdList* seg;
+    id_chain_same(pos, params, restated);
+    seg = id_parse_block(pos);
+    id_chain_add(body, seg);
+    return;
+}
+
+void id_chain_add(IdList* body, IdList* seg) {
+    int mark;
+    mark = id_newleaf("chain", 0, 0, "", "");
+    id_list_push(body, (long long)(mark));
+    id_chain_fill(body, seg);
+    return;
+}
+
+void id_chain_fill(IdList* body, IdList* seg) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(seg))) {
+        id_list_push(body, (long long)((int)(id_list_get(seg, i))));
+        i = (i + 1);
+    }
+    return;
+}
+
+IdList* id_parse_params(IdList* pos, char* kind) {
+    IdList* params;
+    params = id_list_lit(0);
+    id_scan_params(pos, params, kind);
+    return params;
+}
+
+void id_scan_params(IdList* pos, IdList* params, char* kind) {
+    id_advance(pos);
+    id_fill_params(pos, params, kind);
+    id_advance(pos);
+    return;
+}
+
+void id_fill_params(IdList* pos, IdList* params, char* kind) {
+    int one_param_v;
+    while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
+        one_param_v = id_one_param(pos, kind);
+        id_list_push(params, (long long)(one_param_v));
+        id_skip_comma(pos);
+    }
+    return;
 }
 
 int id_one_param(IdList* pos, char* kind) {
@@ -12345,30 +12585,6 @@ int id_func_done(IdList* pos, char* name, IdList* params, IdList* body, char* rt
     id_skip_semi(pos);
     ret_i = id_node_func(name, rt, params, body, rexpr);
     return ret_i;
-}
-
-IdList* id_parse_params(IdList* pos, char* kind) {
-    IdList* params;
-    params = id_list_lit(0);
-    id_scan_params(pos, params, kind);
-    return params;
-}
-
-void id_scan_params(IdList* pos, IdList* params, char* kind) {
-    id_advance(pos);
-    id_fill_params(pos, params, kind);
-    id_advance(pos);
-    return;
-}
-
-void id_fill_params(IdList* pos, IdList* params, char* kind) {
-    int one_param_v;
-    while (((strcmp(id_cur_text(pos), ")") != 0) && (strcmp(id_cur_kind(pos), "eof") != 0))) {
-        one_param_v = id_one_param(pos, kind);
-        id_list_push(params, (long long)(one_param_v));
-        id_skip_comma(pos);
-    }
-    return;
 }
 
 int id_ret_expr(IdList* pos, char* rt) {
@@ -17618,6 +17834,15 @@ char* id_canon_iassign(int id) {
     return ret_s;
 }
 
+char* id_cst4(int id) {
+    char* out;
+    out = id_concat(id_concat(id_concat("?", id_k_of(id)), "#"), id_str_of_int(id));
+    if ((strcmp(id_k_of(id), "chain") == 0)) {
+        out = "|";
+    }
+    return out;
+}
+
 char* id_decl_tag(int id) {
     char* out;
     out = "d:";
@@ -17709,7 +17934,7 @@ char* id_cst3(int id) {
     char* out;
     int i1_of_v2;
     IdList* l1_of_v2;
-    out = id_concat(id_concat(id_concat("?", id_k_of(id)), "#"), id_str_of_int(id));
+    out = id_cst4(id);
     if ((strcmp(id_k_of(id), "if") == 0)) {
         out = id_cst_if(id);
     }
@@ -18945,7 +19170,7 @@ void id_check_plain_else(IdList* els, int depth, char* fname, int ln) {
 void id_report_actions(char* fname, int n, int ln) {
     char* loc_at_v;
     loc_at_v = id_loc_at(fname, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "a block in '"), fname), "' performs "), id_str_of_int(n)), " actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- move some statements into a helper function to stay within the limit"));
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, "a block in '"), fname), "' performs "), id_str_of_int(n)), " actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- continue the function into a chain: `} chain (same parameters) {`"));
     id_note_failure();
     return;
 }
@@ -18975,6 +19200,8 @@ int id_stmt_actions(int id) {
     n = 1;
     if ((strcmp(id_k_of(id), "if") == 0)) {
         n = (1 + id_count_elses(id));
+    } else if ((strcmp(id_k_of(id), "chain") == 0)) {
+        n = 0;
     }
     return n;
 }
@@ -19056,15 +19283,15 @@ void id_check_block(IdList* body, int depth, char* fname, int ln) {
 }
 
 void id_check_fits(IdList* body, int depth, char* fname, int ln) {
-    id_check_count(body, fname, ln);
+    id_check_count(body, depth, fname, ln);
     id_check_children(body, depth, fname);
     return;
 }
 
-void id_check_count(IdList* body, char* fname, int ln) {
+void id_check_count(IdList* body, int depth, char* fname, int ln) {
     int n;
     n = id_count_actions(body);
-    if ((n > 3)) {
+    if (((n > 3) && (depth > 0))) {
         id_report_actions(fname, n, ln);
     }
     return;
@@ -19085,6 +19312,15 @@ void id_check_body_at(IdList* l2_of_v, char* s1_of_v) {
     int func_line_v;
     func_line_v = id_func_line(s1_of_v);
     id_check_block(l2_of_v, 0, s1_of_v, func_line_v);
+    id_check_segs(l2_of_v, s1_of_v, func_line_v);
+    return;
+}
+
+void id_check_segs(IdList* body, char* fname, int ln) {
+    IdList* acc;
+    acc = id_list_lit(1, (long long)(0));
+    id_seg_walk(body, fname, ln, acc);
+    id_seg_close(fname, ln, acc);
     return;
 }
 
@@ -19141,6 +19377,35 @@ void id_report_main(void) {
     func_line_v = id_func_line("main");
     loc_at_v = id_loc_at("main", func_line_v);
     id_var_report(id_concat(loc_at_v, "'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status"));
+    return;
+}
+
+void id_seg_walk(IdList* body, char* fname, int ln, IdList* acc) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(body))) {
+        id_seg_step(body, fname, ln, acc, i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_seg_step(IdList* body, char* fname, int ln, IdList* acc, int i) {
+    int a;
+    if ((strcmp(id_k_of((int)(id_list_get(body, i))), "chain") == 0)) {
+        id_seg_close(fname, ln, acc);
+    } else {
+        a = id_stmt_actions((int)(id_list_get(body, i)));
+        id_lset(acc, 0, ((int)(id_list_get(acc, 0)) + a));
+    }
+    return;
+}
+
+void id_seg_close(char* fname, int ln, IdList* acc) {
+    if (((int)(id_list_get(acc, 0)) > 3)) {
+        id_report_actions(fname, (int)(id_list_get(acc, 0)), ln);
+    }
+    id_lset(acc, 0, 0);
     return;
 }
 

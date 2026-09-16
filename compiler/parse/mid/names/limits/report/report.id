@@ -12,7 +12,7 @@ check_plain_else(int[] els, int depth, string fname, int ln) {
 
 report_actions(string fname, int n, int ln) {
   string loc_at_v = loc_at(fname, ln);
-  print(loc_at_v + "a block in '" + fname + "' performs " + n + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- move some statements into a helper function to stay within the limit");
+  print(loc_at_v + "a block in '" + fname + "' performs " + n + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- continue the function into a chain: `} chain (same parameters) {`");
   note_failure();
 } return void;
 

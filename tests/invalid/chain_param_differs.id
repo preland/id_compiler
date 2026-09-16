@@ -1,0 +1,9 @@
+// EXPECT: this one differs
+// the restated parameter count matches, but the second name does not
+main(int argc, string[] argv) {
+  int a = 1;
+  int b = 2;
+  int c = 3;
+} chain (int argc, string[] args) {
+  int d = 4;
+} return int 0;

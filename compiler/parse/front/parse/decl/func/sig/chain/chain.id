@@ -1,0 +1,43 @@
+// A function may continue into a chain:
+//
+//     name(params) { ... } chain (params) { ... } return TYPE expr;
+//
+// A chain is a literal continuation, not a call: the parameters, the imports
+// and every local declared so far are still in scope, and control falls into
+// it. So the segments are collected into the one body the function already
+// has, and nothing downstream -- lowering, the backends, the harness -- ever
+// sees a seam.
+//
+// What a chain is *for* is the three-actions-per-block limit: a block that is
+// full continues into the next segment instead of being split into a helper
+// that is called once and never again. The limit is unchanged; where the work
+// goes is what changed.
+
+parse_segments(int[] pos, int[] params) {
+  int[] body = parse_block(pos);
+  chain_loop(pos, params, body);
+} return int[] body;
+given decl_tokens ([8], []):([5, 13])
+given decl_tokens ([8], [0]):([5, 13])
+
+// `chain` is a keyword (lex/chars/classify/ident_kw.id), so this reads the
+// token text rather than a kind: the cursor sits just past the closing brace
+// parse_block consumed.
+chain_loop(int[] pos, int[] params, int[] body) {
+  while(cur_text(pos) == "chain") {
+    take_chain(pos, params, body);
+  }
+} return void;
+given decl_tokens ([33], [], []):() then check_failed:(0)
+given decl_tokens ([35], [], []):() then check_failed:(0)
+
+// The parameters are restated for the reader, and must match exactly -- they
+// name the same values, so a restatement that disagrees is a mistake about
+// what is in scope rather than a second signature.
+take_chain(int[] pos, int[] params, int[] body) {
+  advance(pos);
+  int[] restated = parse_params(pos, "param");
+  chain_tail(pos, params, restated, body);
+} return void;
+given decl_tokens ([33], [], []):() then check_failed:(1)
+given decl_tokens ([35], [], []):() then check_failed:(1)

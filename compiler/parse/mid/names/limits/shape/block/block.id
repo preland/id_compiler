@@ -19,13 +19,17 @@ check_block(int[] body, int depth, string fname, int ln) {
 } return void;
 
 check_fits(int[] body, int depth, string fname, int ln) {
-  check_count(body, fname, ln);
+  check_count(body, depth, fname, ln);
   check_children(body, depth, fname);
 } return void;
 
-check_count(int[] body, string fname, int ln) {
+// Only a nested block is counted here. A function's own body arrives at depth
+// 0, and check_segs (more/seg.id) measures it a segment at a time, so counting
+// the whole body here as well would report a chained function twice -- for a
+// concatenated total it never wrote -- and an ordinary one twice over.
+check_count(int[] body, int depth, string fname, int ln) {
   int n = count_actions(body);
-  if(n > 3) {
+  if(n > 3 && depth > 0) {
     report_actions(fname, n, ln);
   }
 } return void;

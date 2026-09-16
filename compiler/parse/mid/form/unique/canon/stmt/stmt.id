@@ -30,10 +30,9 @@ cst2(int id) {
 // The two compound statements. An if carries its else arm (which may be
 // nothing at all), and the two are told apart by their tag, so `if(c){}` and
 // `wh(c){}` over the same body are never the same statement.
-// The end of the chain; its default is an unrepeatable string for the same
-// reason as ce5's.
+// The seam and the default sit one link further along, in more/seam.id.
 cst3(int id) {
-  string out = "?" + k_of(id) + "#" + id;
+  string out = cst4(id);
   if(k_of(id) == "if") {
     out = cst_if(id);
   }

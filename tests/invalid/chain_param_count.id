@@ -1,0 +1,9 @@
+// EXPECT: lists a different number
+// a chain restates the function's parameters; this one drops the second
+main(int argc, string[] argv) {
+  int a = 1;
+  int b = 2;
+  int c = 3;
+} chain (int argc) {
+  int d = 4;
+} return int 0;
