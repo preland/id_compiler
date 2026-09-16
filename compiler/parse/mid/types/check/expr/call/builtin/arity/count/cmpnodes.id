@@ -1,0 +1,32 @@
+// Comparison/bitwise/mixed-precedence nodes on composite_fixture's leaves,
+// for the compare/cond cluster (check/expr/op/compare/, .../unary_bits/).
+// Filed here because it was the one directory left anywhere under
+// mid/types/ with room -- every other one is at the 3-entry cap.
+cmp_fixture() {
+  composite_fixture();
+  cmp_build();
+  cmp_build2();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+cmp_build() {
+  export int bin_eq = node_bin("==", (import lit_a), (import lit_b));
+  export int bin_lt = node_bin("<", (import lit_a), (import lit_b));
+  export int bin_bitand = node_bin("&", (import lit_a), (import lit_b));
+} return void;
+given composite_fixture ():() then check_failed:(0)
+given composite_fixture ():() then init_units:(0)
+
+// bin_mixed is unparenthesized (nothing here pushes it to nparen), so it is
+// the "needs parens" shape mixed_side looks for. print_call is a builtin
+// call whose type is "void", for chk_cond's unit case. exprstmt_bin wraps
+// bin_eq the way a "this statement compares instead of assigning" node
+// would (chk_exprstmt only reads i1_of, not the wrapper's own kind).
+cmp_build2() {
+  export int bin_mixed = node_bin("<", (import bin_bitand), (import lit_a));
+  export int print_call = node_call("print", [(import lit_str)]);
+  export int exprstmt_bin = node_exprstmt((import bin_eq));
+} return void;
+given cmp_fixture ():() then check_failed:(0)
+given cmp_fixture ():() then init_units:(0)

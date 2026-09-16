@@ -8,6 +8,8 @@ cmp_bad(string lt, string rt, int okk) {
     ok = 1;
   }
 } return int ok;
+given init_tyreg ("int", "word", 0):(1)
+given init_tyreg ("int", "word", 1):(0)
 
 eq_ok(string lt, string rt) {
   int ok = 0;
@@ -15,6 +17,8 @@ eq_ok(string lt, string rt) {
     ok = 1;
   }
 } return int ok;
+given init_tyreg ("string", "string"):(1)
+given init_tyreg ("int", "string"):(0)
 
 ord_ok(string lt, string rt) {
   int ok = 0;
@@ -22,3 +26,5 @@ ord_ok(string lt, string rt) {
     ok = 1;
   }
 } return int ok;
+given init_tyreg ("int", "word"):(1)
+given init_tyreg ("string", "string"):(0)
