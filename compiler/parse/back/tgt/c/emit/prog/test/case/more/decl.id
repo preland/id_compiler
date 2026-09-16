@@ -4,11 +4,15 @@ emit_tc_decl(string pt, string nm, string cv) {
   string ct = c_type(pt);
   emit_line("    " + ct + " " + nm + " = " + cv + ";");
 } return void;
+given lc_env2 ("int", "idtc_a0", "5"):() then prints:("    int idtc_a0 = 5;\n")
+given lc_env2 ("string", "idtc_a1", "\"hi\""):() then prints:("    char* idtc_a1 = \"hi\";\n")
 
 arg_names(int fn) {
   int n = flat_arg_count(fn);
   string out = names_upto(n);
 } return string out;
+given fn_fixture ((import fixture_fn)):("idtc_a0")
+given nz_prog_fixture ((import nz_plainfn)):("")
 
 names_upto(int n) {
   string out = "";
@@ -18,3 +22,5 @@ names_upto(int n) {
     j = j + 1;
   }
 } return string out;
+(0):("")
+(2):("idtc_a0, idtc_a1")

@@ -5,6 +5,8 @@ emit_case_args(int ci) {
   int[] args = l1_of((import casenode)[ci]);
   emit_arg_lines(ps, args);
 } return void;
+given wrap_fixture (0):() then prints:("    int idtc_a0 = 0;\n")
+given wrap_fixture (0):() then calls emit_tc_decl:[1]
 
 emit_arg_lines(int[] ps, int[] args) {
   int j = 0;
@@ -13,9 +15,13 @@ emit_arg_lines(int[] ps, int[] args) {
     j = j + 1;
   }
 } return void;
+given calls_items_fixture ((import fixture_params), (import fixture_calls_one)):() then prints:("    int idtc_a0 = 1;\n")
+given calls_items_fixture ((import fixture_params), (import fixture_calls_none)):() then prints:("")
 
 emit_arg_line(int[] ps, int[] args, int j) {
   string pt = s1_of(ps[j]);
   string cv = tc_value(args[j], pt);
   emit_tc_decl(pt, "idtc_a" + j, cv);
 } return void;
+given calls_items_fixture ((import fixture_params), (import fixture_calls_one), 0):() then prints:("    int idtc_a0 = 1;\n")
+given calls_items_fixture ((import fixture_params), (import fixture_calls_one), 0):() then calls tc_value:[1]

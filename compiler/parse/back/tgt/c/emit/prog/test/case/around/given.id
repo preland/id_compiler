@@ -9,6 +9,8 @@ emit_case_pre(int ci) {
   emit_case_given(ci);
   emit_case_args(ci);
 } return void;
+given casegiven_fixture (0):() then prints:("    int idtc_a0 = 0;\n")
+given casegiven_fixture (0):() then calls emit_case_args:[1]
 
 emit_case_given(int ci) {
   string setup_nm = (import casegiven)[ci];
@@ -16,3 +18,16 @@ emit_case_given(int ci) {
     emit_line("    id_" + setup_nm + "();");
   }
 } return void;
+given casegiven_fixture (0):() then prints:("")
+given casegiven_fixture (1):() then prints:("    id_extra_setup();\n")
+
+// wrap_fixture's casenode/casefn (test/case/around/then/more/capture/pre/
+// fixture.id, pre-existing) plus a two-entry casegiven -- "" at 0 (a case
+// with no `given`), a real name at 1 -- neither of which that fixture sets.
+casegiven_fixture() {
+  wrap_fixture();
+  push((import casegiven), "");
+  push((import casegiven), "extra_setup");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
