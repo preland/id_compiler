@@ -12,15 +12,21 @@ reg_report4(string name, string type, string owner, int exported, int ln, int un
     report_var_type(name, type, prev, owner, ln);
   }
 } return void;
+given regrow_d ("x", "string", "f", 0, 10, 0):() then calls report_var_type:("x", "string", "int", "f", 10)
+given regrow_d ("x", "int", "f", 0, 10, 0):() then check_failed:(0)
 
 reg_push(string name, string type, string owner, int exported, int unit) {
   didx_add(name);
   push((import dvtype), type);
   reg_push2(owner, exported, unit);
 } return void;
+given regrow_c ("y", "int", "f", 0, 0):() then dvname_len:(1)
+given regrow_d ("z", "int", "f", 0, 0):() then dvname_len:(2)
 
 reg_push2(string owner, int exported, int unit) {
   push((import dvfunc), owner);
   push((import dvexp), exported);
   push((import dvunit), unit);
 } return void;
+given regrow_d ("f", 0, 0):() then check_failed:(0)
+given regrow_c ("g", 1, 5):() then check_failed:(0)

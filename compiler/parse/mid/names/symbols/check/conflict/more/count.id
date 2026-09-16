@@ -11,6 +11,8 @@ fn_count(string fname) {
     i = i + 1;
   }
 } return int n;
+given fncount_setup ("g"):(1)
+given fncount_setup ("nope"):(0)
 
 // Asked only once a declaration already collides, so the scan over every
 // function is paid by the rare repeated name rather than by every declaration.
@@ -23,6 +25,8 @@ reg_twice(string name, string type, string owner, int exported, int ln, int unit
     reg_report3(name, type, owner, exported, ln, unit);
   }
 } return void;
+given fncount_setup ("x", "int", "g", 0, 10, 0):() then calls report_var_twice:("x", "g", 10)
+given fncount_setup ("x", "int", "nope", 0, 10, 0):() then calls report_var_twice:("x", "nope", 10)
 
 fn_count_at(int i, string fname, int n) {
   int r = n;
@@ -30,3 +34,5 @@ fn_count_at(int i, string fname, int n) {
     r = n + 1;
   }
 } return int r;
+given fncount_setup (0, "g", 0):(1)
+given fncount_setup (0, "nope", 0):(0)

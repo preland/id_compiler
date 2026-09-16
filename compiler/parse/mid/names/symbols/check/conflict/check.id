@@ -11,6 +11,8 @@ reg_report(string name, string type, string owner, int exported, int ln, int uni
     reg_report2(name, type, owner, exported, ln, unit);
   }
 } return void;
+given argfn_d ("g", "int", "f", 0, 10, 0):() then calls report_var_is_func:("g", "f", 10)
+given regrow_d ("z", "int", "f", 0, 10, 0):() then calls reg_report2:("z", "int", "f", 0, 10, 0)
 
 reg_report2(string name, string type, string owner, int exported, int ln, int unit) {
   if(declared_in(name, owner) > 0) {
@@ -19,6 +21,8 @@ reg_report2(string name, string type, string owner, int exported, int ln, int un
     reg_report3(name, type, owner, exported, ln, unit);
   }
 } return void;
+given regrow_d ("x", "int", "f", 0, 10, 0):() then calls reg_twice:("x", "int", "f", 0, 10, 0)
+given regrow_d ("z", "int", "f", 0, 10, 0):() then calls reg_report3:("z", "int", "f", 0, 10, 0)
 
 // The `export` declaration is the one that claims the name, so it is exempt;
 // every other declaration of it is the reuse the rule forbids.
@@ -29,3 +33,5 @@ reg_report3(string name, string type, string owner, int exported, int ln, int un
     reg_report4(name, type, owner, exported, ln, unit);
   }
 } return void;
+given call2_setup ("clist", "int", "f", 0, 10, 0):() then calls report_var_exported:("clist", "f", 10)
+given regrow_d ("z", "int", "f", 0, 10, 0):() then calls reg_report4:("z", "int", "f", 0, 10, 0)
