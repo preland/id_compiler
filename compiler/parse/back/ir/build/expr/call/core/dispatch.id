@@ -10,14 +10,20 @@ lw_call_dispatch(int node, string name) {
     v = lw_ocall(node);
   }
 } return int v;
+given ocall_fixture ((import ocall_node), "fx_target"):(0)
+given bicall_fixture ((import bicall_node), "print"):(2)
 
 lw_ucall_name(int node) {
   string s1_of_v = s1_of(node);
   string name = "id_" + s1_of_v;
 } return string name;
+given ocall_fixture ((import ocall_node)):("id_fx_target")
+given fcallv_fixture ((import fcallv_node)):("id_gfunc")
 
 lw_ucall_rest(int node, string name) {
   string ety = lw_ety(node);
   int[] args = lw_args(node);
   int ret_i = lw_callf(name, ety, args);
 } return int ret_i;
+given ocall_fixture ((import ocall_node), "id_fx_target"):(0)
+given fcallv_fixture ((import fcallv_node), "id_gfunc"):(0)

@@ -6,11 +6,15 @@ lw_call(int node) {
   string name = s1_of(node);
   int v = lw_call_dispatch(node, name);
 } return int v;
+given ocall_fixture ((import ocall_node)):(0)
+given bicall_fixture ((import bicall_node)):(2)
 
 lw_ucall(int node) {
   string name = lw_ucall_name(node);
   int ret_i = lw_ucall_rest(node, name);
 } return int ret_i;
+given ocall_fixture ((import ocall_node)):(0)
+given fcallv_fixture ((import fcallv_node)):(0)
 
 // A call's arguments, each converted to the parameter type the callee
 // declared. A callee with no AST node is an `asm` function, whose parameter
@@ -22,3 +26,5 @@ lw_args(int node) {
     i = lw_arg_at(node, i, vals);
   }
 } return int[] vals;
+given ocall_fixture ((import ocall_node)):([])
+given bicall_fixture ((import bicall_node)):([0])

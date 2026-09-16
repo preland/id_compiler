@@ -18,3 +18,5 @@ lw_fcall_emit(int node, int callee, int[] args) {
   int[] none = [];
   int ret_i = lw_emit("call", ety, callee, 0 - 1, "", args, none);
 } return int ret_i;
+given fcallv_fixture ((import fcallv_node), 0, []):(0) then ir_last_b:(0)
+given fcallv_fixture ((import fcallv_node), 0, [1, 2]):(0)
