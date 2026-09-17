@@ -29,9 +29,13 @@ parse_native(int[] pos) {
   string name = cur_text(pos);
   int ret_i = native_sig(pos, name);
 } return int ret_i;
+given decl_tokens ([0]):(2)
+given decl_tokens ([32]):(1)
 
 native_sig(int[] pos, string name) {
   advance(pos);
   int[] params = parse_params(pos, "nparam");
   int ret_i = native_ret(pos, name, params);
 } return int ret_i;
+given decl_tokens ([1], "n1"):(2)
+given decl_tokens ([33], "n2"):(1)

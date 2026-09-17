@@ -13,9 +13,13 @@ cons_list(int[] pos) {
   }
   expect_text(pos, "]");
 } return void;
+given cons_fix1 ([0]):() then prints:("<stdin>:1: error: expected ':', found ''\n<stdin>:1: error: expected '(', found ''\n<stdin>:1: error: expected ']', found ''\n")
+given bound_n_fix ([0]):() then prints:("<stdin>:1: error: unknown constraint 'O'; a case constrains 'time' or 'mem'\n<stdin>:1: error: expected ':', found '('\n<stdin>:1: error: expected '(', found 'n'\n<stdin>:1: error: expected ']', found 'n'\n")
 
 cons_one(int[] pos) {
   string ck = cur_text(pos);
   cons_kind(pos, ck);
   cons_rest(pos, ck);
 } return void;
+given cons_fix1 ([0]):() then prints:("<stdin>:1: error: expected ':', found ''\n<stdin>:1: error: expected '(', found ''\n")
+given bound_n_fix ([0]):() then prints:("<stdin>:1: error: unknown constraint 'O'; a case constrains 'time' or 'mem'\n<stdin>:1: error: expected ':', found '('\n<stdin>:1: error: expected '(', found 'n'\n")

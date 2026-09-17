@@ -10,6 +10,8 @@ parse_stmt5(int[] pos) {
     node = parse_exprstmt(pos);
   }
 } return int node;
+given atom_tokens ([33]):(4)
+given atom_tokens ([0]):(4)
 
 pp2(int[] pos) {
   int node = 0;

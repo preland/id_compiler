@@ -13,12 +13,16 @@ init_cases() {
   export int[] casenode = [];
   init_cases2();
 } return void;
+():() then calls init_cases2:[1]
+():() then calls init_cases2:()
 
 init_cases2() {
   export int[] conscase = [];
   export string[] conskind = [];
   init_cases3();
 } return void;
+():() then calls init_cases3:[1]
+():() then calls init_cases3:()
 
 init_cases3() {
   export string[] consbound = [];

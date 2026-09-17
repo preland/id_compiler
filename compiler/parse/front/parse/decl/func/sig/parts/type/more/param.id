@@ -7,6 +7,8 @@ fn_type_param(int[] pos, string out) {
   no_param_name(pos, pt);
   string ret_s = out + fn_sep(out) + pt;
 } return string ret_s;
+given decl_tokens ([2], ""):("int")
+given decl_tokens ([5], "int"):("int, int")
 
 no_param_name(int[] pos, string pt) {
   if(cur_kind(pos) == "ident") {
@@ -16,6 +18,8 @@ no_param_name(int[] pos, string pt) {
   }
   skip_comma(pos);
 } return void;
+given decl_tokens ([3], "int"):() then prints:("<stdin>:1: error: a function type lists parameter types only: write 'int', not 'int a'\n")
+given decl_tokens ([7], "int"):() then prints:("")
 
 // The separator before the next parameter type: none before the first.
 fn_sep(string out) {

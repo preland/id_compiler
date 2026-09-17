@@ -6,12 +6,16 @@ bound_parts(int[] pos) {
     out = bound_step(pos, out);
   }
 } return string out;
+given bound_n_fix ([3]):("")
+given bound_n_fix ([2]):("n")
 
 bound_step(int[] pos, string out) {
   string t2 = cur_text(pos);
   string so = out + bound_sep(out, t2) + t2;
   advance(pos);
 } return string so;
+given bound_n_fix ([2], ""):("n")
+given bound_n_fix ([2], "prefix"):("prefix n")
 
 bound_sep(string out, string t2) {
   string gap = " ";

@@ -13,9 +13,13 @@ no_fn_ret(int[] pos, string rb) {
     syn_err(pos, "a function type cannot return a function value; pass the function, or store it in a local or an export");
   }
 } return void;
+given decl_tokens ([33], "func"):() then prints:("<stdin>:1: error: a function type cannot return a function value; pass the function, or store it in a local or an export\n")
+given decl_tokens ([33], "int"):() then prints:("")
 
 no_void_list(int[] pos, string pl, string rb, string rt) {
   if(rb == "void" && rt != "void") {
     syn_err(pos, "'func(" + pl + ") return " + rt + "': brackets after a function type's return type belong to the return type, and " + rt + " is not a type; a function value cannot be an element of a list");
   }
 } return void;
+given decl_tokens ([33], "int, int", "void", "int"):() then prints:("<stdin>:1: error: 'func(int, int) return int': brackets after a function type's return type belong to the return type, and int is not a type; a function value cannot be an element of a list\n")
+given decl_tokens ([33], "int, int", "int", "string"):() then prints:("")

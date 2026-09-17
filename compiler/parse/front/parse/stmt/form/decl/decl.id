@@ -5,6 +5,8 @@ parse_decl(int[] pos) {
   string type = parse_type(pos);
   int ret_i = finish_decl(pos, type, exported);
 } return int ret_i;
+given stmt_tokens ([0]):(1) then prints:("")
+given stmt_tokens ([5]):(1) then prints:("<stdin>:1: error: expected '=', found '2'\n<stdin>:1: error: unexpected token ';'\n")
 
 take_export(int[] pos) {
   int e = 0;
@@ -13,8 +15,12 @@ take_export(int[] pos) {
     e = 1;
   }
 } return int e;
+given stmt_tokens ([0]):(0)
+given stmt_tokens ([5]):(0)
 
 finish_decl(int[] pos, string type, int exported) {
   string name = read_name(pos);
   int ret_i = finish_decl_tail(pos, type, name, exported);
 } return int ret_i;
+given stmt_tokens ([1], "int", 0):(1)
+given stmt_tokens ([1], "int", 1):(1) then calls node_decl:[1]

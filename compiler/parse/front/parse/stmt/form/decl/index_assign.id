@@ -8,6 +8,8 @@ is_iassign(int[] pos) {
     ok = 1;
   }
 } return int ok;
+given atom_tokens ([33]):(1)
+given atom_tokens ([0]):(0)
 
 parse_iassign(int[] pos) {
   int target = parse_postfix(pos);
@@ -17,3 +19,5 @@ parse_iassign(int[] pos) {
   skip_semi(pos);
   int ret_i = node_iassign(target, expr);
 } return int ret_i;
+given atom_tokens ([33]):(4)
+given atom_tokens ([33]):(4) then calls node_iassign:[1]

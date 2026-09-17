@@ -7,12 +7,16 @@ native_ret(int[] pos, string name, int[] params) {
   advance(pos);
   int ret_i = native_type(pos, name, params);
 } return int ret_i;
+given decl_tokens ([33], "nm1", []):(0) then prints:("<stdin>:1: error: expected ';', found 's'\n")
+given decl_tokens ([2], "nm2", []):(0) then prints:("<stdin>:1: error: expected 'return', found 'int'\n<stdin>:1: error: expected ';', found ','\n")
 
 native_type(int[] pos, string name, int[] params) {
   string rt = parse_type(pos);
   expect_text(pos, ";");
   int ret_i = native_node(pos, name, rt, params);
 } return int ret_i;
+given decl_tokens ([34], "nm1", []):(0) then prints:("<stdin>:1: error: expected ';', found 's'\n")
+given decl_tokens ([3], "nm2", []):(0) then prints:("<stdin>:1: error: expected ';', found ','\n")
 
 // -1 for the return expression, as for `return void`: there is none to check.
 native_node(int[] pos, string name, string rt, int[] params) {
@@ -20,3 +24,5 @@ native_node(int[] pos, string name, string rt, int[] params) {
   int[] none = [];
   int ret_i = newnode("func", 0 - 1, 1, name, rt, params, none);
 } return int ret_i;
+given decl_tokens ([36], "nm1", "int", []):(0)
+given decl_tokens ([4], "nm2", "int", []):(0)

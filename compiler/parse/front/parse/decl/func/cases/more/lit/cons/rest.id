@@ -5,12 +5,16 @@ cons_rest(int[] pos, string ck) {
   eat_colon(pos);
   cons_bound(pos, ck);
 } return void;
+given cons_fix1 ([0], "time"):() then prints:("<stdin>:1: error: expected ':', found ''\n<stdin>:1: error: expected '(', found ''\n")
+given then_fix ([1], "mem"):() then prints:("<stdin>:1: error: expected '(', found '6'\n")
 
 cons_bound(int[] pos, string ck) {
   string bt = big_o(pos);
   int n = len((import casestart));
   cons_push(n, ck, bt);
 } return void;
+given bound_n_fix ([0], "foo"):() then prints:("")
+given then_fix ([1], "bar"):() then prints:("<stdin>:1: error: expected '(', found ':'\n")
 
 // The case being parsed is the last one whose start has been recorded.
 cons_push(int n, string ck, string bt) {

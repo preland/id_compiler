@@ -12,11 +12,15 @@ parse_fn_type(int[] pos) {
   advance(pos);
   string ret_s = fn_type_rest(pos);
 } return string ret_s;
+given decl_tokens ([1]):("func(int, int) return int")
+given decl_tokens ([6]):("func() return int")
 
 fn_type_rest(int[] pos) {
   string pl = fn_type_params(pos, "");
   string ret_s = fn_type_ret(pos, pl);
 } return string ret_s;
+given decl_tokens ([2]):("func(int, int) return int")
+given decl_tokens ([5]):("func(int) return int")
 
 // The parameter types, joined as the canonical spelling joins them, and the
 // closing parenthesis.
@@ -26,3 +30,5 @@ fn_type_params(int[] pos, string out) {
   }
   advance(pos);
 } return string out;
+given decl_tokens ([2], ""):("int, int")
+given decl_tokens ([7], ""):("")

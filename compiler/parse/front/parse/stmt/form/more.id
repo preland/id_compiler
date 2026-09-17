@@ -4,3 +4,5 @@ finish_decl_tail(int[] pos, string type, string name, int exported) {
   eat_eq(pos);
   int ret_i = decl_rhs(pos, type, name, exported);
 } return int ret_i;
+given stmt_tokens ([2], "int", "x", 0):(1)
+given stmt_tokens ([17], "int", "y", 0):(1) then prints:("")

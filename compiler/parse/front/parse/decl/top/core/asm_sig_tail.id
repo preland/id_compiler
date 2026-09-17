@@ -4,6 +4,8 @@ asm_sig_tail(int[] pos, int[] parse_params_v) {
   push((import afparams), parse_params_v);
   int ret_i = asm_lines(pos);
 } return int ret_i;
+given asm_fix_full ([0], []):(0) then afret_last:("int") then afretn_last:("result")
+given asm_fix_full2 ([0], []):(0) then afret_last:("word") then afretn_last:("r")
 
 // grp_note's two pushes, for its own cases -- it is void and ngrp/ngrpc are
 // imported lists, not arguments a case can read back.
