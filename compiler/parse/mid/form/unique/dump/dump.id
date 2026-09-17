@@ -1,16 +1,16 @@
 // `idparse --fingerprints`: one line per function, `<fingerprint>\t<name>\t
 // <file>:<line>`, instead of a build. cfp already holds every function's
-// fingerprint, in prog order, once check_unique() has run (../scan/check.id) --
-// this is a reader of that, not a second walk of the tree.
+// fingerprint, once check_unique() has run (../scan/pass/check.id) -- this is a
+// reader of that, not a second walk of the tree.
 
-// One line per `prog` entry, and the same index reaches both lists: print_fp_line
-// reads `prog[i]` for the name and `cfp[i]` for the fingerprint. The cases pin
-// the count and the indices used, so a `cfp` that stops holding one entry per
-// function fails here rather than quietly printing a report whose line count no
-// longer matches the program it describes.
+// One line per fingerprint, which is why the walk is over `cfp` and not `prog`:
+// a chained function is meant to contribute one entry per segment, and then the
+// two lists differ in length. The cases pin the count and the indices used, so
+// a mismatch fails here rather than quietly printing a report whose line count
+// no longer matches what it describes.
 print_fingerprints() {
   int i = 0;
-  while(i < len((import prog))) {
+  while(i < len((import cfp))) {
     print_fp_line(i);
     i = i + 1;
   }
@@ -18,8 +18,11 @@ print_fingerprints() {
 given lz_o ():() then calls print_fp_line:[2]
 given lz_o ():() then calls print_fp_line:(0) then calls print_fp_line:(1)
 
+// `i` indexes the fingerprints; the function it belongs to is resolved by
+// fname_at (../scan/more/report/report.id), the checker's one place for that
+// mapping, rather than by indexing `prog` with a fingerprint's index here.
 print_fp_line(int i) {
-  string name = s1_of((import prog)[i]);
+  string name = fname_at(i);
   string line = fp_line(name, (import cfp)[i]);
   print(line);
 } return void;

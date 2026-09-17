@@ -2119,12 +2119,8 @@ char* id_cst3(int id);
 void id_print_fingerprints(void);
 void id_print_fp_line(int i);
 char* id_fp_line(char* name, char* fp);
-void id_check_bodies(void);
-void id_check_unique(void);
-void id_uq_fill(void);
-void id_uq_scan(void);
-void id_uq_at(int i);
-int id_find_dup(int i);
+void id_uq_fill_all(void);
+void id_uq_fill_at(int i);
 void id_chk_dupfn(void);
 void id_dupfn_at(int i);
 void id_dupfn_err(int i, int j);
@@ -2169,6 +2165,12 @@ void id_resv_print(char* prog_loc_v, char* s1_of_v);
 void id_resv_at(int i);
 void id_resv_err(int i);
 void id_init_resv_names(void);
+void id_check_bodies(void);
+void id_check_unique(void);
+void id_uq_fill(void);
+void id_uq_scan(void);
+void id_uq_at(int i);
+int id_find_dup(int i);
 void id_exp_one(int id, char* owner);
 int id_is_export_decl(int id);
 void id_add_export(char* name, char* type, char* owner);
@@ -2906,10 +2908,11 @@ IdList* fixd_std;  /* exported by fix_state2() */
 IdList* fixd_file;  /* exported by fix_state2() */
 IdList* cself;  /* exported by uq_begin() */
 IdList* cnames;  /* exported by uq_begin() */
-IdList* cfp;  /* exported by uq_fill() */
 IdList* cw_names;  /* exported by cw_begin() */
 IdList* cw_vals;  /* exported by cw_begin() */
 IdList* resv_names;  /* exported by init_resv_names() */
+IdList* cfp;  /* exported by uq_fill() */
+IdList* cfpfn;  /* exported by uq_fill() */
 IdList* bnames;  /* exported by init_bnames() */
 IdList* hostc;  /* exported by host_init() */
 IdList* rtc;  /* exported by init_rtc() */
@@ -17950,7 +17953,7 @@ char* id_cst3(int id) {
 void id_print_fingerprints(void) {
     int i;
     i = 0;
-    while ((i < id_list_len(prog))) {
+    while ((i < id_list_len(cfp))) {
         id_print_fp_line(i);
         i = (i + 1);
     }
@@ -17960,7 +17963,7 @@ void id_print_fingerprints(void) {
 void id_print_fp_line(int i) {
     char* name;
     char* line;
-    name = id_s1_of((int)(id_list_get(prog, i)));
+    name = id_fname_at(i);
     line = id_fp_line(name, (char*)(intptr_t)(id_list_get(cfp, i)));
     id_print(line);
     return;
@@ -17974,62 +17977,22 @@ char* id_fp_line(char* name, char* fp) {
     return ret_s;
 }
 
-void id_check_bodies(void) {
-    id_check_funcs();
-    id_chk_dupfn();
-    id_check_unique();
-    return;
-}
-
-void id_check_unique(void) {
-    id_uq_fill();
-    id_uq_scan();
-    id_cw_scan();
-    return;
-}
-
-void id_uq_fill(void) {
+void id_uq_fill_all(void) {
     int i;
-    char* canon_func_v;
-    cfp = id_list_lit(0);
     i = 0;
     while ((i < id_list_len(prog))) {
-        canon_func_v = id_canon_func((int)(id_list_get(prog, i)));
-        id_list_push(cfp, (long long)(intptr_t)(canon_func_v));
+        id_uq_fill_at(i);
         i = (i + 1);
     }
     return;
 }
 
-void id_uq_scan(void) {
-    int i;
-    i = 0;
-    while ((i < id_list_len(cfp))) {
-        id_uq_at(i);
-        i = (i + 1);
-    }
+void id_uq_fill_at(int i) {
+    char* canon_func_v;
+    canon_func_v = id_canon_func((int)(id_list_get(prog, i)));
+    id_list_push(cfp, (long long)(intptr_t)(canon_func_v));
+    id_list_push(cfpfn, (long long)(i));
     return;
-}
-
-void id_uq_at(int i) {
-    int j;
-    j = id_find_dup(i);
-    if ((j >= 0)) {
-        id_report_dup(i, j);
-    }
-    return;
-}
-
-int id_find_dup(int i) {
-    int j;
-    int found;
-    j = 0;
-    found = (0 - 1);
-    while (((j < i) && (found < 0))) {
-        found = id_dup_probe(i, j);
-        j = (j + 1);
-    }
-    return found;
 }
 
 void id_chk_dupfn(void) {
@@ -18307,8 +18270,10 @@ void id_report_dup(int i, int j) {
 }
 
 char* id_fname_at(int i) {
+    int fi;
     char* ret_s;
-    ret_s = id_s1_of((int)(id_list_get(prog, i)));
+    fi = (int)(id_list_get(cfpfn, i));
+    ret_s = id_s1_of((int)(id_list_get(prog, fi)));
     return ret_s;
 }
 
@@ -18435,6 +18400,58 @@ void id_init_resv_names(void) {
     resv_names = id_list_lit(0);
     id_split_resv_names(resv_names_src, 0);
     return;
+}
+
+void id_check_bodies(void) {
+    id_check_funcs();
+    id_chk_dupfn();
+    id_check_unique();
+    return;
+}
+
+void id_check_unique(void) {
+    id_uq_fill();
+    id_uq_scan();
+    id_cw_scan();
+    return;
+}
+
+void id_uq_fill(void) {
+    cfp = id_list_lit(0);
+    cfpfn = id_list_lit(0);
+    id_uq_fill_all();
+    return;
+}
+
+void id_uq_scan(void) {
+    int i;
+    i = 0;
+    while ((i < id_list_len(cfp))) {
+        id_uq_at(i);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_uq_at(int i) {
+    int j;
+    j = id_find_dup(i);
+    if ((j >= 0)) {
+        id_report_dup(i, j);
+    }
+    return;
+}
+
+int id_find_dup(int i) {
+    int j;
+    int found;
+    j = 0;
+    found = (0 - 1);
+    while (((j < i) && (found < 0))) {
+        found = id_dup_probe(i, j);
+        j = (j + 1);
+    }
+    return found;
 }
 
 void id_exp_one(int id, char* owner) {

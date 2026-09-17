@@ -30,12 +30,11 @@ check_unique() {
 // Fingerprint every function once. Comparing is quadratic in the number of
 // functions but canonicalising is not, and canonicalising is the expensive
 // half, so the two passes are kept apart.
+//
+// `cfpfn` records which function each fingerprint belongs to; the walk itself
+// is ../fill.id, which explains why the owner is kept separately.
 uq_fill() {
   export string[] cfp = [];
-  int i = 0;
-  while(i < len((import prog))) {
-    string canon_func_v = canon_func((import prog)[i]);
-    push((import cfp), canon_func_v);
-    i = i + 1;
-  }
+  export int[] cfpfn = [];
+  uq_fill_all();
 } return void;

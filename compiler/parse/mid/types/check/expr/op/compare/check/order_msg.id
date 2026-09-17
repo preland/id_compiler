@@ -8,7 +8,7 @@ farm_j() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
-// The real fingerprint pass (mid/form/unique/scan/check.id's uq_fill), run
+// The real fingerprint pass (mid/form/unique/scan/pass/check.id's uq_fill), run
 // over prog = [fwd1, main, user] -- for fwd_used_as_value/fwd_used_scan/
 // fwd_used_step's cases, which read cfp and cannot fake its content (only
 // uq_fill may declare it). user's fingerprint contains "fv(target)"; none

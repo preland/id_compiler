@@ -1,0 +1,32 @@
+// Filling the fingerprint table, and recording which function each entry
+// belongs to.
+//
+// `cfp` holds the fingerprints and `cfpfn` holds, for each one, the `prog`
+// index of the function it came from. Today that is simply 0, 1, 2, ... -- one
+// entry per function -- and the two lists could be collapsed into one. They are
+// kept apart because a chained function is meant to contribute one fingerprint
+// per segment (each chain block, and the initial function, being its own unit
+// for duplicate checking), and then the two lists stop being the same length.
+//
+// Keeping the owner explicit means the index of a fingerprint and the index of
+// a function are different things with different names, rather than one number
+// used for both -- which is what `fname_at` (./more/report/report.id) resolves,
+// and the only place in the checker that maps one to the other.
+
+uq_fill_all() {
+  int i = 0;
+  while(i < len((import prog))) {
+    uq_fill_at(i);
+    i = i + 1;
+  }
+} return void;
+given lz_o ():() then calls uq_fill_at:[2]
+given farm_g ():() then calls uq_fill_at:[0]
+
+uq_fill_at(int i) {
+  string canon_func_v = canon_func((import prog)[i]);
+  push((import cfp), canon_func_v);
+  push((import cfpfn), i);
+} return void;
+given lz_o (0):() then calls canon_func:(22)
+given lz_o (1):() then calls canon_func:(23)

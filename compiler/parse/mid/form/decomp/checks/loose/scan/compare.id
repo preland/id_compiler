@@ -1,4 +1,4 @@
-// Comparing the loose fingerprints, mirroring mid/form/unique/scan/compare.id's
+// Comparing the loose fingerprints, mirroring mid/form/unique/scan/pass/compare.id's
 // uq_scan/uq_at: each function against every earlier one, reported against
 // the first match. ./more/probe.id excludes a pair the strict duplicate-logic
 // rule (mid/form/unique/) already rejects as an error -- this warns about the
