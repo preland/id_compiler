@@ -6,11 +6,15 @@ entry_of(int f) {
   int[] irf_blk_v = irf_blk(f);
   int b = irf_blk_v[0];
 } return int b;
+given ir_rows (0):(0)
+given ir_rows (1):(1)
 
 entry_count(int f) {
   int b = entry_of(f);
   int n = insn_count(b);
 } return int n;
+given ir_rows (0):(1)
+given ir_rows (1):(0)
 
 m2r_collect_at(int f, int i) {
   int b = entry_of(f);

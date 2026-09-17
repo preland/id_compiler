@@ -6,6 +6,8 @@ m2r_sweep(int f, int i, int n) {
     i = i + 1;
   }
 } return int n;
+given ir_rows (0, 0, 5):(5) then chk_op:("add")
+given ir_rows (0, 1, 5):(5)
 
 m2r_sweep_b(int f, int b, int n) {
   int i = 0;
@@ -15,6 +17,8 @@ m2r_sweep_b(int f, int b, int n) {
     i = i + 1;
   }
 } return int n;
+given ir_rows (0, 0, 5):(5) then chk_op:("add")
+given ir_rows (1, 1, 7):(7)
 
 m2r_try(int f, int id, int n) {
   int v = m2r_same(id);
@@ -22,3 +26,5 @@ m2r_try(int f, int id, int n) {
     n = m2r_drop(f, id, v, n);
   }
 } return int n;
+given ir_rows (0, 0, 3):(3) then chk_op:("add")
+given m2rphi_setup (0, (import m2rphi_id), 3):(4) then chk_op:("nop")

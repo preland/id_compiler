@@ -14,6 +14,8 @@ asm_prev(string name, int n) {
     i = i + 1;
   }
 } return int found;
+given asmfx_setup ("foo", 1):(0)
+given asmfx_setup ("foo", 0):(-1)
 
 asm_match2(int i, string name, int found) {
   int r = found;

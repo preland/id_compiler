@@ -7,6 +7,8 @@ fold_isbool(int v) {
   string t = ir_ty(a);
   int r = t == "bool";
 } return int r;
+given irlfx_setup ((import irlfx_id)):(0)
+given fold_true_setup ((import ft_id)):(1)
 
 fold_zero_of(int id) {
   int b = ir_b(id);
@@ -15,3 +17,19 @@ fold_zero_of(int id) {
     r = 1;
   }
 } return int r;
+given ir_rows (1):(0)
+given fold_true_setup ((import ft_id)):(1)
+
+// A "const" bool row (c0, "0") that both fold_isbool's and fold_zero_of's
+// true branches can point at: ft_id ("add") has both fields set to c0, and
+// fz_id ("zext") gives fold_iszext (../cmp.id) a row whose op matches too.
+fold_true_setup() {
+  env_init();
+  int[] none = [];
+  int c0 = ir_insn("const", "bool", 0, 0, "0", none, none);
+} chain () {
+  export int ft_id = ir_insn("add", "int", c0, c0, "", none, none);
+  export int fz_id = ir_insn("zext", "int", c0, 0, "", none, none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

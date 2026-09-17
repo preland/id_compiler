@@ -1,0 +1,16 @@
+// init_opt (../../cell.id) returns void by its own effects, not its value
+// (always 0), so this is a void wrapper a case can `given`, and a reader for
+// the state it left -- for init_opt's own two cases.
+
+optfx_setup() {
+  env_init();
+  int r = init_opt();
+} return void;
+():() then check_failed:(0)
+():() then pra_len_check:(0)
+
+pra_len_check() {
+  int n = len((import pra));
+} return int n;
+given optfx_setup ():(0)
+given optfx_setup ():(0) then check_failed:(0)

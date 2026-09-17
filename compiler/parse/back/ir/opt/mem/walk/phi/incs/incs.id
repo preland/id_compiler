@@ -12,6 +12,8 @@ m2r_pre_count(int b) {
   int[] blk_pre_v = blk_pre(b);
   int n = len(blk_pre_v);
 } return int n;
+given br_fixture_p (0):(0)
+given br_fixture_p (1):(1)
 
 m2r_inc(int f, int b, int ph, int j, int i) {
   int pb = m2r_pre_at(b, i);

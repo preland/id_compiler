@@ -7,6 +7,8 @@ asm_triples(string name) {
     i = i + 1;
   }
 } return string out;
+given asmfx_setup ("foo"):("x86_64-unknown-linux-gnu")
+given asmfx_setup ("bar"):("")
 
 asm_tsep(int i, string name, string out) {
   string s = "";

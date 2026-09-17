@@ -23,6 +23,8 @@ const_line(string name) {
   string s1_of_v = s1_of(d);
   string ret_s = const_line_tail(d, s1_of_v);
 } return string ret_s;
+given cl_scalar_setup ("m"):("int m = 9;  /* constant from conf.id */")
+given cl_setup ("k"):("IdList* k;  /* constant from conf.id */")
 
 const_line_tail(int d, string s1_of_v) {
   int i1_of_v = i1_of(d);

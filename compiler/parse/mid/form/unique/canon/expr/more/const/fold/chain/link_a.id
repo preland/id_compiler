@@ -28,8 +28,12 @@ compute_add(int a, int b) {
     ret_s = "I" + n;
   }
 } return string ret_s;
+(0, 0):("I0")
+(1, 2):("I3")
 
 compute_sub(int a, int b) {
   int n = a - b;
   string ret_s = "I" + n;
 } return string ret_s;
+(5, 3):("I2")
+(0, 0):("I0")

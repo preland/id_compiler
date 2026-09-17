@@ -1,0 +1,24 @@
+// A third row on top of ir_rows: a "phi" whose two incoming values agree
+// (7, 7), so m2r_same resolves it and m2r_try has something to drop. Points
+// chk_id at it so chk_op/chk_ty (make/insn/read/row_fields.id) read it back.
+
+m2rphi_setup() {
+  ir_rows();
+  m2rphi_make();
+} return void;
+():() then check_failed:(0)
+():() then m2rphi_id_check:(2)
+
+m2rphi_make() {
+  int[] bl = [];
+  export int m2rphi_id = ir_insn("phi", "int", 7, 7, "", [7, 7], bl);
+  lset((import chk_id), 0, m2rphi_id);
+} return void;
+given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then m2rphi_id_check:(2)
+
+m2rphi_id_check() {
+  int n = (import m2rphi_id);
+} return int n;
+given m2rphi_setup ():(2)
+given m2rphi_setup ():(2) then check_failed:(0)

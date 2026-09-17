@@ -13,6 +13,8 @@ show_all(int fn, int[] expd) {
     so = "fputs(\"(\", stderr); " + so + " fputs(\")\", stderr);";
   }
 } return string so;
+given fn_fixture ((import fixture_fn), [0]):("fprintf(stderr, \"%d\", idtc_got);")
+given fn_fixture ((import fixture_fn), []):("fputs(\"(\", stderr);  fputs(\")\", stderr);")
 
 show_parts(int fn, int[] expd) {
   string out = "";
@@ -22,3 +24,5 @@ show_parts(int fn, int[] expd) {
     j = j + 1;
   }
 } return string out;
+given fn_fixture ((import fixture_fn), []):("")
+given fn_fixture ((import fixture_fn), [0]):("fprintf(stderr, \"%d\", idtc_got);")

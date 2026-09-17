@@ -13,6 +13,8 @@ init_opt() {
   export int[][] phiof = [];
   export int[][] outv = [];
 } return int 0;
+given env_init ():(0) then check_failed:(0)
+given env_init ():(0) then pra_len_check:(0)
 
 // The optimisation level, from `--opt N`. Level 0 emits the lowering as it
 // stands, which is the property that makes the lowering trustworthy: a program
@@ -26,3 +28,5 @@ arg_opt(int argc, string[] argv, int i, int lvl) {
     r = arg_opt(argc, argv, i + 1, lvl);
   }
 } return int r;
+(3, ["prog", "--opt", "2"], 0, 1):(2)
+(2, ["prog", "x"], 0, 1):(1)

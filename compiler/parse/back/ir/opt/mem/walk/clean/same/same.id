@@ -10,6 +10,8 @@ m2r_same(int id) {
     i = i + 1;
   }
 } return int v;
+given ir_rows (0):(-1)
+given irlfx_setup ((import irlfx_id)):(-2)
 
 m2r_pick(int id, int i, int v) {
   int r = 0 - 2;
@@ -19,6 +21,8 @@ m2r_pick(int id, int i, int v) {
     r = ir_l(id)[i];
   }
 } return int r;
+given irlfx_setup ((import irlfx_id), 0, -1):(10)
+given irlfx_setup ((import irlfx_id), 1, 10):(-2)
 
 // Replace every use of a value with another and remove what defined it. The
 // same operation serves a promoted load and a collapsed phi, which is why it
@@ -28,3 +32,5 @@ m2r_drop(int f, int id, int v, int n) {
   ir_kill(id);
   int ret_i = n + 1;
 } return int ret_i;
+given ir_rows (0, 0, 99, 5):(6) then chk_op:("nop") then chk_ty:("")
+given ir_rows (1, 1, 77, 2):(3) then chk_op:("add") then chk_ty:("int")

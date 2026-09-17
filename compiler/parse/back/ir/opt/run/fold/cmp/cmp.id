@@ -14,4 +14,6 @@ fold_iszext(int v) {
     r = 1;
   }
 } return int r;
+given ir_rows (0):(0)
+given fold_true_setup ((import fz_id)):(1)
 

@@ -6,3 +6,19 @@ ir_l_count(int id) {
   int[] l = ir_l(id);
   int n = len(l);
 } return int n;
+given ir_rows (0):(0)
+given irlfx_setup ((import irlfx_id)):(3)
+
+irlfx_setup() {
+  env_init();
+  int[] bl = [];
+  export int irlfx_id = ir_insn("add", "int", 0, 1, "", [10, 11, 12], bl);
+} return void;
+():() then check_failed:(0)
+():() then irlfx_id_check:(0)
+
+irlfx_id_check() {
+  int n = (import irlfx_id);
+} return int n;
+given irlfx_setup ():(0)
+given irlfx_setup ():(0) then check_failed:(0)

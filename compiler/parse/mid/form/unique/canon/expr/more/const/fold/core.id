@@ -29,3 +29,5 @@ fold_word(word wv) {
     ret_s = "I" + n;
   }
 } return string ret_s;
+(0):("I0")
+(1000):("I1000")

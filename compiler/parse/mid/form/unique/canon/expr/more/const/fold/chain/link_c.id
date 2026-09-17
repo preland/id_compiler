@@ -21,8 +21,12 @@ compute_mod(int a, int b) {
     ret_s = "I" + n;
   }
 } return string ret_s;
+(10, 3):("I1")
+(5, 0):("")
 
 compute_and(int a, int b) {
   int n = a & b;
   string ret_s = "I" + n;
 } return string ret_s;
+(12, 10):("I8")
+(0, 5):("I0")

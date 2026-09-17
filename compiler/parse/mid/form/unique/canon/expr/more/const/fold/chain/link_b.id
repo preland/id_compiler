@@ -19,6 +19,8 @@ compute_mul(int a, int b) {
   word prod = mul_word(a, b);
   string ret_s = fold_word(prod);
 } return string ret_s;
+(0, 5):("I0")
+(2, 3):("I6")
 
 // `/` by zero traps at runtime; folding it here would move that trap from
 // the program that wrote it to the compiler canonicalising it, so it is
@@ -30,3 +32,5 @@ compute_div(int a, int b) {
     ret_s = "I" + n;
   }
 } return string ret_s;
+(6, 2):("I3")
+(5, 0):("")

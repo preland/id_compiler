@@ -6,8 +6,12 @@ m2r_pre_at(int b, int i) {
   int[] blk_pre_v = blk_pre(b);
   int pb = blk_pre_v[i];
 } return int pb;
+given br_fixture_p (1, 0):(0)
+given prefx2_setup (1, 1):(9)
 
 m2r_pos(int f, int b) {
   int[] irf_blk_v = irf_blk(f);
   int ret_i = lst_index_of(irf_blk_v, b);
 } return int ret_i;
+given cfg_fixture (0, 0):(0)
+given cfg_fixture (0, 1):(1)

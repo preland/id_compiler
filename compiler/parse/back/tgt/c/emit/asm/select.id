@@ -19,6 +19,8 @@ asm_row(string name, string triple) {
     i = i + 1;
   }
 } return int found;
+given asmfx_setup ("foo", "x86_64-unknown-linux-gnu"):(0)
+given asmfx_setup ("bar", "x86_64-unknown-linux-gnu"):(-1)
 
 asm_match(int i, string name, string triple, int found) {
   int r = found;

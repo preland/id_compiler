@@ -5,3 +5,5 @@ and_sep(int j) {
     so = " && ";
   }
 } return string so;
+(0):("")
+(1):(" && ")

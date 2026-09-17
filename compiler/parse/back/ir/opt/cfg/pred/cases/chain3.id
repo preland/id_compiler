@@ -1,0 +1,11 @@
+// br_fixture_p plus a synthetic second predecessor value (9) pushed onto
+// block 1's list -- for m2r_pre_at (mem/walk/phi/incs/at.id) cases that
+// need more than one entry to index into.
+
+prefx2_setup() {
+  br_fixture_p();
+  int[] blk_pre_v = blk_pre(1);
+  push(blk_pre_v, 9);
+} return void;
+():() then check_failed:(0)
+():() then chk_pred1:([0, 9])
