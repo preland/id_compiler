@@ -20,8 +20,12 @@ given flags_setup (2, ["prog", "--runtime"]):() then is_runtime:(1)
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
   fs_set(arg_flag_v2);
-  host_init(argc, argv);
+  string host_t = arg_flag_val(argc, argv, 1, "--host-triple", "");
 } chain (int argc, string[] argv) {
+  if(host_t == "") {
+    host_t = arg_triple(argc, argv);
+  }
+  export string[] hostc = [host_t];
   nat_init(argc, argv);
 } return void;
 given flags_setup (1, ["prog"]):() then is_freestanding:(0)

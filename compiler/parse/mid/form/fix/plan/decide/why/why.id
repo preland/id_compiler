@@ -1,9 +1,6 @@
-fix_why(int sn, int last) {
-  string why = fix_why_cond(last);
-  if(why == "") {
-    why = fix_why_type(sn, last);
-  }
-} return string why;
+// fix_why used to sit here, dispatching to fix_why_cond and fix_why_type; it
+// was called exactly once, as the last action of fix_mark
+// (../mark/decide.id), and now chains there directly.
 
 fix_why_cond(int last) {
   int i = 0;

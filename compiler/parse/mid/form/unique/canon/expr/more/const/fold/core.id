@@ -6,14 +6,9 @@
 // is meant as `int` or `word`. bin_fold2 extracts the values and hands off
 // to the operator chain (./chain, ./calc); fold_op's own conservatism (never
 // folding a result that would differ between int and word width) is
-// documented where each operator is computed.
-
-bin_fold(string op, int lid, int rid) {
-  string ret_s = "";
-  if(k_of(lid) == "int" && k_of(rid) == "int") {
-    ret_s = bin_fold2(op, lid, rid);
-  }
-} return string ret_s;
+// documented where each operator is computed. What used to be bin_fold now
+// lives in bin_simplify's chain (../dispatch.id): it was called exactly once,
+// as that function's last action.
 
 bin_fold2(string op, int lid, int rid) {
   string ret_s = "";

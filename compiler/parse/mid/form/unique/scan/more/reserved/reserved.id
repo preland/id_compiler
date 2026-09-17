@@ -21,11 +21,8 @@
 // Not asked of the runtime itself: `--runtime` says this project IS the
 // implementation of those helpers, so a function named `str_of_int` here is
 // the definition of `id_str_of_int` rather than a collision with one.
-resv_at(int i) {
-  if(is_runtime() == 0 && is_reserved_name(i)) {
-    resv_err(i);
-  }
-} return void;
+// This used to be its own function, resv_at, called exactly once as the last
+// action of dupfn_at (../dup/dup_name.id); the check now inlines there.
 
 resv_err(int i) {
   string prog_loc_v = prog_loc(i);

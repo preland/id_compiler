@@ -4,22 +4,10 @@
 //
 // idc.py raised these while building its harness. They are properties of the
 // program, not of a harness, so here they are checks like the others, and they
-// run on every build. idc.py's wording, word for word.
-
-check_case_fits() {
-  int i = 0;
-  while(i < len((import casenode))) {
-    fit_case(i);
-    fit_given(i);
-    i = i + 1;
-  }
-  int ti = 0;
-} chain () {
-  while(ti < len((import thennode))) {
-    fit_then(ti);
-    ti = ti + 1;
-  }
-} return void;
+// run on every build. idc.py's wording, word for word. The loop that drove
+// this over every case and every then-clause was check_case_fits; it was
+// called exactly once, as the last action of check_scopes
+// (mid/names/symbols/build/scopes.id), and now chains there directly.
 
 fit_case(int i) {
   int fn = (import casefn)[i];

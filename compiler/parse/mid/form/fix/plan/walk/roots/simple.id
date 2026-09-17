@@ -17,8 +17,15 @@ fix_iassign(int sn) {
 fix_plan(int sn, int[] roots, int md) {
   fix_ev_reset();
   fix_walk_roots(roots);
-  int last = fix_last_m();
+  int i = 0;
 } chain (int sn, int[] roots, int md) {
+  int last = 0 - 1;
+  while(i < len((import fixe_cl))) {
+    if((import fixe_cl)[i] == 3) {
+      last = i;
+    }
+    i = i + 1;
+  }
   if(last >= 0) {
     fix_decide2(sn, md, last);
   }

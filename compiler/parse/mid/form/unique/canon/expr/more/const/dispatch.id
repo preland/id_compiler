@@ -9,8 +9,11 @@
 bin_simplify(int id, string op) {
   int lid = i1_of(id);
   int rid = i2_of(id);
-  string ret_s = bin_fold(op, lid, rid);
+  string ret_s = "";
 } chain (int id, string op) {
+  if(k_of(lid) == "int" && k_of(rid) == "int") {
+    ret_s = bin_fold2(op, lid, rid);
+  }
   if(ret_s == "") {
     ret_s = bin_identity(op, lid, rid);
   }

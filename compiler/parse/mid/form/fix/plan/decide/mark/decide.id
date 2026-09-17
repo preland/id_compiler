@@ -17,8 +17,11 @@ fix_decide2(int sn, int md, int last) {
 fix_mark(int sn, int last) {
   fix_mark_moves(last);
   fix_mark_sep(last);
-  string why = fix_why(sn, last);
+  string why = fix_why_cond(last);
 } chain (int sn, int last) {
+  if(why == "") {
+    why = fix_why_type(sn, last);
+  }
   if(why == "") {
     fix_emit_stmt(sn, last);
   } else {

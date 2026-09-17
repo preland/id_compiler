@@ -23,11 +23,15 @@ chk_dupfn() {
 // The reserved-name check rides this walk rather than opening its own: it is
 // the same question asked of the same name -- is this name already taken --
 // and a second pass over `prog` to ask it would be a function whose only job
-// is to call resv_at.
+// is to call resv_at. That call was resv_at's only caller and its last
+// action, so its one action (../reserved/reserved.id) is inlined directly
+// above rather than kept as a separate function.
 dupfn_at(int i) {
   string s1_of_v = s1_of((import prog)[i]);
   int j = first_fn(s1_of_v);
-  resv_at(i);
+  if(is_runtime() == 0 && is_reserved_name(i)) {
+    resv_err(i);
+  }
 } chain (int i) {
   if(j < i && i < len((import pfile))) {
     dupfn_err(i, j);

@@ -17,9 +17,15 @@ fix_walk_roots(int[] roots) {
 fix_walk(int e, int ca, int cd, string nt, string an) {
   int lo = len((import fixe_n));
   fix_walk_kids(e, cd);
-  int cl = fix_class(e, ca, nt, lo);
+  int cl = fix_class2(e);
 } chain (int e, int ca, int cd, string nt, string an) {
+  if(nt != "" || cl == 1 && ca == 1) {
+    cl = 3;
+  } else if(ca == 1 && cl != 1 && fix_any_call(lo) == 1) {
+    cl = 3;
+  }
   fix_push_rest(e, lo, cl, cd, nt, an);
+} chain (int e, int ca, int cd, string nt, string an) {
   fix_rcache_taint(e);
 } return void;
 

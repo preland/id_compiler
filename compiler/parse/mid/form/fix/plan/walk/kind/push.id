@@ -12,12 +12,6 @@ fix_push4(int cd, string nt) {
 // but has one somewhere inside it -- named whole, rather than naming the call
 // alone, since naming the call alone would still leave it inside the
 // argument of the call this argument belongs to. Anything else is named only
-// if something evaluated after it moves (plan/decide/).
-fix_class(int e, int ca, string nt, int lo) {
-  int cl = fix_class2(e);
-  if(nt != "" || cl == 1 && ca == 1) {
-    cl = 3;
-  } else if(ca == 1 && cl != 1 && fix_any_call(lo) == 1) {
-    cl = 3;
-  }
-} return int cl;
+// if something evaluated after it moves (plan/decide/). This used to be its
+// own function, fix_class, called exactly once as the last action of
+// fix_walk (../roots/walk.id); it now chains there directly.

@@ -1,15 +1,9 @@
 // The machine the build runs on, as a triple: what the test harness is built
 // for, and so what an `asm` function needs a body for before a case can reach
 // it. bin/idc passes it as --host-triple. Without the flag it is the build's
-// own triple, which is what a hosted build's harness has always been built for.
-
-host_init(int argc, string[] argv) {
-  string host_t = arg_flag_val(argc, argv, 1, "--host-triple", "");
-  if(host_t == "") {
-    host_t = arg_triple(argc, argv);
-  }
-  export string[] hostc = [host_t];
-} return void;
+// own triple, which is what a hosted build's harness has always been built
+// for. host_init was called exactly once, as the last action of arg_flags4
+// (back/drive/run/check/flags/args2.id); it now folds into that chain.
 
 build_host() {
   string ret_s = (import hostc)[0];

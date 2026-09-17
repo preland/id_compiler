@@ -16,7 +16,18 @@
 check_scopes() {
   check_rest();
   check_names();
-  check_case_fits();
+  int i = 0;
+} chain () {
+  while(i < len((import casenode))) {
+    fit_case(i);
+    fit_given(i);
+    i = i + 1;
+  }
+  int ti = 0;
+  while(ti < len((import thennode))) {
+    fit_then(ti);
+    ti = ti + 1;
+  }
 } chain () {
   check_case_runs();
   if(require_tests() == 1) {
