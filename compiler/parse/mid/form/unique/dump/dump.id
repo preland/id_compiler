@@ -3,6 +3,11 @@
 // fingerprint, in prog order, once check_unique() has run (../scan/check.id) --
 // this is a reader of that, not a second walk of the tree.
 
+// One line per `prog` entry, and the same index reaches both lists: print_fp_line
+// reads `prog[i]` for the name and `cfp[i]` for the fingerprint. The cases pin
+// the count and the indices used, so a `cfp` that stops holding one entry per
+// function fails here rather than quietly printing a report whose line count no
+// longer matches the program it describes.
 print_fingerprints() {
   int i = 0;
   while(i < len((import prog))) {
@@ -10,6 +15,8 @@ print_fingerprints() {
     i = i + 1;
   }
 } return void;
+given lz_o ():() then calls print_fp_line:[2]
+given lz_o ():() then calls print_fp_line:(0) then calls print_fp_line:(1)
 
 print_fp_line(int i) {
   string name = s1_of((import prog)[i]);
