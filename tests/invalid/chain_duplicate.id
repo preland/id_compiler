@@ -1,0 +1,19 @@
+// EXPECT: same signature and logic
+// A chain block is its own unit for duplicate checking, so a chain that
+// matches a whole function elsewhere is rejected: it was not a continuation of
+// anything, it was that function written again.
+//
+// The first segment deliberately declares no locals. Position numbering runs
+// once per function, not once per segment, so a local in the chain takes the
+// same position as helper's only if nothing before it claimed one.
+main(int argc, string[] argv) {
+  print(1);
+  print(2);
+  print(3);
+} chain (int argc, string[] argv) {
+  int d = 4;
+} return int 0;
+
+helper(int argc, string[] argv) {
+  int d = 4;
+} return int 0;
