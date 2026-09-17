@@ -231,10 +231,11 @@ line:
 caller|caller_file:line|callee|callee_file:line|kind
 ```
 
-`kind` is `call` for a direct call, `value` for a function named as a value
+`kind` is `call` for a direct call, or `value` for a function named as a value
 (an export, a parameter, a local of type `func(...) return ...` -- see
-`docs/SPEC.md` §1.1), or `builtin` for a runtime builtin with no `id` source
-(`callee_file:line` is empty for those). The edges are based on what the
+`docs/SPEC.md` §1.1). There is no third kind: a runtime builtin with no `id`
+source is emitted as a `call` whose `callee_file:line` is empty, and that empty
+location is the only thing that identifies it. The edges are based on what the
 compiler actually resolved -- the same node-kind read and the same flat,
 creation-order walk over each function's nodes that dead-code elimination's
 reachability pass uses to decide what a build keeps

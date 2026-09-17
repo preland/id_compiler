@@ -13,8 +13,9 @@
 #       is marked "(recursive)" and not expanded again; a node whose subtree
 #       was already printed elsewhere in this tree is marked "(shown above)"
 #       instead, so a widely-shared function is not re-expanded exponentially
-#       many times. A builtin (no id source, ../docs/TESTS.md's kind=builtin)
-#       is always a leaf, marked "[builtin]"; a function from the standard
+#       many times. A builtin (no id source, so --calls gives it an empty
+#       callee_file:line -- there is no kind=builtin, see ../README.md) is
+#       always a leaf, marked "[builtin]"; a function from the standard
 #       library ($IDSTD_HOME) is marked "[idstd]".
 #
 #   tools/calltree.sh PATH --order FILE
