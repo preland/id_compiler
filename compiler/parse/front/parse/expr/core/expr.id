@@ -8,9 +8,17 @@
 // The four bitwise levels are in bits/; the rest are here and in the
 // neighbouring files.
 
+// `parse_or` had exactly one caller -- this one -- and the call was its last
+// action, so it was never a name anything else could use. Its body continues
+// here directly rather than through a call. It inlines rather than chains
+// because it spends only two actions: too few to fill the segment a chain must
+// follow, which is what that rule means when the callee is small.
 parse_expr(int[] pos) {
-  int ret_i = parse_or(pos);
-} return int ret_i;
+  int left = parse_and(pos);
+  while(cur_text(pos) == "||") {
+    left = fold_or(pos, left);
+  }
+} return int left;
 given expr_tokens ([0]):(18)
 given expr_tokens ([18]):(0)
 

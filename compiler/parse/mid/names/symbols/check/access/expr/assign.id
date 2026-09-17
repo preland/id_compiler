@@ -1,13 +1,16 @@
 // The assignment target is a name in its own right: writing to a variable the
 // function does not have is the same error as reading one.
+// The value's own check continues in a chain rather than in a second function.
+// acc_assign_val was called exactly once, as this function's last action, so it
+// was never a name a caller elsewhere could use. Its first line moves up here,
+// which is what leaves the segment before the chain spending all three of its
+// actions; `i1_of_v` crosses the seam because a chain is a literal
+// continuation, not a call.
 acc_assign(int id, string owner) {
   string s1_of_v = s1_of(id);
   acc_name(s1_of_v, owner, (import nline)[id]);
-  acc_assign_val(id, owner);
-} return void;
-
-acc_assign_val(int id, string owner) {
   int i1_of_v = i1_of(id);
+} chain (int id, string owner) {
   acc_expr(i1_of_v, owner, (import nline)[id]);
 } return void;
 

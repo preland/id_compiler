@@ -1,14 +1,9 @@
-// Logical-or level (lowest precedence), above and/equality. Mirrors idc.py:
-// parse_expr -> parse_or -> parse_and -> parse_rel(equality+relational).
-
-parse_or(int[] pos) {
-  int left = parse_and(pos);
-  while(cur_text(pos) == "||") {
-    left = fold_or(pos, left);
-  }
-} return int left;
-given expr_tokens ([0]):(18)
-given expr_tokens ([18]):(0)
+// One fold step of the logical-or level (lowest precedence), above
+// and/equality. The level's own loop now lives in parse_expr
+// (../../core/expr.id): parse_or was called exactly once, as that function's
+// last action, and spent too few actions to fill the segment a chain must
+// follow -- so it inlined there rather than chaining. The ladder reads
+// parse_expr -> parse_and -> parse_rel(equality+relational).
 
 fold_or(int[] pos, int left) {
   advance(pos);
