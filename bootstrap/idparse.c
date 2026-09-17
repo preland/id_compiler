@@ -2094,6 +2094,16 @@ char* id_canon_native(int id, char* out);
 char* id_canon_func_body(int id);
 char* id_canon_func_tail(int id, char* out);
 char* id_canon_logic(int id, char* out);
+void id_segs_kind(int id, IdList* segs_out);
+void id_segs_native(int id, IdList* segs_out);
+char* id_segs_sig(int id);
+char* id_segs_sig2(int id);
+void id_segs_loop(int id, char* sigtext, IdList* cur, IdList* segs_out);
+void id_segs_step(int node, char* sigtext, IdList* cur, IdList* segs_out);
+void id_segs_flush(char* sigtext, IdList* cur, IdList* segs_out);
+IdList* id_canon_segs(int id);
+void id_segs_plain(int id, IdList* segs_out);
+void id_segs_walk(int id, char* sigtext, IdList* segs_out);
 char* id_cn(char* name);
 int id_cn_add(char* name);
 char* id_canon_var(int id);
@@ -2121,6 +2131,7 @@ void id_print_fp_line(int i);
 char* id_fp_line(char* name, char* fp);
 void id_uq_fill_all(void);
 void id_uq_fill_at(int i);
+void id_uq_push_segs(IdList* seglist, int i);
 void id_chk_dupfn(void);
 void id_dupfn_at(int i);
 void id_dupfn_err(int i, int j);
@@ -17725,6 +17736,94 @@ char* id_canon_logic(int id, char* out) {
     return ret_s;
 }
 
+void id_segs_kind(int id, IdList* segs_out) {
+    if ((id_is_native(id) == 1)) {
+        id_segs_native(id, segs_out);
+    } else {
+        id_segs_plain(id, segs_out);
+    }
+    return;
+}
+
+void id_segs_native(int id, IdList* segs_out) {
+    char* fp;
+    fp = id_canon_func(id);
+    id_list_push(segs_out, (long long)(intptr_t)(fp));
+    return;
+}
+
+char* id_segs_sig(int id) {
+    char* nm;
+    char* ret_s;
+    nm = id_s1_of(id);
+    id_uq_begin(nm);
+    ret_s = id_segs_sig2(id);
+    return ret_s;
+}
+
+char* id_segs_sig2(int id) {
+    IdList* params;
+    char* sigparams;
+    char* ret_s;
+    params = id_l1_of(id);
+    sigparams = id_canon_params(params);
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat("(", sigparams), ")->"), id_s2_of(id)), "=>"), id_canon_ret(id));
+    return ret_s;
+}
+
+void id_segs_loop(int id, char* sigtext, IdList* cur, IdList* segs_out) {
+    IdList* body;
+    int i;
+    body = id_l2_of(id);
+    i = 0;
+    while ((i < id_list_len(body))) {
+        id_segs_step((int)(id_list_get(body, i)), sigtext, cur, segs_out);
+        i = (i + 1);
+    }
+    return;
+}
+
+void id_segs_step(int node, char* sigtext, IdList* cur, IdList* segs_out) {
+    if ((strcmp(id_k_of(node), "chain") == 0)) {
+        id_segs_flush(sigtext, cur, segs_out);
+    } else {
+        id_list_push(cur, (long long)(node));
+    }
+    return;
+}
+
+void id_segs_flush(char* sigtext, IdList* cur, IdList* segs_out) {
+    char* segtext;
+    segtext = id_concat(id_concat(id_concat(sigtext, "{"), id_canon_body(cur)), "}");
+    id_list_push(segs_out, (long long)(intptr_t)(segtext));
+    while ((id_list_len(cur) > 0)) {
+        (int)(id_list_pop(cur));
+    }
+    return;
+}
+
+IdList* id_canon_segs(int id) {
+    IdList* segs_out;
+    segs_out = id_list_lit(0);
+    id_segs_kind(id, segs_out);
+    return segs_out;
+}
+
+void id_segs_plain(int id, IdList* segs_out) {
+    char* sigtext;
+    sigtext = id_segs_sig(id);
+    id_segs_walk(id, sigtext, segs_out);
+    return;
+}
+
+void id_segs_walk(int id, char* sigtext, IdList* segs_out) {
+    IdList* cur;
+    cur = id_list_lit(0);
+    id_segs_loop(id, sigtext, cur, segs_out);
+    id_segs_flush(sigtext, cur, segs_out);
+    return;
+}
+
 char* id_cn(char* name) {
     int idx;
     char* ret_s;
@@ -17988,10 +18087,22 @@ void id_uq_fill_all(void) {
 }
 
 void id_uq_fill_at(int i) {
-    char* canon_func_v;
-    canon_func_v = id_canon_func((int)(id_list_get(prog, i)));
-    id_list_push(cfp, (long long)(intptr_t)(canon_func_v));
-    id_list_push(cfpfn, (long long)(i));
+    int fid;
+    IdList* seglist;
+    fid = (int)(id_list_get(prog, i));
+    seglist = id_canon_segs(fid);
+    id_uq_push_segs(seglist, i);
+    return;
+}
+
+void id_uq_push_segs(IdList* seglist, int i) {
+    int j;
+    j = 0;
+    while ((j < id_list_len(seglist))) {
+        id_list_push(cfp, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(seglist, j))));
+        id_list_push(cfpfn, (long long)(i));
+        j = (j + 1);
+    }
     return;
 }
 

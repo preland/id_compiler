@@ -1,0 +1,44 @@
+// The walk itself, and what happens at a seam.
+
+segs_loop(int id, string sigtext, int[] cur, string[] segs_out) {
+  int[] body = l2_of(id);
+  int i = 0;
+  while(i < len(body)) {
+    segs_step(body[i], sigtext, cur, segs_out);
+    i = i + 1;
+  }
+} return void;
+given lz_o (22, "S", [], []):() then calls segs_step:[1]
+given lz_o (23, "S", [], []):() then calls segs_step:[1]
+
+// A marker ends the current segment; anything else belongs to it. The marker
+// itself is never added, so it contributes nothing to any segment's text.
+// One node, not a list and an index: the caller already has the index, and a
+// step that cannot see the rest of the body cannot come to depend on it.
+segs_step(int node, string sigtext, int[] cur, string[] segs_out) {
+  if(k_of(node) == "chain") {
+    segs_flush(sigtext, cur, segs_out);
+  } else {
+    push(cur, node);
+  }
+} return void;
+given lz_o ((import lz_decl5), "S", [], []):() then calls segs_flush:[0]
+given lz_o ((import lz_decl9), "S", [], []):() then calls segs_flush:[0]
+
+// One finished segment, and the accumulator emptied for the next. `cur` is
+// emptied rather than rebound because a list is a reference: the caller's
+// accumulator has to be the one that empties.
+//
+// The emptying is written out here rather than given its own function: as a
+// helper it was rejected as identical in signature and logic to pred_wipe
+// (back/ir/opt/cfg/more/more.id), which is the duplicate-logic rule working
+// correctly. A fourth way to empty a list is not what this needed.
+segs_flush(string sigtext, int[] cur, string[] segs_out) {
+  string segtext = sigtext + "{" + canon_body(cur) + "}";
+  push(segs_out, segtext);
+  while(len(cur) > 0) {
+    pop(cur);
+  }
+} return void;
+given lz_o ("S", [], []):() then calls canon_body:([])
+given lz_o ("T", [1], []):() then calls canon_body:[1]

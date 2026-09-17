@@ -1,0 +1,30 @@
+// Which shape of function is being fingerprinted.
+//
+// A `native` declaration has no body, so it has no segments and must keep the
+// fingerprint canon_func gives it -- its signature and its *name*
+// (../../parts/native.id). Building a signature-and-empty-body unit for it
+// instead makes every native with the same signature identical, which is how
+// this split first went wrong: twenty idstd natives (fs_read/fs_write,
+// fs_size/fs_exists, the gfx and sock handles) were reported as duplicates of
+// one another.
+
+segs_kind(int id, string[] segs_out) {
+  if(is_native(id) == 1) {
+    segs_native(id, segs_out);
+  } else {
+    segs_plain(id, segs_out);
+  }
+} return void;
+given lz_o (22, []):() then calls segs_plain:[1]
+given lz_o (23, []):() then calls segs_native:[0]
+
+// One unit, from canon_func, which already dispatches a native to canon_native
+// and resets the position map on the way. Delegating rather than repeating it
+// is also what keeps canon_func reachable now that uq_fill_at no longer calls
+// it directly.
+segs_native(int id, string[] segs_out) {
+  string fp = canon_func(id);
+  push(segs_out, fp);
+} return void;
+given lz_o (22, []):() then calls canon_func:(22)
+given lz_o (23, []):() then calls canon_func:(23)

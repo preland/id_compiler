@@ -23,10 +23,24 @@ uq_fill_all() {
 given lz_o ():() then calls uq_fill_at:[2]
 given farm_g ():() then calls uq_fill_at:[0]
 
+// One entry per segment, each recording the same owning function. For an
+// unchained function that is exactly one entry, so `cfp` and `prog` keep the
+// same length and nothing downstream sees a difference.
 uq_fill_at(int i) {
-  string canon_func_v = canon_func((import prog)[i]);
-  push((import cfp), canon_func_v);
-  push((import cfpfn), i);
+  int fid = (import prog)[i];
+  string[] seglist = canon_segs(fid);
+  uq_push_segs(seglist, i);
 } return void;
-given lz_o (0):() then calls canon_func:(22)
-given lz_o (1):() then calls canon_func:(23)
+given lz_o (0):() then calls canon_segs:(22)
+given lz_o (1):() then calls canon_segs:(23)
+
+uq_push_segs(string[] seglist, int i) {
+  int j = 0;
+  while(j < len(seglist)) {
+    push((import cfp), seglist[j]);
+    push((import cfpfn), i);
+    j = j + 1;
+  }
+} return void;
+given lz_o ([], 0):() then check_failed:(0)
+given lz_o (["X"], 0):() then check_failed:(0)

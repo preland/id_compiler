@@ -1,0 +1,31 @@
+// The first step of canonicalising a function, exactly as canon_func does it:
+// uq_begin empties the position map and names the function whose calls count
+// as recursion. It is done once per function rather than once per segment, so
+// a local declared in one segment keeps its number in the next -- the segments
+// are one function's scope, and renumbering them apart would make a segment
+// that merely inherits a different local look like a different segment.
+//
+// The cost, recorded rather than hidden: a later segment's fingerprint carries
+// numbering handed out in an earlier one, so the same logic appearing as the
+// first segment of another function does not compare equal to it. That weakens
+// cross-function collision detection for later segments, and is the open half
+// of this design.
+segs_sig(int id) {
+  string nm = s1_of(id);
+  uq_begin(nm);
+  string ret_s = segs_sig2(id);
+} return string ret_s;
+given lz_o (22):("()->int=>v0")
+given lz_o (23):("()->int=>v0")
+
+// The signature half of a segment's unit: the same parameters and return that
+// canon_logic (../../parts/tail.id) puts around a whole body, without the body.
+// Split from segs_sig so that it stays within the action limit once the
+// position map is reset there.
+segs_sig2(int id) {
+  int[] params = l1_of(id);
+  string sigparams = canon_params(params);
+  string ret_s = "(" + sigparams + ")->" + s2_of(id) + "=>" + canon_ret(id);
+} return string ret_s;
+given lz_o (22):("()->int=>v0")
+given lz_o (23):("()->int=>v0")

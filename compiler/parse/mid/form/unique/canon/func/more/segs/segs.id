@@ -1,0 +1,49 @@
+// A chained function's fingerprints: one per segment, not one per function.
+//
+// Each chain block, and the initial function, is its own unit for duplicate
+// checking, so a chain that happens to match a function elsewhere is reported
+// -- which is the point, since it means the chain was not really a
+// continuation of anything.
+//
+// The split is made on the body's NODE LIST, at the `chain` marker that
+// front/parse/decl/func/sig/chain/tail.id pushes, and deliberately not by
+// splitting the finished canonical string on the seam `cst4` emits. A string
+// literal canonicalises as its text verbatim (`"S" + s1_of(id)`,
+// ../../../expr/expr.id), so a program with a `|` inside a string could forge
+// a segment boundary -- and `|` is the field separator in the compiler's own
+// --calls format strings, so that is not a hypothetical program. A forged seam
+// would make two unlike segments compare equal and report a duplicate against
+// a legal program, the costliest mistake this checker can make.
+//
+// Every segment carries the function's signature, so two segments collide only
+// when they agree on the signature as well as on the logic. A `native` has no
+// body to segment and is fingerprinted by name instead: ./kind/native.id.
+//
+// The names here are deliberately unshared: `out`, `seg`, `sig` and `ps`
+// already mean other things elsewhere in the tree, and a name keeps one type
+// across the whole program (docs/PROJECT.md, checklist 6).
+
+canon_segs(int id) {
+  string[] segs_out = [];
+  segs_kind(id, segs_out);
+} return string[] segs_out;
+given lz_o (22):(["()->int=>v0{d:int 0=I5}"])
+given lz_o (23):(["()->int=>v0{d:int 0=I9}"])
+
+// A function with a real body: its signature, then its segments.
+segs_plain(int id, string[] segs_out) {
+  string sigtext = segs_sig(id);
+  segs_walk(id, sigtext, segs_out);
+} return void;
+given lz_o (22, []):() then calls segs_walk:[1]
+given lz_o (23, []):() then calls segs_sig:[1]
+
+// The accumulator starts empty and is flushed at every seam; the trailing
+// flush is what emits the last segment, which no marker follows.
+segs_walk(int id, string sigtext, string[] segs_out) {
+  int[] cur = [];
+  segs_loop(id, sigtext, cur, segs_out);
+  segs_flush(sigtext, cur, segs_out);
+} return void;
+given lz_o (22, "S", []):() then calls segs_flush:[1]
+given lz_o (23, "S", []):() then calls segs_loop:[1]
