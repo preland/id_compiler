@@ -13,13 +13,20 @@ uq_scan() {
     i = i + 1;
   }
 } return void;
+given lz_o ():() then calls uq_at:(0) then calls uq_at:(1)
+given lz_o ():() then calls uq_at:[2]
 
+// dup5 and dup9 differ in a literal, which the strict fingerprint keeps, so
+// neither is reported against the other: the case pins the quiet path, which
+// is the one a broken comparison would break first.
 uq_at(int i) {
   int j = find_dup(i);
   if(j >= 0) {
     report_dup(i, j);
   }
 } return void;
+given lz_o (1):() then calls report_dup:[0]
+given lz_o (0):() then calls report_dup:[0]
 
 // The first earlier function with the same fingerprint, or -1. The search
 // stops at the match: `found < 0` in the condition is how a loop leaves early

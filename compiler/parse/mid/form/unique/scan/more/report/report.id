@@ -11,13 +11,25 @@ dup_probe(int i, int j) {
     found = j;
   }
 } return int found;
+given lz_o (0, 0):(0)
+given lz_o (1, 1):(1)
 
 report_dup(int i, int j) {
   note_failure();
   string name_i = fname_at(i);
   dup_report(name_i, j);
 } return void;
+given lz_o (1, 0):() then check_failed:(1)
+given lz_o (0, 1):() then check_failed:(1)
 
+// `cfp` is one entry per `prog` index, and this is where that correspondence
+// is cashed in: the index of a fingerprint is used, unchanged, as the index of
+// the function it belongs to. The two cases pin the mapping in both
+// directions, so anything that makes `cfp` hold a different number of entries
+// than `prog` -- per-segment fingerprints, say -- fails here rather than
+// silently reporting a collision against the wrong function.
 fname_at(int i) {
   string ret_s = s1_of((import prog)[i]);
 } return string ret_s;
+given lz_o (0):("dup5")
+given lz_o (1):("dup9")
