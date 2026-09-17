@@ -11,7 +11,9 @@ acc_expr3(int id, string owner, int ln) {
 acc_pair(int id, string owner, int ln) {
   int i1_of_v = i1_of(id);
   acc_expr(i1_of_v, owner, ln);
-  acc_pair2(id, owner, ln);
+  int i2_of_v = i2_of(id);
+} chain (int id, string owner, int ln) {
+  acc_expr(i2_of_v, owner, ln);
 } return void;
 
 acc_expr4(int id, string owner, int ln) {

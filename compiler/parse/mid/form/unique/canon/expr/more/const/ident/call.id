@@ -6,12 +6,9 @@
 call_fp(int id) {
   string s1_of_v = s1_of(id);
   int[] l1_of_v = l1_of(id);
-  string ret_s = call_fp2(s1_of_v, l1_of_v);
-} return string ret_s;
-
-call_fp2(string name, int[] args) {
-  string ret_s = "c(" + canon_callee(name) + ":" + canon_args(args) + ")";
-  if(name == "ushr" && len(args) == 2 && lit_is(args[1], 0) == 1) {
-    ret_s = canon_expr(args[0]);
+  string ret_s = "c(" + canon_callee(s1_of_v) + ":" + canon_args(l1_of_v) + ")";
+} chain (int id) {
+  if(s1_of_v == "ushr" && len(l1_of_v) == 2 && lit_is(l1_of_v[1], 0) == 1) {
+    ret_s = canon_expr(l1_of_v[0]);
   }
 } return string ret_s;

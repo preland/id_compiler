@@ -14,7 +14,9 @@ is_builtin(string name) {
 report_nosuchfn(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   string builtin_list_v = builtin_list();
-  nosuchfn_report(loc_at_v, name, builtin_list_v);
+  print(loc_at_v + "no such function '" + name + "'; available builtins: " + builtin_list_v);
+} chain (string name, string owner, int ln) {
+  note_failure();
 } return void;
 
 whilefix() {

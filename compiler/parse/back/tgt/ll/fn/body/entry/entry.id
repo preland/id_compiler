@@ -19,5 +19,10 @@ ll_sep(int i) {
 
 ll_block(int b) {
   emit_line("b" + b + ":");
-  ll_insns(b);
+  int i = 0;
+  while(i < insn_count(b)) {
+    int[] ins = blk_ins(b);
+    ll_insn(ins[i]);
+    i = i + 1;
+  }
 } return void;

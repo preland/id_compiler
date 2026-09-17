@@ -15,7 +15,7 @@ given fix_rcache_taint_fixture ((import rt_e2)):() then calls fix_rcache_reset:[
 // A call to a name that is no function of this build (an unregistered
 // callee, plan/reach/build/func.id's fix_fnix) could run anything, so it
 // touches; a call to a builtin (len) never runs id code, so it does not
-// (fix_touch_ix, plan/decide/touch/anc.id).
+// (fix_call_touch, plan/decide/touch/touch.id).
 fix_rcache_taint_fixture() {
   fix_fixture();
   int e1 = node_call("unknownfn", [0 - 1]);

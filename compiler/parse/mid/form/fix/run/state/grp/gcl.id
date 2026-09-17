@@ -3,7 +3,12 @@
 fix_gcl() {
   export int[] fixd_gcl = [];
   fix_gcl_fill();
-  fix_gcl_set();
+  int i = 0;
+} chain () {
+  while(i < len((import ngrp))) {
+    fix_gcl_at(i);
+    i = i + 1;
+  }
 } return void;
 given env_init ():() then check_failed:(0)
 given fix_gcl_nodes ():() then check_failed:(0)

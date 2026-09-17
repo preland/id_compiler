@@ -1,10 +1,3 @@
-// The rest of `ll_asm_one`: the define line and its close, around the body.
-ll_asm_one_out(int r, string ty, string par) {
-  emit_line("define " + ty + " @id_" + (import afname)[r] + "(" + par + ") noinline {");
-  ll_asm_body(r);
-  emit_line("}");
-} return void;
-
 // The rest of `ll_asm_body`: the text and constraint string, then the two
 // lines of the block.
 ll_asm_body2(int r, string ty, string q) {

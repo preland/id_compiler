@@ -7,13 +7,6 @@ reach_add(string name) {
   }
 } return void;
 
-// One more sweep with the imports switched on, now that the reachable set is
-// final.
-dead_final() {
-  lset((import dphase), 0, 1);
-  reach_funcs(0, 0);
-} return void;
-
 regrow_prog() {
   regrow_fn();
   push((import prog), (import regrow_fn_node));

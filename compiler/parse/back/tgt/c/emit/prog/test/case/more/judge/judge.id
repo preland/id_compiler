@@ -10,11 +10,8 @@ emit_case_judge(int ci) {
 emit_case_expd(int ci) {
   int fn = (import casefn)[ci];
   int[] expd = l2_of((import casenode)[ci]);
-  emit_expd_decls(fn, expd);
-} return void;
-
-emit_expd_decls(int fn, int[] expd) {
   int j = 0;
+} chain (int ci) {
   while(j < len(expd)) {
     emit_expd_decl(fn, expd, j);
     j = j + 1;

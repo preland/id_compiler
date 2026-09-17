@@ -10,15 +10,8 @@ chain_elses(int id, int[] els) {
   }
 } return int n;
 
-// Descending into the compound statements of a block that fits.
-check_children(int[] body, int depth, string fname) {
-  int i = 0;
-  while(i < len(body)) {
-    check_stmt(body[i], depth, fname);
-    i = i + 1;
-  }
-} return void;
-
+// Descending into the compound statements of a block that fits happens in
+// check_fits (../block/block.id), which calls check_stmt directly.
 check_stmt(int id, int depth, string fname) {
   if(k_of(id) == "if") {
     check_if(id, depth, fname);

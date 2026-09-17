@@ -3,15 +3,6 @@ fix_then(int sn) {
   fix_block(l1_of_v);
 } return void;
 
-fix_else(int sn) {
-  int[] els = l2_of(sn);
-  if(i2_of(sn) == 1) {
-    fix_stmt(els[0], 2);
-  } else {
-    fix_block(els);
-  }
-} return void;
-
 fix_while(int sn) {
   fix_cond(sn, 1);
   fix_then(sn);

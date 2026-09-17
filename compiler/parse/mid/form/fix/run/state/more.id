@@ -1,11 +1,3 @@
-fix_gcl_set() {
-  int i = 0;
-  while(i < len((import ngrp))) {
-    fix_gcl_at(i);
-    i = i + 1;
-  }
-} return void;
-
 // Pairs are recorded inside out, so the outermost is the one that closes last.
 fix_gcl_at(int i) {
   int n = (import ngrp)[i];

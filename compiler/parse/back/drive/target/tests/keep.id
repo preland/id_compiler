@@ -14,11 +14,8 @@
 emit_test_kept(string triple) {
   int[] pkeep = [];
   string[] rkeep = [];
-  test_kept(triple, pkeep, rkeep);
-} return void;
-
-test_kept(string triple, int[] pkeep, string[] rkeep) {
   test_narrow(pkeep, rkeep);
+} chain (string triple) {
   emit_test_unit(triple);
   test_widen(pkeep, rkeep);
 } return void;

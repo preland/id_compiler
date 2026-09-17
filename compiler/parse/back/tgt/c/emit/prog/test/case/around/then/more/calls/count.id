@@ -5,11 +5,8 @@
 emit_calls_count(int ci, int ti, int node) {
   string nm = s1_of(node);
   int[] items = l1_of(node);
-  emit_calls_count_body(ci, nm, items);
-} return void;
-
-emit_calls_count_body(int ci, string nm, int[] items) {
   string want = tc_value(items[0], "int");
+} chain (int ci, int ti, int node) {
   string cntexpr = "idtc_rc_" + nm + "_n";
   emit_calls_count_cond(ci, nm, cntexpr, want);
 } return void;

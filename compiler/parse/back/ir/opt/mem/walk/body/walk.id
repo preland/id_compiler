@@ -15,5 +15,11 @@ m2r_walk(int f, int i) {
 m2r_blk(int f, int i) {
   m2r_seed(i, 0);
   int[] irf_blk_v = irf_blk(f);
-  m2r_scan(f, irf_blk_v[i], i);
+  int n = 0;
+} chain (int f, int i) {
+  while(n < insn_count(irf_blk_v[i])) {
+    int[] blk_ins_v = blk_ins(irf_blk_v[i]);
+    m2r_step(f, blk_ins_v[n], i);
+    n = n + 1;
+  }
 } return void;

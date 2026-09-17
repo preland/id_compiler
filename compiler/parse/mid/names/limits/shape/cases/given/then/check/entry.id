@@ -12,7 +12,13 @@ given then_node_fixture ((import fixture_then_bad)):() then prints:("fixture.id:
 then_fn(int chk_node, string chk_nm) {
   int cfn = func_node(chk_nm);
   int ci = i1_of(chk_node);
-  then_shape(ci, chk_node, cfn);
+  string chk_nm2 = s1_of(chk_node);
+} chain (int chk_node, string chk_nm) {
+  if(cfn < 0) {
+    case_err(ci, "'then' names '" + chk_nm2 + "', which is not a function in this build");
+  } else {
+    then_sig(ci, chk_node, cfn, chk_nm2);
+  }
 } return void;
 given then_node_fixture ((import fixture_then_node), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
 given then_node_fixture ((import fixture_then_bad), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")

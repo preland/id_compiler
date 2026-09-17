@@ -15,7 +15,12 @@
 canon_bin(int id) {
   string op = bin_op(id);
   string simple_s = bin_simplify(id, op);
-  string ret_s = bin_fallback(id, op, simple_s);
+  string ret_s = simple_s;
+} chain (int id) {
+  if(simple_s == "") {
+    string pair_v = bin_pair(id);
+    ret_s = "b" + op + pair_v;
+  }
 } return string ret_s;
 
 bin_op(int id) {

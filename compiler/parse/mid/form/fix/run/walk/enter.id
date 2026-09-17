@@ -1,17 +1,13 @@
 fix_enter(int i, int f, int lo) {
   fix_state3();
   fix_setfile(i);
-  fix_used(lo, f);
+  while(lo <= f) {
+    fix_used_at(lo);
+    lo = lo + 1;
+  }
 } return void;
 
 fix_setfile(int i) {
   pop((import fixd_file));
   push((import fixd_file), (import pfile)[i]);
-} return void;
-
-fix_used(int lo, int hi) {
-  while(lo <= hi) {
-    fix_used_at(lo);
-    lo = lo + 1;
-  }
 } return void;

@@ -12,11 +12,8 @@ iassign_val(int id, string head, string key) {
 cst_if(int id) {
   int i1_of_v = i1_of(id);
   int[] l1_of_v = l1_of(id);
-  string ret_s = cst_if_tail(id, i1_of_v, l1_of_v);
-} return string ret_s;
-
-cst_if_tail(int id, int i1_of_v, int[] l1_of_v) {
   int[] l2_of_v = l2_of(id);
+} chain (int id) {
   int i2_of_v = i2_of(id);
   string out = "if(" + canon_expr(i1_of_v) + "){" + canon_body(l1_of_v) + "}" + canon_else2(l2_of_v, i2_of_v);
 } return string out;

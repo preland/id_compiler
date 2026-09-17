@@ -13,7 +13,12 @@ check_case_fits() {
     fit_given(i);
     i = i + 1;
   }
-  fit_thens();
+  int ti = 0;
+} chain () {
+  while(ti < len((import thennode))) {
+    fit_then(ti);
+    ti = ti + 1;
+  }
 } return void;
 
 fit_case(int i) {

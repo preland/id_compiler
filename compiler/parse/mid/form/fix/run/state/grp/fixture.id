@@ -3,8 +3,8 @@
 // event arrays a statement's walk fills (run/state/more.id's fix_ev_reset),
 // the builtin names is_builtin reads, and the symbol index lookup_var needs
 // (mid/names/symbols/lookup/index/table/more/init.id) -- minus fix_wbuild and
-// fix_std_detect, which only a reachability or idstd-naming case needs of its
-// own.
+// the idstd-naming detection in fix_init's own chain, which only a
+// reachability or idstd-naming case needs of its own.
 fix_fixture() {
   env_init();
   fix_state();

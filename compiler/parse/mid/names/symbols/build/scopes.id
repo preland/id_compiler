@@ -16,7 +16,12 @@
 check_scopes() {
   check_rest();
   check_names();
-  check_cases_maybe();
+  check_case_fits();
+} chain () {
+  check_case_runs();
+  if(require_tests() == 1) {
+    check_cases();
+  }
 } return void;
 
 // Two passes, in idc.py's order: register every declaration (reporting what

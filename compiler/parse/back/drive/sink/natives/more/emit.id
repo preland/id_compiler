@@ -21,14 +21,6 @@ natives_then_prune() {
 given natcall_fixture ():() then calls nat_scan:("program", 1)
 given natcall_fixture ():() then calls nat_scan:("program", 1) then check_failed:(0)
 
-emit_then_natives(int argc, string[] argv) {
-  emit(argc, argv);
-  if((import natc)[0] == 1) {
-    nat_print();
-  }
-  emit_notes();
-} return void;
-
 nat_print() {
   int i = 0;
   emit_line("/* ---- natives ---- */");

@@ -15,8 +15,3 @@ build_host() {
   string ret_s = (import hostc)[0];
 } return string ret_s;
 
-// Chained from arg_flags4, whose block is full.
-arg_flags5(int argc, string[] argv) {
-  host_init(argc, argv);
-  nat_init(argc, argv);
-} return void;

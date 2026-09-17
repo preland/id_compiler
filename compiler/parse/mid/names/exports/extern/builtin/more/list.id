@@ -3,10 +3,7 @@
 
 builtin_list() {
   string s = (import bnames)[0];
-  string ret_s = join_bnames(s, 1);
-} return string ret_s;
-
-join_bnames(string s, int i) {
+  int i = 1;
   while(i < len((import bnames))) {
     s = s + ", " + (import bnames)[i];
     i = i + 1;

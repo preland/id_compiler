@@ -16,8 +16,16 @@ fix_touch_at(int i, int ok) {
   }
 } return int r;
 
+// A builtin runs no id code. A call through a function value, or to a name
+// that is no function, could run anything.
 fix_call_touch(int e) {
   string s1_of_v = s1_of(e);
   int ci = fix_fnix(s1_of_v);
-  int ok = fix_touch_ix(ci, s1_of_v);
+  int ok = 1;
+} chain (int e) {
+  if(ci >= 0) {
+    ok = (import fixd_wm)[ci];
+  } else if(is_builtin(s1_of_v) == 1) {
+    ok = 0;
+  }
 } return int ok;

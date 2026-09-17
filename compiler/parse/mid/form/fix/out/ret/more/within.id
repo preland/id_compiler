@@ -1,13 +1,5 @@
-// Whether tokens b..e lie inside a range this run replaces.
-fix_within(int b, int e) {
-  int i = 0;
-  int ok = 0;
-  while(i < len((import fixd_lo))) {
-    ok = fix_within_at(i, b, e, ok);
-    i = i + 1;
-  }
-} return int ok;
-
+// Whether tokens b..e lie inside a range this run replaces, checked in
+// fix_in_moved's chain (../../paren/more.id) once its own block is full.
 fix_within_at(int i, int b, int e, int ok) {
   int r = ok;
   if((import fixd_lo)[i] <= b && e <= (import fixd_hi)[i]) {

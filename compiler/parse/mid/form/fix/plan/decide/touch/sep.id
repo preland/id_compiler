@@ -1,14 +1,3 @@
-// A builtin runs no id code. A call through a function value, or to a name
-// that is no function, could run anything.
-fix_touch_ix(int ci, string name) {
-  int ok = 1;
-  if(ci >= 0) {
-    ok = (import fixd_wm)[ci];
-  } else if(is_builtin(name) == 1) {
-    ok = 0;
-  }
-} return int ok;
-
 // A moved event is declared on its own unless another that moves contains it
 // and carries its text -- except a value that must be named, which is declared
 // on its own wherever it is.

@@ -4,14 +4,8 @@
 // before it, moves too, in the same order. What is left in the statement was
 // evaluated after all of them, or has no effect and reads nothing a moved
 // call can write -- a local, a parameter, a literal, a non-trapping operator
-// over those -- and so gives the same value either way.
-fix_decide(int sn, int md) {
-  int last = fix_last_m();
-  if(last >= 0) {
-    fix_decide2(sn, md, last);
-  }
-} return void;
-
+// over those -- and so gives the same value either way. Decided in fix_plan's
+// chain (../../walk/roots/simple.id) once its own block is full.
 fix_decide2(int sn, int md, int last) {
   if(md > 0) {
     fix_refuse_md(md, last);
@@ -23,5 +17,11 @@ fix_decide2(int sn, int md, int last) {
 fix_mark(int sn, int last) {
   fix_mark_moves(last);
   fix_mark_sep(last);
-  fix_check_and_emit(sn, last);
+  string why = fix_why(sn, last);
+} chain (int sn, int last) {
+  if(why == "") {
+    fix_emit_stmt(sn, last);
+  } else {
+    fix_refuse(last, why);
+  }
 } return void;

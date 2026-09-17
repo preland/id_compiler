@@ -7,17 +7,13 @@
 // compile" -- a portability problem reported as a compiler bug. It belongs
 // here instead, beside the other gate, where a failure means nothing is
 // written at all.
-check_asm_targets(int argc, string[] argv) {
-  string arg_triple_v = arg_triple(argc, argv);
-  asm_target_rows(arg_triple_v);
-} return void;
-
 // Both targets select asm bodies the same way, so the check is neither one's;
 // asm_check itself reports only on a name's first row.
-asm_target_rows(string triple) {
+check_asm_targets(int argc, string[] argv) {
+  string arg_triple_v = arg_triple(argc, argv);
   int i = 0;
   while(i < asm_count()) {
-    asm_check(i, triple);
+    asm_check(i, arg_triple_v);
     i = i + 1;
   }
 } return void;

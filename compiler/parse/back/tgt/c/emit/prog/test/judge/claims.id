@@ -10,7 +10,11 @@ emit_tc_claims() {
 
 claim_body() {
   claim_sizes();
-  claim_all();
+  int c = 0;
+  while(c < len((import conscase))) {
+    claim_at(c);
+    c = c + 1;
+  }
 } return void;
 
 claim_sizes() {

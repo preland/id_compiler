@@ -26,5 +26,10 @@ fit_list(int i, int e, string want) {
 fit_elems(int i, int e, string want) {
   int[] xs = l1_of(e);
   string et = list_elem(want);
-  fit_each(i, xs, et);
+  int j = 0;
+} chain (int i, int e, string want) {
+  while(j < len(xs)) {
+    fit_value(i, xs[j], et);
+    j = j + 1;
+  }
 } return void;

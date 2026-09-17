@@ -16,7 +16,13 @@ fix_stmt(int sn, int md) {
 fix_if(int sn, int md) {
   fix_cond(sn, md);
   fix_then(sn);
-  fix_else(sn);
+  int[] els = l2_of(sn);
+} chain (int sn, int md) {
+  if(i2_of(sn) == 1) {
+    fix_stmt(els[0], 2);
+  } else {
+    fix_block(els);
+  }
 } return void;
 
 // A declaration, an assignment and an expression statement keep their one

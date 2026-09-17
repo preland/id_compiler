@@ -10,7 +10,11 @@
 
 case_rest(int[] pos) {
   case_thens(pos);
-  case_cons(pos);
+  if(cur_text(pos) == "[") {
+    advance(pos);
+    cons_list(pos);
+    advance(pos);
+  }
 } return void;
 given fn_fixture ([0]):()
 given then_fix ([0]):()

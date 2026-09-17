@@ -27,5 +27,8 @@ ll_asm_row(int i, string triple) {
 ll_asm_one(int r) {
   string ty = ll_ty((import afret)[r]);
   string par = ll_asm_par(r);
-  ll_asm_one_out(r, ty, par);
+  emit_line("define " + ty + " @id_" + (import afname)[r] + "(" + par + ") noinline {");
+} chain (int r) {
+  ll_asm_body(r);
+  emit_line("}");
 } return void;

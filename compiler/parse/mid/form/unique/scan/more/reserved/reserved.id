@@ -30,7 +30,9 @@ resv_at(int i) {
 resv_err(int i) {
   string prog_loc_v = prog_loc(i);
   string s1_of_v = s1_of((import prog)[i]);
-  resv_print(prog_loc_v, s1_of_v);
+  print(prog_loc_v + "function '" + s1_of_v + "' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_" + s1_of_v + "'. Choose another name");
+} chain (int i) {
+  note_failure();
 } return void;
 
 init_resv_names() {

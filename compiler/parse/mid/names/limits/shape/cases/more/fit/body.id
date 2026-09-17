@@ -5,7 +5,13 @@
 fit_body(int i, int fn, int node) {
   int[] args = l1_of(node);
   fit_items(i, fn, args);
-  fit_expd(i, fn, node);
+  int[] expd = l2_of(node);
+} chain (int i, int fn, int node) {
+  if(s2_of(fn) == "void") {
+    fit_void(i, fn, expd);
+  } else {
+    fit_ret(i, fn, expd);
+  }
 } return void;
 
 fit_items(int i, int fn, int[] items) {

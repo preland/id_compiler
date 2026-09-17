@@ -9,7 +9,3 @@ lz_c() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
-main_tail(int argc, string[] argv) {
-  run(argc, argv);
-  int ret_i = check_failed();
-} return int ret_i;

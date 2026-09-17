@@ -10,18 +10,15 @@ cw_assign(int id) {
   }
 } return int ok;
 
+// Appended rather than overwritten, so an assignment needs no search to write;
+// the latest entry for a name is its value (cw_get).
 cw_put(int id, string name) {
   int i1_of_v = i1_of(id);
   string val = cw_value_of(i1_of_v);
-  int ok = cw_keep(name, val);
-} return int ok;
-given cwv_setup ((import cwv_func), "y"):(1)
-given cwv_setup ((import cwv_arr), "y"):(1)
-
-// Appended rather than overwritten, so an assignment needs no search to write;
-// the latest entry for a name is its value (cw_get).
-cw_keep(string name, string val) {
   push((import cw_names), name);
+} chain (int id, string name) {
   push((import cw_vals), val);
   int ok = cw_is_lit(val);
 } return int ok;
+given cwv_setup ((import cwv_func), "y"):(1)
+given cwv_setup ((import cwv_arr), "y"):(1)

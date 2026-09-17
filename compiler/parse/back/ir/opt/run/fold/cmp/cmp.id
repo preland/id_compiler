@@ -15,9 +15,3 @@ fold_iszext(int v) {
   }
 } return int r;
 
-fold_zero(int v) {
-  int r = 0;
-  if(v >= 0 && ir_op(v) == "const" && ir_s(v) == "0") {
-    r = 1;
-  }
-} return int r;

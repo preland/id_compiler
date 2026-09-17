@@ -14,5 +14,9 @@ fix_stmt_at(int sn) {
 
 fix_subs(int i) {
   int j = (import fixe_lo)[i];
-  string out = fix_subs_from(i, j);
+  string out = "";
+  while(j < i) {
+    out = fix_sub_at(i, j, out);
+    j = j + 1;
+  }
 } return string out;

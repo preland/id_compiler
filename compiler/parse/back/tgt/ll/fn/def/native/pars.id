@@ -1,11 +1,6 @@
 // One declaration line, and its parameter types. A declaration names no
-// parameters, so only the types are spelled.
-
-ll_native_line(int id, string ty) {
-  int[] l1_of_v = l1_of(id);
-  string plist = ll_native_pars(l1_of_v);
-  string ret_s = "declare " + ty + " @id_" + s1_of(id) + "(" + plist + ")";
-} return string ret_s;
+// parameters, so only the types are spelled. The line itself is built in
+// ll_native_decl's chain (../native.id) once its own block is full.
 
 ll_native_pars(int[] ps) {
   string out = "";

@@ -8,14 +8,6 @@ claim_of(int j, int ci) {
   }
 } return int r;
 
-claim_all() {
-  int c = 0;
-  while(c < len((import conscase))) {
-    claim_at(c);
-    c = c + 1;
-  }
-} return void;
-
 claim_at(int c) {
   if(first_claim(c) == 1) {
     emit_claim(c);

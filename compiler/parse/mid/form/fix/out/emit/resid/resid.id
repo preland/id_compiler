@@ -1,11 +1,3 @@
-fix_resid(int last) {
-  int i = 0;
-  while(i <= last) {
-    fix_resid_at(i, last);
-    i = i + 1;
-  }
-} return void;
-
 fix_resid_at(int i, int last) {
   if((import fixe_sep)[i] == 1 && fix_anc((import fixe_sep), i, last) == 0) {
     fix_replace((import fixe_n)[i], (import fixe_nm)[i]);

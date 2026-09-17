@@ -27,11 +27,17 @@ chk_dupfn() {
 dupfn_at(int i) {
   string s1_of_v = s1_of((import prog)[i]);
   int j = first_fn(s1_of_v);
-  dupfn_check(i, j);
+  resv_at(i);
+} chain (int i) {
+  if(j < i && i < len((import pfile))) {
+    dupfn_err(i, j);
+  }
 } return void;
 
 dupfn_err(int i, int j) {
   string prog_loc_v = prog_loc(i);
   string s1_of_v = s1_of((import prog)[i]);
-  dupfn_print(prog_loc_v, s1_of_v, j);
+  print(prog_loc_v + "function '" + s1_of_v + "' already defined at " + (import pfile)[j] + ":" + (import pline)[j]);
+} chain (int i, int j) {
+  note_failure();
 } return void;

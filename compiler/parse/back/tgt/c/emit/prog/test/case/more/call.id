@@ -4,11 +4,8 @@
 emit_case_call(int ci) {
   int fn = (import casefn)[ci];
   string cargs = arg_names(fn);
-  emit_call_line(fn, cargs);
-} return void;
-
-emit_call_line(int fn, string cargs) {
   string f1 = s1_of(fn);
+} chain (int ci) {
   if(s2_of(fn) == "void") {
     emit_line("    id_" + f1 + "(" + cargs + ");");
   } else {

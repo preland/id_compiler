@@ -1,10 +1,7 @@
 // fixe_ru starts 0 for every event, same as fixe_sep and fixe_nm
-// (plan/walk/kind/push.id's fix_push5) -- out/emit/name/pick/reuse/ sets it
-// only for a call whose name it reused.
-fix_push_ru(string an) {
-  push((import fixe_an), an);
-  push((import fixe_ru), 0);
-} return void;
+// (plan/walk/kind/push.id's fix_push4 chain), pushed in fix_push_rest's own
+// chain (../push.id) -- out/emit/name/pick/reuse/ sets it only for a call
+// whose name it reused.
 
 // A call node with a real 3-token span ("len", "(", ")"), for a case that
 // needs fix_rkey (out/emit/name/pick/reuse/key.id) to produce a real key.

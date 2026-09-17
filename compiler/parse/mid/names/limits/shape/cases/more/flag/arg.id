@@ -12,17 +12,6 @@ arg_reqtests(int argc, string[] argv, int i, int ok) {
   }
 } return int r;
 
-// Chained from check_scopes rather than check_program, whose block is full.
-// The duplicate check and whether each case fits its function run
-// unconditionally; only the two-case minimum is behind the flag.
-check_cases_maybe() {
-  check_case_fits();
-  check_case_runs();
-  if(require_tests() == 1) {
-    check_cases();
-  }
-} return void;
-
 // Which functions cannot be tested on the build host is decided before either
 // check that reads it: a case that would never run, and the minimum
 // (../../report/host/).

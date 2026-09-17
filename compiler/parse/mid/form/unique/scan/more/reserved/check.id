@@ -1,6 +1,3 @@
-// resv_print is the split tail of resv_err, kept here because reserved.id was
-// already at the 3-function limit.
-//
 // eprint is named on its own because (import resv_names) is idc.py's list,
 // and idc.py has no eprint: its helper, id_eprint, is emitted beside the
 // prelude rather than in it (back/tgt/c/emit/prog/head/decl/eprint.id).
@@ -9,8 +6,3 @@ is_reserved_name(int i) {
   string s1_of_v = s1_of((import prog)[i]);
   int ok = find_str((import resv_names), s1_of_v) >= 0 || s1_of_v == "eprint";
 } return int ok;
-
-resv_print(string prog_loc_v, string s1_of_v) {
-  print(prog_loc_v + "function '" + s1_of_v + "' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_" + s1_of_v + "'. Choose another name");
-  note_failure();
-} return void;

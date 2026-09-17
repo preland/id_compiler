@@ -38,5 +38,10 @@ fix_all(int argc, string[] argv) {
 fix_init(int argc, string[] argv) {
   fix_state();
   fix_wbuild();
-  fix_std_detect(argc, argv);
+  int on = arg_flag(argc, argv, 1, "--fix-std");
+} chain (int argc, string[] argv) {
+  if(on == 0) {
+    on = fix_std_scan();
+  }
+  lset((import fixd_std), 0, on);
 } return void;

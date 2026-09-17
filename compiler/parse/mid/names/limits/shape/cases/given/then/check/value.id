@@ -1,15 +1,7 @@
 // A check's function, then its value. The value is held to exactly what an
 // expected value is held to, at the check's return type -- and it is a literal:
-// `(import NAME)` is an argument or an expected value, never a check's.
-
-then_shape(int ci, int chk_node, int cfn) {
-  string chk_nm = s1_of(chk_node);
-  if(cfn < 0) {
-    case_err(ci, "'then' names '" + chk_nm + "', which is not a function in this build");
-  } else {
-    then_sig(ci, chk_node, cfn, chk_nm);
-  }
-} return void;
+// `(import NAME)` is an argument or an expected value, never a check's. The
+// name-vs-shape check itself is then_fn's chain (../entry.id).
 
 then_value_fit(int ci, int chk_node, int cfn) {
   int[] items = l1_of(chk_node);

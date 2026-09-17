@@ -17,7 +17,10 @@ fix_walk_roots(int[] roots) {
 fix_walk(int e, int ca, int cd, string nt, string an) {
   int lo = len((import fixe_n));
   fix_walk_kids(e, cd);
-  fix_push_ev(e, lo, ca, cd, nt, an);
+  int cl = fix_class(e, ca, nt, lo);
+} chain (int e, int ca, int cd, string nt, string an) {
+  fix_push_rest(e, lo, cl, cd, nt, an);
+  fix_rcache_taint(e);
 } return void;
 
 fix_walk_kids(int e, int cd) {

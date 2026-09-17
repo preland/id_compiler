@@ -1,11 +1,8 @@
 fix_push4(int cd, string nt) {
   push((import fixe_cd), cd);
   push((import fixe_nt), nt);
-  fix_push5();
-} return void;
-
-fix_push5() {
   push((import fixe_mv), 0);
+} chain (int cd, string nt) {
   push((import fixe_sep), 0);
   push((import fixe_nm), "");
 } return void;

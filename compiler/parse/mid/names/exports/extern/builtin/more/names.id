@@ -7,12 +7,9 @@
 
 init_bnames() {
   export string[] bnames = [];
-  split_bnames((import builtin_src), 0);
-} return void;
-
-split_bnames(string src, int i) {
-  while(i < len(src)) {
-    i = take_bname(src, i);
+  int i = 0;
+  while(i < len((import builtin_src))) {
+    i = take_bname((import builtin_src), i);
   }
 } return void;
 

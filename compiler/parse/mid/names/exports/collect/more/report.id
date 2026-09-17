@@ -5,11 +5,8 @@
 dupexp_err(int id, string owner) {
   string loc_at_v = loc_at(owner, (import nline)[id]);
   string s2_of_v = s2_of(id);
-  dupexp_report(loc_at_v, s2_of_v);
-} return void;
-
-dupexp_report(string loc_at_v, string s2_of_v) {
   string export_owner_v = export_owner(s2_of_v);
+} chain (int id, string owner) {
   print(loc_at_v + "'" + s2_of_v + "' is already an exported global (exported by '" + export_owner_v + "')");
   note_failure();
 } return void;

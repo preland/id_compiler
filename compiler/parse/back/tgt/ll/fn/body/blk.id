@@ -8,15 +8,6 @@ ll_blocks(int f) {
   }
 } return void;
 
-ll_insns(int b) {
-  int i = 0;
-  while(i < insn_count(b)) {
-    int[] ins = blk_ins(b);
-    ll_insn(ins[i]);
-    i = i + 1;
-  }
-} return void;
-
 // A parameter is spelled in the signature and a nop is what a pass left
 // behind; neither is a line of the body.
 ll_insn(int id) {

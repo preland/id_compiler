@@ -14,18 +14,15 @@
 init_idx() {
   export int[][] vidx = [];
   export int[][] fidx = [];
-  fill_idx();
-} return void;
-given env_init ():() then check_failed:(0)
-given call2_setup ():() then check_failed:(0)
-
-fill_idx() {
   int i = 0;
+} chain () {
   while(i < (import idx_n)) {
     push_buckets();
     i = i + 1;
   }
 } return void;
+given env_init ():() then check_failed:(0)
+given call2_setup ():() then check_failed:(0)
 
 // Both indexes get their buckets in one loop: they are the same size and are
 // built at the same moment, and two loops would be the same loop twice.

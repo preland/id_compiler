@@ -23,7 +23,9 @@ given stmt_tokens ([28]):([])
 parse_while(int[] pos) {
   advance(pos);
   int cond = parse_paren(pos);
-  int ret_i = parse_while_tail(pos, cond);
+  int[] parse_block_v = parse_block(pos);
+} chain (int[] pos) {
+  int ret_i = node_while(cond, parse_block_v);
 } return int ret_i;
 given stmt_tokens ([28]):(7)
 given stmt_tokens ([9]):(5)

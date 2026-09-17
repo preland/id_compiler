@@ -4,7 +4,12 @@
 fix_emit_stmt(int sn, int last) {
   fix_names(last);
   fix_decls(sn, last);
-  fix_resid(last);
+  int i = 0;
+} chain (int sn, int last) {
+  while(i <= last) {
+    fix_resid_at(i, last);
+    i = i + 1;
+  }
 } return void;
 
 // fix_rcache_taint runs again for every event here (plan/walk/ev/push/ev.id

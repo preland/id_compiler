@@ -1,16 +1,9 @@
-// The constraint list: `[time:O(n), mem:O(1)]`, optional.
+// The constraint list: `[time:O(n), mem:O(1)]`, optional. Parsed from
+// case_rest (../../case/then/then.id) when the case has one.
 //
 // Each claim is recorded in three parallel lists -- the case it is written on,
 // its kind and its bound -- because a claim is checked against the OTHER cases
 // of the same function that carry it, and that grouping is a scan of these.
-
-case_cons(int[] pos) {
-  if(cur_text(pos) == "[") {
-    advance(pos);
-    cons_list(pos);
-    advance(pos);
-  }
-} return void;
 
 cons_list(int[] pos) {
   cons_one(pos);

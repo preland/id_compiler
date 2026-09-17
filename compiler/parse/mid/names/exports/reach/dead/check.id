@@ -22,7 +22,9 @@
 chk_dead() {
   init_reach();
   reach_mark();
-  dead_final();
+  lset((import dphase), 0, 1);
+} chain () {
+  reach_funcs(0, 0);
 } return void;
 
 // Seeded with "main" unconditionally. A project without one is a library, and

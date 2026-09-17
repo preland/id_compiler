@@ -8,7 +8,9 @@
 canon_decl(int id) {
   string out = decl_tag(id);
   string nm = decl_name(id);
-  string ret_s = decl_tail(id, out, nm);
+  int i1_of_v = i1_of(id);
+} chain (int id) {
+  string ret_s = out + s1_of(id) + " " + nm + "=" + canon_expr(i1_of_v);
 } return string ret_s;
 
 // The declared name: positional for a local, verbatim for an export, since an

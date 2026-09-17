@@ -15,5 +15,7 @@ entry_count(int f) {
 m2r_collect_at(int f, int i) {
   int b = entry_of(f);
   int[] blk_ins_v = blk_ins(b);
-  m2r_take(blk_ins_v[i]);
+  if(ir_op(blk_ins_v[i]) == "alloca") {
+    push((import pra), blk_ins_v[i]);
+  }
 } return void;

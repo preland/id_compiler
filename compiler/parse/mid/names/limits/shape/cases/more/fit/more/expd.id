@@ -1,13 +1,5 @@
-// The expected side of a case.
-
-fit_expd(int i, int fn, int node) {
-  int[] expd = l2_of(node);
-  if(s2_of(fn) == "void") {
-    fit_void(i, fn, expd);
-  } else {
-    fit_ret(i, fn, expd);
-  }
-} return void;
+// The expected side of a case, judged in fit_body's chain (../body.id) once
+// its own block is full.
 
 // A void function is judged by what it left in its arguments, positionally. It
 // may stop early: only the arguments the case names are checked.

@@ -17,7 +17,10 @@ given lz_o (1, 1):(1)
 report_dup(int i, int j) {
   note_failure();
   string name_i = fname_at(i);
-  dup_report(name_i, j);
+  string loc_at_v = dup_loc(name_i);
+} chain (int i, int j) {
+  string tail_v = dup_tail(j);
+  print(loc_at_v + "function '" + name_i + "' has the same signature and logic as " + tail_v);
 } return void;
 given lz_o (1, 0):() then check_failed:(1)
 given lz_o (0, 1):() then check_failed:(1)

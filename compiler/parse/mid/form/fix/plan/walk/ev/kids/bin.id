@@ -5,7 +5,10 @@
 fix_walk_bin(int e, int cd) {
   int a = i1_of(e);
   fix_walk(a, 0, cd, "", "");
-  fix_walk_rhs(e, cd);
+  int b = i2_of(e);
+} chain (int e, int cd) {
+  int c2 = fix_condop(e, cd);
+  fix_walk(b, 0, c2, "", "");
 } return void;
 
 // The name fix_walk_arg2's own call left at fixe_an[0] (kids/args.id's

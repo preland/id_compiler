@@ -1,12 +1,5 @@
-// A list's elements, one by one, and a scalar literal against a scalar type.
-
-fit_each(int i, int[] xs, string et) {
-  int j = 0;
-  while(j < len(xs)) {
-    fit_value(i, xs[j], et);
-    j = j + 1;
-  }
-} return void;
+// A list's elements, one by one (in fit_elems's chain, ../value.id), and a
+// scalar literal against a scalar type.
 
 fit_scalar(int i, int e, string want) {
   string lt = case_lit_type(e);

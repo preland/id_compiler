@@ -1,13 +1,5 @@
 // Inside a declared value, each outermost value declared before it is replaced
-// by its name.
-fix_subs_from(int i, int j) {
-  string out = "";
-  while(j < i) {
-    out = fix_sub_at(i, j, out);
-    j = j + 1;
-  }
-} return string out;
-
+// by its name, in fix_subs (../head.id).
 fix_sub_at(int i, int j, string out) {
   string rs = out;
   if((import fixe_sep)[j] == 1 && fix_anc((import fixe_sep), j, i - 1) == 0) {

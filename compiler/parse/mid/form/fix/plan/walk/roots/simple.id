@@ -17,5 +17,9 @@ fix_iassign(int sn) {
 fix_plan(int sn, int[] roots, int md) {
   fix_ev_reset();
   fix_walk_roots(roots);
-  fix_decide(sn, md);
+  int last = fix_last_m();
+} chain (int sn, int[] roots, int md) {
+  if(last >= 0) {
+    fix_decide2(sn, md, last);
+  }
 } return void;

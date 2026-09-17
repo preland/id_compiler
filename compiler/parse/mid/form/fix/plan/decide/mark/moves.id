@@ -1,12 +1,3 @@
-fix_check_and_emit(int sn, int last) {
-  string why = fix_why(sn, last);
-  if(why == "") {
-    fix_emit_stmt(sn, last);
-  } else {
-    fix_refuse(last, why);
-  }
-} return void;
-
 fix_last_m() {
   int i = 0;
   int last = 0 - 1;

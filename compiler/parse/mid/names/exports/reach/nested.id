@@ -11,7 +11,9 @@ exp_nested(int id, string owner) {
 exp_branches(int id, string owner) {
   int[] l1_of_v = l1_of(id);
   exp_list(l1_of_v, owner);
-  exp_else(id, owner);
+  int[] l2_of_v = l2_of(id);
+} chain (int id, string owner) {
+  exp_list(l2_of_v, owner);
 } return void;
 
 exp_loop(int id, string owner) {

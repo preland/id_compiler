@@ -4,14 +4,6 @@ is_runtime() {
   int ret_i = (import rtc)[0];
 } return int ret_i;
 
-// Split out of report_nosuchfn so that block stays within the action limit;
-// placed here rather than beside it because builtin/report.id and builtin/
-// itself were already at their 3-entry limits.
-nosuchfn_report(string loc_at_v, string name, string builtin_list_v) {
-  print(loc_at_v + "no such function '" + name + "'; available builtins: " + builtin_list_v);
-  note_failure();
-} return void;
-
 declfix() {
   regrow_d();
   int e = node_int("1", 1, 0);

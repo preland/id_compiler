@@ -9,7 +9,10 @@
 fix_wbuild() {
   fix_winit();
   fix_wedges(0, 0);
-  fix_wbfs();
+  while(len((import fixd_wq)) > 0) {
+    int gi = pop((import fixd_wq));
+    fix_wprop(gi);
+  }
 } return void;
 
 //   fixd_wadj  for each function, the functions that call or name it

@@ -28,5 +28,8 @@ check_funcs() {
 check_func_body(int id) {
   int[] l2_of_v = l2_of(id);
   string s1_of_v = s1_of(id);
-  check_body_at(l2_of_v, s1_of_v);
+  int func_line_v = func_line(s1_of_v);
+} chain (int id) {
+  check_block(l2_of_v, 0, s1_of_v, func_line_v);
+  check_segs(l2_of_v, s1_of_v, func_line_v);
 } return void;

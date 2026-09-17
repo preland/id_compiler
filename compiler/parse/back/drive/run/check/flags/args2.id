@@ -20,7 +20,9 @@ given flags_setup (2, ["prog", "--runtime"]):() then is_runtime:(1)
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
   fs_set(arg_flag_v2);
-  arg_flags5(argc, argv);
+  host_init(argc, argv);
+} chain (int argc, string[] argv) {
+  nat_init(argc, argv);
 } return void;
 given flags_setup (1, ["prog"]):() then is_freestanding:(0)
 given flags_setup (2, ["prog", "--freestanding"]):() then is_freestanding:(1)

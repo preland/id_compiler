@@ -12,11 +12,8 @@ is_iassign(int[] pos) {
 parse_iassign(int[] pos) {
   int target = parse_postfix(pos);
   advance(pos);
-  int ret_i = iassign_rhs(pos, target);
-} return int ret_i;
-
-iassign_rhs(int[] pos, int target) {
   int expr = parse_expr(pos);
+} chain (int[] pos) {
   skip_semi(pos);
   int ret_i = node_iassign(target, expr);
 } return int ret_i;

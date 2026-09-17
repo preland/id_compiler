@@ -49,5 +49,10 @@ guarded_emit_tail(int argc, string[] argv) {
 emit_all(int argc, string[] argv) {
   emit_tests_maybe(argc, argv);
   natives_then_prune();
-  emit_then_natives(argc, argv);
+  emit(argc, argv);
+} chain (int argc, string[] argv) {
+  if((import natc)[0] == 1) {
+    nat_print();
+  }
+  emit_notes();
 } return void;

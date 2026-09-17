@@ -17,7 +17,12 @@ given ret_widens_fn ((import widen_f)):(1)
 cw_body(int id) {
   string s1_of_v = s1_of(id);
   cw_begin(s1_of_v);
-  string val = cw_walk(id);
+  int[] l2_of_v = l2_of(id);
+} chain (int id) {
+  string val = "";
+  if(cw_stmts(l2_of_v) == 1) {
+    val = cw_ret(id);
+  }
 } return string val;
 
 // Start the walk of function `name`: canon_expr's position map is emptied as

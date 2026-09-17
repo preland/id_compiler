@@ -19,5 +19,5 @@ same_claim(int j, int c) {
 emit_claim(int c) {
   string grp = claim_group(c);
   int gn = claim_count(c);
-  emit_claim_line(c, grp, gn);
+  emit_line("    bad |= idtc_claim((int[]){" + grp + "}, " + gn + ", \"" + (import conskind)[c] + "\", \"" + (import consbound)[c] + "\");");
 } return void;

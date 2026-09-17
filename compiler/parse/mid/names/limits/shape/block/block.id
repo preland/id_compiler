@@ -20,7 +20,11 @@ check_block(int[] body, int depth, string fname, int ln) {
 
 check_fits(int[] body, int depth, string fname, int ln) {
   check_count(body, depth, fname, ln);
-  check_children(body, depth, fname);
+  int i = 0;
+  while(i < len(body)) {
+    check_stmt(body[i], depth, fname);
+    i = i + 1;
+  }
 } return void;
 
 // Only a nested block is counted here. A function's own body arrives at depth

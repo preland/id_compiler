@@ -12,5 +12,11 @@ fix_paren_rec(string p1, string p2) {
 fix_in_moved(int c) {
   int b = fix_nbeg(c);
   int e = fix_nend(c);
-  int ok = fix_within(b, e);
+  int i = 0;
+} chain (int c) {
+  int ok = 0;
+  while(i < len((import fixd_lo))) {
+    ok = fix_within_at(i, b, e, ok);
+    i = i + 1;
+  }
 } return int ok;

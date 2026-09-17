@@ -1,11 +1,8 @@
 fix_fparam(int e, int i) {
   string vt = callee_var_type(e);
   string[] pts = fn_params(vt);
-  string pt = fix_nth(pts, i, e);
-} return string pt;
-
-fix_nth(string[] pts, int i, int e) {
   string pt = "";
+} chain (int e, int i) {
   if(i < len(pts) && len(pts) == flat_arg_count(e)) {
     pt = pts[i];
   }

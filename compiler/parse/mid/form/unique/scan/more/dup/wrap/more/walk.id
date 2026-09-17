@@ -1,14 +1,8 @@
 // The body, statement by statement. Every one must give one of the
 // function's own locals a literal value; a call, an export, a loop, a branch or
 // a write through an index is an effect or a dependency, and ends the walk.
-
-cw_walk(int id) {
-  int[] l2_of_v = l2_of(id);
-  string val = "";
-  if(cw_stmts(l2_of_v) == 1) {
-    val = cw_ret(id);
-  }
-} return string val;
+// The walk itself is the chain cw_body (../body.id) runs once its own block
+// is full.
 
 // The loop leaves at the first statement that is not a literal store: the flag
 // in the condition is how a loop leaves early here.
