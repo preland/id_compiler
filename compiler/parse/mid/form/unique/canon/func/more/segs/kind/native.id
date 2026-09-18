@@ -8,6 +8,18 @@
 // fs_size/fs_exists, the gfx and sock handles) were reported as duplicates of
 // one another.
 
+// A canonicalisation begun over lz_j's program rather than lz_g's.
+// canon_begun_fixture stops at lz_g, which builds eleven nodes (0 to 10); the
+// function nodes the strict canonicaliser is tested on are ids 11 and 15,
+// created two links further along by lz_h and lz_j. Only canon_func calls
+// uq_begin itself, so everything below it needs the map already filled.
+canon_begun_j_fixture() {
+  lz_j();
+  uq_begin("f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 segs_kind(int id, string[] segs_out) {
   if(is_native(id) == 1) {
     segs_native(id, segs_out);

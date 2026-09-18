@@ -4,6 +4,8 @@ canon_func_body(int id) {
   string out = canon_params(l1_of_v);
   string ret_s = canon_func_tail(id, out);
 } return string ret_s;
+given canon_begun_j_fixture (11):("()->int{d:int 0=I3;e:c(foo:I3)}=>v0")
+given canon_begun_j_fixture (15):("()->void{d:int 0=I3}=>void")
 
 canon_func_tail(int id, string out) {
   string ret_s = "";
@@ -19,3 +21,5 @@ canon_logic(int id, string out) {
   string val = canon_body(l2_of_v);
   string ret_s = "(" + out + ")->" + s2_of(id) + "{" + val + "}=>" + canon_ret(id);
 } return string ret_s;
+given canon_begun_j_fixture (11, ""):("()->int{d:int 0=I3;e:c(foo:I3)}=>v0")
+given canon_begun_j_fixture (15, ""):("()->void{d:int 0=I3}=>void")

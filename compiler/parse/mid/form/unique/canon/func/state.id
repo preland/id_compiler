@@ -11,6 +11,8 @@ canon_ret(int id) {
     out = canon_expr(i1_of_v);
   }
 } return string out;
+given canon_begun_j_fixture (11):("v0")
+given canon_begun_j_fixture (15):("void")
 
 // Start canonicalising the function called `name`: an empty position map, and
 // the name whose calls count as recursion. Both are declared here rather than
@@ -20,7 +22,11 @@ uq_begin(string name) {
   export string[] cself = [name];
   export string[] cnames = [];
 } return void;
+given lz_g ("one"):() then cur_self:("one")
+given lz_g ("two"):() then cur_self:("two")
 
 cur_self() {
   string ret_s = (import cself)[0];
 } return string ret_s;
+given lz_a ():("test")
+given canon_begun_fixture ():("f")

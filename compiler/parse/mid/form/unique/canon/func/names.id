@@ -15,11 +15,15 @@ cn(string name) {
   }
   string ret_s = "" + idx;
 } return string ret_s;
+given canon_begun_fixture ("first"):("0")
+given cn_seeded_fixture ("second"):("1")
 
 cn_add(string name) {
   push((import cnames), name);
   int ret_i = len((import cnames)) - 1;
 } return int ret_i;
+given canon_begun_fixture ("first"):(0)
+given cn_seeded_fixture ("second"):(1)
 
 // A name read as a value. A function's name is a function value and keeps its
 // name, as a callee does: two functions that differ only in which function

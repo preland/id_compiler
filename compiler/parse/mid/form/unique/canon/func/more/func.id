@@ -12,6 +12,8 @@ canon_func(int id) {
   uq_begin(s1_of_v);
   string ret_s = canon_func_body(id);
 } return string ret_s;
+given lz_j (11):("()->int{d:int 0=I3;e:c(foo:I3)}=>v0")
+given lz_j (15):("()->void{d:int 0=I3}=>void")
 
 canon_params(int[] params) {
   string out = "";

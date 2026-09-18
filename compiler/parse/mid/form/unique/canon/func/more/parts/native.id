@@ -2,6 +2,17 @@
 // signature and its name -- the way an `asm` function is identified by name
 // and triple. Two natives with one signature are two functions, not one
 // written twice.
+// canon_begun_fixture with one name already numbered, so cn and cn_add have a
+// non-empty position map to answer against: from an empty one they both
+// answer 0 whatever the name, which is no pair at all. Filed here because
+// names.id, state.id and more/func.id are each at the three-function limit.
+cn_seeded_fixture() {
+  canon_begun_fixture();
+  push((import cnames), "already");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 canon_native(int id, string out) {
   string ret_s = "(" + out + ")->" + s2_of(id) + " native " + s1_of(id);
 } return string ret_s;
