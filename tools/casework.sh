@@ -37,6 +37,15 @@ fn_end() {
     awk -v s="$2" 'NR > s && /^\} *return/ { print NR; exit }' "$1"
 }
 
+# A stale line number is the common mistake: cases added above a function move
+# its header down, so a FILE:LINE copied from an older `list` now points at a
+# comment. fn_end happily finds the next `} return` regardless, and mutate then
+# takes the comment text as the function's name -- which makes its verdict
+# grep for "test failed: <comment>(" and report a real KILLED as indirect.
+fn_header_name() {
+    sed -n "${2}p" "$1" | sed -nE 's/^([a-z_][a-z0-9_]*)\(.*/\1/p'
+}
+
 build() {
     local rc
     env -u IDC_NO_STD "$IDC" "$1" --allow-untested --emit-c "$WORK/out.c" >"$WORK/build.log" 2>&1
@@ -60,7 +69,8 @@ cmd_packet() {
     [ -f "$file" ] || die "no such file: $file"
     end=$(fn_end "$file" "$line")
     [ -n "$end" ] || die "no '} return' after $loc"
-    name=$(sed -n "${line}p" "$file" | sed -E 's/^([a-z_][a-z0-9_]*)\(.*/\1/')
+    name=$(fn_header_name "$file" "$line")
+    [ -n "$name" ] || die "$loc is not a function header -- re-run 'casework.sh list' for its current line"
     echo "== $name  ($loc)"
     echo "-- source and existing cases"
     awk -v s="$line" -v e="$end" 'NR >= s && NR <= e { print; next } NR > e && /^(\(|given )/ { print; next } NR > e { exit }' "$file"
@@ -156,7 +166,8 @@ cmd_mutate() {
     [ -f "$file" ] || die "no such file: $file"
     end=$(fn_end "$file" "$line")
     [ -n "$end" ] || die "no '} return' after $loc"
-    name=$(sed -n "${line}p" "$file" | sed -E 's/^([a-z_][a-z0-9_]*)\(.*/\1/')
+    name=$(fn_header_name "$file" "$line")
+    [ -n "$name" ] || die "$loc is not a function header -- re-run 'casework.sh list' for its current line"
     CW_BACKUP="$WORK/backup.id"
     local backup="$CW_BACKUP"
     cp "$file" "$backup"
