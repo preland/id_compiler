@@ -16,3 +16,18 @@ claim_hit(int j, int ci, int c) {
     r = 1;
   }
 } return int r;
+given claim_cols_fixture (0, 0, 0):(1)
+given claim_cols_fixture (1, 0, 0):(0)
+
+// Two claims on case 0, differing in kind: the three claim columns are
+// parallel and claim_conscase_fixture pushes only conscase, so conskind and
+// consbound are empty under it and every function that compares them reads
+// out of bounds. case_fidx_fixture supplies the two casefn rows carries and
+// same_claim need to tell one function's cases from another's.
+claim_cols_fixture() {
+  case_fidx_fixture();
+  push((import conscase), 0);
+  claim_cols_rest();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

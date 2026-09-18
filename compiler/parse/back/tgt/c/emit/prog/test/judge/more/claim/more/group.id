@@ -16,3 +16,16 @@ group_item(string out, int ci, int c) {
     so = group_sep(out) + ci;
   }
 } return string so;
+given claim_cols_fixture ("", 0, 0):("0")
+given claim_cols_fixture ("", 1, 0):("")
+
+// The rest of claim_cols_fixture (../hit/has.id): a second claim on the same
+// case with a different kind, so claim_hit and same_claim have two rows that
+// agree on the case and differ on the kind.
+claim_cols_rest() {
+  push((import conscase), 0);
+  push((import conskind), "time");
+  claim_cols_bounds();
+} return void;
+given case_fidx_fixture ():() then check_failed:(0)
+given case_fidx_fixture ():() then init_units:(0)

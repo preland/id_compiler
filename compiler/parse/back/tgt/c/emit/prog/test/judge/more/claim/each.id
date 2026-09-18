@@ -15,3 +15,15 @@ claim_at(int c) {
     emit_claim(c);
   }
 } return void;
+
+// The last of claim_cols_fixture (../more/hit/has.id): the second claim's
+// kind and both bounds. Two claims on case 0, kinds "mem" and "time", the
+// same bound -- so a comparison on kind separates them and one on bound does
+// not.
+claim_cols_bounds() {
+  push((import conskind), "mem");
+  push((import consbound), "O(n)");
+  push((import consbound), "O(n)");
+} return void;
+given case_fidx_fixture ():() then check_failed:(0)
+given case_fidx_fixture ():() then init_units:(0)
