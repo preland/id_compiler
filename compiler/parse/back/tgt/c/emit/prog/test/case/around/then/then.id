@@ -22,3 +22,5 @@ emit_then(int ci, int ti) {
   string kind = k_of(node);
   emit_then_kind(kind, ci, ti, node);
 } return void;
+given print_fixture ((import fixture_ci), 0):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+given calls_node_fixture ((import fixture_ci), 0):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_fx_target_n; idtc_j0++) {\n        if (idtc_rc_fx_target_seq[idtc_j0] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j0].x == 1))) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target(...) did not match; %d call(s) to 'fx_target' were recorded\\n\", idtc_where[0], idtc_call[0], idtc_rc_fx_target_n);\n        return 3;\n    }\n")
