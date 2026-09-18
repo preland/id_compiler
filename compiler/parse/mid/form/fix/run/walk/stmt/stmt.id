@@ -10,6 +10,8 @@ fix_body(int f) {
   int[] l2_of_v = l2_of(f);
   fix_block(l2_of_v);
 } return void;
+given fix_touch_fixture ((import ft_call)):() then calls fix_block:[1]
+given fix_touch_fixture ((import ft_lit)):() then calls fix_block:[1]
 
 fix_block(int[] stmts) {
   int i = 0;
