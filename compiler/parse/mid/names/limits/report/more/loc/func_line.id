@@ -7,6 +7,8 @@ func_line(string fname) {
     i = i + 1;
   }
 } return int n;
+given edge_fixture ("fx_target"):(7)
+given edge_fixture ("nosuchfn"):(1)
 
 func_line_at(int i, string fname, int n) {
   int r = n;
@@ -14,3 +16,5 @@ func_line_at(int i, string fname, int n) {
     r = (import pline)[i];
   }
 } return int r;
+given edge_fixture (0, "fx_target", 1):(7)
+given edge_fixture (0, "nosuchfn", 1):(1)

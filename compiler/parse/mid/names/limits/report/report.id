@@ -21,3 +21,5 @@ report_deep(string fname, int depth, int ln) {
   print(loc_at_v + "code in '" + fname + "' is nested too deeply (" + depth + " levels); the maximum is 2. Split the inner block into its own function");
   note_failure();
 } return void;
+given edge_fixture ("fx_target", 3, 4):() then prints:("fixture.id:4: error: code in 'fx_target' is nested too deeply (3 levels); the maximum is 2. Split the inner block into its own function\n")
+given edge_fixture ("nosuchfn", 4, 9):() then prints:("<stdin>:9: error: code in 'nosuchfn' is nested too deeply (4 levels); the maximum is 2. Split the inner block into its own function\n")

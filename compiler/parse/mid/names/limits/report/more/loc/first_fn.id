@@ -13,6 +13,8 @@ first_fn(string fname) {
     i = i + 1;
   }
 } return int n;
+given edge_fixture ("fx_target"):(0)
+given edge_fixture ("nosuchfn"):(-1)
 
 first_fn_at(int i, string fname, int n) {
   int r = n;
@@ -20,7 +22,11 @@ first_fn_at(int i, string fname, int n) {
     r = i;
   }
 } return int r;
+given edge_fixture (0, "fx_target", -1):(0)
+given edge_fixture (0, "fx_target", 5):(5)
 
 prog_loc(int i) {
   string ret_s = (import pfile)[i] + ":" + (import pline)[i] + ": error: ";
 } return string ret_s;
+given edge_fixture (0):("fixture.id:7: error: ")
+given edge_fixture (1):("fixture.id:20: error: ")

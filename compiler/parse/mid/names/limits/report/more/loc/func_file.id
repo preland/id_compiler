@@ -7,6 +7,8 @@ func_file(string fname) {
     i = i + 1;
   }
 } return string s;
+given edge_fixture ("fx_target"):("fixture.id")
+given edge_fixture ("nosuchfn"):("<stdin>")
 
 func_file_at(int i, string fname, string s) {
   string fpath = s;
@@ -14,3 +16,5 @@ func_file_at(int i, string fname, string s) {
     fpath = (import pfile)[i];
   }
 } return string fpath;
+given edge_fixture (0, "fx_target", "<stdin>"):("fixture.id")
+given edge_fixture (0, "nosuchfn", "<stdin>"):("<stdin>")

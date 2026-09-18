@@ -6,6 +6,8 @@
 loc_at(string fname, int ln) {
   string ret_s = func_file(fname) + ":" + ln + ": error: ";
 } return string ret_s;
+given edge_fixture ("fx_target", 4):("fixture.id:4: error: ")
+given edge_fixture ("nosuchfn", 9):("<stdin>:9: error: ")
 
 dvname_len() {
   int n = len((import dvname));

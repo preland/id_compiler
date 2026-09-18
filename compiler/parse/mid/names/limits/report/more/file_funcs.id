@@ -5,6 +5,8 @@ file_hit(int i, string name) {
     n = 1;
   }
 } return int n;
+given edge_fixture (0, "fixture.id"):(1)
+given edge_fixture (0, "other.id"):(0)
 
 first_of_file(int i) {
   int n = 0;
