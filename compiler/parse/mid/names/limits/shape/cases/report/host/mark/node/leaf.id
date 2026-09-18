@@ -31,3 +31,5 @@ ut_native(string callee_nm) {
     what_s = "native '" + callee_nm + "', which a --freestanding build does not link: whatever the object is linked with provides it";
   }
 } return string what_s;
+given natcall_fixture ("nat_target"):("native 'nat_target', which a --freestanding build does not link: whatever the object is linked with provides it")
+given natcall_fixture ("fx_target"):("")
