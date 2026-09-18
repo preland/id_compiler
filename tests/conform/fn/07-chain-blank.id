@@ -1,0 +1,15 @@
+// A `blank` pads the first segment to three actions so that a chain may
+// follow it. The chain opens on an if/else, which is one statement costing
+// two actions, and only one slot was left -- so it could not have been
+// written in the first segment instead, which is the whole case for `blank`.
+main(int argc, string[] argv) {
+  int a = 1;
+  int b = 2;
+  blank;
+} chain (int argc, string[] argv) {
+  if (a > 0) {
+    print(b);
+  } else {
+    print(a);
+  }
+} return int 0;

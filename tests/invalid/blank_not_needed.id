@@ -1,0 +1,11 @@
+// EXPECT: is too large to move up into the segment
+// the first segment pads itself to 3 actions with two blanks, but the chain's
+// first statement costs one action and would have fitted in either slot, so
+// the padding stands where real work belonged
+main(int argc, string[] argv) {
+  int a = 1;
+  blank;
+  blank;
+} chain (int argc, string[] argv) {
+  int c = 3;
+} return int 0;

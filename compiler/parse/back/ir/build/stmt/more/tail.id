@@ -16,7 +16,7 @@ given nest_fixture ((import if_node)):() then check_failed:(0)
 ls4(int node) {
   if(k_of(node) == "iassign") {
     lw_iassign(node);
-  } else if(k_of(node) != "chain") {
+  } else if(k_of(node) != "chain" && k_of(node) != "blank") {
     ls5(node);
   }
 } return void;

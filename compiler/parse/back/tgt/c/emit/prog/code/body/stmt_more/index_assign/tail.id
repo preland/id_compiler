@@ -20,10 +20,14 @@ given iassign_fixture ((import iassign_node), "OTHER"):("id_list_set(id_list_lit
 // A chain marker is a seam between two segments of one function, not a
 // statement: it emits nothing. Without this arm it would fall through to es4,
 // which treats anything that is not an `if` as a `while`.
+// A chain marker is a seam between two segments of one function, and a `blank`
+// is an action slot that does nothing: neither emits anything. Without these
+// arms both would fall through to es4, which treats anything that is not an
+// `if` as a `while`.
 es3b(int id, string ind) {
   if(k_of(id) == "iassign") {
     emit_iassign(id, ind);
-  } else if(k_of(id) != "chain") {
+  } else if(k_of(id) != "chain" && k_of(id) != "blank") {
     es4(id, ind);
   }
 } return void;

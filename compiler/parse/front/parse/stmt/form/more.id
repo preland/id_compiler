@@ -1,4 +1,20 @@
-// The tail of parse_decl, split off because decl/decl.id is already full.
+// The tail of parse_decl, split off because decl/decl.id is already full, and
+// the `blank` statement, which belongs with the statement forms rather than
+// with the dispatch that routes to it.
+
+// `blank` costs one action and does nothing. Its only use is to fill a segment
+// that must reach three actions before a chain, in the case where the chain's
+// first action cannot be lifted into that segment because the action following
+// it is structurally tied to it -- an if/else-if chain being the instance,
+// since splitting one would leave the chain unable to be spun back out into
+// its own function later. It carries no operand, so the node is a bare leaf.
+parse_blank(int[] pos) {
+  advance(pos);
+  skip_semi(pos);
+  int ret_i = newleaf("blank", 0, 0, "", "");
+} return int ret_i;
+given stmt_tokens ([42]):(0)
+given stmt_tokens ([4]):(0)
 
 finish_decl_tail(int[] pos, string type, string name, int exported) {
   eat_eq(pos);

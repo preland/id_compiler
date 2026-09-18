@@ -12,7 +12,7 @@ is_alnum(int c) {
 // The twenty id keywords. One big boolean keeps this within the action limit.
 is_kw(string w) {
   int ok = 0;
-  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain") {
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank") {
     ok = 1;
   }
 } return int ok;

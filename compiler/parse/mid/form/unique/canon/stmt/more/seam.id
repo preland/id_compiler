@@ -9,9 +9,35 @@
 //
 // Split out of cst3 (../stmt.id), which was already at the action limit.
 
+// A `blank` canonicalises to nothing at all, and canon_body drops it from the
+// list before joining, so it leaves no separator either. That is deliberate: a
+// blank does no work, so a function padded with one is the same function as the
+// one without it, and the two must collide. Erasing it here is only half the
+// job -- see blank_drop below, which canon_body applies before joining.
 cst4(int id) {
   string out = "?" + k_of(id) + "#" + id;
   if(k_of(id) == "chain") {
     out = "|";
+  } else if(k_of(id) == "blank") {
+    out = "";
   }
 } return string out;
+
+// The statement list with every `blank` removed, which is what canon_body
+// hands to canon_join. A list is a reference, so `kept` can be filled in place
+// by blank_push; the push has to be its own function because the `if` would
+// put this one over the action limit.
+blank_drop(int[] stmts) {
+  int[] kept = [];
+  int i = 0;
+  while(i < len(stmts)) {
+    blank_push(kept, stmts[i]);
+    i = i + 1;
+  }
+} return int[] kept;
+
+blank_push(int[] kept, int id) {
+  if(k_of(id) != "blank") {
+    push(kept, id);
+  }
+} return void;

@@ -7,8 +7,10 @@
 // so the body is walked once, counting actions and reporting whenever a seam
 // or the end of the body closes a segment that ran over.
 //
-// The running count lives in a one-element list because an argument is passed
-// by value: the same reason the parser threads its cursor as `int[] pos`.
+// The running tallies live in a list because an argument is passed by value:
+// the same reason the parser threads its cursor as `int[] pos`. Cell 0 is the
+// segment's action count and cell 1 is how many of those actions were `blank`,
+// which check_blank_use (entry/blank.id) needs to tell padding from work.
 
 seg_walk(int[] body, string fname, int ln, int[] acc) {
   int i = 0;
@@ -17,19 +19,21 @@ seg_walk(int[] body, string fname, int ln, int[] acc) {
     i = i + 1;
   }
 } return void;
-given full_env ([], "f", 1, [0]):() then check_failed:(0)
-given full_env ([], "g", 2, [0]):() then check_failed:(0)
+given full_env ([], "f", 1, [0, 0]):() then check_failed:(0)
+given full_env ([], "g", 2, [0, 0]):() then check_failed:(0)
 
 seg_step(int[] body, string fname, int ln, int[] acc, int i) {
   if(k_of(body[i]) == "chain") {
-    seg_close(fname, ln, acc, 1);
+    int nxt = next_cost(body, i);
+    seg_close(fname, ln, acc, 1, nxt);
   } else {
     int a = stmt_actions(body[i]);
     lset(acc, 0, acc[0] + a);
+    blank_tally(acc, body[i]);
   }
 } return void;
-given fn_fixture ((import fixture_params), "f", 1, [0], 0):() then check_failed:(0)
-given fn_fixture ((import fixture_params), "g", 2, [0], 0):() then check_failed:(0)
+given fn_fixture ((import fixture_params), "f", 1, [0, 0], 0):() then check_failed:(0)
+given fn_fixture ((import fixture_params), "g", 2, [0, 0], 0):() then check_failed:(0)
 
 // Closing a segment: report it if it ran over, report it if a chain follows a
 // segment that still had room, then start the next at zero. `at_seam` is 1
@@ -37,15 +41,22 @@ given fn_fixture ((import fixture_params), "g", 2, [0], 0):() then check_failed:
 // second rule applies only at a seam, because the final segment is allowed to
 // stop wherever the function stops. The two conditions cannot both hold, so
 // nothing is reported twice.
-seg_close(string fname, int ln, int[] acc, int at_seam) {
+//
+// `nxt` is what the first statement after the seam costs, and is 0 when no
+// seam closed this segment: check_blank_use needs it to know whether that
+// statement could have been moved up instead of padded around.
+seg_close(string fname, int ln, int[] acc, int at_seam, int nxt) {
   if(acc[0] > 3) {
     report_actions(fname, acc[0], ln);
   }
   if(at_seam == 1 && acc[0] < 3) {
     report_short_seg(fname, acc[0], ln);
   }
+  check_blank_use(fname, ln, acc, at_seam, nxt);
+} chain (string fname, int ln, int[] acc, int at_seam, int nxt) {
   lset(acc, 0, 0);
+  lset(acc, 1, 0);
 } return void;
-given full_env ("f", 1, [0], 0):() then check_failed:(0)
-given full_env ("f", 1, [4], 0):() then check_failed:(1)
-given full_env ("f", 1, [2], 1):() then check_failed:(1)
+given full_env ("f", 1, [0, 0], 0, 0):() then check_failed:(0)
+given full_env ("f", 1, [4, 0], 0, 0):() then check_failed:(1)
+given full_env ("f", 1, [2, 0], 1, 0):() then check_failed:(1)

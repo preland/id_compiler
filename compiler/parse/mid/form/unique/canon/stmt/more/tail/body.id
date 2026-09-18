@@ -1,0 +1,16 @@
+// The join half of canon_body, split out so that canon_body has an action to
+// spend on dropping `blank` nodes first.
+//
+// The split is here rather than at the five call sites because `id` forbids a
+// call inside a call's argument: canon_body(blank_drop(x)) is illegal, so
+// filtering outside would cost every caller a named intermediate, and four of
+// the five callers are already at the action limit.
+
+canon_join(int[] stmts) {
+  string out = "";
+  int i = 0;
+  while(i < len(stmts)) {
+    out = out + sep_at(";", i) + canon_stmt(stmts[i]);
+    i = i + 1;
+  }
+} return string out;

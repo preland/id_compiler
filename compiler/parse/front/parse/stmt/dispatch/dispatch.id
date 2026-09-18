@@ -28,7 +28,7 @@ parse_stmt3(int[] pos) {
   if(is_decl_start(pos)) {
     node = parse_decl(pos);
   } else {
-    node = parse_stmt4(pos);
+    node = parse_blank_or(pos);
   }
 } return int node;
 given stmt_tokens ([42]):(1)

@@ -27,11 +27,11 @@ canon_else3(int[] els) {
 // Statements in order, separated by `;`. The order matters twice over: it is
 // the logic being fingerprinted, and it is what decides the position each
 // local name is given.
+// `blank` nodes are dropped before the join rather than skipped inside it: the
+// separator comes from sep_at(";", i), which keys off the index, so a skipped
+// element would still leave its comma behind and a padded function would
+// fingerprint differently from the same function unpadded.
 canon_body(int[] stmts) {
-  string out = "";
-  int i = 0;
-  while(i < len(stmts)) {
-    out = out + sep_at(";", i) + canon_stmt(stmts[i]);
-    i = i + 1;
-  }
-} return string out;
+  int[] kept = blank_drop(stmts);
+  string ret_s = canon_join(kept);
+} return string ret_s;

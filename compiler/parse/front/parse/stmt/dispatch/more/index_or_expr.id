@@ -13,6 +13,22 @@ parse_stmt5(int[] pos) {
 given atom_tokens ([33]):(4)
 given atom_tokens ([0]):(4)
 
+// `blank` occupies an action slot and does nothing. It exists so that a segment
+// which must reach three actions before a chain can do so when the chain's
+// first action cannot be lifted into it -- an if/else-if chain being the case
+// in point, since splitting one would leave the chain unable to be spun back
+// out into its own function later.
+parse_blank_or(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "blank") {
+    node = parse_blank(pos);
+  } else {
+    node = parse_stmt4(pos);
+  }
+} return int node;
+given stmt_tokens ([42]):(1)
+given stmt_tokens ([9]):(5)
+
 pp2(int[] pos) {
   int node = 0;
   if(cur_text(pos) == "[") {
