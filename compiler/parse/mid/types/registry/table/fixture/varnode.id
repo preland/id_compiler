@@ -21,3 +21,17 @@ fnval_call_fixture() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// A call one level down inside a unary node, for has_call's recursive
+// descent (mid/names/limits/expr/). Nothing else in the tree wraps a call:
+// every un, bin, index and arr fixture is built over a literal, so hc_more's
+// `un` arm had no case that could reach it. Filed here because every file
+// under limits/expr/ is at the three-function cap and both of its
+// directories are at the three-entry one.
+hidden_call_fixture() {
+  fn_idx_fixture();
+  export int hc_call = node_call("fx_target", (import fixture_params));
+  export int hc_un = node_un("!", (import hc_call));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

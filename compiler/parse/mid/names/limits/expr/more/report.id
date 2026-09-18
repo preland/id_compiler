@@ -9,6 +9,8 @@ ret_shape_err(int id, int e) {
   string shape_word_v = shape_word(e);
   tc_err(e, "the return clause of '" + s1_of_v + "' is " + shape_word_v + "; it must be a name or a literal -- name the value in the body and return the name");
 } return void;
+given fn_fixture ((import fixture_fn), (import fixture_zero)):() then prints:("<stdin>:1: error: the return clause of 'fx_target' is an expression; it must be a name or a literal -- name the value in the body and return the name\n")
+given fn_fixture ((import fixture_zero), (import fixture_zero)):() then prints:("<stdin>:1: error: the return clause of '0' is an expression; it must be a name or a literal -- name the value in the body and return the name\n")
 
 shape_word(int e) {
   string w = "an expression";
@@ -18,6 +20,8 @@ shape_word(int e) {
     w = "a list literal";
   }
 } return string w;
+given lencall_fixture ((import lencall_node)):("a call")
+given arith_fixture ((import ev_node)):("an expression")
 
 // How many arguments a call's own argument list holds, named so the while
 // in chk_flat_args does not put a call inside len()'s argument. Placed here,
@@ -27,3 +31,5 @@ flat_arg_count(int id) {
   int[] args = l1_of(id);
   int n = len(args);
 } return int n;
+given lencall_fixture ((import lencall_node)):(1)
+given arith_fixture ((import ev_node)):(0)
