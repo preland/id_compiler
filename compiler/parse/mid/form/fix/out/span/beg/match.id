@@ -17,6 +17,8 @@ fix_match(int c, string opn, string cls) {
     d = d + fix_depth(t0, opn, cls);
   }
 } return int t0;
+given stmt_tokens (14, "(", ")"):(10)
+given stmt_tokens (33, "(", ")"):(29)
 
 fix_depth(int t0, string opn, string cls) {
   int d = 0;
@@ -26,3 +28,5 @@ fix_depth(int t0, string opn, string cls) {
     d = 0 - 1;
   }
 } return int d;
+given stmt_tokens (14, "(", ")"):(1)
+given stmt_tokens (10, "(", ")"):(-1)
