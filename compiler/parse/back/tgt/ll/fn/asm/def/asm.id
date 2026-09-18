@@ -13,12 +13,16 @@ ll_asm_all(string triple) {
     i = i + 1;
   }
 } return void;
+given llasm_row_fixture ("elsewhere"):() then prints:("")
+given llasm_row_fixture ("x86_64-unknown-none"):() then prints:("define i32 @id_portout(i32 %a0) noinline {\n  %r = call i32 asm sideeffect \"mov $1, $$0\\0A\\09ret\", \"=r,r,~{memory}\"(i32 %a0)\n  ret i32 %r\n}\n")
 
 ll_asm_row(int i, string triple) {
   if((import aftriple)[i] == triple) {
     ll_asm_one(i);
   }
 } return void;
+given llasm_row_fixture (0, "elsewhere"):() then prints:("")
+given llasm_row_fixture (0, "x86_64-unknown-none"):() then prints:("define i32 @id_portout(i32 %a0) noinline {\n  %r = call i32 asm sideeffect \"mov $1, $$0\\0A\\09ret\", \"=r,r,~{memory}\"(i32 %a0)\n  ret i32 %r\n}\n")
 
 // noinline, and it matters: the block clobbers whatever registers its
 // instructions name, and `id` has no way to declare that. Kept out of line, a
@@ -32,3 +36,5 @@ ll_asm_one(int r) {
   ll_asm_body(r);
   emit_line("}");
 } return void;
+given llasm_row_fixture (0):() then prints:("define i32 @id_portout(i32 %a0) noinline {\n  %r = call i32 asm sideeffect \"mov $1, $$0\\0A\\09ret\", \"=r,r,~{memory}\"(i32 %a0)\n  ret i32 %r\n}\n")
+given llasm_row2_fixture (1):() then prints:("define ptr @id_barrier() noinline {\n  %r = call ptr asm sideeffect \"nop\", \"=r,~{memory}\"()\n  ret ptr %r\n}\n")

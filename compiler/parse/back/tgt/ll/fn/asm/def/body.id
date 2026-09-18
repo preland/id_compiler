@@ -8,6 +8,8 @@ ll_asm_par(int r) {
     i = i + 1;
   }
 } return string s;
+given llasm_row_fixture (0):("i32 %a0")
+given llasm_row2_fixture (1):("")
 
 // Volatile with a memory clobber on every block, as in the C target: a wrong
 // hand-written clobber list is a miscompile that appears months later, and the
@@ -18,6 +20,8 @@ ll_asm_body(int r) {
   string q = chr(34);
   ll_asm_body2(r, ty, q);
 } return void;
+given llasm_row_fixture (0):() then prints:("  %r = call i32 asm sideeffect \"mov $1, $$0\\0A\\09ret\", \"=r,r,~{memory}\"(i32 %a0)\n  ret i32 %r\n")
+given llasm_row2_fixture (1):() then prints:("  %r = call ptr asm sideeffect \"nop\", \"=r,~{memory}\"()\n  ret ptr %r\n")
 
 // One `=r` for the result, one `r` per parameter, then the memory clobber.
 ll_asm_cons(int r, int i) {
@@ -28,3 +32,5 @@ ll_asm_cons(int r, int i) {
   }
   string ret_s = s + ",~{memory}";
 } return string ret_s;
+given llasm_row_fixture (0, 0):("=r,r,~{memory}")
+given llasm_row_fixture (0, 1):("=r,~{memory}")

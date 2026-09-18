@@ -5,9 +5,20 @@
 // operand would have to grow those in step. Filed here because
 // ../fixture.id is at the three-function limit and ll_asm_body2 below is
 // itself a caller of ll_asm_text.
+// A whole second asm row: a `string` return, no parameters, and a one-line
+// body with no operand reference. The tables are parallel, so a row present
+// in one of them alone is usable only by a function reading that one --
+// aflines by itself serves ll_asm_text and nothing else, which is what the
+// first version of this fixture got wrong. afretn is left alone because only
+// ll_asm_ix reads it and no case asks it about row 1.
 llasm_row2_fixture() {
   llasm_row_fixture();
   push((import aflines), ["\"nop\""]);
+  push((import afname), "barrier");
+} chain () {
+  push((import aftriple), "x86_64-unknown-none");
+  push((import afret), "string");
+  push((import afparams), []);
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
@@ -19,9 +30,13 @@ ll_asm_body2(int r, string ty, string q) {
   string cons = ll_asm_cons(r, 0);
   ll_asm_body3(r, ty, q, text, cons);
 } return void;
+given llasm_row_fixture (0, "i32", "\""):() then prints:("  %r = call i32 asm sideeffect \"mov $1, $$0\\0A\\09ret\", \"=r,r,~{memory}\"(i32 %a0)\n  ret i32 %r\n")
+given llasm_row2_fixture (1, "ptr", "\""):() then prints:("  %r = call ptr asm sideeffect \"nop\", \"=r,~{memory}\"()\n  ret ptr %r\n")
 
 ll_asm_body3(int r, string ty, string q, string text, string cons) {
   string par = ll_asm_par(r);
   emit_line("  %r = call " + ty + " asm sideeffect " + q + text + q + ", " + q + cons + q + "(" + par + ")");
   emit_line("  ret " + ty + " %r");
 } return void;
+given llasm_row_fixture (0, "i32", "\"", "nop", "=r"):() then prints:("  %r = call i32 asm sideeffect \"nop\", \"=r\"(i32 %a0)\n  ret i32 %r\n")
+given llasm_row_fixture (0, "ptr", "\"", "ret", "=r,r"):() then prints:("  %r = call ptr asm sideeffect \"ret\", \"=r,r\"(i32 %a0)\n  ret ptr %r\n")

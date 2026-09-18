@@ -33,6 +33,8 @@ llasm_row_fixture() {
   push((import afparams), [pnode]);
 } chain () {
   push((import aflines), ["\"mov %[x], $0\"", "\"ret\""]);
+  push((import afname), "portout");
+  push((import aftriple), "x86_64-unknown-none");
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
