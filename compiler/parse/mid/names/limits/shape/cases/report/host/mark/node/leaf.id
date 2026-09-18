@@ -23,6 +23,8 @@ ut_leaf(string callee_nm) {
     what_s = "asm '" + callee_nm + "', which has no body for that triple (defined for: " + asm_triples_v + ")";
   }
 } return string what_s;
+given ut_asm_seeded ("foo"):("asm 'foo', which has no body for that triple (defined for: x86_64-unknown-linux-gnu)")
+given ut_asm_seeded ("bar"):("")
 
 ut_native(string callee_nm) {
   string what_s = "";

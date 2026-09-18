@@ -1,4 +1,21 @@
 
+// An asm row defined for a triple that is not the build host's, which is the
+// one shape ut_leaf (mid/names/limits/shape/cases/report/host/mark/node/
+// leaf.id) reports on: the function exists in afname, but asm_row finds no
+// body for the host, so a harness built for the host cannot reach it.
+//
+// Two fixtures had to meet for that. ut_host_seeded drives the flag chain, the
+// only thing that exports hostc, and sets the triple to x86_64-unknown-none;
+// asmfx_push seeds a row for x86_64-unknown-linux-gnu. Filed beside asmfx.id's
+// own fixture because every directory under cases/report/ is at the
+// three-entry cap and every file in it at the three-function cap.
+ut_asm_seeded() {
+  ut_host_seeded();
+  asmfx_push();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 // The tail of main, once setup and load have already run.
 // id 3: an "import" leaf reading "cfg"; id 4: "x + 3", a "bin" node.
 lz_c() {
