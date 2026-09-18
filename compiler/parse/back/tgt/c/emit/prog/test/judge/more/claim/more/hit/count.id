@@ -6,6 +6,8 @@ group_sep(string out) {
     so = "";
   }
 } return string so;
+(""):("")
+("0"):(", ")
 
 claim_count(int c) {
   int n = 0;

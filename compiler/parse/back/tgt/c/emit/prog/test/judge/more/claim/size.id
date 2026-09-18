@@ -16,6 +16,8 @@ case_size(int ci) {
     so = sizes_c(args);
   }
 } return string so;
+given claim_conscase_fixture (0):("0")
+given case_fixture (0):("0")
 
 case_claims(int ci) {
   int r = 0;
