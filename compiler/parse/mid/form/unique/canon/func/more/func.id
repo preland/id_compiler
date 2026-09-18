@@ -23,6 +23,8 @@ canon_params(int[] params) {
     i = i + 1;
   }
 } return string out;
+given canon_begun_fixture ((import f_none)):("")
+given paramlist_begun_fixture ((import f_pgen_list)):("int 0")
 
 // A parameter contributes its type, which is part of the signature, and its
 // position, which is not its name: `f(int a)` and `f(int b)` are one function.
@@ -31,3 +33,5 @@ canon_param(int id) {
   string out = cn(s2_of_v);
   string ret_s = s1_of(id) + " " + out;
 } return string ret_s;
+given param_begun_fixture ((import f_pa)):("int 0")
+given paramlist_begun_fixture ((import f_pgen)):("int 0")

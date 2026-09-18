@@ -37,3 +37,5 @@ canon_var(int id) {
     out = "v" + cn(name);
   }
 } return string out;
+given lz_b ((import lz_var)):("v0")
+given cn_seeded_fixture ((import lz_var)):("v1")

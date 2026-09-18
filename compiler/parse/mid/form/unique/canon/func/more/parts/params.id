@@ -1,0 +1,17 @@
+// A parameter list with a canonicalisation begun over it, for canon_params.
+//
+// gn_env (mid/names/exports/reach/branch.id) is the one fixture that exports a
+// list of parameter nodes rather than a bare one, and its chain reaches
+// fwd_env, so the symbol index is there too. param_begun_fixture cannot be
+// reused: farm_a is a sibling of gn_env's base rather than a link in its
+// chain, so f_pgen_list is not set under it.
+//
+// Filed as its own file because native.id and tail.id are both at the
+// three-function limit; this directory had room for a third entry.
+
+paramlist_begun_fixture() {
+  gn_env();
+  uq_begin("f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
