@@ -7,6 +7,8 @@ sym_func(int id) {
     add_func(s1_of_v, s2_of_v, id);
   }
 } return void;
+given fn_idx_fixture ((import fixture_fn)):() then asmfx_fn_count:(2)
+given fn_idx_fixture ((import fixture_zero)):() then asmfx_fn_count:(1)
 
 // The unit comes along because the table is keyed by it: a name may be an int
 // in the program and a string in an imported library, and a lookup has to know
@@ -16,6 +18,8 @@ add_var(string name, string type, int unit) {
   push((import vunit), unit);
   vidx_add(name);
 } return void;
+given call2_setup ("newv", "int", 0):() then vnames_len:(1)
+given fcall_reg_b ("newv2", "int", 0):() then vnames_len:(2)
 
 // The node id comes along so that a call site can reach the parameter list
 // and the return clause: a name and a return type answer "what does this
@@ -26,3 +30,5 @@ add_func(string name, string ret, int id) {
   push((import fnodes), id);
   fidx_add(name);
 } return void;
+given call2_setup ("newf", "int", 0):() then asmfx_fn_count:(1)
+given argfn_d ("newf2", "int", 0):() then asmfx_fn_count:(2)

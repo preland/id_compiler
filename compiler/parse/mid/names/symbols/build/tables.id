@@ -9,6 +9,8 @@ build_syms() {
     i = i + 1;
   }
 } return void;
+given fn_idx_fixture ():() then asmfx_fn_count:(2)
+given elif_fixture ():() then asmfx_fn_count:(0)
 
 sym_one(int id) {
   if(is_vardecl(id)) {
@@ -19,6 +21,8 @@ sym_one(int id) {
     sym_func(id);
   }
 } return void;
+given fn_idx_fixture ((import fixture_fn)):() then asmfx_fn_count:(2)
+given fn_idx_fixture ((import fixture_zero)):() then asmfx_fn_count:(1)
 
 is_vardecl(int id) {
   int ok = 0;
@@ -26,3 +30,5 @@ is_vardecl(int id) {
     ok = 1;
   }
 } return int ok;
+given elif_fixture ((import decl_node)):(1)
+given elif_fixture ((import if_node)):(0)

@@ -24,8 +24,8 @@ hc_at(int[] xs, int ok, int i) {
     hit = has_call(xs[i]);
   }
 } return int hit;
-given elif_fixture ((import no_stmts), 1, 0):(1)
-given elif_fixture ((import elif_body), 0, 0):(0)
+given edge_fixture ((import edge_body), 0, 0):(1)
+given edge_fixture ((import edge_body), 0, 1):(0)
 
 is_plain(int e) {
   int ok = 0;
