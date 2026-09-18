@@ -8,6 +8,8 @@ fix_paren_rec(string p1, string p2) {
   fix_emit_pt(p1, "(");
   fix_emit_pt(p2, ")");
 } return void;
+given fix_fixture ("1|0", "1|9"):() then calls fix_emit_pt:("1|0", "(")
+given fix_fixture ("1|0", "1|9"):() then calls fix_emit_pt:("1|9", ")")
 
 fix_in_moved(int c) {
   int b = fix_nbeg(c);

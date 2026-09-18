@@ -7,15 +7,21 @@ asm_stmt(int r) {
   string chr_v = chr(34);
   asm_stmt2(r, asm_text_v, chr_v);
 } return void;
+given llasm_row_fixture (0):() then calls asm_stmt2:[1]
+given llasm_row2_fixture (0):() then calls asm_stmt2:[1]
 
 asm_stmt2(int r, string asm_text_v, string chr_v) {
   string chr_v2 = chr(34);
   string asm_in_ops_v = asm_in_ops((import afparams)[r]);
   asm_stmt3(r, asm_text_v, chr_v, chr_v2, asm_in_ops_v);
 } return void;
+given llasm_row_fixture (0, "T", "Q"):() then calls asm_stmt3:[1]
+given llasm_row_fixture (0, "U", "Z"):() then calls asm_stmt3:[1]
 
 asm_stmt3(int r, string asm_text_v, string chr_v, string chr_v2, string asm_in_ops_v) {
   string chr_v3 = chr(34);
   string chr_v4 = chr(34);
   asm_stmt_lines(r, asm_text_v, chr_v, chr_v2, asm_in_ops_v, chr_v3, chr_v4);
 } return void;
+given llasm_row_fixture (0, "T", "Q", "Q", "OPS"):() then calls asm_stmt_lines:[1]
+given llasm_row_fixture (0, "U", "Z", "Z", ""):() then calls asm_stmt_lines:[1]

@@ -16,3 +16,19 @@ fix_ev_reset5() {
   export string[] fixe_an = [];
   export int[] fixe_ru = [];
 } return void;
+
+// How many events have been marked for a declaration of their own, and how
+// many have been named. A `then` check takes no parameters, so a function
+// whose whole effect is a push or an lset on one of these columns can only be
+// observed through a reader of it -- fix_sep_at and fix_mark_sep
+// (../../../decide/touch/sep.id) are what this one is for.
+fixe_sep_count() {
+  int n = 0;
+  int i = 0;
+  while(i < len((import fixe_sep))) {
+    n = n + (import fixe_sep)[i];
+    i = i + 1;
+  }
+} return int n;
+given fix_fixture ():(0)
+given fix_touch_fixture ():(0)

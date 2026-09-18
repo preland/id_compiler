@@ -2,6 +2,8 @@ fix_paren_two(int x, int a, int b) {
   fix_paren_side(x, a);
   fix_paren_side(x, b);
 } return void;
+given lz_c ((import lz_binid), (import lz_var), (import lz_i1)):() then calls fix_paren_side:[2]
+given lz_c ((import lz_binid), (import lz_i1), (import lz_i1)):() then calls fix_paren_side:[2]
 
 // Not inside text another edit of this run moves: that text is copied from the
 // source as it was, and gets its parentheses on the next run.
