@@ -52,3 +52,5 @@ canon_callee(string name) {
     out = "v" + cn(name);
   }
 } return string out;
+given lz_a ("test"):("self")
+given lz_a ("nobody"):("nobody")

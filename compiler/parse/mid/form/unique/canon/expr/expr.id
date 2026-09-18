@@ -45,6 +45,8 @@ ce2(int id) {
     out = canon_var(id);
   }
 } return string out;
+given lz_a ((import lz_str)):("Shi")
+given lz_c ((import lz_imp)):("g(cfg)")
 
 // An imported global keeps its name: two functions that differ only by which
 // global they read are different functions.
@@ -57,3 +59,5 @@ ce3(int id) {
     out = canon_bin(id);
   }
 } return string out;
+given lz_c ((import lz_imp)):("g(cfg)")
+given lz_c ((import lz_i1)):("?int#2")
