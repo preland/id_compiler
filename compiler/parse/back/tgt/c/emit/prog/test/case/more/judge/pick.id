@@ -7,6 +7,8 @@ emit_expd_decl(int fn, int[] expd, int j) {
   string cv = tc_value(expd[j], pt);
   emit_tc_decl(pt, "idtc_e" + j, cv);
 } return void;
+given chk_fixture ((import fixture_fn), (import fixture_chk_one), 0):() then prints:("    int idtc_e0 = 1;\n")
+given chk_fixture ((import fixture_fn), (import fixture_chk_zero), 0):() then prints:("    int idtc_e0 = 0;\n")
 
 chk_name(int fn, int j) {
   string nm = "idtc_got";

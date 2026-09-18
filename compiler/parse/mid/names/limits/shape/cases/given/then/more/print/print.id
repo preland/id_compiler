@@ -41,6 +41,8 @@ chk_fixture() {
   push((import prog), (import fixture_chk_fn));
   export int fixture_chk_node = newnode("then", (import fixture_ci), 0, "chk", "", (import fixture_chk_one), (import fixture_chk_one));
   push((import thennode), (import fixture_chk_node));
+} chain () {
+  export int[] fixture_chk_zero = [(import fixture_zero)];
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)

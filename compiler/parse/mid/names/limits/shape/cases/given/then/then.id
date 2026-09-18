@@ -10,6 +10,8 @@ fit_then(int ti) {
   string kind = k_of(chk_node);
   fit_then_kind(kind, chk_node);
 } return void;
+given print_fixture (0):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
+given calls_node_fixture (0):() then prints:("")
 
 fit_then_kind(string kind, int chk_node) {
   if(kind == "then") {

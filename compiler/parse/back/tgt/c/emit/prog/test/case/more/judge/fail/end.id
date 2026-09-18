@@ -16,6 +16,7 @@ emit_case_fail(int ci) {
   int[] expd = l2_of((import casenode)[ci]);
   emit_fail_lines(ci, fn, expd);
 } return void;
+given wrap_fixture (0):() then prints:("    if (!((idtc_got == idtc_e0))) {\n        fprintf(stderr, \"%s: test failed: %s = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_got);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_fail_lines(int ci, int fn, int[] expd) {
   string cnd = case_cond(fn, expd);
