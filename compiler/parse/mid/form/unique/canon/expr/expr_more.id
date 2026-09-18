@@ -14,6 +14,8 @@ ce4(int id) {
     out = "ix" + canon_pair(i1_of_v2, i2_of_v);
   }
 } return string out;
+given un_fixture ((import neg_node)):("u-(I7)")
+given lw_fix_arr ((import fix_arr_n)):("ar(I1)")
 
 // The end of the chain. Its default is reached only by an expression kind
 // nobody above recognised, which today cannot happen -- every kind the parser
@@ -32,6 +34,8 @@ ce5(int id) {
     out = "ar(" + canon_args(l1_of_v2) + ")";
   }
 } return string out;
+given lw_fix_arr ((import fix_arr_n)):("ar(I1)")
+given lw_fix_arr_empty ((import fix_arr_empty_n)):("ar()")
 
 // A callee keeps its name -- except a call to the function being canonicalised
 // itself, which becomes a fixed marker so that two identical recursive

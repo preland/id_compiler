@@ -33,6 +33,8 @@ canon_expr(int id) {
     out = "F" + s1_of(id);
   }
 } return string out;
+given un_fixture ((import ev_node)):("I7")
+given un_fixture ((import neg_node)):("u-(I7)")
 
 ce2(int id) {
   string out = ce3(id);
