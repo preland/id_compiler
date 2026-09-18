@@ -37,3 +37,5 @@ count_cases(int node) {
     i = i + 1;
   }
 } return int n;
+given case_fidx_fixture ((import fixture_fn)):(2)
+given case_fidx_fixture2 ((import fixture_zero)):(1)

@@ -11,6 +11,20 @@ arg_reqtests(int argc, string[] argv, int i, int ok) {
     r = arg_reqtests(argc, argv, i + 1, ok);
   }
 } return int r;
+(2, ["prog", "--require-tests"], 1, 0):(1)
+(2, ["prog", "--other"], 1, 0):(0)
+
+// The flag cell turned on, for require_tests's own "yes" case. reqtests_set
+// has a pair proving the cell flips, but require_tests takes no arguments, so
+// its two cases have to differ by setup rather than by argument. Filed beside
+// the flag scanner because flag.id and count.id are both at the
+// three-function cap and this directory is at the three-entry one.
+reqtests_flagged() {
+  flags_setup();
+  reqtests_set(1);
+} return void;
+():() then require_tests:(1)
+():() then check_failed:(0)
 
 // Which functions cannot be tested on the build host is decided before either
 // check that reads it: a case that would never run, and the minimum
