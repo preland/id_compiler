@@ -14,6 +14,8 @@ fold_op2(string op, int a, int b) {
     ret_s = compute_div(a, b);
   }
 } return string ret_s;
+("*", 2, 3):("I6")
+("%", 10, 3):("I1")
 
 compute_mul(int a, int b) {
   word prod = mul_word(a, b);

@@ -13,6 +13,8 @@ fold_op3(string op, int a, int b) {
     ret_s = compute_and(a, b);
   }
 } return string ret_s;
+("&", 12, 10):("I8")
+("|", 12, 10):("I14")
 
 compute_mod(int a, int b) {
   string ret_s = "";

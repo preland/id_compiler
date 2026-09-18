@@ -22,3 +22,5 @@ ident_one(string op, int lid, int rid) {
     ret_s = canon_expr(rid);
   }
 } return string ret_s;
+given fixture_one_fx ("*", (import fixture_zero), (import fixture_one)):("I0")
+given fixture_one_fx ("+", (import fixture_zero), (import fixture_one)):("")

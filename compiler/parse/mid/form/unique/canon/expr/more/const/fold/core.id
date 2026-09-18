@@ -18,6 +18,8 @@ bin_fold2(string op, int lid, int rid) {
     ret_s = fold_op(op, a, b);
   }
 } return string ret_s;
+given un_fixture ("+", (import ev_node), (import ev_node)):("I14")
+given un_fixture ("==", (import ev_node), (import ev_node)):("")
 
 // A `word` result that turned out to still fit an int folds to it; one that
 // does not is the signal that the fold was not width-safe, so it is not

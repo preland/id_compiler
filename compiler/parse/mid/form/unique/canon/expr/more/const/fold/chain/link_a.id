@@ -18,6 +18,8 @@ fold_op(string op, int a, int b) {
     ret_s = compute_sub(a, b);
   }
 } return string ret_s;
+("+", 1, 2):("I3")
+("*", 2, 3):("I6")
 
 // a + b overflows an int when a is more than INT_MAX - b past zero; written
 // this way so the check itself cannot overflow.

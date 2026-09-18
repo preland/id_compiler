@@ -11,6 +11,8 @@ fold_op4(string op, int a, int b) {
     ret_s = compute_xor(a, b);
   }
 } return string ret_s;
+("|", 12, 10):("I14")
+(">>", 16, 2):("I4")
 
 compute_or(int a, int b) {
   int n = a | b;

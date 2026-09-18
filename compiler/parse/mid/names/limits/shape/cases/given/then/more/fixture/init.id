@@ -12,6 +12,17 @@ case_fixture_init() {
 given case_fixture ():() then check_failed:(0)
 given case_fixture ():() then init_units:(0)
 
+// The integer literal 1, beside fixture_zero (fn.id) because fn.id is at the
+// three-function limit. The identity rules in canon/expr/more/const/ident/
+// need a literal 1 for x*1, 1*x and x/1, and nothing in the tree exported
+// one -- fixture_zero was the only 0-or-1 literal there was.
+fixture_one_fx() {
+  fn_fixture();
+  export int fixture_one = node_int("1", 1, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 // fn.id's last step: fx_target registered where func_node/find_str look.
 fn_fixture_reg() {
   push((import fnames), "fx_target");
