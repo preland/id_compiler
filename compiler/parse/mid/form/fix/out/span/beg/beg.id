@@ -9,6 +9,8 @@ fix_ibeg(int e) {
     t0 = fix_match(c, "(", ")") - 1;
   }
 } return int t0;
+given fix_span_fixture ((import sp_e)):(0)
+given fix_gcl_nodes (0):(0)
 
 fix_ibeg2(int e) {
   int t0 = fix_ibeg3(e);
@@ -17,6 +19,8 @@ fix_ibeg2(int e) {
     t0 = fix_match(c, "[", "]");
   }
 } return int t0;
+given fix_span_fixture ((import sp_e)):(2)
+given fix_gcl_nodes (0):(0)
 
 fix_ibeg3(int e) {
   int t0 = fix_ibeg4(e);
@@ -25,3 +29,5 @@ fix_ibeg3(int e) {
     t0 = fix_nbeg(a);
   }
 } return int t0;
+given fix_span_fixture ((import sp_e)):(2)
+given fix_gcl_nodes (0):(0)
