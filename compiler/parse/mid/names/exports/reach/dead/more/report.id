@@ -22,3 +22,5 @@ dead_err(int id) {
   string export_owner_v = export_owner(s1_of_v);
   tc_err(id, "'" + s1_of_v + "' is exported by '" + export_owner_v + "', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call '" + export_owner_v + "' from main's setup chain");
 } return void;
+given dead_exp_fixture ((import dead_imp_a)):() then prints:("<stdin>:1: error: 'gx' is exported by 'setup_fn', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call 'setup_fn' from main's setup chain\n") then check_failed:(1)
+given dead_exp_fixture ((import dead_imp_b)):() then prints:("<stdin>:1: error: 'gy' is exported by 'other_fn', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call 'other_fn' from main's setup chain\n") then check_failed:(1)

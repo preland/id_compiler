@@ -13,3 +13,18 @@ regrow_prog() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// Two exported names whose owners are not in rfn, and an import node reading
+// each: what dead_err (report.id) reports on. rfn starts as ["main",
+// "conf.id"] (../check.id), so any other owner is unreachable, which is the
+// state the message describes.
+dead_exp_fixture() {
+  env_init();
+  add_export("gx", "int", "setup_fn");
+  add_export("gy", "int", "other_fn");
+} chain () {
+  export int dead_imp_a = node_import("gx");
+  export int dead_imp_b = node_import("gy");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
