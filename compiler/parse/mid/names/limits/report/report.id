@@ -15,6 +15,8 @@ report_actions(string fname, int n, int ln) {
   print(loc_at_v + "a block in '" + fname + "' performs " + n + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- continue the function into a chain: `} chain (same parameters) {`");
   note_failure();
 } return void;
+given edge_fixture ("fx_target", 4, 4):() then prints:("fixture.id:4: error: a block in 'fx_target' performs 4 actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- continue the function into a chain: `} chain (same parameters) {`\n")
+given edge_fixture ("nosuchfn", 5, 9):() then prints:("<stdin>:9: error: a block in 'nosuchfn' performs 5 actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- continue the function into a chain: `} chain (same parameters) {`\n")
 
 report_deep(string fname, int depth, int ln) {
   string loc_at_v = loc_at(fname, ln);

@@ -25,3 +25,5 @@ report_short_seg(string fname, int n, int ln) {
   print(loc_at_v + "a segment of '" + fname + "' performs " + n + " actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead");
   note_failure();
 } return void;
+given edge_fixture ("fx_target", 2, 4):() then prints:("fixture.id:4: error: a segment of 'fx_target' performs 2 actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead\n")
+given edge_fixture ("nosuchfn", 1, 9):() then prints:("<stdin>:9: error: a segment of 'nosuchfn' performs 1 actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead\n")

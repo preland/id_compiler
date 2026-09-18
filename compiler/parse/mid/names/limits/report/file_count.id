@@ -36,3 +36,5 @@ count_file(string name) {
     i = i + 1;
   }
 } return int n;
+given edge_fixture ("fixture.id"):(2)
+given edge_fixture ("other.id"):(0)

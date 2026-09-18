@@ -16,8 +16,12 @@ first_of_file(int i) {
     n = n + 1;
   }
 } return int r;
+given edge_fixture (0):(1)
+given edge_fixture (1):(0)
 
 report_funcs(string name, int n) {
   note_failure();
   print(name + ":1: error: too many functions in this file (" + n + "); the limit is 3 per file");
 } return void;
+given edge_fixture ("a.id", 4):() then prints:("a.id:1: error: too many functions in this file (4); the limit is 3 per file\n")
+given edge_fixture ("b.id", 9):() then prints:("b.id:1: error: too many functions in this file (9); the limit is 3 per file\n")
