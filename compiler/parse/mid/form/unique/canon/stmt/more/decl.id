@@ -12,6 +12,7 @@ canon_decl(int id) {
 } chain (int id) {
   string ret_s = out + s1_of(id) + " " + nm + "=" + canon_expr(i1_of_v);
 } return string ret_s;
+given lz_j ((import lz_edecl)):("ed:int z=I3")
 
 // The declared name: positional for a local, verbatim for an export, since an
 // exported name is a reserved global that the rest of the program reads by
@@ -22,6 +23,8 @@ decl_name(int id) {
     out = cn(out);
   }
 } return string out;
+given lz_j ((import lz_edecl)):("z")
+given lz_j (16):("z")
 
 // `base[index] = value`. The parser folds the parsed index target into the
 // node's two int fields and puts the value in a one-element list.

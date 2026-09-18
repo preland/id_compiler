@@ -14,3 +14,4 @@ canon_join(int[] stmts) {
     i = i + 1;
   }
 } return string out;
+given elif_fixture ((import no_stmts)):("")

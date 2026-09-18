@@ -35,6 +35,8 @@ blank_drop(int[] stmts) {
     i = i + 1;
   }
 } return int[] kept;
+given elif_fixture ((import no_stmts)):([])
+given elif_fixture ((import elif_body)):((import elif_body))
 
 blank_push(int[] kept, int id) {
   if(k_of(id) != "blank") {

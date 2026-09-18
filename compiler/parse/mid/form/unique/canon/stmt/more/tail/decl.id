@@ -8,6 +8,8 @@ decl_tag(int id) {
     out = "ed:";
   }
 } return string out;
+given gdecl_fixture ((import decl_node)):("d:")
+given gdecl_fixture ((import gdecl_node)):("ed:")
 
 iassign_tail(int id, string head) {
   int i2_of_v = i2_of(id);

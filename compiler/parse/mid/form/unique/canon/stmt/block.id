@@ -35,3 +35,4 @@ canon_body(int[] stmts) {
   int[] kept = blank_drop(stmts);
   string ret_s = canon_join(kept);
 } return string ret_s;
+given elif_fixture ((import no_stmts)):("")
