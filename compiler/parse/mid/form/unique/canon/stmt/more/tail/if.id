@@ -8,6 +8,8 @@ iassign_val(int id, string head, string key) {
   string val = canon_expr(l1_of_v[0]);
   string ret_s = "ia:" + head + "[" + key + "]=" + val;
 } return string ret_s;
+given iassign_begun_fixture ((import fix_iassign_n), "H", "K"):("ia:H[K]=I9")
+given iassign_begun_fixture ((import fix_iassign_n), "X", "Y"):("ia:X[Y]=I9")
 
 cst_if(int id) {
   int i1_of_v = i1_of(id);
@@ -17,3 +19,15 @@ cst_if(int id) {
   int i2_of_v = i2_of(id);
   string out = "if(" + canon_expr(i1_of_v) + "){" + canon_body(l1_of_v) + "}" + canon_else2(l2_of_v, i2_of_v);
 } return string out;
+given elif_begun_fixture ((import if_node)):("if(I7){d:int 0=I7}")
+given elif_begun_fixture ((import else_node)):("if(I7){d:int 0=I7}else{d:int 0=I7}")
+
+// elif_fixture's if nodes with a canonicalisation begun over them: cst_if and
+// canon_else2 reach canon_body, which reaches cn() for the declared name, and
+// that reads the position map only uq_begin exports.
+elif_begun_fixture() {
+  elif_fixture();
+  uq_begin("f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

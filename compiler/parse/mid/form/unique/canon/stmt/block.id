@@ -13,6 +13,8 @@ canon_else2(int[] els, int elif) {
     out = canon_else3(els);
   }
 } return string out;
+given elif_begun_fixture ((import else_stmts), 0):("else{if(I7){d:int 0=I7}else{d:int 0=I7}}")
+given elif_begun_fixture ((import no_stmts), 0):("")
 
 // An empty `else { }` adds nothing, matching idc.py, where an empty else list
 // is falsy and the arm is skipped. It costs an action, but the action limit is

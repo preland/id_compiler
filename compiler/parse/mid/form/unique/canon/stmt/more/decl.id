@@ -34,3 +34,4 @@ canon_iassign(int id) {
   string head = canon_expr(i1_of_v);
   string ret_s = iassign_tail(id, head);
 } return string ret_s;
+given iassign_begun_fixture ((import fix_iassign_n)):("ia:I1[I0]=I9")

@@ -16,3 +16,15 @@ iassign_tail(int id, string head) {
   string key = canon_expr(i2_of_v);
   string ret_s = iassign_val(id, head, key);
 } return string ret_s;
+given iassign_begun_fixture ((import fix_iassign_n), "H"):("ia:H[I0]=I9")
+given iassign_begun_fixture ((import fix_iassign_n), "X"):("ia:X[I0]=I9")
+
+// lw_fix_iassign's `xs[i] = 9` node with a canonicalisation begun over it:
+// canon_iassign and its two tails reach canon_expr, which reaches cn() for a
+// local name, and that reads the position map only uq_begin exports.
+iassign_begun_fixture() {
+  lw_fix_iassign();
+  uq_begin("f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
