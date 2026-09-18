@@ -5,6 +5,8 @@ ll_asm_tok(int r, string s, int i) {
   int c = charat(s, i);
   string out = ll_asm_tok_sel(r, s, i, c);
 } return string out;
+given llasm_row_fixture (0, "$0", 0):("$$")
+given llasm_row_fixture (0, "%[x]", 0):("$1")
 
 ll_asm_ref(int r, string s, int i) {
   string out = "%";
@@ -12,6 +14,8 @@ ll_asm_ref(int r, string s, int i) {
     out = ll_asm_ref2(r, s, i);
   }
 } return string out;
+given llasm_row_fixture (0, "%[x]", 0):("$1")
+given llasm_row_fixture (0, "%%y", 0):("%")
 
 // `%[name]` is operand N; `%x[name]` is operand N under LLVM's modifier x,
 // which is how a byte or word view of a register is asked for -- `%b[c]` for
@@ -24,3 +28,5 @@ ll_asm_ref2(int r, string s, int i) {
     out = "${" + ll_asm_ix(r, nm) + ":" + chr(charat_v) + "}";
   }
 } return string out;
+given llasm_row_fixture (0, "%[x]", 0):("$1")
+given llasm_row_fixture (0, "%b[x]", 0):("${1:b}")

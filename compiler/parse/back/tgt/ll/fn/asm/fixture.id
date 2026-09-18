@@ -32,7 +32,7 @@ llasm_row_fixture() {
   int pnode = node_param("param", "int", "x");
   push((import afparams), [pnode]);
 } chain () {
-  push((import aflines), ["\"mov %[x], $0\""]);
+  push((import aflines), ["\"mov %[x], $0\"", "\"ret\""]);
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)

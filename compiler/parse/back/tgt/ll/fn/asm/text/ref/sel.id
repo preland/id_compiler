@@ -7,6 +7,8 @@ ll_asm_tok_sel(int r, string s, int i, int c) {
     out = ll_asm_ref(r, s, i);
   }
 } return string out;
+given llasm_row_fixture (0, "$0", 0, 36):("$$")
+given llasm_row_fixture (0, "ab", 0, 97):("a")
 
 // Where the operand name in `%[name]` (or `%x[name]`) runs, so `ll_asm_ref2`
 // can slice it out.

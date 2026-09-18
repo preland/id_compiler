@@ -1,3 +1,17 @@
+// A second asm row, so ll_asm_text (../text/text.id) has two rows to tell
+// apart rather than one. Its line carries no operand reference, which is what
+// keeps this to a single push: ll_asm_line reaches ll_asm_ix only for a
+// `%[name]` token, and ll_asm_ix reads afretn and afparams, so a row with an
+// operand would have to grow those in step. Filed here because
+// ../fixture.id is at the three-function limit and ll_asm_body2 below is
+// itself a caller of ll_asm_text.
+llasm_row2_fixture() {
+  llasm_row_fixture();
+  push((import aflines), ["\"nop\""]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 // The rest of `ll_asm_body`: the text and constraint string, then the two
 // lines of the block.
 ll_asm_body2(int r, string ty, string q) {
