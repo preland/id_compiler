@@ -18,4 +18,6 @@ bin_simplify(int id, string op) {
     ret_s = bin_identity(op, lid, rid);
   }
 } return string ret_s;
+given lz_c ((import lz_binid), "+"):("")
+given arith_fixture ((import bin_node), "+"):("I14")
 
