@@ -9,6 +9,8 @@ ut_what(string callee_nm) {
     what_s = (import utwhat)[ut_k];
   }
 } return string what_s;
+given ut_host_seeded ("port_byte"):("asm 'in8'")
+given ut_host_seeded ("nothing_marked"):("")
 
 // An `asm` function runs on the host only through a body for the host's own
 // triple. That body is the overload the harness selects, exactly as any build

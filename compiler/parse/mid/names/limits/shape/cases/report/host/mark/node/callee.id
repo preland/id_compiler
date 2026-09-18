@@ -17,6 +17,8 @@ ut_via(string callee_nm) {
     via_nm = callee_nm;
   }
 } return string via_nm;
+given ut_host_seeded ("caller"):("caller")
+given ut_host_seeded ("port_byte"):("")
 
 ut_add(string fname, string what_s, string via_s) {
   push((import utname), fname);
