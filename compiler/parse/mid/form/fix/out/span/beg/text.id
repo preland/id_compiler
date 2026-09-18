@@ -16,5 +16,3 @@ fix_span(int e) {
   int c = fix_nend(e);
   string ret_s = fix_at(b) + "|" + fix_after(c);
 } return string ret_s;
-given fix_span_fixture ((import sp_e)):("1|0|1|-1")
-given fix_gcl_nodes (0):("1|0|1|-1")
