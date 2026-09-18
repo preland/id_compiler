@@ -23,6 +23,8 @@ canon_else3(int[] els) {
     out = "else{" + canon_body(els) + "}";
   }
 } return string out;
+given elif_fixture ((import no_stmts)):("")
+given canon_begun_fixture ((import lz_body1)):("else{d:int 0=I3;e:c(foo:I3)}")
 
 // Statements in order, separated by `;`. The order matters twice over: it is
 // the logic being fingerprinted, and it is what decides the position each
@@ -36,3 +38,4 @@ canon_body(int[] stmts) {
   string ret_s = canon_join(kept);
 } return string ret_s;
 given elif_fixture ((import no_stmts)):("")
+given canon_begun_fixture ((import lz_body1)):("d:int 0=I3;e:c(foo:I3)")

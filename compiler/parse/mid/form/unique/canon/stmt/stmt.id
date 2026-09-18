@@ -15,6 +15,8 @@ canon_stmt(int id) {
     out = "a:" + cn(s1_of_v) + "=" + canon_expr(i1_of_v);
   }
 } return string out;
+given canon_begun_fixture ((import lz_declid)):("d:int 0=I3")
+given canon_begun_fixture ((import lz_assignid)):("a:0=I3")
 
 cst2(int id) {
   string out = cst3(id);
@@ -26,6 +28,8 @@ cst2(int id) {
     out = "e:" + canon_expr(i1_of_v);
   }
 } return string out;
+given canon_begun_fixture ((import lz_exprstmt)):("e:c(foo:I3)")
+given blank_stmts_fixture ((import chain_node)):("|")
 
 // The two compound statements. An if carries its else arm (which may be
 // nothing at all), and the two are told apart by their tag, so `if(c){}` and
@@ -42,3 +46,5 @@ cst3(int id) {
     out = "wh(" + canon_expr(i1_of_v2) + "){" + canon_body(l1_of_v2) + "}";
   }
 } return string out;
+given blank_stmts_fixture ((import chain_node)):("|")
+given blank_stmts_fixture ((import blank_node)):("")

@@ -15,11 +15,23 @@ canon_join(int[] stmts) {
   }
 } return string out;
 given elif_fixture ((import no_stmts)):("")
+given canon_begun_fixture ((import lz_body1)):("d:int 0=I3;e:c(foo:I3)")
 
 // A `blank` statement and a list holding one, for the filter cst4 and
 // blank_drop exist for. Nothing else in the tree builds a node of that kind:
 // parse_blank (front/parse/stmt/form/more.id) is the only constructor, and it
 // takes a token cursor, so the leaf is built the same way here.
+// lz_g's program with a canonicalisation begun over it. Every statement form
+// below decl reaches cn() for a local name, which reads the position map that
+// only uq_begin exports -- and no lz_* fixture runs it, because the loose
+// canonicaliser calls uq_begin itself from lz_func.
+canon_begun_fixture() {
+  lz_g();
+  uq_begin("f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 blank_stmts_fixture() {
   lz_g();
   export int blank_node = newleaf("blank", 0, 0, "", "");
