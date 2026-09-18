@@ -16,6 +16,8 @@ ll_asm_sep(int i) {
     s = "\\0A\\09";
   }
 } return string s;
+(0):("")
+(3):("\\0A\\09")
 
 // A line arrives with its quotes, so the scan runs between them.
 ll_asm_line(int r, string s) {

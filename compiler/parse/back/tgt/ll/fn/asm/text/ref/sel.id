@@ -15,3 +15,5 @@ ll_asm_ref2_nm(string s, int i) {
   int end_v = ll_asm_end(s, i);
   string ret_s = slice(s, nm_v, end_v);
 } return string ret_s;
+("%[a]", 0):("a")
+("%w[bc]", 0):("bc")

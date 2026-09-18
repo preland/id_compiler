@@ -8,6 +8,8 @@ ll_asm_step(string s, int i) {
     n = ll_asm_end(s, i) + 1;
   }
 } return int n;
+("%%y", 0):(2)
+("ab", 0):(1)
 
 ll_asm_end(string s, int i) {
   int n = i;
@@ -15,6 +17,8 @@ ll_asm_end(string s, int i) {
     n = n + 1;
   }
 } return int n;
+("x%[a]", 1):(4)
+("abc", 0):(3)
 
 // Where the operand name starts: past `%[`, or past `%x[` when a modifier
 // letter comes first.
@@ -24,3 +28,5 @@ ll_asm_nm(string s, int i) {
     n = i + 3;
   }
 } return int n;
+("%[a]", 0):(2)
+("%w[a]", 0):(3)
