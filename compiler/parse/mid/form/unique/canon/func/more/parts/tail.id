@@ -15,6 +15,8 @@ canon_func_tail(int id, string out) {
     ret_s = canon_logic(id, out);
   }
 } return string ret_s;
+given canon_begun_j_fixture (11, ""):("()->int{d:int 0=I3;e:c(foo:I3)}=>v0")
+given canon_begun_j_fixture (15, ""):("()->void{d:int 0=I3}=>void")
 
 canon_logic(int id, string out) {
   int[] l2_of_v = l2_of(id);
