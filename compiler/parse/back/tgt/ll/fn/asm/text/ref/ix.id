@@ -6,6 +6,8 @@ ll_asm_ix(int r, string nm) {
     n = ll_asm_pix(r, nm) + 1;
   }
 } return int n;
+given llasm_row_fixture (0, "result"):(0)
+given llasm_row_fixture (0, "x"):(1)
 
 ll_asm_pix(int r, string nm) {
   int i = 0;
@@ -15,6 +17,8 @@ ll_asm_pix(int r, string nm) {
     i = i + 1;
   }
 } return int found;
+given llasm_row_fixture (0, "x"):(0)
+given llasm_row_fixture (0, "nosuch"):(-1)
 
 ll_asm_pm(int r, int i, string nm, int found) {
   int v = found;
@@ -22,3 +26,5 @@ ll_asm_pm(int r, int i, string nm, int found) {
     v = i;
   }
 } return int v;
+given llasm_row_fixture (0, 0, "x", -1):(0)
+given llasm_row_fixture (0, 0, "nosuch", -1):(-1)
