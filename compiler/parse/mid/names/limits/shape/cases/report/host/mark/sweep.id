@@ -3,6 +3,18 @@
 // the previous function ended through its own node. Returns the set's size
 // before the sweep, so ut_loop stops when a sweep marks nothing.
 
+// One row in the untestable set, for the why/ functions that read it. ut_add
+// is the only writer and nothing pre-populates the tables, so ut_at returned
+// -1 for every name and ut_because indexed utvia at -1 -- a trap rather than
+// an answer. Seeded with the shape docs/TESTS.md uses as its example: an asm
+// function with no body for the build host's triple.
+ut_seeded() {
+  notes_base();
+  ut_add("port_byte", "asm 'in8'", "*");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 ut_loop() {
   int n = 0 - 1;
   while(n != len((import utname))) {

@@ -22,7 +22,7 @@ sym_one(int id) {
   }
 } return void;
 given fn_idx_fixture ((import fixture_fn)):() then asmfx_fn_count:(2)
-given fn_idx_fixture ((import fixture_zero)):() then asmfx_fn_count:(1)
+given farm_a ((import f_pa)):() then vnames_len:(1)
 
 is_vardecl(int id) {
   int ok = 0;

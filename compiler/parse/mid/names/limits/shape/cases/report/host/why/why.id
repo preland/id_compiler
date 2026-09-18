@@ -4,6 +4,8 @@
 ut_at(string name) {
   int ut_k = find_str((import utname), name);
 } return int ut_k;
+given ut_seeded ("port_byte"):(0)
+given ut_seeded ("fx_target"):(-1)
 
 ut_why(string name) {
   string build_host_v = build_host();

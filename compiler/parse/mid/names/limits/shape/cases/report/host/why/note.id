@@ -9,6 +9,9 @@ ut_because_at(string via_s, string what_s) {
     ret_s = "it calls '" + via_s + "', which reaches " + what_s;
   }
 } return string ret_s;
+("*", "asm 'in8'"):("it is asm 'in8'")
+("g", "asm 'in8'"):("it calls 'g', which reaches asm 'in8'")
+("", "asm 'in8'"):("it reaches asm 'in8'")
 
 // A function short of two cases that cannot be tested on the build host is not
 // short: it needs none, and a note says why rather than the minimum being
