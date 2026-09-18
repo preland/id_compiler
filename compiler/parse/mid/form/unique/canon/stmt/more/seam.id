@@ -22,6 +22,8 @@ cst4(int id) {
     out = "";
   }
 } return string out;
+given blank_stmts_fixture ((import blank_node)):("")
+given blank_stmts_fixture ((import chain_node)):("|")
 
 // The statement list with every `blank` removed, which is what canon_body
 // hands to canon_join. A list is a reference, so `kept` can be filled in place
@@ -35,8 +37,8 @@ blank_drop(int[] stmts) {
     i = i + 1;
   }
 } return int[] kept;
+given blank_stmts_fixture ((import blank_body)):((import kept_body))
 given elif_fixture ((import no_stmts)):([])
-given elif_fixture ((import elif_body)):((import elif_body))
 
 blank_push(int[] kept, int id) {
   if(k_of(id) != "blank") {

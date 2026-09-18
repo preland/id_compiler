@@ -15,3 +15,18 @@ canon_join(int[] stmts) {
   }
 } return string out;
 given elif_fixture ((import no_stmts)):("")
+
+// A `blank` statement and a list holding one, for the filter cst4 and
+// blank_drop exist for. Nothing else in the tree builds a node of that kind:
+// parse_blank (front/parse/stmt/form/more.id) is the only constructor, and it
+// takes a token cursor, so the leaf is built the same way here.
+blank_stmts_fixture() {
+  lz_g();
+  export int blank_node = newleaf("blank", 0, 0, "", "");
+  export int chain_node = newleaf("chain", 0, 0, "", "");
+} chain () {
+  export int[] blank_body = [(import blank_node), (import lz_declid)];
+  export int[] kept_body = [(import lz_declid)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
