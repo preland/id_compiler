@@ -11,6 +11,24 @@ lz_b() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// Everything ut_why needs in one setup: the untestable tables seeded, a
+// second row whose reason is a named callee rather than the function itself,
+// and the build host's triple in its cell.
+//
+// The triple only arrives through the flag chain -- arg_flags4 is the one
+// function that exports hostc -- so nothing reaching build_host
+// (mid/names/exports/extern/tab/host.id) could be tested without driving it,
+// which is what flags_setup exists to allow. Two rows rather than one because
+// an unseeded name sends ut_at to -1 and ut_because then indexes utvia at -1,
+// so both of a pair's cases have to name a seeded function.
+ut_host_seeded() {
+  ut_seeded();
+  ut_add("caller", "asm 'in8'", "port_byte");
+  arg_flags4(3, ["prog", "--host-triple", "x86_64-unknown-none"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 arg_flag(int argc, string[] argv, int i, string name) {
   int r = 0;
   if(i < argc && argv[i] == name) {

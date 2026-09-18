@@ -12,8 +12,12 @@ ut_why(string name) {
   string because = ut_because(name);
   string ret_s = "cannot be tested on the build host (" + build_host_v + "): " + because;
 } return string ret_s;
+given ut_host_seeded ("port_byte"):("cannot be tested on the build host (x86_64-unknown-none): it is asm 'in8'")
+given ut_host_seeded ("caller"):("cannot be tested on the build host (x86_64-unknown-none): it calls 'port_byte', which reaches asm 'in8'")
 
 ut_because(string name) {
   int ut_k = ut_at(name);
   string ret_s = ut_because_at((import utvia)[ut_k], (import utwhat)[ut_k]);
 } return string ret_s;
+given ut_host_seeded ("port_byte"):("it is asm 'in8'")
+given ut_host_seeded ("caller"):("it calls 'port_byte', which reaches asm 'in8'")
