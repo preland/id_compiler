@@ -11,6 +11,17 @@ check_segs(int[] body, string fname, int ln) {
 given full_env ([], "f", 1):() then check_failed:(0)
 given full_env ([], "g", 2):() then check_failed:(0)
 
+// The tail of elif_fixture (../../actions/else_chain.id), which had no room
+// left in that directory. Two statement lists as exports rather than as list
+// literals in the cases themselves: an `(import NAME)` may be an argument of
+// a case but not an element of one of its list literals (docs/TESTS.md).
+elif_lists() {
+  export int[] else_stmts = [(import else_node)];
+  export int[] no_stmts = [];
+} return void;
+given nest_fixture ():() then check_failed:(0)
+given nest_fixture ():() then init_units:(0)
+
 regrow_c() {
   regrow_b();
   push((import dvexp), 0);

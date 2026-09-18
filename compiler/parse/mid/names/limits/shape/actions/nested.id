@@ -11,6 +11,21 @@ check_loop(int id, int depth, string fname) {
     check_block(l1_of_v, depth + 1, fname, (import nline)[id]);
   }
 } return void;
+given elif_fixture ((import while_node), 2, "f"):() then check_failed:(1)
+given elif_fixture ((import decl_node), 2, "f"):() then check_failed:(0)
+
+// The rest of elif_fixture (../actions/else_chain.id), which ran out of
+// actions. The `else if` node's else arm holds exactly one nested if -- the
+// shape the parser builds -- and the statement lists are exported because an
+// `(import NAME)` may be an argument but not an element of a list literal in
+// a case (docs/TESTS.md).
+elif_fixture2() {
+  export int elif_node = node_if((import ev_node), [(import decl_node)], [(import else_node)], 1);
+  export int[] elif_body = [(import elif_node)];
+  elif_lists();
+} return void;
+given nest_fixture ():() then check_failed:(0)
+given nest_fixture ():() then init_units:(0)
 
 check_if(int id, int depth, string fname) {
   int[] l1_of_v = l1_of(id);
@@ -23,3 +38,5 @@ check_if(int id, int depth, string fname) {
     check_plain_else(els, depth, fname, (import nline)[id]);
   }
 } return void;
+given elif_fixture ((import if_node), 2, "f"):() then check_failed:(1)
+given elif_fixture ((import if_node), 0, "f"):() then check_failed:(0)

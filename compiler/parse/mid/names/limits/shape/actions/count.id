@@ -14,6 +14,8 @@ count_actions(int[] stmts) {
     i = i + 1;
   }
 } return int n;
+given elif_fixture ((import elif_body)):(3)
+given elif_fixture ((import no_stmts)):(0)
 
 // A chain marker (front/parse/decl/func/sig/chain/tail.id) records where one
 // segment ends and the next begins. It is a seam, not a statement, so it costs
@@ -26,6 +28,8 @@ stmt_actions(int id) {
     n = 0;
   }
 } return int n;
+given elif_fixture ((import else_node)):(2)
+given elif_fixture ((import while_node)):(1)
 
 // ni2 is 0 when the if had no else arm at all. An *empty* `else { }` has an
 // empty else list but still costs an action, which is why the flag is asked
@@ -37,3 +41,5 @@ count_elses(int id) {
     n = 1 + chain_elses(id, els);
   }
 } return int n;
+given elif_fixture ((import else_node)):(1)
+given elif_fixture ((import if_node)):(0)
