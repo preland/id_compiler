@@ -14,3 +14,5 @@ fix_ev_reset() {
   export int[] fixe_lo = [];
   fix_ev_reset2();
 } return void;
+given fix_fixture ():() then calls fix_ev_reset2:[1]
+given fix_touch_fixture ():() then calls fix_ev_reset2:[1]

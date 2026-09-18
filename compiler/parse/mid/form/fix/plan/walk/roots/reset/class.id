@@ -6,3 +6,15 @@ fix_ev_reset2() {
   export int[] fixe_cd = [];
   fix_ev_reset3();
 } return void;
+given fix_fixture ():() then calls fix_ev_reset3:[1]
+given fix_touch_fixture ():() then calls fix_ev_reset3:[1]
+
+// fixe_ru holds one entry per event, so its length is what a function that
+// resets or pushes an event column changes. fix_ev_reset5 ends the reset
+// chain -- it calls nothing, so a `calls` clause cannot reach it and only a
+// reader of one of its own columns can.
+fixe_ru_len() {
+  int n = len((import fixe_ru));
+} return int n;
+given fix_fixture ():(0)
+given fix_span_fixture ():(1)

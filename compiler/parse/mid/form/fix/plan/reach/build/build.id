@@ -22,8 +22,12 @@ fix_winit() {
   export int[][] fixd_wadj = [];
   fix_winit2();
 } return void;
+given fix_fixture ():() then calls fix_winit2:[1]
+given fix_touch_fixture ():() then calls fix_winit2:[1]
 
 fix_winit2() {
   export int[] fixd_wq = [];
   fix_wfill();
 } return void;
+given fix_fixture ():() then calls fix_wfill:[1]
+given fix_touch_fixture ():() then calls fix_wfill:[1]

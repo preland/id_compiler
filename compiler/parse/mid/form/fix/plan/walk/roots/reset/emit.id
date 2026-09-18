@@ -7,6 +7,8 @@ fix_ev_reset4() {
   export string[] fixe_nm = [];
   fix_ev_reset5();
 } return void;
+given fix_fixture ():() then calls fix_ev_reset5:[1]
+given fix_touch_fixture ():() then calls fix_ev_reset5:[1]
 
 //   fixe_ru  1 for a call event whose name is reused from an earlier
 //            identical, still-trustworthy call (out/emit/name/pick/reuse/):

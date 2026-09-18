@@ -22,3 +22,5 @@ fix_state2() {
   export string[] fixd_file = [""];
   fix_state3();
 } return void;
+given fix_fixture ():() then calls fix_state3:[1]
+given fix_touch_fixture ():() then calls fix_state3:[1]
