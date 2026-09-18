@@ -8,6 +8,8 @@ ident_zero_right(string op, int lid, int rid) {
     ret_s = canon_expr(lid);
   }
 } return string ret_s;
+given fn_fixture ("-", (import fixture_zero), (import fixture_zero)):("I0")
+given fn_fixture ("+", (import fixture_zero), (import fixture_zero)):("")
 
 // x*1, 1*x and x/1 fingerprint as x. `1/x` is not a no-op, so it keeps its
 // own fingerprint.

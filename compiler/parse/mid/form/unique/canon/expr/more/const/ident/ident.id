@@ -16,6 +16,8 @@ bin_identity(string op, int lid, int rid) {
     ret_s = ident_one(op, lid, rid);
   }
 } return string ret_s;
+given fn_fixture ("-", (import fixture_zero), (import fixture_zero)):("I0")
+given fn_fixture ("&", (import fixture_zero), (import fixture_zero)):("")
 
 // Is node `nid` the integer literal `v`? A wide literal (too big for an
 // int) can never be 0 or 1, so it needs no separate check here.
@@ -25,6 +27,8 @@ lit_is(int nid, int v) {
     ok = 1;
   }
 } return int ok;
+given un_fixture ((import ev_node), 7):(1)
+given un_fixture ((import ev_node), 0):(0)
 
 ident_zero_sym(string op, int lid, int rid) {
   string ret_s = "";
@@ -35,3 +39,5 @@ ident_zero_sym(string op, int lid, int rid) {
     ret_s = canon_expr(rid);
   }
 } return string ret_s;
+given fn_fixture ("+", (import fixture_zero), (import fixture_zero)):("I0")
+given fn_fixture ("&", (import fixture_zero), (import fixture_zero)):("")
