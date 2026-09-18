@@ -1,14 +1,11 @@
 // Dispatch by node kind (../then.id), and the original check's own entry
 // point: what it names, then what it returns (got.id).
 //
-// KNOWN GAP: no case here drives the "then" branch (emit_then_check) with a
-// real check node. Emission assumes mid-check already accepted the case
-// (docs/TESTS.md): every check-shaped node this tree can build synthetically
-// is one mid-check would have rejected (fx_target takes an argument, "nope"
-// does not exist), and emit_then_got (pre-existing, not new) reads the
-// callee's return type unconditionally, which is what crashes on either.
-// emit_then_check itself has direct cases below on a node mid-check would
-// accept, if this fixture area grows a niladic, valid check target.
+// The "then" branch is driven by chk_fixture (mid/.../given/then/more/print/
+// print.id), whose "chk() return int" is the niladic, registered check
+// target the other fixtures here lack: fx_target takes an argument and
+// "nope" does not exist, and emit_then_got reads the callee's return type
+// unconditionally, so either would crash rather than emit.
 
 emit_then_kind(string kind, int ci, int ti, int node) {
   if(kind == "then") {
@@ -21,9 +18,12 @@ emit_then_kind(string kind, int ci, int ti, int node) {
 } return void;
 given print_fixture ("thenprints", (import fixture_ci), 0, (import fixture_print_node)):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 given calls_node_fixture ("thencalls", (import fixture_ci), 0, (import fixture_calls_node)):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_fx_target_n; idtc_j0++) {\n        if (idtc_rc_fx_target_seq[idtc_j0] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j0].x == 1))) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target(...) did not match; %d call(s) to 'fx_target' were recorded\\n\", idtc_where[0], idtc_call[0], idtc_rc_fx_target_n);\n        return 3;\n    }\n")
+given chk_fixture ("then", 0, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_then_check(int ci, int ti, int node) {
   string chk_nm = s1_of(node);
   int cfn = func_node(chk_nm);
   emit_then_got(ci, ti, chk_nm, cfn);
 } return void;
+given chk_fixture (0, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+given chk_fixture (2, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")

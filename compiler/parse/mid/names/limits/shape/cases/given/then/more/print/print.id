@@ -21,3 +21,26 @@ fit_print_items(int ci, int[] items) {
 } return void;
 given print_fixture ((import fixture_ci), (import fixture_print_two)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
 given print_fixture ((import fixture_ci), (import fixture_print_none)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
+
+// A check target mid-check would accept: "chk() return int", niladic where
+// fx_target takes an argument, registered where func_node looks, and its
+// "then" node pushed onto thennode -- what emission's check branch
+// (back/.../then/check/entry.id) needs and no fixture had. Here rather than
+// beside fixture_then_node (node.id) because that file is at the
+// three-function limit and this directory at the three-entry one; one
+// function with two chain seams is what the remaining slot holds.
+chk_fixture() {
+  fixture_one_fx();
+  int[] none = [];
+  export int[] fixture_chk_one = [(import fixture_one)];
+} chain () {
+  export int fixture_chk_fn = node_func("chk", "int", none, none, (import fixture_one));
+  push((import fnames), "chk");
+  push((import fnodes), (import fixture_chk_fn));
+} chain () {
+  push((import prog), (import fixture_chk_fn));
+  export int fixture_chk_node = newnode("then", (import fixture_ci), 0, "chk", "", (import fixture_chk_one), (import fixture_chk_one));
+  push((import thennode), (import fixture_chk_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
