@@ -8,6 +8,8 @@ fix_touches(int last) {
     i = i + 1;
   }
 } return int ok;
+given fix_touch_fixture (1):(1)
+given fix_touch_fixture (0):(0)
 
 fix_touch_at(int i, int ok) {
   int r = ok;
@@ -15,6 +17,8 @@ fix_touch_at(int i, int ok) {
     r = r | fix_call_touch((import fixe_n)[i]);
   }
 } return int r;
+given fix_touch_fixture (1, 0):(1)
+given fix_touch_fixture (0, 0):(0)
 
 // A builtin runs no id code. A call through a function value, or to a name
 // that is no function, could run anything.
@@ -29,3 +33,5 @@ fix_call_touch(int e) {
     ok = 0;
   }
 } return int ok;
+given fix_touch_fixture ((import ft_call)):(1)
+given fix_touch_fixture ((import ft_bcall)):(0)

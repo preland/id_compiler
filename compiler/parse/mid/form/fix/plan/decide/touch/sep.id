@@ -14,3 +14,32 @@ fix_sep_at(int i, int last) {
     lset((import fixe_sep), i, 1);
   }
 } return void;
+
+// Two events for the decide/ walks. fix_fixture exports every fixe_ column
+// but leaves them all empty, so a function that indexes one has nothing to
+// read: event 0 is a plain int node that does not move, event 1 a call to an
+// unregistered name that does. Seven columns is more than three actions, and
+// this directory is at its three-entry cap, so it is a chain rather than a
+// second file.
+fix_touch_fixture() {
+  fix_fixture();
+  int[] none = [];
+  export int ft_call = node_call("nosuchfn", none);
+} chain () {
+  int[] none2 = [];
+  export int ft_bcall = node_call("print", none2);
+  export int ft_lit = node_int("4", 4, 0);
+} chain () {
+  push((import fixe_n), (import ft_lit));
+  push((import fixe_n), (import ft_call));
+  push((import fixe_lo), 0);
+} chain () {
+  push((import fixe_lo), 0);
+  push((import fixe_mv), 0);
+  push((import fixe_mv), 1);
+} chain () {
+  push((import fixe_nt), "int");
+  push((import fixe_nt), "word");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
