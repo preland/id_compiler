@@ -7,3 +7,24 @@ fix_ev_reset3() {
 } return void;
 given fix_fixture ():() then calls fix_ev_reset4:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset4:[1]
+
+// fixe_nm holds one entry per event, pushed empty by fix_push4 (../../kind/
+// push.id) and set by fix_name_at (out/emit/name/name.id), so its length is
+// what a function that resets or pushes an event column changes. Filed here
+// rather than beside its export in emit.id, which is at its three-function
+// cap in a directory at its three-entry one.
+fixe_nm_len() {
+  int n = len((import fixe_nm));
+} return int n;
+given fix_fixture ():(0)
+given fix_push4_fixture ():(1)
+
+// One event pushed the way the walk pushes them: fix_fixture exports every
+// fixe_ column but leaves them all empty, so a reader of one of the columns
+// fix_push4 fills has nothing to tell apart without this.
+fix_push4_fixture() {
+  fix_fixture();
+  fix_push4(0, "int");
+} return void;
+():() then check_failed:(0)
+():() then fixe_nm_len:(1)

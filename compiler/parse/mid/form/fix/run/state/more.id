@@ -16,3 +16,13 @@ fix_ev_reset() {
 } return void;
 given fix_fixture ():() then calls fix_ev_reset2:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset2:[1]
+
+// The high end of the ranges fixd_lo_len counts, pushed in step with it by
+// fix_note_tok (out/emit/resid/rec.id). Filed here rather than beside its
+// export in grp/reset.id, which is at its three-function cap in a directory
+// at its three-entry one.
+fixd_hi_len() {
+  int n = len((import fixd_hi));
+} return int n;
+given fix_fixture ():(0)
+given fix_note_fixture ():(1)

@@ -16,6 +16,15 @@ init_opt() {
 given env_init ():(0) then check_failed:(0)
 given env_init ():(0) then pra_len_check:(0)
 
+// One row per block, pushed by m2r_row (../../mem/init/blank/blank.id) whose
+// whole effect is that push and outv's: nothing but a reader of one of the
+// two tables can see either happen.
+phiof_len() {
+  int n = len((import phiof));
+} return int n;
+given optfx_setup ():(0)
+given m2r_row_fixture ():(1)
+
 // The optimisation level, from `--opt N`. Level 0 emits the lowering as it
 // stands, which is the property that makes the lowering trustworthy: a program
 // built with every pass off must still be correct, so a wrong answer at -O1 is

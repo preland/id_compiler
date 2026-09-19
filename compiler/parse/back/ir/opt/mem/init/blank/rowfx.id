@@ -1,0 +1,12 @@
+// m2r_row (blank.id) pushes one blank row onto phiof and one onto outv, and
+// that is its whole effect, so a case can only see it through a reader of
+// one of those tables -- and a reader can only tell the push apart from the
+// reset that precedes it from a state where the tables are not empty.
+// optfx_setup (../../../run/pipe/cases/optfx.id) leaves both at zero.
+
+m2r_row_fixture() {
+  optfx_setup();
+  m2r_row();
+} return void;
+():() then check_failed:(0)
+():() then phiof_len:(1)

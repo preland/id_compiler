@@ -14,3 +14,12 @@ pra_len_check() {
 } return int n;
 given optfx_setup ():(0)
 given optfx_setup ():(0) then check_failed:(0)
+
+// The other table m2r_row pushes a row onto, read as pra_len_check reads
+// pra. Filed here rather than beside its export in ../../cell.id, which this
+// leaves at its three-function cap.
+outv_len() {
+  int n = len((import outv));
+} return int n;
+given optfx_setup ():(0)
+given m2r_row_fixture ():(1)

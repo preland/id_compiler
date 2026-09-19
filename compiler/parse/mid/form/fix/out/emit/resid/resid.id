@@ -8,3 +8,13 @@ fix_replace(int e, string name) {
   fix_emit_r(e, name);
   fix_note_span(e);
 } return void;
+
+// fixd_lo and fixd_hi (run/state/grp/reset.id) are pushed in step by
+// fix_note_tok (rec.id) and by nothing else, so a case that wants either of
+// them non-empty has to note a range itself: fix_fixture leaves both empty.
+fix_note_fixture() {
+  fix_fixture();
+  fix_note_tok(1, 2);
+} return void;
+():() then check_failed:(0)
+():() then fixd_lo_len:(1)
