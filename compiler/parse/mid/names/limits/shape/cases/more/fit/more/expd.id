@@ -11,6 +11,8 @@ fit_void(int i, int fn, int[] expd) {
     fit_items(i, fn, expd);
   }
 } return void;
+given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1\n")
+given print_fixture (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:[1]
 
 fit_ret(int i, int fn, int[] expd) {
   if(len(expd) != 1) {
@@ -21,3 +23,5 @@ fit_ret(int i, int fn, int[] expd) {
     fit_value(i, expd[0], rt);
   }
 } return void;
+given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2\n")
+given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one)):() then calls fit_value:[1]

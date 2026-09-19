@@ -43,6 +43,8 @@ check_names() {
   build_reg();
   check_access();
 } return void;
+given case_fixture ():() then calls build_reg:[1]
+given case_fixture ():() then calls check_access:[1]
 
 // The declaration registry: one row per parameter and per declaration, in the
 // order idc.py's register_var sees them. Every question the three rules ask is

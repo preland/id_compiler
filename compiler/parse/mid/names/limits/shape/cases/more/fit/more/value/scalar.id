@@ -17,3 +17,5 @@ ty_fits(string want, string lt) {
     r = 1;
   }
 } return int r;
+given case_fixture ("int", "int"):(1)
+given case_fixture ("int", "string"):(0)

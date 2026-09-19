@@ -21,9 +21,13 @@ fit_items(int i, int fn, int[] items) {
     j = j + 1;
   }
 } return void;
+given case_fixture (0, (import fixture_node), []):() then prints:("")
+given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one)):() then calls fit_item:[1]
 
 fit_item(int i, int fn, int[] items, int j) {
   int[] ps = l1_of(fn);
   string pt = s1_of(ps[j]);
   fit_value(i, items[j], pt);
 } return void;
+given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one), 0):() then calls fit_value:[1]
+given print_fixture (0, (import fixture_fn), (import fixture_print_two), 0):() then calls fit_value:[1]

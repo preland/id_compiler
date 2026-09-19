@@ -7,6 +7,8 @@ items_text(int[] xs) {
     j = j + 1;
   }
 } return string lt;
+([]):("")
+given calls_node_fixture ((import fixture_calls_one)):("1")
 
 // A leaf as written: its own text, or `(import NAME)` for an export a case
 // reads (front/parse/decl/func/cases/case/given/elem.id).

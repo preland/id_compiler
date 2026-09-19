@@ -9,9 +9,13 @@ reaches(string src_fn, string dst_fn) {
   reach_mark();
   int r = is_reach(dst_fn);
 } return int r;
+given case_fixture ("myfn", "myfn"):(1)
+given case_fixture ("myfn", "other"):(0)
 
 reach_seed(string src_fn) {
   init_reach();
   clear_strs((import rfn));
   push((import rfn), src_fn);
 } return void;
+given case_fixture ("myfn"):() then check_failed:(0)
+given case_fixture ("other"):() then check_failed:(0)

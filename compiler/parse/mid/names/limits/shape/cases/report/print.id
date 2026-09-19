@@ -6,11 +6,15 @@ cases_report(string prog_loc_v, string s1_of_v, int n) {
   print(prog_loc_v + "function '" + s1_of_v + "' has " + n + " test case(s); --require-tests needs at least 2 (see docs/TESTS.md)");
   note_failure();
 } return void;
+given case_fixture ("somefile.id:1: error: ", "myfunc", 5):() then prints:("somefile.id:1: error: function 'myfunc' has 5 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)\n")
+given case_fixture ("other.id:2: error: ", "otherfunc", 0):() then prints:("other.id:2: error: function 'otherfunc' has 0 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)\n")
 
 dup_case_report(string func_file_v, int i) {
   print(func_file_v + ":" + (import tline)[(import casestart)[i]] + ": error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)");
   note_failure();
 } return void;
+given case_fixture ("somefile.id", 0):() then prints:("somefile.id:4: error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)\n")
+given case_fixture ("other.id", 0):() then prints:("other.id:4: error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)\n")
 
 fnscope_fix() {
   regrow_fn();

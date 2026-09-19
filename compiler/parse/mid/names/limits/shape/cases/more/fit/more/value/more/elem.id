@@ -6,3 +6,5 @@ list_elem(string t) {
   int n = len(t);
   string et = slice(t, 0, n - 2);
 } return string et;
+("int[]"):("int")
+("string[]"):("string")

@@ -9,6 +9,8 @@ case_lit_type(int e) {
     lt = leaf_type(i1_of_v);
   }
 } return string lt;
+given fn_fixture ((import fixture_zero)):("int")
+given lw_fix_un ((import fix_un_n)):("int")
 
 leaf_type(int e) {
   string lt = "string";

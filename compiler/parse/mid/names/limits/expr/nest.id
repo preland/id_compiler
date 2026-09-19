@@ -11,6 +11,8 @@ chk_flat_args(int id) {
     i = chk_flat_at(id, i);
   }
 } return void;
+given cm_setup ((import cm_push_call)):() then prints:("")
+given cm_other_setup ((import cm_var_node)):() then prints:("")
 
 chk_flat_at(int id, int i) {
   int a = l1_of(id)[i];
@@ -29,3 +31,5 @@ has_call(int e) {
     ok = hc_kids(e);
   }
 } return int ok;
+given cm_setup ((import cm_push_call)):(1)
+given cm_other_setup ((import cm_var_node)):(0)
