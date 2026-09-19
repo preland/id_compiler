@@ -17,3 +17,5 @@ cw_say(string name, string rt, string lit) {
   string loc_at_v = dup_loc(name);
   print(loc_at_v + "'" + name + "' only returns the constant " + lit + "; declare it in conf.id as '" + rt + " " + name + " = " + lit + ";' and read it with (import " + name + ")");
 } return void;
+given env_init ("f", "int", "5"):() then prints:("<stdin>:1: error: 'f' only returns the constant 5; declare it in conf.id as 'int f = 5;' and read it with (import f)\n")
+given env_init ("g", "void", "0"):() then prints:("<stdin>:1: error: 'g' only returns the constant 0; declare it in conf.id as 'void g = 0;' and read it with (import g)\n")

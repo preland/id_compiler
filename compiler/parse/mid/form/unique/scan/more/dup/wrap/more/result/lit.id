@@ -23,3 +23,5 @@ cw_spell(string val) {
     lit = "0 - " + mag;
   }
 } return string lit;
+("I5"):("5")
+("I-3"):("0 - 3")

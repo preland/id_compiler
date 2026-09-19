@@ -33,3 +33,5 @@ fp_line(string name, string fp) {
   string tab = chr(9);
   string ret_s = fp + tab + name + tab + func_file(name) + ":" + func_line(name);
 } return string ret_s;
+given env_init ("f", "X"):("X\tf\t<stdin>:1")
+given env_init ("g", "Y"):("Y\tg\t<stdin>:1")

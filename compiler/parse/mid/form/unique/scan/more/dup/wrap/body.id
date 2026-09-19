@@ -35,3 +35,5 @@ cw_begin(string name) {
   export string[] cw_names = [];
   export string[] cw_vals = [];
 } return void;
+("foo"):() then cur_self:("foo")
+("bar"):() then cur_self:("bar")
