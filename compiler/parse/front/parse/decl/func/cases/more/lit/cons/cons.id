@@ -23,3 +23,15 @@ cons_one(int[] pos) {
 } return void;
 given cons_fix1 ([0]):() then prints:("<stdin>:1: error: expected ':', found ''\n<stdin>:1: error: expected '(', found ''\n")
 given bound_n_fix ([0]):() then prints:("<stdin>:1: error: unknown constraint 'O'; a case constrains 'time' or 'mem'\n<stdin>:1: error: expected ':', found '('\n<stdin>:1: error: expected '(', found 'n'\n")
+
+// cons_push (rest.id) pushes the three claim columns in step, one entry each
+// per claim, so a reader of any one of them sees that push happen -- but only
+// that one: deleting either of the other two pushes would leave this count
+// exactly where it was. That is why each column has a reader of its own, and
+// why cons_push's cases check all three at once: the columns must grow
+// together, and only asserting them together says so.
+conscase_len() {
+  int n = len((import conscase));
+} return int n;
+given case_fixture ():(0)
+given claim_conscase_fixture ():(1)

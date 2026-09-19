@@ -1,3 +1,8 @@
+// fixd_wq is deliberately left uncased, on blast radius rather than cost: a
+// regression changes which functions --fix treats as reachable, so the worst
+// outcome is a repair suggestion missed or offered spuriously, and --fix
+// output is read before it is applied. Nothing wrong is emitted. That does
+// not pay for a reader and the fixture it would need (../build/fill.id).
 fix_wseed(int ow) {
   if(ow >= 0 && (import fixd_wm)[ow] == 0) {
     lset((import fixd_wm), ow, 1);

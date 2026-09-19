@@ -26,6 +26,12 @@ ll_asm_ref2_nm(string s, int i) {
 // functions, and the asm subtree this belongs to has room in no other file --
 // so it sits two directories from llasm_row_fixture, which pushes the row it
 // counts.
+// parse_asm_mid, the writer, is deliberately left uncased: reaching it needs
+// a token stream standing at the triple string, and every asm fixture in the
+// tree starts at the body brace instead, so pinning its one push would take a
+// new fixture spanning the parser cursor and a whole declaration. Dropped on
+// fixture cost, not because the push is uninteresting -- so this reader is
+// ready for that case rather than witnessing one today.
 aftriple_len() {
   int n = len((import aftriple));
 } return int n;

@@ -13,6 +13,13 @@ fix_gcl() {
 given env_init ():() then check_failed:(0)
 given fix_gcl_nodes ():() then check_failed:(0)
 
+// fixd_gcl is deliberately left uncased, on fixture cost. fix_gcl exports it
+// and runs both writers in one chain -- this fill, then fix_gcl_at over ngrp
+// (../more.id) -- so every setup that reaches the export has already applied
+// them, and the values fix_gcl_at reads come from ngrpc, which the token
+// loader fills and no fix fixture does. Telling the lset apart would need
+// grouping-paren token state built by hand: fix state plus the lexer, two
+// subsystems for one write.
 fix_gcl_fill() {
   int i = 0;
   while(i < len((import nkind))) {

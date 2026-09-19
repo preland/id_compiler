@@ -7,6 +7,13 @@ chk_l() {
 given ir_rows ():([])
 given ir_rows_chk1 ():([])
 
+// ihome is written both ways -- pushed as -1 when an instruction is made
+// (../insn/cols.id) and lset to a real block by ir_add (../../edit/place.id)
+// and m2r_front_fin (opt/mem/phi/more.id) -- but it wants no summing reader
+// of the kind outv and phiof have. This one already pins which cell holds
+// what, which is the stronger statement; a sum could not tell a pushed -1
+// from an lset of -1 somewhere else. There is no gap here, unlike the tables
+// recorded elsewhere as deliberately uncovered.
 chk_home() {
   int ret_i = ir_home((import chk_id)[0]);
 } return int ret_i;

@@ -16,6 +16,10 @@ take_resv_name(string src, int i) {
   int ret_i = e + 1;
 } return int ret_i;
 
+// resv_names is deliberately left uncased, because a regression here is
+// caught louder downstream: a reserved word let through as an identifier, or
+// one rejected that was fine, fails immediately in the checks that read this
+// table. A reader would be a second witness to something already unmissable.
 push_resv_name(string src, int i, int e) {
   string slice_v = slice(src, i, e);
   push((import resv_names), slice_v);

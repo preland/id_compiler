@@ -1,3 +1,11 @@
+// fixd_wm and fixd_wadj are deliberately left uncased, on fixture cost. Both
+// are written two ways -- fixd_wm pushed as a literal 0 here and lset to 1 by
+// fix_wseed (../edge/ref/seed.id) -- so a length reader would be blind to the
+// lset and a sum blind to a push of zero, and witnessing either needs both
+// readers. The obstacle is the fixture: len(fnames) is 0 under every fix
+// fixture, because nothing there registers a function name, so this loop
+// pushes nothing and fix_wseed would index an empty table. A case would need
+// fix state and name registration together -- two subsystems, for one lset.
 fix_wfill() {
   int i = 0;
   while(i < len((import fnames))) {

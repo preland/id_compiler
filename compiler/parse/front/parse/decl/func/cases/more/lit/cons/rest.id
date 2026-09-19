@@ -22,3 +22,5 @@ cons_push(int n, string ck, string bt) {
   push((import conskind), ck);
   push((import consbound), bt);
 } return void;
+given case_fixture (1, "time", "O(n)"):() then conscase_len:(1) then conskind_len:(1) then consbound_len:(1)
+given claim_conscase_fixture (2, "mem", "O(1)"):() then conscase_len:(2) then conskind_len:(1) then consbound_len:(1)

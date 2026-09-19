@@ -9,3 +9,23 @@ then_push_kind(string kind, string s1v, int[] items) {
 } return void;
 given fn_fixture ("thenprints", "", []):()
 given fn_fixture ("theneprints", "", [1]):()
+
+// The kind a claim constrains, pushed by cons_push (../../../../more/lit/
+// cons/rest.id) beside the case index and the bound. Filed here because the
+// cons directory has one free function slot and the three parallel columns
+// need a reader each -- conscase_len (../../../../more/lit/cons/cons.id) says
+// why one cannot stand for the others.
+conskind_len() {
+  int n = len((import conskind));
+} return int n;
+given case_fixture ():(0)
+given claim_cols_fixture ():(2)
+
+// The bound a claim gives that kind, the third of the three. claim_cols_rest
+// (back/tgt/c/emit/prog/test/judge/more/claim/more/group.id) reaches
+// claim_cols_bounds, so the fixture that leaves one kind row leaves two.
+consbound_len() {
+  int n = len((import consbound));
+} return int n;
+given case_fixture ():(0)
+given claim_cols_fixture ():(2)
