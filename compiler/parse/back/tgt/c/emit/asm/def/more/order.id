@@ -17,3 +17,16 @@ asm_error(string name, string triple) {
   print("error: no 'asm' definition of '" + name + "' for target '" + triple + "'; defined for: " + asm_triples_v);
   note_failure();
 } return void;
+
+// Row 1 as emit_asm_one needs it: llasm_row2_fixture (../../../ll/fn/asm/def/
+// more.id) leaves afretn unpushed, because only ll_asm_ix reads it and no
+// case there asks about row 1 -- but emit_asm_decl reads it for every row, so
+// without this the row traps instead of emitting. init_tyc is here for the
+// same reason it is in casm_row_fixture: c_type reads tyc.
+casm_row2_fixture() {
+  llasm_row2_fixture();
+  init_tyc();
+  push((import afretn), "out");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

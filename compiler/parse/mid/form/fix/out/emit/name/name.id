@@ -31,3 +31,5 @@ fix_name_at(int i) {
     sset((import fixe_nm), i, name);
   }
 } return void;
+given fix_nameat_fixture (0):() then fixe_nm_named:(1)
+given fix_nameat_fixture (1):() then fixe_nm_named:(0)

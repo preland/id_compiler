@@ -28,3 +28,21 @@ fix_mark(int sn, int last) {
     fix_refuse(last, why);
   }
 } return void;
+
+// fix_mark_cls (one.id) records its answer in place: it lsets a 1 into a cell
+// that already exists, so the column's length never changes and fixe_mv_len
+// (moves.id) cannot see it happen. Summing the column can, because a cell
+// that changes changes the total. It reports that some event was marked, not
+// which one, so it anchors a regression rather than pinning a cell -- a sum
+// that stayed still would also hide two writes that cancelled, which this
+// column cannot do, since the only value ever written to it here is 1.
+fixe_mv_sum() {
+  int n = 0;
+  int i = 0;
+  while(i < len((import fixe_mv))) {
+    n = n + (import fixe_mv)[i];
+    i = i + 1;
+  }
+} return int n;
+given fix_fixture ():(0)
+given fix_touch_fixture ():(1)

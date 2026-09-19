@@ -1,0 +1,28 @@
+// ir_rows leaves function 0's entry block holding one instruction, an "add",
+// so m2r_collect_at has nothing to collect there: only an alloca is a
+// promotable slot. This appends one to that same block, and runs init_opt so
+// that pra exists to collect into -- env_init does not reach it, which is why
+// optfx_setup calls it separately.
+
+m2r_alloca_fixture() {
+  ir_rows();
+  int r = init_opt();
+  int v = ir_leaf("alloca", "int", 0 - 1, 0 - 1, "x");
+} chain () {
+  ir_add(0, v);
+} return void;
+():() then pra_len_check:(0)
+():() then check_failed:(0)
+
+// A row with a cell in it. m2r_row fills each row to len(pra), so outv's
+// rows stay empty until a slot has been collected, and a sum over an empty
+// row is 0 whatever the writers do. Collecting the alloca above gives pra
+// its one entry, and m2r_row then pushes the one-cell row that the in-place
+// writers in walk/body/ need to have somewhere to write.
+m2r_outv_fixture() {
+  m2r_alloca_fixture();
+  m2r_collect_at(0, 1);
+  m2r_row();
+} return void;
+():() then outv_sum:(-1)
+():() then pra_len_check:(1)

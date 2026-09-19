@@ -13,6 +13,17 @@ lz_k() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// c_type reads tyc through c_scalar (prog/code/func/ctype/ctype.id), and
+// nothing in the llasm chain declares it: an export whose declaration never
+// runs is a null pointer in the generated C, so emit_asm_one faulted instead
+// of diagnosing. init_tyc is what a real build runs before it emits any C.
+casm_row_fixture() {
+  llasm_row_fixture();
+  init_tyc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 asm_stmt_lines(int r, string asm_text_v, string chr_v, string chr_v2, string asm_in_ops_v, string chr_v3, string chr_v4) {
   emit_line("    __asm__ __volatile__(" + asm_text_v + " : [" + (import afretn)[r] + "] " + chr_v + "=r" + chr_v2 + " (" + (import afretn)[r] + ") : " + asm_in_ops_v + " : " + chr_v3 + "memory" + chr_v4 + ");");
   emit_line("    return " + (import afretn)[r] + ";");

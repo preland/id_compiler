@@ -22,3 +22,5 @@ fix_mark_cls(int last, int wcl) {
     i = i + 1;
   }
 } return void;
+given fix_sep_fixture (1, 0):() then fixe_mv_sum:(2)
+given fix_sep_fixture (1, 3):() then fixe_mv_sum:(1)

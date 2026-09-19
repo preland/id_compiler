@@ -2,3 +2,39 @@ fix_pick(int i) {
   string t = fix_evtype(i);
   string name = fix_pick_name(i, t);
 } return string name;
+
+// fixe_nm holds strings, so the sum that witnesses an lset into an int column
+// has no equivalent here: counting the entries that have been given a name
+// does the same work, since fix_name_at (../../name.id) ssets a name into a
+// cell that already exists and leaves the column's length alone. It reports
+// how many events are named, not which, and a name replaced by a different
+// name would not move it. Its own two cases cannot discriminate: fix_name_at
+// is the only writer that puts a real name in the column -- fix_push4 pushes
+// "" -- so no setup leaves one there to read.
+fixe_nm_named() {
+  int n = 0;
+  int i = 0;
+  while(i < len((import fixe_nm))) {
+    if((import fixe_nm)[i] != "") {
+      n = n + 1;
+    }
+    i = i + 1;
+  }
+} return int n;
+given fix_fixture ():(0)
+given fix_nameat_fixture ():(0) then check_failed:(0)
+
+// fix_name_pick_miss_fixture (../reuse/lookup/pick.id) leaves the naming
+// machinery ready but fixe_sep and fixe_nm empty, and fix_name_at reads the
+// first and ssets the second, so both are pushed here rather than lset: event
+// 0 is declared on its own and gets a name, event 1 is not and stays as it is.
+fix_nameat_fixture() {
+  fix_name_pick_miss_fixture();
+  push((import fixe_nm), "");
+  push((import fixe_nm), "");
+} chain () {
+  push((import fixe_sep), 1);
+  push((import fixe_sep), 0);
+} return void;
+():() then fixe_nm_named:(0)
+():() then check_failed:(0)

@@ -7,3 +7,20 @@ and_sep(int j) {
 } return string so;
 (0):("")
 (1):(" && ")
+
+// emit_case_fail (../end.id) reads casefn[ci] and casenode[ci], so a case for
+// any row but 0 needs that row to exist. wrap_fixture_push lsets casenode,
+// which cannot create a row, so the second one is pushed here. It is built
+// the same way row 0 is -- same function node, same expected list -- because
+// case_cond and emit_fail_show take the condition from those, leaving the
+// row index as the only difference in the emitted text.
+wrap_row2_fixture() {
+  wrap_fixture();
+  int[] one = [(import fixture_zero)];
+  int node = newnode("case", 0, 0, "", "", one, one);
+} chain () {
+  push((import casefn), (import fixture_fn));
+  push((import casenode), node);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

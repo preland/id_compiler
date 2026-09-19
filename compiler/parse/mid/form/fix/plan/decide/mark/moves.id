@@ -19,3 +19,20 @@ fixe_mv_len() {
 } return int n;
 given fix_fixture ():(0)
 given fix_touch_fixture ():(2)
+
+// fix_sep_at (../touch/sep.id) reads fixe_cl and writes fixe_sep, and
+// fix_touch_fixture leaves both empty, so an index into either traps. Event 1
+// gets class 3, the value that must be named wherever it sits, which decides
+// the guard without fix_anc having to; event 0 does not move at all and fails
+// the guard on its first test. Filed here rather than beside it in ../touch/,
+// whose three files are each at the three-function cap.
+fix_sep_fixture() {
+  fix_touch_fixture();
+  push((import fixe_cl), 0);
+  push((import fixe_cl), 3);
+} chain () {
+  push((import fixe_sep), 0);
+  push((import fixe_sep), 0);
+} return void;
+():() then fixe_sep_count:(0)
+():() then check_failed:(0)

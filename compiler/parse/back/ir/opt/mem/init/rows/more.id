@@ -23,3 +23,5 @@ m2r_collect_at(int f, int i) {
     push((import pra), blk_ins_v[i]);
   }
 } return void;
+given m2r_alloca_fixture (0, 1):() then pra_len_check:(1)
+given m2r_alloca_fixture (0, 0):() then pra_len_check:(0)

@@ -5,6 +5,8 @@ emit_asm_one(int r) {
   string list_params_v = list_params((import afparams)[r]);
   emit_asm_header(r, c_type_v, list_params_v);
 } return void;
+given casm_row_fixture (0):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+given casm_row2_fixture (1):() then calls emit_asm_header:[1]
 
 emit_asm_header(int r, string c_type_v, string list_params_v) {
   emit_line(c_type_v + " id_" + (import afname)[r] + "(" + list_params_v + ") {");
