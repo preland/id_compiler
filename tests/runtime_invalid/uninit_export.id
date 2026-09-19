@@ -1,0 +1,19 @@
+// EXPECT: id: read of an uninitialised export (its declaring function has not run)
+//
+// The residue the dead-export check cannot see. That check rejects the easy
+// shape outright -- an export whose declaring function nothing calls -- so the
+// easy shape cannot be written here at all: it is a compile error, not a
+// runtime abort. What is left is a declarer that IS called, with its `export`
+// inside a branch that is false at run time. The check reasons per function,
+// so the owner counts as reached and it stays silent, while the global is
+// never assigned and the read finds NULL.
+owner(int n) {
+  if(n > 99) {
+    export int[] gx2 = [1, 2, 3];
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  owner(argc);
+  int y = (import gx2)[0];
+} return int 0;
