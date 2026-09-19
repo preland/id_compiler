@@ -20,3 +20,5 @@ add_export(string name, string type, string owner) {
   push((import etypes), type);
   push((import eowners), owner);
 } return void;
+given env_init ("gx", "int", "setup_fn"):() then etypes_len:(1)
+given dead_exp_fixture ("gz", "int", "setup_fn"):() then eowners_len:(3)

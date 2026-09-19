@@ -3,6 +3,8 @@ fix_push3(int e, int lo, int cl) {
   push((import fixe_lo), lo);
   push((import fixe_cl), cl);
 } return void;
+given fix_fixture (7, 0, 1):() then fixe_n_len:(1)
+given fix_touch_fixture (7, 0, 1):() then fixe_n_len:(3)
 
 // fixe_n gets one entry per event and is pushed here and nowhere else, so its
 // length is what this function changes. A `then` check takes no parameters,

@@ -25,3 +25,5 @@ ut_add(string fname, string what_s, string via_s) {
   push((import utwhat), what_s);
   push((import utvia), via_s);
 } return void;
+given notes_base ("port_byte", "asm 'in8'", "*"):() then utwhat_len:(1)
+given ut_seeded ("caller", "asm 'in8'", "port_byte"):() then utvia_len:(2)

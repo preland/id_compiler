@@ -28,3 +28,5 @@ fix_any_call_setup() {
   push((import fixe_cl), 0);
   push((import fixe_cl), 1);
 } return void;
+():() then fix_pr_cl0:(0)
+():() then fixe_n_len:(0)

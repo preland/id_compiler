@@ -6,6 +6,8 @@ fix_push4(int cd, string nt) {
   push((import fixe_sep), 0);
   push((import fixe_nm), "");
 } return void;
+given fix_fixture (0, "int"):() then fixe_cd_len:(1)
+given fix_touch_fixture (0, "int"):() then fixe_nt_len:(3)
 
 // fixe_cd is pushed here and nowhere else, so this function's first action is
 // only observable through its length. fix_touch_fixture builds its two events

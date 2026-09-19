@@ -6,6 +6,8 @@ m2r_row() {
 } chain () {
   push((import outv), m2r_blank_v2);
 } return void;
+given optfx_setup ():() then phiof_len:(1)
+given m2r_row_fixture ():() then outv_len:(2)
 
 m2r_blank() {
   int[] row = [];
