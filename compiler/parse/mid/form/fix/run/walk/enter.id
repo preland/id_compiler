@@ -11,3 +11,14 @@ fix_setfile(int i) {
   pop((import fixd_file));
   push((import fixd_file), (import pfile)[i]);
 } return void;
+
+// fixd_std is one cell, not a list that grows: fix_init (../entry.id) lsets
+// the answer into it and nothing pushes, so neither a length nor a sum is
+// the right witness -- reading the cell is, the same shape check_failed and
+// is_runtime use for their own flags. Filed here rather than beside the
+// export in ../state/state.id, which is at its three-function cap.
+fixd_std_on() {
+  int n = (import fixd_std)[0];
+} return int n;
+given fix_fixture ():(0)
+given fix_env_std ():(1)

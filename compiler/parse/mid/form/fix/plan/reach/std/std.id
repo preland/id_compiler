@@ -18,3 +18,16 @@ fix_std_rows(int[] cnt) {
     i = i + 1;
   }
 } return void;
+
+// fix_fixture builds the state a --fix function needs but not the declaration
+// registry, and the scan above reads dvname (init_reg, mid/names/symbols/
+// build/scopes.id) several calls below any import a case names -- so the
+// reachability check a case line is held to never sees it, and fix_init's
+// no-flag branch faulted on a null rather than reporting. Declared and empty
+// is all the scan needs: with no rows the loop never runs and the answer is 0.
+fix_std_fixture() {
+  fix_fixture();
+  init_reg();
+} return void;
+():() then fixd_std_on:(0)
+():() then check_failed:(0)

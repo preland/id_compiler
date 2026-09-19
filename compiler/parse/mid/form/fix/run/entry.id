@@ -45,3 +45,5 @@ fix_init(int argc, string[] argv) {
   }
   lset((import fixd_std), 0, on);
 } return void;
+given fix_std_fixture (2, ["prog", "--fix-std"]):() then fixd_std_on:(1)
+given fix_std_fixture (1, ["prog"]):() then fixd_std_on:(0)
