@@ -19,10 +19,10 @@ parse_asm(int[] pos) {
   string unquote_v = unquote(cur_text_v);
 } chain (int[] pos) {
   push((import aftriple), unquote_v);
-  string cur_text_v2 = cur_text(pos);
-  push((import afname), cur_text_v2);
-} chain (int[] pos) {
   advance(pos);
+  string cur_text_v2 = cur_text(pos);
+} chain (int[] pos) {
+  push((import afname), cur_text_v2);
   advance(pos);
   int[] parse_params_v = parse_params(pos, "param");
 } chain (int[] pos) {
