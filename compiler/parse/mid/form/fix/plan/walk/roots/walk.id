@@ -19,7 +19,14 @@ given fix_tokline_node_fixture ([]):() then calls fix_walk:[0]
 fix_walk(int e, int ca, int cd, string nt, string an) {
   int lo = len((import fixe_n));
   fix_walk_kids(e, cd);
-  int cl = fix_class2(e);
+  int cl = fix_class3(e);
+} chain (int e, int ca, int cd, string nt, string an) {
+  if(k_of(e) == "call") {
+    cl = 1;
+  } else if(k_of(e) == "index") {
+    cl = 2;
+  }
+  blank;
 } chain (int e, int ca, int cd, string nt, string an) {
   if(nt != "" || cl == 1 && ca == 1) {
     cl = 3;

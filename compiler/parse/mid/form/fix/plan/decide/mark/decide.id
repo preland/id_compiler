@@ -19,11 +19,19 @@ given fix_mark_case_fixture (0, 0, 0):() then calls fix_mark:[1]
 fix_mark(int sn, int last) {
   fix_mark_moves(last);
   fix_mark_sep(last);
-  string why = fix_why_cond(last);
+  int i = 0;
 } chain (int sn, int last) {
+  string why = "";
+  while(i <= last) {
+    if((import fixe_mv)[i] == 1 && (import fixe_cd)[i] == 1) {
+      why = "a value that would have to be named is to the right of && or ||, which may not evaluate it; a name bound before the statement would be computed anyway -- make the composition a function (docs/SPEC.md 7.1)";
+    }
+    i = i + 1;
+  }
   if(why == "") {
     why = fix_why_type(sn, last);
   }
+} chain (int sn, int last) {
   if(why == "") {
     fix_emit_stmt(sn, last);
   } else {

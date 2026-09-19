@@ -18,7 +18,10 @@ given env_init ():() then check_failed:(0)
 emit_tc_rest() {
   emit_cases();
   emit_tc_setup();
-  emit_tc_claims();
+  emit_line("static int idtc_claims(void) {\n    int bad = 0;");
+} chain () {
+  claim_body();
+  emit_line("    return bad;\n}");
 } return void;
-given env_init ():() then calls emit_tc_setup:[1] then calls emit_tc_claims:[1]
+given env_init ():() then calls emit_tc_setup:[1] then calls claim_body:[1]
 given env_init ():() then check_failed:(0)

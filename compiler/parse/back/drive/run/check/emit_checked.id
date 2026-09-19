@@ -26,5 +26,11 @@ given asmfx_setup (0):() then check_failed:(0)
 emit_checked(int argc, string[] argv) {
   arg_setup(argc, argv);
   check_program();
-  guarded_emit(argc, argv);
+  check_asm_targets(argc, argv);
+} chain (int argc, string[] argv) {
+  if(arg_flag(argc, argv, 1, "--calls") == 1) {
+    print_calls();
+  } else {
+    guarded_emit_tail(argc, argv);
+  }
 } return void;

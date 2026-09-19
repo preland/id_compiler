@@ -12,19 +12,12 @@
 main(int argc, string[] argv) {
   setup();
   load();
-  run(argc, argv);
-} chain (int argc, string[] argv) {
-  int ret_i = check_failed();
-} return int ret_i;
-
-run(int argc, string[] argv) {
   int[] pos = [0];
+} chain (int argc, string[] argv) {
   parse_program(pos);
-  finish(argc, argv);
-} return void;
-
-finish(int argc, string[] argv) {
   build_syms();
   collect_exports();
+} chain (int argc, string[] argv) {
   emit_checked(argc, argv);
-} return void;
+  int ret_i = check_failed();
+} return int ret_i;

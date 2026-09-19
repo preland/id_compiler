@@ -3,27 +3,29 @@
 // function value that cannot. Like the other case checks it is decided whether
 // or not the minimum is on, because a case that cannot run is wrong either way.
 
-ut_cases() {
-  int ci = 0;
-  while(ci < len((import casefn))) {
-    ut_case(ci);
-    ci = ci + 1;
-  }
-  ut_thens();
-} return void;
-
-// Refused: ut_case_given (../cases/given.id) reads casegiven[ci]
-// unconditionally, which traps unless a case's `given` populated it -- only
-// wrap_fixture (back/tgt/c/emit/prog/test/case/around/then/more/capture/
-// pre/fixture.id) gives casefn/casenode a real entry, and it does not touch
-// casegiven; impcase_empty/impcase_given (../../../fit/fit.id, .../more/
-// value/more/text/items.id) give casegiven but not casefn/casenode. No
-// fixture combines the two, and the lane's free function slots are already
-// spent (see ut_note's note, ../why/note.id, for the same kind of gap).
+// Refused: ut_case reads casegiven[ci] unconditionally (below), which traps
+// unless a case's `given` populated it -- only wrap_fixture (back/tgt/c/emit/
+// prog/test/case/around/then/more/capture/pre/fixture.id) gives casefn/
+// casenode a real entry, and it does not touch casegiven; impcase_empty/
+// impcase_given (../../../fit/fit.id, .../more/value/more/text/items.id)
+// give casegiven but not casefn/casenode. No fixture combines the two, and
+// the lane's free function slots are already spent (see ut_note's note,
+// ../why/note.id, for the same kind of gap).
 ut_case(int ci) {
   string s1_of_v = s1_of((import casefn)[ci]);
   ut_case_fn(ci, s1_of_v);
-  ut_case_given(ci);
+  string setup_nm = (import casegiven)[ci];
+} chain (int ci) {
+  if(setup_nm != "" && ut_at(setup_nm) >= 0) {
+    ut_named(ci, "'given' names '", setup_nm);
+  }
+  int[] args = l1_of((import casenode)[ci]);
+  int j = 0;
+} chain (int ci) {
+  while(j < len(args)) {
+    ut_case_val(ci, args[j]);
+    j = j + 1;
+  }
 } return void;
 
 // ut_at (../../why/why.id) traps unless a case's `given` also ran ut_mark

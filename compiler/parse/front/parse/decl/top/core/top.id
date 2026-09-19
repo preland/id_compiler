@@ -16,11 +16,15 @@ given decl_tokens ([0]):() then calls parse_decl_top:[1]
 parse_asm(int[] pos) {
   advance(pos);
   string cur_text_v = cur_text(pos);
-  int ret_i = parse_asm_mid(pos, cur_text_v);
-} return int ret_i;
-
-asm_sig(int[] pos) {
-  string cur_text_v = cur_text(pos);
-  push((import afname), cur_text_v);
-  int ret_i = asm_sig_mid(pos);
+  string unquote_v = unquote(cur_text_v);
+} chain (int[] pos) {
+  push((import aftriple), unquote_v);
+  string cur_text_v2 = cur_text(pos);
+  push((import afname), cur_text_v2);
+} chain (int[] pos) {
+  advance(pos);
+  advance(pos);
+  int[] parse_params_v = parse_params(pos, "param");
+} chain (int[] pos) {
+  int ret_i = asm_sig_tail(pos, parse_params_v);
 } return int ret_i;

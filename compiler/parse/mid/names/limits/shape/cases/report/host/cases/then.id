@@ -1,14 +1,6 @@
 // A case's `then` checks. A check node records the case it belongs to
 // (front/parse/decl/func/cases/case/then/push.id).
 
-ut_thens() {
-  int ti = 0;
-  while(ti < len((import thennode))) {
-    ut_then((import thennode)[ti]);
-    ti = ti + 1;
-  }
-} return void;
-
 // A "thenprints"/"theneprints" node's s1 is "" (front/.../case/then/more/
 // print/print.id), which ut_at never finds, so this skips it without having
 // to name its kind here too.

@@ -1,9 +1,4 @@
 
-m2r_after(int f) {
-  m2r_clean(f);
-  m2r_end(f, 0);
-} return void;
-
 // A phi that turned out to be one value is that value. Iterated, because
 // removing one can make the next one trivial -- which is exactly what happens
 // to the phis a straight line of blocks got for every slot in the function.
@@ -15,10 +10,3 @@ m2r_clean(int f) {
 } return void;
 given ir_rows (0):() then calls m2r_sweep:[1]
 given ir_rows (0):() then calls m2r_sweep:(0, 0, 0)
-
-m2r_end(int f, int j) {
-  while(j < len((import pra))) {
-    ir_kill((import pra)[j]);
-    j = j + 1;
-  }
-} return void;

@@ -1,6 +1,7 @@
-// The rest of `ll_wrap_tail`: the two lines that close the block, after the
-// call to `id_main` itself.
-ll_wrap_end() {
-  emit_line("  ret i32 %r");
+// The closing brace shared by every emitted block this backend closes on
+// its own line -- ll_func's define block and the C-ABI wrapper's alike.
+ll_close_brace() {
   emit_line("}");
 } return void;
+given ll_main_fixture ():() then prints:("}\n")
+given ir_rows ():() then prints:("}\n")

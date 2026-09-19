@@ -6,7 +6,11 @@
 acc_func_body(int[] l2_of_v, string s1_of_v, int id) {
   scope_func(id);
   acc_list(l2_of_v, s1_of_v);
-  acc_ret(id);
+  if(i1_of(id) >= 0) {
+    int i1_of_v = i1_of(id);
+    string ret_owner = s1_of(id);
+    acc_expr(i1_of_v, ret_owner, (import nline)[i1_of_v]);
+  }
 } return void;
 given fnscope_fix ((import regrow_plist), "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))
 given fnscope_fix ([], "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))

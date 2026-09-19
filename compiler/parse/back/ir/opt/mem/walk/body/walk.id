@@ -1,10 +1,4 @@
 
-m2r_pass2(int f) {
-  m2r_walk(f, 0);
-  m2r_fill(f, 1);
-  m2r_after(f);
-} return void;
-
 m2r_walk(int f, int i) {
   while(i < blk_count(f)) {
     m2r_blk(f, i);

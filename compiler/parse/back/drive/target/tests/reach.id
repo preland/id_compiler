@@ -2,24 +2,24 @@
 // again first: its diagnostics were given during checking, and a reachable set
 // seeded from anywhere but `main` is not what they are about.
 
-test_reach() {
-  lset((import dphase), 0, 0);
-  seed_tested();
-  test_reach_tail();
-} return void;
-
-// The harness's natives are read between the fixpoint and the narrowing, while
-// `prog` is still whole (back/drive/sink/natives/scan.id).
-test_reach_tail() {
-  reach_mark();
-  nat_scan("harness", 0);
-  dce_pack(0, 0);
-} return void;
-
 seed_tested() {
   clear_strs((import rfn));
   push((import rfn), "conf.id");
-  seed_cases();
+  int ci = 0;
+} chain () {
+  while(ci < len((import casefn))) {
+    string s1_of_v = s1_of((import casefn)[ci]);
+    reach_add(s1_of_v);
+    ci = ci + 1;
+  }
+  seed_givens();
+  seed_thens();
+} chain () {
+  int ni = 0;
+  while(ni < len((import casenode))) {
+    seed_fn_args(ni);
+    ni = ni + 1;
+  }
 } return void;
 given rfnfx_setup ():() then rfn_first:("conf.id")
 given seed_given_fixture ():() then rfn_len:(2)

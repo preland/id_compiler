@@ -18,16 +18,17 @@
 check_bodies() {
   check_funcs();
   chk_dupfn();
-  check_unique();
+  uq_fill();
+} chain () {
+  uq_scan();
+  int i = 0;
+  while(i < len((import prog))) {
+    cw_at(i);
+    i = i + 1;
+  }
 } return void;
 given dupfn_fixture ():() then check_failed:(1)
 given clean_prog_fixture ():() then check_failed:(0)
-
-check_unique() {
-  uq_fill();
-  uq_scan();
-  cw_scan();
-} return void;
 
 // Fingerprint every function once. Comparing is quadratic in the number of
 // functions but canonicalising is not, and canonicalising is the expensive

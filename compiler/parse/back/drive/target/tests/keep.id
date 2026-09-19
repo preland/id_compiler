@@ -14,16 +14,18 @@
 emit_test_kept(string triple) {
   int[] pkeep = [];
   string[] rkeep = [];
-  test_narrow(pkeep, rkeep);
+  keep_ints((import prog), pkeep);
+} chain (string triple) {
+  keep_strs((import rfn), rkeep);
+  lset((import dphase), 0, 0);
+  seed_tested();
+} chain (string triple) {
+  reach_mark();
+  nat_scan("harness", 0);
+  dce_pack(0, 0);
 } chain (string triple) {
   emit_test_unit(triple);
   test_widen(pkeep, rkeep);
-} return void;
-
-test_narrow(int[] pkeep, string[] rkeep) {
-  keep_ints((import prog), pkeep);
-  keep_strs((import rfn), rkeep);
-  test_reach();
 } return void;
 
 // A single name in casegiven (given.id's own seed_givens), for a case that

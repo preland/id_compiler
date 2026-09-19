@@ -1,23 +1,14 @@
 
-ll_funcs() {
-  int i = 0;
-  while(i < len((import irprog))) {
-    ll_func((import irprog)[i]);
-    i = i + 1;
-  }
-  int ret_i = ll_ends();
-} return int ret_i;
-
-ll_ends() {
-  emit_line("");
-  ll_strs();
-  int ret_i = ll_entry();
-} return int ret_i;
-
 ll_func(int f) {
   string ret = irf_ret(f);
   string ty = ll_ty(ret);
-  ll_func_out(f, ty);
+  string name = irf_name(f);
+} chain (int f) {
+  string plist = ll_pstr(f);
+  emit_line("define " + ty + " @id_" + name + "(" + plist + ") {");
+  ll_blocks(f);
+} chain (int f) {
+  emit_line("}");
 } return void;
 given ll_blk_fixture (0):() then prints:("define i32 @id_g() {\nb0:\n  %v2 = add i32 5, 5\n}\n")
 given ir_rows (1):() then prints:("define ptr @id_two() {\nb1:\n}\n")

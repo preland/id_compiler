@@ -17,8 +17,3 @@ fix_tletter2(string tb) {
 } return string tl;
 ("string"):("s")
 ("int"):("i")
-
-fix_ret_parens(int f, int lo) {
-  fix_ret(f);
-  fix_parens(lo, f);
-} return void;

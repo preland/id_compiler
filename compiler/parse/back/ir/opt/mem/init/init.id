@@ -14,10 +14,19 @@
 op_mem2reg(int f) {
   m2r_init(f);
   m2r_phis(f);
-  m2r_pass2(f);
+  m2r_walk(f, 0);
+} chain (int f) {
+  m2r_fill(f, 1);
+  m2r_clean(f);
+  int j = 0;
+} chain (int f) {
+  while(j < len((import pra))) {
+    ir_kill((import pra)[j]);
+    j = j + 1;
+  }
 } return void;
-given m2r_alloca_fixture (0):() then calls m2r_init:(0) then calls m2r_phis:(0) then calls m2r_pass2:(0)
-given m2r_alloca_fixture (1):() then calls m2r_init:(1) then calls m2r_phis:(1) then calls m2r_pass2:(1)
+given m2r_alloca_fixture (0):() then calls m2r_init:(0) then calls m2r_phis:(0) then calls m2r_walk:(0, 0)
+given m2r_alloca_fixture (1):() then calls m2r_init:(1) then calls m2r_phis:(1) then calls m2r_walk:(1, 0)
 
 m2r_init(int f) {
   m2r_reset();

@@ -1,11 +1,3 @@
-// The tail of `m2r_front`: once the phi is on the end of the block, put its
-// home on record and walk it into first position.
-m2r_front_fin(int[] l, int ph, int b) {
-  int len_v = len(l);
-  m2r_shift(l, len_v - 1);
-  lset((import ihome), ph, b);
-} return void;
-
 // The tail of `m2r_phi_one`, split at the point where the phi has a value id
 // but no home yet: making it is one concern, placing it in its block another.
 // Unlike m2r_seed1 (../walk/body/seed.id), whose return is j + 1 and says
@@ -26,7 +18,14 @@ given m2r_outv_fixture (0, 0):(3) then check_failed:(0)
 
 m2r_phi_place(int f, int i, int ph) {
   int[] irf_blk_v = irf_blk(f);
-  m2r_front(irf_blk_v[i], ph);
+  int b = irf_blk_v[i];
+  int[] blk_ins_v = blk_ins(b);
+} chain (int f, int i, int ph) {
+  push(blk_ins_v, ph);
+  int len_v = len(blk_ins_v);
+  m2r_shift(blk_ins_v, len_v - 1);
+} chain (int f, int i, int ph) {
+  lset((import ihome), ph, b);
 } return void;
 given ir_rows_chk1 (0, 0, 1):() then chk_home:(0)
 given ir_rows_chk1 (1, 0, 1):() then chk_home:(1)

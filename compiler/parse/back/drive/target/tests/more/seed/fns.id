@@ -2,14 +2,6 @@
 // under test, so the harness has to carry it whether or not anything else in
 // the build calls it.
 
-seed_case_fns() {
-  int ci = 0;
-  while(ci < len((import casenode))) {
-    seed_fn_args(ci);
-    ci = ci + 1;
-  }
-} return void;
-
 seed_fn_args(int ci) {
   int[] args = l1_of((import casenode)[ci]);
   int j = 0;

@@ -17,15 +17,12 @@
 init_rtc() {
   export int[] rtc = [0];
   export int[] fsc = [0];
-  init_rtc2();
+  init_bnames();
+} chain () {
+  init_resv_names();
 } return void;
 ():() then is_runtime:(0)
 ():() then is_freestanding:(0)
-
-init_rtc2() {
-  init_bnames();
-  init_resv_names();
-} return void;
 
 rt_set(int v) {
   lset((import rtc), 0, v);

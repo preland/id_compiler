@@ -28,7 +28,11 @@ given ir_rows (0, 0):() then calls opt_round:[0]
 opt_round(int f) {
   op_preds(f);
   op_mem2reg(f);
-  opt_clean(f);
+  op_fold(f);
+} chain (int f) {
+  op_dce(f);
+  op_fold(f);
+  op_dce(f);
 } return void;
-given m2r_alloca_fixture (0):() then calls op_preds:(0) then calls op_mem2reg:(0) then calls opt_clean:(0)
-given m2r_predfx (0):() then calls op_preds:(0) then calls op_mem2reg:(0) then calls opt_clean:(0)
+given m2r_alloca_fixture (0):() then calls op_preds:(0) then calls op_mem2reg:(0) then calls op_fold:(0)
+given m2r_predfx (0):() then calls op_preds:(0) then calls op_mem2reg:(0) then calls op_fold:(0)

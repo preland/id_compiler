@@ -14,14 +14,6 @@
 // rule can miss a wrapper the fold does not reduce, but it cannot reject a
 // function whose result depends on anything but literals.
 
-cw_scan() {
-  int i = 0;
-  while(i < len((import prog))) {
-    cw_at(i);
-    i = i + 1;
-  }
-} return void;
-
 cw_at(int i) {
   int id = (import prog)[i];
   string val = cw_value(id);

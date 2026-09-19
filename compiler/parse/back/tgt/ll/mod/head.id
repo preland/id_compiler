@@ -17,7 +17,19 @@ ll_head_triple(string triple, string q) {
 ll_body() {
   ll_declares();
   ll_globals();
-  ll_funcs();
+  int i = 0;
+} chain () {
+  while(i < len((import irprog))) {
+    ll_func((import irprog)[i]);
+    i = i + 1;
+  }
+  emit_line("");
+  ll_strs();
+} chain () {
+  int f = ll_main();
+  if(f >= 0 && is_freestanding() == 0) {
+    ll_wrapper(f);
+  }
 } return void;
-given ll_env_fixture2 ():() then calls ll_declares:[1] then calls ll_globals:[1] then calls ll_funcs:[1]
+given ll_env_fixture2 ():() then calls ll_declares:[1] then calls ll_globals:[1] then calls ll_strs:[1]
 given ll_env_fixture2 ():() then check_failed:(0)

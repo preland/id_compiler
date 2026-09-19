@@ -20,26 +20,19 @@
 //           itself, "*" when it is the thing
 //   utnote  the exemption notes check_cases wrote (back/drive/sink/notes.id)
 
-ut_mark() {
-  export string[] utname = [];
-  export string[] utwhat = [];
-  ut_mark2();
-} return void;
-given notes_base ():() then calls ut_mark2:[1]
-given notes_base ():() then calls ut_fix:[1]
-
-ut_mark2() {
-  export string[] utvia = [];
-  export string[] utnote = [];
-  ut_fix();
-} return void;
-
 // The runtime's own helpers first, then the call graph to a fixpoint: a sweep
 // that marks nothing new ends it, so the number of sweeps is the length of the
 // longest chain to something that cannot run.
-ut_fix() {
+ut_mark() {
+  export string[] utname = [];
+  export string[] utwhat = [];
+  export string[] utvia = [];
+} chain () {
+  export string[] utnote = [];
   if(is_freestanding() == 1) {
     ut_seed_self();
     ut_loop();
   }
 } return void;
+given notes_base ():() then ut_sweep:(0)
+given ut_seeded ():() then ut_sweep:(0)

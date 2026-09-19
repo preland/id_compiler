@@ -3,10 +3,17 @@
 // and now chains there directly.
 
 // Calls first: whether a trapping read or an import moves depends on which
-// calls do.
+// calls do. A trapping read (an index, or an operator that can trap) and an
+// import read move only when some call ahead of them that also moves could
+// write -- the only way either could see a different value
+// (docs/PROJECT.md, --fix).
 fix_mark_moves(int last) {
   fix_mark_cls(last, 1);
-  fix_mark_rest(last);
+  fix_mark_cls(last, 3);
+  if(fix_touches(last) == 1) {
+    fix_mark_cls(last, 2);
+    fix_mark_cls(last, 4);
+  }
 } return void;
 given fix_sep_fixture (0):() then calls fix_mark_cls:[2]
 given fix_sep_fixture (1):() then calls fix_mark_cls:[4]
