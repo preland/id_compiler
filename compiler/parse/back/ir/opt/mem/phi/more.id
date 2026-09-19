@@ -8,11 +8,21 @@ m2r_front_fin(int[] l, int ph, int b) {
 
 // The tail of `m2r_phi_one`, split at the point where the phi has a value id
 // but no home yet: making it is one concern, placing it in its block another.
+// Unlike m2r_seed1 (../walk/body/seed.id), whose return is j + 1 and says
+// nothing about its write, the value returned here is the phi that was
+// written, so checking it is coupled to the lset rather than independent of
+// it. It is still not a witness: the same phi would come back if the lset
+// had put it in the wrong cell, or in the wrong row. phiof_sum
+// (../walk/phi/incs/at.id) is what sees where it landed. Only (0, 0) is in
+// range -- m2r_outv_fixture leaves one row of one cell -- so the second case
+// differs in what it checks, not in what it does.
 m2r_phi_make(int i, int j) {
   string ir_ty_v = ir_ty((import pra)[j]);
   int ph = ir_leaf("phi", ir_ty_v, 0 - 1, 0 - 1, "");
   lset((import phiof)[i], j, ph);
 } return int ph;
+given m2r_outv_fixture (0, 0):(3) then phiof_sum:(3)
+given m2r_outv_fixture (0, 0):(3) then check_failed:(0)
 
 m2r_phi_place(int f, int i, int ph) {
   int[] irf_blk_v = irf_blk(f);

@@ -8,11 +8,20 @@ m2r_seed(int i, int j) {
   }
 } return void;
 
+// What this function is for is the value it writes; what it returns is
+// j + 1, arithmetic on its own argument that a case can pin green while the
+// lset never runs at all. So the return value is checked to keep the walk's
+// cursor honest, and outv_sum (../../init/blank/rowfx.id) is what actually
+// witnesses the write. Only (0, 0) is in range -- m2r_outv_fixture leaves one
+// row of one cell -- so the second case can differ in what it checks but not
+// in what it does.
 m2r_seed1(int i, int j) {
   int m2r_in_v = m2r_in(i, j);
   lset((import outv)[i], j, m2r_in_v);
   int ret_i = j + 1;
 } return int ret_i;
+given m2r_outv_fixture (0, 0):(1) then outv_sum:(3)
+given m2r_outv_fixture (0, 0):(1) then check_failed:(0)
 
 m2r_in(int i, int j) {
   int v = (import phiof)[i][j];

@@ -15,3 +15,20 @@ m2r_pos(int f, int b) {
 } return int ret_i;
 given cfg_fixture (0, 0):(0)
 given cfg_fixture (0, 1):(1)
+
+// phiof is written in place: m2r_phi_make (../../../phi/more.id) lsets the
+// phi it has just built into a row m2r_row already pushed, so neither the
+// table's length nor the row's ever changes and phiof_len (opt/run/cell.id)
+// witnesses none of it. Summing every cell does. It reports that a cell
+// changed, not which one, and because these cells hold instruction ids
+// rather than counts, two writes that cancelled would leave the total alone.
+phiof_sum() {
+  int n = 0;
+  int i = 0;
+  while(i < len((import phiof))) {
+    n = n + phiof_row_sum(i);
+    i = i + 1;
+  }
+} return int n;
+given m2r_row_fixture ():(0)
+given m2r_outv_fixture ():(-1)
