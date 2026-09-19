@@ -19,3 +19,15 @@ ll_asm_ref2_nm(string s, int i) {
 } return string ret_s;
 ("%[a]", 0):("a")
 ("%w[bc]", 0):("bc")
+
+// One entry per asm row, exported by asm_state (front/parse/decl/asm/
+// asm_state.id) and pushed by parse_asm_mid as it reads each triple. Filed
+// here because that directory holds three entries with both files at three
+// functions, and the asm subtree this belongs to has room in no other file --
+// so it sits two directories from llasm_row_fixture, which pushes the row it
+// counts.
+aftriple_len() {
+  int n = len((import aftriple));
+} return int n;
+given llasm_row_fixture ():(1)
+given llasm_row2_fixture ():(2)
