@@ -13,6 +13,8 @@ fix_decide2(int sn, int md, int last) {
     fix_mark(sn, last);
   }
 } return void;
+given fix_mark_case_fixture (0, 1, 0):() then calls fix_refuse_md:[1]
+given fix_mark_case_fixture (0, 0, 0):() then calls fix_mark:[1]
 
 fix_mark(int sn, int last) {
   fix_mark_moves(last);
@@ -28,6 +30,8 @@ fix_mark(int sn, int last) {
     fix_refuse(last, why);
   }
 } return void;
+given fix_mark_case_fixture (0, 0):() then calls fix_refuse:(0, "a value that would have to be named is to the right of && or ||, which may not evaluate it; a name bound before the statement would be computed anyway -- make the composition a function (docs/SPEC.md 7.1)")
+given fix_mark_case_fixture (5, 0):() then calls fix_refuse:(0, "a value that would have to be named is to the right of && or ||, which may not evaluate it; a name bound before the statement would be computed anyway -- make the composition a function (docs/SPEC.md 7.1)")
 
 // fix_mark_cls (one.id) records its answer in place: it lsets a 1 into a cell
 // that already exists, so the column's length never changes and fixe_mv_len

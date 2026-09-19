@@ -9,6 +9,8 @@ ee4(int id) {
     s = emit_index(id);
   }
 } return string s;
+given leaves_fixture ((import lit_a)):("2")
+given idx_build ((import idx_fix)):("(int)(id_list_get(id_list_lit(2, (long long)(2), (long long)(5)), 2))")
 
 ee5(int id) {
   string s = ee6(id);
@@ -16,3 +18,5 @@ ee5(int id) {
     s = emit_arr(id);
   }
 } return string s;
+given leaves_fixture ((import lit_a)):("2")
+given shapes_fixture ((import arr_ints)):("id_list_lit(2, (long long)(2), (long long)(5))")

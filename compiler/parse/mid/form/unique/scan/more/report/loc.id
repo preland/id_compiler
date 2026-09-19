@@ -8,3 +8,5 @@ dup_loc(string name_i) {
   int func_line_v = func_line(name_i);
   string loc_at_v = loc_at(name_i, func_line_v);
 } return string loc_at_v;
+given edge_fixture ("fx_target"):("fixture.id:7: error: ")
+given edge_fixture ("edge_caller"):("fixture.id:20: error: ")

@@ -9,12 +9,16 @@ report_bad_var(string name, string owner, int ln) {
     report_owned_var(name, owner, ln);
   }
 } return void;
+given regrow_d ("z", "f", 10):() then calls report_undef_var:("z", "f", 10)
+given regrow_d ("x", "f", 10):() then calls report_owned_var:("x", "f", 10)
 
 report_undef_var(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);
   print(loc_at_v + "undefined variable '" + name + "'");
   note_failure();
 } return void;
+given env_init ("z", "f", 10):() then prints:("<stdin>:10: error: undefined variable 'z'\n") then check_failed:(1)
+given env_init ("y", "g", 20):() then prints:("<stdin>:20: error: undefined variable 'y'\n") then check_failed:(1)
 
 report_owned_var(string name, string owner, int ln) {
   if(find_str((import enames), name) >= 0) {
@@ -23,3 +27,5 @@ report_owned_var(string name, string owner, int ln) {
     report_var_private(name, owner, ln);
   }
 } return void;
+given regrow_d ("z", "f", 10):() then calls report_var_private:("z", "f", 10)
+given regrow_e ("g", "f", 10):() then calls report_var_import:("g", "f", 10)

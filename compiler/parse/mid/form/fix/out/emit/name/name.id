@@ -11,6 +11,8 @@ fix_emit_stmt(int sn, int last) {
     i = i + 1;
   }
 } return void;
+given fix_decl_fixture (0, 1):() then calls fix_names:(1)
+given fix_decl_fixture (0, 1):() then calls fix_resid_at:(1, 1)
 
 // fix_rcache_taint runs again for every event here (plan/walk/ev/push/ev.id
 // already ran it once for the whole statement, during the walk): a call
@@ -24,6 +26,8 @@ fix_names(int last) {
     i = i + 1;
   }
 } return void;
+given fix_nameat_fixture (0):() then fixe_nm_named:(1)
+given fix_nameat_fixture (0):() then calls fix_rcache_taint:(0)
 
 fix_name_at(int i) {
   if((import fixe_sep)[i] == 1) {

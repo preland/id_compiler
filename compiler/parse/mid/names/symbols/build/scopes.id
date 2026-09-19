@@ -13,6 +13,10 @@
 // export plus check_funcs -- so every pass after the first chains from this
 // one call: types/'s check_rest() (the per-file rule and the type checks), then
 // the naming and scope rules below.
+// Deliberately left uncased, for the reason check_program carries
+// (../../limits/shape/block/more/entry/check.id): its chain reaches
+// check_case_runs and the real compile-time case table, which no fixture
+// populates alongside the node environment. A case traps rather than fails.
 check_scopes() {
   check_rest();
   check_names();

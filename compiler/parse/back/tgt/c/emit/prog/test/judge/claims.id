@@ -16,6 +16,8 @@ claim_body() {
     c = c + 1;
   }
 } return void;
+given claim_dup_fixture ():() then calls claim_sizes:[1] then calls claim_at:(0) then calls claim_at:(1)
+given case_fixture ():() then calls claim_sizes:[1] then calls claim_at:[0]
 
 claim_sizes() {
   int ci = 0;
@@ -24,3 +26,5 @@ claim_sizes() {
     ci = ci + 1;
   }
 } return void;
+given wrap_fixture ():() then calls size_row:[1]
+given void_call_fixture ():() then calls size_row:(0) then calls size_row:(1)

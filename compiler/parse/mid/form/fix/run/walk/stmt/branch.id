@@ -12,6 +12,8 @@ fix_stmt(int sn, int md) {
     fix_simple(sn);
   }
 } return void;
+given fix_if_fixture (1, 0):() then calls fix_if:(1, 0)
+given fix_if_fixture (2, 0):() then calls fix_while:(2)
 
 fix_if(int sn, int md) {
   fix_cond(sn, md);
@@ -24,6 +26,8 @@ fix_if(int sn, int md) {
     fix_block(els);
   }
 } return void;
+given fix_if_fixture (1, 0):() then calls fix_cond:(1, 0)
+given fix_if_fixture (1, 0):() then calls fix_block:[2]
 
 // A declaration, an assignment and an expression statement keep their one
 // expression where an if and a while keep their condition.
@@ -32,3 +36,5 @@ fix_cond(int sn, int md) {
   int[] fixp_roots = [c];
   fix_plan(sn, fixp_roots, md);
 } return void;
+given fix_if_fixture (1, 0):() then calls fix_plan:(1, [0], 0)
+given fix_if_fixture (2, 1):() then calls fix_plan:(2, [0], 1)

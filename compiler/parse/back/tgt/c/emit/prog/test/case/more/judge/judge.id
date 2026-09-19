@@ -17,3 +17,5 @@ emit_case_expd(int ci) {
     j = j + 1;
   }
 } return void;
+given wrap_fixture (0):() then prints:("    int idtc_e0 = 0;\n")
+given void_call_fixture (1):() then prints:("")

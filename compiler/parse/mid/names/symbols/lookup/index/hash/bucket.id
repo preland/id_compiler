@@ -18,3 +18,18 @@ name_bucket(string s) {
 } return int ret_i;
 ("a"):(97)
 ("b"):(98)
+
+// edge_fixture (2 real functions, pfile pushed, case tables initialised via
+// case_fixture) plus init_rtc and a first ut_mark run, for check_scopes/
+// check_program (symbols/build/scopes.id, limits/shape/block/more/entry/
+// check.id): both call check_case_runs for real, which calls ut_mark again
+// on top of this, and is_freestanding (called through it) reads fsc, which
+// nothing else these two reach ever declares. Filed here because every file
+// near either caller is at the 3-function cap.
+scopes_fixture() {
+  edge_fixture();
+  init_rtc();
+  ut_mark();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

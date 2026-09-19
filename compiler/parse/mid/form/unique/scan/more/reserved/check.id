@@ -6,3 +6,26 @@ is_reserved_name(int i) {
   string s1_of_v = s1_of((import prog)[i]);
   int ok = find_str((import resv_names), s1_of_v) >= 0 || s1_of_v == "eprint";
 } return int ok;
+given resv_scan_fixture (0):(1)
+given resv_scan_fixture (1):(0)
+
+// "eprint" (the OR's own special case: it is not in resv_names_src, only
+// idc.py's separate list -- see the comment above) and an ordinary name,
+// registered with real file:line entries for resv_err's own cases below.
+resv_scan_fixture() {
+  resv_env_setup();
+  int[] none = [];
+  int rsf1 = node_func("eprint", "void", none, none, 0 - 1);
+} chain () {
+  push((import prog), rsf1);
+  push((import pfile), "a.id");
+  push((import pline), 3);
+} chain () {
+  int rsf2 = node_func("plain_name", "void", none, none, 0 - 1);
+  push((import prog), rsf2);
+  push((import pfile), "b.id");
+} chain () {
+  push((import pline), 9);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

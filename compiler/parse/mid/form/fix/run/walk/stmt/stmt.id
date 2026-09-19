@@ -5,6 +5,8 @@ fix_used_at(int x) {
     push((import fixd_used), s2_of_v);
   }
 } return void;
+given fix_ret_fixture (7):() then calls s2_of:(7)
+given fix_ret_fixture (0):() then calls s2_of:[0]
 
 fix_body(int f) {
   int[] l2_of_v = l2_of(f);
@@ -20,3 +22,5 @@ fix_block(int[] stmts) {
     i = i + 1;
   }
 } return void;
+given fix_if_fixture ([0]):() then calls fix_stmt:(0, 0)
+given fix_if_fixture ([]):() then calls fix_stmt:[0]

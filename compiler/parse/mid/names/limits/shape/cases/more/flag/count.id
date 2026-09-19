@@ -21,13 +21,24 @@ check_cases() {
     i = i + 1;
   }
 } return void;
+given natcall_fixture ():() then calls check_cases_at:[1]
+given case_fixture ():() then calls check_cases_at:[0]
 
+// cases_short itself reads ut_at (../../report/host/why/note.id), which
+// traps unless a case's `given` has also run ut_mark (report/host/mark/) --
+// no fixture combines that with a real `prog` entry, so both cases below
+// avoid ever calling it: case_fidx_fixture (back/tgt/c/emit/prog/test/judge/
+// more/claim/more/hit/fixture.id) gives count_cases 2 hits (not short),
+// natcall_fixture (back/ir/opt/run/pipe/cases/natfixture.id) gives a native
+// row (exempt) -- the guard's two ways to skip.
 check_cases_at(int i) {
   int n = count_cases((import prog)[i]);
   if(n < 2 && is_native((import prog)[i]) == 0) {
     cases_short(i, n);
   }
 } return void;
+given case_fidx_fixture (0):() then calls cases_short:[0]
+given natcall_fixture (0):() then calls cases_short:[0]
 
 count_cases(int node) {
   int i = 0;

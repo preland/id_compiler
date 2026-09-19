@@ -9,6 +9,8 @@ ll_pstr(int f) {
     i = i + 1;
   }
 } return string s;
+given ll_main_fixture (0):("i32 %v0, i64 %v1")
+given ir_rows (0):("")
 
 ll_sep(int i) {
   string s = ", ";
@@ -16,6 +18,8 @@ ll_sep(int i) {
     s = "";
   }
 } return string s;
+(0):("")
+(1):(", ")
 
 ll_block(int b) {
   emit_line("b" + b + ":");
@@ -26,3 +30,5 @@ ll_block(int b) {
     i = i + 1;
   }
 } return void;
+given ll_blk_fixture (0):() then prints:("b0:\n  %v2 = add i32 5, 5\n")
+given ir_rows (1):() then prints:("b1:\n")

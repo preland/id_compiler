@@ -30,6 +30,8 @@ guarded_emit_tail(int argc, string[] argv) {
     report_mode(argc, argv, fp_mode);
   }
 } return void;
+given notes_base (2, ["prog", "--untested"]):() then calls emit_or_notes:(2, ["prog", "--untested"])
+given lz_o (2, ["prog", "--fingerprints"]):() then calls report_mode:(2, ["prog", "--fingerprints"], 1)
 
 // The test harness comes first, while `prog` still holds every function: a
 // function with cases need not be reachable from main, and every case in the
@@ -56,3 +58,5 @@ emit_all(int argc, string[] argv) {
   }
   emit_notes();
 } return void;
+given emit_all_fixture_off (1, ["prog"]):() then calls nat_print:[0] then calls emit_notes:[1]
+given emit_all_fixture_on (2, ["prog", "--natives"]):() then calls nat_print:[1] then calls emit_notes:[1]

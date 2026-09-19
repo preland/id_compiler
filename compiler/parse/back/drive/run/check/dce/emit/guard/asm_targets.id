@@ -17,3 +17,24 @@ check_asm_targets(int argc, string[] argv) {
     i = i + 1;
   }
 } return void;
+given asmfx_setup (1, ["prog"]):() then calls asm_check:(0, "x86_64-unknown-linux-gnu")
+given asmfx_setup (3, ["prog", "--triple", "wasm32"]):() then calls asm_check:(0, "wasm32")
+
+// emit_all's own fixtures (guarded_emit.id): natives_then_prune reads fsc
+// through is_freestanding, which notes_base's own init_rtc() call sets up --
+// natinit_fixture_off/natcall_fixture do not, so a case built on either alone
+// traps on an uninitialised export. Filed here (this file's own gate) because
+// guard/ is at its 3-file cap.
+emit_all_fixture_off() {
+  notes_base();
+  nat_init(1, ["prog"]);
+} return void;
+():() then check_failed:(0)
+():() then nat_on_check:(0)
+
+emit_all_fixture_on() {
+  notes_base();
+  nat_init(2, ["prog", "--natives"]);
+} return void;
+():() then check_failed:(0)
+():() then nat_on_check:(1)

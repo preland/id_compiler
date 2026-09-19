@@ -31,6 +31,8 @@ resv_err(int i) {
 } chain (int i) {
   note_failure();
 } return void;
+given resv_scan_fixture (0):() then prints:("a.id:3: error: function 'eprint' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_eprint'. Choose another name\n")
+given resv_scan_fixture (1):() then prints:("b.id:9: error: function 'plain_name' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_plain_name'. Choose another name\n")
 
 init_resv_names() {
   export string[] resv_names = [];

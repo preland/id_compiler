@@ -23,3 +23,5 @@ then_tail(int ti) {
   string lt = lit_text(items[0]);
   string so = c_esc(", expected " + lt + "\n");
 } return string so;
+given chk_fixture (0):(", expected 1\\n")
+given print_fixture (0):(", expected 1\\n")

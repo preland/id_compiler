@@ -10,6 +10,8 @@ fix_std_scan() {
   fix_std_rows(cnt);
   int ok = cnt[0] > 0 && cnt[1] == 0;
 } return int ok;
+given fix_std_fixture ():(0)
+given fix_std_row_fixture ():(1)
 
 fix_std_rows(int[] cnt) {
   int i = 0;
@@ -18,6 +20,8 @@ fix_std_rows(int[] cnt) {
     i = i + 1;
   }
 } return void;
+given fix_std_fixture ([0, 0]):([0, 0])
+given fix_std_row_fixture ([0, 0]):([1, 0])
 
 // fix_fixture builds the state a --fix function needs but not the declaration
 // registry, and the scan above reads dvname (init_reg, mid/names/symbols/

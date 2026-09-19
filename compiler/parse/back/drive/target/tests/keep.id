@@ -25,3 +25,15 @@ test_narrow(int[] pkeep, string[] rkeep) {
   keep_strs((import rfn), rkeep);
   test_reach();
 } return void;
+
+// A single name in casegiven (given.id's own seed_givens), for a case that
+// cannot otherwise see whether the loop reached reach_add: rfn_len reads the
+// only trace it leaves. Filed here (an unrelated harness-narrowing step)
+// because tests/more/seed/ (given.id, fns.id, seed.id) is at its 3-file cap.
+seed_given_fixture() {
+  fn_fixture();
+  init_reach();
+  push((import casegiven), "fx_target");
+} return void;
+():() then check_failed:(0)
+():() then rfn_len:(2)

@@ -15,12 +15,18 @@ ut_seeded() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// ut_loop and ut_sweep both read utname (../../why/why.id's ut_at does too),
+// which traps unless a case's `given` also ran ut_mark (this file's own
+// ut_seeded does; case_fixture/fn_fixture do not) -- see ut_note's note
+// (../why/note.id) for the fixture gap this runs into for a non-empty prog.
 ut_loop() {
   int n = 0 - 1;
   while(n != len((import utname))) {
     n = ut_sweep();
   }
 } return void;
+given notes_base ():() then calls ut_sweep:[1]
+given ut_seeded ():() then calls ut_sweep:[1]
 
 ut_sweep() {
   int n = len((import utname));
@@ -32,3 +38,5 @@ ut_sweep() {
     f = f + 1;
   }
 } return int n;
+given notes_base ():(0)
+given ut_seeded ():(1)

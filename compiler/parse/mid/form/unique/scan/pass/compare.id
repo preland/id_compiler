@@ -39,3 +39,5 @@ find_dup(int i) {
     j = j + 1;
   }
 } return int found;
+given dup_pair_fixture (0):(-1)
+given dup_pair_fixture (1):(0)

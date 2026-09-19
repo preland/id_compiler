@@ -7,6 +7,8 @@ exp_one(int id, string owner) {
     exp_nested(id, owner);
   }
 } return void;
+given lz_j ((import lz_edecl), "setup_fn"):() then calls add_export2:((import lz_edecl), "setup_fn")
+given dead_exp_fixture ((import dead_imp_a), "setup_fn"):() then calls exp_nested:((import dead_imp_a), "setup_fn")
 
 is_export_decl(int id) {
   int ok = 0;
@@ -14,6 +16,8 @@ is_export_decl(int id) {
     ok = 1;
   }
 } return int ok;
+given lz_j ((import lz_edecl)):(1)
+given dead_exp_fixture ((import dead_imp_a)):(0)
 
 add_export(string name, string type, string owner) {
   push((import enames), name);

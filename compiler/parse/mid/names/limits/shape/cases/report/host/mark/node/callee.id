@@ -7,6 +7,8 @@ ut_callee(string fname, string callee_nm) {
     ut_add(fname, ut_what_v, ut_via_v);
   }
 } return void;
+given ut_host_seeded ("newfn", "port_byte"):() then utwhat_len:(3)
+given ut_host_seeded ("port_byte", "port_byte"):() then utwhat_len:(2)
 
 // A callee is named only when it is a caller itself. When it is the thing that
 // cannot run, the message names that thing directly instead.

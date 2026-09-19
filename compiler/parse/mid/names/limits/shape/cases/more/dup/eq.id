@@ -6,6 +6,8 @@ case_eq(int a, int b) {
     r = case_eq_run((import casestart)[a], (import casestart)[b] - (import casestart)[a], (import caseend)[a]);
   }
 } return int r;
+given dupeq_fixture (0, 0):(1)
+given dupeq_fixture (0, 1):(0)
 
 // `off` is b's start minus a's, so the second cursor is derived rather than
 // carried: a second counter would put this block over the action limit.
@@ -16,6 +18,8 @@ case_eq_run(int i, int off, int stop) {
     i = i + 1;
   }
 } return int r;
+given mk_two_toks (0, 0, 1):(1)
+given mk_two_toks (0, 1, 1):(0)
 
 tok_same(int i, int j) {
   int r = 0;
@@ -23,3 +27,5 @@ tok_same(int i, int j) {
     r = 1;
   }
 } return int r;
+given mk_two_toks (0, 0):(1)
+given mk_two_toks (0, 1):(0)

@@ -12,6 +12,14 @@ ut_thens() {
 // A "thenprints"/"theneprints" node's s1 is "" (front/.../case/then/more/
 // print/print.id), which ut_at never finds, so this skips it without having
 // to name its kind here too.
+//
+// Refused: ut_at (../../why/why.id) is called unconditionally, which traps
+// unless a case's `given` also ran ut_mark (../mark/); then_node_fixture and
+// calls_node_fixture (../../../given/then/more/print/node.id,
+// .../more/calls/fixture.id), the only "then"/"thencalls" nodes this lane
+// has, never do. No fixture combines the two, and the lane's free function
+// slots are already spent (see ut_note's note, ../why/note.id, for the same
+// gap).
 ut_then(int node) {
   string s1_of_v = s1_of(node);
   if(ut_at(s1_of_v) >= 0) {

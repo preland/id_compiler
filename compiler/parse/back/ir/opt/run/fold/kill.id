@@ -2,3 +2,40 @@
 fold_kill(int f, int id, int v) {
   m2r_drop(f, id, v, 0);
 } return void;
+given ir_rows (0, 0, 5):() then chk_op:("nop")
+given ir_rows_chk1 (0, 1, 9):() then chk_ty:("")
+
+// An "icmp ne" whose operands satisfy fold_iszext and fold_zero_of, for
+// fold_cmp/fold_one's own cases, plus fmix_id (fold_iszext true, ir_b
+// reused as its own zext instead of a zero const, so fold_zero_of is
+// false): a case on fcmp_row (both true) and one on fq_id (both false)
+// cannot tell fold_cmp's `&&` from an `||` -- both arms agree on the
+// answer either way -- and mutate confirmed that SURVIVED before fmix_id
+// existed. Filed here, not cmp.id, which is at its 3-function cap. fcx_b1
+// is both the bool-typed value the zext widens (fold_isbool reads its
+// type) and the zero constant the icmp compares against (fold_zero_of
+// reads its op and s), so this needs one fewer row than building them
+// separately. Needs a real function, not just env_init:
+// when fcmp_row genuinely satisfies fold_cmp's guard, fold_kill runs
+// op_rauw(f, ...), which indexes irf_blk(f) -- with no function ever built
+// (env_init alone never calls ir_func), that traps "index 0 out of bounds
+// (len 0)", which looked at first like a broken case argument but was
+// actually this. cfg_fixture supplies a real function 0 the same one
+// statement env_init did.
+fold_cmp_fixture() {
+  cfg_fixture();
+  export int fcx_b1 = ir_leaf("const", "bool", 0 - 1, 0 - 1, "0");
+  export int fzc_id = ir_leaf("zext", "int", (import fcx_b1), 0 - 1, "");
+} chain () {
+  export int fcmp_row = ir_leaf("icmp", "int", (import fzc_id), (import fcx_b1), "!=");
+  export int fq_id = ir_leaf("const", "int", 0 - 1, 0 - 1, "5");
+  export int fmix_id = ir_leaf("icmp", "int", (import fzc_id), (import fzc_id), "!=");
+} return void;
+():() then check_failed:(0)
+():() then fc_op_check:("icmp")
+
+fc_op_check() {
+  string ret_s = ir_op((import fcmp_row));
+} return string ret_s;
+given fold_cmp_fixture ():("icmp")
+given fold_cmp_fixture ():("icmp") then check_failed:(0)

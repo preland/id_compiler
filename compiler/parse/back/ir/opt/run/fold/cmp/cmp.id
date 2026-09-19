@@ -7,6 +7,9 @@ fold_cmp(int f, int id) {
     fold_kill(f, id, ir_a_v3);
   }
 } return void;
+given fold_cmp_fixture (0, (import fcmp_row)):() then fc_op_check:("nop")
+given fold_cmp_fixture (0, (import fq_id)):() then fc_op_check:("icmp")
+given fold_cmp_fixture (0, (import fmix_id)):() then calls fold_kill:[0]
 
 fold_iszext(int v) {
   int r = 0;
@@ -16,4 +19,23 @@ fold_iszext(int v) {
 } return int r;
 given ir_rows (0):(0)
 given fold_true_setup ((import fz_id)):(1)
+
+// br_fixture_p plus pra/phiof/outv, for m2r_incs/m2r_inc/ir_opt/opt_round
+// cases that need a function whose blocks are actually terminated: unlike
+// ir_rows's second function (a "const" never added to its block, so
+// op_preds's pred_of underflows blk_ins[-1] on it), br_fixture_p's two
+// blocks both hold real instructions, so running the real pipeline on it
+// does not crash. Filed here, not incs.id/push.id, which are at their
+// 3-function cap.
+m2r_predfx() {
+  br_fixture_p();
+  int r = init_opt();
+  int slot = ir_leaf("alloca", "int", 0 - 1, 0 - 1, "x");
+} chain () {
+  push((import pra), slot);
+  m2r_row();
+  m2r_row();
+} return void;
+():() then check_failed:(0)
+():() then chk_pred1:([0])
 

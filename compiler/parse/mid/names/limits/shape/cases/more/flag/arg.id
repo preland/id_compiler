@@ -34,3 +34,5 @@ check_case_runs() {
   ut_mark();
   ut_cases();
 } return void;
+given notes_base ():() then calls check_dup_cases:[1]
+given notes_base ():() then calls ut_cases:[1]

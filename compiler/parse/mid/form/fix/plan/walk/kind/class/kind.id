@@ -17,3 +17,11 @@ fix_class3(int e) {
     cl = 2;
   }
 } return int cl;
+given fix_class3_setup ((import ck_import)):(4)
+given fix_class3_setup ((import ck_int)):(0)
+
+fix_class3_setup() {
+  fix_fixture();
+  export int ck_import = newleaf("import", 0, 0, "x", "");
+  export int ck_int = newleaf("int", 1, 0, "1", "");
+} return void;

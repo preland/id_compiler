@@ -5,6 +5,8 @@ case_hit(int i, int node) {
     n = 1;
   }
 } return int n;
+given wrap_fixture ((import fixture_ci), (import fixture_fn)):(1)
+given wrap_fixture ((import fixture_ci), (import fixture_zero)):(0)
 
 // idc.py's message, word for word -- tests/invalid.sh requires both compilers
 // to produce the same text for the same program.
@@ -13,6 +15,8 @@ report_cases(int i, int n) {
   string s1_of_v = s1_of((import prog)[i]);
   cases_report(prog_loc_v, s1_of_v, n);
 } return void;
+given edge_fixture (0, 5):() then prints:("fixture.id:7: error: function 'fx_target' has 5 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)\n")
+given edge_fixture (1, 0):() then prints:("fixture.id:20: error: function 'edge_caller' has 0 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)\n")
 
 // Located by the case's own first token rather than by its function, because
 // the point of the message is the line the reader has to change.
@@ -21,3 +25,5 @@ report_dup_case(int i) {
   string func_file_v = func_file(s1_of_v);
   dup_case_report(func_file_v, i);
 } return void;
+given wrap_fixture ((import fixture_ci)):() then prints:("<stdin>:4: error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)\n")
+given dupeq_fixture (0):() then prints:("<stdin>:1: error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)\n")

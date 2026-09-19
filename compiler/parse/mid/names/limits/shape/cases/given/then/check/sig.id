@@ -16,3 +16,17 @@ then_sig(int ci, int chk_node, int cfn, string chk_nm) {
     then_value_fit(ci, chk_node, cfn);
   }
 } return void;
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn), "chk"):() then prints:("")
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_fn), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
+
+// The third step of the dup-case-detection fixture (more/dup/), filed here
+// because more/dup/ itself and every directory above it are at the 3-entry
+// layout limit and this file had the one free function slot left in the
+// lane. Continues dupeq_starts (../../../more/fit/more/value/scalar.id).
+dupeq_ends() {
+  push((import caseend), 1);
+  push((import caseend), 2);
+  dupeq_fns();
+} return void;
+given dupeq_fixture ():() then check_failed:(0)
+given dupeq_fixture ():() then init_units:(0)

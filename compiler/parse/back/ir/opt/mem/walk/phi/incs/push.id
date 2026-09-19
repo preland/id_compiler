@@ -9,11 +9,15 @@ m2r_inc_at(int f, int ph, int j, int pb) {
 } chain (int f, int ph, int j, int pb) {
   push(bl, pb);
 } return void;
+given m2r_outv_fixture (0, 0, 0, 0):() then chk_l:([-1]) then chk_bl:([0])
+given m2r_outv_fixture (1, 0, 0, 1):() then chk_l:([-1]) then chk_bl:([1])
 
 m2r_inc_val(int ph, int j, int pi) {
   int[] l = ir_l(ph);
   push(l, (import outv)[pi][j]);
 } return void;
+given m2r_outv_fixture (0, 0, 0):() then chk_l:([-1])
+given m2r_outv_fixture (0, 0, 0):() then chk_bl:([])
 
 // One row of phiof, for phiof_sum (at.id): a loop inside a loop is already
 // at the nesting limit, so the inner one cannot sit in the reader itself.

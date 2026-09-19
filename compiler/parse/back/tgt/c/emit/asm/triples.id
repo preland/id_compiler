@@ -16,6 +16,8 @@ asm_tsep(int i, string name, string out) {
     s = asm_comma(out) + (import aftriple)[i];
   }
 } return string s;
+given asmfx_setup (0, "foo", "x"):(", x86_64-unknown-linux-gnu")
+given asmfx_setup (0, "bar", ""):("")
 
 asm_comma(string out) {
   string s = ", ";

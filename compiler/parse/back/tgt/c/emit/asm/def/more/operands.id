@@ -9,6 +9,8 @@ asm_text(int r) {
     i = i + 1;
   }
 } return string out;
+given llasm_row_fixture (0):("\"mov %[x], $0\" \"\\n\\t\" \"ret\"")
+given llasm_row2_fixture (1):("\"nop\"")
 
 asm_sep(int i) {
   string s = "";

@@ -6,6 +6,8 @@ cw_report(int id, string val) {
   string lit = cw_spell(val);
   cw_print(id, lit);
 } return void;
+given ret_widens_fn ((import widen_f), "I5"):() then prints:("<stdin>:1: error: 'f' only returns the constant 5; declare it in conf.id as 'word f = 5;' and read it with (import f)\n")
+given cwv_setup ((import cwv_func), "A[1, \"hi\"]"):() then prints:("<stdin>:1: error: 'f' only returns the constant [1, \"hi\"]; declare it in conf.id as 'int[] f = [1, \"hi\"];' and read it with (import f)\n")
 
 cw_print(int id, string lit) {
   string name = s1_of(id);

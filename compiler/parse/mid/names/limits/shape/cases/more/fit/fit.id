@@ -14,6 +14,23 @@ fit_case(int i) {
   int node = (import casenode)[i];
   fit_arity(i, fn, node);
 } return void;
+given wrap_fixture ((import fixture_ci)):() then prints:("")
+given wrap_fixture ((import fixture_ci)):() then calls fit_arity:[1]
+
+// casegiven[i] populated with "" (a case with no `given`): fit_given
+// (../../given/given.id), fit_import and imp_owner (../../given/read/
+// read.id) all need it, and no existing fixture sets it. Paired with
+// impcase_given (../more/value/more/text/items.id, room for only one of the
+// two there), which gives the non-empty case. etypes gets a matching row too
+// so imp_owner's cases (../../given/read/read.id) have a real ek to read.
+// Filed here because given/ itself is at the 3-entry layout limit.
+impcase_empty() {
+  fn_fixture();
+  push((import casegiven), "");
+  push((import etypes), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
 
 fit_arity(int i, int fn, int node) {
   if(flat_arg_count(fn) != flat_arg_count(node)) {

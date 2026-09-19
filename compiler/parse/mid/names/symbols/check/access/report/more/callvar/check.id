@@ -17,3 +17,15 @@ regrow_d() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// regrow_d plus "g" exported, for report_owned_var's own cases (check/access/
+// report/bad_var.id): report_var_import needs an export the registry
+// (regrow_d) does not give it, and bound_fixture2 (which does export one)
+// never reaches the registry the other way.
+regrow_e() {
+  regrow_d();
+  push((import enames), "g");
+  push((import etypes), "int");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

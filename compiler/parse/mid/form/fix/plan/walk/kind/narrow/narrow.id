@@ -5,6 +5,8 @@ fix_unsafe_rhs(int e) {
     ok = 0;
   }
 } return int ok;
+given fix_traps_setup ((import tr_safe)):(0)
+given fix_traps_setup ((import tr_unsafe)):(1)
 
 // The parameter type an argument narrows to, or "". The test the call checks
 // make (mid/types/check/expr/call/args/err/typecheck.id, and callsite/fcall/

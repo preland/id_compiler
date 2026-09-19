@@ -6,6 +6,8 @@ emit_asm_then_main(string triple) {
   emit_asm_all(triple);
   def_all();
 } return void;
+given test_body_fixture ("x86_64-linux-gnu"):() then calls emit_asm_all:("x86_64-linux-gnu") then calls def_all:[1]
+given test_body_fixture ("wasm32"):() then calls emit_asm_all:("wasm32") then calls def_all:[1]
 
 // Printing it is not enough: `print` writes to the same stream the generated
 // code goes to, so without the flag the message landed *inside* the C and the
@@ -17,6 +19,8 @@ asm_error(string name, string triple) {
   print("error: no 'asm' definition of '" + name + "' for target '" + triple + "'; defined for: " + asm_triples_v);
   note_failure();
 } return void;
+given asmfx_setup ("foo", "aarch64-unknown-linux-gnu"):() then prints:("error: no 'asm' definition of 'foo' for target 'aarch64-unknown-linux-gnu'; defined for: x86_64-unknown-linux-gnu\n") then check_failed:(1)
+given asmfx_setup ("nope", "aarch64-unknown-linux-gnu"):() then prints:("error: no 'asm' definition of 'nope' for target 'aarch64-unknown-linux-gnu'; defined for: \n") then check_failed:(1)
 
 // Row 1 as emit_asm_one needs it: llasm_row2_fixture (../../../ll/fn/asm/def/
 // more.id) leaves afretn unpushed, because only ll_asm_ix reads it and no

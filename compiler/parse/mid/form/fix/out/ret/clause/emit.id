@@ -7,12 +7,16 @@ fix_close(int e) {
   }
   int cb = t0 - 1;
 } return int cb;
+given fix_ret_fixture (0):(0)
+given fix_ret_fixture (5):(-1)
 
 fix_ret_emit(int f, int e, string t) {
   string name = fix_ret_name(t);
   fix_ret_decl(f, e, t, name);
   fix_replace(e, name);
 } return void;
+given fix_ret_fixture (2, 0, "int"):() then prints:("@D||10|5|1|5|int ret_i = |10|5|10|8\n@R||10|5|10|8|2|ret_i\n")
+given fix_ret_fixture (3, 0, "string"):() then prints:("@D||10|5|1|0|string ret_s = |10|5|10|8\n@R||10|5|10|8|2|ret_s\n")
 
 fix_ret_name(string t) {
   string sfx = fix_tsuf(t);

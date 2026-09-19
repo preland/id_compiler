@@ -28,3 +28,5 @@ m2r_phi_place(int f, int i, int ph) {
   int[] irf_blk_v = irf_blk(f);
   m2r_front(irf_blk_v[i], ph);
 } return void;
+given ir_rows_chk1 (0, 0, 1):() then chk_home:(0)
+given ir_rows_chk1 (1, 0, 1):() then chk_home:(1)

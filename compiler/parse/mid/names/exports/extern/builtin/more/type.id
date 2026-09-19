@@ -5,11 +5,15 @@ bname_end(string src, int i) {
   int len_v = len(src);
   int e = find_space(src, i, len_v);
 } return int e;
+("print input", 0):(5)
+("print input foo", 6):(11)
 
 push_bname(string src, int i, int e) {
   string slice_v = slice(src, i, e);
   push((import bnames), slice_v);
 } return void;
+given init_rtc ("test", 0, 4):() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, test")
+given init_rtc ("x", 0, 1):() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, x")
 
 xvarfix() {
   regrow_d();

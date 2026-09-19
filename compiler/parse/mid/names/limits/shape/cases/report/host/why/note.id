@@ -17,6 +17,16 @@ ut_because_at(string via_s, string what_s) {
 // short: it needs none, and a note says why rather than the minimum being
 // lifted silently. One that has a case anyway already has an error at that case
 // (../cases/cases.id), so it gets nothing more here.
+// Refused: ut_at (../../why/why.id) is called unconditionally, which traps
+// unless a case's `given` also ran ut_mark (../mark/); edge_fixture
+// (back/drive/run/check/dce/emit/calls/fixture/setup.id), the only fixture
+// with a real prog[i]/pfile[i]/pline[i] row this lane has, never does. No
+// fixture combines the two, and every directory in this lane is at the
+// 3-entry layout limit with all of its free function slots already spent on
+// the dup-case and given/read fixtures, so there is no legal slot left to
+// add the combining fixture this would need. (The `else if` branch, or
+// ut_note directly, has the same gap one level deeper: it also needs
+// prog[i]'s name marked in utname at the same time as its pfile/pline row.)
 cases_short(int i, int n) {
   string s1_of_v = s1_of((import prog)[i]);
   if(ut_at(s1_of_v) < 0) {
@@ -25,7 +35,6 @@ cases_short(int i, int n) {
     ut_note(i, s1_of_v);
   }
 } return void;
-
 ut_note(int i, string name) {
   string note_at = (import pfile)[i] + ":" + (import pline)[i] + ": note: ";
   string ut_why_v = ut_why(name);

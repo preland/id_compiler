@@ -14,3 +14,21 @@ cw_value_of(int e) {
 } return string val;
 given cwv_setup ((import cwv_arr)):("A[1, \"hi\"]")
 given ret_widens_fn ((import widen_f)):("?func#1")
+
+// An all-literal element list, and one with a non-literal (a func node)
+// mixed in -- for ../lit.id's cw_arr_lit2; cwv_setup's own cwv_build2
+// (../../fixture.id) is already at the 3-action limit, so this is built
+// fresh rather than reusing its e0/e1.
+cwv_els_fixture() {
+  env_init();
+  int e0 = node_int("1", 1, 0);
+  int e1 = node_str("hi");
+} chain () {
+  export int[] cwv_els = [e0, e1];
+  int[] noneP = [];
+  int fn = node_func("g", "int", noneP, noneP, 0 - 1);
+} chain () {
+  export int[] cwv_mixed_els = [e0, fn];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

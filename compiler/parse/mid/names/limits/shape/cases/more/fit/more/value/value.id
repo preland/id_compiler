@@ -13,6 +13,8 @@ fit_value(int i, int e, string want) {
     fit_scalar(i, e, want);
   }
 } return void;
+given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then check_failed:(1)
+given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then check_failed:(0)
 
 fit_list(int i, int e, string want) {
   if(k_of(e) == "arr") {
@@ -22,6 +24,8 @@ fit_list(int i, int e, string want) {
     case_err(i, "this case gives " + lt + " where a " + want + " is required");
   }
 } return void;
+given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then check_failed:(0)
+given fn_fixture ((import fixture_ci), (import fixture_zero), "int[]"):() then check_failed:(1)
 
 fit_elems(int i, int e, string want) {
   int[] xs = l1_of(e);
@@ -33,3 +37,5 @@ fit_elems(int i, int e, string want) {
     j = j + 1;
   }
 } return void;
+given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then check_failed:(0)
+given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then calls fit_value:[2]

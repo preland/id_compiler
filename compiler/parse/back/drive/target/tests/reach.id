@@ -21,3 +21,5 @@ seed_tested() {
   push((import rfn), "conf.id");
   seed_cases();
 } return void;
+given rfnfx_setup ():() then rfn_first:("conf.id")
+given seed_given_fixture ():() then rfn_len:(2)

@@ -5,6 +5,8 @@ reach_range(int lo, int hi) {
     lo = lo + 1;
   }
 } return void;
+given natcall_fixture (0, 0):() then calls scan_reach:[1]
+given natcall_fixture (0, 2):() then calls scan_reach:[3]
 
 // The leaf of the walk, doing both jobs so that one walker serves both passes.
 // During the fixpoint only the calls matter; the imports cannot be judged yet,
@@ -24,6 +26,8 @@ scan_reach(int id) {
     chk_import_at(id);
   }
 } return void;
+given natcall_fixture (2):() then calls reach_add:[1]
+given natcall_fixture (0):() then calls reach_add:[0]
 
 is_reach(string name) {
   int ok = 0;
@@ -31,3 +35,5 @@ is_reach(string name) {
     ok = 1;
   }
 } return int ok;
+given init_reach ("main"):(1)
+given init_reach ("nonexistent"):(0)

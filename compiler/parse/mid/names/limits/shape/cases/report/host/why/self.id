@@ -2,6 +2,15 @@
 // helper's definition. A harness on the build host already has one, from the
 // host's C runtime, so it would run the host's and never this tree's.
 
+// Refused: ut_self_at calls is_runtime() (mid/names/exports/extern/note.id)
+// unconditionally, which traps unless a case's `given` also ran init_rtc;
+// fn_fixture and edge_fixture (../../given/then/more/fixture/fn.id, back/
+// drive/run/check/dce/emit/calls/fixture/setup.id), the fixtures with a real
+// `prog` this lane has, never do (init_rtc is only reached through notes_base
+// or rt_fixture, ../mark/mark.id / mid/names/exports/extern/note.id, neither
+// of which builds a `prog`). No fixture combines the two, and this lane has
+// no free function slot left (see ut_self_at's own note below for the
+// accounting).
 ut_seed_self() {
   int i = 0;
   while(i < len((import prog))) {
@@ -10,6 +19,15 @@ ut_seed_self() {
   }
 } return void;
 
+// Refused: ut_self_at's own marking branch needs is_runtime()==1 (only
+// rt_fixture, mid/names/exports/extern/note.id, gives that) at the same time
+// as a real `prog` entry whose name is_reserved_name recognises (only
+// resv_scan_fixture, mid/form/unique/scan/more/reserved/check.id, gives that);
+// rt_fixture builds no `prog` at all, so combining them traps on prog[i] out
+// of range. No existing fixture does both, and this lane has no free function
+// slot left (every directory here is at the 3-entry layout limit, and all 7
+// spare function slots in the lane are already spent on the dup-case and
+// given/read fixtures) to add the combining fixture this would need.
 ut_self_at(int i) {
   if(is_runtime() == 1 && is_reserved_name(i)) {
     string s1_of_v = s1_of((import prog)[i]);
@@ -17,6 +35,13 @@ ut_self_at(int i) {
   }
 } return void;
 
+// Refused: same root cause as ut_note (../why/note.id) -- ut_named calls
+// ut_why(name), which traps on a negative utvia index unless `name` is
+// already marked in utname (ut_add, ../mark/), and this also needs a real
+// case index (casenode/casestart/tline) from case_fixture's chain to report
+// through. No fixture combines the two, and the lane's free function slots
+// are already spent (see ut_note's note for the accounting).
+//
 // A setup, a check or a function value a case names runs in the harness as
 // surely as the function under test does.
 ut_named(int ci, string lead, string name) {

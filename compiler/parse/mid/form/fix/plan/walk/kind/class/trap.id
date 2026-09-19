@@ -8,3 +8,15 @@ fix_traps(int e) {
     ok = fix_unsafe_rhs(e);
   }
 } return int ok;
+given fix_traps_setup ((import tr_safe)):(0)
+given fix_traps_setup ((import tr_unsafe)):(1)
+
+fix_traps_setup() {
+  fix_fixture();
+  int tr_one = newleaf("int", 1, 0, "1", "");
+  int tr_five = newleaf("int", 5, 0, "5", "");
+} chain () {
+  int tr_zero = newleaf("int", 0, 0, "0", "");
+  export int tr_safe = newleaf("bin", tr_one, tr_five, "/", "");
+  export int tr_unsafe = newleaf("bin", tr_one, tr_zero, "/", "");
+} return void;

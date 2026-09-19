@@ -3,6 +3,8 @@ fix_walk_arg(int e, int i, int cd) {
   string nt = fix_narrow(e, i, a);
   fix_walk_arg2(e, i, a, cd, nt);
 } return void;
+given fix_walk_arg2_fixture ((import wa2_e1), 0, 0):() then calls fix_walk_arg2:((import wa2_e1), 0, (import wa2_e2), 0, "")
+given fix_walk_arg2_fixture ((import wa2_e1), 0, 1):() then calls fix_walk_arg2:((import wa2_e1), 0, (import wa2_e2), 1, "")
 
 // an: the name to use if this argument narrows nothing itself but is named as
 // a whole anyway, because a call sits somewhere inside it (plan/walk/kind/).

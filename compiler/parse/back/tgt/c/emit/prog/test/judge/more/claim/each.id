@@ -15,6 +15,8 @@ claim_at(int c) {
     emit_claim(c);
   }
 } return void;
+given claim_cols_fixture (0):() then prints:("    bad |= idtc_claim((int[]){0}, 1, \"time\", \"O(n)\");\n")
+given claim_dup_fixture (1):() then prints:("")
 
 // The last of claim_cols_fixture (../more/hit/has.id): the second claim's
 // kind and both bounds. Two claims on case 0, kinds "mem" and "time", the

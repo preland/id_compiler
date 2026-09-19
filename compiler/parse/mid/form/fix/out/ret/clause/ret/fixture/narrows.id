@@ -12,6 +12,16 @@ ret_narrows_val() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// A reader for run/walk/enter.id's fix_setfile: fixd_file holds one cell
+// (run/state/state.id), so, as fixd_std_on does for fixd_std, reading it is
+// the witness -- fix_setfile pops then pushes, leaving the length the same,
+// so a length check would not see the pop/push land the wrong string.
+fixd_file0() {
+  string s = (import fixd_file)[0];
+} return string s;
+given fix_fixture ():("")
+given fix_ret_fixture ():("")
+
 ret_narrows_fn() {
   ret_narrows_val();
   int[] none = [];

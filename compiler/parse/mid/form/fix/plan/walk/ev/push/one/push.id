@@ -16,3 +16,19 @@ given fix_fixture (7, 2, 0, 0, "", ""):() then fix_walk_arg2_an0:("") then fix_p
 fix_pr_cl0() {
   int n = (import fixe_cl)[0];
 } return int n;
+
+// One real event with a known token (curtk stays 0, so ntok[e] is 0) and a
+// known line for it (tline[0]), class 3 (must be named wherever it sits) and
+// cd 1 (right of && or ||) -- the one combination that lets decide/mark/'s
+// own cases reach fix_refuse without tripping on an empty fixe_cd, nst or
+// tline, all of which decide/mark/ and decide/why/ are too full to fix with
+// a fixture of their own.
+fix_mark_case_fixture() {
+  fix_fixture();
+  export int mfe = node_int("1", 1, 0);
+  push((import tline), 3);
+} chain () {
+  fix_push_rest((import mfe), 0, 3, 1, "", "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

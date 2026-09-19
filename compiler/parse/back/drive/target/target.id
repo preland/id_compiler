@@ -15,6 +15,8 @@ emit_target(int argc, string[] argv) {
     emit_target2(arg_target_v, argc, argv);
   }
 } return void;
+given ll_env_fixture2 (3, ["prog", "--target", "llvm"]):() then calls emit_llvm:("x86_64-unknown-linux-gnu", 1)
+given nz_prog_fixture (1, ["prog"]):() then calls emit_target2:("c", 1, ["prog"])
 
 // `crt` is not a code generator: it prints the C runtime with external
 // linkage, which is what the LLVM target links against until the runtime is
@@ -28,6 +30,8 @@ emit_target2(string t, int argc, string[] argv) {
     emit_program(arg_triple_v);
   }
 } return void;
+given nz_env ("crt", 1, ["prog"]):() then calls emit_crt:[1] then calls emit_crt_eprint:[1]
+given nz_prog_fixture ("c", 1, ["prog"]):() then calls emit_program:("x86_64-unknown-linux-gnu")
 
 // `--target NAME`, scanned rather than read at a fixed position: the driver
 // also passes --triple and --require-tests, and a flag whose meaning depends

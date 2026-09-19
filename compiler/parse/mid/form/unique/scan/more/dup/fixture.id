@@ -1,0 +1,60 @@
+// env_init() plus init_rtc() (rtc/fsc/bnames/resv_names -- dupfn_at reads
+// is_runtime(), which needs rtc, as well as resv_names), shared by this
+// file's two fixtures and by ../../reserved/check.id's resv_scan_fixture --
+// so the calling segment, not the setup itself, is what the per-segment
+// fingerprint sees.
+resv_env_setup() {
+  env_init();
+  init_rtc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// Two functions named "dupe", registered in `prog`/`pfile`/`pline` the way a
+// real duplicate declaration would be (front/parse/decl/top/decl/decl_top.id),
+// for dup_name.id's own cases and for ../../pass/check.id's check_bodies.
+// Built directly through node_func/push rather than parsed, since a program
+// with a real duplicate name is a compile error before this pass would ever
+// see it.
+dupfn_fixture() {
+  resv_env_setup();
+  int[] none = [];
+  int dnf1 = node_func("dupe", "void", none, none, 0 - 1);
+} chain () {
+  push((import prog), dnf1);
+  push((import pfile), "a.id");
+  push((import pline), 1);
+} chain () {
+  int dnf2 = node_func("dupe", "void", none, none, 0 - 1);
+  push((import prog), dnf2);
+  push((import pfile), "b.id");
+} chain () {
+  push((import pline), 5);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A `prog` with no duplicate names, no reserved-name collisions and no
+// constant wrappers -- check_bodies' quiet path. Each function returns a
+// call's result rather than a literal, so cw_value_of's fingerprint is
+// tagged 'c', not one of 'I'/'F'/'S'/'A', and neither is mistaken for a
+// wrapper.
+clean_prog_fixture() {
+  resv_env_setup();
+  int[] none = [];
+  int cpca = node_call("cpc_a", none);
+} chain () {
+  int cpf1 = node_func("alpha", "int", none, none, cpca);
+  push((import prog), cpf1);
+  push((import pfile), "a.id");
+} chain () {
+  push((import pline), 1);
+  int cpcb = node_call("cpc_b", none);
+  int cpf2 = node_func("beta", "string", none, none, cpcb);
+} chain () {
+  push((import prog), cpf2);
+  push((import pfile), "b.id");
+  push((import pline), 5);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

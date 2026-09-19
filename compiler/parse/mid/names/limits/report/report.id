@@ -9,6 +9,8 @@ check_plain_else(int[] els, int depth, string fname, int ln) {
     check_block(els, depth + 1, fname, ln);
   }
 } return void;
+([], 0, "f", 5):() then calls check_block:[0]
+given env_init ([7], 2, "f", 5):() then calls check_block:([7], 3, "f", 5)
 
 report_actions(string fname, int n, int ln) {
   string loc_at_v = loc_at(fname, ln);

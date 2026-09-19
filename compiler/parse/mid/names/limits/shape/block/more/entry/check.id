@@ -8,6 +8,11 @@
 // violation is printed (idc.py stops at the first; this reports them all) and
 // check_failed() then answers 1.
 
+// Deliberately left uncased. It reaches check_case_runs, which reads the
+// real compile-time case table (casefn, casenode, casegiven); no fixture in
+// the build populates that alongside the node environment this needs, and
+// mid/names/limits/shape/cases/ records the same gap from the other side.
+// A case here traps rather than fails, so there is nothing to assert.
 check_program() {
   check_bodies();
   check_scopes();
@@ -22,6 +27,8 @@ check_funcs() {
     i = i + 1;
   }
 } return void;
+given env_init ():() then calls check_main:[1] then calls check_func_body:[0]
+given fn_fixture ():() then calls check_main:[1] then calls check_func_body:[1]
 
 // A function's own body is the outermost block, at depth 0. Its name labels
 // every diagnostic found anywhere inside it, as in idc.py.
@@ -33,3 +40,5 @@ check_func_body(int id) {
   check_block(l2_of_v, 0, s1_of_v, func_line_v);
   check_segs(l2_of_v, s1_of_v, func_line_v);
 } return void;
+given fn_fixture ((import fixture_fn)):() then calls check_block:([], 0, "fx_target", 1) then calls check_segs:([], "fx_target", 1)
+given edge_fixture ((import fixture_fn)):() then calls check_block:([], 0, "fx_target", 7) then calls check_segs:([], "fx_target", 7)

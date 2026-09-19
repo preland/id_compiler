@@ -8,6 +8,8 @@ m2r_fill(int f, int i) {
     i = i + 1;
   }
 } return void;
+given m2r_outv_fixture (0, 0):() then calls m2r_fill_b:(0, 0)
+given m2r_outv_fixture (0, 1):() then calls m2r_fill_b:[0]
 
 m2r_fill_b(int f, int i) {
   int j = 0;
@@ -15,9 +17,13 @@ m2r_fill_b(int f, int i) {
     j = m2r_fill_one(f, i, j);
   }
 } return void;
+given m2r_outv_fixture (0, 0):() then calls m2r_fill_one:(0, 0, 0)
+given m2r_row_fixture (0, 0):() then calls m2r_fill_one:[0]
 
 m2r_fill_one(int f, int i, int j) {
   int[] irf_blk_v = irf_blk(f);
   m2r_incs(f, irf_blk_v[i], (import phiof)[i][j], j);
   int ret_i = j + 1;
 } return int ret_i;
+given m2r_outv_fixture (0, 0, 0):(1) then calls m2r_incs:(0, 0, -1, 0)
+given m2r_outv_fixture (1, 0, 0):(1) then calls m2r_incs:(1, 1, -1, 0)

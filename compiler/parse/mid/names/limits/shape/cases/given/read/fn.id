@@ -13,12 +13,16 @@ fit_named(int i, int e, string want) {
     fit_import(i, e, want);
   }
 } return void;
+given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then check_failed:(0)
+given cfn_fixture ((import fixture_ci), (import fixture_zero), "int"):() then check_failed:(1)
 
 fit_fn(int i, int e, string want) {
   string nm = s1_of(e);
   string ft = fn_sig_of(nm);
   fit_fn_type(i, nm, ft, want);
 } return void;
+given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then check_failed:(0)
+given cfn_fixture ((import fixture_ci), (import cfn_e), "func(string) return void"):() then check_failed:(1)
 
 fit_fn_type(int i, string nm, string ft, string want) {
   if(ft == "") {

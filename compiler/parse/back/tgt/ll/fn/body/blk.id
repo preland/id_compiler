@@ -7,6 +7,8 @@ ll_blocks(int f) {
     i = i + 1;
   }
 } return void;
+given ll_blk_fixture (0):() then prints:("b0:\n  %v2 = add i32 5, 5\n")
+given ir_rows (1):() then prints:("b1:\n")
 
 // A parameter is spelled in the signature and a nop is what a pass left
 // behind; neither is a line of the body.
@@ -16,3 +18,20 @@ ll_insn(int id) {
     emit_line("  " + ll_text_v);
   }
 } return void;
+given ir_fix2 ((import irf_n3)):() then prints:("  %v2 = add i32 5, 5\n")
+given ll_main_fixture (0):() then prints:("")
+
+// A block and a function large enough to reach ll_block/ll_insn without
+// touching the sentinel operands ir_rows leaves undefined (its "add" is
+// never read by ll_val, only stored and reread by the core/ cases it
+// serves): ir_fix2's add instruction (id 2) has two real, safe operands,
+// so it is put in a real block of a real function here instead.
+ll_blk_fixture() {
+  ir_fix2();
+  int f = ir_func(0 - 1, "g", "int");
+  int blkf_blk = ir_block(f, "entry");
+} chain () {
+  ir_add(blkf_blk, (import irf_n3));
+} return void;
+():() then init_opt:(0)
+():() then init_units:(0)

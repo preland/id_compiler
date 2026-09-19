@@ -7,6 +7,8 @@ acc_expr3(int id, string owner, int ln) {
     acc_expr4(id, owner, ln);
   }
 } return void;
+given cmp_fixture ((import bin_eq), "f", 10):() then calls acc_pair:((import bin_eq), "f", 10)
+given cm_other_setup ((import cm_var_node), "f", 10):() then calls acc_expr4:((import cm_var_node), "f", 10)
 
 acc_pair(int id, string owner, int ln) {
   int i1_of_v = i1_of(id);
@@ -15,6 +17,8 @@ acc_pair(int id, string owner, int ln) {
 } chain (int id, string owner, int ln) {
   acc_expr(i2_of_v, owner, ln);
 } return void;
+given cmp_fixture ((import bin_eq), "f", 10):() then calls acc_expr:((import lit_a), "f", 10) then calls acc_expr:((import lit_b), "f", 10)
+given cmp_fixture ((import bin_mixed), "f", 10):() then calls acc_expr:((import bin_bitand), "f", 10) then calls acc_expr:((import lit_a), "f", 10)
 
 acc_expr4(int id, string owner, int ln) {
   if(k_of(id) == "un") {
@@ -24,3 +28,5 @@ acc_expr4(int id, string owner, int ln) {
     acc_expr5(id, owner, ln);
   }
 } return void;
+given hidden_call_fixture ((import hc_un), "f", 10):() then calls acc_expr:((import hc_call), "f", 10)
+given cm_setup ((import cm_push_call), "f", 10):() then calls acc_expr5:((import cm_push_call), "f", 10)

@@ -5,6 +5,8 @@ asm_first(int i) {
     r = 0;
   }
 } return int r;
+given asmfx_setup (0):(1)
+given asmfx_dup_fixture (1):(0)
 
 asm_prev(string name, int n) {
   int i = 0;
@@ -23,3 +25,5 @@ asm_match2(int i, string name, int found) {
     r = i;
   }
 } return int r;
+given asmfx_setup (0, "foo", -1):(0)
+given asmfx_setup (0, "bar", -1):(-1)

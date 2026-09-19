@@ -16,6 +16,8 @@ chk_dupfn() {
     i = i + 1;
   }
 } return void;
+given dupfn_fixture ():() then calls dupfn_err:(1, 0)
+given clean_prog_fixture ():() then calls dupfn_err:[0]
 
 // Reported against every definition after the first, so three functions of
 // one name draw two diagnostics rather than one -- the checker reports every
@@ -37,6 +39,8 @@ dupfn_at(int i) {
     dupfn_err(i, j);
   }
 } return void;
+given dupfn_fixture (0):() then calls dupfn_err:[0]
+given dupfn_fixture (1):() then calls dupfn_err:(1, 0)
 
 dupfn_err(int i, int j) {
   string prog_loc_v = prog_loc(i);
@@ -45,3 +49,5 @@ dupfn_err(int i, int j) {
 } chain (int i, int j) {
   note_failure();
 } return void;
+given dupfn_fixture (0, 1):() then prints:("a.id:1: error: function 'dupe' already defined at b.id:5\n")
+given dupfn_fixture (1, 0):() then prints:("b.id:5: error: function 'dupe' already defined at a.id:1\n")

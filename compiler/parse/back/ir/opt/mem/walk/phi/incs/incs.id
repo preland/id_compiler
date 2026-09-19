@@ -5,6 +5,8 @@ m2r_incs(int f, int b, int ph, int j) {
     i = m2r_inc(f, b, ph, j, i);
   }
 } return void;
+given cfg_fixture (0, 0, 0, 0):() then calls m2r_inc:[0]
+given m2r_predfx (0, 1, 0, 0):() then calls m2r_inc:(0, 1, 0, 0, 0)
 
 // A block's predecessor count, composed so `blk_pre` -- a call -- does not
 // sit inside `len`'s own argument list.
@@ -20,3 +22,5 @@ m2r_inc(int f, int b, int ph, int j, int i) {
   m2r_inc_at(f, ph, j, pb);
   int ret_i = i + 1;
 } return int ret_i;
+given m2r_predfx (0, 1, 0, 0, 0):(1) then calls m2r_inc_at:(0, 0, 0, 0)
+given m2r_predfx (0, 1, 1, 0, 0):(1) then calls m2r_inc_at:(0, 1, 0, 0)

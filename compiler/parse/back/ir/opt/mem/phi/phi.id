@@ -10,6 +10,8 @@ m2r_phis(int f) {
     i = i + 1;
   }
 } return void;
+given m2r_2blk_fixture (0):() then calls m2r_phi_blk:(0, 1)
+given m2r_outv_fixture (0):() then calls m2r_phi_blk:[0]
 
 m2r_phi_blk(int f, int i) {
   int j = 0;
@@ -17,9 +19,13 @@ m2r_phi_blk(int f, int i) {
     j = m2r_phi_one(f, i, j);
   }
 } return void;
+given m2r_outv_fixture (0, 0):() then calls m2r_phi_one:(0, 0, 0)
+given m2r_row_fixture (0, 0):() then calls m2r_phi_one:[0]
 
 m2r_phi_one(int f, int i, int j) {
   int ph = m2r_phi_make(i, j);
   m2r_phi_place(f, i, ph);
   int ret_i = j + 1;
 } return int ret_i;
+given m2r_outv_fixture (0, 0, 0):(1) then phiof_sum:(3)
+given m2r_outv_fixture (0, 0, 0):(1) then calls m2r_phi_place:(0, 0, 3)

@@ -16,3 +16,15 @@ m2r_collect(int f) {
     i = i + 1;
   }
 } return void;
+given m2r_alloca_fixture (0):() then calls m2r_collect_at:(0, 0) then calls m2r_collect_at:(0, 1)
+given m2r_alloca_fixture (1):() then calls m2r_collect_at:[0]
+
+// cfg_fixture's two blocks, with pra/phiof/outv exported: for m2r_phis and
+// m2r_walk cases that need blk_count(f) > 1 without crashing on the tables
+// mem2reg reads, which cfg_fixture alone leaves undeclared.
+m2r_2blk_fixture() {
+  cfg_fixture();
+  int r = init_opt();
+} return void;
+():() then check_failed:(0)
+():() then chk_blk_count:(2)

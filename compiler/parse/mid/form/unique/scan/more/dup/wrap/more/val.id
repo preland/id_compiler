@@ -9,6 +9,8 @@ cw_assign(int id) {
     ok = cw_put(id, s1_of_v);
   }
 } return int ok;
+given cw_assign_fixture ((import cw_assign_x)):(1)
+given cw_assign_fixture ((import cw_assign_y)):(0)
 
 // Appended rather than overwritten, so an assignment needs no search to write;
 // the latest entry for a name is its value (cw_get).
@@ -22,3 +24,16 @@ cw_put(int id, string name) {
 } return int ok;
 given cwv_setup ((import cwv_func), "y"):(1)
 given cwv_setup ((import cwv_arr), "y"):(1)
+
+// "x" declared with a literal 3 (before cw_put has run over it), for
+// ../walk.id's cw_stmts/cw_stmt and ../result/lit.id's cw_named_fixture.
+cw_decl_fixture() {
+  cwv_setup();
+  int e = node_int("3", 3, 0);
+  export int cw_decl_x = node_decl("int", "x", e, 0);
+} chain () {
+  export int[] cw_decl_list = [(import cw_decl_x)];
+  export int[] cw_func_list = [(import cwv_func)];
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

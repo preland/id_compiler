@@ -19,6 +19,8 @@ init_rtc() {
   export int[] fsc = [0];
   init_rtc2();
 } return void;
+():() then is_runtime:(0)
+():() then is_freestanding:(0)
 
 init_rtc2() {
   init_bnames();
@@ -28,3 +30,5 @@ init_rtc2() {
 rt_set(int v) {
   lset((import rtc), 0, v);
 } return void;
+given init_rtc (1):() then is_runtime:(1)
+given init_rtc (0):() then is_runtime:(0)

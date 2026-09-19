@@ -7,8 +7,26 @@ case_err(int i, string msg) {
   print(case_loc_v + ": error: " + msg);
   note_failure();
 } return void;
+given case_fixture (0, "oops"):() then prints:("fixture.id:4: error: oops\n")
+given case_fixture (0, "oops"):() then check_failed:(1)
 
 case_loc(int i) {
   string s1_of_v = s1_of((import casenode)[i]);
   string ret_s = s1_of_v + ":" + (import tline)[(import casestart)[i]];
 } return string ret_s;
+given case_fixture (0):("fixture.id:4")
+given wrap_fixture ((import fixture_ci)):(":4")
+
+// A "cfn" case-literal node naming a real, indexed function ("fx_target",
+// registered where fn_sig_of looks it up), for fit_named/fit_fn (../../../../
+// given/read/fn.id) -- neither existing "cfn" fixture (seed_cfn_fixture_node,
+// back/drive/.../export/consts.id; cfnid, back/.../export/consts.id) is built
+// on the indexed lookup fn_sig_of needs. Filed here because given/read/ is at
+// the 3-entry limit and this was the lane's last free slot.
+cfn_fixture() {
+  fn_idx_fixture();
+  export int cfn_e = newleaf("cfn", 0, 0, "fx_target", "");
+  push((import casegiven), "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -9,6 +9,8 @@ claim_group(int c) {
     ci = ci + 1;
   }
 } return string out;
+given claim_cols_fixture (0):("0")
+given claim_other_fn_fixture (0):("")
 
 group_item(string out, int ci, int c) {
   string so = "";

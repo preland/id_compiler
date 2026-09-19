@@ -29,8 +29,12 @@ cw_arr_lit2(int[] els) {
     i = i + 1;
   }
 } return int ok;
+given cwv_els_fixture ((import cwv_els)):(1)
+given cwv_els_fixture ((import cwv_mixed_els)):(0)
 
 cw_arr_elem_lit(int e) {
   string k = k_of(e);
   int ok = k == "int" || k == "float" || k == "str";
 } return int ok;
+given ret_widens_fn ((import widen_e)):(1)
+given cwv_setup ((import cwv_func)):(0)

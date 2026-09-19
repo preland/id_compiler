@@ -18,3 +18,14 @@ func_file_at(int i, string fname, string s) {
 } return string fpath;
 given edge_fixture (0, "fx_target", "<stdin>"):("fixture.id")
 given edge_fixture (0, "nosuchfn", "<stdin>"):("<stdin>")
+
+// note_failure sets chkfail, but only env_init declares it, so neither alone
+// is a legal setup for a case that wants the flag already raised: called bare
+// note_failure traps, and env_init alone leaves the flag at 0. Composing them
+// is the only way to reach chkfail == 1 from a no-argument setup.
+chkfail_raised() {
+  env_init();
+  note_failure();
+} return void;
+():() then check_failed:(1)
+():() then init_units:(0)

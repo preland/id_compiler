@@ -10,7 +10,25 @@ m2r_step(int f, int id, int i) {
     m2r_store(id, i);
   }
 } return void;
+given m2r_ldfx (0, (import ldfx_id), 0):() then calls m2r_load:(0, (import ldfx_id), 0)
+given m2r_ldfx (0, (import ldfx_id2), 0):() then calls m2r_store:((import ldfx_id2), 0)
 
 m2r_slot(int a) {
   int ret_i = lst_index_of((import pra), a);
 } return int ret_i;
+given m2r_outv_fixture (2):(0)
+given m2r_outv_fixture (99):(-1)
+
+// A "load" and a "store" whose address is the promotable slot m2r_outv_fixture
+// collects, for m2r_load/m2r_store/m2r_step's own cases: neither reads
+// ir_op, so an id built for this needs to be right only in ir_a and ir_b.
+m2r_ldfx() {
+  m2r_outv_fixture();
+  int[] none = [];
+  export int ldfx_id = ir_insn("load", "int", (import pra)[0], 42, "", none, none);
+} chain () {
+  export int ldfx_id2 = ir_insn("store", "int", (import pra)[0], 42, "", none, none);
+  lset((import chk_id), 0, ldfx_id);
+} return void;
+():() then check_failed:(0)
+():() then chk_op:("load")

@@ -25,3 +25,13 @@ cw_spell(string val) {
 } return string lit;
 ("I5"):("5")
 ("I-3"):("0 - 3")
+
+// "x" declared with a literal value, already recorded by cw_put -- for
+// ../ret.id's cw_get/cw_pick, which read cw_names/cw_vals rather than
+// walking a body themselves.
+cw_named_fixture() {
+  cw_decl_fixture();
+  int ok = cw_put((import cw_decl_x), "x");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

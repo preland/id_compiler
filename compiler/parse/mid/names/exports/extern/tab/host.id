@@ -9,3 +9,26 @@ build_host() {
   string ret_s = (import hostc)[0];
 } return string ret_s;
 
+fs_fixture_extern() {
+  init_rtc();
+  fs_set(1);
+} return void;
+():() then is_freestanding:(1)
+():() then is_runtime:(0)
+
+
+// dead_exp_fixture (../../reach/dead/more/add.id) declares the dead-export
+// nodes but never runs init_reach, so rfn does not exist and every reader of
+// it traps. Composing the two is what a case about reachability needs, and
+// "gm" gives it the reachable-owner side that ["main", "conf.id"] alone
+// cannot. Filed here because reach/dead/more/ is at its three-file cap and
+// every file in it is at three functions.
+dead_exp_reach_fixture() {
+  dead_exp_fixture();
+  init_reach();
+  add_export("gm", "int", "main");
+} chain () {
+  export int reach_imp_m = node_import("gm");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

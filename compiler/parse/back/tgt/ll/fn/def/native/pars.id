@@ -11,3 +11,25 @@ ll_native_pars(int[] ps) {
     i = i + 1;
   }
 } return string out;
+given ll_native_fixture ((import nat_params)):("i32, i64")
+given ll_native_fixture ((import nat_params0)):("")
+
+// A native with two parameters ("helper", int/word) and one with none
+// ("getter", word) -- a `native` is a plain func node with 1 in its i2
+// field (front/parse/decl/top/decl/native/tail.id), built directly since
+// node_func always leaves i2 at 0.
+ll_native_fixture() {
+  env_init();
+  int nfx_pa = node_param("param", "int", "a");
+  int nfx_pb = node_param("param", "word", "b");
+} chain () {
+  export int[] nat_params = [nfx_pa, nfx_pb];
+  int[] none = [];
+  export int nat_id = newnode("func", 0 - 1, 1, "helper", "int", (import nat_params), none);
+} chain () {
+  int[] none2 = [];
+  export int[] nat_params0 = none2;
+  export int nat_id0 = newnode("func", 0 - 1, 1, "getter", "word", none2, none2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -9,6 +9,21 @@ fit_scalar(int i, int e, string want) {
     case_err(i, "this case gives a " + lt + " where a " + want + " is required");
   }
 } return void;
+given fn_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
+given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+
+// The second step of the dup-case fixture (more/dup/): casestart, two rows
+// (0 and 1) over mk_two_toks's two tokens. Continues dupeq_fixture
+// (../more/ty.id); continued by dupeq_ends (../../../../given/then/check/
+// sig.id). Filed here for the same reason as its neighbours: every directory
+// from here up to more/dup/ itself is at the 3-entry limit.
+dupeq_starts() {
+  push((import casestart), 0);
+  push((import casestart), 1);
+  dupeq_ends();
+} return void;
+given dupeq_fixture ():() then check_failed:(0)
+given dupeq_fixture ():() then init_units:(0)
 
 // idc.py's `compatible`: the same type, or two numeric ones.
 ty_fits(string want, string lt) {

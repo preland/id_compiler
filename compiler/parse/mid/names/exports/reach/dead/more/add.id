@@ -6,6 +6,8 @@ reach_add(string name) {
     push((import rfn), name);
   }
 } return void;
+given seed_given_fixture ("main"):() then reach_pass:(2)
+given seed_given_fixture ("fx_target"):() then reach_pass:(3)
 
 regrow_prog() {
   regrow_fn();

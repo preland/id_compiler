@@ -12,9 +12,24 @@ init_bnames() {
     i = take_bname((import builtin_src), i);
   }
 } return void;
+():() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint")
+given init_rtc ():() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint")
 
 take_bname(string src, int i) {
   int e = bname_end(src, i);
   push_bname(src, i, e);
   int ret_i = e + 1;
 } return int ret_i;
+given init_rtc ("print input", 0):(6)
+given init_rtc ("print input read_all", 6):(12)
+
+// call_fixture_extern (list.id) builds its node with node_call, which needs
+// the node store pushfix creates -- its own cases say so with `given pushfix`.
+// Named as a `given` elsewhere it runs bare and traps, so the two are composed
+// here, where there was a free slot.
+unresolved_call_fixture() {
+  pushfix();
+  call_fixture_extern();
+} return void;
+():() then check_failed:(0)
+():() then is_runtime:(0)

@@ -18,3 +18,14 @@ fix_env3() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// out/ret/more/within.id's fix_ret_fixture plus a noted range (1..2, run/
+// state/grp's fixd_lo/fixd_hi), for fix_in_moved (../../../ret/paren/more.id):
+// e2 (token 1) falls inside it, e (token 3) does not. out/ret/paren/ is at
+// its three-function cap in all three of its files, so this is filed here.
+fix_moved_fixture() {
+  fix_ret_fixture();
+  fix_note_tok(1, 2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

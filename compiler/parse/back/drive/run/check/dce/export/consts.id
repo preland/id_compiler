@@ -16,6 +16,19 @@ is_list_const(int i) {
 given lc_dce_setup (0):(1)
 given lc_dce_setup (1):(0)
 
+// seed_cfn_fixture's cfn leaf (fns.id, tests/more/clear.id), wrapped as a
+// single-argument "case" node the way tuple.id's own parser builds one, so
+// seed_fn_args has a casenode entry whose l1_of is non-empty. Filed here (an
+// unrelated list-constants check) because tests/more/seed/ is at its 3-file
+// cap.
+seed_cfn_fixture_node() {
+  export int cfnid = newleaf("cfn", 0, 0, "fx_target", "");
+  int[] args = [cfnid];
+  seed_cfn_fixture_add(args);
+} return void;
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)
+
 list_consts_kept() {
   int n = 0;
   int i = 0;

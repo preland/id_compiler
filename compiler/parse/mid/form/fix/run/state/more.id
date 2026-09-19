@@ -5,6 +5,8 @@ fix_gcl_at(int i) {
     lset((import fixd_gcl), n, (import ngrpc)[i]);
   }
 } return void;
+given fix_gcl_fixture (0):() then calls lset:[0]
+given fix_gcl_fixture (1):() then calls lset:[1]
 
 // The events of one statement, reset by declaring them again (plan/walk/).
 //   fixe_n   each node, in the order it is evaluated

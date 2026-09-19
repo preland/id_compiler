@@ -15,6 +15,18 @@ lz_e() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// A casegiven entry naming no function in the build, for given.id's own
+// seed_givens: reach_add's fnames guard must block it, which a case built on
+// seed_given_fixture (a real name) cannot show. Filed here (an unrelated
+// flag-value reader) because tests/more/seed/ is at its 3-file cap.
+seed_given_fixture_bad() {
+  env_init();
+  init_reach();
+  push((import casegiven), "nope");
+} return void;
+():() then check_failed:(0)
+():() then rfn_len:(2)
+
 arg_flag_val(int argc, string[] argv, int i, string name, string dflt) {
   string s = dflt;
   if(i + 1 < argc && argv[i] == name) {

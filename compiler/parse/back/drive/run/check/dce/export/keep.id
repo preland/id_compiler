@@ -19,6 +19,19 @@ lz_a() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// The last step of seed_cfn_fixture (tests/more/clear.id, dce/export/
+// consts.id): wraps the args list into a "case" node the way tuple.id does
+// (l1 = args, l2 reused since fns.id never reads it) and pushes it onto
+// casenode, so seed_fn_args has a real entry to iterate. Filed here (an
+// unrelated export-liveness check) because tests/more/seed/ is at its
+// 3-file cap.
+seed_cfn_fixture_add(int[] args) {
+  int caseid = newnode("case", 0, 0, "fixture.id", "", args, args);
+  push((import casenode), caseid);
+} return void;
+given fn_fixture ([0]):() then check_failed:(0)
+given fn_fixture ([1]):() then check_failed:(0)
+
 keep_export(int i) {
   int ok = 1;
   if(is_harn() == 0 && nat_all_live() == 0) {

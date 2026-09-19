@@ -2,6 +2,8 @@ fix_seq() {
   int n = (import fixd_seq)[0] + 1;
   lset((import fixd_seq), 0, n);
 } return int n;
+given fix_fixture ():(1)
+given fix_seq_once ():(2)
 
 // A zero-width edit: text inserted at p, a LINE|COL.
 fix_emit_pt(string p, string text) {

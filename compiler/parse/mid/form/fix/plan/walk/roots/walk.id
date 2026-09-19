@@ -30,6 +30,8 @@ fix_walk(int e, int ca, int cd, string nt, string an) {
 } chain (int e, int ca, int cd, string nt, string an) {
   fix_rcache_taint(e);
 } return void;
+given fix_tokline_node_fixture (0, 0, 0, "", ""):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
+given fix_tokline_node_fixture (0, 1, 0, "int", "x"):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
 
 fix_walk_kids(int e, int cd) {
   if(k_of(e) == "call") {
@@ -40,3 +42,5 @@ fix_walk_kids(int e, int cd) {
     fix_walk_more(e, cd);
   }
 } return void;
+given fix_tokline_node_fixture (0, 0):() then calls fix_walk_more:(0, 0)
+given fix_tokline_node_fixture (0, 1):() then calls fix_walk_more:(0, 1)

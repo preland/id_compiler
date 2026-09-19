@@ -3,6 +3,8 @@ fix_spanok(int e) {
   int c = fix_nend(e);
   int ok = fix_packed(b) >= 0 && fix_packed(c) >= 0;
 } return int ok;
+given fix_ret_fixture (0):(1)
+given fix_ret_fixture (6):(0)
 
 // A node's last token, or the closing parenthesis written around it.
 fix_nend(int e) {
@@ -11,6 +13,8 @@ fix_nend(int e) {
     t0 = (import fixd_gcl)[e];
   }
 } return int t0;
+given fix_ret_fixture (0):(3)
+given fix_ret_fixture (5):(1)
 
 // A node's first token, or the opening parenthesis written around it.
 fix_nbeg(int e) {
@@ -21,3 +25,5 @@ fix_nbeg(int e) {
     t0 = fix_ibeg(e);
   }
 } return int t0;
+given fix_ret_fixture (0):(3)
+given fix_ret_fixture (5):(1)

@@ -6,6 +6,8 @@ acc_elems(int[] elems, string owner, int ln) {
     i = i + 1;
   }
 } return void;
+([], "f", 10):() then calls acc_expr:[0]
+given elems_fixture ((import elems_two), "f", 10):() then calls acc_expr:((import elems_e1), "f", 10) then calls acc_expr:((import elems_e2), "f", 10)
 
 // Expression dispatch. Only two kinds name anything: `var` reads a variable of
 // the enclosing function or names a function as a value, `import` reads an
@@ -19,6 +21,8 @@ acc_expr(int id, string owner, int ln) {
     acc_expr2(id, owner, ln);
   }
 } return void;
+given pushfix_var ((import pushfix_var_node), "f", 10):() then calls acc_var:("x", "f", 10)
+given cm_setup ((import cm_push_call), "f", 10):() then calls acc_expr2:((import cm_push_call), "f", 10)
 
 acc_expr2(int id, string owner, int ln) {
   if(k_of(id) == "import") {
@@ -28,3 +32,5 @@ acc_expr2(int id, string owner, int ln) {
     acc_expr3(id, owner, ln);
   }
 } return void;
+given dead_exp_fixture ((import dead_imp_a), "f", 10):() then calls acc_import:("gx", "f", 10)
+given cm_setup ((import cm_push_call), "f", 10):() then calls acc_expr3:((import cm_push_call), "f", 10)

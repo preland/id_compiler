@@ -19,3 +19,5 @@ ll_func(int f) {
   string ty = ll_ty(ret);
   ll_func_out(f, ty);
 } return void;
+given ll_blk_fixture (0):() then prints:("define i32 @id_g() {\nb0:\n  %v2 = add i32 5, 5\n}\n")
+given ir_rows (1):() then prints:("define ptr @id_two() {\nb1:\n}\n")

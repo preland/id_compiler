@@ -13,8 +13,34 @@ emit_case_call(int ci) {
     emit_ret_call(f1, rt, cargs);
   }
 } return void;
+given wrap_fixture (0):() then prints:("    int idtc_got = id_fx_target(idtc_a0);\n")
+given void_call_fixture (1):() then prints:("    id_bare();\n")
+
+// A second casefn/casenode entry, a void-returning function with no
+// parameters -- wrap_fixture's own fx_target always returns int, and
+// emit_case_call's void branch needs one that does not, without a second
+// env_init() (nz_plain_fixture's chain has one of its own, which would wipe
+// wrap_fixture's casefn/casenode instead of adding to them). Also gives both
+// indices a casegiven entry, so a case built on this can drive emit_case_fn/
+// emit_cases (case/case.id) at either index without a bare casegiven[ci].
+void_call_fixture() {
+  wrap_fixture();
+  int[] none = [];
+  int fn2 = node_func("bare", "void", none, none, 0 - 1);
+} chain () {
+  push((import casefn), fn2);
+  int node = newnode("case", 1, 0, "", "", none, none);
+  push((import casenode), node);
+} chain () {
+  push((import casegiven), "");
+  push((import casegiven), "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
 
 emit_ret_call(string f1, string rt, string cargs) {
   string ct = c_type(rt);
   emit_line("    " + ct + " idtc_got = id_" + f1 + "(" + cargs + ");");
 } return void;
+given lc_env2 ("foo", "int", "1, 2"):() then prints:("    int idtc_got = id_foo(1, 2);\n")
+given lc_env2 ("bar", "string", "x"):() then prints:("    char* idtc_got = id_bar(x);\n")

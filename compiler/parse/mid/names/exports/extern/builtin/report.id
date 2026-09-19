@@ -6,6 +6,8 @@ is_builtin(string name) {
     ok = 1;
   }
 } return int ok;
+given init_rtc ("print"):(1)
+given init_rtc ("notabuiltin"):(0)
 
 // idc.py also offers a "did you mean the builtin 'X'?" hint here, computed
 // with Python's difflib. That is not reproduced yet, so the message is its
@@ -18,6 +20,8 @@ report_nosuchfn(string name, string owner, int ln) {
 } chain (string name, string owner, int ln) {
   note_failure();
 } return void;
+given pushfix ("foo", "test.id", 1):() then prints:("<stdin>:1: error: no such function 'foo'; available builtins: print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint\n")
+given pushfix ("bar", "file.id", 5):() then prints:("<stdin>:5: error: no such function 'bar'; available builtins: print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint\n")
 
 whilefix() {
   ifwhilefix();

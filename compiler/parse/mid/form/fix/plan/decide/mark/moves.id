@@ -8,6 +8,8 @@ fix_mark_moves(int last) {
   fix_mark_cls(last, 1);
   fix_mark_rest(last);
 } return void;
+given fix_sep_fixture (0):() then calls fix_mark_cls:[2]
+given fix_sep_fixture (1):() then calls fix_mark_cls:[4]
 
 // One entry per event, pushed by fix_push4 (../../walk/kind/push.id) and set
 // by fix_mark_cls (one.id), whose whole effect is that lset: only a reader of

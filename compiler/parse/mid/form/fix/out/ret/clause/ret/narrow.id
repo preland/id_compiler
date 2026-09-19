@@ -24,3 +24,23 @@ fix_ret_narrows(int f, int e) {
 } return int ok;
 given ret_narrows_fn ((import narrow_f), (import narrow_e)):(1)
 given ret_widens_fn ((import widen_f), (import widen_e)):(0)
+
+// Unrelated to this file's own two functions: run/state/more.id's fix_gcl_at
+// needs a synthetic ngrp/ngrpc pair (the real ones come from the token
+// loader, which no fix fixture builds -- run/state/grp/gcl.id's own comment),
+// and that file is at its three-function cap, so it is filed here instead.
+// Both entries group into fixd_gcl[0] (started at 10): ngrpc[0]=5 does not
+// widen it, ngrpc[1]=99 does.
+fix_gcl_fixture() {
+  env_init();
+  fix_gcl();
+  push((import fixd_gcl), 10);
+} chain () {
+  push((import ngrp), 0);
+  push((import ngrp), 0);
+  push((import ngrpc), 5);
+} chain () {
+  push((import ngrpc), 99);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

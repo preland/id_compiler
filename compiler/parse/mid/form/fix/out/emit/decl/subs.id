@@ -6,6 +6,8 @@ fix_sub_at(int i, int j, string out) {
     rs = out + "|" + fix_span((import fixe_n)[j]) + "|" + (import fixe_nm)[j];
   }
 } return string rs;
+given fix_decl_fixture (1, 0, ""):("|3|2|3|5|myname")
+given fix_decl_fixture (1, 1, "X"):("X|7|1|7|4|othername")
 
 // A leaf node ("ident", not one of the kinds out/span/beg/beg.id branches
 // on) at token 0 of fix_tokline_fixture2 -- fixd_gcl reused from
@@ -18,3 +20,37 @@ fix_tokline_node_fixture() {
 } return void;
 given fix_tokline_fixture2 ():() then check_failed:(0)
 given fix_tokline_fixture2 ():() then init_units:(0)
+
+// Two events for out/emit/decl/{decl,head}.id's own cases: event 0 at token
+// 0 (fix_tokline_node_fixture's own node -- its fix_span_fixture2 chain
+// already pushes fixe_n[0] and fixe_ru[0], so this fixture pushes only the
+// columns that chain leaves alone), declared and not reused; event 1 at
+// token 1, declared but reused (fixe_ru), so fix_decl_at leaves it alone
+// even though it is sep -- the branch the comment in decl.id names.
+fix_decl_fixture() {
+  fix_tokline_node_fixture();
+  push((import fixe_nm), "myname");
+  push((import fixe_sep), 1);
+} chain () {
+  push((import fixe_lo), 0);
+  push((import fixe_nt), "int");
+  push((import fixe_an), "");
+} chain () {
+  lset((import nst), 0, 0);
+  lset((import curtk), 0, 1);
+  int e2 = newleaf("ident", 0, 0, "n", "");
+} chain () {
+  push((import fixd_gcl), 0 - 1);
+  push((import fixe_n), e2);
+  push((import fixe_nm), "othername");
+} chain () {
+  push((import fixe_sep), 1);
+  push((import fixe_lo), 0);
+  push((import fixe_ru), 1);
+} chain () {
+  push((import fixe_nt), "string");
+  lset((import nst), 1, 1);
+  push((import fixe_an), "");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

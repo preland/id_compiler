@@ -5,10 +5,14 @@
 fs_set(int v) {
   lset((import fsc), 0, v);
 } return void;
+given init_rtc (1):() then is_freestanding:(1)
+given init_rtc (0):() then is_freestanding:(0)
 
 is_freestanding() {
   int ret_i = (import fsc)[0];
 } return int ret_i;
+given init_rtc ():(0)
+given fs_fixture_extern ():(1)
 
 regrow_param() {
   regrow_d();

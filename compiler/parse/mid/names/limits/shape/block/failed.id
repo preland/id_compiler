@@ -6,6 +6,8 @@
 check_failed() {
   int ret_i = (import chkfail)[0];
 } return int ret_i;
+given env_init ():(0)
+given chkfail_raised ():(1)
 
 // Writing through an imported list needs the list as a parameter: an
 // index-assignment is only recognised when the target is a plain identifier.
@@ -15,6 +17,8 @@ check_failed() {
 note_failure() {
   lset((import chkfail), 0, 1);
 } return void;
+given env_init ():() then check_failed:(1)
+given full_env ():() then check_failed:(1)
 
 regrow_fn() {
   regrow_param();

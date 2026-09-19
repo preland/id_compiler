@@ -4,6 +4,8 @@ fix_wrange(int lo, int hi, int ow) {
     lo = lo + 1;
   }
 } return void;
+given fix_touch_fixture ((import ft_bcall), (import ft_bcall), 3):() then calls fix_wnode:((import ft_bcall), 3)
+given fix_touch_fixture ((import ft_bcall), -1, 3):() then calls fix_wnode:[0]
 
 // An index-assignment writes through a plain identifier (docs/SPEC.md 5); the
 // list it names may be a parameter, and lists are references, so this can
@@ -17,9 +19,13 @@ fix_wnode(int x, int ow) {
     fix_wseed(ow);
   }
 } return void;
+given fix_touch_fixture ((import ft_bcall), 3):() then calls fix_wref:((import ft_bcall), 3)
+given fix_touch_fixture ((import ft_lit), 3):() then calls fix_wref:[0]
 
 fix_wref(int x, int ow) {
   string s1_of_v = s1_of(x);
   int ci = fix_fnix(s1_of_v);
   fix_wref2(x, ow, ci, s1_of_v);
 } return void;
+given fix_touch_fixture ((import ft_bcall), 3):() then calls fix_wref2:((import ft_bcall), 3, -1, "print")
+given fix_touch_fixture ((import ft_bcall), 5):() then calls fix_wref2:((import ft_bcall), 5, -1, "print")

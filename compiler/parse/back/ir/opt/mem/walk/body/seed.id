@@ -7,6 +7,8 @@ m2r_seed(int i, int j) {
     j = m2r_seed1(i, j);
   }
 } return void;
+given m2r_outv_fixture (0, 0):() then outv_sum:(3)
+given m2r_row_fixture (0, 0):() then outv_sum:(0)
 
 // What this function is for is the value it writes; what it returns is
 // j + 1, arithmetic on its own argument that a case can pin green while the
@@ -30,3 +32,5 @@ m2r_in(int i, int j) {
     v = ir_leaf("const", ir_ty_v, 0 - 1, 0 - 1, "undef");
   }
 } return int v;
+given m2r_outv_fixture (0, 0):(3)
+given m2r_outv_fixture (0, 0):(3) then phiof_sum:(-1)

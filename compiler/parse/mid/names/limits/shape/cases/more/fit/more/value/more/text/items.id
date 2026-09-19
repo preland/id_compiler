@@ -18,3 +18,24 @@ leaf_text(int e) {
     lt = "(import " + lt + ")";
   }
 } return string lt;
+given fn_fixture ((import fixture_zero)):("0")
+given lit_import_fixture ((import lit_cimport_e)):("(import gb)")
+
+// A `given` naming a real, resolvable, 0-parameter void setup, with
+// casegiven[i] non-empty: fit_given (../../../../given/given.id) needs one
+// case where a case's `given` really did run. "fx_setup" is registered here
+// (fn_fixture only registers "fx_target", which takes a parameter and
+// returns int, so given_shape would reject it) the way fn_fixture_reg
+// registers "fx_target" itself. Paired with impcase_empty (../../../fit/
+// fit.id, room for only one of the two there).
+impcase_given() {
+  fn_fixture();
+  int[] none = [];
+  int setup_node = node_func("fx_setup", "void", none, none, 0 - 1);
+} chain () {
+  push((import fnames), "fx_setup");
+  push((import fnodes), setup_node);
+  push((import casegiven), "fx_setup");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

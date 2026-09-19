@@ -23,6 +23,8 @@ report_mode(int argc, string[] argv, int mode) {
     fix_all(argc, argv);
   }
 } return void;
+given lz_o (0, [], 1):() then calls print_fingerprints:[1]
+given fix_std_fixture (2, ["prog", "--fix-std"], 0):() then calls fix_all:(2, ["prog", "--fix-std"])
 
 // A syntax error means the tree is not what was written, so nothing may be
 // rewritten from it.
@@ -34,6 +36,8 @@ fix_all(int argc, string[] argv) {
     print("@N|||the source has syntax errors; nothing was rewritten");
   }
 } return void;
+given fix_std_fixture (2, ["prog", "--fix-std"]):() then calls fix_init:(2, ["prog", "--fix-std"])
+given fix_std_fixture (1, ["prog"]):() then calls fix_funcs:[1]
 
 fix_init(int argc, string[] argv) {
   fix_state();

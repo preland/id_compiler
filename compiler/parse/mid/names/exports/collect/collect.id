@@ -14,6 +14,8 @@ scan_func_exports(int id) {
   string s1_of_v = s1_of(id);
   exp_list(l2_of_v, s1_of_v);
 } return void;
+given lz_j ((import lz_func2)):() then calls exp_one:[1]
+given ifwhilefix ((import rgif_node)):() then calls exp_one:[1]
 
 exp_list(int[] stmts, string owner) {
   int i = 0;
@@ -22,3 +24,5 @@ exp_list(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
+given ifwhilefix ((import rgdeclist), "owner"):() then calls exp_one:[1]
+given ifwhilefix ([], "owner"):() then calls exp_one:[0]

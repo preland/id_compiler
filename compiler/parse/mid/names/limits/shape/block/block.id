@@ -17,6 +17,8 @@ check_block(int[] body, int depth, string fname, int ln) {
     check_fits(body, depth, fname, ln);
   }
 } return void;
+given env_init ([], 3, "f", 5):() then calls report_deep:("f", 3, 5)
+([], 2, "f", 5):() then calls check_fits:([], 2, "f", 5)
 
 check_fits(int[] body, int depth, string fname, int ln) {
   check_count(body, depth, fname, ln);
@@ -26,6 +28,8 @@ check_fits(int[] body, int depth, string fname, int ln) {
     i = i + 1;
   }
 } return void;
+([], 0, "f", 5):() then calls check_count:([], 0, "f", 5) then calls check_stmt:[0]
+given edge_fixture ((import edge_body), 0, "f", 5):() then calls check_count:((import edge_body), 0, "f", 5) then calls check_stmt:((import edge_call_node), 0, "f") then calls check_stmt:((import edge_var_node), 0, "f")
 
 // Only a nested block is counted here. A function's own body arrives at depth
 // 0, and check_segs (more/seg.id) measures it a segment at a time, so counting

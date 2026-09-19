@@ -7,6 +7,8 @@ ll_main() {
     i = i + 1;
   }
 } return int r;
+given ll_main_fixture ():(0)
+given ir_rows ():(-1)
 
 ll_main_at(int f, int r) {
   int v = r;
@@ -14,6 +16,8 @@ ll_main_at(int f, int r) {
     v = f;
   }
 } return int v;
+given ir_rows (0, -1):(-1)
+given ll_main_fixture (0, -1):(0)
 
 // A main taking no arguments is called with none; the marshalled list is
 // simply unused, which costs one call and keeps the wrapper in one piece.
@@ -24,3 +28,5 @@ ll_mcall(int f) {
     s = "  %r = call i32 @id_main(i32 %argc, ptr %args)";
   }
 } return string s;
+given ll_main_fixture (0):("  %r = call i32 @id_main(i32 %argc, ptr %args)")
+given ir_rows (0):("  %r = call i32 @id_main()")

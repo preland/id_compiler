@@ -4,6 +4,8 @@ fix_condop(int e, int cd) {
     c = 1;
   }
 } return int c;
+given fix_walk_arg2_fixture ((import wa2_e1), 0):(0)
+given fix_walk_arg2_fixture ((import wa2_e2), 1):(1)
 
 fix_walk_more(int e, int cd) {
   if(k_of(e) == "un") {
@@ -13,3 +15,16 @@ fix_walk_more(int e, int cd) {
     fix_walk_arr(e, cd);
   }
 } return void;
+given fix_walk_more_fixture ((import wm_un), 0):() then calls fix_walk:((import wm_a), 0, 0, "", "")
+given fix_walk_more_fixture ((import wm_arr), 1):() then calls fix_walk_arr:((import wm_arr), 1)
+
+fix_walk_more_fixture() {
+  fix_fixture();
+  int a = newleaf("int", 1, 0, "1", "");
+  export int wm_a = a;
+} chain () {
+  export int wm_un = newleaf("un", a, 0, "-", "");
+  export int wm_arr = node_arr([a]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

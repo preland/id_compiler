@@ -9,3 +9,5 @@ dup_tail(int j) {
 } chain (int j) {
   string ret_s = "'" + name_j + "' (defined at " + func_file_v + ":" + func_line_v2 + "); functions must be unique -- remove one and call it from both places, or make them genuinely differ";
 } return string ret_s;
+given lz_o (0):("'dup5' (defined at <stdin>:1); functions must be unique -- remove one and call it from both places, or make them genuinely differ")
+given lz_o (1):("'dup9' (defined at <stdin>:1); functions must be unique -- remove one and call it from both places, or make them genuinely differ")

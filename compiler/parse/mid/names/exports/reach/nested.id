@@ -7,6 +7,8 @@ exp_nested(int id, string owner) {
     exp_loop(id, owner);
   }
 } return void;
+given ifwhilefix ((import rgif_node), "main"):() then calls exp_branches:[1]
+given ifwhilefix ((import rgdecl_node), "main"):() then calls exp_loop:[1]
 
 exp_branches(int id, string owner) {
   int[] l1_of_v = l1_of(id);
@@ -15,6 +17,8 @@ exp_branches(int id, string owner) {
 } chain (int id, string owner) {
   exp_list(l2_of_v, owner);
 } return void;
+given ifwhilefix ((import rgif_node), "main"):() then calls exp_list:[2]
+given ifwhilefix ((import rgif_node), "other"):() then calls exp_list:[2]
 
 exp_loop(int id, string owner) {
   if(k_of(id) == "while") {
@@ -22,3 +26,5 @@ exp_loop(int id, string owner) {
     exp_list(l1_of_v, owner);
   }
 } return void;
+given whilefix ((import rgwhile_node), "main"):() then calls exp_list:[1]
+given whilefix ((import rgdecl_node), "main"):() then calls exp_list:[0]

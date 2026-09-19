@@ -10,6 +10,8 @@ dupexp_err(int id, string owner) {
   print(loc_at_v + "'" + s2_of_v + "' is already an exported global (exported by '" + export_owner_v + "')");
   note_failure();
 } return void;
+given cm_setup (2, "fn1"):() then calls note_failure:[1]
+given pushfix (2, "fn2"):() then calls note_failure:[1]
 
 ifwhilefix() {
   declfix();

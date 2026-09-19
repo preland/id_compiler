@@ -8,6 +8,20 @@ lz_f() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
+// A case node naming fx_target as a function-value argument (a "cfn" leaf,
+// front/parse/decl/func/cases/case/given/elem/fn.id), for fns.id's own
+// seed_fn_args/seed_fn_arg: the loop needs a real casenode entry whose args
+// list is non-empty, and reach_add's fnames guard needs the name it carries
+// to be one fn_fixture actually registered. Filed here (an unrelated
+// list-clearing step) because tests/more/seed/ is at its 3-file cap.
+seed_cfn_fixture() {
+  fn_fixture();
+  init_reach();
+  seed_cfn_fixture_node();
+} return void;
+():() then check_failed:(0)
+():() then rfn_len:(2)
+
 clear_strs(string[] names) {
   while(len(names) > 0) {
     pop(names);

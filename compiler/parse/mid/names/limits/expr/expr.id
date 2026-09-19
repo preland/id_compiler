@@ -21,6 +21,8 @@ check_shape() {
     i = i + 1;
   }
 } return void;
+given env_init ():() then calls shape_node:[0]
+given fn_fixture ():() then calls shape_node:(0)
 
 shape_node(int id) {
   if(k_of(id) == "call") {
@@ -30,6 +32,8 @@ shape_node(int id) {
     chk_ret_name(id);
   }
 } return void;
+given cm_setup ((import cm_push_call)):() then calls chk_flat_args:((import cm_push_call))
+given fn_fixture ((import fixture_fn)):() then calls chk_ret_name:((import fixture_fn))
 
 // ni1 is -1 for `} return void;`, which has no expression to judge.
 chk_ret_name(int id) {
@@ -38,3 +42,5 @@ chk_ret_name(int id) {
     ret_shape_err(id, e);
   }
 } return void;
+given fn_fixture ((import fixture_fn)):() then calls ret_shape_err:[0]
+given hidden_call_fixture ((import hc_un)):() then calls ret_shape_err:((import hc_un), (import hc_call))

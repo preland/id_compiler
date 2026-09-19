@@ -12,6 +12,8 @@ then_value_fit(int ci, int chk_node, int cfn) {
     then_lit(ci, items[0], cfn);
   }
 } return void;
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then prints:("")
+given then_node_fixture ((import fixture_ci), (import fixture_then_node), (import fixture_fn)):() then prints:("fixture.id:4: error: a 'then' check compares exactly one value, not 0\n")
 
 then_lit(int ci, int e, int cfn) {
   if(k_of(e) == "cimport") {
@@ -22,3 +24,17 @@ then_lit(int ci, int e, int cfn) {
     fit_value(ci, e, rt);
   }
 } return void;
+given chk_fixture ((import fixture_ci), (import fixture_one), (import fixture_chk_fn)):() then prints:("")
+given chk_fixture ((import fixture_ci), (import fixture_fn), (import fixture_chk_fn)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+
+// The last step of the dup-case-detection fixture (more/dup/): casefn, two
+// rows deep so dup_hit/dup_scan/check_dup_cases (more/dup/dup.id) and case_eq
+// (more/dup/eq.id) have a real node to report through. Filed here because
+// more/dup/ and everything above it are at the 3-entry limit, and this was
+// the lane's last free function slot.
+dupeq_fns() {
+  push((import casefn), (import dupeq_node));
+  push((import casefn), (import dupeq_node));
+} return void;
+given dupeq_fixture ():() then check_failed:(0)
+given dupeq_fixture ():() then init_units:(0)

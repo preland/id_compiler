@@ -26,6 +26,8 @@ chk_dead() {
 } chain () {
   reach_funcs(0, 0);
 } return void;
+given env_init ():() then calls init_reach:()
+given env_init ():() then calls reach_mark:()
 
 // Seeded with "main" unconditionally. A project without one is a library, and
 // then no function is named main, so nothing ever matches and nothing is
@@ -42,6 +44,8 @@ init_reach() {
   export string[] rfn = ["main", "conf.id"];
   export int[] dphase = [0];
 } return void;
+given env_init ():() then reach_pass:(2)
+given full_env ():() then reach_pass:(2)
 
 // Fixpoint: sweep until a sweep adds nothing. The number of sweeps is the
 // depth of the call graph, which in `id` is large but the sweep is linear, and
@@ -52,3 +56,5 @@ reach_mark() {
     n = reach_pass();
   }
 } return void;
+given seed_given_fixture_bad ():() then calls reach_pass:[1]
+given rfnfx_setup ():() then calls reach_pass:[1]

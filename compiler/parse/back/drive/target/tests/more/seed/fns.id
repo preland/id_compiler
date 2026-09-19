@@ -18,6 +18,8 @@ seed_fn_args(int ci) {
     j = j + 1;
   }
 } return void;
+given seed_cfn_fixture (0):() then rfn_len:(2)
+given seed_cfn_fixture (1):() then rfn_len:(3)
 
 seed_fn_arg(int e) {
   if(k_of(e) == "cfn") {
@@ -25,3 +27,5 @@ seed_fn_arg(int e) {
     reach_add(s1_of_v);
   }
 } return void;
+given seed_cfn_fixture ((import fixture_zero)):() then rfn_len:(2)
+given seed_cfn_fixture ((import cfnid)):() then rfn_len:(3)

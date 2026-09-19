@@ -6,3 +6,84 @@ fix_within_at(int i, int b, int e, int ok) {
     r = 1;
   }
 } return int r;
+given fix_note_fixture (0, 1, 2, 0):(1)
+given fix_note_fixture (0, 0, 3, 7):(7)
+
+// fix_seq's own two cases need a second call already run, and out/emit/resid/
+// is at its three-function cap, so this one is filed here instead.
+fix_seq_once() {
+  fix_fixture();
+  fix_seq();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// A real return-clause value (e, an "ident" so is_plain leaves fix_ret_needs
+// at its default 1) at token 3 of a 4-token "{ return ( x" line, past a
+// second "y" (e2) that sits at token 1 with nothing before it -- fix_close
+// hits token 0 through the loop's own t0>0 guard rather than a match, so
+// fix_ret_ok(e2) fails on cb<0. f declares "int" over a one-statement body
+// (nline 5); f2 declares "int" over an empty one (fix_indent_line's 0
+// branch); f3 is `return void` (i1_of -1) for fix_ret's other early-out; e3
+// sits past the end of tspan (token 10 of 4), for fix_spanok's false branch.
+// pfile gets two rows for fix_setfile/fix_enter (run/walk/enter.id); prog
+// gets f then f2 for run/walk/func.id's own cases; dcl (a "decl" node over e)
+// is for fix_used_at (run/walk/stmt/stmt.id).
+// out/ret/clause/{emit,pos}.id and ret/ret.id are each at the three-function
+// cap, so this is filed here, in the file fix_within_at (../within.id)
+// shares the directory with.
+fix_ret_fixture() {
+  fix_fixture();
+  string[] rkinds = ["op", "kw", "op", "op"];
+  string[] rtexts = ["{", "return", "(", "x"];
+} chain () {
+  toks_push(rkinds, rtexts);
+  lset((import curtk), 0, 3);
+  int tlk = 0;
+} chain () {
+  while(tlk < 4) {
+    push((import tline), 10);
+    tlk = tlk + 1;
+  }
+  int m = 0;
+  while(m < 4) {
+    push((import tspan), 5 * 65536 + 8);
+    m = m + 1;
+  }
+} chain () {
+  int e = newleaf("ident", 0, 0, "x", "");
+  push((import fixd_gcl), 0 - 1);
+  lset((import curtl), 0, 5);
+} chain () {
+  int stmt = newleaf("ident", 0, 0, "s", "");
+  push((import fixd_gcl), 0 - 1);
+  int[] none = [];
+} chain () {
+  int[] body = [stmt];
+  int f = node_func("f", "int", none, body, e);
+  push((import fixd_gcl), 0 - 1);
+} chain () {
+  int[] none2 = [];
+  int f2 = node_func("g", "int", none2, none2, e);
+  push((import fixd_gcl), 0 - 1);
+} chain () {
+  int f3 = node_func("h", "void", none2, none2, 0 - 1);
+  push((import fixd_gcl), 0 - 1);
+  lset((import curtk), 0, 1);
+} chain () {
+  int e2 = newleaf("ident", 0, 0, "y", "");
+  push((import fixd_gcl), 0 - 1);
+  push((import pfile), "a.id");
+} chain () {
+  push((import pfile), "b.id");
+  lset((import curtk), 0, 10);
+  int e3 = newleaf("ident", 0, 0, "z", "");
+} chain () {
+  push((import fixd_gcl), 0 - 1);
+  push((import prog), f);
+  push((import prog), f2);
+} chain () {
+  int dcl = node_decl("int", "myvar", e, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

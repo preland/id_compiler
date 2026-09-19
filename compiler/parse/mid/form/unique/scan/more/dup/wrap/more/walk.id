@@ -14,6 +14,8 @@ cw_stmts(int[] stmts) {
     i = i + 1;
   }
 } return int ok;
+given cw_decl_fixture ((import cw_decl_list)):(1)
+given cw_decl_fixture ((import cw_func_list)):(0)
 
 cw_stmt(int id) {
   int ok = 0;
@@ -25,3 +27,18 @@ cw_stmt(int id) {
     ok = cw_assign(id);
   }
 } return int ok;
+given cw_decl_fixture ((import cw_decl_x)):(1)
+given cw_decl_fixture ((import cwv_func)):(0)
+
+// "x = 4" once "x" is declared, and "y = 5" while it is not -- for
+// ../val.id's cw_assign.
+cw_assign_fixture() {
+  cw_named_fixture();
+  int e2 = node_int("4", 4, 0);
+  export int cw_assign_x = node_assign("x", e2);
+} chain () {
+  int e3 = node_int("5", 5, 0);
+  export int cw_assign_y = node_assign("y", e3);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

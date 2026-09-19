@@ -9,6 +9,8 @@ has_claim(int ci, int c) {
     j = j + 1;
   }
 } return int r;
+given claim_cols_fixture (0, 0):(1)
+given claim_other_fn_fixture (0, 0):(0)
 
 claim_hit(int j, int ci, int c) {
   int r = 0;

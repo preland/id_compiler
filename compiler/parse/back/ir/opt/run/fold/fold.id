@@ -19,6 +19,8 @@ op_fold(int f) {
     i = i + 1;
   }
 } return void;
+given cfg_fixture (0):() then calls fold_blk:(0, 0) then calls fold_blk:(0, 1)
+given ir_rows (1):() then calls fold_blk:(1, 1)
 
 fold_blk(int f, int b) {
   int i = 0;
@@ -28,9 +30,13 @@ fold_blk(int f, int b) {
     i = i + 1;
   }
 } return void;
+given cfg_fixture (0, 0):() then calls fold_one:(0, 0)
+given cfg_fixture (0, 1):() then calls fold_one:[0]
 
 fold_one(int f, int id) {
   if(ir_op(id) == "icmp" && ir_s(id) == "!=") {
     fold_cmp(f, id);
   }
 } return void;
+given fold_cmp_fixture (0, (import fcmp_row)):() then calls fold_cmp:(0, (import fcmp_row))
+given fold_cmp_fixture (0, (import fq_id)):() then calls fold_cmp:[0]

@@ -9,6 +9,8 @@ lit_text(int e) {
     lt = neg_text(e);
   }
 } return string lt;
+given lit_arr_fixture ((import lit_arr_e)):("[5, 4]")
+given lw_fix_un ((import fix_un_n)):("-1")
 
 neg_text(int e) {
   int i1_of_v = i1_of(e);
@@ -21,3 +23,5 @@ arr_text(int e) {
   int[] xs = l1_of(e);
   string lt = "[" + items_text(xs) + "]";
 } return string lt;
+given lit_arr_fixture ((import lit_arr_e)):("[5, 4]")
+given arr1_fixture ((import arr1_e)):("[5]")

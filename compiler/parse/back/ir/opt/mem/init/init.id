@@ -16,6 +16,8 @@ op_mem2reg(int f) {
   m2r_phis(f);
   m2r_pass2(f);
 } return void;
+given m2r_alloca_fixture (0):() then calls m2r_init:(0) then calls m2r_phis:(0) then calls m2r_pass2:(0)
+given m2r_alloca_fixture (1):() then calls m2r_init:(1) then calls m2r_phis:(1) then calls m2r_pass2:(1)
 
 m2r_init(int f) {
   m2r_reset();
@@ -27,9 +29,13 @@ m2r_init(int f) {
     i = i + 1;
   }
 } return void;
+given m2r_alloca_fixture (0):() then calls m2r_reset:() then calls m2r_collect:(0) then calls m2r_row:[1]
+given m2r_alloca_fixture (1):() then calls m2r_reset:() then calls m2r_collect:(1) then calls m2r_row:[1]
 
 m2r_reset() {
   pred_wipe((import pra));
   m2r_wipe((import phiof));
   m2r_wipe((import outv));
 } return void;
+given m2r_outv_fixture ():() then pra_len_check:(0) then phiof_len:(0) then outv_len:(0)
+given m2r_row_fixture ():() then pra_len_check:(0) then phiof_len:(0) then outv_len:(0)

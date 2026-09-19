@@ -24,6 +24,8 @@ is_unresolved_call(int id) {
     ok = unresolved_fn(s1_of_v);
   }
 } return int ok;
+given unresolved_call_fixture ((import unresolved_call)):(1)
+given declfix ((import rgdecl_node)):(0)
 
 // Deliberately not is_unknown_fn: that one names the builtins it knows about
 // and is allowed to fall behind, because falling behind only makes *its*
@@ -35,3 +37,5 @@ unresolved_fn(string name) {
     ok = 1;
   }
 } return int ok;
+given pushfix ("print"):(0)
+given pushfix ("notafunction"):(1)

@@ -6,6 +6,8 @@ m2r_load(int f, int id, int i) {
     m2r_drop(f, id, (import outv)[i][j], 0);
   }
 } return void;
+given m2r_ldfx (0, (import ldfx_id), 0):() then chk_op:("nop") then chk_ty:("")
+given m2r_outv_fixture (0, 0, 0):() then chk_op:("add")
 
 m2r_store(int id, int i) {
   int ir_a_v = ir_a(id);
@@ -14,6 +16,8 @@ m2r_store(int id, int i) {
     m2r_kept(id, i, j);
   }
 } return void;
+given m2r_ldfx ((import ldfx_id), 0):() then outv_sum:(42) then chk_op:("nop")
+given m2r_outv_fixture (0, 0):() then outv_sum:(-1) then chk_op:("add")
 
 m2r_kept(int id, int i, int j) {
   int ir_b_v = ir_b(id);

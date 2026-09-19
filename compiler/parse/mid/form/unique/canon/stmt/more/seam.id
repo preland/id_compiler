@@ -45,3 +45,5 @@ blank_push(int[] kept, int id) {
     push(kept, id);
   }
 } return void;
+given blank_push_fixture ([], (import bp_blank)):([])
+given blank_push_fixture ([], (import bp_lit)):((import bp_kept_after))

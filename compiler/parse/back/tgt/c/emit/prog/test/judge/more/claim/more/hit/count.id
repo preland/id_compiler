@@ -17,6 +17,8 @@ claim_count(int c) {
     ci = ci + 1;
   }
 } return int n;
+given claim_cols_fixture (0):(1)
+given claim_other_fn_fixture (0):(0)
 
 carries(int ci, int c) {
   int r = 0;
@@ -24,3 +26,5 @@ carries(int ci, int c) {
     r = 1;
   }
 } return int r;
+given claim_cols_fixture (0, 0):(1)
+given claim_other_fn_fixture (0, 0):(0)

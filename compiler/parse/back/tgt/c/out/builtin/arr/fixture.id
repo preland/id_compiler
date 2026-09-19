@@ -10,3 +10,38 @@ arr1_fixture() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// Two claims on two different cases of the same function, same kind and
+// bound -- for first_claim/same_claim (../../../emit/prog/test/judge/more/
+// claim/more/first.id), which need a genuine duplicate to see the false
+// branch; every fixture under that subtree is at its cap (each file and each
+// directory), so this is filed here instead, the same reason fix_env2 and
+// asmfx_dup_fixture are filed away from their own subjects.
+claim_dup_fixture() {
+  case_fidx_fixture();
+  push((import conscase), 0);
+  push((import conscase), 1);
+} chain () {
+  push((import conskind), "time");
+  push((import conskind), "time");
+  push((import consbound), "O(n)");
+} chain () {
+  push((import consbound), "O(n)");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// One claim on a case whose function differs from case 0's -- for
+// claim_group/carries (same subtree as claim_dup_fixture above, same reason
+// filed here), which need a claim case 0 does not carry to see the empty
+// side of "the cases of its function that carry the same claim".
+claim_other_fn_fixture() {
+  case_fidx_fixture2();
+  push((import conscase), 1);
+  string k = "time";
+} chain () {
+  push((import conskind), k);
+  push((import consbound), "O(n)");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

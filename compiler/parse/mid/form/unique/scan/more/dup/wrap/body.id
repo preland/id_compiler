@@ -24,6 +24,8 @@ cw_body(int id) {
     val = cw_ret(id);
   }
 } return string val;
+given cwv_setup ((import cwv_func)):("A[1, \"hi\"]")
+given ret_widens_fn ((import widen_f)):("I5")
 
 // Start the walk of function `name`: canon_expr's position map is emptied as
 // for a fingerprint (uq_begin), and the locals seen so far are forgotten.

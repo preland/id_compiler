@@ -3,6 +3,8 @@ fix_std_row(int i, int[] cnt) {
     fix_std_count(i, cnt);
   }
 } return void;
+given fix_std_row_fixture (0, [0, 0]):(0, [1, 0])
+given fix_std_row_fixture (1, [0, 0]):(1, [0, 0])
 
 fix_std_count(int i, int[] cnt) {
   if(str_starts((import dvname)[i], "idstd_") == 1) {
@@ -11,3 +13,24 @@ fix_std_count(int i, int[] cnt) {
     cnt[1] = cnt[1] + 1;
   }
 } return void;
+given fix_std_row_fixture (0, [0, 0]):(0, [1, 0])
+given fix_std_row_fixture (1, [0, 0]):(1, [0, 1])
+
+// Row 0 passes fix_std_row's own unit/exp guard (unit 0, exported 0) and its
+// name carries the idstd_ prefix; row 1 fails the guard (unit 1, exported 1)
+// so fix_std_row never reaches fix_std_count for it, though fix_std_count
+// itself (called directly, bypassing the guard) would count it as the other
+// bucket -- its name has no prefix.
+fix_std_row_fixture() {
+  fix_std_fixture();
+  push((import dvname), "idstd_x");
+  push((import dvunit), 0);
+} chain () {
+  push((import dvexp), 0);
+  push((import dvname), "other_name");
+  push((import dvunit), 1);
+} chain () {
+  push((import dvexp), 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

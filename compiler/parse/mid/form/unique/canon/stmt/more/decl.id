@@ -35,3 +35,4 @@ canon_iassign(int id) {
   string ret_s = iassign_tail(id, head);
 } return string ret_s;
 given iassign_begun_fixture ((import fix_iassign_n)):("ia:I1[I0]=I9")
+given iassign2_fixture ((import ia_node)):("ia:I1[I1]=I2")

@@ -12,3 +12,31 @@ call_fp(int id) {
     ret_s = canon_expr(l1_of_v[0]);
   }
 } return string ret_s;
+given call_fp_fixture ((import call_foo)):("c(foo:I3)")
+given call_fp_fixture ((import call_ushr)):("I7")
+
+// A plain call ("foo(3)") and a `ushr(x, 0)` -- the logical-shift-by-zero
+// spelling this function folds to its left operand alone.
+call_fp_fixture() {
+  canon_begun_fixture();
+  int lit3 = node_int("3", 3, 0);
+  int lit0 = node_int("0", 0, 0);
+} chain () {
+  export int call_foo = node_call("foo", [lit3]);
+  int cfx_x = node_int("7", 7, 0);
+  export int call_ushr = node_call("ushr", [cfx_x, lit0]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// canon_iassign's second case (../../../../stmt/more/decl.id) needs an
+// `iassign` node distinct from that file's own iassign_begun_fixture, and
+// every directory near it (tail/, its parent) is at the 3-entry cap; iafix
+// (mid/types/registry/fn/split/last.id) already builds one from literals
+// alone, so only the uq_begin this checker's canon_expr wants is added here.
+iassign2_fixture() {
+  iafix();
+  uq_begin("f");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

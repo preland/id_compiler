@@ -3,6 +3,8 @@ fix_decl_head(int sn, int i) {
   string t = fix_evtype(i);
   string ret_s = "@D|" + (import fixd_file)[0] + "|" + where + "|" + t + " " + (import fixe_nm)[i] + " = |" + fix_span((import fixe_n)[i]);
 } return string ret_s;
+given fix_decl_fixture (0, 0):("@D||3|2|1|3|int myname = |3|2|3|5")
+given fix_decl_fixture (1, 1):("@D||7|1|1|7|string othername = |7|1|7|4")
 
 // A statement's new declarations go before its first token, indented as its
 // own line is.
@@ -11,6 +13,8 @@ fix_stmt_at(int sn) {
   int sq = fix_seq();
   string ret_s = (import tline)[t0] + "|" + fix_col(t0) + "|" + sq + "|" + (import tline)[t0];
 } return string ret_s;
+given fix_decl_fixture (0):("3|2|1|3")
+given fix_decl_fixture (1):("7|1|1|7")
 
 fix_subs(int i) {
   int j = (import fixe_lo)[i];
@@ -20,3 +24,5 @@ fix_subs(int i) {
     j = j + 1;
   }
 } return string out;
+given fix_decl_fixture (0):("")
+given fix_decl_fixture (1):("|3|2|3|5|myname")

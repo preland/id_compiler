@@ -12,8 +12,12 @@ emit_index(int id) {
   string g = "id_list_get(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ")";
   string ret_s = unbox(g, elem);
 } return string ret_s;
+given idx_build ((import idx_fix)):("(int)(id_list_get(id_list_lit(2, (long long)(2), (long long)(5)), 2))")
+given stridx_build ((import idx_str)):("(char*)(intptr_t)(id_list_get(id_list_lit(1, (long long)(intptr_t)(hi)), 2))")
 
 index_elem(int i1_of_v) {
   string type_of_v = type_of(i1_of_v);
   string elem = elem_type(type_of_v);
 } return string elem;
+given idx_build ((import arr_ints)):("int")
+given strarr_fixture ((import arr_strs)):("string")

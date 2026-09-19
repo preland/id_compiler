@@ -22,6 +22,8 @@ check_dup_cases() {
     i = i + 1;
   }
 } return void;
+given dupeq_fixture ():() then calls dup_scan:[2]
+given case_fixture ():() then calls dup_scan:[0]
 
 // Against every EARLIER case, so a duplicate is reported once, at the second
 // one -- the one that has to change.
@@ -32,9 +34,13 @@ dup_scan(int i) {
     j = j + 1;
   }
 } return void;
+given dupeq_fixture (0):() then calls dup_hit:[0]
+given dupeq_fixture (1):() then calls dup_hit:[1]
 
 dup_hit(int i, int j) {
   if((import casefn)[i] == (import casefn)[j] && case_eq(i, j) == 1) {
     report_dup_case(i);
   }
 } return void;
+given dupeq_fixture (0, 0):() then check_failed:(1)
+given dupeq_fixture (0, 1):() then check_failed:(0)

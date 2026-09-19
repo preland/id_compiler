@@ -20,6 +20,8 @@ check_bodies() {
   chk_dupfn();
   check_unique();
 } return void;
+given dupfn_fixture ():() then check_failed:(1)
+given clean_prog_fixture ():() then check_failed:(0)
 
 check_unique() {
   uq_fill();
@@ -38,3 +40,5 @@ uq_fill() {
   export int[] cfpfn = [];
   uq_fill_all();
 } return void;
+given dupfn_fixture ():() then cfp_len:(2)
+given fn_fixture ():() then cfp_len:(1)

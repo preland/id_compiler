@@ -11,11 +11,15 @@ fit_given(int i) {
     given_fn(i, setup_nm);
   }
 } return void;
+given impcase_empty (0):() then calls given_fn:[0]
+given impcase_given (0):() then calls given_fn:(0, "fx_setup")
 
 given_fn(int i, string setup_nm) {
   int sfn = func_node(setup_nm);
   given_shape(i, setup_nm, sfn);
 } return void;
+given impcase_given ((import fixture_ci), "fx_setup"):() then check_failed:(0)
+given fn_fixture ((import fixture_ci), "nosuchfn123"):() then check_failed:(1)
 
 given_shape(int i, string setup_nm, int sfn) {
   if(sfn < 0) {

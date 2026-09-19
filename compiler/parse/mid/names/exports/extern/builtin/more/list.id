@@ -9,6 +9,16 @@ builtin_list() {
     i = i + 1;
   }
 } return string s;
+given init_rtc ():("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint")
+given init_bnames ():("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint")
+
+call_fixture_extern() {
+  init_rtc();
+  int[] args = [];
+  export int unresolved_call = node_call("unknown", args);
+} return void;
+given pushfix ():()
+given pushfix ():() then is_runtime:(0)
 
 scnames_fix() {
   ifwhilefix();

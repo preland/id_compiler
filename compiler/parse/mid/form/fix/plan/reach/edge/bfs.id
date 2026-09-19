@@ -6,3 +6,23 @@ fix_wprop(int gi) {
     i = i + 1;
   }
 } return void;
+given fix_wprop_fixture (0):() then calls fix_wseed:(-1) then calls fix_wseed:(-2)
+given fix_wprop_fixture (1):() then calls fix_wseed:[0]
+
+// fixd_wm is deliberately left empty by fix_winit (fix_wfill pushes one entry
+// per name in fnames, which every --fix fixture leaves empty), so a seeded
+// value >= 0 would index it out of bounds; -1 and -2 exercise fix_wprop's own
+// loop over the row without asking fix_wseed to touch that table at all --
+// fix_wseed's own guard (`ow >= 0`) is what fix_wseed's cases would need to
+// cover, and it is deliberately left uncased (edge/ref/seed.id).
+fix_wprop_fixture() {
+  fix_fixture();
+  fix_winit();
+  fix_wrow();
+} chain () {
+  fix_wrow();
+  fix_wedge(0, -1);
+  fix_wedge(0, -2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

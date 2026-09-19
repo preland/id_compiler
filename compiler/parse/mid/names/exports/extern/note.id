@@ -3,6 +3,15 @@
 is_runtime() {
   int ret_i = (import rtc)[0];
 } return int ret_i;
+given init_rtc ():(0)
+given rt_fixture ():(1)
+
+rt_fixture() {
+  init_rtc();
+  rt_set(1);
+} return void;
+():() then is_runtime:(1)
+():() then is_freestanding:(0)
 
 declfix() {
   regrow_d();
