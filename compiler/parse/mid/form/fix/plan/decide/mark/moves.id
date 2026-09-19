@@ -8,3 +8,14 @@ fix_mark_moves(int last) {
   fix_mark_cls(last, 1);
   fix_mark_rest(last);
 } return void;
+
+// One entry per event, pushed by fix_push4 (../../walk/kind/push.id) and set
+// by fix_mark_cls (one.id), whose whole effect is that lset: only a reader of
+// this column can see either happen. Filed here rather than beside its export
+// in ../../walk/roots/reset/narrow.id, which is at its three-function cap in
+// a directory at its three-entry one.
+fixe_mv_len() {
+  int n = len((import fixe_mv));
+} return int n;
+given fix_fixture ():(0)
+given fix_touch_fixture ():(2)

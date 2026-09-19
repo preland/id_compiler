@@ -7,6 +7,23 @@ fix_push4(int cd, string nt) {
   push((import fixe_nm), "");
 } return void;
 
+// fixe_cd is pushed here and nowhere else, so this function's first action is
+// only observable through its length. fix_touch_fixture builds its two events
+// by hand and leaves this column alone, so fix_push4_fixture
+// (../roots/reset/narrow.id) is what tells the push apart from the reset.
+fixe_cd_len() {
+  int n = len((import fixe_cd));
+} return int n;
+given fix_fixture ():(0)
+given fix_push4_fixture ():(1)
+
+// The narrowing type pushed beside it, which fix_touch_fixture does fill.
+fixe_nt_len() {
+  int n = len((import fixe_nt));
+} return int n;
+given fix_fixture ():(0)
+given fix_touch_fixture ():(2)
+
 // A call inside another call's argument must be named; so must an argument
 // that narrows, whatever it is; so must an argument that is not itself a call
 // but has one somewhere inside it -- named whole, rather than naming the call

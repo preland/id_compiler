@@ -15,3 +15,13 @@ fncount_setup() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// The owner recorded for each exported name, pushed by add_export
+// (../collect/add.id) in step with enames and etypes. dead_err
+// (dead/more/report.id) is what reads it back, and add_export returns void,
+// so only a reader of one of its columns can see the push that filled it.
+eowners_len() {
+  int n = len((import eowners));
+} return int n;
+given env_init ():(0)
+given dead_exp_fixture ():(2)

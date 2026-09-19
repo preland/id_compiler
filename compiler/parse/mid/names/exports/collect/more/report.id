@@ -18,3 +18,13 @@ ifwhilefix() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// One entry per exported name, pushed by add_export (../add.id) in step with
+// enames and eowners. add_export returns void and the table it builds is what
+// the later checks read, so only a reader of one of its columns can see the
+// push happen; dead_exp_fixture (../../reach/dead/more/add.id) adds two.
+etypes_len() {
+  int n = len((import etypes));
+} return int n;
+given env_init ():(0)
+given dead_exp_fixture ():(2)

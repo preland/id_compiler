@@ -1,0 +1,28 @@
+// Readers for the untestable-set columns that have none. ut_add
+// (../../report/host/mark/node/callee.id) and ut_note (../../report/host/why/
+// note.id) both return void and their whole effect is a push, so a case can
+// only see either happen through the length of a column they push to --
+// utname already has ut_sweep. Filed here because every directory under
+// report/host/ is at the 3-entry layout limit and every file in it already
+// holds three functions.
+
+utwhat_len() {
+  int n = len((import utwhat));
+} return int n;
+given notes_base ():(0)
+given ut_seeded ():(1)
+
+utvia_len() {
+  int n = len((import utvia));
+} return int n;
+given notes_base ():(0)
+given ut_seeded ():(1)
+
+// utnote is the one column ut_add does not touch: check_cases writes it
+// through ut_note, so notes_push (mid/form/decomp/notesfx.id) rather than
+// ut_seeded is what puts a row in it.
+utnote_len() {
+  int n = len((import utnote));
+} return int n;
+given notes_base ():(0)
+given notes_setup ():(1)
