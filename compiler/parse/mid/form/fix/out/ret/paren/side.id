@@ -18,3 +18,5 @@ fix_paren_emit(int c) {
   int e = fix_nend(c);
   fix_paren_pts(b, e);
 } return void;
+given fix_tokline_node_fixture (0):() then calls fix_paren_pts:(0, 0)
+given fix_tokline_node_fixture2 (0):() then calls fix_paren_pts:(0, 0)

@@ -6,3 +6,15 @@ fix_sub_at(int i, int j, string out) {
     rs = out + "|" + fix_span((import fixe_n)[j]) + "|" + (import fixe_nm)[j];
   }
 } return string rs;
+
+// A leaf node ("ident", not one of the kinds out/span/beg/beg.id branches
+// on) at token 0 of fix_tokline_fixture2 -- fixd_gcl reused from
+// plan/walk/ev/push/one/ru.id's fix_span_fixture2, which pushes -1
+// (ungrouped) and nothing else this fixture's own cases read.
+fix_tokline_node_fixture() {
+  fix_tokline_fixture2();
+  int e = newleaf("ident", 0, 0, "len", "");
+  fix_span_fixture2(e);
+} return void;
+given fix_tokline_fixture2 ():() then check_failed:(0)
+given fix_tokline_fixture2 ():() then init_units:(0)

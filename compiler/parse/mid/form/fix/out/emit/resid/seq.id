@@ -8,6 +8,8 @@ fix_emit_pt(string p, string text) {
   int sq = fix_seq();
   print("@R|" + (import fixd_file)[0] + "|" + p + "|" + p + "|" + sq + "|" + text);
 } return void;
+given fix_fixture ("1|2", "hi"):() then prints:("@R||1|2|1|2|1|hi\n")
+given fix_fixture ("3|4", "bye"):() then prints:("@R||3|4|3|4|1|bye\n")
 
 // The low end of each token range this run replaces, one push per noted
 // range. A `then` check takes no parameters, so fix_note_tok (rec.id), whose

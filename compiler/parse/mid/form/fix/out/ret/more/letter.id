@@ -6,6 +6,8 @@ fix_tletter(string tb) {
     tl = "f";
   }
 } return string tl;
+("word"):("w")
+("string"):("s")
 
 fix_tletter2(string tb) {
   string tl = "i";
@@ -13,6 +15,8 @@ fix_tletter2(string tb) {
     tl = "s";
   }
 } return string tl;
+("string"):("s")
+("int"):("i")
 
 fix_ret_parens(int f, int lo) {
   fix_ret(f);

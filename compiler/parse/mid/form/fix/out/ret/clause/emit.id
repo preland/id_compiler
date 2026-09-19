@@ -19,3 +19,5 @@ fix_ret_name(string t) {
   string bstem = fix_prefixed("ret_" + sfx);
   string name = fix_choose_base(bstem, "", t);
 } return string name;
+given fix_fixture ("int"):("ret_i")
+given fix_fixture ("string"):("ret_s")

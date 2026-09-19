@@ -23,3 +23,5 @@ fix_why_type(int sn, int last) {
     i = i + 1;
   }
 } return string why;
+given fix_tokline_node_fixture (0, -1):("the statement's position in the source is unknown")
+given fix_tokline_node_fixture2 (0, -1):("the statement's position in the source is unknown")

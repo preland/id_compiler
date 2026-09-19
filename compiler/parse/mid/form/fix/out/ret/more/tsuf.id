@@ -5,15 +5,21 @@ fix_tsuf(string t) {
   fix_tstrip(fixt_st);
   string ret_s = fixt_st[1] + fix_tletter(fixt_st[0]);
 } return string ret_s;
+("int"):("i")
+("int[]"):("li")
 
 fix_tstrip(string[] fixt_st) {
   while(str_ends(fixt_st[0], "[]") == 1) {
     fix_tstep(fixt_st);
   }
 } return void;
+(["int[]", ""]):(["int", "l"])
+(["int", ""]):(["int", ""])
 
 fix_tstep(string[] fixt_st) {
   int n = len(fixt_st[0]) - 2;
   fixt_st[0] = slice(fixt_st[0], 0, n);
   fixt_st[1] = fixt_st[1] + "l";
 } return void;
+(["int[]", ""]):(["int", "l"])
+(["int[][]", "l"]):(["int[]", "ll"])

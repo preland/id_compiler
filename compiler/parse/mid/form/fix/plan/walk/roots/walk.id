@@ -5,6 +5,8 @@ fix_walk_roots(int[] roots) {
     i = i + 1;
   }
 } return void;
+given fix_tokline_node_fixture ([0]):() then calls fix_walk:(0, 0, 0, "", "")
+given fix_tokline_node_fixture ([]):() then calls fix_walk:[0]
 
 // Post-order is evaluation order (docs/SPEC.md 7): an operator's operands left
 // to right and then the operator, a call's arguments left to right and then

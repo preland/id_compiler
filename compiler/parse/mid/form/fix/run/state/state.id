@@ -10,12 +10,16 @@ fix_state() {
   fix_state2();
   fix_gcl();
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
 
 fix_state1() {
   export string[] fixd_nm = [];
   export string[] fixd_ty = [];
   export int[] fixd_seq = [0];
 } return void;
+given env_init ():() then check_failed:(0)
+given env_init ():() then init_units:(0)
 
 fix_state2() {
   export int[] fixd_std = [0];

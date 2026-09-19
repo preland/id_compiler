@@ -18,6 +18,8 @@ fix_ev_reset5() {
   export string[] fixe_an = [];
   export int[] fixe_ru = [];
 } return void;
+given fix_fixture ():() then check_failed:(0)
+given fix_fixture ():() then init_units:(0)
 
 // How many events have been marked for a declaration of their own, and how
 // many have been named. A `then` check takes no parameters, so a function

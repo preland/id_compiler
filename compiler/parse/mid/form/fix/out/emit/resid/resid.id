@@ -8,6 +8,8 @@ fix_replace(int e, string name) {
   fix_emit_r(e, name);
   fix_note_span(e);
 } return void;
+given fix_tokline_node_fixture (0, "myname"):() then prints:("@R||3|2|3|5|1|myname\n")
+given fix_tokline_node_fixture2 (0, "other"):() then prints:("@R||9|1|9|4|1|other\n")
 
 // fixd_lo and fixd_hi (run/state/grp/reset.id) are pushed in step by
 // fix_note_tok (rec.id) and by nothing else, so a case that wants either of

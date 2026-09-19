@@ -3,6 +3,8 @@ fix_paren_pts(int b, int e) {
   string p2 = fix_after(e);
   fix_paren_rec(p1, p2);
 } return void;
+given fix_tokline_fixture2 (0, 1):() then calls fix_emit_pt:("3|2", "(") then calls fix_emit_pt:("7|4", ")")
+given fix_tokline_fixture2 (1, 0):() then calls fix_emit_pt:("7|1", "(") then calls fix_emit_pt:("3|5", ")")
 
 fix_paren_rec(string p1, string p2) {
   fix_emit_pt(p1, "(");

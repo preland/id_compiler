@@ -9,3 +9,24 @@ ret_same_fn() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// Two tokens' lines, for a span-reading case (out/span/beg/text.id) that
+// needs a real tline pair rather than the empty one env_init leaves: line 3
+// for token 0, line 7 for token 1.
+fix_tokline_fixture() {
+  fix_fixture();
+  push((import tline), 3);
+  push((import tline), 7);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The matching columns (out/span/col.id): token 0 spans columns 2-5, token 1
+// columns 1-4.
+fix_tokline_fixture2() {
+  fix_tokline_fixture();
+  push((import tspan), 2 * 65536 + 5);
+  push((import tspan), 1 * 65536 + 4);
+} return void;
+given fix_tokline_fixture ():() then check_failed:(0)
+given fix_tokline_fixture ():() then init_units:(0)

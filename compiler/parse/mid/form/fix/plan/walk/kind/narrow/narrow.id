@@ -25,3 +25,5 @@ fix_narrows(string pt, int a) {
   string type_of_v = type_of(a);
   int ok = ty_narrows(pt, type_of_v);
 } return int ok;
+given ret_narrows_val ("int", (import narrow_e)):(1)
+given ret_widens_val ("word", (import widen_e)):(0)

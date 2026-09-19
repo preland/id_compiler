@@ -16,3 +16,5 @@ fix_span(int e) {
   int c = fix_nend(e);
   string ret_s = fix_at(b) + "|" + fix_after(c);
 } return string ret_s;
+given fix_tokline_node_fixture (0):("3|2|3|5")
+given fix_tokline_node_fixture2 (0):("9|1|9|4")

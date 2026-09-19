@@ -3,12 +3,16 @@ fix_emit_r(int e, string text) {
   string spn = fix_span(e);
   print("@R|" + (import fixd_file)[0] + "|" + spn + "|" + sq + "|" + text);
 } return void;
+given fix_tokline_node_fixture (0, "hi"):() then prints:("@R||3|2|3|5|1|hi\n")
+given fix_tokline_node_fixture2 (0, "bye"):() then prints:("@R||9|1|9|4|1|bye\n")
 
 fix_note_span(int e) {
   int b = fix_nbeg(e);
   int c = fix_nend(e);
   fix_note_tok(b, c);
 } return void;
+given fix_tokline_node_fixture (0):() then calls fix_note_tok:(0, 0)
+given fix_span_fixture ((import sp_e)):() then calls fix_note_tok:(0, 2)
 
 fix_note_tok(int b, int c) {
   push((import fixd_lo), b);

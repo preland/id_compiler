@@ -4,6 +4,8 @@ fix_free_fn(string name) {
     ok = 1;
   }
 } return int ok;
+given fix_fixture ("print"):(0)
+given fix_fixture ("zzz_unused"):(1)
 
 // lookup_var answers from another unit when the name is not in this one, which
 // can only refuse a name that was free; it never accepts one that was not.

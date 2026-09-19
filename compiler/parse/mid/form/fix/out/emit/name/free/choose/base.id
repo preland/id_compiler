@@ -11,3 +11,14 @@ fix_choose_base(string bstem, string sfx, string t) {
 } return string name;
 given fix_fixture ("foo", "_v", "int"):("foo_v")
 given fix_fixture ("bar", "_v", "string"):("bar_v")
+
+// A leaf node at token 0 of ../../pick/reuse/lookup/at.id's
+// fix_tokline_fixture3, for a fix_span case that needs a token position
+// other than out/emit/decl/subs.id's fix_tokline_node_fixture.
+fix_tokline_node_fixture2() {
+  fix_tokline_fixture3();
+  int e = newleaf("ident", 0, 0, "len", "");
+  fix_span_fixture2(e);
+} return void;
+given fix_tokline_fixture3 ():() then check_failed:(0)
+given fix_tokline_fixture3 ():() then init_units:(0)

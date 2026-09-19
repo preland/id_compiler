@@ -13,3 +13,14 @@ fix_rcache_find_at_fixture() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// A second, independent token position (line 9, columns 1-4), for a
+// out/span/beg/text.id fix_span case that needs a value different from
+// out/ret/clause/ret/fixture/same.id's fix_tokline_fixture2.
+fix_tokline_fixture3() {
+  fix_fixture();
+  push((import tline), 9);
+  push((import tspan), 1 * 65536 + 4);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
