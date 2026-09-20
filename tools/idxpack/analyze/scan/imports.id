@@ -1,0 +1,44 @@
+// Every distinct "(import NAME)" read anywhere in `names`' own bodies --
+// call this on a BFS closure (analyze/graph/bfs.id) to get the transitive
+// answer casework.sh packet's own-body-only grep cannot see.
+collect_imports(string[] names) {
+  string[] out_li = [];
+  int i = 0;
+  while(i < len(names)) {
+    string[] body = func_body_lines(names[i]);
+    scan_imports_in(body, out_li);
+    i = i + 1;
+  }
+} return string[] out_li;
+given ix_test_setup (["nope"]):([])
+given ix_import_fixture (["r"]):(["err_n"])
+
+// Appends every "(import NAME)" found in `body`'s lines to `out_li`, skipping
+// a name already collected.
+scan_imports_in(string[] body, string[] out_li) {
+  int i = 0;
+  while(i < len(body)) {
+    scan_imports_in_line(body[i], out_li);
+    i = i + 1;
+  }
+} return void;
+(["x"], []):(["x"], [])
+(["int c = (import err_n)[0];"], []):(["int c = (import err_n)[0];"], ["err_n"])
+
+scan_imports_in_line(string text_line, string[] out_li) {
+  int p = str_find(text_line, "(import ");
+  string name = "";
+  if(p >= 0) {
+    int q = str_findat(text_line, ")", p + 8);
+    if(q >= 0) {
+      int len_n = q - p - 8;
+      name = str_slice(text_line, p + 8, len_n);
+    }
+  }
+} chain (string text_line, string[] out_li) {
+  if(str_cmp(name, "") != 0 && idx_find_str(out_li, name) < 0) {
+    push(out_li, name);
+  }
+} return void;
+("plain line", []):("plain line", [])
+("int c = (import err_n)[0];", []):("int c = (import err_n)[0];", ["err_n"])

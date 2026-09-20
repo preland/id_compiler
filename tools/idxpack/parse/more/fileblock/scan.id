@@ -1,0 +1,20 @@
+// Walk the FILES section, one marker block at a time.
+fx_fill(string[] paths, string[][] blocks, string[] lines, int i) {
+  while(i < len(lines)) {
+    i = fx_fill_step(paths, blocks, lines, i);
+  }
+} return void;
+([], [], [], 0):([], [], [])
+([], [], ["===F:a.id===", "x"], 0):(["a.id"], [["x"]], ["===F:a.id===", "x"])
+
+fx_fill_step(string[] paths, string[][] blocks, string[] lines, int i) {
+  string cur = lines[i];
+  int is_marker = str_starts(cur, "===F:");
+  int ret_i = i + 1;
+} chain (string[] paths, string[][] blocks, string[] lines, int i) {
+  if(is_marker == 1) {
+    ret_i = fx_fill_block(paths, blocks, lines, i, cur);
+  }
+} return int ret_i;
+([], [], ["not a marker"], 0):(1)
+([], [], ["===F:a.id===", "x"], 0):(2)

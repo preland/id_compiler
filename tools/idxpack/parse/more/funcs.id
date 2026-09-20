@@ -1,0 +1,25 @@
+// The function table, as parallel lists: one entry per --calls case-count
+// row the shell wrapper reformatted to "name|file_l|line_l|cases" (splitting
+// the original "file_l:line_l" field so idxpack never has to parse a colon).
+ix_fill_funcs(string[] fn, string[] file_l, int[] line_l, int[] cases, string[] lines, int i) {
+  while(i < len(lines)) {
+    ix_row_fn(fn, file_l, line_l, cases, lines[i]);
+    i = i + 1;
+  }
+} return void;
+([], [], [], [], [], 0):([], [], [], [], [])
+([], [], [], [], ["a|b.id|3|2"], 0):(["a"], ["b.id"], [3], [2], ["a|b.id|3|2"])
+
+ix_row_fn(string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v) {
+  string[] parts = str_split(line_v, "|");
+  int line_n = to_int(parts[2]);
+  int cases_n = to_int(parts[3]);
+} chain (string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v) {
+  push(fn, parts[0]);
+  push(file_l, parts[1]);
+  push(line_l, line_n);
+} chain (string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v) {
+  push(cases, cases_n);
+} return void;
+([], [], [], [], "a|b.id|3|2"):(["a"], ["b.id"], [3], [2])
+(["x"], ["y.id"], [1], [0], "a|b.id|3|2"):(["x", "a"], ["y.id", "b.id"], [1, 3], [0, 2])

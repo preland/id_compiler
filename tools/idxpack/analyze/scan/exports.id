@@ -1,0 +1,38 @@
+// The function that exports `name`, found by scanning every function's own
+// body for an "export TYPE name = ..." statement -- or "" if none declares
+// it, which the packet reports honestly rather than guessing at one.
+find_declaring_fn(string name) {
+  int i = 0;
+  string out_s = "";
+  while(i < len((import ix_fn)) && str_cmp(out_s, "") == 0) {
+    out_s = find_declaring_fn_step(name, i, out_s);
+    i = i + 1;
+  }
+} return string out_s;
+given ix_import_fixture ("err_n"):("")
+given ix_export_fixture ("gv"):("setter")
+
+find_declaring_fn_step(string name, int i, string out_s) {
+  string cand = (import ix_fn)[i];
+  string[] body = func_body_lines(cand);
+  string ret_s = out_s;
+} chain (string name, int i, string out_s) {
+  if(body_declares_export(body, name) == 1) {
+    ret_s = cand;
+  }
+} return string ret_s;
+given ix_export_fixture ("gv", 0, ""):("setter")
+given ix_import_fixture ("err_n", 0, ""):("")
+
+body_declares_export(string[] body, string name) {
+  int i = 0;
+  int out_i = 0;
+  while(i < len(body) && out_i == 0) {
+    if(str_find(body[i], "export ") >= 0 && str_find(body[i], " " + name + " =") >= 0) {
+      out_i = 1;
+    }
+    i = i + 1;
+  }
+} return int out_i;
+(["plain"], "gv"):(0)
+(["  export int gv = 0;"], "gv"):(1)

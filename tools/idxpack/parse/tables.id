@@ -1,0 +1,29 @@
+// The two tables every later stage reads: the call graph (ix_*, from
+// --calls's edge rows) and the function table (also ix_*, from --calls's
+// case-count rows, reformatted by idc/tools/idxpack.sh into
+// "name|file|line|cases" so nothing here has to split a colon).
+ix_init(string[] edge_lines, string[] fn_lines) {
+  export string[] ix_ecaller = [];
+  export string[] ix_ecallee = [];
+  export string[] ix_ekind = [];
+} chain (string[] edge_lines, string[] fn_lines) {
+  export string[] ix_fn = [];
+  export string[] ix_file = [];
+  export int[] ix_line = [];
+} chain (string[] edge_lines, string[] fn_lines) {
+  export int[] ix_cases = [];
+  ix_fill_edges((import ix_ecaller), (import ix_ecallee), (import ix_ekind), edge_lines, 0);
+  ix_fill_funcs((import ix_fn), (import ix_file), (import ix_line), (import ix_cases), fn_lines, 0);
+} return void;
+([], []):() then total_funcs:(0)
+(["a|b|call"], ["x|y.id|1|2"]):() then total_funcs:(1)
+
+// The concatenated source text of every file the shell wrapper attached,
+// split into one path and one line array per "===F:...===" block.
+fx_init(string[] file_lines) {
+  export string[] fx_path = [];
+  export string[][] fx_lines = [];
+  fx_fill((import fx_path), (import fx_lines), file_lines, 0);
+} return void;
+(["===F:a.id===", "x"]):() then total_files:(1)
+([]):() then total_files:(0)

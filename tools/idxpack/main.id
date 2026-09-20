@@ -1,0 +1,66 @@
+// idxpack -- transitive-closure index for id test-case writing.
+//
+// stdin (built by idc/tools/idxpack.sh) is three sections:
+//   ===EDGES===
+//   caller|callee|kind         (from `idc PATH --calls`, locations dropped)
+//   ===FUNCS===
+//   name|file|line|cases       (--calls's case-count rows, "file:line" split)
+//   ===FILES===
+//   ===F:<path>===
+//   <raw source lines of that file>
+//   ===F:<path2>===
+//   ...
+//
+// argv[1] is the target function name. Prints three lists, one per line,
+// blank-line separated: the target's transitive call closure (BFS over
+// "call" edges), the exported names its closure reads (collect_imports),
+// then every zero-parameter void function that transitively initialises
+// all of them (find_givens) -- the legal `given` setups for a case on the
+// target. Packet formatting (source text, structural slots, candidate
+// `then` checks) is not wired in yet -- see the report for what stops here.
+main(int argc, string[] argv) {
+  string text = read_all();
+  string target = argv[1];
+  run(text, target);
+} return int 0;
+(2, ["idxpack", "f"]):(0)
+(2, ["idxpack", "g"]):(0)
+
+run(string text, string target) {
+  string nl = chr(10);
+  string[] lines = str_split(text, nl);
+  int e = idx_find_str(lines, "===EDGES===");
+} chain (string text, string target) {
+  int f = idx_find_str(lines, "===FUNCS===");
+  int g = idx_find_str(lines, "===FILES===");
+  int n = len(lines);
+} chain (string text, string target) {
+  string[] edge_lines = slice_lines(lines, e + 1, f);
+  string[] fn_lines = slice_lines(lines, f + 1, g);
+  string[] file_lines = slice_lines(lines, g + 1, n);
+} chain (string text, string target) {
+  ix_init(edge_lines, fn_lines);
+  fx_init(file_lines);
+  string[] reached = bfs_run(target);
+} chain (string text, string target) {
+  string[] imports = collect_imports(reached);
+  string[] declared = declaring_fns(imports);
+  string[] givens = find_givens(declared);
+} chain (string text, string target) {
+  print_list(reached);
+  print_list(imports);
+  print_list(givens);
+} return void;
+("===EDGES===\n===FUNCS===\n===FILES===", "z"):() then prints:("z\n\n\n\n")
+("===EDGES===\na|b|call\n===FUNCS===\n===FILES===", "a"):() then prints:("a\nb\n\n\n\n")
+
+print_list(string[] xs) {
+  int i = 0;
+  while(i < len(xs)) {
+    print(xs[i]);
+    i = i + 1;
+  }
+  print("");
+} return void;
+([]):() then prints:("\n")
+(["a", "b"]):() then prints:("a\nb\n\n")

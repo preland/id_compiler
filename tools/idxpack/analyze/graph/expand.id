@@ -1,0 +1,27 @@
+// A name's neighbours: mark it visited, then walk every edge looking for
+// ones it is the caller of.
+bfs_visit_new(string name) {
+  push((import bfs_visited), name);
+  bfs_expand_loop(name, 0);
+} return void;
+given bfs_test_setup ("q"):() then bfs_seen_count:(3)
+given bfs_test_setup ("a"):() then bfs_seen_count:(3)
+
+bfs_expand_loop(string caller, int i) {
+  while(i < len((import ix_ecaller))) {
+    i = bfs_expand_step(i, caller);
+  }
+} return void;
+given bfs_test_setup ("a", 0):() then bfs_seen_count:(2)
+given bfs_test_setup ("a", 1):() then bfs_seen_count:(2)
+
+bfs_expand_step(int i, string caller) {
+  int m = edge_is_call_from(i, caller);
+  if(m == 1) {
+    string callee = (import ix_ecallee)[i];
+    bfs_visit(callee);
+  }
+  int ret_i = i + 1;
+} return int ret_i;
+given bfs_test_setup (0, "a"):(1)
+given bfs_test_setup (0, "q"):(1)

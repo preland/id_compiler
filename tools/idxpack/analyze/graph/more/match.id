@@ -1,0 +1,27 @@
+// Is edge `i` a direct call from `caller`? ("value" edges -- a function
+// merely named, not invoked -- never extend the BFS.)
+edge_is_call_from(int i, string caller) {
+  string ec = (import ix_ecaller)[i];
+  string ek = (import ix_ekind)[i];
+  int out_i = 0;
+} chain (int i, string caller) {
+  if(str_cmp(ec, caller) == 0 && str_cmp(ek, "call") == 0) {
+    out_i = 1;
+  }
+} return int out_i;
+given bfs_test_setup (0, "a"):(1)
+given bfs_test_setup (0, "q"):(0)
+
+// How many names the last `bfs_run` reached -- a witness for BFS's own
+// tests that does not depend on the order names were visited in.
+bfs_seen_count() {
+  int ret_i = len((import bfs_visited));
+} return int ret_i;
+given bfs_test_setup ():(2)
+given bfs_test_setup2 ():(3)
+
+total_edges() {
+  int ret_i = len((import ix_ecaller));
+} return int ret_i;
+given bfs_test_setup ():(1)
+given ix_test_setup_empty ():(0)

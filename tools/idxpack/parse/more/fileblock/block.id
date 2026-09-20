@@ -1,0 +1,25 @@
+// The path named by one "===F:<path>===" marker line: strip the fixed
+// 5-character prefix and 3-character suffix idc/tools/idxpack.sh writes
+// around every path.
+fx_marker_path(string cur) {
+  int n = len(cur);
+  string mid = str_slice(cur, 5, n - 8);
+} return string mid;
+("===F:a.id==="):("a.id")
+("===F:x/y.id==="):("x/y.id")
+
+// One file's block: its path, and its lines up to (not including) the next
+// marker. Returns the index the scan should resume at.
+fx_fill_block(string[] paths, string[][] blocks, string[] lines, int i, string cur) {
+  string path = fx_marker_path(cur);
+  int n = len(lines);
+  int body_from = i + 1;
+} chain (string[] paths, string[][] blocks, string[] lines, int i, string cur) {
+  int j = find_next_file_marker(lines, body_from);
+  string[] block = slice_lines(lines, body_from, j);
+  push(paths, path);
+} chain (string[] paths, string[][] blocks, string[] lines, int i, string cur) {
+  push(blocks, block);
+} return int j;
+([], [], ["===F:a.id===", "x", "y"], 0, "===F:a.id==="):(3)
+([], [], ["===F:a.id===", "x", "===F:b.id===", "z"], 0, "===F:a.id==="):(2)

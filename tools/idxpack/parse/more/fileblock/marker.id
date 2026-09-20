@@ -1,0 +1,27 @@
+// The next "===F:<path>===" marker at or after `from`, or `len(lines)` if
+// there is none -- so a caller can always slice up to it without a separate
+// not-found check.
+find_next_file_marker(string[] lines, int from) {
+  int i = from;
+  int out_i = -1;
+  while(i < len(lines) && out_i < 0) {
+    out_i = find_next_file_marker_step(lines, i, out_i);
+    i = i + 1;
+  }
+} chain (string[] lines, int from) {
+  int ret_i = out_i;
+  if(out_i < 0) {
+    ret_i = len(lines);
+  }
+} return int ret_i;
+([], 0):(0)
+(["a", "===F:x===", "b"], 0):(1)
+
+find_next_file_marker_step(string[] lines, int i, int out_i) {
+  int ret_i = out_i;
+  if(out_i < 0 && str_starts(lines[i], "===F:") == 1) {
+    ret_i = i;
+  }
+} return int ret_i;
+(["a"], 0, -1):(-1)
+(["===F:x==="], 0, -1):(0)

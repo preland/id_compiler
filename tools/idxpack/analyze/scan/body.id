@@ -1,0 +1,41 @@
+// The line just before the next function declared in the same file, or the
+// file's own line count if `name` is the last function in it -- exactly
+// idc/tools/casework.sh's `fn_end`, but from the table instead of an awk
+// scan, since --calls already gave every function's start line.
+func_end_line(string file, int line, string[] all_lines) {
+  int i = 0;
+  int best = len(all_lines);
+  while(i < len((import ix_fn))) {
+    if(str_cmp((import ix_file)[i], file) == 0 && (import ix_line)[i] > line && (import ix_line)[i] - 1 < best) {
+      best = (import ix_line)[i] - 1;
+    }
+    i = i + 1;
+  }
+} return int best;
+given ix_test_setup ("f.id", 1, ["a", "b"]):(2)
+given ix_test_setup_empty ("f.id", 1, ["a", "b", "c"]):(3)
+
+// A function's own source lines, by name: its declared line to the line
+// before the next function in the same file (func_end_line above). A name
+// this build never declared (not found in ix_fn) has no body -- returns [].
+func_body_lines(string name) {
+  int fi = idx_find_str((import ix_fn), name);
+  string[] ret_li = [];
+  if(fi >= 0) {
+    ret_li = func_body_lines_at((import ix_file)[fi], (import ix_line)[fi]);
+  }
+} return string[] ret_li;
+given ix_test_setup ("a"):(["a() { } return void;"])
+given ix_test_setup ("nope"):([])
+
+func_body_lines_at(string file, int line) {
+  int pi = idx_find_str((import fx_path), file);
+  string[] ret_li = [];
+  if(pi >= 0) {
+    string[] all_lines = (import fx_lines)[pi];
+    int end = func_end_line(file, line, all_lines);
+    ret_li = slice_lines(all_lines, line - 1, end);
+  }
+} return string[] ret_li;
+given ix_test_setup ("f.id", 1):(["a() { } return void;"])
+given ix_test_setup ("nope.id", 1):([])

@@ -1,0 +1,35 @@
+// A linear index-of for string lists: id has no hashmap, and the table
+// sizes here (low thousands of functions at most, for one project) make an
+// O(n) scan cheap enough that a hash index is not worth the complexity.
+idx_find_str(string[] xs, string s) {
+  int i = 0;
+  int out_i = -1;
+  while(i < len(xs)) {
+    out_i = idx_find_str_step(xs, s, i, out_i);
+    i = i + 1;
+  }
+} return int out_i;
+([], "a"):(-1)
+(["a", "b"], "b"):(1)
+
+idx_find_str_step(string[] xs, string s, int i, int out_i) {
+  int ret_i = out_i;
+  if(out_i < 0 && str_cmp(xs[i], s) == 0) {
+    ret_i = i;
+  }
+} return int ret_i;
+(["x"], "y", 0, -1):(-1)
+(["x"], "x", 0, -1):(0)
+
+// A slice of lines [start, end), clamped to the array's own length -- used
+// to cut one function's or one file's block out_i of a larger line array.
+slice_lines(string[] lines, int start, int end) {
+  string[] piece = [];
+  int i = start;
+  while(i < end && i < len(lines)) {
+    push(piece, lines[i]);
+    i = i + 1;
+  }
+} return string[] piece;
+([], 0, 0):([])
+(["a", "b", "c"], 1, 2):(["b"])

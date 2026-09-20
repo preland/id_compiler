@@ -1,0 +1,22 @@
+// The call graph, as parallel lists the caller passes in explicitly (kept
+// as plain parameters, not exports, so these are testable as ordinary list
+// mutators -- docs/TESTS.md's `fill` idiom -- and the only place that reads
+// them through `(import ...)` is tables.id's ix_init, once).
+ix_fill_edges(string[] ecaller, string[] ecallee, string[] ekind, string[] lines, int i) {
+  while(i < len(lines)) {
+    ix_row_edge(ecaller, ecallee, ekind, lines[i]);
+    i = i + 1;
+  }
+} return void;
+([], [], [], [], 0):([], [], [], [])
+([], [], [], ["a|b|call"], 0):(["a"], ["b"], ["call"], ["a|b|call"])
+
+ix_row_edge(string[] ecaller, string[] ecallee, string[] ekind, string edge_line) {
+  string[] parts = str_split(edge_line, "|");
+  push(ecaller, parts[0]);
+  push(ecallee, parts[1]);
+} chain (string[] ecaller, string[] ecallee, string[] ekind, string edge_line) {
+  push(ekind, parts[2]);
+} return void;
+([], [], [], "a|b|call"):(["a"], ["b"], ["call"])
+(["x"], ["y"], ["z"], "c|d|value"):(["x", "c"], ["y", "d"], ["z", "value"])

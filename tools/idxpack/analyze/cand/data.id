@@ -1,0 +1,41 @@
+// A fixture whose one registered function's body actually reads an
+// import, for collect_imports/find_givens cases that need a real hit
+// instead of the empty-closure path ix_test_setup exercises.
+ix_import_fixture() {
+  string[] no_edges = [];
+  ix_init(no_edges, ["r|f.id|1|2"]);
+  fx_init(["===F:f.id===", "r() {", "  int c = (import err_n)[0];", "} return int c;"]);
+} return void;
+():() then total_funcs:(1)
+():() then total_files:(1)
+
+// The declaring function of every name in `imports` -- the actual required
+// set for `find_givens`, which checks reachability of FUNCTION names, not
+// export names. A name with no declaring function found (most commonly a
+// conf.id constant, which docs/PROJECT.md says is readable from main's
+// first statement on and needs no setup) is dropped rather than left in
+// the set, where it would make the reachability check unsatisfiable for
+// every candidate regardless of whether one exists for the rest.
+declaring_fns(string[] imports) {
+  string[] out_li = [];
+  int i = 0;
+  while(i < len(imports)) {
+    string d = find_declaring_fn(imports[i]);
+    if(str_cmp(d, "") != 0) {
+      push(out_li, d);
+    }
+    i = i + 1;
+  }
+} return string[] out_li;
+given ix_export_fixture (["gv"]):(["setter"])
+given ix_import_fixture (["err_n"]):([])
+
+// A fixture whose one registered function's body declares an export, for
+// find_declaring_fn's "found it" case.
+ix_export_fixture() {
+  string[] no_edges = [];
+  ix_init(no_edges, ["setter|f.id|1|2"]);
+  fx_init(["===F:f.id===", "setter() {", "  export int gv = 0;", "} return void;"]);
+} return void;
+():() then total_funcs:(1)
+():() then total_files:(1)

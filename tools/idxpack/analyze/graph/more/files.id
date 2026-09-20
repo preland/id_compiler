@@ -1,0 +1,16 @@
+total_files() {
+  int ret_i = len((import fx_path));
+} return int ret_i;
+given ix_test_setup ():(1)
+given ix_test_setup_empty ():(0)
+
+// A second BFS fixture with one extra visited name, purely so functions
+// like `bfs_seen_count` that take no arguments have two genuinely different
+// states to be checked against.
+bfs_test_setup2() {
+  ix_init(["a|b|call"], ["a|f.id|1|2"]);
+  bfs_run("a");
+  bfs_visit_new("z");
+} return void;
+():() then bfs_seen_count:(3)
+():() then total_funcs:(1)
