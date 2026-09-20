@@ -8,6 +8,8 @@ fix_owner(int f) {
   string s1_of_v = s1_of((import prog)[f]);
   int ow = fix_fnix(s1_of_v);
 } return int ow;
+given fix_ret_fixture (0):(-1) then calls s1_of:[1]
+given fix_ret_fixture (1):(-1) then calls fix_fnix:[1]
 
 // A function's index in fnames, through the hash index lookup_func uses.
 fix_fnix(string name) {
