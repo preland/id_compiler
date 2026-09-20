@@ -16,21 +16,3 @@ push_sym_row(int i) {
 } return void;
 given asmfx_setup (0):() then asmfx_fn_count:(1)
 given asmfx_setup (0):() then check_failed:(0)
-
-// Everything the checks need that is not in the AST is set up first -- see
-// arg_setup. It used to be just register_asm_syms(), and that call used to
-// sit inside emit(), which left every type check silently inactive on
-// asm-using code: the checks saw an unknown return type and, correctly,
-// declined to guess, so a whole program could go unchecked with no
-// diagnostic at all.
-emit_checked(int argc, string[] argv) {
-  arg_setup(argc, argv);
-  check_program();
-  check_asm_targets(argc, argv);
-} chain (int argc, string[] argv) {
-  if(arg_flag(argc, argv, 1, "--calls") == 1) {
-    print_calls();
-  } else {
-    guarded_emit_tail(argc, argv);
-  }
-} return void;

@@ -27,11 +27,17 @@ given lz_o (2, ["prog", "--fingerprints"]):() then calls report_mode:(2, ["prog"
 emit_all(int argc, string[] argv) {
   emit_tests_maybe(argc, argv);
   natives_then_prune();
-  emit(argc, argv);
+  blank;
 } chain (int argc, string[] argv) {
+  if(argc > 1 && argv[1] == "ast") {
+    print_program();
+  } else {
+    emit_target(argc, argv);
+  }
   if((import natc)[0] == 1) {
     nat_print();
   }
+} chain (int argc, string[] argv) {
   emit_notes();
 } return void;
 given emit_all_fixture_off (1, ["prog"]):() then calls nat_print:[0] then calls emit_notes:[1]

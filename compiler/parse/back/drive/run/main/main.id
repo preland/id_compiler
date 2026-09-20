@@ -18,6 +18,14 @@ main(int argc, string[] argv) {
   build_syms();
   collect_exports();
 } chain (int argc, string[] argv) {
-  emit_checked(argc, argv);
+  arg_setup(argc, argv);
+  check_program();
+  check_asm_targets(argc, argv);
+} chain (int argc, string[] argv) {
+  if(arg_flag(argc, argv, 1, "--calls") == 1) {
+    print_calls();
+  } else {
+    guarded_emit_tail(argc, argv);
+  }
   int ret_i = check_failed();
 } return int ret_i;

@@ -1,14 +1,3 @@
-// Output mode: the AST dump when given `ast`, else whichever code generator
-// `--target` names (drive/target/).
-
-emit(int argc, string[] argv) {
-  if(argc > 1 && argv[1] == "ast") {
-    print_program();
-  } else {
-    emit_target(argc, argv);
-  }
-} return void;
-
 // The target triple: `idparse --triple T`, else the host default. Kept here
 // rather than in a global so nothing below the driver can change it.
 arg_triple(int argc, string[] argv) {

@@ -13,12 +13,8 @@
 fit_import(int i, int e, string want) {
   string imp_nm = s1_of(e);
   int ek = find_str((import enames), imp_nm);
-  imp_check(i, imp_nm, ek, want);
-} return void;
-given impcase_empty ((import fixture_ci), (import fixture_zero), "int"):() then prints:("fixture.id:4: error: (import 0) needs a 'given': an export has no value in a case until a setup has run\n")
-given impcase_given ((import fixture_ci), (import fixture_zero), "int"):() then prints:("fixture.id:4: error: (import 0): '0' is not an exported variable\n")
-
-imp_check(int i, string imp_nm, int ek, string want) {
+  blank;
+} chain (int i, int e, string want) {
   if((import casegiven)[i] == "") {
     case_err(i, "(import " + imp_nm + ") needs a 'given': an export has no value in a case until a setup has run");
   } else if(ek < 0) {
@@ -27,6 +23,8 @@ imp_check(int i, string imp_nm, int ek, string want) {
     imp_owner(i, imp_nm, ek, want);
   }
 } return void;
+given impcase_empty ((import fixture_ci), (import fixture_zero), "int"):() then prints:("fixture.id:4: error: (import 0) needs a 'given': an export has no value in a case until a setup has run\n")
+given impcase_given ((import fixture_ci), (import fixture_zero), "int"):() then prints:("fixture.id:4: error: (import 0): '0' is not an exported variable\n")
 
 imp_owner(int i, string imp_nm, int ek, string want) {
   string setup_nm = (import casegiven)[i];

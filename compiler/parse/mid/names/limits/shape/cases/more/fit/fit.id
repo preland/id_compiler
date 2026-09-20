@@ -12,10 +12,17 @@
 fit_case(int i) {
   int fn = (import casefn)[i];
   int node = (import casenode)[i];
-  fit_arity(i, fn, node);
+  blank;
+} chain (int i) {
+  if(flat_arg_count(fn) != flat_arg_count(node)) {
+    int na = flat_arg_count(node);
+    case_arity_err(i, fn, na);
+  } else {
+    fit_body(i, fn, node);
+  }
 } return void;
 given wrap_fixture ((import fixture_ci)):() then prints:("")
-given wrap_fixture ((import fixture_ci)):() then calls fit_arity:[1]
+given wrap_fixture ((import fixture_ci)):() then calls fit_body:[1]
 
 // casegiven[i] populated with "" (a case with no `given`): fit_given
 // (../../given/given.id), fit_import and imp_owner (../../given/read/
@@ -31,12 +38,3 @@ impcase_empty() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
-
-fit_arity(int i, int fn, int node) {
-  if(flat_arg_count(fn) != flat_arg_count(node)) {
-    int na = flat_arg_count(node);
-    case_arity_err(i, fn, na);
-  } else {
-    fit_body(i, fn, node);
-  }
-} return void;

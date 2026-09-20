@@ -16,12 +16,9 @@ given impcase_given (0):() then calls given_fn:(0, "fx_setup")
 
 given_fn(int i, string setup_nm) {
   int sfn = func_node(setup_nm);
-  given_shape(i, setup_nm, sfn);
-} return void;
-given impcase_given ((import fixture_ci), "fx_setup"):() then check_failed:(0)
-given fn_fixture ((import fixture_ci), "nosuchfn123"):() then check_failed:(1)
-
-given_shape(int i, string setup_nm, int sfn) {
+  blank;
+  blank;
+} chain (int i, string setup_nm) {
   if(sfn < 0) {
     case_err(i, "'given' names '" + setup_nm + "', which is not a function in this build");
   } else if(flat_arg_count(sfn) != 0) {
@@ -32,3 +29,5 @@ given_shape(int i, string setup_nm, int sfn) {
     case_err(i, "'given' names '" + setup_nm + "', which returns " + rt + "; a setup takes none and returns void");
   }
 } return void;
+given impcase_given ((import fixture_ci), "fx_setup"):() then check_failed:(0)
+given fn_fixture ((import fixture_ci), "nosuchfn123"):() then check_failed:(1)
