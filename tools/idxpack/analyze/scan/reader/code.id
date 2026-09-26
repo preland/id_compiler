@@ -34,10 +34,15 @@ func_code_lines_step(string[] body, string[] out_li, int i) {
 // `a` (zero-void) calls `b`, which reads an import only `d` declares --
 // but `a` never reaches `d`. The `given` search this fixture backs
 // (runnable.id) exists to catch exactly this: offering `a` as a setup
-// would leave `b`'s own read unsatisfied.
+// would leave `b`'s own read unsatisfied. std_root_set("", 0) matches
+// pick_declarer's fallback unit (index.txt with no ===STD=== line), which
+// this fixture's own "f.id" path falls under either way, so a reader's own
+// requirement can actually be resolved through pick_declarer rather than
+// trapping on an unset ix_stdpresent.
 unmet_req_fixture() {
   ix_init(["a|b|call"], ["a|f.id|1|2", "b|f.id|2|2", "d|f.id|3|2"]);
   fx_init(["===F:f.id===", "a() { } return void;", "b() { int x = (import zzz)[0]; } return int x;", "d() { export int zzz = 0; } return void;"]);
+  std_root_set("", 0);
 } return void;
 ():() then total_funcs:(3)
 ():() then total_edges:(1)

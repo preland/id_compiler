@@ -1,9 +1,14 @@
 // A fixture whose one registered function's body actually reads an
 // import, for collect_imports/find_givens cases that need a real hit
-// instead of the empty-closure path ix_test_setup exercises.
+// instead of the empty-closure path ix_test_setup exercises. std_root_set
+// ("", 0) matches pick_declarer's fallback unit, so a reader_own_required
+// case run over this fixture's "r" can resolve through pick_declarer
+// instead of trapping on an unset ix_stdpresent.
 ix_import_fixture() {
   string[] no_edges = [];
   ix_init(no_edges, ["r|f.id|1|2"]);
+  std_root_set("", 0);
+} chain () {
   fx_init(["===F:f.id===", "r() {", "  int c = (import err_n)[0];", "} return int c;"]);
 } return void;
 ():() then total_funcs:(1)

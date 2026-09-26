@@ -35,8 +35,8 @@ reader_own_required_step(string path, string imp_name, string[] out_li) {
     push(out_li, d);
   }
 } return void;
-given ix_export_fixture ("f.id", "gv", []):("f.id", "gv", ["setter"])
-given ix_export_fixture ("f.id", "nope", []):("f.id", "nope", [])
+given unit_fixture ("/proj/x.id", "gv", []):("/proj/x.id", "gv", ["a"])
+given unit_fixture ("/proj/x.id", "nope", []):("/proj/x.id", "nope", [])
 
 // The required declarers for a whole set of readers (main.id's `reached`),
 // unioned and filtered against `reached` itself -- the target-level
