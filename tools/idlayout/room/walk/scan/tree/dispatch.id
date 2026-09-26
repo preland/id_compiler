@@ -1,0 +1,35 @@
+// One directory's own fs_list buffer, read entry by entry (same shape as
+// audit/walk/scan/loop.id's lay_scan/lay_scan_one/lay_scan_entry): a
+// subdirectory recurses (recurse.id); a real *.id file (classify.id's kind 3
+// or 4 -- a legacy manifest, a backend link and anything else are never
+// candidates) is checked for room.
+
+lay_room_scan_entry(int[] buf, int lo, int hi, string dir, string root, int is_root) {
+  if(buf[hi - 1] == 47) {
+    lay_room_handle_dir(buf, lo, hi - 1, dir, root, is_root);
+  } else {
+    string name = lay_name_of(buf, lo, hi);
+    int kind = lay_file_kind(name);
+    if(kind == 3 || kind == 4) {
+      lay_room_emit_file(dir, root, name);
+    }
+  }
+} return void;
+given lay_room_ref_fixture ([97, 46, 105, 100], 0, 4, "/r", "/r", 0):() then lay_room_count:(1)
+given lay_room_ref_fixture ([99, 111, 110, 102, 46, 105, 100], 0, 7, "/r", "/r", 0):() then lay_room_count:(0)
+
+lay_room_scan_one(int[] buf, string dir, string root, int is_root, int at) {
+  int end = lay_eol(buf, at);
+  lay_room_scan_entry(buf, at, end, dir, root, is_root);
+  int next = end + 1;
+} return int next;
+given lay_room_ref_fixture ([97, 46, 105, 100, 10], "/r", "/r", 0, 0):(5)
+given lay_room_ref_fixture ([46, 103, 105, 116, 47, 10], "/r", "/r", 1, 0):(6)
+
+lay_room_scan(int[] buf, string dir, string root, int is_root, int at) {
+  while(at < len(buf)) {
+    at = lay_room_scan_one(buf, dir, root, is_root, at);
+  }
+} return void;
+given lay_room_ref_fixture ([], "/r", "/r", 0, 0):() then lay_room_count:(0)
+given lay_room_ref_fixture ([97, 46, 105, 100, 10], "/r", "/r", 0, 0):() then lay_room_count:(1)

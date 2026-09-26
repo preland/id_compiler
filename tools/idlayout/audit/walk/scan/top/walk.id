@@ -1,5 +1,5 @@
 // One directory, fully: list it (walk/list.id), count its own entries and
-// check them against the limit, then scan each one for the other four
+// check them against the limit, then scan each one for the other six
 // violations and recurse into every subdirectory reached. A directory that
 // cannot be read (fs_list < 0) lists as nothing, same as `find` skipping it.
 
@@ -19,6 +19,7 @@ lay_walk_listed(string dir, string root, string build, int is_root, int size) {
 } chain (string dir, string root, string build, int is_root, int size) {
   string self = lay_basename(dir);
   lay_scan(buf, dir, root, build, is_root, self, 0);
+  lay_check_numbered(dir, build, is_root, buf);
 } return void;
 given lay_walk_listed_fixture ("/tmp/idlayout_wfb", "/tmp/idlayout_wfb", "build", 1, (import lay_wl_size)):() then lay_report:(1)
 given lay_walk_listed_fixture ("/tmp/idlayout_wfb", "/tmp/idlayout_wfb", "build", 1, (import lay_wl_size)):() then calls lay_check_entrylimit:("/tmp/idlayout_wfb")

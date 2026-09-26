@@ -1,0 +1,50 @@
+// Whether a stem's own base names an actual entry (the "bare" one) already
+// in the same listing: chunk2's base is "chunk", and `lay_ns_find_bare`
+// answers with the index of "chunk" itself, if it is there. Names are unique
+// within one directory listing, so at most one stem can ever be bare and
+// equal to a given base -- there is nothing to pick between two matches.
+//
+// `lay_ns_solo_earlier` is for the other case, no bare entry at all: x2 and
+// x3 are numbered siblings of *each other*. It answers with the first
+// earlier stem sharing this base, but only when that is the ONLY earlier one
+// -- a third occurrence (x4) is not reported again, matching bin/idc's own
+// bash version, which stops at the first pair. `lay_ns_bump` is what turns a
+// second match into "more than one" (-2) without a second loop variable: a
+// while loop already at its own nesting limit cannot hold the extra branch
+// inline.
+
+lay_ns_find_bare(string[] stems, int n, string base) {
+  int j = 0;
+  int found = -1;
+  while(j < n) {
+    if(lay_stem_bare(stems[j]) == 1 && stems[j] == base) {
+      found = j;
+    }
+    j = j + 1;
+  }
+} return int found;
+(["chunk", "chunk2"], 2, "chunk"):(0)
+(["chunk2", "ihdr3"], 2, "chunk"):(-1)
+
+lay_ns_bump(int cur, int j) {
+  int next = j;
+  if(cur != -1) {
+    next = -2;
+  }
+} return int next;
+(-1, 3):(3)
+(3, 5):(-2)
+(-2, 7):(-2)
+
+lay_ns_solo_earlier(string[] stems, int n, int i, string base) {
+  int j = 0;
+  int first = -1;
+  while(j < i) {
+    if(lay_stem_base(stems[j]) == base) {
+      first = lay_ns_bump(first, j);
+    }
+    j = j + 1;
+  }
+} return int first;
+(["chunk2", "chunk3"], 2, 1, "chunk"):(0)
+(["chunk2", "chunk3", "chunk4"], 3, 2, "chunk"):(-2)

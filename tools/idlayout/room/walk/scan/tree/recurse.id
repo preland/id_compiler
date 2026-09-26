@@ -1,0 +1,42 @@
+// Descending into the tree (mirrors audit/walk/list.id's own lay_walk/
+// lay_walk_listed): a subdirectory is skipped if hidden or -- only directly
+// under ROOT -- the build output directory, the same filter
+// audit/check/rule/dir/entrylimit/count.id applies for the entry-limit rule;
+// otherwise it is walked in turn. A directory's own entry total is
+// lay_count_all's (audit/check/rule/dir/entrylimit/{count,scan}.id), read
+// back the same way lay_check_entrylimit does, so a directory candidate's
+// free count always agrees with the rule that would otherwise flag it.
+
+lay_room_handle_dir(int[] buf, int lo, int hi, string dir, string root, int is_root) {
+  string name = lay_name_of(buf, lo, hi);
+  int hidden = charat(name, 0) == 46;
+  int pruned = is_root == 1 && name == "build";
+} chain (int[] buf, int lo, int hi, string dir, string root, int is_root) {
+  if(hidden == 0 && pruned == 0) {
+    string child = dir + "/" + name;
+    lay_room_walk(child, root, 0);
+  }
+} return void;
+given lay_room_ref_fixture ([46, 103, 105, 116], 0, 4, "/r", "/r", 0):() then lay_room_count:(0)
+given lay_room_ref_fixture ([98, 117, 105, 108, 100], 0, 5, "/r", "/r", 1):() then lay_room_count:(0)
+
+lay_room_walk(string dir, string root, int is_root) {
+  int size = lay_list_size(dir);
+  if(size >= 0) {
+    lay_room_walk_listed(dir, root, is_root, size);
+  }
+} return void;
+given lay_room_ref_fixture ("does-not-exist-xyz-room-walk", "does-not-exist-xyz-room-walk", 1):() then lay_room_count:(0)
+given lay_room_scratch_fixture ((import lay_room_scratch), (import lay_room_scratch), 1):() then lay_room_count:(2) then lay_room_scratch_clean:(0)
+
+lay_room_walk_listed(string dir, string root, int is_root, int size) {
+  int[] buf = lay_list_read(dir, size);
+  lay_count_all(buf, "build", is_root);
+  int total = len((import lay_scratch_names));
+} chain (string dir, string root, int is_root, int size) {
+  lay_room_emit_dir(dir, root, total);
+  lay_room_scan(buf, dir, root, is_root, 0);
+} return void;
+given lay_room_scratch_fixture ((import lay_room_scratch), (import lay_room_scratch), 1, (import lay_room_scratch_size)):() then lay_room_count:(2) then lay_room_scratch_clean:(0)
+given lay_room_empty_fixture ((import lay_room_empty), (import lay_room_empty), 1, (import lay_room_empty_size)):() then lay_room_count:(1) then lay_room_empty_clean:(0)
+

@@ -1,0 +1,47 @@
+// The nearest not-yet-printed candidate: lay_room_first_untaken seeds the
+// search at the first index still free (so lay_room_consider never has to
+// handle "nothing found yet" as a special case -- every index it compares
+// against is already a real candidate), and lay_room_find_min folds the rest
+// of the list into it one index at a time. -1 throughout means "none left",
+// the same sentinel `taken` marks a printed row with (emit.id).
+
+lay_room_first_untaken(int[] taken, int n) {
+  int i = 0;
+  int found = -1;
+  while(i < n && found == -1) {
+    if(taken[i] == 0) {
+      found = i;
+    }
+    i = i + 1;
+  }
+} return int found;
+given lay_room_two_fixture ([0, 0], 2):(0)
+given lay_room_two_fixture ([1, 1], 2):(-1)
+
+lay_room_consider(int[] taken, int i, int best) {
+  int nb = best;
+  string k1 = lay_room_key(i);
+  string k2 = lay_room_key(best);
+} chain (int[] taken, int i, int best) {
+  int c = str_cmp(k1, k2);
+  if(taken[i] == 0 && c < 0) {
+    nb = i;
+  }
+} return int nb;
+given lay_room_two_fixture ([0, 0], 1, 0):(0)
+given lay_room_two_fixture ([0, 0], 0, 1):(0)
+given lay_room_two_fixture ([1, 0], 0, 1):(1)
+
+lay_room_find_min(int[] taken) {
+  int n = len((import room_paths));
+  int best = lay_room_first_untaken(taken, n);
+  int i = best + 1;
+} chain (int[] taken) {
+  while(i < n && best != -1) {
+    best = lay_room_consider(taken, i, best);
+    i = i + 1;
+  }
+} return int best;
+given lay_room_two_fixture ([0, 0]):(0)
+given lay_room_two_fixture ([1, 0]):(1)
+given lay_room_two_fixture ([1, 1]):(-1)

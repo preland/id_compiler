@@ -1,0 +1,31 @@
+// One candidate entry (already known to be non-bare), checked against the
+// rest of its own list: a bare match anywhere reports it as a copy of that
+// one; failing that, an earlier non-bare entry sharing its base -- but only
+// if there is exactly one -- reports the pair as numbered siblings of each
+// other. `lay_ns_push_hit` writes the message either way, in bin/idc's own
+// bash wording.
+
+lay_ns_push_hit(string[] names, int i, int other, string dir, string noun) {
+  string numbered = dir + "/" + names[i];
+  string base_path = dir + "/" + names[other];
+  string msg = lay_msg(numbered, noun + " '" + numbered + "' is a numbered copy of '" + base_path + "'; name it for what it holds");
+} chain (string[] names, int i, int other, string dir, string noun) {
+  push((import lay_hit_numbered), msg);
+} return void;
+given lay_reset (["chunk.id", "chunk2.id"], 1, 0, "d", "file"):() then lay_report:(1)
+given lay_reset (["pane", "pane2"], 1, 0, "d", "directory"):() then lay_report:(1)
+
+lay_ns_check_numbered(string[] stems, string[] names, int n, int i, string base, string dir, string noun) {
+  int bare_idx = lay_ns_find_bare(stems, n, base);
+  if(bare_idx != -1) {
+    lay_ns_push_hit(names, i, bare_idx, dir, noun);
+  } else {
+    int solo = lay_ns_solo_earlier(stems, n, i, base);
+    if(solo >= 0) {
+      lay_ns_push_hit(names, i, solo, dir, noun);
+    }
+  }
+} return void;
+given lay_reset (["chunk", "chunk2"], ["chunk.id", "chunk2.id"], 2, 1, "chunk", "d", "file"):() then lay_report:(1)
+given lay_reset (["chunk2", "chunk3"], ["chunk2.id", "chunk3.id"], 2, 1, "chunk", "d", "file"):() then lay_report:(1)
+given lay_reset (["md5"], ["md5.id"], 1, 0, "md", "d", "file"):() then lay_report:(0)

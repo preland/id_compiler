@@ -8,7 +8,7 @@ lay_scan_entry(int[] buf, int lo, int hi, string dir, string root, string build,
   if(buf[hi - 1] == 47) {
     lay_handle_dir(buf, lo, hi - 1, dir, root, build, is_root, self);
   } else {
-    lay_handle_file(buf, lo, hi, dir, is_root);
+    lay_handle_file(buf, lo, hi, dir, is_root, self);
   }
 } return void;
 given lay_reset ([46, 103, 105, 116, 47], 0, 5, "d", "r", "build", 0, "d"):() then lay_report:(0)

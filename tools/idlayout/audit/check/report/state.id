@@ -1,0 +1,19 @@
+// One bucket per bash check (check_legacy_manifest, check_entry_limit,
+// check_nested_manifest, check_same_name_as_parent, check_generic_names,
+// check_numbered_sibling, check_file_named_like_dir), holding every
+// violation it finds rather than bash's `head -1`. Reset once, at the start
+// of a run, before the walk pushes into any of them.
+
+lay_reset() {
+  export string[] lay_hit_legacy = [];
+  export string[] lay_hit_entry = [];
+  export string[] lay_hit_nested = [];
+} chain () {
+  export string[] lay_hit_samename = [];
+  export string[] lay_hit_generic = [];
+  export string[] lay_hit_numbered = [];
+} chain () {
+  export string[] lay_hit_samefile = [];
+} return void;
+():() then prints:("")
+():() then lay_report:(0)

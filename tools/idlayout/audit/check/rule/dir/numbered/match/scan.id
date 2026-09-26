@@ -1,0 +1,25 @@
+// One directory's own list of same-typed entries (all its subdirectories, or
+// all its *.id files, stems and full names in parallel): every bare entry is
+// skipped -- it is the canonical form, never a copy of anything -- and every
+// other one is checked (check.id) against the rest of the list. `noun` is
+// "file" or "directory", carried straight into the message.
+
+lay_ns_check_index(string[] stems, string[] names, int n, int i, string dir, string noun) {
+  string base = lay_stem_base(stems[i]);
+  int bare_i = lay_stem_bare(stems[i]);
+  if(bare_i == 0) {
+    lay_ns_check_numbered(stems, names, n, i, base, dir, noun);
+  }
+} return void;
+given lay_reset (["chunk", "chunk2"], ["chunk.id", "chunk2.id"], 2, 1, "d", "file"):() then lay_report:(1)
+given lay_reset (["chunk", "chunk2"], ["chunk.id", "chunk2.id"], 2, 0, "d", "file"):() then lay_report:(0)
+
+lay_ns_scan(string[] stems, string[] names, int n, string dir, string noun) {
+  int i = 0;
+  while(i < n) {
+    lay_ns_check_index(stems, names, n, i, dir, noun);
+    i = i + 1;
+  }
+} return void;
+given lay_reset (["chunk", "chunk2"], ["chunk.id", "chunk2.id"], 2, "d", "file"):() then lay_report:(1)
+given lay_reset (["a", "b"], ["a.id", "b.id"], 2, "d", "file"):() then lay_report:(0)

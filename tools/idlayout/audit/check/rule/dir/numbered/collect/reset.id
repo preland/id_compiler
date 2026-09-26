@@ -1,0 +1,25 @@
+// One directory's own two candidate lists for the numbered-sibling check --
+// its subdirectory names and its *.id file names, kept apart because a
+// directory is never a numbered copy of a file, or the reverse. Reset once
+// per directory (all.id) before either is filled; the two `_len` checks are
+// what a case reads back, the same role fixture/scratch.id's own
+// `lay_scratch_len` plays for the entry-limit count.
+
+lay_ns_scratch_reset() {
+  export string[] lay_ns_dirs = [];
+  export string[] lay_ns_files = [];
+} return void;
+():() then prints:("")
+():() then lay_ns_dirs_len:(0)
+
+lay_ns_dirs_len() {
+  int n = len((import lay_ns_dirs));
+} return int n;
+given lay_ns_scratch_reset ():(0)
+given lay_ns_scratch_reset ():(0) then prints:("")
+
+lay_ns_files_len() {
+  int n = len((import lay_ns_files));
+} return int n;
+given lay_ns_scratch_reset ():(0)
+given lay_ns_scratch_reset ():(0) then prints:("")

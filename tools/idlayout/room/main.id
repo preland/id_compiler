@@ -1,0 +1,28 @@
+// idlayout --room ROOT DIR -- where the nearest free room is, walking the
+// whole ROOT tree (walk/) and printing up to 10 candidates, nearest to DIR
+// first (out/). Exit code mirrors the walk's own answer: 0 once anything was
+// printed, 1 when DIR has no room anywhere under ROOT -- room/main.id is the
+// only file that ties the two trees together, so a change to either one
+// never has to touch the other.
+
+lay_room_set_ref(string[] segs) {
+  export string[] room_ref_segs = segs;
+} return void;
+([]):() then prints:("")
+(["a", "b"]):() then prints:("")
+
+lay_room_run(string root, string dir) {
+  lay_room_reset();
+  string[] segs = lay_room_segs(root, dir);
+  lay_room_set_ref(segs);
+} chain (string root, string dir) {
+  lay_room_walk(root, root, 1);
+  int printed = lay_room_print(10);
+  int code = 0;
+} chain (string root, string dir) {
+  if(printed == 0) {
+    code = 1;
+  }
+} return int code;
+("does-not-exist-xyz-room-run-root", "does-not-exist-xyz-room-run-root"):(1) then prints:("")
+given lay_room_scratch_fixture ((import lay_room_scratch), (import lay_room_scratch)):(0) then lay_room_scratch_clean:(0)

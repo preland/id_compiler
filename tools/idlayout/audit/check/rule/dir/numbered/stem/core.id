@@ -1,0 +1,48 @@
+// Whether a name's own trailing digits mark it as another entry's numbered
+// copy: chunk2 beside chunk, or x_2 beside x (a trailing `_digits` suffix
+// counts the same as trailing digits alone). `lay_suffix_start` finds where
+// that optional suffix begins in a stem (name with any `.id` already
+// stripped, see ../names.id); `lay_stem_bare` and `lay_stem_base` read what
+// it found. A stem with digits but nothing left once they are stripped
+// (a bare "42") has no suffix at all -- it is its own base, same as one with
+// no digits.
+
+lay_suffix_start(string s) {
+  int i = len(s) - 1;
+  int last_digit = -1;
+  while(i >= 0 && chr_is_digit(charat(s, i)) == 1) {
+    last_digit = i;
+    i = i - 1;
+  }
+} chain (string s) {
+  int start = last_digit;
+  if(last_digit > 0 && charat(s, last_digit - 1) == 95) {
+    start = last_digit - 1;
+  }
+} return int start;
+("chunk2"):(5)
+("chunk"):(-1)
+("x_2"):(1)
+("42"):(0)
+
+lay_stem_bare(string stem) {
+  int start = lay_suffix_start(stem);
+  int bare = 1;
+  if(start > 0) {
+    bare = 0;
+  }
+} return int bare;
+("chunk2"):(0)
+("chunk"):(1)
+("42"):(1)
+
+lay_stem_base(string stem) {
+  int start = lay_suffix_start(stem);
+  string base = stem;
+  if(start > 0) {
+    base = str_slice(stem, 0, start);
+  }
+} return string base;
+("chunk2"):("chunk")
+("chunk"):("chunk")
+("x_2"):("x")

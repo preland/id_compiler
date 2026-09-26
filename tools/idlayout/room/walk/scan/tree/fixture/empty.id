@@ -1,0 +1,21 @@
+// The other boundary scratch.id's real one-file directory does not reach: an
+// empty directory, still under 3 entries so it is still a `dir` candidate,
+// but with nothing in it for lay_room_scan to turn into a `file` one.
+
+lay_room_empty_fixture() {
+  lay_room_reset();
+  export string lay_room_empty = fs_mktemp("idlayout_room_", 1);
+  export int lay_room_empty_size = lay_list_size(lay_room_empty);
+} chain () {
+  string[] no_segs = [];
+  lay_room_set_ref(no_segs);
+} return void;
+():() then lay_room_empty_clean:(0)
+():() then lay_room_empty_clean:(0) then lay_room_empty_clean:(-1)
+
+lay_room_empty_clean() {
+  string dir_v = (import lay_room_empty);
+  int r1 = fs_remove(dir_v);
+} return int r1;
+given lay_room_empty_fixture ():(0)
+given lay_room_empty_fixture ():(0) then lay_room_empty_clean:(-1)

@@ -1,0 +1,31 @@
+// Printing up to `cap` rows, nearest first: each round asks find.id for the
+// nearest not-yet-printed candidate, prints its line (cmp.id) and marks it
+// taken, so the next round's search never returns the same index twice. The
+// count printed is the whole point of the walk from lay_room_run's side: 0
+// means ROOT had no room for DIR anywhere, which is what decides its exit
+// code.
+
+lay_room_emit_one(int[] taken, int idx) {
+  string line = lay_room_line(idx);
+  print(line);
+  taken[idx] = 1;
+} return void;
+given lay_room_one_fixture ([0], 0):([1], 0) then prints:("dir /a 2\n")
+given lay_room_two_fixture ([0, 0], 1):([0, 1], 1) then prints:("file /b.id 1\n")
+
+lay_room_print(int cap) {
+  int n = len((import room_paths));
+  int[] taken = [];
+  lst_fill(taken, n, 0);
+} chain (int cap) {
+  int printed = 0;
+  int idx = lay_room_find_min(taken);
+  while(printed < cap && idx != -1) {
+    lay_room_emit_one(taken, idx);
+    printed = printed + 1;
+    idx = lay_room_find_min(taken);
+  }
+} return int printed;
+given lay_room_two_fixture (0):(0) then prints:("")
+given lay_room_two_fixture (1):(1) then prints:("dir /a 2\n")
+given lay_room_two_fixture (10):(2) then prints:("dir /a 2\nfile /b.id 1\n")

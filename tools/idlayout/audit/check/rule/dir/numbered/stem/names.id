@@ -1,0 +1,22 @@
+// Turning a file's own name into the stem core.id's rules compare: strip the
+// `.id` every candidate here already carries (walk/entry/collect already
+// filtered to *.id), one name at a time or over a whole list at once for the
+// file side of a directory's own listing (../collect/entry.id).
+
+lay_strip_id(string name) {
+  int n = len(name);
+  string stem = str_slice(name, 0, n - 3);
+} return string stem;
+("chunk.id"):("chunk")
+("a.id"):("a")
+
+lay_ns_file_stems(string[] names) {
+  string[] stems = [];
+  int i = 0;
+  while(i < len(names)) {
+    push(stems, lay_strip_id(names[i]));
+    i = i + 1;
+  }
+} return string[] stems;
+([]):([])
+(["a.id", "b.id"]):(["a", "b"])

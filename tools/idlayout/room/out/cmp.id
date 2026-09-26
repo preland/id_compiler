@@ -1,0 +1,29 @@
+// Turning one candidate into a sortable key and a printable line. The key is
+// the distance, left-padded with spaces to a fixed width (fmt_pad), then the
+// path: a space (32) sorts before every digit (48-57), so a shorter, nearer
+// distance's padding always beats a longer one's digit at the same position,
+// and two equal distances fall back on str_cmp's own path order -- exactly
+// the "nearest first, ties in path order" the tool promises, with one
+// str_cmp doing both comparisons instead of a distance compare and a path
+// compare kept in step by hand.
+
+lay_room_key(int i) {
+  int d = (import room_dist)[i];
+  string ds = "" + d;
+  string padded = fmt_pad(ds, 6);
+} chain (int i) {
+  string path = (import room_paths)[i];
+  string key = padded + path;
+} return string key;
+given lay_room_one_fixture (0):("     0/a")
+given lay_room_two_fixture (1):("    12/b.id")
+
+lay_room_line(int i) {
+  string role = (import room_kinds)[i];
+  string path = (import room_paths)[i];
+  int free = (import room_free)[i];
+} chain (int i) {
+  string line = role + " " + path + " " + free;
+} return string line;
+given lay_room_one_fixture (0):("dir /a 2")
+given lay_room_two_fixture (1):("file /b.id 1")

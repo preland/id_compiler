@@ -1,0 +1,34 @@
+// A real, known one-file directory for lay_room_walk/lay_room_walk_listed's
+// own cases (mirrors audit/walk/scan/top/fixture.id's lay_walk_fixture_bad),
+// made under a fresh fs_mktemp path so two builds' cases never share one --
+// and removed again by lay_room_scratch_clean, which every case below calls.
+
+lay_room_scratch_fixture() {
+  lay_room_reset();
+  export string lay_room_scratch = fs_mktemp("idlayout_room_", 1);
+  int h = fs_open(lay_room_scratch + "/a.id", "w");
+} chain () {
+  int c = fs_close(h);
+  export int lay_room_scratch_size = lay_list_size(lay_room_scratch);
+  string[] no_segs = [];
+} chain () {
+  lay_room_set_ref(no_segs);
+} return void;
+():() then lay_room_scratch_clean:(0)
+():() then lay_room_scratch_clean:(0) then lay_room_scratch_clean:(-1)
+
+// Every path this fixture made, newest-first (the file before the directory
+// that holds it -- fs_remove refuses a non-empty directory), removed in one
+// loop rather than one `fs_remove` per path spelled out by hand.
+lay_room_scratch_clean() {
+  string[] made_paths = [(import lay_room_scratch) + "/a.id", (import lay_room_scratch)];
+  int i = 0;
+  int r = 0;
+} chain () {
+  while(i < len(made_paths)) {
+    r = fs_remove(made_paths[i]);
+    i = i + 1;
+  }
+} return int r;
+given lay_room_scratch_fixture ():(0)
+given lay_room_scratch_fixture ():(0) then lay_room_scratch_clean:(-1)

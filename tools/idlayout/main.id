@@ -1,17 +1,24 @@
-// idlayout ROOT BUILD_DIR -- bin/idc's five bash structural checks
+// idlayout ROOT BUILD_DIR -- bin/idc's seven bash structural checks
 // (check_legacy_manifest, check_entry_limit, check_nested_manifest,
-// check_same_name_as_parent, check_generic_names), ported to `id` and
-// merged into one walk of the tree (fs_list; see walk/), so it pays for one
-// listing per directory instead of five separate `find` passes. Every
-// violation is printed, in bin/idc's own check order, instead of bash's
-// `head -1`; bin/idc builds and caches this the way it does tools/ccrun,
-// falling back to the old bash checks if it fails to build.
+// check_same_name_as_parent, check_generic_names, check_numbered_sibling,
+// check_file_named_like_dir), ported to `id` and merged into one walk of the
+// tree (fs_list; see audit/walk/), so it pays for one listing per directory
+// instead of seven separate `find` passes. Every violation is printed, in
+// bin/idc's own check order, instead of bash's `head -1`; bin/idc builds and
+// caches this the way it does tools/ccrun, falling back to the old bash
+// checks if it fails to build.
+//
+// idlayout --room ROOT DIR -- the other question the same tree answers:
+// where is the nearest free room for a new fixture, measured from DIR
+// (room/). The two modes share nothing but this dispatch and the tree
+// walked: --room prints candidates and never fails the build the way the
+// first form does.
 
 lay_usage() {
-  print("usage: idlayout ROOT BUILD_DIR");
+  print("usage: idlayout ROOT BUILD_DIR\n       idlayout --room ROOT DIR");
 } return void;
-():() then prints:("usage: idlayout ROOT BUILD_DIR\n")
-():() then prints:("usage: idlayout ROOT BUILD_DIR\n") then eprints:("")
+():() then prints:("usage: idlayout ROOT BUILD_DIR\n       idlayout --room ROOT DIR\n")
+():() then prints:("usage: idlayout ROOT BUILD_DIR\n       idlayout --room ROOT DIR\n") then eprints:("")
 
 lay_run(string root, string build) {
   lay_reset();
@@ -28,12 +35,25 @@ given lay_walk_fixture_bad ("/tmp/idlayout_wfb", "build"):(1)
 
 main(int argc, string[] argv) {
   int code = 0;
-  if(argc < 3) {
-    lay_usage();
-    code = 1;
-  } else {
+  int is_room = 0;
+  if(argc >= 2 && argv[1] == "--room") {
+    is_room = 1;
+  }
+} chain (int argc, string[] argv) {
+  if(is_room == 1 && argc >= 4) {
+    code = lay_room_run(argv[2], argv[3]);
+  }
+  if(is_room == 0 && argc >= 3) {
     code = lay_run(argv[1], argv[2]);
   }
+  int bad = (is_room == 1 && argc < 4) || (is_room == 0 && argc < 3);
+} chain (int argc, string[] argv) {
+  if(bad == 1) {
+    lay_usage();
+    code = 1;
+  }
 } return int code;
-(1, ["idlayout"]):(1) then prints:("usage: idlayout ROOT BUILD_DIR\n")
+(1, ["idlayout"]):(1) then prints:("usage: idlayout ROOT BUILD_DIR\n       idlayout --room ROOT DIR\n")
 (3, ["idlayout", "does-not-exist-xyz-idlayout-main", "build"]):(0) then prints:("")
+(2, ["idlayout", "--room"]):(1) then prints:("usage: idlayout ROOT BUILD_DIR\n       idlayout --room ROOT DIR\n")
+(4, ["idlayout", "--room", "does-not-exist-xyz-idlayout-room-main", "does-not-exist-xyz-idlayout-room-main"]):(1) then prints:("")

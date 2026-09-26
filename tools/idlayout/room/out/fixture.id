@@ -1,0 +1,19 @@
+// Known, pushed candidates for cmp.id and pick/'s own cases: `given` takes no
+// parameters, and this is the only way to hand a case a fresh candidate list
+// with entries already in it. The two-entry fixture's second distance (12)
+// is wide enough to prove key.id's padding, not just its digit.
+
+lay_room_one_fixture() {
+  lay_room_reset();
+  lay_room_push("/a", "dir", 2, 0);
+} return void;
+():() then prints:("")
+():() then lay_room_count:(1)
+
+lay_room_two_fixture() {
+  lay_room_reset();
+  lay_room_push("/a", "dir", 2, 0);
+  lay_room_push("/b.id", "file", 1, 12);
+} return void;
+():() then prints:("")
+():() then lay_room_count:(2)

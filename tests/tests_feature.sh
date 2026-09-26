@@ -175,11 +175,10 @@ self_refuse "bin/idc: a case needs the ':' between its two sides" "expected ':'"
 
 # --- two cases per function, by default ---------------------------------------
 # Every build of bin/idc applies the two-case minimum, with the diagnostic
-# --require-tests gives. --allow-untested is the deprecated way out while the
-# tree is catching up: it turns the minimum off and says so once on stderr, and
-# changes nothing else -- not the exit status, and not stdout, which can be the
-# program's C.
-DEPRECATED="idc: warning: --allow-untested is deprecated and will be removed once every function has its test cases"
+# --require-tests gives. --allow-untested is the way out while the tree is
+# catching up: it turns the minimum off and changes nothing else -- not the
+# exit status, and not stdout, which can be the program's C, and it is
+# silent (id has no warnings: something is allowed or it is not).
 printf '%s' 'add(int a, int b) {
   int s = a + b;
 } return int s;
@@ -190,12 +189,12 @@ self_refuse "bin/idc: a function with no cases fails a default build" \
 [ $? -eq 0 ] \
     && ok "bin/idc: --allow-untested builds a function with no cases" \
     || bad "bin/idc: --allow-untested builds a function with no cases ($(head -1 "$TMP/stderr"))"
-[ "$(cat "$TMP/stderr")" = "$DEPRECATED" ] \
-    && ok "bin/idc: --allow-untested prints its deprecation warning exactly once, and nothing else" \
-    || bad "bin/idc: --allow-untested prints its deprecation warning exactly once, and nothing else (stderr: $(tr '\n' '|' < "$TMP/stderr"))"
+[ ! -s "$TMP/stderr" ] \
+    && ok "bin/idc: --allow-untested prints nothing on stderr" \
+    || bad "bin/idc: --allow-untested prints nothing on stderr (stderr: $(tr '\n' '|' < "$TMP/stderr"))"
 [ -e "$TMP/out" ] && [ ! -s "$TMP/stdout" ] \
-    && ok "bin/idc: the deprecation warning is not on stdout" \
-    || bad "bin/idc: the deprecation warning is not on stdout"
+    && ok "bin/idc: --allow-untested prints nothing on stdout" \
+    || bad "bin/idc: --allow-untested prints nothing on stdout"
 
 printf '%s' 'add(int a, int b) {
   int s = a + b;
@@ -205,9 +204,9 @@ printf '%s' 'add(int a, int b) {
 self_refuse "bin/idc: a function with one case fails a default build" \
     "function 'add' has 1 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)" --emit-c /dev/null
 self_accept "bin/idc: --allow-untested builds a function with one case" --allow-untested --emit-c /dev/null
-[ "$(grep -cF "$DEPRECATED" "$TMP/log")" = 1 ] \
-    && ok "bin/idc: --allow-untested warns once on a one-case build" \
-    || bad "bin/idc: --allow-untested warns once on a one-case build"
+[ ! -s "$TMP/log" ] || ! grep -qF -- "--allow-untested" "$TMP/log" \
+    && ok "bin/idc: --allow-untested is silent on a one-case build" \
+    || bad "bin/idc: --allow-untested is silent on a one-case build (log: $(tr '\n' '|' < "$TMP/log"))"
 
 printf '%s' 'add(int a, int b) {
   int s = a + b;

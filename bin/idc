@@ -13,9 +13,10 @@
 # The semantic checks live in idparse, in id: the action-per-block limit,
 # nesting depth, 3-functions-per-file, name-type consistency, export/import
 # access, function-logic uniqueness, the type checks, and unresolved calls.
-# The 3-entries-per-directory limit and its four neighbours (a legacy-named
+# The 3-entries-per-directory limit and its six neighbours (a legacy-named
 # or nested conf.id, a directory sharing its parent's name, a generic file
-# name) are checked by tools/idlayout, an `id` program this driver builds
+# name, a numbered sibling, a file named like its own directory) are checked
+# by tools/idlayout, an `id` program this driver builds
 # and runs (run_idlayout below) -- `id` reads a directory's own listing
 # through idstd's fs_list now, so this is no longer a rule the language
 # cannot express, only one this driver still has to call before it knows
@@ -220,14 +221,9 @@ fi
 # Every function carries at least two test cases, on every build, so that what
 # a function does is pinned where it is declared and cannot drift unnoticed
 # (docs/TESTS.md). --require-tests is that default restated. --allow-untested
-# is the one way out, and it exists only until the tree has its cases: it says
-# so once per build, on stderr, and changes neither stdout nor the exit status.
-# The driver's own re-entry to build its compiler stages (IDC_STAGE_LEX, below)
-# passes it silently -- a build that did not ask for it is not told it did.
+# is the one way out, and it exists only until the tree has its cases.
 if [ "$ALLOW_UNTESTED" -eq 1 ]; then
     REQUIRE_TESTS=0
-    [ -z "${IDC_STAGE_LEX:-}" ] \
-        && echo "idc: warning: --allow-untested is deprecated and will be removed once every function has its test cases" >&2
 fi
 
 # --emit-c writes the C a build compiles, and an LLVM build compiles none. The
@@ -406,8 +402,8 @@ ensure_idlayout() {
     fi
 }
 
-# run_idlayout ROOT -- every one of the five structural checks over ROOT's
-# tree, in one call. Used at every place that used to call the five bash
+# run_idlayout ROOT -- every one of the seven structural checks over ROOT's
+# tree, in one call. Used at every place that used to call the seven bash
 # check_* functions: the project itself, each dependency a conf.id names,
 # each --backend directory, and the standard library.
 run_idlayout() {

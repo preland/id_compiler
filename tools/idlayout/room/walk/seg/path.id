@@ -1,0 +1,30 @@
+// A path's own place in the tree --room walks, relative to ROOT: the empty
+// string for ROOT itself, otherwise the part after "ROOT/", split into the
+// segments lay_room_dist compares two paths by. An empty relative path is
+// kept out of str_split entirely -- str_split("", "/") answers [""], one
+// empty segment, not the zero segments ROOT itself must have.
+
+lay_room_relpath(string root, string path) {
+  string rel = "";
+  int rl = len(root);
+  int pl = len(path);
+} chain (string root, string path) {
+  if(path != root) {
+    int start = rl + 1;
+    int length = pl - rl - 1;
+    rel = str_slice(path, start, length);
+  }
+} return string rel;
+("/a/b", "/a/b"):("")
+("/a/b", "/a/b/c"):("c")
+("/a/b", "/a/b/c/d"):("c/d")
+
+lay_room_segs(string root, string path) {
+  string rel = lay_room_relpath(root, path);
+  string[] segs = [];
+  if(rel != "") {
+    segs = str_split(rel, "/");
+  }
+} return string[] segs;
+("/a/b", "/a/b"):([])
+("/a/b", "/a/b/c/d"):(["c", "d"])

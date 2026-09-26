@@ -1,0 +1,40 @@
+// Tree distance between two paths, from their segment lists (path.id):
+// however many segments they share from the root down (their lowest common
+// ancestor) is free; every segment either side has beyond that is one step
+// up or down the tree. DIR itself is distance 0 from itself (every segment
+// shared); a parent or a child is 1; a sibling, sharing everything but the
+// last segment on both sides, is 2.
+
+lay_room_minlen(string[] segs_a, string[] segs_b) {
+  int n = len(segs_a);
+  if(len(segs_b) < n) {
+    n = len(segs_b);
+  }
+} return int n;
+(["a", "b"], ["a"]):(1)
+(["a"], ["a", "b"]):(1)
+
+lay_room_common(string[] segs_a, string[] segs_b) {
+  int n = lay_room_minlen(segs_a, segs_b);
+  int i = 0;
+  while(i < n && segs_a[i] == segs_b[i]) {
+    i = i + 1;
+  }
+} return int i;
+(["a", "b"], ["a", "c"]):(1)
+(["a", "b"], ["a", "b"]):(2)
+([], ["a"]):(0)
+
+lay_room_dist(string[] segs_a, string[] segs_b) {
+  int c = lay_room_common(segs_a, segs_b);
+  int la = len(segs_a);
+  int lb = len(segs_b);
+} chain (string[] segs_a, string[] segs_b) {
+  int up = la - c;
+  int down = lb - c;
+  int d = up + down;
+} return int d;
+(["a", "b"], ["a", "b"]):(0)
+(["a", "b"], ["a"]):(1)
+(["a", "b"], ["a", "b", "c"]):(1)
+(["a", "b"], ["a", "c"]):(2)

@@ -36,7 +36,7 @@ main(int argc, string[] argv) {
 } return int 0;
 IDEOF
 
-cat > "$P/show/show.id" <<'IDEOF'
+cat > "$P/show/walk.id" <<'IDEOF'
 tst_show() {
   show_paras();
   tst_p(0);
@@ -76,7 +76,7 @@ show_err() {
 } return void;
 IDEOF
 
-cat > "$P/show/more/more.id" <<'IDEOF'
+cat > "$P/show/more/runs.id" <<'IDEOF'
 tst_r(int r) {
   while(r < odt_runs()) {
     show_r_line(r);

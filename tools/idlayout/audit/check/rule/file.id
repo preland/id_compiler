@@ -28,10 +28,27 @@ given lay_reset ("d", 0, "util.id", 3):() then lay_report:(1)
 given lay_reset ("d", 0, "main.id", 4):() then lay_report:(0)
 
 // Every violation is reported "PATH:1: error: TEXT" -- the same shape
-// bin/idc's five bash checks already print, kept so a user's build output
+// bin/idc's seven bash checks already print, kept so a user's build output
 // does not change when the check that produced a line does.
 lay_msg(string path, string text) {
   string line = path + ":1: error: " + text;
 } return string line;
 ("a.id", "x"):("a.id:1: error: x")
 ("b/c.id", "y"):("b/c.id:1: error: y")
+
+// A file whose own stem equals the directory holding it (a/loop/loop.id)
+// says nothing about why it exists, the same complaint dir/samename.id makes
+// about a subdirectory. Not applied to a file directly in the collected
+// root: the root's own name is just where the project was checked out, not a
+// level of the tree it wrote (walk/scan/top/fixture.id's is_root).
+lay_check_samefile(string dir, int is_root, string self, string name, int kind) {
+  string stem = lay_strip_id(name);
+  if(is_root == 0 && kind != 0 && kind != 1 && stem == self) {
+    string full = dir + "/" + name;
+    string msg = lay_msg(full, "file '" + full + "' has the same name as its directory; name it for what it holds");
+    push((import lay_hit_samefile), msg);
+  }
+} return void;
+given lay_reset ("a/loop", 0, "loop", "loop.id", 4):() then lay_report:(1)
+given lay_reset ("a/loop", 0, "loop", "main.id", 4):() then lay_report:(0)
+given lay_reset ("root", 1, "root", "root.id", 4):() then lay_report:(0)

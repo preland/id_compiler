@@ -969,7 +969,7 @@ fill(int n) {
   }
 } return void;
 EOF
-cat > "$dual/loop/loop.id" <<'EOF'
+cat > "$dual/loop/spin.id" <<'EOF'
 spin(int t) {
   while(t < 2) {
     t = one(t);

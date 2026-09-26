@@ -1,0 +1,37 @@
+// What one fs_list entry means for the numbered-sibling check: a
+// subdirectory is collected unless hidden or (only directly under the root)
+// the build output directory -- the same filter dir/entrylimit/count.id
+// applies for its own reasons -- and a file is collected unless it is
+// conf.id or backend.id, regardless of a generic or legacy name (those are
+// still candidates for a numbered copy). `lay_ns_collect_entry` dispatches on
+// the trailing '/' fs_list already writes, same as lay_count_check.
+
+lay_ns_collect_dir(int[] buf, int lo, int hi, string build, int is_root) {
+  string name = lay_name_of(buf, lo, hi);
+  int kept = charat(name, 0) != 46 && (is_root != 1 || name != build);
+  if(kept == 1) {
+    push((import lay_ns_dirs), name);
+  }
+} return void;
+given lay_ns_scratch_reset ([46, 103, 105, 116], 0, 4, "build", 1):() then lay_ns_dirs_len:(0)
+given lay_ns_scratch_reset ([115, 114, 99], 0, 3, "build", 1):() then lay_ns_dirs_len:(1)
+
+lay_ns_collect_file(int[] buf, int lo, int hi) {
+  string name = lay_name_of(buf, lo, hi);
+  int kind = lay_file_kind(name);
+  if(kind != 0 && kind != 1 && kind != 5) {
+    push((import lay_ns_files), name);
+  }
+} return void;
+given lay_ns_scratch_reset ([99, 111, 110, 102, 46, 105, 100], 0, 7):() then lay_ns_files_len:(0)
+given lay_ns_scratch_reset ([109, 46, 105, 100], 0, 4):() then lay_ns_files_len:(1)
+
+lay_ns_collect_entry(int[] buf, int lo, int hi, string build, int is_root) {
+  if(buf[hi - 1] == 47) {
+    lay_ns_collect_dir(buf, lo, hi - 1, build, is_root);
+  } else {
+    lay_ns_collect_file(buf, lo, hi);
+  }
+} return void;
+given lay_ns_scratch_reset ([100, 47], 0, 2, "build", 0):() then lay_ns_dirs_len:(1)
+given lay_ns_scratch_reset ([97, 46, 105, 100], 0, 4, "build", 0):() then lay_ns_files_len:(1)

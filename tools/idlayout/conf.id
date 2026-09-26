@@ -1,0 +1,6 @@
+// --room reads a candidate file's own bytes to count its functions, through
+// the file tree tools/fbtext and tools/mkfont already share; conf.id and
+// backend.id are excluded from every entry/function count below, so neither
+// this manifest nor the dependency itself ever counts against a directory or
+// a file.
+import "../lib/file"

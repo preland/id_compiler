@@ -1,15 +1,19 @@
 // What one fs_list entry means once its own name and kind are known: a
 // subdirectory is checked against its own parent's name and, unless hidden
 // or (only directly under the root) the build output directory, walked in
-// turn; a file is classified and checked (check/rule/file.id).
+// turn; a file is classified and checked (check/rule/file.id) against both
+// its own kind and, with `self` in hand here, its own directory's name.
 
-lay_handle_file(int[] buf, int lo, int hi, string dir, int is_root) {
+lay_handle_file(int[] buf, int lo, int hi, string dir, int is_root, string self) {
   string name = lay_name_of(buf, lo, hi);
   int kind = lay_file_kind(name);
   lay_check_file(dir, is_root, name, kind);
+} chain (int[] buf, int lo, int hi, string dir, int is_root, string self) {
+  lay_check_samefile(dir, is_root, self, name, kind);
 } return void;
-given lay_reset ([97, 46, 105, 100], 0, 4, "d", 0):() then lay_report:(0)
-given lay_reset ([105, 109, 112, 111, 114, 116, 46, 105, 100], 0, 9, "d", 0):() then lay_report:(1)
+given lay_reset ([97, 46, 105, 100], 0, 4, "d", 0, "x"):() then lay_report:(0)
+given lay_reset ([105, 109, 112, 111, 114, 116, 46, 105, 100], 0, 9, "d", 0, "x"):() then lay_report:(1)
+given lay_reset ([97, 46, 105, 100], 0, 4, "d", 0, "a"):() then lay_report:(1)
 
 lay_enter_dir(string dir, string root, string build, int is_root, string self, string name) {
   lay_check_samename(dir, self, name);

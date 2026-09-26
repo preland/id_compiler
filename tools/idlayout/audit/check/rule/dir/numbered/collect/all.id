@@ -1,0 +1,40 @@
+// One directory's own listing, split into its two candidate lists
+// (lay_ns_collect_all), and the whole numbered-sibling check run over both
+// (lay_check_numbered): the subdirectories against each other, then the
+// *.id files (stems with their own extension already stripped) against each
+// other. Called once per directory from walk/scan/top/walk.id, beside the
+// entry-limit count and the recursive scan it already does over the same
+// buffer.
+
+lay_ns_collect_one(int[] buf, string build, int is_root, int at) {
+  int end = lay_eol(buf, at);
+  lay_ns_collect_entry(buf, at, end, build, is_root);
+  int next = end + 1;
+} return int next;
+given lay_ns_scratch_reset ([97, 46, 105, 100, 10], "build", 0, 0):(5) then lay_ns_files_len:(1)
+given lay_ns_scratch_reset ([46, 103, 105, 116, 47, 10], "build", 1, 0):(6) then lay_ns_dirs_len:(0)
+
+lay_ns_collect_all(int[] buf, string build, int is_root) {
+  lay_ns_scratch_reset();
+  int at = 0;
+  while(at < len(buf)) {
+    at = lay_ns_collect_one(buf, build, is_root, at);
+  }
+} return void;
+([97, 46, 105, 100, 10], "build", 0):() then lay_ns_files_len:(1)
+([], "build", 0):() then lay_ns_files_len:(0)
+
+lay_check_numbered(string dir, string build, int is_root, int[] buf) {
+  lay_ns_collect_all(buf, build, is_root);
+  string[] dir_names = (import lay_ns_dirs);
+  string[] file_names = (import lay_ns_files);
+} chain (string dir, string build, int is_root, int[] buf) {
+  string[] file_stems = lay_ns_file_stems(file_names);
+  int dn = len(dir_names);
+  lay_ns_scan(dir_names, dir_names, dn, dir, "directory");
+} chain (string dir, string build, int is_root, int[] buf) {
+  int fn = len(file_names);
+  lay_ns_scan(file_stems, file_names, fn, dir, "file");
+} return void;
+given lay_reset ("d", "build", 0, [99, 104, 117, 110, 107, 46, 105, 100, 10, 99, 104, 117, 110, 107, 50, 46, 105, 100, 10]):() then lay_report:(1)
+given lay_reset ("d", "build", 0, [97, 46, 105, 100, 10]):() then lay_report:(0)

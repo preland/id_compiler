@@ -1,0 +1,16 @@
+// An empty, known scratch list for logic.id's own per-line cases, the same
+// role audit/check/rule/dir/entrylimit/fixture/scratch.id's lay_scratch_reset
+// plays for the entry-limit count: a `given` setup takes no parameters, and
+// this is the only way to hand a case a fresh room_func_hits to push onto.
+
+lay_room_hits_reset() {
+  export int[] room_func_hits = [];
+} return void;
+():() then prints:("")
+():() then lay_room_hits_len:(0)
+
+lay_room_hits_len() {
+  int n = len((import room_func_hits));
+} return int n;
+given lay_room_hits_reset ():(0)
+given lay_room_hits_reset ():(0) then prints:("")
