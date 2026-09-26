@@ -85,7 +85,10 @@ cmd_packet() {
         echo "$imp: ${where:-not found under $path}"
     done
     echo "-- given setups used in this directory and its parent"
-    grep -rhoE '^given [a-z_][a-z0-9_]*' "$(dirname "$file")" "$(dirname "$(dirname "$file")")" --include='*.id' 2>/dev/null \
+    local dir up
+    dir=$(dirname "$file"); up=$(dirname "$dir")
+    [ "$(realpath "$dir")" = "$(realpath "$path")" ] && up=$dir
+    grep -rhoE '^given [a-z_][a-z0-9_]*' "$dir" "$up" --include='*.id' 2>/dev/null \
         | sort | uniq -c | sort -rn | head -6
 }
 
