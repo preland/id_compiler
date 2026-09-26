@@ -17,8 +17,10 @@
 set -u
 cd "$(dirname "$0")/.."
 
-# A case is a line of the form (args):(expected), optionally opened by
-# `given SETUP` and with `(import NAME)` among its values; a function
+# A case is a line of the form (args):(expected), possibly indented,
+# optionally opened by any number of `given SETUP` and then one `stdin "TEXT"`,
+# and with `(import NAME)`, other parenthesised values and string literals
+# among its values; a function
 # declaration starts at column 0 with a name and an open paren. Both are
 # counted the same way in every repository so the numbers mean the same thing.
 # `build/` is excluded everywhere: the harnesses write generated `id` there, and
@@ -34,7 +36,7 @@ cd "$(dirname "$0")/.."
 # The patterns reach awk through the environment, not -v: -v processes escape
 # sequences, which turns every \( into ( and leaves an invalid regular
 # expression that counts nothing.
-export CASE_RE='^(given +[A-Za-z_][A-Za-z0-9_]* +)?\((\(import [A-Za-z_][A-Za-z0-9_]*\)|[^)])*\) *: *\('
+export CASE_RE='^[ \t]*(given +[A-Za-z_][A-Za-z0-9_]* +)*(stdin +"([^"\\]|\\.)*" +)?\((\(([^()"]|"([^"\\]|\\.)*")*\)|"([^"\\]|\\.)*"|[^)"])*\) *: *\('
 export FN_RE='^[a-z_][a-z0-9_]*\('
 id_files() { find "$@" -name build -prune -o -name '*.id' -type f -print 2>/dev/null | LC_ALL=C sort; }
 count_tree() {
