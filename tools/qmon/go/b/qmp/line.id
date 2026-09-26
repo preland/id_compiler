@@ -13,12 +13,16 @@ qmp_read_line() {
     b = read_one_byte();
   }
 } return string line;
+given qmb_qmp_hello_ser_empty ():("hello")
+given qmb_qmp_empty_ser_empty ():("")
 
 read_one_byte() {
   int[] buf = [0];
   int got = sock_recv((import qm_qmph), buf, 1, 5000);
   int b = byte_or_neg(got, buf);
 } return int b;
+given qmb_qmp_hello_ser_empty ():(104)
+given qmb_qmp_empty_ser_empty ():(-1)
 
 byte_or_neg(int got, int[] buf) {
   int b = -1;

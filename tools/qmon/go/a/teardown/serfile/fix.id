@@ -1,0 +1,40 @@
+// A real, empty scratch file plus an already-open write handle on it, for
+// write_and_close/send_and_close/write_if_open's real-write cases.
+qa_scratch_file() {
+  string qa_p = fs_mktemp("qa_scratch_", 0);
+  int qa_h = fs_open(qa_p, "w");
+  export string qa_scratch_path = qa_p;
+} chain () {
+  export int qa_scratch_h = qa_h;
+} return void;
+():() then calls fs_mktemp:[1] then qa_scratch_check:(0)
+():() then calls fs_mktemp:("qa_scratch_", 0) then qa_scratch_check:(0)
+
+// Reads qa_scratch_path back and removes it, so a case naming this as a
+// "then" check both verifies and cleans up in one step.
+qa_scratch_check() {
+  string qa_p = (import qa_scratch_path);
+  int qa_h = fs_open(qa_p, "r");
+  int[] qa_buf = [0, 0];
+} chain () {
+  int qa_n = fs_read(qa_h, qa_buf, 2);
+  string qa_got = bytes_str(qa_buf, qa_n);
+  int qa_close = fs_close(qa_h);
+} chain () {
+  int qa_rm = fs_remove(qa_p);
+  int qa_ok = str_cmp(qa_got, "hi") == 0;
+} return int qa_ok;
+given qa_scratch_file ():(0)
+given qa_scratch_file ():(0) then qa_scratch_check:(0)
+
+// A real --serial path (a fresh fs_mktemp name, not yet a file) for
+// write_serial_file/finish's real-write cases.
+qa_init_serial() {
+  string qa_p = fs_mktemp("qa_serial_", 0);
+  int qa_rm = fs_remove(qa_p);
+  init(4, ["qmon", "/qa-nonexistent-kernel", "--serial", qa_p]);
+} chain () {
+  export string qa_serial_path = qa_p;
+} return void;
+():() then calls init:[1]
+():() then calls fs_mktemp:[1] then calls init:[1]

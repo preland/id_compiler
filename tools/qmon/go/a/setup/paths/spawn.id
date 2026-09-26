@@ -10,12 +10,21 @@ mk_paths() {
   export string qm_qmp_path = "/tmp/qmon." + t + ".qmp";
   export string qm_ser_path = "/tmp/qmon." + t + ".ser";
 } return void;
+():() then qa_check_paths:(1)
+():() then qa_check_paths:(1) then qa_check_paths:(1)
 
 // The full command line, one argument per line -- see
 // idstd's sys/io/ipc/proc/README.md for why proc_spawn takes it that way.
 // Matches qmon.py's qemu list exactly: a socket chardev carries the serial
 // port (rather than a plain -serial file) so the same port can be typed at
 // and read from, and QMP is the second socket.
+//
+// Not cased directly: its only non-literal inputs beyond qm_kernel are
+// qm_ser_path/qm_qmp_path, and mk_paths -- their sole exporter -- derives
+// both from ticks(), so no given can hand this an expected return value that
+// stays true from one run to the next. spawn_qemu's case below exercises it
+// instead: a malformed argv here is what would make that real qemu process
+// fail to start at all.
 build_argv() {
   string a = "qemu-system-x86_64\n-kernel\n" + (import qm_kernel) + "\n-display\nnone\n-vga\nstd\n-no-reboot\n-chardev\nsocket,id=s0,path=" + (import qm_ser_path) + ",server=on,wait=off\n-serial\nchardev:s0\n-qmp\nunix:" + (import qm_qmp_path) + ",server,nowait";
 } return string a;
@@ -29,3 +38,5 @@ spawn_qemu() {
 } chain () {
   int qm_in_closed = proc_close_in((import qm_qh));
 } return void;
+given qa_init_fast given mk_paths ():() then qa_check_spawn:(1)
+given qa_init_fast given mk_paths ():() then qa_check_spawn:(1) then qa_check_spawn:(1)

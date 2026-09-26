@@ -12,9 +12,13 @@ fill_bytes(int[] out, string s, int n, int i) {
     i = push_one_byte(out, s, i);
   }
 } return void;
+([], "hi", 2, 0):([104, 105])
+([200], "abc", 3, 1):([200, 98, 99])
 
 push_one_byte(int[] out, string s, int i) {
   int c = charat(s, i);
   push(out, c);
   int j = i + 1;
 } return int j;
+given qmb_conv_buf_setup ((import qmb_conv_buf), "hi", 0):(1) then qmb_conv_buf_probe:(2)
+given qmb_conv_buf_setup ((import qmb_conv_buf), "abc", 1):(2) then qmb_conv_buf_probe:(2)

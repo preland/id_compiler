@@ -6,14 +6,20 @@ write_serial_file(string text) {
     do_write_serial(path, text);
   }
 } return void;
+given qa_init_fast ("anything"):() then calls do_write_serial:[0]
+given qa_init_serial ("hello"):() then qa_check_serial_file:(1)
 
 do_write_serial(string path, string text) {
   int h = fs_open(path, "w");
   write_if_open(h, text);
 } return void;
+given qa_scratch_file ((import qa_scratch_path), "hi"):() then qa_scratch_check:(1)
+given qa_scratch_file ((import qa_scratch_path), "hi"):() then qa_scratch_check:(1) then qa_scratch_check:(0)
 
 write_if_open(int h, string text) {
   if(h >= 0) {
     write_and_close(h, text);
   }
 } return void;
+(-1, "hi"):() then calls write_and_close:[0]
+given qa_scratch_file ((import qa_scratch_h), "hi"):() then qa_scratch_check:(1)

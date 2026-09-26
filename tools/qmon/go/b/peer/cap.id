@@ -1,0 +1,44 @@
+// Capturing what sock_send_str actually put on the wire: a real `nc` bound
+// at the QMP path writes every byte it receives to a scratch file, which
+// qmb_cap_read reads back -- sock_send/sock_recv are native, so `then
+// calls` cannot witness them directly (docs/TESTS.md), and this is the
+// honest alternative. `nc` does not remove its own socket file on exit
+// (unlike the `unlink-early` socat peers in qmp.id), so the check removes
+// both scratch paths itself -- but only after closing this process's own
+// end of the connection and waiting for it to actually exit: `nc` keeps the
+// socket open, and does not see EOF, flush its capture and exit, until this
+// side hangs up, so removing the paths on a fixed sleep after closing (with
+// no wait for `nc` itself) raced its exit under load and occasionally lost.
+qmb_qmp_capture_setup() {
+  mk_paths();
+  export string qmb_cap_path = (import qm_qmp_path) + ".cap";
+  export int qmb_cap_h = proc_spawn("sh\n-c\nnc -lU " + (import qm_qmp_path) + " > " + (import qmb_cap_path));
+} chain () {
+  connect_qmp();
+} return void;
+():() then qmb_cap_read:("")
+():() then calls mk_paths:() then qmb_cap_read:("")
+
+qmb_cap_read() {
+  sock_close((import qm_qmph));
+  proc_wait((import qmb_cap_h), 1000);
+  int h = fs_open((import qmb_cap_path), "r");
+} chain () {
+  int[] buf = [];
+  lst_fill(buf, 64, 0);
+  int got = fs_read(h, buf, 64);
+} chain () {
+  string s = bytes_str(buf, got);
+  fs_close(h);
+  fs_remove((import qmb_cap_path));
+} chain () {
+  fs_remove((import qm_qmp_path));
+} return string s;
+given qmb_qmp_capture_setup ():("")
+given qmb_qmp_capture_setup given qmb_cap_send_hi ():("hi")
+
+qmb_cap_send_hi() {
+  sock_send_str((import qm_qmph), "hi");
+} return void;
+given qmb_qmp_capture_setup ():() then qmb_cap_read:("hi")
+given qmb_qmp_capture_setup ():() then calls sock_send_str:((import qm_qmph), "hi") then qmb_cap_read:("hi")

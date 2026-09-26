@@ -1,0 +1,63 @@
+// Kill, reap and close one real handle, then remove the socket file it was
+// bound to. Graceful on an already-invalid handle or a path that is not
+// there, exactly like the natives it wraps, which is what its own 2 cases
+// exercise: live_check.id's checks call it on the real thing.
+qa_close_nc(int qa_h, string qa_path) {
+  int qa_k = proc_kill(qa_h);
+  int qa_w = proc_wait(qa_h, 500);
+  int qa_c = proc_close(qa_h);
+} chain (int qa_h, string qa_path) {
+  int qa_r = fs_remove(qa_path);
+} return void;
+(-1, "/qa-nonexistent-close-a"):()
+(-2, "/qa-nonexistent-close-b"):()
+
+// Fills this case's own 8-slot sock table with real connections to a real
+// socat listener, so the very next sock_connect -- whatever path it names --
+// fails immediately with EMFILE (checked before any retry loop starts,
+// sock_linux.c) instead of retrying ENOENT/ECONNREFUSED for the full 10s.
+// That is the deterministic, fast way to put qm_qmph/qm_serh at -1.
+qa_sock_full() {
+  string qa_base = fs_mktemp("qa_full_", 0);
+  int qa_rm = fs_remove(qa_base);
+  string qa_path = qa_base + ".sock";
+} chain () {
+  int qa_listener = proc_spawn("socat\n-u\nUNIX-LISTEN:" + qa_path + ",fork,unlink-early\n/dev/null\n");
+  export string qa_full_path = qa_path;
+  export int qa_full_listener = qa_listener;
+} chain () {
+  sleep_ms(50);
+  int[] qa_hs = [];
+  int qa_i = 0;
+} chain () {
+  while (qa_i < 8) {
+    int qa_h = sock_connect((import qa_full_path), 500);
+    push(qa_hs, qa_h);
+    qa_i = qa_i + 1;
+  }
+  export int[] qa_full_hs = qa_hs;
+} return void;
+():() then qa_free_sock:(1)
+():() then qa_free_sock:(1) then qa_free_sock:(1)
+
+// Proves the table really was full (one more connect fails at once), then
+// closes all 8, kills the listener and removes its path -- called first in
+// every case that uses qa_sock_full, so nothing it made outlives the case.
+qa_free_sock() {
+  int qa_probe = sock_connect((import qa_full_path), 200);
+  int qa_ok = qa_probe < 0;
+  int qa_i = 0;
+} chain () {
+  int[] qa_hs = (import qa_full_hs);
+  while (qa_i < 8) {
+    int qa_c = sock_close(qa_hs[qa_i]);
+    qa_i = qa_i + 1;
+  }
+  int qa_lk = proc_kill((import qa_full_listener));
+} chain () {
+  int qa_lw = proc_wait((import qa_full_listener), 500);
+  int qa_lc = proc_close((import qa_full_listener));
+  int qa_rm = fs_remove((import qa_full_path));
+} return int qa_ok;
+given qa_sock_full ():(1)
+given qa_sock_full ():(1) then qa_free_sock:(1)

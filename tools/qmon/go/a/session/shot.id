@@ -8,8 +8,12 @@ maybe_shot() {
     do_shot(path);
   }
 } return void;
+given qa_init_zero ():() then calls do_shot:[0]
+given qa_init_shot given qa_both_ready given connect_qmp ():() then qa_check_nc1:(1) then calls do_shot:("/qa-shot.ppm")
 
 do_shot(string path) {
   string msg = msg_screendump(path);
   qmp_cmd(msg);
 } return void;
+given qa_both_ready given connect_qmp ("/qa-shot-a.ppm"):() then qa_check_nc1:(1) then calls qmp_cmd:("{\"execute\": \"screendump\", \"arguments\": {\"filename\": \"/qa-shot-a.ppm\"}}\n")
+given qa_both_ready given connect_qmp ("/qa-shot-b.ppm"):() then qa_check_nc1:(1) then calls qmp_cmd:("{\"execute\": \"screendump\", \"arguments\": {\"filename\": \"/qa-shot-b.ppm\"}}\n")

@@ -1,0 +1,15 @@
+// The real exit status of qm_qh: 1 (a bad -kernel's own exit) the first
+// time this reaps and closes it, -1 (EBADF) a second time on the same,
+// now-closed handle -- proving the reap is real without ever needing a
+// process this check itself must remember to kill. Removes both socket
+// files either way.
+qa_kill_check() {
+  int qa_qh = (import qm_qh);
+  int qa_rc = proc_wait(qa_qh, 2000);
+  int qa_close = proc_close(qa_qh);
+} chain () {
+  int qa_r1 = fs_remove((import qm_qmp_path));
+  int qa_r2 = fs_remove((import qm_ser_path));
+} return int qa_rc;
+given qa_init_fast given mk_paths given spawn_qemu ():(1)
+given qa_init_fast given mk_paths given spawn_qemu ():(1) then qa_kill_check:(-1)

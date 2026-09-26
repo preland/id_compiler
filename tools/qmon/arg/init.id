@@ -9,11 +9,15 @@ init(int argc, string[] argv) {
   init_wait(argc, argv);
   init_rest(argc, argv);
 } return void;
+(2, ["qmon", "k1.elf"]):() then qm_args_summary_now:("k1.elf|2000|||1000||")
+(14, ["qmon", "full.elf", "--wait", "3", "--keys", "z", "--type", "cat", "--settle", "5", "--shot", "s.ppm", "--serial", "o.log"]):() then qm_args_summary_now:("full.elf|3000|z|cat|5000|s.ppm|o.log")
 
 init_wait(int argc, string[] argv) {
   string v = scan_value(argv, argc, "--wait", 2);
   export int qm_wait_ms = wait_ms_of(v);
 } return void;
+given qmb_init_seed_a (2, ["qmon", "k.elf"]):() then qm_args_summary_now:("other.elf|2000|ret esc|ls;pwd|2000|out.ppm|ser.log")
+given qmb_init_seed_a (4, ["qmon", "k.elf", "--wait", "9"]):() then qm_args_summary_now:("other.elf|9000|ret esc|ls;pwd|2000|out.ppm|ser.log")
 
 // "" (not found) means the default; qmon.py's own default is 2.0 seconds.
 // id has no float-parsing builtin (to_int parses a leading integer, SPEC.md

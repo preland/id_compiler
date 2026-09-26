@@ -2,6 +2,8 @@ close_sockets() {
   sock_close((import qm_qmph));
   sock_close((import qm_serh));
 } return void;
+given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then qa_check_close:(1)
+given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then qa_check_close:(1) then qa_check_close:(1)
 
 // The whole of qm_buf (every byte drain_serial ever collected) as one
 // string, the collected serial output qmon.py wrote with
@@ -11,6 +13,8 @@ output() {
   string text = bytes_str((import qm_buf), n);
   finish(text);
 } return void;
+given qa_init_fast given mk_paths given spawn_qemu ():() then prints:("") then qa_check_spawn:(1)
+given qa_buf_hi ():() then prints:("hi") then qa_check_bufhi:(1)
 
 // put, not print: qmon.py wrote the serial text with sys.stdout.write, which
 // adds no newline of its own, and a test diffing this output byte for byte
@@ -19,3 +23,5 @@ finish(string text) {
   write_serial_file(text);
   put(text);
 } return void;
+given qa_init_fast ("hello"):() then prints:("hello")
+given qa_init_serial ("hello"):() then prints:("hello") then qa_check_serial_file:(1)

@@ -5,12 +5,27 @@ boot() {
   mk_paths();
   spawn_qemu();
 } return void;
+given qa_init_fast ():() then qa_check_spawn:(1)
+given qa_init_fast ():() then qa_check_spawn:(1) then qa_check_spawn:(1)
 
 connect_both() {
   connect_qmp();
   connect_serial();
 } return void;
+given qa_both_ready ():() then qa_check_nc1:(1) then calls connect_qmp:[1] then calls connect_serial:[1]
+given mk_paths given qa_sock_full ():() then qa_free_sock:(1) then calls connect_qmp:[1] then calls connect_serial:[1]
 
+// Not cased: setup() chains boot() (a real qemu spawned with a fresh,
+// mk_paths-generated pair of socket paths that no given can see in advance)
+// straight into connect_both() against that same, still-starting process.
+// Measured by hand (5 runs, tools/qmon's own real qemu, a bad -kernel):
+// connect_qmp's ENOENT retry sometimes wins the race (~50ms, 2 of 5 runs)
+// and sometimes loses it and pays the full 10s timeout (3 of 5) before the
+// child has even finished exec'ing -- so both the wall-clock cost of a case
+// here and, worse, which branch qm_rc lands in are decided by scheduler
+// timing this test cannot pin down, not by setup()'s own logic. boot() and
+// connect_both() above cover its two pieces on their own terms; run() and
+// drive() (session/drive.id) inherit the same problem by calling this.
 setup() {
   boot();
   connect_both();

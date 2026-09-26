@@ -1,0 +1,23 @@
+// Two shared fixtures for the arg/ functions' own cases: each runs a real
+// argv through init(), exercising every flag, so init_wait/init_rest/
+// init_settle/init_rest2 can each be called again directly afterward and
+// overwrite only the export(s) it owns, leaving the rest at these seed
+// values -- qm_args_summary_now then reads all seven in one shot without
+// tripping the uninitialised-export trap.
+qmb_init_seed_a() {
+  init(14, ["qmon", "other.elf", "--wait", "4", "--keys", "ret esc", "--type", "ls;pwd", "--settle", "2", "--shot", "out.ppm", "--serial", "ser.log"]);
+} return void;
+():() then qm_args_summary_now:("other.elf|4000|ret esc|ls;pwd|2000|out.ppm|ser.log")
+():() then calls init:(14, ["qmon", "other.elf", "--wait", "4", "--keys", "ret esc", "--type", "ls;pwd", "--settle", "2", "--shot", "out.ppm", "--serial", "ser.log"]) then qm_args_summary_now:("other.elf|4000|ret esc|ls;pwd|2000|out.ppm|ser.log")
+
+qmb_init_seed_b() {
+  init(10, ["qmon", "second.elf", "--wait", "1", "--keys", "tab", "--type", "echo hi", "--settle", "6"]);
+} return void;
+():() then qm_args_summary_now:("second.elf|1000|tab|echo hi|6000||")
+():() then calls init:(10, ["qmon", "second.elf", "--wait", "1", "--keys", "tab", "--type", "echo hi", "--settle", "6"]) then qm_args_summary_now:("second.elf|1000|tab|echo hi|6000||")
+
+qm_args_summary_now() {
+  string s = (import qm_kernel) + "|" + (import qm_wait_ms) + "|" + (import qm_keys) + "|" + (import qm_text) + "|" + (import qm_settle_ms) + "|" + (import qm_shot) + "|" + (import qm_serial_out);
+} return string s;
+given qmb_init_seed_a ():("other.elf|4000|ret esc|ls;pwd|2000|out.ppm|ser.log")
+given qmb_init_seed_b ():("second.elf|1000|tab|echo hi|6000||")

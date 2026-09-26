@@ -1,0 +1,55 @@
+// Real sockets for connect_qmp/connect_serial's success branch: mk_paths()
+// picks the two paths (the only exporter of qm_qmp_path/qm_ser_path). The
+// serial peer is a plain `nc -lkU` (drain_serial's own 20ms-timeout reads are
+// meant to run for real). The QMP peer is a socat listener that, per
+// connection, prints 10 harmless reply lines before this fixture ever
+// returns: greet/qmp_cmd's real byte-at-a-time reads (go/b/qmp/line.id) each
+// carry their own 5s native timeout with nothing to read, and 10 lines sitting
+// in the kernel receive buffer already answers every real read a given chain
+// after this one goes on to make, instead of paying that 5s per read. Their
+// own 2 cases call state/live_check.id's checks twice each: the first call
+// finds the listener alive and cleans it up, the second finds it already
+// gone -- so every case that runs this leaves nothing behind. The 50ms sleep
+// lets both peers finish binding before any given chained after this one
+// connects.
+qa_both_ready() {
+  mk_paths();
+  int qa_h1 = proc_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",fork,unlink-early\nEXEC:printf ok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\nok\\n\n");
+  int qa_h2 = proc_spawn("nc\n-lkU\n" + (import qm_ser_path) + "\n");
+} chain () {
+  export int qa_both_nc1 = qa_h1;
+  export int qa_both_nc2 = qa_h2;
+  sleep_ms(50);
+} return void;
+():() then qa_check_nc1:(1)
+():() then qa_check_nc1:(1) then qa_check_nc1:(0)
+
+// Only the QMP path gets a listener; the serial path stays unreachable, so
+// connect_serial (given this) takes its real, deterministic ENOENT-retry
+// failure -- used for conn_bad/set_rc's mixed branch.
+qa_qmp_only_ready() {
+  mk_paths();
+  int qa_h1 = proc_spawn("nc\n-lkU\n" + (import qm_qmp_path) + "\n");
+  export int qa_qmp_only_nc = qa_h1;
+} return void;
+():() then qa_check_qmp_only:(1)
+():() then qa_check_qmp_only:(1) then qa_check_qmp_only:(0)
+
+// A qm_qh that is genuinely still running: -kernel points at a fresh FIFO,
+// which QEMU blocks reading until a writer shows up (never, here), so the
+// child hangs until something sends it SIGKILL -- exactly the state
+// kill_if_needed's "still running" branch needs to prove a real kill.
+qa_hang_qh() {
+  string qa_fifo = fs_mktemp("qa_fifo_", 0);
+  int qa_rm = fs_remove(qa_fifo);
+  int qa_mk = proc_spawn("mkfifo\n" + qa_fifo + "\n");
+} chain () {
+  int qa_mkwait = proc_wait(qa_mk, 2000);
+  int qa_mkclose = proc_close(qa_mk);
+  export string qa_hang_fifo = qa_fifo;
+} chain () {
+  init(2, ["qmon", qa_fifo]);
+  boot();
+} return void;
+():() then qa_check_hang:(1)
+():() then qa_check_hang:(1) then qa_check_hang:(0)

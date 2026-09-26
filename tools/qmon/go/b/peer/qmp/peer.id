@@ -1,0 +1,50 @@
+// Live one-shot peers for go/b/qmp's cases: a real Unix-domain socket at
+// mk_paths()'s own path, served by a real system `socat` (not QEMU), so
+// qmp_read_line/qmp_read_response/qmp_cmd exercise the real sock_connect and
+// sock_recv natives against real bytes instead of a mock. The serial side is
+// always a silent peer too (conn_bad reads qm_serh even from the QMP path),
+// and it never sends anything, so nothing here ever touches qm_buf (whose
+// sole exporter is spawn_qemu -- see go/b/peer/boot/). One parameterised
+// body -- only the QMP line varies -- so the scenarios below are calls, not
+// duplicate-logic functions. `-u` (one-way) `socat` closes and exits on its
+// own once its one line of input hits EOF, whether or not this side has
+// read or closed anything, so waiting for it to actually exit before
+// removing its socket path (rather than a fixed delay, or removing right
+// after connecting) is what makes the cleanup below reliable: the data is
+// already queued in the kernel's socket buffer by then, so the later read
+// this fixture is `given` for still sees it.
+qmb_qmp_peer(string qmp_line) {
+  mk_paths();
+  int p1 = proc_spawn("sh\n-c\necho '" + qmp_line + "' | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early");
+  int p2 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early");
+} chain (string qmp_line) {
+  connect_both();
+  proc_wait(p1, 1000);
+  proc_wait(p2, 1000);
+} chain (string qmp_line) {
+  fs_remove((import qm_qmp_path));
+  fs_remove((import qm_ser_path));
+} return void;
+("hello"):() then read_one_byte:(104)
+("bye"):() then read_one_byte:(98)
+
+qmb_qmp_hello_ser_empty() {
+  qmb_qmp_peer("hello");
+} return void;
+():() then read_one_byte:(104)
+():() then qmp_read_line:("hello")
+
+qmb_qmp_empty_ser_empty() {
+  mk_paths();
+  int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early");
+  int p2 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early");
+} chain () {
+  connect_both();
+  proc_wait(p1, 1000);
+  proc_wait(p2, 1000);
+} chain () {
+  fs_remove((import qm_qmp_path));
+  fs_remove((import qm_ser_path));
+} return void;
+():() then read_one_byte:(-1)
+():() then qmp_read_line:("")

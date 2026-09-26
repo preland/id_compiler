@@ -1,0 +1,17 @@
+// A witness for push_one_byte's cases: EXPECTED for a non-void function is
+// exactly its return value (no room to also show the mutated `out` list), so
+// this exported buffer plus a check that pushes one more cell proves the
+// call under test really pushed -- deleting its push would leave the buffer
+// one cell short of what the check reports.
+qmb_conv_buf_setup() {
+  export int[] qmb_conv_buf = [];
+} return void;
+():() then qmb_conv_buf_probe:(1)
+():() then qmb_conv_buf_probe:(1) then qmb_conv_buf_probe:(2)
+
+qmb_conv_buf_probe() {
+  push((import qmb_conv_buf), 1);
+  int n = len((import qmb_conv_buf));
+} return int n;
+given qmb_conv_buf_setup ():(1)
+given qmb_conv_buf_setup ():(1) then qmb_conv_buf_probe:(2)

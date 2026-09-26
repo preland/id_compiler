@@ -1,0 +1,35 @@
+// mk_paths' own two exports: both start "/tmp/qmon." and end in the right
+// suffix -- ticks() varies, so this checks the pattern rather than a fixed
+// value.
+qa_check_paths() {
+  string qa_q = (import qm_qmp_path);
+  string qa_s = (import qm_ser_path);
+  int qa_qok = (str_find(qa_q, "/tmp/qmon.") == 0) * (str_find(qa_q, ".qmp") == len(qa_q) - 4);
+} chain () {
+  int qa_sok = (str_find(qa_s, "/tmp/qmon.") == 0) * (str_find(qa_s, ".ser") == len(qa_s) - 4);
+  int qa_ok = qa_qok * qa_sok;
+} return int qa_ok;
+given mk_paths ():(1)
+given mk_paths ():(1) then qa_check_paths:(1)
+
+// spawn_qemu/boot leave a real (if instantly-failing) qemu child and its two
+// socket files behind; every case that reaches either reaps the child and
+// removes both files here so the build leaves nothing in /tmp.
+qa_check_spawn() {
+  int qa_h = (import qm_qh);
+  int qa_bufempty = len((import qm_buf)) == 0;
+  int qa_ok = (qa_h >= 0) * qa_bufempty;
+} chain () {
+  qa_reap_spawn();
+} return int qa_ok;
+given qa_init_fast given mk_paths given spawn_qemu ():(1)
+given qa_init_fast given mk_paths given spawn_qemu ():(1) then qa_check_spawn:(1)
+
+// connect_qmp's own export, reduced to a sign: -1 on the deterministic
+// ENOENT-timeout failure, >=0 once a real listener answers.
+qa_check_qmph() {
+  int qa_v = (import qm_qmph);
+  int qa_ok = qa_v >= 0;
+} return int qa_ok;
+given qa_both_ready given connect_qmp ():(1) then qa_check_nc1:(1)
+given qa_both_ready given connect_qmp ():(1) then qa_check_nc1:(1) then qa_check_qmph:(1)

@@ -5,13 +5,19 @@ phase_settle() {
   wait_loop(n);
   phase_shot();
 } return void;
+given qa_init_zero given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls wait_loop:(0) then calls phase_shot:[1]
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls wait_loop:(50) then calls phase_shot:[1]
 
 phase_shot() {
   maybe_shot();
   phase_quit();
 } return void;
+given qa_init_zero given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls maybe_shot:[1] then calls phase_quit:[1]
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls maybe_shot:[1] then calls phase_quit:[1]
 
 phase_quit() {
   qmp_cmd((import qm_msg_quit));
   drain_serial();
 } return void;
+given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls qmp_cmd:("{\"execute\": \"quit\"}\n") then calls drain_serial:[1]
+given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls qmp_cmd:[1] then calls drain_serial:[1]

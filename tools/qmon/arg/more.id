@@ -5,12 +5,16 @@ init_rest(int argc, string[] argv) {
   export string qm_text = scan_value(argv, argc, "--type", 2);
   init_settle(argc, argv);
 } return void;
+given qmb_init_seed_a (2, ["qmon", "k.elf"]):() then qm_args_summary_now:("other.elf|4000|||1000||")
+given qmb_init_seed_a (6, ["qmon", "k.elf", "--keys", "a b", "--type", "x;y"]):() then qm_args_summary_now:("other.elf|4000|a b|x;y|1000||")
 
 init_settle(int argc, string[] argv) {
   string v = scan_value(argv, argc, "--settle", 2);
   export int qm_settle_ms = settle_ms_of(v);
   init_rest2(argc, argv);
 } return void;
+given qmb_init_seed_a (2, ["qmon", "k.elf"]):() then qm_args_summary_now:("other.elf|4000|ret esc|ls;pwd|1000||")
+given qmb_init_seed_a (4, ["qmon", "k.elf", "--settle", "5"]):() then qm_args_summary_now:("other.elf|4000|ret esc|ls;pwd|5000||")
 
 settle_ms_of(string v) {
   int ms = 1000;

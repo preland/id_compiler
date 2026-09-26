@@ -6,11 +6,15 @@ send_text() {
     send_text_lines(text);
   }
 } return void;
+given qmb_keys_empty_seed ():() then calls send_text_lines:[0]
+given qmb_init_seed_a given qmb_qmp_empty_ser_empty ():() then calls send_text_lines:("ls;pwd")
 
 send_text_lines(string text) {
   string[] lines = str_split(text, ";");
   send_lines_loop(lines, 0);
 } return void;
+given qmb_qmp_empty_ser_empty ("hi"):() then calls send_lines_loop:(["hi"], 0)
+given qmb_qmp_empty_ser_empty ("a;b"):() then calls send_lines_loop:(["a", "b"], 0)
 
 send_lines_loop(string[] lines, int i) {
   int n = len(lines);
@@ -18,3 +22,5 @@ send_lines_loop(string[] lines, int i) {
     i = send_one_line(lines, i);
   }
 } return void;
+given qmb_qmp_empty_ser_empty (["x"], 0):() then calls send_one_line:(["x"], 0)
+given qmb_qmp_empty_ser_empty (["x", "y"], 0):() then calls send_one_line:(["x", "y"], 0) then calls send_one_line:(["x", "y"], 1)

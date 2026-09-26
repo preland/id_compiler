@@ -6,6 +6,8 @@ qmp_cmd(string msg) {
   string r = qmp_read_response();
   check_error(r);
 } return void;
+given qmb_qmp_hello_ser_empty ("ping"):() then eprints:("")
+given qmb_qmp_error_ser_empty ("ping"):() then eprints:("qmon: oops \"error\" seen\n")
 
 check_error(string r) {
   int idx = str_find(r, "\"error\"");

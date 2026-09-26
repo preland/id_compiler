@@ -6,11 +6,15 @@ send_keys() {
     send_keys_list(keys);
   }
 } return void;
+given qmb_keys_empty_seed ():() then calls send_keys_list:[0]
+given qmb_keys_pause_seed ():() then calls send_keys_list:("| |")
 
 send_keys_list(string keys) {
   string[] toks = str_split(keys, " ");
   send_keys_loop(toks, 0);
 } return void;
+("|"):() then calls send_keys_loop:(["|"], 0)
+("| |"):() then calls send_keys_loop:(["|", "|"], 0)
 
 send_keys_loop(string[] toks, int i) {
   int n = len(toks);
@@ -18,3 +22,5 @@ send_keys_loop(string[] toks, int i) {
     i = key_or_pause(toks, i);
   }
 } return void;
+(["|"], 0):() then calls key_or_pause:(["|"], 0)
+(["|", "|"], 0):() then calls key_or_pause:(["|", "|"], 1)

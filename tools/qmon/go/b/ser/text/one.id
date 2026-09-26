@@ -3,6 +3,8 @@ send_one_line(string[] lines, int i) {
   sock_send_str((import qm_serh), lines[i] + "\n");
   int j = after_line(i);
 } return int j;
+given qmb_qmp_empty_ser_empty (["hello"], 0):(1) then calls sock_send_str:((import qm_serh), "hello\n")
+given qmb_qmp_empty_ser_empty (["x", "world"], 1):(2) then calls sock_send_str:((import qm_serh), "world\n")
 
 // The same 250ms pause qmon.py's `time.sleep(0.25)` used between lines, and
 // a drain in between -- see go/a/session/phase/wait.id for why this cannot
@@ -13,3 +15,5 @@ after_line(int i) {
   drain_serial();
   int j = i + 1;
 } return int j;
+given qmb_qmp_empty_ser_empty (0):(1) then calls drain_serial:[1]
+given qmb_qmp_empty_ser_empty (4):(5) then calls drain_serial:[1]

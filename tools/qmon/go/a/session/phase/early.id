@@ -6,13 +6,19 @@ phase_wait() {
   wait_loop(n);
   phase_text();
 } return void;
+given qa_init_zero given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls wait_loop:(0) then calls phase_text:[1]
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls wait_loop:(100) then calls phase_text:[1]
 
 phase_text() {
   send_text();
   phase_keys();
 } return void;
+given qa_init_zero given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls send_text:[1] then calls phase_keys:[1]
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls send_text:[1] then calls phase_keys:[1]
 
 phase_keys() {
   send_keys();
   phase_settle();
 } return void;
+given qa_init_zero given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls send_keys:[1] then calls phase_settle:[1]
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then calls send_keys:[1] then calls phase_settle:[1]

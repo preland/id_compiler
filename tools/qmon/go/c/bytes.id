@@ -19,3 +19,5 @@ sock_send_str(int h, string msg) {
   int n = len(bs);
   sock_send(h, bs, n);
 } return void;
+given qmb_qmp_capture_setup ((import qm_qmph), "ping"):() then qmb_cap_read:("ping")
+given qmb_qmp_capture_setup ((import qm_qmph), "pong"):() then qmb_cap_read:("pong")

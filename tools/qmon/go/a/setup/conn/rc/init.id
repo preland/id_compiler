@@ -1,0 +1,25 @@
+// Test fixtures: real calls to arg/init.id's init(), the sole exporter of
+// qm_kernel/qm_wait_ms/qm_text/qm_keys/qm_settle_ms/qm_shot/qm_serial_out --
+// none of them may be exported a second time, so a case that needs any of
+// them reaches this real init() call rather than faking the export.
+qa_init_fast() {
+  init(2, ["qmon", "/qa-nonexistent-kernel"]);
+} return void;
+():() then calls init:(2, ["qmon", "/qa-nonexistent-kernel"])
+():() then calls init:[1]
+
+// --wait 0 --settle 0: the phase chain (session/phase/) skips every real
+// wait_loop iteration, so a case that drives it does not also pay for
+// drain_serial's 20ms poll n times over.
+qa_init_zero() {
+  init(6, ["qmon", "/qa-nonexistent-kernel", "--wait", "0", "--settle", "0"]);
+} return void;
+():() then calls init:(6, ["qmon", "/qa-nonexistent-kernel", "--wait", "0", "--settle", "0"])
+():() then calls init:[1]
+
+// Adds --shot, for maybe_shot's non-skip branch.
+qa_init_shot() {
+  init(8, ["qmon", "/qa-nonexistent-kernel", "--wait", "0", "--settle", "0", "--shot", "/qa-shot.ppm"]);
+} return void;
+():() then calls init:(8, ["qmon", "/qa-nonexistent-kernel", "--wait", "0", "--settle", "0", "--shot", "/qa-shot.ppm"])
+():() then calls init:[1]

@@ -1,0 +1,36 @@
+// Stop QEMU: give it 10 seconds to exit after "quit" (like qmon.py's
+// proc.wait(timeout=10)), and kill it if it has not. This always runs, quit
+// having been sent or not -- see go/a/session/drive.id.
+reap_qemu() {
+  int rc = proc_wait((import qm_qh), 10000);
+  kill_if_needed(rc);
+  proc_close((import qm_qh));
+} return void;
+given qa_init_fast given mk_paths given spawn_qemu ():() then calls kill_if_needed:(1) then qa_check_spawn:(1)
+given qa_init_fast given mk_paths given spawn_qemu ():() then calls kill_if_needed:[1] then qa_check_spawn:(1)
+
+// proc_wait returns -1 (ETIMEDOUT) for a child still running past the
+// deadline; see idstd's sys/io/ipc/proc/README.md.
+kill_if_needed(int rc) {
+  if(rc < 0) {
+    proc_kill((import qm_qh));
+  }
+} return void;
+given qa_init_fast given mk_paths given spawn_qemu (0):() then qa_kill_check:(1)
+given qa_hang_qh (-1):() then qa_kill_check:(137) then qa_check_hang:(1)
+
+// Not cased: cleanup() needs a real qm_qh (spawn_qemu, tied to whatever
+// qm_ser_path/qm_qmp_path were current when it ran) and real qm_qmph/qm_serh
+// (connect_qmp/connect_serial, needing a live listener on those same two
+// paths) at once. Every ordering tried -- qa_both_ready's listeners before
+// spawn_qemu (a real bind conflict on qa_both_ready's own paths, confirmed
+// by hand: qemu's chardev realization competes with nc for the same path)
+// and after it (no bind conflict, but qa_check_nc1's post-cleanup probe
+// still measured the listener gone one run in several) -- leaves a
+// real-process race this suite could not pin down. reap_qemu, kill_if_needed
+// and close_sockets above cover cleanup()'s three pieces on their own terms.
+cleanup() {
+  reap_qemu();
+  close_sockets();
+  output();
+} return void;

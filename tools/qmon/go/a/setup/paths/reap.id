@@ -1,0 +1,12 @@
+// Reaps and closes qm_qh, then removes its two socket files -- shared by
+// every check that leaves a real (if instantly-failing) qemu child behind,
+// so each of those stays about its own state rather than repeating this.
+qa_reap_spawn() {
+  int qa_rc = proc_wait((import qm_qh), 3000);
+  int qa_close = proc_close((import qm_qh));
+  int qa_r1 = fs_remove((import qm_qmp_path));
+} chain () {
+  int qa_r2 = fs_remove((import qm_ser_path));
+} return void;
+given qa_init_fast given mk_paths given spawn_qemu ():() then qa_check_spawn:(1)
+given qa_init_fast given mk_paths given spawn_qemu ():() then qa_check_spawn:(1) then qa_check_spawn:(1)

@@ -10,3 +10,5 @@ main(int argc, string[] argv) {
   init(argc, argv);
   int rc = drive();
 } return int rc;
+(1, ["qmon"]):() then traps:("index 1 out of bounds (len 1)")
+(0, []):() then traps:("index 1 out of bounds (len 0)")

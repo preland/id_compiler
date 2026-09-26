@@ -4,11 +4,15 @@ append_bytes(int[] chunk, int got) {
     i = append_one(chunk, i);
   }
 } return void;
+given qmb_buf_boot ([104, 105], 2):() then qmb_buf_probe:(3)
+given qmb_buf_boot ([104, 105, 106], 2):() then qmb_buf_probe:(3)
 
 append_one(int[] chunk, int i) {
   push((import qm_buf), chunk[i]);
   int j = i + 1;
 } return int j;
+given qmb_buf_boot ([104, 105], 0):(1) then qmb_buf_probe:(2)
+given qmb_buf_boot ([104, 105], 1):(2) then qmb_buf_probe:(2)
 
 // A full read likely means more is waiting; keep draining until one comes
 // back empty.
@@ -17,3 +21,5 @@ more_if_any(int got) {
     drain_serial();
   }
 } return void;
+(0):()
+given qmb_qmp_empty_ser_empty (1):() then calls drain_serial:[1]

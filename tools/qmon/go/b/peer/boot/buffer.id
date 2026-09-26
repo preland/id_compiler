@@ -1,0 +1,32 @@
+// qm_buf's sole exporter is spawn_qemu (go/a/setup/paths.id), alongside a
+// real qemu-system-x86_64 spawn -- a nonexistent kernel path makes QEMU exit
+// almost at once (confirmed by hand: ~60ms, "could not open kernel file"),
+// so this is cheap even though it is a real process. append_bytes/
+// append_one take their bytes as a plain int[] parameter -- no socket is
+// ever connected to -- but QEMU itself still creates both -chardev socket
+// files before it gets far enough to notice the kernel is missing
+// (confirmed by hand), so this waits for it to exit and removes them: doing
+// that before QEMU has had time to create them left the inode behind, made
+// moments later by QEMU, after this function had already returned.
+qmb_buf_boot() {
+  init(2, ["qmon", "/nonexistent/kernel.elf"]);
+  mk_paths();
+  spawn_qemu();
+} chain () {
+  proc_wait((import qm_qh), 2000);
+  fs_remove((import qm_qmp_path));
+  fs_remove((import qm_ser_path));
+} return void;
+():() then qmb_buf_probe:(1)
+():() then qmb_buf_probe:(1) then qmb_buf_probe:(2)
+
+// Pushes one witness cell and reports the new length, so a case that also
+// pushed cells of its own reads back the combined total -- proof that a
+// call under test really touched qm_buf, since EXPECTED cannot show an
+// import's state the way it shows a mutated parameter.
+qmb_buf_probe() {
+  push((import qm_buf), 7);
+  int n = len((import qm_buf));
+} return int n;
+given qmb_buf_boot ():(1)
+given qmb_buf_boot ():(1) then qmb_buf_probe:(2)

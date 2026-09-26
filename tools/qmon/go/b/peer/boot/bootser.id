@@ -1,0 +1,46 @@
+// Like boot.id's qmb_buf_boot, but also gives drain_serial/pull_chunk a real
+// qm_serh: real socat peers are spawned at mk_paths()'s own paths before the
+// real QEMU spawn attempts its own bind of the same paths, so this tool's
+// own peers win the connect race and connect_qmp/connect_serial talk to
+// them instead. The QMP side is always silent -- these fixtures are for the
+// serial-side scope functions, which never read it. QEMU still creates both
+// -chardev socket files on its way to noticing the kernel is missing
+// (confirmed by hand), on its own slower schedule than this tool's own
+// peers, and each `-u` socat peer closes its socket path only once it
+// exits, which does not have to be the moment it is connected to -- so
+// cleanup here waits for QEMU and both peers to actually exit (each a real
+// process handle from proc_spawn) before removing either path, the same
+// reasoning go/b/peer/qmp/peer.id's qmb_qmp_peer uses. One parameterised
+// body (the serial script is the only thing that varies) so the two
+// scenarios below are not rejected as duplicate-logic functions.
+qmb_boot_ser(string ser_script) {
+  init(2, ["qmon", "/nonexistent/kernel.elf"]);
+  mk_paths();
+  int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early");
+} chain (string ser_script) {
+  int p2 = proc_spawn("sh\n-c\n" + ser_script + " | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early");
+  spawn_qemu();
+  connect_qmp();
+} chain (string ser_script) {
+  connect_serial();
+  proc_wait((import qm_qh), 2000);
+  proc_wait(p1, 1000);
+} chain (string ser_script) {
+  proc_wait(p2, 1000);
+  fs_remove((import qm_qmp_path));
+  fs_remove((import qm_ser_path));
+} return void;
+("printf AB"):() then qmb_buf_probe:(1)
+(": "):() then qmb_buf_probe:(1)
+
+qmb_boot_ser_ab() {
+  qmb_boot_ser("printf AB");
+} return void;
+():() then qmb_buf_probe:(1)
+():() then calls qmb_boot_ser:("printf AB")
+
+qmb_boot_ser_empty() {
+  qmb_boot_ser(": ");
+} return void;
+():() then qmb_buf_probe:(1)
+():() then calls qmb_boot_ser:(": ")

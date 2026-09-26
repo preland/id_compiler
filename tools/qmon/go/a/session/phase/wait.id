@@ -10,8 +10,12 @@ wait_loop(int n) {
     i = wait_step(i);
   }
 } return void;
+given qa_both_ready given connect_qmp given connect_serial (0):() then qa_check_nc1:(1) then calls drain_serial:[0]
+given qa_both_ready given connect_qmp given connect_serial (3):() then qa_check_nc1:(1) then calls drain_serial:[3]
 
 wait_step(int i) {
   drain_serial();
   int j = i + 1;
 } return int j;
+given qa_both_ready given connect_qmp given connect_serial (0):(1) then qa_check_nc1:(1) then calls drain_serial:[1]
+given qa_both_ready given connect_qmp given connect_serial (5):(6) then qa_check_nc1:(1) then calls drain_serial:[1]

@@ -4,6 +4,8 @@ init_rest2(int argc, string[] argv) {
   export string qm_shot = scan_value(argv, argc, "--shot", 2);
   export string qm_serial_out = scan_value(argv, argc, "--serial", 2);
 } return void;
+given qmb_init_seed_a (2, ["qmon", "k.elf"]):() then qm_args_summary_now:("other.elf|4000|ret esc|ls;pwd|2000||")
+given qmb_init_seed_a (6, ["qmon", "k.elf", "--shot", "o.ppm", "--serial", "s.log"]):() then qm_args_summary_now:("other.elf|4000|ret esc|ls;pwd|2000|o.ppm|s.log")
 
 // The value right after the last argv[i] == name, for i in [start, argc), or
 // "" if name never appears. There is no break in id (TUTORIAL.md §2), so the

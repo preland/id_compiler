@@ -1,0 +1,45 @@
+// Verifies live.id's 3 fixtures really made what they claim, and tears it
+// all down: called twice per fixture's own 2 cases (see live.id), the first
+// call finds the real resource and removes it, the second finds it already
+// gone -- so nothing a case here makes ever outlives the case.
+// A real connect probe, not a file-existence check: `nc` binding its socket
+// races the given's own return under load, and sock_connect's built-in
+// ENOENT/ECONNREFUSED retry (up to the timeout given here) absorbs that,
+// where a single fs_exists could not.
+qa_check_nc1() {
+  int qa_h1 = (import qa_both_nc1);
+  int qa_probe = sock_connect((import qm_qmp_path), 300);
+  int qa_ok = (qa_probe >= 0) * (qa_h1 >= 0);
+} chain () {
+  int qa_pc = sock_close(qa_probe);
+  qa_close_nc(qa_h1, (import qm_qmp_path));
+  qa_close_nc((import qa_both_nc2), (import qm_ser_path));
+} return int qa_ok;
+given qa_both_ready ():(1)
+given qa_both_ready ():(1) then qa_check_nc1:(0)
+
+qa_check_qmp_only() {
+  int qa_h1 = (import qa_qmp_only_nc);
+  int qa_probe = sock_connect((import qm_qmp_path), 300);
+  int qa_ok = (qa_probe >= 0) * (qa_h1 >= 0);
+} chain () {
+  int qa_pc = sock_close(qa_probe);
+  qa_close_nc(qa_h1, (import qm_qmp_path));
+} return int qa_ok;
+given qa_qmp_only_ready ():(1)
+given qa_qmp_only_ready ():(1) then qa_check_qmp_only:(0)
+
+qa_check_hang() {
+  int qa_qh = (import qm_qh);
+  int qa_fifo_exists = fs_exists((import qa_hang_fifo));
+  int qa_kill = proc_kill(qa_qh);
+} chain () {
+  int qa_reap = proc_wait(qa_qh, 1000);
+  int qa_close = proc_close(qa_qh);
+  int qa_rm = fs_remove((import qa_hang_fifo));
+} chain () {
+  int qa_rq = fs_remove((import qm_qmp_path));
+  int qa_rs = fs_remove((import qm_ser_path));
+} return int qa_fifo_exists;
+given qa_hang_qh ():(1)
+given qa_hang_qh ():(1) then qa_check_hang:(0)

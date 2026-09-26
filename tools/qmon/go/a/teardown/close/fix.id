@@ -1,0 +1,41 @@
+// close_sockets' only observable effect: after it runs, a raw recv on either
+// handle fails (-1), against 0 (no data yet, but still open) beforehand --
+// so its own 2 cases below are close_sockets not yet called, and called.
+qa_check_close() {
+  int qa_h1 = (import qm_qmph);
+  int[] qa_buf1 = [0];
+  int qa_r1 = sock_recv(qa_h1, qa_buf1, 1, 10);
+} chain () {
+  int qa_h2 = (import qm_serh);
+  int[] qa_buf2 = [0];
+  int qa_r2 = sock_recv(qa_h2, qa_buf2, 1, 10);
+} chain () {
+  int qa_ok = qa_r1 == -1 && qa_r2 == -1;
+} return int qa_ok;
+given qa_both_ready given connect_qmp given connect_serial ():(0) then qa_check_nc1:(1)
+given qa_both_ready given connect_qmp given connect_serial given close_sockets ():(1) then qa_check_nc1:(1)
+
+// qm_buf holds "hi" (104, 105), pushed onto the real list spawn_qemu
+// exported -- lists are references, so this is legal without a second
+// exporter of qm_buf.
+qa_buf_hi() {
+  qa_init_fast();
+  mk_paths();
+  spawn_qemu();
+} chain () {
+  push((import qm_buf), 104);
+  push((import qm_buf), 105);
+} return void;
+():() then qa_check_bufhi:(1)
+():() then qa_check_bufhi:(1) then qa_check_bufhi:(1)
+
+qa_check_bufhi() {
+  int qa_n = len((import qm_buf));
+  string qa_s = bytes_str((import qm_buf), qa_n);
+  int qa_ok = str_cmp(qa_s, "hi") == 0;
+} chain () {
+  qa_reap_spawn();
+  int qa_final = qa_ok;
+} return int qa_final;
+given qa_buf_hi ():(1)
+given qa_buf_hi ():(1) then qa_check_bufhi:(1)

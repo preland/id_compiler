@@ -1,0 +1,18 @@
+// Reads qa_serial_path back and removes it, for write_serial_file/finish's
+// real-write cases (teardown/serfile/fix.id's qa_init_serial supplies the
+// path; it is not yet a file, so this function's own 2 cases both see it
+// missing -- the positive read is exercised as a "then" check elsewhere).
+qa_check_serial_file() {
+  string qa_p = (import qa_serial_path);
+  int qa_h = fs_open(qa_p, "r");
+  int[] qa_buf = [0, 0, 0, 0, 0];
+} chain () {
+  int qa_n = fs_read(qa_h, qa_buf, 5);
+  string qa_got = bytes_str(qa_buf, qa_n);
+  int qa_close = fs_close(qa_h);
+} chain () {
+  int qa_rm = fs_remove(qa_p);
+  int qa_ok = str_cmp(qa_got, "hello") == 0;
+} return int qa_ok;
+given qa_init_serial ():(0)
+given qa_init_serial ():(0) then qa_check_serial_file:(0)
