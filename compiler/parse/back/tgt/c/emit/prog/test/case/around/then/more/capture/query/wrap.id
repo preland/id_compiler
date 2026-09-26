@@ -1,6 +1,6 @@
 // The call under test, with whatever it needs wrapped around it: output
 // captured for a prints/eprints clause, recording turned on for a calls
-// clause (pre.id, post.id) -- or, for a case with none of these, exactly the
+// clause (pre/redirect.id, post/restore.id) -- or, for a case with none of these, exactly the
 // call, unchanged.
 
 emit_case_call_wrapped(int ci) {
@@ -12,7 +12,7 @@ given wrap_fixture (0):() then prints:("    int idtc_got = id_fx_target(idtc_a0)
 given void_call_fixture (1):() then prints:("    id_bare();\n")
 
 // The case's own `traps` node, or -1: judge/more/row.id's idtc_traps[ci] row
-// needs the message, not just whether one exists (case_has_out, ../query.id,
+// needs the message, not just whether one exists (case_has_out, ../hasout.id,
 // already answers that). At most one thentraps node names a given ci
 // (front/.../case/then/more/calls/fixture.id's then_traps_clause rejects a
 // second), so the last match found is the only one there is.

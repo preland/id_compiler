@@ -1,4 +1,4 @@
-// The tail of parse_decl, split off because decl/decl.id is already full, and
+// The tail of parse_decl, split off because decl/declare.id is already full, and
 // the `blank` statement, which belongs with the statement forms rather than
 // with the dispatch that routes to it.
 

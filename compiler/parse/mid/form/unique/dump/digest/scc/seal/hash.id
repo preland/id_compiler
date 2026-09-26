@@ -4,7 +4,7 @@
 // and one term per edge that leaves the component, the hash of the component
 // it reaches. A sum does not care what order the stack or an out-list holds
 // things in, and every component an edge leaves for is sealed already
-// (../visit/visit.id), so its hash is final. An edge that stays inside the
+// (../visit/tarjan.id), so its hash is final. An edge that stays inside the
 // component adds nothing: which member calls which is in the members' tokens.
 //
 // The members are the stack from dgp up; the component's number is the next

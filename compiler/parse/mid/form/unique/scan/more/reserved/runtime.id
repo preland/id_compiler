@@ -14,7 +14,7 @@
 // It sits with the duplicate-NAME check because it is the same kind of rule:
 // both say a name is already taken, and both are decided from the function
 // name alone. resv_names_src (compiler/parse/conf.id) is hand-maintained in
-// step with the runtime prelude (back/tgt/c/runtime/runtime.id); tests/stdlib.sh
+// step with the runtime prelude (back/tgt/c/runtime/prelude.id); tests/stdlib.sh
 // checks the two have not drifted. init_resv_names splits it into resv_names,
 // the way init_bnames splits builtin_src (exports/extern/builtin/more/names.id).
 

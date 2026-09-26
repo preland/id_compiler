@@ -22,7 +22,7 @@ given fold_true_setup ((import ft_id)):(1)
 
 // A "const" bool row (c0, "0") that both fold_isbool's and fold_zero_of's
 // true branches can point at: ft_id ("add") has both fields set to c0, and
-// fz_id ("zext") gives fold_iszext (../cmp.id) a row whose op matches too.
+// fz_id ("zext") gives fold_iszext (../zext.id) a row whose op matches too.
 fold_true_setup() {
   env_init();
   int[] none = [];

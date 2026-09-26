@@ -25,7 +25,7 @@ given fold_true_setup ((import fz_id)):(1)
 // ir_rows's second function (a "const" never added to its block, so
 // op_preds's pred_of underflows blk_ins[-1] on it), br_fixture_p's two
 // blocks both hold real instructions, so running the real pipeline on it
-// does not crash. Filed here, not incs.id/push.id, which are at their
+// does not crash. Filed here, not scan.id/push.id, which are at their
 // 3-function cap.
 m2r_predfx() {
   br_fixture_p();

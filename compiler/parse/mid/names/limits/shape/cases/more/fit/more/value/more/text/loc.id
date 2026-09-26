@@ -1,5 +1,5 @@
 // Where a case is: the file it is written in, recorded on its node when it was
-// parsed (front/parse/decl/func/cases/cases.id), and the line of its first
+// parsed (front/parse/decl/func/cases/collect.id), and the line of its first
 // token -- the line the reader has to change.
 
 case_err(int i, string msg) {

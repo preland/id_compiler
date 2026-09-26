@@ -13,7 +13,7 @@ given fn_fixture ("theneprints", "", [1]):()
 // The kind a claim constrains, pushed by cons_push (../../../../more/lit/
 // cons/rest.id) beside the case index and the bound. Filed here because the
 // cons directory has one free function slot and the three parallel columns
-// need a reader each -- conscase_len (../../../../more/lit/cons/cons.id) says
+// need a reader each -- conscase_len (../../../../more/lit/cons/list.id) says
 // why one cannot stand for the others.
 conskind_len() {
   int n = len((import conskind));

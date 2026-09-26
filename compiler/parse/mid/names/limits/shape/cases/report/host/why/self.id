@@ -7,7 +7,7 @@
 // fn_fixture and edge_fixture (../../given/then/more/fixture/fn.id, back/
 // drive/run/check/dce/emit/calls/fixture/setup.id), the fixtures with a real
 // `prog` this lane has, never do (init_rtc is only reached through notes_base
-// or rt_fixture, ../mark/mark.id / mid/names/exports/extern/note.id, neither
+// or rt_fixture, ../mark/init.id / mid/names/exports/extern/note.id, neither
 // of which builds a `prog`). No fixture combines the two, and this lane has
 // no free function slot left (see ut_self_at's own note below for the
 // accounting).

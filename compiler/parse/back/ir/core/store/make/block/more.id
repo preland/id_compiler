@@ -10,7 +10,7 @@ given ir_rows (1):(1)
 given ir_rows_chk1 (0):(1)
 
 // The most recently pushed block's label and owning function, for a case on
-// ir_block/ir_blk2 (../block.id).
+// ir_block/ir_blk2 (../build.id).
 chk_last_blk_lbl() {
   int n = len((import bfunc));
   string ret_s = blk_lbl(n - 1);

@@ -1,4 +1,4 @@
-// Whether export i survives emission, mirroring dce.id's own test for a
+// Whether export i survives emission, mirroring sweep.id's own test for a
 // function: kept when its owner is reachable, but only in the program itself,
 // exactly where dce_prune decides to run at all -- a build with `main`, not
 // `--freestanding` (nat_all_live, back/drive/sink/natives/more/live.id).

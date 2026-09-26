@@ -1,7 +1,7 @@
-// Six synthetic IR instructions (back/ir/core/store/make/insn/insn.id's
+// Six synthetic IR instructions (back/ir/core/store/make/insn/build.id's
 // ir_insn, after init_ir -- a second, independent parallel-list store with
 // no relation to the front-end node store, so none of env_init's tables
-// apply here) for this directory and ../insn.id's dispatch chains: a `ret`
+// apply here) for this directory and ../text.id's dispatch chains: a `ret`
 // with no value, an unconditional `br`, a conditional `cbr`, an `alloca`,
 // a `load` and a `store`. None of the six read their own l/bl columns in
 // this dispatch chain, so [9] (any non-empty literal, which needs no

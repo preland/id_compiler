@@ -18,9 +18,9 @@ once this compiler uses a construct on itself.
 
 | function | file | what |
 | --- | --- | --- |
-| `is_space_at` | `compiler/lex/chars/classify/at/at.id` | The character classes, asked of a source position rather than of a byte. |
-| `is_digit_at` | `compiler/lex/chars/classify/at/at.id` | The character classes, asked of a source position rather than of a byte. |
-| `is_alpha_at` | `compiler/lex/chars/classify/at/at.id` | The character classes, asked of a source position rather than of a byte. |
+| `is_space_at` | `compiler/lex/chars/classify/at/checks.id` | The character classes, asked of a source position rather than of a byte. |
+| `is_digit_at` | `compiler/lex/chars/classify/at/checks.id` | The character classes, asked of a source position rather than of a byte. |
+| `is_alpha_at` | `compiler/lex/chars/classify/at/checks.id` | The character classes, asked of a source position rather than of a byte. |
 | `lex_fix_setup` | `compiler/lex/chars/classify/at/fixture.id` | Zero-arg wrappers for lex_setup, for cases under compiler/lex/driver and |
 | `lex_fix_setup_cols` | `compiler/lex/chars/classify/at/fixture.id` | Zero-arg wrappers for lex_setup, for cases under compiler/lex/driver and |
 | `lex_cols_now` | `compiler/lex/chars/classify/at/fixture.id` | Zero-arg wrappers for lex_setup, for cases under compiler/lex/driver and |
@@ -33,9 +33,9 @@ once this compiler uses a construct on itself.
 | `is_alnum` | `compiler/lex/chars/classify/ident_kw.id` | Identifier-continuation test and keyword recognition. |
 | `is_kw` | `compiler/lex/chars/classify/ident_kw.id` | The id keywords. One big boolean keeps this within the action limit. |
 | `kindof` | `compiler/lex/chars/classify/ident_kw.id` | Identifier-continuation test and keyword recognition. |
-| `scan_one` | `compiler/lex/chars/dispatch/dispatch.id` | whitespace, or hand off |
-| `scan_word` | `compiler/lex/chars/dispatch/dispatch.id` | `//` line comment, or hand off |
-| `scan_token` | `compiler/lex/chars/dispatch/dispatch.id` | identifier/keyword, or hand off |
+| `scan_one` | `compiler/lex/chars/dispatch/dispatch_head.id` | whitespace, or hand off |
+| `scan_word` | `compiler/lex/chars/dispatch/dispatch_head.id` | `//` line comment, or hand off |
+| `scan_token` | `compiler/lex/chars/dispatch/dispatch_head.id` | identifier/keyword, or hand off |
 | `scan_numop` | `compiler/lex/chars/dispatch/dispatch_tail.id` | hex literal, or hand off to the binary case. Hex is tested before the |
 | `scan_strop` | `compiler/lex/chars/dispatch/dispatch_tail.id` | string literal (pass the index past the opening quote), else an operator |
 | `scan_block` | `compiler/lex/chars/dispatch/more/block.id` | `/* ... */` is not id syntax -- the language has line comments and nothing |
@@ -47,21 +47,18 @@ once this compiler uses a construct on itself.
 | `scan_decop` | `compiler/lex/chars/dispatch/more/number_or_op.id` | decimal number, or hand off |
 | `scan_hashop` | `compiler/lex/chars/dispatch/more/number_or_op.id` | A `#<word> <rest>` marker, injected into the stream by the driver. `id` has |
 | `scan_hash` | `compiler/lex/chars/dispatch/more/number_or_op.id` | The marker word is not parsed here: dropping the `#` and passing the rest of |
-| `is_bin` | `compiler/lex/chars/numlit/bin/bin.id` | Binary literals, the mirror of the hex case: `id` lexes 0b1010 to the |
-| `bin_start` | `compiler/lex/chars/numlit/bin/bin.id` | The trailing digit test is what keeps a bare `0` followed by an identifier |
-| `bin_end` | `compiler/lex/chars/numlit/bin/bin.id` | Binary literals, the mirror of the hex case: `id` lexes 0b1010 to the |
 | `scan_binop` | `compiler/lex/chars/numlit/bin/bin_value.id` | binary literal, or hand off. Tested before the decimal case for the same |
 | `scan_bin` | `compiler/lex/chars/numlit/bin/bin_value.id` | i points at the '0'; i + 2 is the first binary digit. |
 | `bin_val` | `compiler/lex/chars/numlit/bin/bin_value.id` | Accumulated in a `word` for the reason hex is: 64 binary digits do not fit |
+| `is_bin` | `compiler/lex/chars/numlit/bin/extent.id` | Binary literals, the mirror of the hex case: `id` lexes 0b1010 to the |
+| `bin_start` | `compiler/lex/chars/numlit/bin/extent.id` | The trailing digit test is what keeps a bare `0` followed by an identifier |
+| `bin_end` | `compiler/lex/chars/numlit/bin/extent.id` | Binary literals, the mirror of the hex case: `id` lexes 0b1010 to the |
 | `lex_line_now` | `compiler/lex/chars/numlit/dec/fixture.id` | The running-line-number reader, for bump_line's cases (see |
 | `lex_fix_bol1` | `compiler/lex/chars/numlit/dec/fixture.id` | lexbol != 0 too, so a case can tell (i - b) from (i + b) in span_out. |
 | `num_end` | `compiler/lex/chars/numlit/dec/numkind.id` | Extend a digit run past an optional fractional part, and pick the token |
 | `numkind` | `compiler/lex/chars/numlit/dec/numkind.id` | Extend a digit run past an optional fractional part, and pick the token |
 | `digit_run_end` | `compiler/lex/chars/numlit/dec/numscan.id` | Digit-run scanning, and the float continuation test: a '.' immediately |
 | `has_frac` | `compiler/lex/chars/numlit/dec/numscan.id` | Digit-run scanning, and the float continuation test: a '.' immediately |
-| `is_hex` | `compiler/lex/chars/numlit/hex/hex.id` | Hex literals. `id` lexes 0xff to the *integer token* 255 -- hex is a |
-| `hex_digit` | `compiler/lex/chars/numlit/hex/hex.id` | Hex literals. `id` lexes 0xff to the *integer token* 255 -- hex is a |
-| `hex_alpha` | `compiler/lex/chars/numlit/hex/hex.id` | Hex literals. `id` lexes 0xff to the *integer token* 255 -- hex is a |
 | `hex_start` | `compiler/lex/chars/numlit/hex/is_hex.id` | A hex literal is "0", then 'x' or 'X' (120 or 88), then at least one hex |
 | `hex_end` | `compiler/lex/chars/numlit/hex/is_hex.id` | A hex literal is "0", then 'x' or 'X' (120 or 88), then at least one hex |
 | `hex_val` | `compiler/lex/chars/numlit/hex/is_hex.id` | Accumulated in a `word`, because a 16-digit literal does not fit an int. |
@@ -69,13 +66,16 @@ once this compiler uses a construct on itself.
 | `udec` | `compiler/lex/chars/numlit/hex/val/hex_value.id` | A word printed as *unsigned* decimal. Plain "" + v prints it signed, so |
 | `pad10` | `compiler/lex/chars/numlit/hex/val/hex_value.id` | i points at the '0'; i + 2 is the first hex digit. |
 | `print_uint` | `compiler/lex/chars/numlit/hex/val/uint.id` | Printing an unsigned literal's value, shared by the hexadecimal and binary |
+| `is_hex` | `compiler/lex/chars/numlit/hex/value.id` | Hex literals. `id` lexes 0xff to the *integer token* 255 -- hex is a |
+| `hex_digit` | `compiler/lex/chars/numlit/hex/value.id` | Hex literals. `id` lexes 0xff to the *integer token* 255 -- hex is a |
+| `hex_alpha` | `compiler/lex/chars/numlit/hex/value.id` | Hex literals. `id` lexes 0xff to the *integer token* 255 -- hex is a |
 | `lex_all` | `compiler/lex/driver/all.id` | Reading the source and lexing it. Two statements, in their own function |
 | `lex_setup` | `compiler/lex/driver/cols.id` | The lexer's state cells and its one flag. |
 | `lex_cols` | `compiler/lex/driver/cols.id` | The lexer's state cells and its one flag. |
 | `is_lcomment` | `compiler/lex/driver/cols.id` | The lexer's state cells and its one flag. |
-| `main` | `compiler/lex/driver/driver.id` | idc-in-id -- a C transpiler for `id`, written in `id` itself. |
-| `eat_space` | `compiler/lex/driver/driver.id` | A `line N` marker is emitted whenever a newline is consumed, so every token |
-| `lex` | `compiler/lex/driver/driver.id` | One pass over the source: advance the cursor one token at a time. The whole |
+| `main` | `compiler/lex/driver/run.id` | idc-in-id -- a C transpiler for `id`, written in `id` itself. |
+| `eat_space` | `compiler/lex/driver/run.id` | A `line N` marker is emitted whenever a newline is consumed, so every token |
+| `lex` | `compiler/lex/driver/run.id` | One pass over the source: advance the cursor one token at a time. The whole |
 | `two_at` | `compiler/lex/scan/more/at.id` | The one and two character operator spellings at a position, and the choice |
 | `one_at` | `compiler/lex/scan/more/at.id` | The one and two character operator spellings at a position, and the choice |
 | `scan_op_out` | `compiler/lex/scan/more/at.id` | `one` is built whether or not it is printed. charat is a read of a byte |
@@ -83,15 +83,15 @@ once this compiler uses a construct on itself.
 | `oplen` | `compiler/lex/scan/more/ops.id` | How many characters the operator at `i` spans (2 or 1). Used by scan_op's |
 | `scan_op` | `compiler/lex/scan/more/ops.id` | Operator scanning: match the eight two-character operators, else a single |
 | `scan_ident_out` | `compiler/lex/scan/more/out/ident.id` | An identifier's token line. `kindof` decides between `ident` and `kw`, and |
-| `scan_num_out` | `compiler/lex/scan/more/out/out.id` | Printing a token, split out from the scanner that found its extent. |
-| `scan_str_out` | `compiler/lex/scan/more/out/out.id` | The quote is reprinted around the slice, which is why it is built here and |
-| `scan_hash_out` | `compiler/lex/scan/more/out/out.id` | Printing a token, split out from the scanner that found its extent. |
-| `scan_ident` | `compiler/lex/scan/scan.id` | Token scanners. Each advances its index parameter inside the loop (so no |
-| `scan_number` | `compiler/lex/scan/scan.id` | An integer digit run, optionally extended with a '.' + fraction digits |
-| `scan_string` | `compiler/lex/scan/scan.id` | Caller passes the index of the first char *after* the opening quote, so the |
+| `scan_num_out` | `compiler/lex/scan/more/out/print.id` | Printing a token, split out from the scanner that found its extent. |
+| `scan_str_out` | `compiler/lex/scan/more/out/print.id` | The quote is reprinted around the slice, which is why it is built here and |
+| `scan_hash_out` | `compiler/lex/scan/more/out/print.id` | Printing a token, split out from the scanner that found its extent. |
 | `str_end` | `compiler/lex/scan/strlit.id` | String-literal helpers: find the closing quote while respecting backslash |
 | `adv_str` | `compiler/lex/scan/strlit.id` | advance one char, or two when the current char is a backslash (skipping the |
 | `slice_str` | `compiler/lex/scan/strlit.id` | String-literal helpers: find the closing quote while respecting backslash |
+| `scan_ident` | `compiler/lex/scan/tokens.id` | Token scanners. Each advances its index parameter inside the loop (so no |
+| `scan_number` | `compiler/lex/scan/tokens.id` | An integer digit run, optionally extended with a '.' + fraction digits |
+| `scan_string` | `compiler/lex/scan/tokens.id` | Caller passes the index of the first char *after* the opening quote, so the |
 
 ## front -- tokens to an AST
 
@@ -112,24 +112,27 @@ once this compiler uses a construct on itself.
 | `asm_tail_mid` | `compiler/parse/front/parse/decl/asm/tail/more.id` | The rest of asm_tail.id's asm_tail, split across two more steps to stay |
 | `asm_tail_end` | `compiler/parse/front/parse/decl/asm/tail/more.id` | The rest of asm_tail.id's asm_tail, split across two more steps to stay |
 | `init_asm_rest` | `compiler/parse/front/parse/decl/asm/tail/more.id` | aloc: one "file:line" per asm declaration, parallel to afname, pushed by |
-| `case_item` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/elem.id` | An element of a case tuple: a literal, `(import NAME)` -- the value an |
-| `case_import` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/elem.id` | An element of a case tuple: a literal, `(import NAME)` -- the value an |
-| `import_rest` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/elem.id` | An element of a case tuple: a literal, `(import NAME)` -- the value an |
+| `case_item` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/cimport.id` | An element of a case tuple: a literal, `(import NAME)` -- the value an |
+| `case_import` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/cimport.id` | An element of a case tuple: a literal, `(import NAME)` -- the value an |
+| `import_rest` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/cimport.id` | An element of a case tuple: a literal, `(import NAME)` -- the value an |
 | `tup1_fix` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/fixture.id` | Token streams for a case tuple, `(5)` and `(5, 6)`, and a bare `:` -- for |
 | `tup2_fix` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/fixture.id` | Token streams for a case tuple, `(5)` and `(5, 6)`, and a bare `:` -- for |
 | `colon_fix` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/fixture.id` | Token streams for a case tuple, `(5)` and `(5, 6)`, and a bare `:` -- for |
 | `case_value` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/fn.id` | A function's name as a case element: that function, passed as a value to a |
 | `at_case_fn` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/fn.id` | A bare name, and nothing after it but the end of the element: `f(1)` is a |
 | `case_fn` | `compiler/parse/front/parse/decl/func/cases/case/given/elem/fn.id` | A function's name as a case element: that function, passed as a value to a |
-| `parse_case_args` | `compiler/parse/front/parse/decl/func/cases/case/given/given.id` | `given SETUP`, ahead of a case's arguments: the function the case's process |
-| `case_given` | `compiler/parse/front/parse/decl/func/cases/case/given/given.id` | `given SETUP`, ahead of a case's arguments: the function the case's process |
-| `given_name` | `compiler/parse/front/parse/decl/func/cases/case/given/given.id` | `given SETUP`, ahead of a case's arguments: the function the case's process |
 | `case_fn_name` | `compiler/parse/front/parse/decl/func/cases/case/given/name.id` | The function a `given` or a `then` names. Anything but a plain name there is |
 | `at_case_import` | `compiler/parse/front/parse/decl/func/cases/case/given/name.id` | Whether the next two tokens open `(import NAME)`. Bounded, because a case |
 | `next_is_import` | `compiler/parse/front/parse/decl/func/cases/case/given/name.id` | The function a `given` or a `then` names. Anything but a plain name there is |
-| `then_calls_clause` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/calls.id` | `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose |
-| `then_calls_rest` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/calls.id` | `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose |
-| `then_calls_args` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/calls.id` | `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose |
+| `parse_case_args` | `compiler/parse/front/parse/decl/func/cases/case/given/setup.id` | `given SETUP`, ahead of a case's arguments: the function the case's process |
+| `case_given` | `compiler/parse/front/parse/decl/func/cases/case/given/setup.id` | `given SETUP`, ahead of a case's arguments: the function the case's process |
+| `given_name` | `compiler/parse/front/parse/decl/func/cases/case/given/setup.id` | `given SETUP`, ahead of a case's arguments: the function the case's process |
+| `case_rest` | `compiler/parse/front/parse/decl/func/cases/case/then/clauses.id` | `then CHECK:(value)`, after a case's expected values and before its |
+| `case_thens` | `compiler/parse/front/parse/decl/func/cases/case/then/clauses.id` | `then CHECK:(value)`, after a case's expected values and before its |
+| `then_one` | `compiler/parse/front/parse/decl/func/cases/case/then/clauses.id` | `then CHECK:(value)`, after a case's expected values and before its |
+| `then_calls_clause` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/clause.id` | `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose |
+| `then_calls_rest` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/clause.id` | `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose |
+| `then_calls_args` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/clause.id` | `then calls NAME:(ARGS)` -- the call under test made a call to NAME whose |
 | `then_calls_count` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/count.id` | `then calls NAME:[N]` -- exactly N calls to NAME, during the call under |
 | `then_calls_count_rest` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/count.id` | `then calls NAME:[N]` -- exactly N calls to NAME, during the call under |
 | `then_calls_count_push` | `compiler/parse/front/parse/decl/func/cases/case/then/more/calls/count.id` | `then calls NAME:[N]` -- exactly N calls to NAME, during the call under |
@@ -142,24 +145,21 @@ once this compiler uses a construct on itself.
 | `fnname_fix` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/fixture.id` | More token streams (see ../../../given/elem/fixture.id for tup1_fix and |
 | `bound_n_fix` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/fixture.id` | More token streams (see ../../../given/elem/fixture.id for tup1_fix and |
 | `bound_1_fix` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/fixture.id` | More token streams (see ../../../given/elem/fixture.id for tup1_fix and |
-| `then_print_dispatch` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/print.id` | `then prints:("...")` / `then eprints:("...")`: the bytes the call under |
-| `then_print_clause` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/print.id` | `then prints:("...")` / `then eprints:("...")`: the bytes the call under |
-| `then_print_value` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/print.id` | `then prints:("...")` / `then eprints:("...")`: the bytes the call under |
+| `then_print_dispatch` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/output.id` | `then prints:("...")` / `then eprints:("...")`: the bytes the call under |
+| `then_print_clause` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/output.id` | `then prints:("...")` / `then eprints:("...")`: the bytes the call under |
+| `then_print_value` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/output.id` | `then prints:("...")` / `then eprints:("...")`: the bytes the call under |
 | `then_push_kind` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/store.id` | Recording a `then`-family clause under whichever node kind it is |
 | `conskind_len` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/store.id` | The kind a claim constrains, pushed by cons_push (../../../../more/lit/ |
 | `consbound_len` | `compiler/parse/front/parse/decl/func/cases/case/then/more/print/store.id` | The bound a claim gives that kind, the third of the three. claim_cols_rest |
 | `then_value` | `compiler/parse/front/parse/decl/func/cases/case/then/push.id` | A check's value, and the check recorded. then_store's leading `kind` is |
 | `then_push` | `compiler/parse/front/parse/decl/func/cases/case/then/push.id` | The case being parsed is the last one whose start has been recorded. |
 | `then_store` | `compiler/parse/front/parse/decl/func/cases/case/then/push.id` | A check's value, and the check recorded. then_store's leading `kind` is |
-| `case_rest` | `compiler/parse/front/parse/decl/func/cases/case/then/then.id` | `then CHECK:(value)`, after a case's expected values and before its |
-| `case_thens` | `compiler/parse/front/parse/decl/func/cases/case/then/then.id` | `then CHECK:(value)`, after a case's expected values and before its |
-| `then_one` | `compiler/parse/front/parse/decl/func/cases/case/then/then.id` | `then CHECK:(value)`, after a case's expected values and before its |
 | `parse_case` | `compiler/parse/front/parse/decl/func/cases/case/tuple.id` | One case: `given SETUP (args) : (expected) then CHECK:(value) [constraints]`, |
 | `parse_case_rhs` | `compiler/parse/front/parse/decl/func/cases/case/tuple.id` | One case: `given SETUP (args) : (expected) then CHECK:(value) [constraints]`, |
 | `case_tail` | `compiler/parse/front/parse/decl/func/cases/case/tuple.id` | One case: `given SETUP (args) : (expected) then CHECK:(value) [constraints]`, |
-| `take_cases` | `compiler/parse/front/parse/decl/func/cases/cases.id` | Returns 0 so it can be called from push_func's return clause, which is the |
-| `push_case` | `compiler/parse/front/parse/decl/func/cases/cases.id` | A case is a "case" node -- its arguments in nl1, its expected values in nl2 |
-| `case_owner` | `compiler/parse/front/parse/decl/func/cases/cases.id` | The case's file is written into its node now, while `pfile` still lines up |
+| `take_cases` | `compiler/parse/front/parse/decl/func/cases/collect.id` | Returns 0 so it can be called from push_func's return clause, which is the |
+| `push_case` | `compiler/parse/front/parse/decl/func/cases/collect.id` | A case is a "case" node -- its arguments in nl1, its expected values in nl2 |
+| `case_owner` | `compiler/parse/front/parse/decl/func/cases/collect.id` | The case's file is written into its node now, while `pfile` still lines up |
 | `case_tuple` | `compiler/parse/front/parse/decl/func/cases/more/fill.id` | A parenthesised tuple of case literals. |
 | `scan_tuple` | `compiler/parse/front/parse/decl/func/cases/more/fill.id` | A parenthesised tuple of case literals. |
 | `fill_tuple` | `compiler/parse/front/parse/decl/func/cases/more/fill.id` | A parenthesised tuple of case literals. |
@@ -169,9 +169,9 @@ once this compiler uses a construct on itself.
 | `check_lit` | `compiler/parse/front/parse/decl/func/cases/more/lit/check.id` | A case takes literals only: a number, a string, a negated number, or a list |
 | `is_lit` | `compiler/parse/front/parse/decl/func/cases/more/lit/check.id` | A case takes literals only: a number, a string, a negated number, or a list |
 | `all_lit` | `compiler/parse/front/parse/decl/func/cases/more/lit/check.id` | A case takes literals only: a number, a string, a negated number, or a list |
-| `big_o` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/bound.id` | A bound, `O(n log n)`, read back as the text it spells. |
-| `bound_body` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/bound.id` | A bound, `O(n log n)`, read back as the text it spells. |
-| `bound_inner` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/bound.id` | A bound, `O(n log n)`, read back as the text it spells. |
+| `big_o` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/bigo.id` | A bound, `O(n log n)`, read back as the text it spells. |
+| `bound_body` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/bigo.id` | A bound, `O(n log n)`, read back as the text it spells. |
+| `bound_inner` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/bigo.id` | A bound, `O(n log n)`, read back as the text it spells. |
 | `bound_close` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/more/check.id` | Only the bounds docs/TESTS.md defines may be claimed. Anything else is |
 | `bound_check` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/more/check.id` | Only the bounds docs/TESTS.md defines may be claimed. Anything else is |
 | `bound_known` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/more/check.id` | Only the bounds docs/TESTS.md defines may be claimed. Anything else is |
@@ -183,24 +183,24 @@ once this compiler uses a construct on itself.
 | `bound_parts` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/parts.id` | The words between a bound's parentheses. |
 | `bound_step` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/parts.id` | The words between a bound's parentheses. |
 | `bound_sep` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/bound/parts.id` | The words between a bound's parentheses. |
-| `cons_list` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/cons.id` | The constraint list: `[time:O(n), mem:O(1)]`, optional. Parsed from |
-| `cons_one` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/cons.id` | The constraint list: `[time:O(n), mem:O(1)]`, optional. Parsed from |
-| `conscase_len` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/cons.id` | cons_push (rest.id) pushes the three claim columns in step, one entry each |
+| `cons_list` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/list.id` | The constraint list: `[time:O(n), mem:O(1)]`, optional. Parsed from |
+| `cons_one` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/list.id` | The constraint list: `[time:O(n), mem:O(1)]`, optional. Parsed from |
+| `conscase_len` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/list.id` | cons_push (rest.id) pushes the three claim columns in step, one entry each |
 | `cons_rest` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/rest.id` | The rest of one claim, once its kind has been read: `: O(...)`. |
 | `cons_bound` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/rest.id` | The rest of one claim, once its kind has been read: `: O(...)`. |
 | `cons_push` | `compiler/parse/front/parse/decl/func/cases/more/lit/cons/rest.id` | The case being parsed is the last one whose start has been recorded. |
 | `leaf_lit` | `compiler/parse/front/parse/decl/func/cases/more/lit/kinds.id` | The leaves a case literal may be built from. |
 | `leaf_num` | `compiler/parse/front/parse/decl/func/cases/more/lit/kinds.id` | The leaves a case literal may be built from. |
 | `neg_lit` | `compiler/parse/front/parse/decl/func/cases/more/lit/kinds.id` | `-1` is a unary minus applied to a literal, not a literal of its own. |
-| `parse_program` | `compiler/parse/front/parse/decl/func/func.id` | Parse every declaration in the file. An ordinary function is pushed onto |
-| `parse_func` | `compiler/parse/front/parse/decl/func/func.id` | function: name ( params ) { body } return TYPE expr ;   (or `return void;`) |
-| `func_sig` | `compiler/parse/front/parse/decl/func/func.id` | Parse every declaration in the file. An ordinary function is pushed onto |
-| `parse_segments` | `compiler/parse/front/parse/decl/func/sig/chain/chain.id` | A function may continue into a chain: |
-| `chain_loop` | `compiler/parse/front/parse/decl/func/sig/chain/chain.id` | `chain` is a keyword (lex/chars/classify/ident_kw.id), so this reads the |
-| `take_chain` | `compiler/parse/front/parse/decl/func/sig/chain/chain.id` | The parameters are restated for the reader, and must match exactly -- they |
+| `parse_program` | `compiler/parse/front/parse/decl/func/define.id` | Parse every declaration in the file. An ordinary function is pushed onto |
+| `parse_func` | `compiler/parse/front/parse/decl/func/define.id` | function: name ( params ) { body } return TYPE expr ;   (or `return void;`) |
+| `func_sig` | `compiler/parse/front/parse/decl/func/define.id` | Parse every declaration in the file. An ordinary function is pushed onto |
 | `chain_same` | `compiler/parse/front/parse/decl/func/sig/chain/same.id` | The restated parameters must match the function's own, exactly. |
 | `chain_each` | `compiler/parse/front/parse/decl/func/sig/chain/same.id` | The restated parameters must match the function's own, exactly. |
 | `chain_one` | `compiler/parse/front/parse/decl/func/sig/chain/same.id` | s1 is the type and s2 the name, so this compares both halves of the |
+| `parse_segments` | `compiler/parse/front/parse/decl/func/sig/chain/segments.id` | A function may continue into a chain: |
+| `chain_loop` | `compiler/parse/front/parse/decl/func/sig/chain/segments.id` | `chain` is a keyword (lex/chars/classify/ident_kw.id), so this reads the |
+| `take_chain` | `compiler/parse/front/parse/decl/func/sig/chain/segments.id` | The parameters are restated for the reader, and must match exactly -- they |
 | `chain_tail` | `compiler/parse/front/parse/decl/func/sig/chain/tail.id` | Appending one chain segment to the body it continues. |
 | `chain_add` | `compiler/parse/front/parse/decl/func/sig/chain/tail.id` | Appending one chain segment to the body it continues. |
 | `parse_params` | `compiler/parse/front/parse/decl/func/sig/params/list.id` | Parameter list: ( [type name (, type name)*] ) |
@@ -214,6 +214,9 @@ once this compiler uses a construct on itself.
 | `ret_expr` | `compiler/parse/front/parse/decl/func/sig/parts/ret_expr.id` | The return expression: none for `void`, otherwise an expression. A void |
 | `mk_grp7` | `compiler/parse/front/parse/decl/func/sig/parts/ret_expr.id` | A grouping-paren pair recorded at (7, token 5) and at (9, token 2), for |
 | `mk_grp9` | `compiler/parse/front/parse/decl/func/sig/parts/ret_expr.id` | The return expression: none for `void`, otherwise an expression. A void |
+| `parse_type` | `compiler/parse/front/parse/decl/func/sig/parts/type/base.id` | Parse a type: a base keyword (int/float/string/void) plus any number of |
+| `type_tail` | `compiler/parse/front/parse/decl/func/sig/parts/type/base.id` | A function type takes no brackets of its own: any that follow belong to its |
+| `add_brackets` | `compiler/parse/front/parse/decl/func/sig/parts/type/base.id` | Parse a type: a base keyword (int/float/string/void) plus any number of |
 | `parse_fn_type` | `compiler/parse/front/parse/decl/func/sig/parts/type/fn.id` | A function type: `func(T1, T2) return R`, parameter types only. |
 | `fn_type_rest` | `compiler/parse/front/parse/decl/func/sig/parts/type/fn.id` | A function type: `func(T1, T2) return R`, parameter types only. |
 | `fn_type_params` | `compiler/parse/front/parse/decl/func/sig/parts/type/fn.id` | The parameter types, joined as the canonical spelling joins them, and the |
@@ -225,9 +228,6 @@ once this compiler uses a construct on itself.
 | `fn_type_ret` | `compiler/parse/front/parse/decl/func/sig/parts/type/more/ret.id` | The return type of a function type, which ends it. The base keyword is read |
 | `fn_type_ret2` | `compiler/parse/front/parse/decl/func/sig/parts/type/more/ret.id` | The return type of a function type, which ends it. The base keyword is read |
 | `fn_type_ret3` | `compiler/parse/front/parse/decl/func/sig/parts/type/more/ret.id` | The return type of a function type, which ends it. The base keyword is read |
-| `parse_type` | `compiler/parse/front/parse/decl/func/sig/parts/type/type.id` | Parse a type: a base keyword (int/float/string/void) plus any number of |
-| `type_tail` | `compiler/parse/front/parse/decl/func/sig/parts/type/type.id` | A function type takes no brackets of its own: any that follow belong to its |
-| `add_brackets` | `compiler/parse/front/parse/decl/func/sig/parts/type/type.id` | Parse a type: a base keyword (int/float/string/void) plus any number of |
 | `void_close` | `compiler/parse/front/parse/decl/func/sig/parts/void/scan.id` | One past the parenthesis that closes the one at `lo`. Counted rather than |
 | `void_step` | `compiler/parse/front/parse/decl/func/sig/parts/void/scan.id` | One past the parenthesis that closes the one at `lo`. Counted rather than |
 | `void_tail` | `compiler/parse/front/parse/decl/func/sig/parts/void/tail.id` | `} return void;` takes no expression, and writing one there is a mistake |
@@ -253,21 +253,21 @@ once this compiler uses a construct on itself.
 | `cons_fix1` | `compiler/parse/front/parse/decl/top/decl/native/fixture.id` | A single `ident` token, "time" -- for decl/func/cases/more/lit/cons/bound/ |
 | `eprints_fix` | `compiler/parse/front/parse/decl/top/decl/native/fixture.id` | `eprints:("hi")`, the other half of then_print_dispatch's branch. |
 | `traps_fix` | `compiler/parse/front/parse/decl/top/decl/native/fixture.id` | `traps:("hi")`, for then_traps_or_check's traps branch and |
-| `parse_fn` | `compiler/parse/front/parse/decl/top/decl/native/native.id` | `native` declarations: a function whose body is native code a backend |
-| `parse_native` | `compiler/parse/front/parse/decl/top/decl/native/native.id` | `native` declarations: a function whose body is native code a backend |
-| `native_sig` | `compiler/parse/front/parse/decl/top/decl/native/native.id` | `native` declarations: a function whose body is native code a backend |
+| `parse_fn` | `compiler/parse/front/parse/decl/top/decl/native/head.id` | `native` declarations: a function whose body is native code a backend |
+| `parse_native` | `compiler/parse/front/parse/decl/top/decl/native/head.id` | `native` declarations: a function whose body is native code a backend |
+| `native_sig` | `compiler/parse/front/parse/decl/top/decl/native/head.id` | `native` declarations: a function whose body is native code a backend |
 | `native_ret` | `compiler/parse/front/parse/decl/top/decl/native/tail.id` | The return clause of a `native` declaration, and its node. The clause is |
 | `native_type` | `compiler/parse/front/parse/decl/top/decl/native/tail.id` | The return clause of a `native` declaration, and its node. The clause is |
 | `native_node` | `compiler/parse/front/parse/decl/top/decl/native/tail.id` | -1 for the return expression, as for `return void`: there is none to check. |
-| `init_consts` | `compiler/parse/front/parse/decl/top/marker/const/const.id` | A `#const` marker and the declaration after it: a constant from the |
-| `take_const` | `compiler/parse/front/parse/decl/top/marker/const/const.id` | A `#const` marker and the declaration after it: a constant from the |
-| `reg_const` | `compiler/parse/front/parse/decl/top/marker/const/const.id` | Registered in the same export tables an in-function `export` fills, so the |
 | `lc_env` | `compiler/parse/front/parse/decl/top/marker/const/fixture.id` | A synthetic conf.id constant, registered the way reg_const registers a real |
 | `lc_reg` | `compiler/parse/front/parse/decl/top/marker/const/fixture.id` | A synthetic conf.id constant, registered the way reg_const registers a real |
 | `lc_reg_setup` | `compiler/parse/front/parse/decl/top/marker/const/fixture.id` | A synthetic conf.id constant, registered the way reg_const registers a real |
 | `lc_env2` | `compiler/parse/front/parse/decl/top/marker/const/reg.id` | Registering a scalar or a one-element list conf.id constant in a single |
 | `lc_reg_int` | `compiler/parse/front/parse/decl/top/marker/const/reg.id` | Registering a scalar or a one-element list conf.id constant in a single |
 | `lc_reg_list1` | `compiler/parse/front/parse/decl/top/marker/const/reg.id` | Registering a scalar or a one-element list conf.id constant in a single |
+| `init_consts` | `compiler/parse/front/parse/decl/top/marker/const/take.id` | A `#const` marker and the declaration after it: a constant from the |
+| `take_const` | `compiler/parse/front/parse/decl/top/marker/const/take.id` | A `#const` marker and the declaration after it: a constant from the |
+| `reg_const` | `compiler/parse/front/parse/decl/top/marker/const/take.id` | Registered in the same export tables an in-function `export` fills, so the |
 | `init_files` | `compiler/parse/front/parse/decl/top/marker/file/cur_file.id` | Which source file the compiler is currently reading. The pipeline hands |
 | `cur_file` | `compiler/parse/front/parse/decl/top/marker/file/cur_file.id` | Which source file the compiler is currently reading. The pipeline hands |
 | `take_file` | `compiler/parse/front/parse/decl/top/marker/file/cur_file.id` | The marker carries the unit as well as the path (see unit/split.id): the |
@@ -301,9 +301,9 @@ once this compiler uses a construct on itself.
 | `fill_args` | `compiler/parse/front/parse/expr/atom/lit/call/args_int.id` | Argument list body + the integer leaf. |
 | `skip_comma` | `compiler/parse/front/parse/expr/atom/lit/call/args_int.id` | Argument list body + the integer leaf. |
 | `parse_int` | `compiler/parse/front/parse/expr/atom/lit/call/args_int.id` | Argument list body + the integer leaf. |
-| `finish_atom` | `compiler/parse/front/parse/expr/atom/lit/call/call.id` | After an identifier: a '(' makes it a call, otherwise it is a variable. |
-| `parse_call` | `compiler/parse/front/parse/expr/atom/lit/call/call.id` | After an identifier: a '(' makes it a call, otherwise it is a variable. |
-| `scan_args` | `compiler/parse/front/parse/expr/atom/lit/call/call.id` | consume '(' args ')', pushing each argument node id onto `args` |
+| `finish_atom` | `compiler/parse/front/parse/expr/atom/lit/call/atom.id` | After an identifier: a '(' makes it a call, otherwise it is a variable. |
+| `parse_call` | `compiler/parse/front/parse/expr/atom/lit/call/atom.id` | After an identifier: a '(' makes it a call, otherwise it is a variable. |
+| `scan_args` | `compiler/parse/front/parse/expr/atom/lit/call/atom.id` | consume '(' args ')', pushing each argument node id onto `args` |
 | `finish_int` | `compiler/parse/front/parse/expr/atom/lit/call/finish_int.id` | The tail of args_int.id's parse_int: building the "int" node needs both |
 | `dec_val` | `compiler/parse/front/parse/expr/atom/lit/int/bigint.id` | An integer literal that does not fit a 32-bit int is a `word`, not a |
 | `dec_step` | `compiler/parse/front/parse/expr/atom/lit/int/bigint.id` | An integer literal that does not fit a 32-bit int is a `word`, not a |
@@ -323,9 +323,9 @@ once this compiler uses a construct on itself.
 | `is_addop` | `compiler/parse/front/parse/expr/atom/lit/more/str_ops.id` | The string leaf, and the operator-class predicates. |
 | `fold_mul_tail` | `compiler/parse/front/parse/expr/atom/primary/more.id` | The tail of primary.id's fold_mul -- see ladder/arith/fold/more.id for |
 | `paren_primary` | `compiler/parse/front/parse/expr/atom/primary/more.id` | A binary operation written inside parentheses builds the same tree as one |
-| `fold_mul` | `compiler/parse/front/parse/expr/atom/primary/primary.id` | multiplicative fold + the primary production. |
-| `parse_primary` | `compiler/parse/front/parse/expr/atom/primary/primary.id` | primary: '(' expr ')' | '[' array literal | INT | STR | ident (var or call) |
-| `parse_paren` | `compiler/parse/front/parse/expr/atom/primary/primary.id` | multiplicative fold + the primary production. |
+| `fold_mul` | `compiler/parse/front/parse/expr/atom/primary/mul_primary.id` | multiplicative fold + the primary production. |
+| `parse_primary` | `compiler/parse/front/parse/expr/atom/primary/mul_primary.id` | primary: '(' expr ')' | '[' array literal | INT | STR | ident (var or call) |
+| `parse_paren` | `compiler/parse/front/parse/expr/atom/primary/mul_primary.id` | multiplicative fold + the primary production. |
 | `no_case_word` | `compiler/parse/front/parse/expr/atom/primary/reserved.id` | `given` and `stdin` begin the parts of a test case that come before its |
 | `no_func_word` | `compiler/parse/front/parse/expr/atom/primary/reserved.id` | `func` begins a function type (docs/SPEC.md), which stands wherever a type |
 | `reserved_word_tokens` | `compiler/parse/front/parse/expr/atom/primary/reserved.id` | `func;` then `given;`, for the reserved-word checks above. |
@@ -363,9 +363,9 @@ once this compiler uses a construct on itself.
 | `case_min_fix` | `compiler/parse/front/parse/expr/ladder/bits/shift/fixture.id` | `:(6)` and `(5):(6)` -- for decl/func/cases/case/tuple.id's cases (a |
 | `import_fix` | `compiler/parse/front/parse/expr/ladder/bits/shift/fixture.id` | `:(6)` and `(5):(6)` -- for decl/func/cases/case/tuple.id's cases (a |
 | `fold_shift_tail` | `compiler/parse/front/parse/expr/ladder/bits/shift/more.id` | The tail of shift.id's fold step -- see arith/fold/more.id for why the |
-| `parse_shift` | `compiler/parse/front/parse/expr/ladder/bits/shift/shift.id` | The shift level -- the tightest of the bitwise group, just above additive. |
-| `fold_shift` | `compiler/parse/front/parse/expr/ladder/bits/shift/shift.id` | The shift level -- the tightest of the bitwise group, just above additive. |
-| `is_shiftop` | `compiler/parse/front/parse/expr/ladder/bits/shift/shift.id` | `>>` is the arithmetic (sign-propagating) shift; the logical one is the |
+| `parse_shift` | `compiler/parse/front/parse/expr/ladder/bits/shift/ops.id` | The shift level -- the tightest of the bitwise group, just above additive. |
+| `fold_shift` | `compiler/parse/front/parse/expr/ladder/bits/shift/ops.id` | The shift level -- the tightest of the bitwise group, just above additive. |
+| `is_shiftop` | `compiler/parse/front/parse/expr/ladder/bits/shift/ops.id` | `>>` is the arithmetic (sign-propagating) shift; the logical one is the |
 | `parse_and` | `compiler/parse/front/parse/expr/ladder/logic/and.id` | Logical-and level, between or and equality/relational. |
 | `fold_and` | `compiler/parse/front/parse/expr/ladder/logic/and.id` | Logical-and level, between or and equality/relational. |
 | `relop_at` | `compiler/parse/front/parse/expr/ladder/logic/lookahead.id` | A call may not be an argument to a call, so a `while` condition that reads |
@@ -377,9 +377,6 @@ once this compiler uses a construct on itself.
 | `parse_stmt4` | `compiler/parse/front/parse/stmt/dispatch/decl_start.id` | The leaf of statement dispatch: assignment vs expression statement, plus the |
 | `is_decl_start` | `compiler/parse/front/parse/stmt/dispatch/decl_start.id` | a declaration starts with `export` or a type keyword |
 | `is_type` | `compiler/parse/front/parse/stmt/dispatch/decl_start.id` | The leaf of statement dispatch: assignment vs expression statement, plus the |
-| `parse_stmt` | `compiler/parse/front/parse/stmt/dispatch/dispatch.id` | Statement dispatch: if / while / declaration / assignment / expression-stmt. |
-| `parse_stmt2` | `compiler/parse/front/parse/stmt/dispatch/dispatch.id` | Statement dispatch: if / while / declaration / assignment / expression-stmt. |
-| `parse_stmt3` | `compiler/parse/front/parse/stmt/dispatch/dispatch.id` | Statement dispatch: if / while / declaration / assignment / expression-stmt. |
 | `fnrhs_fix` | `compiler/parse/front/parse/stmt/dispatch/more/fixture.id` | A registered function plus a started case (fn_fixture, |
 | `then_fix` | `compiler/parse/front/parse/stmt/dispatch/more/fixture.id` | `then myfn:(6)`, for case_thens/then_one/case_rest. |
 | `then_prints_fix` | `compiler/parse/front/parse/stmt/dispatch/more/fixture.id` | `then prints:("hi")`, for the prints/eprints half of then_dispatch. |
@@ -389,6 +386,9 @@ once this compiler uses a construct on itself.
 | `is_assign` | `compiler/parse/front/parse/stmt/dispatch/more/is_assign.id` | `name = ...` is an assignment; anything else starting here is an expression |
 | `cur2_text` | `compiler/parse/front/parse/stmt/dispatch/more/is_assign.id` | `name = ...` is an assignment; anything else starting here is an expression |
 | `skip_semi` | `compiler/parse/front/parse/stmt/dispatch/more/is_assign.id` | `name = ...` is an assignment; anything else starting here is an expression |
+| `parse_stmt` | `compiler/parse/front/parse/stmt/dispatch/route.id` | Statement dispatch: if / while / declaration / assignment / expression-stmt. |
+| `parse_stmt2` | `compiler/parse/front/parse/stmt/dispatch/route.id` | Statement dispatch: if / while / declaration / assignment / expression-stmt. |
+| `parse_stmt3` | `compiler/parse/front/parse/stmt/dispatch/route.id` | Statement dispatch: if / while / declaration / assignment / expression-stmt. |
 | `else_body` | `compiler/parse/front/parse/stmt/form/branch/else_if.id` | What follows an `else`: either a nested if (an `else if` chain) or a block. |
 | `at_elif` | `compiler/parse/front/parse/stmt/form/branch/else_if.id` | 0 = no else arm, 1 = `else if`, 2 = a plain `else { ... }`. The third case |
 | `if_tail` | `compiler/parse/front/parse/stmt/form/branch/else_if.id` | What follows an `else`: either a nested if (an `else if` chain) or a block. |
@@ -401,14 +401,14 @@ once this compiler uses a construct on itself.
 | `decl_rhs` | `compiler/parse/front/parse/stmt/form/decl/assign.id` | Declaration right-hand side, and assignment. |
 | `parse_assign` | `compiler/parse/front/parse/stmt/form/decl/assign.id` | Declaration right-hand side, and assignment. |
 | `assign_rhs` | `compiler/parse/front/parse/stmt/form/decl/assign.id` | Declaration right-hand side, and assignment. |
-| `parse_decl` | `compiler/parse/front/parse/stmt/form/decl/decl.id` | Declaration: [export] type name = expr ; |
-| `take_export` | `compiler/parse/front/parse/stmt/form/decl/decl.id` | Declaration: [export] type name = expr ; |
-| `finish_decl` | `compiler/parse/front/parse/stmt/form/decl/decl.id` | Declaration: [export] type name = expr ; |
+| `parse_decl` | `compiler/parse/front/parse/stmt/form/decl/declare.id` | Declaration: [export] type name = expr ; |
+| `take_export` | `compiler/parse/front/parse/stmt/form/decl/declare.id` | Declaration: [export] type name = expr ; |
+| `finish_decl` | `compiler/parse/front/parse/stmt/form/decl/declare.id` | Declaration: [export] type name = expr ; |
 | `is_iassign` | `compiler/parse/front/parse/stmt/form/decl/index_assign.id` | Index-assignment: an identifier followed by `[` begins a list-element |
 | `parse_iassign` | `compiler/parse/front/parse/stmt/form/decl/index_assign.id` | Index-assignment: an identifier followed by `[` begins a list-element |
 | `parse_blank` | `compiler/parse/front/parse/stmt/form/more.id` | A bare keyword statement: `blank` or `break`. Both carry no operand, so the |
 | `parse_ret_or` | `compiler/parse/front/parse/stmt/form/more.id` | An early `return`, or on to the rest of the statement forms. |
-| `finish_decl_tail` | `compiler/parse/front/parse/stmt/form/more.id` | The tail of parse_decl, split off because decl/decl.id is already full, and |
+| `finish_decl_tail` | `compiler/parse/front/parse/stmt/form/more.id` | The tail of parse_decl, split off because decl/declare.id is already full, and |
 | `cur_kind` | `compiler/parse/front/tokens/cursor.id` | Cursor over the token store. `pos` is a one-element int[] cell passed by |
 | `cur_text` | `compiler/parse/front/tokens/cursor.id` | Cursor over the token store. `pos` is a one-element int[] cell passed by |
 | `advance` | `compiler/parse/front/tokens/cursor.id` | Consuming a token records its line. Every node is built immediately after |
@@ -421,9 +421,9 @@ once this compiler uses a construct on itself.
 | `no_op_atom` | `compiler/parse/front/tokens/expect/unexpected.id` | An operator where an expression belongs. |
 | `unexpected_msg` | `compiler/parse/front/tokens/expect/unexpected.id` | The lexer folds a whole `/* ... */` into one `/*` token precisely so this |
 | `syn_err_tail` | `compiler/parse/front/tokens/expect/unexpected.id` | The tail of syn_err.id's syn_err -- that file is already full. |
-| `load` | `compiler/parse/front/tokens/load/load.id` | No cases: read_all() is a builtin that reads the process's real stdin fd |
-| `load_at` | `compiler/parse/front/tokens/load/load.id` | Loader: read the lexer's "<kind> <value>" lines from stdin into the token |
-| `take_line` | `compiler/parse/front/tokens/load/load.id` | Loader: read the lexer's "<kind> <value>" lines from stdin into the token |
+| `load` | `compiler/parse/front/tokens/load/ingest.id` | No cases: read_all() is a builtin that reads the process's real stdin fd |
+| `load_at` | `compiler/parse/front/tokens/load/ingest.id` | Loader: read the lexer's "<kind> <value>" lines from stdin into the token |
+| `take_line` | `compiler/parse/front/tokens/load/ingest.id` | Loader: read the lexer's "<kind> <value>" lines from stdin into the token |
 | `init_pos` | `compiler/parse/front/tokens/load/more/pos/span.id` | Where each token sits on its line, for `idc --fix`: a `span V` line from |
 | `set_span` | `compiler/parse/front/tokens/load/more/pos/span.id` | Padded first, so a token that arrived without a span cannot shift every |
 | `span_pad` | `compiler/parse/front/tokens/load/more/pos/span.id` | Where each token sits on its line, for `idc --fix`: a `span V` line from |
@@ -465,9 +465,9 @@ once this compiler uses a construct on itself.
 | `setup_rest` | `compiler/parse/front/tree/init/setup/more.id` | The tail of init.id's setup -- that file is already full. |
 | `full_env` | `compiler/parse/front/tree/init/setup/more.id` | The env a front/tokens or front/tree case needs beyond env_init's own |
 | `last_tspan` | `compiler/parse/front/tree/init/setup/more.id` | The column-packed value most recently pushed onto tspan, for set_span and |
-| `node_index` | `compiler/parse/front/tree/make/array/array.id` | Constructors for the array/index nodes. |
-| `node_arr` | `compiler/parse/front/tree/make/array/array.id` | Constructors for the array/index nodes. |
-| `node_iassign` | `compiler/parse/front/tree/make/array/array.id` | Constructors for the array/index nodes. |
+| `node_index` | `compiler/parse/front/tree/make/array/ctor.id` | Constructors for the array/index nodes. |
+| `node_arr` | `compiler/parse/front/tree/make/array/ctor.id` | Constructors for the array/index nodes. |
+| `node_iassign` | `compiler/parse/front/tree/make/array/ctor.id` | Constructors for the array/index nodes. |
 | `asm_reg_fix1c` | `compiler/parse/front/tree/make/array/fixture.id` | The rest of ../../node/newnode/fixture.id's afret/afretn scenarios, and |
 | `asm_reg_fix1d` | `compiler/parse/front/tree/make/array/fixture.id` | The rest of ../../node/newnode/fixture.id's afret/afretn scenarios, and |
 | `afret_last` | `compiler/parse/front/tree/make/array/fixture.id` | The rest of ../../node/newnode/fixture.id's afret/afretn scenarios, and |
@@ -492,9 +492,9 @@ once this compiler uses a construct on itself.
 | `node_if` | `compiler/parse/front/tree/make/stmt/if_while_func.id` | `elif` is 1 when the else arm was written `else if`, and 0 when it was |
 | `node_while` | `compiler/parse/front/tree/make/stmt/if_while_func.id` | compound-statement + function constructors. |
 | `node_func` | `compiler/parse/front/tree/make/stmt/if_while_func.id` | compound-statement + function constructors. |
-| `i1_of` | `compiler/parse/front/tree/node/field/field.id` | Field accessors, part 1. |
-| `i2_of` | `compiler/parse/front/tree/node/field/field.id` | Field accessors, part 1. |
-| `s1_of` | `compiler/parse/front/tree/node/field/field.id` | Field accessors, part 1. |
+| `i1_of` | `compiler/parse/front/tree/node/field/core.id` | Field accessors, part 1. |
+| `i2_of` | `compiler/parse/front/tree/node/field/core.id` | Field accessors, part 1. |
+| `s1_of` | `compiler/parse/front/tree/node/field/core.id` | Field accessors, part 1. |
 | `s2_of` | `compiler/parse/front/tree/node/field/field_more.id` | Field accessors, part 2 (the second string field and the two child lists). |
 | `l1_of` | `compiler/parse/front/tree/node/field/field_more.id` | Field accessors, part 2 (the second string field and the two child lists). |
 | `l2_of` | `compiler/parse/front/tree/node/field/field_more.id` | Field accessors, part 2 (the second string field and the two child lists). |
@@ -507,12 +507,12 @@ once this compiler uses a construct on itself.
 | `last_kind` | `compiler/parse/front/tree/node/newnode/cases/recent.id` | Field readers for the most recently pushed node, used as `then` checks by |
 | `last_s1` | `compiler/parse/front/tree/node/newnode/cases/recent.id` | Field readers for the most recently pushed node, used as `then` checks by |
 | `last_l1` | `compiler/parse/front/tree/node/newnode/cases/recent.id` | Field readers for the most recently pushed node, used as `then` checks by |
+| `newnode` | `compiler/parse/front/tree/node/newnode/construct.id` | newnode appends a full node and returns its id. newleaf is the common case |
+| `newleaf` | `compiler/parse/front/tree/node/newnode/construct.id` | newnode appends a full node and returns its id. newleaf is the common case |
+| `k_of` | `compiler/parse/front/tree/node/newnode/construct.id` | newnode appends a full node and returns its id. newleaf is the common case |
 | `newnode_tail` | `compiler/parse/front/tree/node/newnode/more.id` | The tail of newnode.id's newnode -- that file is already full. |
 | `push_pos` | `compiler/parse/front/tree/node/newnode/more.id` | A node's last token, and its first-token slot, which only a statement fills |
 | `mk_one_kind` | `compiler/parse/front/tree/node/newnode/more.id` | One "shell" leaf's kind pushed to nkind, nothing else -- newnode_tail's own |
-| `newnode` | `compiler/parse/front/tree/node/newnode/newnode.id` | newnode appends a full node and returns its id. newleaf is the common case |
-| `newleaf` | `compiler/parse/front/tree/node/newnode/newnode.id` | newnode appends a full node and returns its id. newleaf is the common case |
-| `k_of` | `compiler/parse/front/tree/node/newnode/newnode.id` | newnode appends a full node and returns its id. newleaf is the common case |
 | `push_kii` | `compiler/parse/front/tree/node/push_node.id` | Appending a node: push one cell onto each of the seven parallel lists. |
 | `push_ss` | `compiler/parse/front/tree/node/push_node.id` | nunit rides along here for the same reason nline rides along below: every |
 | `push_ll` | `compiler/parse/front/tree/node/push_node.id` | nline keeps the parallel lists aligned: every node gets a line slot, filled |
@@ -577,9 +577,9 @@ once this compiler uses a construct on itself.
 | `fwd_env` | `compiler/parse/mid/form/decomp/checks/genname/strip/prefix.id` | The env every fwd/ (../../fwd/) case fixture builds on: env_init, the |
 | `farm_a` | `compiler/parse/mid/form/decomp/checks/genname/strip/prefix.id` | param "a":int and the var "a" that reads it -- id 0 and 1 of every fwd/ |
 | `strip_idstd_prefix` | `compiler/parse/mid/form/decomp/checks/genname/strip/prefix.id` | The env every fwd/ (../../fwd/) case fixture builds on: env_init, the |
-| `lz_expr` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/expr.id` | Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same |
-| `lz_e2` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/expr.id` | Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same |
-| `lz_e3` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/expr.id` | Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same |
+| `lz_expr` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/fingerprint.id` | Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same |
+| `lz_e2` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/fingerprint.id` | Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same |
+| `lz_e3` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/fingerprint.id` | Warning 2's own fingerprint, alongside mid/form/unique/canon/'s: the same |
 | `lz_e4` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/more/expr_more.id` | The end of the dispatch (../expr.id) -- a `call`, an `index` (./index.id), |
 | `lz_bin` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/more/expr_more.id` | The end of the dispatch (../expr.id) -- a `call`, an `index` (./index.id), |
 | `lz_bin_pair` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/more/expr_more.id` | The end of the dispatch (../expr.id) -- a `call`, an `index` (./index.id), |
@@ -587,17 +587,17 @@ once this compiler uses a construct on itself.
 | `lz_pair` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/more/pair_call.id` | The two-operand shape (mirrors mid/form/unique/canon/expr/more/args.id's |
 | `lz_call` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/more/pair_call.id` | The two-operand shape (mirrors mid/form/unique/canon/expr/more/args.id's |
 | `lz_args` | `compiler/parse/mid/form/decomp/checks/loose/canon/expr/more/pair_call.id` | The two-operand shape (mirrors mid/form/unique/canon/expr/more/args.id's |
-| `lz_func` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/func.id` | A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/ |
-| `lz_func_body` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/func.id` | A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/ |
-| `lz_logic` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/func.id` | A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/ |
+| `lz_func` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/fingerprint.id` | A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/ |
+| `lz_func_body` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/fingerprint.id` | A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/ |
+| `lz_logic` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/fingerprint.id` | A whole function's loose fingerprint, mirroring mid/form/unique/canon/func/ |
 | `lz_body` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/more/body_ret.id` | Statements in order (mirrors canon_body), and the return clause (mirrors |
 | `lz_ret` | `compiler/parse/mid/form/decomp/checks/loose/canon/func/more/body_ret.id` | Statements in order (mirrors canon_body), and the return clause (mirrors |
+| `lz_stmt` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/fingerprint.id` | A statement, loosely: only `decl`, `assign` and `exprstmt` are recognised |
+| `lz_st2` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/fingerprint.id` | A statement, loosely: only `decl`, `assign` and `exprstmt` are recognised |
+| `lz_decl` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/fingerprint.id` | Reuses decl_tag and decl_name (mid/form/unique/canon/stmt/more/decl.id) as |
 | `lz_decl_tail` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/more/decl_tail.id` |  |
 | `lz_assign` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/more/decl_tail.id` | An `assign` statement, loosely: the assigned name is positional, exactly |
 | `lz_assign_tail` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/more/decl_tail.id` |  |
-| `lz_stmt` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/stmt.id` | A statement, loosely: only `decl`, `assign` and `exprstmt` are recognised |
-| `lz_st2` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/stmt.id` | A statement, loosely: only `decl`, `assign` and `exprstmt` are recognised |
-| `lz_decl` | `compiler/parse/mid/form/decomp/checks/loose/canon/stmt/stmt.id` | Reuses decl_tag and decl_name (mid/form/unique/canon/stmt/more/decl.id) as |
 | `check_loose_dup` | `compiler/parse/mid/form/decomp/checks/loose/entry.id` |  |
 | `lz_fixture` | `compiler/parse/mid/form/decomp/checks/loose/entry.id` | [0] and [1] are int literal nodes with different values -- enough to show |
 | `lz_build` | `compiler/parse/mid/form/decomp/checks/loose/entry.id` |  |
@@ -618,15 +618,18 @@ once this compiler uses a construct on itself.
 | `notes_base` | `compiler/parse/mid/form/decomp/notesfx.id` | State for back/drive/sink/notes.id's own cases -- filed here because |
 | `notes_setup` | `compiler/parse/mid/form/decomp/notesfx.id` | State for back/drive/sink/notes.id's own cases -- filed here because |
 | `notes_push` | `compiler/parse/mid/form/decomp/notesfx.id` | State for back/drive/sink/notes.id's own cases -- filed here because |
-| `fix_decls` | `compiler/parse/mid/form/fix/out/emit/decl/decl.id` |  |
-| `fix_decl_at` | `compiler/parse/mid/form/fix/out/emit/decl/decl.id` | A reused event (fixe_ru, out/emit/name/pick/reuse/) is still sep -- its |
-| `fix_decl` | `compiler/parse/mid/form/fix/out/emit/decl/decl.id` |  |
 | `fix_decl_head` | `compiler/parse/mid/form/fix/out/emit/decl/head.id` |  |
 | `fix_stmt_at` | `compiler/parse/mid/form/fix/out/emit/decl/head.id` | A statement's new declarations go before its first token, indented as its |
 | `fix_subs` | `compiler/parse/mid/form/fix/out/emit/decl/head.id` |  |
+| `fix_decls` | `compiler/parse/mid/form/fix/out/emit/decl/loop.id` |  |
+| `fix_decl_at` | `compiler/parse/mid/form/fix/out/emit/decl/loop.id` | A reused event (fixe_ru, out/emit/name/pick/reuse/) is still sep -- its |
+| `fix_decl` | `compiler/parse/mid/form/fix/out/emit/decl/loop.id` |  |
 | `fix_sub_at` | `compiler/parse/mid/form/fix/out/emit/decl/subs.id` | Inside a declared value, each outermost value declared before it is replaced |
-| `fix_tokline_node_fixture` | `compiler/parse/mid/form/fix/out/emit/decl/subs.id` | A leaf node ("ident", not one of the kinds out/span/beg/beg.id branches |
+| `fix_tokline_node_fixture` | `compiler/parse/mid/form/fix/out/emit/decl/subs.id` | A leaf node ("ident", not one of the kinds out/span/beg/start.id branches |
 | `fix_decl_fixture` | `compiler/parse/mid/form/fix/out/emit/decl/subs.id` | Two events for out/emit/decl/{decl,head}.id's own cases: event 0 at token |
+| `fix_emit_stmt` | `compiler/parse/mid/form/fix/out/emit/name/drive.id` | A statement's edits: each value that moves is declared before it in the |
+| `fix_names` | `compiler/parse/mid/form/fix/out/emit/name/drive.id` | fix_rcache_taint runs again for every event here (plan/walk/ev/push/ev.id |
+| `fix_name_at` | `compiler/parse/mid/form/fix/out/emit/name/drive.id` | A statement's edits: each value that moves is declared before it in the |
 | `fix_choose_arg` | `compiler/parse/mid/form/fix/out/emit/name/free/choose/arg.id` | A whole argument named because it has a call somewhere inside it |
 | `fix_choose_arg_taken` | `compiler/parse/mid/form/fix/out/emit/name/free/choose/arg.id` | The stem already taken, as if an earlier argument had claimed it. |
 | `fix_span_fixture6` | `compiler/parse/mid/form/fix/out/emit/name/free/choose/arg.id` | The call node itself at fixe_n[0] (plan/walk/ev/push/one/ru.id's |
@@ -642,21 +645,18 @@ once this compiler uses a construct on itself.
 | `fix_free_fn` | `compiler/parse/mid/form/fix/out/emit/name/free/var.id` |  |
 | `fix_free_var` | `compiler/parse/mid/form/fix/out/emit/name/free/var.id` | lookup_var answers from another unit when the name is not in this one, which |
 | `fix_free_round` | `compiler/parse/mid/form/fix/out/emit/name/free/var.id` |  |
-| `fix_emit_stmt` | `compiler/parse/mid/form/fix/out/emit/name/name.id` | A statement's edits: each value that moves is declared before it in the |
-| `fix_names` | `compiler/parse/mid/form/fix/out/emit/name/name.id` | fix_rcache_taint runs again for every event here (plan/walk/ev/push/ev.id |
-| `fix_name_at` | `compiler/parse/mid/form/fix/out/emit/name/name.id` | A statement's edits: each value that moves is declared before it in the |
 | `fix_pick_name` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/name.id` |  |
 | `fix_pick_fixture_an0` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/name.id` | fixe_an[0] empty: fix_pick_name2 takes the plain, fix_stem branch. |
 | `fix_pick_fixture_an_named` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/name.id` | fixe_an[0] set, and fixe_cl[0] forced (fix_pick_fixture_named): fix_pick_name2 |
-| `fix_pick_name2` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/name2.id` | fixe_an holds a candidate name for every argument, whether or not it is |
-| `fix_pick_fixture_n` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/name2.id` | A literal node at fixe_n[0], for the branch fixe_cl leaves plain: fix_stem |
-| `fix_pick_fixture_named` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/name2.id` | The same node, forced (fixe_cl 3): the node that has a call inside it, or |
 | `fix_pick` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/pick.id` |  |
 | `fixe_nm_named` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/pick.id` | fixe_nm holds strings, so the sum that witnesses an lset into an int column |
 | `fix_nameat_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/pick.id` | fix_name_pick_miss_fixture (../reuse/lookup/pick.id) leaves the naming |
+| `fix_pick_name2` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/resolve.id` | fixe_an holds a candidate name for every argument, whether or not it is |
+| `fix_pick_fixture_n` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/resolve.id` | A literal node at fixe_n[0], for the branch fixe_cl leaves plain: fix_stem |
+| `fix_pick_fixture_named` | `compiler/parse/mid/form/fix/out/emit/name/pick/main/resolve.id` | The same node, forced (fixe_cl 3): the node that has a call inside it, or |
 | `fix_rcache_add` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | A call that cannot write is cached under its own text, so a later |
 | `fix_rcache_reset` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | fixd_rk, fixd_rn: the cached calls' text and the name each was given, this |
-| `fix_span_fixture3` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | The two token kinds fix_depth (out/span/beg/beg.id's fix_match) reads while |
+| `fix_span_fixture3` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/add.id` | The two token kinds fix_depth (out/span/beg/start.id's fix_match) reads while |
 | `fix_rkey` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/key.id` |  |
 | `fix_toktext` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/key.id` |  |
 | `fix_toktext_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/key.id` |  |
@@ -667,7 +667,7 @@ once this compiler uses a construct on itself.
 | `fix_rcache_find_hit` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/find.id` | The call node fix_span_fixture (plan/walk/ev/push/one/ru.id) builds, with |
 | `fix_span_fixture1` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/find.id` | plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the |
 | `fix_name_pick` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | A name for event i: an earlier identical, still-trustworthy call's, if one |
-| `fix_name_pick_miss_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | fixe_n[0] as fix_pick_fixture_n (out/emit/name/pick/main/name2.id) already |
+| `fix_name_pick_miss_fixture` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | fixe_n[0] as fix_pick_fixture_n (out/emit/name/pick/main/resolve.id) already |
 | `fix_name_pick_miss_fixture2` | `compiler/parse/mid/form/fix/out/emit/name/pick/reuse/lookup/pick.id` | A name for event i: an earlier identical, still-trustworthy call's, if one |
 | `fix_stem` | `compiler/parse/mid/form/fix/out/emit/name/pick/stem.id` | The tree's convention: a call's value is <callee>_v. A value that is not a |
 | `fix_stem2` | `compiler/parse/mid/form/fix/out/emit/name/pick/stem.id` | The tree's convention: a call's value is <callee>_v. A value that is not a |
@@ -675,9 +675,9 @@ once this compiler uses a construct on itself.
 | `fix_emit_r` | `compiler/parse/mid/form/fix/out/emit/resid/rec.id` |  |
 | `fix_note_span` | `compiler/parse/mid/form/fix/out/emit/resid/rec.id` |  |
 | `fix_note_tok` | `compiler/parse/mid/form/fix/out/emit/resid/rec.id` |  |
-| `fix_resid_at` | `compiler/parse/mid/form/fix/out/emit/resid/resid.id` |  |
-| `fix_replace` | `compiler/parse/mid/form/fix/out/emit/resid/resid.id` |  |
-| `fix_note_fixture` | `compiler/parse/mid/form/fix/out/emit/resid/resid.id` | fixd_lo and fixd_hi (run/state/grp/reset.id) are pushed in step by |
+| `fix_resid_at` | `compiler/parse/mid/form/fix/out/emit/resid/replace.id` |  |
+| `fix_replace` | `compiler/parse/mid/form/fix/out/emit/resid/replace.id` |  |
+| `fix_note_fixture` | `compiler/parse/mid/form/fix/out/emit/resid/replace.id` | fixd_lo and fixd_hi (run/state/grp/reset.id) are pushed in step by |
 | `fix_seq` | `compiler/parse/mid/form/fix/out/emit/resid/seq.id` |  |
 | `fix_emit_pt` | `compiler/parse/mid/form/fix/out/emit/resid/seq.id` | A zero-width edit: text inserted at p, a LINE|COL. |
 | `fixd_lo_len` | `compiler/parse/mid/form/fix/out/emit/resid/seq.id` | The low end of each token range this run replaces, one push per noted |
@@ -697,11 +697,11 @@ once this compiler uses a construct on itself.
 | `ret_widens_fn` | `compiler/parse/mid/form/fix/out/ret/clause/ret/fixture/widens.id` | A func node whose declared return type does not narrow the value it hands |
 | `ret_nonplain_fn` | `compiler/parse/mid/form/fix/out/ret/clause/ret/fixture/widens.id` | A func node whose declared return type does not narrow the value it hands |
 | `fix_ret_needs` | `compiler/parse/mid/form/fix/out/ret/clause/ret/narrow.id` | Whether a plain return clause (ret.id's fix_ret) still needs the rewrite: |
-| `fix_ret_narrows` | `compiler/parse/mid/form/fix/out/ret/clause/ret/narrow.id` | The same guard fix_narrow uses (plan/walk/kind/narrow/narrow.id), and the |
+| `fix_ret_narrows` | `compiler/parse/mid/form/fix/out/ret/clause/ret/narrow.id` | The same guard fix_narrow uses (plan/walk/kind/narrow/decide.id), and the |
 | `fix_gcl_fixture` | `compiler/parse/mid/form/fix/out/ret/clause/ret/narrow.id` | Unrelated to this file's own two functions: run/state/more.id's fix_gcl_at |
-| `fix_ret` | `compiler/parse/mid/form/fix/out/ret/clause/ret/ret.id` | A return clause that is not a name or a literal, or one that is but |
-| `fix_ret_at` | `compiler/parse/mid/form/fix/out/ret/clause/ret/ret.id` | A return clause that is not a name or a literal, or one that is but |
-| `fix_ret_ok` | `compiler/parse/mid/form/fix/out/ret/clause/ret/ret.id` | A return clause that is not a name or a literal, or one that is but |
+| `fix_ret` | `compiler/parse/mid/form/fix/out/ret/clause/ret/value.id` | A return clause that is not a name or a literal, or one that is but |
+| `fix_ret_at` | `compiler/parse/mid/form/fix/out/ret/clause/ret/value.id` | A return clause that is not a name or a literal, or one that is but |
+| `fix_ret_ok` | `compiler/parse/mid/form/fix/out/ret/clause/ret/value.id` | A return clause that is not a name or a literal, or one that is but |
 | `fix_tletter` | `compiler/parse/mid/form/fix/out/ret/more/letter.id` |  |
 | `fix_tletter2` | `compiler/parse/mid/form/fix/out/ret/more/letter.id` |  |
 | `fix_tsuf` | `compiler/parse/mid/form/fix/out/ret/more/tsuf.id` | The type part of a return name: one l per list level, then a letter for the |
@@ -713,18 +713,18 @@ once this compiler uses a construct on itself.
 | `fix_paren_pts` | `compiler/parse/mid/form/fix/out/ret/paren/more.id` |  |
 | `fix_paren_rec` | `compiler/parse/mid/form/fix/out/ret/paren/more.id` |  |
 | `fix_in_moved` | `compiler/parse/mid/form/fix/out/ret/paren/more.id` |  |
-| `fix_parens` | `compiler/parse/mid/form/fix/out/ret/paren/paren.id` | Parentheses where a comparison and a bitwise operator mix bare, around the |
-| `fix_paren_node` | `compiler/parse/mid/form/fix/out/ret/paren/paren.id` | Parentheses where a comparison and a bitwise operator mix bare, around the |
-| `fix_paren_pair` | `compiler/parse/mid/form/fix/out/ret/paren/paren.id` | Parentheses where a comparison and a bitwise operator mix bare, around the |
 | `fix_paren_two` | `compiler/parse/mid/form/fix/out/ret/paren/side.id` |  |
 | `fix_paren_side` | `compiler/parse/mid/form/fix/out/ret/paren/side.id` | Not inside text another edit of this run moves: that text is copied from the |
 | `fix_paren_emit` | `compiler/parse/mid/form/fix/out/ret/paren/side.id` |  |
-| `fix_ibeg` | `compiler/parse/mid/form/fix/out/span/beg/beg.id` | Where each kind of node begins: a call at its name, before the parenthesis |
-| `fix_ibeg2` | `compiler/parse/mid/form/fix/out/span/beg/beg.id` | Where each kind of node begins: a call at its name, before the parenthesis |
-| `fix_ibeg3` | `compiler/parse/mid/form/fix/out/span/beg/beg.id` | Where each kind of node begins: a call at its name, before the parenthesis |
+| `fix_parens` | `compiler/parse/mid/form/fix/out/ret/paren/wrap.id` | Parentheses where a comparison and a bitwise operator mix bare, around the |
+| `fix_paren_node` | `compiler/parse/mid/form/fix/out/ret/paren/wrap.id` | Parentheses where a comparison and a bitwise operator mix bare, around the |
+| `fix_paren_pair` | `compiler/parse/mid/form/fix/out/ret/paren/wrap.id` | Parentheses where a comparison and a bitwise operator mix bare, around the |
 | `fix_ibeg4` | `compiler/parse/mid/form/fix/out/span/beg/match.id` |  |
 | `fix_match` | `compiler/parse/mid/form/fix/out/span/beg/match.id` | Back from the closing token c to the opening one that matches it. |
 | `fix_depth` | `compiler/parse/mid/form/fix/out/span/beg/match.id` |  |
+| `fix_ibeg` | `compiler/parse/mid/form/fix/out/span/beg/start.id` | Where each kind of node begins: a call at its name, before the parenthesis |
+| `fix_ibeg2` | `compiler/parse/mid/form/fix/out/span/beg/start.id` | Where each kind of node begins: a call at its name, before the parenthesis |
+| `fix_ibeg3` | `compiler/parse/mid/form/fix/out/span/beg/start.id` | Where each kind of node begins: a call at its name, before the parenthesis |
 | `fix_at` | `compiler/parse/mid/form/fix/out/span/beg/text.id` | A token's start, or its end, as LINE|COL; a node's span as both. |
 | `fix_after` | `compiler/parse/mid/form/fix/out/span/beg/text.id` | A token's start, or its end, as LINE|COL; a node's span as both. |
 | `fix_span` | `compiler/parse/mid/form/fix/out/span/beg/text.id` | A token's start, or its end, as LINE|COL; a node's span as both. |
@@ -744,21 +744,21 @@ once this compiler uses a construct on itself.
 | `fix_anc` | `compiler/parse/mid/form/fix/plan/decide/touch/anc.id` | Whether an event after i, up to hi, is flagged in fl and contains i. |
 | `fix_anc_at` | `compiler/parse/mid/form/fix/plan/decide/touch/anc.id` | Whether an event after i, up to hi, is flagged in fl and contains i. |
 | `fix_evtype` | `compiler/parse/mid/form/fix/plan/decide/touch/anc.id` | Whether an event after i, up to hi, is flagged in fl and contains i. |
+| `fix_touches` | `compiler/parse/mid/form/fix/plan/decide/touch/scan.id` | Whether a call that moves could run a function that declares an export, |
+| `fix_touch_at` | `compiler/parse/mid/form/fix/plan/decide/touch/scan.id` | Whether a call that moves could run a function that declares an export, |
+| `fix_call_touch` | `compiler/parse/mid/form/fix/plan/decide/touch/scan.id` | A builtin runs no id code. A call through a function value, or to a name |
 | `fix_mark_sep` | `compiler/parse/mid/form/fix/plan/decide/touch/sep.id` | A moved event is declared on its own unless another that moves contains it |
 | `fix_sep_at` | `compiler/parse/mid/form/fix/plan/decide/touch/sep.id` | A moved event is declared on its own unless another that moves contains it |
 | `fix_touch_fixture` | `compiler/parse/mid/form/fix/plan/decide/touch/sep.id` | Two events for the decide/ walks. fix_fixture exports every fixe_ column |
-| `fix_touches` | `compiler/parse/mid/form/fix/plan/decide/touch/touch.id` | Whether a call that moves could run a function that declares an export, |
-| `fix_touch_at` | `compiler/parse/mid/form/fix/plan/decide/touch/touch.id` | Whether a call that moves could run a function that declares an export, |
-| `fix_call_touch` | `compiler/parse/mid/form/fix/plan/decide/touch/touch.id` | A builtin runs no id code. A call through a function value, or to a name |
 | `fix_refuse_md` | `compiler/parse/mid/form/fix/plan/decide/why/refuse.id` |  |
 | `fix_md_why` | `compiler/parse/mid/form/fix/plan/decide/why/refuse.id` |  |
 | `fix_type_ok` | `compiler/parse/mid/form/fix/plan/decide/why/type.id` |  |
 | `fix_why_pos` | `compiler/parse/mid/form/fix/plan/decide/why/type.id` | The statement's first token has to have columns, or there is nowhere to put |
 | `fix_refuse` | `compiler/parse/mid/form/fix/plan/decide/why/type.id` |  |
-| `fix_why_type` | `compiler/parse/mid/form/fix/plan/decide/why/why.id` | fix_why used to sit here, dispatching to fix_why_cond and fix_why_type; it |
-| `fix_wbuild` | `compiler/parse/mid/form/fix/plan/reach/build/build.id` | fixd_wm: 1 for each function, indexed as fnames is, that can run a function |
-| `fix_winit` | `compiler/parse/mid/form/fix/plan/reach/build/build.id` |   fixd_wadj  for each function, the functions that call or name it |
-| `fix_winit2` | `compiler/parse/mid/form/fix/plan/reach/build/build.id` | fixd_wm: 1 for each function, indexed as fnames is, that can run a function |
+| `fix_why_type` | `compiler/parse/mid/form/fix/plan/decide/why/type_reason.id` | fix_why used to sit here, dispatching to fix_why_cond and fix_why_type; it |
+| `fix_wbuild` | `compiler/parse/mid/form/fix/plan/reach/build/driver.id` | fixd_wm: 1 for each function, indexed as fnames is, that can run a function |
+| `fix_winit` | `compiler/parse/mid/form/fix/plan/reach/build/driver.id` |   fixd_wadj  for each function, the functions that call or name it |
+| `fix_winit2` | `compiler/parse/mid/form/fix/plan/reach/build/driver.id` | fixd_wm: 1 for each function, indexed as fnames is, that can run a function |
 | `fix_wfill_fixture` | `compiler/parse/mid/form/fix/plan/reach/build/fill.id` | fnames is registered by full_env's own env, not by any fix fixture, so |
 | `fix_wrow` | `compiler/parse/mid/form/fix/plan/reach/build/fill.id` | fnames is registered by full_env's own env, not by any fix fixture, so |
 | `fix_wedges` | `compiler/parse/mid/form/fix/plan/reach/build/fill.id` | fnames is registered by full_env's own env, not by any fix fixture, so |
@@ -777,12 +777,12 @@ once this compiler uses a construct on itself.
 | `fix_wseed` | `compiler/parse/mid/form/fix/plan/reach/edge/ref/seed.id` | fixd_wq is deliberately left uncased, on blast radius rather than cost: a |
 | `fix_wseed_fixture` | `compiler/parse/mid/form/fix/plan/reach/edge/ref/seed.id` | fixd_wm seeded with one unmarked entry directly, bypassing fix_wfill's |
 | `fixd_wadj_all` | `compiler/parse/mid/form/fix/plan/reach/edge/ref/seed.id` | fixd_wadj as a whole, for fix_wedge's own cases (edge/ref/main.id is at |
+| `fix_std_scan` | `compiler/parse/mid/form/fix/plan/reach/std/detect.id` | Whether the names this run introduces take the idstd_ prefix. The standard |
+| `fix_std_rows` | `compiler/parse/mid/form/fix/plan/reach/std/detect.id` | Whether the names this run introduces take the idstd_ prefix. The standard |
+| `fix_std_fixture` | `compiler/parse/mid/form/fix/plan/reach/std/detect.id` | fix_fixture builds the state a --fix function needs but not the declaration |
 | `fix_std_row` | `compiler/parse/mid/form/fix/plan/reach/std/row.id` |  |
 | `fix_std_count` | `compiler/parse/mid/form/fix/plan/reach/std/row.id` |  |
 | `fix_std_row_fixture` | `compiler/parse/mid/form/fix/plan/reach/std/row.id` | Row 0 passes fix_std_row's own unit/exp guard (unit 0, exported 0) and its |
-| `fix_std_scan` | `compiler/parse/mid/form/fix/plan/reach/std/std.id` | Whether the names this run introduces take the idstd_ prefix. The standard |
-| `fix_std_rows` | `compiler/parse/mid/form/fix/plan/reach/std/std.id` | Whether the names this run introduces take the idstd_ prefix. The standard |
-| `fix_std_fixture` | `compiler/parse/mid/form/fix/plan/reach/std/std.id` | fix_fixture builds the state a --fix function needs but not the declaration |
 | `fix_walk_arg` | `compiler/parse/mid/form/fix/plan/walk/ev/kids/arg.id` |  |
 | `fix_walk_arg2` | `compiler/parse/mid/form/fix/plan/walk/ev/kids/arg.id` | an: the name to use if this argument narrows nothing itself but is named as |
 | `fix_rkey_fixture_leaf` | `compiler/parse/mid/form/fix/plan/walk/ev/kids/arg.id` | A leaf node with a one-token span (out/emit/name/pick/reuse/key.id's |
@@ -818,12 +818,12 @@ once this compiler uses a construct on itself.
 | `fix_traps` | `compiler/parse/mid/form/fix/plan/walk/kind/class/trap.id` | Division, remainder and the shifts trap (docs/SPEC.md 2.2, 2.3), except by |
 | `fix_traps_setup` | `compiler/parse/mid/form/fix/plan/walk/kind/class/trap.id` | Division, remainder and the shifts trap (docs/SPEC.md 2.2, 2.3), except by |
 | `tr_unsafe_rhs_val` | `compiler/parse/mid/form/fix/plan/walk/kind/class/trap.id` | Division, remainder and the shifts trap (docs/SPEC.md 2.2, 2.3), except by |
+| `fix_unsafe_rhs` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/decide.id` |  |
+| `fix_narrow` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/decide.id` | The parameter type an argument narrows to, or "". The test the call checks |
+| `fix_narrows` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/decide.id` |  |
 | `fix_fparam` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/fparam.id` |  |
 | `fix_simple_fixture` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/fparam.id` |  |
 | `fix_type_ok_fixture` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/fparam.id` |  |
-| `fix_unsafe_rhs` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/narrow.id` |  |
-| `fix_narrow` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/narrow.id` | The parameter type an argument narrows to, or "". The test the call checks |
-| `fix_narrows` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/narrow.id` |  |
 | `fix_ptype` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/param.id` |  |
 | `fix_pparam` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/param.id` | Only when the count matches: otherwise the checks report that instead and |
 | `fix_pparam_fixture` | `compiler/parse/mid/form/fix/plan/walk/kind/narrow/param.id` |  |
@@ -856,12 +856,12 @@ once this compiler uses a construct on itself.
 | `fix_state3` | `compiler/parse/mid/form/fix/run/state/grp/reset.id` | Per function, reset by running this again (run/walk/enter.id): |
 | `fix_state3b` | `compiler/parse/mid/form/fix/run/state/grp/reset.id` | The repeated-call cache (out/emit/name/pick/reuse/) is a function's own |
 | `fix_span_fixture4` | `compiler/parse/mid/form/fix/run/state/grp/reset.id` | The third span token (plan/walk/ev/push/one/ru.id's fix_span_fixture |
+| `fix_state` | `compiler/parse/mid/form/fix/run/state/init.id` | The state of one fix run. |
+| `fix_state1` | `compiler/parse/mid/form/fix/run/state/init.id` | The state of one fix run. |
+| `fix_state2` | `compiler/parse/mid/form/fix/run/state/init.id` | The state of one fix run. |
 | `fix_gcl_at` | `compiler/parse/mid/form/fix/run/state/more.id` | Pairs are recorded inside out, so the outermost is the one that closes last. |
 | `fix_ev_reset` | `compiler/parse/mid/form/fix/run/state/more.id` | The events of one statement, reset by declaring them again (plan/walk/). |
 | `fixd_hi_len` | `compiler/parse/mid/form/fix/run/state/more.id` | The high end of the ranges fixd_lo_len counts, pushed in step with it by |
-| `fix_state` | `compiler/parse/mid/form/fix/run/state/state.id` | The state of one fix run. |
-| `fix_state1` | `compiler/parse/mid/form/fix/run/state/state.id` | The state of one fix run. |
-| `fix_state2` | `compiler/parse/mid/form/fix/run/state/state.id` | The state of one fix run. |
 | `fix_enter` | `compiler/parse/mid/form/fix/run/walk/enter.id` |  |
 | `fix_setfile` | `compiler/parse/mid/form/fix/run/walk/enter.id` |  |
 | `fixd_std_on` | `compiler/parse/mid/form/fix/run/walk/enter.id` | fixd_std is one cell, not a list that grows: fix_init (../entry.id) lsets |
@@ -871,15 +871,15 @@ once this compiler uses a construct on itself.
 | `fix_stmt` | `compiler/parse/mid/form/fix/run/walk/stmt/branch.id` | md says how often a statement's expression is evaluated: 0 once, where it |
 | `fix_if` | `compiler/parse/mid/form/fix/run/walk/stmt/branch.id` | md says how often a statement's expression is evaluated: 0 once, where it |
 | `fix_cond` | `compiler/parse/mid/form/fix/run/walk/stmt/branch.id` | A declaration, an assignment and an expression statement keep their one |
-| `fix_used_at` | `compiler/parse/mid/form/fix/run/walk/stmt/stmt.id` | A parameter or a declaration anywhere in the function reserves its name. |
-| `fix_body` | `compiler/parse/mid/form/fix/run/walk/stmt/stmt.id` | A parameter or a declaration anywhere in the function reserves its name. |
-| `fix_block` | `compiler/parse/mid/form/fix/run/walk/stmt/stmt.id` | A parameter or a declaration anywhere in the function reserves its name. |
 | `fix_then` | `compiler/parse/mid/form/fix/run/walk/stmt/tail.id` |  |
 | `fix_while` | `compiler/parse/mid/form/fix/run/walk/stmt/tail.id` |  |
 | `fix_if_fixture` | `compiler/parse/mid/form/fix/run/walk/stmt/tail.id` | An "if" node (cond 0, empty then/else) and a "while" node (same cond, empty |
-| `canon_expr` | `compiler/parse/mid/form/unique/canon/expr/expr.id` | A literal fingerprints by value, not spelling: the lexer already turns hex |
-| `ce2` | `compiler/parse/mid/form/unique/canon/expr/expr.id` | Canonicalising an expression, mirroring idc.py's _canon_expr. |
-| `ce3` | `compiler/parse/mid/form/unique/canon/expr/expr.id` | An imported global keeps its name: two functions that differ only by which |
+| `fix_used_at` | `compiler/parse/mid/form/fix/run/walk/stmt/walk.id` | A parameter or a declaration anywhere in the function reserves its name. |
+| `fix_body` | `compiler/parse/mid/form/fix/run/walk/stmt/walk.id` | A parameter or a declaration anywhere in the function reserves its name. |
+| `fix_block` | `compiler/parse/mid/form/fix/run/walk/stmt/walk.id` | A parameter or a declaration anywhere in the function reserves its name. |
+| `canon_expr` | `compiler/parse/mid/form/unique/canon/expr/canon.id` | A literal fingerprints by value, not spelling: the lexer already turns hex |
+| `ce2` | `compiler/parse/mid/form/unique/canon/expr/canon.id` | Canonicalising an expression, mirroring idc.py's _canon_expr. |
+| `ce3` | `compiler/parse/mid/form/unique/canon/expr/canon.id` | An imported global keeps its name: two functions that differ only by which |
 | `ce4` | `compiler/parse/mid/form/unique/canon/expr/expr_more.id` | The rest of the expression kinds. ce5 ends the chain, so its default is the |
 | `ce5` | `compiler/parse/mid/form/unique/canon/expr/expr_more.id` | The end of the chain. Its default is reached only by an expression kind |
 | `canon_callee` | `compiler/parse/mid/form/unique/canon/expr/expr_more.id` | A callee keeps its name -- except a call to the function being canonicalised |
@@ -912,9 +912,9 @@ once this compiler uses a construct on itself.
 | `call_fp` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/call.id` | A call's fingerprint (moved out of ce5 so its body still fits in three |
 | `call_fp_fixture` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/call.id` | A plain call ("foo(3)") and a `ushr(x, 0)` -- the logical-shift-by-zero |
 | `iassign2_fixture` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/call.id` | canon_iassign's second case (../../../../stmt/more/decl.id) needs an |
-| `bin_identity` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
-| `lit_is` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident.id` | Is node `nid` the integer literal `v`? A wide literal (too big for an |
-| `ident_zero_sym` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
+| `bin_identity` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/fold.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
+| `lit_is` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/fold.id` | Is node `nid` the integer literal `v`? A wide literal (too big for an |
+| `ident_zero_sym` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/fold.id` | x+0, 0+x, x|0, 0|x, x^0 and 0^x fingerprint as x: adding, or-ing or |
 | `ident_zero_right` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident_more.id` | x-0, x<<0 and x>>0 fingerprint as x: unlike + | ^, subtraction and the |
 | `ident_one` | `compiler/parse/mid/form/unique/canon/expr/more/const/ident/ident_more.id` | x*1, 1*x and x/1 fingerprint as x. `1/x` is not a no-op, so it keeps its |
 | `canon_func` | `compiler/parse/mid/form/unique/canon/func/more/func.id` | A whole function's fingerprint: its signature and its logic, and nothing of |
@@ -927,6 +927,9 @@ once this compiler uses a construct on itself.
 | `canon_func_body` | `compiler/parse/mid/form/unique/canon/func/more/parts/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
 | `canon_func_tail` | `compiler/parse/mid/form/unique/canon/func/more/parts/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
 | `canon_logic` | `compiler/parse/mid/form/unique/canon/func/more/parts/tail.id` | The rest of canon_func, split so that block stays within the action limit. |
+| `canon_segs` | `compiler/parse/mid/form/unique/canon/func/more/segs/chain.id` | A chained function's fingerprints: one per segment, not one per function. |
+| `segs_plain` | `compiler/parse/mid/form/unique/canon/func/more/segs/chain.id` | A function with a real body: its signature, then its segments. |
+| `segs_walk` | `compiler/parse/mid/form/unique/canon/func/more/segs/chain.id` | The accumulator starts empty and is flushed at every seam; the trailing |
 | `cst_flow` | `compiler/parse/mid/form/unique/canon/func/more/segs/kind/flow.id` | `break` and an early `return` in a fingerprint. Without these they reached |
 | `flow_canon_fixture` | `compiler/parse/mid/form/unique/canon/func/more/segs/kind/flow.id` | A `break`, and a `return 4;` from an int function. |
 | `canon_begun_j_fixture` | `compiler/parse/mid/form/unique/canon/func/more/segs/kind/native.id` | A canonicalisation begun over lz_j's program rather than lz_g's. |
@@ -937,9 +940,6 @@ once this compiler uses a construct on itself.
 | `segs_loop` | `compiler/parse/mid/form/unique/canon/func/more/segs/more.id` | The walk itself, and what happens at a seam. |
 | `segs_step` | `compiler/parse/mid/form/unique/canon/func/more/segs/more.id` | A marker ends the current segment; anything else belongs to it. The marker |
 | `segs_flush` | `compiler/parse/mid/form/unique/canon/func/more/segs/more.id` | One finished segment, and the accumulator emptied for the next. `cur` is |
-| `canon_segs` | `compiler/parse/mid/form/unique/canon/func/more/segs/segs.id` | A chained function's fingerprints: one per segment, not one per function. |
-| `segs_plain` | `compiler/parse/mid/form/unique/canon/func/more/segs/segs.id` | A function with a real body: its signature, then its segments. |
-| `segs_walk` | `compiler/parse/mid/form/unique/canon/func/more/segs/segs.id` | The accumulator starts empty and is flushed at every seam; the trailing |
 | `cn` | `compiler/parse/mid/form/unique/canon/func/names.id` | The position map: parameters and locals of the function being canonicalised, |
 | `cn_add` | `compiler/parse/mid/form/unique/canon/func/names.id` | The position map: parameters and locals of the function being canonicalised, |
 | `canon_var` | `compiler/parse/mid/form/unique/canon/func/names.id` | A name read as a value. A function's name is a function value and keeps its |
@@ -949,6 +949,9 @@ once this compiler uses a construct on itself.
 | `canon_else2` | `compiler/parse/mid/form/unique/canon/stmt/block.id` | The else arm, and a statement list. |
 | `canon_else3` | `compiler/parse/mid/form/unique/canon/stmt/block.id` | An empty `else { }` adds nothing, matching idc.py, where an empty else list |
 | `canon_body` | `compiler/parse/mid/form/unique/canon/stmt/block.id` | Statements in order, separated by `;`. The order matters twice over: it is |
+| `canon_stmt` | `compiler/parse/mid/form/unique/canon/stmt/canon.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
+| `cst2` | `compiler/parse/mid/form/unique/canon/stmt/canon.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
+| `cst3` | `compiler/parse/mid/form/unique/canon/stmt/canon.id` | The two compound statements. An if carries its else arm (which may be |
 | `canon_decl` | `compiler/parse/mid/form/unique/canon/stmt/more/decl.id` | Declaration, and index-assignment. |
 | `decl_name` | `compiler/parse/mid/form/unique/canon/stmt/more/decl.id` | The declared name: positional for a local, verbatim for an export, since an |
 | `canon_iassign` | `compiler/parse/mid/form/unique/canon/stmt/more/decl.id` | `base[index] = value`. The parser folds the parsed index target into the |
@@ -964,9 +967,6 @@ once this compiler uses a construct on itself.
 | `iassign_val` | `compiler/parse/mid/form/unique/canon/stmt/more/tail/if.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
 | `cst_if` | `compiler/parse/mid/form/unique/canon/stmt/more/tail/if.id` | The last step of canon_iassign, and the "if" arm of cst3, split so each of |
 | `elif_begun_fixture` | `compiler/parse/mid/form/unique/canon/stmt/more/tail/if.id` | elif_fixture's if nodes with a canonicalisation begun over them: cst_if and |
-| `canon_stmt` | `compiler/parse/mid/form/unique/canon/stmt/stmt.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
-| `cst2` | `compiler/parse/mid/form/unique/canon/stmt/stmt.id` | Canonicalising a statement, mirroring idc.py's _canon_stmt. Same eager |
-| `cst3` | `compiler/parse/mid/form/unique/canon/stmt/stmt.id` | The two compound statements. An if carries its else arm (which may be |
 | `incase_init` | `compiler/parse/mid/form/unique/dump/cases/casefixture.id` | casenode/casefn (a case's node range) need init_cases, not part of |
 | `incase_fixture` | `compiler/parse/mid/form/unique/dump/cases/casefixture.id` | casenode/casefn (a case's node range) need init_cases, not part of |
 | `incase_setup` | `compiler/parse/mid/form/unique/dump/cases/casefixture.id` | One case range, [0, 1000), well past any node id a fresh fixture builds. |
@@ -1032,9 +1032,6 @@ once this compiler uses a construct on itself.
 | `dg_t_exp_node` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/fixture.id` | The parsed pair's rows with an `(import gx)` node made after them, for |
 | `rfn_hand` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/fixture.id` | rfn refilled by hand with "conf.id" alone and its index not yet rebuilt, |
 | `dg_ncout1` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/fixture.id` | Readers and a fixture for dg_cout, the call-only edges (../../graph/build/ |
-| `dg_pop` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/pop.id` | A component is complete when the walk returns to its root: every function |
-| `dg_mark` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/pop.id` | Marks the stack from its top down to dgv, returning dgv's position -- the |
-| `dg_own_comp` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/pop.id` | A component is complete when the walk returns to its root: every function |
 | `tk_nin` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/tkfix/check.id` | Readers of the type check cache's tables, for `then` checks. |
 | `tk_etype_gx` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/tkfix/check.id` | Readers of the type check cache's tables, for `then` checks. |
 | `tk_asm_foo` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/tkfix/check.id` | Readers of the type check cache's tables, for `then` checks. |
@@ -1044,27 +1041,30 @@ once this compiler uses a construct on itself.
 | `tk_t_in1` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/tkfix/late.id` | Fixtures for the type check's cache (mid/types/check/walk/check/tk/), filed |
 | `tk_t_exp_late` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/tkfix/late.id` | Fixtures for the type check's cache (mid/types/check/walk/check/tk/), filed |
 | `tk_t_asm_late` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/tkfix/late.id` | Fixtures for the type check's cache (mid/types/check/walk/check/tk/), filed |
+| `dg_pop` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/unwind.id` | A component is complete when the walk returns to its root: every function |
+| `dg_mark` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/unwind.id` | Marks the stack from its top down to dgv, returning dgv's position -- the |
+| `dg_own_comp` | `compiler/parse/mid/form/unique/dump/digest/scc/pop/unwind.id` | A component is complete when the walk returns to its root: every function |
 | `dg_seal_out` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/edge.id` | One member's out-edges, into the sums dg_seal (seal.id) is building. |
 | `dg_seal_edge` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/edge.id` | An edge to a sealed component adds that component's hash and dirt. One to |
 | `dg_trunc` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/edge.id` | The stack cut back to its first dgp entries once a component is sealed. |
 | `dg_t_stk2` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/fixture.id` | ../../graph/state/fixture.id's graph, stopped where the walk from 0 is about |
 | `dg_t_marked` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/fixture.id` | ../../graph/state/fixture.id's graph, stopped where the walk from 0 is about |
 | `dg_nstk` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/fixture.id` | ../../graph/state/fixture.id's graph, stopped where the walk from 0 is about |
-| `dg_seal` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/seal.id` | Sealing a component: its hash, and whether it is dirty. |
-| `dg_seal_run` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/seal.id` | Sealing a component: its hash, and whether it is dirty. |
-| `dg_seal_one` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/seal.id` | Sealing a component: its hash, and whether it is dirty. |
+| `dg_seal` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/hash.id` | Sealing a component: its hash, and whether it is dirty. |
+| `dg_seal_run` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/hash.id` | Sealing a component: its hash, and whether it is dirty. |
+| `dg_seal_one` | `compiler/parse/mid/form/unique/dump/digest/scc/seal/hash.id` | Sealing a component: its hash, and whether it is dirty. |
 | `dg_comp_at` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/check.id` | Readers of the walk's rows, for the `then` checks of this directory's cases |
 | `dg_low0` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/check.id` | Readers of the walk's rows, for the `then` checks of this directory's cases |
 | `dg_nout1` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/check.id` | Readers of the walk's rows, for the `then` checks of this directory's cases |
 | `dg_succ` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/step.id` | One function's successors, from dgi on: an unvisited one is walked and its |
 | `dg_step` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/step.id` | One function's successors, from dgi on: an unvisited one is walked and its |
 | `dg_lower` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/step.id` | One function's successors, from dgi on: an unvisited one is walked and its |
-| `dg_scc_all` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/visit.id` | Tarjan's strongly connected components over the digest's call graph. |
-| `dg_try` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/visit.id` | Tarjan's strongly connected components over the digest's call graph. |
-| `dg_visit` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/visit.id` | Tarjan's strongly connected components over the digest's call graph. |
-| `print_fingerprints` | `compiler/parse/mid/form/unique/dump/dump.id` | One line per fingerprint, which is why the walk is over `cfp` and not `prog`: |
-| `print_fp_line` | `compiler/parse/mid/form/unique/dump/dump.id` | `i` indexes the fingerprints; the function it belongs to is resolved by |
-| `fp_line` | `compiler/parse/mid/form/unique/dump/dump.id` | file:line, the same two facts a diagnostic's prefix names (../../names/ |
+| `dg_scc_all` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/tarjan.id` | Tarjan's strongly connected components over the digest's call graph. |
+| `dg_try` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/tarjan.id` | Tarjan's strongly connected components over the digest's call graph. |
+| `dg_visit` | `compiler/parse/mid/form/unique/dump/digest/scc/visit/tarjan.id` | Tarjan's strongly connected components over the digest's call graph. |
+| `print_fingerprints` | `compiler/parse/mid/form/unique/dump/fingerprints.id` | One line per fingerprint, which is why the walk is over `cfp` and not `prog`: |
+| `print_fp_line` | `compiler/parse/mid/form/unique/dump/fingerprints.id` | `i` indexes the fingerprints; the function it belongs to is resolved by |
+| `fp_line` | `compiler/parse/mid/form/unique/dump/fingerprints.id` | file:line, the same two facts a diagnostic's prefix names (../../names/ |
 | `uq_fill_all` | `compiler/parse/mid/form/unique/scan/fill.id` | Filling the fingerprint table, and recording which function each entry |
 | `uq_fill_at` | `compiler/parse/mid/form/unique/scan/fill.id` | One entry per segment, each recording the same owning function. For an |
 | `uq_push_segs` | `compiler/parse/mid/form/unique/scan/fill.id` | Filling the fingerprint table, and recording which function each entry |
@@ -1091,12 +1091,12 @@ once this compiler uses a construct on itself.
 | `cw_stmts` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/walk.id` | The loop leaves at the first statement that is not a literal store: the flag |
 | `cw_stmt` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/walk.id` | The body, statement by statement. Every one must give one of the |
 | `cw_assign_fixture` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/more/walk.id` | "x = 4" once "x" is declared, and "y = 5" while it is not -- for |
-| `cw_at` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/wrap.id` | A constant wrapper: a function whose whole result is one scalar literal, |
-| `cw_value` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/wrap.id` | "" unless the function is a constant wrapper, else the constant's |
+| `cw_at` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/scan.id` | A constant wrapper: a function whose whole result is one scalar literal, |
+| `cw_value` | `compiler/parse/mid/form/unique/scan/more/dup/wrap/scan.id` | "" unless the function is a constant wrapper, else the constant's |
+| `dup_probe` | `compiler/parse/mid/form/unique/scan/more/report/dup.id` | One comparison, and the diagnostic. |
+| `report_dup` | `compiler/parse/mid/form/unique/scan/more/report/dup.id` | One comparison, and the diagnostic. |
+| `fname_at` | `compiler/parse/mid/form/unique/scan/more/report/dup.id` | The one place a fingerprint's index becomes a function. `cfpfn` (../../fill.id) |
 | `dup_loc` | `compiler/parse/mid/form/unique/scan/more/report/loc.id` | The i-side of report_dup's message: the location the diagnostic points at. |
-| `dup_probe` | `compiler/parse/mid/form/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
-| `report_dup` | `compiler/parse/mid/form/unique/scan/more/report/report.id` | One comparison, and the diagnostic. |
-| `fname_at` | `compiler/parse/mid/form/unique/scan/more/report/report.id` | The one place a fingerprint's index becomes a function. `cfpfn` (../../fill.id) |
 | `dup_tail` | `compiler/parse/mid/form/unique/scan/more/report/tail.id` | The j-side of report_dup's message: where the earlier, colliding function |
 | `cw_arr_lit` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/build/lit.id` | Whether a list literal is built from nothing but literal elements -- the |
 | `cw_arr_lit2` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/build/lit.id` | Whether a list literal is built from nothing but literal elements -- the |
@@ -1109,9 +1109,9 @@ once this compiler uses a construct on itself.
 | `cw_elem_spell` | `compiler/parse/mid/form/unique/scan/more/reserved/arrlit/spell.id` | A string element is re-quoted; an int or a float already reads as source. |
 | `is_reserved_name` | `compiler/parse/mid/form/unique/scan/more/reserved/check.id` | eprint is named on its own because (import resv_names) is idc.py's list, |
 | `resv_scan_fixture` | `compiler/parse/mid/form/unique/scan/more/reserved/check.id` | "eprint" (the OR's own special case: it is not in resv_names_src, only |
-| `resv_err` | `compiler/parse/mid/form/unique/scan/more/reserved/reserved.id` | A function may not be named after a runtime helper. |
-| `init_resv_names` | `compiler/parse/mid/form/unique/scan/more/reserved/reserved.id` | A function may not be named after a runtime helper. |
-| `resv_names_last` | `compiler/parse/mid/form/unique/scan/more/reserved/reserved.id` | A function may not be named after a runtime helper. |
+| `resv_err` | `compiler/parse/mid/form/unique/scan/more/reserved/runtime.id` | A function may not be named after a runtime helper. |
+| `init_resv_names` | `compiler/parse/mid/form/unique/scan/more/reserved/runtime.id` | A function may not be named after a runtime helper. |
+| `resv_names_last` | `compiler/parse/mid/form/unique/scan/more/reserved/runtime.id` | A function may not be named after a runtime helper. |
 | `check_bodies` | `compiler/parse/mid/form/unique/scan/pass/check.id` | What check_program() calls in place of check_funcs(): the per-function body |
 | `uq_fill` | `compiler/parse/mid/form/unique/scan/pass/check.id` | Fingerprint every function once. Comparing is quadratic in the number of |
 | `uq_scan` | `compiler/parse/mid/form/unique/scan/pass/compare.id` | Comparing the fingerprints. |
@@ -1123,9 +1123,6 @@ once this compiler uses a construct on itself.
 | `exp_one` | `compiler/parse/mid/names/exports/collect/add.id` | An exported declaration is recorded; other statements may nest exports. |
 | `is_export_decl` | `compiler/parse/mid/names/exports/collect/add.id` | An exported declaration is recorded; other statements may nest exports. |
 | `add_export` | `compiler/parse/mid/names/exports/collect/add.id` | An exported declaration is recorded; other statements may nest exports. |
-| `collect_exports` | `compiler/parse/mid/names/exports/collect/collect.id` | Collect exported variables (with their owning function) by scanning each |
-| `scan_func_exports` | `compiler/parse/mid/names/exports/collect/collect.id` | Collect exported variables (with their owning function) by scanning each |
-| `exp_list` | `compiler/parse/mid/names/exports/collect/collect.id` | Collect exported variables (with their owning function) by scanning each |
 | `add_export2` | `compiler/parse/mid/names/exports/collect/more/duplicate.id` | A name may be exported only once (idc.py's pass 1 over exported |
 | `chk_dupexp` | `compiler/parse/mid/names/exports/collect/more/duplicate.id` | A name may be exported only once (idc.py's pass 1 over exported |
 | `dupexp_err` | `compiler/parse/mid/names/exports/collect/more/report.id` | The duplicate is recorded anyway, even though it was just rejected: the |
@@ -1133,6 +1130,9 @@ once this compiler uses a construct on itself.
 | `etypes_len` | `compiler/parse/mid/names/exports/collect/more/report.id` | One entry per exported name, pushed by add_export (../add.id) in step with |
 | `take_resv_name` | `compiler/parse/mid/names/exports/collect/more/resv.id` | resv_names, split out of resv_names_src (compiler/parse/conf.id) the way |
 | `push_resv_name` | `compiler/parse/mid/names/exports/collect/more/resv.id` | resv_names is deliberately left uncased, because a regression here is |
+| `collect_exports` | `compiler/parse/mid/names/exports/collect/walk.id` | Collect exported variables (with their owning function) by scanning each |
+| `scan_func_exports` | `compiler/parse/mid/names/exports/collect/walk.id` | Collect exported variables (with their owning function) by scanning each |
+| `exp_list` | `compiler/parse/mid/names/exports/collect/walk.id` | Collect exported variables (with their owning function) by scanning each |
 | `builtin_list` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The comma-joined spelling the diagnostic prints. The literal it is split |
 | `call_fixture_extern` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The comma-joined spelling the diagnostic prints. The literal it is split |
 | `scnames_fix` | `compiler/parse/mid/names/exports/extern/builtin/more/list.id` | The comma-joined spelling the diagnostic prints. The literal it is split |
@@ -1164,9 +1164,9 @@ once this compiler uses a construct on itself.
 | `chk_dead` | `compiler/parse/mid/names/exports/reach/dead/check.id` | An export whose declaring function is never reached. |
 | `init_reach` | `compiler/parse/mid/names/exports/reach/dead/check.id` | Seeded with "main" unconditionally. A project without one is a library, and |
 | `reach_mark` | `compiler/parse/mid/names/exports/reach/dead/check.id` | Fixpoint: sweep until a sweep adds nothing. The number of sweeps is the |
-| `reach_add` | `compiler/parse/mid/names/exports/reach/dead/more/add/add.id` | Only names this program actually defines are added: a builtin and a |
-| `regrow_prog` | `compiler/parse/mid/names/exports/reach/dead/more/add/add.id` | Only names this program actually defines are added: a builtin and a |
-| `dead_exp_fixture` | `compiler/parse/mid/names/exports/reach/dead/more/add/add.id` | Two exported names whose owners are not in rfn, and an import node reading |
+| `reach_add` | `compiler/parse/mid/names/exports/reach/dead/more/add/grow.id` | Only names this program actually defines are added: a builtin and a |
+| `regrow_prog` | `compiler/parse/mid/names/exports/reach/dead/more/add/grow.id` | Only names this program actually defines are added: a builtin and a |
+| `dead_exp_fixture` | `compiler/parse/mid/names/exports/reach/dead/more/add/grow.id` | Two exported names whose owners are not in rfn, and an import node reading |
 | `rfx_init` | `compiler/parse/mid/names/exports/reach/dead/more/add/index.id` | An index over rfn, so is_reach (../scan.id) is a hash lookup instead of a |
 | `rfn_reindex` | `compiler/parse/mid/names/exports/reach/dead/more/add/index.id` | An index over rfn, so is_reach (../scan.id) is a hash lookup instead of a |
 | `rfx_put` | `compiler/parse/mid/names/exports/reach/dead/more/add/index.id` | An index over rfn, so is_reach (../scan.id) is a hash lookup instead of a |
@@ -1185,9 +1185,6 @@ once this compiler uses a construct on itself.
 | `exp_nested` | `compiler/parse/mid/names/exports/reach/nested.id` | Recurse into compound statements when collecting exports. |
 | `exp_branches` | `compiler/parse/mid/names/exports/reach/nested.id` | Recurse into compound statements when collecting exports. |
 | `exp_loop` | `compiler/parse/mid/names/exports/reach/nested.id` | Recurse into compound statements when collecting exports. |
-| `check_shape` | `compiler/parse/mid/names/limits/expr/expr.id` | Two rules about the shape of an expression. Both say the same thing: a |
-| `shape_node` | `compiler/parse/mid/names/limits/expr/expr.id` | Two rules about the shape of an expression. Both say the same thing: a |
-| `chk_ret_name` | `compiler/parse/mid/names/limits/expr/expr.id` | ni1 is -1 for `} return void;`, which has no expression to judge. |
 | `hc_kids` | `compiler/parse/mid/names/limits/expr/more/kind.id` | Descending into the kinds that have children, and naming a kind in English |
 | `hc_more` | `compiler/parse/mid/names/limits/expr/more/kind.id` | Descending into the kinds that have children, and naming a kind in English |
 | `hc_pair` | `compiler/parse/mid/names/limits/expr/more/kind.id` | Descending into the kinds that have children, and naming a kind in English |
@@ -1200,6 +1197,12 @@ once this compiler uses a construct on itself.
 | `chk_flat_args` | `compiler/parse/mid/names/limits/expr/nest.id` | A call's arguments, each of which may hold at most one level of call |
 | `chk_flat_at` | `compiler/parse/mid/names/limits/expr/nest.id` | A call's arguments, each of which may hold at most one level of call |
 | `has_call` | `compiler/parse/mid/names/limits/expr/nest.id` | A call's arguments, each of which may hold at most one level of call |
+| `check_shape` | `compiler/parse/mid/names/limits/expr/shape.id` | Two rules about the shape of an expression. Both say the same thing: a |
+| `shape_node` | `compiler/parse/mid/names/limits/expr/shape.id` | Two rules about the shape of an expression. Both say the same thing: a |
+| `chk_ret_name` | `compiler/parse/mid/names/limits/expr/shape.id` | ni1 is -1 for `} return void;`, which has no expression to judge. |
+| `check_plain_else` | `compiler/parse/mid/names/limits/report/actions.id` | A trailing `else { ... }`, and the two diagnostics. |
+| `report_actions` | `compiler/parse/mid/names/limits/report/actions.id` | A trailing `else { ... }`, and the two diagnostics. |
+| `report_deep` | `compiler/parse/mid/names/limits/report/actions.id` | A trailing `else { ... }`, and the two diagnostics. |
 | `check_files` | `compiler/parse/mid/names/limits/report/file_count.id` | The 3-functions-per-file rule. The pipeline concatenates every source file |
 | `check_file_at` | `compiler/parse/mid/names/limits/report/file_count.id` | Reported once per file rather than once per function over the limit. |
 | `count_file` | `compiler/parse/mid/names/limits/report/file_count.id` | The 3-functions-per-file rule. The pipeline concatenates every source file |
@@ -1218,9 +1221,6 @@ once this compiler uses a construct on itself.
 | `loc_at` | `compiler/parse/mid/names/limits/report/more/prefix.id` | The `file:line: error: ` prefix for a diagnostic about function `fname`. |
 | `dvname_len` | `compiler/parse/mid/names/limits/report/more/prefix.id` | The `file:line: error: ` prefix for a diagnostic about function `fname`. |
 | `report_short_seg` | `compiler/parse/mid/names/limits/report/more/prefix.id` | A chain continues a function that has run out of room, so a segment that |
-| `check_plain_else` | `compiler/parse/mid/names/limits/report/report.id` | A trailing `else { ... }`, and the two diagnostics. |
-| `report_actions` | `compiler/parse/mid/names/limits/report/report.id` | A trailing `else { ... }`, and the two diagnostics. |
-| `report_deep` | `compiler/parse/mid/names/limits/report/report.id` | A trailing `else { ... }`, and the two diagnostics. |
 | `count_actions` | `compiler/parse/mid/names/limits/shape/actions/count.id` | Counting the actions of a block, mirroring idc.py's block_actions. |
 | `stmt_actions` | `compiler/parse/mid/names/limits/shape/actions/count.id` | A chain marker (front/parse/decl/func/sig/chain/tail.id) records where one |
 | `count_elses` | `compiler/parse/mid/names/limits/shape/actions/count.id` | ni2 is 0 when the if had no else arm at all. An *empty* `else { }` has an |
@@ -1230,9 +1230,9 @@ once this compiler uses a construct on itself.
 | `check_loop` | `compiler/parse/mid/names/limits/shape/actions/nested.id` | The bodies of the two compound statements. A loop body and each arm of an |
 | `elif_fixture2` | `compiler/parse/mid/names/limits/shape/actions/nested.id` | The rest of elif_fixture (../actions/else_chain.id), which ran out of |
 | `check_if` | `compiler/parse/mid/names/limits/shape/actions/nested.id` | The bodies of the two compound statements. A loop body and each arm of an |
-| `check_block` | `compiler/parse/mid/names/limits/shape/block/block.id` | `ln` is the line of the construct that *owns* this block -- the function's |
-| `check_fits` | `compiler/parse/mid/names/limits/shape/block/block.id` | Checking one block, mirroring idc.py's check_block exactly. |
-| `check_count` | `compiler/parse/mid/names/limits/shape/block/block.id` | Only a nested block is counted here. A function's own body arrives at depth |
+| `check_block` | `compiler/parse/mid/names/limits/shape/block/check.id` | `ln` is the line of the construct that *owns* this block -- the function's |
+| `check_fits` | `compiler/parse/mid/names/limits/shape/block/check.id` | Checking one block, mirroring idc.py's check_block exactly. |
+| `check_count` | `compiler/parse/mid/names/limits/shape/block/check.id` | Only a nested block is counted here. A function's own body arrives at depth |
 | `check_failed` | `compiler/parse/mid/names/limits/shape/block/failed.id` | The "something was rejected" flag. id has no stderr and no early exit, so |
 | `note_failure` | `compiler/parse/mid/names/limits/shape/block/failed.id` | Writing through an imported list needs the list as a parameter: an |
 | `regrow_fn` | `compiler/parse/mid/names/limits/shape/block/failed.id` | The "something was rejected" flag. id has no stderr and no early exit, so |
@@ -1251,29 +1251,27 @@ once this compiler uses a construct on itself.
 | `seg_walk` | `compiler/parse/mid/names/limits/shape/block/more/seg.id` | Measuring each segment of a chained function against the three-action limit. |
 | `seg_step` | `compiler/parse/mid/names/limits/shape/block/more/seg.id` | Measuring each segment of a chained function against the three-action limit. |
 | `seg_close` | `compiler/parse/mid/names/limits/shape/block/more/seg.id` | Closing a segment: report it if it ran over, report it if a chain follows a |
-| `fit_given` | `compiler/parse/mid/names/limits/shape/cases/given/given.id` | A case's `given`: the function it names must be a setup -- a function in the |
-| `given_fn` | `compiler/parse/mid/names/limits/shape/cases/given/given.id` | A case's `given`: the function it names must be a setup -- a function in the |
 | `fit_named` | `compiler/parse/mid/names/limits/shape/cases/given/read/fn.id` | A function named in a case (front/parse/decl/func/cases/case/given/elem/fn.id) |
 | `fit_fn` | `compiler/parse/mid/names/limits/shape/cases/given/read/fn.id` | A function named in a case (front/parse/decl/func/cases/case/given/elem/fn.id) |
 | `miss_seen` | `compiler/parse/mid/names/limits/shape/cases/given/read/fn.id` | One setup of a multi-setup `given` (../read.id's setups_miss): raises `seen` |
+| `fit_import` | `compiler/parse/mid/names/limits/shape/cases/given/read/impcheck.id` | `(import NAME)` in a case: the value of an export once the case's setup has |
+| `imp_owner` | `compiler/parse/mid/names/limits/shape/cases/given/read/impcheck.id` | `(import NAME)` in a case: the value of an export once the case's setup has |
+| `setups_miss` | `compiler/parse/mid/names/limits/shape/cases/given/read/impcheck.id` | A `given` may name several setups, so the requirement is that ONE of them |
 | `rc_ready` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/memo.id` | The memo behind reaches (reach.id): for each setup asked about, the set of |
 | `rc_build` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/memo.id` | The memo behind reaches (reach.id): for each setup asked about, the set of |
 | `rc_of` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/memo.id` | The index of src's set, walking the graph the first time src is asked for. |
-| `reaches` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/reach.id` | Whether one function reaches another through the call graph -- the calls |
-| `reach_seed` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/reach.id` | The dead-export check's set seeded with one function, for the fixtures that |
-| `miss_hit` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/reach.id` | One setup of a multi-setup `given` (../read.id's setups_miss): raises `hit` |
+| `reaches` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/query.id` | Whether one function reaches another through the call graph -- the calls |
+| `reach_seed` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/query.id` | The dead-export check's set seeded with one function, for the fixtures that |
+| `miss_hit` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/query.id` | One setup of a multi-setup `given` (../read.id's setups_miss): raises `hit` |
 | `rc_t_ready` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/fixture.id` | The digest's parsed pair (mid/form/unique/dump/digest/graph/state/ |
 | `rc_t_one` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/fixture.id` | The digest's parsed pair (mid/form/unique/dump/digest/graph/state/ |
 | `rc_nsets` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/fixture.id` | The digest's parsed pair (mid/form/unique/dump/digest/graph/state/ |
 | `rc_new` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/flags.id` | One setup's reachable set, found by a walk over dg_cout (the digest's |
 | `rc_flags` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/flags.id` | A flag per row, 1 where src reaches. src's own row is set first, the way |
 | `rc_has` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/flags.id` | One setup's reachable set, found by a walk over dg_cout (the digest's |
-| `rc_visit` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/walk.id` | A worklist walk: every row is flagged and queued at most once, so a setup |
-| `rc_walk` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/walk.id` | A worklist walk: every row is flagged and queued at most once, so a setup |
-| `rc_step` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/walk.id` | A worklist walk: every row is flagged and queued at most once, so a setup |
-| `fit_import` | `compiler/parse/mid/names/limits/shape/cases/given/read/read.id` | `(import NAME)` in a case: the value of an export once the case's setup has |
-| `imp_owner` | `compiler/parse/mid/names/limits/shape/cases/given/read/read.id` | `(import NAME)` in a case: the value of an export once the case's setup has |
-| `setups_miss` | `compiler/parse/mid/names/limits/shape/cases/given/read/read.id` | A `given` may name several setups, so the requirement is that ONE of them |
+| `rc_visit` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/worklist.id` | A worklist walk: every row is flagged and queued at most once, so a setup |
+| `rc_walk` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/worklist.id` | A worklist walk: every row is flagged and queued at most once, so a setup |
+| `rc_step` | `compiler/parse/mid/names/limits/shape/cases/given/read/reach/walk/worklist.id` | A worklist walk: every row is flagged and queued at most once, so a setup |
 | `then_fn_entry` | `compiler/parse/mid/names/limits/shape/cases/given/then/check/entry.id` | The entry point for a "then" (check) node: reads its name, then checks its |
 | `then_fn` | `compiler/parse/mid/names/limits/shape/cases/given/then/check/entry.id` | The entry point for a "then" (check) node: reads its name, then checks its |
 | `fit_then_traps` | `compiler/parse/mid/names/limits/shape/cases/given/then/check/entry.id` | `traps:(...)`: exactly one value, a string -- the message a trap's own |
@@ -1283,9 +1281,9 @@ once this compiler uses a construct on itself.
 | `then_value_fit` | `compiler/parse/mid/names/limits/shape/cases/given/then/check/value.id` | A check's function, then its value. The value is held to exactly what an |
 | `then_lit` | `compiler/parse/mid/names/limits/shape/cases/given/then/check/value.id` | A check's function, then its value. The value is held to exactly what an |
 | `dupeq_fns` | `compiler/parse/mid/names/limits/shape/cases/given/then/check/value.id` | The last step of the dup-case-detection fixture (more/dup/): casefn, two |
-| `fit_then_calls` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/calls.id` | `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/ |
-| `fit_calls_name` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/calls.id` | `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/ |
-| `fit_calls_native` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/calls.id` | `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/ |
+| `fit_then` | `compiler/parse/mid/names/limits/shape/cases/given/then/dispatch.id` | A case's `then` clauses, dispatched by node kind: a check (check/), the |
+| `fit_then_kind` | `compiler/parse/mid/names/limits/shape/cases/given/then/dispatch.id` | A case's `then` clauses, dispatched by node kind: a check (check/), the |
+| `fit_then_traps_or_calls` | `compiler/parse/mid/names/limits/shape/cases/given/then/dispatch.id` | `traps` is the fourth kind fit_then_kind tells apart -- folded in beside |
 | `fit_calls_body` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/fit/args.id` | The argument form's arity and types, against NAME's own parameters |
 | `fit_calls_args` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/fit/args.id` | The argument form's arity and types, against NAME's own parameters |
 | `fit_calls_count` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/fit/args.id` | The argument form's arity and types, against NAME's own parameters |
@@ -1295,6 +1293,9 @@ once this compiler uses a construct on itself.
 | `calls_node_fixture` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/fixture.id` | A "thencalls" node naming fx_target with one matching int argument, and |
 | `calls_node_build` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/fixture.id` | A "thencalls" node naming fx_target with one matching int argument, and |
 | `calls_node_unknown` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/fixture.id` | fixture_calls_node is pushed onto thennode at index 0, the same reason |
+| `fit_then_calls` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/target.id` | `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/ |
+| `fit_calls_name` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/target.id` | `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/ |
+| `fit_calls_native` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/calls/target.id` | `then calls NAME:(...)` / `then calls NAME:[N]` (front/.../case/then/more/ |
 | `case_fixture` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/fixture/case.id` | A synthetic case, for testing a function that reports at a case's line |
 | `case_fixture_line` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/fixture/case.id` | One line, and the node -- a "case" whose file is "fixture.id", so |
 | `case_fixture_add` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/fixture/case.id` | A synthetic case, for testing a function that reports at a case's line |
@@ -1310,27 +1311,26 @@ once this compiler uses a construct on itself.
 | `then_node_fixture` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/node.id` | A "then" (check) node naming fx_target (whose signature never fits a |
 | `then_node_build` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/node.id` | A "then" (check) node naming fx_target (whose signature never fits a |
 | `then_node_bad` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/node.id` | A "then" (check) node naming fx_target (whose signature never fits a |
-| `fit_then_print` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/print.id` | `then prints:(...)` / `then eprints:(...)`: exactly one value, a string -- |
-| `fit_print_items` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/print.id` | `then prints:(...)` / `then eprints:(...)`: exactly one value, a string -- |
-| `chk_fixture` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/print.id` | A check target mid-check would accept: "chk() return int", niladic where |
-| `fit_then` | `compiler/parse/mid/names/limits/shape/cases/given/then/then.id` | A case's `then` clauses, dispatched by node kind: a check (check/), the |
-| `fit_then_kind` | `compiler/parse/mid/names/limits/shape/cases/given/then/then.id` | A case's `then` clauses, dispatched by node kind: a check (check/), the |
-| `fit_then_traps_or_calls` | `compiler/parse/mid/names/limits/shape/cases/given/then/then.id` | `traps` is the fourth kind fit_then_kind tells apart -- folded in beside |
-| `check_dup_cases` | `compiler/parse/mid/names/limits/shape/cases/more/dup/dup.id` | Two identical cases under one function. |
-| `dup_scan` | `compiler/parse/mid/names/limits/shape/cases/more/dup/dup.id` | Against every EARLIER case, so a duplicate is reported once, at the second |
-| `dup_hit` | `compiler/parse/mid/names/limits/shape/cases/more/dup/dup.id` | Two identical cases under one function. |
+| `fit_then_print` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/output.id` | `then prints:(...)` / `then eprints:(...)`: exactly one value, a string -- |
+| `fit_print_items` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/output.id` | `then prints:(...)` / `then eprints:(...)`: exactly one value, a string -- |
+| `chk_fixture` | `compiler/parse/mid/names/limits/shape/cases/given/then/more/print/output.id` | A check target mid-check would accept: "chk() return int", niladic where |
+| `fit_given` | `compiler/parse/mid/names/limits/shape/cases/given/valid.id` | A case's `given`: the function it names must be a setup -- a function in the |
+| `given_fn` | `compiler/parse/mid/names/limits/shape/cases/given/valid.id` | A case's `given`: the function it names must be a setup -- a function in the |
 | `case_eq` | `compiler/parse/mid/names/limits/shape/cases/more/dup/eq.id` | Whether two cases are the same case: equal token counts, then equal tokens. |
 | `case_eq_run` | `compiler/parse/mid/names/limits/shape/cases/more/dup/eq.id` | `off` is b's start minus a's, so the second cursor is derived rather than |
 | `tok_same` | `compiler/parse/mid/names/limits/shape/cases/more/dup/eq.id` | Whether two cases are the same case: equal token counts, then equal tokens. |
+| `check_dup_cases` | `compiler/parse/mid/names/limits/shape/cases/more/dup/scan.id` | Two identical cases under one function. |
+| `dup_scan` | `compiler/parse/mid/names/limits/shape/cases/more/dup/scan.id` | Against every EARLIER case, so a duplicate is reported once, at the second |
+| `dup_hit` | `compiler/parse/mid/names/limits/shape/cases/more/dup/scan.id` | Two identical cases under one function. |
 | `utwhat_len` | `compiler/parse/mid/names/limits/shape/cases/more/dup/utread.id` | Readers for the untestable-set columns that have none. ut_add |
 | `utvia_len` | `compiler/parse/mid/names/limits/shape/cases/more/dup/utread.id` | Readers for the untestable-set columns that have none. ut_add |
 | `utnote_len` | `compiler/parse/mid/names/limits/shape/cases/more/dup/utread.id` | utnote is the one column ut_add does not touch: check_cases writes it |
 | `fit_body` | `compiler/parse/mid/names/limits/shape/cases/more/fit/body.id` | The arguments against the parameters, then the expected side against what |
 | `fit_items` | `compiler/parse/mid/names/limits/shape/cases/more/fit/body.id` | The arguments against the parameters, then the expected side against what |
 | `fit_item` | `compiler/parse/mid/names/limits/shape/cases/more/fit/body.id` | The arguments against the parameters, then the expected side against what |
-| `fit_case` | `compiler/parse/mid/names/limits/shape/cases/more/fit/fit.id` | Whether each case fits the function it is written under: the right number of |
-| `fit_traps` | `compiler/parse/mid/names/limits/shape/cases/more/fit/fit.id` | A case's `traps` check is checked here, once per case, rather than beside |
-| `impcase_empty` | `compiler/parse/mid/names/limits/shape/cases/more/fit/fit.id` | casegiven[i] populated with "" (a case with no `given`): fit_given |
+| `fit_case` | `compiler/parse/mid/names/limits/shape/cases/more/fit/case.id` | Whether each case fits the function it is written under: the right number of |
+| `fit_traps` | `compiler/parse/mid/names/limits/shape/cases/more/fit/case.id` | A case's `traps` check is checked here, once per case, rather than beside |
+| `impcase_empty` | `compiler/parse/mid/names/limits/shape/cases/more/fit/case.id` | casegiven[i] populated with "" (a case with no `given`): fit_given |
 | `case_arity_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/err.id` | The three messages about a case's shape. |
 | `case_void_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/err.id` | The three messages about a case's shape. |
 | `case_ret_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/err.id` | The three messages about a case's shape. |
@@ -1342,63 +1342,63 @@ once this compiler uses a construct on itself.
 | `items_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | Literals joined the way a case writes them: `1, [2, 3], "x"`. |
 | `leaf_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | A leaf as written: its own text, or `(import NAME)` for an export a case |
 | `impcase_given` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/items.id` | A `given` naming a real, resolvable, 0-parameter void setup, with |
+| `lit_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/literal.id` | A case literal written back out the way it was written: for diagnostics, and |
+| `neg_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/literal.id` | A case literal written back out the way it was written: for diagnostics, and |
+| `arr_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/literal.id` | A case literal written back out the way it was written: for diagnostics, and |
 | `case_err` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file it is written in, recorded on its node when it was |
 | `case_loc` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | Where a case is: the file it is written in, recorded on its node when it was |
 | `cfn_fixture` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/loc.id` | A "cfn" case-literal node naming a real, indexed function ("fx_target", |
-| `lit_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
-| `neg_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
-| `arr_text` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/text/text.id` | A case literal written back out the way it was written: for diagnostics, and |
 | `case_lit_type` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/ty.id` | The type a case literal has on its own, for comparing against a scalar |
 | `leaf_type` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/ty.id` | The type a case literal has on its own, for comparing against a scalar |
-| `dupeq_fixture` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/ty.id` | The dup-case fixture's root (more/dup/dup.id, more/dup/eq.id): two token |
+| `dupeq_fixture` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/more/ty.id` | The dup-case fixture's root (more/dup/scan.id, more/dup/eq.id): two token |
 | `fit_scalar` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/scalar.id` | A list's elements, one by one (in fit_elems's chain, ../value.id), and a |
 | `dupeq_starts` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/scalar.id` | The second step of the dup-case fixture (more/dup/): casestart, two rows |
 | `ty_fits` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/scalar.id` | idc.py's `compatible`: the same type, or two numeric ones. |
-| `fit_value` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/value.id` | A literal against the type it will be built at. The declared type decides, |
-| `fit_list` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/value.id` | A literal against the type it will be built at. The declared type decides, |
-| `fit_elems` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/value.id` | A literal against the type it will be built at. The declared type decides, |
+| `fit_value` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/typematch.id` | A literal against the type it will be built at. The declared type decides, |
+| `fit_list` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/typematch.id` | A literal against the type it will be built at. The declared type decides, |
+| `fit_elems` | `compiler/parse/mid/names/limits/shape/cases/more/fit/more/value/typematch.id` | A literal against the type it will be built at. The declared type decides, |
 | `arg_reqtests` | `compiler/parse/mid/names/limits/shape/cases/more/flag/arg.id` | `--require-tests` anywhere in the arguments. Scanned rather than tested at a |
 | `reqtests_flagged` | `compiler/parse/mid/names/limits/shape/cases/more/flag/arg.id` | The flag cell turned on, for require_tests's own "yes" case. reqtests_set |
 | `check_case_runs` | `compiler/parse/mid/names/limits/shape/cases/more/flag/arg.id` | Which functions cannot be tested on the build host is decided before either |
 | `check_cases` | `compiler/parse/mid/names/limits/shape/cases/more/flag/count.id` | The two-cases-per-function rule (docs/TESTS.md). |
 | `check_cases_at` | `compiler/parse/mid/names/limits/shape/cases/more/flag/count.id` | cases_short itself reads ut_at (../../report/host/why/note.id), which |
 | `count_cases` | `compiler/parse/mid/names/limits/shape/cases/more/flag/count.id` | The two-cases-per-function rule (docs/TESTS.md). |
-| `reqtests_init` | `compiler/parse/mid/names/limits/shape/cases/more/flag/flag.id` | Whether this build asks for the two-cases-per-function rule. |
-| `reqtests_set` | `compiler/parse/mid/names/limits/shape/cases/more/flag/flag.id` | An exported scalar may only be assigned by its declaring function, so the |
-| `require_tests` | `compiler/parse/mid/names/limits/shape/cases/more/flag/flag.id` | Whether this build asks for the two-cases-per-function rule. |
-| `ut_case` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/cases.id` | Refused: ut_case reads casegiven[ci] unconditionally (below), which traps |
-| `ut_case_fn` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/cases.id` | ut_at (../../why/why.id) traps unless a case's `given` also ran ut_mark |
+| `reqtests_init` | `compiler/parse/mid/names/limits/shape/cases/more/flag/reqtests.id` | Whether this build asks for the two-cases-per-function rule. |
+| `reqtests_set` | `compiler/parse/mid/names/limits/shape/cases/more/flag/reqtests.id` | An exported scalar may only be assigned by its declaring function, so the |
+| `require_tests` | `compiler/parse/mid/names/limits/shape/cases/more/flag/reqtests.id` | Whether this build asks for the two-cases-per-function rule. |
+| `case_hit` | `compiler/parse/mid/names/limits/shape/cases/report/diagnostics.id` | One entry of `casefn` against one function node. |
+| `report_cases` | `compiler/parse/mid/names/limits/shape/cases/report/diagnostics.id` | idc.py's message, word for word -- tests/invalid.sh requires both compilers |
+| `report_dup_case` | `compiler/parse/mid/names/limits/shape/cases/report/diagnostics.id` | Located by the case's own first token rather than by its function, because |
 | `ut_case_val` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/given.id` | Refused: the only branch this lane can reach safely is "not cfn", which |
 | `ut_then` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/then.id` | A "thenprints"/"theneprints" node's s1 is "" (front/.../case/then/more/ |
 | `ut_then_lead` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/then.id` | A case's `then` checks. A check node records the case it belongs to |
-| `ut_mark` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/mark.id` | The runtime's own helpers first, then the call graph to a fixpoint: a sweep |
+| `ut_case` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/untestable.id` | Refused: ut_case reads casegiven[ci] unconditionally (below), which traps |
+| `ut_case_fn` | `compiler/parse/mid/names/limits/shape/cases/report/host/cases/untestable.id` | ut_at (../../why/reason.id) traps unless a case's `given` also ran ut_mark |
+| `ut_mark` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/init.id` | The runtime's own helpers first, then the call graph to a fixpoint: a sweep |
 | `ut_callee` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/callee.id` | Marking a function by what one of its callees reaches. |
 | `ut_via` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/callee.id` | A callee is named only when it is a caller itself. When it is the thing that |
 | `ut_add` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/callee.id` | Marking a function by what one of its callees reaches. |
 | `ut_what` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/leaf.id` | What a callee reaches that the build host cannot run, or "". A callee |
 | `ut_leaf` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/leaf.id` | An `asm` function runs on the host only through a body for the host's own |
 | `ut_native` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/leaf.id` | What a callee reaches that the build host cannot run, or "". A callee |
-| `ut_func` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/node.id` | Refused: ut_at (../../why/why.id) is called unconditionally, which traps |
-| `ut_range` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/node.id` | One function's nodes. A function already marked is skipped, so what it is |
-| `ut_node` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/node.id` | A call, or a function named as a value: the two ways scan_reach reaches a |
+| `ut_func` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/walk.id` | Refused: ut_at (../../why/reason.id) is called unconditionally, which traps |
+| `ut_range` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/walk.id` | One function's nodes. A function already marked is skipped, so what it is |
+| `ut_node` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/node/walk.id` | A call, or a function named as a value: the two ways scan_reach reaches a |
 | `ut_seeded` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/sweep.id` | One row in the untestable set, for the why/ functions that read it. ut_add |
-| `ut_loop` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/sweep.id` | ut_loop and ut_sweep both read utname (../../why/why.id's ut_at does too), |
+| `ut_loop` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/sweep.id` | ut_loop and ut_sweep both read utname (../../why/reason.id's ut_at does too), |
 | `ut_sweep` | `compiler/parse/mid/names/limits/shape/cases/report/host/mark/sweep.id` | One sweep over every function, in the node ranges reach_func walks |
 | `ut_because_at` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/note.id` | The clause after "cannot be tested on the build host (...):", from how the |
 | `cases_short` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/note.id` | A function short of two cases that cannot be tested on the build host is not |
 | `ut_note` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/note.id` | The clause after "cannot be tested on the build host (...):", from how the |
+| `ut_at` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/reason.id` | Why a function cannot be tested on the build host, in the one wording every |
+| `ut_why` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/reason.id` | Why a function cannot be tested on the build host, in the one wording every |
+| `ut_because` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/reason.id` | Why a function cannot be tested on the build host, in the one wording every |
 | `ut_seed_self` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/self.id` | Refused: ut_self_at calls is_runtime() (mid/names/exports/extern/note.id) |
 | `ut_self_at` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/self.id` | Refused: ut_self_at's own marking branch needs is_runtime()==1 (only |
 | `ut_named` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/self.id` | Refused: same root cause as ut_note (../why/note.id) -- ut_named calls |
-| `ut_at` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/why.id` | Why a function cannot be tested on the build host, in the one wording every |
-| `ut_why` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/why.id` | Why a function cannot be tested on the build host, in the one wording every |
-| `ut_because` | `compiler/parse/mid/names/limits/shape/cases/report/host/why/why.id` | Why a function cannot be tested on the build host, in the one wording every |
 | `cases_report` | `compiler/parse/mid/names/limits/shape/cases/report/print.id` | The two messages of report.id, split out so each reporting block stays |
 | `dup_case_report` | `compiler/parse/mid/names/limits/shape/cases/report/print.id` | The two messages of report.id, split out so each reporting block stays |
 | `fnscope_fix` | `compiler/parse/mid/names/limits/shape/cases/report/print.id` | The two messages of report.id, split out so each reporting block stays |
-| `case_hit` | `compiler/parse/mid/names/limits/shape/cases/report/report.id` | One entry of `casefn` against one function node. |
-| `report_cases` | `compiler/parse/mid/names/limits/shape/cases/report/report.id` | idc.py's message, word for word -- tests/invalid.sh requires both compilers |
-| `report_dup_case` | `compiler/parse/mid/names/limits/shape/cases/report/report.id` | Located by the case's own first token rather than by its function, because |
 | `sym_func` | `compiler/parse/mid/names/symbols/build/add.id` | Record a function's return type, and the two table-append helpers. |
 | `add_var` | `compiler/parse/mid/names/symbols/build/add.id` | The unit comes along because the table is keyed by it: a name may be an int |
 | `add_func` | `compiler/parse/mid/names/symbols/build/add.id` | The node id comes along so that a call site can reach the parameter list |
@@ -1411,9 +1411,6 @@ once this compiler uses a construct on itself.
 | `acc_assign` | `compiler/parse/mid/names/symbols/check/access/expr/assign.id` | The assignment target is a name in its own right: writing to a variable the |
 | `acc_stmt4` | `compiler/parse/mid/names/symbols/check/access/expr/assign.id` | What is left is `decl`, `iassign`, `exprstmt`, `break` and an early |
 | `regrow_assign` | `compiler/parse/mid/names/symbols/check/access/expr/assign.id` | An "assign" node reachable together with the declaration registry |
-| `acc_elems` | `compiler/parse/mid/names/symbols/check/access/expr/expr.id` |  |
-| `acc_expr` | `compiler/parse/mid/names/symbols/check/access/expr/expr.id` | Expression dispatch. Only two kinds name anything: `var` reads a variable of |
-| `acc_expr2` | `compiler/parse/mid/names/symbols/check/access/expr/expr.id` |  |
 | `acc_expr3` | `compiler/parse/mid/names/symbols/check/access/expr/more/expr_more.id` | A binary operator and an index both hold two expressions in the same two |
 | `acc_pair` | `compiler/parse/mid/names/symbols/check/access/expr/more/expr_more.id` | A binary operator and an index both hold two expressions in the same two |
 | `acc_expr4` | `compiler/parse/mid/names/symbols/check/access/expr/more/expr_more.id` | A binary operator and an index both hold two expressions in the same two |
@@ -1421,6 +1418,9 @@ once this compiler uses a construct on itself.
 | `pushfix` | `compiler/parse/mid/names/symbols/check/access/expr/more/pair.id` |  |
 | `regrow_b` | `compiler/parse/mid/names/symbols/check/access/expr/more/pair.id` |  |
 | `pushfix_var` | `compiler/parse/mid/names/symbols/check/access/expr/more/pair.id` | A "var" node reachable together with the declaration registry: acc_var's |
+| `acc_elems` | `compiler/parse/mid/names/symbols/check/access/expr/walk.id` |  |
+| `acc_expr` | `compiler/parse/mid/names/symbols/check/access/expr/walk.id` | Expression dispatch. Only two kinds name anything: `var` reads a variable of |
+| `acc_expr2` | `compiler/parse/mid/names/symbols/check/access/expr/walk.id` |  |
 | `report_bad_var` | `compiler/parse/mid/names/symbols/check/access/report/bad_var.id` | idc.py's explain_bad_var: a name nobody declared is a typo, and a name |
 | `report_undef_var` | `compiler/parse/mid/names/symbols/check/access/report/bad_var.id` | idc.py's explain_bad_var: a name nobody declared is a typo, and a name |
 | `report_owned_var` | `compiler/parse/mid/names/symbols/check/access/report/bad_var.id` | idc.py's explain_bad_var: a name nobody declared is a typo, and a name |
@@ -1458,9 +1458,9 @@ once this compiler uses a construct on itself.
 | `acc_func_body` | `compiler/parse/mid/names/symbols/check/access/stmt/more/tail.id` | The parts of acc_func, acc_if and acc_while moved out so each of those |
 | `acc_if_body` | `compiler/parse/mid/names/symbols/check/access/stmt/more/tail.id` | The parts of acc_func, acc_if and acc_while moved out so each of those |
 | `acc_if_else` | `compiler/parse/mid/names/symbols/check/access/stmt/more/tail.id` | The parts of acc_func, acc_if and acc_while moved out so each of those |
-| `acc_list` | `compiler/parse/mid/names/symbols/check/access/stmt/stmt.id` | Statement dispatch. Each statement carries the line it began on in `nline`, |
-| `acc_stmt` | `compiler/parse/mid/names/symbols/check/access/stmt/stmt.id` | Statement dispatch. Each statement carries the line it began on in `nline`, |
-| `acc_if` | `compiler/parse/mid/names/symbols/check/access/stmt/stmt.id` | Statement dispatch. Each statement carries the line it began on in `nline`, |
+| `acc_list` | `compiler/parse/mid/names/symbols/check/access/stmt/walk.id` | Statement dispatch. Each statement carries the line it began on in `nline`, |
+| `acc_stmt` | `compiler/parse/mid/names/symbols/check/access/stmt/walk.id` | Statement dispatch. Each statement carries the line it began on in `nline`, |
+| `acc_if` | `compiler/parse/mid/names/symbols/check/access/stmt/walk.id` | Statement dispatch. Each statement carries the line it began on in `nline`, |
 | `reg_report` | `compiler/parse/mid/names/symbols/check/conflict/check.id` | The four things a declaration can conflict with, tested in idc.py's order. |
 | `reg_report2` | `compiler/parse/mid/names/symbols/check/conflict/check.id` | The four things a declaration can conflict with, tested in idc.py's order. |
 | `reg_report3` | `compiler/parse/mid/names/symbols/check/conflict/check.id` | The `export` declaration is the one that claims the name, so it is exempt; |
@@ -1496,9 +1496,9 @@ once this compiler uses a construct on itself.
 | `new_bucket` | `compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id` | One empty bucket. A list literal builds a fresh list on every call, which is |
 | `name_bucket` | `compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id` | Which bucket a name belongs in -- not a hash. It was called str_hash, which |
 | `scopes_fixture` | `compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id` | edge_fixture (2 real functions, pfile pushed, case tables initialised via |
-| `hash_loop` | `compiler/parse/mid/names/symbols/lookup/index/hash/hash.id` | The usual polynomial string hash, kept inside 16 bits at every step so the |
-| `hash_step` | `compiler/parse/mid/names/symbols/lookup/index/hash/hash.id` | The usual polynomial string hash, kept inside 16 bits at every step so the |
-| `find_ix` | `compiler/parse/mid/names/symbols/lookup/index/hash/hash.id` | find_str's answer, over one bucket instead of the whole table. Same |
+| `hash_loop` | `compiler/parse/mid/names/symbols/lookup/index/hash/poly.id` | The usual polynomial string hash, kept inside 16 bits at every step so the |
+| `hash_step` | `compiler/parse/mid/names/symbols/lookup/index/hash/poly.id` | The usual polynomial string hash, kept inside 16 bits at every step so the |
+| `find_ix` | `compiler/parse/mid/names/symbols/lookup/index/hash/poly.id` | find_str's answer, over one bucket instead of the whole table. Same |
 | `dv_count` | `compiler/parse/mid/names/symbols/lookup/index/hash/scan.id` | The three questions asked of one bucket instead of the whole table. All |
 | `ft_scan` | `compiler/parse/mid/names/symbols/lookup/index/hash/scan.id` | The three questions asked of one bucket instead of the whole table. All |
 | `vx_scan` | `compiler/parse/mid/names/symbols/lookup/index/hash/scan.id` | The three questions asked of one bucket instead of the whole table. All |
@@ -1532,9 +1532,9 @@ once this compiler uses a construct on itself.
 | `init_reg2` | `compiler/parse/mid/names/symbols/lookup/registry.id` | The other half of the registry, and the one question it is asked most. |
 | `declared_in` | `compiler/parse/mid/names/symbols/lookup/registry.id` | How many registry rows declare `name` inside `owner`. One scan answers two |
 | `dv_hit` | `compiler/parse/mid/names/symbols/lookup/registry.id` | The other half of the registry, and the one question it is asked most. |
-| `chk_argtypes` | `compiler/parse/mid/types/check/expr/call/args/args.id` | One argument against one parameter. Reported at the argument's own line, |
-| `chk_arg_at` | `compiler/parse/mid/types/check/expr/call/args/args.id` | One argument against one parameter. Reported at the argument's own line, |
-| `argfn_b` | `compiler/parse/mid/types/check/expr/call/args/args.id` | One argument against one parameter. Reported at the argument's own line, |
+| `chk_argtypes` | `compiler/parse/mid/types/check/expr/call/args/check.id` | One argument against one parameter. Reported at the argument's own line, |
+| `chk_arg_at` | `compiler/parse/mid/types/check/expr/call/args/check.id` | One argument against one parameter. Reported at the argument's own line, |
+| `argfn_b` | `compiler/parse/mid/types/check/expr/call/args/check.id` | One argument against one parameter. Reported at the argument's own line, |
 | `argfn_d` | `compiler/parse/mid/types/check/expr/call/args/err/argfn.id` | The last step of the argfn chain (msg/narrowmsg.id's argfn_c, and narrow.id |
 | `param_name` | `compiler/parse/mid/types/check/expr/call/args/err/msg/argmsg.id` | The parameter's name, read the same way as its type. |
 | `arg_err_msg` | `compiler/parse/mid/types/check/expr/call/args/err/msg/argmsg.id` | The parameter's name, read the same way as its type. |
@@ -1548,33 +1548,33 @@ once this compiler uses a construct on itself.
 | `chk_narrow` | `compiler/parse/mid/types/check/expr/call/args/narrow.id` | docs/FRICTION.md 12: a narrowing conversion is written down, not inferred. |
 | `narrow_err` | `compiler/parse/mid/types/check/expr/call/args/narrow.id` | docs/FRICTION.md 12: a narrowing conversion is written down, not inferred. |
 | `argfn_a` | `compiler/parse/mid/types/check/expr/call/args/narrow.id` | docs/FRICTION.md 12: a narrowing conversion is written down, not inferred. |
-| `is_peekfn` | `compiler/parse/mid/types/check/expr/call/builtin/args/args.id` | The peek family, which is the only group of builtins that takes one |
-| `chk_bi_args` | `compiler/parse/mid/types/check/expr/call/builtin/args/args.id` | The peek family, which is the only group of builtins that takes one |
-| `chk_bi_arg` | `compiler/parse/mid/types/check/expr/call/builtin/args/args.id` | A position with no requirement ("") is skipped, and so is a type the |
+| `is_peekfn` | `compiler/parse/mid/types/check/expr/call/builtin/args/check.id` | The peek family, which is the only group of builtins that takes one |
+| `chk_bi_args` | `compiler/parse/mid/types/check/expr/call/builtin/args/check.id` | The peek family, which is the only group of builtins that takes one |
+| `chk_bi_arg` | `compiler/parse/mid/types/check/expr/call/builtin/args/check.id` | A position with no requirement ("") is skipped, and so is a type the |
 | `arg_type_at` | `compiler/parse/mid/types/check/expr/call/builtin/args/read.id` | Argument i's own type, read the same way a defined function's parameter |
 | `bi_want_for` | `compiler/parse/mid/types/check/expr/call/builtin/args/read.id` | What position i of this builtin requires, by name. |
 | `fv_fixture` | `compiler/parse/mid/types/check/expr/call/builtin/args/read.id` | Argument i's own type, read the same way a defined function's parameter |
 | `fv_bi_args` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/fv.id` | No builtin takes a function value (docs/SPEC.md 1.1). A builtin is not a |
 | `fv_bi_arg` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/fv.id` | No builtin takes a function value (docs/SPEC.md 1.1). A builtin is not a |
 | `fv_build` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/fv.id` | No builtin takes a function value (docs/SPEC.md 1.1). A builtin is not a |
-| `bi_wants` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/wants.id` | What argument `i` of a builtin must be, as a word this file's neighbours |
-| `bi_wants2` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/wants.id` | charat's first argument was taken above, so what reaches here is its |
-| `bi_wants3` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/wants.id` | What argument `i` of a builtin must be, as a word this file's neighbours |
+| `bi_wants` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/spec.id` | What argument `i` of a builtin must be, as a word this file's neighbours |
+| `bi_wants2` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/spec.id` | charat's first argument was taken above, so what reaches here is its |
+| `bi_wants3` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/spec.id` | What argument `i` of a builtin must be, as a word this file's neighbours |
 | `bi_wants4` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/wants_more.id` |  |
 | `bi_wants5` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/wants_more.id` |  |
 | `bi_ok` | `compiler/parse/mid/types/check/expr/call/builtin/args/wants/wants_more.id` | Is `t` acceptable where `want` is required? A chain rather than one |
-| `chk_bi` | `compiler/parse/mid/types/check/expr/call/builtin/arity/arity.id` | Calling a builtin: the right number of arguments, of the right types. |
-| `chk_bi_arity` | `compiler/parse/mid/types/check/expr/call/builtin/arity/arity.id` | Arity first, and nothing else if it is wrong -- as at a call to a defined |
-| `bi_arity_err` | `compiler/parse/mid/types/check/expr/call/builtin/arity/arity.id` | Two wordings, because idc.py has two: the flat-store and unsigned-word |
+| `chk_bi` | `compiler/parse/mid/types/check/expr/call/builtin/arity/check.id` | Calling a builtin: the right number of arguments, of the right types. |
+| `chk_bi_arity` | `compiler/parse/mid/types/check/expr/call/builtin/arity/check.id` | Arity first, and nothing else if it is wrong -- as at a call to a defined |
+| `bi_arity_err` | `compiler/parse/mid/types/check/expr/call/builtin/arity/check.id` | Two wordings, because idc.py has two: the flat-store and unsigned-word |
 | `cmp_fixture` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/cmpnodes.id` | Comparison/bitwise/mixed-precedence nodes on composite_fixture's leaves, |
 | `cmp_build` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/cmpnodes.id` | Comparison/bitwise/mixed-precedence nodes on composite_fixture's leaves, |
 | `cmp_build2` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/cmpnodes.id` | bin_mixed is unparenthesized (nothing here pushes it to nparen), so it is |
-| `bi_plural` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/count.id` | The two spellings of a count. |
-| `bi_count` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/count.id` | The two spellings of a count. |
-| `is_sysbi` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/count.id` | The flat-store and unsigned-word builtins: idc.py's STORE_BUILTINS and |
 | `bi_arity` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/table.id` | How many arguments each builtin takes. Two is the common case and so the |
 | `bi_zero` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/table.id` | How many arguments each builtin takes. Two is the common case and so the |
 | `bi_one` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/table.id` | How many arguments each builtin takes. Two is the common case and so the |
+| `bi_plural` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/wording.id` | The two spellings of a count. |
+| `bi_count` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/wording.id` | The two spellings of a count. |
+| `is_sysbi` | `compiler/parse/mid/types/check/expr/call/builtin/arity/count/wording.id` | The flat-store and unsigned-word builtins: idc.py's STORE_BUILTINS and |
 | `bi_arity_mismatch` | `compiler/parse/mid/types/check/expr/call/builtin/arity/msg/mismatch.id` |  |
 | `arity_ne` | `compiler/parse/mid/types/check/expr/call/builtin/arity/msg/mismatch.id` |  |
 | `bi_mismatch_sys0_setup` | `compiler/parse/mid/types/check/expr/call/builtin/arity/msg/mismatch.id` |  |
@@ -1596,12 +1596,12 @@ once this compiler uses a construct on itself.
 | `chk_call2` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/call2.id` | The rest of chk_call's work, split out so the block stays within the |
 | `farm_g` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/call2.id` | id 10: "vfwd(int a) return void" whose only statement is f_exprstmt (id |
 | `farm_h` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/call2.id` | prog and pfile carry one entry, fwd1 (id 6) from "test.id" -- for |
+| `chk_const_mut2` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/constlist.id` | The list argument -- `push`'s first, `pop`'s only -- read straight, not |
+| `chk_const_mut3` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/constlist.id` | const_decl (back/tgt/c/emit/prog/head/const/find.id) is the one place that |
+| `cml_report` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/constlist.id` | The list argument -- `push`'s first, `pop`'s only -- read straight, not |
 | `chk_const_mut` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/mut.id` | A conf.id list constant is locked at runtime (docs/SPEC.md 8), but a direct |
 | `is_mut_call` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/mut.id` | A conf.id list constant is locked at runtime (docs/SPEC.md 8), but a direct |
 | `is_mut_name` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/mut.id` | A conf.id list constant is locked at runtime (docs/SPEC.md 8), but a direct |
-| `chk_const_mut2` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/mut2.id` | The list argument -- `push`'s first, `pop`'s only -- read straight, not |
-| `chk_const_mut3` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/mut2.id` | const_decl (back/tgt/c/emit/prog/head/const/find.id) is the one place that |
-| `cml_report` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/check/mut2.id` | The list argument -- `push`'s first, `pop`'s only -- read straight, not |
 | `cm_call` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/fixture.id` | A `push` call on `(import NAME)`, built the same way for every positive |
 | `cm_setup` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/fixture.id` | A `push` call on `(import NAME)`, built the same way for every positive |
 | `cm_scalar_setup` | `compiler/parse/mid/types/check/expr/call/callsite/arity/constmut/fixture.id` | A `push` call on `(import NAME)`, built the same way for every positive |
@@ -1617,18 +1617,18 @@ once this compiler uses a construct on itself.
 | `fcall_arg_at` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/arg.id` | One argument of a call through a function value: the value must fit the |
 | `fcall_arg_check` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/arg.id` | One argument of a call through a function value: the value must fit the |
 | `argfn_narrow_call` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/arg.id` | One argument of a call through a function value: the value must fit the |
-| `chk_fcall` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/fcall.id` | Calling through a variable of function type: the questions a call to a |
-| `fcall_arity` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/fcall.id` | Calling through a variable of function type: the questions a call to a |
-| `fcall_args` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/fcall.id` | Calling through a variable of function type: the questions a call to a |
+| `chk_fcall` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/check.id` | Calling through a variable of function type: the questions a call to a |
+| `fcall_arity` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/check.id` | Calling through a variable of function type: the questions a call to a |
+| `fcall_args` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/check.id` | Calling through a variable of function type: the questions a call to a |
 | `fcall_arity_err` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/msg.id` | The three diagnostics of a call through a function value. A parameter of a |
 | `fcall_arg_err` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/msg.id` | The three diagnostics of a call through a function value. A parameter of a |
 | `fcall_narrow_err` | `compiler/parse/mid/types/check/expr/call/callsite/fcall/msg.id` | The three diagnostics of a call through a function value. A parameter of a |
 | `chk_callsite` | `compiler/parse/mid/types/check/expr/call/callsite/site.id` | Calling a function this program defines: the right number of arguments, of |
 | `func_node` | `compiler/parse/mid/types/check/expr/call/callsite/site.id` | The func node behind a called name, or -1 when there is none to check |
 | `chk_site_at` | `compiler/parse/mid/types/check/expr/call/callsite/site.id` | A call to a function this program defines is checked against its node |
-| `tc_g4` | `compiler/parse/mid/types/check/expr/more/index/index.id` | Reading `base[index]`. The same two questions index-assignment asks, and |
-| `chk_index` | `compiler/parse/mid/types/check/expr/more/index/index.id` | Reading `base[index]`. The same two questions index-assignment asks, and |
-| `chk_index2` | `compiler/parse/mid/types/check/expr/more/index/index.id` | Reading `base[index]`. The same two questions index-assignment asks, and |
+| `tc_g4` | `compiler/parse/mid/types/check/expr/more/index/check.id` | Reading `base[index]`. The same two questions index-assignment asks, and |
+| `chk_index` | `compiler/parse/mid/types/check/expr/more/index/check.id` | Reading `base[index]`. The same two questions index-assignment asks, and |
+| `chk_index2` | `compiler/parse/mid/types/check/expr/more/index/check.id` | Reading `base[index]`. The same two questions index-assignment asks, and |
 | `ix_err` | `compiler/parse/mid/types/check/expr/more/index/target.id` | Suppressing the read-index diagnostic on an index-assignment target. |
 | `is_ia_target` | `compiler/parse/mid/types/check/expr/more/index/target.id` | Suppressing the read-index diagnostic on an index-assignment target. |
 | `ia_hit` | `compiler/parse/mid/types/check/expr/more/index/target.id` | Suppressing the read-index diagnostic on an index-assignment target. |
@@ -1638,12 +1638,12 @@ once this compiler uses a construct on itself.
 | `is_ordop` | `compiler/parse/mid/types/check/expr/more/push/call.id` | The ordering operators, and the one builtin call with an element-type rule. |
 | `chk_call` | `compiler/parse/mid/types/check/expr/more/push/call.id` | The ordering operators, and the one builtin call with an element-type rule. |
 | `is_push2` | `compiler/parse/mid/types/check/expr/more/push/call.id` | A two-argument `push`. The arity is part of the test because a call written |
+| `chk_push` | `compiler/parse/mid/types/check/expr/more/push/check.id` | push's element type, and the untyped empty list literal. |
+| `chk_push2` | `compiler/parse/mid/types/check/expr/more/push/check.id` | Pushing onto something that is not a list is idc.py's "push expects a list" |
+| `chk_arr` | `compiler/parse/mid/types/check/expr/more/push/check.id` | `[]` carries no element type, so it is only meaningful where something else |
 | `arr_ok` | `compiler/parse/mid/types/check/expr/more/push/empty_arr.id` | Where an empty list literal is allowed. idc.py hands an expected type down |
 | `arr_ok_at` | `compiler/parse/mid/types/check/expr/more/push/empty_arr.id` | Where an empty list literal is allowed. idc.py hands an expected type down |
 | `want_list` | `compiler/parse/mid/types/check/expr/more/push/empty_arr.id` | Where an empty list literal is allowed. idc.py hands an expected type down |
-| `chk_push` | `compiler/parse/mid/types/check/expr/more/push/push.id` | push's element type, and the untyped empty list literal. |
-| `chk_push2` | `compiler/parse/mid/types/check/expr/more/push/push.id` | Pushing onto something that is not a list is idc.py's "push expects a list" |
-| `chk_arr` | `compiler/parse/mid/types/check/expr/more/push/push.id` | `[]` carries no element type, so it is only meaningful where something else |
 | `var_type_at` | `compiler/parse/mid/types/check/expr/more/want/positions/ok.id` | The variable's declared type, read from the symbol table by name. |
 | `want_elem_ok` | `compiler/parse/mid/types/check/expr/more/want/positions/ok.id` | The variable's declared type, read from the symbol table by name. |
 | `want_elem_ok2` | `compiler/parse/mid/types/check/expr/more/want/positions/ok.id` | Whether a list-of-lists' element type is itself a list type. |
@@ -1680,12 +1680,12 @@ once this compiler uses a construct on itself.
 | `farm_j` | `compiler/parse/mid/types/check/expr/op/compare/check/order_msg.id` | id 13: "main() return int", pushed onto prog at index 1 -- fwd_should is |
 | `farm_k` | `compiler/parse/mid/types/check/expr/op/compare/check/order_msg.id` | The real fingerprint pass (mid/form/unique/scan/pass/check.id's uq_fill), run |
 | `ord_report` | `compiler/parse/mid/types/check/expr/op/compare/check/order_msg.id` | id 13: "main() return int", pushed onto prog at index 1 -- fwd_should is |
+| `chk_cond` | `compiler/parse/mid/types/check/expr/op/compare/cond/check.id` | A condition that is a call to a void function is the one type error the |
+| `cond_kind` | `compiler/parse/mid/types/check/expr/op/compare/cond/check.id` | A function value is a value, but not a truth: C would test the address, |
+| `chk_bin` | `compiler/parse/mid/types/check/expr/op/compare/cond/check.id` | `==`, `!=` and id's bare `=` compare; `< <= > >=` order. is_eqop already |
 | `chk_cmp` | `compiler/parse/mid/types/check/expr/op/compare/cond/cmp.id` |  |
 | `fv_bin` | `compiler/parse/mid/types/check/expr/op/compare/cond/cmp.id` | No binary operator takes a function value (docs/SPEC.md 1.1): arithmetic on |
 | `fv_side` | `compiler/parse/mid/types/check/expr/op/compare/cond/cmp.id` |  |
-| `chk_cond` | `compiler/parse/mid/types/check/expr/op/compare/cond/cond.id` | A condition that is a call to a void function is the one type error the |
-| `cond_kind` | `compiler/parse/mid/types/check/expr/op/compare/cond/cond.id` | A function value is a value, but not a truth: C would test the address, |
-| `chk_bin` | `compiler/parse/mid/types/check/expr/op/compare/cond/cond.id` | `==`, `!=` and id's bare `=` compare; `< <= > >=` order. is_eqop already |
 | `chk_mixed` | `compiler/parse/mid/types/check/expr/op/compare/cond/more/mixed.id` | A comparison with a bare bitwise operand, or a bitwise operation with a bare |
 | `mixed_pair` | `compiler/parse/mid/types/check/expr/op/compare/cond/more/mixed.id` | One report per operation, naming the left operand when both are bare; the |
 | `mixed_side` | `compiler/parse/mid/types/check/expr/op/compare/cond/more/mixed.id` | The parenthesis record is searched only once the operators already mix, so |
@@ -1713,21 +1713,21 @@ once this compiler uses a construct on itself.
 | `chk_exprstmt` | `compiler/parse/mid/types/check/expr/op/exprstmt.id` | A statement that compares instead of assigning. |
 | `is_asgop` | `compiler/parse/mid/types/check/expr/op/exprstmt.id` | Both spellings. idc.py's parser folds `=` into `==` on the way in, so by the |
 | `disc_hint` | `compiler/parse/mid/types/check/expr/op/exprstmt.id` | Naming the fix is the point of the diagnostic, so an index target -- the |
-| `chk_bits` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/bits.id` | The operators that want integers on both sides: the bitwise group |
-| `chk_bits2` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/bits.id` | The operators that want integers on both sides: the bitwise group |
-| `bits_err` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/bits.id` | The logical pair names no types: `&&` on two lists is a mistake about what |
+| `chk_bits` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/check.id` | The operators that want integers on both sides: the bitwise group |
+| `chk_bits2` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/check.id` | The operators that want integers on both sides: the bitwise group |
+| `bits_err` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/check.id` | The logical pair names no types: `&&` on two lists is a mistake about what |
 | `iassign_build` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/fixture.id` | An `iassign` and a `push` call, on exprfix's leaves (check/store/assign/ |
 | `push_build` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/fixture.id` | An `iassign` and a `push` call, on exprfix's leaves (check/store/assign/ |
 | `assign_build2` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/fixture.id` | A second, compatibly-typed assignment (exprfix/lit/decl.id's assign_build |
 | `farm_j2` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/types.id` | id 14: a bare read of "target" as a value (mid/form/decomp/checks/fwd/'s |
 | `bits_types` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/types.id` | id 14: a bare read of "target" as a value (mid/form/decomp/checks/fwd/'s |
 | `fcall_reg_a` | `compiler/parse/mid/types/check/expr/op/unary_bits/bits/types.id` | id 14: a bare read of "target" as a value (mid/form/decomp/checks/fwd/'s |
+| `chk_mod` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/classify.id` | `%` is the odd one: it is an arithmetic operator, so two numbers are the |
+| `is_logop` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/classify.id` | `%` is the odd one: it is an arithmetic operator, so two numbers are the |
+| `is_bitop` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/classify.id` | `%` is the odd one: it is an arithmetic operator, so two numbers are the |
 | `chkret_fixture` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/fixture.id` | fn_fixture's function node together with exprfix's leaves (check/store/ |
 | `badexpr_fixture` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/fixture.id` | A function returning "int" whose own return expression is a string -- |
 | `badexpr_build` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/fixture.id` | fn_fixture's function node together with exprfix's leaves (check/store/ |
-| `chk_mod` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/mod.id` | `%` is the odd one: it is an arithmetic operator, so two numbers are the |
-| `is_logop` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/mod.id` | `%` is the odd one: it is an arithmetic operator, so two numbers are the |
-| `is_bitop` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/mod.id` | `%` is the odd one: it is an arithmetic operator, so two numbers are the |
 | `farm_j3` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/types.id` | id 15: "f_uvar;" as a bare exprstmt. |
 | `mod_types` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/types.id` | id 15: "f_uvar;" as a bare exprstmt. |
 | `fcall_reg_b` | `compiler/parse/mid/types/check/expr/op/unary_bits/mod/types.id` | id 15: "f_uvar;" as a bare exprstmt. |
@@ -1783,12 +1783,15 @@ once this compiler uses a construct on itself.
 | `base_type` | `compiler/parse/mid/types/check/store/more/read.id` | The base and index types an indexing operation reads twice over (once to |
 | `index_type` | `compiler/parse/mid/types/check/store/more/read.id` | The base and index types an indexing operation reads twice over (once to |
 | `bi_mismatch_sys_setup` | `compiler/parse/mid/types/check/store/more/read.id` | The base and index types an indexing operation reads twice over (once to |
-| `check_rest` | `compiler/parse/mid/types/check/walk/check/check.id` | The entry point. check_program()'s own block is full -- the chkfail export |
-| `tc_all` | `compiler/parse/mid/types/check/walk/check/check.id` | The type checks: idc.py's assertions from gen_stmt/gen_expr/gen_binop, |
-| `tc_nodes` | `compiler/parse/mid/types/check/walk/check/check.id` | A function whose check came out clean in an earlier build, and whose key |
+| `check_rest` | `compiler/parse/mid/types/check/walk/check/entry.id` | The entry point. check_program()'s own block is full -- the chkfail export |
+| `tc_all` | `compiler/parse/mid/types/check/walk/check/entry.id` | The type checks: idc.py's assertions from gen_stmt/gen_expr/gen_binop, |
+| `tc_nodes` | `compiler/parse/mid/types/check/walk/check/entry.id` | A function whose check came out clean in an earlier build, and whose key |
 | `tk_node` | `compiler/parse/mid/types/check/walk/check/skip.id` | The walk with the skips. A function's nodes are the run from the node after |
 | `tk_check` | `compiler/parse/mid/types/check/walk/check/skip.id` | The walk with the skips. A function's nodes are the run from the node after |
 | `tk_row_at` | `compiler/parse/mid/types/check/walk/check/skip.id` | The walk with the skips. A function's nodes are the run from the node after |
+| `tk_key` | `compiler/parse/mid/types/check/walk/check/tk/key/compute.id` | One function's key: its run's tokens (the digest's own hash of them, |
+| `tk_names` | `compiler/parse/mid/types/check/walk/check/tk/key/compute.id` | One function's key: its run's tokens (the digest's own hash of them, |
+| `tk_name` | `compiler/parse/mid/types/check/walk/check/tk/key/compute.id` | One function's key: its run's tokens (the digest's own hash of them, |
 | `tk_nkeys` | `compiler/parse/mid/types/check/walk/check/tk/key/fix/count.id` | Counts over the keying's rows, for the `then` checks of this directory's |
 | `tk_nskip` | `compiler/parse/mid/types/check/walk/check/tk/key/fix/count.id` | Counts over the keying's rows, for the `then` checks of this directory's |
 | `tk_nbad` | `compiler/parse/mid/types/check/walk/check/tk/key/fix/count.id` | Counts over the keying's rows, for the `then` checks of this directory's |
@@ -1798,9 +1801,6 @@ once this compiler uses a construct on itself.
 | `tk_t_warm0` | `compiler/parse/mid/types/check/walk/check/tk/key/fix/warm.id` | A warm build: fa's key handed in as clean (its value is tk_key's own first |
 | `tk_t_warm` | `compiler/parse/mid/types/check/walk/check/tk/key/fix/warm.id` | A warm build: fa's key handed in as clean (its value is tk_key's own first |
 | `tk_t_bad` | `compiler/parse/mid/types/check/walk/check/tk/key/fix/warm.id` | A warm build: fa's key handed in as clean (its value is tk_key's own first |
-| `tk_key` | `compiler/parse/mid/types/check/walk/check/tk/key/key.id` | One function's key: its run's tokens (the digest's own hash of them, |
-| `tk_names` | `compiler/parse/mid/types/check/walk/check/tk/key/key.id` | One function's key: its run's tokens (the digest's own hash of them, |
-| `tk_name` | `compiler/parse/mid/types/check/walk/check/tk/key/key.id` | One function's key: its run's tokens (the digest's own hash of them, |
 | `tk_meaning` | `compiler/parse/mid/types/check/walk/check/tk/key/mean.id` | What a name can mean to a type check, anywhere in the program: the |
 | `tk_from` | `compiler/parse/mid/types/check/walk/check/tk/key/mean.id` | Where a function's run of tokens starts: just past the previous function's |
 | `tk_units` | `compiler/parse/mid/types/check/walk/check/tk/key/mean.id` | The unit of the function before this one (the first's own) times 65536, |
@@ -1810,9 +1810,9 @@ once this compiler uses a construct on itself.
 | `tk_emit_keys` | `compiler/parse/mid/types/check/walk/check/tk/maps/emit.id` | Under --tc-keys, the build's clean keys go out last, after everything else |
 | `tk_emit_one` | `compiler/parse/mid/types/check/walk/check/tk/maps/emit.id` | Under --tc-keys, the build's clean keys go out last, after everything else |
 | `tk_row` | `compiler/parse/mid/types/check/walk/check/tk/maps/emit.id` | One function's key, and whether it is skipped: a key bin/idc handed in. |
-| `tk_maps` | `compiler/parse/mid/types/check/walk/check/tk/maps/maps.id` | The two tables the keys need, over idstd's hmap: |
-| `tk_fill_in` | `compiler/parse/mid/types/check/walk/check/tk/maps/maps.id` | The two tables the keys need, over idstd's hmap: |
-| `tk_fill_ex` | `compiler/parse/mid/types/check/walk/check/tk/maps/maps.id` | The two tables the keys need, over idstd's hmap: |
+| `tk_maps` | `compiler/parse/mid/types/check/walk/check/tk/maps/init.id` | The two tables the keys need, over idstd's hmap: |
+| `tk_fill_in` | `compiler/parse/mid/types/check/walk/check/tk/maps/init.id` | The two tables the keys need, over idstd's hmap: |
+| `tk_fill_ex` | `compiler/parse/mid/types/check/walk/check/tk/maps/init.id` | The two tables the keys need, over idstd's hmap: |
 | `tk_prepare` | `compiler/parse/mid/types/check/walk/check/tk/prep.id` | The type check's cache (Stage 3 of the incremental build): per function, a |
 | `tk_enabled` | `compiler/parse/mid/types/check/walk/check/tk/prep.id` | The type check's cache (Stage 3 of the incremental build): per function, a |
 | `tk_setup` | `compiler/parse/mid/types/check/walk/check/tk/prep.id` | The type check's cache (Stage 3 of the incremental build): per function, a |
@@ -1822,21 +1822,21 @@ once this compiler uses a construct on itself.
 | `tc_node_at` | `compiler/parse/mid/types/check/walk/void_arr/case.id` | A test case's literals are in the node store, and are not expressions of the |
 | `in_case` | `compiler/parse/mid/types/check/walk/void_arr/case.id` | A test case's literals are in the node store, and are not expressions of the |
 | `in_case_at` | `compiler/parse/mid/types/check/walk/void_arr/case.id` | A test case's literals are in the node store, and are not expressions of the |
+| `tc_g3` | `compiler/parse/mid/types/check/walk/void_arr/check.id` | The rest of the dispatch, and the `void[]` rule. |
+| `chk_voidarr` | `compiler/parse/mid/types/check/walk/void_arr/check.id` | idc.py rejects `void[]` in parse_type, so it applies to every written type: |
+| `void_arr_type` | `compiler/parse/mid/types/check/walk/void_arr/check.id` | The rest of the dispatch, and the `void[]` rule. |
 | `farm_j4` | `compiler/parse/mid/types/check/walk/void_arr/pair.id` | id 16: "user() return void", body [f_ustmt] -- reads target's name as a |
 | `void_arr_pair` | `compiler/parse/mid/types/check/walk/void_arr/pair.id` | id 16: "user() return void", body [f_ustmt] -- reads target's name as a |
 | `idxfix` | `compiler/parse/mid/types/check/walk/void_arr/pair.id` | id 16: "user() return void", body [f_ustmt] -- reads target's name as a |
-| `tc_g3` | `compiler/parse/mid/types/check/walk/void_arr/void_arr.id` | The rest of the dispatch, and the `void[]` rule. |
-| `chk_voidarr` | `compiler/parse/mid/types/check/walk/void_arr/void_arr.id` | idc.py rejects `void[]` in parse_type, so it applies to every written type: |
-| `void_arr_type` | `compiler/parse/mid/types/check/walk/void_arr/void_arr.id` | The rest of the dispatch, and the `void[]` rule. |
 | `fn_idx_fixture` | `compiler/parse/mid/types/registry/fn/node/sig/idx.id` | fn_fixture (mid/names/limits/shape/cases/given/then/more/fixture/fn.id) |
 | `fnreg_index` | `compiler/parse/mid/types/registry/fn/node/sig/idx.id` | fn_fixture (mid/names/limits/shape/cases/given/then/more/fixture/fn.id) |
 | `fn_fixture_init_idx` | `compiler/parse/mid/types/registry/fn/node/sig/idx.id` | init_idx before the registration fnreg_index's own cases need, without the |
 | `fn_node_of` | `compiler/parse/mid/types/registry/fn/node/sig/lookup.id` | The function node a name denotes, or -1. |
 | `fn_node_at` | `compiler/parse/mid/types/registry/fn/node/sig/lookup.id` | -1 for a name with no row, and for an `asm` function, whose row has no node: |
 | `fn_sig_of` | `compiler/parse/mid/types/registry/fn/node/sig/lookup.id` | The type of the function a name denotes, or "" when it denotes none. |
-| `fn_sig` | `compiler/parse/mid/types/registry/fn/node/sig/sig.id` | A defined function's type, spelled as a function type is written. That is |
-| `fn_sig_at` | `compiler/parse/mid/types/registry/fn/node/sig/sig.id` | A defined function's type, spelled as a function type is written. That is |
-| `fn_type_list` | `compiler/parse/mid/types/registry/fn/node/sig/sig.id` | A defined function's type, spelled as a function type is written. That is |
+| `fn_sig` | `compiler/parse/mid/types/registry/fn/node/sig/spell.id` | A defined function's type, spelled as a function type is written. That is |
+| `fn_sig_at` | `compiler/parse/mid/types/registry/fn/node/sig/spell.id` | A defined function's type, spelled as a function type is written. That is |
+| `fn_type_list` | `compiler/parse/mid/types/registry/fn/node/sig/spell.id` | A defined function's type, spelled as a function type is written. That is |
 | `name_type` | `compiler/parse/mid/types/registry/fn/node/type.id` | The types a function value gives an expression: a name that denotes a |
 | `call_ret` | `compiler/parse/mid/types/registry/fn/node/type.id` | The types a function value gives an expression: a name that denotes a |
 | `fcall_ret` | `compiler/parse/mid/types/registry/fn/node/type.id` | The types a function value gives an expression: a name that denotes a |
@@ -1849,9 +1849,9 @@ once this compiler uses a construct on itself.
 | `fn_last` | `compiler/parse/mid/types/registry/fn/split/last.id` | The piece after the last comma. hi is 5 exactly when nothing stands between |
 | `fn_param_at` | `compiler/parse/mid/types/registry/fn/split/last.id` | Parameter i's type. Asked only once the arity has been checked. |
 | `iafix` | `compiler/parse/mid/types/registry/fn/split/last.id` | The piece after the last comma. hi is 5 exactly when nothing stands between |
-| `fn_ret` | `compiler/parse/mid/types/registry/fn/split/split.id` | fn_close is one past the `)`, and " return " is the 8 characters after it. |
-| `fn_params` | `compiler/parse/mid/types/registry/fn/split/split.id` | A function type's return type, and its parameter types in order. |
-| `fn_split` | `compiler/parse/mid/types/registry/fn/split/split.id` | st holds where the piece being read began, and how many nested parameter |
+| `fn_ret` | `compiler/parse/mid/types/registry/fn/split/parts.id` | fn_close is one past the `)`, and " return " is the 8 characters after it. |
+| `fn_params` | `compiler/parse/mid/types/registry/fn/split/parts.id` | A function type's return type, and its parameter types in order. |
+| `fn_split` | `compiler/parse/mid/types/registry/fn/split/parts.id` | st holds where the piece being read began, and how many nested parameter |
 | `fn_walk` | `compiler/parse/mid/types/registry/fn/split/walk.id` | The walk over a parameter list's characters. 44 is `,`, and the separator |
 | `fn_step` | `compiler/parse/mid/types/registry/fn/split/walk.id` | The walk over a parameter list's characters. 44 is `,`, and the separator |
 | `fn_cut` | `compiler/parse/mid/types/registry/fn/split/walk.id` | The walk over a parameter list's characters. 44 is `,`, and the separator |
@@ -1883,12 +1883,12 @@ once this compiler uses a construct on itself.
 | `init_ty_rows2` | `compiler/parse/mid/types/registry/table/rows.id` | The remaining rows, and the row constructor. Adding a type to id is adding |
 | `init_ty_rows3` | `compiler/parse/mid/types/registry/table/rows.id` | `string` is a reference, so its width is a pointer's, not a character |
 | `ty_row` | `compiler/parse/mid/types/registry/table/rows.id` | The remaining rows, and the row constructor. Adding a type to id is adding |
-| `tb2` | `compiler/parse/mid/types/type_of/binary/arith/arith.id` | The type of a binary expression that is not a concatenation. Comparisons |
-| `is_arith` | `compiler/parse/mid/types/type_of/binary/arith/arith.id` | The operators whose result type follows their operands. `&& ||` are not |
-| `arith_result` | `compiler/parse/mid/types/type_of/binary/arith/arith.id` | Widening order is int < word < float, so mixing an index with an address |
 | `type_of_miss` | `compiler/parse/mid/types/type_of/binary/arith/miss.id` | type_of's cache-miss path: the dispatch entry's original body, moved here |
 | `tb2_arith` | `compiler/parse/mid/types/type_of/binary/arith/operands.id` |  |
 | `tb2_arith2` | `compiler/parse/mid/types/type_of/binary/arith/operands.id` |  |
+| `tb2` | `compiler/parse/mid/types/type_of/binary/arith/result.id` | The type of a binary expression that is not a concatenation. Comparisons |
+| `is_arith` | `compiler/parse/mid/types/type_of/binary/arith/result.id` | The operators whose result type follows their operands. `&& ||` are not |
+| `arith_result` | `compiler/parse/mid/types/type_of/binary/arith/result.id` | Widening order is int < word < float, so mixing an index with an address |
 | `type_arr` | `compiler/parse/mid/types/type_of/binary/array.id` | What an array literal answers when something asks for its type without |
 | `call2_setup` | `compiler/parse/mid/types/type_of/binary/array.id` | What an array literal answers when something asks for its type without |
 | `call2_scalar_setup` | `compiler/parse/mid/types/type_of/binary/array.id` | What an array literal answers when something asks for its type without |
@@ -1902,9 +1902,9 @@ once this compiler uses a construct on itself.
 | `bt2` | `compiler/parse/mid/types/type_of/call/builtin/types.id` | Remaining builtin return types, and the type of a binary expression. |
 | `bt3` | `compiler/parse/mid/types/type_of/call/builtin/types.id` | Remaining builtin return types, and the type of a binary expression. |
 | `type_bin` | `compiler/parse/mid/types/type_of/call/builtin/types.id` | `+` with a string operand is concatenation (-> string); anything else is an |
-| `type_of4` | `compiler/parse/mid/types/type_of/call/call.id` | call/bin dispatch, and the return type of a called name. |
-| `type_call` | `compiler/parse/mid/types/type_of/call/call.id` | call/bin dispatch, and the return type of a called name. |
-| `builtin_type` | `compiler/parse/mid/types/type_of/call/call.id` | return type of a builtin, or "?" if `name` is not a builtin |
+| `type_of4` | `compiler/parse/mid/types/type_of/call/dispatch.id` | call/bin dispatch, and the return type of a called name. |
+| `type_call` | `compiler/parse/mid/types/type_of/call/dispatch.id` | call/bin dispatch, and the return type of a called name. |
+| `builtin_type` | `compiler/parse/mid/types/type_of/call/dispatch.id` | return type of a builtin, or "?" if `name` is not a builtin |
 | `lit_type` | `compiler/parse/mid/types/type_of/call/lit.id` | The type of an integer literal: `word` when it does not fit an int (the |
 | `call_type` | `compiler/parse/mid/types/type_of/call/lit.id` | A call's result type. Every builtin's type follows from its name except |
 | `pop_elem` | `compiler/parse/mid/types/type_of/call/lit.id` | The type of an integer literal: `word` when it does not fit an int (the |
@@ -1928,9 +1928,6 @@ once this compiler uses a construct on itself.
 
 | function | file | what |
 | --- | --- | --- |
-| `dce_prune` | `compiler/parse/back/drive/run/check/dce/dce.id` | Dead-code elimination: emit only what the program can reach. |
-| `dce_pack` | `compiler/parse/back/drive/run/check/dce/dce.id` | Compact the program list over itself, keeping the reachable functions in |
-| `dce_keep` | `compiler/parse/back/drive/run/check/dce/dce.id` | Keep slot i by writing it at n, the next free slot. n only advances when |
 | `print_calls` | `compiler/parse/back/drive/run/check/dce/emit/calls/cases.id` | `idparse --calls`: like --fingerprints, a report about the parsed program |
 | `print_call_cases` | `compiler/parse/back/drive/run/check/dce/emit/calls/cases.id` | `--calls`'s case-count section: one row per function, printed after every |
 | `call_case_row` | `compiler/parse/back/drive/run/check/dce/emit/calls/cases.id` | count_cases (mid/names/limits/shape/cases/more/flag/count.id) already |
@@ -1952,9 +1949,9 @@ once this compiler uses a construct on itself.
 | `edge_fixture` | `compiler/parse/back/drive/run/check/dce/emit/calls/fixture/setup.id` | A two-function synthetic program for `--calls` (../../edges/, ../../cases.id): |
 | `edge_fixture_target_loc` | `compiler/parse/back/drive/run/check/dce/emit/calls/fixture/setup.id` | A two-function synthetic program for `--calls` (../../edges/, ../../cases.id): |
 | `edge_fixture_caller` | `compiler/parse/back/drive/run/check/dce/emit/calls/fixture/setup.id` | A two-function synthetic program for `--calls` (../../edges/, ../../cases.id): |
-| `dce_fx_setup` | `compiler/parse/back/drive/run/check/dce/emit/fixture.id` | State for dce.id's own cases: one registered function ("fx_target", via |
-| `dce_fx_setup_unreached` | `compiler/parse/back/drive/run/check/dce/emit/fixture.id` | State for dce.id's own cases: one registered function ("fx_target", via |
-| `prog_len` | `compiler/parse/back/drive/run/check/dce/emit/fixture.id` | State for dce.id's own cases: one registered function ("fx_target", via |
+| `dce_fx_setup` | `compiler/parse/back/drive/run/check/dce/emit/fixture.id` | State for sweep.id's own cases: one registered function ("fx_target", via |
+| `dce_fx_setup_unreached` | `compiler/parse/back/drive/run/check/dce/emit/fixture.id` | State for sweep.id's own cases: one registered function ("fx_target", via |
+| `prog_len` | `compiler/parse/back/drive/run/check/dce/emit/fixture.id` | State for sweep.id's own cases: one registered function ("fx_target", via |
 | `check_asm_targets` | `compiler/parse/back/drive/run/check/dce/emit/guard/asm_targets.id` | Every `asm` function must have a body for the triple this build selected. |
 | `emit_all_fixture_off` | `compiler/parse/back/drive/run/check/dce/emit/guard/asm_targets.id` | emit_all's own fixtures (guarded_emit.id): natives_then_prune reads fsc |
 | `emit_all_fixture_on` | `compiler/parse/back/drive/run/check/dce/emit/guard/asm_targets.id` | Every `asm` function must have a body for the triple this build selected. |
@@ -1970,26 +1967,29 @@ once this compiler uses a construct on itself.
 | `lc_dce_init` | `compiler/parse/back/drive/run/check/dce/export/fixture.id` | Export-table state for is_list_const/list_consts_kept, built without a |
 | `lc_dce_setup` | `compiler/parse/back/drive/run/check/dce/export/fixture.id` | One list constant ("a") and one scalar constant ("b"), at export indices 0 |
 | `lc_dce_setup2` | `compiler/parse/back/drive/run/check/dce/export/fixture.id` | A scalar constant only -- no list constant survives, for list_consts_kept's |
-| `lz_a` | `compiler/parse/back/drive/run/check/dce/export/keep.id` | Whether export i survives emission, mirroring dce.id's own test for a |
+| `lz_a` | `compiler/parse/back/drive/run/check/dce/export/keep.id` | Whether export i survives emission, mirroring sweep.id's own test for a |
 | `seed_cfn_fixture_add` | `compiler/parse/back/drive/run/check/dce/export/keep.id` | The last step of seed_cfn_fixture (tests/more/clear.id, dce/export/ |
-| `keep_export` | `compiler/parse/back/drive/run/check/dce/export/keep.id` | Whether export i survives emission, mirroring dce.id's own test for a |
+| `keep_export` | `compiler/parse/back/drive/run/check/dce/export/keep.id` | Whether export i survives emission, mirroring sweep.id's own test for a |
+| `dce_prune` | `compiler/parse/back/drive/run/check/dce/sweep.id` | Dead-code elimination: emit only what the program can reach. |
+| `dce_pack` | `compiler/parse/back/drive/run/check/dce/sweep.id` | Compact the program list over itself, keeping the reachable functions in |
+| `dce_keep` | `compiler/parse/back/drive/run/check/dce/sweep.id` | Keep slot i by writing it at n, the next free slot. n only advances when |
 | `push_asm_sym` | `compiler/parse/back/drive/run/check/emit_checked.id` | Registered once per name; a platform overload does not add a second row. |
 | `push_sym_row` | `compiler/parse/back/drive/run/check/emit_checked.id` | -1 for the node id: an asm function is not in the node store at all, and |
 | `arg_setup` | `compiler/parse/back/drive/run/check/flags/args.id` | What the checks need set up before they run: the asm symbols, the flag |
 | `arg_flags` | `compiler/parse/back/drive/run/check/flags/args.id` | The build flags, set together: this block has the room that arg_setup's |
 | `flags_setup` | `compiler/parse/back/drive/run/check/flags/args.id` | init_rtc() (mid/names/exports/extern/tab/table.id) and reqtests_init() |
-| `arg_flags2` | `compiler/parse/back/drive/run/check/flags/args2.id` | The rest of arg_flags2, one flag at a time. |
-| `arg_flags3` | `compiler/parse/back/drive/run/check/flags/args2.id` | The rest of arg_flags2, one flag at a time. |
-| `arg_flags4` | `compiler/parse/back/drive/run/check/flags/args2.id` | The rest of arg_flags2, one flag at a time. |
+| `arg_flags2` | `compiler/parse/back/drive/run/check/flags/flagvals.id` | The rest of arg_flags2, one flag at a time. |
+| `arg_flags3` | `compiler/parse/back/drive/run/check/flags/flagvals.id` | The rest of arg_flags2, one flag at a time. |
+| `arg_flags4` | `compiler/parse/back/drive/run/check/flags/flagvals.id` | The rest of arg_flags2, one flag at a time. |
 | `lz_b` | `compiler/parse/back/drive/run/check/flags/xok.id` | Any flag that is just its own presence, anywhere in the arguments. Scanned |
 | `ut_host_seeded` | `compiler/parse/back/drive/run/check/flags/xok.id` | Everything ut_why needs in one setup: the untestable tables seeded, a |
 | `arg_flag` | `compiler/parse/back/drive/run/check/flags/xok.id` | Any flag that is just its own presence, anywhere in the arguments. Scanned |
 | `asmfx_setup` | `compiler/parse/back/drive/run/main/asmfx.id` | One asm row ("foo", returning "int", for the host triple), for |
 | `asmfx_push` | `compiler/parse/back/drive/run/main/asmfx.id` | One asm row ("foo", returning "int", for the host triple), for |
 | `asmfx_fn_count` | `compiler/parse/back/drive/run/main/asmfx.id` | How many functions are registered -- a `then` check for the void |
-| `fixd_wadj_len` | `compiler/parse/back/drive/run/main/main.id` | fixd_wadj has no reader elsewhere in the build, for fix_wrow's own cases |
-| `fix_paren_side_fixture` | `compiler/parse/back/drive/run/main/main.id` | cmp_fixture's bin_mixed/bin_bitand (mid/types/.../cmpnodes.id) are a real |
-| `main` | `compiler/parse/back/drive/run/main/main.id` | The exit code is whether the program broke a rule of the language: 1 if a |
+| `fixd_wadj_len` | `compiler/parse/back/drive/run/main/driver.id` | fixd_wadj has no reader elsewhere in the build, for fix_wrow's own cases |
+| `fix_paren_side_fixture` | `compiler/parse/back/drive/run/main/driver.id` | cmp_fixture's bin_mixed/bin_bitand (mid/types/.../cmpnodes.id) are a real |
+| `main` | `compiler/parse/back/drive/run/main/driver.id` | The exit code is whether the program broke a rule of the language: 1 if a |
 | `ut_asm_seeded` | `compiler/parse/back/drive/run/main/tail.id` | An asm row defined for a triple that is not the build host's, which is the |
 | `rfn_first` | `compiler/parse/back/drive/run/main/tail.id` | The first entry of rfn, for seed_tested's own cases (back/drive/target/ |
 | `lz_c` | `compiler/parse/back/drive/run/main/tail.id` | The tail of main, once setup and load have already run. |
@@ -2003,7 +2003,7 @@ once this compiler uses a construct on itself.
 | `exclunit_seed` | `compiler/parse/back/drive/sink/natives/more/emit.id` | Splits raw (--exclude-units' value, comma-joined by bin/idc) and pushes |
 | `nat_init` | `compiler/parse/back/drive/sink/natives/more/live.id` | --natives, and the two lists it fills. The flag lives in a cell like every |
 | `nat_lists` | `compiler/parse/back/drive/sink/natives/more/live.id` |   natkey  KIND|NAME of every row, so a native is listed once per kind |
-| `nat_all_live` | `compiler/parse/back/drive/sink/natives/more/live.id` | Nothing is pruned with no main or when freestanding (dce.id, |
+| `nat_all_live` | `compiler/parse/back/drive/sink/natives/more/live.id` | Nothing is pruned with no main or when freestanding (sweep.id, |
 | `nat_push` | `compiler/parse/back/drive/sink/natives/more/site.id` | A natives row: KIND|NAME, the call that reaches the native, and the file |
 | `nat_site` | `compiler/parse/back/drive/sink/natives/more/site.id` | A call's file is its function's; its line is the one the parser recorded |
 | `call_line` | `compiler/parse/back/drive/sink/natives/more/site.id` | Every call node is recorded as it is parsed, so the fallback -- the |
@@ -2019,9 +2019,9 @@ once this compiler uses a construct on itself.
 | `lz_e` | `compiler/parse/back/drive/target/flagval.id` | The value of a `--name VALUE` flag, found anywhere in the arguments. |
 | `seed_given_fixture_bad` | `compiler/parse/back/drive/target/flagval.id` | A casegiven entry naming no function in the build, for given.id's own |
 | `arg_flag_val` | `compiler/parse/back/drive/target/flagval.id` | The value of a `--name VALUE` flag, found anywhere in the arguments. |
-| `emit_target` | `compiler/parse/back/drive/target/target.id` | Which code generator a build uses. |
-| `emit_target2` | `compiler/parse/back/drive/target/target.id` | `crt` is not a code generator: it prints the C runtime with external |
-| `arg_target` | `compiler/parse/back/drive/target/target.id` | `--target NAME`, scanned rather than read at a fixed position: the driver |
+| `emit_target` | `compiler/parse/back/drive/target/select.id` | Which code generator a build uses. |
+| `emit_target2` | `compiler/parse/back/drive/target/select.id` | `crt` is not a code generator: it prints the C runtime with external |
+| `arg_target` | `compiler/parse/back/drive/target/select.id` | `--target NAME`, scanned rather than read at a fixed position: the driver |
 | `emit_test_kept` | `compiler/parse/back/drive/target/tests/keep.id` | The functions the test harness carries: the ones a case can reach. |
 | `kept_natoff_fixture` | `compiler/parse/back/drive/target/tests/keep.id` | Two gaps void_call_fixture's narrower cases never hit: nat_scan's own |
 | `seed_given_fixture` | `compiler/parse/back/drive/target/tests/keep.id` | A single name in casegiven (given.id's own seed_givens), for a case that |
@@ -2036,8 +2036,8 @@ once this compiler uses a construct on itself.
 | `seed_givens` | `compiler/parse/back/drive/target/tests/more/seed/given.id` | A library case's own `given`s are skipped the same way its root is |
 | `seed_given_list` | `compiler/parse/back/drive/target/tests/more/seed/given.id` | One case's setups: a `given` may name several, so each entry is a |
 | `seed_thens` | `compiler/parse/back/drive/target/tests/more/seed/given.id` | case_is_std takes a case index, and a thennode carries the index of the |
-| `test_widen` | `compiler/parse/back/drive/target/tests/more/seed/seed.id` |  |
-| `test_widen2` | `compiler/parse/back/drive/target/tests/more/seed/seed.id` | rfn is restored by hand, so its index is rebuilt with it (mid/names/ |
+| `test_widen` | `compiler/parse/back/drive/target/tests/more/seed/widen.id` |  |
+| `test_widen2` | `compiler/parse/back/drive/target/tests/more/seed/widen.id` | rfn is restored by hand, so its index is rebuilt with it (mid/names/ |
 | `seed_tested` | `compiler/parse/back/drive/target/tests/reach.id` | A case's own root is skipped once for a case whose function is the |
 | `flat_call_fixture` | `compiler/parse/back/drive/target/tests/reach.id` | A "push" call whose own argument is itself a call, for chk_flat_at's |
 | `flat_deep_call_fixture` | `compiler/parse/back/drive/target/tests/reach.id` | flat_outer_call is itself two calls deep (outer(push(...))), so wrapping it |
@@ -2047,15 +2047,12 @@ once this compiler uses a construct on itself.
 | `lw_cast2` | `compiler/parse/back/ir/build/expr/atom/lit/conv/cast.id` | A conversion between two numbers is a real instruction; anything else -- |
 | `lw_castop` | `compiler/parse/back/ir/build/expr/atom/lit/conv/cast.id` | A conversion between two numbers is a real instruction; anything else -- |
 | `lw_castop2` | `compiler/parse/back/ir/build/expr/atom/lit/conv/cast.id` | A conversion between two numbers is a real instruction; anything else -- |
-| `lw_as` | `compiler/parse/back/ir/build/expr/atom/lit/conv/conv.id` | Lower an expression and convert it to the type the context wants. C's |
-| `lw_conv` | `compiler/parse/back/ir/build/expr/atom/lit/conv/conv.id` | Lower an expression and convert it to the type the context wants. C's |
-| `lw_cast` | `compiler/parse/back/ir/build/expr/atom/lit/conv/conv.id` | `bool` is the IR's own type -- the i1 a comparison produces. It never |
+| `lw_as` | `compiler/parse/back/ir/build/expr/atom/lit/conv/convert.id` | Lower an expression and convert it to the type the context wants. C's |
+| `lw_conv` | `compiler/parse/back/ir/build/expr/atom/lit/conv/convert.id` | Lower an expression and convert it to the type the context wants. C's |
+| `lw_cast` | `compiler/parse/back/ir/build/expr/atom/lit/conv/convert.id` | `bool` is the IR's own type -- the i1 a comparison produces. It never |
 | `lz_g` | `compiler/parse/back/ir/build/expr/atom/lit/conv/narrow.id` | Both types are integral, so the direction is the only question and the |
 | `lw_narrow` | `compiler/parse/back/ir/build/expr/atom/lit/conv/narrow.id` | Both types are integral, so the direction is the only question and the |
 | `lw_as_arg` | `compiler/parse/back/ir/build/expr/atom/lit/conv/narrow.id` | A builtin argument widened to what its helper takes. `udiv`, `umod` and |
-| `lw_lit` | `compiler/parse/back/ir/build/expr/atom/lit/lit.id` | A literal is a constant, and a constant is not an instruction anybody emits: |
-| `lw_const` | `compiler/parse/back/ir/build/expr/atom/lit/lit.id` | A literal is a constant, and a constant is not an instruction anybody emits: |
-| `lw_name` | `compiler/parse/back/ir/build/expr/atom/lit/lit.id` | Reading a name: the address, then a load from it. |
 | `lz_h` | `compiler/parse/back/ir/build/expr/atom/lit/more/addr.id` | The stack slot a name reads from or writes to. |
 | `lw_name_addr` | `compiler/parse/back/ir/build/expr/atom/lit/more/addr.id` | The stack slot a name reads from or writes to. |
 | `lw_ety` | `compiler/parse/back/ir/build/expr/atom/lit/more/ety.id` | The type of an expression. type_of answers it for everything the checks see, |
@@ -2064,6 +2061,9 @@ once this compiler uses a construct on itself.
 | `lw_named` | `compiler/parse/back/ir/build/expr/atom/lit/more/fnref.id` | A function named as a value is the function's own symbol: a constant, like |
 | `lw_fnref` | `compiler/parse/back/ir/build/expr/atom/lit/more/fnref.id` | A function named as a value is the function's own symbol: a constant, like |
 | `ir_last_b` | `compiler/parse/back/ir/build/expr/atom/lit/more/fnref.id` | Operand B of the most recently created instruction, offset by one since a |
+| `lw_lit` | `compiler/parse/back/ir/build/expr/atom/lit/read.id` | A literal is a constant, and a constant is not an instruction anybody emits: |
+| `lw_const` | `compiler/parse/back/ir/build/expr/atom/lit/read.id` | A literal is a constant, and a constant is not an instruction anybody emits: |
+| `lw_name` | `compiler/parse/back/ir/build/expr/atom/lit/read.id` | Reading a name: the address, then a load from it. |
 | `le4` | `compiler/parse/back/ir/build/expr/atom/tail.id` |  |
 | `le5` | `compiler/parse/back/ir/build/expr/atom/tail.id` |  |
 | `le6` | `compiler/parse/back/ir/build/expr/atom/tail.id` |  |
@@ -2142,24 +2142,24 @@ once this compiler uses a construct on itself.
 | `lw_bpty2` | `compiler/parse/back/ir/build/expr/call/more/plain/want.id` | The flat store and the unsigned operations work in machine words, so every |
 | `lw_bpty3` | `compiler/parse/back/ir/build/expr/call/more/plain/want.id` | The flat store and the unsigned operations work in machine words, so every |
 | `lw_barg_val` | `compiler/parse/back/ir/build/expr/call/more/plain/want.id` | The rest of lw_barg_at, once the argument's own position is known. |
-| `lw_bin` | `compiler/parse/back/ir/build/expr/op/bin/bin.id` | A binary expression. Four shapes, the same four the C target has: a |
-| `lb2` | `compiler/parse/back/ir/build/expr/op/bin/bin.id` | A binary expression. Four shapes, the same four the C target has: a |
-| `lb3` | `compiler/parse/back/ir/build/expr/op/bin/bin.id` | `&&` and `||` emit as C infix in the C target, so they short-circuit there. |
 | `lw_bin_op` | `compiler/parse/back/ir/build/expr/op/bin/disp.id` | The first of the four shapes: whether the operator is a comparison at all. |
 | `lencall_fixture` | `compiler/parse/back/ir/build/expr/op/bin/lcall.id` | Two more builtin `call`-node fixtures for the call/more/bi/ dispatch |
 | `lencall_fixture_reg` | `compiler/parse/back/ir/build/expr/op/bin/lcall.id` | Two more builtin `call`-node fixtures for the call/more/bi/ dispatch |
 | `popcall_fixture` | `compiler/parse/back/ir/build/expr/op/bin/lcall.id` | Two more builtin `call`-node fixtures for the call/more/bi/ dispatch |
-| `lw_ispred` | `compiler/parse/back/ir/build/expr/op/cmp/cmp.id` | A comparison. Its operands widen against each other -- `int` against `word` |
-| `lw_cmp` | `compiler/parse/back/ir/build/expr/op/cmp/cmp.id` | A comparison produces the IR's own `bool`, and `id` says the expression is |
-| `lw_cmp2` | `compiler/parse/back/ir/build/expr/op/cmp/cmp.id` | A comparison. Its operands widen against each other -- `int` against `word` |
+| `lw_bin` | `compiler/parse/back/ir/build/expr/op/bin/shape.id` | A binary expression. Four shapes, the same four the C target has: a |
+| `lb2` | `compiler/parse/back/ir/build/expr/op/bin/shape.id` | A binary expression. Four shapes, the same four the C target has: a |
+| `lb3` | `compiler/parse/back/ir/build/expr/op/bin/shape.id` | `&&` and `||` emit as C infix in the C target, so they short-circuit there. |
 | `pcall_fixture` | `compiler/parse/back/ir/build/expr/op/cmp/pfixture.id` | A `call` node whose callee has a real declared parameter ("gparam", one |
 | `pcall_fixture_reg` | `compiler/parse/back/ir/build/expr/op/cmp/pfixture.id` | A `call` node whose callee has a real declared parameter ("gparam", one |
 | `pcall_fixture_func` | `compiler/parse/back/ir/build/expr/op/cmp/pfixture.id` | A `call` node whose callee has a real declared parameter ("gparam", one |
+| `lw_ispred` | `compiler/parse/back/ir/build/expr/op/cmp/predicate.id` | A comparison. Its operands widen against each other -- `int` against `word` |
+| `lw_cmp` | `compiler/parse/back/ir/build/expr/op/cmp/predicate.id` | A comparison produces the IR's own `bool`, and `id` says the expression is |
+| `lw_cmp2` | `compiler/parse/back/ir/build/expr/op/cmp/predicate.id` | A comparison. Its operands widen against each other -- `int` against `word` |
 | `lw_cmp_t2` | `compiler/parse/back/ir/build/expr/op/cmp/wide.id` | Continues lw_cmp: the left operand's type is known, so the right operand's |
 | `lw_cmp_wide` | `compiler/parse/back/ir/build/expr/op/cmp/wide.id` | Continues lw_cmp: the left operand's type is known, so the right operand's |
-| `lw_arith` | `compiler/parse/back/ir/build/expr/op/more/arith/arith.id` | Ordinary arithmetic. The result type is the widened operand type, and both |
-| `lw_arith2` | `compiler/parse/back/ir/build/expr/op/more/arith/arith.id` | Ordinary arithmetic. The result type is the widened operand type, and both |
-| `lw_arith3` | `compiler/parse/back/ir/build/expr/op/more/arith/arith.id` | Ordinary arithmetic. The result type is the widened operand type, and both |
+| `lw_arith` | `compiler/parse/back/ir/build/expr/op/more/arith/combine.id` | Ordinary arithmetic. The result type is the widened operand type, and both |
+| `lw_arith2` | `compiler/parse/back/ir/build/expr/op/more/arith/combine.id` | Ordinary arithmetic. The result type is the widened operand type, and both |
+| `lw_arith3` | `compiler/parse/back/ir/build/expr/op/more/arith/combine.id` | Ordinary arithmetic. The result type is the widened operand type, and both |
 | `lw_hcall` | `compiler/parse/back/ir/build/expr/op/more/arith/hcall.id` | The shifts and the checked divisions are runtime calls, exactly as they are |
 | `lw_hcall2` | `compiler/parse/back/ir/build/expr/op/more/arith/hcall.id` | The shifts and the checked divisions are runtime calls, exactly as they are |
 | `lw_hcall2_out` | `compiler/parse/back/ir/build/expr/op/more/arith/hcall.id` | The shifts and the checked divisions are runtime calls, exactly as they are |
@@ -2173,15 +2173,12 @@ once this compiler uses a construct on itself.
 | `lw_hty` | `compiler/parse/back/ir/build/expr/op/more/arith/more/select.id` | The shift helpers work on a machine word; the division helpers work at the |
 | `lw_iop_bits` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/bits.id` |  |
 | `un_fixture` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/bits.id` | bound_fixture (../../../../../func/slot/map.id chain) plus two "un" |
+| `lw_irop` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/float.id` | The IR opcode for an operator at a type. Float arithmetic is its own set of |
+| `lw_iop_f` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/float.id` | The IR opcode for an operator at a type. Float arithmetic is its own set of |
+| `lw_iop_f2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/float.id` | The IR opcode for an operator at a type. Float arithmetic is its own set of |
 | `lw_iop_int` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/int.id` |  |
 | `lw_iop_int2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/int.id` |  |
 | `str_fixture2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/int.id` | str_fixture (../../str/ncmp.id) plus a "+" concat and a "<" numeric |
-| `lw_irop` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/irop.id` | The IR opcode for an operator at a type. Float arithmetic is its own set of |
-| `lw_iop_f` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/irop.id` | The IR opcode for an operator at a type. Float arithmetic is its own set of |
-| `lw_iop_f2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/irop/irop.id` | The IR opcode for an operator at a type. Float arithmetic is its own set of |
-| `lw_logic` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/logic.id` | `&&` and `||`, short-circuiting. The result lands in an unnamed slot rather |
-| `lw_ini` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/logic.id` | `a && b` starts at 0 and only the right-hand side can raise it; `a || b` |
-| `lw_logic2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/logic.id` | `&&` and `||`, short-circuiting. The result lands in an unnamed slot rather |
 | `lw_logic2_join` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/more/blocks.id` | Continues lw_logic2: the join block, once the rhs block already exists. |
 | `lw_short_term` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/more/blocks.id` | Continues lw_short: the branch out of the condition block, once the |
 | `logic_fixture` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/more/blocks.id` | bound_fixture plus a "&&" and a "||" node over ev_node, for a case |
@@ -2194,12 +2191,15 @@ once this compiler uses a construct on itself.
 | `lw_rhs` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/rhs.id` |  |
 | `lw_rhs_val` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/rhs.id` | Continues lw_rhs: the right-hand side's value, once its block is current. |
 | `lw_rhs_store` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/rhs.id` | Continues lw_rhs_val: store the value, then join the way lb2/lw_logic2 |
+| `lw_logic` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/seed.id` | `&&` and `||`, short-circuiting. The result lands in an unnamed slot rather |
+| `lw_ini` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/seed.id` | `a && b` starts at 0 and only the right-hand side can raise it; `a || b` |
+| `lw_logic2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/logic/seed.id` | `&&` and `||`, short-circuiting. The result lands in an unnamed slot rather |
+| `lw_un` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/select.id` | Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a |
+| `lw_un2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/select.id` | Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a |
+| `lw_unop` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/select.id` | Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a |
 | `lw_un2_op` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/tail.id` | Continues lw_un2's instruction arm: the operator's IR name, then the |
 | `lw_un2_apply` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/tail.id` | Continues lw_un2's instruction arm: the operator's IR name, then the |
 | `lw_not_val` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/tail.id` | Continues lw_not: the operand's type is known, so its value is fetched |
-| `lw_un` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/un.id` | Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a |
-| `lw_un2` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/un.id` | Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a |
-| `lw_unop` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/un.id` | Unary `-`, `~` and `!`. The first two keep their operand's type; `!` is a |
 | `lw_iszero` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/zero.id` |  |
 | `lw_iszero_cmp` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/zero.id` | Continues lw_iszero: the comparison operator is known, so the zero |
 | `lw_not` | `compiler/parse/back/ir/build/expr/op/more/ctrl/un/zero.id` |  |
@@ -2215,9 +2215,9 @@ once this compiler uses a construct on itself.
 | `lw_ncmp` | `compiler/parse/back/ir/build/expr/op/more/str/ncmp.id` | A numeric comparison: both operands widen to the type they were compared |
 | `lw_strcmp` | `compiler/parse/back/ir/build/expr/op/more/str/ncmp.id` | libc's strcmp when there is a libc, and the runtime's own when there is not. |
 | `str_fixture` | `compiler/parse/back/ir/build/expr/op/more/str/ncmp.id` | bound_fixture plus a "str" node and an "==" comparison of it with itself, |
-| `lw_scmp` | `compiler/parse/back/ir/build/expr/op/more/str/str.id` | String equality is strcmp against zero, as it is in the C target. strcmp is |
-| `lw_scmp2` | `compiler/parse/back/ir/build/expr/op/more/str/str.id` | String equality is strcmp against zero, as it is in the C target. strcmp is |
-| `lw_concat` | `compiler/parse/back/ir/build/expr/op/more/str/str.id` | String `+` builds a new string; each operand reaches it already converted to |
+| `lw_scmp` | `compiler/parse/back/ir/build/expr/op/more/str/strop.id` | String equality is strcmp against zero, as it is in the C target. strcmp is |
+| `lw_scmp2` | `compiler/parse/back/ir/build/expr/op/more/str/strop.id` | String equality is strcmp against zero, as it is in the C target. strcmp is |
+| `lw_concat` | `compiler/parse/back/ir/build/expr/op/more/str/strop.id` | String `+` builds a new string; each operand reaches it already converted to |
 | `lw_fin` | `compiler/parse/back/ir/build/func/lower/ends.id` | The body, then the return clause, then the entry block's branch into the |
 | `lw_ret` | `compiler/parse/back/ir/build/func/lower/ends.id` | `id` has no return statement: the return clause is an expression after the |
 | `lw_ret_val` | `compiler/parse/back/ir/build/func/lower/ends.id` | The body, then the return clause, then the entry block's branch into the |
@@ -2254,12 +2254,12 @@ once this compiler uses a construct on itself.
 | `lw_params` | `compiler/parse/back/ir/build/func/slot/par.id` |  |
 | `lw_param` | `compiler/parse/back/ir/build/func/slot/par.id` |  |
 | `lw_pslot` | `compiler/parse/back/ir/build/func/slot/par.id` | A parameter is copied into a stack slot like any other local, so that an |
+| `lw_ent` | `compiler/parse/back/ir/build/func/state/emit/append.id` |  |
+| `lw_emit` | `compiler/parse/back/ir/build/func/state/emit/append.id` | Create an instruction and append it to the block being built. Everything |
+| `lw_reset` | `compiler/parse/back/ir/build/func/state/emit/append.id` |  |
 | `last_fixd_nm` | `compiler/parse/back/ir/build/func/state/emit/br.id` | A branch built rather than emitted: it goes at the end of a block the |
 | `fix_env4` | `compiler/parse/back/ir/build/func/state/emit/br.id` | fix_fixture, with fix_take("baz_v", "int") already run -- so fix_try's |
 | `lw_brto` | `compiler/parse/back/ir/build/func/state/emit/br.id` | A branch built rather than emitted: it goes at the end of a block the |
-| `lw_ent` | `compiler/parse/back/ir/build/func/state/emit/emit.id` |  |
-| `lw_emit` | `compiler/parse/back/ir/build/func/state/emit/emit.id` | Create an instruction and append it to the block being built. Everything |
-| `lw_reset` | `compiler/parse/back/ir/build/func/state/emit/emit.id` |  |
 | `lw_op` | `compiler/parse/back/ir/build/func/state/emit/op.id` | The three shapes an instruction is built in. An empty list literal needs a |
 | `lw_term` | `compiler/parse/back/ir/build/func/state/emit/op.id` | A terminator: no value, no operand list, and the blocks it can reach. |
 | `ir_leaf` | `compiler/parse/back/ir/build/func/state/emit/op.id` | A leaf that lives in no block -- a constant, a global, an alloca, a |
@@ -2272,9 +2272,9 @@ once this compiler uses a construct on itself.
 | `lw_fix_iassign` | `compiler/parse/back/ir/build/func/state/more/fixture/list.id` | Three more AST-node fixtures for the call/list/ lowering cases: an |
 | `lw_fix_arr` | `compiler/parse/back/ir/build/func/state/more/fixture/list.id` | Three more AST-node fixtures for the call/list/ lowering cases: an |
 | `lw_fix_arr_empty` | `compiler/parse/back/ir/build/func/state/more/fixture/list.id` | Three more AST-node fixtures for the call/list/ lowering cases: an |
-| `lw_fixture` | `compiler/parse/back/ir/build/func/state/more/fixture/rows.id` | An open lowering state, reusing ir_rows (../../../../../core/fixture/rows/fn0.id): |
+| `lw_fixture` | `compiler/parse/back/ir/build/func/state/more/fixture/rows.id` | An open lowering state, reusing ir_rows (../../../../../core/fixture/rows/addfn.id): |
 | `lw_fixture2` | `compiler/parse/back/ir/build/func/state/more/fixture/rows.id` | The same, opening fn 1 (fn1id) instead of fn 0. |
-| `chk_lwcur` | `compiler/parse/back/ir/build/func/state/more/fixture/rows.id` | An open lowering state, reusing ir_rows (../../../../../core/fixture/rows/fn0.id): |
+| `chk_lwcur` | `compiler/parse/back/ir/build/func/state/more/fixture/rows.id` | An open lowering state, reusing ir_rows (../../../../../core/fixture/rows/addfn.id): |
 | `lw_open2_tail` | `compiler/parse/back/ir/build/func/state/more/open.id` | The rest of lw_open2, once the entry block itself exists. |
 | `lw_fixture_vars` | `compiler/parse/back/ir/build/func/state/more/open.id` | lw_fixture (lw_fixture.id) with two fake locals pushed directly, for a |
 | `chk_lwvar_len` | `compiler/parse/back/ir/build/func/state/more/open.id` | The rest of lw_open2, once the entry block itself exists. |
@@ -2305,20 +2305,20 @@ once this compiler uses a construct on itself.
 | `lw_break` | `compiler/parse/back/ir/build/stmt/flow/cond/op.id` | A branch to the innermost loop's exit, then a fresh block for whatever |
 | `lw_if_arms` | `compiler/parse/back/ir/build/stmt/flow/if/arms.id` |  |
 | `lw_if_arms2` | `compiler/parse/back/ir/build/stmt/flow/if/arms.id` |  |
-| `lw_if` | `compiler/parse/back/ir/build/stmt/flow/if/if.id` | if / else if / else. Three blocks: the two arms and the join they both |
-| `lw_if_thn` | `compiler/parse/back/ir/build/stmt/flow/if/if.id` | if / else if / else. Three blocks: the two arms and the join they both |
-| `lw_if2` | `compiler/parse/back/ir/build/stmt/flow/if/if.id` | if / else if / else. Three blocks: the two arms and the join they both |
+| `lw_if` | `compiler/parse/back/ir/build/stmt/flow/if/branch.id` | if / else if / else. Three blocks: the two arms and the join they both |
+| `lw_if_thn` | `compiler/parse/back/ir/build/stmt/flow/if/branch.id` | if / else if / else. Three blocks: the two arms and the join they both |
+| `lw_if2` | `compiler/parse/back/ir/build/stmt/flow/if/branch.id` | if / else if / else. Three blocks: the two arms and the join they both |
 | `lw_if_join` | `compiler/parse/back/ir/build/stmt/flow/if/join.id` |  |
 | `lw_if3` | `compiler/parse/back/ir/build/stmt/flow/if/join.id` |  |
+| `lw_while` | `compiler/parse/back/ir/build/stmt/flow/loop/blocks.id` | while. Four blocks in the usual shape: a head that tests, a body that runs |
+| `lw_while_go` | `compiler/parse/back/ir/build/stmt/flow/loop/blocks.id` | while. Four blocks in the usual shape: a head that tests, a body that runs |
+| `lw_while2` | `compiler/parse/back/ir/build/stmt/flow/loop/blocks.id` | while. Four blocks in the usual shape: a head that tests, a body that runs |
 | `lw_while_ex` | `compiler/parse/back/ir/build/stmt/flow/loop/body.id` |  |
 | `lw_while3` | `compiler/parse/back/ir/build/stmt/flow/loop/body.id` |  |
 | `lw_while_body` | `compiler/parse/back/ir/build/stmt/flow/loop/body.id` | The exit block is pushed while the body is lowered, so a `break` inside it |
 | `popcall_fixture_reg` | `compiler/parse/back/ir/build/stmt/flow/loop/lcall.id` | Finishes ../../../expr/op/bin/lcall.id's popcall_fixture ("pop" over one |
 | `pushcall_fixture` | `compiler/parse/back/ir/build/stmt/flow/loop/lcall.id` | Finishes ../../../expr/op/bin/lcall.id's popcall_fixture ("pop" over one |
 | `pushcall_fixture_reg` | `compiler/parse/back/ir/build/stmt/flow/loop/lcall.id` | Finishes ../../../expr/op/bin/lcall.id's popcall_fixture ("pop" over one |
-| `lw_while` | `compiler/parse/back/ir/build/stmt/flow/loop/loop.id` | while. Four blocks in the usual shape: a head that tests, a body that runs |
-| `lw_while_go` | `compiler/parse/back/ir/build/stmt/flow/loop/loop.id` | while. Four blocks in the usual shape: a head that tests, a body that runs |
-| `lw_while2` | `compiler/parse/back/ir/build/stmt/flow/loop/loop.id` | while. Four blocks in the usual shape: a head that tests, a body that runs |
 | `ls2` | `compiler/parse/back/ir/build/stmt/more/assign.id` |  |
 | `lw_assign` | `compiler/parse/back/ir/build/stmt/more/assign.id` |  |
 | `lw_aty` | `compiler/parse/back/ir/build/stmt/more/assign.id` | The declared type of an assignment's target: an export's if it is one, and |
@@ -2348,13 +2348,13 @@ once this compiler uses a construct on itself.
 | `lw_fix_un` | `compiler/parse/back/ir/core/fixture/ops/opnodes.id` | Two more synthetic expr nodes for the atom/lit-style dispatch cases |
 | `lw_fix_index` | `compiler/parse/back/ir/core/fixture/ops/opnodes.id` | Two more synthetic expr nodes for the atom/lit-style dispatch cases |
 | `lw_fix_index_tail` | `compiler/parse/back/ir/core/fixture/ops/opnodes.id` | Two more synthetic expr nodes for the atom/lit-style dispatch cases |
+| `ir_rows` | `compiler/parse/back/ir/core/fixture/rows/addfn.id` | Two IR functions, each with a block and one instruction, distinct in |
+| `ir_rows_fn0` | `compiler/parse/back/ir/core/fixture/rows/addfn.id` | Two IR functions, each with a block and one instruction, distinct in |
+| `ir_rows_fn0_insn` | `compiler/parse/back/ir/core/fixture/rows/addfn.id` | Two IR functions, each with a block and one instruction, distinct in |
 | `ir_rows_chk1` | `compiler/parse/back/ir/core/fixture/rows/chk1.id` | Points chk_id (../fn1.id) at instruction 1 (fn1.id's "const"), so a |
-| `ir_rows` | `compiler/parse/back/ir/core/fixture/rows/fn0.id` | Two IR functions, each with a block and one instruction, distinct in |
-| `ir_rows_fn0` | `compiler/parse/back/ir/core/fixture/rows/fn0.id` | Two IR functions, each with a block and one instruction, distinct in |
-| `ir_rows_fn0_insn` | `compiler/parse/back/ir/core/fixture/rows/fn0.id` | Two IR functions, each with a block and one instruction, distinct in |
-| `ir_rows_fn1` | `compiler/parse/back/ir/core/fixture/rows/fn1.id` |  |
-| `ir_rows_fn1_insn` | `compiler/parse/back/ir/core/fixture/rows/fn1.id` |  |
-| `ir_rows_fn1_idx` | `compiler/parse/back/ir/core/fixture/rows/fn1.id` | Symbol-index and build-flag tables a case can otherwise segfault reading: |
+| `ir_rows_fn1` | `compiler/parse/back/ir/core/fixture/rows/constfn.id` |  |
+| `ir_rows_fn1_insn` | `compiler/parse/back/ir/core/fixture/rows/constfn.id` |  |
+| `ir_rows_fn1_idx` | `compiler/parse/back/ir/core/fixture/rows/constfn.id` | Symbol-index and build-flag tables a case can otherwise segfault reading: |
 | `blk_count` | `compiler/parse/back/ir/core/read/count.id` | Composed counts, for the many passes that walk a function's blocks or a |
 | `insn_count` | `compiler/parse/back/ir/core/read/count.id` | Composed counts, for the many passes that walk a function's blocks or a |
 | `blk_fn` | `compiler/parse/back/ir/core/read/frame/block.id` |  |
@@ -2366,12 +2366,12 @@ once this compiler uses a construct on itself.
 | `irf_blk` | `compiler/parse/back/ir/core/read/frame/more.id` |  |
 | `irf_node` | `compiler/parse/back/ir/core/read/frame/more.id` |  |
 | `blk_pre` | `compiler/parse/back/ir/core/read/frame/more.id` |  |
-| `ir_op` | `compiler/parse/back/ir/core/read/insn/insn.id` | Reading an instruction. Every pass and the printer go through these rather |
-| `ir_ty` | `compiler/parse/back/ir/core/read/insn/insn.id` | Reading an instruction. Every pass and the printer go through these rather |
-| `ir_a` | `compiler/parse/back/ir/core/read/insn/insn.id` | Reading an instruction. Every pass and the printer go through these rather |
 | `ir_b` | `compiler/parse/back/ir/core/read/insn/more.id` |  |
 | `ir_s` | `compiler/parse/back/ir/core/read/insn/more.id` |  |
 | `ir_l` | `compiler/parse/back/ir/core/read/insn/more.id` |  |
+| `ir_op` | `compiler/parse/back/ir/core/read/insn/opfields.id` | Reading an instruction. Every pass and the printer go through these rather |
+| `ir_ty` | `compiler/parse/back/ir/core/read/insn/opfields.id` | Reading an instruction. Every pass and the printer go through these rather |
+| `ir_a` | `compiler/parse/back/ir/core/read/insn/opfields.id` | Reading an instruction. Every pass and the printer go through these rather |
 | `ir_bl` | `compiler/parse/back/ir/core/read/insn/place.id` |  |
 | `ir_home` | `compiler/parse/back/ir/core/read/insn/place.id` |  |
 | `ir_isconst` | `compiler/parse/back/ir/core/read/insn/place.id` | A constant is not an instruction anybody emits: it prints as its literal at |
@@ -2399,41 +2399,41 @@ once this compiler uses a construct on itself.
 | `init_ir7` | `compiler/parse/back/ir/core/store/init/more.id` | The columns left over once the other init functions took two apiece: the |
 | `init_ir8` | `compiler/parse/back/ir/core/store/init/more.id` | The columns left over once the other init functions took two apiece: the |
 | `init_ir9` | `compiler/parse/back/ir/core/store/init/more.id` | The columns left over once the other init functions took two apiece: the |
-| `ir_block` | `compiler/parse/back/ir/core/store/make/block/block.id` | A block belongs to a function from the moment it exists and is appended to |
-| `ir_blk2` | `compiler/parse/back/ir/core/store/make/block/block.id` | A block belongs to a function from the moment it exists and is appended to |
-| `ir_blk3` | `compiler/parse/back/ir/core/store/make/block/block.id` | A block belongs to a function from the moment it exists and is appended to |
+| `ir_block` | `compiler/parse/back/ir/core/store/make/block/build.id` | A block belongs to a function from the moment it exists and is appended to |
+| `ir_blk2` | `compiler/parse/back/ir/core/store/make/block/build.id` | A block belongs to a function from the moment it exists and is appended to |
+| `ir_blk3` | `compiler/parse/back/ir/core/store/make/block/build.id` | A block belongs to a function from the moment it exists and is appended to |
 | `ir_blk4` | `compiler/parse/back/ir/core/store/make/block/more.id` | The new block's own index. Its predecessors, instructions and label are |
 | `chk_last_blk_lbl` | `compiler/parse/back/ir/core/store/make/block/more.id` | The most recently pushed block's label and owning function, for a case on |
 | `chk_last_blk_fn` | `compiler/parse/back/ir/core/store/make/block/more.id` | The new block's own index. Its predecessors, instructions and label are |
 | `chk_l` | `compiler/parse/back/ir/core/store/make/block/row_lists.id` | The last two of insn/row_fields.id's readers: the auxiliary value list |
 | `chk_home` | `compiler/parse/back/ir/core/store/make/block/row_lists.id` | ihome is written both ways -- pushed as -1 when an instruction is made |
 | `chk_irprog_last` | `compiler/parse/back/ir/core/store/make/block/row_lists.id` | The most recently pushed entry of irprog (../func/more.id), for a case on |
-| `ir_func` | `compiler/parse/back/ir/core/store/make/func/func.id` | An IR function. Its block list is empty at this point; the lowering fills it. |
-| `ir_func2` | `compiler/parse/back/ir/core/store/make/func/func.id` | The parameter list starts empty and lw_param fills it: a function's |
-| `ir_func3` | `compiler/parse/back/ir/core/store/make/func/func.id` | An IR function. Its block list is empty at this point; the lowering fills it. |
+| `ir_func` | `compiler/parse/back/ir/core/store/make/func/build.id` | An IR function. Its block list is empty at this point; the lowering fills it. |
+| `ir_func2` | `compiler/parse/back/ir/core/store/make/func/build.id` | The parameter list starts empty and lw_param fills it: a function's |
+| `ir_func3` | `compiler/parse/back/ir/core/store/make/func/build.id` | An IR function. Its block list is empty at this point; the lowering fills it. |
 | `ir_func4` | `compiler/parse/back/ir/core/store/make/func/more.id` | The new function's own index, once its name, parameters and node are |
 | `chk_last_fn_name` | `compiler/parse/back/ir/core/store/make/func/more.id` | The most recently pushed function's name and return type, for a case on |
 | `chk_last_fn_ret` | `compiler/parse/back/ir/core/store/make/func/more.id` | The new function's own index, once its name, parameters and node are |
 | `chk_b` | `compiler/parse/back/ir/core/store/make/func/row_more.id` | The rest of insn/row_fields.id's readers: operand B, the auxiliary |
 | `chk_s` | `compiler/parse/back/ir/core/store/make/func/row_more.id` | The rest of insn/row_fields.id's readers: operand B, the auxiliary |
 | `chk_bl` | `compiler/parse/back/ir/core/store/make/func/row_more.id` | The rest of insn/row_fields.id's readers: operand B, the auxiliary |
+| `ir_insn` | `compiler/parse/back/ir/core/store/make/insn/build.id` | Building an instruction. The returned value id IS the instruction's index -- |
+| `ir_col1` | `compiler/parse/back/ir/core/store/make/insn/build.id` | Building an instruction. The returned value id IS the instruction's index -- |
+| `ir_col2` | `compiler/parse/back/ir/core/store/make/insn/build.id` | Building an instruction. The returned value id IS the instruction's index -- |
 | `ir_col3` | `compiler/parse/back/ir/core/store/make/insn/cols.id` | The last two instruction columns. An instruction starts with no home block: |
 | `ir_insn_fin` | `compiler/parse/back/ir/core/store/make/insn/cols.id` | The new instruction's own id, once every column has a row for it: the id |
-| `ir_insn` | `compiler/parse/back/ir/core/store/make/insn/insn.id` | Building an instruction. The returned value id IS the instruction's index -- |
-| `ir_col1` | `compiler/parse/back/ir/core/store/make/insn/insn.id` | Building an instruction. The returned value id IS the instruction's index -- |
-| `ir_col2` | `compiler/parse/back/ir/core/store/make/insn/insn.id` | Building an instruction. The returned value id IS the instruction's index -- |
 | `ir_seed` | `compiler/parse/back/ir/core/store/make/insn/read/check.id` | A synthetic one-row IR instruction, and two ways to read it back -- a |
 | `chk0_bl` | `compiler/parse/back/ir/core/store/make/insn/read/check.id` | A synthetic one-row IR instruction, and two ways to read it back -- a |
 | `chk0_home` | `compiler/parse/back/ir/core/store/make/insn/read/check.id` | A synthetic one-row IR instruction, and two ways to read it back -- a |
-| `chk_op` | `compiler/parse/back/ir/core/store/make/insn/read/row_fields.id` | Niladic readers of chk_id's instruction (../../../../fixture/rows/fn1.id), for |
-| `chk_ty` | `compiler/parse/back/ir/core/store/make/insn/read/row_fields.id` | Niladic readers of chk_id's instruction (../../../../fixture/rows/fn1.id), for |
-| `chk_a` | `compiler/parse/back/ir/core/store/make/insn/read/row_fields.id` | Niladic readers of chk_id's instruction (../../../../fixture/rows/fn1.id), for |
-| `op_dce` | `compiler/parse/back/ir/opt/cfg/dce/dce.id` | Dead code elimination: an instruction with no users and no effect is |
-| `dce_sweep` | `compiler/parse/back/ir/opt/cfg/dce/dce.id` | Dead code elimination: an instruction with no users and no effect is |
-| `dce_blk` | `compiler/parse/back/ir/opt/cfg/dce/dce.id` | Dead code elimination: an instruction with no users and no effect is |
+| `chk_op` | `compiler/parse/back/ir/core/store/make/insn/read/row_fields.id` | Niladic readers of chk_id's instruction (../../../../fixture/rows/constfn.id), for |
+| `chk_ty` | `compiler/parse/back/ir/core/store/make/insn/read/row_fields.id` | Niladic readers of chk_id's instruction (../../../../fixture/rows/constfn.id), for |
+| `chk_a` | `compiler/parse/back/ir/core/store/make/insn/read/row_fields.id` | Niladic readers of chk_id's instruction (../../../../fixture/rows/constfn.id), for |
 | `dce_one` | `compiler/parse/back/ir/opt/cfg/dce/one.id` |  |
 | `dce_pure` | `compiler/parse/back/ir/opt/cfg/dce/one.id` | What may not be removed for having no users. A call is here because nothing |
 | `dce_used` | `compiler/parse/back/ir/opt/cfg/dce/one.id` | How many instructions of this function name the value. An SSA value is |
+| `op_dce` | `compiler/parse/back/ir/opt/cfg/dce/sweep.id` | Dead code elimination: an instruction with no users and no effect is |
+| `dce_sweep` | `compiler/parse/back/ir/opt/cfg/dce/sweep.id` | Dead code elimination: an instruction with no users and no effect is |
+| `dce_blk` | `compiler/parse/back/ir/opt/cfg/dce/sweep.id` | Dead code elimination: an instruction with no users and no effect is |
 | `dce_fixture` | `compiler/parse/back/ir/opt/cfg/dce/use/cases/fixture.id` | A synthetic "call"-like instruction (id 0) whose auxiliary values list is |
 | `chk_op0` | `compiler/parse/back/ir/opt/cfg/dce/use/cases/fixture.id` | A synthetic "call"-like instruction (id 0) whose auxiliary values list is |
 | `chk_a0` | `compiler/parse/back/ir/opt/cfg/dce/use/cases/fixture.id` | A synthetic "call"-like instruction (id 0) whose auxiliary values list is |
@@ -2443,15 +2443,15 @@ once this compiler uses a construct on itself.
 | `dce_lists` | `compiler/parse/back/ir/opt/cfg/dce/use/find.id` | Whether `id` appears among an instruction's auxiliary values -- a call's |
 | `cfg_fixture_u` | `compiler/parse/back/ir/opt/cfg/dce/use/find.id` | cfg_fixture plus a second block-0 instruction that references id0 -- so a |
 | `ret1_add` | `compiler/parse/back/ir/opt/cfg/dce/use/find.id` | A terminator ("ret", no successors) for br_fixture's second block -- every |
-| `dce_used_b` | `compiler/parse/back/ir/opt/cfg/dce/use/use.id` |  |
-| `dce_refs` | `compiler/parse/back/ir/opt/cfg/dce/use/use.id` | A killed instruction keeps its operands, so it is skipped rather than read: |
-| `dce_names` | `compiler/parse/back/ir/opt/cfg/dce/use/use.id` |  |
+| `dce_used_b` | `compiler/parse/back/ir/opt/cfg/dce/use/refs.id` |  |
+| `dce_refs` | `compiler/parse/back/ir/opt/cfg/dce/use/refs.id` | A killed instruction keeps its operands, so it is skipped rather than read: |
+| `dce_names` | `compiler/parse/back/ir/opt/cfg/dce/use/refs.id` |  |
 | `chk_blk_count` | `compiler/parse/back/ir/opt/cfg/more/counts.id` | No-argument readers of the fixture's shape, since a `then` check takes |
 | `chk_ins0_count` | `compiler/parse/back/ir/opt/cfg/more/counts.id` | No-argument readers of the fixture's shape, since a `then` check takes |
 | `chk_pred1` | `compiler/parse/back/ir/opt/cfg/more/counts.id` | No-argument readers of the fixture's shape, since a `then` check takes |
-| `pred_wipe` | `compiler/parse/back/ir/opt/cfg/more/more.id` |  |
-| `pred_of` | `compiler/parse/back/ir/opt/cfg/more/more.id` | A block's successors are the blocks its terminator names, and its terminator |
-| `pred_succ` | `compiler/parse/back/ir/opt/cfg/more/more.id` |  |
+| `pred_wipe` | `compiler/parse/back/ir/opt/cfg/more/scan.id` |  |
+| `pred_of` | `compiler/parse/back/ir/opt/cfg/more/scan.id` | A block's successors are the blocks its terminator names, and its terminator |
+| `pred_succ` | `compiler/parse/back/ir/opt/cfg/more/scan.id` |  |
 | `succ_count` | `compiler/parse/back/ir/opt/cfg/more/succ.id` | A terminator's targets and what each one gets: `b` pushed onto that |
 | `pred_succ_at` | `compiler/parse/back/ir/opt/cfg/more/succ.id` | A terminator's targets and what each one gets: `b` pushed onto that |
 | `br_fixture_p` | `compiler/parse/back/ir/opt/cfg/more/succ.id` | br_fixture with its one edge already scanned -- block 1's predecessor |
@@ -2464,57 +2464,57 @@ once this compiler uses a construct on itself.
 | `pred_clear_at` | `compiler/parse/back/ir/opt/cfg/pred/more.id` | One block's predecessor list, wiped before the rescan refills it. |
 | `br_fixture` | `compiler/parse/back/ir/opt/cfg/pred/more.id` | cfg_fixture plus a second, branching terminator in block 0 (id 1, "br", |
 | `br_add` | `compiler/parse/back/ir/opt/cfg/pred/more.id` | One block's predecessor list, wiped before the rescan refills it. |
-| `op_preds` | `compiler/parse/back/ir/opt/cfg/pred/pred.id` | The predecessors of every block, computed rather than maintained. |
-| `pred_clear` | `compiler/parse/back/ir/opt/cfg/pred/pred.id` | The predecessors of every block, computed rather than maintained. |
-| `pred_scan` | `compiler/parse/back/ir/opt/cfg/pred/pred.id` | The predecessors of every block, computed rather than maintained. |
-| `m2r_row` | `compiler/parse/back/ir/opt/mem/init/blank/blank.id` |  |
-| `m2r_blank` | `compiler/parse/back/ir/opt/mem/init/blank/blank.id` |  |
-| `fix_wbuild_fixture` | `compiler/parse/back/ir/opt/mem/init/blank/blank.id` | A decl node (exported, i2=1) walked ahead of a registered function node, |
+| `op_preds` | `compiler/parse/back/ir/opt/cfg/pred/recompute.id` | The predecessors of every block, computed rather than maintained. |
+| `pred_clear` | `compiler/parse/back/ir/opt/cfg/pred/recompute.id` | The predecessors of every block, computed rather than maintained. |
+| `pred_scan` | `compiler/parse/back/ir/opt/cfg/pred/recompute.id` | The predecessors of every block, computed rather than maintained. |
 | `nat_on_check` | `compiler/parse/back/ir/opt/mem/init/blank/natfixture.id` | Two small helpers for the back/drive/sink/natives/more/live.id cases: |
 | `natinit_fixture_off` | `compiler/parse/back/ir/opt/mem/init/blank/natfixture.id` | Two small helpers for the back/drive/sink/natives/more/live.id cases: |
 | `natinit_fixture_on` | `compiler/parse/back/ir/opt/mem/init/blank/natfixture.id` | Two small helpers for the back/drive/sink/natives/more/live.id cases: |
-| `m2r_row_fixture` | `compiler/parse/back/ir/opt/mem/init/blank/rowfx.id` | m2r_row (blank.id) pushes one blank row onto phiof and one onto outv, and |
+| `m2r_row` | `compiler/parse/back/ir/opt/mem/init/blank/row.id` |  |
+| `m2r_blank` | `compiler/parse/back/ir/opt/mem/init/blank/row.id` |  |
+| `fix_wbuild_fixture` | `compiler/parse/back/ir/opt/mem/init/blank/row.id` | A decl node (exported, i2=1) walked ahead of a registered function node, |
+| `m2r_row_fixture` | `compiler/parse/back/ir/opt/mem/init/blank/rowfx.id` | m2r_row (row.id) pushes one blank row onto phiof and one onto outv, and |
 | `outv_sum` | `compiler/parse/back/ir/opt/mem/init/blank/rowfx.id` | outv is written in place: m2r_kept (../../walk/body/scan/ldst.id), |
 | `outv_row_sum` | `compiler/parse/back/ir/opt/mem/init/blank/rowfx.id` | A row of its own: two nested loops are already at the nesting limit, so |
-| `op_mem2reg` | `compiler/parse/back/ir/opt/mem/init/init.id` | mem2reg: stack slots become SSA values. |
-| `m2r_init` | `compiler/parse/back/ir/opt/mem/init/init.id` | mem2reg: stack slots become SSA values. |
-| `m2r_reset` | `compiler/parse/back/ir/opt/mem/init/init.id` | mem2reg: stack slots become SSA values. |
 | `m2r_alloca_fixture` | `compiler/parse/back/ir/opt/mem/init/rows/alloca.id` | ir_rows leaves function 0's entry block holding one instruction, an "add", |
 | `m2r_outv_fixture` | `compiler/parse/back/ir/opt/mem/init/rows/alloca.id` | A row with a cell in it. m2r_row fills each row to len(pra), so outv's |
+| `m2r_wipe` | `compiler/parse/back/ir/opt/mem/init/rows/collect.id` |  |
+| `m2r_collect` | `compiler/parse/back/ir/opt/mem/init/rows/collect.id` | The slots, in the order they were allocated -- which is the entry block, in |
+| `m2r_2blk_fixture` | `compiler/parse/back/ir/opt/mem/init/rows/collect.id` | cfg_fixture's two blocks, with pra/phiof/outv exported: for m2r_phis and |
 | `entry_of` | `compiler/parse/back/ir/opt/mem/init/rows/more.id` | The entry block, and what `m2r_collect` needs of it: only the entry ever |
 | `entry_count` | `compiler/parse/back/ir/opt/mem/init/rows/more.id` | The entry block, and what `m2r_collect` needs of it: only the entry ever |
 | `m2r_collect_at` | `compiler/parse/back/ir/opt/mem/init/rows/more.id` | The entry block, and what `m2r_collect` needs of it: only the entry ever |
-| `m2r_wipe` | `compiler/parse/back/ir/opt/mem/init/rows/rows.id` |  |
-| `m2r_collect` | `compiler/parse/back/ir/opt/mem/init/rows/rows.id` | The slots, in the order they were allocated -- which is the entry block, in |
-| `m2r_2blk_fixture` | `compiler/parse/back/ir/opt/mem/init/rows/rows.id` | cfg_fixture's two blocks, with pra/phiof/outv exported: for m2r_phis and |
+| `op_mem2reg` | `compiler/parse/back/ir/opt/mem/init/run.id` | mem2reg: stack slots become SSA values. |
+| `m2r_init` | `compiler/parse/back/ir/opt/mem/init/run.id` | mem2reg: stack slots become SSA values. |
+| `m2r_reset` | `compiler/parse/back/ir/opt/mem/init/run.id` | mem2reg: stack slots become SSA values. |
 | `m2r_shift` | `compiler/parse/back/ir/opt/mem/phi/front.id` |  |
 | `m2r_swap` | `compiler/parse/back/ir/opt/mem/phi/front.id` |  |
 | `m2r_phi_make` | `compiler/parse/back/ir/opt/mem/phi/more.id` | The tail of `m2r_phi_one`, split at the point where the phi has a value id |
 | `m2r_phi_place` | `compiler/parse/back/ir/opt/mem/phi/more.id` | The tail of `m2r_phi_one`, split at the point where the phi has a value id |
-| `m2r_phis` | `compiler/parse/back/ir/opt/mem/phi/phi.id` | A phi for every slot in every block but the entry, before anything is |
-| `m2r_phi_blk` | `compiler/parse/back/ir/opt/mem/phi/phi.id` | A phi for every slot in every block but the entry, before anything is |
-| `m2r_phi_one` | `compiler/parse/back/ir/opt/mem/phi/phi.id` | A phi for every slot in every block but the entry, before anything is |
+| `m2r_phis` | `compiler/parse/back/ir/opt/mem/phi/place.id` | A phi for every slot in every block but the entry, before anything is |
+| `m2r_phi_blk` | `compiler/parse/back/ir/opt/mem/phi/place.id` | A phi for every slot in every block but the entry, before anything is |
+| `m2r_phi_one` | `compiler/parse/back/ir/opt/mem/phi/place.id` | A phi for every slot in every block but the entry, before anything is |
 | `m2r_load` | `compiler/parse/back/ir/opt/mem/walk/body/scan/ldst.id` |  |
 | `m2r_store` | `compiler/parse/back/ir/opt/mem/walk/body/scan/ldst.id` |  |
 | `m2r_kept` | `compiler/parse/back/ir/opt/mem/walk/body/scan/ldst.id` |  |
-| `m2r_step` | `compiler/parse/back/ir/opt/mem/walk/body/scan/scan.id` | One block, in order: a load of a slot becomes the value the slot holds here, |
-| `m2r_slot` | `compiler/parse/back/ir/opt/mem/walk/body/scan/scan.id` | One block, in order: a load of a slot becomes the value the slot holds here, |
-| `m2r_ldfx` | `compiler/parse/back/ir/opt/mem/walk/body/scan/scan.id` | A "load" and a "store" whose address is the promotable slot m2r_outv_fixture |
+| `m2r_step` | `compiler/parse/back/ir/opt/mem/walk/body/scan/step.id` | One block, in order: a load of a slot becomes the value the slot holds here, |
+| `m2r_slot` | `compiler/parse/back/ir/opt/mem/walk/body/scan/step.id` | One block, in order: a load of a slot becomes the value the slot holds here, |
+| `m2r_ldfx` | `compiler/parse/back/ir/opt/mem/walk/body/scan/step.id` | A "load" and a "store" whose address is the promotable slot m2r_outv_fixture |
 | `m2r_seed` | `compiler/parse/back/ir/opt/mem/walk/body/seed.id` | The value each slot holds on entry to a block: the phi placed for it, or -- |
 | `m2r_seed1` | `compiler/parse/back/ir/opt/mem/walk/body/seed.id` | What this function is for is the value it writes; what it returns is |
 | `m2r_in` | `compiler/parse/back/ir/opt/mem/walk/body/seed.id` | The value each slot holds on entry to a block: the phi placed for it, or -- |
 | `m2r_walk` | `compiler/parse/back/ir/opt/mem/walk/body/walk.id` |  |
 | `m2r_blk` | `compiler/parse/back/ir/opt/mem/walk/body/walk.id` |  |
-| `m2r_clean` | `compiler/parse/back/ir/opt/mem/walk/clean/clean.id` | A phi that turned out to be one value is that value. Iterated, because |
+| `m2r_clean` | `compiler/parse/back/ir/opt/mem/walk/clean/iterate.id` | A phi that turned out to be one value is that value. Iterated, because |
 | `ir_l_count` | `compiler/parse/back/ir/opt/mem/walk/clean/same/count.id` | A phi's incoming-value count, composed so `ir_l` -- a call -- does not sit |
 | `irlfx_setup` | `compiler/parse/back/ir/opt/mem/walk/clean/same/count.id` | A phi's incoming-value count, composed so `ir_l` -- a call -- does not sit |
 | `irlfx_id_check` | `compiler/parse/back/ir/opt/mem/walk/clean/same/count.id` | A phi's incoming-value count, composed so `ir_l` -- a call -- does not sit |
 | `m2rphi_setup` | `compiler/parse/back/ir/opt/mem/walk/clean/same/phifx.id` | A third row on top of ir_rows: a "phi" whose two incoming values agree |
 | `m2rphi_make` | `compiler/parse/back/ir/opt/mem/walk/clean/same/phifx.id` | A third row on top of ir_rows: a "phi" whose two incoming values agree |
 | `m2rphi_id_check` | `compiler/parse/back/ir/opt/mem/walk/clean/same/phifx.id` | A third row on top of ir_rows: a "phi" whose two incoming values agree |
-| `m2r_same` | `compiler/parse/back/ir/opt/mem/walk/clean/same/same.id` | The single value a phi is, or -1 if it has none yet and -2 if it has more |
-| `m2r_pick` | `compiler/parse/back/ir/opt/mem/walk/clean/same/same.id` | The single value a phi is, or -1 if it has none yet and -2 if it has more |
-| `m2r_drop` | `compiler/parse/back/ir/opt/mem/walk/clean/same/same.id` | Replace every use of a value with another and remove what defined it. The |
+| `m2r_same` | `compiler/parse/back/ir/opt/mem/walk/clean/same/resolve.id` | The single value a phi is, or -1 if it has none yet and -2 if it has more |
+| `m2r_pick` | `compiler/parse/back/ir/opt/mem/walk/clean/same/resolve.id` | The single value a phi is, or -1 if it has none yet and -2 if it has more |
+| `m2r_drop` | `compiler/parse/back/ir/opt/mem/walk/clean/same/resolve.id` | Replace every use of a value with another and remove what defined it. The |
 | `m2r_sweep` | `compiler/parse/back/ir/opt/mem/walk/clean/sweep.id` |  |
 | `m2r_sweep_b` | `compiler/parse/back/ir/opt/mem/walk/clean/sweep.id` |  |
 | `m2r_try` | `compiler/parse/back/ir/opt/mem/walk/clean/sweep.id` |  |
@@ -2524,33 +2524,33 @@ once this compiler uses a construct on itself.
 | `m2r_pre_at` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/at.id` | The block a phi's `i`th incoming edge comes from, and where it sits in |
 | `m2r_pos` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/at.id` | The block a phi's `i`th incoming edge comes from, and where it sits in |
 | `phiof_sum` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/at.id` | phiof is written in place: m2r_phi_make (../../../phi/more.id) lsets the |
-| `m2r_incs` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/incs.id` |  |
-| `m2r_pre_count` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/incs.id` | A block's predecessor count, composed so `blk_pre` -- a call -- does not |
-| `m2r_inc` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/incs.id` |  |
 | `m2r_inc_at` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/push.id` | A phi's incoming edge, in two halves: the value the predecessor left this |
 | `m2r_inc_val` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/push.id` | A phi's incoming edge, in two halves: the value the predecessor left this |
 | `phiof_row_sum` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/push.id` | One row of phiof, for phiof_sum (at.id): a loop inside a loop is already |
+| `m2r_incs` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/scan.id` |  |
+| `m2r_pre_count` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/scan.id` | A block's predecessor count, composed so `blk_pre` -- a call -- does not |
+| `m2r_inc` | `compiler/parse/back/ir/opt/mem/walk/phi/incs/scan.id` |  |
 | `rfnfx_setup` | `compiler/parse/back/ir/opt/mem/walk/phi/testwfx.id` | Two `then` checks for test_widen/test_widen2 (back/drive/target/tests/ |
 | `rfn_len` | `compiler/parse/back/ir/opt/mem/walk/phi/testwfx.id` | Two `then` checks for test_widen/test_widen2 (back/drive/target/tests/ |
 | `dphase_check` | `compiler/parse/back/ir/opt/mem/walk/phi/testwfx.id` | Two `then` checks for test_widen/test_widen2 (back/drive/target/tests/ |
 | `init_opt` | `compiler/parse/back/ir/opt/run/cell.id` | What a pass needs to know beyond the function it is given. |
-| `phiof_len` | `compiler/parse/back/ir/opt/run/cell.id` | One row per block, pushed by m2r_row (../../mem/init/blank/blank.id) whose |
+| `phiof_len` | `compiler/parse/back/ir/opt/run/cell.id` | One row per block, pushed by m2r_row (../../mem/init/blank/row.id) whose |
 | `arg_opt` | `compiler/parse/back/ir/opt/run/cell.id` | The optimisation level, from `--opt N`. Level 0 emits the lowering as it |
-| `fold_cmp` | `compiler/parse/back/ir/opt/run/fold/cmp/cmp.id` |  |
-| `fold_iszext` | `compiler/parse/back/ir/opt/run/fold/cmp/cmp.id` |  |
-| `m2r_predfx` | `compiler/parse/back/ir/opt/run/fold/cmp/cmp.id` | br_fixture_p plus pra/phiof/outv, for m2r_incs/m2r_inc/ir_opt/opt_round |
 | `keep_export_fixture_harn_on` | `compiler/parse/back/ir/opt/run/fold/cmp/keepexpfx.id` | keep_export_fixture (../../../cfg/dce/use/cases/keepexpfx.id) plus is_harn() |
 | `keep_export_fixture_tail` | `compiler/parse/back/ir/opt/run/fold/cmp/keepexpfx.id` | The rest of keep_export_fixture_reg's chain: main reachable and two |
 | `keep_export_fixture_all` | `compiler/parse/back/ir/opt/run/fold/cmp/keepexpfx.id` | The registration and the export owners together: the one setup that gives |
 | `fold_isbool` | `compiler/parse/back/ir/opt/run/fold/cmp/more.id` | The two operands `fold_iszext` and `fold_cmp` test on the right of an |
 | `fold_zero_of` | `compiler/parse/back/ir/opt/run/fold/cmp/more.id` | The two operands `fold_iszext` and `fold_cmp` test on the right of an |
 | `fold_true_setup` | `compiler/parse/back/ir/opt/run/fold/cmp/more.id` | A "const" bool row (c0, "0") that both fold_isbool's and fold_zero_of's |
-| `op_fold` | `compiler/parse/back/ir/opt/run/fold/fold.id` | The folds mem2reg makes visible. |
-| `fold_blk` | `compiler/parse/back/ir/opt/run/fold/fold.id` | The folds mem2reg makes visible. |
-| `fold_one` | `compiler/parse/back/ir/opt/run/fold/fold.id` | The folds mem2reg makes visible. |
+| `fold_cmp` | `compiler/parse/back/ir/opt/run/fold/cmp/zext.id` |  |
+| `fold_iszext` | `compiler/parse/back/ir/opt/run/fold/cmp/zext.id` |  |
+| `m2r_predfx` | `compiler/parse/back/ir/opt/run/fold/cmp/zext.id` | br_fixture_p plus pra/phiof/outv, for m2r_incs/m2r_inc/ir_opt/opt_round |
 | `fold_kill` | `compiler/parse/back/ir/opt/run/fold/kill.id` |  |
 | `fold_cmp_fixture` | `compiler/parse/back/ir/opt/run/fold/kill.id` | An "icmp ne" whose operands satisfy fold_iszext and fold_zero_of, for |
 | `fc_op_check` | `compiler/parse/back/ir/opt/run/fold/kill.id` |  |
+| `op_fold` | `compiler/parse/back/ir/opt/run/fold/walk.id` | The folds mem2reg makes visible. |
+| `fold_blk` | `compiler/parse/back/ir/opt/run/fold/walk.id` | The folds mem2reg makes visible. |
+| `fold_one` | `compiler/parse/back/ir/opt/run/fold/walk.id` | The folds mem2reg makes visible. |
 | `ir_fix4` | `compiler/parse/back/ir/opt/run/pipe/cases/llval2.id` | The rest of back/ir/core/fixture/ops/llval.id's chain: two unary |
 | `ir_fix5` | `compiler/parse/back/ir/opt/run/pipe/cases/llval2.id` | The rest of back/ir/core/fixture/ops/llval.id's chain: two unary |
 | `ir_call_node` | `compiler/parse/back/ir/opt/run/pipe/cases/llval2.id` | The rest of back/ir/core/fixture/ops/llval.id's chain: two unary |
@@ -2564,12 +2564,12 @@ once this compiler uses a construct on itself.
 | `opt_func` | `compiler/parse/back/ir/opt/run/pipe/run.id` | The pass pipeline. |
 | `opt_round` | `compiler/parse/back/ir/opt/run/pipe/run.id` | The pass pipeline. |
 | `pe_args` | `compiler/parse/back/tgt/ast/expr/args.id` | Render a child-id list as space-prefixed printed expressions. |
-| `print_expr` | `compiler/parse/back/tgt/ast/expr/expr.id` | Expression printer (S-expression). Dispatch on node kind via a helper chain. |
-| `pe_op` | `compiler/parse/back/tgt/ast/expr/expr.id` | Expression printer (S-expression). Dispatch on node kind via a helper chain. |
-| `pe_atom` | `compiler/parse/back/tgt/ast/expr/expr.id` | Expression printer (S-expression). Dispatch on node kind via a helper chain. |
 | `bin_fix` | `compiler/parse/back/tgt/ast/expr/fixture.id` | A small synthetic expression tree for the printer's own cases: e0 = the |
 | `bin_fix2` | `compiler/parse/back/tgt/ast/expr/fixture.id` | A small synthetic expression tree for the printer's own cases: e0 = the |
 | `call_fix` | `compiler/parse/back/tgt/ast/expr/fixture.id` | A small synthetic expression tree for the printer's own cases: e0 = the |
+| `print_expr` | `compiler/parse/back/tgt/ast/expr/print.id` | Expression printer (S-expression). Dispatch on node kind via a helper chain. |
+| `pe_op` | `compiler/parse/back/tgt/ast/expr/print.id` | Expression printer (S-expression). Dispatch on node kind via a helper chain. |
+| `pe_atom` | `compiler/parse/back/tgt/ast/expr/print.id` | Expression printer (S-expression). Dispatch on node kind via a helper chain. |
 | `print_program` | `compiler/parse/back/tgt/ast/prog/func.id` | Program printer: render each parsed function as a nested S-expression. |
 | `show_func` | `compiler/parse/back/tgt/ast/prog/func.id` | Program printer: render each parsed function as a nested S-expression. |
 | `print_func` | `compiler/parse/back/tgt/ast/prog/func.id` | Program printer: render each parsed function as a nested S-expression. |
@@ -2579,12 +2579,12 @@ once this compiler uses a construct on itself.
 | `print_func_tail` | `compiler/parse/back/tgt/ast/prog/tail.id` | The tail of print_func: the body and return clause, once the signature is |
 | `stmt_fix` | `compiler/parse/back/tgt/ast/prog/tail.id` | A small synthetic statement tree: e0 = int literal 5, d0 = decl "int y" = |
 | `stmt_fix2` | `compiler/parse/back/tgt/ast/prog/tail.id` | The tail of print_func: the body and return clause, once the signature is |
+| `ps2` | `compiler/parse/back/tgt/ast/stmt/dispatch.id` | Remaining statement forms. |
+| `ps3` | `compiler/parse/back/tgt/ast/stmt/dispatch.id` | Remaining statement forms. |
+| `ps4` | `compiler/parse/back/tgt/ast/stmt/dispatch.id` | Remaining statement forms. |
 | `print_ret` | `compiler/parse/back/tgt/ast/stmt/ret.id` | The return clause: `(return EXPR)`, or `(return void)` (recorded as -1). |
 | `stmt_fix3` | `compiler/parse/back/tgt/ast/stmt/ret.id` | w0 = while(e0, body []). Deterministic id: w0=3. |
 | `stmt_fix4` | `compiler/parse/back/tgt/ast/stmt/ret.id` | if0 = if(e0, then [], else []), x0 = exprstmt e0. Deterministic ids: |
-| `ps2` | `compiler/parse/back/tgt/ast/stmt/stmt.id` | Remaining statement forms. |
-| `ps3` | `compiler/parse/back/tgt/ast/stmt/stmt.id` | Remaining statement forms. |
-| `ps4` | `compiler/parse/back/tgt/ast/stmt/stmt.id` | Remaining statement forms. |
 | `ps4_while` | `compiler/parse/back/tgt/ast/stmt/while_if.id` | The while form of ps4, tried before the if form takes over. |
 | `ps4_if` | `compiler/parse/back/tgt/ast/stmt/while_if.id` | The if form of ps4, once the condition and the then-branch are known. |
 | `func_fix` | `compiler/parse/back/tgt/ast/stmt/while_if.id` | func_fix: f0 = func "f" (params [p0]) int (body [d0, a0]) (return e0). |
@@ -2595,7 +2595,7 @@ once this compiler uses a construct on itself.
 | `asm_prev` | `compiler/parse/back/tgt/c/emit/asm/def/first_row.id` |  |
 | `asm_match2` | `compiler/parse/back/tgt/c/emit/asm/def/first_row.id` |  |
 | `lz_k` | `compiler/parse/back/tgt/c/emit/asm/def/more/body/lines.id` | The three lines of one asm function's body, once every piece of the |
-| `casm_row_fixture` | `compiler/parse/back/tgt/c/emit/asm/def/more/body/lines.id` | c_type reads tyc through c_scalar (prog/code/func/ctype/ctype.id), and |
+| `casm_row_fixture` | `compiler/parse/back/tgt/c/emit/asm/def/more/body/lines.id` | c_type reads tyc through c_scalar (prog/code/func/ctype/convert.id), and |
 | `emit_asm_one` | `compiler/parse/back/tgt/c/emit/asm/def/more/body/sig.id` | Signature and return-variable declaration of one asm function's C body. |
 | `asm_stmt` | `compiler/parse/back/tgt/c/emit/asm/def/more/body/stmt.id` | GCC extended asm. Every block is volatile with a memory clobber: that is |
 | `asm_stmt2` | `compiler/parse/back/tgt/c/emit/asm/def/more/body/stmt.id` | GCC extended asm. Every block is volatile with a memory clobber: that is |
@@ -2632,31 +2632,31 @@ once this compiler uses a construct on itself.
 | `ee6` | `compiler/parse/back/tgt/c/emit/op/unary.id` | Unary-expression emission: `(OP operand)`, e.g. `(-1)`. Extends the |
 | `emit_un` | `compiler/parse/back/tgt/c/emit/op/unary.id` | Unary-expression emission: `(OP operand)`, e.g. `(-1)`. Extends the |
 | `un_fix` | `compiler/parse/back/tgt/c/emit/op/unary.id` | A "-6" un node, reusing arith_fix's ai0 as the operand. Deterministic id: |
-| `hoist` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist.id` | Hoist locals: id is function-scoped (a var declared in a branch may be used |
-| `hoist_list` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist.id` | Hoist locals: id is function-scoped (a var declared in a branch may be used |
-| `hoist_one` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist.id` | Hoist locals: id is function-scoped (a var declared in a branch may be used |
 | `hoist_loop` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist_loop.id` | Hoist locals declared inside a while body. |
 | `hoist_decl_line` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist_loop.id` | The tail of hoist_decl: the C type is derived from the declared type only |
 | `sq_name` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist_loop.id` | A sequencing temporary's name (../../expr/atom/order/): idsq_ and the |
 | `hoist_decl` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist_nested.id` | exported decls are C globals (emitted separately), so only non-exported |
 | `hoist_nested` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist_nested.id` | Recurse into the bodies of compound statements when hoisting. |
 | `hoist_branches` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/hoist_nested.id` | Recurse into the bodies of compound statements when hoisting. |
-| `emit_block` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/block.id` | Emit a block of statements, and the start of the statement dispatch. |
-| `emit_stmt` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/block.id` | Emit a block of statements, and the start of the statement dispatch. |
-| `emit_decl_line` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/block.id` | The tail of a decl statement, once its target name and initializer are known. |
+| `hoist` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/walk.id` | Hoist locals: id is function-scoped (a var declared in a branch may be used |
+| `hoist_list` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/walk.id` | Hoist locals: id is function-scoped (a var declared in a branch may be used |
+| `hoist_one` | `compiler/parse/back/tgt/c/emit/prog/code/body/hoist/walk.id` | Hoist locals: id is function-scoped (a var declared in a branch may be used |
+| `emit_block` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/emit.id` | Emit a block of statements, and the start of the statement dispatch. |
+| `emit_stmt` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/emit.id` | Emit a block of statements, and the start of the statement dispatch. |
+| `emit_decl_line` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/emit.id` | The tail of a decl statement, once its target name and initializer are known. |
 | `lz_l` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/es2.id` | id 19: "r", the shared return var; id 20: "int r = 5;". |
 | `es2` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/es2.id` | id 19: "r", the shared return var; id 20: "int r = 5;". |
 | `emit_decl_mark` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/es2.id` | A decl statement, and in the harness an exported one's flag right after |
 | `harn_fix` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/fixture.id` | stmt_fix plus harn_init -- emit_while_body calls emit_count, which reads |
 | `tyc_fix` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/block/fixture.id` | func_fix plus init_tyc -- hoist_decl_line calls c_type, which reads the C |
+| `es3` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/dispatch.id` | Expression statement, then the if/while split. |
+| `es4` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/dispatch.id` | Expression statement, then the if/while split. |
+| `emit_if` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/dispatch.id` | Expression statement, then the if/while split. |
 | `cond_text_of` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/at.id` | One condition's text, computed once per level of an if / else-if chain |
 | `sq_based` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/at.id` | The state emit_def (func/def/body/def.id) leaves while it emits the body |
-| `collect_chain` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/if.id` | A declaration cannot sit between a branch's closing `}` and its `} else |
-| `seq_conds` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/if.id` | A declaration cannot sit between a branch's closing `}` and its `} else |
-| `render_chain` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/if.id` | Render one level of the chain, using its precomputed condition text rather |
-| `es3` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/stmt.id` | Expression statement, then the if/while split. |
-| `es4` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/stmt.id` | Expression statement, then the if/while split. |
-| `emit_if` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/stmt.id` | Expression statement, then the if/while split. |
+| `collect_chain` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/chain.id` | A declaration cannot sit between a branch's closing `}` and its `} else |
+| `seq_conds` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/chain.id` | A declaration cannot sit between a branch's closing `}` and its `} else |
+| `render_chain` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt/if/chain.id` | Render one level of the chain, using its precomputed condition text rather |
 | `emit_else` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/else_while/else.id` | The else arm. |
 | `emit_body_close` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/else_while/else.id` | The closing lines a block shares with a while loop: the body, then the |
 | `es_flow` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/else_while/else.id` | The two flow statements, then on to if/while. id's `while` is a C `while`, |
@@ -2683,7 +2683,7 @@ once this compiler uses a construct on itself.
 | `nz_int_big_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/list/pair.id` | A literal too wide for a 32-bit int, matching the `big` flag a real parse |
 | `nz_if_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/branch.id` | An `if` and a `while` node, both with empty bodies, for the statement |
 | `nz_while_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/branch.id` | An `if` and a `while` node, both with empty bodies, for the statement |
-| `nz_tyc_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/branch.id` | init_tyc gives c_type/c_scalar (func/ctype/ctype.id) their C-spelling |
+| `nz_tyc_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/branch.id` | init_tyc gives c_type/c_scalar (func/ctype/convert.id) their C-spelling |
 | `nz_main_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/prog.id` | Two `func` nodes: one named "main" taking one int parameter, one not -- |
 | `nz_plain_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/prog.id` | Two `func` nodes: one named "main" taking one int parameter, one not -- |
 | `nz_prog_fixture` | `compiler/parse/back/tgt/c/emit/prog/code/body/stmt_more/fixture/stmt/prog.id` | Two `func` nodes: one named "main" taking one int parameter, one not -- |
@@ -2737,20 +2737,20 @@ once this compiler uses a construct on itself.
 | `both_str` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/both_str.id` | Both operands are strings? |
 | `is_i2_str` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/both_str.id` | The second operand's type, read and compared inside one function so that |
 | `infix_line` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/both_str.id` | The tail of emit_infix, once the left operand and the operator are known. |
+| `emit_strcmp` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/strcmp/emit.id` | String equality: `a == b` on strings becomes (strcmp(a, b) == 0), matching |
+| `strcmp_line` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/strcmp/emit.id` | String equality: `a == b` on strings becomes (strcmp(a, b) == 0), matching |
 | `is_strcmp` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/strcmp/eq.id` |  |
 | `is_eqop` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/strcmp/eq.id` |  |
-| `emit_strcmp` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/strcmp/strcmp.id` | String equality: `a == b` on strings becomes (strcmp(a, b) == 0), matching |
-| `strcmp_line` | `compiler/parse/back/tgt/c/emit/prog/code/expr/binop/strcmp/strcmp.id` | String equality: `a == b` on strings becomes (strcmp(a, b) == 0), matching |
 | `emit_args` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/args.id` | Comma-separated argument list, the separator helper (shared with params), |
 | `sep_arg` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/args.id` | Comma-separated argument list, the separator helper (shared with params), |
 | `map_op` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/args.id` | Comma-separated argument list, the separator helper (shared with params), |
-| `emit_call` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/call.id` | Call emission: a normal call is id_NAME(args); print and eprint coerce their |
-| `emit_print` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/call.id` | Call emission: a normal call is id_NAME(args); print and eprint coerce their |
 | `emit_concat` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/concat.id` | String concatenation, and an operand coerced to string context. |
 | `arg_str` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/concat.id` | String concatenation, and an operand coerced to string context. |
-| `c_type` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/ctype.id` | id type -> C type. Any list type is the generic IdList*; a function type is |
-| `c_fn_type` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/ctype.id` | C can spell a pointer to a function only around a name -- `void (*f)(int)` -- |
-| `c_scalar` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/ctype.id` | A type with no registry row has no spelling either. It answers `int` for |
+| `emit_call` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/emit.id` | Call emission: a normal call is id_NAME(args); print and eprint coerce their |
+| `emit_print` | `compiler/parse/back/tgt/c/emit/prog/code/expr/call/emit.id` | Call emission: a normal call is id_NAME(args); print and eprint coerce their |
+| `c_type` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/convert.id` | id type -> C type. Any list type is the generic IdList*; a function type is |
+| `c_fn_type` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/convert.id` | C can spell a pointer to a function only around a name -- `void (*f)(int)` -- |
+| `c_scalar` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/convert.id` | A type with no registry row has no spelling either. It answers `int` for |
 | `emit_tc_helpers` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/collect.id` | The harness's helpers for list types: `idtc_eq_K` compares two lists and |
 | `tc_emit_types` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/collect.id` | The harness's helpers for list types: `idtc_eq_K` compares two lists and |
 | `tc_collect` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/collect.id` | The harness's helpers for list types: `idtc_eq_K` compares two lists and |
@@ -2768,9 +2768,9 @@ once this compiler uses a construct on itself.
 | `note_one` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/protos.id` | The set of list types, in the order first met, and their prototypes. |
 | `tc_types_init` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/protos.id` | The set of list types, in the order first met, and their prototypes. |
 | `emit_ty_protos` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/more/protos.id` | The set of list types, in the order first met, and their prototypes. |
-| `tc_collect_case` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/note.id` | The types one case compares at. |
-| `tc_collect_expd` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/note.id` | The types one case compares at. |
-| `note_ty` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/note.id` | The types one case compares at. |
+| `tc_collect_case` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/collect.id` | The types one case compares at. |
+| `tc_collect_expd` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/collect.id` | The types one case compares at. |
+| `note_ty` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/collect.id` | The types one case compares at. |
 | `note_fn_ret` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/ret.id` | A function's return type, noted the same way a case's expected value's is |
 | `tctys_len` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/ret.id` | A reader for `tctys` (protos.id's note_one/tc_types_init have no other |
 | `tctys_note_one_setup` | `compiler/parse/back/tgt/c/emit/prog/code/func/ctype/list/note/ret.id` | A function's return type, noted the same way a case's expected value's is |
@@ -2818,9 +2818,9 @@ once this compiler uses a construct on itself.
 | `wrap_body` | `compiler/parse/back/tgt/c/emit/prog/code/func/entry/wrapper.id` | The real C entry point wrapping id's main(). Matches idc.py: marshals C argv |
 | `const_decl` | `compiler/parse/back/tgt/c/emit/prog/head/const/find.id` | The declaration node a constant's name came from. Looked up by name rather |
 | `const_pick` | `compiler/parse/back/tgt/c/emit/prog/head/const/find.id` | The declaration node a constant's name came from. Looked up by name rather |
-| `emit_const_init` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/init.id` | The C target's initialiser for list constants (dce/export/consts.id says |
-| `emit_init_fn` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/init.id` | The C target's initialiser for list constants (dce/export/consts.id says |
-| `init_lines` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/init.id` | The C target's initialiser for list constants (dce/export/consts.id says |
+| `emit_const_init` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/build.id` | The C target's initialiser for list constants (dce/export/consts.id says |
+| `emit_init_fn` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/build.id` | The C target's initialiser for list constants (dce/export/consts.id says |
+| `init_lines` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/build.id` | The C target's initialiser for list constants (dce/export/consts.id says |
 | `init_line_kept` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/line.id` | One list constant built: `name = id_list_lit(...);`, the list literal as the |
 | `init_line_emit` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/line.id` | One list constant built: `name = id_list_lit(...);`, the list literal as the |
 | `init_line` | `compiler/parse/back/tgt/c/emit/prog/head/const/init/line.id` | One list constant built: `name = id_list_lit(...);`, the list literal as the |
@@ -2851,46 +2851,46 @@ once this compiler uses a construct on itself.
 | `emit_case_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/given.id` | Before the call: the case's setup, if it has one, then its arguments. The |
 | `emit_case_given` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/given.id` | Before the call: the case's setup, if it has one, then its arguments. The |
 | `casegiven_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/given.id` | wrap_fixture's casenode/casefn (test/case/around/then/more/capture/pre/ |
-| `emit_then_kind` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/entry.id` | Dispatch by node kind (../then.id), and the original check's own entry |
-| `emit_then_check` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/entry.id` | Dispatch by node kind (../then.id), and the original check's own entry |
+| `emit_then_kind` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/entry.id` | Dispatch by node kind (../walk.id), and the original check's own entry |
+| `emit_then_check` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/entry.id` | Dispatch by node kind (../walk.id), and the original check's own entry |
 | `emit_then_fail` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/fail.id` | A check that does not hold fails the case the way a wrong result does, in the |
 | `emit_then_lines` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/fail.id` | A check that does not hold fails the case the way a wrong result does, in the |
 | `then_tail` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/fail.id` | A check that does not hold fails the case the way a wrong result does, in the |
 | `emit_then_got` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/got.id` | One check: what it returned and what it must equal, one C local each -- |
 | `emit_then_want` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/got.id` | One check: what it returned and what it must equal, one C local each -- |
 | `emit_then_judge` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/check/got.id` | One check: what it returned and what it must equal, one C local each -- |
-| `emit_calls_args` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/args.id` | `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the |
-| `emit_calls_args_body` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/args.id` | `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the |
-| `emit_calls_args_cond` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/args.id` | `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the |
 | `calls_row_cond` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/build.id` | The row condition: every parameter of NAME compared against the clause's |
 | `calls_row_scan` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/build.id` | The row condition: every parameter of NAME compared against the clause's |
 | `calls_row_step` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/build.id` | The row condition: every parameter of NAME compared against the clause's |
 | `calls_row_cmp` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/cmp.id` | One column's comparison (build.id) and display (../dispatch.id's |
 | `emit_calls_args_emit` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/cmp.id` | One column's comparison (build.id) and display (../dispatch.id's |
 | `calls_show_step` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/cmp.id` | One column's comparison (build.id) and display (../dispatch.id's |
+| `emit_calls_args` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/match.id` | `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the |
+| `emit_calls_args_body` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/match.id` | `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the |
+| `emit_calls_args_cond` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/args/match.id` | `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the |
 | `emit_calls_count` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/count.id` | `then calls NAME:[N]` -- the exact count recorded for NAME |
 | `emit_calls_count_cond` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/count.id` | `then calls NAME:[N]` -- the exact count recorded for NAME |
 | `emit_then_calls` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/dispatch.id` | `then calls NAME:(...)` (args/) or `then calls NAME:[N]` (count.id), and |
 | `calls_row_show` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/dispatch.id` | `then calls NAME:(...)` (args/) or `then calls NAME:[N]` (count.id), and |
 | `note_calls` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/calls/dispatch.id` | `then calls NAME:(...)` (args/) or `then calls NAME:[N]` (count.id), and |
-| `emit_capture_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/post.id` | After the call under test: stdout restored, and what it wrote read back |
-| `emit_out_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/post.id` | After the call under test: stdout restored, and what it wrote read back |
 | `emit_capture_post2` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/rest.id` | eprint's buffer read back the same way stdout's is, and its target restored |
 | `emit_err_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/rest.id` | eprint's buffer read back the same way stdout's is, and its target restored |
 | `emit_calls_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/rest.id` | eprint's buffer read back the same way stdout's is, and its target restored |
+| `emit_capture_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/restore.id` | After the call under test: stdout restored, and what it wrote read back |
+| `emit_out_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/post/restore.id` | After the call under test: stdout restored, and what it wrote read back |
 | `wrap_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/fixture.id` | casefn/casenode filled in for fixture_ci: fx_target itself, called with |
 | `wrap_fixture_case` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/fixture.id` | casefn/casenode filled in for fixture_ci: fx_target itself, called with |
 | `wrap_fixture_push` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/fixture.id` | casefn/casenode filled in for fixture_ci: fx_target itself, called with |
-| `emit_capture_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/pre.id` | Before the call under test: redirect stdout to a temp file for a `prints` |
-| `emit_out_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/pre.id` | Before the call under test: redirect stdout to a temp file for a `prints` |
+| `emit_capture_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/redirect.id` | Before the call under test: redirect stdout to a temp file for a `prints` |
+| `emit_out_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/redirect.id` | Before the call under test: redirect stdout to a temp file for a `prints` |
 | `emit_capture_pre2` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/rest.id` | The other two: eprint's target swapped for an `eprints` clause (its default |
 | `emit_err_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/rest.id` | The other two: eprint's target swapped for an `eprints` clause (its default |
 | `emit_calls_pre` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/pre/rest.id` | The other two: eprint's target swapped for an `eprints` clause (its default |
 | `case_has_calls` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/calls.id` | Either form of `calls` counts, for turning recording on around the call |
-| `query_node_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/calls.id` | thennode with one entry, not empty -- for out_step (query.id), which |
-| `case_has_out` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/query.id` | Whether the case being emitted carries a `then` clause of a given kind -- |
-| `out_scan` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/query.id` | Whether the case being emitted carries a `then` clause of a given kind -- |
-| `out_step` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/query.id` | Whether the case being emitted carries a `then` clause of a given kind -- |
+| `query_node_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/calls.id` | thennode with one entry, not empty -- for out_step (hasout.id), which |
+| `case_has_out` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/hasout.id` | Whether the case being emitted carries a `then` clause of a given kind -- |
+| `out_scan` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/hasout.id` | Whether the case being emitted carries a `then` clause of a given kind -- |
+| `out_step` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/hasout.id` | Whether the case being emitted carries a `then` clause of a given kind -- |
 | `emit_case_call_wrapped` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/wrap.id` | The call under test, with whatever it needs wrapped around it: output |
 | `case_traps_node` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/wrap.id` | The case's own `traps` node, or -1: judge/more/row.id's idtc_traps[ci] row |
 | `traps_node_step` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/capture/query/wrap.id` | The call under test, with whatever it needs wrapped around it: output |
@@ -2901,18 +2901,20 @@ once this compiler uses a construct on itself.
 | `emit_print_cond` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/print/judge.id` | The captured buffer against the clause's one value, compared exactly as a |
 | `print_var` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/print/vars.id` | What a `prints`/`eprints` clause compares against, and what its failure |
 | `print_label` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/more/print/vars.id` | What a `prints`/`eprints` clause compares against, and what its failure |
-| `emit_case_thens` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/then.id` | After the call has been compared: each `then` clause written on the case, |
-| `then_at` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/then.id` | After the call has been compared: each `then` clause written on the case, |
-| `emit_then` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/then.id` | After the call has been compared: each `then` clause written on the case, |
-| `emit_cases` | `compiler/parse/back/tgt/c/emit/prog/test/case/case.id` | A library case (case_is_std, mid/names/symbols/lookup/more/std_unit.id) |
-| `emit_case_fn` | `compiler/parse/back/tgt/c/emit/prog/test/case/case.id` | One C function per case, run in the case's own process: |
-| `emit_case_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/case.id` | A `traps` case skips the return-value machinery entirely (emit_case_expd, |
+| `emit_case_thens` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/walk.id` | After the call has been compared: each `then` clause written on the case, |
+| `then_at` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/walk.id` | After the call has been compared: each `then` clause written on the case, |
+| `emit_then` | `compiler/parse/back/tgt/c/emit/prog/test/case/around/then/walk.id` | After the call has been compared: each `then` clause written on the case, |
+| `emit_cases` | `compiler/parse/back/tgt/c/emit/prog/test/case/emit.id` | A library case (case_is_std, mid/names/symbols/lookup/more/std_unit.id) |
+| `emit_case_fn` | `compiler/parse/back/tgt/c/emit/prog/test/case/emit.id` | One C function per case, run in the case's own process: |
+| `emit_case_post` | `compiler/parse/back/tgt/c/emit/prog/test/case/emit.id` | A `traps` case skips the return-value machinery entirely (emit_case_expd, |
 | `emit_case_call` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/call.id` | The call under test. A value is kept in `idtc_got`; a void function's result |
 | `void_call_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/call.id` | A second casefn/casenode entry, a void-returning function with no |
 | `emit_ret_call` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/call.id` | The call under test. A value is kept in `idtc_got`; a void function's result |
 | `emit_tc_decl` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/decl.id` | A harness local, and the argument list that names them. |
 | `arg_names` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/decl.id` | A harness local, and the argument list that names them. |
 | `names_upto` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/decl.id` | A harness local, and the argument list that names them. |
+| `emit_case_expd` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/expected.id` | After the call: the counts, then the expected values, one local each -- |
+| `emit_case_traps_fail` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/expected.id` | A `traps` case's whole point is that the call does not return, so if this |
 | `emit_case_fail` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/fail/end.id` | The comparison and its message, idc.py's wording: |
 | `case_cond` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/fail/more/cond.id` | Whether the call produced what the case expects: every compared value |
 | `cond_parts` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/fail/more/cond.id` | Whether the call produced what the case expects: every compared value |
@@ -2924,14 +2926,12 @@ once this compiler uses a construct on itself.
 | `wrap_row2_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/fail/more/sep.id` | emit_case_fail (../end.id) reads casefn[ci] and casenode[ci], so a case for |
 | `show_all` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/fail/show.id` | What the call produced, printed the way a case writes it: one value, or a |
 | `show_parts` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/fail/show.id` | What the call produced, printed the way a case writes it: one value, or a |
-| `emit_case_expd` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/judge.id` | After the call: the counts, then the expected values, one local each -- |
-| `emit_case_traps_fail` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/judge.id` | A `traps` case's whole point is that the call does not return, so if this |
 | `emit_expd_decl` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/pick.id` | What the j-th expected value is compared with, and at which type: the |
 | `chk_name` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/pick.id` | What the j-th expected value is compared with, and at which type: the |
 | `chk_type` | `compiler/parse/back/tgt/c/emit/prog/test/case/more/judge/pick.id` | What the j-th expected value is compared with, and at which type: the |
-| `claim_body` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/claims.id` | The scaling claims, judged once every case has passed: first each claiming |
-| `claim_sizes` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/claims.id` | The scaling claims, judged once every case has passed: first each claiming |
-| `ur_count` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/claims.id` | How many unit roots bin/idc passed (root.id), for its cases. |
+| `claim_body` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/body.id` | The scaling claims, judged once every case has passed: first each claiming |
+| `claim_sizes` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/body.id` | The scaling claims, judged once every case has passed: first each claiming |
+| `ur_count` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/body.id` | How many unit roots bin/idc passed (root.id), for its cases. |
 | `emit_tc_dirs` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/dirs.id` | Where each case runs: idtc_dirs, called once before any case, fills |
 | `tc_dir_rows` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/dirs.id` | Where each case runs: idtc_dirs, called once before any case, fills |
 | `emit_dir_row` | `compiler/parse/back/tgt/c/emit/prog/test/judge/claims/dirs.id` | Where each case runs: idtc_dirs, called once before any case, fills |
@@ -2968,6 +2968,9 @@ once this compiler uses a construct on itself.
 | `emit_tc_setup` | `compiler/parse/back/tgt/c/emit/prog/test/judge/setup.id` | The case table, filled in before the first fork: where each case is, the |
 | `setup_rows` | `compiler/parse/back/tgt/c/emit/prog/test/judge/setup.id` | The case table, filled in before the first fork: where each case is, the |
 | `setup_row` | `compiler/parse/back/tgt/c/emit/prog/test/judge/setup.id` | The case table, filled in before the first fork: where each case is, the |
+| `emit_tests_maybe` | `compiler/parse/back/tgt/c/emit/prog/test/unit/entry.id` | The test harness: a second translation unit that runs every case written |
+| `emit_tests` | `compiler/parse/back/tgt/c/emit/prog/test/unit/entry.id` | The case keys come first, while `prog` is still every function as parsed |
+| `emit_test_unit` | `compiler/parse/back/tgt/c/emit/prog/test/unit/entry.id` | The test harness: a second translation unit that runs every case written |
 | `harn_init` | `compiler/parse/back/tgt/c/emit/prog/test/unit/flag.id` | Whether the C being emitted is the harness's. Read where work is counted -- |
 | `harn_set` | `compiler/parse/back/tgt/c/emit/prog/test/unit/flag.id` | Whether the C being emitted is the harness's. Read where work is counted -- |
 | `is_harn` | `compiler/parse/back/tgt/c/emit/prog/test/unit/flag.id` | Whether the C being emitted is the harness's. Read where work is counted -- |
@@ -2983,8 +2986,6 @@ once this compiler uses a construct on itself.
 | `emit_rec_call` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/call.id` | Whether function `id` gets the call-recording hook (its body is emitted |
 | `emit_rec_call_line` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/call.id` | Whether function `id` gets the call-recording hook (its body is emitted |
 | `call_fixture` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/call.id` | is_harn() true (harn_init/harn_set, test/unit/more/flag.id) and fx_target a |
-| `emit_rec_def` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/def.id` | One recorded name's storage: a struct with one native-typed field per |
-| `emit_rec_types` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/def.id` | One recorded name's storage: a struct with one native-typed field per |
 | `emit_rec_fn` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/fn.id` | The recorder itself: NAME's own parameter list (its signature, unchanged -- |
 | `emit_rec_fn_body` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/fn.id` | The recorder itself: NAME's own parameter list (its signature, unchanged -- |
 | `rec_row_assigns` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/row/assign.id` | A recorded row's assignments, `pfx.name = name;` for each parameter -- |
@@ -2995,6 +2996,8 @@ once this compiler uses a construct on itself.
 | `rec_row_add` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/row/columns.id` | A recorded row's fields: one per parameter, native-typed and named exactly |
 | `rec_param_names` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/row/names.id` | Just the parameter names, comma-separated: the arguments a NAME's body |
 | `rec_name_scan` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/row/names.id` | Just the parameter names, comma-separated: the arguments a NAME's body |
+| `emit_rec_def` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/struct.id` | One recorded name's storage: a struct with one native-typed field per |
+| `emit_rec_types` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/def/struct.id` | One recorded name's storage: a struct with one native-typed field per |
 | `emit_rec_defs` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/defs.id` | A recorder for every function targeted by a `calls` clause (target.id), |
 | `emit_rec_scan` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/defs.id` | A recorder for every function targeted by a `calls` clause (target.id), |
 | `emit_rec_at` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/defs.id` | A recorder for every function targeted by a `calls` clause (target.id), |
@@ -3010,9 +3013,6 @@ once this compiler uses a construct on itself.
 | `emit_test_tail` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/text/proc.id` | The harness's fixed code, and the order its generated parts follow in. |
 | `emit_tc_run` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/text/proc.id` | The harness's fixed code, and the order its generated parts follow in. |
 | `emit_tc_proc` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/text/proc.id` | The harness's fixed code, and the order its generated parts follow in. |
-| `emit_tests_maybe` | `compiler/parse/back/tgt/c/emit/prog/test/unit/unit.id` | The test harness: a second translation unit that runs every case written |
-| `emit_tests` | `compiler/parse/back/tgt/c/emit/prog/test/unit/unit.id` | The case keys come first, while `prog` is still every function as parsed |
-| `emit_test_unit` | `compiler/parse/back/tgt/c/emit/prog/test/unit/unit.id` | The test harness: a second translation unit that runs every case written |
 | `arr_cells` | `compiler/parse/back/tgt/c/out/builtin/arr/arr_cells.id` | The boxed, comma-separated cell list for an array literal. |
 | `emit_arr` | `compiler/parse/back/tgt/c/out/builtin/arr/arr_lit.id` | Array-literal emission: `id_list_lit(0)` for an empty list, otherwise |
 | `emit_arr_n` | `compiler/parse/back/tgt/c/out/builtin/arr/arr_lit.id` | Array-literal emission: `id_list_lit(0)` for an empty list, otherwise |
@@ -3020,56 +3020,56 @@ once this compiler uses a construct on itself.
 | `arr1_fixture` | `compiler/parse/back/tgt/c/out/builtin/arr/fixture.id` | A one-element "arr" node, alongside case/lit/fixture.id's plain ints and |
 | `claim_dup_fixture` | `compiler/parse/back/tgt/c/out/builtin/arr/fixture.id` | Two claims on two different cases of the same function, same kind and |
 | `claim_other_fn_fixture` | `compiler/parse/back/tgt/c/out/builtin/arr/fixture.id` | One claim on a case whose function differs from case 0's -- for |
-| `ec2` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/dispatch.id` | Call emission dispatch for the list builtins, extending emit_call: |
-| `ec3` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/dispatch.id` | Call emission dispatch for the list builtins, extending emit_call: |
-| `emit_gcall` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/dispatch.id` | Call emission dispatch for the list builtins, extending emit_call: |
+| `ec2` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/chain.id` | Call emission dispatch for the list builtins, extending emit_call: |
+| `ec3` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/chain.id` | Call emission dispatch for the list builtins, extending emit_call: |
+| `emit_gcall` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/chain.id` | Call emission dispatch for the list builtins, extending emit_call: |
 | `lz_empty` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/fcall.id` | A call through a variable of function type. The variable is a C function |
 | `emit_fcall` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/fcall.id` | A call through a variable of function type. The variable is a C function |
 | `emit_gcall_tail` | `compiler/parse/back/tgt/c/out/builtin/call/dispatch/tail.id` | The tail of emit_gcall: the generic id_NAME(args) form, overridden with a |
+| `emit_len` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/emit.id` | len picks id_len for a string and id_list_len for a list; push boxes its |
+| `emit_push` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/emit.id` | len picks id_len for a string and id_list_len for a list; push boxes its |
 | `call_env_fixture` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/fixture.id` | A synthetic "call" node's pieces: env_init's node tables plus the symbol |
 | `call_int_fixture` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/fixture.id` | A synthetic "call" node's pieces: env_init's node tables plus the symbol |
 | `call_args_fixture` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/fixture.id` | call_args_rev is the same two nodes in the other order -- what gives |
-| `emit_len` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/len_push.id` | len picks id_len for a string and id_list_len for a list; push boxes its |
-| `emit_push` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/len_push.id` | len picks id_len for a string and id_list_len for a list; push boxes its |
 | `emit_push_tail` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/tail.id` |  |
 | `push_code` | `compiler/parse/back/tgt/c/out/builtin/call/len_push/tail.id` |  |
 | `ec4` | `compiler/parse/back/tgt/c/out/builtin/call/pop.id` | pop(xs) -- removes and returns the last cell, so like every list read it |
 | `emit_pop` | `compiler/parse/back/tgt/c/out/builtin/call/pop.id` | pop(xs) -- removes and returns the last cell, so like every list read it |
 | `emit_pop_tail` | `compiler/parse/back/tgt/c/out/builtin/call/pop.id` | pop(xs) -- removes and returns the last cell, so like every list read it |
+| `emit_syscall` | `compiler/parse/back/tgt/c/out/builtin/syscall/emit.id` | The flat-store and unsigned-word builtins. They all take machine words, so |
+| `cast_args` | `compiler/parse/back/tgt/c/out/builtin/syscall/emit.id` | The flat-store and unsigned-word builtins. They all take machine words, so |
+| `is_syscall` | `compiler/parse/back/tgt/c/out/builtin/syscall/emit.id` | The flat-store and unsigned-word builtins. They all take machine words, so |
 | `call_names_fixture` | `compiler/parse/back/tgt/c/out/builtin/syscall/fixture.id` | "call" nodes over len_push/fixture.id's two int arguments (5 and 4), one |
 | `call_names_fixture2` | `compiler/parse/back/tgt/c/out/builtin/syscall/fixture.id` | "call" nodes over len_push/fixture.id's two int arguments (5 and 4), one |
 | `call_sys_fixture` | `compiler/parse/back/tgt/c/out/builtin/syscall/fixture.id` | Two syscall names: "peek8" (an ordinary is_wordfn helper) and "alloc" |
 | `sys_helper` | `compiler/parse/back/tgt/c/out/builtin/syscall/helper_name.id` | C helper name for a systems builtin: `id_` + the builtin's name, except for |
 | `sys_helper2` | `compiler/parse/back/tgt/c/out/builtin/syscall/helper_name.id` | C helper name for a systems builtin: `id_` + the builtin's name, except for |
 | `arg_cast` | `compiler/parse/back/tgt/c/out/builtin/syscall/helper_name.id` | The cast in front of one argument. `udiv`, `umod` and `ushr` read an `int` |
-| `emit_syscall` | `compiler/parse/back/tgt/c/out/builtin/syscall/syscall.id` | The flat-store and unsigned-word builtins. They all take machine words, so |
-| `cast_args` | `compiler/parse/back/tgt/c/out/builtin/syscall/syscall.id` | The flat-store and unsigned-word builtins. They all take machine words, so |
-| `is_syscall` | `compiler/parse/back/tgt/c/out/builtin/syscall/syscall.id` | The flat-store and unsigned-word builtins. They all take machine words, so |
 | `tc_cells` | `compiler/parse/back/tgt/c/out/case/lit/cells.id` | A list literal's cells, and a scalar: the digits or text as written, with a |
 | `tc_scalar` | `compiler/parse/back/tgt/c/out/case/lit/cells.id` | A list literal's cells, and a scalar: the digits or text as written, with a |
 | `tc_neg` | `compiler/parse/back/tgt/c/out/case/lit/cells.id` | A list literal's cells, and a scalar: the digits or text as written, with a |
+| `tc_lit` | `compiler/parse/back/tgt/c/out/case/lit/emit.id` | A case literal as C, built at the type the signature declares -- the same |
 | `lit_int_fixture` | `compiler/parse/back/tgt/c/out/case/lit/fixture.id` | Synthetic case-literal nodes for this directory's emitters: two plain |
 | `lit_un_fixture` | `compiler/parse/back/tgt/c/out/case/lit/fixture.id` | Synthetic case-literal nodes for this directory's emitters: two plain |
 | `lit_str_fixture` | `compiler/parse/back/tgt/c/out/case/lit/fixture.id` | A string leaf, for the emitters that read a "str" node's text rather than |
-| `tc_lit` | `compiler/parse/back/tgt/c/out/case/lit/lit.id` | A case literal as C, built at the type the signature declares -- the same |
 | `tc_compare` | `compiler/parse/back/tgt/c/out/case/more/cmp.id` | Comparing and printing a value of an id type, in C. A list goes through the |
 | `tc_show` | `compiler/parse/back/tgt/c/out/case/more/cmp.id` | Comparing and printing a value of an id type, in C. A list goes through the |
 | `show_scalar` | `compiler/parse/back/tgt/c/out/case/more/cmp.id` | Comparing and printing a value of an id type, in C. A list goes through the |
 | `c_esc` | `compiler/parse/back/tgt/c/out/case/more/esc.id` | Text as the body of a C string literal: the harness's messages quote id |
 | `esc_at` | `compiler/parse/back/tgt/c/out/case/more/esc.id` | Text as the body of a C string literal: the harness's messages quote id |
 | `esc_code` | `compiler/parse/back/tgt/c/out/case/more/esc.id` | 92 is a backslash, 34 a double quote, 10 a newline. |
+| `tc_size` | `compiler/parse/back/tgt/c/out/case/more/size/expr.id` | The `n` a case argument contributes to a scaling claim, as a C expression: |
+| `size_leaf` | `compiler/parse/back/tgt/c/out/case/more/size/expr.id` | The `n` a case argument contributes to a scaling claim, as a C expression: |
+| `size_neg` | `compiler/parse/back/tgt/c/out/case/more/size/expr.id` | The `n` a case argument contributes to a scaling claim, as a C expression: |
 | `lit_arr_fixture` | `compiler/parse/back/tgt/c/out/case/more/size/fixture.id` | Two more shapes case/lit/fixture.id's plain ints do not cover: a list |
 | `lit_cells_fixture` | `compiler/parse/back/tgt/c/out/case/more/size/fixture.id` | Two more shapes case/lit/fixture.id's plain ints do not cover: a list |
 | `lit_import_fixture` | `compiler/parse/back/tgt/c/out/case/more/size/fixture.id` | A `(import NAME)` case argument, as the node the parser builds for it |
 | `show_num` | `compiler/parse/back/tgt/c/out/case/more/size/num.id` | A number printed the way a case writes it, and a case's `n`: the largest |
 | `size_list` | `compiler/parse/back/tgt/c/out/case/more/size/num.id` | A number printed the way a case writes it, and a case's `n`: the largest |
 | `sizes_c` | `compiler/parse/back/tgt/c/out/case/more/size/num.id` | A number printed the way a case writes it, and a case's `n`: the largest |
-| `tc_size` | `compiler/parse/back/tgt/c/out/case/more/size/size.id` | The `n` a case argument contributes to a scaling claim, as a C expression: |
-| `size_leaf` | `compiler/parse/back/tgt/c/out/case/more/size/size.id` | The `n` a case argument contributes to a scaling claim, as a C expression: |
-| `size_neg` | `compiler/parse/back/tgt/c/out/case/more/size/size.id` | The `n` a case argument contributes to a scaling claim, as a C expression: |
-| `tc_value` | `compiler/parse/back/tgt/c/out/case/value.id` | A case value as C: a literal, built by tc_lit (lit/lit.id), or |
-| `tc_list` | `compiler/parse/back/tgt/c/out/case/value.id` | A case value as C: a literal, built by tc_lit (lit/lit.id), or |
-| `tc_list_n` | `compiler/parse/back/tgt/c/out/case/value.id` | A case value as C: a literal, built by tc_lit (lit/lit.id), or |
+| `tc_value` | `compiler/parse/back/tgt/c/out/case/value.id` | A case value as C: a literal, built by tc_lit (lit/emit.id), or |
+| `tc_list` | `compiler/parse/back/tgt/c/out/case/value.id` | A case value as C: a literal, built by tc_lit (lit/emit.id), or |
+| `tc_list_n` | `compiler/parse/back/tgt/c/out/case/value.id` | A case value as C: a literal, built by tc_lit (lit/emit.id), or |
 | `box` | `compiler/parse/back/tgt/c/out/cell/box.id` | A `word` boxes exactly like an `int` -- the cast is what widens a narrower |
 | `box2` | `compiler/parse/back/tgt/c/out/cell/box.id` | Boxing a value into a uniform list cell (a long long), mirroring idc.py's |
 | `elem_type` | `compiler/parse/back/tgt/c/out/cell/box.id` | Boxing a value into a uniform list cell (a long long), mirroring idc.py's |
@@ -3082,19 +3082,22 @@ once this compiler uses a construct on itself.
 | `ret_void_fix` | `compiler/parse/back/tgt/c/runtime/extern.id` | fv0 = func "g" (params []) void (body []) (return void) -- so print_ret, |
 | `stmt_fix5` | `compiler/parse/back/tgt/c/runtime/extern.id` | p0 = param "int p". Deterministic id: p0=6. |
 | `emit_crt` | `compiler/parse/back/tgt/c/runtime/extern.id` | The C runtime with external linkage, which is what the LLVM target |
-| `emit_runtime` | `compiler/parse/back/tgt/c/runtime/runtime.id` | The C runtime prelude, printed verbatim so every target that splices C |
+| `emit_runtime` | `compiler/parse/back/tgt/c/runtime/prelude.id` | The C runtime prelude, printed verbatim so every target that splices C |
 | `ll_asm_all` | `compiler/parse/back/tgt/ll/fn/asm/def/asm.id` | `asm` functions, as LLVM inline assembly. |
 | `ll_asm_row` | `compiler/parse/back/tgt/ll/fn/asm/def/asm.id` | `asm` functions, as LLVM inline assembly. |
 | `ll_asm_one` | `compiler/parse/back/tgt/ll/fn/asm/def/asm.id` | noinline, and it matters: the block clobbers whatever registers its |
 | `ll_asm_par` | `compiler/parse/back/tgt/ll/fn/asm/def/body.id` |  |
 | `ll_asm_body` | `compiler/parse/back/tgt/ll/fn/asm/def/body.id` | Volatile with a memory clobber on every block, as in the C target: a wrong |
 | `ll_asm_cons` | `compiler/parse/back/tgt/ll/fn/asm/def/body.id` | One `=r` for the result, one `r` per parameter, then the memory clobber. |
-| `llasm_row2_fixture` | `compiler/parse/back/tgt/ll/fn/asm/def/more.id` | A second asm row, so ll_asm_text (../text/text.id) has two rows to tell |
+| `llasm_row2_fixture` | `compiler/parse/back/tgt/ll/fn/asm/def/more.id` | A second asm row, so ll_asm_text (../text/join.id) has two rows to tell |
 | `ll_asm_body2` | `compiler/parse/back/tgt/ll/fn/asm/def/more.id` | The rest of `ll_asm_body`: the text and constraint string, then the two |
-| `ll_asm_body3` | `compiler/parse/back/tgt/ll/fn/asm/def/more.id` | A second asm row, so ll_asm_text (../text/text.id) has two rows to tell |
+| `ll_asm_body3` | `compiler/parse/back/tgt/ll/fn/asm/def/more.id` | A second asm row, so ll_asm_text (../text/join.id) has two rows to tell |
 | `elems2_fixture` | `compiler/parse/back/tgt/ll/fn/asm/fixture.id` | "a"'s own value node (../../../mod/sect/glob/../../drive/run/check/dce/ |
 | `elems3_fixture` | `compiler/parse/back/tgt/ll/fn/asm/fixture.id` | "a"'s own value node (../../../mod/sect/glob/../../drive/run/check/dce/ |
 | `llasm_row_fixture` | `compiler/parse/back/tgt/ll/fn/asm/fixture.id` | One whole asm row, for the operand-text translation in text/. asm_reg_fix1b |
+| `ll_asm_text` | `compiler/parse/back/tgt/ll/fn/asm/text/join.id` | The instruction lines, joined with a newline and a tab, translated from the |
+| `ll_asm_sep` | `compiler/parse/back/tgt/ll/fn/asm/text/join.id` | The instruction lines, joined with a newline and a tab, translated from the |
+| `ll_asm_line` | `compiler/parse/back/tgt/ll/fn/asm/text/join.id` | A line arrives with its quotes, so the scan runs between them. |
 | `ll_asm_ix` | `compiler/parse/back/tgt/ll/fn/asm/text/ref/ix.id` | Which numbered operand a name is. The result is operand 0 -- LLVM counts |
 | `ll_asm_pix` | `compiler/parse/back/tgt/ll/fn/asm/text/ref/ix.id` | Which numbered operand a name is. The result is operand 0 -- LLVM counts |
 | `ll_asm_pm` | `compiler/parse/back/tgt/ll/fn/asm/text/ref/ix.id` | Which numbered operand a name is. The result is operand 0 -- LLVM counts |
@@ -3107,31 +3110,28 @@ once this compiler uses a construct on itself.
 | `ll_asm_step` | `compiler/parse/back/tgt/ll/fn/asm/text/scan.id` | How far a token reaches. An operand reference runs to its closing bracket; |
 | `ll_asm_end` | `compiler/parse/back/tgt/ll/fn/asm/text/scan.id` | How far a token reaches. An operand reference runs to its closing bracket; |
 | `ll_asm_nm` | `compiler/parse/back/tgt/ll/fn/asm/text/scan.id` | Where the operand name starts: past `%[`, or past `%x[` when a modifier |
-| `ll_asm_text` | `compiler/parse/back/tgt/ll/fn/asm/text/text.id` | The instruction lines, joined with a newline and a tab, translated from the |
-| `ll_asm_sep` | `compiler/parse/back/tgt/ll/fn/asm/text/text.id` | The instruction lines, joined with a newline and a tab, translated from the |
-| `ll_asm_line` | `compiler/parse/back/tgt/ll/fn/asm/text/text.id` | A line arrives with its quotes, so the scan runs between them. |
 | `ll_blocks` | `compiler/parse/back/tgt/ll/fn/body/blk.id` |  |
 | `ll_insn` | `compiler/parse/back/tgt/ll/fn/body/blk.id` | A parameter is spelled in the signature and a nop is what a pass left |
 | `ll_blk_fixture` | `compiler/parse/back/tgt/ll/fn/body/blk.id` | A block and a function large enough to reach ll_block/ll_insn without |
-| `ll_pstr` | `compiler/parse/back/tgt/ll/fn/body/entry/entry.id` | The parameter list of a define: `<ty> %v<id>`, in order, which is also how |
-| `ll_sep` | `compiler/parse/back/tgt/ll/fn/body/entry/entry.id` | The parameter list of a define: `<ty> %v<id>`, in order, which is also how |
-| `ll_block` | `compiler/parse/back/tgt/ll/fn/body/entry/entry.id` | The parameter list of a define: `<ty> %v<id>`, in order, which is also how |
 | `ll_cmp_fixture` | `compiler/parse/back/tgt/ll/fn/body/entry/fixture.id` | A comparison instruction (both env_init, for ty_kind's type registry |
 | `phi_fixture` | `compiler/parse/back/tgt/ll/fn/body/entry/fixture.id` | A comparison instruction (both env_init, for ty_kind's type registry |
 | `phi_empty_fixture` | `compiler/parse/back/tgt/ll/fn/body/entry/fixture.id` | The empty phi (0 incoming edges) needs a genuinely, typed-empty l/bl -- |
 | `ll_pcount` | `compiler/parse/back/tgt/ll/fn/body/entry/more.id` | How many parameters a function has, named for the same reason as |
 | `ll_pstr_step` | `compiler/parse/back/tgt/ll/fn/body/entry/more.id` | The rest of `ll_pstr`: one parameter's text. |
 | `ll_main_fixture` | `compiler/parse/back/tgt/ll/fn/body/entry/more.id` | A two-parameter "main(int, word)" -- irf_par/ir_ty of a real function, for |
+| `ll_pstr` | `compiler/parse/back/tgt/ll/fn/body/entry/params.id` | The parameter list of a define: `<ty> %v<id>`, in order, which is also how |
+| `ll_sep` | `compiler/parse/back/tgt/ll/fn/body/entry/params.id` | The parameter list of a define: `<ty> %v<id>`, in order, which is also how |
+| `ll_block` | `compiler/parse/back/tgt/ll/fn/body/entry/params.id` | The parameter list of a define: `<ty> %v<id>`, in order, which is also how |
 | `ll_close_brace` | `compiler/parse/back/tgt/ll/fn/body/main/end.id` | The closing brace shared by every emitted block this backend closes on |
 | `ll_main` | `compiler/parse/back/tgt/ll/fn/body/main/find.id` |  |
 | `ll_main_at` | `compiler/parse/back/tgt/ll/fn/body/main/find.id` |  |
 | `ll_mcall` | `compiler/parse/back/tgt/ll/fn/body/main/find.id` | A main taking no arguments is called with none; the marshalled list is |
 | `ll_wrapper` | `compiler/parse/back/tgt/ll/fn/body/main/wrap.id` | The C-ABI entry point: marshal argv into an `id` string list and call |
 | `ll_func` | `compiler/parse/back/tgt/ll/fn/def/fn.id` |  |
-| `ll_str_fixture` | `compiler/parse/back/tgt/ll/fn/def/native/fixture.id` | Two "const","string" IR instructions for ../../../mod/sect/str/str.id |
-| `ll_natives_fixture2` | `compiler/parse/back/tgt/ll/fn/def/native/native.id` | A real native in `prog` (nat_id0, "getter"), for ll_declares' own folded |
-| `ll_natives_fixture3` | `compiler/parse/back/tgt/ll/fn/def/native/native.id` | The `--runtime` side of the same fixture: rtc set, so ll_decl_block does |
-| `ll_native_decl` | `compiler/parse/back/tgt/ll/fn/def/native/native.id` | A real native in `prog` (nat_id0, "getter"), for ll_declares' own folded |
+| `ll_natives_fixture2` | `compiler/parse/back/tgt/ll/fn/def/native/decl.id` | A real native in `prog` (nat_id0, "getter"), for ll_declares' own folded |
+| `ll_natives_fixture3` | `compiler/parse/back/tgt/ll/fn/def/native/decl.id` | The `--runtime` side of the same fixture: rtc set, so ll_decl_block does |
+| `ll_native_decl` | `compiler/parse/back/tgt/ll/fn/def/native/decl.id` | A real native in `prog` (nat_id0, "getter"), for ll_declares' own folded |
+| `ll_str_fixture` | `compiler/parse/back/tgt/ll/fn/def/native/fixture.id` | Two "const","string" IR instructions for ../../../mod/sect/str/walk.id |
 | `ll_native_pars` | `compiler/parse/back/tgt/ll/fn/def/native/pars.id` | One declaration line, and its parameter types. A declaration names no |
 | `ll_native_fixture` | `compiler/parse/back/tgt/ll/fn/def/native/pars.id` | A native with two parameters ("helper", int/word) and one with none |
 | `ll_head` | `compiler/parse/back/tgt/ll/mod/head.id` | The module preamble, and the three sections that make up its body. |
@@ -3142,9 +3142,12 @@ once this compiler uses a construct on itself.
 | `ll_declares` | `compiler/parse/back/tgt/ll/mod/sect/decl.id` | The runtime symbols the module calls. They are declarations, never |
 | `ll_decl_block` | `compiler/parse/back/tgt/ll/mod/sect/decl.id` | One line is not in the block above, because it is the only symbol whose |
 | `ll_decl_cmp` | `compiler/parse/back/tgt/ll/mod/sect/decl.id` | The runtime symbols the module calls. They are declarations, never |
-| `ll_globals` | `compiler/parse/back/tgt/ll/mod/sect/glob/glob.id` | An exported variable is a module-level global. A scalar constant from |
-| `ll_global_at` | `compiler/parse/back/tgt/ll/mod/sect/glob/glob.id` | An exported variable is a module-level global. A scalar constant from |
-| `ll_init` | `compiler/parse/back/tgt/ll/mod/sect/glob/glob.id` | An exported variable is a module-level global. A scalar constant from |
+| `ll_globals` | `compiler/parse/back/tgt/ll/mod/sect/glob/emit.id` | An exported variable is a module-level global. A scalar constant from |
+| `ll_global_at` | `compiler/parse/back/tgt/ll/mod/sect/glob/emit.id` | An exported variable is a module-level global. A scalar constant from |
+| `ll_init` | `compiler/parse/back/tgt/ll/mod/sect/glob/emit.id` | An exported variable is a module-level global. A scalar constant from |
+| `ll_const_init` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/build.id` | The LLVM target's initialiser for list constants (dce/export/consts.id): |
+| `ll_init_fn` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/build.id` | The LLVM target's initialiser for list constants (dce/export/consts.id): |
+| `ll_init_rest` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/build.id` | The LLVM target's initialiser for list constants (dce/export/consts.id): |
 | `ll_init_each` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/each.id` | One walk over the kept list constants, and one constant built: a fresh list, |
 | `ll_init_one` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/each.id` | One walk over the kept list constants, and one constant built: a fresh list, |
 | `ll_init_build` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/each.id` | One walk over the kept list constants, and one constant built: a fresh list, |
@@ -3163,9 +3166,6 @@ once this compiler uses a construct on itself.
 | `llc_int_setup` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/elem/fixture.id` | A literal node of each element kind ll_cell (build/cell.id) dispatches on, |
 | `llc_str_setup` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/elem/fixture.id` | A literal node of each element kind ll_cell (build/cell.id) dispatches on, |
 | `llc_float_setup` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/elem/fixture.id` | A literal node of each element kind ll_cell (build/cell.id) dispatches on, |
-| `ll_const_init` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/init.id` | The LLVM target's initialiser for list constants (dce/export/consts.id): |
-| `ll_init_fn` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/init.id` | The LLVM target's initialiser for list constants (dce/export/consts.id): |
-| `ll_init_rest` | `compiler/parse/back/tgt/ll/mod/sect/glob/init/init.id` | The LLVM target's initialiser for list constants (dce/export/consts.id): |
 | `fix_env_std` | `compiler/parse/back/tgt/ll/mod/sect/glob/keep.id` | One `@name = global` line, or nothing when pruning drops it |
 | `ll_global_kept` | `compiler/parse/back/tgt/ll/mod/sect/glob/keep.id` | One `@name = global` line, or nothing when pruning drops it |
 | `ll_const_val` | `compiler/parse/back/tgt/ll/mod/sect/str/const.id` | A conf.id constant's initialiser, as a value an LLVM global can hold. |
@@ -3174,19 +3174,16 @@ once this compiler uses a construct on itself.
 | `ll_str_emit` | `compiler/parse/back/tgt/ll/mod/sect/str/more.id` | The rest of `ll_str_at`: the length and bytes, then the constant line. |
 | `ll_str_bytes` | `compiler/parse/back/tgt/ll/mod/sect/str/more.id` | A string literal's bytes as a private global called `gname`. A literal in a |
 | `ll_str_emit2` | `compiler/parse/back/tgt/ll/mod/sect/str/more.id` | The rest of `ll_str_at`: the length and bytes, then the constant line. |
-| `ll_zero` | `compiler/parse/back/tgt/ll/mod/sect/str/str.id` | A zero of a type, for a global with no initialiser. |
-| `ll_strs` | `compiler/parse/back/tgt/ll/mod/sect/str/str.id` | String literals become private globals, emitted after the functions that |
-| `ll_str_at` | `compiler/parse/back/tgt/ll/mod/sect/str/str.id` | A zero of a type, for a global with no initialiser. |
-| `ll_text` | `compiler/parse/back/tgt/ll/val/insn/insn.id` | One instruction, as LLVM text. A dispatch chain in the order the shapes |
-| `ll_ret` | `compiler/parse/back/tgt/ll/val/insn/insn.id` | One instruction, as LLVM text. A dispatch chain in the order the shapes |
-| `ll_t2` | `compiler/parse/back/tgt/ll/val/insn/insn.id` | One instruction, as LLVM text. A dispatch chain in the order the shapes |
+| `ll_zero` | `compiler/parse/back/tgt/ll/mod/sect/str/walk.id` | A zero of a type, for a global with no initialiser. |
+| `ll_strs` | `compiler/parse/back/tgt/ll/mod/sect/str/walk.id` | String literals become private globals, emitted after the functions that |
+| `ll_str_at` | `compiler/parse/back/tgt/ll/mod/sect/str/walk.id` | A zero of a type, for a global with no initialiser. |
 | `ll_callee` | `compiler/parse/back/tgt/ll/val/insn/mem/call.id` | What a call calls. A call to a function names its symbol; a call through a |
-| `ir_fixture1` | `compiler/parse/back/tgt/ll/val/insn/mem/fixture.id` | Six synthetic IR instructions (back/ir/core/store/make/insn/insn.id's |
-| `ir_fixture2` | `compiler/parse/back/tgt/ll/val/insn/mem/fixture.id` | Six synthetic IR instructions (back/ir/core/store/make/insn/insn.id's |
-| `ir_fixture3` | `compiler/parse/back/tgt/ll/val/insn/mem/fixture.id` | Six synthetic IR instructions (back/ir/core/store/make/insn/insn.id's |
-| `ll_t3` | `compiler/parse/back/tgt/ll/val/insn/mem/mem.id` |  |
-| `ll_t4` | `compiler/parse/back/tgt/ll/val/insn/mem/mem.id` |  |
-| `ll_call` | `compiler/parse/back/tgt/ll/val/insn/mem/mem.id` | A call that produces nothing is a statement; one that produces a value names |
+| `ll_t3` | `compiler/parse/back/tgt/ll/val/insn/mem/chain.id` |  |
+| `ll_t4` | `compiler/parse/back/tgt/ll/val/insn/mem/chain.id` |  |
+| `ll_call` | `compiler/parse/back/tgt/ll/val/insn/mem/chain.id` | A call that produces nothing is a statement; one that produces a value names |
+| `ir_fixture1` | `compiler/parse/back/tgt/ll/val/insn/mem/fixture.id` | Six synthetic IR instructions (back/ir/core/store/make/insn/build.id's |
+| `ir_fixture2` | `compiler/parse/back/tgt/ll/val/insn/mem/fixture.id` | Six synthetic IR instructions (back/ir/core/store/make/insn/build.id's |
+| `ir_fixture3` | `compiler/parse/back/tgt/ll/val/insn/mem/fixture.id` | Six synthetic IR instructions (back/ir/core/store/make/insn/build.id's |
 | `ll_t5_isc` | `compiler/parse/back/tgt/ll/val/insn/ops/build.id` | The rest of `ll_t5` and `ll_t6`: whether an opcode is a cast, and the two |
 | `ll_t5_cmp` | `compiler/parse/back/tgt/ll/val/insn/ops/build.id` | The rest of `ll_t5` and `ll_t6`: whether an opcode is a cast, and the two |
 | `ll_t6_bin` | `compiler/parse/back/tgt/ll/val/insn/ops/build.id` | The rest of `ll_t5` and `ll_t6`: whether an opcode is a cast, and the two |
@@ -3200,10 +3197,13 @@ once this compiler uses a construct on itself.
 | `ll_rel2` | `compiler/parse/back/tgt/ll/val/insn/ops/more/rel.id` | The relational half of a predicate: `lt`, `gt`, `le`, `ge`. Signedness and |
 | `ll_t5` | `compiler/parse/back/tgt/ll/val/insn/ops/op.id` |  |
 | `ll_t6` | `compiler/parse/back/tgt/ll/val/insn/ops/op.id` | `neg` and `not` have no LLVM opcode of their own: negation is a subtraction |
+| `ll_text` | `compiler/parse/back/tgt/ll/val/insn/text.id` | One instruction, as LLVM text. A dispatch chain in the order the shapes |
+| `ll_ret` | `compiler/parse/back/tgt/ll/val/insn/text.id` | One instruction, as LLVM text. A dispatch chain in the order the shapes |
+| `ll_t2` | `compiler/parse/back/tgt/ll/val/insn/text.id` | One instruction, as LLVM text. A dispatch chain in the order the shapes |
 | `ll_bytes_acc` | `compiler/parse/back/tgt/ll/val/str/bytes/acc.id` | The rest of `ll_bytes`: the accumulating loop, kept apart because a |
-| `ll_bytes` | `compiler/parse/back/tgt/ll/val/str/bytes/bytes.id` | A string literal, as LLVM wants it: every byte written as an escape, so no |
-| `ll_piece` | `compiler/parse/back/tgt/ll/val/str/bytes/bytes.id` | A string literal, as LLVM wants it: every byte written as an escape, so no |
-| `ll_step` | `compiler/parse/back/tgt/ll/val/str/bytes/bytes.id` | A backslash escape spells one byte out of two source characters. |
+| `ll_bytes` | `compiler/parse/back/tgt/ll/val/str/bytes/escape.id` | A string literal, as LLVM wants it: every byte written as an escape, so no |
+| `ll_piece` | `compiler/parse/back/tgt/ll/val/str/bytes/escape.id` | A string literal, as LLVM wants it: every byte written as an escape, so no |
+| `ll_step` | `compiler/parse/back/tgt/ll/val/str/bytes/escape.id` | A backslash escape spells one byte out of two source characters. |
 | `fixture1` | `compiler/parse/back/tgt/ll/val/str/bytes/fixture.id` | Three more synthetic IR instructions, chained the same way |
 | `fixture2` | `compiler/parse/back/tgt/ll/val/str/bytes/fixture.id` | Three more synthetic IR instructions, chained the same way |
 | `fixture3` | `compiler/parse/back/tgt/ll/val/str/bytes/fixture.id` | Three more synthetic IR instructions, chained the same way |
@@ -3216,9 +3216,9 @@ once this compiler uses a construct on itself.
 | `ll_lit` | `compiler/parse/back/tgt/ll/val/ty/lit.id` |  |
 | `ll_op` | `compiler/parse/back/tgt/ll/val/ty/lit.id` | A typed operand: `<ty> <value>`, the form LLVM wants nearly everywhere. |
 | `ll_args` | `compiler/parse/back/tgt/ll/val/ty/lit.id` |  |
-| `ll_ty` | `compiler/parse/back/tgt/ll/val/ty/ty.id` | An `id` type in LLVM's spelling. Every reference type -- a string, a list of |
-| `ll_ty2` | `compiler/parse/back/tgt/ll/val/ty/ty.id` | An `id` type in LLVM's spelling. Every reference type -- a string, a list of |
-| `ll_ty3` | `compiler/parse/back/tgt/ll/val/ty/ty.id` | An `id` type in LLVM's spelling. Every reference type -- a string, a list of |
+| `ll_ty` | `compiler/parse/back/tgt/ll/val/ty/spell.id` | An `id` type in LLVM's spelling. Every reference type -- a string, a list of |
+| `ll_ty2` | `compiler/parse/back/tgt/ll/val/ty/spell.id` | An `id` type in LLVM's spelling. Every reference type -- a string, a list of |
+| `ll_ty3` | `compiler/parse/back/tgt/ll/val/ty/spell.id` | An `id` type in LLVM's spelling. Every reference type -- a string, a list of |
 | `ll_val` | `compiler/parse/back/tgt/ll/val/ty/val.id` | How a value is written where it is used. A constant prints as its literal |
 | `ll_val2` | `compiler/parse/back/tgt/ll/val/ty/val.id` | How a value is written where it is used. A constant prints as its literal |
 | `ll_vty` | `compiler/parse/back/tgt/ll/val/ty/val.id` | The type of a value, safe on an absent operand for the same reason. |

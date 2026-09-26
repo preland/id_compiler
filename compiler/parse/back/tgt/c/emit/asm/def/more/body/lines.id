@@ -13,7 +13,7 @@ lz_k() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
-// c_type reads tyc through c_scalar (prog/code/func/ctype/ctype.id), and
+// c_type reads tyc through c_scalar (prog/code/func/ctype/convert.id), and
 // nothing in the llasm chain declares it: an export whose declaration never
 // runs is a null pointer in the generated C, so emit_asm_one faulted instead
 // of diagnosing. init_tyc is what a real build runs before it emits any C.

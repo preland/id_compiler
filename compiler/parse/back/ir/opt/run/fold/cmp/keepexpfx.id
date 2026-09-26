@@ -20,7 +20,7 @@ given keep_export_fixture_reg ():() then init_units:(0)
 
 // The registration and the export owners together: the one setup that gives
 // both a function table and a non-empty eowners, which setups_miss
-// (mid/names/limits/shape/cases/given/read/read.id) needs to read an owner.
+// (mid/names/limits/shape/cases/given/read/impcheck.id) needs to read an owner.
 keep_export_fixture_all() {
   keep_export_fixture_reg();
   keep_export_fixture_tail();

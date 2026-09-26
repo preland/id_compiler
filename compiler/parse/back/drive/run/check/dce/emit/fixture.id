@@ -1,4 +1,4 @@
-// State for dce.id's own cases: one registered function ("fx_target", via
+// State for sweep.id's own cases: one registered function ("fx_target", via
 // ../../../../../mid/names/limits/shape/cases/given/then/more/fixture/fn.id's
 // fn_fixture) with "main" also in fnames, so dce_prune's own guard is true,
 // and the reachable set (rfn) seeded either with or without that function's

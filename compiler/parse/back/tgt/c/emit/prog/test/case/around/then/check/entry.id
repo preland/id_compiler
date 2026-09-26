@@ -1,4 +1,4 @@
-// Dispatch by node kind (../then.id), and the original check's own entry
+// Dispatch by node kind (../walk.id), and the original check's own entry
 // point: what it names, then what it returns (got.id).
 //
 // The "then" branch is driven by chk_fixture (mid/.../given/then/more/print/

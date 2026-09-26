@@ -1,5 +1,5 @@
 // A statement, loosely: only `decl`, `assign` and `exprstmt` are recognised
-// (see ../expr/expr.id's header on what an unrecognised kind fingerprints
+// (see ../expr/fingerprint.id's header on what an unrecognised kind fingerprints
 // as) -- `if`, `while` and `iassign` never appear in the examples this
 // module was sized for, so they are left to the safe default in lz_st2
 // (./more/decl_tail.id is the rest of `decl`'s canonicalisation).

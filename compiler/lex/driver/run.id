@@ -16,10 +16,10 @@
 // string, operator). Each scanner consumes a run and prints its token.
 //
 // Files (3 functions each by the per-file rule):
-//   driver/driver.id             main + lex
-//   chars/dispatch/dispatch.id       scan_one / scan_word / scan_token
+//   driver/run.id             main + lex
+//   chars/dispatch/dispatch_head.id  scan_one / scan_word / scan_token
 //   chars/dispatch/dispatch_tail.id  scan_numop / scan_strop (a comment ends at idstd's str_eol)
-//   scan/scan.id                 scan_ident / scan_number / scan_string
+//   scan/tokens.id               scan_ident / scan_number / scan_string
 //   scan/ops.id                  is_two_op / oplen / scan_op
 //   chars/classify/charclass.id  is_space / is_digit / is_alpha
 //   chars/classify/ident_kw.id   is_alnum / is_kw / kindof

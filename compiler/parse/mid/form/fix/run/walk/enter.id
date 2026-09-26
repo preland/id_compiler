@@ -20,7 +20,7 @@ given fix_ret_fixture (1):() then fixd_file0:("b.id")
 // the answer into it and nothing pushes, so neither a length nor a sum is
 // the right witness -- reading the cell is, the same shape check_failed and
 // is_runtime use for their own flags. Filed here rather than beside the
-// export in ../state/state.id, which is at its three-function cap.
+// export in ../state/init.id, which is at its three-function cap.
 fixd_std_on() {
   int n = (import fixd_std)[0];
 } return int n;

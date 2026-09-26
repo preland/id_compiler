@@ -1,5 +1,5 @@
 // The recorder itself: NAME's own parameter list (its signature, unchanged --
-// param_str(fn) in def.id). ../call.id calls it from inside NAME's body with
+// param_str(fn) in struct.id). ../call.id calls it from inside NAME's body with
 // NAME's own parameters, by name (row/names.id), since that is what is in
 // scope there. Appends a row only while idtc_rec_on is set
 // (case/around/then/more/capture/), counting every such call but keeping

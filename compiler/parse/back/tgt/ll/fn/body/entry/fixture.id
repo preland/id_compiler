@@ -2,7 +2,7 @@
 // ll_pred reads, and init_ir, for the instruction itself -- two
 // independent stores, so both inits are needed together only here) and a
 // phi built on it, for ../../../val/insn/ops/build.id's ll_t5_cmp and
-// ../../../val/insn/ops/more/cast.id's ll_phis/../mem.id's ll_t4. The
+// ../../../val/insn/ops/more/cast.id's ll_phis/../chain.id's ll_t4. The
 // comparison is its own left operand -- mechanical, not semantic, but
 // deterministic -- so no second instruction is spent building one; [9]
 // stands in for its own unread l/bl (see ../../../val/insn/mem/

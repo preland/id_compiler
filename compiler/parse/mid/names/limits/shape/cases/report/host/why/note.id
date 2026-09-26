@@ -16,7 +16,7 @@ ut_because_at(string via_s, string what_s) {
 // A function short of two cases that cannot be tested on the build host is not
 // short: it needs none, and a note says why rather than the minimum being
 // lifted silently. One that has a case anyway already has an error at that case
-// (../cases/cases.id), so it gets nothing more here.
+// (../cases/untestable.id), so it gets nothing more here.
 // `given` may now be repeated (docs/TESTS.md), so the "not exempt" branch
 // (ut_at(s1_of_v) < 0, the ordinary report_cases path) is cased below by
 // composing notes_base, which runs ut_mark (../mark/), with edge_fixture

@@ -1,6 +1,6 @@
 
 // Call emission dispatch for the list builtins, extending emit_call:
-//   print -> id_print(to_string(...))   (in expr/call/call.id)
+//   print -> id_print(to_string(...))   (in expr/call/emit.id)
 //   len   -> id_len (string) or id_list_len (list)
 //   push  -> id_list_push with the value boxed
 //   pop   -> id_list_pop unboxed to the element type (in pop.id)

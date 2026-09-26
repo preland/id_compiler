@@ -31,7 +31,7 @@ given lz_o ((import lz_decl9), "S", [], []):() then calls segs_flush:[0]
 //
 // The emptying is written out here rather than given its own function: as a
 // helper it was rejected as identical in signature and logic to pred_wipe
-// (back/ir/opt/cfg/more/more.id), which is the duplicate-logic rule working
+// (back/ir/opt/cfg/more/scan.id), which is the duplicate-logic rule working
 // correctly. A fourth way to empty a list is not what this needed.
 segs_flush(string sigtext, int[] cur, string[] segs_out) {
   string segtext = sigtext + "{" + canon_body(cur) + "}";

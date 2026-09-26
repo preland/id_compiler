@@ -6,7 +6,7 @@ given lz_o ():() then calls lz_report:(1, 0)
 given lz_j ():() then calls lz_report:[0]
 
 // [0] and [1] are int literal nodes with different values -- enough to show
-// lz_expr (canon/expr/expr.id) fingerprints a literal by its kind alone.
+// lz_expr (canon/expr/fingerprint.id) fingerprints a literal by its kind alone.
 lz_fixture() {
   env_init();
   lz_build();

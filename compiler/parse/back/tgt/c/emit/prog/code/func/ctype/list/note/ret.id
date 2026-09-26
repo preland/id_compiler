@@ -1,5 +1,5 @@
 // A function's return type, noted the same way a case's expected value's is
-// (note.id).
+// (collect.id).
 
 note_fn_ret(int cfn) {
   if(cfn >= 0) {

@@ -1,6 +1,6 @@
 
 // One condition's text, computed once per level of an if / else-if chain
-// (if.id, seq_conds) so that a unit's declaration -- printed as a side
+// (chain.id, seq_conds) so that a unit's declaration -- printed as a side
 // effect of emit_expr, inside emit_seq -- lands before the chain's first
 // line rather than at this level's own, possibly later, position.
 cond_text_of(int if_id) {

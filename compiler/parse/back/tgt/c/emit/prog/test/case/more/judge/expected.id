@@ -17,7 +17,7 @@ given void_call_fixture (1):() then prints:("")
 // A `traps` case's whole point is that the call does not return, so if this
 // runs at all the call came back instead of trapping -- a failure by itself,
 // reported the same way a mismatched return value is (check/fail.id), just
-// with no return value to show on either side. emit_case_post (../../case.id)
+// with no return value to show on either side. emit_case_post (../../emit.id)
 // calls this instead of emit_case_expd/emit_case_fail/emit_case_thens for a
 // case that carries one.
 emit_case_traps_fail(int ci) {

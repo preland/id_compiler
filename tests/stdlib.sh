@@ -356,13 +356,13 @@ fi
 
 # -- 20. the reserved-name list has not drifted from the runtime -----------
 # resv_names_src, in compiler/parse/conf.id, and the runtime prelude
-# (compiler/parse/back/tgt/c/runtime/runtime.id) are both hand-maintained now
+# (compiler/parse/back/tgt/c/runtime/prelude.id) are both hand-maintained now
 # (docs/HACKING.md). If someone adds a helper to the prelude and forgets to add
 # its name to resv_names_src, an id function could be given that name and
 # collide with the runtime in the generated C -- this is what makes forgetting
 # it a test failure, extracting each side with grep/sed rather than a second
 # implementation of either.
-runtime_names=$(grep -oE 'id_[a-zA-Z_0-9]+\(' "$ROOT/compiler/parse/back/tgt/c/runtime/runtime.id" \
+runtime_names=$(grep -oE 'id_[a-zA-Z_0-9]+\(' "$ROOT/compiler/parse/back/tgt/c/runtime/prelude.id" \
     | sed -E 's/^id_//; s/\($//' | sort -u)
 conf_names=$(grep -oE 'string resv_names_src = "[^"]*"' "$ROOT/compiler/parse/conf.id" \
     | sed -E 's/^string resv_names_src = "//; s/"$//' | tr ' ' '\n' | sort -u)

@@ -2,10 +2,10 @@
 // (front/parse/decl/func/cases/case/then/push.id).
 
 // A "thenprints"/"theneprints" node's s1 is "" (front/.../case/then/more/
-// print/print.id), which ut_at never finds, so this skips it without having
+// print/output.id), which ut_at never finds, so this skips it without having
 // to name its kind here too.
 //
-// Refused: ut_at (../../why/why.id) is called unconditionally, which traps
+// Refused: ut_at (../../why/reason.id) is called unconditionally, which traps
 // unless a case's `given` also ran ut_mark (../mark/); then_node_fixture and
 // calls_node_fixture (../../../given/then/more/print/node.id,
 // .../more/calls/fixture.id), the only "then"/"thencalls" nodes this lane

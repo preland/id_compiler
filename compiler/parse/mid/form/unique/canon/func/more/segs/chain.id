@@ -9,7 +9,7 @@
 // front/parse/decl/func/sig/chain/tail.id pushes, and deliberately not by
 // splitting the finished canonical string on the seam `cst4` emits. A string
 // literal canonicalises as its text verbatim (`"S" + s1_of(id)`,
-// ../../../expr/expr.id), so a program with a `|` inside a string could forge
+// ../../../expr/canon.id), so a program with a `|` inside a string could forge
 // a segment boundary -- and `|` is the field separator in the compiler's own
 // --calls format strings, so that is not a hypothetical program. A forged seam
 // would make two unlike segments compare equal and report a duplicate against

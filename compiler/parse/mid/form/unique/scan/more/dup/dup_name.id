@@ -26,7 +26,7 @@ given clean_prog_fixture ():() then calls dupfn_err:[0]
 // the same question asked of the same name -- is this name already taken --
 // and a second pass over `prog` to ask it would be a function whose only job
 // is to call resv_at. That call was resv_at's only caller and its last
-// action, so its one action (../reserved/reserved.id) is inlined directly
+// action, so its one action (../reserved/runtime.id) is inlined directly
 // above rather than kept as a separate function.
 dupfn_at(int i) {
   string s1_of_v = s1_of((import prog)[i]);

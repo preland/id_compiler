@@ -26,7 +26,7 @@ fix_rcache_reset() {
 given env_init ():() then check_failed:(0)
 given env_init ():() then init_units:(0)
 
-// The two token kinds fix_depth (out/span/beg/beg.id's fix_match) reads while
+// The two token kinds fix_depth (out/span/beg/start.id's fix_match) reads while
 // backing up from a call's closing paren to its name: "ident" for the name
 // itself, "op" for each parenthesis (plan/walk/ev/push/one/ru.id's
 // fix_span_fixture onward).

@@ -1,7 +1,7 @@
 // One function's nodes. A function already marked is skipped, so what it is
 // reported as reaching is the first thing a sweep found, in source order.
 
-// Refused: ut_at (../../why/why.id) is called unconditionally, which traps
+// Refused: ut_at (../../why/reason.id) is called unconditionally, which traps
 // unless a case's `given` also ran ut_mark (../mark/); fn_fixture and
 // chk_fixture (../../../given/then/more/fixture/fn.id, .../more/print/
 // print.id), the fixtures with a real `prog` entry, never do. No fixture

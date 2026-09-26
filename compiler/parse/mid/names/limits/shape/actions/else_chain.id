@@ -27,7 +27,7 @@ elif_fixture() {
 ():() then init_units:(0)
 
 // Descending into the compound statements of a block that fits happens in
-// check_fits (../block/block.id), which calls check_stmt directly.
+// check_fits (../block/check.id), which calls check_stmt directly.
 check_stmt(int id, int depth, string fname) {
   if(k_of(id) == "if") {
     check_if(id, depth, fname);

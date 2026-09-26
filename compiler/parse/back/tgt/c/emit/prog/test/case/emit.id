@@ -53,7 +53,7 @@ given void_call_fixture (1):() then calls emit_case_pre:(1) then calls emit_case
 // A `traps` case skips the return-value machinery entirely (emit_case_expd,
 // emit_case_fail, emit_case_thens): all three read what the call under test
 // left behind, and a trap means the call's process never comes back to read
-// it from (case/more/judge/judge.id's emit_case_traps_fail is what a traps
+// it from (case/more/judge/expected.id's emit_case_traps_fail is what a traps
 // case gets instead). The write-the-counts tail after this stays the same
 // either way: a traps case that DOES return falls through emit_case_traps_fail's
 // own `return 3;` before ever reaching it.

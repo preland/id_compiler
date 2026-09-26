@@ -45,7 +45,7 @@ given emit_all_fixture_off (1, ["prog"]):() then calls nat_print:[0] then calls 
 given emit_all_fixture_on (2, ["prog", "--natives"]):() then calls nat_print:[1] then calls emit_notes:[1]
 
 // --calls' asm rows: one per asm declaration, printed after print_call_cases
-// (main.id's print_calls calls both). Filed here rather than beside
+// (driver.id's print_calls calls both). Filed here rather than beside
 // print_call_cases (back/drive/run/check/dce/emit/calls/cases.id, at its
 // 3-function cap) or asm_case_row (mid/names/limits/report/more/loc/
 // func_line.id, this row's own builder).

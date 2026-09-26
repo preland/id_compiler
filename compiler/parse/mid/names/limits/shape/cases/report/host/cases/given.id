@@ -1,5 +1,5 @@
 // Refused: the only branch this lane can reach safely is "not cfn", which
-// never calls ut_at (../../why/why.id) at all -- two cases of it would both
+// never calls ut_at (../../why/reason.id) at all -- two cases of it would both
 // stay green with the `if(k_of(e) == "cfn")` check deleted outright, which
 // is exactly the decorative case docs/TESTS.md warns against. The "cfn"
 // branch itself calls ut_at unconditionally, which traps unless a case's

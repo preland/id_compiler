@@ -19,7 +19,7 @@ given m2r_outv_fixture ():([-1])
 
 // A decl node (exported, i2=1) walked ahead of a registered function node,
 // so fix_wbuild's own seed-then-drain path has something to mark and pop --
-// for fix_wbuild's own cases (plan/reach/build/build.id is at the
+// for fix_wbuild's own cases (plan/reach/build/driver.id is at the
 // three-function cap).
 fix_wbuild_fixture() {
   full_env();

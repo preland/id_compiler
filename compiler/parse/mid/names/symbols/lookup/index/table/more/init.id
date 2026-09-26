@@ -36,7 +36,7 @@ given call2_setup ():() then check_failed:(0)
 given argfn_d ():() then check_failed:(0)
 
 // Two plain int leaves in one list, for acc_elems' own cases
-// (check/access/expr/expr.id) -- a call's or a var's argument list would also
+// (check/access/expr/walk.id) -- a call's or a var's argument list would also
 // dispatch into the registry reads acc_var/acc_callee need, and env_init alone
 // is not enough for those. Filed here because every file under
 // check/access/expr/ is at the 3-function cap and this was the only one left

@@ -5,7 +5,7 @@
 // A function's run of nodes is everything the parser made between the end of
 // the previous function's return clause and the end of its own -- so the
 // previous function's cases, and any conf.id constant, ride with it. The key
-// hashes exactly those tokens (key/key.id), the units of both functions, and,
+// hashes exactly those tokens (key/compute.id), the units of both functions, and,
 // for every name among them, all that name can mean anywhere in the program:
 // the signature of a function by that name, its return type, the type of an
 // export by that name, and the one type the name has as a variable in each of

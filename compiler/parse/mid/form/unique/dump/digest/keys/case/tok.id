@@ -23,7 +23,7 @@ given dg_t_built ([0, 0], "fa"):([-8546436610636599953, 0])
 given dg_t_built ([0, 0], "nope"):([0, 0])
 
 // The hash of the component sealed last, for dg_seal's own cases (../../scc/
-// seal/seal.id, whose directory is at its three-entry cap).
+// seal/hash.id, whose directory is at its three-entry cap).
 dg_deep_last() {
   int dgl = len((import dg_deep)) - 1;
   word dgd = (import dg_deep)[dgl];

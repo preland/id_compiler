@@ -507,19 +507,16 @@ void id_span_out(char* src, int i, int ni);
 int id_scan_decop(char* src, int i);
 int id_scan_hashop(char* src, int i);
 int id_scan_hash(char* src, int i);
-int id_is_bin(int c);
-int id_bin_start(char* src, int i);
-int id_bin_end(char* src, int i);
 int id_scan_binop(char* src, int i);
 int id_scan_bin(char* src, int i);
 long long id_bin_val(char* src, int i, int e);
+int id_is_bin(int c);
+int id_bin_start(char* src, int i);
+int id_bin_end(char* src, int i);
 int id_num_end(char* src, int i, int e);
 char* id_numkind(int e, int fe);
 int id_digit_run_end(char* src, int i);
 int id_has_frac(char* src, int e);
-int id_is_hex(int c);
-int id_hex_digit(int c);
-int id_hex_alpha(int c);
 int id_hex_start(char* src, int i);
 int id_hex_end(char* src, int i);
 long long id_hex_val(char* src, int i, int e);
@@ -527,6 +524,9 @@ int id_scan_hex(char* src, int i);
 char* id_udec(long long v);
 char* id_pad10(char* s);
 void id_print_uint(long long v);
+int id_is_hex(int c);
+int id_hex_digit(int c);
+int id_hex_alpha(int c);
 void id_lex_all(void);
 void id_lex_setup(int argc, IdList* argv);
 void id_lex_cols(int argc, IdList* argv);
@@ -544,12 +544,12 @@ void id_scan_ident_out(char* ident);
 void id_scan_num_out(char* src, int i, int e, int fe);
 void id_scan_str_out(char* src, int i, int e);
 void id_scan_hash_out(char* src, int i, int e);
-int id_scan_ident(char* src, int i);
-int id_scan_number(char* src, int i);
-int id_scan_string(char* src, int i);
 int id_str_end(char* src, int i);
 int id_adv_str(char* src, int i);
 char* id_slice_str(char* src, int a, int b);
+int id_scan_ident(char* src, int i);
+int id_scan_number(char* src, int i);
+int id_scan_string(char* src, int i);
 
 /* exported variables */
 IdList* lexline;  /* exported by lex_setup() */
@@ -805,31 +805,6 @@ int id_scan_hash(char* src, int i) {
     return e;
 }
 
-int id_is_bin(int c) {
-    int ok;
-    ok = 0;
-    if (((c == 48) || (c == 49))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-int id_bin_start(char* src, int i) {
-    int ok;
-    ok = 0;
-    if ((((id_charat(src, i) == 48) && ((id_charat(src, (i + 1)) == 98) || (id_charat(src, (i + 1)) == 66))) && id_is_bin_at(src, (i + 2)))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-int id_bin_end(char* src, int i) {
-    while (id_is_bin_at(src, i)) {
-        i = (i + 1);
-    }
-    return i;
-}
-
 int id_scan_binop(char* src, int i) {
     int ni;
     ni = 0;
@@ -858,6 +833,31 @@ long long id_bin_val(char* src, int i, int e) {
         i = (i + 1);
     }
     return v;
+}
+
+int id_is_bin(int c) {
+    int ok;
+    ok = 0;
+    if (((c == 48) || (c == 49))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_bin_start(char* src, int i) {
+    int ok;
+    ok = 0;
+    if ((((id_charat(src, i) == 48) && ((id_charat(src, (i + 1)) == 98) || (id_charat(src, (i + 1)) == 66))) && id_is_bin_at(src, (i + 2)))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_bin_end(char* src, int i) {
+    while (id_is_bin_at(src, i)) {
+        i = (i + 1);
+    }
+    return i;
 }
 
 int id_num_end(char* src, int i, int e) {
@@ -892,33 +892,6 @@ int id_has_frac(char* src, int e) {
         ok = 1;
     }
     return ok;
-}
-
-int id_is_hex(int c) {
-    int ok;
-    ok = 0;
-    if (((id_is_digit(c) || ((c >= 97) && (c <= 102))) || ((c >= 65) && (c <= 70)))) {
-        ok = 1;
-    }
-    return ok;
-}
-
-int id_hex_digit(int c) {
-    int n;
-    n = (c - 48);
-    if ((c >= 65)) {
-        n = id_hex_alpha(c);
-    }
-    return n;
-}
-
-int id_hex_alpha(int c) {
-    int n;
-    n = (c - 55);
-    if ((c >= 97)) {
-        n = (c - 87);
-    }
-    return n;
 }
 
 int id_hex_start(char* src, int i) {
@@ -983,6 +956,33 @@ void id_print_uint(long long v) {
     text = id_udec(v);
     id_print(id_concat("int ", text));
     return;
+}
+
+int id_is_hex(int c) {
+    int ok;
+    ok = 0;
+    if (((id_is_digit(c) || ((c >= 97) && (c <= 102))) || ((c >= 65) && (c <= 70)))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_hex_digit(int c) {
+    int n;
+    n = (c - 48);
+    if ((c >= 65)) {
+        n = id_hex_alpha(c);
+    }
+    return n;
+}
+
+int id_hex_alpha(int c) {
+    int n;
+    n = (c - 55);
+    if ((c >= 97)) {
+        n = (c - 87);
+    }
+    return n;
 }
 
 void id_lex_all(void) {
@@ -1137,6 +1137,34 @@ void id_scan_hash_out(char* src, int i, int e) {
     return;
 }
 
+int id_str_end(char* src, int i) {
+    while (((id_charat(src, i) != 34) && (id_charat(src, i) != (-1)))) {
+        i = id_adv_str(src, i);
+    }
+    return i;
+}
+
+int id_adv_str(char* src, int i) {
+    int n;
+    n = (i + 1);
+    if ((id_charat(src, i) == 92)) {
+        n = (i + 2);
+    }
+    return n;
+}
+
+char* id_slice_str(char* src, int a, int b) {
+    char* out;
+    int charat_v;
+    out = "";
+    while ((a < b)) {
+        charat_v = id_charat(src, a);
+        out = id_concat(out, id_chr(charat_v));
+        a = (a + 1);
+    }
+    return out;
+}
+
 int id_scan_ident(char* src, int i) {
     char* ident;
     int charat_v;
@@ -1166,34 +1194,6 @@ int id_scan_string(char* src, int i) {
     id_scan_str_out(src, i, e);
     ret_i = (e + 1);
     return ret_i;
-}
-
-int id_str_end(char* src, int i) {
-    while (((id_charat(src, i) != 34) && (id_charat(src, i) != (-1)))) {
-        i = id_adv_str(src, i);
-    }
-    return i;
-}
-
-int id_adv_str(char* src, int i) {
-    int n;
-    n = (i + 1);
-    if ((id_charat(src, i) == 92)) {
-        n = (i + 2);
-    }
-    return n;
-}
-
-char* id_slice_str(char* src, int a, int b) {
-    char* out;
-    int charat_v;
-    out = "";
-    while ((a < b)) {
-        charat_v = id_charat(src, a);
-        out = id_concat(out, id_chr(charat_v));
-        a = (a + 1);
-    }
-    return out;
 }
 
 int main(int argc, char** argv) { (void)argc; (void)argv;

@@ -19,7 +19,7 @@ given lz_o ():() then calls print_fp_line:[2]
 given lz_o ():() then calls print_fp_line:(0) then calls print_fp_line:(1)
 
 // `i` indexes the fingerprints; the function it belongs to is resolved by
-// fname_at (../scan/more/report/report.id), the checker's one place for that
+// fname_at (../scan/more/report/dup.id), the checker's one place for that
 // mapping, rather than by indexing `prog` with a fingerprint's index here.
 print_fp_line(int i) {
   string name = fname_at(i);

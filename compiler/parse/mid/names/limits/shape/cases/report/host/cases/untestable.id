@@ -7,7 +7,7 @@
 // unless a case's `given` populated it -- only wrap_fixture (back/tgt/c/emit/
 // prog/test/case/around/then/more/capture/pre/fixture.id) gives casefn/
 // casenode a real entry, and it does not touch casegiven; impcase_empty/
-// impcase_given (../../../fit/fit.id, .../more/value/more/text/items.id)
+// impcase_given (../../../fit/case.id, .../more/value/more/text/items.id)
 // give casegiven but not casefn/casenode. No fixture combines the two, and
 // the lane's free function slots are already spent (see ut_note's note,
 // ../why/note.id, for the same kind of gap).
@@ -30,7 +30,7 @@ ut_case(int ci) {
 given notes_base given void_call_fixture (0):() then calls ut_case_fn:(0, "fx_target") then calls ut_case_val:(0, (import fixture_zero))
 given notes_base given void_call_fixture (1):() then calls ut_case_fn:(1, "bare") then calls ut_case_val:[0]
 
-// ut_at (../../why/why.id) traps unless a case's `given` also ran ut_mark
+// ut_at (../../why/reason.id) traps unless a case's `given` also ran ut_mark
 // (../mark/), which case_fixture/wrap_fixture never do; notes_base (mid/
 // form/decomp/notesfx.id) does, and case_err's own branch here needs no case
 // index at all when ut_at is negative (the only outcome an empty utname can

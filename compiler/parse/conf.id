@@ -14,7 +14,7 @@
 // comes last.
 int idx_n = 251;
 string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint";
-// The runtime helper names (compiler/parse/back/tgt/c/runtime/runtime.id),
+// The runtime helper names (compiler/parse/back/tgt/c/runtime/prelude.id),
 // space-separated: an id function may not be named after one of these,
 // because every id function is emitted as id_<name> and would collide with
 // the runtime in C. is_reserved_name (mid/form/unique/scan/more/reserved/

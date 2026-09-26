@@ -22,7 +22,7 @@ given void_call_fixture (1):() then prints:("    id_bare();\n")
 // env_init() (nz_plain_fixture's chain has one of its own, which would wipe
 // wrap_fixture's casefn/casenode instead of adding to them). Also gives both
 // indices a casegiven entry, so a case built on this can drive emit_case_fn/
-// emit_cases (case/case.id) at either index without a bare casegiven[ci].
+// emit_cases (case/emit.id) at either index without a bare casegiven[ci].
 void_call_fixture() {
   wrap_fixture();
   int[] none = [];

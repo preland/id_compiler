@@ -28,8 +28,8 @@ fix_seq_once() {
 // sits past the end of tspan (token 10 of 4), for fix_spanok's false branch.
 // pfile gets two rows for fix_setfile/fix_enter (run/walk/enter.id); prog
 // gets f then f2 for run/walk/func.id's own cases; dcl (a "decl" node over e)
-// is for fix_used_at (run/walk/stmt/stmt.id).
-// out/ret/clause/{emit,pos}.id and ret/ret.id are each at the three-function
+// is for fix_used_at (run/walk/stmt/walk.id).
+// out/ret/clause/{emit,pos}.id and ret/value.id are each at the three-function
 // cap, so this is filed here, in the file fix_within_at (../within.id)
 // shares the directory with.
 fix_ret_fixture() {

@@ -2,12 +2,12 @@
 // (case_is_std, mid/names/symbols/lookup/more/std_unit.id) row still runs --
 // IDTC_N is the full, unfiltered case count, so every index needs a live
 // function pointer -- but points at idtc_case_std_skip (emit_cases,
-// case/case.id) instead of its own idtc_case_ci, which emit_cases never
+// case/emit.id) instead of its own idtc_case_ci, which emit_cases never
 // emitted for it. The `idtc_in` cell is the case's `stdin` literal as a C
 // string, `""` for a case without one. Read defensively -- `ci <
 // len(casestdin)` -- because a case fixture that only pushes casenode (most of
 // them, elsewhere in this directory) leaves casestdin short; a real parse
-// always pushes one casestdin entry per case (case/given/given.id), so the
+// always pushes one casestdin entry per case (case/given/setup.id), so the
 // guard never triggers there.
 
 emit_setup_line(int ci, string cw, string cc) {

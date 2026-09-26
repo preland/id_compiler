@@ -15,7 +15,7 @@ ut_seeded() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
-// ut_loop and ut_sweep both read utname (../../why/why.id's ut_at does too),
+// ut_loop and ut_sweep both read utname (../../why/reason.id's ut_at does too),
 // which traps unless a case's `given` also ran ut_mark (this file's own
 // ut_seeded does; case_fixture/fn_fixture do not) -- see ut_note's note
 // (../why/note.id) for the fixture gap this runs into for a non-empty prog.

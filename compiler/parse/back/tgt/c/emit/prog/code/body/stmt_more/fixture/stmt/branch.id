@@ -17,7 +17,7 @@ nz_while_fixture() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
-// init_tyc gives c_type/c_scalar (func/ctype/ctype.id) their C-spelling
+// init_tyc gives c_type/c_scalar (func/ctype/convert.id) their C-spelling
 // column, needed by anything downstream that emits a function's signature.
 nz_tyc_fixture() {
   nz_while_fixture();

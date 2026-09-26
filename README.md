@@ -261,7 +261,7 @@ no row of its own naming the file it lives in.
 
 **Known over-report.** The parser builds a `var` node for every bare
 identifier before it knows whether a `(` follows
-(`compiler/parse/front/parse/expr/atom/lit/call/call.id`'s `finish_atom`),
+(`compiler/parse/front/parse/expr/atom/lit/call/atom.id`'s `finish_atom`),
 and when one does, that node is not removed -- it is simply not on the tree a
 real value-read would leave, but it is still in the flat id range the walk
 above scans. So every direct call also prints a `value` row for the same
@@ -332,10 +332,10 @@ went to [`bootstrap/`](bootstrap) — the compiler as C, compiled by `cc` — an
 
 The **C runtime prelude** used to live in `idc.py`'s `RUNTIME` string, with
 `tools/gen_runtime_id.py` regenerating the `id`-side copy
-(`compiler/parse/back/tgt/c/runtime/runtime.id` and `extern.id`) from it. Both
+(`compiler/parse/back/tgt/c/runtime/prelude.id` and `extern.id`) from it. Both
 are hand-maintained `id` source now, kept in step by hand rather than
 generated; `tests/stdlib.sh` checks that `compiler/parse/conf.id`'s reserved-name
-list has not drifted from `runtime.id`.
+list has not drifted from `prelude.id`.
 
 **It was never where language features should be built**, and that is truer
 than ever now that it cannot change at all. "Reference implementation" is what

@@ -1,7 +1,7 @@
 // The C runtime with external linkage, which is what the LLVM target
 // links against: it compiles the runtime as its own translation unit
 // rather than splicing it into the program. Source of truth: this file,
-// kept in step with runtime.id by hand (idc.py's RUNTIME, which used to
+// kept in step with prelude.id by hand (idc.py's RUNTIME, which used to
 // generate both, is frozen -- see docs/HACKING.md).
 
 // fv0 = func "g" (params []) void (body []) (return void) -- so print_ret,

@@ -10,7 +10,7 @@ case_has_calls(int ci) {
 given case_fixture ((import fixture_ci)):(0)
 given fn_fixture ((import fixture_ci)):(0)
 
-// thennode with one entry, not empty -- for out_step (query.id), which
+// thennode with one entry, not empty -- for out_step (hasout.id), which
 // indexes it directly rather than scanning it.
 query_node_fixture() {
   fn_fixture();

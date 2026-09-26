@@ -11,7 +11,7 @@ given ir_rows_chk1 (0, 1, 9):() then chk_ty:("")
 // false): a case on fcmp_row (both true) and one on fq_id (both false)
 // cannot tell fold_cmp's `&&` from an `||` -- both arms agree on the
 // answer either way -- and mutate confirmed that SURVIVED before fmix_id
-// existed. Filed here, not cmp.id, which is at its 3-function cap. fcx_b1
+// existed. Filed here, not zext.id, which is at its 3-function cap. fcx_b1
 // is both the bool-typed value the zext widens (fold_isbool reads its
 // type) and the zero constant the icmp compares against (fold_zero_of
 // reads its op and s), so this needs one fewer row than building them

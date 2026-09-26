@@ -10,7 +10,7 @@
 //
 // Keeping the owner explicit means the index of a fingerprint and the index of
 // a function are different things with different names, rather than one number
-// used for both -- which is what `fname_at` (./more/report/report.id) resolves,
+// used for both -- which is what `fname_at` (./more/report/dup.id) resolves,
 // and the only place in the checker that maps one to the other.
 
 uq_fill_all() {

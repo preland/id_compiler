@@ -21,7 +21,7 @@ given edge_fixture ((import edge_var_node), "edge_caller"):() then check_failed:
 // a plain variable's name the same way, so a local that happens to share a
 // name with nothing in `fnames` is silently not an edge.
 //
-// KNOWN OVER-REPORT: finish_atom (front/parse/expr/atom/lit/call/call.id)
+// KNOWN OVER-REPORT: finish_atom (front/parse/expr/atom/lit/call/atom.id)
 // builds a "var" node for every bare identifier before it knows whether a
 // '(' follows, and when one does, that var node is never removed -- it is
 // simply not on the tree a real value-read would leave, but it is still in

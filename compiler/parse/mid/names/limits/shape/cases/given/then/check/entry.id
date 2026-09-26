@@ -24,10 +24,10 @@ given then_node_fixture ((import fixture_then_node), "fx_target"):() then prints
 given then_node_fixture ((import fixture_then_bad), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
 
 // `traps:(...)`: exactly one value, a string -- the message a trap's own
-// text is searched for (docs/TESTS.md). fit_traps (../../more/fit/fit.id)
+// text is searched for (docs/TESTS.md). fit_traps (../../more/fit/case.id)
 // is what rules out combining it with an expected return value or another
 // `then` clause; this is only the shape of the traps node itself, the same
-// split fit_then_print/fit_print_items (../more/print/print.id) make.
+// split fit_then_print/fit_print_items (../more/print/output.id) make.
 fit_then_traps(int chk_node) {
   int ci = i1_of(chk_node);
   int[] items = l1_of(chk_node);

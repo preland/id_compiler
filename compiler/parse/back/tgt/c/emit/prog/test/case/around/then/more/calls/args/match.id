@@ -1,5 +1,5 @@
 // `then calls NAME:(ARGS)` -- some recorded call to NAME, after idtc_seek (the
-// case's shared search position, capture/pre.id), whose arguments equal ARGS.
+// case's shared search position, capture/pre/redirect.id), whose arguments equal ARGS.
 // A match advances idtc_seek to that call's position, so several `calls`
 // clauses on one case are matched as a subsequence, in the order written
 // (docs/TESTS.md).

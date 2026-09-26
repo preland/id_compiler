@@ -1,6 +1,6 @@
 // State for back/drive/sink/notes.id's own cases -- filed here because
 // every directory near notes.id and utnote's own declaration
-// (mid/names/limits/shape/cases/report/host/mark/mark.id) is already at the
+// (mid/names/limits/shape/cases/report/host/mark/init.id) is already at the
 // 3-entry layout limit. notes_base alone is the "nothing to report" case
 // (utnote exported but empty); notes_setup adds one note to it.
 

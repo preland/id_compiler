@@ -1,4 +1,4 @@
-// Two "const","string" IR instructions for ../../../mod/sect/str/str.id
+// Two "const","string" IR instructions for ../../../mod/sect/str/walk.id
 // and more.id: ll_isstr requires the quotes a real string literal's own
 // text carries (front/parse/expr/atom/lit/more/str_ops.id's parse_str
 // keeps them), so ir_s here is the *quoted* text -- `""` (two quote

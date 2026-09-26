@@ -18,7 +18,7 @@ lit_cells_fixture() {
 ():() then init_units:(0)
 
 // A `(import NAME)` case argument, as the node the parser builds for it
-// (front/parse/decl/func/cases/case/given/elem/elem.id): a "cimport" leaf
+// (front/parse/decl/func/cases/case/given/elem/cimport.id): a "cimport" leaf
 // naming the export.
 lit_import_fixture() {
   env_init();

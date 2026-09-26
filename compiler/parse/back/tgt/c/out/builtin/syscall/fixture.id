@@ -1,7 +1,7 @@
 // "call" nodes over len_push/fixture.id's two int arguments (5 and 4), one
 // per name this directory and dispatch/ need to prove a dispatcher's
 // override branch: "foo" is an ordinary call (no override anywhere), "len"
-// and "push" are what dispatch.id's ec2/ec3 each look for, "pop" is what
+// and "push" are what chain.id's ec2/ec3 each look for, "pop" is what
 // pop.id's ec4 looks for, and "peek8" is a real syscall (is_wordfn), for
 // this file's own emit_syscall/cast_args.
 

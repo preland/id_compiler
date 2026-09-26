@@ -12,7 +12,7 @@ given ret_narrows_fn ((import narrow_f), (import narrow_e)):(1)
 given ret_same_fn ((import same_f), (import widen_e)):(0)
 given ret_nonplain_fn ((import narrow_f), (import nonplain_e)):(1)
 
-// The same guard fix_narrow uses (plan/walk/kind/narrow/narrow.id), and the
+// The same guard fix_narrow uses (plan/walk/kind/narrow/decide.id), and the
 // same fix_narrows it judges the narrowing with -- a return clause narrows
 // exactly as an argument does.
 fix_ret_narrows(int f, int e) {

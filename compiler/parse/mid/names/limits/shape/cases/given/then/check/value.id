@@ -28,7 +28,7 @@ given chk_fixture ((import fixture_ci), (import fixture_one), (import fixture_ch
 given chk_fixture ((import fixture_ci), (import fixture_fn), (import fixture_chk_fn)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
 
 // The last step of the dup-case-detection fixture (more/dup/): casefn, two
-// rows deep so dup_hit/dup_scan/check_dup_cases (more/dup/dup.id) and case_eq
+// rows deep so dup_hit/dup_scan/check_dup_cases (more/dup/scan.id) and case_eq
 // (more/dup/eq.id) have a real node to report through. Filed here because
 // more/dup/ and everything above it are at the 3-entry limit, and this was
 // the lane's last free function slot.

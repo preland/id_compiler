@@ -7,7 +7,7 @@ given lz_e (7, "d:", "0"):("d:int 0=I")
 given lz_e (7, "ed:", "y"):("ed:int y=I")
 
 // An `assign` statement, loosely: the assigned name is positional, exactly
-// as mid/form/unique/canon/stmt/stmt.id's canon_stmt treats it.
+// as mid/form/unique/canon/stmt/canon.id's canon_stmt treats it.
 lz_assign(int id) {
   string nm = s1_of(id);
   int i1 = i1_of(id);

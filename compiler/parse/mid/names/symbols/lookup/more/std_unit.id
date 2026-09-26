@@ -1,6 +1,6 @@
 // Whether a case belongs to a library, for the harness narrowing
 // (back/drive/target/tests/reach.id's seed_tested/seed_givens/seed_thens,
-// back/tgt/c/emit/prog/test/case/case.id's emit_cases): a case whose
+// back/tgt/c/emit/prog/test/case/emit.id's emit_cases): a case whose
 // function was parsed in a unit at or past --std-unit's boundary (nat_init's
 // own chain, back/drive/sink/natives/more/live.id, mutating the `stdunit`
 // cell init_units exports) is the standard library's own, and a case whose
@@ -31,7 +31,7 @@ given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
 
 // nat_init's own cases (live.id) read this back to check --std-unit landed
-// in the cell; case_unit_fixture (back/tgt/c/emit/prog/test/case/case.id)
+// in the cell; case_unit_fixture (back/tgt/c/emit/prog/test/case/emit.id)
 // gives a second, differently-sourced value so this function's own two
 // cases are not both nat_init's default.
 stdunit_check() {

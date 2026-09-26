@@ -3,7 +3,7 @@
 // bytes the runtime's helpers touch, `mem` the bytes each allocation requests.
 //
 // idc.py splices counters into the text of its runtime. Here the runtime is a
-// generated literal (../../../../../runtime/runtime.id), so the counting is
+// generated literal (../../../../../runtime/prelude.id), so the counting is
 // wrapped around it with the preprocessor instead:
 //
 //   * every allocation the runtime makes is one malloc or realloc, inside

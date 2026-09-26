@@ -10,7 +10,7 @@ given ir_rows ():(1) then chk_irprog_last:(1)
 given ir_rows_chk1 ():(1) then chk_irprog_last:(1)
 
 // The most recently pushed function's name and return type, for a case on
-// ir_func/ir_func2 (../func.id): a wrapper because a `then` check takes no
+// ir_func/ir_func2 (../build.id): a wrapper because a `then` check takes no
 // arguments, and the row a case just built is always the last one.
 chk_last_fn_name() {
   int n = len((import fnname));

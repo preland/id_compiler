@@ -56,7 +56,7 @@ nat_lists() {
 given env_init ():() then nat_row_count:(0)
 given env_init ():() then check_failed:(0)
 
-// Nothing is pruned with no main or when freestanding (dce.id,
+// Nothing is pruned with no main or when freestanding (sweep.id,
 // guarded_emit.id), so there every function is live and every native any of
 // them calls is one the object needs.
 nat_all_live() {

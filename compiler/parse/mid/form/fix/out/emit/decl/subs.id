@@ -9,7 +9,7 @@ fix_sub_at(int i, int j, string out) {
 given fix_decl_fixture (1, 0, ""):("|3|2|3|5|myname")
 given fix_decl_fixture (1, 1, "X"):("X|7|1|7|4|othername")
 
-// A leaf node ("ident", not one of the kinds out/span/beg/beg.id branches
+// A leaf node ("ident", not one of the kinds out/span/beg/start.id branches
 // on) at token 0 of fix_tokline_fixture2 -- fixd_gcl reused from
 // plan/walk/ev/push/one/ru.id's fix_span_fixture2, which pushes -1
 // (ungrouped) and nothing else this fixture's own cases read.

@@ -2,10 +2,10 @@
 // the unit as a function value. Read off the STRICT fingerprint
 // (mid/form/unique/, already computed by uq_fill before check_program_tail
 // runs): canon_var tags exactly that use "fv(NAME)" (mid/form/unique/canon/
-// expr/expr.id's ce2, mid/form/unique/canon/func/names.id's canon_var), and
+// expr/canon.id's ce2, mid/form/unique/canon/func/names.id's canon_var), and
 // the fingerprint is built by a real walk of the reachable tree -- unlike a
 // flat scan of every node the parser ever allocated, which also finds the
-// `var` node finish_atom (front/parse/expr/atom/lit/call/call.id) builds and
+// `var` node finish_atom (front/parse/expr/atom/lit/call/atom.id) builds and
 // discards for every call's own callee before it knows the callee is not a
 // local: `helper(x)` would then make `helper` look "used as a value" by
 // nothing more than being called.
