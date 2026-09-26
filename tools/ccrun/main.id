@@ -31,6 +31,8 @@ main(int argc, string[] argv) {
   int cpu_s = to_int(argv[2]);
   int code = run_capped(argv[4], argv[3], mem_kb, cpu_s);
 } return int code;
+(5, ["ccrun", "0", "0", "-", "true\n"]):(0)
+(5, ["ccrun", "0", "0", "-", "false\n"]):(1)
 
 // Open real stdout/stderr in *append* mode, never "w": a "w" fopen()
 // truncates, and when a caller's own stdout or stderr is already a real
@@ -48,3 +50,14 @@ run_capped(string argv_lines, string input, int mem_kb, int cpu_s) {
   int code = pump_finish(1);
   close_all();
 } return int code;
+("true\n", "-", 0, 0):(0)
+("false\n", "-", 0, 0):(1)
+
+// Reads cr_in_done (input/close.id's do_close_in, its sole exporter) back,
+// for cases that need to see the export itself rather than just count the
+// call that set it.
+ccrun_fx_in_done_value() {
+  int ccrun_fx_in_done_v = (import cr_in_done);
+} return int ccrun_fx_in_done_v;
+given ccrun_fx_run_capped_true given ccrun_fx_after_close ():(1)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main given ccrun_fx_after_close ():(1)

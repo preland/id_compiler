@@ -17,6 +17,8 @@ setup_io(string input) {
 } chain (string input) {
   open_input_if_any(input);
 } return void;
+given ccrun_fx_run_capped_true ("-"):("-") then calls open_input_if_any:("-")
+("main.id"):("main.id") then calls open_input_if_any:("main.id")
 
 // A real file, or "-": no input at all, and the child's stdin is closed at
 // once -- the same immediate EOF `capped()` gave a child that never read
@@ -29,9 +31,13 @@ open_input_if_any(string input) {
     int closed = proc_close_in((import cr_h));
   }
 } return void;
+given ccrun_fx_run_capped_true ("-"):("-") then calls open_input:[0]
+("main.id"):("main.id") then calls open_input:("main.id")
 
 open_input(string input) {
   export int cr_in = fs_open(input, "r");
   export int[] cr_pending = [];
   lst_fill((import cr_pending), 4096, 0);
 } return void;
+("main.id"):("main.id") then calls lst_fill:[1]
+("child/setup.id"):("child/setup.id") then calls lst_fill:[1]

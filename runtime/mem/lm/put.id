@@ -20,3 +20,6 @@ lm_next(int at) {
     n = 0;
   }
 } return int n;
+(0):(1)
+(6):(7)
+(7):(0)

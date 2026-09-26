@@ -33,6 +33,8 @@ drain_remaining(int timeout_ms) {
     drain_remaining(timeout_ms);
   }
 } return void;
+given ccrun_fx_run_capped_true (0):(0) then prints:("")
+given ccrun_fx_run_capped_true (500):(500) then prints:("")
 
 // Flush and close every stream this run opened, once pump_finish has
 // drained everything there was to relay in both directions. cr_in is
@@ -47,3 +49,5 @@ close_all() {
 } chain () {
   int cp = proc_close((import cr_h));
 } return void;
+given ccrun_fx_run_capped_true ():() then calls close_input_if_any:[1]
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then calls close_input_if_any:[1]

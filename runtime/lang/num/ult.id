@@ -17,3 +17,6 @@ ult_at(word p, word q) {
     v = 1;
   }
 } return word v;
+(1, 2):(1)
+(2, 1):(0)
+(5, 5):(0)

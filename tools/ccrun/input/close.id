@@ -18,6 +18,8 @@ do_close_in() {
   int closed = proc_close_in((import cr_h));
   export int cr_in_done = 1;
 } return void;
+given ccrun_fx_run_capped_true ():() then ccrun_fx_in_done_value:(1)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then ccrun_fx_in_done_value:(1)
 
 // The file cr_in was opened from (child/setup.id's open_input), closed once
 // at the very end -- called from child/finish.id's close_all, only on the
@@ -29,3 +31,5 @@ close_input_if_any() {
     int ci = fs_close((import cr_in));
   }
 } return void;
+given ccrun_fx_run_capped_true ():()
+given ccrun_fx_setup_input_main ():()

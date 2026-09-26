@@ -28,3 +28,25 @@ pump_in(int timeout_ms) {
 } chain (int timeout_ms) {
   maybe_close_in();
 } return void;
+
+// run_capped, spawning a real ("true") child under no limits with real
+// stdout/stderr streams, is the sole exporter of cr_h/cr_out/cr_err
+// (main.id): nothing else may declare them, so this is the only way any
+// other case gets a real (if, by the time this returns, already drained and
+// closed) value for cr_h. Reused by every case below that needs one.
+ccrun_fx_run_capped_true() {
+  int ccrun_fx_rc_code = run_capped("true\n", "-", 0, 0);
+} return void;
+():() then calls run_capped:("true\n", "-", 0, 0)
+():() then calls setup_io:("-")
+
+// setup_io, the sole exporter of cr_chunk/cr_has_in (child/setup.id), run on
+// a real file in this project's own tree: cr_has_in ends up 1, and
+// open_input (the sole exporter of cr_in/cr_pending) runs too. Composes
+// with ccrun_fx_run_capped_true for a case that needs both cr_h and a
+// has-input state.
+ccrun_fx_setup_input_main() {
+  setup_io("main.id");
+} return void;
+():() then calls setup_io:("main.id")
+():() then calls open_input:("main.id")
