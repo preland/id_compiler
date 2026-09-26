@@ -7,6 +7,8 @@ rest_take(int i, int[] grp, int j) {
   string b = ds_fp(j);
   take_eq(grp, j, a, b);
 } return void;
+given ds_test_setup (0, [0], 1):(0, [0, 1], 1)
+given ds_test_setup (0, [0], 3):(0, [0], 3)
 
 take_eq(int[] grp, int j, string a, string b) {
   if(str_cmp(a, b) == 0) {
@@ -14,6 +16,8 @@ take_eq(int[] grp, int j, string a, string b) {
     take_new(grp, j);
   }
 } return void;
+given ds_test_setup ([0], 1, "FPX", "FPX"):([0, 1], 1, "FPX", "FPX") then ds_seen1:(1)
+given ds_test_setup ([0], 1, "FPX", "FPY"):([0], 1, "FPX", "FPY") then ds_seen1:(0)
 
 take_new(int[] grp, int j) {
   int dup = has_where(grp, j);
@@ -21,3 +25,5 @@ take_new(int[] grp, int j) {
     push(grp, j);
   }
 } return void;
+given ds_test_setup ([0], 1):([0, 1], 1)
+given ds_test_setup ([0], 0):([0], 0)

@@ -4,6 +4,8 @@ fld(string line, string tab, int n) {
   string[] parts = str_split(line, tab);
   string out = fld_at(parts, n);
 } return string out;
+("a\tb\tc", "\t", 1):("b")
+("a\tb\tc", "\t", 5):("")
 
 fld_at(string[] parts, int n) {
   string out = "";
@@ -11,3 +13,5 @@ fld_at(string[] parts, int n) {
     out = parts[n];
   }
 } return string out;
+(["x", "y"], 0):("x")
+(["x", "y"], 2):("")

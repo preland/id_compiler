@@ -5,8 +5,12 @@ emit_rows(int[] grp, int k) {
     k = k + 1;
   }
 } return void;
+given ds_test_setup ([0, 1, 2], 0):() then prints:("    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup ([0, 1, 2], 3):() then prints:("")
 
 emit_row(int[] grp, int k) {
   string where = ds_where(grp[k]);
   print("    " + where);
 } return void;
+given ds_test_setup ([0, 1, 2], 0):() then prints:("    fileA.id:10\n")
+given ds_test_setup ([0, 1, 2], 2):() then prints:("    fileC.id:30\n")

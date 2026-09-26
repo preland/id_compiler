@@ -5,6 +5,8 @@ has_where(int[] grp, int j) {
   string where = ds_where(j);
   int r = where_loop(grp, where, 0);
 } return int r;
+given ds_test_setup ([0], 1):(0)
+given ds_test_setup ([0], 0):(1)
 
 where_loop(int[] grp, string where, int k) {
   int r = 0;
@@ -13,8 +15,12 @@ where_loop(int[] grp, string where, int k) {
     k = k + 1;
   }
 } return int r;
+given ds_test_setup ([0, 2], "fileC.id:30", 0):(1)
+given ds_test_setup ([0, 2], "fileC.id:30", 2):(0)
 
 where_at(int[] grp, string where, int k) {
   string here = ds_where(grp[k]);
   int r = str_cmp(where, here) == 0;
 } return int r;
+given ds_test_setup ([0], "fileA.id:10", 0):(1)
+given ds_test_setup ([0], "fileZ.id:99", 0):(0)

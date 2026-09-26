@@ -5,13 +5,19 @@ ds_row(int i) {
   int h = str_hash(fp);
   ds_push(h);
 } return void;
+given ds_test_setup (0):() then ds_hash_tail:(2074958313)
+given ds_test_setup (3):() then ds_hash_tail:(2058180694)
 
 ds_push(int h) {
   push((import ds_hash), h);
   push((import ds_seen), 0);
 } return void;
+given ds_test_setup (777):() then ds_hash_tail:(777)
+given ds_test_setup (0):() then ds_hash_tail:(0)
 
 // The fingerprint of line i.
 ds_fp(int i) {
   string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 1);
 } return string ret_s;
+given ds_test_setup (0):("FPX")
+given ds_test_setup (3):("FPY")

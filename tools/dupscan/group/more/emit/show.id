@@ -4,6 +4,8 @@ emit_group(int[] grp) {
   int n = len(grp);
   emit_head(grp, n);
 } return void;
+given ds_test_setup ([0, 1, 2]):() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup ([3]):() then prints:("")
 
 emit_head(int[] grp, int n) {
   if(n > 1) {
@@ -11,9 +13,13 @@ emit_head(int[] grp, int n) {
     emit_rows(grp, 0);
   }
 } return void;
+given ds_test_setup ([0, 1, 2], 3):() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup ([3], 1):() then prints:("")
 
 emit_title(int[] grp, int n) {
   string name = ds_name(grp[0]);
   string count = fmt_int(n, 0);
   print(count + " copies of " + name + ":");
 } return void;
+given ds_test_setup ([0, 1, 2], 3):() then prints:("3 copies of foo:\n")
+given ds_test_setup ([3], 5):() then prints:("5 copies of baz:\n")

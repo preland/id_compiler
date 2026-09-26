@@ -2,11 +2,17 @@
 ds_proj(int i) {
   string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 0);
 } return string ret_s;
+given ds_test_setup (0):("projA")
+given ds_test_setup (3):("projD")
 
 ds_name(int i) {
   string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 2);
 } return string ret_s;
+given ds_test_setup (0):("foo")
+given ds_test_setup (3):("baz")
 
 ds_where(int i) {
   string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 3);
 } return string ret_s;
+given ds_test_setup (0):("fileA.id:10")
+given ds_test_setup (3):("fileD.id:40")

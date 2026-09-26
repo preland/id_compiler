@@ -8,6 +8,8 @@ group_all() {
     i = i + 1;
   }
 } return void;
+given ds_test_setup ():() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup given group_all ():() then prints:("")
 
 group_at(int i) {
   if((import ds_seen)[i] == 0 && len((import ds_lines)[i]) > 0) {
@@ -15,9 +17,13 @@ group_at(int i) {
     group_head(i, grp);
   }
 } return void;
+given ds_test_setup (0):() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup (4):() then prints:("")
 
 group_head(int i, int[] grp) {
   push(grp, i);
   lset((import ds_seen), i, 1);
   group_rest(i, grp);
 } return void;
+given ds_test_setup (0, []):(0, [0, 1, 2])
+given ds_test_setup (3, []):(3, [3])

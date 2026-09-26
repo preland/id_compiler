@@ -6,12 +6,16 @@ ds_init(string[] lines, string tab) {
   export string[] ds_tab = [tab];
   ds_init2();
 } return void;
+(["a\tPX\tn\tw.id:1"], "\t"):() then ds_hash_tail:(956306805)
+(["a\tQZ\tm\tv.id:9"], "\t"):() then ds_hash_tail:(1962713682)
 
 ds_init2() {
   export int[] ds_seen = [];
   export int[] ds_hash = [];
   ds_fill(0);
 } return void;
+given ds_test_setup ():() then ds_hash_len:(5)
+():() then traps:("uninitialised export")
 
 // One pass to fingerprint-hash every line. Comparing is quadratic and hashing
 // is not, so the two are kept apart -- exactly as mid/form/unique does it.
@@ -21,3 +25,5 @@ ds_fill(int i) {
     i = i + 1;
   }
 } return void;
+given ds_test_setup (5):() then ds_hash_len:(5)
+given ds_test_setup (0):() then ds_hash_len:(10)

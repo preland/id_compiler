@@ -1,0 +1,8 @@
+// How many rows have been hashed so far -- the length witness ds_init2 and
+// ds_fill need, since a reset that silently no-ops would leave stale rows
+// behind instead of an empty list len() alone would not tell apart.
+ds_hash_len() {
+  int r = len((import ds_hash));
+} return int r;
+given ds_test_setup ():(5)
+():() then traps:("uninitialised export")
