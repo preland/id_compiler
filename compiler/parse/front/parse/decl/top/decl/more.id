@@ -9,10 +9,34 @@ push_func_line(int[] pos) {
 given decl_tokens ([0]):(0)
 given decl_tokens ([0]):(0) then check_failed:(0)
 
+// The function's own token range is recorded beside it (ptoks/ptoke), before
+// its cases are taken: the text a case key hashes is the declaration alone,
+// so adding a case to a function does not change the key of a caller's case.
 push_func_body(int[] pos) {
+  int ptok_first = pos[0];
   int parse_func_v = parse_fn(pos);
   push((import prog), parse_func_v);
+} chain (int[] pos) {
+  ptok_note(ptok_first, pos[0], parse_func_v);
   int ret_i = take_cases(pos);
 } return int ret_i;
-given decl_tokens ([0]):(0)
+given decl_tokens ([0]):(0) then ptok_span:(37)
 given decl_tokens ([0]):(0) then check_failed:(0)
+
+// push_asm records where an asm declaration begins, the way push_func
+// records an ordinary function's, before parse_asm (../core/top.id) consumes
+// it -- so --calls can give it a fn row (asm_case_row, mid/names/limits/
+// report/more/loc/func_line.id; print_asm_cases, back/drive/run/check/dce/
+// emit/guard/guarded_emit.id) the way an ordinary function already gets one.
+// aloc holds "file:line" already joined, one entry per declaration, parallel
+// to afname (front/parse/decl/asm/asm_state.id).
+push_asm(int[] pos) {
+  string cur_file_v = cur_file();
+  int cur_ln_v = cur_ln(pos);
+  string loc = cur_file_v + ":" + cur_ln_v;
+} chain (int[] pos) {
+  push((import aloc), loc);
+  int ret_i = parse_asm(pos);
+} return int ret_i;
+given asm_decl_fixture ([0]):(0)
+given asm_decl_fixture2 ([0]):(0)

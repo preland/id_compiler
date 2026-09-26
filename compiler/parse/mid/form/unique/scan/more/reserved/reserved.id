@@ -36,5 +36,17 @@ given resv_scan_fixture (1):() then prints:("b.id:9: error: function 'plain_name
 
 init_resv_names() {
   export string[] resv_names = [];
-  split_resv_names((import resv_names_src), 0);
+  int i = 0;
+  while(i < len((import resv_names_src))) {
+    i = take_resv_name((import resv_names_src), i);
+  }
 } return void;
+():() then calls push_resv_name:[67]
+():() then resv_names_last:("ushr")
+
+resv_names_last() {
+  int n = len((import resv_names));
+  string last_s = (import resv_names)[n - 1];
+} return string last_s;
+given init_resv_names ():("ushr")
+given init_rtc ():("ushr")

@@ -1,0 +1,40 @@
+// The walk with the skips. A function's nodes are the run from the node after
+// the previous function's through its own (the order the parser made them
+// in), so the run a node belongs to is found with one cursor that only moves
+// forward. A skipped run is stepped over whole; a checked node is checked
+// exactly as before, and a diagnostic it raises marks its run, so that run
+// is never offered to the cache (tk/key/, tk/maps/emit.id).
+
+tk_node(int i) {
+  int tkf = tk_row_at(i);
+  int tknext = i + 1;
+  blank;
+} chain (int i) {
+  if(tkf < len((import tkskip)) && (import tkskip)[tkf] == 1) {
+    tknext = (import prog)[tkf] + 1;
+  } else {
+    tk_check(i, tkf);
+  }
+} return int tknext;
+given tk_t_warm (0):(7)
+given tk_t_prep (0):(1)
+
+tk_check(int i, int tkf) {
+  int tkb = (import tcerrs)[0];
+  tc_node_at(i);
+  if((import tcerrs)[0] != tkb && tkf < len((import tkbad))) {
+    lset((import tkbad), tkf, 1);
+  }
+} return void;
+given tk_t_prep (0, 0):() then tk_nbad:(0)
+given tk_t_bad ((import decl_list), 0):() then tk_nbad:(1)
+
+tk_row_at(int i) {
+  int tkc = (import tkcur)[0];
+  while(tkc < len((import prog)) && (import prog)[tkc] < i) {
+    tkc = tkc + 1;
+  }
+  lset((import tkcur), 0, tkc);
+} return int tkc;
+given tk_t_prep (3):(0)
+given tk_t_prep (7):(1)

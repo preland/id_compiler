@@ -12,6 +12,8 @@ fix_paren_side(int x, int c) {
     fix_paren_emit(c);
   }
 } return void;
+given fix_paren_side_fixture ((import bin_mixed), (import bin_bitand)):() then calls fix_paren_emit:((import bin_bitand))
+given fix_paren_side_fixture ((import bin_eq), (import bin_lt)):() then calls fix_paren_emit:[0]
 
 fix_paren_emit(int c) {
   int b = fix_nbeg(c);

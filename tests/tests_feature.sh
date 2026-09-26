@@ -383,6 +383,171 @@ EOF
 self_refuse "bin/idc: a crashing case is reported with its signal" \
     "p.id:4: test failed: down(0) was killed by signal" --emit-c /dev/null
 
+# --- callees first, and a caller of a failed case is not run ------------------
+# top calls mid calls leaf, written in that order, so index order would run
+# the callers first. leaf's `traps` case passes and its second case fails.
+cat > "$TMP/p.id" <<'EOF'
+top(int a) {
+  int t = mid(a);
+  t = t + 0;
+} return int t;
+(1):(6)
+(2):(3)
+
+mid(int a) {
+  int m = leaf(a);
+  m = m + 0;
+} return int m;
+(1):(6)
+(3):(2)
+
+leaf(int a) {
+  int q = 6 / a;
+} return int q;
+(0):() then traps:("division by zero")
+(3):(3)
+EOF
+self_refuse "bin/idc: a caller of a function whose case failed is reported not run" \
+    "p.id:12: not run: mid(1) depends on leaf, whose case at $TMP/p.id:19 failed" --emit-c /dev/null
+grep -qF "p.id:5: not run: top(1) depends on leaf, whose case at $TMP/p.id:19 failed" "$TMP/log" \
+    && grep -qF "p.id:6: not run: top(2) depends on leaf" "$TMP/log" \
+    && ! grep -q 'test failed: \(top\|mid\)' "$TMP/log" \
+    && ! grep -q 'p.id:18' "$TMP/log" \
+    && ok "bin/idc: a failure skips every transitive caller's cases, and none of them runs" \
+    || bad "bin/idc: a failure skips every transitive caller's cases, and none of them runs ($(cat "$TMP/log"))"
+leaf_at=$(grep -n 'p.id:19: test failed' "$TMP/log" | cut -d: -f1)
+top_at=$(grep -n 'p.id:5: not run' "$TMP/log" | cut -d: -f1)
+[ -n "$leaf_at" ] && [ -n "$top_at" ] && [ "$leaf_at" -lt "$top_at" ] \
+    && ok "bin/idc: a callee's cases run before its callers', whatever the file order" \
+    || bad "bin/idc: a callee's cases run before its callers', whatever the file order ($(cat "$TMP/log"))"
+
+# other is independent of caller and leaf, and fails on its own.
+cat > "$TMP/p.id" <<'EOF'
+caller(int a) {
+  int c = leaf(a);
+  c = c + 0;
+} return int c;
+(1):(6)
+(3):(2)
+
+other(int a) {
+  int o = a * 2;
+} return int o;
+(1):(3)
+(2):(4)
+
+leaf(int a) {
+  int q = 6 / a;
+} return int q;
+(1):(6)
+(3):(3)
+EOF
+self_refuse "bin/idc: an independent function's cases still run beside a skipped caller" \
+    "p.id:11: test failed: other(1) = 2, expected 3" --emit-c /dev/null
+grep -qF "p.id:5: not run: caller(1) depends on leaf, whose case at $TMP/p.id:18 failed" "$TMP/log" \
+    && grep -qF "idc: 2 case(s) failed; 2 more not run, because a function they call failed a case" "$TMP/log" \
+    && ok "bin/idc: the summary counts the failed cases and the ones not run" \
+    || bad "bin/idc: the summary counts the failed cases and the ones not run ($(cat "$TMP/log"))"
+
+# --- then traps:("TEXT") (docs/TESTS.md) --------------------------------------
+# bin/idc only: idc.py lexes `traps` as an ordinary identifier the same way it
+# does `given`/`then`/`prints`/`eprints`/`calls`.
+cat > "$TMP/p.id" <<'EOF'
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 0):() then traps:("division by zero")
+(6, 3):(2)
+EOF
+self_accept "bin/idc: a matching 'traps' check builds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 0):() then traps:("out of bounds")
+(6, 3):(2)
+EOF
+self_refuse "bin/idc: a mismatching 'traps' check fails, showing both sides" \
+    "p.id:4: test failed: quot(6, 0) trapped: id: division by zero, expected a trap containing out of bounds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 3):() then traps:("division by zero")
+(6, 2):(3)
+EOF
+self_refuse "bin/idc: a function that returns instead of trapping fails 'traps'" \
+    "p.id:4: test failed: quot(6, 3) expected a trap containing division by zero, but it returned" --emit-c /dev/null
+
+# A signal death (docs/TESTS.md's "was killed by signal") counts as a trap
+# too, matched against the same text idtc_report would otherwise print.
+cat > "$TMP/p.id" <<'EOF'
+down(int n) {
+  int r = down(n + 1);
+} return int r;
+(0):() then traps:("signal 11")
+(1):() then traps:("Segmentation fault")
+EOF
+self_accept "bin/idc: 'traps' matches a death by signal, not only a runtime trap" --emit-c /dev/null
+
+# A case whose `given` omits the setup reads an export nothing has set. The
+# harness traps on it for every type (docs/SPEC.md 8) -- a string used to
+# segfault and an int to read 0 -- while the program's own C carries no check.
+cat > "$TMP/p.id" <<'EOF'
+setup_s() {
+  export string gs = "x";
+} return void;
+():() then read_s:("x")
+given setup_s ():() then read_s:("x")
+
+read_s() {
+  string v = (import gs);
+} return string v;
+given setup_s ():("x")
+():() then traps:("uninitialised export")
+
+main(int argc, string[] argv) {
+  setup_s();
+  print(read_s());
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF
+self_accept "bin/idc: a string export read before its setup traps in a case" --emit-c "$TMP/out.c"
+if grep -q idtc_set "$TMP/out.c"; then
+    bad "bin/idc: the program's C carries no uninitialised-export check"
+else
+    ok "bin/idc: the program's C carries no uninitialised-export check"
+fi
+
+cat > "$TMP/p.id" <<'EOF'
+setup_i() {
+  export int gi = 7;
+} return void;
+():() then read_i:(7)
+given setup_i ():() then read_i:(7)
+
+read_i() {
+  int v = (import gi);
+} return int v;
+given setup_i ():(7)
+():() then traps:("uninitialised export")
+
+main(int argc, string[] argv) {
+  setup_i();
+  print("" + read_i());
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF
+self_accept "bin/idc: an int export read before its setup traps in a case" --emit-c /dev/null
+
+sed -i 's/^():() then traps:("uninitialised export")$/():(7)/' "$TMP/p.id"
+self_refuse "bin/idc: an int export read before its setup fails the case, not reads 0" \
+    "p.id:11: test failed: read_i() trapped: id: read of an uninitialised export (its declaring function has not run)" --emit-c /dev/null
+
 # Flat-store addresses are the case's own: the second case would be handed a
 # later address if the first case's allocation were still live.
 cat > "$TMP/p.id" <<'EOF'
@@ -742,6 +907,31 @@ f(int then) {
 EOF
 self_refuse "bin/idc: then is not a parameter name" \
     "p.id:1: error: 'then' is a test case keyword (see docs/TESTS.md) and cannot be used as a name" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+f(int stdin) {
+  int b = len("a");
+} return int b;
+(1):(1)
+(2):(1)
+EOF
+self_refuse "bin/idc: stdin is not a parameter name" \
+    "p.id:1: error: 'stdin' is a test case keyword (see docs/TESTS.md) and cannot be used as a name" --emit-c /dev/null
+
+# --- a case's stdin clause, and the default when it has none -----------------
+# read_all() reads the real stdin of the case's own process (docs/TESTS.md):
+# a `stdin "TEXT"` clause makes that TEXT, and a case with none sees an empty
+# stdin rather than the harness's own -- never the terminal, never a leftover
+# from an earlier case.
+cat > "$TMP/p.id" <<'EOF'
+grab() {
+  string s = read_all();
+  print(s);
+} return void;
+stdin "hi\n" ():() then prints:("hi\n\n")
+():() then prints:("\n")
+EOF
+self_accept "bin/idc: a case's stdin clause is what read_all() sees, and a case without one sees empty stdin" --emit-c /dev/null
 
 # --- a build whose cases cannot run here says why ----------------------------
 cat > "$TMP/p.id" <<'EOF'
@@ -1412,7 +1602,7 @@ runner(int n) {
 (2):(3) then calls helper:(2)
 EOF
 self_refuse "bin/idc: 'calls NAME:(ARGS)' with the wrong arguments fails" \
-    "p.id:10: test failed: runner(1) calls helper(...) did not match; 1 call(s) to 'helper' were recorded" \
+    "p.id:10: test failed: runner(1) calls helper(99) did not match any of the 1 recorded call(s) to 'helper': helper(1)" \
     --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
@@ -1428,7 +1618,7 @@ runner(int n) {
 (2):(2) then calls helper:(2)
 EOF
 self_refuse "bin/idc: 'calls NAME:(ARGS)' fails when the function is never called" \
-    "p.id:9: test failed: runner(1) calls helper(...) did not match; 0 call(s) to 'helper' were recorded" \
+    "p.id:9: test failed: runner(1) calls helper(1) did not match any of the 0 recorded call(s) to 'helper'" \
     --emit-c /dev/null
 
 # Two clauses on one case, matched as a subsequence in the order written: the
@@ -1543,6 +1733,164 @@ given warmup (2):(2) then calls helper:[0]
 EOF
 self_accept "bin/idc: a 'given' setup's own calls are not recorded" \
     --allow-untested --emit-c /dev/null
+
+# Recording is bounded (test/unit/more/rec/scan/prelude.id's IDTC_REC_MAX,
+# 65536 rows a name). 200 million calls once grew the rows past the case's
+# address space and the recorder wrote through realloc's NULL, a segfault;
+# every call is still counted, so the count stays exact past the bound.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int i = 0;
+  int s = 0;
+  while(i < n) {
+    s = helper(i);
+    i = i + 1;
+  }
+} return int s;
+(70000):(70000) then calls helper:[70000]
+(200000000):(200000000) then calls helper:[200000000]
+EOF
+self_accept "bin/idc: 'calls NAME:[N]' stays exact past the recording bound" --emit-c /dev/null
+
+# The last kept row (call 65536, argument 65535) still matches; the first call
+# past the bound was counted but its arguments were not kept, so a miss says
+# the recording overflowed rather than passing or claiming no such call.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int i = 0;
+  int s = 0;
+  while(i < n) {
+    s = helper(i);
+    i = i + 1;
+  }
+} return int s;
+(70000):(70000) then calls helper:(65535)
+(3):(3) then calls helper:(2)
+EOF
+self_accept "bin/idc: 'calls NAME:(ARGS)' matches the last row inside the recording bound" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int i = 0;
+  int s = 0;
+  while(i < n) {
+    s = helper(i);
+    i = i + 1;
+  }
+} return int s;
+(70000):(70000) then calls helper:(65536)
+(3):(3) then calls helper:(2)
+EOF
+self_refuse "bin/idc: 'calls NAME:(ARGS)' past the recording bound reports the overflow" \
+    "p.id:15: test failed: runner(70000) calls helper(65536) did not match any of the 65536 recorded call(s) to 'helper': helper(0), helper(1), helper(2), helper(3), helper(4), ... (65531 more); recording overflowed: 4464 later call(s) were counted but their arguments were not kept (at most 65536 per function)" \
+    --emit-c /dev/null
+
+# A miss shows the recorded calls it was compared against, at most five, as
+# the clause itself would write them.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int i = 0;
+  int s = 0;
+  while(i < n) {
+    s = helper(i);
+    i = i + 1;
+  }
+} return int s;
+(8):(8) then calls helper:(99)
+(3):(3) then calls helper:(2)
+EOF
+self_refuse "bin/idc: a 'calls' miss shows at most five recorded calls" \
+    "p.id:15: test failed: runner(8) calls helper(99) did not match any of the 8 recorded call(s) to 'helper': helper(0), helper(1), helper(2), helper(3), helper(4), ... (3 more)" --emit-c /dev/null
+
+# A later clause may only match after the previous one's match, so the calls
+# before it are listed apart as skipped rather than as candidates.
+cat > "$TMP/p.id" <<'EOF'
+helper(int x) {
+  int y = x + 1;
+} return int y;
+(1):(2)
+(5):(6)
+
+runner(int n) {
+  int a = helper(n);
+  int b = helper(n + 1);
+  int c = helper(n + 2);
+} return int c;
+(1):(4) then calls helper:(2) then calls helper:(1)
+(2):(5) then calls helper:(3) then calls helper:(4)
+EOF
+self_refuse "bin/idc: a 'calls' miss after an earlier match lists the skipped calls apart" \
+    "p.id:12: test failed: runner(1) calls helper(1) did not match any of the 1 recorded call(s) to 'helper' after the previous clause's match: helper(3); 2 earlier call(s) were skipped: helper(1), helper(2)" \
+    --emit-c /dev/null
+
+# A list argument is recorded by reference, so it shows (and is compared at)
+# the state the case left it in, and the message says so.
+cat > "$TMP/p.id" <<'EOF'
+helper(int[] xs, int k) {
+  int y = k + 1;
+} return int y;
+([1], 1):(2)
+([2], 5):(6)
+
+runner(int n) {
+  int[] zs = [0, 0];
+  int h = helper(zs, n);
+  zs[0] = 7;
+} return int h;
+(1):(2) then calls helper:([0, 0], 1)
+(2):(3) then calls helper:([7, 0], 2)
+EOF
+self_refuse "bin/idc: a 'calls' miss shows a list argument's final state, and says so" \
+    "p.id:12: test failed: runner(1) calls helper([0, 0], 1) did not match any of the 1 recorded call(s) to 'helper': helper([7, 0], 1) (list arguments show their final state)" \
+    --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+helper(int[] xs, int k) {
+  int y = k + 1;
+} return int y;
+([1], 1):(2)
+([2], 5):(6)
+
+runner(int n) {
+  int[] zs = [];
+  int i = 0;
+  while(i < n) {
+    push(zs, i);
+    i = i + 1;
+  }
+} chain (int n) {
+  int h = helper(zs, n);
+} return int h;
+(20):(21) then calls helper:([], 20)
+(2):(3) then calls helper:([0, 1], 2)
+EOF
+self_refuse "bin/idc: a 'calls' miss shows at most 16 elements of a list" \
+    "p.id:17: test failed: runner(20) calls helper([], 20) did not match any of the 1 recorded call(s) to 'helper': helper([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...], 20) (list arguments show their final state)" \
+    --emit-c /dev/null
 
 # --------------------------------------------------------------------------
 # Decomposition warnings (docs/PROJECT.md, "decomposition warnings"): a
@@ -1760,6 +2108,35 @@ main(int argc, string[] argv) {
 EOF
 self_nowarn "bin/idc: an idstd_-prefixed parameter is not a generated name (idstd_v)" \
     "has a generated name" --allow-untested --emit-c /dev/null
+
+# A chain's seam marker used to be built with its "return expression" field
+# left at 0 rather than -1 (front/parse/decl/func/sig/chain/tail.id), the
+# value every other no-expression node in this pass uses (see acc_stmt4,
+# mid/names/symbols/check/access/expr/assign.id). 0 is also a real node id --
+# whichever node the whole build happens to parse first -- so the access
+# check ran that node through acc_expr as if it were the marker's own
+# expression. It stayed silent whenever node 0 was harmless, and only
+# surfaced as a bogus "'NAME' is a builtin, not a function defined in id"
+# once something built earlier in the same source stream put a bare builtin
+# reference at node 0 -- which is what `alloc(1)` here does, parsed before
+# any node of g's. bin/idc's own driver/idstd build hit this for real: the
+# same project fails or builds depending only on whether its absolute path
+# sorts before or after idstd's in the one global source-file sort.
+cat > "$TMP/p.id" <<'EOF'
+f() {
+  alloc(1);
+} return void;
+
+g(int x) {
+  int a1 = x;
+  int a2 = a1;
+  int a3 = a2;
+} chain (int x) {
+  int a4 = a3;
+} return void;
+EOF
+self_accept "bin/idc: a chain segment after a builtin call elsewhere does not misname 'alloc'" \
+    --allow-untested --emit-c /dev/null
 
 echo
 echo "$pass passed, $fail failed"

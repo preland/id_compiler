@@ -1,0 +1,5 @@
+// EXPECT: 'break' is not inside a 'while'
+// break leaves the innermost loop, so outside every loop it has nothing to leave
+main(int argc, string[] argv) {
+  break;
+} return int 0;

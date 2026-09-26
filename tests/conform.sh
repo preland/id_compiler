@@ -4,16 +4,15 @@
 #
 # Comparing the *text* two compilers emit, which the tree used to do, is only
 # a question that exists while both of them emit C. It cannot say anything about
-# The `llvm` target here is `bin/idc --target llvm` -- the primary compiler's
-# own LLVM back end, which lowers to the SSA IR in compiler/parse/back/ir and
-# prints it (docs/LLVM.md). `idc.py --target llvm` is a separate, older code
-# generator that idc.py is frozen with (docs/HACKING.md); it is no longer
-# what this suite holds the language to.
-#
 # `--target llvm` or `--target wasm`, and it never will. This file asks the
 # question that survives a second target: build the same program every way the
 # toolchain can, run it, and require the same stdout, the same exit code and
 # the same stderr from each.
+#
+# Every target is bin/idc. `llvm` is its own LLVM back end, which lowers to the
+# SSA IR in compiler/parse/back/ir and prints it (docs/LLVM.md). `wasm` is the C
+# target's C recompiled for wasm32-wasi as a WASI command, run by wasmtime --
+# so it shares C's semantics but not its C compiler: clang, not gcc.
 #
 # Every case is one .id file under tests/conform/<area>/ with its answer beside
 # it:
@@ -43,12 +42,12 @@
 # for coverage.
 #
 # Run from anywhere: tests/conform.sh
-# Needs clang for --target llvm and wat2wasm + wasmtime for --target wasm;
+# Needs clang for --target llvm, and the WASI toolchain `nix develop` sets plus
+# wasmtime for --target wasm;
 # a missing toolchain skips that target with a message rather than passing.
 set -u
 cd "$(dirname "$0")"
 BIN_IDC=../bin/idc
-IDC_PY=../idc.py
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
@@ -66,14 +65,9 @@ skip() { gap=$((gap+1));  GAPS="$GAPS$1"$'\n'; }
 GAPS=""
 
 # A target that says "this is C-only" is describing a known limitation rather
-# than getting the answer wrong. The message comes from idc.py's
-# unsupported_builtin_msg and reject_word_type, so match on their wording.
-# eprint is the one builtin idc.py never learned, and it refuses it by name as
-# an external call. That refusal is the wasm target's gap for it, and only
-# wasm's: on the other targets the same name in a build log is a failure.
+# than getting the answer wrong, so match on that wording.
 is_enumerated_gap() {
-    grep -qE "is C-only|C-only|not implemented for this target" "$1" && return 0
-    [ "$2" = wasm ] && grep -qF "call to external function 'eprint' is not supported" "$1"
+    grep -qE "is C-only|C-only|not implemented for this target" "$1"
 }
 
 # A target that is known not to conform in one area, by name.
@@ -83,26 +77,14 @@ is_enumerated_gap() {
 # and gets a different answer, and the only honest way to keep the suite green
 # while that is true is to name the area and say why. Removing a line here is
 # how the fix gets noticed.
-#
-#   c:order   the C target emits one C expression per `id` expression, and C
-#             does not sequence the arguments of a call. gcc evaluates them
-#             right to left; docs/SPEC.md 7 says left to right. Conforming
-#             means hoisting operands into temporaries. See SPEC 11, S11.
-#   wasm:fn   the WASM target is built by idc.py, which is frozen (docs/HACKING.md) and
-#             has no function values: it refuses `func` as a type. See SPEC
-#             11, S12.
 known_apart() {
     case "$1:$2" in
-        c:order) return 0 ;;
-        wasm:fn) return 0 ;;
     esac
     return 1
 }
 
 apart_why() {
     case "$1:$2" in
-        c:order) echo "the C target does not sequence operands (SPEC 7)" ;;
-        wasm:fn) echo "idc.py, which builds wasm, has no function values (SPEC 11, S12)" ;;
     esac
 }
 
@@ -135,7 +117,7 @@ run_case() {
               "$BIN_IDC" "$src" --allow-untested --target llvm -o "$bin" \
                   >"$TMP/build.log" 2>&1 ;;
         wasm) bin="$TMP/$slug.wasm"
-              python3 "$IDC_PY" "$src" --target wasm -o "$bin" \
+              "$BIN_IDC" "$src" --allow-untested --target wasm -o "$bin" \
                   >"$TMP/build.log" 2>&1 ;;
     esac
 
@@ -189,8 +171,8 @@ have() { command -v "$1" >/dev/null 2>&1; }
 TARGETS="c"
 if have clang; then TARGETS="$TARGETS llvm"
 else echo "SKIP: --target llvm (needs clang on PATH)"; fi
-if have wat2wasm && have wasmtime; then TARGETS="$TARGETS wasm"
-else echo "SKIP: --target wasm (needs wat2wasm and wasmtime on PATH)"; fi
+if [ -n "${IDC_WASI_CLANG:-}" ] && have wasmtime; then TARGETS="$TARGETS wasm"
+else echo "SKIP: --target wasm (needs the WASI toolchain nix develop sets, and wasmtime on PATH)"; fi
 
 cases=0
 for src in conform/*/*.id; do

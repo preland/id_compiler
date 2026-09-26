@@ -21,7 +21,7 @@ push_tok(string kind, string text) {
   } else if(kind == "span") {
     set_span(text);
   } else {
-    push_real(kind, text);
+    push_tok2(kind, text);
   }
 } return void;
 given full_env ("line", "7"):() then src_line:(7)

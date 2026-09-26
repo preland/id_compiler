@@ -1,0 +1,45 @@
+// Case keys: one line per case, in the harness's own case order (the index
+// idtc_case_N and IDTC_N use), ahead of the harness C:
+//
+//   // idtc key N KEY
+//
+// KEY is a decimal hash of everything the case's result can depend on in
+// the source -- its own tokens, and the hashes of the components of its
+// function and of every function its tokens name (a `given` setup, a `then`
+// check, a `calls` target, a function passed as a value) -- or one of two
+// words: `std`, a case of the standard library, which the harness never runs
+// here (bin/idc's library pre-check does); or `-`, a case that must run on
+// every build, because it carries a scaling claim (judged against the other
+// cases carrying it), or reaches a native (whose body, and whatever file or
+// device it reads, no hash here can see). bin/idc keeps a case's pass under
+// its KEY and adds what the hashes here cannot know: the compiler, cc, and
+// the conf.id constants.
+//
+// The lines are C comments, so the harness compiles as it did.
+
+dg_emit_keys() {
+  dg_build();
+  int dgc = 0;
+  while(dgc < len((import casefn))) {
+    dg_emit_key(dgc);
+    dgc = dgc + 1;
+  }
+} return void;
+given dg_t_parsed ():() then calls dg_emit_key:[4]
+given env_init ():() then calls dg_emit_key:[0]
+
+dg_emit_key(int dgc) {
+  string dgkey = dg_case_key(dgc);
+  emit_line("// idtc key " + dgc + " " + dgkey);
+} return void;
+given dg_t_built (0):() then prints:("// idtc key 0 -5465788173469261037\n")
+given dg_t_built (3):() then prints:("// idtc key 3 -26172764691117968\n")
+
+dg_case_key(int dgc) {
+  string dgkey = "std";
+  if(case_is_std(dgc) == 0) {
+    dgkey = dg_case_word(dgc);
+  }
+} return string dgkey;
+given dg_t_built (1):("1931614673935473091")
+given dg_t_std (1):("std")

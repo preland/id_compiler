@@ -1,0 +1,46 @@
+// The parenthesised comma expression. Units are bound in order only until no
+// two operands are left unsequenced: what remains is at most one path of
+// units, which C already runs inside out, so binding it too would change
+// nothing but the text. Each bound unit's declaration (seq_bind) is emitted
+// as its own line, before this expression's own statement, so the comma here
+// only assigns -- it declares nothing, which is what keeps this ISO C.
+
+emit_seq(int id) {
+  int[] sq_units = [];
+  seq_units(id, sq_units);
+  string sq_pre = seq_binds(sq_units, id);
+} chain (int id) {
+  string sq_body = emit_expr(id);
+  seq_clear(sq_units);
+  string ret_s = "(" + sq_pre + sq_body + ")";
+} return string ret_s;
+given sq_fixture ((import sq_two)):("(idsq_7 = id_foo(7), id_pair(idsq_7, id_bar(3)))") then calls seq_bind:[1]
+given sq_fixture ((import sq_two)):("(idsq_7 = id_foo(7), id_pair(idsq_7, id_bar(3)))") then sq_foo_seqd:(0)
+given sq_marked ((import sq_two)):("(id_pair(idsq_7, id_bar(3)))") then sq_foo_seqd:(1)
+
+seq_binds(int[] sq_units, int id) {
+  string sq_pre = "";
+  int i = 0;
+  while(i < len(sq_units) && seqk(id) == 2) {
+    sq_pre = sq_pre + seq_bind(sq_units[i]);
+    i = i + 1;
+  }
+} return string sq_pre;
+given sq_fixture ([7, 9, 11], (import sq_two)):("idsq_7 = id_foo(7), ") then sq_foo_seqd:(1)
+given sq_fixture ([], (import sq_two)):("") then sq_foo_seqd:(0)
+
+// The unit's own declaration is emitted here, as a side effect, before its
+// text is computed: the unit is emitted (and thereby every nested
+// declaration of its own) before it is marked, so its own text is its
+// expression and not its temporary.
+seq_bind(int u) {
+  string sq_code = emit_expr(u);
+  string sq_type_v = type_of(u);
+  string sq_ctype = c_type(sq_type_v);
+} chain (int u) {
+  emit_line(sq_ctype + " " + sq_name(u) + ";");
+  seq_mark(u, 1);
+  string ret_s = sq_name(u) + " = " + sq_code + ", ";
+} return string ret_s;
+given sq_fixture (7):("idsq_7 = id_foo(7), ") then sq_foo_seqd:(1)
+given sq_fixture (9):("idsq_9 = id_bar(3), ") then prints:("int idsq_9;\n")

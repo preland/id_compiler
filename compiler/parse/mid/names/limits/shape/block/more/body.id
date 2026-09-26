@@ -19,8 +19,8 @@ elif_lists() {
   export int[] else_stmts = [(import else_node)];
   export int[] no_stmts = [];
 } return void;
-given nest_fixture ():() then check_failed:(0)
-given nest_fixture ():() then init_units:(0)
+given elif_fixture ():() then check_failed:(0)
+given elif_fixture ():() then init_units:(0)
 
 regrow_c() {
   regrow_b();

@@ -1,0 +1,60 @@
+// Reverse call-edge CSR: callee index -> its callers' indices, built once
+// per query instead of the O(F) fresh forward BFS per candidate that used
+// to dominate find_givens (analyze/cand/given.id). Two passes over the edge
+// table (rev_counts then rev_flat), counting-sort style, so a caller lookup
+// during backward BFS (rev/bfs.id) never rescans the whole edge list.
+
+// Reverse call-edge in-degree per function index -- the counting pass of
+// the CSR build.
+rev_counts(int fcount) {
+  int[] counts = [];
+  int i = 0;
+  while(i < fcount) {
+    push(counts, 0);
+    i = i + 1;
+  }
+} chain (int fcount) {
+  int ei = 0;
+  while(ei < len((import ix_ekind))) {
+    int ci = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
+    if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0) {
+      counts[ci] = counts[ci] + 1;
+    }
+    ei = ei + 1;
+  }
+} return int[] counts;
+given rev_edge_fixture (2):([0, 1])
+given ix_test_setup (1):([0])
+
+// Prefix sum of `counts` into CSR start offsets (length fcount+1): offs[c]
+// is where callee c's caller-index run begins in rev_flat's flat array.
+rev_prefix(int[] counts, int fcount) {
+  int[] offs = [];
+  push(offs, 0);
+  int i = 0;
+} chain (int[] counts, int fcount) {
+  while(i < fcount) {
+    push(offs, offs[i] + counts[i]);
+    i = i + 1;
+  }
+} return int[] offs;
+([0, 1], 2):([0, 0, 1])
+([2, 0, 3], 3):([0, 2, 2, 5])
+
+// Second CSR pass: place each qualifying call edge's caller index into its
+// callee's slot range (rev_prefix's `offs`), via a scratch cursor so a
+// repeated callee does not overwrite the first caller already placed there.
+rev_flat(int[] offs, int fcount) {
+  int total = offs[fcount];
+  int[] flat = [];
+  lst_fill(flat, total, 0);
+} chain (int[] offs, int fcount) {
+  int[] cursor = lst_copy(offs);
+  int ei = 0;
+  while(ei < len((import ix_ekind))) {
+    rev_flat_step(flat, cursor, ei);
+    ei = ei + 1;
+  }
+} return int[] flat;
+given rev_edge_fixture ([0, 0, 1], 2):([0])
+given ix_test_setup ([0, 0], 1):([])

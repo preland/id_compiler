@@ -1,9 +1,13 @@
 
-// A function definition: signature, hoisted locals, body, return.
+// A function definition: signature, hoisted locals, body, return. Its node is
+// what its sequencing temporaries are named from (sq_name, ../../../body/
+// hoist/hoist_loop.id).
 
 emit_def(int id) {
   string sig_v = sig(id);
+  lset((import sqbase), 0, id);
   emit_line(sig_v + " {");
+} chain (int id) {
   emit_def_body(id);
 } return void;
 given nz_prog_fixture ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n")

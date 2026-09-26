@@ -20,7 +20,7 @@ then_dispatch(int[] pos) {
   } else if(cur_kind(pos) == "kw" && cur_text(pos) == "calls") {
     then_calls_clause(pos);
   } else {
-    then_check_clause(pos);
+    then_traps_or_check(pos);
   }
 } return void;
 given then_fix ([1]):()
@@ -32,3 +32,17 @@ then_check_clause(int[] pos) {
 } return void;
 given then_fix ([1]):()
 given chkname_fix ([0]):()
+
+// `traps` is the fourth keyword then_dispatch tells apart, folded in here
+// rather than as a fourth branch above (that if/else-if chain already spends
+// its own action budget) -- more/calls/fixture.id's then_traps_clause is the
+// actual parse.
+then_traps_or_check(int[] pos) {
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "traps") {
+    then_traps_clause(pos);
+  } else {
+    then_check_clause(pos);
+  }
+} return void;
+given then_fix ([1]):()
+given traps_fix ([0]):()

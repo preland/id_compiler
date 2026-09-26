@@ -2,24 +2,60 @@
 // again first: its diagnostics were given during checking, and a reachable set
 // seeded from anywhere but `main` is not what they are about.
 
+// A case's own root is skipped once for a case whose function is the
+// standard library's (case_is_std, mid/names/symbols/lookup/more/
+// std_unit.id): bin/idc's own separate pre-check of the library runs those,
+// not a program's harness, and the function is still carried as a callee
+// wherever the kept cases reach it (reach_mark, unchanged).
+//
+// rfn is cleared and refilled by hand here, so its index is rebuilt before the
+// first reach_add asks it anything (mid/names/exports/reach/dead/more/add/).
 seed_tested() {
   clear_strs((import rfn));
   push((import rfn), "conf.id");
-  int ci = 0;
+  rfn_reindex();
 } chain () {
+  int ci = 0;
   while(ci < len((import casefn))) {
     string s1_of_v = s1_of((import casefn)[ci]);
-    reach_add(s1_of_v);
+    if(case_is_std(ci) == 0) {
+      reach_add(s1_of_v);
+    }
     ci = ci + 1;
   }
   seed_givens();
-  seed_thens();
 } chain () {
+  seed_thens();
   int ni = 0;
   while(ni < len((import casenode))) {
-    seed_fn_args(ni);
+    if(case_is_std(ni) == 0) {
+      seed_fn_args(ni);
+    }
     ni = ni + 1;
   }
 } return void;
 given rfnfx_setup ():() then rfn_first:("conf.id")
 given seed_given_fixture ():() then rfn_len:(2)
+
+// A "push" call whose own argument is itself a call, for chk_flat_at's
+// positive case (mid/names/limits/expr/nest.id) -- cm_setup's cm_push_call is
+// a call node, so wrapping it as an argument gives an id with a nested call
+// one level deep.
+flat_call_fixture() {
+  cm_setup();
+  export int flat_outer_call = node_call("outer", [(import cm_push_call)]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// flat_outer_call is itself two calls deep (outer(push(...))), so wrapping it
+// as an argument gives chk_flat_at's negative case: nested two levels rather
+// than one. Paired beside cm_push_call (one level) so the same call node
+// carries an argument of each depth, for hc_pair/hc_list's own cases too.
+flat_deep_call_fixture() {
+  flat_call_fixture();
+  export int[] flat_deep_args = [(import cm_push_call), (import flat_outer_call)];
+  export int flat_deep_call = node_call("mid", flat_deep_args);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

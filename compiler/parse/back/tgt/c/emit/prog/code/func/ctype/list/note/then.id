@@ -3,9 +3,12 @@
 //
 // A `then` node's s1 is always a function's name; the other then-family
 // kinds' is not (front/.../case/then/more/) -- "" for prints/eprints, and for
-// a calls clause the recorded function's own name, whose *parameters* would
-// need noting, not its return type, so it is skipped here too rather than
-// noted wrongly. func_node("") is -1, which is what the guard below is for.
+// a calls clause the recorded function's own name, whose *parameters* are
+// what a `calls NAME:(...)` clause compares and shows, so those are noted
+// instead (note_calls, test/case/around/then/more/calls/dispatch.id): a list
+// type only a recorded parameter had once left the harness calling an
+// idtc_eq_K it never defined. func_node("") is -1, which is what the guard
+// below is for.
 
 tc_collect_thens() {
   int ti = 0;
@@ -22,9 +25,13 @@ note_check(int ti) {
   if(k_of(node) == "then") {
     note_check_then(node);
   }
+  if(k_of(node) == "thencalls") {
+    note_calls(node);
+  }
 } return void;
 given print_fixture (0):() then prints:("")
 given calls_node_fixture (0):() then prints:("")
+given calls_node_fixture (0):() then calls note_calls:[1]
 
 note_check_then(int node) {
   string chk_nm = s1_of(node);

@@ -1,18 +1,30 @@
-// A call through a name that is no function could run anything; so could a
-// direct call to push, pop, lset or a poke -- none declares an export, but
-// each writes through whatever it is given, and the value given may be a
-// parameter a caller still holds (docs/SPEC.md 5, 6).
-fix_wref2(int x, int ow, int ci, string name) {
-  if(ci >= 0) {
-    fix_wedge(ci, ow);
-  } else if(k_of(x) == "call" && is_builtin(name) == 0) {
-    fix_wseed(ow);
-  } else if(k_of(x) == "call" && fix_wmut(name) == 1) {
-    fix_wseed(ow);
-  }
+// ft_call ("nosuchfn", not a builtin) drives fix_wref's folded guard into
+// fix_wseed for fix_wref_fixture's own cases (node.id) -- fixd_wm padded to
+// two slots since those cases vary ow, the way the folded fix_wref2's
+// original two cases (3 and 5) did.
+fix_wref_fixture() {
+  fix_touch_fixture();
+  fix_winit();
+  push((import fixd_wm), 0);
+} chain () {
+  push((import fixd_wm), 0);
 } return void;
+():() then check_failed:(0)
+():() then init_units:(0)
 
 fix_wedge(int ci, int ow) {
   int[] row = (import fixd_wadj)[ci];
   push(row, ow);
 } return void;
+given fix_wprop_fixture (1, 7):() then fixd_wadj_all:([[-1, -2], [7]])
+given fix_wprop_fixture (0, 9):() then fixd_wadj_all:([[-1, -2, 9], []])
+
+// fnames+fidx with "foo" registered as the only entry, for fix_fnix's own
+// cases (build/func.id is at the three-function cap) -- neg1_setup reaches
+// both declaring functions but registers no name itself.
+fix_fnix_fixture() {
+  neg1_setup();
+  fidx_add("foo");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

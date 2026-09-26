@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 # idxpack.sh -- transitive-closure index for id test-case writing.
 #
-#   tools/idxpack.sh build PATH OUTDIR
+#   tools/idxpack.sh build PATH OUTDIR [IDC_FLAG...]
 #       The expensive step, done once per project: builds tools/idxpack and
-#       runs `idc PATH --calls` once, writing OUTDIR/index.txt (the
-#       reshaped EDGES/FUNCS/FILES sections tools/idxpack/main.id reads)
-#       and OUTDIR/idxpack.bin (the compiled binary). Re-run after cases
-#       land so later queries see the updated case counts.
+#       runs `idc PATH --calls` once, writing OUTDIR/index.txt (a leading
+#       ===STD===<path> line naming the stdlib root this build actually
+#       resolved -- from `idc PATH --print-std`, same flags/env as the
+#       --calls run below, empty when there is none -- then the reshaped
+#       EDGES/FUNCS/FILES sections tools/idxpack/main.id reads) and
+#       OUTDIR/idxpack.bin (the compiled binary). Re-run after cases land
+#       so later queries see the updated case counts.
+#       Any IDC_FLAGs (e.g. --no-std --freestanding --triple T for the
+#       kernel) are passed to both of those idc runs, so the index describes
+#       the same build the project really gets.
 #
 #   tools/idxpack.sh query OUTDIR TARGET
 #       Cheap: reads OUTDIR/index.txt (no rebuild, no re-run of --calls) and
@@ -57,13 +63,21 @@ die() { echo "idxpack.sh: $*" >&2; exit 2; }
 
 build_index() {
     local proj="$1" outdir="$2" work
+    shift 2
     work=$(mktemp -d)
     trap 'rm -rf "$work"' RETURN
 
     env -u IDC_NO_STD "$IDC" "$HERE/tools/idxpack" --allow-untested -o "$outdir/idxpack.bin" >&2 \
         || die "failed to build tools/idxpack"
 
-    env -u IDC_NO_STD "$IDC" "$proj" --calls > "$work/calls.out" 2>"$work/calls.err"
+    # The stdlib root THIS build actually resolves -- same flags/env as the
+    # --calls run right below -- so the id side can tell a stdlib file from a
+    # project file by where the library really is, not by guessing at a
+    # hard-coded "/idstd/" path substring (see pick/unit/std.id).
+    local std_root
+    std_root=$(env -u IDC_NO_STD "$IDC" "$proj" "$@" --print-std)
+
+    env -u IDC_NO_STD "$IDC" "$proj" "$@" --calls > "$work/calls.out" 2>"$work/calls.err"
     local rc=$?
     if [ ! -s "$work/calls.out" ]; then
         cat "$work/calls.err" >&2
@@ -107,6 +121,7 @@ build_index() {
     done >> "$work/files.txt"
 
     {
+        echo "===STD===$std_root"
         echo "===EDGES==="
         cat "$work/edges.txt"
         echo "===FUNCS==="
@@ -125,10 +140,10 @@ query_index() {
 
 case "${1:-}" in
     build)
-        [ $# -eq 3 ] || die "usage: idxpack.sh build PATH OUTDIR"
+        [ $# -ge 3 ] || die "usage: idxpack.sh build PATH OUTDIR [IDC_FLAG...]"
         [ -e "$2" ] || die "no such path: $2"
         mkdir -p "$3"
-        build_index "$2" "$3"
+        build_index "$2" "$3" "${@:4}"
         ;;
     query)
         [ $# -eq 3 ] || die "usage: idxpack.sh query OUTDIR TARGET"

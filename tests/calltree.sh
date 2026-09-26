@@ -32,7 +32,7 @@ if [ ! -d "$STD" ]; then
 fi
 STD=$(cd "$STD" && pwd -P)
 export IDSTD_HOME="$STD"
-LSET_LOC="$STD/core/data/lst/lst.id:21"
+LSET_LOC=$(grep -rn "^lset(" "$STD/core" --include=*.id | head -1 | cut -d: -f1,2)
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT

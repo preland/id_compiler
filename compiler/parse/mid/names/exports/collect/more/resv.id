@@ -4,12 +4,6 @@
 // walked again here, since it only finds the next space and is not tied to
 // bnames at all.
 
-split_resv_names(string src, int i) {
-  while(i < len(src)) {
-    i = take_resv_name(src, i);
-  }
-} return void;
-
 take_resv_name(string src, int i) {
   int e = bname_end(src, i);
   push_resv_name(src, i, e);
@@ -29,3 +23,5 @@ push_resv_name(string src, int i, int e) {
   string slice_v = slice(src, i, e);
   push((import resv_names), slice_v);
 } return void;
+given init_resv_names ("xyz", 0, 3):() then resv_names_last:("xyz")
+given init_resv_names ("wxyz", 2, 4):() then resv_names_last:("yz")

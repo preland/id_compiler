@@ -1,0 +1,20 @@
+// Arguments that wrap a call in an operator, and an argument that is itself a
+// short-circuit, are still evaluated left to right. In the first pair, the
+// tick runs first (a=10), so c[0] > 0 decides the || and its tick is skipped.
+// In the second, the two ticks are 2 and 3.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string s = pair(tick(c) * 10, c[0] > 0 || tick(c) > 0);
+  string t = pair(tick(c) + 1, tick(c) - 1);
+} chain (int argc, string[] argv) {
+  print(s + " " + t + " c=" + c[0]);
+} return int 0;
+
+pair(int a, int b) {
+  string s = "a=" + a + " b=" + b;
+} return string s;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

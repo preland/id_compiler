@@ -93,7 +93,7 @@ test harness ahead of the program on the same stream (so the program's own C
 is unchanged); it carries only the functions
 a case can reach. The driver splits it off, compiles it with the build's
 backends and runs it. Each case runs in a process
-of its own with 10 seconds and 1 GiB, so a case that traps or crashes is
+of its own with 30 seconds and 4 GiB, so a case that traps or crashes is
 reported as that case. `[time:…]`/`[mem:…]` claims are counted exactly and
 judged after every case has passed. A build whose cases cannot run on this
 machine — `--freestanding`, or another platform's `--triple` — is refused,
@@ -254,7 +254,10 @@ fn|file:line|cases
 
 `cases` is how many test cases that function currently has (`docs/TESTS.md`'s
 two-case minimum), so a tree walker never has to build the program a second
-time to answer "does this one already have cases".
+time to answer "does this one already have cases". An `asm` declaration
+(`docs/ASM.md`) gets a row here too, `cases` fixed at `0` since it has none to
+count -- otherwise it would appear only as a `callee` in the edges above, with
+no row of its own naming the file it lives in.
 
 **Known over-report.** The parser builds a `var` node for every bare
 identifier before it knows whether a `(` follows

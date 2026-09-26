@@ -3,7 +3,7 @@
 // function named as a value is the C function it is emitted as, id_NAME.
 
 ee6(int id) {
-  string s = s1_of(id);
+  string s = import_text(id);
   if(k_of(id) == "un") {
     s = emit_un(id);
   }

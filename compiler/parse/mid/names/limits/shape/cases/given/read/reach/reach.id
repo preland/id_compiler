@@ -1,0 +1,42 @@
+// Whether one function reaches another through the call graph -- the calls
+// and function values the dead-export check follows (mid/names/exports/reach/
+// dead/), from one function instead of `main`. That used to be the check's
+// own fixpoint, rerun from scratch for every `(import NAME)` in every case:
+// 54% of the compiler's front end on its own tree. The answer depends only on
+// the setup, so it is now one walk per distinct setup over the digest's call
+// graph (memo.id), and every later case with that setup is a lookup.
+
+reaches(string src_fn, string dst_fn) {
+  rc_ready();
+  int r = 0;
+  if(src_fn == dst_fn || rc_has(src_fn, dst_fn) == 1) {
+    r = 1;
+  }
+} return int r;
+given case_fixture ("myfn", "myfn"):(1)
+given case_fixture ("myfn", "other"):(0)
+
+// The dead-export check's set seeded with one function, for the fixtures that
+// still want that state (back/drive/run/check/dce/emit/fixture.id). rfn was
+// cleared and refilled by hand, so its index is rebuilt (mid/names/exports/
+// reach/dead/more/add/index.id).
+reach_seed(string src_fn) {
+  init_reach();
+  clear_strs((import rfn));
+  push((import rfn), src_fn);
+} chain (string src_fn) {
+  rfn_reindex();
+} return void;
+given case_fixture ("myfn"):() then check_failed:(0)
+given case_fixture ("other"):() then check_failed:(0)
+
+// One setup of a multi-setup `given` (../read.id's setups_miss): raises `hit`
+// when this name is a function in the build that reaches `owner`.
+miss_hit(string nm, int ek, int hit) {
+  int r = hit;
+  if(nm != "" && func_node(nm) >= 0 && reaches(nm, (import eowners)[ek]) == 1) {
+    r = 1;
+  }
+} return int r;
+given fn_fixture ("nosuchfn123", 0, 0):(0)
+given fn_fixture ("", 0, 1):(1)

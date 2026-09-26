@@ -1,9 +1,13 @@
 // Message text is idc.py's, word for word, so the two compilers explain a
 // rejected program the same way.
+// Each one is counted (tcerrs), which is how the type check's cache knows a
+// function's check was not clean (../../../walk/check/skip.id).
 tc_err(int id, string msg) {
   string loc = tc_loc(id);
   print(loc + msg);
   note_failure();
+} chain (int id, string msg) {
+  lset((import tcerrs), 0, (import tcerrs)[0] + 1);
 } return void;
 given fn_fixture ((import fixture_zero), "boom"):() then prints:("<stdin>:1: error: boom\n") then check_failed:(1)
 given fn_fixture ((import fixture_zero), "nope"):() then prints:("<stdin>:1: error: nope\n") then check_failed:(1)

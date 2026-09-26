@@ -9,6 +9,16 @@ stmt_tokens() {
 ():() then check_failed:(0)
 ():() then tkind_len:(45)
 
+// A token stream for the two flow statements: `break; return x; return; x;`
+// -- a break, a return with a value, a bare return, and an ordinary statement
+// to route past them.
+flow_tokens() {
+  env_init();
+  push_toks(["kw", "op", "kw", "ident", "op", "kw", "op", "ident", "op", "eof"], ["break", ";", "return", "x", ";", "return", ";", "x", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(10)
+
 // A token stream for one whole function declaration:
 // `add(int a, int b) { int s = a + b * 2; if (s > 0) { s = s - 1; } }
 //  return int s;`

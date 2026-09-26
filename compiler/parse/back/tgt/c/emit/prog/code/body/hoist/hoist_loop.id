@@ -17,3 +17,22 @@ hoist_decl_line(string s1_of_v, string s2_of_v) {
 } return void;
 given tyc_fix ("int", "y"):() then prints:("    int y;\n")
 given tyc_fix ("int", "z"):() then prints:("    int z;\n")
+
+// A sequencing temporary's name (../../expr/atom/order/): idsq_ and the
+// node's distance below the node of the function being emitted, which
+// emit_def (../../func/def/body/def.id) sets into sqbase. A function's nodes
+// all precede its own node, so the distance is positive and unique within
+// it -- and, unlike the node id itself, it stays put when a function earlier
+// in the program gains or loses a node, so an edit changes the C of the
+// function edited and of no other (bin/idc compiles and caches that C a
+// unit at a time). Outside any function (sqbase 0), the node id as before.
+// Filed here because order/ and its files are at their caps.
+sq_name(int u) {
+  int sqn = u;
+  if((import sqbase)[0] > u) {
+    sqn = (import sqbase)[0] - u;
+  }
+  string s = "idsq_" + sqn;
+} return string s;
+given env_init (7):("idsq_7")
+given sq_based (7):("idsq_13")

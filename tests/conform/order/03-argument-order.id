@@ -1,0 +1,14 @@
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string s = pair(bump(c), bump(c));
+  print(s);
+} return int 0;
+
+pair(int a, int b) {
+  string s = "a=" + a + " b=" + b;
+} return string s;
+
+bump(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

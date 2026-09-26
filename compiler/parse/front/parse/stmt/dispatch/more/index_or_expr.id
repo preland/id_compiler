@@ -20,10 +20,10 @@ given atom_tokens ([0]):(4)
 // out into its own function later.
 parse_blank_or(int[] pos) {
   int node = 0;
-  if(cur_text(pos) == "blank") {
+  if(cur_text(pos) == "blank" || cur_text(pos) == "break") {
     node = parse_blank(pos);
   } else {
-    node = parse_stmt4(pos);
+    node = parse_ret_or(pos);
   }
 } return int node;
 given stmt_tokens ([42]):(1)

@@ -1,0 +1,11 @@
+// The elements of a list literal are evaluated left to right.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  int[] xs = [tick(c), tick(c), tick(c)];
+  print("" + xs[0] + xs[1] + xs[2]);
+} return int 0;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

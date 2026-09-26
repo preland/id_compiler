@@ -1,0 +1,41 @@
+// A five-function call graph built straight into the digest's rows, with no
+// parse behind it, for the walk's own cases (../../scc/):
+//
+//   0 <-> 1 -> 2        a cycle calling a leaf
+//   4 -> 3 (native)     a caller of a body the digest cannot see
+//
+// so the walk finds four components -- {2}, {0,1}, {3}, {4}, completed in
+// that order -- and only the last two are dirty.
+
+dg_t_graph() {
+  dg_init();
+  dg_add(1, 0);
+  dg_add(2, 0);
+} chain () {
+  dg_add(3, 0);
+  dg_add(4, 1);
+  dg_add(5, 0);
+} chain () {
+  dg_link(0, 1);
+  dg_link(1, 0);
+  dg_link(1, 2);
+} chain () {
+  dg_link(4, 3);
+} return void;
+():() then dg_ncomp:(0)
+():() then dg_nrows:(5)
+
+dg_t_scc() {
+  dg_t_graph();
+  dg_scc_all();
+} return void;
+():() then dg_ncomp:(4)
+():() then dg_nrows:(5)
+
+// How many functions have a row: the check for the builders above and in
+// ../build/, which fill every column together.
+dg_nrows() {
+  int dgn = len((import dg_comp));
+} return int dgn;
+given dg_t_graph ():(5)
+given dg_t_built ():(3)

@@ -1,6 +1,12 @@
 // idxpack -- transitive-closure index for id test-case writing.
 //
-// stdin (built by idc/tools/idxpack.sh) is three sections:
+// stdin (built by idc/tools/idxpack.sh) is an optional ===STD=== line
+// followed by three sections:
+//   ===STD===<path>            (the stdlib root this build resolved, from
+//                                `idc --print-std`; empty when there is
+//                                none. Absent entirely in an index.txt
+//                                written before this line existed -- see
+//                                pick/unit/std.id's fallback.)
 //   ===EDGES===
 //   caller|callee|kind         (from `idc PATH --calls`, locations dropped)
 //   ===FUNCS===
@@ -13,11 +19,16 @@
 //
 // argv[1] is the target function name. Prints three lists, one per line,
 // blank-line separated: the target's transitive call closure (BFS over
-// "call" edges), the exported names its closure reads (collect_imports),
-// then every zero-parameter void function that transitively initialises
-// all of them (find_givens) -- the legal `given` setups for a case on the
-// target. Packet formatting (source text, structural slots, candidate
-// `then` checks) is not wired in yet -- see the report for what stops here.
+// "call" edges), the exported names its closure reads (collect_imports,
+// for inspection only -- unchanged by the two fixes below), then every
+// zero-parameter void function that is itself runnable (pick/runnable.id)
+// and transitively initialises everything the closure still needs
+// (run_gather_required, scan/reader/required.id's per-reader scan, each
+// import resolved by pick/unit/declarer.id's unit-preferring pick_declarer,
+// against the ===STD=== root pick/unit/std.id parses) -- the legal `given`
+// setups for a case on the target. Packet formatting (source text,
+// structural slots, candidate `then` checks) is not wired in yet -- see the
+// report for what stops here.
 main(int argc, string[] argv) {
   string text = read_all();
   string target = argv[1];
@@ -31,21 +42,35 @@ run(string text, string target) {
   string[] lines = str_split(text, nl);
   int e = idx_find_str(lines, "===EDGES===");
 } chain (string text, string target) {
+  int std_present = str_starts(lines[0], "===STD===");
+  string std_root = "";
+  if(std_present == 1) {
+    int prefix_n = 9;
+    std_root = str_slice(lines[0], prefix_n, len(lines[0]) - prefix_n);
+  }
+} chain (string text, string target) {
+  std_root_set(std_root, std_present);
   int f = idx_find_str(lines, "===FUNCS===");
   int g = idx_find_str(lines, "===FILES===");
-  int n = len(lines);
 } chain (string text, string target) {
+  int n = len(lines);
   string[] edge_lines = slice_lines(lines, e + 1, f);
   string[] fn_lines = slice_lines(lines, f + 1, g);
-  string[] file_lines = slice_lines(lines, g + 1, n);
 } chain (string text, string target) {
+  string[] file_lines = slice_lines(lines, g + 1, n);
   ix_init(edge_lines, fn_lines);
   fx_init(file_lines);
-  string[] reached = bfs_run(target);
 } chain (string text, string target) {
+  string[] reached = bfs_run(target);
   string[] imports = collect_imports(reached);
-  string[] declared = declaring_fns(imports);
-  string[] givens = find_givens(declared);
+  string[] needed = [];
+} chain (string text, string target) {
+  int ri = 0;
+  while(ri < len(reached)) {
+    run_gather_required(reached, reached[ri], needed);
+    ri = ri + 1;
+  }
+  string[] givens = find_givens(needed);
 } chain (string text, string target) {
   print_list(reached);
   print_list(imports);
@@ -53,6 +78,7 @@ run(string text, string target) {
 } return void;
 ("===EDGES===\n===FUNCS===\n===FILES===", "z"):() then prints:("z\n\n\n\n")
 ("===EDGES===\na|b|call\n===FUNCS===\n===FILES===", "a"):() then prints:("a\nb\n\n\n\n")
+("===EDGES===\nt|g|call\n===FUNCS===\nt|f.id|1|0\ng|f.id|5|0\nh|f.id|6|0\n===FILES===\n===F:f.id===\nt() {\n  int a = (import eg)[0];\n  int b = (import eh)[0];\n} return void;\ng() { export int eg = 0; } return void;\nh() { export int eh = 0; } return void;", "t"):() then prints:("t\ng\n\neg\neh\n\nh\n\n")
 
 print_list(string[] xs) {
   int i = 0;

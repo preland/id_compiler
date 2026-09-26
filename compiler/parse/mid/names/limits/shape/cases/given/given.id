@@ -6,9 +6,13 @@
 // does not compile.
 
 fit_given(int i) {
-  string setup_nm = (import casegiven)[i];
-  if(setup_nm != "") {
-    given_fn(i, setup_nm);
+  string[] setups = str_split((import casegiven)[i], " ");
+  int si = 0;
+  while(si < len(setups)) {
+    if(setups[si] != "") {
+      given_fn(i, setups[si]);
+    }
+    si = si + 1;
   }
 } return void;
 given impcase_empty (0):() then calls given_fn:[0]

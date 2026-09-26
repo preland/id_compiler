@@ -7,6 +7,8 @@
 //   lwbody  the block that branch goes to, where the body starts
 //   lwvar   the names bound so far, and
 //   lwslot  the alloca each one lives in -- both cleared per function
+//   lwloop  the exit block of each enclosing `while`, innermost last: where a
+//           `break` branches to (stmt/flow/cond/op.id)
 
 init_lw() {
   export int[] lwcur = [0];
@@ -28,6 +30,8 @@ init_lw3() {
   export string[] lwvar = [];
   export int[] lwslot = [];
   int ret_i = init_opt();
+} chain () {
+  export int[] lwloop = [];
 } return int ret_i;
 given ir_rows ():(0) then check_failed:(0)
 given ir_rows ():(0) then init_units:(0)

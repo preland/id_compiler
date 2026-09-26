@@ -23,3 +23,25 @@ ix_row_fn(string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v
 } return void;
 ([], [], [], [], "a|b.id|3|2"):(["a"], ["b.id"], [3], [2])
 (["x"], ["y.id"], [1], [0], "a|b.id|3|2"):(["x", "a"], ["y.id", "b.id"], [1, 3], [0, 2])
+
+// Per-file-bucket function counts -- the counting pass of func_end_line's
+// CSR (the same counting-sort shape rev/build.id's rev_counts uses, keyed
+// by ix_fbucket instead of a call edge's callee), so finding "the next
+// function in this file" never rescans every function in the build.
+ix_fg_counts(int num_buckets, int fcount) {
+  int[] counts = [];
+  int i = 0;
+  while(i < num_buckets) {
+    push(counts, 0);
+    i = i + 1;
+  }
+} chain (int num_buckets, int fcount) {
+  int fi = 0;
+  while(fi < fcount) {
+    int b = (import ix_fbucket)[fi];
+    counts[b] = counts[b] + 1;
+    fi = fi + 1;
+  }
+} return int[] counts;
+given rev_edge_fixture (1, 2):([2])
+given ix_test_setup (1, 1):([1])

@@ -8,6 +8,8 @@ collect_exports() {
     i = i + 1;
   }
 } return void;
+given fn_fixture ():() then calls scan_func_exports:[1]
+given env_init ():() then calls scan_func_exports:[0]
 
 scan_func_exports(int id) {
   int[] l2_of_v = l2_of(id);

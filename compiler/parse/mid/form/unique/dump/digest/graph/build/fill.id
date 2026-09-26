@@ -1,0 +1,50 @@
+// Building the digest over the whole of `prog`, while it is still the program
+// as parsed: the test harness narrows `prog` right after this runs
+// (back/drive/target/tests/keep.id), and both the node ranges the edges are
+// read from and ptoks/ptoke line up only with the unnarrowed list.
+
+dg_build() {
+  dg_init();
+  int dgf = 0;
+  while(dgf < len((import prog))) {
+    dg_fill_one(dgf);
+    dgf = dgf + 1;
+  }
+} chain () {
+  dg_asm_row();
+  dg_exports(0);
+  dg_edges_all();
+} chain () {
+  dg_scc_all();
+} return void;
+given dg_t_parsed ():() then dg_nfn:(2) then dg_ncomp:(3)
+given env_init ():() then dg_nfn:(0) then dg_ncomp:(1)
+
+// One function's row. A function whose tokens were never recorded -- only a
+// hand-built test fixture has one -- is marked like a native: its key could
+// not see an edit to it, so no case reaching it may be cached.
+dg_fill_one(int dgf) {
+  string dgnm = s1_of((import prog)[dgf]);
+  hmap_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), dgnm, dgf);
+  word dgo = dg_own_of(dgf, dgnm);
+} chain (int dgf) {
+  int dgn = is_native((import prog)[dgf]) == 1 || dgf >= len((import ptoke));
+  dg_add(dgo, dgn);
+} return void;
+given dg_t_rows0 (0):() then dg_nfn:(1) then dg_nrows:(1)
+given dg_t_rows0 (1):() then dg_nfn:(1) then dg_nat0:(0)
+
+dg_add(word dgo, int dgn) {
+  push((import dg_own), dgo);
+  push((import dg_out), []);
+  push((import dg_nat), dgn);
+} chain (word dgo, int dgn) {
+  push((import dg_ix), 0 - 1);
+  push((import dg_low), 0);
+  push((import dg_on), 0);
+} chain (word dgo, int dgn) {
+  push((import dg_comp), 0 - 1);
+  push((import dg_cout), []);
+} return void;
+given dg_init (7, 0):() then dg_nrows:(1)
+given dg_t_graph (7, 1):() then dg_nrows:(6)

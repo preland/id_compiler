@@ -1,0 +1,30 @@
+// `break` and an early `return` in a fingerprint. Without these they reached
+// the deliberately unrepeatable default (../../../../stmt/more/seam.id), which
+// embeds the node id -- safe, but it made every function containing one
+// unique, so the duplicate rule could never see two copies of it. An early
+// return keeps its value where the return clause does, so canon_ret
+// (../../../state.id) reads it unchanged. Housed here because every directory
+// under canon/stmt/ is at the three-entry limit: the slot within reach, not the
+// right label.
+cst_flow(int id) {
+  string out = "?" + k_of(id) + "#" + id;
+  if(k_of(id) == "break") {
+    out = "brk";
+  } else if(k_of(id) == "ret") {
+    out = "ret(" + canon_ret(id) + ")";
+  }
+} return string out;
+given flow_canon_fixture ((import canon_brk)):("brk")
+given flow_canon_fixture ((import canon_retv)):("ret(I4)")
+
+// A `break`, and a `return 4;` from an int function.
+flow_canon_fixture() {
+  blank_stmts_fixture();
+  export int canon_brk = newleaf("break", 0 - 1, 0, "", "");
+  export int canon_lit = node_int("4", 4, 1);
+} chain () {
+  int[] canon_none = [];
+  export int canon_retv = newnode("ret", (import canon_lit), 0, "f", "int", canon_none, canon_none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -29,9 +29,12 @@ scan_reach(int id) {
 given natcall_fixture (2):() then calls reach_add:[1]
 given natcall_fixture (0):() then calls reach_add:[0]
 
+// A lookup in rfn's index (add/index.id), believed only when rfn still holds
+// the name at the position it gives.
 is_reach(string name) {
+  int rv = hmap_get((import rfxk), (import rfxv), (import rfxu), name, 0 - 1);
   int ok = 0;
-  if(find_str((import rfn), name) >= 0) {
+  if(rv >= 0 && rv < len((import rfn)) && (import rfn)[rv] == name) {
     ok = 1;
   }
 } return int ok;

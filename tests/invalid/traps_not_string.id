@@ -1,0 +1,5 @@
+// EXPECT: this case gives a int where a string is required
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 0):() then traps:(5)

@@ -1,0 +1,20 @@
+// EXPECT: same signature and logic
+// two functions identical up to renaming, both using an early return, are one
+// function: the duplicate rule must see through the return as it does any
+// other statement
+clampa(int x) {
+  if(x < 0) {
+    return 0;
+  }
+} return int x;
+
+clampb(int y) {
+  if(y < 0) {
+    return 0;
+  }
+} return int y;
+
+main(int argc, string[] argv) {
+  int a = clampa(1);
+  int b = clampb(2);
+} return int a;

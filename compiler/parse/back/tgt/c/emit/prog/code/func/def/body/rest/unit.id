@@ -1,0 +1,47 @@
+// Unit markers: under --units, a definition whose source file differs from
+// the one before it is preceded by one comment line,
+//
+//   /* idc unit: PATH */
+//
+// which is where bin/idc cuts the C into translation units it compiles and
+// caches one by one, so that an edit recompiles the unit it is in and not the
+// whole program. Only the compiler knows which file a function came from once
+// `prog` has been narrowed (the harness) or pruned (the program), so it is
+// said here; a marker changes no code, and without the flag nothing is
+// written at all.
+
+unit_mark(int id) {
+  if((import unitc)[0] == 1) {
+    string uf = unit_file(id);
+    unit_mark_at(uf);
+  }
+} return void;
+given unit_t_two ((import unit_t_fb)):() then prints:("/* idc unit: b.id */\n")
+given unit_t_off ((import unit_t_fb)):() then prints:("")
+
+unit_mark_at(string uf) {
+  if(uf != (import unitlast)[0]) {
+    sset((import unitlast), 0, uf);
+    emit_line("/* idc unit: " + uf + " */");
+  }
+} return void;
+given unit_t_two ("a.id"):() then prints:("/* idc unit: a.id */\n")
+given unit_t_two (""):() then prints:("")
+
+// The file of function node id, by walking pnodes forward from where the last
+// lookup stopped: `prog` is only ever narrowed or pruned, never reordered, so
+// one pass over it is one pass over pnodes. unit_from starts a new pass.
+unit_file(int id) {
+  int uc = unit_from(id);
+  while(uc < len((import pnodes)) && (import pnodes)[uc] != id) {
+    uc = uc + 1;
+  }
+  lset((import unitc), 1, uc);
+} chain (int id) {
+  string uf = "";
+  if(uc < len((import pfile))) {
+    uf = (import pfile)[uc];
+  }
+} return string uf;
+given unit_t_two ((import unit_t_fb)):("b.id")
+given unit_t_two (99):("")

@@ -1,0 +1,32 @@
+// What one fs_list entry means once its own name and kind are known: a
+// subdirectory is checked against its own parent's name and, unless hidden
+// or (only directly under the root) the build output directory, walked in
+// turn; a file is classified and checked (check/rule/file.id).
+
+lay_handle_file(int[] buf, int lo, int hi, string dir, int is_root) {
+  string name = lay_name_of(buf, lo, hi);
+  int kind = lay_file_kind(name);
+  lay_check_file(dir, is_root, name, kind);
+} return void;
+given lay_reset ([97, 46, 105, 100], 0, 4, "d", 0):() then lay_report:(0)
+given lay_reset ([105, 109, 112, 111, 114, 116, 46, 105, 100], 0, 9, "d", 0):() then lay_report:(1)
+
+lay_enter_dir(string dir, string root, string build, int is_root, string self, string name) {
+  lay_check_samename(dir, self, name);
+  string child = dir + "/" + name;
+  lay_walk(child, root, build, is_root);
+} return void;
+given lay_reset ("d", "r", "build", 0, "loop", "loop"):() then calls lay_check_samename:("d", "loop", "loop")
+("d", "r", "build", 0, "a", "b"):() then calls lay_check_samename:("d", "a", "b")
+
+lay_handle_dir(int[] buf, int lo, int hi, string dir, string root, string build, int is_root, string self) {
+  string name = lay_name_of(buf, lo, hi);
+  int hidden = charat(name, 0) == 46;
+  int pruned = is_root == 1 && name == build;
+} chain (int[] buf, int lo, int hi, string dir, string root, string build, int is_root, string self) {
+  if(hidden == 0 && pruned == 0) {
+    lay_enter_dir(dir, root, build, 0, self, name);
+  }
+} return void;
+given lay_reset ([46, 103, 105, 116], 0, 4, "d", "r", "build", 0, "d"):() then lay_report:(0)
+given lay_reset ([98, 117, 105, 108, 100], 0, 5, "r", "r", "build", 1, "r"):() then lay_report:(0)

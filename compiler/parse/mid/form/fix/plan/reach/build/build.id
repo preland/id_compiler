@@ -14,6 +14,8 @@ fix_wbuild() {
     fix_wprop(gi);
   }
 } return void;
+given fix_wbuild_fixture ():() then calls fix_wprop:(0)
+given full_env ():() then calls fix_wprop:[0]
 
 //   fixd_wadj  for each function, the functions that call or name it
 //   fixd_wq    marked functions whose callers are not marked yet
@@ -27,7 +29,12 @@ given fix_touch_fixture ():() then calls fix_winit2:[1]
 
 fix_winit2() {
   export int[] fixd_wq = [];
-  fix_wfill();
+  int i = 0;
+  while(i < len((import fnames))) {
+    push((import fixd_wm), 0);
+    fix_wrow();
+    i = i + 1;
+  }
 } return void;
-given fix_fixture ():() then calls fix_wfill:[1]
-given fix_touch_fixture ():() then calls fix_wfill:[1]
+given fix_wfill_fixture ():() then fixd_wadj_len:(2)
+given fix_wfill_fixture ():() then fixd_wadj_all:([[], []])

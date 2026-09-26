@@ -73,7 +73,6 @@ mark_done() { mkdir -p "$(dirname "$STATE")"; printf '%s ' "$1" >> "$STATE"; }
 # happen until idstd has the functions to port them onto.
 export IDC_NO_STD=1
 
-IDC=../idc.py   # frozen (docs/HACKING.md); used only for the wasm target below
 # Nothing this file builds with bin/idc has two cases per function -- not the
 # compiler, not the demos -- so every such build passes --allow-untested.
 # docs/TESTS.md, "Enforcement, and the migration"; the check near the end of
@@ -429,9 +428,9 @@ one(int a) {
 two(int b) {
   int v = b + 1;
 } return int v;' "same signature and logic"
-guard_reject "return inside a body" 'main(int argc, string[] argv) {
-  return 0;
-} return int 0;' "belongs after the function"
+guard_reject "break outside a loop" 'main(int argc, string[] argv) {
+  break;
+} return int 0;' "is not inside a 'while'"
 guard_reject "missing brace" 'main(int argc, string[] argv)
   int x = 1;
 } return int 0;' "expected .{."
@@ -833,28 +832,26 @@ expect_output "int element widened into a word[]" "-1 0" "$("$TMP/wbox.out")"
 
 # --- alt codegen targets (--target llvm / --target wasm): a handful of
 # known-good demos must produce the SAME program output/exit code as the
-# default C target. Needs clang (llvm) and wat2wasm + wasmtime (wasm); skip
-# with a clear message if the toolchain isn't on PATH (it is inside
+# default C target. Needs clang (llvm), and the WASI toolchain plus wasmtime
+# (wasm); skip with a clear message if they are missing (they are inside
 # tools/devshell.sh, which is how this script is meant to be run for these
 # checks: `tools/devshell.sh bash tests/run.sh`).
 echo
 echo "--- alt targets (--target llvm / --target wasm) ---"
 have_alt=1
-for tool in clang wat2wasm wasmtime; do
+for tool in clang wasmtime; do
     command -v "$tool" >/dev/null 2>&1 || have_alt=0
 done
+[ -n "${IDC_WASI_CLANG:-}" ] || have_alt=0
 if [ "$have_alt" -eq 0 ]; then
-    echo "SKIP: alt-target tests (need clang, wat2wasm, and wasmtime on PATH -- " \
+    echo "SKIP: alt-target tests (need clang, wasmtime and the WASI toolchain -- " \
          "run via 'tools/devshell.sh bash tests/run.sh')"
 else
     # argv[0] differs by target/binary path/name (and wasmtime reports it
     # differently again), so exercise hello with an argument (its output
     # doesn't embed argv[0]) rather than the no-arg "usage" branch.
-    # llvm is the self-hosted target (bin/idc); wasm is still idc.py's, and is
-    # the last thing holding that file here.
     alt_cc() { # alt_cc TARGET SRC OUT
-        if [ "$1" = llvm ]; then $BIN_IDC "$2" --target llvm -o "$3" 2>/dev/null
-        else "$IDC" "$2" --target "$1" -o "$3" 2>/dev/null; fi
+        $BIN_IDC "$2" --target "$1" -o "$3" 2>/dev/null
     }
     for target in llvm wasm; do
         if [ "$target" = wasm ]; then
@@ -964,28 +961,16 @@ else
     bad "no '> **Status:' line in:$undocumented -- say whether the doc is a description, a plan, or a proposal"
 fi
 
-# --- and the numbers in a status block are measured, not remembered.
-#     docs/TESTS.md said "Cases written so far: 0, of 6816" -- true when
-#     written, false four commits later in the same session, and lying about
-#     the adoption of the rule it describes. The counts are generated now.
-#     Same discipline as MAP.md above, and as ../linux_id/docs/STATUS.md,
-#     which is where the idea comes from.
-if ../tools/statusgen.sh --check >/dev/null 2>&1; then
-    ok "docs/TESTS.md adoption numbers are current"
-else
-    bad "docs/TESTS.md adoption numbers are stale -- run tools/statusgen.sh"
-fi
-
 # --- --allow-untested excuses a tree that does not have its cases yet, and
 #     nothing else. Once no function in any tree is short of two cases there is
 #     nothing left for it to excuse, and a way out nobody needs is a way out
 #     somebody will use: so from then on this fails until the flag is deleted
-#     from bin/idc. The count is statusgen's, read from the block it writes,
-#     which the check above has just said is current. It counts functions, not
-#     cases, so functions with many cases cannot hide one with none.
-short=$(sed -n 's/^\*\*Functions short of two cases: \([0-9]*\) of .*/\1/p' ../../docs/TESTS.md)
+#     from bin/idc. The count is measured now by statusgen, not read from a
+#     doc. It counts functions, not cases, so functions with many cases cannot
+#     hide one with none.
+short=$(../tools/statusgen.sh 2>/dev/null | sed -n "s/^Functions short of two cases: \([0-9]*\) of .*/\1/p")
 if [ -z "$short" ]; then
-    bad "no short-of-cases count in docs/TESTS.md -- run tools/statusgen.sh"
+    bad "tools/statusgen.sh printed no short-of-cases count"
 elif [ "$short" -eq 0 ] && grep -q -- '--allow-untested' ../bin/idc; then
     bad "no function is short of two cases and bin/idc still has --allow-untested -- delete the flag from bin/idc and every build that passes it"
 else

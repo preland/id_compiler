@@ -1,0 +1,55 @@
+// One reader's own, direct requirements -- the declaring functions its own
+// code (func_code_lines, not its whole transitive closure) reads via
+// "(import NAME)", each resolved by pick_declarer.id's unit-preferring pick
+// and dropped when nothing declares it. Mirrors one iteration of index.py's
+// required_strict, before that closure filters which of them are already
+// met -- callers (run_gather_required below, runnable.id) do that part
+// against their own closure, not this reader's.
+reader_own_required(string name) {
+  int idx = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), name, -1);
+  string[] out_li = [];
+  string path = "";
+} chain (string name) {
+  string[] code = [];
+  if(idx >= 0) {
+    path = (import ix_file)[idx];
+    code = func_code_lines(name);
+  }
+  string[] names_li = [];
+} chain (string name) {
+  scan_imports_in(code, names_li);
+  int i = 0;
+  while(i < len(names_li)) {
+    reader_own_required_step(path, names_li[i], out_li);
+    i = i + 1;
+  }
+} return string[] out_li;
+given ix_import_fixture ("r"):([])
+given unmet_req_fixture ("b"):(["d"])
+
+// One resolved import, added to `out_li` unless nothing declares it or it
+// is already there.
+reader_own_required_step(string path, string imp_name, string[] out_li) {
+  string d = pick_declarer(path, imp_name);
+  if(str_cmp(d, "") != 0 && idx_find_str(out_li, d) < 0) {
+    push(out_li, d);
+  }
+} return void;
+given ix_export_fixture ("f.id", "gv", []):("f.id", "gv", ["setter"])
+given ix_export_fixture ("f.id", "nope", []):("f.id", "nope", [])
+
+// The required declarers for a whole set of readers (main.id's `reached`),
+// unioned and filtered against `reached` itself -- the target-level
+// required_strict main.id's run() needs, one reader at a time.
+run_gather_required(string[] reached, string reader, string[] needed) {
+  string[] req = reader_own_required(reader);
+  int j = 0;
+  while(j < len(req)) {
+    if(idx_find_str(reached, req[j]) < 0 && idx_find_str(needed, req[j]) < 0) {
+      push(needed, req[j]);
+    }
+    j = j + 1;
+  }
+} return void;
+given unmet_req_fixture (["b"], "b", []):(["b"], "b", ["d"])
+given unmet_req_fixture (["b", "d"], "b", []):(["b", "d"], "b", [])

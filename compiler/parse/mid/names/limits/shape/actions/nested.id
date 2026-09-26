@@ -24,8 +24,8 @@ elif_fixture2() {
   export int[] elif_body = [(import elif_node)];
   elif_lists();
 } return void;
-given nest_fixture ():() then check_failed:(0)
-given nest_fixture ():() then init_units:(0)
+given elif_fixture ():() then check_failed:(0)
+given elif_fixture ():() then init_units:(0)
 
 check_if(int id, int depth, string fname) {
   int[] l1_of_v = l1_of(id);

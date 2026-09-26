@@ -1,0 +1,44 @@
+// A read of an export whose declaring function has not run, trapped in the
+// test harness only. A program cannot reach that state -- the dead-export
+// check rejects an export nothing calls the owner of -- but a case whose
+// `given` omits the setup can, and there an int read 0 and a string read
+// NULL, silently or by a segfault. So each export the harness declares gets
+// a flag, set where its `export` statement runs (es2.id's emit_decl_mark),
+// and each `(import NAME)` the harness emits tests it first (op/index/
+// dispatch.id's import_text). A conf.id constant has no declaring function
+// and is set before main, so it gets neither. The program's C never sees a
+// flag: every piece is gated on is_harn().
+
+emit_set_decl(int i) {
+  if((import eowners)[i] != "conf.id" && is_harn() == 1) {
+    emit_line("char idtc_set_" + (import enames)[i] + ";");
+  }
+} return void;
+given uninit_fixture (0):() then prints:("char idtc_set_gx;\n")
+given uninit_fixture (1):() then prints:("")
+given lc_dce_setup (0):() then prints:("")
+
+checked_read(string nm) {
+  string s = nm;
+  int ek = find_str((import enames), nm);
+  if(ek >= 0 && (import eowners)[ek] != "conf.id") {
+    s = "((void)(idtc_set_" + nm + " || (id_null_read(), 0)), " + nm + ")";
+  }
+} return string s;
+given uninit_fixture ("gx"):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
+given uninit_fixture ("gc"):("gc")
+given uninit_fixture ("zz"):("zz")
+
+// lz_j's exported decl `int z = 3` (lz_edecl), with the harness flag on, one
+// export owned by a function (gx, index 0), one conf.id constant (gc, index
+// 1), and an import node reading gx.
+uninit_fixture() {
+  lz_j();
+  entry_fixture_harn();
+  add_export("gx", "int", "setup_fn");
+} chain () {
+  add_export("gc", "int", "conf.id");
+  export int uninit_imp = node_import("gx");
+} return void;
+():() then check_failed:(0)
+():() then is_harn:(1)

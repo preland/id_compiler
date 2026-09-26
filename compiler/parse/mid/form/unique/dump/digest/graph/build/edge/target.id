@@ -1,0 +1,37 @@
+// The row a node points at, or -1. A call, and a variable read that names a
+// function -- a function value, reached exactly as a call reaches it
+// (scan_reach, mid/names/exports/reach/dead/sweep.id) -- point at that
+// function; a name that is a builtin, a local or an asm routine is in
+// neither table and points nowhere. An `(import NAME)` points at the
+// function that declares NAME (../own.id's dg_exports).
+
+dg_target(int dgid) {
+  string dgkd = k_of(dgid);
+  string dgnm = s1_of(dgid);
+  int dgw = 0 - 1;
+} chain (int dgid) {
+  if(dgkd == "call" || dgkd == "var") {
+    dgw = hmap_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, dgw);
+  } else if(dgkd == "import") {
+    dgw = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgw);
+  }
+} return int dgw;
+given dg_t_rows (16):(0)
+given dg_t_rows (1):(-1)
+
+dg_link(int dgf, int dgw) {
+  push((import dg_out)[dgf], dgw);
+} return void;
+given dg_t_graph (1, 3):() then dg_nout1:(3)
+given dg_t_graph (0, 3):() then dg_nout1:(2)
+
+// The same edge into dg_cout, unless node dgid is an `(import NAME)`: reading
+// an export is a dependency for a key, but it runs nothing, so a setup does
+// not reach the export's owner through it.
+dg_clink(int dgf, int dgw, int dgid) {
+  if(k_of(dgid) != "import") {
+    push((import dg_cout)[dgf], dgw);
+  }
+} return void;
+given dg_t_rows (1, 0, 16):() then dg_ncout1:(1)
+given dg_t_exp_node (1, 0, (import dg_t_imp)):() then dg_ncout1:(0)

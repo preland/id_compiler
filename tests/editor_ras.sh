@@ -70,10 +70,11 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # ras_scale is a program built out of the font module, the shared byte readers
 # under it, and a main that calls the module's own ras_selftest.
 PROJ="$TMP/p"
-mkdir -p "$PROJ/font" "$PROJ/byte"
-cp -r "$ORG/editor/lib/font/." "$PROJ/font/"
-cp "$ORG"/editor/lib/zip/byte/*.id "$PROJ/byte/"
-cat > "$PROJ/main.id" <<'IDEOF'
+mkdir -p "$PROJ/src/font" "$PROJ/src/byte"
+cp -r "$ORG/editor/test_assets" "$PROJ/test_assets"
+cp -r "$ORG/editor/lib/font/." "$PROJ/src/font/"
+cp "$ORG"/editor/lib/zip/byte/*.id "$PROJ/src/byte/"
+cat > "$PROJ/src/main.id" <<'IDEOF'
 main(int argc, string[] argv) {
   ras_selftest(argv);
 } return int 0;

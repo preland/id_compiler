@@ -1,0 +1,38 @@
+// What a function's own row hashes, and the second name table.
+
+// Its declaration's tokens, from its name through its return clause -- not
+// its cases, which are keyed on their own (../../../keys/). Without a
+// recorded span, only its name: dg_fill_one marks that row dirty, so the
+// weaker hash is never what decides a key.
+dg_own_of(int dgf, string dgnm) {
+  word dgh = dg_fnv(0, dgnm);
+  if(dgf < len((import ptoke))) {
+    dgh = dg_tokhash((import ptoks)[dgf], (import ptoke)[dgf]);
+  }
+} return word dgh;
+given dg_t_parsed (0, "fa"):(-4689288257431824535)
+given env_init (0, "a"):(106652627936467)
+
+// Every exported variable, by name, to the row of the function that declares
+// it. Reading an export is a dependency on its declaration -- its type, and
+// the value its initialiser gives it -- even though nothing calls the
+// declaring function, so dg_target (edge/) follows an import to it. A
+// constant's owner is "conf.id", which is no function: constants are hashed
+// into bin/idc's own part of the key instead.
+dg_exports(int dgi) {
+  while(dgi < len((import enames))) {
+    dg_export_one(dgi);
+    dgi = dgi + 1;
+  }
+} return void;
+given dg_t_exp (0):() then dg_nexp:(1)
+given dg_t_exp (1):() then dg_nexp:(0)
+
+dg_export_one(int dgi) {
+  int dgof = hmap_get((import dg_fk), (import dg_fv), (import dg_fu), (import eowners)[dgi], 0 - 1);
+  if(dgof >= 0) {
+    hmap_put((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec), (import enames)[dgi], dgof);
+  }
+} return void;
+given dg_t_exp (0):() then dg_nexp:(1)
+given dg_t_exp (1):() then dg_nexp:(0)

@@ -16,7 +16,7 @@ emit_stmt(int id, string ind) {
   if(k_of(id) == "decl") {
     string s2_of_v = s2_of(id);
     int i1_of_v = i1_of(id);
-    emit_decl_line(s2_of_v, i1_of_v, ind);
+    emit_decl_mark(id, s2_of_v, i1_of_v, ind);
   } else {
     es2(id, ind);
   }

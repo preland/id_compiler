@@ -1,0 +1,26 @@
+// Fixtures for the type check's cache (mid/types/check/walk/check/tk/), filed
+// here because every directory of that tree is at its three-entry cap: the
+// prepared pair with something added only after its tables were built -- a
+// clean key handed in, an export, an asm routine -- for the cases of the
+// functions that fill those tables.
+
+tk_t_in1() {
+  tk_t_prep();
+  push((import tccin), "x");
+} return void;
+():() then tk_nin:(0)
+():() then tk_nkeys:(2)
+
+tk_t_exp_late() {
+  tk_t_prep();
+  add_export("gx", "int", "fa");
+} return void;
+():() then tk_etype_gx:("")
+():() then tk_nkeys:(2)
+
+tk_t_asm_late() {
+  tk_t_prep();
+  asmfx_push();
+} return void;
+():() then tk_asm_foo:(0)
+():() then tk_nkeys:(2)

@@ -20,3 +20,21 @@ ix_row_edge(string[] ecaller, string[] ecallee, string[] ekind, string edge_line
 } return void;
 ([], [], [], "a|b|call"):(["a"], ["b"], ["call"])
 (["x"], ["y"], ["z"], "c|d|value"):(["x", "c"], ["y", "d"], ["z", "value"])
+
+// Second CSR pass for func_end_line's file-grouping: place each function's
+// own index into its file bucket's slot range (ix_fg_counts's prefix sum,
+// via rev/build.id's rev_prefix) -- the same CSR-fill shape rev_flat uses,
+// keyed by file bucket instead of call-edge callee.
+ix_fg_fill(int[] fgstart, int fcount) {
+  int[] flat = [];
+  lst_fill(flat, fcount, 0);
+  int[] cursor = lst_copy(fgstart);
+} chain (int[] fgstart, int fcount) {
+  int fi = 0;
+  while(fi < fcount) {
+    ix_fg_place(flat, cursor, fi);
+    fi = fi + 1;
+  }
+} return int[] flat;
+given rev_edge_fixture ([0, 2], 2):([0, 1])
+given ix_test_setup ([0, 1], 1):([0])

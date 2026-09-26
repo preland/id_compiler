@@ -1,0 +1,37 @@
+// The two operator units. An integer `/` or `%` traps on a zero divisor
+// (op/helper/), so where it runs relative to a call is observable -- unless
+// the divisor is a literal other than zero, which cannot trap.
+
+div_traps(int id) {
+  int ok = 0;
+  if(k_of(id) == "bin" && hop_div(id) != "") {
+    int i2_of_v = i2_of(id);
+    ok = 1 - safe_div(i2_of_v);
+  }
+} return int ok;
+given sq_fixture ((import sq_mod)):(1)
+given sq_fixture ((import sq_div3)):(0)
+given sq_fixture ((import nz_call_foo)):(0)
+
+// A big literal keeps 0 in its value field, so it is counted as one that
+// could trap: the cost is a temporary, never a wrong order.
+safe_div(int e) {
+  int ok = 0;
+  if(k_of(e) == "int" && i1_of(e) != 0) {
+    ok = 1;
+  }
+} return int ok;
+given sq_fixture ((import nz_int2)):(1)
+given sq_fixture (13):(0)
+given sq_fixture ((import nz_call_foo)):(0)
+
+is_logic(int id) {
+  int ok = 0;
+  string s1_of_v = s1_of(id);
+  if(k_of(id) == "bin" && is_logop(s1_of_v) == 1) {
+    ok = 1;
+  }
+} return int ok;
+given sq_fixture ((import sq_and)):(1)
+given sq_fixture ((import sq_two)):(0)
+given sq_fixture ((import nz_bin_add)):(0)

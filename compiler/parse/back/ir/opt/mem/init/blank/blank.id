@@ -14,3 +14,23 @@ m2r_blank() {
   int len_v = len((import pra));
   lst_fill(row, len_v, 0 - 1);
 } return int[] row;
+given optfx_setup ():([])
+given m2r_outv_fixture ():([-1])
+
+// A decl node (exported, i2=1) walked ahead of a registered function node,
+// so fix_wbuild's own seed-then-drain path has something to mark and pop --
+// for fix_wbuild's own cases (plan/reach/build/build.id is at the
+// three-function cap).
+fix_wbuild_fixture() {
+  full_env();
+  init_idx();
+  int d = node_decl("int", "x", 0, 1);
+} chain () {
+  int[] none = [];
+  int fn = node_func("foo", "void", none, none, 0 - 1);
+  push((import prog), fn);
+} chain () {
+  fidx_add("foo");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

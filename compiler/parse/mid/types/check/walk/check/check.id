@@ -1,0 +1,52 @@
+// The type checks: idc.py's assertions from gen_stmt/gen_expr/gen_binop,
+// moved into the language. They are assertions on results ../../type_of/ already
+// computes for codegen, and they get their type facts from ../../registry/ rather
+// than from a new if-chain.
+//
+// The walk is over the whole node store, not over the function tree. That is
+// sound here and nowhere else: id's rule that a name has one type
+// program-wide means type_of(e) needs no scope, so a node can be judged
+// wherever it sits. It also means each node is judged exactly once, including
+// the ones inside `else if` chains, which a tree walk has to be careful about.
+//
+// Two things are NOT judged, deliberately:
+//   * a type the compiler could not work out (ty_known == 0). An asm
+//     function's return type is one, because the driver registers asm symbols
+//     after check_program() runs. Reporting on an unknown type is how a check
+//     invents diagnostics; staying quiet is how it stays trustworthy.
+//   * an empty list literal as a value, which has no type of its own -- it
+//     takes the one the context wants. chk_arr judges the context instead.
+
+// The entry point. check_program()'s own block is full -- the chkfail export
+// plus two calls -- so the check families chain instead of each taking a slot
+// there; names/'s check_scopes() calls this one. It carries names/'s per-file
+// rule along with it for the same reason.
+check_rest() {
+  check_files();
+  check_shape();
+  tc_all();
+} return void;
+given full_check_fixture ():() then check_failed:(1)
+given clean_check_fixture ():() then check_failed:(0)
+
+tc_all() {
+  init_tyreg();
+  init_tcache();
+  tc_nodes();
+} return void;
+given cmp_fixture ():() then check_failed:(1)
+given leaves_fixture ():() then check_failed:(0)
+
+// A function whose check came out clean in an earlier build, and whose key
+// says nothing it depends on has changed since, is not checked again: tk/
+// works out each function's key and which to skip, and skip.id steps over
+// their nodes.
+tc_nodes() {
+  tk_prepare();
+  int i = 0;
+  while(i < len((import nkind))) {
+    i = tk_node(i);
+  }
+} return void;
+given cmp_fixture ():() then check_failed:(1)
+given leaves_fixture ():() then check_failed:(0)

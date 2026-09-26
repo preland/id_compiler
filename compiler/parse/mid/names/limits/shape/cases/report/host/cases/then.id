@@ -20,6 +20,8 @@ ut_then(int node) {
     ut_named(ci, lead, s1_of_v);
   }
 } return void;
+given notes_base given then_node_fixture ((import fixture_then_node)):() then calls ut_named:[0]
+given notes_base given calls_node_fixture ((import fixture_calls_bad)):() then calls ut_named:[0]
 
 ut_then_lead(int node) {
   string lead = "'then' names '";

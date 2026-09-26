@@ -1,10 +1,18 @@
 // Loader: read the lexer's "<kind> <value>" lines from stdin into the token
 // store. Kind = text before the first space, value = text after it.
 
+// No cases: read_all() is a builtin that reads the process's real stdin fd
+// directly in the generated C (mid/names/exports/extern/builtin/more/
+// names.id's builtin_list carries it beside input/getkey), and given/then
+// can only substitute a literal or a setup's exported state for an ordinary
+// id-level call -- neither reaches a builtin's own I/O. load_at/take_line,
+// its callees, take the string as a parameter and are cased directly.
 load() {
   string src = read_all();
   load_at(src, 0);
 } return void;
+given full_env stdin "op =\nkw return\n" ():() then last_tkind:("kw")
+given full_env stdin "ident x\n" ():() then last_tkind:("ident")
 
 load_at(string src, int i) {
   while(i < len(src)) {

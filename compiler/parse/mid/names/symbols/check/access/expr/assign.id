@@ -16,17 +16,20 @@ acc_assign(int id, string owner) {
 given regrow_assign ((import regrow_assign_node), "f"):() then calls acc_name:("z", "f", 0) then calls acc_expr:((import regrow_assign_val), "f", 0)
 given regrow_assign ((import regrow_assign_node), "g"):() then calls acc_name:("z", "g", 0) then calls acc_expr:((import regrow_assign_val), "g", 0)
 
-// What is left is `decl`, `iassign` and `exprstmt`. A declaration and an
-// expression statement both keep their expression in the same field, so only
-// the index-assignment needs telling apart. A declaration's *name* is not
-// resolved here -- it is the thing being introduced, and build_reg has already
-// had its say about it.
+// What is left is `decl`, `iassign`, `exprstmt`, `break` and an early
+// `return`. All but the index-assignment keep their expression in the same
+// field, so only it needs telling apart -- and a `break` or a bare `return;`
+// has no expression, which the field records as -1. A declaration's *name* is
+// not resolved here -- it is the thing being introduced, and build_reg has
+// already had its say about it.
 acc_stmt4(int id, string owner) {
   if(k_of(id) == "iassign") {
     acc_iassign(id, owner);
   } else {
-    int i1_of_v = i1_of(id);
-    acc_expr(i1_of_v, owner, (import nline)[id]);
+    if(i1_of(id) >= 0) {
+      int i1_of_v = i1_of(id);
+      acc_expr(i1_of_v, owner, (import nline)[id]);
+    }
     scope_add(id);
   }
 } return void;

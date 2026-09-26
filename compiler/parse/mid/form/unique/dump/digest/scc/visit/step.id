@@ -1,0 +1,31 @@
+// One function's successors, from dgi on: an unvisited one is walked and its
+// low-link taken; one still on the stack is in this component, and its index
+// is taken; one already in a finished component changes nothing.
+
+dg_succ(int dgv, int dgi) {
+  while(dgi < len((import dg_out)[dgv])) {
+    dg_step(dgv, (import dg_out)[dgv][dgi]);
+    dgi = dgi + 1;
+  }
+} return void;
+given dg_t_graph (4, 0):() then dg_ncomp:(1)
+given dg_t_graph (4, 1):() then dg_ncomp:(0)
+
+dg_step(int dgv, int dgw) {
+  if((import dg_ix)[dgw] < 0) {
+    dg_visit(dgw);
+    dg_lower(dgv, (import dg_low)[dgw]);
+  } else if((import dg_on)[dgw] == 1) {
+    dg_lower(dgv, (import dg_ix)[dgw]);
+  }
+} return void;
+given dg_t_graph (4, 3):() then dg_ncomp:(1)
+given dg_t_scc (4, 3):() then dg_ncomp:(4)
+
+dg_lower(int dgv, int dglv) {
+  if(dglv < (import dg_low)[dgv]) {
+    lset((import dg_low), dgv, dglv);
+  }
+} return void;
+given dg_t_graph (0, -1):() then dg_low0:(-1)
+given dg_t_graph (0, 5):() then dg_low0:(0)

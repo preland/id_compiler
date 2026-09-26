@@ -1,0 +1,30 @@
+// Readers and a fixture for dg_cout, the call-only edges (../../graph/build/
+// edge/target.id's dg_clink). Filed beside the walk because graph/ and its
+// directories are at their caps.
+
+// The parsed pair's rows with an `(import gx)` node made after them, for
+// dg_clink's case that an import adds no call edge.
+dg_t_exp_node() {
+  dg_t_rows();
+  export int dg_t_imp = node_import("gx");
+} return void;
+():() then dg_ncout1:(0)
+():() then dg_nrows:(2)
+
+// rfn refilled by hand with "conf.id" alone and its index not yet rebuilt,
+// for rfn_reindex's own case (mid/names/exports/reach/dead/more/add/, at its
+// three-function caps): the index still puts "conf.id" at position 1, past
+// the end, so is_reach does not believe it until rfn_reindex runs.
+rfn_hand() {
+  init_reach();
+  clear_strs((import rfn));
+  push((import rfn), "conf.id");
+} return void;
+():() then conf_reached:(0)
+():() then rfn_len:(1)
+
+dg_ncout1() {
+  int dgn = len((import dg_cout)[1]);
+} return int dgn;
+given dg_t_rows ():(0)
+given dg_t_built ():(2)

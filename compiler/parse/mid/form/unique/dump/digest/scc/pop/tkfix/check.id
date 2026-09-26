@@ -1,0 +1,19 @@
+// Readers of the type check cache's tables, for `then` checks.
+
+tk_nin() {
+  int tkn = hmap_count((import tkic));
+} return int tkn;
+given tk_t_warm ():(1)
+given tk_t_prep ():(0)
+
+tk_etype_gx() {
+  string tkt = tk_etype("gx");
+} return string tkt;
+given tk_t_exp ():("int")
+given tk_t_prep ():("")
+
+tk_asm_foo() {
+  int tka = tk_is_asm("foo");
+} return int tka;
+given tk_t_asm ():(1)
+given tk_t_prep ():(0)

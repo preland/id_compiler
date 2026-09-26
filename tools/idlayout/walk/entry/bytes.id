@@ -1,0 +1,32 @@
+// Pulling one name out of an fs_list listing: bytes are separated by a
+// newline (10), the last entry has one too, and a directory's name ends in
+// '/' (47) -- the same layout idc/driver/main.id already walks. This is a
+// second, independent reader over the same shape, because idlayout needs
+// more per-entry state (five separate violation buckets, an over-full
+// directory's own member list) than that walk keeps.
+
+lay_eol(int[] buf, int at) {
+  while(at < len(buf) && buf[at] != 10) {
+    at = at + 1;
+  }
+} return int at;
+([104, 105, 10, 120], 0):(2)
+([104, 105], 0):(2)
+
+lay_poke_range(int[] buf, word addr, int lo, int hi) {
+  int i = lo;
+  while(i < hi) {
+    poke8(addr + i - lo, buf[i]);
+    i = i + 1;
+  }
+} return void;
+given lay_poke_setup ([104, 105], (import lay_pb), 0, 2):() then lay_poke_read:("hi")
+given lay_poke_setup ([65, 66], (import lay_pb), 0, 2):() then lay_poke_read:("AB")
+
+lay_name_of(int[] buf, int lo, int hi) {
+  word addr = alloc(hi - lo + 1);
+  lay_poke_range(buf, addr, lo, hi);
+  string name = str_of_mem(addr, hi - lo);
+} return string name;
+([104, 105, 106], 0, 2):("hi")
+([97, 46, 105, 100], 0, 4):("a.id")

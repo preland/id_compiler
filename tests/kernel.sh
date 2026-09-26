@@ -40,6 +40,20 @@ if ! "$ROOT/tools/kbuild.sh" "$ELF" >"$TMP/build.log" 2>&1; then
 fi
 ok "the kernel builds"
 
+# An `asm` declaration (docs/ASM.md) gets its own fn row in `--calls`, the
+# same as an ordinary function -- otherwise it appears only as a callee in
+# the edges above, with no row naming the file it lives in, and
+# tools/idxpack.sh's FILES section has nothing to index it by.
+CALLS_LOG="$TMP/calls.log"
+if "$ROOT/bin/idc" "$ORG/kernel/prog" --calls --no-std --freestanding --triple x86_64-unknown-none \
+        >"$TMP/calls.out" 2>"$CALLS_LOG" \
+   && grep -qE '^lidt_load\|.*sys/trap/asm\.id:[0-9]+\|0$' "$TMP/calls.out" \
+   && grep -qE '^cpu_halt\|.*sys/hw/io/halt\.id:[0-9]+\|0$' "$TMP/calls.out"; then
+    ok "--calls lists asm functions (lidt_load, cpu_halt) as fn rows with their file"
+else
+    bad "--calls lists asm functions (lidt_load, cpu_halt) as fn rows with their file" "$(cat "$CALLS_LOG")"
+fi
+
 # Nothing in the image may have come from a C compiler. The runtime's own
 # object is the whole runtime, so a libc symbol here would mean something was
 # linked that this repository did not compile from `id`.

@@ -1,16 +1,21 @@
 
-// The rest of emit_if_at: the opening line, then the body and its close.
-emit_if_head(int id, string ind, string head, string emit_expr_v) {
-  emit_line(head + emit_expr_v + ") {");
-  int[] l1_of_v = l1_of(id);
-  emit_if_tail(id, ind, l1_of_v);
-} return void;
-given stmt_fix (4, "", "if (", "5"):() then prints:("if (5) {\n}\n")
-given stmt_fix (3, "  ", "if (", "5"):() then prints:("if (5) {\n  }\n")
+// One condition's text, computed once per level of an if / else-if chain
+// (if.id, seq_conds) so that a unit's declaration -- printed as a side
+// effect of emit_expr, inside emit_seq -- lands before the chain's first
+// line rather than at this level's own, possibly later, position.
+cond_text_of(int if_id) {
+  int cond_id = i1_of(if_id);
+  string cond_text = emit_expr(cond_id);
+} return string cond_text;
+given stmt_fix (4):("5")
+given stmt_fix (3):("5")
 
-emit_if_tail(int id, string ind, int[] l1_of_v) {
-  emit_block(l1_of_v, ind + "    ");
-  end_if(id, ind);
+// The state emit_def (func/def/body/def.id) leaves while it emits the body
+// of a function whose node is 20, for sq_name's own cases (body/hoist/
+// hoist_loop.id is at its three-function cap).
+sq_based() {
+  env_init();
+  lset((import sqbase), 0, 20);
 } return void;
-given stmt_fix (4, "", []):() then prints:("}\n")
-given stmt_fix (3, "  ", []):() then prints:("  }\n")
+():() then check_failed:(0)
+():() then init_units:(0)

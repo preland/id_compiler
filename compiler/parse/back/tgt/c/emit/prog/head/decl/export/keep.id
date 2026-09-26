@@ -3,6 +3,7 @@ emit_export_line_kept(int i) {
   if(keep_export(i) == 1) {
     string export_line_v = export_line(i);
     emit_line(export_line_v);
+    emit_set_decl(i);
   }
 } return void;
 given lc_dce_setup (0):() then prints:("IdList* a;  /* constant from conf.id */\n")

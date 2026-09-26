@@ -1,5 +1,5 @@
-// EXPECT: 'return' belongs after the function's closing brace
-// the return clause comes after the closing brace, not inside the body
+// EXPECT: so 'return;' needs a value
+// an early return in a function that returns int must hand back an int
 main(int argc, string[] argv) {
-  return 0;
+  return;
 } return int 0;

@@ -1,4 +1,10 @@
-// `then calls NAME:(...)` (args/) or `then calls NAME:[N]` (count.id).
+// `then calls NAME:(...)` (args/) or `then calls NAME:[N]` (count.id), and
+// what the `:(...)` form needs from outside its own block: one recorded row
+// written the way the clause writes it, for a miss to show
+// (args/cmp.id), and the list types among NAME's parameters, noted with
+// the ones cases compare at (ctype/list/note/then.id) -- the row condition
+// compares those columns with idtc_eq_K and the miss prints them with
+// idtc_show_K, and neither exists for a type nothing else noted.
 
 emit_then_calls(int ci, int ti, int node) {
   string kind = k_of(node);
@@ -8,5 +14,31 @@ emit_then_calls(int ci, int ti, int node) {
     emit_calls_count(ci, ti, node);
   }
 } return void;
-given calls_node_fixture (0, 0, (import fixture_calls_node)):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_fx_target_n; idtc_j0++) {\n        if (idtc_rc_fx_target_seq[idtc_j0] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j0].x == 1))) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target(...) did not match; %d call(s) to 'fx_target' were recorded\\n\", idtc_where[0], idtc_call[0], idtc_rc_fx_target_n);\n        return 3;\n    }\n")
-given calls_node_fixture (1, 2, (import fixture_calls_node)):() then prints:("    int idtc_hit2 = 0;\n    for (int idtc_j2 = 0; idtc_j2 < idtc_rc_fx_target_n; idtc_j2++) {\n        if (idtc_rc_fx_target_seq[idtc_j2] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j2].x == 1))) {\n            idtc_hit2 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j2];\n            break;\n        }\n    }\n    if (!idtc_hit2) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target(...) did not match; %d call(s) to 'fx_target' were recorded\\n\", idtc_where[1], idtc_call[1], idtc_rc_fx_target_n);\n        return 3;\n    }\n")
+given calls_node_fixture (0, 0, (import fixture_calls_node)):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_fx_target_kept; idtc_j0++) {\n        if (idtc_rc_fx_target_seq[idtc_j0] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j0].x == 1))) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        int idtc_sk0 = idtc_calls_skipped(idtc_rc_fx_target_seq, idtc_rc_fx_target_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to 'fx_target'%s\", idtc_where[0], idtc_call[0], \"fx_target(1)\", idtc_rc_fx_target_kept - idtc_sk0, idtc_sk0 ? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k0 = 0; idtc_k0 < idtc_rc_fx_target_kept; idtc_k0++) {\n            int idtc_j0 = (idtc_k0 + idtc_sk0) % idtc_rc_fx_target_kept;\n            if (idtc_calls_item(idtc_k0, idtc_rc_fx_target_kept, idtc_sk0)) { fputs(\"fx_target(\", stderr); fprintf(stderr, \"%d\", idtc_rc_fx_target_buf[idtc_j0].x); fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_fx_target_n, idtc_rc_fx_target_kept);\n        return 3;\n    }\n")
+given calls_node_fixture (1, 2, (import fixture_calls_node)):() then prints:("    int idtc_hit2 = 0;\n    for (int idtc_j2 = 0; idtc_j2 < idtc_rc_fx_target_kept; idtc_j2++) {\n        if (idtc_rc_fx_target_seq[idtc_j2] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j2].x == 1))) {\n            idtc_hit2 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j2];\n            break;\n        }\n    }\n    if (!idtc_hit2) {\n        int idtc_sk2 = idtc_calls_skipped(idtc_rc_fx_target_seq, idtc_rc_fx_target_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to 'fx_target'%s\", idtc_where[1], idtc_call[1], \"fx_target(1)\", idtc_rc_fx_target_kept - idtc_sk2, idtc_sk2 ? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k2 = 0; idtc_k2 < idtc_rc_fx_target_kept; idtc_k2++) {\n            int idtc_j2 = (idtc_k2 + idtc_sk2) % idtc_rc_fx_target_kept;\n            if (idtc_calls_item(idtc_k2, idtc_rc_fx_target_kept, idtc_sk2)) { fputs(\"fx_target(\", stderr); fprintf(stderr, \"%d\", idtc_rc_fx_target_buf[idtc_j2].x); fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_fx_target_n, idtc_rc_fx_target_kept);\n        return 3;\n    }\n")
+
+calls_row_show(string nm, int ti, int[] params) {
+  string out = "fputs(\"" + nm + "(\", stderr); ";
+  int i = 0;
+  while(i < len(params)) {
+    out = calls_show_step(nm, ti, params, out, i);
+    i = i + 1;
+  }
+} return string out;
+given calls_items_fixture ("fx_target", 0, (import fixture_params)):("fputs(\"fx_target(\", stderr); fprintf(stderr, \"%d\", idtc_rc_fx_target_buf[idtc_j0].x); ")
+("g", 2, []):("fputs(\"g(\", stderr); ")
+
+note_calls(int node) {
+  string nm = s1_of(node);
+  int cfn = func_node(nm);
+  int[] ps = l1_of(cfn);
+} chain (int node) {
+  int i = 0;
+  while(i < len(ps)) {
+    string pt = s1_of(ps[i]);
+    note_ty(pt);
+    i = i + 1;
+  }
+} return void;
+given calls_node_fixture ((import fixture_calls_node)):() then calls note_ty:("int")
+given calls_node_fixture ((import fixture_calls_node)):() then calls note_ty:[1]

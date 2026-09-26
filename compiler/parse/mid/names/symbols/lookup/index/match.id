@@ -15,13 +15,15 @@ match_idx(string[] names, int i, string name, int found) {
 // global, which is one global for the whole program however many units it is
 // read from, or undefined; both answer exactly as they did before units.
 find_vix(int[] bucket, string name, int unit) {
-  int found = vx_scan(bucket, name, unit, 0, 0 - 1);
+  int start_v = len(bucket) - 1;
+  int found = vx_scan(bucket, name, unit, start_v, 0 - 1);
   if(found < 0) {
     found = find_ix((import vnames), bucket, name);
   }
 } return int found;
 given fcall_reg_b ([0], "h", 0):(0)
 given fcall_reg_b ([0], "h", 5):(0)
+given vx_dup_fixture ([0, 1], "h", 0):(1)
 
 vx_hit(int[] bucket, int i, string name, int unit, int found) {
   int r = found;

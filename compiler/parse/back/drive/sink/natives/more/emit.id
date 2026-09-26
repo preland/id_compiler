@@ -31,3 +31,31 @@ nat_print() {
 } return void;
 given natcall_fixture ():() then prints:("/* ---- natives ---- */\n")
 given nat_row_setup ():() then prints:("/* ---- natives ---- */\nharness|nat_target|<stdin>:1|<stdin>\n")
+
+// Splits raw (--exclude-units' value, comma-joined by bin/idc) and pushes
+// each non-empty field onto the exported `exclunit` list (init_units,
+// front/parse/decl/top/marker/file/unit/state.id) as an int -- the harness
+// narrowing (mid/names/symbols/lookup/more/std_unit.id's unit_excluded)
+// reads it back a case at a time. An empty field (raw == "", or a trailing
+// comma) is skipped rather than parsed to 0, the same way str_split's own
+// empty-piece rule leaves one for "": to_int("") would otherwise exclude
+// unit 0 by accident. The resulting length is returned so a case here has
+// something to compare without a second, module-state-reading function --
+// `given env_init`, since pushing onto an export needs its declaring
+// function (init_units) to have run first, the same as any other exported
+// list this program's cases grow.
+exclunit_seed(string raw) {
+  string[] excl_parts = str_split(raw, ",");
+  int i = 0;
+  while(i < len(excl_parts)) {
+    if(excl_parts[i] != "") {
+      push((import exclunit), to_int(excl_parts[i]));
+    }
+    i = i + 1;
+  }
+} chain (string raw) {
+  int excl_n = len((import exclunit));
+} return int excl_n;
+given env_init ("5"):(1)
+given env_init ("5,9"):(2)
+given env_init (""):(0)

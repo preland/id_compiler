@@ -10,3 +10,28 @@ emit_case_call_wrapped(int ci) {
 } return void;
 given wrap_fixture (0):() then prints:("    int idtc_got = id_fx_target(idtc_a0);\n")
 given void_call_fixture (1):() then prints:("    id_bare();\n")
+
+// The case's own `traps` node, or -1: judge/more/row.id's idtc_traps[ci] row
+// needs the message, not just whether one exists (case_has_out, ../query.id,
+// already answers that). At most one thentraps node names a given ci
+// (front/.../case/then/more/calls/fixture.id's then_traps_clause rejects a
+// second), so the last match found is the only one there is.
+case_traps_node(int ci) {
+  int ti = 0;
+  int r = -1;
+  while(ti < len((import thennode))) {
+    r = traps_node_step(ci, ti, r);
+    ti = ti + 1;
+  }
+} return int r;
+given print_fixture ((import fixture_ci)):(-1)
+given traps_case_fixture ((import fixture_ci)):((import fixture_traps_case_node))
+
+traps_node_step(int ci, int ti, int r) {
+  int node = (import thennode)[ti];
+  if(i1_of(node) == ci && k_of(node) == "thentraps") {
+    r = node;
+  }
+} return int r;
+given query_node_fixture ((import fixture_ci), 0, -1):(-1)
+given traps_case_fixture ((import fixture_ci), 0, -1):((import fixture_traps_case_node))

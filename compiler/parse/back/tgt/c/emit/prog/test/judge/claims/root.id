@@ -1,0 +1,33 @@
+// The unit roots: bin/idc passes every compilation unit's root directory,
+// absolute and in unit order (the order of its SRC_ROOTS), as one --unit-roots
+// argument joined by byte 31, which no path in this tree contains. uroots
+// holds them; a case's function carries its unit (nunit).
+
+case_root(int ci) {
+  int cu = (import nunit)[(import casefn)[ci]];
+  string cr = "";
+  if(cu >= 0 && cu < len((import uroots))) {
+    cr = (import uroots)[cu];
+  }
+} return string cr;
+given ur_t (1):("/tmp/r0")
+given dg_t_parsed (1):("")
+
+ur_seed(string urs) {
+  if(urs != "") {
+    string[] urparts = str_split(urs, chr(31));
+    keep_strs(urparts, (import uroots));
+  }
+} return void;
+given case_fixture ("/a"):() then ur_count:(1)
+given case_fixture (""):() then ur_count:(0)
+
+// The digest's parsed pair (mid/form/unique/dump/digest/graph/state/
+// parsed.id: four cases, all in unit 0) with unit 0's root set, for this
+// directory's cases.
+ur_t() {
+  dg_t_parsed();
+  ur_seed("/tmp/r0");
+} return void;
+():() then ur_count:(1)
+():() then check_failed:(0)

@@ -25,8 +25,12 @@ emit_tests_maybe(int argc, string[] argv) {
 given env_init (1, ["prog"]):() then calls harn_init:[1] then calls emit_tests:[0]
 given env_init (3, ["prog", "a", "b"]):() then calls harn_init:[1] then calls emit_tests:[0]
 
+// The case keys come first, while `prog` is still every function as parsed
+// (mid/form/unique/dump/digest/keys/emit.id): bin/idc reads them to decide
+// which cases this build has already seen pass.
 emit_tests(string triple) {
   if(len((import casefn)) > 0) {
+    dg_emit_keys();
     emit_test_kept(triple);
   }
   emit_line("/* ---- end of test harness ---- */");

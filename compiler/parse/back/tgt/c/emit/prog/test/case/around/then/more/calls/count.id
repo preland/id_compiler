@@ -10,12 +10,12 @@ emit_calls_count(int ci, int ti, int node) {
   string cntexpr = "idtc_rc_" + nm + "_n";
   emit_calls_count_cond(ci, nm, cntexpr, want);
 } return void;
-given calls_node_fixture (0, 0, (import fixture_calls_node)):() then prints:("    if (!(idtc_rc_fx_target_n == (1))) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target[%d], expected %d\\n\", idtc_where[0], idtc_call[0], idtc_rc_fx_target_n, 1);\n        return 3;\n    }\n")
-given calls_node_fixture (2, 0, (import fixture_calls_node)):() then prints:("    if (!(idtc_rc_fx_target_n == (1))) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target[%d], expected %d\\n\", idtc_where[2], idtc_call[2], idtc_rc_fx_target_n, 1);\n        return 3;\n    }\n")
+given calls_node_fixture (0, 0, (import fixture_calls_node)):() then prints:("    if (!(idtc_rc_fx_target_n == (1))) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target[%lld], expected %d\\n\", idtc_where[0], idtc_call[0], idtc_rc_fx_target_n, 1);\n        return 3;\n    }\n")
+given calls_node_fixture (2, 0, (import fixture_calls_node)):() then prints:("    if (!(idtc_rc_fx_target_n == (1))) {\n        fprintf(stderr, \"%s: test failed: %s calls fx_target[%lld], expected %d\\n\", idtc_where[2], idtc_call[2], idtc_rc_fx_target_n, 1);\n        return 3;\n    }\n")
 
 emit_calls_count_cond(int ci, string nm, string cntexpr, string want) {
   string cnd = "(" + cntexpr + " == (" + want + "))";
-  emit_line("    if (!" + cnd + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "[%d], expected %d\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], " + cntexpr + ", " + want + ");\n        return 3;\n    }");
+  emit_line("    if (!" + cnd + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "[%lld], expected %d\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], " + cntexpr + ", " + want + ");\n        return 3;\n    }");
 } return void;
-(0, "f", "idtc_rc_f_n", "3"):() then prints:("    if (!(idtc_rc_f_n == (3))) {\n        fprintf(stderr, \"%s: test failed: %s calls f[%d], expected %d\\n\", idtc_where[0], idtc_call[0], idtc_rc_f_n, 3);\n        return 3;\n    }\n")
-(1, "g", "idtc_rc_g_n", "5"):() then prints:("    if (!(idtc_rc_g_n == (5))) {\n        fprintf(stderr, \"%s: test failed: %s calls g[%d], expected %d\\n\", idtc_where[1], idtc_call[1], idtc_rc_g_n, 5);\n        return 3;\n    }\n")
+(0, "f", "idtc_rc_f_n", "3"):() then prints:("    if (!(idtc_rc_f_n == (3))) {\n        fprintf(stderr, \"%s: test failed: %s calls f[%lld], expected %d\\n\", idtc_where[0], idtc_call[0], idtc_rc_f_n, 3);\n        return 3;\n    }\n")
+(1, "g", "idtc_rc_g_n", "5"):() then prints:("    if (!(idtc_rc_g_n == (5))) {\n        fprintf(stderr, \"%s: test failed: %s calls g[%lld], expected %d\\n\", idtc_where[1], idtc_call[1], idtc_rc_g_n, 5);\n        return 3;\n    }\n")

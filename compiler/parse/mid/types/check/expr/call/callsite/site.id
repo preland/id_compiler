@@ -10,7 +10,7 @@
 
 chk_callsite(int id) {
   string s1_of_v = s1_of(id);
-  int fn = func_node(s1_of_v);
+  int fn = fn_node_of(s1_of_v);
   chk_site_at(id, fn);
 } return void;
 given argfn_match_call ((import argfn_call_match)):() then calls chk_arity:((import argfn_call_match), (import argfn_fn))
@@ -20,6 +20,14 @@ given h_call_match ((import h_call_1)):() then calls chk_fcall:((import h_call_1
 // against: a builtin, or an asm function (its parameters live in the asm
 // tables, and idc.py does not check a call to one either). A `native`
 // declaration is a func node like any other, so a call to one is checked.
+//
+// fn_node_of (mid/types/registry/fn/node/sig/lookup.id) answers the same
+// question through the hash index, and every caller reached from a real
+// build's own compilation now calls it directly instead. This one stays a
+// plain find_str because several of its remaining callers' own cases build
+// fnames by hand (impcase_given and kin) without ever calling init_idx, so
+// fidx does not exist for them yet; fn_node_of would trap on an
+// uninitialised export where find_str just answers "not found".
 func_node(string name) {
   int n = 0 - 1;
   int idx = find_str((import fnames), name);

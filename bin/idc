@@ -13,16 +13,13 @@
 # The semantic checks live in idparse, in id: the action-per-block limit,
 # nesting depth, 3-functions-per-file, name-type consistency, export/import
 # access, function-logic uniqueness, the type checks, and unresolved calls.
-# The one rule checked here instead is the 3-entries-per-directory limit --
-# it is a property of the filesystem, which `id` cannot see, which is also
-# why this driver exists.
-#
-# What this does NOT do (still idc.py's job -- see docs/GAPS.md):
-#   - --target llvm. Only the C target and --target wasm (which is the C
-#     target, recompiled for wasm32-wasi) are self-hosted.
-#
-# Every case in tests/invalid/ is checked against BOTH compilers, so a
-# diagnostic idc.py gives and this one does not is a test failure.
+# The 3-entries-per-directory limit and its four neighbours (a legacy-named
+# or nested conf.id, a directory sharing its parent's name, a generic file
+# name) are checked by tools/idlayout, an `id` program this driver builds
+# and runs (run_idlayout below) -- `id` reads a directory's own listing
+# through idstd's fs_list now, so this is no longer a rule the language
+# cannot express, only one this driver still has to call before it knows
+# what tree it is compiling.
 #
 # Usage:
 #   bin/idc PATH [-o OUTPUT] [--emit-c FILE] [--keep-c] [--cc CC]
@@ -39,10 +36,9 @@ set -u
 # locate the repo root (this script lives in <root>/bin/idc)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-IDC_PY="$ROOT/idc.py"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std]" >&2
 }
 
 PATH_ARG=""
@@ -66,6 +62,7 @@ FINGERPRINTS=0
 CALLS=0
 CHECK=0
 FIX=0
+PRINT_STD=0
 NO_STD=0
 STD_DIR=""
 BACKENDS=()          # from --backend flags: an override, or a backend of its own
@@ -111,6 +108,8 @@ while [ $# -gt 0 ]; do
             CHECK=1; shift ;;
         --fix)
             FIX=1; shift ;;
+        --print-std)
+            PRINT_STD=1; shift ;;
         --no-std)
             NO_STD=1; shift ;;
         --std)
@@ -152,6 +151,70 @@ if [ -n "${1:-}" ] && [ -z "$PATH_ARG" ]; then
 fi
 if [ -z "$PATH_ARG" ]; then
     echo "idc: missing PATH" >&2; usage; exit 2
+fi
+
+# resolve_stdlib -- the standard library this invocation would merge, if any,
+# left in STDLIB (absolute, no trailing slash, or "" for none). Resolution
+# order: --no-std / IDC_NO_STD, then --std, then $IDSTD_HOME, then an `idstd`
+# directory beside this repository or the one above it. Mirrors idc.py's
+# resolve_stdlib. Shared by --print-std (below) and the real merge further
+# down, which collects STDLIB's source once this has answered which directory
+# it is.
+resolve_stdlib() {
+    STDLIB=""
+    if [ "$NO_STD" -eq 0 ] && [ -z "${IDC_NO_STD:-}" ]; then
+        if [ -n "$STD_DIR" ]; then
+            [ -d "$STD_DIR" ] || { echo "idc: --std: not a directory: $STD_DIR" >&2; exit 1; }
+            STDLIB="$STD_DIR"
+        elif [ -n "${IDSTD_HOME:-}" ]; then
+            [ -d "$IDSTD_HOME" ] || { echo "idc: \$IDSTD_HOME: not a directory: $IDSTD_HOME" >&2; exit 1; }
+            STDLIB="$IDSTD_HOME"
+        elif [ -d "$ROOT/../idstd" ]; then
+            STDLIB="$ROOT/../idstd"
+        elif [ -d "$ROOT/../../idstd" ]; then
+            STDLIB="$ROOT/../../idstd"
+        fi
+    fi
+    [ -n "$STDLIB" ] && STDLIB="$(cd "$STDLIB" && pwd -P)"
+}
+
+# --print-std answers, alone, the question a caller like tools/idxpack.sh
+# needs before it runs --calls: which stdlib root this exact invocation --
+# same flags, same environment -- would merge, so a caller can tell a
+# project file from a stdlib file by where THIS build's library actually is,
+# not by guessing at a hard-coded path substring. No source is collected, no
+# layout is checked, no stage is bootstrapped -- just the same resolution the
+# real build below does, printed and done.
+if [ "$PRINT_STD" -eq 1 ]; then
+    resolve_stdlib
+    printf '%s\n' "$STDLIB"
+    exit 0
+fi
+
+# At most IDC_JOBS builds run at once on this machine -- by default a quarter
+# of its cores -- because a build is several single-core stages back to back
+# and a dozen of them at once starve everything else. A build holds one slot
+# file under flock for its whole run, and a build with every slot taken waits
+# on one rather than polling. A build started from inside another (a compiler
+# stage, a driver tool, a library pre-check) is part of its parent's work and
+# takes no second slot, which is also what keeps a nested build from waiting
+# on its own parent.
+if [ -z "${IDC_SLOT_HELD:-}" ] && command -v flock >/dev/null 2>&1; then
+    idc_jobs=${IDC_JOBS:-$(( $(nproc 2>/dev/null || echo 4) / 4 ))}
+    [ "$idc_jobs" -ge 1 ] 2>/dev/null || idc_jobs=1
+    slot_dir="${XDG_RUNTIME_DIR:-/tmp}/idc-slots"
+    mkdir -p "$slot_dir"
+    slot_got=0
+    for slot_i in $(seq 0 $((idc_jobs - 1))); do
+        exec 8>>"$slot_dir/slot$slot_i"
+        if flock -n 8; then slot_got=1; break; fi
+        exec 8>&-
+    done
+    if [ "$slot_got" -eq 0 ]; then
+        exec 8>>"$slot_dir/slot$((RANDOM % idc_jobs))"
+        flock 8
+    fi
+    export IDC_SLOT_HELD=1
 fi
 
 # Every function carries at least two test cases, on every build, so that what
@@ -250,14 +313,163 @@ fi
 # capped CMD... -- run CMD under MEM_CAP_KB, the limit actually in force. A
 # caller's own tighter `ulimit -v` is inherited and left alone: an unprivileged
 # process cannot raise its limit, and trying printed "cannot modify limit" once
-# per stage. ulimit -v is set in a subshell, so it bounds only CMD, never this
-# script or anything that runs after it.
+# per stage.
+#
+# Once tools/ccrun is built (see ensure_ccrun below), this delegates to it:
+# `ccrun MEM_KB CPU_SECONDS ARGV_LINES` applies the same RLIMIT_AS via
+# proc_spawn_limited, forwards CMD's stdout/stderr byte for byte to this
+# script's, and exits with CMD's exit status -- the same contract the old
+# `ulimit -v` subshell gave, including how mem_ceiling_hit/mem_ceiling_error
+# below detect and report a ceiling hit, since both read the exit status and
+# CMD's stderr (captured by the caller's own `2>file`), never how CMD was
+# actually spawned.
+#
+# Before $CCRUN exists -- building it needs a working idlex/idparse, so it is
+# not ready the first few times capped() is called in a from-scratch build --
+# this falls back to the plain `ulimit -v` subshell, set in a subshell so it
+# bounds only CMD, never this script or anything that runs after it. ccrun
+# cannot depend on itself to get built, and this fallback is what makes that
+# possible without a second copy of the capping logic.
+#
+# ensure_ccrun is called lazily, from here, rather than unconditionally near
+# the top of the script: a build that never actually reaches this branch --
+# IDC_MEM_LIMIT=0, or a caller's own tighter inherited `ulimit -v` -- must not
+# pay for building ccrun. CCRUN_CHECKED guards it to once per process --
+# stale() is one `find`, cheap, but there is no reason to pay it on every one
+# of a build's dozen-plus capped() calls.
+#
+# ccrun and idlayout are the driver's own tools, not the user's program: they
+# are built against the idstd this driver would use with no --std/--no-std of
+# its own (resolve_tool_std), regardless of what the actual build's flags or
+# environment say -- a --no-std or --std OTHER_LIB build (the kernel's is the
+# one in this tree) must still get a working ccrun and idlayout, or a program
+# that legitimately wants no standard library could never build in a checkout
+# that has one to find at all.
+TOOL_STD_RESOLVED=0
+TOOL_STD_ARGS=()
+resolve_tool_std() {
+    [ "$TOOL_STD_RESOLVED" -eq 1 ] && return 0
+    TOOL_STD_RESOLVED=1
+    local dir=""
+    if [ -n "${IDSTD_HOME:-}" ]; then
+        [ -d "$IDSTD_HOME" ] || { echo "idc: \$IDSTD_HOME: not a directory: $IDSTD_HOME" >&2; exit 1; }
+        dir="$IDSTD_HOME"
+    elif [ -d "$ROOT/../idstd" ]; then
+        dir="$ROOT/../idstd"
+    elif [ -d "$ROOT/../../idstd" ]; then
+        dir="$ROOT/../../idstd"
+    else
+        echo "idc: tools/ccrun and tools/idlayout need idstd to build, and none was found; set \$IDSTD_HOME, or check out idstd beside $(basename "$ROOT")" >&2
+        exit 1
+    fi
+    TOOL_STD_ARGS=(--std "$dir")
+}
+CCRUN_CHECKED=0
+ensure_ccrun() {
+    [ "$CCRUN_CHECKED" -eq 1 ] && return 0
+    CCRUN_CHECKED=1
+    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
+    if stale "$CCRUN" "$ROOT/tools/ccrun"; then
+        resolve_tool_std
+        progress bootstrap "ccrun (from tools/ccrun)"
+        IDC_BUILDING_CCRUN=1 \
+            env -u IDC_NO_STD \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/ccrun" -o "$CCRUN" >&2 \
+            || { progress_clear; echo "idc: failed to build tools/ccrun; falling back to a plain ulimit subshell" >&2; }
+    fi
+}
+
+# tools/idlayout -- the id-written 3-entries-per-directory walk and its four
+# neighbours (run_idlayout below), built and cached the same lazy way as
+# ccrun above, and for the same reason: it needs a working idlex/idparse, so
+# it is not ready the first few times a directory's structure has to be
+# checked in a from-scratch build. IDC_BUILDING_IDLAYOUT breaks the same
+# bootstrap cycle IDC_BUILDING_CCRUN does: building tools/idlayout means
+# checking tools/idlayout's own directory structure, which would call
+# ensure_idlayout again before idlayout exists to check anything with. That
+# inner call returns having built nothing, and run_idlayout's own -x guard
+# is what skips the check for that one build rather than erroring -- there is
+# no bash left to fall back to, and tools/idlayout's structure is checked
+# again, for real, on every build after this first one.
+IDLAYOUT_CHECKED=0
+ensure_idlayout() {
+    [ "$IDLAYOUT_CHECKED" -eq 1 ] && return 0
+    IDLAYOUT_CHECKED=1
+    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
+    if stale "$IDLAYOUT" "$ROOT/tools/idlayout"; then
+        resolve_tool_std
+        progress bootstrap "idlayout (from tools/idlayout)"
+        IDC_BUILDING_IDLAYOUT=1 \
+            env -u IDC_NO_STD \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idlayout" -o "$IDLAYOUT" >&2 \
+            || { progress_clear; echo "idc: failed to build tools/idlayout; see the errors above" >&2; exit 1; }
+    fi
+}
+
+# run_idlayout ROOT -- every one of the five structural checks over ROOT's
+# tree, in one call. Used at every place that used to call the five bash
+# check_* functions: the project itself, each dependency a conf.id names,
+# each --backend directory, and the standard library.
+run_idlayout() {
+    ensure_idlayout
+    if [ -x "$IDLAYOUT" ]; then
+        "$IDLAYOUT" "$1" "$BUILD_DIR" >&2
+        [ $? -ne 0 ] && STRUCT_VIOLATIONS=1
+    fi
+}
 capped() {
     if [ "$MEM_CAP_FROM" = IDC_MEM_LIMIT ] && [ "$MEM_CAP_KB" -ne 0 ]; then
-        ( ulimit -v "$MEM_CAP_KB"; exec "$@" )
+        ensure_ccrun
+        if [ -x "$CCRUN" ]; then
+            "$CCRUN" "$MEM_CAP_KB" 0 - "$(printf '%s\n' "$@")"
+        else
+            ( ulimit -v "$MEM_CAP_KB"; exec "$@" )
+        fi
     else
         "$@"
     fi
+}
+
+# capped_from INPUT CMD... -- like capped(), but CMD's stdin is INPUT, a real
+# file. ccrun does not read its own stdin at all (see tools/ccrun/main.id):
+# every stage that needs to feed a child something now names the file
+# explicitly, which is also what let ccrun drop the poll-every-round relay
+# of its own stdin that cost ~13s on a build that needs under a second of
+# real work (see run_lex_parse below, and README/HACKING for the measurement).
+capped_from() {
+    local input="$1"; shift
+    if [ "$MEM_CAP_FROM" = IDC_MEM_LIMIT ] && [ "$MEM_CAP_KB" -ne 0 ]; then
+        ensure_ccrun
+        if [ -x "$CCRUN" ]; then
+            "$CCRUN" "$MEM_CAP_KB" 0 "$input" "$(printf '%s\n' "$@")"
+        else
+            ( ulimit -v "$MEM_CAP_KB"; exec "$@" ) < "$input"
+        fi
+    else
+        "$@" < "$input"
+    fi
+}
+
+# run_lex_parse SRC_FILE LEX_ARG... -- idlex|idparse, SRC_FILE through idlex
+# (LEX_ARG... appended) and idlex's own output through idparse ($PARSE_ARGS),
+# writing $RAW_OUT/$LEX_ERR/$PARSE_ERR and setting lex_rc/parse_rc, exactly as
+# the two-stage bash pipe this replaces did (PIPESTATUS[0]/[1] there). Two
+# sequential capped_from calls through a real intermediate file
+# ($WORK/lex_out) rather than one live bash pipe between two ccrun instances:
+# idlex is "well under a second" (bin/idc's own bootstrap comment) next to
+# idparse's ~80% of the wall time, so losing the OS-level overlap between the
+# two costs nothing worth measuring, and it is what lets neither ccrun
+# instance ever have to relay a live, unbounded stdin of its own.
+run_lex_parse() {
+    local src="$1"; shift
+    local lex_out="$WORK/lex_out"
+    capped_from "$src" "$IDLEX" "$@" 2>"$LEX_ERR" > "$lex_out"
+    lex_rc=$?
+    if [ -n "${TC_FILE:-}" ] && [ -s "$TC_FILE" ]; then
+        { sed 's/^/tcc /' "$TC_FILE"; cat "$lex_out"; } > "$lex_out.tc" && lex_out="$lex_out.tc"
+    fi
+    capped_from "$lex_out" "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
+    parse_rc=$?
 }
 
 # mem_ceiling_hit RC [STDERR_FILE] -- true if a capped stage's failure looks
@@ -311,6 +523,14 @@ IDPARSE="$CACHE_DIR/idparse"
 BOOT_DIR="$ROOT/bootstrap"
 STAGE0_LEX="$CACHE_DIR/idlex0"
 STAGE0_PARSE="$CACHE_DIR/idparse0"
+# tools/ccrun -- see capped() below. Set here (before capped() is ever
+# called) even though it is only built further down, once idlex/idparse
+# exist to build it with: capped() reads it by name at call time, and
+# `[ -x "$CCRUN" ]` is false until the build below has actually run.
+CCRUN="$CACHE_DIR/ccrun"
+# tools/idlayout -- see ensure_idlayout below. Set here for the same reason
+# CCRUN is: ensure_idlayout reads it by name at call time.
+IDLAYOUT="$CACHE_DIR/idlayout"
 
 # --std, if given, points the bootstrap at the same library the build will use.
 # --no-std deliberately does NOT propagate: it says the user's program wants no
@@ -327,8 +547,8 @@ STD_ARGS=()
 # stdout carries real output (`--emit-c -`, and the idlex|idparse pipeline
 # itself), and a carriage return in the middle of emitted C would be a bug;
 # while a non-terminal stderr is a log or a test capture, and
-# tests/invalid.sh compares diagnostics byte for byte against idc.py, so a
-# single extra character there fails the whole negative suite. When stderr is
+# tests/invalid.sh compares diagnostics against expected text, so a single
+# extra character there fails the whole negative suite. When stderr is
 # not a tty every function below is a no-op -- not "quieter", silent.
 #
 # The line is cleared before anything else is written, so a diagnostic never
@@ -502,105 +722,6 @@ collect_ids() {
             | LC_ALL=C sort)
 }
 
-# A file still called import.id would be compiled as ordinary source, and its
-# `import "../lib"` lines reported as a syntax error in a file the author
-# thinks is configuration. Name the rename instead. Mirrors idc.py.
-check_legacy_manifest() {
-    local root="$1" old
-    old=$(find "$root" \( -type d -name '.*' -prune \) -o \( -name 'import.id' -print \) | LC_ALL=C sort | head -1)
-    if [ -n "$old" ]; then
-        echo "$old:1: error: 'import.id' is now called 'conf.id' -- it holds constants as well as dependencies. Rename it" >&2
-        STRUCT_VIOLATIONS=1
-    fi
-}
-
-# check_nested_manifest ROOT -- reject a conf.id below ROOT's own level.
-#
-# A nested one is neither compiled (collect_ids filters it out as metadata) nor
-# read as a manifest (only a root's is), so anything it defines silently does
-# not exist, and the only symptom is "no such function" at the caller --
-# blaming a file that is fine. Mirrors idc.py's collect_project.
-#
-# The root's own conf.id is excluded by PATH rather than by `-mindepth 2`,
-# because `-mindepth` suppresses the whole expression at depth 1 -- prune
-# included -- so a hidden directory directly under ROOT was walked into and
-# every conf.id below it reported. idc.py compares the directory against the
-# root for the same reason.
-check_nested_manifest() {
-    local root="${1%/}" nested
-    nested=$(find "$root" -mindepth 1 \
-                  \( -type d -name '.*' -prune \) -o \
-                  \( -name 'conf.id' ! -path "$root/conf.id" -print \) | LC_ALL=C sort | head -1)
-    [ -z "$nested" ] && return 0
-    echo "$nested:1: error: 'conf.id' is the dependency manifest and is only read at the root of a project or a dependency. Here it is neither compiled nor read, so anything it defines silently does not exist; rename it" >&2
-    STRUCT_VIOLATIONS=1
-}
-
-# check_entry_limit ROOT -- the 3-entries-per-directory rule over ROOT's tree.
-#
-# One `find`, one `awk`. It used to be a loop that ran two `find`s and two
-# `wc`s per directory, which is four processes each: on a 200-directory tree
-# that was 800 forks and 4.4 seconds -- more than twice the whole compiler.
-# The rule is a tally of each directory's children, so the tree is listed once
-# and every entry is counted against its parent.
-#
-# Hidden directories are pruned rather than counted, and nothing under them is
-# reached; `-mindepth 1` keeps the prune from applying to ROOT itself, so a
-# project whose own directory is hidden still builds. ROOT/build, the output
-# directory, is pruned for the reason collect_ids gives: it is not source, and
-# building a library in place must not push its root over the limit.
-check_entry_limit() {
-    local root="$1" over
-    over=$(find "$root" -mindepth 1 \
-                \( -type d -name '.*' -prune \) -o \
-                \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
-                \( -type d -printf 'd|%h\n' \) -o \
-                \( -name '*.id' ! -name 'conf.id' ! -name 'backend.id' -printf 'f|%h\n' \) \
-           | awk -F'|' '{ n[$2]++ }
-                        END { for (d in n) if (n[d] > 3) print n[d] "|" d }' \
-           | LC_ALL=C sort -t'|' -k2 | head -1)
-    [ -z "$over" ] && return 0
-    local total="${over%%|*}" d="${over#*|}"
-    echo "$d:1: error: a project directory may contain at most 3 files and directories combined, but this one has $total (.id files and subdirectories); split it into subdirectories" >&2
-    STRUCT_VIOLATIONS=1
-}
-
-# check_same_name_as_parent ROOT -- reject directories with the same name as
-# their parent directory (e.g. a/loop/loop/).
-#
-# One find and awk pass. Formats each directory path and checks if the final
-# component equals the second-to-last component.
-check_same_name_as_parent() {
-    local root="$1" dup
-    dup=$(find "$root" -mindepth 1 \
-                \( -type d -name '.*' -prune \) -o \
-                \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
-                \( -type d -printf '%p\n' \) \
-           | awk -F'/' 'NF >= 2 { d=$(NF); p=$(NF-1); if (d == p && d != "") print $0 }' \
-           | head -1)
-    [ -z "$dup" ] && return 0
-    echo "$dup:1: error: directory '$dup' has the same name as its parent; name it for what it holds, or merge it into the parent" >&2
-    STRUCT_VIOLATIONS=1
-}
-
-# check_generic_names ROOT -- reject files with generic names like helper.id,
-# util.id, misc.id, common.id, stuff.id, tmp.id, temp.id.
-#
-# These names do not indicate what the file holds, making it impossible to
-# name what you are importing and encouraging developers to dump unrelated
-# functions into a single file. Uses the same filter structure as check_entry_limit.
-check_generic_names() {
-    local root="$1" generic
-    generic=$(find "$root" -mindepth 1 \
-                 \( -type d -name '.*' -prune \) -o \
-                 \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
-                 \( \( -name 'helper.id' -o -name 'helpers.id' -o -name 'util.id' -o -name 'utils.id' -o -name 'misc.id' -o -name 'common.id' -o -name 'stuff.id' -o -name 'tmp.id' -o -name 'temp.id' \) -printf '%p\n' \) \
-           | LC_ALL=C sort | head -1)
-    [ -z "$generic" ] && return 0
-    echo "$generic:1: error: file '$generic' has a generic name '$(basename "$generic")'; name it for what it holds" >&2
-    STRUCT_VIOLATIONS=1
-}
-
 # ---------------------------------------------------------------------------
 # collect .id source files: a single file is just itself; a project directory
 # is its whole tree.
@@ -615,16 +736,10 @@ else
     echo "idc: no such file or directory: '$PATH_ARG'" >&2
     exit 1
 fi
-# The 3-entries-per-directory rule. This is the one structural rule the
-# self-hosted compiler genuinely cannot check: it is a property of the
-# filesystem, and `id` has no directory access -- which is the same reason
-# this driver exists at all. Everything else belongs in idparse.
+# The 3-entries-per-directory rule and its four neighbours (run_idlayout,
+# above). Everything else belongs in idparse.
 if [ -d "$PATH_ARG" ]; then
-    check_legacy_manifest "$PATH_ARG"
-    check_entry_limit "$PATH_ARG"
-    check_nested_manifest "$PATH_ARG"
-    check_same_name_as_parent "$PATH_ARG"
-    check_generic_names "$PATH_ARG"
+    run_idlayout "$PATH_ARG"
 fi
 
 if [ ${#SRC_FILES[@]} -eq 0 ]; then
@@ -776,10 +891,7 @@ read_manifest() {
         # A backend is a dependency like any other: its .id files -- the
         # `native` declarations of what it links -- are merged as source under
         # the same limits, and collect_ids finds its backend.id.
-        check_entry_limit "$deppath"
-        check_nested_manifest "$deppath"
-        check_same_name_as_parent "$deppath"
-        check_generic_names "$deppath"
+        run_idlayout "$deppath"
         collect_ids "$deppath"
         DEP_QUEUE+=("$deppath")
         if [ ! -f "$deppath/conf.id" ] && up=$(enclosing_root "$deppath"); then
@@ -812,10 +924,7 @@ for b in ${BACKENDS[@]+"${BACKENDS[@]}"}; do
     b="$(cd "$b" && pwd -P)"
     seen_dep "$b" && continue
     SEEN_DEPS+=("$b")
-    check_entry_limit "$b"
-    check_nested_manifest "$b"
-    check_same_name_as_parent "$b"
-    check_generic_names "$b"
+    run_idlayout "$b"
     collect_ids "$b"
     walk_deps "$b"
 done
@@ -827,36 +936,102 @@ done
 # backend.id (collect_ids), so every program has them and none links one it
 # does not reach.
 #
-# Resolution order: --no-std / IDC_NO_STD, then --std, then $IDSTD_HOME, then
-# an `idstd` directory beside this repository. A checkout with no idstd beside
-# it has no standard library, and that is not an error -- the compiler has to
-# keep building the language's own bootstrap in a tree where it does not exist.
-# Mirrors idc.py's resolve_stdlib.
-STDLIB=""
-if [ "$NO_STD" -eq 0 ] && [ -z "${IDC_NO_STD:-}" ]; then
-    if [ -n "$STD_DIR" ]; then
-        [ -d "$STD_DIR" ] || { echo "idc: --std: not a directory: $STD_DIR" >&2; exit 1; }
-        STDLIB="$STD_DIR"
-    elif [ -n "${IDSTD_HOME:-}" ]; then
-        [ -d "$IDSTD_HOME" ] || { echo "idc: \$IDSTD_HOME: not a directory: $IDSTD_HOME" >&2; exit 1; }
-        STDLIB="$IDSTD_HOME"
-    elif [ -d "$ROOT/../idstd" ]; then
-        STDLIB="$ROOT/../idstd"
-    elif [ -d "$ROOT/../../idstd" ]; then
-        STDLIB="$ROOT/../../idstd"
-    fi
-fi
+# A checkout with no idstd beside it has no standard library, and that is not
+# an error -- the compiler has to keep building the language's own bootstrap
+# in a tree where it does not exist. resolve_stdlib (above, shared with
+# --print-std) answers which directory, if any; this collects its source.
+#
+# STD_UNIT_START is recorded here, before the merge below runs: every root
+# SRC_ROOTS gains from this point on -- STDLIB itself and everything its own
+# conf.id reaches -- is the library, and nothing gained before it (the
+# project's own tree, its own dependencies, an explicit --backend) is. It is
+# the compilation-unit index (the `#file N|PATH` marker's N, emit_sources
+# above) a --std-unit N passed to idparse means "at or past this is the
+# library" by (back/drive/target/tests/ + mid/names/symbols/lookup/more/
+# std_unit.id's case_is_std): when STDLIB is already one of SRC_ROOTS --
+# building the library itself, PATH_ARG resolved to it -- seen_dep skips the
+# merge and no more roots are gained, so the boundary excludes nothing and
+# every one of the library's own cases stays seeded, which is what its own
+# build (and bin/idc's pre-check of it, below) needs.
+resolve_stdlib
+STD_UNIT_START=${#SRC_ROOTS[@]}
 if [ -n "$STDLIB" ]; then
-    STDLIB="$(cd "$STDLIB" && pwd -P)"
     if ! seen_dep "$STDLIB"; then
         SEEN_DEPS+=("$STDLIB")
-        check_entry_limit "$STDLIB"
-        check_same_name_as_parent "$STDLIB"
-        check_generic_names "$STDLIB"
+        run_idlayout "$STDLIB"
         collect_ids "$STDLIB"
         walk_deps "$STDLIB"
     fi
 fi
+
+# ---------------------------------------------------------------------------
+# A directory with a backend.id is a library exactly like the stdlib: its own
+# cases must not run in the harness of whatever imports it, and a failure in
+# them is the backend's fault, never the program's (run_lib_precheck,
+# further down). STD_UNIT_START's boundary already covers a backend merged
+# into the stdlib's own range by directory walk alone (collect_ids's
+# FOUND_BACKENDS comment, above) -- idstd's sys/io/fs is such a backend, and
+# every one of its cases is already >= STD_UNIT_START. What it cannot name is
+# a backend that is its own compilation unit -- --backend, or a conf.id
+# import, by the project or one of its dependencies (or, in principle, the
+# stdlib's own conf.id) -- outside that range: a --no-std program importing
+# idstd's fs backend directly is exactly this, and STDLIB is "" there, so the
+# boundary excludes nothing at all.
+#
+# BACKENDS and FOUND_BACKENDS are both final now (every collect_ids call that
+# can add to either has already run, above), and so is SRC_ROOTS, so this can
+# answer "which unit is DIR" before PARSE_ARGS is built. backend_lib_scan
+# resolves DIR against SRC_ROOTS the same way backend_of does further down
+# (Native backends, below) -- that section runs later and reads BACKENDS/
+# FOUND_BACKENDS afresh, so duplicating the resolve here costs nothing it
+# would otherwise share.
+#
+# EXCLUDE_UNITS is passed to idparse as --exclude-units, a comma-joined list
+# (mid/names/symbols/lookup/more/std_unit.id's unit_excluded) -- chosen over
+# repeating --std-unit's single-boundary flag because these units are not a
+# contiguous range the way the stdlib's own is. LIB_PRECHECK_DIRS/_UNITS are
+# the subset that also has id code to pre-check (run_lib_precheck, run
+# alongside run_std_precheck, below) -- a pure-native backend (backend.id
+# plus only a C/H source) has no cases to fail, so it is excluded from the
+# harness the same way but never built again just to find that out.
+EXCLUDE_UNITS=()
+LIB_PRECHECK_DIRS=()
+LIB_PRECHECK_UNITS=()
+# PATH_ARG_KEY -- PATH_ARG resolved, the same way run_std_precheck's own
+# path_key is (below): a backend directory built AS ITSELF (bin/idc
+# recursing into one, from run_backend_prechecks, or a user building it
+# directly) must run every one of its own cases as itself, the same reason
+# STD_UNIT_START's own comment gives for the stdlib -- excluding it here
+# would leave its own pre-check nothing to run and every rc=0 regardless of
+# what its cases say.
+PATH_ARG_KEY=""
+[ -d "$PATH_ARG" ] && PATH_ARG_KEY="$(cd "$PATH_ARG" && pwd -P)"
+backend_lib_scan() { # backend_lib_scan DIR
+    local d="$1" real i r unit=-1 u
+    real=$(cd "$d" 2>/dev/null && pwd -P) || return 0
+    [ "$real" = "$PATH_ARG_KEY" ] && return 0
+    for i in "${!SRC_ROOTS[@]}"; do
+        r=$(cd "${SRC_ROOTS[$i]}" 2>/dev/null && pwd -P) || continue
+        [ "$r" = "$real" ] && { unit=$i; break; }
+    done
+    [ "$unit" -ge 0 ] || return 0
+    [ -n "$STDLIB" ] && [ "$unit" -ge "$STD_UNIT_START" ] && return 0
+    for u in ${EXCLUDE_UNITS[@]+"${EXCLUDE_UNITS[@]}"}; do
+        [ "$u" = "$unit" ] && return 0
+    done
+    EXCLUDE_UNITS+=("$unit")
+    if find "$real" -mindepth 1 \
+            \( -type d -name '.*' -prune \) -o \
+            \( -type d -path "${real%/}/$BUILD_DIR" -prune \) -o \
+            \( -name '*.id' ! -name 'backend.id' ! -name 'conf.id' -print -quit \) \
+         | grep -q .; then
+        LIB_PRECHECK_DIRS+=("$real")
+        LIB_PRECHECK_UNITS+=("$unit")
+    fi
+}
+for b in ${BACKENDS[@]+"${BACKENDS[@]}"} ${FOUND_BACKENDS[@]+"${FOUND_BACKENDS[@]}"}; do
+    backend_lib_scan "$b"
+done
 
 # One global sort over every source file, project and dependencies together,
 # and one dedupe -- exactly idc.py's `sorted(set(source_files))`.
@@ -873,6 +1048,20 @@ fi
 if [ "${#SRC_FILES[@]}" -gt 0 ]; then
     mapfile -t SRC_FILES < <(printf '%s\n' "${SRC_FILES[@]}" | LC_ALL=C sort -u)
 fi
+
+# Per-unit C compilation (unit_build, below): idparse marks where each source
+# file's functions begin (--units), and the C is compiled as a handful of
+# translation units cached one by one, so an edit recompiles the unit it is
+# in. Off with the caches (IDC_NO_CACHE), under IDC_UNITS=0, and for the
+# driver's own compiler stages, which stage 0 compiles and which are built
+# once and then run by every build: they keep the one translation unit they
+# always had.
+# (Measured on idparse itself, built both ways from the same C: 7.75 s and
+# 7.78 s on the same input, so units cost the program nothing measurable.)
+UNITS_ON=1
+[ "${IDC_UNITS:-1}" = 0 ] && UNITS_ON=0
+[ -n "${IDC_NO_CACHE:-}" ] && UNITS_ON=0
+[ -n "${IDC_STAGE_LEX:-}" ] && UNITS_ON=0
 
 PARSE_ARGS=()
 # The target triple selects among a program's `asm` overloads, and is always
@@ -914,6 +1103,30 @@ elif [ "$CHECK" -eq 1 ]; then
 else
     PARSE_ARGS+=(--harness)
     PARSE_ARGS+=(--natives)
+    [ "$UNITS_ON" -eq 1 ] && PARSE_ARGS+=(--units)
+    [ -z "${IDC_NO_CACHE:-}" ] && [ -z "${IDC_STAGE_LEX:-}" ] && PARSE_ARGS+=(--tc-keys)
+    # Each case runs in the root of the source tree that owns its function
+    # (compiler/parse/back/tgt/c/emit/prog/test/judge/claims/): absolute, one
+    # per unit in SRC_ROOTS order, joined by byte 31 -- a single-file build's
+    # root is the file's directory. A stage-0 idparse ignores the flag, and
+    # its cases run where the harness is started, the project root, as before.
+    UNIT_ROOTS=""
+    for ui in "${!SRC_ROOTS[@]}"; do
+        r="${SRC_ROOTS[$ui]}"
+        [ -d "$r" ] || r=$(dirname "$r")
+        r=$(cd "$r" 2>/dev/null && pwd -P) || r=""
+        [ "$ui" -gt 0 ] && UNIT_ROOTS="$UNIT_ROOTS"$'\x1f'
+        UNIT_ROOTS="$UNIT_ROOTS$r"
+    done
+    PARSE_ARGS+=(--unit-roots "$UNIT_ROOTS")
+    # Only the harness build narrows by unit: STD_UNIT_START means nothing to
+    # --check/--fix/--calls/--fingerprints/--list-untested, which build no
+    # harness to narrow.
+    PARSE_ARGS+=(--std-unit "$STD_UNIT_START")
+    if [ "${#EXCLUDE_UNITS[@]}" -gt 0 ]; then
+        EXCLUDE_UNITS_CSV=$(IFS=,; echo "${EXCLUDE_UNITS[*]}")
+        PARSE_ARGS+=(--exclude-units "$EXCLUDE_UNITS_CSV")
+    fi
 fi
 
 WORK=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
@@ -994,26 +1207,209 @@ if [ "$FIX" -eq 1 ]; then
     fi
 fi
 
+# ---------------------------------------------------------------------------
+# Build cache. idlex|idparse is the expensive part of a build (measured at
+# ~80% of the wall time on compiler/parse -- idlex itself is under a second),
+# and it is a pure function of the exact source stream, the lex/parse flags,
+# the two stage binaries' own identity, and the few environment variables that
+# can change dependency resolution or the memory ceiling. When none of that
+# has changed since a previous build, its output (RAW_OUT/LEX_ERR/PARSE_ERR,
+# and the exit codes that go with them) is reused instead of recomputed, and
+# everything downstream -- split_harness, the harness build, running the
+# cases, the final cc -- runs exactly as it would have on a fresh parse. The
+# cases are never skipped: a cache hit only ever saves the parse, so a build
+# whose cases fail cannot come back green because it was cached.
+#
+# IDC_NO_CACHE=1 turns this (and the object cache in run_cases/the final cc
+# below) off entirely -- both read and write -- so a suspect result can always
+# be reproduced from a clean run. --fix mutates the project's own files as it
+# reruns idlex|idparse, so its input is a moving target and it is excluded
+# rather than keyed on one.
+CACHE_ON=1
+[ -n "${IDC_NO_CACHE:-}" ] && CACHE_ON=0
+[ "$FIX" -eq 1 ] && CACHE_ON=0
+
+# cache_prune DIR MAX -- keep only the MAX most-recently-touched entries
+# directly under DIR, deleting the rest, so neither cache below can grow
+# without bound. Recency is mtime, and a hit touch(1)es its entry, so "most
+# recently touched" is "most recently reused or created".
+cache_prune() {
+    local dir="$1" max="$2"
+    [ -d "$dir" ] || return 0
+    find "$dir" -mindepth 1 -maxdepth 1 -printf '%T@ %p\n' 2>/dev/null \
+        | LC_ALL=C sort -rn | tail -n +"$((max + 1))" | cut -d' ' -f2- \
+        | while IFS= read -r old; do rm -rf "$old"; done
+}
+CACHE_MAX="${IDC_CACHE_ENTRIES:-50}"
+OBJ_CACHE_DIR="$CACHE_DIR/obj"
+# The library pre-check's own cache (run_lib_precheck, below -- the stdlib's
+# own entries and every backend library's share it, keyed by what each one
+# hashes to): never $CACHE_DIR/fe or $CACHE_DIR/obj themselves, so a program
+# build's own front-end and object entry counts are exactly what they were
+# before the pre-check existed -- tests/cache.sh counts those two directly.
+# The directory keeps its original name: tests/stdlib.sh already counts
+# entries under it by this literal path.
+STD_PRECHECK_DIR="$CACHE_DIR/std_precheck"
+
+# obj_cache_key TAG FILE... -- a sha256 identifying a compiled artifact: TAG
+# (so a harness binary and a program binary can never collide on the same
+# hash even from identical C), cc's own identity, what backends_for decided
+# this link needs (LINK_FLAGS/LINK_OBJS -- read from the caller's scope, as
+# they stand whenever this is called), and every FILE's content. Used for both
+# the test harness and the final program below: same reasoning, same cache.
+obj_cache_key() {
+    local tag="$1" cc_path o f; shift
+    {
+        printf '%s\0%s\0' "$tag" "$CC"
+        printf '%s\0' ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"}
+        cc_path="$(command -v "$CC" 2>/dev/null)"
+        [ -n "$cc_path" ] && sha256sum < "$cc_path"
+        for o in ${LINK_OBJS[@]+"${LINK_OBJS[@]}"}; do sha256sum < "$o"; done
+        for f in "$@"; do sha256sum < "$f"; done
+    } | sha256sum | cut -d' ' -f1
+}
+
+# obj_cache_get KEY DEST -- true and DEST populated (executable) if KEY is
+# cached; touches the entry so it counts as recently used. False, and DEST
+# untouched, on a miss -- including when caching is off, so every call site
+# can use this without its own CACHE_ON check.
+obj_cache_get() {
+    [ "$CACHE_ON" -eq 1 ] || return 1
+    local entry="$OBJ_CACHE_DIR/$1"
+    [ -f "$entry/bin" ] || return 1
+    cp "$entry/bin" "$2" && chmod +x "$2" && touch "$entry"
+}
+
+# obj_cache_put KEY SRC -- cache SRC (already built and known good -- this is
+# never called on a failed compile) under KEY. Best-effort: a failure here
+# loses nothing but the chance to skip this compile next time.
+obj_cache_put() {
+    [ "$CACHE_ON" -eq 1 ] || return 0
+    local entry="$OBJ_CACHE_DIR/$1"
+    rm -rf "$WORK/obj_entry"
+    mkdir -p "$WORK/obj_entry" && cp "$2" "$WORK/obj_entry/bin" && chmod +x "$WORK/obj_entry/bin" || return 0
+    mkdir -p "$OBJ_CACHE_DIR"
+    rm -rf "$entry"
+    mv -f "$WORK/obj_entry" "$entry"
+    cache_prune "$OBJ_CACHE_DIR" "$CACHE_MAX"
+}
+
 progress compile "$(plural "${#SRC_FILES[@]}" file) -> tokens -> C"
-emit_sources | capped "$IDLEX" ${LEX_ARGS[@]+"${LEX_ARGS[@]}"} 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
-rc=("${PIPESTATUS[@]}")
-lex_rc="${rc[1]}"
-parse_rc="${rc[2]}"
+FE_HIT=0
+# Materialised unconditionally, cache on or off: capped_from (see capped(),
+# above) needs a real path for idlex's input regardless, since ccrun no
+# longer touches its own stdin at all (see its own comments) -- and the
+# cache-on path already needed this file for its hash, so there is now one
+# copy of "emit the source stream" instead of two.
+SOURCES_TMP="$WORK/sources"
+emit_sources > "$SOURCES_TMP"
+if [ "$CACHE_ON" -eq 1 ]; then
+    FE_CACHE_DIR="$CACHE_DIR/fe"
+    # cc's identity is not part of what idlex|idparse can vary with -- it
+    # never runs cc -- but is hashed anyway so this key can be built the same
+    # way as the object cache's, below, and so the two never need to
+    # disagree about what "the same build" means.
+    FE_KEY=$(
+        { sha256sum "$IDLEX" "$IDPARSE"
+          printf '%s\0' "${LEX_ARGS[@]+"${LEX_ARGS[@]}"}" "${PARSE_ARGS[@]}"
+          printf 'IDSTD_HOME=%s\0IDC_NO_STD=%s\0IDC_MEM_LIMIT=%s\0CC=%s\0' \
+              "${IDSTD_HOME:-}" "${IDC_NO_STD:-}" "${IDC_MEM_LIMIT:-}" "$CC"
+          if [ "$TARGET" = wasm ]; then
+              printf 'WASI=%s|%s|%s|%s\0' "${IDC_WASI_CLANG:-}" \
+                  "${IDC_WASI_SYSROOT_INCLUDE:-}" "${IDC_WASI_LIBDIR:-}" "${IDC_WASI_COMPILER_RT:-}"
+          fi
+          cc_path="$(command -v "$CC" 2>/dev/null)"
+          [ -n "$cc_path" ] && sha256sum "$cc_path"
+          cat "$SOURCES_TMP"
+        } | sha256sum | cut -d' ' -f1
+    )
+    FE_ENTRY="$FE_CACHE_DIR/$FE_KEY"
+    if [ -f "$FE_ENTRY/rc" ]; then
+        cp "$FE_ENTRY/raw.out" "$RAW_OUT"
+        cp "$FE_ENTRY/lex.err" "$LEX_ERR"
+        cp "$FE_ENTRY/parse.err" "$PARSE_ERR"
+        read -r lex_rc parse_rc < "$FE_ENTRY/rc"
+        touch "$FE_ENTRY"
+        FE_HIT=1
+    fi
+fi
+# The type check's cache (compiler/parse/mid/types/check/walk/check/tk/):
+# idparse keys each function on its own tokens and on what every name in them
+# means program-wide, and skips the check of a function whose key has come out
+# clean before. The keys it is handed are the TC_FILE list, as `tcc KEY` lines
+# ahead of the tokens (run_lex_parse); a build that succeeds writes back every
+# clean key it has, after everything else, behind a separator tc_record cuts
+# off. What the keys cannot see -- the compiler, the platform the build is for,
+# and the conf.id constants -- names the list. Only the flags that can change
+# what a check says go into that name, so a --check, --calls or ordinary
+# build of one program all share one list. Off with the other caches, and
+# for the bootstrap's stage-0 builds, whose idparse predates it.
+TC_FILE=""
+if [ "$CACHE_ON" -eq 1 ] && [ -z "${IDC_STAGE_LEX:-}" ]; then
+    TC_FILE=$(
+        { sha256sum < "$IDLEX"; sha256sum < "$IDPARSE"
+          tc_skip=0
+          for a in "${PARSE_ARGS[@]}"; do
+              case "$a" in
+                  --harness|--natives|--units|--tc-keys|--check|--calls|--fingerprints|--untested|--require-tests) ;;
+                  --std-unit|--exclude-units|--unit-roots) tc_skip=1 ;;
+                  *) [ "$tc_skip" -eq 1 ] && tc_skip=0 || printf '%s\0' "$a" ;;
+              esac
+          done
+          printf '%s\0' ${CONSTS[@]+"${CONSTS[@]}"}
+        } | sha256sum | cut -d' ' -f1)
+    TC_FILE="$CACHE_DIR/tc/$TC_FILE"
+fi
+
+# tc_record -- cut the clean keys off the end of RAW_OUT and add them to
+# TC_FILE: newest last, at most IDC_TC_KEYS (default 200000), written beside
+# the list and renamed over it.
+tc_record() {
+    grep -qxF '/* ---- tc keys ---- */' "$RAW_OUT" || return 0
+    awk -v out="$WORK/tc.new" -v raw="$WORK/raw.cut" '
+        { line[NR] = $0 } $0 == "/* ---- tc keys ---- */" { at = NR }
+        END { for (i = 1; i < at; i++) print line[i] > raw
+              printf "" > raw
+              for (i = at + 1; i <= NR; i++) print line[i] > out
+              printf "" > out }' "$RAW_OUT" && mv -f "$WORK/raw.cut" "$RAW_OUT"
+    [ -n "$TC_FILE" ] && [ -s "$WORK/tc.new" ] || return 0
+    mkdir -p "${TC_FILE%/*}" || return 0
+    local tmp="$TC_FILE.$$.tmp"
+    { [ -f "$TC_FILE" ] && cat "$TC_FILE"; cat "$WORK/tc.new"; } \
+        | tac | awk '!seen[$0]++' | head -n "${IDC_TC_KEYS:-200000}" | tac > "$tmp" && mv -f "$tmp" "$TC_FILE"
+    rm -f "$tmp"
+    cache_prune "${TC_FILE%/*}" "$CACHE_MAX"
+}
+
+if [ "$FE_HIT" -eq 0 ]; then
+    run_lex_parse "$SOURCES_TMP" ${LEX_ARGS[@]+"${LEX_ARGS[@]}"}
+    if [ "$CACHE_ON" -eq 1 ]; then
+        rm -rf "$WORK/fe_entry"
+        if mkdir -p "$WORK/fe_entry" \
+           && cp "$RAW_OUT" "$WORK/fe_entry/raw.out" \
+           && cp "$LEX_ERR" "$WORK/fe_entry/lex.err" \
+           && cp "$PARSE_ERR" "$WORK/fe_entry/parse.err" \
+           && printf '%s %s\n' "$lex_rc" "$parse_rc" > "$WORK/fe_entry/rc"; then
+            mkdir -p "$FE_CACHE_DIR"
+            rm -rf "$FE_ENTRY"
+            mv -f "$WORK/fe_entry" "$FE_ENTRY"
+            cache_prune "$FE_CACHE_DIR" "$CACHE_MAX"
+        fi
+    fi
+fi
+tc_record
 
 # The self-hosted stages cover the whole language, so a failure here is a bug
 # in this compiler, not an input it cannot reach. Falling back to idc.py would
 # hide that -- and worse, would hand the program to a compiler that does not
 # check nine of the language's rules. There is no fallback, and since stage 0
 # became bootstrap/*.c there is no bootstrap either: this driver does not run
-# idc.py at all. It is named below only as something a human can compare
-# against by hand.
+# idc.py at all.
 compiler_bug() { # compiler_bug REASON
     progress_clear
     echo "idc: internal error: $1" >&2
     [ -s "${C_OUT:-}" ] && echo "idc: the generated C is at $C_OUT" >&2
     echo "idc: this is a bug in the self-hosted compiler; please report it." >&2
-    echo "idc: to compare against the reference implementation, run:" >&2
-    echo "idc:     $IDC_PY $PATH_ARG" >&2
     exit 1
 }
 
@@ -1127,10 +1523,8 @@ run_fix() {
         cut -d'|' -f2 "$WORK/edits" | LC_ALL=C sort -u > "$WORK/files"
         while IFS= read -r f; do fix_file "$f"; done < "$WORK/files"
         progress fix "run $((round + 1))"
-        emit_sources | capped "$IDLEX" --cols 2>"$LEX_ERR" | capped "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
-        rc=("${PIPESTATUS[@]}")
-        lex_rc="${rc[1]}"
-        parse_rc="${rc[2]}"
+        emit_sources > "$SOURCES_TMP"
+        run_lex_parse "$SOURCES_TMP" --cols
     done
     progress_clear
     fix_report_edits
@@ -1167,12 +1561,18 @@ fi
 
 # --calls: every resolved call edge of the collected program, then the
 # case-count section, each sorted (LC_ALL=C) and deduplicated. print_calls
-# (compiler/parse/back/drive/run/check/dce/emit/guarded_emit.id) prints both
+# (compiler/parse/back/drive/run/check/dce/emit/calls/cases.id) prints both
 # kinds of row to the same stream in traversal order; an edge row always has
 # 5 pipe-fields (caller|caller_file:line|callee|callee_file:line|kind, the
 # last field empty for kind=builtin) and a case row always has 3
 # (fn|file:line|cases), so awk routes each by field count rather than a
-# marker. Like --fingerprints, this is a report about the parsed program, not
+# marker. The case-count section has one row per ordinary function
+# (print_call_cases, same file) and one per asm declaration (print_asm_cases,
+# compiler/parse/back/drive/run/check/dce/emit/guard/guarded_emit.id), case
+# count fixed at 0 for the latter -- an asm function has no cases -- which is
+# what lets a row-consuming tool (idc/tools/idxpack.sh's FILES section) find
+# an asm body's file the way it finds an ordinary function's. Like
+# --fingerprints, this is a report about the parsed program, not
 # a build of it, so it prints regardless of parse_rc (see the comment there)
 # -- but unlike --fingerprints, which just cats RAW_OUT as it is, this sorts
 # the two report sections apart from each other, so any OTHER diagnostic
@@ -1582,6 +1982,25 @@ backends_for() {
     done
 }
 
+# backends_for_program -- backends_for program, but only when the build
+# actually has a `main` to link them into (have_main, set by each target
+# before this runs); a .o has nothing to link them into, so a backend the
+# program reaches is named but left unbuilt. Shared by the C and LLVM
+# targets: both link the program's own natives the same way, into the same
+# objects and flags, so the collection lives once rather than being copied.
+backends_for_program() {
+    LINK_OBJS=()
+    LINK_FLAGS=()
+    if [ "$have_main" -eq 0 ]; then
+        if grep -q '^program|' "$NATIVES"; then
+            echo "idc: backend(s) ignored: this project has no main (builds to a .o);" \
+                 "link the backend into the final program" >&2
+        fi
+    else
+        backends_for program
+    fi
+}
+
 # ---------------------------------------------------------------------------
 # The cases written under the program's functions run on every build, before
 # any output exists, and a case that does not pass fails the build -- there is
@@ -1635,6 +2054,244 @@ split_harness() {
     fi
 }
 
+# ---------------------------------------------------------------------------
+# The case-result cache. idparse writes a key for every case at the top of
+# the harness, `// idtc key N KEY` (compiler/parse/mid/form/unique/dump/
+# digest/keys/emit.id): a hash of the case's own tokens and of every function
+# it can reach, `-` for a case that must run on every build, or `std` for a
+# library case the program's harness never runs. What the source cannot say
+# is hashed here, once per build, into the name of the pass list the keys are
+# looked up in: the two compiler stages (which also write the runtime and the
+# harness), cc, the host, and the conf.id constants. A case whose key is on
+# that list is not run; when no case is left, the harness is neither compiled
+# nor run. A key joins the list only when the harness itself reports its case
+# as passed, so a failing case is never taken for a pass.
+#
+# IDC_NO_CACHE=1 turns this off with the other caches: every case runs.
+CASE_CACHE_DIR="$CACHE_DIR/cases"
+CASE_KEEP="${IDC_CASE_KEYS:-200000}"
+
+# case_cache_global -- the build's part of every case key: see above.
+case_cache_global() {
+    local cc_path
+    {
+        sha256sum < "$IDLEX"
+        sha256sum < "$IDPARSE"
+        printf '%s\0' "$CC" "$(host_triple)" ${CONSTS[@]+"${CONSTS[@]}"}
+        cc_path="$(command -v "$CC" 2>/dev/null)"
+        [ -n "$cc_path" ] && sha256sum < "$cc_path"
+    } | sha256sum | cut -d' ' -f1
+}
+
+# case_plan -- which cases this build still has to run. Sets CASE_FILE (the
+# pass list), CASE_MASK (one character per case, '1' for a case not to run:
+# the harness's $IDTC_SKIP), CASE_HITS (cases skipped because their key has
+# already passed) and CASE_TODO (cases left to run). With the cache off, or a
+# harness with no keys in it -- stage 0's, until it is regenerated -- the mask
+# is empty, which the harness reads as "run everything".
+case_plan() {
+    CASE_FILE="" CASE_MASK="" CASE_HITS=0 CASE_TODO=1
+    [ "$CACHE_ON" -eq 1 ] || return 0
+    grep -q '^// idtc key ' "$HARNESS_C" || return 0
+    CASE_FILE="$CASE_CACHE_DIR/$(case_cache_global)"
+    local total plan
+    total=$(sed -n 's/^#define IDTC_N //p' "$HARNESS_C")
+    plan=$(awk -v n="$total" -v list="$CASE_FILE" '
+        BEGIN { while ((getline line < list) > 0) ok[line] = 1 }
+        /^\/\/ idtc key / {
+            if ($5 == "std") { skip[$4] = 1 }
+            else if ($5 != "-" && ($5 in ok)) { skip[$4] = 1; hits++ }
+            else { todo++ }
+        }
+        END {
+            s = ""
+            for (i = 0; i < n; i++) s = s ((i in skip) ? "1" : "0")
+            print hits + 0, todo + 0, s
+        }' "$HARNESS_C")
+    read -r CASE_HITS CASE_TODO CASE_MASK <<< "$plan"
+    # The mask travels in the environment, where one string may not pass
+    # 128 KiB on Linux; past that, every case runs rather than none starting.
+    [ "${#CASE_MASK}" -gt 100000 ] && CASE_MASK=""
+}
+
+# case_record -- add the key of every case the harness reported as passed
+# ($WORK/passed, which only the harness writes) to CASE_FILE. Called whether
+# or not the run passed as a whole: a case that passed in a failing build
+# still passed. The list is written whole beside itself and renamed over the
+# old one, so a build reading it at the same moment sees one list or the
+# other; the newest CASE_KEEP keys are kept, newest last.
+case_record() {
+    [ -n "$CASE_FILE" ] && [ -s "$WORK/passed" ] || return 0
+    mkdir -p "$CASE_CACHE_DIR" || return 0
+    local tmp="$CASE_FILE.$$.tmp"
+    {
+        [ -f "$CASE_FILE" ] && cat "$CASE_FILE"
+        awk 'FNR == NR { p[$1] = 1; next }
+             /^\/\/ idtc key / && ($4 in p) && $5 != "-" && $5 != "std" { print $5 }' \
+            "$WORK/passed" "$HARNESS_C"
+    } | tac | awk '!seen[$0]++' | head -n "$CASE_KEEP" | tac > "$tmp" && mv -f "$tmp" "$CASE_FILE"
+    rm -f "$tmp"
+    cache_prune "$CASE_CACHE_DIR" "$CACHE_MAX"
+}
+
+# ---------------------------------------------------------------------------
+# Per-unit compilation (UNITS_ON, above). The C idparse writes is, in order:
+# the runtime prelude, the forward declarations, the exported variables, the
+# function definitions -- each file's preceded by its `/* idc unit: PATH */`
+# marker -- and then the main wrapper or, in a harness, the case table from
+# `#define IDTC_N` on. unit_split cuts it into:
+#
+#   idc.h  the prelude, every prototype, and an `extern` for each exported
+#          variable and for each piece of the prelude's own state -- which is
+#          `static` in one translation unit and has to be one object here
+#   u0.c   that state and those variables, defined once
+#   uN.c   the definitions, a run of source files each: a run ends before a
+#          file whose path hashes to 0 modulo IDC_UNIT_FILES (default 16), so
+#          where one ends depends on that file's path alone and adding or
+#          removing a file moves at most its own run's edges. 1 is a unit
+#          per file; but every unit parses idc.h, all the prototypes, so on
+#          the compiler's own tree (1100 files) 16 compiled cold in 2.4 s at
+#          -O2 with four jobs, 4 took 4.4 s, and one whole file 4.3 s
+#   ut.c   the main wrapper, or the case table with every case the harness
+#          will skip (CASE_MASK) cut out, so a build that runs a few cases
+#          compiles a few
+#
+# The prelude's functions stay `static` in idc.h, so every unit can still
+# inline them -- `static inline`, which is what keeps cc from generating all
+# of them in every unit at -O0 (0.35 s a unit on the compiler's harness,
+# against 0.07 s) -- and the two it defines with external linkage (id_alloc,
+# id_store_span, which native backends call) become weak. `list` is the units
+# in link order; `syms` names what was `static` state, which a relocatable
+# object (a program with no main) makes local again after linking.
+unit_split() { # unit_split C_FILE DIR MASK
+    awk -v dir="$2" -v mask="$3" -v g="${IDC_UNIT_FILES:-16}" '
+        function emit(line) { print line > (dir "/" cur) }
+        function begin_unit(name) {
+            cur = name; print "#include \"idc.h\"" > (dir "/" cur); print cur > (dir "/list") }
+        function declname(d,   n) {
+            n = d; sub(/[ \t]*;[ \t]*$/, "", n); sub(/[ \t]*\[.*$/, "", n); match(n, /[A-Za-z_][A-Za-z0-9_]*$/)
+            return substr(n, RSTART, RLENGTH) }
+        function extern_of(line,   d) {
+            d = line; sub(/[ \t]*\/\*.*\*\/[ \t]*$/, "", d); sub(/;[ \t]*$/, "", d); sub(/ = .*$/, "", d)
+            sub(/^static /, "", d); return "extern " d ";" }
+        function phash(s,   i, h) {
+            h = 0; for (i = 1; i <= length(s); i++) h = (h * 31 + ord[substr(s, i, 1)]) % 1000003
+            return h }
+        BEGIN {
+            for (i = 0; i < 256; i++) ord[sprintf("%c", i)] = i
+            h = dir "/idc.h"; st = "pre"; nu = 0; skipping = 0; indef = 0
+            begin_unit("u0.c") }
+        /^\/\/ idtc key / { next }
+        st == "pre" && $0 == "/* forward declarations */" { st = "fwd"; print > h; next }
+        st == "pre" {
+            if ($0 ~ /^#[ \t]*(if|ifdef|ifndef|else|elif|endif)/) { print > h; print > (dir "/u0.c"); next }
+            if ($0 ~ /^static / && $0 !~ /\(/ && $0 ~ /;[ \t]*(\/\*.*\*\/)?[ \t]*$/) {
+                print extern_of($0) > h; d = $0; sub(/^static /, "", d); print d > (dir "/u0.c")
+                print declname(substr(extern_of($0), 8)) > (dir "/syms"); next }
+            if ($0 ~ /^[A-Za-z_].*\) *\{/ && $0 !~ /^(static|typedef)/) { print "__attribute__((weak)) " $0 > h; next }
+            if ($0 ~ /^static [A-Za-z_][^;=]*\) *\{/) { sub(/^static /, "static inline "); print > h; next }
+            print > h; next }
+        st == "fwd" && $0 == "/* exported variables */" { st = "exp"; print > h; next }
+        st == "exp" && $0 == "" { st = "defs"; next }
+        st == "exp" { print extern_of($0) > h; print > (dir "/u0.c"); next }
+        st == "fwd" && $0 !~ /^\/\* idc unit: / && $0 !~ /^[A-Za-z_].*\) *\{$/ { print > h; next }
+        st == "fwd" { st = "defs" }
+        st == "defs" && indef == 0 && /^static [A-Za-z_].*\) *\{$/ {
+            d = $0; sub(/^static /, "", d); proto = d; sub(/ *\{$/, ";", proto); print proto > h
+            print declname(substr(proto, 1, index(proto, "(") - 1)) > (dir "/syms")
+            print d > (dir "/u0.c"); inzero = 1; next }
+        inzero { print > (dir "/u0.c"); if ($0 == "}") inzero = 0; next }
+        st == "defs" && /^\/\* idc unit: .* \*\/$/ {
+            p = $0; sub(/^\/\* idc unit: /, "", p); sub(/ \*\/$/, "", p)
+            if (nu == 0 || phash(p) % g == 0) { nu++; begin_unit("u" nu ".c") }
+            next }
+        st == "defs" && ($0 ~ /^#define IDTC_N / || $0 ~ /^int main\(/) { st = "tail"; begin_unit("ut.c") }
+        st == "defs" {
+            if (nu == 0) { nu = 1; begin_unit("u1.c") }
+            emit($0); next }
+        st == "tail" && skipping { if ($0 == "}") skipping = 0; next }
+        st == "tail" && match($0, /^static int idtc_case_[0-9]+\(int idtc_fd\) \{$/) {
+            k = $0; sub(/^static int idtc_case_/, "", k); sub(/\(.*$/, "", k)
+            if (substr(mask, k + 1, 1) == "1") { skipping = 1; next } }
+        st == "tail" && $0 == "static void idtc_setup(void) {" { insetup = 1 }
+        st == "tail" && insetup && $0 == "}" { insetup = 0 }
+        st == "tail" && insetup && /^    idtc_where\[[0-9]+\] = .* idtc_case\[[0-9]+\] = idtc_case_[0-9]+;$/ {
+            k = $0; sub(/^    idtc_where\[/, "", k); sub(/\].*$/, "", k)
+            if (substr(mask, k + 1, 1) == "1") sub(/idtc_case_[0-9]+;$/, "idtc_case_std_skip;")
+            emit($0); next }
+        st == "tail" { emit($0); next }
+        END { if (st != "defs" && st != "tail") exit 1 }' "$1"
+}
+
+# unit_build C_FILE KIND OUT -- C_FILE through unit_split, each unit compiled
+# at KIND's flags (harness: -O0; program: -O2) into $CACHE_DIR/units, keyed by
+# the unit's own text, idc.h's, cc's identity and the flags, and linked into
+# OUT: an executable (harness, or a program with a main) or a relocatable
+# object. Up to IDC_UNIT_JOBS (default 4) units compile at once, the last
+# listed first: that is the case table or the main wrapper, the one unit that
+# can be as large as all the others together. False on any
+# failure at all, having printed nothing: the caller then compiles C_FILE
+# whole, the way every build did before units, so what a failing build says
+# is exactly what it always said.
+UNIT_CACHE_DIR="$CACHE_DIR/units"
+UNIT_HITS=0
+UNIT_BUILT=0
+unit_build() {
+    local src="$1" kind="$2" out="$3" udir="$WORK/units.$2" opt=-O2 mask=""
+    [ "$kind" = harness ] && { opt=-O0; mask="$CASE_MASK"; }
+    mkdir -p "$udir" "$UNIT_CACHE_DIR" || return 1
+    : > "$udir/syms"
+    unit_split "$src" "$udir" "$mask" || return 1
+    grep -qx '' "$udir/syms" && return 1
+    local ctx cc_path
+    cc_path="$(command -v "$CC" 2>/dev/null)"
+    ctx=$({ sha256sum < "$udir/idc.h"; printf '%s\0' "$CC" -std=c11 "$opt" "$kind"
+            [ -n "$cc_path" ] && sha256sum < "$cc_path"; } | sha256sum | cut -c1-32)
+    local objs=() todo=() u key
+    while read -r key u; do
+        u="${u##*/}"
+        objs+=("$UNIT_CACHE_DIR/$key-$ctx.o")
+        if [ -f "$UNIT_CACHE_DIR/$key-$ctx.o" ]; then
+            touch "$UNIT_CACHE_DIR/$key-$ctx.o"; UNIT_HITS=$((UNIT_HITS + 1))
+        else
+            todo+=("$u $key")
+        fi
+    done < <(cd "$udir" && sha256sum $(cat list))
+    local jobs="${IDC_UNIT_JOBS:-4}" running=0 i="${#todo[@]}" t
+    while [ "$i" -gt 0 ]; do
+        i=$((i - 1))
+        read -r u key <<< "${todo[$i]}"
+        ( capped "$CC" -std=c11 "$opt" -c "$udir/$u" -o "$udir/$u.o" 2>"$udir/$u.err" \
+            && mv -f "$udir/$u.o" "$UNIT_CACHE_DIR/$key-$ctx.o" ) &
+        running=$((running + 1))
+        if [ "$running" -ge "$jobs" ]; then wait -n; running=$((running - 1)); fi
+    done
+    wait
+    for t in ${todo[@]+"${todo[@]}"}; do
+        read -r u key <<< "$t"
+        [ -f "$UNIT_CACHE_DIR/$key-$ctx.o" ] || return 1
+        UNIT_BUILT=$((UNIT_BUILT + 1))
+    done
+    cache_prune "$UNIT_CACHE_DIR" "${IDC_UNIT_ENTRIES:-4000}"
+    # The link is cached too, by the objects' names -- which are their
+    # content -- so a harness whose units and case table are all unchanged
+    # (a build that reruns only its always-run cases) is not relinked.
+    local lkey
+    printf '%s\n' "${objs[@]##*/}" > "$udir/objlist"
+    lkey=$(obj_cache_key "link:$kind:${have_main:--}" "$udir/objlist")
+    obj_cache_get "$lkey" "$out" && return 0
+    if [ "$kind" = harness ]; then
+        capped "$CC" -std=c11 -O0 "${objs[@]}" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$out" -lm ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"} 2>"$udir/link.err" || return 1
+    elif [ "$have_main" -eq 1 ]; then
+        capped "$CC" -std=c11 -O2 "${objs[@]}" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$out" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"} 2>"$udir/link.err" || return 1
+    else
+        command -v objcopy >/dev/null 2>&1 || return 1
+        capped "$CC" -r -nostdlib "${objs[@]}" -o "$udir/out.o" 2>"$udir/link.err" \
+            && objcopy $(sed 's/^/--localize-symbol=/' "$udir/syms") "$udir/out.o" "$out" 2>>"$udir/link.err" || return 1
+    fi
+    obj_cache_put "$lkey" "$out"
+}
+
 # The harness runs every case in a process of its own, with its own time and
 # memory limits, and prints each failure as FILE:LINE. It is built for and run
 # on this machine. A --freestanding build's harness is the same source built
@@ -1652,27 +2309,225 @@ run_cases() {
         echo "idc: this build has $(plural "$n" "test case"), which run on this machine ('$host'), but it is for '$TRIPLE'; build for '$host' to run them" >&2
         exit 1
     fi
-    backends_for harness
-    progress test "$(plural "$n" case)"
-    local hcmd=("$CC" -std=c11 -O0 "$HARNESS_C" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$WORK/harness" -lm ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
-    capped "${hcmd[@]}" 2>"$WORK/harness.err"; hbuild_rc=$?
-    if [ "$hbuild_rc" -ne 0 ]; then
-        progress_clear
-        if mem_ceiling_hit "$hbuild_rc" "$WORK/harness.err"; then
-            mem_ceiling_error "cc (test harness)"
-        else
-            sed 's/^/idc:   /' "$WORK/harness.err" >&2
-            echo "idc: the test harness did not build (command: ${hcmd[*]})" >&2
-        fi
-        exit 1
+    case_plan
+    if [ "$CASE_TODO" -eq 0 ]; then
+        progress test "$(plural "$n" case), all $CASE_HITS already passed"
+        touch "$CASE_FILE" 2>/dev/null
+        return 0
     fi
-    "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err"
+    backends_for harness
+    progress test "$(plural "$n" case) ($CASE_HITS already passed)"
+    # The compile is cached by content (see obj_cache_key); running it is
+    # not -- a hit only skips cc, and the cases below always run for real, so
+    # a build whose cases fail can never come back green because it was
+    # cached.
+    local hkey=""
+    [ "$CACHE_ON" -eq 1 ] && [ "$UNITS_ON" -eq 0 ] && hkey=$(obj_cache_key harness "$HARNESS_C")
+    if [ "$UNITS_ON" -eq 1 ] && unit_build "$HARNESS_C" harness "$WORK/harness"; then
+        :
+    elif [ -z "$hkey" ] || ! obj_cache_get "$hkey" "$WORK/harness"; then
+        local hcmd=("$CC" -std=c11 -O0 "$HARNESS_C" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$WORK/harness" -lm ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
+        capped "${hcmd[@]}" 2>"$WORK/harness.err"; hbuild_rc=$?
+        if [ "$hbuild_rc" -ne 0 ]; then
+            progress_clear
+            if mem_ceiling_hit "$hbuild_rc" "$WORK/harness.err"; then
+                mem_ceiling_error "cc (test harness)"
+            else
+                sed 's/^/idc:   /' "$WORK/harness.err" >&2
+                echo "idc: the test harness did not build (command: ${hcmd[*]})" >&2
+            fi
+            exit 1
+        fi
+        [ -n "$hkey" ] && obj_cache_put "$hkey" "$WORK/harness"
+    fi
+    # Each case enters the root of the tree that owns its function (the
+    # --unit-roots table, emitted into the harness as idtc_dir) before it
+    # runs, so a library's cases read their files from the library however it
+    # is imported. The harness itself starts in the project root, which is
+    # where a case with no entry in that table -- none, in a build whose
+    # idparse writes it -- stays.
+    local case_dir="$PATH_ARG"
+    [ -d "$case_dir" ] || case_dir=$(dirname "$case_dir")
+    : > "$WORK/passed"
+    (cd "$case_dir" && IDTC_SKIP="$CASE_MASK" IDTC_PASSED="$WORK/passed" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err")
     hrc=$?
+    case_record
     [ "$hrc" -eq 0 ] && return 0
     progress_clear
     cat "$WORK/cases.err" >&2
     [ -s "$WORK/cases.err" ] || echo "idc: the test harness stopped (status $hrc) without saying why" >&2
     exit 1
+}
+
+# ---------------------------------------------------------------------------
+# A library's own pre-check: its cases run once, as a check of the library
+# itself, before the program's own harness (run_cases, above) -- a failure
+# there must still fail the build, but reported as the library's, never the
+# program's. One routine (run_lib_precheck, below) does this for any library
+# root: the stdlib (run_std_precheck) and every backend directory that is its
+# own compilation unit and has id code to run (LIB_PRECHECK_DIRS/_UNITS,
+# computed above, once SRC_ROOTS was final).
+#
+# lib_precheck_key ROOT -- keyed by exactly what decides the answer: the two
+# stage binaries (a different compiler could parse or run a case
+# differently), the cc the pre-check itself builds ROOT with
+# (LIB_PRECHECK_CC, below -- never this build's own --cc: see
+# run_lib_precheck), and the content of every file under ROOT (pruned the way
+# collect_ids prunes source: hidden directories and BUILD_DIR are never
+# source, and a library built in place must hash the same as one that was
+# never built). Nothing about the PROGRAM being built is in it, so two
+# different programs against the same library and compiler hit one entry.
+lib_precheck_key() {
+    local root="$1" cc_path
+    {
+        # Redirected (< "$f"), not "$f" as an argument: sha256sum prints the
+        # path it was given alongside the hash, and ROOT's own path is not
+        # part of what determines this answer (a checkout at a different
+        # path, or backends.sh's own fresh mktemp directory every run, must
+        # hit the same entry). $IDLEX/$IDPARSE are exempt: their path is
+        # $CACHE_DIR, fixed for the whole build, so it costs nothing to
+        # include and matches obj_cache_key's own style above.
+        sha256sum "$IDLEX" "$IDPARSE"
+        cc_path="$(command -v "$LIB_PRECHECK_CC" 2>/dev/null)"
+        [ -n "$cc_path" ] && sha256sum < "$cc_path"
+        find "$root" -mindepth 1 \
+             \( -type d -name '.*' -prune \) -o \
+             \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
+             \( -type f -print \) \
+            | LC_ALL=C sort \
+            | while IFS= read -r f; do sha256sum < "$f"; done
+    } | sha256sum | cut -d' ' -f1
+}
+
+# run_lib_precheck ROOT KIND STDARG... -- see the comment above. A miss
+# builds ROOT as its own project (a library with no main, so the output is a
+# discarded .o -- --allow-untested, since whether the library has enough
+# cases is --list-untested's question, not this one) through a SEPARATE
+# binary cache seeded from this build's own idlex/idparse/ccrun/idlayout --
+# so it costs no re-bootstrap -- but with its OWN fe/ and obj/
+# subdirectories, never this build's, which is what keeps a program build's
+# own cache-entry counts exactly what they always were (tests/cache.sh).
+# STDARG... is --std "$STDLIB" for the stdlib itself, or --no-std for a
+# backend directory checked standing alone -- exactly how a --no-std program
+# that imports it directly already has to build (fs's own README/comments:
+# it "still builds on its own, imported by a --no-std program"), so this
+# checks precisely the thing a program depending on it depends on.
+#
+# The library's own validation always builds with plain "cc", never this
+# build's own --cc: a caller's --cc is often a wrapper built to observe or
+# constrain THIS build (tests/backends.sh's cc-invocation loggers are
+# exactly that), and a library's own correctness is a property of the
+# library, not of whichever such wrapper happens to be in scope. A real
+# cross-cc concern (does the library also build clean under the triple's
+# actual toolchain) is a different question from "do its cases pass," which
+# is all this answers.
+#
+# IDC_BUILDING_LIB_PRECHECK marks the recursive build so it never triggers a
+# pre-check of its own (a backend nested inside another backend, or inside
+# the stdlib this same call is checking) -- the same reasoning run_std_precheck
+# already applied to itself before this generalised, now shared by both.
+LIB_PRECHECK_CC=cc
+run_lib_precheck() {
+    local root="$1" kind="$2"; shift 2
+    local key="" entry=""
+    if [ "$CACHE_ON" -eq 1 ]; then
+        key=$(lib_precheck_key "$root")
+        entry="$STD_PRECHECK_DIR/$key"
+        if [ -f "$entry/rc" ]; then
+            touch "$entry"
+            [ "$(cat "$entry/rc")" -eq 0 ] && return 0
+            progress_clear
+            echo "idc: the $kind at $root failed its own test cases (this is not an error in your program):" >&2
+            cat "$entry/out" >&2
+            exit 1
+        fi
+    fi
+
+    progress lib "$root"
+    # idlex0/idparse0 copied first, idlex/idparse last: bin/idc rebuilds
+    # stage 1 from stage 0 whenever stage 0's mtime is newer than stage 1's
+    # (the bootstrap section, above), so copying stage 1 first would leave
+    # stage 0 the newer file by a few milliseconds and force a real
+    # stage-0-only rebuild here -- one the OLD, frozen stage 0 runs every
+    # case with, none of this file's narrowing included.
+    local inner_cache="$STD_PRECHECK_DIR/.bincache" f
+    mkdir -p "$inner_cache"
+    for f in idlex0 idparse0 ccrun idlayout idlex idparse; do
+        if [ -x "$CACHE_DIR/$f" ]; then
+            cp "$CACHE_DIR/$f" "$inner_cache/$f" 2>/dev/null && chmod +x "$inner_cache/$f"
+        fi
+    done
+
+    local lib_work out rc
+    lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
+    out="$lib_work/out"
+    IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 \
+        "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
+        >"$out" 2>&1
+    rc=$?
+    progress_clear
+
+    if [ "$CACHE_ON" -eq 1 ]; then
+        mkdir -p "$lib_work/entry"
+        cp "$out" "$lib_work/entry/out"
+        printf '%s\n' "$rc" > "$lib_work/entry/rc"
+        mkdir -p "$STD_PRECHECK_DIR"
+        rm -rf "$entry"
+        mv -f "$lib_work/entry" "$entry"
+        cache_prune "$STD_PRECHECK_DIR" "$CACHE_MAX"
+    fi
+
+    if [ "$rc" -ne 0 ]; then
+        echo "idc: the $kind at $root failed its own test cases (this is not an error in your program):" >&2
+        cat "$out" >&2
+        rm -rf "$lib_work"
+        exit 1
+    fi
+    rm -rf "$lib_work"
+}
+
+# run_std_precheck -- the stdlib through run_lib_precheck, above. Skipped for
+# --no-std/IDC_NO_STD (STDLIB is then ""), for the bootstrap's own re-entries
+# and tool builds (IDC_STAGE_LEX, IDC_BUILDING_CCRUN, IDC_BUILDING_IDLAYOUT),
+# for a nested library pre-check (IDC_BUILDING_LIB_PRECHECK), and when
+# PATH_ARG already IS the library: that build runs every one of its own
+# cases as itself (see STD_UNIT_START's comment, above), which this would
+# only repeat. --std "$STDLIB" pins the recursive build to exactly the
+# library this pre-check is of -- never IDSTD_HOME or a sibling idstd/,
+# which could name a different directory than --std/$IDSTD_HOME resolved
+# this build to and would otherwise merge a second, unrelated library into
+# the one under test (and recurse into a pre-check of THAT one, of
+# PATH_ARG=STDLIB again).
+run_std_precheck() {
+    [ -z "$STDLIB" ] && return 0
+    [ -n "${IDC_STAGE_LEX:-}" ] && return 0
+    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
+    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
+    [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
+    local path_key=""
+    [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
+    [ "$path_key" = "$STDLIB" ] && return 0
+    run_lib_precheck "$STDLIB" "standard library" --std "$STDLIB"
+}
+
+# run_backend_prechecks -- every LIB_PRECHECK_DIRS entry through
+# run_lib_precheck, above, standing alone (--no-std): a backend directory
+# has no conf.id of its own (Native backends, below -- backend.id is link
+# facts, not a dependency manifest), so it either builds on its own or it
+# does not, exactly as a --no-std program importing it directly finds out
+# today. Skipped for the same re-entries and tool builds run_std_precheck
+# skips, and for whichever of LIB_PRECHECK_DIRS PATH_ARG already IS.
+run_backend_prechecks() {
+    [ -n "${IDC_STAGE_LEX:-}" ] && return 0
+    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
+    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
+    [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
+    local path_key="" i
+    [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
+    for i in "${!LIB_PRECHECK_DIRS[@]}"; do
+        [ "${LIB_PRECHECK_DIRS[$i]}" = "$path_key" ] && continue
+        run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std
+    done
 }
 
 split_harness
@@ -1685,11 +2540,14 @@ fi
 # refusal to run that build's cases here (run_cases) would otherwise hide it,
 # and the standard library always has cases. So the program's natives are
 # checked first -- backend.id files read, nothing compiled, so what is built
-# and in what order does not change. --emit-c writes C and links nothing, and
-# the LLVM target links no backend, so neither asks.
+# and in what order does not change. --emit-c writes C and links nothing, so
+# it does not ask; the LLVM target asks the same question its own way, in its
+# own branch below (backends_for_program), once it knows have_main.
 if [ "$TARGET" = c ] && [ -z "$EMIT_C" ] && grep -q '^int main(' "$C_OUT"; then
     backends_for program check
 fi
+run_std_precheck
+run_backend_prechecks
 run_cases
 
 # The output path, chosen the same way whichever target produced the code:
@@ -1791,15 +2649,21 @@ if [ "$TARGET" = llvm ]; then
     have_main=0
     grep -q '^define i32 @main(' "$LL_OUT" && have_main=1
     choose_output
+    # The backends the program's reached natives need, same as the C target
+    # (backends_for_program, above): built now, from this same $TRIPLE and
+    # $PLATKEY_BUILD, and linked into the same clang invocation below.
+    backends_for_program
     RT_C="$WORK/runtime.c"
-    printf '' | capped "$IDLEX" | capped "$IDPARSE" --target crt > "$RT_C" || {
+    RT_LEX_OUT="$WORK/runtime_lex.out"
+    capped "$IDLEX" < /dev/null > "$RT_LEX_OUT" \
+        && capped_from "$RT_LEX_OUT" "$IDPARSE" --target crt > "$RT_C" || {
         progress_clear; echo "idc: could not obtain the C runtime from idparse" >&2; exit 1; }
 
     LLVM_CC=clang
     command -v clang >/dev/null 2>&1 || LLVM_CC="$CC"
     cmd=("$LLVM_CC" -O2 -Wno-override-module)
     [ "$have_main" -eq 0 ] && cmd+=(-c "$LL_OUT") || cmd+=("$RT_C" "$LL_OUT")
-    cmd+=(-o "$OUT")
+    cmd+=(${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$OUT" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
 
     progress link "clang -> $(basename "$OUT")"
     capped "${cmd[@]}" 2>"$WORK/clang.err"; cmd_rc=$?
@@ -1840,10 +2704,12 @@ if [ "$syntax_rc" -ne 0 ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# --emit-c: write the generated C and stop (matches idc.py --emit-c)
+# --emit-c: write the generated C and stop (matches idc.py --emit-c). The unit
+# markers are the driver's business, not the program's: without them the file
+# is byte for byte what a build without --units writes.
 if [ -n "$EMIT_C" ]; then
     progress_done "wrote $EMIT_C ($(plural "${#SRC_FILES[@]}" "source file"))"
-    cp "$C_OUT" "$EMIT_C" || exit 1
+    sed '/^\/\* idc unit: .* \*\/$/d' "$C_OUT" > "$EMIT_C" || exit 1
     echo "wrote $EMIT_C"
     exit_ok
 fi
@@ -1925,10 +2791,20 @@ if [ "$TARGET" = wasm ]; then
         exit 1
     fi
 
+    # A program with a main is a WASI command -- _start runs it, as wasmtime
+    # does -- and one without is a reactor whose functions a host calls, the
+    # same split the C target makes between an executable and a .o.
+    wcrt="$IDC_WASI_LIBDIR/crt1-reactor.o"
+    wentry=(-Wl,--no-entry "${WEXPORT_FLAGS[@]}")
+    if grep -q '^int main(' "$C_OUT"; then
+        wcrt="$IDC_WASI_LIBDIR/crt1-command.o"
+        wentry=()
+    fi
+
     progress link "wasm-ld -> $(basename "$WOUT")"
     lcmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -nostdlib "$WORK/out.o"
-          "$IDC_WASI_LIBDIR/crt1-reactor.o" -L"$IDC_WASI_LIBDIR" -lc "$IDC_WASI_COMPILER_RT"
-          -Wl,--no-entry -Wl,--gc-sections "${WEXPORT_FLAGS[@]}" -o "$WOUT")
+          "$wcrt" -L"$IDC_WASI_LIBDIR" -lc "$IDC_WASI_COMPILER_RT"
+          -Wl,--gc-sections ${wentry[@]+"${wentry[@]}"} -o "$WOUT")
     capped "${lcmd[@]}" 2>"$WORK/wasild.err"; wld_rc=$?
     [ "$KEEP_C" -eq 1 ] || rm -f "$c_path"
     if [ "$wld_rc" -ne 0 ]; then
@@ -1955,20 +2831,11 @@ grep -q '^int main(' "$C_OUT" && have_main=1
 choose_output
 
 # ---------------------------------------------------------------------------
-# The backends the program's reached natives need (backends_for, above), built
-# if the test harness has not already built them. A .o is not the whole
-# program: what its natives need is linked into whatever links it, so it is
-# named only when some function the object keeps calls one.
-LINK_OBJS=()
-LINK_FLAGS=()
-if [ "$have_main" -eq 0 ]; then
-    if grep -q '^program|' "$NATIVES"; then
-        echo "idc: backend(s) ignored: this project has no main (builds to a .o);" \
-             "link the backend into the final program" >&2
-    fi
-else
-    backends_for program
-fi
+# The backends the program's reached natives need (backends_for_program,
+# above), built if the test harness has not already built them. A .o is not
+# the whole program: what its natives need is linked into whatever links it,
+# so it is named only when some function the object keeps calls one.
+backends_for_program
 
 # ---------------------------------------------------------------------------
 # hand the emitted C to cc (mirrors idc.py's build_c)
@@ -1995,13 +2862,27 @@ if [ "$CC_EXPLICIT" -eq 0 ] && [ "$PLATKEY_BUILD" != "$HOSTPLAT" ]; then
     exit 1
 fi
 
-cmd=("$CC")
-[ "$have_main" -eq 0 ] && cmd+=("-c")
-cmd+=("-std=c11" "-O2" "$c_path" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} "-o" "$OUT" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
+# Cached the same way the test harness is (see obj_cache_key/run_cases): the
+# key folds in whether this is a -c compile (the tag names have_main), so it
+# cannot be reused across a change in that shape even from identical C.
+PROG_KEY=""
+[ "$CACHE_ON" -eq 1 ] && PROG_KEY=$(obj_cache_key "program:$have_main" "$c_path")
+if [ -n "$PROG_KEY" ] && obj_cache_get "$PROG_KEY" "$OUT"; then
+    cc_rc=0
+else
+    cmd=("$CC")
+    [ "$have_main" -eq 0 ] && cmd+=("-c")
+    cmd+=("-std=c11" "-O2" "$c_path" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} "-o" "$OUT" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
 
-progress link "cc -> $(basename "$OUT")"
-capped "${cmd[@]}" 2>"$WORK/cc.err"
-cc_rc=$?
+    progress link "cc -> $(basename "$OUT")"
+    if [ "$UNITS_ON" -eq 1 ] && unit_build "$c_path" program "$OUT"; then
+        cc_rc=0
+    else
+        capped "${cmd[@]}" 2>"$WORK/cc.err"
+        cc_rc=$?
+    fi
+    [ "$cc_rc" -eq 0 ] && [ -n "$PROG_KEY" ] && obj_cache_put "$PROG_KEY" "$OUT"
+fi
 
 [ "$KEEP_C" -eq 1 ] || rm -f "$c_path"
 for o in "${BACKEND_OBJS[@]}"; do rm -f "$o"; done
@@ -2027,5 +2908,7 @@ if [ "$cc_rc" -ne 0 ]; then
     echo "idc: symbols, which would be a bug in the self-hosted compiler worth reporting." >&2
     exit 1
 fi
-progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
+UNIT_NOTE=""
+[ $((UNIT_BUILT + UNIT_HITS)) -gt 0 ] && UNIT_NOTE=", $UNIT_BUILT of $((UNIT_BUILT + UNIT_HITS)) units compiled"
+progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file")$UNIT_NOTE)"
 exit_ok

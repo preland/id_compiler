@@ -1,18 +1,23 @@
-// `native` declarations, as LLVM declarations with their real types. The
-// backend's object file defines them; the module only has to agree with it
-// about the signature, which is the id signature spelled the way every
-// defined function's is.
-
-ll_natives() {
-  int i = 0;
-  while(i < len((import prog))) {
-    if(is_native((import prog)[i]) == 1) {
-      string ndecl = ll_native_decl((import prog)[i]);
-      emit_line(ndecl);
-    }
-    i = i + 1;
-  }
+// A real native in `prog` (nat_id0, "getter"), for ll_declares' own folded
+// natives loop (../../mod/sect/decl.id) -- rtc left at 0, ll_decl_block's own
+// side of that fixture (ll_env_fixture2's).
+ll_natives_fixture2() {
+  ll_env_fixture2();
+  ll_native_fixture();
+  push((import prog), (import nat_id0));
 } return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The `--runtime` side of the same fixture: rtc set, so ll_decl_block does
+// not run, and ll_declares' folded natives loop is the only source of output.
+ll_natives_fixture3() {
+  ll_env_fixture3();
+  ll_native_fixture();
+  push((import prog), (import nat_id0));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
 
 ll_native_decl(int id) {
   string s2_of_v = s2_of(id);

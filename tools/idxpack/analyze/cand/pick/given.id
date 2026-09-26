@@ -1,0 +1,80 @@
+// Every zero-parameter void function in the build whose transitive call
+// closure (analyze/graph/bfs.id) reaches every name in `required`, AND is
+// itself runnable (pick/runnable.id's fix 1: no unmet requirement of its
+// own) -- the legal `given` setups for a case that needs `required`
+// initialised. Computed backward (rev/build.id's CSR, rev/reach.id's
+// per-declarer BFS intersected, runnable.id's own-requirement mask) instead
+// of a fresh forward BFS per candidate, which is what made this O(F) BFS
+// runs deep for F candidates.
+find_givens(string[] required) {
+  int fcount = len((import ix_fn));
+  int[] counts = rev_counts(fcount);
+  int[] offs = rev_prefix(counts, fcount);
+} chain (string[] required) {
+  int[] flat = rev_flat(offs, fcount);
+  int[] reach_ok = rev_reach_all(required, offs, flat, fcount);
+  int[] runnable = runnable_mask(offs, flat, fcount);
+} chain (string[] required) {
+  int[] zvoid = [];
+  int zi = 0;
+  while(zi < fcount) {
+    int zv = is_zero_void((import ix_fn)[zi]);
+    push(zvoid, zv);
+    zi = zi + 1;
+  }
+} chain (string[] required) {
+  string[] out_li = [];
+  int oi = 0;
+  while(oi < fcount) {
+    if(reach_ok[oi] == 1 && zvoid[oi] == 1 && runnable[oi] == 1) {
+      push(out_li, (import ix_fn)[oi]);
+    }
+    oi = oi + 1;
+  }
+} return string[] out_li;
+given ix_export_fixture (["setter"]):(["setter"])
+given ix_export_fixture (["nope"]):([])
+given rev_edge_fixture (["q"]):(["p", "q"])
+given rev_edge_fixture (["p"]):(["p"])
+given unmet_req_fixture ([]):(["d"])
+given unmet_req_fixture (["b"]):([])
+
+// Does `candidate`'s own transitive call closure include every name in
+// `required`? Reuses the same backward machinery find_givens does (a
+// single-candidate membership test against rev_reach_all's intersected
+// set) rather than its own forward BFS, so the two never disagree on what
+// "reaches" means.
+given_reaches(string candidate, string[] required) {
+  int fcount = len((import ix_fn));
+  int[] counts = rev_counts(fcount);
+  int[] offs = rev_prefix(counts, fcount);
+} chain (string candidate, string[] required) {
+  int[] flat = rev_flat(offs, fcount);
+  int[] reach_ok = rev_reach_all(required, offs, flat, fcount);
+  int cidx = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), candidate, -1);
+} chain (string candidate, string[] required) {
+  int out_i = 0;
+  if(cidx >= 0 && reach_ok[cidx] == 1) {
+    out_i = 1;
+  }
+} return int out_i;
+given ix_export_fixture ("setter", ["setter"]):(1)
+given ix_export_fixture ("setter", ["nope"]):(0)
+given rev_edge_fixture ("q", ["p"]):(0)
+given rev_edge_fixture ("p", ["q"]):(1)
+
+// Zero parameters (the header line's "NAME()") and a `void` return (the
+// function's own "} return void" line, found by joining its body once
+// rather than scanning line by line for the one clause that has it).
+is_zero_void(string name) {
+  string[] body = func_body_lines(name);
+  int out_i = 0;
+  if(len(body) >= 1 && str_find(body[0], "()") >= 0) {
+    string joined = str_join(body, "\n");
+    if(str_find(joined, "} return void") >= 0) {
+      out_i = 1;
+    }
+  }
+} return int out_i;
+given ix_export_fixture ("setter"):(1)
+given ix_import_fixture ("r"):(0)

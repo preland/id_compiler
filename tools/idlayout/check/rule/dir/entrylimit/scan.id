@@ -1,0 +1,34 @@
+// One directory's own listing, counted: lay_count_all resets
+// lay_scratch_names and walks buf once, pushing every counted entry's name
+// (count.id); lay_check_entrylimit then reads that list back, and, over the
+// limit, reports it with its own members named so the user sees what to
+// split -- bin/idc's check_entry_limit reported only the count.
+
+lay_count_one(int[] buf, string build, int is_root, int at) {
+  int end = lay_eol(buf, at);
+  lay_count_check(buf, at, end, build, is_root);
+  int next = end + 1;
+} return int next;
+given lay_scratch_reset ([97, 46, 105, 100, 10], "build", 0, 0):(5) then lay_scratch_len:(1)
+given lay_scratch_reset ([46, 103, 105, 116, 47, 10], "build", 1, 0):(6) then lay_scratch_len:(0)
+
+lay_count_all(int[] buf, string build, int is_root) {
+  lay_scratch_reset();
+  int at = 0;
+  while(at < len(buf)) {
+    at = lay_count_one(buf, build, is_root, at);
+  }
+} return void;
+([97, 46, 105, 100, 10], "build", 0):() then lay_scratch_len:(1)
+([], "build", 0):() then lay_scratch_len:(0)
+
+lay_check_entrylimit(string dir) {
+  int total = len((import lay_scratch_names));
+  if(total > 3) {
+    string list = str_join((import lay_scratch_names), ", ");
+    string msg = lay_msg(dir, "a project directory may contain at most 3 files and directories combined, but this one has " + total + " (.id files and subdirectories); split it into subdirectories (entries: " + list + ")");
+    push((import lay_hit_entry), msg);
+  }
+} return void;
+given lay_fixture_over ("d"):() then lay_report:(1)
+given lay_fixture_under ("d"):() then lay_report:(0)

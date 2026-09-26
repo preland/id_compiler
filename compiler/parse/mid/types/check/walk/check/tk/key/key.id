@@ -1,0 +1,39 @@
+// One function's key: its run's tokens (the digest's own hash of them,
+// mid/form/unique/dump/digest/graph/hash/), the units of it and of the
+// function before it, and what every name among those tokens means
+// (mean.id). "" when the run names an asm routine.
+
+tk_key(int tkf) {
+  int tkfrom = tk_from(tkf);
+  int tkto = (import ptoke)[tkf];
+  word[] tkacc = [0, 0];
+} chain (int tkf) {
+  tkacc[0] = dg_mix(dg_tokhash(tkfrom, tkto), tk_units(tkf));
+  tk_names(tkacc, tkf, tkfrom, tkto);
+  string tkk = "";
+} chain (int tkf) {
+  if(tkacc[1] == 0) {
+    tkk = "" + tkacc[0];
+  }
+} return string tkk;
+given tk_t_prep (0):("4208351378666089285")
+given tk_t_prep (1):("-8648083975898962277")
+
+tk_names(word[] tkacc, int tkf, int tkfrom, int tkto) {
+  while(tkfrom < tkto) {
+    if((import tkind)[tkfrom] == "ident") {
+      tk_name(tkacc, tkf, (import ttext)[tkfrom]);
+    }
+    tkfrom = tkfrom + 1;
+  }
+} return void;
+given tk_t_prep ([0, 0], 0, 0, 0):([0, 0])
+given tk_t_prep ([0, 0], 1, 41, 42):([-2702843519264158902, 0])
+
+tk_name(word[] tkacc, int tkf, string name) {
+  string tkm = tk_meaning(name, tkf);
+  tkacc[0] = dg_mix(tkacc[0], dg_fnv(0, tkm));
+  tkacc[1] = tkacc[1] + tk_is_asm(name);
+} return void;
+given tk_t_prep ([0, 0], 1, "fa"):([-2702843519264158902, 0])
+given tk_t_asm ([0, 0], 1, "foo"):([-5552716542499430389, 1])

@@ -1,38 +1,62 @@
 
-// Close an if: emit the else arm only when there is one (a non-empty else
-// list), matching idc.py which omits `else` for a plain `if`.
+// A declaration cannot sit between a branch's closing `}` and its `} else
+// if (`, so every condition of an if / else-if chain is emitted -- and its
+// units' declarations printed, as a side effect of emit_expr -- before the
+// chain's first line. collect_chain walks the chain of `if` nodes (an else
+// arm holding exactly one `if` continues it); seq_conds then computes each
+// condition's text, in order, before any of it is rendered.
 
-end_if(int id, string ind) {
-  if(i2_of(id) > 0) {
-    else_arm(id, ind);
-  } else {
+collect_chain(int id) {
+  int[] if_ids = [id];
+  int cur_id = id;
+  while(i2_of(cur_id) == 1) {
+    int[] elsel = l2_of(cur_id);
+    cur_id = elsel[0];
+    push(if_ids, cur_id);
+  }
+} return int[] if_ids;
+given stmt_fix (4):([4])
+given stmt_fix (3):([3])
+
+seq_conds(int[] if_ids) {
+  string[] cond_texts = [];
+  int i = 0;
+  while(i < len(if_ids)) {
+    string cond_text = cond_text_of(if_ids[i]);
+    push(cond_texts, cond_text);
+    i = i + 1;
+  }
+} return string[] cond_texts;
+given stmt_fix ([4]):(["5"])
+given stmt_fix ([]):([])
+
+// Render one level of the chain, using its precomputed condition text rather
+// than computing it here: computing it here, for an else-if, would run at
+// this level's own position in the output -- between the previous branch's
+// `}` and this `} else if (`, which is exactly the position a declaration
+// may not sit in.
+render_chain(int[] if_ids, string[] cond_texts, int lvl, string ind) {
+  string cond_text = cond_texts[lvl];
+  int cur_id = if_ids[lvl];
+  int[] l1_of_v = l1_of(cur_id);
+} chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
+  string head = ind + "if (";
+  if(lvl > 0) {
+    head = ind + "} else if (";
+  }
+  emit_line(head + cond_text + ") {");
+} chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
+  emit_block(l1_of_v, ind + "    ");
+  int has_else = i2_of(cur_id);
+  int next_k = lvl + 1;
+} chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
+  if(has_else == 0) {
     emit_line(ind + "}");
-  }
-} return void;
-given stmt_fix (4, ""):() then prints:("}\n")
-given stmt_fix (4, "  "):() then prints:("  }\n")
-
-// An else arm holding exactly one if is an `else if`. idc.py emits those by
-// splicing the nested if's opening line onto this one, so the chain stays
-// flat in the generated C instead of nesting a block per level -- matching
-// that byte for byte is the whole point.
-else_arm(int id, string ind) {
-  int[] elsel = l2_of(id);
-  if(i2_of(id) == 1) {
-    emit_if_at(elsel[0], ind, ind + "} else if (");
+  } else if(has_else == 1) {
+    render_chain(if_ids, cond_texts, next_k, ind);
   } else {
-    emit_else(id, ind);
+    emit_else(cur_id, ind);
   }
 } return void;
-given stmt_fix (4, ""):() then prints:("} else {\n}\n")
-given stmt_fix (3, "  "):() then prints:("  } else {\n  }\n")
-
-// The body of an if, with its opening text supplied by the caller so that the
-// `if (` and `} else if (` forms share one implementation.
-emit_if_at(int id, string ind, string head) {
-  int i1_of_v = i1_of(id);
-  string emit_expr_v = emit_expr(i1_of_v);
-  emit_if_head(id, ind, head, emit_expr_v);
-} return void;
-given stmt_fix (4, "", "if ("):() then prints:("if (5) {\n}\n")
-given stmt_fix (3, "  ", "if ("):() then prints:("if (5) {\n  }\n")
+given stmt_fix ([4], ["5"], 0, ""):() then prints:("if (5) {\n}\n")
+given stmt_fix ([4], ["5"], 0, "  "):() then prints:("  if (5) {\n  }\n")

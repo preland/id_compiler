@@ -1,0 +1,55 @@
+// What a node itself contributes to its sequencing need.
+//
+// Only a unit has to be ordered against the rest of an expression: a call
+// (anything may happen in it), an index (it reads a list a call can change,
+// and it traps), an import (it reads a global a call can export again), a
+// division that can trap, and an `&&` or `||`. Everything else is pure: a
+// local or a parameter cannot be reassigned by a callee, and the remaining
+// operators neither trap nor read shared state. So sequencing the units
+// alone is enough for docs/SPEC.md 7.
+//
+// An `&&` or `||` is sequenced as one unit and never looked into: its right
+// operand may not run before, or without, its left, so it is emitted as C's
+// own short-circuit and each operand is sequenced by itself.
+
+seqk(int id) {
+  int sk = 0;
+  if(is_seqd(id) == 0) {
+    int[] sq_kids = seq_kids(id);
+    sk = seq_fold(sq_kids);
+    sk = seq_own(id, sk);
+  }
+} return int sk;
+given sq_fixture ((import sq_two)):(2)
+given sq_fixture ((import sq_one)):(1)
+given sq_fixture ((import nz_int)):(0)
+given sq_fixture ((import sq_and)):(1)
+given sq_marked ((import sq_two)):(1)
+
+seq_own(int id, int sk) {
+  int sk_n = sk;
+  if(sk_n == 0 && is_unit(id) == 1) {
+    sk_n = 1;
+  }
+  if(is_logic(id) == 1) {
+    sk_n = 1;
+  }
+} return int sk_n;
+given sq_fixture ((import nz_call_foo), 0):(1)
+given sq_fixture ((import sq_and), 2):(1)
+given sq_fixture ((import nz_int), 0):(0)
+given sq_fixture ((import sq_two), 2):(2)
+
+is_unit(int id) {
+  int ok = div_traps(id);
+  if(k_of(id) == "call" || k_of(id) == "index" || k_of(id) == "import") {
+    ok = 1;
+  } else if(is_logic(id) == 1) {
+    ok = 1;
+  }
+} return int ok;
+given sq_fixture ((import nz_call_foo)):(1)
+given sq_fixture ((import nz_int)):(0)
+given sq_fixture ((import sq_mod)):(1)
+given sq_fixture ((import sq_div3)):(0)
+given sq_fixture ((import sq_and)):(1)

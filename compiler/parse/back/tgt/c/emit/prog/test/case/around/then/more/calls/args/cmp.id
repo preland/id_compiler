@@ -1,7 +1,12 @@
-// One column's comparison (build.id), and the search loop over NAME's
-// recorded rows: the first one at or after idtc_seek that matches every
-// column, or a failure naming how many calls to NAME were recorded at all
-// (docs/TESTS.md allows the count in place of showing each one).
+// One column's comparison (build.id) and display (../dispatch.id's
+// calls_row_show), and the search loop over NAME's recorded rows: the first
+// one after idtc_seek that matches every column. A miss shows the calls it was
+// compared against, written the way the clause is, because a count alone left
+// case writers trapping on purpose to learn the real arguments. The calls an
+// earlier clause's match put out of reach are listed apart from the ones that
+// could still have matched; when calls went uncaptured (the IDTC_REC_MAX
+// bound, test/unit/more/rec/scan/prelude.id), the miss also says the
+// recording overflowed: the match may be among them.
 
 calls_row_cmp(string nm, int ti, string pt, string fld, int item, string out) {
   string code = "idtc_rc_" + nm + "_buf[idtc_j" + ti + "]." + fld;
@@ -11,8 +16,19 @@ calls_row_cmp(string nm, int ti, string pt, string fld, int item, string out) {
 given fn_fixture ("f", 0, "int", "x", (import fixture_zero), "1"):("1 && (idtc_rc_f_buf[idtc_j0].x == 0)")
 given fn_fixture ("g", 2, "int", "y", (import fixture_zero), "0"):("0 && (idtc_rc_g_buf[idtc_j2].y == 0)")
 
-emit_calls_args_emit(int ci, int ti, string nm, string rowcond) {
-  emit_line("    int idtc_hit" + ti + " = 0;\n    for (int idtc_j" + ti + " = 0; idtc_j" + ti + " < idtc_rc_" + nm + "_n; idtc_j" + ti + "++) {\n        if (idtc_rc_" + nm + "_seq[idtc_j" + ti + "] > idtc_seek && (" + rowcond + ")) {\n            idtc_hit" + ti + " = 1;\n            idtc_seek = idtc_rc_" + nm + "_seq[idtc_j" + ti + "];\n            break;\n        }\n    }\n    if (!idtc_hit" + ti + ") {\n        fprintf(stderr, \"%s: test failed: %s calls " + nm + "(...) did not match; %d call(s) to '" + nm + "' were recorded\\n\", idtc_where[" + ci + "], idtc_call[" + ci + "], idtc_rc_" + nm + "_n);\n        return 3;\n    }");
+
+emit_calls_args_emit(int ci, int ti, string nm, string rowcond, string rowshow, int[] items) {
+  string et = items_text(items);
+  string extext = c_esc(nm + "(" + et + ")");
+  emit_line("    int idtc_hit" + ti + " = 0;\n    for (int idtc_j" + ti + " = 0; idtc_j" + ti + " < idtc_rc_" + nm + "_kept; idtc_j" + ti + "++) {\n        if (idtc_rc_" + nm + "_seq[idtc_j" + ti + "] > idtc_seek && (" + rowcond + ")) {\n            idtc_hit" + ti + " = 1;\n            idtc_seek = idtc_rc_" + nm + "_seq[idtc_j" + ti + "];\n            break;\n        }\n    }\n    if (!idtc_hit" + ti + ") {\n        int idtc_sk" + ti + " = idtc_calls_skipped(idtc_rc_" + nm + "_seq, idtc_rc_" + nm + "_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to '" + nm + "'%s\", idtc_where[" + ci + "], idtc_call[" + ci + "], \"" + extext + "\", idtc_rc_" + nm + "_kept - idtc_sk" + ti + ", idtc_sk" + ti + " ? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k" + ti + " = 0; idtc_k" + ti + " < idtc_rc_" + nm + "_kept; idtc_k" + ti + "++) {\n            int idtc_j" + ti + " = (idtc_k" + ti + " + idtc_sk" + ti + ") % idtc_rc_" + nm + "_kept;\n            if (idtc_calls_item(idtc_k" + ti + ", idtc_rc_" + nm + "_kept, idtc_sk" + ti + ")) { " + rowshow + "fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_" + nm + "_n, idtc_rc_" + nm + "_kept);\n        return 3;\n    }");
 } return void;
-(0, 0, "f", "1"):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_f_n; idtc_j0++) {\n        if (idtc_rc_f_seq[idtc_j0] > idtc_seek && (1)) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_f_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        fprintf(stderr, \"%s: test failed: %s calls f(...) did not match; %d call(s) to 'f' were recorded\\n\", idtc_where[0], idtc_call[0], idtc_rc_f_n);\n        return 3;\n    }\n")
-(1, 2, "g", "0"):() then prints:("    int idtc_hit2 = 0;\n    for (int idtc_j2 = 0; idtc_j2 < idtc_rc_g_n; idtc_j2++) {\n        if (idtc_rc_g_seq[idtc_j2] > idtc_seek && (0)) {\n            idtc_hit2 = 1;\n            idtc_seek = idtc_rc_g_seq[idtc_j2];\n            break;\n        }\n    }\n    if (!idtc_hit2) {\n        fprintf(stderr, \"%s: test failed: %s calls g(...) did not match; %d call(s) to 'g' were recorded\\n\", idtc_where[1], idtc_call[1], idtc_rc_g_n);\n        return 3;\n    }\n")
+(0, 0, "f", "1", "fputs(\"f(\", stderr); ", []):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_f_kept; idtc_j0++) {\n        if (idtc_rc_f_seq[idtc_j0] > idtc_seek && (1)) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_f_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        int idtc_sk0 = idtc_calls_skipped(idtc_rc_f_seq, idtc_rc_f_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to 'f'%s\", idtc_where[0], idtc_call[0], \"f()\", idtc_rc_f_kept - idtc_sk0, idtc_sk0 ? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k0 = 0; idtc_k0 < idtc_rc_f_kept; idtc_k0++) {\n            int idtc_j0 = (idtc_k0 + idtc_sk0) % idtc_rc_f_kept;\n            if (idtc_calls_item(idtc_k0, idtc_rc_f_kept, idtc_sk0)) { fputs(\"f(\", stderr); fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_f_n, idtc_rc_f_kept);\n        return 3;\n    }\n")
+(1, 2, "g", "0", "fputs(\"g(\", stderr); ", []):() then prints:("    int idtc_hit2 = 0;\n    for (int idtc_j2 = 0; idtc_j2 < idtc_rc_g_kept; idtc_j2++) {\n        if (idtc_rc_g_seq[idtc_j2] > idtc_seek && (0)) {\n            idtc_hit2 = 1;\n            idtc_seek = idtc_rc_g_seq[idtc_j2];\n            break;\n        }\n    }\n    if (!idtc_hit2) {\n        int idtc_sk2 = idtc_calls_skipped(idtc_rc_g_seq, idtc_rc_g_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to 'g'%s\", idtc_where[1], idtc_call[1], \"g()\", idtc_rc_g_kept - idtc_sk2, idtc_sk2 ? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k2 = 0; idtc_k2 < idtc_rc_g_kept; idtc_k2++) {\n            int idtc_j2 = (idtc_k2 + idtc_sk2) % idtc_rc_g_kept;\n            if (idtc_calls_item(idtc_k2, idtc_rc_g_kept, idtc_sk2)) { fputs(\"g(\", stderr); fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_g_n, idtc_rc_g_kept);\n        return 3;\n    }\n")
+
+calls_show_step(string nm, int ti, int[] params, string out, int i) {
+  string pt = s1_of(params[i]);
+  string code = "idtc_rc_" + nm + "_buf[idtc_j" + ti + "]." + s2_of(params[i]);
+  string so = out + show_sep(i) + tc_show(code, pt) + " ";
+} return string so;
+given calls_items_fixture ("f", 0, (import fixture_params), "", 0):("fprintf(stderr, \"%d\", idtc_rc_f_buf[idtc_j0].x); ")
+given calls_items_fixture ("g", 2, (import fixture_params), "fputs(\"g(\", stderr); ", 0):("fputs(\"g(\", stderr); fprintf(stderr, \"%d\", idtc_rc_g_buf[idtc_j2].x); ")

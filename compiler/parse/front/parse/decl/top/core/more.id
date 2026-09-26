@@ -1,0 +1,37 @@
+// Token streams for a full `asm "triple" name(params) { "insn" } return
+// TYPE retname;` declaration, for top.id's own parse_asm -- no fixture
+// elsewhere builds one by hand, since afparams' only writer is the parser
+// itself. "asm" is read by text, not by kind (decl/decl_top.id checks
+// cur_text(pos) == "asm"), so it is tokenized "ident" like any other name.
+
+asm_decl_fixture() {
+  env_init();
+  toks_push(["ident", "str", "ident", "op", "op", "op", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"abc\"", "foo", "(", ")", "{", "\"i1\"", "}", "return", "int", "r", ";"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+asm_decl_fixture2() {
+  env_init();
+  toks_push(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// Two asm declarations back to back, both pushed through push_asm (../decl/
+// more.id) -- for asm_case_row and print_asm_cases (mid/names/limits/
+// report/more/loc/func_line.id and back/drive/run/check/dce/emit/guard/
+// guarded_emit.id; the calls/ tree those belong beside is at its
+// 3-function/3-file cap). toks_push appends, so the second call queues a
+// second declaration for the second push_asm to consume after the first.
+asm_row_fixture() {
+  env_init();
+  toks_push(["ident", "str", "ident", "op", "op", "op", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"abc\"", "foo", "(", ")", "{", "\"i1\"", "}", "return", "int", "r", ";"]);
+  int[] pos = [0];
+} chain () {
+  toks_push(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"]);
+  push_asm(pos);
+  push_asm(pos);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

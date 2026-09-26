@@ -1,0 +1,31 @@
+// Close the child's stdin exactly once, and only once every byte of ours
+// has actually been staged and sent (eof reached, nothing left pending).
+// Closing it signals EOF to the child -- a plain compile that never reads
+// stdin at all still needs this eventually, and idlex/idparse do read it,
+// so both must see the same signal.
+maybe_close_in() {
+  int eof = (import cr_in_eof);
+  int pending = (import cr_pending_n);
+  int done = (import cr_in_done);
+} chain () {
+  int ready = eof == 1 && pending == 0 && done == 0;
+  if(ready) {
+    do_close_in();
+  }
+} return void;
+
+do_close_in() {
+  int closed = proc_close_in((import cr_h));
+  export int cr_in_done = 1;
+} return void;
+
+// The file cr_in was opened from (child/setup.id's open_input), closed once
+// at the very end -- called from child/finish.id's close_all, only on the
+// has-input path: cr_in is never opened on the "-" path, so there is
+// nothing here to close.
+close_input_if_any() {
+  int has = (import cr_has_in);
+  if(has) {
+    int ci = fs_close((import cr_in));
+  }
+} return void;

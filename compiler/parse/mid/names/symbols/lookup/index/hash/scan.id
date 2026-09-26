@@ -22,10 +22,14 @@ given regrow_d ([0], "x", 0, 0, ""):("int")
 given regrow_d ([0], "y", 0, 0, ""):("")
 
 vx_scan(int[] bkt, string name, int unit, int i, int found) {
-  while(i < len(bkt)) {
+  while(i >= 0) {
     found = vx_hit(bkt, i, name, unit, found);
-    i = i + 1;
+    if(found == bkt[i]) {
+      break;
+    }
+    i = i - 1;
   }
 } return int found;
 given fcall_reg_b ([0], "h", 0, 0, 99):(0)
 given fcall_reg_b ([0], "z", 0, 0, 99):(99)
+given vx_dup_fixture ([0, 1], "h", 0, 1, 99):(1)

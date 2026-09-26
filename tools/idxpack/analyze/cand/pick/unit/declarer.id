@@ -1,0 +1,73 @@
+// Fix 2 (index.py's required_strict): editor and idstd can both declare
+// the same export name (inf_in, tt_*, ...), and picking whichever one
+// ix_scan_export_line happened to record last (parse/more/fileblock/
+// block.id's single-valued hmap) is arbitrary. index.py's heuristic --
+// unit = whether a path is under idstd or not -- prefers a declarer in the
+// READER's own unit (std.id's path_is_std, against the stdlib root the
+// build that produced this index actually resolved -- idxpack.sh's
+// ===STD=== line, not a hard-coded "/idstd/" guess), over ix_ename/ix_efn
+// (the same block.id scan, kept as parallel lists instead of overwritten in
+// place) falling back to the first declaration of any unit when the reader's
+// own has none.
+pick_declarer(string reader_path, string name) {
+  int reader_std = 0;
+  if(path_is_std(reader_path) == 1) {
+    reader_std = 1;
+  }
+  int n = len((import ix_ename));
+} chain (string reader_path, string name) {
+  string same_fn = "";
+  int i = 0;
+  while(i < n) {
+    same_fn = pick_declarer_step(name, reader_std, i, same_fn);
+    i = i + 1;
+  }
+} chain (string reader_path, string name) {
+  string chosen = same_fn;
+  if(str_cmp(chosen, "") == 0) {
+    int any_i = idx_find_str((import ix_ename), name);
+    if(any_i >= 0) {
+      chosen = (import ix_fn)[(import ix_efn)[any_i]];
+    }
+  }
+} return string chosen;
+given unit_fixture ("/proj/x.id", "gv"):("a")
+given unit_fixture ("/repo/idstd/y.id", "gv"):("b")
+
+// One export declaration's contribution to the same-unit scan: keeps the
+// first match already found (`acc`), and only looks at index `i` when
+// nothing has matched yet, so the result is the FIRST same-unit
+// declaration in scan order, not the last.
+pick_declarer_step(string name, int reader_std, int i, string acc) {
+  string ret_s = acc;
+  int matches = 0;
+  if(str_cmp(acc, "") == 0 && str_cmp((import ix_ename)[i], name) == 0) {
+    int d_std = path_is_std((import ix_file)[(import ix_efn)[i]]);
+    if(d_std == reader_std) {
+      matches = 1;
+    }
+  }
+} chain (string name, int reader_std, int i, string acc) {
+  if(matches == 1) {
+    ret_s = (import ix_fn)[(import ix_efn)[i]];
+  }
+} return string ret_s;
+given unit_fixture ("gv", 0, 0, ""):("a")
+given unit_fixture ("gv", 0, 1, ""):("")
+
+// Two declarations of the same export name, one under a path that looks
+// like idstd and one that does not -- the smallest state where a same-unit
+// pick and a first-in-scan-order pick actually disagree, for pick_declarer's
+// and pick_declarer_step's own cases. std_root_set establishes the fallback
+// state (no ===STD=== line resolved) rather than a real root, so these two
+// cases keep pinning the "/idstd/" substring rule that std.id's path_is_std
+// falls back to when an index.txt has no ===STD=== line.
+unit_fixture() {
+  string[] no_edges = [];
+  ix_init(no_edges, ["a|/proj/x.id|1|2", "b|/repo/idstd/y.id|1|2"]);
+  fx_init(["===F:/proj/x.id===", "a() { export int gv = 0; } return void;", "===F:/repo/idstd/y.id===", "b() { export int gv = 0; } return void;"]);
+} chain () {
+  std_root_set("", 0);
+} return void;
+():() then total_funcs:(2)
+():() then total_files:(2)

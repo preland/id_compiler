@@ -1,0 +1,30 @@
+// The digest's parsed pair (mid/form/unique/dump/digest/graph/state/
+// parsed.id: fa, then fb calling fa) with the symbol and export tables a real
+// build has by the time the checks run, for the key's own cases. tk_t_parsed
+// has --tc-keys on; tk_t_prep0 has it off and the (empty) state prepared, so
+// a case can switch the keying on by hand; tk_t_prep is prepared for real.
+
+tk_t_parsed() {
+  dg_t_parsed();
+  build_syms();
+  collect_exports();
+} chain () {
+  lset((import tkout), 0, 1);
+} return void;
+():() then tk_enabled:(1)
+():() then check_failed:(0)
+
+tk_t_prep0() {
+  tk_t_parsed();
+  lset((import tkout), 0, 0);
+  tk_prepare();
+} return void;
+():() then tk_nkeys:(0)
+():() then tk_enabled:(0)
+
+tk_t_prep() {
+  tk_t_parsed();
+  tk_prepare();
+} return void;
+():() then tk_nkeys:(2)
+():() then tk_nskip:(0)

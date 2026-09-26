@@ -8,3 +8,19 @@ list_elem(string t) {
 } return string et;
 ("int[]"):("int")
 ("string[]"):("string")
+
+// Two "thentraps" nodes, one with the wrong arity (fixture_print_two,
+// ../../../../given/then/more/print/fixture.id, is a ready two-item list) and
+// one with exactly one item, for fit_then_traps (../../../given/then/
+// check/entry.id). Filed here, not beside print's own fixtures, because that
+// directory is at the 3-entry layout limit and this file has room.
+traps_node_fixture() {
+  print_fixture();
+  int ci = (import fixture_ci);
+  int[] trap_one = [node_int("1", 1, 0)];
+} chain () {
+  export int fixture_traps_node = newnode("thentraps", ci, 0, "", "", (import fixture_print_two), (import fixture_print_two));
+  export int fixture_traps_one = newnode("thentraps", ci, 0, "", "", trap_one, trap_one);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

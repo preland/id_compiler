@@ -11,13 +11,21 @@ lz_m() {
 ():() then init_units:(0)
 
 emit_ret(int id) {
-  if(i1_of(id) >= 0) {
-    int i1_of_v = i1_of(id);
-    string emit_expr_v = emit_expr(i1_of_v);
-    emit_line("    return " + emit_expr_v + ";");
-  } else {
-    emit_line("    return;");
-  }
+  string ret_code_v = ret_code(id);
+  emit_line("    " + ret_code_v);
 } return void;
 given func_fix (7):() then prints:("    return 5;\n")
 given ret_void_fix (8):() then prints:("    return;\n")
+
+// The C of a return, from a func node's return clause or an early `return`
+// statement alike: both keep the value in ni1, -1 when there is none.
+ret_code(int id) {
+  string ret_s = "return;";
+  if(i1_of(id) >= 0) {
+    int i1_of_v = i1_of(id);
+    string emit_expr_v = emit_expr(i1_of_v);
+    ret_s = "return " + emit_expr_v + ";";
+  }
+} return string ret_s;
+given func_fix (7):("return 5;")
+given ret_void_fix (8):("return;")

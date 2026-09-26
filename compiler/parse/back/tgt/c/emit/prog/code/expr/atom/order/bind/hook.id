@@ -1,0 +1,42 @@
+// Where emit_expr meets docs/SPEC.md 7. C does not sequence the operands of
+// an operator or the arguments of a call, so an expression with two operands
+// that each hold ordered work (units/) is emitted as a GNU statement
+// expression: each unit is bound to a temporary in left-to-right order, and
+// the expression is then emitted over the temporaries. The expression stays
+// where it was written, so a `while` condition still runs every iteration and
+// an `else if` condition still runs only when it is reached.
+//
+// `seqt` holds, per node, whether that node's value is currently in its
+// temporary, idsq_<node>. It is set only while one expression is emitted and
+// cleared before emit_expr returns, so emit_expr stays a function of its node.
+
+ee_seq(int id) {
+  string s = sq_name(id);
+  if(is_seqd(id) == 0 && seqk(id) == 2) {
+    s = emit_seq(id);
+  } else if(is_seqd(id) == 0) {
+    s = ee2(id);
+  }
+} return string s;
+given sq_fixture ((import sq_two)):("(idsq_7 = id_foo(7), id_pair(idsq_7, id_bar(3)))")
+given sq_fixture ((import sq_one)):("id_pair(id_foo(7), 7)")
+given sq_marked ((import nz_call_foo)):("idsq_7")
+
+is_seqd(int id) {
+  int ok = 0;
+  if(id < len((import seqt))) {
+    ok = (import seqt)[id];
+  }
+} return int ok;
+given sq_marked (7):(1)
+given sq_fixture (7):(0)
+given sq_marked (100000):(0)
+
+seq_mark(int id, int v) {
+  while(len((import seqt)) <= id) {
+    push((import seqt), 0);
+  }
+  lset((import seqt), id, v);
+} return void;
+given sq_fixture (7, 1):() then sq_foo_seqd:(1)
+given sq_marked (7, 0):() then sq_foo_seqd:(0)

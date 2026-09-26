@@ -1,0 +1,41 @@
+// An index over rfn, so is_reach (../scan.id) is a hash lookup instead of a
+// scan of the whole set -- which the fixpoint asks once per call and variable
+// node on every sweep. rfn itself is unchanged: the same names in the same
+// order, read by position and by length where it always was.
+//
+//   rfxk/rfxv/rfxu/rfxc  name -> where it sits in rfn, over idstd's hmap; or,
+//                        for a name that is no function, -2 - len(fnames)
+//                        (known.id)
+//
+// A position is only believed when rfn still holds the name there, so an
+// entry left behind by a clear goes stale on its own. Everything that clears
+// rfn and refills it by hand -- init_reach, reach_seed, seed_tested,
+// test_widen2 -- calls rfn_reindex after, and reach_add keeps it in step.
+
+rfx_init() {
+  export string[] rfxk = [];
+  export int[] rfxv = [];
+  export int[] rfxu = [];
+} chain () {
+  export int[] rfxc = [];
+  hmap_init((import rfxk), (import rfxv), (import rfxu), (import rfxc));
+  rfn_reindex();
+} return void;
+given init_reach ():() then conf_reached:(1)
+given rfnfx_setup ():() then conf_reached:(1)
+
+rfn_reindex() {
+  int rfi = 0;
+  while(rfi < len((import rfn))) {
+    rfx_put((import rfn)[rfi], rfi);
+    rfi = rfi + 1;
+  }
+} return void;
+given rfn_hand ():() then conf_reached:(1)
+given init_reach ():() then conf_reached:(1)
+
+rfx_put(string name, int rfpos) {
+  hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, rfpos);
+} return void;
+given init_reach ("conf.id", 0):() then conf_reached:(0)
+given init_reach ("conf.id", 1):() then conf_reached:(1)

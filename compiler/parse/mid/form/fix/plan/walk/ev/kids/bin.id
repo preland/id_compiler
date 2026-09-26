@@ -19,6 +19,8 @@ given fix_traps_setup ((import tr_unsafe), 1):() then calls fix_walk:[2]
 fix_walk_arg2_an0() {
   string s = (import fixe_an)[0];
 } return string s;
+given fix_pick_fixture_an_named ():("myarg")
+given fix_pick_fixture_an0 ():("")
 
 fix_walk_arg2_fixture2(int e1, int e2) {
   export int wa2_e1 = e1;

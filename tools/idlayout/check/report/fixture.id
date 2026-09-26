@@ -1,0 +1,11 @@
+// Two known hits, one in the first bucket lay_report prints and one in the
+// last, for lay_report's own cases to check both that pushing works and
+// that the groups print in bin/idc's call order with nothing in between.
+
+lay_fixture_two_hits() {
+  lay_reset();
+  push((import lay_hit_legacy), "a.id:1: error: x");
+  push((import lay_hit_generic), "b.id:1: error: y");
+} return void;
+():() then prints:("")
+():() then lay_report:(2)

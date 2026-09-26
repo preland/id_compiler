@@ -127,6 +127,27 @@ static IdList* id_list_new(void) {
     L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, "list init"));
     return L;
 }
+/* An export is a C global, assigned when its declaring function runs, so a
+   read before that finds NULL -- the one memory error in this runtime that
+   was silent, since dereferencing NULL is a segfault with no message.
+   The compile-time dead-export check (mid/names/exports/reach/dead/) already
+   rejects the easy shape: an export whose declaring function nothing calls.
+   What it cannot see is a declarer that IS called, with its export statement
+   inside a branch that is false at run time -- it reasons per function, so
+   the owner counts as reached. That residue lands here.
+   _Noreturn is what makes this free: without it gcc must preserve live
+   registers across the call, and spills in these hot accessors cost several
+   percent on the compiler's own build.
+   Every target shares this runtime -- wasm is this same C recompiled, and the
+   LLVM backend declares these symbols rather than defining them (--target
+   llvm is not self-hosted yet). */
+#ifdef __GNUC__
+__attribute__((noinline, cold))
+#endif
+static _Noreturn void id_null_read(void) {
+    fprintf(stderr, "id: read of an uninitialised export (its declaring function has not run)\n");
+    exit(1);
+}
 static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }
 static void id_list_mut_check(IdList* L) {
     if (L->cap < 0) {
@@ -135,6 +156,7 @@ static void id_list_mut_check(IdList* L) {
     }
 }
 static void id_list_push(IdList* L, long long v) {
+    if (!L) id_null_read();
     id_list_mut_check(L); if (L->len >= L->cap) {
         if (L->cap > INT_MAX / 2) {
             fprintf(stderr, "id: list capacity overflow\n");
@@ -148,6 +170,7 @@ static void id_list_push(IdList* L, long long v) {
     L->data[L->len++] = v;
 }
 static long long id_list_get(IdList* L, int i) {
+    if (!L) id_null_read();
     if (i < 0 || i >= L->len) {
         fprintf(stderr, "id: index %d out of bounds (len %d)\n", i, L->len);
         exit(1);
@@ -155,14 +178,16 @@ static long long id_list_get(IdList* L, int i) {
     return L->data[i];
 }
 static void id_list_set(IdList* L, int i, long long v) {
+    if (!L) id_null_read();
     id_list_mut_check(L); if (i < 0 || i >= L->len) {
         fprintf(stderr, "id: index %d out of bounds (len %d)\n", i, L->len);
         exit(1);
     }
     L->data[i] = v;
 }
-static int id_list_len(IdList* L) { return L->len; }
+static int id_list_len(IdList* L) { if (!L) id_null_read(); return L->len; }
 static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
+    if (!L) id_null_read();
     id_list_mut_check(L); if (L->len <= 0) {
         fprintf(stderr, "id: pop from empty list\n");
         exit(1);
@@ -303,6 +328,13 @@ static unsigned char* id_at(long long addr, long long width) {
         exit(1);
     }
     return id_store + addr;
+}
+/* The store as a native sees it: n bytes at addr, bounds-checked like every
+   other access. Not static, so separately compiled C can reach it. The
+   pointer is good only until the next alloc, which may move the store. */
+unsigned char* id_store_span(long long addr, long long n) {
+    if (n < 0) id_trap("negative length");
+    return id_at(addr, n);
 }
 /* Little-endian, byte at a time: the same bytes on every host, and no
    alignment requirement -- C code casts pointers to odd addresses freely. */
@@ -623,7 +655,7 @@ int id_is_alnum(int c) {
 int id_is_kw(char* w) {
     int ok;
     ok = 0;
-    if ((((((((((((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0)) || (strcmp(w, "native") == 0)) || (strcmp(w, "given") == 0)) || (strcmp(w, "then") == 0)) || (strcmp(w, "func") == 0)) || (strcmp(w, "prints") == 0)) || (strcmp(w, "eprints") == 0)) || (strcmp(w, "calls") == 0)) || (strcmp(w, "chain") == 0)) || (strcmp(w, "blank") == 0))) {
+    if (((((((((((((((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0)) || (strcmp(w, "native") == 0)) || (strcmp(w, "given") == 0)) || (strcmp(w, "then") == 0)) || (strcmp(w, "func") == 0)) || (strcmp(w, "prints") == 0)) || (strcmp(w, "eprints") == 0)) || (strcmp(w, "calls") == 0)) || (strcmp(w, "chain") == 0)) || (strcmp(w, "blank") == 0)) || (strcmp(w, "break") == 0)) || (strcmp(w, "stdin") == 0)) || (strcmp(w, "traps") == 0))) {
         ok = 1;
     }
     return ok;
@@ -721,7 +753,8 @@ int id_skip_block(char* src, int i) {
 }
 
 void id_bump_line(void) {
-    id_lset(lexline, 0, ((int)(id_list_get(lexline, 0)) + 1));
+IdList* idsq_17;
+    (idsq_17 = lexline, id_lset(idsq_17, 0, ((int)(id_list_get(lexline, 0)) + 1)));
     id_print(id_concat("line ", id_str_of_int((int)(id_list_get(lexline, 0)))));
     return;
 }
@@ -1019,7 +1052,8 @@ char* id_two_at(char* src, int i) {
     char* two;
     c1 = id_charat(src, i);
     c2 = id_charat(src, (i + 1));
-    two = id_concat(id_chr(c1), id_chr(c2));
+char* idsq_7;
+    two = (idsq_7 = id_chr(c1), id_concat(idsq_7, id_chr(c2)));
     return two;
 }
 

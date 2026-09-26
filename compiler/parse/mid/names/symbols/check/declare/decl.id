@@ -27,6 +27,12 @@ reg_var(string name, string type, string owner, int exported, int ln, int unit) 
   reg_report(name, type, owner, exported, ln, unit);
   reg_push(name, type, owner, exported, unit);
   push((import dvline), ln);
+} chain (string name, string type, string owner, int exported, int ln, int unit) {
+  if(str_starts(name, "idsq_") == 1) {
+    string loc_at_v = loc_at(owner, ln);
+    var_report(loc_at_v + "names beginning 'idsq_' are reserved for the C target's temporaries; rename '" + name + "'");
+  }
 } return void;
 given regrow_d ("q", "int", "f", 0, 10, 0):() then dvname_len:(2)
 given regrow_c ("q", "int", "f", 0, 10, 0):() then dvname_len:(1)
+given regrow_d ("idsq_x", "int", "f", 0, 10, 0):() then prints:("<stdin>:10: error: names beginning 'idsq_' are reserved for the C target's temporaries; rename 'idsq_x'\n")

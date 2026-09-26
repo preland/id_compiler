@@ -1,0 +1,21 @@
+// One directory's own listing: fs_list answers with the size the whole
+// thing needs even when it wrote nothing, so asking with no buffer at all
+// (lay_list_size) is how a caller learns what to allocate before the real
+// read (lay_list_read). Mirrors idc/driver/more/txt/read.id's drv_size/
+// drv_read; a directory that cannot be read lists as nothing rather than an
+// error, the same way `find` silently skips one.
+
+lay_list_size(string path) {
+  int[] buf = [];
+  int n = fs_list(path, buf, 0);
+} return int n;
+("does-not-exist-xyz-idlayout-test"):(-1)
+("also-does-not-exist-xyz-idlayout-test"):(-1)
+
+lay_list_read(string path, int n) {
+  int[] buf = [];
+  lst_fill(buf, n, 0);
+  int got = fs_list(path, buf, n);
+} return int[] buf;
+("does-not-exist-xyz-idlayout-test", 0):([])
+("also-does-not-exist-xyz-idlayout-test", 0):([])

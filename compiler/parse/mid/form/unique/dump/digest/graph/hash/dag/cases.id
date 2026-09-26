@@ -1,0 +1,32 @@
+// The component DAG the test harness orders and skips its cases by (back/
+// tgt/c/emit/prog/test/unit/more/text/judge.id's emit_tc_graph). Filed under
+// hash/ because graph/ and digest/ are at their three-entry caps.
+//
+// Each case's function's component, in the harness's own case order, or -1
+// when its function has no row or no component: such a case runs where it
+// falls and is never skipped. Tarjan numbers components callees first
+// (../../../scc/), which is what makes a component number an order at all.
+
+dg_case_comps() {
+  int[] dgcc = [];
+  int dgi = 0;
+  while(dgi < len((import casefn))) {
+    int dgc = dg_case_comp(dgi);
+    push(dgcc, dgc);
+    dgi = dgi + 1;
+  }
+} return int[] dgcc;
+given dg_t_built ():([0, 0, 1, 1])
+given env_init ():([])
+
+dg_case_comp(int dgc) {
+  string dgnm = s1_of((import casefn)[dgc]);
+  int dgf = dg_fn_named(dgnm);
+  int dgw = 0 - 1;
+} chain (int dgc) {
+  if(dgf >= 0) {
+    dgw = (import dg_comp)[dgf];
+  }
+} return int dgw;
+given dg_t_built (3):(1)
+given dg_t_rows (0):(-1)

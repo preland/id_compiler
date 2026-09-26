@@ -1,0 +1,34 @@
+// Only names this program actually defines are added: a builtin and a
+// link-time symbol have no body to reach into, and adding them would make the
+// set grow forever on the fixpoint test. Both questions go through rfn's index
+// (index.id, known.id), and the name's new position is recorded in it.
+reach_add(string name) {
+  if(is_reach(name) == 0 && rfx_fn(name) == 1) {
+    push((import rfn), name);
+    rfx_put(name, len((import rfn)) - 1);
+  }
+} return void;
+given seed_given_fixture ("main"):() then reach_pass:(2)
+given seed_given_fixture ("fx_target"):() then reach_pass:(3)
+
+regrow_prog() {
+  regrow_fn();
+  push((import prog), (import regrow_fn_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// Two exported names whose owners are not in rfn, and an import node reading
+// each: what dead_err (report.id) reports on. rfn starts as ["main",
+// "conf.id"] (../check.id), so any other owner is unreachable, which is the
+// state the message describes.
+dead_exp_fixture() {
+  env_init();
+  add_export("gx", "int", "setup_fn");
+  add_export("gy", "int", "other_fn");
+} chain () {
+  export int dead_imp_a = node_import("gx");
+  export int dead_imp_b = node_import("gy");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

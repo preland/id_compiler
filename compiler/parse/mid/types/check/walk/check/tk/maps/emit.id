@@ -1,0 +1,36 @@
+// Under --tc-keys, the build's clean keys go out last, after everything else
+// idparse writes, behind a separator bin/idc cuts them off at: every function
+// with a key whose run raised nothing, whether it was checked this time or
+// skipped. A build whose checks fail emits nothing at all, keys included.
+
+tk_emit_keys() {
+  if((import tkout)[0] == 1) {
+    emit_line("/* ---- tc keys ---- */");
+    tk_emit_one(0);
+  }
+} return void;
+given tk_t_prep ():() then prints:("/* ---- tc keys ---- */\n4208351378666089285\n-8648083975898962277\n")
+given tk_t_prep0 ():() then prints:("")
+
+tk_emit_one(int tkf) {
+  while(tkf < len((import tkkey))) {
+    if((import tkkey)[tkf] != "" && (import tkbad)[tkf] == 0) {
+      emit_line((import tkkey)[tkf]);
+    }
+    tkf = tkf + 1;
+  }
+} return void;
+given tk_t_prep (1):() then prints:("-8648083975898962277\n")
+given tk_t_bad2 (0):() then prints:("-8648083975898962277\n")
+
+// One function's key, and whether it is skipped: a key bin/idc handed in.
+tk_row(int tkf) {
+  string tkk = tk_key(tkf);
+  push((import tkkey), tkk);
+  int tkhit = tkk != "" && hmap_has((import tkik), (import tkiu), tkk) == 1;
+} chain (int tkf) {
+  push((import tkskip), tkhit);
+  push((import tkbad), 0);
+} return void;
+given tk_t_prep (0):() then tk_nkeys:(3) then tk_nskip:(0)
+given tk_t_warm (0):() then tk_nkeys:(3) then tk_nskip:(2)

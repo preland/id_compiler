@@ -28,3 +28,17 @@ parse_asm(int[] pos) {
 } chain (int[] pos) {
   int ret_i = asm_sig_tail(pos, parse_params_v);
 } return int ret_i;
+given asm_decl_fixture ([0]):(0) then afname_last:("foo") then afretn_last:("r")
+given asm_decl_fixture2 ([0]):(0) then afname_last:("bar") then afretn_last:("s")
+
+// A parsed function's token span and node, beside `prog` as parsed (the
+// columns are described with the case columns, func/cases/more/lit/cons/
+// bound/more/state.id). Filed here because ../decl/more.id, which calls it,
+// is at the three-function cap.
+ptok_note(int ptok_first, int ptok_last, int ptok_node) {
+  push((import ptoks), ptok_first);
+  push((import ptoke), ptok_last);
+  push((import pnodes), ptok_node);
+} return void;
+given full_env (3, 9, 4):() then ptok_span:(6)
+given dg_t_parsed (0, 2, 7):() then ptok_span:(2)

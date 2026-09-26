@@ -25,12 +25,15 @@ expect_text(int[] pos, string want) {
 given mk_two_toks ([0], "="):() then check_failed:(0)
 given mk_two_toks ([1], "="):() then check_failed:(1) then prints:("<stdin>:1: error: expected '=', found 'return'\n")
 
-// `id` puts the return clause after the closing brace, so a `return` where a
-// statement belongs is always a mistake -- and a common one.
-no_return_here(int[] pos) {
-  if(cur_text(pos) == "return") {
-    syn_err(pos, "'return' belongs after the function's closing brace");
+// The rest of push_tok (../load/more/push_tok.id, at its three-function cap):
+// a `tcc KEY` line is not a token either -- it is a type-check key bin/idc
+// has on record as clean (mid/types/check/walk/check/tk/), kept in tccin.
+push_tok2(string kind, string text) {
+  if(kind == "tcc") {
+    push((import tccin), text);
+  } else {
+    push_real(kind, text);
   }
 } return void;
-given mk_two_toks ([0]):() then check_failed:(0)
-given mk_two_toks ([1]):() then check_failed:(1) then prints:("<stdin>:1: error: 'return' belongs after the function's closing brace\n")
+given full_env ("tcc", "123"):() then tkind_len:(0)
+given full_env ("kw", "int"):() then tkind_len:(1)

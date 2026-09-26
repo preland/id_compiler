@@ -14,3 +14,15 @@ bfs_test_setup2() {
 } return void;
 ():() then bfs_seen_count:(3)
 ():() then total_funcs:(1)
+
+// One function's placement into its file-bucket's CSR slot -- split out of
+// ix_fg_fill's own loop, the same reason rev_flat's edge loop needed
+// rev_flat_step: get-bucket, write, advance-cursor and the outer index were
+// already four actions.
+ix_fg_place(int[] flat, int[] cursor, int fi) {
+  int b = (import ix_fbucket)[fi];
+  flat[cursor[b]] = fi;
+  cursor[b] = cursor[b] + 1;
+} return void;
+given rev_edge_fixture ([9, 9], [0, 0], 0):([0, 9], [1, 0])
+given rev_edge_fixture ([9, 9], [1, 0], 1):([9, 1], [2, 0])

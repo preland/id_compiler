@@ -1,0 +1,47 @@
+// The stdlib root idxpack.sh's ===STD=== line named (from `idc --print-std`,
+// run with the same flags/env as the --calls run that produced this index),
+// or its absence when index.txt predates that line. main.id's run() calls
+// this once, from the parsed marker, before any reader's unit is decided.
+std_root_set(string root, int present) {
+  export string ix_stdroot = root;
+  export int ix_stdpresent = present;
+} return void;
+("/repo/idstd", 1):() then std_present_get:(1)
+("", 0):() then std_present_get:(0)
+
+// Whether this build actually resolved a stdlib -- read back, not just
+// written, so std_root_set's own cases have a witness instead of a bare
+// void call.
+std_present_get() {
+  int ret_i = (import ix_stdpresent);
+} return int ret_i;
+given std_unit_fixture_root ():(1)
+given std_unit_fixture_fallback ():(0)
+
+// A path is in the std unit when a root was named (===STD=== present and
+// non-empty) and the path starts with it followed by "/" -- not merely
+// contains it, so a sibling checkout named e.g. "idstd2" is never mistaken
+// for "idstd". With no root named (index.txt has no ===STD=== line, or the
+// line named none because that build used --no-std), the old "/idstd/"
+// substring rule is the fallback, so an index built before this change, or
+// by a build with no stdlib at all, still reads.
+path_is_std(string path) {
+  int out_i = 0;
+  int has_root = 0;
+  if((import ix_stdpresent) == 1 && str_cmp((import ix_stdroot), "") != 0) {
+    has_root = 1;
+  }
+} chain (string path) {
+  if(has_root == 1 && str_starts(path, (import ix_stdroot) + "/") == 1) {
+    out_i = 1;
+  }
+  if(has_root == 0 && (import ix_stdpresent) == 0 && str_find(path, "/idstd/") >= 0) {
+    out_i = 1;
+  }
+} return int out_i;
+given std_unit_fixture_root ("/repo/idstd/y.id"):(1)
+given std_unit_fixture_root ("/repo/idstd2/y.id"):(0)
+given std_unit_fixture_root ("/proj/x.id"):(0)
+given std_unit_fixture_fallback ("/repo/idstd/y.id"):(1)
+given std_unit_fixture_fallback ("/proj/x.id"):(0)
+given std_unit_fixture_empty ("/repo/idstd/y.id"):(0)

@@ -4,6 +4,8 @@ m2r_wipe(int[][] rows) {
     pop(rows);
   }
 } return void;
+([[1, 2], [3]]):([])
+([]):([])
 
 // The slots, in the order they were allocated -- which is the entry block, in
 // order, because that is the only place the lowering puts an alloca. Every one

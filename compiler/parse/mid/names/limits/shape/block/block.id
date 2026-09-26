@@ -41,3 +41,5 @@ check_count(int[] body, int depth, string fname, int ln) {
     report_actions(fname, n, ln);
   }
 } return void;
+given elif_fixture ((import elif_body), 0, "f", 5):() then calls report_actions:[0]
+given elif_fixture ((import elif_body), 1, "f", 5):() then calls report_actions:[0]

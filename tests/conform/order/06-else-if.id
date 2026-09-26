@@ -1,0 +1,24 @@
+// An else-if condition runs only when control reaches it. The first pick
+// takes its first branch, so its else-if's two ticks never run; the second
+// reaches the else-if and runs them left to right, "12". Run before the whole
+// if, the second pick would read "34"; right to left, "21". Either way it
+// would say none.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string s = pick(c, 1) + " " + pick(c, 0);
+  print(s + " c=" + c[0]);
+} return int 0;
+
+pick(int[] c, int first) {
+  string s = "none";
+  if(first == 1) {
+    s = "first";
+  } else if("" + tick(c) + tick(c) == "12") {
+    s = "second";
+  }
+} return string s;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

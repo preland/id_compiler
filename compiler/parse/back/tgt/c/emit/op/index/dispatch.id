@@ -20,3 +20,16 @@ ee5(int id) {
 } return string s;
 given leaves_fixture ((import lit_a)):("2")
 given shapes_fixture ((import arr_ints)):("id_list_lit(2, (long long)(2), (long long)(5))")
+
+// The leaf text ee6 starts from: a name as written, except an import read in
+// the harness, which traps first when nothing has set it
+// (prog/head/decl/export/uninit.id). The kind is tested before is_harn(), so
+// emitting any other leaf never reads the flag.
+import_text(int id) {
+  string s = s1_of(id);
+  if(k_of(id) == "import" && is_harn() == 1) {
+    s = checked_read(s);
+  }
+} return string s;
+given uninit_fixture ((import uninit_imp)):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
+given leaves_fixture ((import lit_a)):("2")

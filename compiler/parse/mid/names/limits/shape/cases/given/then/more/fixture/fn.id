@@ -29,5 +29,5 @@ fn_fixture_node() {
   export int fixture_fn = node_func("fx_target", "int", (import fixture_params), none, (import fixture_zero));
   fn_fixture_reg();
 } return void;
-given case_fixture ():() then check_failed:(0)
-given case_fixture ():() then init_units:(0)
+given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then init_units:(0)

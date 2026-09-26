@@ -38,6 +38,10 @@ dupfn_at(int i) {
   if(j < i && i < len((import pfile))) {
     dupfn_err(i, j);
   }
+  if(str_starts(s1_of_v, "idsq_") == 1) {
+    string prog_loc_v = prog_loc(i);
+    var_report(prog_loc_v + "names beginning 'idsq_' are reserved for the C target's temporaries; rename '" + s1_of_v + "'");
+  }
 } return void;
 given dupfn_fixture (0):() then calls dupfn_err:[0]
 given dupfn_fixture (1):() then calls dupfn_err:(1, 0)

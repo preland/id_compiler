@@ -1,0 +1,35 @@
+// The two hashes a case key is built from, both 64-bit and both defined by
+// their own arithmetic alone, so a key is the same on every machine and every
+// run: bin/idc keeps a case's pass under its key across builds.
+//
+// dg_fnv is FNV-1a over the bytes of a string, continuing from dgh, so a
+// token's kind and text can be folded into one running hash. The offset basis
+// is left to the caller (0 here): what matters is that equal input gives an
+// equal hash, and that a one-byte edit anywhere changes it.
+
+dg_fnv(word dgh, string dgs) {
+  int dgi = 0;
+  while(charat(dgs, dgi) >= 0) {
+    dgh = (dgh ^ charat(dgs, dgi)) * 1099511628211;
+    dgi = dgi + 1;
+  }
+} return word dgh;
+(0, "a"):(106652627936467)
+(5, "ab"):(95554157542382666)
+
+// Two 64-bit values mixed into one, the multiply-xorshift finaliser shape:
+// every input bit reaches every output bit, which a plain sum or xor of two
+// hashes does not do. A component's hash is a SUM of mixed values
+// (../../scc/seal/), so the order its callees are found in cannot matter, and
+// mixing each term first is what keeps that sum from being a weak one. dga is
+// multiplied before dgb joins it, so the mix is not symmetric: (x, y) and
+// (y, x) -- a function's own hash and its callees', say -- do not collide.
+dg_mix(word dga, word dgb) {
+  word dgx = (dga * 6364136223846793005) ^ dgb;
+  dgx = dgx ^ ushr(dgx, 31);
+  dgx = dgx * 1099511628211;
+} chain (word dga, word dgb) {
+  dgx = dgx ^ ushr(dgx, 29);
+} return word dgx;
+(1, 2):(5321389033778684627)
+(3, 7):(7316741911867076322)

@@ -60,13 +60,16 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # `editor/` is a library: it has no main, so it builds to a .o and cannot be
 # run. The smallest thing that can exercise tt_glyph is a program, so one is
 # built here out of the font module, the shared byte readers it depends on,
-# and a main that calls the module's own tt_selftest. The project directory
-# holds three entries, which is the limit. fs is the standard library's.
+# and a main that calls the module's own tt_selftest. The sources sit under
+# src/, beside a copy of editor/test_assets/: a case runs from the project root, and
+# the font fixtures name their files relative to it. fs is the standard
+# library's.
 PROJ="$TMP/p"
-mkdir -p "$PROJ/ttf" "$PROJ/byte"
-cp -r "$ORG/editor/lib/font/ttf/." "$PROJ/ttf/"
-cp "$ORG"/editor/lib/zip/byte/*.id "$PROJ/byte/"
-cat > "$PROJ/main.id" <<'IDEOF'
+mkdir -p "$PROJ/src/ttf" "$PROJ/src/byte"
+cp -r "$ORG/editor/test_assets" "$PROJ/test_assets"
+cp -r "$ORG/editor/lib/font/ttf/." "$PROJ/src/ttf/"
+cp "$ORG"/editor/lib/zip/byte/*.id "$PROJ/src/byte/"
+cat > "$PROJ/src/main.id" <<'IDEOF'
 main(int argc, string[] argv) {
   tt_selftest(argv);
 } return int 0;

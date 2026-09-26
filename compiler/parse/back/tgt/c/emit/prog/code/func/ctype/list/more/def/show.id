@@ -1,13 +1,15 @@
 // A list printed as a case writes it, `[1, 2, 3]`, and the name its helpers
-// are spelled with.
+// are spelled with. A nonzero idtc_show_cap cuts it to that many elements
+// and `...`: a `calls` miss prints recorded lists of any length
+// (test/unit/more/rec/scan/prelude.id), and one message must stay readable.
 
 emit_show_body(string key, string et) {
   string ga = unbox("a->data[i]", et);
   string sh = tc_show(ga, et);
-  emit_line("static void idtc_show_" + key + "(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        " + sh + "\n    }\n    fputs(\"]\", stderr);\n}");
+  emit_line("static void idtc_show_" + key + "(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        " + sh + "\n    }\n    fputs(\"]\", stderr);\n}");
 } return void;
-("int", "int"):() then prints:("static void idtc_show_int(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
-("str", "string"):() then prints:("static void idtc_show_str(IdList* a) {\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+("int", "int"):() then prints:("static void idtc_show_int(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+("str", "string"):() then prints:("static void idtc_show_str(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
 
 tc_key(string type) {
   string et = list_elem(type);

@@ -21,3 +21,16 @@ c_type_list(string[] pts) {
 } return string out;
 given lc_env2 (["int", "string"]):("int, char*")
 given lc_env2 ([]):("")
+
+// Where unit_file (unit.id, at its three-function cap) starts looking: where
+// the last lookup stopped, unless id lies before that -- node ids grow along
+// pnodes, so an earlier id means a second pass over `prog` has begun (the
+// program's, after the harness's) and the walk starts again from the top.
+unit_from(int id) {
+  int uc = (import unitc)[1];
+  if(uc < len((import pnodes)) && id < (import pnodes)[uc]) {
+    uc = 0;
+  }
+} return int uc;
+given unit_t_late ((import unit_t_fb)):(1)
+given unit_t_late ((import unit_t_fa)):(0)

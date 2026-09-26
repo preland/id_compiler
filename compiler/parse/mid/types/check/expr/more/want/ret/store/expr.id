@@ -5,6 +5,13 @@
 // fields of the func node that the call checks read, so it sits with them.
 //
 // `return void;` records -1 in the int field and has no expression to judge.
+//
+// An early `return` (front/parse/stmt/form/branch/exprstmt_if.id) is checked
+// here too: it carries its function's name and return type in the same fields.
+// Its value can disagree with the signature in a way the return clause's
+// syntax rules out -- a value in a void function, or none in a typed one --
+// which the chained segments report, for `ret` nodes only: a `native`
+// declaration is a func node with a type and no value, and is not a mistake.
 
 chk_retexpr(int id) {
   int e = i1_of(id);
@@ -12,6 +19,16 @@ chk_retexpr(int id) {
     chk_ret2(id, e);
   }
   fn_ret_type(id);
+} chain (int id) {
+  string ret_fn_nm = s1_of(id);
+  string ret_fn_ty = s2_of(id);
+  if(k_of(id) == "ret" && ret_fn_ty == "void" && e >= 0) {
+    tc_err(e, "'" + ret_fn_nm + "' returns void, so its 'return' takes no value; write 'return;'");
+  }
+} chain (int id) {
+  if(k_of(id) == "ret" && ret_fn_ty != "void" && e < 0) {
+    tc_err(id, "'" + ret_fn_nm + "' returns " + ret_fn_ty + ", so 'return;' needs a value; write 'return NAME;' or 'return LITERAL;'");
+  }
 } return void;
 given chkret_fixture ((import fixture_fn)):() then check_failed:(0)
 given badexpr_fixture ((import badexpr_fn)):() then check_failed:(1)

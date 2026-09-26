@@ -1,0 +1,5 @@
+// EXPECT: a case may have at most one 'traps' check
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 0):() then traps:("division by zero") then traps:("nope")

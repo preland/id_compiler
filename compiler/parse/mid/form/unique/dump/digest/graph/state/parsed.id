@@ -1,0 +1,36 @@
+// A real parse for the digest's own cases -- two functions, the second calling
+// the first, each with two cases:
+//
+//   fa(int a) { int b = a + 1; } return int b;     tokens 0..17
+//   (1):(2)                                        18..24
+//   (2):(3)                                        25..31
+//   fb(int a) { int b = fa(a); } return int b;     32..50
+//   (1):(2)                                        51..57
+//   (3):(4)                                        58..64
+//
+// so prog, ptoks/ptoke, casefn and casestart/caseend are what the parser
+// writes, not what a fixture guesses it writes.
+
+dg_t_parsed() {
+  full_env();
+  push_toks(["ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "int", "op", "op", "kw", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op", "ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "ident", "op", "op", "op", "kw", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op", "eof"], ["fa", "(", "int", "a", ")", "{", "int", "b", "=", "a", "+", "1", ";", "}", "return", "int", "b", ";", "(", "1", ")", ":", "(", "2", ")", "(", "2", ")", ":", "(", "3", ")", "fb", "(", "int", "a", ")", "{", "int", "b", "=", "fa", "(", "a", ")", ";", "}", "return", "int", "b", ";", "(", "1", ")", ":", "(", "2", ")", "(", "3", ")", ":", "(", "4", ")", ""]);
+  int[] dgpos = [0];
+} chain () {
+  parse_program(dgpos);
+} return void;
+():() then check_failed:(0)
+():() then ptok_span:(19)
+
+dg_t_built() {
+  dg_t_parsed();
+  dg_build();
+} return void;
+():() then dg_nfn:(2)
+():() then dg_ncomp:(3)
+
+// How many function names the digest registered.
+dg_nfn() {
+  int dgn = hmap_count((import dg_fc));
+} return int dgn;
+given dg_t_built ():(2)
+given dg_t_graph ():(0)

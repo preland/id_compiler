@@ -29,3 +29,15 @@ fit_fn(int i, int e, string want) {
 } return void;
 given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then check_failed:(0)
 given cfn_fixture ((import fixture_ci), (import cfn_e), "func(string) return void"):() then check_failed:(1)
+
+// One setup of a multi-setup `given` (../read.id's setups_miss): raises `seen`
+// when this name is a function in the build at all. A name that is not is
+// given_fn's error, so setups_miss must not report it a second time.
+miss_seen(string nm, int seen) {
+  int r = seen;
+  if(nm != "" && func_node(nm) >= 0) {
+    r = 1;
+  }
+} return int r;
+given fn_fixture ("fx_target", 0):(1)
+given fn_fixture ("nosuchfn123", 0):(0)

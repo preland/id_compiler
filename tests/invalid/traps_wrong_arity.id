@@ -1,0 +1,5 @@
+// EXPECT: a 'traps' check names exactly one message, not 2
+quot(int a, int b) {
+  int q = a / b;
+} return int q;
+(6, 0):() then traps:("a", "b")

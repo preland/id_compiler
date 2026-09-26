@@ -7,7 +7,11 @@ tfx_max(int a, int b) {
     m = b;
   }
 } return int m;
+(3, 9):(9)
+(9, 3):(9)
 
 tfx_abs(int a) {
   int m = tfx_max(a, 0 - a);
 } return int m;
+(-4):(4)
+(4):(4)

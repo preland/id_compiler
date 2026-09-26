@@ -1,13 +1,51 @@
 // --natives, and the two lists it fills. The flag lives in a cell like every
 // other build flag, because the walk that fills the harness's rows runs inside
 // the harness narrowing, which has no argv.
+//
+// --std-unit rides the same chain-of-this-function pattern (not a function
+// of its own -- back/drive/run/check/flags/ and this file are both at their
+// 3-function cap): the unit index the standard library starts at (bin/idc's
+// STD_UNIT_START), or -1 when there is no stdlib to exclude. It is mutated
+// into the `stdunit` cell init_units already exports at that default
+// (front/parse/decl/top/marker/file/unit/state.id), not exported again here
+// -- a name is exported once. The harness narrowing
+// (mid/names/symbols/lookup/more/std_unit.id) reads it from the cell the
+// same way it reads hostc.
+//
+// --exclude-units is the same treatment for the backend-library units
+// STD_UNIT_START's single boundary cannot name (bin/idc computes them once
+// SRC_ROOTS is final and joins them with commas): the raw flag value is
+// handed to exclunit_seed (back/drive/sink/natives/more/emit.id), which
+// grows `exclunit` by pushing rather than this chain lset-ing it in place
+// -- a chain of its own since this one already spent its three actions on
+// --std-unit. --units shares that chain's last action: whether the C emitter
+// writes unit markers (back/tgt/c/emit/prog/code/func/def/body/rest/unit.id),
+// set into the `unitc` cell the case columns' init already exports; and
+// --tc-keys, whether the type check's clean keys are written (tkout); and
+// --unit-roots, each unit's root, where its cases run (uroots).
 nat_init(int argc, string[] argv) {
   int nat_on = arg_flag(argc, argv, 1, "--natives");
   export int[] natc = [nat_on];
   nat_lists();
+} chain (int argc, string[] argv) {
+  string stdunit_arg = arg_flag_val(argc, argv, 1, "--std-unit", "-1");
+  int stdunit_val = to_int(stdunit_arg);
+  lset((import stdunit), 0, stdunit_val);
+} chain (int argc, string[] argv) {
+  string exclunit_arg = arg_flag_val(argc, argv, 1, "--exclude-units", "");
+  exclunit_seed(exclunit_arg);
+  lset((import unitc), 0, arg_flag(argc, argv, 1, "--units"));
+} chain (int argc, string[] argv) {
+  lset((import tkout), 0, arg_flag(argc, argv, 1, "--tc-keys"));
+  ur_seed(arg_flag_val(argc, argv, 1, "--unit-roots", ""));
 } return void;
-given env_init (1, ["prog"]):() then nat_on_check:(0)
-given env_init (2, ["prog", "--natives"]):() then nat_on_check:(1)
+given env_init (3, ["prog", "--unit-roots", "/r"]):() then ur_count:(1)
+given env_init (2, ["prog", "--units"]):() then calls arg_flag:(2, ["prog", "--units"], 1, "--units")
+given env_init (1, ["prog"]):() then nat_on_check:(0) then stdunit_check:(-1)
+given env_init (2, ["prog", "--natives"]):() then nat_on_check:(1) then stdunit_check:(-1)
+given env_init (3, ["prog", "--std-unit", "5"]):() then stdunit_check:(5)
+given env_init (3, ["prog", "--exclude-units", "5,9"]):() then calls exclunit_seed:("5,9")
+given env_init (1, ["prog"]):() then calls exclunit_seed:("")
 
 //   natkey  KIND|NAME of every row, so a native is listed once per kind
 //   natrow  the rows themselves (emit.id)

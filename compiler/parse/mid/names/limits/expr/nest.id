@@ -1,9 +1,12 @@
-// A call's arguments, each of which must be free of calls.
+// A call's arguments, each of which may hold at most one level of call
+// nesting.
 //
-// Free of calls anywhere inside it, not merely at the top: `f(g(x) + 1)` hides
-// the call one level down and reads no better for it. The argument that
-// carries the call is the one reported, by position, because a call spread
-// over several lines should name the line that is wrong.
+// Counted by call depth, not by expression depth: `f(g(x) + 1)` and
+// `f(a[g(x)])` are one level (a single call, wrapped in an operator that adds
+// no call of its own) and are allowed; `f(g(h(x)))` is two (`g`'s own
+// argument is itself a call) and is rejected. The argument that carries the
+// excess depth is the one reported, by position, because a call spread over
+// several lines should name the line that is wrong.
 
 chk_flat_args(int id) {
   int i = 0;
@@ -16,20 +19,25 @@ given cm_other_setup ((import cm_var_node)):() then prints:("")
 
 chk_flat_at(int id, int i) {
   int a = l1_of(id)[i];
-  if(has_call(a) == 1) {
+  if(has_call(a) > 1) {
     string s1_of_v = s1_of(id);
-    tc_err(a, "argument " + i + " of '" + s1_of_v + "' contains a call; give that value a name and pass the name");
+    tc_err(a, "argument " + i + " of '" + s1_of_v + "' has a call nested inside a call; an argument may hold one level of call, not two -- name the inner call's result and pass the name");
   }
   int ret_i = i + 1;
 } return int ret_i;
+given flat_call_fixture ((import flat_outer_call), 0):(1) then check_failed:(0)
+given flat_deep_call_fixture ((import flat_deep_call), 1):(2) then check_failed:(1)
+given cm_setup ((import cm_push_call), 0):(1) then check_failed:(0)
 
 has_call(int e) {
   int ok = 0;
   if(k_of(e) == "call") {
-    ok = 1;
+    int[] l1_of_v = l1_of(e);
+    ok = 1 + hc_list(l1_of_v);
   } else {
     ok = hc_kids(e);
   }
 } return int ok;
 given cm_setup ((import cm_push_call)):(1)
 given cm_other_setup ((import cm_var_node)):(0)
+given flat_call_fixture ((import flat_outer_call)):(2)

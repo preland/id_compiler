@@ -1,0 +1,46 @@
+// Expressions whose operands do and do not need sequencing, for the cases in
+// expr/atom/order/: foo(7) is nz_call_foo, and
+//   sq_bar   bar(3)
+//   sq_one   pair(foo(7), 7)      one operand holds a call
+//   sq_two   pair(foo(7), bar(3)) both do
+//   sq_and   foo(7) && bar(3)
+//   sq_mod   7 % 0                can trap
+//   sq_div3  7 / 3                cannot
+//   sq_iset  [7][foo(7)] = bar(3), and sq_iset0 the same with index 7
+//   sq_at    [7][foo(7)]
+
+sq_fixture() {
+  nz_call_eprint_fixture();
+  export int sq_bar = node_call("bar", [(import nz_int2)]);
+  export int sq_one = node_call("pair", [(import nz_call_foo), (import nz_int)]);
+} chain () {
+  export int sq_two = node_call("pair", [(import nz_call_foo), (import sq_bar)]);
+  export int sq_and = node_bin("&&", (import nz_call_foo), (import sq_bar));
+  int sq_zero = node_int("0", 0, 0);
+} chain () {
+  export int sq_mod = node_bin("%", (import nz_int), sq_zero);
+  export int sq_div3 = node_bin("/", (import nz_int), (import nz_int2));
+  int sq_lst = node_arr([(import nz_int)]);
+} chain () {
+  export int sq_iset = newnode("iassign", sq_lst, (import nz_call_foo), "", "", [(import sq_bar)], [(import sq_bar)]);
+  export int sq_iset0 = newnode("iassign", sq_lst, (import nz_int), "", "", [(import sq_bar)], [(import sq_bar)]);
+  export int sq_at = newleaf("index", sq_lst, (import nz_call_foo), "", "");
+} chain () {
+  init_tyc();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The same nodes, with foo(7) already bound to its temporary.
+sq_marked() {
+  sq_fixture();
+  seq_mark((import nz_call_foo), 1);
+} return void;
+():() then check_failed:(0)
+():() then sq_foo_seqd:(1)
+
+sq_foo_seqd() {
+  int ok = is_seqd((import nz_call_foo));
+} return int ok;
+given sq_fixture ():(0)
+given sq_marked ():(1)

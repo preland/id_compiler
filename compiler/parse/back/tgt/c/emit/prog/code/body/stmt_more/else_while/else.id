@@ -18,3 +18,19 @@ emit_body_close(int[] l2_of_v, string ind) {
 } return void;
 given stmt_fix ([], ""):() then prints:("}\n")
 given stmt_fix ([], "  "):() then prints:("  }\n")
+
+// The two flow statements, then on to if/while. id's `while` is a C `while`,
+// so a `break` is C's; an early return is C's `return` at the statement's own
+// indent.
+es_flow(int id, string ind) {
+  if(k_of(id) == "break") {
+    emit_line(ind + "break;");
+  } else if(k_of(id) == "ret") {
+    string ret_code_v = ret_code(id);
+    emit_line(ind + ret_code_v);
+  } else {
+    es4(id, ind);
+  }
+} return void;
+given flow_emit_fixture ((import flow_brk), "  "):() then prints:("  break;\n")
+given flow_emit_fixture ((import flow_retn), "  "):() then prints:("  return 7;\n")

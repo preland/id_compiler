@@ -19,3 +19,15 @@ sys_helper2(string name) {
 } return string h;
 ("peek8"):("id_peek8")
 ("store_size"):("id_mem_size")
+
+// The cast in front of one argument. `udiv`, `umod` and `ushr` read an `int`
+// as its 32 unsigned bits, so an `int` there is zero-extended rather than
+// sign-extended into the helper's `long long`.
+arg_cast(string name, int arg) {
+  string pre_cast = "(long long)(";
+  if((name == "udiv" || name == "umod" || name == "ushr") && type_of(arg) == "int") {
+    pre_cast = "(long long)(unsigned int)(";
+  }
+} return string pre_cast;
+given call_args_fixture ("peek8", (import call_e1)):("(long long)(")
+given call_args_fixture ("ushr", (import call_e1)):("(long long)(unsigned int)(")

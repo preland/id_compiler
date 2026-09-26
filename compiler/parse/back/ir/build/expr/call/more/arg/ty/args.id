@@ -10,10 +10,10 @@ given bicall_fixture ((import bicall_node), 0, []):(1)
 // The declared type of a callee's i-th parameter, or the argument's own type
 // when the callee has no parameter list to ask.
 lw_pty(string name, int i, int node) {
-  int f = find_str((import fnames), name);
+  int f = fn_node_of(name);
   string t = lw_pty_base(name, i, node);
   if(f >= 0) {
-    t = lw_pty2((import fnodes)[f], i, t);
+    t = lw_pty2(f, i, t);
   }
 } return string t;
 given pcall_fixture ("gparam", 0, (import pcall_arg_n)):("word")

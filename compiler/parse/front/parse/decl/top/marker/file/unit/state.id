@@ -8,10 +8,30 @@
 // name keeps one type -- and it does, within a unit. So the symbol table is
 // keyed by unit as well as name, and a node carries the unit it was written
 // in so that every lookup can say which one it means.
+//
+// stdunit rides the same init, at its own -1 ("no library to exclude")
+// default: it is mutated in place by nat_init's own chain
+// (back/drive/sink/natives/more/live.id) once a real build's --std-unit is
+// read, not re-exported there, since a name is exported once -- and mutated
+// here in a chain of its own because this segment already used its 3.
+//
+// exclunit is the same idea for a unit range --std-unit cannot name: a
+// backend directory attached as its own dependency (not merged into the
+// stdlib's own contiguous range) is a library too, and its cases are
+// excluded by unit number rather than by boundary (mid/names/symbols/
+// lookup/more/std_unit.id's unit_excluded). Empty at its own default --
+// "nothing excluded", the same reading len() > 0 gives an untouched list
+// everywhere else in this program -- and grown by nat_init's chain calling
+// back/drive/sink/natives/more/emit.id's exclunit_seed, never lset in
+// place: a name is exported once, and a list export is populated the same
+// push-based way every other one in this file is.
 init_units() {
   export int[] nunit = [];
   export int[] ucur = [0];
   export int[] vunit = [];
+} chain () {
+  export int[] stdunit = [0 - 1];
+  export int[] exclunit = [];
 } return int 0;
 given env_init ():(0)
 given env_init ():(0) then check_failed:(0)

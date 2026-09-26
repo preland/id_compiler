@@ -1,0 +1,40 @@
+// The units of one expression in the order docs/SPEC.md 7 runs them: every
+// operand left to right, and a node after its operands. An `&&` or `||` is
+// one unit and is not looked into (units/own.id), and a node already in a
+// temporary is neither collected nor looked into, so clearing what was
+// collected never clears a binding made outside this expression.
+
+seq_units(int id, int[] sq_units) {
+  if(is_logic(id) == 0 && is_seqd(id) == 0) {
+    int[] sq_kids = seq_kids(id);
+    seq_units_list(sq_kids, sq_units);
+  }
+  if(is_unit(id) == 1 && is_seqd(id) == 0) {
+    push(sq_units, id);
+  }
+} return void;
+given sq_fixture ((import sq_two), []):((import sq_two), [7, 9, 11])
+given sq_fixture ((import sq_and), []):((import sq_and), [12])
+given sq_marked ((import sq_two), []):((import sq_two), [9, 11])
+given sq_fixture ((import nz_bin_add), []):((import nz_bin_add), [])
+
+seq_units_list(int[] sq_kids, int[] sq_units) {
+  int i = 0;
+  while(i < len(sq_kids)) {
+    seq_units(sq_kids[i], sq_units);
+    i = i + 1;
+  }
+} return void;
+given sq_fixture ([7, 0], []):([7, 0], [7])
+given sq_fixture ([12, 11], []):([12, 11], [12, 7, 9, 11])
+
+seq_clear(int[] sq_units) {
+  int i = 0;
+  while(i < len(sq_units)) {
+    seq_mark(sq_units[i], 0);
+    i = i + 1;
+  }
+} return void;
+given sq_marked ([7]):() then sq_foo_seqd:(0)
+given sq_marked ([9, 11]):() then sq_foo_seqd:(1)
+given sq_marked ([9, 7]):() then sq_foo_seqd:(0)

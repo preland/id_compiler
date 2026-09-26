@@ -8,3 +8,15 @@ fs_on_fixture() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// A second, distinct --host-triple from ut_host_seeded's (xok.id), for
+// build_host's (mid/names/exports/extern/tab/host.id) own cases: hostc is
+// exported only by arg_flags4, so a case reaching it has to drive that flag
+// chain, and two cases need two different triples to be more than one call
+// recorded twice.
+build_host_fixture2() {
+  flags_setup();
+  arg_flags4(3, ["prog", "--host-triple", "wasm32-unknown-unknown"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

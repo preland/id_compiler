@@ -1,0 +1,6 @@
+// EXPECT: returns int but the expression has type string
+// an early return is checked against the signature like the return clause
+main(int argc, string[] argv) {
+  string s = "no";
+  return s;
+} return int 0;

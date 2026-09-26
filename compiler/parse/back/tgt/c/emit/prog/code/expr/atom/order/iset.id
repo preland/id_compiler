@@ -1,0 +1,42 @@
+// An index assignment is three expressions in one C call, id_list_set(list,
+// index, value), and docs/SPEC.md 7 runs them list, then index, then value.
+// The list is a plain name, which no call can rebind, so only the index and
+// the value can disagree: when both hold units, the index is bound first.
+
+iset_hz(int id) {
+  int[] l1_of_v = l1_of(id);
+  int i2_of_v = i2_of(id);
+  int ok = seq_both(i2_of_v, l1_of_v[0]);
+} return int ok;
+given sq_fixture ((import sq_iset)):(1)
+given sq_fixture ((import sq_iset0)):(0)
+
+seq_both(int a, int b) {
+  int ok = 0;
+  if(seqk(a) > 0 && seqk(b) > 0) {
+    ok = 1;
+  }
+} return int ok;
+given sq_fixture (7, 9):(1)
+given sq_fixture (7, 0):(0)
+given sq_fixture (0, 7):(0)
+
+// The index's declaration is emitted here, before its statement, the same
+// way seq_bind (bind/wrap.id) declares a unit it binds; the index is emitted
+// (its own code computed) before it is marked, so sq_code is its expression
+// and not its temporary.
+iset_seq(int id, string val) {
+  int i2_of_v = i2_of(id);
+  string sq_code = emit_expr(i2_of_v);
+  string sq_type_v = type_of(i2_of_v);
+} chain (int id, string val) {
+  string sq_ctype = c_type(sq_type_v);
+  emit_line(sq_ctype + " " + sq_name(i2_of_v) + ";");
+  seq_mark(i2_of_v, 1);
+} chain (int id, string val) {
+  string iset_code_v = iset_code(id, val);
+  seq_mark(i2_of_v, 0);
+  string ret_s = "(" + sq_name(i2_of_v) + " = " + sq_code + ", " + iset_code_v + ")";
+} return string ret_s;
+given sq_fixture ((import sq_iset), "V"):("(idsq_7 = id_foo(7), id_list_set(id_list_lit(1, (long long)(7)), idsq_7, V))") then prints:("int idsq_7;\n")
+given sq_fixture ((import sq_iset), "W"):("(idsq_7 = id_foo(7), id_list_set(id_list_lit(1, (long long)(7)), idsq_7, W))") then sq_foo_seqd:(0)

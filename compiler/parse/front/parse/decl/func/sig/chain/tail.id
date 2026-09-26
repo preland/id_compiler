@@ -15,19 +15,9 @@ given decl_tokens ([33], [], [], []):() then check_failed:(1)
 given decl_tokens ([35], [], [], []):() then check_failed:(1)
 
 chain_add(int[] body, int[] seg) {
-  int mark = newleaf("chain", 0, 0, "", "");
+  int mark = newleaf("chain", 0 - 1, 0, "", "");
   push(body, mark);
-  chain_fill(body, seg);
-} return void;
-given full_env ([], []):() then check_failed:(0)
-given full_env ([1], [2]):() then check_failed:(0)
-
-chain_fill(int[] body, int[] seg) {
-  int i = 0;
-  while(i < len(seg)) {
-    push(body, seg[i]);
-    i = i + 1;
-  }
+  lst_extend(body, seg);
 } return void;
 given full_env ([], []):() then check_failed:(0)
 given full_env ([1], [2]):() then check_failed:(0)

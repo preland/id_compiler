@@ -1,0 +1,44 @@
+// The memo behind reaches (reach.id): for each setup asked about, the set of
+// digest rows (mid/form/unique/dump/digest/) it reaches, found once.
+//
+//   rcon    [1 once the digest is built and the memo exists]
+//   rck/rcv/rcu/rcc   setup name -> its set's index, over idstd's hmap
+//   rcsets  per setup, one flag per digest row: 1 where the setup reaches it
+//
+// The digest is built from `prog` as it stands when the first case asks,
+// which during the checks is every function as parsed -- the program the
+// fixpoint this replaces walked. Nothing edits `prog` before the harness is
+// emitted, so the sets stay true for the whole of the case checks.
+
+rc_ready() {
+  if((import rcon)[0] == 0) {
+    rc_build();
+  }
+} return void;
+given dg_t_parsed ():() then rc_nsets:(0)
+given dg_t_parsed ():() then dg_nfn:(2)
+
+rc_build() {
+  dg_build();
+  export string[] rck = [];
+  export int[] rcv = [];
+} chain () {
+  export int[] rcu = [];
+  export int[] rcc = [];
+  export int[][] rcsets = [];
+} chain () {
+  hmap_init((import rck), (import rcv), (import rcu), (import rcc));
+  lset((import rcon), 0, 1);
+} return void;
+given dg_t_parsed ():() then rc_nsets:(0) then dg_nfn:(2)
+given env_init ():() then rc_nsets:(0) then dg_nfn:(0)
+
+// The index of src's set, walking the graph the first time src is asked for.
+rc_of(string src) {
+  int ri = hmap_get((import rck), (import rcv), (import rcu), src, 0 - 1);
+  if(ri < 0) {
+    ri = rc_new(src);
+  }
+} return int ri;
+given rc_t_ready ("fb"):(0) then rc_nsets:(1)
+given rc_t_one ("fb"):(0) then rc_nsets:(1)

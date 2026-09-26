@@ -1,0 +1,14 @@
+// A directory named the same as the one that holds it (e.g. a/loop/loop/)
+// says nothing about why it exists. `self` is the current directory's own
+// basename; `name` is one of its child directories, checked as the walk
+// reaches it (walk/dir.id).
+
+lay_check_samename(string dir, string self, string name) {
+  if(name == self) {
+    string full = dir + "/" + name;
+    string msg = lay_msg(full, "directory '" + full + "' has the same name as its parent; name it for what it holds, or merge it into the parent");
+    push((import lay_hit_samename), msg);
+  }
+} return void;
+given lay_reset ("root", "loop", "loop"):() then lay_report:(1)
+given lay_reset ("root", "loop", "other"):() then lay_report:(0)

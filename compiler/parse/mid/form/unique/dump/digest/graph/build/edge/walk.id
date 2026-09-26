@@ -1,0 +1,37 @@
+// Every function's out-edges, read off its nodes. A function's nodes are the
+// range from wherever the previous function's ended through its own node,
+// which the parser creates last -- the same walk reach_funcs does
+// (mid/names/exports/reach/dead/sweep.id), over the same unnarrowed `prog`.
+// The range also holds the previous function's case nodes; an edge found
+// there only ever makes a key more cautious, never less.
+
+dg_edges_all() {
+  int dgf = 0;
+  int dglo = 0;
+  while(dgf < len((import prog))) {
+    dglo = dg_edges(dgf, dglo);
+    dgf = dgf + 1;
+  }
+} return void;
+given dg_t_rows ():() then dg_nout1:(2)
+given dg_t_built ():() then dg_nout1:(4)
+
+dg_edges(int dgf, int dglo) {
+  int dghi = (import prog)[dgf];
+  while(dglo <= dghi) {
+    dg_edge(dgf, dglo);
+    dglo = dglo + 1;
+  }
+} return int dglo;
+given dg_t_rows (1, 0):(20) then dg_nout1:(2)
+given dg_t_rows (0, 0):(7) then dg_nout1:(0)
+
+dg_edge(int dgf, int dgid) {
+  int dgw = dg_target(dgid);
+  if(dgw >= 0) {
+    dg_link(dgf, dgw);
+    dg_clink(dgf, dgw, dgid);
+  }
+} return void;
+given dg_t_rows (1, 16):() then dg_nout1:(1) then dg_ncout1:(1)
+given dg_t_rows (1, 15):() then dg_nout1:(0) then dg_ncout1:(0)

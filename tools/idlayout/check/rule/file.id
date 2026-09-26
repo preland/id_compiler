@@ -1,0 +1,37 @@
+// What a file's kind (classify.id's lay_file_kind) means for the walk: an
+// old-named manifest and a manifest that is not at the root are both
+// violations wherever they are found; a generic name is too. conf.id and
+// backend.id themselves never count toward a directory's entry total (see
+// entrycount.id) -- that exclusion lives there, not here.
+
+lay_check_file(string dir, int is_root, string name, int kind) {
+  string full = dir + "/" + name;
+  if(kind == 2) {
+    string msg = lay_msg(full, "'import.id' is now called 'conf.id' -- it holds constants as well as dependencies. Rename it");
+    push((import lay_hit_legacy), msg);
+  }
+  if(kind == 0 && is_root == 0) {
+    string msg2 = lay_msg(full, "'conf.id' is the dependency manifest and is only read at the root of a project or a dependency. Here it is neither compiled nor read, so anything it defines silently does not exist; rename it");
+    push((import lay_hit_nested), msg2);
+  }
+} chain (string dir, int is_root, string name, int kind) {
+  if(kind == 3) {
+    string text = "file '" + full + "' has a generic name '" + name + "'; name it for what it holds";
+    string msg3 = lay_msg(full, text);
+    push((import lay_hit_generic), msg3);
+  }
+} return void;
+given lay_reset ("d", 0, "import.id", 2):() then lay_report:(1)
+given lay_reset ("d", 0, "conf.id", 0):() then lay_report:(1)
+given lay_reset ("root", 1, "conf.id", 0):() then lay_report:(0)
+given lay_reset ("d", 0, "util.id", 3):() then lay_report:(1)
+given lay_reset ("d", 0, "main.id", 4):() then lay_report:(0)
+
+// Every violation is reported "PATH:1: error: TEXT" -- the same shape
+// bin/idc's five bash checks already print, kept so a user's build output
+// does not change when the check that produced a line does.
+lay_msg(string path, string text) {
+  string line = path + ":1: error: " + text;
+} return string line;
+("a.id", "x"):("a.id:1: error: x")
+("b/c.id", "y"):("b/c.id:1: error: y")

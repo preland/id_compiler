@@ -9,3 +9,28 @@ fix_wseed(int ow) {
     push((import fixd_wq), ow);
   }
 } return void;
+given fix_wseed_fixture (0):() then calls lset:((import fixd_wm), 0, 1)
+given fix_wseed_fixture (-1):() then calls lset:[0]
+
+// fixd_wm seeded with one unmarked entry directly, bypassing fix_wfill's
+// fnames-length loop entirely (fill.id's own comment: every fix fixture
+// leaves fnames empty, so fix_wfill never grows fixd_wm) -- fix_wseed's own
+// guard needs a real slot to mark, not the fnames/name-registration
+// machinery that guard is agnostic to. full_env comes first so fix_winit's
+// own fix_wfill has a declared (empty) fnames to read instead of trapping.
+fix_wseed_fixture() {
+  full_env();
+  fix_winit();
+  push((import fixd_wm), 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// fixd_wadj as a whole, for fix_wedge's own cases (edge/ref/main.id is at
+// the three-function cap) -- push cannot be witnessed with 'then calls' (it
+// is a builtin), and reading the whole table avoids hard-coding which row.
+fixd_wadj_all() {
+  int[][] wadj_all_v = (import fixd_wadj);
+} return int[][] wadj_all_v;
+given fix_wseed_fixture ():([])
+given fix_wprop_fixture ():([[-1, -2], []])

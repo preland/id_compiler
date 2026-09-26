@@ -1,0 +1,27 @@
+// Counts over the keying's rows, for the `then` checks of this directory's
+// cases: how many functions have a key, are skipped, raised a diagnostic.
+
+tk_nkeys() {
+  int tkn = 0;
+  int tki = 0;
+  while(tki < len((import tkkey))) {
+    if((import tkkey)[tki] != "") {
+      tkn = tkn + 1;
+    }
+    tki = tki + 1;
+  }
+} return int tkn;
+given tk_t_prep ():(2)
+given tk_t_prep0 ():(0)
+
+tk_nskip() {
+  int tkn = lst_sum((import tkskip));
+} return int tkn;
+given tk_t_warm ():(1)
+given tk_t_prep ():(0)
+
+tk_nbad() {
+  int tkn = lst_sum((import tkbad));
+} return int tkn;
+given tk_t_bad ():(0)
+given tk_t_bad2 ():(1)

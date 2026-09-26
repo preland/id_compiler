@@ -9,3 +9,28 @@ lw_cmpop(string t) {
 } return string op;
 given ir_rows ("int"):("icmp")
 given ir_rows ("float"):("fcmp")
+
+// The two statements that leave: `break` and an early `return`. They sit here,
+// beside comparisons, only because every directory on the way to a proper
+// flow/exit/ is at the three-entry limit -- the slot within reach, not the
+// right label.
+lw_flow(int node) {
+  if(k_of(node) == "break") {
+    lw_break();
+  } else {
+    lw_early_ret(node);
+  }
+} return void;
+given flow_ir_fixture ((import flow_ir_brk)):() then calls lw_break:[1]
+given flow_ir_fixture ((import flow_ir_ret)):() then calls lw_early_ret:[1]
+
+// A branch to the innermost loop's exit, then a fresh block for whatever
+// follows it in the source: unreachable, but still somewhere to put it. The
+// fixture's loops exit to blocks 1 then 2, so the innermost is 2.
+lw_break() {
+  int lw_brk_ex = (import lwloop)[len((import lwloop)) - 1];
+  lw_term("br", 0 - 1, [lw_brk_ex]);
+  lw_dead();
+} return void;
+given flow_ir_fixture ():() then calls lw_term:("br", -1, [2])
+given flow_ir_fixture ():() then calls lw_dead:[1]

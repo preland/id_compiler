@@ -16,3 +16,12 @@ eprints_fix() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// `traps:("hi")`, for then_traps_or_check's traps branch and
+// then_traps_clause (case/then/more/calls/fixture.id).
+traps_fix() {
+  fn_fixture();
+  toks_push(["kw", "op", "op", "str", "op"], ["traps", ":", "(", "\"hi\"", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

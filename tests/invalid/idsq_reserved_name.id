@@ -1,0 +1,8 @@
+// EXPECT: names beginning 'idsq_' are reserved for the C target's temporaries
+// idsq_ is the C target's own prefix for its sequencing temporaries
+// (back/tgt/c/emit/prog/code/expr/atom/order/); an id variable spelled that
+// way would collide with a real declaration the C target emits.
+main(int argc, string[] argv) {
+  int idsq_7 = 3;
+  print(idsq_7);
+} return int 0;

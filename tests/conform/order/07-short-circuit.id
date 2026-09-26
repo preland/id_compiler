@@ -1,0 +1,29 @@
+// The right operand of && and || runs only when the left one does not decide
+// the result, and when it does run its own operands still go left to right.
+// Gates 0 and 1 are decided by their left operand, so their ticks never run;
+// gate 2 runs its right operand, 1 < 2.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string s = gate(c, 0) + " " + gate(c, 1) + " " + gate(c, 2);
+  print(s + " c=" + c[0]);
+} return int 0;
+
+gate(int[] c, int k) {
+  int hit = 0;
+  if(k == 0) {
+    hit = c[0] > 0 && tick(c) < tick(c);
+  }
+  if(k == 1) {
+    hit = c[0] == 0 || tick(c) < tick(c);
+  }
+} chain (int[] c, int k) {
+  if(k == 2) {
+    hit = c[0] == 0 && tick(c) < tick(c);
+  }
+  string s = "" + hit;
+} return string s;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

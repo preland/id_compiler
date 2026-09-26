@@ -1,0 +1,17 @@
+// A poked, known 2-byte buffer for lay_poke_range's own cases: a `given`
+// setup takes no parameters, and this is the only way to hand a case a real
+// address to overwrite.
+
+lay_poke_setup() {
+  export word lay_pb = alloc(4);
+  poke8(lay_pb, 122);
+  poke8(lay_pb + 1, 122);
+} return void;
+():() then prints:("")
+():() then prints:("") then lay_poke_read:("zz")
+
+lay_poke_read() {
+  string s = str_of_mem((import lay_pb), 2);
+} return string s;
+given lay_poke_setup ():("zz")
+given lay_poke_setup ():("zz") then prints:("")

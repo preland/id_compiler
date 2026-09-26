@@ -11,7 +11,8 @@
 // which bin/idc builds and runs before the program on every build.
 //
 // There is no ambiguity with the next declaration -- a function starts
-// `ident (`, a case starts `(` or the keyword `given` -- so this is a plain
+// `ident (`, a case starts `(`, or the keyword `given` or `stdin` (a case may
+// open with `stdin "TEXT"` and no `given` at all) -- so this is a plain
 // "while the next token opens a case" loop, run after the function has been
 // pushed so each case can record which function it belongs to.
 
@@ -19,7 +20,7 @@
 // only free slot there under the action limit. The function each case belongs
 // to is the last one pushed onto `prog`, which is why this runs after it.
 take_cases(int[] pos) {
-  while((cur_kind(pos) == "op" && cur_text(pos) == "(") || (cur_kind(pos) == "kw" && cur_text(pos) == "given")) {
+  while((cur_kind(pos) == "op" && cur_text(pos) == "(") || (cur_kind(pos) == "kw" && cur_text(pos) == "given") || (cur_kind(pos) == "kw" && cur_text(pos) == "stdin")) {
     push_case(pos);
   }
 } return int 0;

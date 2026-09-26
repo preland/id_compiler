@@ -5,6 +5,7 @@
 print_calls() {
   call_edges_funcs(0, 0);
   print_call_cases();
+  print_asm_cases();
 } return void;
 given edge_fixture ():() then check_failed:(0)
 given edge_fixture ():() then init_units:(0)

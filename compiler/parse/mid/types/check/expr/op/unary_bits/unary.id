@@ -5,7 +5,7 @@
 // could not work out is not judged, as everywhere else in tc.
 
 tc_g5(int id) {
-  if(k_of(id) == "func") {
+  if(k_of(id) == "func" || k_of(id) == "ret") {
     chk_retexpr(id);
   }
   if(k_of(id) == "un") {

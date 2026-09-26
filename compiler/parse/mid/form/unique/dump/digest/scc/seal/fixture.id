@@ -1,0 +1,33 @@
+// ../../graph/state/fixture.id's graph, stopped where the walk from 0 is about
+// to complete {0, 1}: {2} is already component 0 (its hash set to 9, clean),
+// and 0 and 1 are on the stack, unmarked. dg_t_marked goes one step further
+// and marks both as component 1, which is the state dg_seal reads.
+
+dg_t_stk2() {
+  dg_t_graph();
+  lset((import dg_comp), 2, 0);
+  push((import dg_deep), 9);
+} chain () {
+  push((import dg_dirty), 0);
+  lset((import dg_ctr), 1, 1);
+  push((import dg_stk), 0);
+} chain () {
+  push((import dg_stk), 1);
+  lset((import dg_on), 0, 1);
+  lset((import dg_on), 1, 1);
+} return void;
+():() then dg_nstk:(2)
+():() then dg_ncomp:(1)
+
+dg_t_marked() {
+  dg_t_stk2();
+  dg_mark(0, 1);
+} return void;
+():() then dg_nstk:(2)
+():() then dg_comp1:(1)
+
+dg_nstk() {
+  int dgn = len((import dg_stk));
+} return int dgn;
+given dg_t_stk2 ():(2)
+given dg_t_graph ():(0)

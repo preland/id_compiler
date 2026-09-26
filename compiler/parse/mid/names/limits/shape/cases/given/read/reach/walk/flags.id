@@ -1,0 +1,34 @@
+// One setup's reachable set, found by a walk over dg_cout (the digest's
+// calls and function values, never its import edges -- reading an export
+// runs nothing), and the question reaches (../reach.id) asks of it.
+
+rc_new(string src) {
+  int ri = len((import rcsets));
+  push((import rcsets), rc_flags(src));
+  hmap_put((import rck), (import rcv), (import rcu), (import rcc), src, ri);
+} return int ri;
+given rc_t_ready ("fb"):(0) then rc_nsets:(1)
+given rc_t_one ("fa"):(1) then rc_nsets:(2)
+
+// A flag per row, 1 where src reaches. src's own row is set first, the way
+// the fixpoint this replaces started with src in its set; a name that is no
+// function of the build reaches nothing.
+rc_flags(string src) {
+  int[] rcfl = [];
+  lst_fill(rcfl, len((import dg_cout)), 0);
+  int[] rctodo = [];
+} chain (string src) {
+  int rcst = dg_fn_named(src);
+  rc_visit(rcfl, rctodo, rcst);
+  rc_walk(rcfl, rctodo);
+} return int[] rcfl;
+given rc_t_ready ("fb"):([1, 1, 0])
+given rc_t_ready ("fa"):([1, 0, 0])
+
+rc_has(string src, string dst) {
+  int ri = rc_of(src);
+  int dw = dg_fn_named(dst);
+  int ok = dw >= 0 && (import rcsets)[ri][dw] == 1;
+} return int ok;
+given rc_t_one ("fb", "fa"):(1) then rc_nsets:(1)
+given rc_t_one ("fa", "fb"):(0) then rc_nsets:(2)

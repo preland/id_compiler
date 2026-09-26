@@ -1,0 +1,15 @@
+// break leaves only the innermost loop. The inner loop breaks at once every
+// time; if the break left the outer loop instead, total would be 0, not 3.
+main(int argc, string[] argv) {
+  int i = 0;
+  int total = 0;
+  while(i < 3) {
+    while(i < 100) {
+      break;
+    }
+    total = total + 1;
+    i = i + 1;
+  }
+} chain (int argc, string[] argv) {
+  print("" + total);
+} return int 0;

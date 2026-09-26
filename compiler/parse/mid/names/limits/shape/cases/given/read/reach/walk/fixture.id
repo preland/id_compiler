@@ -1,0 +1,23 @@
+// The digest's parsed pair (mid/form/unique/dump/digest/graph/state/
+// parsed.id: fb calls fa) with the memo built -- rows 0 fa, 1 fb, 2 the asm
+// row -- and then with fb's set already found.
+
+rc_t_ready() {
+  dg_t_parsed();
+  rc_ready();
+} return void;
+():() then rc_nsets:(0)
+():() then dg_nrows:(3)
+
+rc_t_one() {
+  rc_t_ready();
+  int rcfirst = rc_of("fb");
+} return void;
+():() then rc_nsets:(1)
+():() then dg_nrows:(3)
+
+rc_nsets() {
+  int rcn = len((import rcsets));
+} return int rcn;
+given rc_t_ready ():(0)
+given rc_t_one ():(1)

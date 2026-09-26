@@ -1,0 +1,59 @@
+// Whether a case belongs to a library, for the harness narrowing
+// (back/drive/target/tests/reach.id's seed_tested/seed_givens/seed_thens,
+// back/tgt/c/emit/prog/test/case/case.id's emit_cases): a case whose
+// function was parsed in a unit at or past --std-unit's boundary (nat_init's
+// own chain, back/drive/sink/natives/more/live.id, mutating the `stdunit`
+// cell init_units exports) is the standard library's own, and a case whose
+// unit is one exclunit names (grown by the same chain calling
+// back/drive/sink/natives/more/emit.id's exclunit_seed, read back by
+// unit_excluded below) is an attached backend directory's own -- bin/idc
+// computes that list from every backend that is its own compilation unit
+// and outside the stdlib's range (a backend merged into the stdlib by
+// directory walk alone is already inside it). Either way the case is not
+// what a program's harness runs -- only bin/idc's separate pre-check of
+// that library does. -1 with an empty exclunit excludes nothing, which is
+// every build before --exclude-units existed.
+//
+// Filed here (an unrelated name-lookup module) rather than under
+// back/drive/target/tests/ or back/tgt/c/emit/prog/test/case/, both of which
+// are at their 3-entry cap two levels up already -- this directory has the
+// room, and a case's own function is looked up by unit the same way a
+// variable's type is (lookup.id, above).
+
+case_is_std(int ci) {
+  int boundary = (import stdunit)[0];
+  int r = 0;
+  if((boundary >= 0 && (import nunit)[(import casefn)[ci]] >= boundary) || unit_excluded(ci) == 1) {
+    r = 1;
+  }
+} return int r;
+given case_unit_fixture (0):(0)
+given case_unit_fixture (1):(1)
+
+// nat_init's own cases (live.id) read this back to check --std-unit landed
+// in the cell; case_unit_fixture (back/tgt/c/emit/prog/test/case/case.id)
+// gives a second, differently-sourced value so this function's own two
+// cases are not both nat_init's default.
+stdunit_check() {
+  int n = (import stdunit)[0];
+} return int n;
+given case_unit_fixture ():(6)
+given natinit_fixture_off ():(-1)
+
+// exclunit is checked len() > 0 first, the same reason the boundary check
+// above reads `boundary >= 0` before touching (import nunit)[(import
+// casefn)[ci]]: several of this file's own callers (reach.id's seed_givens/
+// seed_thens in particular) run case_is_std against a `ci` that is only
+// valid as an index into casegiven, not casefn -- safe today only because
+// the boundary's `&&` never evaluates the indexing past it. exclunit's own
+// membership check would be the same trap the moment a build ever excludes
+// anything, so it gets the same short-circuit rather than reading nunit/
+// casefn unconditionally.
+unit_excluded(int ci) {
+  int r = 0;
+  if(len((import exclunit)) > 0 && lst_find((import exclunit), (import nunit)[(import casefn)[ci]]) == 1) {
+    r = 1;
+  }
+} return int r;
+given case_unit_fixture (0):(0)
+given case_unit_fixture (1):(1)

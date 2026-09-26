@@ -16,3 +16,11 @@ fix_class3_setup() {
   export int ck_import = newleaf("import", 0, 0, "x", "");
   export int ck_int = newleaf("int", 1, 0, "1", "");
 } return void;
+():() then ck_import_check:("import")
+():() then check_failed:(0)
+
+ck_import_check() {
+  string k = k_of((import ck_import));
+} return string k;
+given fix_class3_setup ():("import")
+given fix_class3_setup ():("import") then check_failed:(0)

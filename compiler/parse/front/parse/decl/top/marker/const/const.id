@@ -13,10 +13,20 @@
 // initialiser for all of them and calls it before main.
 //
 //   cdecl  the declaration node of each constant, in conf.id order
+//
+// Two pieces of parse state that are not about constants ride along, because
+// this is the parser's one init with room: pend_rets holds the early `return`
+// nodes of the function being parsed, which learn its name and return type
+// only once its return clause is read (sig/params/seal.id); loopd is how many
+// `while` bodies enclose the statement being parsed, so a `break` outside one
+// is refused where it is written (stmt/form/more.id).
 
 init_consts() {
   export int[] cdecl = [];
   init_pos();
+  export int[] pend_rets = [];
+} chain () {
+  export int[] loopd = [0];
 } return int 0;
 given env_init ():(0)
 given env_init ():(0) then check_failed:(0)

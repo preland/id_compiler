@@ -1,7 +1,18 @@
 // `given SETUP`, ahead of a case's arguments: the function the case's process
-// runs first. It is recorded by name, one entry per case in `casegiven`, and
-// "" for a case without one. Whether the name is a setup at all is a check
+// runs first. `given` may be repeated, and each setup runs in the order
+// written, so a case needing two subsystems live names both rather than
+// needing a fixture written to call them. The names are recorded as one
+// space-separated entry per case in `casegiven`, "" for a case without any.
+// Whether a name is a setup at all is a check
 // (mid/names/limits/shape/cases/given/), not a parse.
+//
+// `stdin "TEXT"` follows any `given`, ahead of the arguments too: the text the
+// case's process sees as its whole standard input (docs/TESTS.md). It is
+// recorded one entry per case in `casestdin` -- the "str" node, or -1 for a
+// case without one -- so the harness can build it exactly as any other case
+// literal (back/tgt/c/emit/prog/test/judge/more/row.id). At most one per case;
+// a second is rejected here, on the same line as the rest of case parsing,
+// rather than left for a later pass to notice.
 
 parse_case_args(int[] pos) {
   int[] args = case_tuple(pos);
@@ -12,10 +23,27 @@ given case_min_fix ([0]):(2) then check_failed:(0)
 
 case_given(int[] pos) {
   string setup_nm = "";
-  if(cur_kind(pos) == "kw" && cur_text(pos) == "given") {
-    setup_nm = given_name(pos);
+  while(cur_kind(pos) == "kw" && cur_text(pos) == "given") {
+    string setup_one = given_name(pos);
+    setup_nm = setup_nm + setup_one + " ";
   }
   push((import casegiven), setup_nm);
+} chain (int[] pos) {
+  int stdin_e = -1;
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "stdin") {
+    advance(pos);
+    if(cur_kind(pos) == "str") {
+      stdin_e = parse_str(pos);
+    } else {
+      string cur_text_v = cur_text(pos);
+      syn_err(pos, "stdin's value must be a string literal, found '" + cur_text_v + "'");
+    }
+  }
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "stdin") {
+    syn_err(pos, "a case may have at most one 'stdin' clause");
+  }
+} chain (int[] pos) {
+  push((import casestdin), stdin_e);
 } return void;
 given given_fix ([0]):()
 given tup1_fix ([0]):()

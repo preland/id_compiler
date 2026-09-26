@@ -1,0 +1,52 @@
+// Backward BFS over the reverse CSR (rev/build.id): everything that can
+// reach `root_idx` by following forward call edges, itself included (the
+// same "root counts as reached" rule the forward bfs_run uses) -- the
+// replacement for a fresh forward BFS per candidate, which is what
+// analyze/cand/given.id used to run once per surviving zero-void function.
+rbfs_run(int[] offs, int[] flat, int root_idx, int fcount) {
+  int[] visited = [];
+  int i = 0;
+  while(i < fcount) {
+    push(visited, 0);
+    i = i + 1;
+  }
+} chain (int[] offs, int[] flat, int root_idx, int fcount) {
+  visited[root_idx] = 1;
+  int[] queue = [];
+  push(queue, root_idx);
+} chain (int[] offs, int[] flat, int root_idx, int fcount) {
+  int qi = 0;
+  while(qi < len(queue)) {
+    rbfs_expand(offs, flat, visited, queue, queue[qi]);
+    qi = qi + 1;
+  }
+} return int[] visited;
+([0, 0, 1], [0], 1, 2):([1, 1])
+([0, 0, 1], [0], 0, 2):([1, 0])
+
+// One node's neighbours, marked visited and queued -- split out of
+// rbfs_run's own loop since a while nested inside a while nested inside an
+// if is one level deeper than a function body may nest.
+rbfs_expand(int[] offs, int[] flat, int[] visited, int[] queue, int node) {
+  int j = offs[node];
+  while(j < offs[node + 1]) {
+    int nb = flat[j];
+    if(visited[nb] == 0) {
+      visited[nb] = 1;
+      push(queue, nb);
+    }
+    j = j + 1;
+  }
+} return void;
+([0, 0, 1], [0], [0, 0], [1], 1):([0, 0, 1], [0], [1, 0], [1, 0])
+([0, 0, 1], [0], [1, 0], [0], 0):([0, 0, 1], [0], [1, 0], [0])
+
+// Two real, connected functions (p calls q) -- the smallest fixture where a
+// backward search actually has a hop to make, unlike ix_test_setup's single
+// tracked function with an edge to an untracked name.
+rev_edge_fixture() {
+  ix_init(["p|q|call"], ["p|f.id|1|2", "q|f.id|2|2"]);
+  fx_init(["===F:f.id===", "p() { } return void;", "q() { } return void;"]);
+} return void;
+():() then total_funcs:(2)
+():() then total_edges:(1)

@@ -1,0 +1,57 @@
+// The type check's cache (Stage 3 of the incremental build): per function, a
+// key over everything its check can read, and whether a clean check under
+// that key is already on record.
+//
+// A function's run of nodes is everything the parser made between the end of
+// the previous function's return clause and the end of its own -- so the
+// previous function's cases, and any conf.id constant, ride with it. The key
+// hashes exactly those tokens (key/key.id), the units of both functions, and,
+// for every name among them, all that name can mean anywhere in the program:
+// the signature of a function by that name, its return type, the type of an
+// export by that name, and the one type the name has as a variable in each of
+// the two units (key/mean.id). A run that names an asm routine gets no key and
+// is always checked. bin/idc adds the compiler, the flags and the constants
+// by keeping one list of clean keys per combination of them, and hands that
+// list back in as `tcc KEY` lines ahead of the tokens (tccin).
+//
+//   tkskip  per function: 1 when its run is skipped
+//   tkbad   per function: 1 once a node of its run raised a diagnostic
+//   tkkey   per function: its key, or "" for none
+//   tkcur   [the run the walk is in] (../skip.id)
+//
+// Nothing is keyed unless someone will use it -- bin/idc asked for the keys
+// (tkout) or handed some in -- and never when the parser's token spans do
+// not line up with `prog`, which only a hand-built fixture's do not.
+
+tk_prepare() {
+  export int[] tkskip = [];
+  export int[] tkbad = [];
+  export string[] tkkey = [];
+} chain () {
+  export int[] tkcur = [0];
+  if(tk_enabled() == 1) {
+    tk_setup();
+  }
+} return void;
+given tk_t_parsed ():() then tk_nkeys:(2)
+given dg_t_parsed ():() then tk_nkeys:(0)
+
+tk_enabled() {
+  int tkon = 0;
+  if(((import tkout)[0] == 1 || len((import tccin)) > 0) && len((import ptoke)) == len((import prog))) {
+    tkon = 1;
+  }
+} return int tkon;
+given tk_t_parsed ():(1)
+given dg_t_parsed ():(0)
+
+tk_setup() {
+  tk_maps();
+  int tkf = 0;
+  while(tkf < len((import prog))) {
+    tk_row(tkf);
+    tkf = tkf + 1;
+  }
+} return void;
+given tk_t_prep0 ():() then tk_nkeys:(2)
+given tk_t_warm0 ():() then tk_nskip:(1)

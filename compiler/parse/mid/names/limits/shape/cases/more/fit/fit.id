@@ -17,12 +17,46 @@ fit_case(int i) {
   if(flat_arg_count(fn) != flat_arg_count(node)) {
     int na = flat_arg_count(node);
     case_arity_err(i, fn, na);
+  } else if(case_has_out(i, "thentraps") == 1) {
+    fit_traps(i);
   } else {
     fit_body(i, fn, node);
   }
 } return void;
 given wrap_fixture ((import fixture_ci)):() then prints:("")
 given wrap_fixture ((import fixture_ci)):() then calls fit_body:[1]
+given traps_case_fixture ((import fixture_ci)):() then calls fit_traps:[1]
+
+// A case's `traps` check is checked here, once per case, rather than beside
+// fit_then_traps (given/then/check/entry.id): the two things it rules out --
+// an expected return value, and any other `then` clause on the same case --
+// are properties of the whole case, not of the traps node itself, and the
+// harness (back/tgt/c/emit/prog/test/) truly cannot see either: nothing runs
+// in the case's process after a real trap, so nothing after the call is ever
+// captured. fit_case only reaches here once case_has_out has already
+// confirmed a `thentraps` node exists, so unlike fit_body's checks this one
+// does not re-test for that.
+fit_traps(int i) {
+  int node = (import casenode)[i];
+  int nexp = len(l2_of(node));
+  if(nexp != 0) {
+    case_err(i, "a case with 'traps' may not also give an expected return value");
+  }
+} chain (int i) {
+  int trap_hp = case_has_out(i, "thenprints");
+  int trap_he = case_has_out(i, "theneprints");
+  int trap_hc1 = case_has_out(i, "thencalls");
+} chain (int i) {
+  int trap_hc2 = case_has_out(i, "thencallsn");
+  int trap_hchk = case_has_out(i, "then");
+  int trap_other = trap_hp + trap_he + trap_hc1 + trap_hc2 + trap_hchk;
+} chain (int i) {
+  if(trap_other != 0) {
+    case_err(i, "a case with 'traps' may not also check another 'then' clause: nothing after a trap is captured");
+  }
+} return void;
+given traps_case_fixture ((import fixture_ci)):() then prints:(":4: error: a case with 'traps' may not also give an expected return value\n")
+given traps_node_fixture ((import fixture_ci)):() then prints:("fixture.id:4: error: a case with 'traps' may not also check another 'then' clause: nothing after a trap is captured\n")
 
 // casegiven[i] populated with "" (a case with no `given`): fit_given
 // (../../given/given.id), fit_import and imp_owner (../../given/read/

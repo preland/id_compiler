@@ -1,0 +1,50 @@
+// ccrun MEM_KB CPU_SECONDS INPUT ARGV_LINES -- run a command under a
+// virtual-memory (and optional CPU) ceiling, forwarding its stdout and
+// stderr byte for byte to this process's own, feeding it INPUT (a real
+// file's path, or "-" for none) as its stdin, and exiting with its exit
+// status.
+//
+// Replaces bin/idc's capped()'s `( ulimit -v MEM_CAP_KB; exec "$@" )`:
+// proc_spawn_limited sets the same RLIMIT_AS -- in kilobytes, the unit
+// ulimit -v takes -- before the child execs (idstd's
+// sys/io/ipc/proc/README.md). ARGV_LINES is the child's argv, one entry per
+// line, exactly what that same README documents; bin/idc's capped() builds
+// it with `printf '%s\n' "$@"`, which never leaves a trailing blank line for
+// proc_split_argv to turn into a spurious empty argument.
+//
+// ccrun never reads its own real stdin. An earlier version did -- eagerly,
+// every round, in case the child wanted it -- and that alone cost ~13s on a
+// build that needs under a second of real work (idc/README.md's timing).
+// INPUT names the file explicitly instead: bin/idc already had one on hand
+// at every call site that fed a child anything (idlex's stdin is a
+// concatenated source file bin/idc writes for its own front-end cache
+// anyway; see bin/idc's run_lex_parse), so nothing downstream lost the
+// ability to feed a child real input, only the part of ccrun that had to
+// guess whether there was any.
+//
+// mem_ceiling_hit/mem_ceiling_error stay in bin/idc unchanged: they read the
+// exit status and the captured stderr file this process writes to, exactly
+// as they read a plain `ulimit -v` subshell's -- ccrun only reproduces the
+// ulimit and the forwarding, not the diagnosis built on top of them.
+main(int argc, string[] argv) {
+  int mem_kb = to_int(argv[1]);
+  int cpu_s = to_int(argv[2]);
+  int code = run_capped(argv[4], argv[3], mem_kb, cpu_s);
+} return int code;
+
+// Open real stdout/stderr in *append* mode, never "w": a "w" fopen()
+// truncates, and when a caller's own stdout or stderr is already a real
+// file (bin/idc's callers redirect both with `2>file` and sometimes
+// `>file`), reopening it truncated would discard nothing yet written by
+// this process but is still the wrong contract to reach for. "a" opens the
+// same underlying file at its current end with no truncation, matching
+// what exec's fd inheritance gave capped() for free.
+run_capped(string argv_lines, string input, int mem_kb, int cpu_s) {
+  export int cr_out = fs_open("/dev/stdout", "a");
+  export int cr_err = fs_open("/dev/stderr", "a");
+  export int cr_h = proc_spawn_limited(argv_lines, mem_kb, cpu_s);
+} chain (string argv_lines, string input, int mem_kb, int cpu_s) {
+  setup_io(input);
+  int code = pump_finish(1);
+  close_all();
+} return int code;

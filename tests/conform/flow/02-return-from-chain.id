@@ -1,0 +1,21 @@
+// an early return inside a chain segment returns from the whole function:
+// the value comes back from the second segment, and the third never runs.
+pick(int n) {
+  int a = n + 1;
+  int b = a + 1;
+  int c = b + 1;
+} chain (int n) {
+  if(c > 5) {
+    return c;
+  }
+  print("small");
+  c = 0;
+} chain (int n) {
+  print("third segment ran");
+} return int c;
+
+main(int argc, string[] argv) {
+  int big = pick(10);
+  int small = pick(1);
+  print("" + big + " " + small);
+} return int 0;

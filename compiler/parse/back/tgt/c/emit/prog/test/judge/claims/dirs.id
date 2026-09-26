@@ -1,0 +1,34 @@
+// Where each case runs: idtc_dirs, called once before any case, fills
+// idtc_dir[ci] with the root of the source tree -- the compilation unit --
+// that owns the function under test (root.id), which the case's process
+// enters before anything of the case runs (unit/more/text/one.id). A case of
+// an imported library therefore reads its files relative to that library,
+// as it does when the library is built on its own, and a program's own case
+// from the program's root. A case with no root known stays where bin/idc
+// started the harness.
+
+emit_tc_dirs() {
+  emit_line("static void idtc_dirs(void) {");
+  tc_dir_rows(0);
+  emit_line("}");
+} return void;
+given ur_t ():() then prints:("static void idtc_dirs(void) {\n    idtc_dir[0] = \"/tmp/r0\";\n    idtc_dir[1] = \"/tmp/r0\";\n    idtc_dir[2] = \"/tmp/r0\";\n    idtc_dir[3] = \"/tmp/r0\";\n}\n")
+given dg_t_parsed ():() then prints:("static void idtc_dirs(void) {\n}\n")
+
+tc_dir_rows(int ci) {
+  while(ci < len((import casefn))) {
+    emit_dir_row(ci);
+    ci = ci + 1;
+  }
+} return void;
+given ur_t (3):() then prints:("    idtc_dir[3] = \"/tmp/r0\";\n")
+given ur_t (4):() then prints:("")
+
+emit_dir_row(int ci) {
+  string cr = case_root(ci);
+  if(cr != "") {
+    emit_line("    idtc_dir[" + ci + "] = \"" + c_esc(cr) + "\";");
+  }
+} return void;
+given ur_t (2):() then prints:("    idtc_dir[2] = \"/tmp/r0\";\n")
+given dg_t_parsed (2):() then prints:("")

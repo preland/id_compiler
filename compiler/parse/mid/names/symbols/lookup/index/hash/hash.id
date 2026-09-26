@@ -20,12 +20,16 @@ hash_step(int hv, int c) {
 // semantics -- the last match wins, and -1 means no match -- so a caller can
 // be switched to it without anything else changing.
 find_ix(string[] names, int[] bucket, string name) {
-  int i = 0;
+  int i = len(bucket) - 1;
   int found = 0 - 1;
-  while(i < len(bucket)) {
+  while(i >= 0) {
     found = ix_hit(names, bucket, i, name, found);
-    i = i + 1;
+    if(found == bucket[i]) {
+      break;
+    }
+    i = i - 1;
   }
 } return int found;
 given neg1_setup (["a", "b"], [0, 1], "b"):(1)
 given neg1_setup (["a", "b"], [0, 1], "c"):((import neg1))
+(["g", "g"], [0, 1], "g"):(1)

@@ -6,7 +6,29 @@
 //   conskind   the claim's kind, `time` or `mem`
 //   consbound  the claim's bound as canonical text, e.g. `O(n log n)`
 //   casegiven  each case's setup function, or "" (cases/case/given/)
+//   casestdin  each case's `stdin "TEXT"` node, or -1 (cases/case/given/)
 //   thennode   each `then` check, as a "then" node (cases/case/then/)
+//   ptoks      each function's first token, parallel to `prog` as parsed
+//   ptoke      one past its return clause's last token: the text a case
+//              key hashes (mid/form/unique/dump/digest/)
+//   pnodes     its node, so a function can be found again once `prog` has
+//              been narrowed or pruned and no longer lines up with pfile
+//   unitc      [1 under --units, the emitter's cursor into pnodes], and
+//   unitlast   the file the last unit marker named (back/tgt/c/emit/prog/
+//              code/func/def/body/rest/unit.id)
+//   rcon       1 once the setup-reach memo exists (mid/names/limits/shape/
+//              cases/given/read/reach/memo.id)
+//   tccin      the clean type-check keys bin/idc handed in, as `tcc KEY`
+//              lines in the token stream (front/tokens/expect/syn_err.id)
+//   tcerrs     how many type-check diagnostics have been printed
+//   tkout      [1 under --tc-keys]: write this build's clean keys (mid/
+//              types/check/walk/check/tk/)
+//   uroots     each compilation unit's root directory, from --unit-roots:
+//              where a unit's cases run (back/tgt/c/emit/prog/test/judge/
+//              claims/)
+//   sqbase     the node of the function the C emitter is inside, which its
+//              sequencing temporaries are named from (sq_name, back/tgt/c/
+//              emit/prog/code/body/hoist/hoist_loop.id)
 
 init_cases() {
   export int[] caseend = [];
@@ -19,13 +41,26 @@ init_cases() {
 init_cases2() {
   export int[] conscase = [];
   export string[] conskind = [];
-  init_cases3();
-} return void;
-():() then calls init_cases3:[1]
-():() then calls init_cases3:()
-
-init_cases3() {
   export string[] consbound = [];
+} chain () {
   export string[] casegiven = [];
   export int[] thennode = [];
+  export int[] casestdin = [];
+} chain () {
+  export int[] ptoks = [];
+  export int[] ptoke = [];
+  export int[] pnodes = [];
+} chain () {
+  export int[] unitc = [0, 0];
+  export string[] unitlast = [""];
+  export int[] sqbase = [0];
+} chain () {
+  export int[] rcon = [0];
+  export string[] tccin = [];
+  export int[] tcerrs = [0];
+} chain () {
+  export int[] tkout = [0];
+  export string[] uroots = [];
 } return void;
+():() then consbound_len:(0)
+given claim_cols_fixture ():() then consbound_len:(0)

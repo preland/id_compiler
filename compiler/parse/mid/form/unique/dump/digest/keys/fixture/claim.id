@@ -1,0 +1,24 @@
+// The parsed pair's first case given a scaling claim, which keeps it off the
+// cache; and the whole pair made standard-library cases (the library unit
+// starting at unit 0), which the harness never runs here.
+
+dg_t_claim() {
+  dg_t_built();
+  push((import conscase), 0);
+} return void;
+():() then dg_nfn:(2)
+():() then dg_ncomp:(3)
+
+dg_t_std() {
+  dg_t_built();
+  lset((import stdunit), 0, 0);
+} return void;
+():() then dg_nfn:(2)
+():() then dg_nrows:(3)
+
+dg_dirty_last() {
+  int dgl = len((import dg_dirty)) - 1;
+  int dgn = (import dg_dirty)[dgl];
+} return int dgn;
+given dg_t_scc ():(1)
+given dg_t_built ():(1)

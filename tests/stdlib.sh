@@ -414,6 +414,100 @@ else
     bad "one type per name still holds across the user's own tree"
 fi
 
+# -- 23. --print-std prints the stdlib root this build would merge ---------
+# tools/idxpack.sh's ===STD=== line is exactly this, run with the same
+# flags/env as its --calls run, so idxpack's "which unit is this file in"
+# decision uses the stdlib idc actually resolved instead of guessing at a
+# "/idstd/" path substring. An explicit --std wins over everything else, so
+# this holds wherever the checkout sits.
+rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj/main.id"
+want=$(cd "$FIXTURE" && pwd -P)
+got=$($BIN_IDC "$TMP/proj" --std "$FIXTURE" --print-std)
+if [ "$got" = "$want" ]; then
+    ok "--print-std honours --std DIR"
+else
+    bad "--print-std honours --std DIR (got '$got', want '$want')"
+fi
+
+# -- 24. --print-std honours $IDSTD_HOME ------------------------------------
+want=$(cd "$FIXTURE" && pwd -P)
+got=$(IDSTD_HOME="$FIXTURE" $BIN_IDC "$TMP/proj" --print-std)
+if [ "$got" = "$want" ]; then
+    ok "--print-std honours \$IDSTD_HOME"
+else
+    bad "--print-std honours \$IDSTD_HOME (got '$got', want '$want')"
+fi
+
+# -- 25. --print-std prints nothing under --no-std --------------------------
+# A --std given alongside --no-std must not leak through: --no-std wins, same
+# as it does for the real build (test 4, above).
+got=$($BIN_IDC --no-std --std "$FIXTURE" "$TMP/proj" --print-std)
+if [ "$got" = "" ]; then
+    ok "--print-std prints nothing under --no-std"
+else
+    bad "--print-std prints nothing under --no-std (got '$got')"
+fi
+
+# -- 26. a broken idstd case fails a program build with the library's own
+# message, never the program's -- bin/idc's pre-check (run_std_precheck),
+# against a scratch COPY of the fixture stdlib, never fixtures/idstd itself.
+rm -rf "$TMP/idstd_broken"; cp -r "$FIXTURE" "$TMP/idstd_broken"
+sed -i 's/(3, 9):(9)/(3, 9):(999)/' "$TMP/idstd_broken/math/fx.id"
+broken=$(cd "$TMP/idstd_broken" && pwd -P)
+rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj/main.id"
+out=$($BIN_IDC "$TMP/proj" --std "$broken" -o "$TMP/out26" 2>&1)
+if printf '%s\n' "$out" | grep -qF "idc: the standard library at $broken failed its own test cases (this is not an error in your program):" \
+   && printf '%s\n' "$out" | grep -qF "test failed: tfx_max(3, 9) = 9, expected 999" \
+   && [ ! -e "$TMP/out26" ]; then
+    ok "a broken idstd case fails a program build with the library's own message"
+else
+    bad "a broken idstd case fails a program build with the library's own message: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ')"
+fi
+
+# -- 27. a failing case in the program itself is reported as the program's,
+# with idstd (unmodified) fine -----------------------------------------------
+rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
+cat > "$TMP/proj/main.id" <<'EOF'
+proj_add_one(int a) {
+  int b = a + 1;
+} return int b;
+(1):(2)
+(2):(999)
+
+main(int argc, string[] argv) {
+  int r = proj_add_one(1);
+  print(r);
+} return int 0;
+EOF
+out=$($BIN_IDC "$TMP/proj" --std "$FIXTURE" -o "$TMP/out27" 2>&1)
+if printf '%s\n' "$out" | grep -qF "test failed: proj_add_one(2) = 3, expected 999" \
+   && ! printf '%s\n' "$out" | grep -q "failed its own test cases"; then
+    ok "a failing case in the program is reported as the program's, with idstd fine"
+else
+    bad "a failing case in the program is reported as the program's, with idstd fine: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ')"
+fi
+
+# -- 28. the pre-check is cached: a second, identical build against the same
+# library creates no new pre-check cache entry -------------------------------
+rm -rf "$TMP/proj" "$TMP/idstd_cachetest"; mkdir -p "$TMP/proj"
+cp -r "$FIXTURE" "$TMP/idstd_cachetest"
+printf 'main(int argc, string[] argv) {\n  print(2);\n} return int 0;\n' > "$TMP/proj/main.id"
+precheck_entries() {
+    find "$ROOT/.idc-cache/std_precheck" -mindepth 1 -maxdepth 1 -type d ! -name '.bincache' 2>/dev/null \
+        | wc -l | tr -d ' '
+}
+$BIN_IDC "$TMP/proj" --std "$TMP/idstd_cachetest" -o "$TMP/out28a" >/dev/null 2>&1
+e1=$(precheck_entries)
+$BIN_IDC "$TMP/proj" --std "$TMP/idstd_cachetest" -o "$TMP/out28b" >/dev/null 2>&1
+e2=$(precheck_entries)
+if [ "$e1" -ge 1 ] && [ "$e2" -eq "$e1" ]; then
+    ok "the library pre-check is cached: a second build creates no new pre-check cache entry"
+else
+    bad "the library pre-check is cached: a second build creates no new pre-check cache entry (had $e1, now $e2)"
+fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

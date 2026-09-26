@@ -19,3 +19,15 @@ es2(int id, string ind) {
 } return void;
 given stmt_fix (2, ""):() then prints:("z = 5;\n")
 given stmt_fix (5, ""):() then prints:("5;\n")
+
+// A decl statement, and in the harness an exported one's flag right after
+// its value is stored (prog/head/decl/export/uninit.id). The export bit is
+// tested before is_harn(), so a local's decl never reads the flag.
+emit_decl_mark(int id, string nm, int e, string ind) {
+  emit_decl_line(nm, e, ind);
+  if(is_export_decl(id) == 1 && is_harn() == 1) {
+    emit_line(ind + "idtc_set_" + nm + " = 1;");
+  }
+} return void;
+given uninit_fixture ((import lz_edecl), "z", (import lz_i1), "  "):() then prints:("  z = 3;\n  idtc_set_z = 1;\n")
+given stmt_fix (1, "y", 0, ""):() then prints:("y = 5;\n")

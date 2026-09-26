@@ -1,0 +1,17 @@
+// Two directory listings, run through lay_count_all itself: three counted
+// files (the boundary -- not yet over) and four (one past it). Both reset
+// the five violation buckets too, since going over pushes into one of them.
+
+lay_fixture_over() {
+  lay_reset();
+  lay_count_all([97, 46, 105, 100, 10, 98, 46, 105, 100, 10, 99, 46, 105, 100, 10, 100, 46, 105, 100, 10], "build", 0);
+} return void;
+():() then prints:("")
+():() then lay_report:(0)
+
+lay_fixture_under() {
+  lay_reset();
+  lay_count_all([97, 46, 105, 100, 10, 98, 46, 105, 100, 10, 99, 46, 105, 100, 10], "build", 0);
+} return void;
+():() then prints:("")
+():() then lay_report:(0)

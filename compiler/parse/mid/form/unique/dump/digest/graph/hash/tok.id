@@ -1,0 +1,35 @@
+// A run of tokens as one hash. The token store is already the canonical form
+// of the source -- no comment, no spacing, no line break reaches it -- so two
+// spellings of one function that differ only in layout hash the same, and any
+// change a reader could see does not. Each token folds its kind, its text and
+// then a separator byte (31, which no token's text contains), so a token
+// boundary cannot move without the hash moving with it.
+
+dg_tok1(word dgh, int dgt) {
+  word dghk = dg_fnv(dgh, (import tkind)[dgt]);
+  word dght = dg_fnv(dghk, (import ttext)[dgt]);
+  word dghs = (dght ^ 31) * 1099511628211;
+} return word dghs;
+given mk_two_toks (0, 0):(1300973626828929235)
+given mk_two_toks (0, 1):(7701663932008181337)
+
+// Tokens dgfrom up to but not including dgto, from a zero hash.
+dg_tokhash(int dgfrom, int dgto) {
+  word dgh = 0;
+  while(dgfrom < dgto) {
+    dgh = dg_tok1(dgh, dgfrom);
+    dgfrom = dgfrom + 1;
+  }
+} return word dgh;
+given mk_two_toks (0, 2):(5330517585167306040)
+given mk_two_toks (1, 1):(0)
+
+// The token span the parser recorded for the most recently parsed function
+// (front/parse/decl/top/decl/more.id's push_func_body): the one reader of
+// ptoks/ptoke outside this directory's own build, for push_func_body's cases.
+ptok_span() {
+  int dgl = len((import ptoks)) - 1;
+  int dgn = (import ptoke)[dgl] - (import ptoks)[dgl];
+} return int dgn;
+given dg_t_parsed ():(19)
+given dg_t_built ():(19)

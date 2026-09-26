@@ -1,0 +1,9 @@
+// EXPECT: names beginning 'idsq_' are reserved for the C target's temporaries
+// The same rule, spelled as a function name rather than a variable: idsq_ is
+// the C target's own prefix for its sequencing temporaries.
+idsq_helper(int v) {
+} return int v;
+
+main(int argc, string[] argv) {
+  print(idsq_helper(1));
+} return int 0;

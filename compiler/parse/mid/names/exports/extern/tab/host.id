@@ -8,6 +8,8 @@
 build_host() {
   string ret_s = (import hostc)[0];
 } return string ret_s;
+given ut_host_seeded ():("x86_64-unknown-none")
+given build_host_fixture2 ():("wasm32-unknown-unknown")
 
 fs_fixture_extern() {
   init_rtc();

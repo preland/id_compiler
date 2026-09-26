@@ -6,3 +6,5 @@ lex_all() {
   string src = read_all();
   lex(src);
 } return void;
+given lex_fix_setup stdin "" ():() then prints:("")
+given lex_fix_setup stdin "x" ():() then prints:("ident x\n")

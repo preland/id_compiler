@@ -2,19 +2,42 @@
 // the `blank` statement, which belongs with the statement forms rather than
 // with the dispatch that routes to it.
 
+// A bare keyword statement: `blank` or `break`. Both carry no operand, so the
+// node is a leaf whose kind is the keyword itself.
+//
 // `blank` costs one action and does nothing. Its only use is to fill a segment
 // that must reach three actions before a chain, in the case where the chain's
 // first action cannot be lifted into that segment because the action following
 // it is structurally tied to it -- an if/else-if chain being the instance,
 // since splitting one would leave the chain unable to be spun back out into
-// its own function later. It carries no operand, so the node is a bare leaf.
+// its own function later.
+//
+// `break` leaves the innermost enclosing `while` and costs no action. Outside
+// every while it has nothing to leave, which is refused here, at the keyword.
 parse_blank(int[] pos) {
+  string bare_kw = cur_text(pos);
+  if(bare_kw == "break" && (import loopd)[0] == 0) {
+    syn_err(pos, "'break' is not inside a 'while': it leaves the innermost enclosing loop, so it can only appear in a while body");
+  }
   advance(pos);
+} chain (int[] pos) {
   skip_semi(pos);
-  int ret_i = newleaf("blank", 0, 0, "", "");
+  int ret_i = newleaf(bare_kw, 0 - 1, 0, "", "");
 } return int ret_i;
-given stmt_tokens ([42]):(0)
-given stmt_tokens ([4]):(0)
+given stmt_tokens ([42]):(0) then check_failed:(0)
+given flow_tokens ([0]):(0) then check_failed:(1)
+
+// An early `return`, or on to the rest of the statement forms.
+parse_ret_or(int[] pos) {
+  int node = 0;
+  if(cur_text(pos) == "return") {
+    node = parse_ret(pos);
+  } else {
+    node = parse_stmt4(pos);
+  }
+} return int node;
+given flow_tokens ([2]):(1) then calls parse_ret:[1]
+given flow_tokens ([7]):(1) then calls parse_stmt4:[1]
 
 finish_decl_tail(int[] pos, string type, string name, int exported) {
   eat_eq(pos);

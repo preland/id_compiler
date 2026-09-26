@@ -1,0 +1,32 @@
+// A case's hash: its function's component, then each of its tokens. dgacc is
+// [hash, dirt]; dirt counts the dirty components the case reaches, and any at
+// all makes the key "-".
+
+dg_case_hash(int dgc, int dgf) {
+  word[] dgacc = [0, 0];
+  dgacc[0] = dg_mix(dg_deep_fn(dgf), 3);
+  dgacc[1] = (import dg_dirty)[(import dg_comp)[dgf]];
+} chain (int dgc, int dgf) {
+  dg_case_toks(dgacc, (import casestart)[dgc], (import caseend)[dgc]);
+  string dgs = "-";
+  if(dgacc[1] == 0) {
+    dgs = "" + dgacc[0];
+  }
+} return string dgs;
+given dg_t_built (0, 0):("-5465788173469261037")
+given dg_t_built (2, 1):("1118206258217500576")
+
+dg_deep_fn(int dgf) {
+  word dgd = (import dg_deep)[(import dg_comp)[dgf]];
+} return word dgd;
+given dg_t_scc (0):(4863496796159887835)
+given dg_t_scc (2):(5376189763659863551)
+
+dg_case_toks(word[] dgacc, int dgfrom, int dgto) {
+  while(dgfrom < dgto) {
+    dg_case_tok(dgacc, dgfrom);
+    dgfrom = dgfrom + 1;
+  }
+} return void;
+given dg_t_built ([0, 0], 0, 0):([0, 0])
+given dg_t_built ([0, 0], 41, 42):([8248207263563534326, 0])

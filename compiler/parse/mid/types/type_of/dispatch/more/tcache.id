@@ -4,10 +4,16 @@
 // type_of doubles its own cost at every level of a binop chain, which is
 // exponential in the chain's depth. Caching the first answer makes the
 // second ask free.
+//
+// seqt is the C back end's per-node table of the same shape (which nodes'
+// values are in a temporary, back/tgt/c/emit/prog/code/expr/atom/order/). It
+// is started here because this is where every build and every fixture that
+// reaches emit_expr already starts a per-node table.
 
 init_tcache() {
   export string[] tcache = [];
   export int[] tcache_ok = [];
+  export int[] seqt = [];
 } return void;
 given env_init ():() then check_failed:(0)
 given env_init ():() then init_units:(0)

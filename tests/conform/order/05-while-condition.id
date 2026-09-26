@@ -1,0 +1,25 @@
+// A while condition is evaluated again on every iteration, operands left to
+// right each time. Left to right the two ticks read "12", "34", "56", and the
+// loop leaves by its break with c at 6. Right to left the first read is "21"
+// and the loop never runs; evaluated once before the loop, c would stay at 2.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  string s = spin(c);
+  print(s);
+} return int 0;
+
+spin(int[] c) {
+  int n = 0;
+  while("" + tick(c) + tick(c) != "21") {
+    n = n + 1;
+    if(n == 3) {
+      break;
+    }
+  }
+  string s = "n=" + n + " c=" + c[0];
+} return string s;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

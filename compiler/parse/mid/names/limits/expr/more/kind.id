@@ -30,9 +30,11 @@ given hidden_call_fixture ((import hc_call)):(0)
 
 hc_pair(int a, int b) {
   int ok = has_call(a);
-  if(ok == 0) {
-    ok = has_call(b);
+  int ok_b = has_call(b);
+  if(ok_b > ok) {
+    ok = ok_b;
   }
 } return int ok;
 given arith_fixture ((import ev_node), (import ev_node)):(0)
 given lencall_fixture ((import lw_fixture_n), (import lencall_node)):(1)
+given flat_call_fixture ((import cm_push_call), (import flat_outer_call)):(2)

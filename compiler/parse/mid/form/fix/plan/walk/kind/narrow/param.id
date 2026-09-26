@@ -1,14 +1,16 @@
 fix_ptype(int e, int i) {
   string s1_of_v = s1_of(e);
-  int fn = func_node(s1_of_v);
+  int fn = fn_node_of(s1_of_v);
   string pt = "";
 } chain (int e, int i) {
-  if(fn >= 0) {
+  if(fn > 0) {
     pt = fix_pparam(e, fn, i);
   } else if(is_fcall(e) == 1) {
     pt = fix_fparam(e, i);
   }
 } return string pt;
+given fix_pparam_fixture ((import ppcall), 0):("int")
+given fix_pparam_fixture ((import ppvarcall), 0):("int")
 
 // Only when the count matches: otherwise the checks report that instead and
 // judge no argument.
@@ -19,3 +21,23 @@ fix_pparam(int e, int fn, int i) {
     pt = s1_of(ps[i]);
   }
 } return string pt;
+given fix_pparam_fixture ((import ppcall), (import ppfn), 0):("int")
+given fix_pparam_fixture ((import ppcall), (import ppfn), 1):("")
+
+fix_pparam_fixture() {
+  fix_fixture();
+  int[] none = [];
+  int p0 = node_param("param", "int", "a");
+} chain () {
+  export int ppfn = node_func("h", "int", [p0], none, 0 - 1);
+  add_func("h", "int", ppfn);
+  int a0 = node_int("1", 1, 0);
+} chain () {
+  export int ppcall = node_call("h", [a0]);
+  add_var("cv", "func(int) return int", 0);
+  export int ppvarcall = node_call("cv", [a0]);
+} chain () {
+  export int ppwide = node_int("99999", 99999, 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

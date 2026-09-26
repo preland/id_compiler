@@ -1,0 +1,15 @@
+// An empty, known scratch list for count.id's own cases: a `given` setup
+// takes no parameters, and this is the only way to hand a case a fresh
+// lay_scratch_names to push onto.
+
+lay_scratch_reset() {
+  export string[] lay_scratch_names = [];
+} return void;
+():() then prints:("")
+():() then lay_scratch_len:(0)
+
+lay_scratch_len() {
+  int n = len((import lay_scratch_names));
+} return int n;
+given lay_scratch_reset ():(0)
+given lay_scratch_reset ():(0) then prints:("")

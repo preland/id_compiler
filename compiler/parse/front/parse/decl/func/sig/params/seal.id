@@ -1,0 +1,24 @@
+// An early `return` is parsed before its function's return clause, which is
+// written after the body, so it cannot know the type it returns until then.
+// Once the clause is read, every early return of the function gets the
+// function's name and return type in ns1/ns2 -- the fields the return
+// clause's own checks and lowerings read from a func node -- and the pending
+// list is emptied for the next function.
+seal_rets(string name, string rt) {
+  while(len((import pend_rets)) > 0) {
+    int seal_r = pop((import pend_rets));
+    sset((import ns1), seal_r, name);
+    sset((import ns2), seal_r, rt);
+  }
+} return void;
+given seal_fixture ("f", "int"):() then last_s1:("f")
+given seal_fixture ("g", "void"):() then last_s1:("g")
+
+// One pending early return, created with an empty name for seal_rets to fill.
+seal_fixture() {
+  flow_tokens();
+  int seal_n = newleaf("ret", 0 - 1, 0, "", "");
+  push((import pend_rets), seal_n);
+} return void;
+():() then last_s1:("")
+():() then check_failed:(0)

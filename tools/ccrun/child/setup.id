@@ -1,0 +1,37 @@
+// All per-run state pump_round/pump_finish/close_all and
+// tools/ccrun/input/round.id's pump_in share, set up once before the first
+// round: a 4096-byte scratch buffer for the child's stdout and stderr, and
+// -- only when INPUT names a real file, never for "-" -- an open handle on
+// it plus a matching 4096-byte staging buffer (4096 is PIPE_BUF: idstd's
+// proc_linux.c caps a single proc_write at 4096 bytes and a Linux pipe
+// write of that size is atomic, so a write is always all-or-nothing and
+// there is never a partial chunk to re-slice).
+//
+// cr_has_in says which case this run is, once, for pump_round and
+// close_all to read; cr_in/cr_pending are exported by open_input (below)
+// only on the has-input path, so nothing ever reads them uninitialised.
+setup_io(string input) {
+  export int[] cr_chunk = [];
+  lst_fill((import cr_chunk), 4096, 0);
+  export int cr_has_in = input != "-";
+} chain (string input) {
+  open_input_if_any(input);
+} return void;
+
+// A real file, or "-": no input at all, and the child's stdin is closed at
+// once -- the same immediate EOF `capped()` gave a child that never read
+// its inherited stdin either.
+open_input_if_any(string input) {
+  int has = input != "-";
+  if(has) {
+    open_input(input);
+  } else {
+    int closed = proc_close_in((import cr_h));
+  }
+} return void;
+
+open_input(string input) {
+  export int cr_in = fs_open(input, "r");
+  export int[] cr_pending = [];
+  lst_fill((import cr_pending), 4096, 0);
+} return void;

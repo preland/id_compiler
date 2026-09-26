@@ -16,3 +16,5 @@ ut_case_val(int ci, int e) {
     }
   }
 } return void;
+given fn_fixture (0, (import fixture_zero)):() then calls ut_named:[0]
+given fn_fixture (0, (import fixture_fn)):() then calls ut_named:[0]

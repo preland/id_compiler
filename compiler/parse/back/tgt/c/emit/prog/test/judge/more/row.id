@@ -1,12 +1,46 @@
-// One row of the case table.
+// One row of the case table, and its `idtc_in` cell. A library case's
+// (case_is_std, mid/names/symbols/lookup/more/std_unit.id) row still runs --
+// IDTC_N is the full, unfiltered case count, so every index needs a live
+// function pointer -- but points at idtc_case_std_skip (emit_cases,
+// case/case.id) instead of its own idtc_case_ci, which emit_cases never
+// emitted for it. The `idtc_in` cell is the case's `stdin` literal as a C
+// string, `""` for a case without one. Read defensively -- `ci <
+// len(casestdin)` -- because a case fixture that only pushes casenode (most of
+// them, elsewhere in this directory) leaves casestdin short; a real parse
+// always pushes one casestdin entry per case (case/given/given.id), so the
+// guard never triggers there.
 
 emit_setup_line(int ci, string cw, string cc) {
   string f1 = s1_of((import casefn)[ci]);
   int fx = case_fidx(ci);
-  emit_line("    idtc_where[" + ci + "] = \"" + cw + "\"; idtc_call[" + ci + "] = \"" + cc + "\"; idtc_fn[" + ci + "] = \"" + f1 + "\"; idtc_fidx[" + ci + "] = " + fx + "; idtc_case[" + ci + "] = idtc_case_" + ci + ";");
+  string fnref = "idtc_case_" + ci;
+} chain (int ci, string cw, string cc) {
+  if(case_is_std(ci) == 1) {
+    fnref = "idtc_case_std_skip";
+  }
+  emit_line("    idtc_where[" + ci + "] = \"" + cw + "\"; idtc_call[" + ci + "] = \"" + cc + "\"; idtc_fn[" + ci + "] = \"" + f1 + "\"; idtc_fidx[" + ci + "] = " + fx + "; idtc_case[" + ci + "] = " + fnref + ";");
+  int se = -1;
+} chain (int ci, string cw, string cc) {
+  if(ci < len((import casestdin))) {
+    se = (import casestdin)[ci];
+  }
+  string sv = "\"\"";
+  if(se != -1) {
+    sv = tc_value(se, "string");
+  }
+} chain (int ci, string cw, string cc) {
+  emit_line("    idtc_in[" + ci + "] = " + sv + ";");
+  int tnid = case_traps_node(ci);
+  string tv = "NULL";
+} chain (int ci, string cw, string cc) {
+  if(tnid != -1) {
+    tv = tc_value(l1_of(tnid)[0], "string");
+  }
+  emit_line("    idtc_traps[" + ci + "] = " + tv + ";");
 } return void;
-given wrap_fixture (0, "a.id:1", "foo()"):() then prints:("    idtc_where[0] = \"a.id:1\"; idtc_call[0] = \"foo()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
-given wrap_fixture (0, "b.id:2", "bar()"):() then prints:("    idtc_where[0] = \"b.id:2\"; idtc_call[0] = \"bar()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n")
+given wrap_fixture (0, "a.id:1", "foo()"):() then prints:("    idtc_where[0] = \"a.id:1\"; idtc_call[0] = \"foo()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n")
+given wrap_fixture (0, "b.id:2", "bar()"):() then prints:("    idtc_where[0] = \"b.id:2\"; idtc_call[0] = \"bar()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n")
+given traps_case_fixture (0, "c.id:3", "boom()"):() then calls tc_value:[1]
 
 case_where_c(int ci) {
   string case_loc_v = case_loc(ci);

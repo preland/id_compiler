@@ -25,7 +25,15 @@ given fix_touch_fixture ((import ft_lit), 3):() then calls fix_wref:[0]
 fix_wref(int x, int ow) {
   string s1_of_v = s1_of(x);
   int ci = fix_fnix(s1_of_v);
-  fix_wref2(x, ow, ci, s1_of_v);
+  blank;
+} chain (int x, int ow) {
+  if(ci >= 0) {
+    fix_wedge(ci, ow);
+  } else if(k_of(x) == "call" && is_builtin(s1_of_v) == 0) {
+    fix_wseed(ow);
+  } else if(k_of(x) == "call" && fix_wmut(s1_of_v) == 1) {
+    fix_wseed(ow);
+  }
 } return void;
-given fix_touch_fixture ((import ft_bcall), 3):() then calls fix_wref2:((import ft_bcall), 3, -1, "print")
-given fix_touch_fixture ((import ft_bcall), 5):() then calls fix_wref2:((import ft_bcall), 5, -1, "print")
+given fix_wref_fixture ((import ft_call), 0):() then calls fix_wseed:(0)
+given fix_wref_fixture ((import ft_call), 1):() then calls fix_wseed:(1)

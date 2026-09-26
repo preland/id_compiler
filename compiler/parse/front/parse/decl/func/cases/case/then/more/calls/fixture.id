@@ -14,3 +14,24 @@ calls_count_fix() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// `traps:("...")` (docs/TESTS.md): its own kind, "thentraps", since the
+// harness reads the message from the process a trap kills rather than from a
+// return value (back/tgt/c/emit/prog/test/). Filed here, beside the other
+// `then`-family clause parses, because more/ itself and more/dispatch.id are
+// both at their layout limit and this file has the one free slot.
+then_traps_clause(int[] pos) {
+  advance(pos);
+  int ci = len((import casestart)) - 1;
+  int dup = case_has_out(ci, "thentraps");
+} chain (int[] pos) {
+  if(dup == 1) {
+    syn_err(pos, "a case may have at most one 'traps' check");
+  }
+  eat_colon(pos);
+  int[] items = case_tuple(pos);
+} chain (int[] pos) {
+  then_push_kind("thentraps", "", items);
+} return void;
+given traps_fix ([0]):()
+given traps_fix ([0]):() then calls then_push_kind:[1]

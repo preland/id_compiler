@@ -1,0 +1,21 @@
+// A real, known one-file directory (one generic-named file, so it also
+// exercises a real violation end to end) for lay_walk/lay_walk_listed's own
+// cases, and its exact fs_list size, for the case that has to hand
+// lay_walk_listed a size without calling fs_list from a case's own ARGS.
+
+lay_walk_fixture_bad() {
+  int made = fs_mkdir_p("/tmp/idlayout_wfb/");
+  int w1 = fs_open("/tmp/idlayout_wfb/util.id", "w");
+  int c1 = fs_close(w1);
+} chain () {
+  lay_reset();
+} return void;
+():() then prints:("")
+():() then lay_report:(0)
+
+lay_walk_listed_fixture() {
+  lay_walk_fixture_bad();
+  export int lay_wl_size = lay_list_size("/tmp/idlayout_wfb");
+} return void;
+():() then prints:("")
+():() then lay_report:(0)

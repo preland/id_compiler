@@ -21,6 +21,8 @@ check_main_at(int m) {
     report_main();
   }
 } return void;
+given fn_fixture ((import fixture_fn)):() then calls report_main:[1]
+given ll_native_fixture ((import nat_id)):() then calls report_main:[1]
 
 report_main() {
   int func_line_v = func_line("main");

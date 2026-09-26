@@ -23,3 +23,25 @@ fx_fill_block(string[] paths, string[][] blocks, string[] lines, int i, string c
 } return int j;
 ([], [], ["===F:a.id===", "x", "y"], 0, "===F:a.id==="):(3)
 ([], [], ["===F:a.id===", "x", "===F:b.id===", "z"], 0, "===F:a.id==="):(2)
+
+// One body line's export name, registered against `fn_idx` in the export
+// hmap and appended to ix_ename/ix_efn -- a line that does not declare an
+// export contributes nothing to either.
+ix_scan_export_line(string line_v, int fn_idx) {
+  int p = str_find(line_v, "export ");
+  int rest_n = len(line_v) - p - 7;
+  string name = "";
+} chain (string line_v, int fn_idx) {
+  if(p >= 0) {
+    string rest = str_slice(line_v, p + 7, rest_n);
+    string[] parts = str_split(rest, " ");
+    name = parts[1];
+  }
+  if(str_cmp(name, "") != 0) {
+    hmap_put((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt), name, fn_idx);
+    push((import ix_ename), name);
+    push((import ix_efn), fn_idx);
+  }
+} return void;
+given ix_export_fixture ("  export int gv = 0;", 0):() then calls hmap_put:[1]
+given ix_export_fixture ("plain line", 0):() then calls hmap_put:[0]

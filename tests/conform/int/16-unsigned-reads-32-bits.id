@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  int e = ushr(0 - 8, 0);
+  string a = "" + ushr(0 - 8, 1) + " " + ushr(0 - 1, 28) + " " + ushr(0 - 8, 0) + " " + e;
+  print(a + " " + udiv(0 - 2, 2) + " " + umod(0 - 1, 10) + " " + ushr(0 - 1, 32));
+} return int 0;

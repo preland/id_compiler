@@ -1,0 +1,39 @@
+// idlayout ROOT BUILD_DIR -- bin/idc's five bash structural checks
+// (check_legacy_manifest, check_entry_limit, check_nested_manifest,
+// check_same_name_as_parent, check_generic_names), ported to `id` and
+// merged into one walk of the tree (fs_list; see walk/), so it pays for one
+// listing per directory instead of five separate `find` passes. Every
+// violation is printed, in bin/idc's own check order, instead of bash's
+// `head -1`; bin/idc builds and caches this the way it does tools/ccrun,
+// falling back to the old bash checks if it fails to build.
+
+lay_usage() {
+  print("usage: idlayout ROOT BUILD_DIR");
+} return void;
+():() then prints:("usage: idlayout ROOT BUILD_DIR\n")
+():() then prints:("usage: idlayout ROOT BUILD_DIR\n") then eprints:("")
+
+lay_run(string root, string build) {
+  lay_reset();
+  lay_walk(root, root, build, 1);
+  int total = lay_report();
+} chain (string root, string build) {
+  int code = 0;
+  if(total > 0) {
+    code = 1;
+  }
+} return int code;
+("does-not-exist-xyz-idlayout-run", "build"):(0) then prints:("")
+given lay_walk_fixture_bad ("/tmp/idlayout_wfb", "build"):(1)
+
+main(int argc, string[] argv) {
+  int code = 0;
+  if(argc < 3) {
+    lay_usage();
+    code = 1;
+  } else {
+    code = lay_run(argv[1], argv[2]);
+  }
+} return int code;
+(1, ["idlayout"]):(1) then prints:("usage: idlayout ROOT BUILD_DIR\n")
+(3, ["idlayout", "does-not-exist-xyz-idlayout-main", "build"]):(0) then prints:("")

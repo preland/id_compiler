@@ -26,8 +26,10 @@ given loop_fixture ((import while_node)):() then check_failed:(0)
 ls5(int node) {
   if(k_of(node) == "if") {
     lw_if(node);
-  } else {
+  } else if(k_of(node) == "while") {
     lw_while(node);
+  } else {
+    lw_flow(node);
   }
 } return void;
 given nest_fixture ((import if_node)):() then check_failed:(0)

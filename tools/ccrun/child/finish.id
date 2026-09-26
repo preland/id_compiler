@@ -1,0 +1,49 @@
+// Loop pump_round until it returns a real exit status: proc_wait(h, 0) is
+// non-blocking and answers -1 (ETIMEDOUT) for a still-running child, so
+// this is idstd's .tests/check/drain/round.id's drain_wait shape. A real
+// exit status only means the child has *terminated*, not that its stdout
+// and stderr pipes are empty: a process that wrote its last chunk and
+// exited immediately can still have that chunk sitting unread in the pipe
+// when proc_wait first reports it gone (observed here -- idlex's output
+// truncated exactly at a 4096-byte read boundary, the rest silently
+// dropped, before this fix), so one more full drain follows before this
+// returns.
+pump_finish(int timeout_ms) {
+  int code = 0 - 1;
+  while(code < 0) {
+    code = pump_round(timeout_ms);
+  }
+  drain_remaining(timeout_ms);
+} return int code;
+
+// Keep reading and forwarding stdout/stderr, once the child is confirmed
+// gone, until a single round reads nothing from either. Both reads use
+// timeout 0: the child has already exited, so whatever is left is already
+// sitting in the pipe, fully buffered -- poll() reports it at once, and
+// there is nothing further to ever wait *for*. This is bounded by however
+// much was left, not by any timeout.
+drain_remaining(int timeout_ms) {
+  int n_out = proc_read((import cr_h), (import cr_chunk), 4096, 0);
+  int wrote_out = fs_write((import cr_out), (import cr_chunk), n_out);
+  int n_err = proc_read_err((import cr_h), (import cr_chunk), 4096, 0);
+} chain (int timeout_ms) {
+  int wrote_err = fs_write((import cr_err), (import cr_chunk), n_err);
+  int more = n_out > 0 || n_err > 0;
+  if(more) {
+    drain_remaining(timeout_ms);
+  }
+} return void;
+
+// Flush and close every stream this run opened, once pump_finish has
+// drained everything there was to relay in both directions. cr_in is
+// closed by input/close.id's close_input_if_any: on the "-" (no input)
+// path it was never opened, and (import cr_in) would read whatever
+// zero-initialised value happens to sit there -- never a real handle, but
+// not one this function should hand to fs_close either.
+close_all() {
+  int co = fs_close((import cr_out));
+  int ce = fs_close((import cr_err));
+  close_input_if_any();
+} chain () {
+  int cp = proc_close((import cr_h));
+} return void;

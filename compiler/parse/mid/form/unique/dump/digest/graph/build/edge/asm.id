@@ -1,0 +1,28 @@
+// An asm routine is not in `prog`, so a call to one would find no row and
+// add no edge -- and a case reaching it would keep its key through an edit
+// to the routine's body. So every asm name maps to one extra row, marked
+// like a native: a case that reaches any asm routine is never cached.
+
+dg_asm_row() {
+  int dgr = len((import dg_own));
+  dg_add(0, 1);
+  dg_asm_names(dgr, 0);
+} return void;
+given dg_t_rows ():() then dg_nrows:(3)
+given dg_t_built ():() then dg_nrows:(4)
+
+dg_asm_names(int dgr, int dgi) {
+  while(dgi < len((import afname))) {
+    hmap_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), (import afname)[dgi], dgr);
+    dgi = dgi + 1;
+  }
+} return void;
+given dg_t_asm (2, 0):() then dg_nfn:(3)
+given dg_t_asm (2, 1):() then dg_nfn:(2)
+
+dg_t_asm() {
+  dg_t_rows();
+  asmfx_push();
+} return void;
+():() then dg_nfn:(2)
+():() then dg_nrows:(2)

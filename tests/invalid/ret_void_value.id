@@ -1,0 +1,9 @@
+// EXPECT: returns void, so its 'return' takes no value
+// a void function's early return carries no value
+say(int x) {
+  return x;
+} return void;
+
+main(int argc, string[] argv) {
+  say(1);
+} return int 0;

@@ -16,6 +16,8 @@ given fix_fixture (7, 2, 0, 0, "", ""):() then fix_walk_arg2_an0:("") then fix_p
 fix_pr_cl0() {
   int n = (import fixe_cl)[0];
 } return int n;
+given fix_mark_case_fixture ():(3)
+given fix_any_call_setup ():(0)
 
 // One real event with a known token (curtk stays 0, so ntok[e] is 0) and a
 // known line for it (tline[0]), class 3 (must be named wherever it sits) and

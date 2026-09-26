@@ -17,16 +17,21 @@ ut_because_at(string via_s, string what_s) {
 // short: it needs none, and a note says why rather than the minimum being
 // lifted silently. One that has a case anyway already has an error at that case
 // (../cases/cases.id), so it gets nothing more here.
-// Refused: ut_at (../../why/why.id) is called unconditionally, which traps
-// unless a case's `given` also ran ut_mark (../mark/); edge_fixture
+// `given` may now be repeated (docs/TESTS.md), so the "not exempt" branch
+// (ut_at(s1_of_v) < 0, the ordinary report_cases path) is cased below by
+// composing notes_base, which runs ut_mark (../mark/), with edge_fixture
 // (back/drive/run/check/dce/emit/calls/fixture/setup.id), the only fixture
-// with a real prog[i]/pfile[i]/pline[i] row this lane has, never does. No
-// fixture combines the two, and every directory in this lane is at the
-// 3-entry layout limit with all of its free function slots already spent on
-// the dup-case and given/read fixtures, so there is no legal slot left to
-// add the combining fixture this would need. (The `else if` branch, or
-// ut_note directly, has the same gap one level deeper: it also needs
-// prog[i]'s name marked in utname at the same time as its pfile/pline row.)
+// with a real prog[i]/pfile[i]/pline[i] row this lane has -- edge_fixture's
+// own env_init (through fn_fixture/case_fixture) does not touch utname, so
+// notes_base's empty seed survives it. The `else if` branch stays uncased:
+// it needs prog[i]'s own name to already be one utname marks, and every
+// fixture that marks a name ("port_byte", "caller", via ut_seeded/
+// ut_host_seeded) never gives that name a real prog[i]/pfile[i]/pline[i] row
+// to go with it, so there is nothing this lane's fixtures can compose to
+// reach it. ut_note below does not share this gap -- it takes `name` as its
+// own argument rather than reading it off prog[i], so composing ut_seeded
+// (which marks "port_byte") with edge_fixture (a real pfile[i]/pline[i] row)
+// covers it directly.
 cases_short(int i, int n) {
   string s1_of_v = s1_of((import prog)[i]);
   if(ut_at(s1_of_v) < 0) {
@@ -35,8 +40,13 @@ cases_short(int i, int n) {
     ut_note(i, s1_of_v);
   }
 } return void;
+given notes_base given edge_fixture (0, 0):() then calls report_cases:(0, 0) then calls ut_note:[0]
+given notes_base given edge_fixture (0, 2):() then calls report_cases:(0, 2) then calls ut_note:[0]
+
 ut_note(int i, string name) {
   string note_at = (import pfile)[i] + ":" + (import pline)[i] + ": note: ";
   string ut_why_v = ut_why(name);
   push((import utnote), note_at + "function '" + name + "' " + ut_why_v + "; it is exempt from the two-case minimum");
 } return void;
+given ut_host_seeded given edge_fixture (0, "port_byte"):() then utnote_len:(1)
+given ut_host_seeded given edge_fixture (1, "caller"):() then utnote_len:(1)

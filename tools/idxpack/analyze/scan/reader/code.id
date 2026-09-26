@@ -1,0 +1,43 @@
+// A function's own code, trimmed to its actual logic: the same lines
+// func_body_lines (analyze/scan/body.id) returns, cut at the first line
+// starting "} return" -- so a per-reader import scan (required.id) never
+// mistakes a `given`/`then` case line below a function for a read inside
+// it. Mirrors index.py's Index.code().
+func_code_lines(string name) {
+  string[] body = func_body_lines(name);
+  string[] out_li = [];
+  int i = 0;
+} chain (string name) {
+  int stop = 0;
+  while(i < len(body) && stop == 0) {
+    stop = func_code_lines_step(body, out_li, i);
+    i = i + 1;
+  }
+} return string[] out_li;
+given ix_test_setup ("a"):(["a() { } return void;"])
+given ix_test_setup ("nope"):([])
+
+// One body line appended to `out_li`; returns 1 once that line starts the
+// function's own "} return" clause, so the caller's loop stops there
+// rather than running on into the case lines func_body_lines_at also
+// slices in.
+func_code_lines_step(string[] body, string[] out_li, int i) {
+  push(out_li, body[i]);
+  int ret_i = 0;
+  if(str_starts(body[i], "} return") == 1) {
+    ret_i = 1;
+  }
+} return int ret_i;
+(["a() {", "} return void;"], [], 1):(1)
+(["a() {", "} return void;"], [], 0):(0)
+
+// `a` (zero-void) calls `b`, which reads an import only `d` declares --
+// but `a` never reaches `d`. The `given` search this fixture backs
+// (runnable.id) exists to catch exactly this: offering `a` as a setup
+// would leave `b`'s own read unsatisfied.
+unmet_req_fixture() {
+  ix_init(["a|b|call"], ["a|f.id|1|2", "b|f.id|2|2", "d|f.id|3|2"]);
+  fx_init(["===F:f.id===", "a() { } return void;", "b() { int x = (import zzz)[0]; } return int x;", "d() { export int zzz = 0; } return void;"]);
+} return void;
+():() then total_funcs:(3)
+():() then total_edges:(1)

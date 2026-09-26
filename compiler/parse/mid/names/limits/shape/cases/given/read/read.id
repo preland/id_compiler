@@ -28,11 +28,34 @@ given impcase_given ((import fixture_ci), (import fixture_zero), "int"):() then 
 
 imp_owner(int i, string imp_nm, int ek, string want) {
   string setup_nm = (import casegiven)[i];
-  if(func_node(setup_nm) >= 0 && reaches(setup_nm, (import eowners)[ek]) == 0) {
-    case_err(i, "(import " + imp_nm + "): '" + imp_nm + "' is exported by '" + (import eowners)[ek] + "', which the setup '" + setup_nm + "' does not reach, so nothing sets it before the call");
+  if(setups_miss(setup_nm, ek) == 1) {
+    case_err(i, "(import " + imp_nm + "): '" + imp_nm + "' is exported by '" + (import eowners)[ek] + "', which the setup '" + str_trim(setup_nm) + "' does not reach, so nothing sets it before the call");
   } else if((import etypes)[ek] != want) {
     case_err(i, "this case gives (import " + imp_nm + "), a " + (import etypes)[ek] + ", where a " + want + " is required");
   }
 } return void;
 given impcase_empty ((import fixture_ci), "x", 0, "int"):() then prints:("")
 given impcase_empty ((import fixture_ci), "x", 0, "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
+
+// A `given` may name several setups, so the requirement is that ONE of them
+// reaches the export's owner. Reported only when a setup exists and none do:
+// a name that is no function at all is given_fn's error, not this one.
+setups_miss(string entry, int ek) {
+  string[] setups = str_split(entry, " ");
+  int si = 0;
+  int seen = 0;
+} chain (string entry, int ek) {
+  int hit = 0;
+  while(si < len(setups)) {
+    seen = miss_seen(setups[si], seen);
+    hit = miss_hit(setups[si], ek, hit);
+    si = si + 1;
+  }
+  int miss = 0;
+} chain (string entry, int ek) {
+  if(seen == 1 && hit == 0) {
+    miss = 1;
+  }
+} return int miss;
+given keep_export_fixture_all ("main", 0):(0)
+given keep_export_fixture_all ("main nosuchfn123", 0):(0)

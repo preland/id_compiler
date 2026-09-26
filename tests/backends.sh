@@ -136,6 +136,95 @@ for c in "$BIN_IDC"; do
     fi
 done
 
+# --target llvm links the fs backend the same way --target c does (both walk
+# backends_for_program in bin/idc), and a native taking a `word` -- the flat
+# store's address type -- is declared and lowered the same way by both
+# targets: fs_write_mem/fs_read_mem round-trip through the store, fs_write/
+# fs_read round-trip through an int[], on the same temp file. The check is
+# that llvm's output equals c's, not a fixed string, since what is under
+# test is parity between the two targets, not fs itself (which the checks
+# above already cover for the C target alone). Skipped, loudly, if this
+# toolchain has no clang.
+llfs="$TMP/llfs"; mkdir -p "$llfs/out"
+printf 'import "%s"\nint[] mkbytes = [104, 101, 108, 108, 111];\nint[] mkbuf = [0, 0, 0, 0, 0];\n' \
+    "$(be_abs fs)" > "$llfs/conf.id"
+cat > "$llfs/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  string path = argv[1];
+  do_write(path);
+  more(path);
+} return int 0;
+
+more(string path) {
+  do_read(path);
+  do_mem(path);
+} return void;
+EOF
+cat > "$llfs/out/write.id" <<'EOF'
+do_write(string path) {
+  int h = fs_open(path, "w");
+  int[] buf = (import mkbytes);
+  int n = fs_write(h, buf, 5);
+} chain (string path) {
+  int c = fs_close(h);
+  print("wrote " + n + " bytes (close " + c + ")");
+} return void;
+EOF
+cat > "$llfs/out/read.id" <<'EOF'
+do_read(string path) {
+  int h = fs_open(path, "r");
+  int[] buf = (import mkbuf);
+  int n = fs_read(h, buf, 5);
+} chain (string path) {
+  int c = fs_close(h);
+  string s = tostr(buf, n);
+  print("read " + n + " bytes: " + s + " (close " + c + ")");
+} return void;
+
+tostr(int[] buf, int n) {
+  string s = "";
+  int i = 0;
+  while(i < n) {
+    s = s + chr(buf[i]);
+    i = i + 1;
+  }
+} return string s;
+EOF
+cat > "$llfs/out/mem.id" <<'EOF'
+do_mem(string path) {
+  word addr = mem_of_str("world");
+  int wh = fs_open(path, "w");
+  int wn = fs_write_mem(wh, addr, 5);
+} chain (string path) {
+  int wc = fs_close(wh);
+  word addr2 = alloc(5);
+  int rh = fs_open(path, "r");
+} chain (string path) {
+  int rn = fs_read_mem(rh, addr2, 5);
+  int rc = fs_close(rh);
+  string s2 = str_of_mem(addr2, rn);
+} chain (string path) {
+  print("mem wrote " + wn + " bytes, mem read " + rn + " bytes: " + s2);
+} return void;
+EOF
+if ! command -v clang >/dev/null 2>&1; then
+    skip "--target llvm links fs the same way --target c does (no clang)"
+elif ! env -u IDC_NO_STD $BIN_IDC "$llfs" --target c -o "$TMP/llfs.c.bin" >"$TMP/llfs.c.err" 2>&1; then
+    bad "--target llvm links fs the same way --target c does: the C target build ($(head -1 "$TMP/llfs.c.err"))"
+elif ! env -u IDC_NO_STD $BIN_IDC "$llfs" --target llvm -o "$TMP/llfs.llvm.bin" >"$TMP/llfs.llvm.err" 2>&1; then
+    bad "--target llvm links fs the same way --target c does: the LLVM target build ($(head -1 "$TMP/llfs.llvm.err"))"
+else
+    ctmp="$TMP/llfs.c.tmp"; lltmp="$TMP/llfs.llvm.tmp"
+    got_c=$("$TMP/llfs.c.bin" "$ctmp" 2>&1)
+    got_llvm=$("$TMP/llfs.llvm.bin" "$lltmp" 2>&1)
+    if [ -n "$got_c" ] && [ "$got_c" = "$got_llvm" ]; then
+        ok "--target llvm links fs the same way --target c does (fs_open/write/read/close, fs_write_mem/fs_read_mem)"
+    else
+        bad "--target llvm links fs the same way --target c does: c '$got_c' llvm '$got_llvm'"
+    fi
+    rm -f "$ctmp" "$lltmp"
+fi
+
 # What fs_list is for: driver/ is the tree walk bin/idc does with `find`, and
 # it must agree with `find` byte for byte. The order files reach the compiler
 # is the order the one-name-one-type rule reports collisions in, so a walk that
@@ -517,6 +606,52 @@ else
     bad "three attached backends that nothing calls are neither compiled nor linked: $(grep -m1 -E 'gfx_linux|gl_linux|fs_posix|-lX11' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7none.err")"
 fi
 
+# -- a backend directory is a library too: its own cases run in a pre-check,
+# and are excluded from the importing program's harness ------------------
+# A --no-std program (IDC_NO_STD=1 throughout this file) whose conf.id
+# imports fs directly -- no stdlib attached at all -- used to compile and
+# link fs_posix.c just to run fs_mkdir_p's cases in ITS OWN harness, even
+# though main never calls fs_mkdir_p: the check above is exactly that
+# scenario. A broken case in fs's own id code must fail the same way a
+# broken stdlib case does (tests/stdlib.sh #26), against a scratch COPY,
+# never the real idstd; the pre-check must be cached the same way
+# (tests/stdlib.sh #28).
+precheck_entries() {
+    find "$ROOT/.idc-cache/std_precheck" -mindepth 1 -maxdepth 1 -type d ! -name '.bincache' 2>/dev/null \
+        | wc -l | tr -d ' '
+}
+
+rm -rf "$TMP/fs_broken"; cp -r "$(be_abs fs)" "$TMP/fs_broken"
+sed -i 's#("/tmp/"):(1)#("/tmp/"):(999)#' "$TMP/fs_broken/path/edit/mkdir/deep.id"
+brokenfs=$(cd "$TMP/fs_broken" && pwd -P)
+c7broken="$TMP/c7broken"; mkdir -p "$c7broken"
+printf 'import "%s"\n' "$brokenfs" > "$c7broken/conf.id"
+printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$c7broken/main.id"
+out=$($BIN_IDC "$c7broken" -o "$TMP/c7broken.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "idc: the backend library at $brokenfs failed its own test cases (this is not an error in your program):" \
+   && printf '%s\n' "$out" | grep -qF 'test failed: fs_mkdir_p("/tmp/") = 1, expected 999' \
+   && [ ! -e "$TMP/c7broken.bin" ]; then
+    ok "a broken case in an attached backend's own id code fails the build with the backend-library message"
+else
+    bad "a broken case in an attached backend's own id code fails the build with the backend-library message: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ' | cut -c1-200)"
+fi
+
+rm -rf "$TMP/fs_cachetest"; cp -r "$(be_abs fs)" "$TMP/fs_cachetest"
+cachefs=$(cd "$TMP/fs_cachetest" && pwd -P)
+c7cache="$TMP/c7cache"; mkdir -p "$c7cache"
+printf 'import "%s"\n' "$cachefs" > "$c7cache/conf.id"
+printf 'main(int argc, string[] argv) {\n  print(2);\n} return int 0;\n' > "$c7cache/main.id"
+e0=$(precheck_entries)
+$BIN_IDC "$c7cache" -o "$TMP/c7cache.bin" >/dev/null 2>&1
+e1=$(precheck_entries)
+$BIN_IDC "$c7cache" -o "$TMP/c7cache.bin2" >/dev/null 2>&1
+e2=$(precheck_entries)
+if [ "$e1" -ge "$e0" ] && [ "$e2" -eq "$e1" ]; then
+    ok "the backend pre-check is cached: a second build creates no new pre-check cache entry"
+else
+    bad "the backend pre-check is cached: a second build creates no new pre-check cache entry (had $e0/$e1, now $e2)"
+fi
+
 # The same through a library whose conf.id imports every backend.
 c7std="$TMP/c7std"; mkdir -p "$c7std/win" "$TMP/c7hello" "$TMP/c7win"
 cp "$c7none/conf.id" "$c7std/conf.id"
@@ -741,7 +876,7 @@ printf 'main(int argc, string[] argv) {\n  int a = bea_val(1);\n  int b = beb_va
 if $BIN_IDC "$two" --cc "$cclog" -o "$TMP/two.bin" >"$TMP/two.err" 2>&1 \
    && [ "$("$TMP/two.bin")" = "350" ] \
    && grep -q "bea/val\.c .*-DBE_K=3$" "$TMP/cc.log" && grep -q "beb/val\.c .*-DBE_K=5$" "$TMP/cc.log" \
-   && grep 'final\.c' "$TMP/cc.log" | grep -q ' -lm$'; then
+   && grep -F -- "-o $TMP/two.bin" "$TMP/cc.log" | grep -q ' -lm$'; then
     ok "two attached backends declaring the same names and platform keys do not collide"
 else
     bad "two attached backends declaring the same names and platform keys do not collide: $(grep -v warning "$TMP/two.err" | head -1 | cut -c1-160)"
@@ -786,12 +921,12 @@ probe(string path) {
 EOF
 : > "$TMP/cc.log"
 if $BIN_IDC "$c7h" --cc "$cclog" -o "$TMP/c7harn.bin" >"$TMP/c7harn.err" 2>&1 \
-   && grep 'harness\.c' "$TMP/cc.log" | grep -q 'fs_posix\.gen\.o' \
-   && ! grep 'harness\.c' "$TMP/cc.log" | grep -qE 'gfx_linux|-lX11' \
-   && grep 'final\.c' "$TMP/cc.log" | grep 'fs_posix\.gen\.o' | grep 'gfx_linux\.gen\.o' | grep -q -- '-lX11'; then
+   && grep -F '/harness -lm' "$TMP/cc.log" | grep -q 'fs_posix\.gen\.o' \
+   && ! grep -F '/harness -lm' "$TMP/cc.log" | grep -qE 'gfx_linux|-lX11' \
+   && grep -F -- "-o $TMP/c7harn.bin" "$TMP/cc.log" | grep 'fs_posix\.gen\.o' | grep 'gfx_linux\.gen\.o' | grep -q -- '-lX11'; then
     ok "the test harness links the backends its cases reach, the program those main reaches"
 else
-    bad "the test harness links the backends its cases reach, the program those main reaches: $(grep 'harness\.c' "$TMP/cc.log" | cut -c1-160)$(head -1 "$TMP/c7harn.err")"
+    bad "the test harness links the backends its cases reach, the program those main reaches: $(grep -F '/harness -lm' "$TMP/cc.log" | cut -c1-160)$(head -1 "$TMP/c7harn.err")"
 fi
 
 # -- the backends themselves compile ----------------------------------------

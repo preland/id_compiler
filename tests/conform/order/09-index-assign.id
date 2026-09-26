@@ -1,0 +1,19 @@
+// An index assignment evaluates the list, then the index, then the value: the
+// index is the first tick (1) and the value the second (2). The other way
+// round, 1 would land at index 2.
+main(int argc, string[] argv) {
+  int[] c = [0];
+  int[] xs = [0, 0, 0];
+  place(xs, c);
+} return int 0;
+
+place(int[] xs, int[] c) {
+  xs[tick(c)] = tick(c);
+  string s = "" + xs[0] + xs[1] + xs[2] + " c=" + c[0];
+  print(s);
+} return void;
+
+tick(int[] c) {
+  c[0] = c[0] + 1;
+  int ret_i = c[0];
+} return int ret_i;

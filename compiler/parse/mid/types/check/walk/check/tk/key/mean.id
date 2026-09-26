@@ -1,0 +1,40 @@
+// What a name can mean to a type check, anywhere in the program: the
+// signature of a function by that name and its return type (an asm routine
+// has only the latter), the type of an export by that name, and the one type
+// it has as a variable in the unit of this function and of the one before it
+// -- whose cases sit in this function's run. Everything a node's type can be
+// looked up from by name is here, so a change to any of them anywhere
+// changes the key of every function using the name.
+
+tk_meaning(string name, int tkf) {
+  string tkfs = fn_sig_of(name) + "|" + lookup_func(name) + "|" + tk_etype(name);
+  int tku = tk_units(tkf);
+  string tkm = tkfs + "|" + lookup_var(name, tku / 65536) + "|" + lookup_var(name, tku % 65536);
+} return string tkm;
+given tk_t_prep ("fa", 1):("func(int) return int|int|||")
+given tk_t_prep ("b", 1):("|||int|int")
+
+// Where a function's run of tokens starts: just past the previous function's
+// return clause, or the start of the stream for the first.
+tk_from(int tkf) {
+  int tkfrom = 0;
+  if(tkf > 0) {
+    tkfrom = (import ptoke)[tkf - 1];
+  }
+} return int tkfrom;
+given tk_t_prep (0):(0)
+given tk_t_prep (1):(18)
+
+// The unit of the function before this one (the first's own) times 65536,
+// plus this function's unit.
+tk_units(int tkf) {
+  int tkun = (import nunit)[(import prog)[tkf]];
+  int tkup = tkun;
+  if(tkf > 0) {
+    tkup = (import nunit)[(import prog)[tkf - 1]];
+  }
+} chain (int tkf) {
+  int tkuv = tkup * 65536 + tkun;
+} return int tkuv;
+given tk_t_prep (0):(0)
+given tk_t_prep (1):(0)

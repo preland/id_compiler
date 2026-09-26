@@ -1,0 +1,6 @@
+// EXPECT: a case may have at most one 'stdin' clause
+grab() {
+  string s = read_all();
+} return string s;
+stdin "a" stdin "b" ():("a")
+():("")

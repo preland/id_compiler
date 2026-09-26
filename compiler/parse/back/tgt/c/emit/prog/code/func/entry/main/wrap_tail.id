@@ -6,3 +6,28 @@ wrap_body_tail(int m) {
 } return void;
 given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return id_main(argc, id_args); }\n")
 given nz_prog_fixture ((import nz_plainfn)):() then prints:("    id_main(); return 0; }\n")
+
+// Two functions parsed from two files, a.id and b.id, with --units on: the
+// state the unit markers (../../def/body/rest/unit.id) read. unit_t_fa and
+// unit_t_fb are the two function nodes. Filed here, beside the main
+// wrapper, because def/body/rest/ is at its three-entry cap.
+unit_t_two() {
+  full_env();
+  push_toks(["file", "ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "int", "op", "op", "kw", "kw", "ident", "op", "file", "ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "ident", "op", "op", "op", "kw", "kw", "ident", "op", "eof"], ["0|a.id", "fa", "(", "int", "a", ")", "{", "int", "b", "=", "a", "+", "1", ";", "}", "return", "int", "b", ";", "0|b.id", "fb", "(", "int", "a", ")", "{", "int", "b", "=", "fa", "(", "a", ")", ";", "}", "return", "int", "b", ";", ""]);
+  int[] upos = [0];
+} chain () {
+  parse_program(upos);
+  lset((import unitc), 0, 1);
+  export int unit_t_fa = (import prog)[0];
+} chain () {
+  export int unit_t_fb = (import prog)[1];
+} return void;
+():() then check_failed:(0)
+():() then ptok_span:(19)
+
+unit_t_off() {
+  unit_t_two();
+  lset((import unitc), 0, 0);
+} return void;
+():() then check_failed:(0)
+():() then ptok_span:(19)

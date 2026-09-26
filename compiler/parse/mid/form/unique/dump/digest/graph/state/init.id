@@ -1,0 +1,70 @@
+// The digest's state: one row per function of `prog`, in prog's order, and
+// one per strongly connected component of the call graph, in the order the
+// components are completed (../../scc/). One more function row follows
+// prog's: the row every asm routine's name maps to (../build/edge/asm.id).
+//
+//   dg_own    the hash of the function's own tokens (../hash/)
+//   dg_out    the functions it names: callees, function values, and the
+//             owner of every export it imports
+//   dg_nat    1 when it is a `native`, the asm row, or its tokens were not
+//             recorded -- a body this digest cannot see, so nothing reaching
+//             it is cached
+//   dg_ix, dg_low, dg_on, dg_stk   Tarjan's walk
+//   dg_comp   the component each function landed in
+//   dg_ctr    [next walk index, next component]
+//   dg_deep   per component: its members' hashes and every component it
+//             reaches, folded into one
+//   dg_dirty  per component: 1 when it reaches a dg_nat function
+//   dg_cout   dg_out without the import edges: the calls and function
+//             values alone, the graph a `given` setup reaches through
+//             (mid/names/limits/shape/cases/given/read/reach/)
+
+dg_init() {
+  export word[] dg_own = [];
+  export int[][] dg_out = [];
+  export int[] dg_nat = [];
+} chain () {
+  export int[] dg_ix = [];
+  export int[] dg_low = [];
+  export int[] dg_on = [];
+} chain () {
+  export int[] dg_stk = [];
+  export int[] dg_comp = [];
+  export int[] dg_ctr = [0, 0];
+} chain () {
+  export word[] dg_deep = [];
+  export int[] dg_dirty = [];
+  dg_init_maps();
+} chain () {
+  export int[][] dg_cout = [];
+} return void;
+():() then dg_ncomp:(0)
+given dg_t_graph ():() then dg_ncomp:(0)
+
+// Two name tables over idstd's hmap: a function's name to its row, and an
+// exported variable's name to the row of the function that declares it.
+dg_init_maps() {
+  export string[] dg_fk = [];
+  export int[] dg_fv = [];
+  export int[] dg_fu = [];
+} chain () {
+  export int[] dg_fc = [];
+  export string[] dg_ek = [];
+  export int[] dg_ev = [];
+} chain () {
+  export int[] dg_eu = [];
+  export int[] dg_ec = [];
+  hmap_init((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc));
+} chain () {
+  hmap_init((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec));
+} return void;
+():() then dg_nfn:(0)
+given dg_t_built ():() then dg_nfn:(0)
+
+// The number of components completed so far: the `then` check the walk's
+// own cases (../../scc/) compare.
+dg_ncomp() {
+  int dgn = (import dg_ctr)[1];
+} return int dgn;
+given dg_t_graph ():(0)
+given dg_t_scc ():(4)

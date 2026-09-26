@@ -13,3 +13,17 @@ emit_case_expd(int ci) {
 } return void;
 given wrap_fixture (0):() then prints:("    int idtc_e0 = 0;\n")
 given void_call_fixture (1):() then prints:("")
+
+// A `traps` case's whole point is that the call does not return, so if this
+// runs at all the call came back instead of trapping -- a failure by itself,
+// reported the same way a mismatched return value is (check/fail.id), just
+// with no return value to show on either side. emit_case_post (../../case.id)
+// calls this instead of emit_case_expd/emit_case_fail/emit_case_thens for a
+// case that carries one.
+emit_case_traps_fail(int ci) {
+  int tnid = case_traps_node(ci);
+  string want = tc_value(l1_of(tnid)[0], "string");
+  emit_line("    fprintf(stderr, \"%s: test failed: %s \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", " + want + ");\n    return 3;");
+} return void;
+given traps_case_fixture ((import fixture_ci)):() then calls case_traps_node:[1]
+given traps_case_fixture ((import fixture_ci)):() then calls tc_value:[1]

@@ -13,3 +13,13 @@ regrow_a() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// A second declaration of the same name in the same unit, on top of
+// fcall_reg_b's one -- vx_scan.id's own cases have only ever had one row to
+// find, which never exercises which of two matching rows it keeps.
+vx_dup_fixture() {
+  fcall_reg_b();
+  add_var("h", "func(int) return int", 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

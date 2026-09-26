@@ -17,15 +17,19 @@ hc_list(int[] xs) {
 } return int ok;
 given edge_fixture ((import edge_body)):(1)
 given elif_fixture ((import no_stmts)):(0)
+given flat_deep_call_fixture ((import flat_deep_args)):(2)
 
 hc_at(int[] xs, int ok, int i) {
   int hit = ok;
-  if(ok == 0) {
-    hit = has_call(xs[i]);
+  int d = has_call(xs[i]);
+  if(d > hit) {
+    hit = d;
   }
 } return int hit;
 given edge_fixture ((import edge_body), 0, 0):(1)
 given edge_fixture ((import edge_body), 0, 1):(0)
+given flat_deep_call_fixture ((import flat_deep_args), 0, 0):(1)
+given flat_deep_call_fixture ((import flat_deep_args), 1, 1):(2)
 
 is_plain(int e) {
   int ok = 0;

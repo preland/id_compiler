@@ -1,0 +1,30 @@
+// One round's worth of relaying cr_in (child/setup.id's open_input; this is
+// only ever called when there is one -- see child/round.id's maybe_pump_in)
+// to the child: finish sending whatever chunk is already staged in
+// cr_pending (a successful proc_write always accepts it whole -- see
+// ../child/setup.id's comment on PIPE_BUF -- so there is never a partial
+// chunk to re-slice, only "sent" or "not yet"), then, once nothing is
+// staged and we have not hit cr_in's own EOF, stage the next chunk from it.
+// cr_pending_n/cr_in_eof are read and re-exported here every round; nothing
+// else ever assigns them, so a stale read racing a fresher write cannot
+// happen.
+pump_in(int timeout_ms) {
+  int pending = (import cr_pending_n);
+  int eof = (import cr_in_eof);
+  if(pending > 0) {
+    int wrote = proc_write((import cr_h), (import cr_pending), pending, timeout_ms);
+    if(wrote == pending) {
+      pending = 0;
+    }
+  }
+} chain (int timeout_ms) {
+  if(pending == 0 && eof == 0) {
+    int got = fs_read((import cr_in), (import cr_pending), 4096);
+    pending = got;
+    eof = got == 0;
+  }
+  export int cr_pending_n = pending;
+  export int cr_in_eof = eof;
+} chain (int timeout_ms) {
+  maybe_close_in();
+} return void;

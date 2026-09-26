@@ -20,11 +20,15 @@ parse_else(int[] pos) {
 given stmt_tokens ([21]):([1])
 given stmt_tokens ([28]):([])
 
+// loopd counts the enclosing while bodies, so a `break` knows whether it has a
+// loop to leave (../more.id).
 parse_while(int[] pos) {
   advance(pos);
   int cond = parse_paren(pos);
-  int[] parse_block_v = parse_block(pos);
+  lset((import loopd), 0, (import loopd)[0] + 1);
 } chain (int[] pos) {
+  int[] parse_block_v = parse_block(pos);
+  lset((import loopd), 0, (import loopd)[0] - 1);
   int ret_i = node_while(cond, parse_block_v);
 } return int ret_i;
 given stmt_tokens ([28]):(7)

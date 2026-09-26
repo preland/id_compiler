@@ -8,16 +8,17 @@
 // violation is printed (idc.py stops at the first; this reports them all) and
 // check_failed() then answers 1.
 
-// Deliberately left uncased. It reaches check_case_runs, which reads the
-// real compile-time case table (casefn, casenode, casegiven); no fixture in
-// the build populates that alongside the node environment this needs, and
-// mid/names/limits/shape/cases/ records the same gap from the other side.
-// A case here traps rather than fails, so there is nothing to assert.
+// clean_check_fixture/full_check_fixture (mid/form/unique/dump/cases/
+// checkfiles.id) give the node environment; init_rtc and reqtests_init are
+// the two exports check_case_runs' own chain reads (is_freestanding via fsc,
+// require_tests via reqc) that neither fixture's own env_init reaches.
 check_program() {
   check_bodies();
   check_scopes();
   check_program_tail();
 } return void;
+given clean_check_fixture given init_rtc given reqtests_init ():() then check_failed:(0)
+given full_check_fixture given init_rtc given reqtests_init ():() then check_failed:(1)
 
 check_funcs() {
   check_main();

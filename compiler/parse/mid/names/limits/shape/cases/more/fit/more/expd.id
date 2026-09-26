@@ -25,3 +25,19 @@ fit_ret(int i, int fn, int[] expd) {
 } return void;
 given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2\n")
 given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one)):() then calls fit_value:[1]
+
+// wrap_fixture's own case (../../../../back/.../capture/pre/fixture.id)
+// already gives fixture_ci a non-empty expected side, which is exactly what
+// fit_traps (../fit.id) needs a case to carry along with a `thentraps` node,
+// so this only adds that node. Filed here because fit.id is now at the
+// 3-function limit and this is a one-slot neighbour still about the expected
+// side of a case.
+traps_case_fixture() {
+  wrap_fixture();
+  int[] trap_msg = [(import fixture_zero)];
+  export int fixture_traps_case_node = newnode("thentraps", (import fixture_ci), 0, "", "", trap_msg, trap_msg);
+} chain () {
+  push((import thennode), (import fixture_traps_case_node));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

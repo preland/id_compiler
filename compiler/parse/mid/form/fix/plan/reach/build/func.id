@@ -3,6 +3,8 @@ fix_wfunc(int f, int lo) {
   fix_wrange(lo, (import prog)[f], ow);
   int ret_i = (import prog)[f] + 1;
 } return int ret_i;
+given fix_wbuild_fixture (0, 1):(2) then calls fix_wnode:[1]
+given fix_wbuild_fixture (0, 2):(2) then calls fix_wnode:[0]
 
 fix_owner(int f) {
   string s1_of_v = s1_of((import prog)[f]);
@@ -16,3 +18,5 @@ fix_fnix(string name) {
   int b = name_bucket(name);
   int ix = find_ix((import fnames), (import fidx)[b], name);
 } return int ix;
+given fix_fnix_fixture ("foo"):(0)
+given fix_fnix_fixture ("bar"):(-1)

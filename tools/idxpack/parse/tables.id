@@ -14,16 +14,103 @@ ix_init(string[] edge_lines, string[] fn_lines) {
   export int[] ix_cases = [];
   ix_fill_edges((import ix_ecaller), (import ix_ecallee), (import ix_ekind), edge_lines, 0);
   ix_fill_funcs((import ix_fn), (import ix_file), (import ix_line), (import ix_cases), fn_lines, 0);
+} chain (string[] edge_lines, string[] fn_lines) {
+  export string[] ix_nkeys = [];
+  export int[] ix_nvals = [];
+  export int[] ix_nused = [];
+} chain (string[] edge_lines, string[] fn_lines) {
+  export int[] ix_ncnt = [];
+  hmap_init((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ncnt));
+  int i = 0;
+} chain (string[] edge_lines, string[] fn_lines) {
+  while(i < len((import ix_fn))) {
+    hmap_put((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ncnt), (import ix_fn)[i], i);
+    i = i + 1;
+  }
+  export string[] ix_fkeys = [];
+  export int[] ix_fvals = [];
+} chain (string[] edge_lines, string[] fn_lines) {
+  export int[] ix_fused = [];
+  export int[] ix_fcnt = [];
+  hmap_init((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_fcnt));
+} chain (string[] edge_lines, string[] fn_lines) {
+  export int[] ix_fbucket = [];
+  int bi = 0;
+  while(bi < len((import ix_fn))) {
+    ix_file_bucket_step(bi);
+    bi = bi + 1;
+  }
+} chain (string[] edge_lines, string[] fn_lines) {
+  export int[] ix_fgstart = [];
+  int nb = hmap_count((import ix_fcnt));
+  int fcount_all = len((import ix_fn));
+} chain (string[] edge_lines, string[] fn_lines) {
+  int[] fgcounts = ix_fg_counts(nb, fcount_all);
+  int[] fgstart_tmp = rev_prefix(fgcounts, nb);
+  int fsi = 0;
+} chain (string[] edge_lines, string[] fn_lines) {
+  while(fsi < len(fgstart_tmp)) {
+    push((import ix_fgstart), fgstart_tmp[fsi]);
+    fsi = fsi + 1;
+  }
+  export int[] ix_fgflat = [];
+  int[] fgflat_tmp = ix_fg_fill((import ix_fgstart), fcount_all);
+} chain (string[] edge_lines, string[] fn_lines) {
+  int ffi = 0;
+  while(ffi < len(fgflat_tmp)) {
+    push((import ix_fgflat), fgflat_tmp[ffi]);
+    ffi = ffi + 1;
+  }
 } return void;
 ([], []):() then total_funcs:(0)
 (["a|b|call"], ["x|y.id|1|2"]):() then total_funcs:(1)
 
+// Get-or-assign this function's file-bucket id (first-seen order): a file
+// name already seen reuses its existing id, one seen for the first time
+// gets the next sequential one -- func_end_line's CSR (ix_fgstart/
+// ix_fgflat) groups by this id instead of rescanning every function.
+ix_file_bucket_step(int i) {
+  int b = hmap_get((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_file)[i], -1);
+  if(b < 0) {
+    b = hmap_count((import ix_fcnt));
+    hmap_put((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_fcnt), (import ix_file)[i], b);
+  }
+  push((import ix_fbucket), b);
+} return void;
+given ix_test_setup (0):() then ix_fbucket_count:(2)
+given rev_edge_fixture (0):() then ix_fbucket_count:(3)
+
 // The concatenated source text of every file the shell wrapper attached,
-// split into one path and one line array per "===F:...===" block.
+// split into one path and one line array per "===F:...===" block. Also
+// builds the export hmap (ix_ekeys/ix_evals/ix_eused/ix_ecnt), since that
+// scan needs both the function table ix_init just filled and the file text
+// this function is about to fill -- run() always calls ix_init before
+// fx_init, and every fixture here follows the same order. ix_ename/ix_efn
+// are the same scan kept as parallel lists rather than overwritten in the
+// hmap: pick_declarer.id needs every declaration of a name, not just
+// whichever one the hmap saw last.
 fx_init(string[] file_lines) {
   export string[] fx_path = [];
   export string[][] fx_lines = [];
   fx_fill((import fx_path), (import fx_lines), file_lines, 0);
+} chain (string[] file_lines) {
+  export string[] ix_ekeys = [];
+  export int[] ix_evals = [];
+  export int[] ix_eused = [];
+} chain (string[] file_lines) {
+  export int[] ix_ecnt = [];
+  hmap_init((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt));
+  export string[] ix_ename = [];
+} chain (string[] file_lines) {
+  export int[] ix_efn = [];
+  int fcount_all = len((import ix_fn));
+  int exi = 0;
+} chain (string[] file_lines) {
+  while(exi < fcount_all) {
+    string[] ebody = func_body_lines_at((import ix_file)[exi], (import ix_line)[exi]);
+    ix_scan_exports_in(ebody, exi);
+    exi = exi + 1;
+  }
 } return void;
-(["===F:a.id===", "x"]):() then total_files:(1)
-([]):() then total_files:(0)
+given ix_test_setup_empty (["===F:a.id===", "x"]):() then total_files:(1)
+given ix_test_setup_empty ([]):() then total_files:(0)

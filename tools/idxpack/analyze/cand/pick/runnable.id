@@ -1,0 +1,57 @@
+// Fix 1 (index.py's runnable_setup): a candidate given-setup must not just
+// reach a target's required declarers, it must have none of its own
+// unmet -- tt_shapes/tt_metrics reach tt_begin but read `ttbuf`, which no
+// zero-param function initialises, so they are not valid setups for
+// anything. Reusing the backward CSR pick/given.id already builds instead
+// of a forward BFS per candidate (which is exactly what that CSR was
+// built to avoid): for every function `r` anywhere in the build with a
+// direct requirement of its own (reader_own_required), a candidate is
+// disqualified when it can reach `r` but not everything `r` itself needs.
+runnable_mask(int[] offs, int[] flat, int fcount) {
+  int[] ok = [];
+  int ri = 0;
+  while(ri < fcount) {
+    push(ok, 1);
+    ri = ri + 1;
+  }
+} chain (int[] offs, int[] flat, int fcount) {
+  int i = 0;
+  while(i < fcount) {
+    runnable_mask_step(offs, flat, fcount, ok, i);
+    i = i + 1;
+  }
+} return int[] ok;
+given rev_edge_fixture ([0, 0, 1], [0], 2):([1, 1])
+given unmet_req_fixture ([0, 0, 1, 1], [0], 3):([0, 0, 1])
+
+// Function index `i`'s own contribution: nothing to check when it has no
+// direct requirement of its own, otherwise runnable_mask_apply marks
+// every function that reaches `i` but not one of `i`'s own needs.
+runnable_mask_step(int[] offs, int[] flat, int fcount, int[] ok, int i) {
+  string[] req = reader_own_required((import ix_fn)[i]);
+  int has_req = len(req);
+  if(has_req > 0) {
+    runnable_mask_apply(offs, flat, fcount, ok, i, req);
+  }
+} return void;
+given rev_edge_fixture ([0, 0, 1], [0], 2, [1, 1], 0):([0, 0, 1], [0], 2, [1, 1], 0)
+given unmet_req_fixture ([0, 0, 1, 1], [0], 3, [1, 1, 1], 1):([0, 0, 1, 1], [0], 3, [0, 0, 1], 1)
+
+// Zeroes `ok` for every function that can reach reader `i` but cannot
+// reach at least one of `req` -- rbfs_run for "reaches i", rev_reach_all
+// (already used for a target's own required set) for "reaches every one
+// of i's own requirements".
+runnable_mask_apply(int[] offs, int[] flat, int fcount, int[] ok, int i, string[] req) {
+  int[] reach_r = rbfs_run(offs, flat, i, fcount);
+  int[] own_ok = rev_reach_all(req, offs, flat, fcount);
+  int j = 0;
+} chain (int[] offs, int[] flat, int fcount, int[] ok, int i, string[] req) {
+  while(j < fcount) {
+    if(reach_r[j] == 1 && own_ok[j] == 0) {
+      ok[j] = 0;
+    }
+    j = j + 1;
+  }
+} return void;
+given rev_edge_fixture ([0, 0, 1], [0], 2, [1, 1], 0, []):([0, 0, 1], [0], 2, [1, 1], 0, [])
+given unmet_req_fixture ([0, 0, 1, 1], [0], 3, [1, 1, 1], 1, ["d"]):([0, 0, 1, 1], [0], 3, [0, 0, 1], 1, ["d"])

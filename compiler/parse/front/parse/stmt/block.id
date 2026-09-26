@@ -23,7 +23,6 @@ given stmt_tokens ([22], []):([28], [1])
 // signatures for the same result.
 fill_block(int[] pos, int[] stmts) {
   while(cur_text(pos) != "}" && cur_kind(pos) != "eof") {
-    no_return_here(pos);
     int stmt_at_line_v = stmt_at_line(pos);
     push(stmts, stmt_at_line_v);
   }

@@ -16,10 +16,20 @@
 // allocates, and that allocation is not the function's. For the same reason the
 // setup runs before they are zeroed and the checks after they are read.
 
+// A library case (case_is_std, mid/names/symbols/lookup/more/std_unit.id)
+// is not emitted: seed_tested never sought its function as a root, so a
+// case still emitted here would call a function dce_pack has already pruned
+// out of `prog` -- a reference the harness C would not compile. Its row
+// (judge/more/row.id's emit_setup_line) points at idtc_case_std_skip
+// instead, emitted once here, unconditionally, so IDTC_N and every index
+// into idtc_case still line up whether or not this build excludes anything.
 emit_cases() {
+  emit_line("static int idtc_case_std_skip(int idtc_fd) {\n    long long idtc_cnt[2] = { 0, 0 };\n    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
   int ci = 0;
   while(ci < len((import casenode))) {
-    emit_case_fn(ci);
+    if(case_is_std(ci) == 0) {
+      emit_case_fn(ci);
+    }
     ci = ci + 1;
   }
 } return void;
@@ -33,11 +43,28 @@ emit_case_fn(int ci) {
 } chain (int ci) {
   emit_case_call_wrapped(ci);
   emit_line("    long long idtc_cnt[2] = { id_ctr_time, id_ctr_mem };");
-  emit_case_expd(ci);
+  emit_case_post(ci);
 } chain (int ci) {
-  emit_case_fail(ci);
-  emit_case_thens(ci);
   emit_line("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
 } return void;
 given void_call_fixture (0):() then calls emit_case_pre:(0) then calls emit_case_call_wrapped:(0)
 given void_call_fixture (1):() then calls emit_case_pre:(1) then calls emit_case_call_wrapped:(1)
+
+// A `traps` case skips the return-value machinery entirely (emit_case_expd,
+// emit_case_fail, emit_case_thens): all three read what the call under test
+// left behind, and a trap means the call's process never comes back to read
+// it from (case/more/judge/judge.id's emit_case_traps_fail is what a traps
+// case gets instead). The write-the-counts tail after this stays the same
+// either way: a traps case that DOES return falls through emit_case_traps_fail's
+// own `return 3;` before ever reaching it.
+emit_case_post(int ci) {
+  if(case_has_out(ci, "thentraps") == 1) {
+    emit_case_traps_fail(ci);
+  } else {
+    emit_case_expd(ci);
+    emit_case_fail(ci);
+    emit_case_thens(ci);
+  }
+} return void;
+given void_call_fixture (0):() then calls emit_case_expd:[1]
+given traps_case_fixture ((import fixture_ci)):() then calls emit_case_traps_fail:[1]

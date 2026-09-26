@@ -1,0 +1,36 @@
+// The edges between components, as flat (caller, callee) pairs: dg_cout's
+// calls and function values, not its imports -- reading an export runs
+// nothing, so a failure in the export's owner is no reason to skip a case.
+// An edge inside one component is dropped, so the pairs form a DAG. The
+// walk's range also holds the previous function's case nodes (../../build/
+// edge/walk.id), so an edge found there makes a case more cautious, never
+// less; a call also appears twice, once as its `var` node.
+
+dg_comp_edges() {
+  int[] dgce = [];
+  int dgf = 0;
+  while(dgf < len((import dg_cout))) {
+    dg_comp_edges_of(dgce, dgf, 0);
+    dgf = dgf + 1;
+  }
+} return int[] dgce;
+given dg_t_built ():([1, 0, 1, 0])
+given dg_t_rows ():([])
+
+dg_comp_edges_of(int[] dgce, int dgf, int dgi) {
+  while(dgi < len((import dg_cout)[dgf])) {
+    dg_comp_edge(dgce, (import dg_comp)[dgf], (import dg_comp)[(import dg_cout)[dgf][dgi]]);
+    dgi = dgi + 1;
+  }
+} return void;
+given dg_t_built ([], 1, 0):([1, 0, 1, 0])
+given dg_t_built ([], 1, 1):([1, 0])
+
+dg_comp_edge(int[] dgce, int dgca, int dgcb) {
+  if(dgca != dgcb) {
+    push(dgce, dgca);
+    push(dgce, dgcb);
+  }
+} return void;
+([], 1, 0):([1, 0])
+([], 2, 2):([])

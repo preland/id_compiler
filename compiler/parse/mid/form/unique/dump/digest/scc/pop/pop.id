@@ -1,0 +1,37 @@
+// A component is complete when the walk returns to its root: every function
+// above the root on the stack is a member. Each is given the component's
+// number and taken off the stack, and the component is sealed (../seal/)
+// before anything else can complete -- so the n-th component sealed is the
+// n-th row of dg_deep and dg_dirty.
+
+dg_pop(int dgv) {
+  int dgc = (import dg_ctr)[1];
+  lset((import dg_ctr), 1, dgc + 1);
+  int dgp = dg_mark(dgv, dgc);
+} chain (int dgv) {
+  dg_seal(dgp);
+  dg_trunc(dgp);
+} return void;
+given dg_t_stk2 (0):() then dg_ncomp:(2) then dg_nstk:(0)
+given dg_t_stk2 (1):() then dg_ncomp:(2) then dg_nstk:(1)
+
+// Marks the stack from its top down to dgv, returning dgv's position -- the
+// bottom of the component.
+dg_mark(int dgv, int dgc) {
+  int dgp = len((import dg_stk)) - 1;
+  while((import dg_stk)[dgp] != dgv) {
+    dg_own_comp(dgp, dgc);
+    dgp = dgp - 1;
+  }
+  dg_own_comp(dgp, dgc);
+} return int dgp;
+given dg_t_stk2 (0, 3):(0) then dg_comp1:(3)
+given dg_t_stk2 (1, 3):(1) then dg_comp1:(3)
+
+dg_own_comp(int dgp, int dgc) {
+  int dgm = (import dg_stk)[dgp];
+  lset((import dg_comp), dgm, dgc);
+  lset((import dg_on), dgm, 0);
+} return void;
+given dg_t_stk2 (1, 5):() then dg_comp1:(5)
+given dg_t_stk2 (0, 5):() then dg_comp1:(-1)

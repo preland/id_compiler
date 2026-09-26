@@ -1,0 +1,59 @@
+// What a file's own name says about it: the dependency manifest, a backend's
+// link facts, the old manifest name, a generic dump, or an ordinary source
+// file. Mirrors bin/idc's own filters (check_entry_limit's `! -name` list,
+// check_legacy_manifest, check_generic_names).
+
+lay_is_generic(string name) {
+  int hit = 0;
+  if(name == "helper.id" || name == "helpers.id") {
+    hit = 1;
+  }
+  if(name == "util.id" || name == "utils.id") {
+    hit = 1;
+  }
+} chain (string name) {
+  if(name == "misc.id" || name == "common.id") {
+    hit = 1;
+  }
+  if(name == "stuff.id" || name == "tmp.id") {
+    hit = 1;
+  }
+  if(name == "temp.id") {
+    hit = 1;
+  }
+} return int hit;
+("util.id"):(1)
+("main.id"):(0)
+("temp.id"):(1)
+("temperature.id"):(0)
+
+// 0 conf.id, 1 backend.id, 2 import.id (the old manifest name), 3 a generic
+// dump, 4 an ordinary *.id file that counts toward the entry limit, 5
+// anything else (not a *.id file at all, so no check below ever sees it).
+lay_file_kind(string name) {
+  int kind = 5;
+  if(str_ends(name, ".id") == 1) {
+    kind = 4;
+  }
+  if(name == "conf.id") {
+    kind = 0;
+  }
+} chain (string name) {
+  if(name == "backend.id") {
+    kind = 1;
+  }
+  if(name == "import.id") {
+    kind = 2;
+  }
+  int generic = lay_is_generic(name);
+} chain (string name) {
+  if(generic == 1) {
+    kind = 3;
+  }
+} return int kind;
+("main.id"):(4)
+("conf.id"):(0)
+("backend.id"):(1)
+("import.id"):(2)
+("util.id"):(3)
+("README"):(5)

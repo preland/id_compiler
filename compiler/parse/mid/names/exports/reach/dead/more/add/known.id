@@ -1,0 +1,31 @@
+// Whether a name is a function of the build, remembered: reach_add (add.id)
+// asks this of every variable read on every sweep, and most of those are
+// locals, so the answer for a name that is no function is kept in the index
+// (index.id) beside the fnames length it was true for -- a table that grows
+// afterwards, as only a hand-built fixture's does, is asked again.
+
+rfx_fn(string name) {
+  int rfm = 0 - 2 - len((import fnames));
+  int ok = 0;
+  if(hmap_get((import rfxk), (import rfxv), (import rfxu), name, 0 - 1) != rfm) {
+    ok = rfx_scan(name, rfm);
+  }
+} return int ok;
+given seed_given_fixture ("fx_target"):(1)
+given seed_given_fixture ("nope"):(0)
+
+rfx_scan(string name, int rfm) {
+  int ok = 1;
+  if(find_str((import fnames), name) < 0) {
+    ok = 0;
+    rfx_put(name, rfm);
+  }
+} return int ok;
+given seed_given_fixture ("fx_target", -3):(1)
+given seed_given_fixture ("nope", -3):(0) then calls rfx_put:("nope", -3)
+
+conf_reached() {
+  int ok = is_reach("conf.id");
+} return int ok;
+given init_reach ():(1)
+given rfn_hand ():(0)

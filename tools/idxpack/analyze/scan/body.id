@@ -3,13 +3,29 @@
 // idc/tools/casework.sh's `fn_end`, but from the table instead of an awk
 // scan, since --calls already gave every function's start line.
 func_end_line(string file, int line, string[] all_lines) {
-  int i = 0;
+  int bucket = hmap_get((import ix_fkeys), (import ix_fvals), (import ix_fused), file, -1);
   int best = len(all_lines);
-  while(i < len((import ix_fn))) {
-    if(str_cmp((import ix_file)[i], file) == 0 && (import ix_line)[i] > line && (import ix_line)[i] - 1 < best) {
-      best = (import ix_line)[i] - 1;
+  int gi = 0;
+} chain (string file, int line, string[] all_lines) {
+  int gend = 0;
+  if(bucket >= 0) {
+    gi = (import ix_fgstart)[bucket];
+    gend = (import ix_fgstart)[bucket + 1];
+  }
+  int j = line - 1;
+} chain (string file, int line, string[] all_lines) {
+  while(gi < gend) {
+    int fidx = (import ix_fgflat)[gi];
+    if((import ix_line)[fidx] > line && (import ix_line)[fidx] - 1 < best) {
+      best = (import ix_line)[fidx] - 1;
     }
-    i = i + 1;
+    gi = gi + 1;
+  }
+  while(j < best) {
+    if(str_find(all_lines[j], "} return") == 0) {
+      best = j + 1;
+    }
+    j = j + 1;
   }
 } return int best;
 given ix_test_setup ("f.id", 1, ["a", "b"]):(2)
@@ -19,7 +35,7 @@ given ix_test_setup_empty ("f.id", 1, ["a", "b", "c"]):(3)
 // before the next function in the same file (func_end_line above). A name
 // this build never declared (not found in ix_fn) has no body -- returns [].
 func_body_lines(string name) {
-  int fi = idx_find_str((import ix_fn), name);
+  int fi = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), name, -1);
   string[] ret_li = [];
   if(fi >= 0) {
     ret_li = func_body_lines_at((import ix_file)[fi], (import ix_line)[fi]);

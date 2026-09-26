@@ -1,0 +1,14 @@
+// pfile with the same name four times over the 3-per-file limit, and fseen
+// seeded so the `len(fseen) > 0` guard passes, for check_file_at's own cases
+// (mid/names/limits/report/file_count.id).
+many_file_fixture() {
+  full_env();
+  push((import pfile), "over.id");
+  push((import pfile), "over.id");
+} chain () {
+  push((import pfile), "over.id");
+  push((import pfile), "over.id");
+  push((import fseen), "over.id");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

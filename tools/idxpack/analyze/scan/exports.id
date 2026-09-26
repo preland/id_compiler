@@ -1,12 +1,13 @@
-// The function that exports `name`, found by scanning every function's own
-// body for an "export TYPE name = ..." statement -- or "" if none declares
-// it, which the packet reports honestly rather than guessing at one.
+// The function that exports `name` -- an O(1) lookup against the export
+// hmap ix_init builds once (every function's body scanned for "export TYPE
+// name = ..." exactly once, not rescanned per name asked about here) -- or
+// "" if none declares it, which the packet reports honestly rather than
+// guessing at one.
 find_declaring_fn(string name) {
-  int i = 0;
+  int idx = hmap_get((import ix_ekeys), (import ix_evals), (import ix_eused), name, -1);
   string out_s = "";
-  while(i < len((import ix_fn)) && str_cmp(out_s, "") == 0) {
-    out_s = find_declaring_fn_step(name, i, out_s);
-    i = i + 1;
+  if(idx >= 0) {
+    out_s = (import ix_fn)[idx];
   }
 } return string out_s;
 given ix_import_fixture ("err_n"):("")

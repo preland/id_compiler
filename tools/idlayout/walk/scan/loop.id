@@ -1,0 +1,31 @@
+// Reading one directory's fs_list buffer entry by entry, in the order
+// fs_list already sorted it -- byte order, '/' included -- so a violation
+// pushed as each entry is reached lands in its bucket in that same order,
+// same as the tree's full path order (idc/driver/main.id's own comment on
+// why this holds).
+
+lay_scan_entry(int[] buf, int lo, int hi, string dir, string root, string build, int is_root, string self) {
+  if(buf[hi - 1] == 47) {
+    lay_handle_dir(buf, lo, hi - 1, dir, root, build, is_root, self);
+  } else {
+    lay_handle_file(buf, lo, hi, dir, is_root);
+  }
+} return void;
+given lay_reset ([46, 103, 105, 116, 47], 0, 5, "d", "r", "build", 0, "d"):() then lay_report:(0)
+given lay_reset ([97, 46, 105, 100], 0, 4, "d", "r", "build", 0, "d"):() then lay_report:(0)
+
+lay_scan_one(int[] buf, string dir, string root, string build, int is_root, string self, int at) {
+  int end = lay_eol(buf, at);
+  lay_scan_entry(buf, at, end, dir, root, build, is_root, self);
+  int next = end + 1;
+} return int next;
+given lay_reset ([97, 46, 105, 100, 10], "d", "r", "build", 0, "d", 0):(5)
+given lay_reset ([46, 103, 105, 116, 47, 10], "d", "r", "build", 0, "d", 0):(6)
+
+lay_scan(int[] buf, string dir, string root, string build, int is_root, string self, int at) {
+  while(at < len(buf)) {
+    at = lay_scan_one(buf, dir, root, build, is_root, self, at);
+  }
+} return void;
+given lay_reset ([], "d", "r", "build", 0, "d", 0):() then lay_report:(0)
+given lay_reset ([97, 46, 105, 100, 10], "d", "r", "build", 0, "d", 0):() then lay_report:(0)

@@ -11,3 +11,18 @@ pcall_fixture_tail(int f) {
 } return void;
 given pcall_fixture (0):() then check_failed:(0)
 given pcall_fixture (0):() then init_units:(0)
+
+// Two enclosing loops exiting to blocks 1 and 2 (innermost last), a `break`,
+// and an early `return` of ev_node from a function returning int -- for the
+// flow statements' lowering (../op.id, tail.id).
+flow_ir_fixture() {
+  loop_fixture();
+  push((import lwloop), 1);
+  push((import lwloop), 2);
+} chain () {
+  export int flow_ir_brk = newleaf("break", 0 - 1, 0, "", "");
+  int[] flow_ir_none = [];
+  export int flow_ir_ret = newnode("ret", (import ev_node), 0, "f", "int", flow_ir_none, flow_ir_none);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

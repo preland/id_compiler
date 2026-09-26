@@ -5,6 +5,8 @@ fix_type_ok(int i) {
     ok = fix_spanok((import fixe_n)[i]);
   }
 } return int ok;
+given fix_type_ok_fixture (0):(1)
+given fix_type_ok_fixture (1):(0)
 
 // The statement's first token has to have columns, or there is nowhere to put
 // the declarations.

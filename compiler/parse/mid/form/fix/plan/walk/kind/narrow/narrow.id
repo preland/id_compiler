@@ -22,6 +22,8 @@ fix_narrow(int e, int i, int a) {
     t = pt;
   }
 } return string t;
+given fix_pparam_fixture ((import ppcall), 0, (import ppwide)):("int")
+given fix_pparam_fixture ((import ppcall), 1, (import ppwide)):("")
 
 fix_narrows(string pt, int a) {
   string type_of_v = type_of(a);

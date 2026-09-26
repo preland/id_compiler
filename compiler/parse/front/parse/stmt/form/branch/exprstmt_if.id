@@ -16,3 +16,25 @@ parse_if(int[] pos) {
 } return int ret_i;
 given stmt_tokens ([9]):(7)
 given stmt_tokens ([28]):(7)
+
+// An early `return`: `return;`, or `return NAME;` / `return LITERAL;`, the
+// same shape the return clause takes. It costs no action. The node holds the
+// value in ni1 (-1 for none); its function's name and return type are written
+// into ns1/ns2 once the return clause after the body has been read
+// (decl/func/sig/params/seal.id), so every check of the return clause applies
+// to it unchanged.
+parse_ret(int[] pos) {
+  advance(pos);
+  int ret_e = 0 - 1;
+  if(cur_text(pos) != ";") {
+    ret_e = parse_expr(pos);
+  }
+} chain (int[] pos) {
+  skip_semi(pos);
+  int[] ret_none = [];
+  int ret_i = newnode("ret", ret_e, 0, "", "", ret_none, ret_none);
+} chain (int[] pos) {
+  push((import pend_rets), ret_i);
+} return int ret_i;
+given flow_tokens ([2]):(1) then calls newnode:("ret", 0, 0, "", "", [], [])
+given flow_tokens ([5]):(0) then calls newnode:("ret", -1, 0, "", "", [], [])

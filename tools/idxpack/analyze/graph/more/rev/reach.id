@@ -1,0 +1,62 @@
+// Backward-reachability of one required declarer, ANDed into the running
+// `reach_ok` set (rev_reach_all calls this once per required name) -- a
+// name with no declaring function (hmap miss) reaches nothing, so it zeroes
+// every candidate rather than being silently skipped.
+rev_reach_merge(string[] required, int[] offs, int[] flat, int fcount, int[] reach_ok, int r) {
+  int d_idx = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), required[r], -1);
+  int[] visited = [];
+  int i = 0;
+} chain (string[] required, int[] offs, int[] flat, int fcount, int[] reach_ok, int r) {
+  while(i < fcount) {
+    push(visited, 0);
+    i = i + 1;
+  }
+  if(d_idx >= 0) {
+    visited = rbfs_run(offs, flat, d_idx, fcount);
+  }
+  int j = 0;
+} chain (string[] required, int[] offs, int[] flat, int fcount, int[] reach_ok, int r) {
+  while(j < fcount) {
+    if(visited[j] == 0) {
+      reach_ok[j] = 0;
+    }
+    j = j + 1;
+  }
+} return void;
+given rev_edge_fixture (["p"], [0, 0, 1], [0], 2, [1, 1], 0):(["p"], [0, 0, 1], [0], 2, [1, 0])
+given rev_edge_fixture (["q"], [0, 0, 1], [0], 2, [1, 1], 0):(["q"], [0, 0, 1], [0], 2, [1, 1])
+
+// All required declarers ANDed together (rev_reach_merge, once per name):
+// with no required names, every function counts as reaching (the vacuous-
+// AND rule given_reaches' own empty-`required` case already relies on).
+rev_reach_all(string[] required, int[] offs, int[] flat, int fcount) {
+  int[] reach_ok = [];
+  int i = 0;
+  while(i < fcount) {
+    push(reach_ok, 1);
+    i = i + 1;
+  }
+} chain (string[] required, int[] offs, int[] flat, int fcount) {
+  int r = 0;
+  while(r < len(required)) {
+    rev_reach_merge(required, offs, flat, fcount, reach_ok, r);
+    r = r + 1;
+  }
+} return int[] reach_ok;
+given rev_edge_fixture (["p"], [0, 0, 1], [0], 2):([1, 0])
+given rev_edge_fixture ([], [0, 0, 1], [0], 2):([1, 1])
+
+// One edge's contribution to rev/build.id's CSR fill: a "value" edge, or one
+// whose caller or callee never declared a function, places nothing. Split
+// out of rev_flat's own loop -- ci, cj, the combined guard and the cursor
+// write were already four actions, one over a while body's own limit.
+rev_flat_step(int[] flat, int[] cursor, int ei) {
+  int ci = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
+  int cj = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecaller)[ei], -1);
+  if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0 && cj >= 0) {
+    flat[cursor[ci]] = cj;
+    cursor[ci] = cursor[ci] + 1;
+  }
+} return void;
+given rev_edge_fixture ([9], [0, 0], 0):([0], [0, 1])
+given ix_test_setup ([5], [3], 0):([5], [3])

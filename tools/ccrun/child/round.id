@@ -1,0 +1,33 @@
+// One poll-and-forward pass. Input and stdout each wait up to the real
+// timeout_ms -- both are genuine two-party handoffs (the child's stdin pipe
+// draining, or its stdout pipe filling) that need a real wait or an active
+// child gets busy-polled at whatever rate the OTHER stream happens to
+// settle at (observed here: proc_write given timeout 0 instead of a real
+// wait made writing a 300KB file cost ~1.5s in retries, one busy round at a
+// time). stderr alone is checked with timeout 0, an immediate peek rather
+// than a second wait: poll() with timeout 0 still reports data that already
+// arrived while stdout's wait was running, so nothing buffered is missed,
+// but a round no longer pays up to timeout_ms extra for a stream that is
+// silent for the whole build, which is the common case (measured at
+// ~20ms/round on a silent stderr, ~3s for a 500KB stdout-only child before
+// this half of the fix -- idc/README.md's timing).
+pump_round(int timeout_ms) {
+  maybe_pump_in(timeout_ms);
+  int n_out = proc_read((import cr_h), (import cr_chunk), 4096, timeout_ms);
+  int wrote_out = fs_write((import cr_out), (import cr_chunk), n_out);
+} chain (int timeout_ms) {
+  int n_err = proc_read_err((import cr_h), (import cr_chunk), 4096, 0);
+  int wrote_err = fs_write((import cr_err), (import cr_chunk), n_err);
+  int code = proc_wait((import cr_h), 0);
+} return int code;
+
+// Skip pump_in entirely on the "-" (no input) path: the common case -- most
+// capped() calls are a plain `cc`/`clang` that never reads stdin at all --
+// pays nothing for input handling once child/setup.id's open_input_if_any
+// has already closed the child's stdin.
+maybe_pump_in(int timeout_ms) {
+  int has = (import cr_has_in);
+  if(has) {
+    pump_in(timeout_ms);
+  }
+} return void;

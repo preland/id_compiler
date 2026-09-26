@@ -5,10 +5,41 @@
 //   idlex < prog.id | idparse        # emit C
 //   idlex < prog.id | idparse ast    # print the AST as an S-expression
 
+// fixd_wadj has no reader elsewhere in the build, for fix_wrow's own cases
+// (plan/reach/build/fill.id is at the three-function cap).
+fixd_wadj_len() {
+  int n = len((import fixd_wadj));
+} return int n;
+given fix_wseed_fixture ():(0)
+given fix_wprop_fixture ():(2)
+
+// cmp_fixture's bin_mixed/bin_bitand (mid/types/.../cmpnodes.id) are a real
+// mixed-operator pair, unparenthesized; fix_state (not fix_fixture, which
+// would re-run env_init and wipe those nodes) sizes fixd_gcl to the nodes
+// already built and leaves fixd_lo empty, so fix_spanok/fix_in_moved read
+// real state instead of trapping; every node built here shares curtk's
+// untouched initial 0, so one tspan entry at index 0 gives fix_packed a
+// real column for every one of them, and fix_spanok comes out 1 -- for
+// fix_paren_side's own cases (out/ret/paren/side.id is at the
+// three-function cap).
+fix_paren_side_fixture() {
+  cmp_fixture();
+  fix_state();
+  push((import tspan), 5 * 65536 + 8);
+} chain () {
+  push((import tline), 1);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
 // The exit code is whether the program broke a rule of the language: 1 if a
 // check failed, 0 otherwise. `id` has no stderr and no early exit, so this is
 // how a diagnostic reaches the driver -- and why nothing is emitted when a
 // check fails, rather than diagnostics being interleaved with C.
+//
+// No cases: main's own first statement is load(), which calls read_all() --
+// a real stdin read the case format has no way to supply (case-writing-
+// prompt.md's refusal list, item 1).
 main(int argc, string[] argv) {
   setup();
   load();
@@ -29,3 +60,13 @@ main(int argc, string[] argv) {
   }
   int ret_i = check_failed();
 } return int ret_i;
+
+// stdin (docs/TESTS.md) is what makes these two possible: `load` reads the
+// real stdin the case's process is given, no differently than the real
+// driver's would be. A token stream with no functions at all raises nothing
+// -- an empty program breaks no rule -- so the first case is the "nothing
+// to check" floor; the second is a real token stream (the lexer's own
+// "<kind> <value>" lines, as `load` reads them) for a function whose two
+// cases are identical tokens, which the duplicate-case rule always rejects.
+given full_env stdin "" (1, ["prog"]):(0)
+given full_env stdin "ident foo\nop (\nkw int\nident x\nop )\nop {\nline 2\nkw int\nident y\nop =\nident x\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident y\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 6\neof\n" (1, ["prog"]):(1)

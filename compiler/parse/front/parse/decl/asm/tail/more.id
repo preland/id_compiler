@@ -17,8 +17,13 @@ asm_tail_end(int[] pos, string name) {
 given asm_fix_full ([4], "result"):(0) then afretn_last:("result")
 given asm_fix_full2 ([5], "r"):(0) then afretn_last:("r")
 
+// aloc: one "file:line" per asm declaration, parallel to afname, pushed by
+// push_asm (front/parse/decl/top/decl/more.id) -- room for the export here
+// only, init_asm/init_asm2 (../asm_state.id) already being at the
+// 3-function cap.
 init_asm_rest() {
   init_files();
+  export string[] aloc = [];
   int ret_i = init_consts();
 } return int ret_i;
 given env_init ():(0) then check_failed:(0)

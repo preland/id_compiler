@@ -28,7 +28,7 @@ shape_node(int id) {
   if(k_of(id) == "call") {
     chk_flat_args(id);
   }
-  if(k_of(id) == "func") {
+  if(k_of(id) == "func" || k_of(id) == "ret") {
     chk_ret_name(id);
   }
 } return void;

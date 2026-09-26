@@ -1,0 +1,46 @@
+// The operands of an expression node, in the order docs/SPEC.md 7 evaluates
+// them, and how their sequencing needs combine.
+//
+// A node's sequencing need (seqk, own.id) is 0 when nothing under it has to
+// be ordered, 1 when exactly one path from it reaches ordered work -- which C
+// then evaluates inside out, as 7 wants -- and 2 when two operands both do,
+// which C leaves unsequenced.
+
+seq_kids(int id) {
+  int[] sq_kids = l1_of(id);
+  if(k_of(id) == "bin" || k_of(id) == "index") {
+    sq_kids = [i1_of(id), i2_of(id)];
+  } else if(k_of(id) == "un") {
+    sq_kids = [i1_of(id)];
+  }
+} return int[] sq_kids;
+given sq_fixture ((import sq_two)):([7, 9])
+given sq_fixture ((import sq_mod)):([0, 13])
+given sq_fixture ((import sq_at)):([16, 7])
+given sq_fixture ((import nz_int)):([])
+
+seq_fold(int[] sq_kids) {
+  int sk = 0;
+  int i = 0;
+  while(i < len(sq_kids)) {
+    int sc = seqk(sq_kids[i]);
+    sk = seq_step(sk, sc);
+    i = i + 1;
+  }
+} return int sk;
+given sq_fixture ([7, 9]):(2)
+given sq_fixture ([7, 0]):(1)
+given sq_fixture ([]):(0)
+
+// Two operands that each need ordering make the parent need it; so does one
+// that already did.
+seq_step(int sk, int sc) {
+  int sk_n = sk + sc;
+  if(sk_n > 2) {
+    sk_n = 2;
+  }
+} return int sk_n;
+(0, 1):(1)
+(1, 1):(2)
+(2, 0):(2)
+(1, 2):(2)

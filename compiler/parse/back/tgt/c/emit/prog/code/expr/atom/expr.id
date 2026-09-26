@@ -4,7 +4,7 @@
 emit_expr(int id) {
   string s = int_code(id);
   if(k_of(id) != "int") {
-    s = ee2(id);
+    s = ee_seq(id);
   }
 } return string s;
 given nz_env ((import nz_int)):("7")

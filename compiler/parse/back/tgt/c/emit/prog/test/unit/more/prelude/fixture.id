@@ -22,3 +22,31 @@ test_body_fixture() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// One casefn entry at unit 0 (fn_lo) and one at unit 5 (fn_hi). The boundary
+// is set to 6 (past fn_hi's own unit) and --exclude-units names fn_hi's
+// unit directly, through a real nat_init(--std-unit, --exclude-units) call
+// rather than exports of their own -- `stdunit`/`exclunit` are init_units's
+// to export, and a name is exported once: fn_lo is kept excluded by
+// neither mechanism, fn_hi by the list rather than the boundary, so
+// mid/names/symbols/lookup/more/std_unit.id's case_is_std/stdunit_check/
+// exclunit_check all have a witness for the list path, not just the
+// boundary one. `given` takes no parameters (docs/TESTS.md), so the two
+// scenarios case_is_std needs are two indices into one fixture rather than
+// one parameterised fixture. unit_excluded reuses it for the same reason.
+// Filed with the other harness fixtures (std_unit.id is at its 3-function cap)
+// rather than beside case_is_std.
+case_unit_fixture() {
+  env_init();
+  int[] none = [];
+  int fn_lo = node_func("cu_lo", "void", none, none, 0 - 1);
+} chain () {
+  int fn_hi = node_func("cu_hi", "void", none, none, 0 - 1);
+  lset((import nunit), fn_hi, 5);
+  push((import casefn), fn_lo);
+} chain () {
+  push((import casefn), fn_hi);
+  nat_init(5, ["prog", "--std-unit", "6", "--exclude-units", "5"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

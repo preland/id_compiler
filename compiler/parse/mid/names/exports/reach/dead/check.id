@@ -43,6 +43,7 @@ given env_init ():() then calls reach_mark:()
 init_reach() {
   export string[] rfn = ["main", "conf.id"];
   export int[] dphase = [0];
+  rfx_init();
 } return void;
 given env_init ():() then reach_pass:(2)
 given full_env ():() then reach_pass:(2)
