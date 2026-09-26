@@ -34,6 +34,7 @@ lay_room_emit_file(string dir, string root, string name) {
   }
 } return void;
 given lay_room_ref_fixture ("/r", "/r", "does-not-exist-xyz-room-file.id"):() then lay_room_count:(1)
+given lay_room_ref_fixture ("room/walk/scan", "room", "push.id"):() then lay_room_count:(0)
 
 // A known, empty DIR-reference for the two cases above: `given` takes no
 // arguments, and this is the only way to hand a case a fresh room_ref_segs
