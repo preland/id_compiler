@@ -5,7 +5,7 @@
 // files either way.
 qa_kill_check() {
   int qa_qh = (import qm_qh);
-  int qa_rc = proc_wait(qa_qh, 2000);
+  int qa_rc = proc_wait(qa_qh, 10000);
   int qa_close = proc_close(qa_qh);
 } chain () {
   int qa_r1 = fs_remove((import qm_qmp_path));
