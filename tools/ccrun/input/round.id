@@ -5,12 +5,13 @@
 // ../child/setup.id's comment on PIPE_BUF -- so there is never a partial
 // chunk to re-slice, only "sent" or "not yet"), then, once nothing is
 // staged and we have not hit cr_in's own EOF, stage the next chunk from it.
-// cr_pending_n/cr_in_eof are read and re-exported here every round; nothing
-// else ever assigns them, so a stale read racing a fresher write cannot
-// happen.
+// cr_pending_n/cr_in_eof are read and written back here every round (index
+// 0 of the 1-element lists child/setup.id's setup_io declares, not a
+// re-export -- setup_io alone may ever declare them); nothing else ever
+// assigns them, so a stale read racing a fresher write cannot happen.
 pump_in(int timeout_ms) {
-  int pending = (import cr_pending_n);
-  int eof = (import cr_in_eof);
+  int pending = (import cr_pending_n)[0];
+  int eof = (import cr_in_eof)[0];
   if(pending > 0) {
     int wrote = proc_write((import cr_h), (import cr_pending), pending, timeout_ms);
     if(wrote == pending) {
@@ -23,11 +24,13 @@ pump_in(int timeout_ms) {
     pending = got;
     eof = got == 0;
   }
-  export int cr_pending_n = pending;
-  export int cr_in_eof = eof;
+  lset((import cr_pending_n), 0, pending);
+  lset((import cr_in_eof), 0, eof);
 } chain (int timeout_ms) {
   maybe_close_in();
 } return void;
+given ccrun_fx_setup_input_main (50):(50) then ccrun_fx_pending_value:(3427)
+given ccrun_fx_run_capped_true given ccrun_fx_empty_input (50):(50) then ccrun_fx_pending_value:(0) then ccrun_fx_in_done_value:(1)
 
 // run_capped, spawning a real ("true") child under no limits with real
 // stdout/stderr streams, is the sole exporter of cr_h/cr_out/cr_err

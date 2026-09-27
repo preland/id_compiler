@@ -10,10 +10,27 @@
 // cr_has_in says which case this run is, once, for pump_round and
 // close_all to read; cr_in/cr_pending are exported by open_input (below)
 // only on the has-input path, so nothing ever reads them uninitialised.
+//
+// cr_pending_n/cr_in_eof/cr_in_done are boxed (a 1-element list, not a
+// plain int) and declared here, not where they used to be re-exported
+// (input/round.id's pump_in, input/close.id's do_close_in): a plain export
+// can only ever be declared by the one function that owns it, so pump_in
+// re-exporting them on every round left them undeclared until pump_in's
+// own first call -- fine in a real build (an int import reads 0 before its
+// declaring function has run), but a test case traps on exactly that read
+// (docs/SPEC.md §8's "any type in a test case" row), and no `given` could
+// reach past it since nothing else was allowed to declare them first. A
+// boxed list is still owned by one function -- this one -- but its cells
+// can be written from anywhere by index, the same way spawn_qemu's qm_buf
+// (tools/qmon) is pushed onto from outside its own exporter.
 setup_io(string input) {
   export int[] cr_chunk = [];
   lst_fill((import cr_chunk), 4096, 0);
   export int cr_has_in = input != "-";
+} chain (string input) {
+  export int[] cr_pending_n = [0];
+  export int[] cr_in_eof = [0];
+  export int[] cr_in_done = [0];
 } chain (string input) {
   open_input_if_any(input);
 } return void;

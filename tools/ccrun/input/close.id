@@ -4,19 +4,21 @@
 // stdin at all still needs this eventually, and idlex/idparse do read it,
 // so both must see the same signal.
 maybe_close_in() {
-  int eof = (import cr_in_eof);
-  int pending = (import cr_pending_n);
-  int done = (import cr_in_done);
+  int eof = (import cr_in_eof)[0];
+  int pending = (import cr_pending_n)[0];
+  int done = (import cr_in_done)[0];
 } chain () {
   int ready = eof == 1 && pending == 0 && done == 0;
   if(ready) {
     do_close_in();
   }
 } return void;
+given ccrun_fx_setup_input_main ():() then calls do_close_in:[0] then ccrun_fx_in_done_value:(0)
+given ccrun_fx_run_capped_true given ccrun_fx_empty_input given ccrun_fx_pump_once ():() then calls do_close_in:[0] then ccrun_fx_in_done_value:(1)
 
 do_close_in() {
   int closed = proc_close_in((import cr_h));
-  export int cr_in_done = 1;
+  lset((import cr_in_done), 0, 1);
 } return void;
 given ccrun_fx_run_capped_true ():() then ccrun_fx_in_done_value:(1)
 given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then ccrun_fx_in_done_value:(1)

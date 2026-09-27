@@ -1,0 +1,29 @@
+// Reads child/setup.id's cr_pending_n box back, for cases that need pump_in's
+// (round.id) staged-byte count rather than just proving it was written.
+ccrun_fx_pending_value() {
+  int v = (import cr_pending_n)[0];
+} return int v;
+given ccrun_fx_setup_input_main ():(0)
+given ccrun_fx_setup_input_main given ccrun_fx_pump_once ():(3427)
+
+// pump_in (round.id) takes timeout_ms, so a `given` cannot name it directly;
+// this gives it a fixed, harmless timeout for cases that need one real round
+// run before the case's own call.
+ccrun_fx_pump_once() {
+  pump_in(50);
+} return void;
+given ccrun_fx_setup_input_main ():() then calls pump_in:(50)
+given ccrun_fx_run_capped_true given ccrun_fx_empty_input ():() then calls pump_in:(50) then ccrun_fx_in_done_value:(1)
+
+// A real, empty file: fs_mktemp's file is removed right after setup_io opens
+// it -- Linux keeps an already-open handle valid past unlink, so this leaves
+// nothing in /tmp. Read from it (round.id's pump_in, via ccrun_fx_pump_once)
+// gets a real, immediate 0-byte result, unlike ccrun_fx_setup_input_main's
+// real content.
+ccrun_fx_empty_input() {
+  string p = fs_mktemp("ccrun_empty_", 0);
+  setup_io(p);
+  int rm = fs_remove(p);
+} return void;
+():() then ccrun_fx_pending_value:(0)
+given ccrun_fx_empty_input ():() then ccrun_fx_pending_value:(0)
