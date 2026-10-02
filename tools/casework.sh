@@ -73,7 +73,7 @@ cmd_packet() {
     [ -n "$name" ] || die "$loc is not a function header -- re-run 'casework.sh list' for its current line"
     echo "== $name  ($loc)"
     echo "-- source and existing cases"
-    awk -v s="$line" -v e="$end" 'NR >= s && NR <= e { print; next } NR > e && /^(\(|given )/ { print; next } NR > e { exit }' "$file"
+    awk -v s="$line" -v e="$end" 'NR >= s && NR <= e { print; next } NR > e && /^(\(|given |stdin |timeout )/ { print; next } NR > e { exit }' "$file"
     echo "-- comment above it"
     awk -v s="$line" 'NR < s { buf = ($0 ~ /^\/\//) ? buf $0 "\n" : "" } NR == s { printf "%s", buf; exit }' "$file"
     echo "-- callers (first 8)"
@@ -88,7 +88,7 @@ cmd_packet() {
     local dir up
     dir=$(dirname "$file"); up=$(dirname "$dir")
     [ "$(realpath "$dir")" = "$(realpath "$path")" ] && up=$dir
-    grep -rhoE '^given [a-z_][a-z0-9_]*' "$dir" "$up" --include='*.id' 2>/dev/null \
+    grep -rhoE '^given [a-z_][a-z0-9_]*(\(([^()]|\([^()]*\))*\))?' "$dir" "$up" --include='*.id' 2>/dev/null \
         | sort | uniq -c | sort -rn | head -6
 }
 

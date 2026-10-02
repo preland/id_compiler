@@ -18,7 +18,8 @@ set -u
 cd "$(dirname "$0")/.."
 
 # A case is a line of the form (args):(expected), possibly indented,
-# optionally opened by any number of `given SETUP` and then one `stdin "TEXT"`,
+# optionally opened by any number of `given SETUP` or `given SETUP(LIT, ...)`,
+# then one `stdin "TEXT"` and one `timeout N`,
 # and with `(import NAME)`, other parenthesised values and string literals
 # among its values; a function
 # declaration starts at column 0 with a name and an open paren. Both are
@@ -36,7 +37,7 @@ cd "$(dirname "$0")/.."
 # The patterns reach awk through the environment, not -v: -v processes escape
 # sequences, which turns every \( into ( and leaves an invalid regular
 # expression that counts nothing.
-export CASE_RE='^[ \t]*(given +[A-Za-z_][A-Za-z0-9_]* +)*(stdin +"([^"\\]|\\.)*" +)?\((\(([^()"]|"([^"\\]|\\.)*")*\)|"([^"\\]|\\.)*"|[^)"])*\) *: *\('
+export CASE_RE='^[ \t]*(given +[A-Za-z_][A-Za-z0-9_]*( *\((\(([^()"]|"([^"\\]|\\.)*")*\)|"([^"\\]|\\.)*"|[^)"])*\) *| +))*(stdin +"([^"\\]|\\.)*" +)?(timeout +[0-9]+ +)?\((\(([^()"]|"([^"\\]|\\.)*")*\)|"([^"\\]|\\.)*"|[^)"])*\) *: *\('
 export FN_RE='^[a-z_][a-z0-9_]*\('
 id_files() { find "$@" -name build -prune -o -name '*.id' -type f -print 2>/dev/null | LC_ALL=C sort; }
 count_tree() {
@@ -89,7 +90,7 @@ STD=${IDSTD_HOME:-../../idstd}
 C2ID=../c2id
 LINUX=../../linux_id
 
-# The two freestanding trees, with the flags tools/kbuild.sh builds them with.
+# The two freestanding trees, with the flags tools/kbuild builds them with.
 { exempt_of ../kernel/prog --no-std --freestanding --triple x86_64-unknown-none \
   && exempt_of runtime --no-std --runtime --triple x86_64-unknown-none; } > "$EXEMPT" || exit 1
 
