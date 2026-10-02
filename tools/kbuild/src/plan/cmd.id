@@ -1,0 +1,30 @@
+// The commands that make the image, as the lines exec_run takes: the program,
+// then each argument, one per line.
+
+// `IDC_ROOT/bin/idc TREE FLAGS --triple T -o OBJ`: one of the two compiles. flags
+// is itself a run of argument lines.
+kb_idc(string root, string tree, string flags, string obj) {
+  string head = root + "/bin/idc\n" + tree + "\n" + flags + "\n--triple\n" + (import kb_triple);
+  string lines = head + "\n-o\n" + obj + "\n";
+} return string lines;
+("/r", "/r/runtime", "--no-std\n--runtime", "/r/build/runtime.o"):("/r/bin/idc\n/r/runtime\n--no-std\n--runtime\n--triple\nx86_64-unknown-none\n-o\n/r/build/runtime.o\n")
+("/q", "/q/../kernel/prog", "--freestanding", "/q/build/kernel.o"):("/q/bin/idc\n/q/../kernel/prog\n--freestanding\n--triple\nx86_64-unknown-none\n-o\n/q/build/kernel.o\n")
+
+// `clang -target T -ffreestanding -c SRC -o OBJ`: an assembler run over one file
+// of the boot stub.
+kb_clang(string src, string obj) {
+  string head = "clang\n-target\n" + (import kb_triple) + "\n-ffreestanding\n-c\n";
+  string lines = head + src + "\n-o\n" + obj + "\n";
+} return string lines;
+("/r/boot.S", "/r/build/boot.o"):("clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/boot.S\n-o\n/r/build/boot.o\n")
+("b.S", "b.o"):("clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\nb.S\n-o\nb.o\n")
+
+// `ld.lld -n -T SCRIPT boot.o isr.o runtime.o kernel.o -o OUT`: the link, with the
+// objects in the order the linker script expects, under the build directory.
+kb_link(string root, string out) {
+  string head = "ld.lld\n-n\n-T\n" + root + "/../kernel/boot/kernel.ld\n";
+  string objs = root + "/build/boot.o\n" + root + "/build/isr.o\n" + root + "/build/runtime.o\n" + root + "/build/kernel.o\n";
+  string lines = head + objs + "-o\n" + out + "\n";
+} return string lines;
+("/r", "/o.elf"):("ld.lld\n-n\n-T\n/r/../kernel/boot/kernel.ld\n/r/build/boot.o\n/r/build/isr.o\n/r/build/runtime.o\n/r/build/kernel.o\n-o\n/o.elf\n")
+("/q", "x"):("ld.lld\n-n\n-T\n/q/../kernel/boot/kernel.ld\n/q/build/boot.o\n/q/build/isr.o\n/q/build/runtime.o\n/q/build/kernel.o\n-o\nx\n")

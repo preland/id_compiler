@@ -12,21 +12,11 @@ zw_str(int[] out, string s) {
 ([], "ab"):([97, 98], "ab")
 ([1], ""):([1], "")
 
-zw_list(int[] out, int[] xs) {
-  int i = 0;
-  while(i < len(xs)) {
-    push(out, xs[i]);
-    i = i + 1;
-  }
-} return void;
-([], [1, 2]):([1, 2], [1, 2])
-([3], []):([3], [])
-
 // The end record's last two fields: where the central directory starts, and
 // an archive comment of no bytes.
 zw_last(int[] out, int at) {
   zw_u32(out, at);
-  zw_list(out, [0, 0]);
+  lst_extend(out, [0, 0]);
 } return void;
 ([], 1):([1, 0, 0, 0, 0, 0], 1)
 ([4], 65536):([4, 0, 0, 1, 0, 0, 0], 65536)

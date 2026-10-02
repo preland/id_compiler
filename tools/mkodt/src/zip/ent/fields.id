@@ -4,7 +4,7 @@
 // 1980-01-01 -- the DOS epoch, one fixed stamp so two runs write the same
 // bytes -- then the checksum, both sizes and the name's length.
 zw_fields(int[] out, string name, int[] body, word crc) {
-  zw_list(out, [20, 0, 0, 0, 0, 0, 0, 0, 33, 0]);
+  lst_extend(out, [20, 0, 0, 0, 0, 0, 0, 0, 33, 0]);
   zw_u32(out, crc);
   zw_sizes(out, name, body);
 } return void;

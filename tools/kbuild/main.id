@@ -1,0 +1,23 @@
+// kbuild -- build the kernel: the runtime and the kernel through the LLVM
+// target, the boot stub with clang's assembler, and ld.lld over the linker
+// script.
+//
+//   kbuild IDC_ROOT [OUT]        (OUT defaults to build/kernel.elf, under IDC_ROOT)
+//
+// IDC_ROOT is the idc directory; the kernel lives beside it, in ../kernel.
+// Nothing here compiles C. clang appears twice -- once as an assembler for each
+// of the boot stub's two files, never as a C compiler -- and the two programs
+// are compiled with --allow-untested until their functions have cases. A
+// freestanding build runs its cases on the build host, and a function that
+// reaches an `asm` body with no host row is exempt from the minimum with a note;
+// every other function needs its two (docs/TESTS.md, "A freestanding build runs
+// its cases on the build host"). idc/tools/statusgen.sh lists both trees with
+// these same flags.
+//
+// This replaces tools/kbuild.sh. Each step's own output goes to stderr, as it
+// did there, and the exit status is the first failing step's.
+main(int argc, string[] argv) {
+  int rc = kb_go(argc, argv);
+} return int rc;
+(1, ["kbuild"]):(2) then eprints:("usage: kbuild IDC_ROOT [OUT]\n")
+(2, ["kbuild", "/nonexistent/idc"]):(127)

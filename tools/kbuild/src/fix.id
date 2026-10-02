@@ -1,0 +1,29 @@
+// Fixtures: a scratch directory standing in for the idc directory, whose
+// bin/idc is a one-line script that exits with a chosen status, so kbuild's
+// first step can be made to fail with a known code without a real compiler.
+
+// Makes the directory, with bin/idc in it executable and exiting with rc, and
+// exports the directory's path.
+kb_t_fake(int rc) {
+  export string kb_t_root = fs_mktemp("kbuild_t_", 1);
+  int made = fs_mkdir(kb_t_root + "/bin");
+  string script = "#!/bin/sh\nexit " + rc + "\n";
+} chain (int rc) {
+  exec_file_put(kb_t_root + "/bin/idc", script, 493);
+} return void;
+(0):() then kb_t_done:(1)
+(5):() then kb_t_done:(1)
+
+// Removes the fixture directory: 1 when all of it went.
+kb_t_done() {
+  int ok = exec_drop((import kb_t_root));
+} return int ok;
+given kb_t_fake(0) ():(1)
+given kb_t_fake(0) ():(1) then kb_t_done:(0)
+
+// 1 when the build directory kbuild makes under the fixture's root is there.
+kb_t_built() {
+  int ok = fs_exists((import kb_t_root) + "/build");
+} return int ok;
+given kb_t_fake(0) ():(0) then kb_t_done:(1)
+given kb_t_fake(0) ():(0) then kb_t_done:(1) then kb_t_built:(0)

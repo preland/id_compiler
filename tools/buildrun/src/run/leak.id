@@ -1,0 +1,31 @@
+// Fixtures that look for scratch directories buildrun left behind: a directory
+// the work function should have removed shows up as an entry of /tmp that starts
+// with the probe prefix its case gave it.
+
+// How many entries of /tmp start with "buildrun_probe_".
+br_t_leaked() {
+  string[] names = exec_ls("/tmp");
+  int n = 0;
+  int i = 0;
+} chain () {
+  while (i < len(names)) {
+    n = n + str_starts(names[i], "buildrun_probe_");
+    i = i + 1;
+  }
+} return int n;
+():(0)
+given br_t_probe ():(1) then br_t_dropped:(1)
+
+// Makes one scratch directory with the probe prefix and exports its path.
+br_t_probe() {
+  export string br_t_probed = fs_mktemp("buildrun_probe_", 1);
+} return void;
+():() then br_t_dropped:(1)
+():() then br_t_leaked:(1) then br_t_dropped:(1)
+
+// Removes the directory br_t_probe made: 1 when it went.
+br_t_dropped() {
+  int ok = exec_drop((import br_t_probed));
+} return int ok;
+given br_t_probe ():(1)
+given br_t_probe ():(1) then br_t_leaked:(0)

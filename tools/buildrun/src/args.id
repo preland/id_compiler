@@ -1,0 +1,34 @@
+// Reading buildrun's own arguments: where IDC_ROOT is, and the tool's
+// arguments as the lines a child is spawned from.
+
+// The index of IDC_ROOT in argv: 2 after a leading --stdin, otherwise 1.
+br_first(int argc, string[] argv) {
+  int at = 1;
+  if (argc > 1 && str_cmp(argv[1], "--stdin") == 0) {
+    at = 2;
+  }
+} return int at;
+(1, ["buildrun"]):(1)
+(4, ["buildrun", "--stdin", "/r", "t"]):(2)
+
+// argv[from] up to but not including argv[to], one per line, each line ended
+// by a newline: the argument lines proc_spawn takes after the program's own.
+br_lines(string[] argv, int from, int to) {
+  string text = "";
+  int i = from;
+  while (i < to) {
+    text = text + argv[i] + "\n";
+    i = i + 1;
+  }
+} return string text;
+(["a", "b", "c"], 1, 3):("b\nc\n")
+(["a", "b", "c"], 2, 2):("")
+
+// The command that builds tools/TOOL under IDC_ROOT into TMP/TOOL, with
+// IDC_NO_STD removed from its environment so the tool gets the standard library.
+br_build_argv(string root, string tool, string tmp) {
+  string head = "env\n-u\nIDC_NO_STD\n" + root + "/bin/idc\n" + root + "/tools/" + tool;
+  string lines = head + "\n--allow-untested\n-o\n" + tmp + "/" + tool + "\n";
+} return string lines;
+("/r", "t", "/tmp/x"):("env\n-u\nIDC_NO_STD\n/r/bin/idc\n/r/tools/t\n--allow-untested\n-o\n/tmp/x/t\n")
+("/idc", "qmon", "/tmp/b"):("env\n-u\nIDC_NO_STD\n/idc/bin/idc\n/idc/tools/qmon\n--allow-untested\n-o\n/tmp/b/qmon\n")

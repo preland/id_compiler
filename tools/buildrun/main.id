@@ -1,0 +1,21 @@
+// buildrun -- build one of the tools under tools/ and run it.
+//
+//   buildrun [--stdin] IDC_ROOT TOOL [ARGS...]
+//
+// IDC_ROOT is the idc directory (the one holding bin/idc and tools/). TOOL is a
+// directory name under its tools/; buildrun compiles tools/TOOL with the
+// standard library whatever the caller's IDC_NO_STD says -- tests/run.sh
+// exports IDC_NO_STD=1 for everything it runs -- runs the result with ARGS, and
+// leaves nothing behind. The build's own output goes to stderr, so stdout is
+// the tool's and nothing else, and the exit status is the tool's. Standard
+// input reaches the tool only with --stdin; without it the tool sees an empty
+// one, so a caller whose own stdin is a terminal is never waited on.
+//
+// This replaces tools/mkodt.sh, tools/qmon.sh and tools/fbtext.sh, which were
+// the same build-then-run script three times.
+main(int argc, string[] argv) {
+  int at = br_first(argc, argv);
+  int rc = br_go(argc, argv, at);
+} return int rc;
+(1, ["buildrun"]):(2) then eprints:("usage: buildrun [--stdin] IDC_ROOT TOOL [ARGS...]\n")
+given br_t_fake(0) (3, ["buildrun", (import br_t_root), "hello"]):(0) then prints:("tool\n") then br_t_done:(1)

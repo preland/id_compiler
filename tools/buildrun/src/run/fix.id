@@ -1,0 +1,41 @@
+// Fixtures: a scratch directory standing in for the idc directory, whose
+// bin/idc is a short script (the br_t_ok or br_t_bad constants of conf.id) in
+// place of the real compiler, so buildrun's build-run-clean-up sequence is
+// tried without building a real tool.
+
+// Makes the directory, with bin/idc in it executable, and exports its path and
+// the script's. A zero rc gives the script that writes a working tool; any
+// other rc gives the one that fails the build.
+br_t_fake(int rc) {
+  export string br_t_root = fs_mktemp("buildrun_t_", 1);
+  export string br_t_idc = br_t_root + "/bin/idc";
+  int made = fs_mkdir(br_t_root + "/bin");
+} chain (int rc) {
+  string script = (import br_t_bad);
+  if (rc == 0) {
+    script = (import br_t_ok);
+  }
+  exec_file_put(br_t_idc, script, 493);
+} return void;
+(0):() then br_t_done:(1)
+(3):() then br_t_ran:(3)
+
+// Removes the fixture directory: 1 when all of it went.
+br_t_done() {
+  int ok = exec_drop((import br_t_root));
+} return int ok;
+given br_t_fake(0) ():(1)
+given br_t_fake(0) ():(1) then br_t_done:(0)
+
+// Runs the fixture's bin/idc and answers its exit status, then removes the
+// directory: 3 for the script that fails the build, 1 for the one that builds a
+// tool when it is run with no -o to write to.
+br_t_ran() {
+  int[] none = [];
+  string cmd = (import br_t_idc) + "\n";
+  int rc = exec_run(cmd, 0, 0, none, none, none, 5000);
+} chain () {
+  exec_drop((import br_t_root));
+} return int rc;
+given br_t_fake(0) ():(1)
+given br_t_fake(3) ():(3)

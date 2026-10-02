@@ -1,0 +1,43 @@
+// buildrun's top level: check the arguments, make the scratch directory, build
+// the tool, run it, and remove the directory.
+
+// The status buildrun exits with: 2 and a usage line when there is no IDC_ROOT
+// and TOOL after the options, otherwise the build's or the tool's.
+br_go(int argc, string[] argv, int at) {
+  int rc = 2;
+  if (argc < at + 2) {
+    eprint("usage: buildrun [--stdin] IDC_ROOT TOOL [ARGS...]");
+  }
+  if (argc >= at + 2) {
+    rc = br_work(argc, argv, at, (import br_prefix));
+  }
+} return int rc;
+(2, ["buildrun", "--stdin"], 2):(2) then eprints:("usage: buildrun [--stdin] IDC_ROOT TOOL [ARGS...]\n")
+given br_t_fake(3) (3, ["buildrun", (import br_t_root), "hello"], 1):(3) then eprints:("buildrun: failed to build tools/hello\n") then br_t_done:(1)
+
+// Builds argv[at + 1] under argv[at], runs it with the arguments after it, and
+// drops the scratch directory either way. The tool is not run if it did not
+// build.
+br_work(int argc, string[] argv, int at, string prefix) {
+  string tmp = fs_mktemp(prefix, 1);
+  int[] in = br_input(at);
+  int rc = br_build(argv[at], argv[at + 1], tmp);
+} chain (int argc, string[] argv, int at, string prefix) {
+  if (rc == 0) {
+    rc = br_exec(tmp, argv, at, argc, in);
+  }
+  exec_drop(tmp);
+} return int rc;
+given br_t_fake(0) (4, ["buildrun", (import br_t_root), "hello", "a b"], 1, "buildrun_probe_"):(0) then prints:("tool a b\n") then br_t_leaked:(0) then br_t_done:(1)
+given br_t_fake(0) stdin "ab" (4, ["buildrun", "--stdin", (import br_t_root), "hello"], 2, "buildrun_probe_"):(0) then prints:("tool\nab") then br_t_leaked:(0) then br_t_done:(1)
+
+// What the tool is given on stdin: the whole of buildrun's own with --stdin
+// (IDC_ROOT at index 2), nothing otherwise.
+br_input(int at) {
+  int[] in = [];
+  if (at == 2) {
+    in = exec_bytes(read_all());
+  }
+} return int[] in;
+stdin "hi" (2):([104, 105])
+stdin "hi" (1):([])

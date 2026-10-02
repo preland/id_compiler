@@ -11,7 +11,7 @@
 // Matching is exact where it can be and nearest-Hamming otherwise; anti-aliasing
 // does not come into it, because the console blits whole bits. The screenshot
 // is binary, so it is read through the fs backend; conf.id is text, so it
-// arrives on stdin. tools/fbtext.sh supplies both.
+// arrives on stdin. tools/buildrun --stdin passes the path and the conf.id.
 main(int argc, string[] argv) {
   string text = read_all();
   int[] d = file_bytes(argv[1]);

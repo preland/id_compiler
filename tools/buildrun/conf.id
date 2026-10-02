@@ -1,0 +1,16 @@
+// buildrun starts other programs and keeps what they wrote, so it is built on
+// the standard library's exec_run and fs_mktemp.
+
+// The longest a tool's build or its run may take, in milliseconds. The kernel
+// tests' QEMU runs are the slow case: tests/kernel.sh bounds them with qmon's
+// own --wait, and this is only the backstop that stops a hung child for good.
+int br_ms = 600000;
+
+// The start of the scratch directory's name, under /tmp.
+string br_prefix = "buildrun_";
+
+// The fixtures' stand-in for bin/idc: a script that writes a one-line tool to
+// the path after -o, the tool echoing its arguments and then its stdin; and
+// one that fails the build.
+string br_t_ok = "#!/bin/sh\nwhile [ $# -gt 0 ]; do if [ \"$1\" = -o ]; then out=\"$2\"; fi; shift; done\nprintf '#!/bin/sh\\necho tool \"$@\"; cat\\n' > \"$out\"\nchmod 755 \"$out\"\n";
+string br_t_bad = "#!/bin/sh\nexit 3\n";

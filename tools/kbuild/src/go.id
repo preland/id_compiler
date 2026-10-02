@@ -1,0 +1,46 @@
+// kbuild's top level: the arguments, the build directory, the steps, the report.
+
+// The status kbuild exits with: 2 and a usage line when there is no IDC_ROOT,
+// otherwise the build's.
+kb_go(int argc, string[] argv) {
+  int rc = 2;
+  if (argc < 2) {
+    eprint("usage: kbuild IDC_ROOT [OUT]");
+  }
+  if (argc >= 2) {
+    rc = kb_build(argv[1], kb_out_arg(argc, argv));
+  }
+} return int rc;
+(1, ["kbuild"]):(2) then eprints:("usage: kbuild IDC_ROOT [OUT]\n")
+(2, ["kbuild", "/nonexistent/idc"]):(127)
+
+// OUT as the caller wrote it: argv[2], or the default when there is none.
+kb_out_arg(int argc, string[] argv) {
+  string out = (import kb_out);
+  if (argc > 2) {
+    out = argv[2];
+  }
+} return string out;
+(2, ["kbuild", "/r"]):("build/kernel.elf")
+(3, ["kbuild", "/r", "/x/k.elf"]):("/x/k.elf")
+
+// Makes root/build, runs the steps with the image going to out (relative to root
+// unless it starts with "/", as it was when the script changed directory first),
+// and reports the image. Answers the first failing step's status, 0 if none.
+kb_build(string root, string out) {
+  string full = out;
+  if (str_starts(out, "/") == 0) {
+    full = root + "/" + out;
+  }
+  int made = fs_mkdir_p(root + "/build");
+} chain (string root, string out) {
+  string[] plan = kb_plan(root, full);
+  int rc = kb_steps(plan);
+  int size = fs_size(full);
+} chain (string root, string out) {
+  if (rc == 0) {
+    print(kb_report(out, size));
+  }
+} return int rc;
+given kb_t_fake(3) ((import kb_t_root), "build/k.elf"):(3) then kb_t_built:(1) then kb_t_done:(1)
+given kb_t_fake(9) ((import kb_t_root), "/x/k.elf"):(9) then kb_t_done:(1)

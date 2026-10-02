@@ -22,7 +22,7 @@ zw_both(int[] out, int[] cd, string name, int[] body) {
 
 zw_emit(int[] out, int[] cd, string name, int[] body, word crc, int at) {
   zw_local(out, name, body, crc);
-  zw_list(out, body);
+  lst_extend(out, body);
   zw_central(cd, name, body, crc, at);
 } return void;
 ([], [], "a", [98], 1908338681, 0):([80, 75, 3, 4, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 97, 98], [80, 75, 1, 2, 20, 3, 20, 0, 0, 0, 0, 0, 0, 0, 33, 0, 249, 239, 190, 113, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 1, 0, 0, 0, 0, 97], "a", [98], 1908338681, 0)

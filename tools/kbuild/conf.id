@@ -1,0 +1,11 @@
+// kbuild builds the kernel image by running the compiler, clang and the linker.
+
+// The target the runtime and the kernel are compiled for, and the boot stub is
+// assembled for.
+string kb_triple = "x86_64-unknown-none";
+
+// Where the image goes when no path is given, relative to the idc directory.
+string kb_out = "build/kernel.elf";
+
+// The longest any one step may take, in milliseconds.
+int kb_ms = 300000;

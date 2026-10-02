@@ -1,0 +1,42 @@
+// The five steps in order, and running them until one fails.
+
+// The commands, in the order they have to run: the runtime, the kernel, the
+// two assembler runs over the boot stub, and the link into out.
+kb_plan(string root, string out) {
+  string[] steps = [];
+  push(steps, kb_idc(root, root + "/runtime", "--no-std\n--runtime\n--allow-untested", root + "/build/runtime.o"));
+  push(steps, kb_idc(root, root + "/../kernel/prog", "--no-std\n--freestanding\n--allow-untested", root + "/build/kernel.o"));
+} chain (string root, string out) {
+  push(steps, kb_clang(root + "/../kernel/boot/boot.S", root + "/build/boot.o"));
+  push(steps, kb_clang(root + "/../kernel/boot/isr.S", root + "/build/isr.o"));
+  push(steps, kb_link(root, out));
+} return string[] steps;
+("/r", "/o"):(["/r/bin/idc\n/r/runtime\n--no-std\n--runtime\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/r/build/runtime.o\n", "/r/bin/idc\n/r/../kernel/prog\n--no-std\n--freestanding\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/r/build/kernel.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/../kernel/boot/boot.S\n-o\n/r/build/boot.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/../kernel/boot/isr.S\n-o\n/r/build/isr.o\n", "ld.lld\n-n\n-T\n/r/../kernel/boot/kernel.ld\n/r/build/boot.o\n/r/build/isr.o\n/r/build/runtime.o\n/r/build/kernel.o\n-o\n/o\n"])
+("/idc", "/x/k.elf"):(["/idc/bin/idc\n/idc/runtime\n--no-std\n--runtime\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/idc/build/runtime.o\n", "/idc/bin/idc\n/idc/../kernel/prog\n--no-std\n--freestanding\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/idc/build/kernel.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/idc/../kernel/boot/boot.S\n-o\n/idc/build/boot.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/idc/../kernel/boot/isr.S\n-o\n/idc/build/isr.o\n", "ld.lld\n-n\n-T\n/idc/../kernel/boot/kernel.ld\n/idc/build/boot.o\n/idc/build/isr.o\n/idc/build/runtime.o\n/idc/build/kernel.o\n-o\n/x/k.elf\n"])
+
+// Runs each command of plan in order and stops at the first that fails, its
+// output shown as it would have been from a shell. Answers 0 when every step
+// passed, otherwise the failing step's exit status -- or 1 where that was not a
+// status (a command that could not start, or ran past kb_ms).
+kb_steps(string[] plan) {
+  int[] none = [];
+  int rc = 0;
+  int i = 0;
+} chain (string[] plan) {
+  while (i < len(plan) && rc == 0) {
+    rc = exec_show(plan[i], none, 0, (import kb_ms));
+    i = i + 1;
+  }
+  if (rc < 0) {
+    rc = 1;
+  }
+} return int rc;
+(["true\n", "true\n"]):(0)
+(["true\n", "sh\n-c\nexit 3\n", "true\n"]):(3)
+
+// The line kbuild ends on: "built OUT (N bytes)", with OUT as the caller wrote it.
+kb_report(string out, int size) {
+  string line = "built " + out + " (" + size + " bytes)";
+} return string line;
+("build/kernel.elf", 1234):("built build/kernel.elf (1234 bytes)")
+("/x/k.elf", 0):("built /x/k.elf (0 bytes)")
