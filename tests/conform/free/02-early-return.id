@@ -1,0 +1,16 @@
+// Every return frees what the function owns, an early one included. pick(9)
+// returns from inside the if with one list made; pick(2) falls through with two.
+pick(int n) {
+  int[] a = [n, n];
+  if(n > 5) {
+    int r = a[0];
+    return r;
+  }
+  int[] b = [1, 2];
+} return int n;
+
+main(int argc, string[] argv) {
+  int x = pick(9);
+  int y = pick(2);
+  print(x + " " + y);
+} return int 0;

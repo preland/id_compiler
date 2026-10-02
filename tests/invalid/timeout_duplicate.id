@@ -1,0 +1,6 @@
+// EXPECT: a case may have at most one 'timeout' clause
+grab() {
+  string s = read_all();
+} return string s;
+timeout 5 timeout 6 ():("")
+():("")

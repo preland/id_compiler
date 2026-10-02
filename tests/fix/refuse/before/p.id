@@ -8,7 +8,7 @@ twice(int n) {
 } return int m;
 
 loop(int[] c) {
-  while(bump(c) < twice(bump(c))) {
+  while(bump(c) < twice(twice(bump(c)))) {
     print("again");
   }
 } return void;

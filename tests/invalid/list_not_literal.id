@@ -1,0 +1,13 @@
+// EXPECT: a test case takes literals only
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+
+use(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+([1, x]):([1])

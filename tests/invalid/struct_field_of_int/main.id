@@ -1,0 +1,5 @@
+// EXPECT: only a struct has fields
+main(int argc, string[] argv) {
+  int n = 3;
+  int m = n.x;
+} return int 0;

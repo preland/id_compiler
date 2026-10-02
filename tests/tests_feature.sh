@@ -753,12 +753,12 @@ self_accept "bin/idc: a setup's work is not counted against a constraint" --allo
 cat > "$TMP/p.id" <<'EOF'
 f(int a) {
   int b = a + 1;
-} return int b;
+} return void;
 given f (1):(2)
 (0):(1)
 EOF
-self_refuse "bin/idc: a setup that takes parameters is rejected" \
-    "p.id:4: error: 'given' names 'f', which takes 1 parameter(s); a setup takes none and returns void" --emit-c /dev/null
+self_refuse "bin/idc: a bare given of a setup that takes parameters is rejected" \
+    "p.id:4: error: 'given' names 'f', which takes 1 parameter(s), but this 'given' passes 0" --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 f(int a) {
@@ -931,6 +931,187 @@ stdin "hi\n" ():() then prints:("hi\n\n")
 ():() then prints:("\n")
 EOF
 self_accept "bin/idc: a case's stdin clause is what read_all() sees, and a case without one sees empty stdin" --emit-c /dev/null
+
+# --- a case's timeout clause: its own limit in place of the default 30 -------
+# Short limits stand in for the real thing (no case may run near 30s here):
+# `timeout 1` on a case that spins for about 3s must be stopped at ITS limit,
+# and the report names that limit; `timeout 5` on the same case passes. The
+# default is IDTC_SECONDS 30 in the harness text (back/tgt/c/emit/prog/test/
+# unit/more/text/proc.id), which a case in that file's own cases checks.
+cat > "$TMP/p.id" <<'EOF'
+spin(int ms) {
+  int t0 = ticks();
+  int t = t0;
+  while(t - t0 < ms) {
+    t = ticks();
+  }
+} return int ms;
+timeout 1 (3000):(3000)
+(0):(0)
+EOF
+self_refuse "bin/idc: a case's timeout stops it at its own limit and the report names it" \
+    "spin(3000) did not finish within 1 seconds" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+spin(int ms) {
+  int t0 = ticks();
+  int t = t0;
+  while(t - t0 < ms) {
+    t = ticks();
+  }
+} return int ms;
+timeout 5 (3000):(3000)
+(0):(0)
+EOF
+self_accept "bin/idc: a case that needs more than a second passes under a larger timeout" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+f(int timeout) {
+  int b = len("a");
+} return int b;
+(1):(1)
+(2):(1)
+EOF
+self_refuse "bin/idc: timeout is not a parameter name" \
+    "p.id:1: error: 'timeout' is a test case keyword (see docs/TESTS.md) and cannot be used as a name" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+grab() {
+  string s = read_all();
+  print(s);
+} return void;
+stdin "hi\n" timeout 20 ():() then prints:("hi\n\n")
+():() then prints:("\n")
+EOF
+self_accept "bin/idc: timeout follows stdin and precedes the arguments" --emit-c /dev/null
+
+# --- (import NAME) inside a list literal of a case -----------------------------
+# An element of a list in ARGS or EXPECTED may be (import NAME), nested lists
+# included: read after the setup on the argument side and after the call on the
+# expected side, exactly as a whole argument is.
+cat > "$TMP/p.id" <<'EOS'
+fx() {
+  export int n = 7;
+} return void;
+():()
+():() then prints:("")
+
+pair(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+given fx ([1, (import n)]):([1, (import n)])
+given fx ([(import n), 2]):([7, 2])
+
+nest(int[][] ys) {
+  int a = len(ys);
+} return int[][] ys;
+given fx ([[1], [(import n)]]):([[1], [7]])
+given fx ([[1], [(import n)]]):([[1], [(import n)]])
+EOS
+self_accept "bin/idc: (import NAME) is an element of a list, nested or not, in arguments and expected values" --emit-c /dev/null
+
+sed -i 's/:(\[7, 2\])/:([8, 2])/' "$TMP/p.id"
+self_refuse "bin/idc: an (import NAME) inside an argument list holds the export's value" \
+    "p.id:11: test failed: pair([(import n), 2]) = [7, 2], expected [8, 2]" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+fx() {
+  export int n = 7;
+} return void;
+():()
+():() then prints:("")
+
+pair(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+([1, (import n)]):([1, 7])
+([2]):([2])
+EOS
+self_refuse "bin/idc: (import NAME) inside a list still needs a given" \
+    "p.id:10: error: (import n) needs a 'given': an export has no value in a case until a setup has run" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+fx() {
+  export string path = "x.db";
+} return void;
+():()
+():() then prints:("")
+
+main(int argc, string[] argv) {
+  print(argv[1]);
+} return int 0;
+given fx (2, ["prog", (import path)]):(0) then prints:("x.db\n")
+given fx (3, ["prog", (import path), "z"]):(0) then prints:("x.db\n")
+EOS
+self_accept "bin/idc: main's argv may carry an exported value" --emit-c /dev/null
+
+# --- parameterised setups: given NAME(LIT, ...) --------------------------------
+cat > "$TMP/p.id" <<'EOS'
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():()
+():() then prints:("")
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+([0, 0], 1, 7):([0, 8], 1, 7)
+([0, 0], 0, 1):([2, 0], 0, 1)
+
+use(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+given mk given bump((import buf), 1, 7) ((import buf)):([0, 8])
+given mk given bump((import buf), 0, 4) given bump((import buf), 1, 6) ((import buf)):([5, 7])
+EOS
+self_accept "bin/idc: a setup is called with literals and with an export an earlier setup set" --emit-c /dev/null
+
+sed -i 's/:(\[0, 8\])$/:([0, 9])/' "$TMP/p.id"
+self_refuse "bin/idc: a setup's arguments reach it (its effect is what the case sees)" \
+    "p.id:16: test failed: use((import buf)) = [0, 8], expected [0, 9]" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():()
+():() then prints:("")
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+([0, 0], 1, 7):([0, 8], 1, 7)
+([0, 0], 0, 1):([2, 0], 0, 1)
+
+use(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+given bump((import buf), 1, 7) given mk ((import buf)):([0, 8])
+([1]):([1])
+EOS
+self_refuse "bin/idc: a setup's own arguments cannot read an export only a later setup sets" \
+    "p.id:16: error: (import buf) needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+fill(int n) {
+  int[] bs = [];
+  int i = 0;
+  while(i < n) {
+    push(bs, i);
+    i = i + 1;
+  }
+} return void;
+(3):(3)
+(4):(4)
+
+inc(int a) {
+  int b = a + 1;
+} return int b;
+given fill(20000) (100):(101)[time:O(1)]
+given fill(20000)(200):(201)[time:O(1)]
+EOS
+self_accept "bin/idc: a parameterised setup's work is not counted against a constraint, and its spacing decides nothing" --allow-untested --emit-c /dev/null
 
 # --- a build whose cases cannot run here says why ----------------------------
 cat > "$TMP/p.id" <<'EOF'
@@ -2018,6 +2199,32 @@ self_warn "bin/idc: two functions differing only in a literal warn" \
     "p.id:5: warning: 'add16' and 'add10' differ only in a literal value; parameterise one function" \
     --allow-untested --emit-c /dev/null
 
+# A chained function owns two entries of the strict fingerprint table, so every
+# function after it sits at a different index there than in `prog`, which is
+# what the loose table is indexed by. The pair must still be named by `prog`
+# position: a lookup through the strict table's owner column named 'add10' and
+# 'chainy' here.
+cat > "$TMP/p.id" <<'EOF2'
+chainy(int x) {
+  int a = x + 1;
+  int b = a + 1;
+  int c = b + 1;
+} chain (int x) {
+  int d = c + 1;
+} return int d;
+
+add10(int x) {
+  int r = x + 10;
+} return int r;
+
+add16(int x) {
+  int r = x + 16;
+} return int r;
+EOF2
+self_warn "bin/idc: a near-duplicate pair after a chained function is named correctly" \
+    "p.id:13: warning: 'add16' and 'add10' differ only in a literal value; parameterise one function" \
+    --allow-untested --emit-c /dev/null
+
 # Two functions identical in every way are still the EXISTING error, not this
 # warning -- this warning is only the gap that rule leaves.
 cat > "$TMP/p.id" <<'EOF'
@@ -2136,6 +2343,77 @@ g(int x) {
 EOF
 self_accept "bin/idc: a chain segment after a builtin call elsewhere does not misname 'alloc'" \
     --allow-untested --emit-c /dev/null
+
+# --- structs (docs/SPEC.md 1.2) ------------------------------------------------
+# A struct has a file of its own, so these programs are directories.
+SD="$TMP/sd"
+sd_project() {   # writes the struct and a main into a fresh $SD
+    rm -rf "$SD"; mkdir -p "$SD/geo" "$SD/app"
+    printf 'struct Box {\n  int[] xs;\n  int n;\n}\n' > "$SD/geo/box.id"
+    printf 'struct Point {\n  int x;\n  int y;\n}\n' > "$SD/geo/point.id"
+}
+sd_build() {   # flags...; the output binary is $SD/out
+    ../bin/idc "$SD" -o "$SD/out" "$@" >"$TMP/log" 2>&1
+}
+
+# A list a function made, put into a struct by the constructor and by a field
+# write, must outlive the function: the analysis does not follow a value into a
+# field, so it keeps it (docs/MEMORY.md). Run under the free guard, a list that
+# was freed and then read is a trap.
+sd_project
+cat > "$SD/app/a.id" <<'EOF'
+make(int n) {
+  int[] xs = [n, n];
+  Box b = Box(xs, n);
+} return Box b;
+
+refill(Box b) {
+  int[] ys = [7, 8];
+  b.xs = ys;
+} return void;
+EOF
+cat > "$SD/main.id" <<'EOF'
+main(int argc, string[] argv) {
+  Box q = make(3);
+  print(q.xs[1]);
+  refill(q);
+} chain (int argc, string[] argv) {
+  print(q.xs[1]);
+} return int 0;
+EOF
+if sd_build --allow-untested; then
+    got=$(ID_FREE_GUARD=1 "$SD/out" 2>&1 | tr '\n' ' ')
+    if [ "$got" = "3 8 " ]; then ok "structs: a list put into a struct is not freed under the guard"; else bad "structs: a list put into a struct is not freed under the guard (got '$got')"; fi
+else
+    bad "structs: the list-in-struct program builds ($(head -1 "$TMP/log"))"
+fi
+
+# A test case writes a struct as its constructor, and a failure shows both sides
+# the way they were written.
+sd_project
+cat > "$SD/app/a.id" <<'EOF'
+shift(Point p, int dx) {
+  p.x = p.x + dx;
+} return void;
+(Point(1, 2), 3):(Point(9, 2))
+(Point(0, 0), 5):(Point(5, 0))
+EOF
+printf 'main(int argc, string[] argv) {\n} return int 0;\n' > "$SD/main.id"
+if sd_build --allow-untested; then
+    bad "structs: a wrong expected struct fails the case (built)"
+elif grep -qF "shift(Point(1, 2), 3) = Point(4, 2), expected Point(9, 2)" "$TMP/log"; then
+    ok "structs: a failing case shows the structs as written"
+else
+    bad "structs: a failing case shows the structs as written ($(head -1 "$TMP/log"))"
+fi
+sed -i 's/Point(9, 2)/Point(4, 2)/' "$SD/app/a.id"
+if sd_build --allow-untested; then ok "structs: a case with struct arguments and a struct expected value passes"; else bad "structs: a case with struct arguments and a struct expected value passes ($(head -1 "$TMP/log"))"; fi
+
+# A struct holds only itself in its file, and one in a single file is refused
+# with the fix named.
+printf 'struct Solo {\n  int a;\n}\n\nmain(int argc, string[] argv) {\n} return int 0;\n' > "$TMP/p.id"
+self_refuse "structs: a struct beside a function is refused" \
+    "a struct is declared in a file of its own" --allow-untested
 
 echo
 echo "$pass passed, $fail failed"

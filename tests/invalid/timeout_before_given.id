@@ -1,0 +1,9 @@
+// EXPECT: 'timeout N' comes after every 'given' and 'stdin' of a case
+setup() {
+  int a = 1;
+} return void;
+grab() {
+  string s = read_all();
+} return string s;
+timeout 5 given setup ():("")
+():("")

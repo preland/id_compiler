@@ -1,0 +1,7 @@
+// EXPECT: 'timeout N' must be followed by the case's argument tuple
+grab() {
+  string s = read_all();
+} return string s;
+():("")
+():("")
+timeout 5

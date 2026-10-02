@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # The editor reads an .odt and draws it.
 #
-# The three modules below it are each tested against a reference of their own
-# (editor_zip.sh, editor_doc.sh, editor_ttf.sh, editor_ras.sh). What this file
-# checks is the thing none of them can: that the whole chain -- archive,
+# The modules below it are each tested against a reference of their own
+# (editor_zip.sh, editor_doc.sh, and idstd's .tests/font for the font). What this
+# file checks is the thing none of them can: that the whole chain -- archive,
 # inflate, XML, styles, font, outline, raster, layout -- ends with the right
 # ink in the right places.
 #
@@ -31,7 +31,8 @@ if [ -z "${FONT:-}" ] || [ ! -f "$FONT" ]; then
 fi
 
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
-[ -f fixtures/sample.odt ] || "$ROOT/tools/mkodt.sh" fixtures/sample.odt >/dev/null
+[ -f fixtures/sample.odt ] || { env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/buildrun" -o "$TMP/buildrun" \
+    && "$TMP/buildrun" "$(cd "$ROOT" && pwd)" mkodt fixtures/sample.odt; } >/dev/null 2>&1
 
 if ! "$ROOT/bin/idc" "$ORG/editor" --allow-untested -o "$TMP/editor" >"$TMP/build.log" 2>&1; then
     bad "the editor builds ($(head -1 "$TMP/build.log"))"

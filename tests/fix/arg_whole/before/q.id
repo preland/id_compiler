@@ -1,0 +1,5 @@
+// `deep` is the only violation here: --fix still names the legal call in
+// p.id's use1, which the rule allows one level of nesting for.
+deep(int x) {
+  print("b" + f(f(x)));
+} return void;

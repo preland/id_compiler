@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  p.x = 5;
+  int a = p.x + p.y;
+} chain (int argc, string[] argv) {
+  print(a);
+} return int 0;

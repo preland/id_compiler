@@ -1,0 +1,5 @@
+
+main(int argc, string[] argv) {
+  string s = input();
+  print(len(s));
+} return int 0;

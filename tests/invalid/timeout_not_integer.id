@@ -1,0 +1,6 @@
+// EXPECT: timeout's value must be a positive integer literal
+grab() {
+  string s = read_all();
+} return string s;
+timeout "5" ():("")
+():("")

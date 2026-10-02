@@ -1,0 +1,6 @@
+twice(Point t) {
+  bump(t);
+  bump(t);
+} return void;
+(Point(0, 0)):(Point(0, 2))
+(Point(5, 5)):(Point(5, 7)) then calls bump:(Point(5, 7)) then calls bump:(Point(5, 7))

@@ -7,3 +7,9 @@ use1() {
   int cur_next_v2 = cur_next();
   int r = combine(cur_next_v, cur_next_v2);
 } return int r;
+
+deep() {
+  int cur_next_v = cur_next();
+  int combine_v = combine(cur_next_v, 1);
+  int d = combine(combine_v, 2);
+} return int d;

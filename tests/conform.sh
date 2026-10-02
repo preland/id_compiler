@@ -21,8 +21,14 @@
 #   NN-name.expected  its exact stdout
 #   NN-name.exit      its exit code, present only when nonzero
 #   NN-name.stderr    its exact stderr, present only when it writes any
+#   NN-name.stdin     the bytes fed to its stdin, present only when it reads
+#                     any (without one, stdin is /dev/null)
 #   NN-name.combined  stdout and stderr sent to one file, present only when the
 #                     order the two streams interleave in is what is pinned
+#   NN-name.env       NAME=VALUE words the program runs with, present only when
+#                     the environment is what is under test (free/ sets
+#                     ID_FREE_STATS so each target reports how many lists it
+#                     freed, which docs/MEMORY.md 2a requires to be equal)
 #
 # The expected files record what the C target does, because the C target is
 # what `docs/SPEC.md` was written from. A disagreement is therefore always
@@ -41,7 +47,8 @@
 # Only FAIL is an error. GAP is the backlog, printed so it cannot be mistaken
 # for coverage.
 #
-# Run from anywhere: tests/conform.sh
+# Run from anywhere: tests/conform.sh [AREA...]   (AREAs, e.g. trap, run only
+# those directories under tests/conform/ -- the whole run is over the 60s budget)
 # Needs clang for --target llvm, and the WASI toolchain `nix develop` sets plus
 # wasmtime for --target wasm;
 # a missing toolchain skips that target with a message rather than passing.
@@ -88,11 +95,25 @@ apart_why() {
     esac
 }
 
+# run_bin TARGET BIN
+# Runs a built case with its .stdin file on stdin and the NAME=VALUE words of its .env file, if it has them
+# (runin and runenv, set by run_case). wasmtime hands the guest only what --env names.
+run_bin() {
+    local kv a=()
+    if [ "$1" = wasm ]; then
+        for kv in ${runenv[@]+"${runenv[@]}"}; do a+=(--env "$kv"); done
+        wasmtime run ${a[@]+"${a[@]}"} "$2" <"${runin:-/dev/null}"
+    else
+        env ${runenv[@]+"${runenv[@]}"} "$2" <"${runin:-/dev/null}"
+    fi
+}
+
 # run_case TARGET CASE_ID DIR BASE
 # Builds and runs one case for one target and records PASS / GAP / FAIL.
 run_case() {
     local target="$1" id="$2" dir="$3" base="$4"
     local src="$dir/$base.id"
+    [ -d "$dir/$base" ] && src="$dir/$base"
     local want_out want_exit want_err got_out got_exit got_err bin
     # The case id names its area, so it contains a '/' that must not reach a
     # path under $TMP -- that directory does not exist and every build would
@@ -130,11 +151,11 @@ run_case() {
         return
     fi
 
-    if [ "$target" = wasm ]; then
-        got_out=$(wasmtime "$bin" 2>"$TMP/err.log"); got_exit=$?
-    else
-        got_out=$("$bin" 2>"$TMP/err.log"); got_exit=$?
-    fi
+    local -a runenv=()
+    [ -f "$dir/$base.env" ] && read -r -a runenv < "$dir/$base.env"
+    local runin=/dev/null
+    [ -f "$dir/$base.stdin" ] && runin="$dir/$base.stdin"
+    got_out=$(run_bin "$target" "$bin" 2>"$TMP/err.log"); got_exit=$?
     got_err=$(cat "$TMP/err.log")
 
     if [ "$got_out" != "$want_out" ]; then
@@ -153,11 +174,7 @@ run_case() {
         fi
     fi
     if [ -f "$dir/$base.combined" ]; then
-        if [ "$target" = wasm ]; then
-            wasmtime "$bin" >"$TMP/both.log" 2>&1
-        else
-            "$bin" >"$TMP/both.log" 2>&1
-        fi
+        run_bin "$target" "$bin" >"$TMP/both.log" 2>&1
         if [ "$(cat "$TMP/both.log")" != "$(cat "$dir/$base.combined")" ]; then
             bad "$target  $id  -- stdout and stderr together: want [$(cat "$dir/$base.combined")] got [$(cat "$TMP/both.log")]"
             return
@@ -175,8 +192,11 @@ if [ -n "${IDC_WASI_CLANG:-}" ] && have wasmtime; then TARGETS="$TARGETS wasm"
 else echo "SKIP: --target wasm (needs the WASI toolchain nix develop sets, and wasmtime on PATH)"; fi
 
 cases=0
-for src in conform/*/*.id; do
-    [ -e "$src" ] || { echo "no conformance cases found under tests/conform/"; exit 1; }
+areas=("$@"); [ "${#areas[@]}" -eq 0 ] && areas=("*")
+for area in "${areas[@]}"; do
+for src in conform/$area/*.id conform/$area/*/; do
+    [ -e "$src" ] || continue
+    src=${src%/}
     dir=$(dirname "$src")
     base=$(basename "$src" .id)
     id="$(basename "$dir")/$base"
@@ -189,6 +209,9 @@ for src in conform/*/*.id; do
         run_case "$target" "$id" "$dir" "$base"
     done
 done
+done
+
+[ "$cases" -gt 0 ] || { echo "no conformance cases found under tests/conform/$*"; exit 1; }
 
 echo
 echo "conformance: $cases cases x targets [$(echo $TARGETS | tr ' ' ',')]"

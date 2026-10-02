@@ -1,0 +1,17 @@
+loop_probe(int ln, int lkeep) {
+  int li = 0;
+  int ls = 0;
+  while(li < ln) {
+    ls = ls + probe_step(li, lkeep);
+    li = li + 1;
+  }
+} return int ls;
+
+growth(int gk) {
+  word gb = store_size();
+  int gs = loop_probe(1000, gk);
+  word ga = store_size();
+} chain (int gk) {
+  word gd = ga - gb;
+  print("kfree sum=" + gs);
+} return word gd;

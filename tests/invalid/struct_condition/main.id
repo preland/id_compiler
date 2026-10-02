@@ -1,0 +1,7 @@
+// EXPECT: a condition cannot be a struct
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  if(p) {
+    print(1);
+  }
+} return int 0;

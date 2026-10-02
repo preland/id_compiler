@@ -1,5 +1,11 @@
 // inf_pow2 writes nothing, so two identical calls share one name and one
-// evaluation instead of running twice.
+// evaluation instead of running twice. `deep` is the only violation the rule
+// still has here; --fix names use1's calls although one level of nesting is
+// allowed.
 use1(int log) {
   int r = combine(inf_pow2(log), inf_pow2(log));
 } return int r;
+
+deep(int log) {
+  int d = combine(inf_pow2(inf_pow2(log)), 1);
+} return int d;

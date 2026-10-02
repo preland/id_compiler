@@ -1,0 +1,6 @@
+// EXPECT: 'struct' is a keyword
+main(int argc, string[] argv) {
+  struct Q {
+  int a;
+  }
+} return int 0;

@@ -1,0 +1,3 @@
+struct Aa {
+  func(int) return void f;
+}

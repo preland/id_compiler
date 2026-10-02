@@ -1,0 +1,17 @@
+main(int argc, string[] argv) {
+  Point p = Point(3, 4);
+  int[] t = [1, 2];
+  Item[] its = [];
+} chain (int argc, string[] argv) {
+  Box b = Box(p, t, its);
+  Item it = Item("n", 2, 5000000000);
+  push(b.items, it);
+} chain (int argc, string[] argv) {
+  bump(b);
+  show(b);
+  print(b.items[0].name);
+} chain (int argc, string[] argv) {
+  print(b.items[0].w);
+  print(b.items[0].big);
+  print(len(b.tags));
+} return int 0;

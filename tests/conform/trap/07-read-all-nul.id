@@ -1,0 +1,5 @@
+
+main(int argc, string[] argv) {
+  string s = read_all();
+  print(len(s));
+} return int 0;

@@ -3,9 +3,17 @@ pair(int a, int b) {
 } return int s;
 
 // The first argument is a whole non-call expression with a call inside it;
-// the second is a call on its own. step must still run before mark.
+// the second is a call on its own. step must still run before mark. --fix
+// names both although the rule allows one level of nesting: the only
+// violation in this file is `deep`, which gives --check something to report.
 use1(int[] c, int x) {
   int pair_a0 = step(c) + 1;
   int mark_v = mark(x);
   int r = pair(pair_a0, mark_v);
 } return int r;
+
+deep(int x) {
+  int mark_v = mark(x);
+  int mark_v2 = mark(mark_v);
+  int d = pair(mark_v2, 1);
+} return int d;

@@ -1,0 +1,16 @@
+setup_pt() {
+  Point sp = Point(1, 2);
+  export Point gp = sp;
+} return void;
+
+bump(Point q) {
+  q.y = q.y + 1;
+} return void;
+given setup_pt ((import gp)):() then cur:(Point(1, 3))
+given setup_pt ((import gp)):((import gp))
+
+cur() {
+  Point c = (import gp);
+} return Point c;
+given setup_pt ():(Point(1, 2))
+given setup_pt given bump((import gp)) ():(Point(1, 3))

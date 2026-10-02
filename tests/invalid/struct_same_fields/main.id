@@ -1,0 +1,3 @@
+// EXPECT: has the same fields as struct
+main(int argc, string[] argv) {
+} return int 0;

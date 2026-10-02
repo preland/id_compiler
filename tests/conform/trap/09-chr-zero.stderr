@@ -1,0 +1,1 @@
+id: a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data

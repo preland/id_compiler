@@ -1,0 +1,3 @@
+// EXPECT: this case gives 5 where a Point is required
+main(int argc, string[] argv) {
+} return int 0;

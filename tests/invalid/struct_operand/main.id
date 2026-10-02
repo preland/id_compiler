@@ -1,0 +1,5 @@
+// EXPECT: '+' cannot take a struct
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  int n = p + 1;
+} return int 0;

@@ -1,5 +1,5 @@
 both(int[] c, int k) {
-  if(k > 0 && twice(bump(c)) > 2) {
+  if(k > 0 && twice(twice(bump(c))) > 2) {
     print("both");
   }
 } return void;
@@ -7,7 +7,7 @@ both(int[] c, int k) {
 chain(int[] c, int k) {
   if(k > 0) {
     print("first");
-  } else if(twice(bump(c)) > 2) {
+  } else if(twice(twice(bump(c))) > 2) {
     print("second");
   }
 } return void;

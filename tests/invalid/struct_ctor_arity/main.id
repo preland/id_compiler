@@ -1,0 +1,4 @@
+// EXPECT: struct 'Point' takes 2 field(s) (x, y), got 1
+main(int argc, string[] argv) {
+  Point p = Point(1);
+} return int 0;

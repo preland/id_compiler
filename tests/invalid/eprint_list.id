@@ -1,0 +1,5 @@
+// EXPECT: 'eprint' cannot take a list: argument 0 is string[]
+main(int argc, string[] argv) {
+  string[] xs = ["a"];
+  eprint(xs);
+} return int 0;

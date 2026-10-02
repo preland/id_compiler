@@ -1,0 +1,5 @@
+// EXPECT: 'print' cannot take a struct
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  print(p);
+} return int 0;

@@ -1,0 +1,20 @@
+// A list that is returned or stored in another list is never freed: freeing it
+// would leave the caller reading a dead list, which the guard turns into a trap.
+// Only `t` and the pool list, which nothing else holds, are freed.
+keep(int[][] pool, int n) {
+  int[] v = [n];
+  push(pool, v);
+} return int[] v;
+
+tally(int n) {
+  int[] t = [n];
+} return int n;
+
+main(int argc, string[] argv) {
+  int[][] pool = [];
+  int[] a = keep(pool, 1);
+  int[] b = keep(pool, 2);
+} chain (int argc, string[] argv) {
+  int c = tally(4);
+  print(pool[0][0] + pool[1][0] + len(a) + c);
+} return int 0;

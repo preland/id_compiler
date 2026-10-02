@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  setup_pt();
+  twice((import gp));
+  print((import gp).y);
+} return int 0;

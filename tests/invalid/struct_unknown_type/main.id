@@ -1,0 +1,4 @@
+// EXPECT: unknown type 'Pnt'
+main(int argc, string[] argv) {
+  Pnt p = Point(1, 2);
+} return int 0;

@@ -1,0 +1,8 @@
+// EXPECT: '==' cannot take a struct
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  Point q = Point(3, 4);
+  if(p == q) {
+    print(1);
+  }
+} return int 0;

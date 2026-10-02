@@ -1,0 +1,5 @@
+struct Box {
+  Point lo;
+  int[] tags;
+  Item[] items;
+}

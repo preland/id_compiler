@@ -1,0 +1,6 @@
+
+main(int argc, string[] argv) {
+  word p = alloc(4);
+  poke8(p + 1, 65);
+  print(str_of_mem(p, 3));
+} return int 0;

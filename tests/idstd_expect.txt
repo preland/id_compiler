@@ -28,6 +28,9 @@ gfxdemo          needs-std
 gl3d             needs-std
 gl3dgame         needs-std
 
+# demos/about: a page on the library's GUI toolkit, so it needs the library.
+about            needs-std
+
 # ---------------------------------------------------------------------------
 # The compiler's own two stages, PORTED. They each carried a private copy of
 # idstd's `lset`; both now call the library's. That is the rule working -- the

@@ -61,7 +61,36 @@ ok()   { pass=$((pass+1)); echo "PASS: $1"; }
 bad()  { fail=$((fail+1)); echo "FAIL: $1"; }
 skip() { echo "SKIP: $1"; }
 
+# The whole file is over the 60 second budget, so it runs by section:
+#
+#   tests/backends.sh                 everything
+#   tests/backends.sh --list          the sections
+#   tests/backends.sh fs ipc          just those
+#
+# Each build a section does is cached, so a section that was stopped runs
+# again from where it got to rather than from the start.
+#
+# The bodies below are not re-indented for the gate, as in run.sh.
+SECTIONS="fs ipc link demos display galaxy galaxy_run"
+case "${1:-}" in
+    --list) for s in $SECTIONS; do echo "$s"; done; exit 0 ;;
+esac
+for s in "$@"; do
+    case " $SECTIONS " in *" $s "*) ;; *) echo "backends.sh: no such section: $s (see --list)" >&2; exit 2 ;; esac
+done
+WANTED=("$@")
+want() { [ "${#WANTED[@]}" -eq 0 ] && return 0; case " ${WANTED[*]} " in *" $1 "*) return 0 ;; esac; return 1; }
+# galaxy is two sections of its own, one per build: its cases build a 6,000,000-particle cloud,
+# over and over, and cost half a minute every build, so both together are over a minute.
+demo_list() { # SECTION GALAXY_SECTION
+    local d
+    for d in gfxdemo gl3d gl3dgame fpsmaze galaxy flyover; do
+        if [ "$d" = galaxy ]; then want "$2" && echo "$d"; else want "$1" && echo "$d"; fi
+    done
+}
+
 # -- fs: files, and no system libraries at all -------------------------------
+if want fs; then
 # Deliberately above the X11 gate below. This backend is stdio and stat, so it
 # builds and runs on any machine with a C compiler, and the checks that used to
 # be impossible without a display budget -- does a backend link, does the
@@ -250,8 +279,10 @@ fi
 # backend's `native` declarations as prototypes, and idc.py, which is frozen
 # (docs/HACKING.md) and will not change, emits `extern int` for the same
 # calls. What both must agree on is the behaviour checked above.
+fi
 
 # -- proc: a child process id can start, read from, wait for and kill ------
+if want ipc; then
 # Deliberately above the X11 gate below, like fs: this is fork/pipe/waitpid,
 # so it needs nothing but a shell. This is the seam tools/qmon is written
 # against (idstd's sys/io/ipc/proc/README.md).
@@ -557,8 +588,10 @@ if $BIN_IDC "$TMP/toy.id" --backend "$nocbe" -o "$TMP/nocbe.bin" 2>&1 \
 else
     bad "a backend with no C target is diagnosed as such (idc)"
 fi
+fi
 
 # -- the default output goes to build/ ---------------------------------------
+if want link; then
 # `idc PROJECT` names the executable after the project, so building from the
 # directory beside it used to ask cc to write over a directory ("cannot open
 # output file: Is a directory", reported by bin/idc as a bug in the self-hosted
@@ -668,7 +701,17 @@ else
 fi
 
 # A reached native no attached backend implements is a diagnostic at the call
-# that reaches it, never a linker error about id_twin_a.
+# that reaches it, never a linker error about id_twin_a. The program is written
+# here as well as in the ipc section: each section runs in a process of its own.
+cat > "$TMP/twin.id" <<'EOF'
+native twin_a(int n) return int;
+native twin_b(int n) return int;
+main(int argc, string[] argv) {
+  string n = "sum ";
+  int r = twin_a(1) + twin_b(2);
+  print(n + r);
+} return int 0;
+EOF
 out=$($BIN_IDC "$TMP/twin.id" -o "$TMP/twin.bin" 2>&1)
 if printf '%s\n' "$out" | grep -qF "twin.id:5: error: native 'twin_a', reached from main by this call, has no implementation for platform" \
    && ! printf '%s\n' "$out" | grep -q "undefined reference"; then
@@ -999,8 +1042,10 @@ if $BIN_IDC "$dual" -o "$TMP/dual.bin" >"$TMP/dual.err" 2>&1; then
 else
     bad "both backends link into one binary ($(grep -m1 -i 'error\|multiple' "$TMP/dual.err" | cut -c1-90))"
 fi
+fi
 
 # -- the graphics demos still build with bin/idc -----------------------------
+if want demos || want galaxy; then
 # Their C is no longer compared with idc.py's. bin/idc reads each backend's
 # `native` declarations and emits them as real prototypes; idc.py, which is
 # frozen and will not change (docs/HACKING.md), emits an unprototyped `extern int` block
@@ -1011,19 +1056,21 @@ fi
 # that idc.py builds them would fail on the library rather than on the demo.
 #
 # They name no backend: gfx and gl are the standard library's.
-for d in gfxdemo gl3d gl3dgame fpsmaze galaxy flyover; do
+for d in $(demo_list demos galaxy); do
     if env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" --emit-c "$TMP/self.c" >/dev/null 2>&1; then
         ok "$d: backend build (bin/idc)"
     else
         bad "$d: backend build (bin/idc)"
     fi
 done
+fi
 
 # -- no windowed demo may hang when there is no display ----------------------
+if want display || want galaxy_run; then
 # Every one of them used to: `int ok = gfx_open(...)` was assigned and then
 # ignored, and with no display gfx_poll returns -1 forever. Running with
 # DISPLAY unset is the test, and it needs no display by construction.
-for d in gfxdemo gl3d gl3dgame fpsmaze galaxy flyover; do
+for d in $(demo_list display galaxy_run); do
     if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" -o "$TMP/$d.bin" >/dev/null 2>&1; then
         bad "$d: builds for the no-display check"; continue
     fi
@@ -1047,7 +1094,9 @@ done
 # It also means these checks no longer need a session at all, so the `no
 # DISPLAY` skip below now only fires when Xvfb itself is missing.
 HEADLESS=../tools/headless.sh
-if ! command -v Xvfb >/dev/null 2>&1; then
+if ! want display; then
+    :
+elif ! command -v Xvfb >/dev/null 2>&1; then
     skip "windowed checks (no Xvfb -- run via tools/devshell.sh)"
 else
     for spec in gfxdemo:gfx gl3d:gl; do
@@ -1110,6 +1159,7 @@ EOF
     else
         bad "gl_read_pixels test builds"
     fi
+fi
 fi
 
 echo

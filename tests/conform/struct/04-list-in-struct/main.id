@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  Box q = make(3);
+  refill(q);
+  print(q.xs[1]);
+} return int 0;

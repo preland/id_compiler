@@ -319,6 +319,52 @@ IDC_NO_CACHE=1 slow_build sc8
     && ok "IDC_NO_CACHE=1 runs every case ($(ms_of sc8)ms)" \
     || bad "IDC_NO_CACHE=1 runs every case (rc $(rc_of sc8), $(ms_of sc8)ms)"
 
+# A case's key is every token of its line, so the literals a `given` setup is
+# called with are part of it: changing one reruns that case and only that one.
+# pause(1500) sleeps 1.5 s inside the setup of each case, so two cases that
+# run take at least 3 s, none well under it, and one takes about half of that.
+GARG="$TMP/garg"; mkdir -p "$GARG"
+cat > "$GARG/main.id" <<'EOF2'
+pause(int ms) {
+  sleep_ms(ms);
+} return void;
+(1):(1)
+(2):(2)
+
+work(int a) {
+  int b = a + 1;
+} return int b;
+given pause(1500) (1):(2)
+given pause(1500) (2):(3)
+
+main(int argc, string[] argv) {
+  print("ok");
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF2
+garg_build() {
+    local name="$1" t0 t1
+    t0=$(ms_now)
+    $BIN_IDC "$GARG" -o "$TMP/$name" --no-std >"$TMP/$name.out" 2>&1
+    echo $? > "$TMP/$name.rc"
+    t1=$(ms_now)
+    echo $((t1 - t0)) > "$TMP/$name.ms"
+}
+garg_build ga1
+[ "$(rc_of ga1)" -eq 0 ] && [ "$(ms_of ga1)" -ge 3000 ] \
+    && ok "setup: two cases each calling a setup with an argument run ($(ms_of ga1)ms)" \
+    || bad "setup: two cases each calling a setup with an argument run (rc $(rc_of ga1), $(ms_of ga1)ms): $(head -2 "$TMP/ga1.out")"
+garg_build ga2
+[ "$(rc_of ga2)" -eq 0 ] && [ "$(ms_of ga2)" -lt 1500 ] \
+    && ok "an identical rebuild runs neither case of a setup with arguments ($(ms_of ga2)ms)" \
+    || bad "an identical rebuild runs neither case of a setup with arguments (rc $(rc_of ga2), $(ms_of ga2)ms)"
+sed -i '0,/given pause(1500)/s//given pause(1501)/' "$GARG/main.id"
+garg_build ga3
+[ "$(rc_of ga3)" -eq 0 ] && [ "$(ms_of ga3)" -ge 1500 ] && [ "$(ms_of ga3)" -lt 3000 ] \
+    && ok "changing a setup's argument reruns that case and only that one ($(ms_of ga3)ms)" \
+    || bad "changing a setup's argument reruns that case and only that one (rc $(rc_of ga3), $(ms_of ga3)ms): $(head -2 "$TMP/ga3.out")"
+
 # -- per-unit compilation -----------------------------------------------------
 # The C is compiled as translation units cached one by one (bin/idc's
 # unit_build). With IDC_UNIT_FILES=1 each source file is its own unit, so an

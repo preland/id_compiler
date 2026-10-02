@@ -41,3 +41,4 @@ error: cannot order string and string
 `==`/`!=` are the only comparisons `string` supports (see `10-equality` and
 `11-inequality`); `<`, `<=`, `>`, `>=` are numeric-only (`is_numeric(lt) and
 is_numeric(rt)` in `idc.py`'s `gen_binop`).
+- `13-plus-ticks` — `+` with a `ticks()` call on either side of a `string` converts the call's `int` result like any other `int` operand; the case prints `ok` when the text starts and ends with the literals around it (the number itself is not deterministic).

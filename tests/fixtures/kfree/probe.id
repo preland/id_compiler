@@ -1,0 +1,18 @@
+probe_freed(int pn) {
+  int[] pf = [pn, pn, pn, pn, pn, pn];
+  int ps = pf[0] + pf[5];
+} return int ps;
+
+probe_kept(int pm) {
+  int[] pk = [pm, pm, pm, pm, pm, pm];
+} return int[] pk;
+
+probe_step(int sn, int skeep) {
+  int sv = 0;
+  if(skeep == 1) {
+    int[] sk = probe_kept(sn);
+    sv = sk[0];
+  } else {
+    sv = probe_freed(sn);
+  }
+} return int sv;

@@ -1,0 +1,16 @@
+// A list declared inside a loop is freed once per pass, and the one declared
+// before it at the return: two passes free the declaration's earlier value, the
+// return frees what is left of both.
+sum_to(int n) {
+  int[] base = [1, 2, 3];
+  int t = 0;
+  while(t < n) {
+    int[] ys = [t, t];
+    t = t + ys[0] + base[1];
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = sum_to(5);
+  print("" + r);
+} return int 0;

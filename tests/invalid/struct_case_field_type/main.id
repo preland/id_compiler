@@ -1,0 +1,3 @@
+// EXPECT: this case gives a string where a int is required
+main(int argc, string[] argv) {
+} return int 0;

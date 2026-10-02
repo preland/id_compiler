@@ -1,0 +1,5 @@
+// EXPECT: 'print' cannot take a list: argument 0 is int[]
+main(int argc, string[] argv) {
+  int[] xs = [1, 2];
+  print(xs);
+} return int 0;

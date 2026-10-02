@@ -1,0 +1,7 @@
+struct Solo {
+  int a;
+}
+
+help(int v) {
+  int w = v + 1;
+} return int w;

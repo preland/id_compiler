@@ -1,0 +1,13 @@
+// EXPECT: needs an earlier 'given' that sets it
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+
+use(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+given bump((import buf), 1, 7) given mk ([0]):([0])

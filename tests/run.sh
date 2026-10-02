@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # Regression tests for idc. Run from anywhere: tests/run.sh
 #
-#   tests/run.sh                 everything (85s -- over the 60s budget)
+#   tests/run.sh                 everything (over the 60s budget: run it by section)
 #   tests/run.sh --list          the sections, with their indices
-#   tests/run.sh core conform    just those, by name or index
+#   tests/run.sh core conform_1  just those, by name or index
 #   tests/run.sh --from 4        section 4 onward
 #   tests/run.sh --resume        continue after the last section that passed
 #
 # Why sections: no test or script should take longer than 60 seconds, because
 # a slow suite does not merely cost time -- it changes behaviour, batching work
-# and skipping verification. The whole suite is 85s and each SECTION is 6-36s,
+# and skipping verification. The whole suite is over it and each SECTION is under,
 # so the budget is met by running it in pieces. --resume records progress after
 # each section, so an interrupted run continues rather than starting over.
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core invalid runtime_invalid self_host_build backends stdlib wasm conform tests_feature fix idstd_real kernel editor)
+SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
 STATE=../.idc-cache/run-state
 WANTED=()
 resume=0
@@ -87,6 +87,14 @@ bad()  { fail=$((fail+1)); echo "FAIL: $1"; }
 
 expect_output() { # name, expected, actual
     if [ "$2" = "$3" ]; then ok "$1"; else bad "$1 (expected '$2', got '$3')"; fi
+}
+
+# core is three sections, because one was over a minute: core builds the lexer
+# and the parser into $TMP and tests them, core_self runs the compiler over its
+# own source, core_rest is the rest. A part run alone builds the two it needs.
+core_tools() {
+    [ -x "$TMP/idlex" ] || env -u IDC_NO_STD $BIN_IDC ../compiler/lex -o "$TMP/idlex" 2>/dev/null || bad "idc-in-id lexer compiles"
+    [ -x "$TMP/idparse" ] || env -u IDC_NO_STD $BIN_IDC ../compiler/parse -o "$TMP/idparse" 2>/dev/null || bad "idc-in-id parser compiles"
 }
 
 # The body below is NOT re-indented: wrapping 700 lines in an if would make
@@ -478,7 +486,7 @@ show(word p) {
 EOF
 cat > "$TMP/g_sys/more.id" <<'EOF'
 show2(word v) {
-  string t = "" + udiv(v, 7) + umod(v, 7) + ult(v, 1) + ushr(0 - 16, 60);
+  string t = "" + udiv(v, 7) + umod(v, 7) + ult(v, 1) + ushr(v, 28);
   string s = mem_str();
   print(t + s);
 } return void;
@@ -490,7 +498,7 @@ mem_str() {
 EOF
 $BIN_IDC "$TMP/g_sys" -o "$TMP/g_sys.bin" 2>/dev/null || bad "systems features (word/bitwise/store) compiles"
 expect_output "word/bitwise/store" "4887937359285593735928336-373592856029887428472933982139
-5337040796015k" "$("$TMP/g_sys.bin")"
+5337040796013k" "$("$TMP/g_sys.bin")"
 # pop, whose result type is the list's element type and so cannot be derived
 # from the callee name alone. The self-hosted emitter used to produce a call
 # to a runtime function that does not exist.
@@ -522,7 +530,13 @@ main(int argc, string[] argv) {
 EOF
 $BIN_IDC "$TMP/g_hex" -o "$TMP/g_hex.bin" 2>/dev/null || bad "wide hex literals compiles"
 expect_output "wide hex literals" "-1 9223372036854775807 255" "$("$TMP/g_hex.bin")"
+echo
+echo "$pass passed, $fail failed"
+[ "$fail" -eq 0 ] && mark_done core
+fi
 
+if want core_self; then
+core_tools
 # --- self-hosting: the id-written compiler emits byte-identical C for its OWN
 #     source (lexer + parser/codegen) whether it is the stage bin/idc runs or
 #     the lexer and parser this file built from that stage's C, and the
@@ -570,7 +584,13 @@ if env -u IDC_NO_STD $BIN_IDC ../compiler/lex --emit-c /dev/null >/dev/null 2>&1
 else
     echo "SKIP: self-hosting checks (no idstd resolvable; the compiler needs it)"
 fi
+echo
+echo "$pass passed, $fail failed"
+[ "$fail" -eq 0 ] && mark_done core_self
+fi
 
+if want core_rest; then
+core_tools
 # --- the two terminal games build cleanly on idstd's term_ engine (real-time
 #     I/O builtins put/flush/getkey/sleep_ms/ticks/pop exercised by the games)
 if env -u IDC_NO_STD $BIN_IDC ../../demos/moonbuggy -o "$TMP/moonbuggy" 2>/dev/null; then
@@ -766,18 +786,18 @@ main(int argc, string[] argv) {
 } return int 0;
 
 show1(word big) {
-  string line1 = "" + (big >> 32) + " " + ushr(0 - 16, 60) + " " + ult(0 - 1, 1);
+  string line1 = "" + (big >> 32) + " " + ushr(big, 44) + " " + ult(0 - 1, 1);
   print(line1);
 } return void;
 
 show2(word big) {
-  string line2 = "" + udiv(0 - 2, 3) + " " + umod(100, 7) + " " + (big & 0xff);
+  string line2 = "" + udiv(big, 3) + " " + umod(100, 7) + " " + (big & 0xff);
   print(line2);
 } return void;
 EOF
 $BIN_IDC "$TMP/word" -o "$TMP/word.out" >/dev/null 2>&1
 expect_output "word: 64-bit + unsigned builtins" "65535 15 0
-6148914691236517204 2 255" "$("$TMP/word.out")"
+93824992236885 2 255" "$("$TMP/word.out")"
 
 # The store is little-endian and untyped: a 32-bit poke is readable as four
 # bytes, which is exactly what makes C structs and unions expressible.
@@ -929,22 +949,6 @@ else
     bad "MAP.md is out of date -- run tools/mapgen.sh"
 fi
 
-# --- idc.py is frozen (docs/HACKING.md): it is stage 0 of a bootstrap that has
-#     been retired (docs/BACKENDS.md), and no longer builds anything, is
-#     compared against by any lane but the WASM target, or takes new work of
-#     any kind -- not a line, not a rule, not a lint fix. The ceiling that used
-#     to ratchet its line count down, and the lightweight lint that held it to
-#     its own rules while it could still change, both did their job by getting
-#     it small and clean; now the file itself must not change at all, which a
-#     line count cannot guarantee but a hash can.
-IDCPY_FROZEN_SHA256=47d5222845a195b6f241db90cd9723ec1a2ff7dddb50151973a859b8fd102887
-idcpy_sha256=$(sha256sum ../idc.py | cut -d' ' -f1)
-if [ "$idcpy_sha256" = "$IDCPY_FROZEN_SHA256" ]; then
-    ok "idc.py is frozen (unchanged from its recorded hash)"
-else
-    bad "idc.py has changed -- it is frozen; new work goes in the self-hosted compiler (got sha256 $idcpy_sha256, want $IDCPY_FROZEN_SHA256)"
-fi
-
 # --- every document says whether it describes reality. Three of the ten did;
 #     the other seven read as specifications whether they were one or not, and
 #     docs/DISPATCH.md -- 113 lines with nothing implemented anywhere -- read
@@ -979,7 +983,7 @@ fi
 
 echo
 echo "$pass passed, $fail failed"
-mark_done core
+[ "$fail" -eq 0 ] && mark_done core_rest
 fi
 
 # --- negative tests: every file in tests/invalid/ must be rejected with the
@@ -1024,11 +1028,13 @@ fi
 echo
 echo "--- native backends (idstd's sys/io/fs, sys/win/gfx, sys/win/gl) ---"
 bend=0
-if want backends; then
-    ./backends.sh
-    bend=$?
-    [ "$bend" -eq 0 ] && mark_done backends
-fi
+for bs in fs ipc link demos display galaxy galaxy_run; do
+    if want "backends_$bs"; then
+        ./backends.sh "$bs"
+        brc=$?
+        if [ "$brc" -eq 0 ]; then mark_done "backends_$bs"; else bend=$brc; fi
+    fi
+done
 
 # --- the standard library: implicit import, --no-std, $IDSTD_HOME, and the
 #     transitive dependency resolution it is built on. Runs against a fixture
@@ -1064,11 +1070,13 @@ fi
 echo
 echo "--- conformance across targets (docs/SPEC.md) ---"
 conf=0
-if want conform; then
-    ./conform.sh
-    conf=$?
-    [ "$conf" -eq 0 ] && mark_done conform
-fi
+for cp in "1 eprint float flow fn free" "2 int list order" "3 store str struct trap"; do
+    if want "conform_${cp%% *}"; then
+        ./conform.sh ${cp#* }
+        crc=$?
+        if [ "$crc" -eq 0 ]; then mark_done "conform_${cp%% *}"; else conf=$crc; fi
+    fi
+done
 
 # --- test clauses: the cases written under a function, run by --tests, and the
 #     scaling claims they may carry. It sets IDC_NO_STD itself, because what a

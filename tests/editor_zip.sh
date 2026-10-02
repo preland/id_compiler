@@ -35,15 +35,15 @@ for need in "$ROOT/bin/idc" "$ORG/editor/lib/zip"; do
         exit 0
     fi
 done
+TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+ABS=$(cd "$ROOT" && pwd)
 if [ ! -f fixtures/sample.odt ]; then
-    if ! "$ROOT/tools/mkodt.sh" fixtures/sample.odt >/dev/null 2>&1; then
-        echo "SKIP: editor/lib/zip tests (no fixtures/sample.odt and tools/mkodt.sh did not run)"
+    if ! { env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/buildrun" -o "$TMP/buildrun" \
+           && "$TMP/buildrun" "$ABS" mkodt fixtures/sample.odt; } >/dev/null 2>&1; then
+        echo "SKIP: editor/lib/zip tests (no fixtures/sample.odt and tools/buildrun mkodt did not run)"
         exit 0
     fi
 fi
-
-TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
-ABS=$(cd "$ROOT" && pwd)
 
 # -- the throwaway project -------------------------------------------------
 # $TMP holds main.id and t/; t/ holds show.id and the copied module. fs is the

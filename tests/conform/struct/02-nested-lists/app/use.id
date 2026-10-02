@@ -1,0 +1,11 @@
+show(Box b) {
+  print(b.lo.x);
+  print(b.tags[1]);
+  print(len(b.items));
+} return void;
+
+bump(Box b) {
+  Point q = b.lo;
+  q.x = q.x + 10;
+  push(b.tags, 99);
+} return void;

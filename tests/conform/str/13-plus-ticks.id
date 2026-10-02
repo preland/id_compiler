@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  string s = "s" + ticks() + "s";
+  int n = len(s);
+  if(n >= 3 && charat(s, 0) == 115 && charat(s, n - 1) == 115) {
+    print("ok");
+  }
+} return int 0;

@@ -55,6 +55,19 @@ for f in invalid/*.id; do
     check_one "$name" "$f" "$expect"
 done
 
+# A directory is a project: a struct is declared in a file of its own
+# (docs/SPEC.md, structs), so a program that uses one is not a single file. Its
+# `// EXPECT:` line is in whichever of its files carries it.
+for d in invalid/*/; do
+    [ -d "$d" ] || continue
+    name=$(basename "$d")
+    expect=$(sed -n 's@^// EXPECT: @@p' "$d"*.id | head -1)
+    if [ -z "$expect" ]; then
+        echo "FAIL: $name (no '// EXPECT:' line in $d)"; fail=$((fail+1)); continue
+    fi
+    check_one "$name" "${d%/}" "$expect"
+done
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

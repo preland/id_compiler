@@ -273,6 +273,81 @@ else
     echo "SKIP: conf.id constants on --target llvm (needs clang on PATH)"
 fi
 
+# (b2-dce) a constant nothing reachable reads is not emitted. The program reads
+#          dce_used, and dce_base only through the initialiser of the list
+#          dce_top, so both survive; dce_unused and the list dce_unlist are
+#          read by nothing and are absent from the C and the LLVM. dce_dead is
+#          read only by a function nothing calls. Every target prints the same.
+dce="$TMP/dce"
+mkdir -p "$dce"
+cat > "$dce/conf.id" <<'EOF'
+int dce_base = 7;
+int[] dce_top = [(import dce_base), 1];
+int dce_used = 5;
+int dce_unused = 9;
+int dce_dead = 11;
+string[] dce_unlist = ["u"];
+string[] dce_list = ["l"];
+EOF
+cat > "$dce/main.id" <<'EOF'
+dead_fn(int k) {
+  int n = (import dce_dead) + k;
+} return int n;
+(0):(11)
+(1):(12)
+
+main(int argc, string[] argv) {
+  print((import dce_used) + (import dce_top)[0] + (import dce_top)[1]);
+  print((import dce_list)[0]);
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "x"]):(0)
+EOF
+want=$(printf '13\nl')
+if $BIN_IDC "$dce" --emit-c "$TMP/dce.c" >/dev/null 2>&1 \
+   && grep -q 'dce_used' "$TMP/dce.c" && grep -q 'dce_top' "$TMP/dce.c" \
+   && grep -q 'dce_base' "$TMP/dce.c" && grep -q 'dce_list' "$TMP/dce.c" \
+   && ! grep -q 'dce_unused' "$TMP/dce.c" && ! grep -q 'dce_unlist' "$TMP/dce.c" \
+   && ! grep -q 'dce_dead' "$TMP/dce.c"; then
+    ok "conf.id: the C has the constants the program reads, and a constant read by a constant, and no others"
+else
+    bad "conf.id: the C has the constants the program reads, and a constant read by a constant, and no others"
+fi
+if $BIN_IDC "$dce" -o "$TMP/dce.bin" >/dev/null 2>&1 \
+   && [ "$("$TMP/dce.bin")" = "$want" ]; then
+    ok "conf.id: a program with pruned constants runs"
+else
+    bad "conf.id: a program with pruned constants runs"
+fi
+if command -v clang >/dev/null 2>&1; then
+    dcel="$TMP/dcel"
+    mkdir -p "$dcel"
+    cp "$dce/main.id" "$dcel/main.id"
+    sed 's/^int\[\] dce_top = .*/int[] dce_top = [7, 1];/' "$dce/conf.id" > "$dcel/conf.id"
+    if $BIN_IDC "$dcel" --emit-llvm "$TMP/dce.ll" >/dev/null 2>&1 \
+       && grep -q '@dce_top' "$TMP/dce.ll" && grep -q '@dce_used' "$TMP/dce.ll" \
+       && ! grep -q 'dce_unused' "$TMP/dce.ll" && ! grep -q 'dce_unlist' "$TMP/dce.ll" \
+       && ! grep -q 'dce_dead' "$TMP/dce.ll" && ! grep -q 'dce_base' "$TMP/dce.ll" \
+       && $BIN_IDC "$dcel" --target llvm -o "$TMP/dce_ll.bin" >/dev/null 2>&1 \
+       && [ "$("$TMP/dce_ll.bin")" = "$want" ]; then
+        ok "conf.id: --target llvm drops the same constants and prints the same"
+    else
+        bad "conf.id: --target llvm drops the same constants and prints the same"
+    fi
+else
+    echo "SKIP: conf.id constant pruning on --target llvm (needs clang on PATH)"
+fi
+if [ -n "${IDC_WASI_CLANG:-}" ] && command -v wasmtime >/dev/null 2>&1; then
+    if $BIN_IDC "$dce" --target wasm -o "$TMP/dce.wasm" >/dev/null 2>&1 \
+       && [ "$(wasmtime run "$TMP/dce.wasm")" = "$want" ]; then
+        ok "conf.id: --target wasm prints the same with the constants pruned"
+    else
+        bad "conf.id: --target wasm prints the same with the constants pruned"
+    fi
+else
+    echo "SKIP: conf.id constant pruning on --target wasm (needs the WASI toolchain and wasmtime)"
+fi
+
 # (b2-list) a conf.id constant may be a list (docs/PROJECT.md 5): read by
 #           index and by len in a built program, and the same program's own
 #           test cases -- each case a process of its own, so the constant has
@@ -532,7 +607,15 @@ fi
 # to build: the triple picked the backend's darwin sources and the host cc
 # compiled them anyway, so `--triple aarch64-apple-darwin` on Linux produced a
 # Linux ELF wearing another platform's name.
-if $BIN_IDC ../../demos/hello --triple aarch64-apple-darwin -o "$TMP/cross.bin" 2>&1 \
+# The program is a file of its own with no cases: a program with cases is
+# refused for a different reason (they cannot run for another platform), which
+# would hide the refusal under test.
+cat > "$TMP/xhello.id" <<'XEOF'
+main(int argc, string[] argv) {
+  print("hi");
+} return int 0;
+XEOF
+if $BIN_IDC "$TMP/xhello.id" --allow-untested --triple aarch64-apple-darwin -o "$TMP/cross.bin" 2>&1 \
    | grep -q "cannot build for 'aarch64-apple-darwin' here" \
    && [ ! -f "$TMP/cross.bin" ]; then
     ok "a non-host platform triple is refused rather than built for the host"
@@ -541,7 +624,7 @@ else
 fi
 
 # (c5) ...and --cc means the user has one, so it is trusted.
-if $BIN_IDC ../../demos/hello --triple aarch64-apple-darwin --cc cc -o "$TMP/cross2.bin" \
+if $BIN_IDC "$TMP/xhello.id" --allow-untested --triple aarch64-apple-darwin --cc cc -o "$TMP/cross2.bin" \
      >/dev/null 2>&1 && [ -f "$TMP/cross2.bin" ]; then
     ok "--cc overrides the host-platform refusal"
 else
@@ -640,16 +723,14 @@ else
     bad "a program with test cases builds, passes its cases, and leaves no trace in the C"
 fi
 
-# -- stage 0 is C, and nothing here runs idc.py ------------------------------
+# -- stage 0 is C ------------------------------------------------------------
 #
 # bootstrap/*.c is the compiler as C (bootstrap/README.md). Two things have to
 # hold, and they fail in different ways: the snapshot has to still BE the
 # compiler, and the driver has to still not need Python to get one.
 
-# The gate. A cold cache, against a ROOT whose idc.py is a DIRECTORY -- which
-# no shebang can execute -- so anything that still shells out to it fails here
-# rather than passing on a file that merely happens to be present. The root is
-# symlinks rather than a copy because the tree is 30 MB and only its names
+# The gate. A cold cache, against a ROOT that is a tree of symlinks.
+# It is symlinks rather than a copy because the tree is 30 MB and only its names
 # matter: bin/idc derives ROOT from its own path, so a linked bin/idc under
 # $BOOTROOT sees $BOOTROOT as the repository.
 #
@@ -672,10 +753,8 @@ fi
 BOOTROOT="$TMP/bootroot"
 mkdir -p "$BOOTROOT"
 for e in "$REAL_ROOT"/*; do
-    [ "$(basename "$e")" = "idc.py" ] && continue
     ln -s "$e" "$BOOTROOT/$(basename "$e")"
 done
-mkdir -p "$BOOTROOT/idc.py"
 printf 'main(int argc, string[] argv) {\n  print("bootstrapped");\n} return int 0;\n' \
     > "$TMP/hello_boot.id"
 if [ -z "$STD_REAL" ]; then
@@ -683,9 +762,9 @@ if [ -z "$STD_REAL" ]; then
 elif IDC_CACHE_DIR="$TMP/bootcache" "$BOOTROOT/bin/idc" --std "$STD_REAL" --allow-untested \
          "$TMP/hello_boot.id" -o "$TMP/hello_boot" >"$TMP/boot.err" 2>&1 \
      && [ "$("$TMP/hello_boot")" = "bootstrapped" ]; then
-    ok "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable"
+    ok "a cold cache bootstraps from bootstrap/*.c"
 else
-    bad "a cold cache bootstraps from bootstrap/*.c with idc.py unreachable: $(head -2 "$TMP/boot.err" | tr '\n' ' ')"
+    bad "a cold cache bootstraps from bootstrap/*.c: $(head -2 "$TMP/boot.err" | tr '\n' ' ')"
 fi
 # That cold build re-entered bin/idc twice to build the compiler's stages,
 # each with --allow-untested. id has no warnings, so none of those builds

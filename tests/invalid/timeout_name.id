@@ -1,0 +1,6 @@
+// EXPECT: 'timeout' is a test case keyword (see docs/TESTS.md) and cannot be used as a name
+f(int timeout) {
+  int b = len("a");
+} return int b;
+(1):(1)
+(2):(1)

@@ -1,0 +1,5 @@
+area(Point p) {
+  int a = p.x * p.y;
+} return int a;
+(Point(1, "s")):(2)
+(Point(3, 4)):(12)

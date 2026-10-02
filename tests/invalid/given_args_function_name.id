@@ -1,0 +1,13 @@
+// EXPECT: is a function name, which only a case's own arguments may pass
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+
+use(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+given mk given bump(mk, 1, 7) ([0]):([0])

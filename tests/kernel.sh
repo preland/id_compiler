@@ -10,7 +10,7 @@
 #
 #   * the serial port, which is what the kernel says;
 #   * the framebuffer, read back through the kernel's own font by
-#     tools/fbtext.sh, which is what the kernel drew -- a graphical shell whose
+#     tools/fbtext (through tools/buildrun), which is what the kernel drew -- a graphical shell whose
 #     only test is its serial output is not a tested graphical shell;
 #   * the same `id` source run hosted, on the C runtime, which is what says the
 #     `id`-written runtime is *right* rather than merely present.
@@ -33,8 +33,16 @@ done
 
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 ELF="$TMP/kernel.elf"
+IDCROOT=$(cd "$ROOT" && pwd)
 
-if ! "$ROOT/tools/kbuild.sh" "$ELF" >"$TMP/build.log" 2>&1; then
+for t in buildrun kbuild; do
+    if ! env -u IDC_NO_STD "$ROOT/bin/idc" "$ROOT/tools/$t" -o "$TMP/$t" >"$TMP/$t.log" 2>&1; then
+        bad "tools/$t builds ($(grep -v 'warning:' "$TMP/$t.log" | head -1))"
+        echo; echo "$pass passed, $fail failed"; exit 1
+    fi
+done
+
+if ! "$TMP/kbuild" "$IDCROOT" "$ELF" >"$TMP/build.log" 2>&1; then
     bad "the kernel builds ($(grep -v 'warning:\|cc-wrapper\|un-wrapped' "$TMP/build.log" | head -1))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi
@@ -83,7 +91,7 @@ fi
 # Two boots, because `fault` stops the machine and the screenshot has to be
 # taken while there is still a machine to photograph.
 CMDS='ls;cd bin;pwd;cat hello;cd ..;mkdir tmp;write /tmp/note hello from a shell in id;cat /tmp/note;ls tmp;rm /tmp/note;ls /tmp;uname;frobnicate'
-"$ROOT/tools/qmon.sh" "$ELF" --wait 4 --type "$CMDS" --settle 2 \
+"$TMP/buildrun" "$IDCROOT" qmon "$ELF" --wait 4 --type "$CMDS" --settle 2 \
         --shot "$TMP/screen.ppm" >"$TMP/serial.txt" 2>"$TMP/qmon.err"
 got=$(cat "$TMP/serial.txt")
 
@@ -106,7 +114,7 @@ want_serial "an unknown command says so"          "frobnicate: not a command -- 
 # is a triple fault and a silent reboot; with one it is three lines naming the
 # vector, the error code and the instruction. docs/SPEC.md §8's traps have
 # nowhere to go in a kernel, and this is what replaces them.
-"$ROOT/tools/qmon.sh" "$ELF" --wait 4 --type "fault" --settle 2 \
+"$TMP/buildrun" "$IDCROOT" qmon "$ELF" --wait 4 --type "fault" --settle 2 \
         >"$TMP/fault.txt" 2>/dev/null
 crash=$(cat "$TMP/fault.txt")
 if printf '%s\n' "$crash" | grep -q '^\*\*\* fault: page fault (vector 14' \
@@ -118,12 +126,12 @@ else
 fi
 
 # -- the screen, not the serial port ----------------------------------------
-# tools/fbtext.sh matches each 8x16 cell of the framebuffer against the font
+# tools/fbtext matches each 8x16 cell of the framebuffer against the font
 # the kernel drew it with, so this asserts on pixels that happen to spell
 # words. A console that wrote to the serial port and drew nothing would pass
 # every check above and fail this one.
 if [ -f "$TMP/screen.ppm" ]; then
-    screen=$("$ROOT/tools/fbtext.sh" "$TMP/screen.ppm" 2>/dev/null)
+    screen=$("$TMP/buildrun" --stdin "$IDCROOT" fbtext "$TMP/screen.ppm" <"$ORG/kernel/prog/conf.id" 2>/dev/null)
     if printf '%s\n' "$screen" | grep -q "id kernel -- x86_64, no libc" \
        && printf '%s\n' "$screen" | grep -q "frobnicate: not a command"; then
         ok "the framebuffer shows what the shell printed"
@@ -161,6 +169,36 @@ if "$ROOT/bin/idc" "$HOST" --no-std --allow-untested -o "$TMP/host.bin" >"$TMP/h
     fi
 else
     bad "the kernel's demonstrations build hosted ($(head -1 "$TMP/host.log"))"
+fi
+
+# -- the runtime gives lists back --------------------------------------------
+# docs/MEMORY.md 2a: every target frees the same allocations, and here that is
+# the runtime's free lists. fixtures/kfree builds a thousand lists the compiler
+# frees and a thousand it cannot (each is returned), and prints how far the
+# arena's high-water mark moved for each. Freed lists reuse their blocks, so
+# that mark barely moves; kept ones each take fresh memory.
+KFREE="$TMP/kfree"
+mkdir -p "$KFREE"
+if "$ROOT/bin/idc" "$ROOT/tests/fixtures/kfree" --no-std --freestanding --allow-untested \
+        --triple x86_64-unknown-none -o "$KFREE/kfree.o" >"$KFREE/build.log" 2>&1 \
+   && ld.lld -n -T "$ORG/kernel/boot/kernel.ld" "$ROOT/build/boot.o" "$ROOT/build/isr.o" \
+        "$ROOT/build/runtime.o" "$KFREE/kfree.o" -o "$KFREE/kfree.elf" >>"$KFREE/build.log" 2>&1; then
+    kall=$(timeout 6 qemu-system-x86_64 -kernel "$KFREE/kfree.elf" -display none -no-reboot \
+            -serial stdio -monitor none </dev/null 2>/dev/null | grep '^kfree ')
+    kf=$(printf '%s\n' "$kall" | grep 'freed=')
+    sums=$(printf '%s\n' "$kall" | grep 'sum=' | tr '\n' ' ')
+    freed=${kf#*freed=}; freed=${freed%% *}
+    kept=${kf#*kept=}
+    case "$freed$kept" in
+        ''|*[!0-9]*) bad "the runtime gives lists back (no numbers from the guest: '$kf')" ;;
+        *) if [ "$freed" -lt 1000 ] && [ "$kept" -gt 50000 ] && [ "$sums" = "kfree sum=999000 kfree sum=499500 " ]; then
+               ok "the runtime gives lists back (freed lists moved the arena $freed bytes, kept ones $kept)"
+           else
+               bad "the runtime gives lists back (freed lists moved the arena $freed bytes, kept ones $kept)"
+           fi ;;
+    esac
+else
+    bad "the runtime gives lists back (fixtures/kfree did not build: $(head -1 "$KFREE/build.log"))"
 fi
 
 echo

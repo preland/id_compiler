@@ -1,0 +1,5 @@
+// EXPECT: cannot index a Point; a struct's fields are read by name
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  int n = p[0];
+} return int 0;

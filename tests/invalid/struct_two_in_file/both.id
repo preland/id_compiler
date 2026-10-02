@@ -1,0 +1,7 @@
+struct Aa {
+  int a;
+}
+
+struct Bb {
+  string b;
+}

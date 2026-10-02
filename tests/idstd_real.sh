@@ -52,10 +52,14 @@ if [ ! -d "$STD" ]; then
     exit 0
 fi
 
+# --check, not --emit-c: whether a project collides with the library is a
+# question about the rules, and --emit-c also ran the project's own cases --
+# galaxy's alone took half a minute a build, twice, for an answer that was
+# never about them.
 classify() { # PATH -> both | needs-std | broken | neither
     local p="$1" w o
-    "$BIN_IDC" "$p" --allow-untested --emit-c /dev/null >/dev/null 2>&1 && w=y || w=n
-    IDC_NO_STD=1 "$BIN_IDC" "$p" --allow-untested --emit-c /dev/null >/dev/null 2>&1 && o=y || o=n
+    "$BIN_IDC" "$p" --allow-untested --check >/dev/null 2>&1 && w=y || w=n
+    IDC_NO_STD=1 "$BIN_IDC" "$p" --allow-untested --check >/dev/null 2>&1 && o=y || o=n
     case "$w$o" in
         yy) echo both ;;
         yn) echo needs-std ;;
@@ -68,7 +72,7 @@ classify() { # PATH -> both | needs-std | broken | neither
 # rather than just the project. What is classified is whether a project
 # collides with the library, not whether it has its test cases, so both builds
 # above pass --allow-untested, and its warning is not the line reported here.
-why() { "$BIN_IDC" "$1" --allow-untested --emit-c /dev/null 2>&1 | grep -v '^idc: warning: --allow-untested' | head -1; }
+why() { "$BIN_IDC" "$1" --allow-untested --check 2>&1 | grep -v '^idc: warning: --allow-untested' | head -1; }
 
 # The GLOB drives, not the ledger. A project added to demos/ or compiler/ is
 # checked from the moment it exists; the ledger only supplies the expectation,

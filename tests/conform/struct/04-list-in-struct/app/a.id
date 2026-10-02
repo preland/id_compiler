@@ -1,0 +1,9 @@
+make(int n) {
+  int[] xs = [n, n];
+  Box b = Box(xs, n);
+} return Box b;
+
+refill(Box b) {
+  int[] ys = [7, 8];
+  b.xs = ys;
+} return void;

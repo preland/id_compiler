@@ -1,0 +1,3 @@
+// EXPECT: is already declared at
+main(int argc, string[] argv) {
+} return int 0;

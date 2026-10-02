@@ -1,0 +1,5 @@
+// EXPECT: can only initialise a declaration
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  p = Point(3, 4);
+} return int 0;
