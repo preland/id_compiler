@@ -1,0 +1,17 @@
+vm_b_peek16(word wa) {
+  word wr = peek16(wa);
+} return word wr;
+given tf_mem8(578437695752307201) ((import tf_addr)):(513)
+given tf_mem8(-1) ((import tf_addr)):(65535)
+
+vm_b_peek32(word wa) {
+  word wr = peek32(wa);
+} return word wr;
+given tf_mem8(578437695752307201) ((import tf_addr)):(67305985)
+given tf_mem8(-1) ((import tf_addr)):(4294967295)
+
+vm_b_peek64(word wa) {
+  word wr = peek64(wa);
+} return word wr;
+given tf_mem8(578437695752307201) ((import tf_addr)):(578437695752307201)
+given tf_mem8(-1) ((import tf_addr)):(-1)

@@ -1,0 +1,29 @@
+// Fixtures for the loader's cases. A case starts with nothing exported, so
+// `given tf_ld("text")` boots the loader and the executor and loads the text
+// as bytes, ready for a parser to read from the start.
+tf_bytes(string s) {
+  int[] by = [];
+  int i = 0;
+  int n = len(s);
+} chain (string s) {
+  while (i < n) {
+    push(by, charat(s, i));
+    i = i + 1;
+  }
+} return int[] by;
+("ab"):([97, 98])
+(""):([])
+
+tf_text(string s) {
+  ld_start(tf_bytes(s));
+} return void;
+given lb_boot ("ab"):() then ld_at:(97)
+given lb_boot (""):() then ld_at:(-1)
+
+tf_ld(string s) {
+  lb_boot();
+  vb_boot();
+  tf_text(s);
+} return void;
+("ab"):() then ld_at:(97)
+("a"):() then tf_iadd:(3)

@@ -1,0 +1,37 @@
+// Replace every block number in a branch with the pc it names. Done once
+// every label has been read, since a branch may name a later block.
+ld_link() {
+  int pc = 0;
+  while (pc < len((import ex_cd))) {
+    ld_link1(pc);
+    pc = pc + (import i_n);
+  }
+} return void;
+given tf_ld("") given ld_blkset(2, 25) given ld_emit(4, 0, 0, 0, 2) ():() then tf_cd:([4, 0, 0, 0, 25])
+given tf_ld("") given ld_blkset(0, 5) given ld_blkset(1, 10) given ld_emit(3, 0, 1, 0, 1) given ld_emit(4, 0, 0, 0, 1) ():() then tf_cd:([3, 0, 1, 5, 10, 4, 0, 0, 0, 10])
+
+ld_link1(int pc) {
+  int[] cd = (import ex_cd);
+  int[] blk = (import ld_blk);
+  int op = cd[pc];
+} chain (int pc) {
+  if (op == (import o_br)) {
+    cd[pc + 4] = blk[cd[pc + 4]];
+  }
+  if (op == (import o_cbr)) {
+    ld_link2(pc);
+  }
+} return void;
+given tf_ld("") given ld_blkset(1, 40) given ld_emit(4, 0, 0, 0, 1) (0):() then tf_cd:([4, 0, 0, 0, 40])
+given tf_ld("") given ld_blkset(1, 40) given ld_emit(0, 0, 0, 0, 1) (0):() then tf_cd:([0, 0, 0, 0, 1])
+given tf_ld("") given ld_blkset(0, 6) given ld_blkset(1, 7) given ld_emit(3, 0, 2, 0, 1) (0):() then tf_cd:([3, 0, 2, 6, 7])
+
+ld_link2(int pc) {
+  int[] cd = (import ex_cd);
+  int[] blk = (import ld_blk);
+  cd[pc + 3] = blk[cd[pc + 3]];
+} chain (int pc) {
+  cd[pc + 4] = blk[cd[pc + 4]];
+} return void;
+given tf_ld("") given ld_blkset(0, 6) given ld_blkset(1, 7) given ld_emit(3, 0, 2, 1, 0) (0):() then tf_cd:([3, 0, 2, 7, 6])
+given tf_ld("") given ld_blkset(2, 30) given ld_emit(3, 0, 9, 2, 2) (0):() then tf_cd:([3, 0, 9, 30, 30])

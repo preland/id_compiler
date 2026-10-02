@@ -1,0 +1,15 @@
+ld_lread(int d, int ty) {
+  int sl = ld_var();
+  ld_emit(ld_fsel(ty, (import o_mov), (import o_movf)), d, sl, 0, 0);
+} return void;
+given tf_ld("%v5") (3, 2):() then tf_cd:([0, 3, 0, 0, 0])
+given tf_ld("%v5") (3, 5):() then tf_cd:([5, 3, 0, 0, 0])
+given tf_ld("%v5") given tf_ns (3, 2):() then tf_cd:([0, 3, 1, 0, 0])
+
+ld_lwrite(int a, int ty) {
+  int sl = ld_var();
+  ld_emit(ld_fsel(ty, (import o_mov), (import o_movf)), sl, a, 0, 0);
+} return void;
+given tf_ld("%v5") (4, 2):() then tf_cd:([0, 0, 4, 0, 0])
+given tf_ld("%v5") (4, 5):() then tf_cd:([5, 0, 4, 0, 0])
+given tf_ld("%v5") given tf_ns (4, 2):() then tf_cd:([0, 1, 4, 0, 0])

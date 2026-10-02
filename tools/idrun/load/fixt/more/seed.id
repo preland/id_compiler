@@ -1,0 +1,19 @@
+// What booting the loader seeded its table with: an instruction word, a
+// runtime helper, and a helper that takes a double.
+tf_iadd() {
+  int k = ld_look("i:add");
+} return int k;
+given lb_boot ():(3)
+given lb_tables ():(-1)
+
+tf_bpoke() {
+  int k = ld_look("b:id_poke64");
+} return int k;
+given lb_boot ():(45)
+given lb_tables ():(-1)
+
+tf_xstr() {
+  int k = ld_look("x:id_str_of_float");
+} return int k;
+given lb_boot ():(2)
+given lb_tables ():(-1)

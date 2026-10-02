@@ -1,0 +1,46 @@
+// The float form of an operation when the type is a double.
+ld_fsel(int ty, int op, int fop) {
+  int r = op;
+  if (ty == (import t_dbl)) {
+    r = fop;
+  }
+} return int r;
+(5, 1, 2):(2)
+(2, 1, 2):(1)
+
+// load T, ptr P. A pointer is a local slot (an alloca, so a move) or a global.
+ld_load(int d) {
+  int ty = ld_ty();
+  ld_word();
+  ld_skip();
+} chain (int d) {
+  if (ld_at() == 64) {
+    ld_gread(d, ty);
+  } else {
+    ld_lread(d, ty);
+  }
+} return void;
+given tf_ld("i32, ptr %v2") (6):() then tf_cd:([0, 6, 0, 0, 0])
+given tf_ld("double, ptr %v2") (6):() then tf_cd:([5, 6, 0, 0, 0])
+given tf_ld("i32, ptr @g") (6):() then tf_cd:([10, 6, 0, 0, 0])
+
+// store T V, ptr P.
+ld_store() {
+  int ty = ld_ty();
+  int a = ld_val(ty);
+  ld_word();
+} chain () {
+  ld_skip();
+  if (ld_at() == 64) {
+    ld_gwrite(a, ty);
+  } else {
+    ld_lwrite(a, ty);
+  }
+} return void;
+given tf_ld("i32 %v3, ptr %v2") ():() then tf_cd:([0, 1, 0, 0, 0])
+given tf_ld("i32 7, ptr %v2") ():() then tf_cd:([0, 1, 0, 0, 0]) then tf_kv:([7])
+given tf_ld("i32 %v3, ptr @g") ():() then tf_cd:([11, 0, 0, 0, 0])
+given tf_ld("double %v3, ptr %v2") ():() then tf_cd:([5, 1, 0, 0, 0])
+given tf_ld("i32 %v3, ptr %v2") given tf_ns ():() then tf_cd:([0, 2, 1, 0, 0])
+given tf_ld("i32 %v3, ptr @g") given tf_ns ():() then tf_cd:([11, 0, 1, 0, 0])
+given tf_ld("double %v3, ptr @g") given tf_ns ():() then tf_cd:([29, 0, 1, 0, 0])

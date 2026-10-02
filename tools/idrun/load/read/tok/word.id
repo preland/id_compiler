@@ -1,0 +1,31 @@
+// Spaces and commas separate tokens; both are skipped.
+ld_skip() {
+  int c = ld_at();
+  while (c == 32 || c == 44) {
+    ld_adv(1);
+    c = ld_at();
+  }
+} return void;
+given tf_ld("  , x") ():() then ld_pos:(4)
+given tf_ld("x") ():() then ld_pos:(0)
+
+// Where the word starting at e ends. A word is letters, digits, '_' and '.'.
+ld_wend(int e) {
+  while (ld_isw(ld_bat(e)) == 1) {
+    e = e + 1;
+  }
+} return int e;
+given tf_ld("add i32") (0):(3)
+given tf_ld("add i32") (4):(7)
+given tf_ld("add i32") (3):(3)
+
+ld_word() {
+  ld_skip();
+  int p = ld_pos();
+  int e = ld_wend(p);
+} chain () {
+  string w = ld_str(p, e);
+  ld_adv(e - p);
+} return string w;
+given tf_ld("  add i32") ():("add") then ld_pos:(5)
+given tf_ld("%v1") ():("") then ld_pos:(0)

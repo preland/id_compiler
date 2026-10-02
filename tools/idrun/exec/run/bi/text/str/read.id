@@ -1,0 +1,21 @@
+// Reading a string: one byte, its length, and a word as text.
+vm_b_charat(word wa, word wb) {
+  int ia = wa;
+  int i = wb;
+  int c = charat((import ex_strs)[ia], i);
+} return int c;
+given vb_boot given tf_sput("abc") (1, 1):(98)
+given vb_boot given tf_sput("abc") (1, 3):(-1)
+
+vm_b_len(word wa) {
+  int ia = wa;
+  int n = len((import ex_strs)[ia]);
+} return int n;
+given vb_boot given tf_sput("hello") (1):(5)
+given vb_boot given tf_sput("") (1):(0)
+
+vm_b_str_of_word(word wa) {
+  int h = vm_sput("" + wa);
+} return int h;
+given vb_boot (5000000000):(1) then tf_strs:(["", "5000000000"])
+given vb_boot (-1):(1) then tf_strs:(["", "-1"])

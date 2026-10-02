@@ -1,0 +1,57 @@
+vm_b_ult(word wa, word wb) {
+  int r = ult(wa, wb);
+} return int r;
+(1, -1):(1)
+(-1, 1):(0)
+
+// The arithmetic helpers, by id.
+vm_ba(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_idiv)) {
+    wr = vm_b_idiv(wa, wb);
+    return wr;
+  }
+  if (id == (import b_imod)) {
+    wr = vm_b_imod(wa, wb);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_sdiv)) {
+    wr = vm_b_sdiv(wa, wb);
+    return wr;
+  }
+  if (id == (import b_smod)) {
+    wr = vm_b_smod(wa, wb);
+    return wr;
+  }
+  if (id == (import b_shl)) {
+    wr = vm_b_shl(wa, wb);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_sar)) {
+    wr = vm_b_sar(wa, wb);
+    return wr;
+  }
+  if (id == (import b_ushr)) {
+    wr = vm_b_ushr(wa, wb);
+    return wr;
+  }
+  if (id == (import b_udiv)) {
+    wr = vm_b_udiv(wa, wb);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_umod)) {
+    wr = vm_b_umod(wa, wb);
+    return wr;
+  }
+  wr = vm_b_ult(wa, wb);
+} return word wr;
+(26, 7, 2, 0):(3)
+(27, 7, 3, 0):(1)
+(28, 9, 2, 0):(4)
+(30, 1, 4, 0):(16)
+(33, -1, 2, 0):(9223372036854775807)
+(34, 100, 7, 0):(2)
+(35, 1, -1, 0):(1)

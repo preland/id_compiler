@@ -1,0 +1,29 @@
+ld_adv(int n) {
+  int[] pr = (import ld_pr);
+  pr[(import pr_p)] = pr[(import pr_p)] + n;
+} return void;
+given tf_ld("abc") (2):() then ld_pos:(2)
+given tf_ld("abc") given ld_adv(1) (2):() then ld_pos:(3)
+
+// The bytes from a up to e as a string, built a byte at a time because
+// slicing through the flat store would move the program's own addresses.
+ld_str(int a, int e) {
+  string s = "";
+  while (a < e) {
+    s = s + chr(ld_bat(a));
+    a = a + 1;
+  }
+} return string s;
+given tf_ld("hello") (1, 4):("ell")
+given tf_ld("hello") (2, 2):("")
+
+// The same for part of a string.
+ld_sub(string src, int a, int e) {
+  string s = "";
+  while (a < e) {
+    s = s + chr(charat(src, a));
+    a = a + 1;
+  }
+} return string s;
+("hello", 1, 4):("ell")
+("abc", 0, 3):("abc")

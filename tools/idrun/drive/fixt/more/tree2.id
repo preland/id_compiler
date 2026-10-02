@@ -1,0 +1,32 @@
+// Remove the tree tf_tree made, files first; 0 when everything went.
+tf_rmtree() {
+  int bad = fs_remove((import tf_root) + "/conf.id") + fs_remove((import tf_root) + "/a.id");
+  bad = bad + fs_remove((import tf_root) + "/z/b.id") + fs_remove((import tf_root) + "/.hid/c.id");
+  bad = bad + fs_remove((import tf_root) + "/build/d.id") + fs_remove((import tf_root) + "/z");
+} chain () {
+  bad = bad + fs_remove((import tf_root) + "/.hid") + fs_remove((import tf_root) + "/build");
+  bad = bad + fs_remove((import tf_root));
+} return int bad;
+given tf_tree ():(0)
+given tf_tree ():(0) then tf_rmtree:(-9)
+
+// A directory to hold the scratch directories dr_tryd makes: tf_stm is a name
+// inside it, tf_d0 and tf_d1 the first two scratch names that stem gives.
+tf_stem() {
+  export string tf_base = fs_mktemp("idrun_s_", 1);
+  export string tf_stm = (import tf_base) + "/s-";
+  export string tf_d0 = (import tf_stm) + "0";
+} chain () {
+  export string tf_d1 = (import tf_stm) + "1";
+} return void;
+():() then tf_rmstem:(0)
+():() then tf_rmstem:(0) then tf_rmstem:(-1)
+
+// Take the scratch directories and their parent away; 0 when the parent went.
+tf_rmstem() {
+  int a = fs_remove((import tf_d0));
+  int b = fs_remove((import tf_d1));
+  int c = fs_remove((import tf_base));
+} return int c;
+given tf_stem ():(0)
+given tf_stem given tf_mk0 ():(0)

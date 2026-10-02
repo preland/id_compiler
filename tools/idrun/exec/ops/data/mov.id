@@ -1,0 +1,22 @@
+// Moves between slots, and a read of an exported variable. A load from an
+// alloca and a store to one both become a move: an alloca is a slot already.
+vm_mov(int fp, int d, int a) {
+  word[] vals = (import ex_vals);
+  vals[fp + d] = vals[fp + a];
+} return void;
+given vb_boot given tf_set(1, 7) (0, 3, 1):() then tf_v3:(7)
+given vb_boot given tf_set(2, 8) (1, 2, 1):() then tf_v3:(8)
+
+vm_movf(int fp, int d, int a) {
+  float[] fvals = (import ex_fvals);
+  fvals[fp + d] = fvals[fp + a];
+} return void;
+given vb_boot given tf_setf(1, 1.5) (0, 3, 1):() then tf_f3:(1.5)
+given vb_boot given tf_setf(2, 2.25) (1, 2, 1):() then tf_f3:(2.25)
+
+vm_gld(int fp, int d, int g) {
+  word[] vals = (import ex_vals);
+  vals[fp + d] = (import ex_gv)[g];
+} return void;
+given vb_boot given tf_gset(2, 31) (0, 3, 2):() then tf_v3:(31)
+given vb_boot given tf_gset(0, 5) (1, 2, 0):() then tf_v3:(5)

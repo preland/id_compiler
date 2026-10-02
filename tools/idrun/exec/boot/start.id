@@ -1,0 +1,26 @@
+vb_boot() {
+  vb_tables();
+  vb_pools();
+  vm_room((import stack_n));
+} chain () {
+  vb_nil();
+} return void;
+():() then tf_vlen:(4096) then tf_lists:([[]])
+():() then tf_llock:([0]) then tf_flen:(4096)
+
+// List 0 and string 0 stand for an exported variable whose declaring function
+// has not run, which is what a zero cell holds. A list operation on list 0 is
+// the trap the compiled runtime raises on a null list.
+vb_nil() {
+  word[] nil = [];
+  push((import ex_lists), nil);
+  push((import ex_llock), 0);
+} return void;
+given vb_pools ():() then tf_lists:([[]])
+given vb_pools ():() then tf_llock:([0])
+
+tf_s1() {
+  string s = (import ex_strs)[1];
+} return string s;
+given vb_boot given tf_sput("ab") ():("ab")
+given vb_boot given tf_sput("") given tf_sput("cd") ():("")

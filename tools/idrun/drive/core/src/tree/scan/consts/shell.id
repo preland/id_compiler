@@ -1,0 +1,10 @@
+// One byte as it goes inside single quotes: itself, except a quote, which
+// closes the quotes, is escaped, and reopens them.
+dr_qc(int c) {
+  string s = chr(c);
+  if (c == 39) {
+    s = "'\\''";
+  }
+} return string s;
+(39):("'\\''")
+(97):("a")

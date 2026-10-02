@@ -1,0 +1,53 @@
+// The executor's state, as exported lists made once before anything is read.
+// A list is a reference, so every function that imports one sees the others'
+// writes; that is the only shared mutable state `id` has, and it is all this
+// interpreter needs.
+//
+// ex_cd      the code: five cells per instruction (conf.id)
+// ex_rg      registers: frame pointer, halt flag, exit status
+// ex_cs      the call stack: three cells per frame (return pc, caller fp, dst)
+// ex_argp    argument slots of every call, back to back
+// ex_ft      the function table: ft_n cells per function id
+// ex_ks/kv/kf  the constant pool: slot, integer value, float value
+vb_tables() {
+  export int[] ex_cd = [];
+  export int[] ex_rg = [0, 0, 0];
+  export int[] ex_cs = [];
+} chain () {
+  export int[] ex_argp = [];
+  export int[] ex_ft = [];
+  export int[] ex_ks = [];
+} return void;
+():() then tf_rg:([0, 0, 0])
+():() then tf_cd:([])
+
+// ex_vals/ex_fvals  the value stack, an integer view and a float view of the
+//                   same slots; a slot holds whichever its instruction wrote
+// ex_strs     every string the program has made; a string value is an index
+// ex_lists    every list; a list value is an index, and ex_llock marks the
+//             constant ones
+// ex_fbox     floats that went into a list, which stores 64-bit cells
+// ex_gv/gf    the program's exported variables
+vb_pools() {
+  export word[] ex_kv = [];
+  export float[] ex_kf = [];
+  export word[] ex_vals = [];
+} chain () {
+  export float[] ex_fvals = [];
+  export string[] ex_strs = [""];
+  export word[][] ex_lists = [];
+} chain () {
+  export int[] ex_llock = [];
+  export float[] ex_fbox = [];
+  export word[] ex_gv = [];
+} chain () {
+  export float[] ex_gf = [];
+} return void;
+():() then tf_strs:([""])
+():() then tf_fbox:([])
+
+tf_fbox() {
+  float[] fb = (import ex_fbox);
+} return float[] fb;
+given vb_boot ():([])
+given vb_boot given tf_setf(1, 2.5) given vm_boxf(0, 3, 1) ():([2.5])

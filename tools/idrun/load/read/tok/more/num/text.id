@@ -1,0 +1,33 @@
+ld_isw(int c) {
+  int ok = 0;
+  if (c >= 97 && c <= 122 || c >= 65 && c <= 90 || c >= 48 && c <= 57 || c == 95 || c == 46) {
+    ok = 1;
+  }
+} return int ok;
+(97):(1)
+(90):(1)
+(55):(1)
+(95):(1)
+(46):(1)
+(32):(0)
+(37):(0)
+(-1):(0)
+
+// Move the cursor to the next byte equal to ch, or to the end.
+ld_to(int ch) {
+  int c = ld_at();
+  while (c != ch && c >= 0) {
+    ld_adv(1);
+    c = ld_at();
+  }
+} return void;
+given tf_ld("abc;def") (59):() then ld_pos:(3)
+given tf_ld("abc;def") (120):() then ld_pos:(7)
+
+// Past the end of this line.
+ld_eol() {
+  ld_to(10);
+  ld_adv(1);
+} return void;
+given tf_ld("ab\ncd") ():() then ld_pos:(3)
+given tf_ld("abcd") ():() then ld_pos:(5)

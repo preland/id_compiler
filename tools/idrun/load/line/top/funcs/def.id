@@ -1,0 +1,37 @@
+// `define` starts a function; `declare` (the runtime helpers) is skipped.
+ld_def() {
+  if (ld_bat(ld_pos() + 2) == 102) {
+    ld_define();
+  }
+} return void;
+given tf_ld("define i32 @id_f(i32 %v1) {") ():() then tf_fnames:(["id_f"])
+given tf_ld("declare i32 @id_x(i32)") ():() then tf_fnames:([])
+
+// define [internal] RT @name(T %v, ...) {
+ld_define() {
+  ld_word();
+  string w = ld_word();
+  if (w == "internal") {
+    w = ld_word();
+  }
+} chain () {
+  ld_skip();
+  ld_adv(1);
+  string nm = ld_word();
+} chain () {
+  ld_begin(nm);
+} return void;
+given tf_ld("define i32 @id_f(i32 %v1) {") ():() then tf_ft:([0, 1, 0, 0, 0]) then tf_fnames:(["id_f"])
+given tf_ld("define internal void @id_g() {") ():() then tf_ft:([0, 0, 0, 0, 0]) then tf_fnames:(["id_g"])
+
+// The parameters take the first slots, in order, because each is the first
+// mention of its name.
+ld_params() {
+  ld_skip();
+  ld_adv(1);
+  int np = ld_plist();
+} chain () {
+  ld_ftset((import ld_pr)[(import pr_fid)], (import ft_np), np);
+} return void;
+given tf_ld("(i32 %v1, i32 %v2)") given tf_get("f", "id_f") ():() then tf_ft:([-1, 2, 0, 0, 0]) then tf_vs:([-1, 0, 1])
+given tf_ld("(i32 %v1)") given tf_get("f", "id_f") ():() then tf_ft:([-1, 1, 0, 0, 0])

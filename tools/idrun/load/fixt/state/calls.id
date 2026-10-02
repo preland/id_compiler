@@ -1,0 +1,7 @@
+// Void wrappers over the parsers that answer a value, so a case can run one as
+// a setup: the next global.
+tf_gr() {
+  int g = ld_gref();
+} return void;
+given tf_ld("@x") ():() then tf_gv:([0])
+given tf_ld("@x @y") given tf_gr ():() then tf_gv:([0, 0])

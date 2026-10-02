@@ -1,0 +1,36 @@
+// idrun [--allow-untested] [--ll] PATH [ARGS...]
+//
+// Runs an `id` program without a C compiler. PATH is a .id file or a project
+// directory; the compiler's own idlex and idparse turn it into the -O0 IR
+// (idparse --target llvm --opt 0), and this program loads that IR and runs it,
+// passing PATH and ARGS to main as argv. With --ll, PATH is IR text already.
+// --allow-untested drops the two-cases-per-function requirement, as it does for
+// idc; every other rule is idparse's and applies as it does there.
+//
+// idlex and idparse are found in $IDC_CACHE_DIR, or in ../.idc-cache beside
+// this program's own directory (so idrun installed in idc/bin works as it is).
+main(int argc, string[] argv) {
+  int code = dr_main(argc, argv);
+} return int code;
+(1, ["idrun"]):(2) then eprints:("usage: idrun [--allow-untested] [--ll] PATH [ARGS...]  (PATH is an .id file or project directory; with --ll, IR text from idparse --target llvm --opt 0)\n")
+given tf_file("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 %v1\n}\n") (5, ["idrun", "--ll", (import tf_path), "x", "y"]):(3) then tf_rm:(0)
+
+dr_main(int argc, string[] argv) {
+  int[] fl = [0, 0];
+  int at = dr_flags(argv, fl);
+  int code = 2;
+} chain (int argc, string[] argv) {
+  if (at >= argc) {
+    dr_usage();
+  } else {
+    code = dr_go(argv, at, fl);
+  }
+} return int code;
+(2, ["idrun", "--ll"]):(2) then eprints:("usage: idrun [--allow-untested] [--ll] PATH [ARGS...]  (PATH is an .id file or project directory; with --ll, IR text from idparse --target llvm --opt 0)\n")
+given tf_file("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") (3, ["idrun", "--ll", (import tf_path)]):(7) then tf_rm:(0)
+
+dr_usage() {
+  eprint("usage: idrun [--allow-untested] [--ll] PATH [ARGS...]  (PATH is an .id file or project directory; with --ll, IR text from idparse --target llvm --opt 0)");
+} return void;
+():() then eprints:("usage: idrun [--allow-untested] [--ll] PATH [ARGS...]  (PATH is an .id file or project directory; with --ll, IR text from idparse --target llvm --opt 0)\n")
+():() then prints:("usage: idrun [--allow-untested] [--ll] PATH [ARGS...]  (PATH is an .id file or project directory; with --ll, IR text from idparse --target llvm --opt 0)\n")

@@ -1,0 +1,21 @@
+// Bytes a case hands a function by name: tf_by is the text as byte cells.
+tf_bset(string text) {
+  export int[] tf_by = tf_bytes(text);
+} return void;
+("ab"):() then tf_bl:(2)
+(""):() then tf_bl:(0)
+
+tf_bl() {
+  int n = len((import tf_by));
+} return int n;
+given tf_bset("abc") ():(3)
+given tf_bset("") ():(0)
+
+// A program loaded from IR text, ready to run.
+tf_irload(string text) {
+  lb_boot();
+  vb_boot();
+  ld_all(tf_bytes(text));
+} return void;
+("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n"):() then tf_fnames:(["id_main"])
+(""):() then tf_fnames:([])

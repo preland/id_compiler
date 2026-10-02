@@ -1,0 +1,13 @@
+// A wall clock has no literal to compare against, so a case stamps ticks()
+// just before the call under test, and expects the same millisecond back.
+tf_clock() {
+  export int tf_t0 = ticks();
+} return void;
+():() then tf_clock_ok:(1)
+():() then tf_clock_ok:(1) then prints:("")
+
+tf_clock_ok() {
+  int ok = ticks() >= (import tf_t0);
+} return int ok;
+given tf_clock ():(1)
+given tf_clock ():(1) then prints:("")

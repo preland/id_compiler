@@ -1,0 +1,18 @@
+// The shell commands that print the stream idlex reads: each source file after
+// a `#file UNIT|PATH` marker (bin/idc's emit_sources writes the same), and a
+// project's constants first. One unit, since idrun reads one tree and no
+// standard library.
+dr_prep(string path) {
+  string frag = dr_one(path);
+  if (fs_is_dir(path) == 1) {
+    frag = dr_consts(path) + dr_walk(path, 1);
+  }
+} return string frag;
+("/x/a.id"):("printf '#file 0|%s\\n' '/x/a.id'; cat '/x/a.id'; echo; ")
+given tf_tree given tf_want ((import tf_root)):((import tf_wwp)) then tf_rmtree:(0)
+
+dr_one(string path) {
+  string frag = "printf '#file 0|%s\\n' " + dr_q(path) + "; cat " + dr_q(path) + "; echo; ";
+} return string frag;
+("/x/a.id"):("printf '#file 0|%s\\n' '/x/a.id'; cat '/x/a.id'; echo; ")
+("it's.id"):("printf '#file 0|%s\\n' 'it'\\''s.id'; cat 'it'\\''s.id'; echo; ")

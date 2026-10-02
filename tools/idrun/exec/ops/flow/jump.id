@@ -1,0 +1,31 @@
+// A conditional branch: the true target when the condition slot is non-zero.
+vm_cbr(int fp, int a, int tt, int ff) {
+  word wc = (import ex_vals)[fp + a];
+  int r = ff;
+  if (wc != 0) {
+    r = tt;
+  }
+} return int r;
+given vb_boot given tf_set(1, 1) (0, 1, 10, 20):(10)
+given vb_boot given tf_set(1, 1) given tf_set(2, 0) (1, 1, 10, 20):(20)
+
+// Return to the caller, or end the program when there is none. A frame is
+// three cells of ex_cs; with none left, the returning function is main.
+vm_ret(int fp, int a) {
+  int rpc = 0 - 1;
+  if (len((import ex_cs)) > 0) {
+    rpc = vm_pop(fp, a);
+  } else {
+    vm_halt(fp, a);
+  }
+} return int rpc;
+given vb_boot given tf_set(6, 99) given vm_frame(15, 0, 3, 5) (5, 1):(15) then tf_v3:(99) then tf_rg:([0, 0, 0])
+given vb_boot given tf_set(1, 42) (0, 1):(-1) then tf_rg:([0, 1, 42])
+
+vm_halt(int fp, int a) {
+  int[] rg = (import ex_rg);
+  rg[(import r_status)] = (import ex_vals)[fp + a];
+  rg[(import r_halt)] = 1;
+} return void;
+given vb_boot given tf_set(1, 7) (0, 1):() then tf_rg:([0, 1, 7])
+given vb_boot given tf_set(2, 9) (1, 1):() then tf_rg:([0, 1, 9])

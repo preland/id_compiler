@@ -1,0 +1,24 @@
+tf_olr() {
+  string[] ol = (import tf_out);
+} return string[] ol;
+given tf_ol ():([])
+given tf_ol given tf_olp("x") ():(["x"])
+
+tf_olp(string s) {
+  push((import tf_out), s);
+} return void;
+given tf_ol ("a"):() then tf_olr:(["a"])
+given tf_ol given tf_olp("a") ("b"):() then tf_olr:(["a", "b"])
+
+// A directory in the shape dr_clean removes: with its three files when full is
+// 1, and empty otherwise.
+tf_cdir(int full) {
+  export string tf_cdp = fs_mktemp("idrun_c_", 1);
+  if (full == 1) {
+    tf_put((import tf_cdp) + "/src", "s");
+    tf_put((import tf_cdp) + "/lex", "l");
+    tf_put((import tf_cdp) + "/ll", "i");
+  }
+} return void;
+(1):() then tf_gone:(0) then tf_rmcd:(0)
+(0):() then tf_gone:(0) then tf_rmcd:(-3)

@@ -1,0 +1,31 @@
+// Make the value stack at least n slots long, in both of its views. A frame
+// is a window of it, so a call that would reach past the end asks for room
+// first (ops/flow/call.id).
+vm_room(int n) {
+  word[] vals = (import ex_vals);
+  float[] fvals = (import ex_fvals);
+  while (len(vals) < n) {
+    push(vals, 0);
+    push(fvals, 0.0);
+  }
+} return void;
+given vb_boot (5000):() then tf_vlen:(5000) then tf_flen:(5000)
+given vb_boot (10):() then tf_vlen:(4096) then tf_flen:(4096)
+
+// A trap of this interpreter's own: the same line the compiled program's
+// runtime writes, then the run stops with status 1.
+vm_trap(string msg) {
+  int[] rg = (import ex_rg);
+  eprint("id: " + msg);
+  rg[(import r_halt)] = 1;
+} chain (string msg) {
+  rg[(import r_status)] = 1;
+} return void;
+given vb_boot ("boom"):() then eprints:("id: boom\n") then tf_rg:([0, 1, 1])
+given vb_boot ("x y"):() then eprints:("id: x y\n") then tf_rg:([0, 1, 1])
+
+tf_gf2() {
+  float f = (import ex_gf)[2];
+} return float f;
+given vb_boot given tf_gsetf(2, 7.5) ():(7.5)
+given vb_boot given tf_gsetf(3, 7.5) ():(0.0)

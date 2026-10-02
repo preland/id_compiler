@@ -1,0 +1,37 @@
+// The bytes a..e of a list as a string, built with chr: reading text into the
+// flat store would move the addresses the program being run sees.
+dr_str(int[] buf, int a, int e) {
+  string s = "";
+  while (a < e) {
+    s = s + chr(buf[a]);
+    a = a + 1;
+  }
+} return string s;
+([104, 105, 106], 0, 3):("hij")
+([104, 105, 106], 1, 2):("i")
+
+// A whole file as byte cells; empty when it cannot be read.
+dr_bytes(string path) {
+  int[] by = [];
+  int n = fs_size(path);
+  if (n > 0) {
+    dr_fill(by, path, n);
+  }
+} return int[] by;
+given tf_file("ab") ((import tf_path)):([97, 98]) then tf_rm:(0)
+given tf_file("") ((import tf_path)):([]) then tf_rm:(0)
+("/nonexistent/idrun-bytes"):([])
+
+dr_fill(int[] by, string path, int n) {
+  lst_fill(by, n, 0);
+  int h = fs_open(path, "r");
+  int got = fs_read(h, by, n);
+} chain (int[] by, string path, int n) {
+  int shut = fs_close(h);
+  while (len(by) > got) {
+    pop(by);
+  }
+} return void;
+given tf_file("abc") ([], (import tf_path), 3):([97, 98, 99], (import tf_path), 3) then tf_rm:(0)
+given tf_file("abc") ([], (import tf_path), 2):([97, 98], (import tf_path), 2) then tf_rm:(0)
+given tf_file("abc") ([], (import tf_path), 5):([97, 98, 99], (import tf_path), 5) then tf_rm:(0)

@@ -1,0 +1,35 @@
+// Take the frame the callee returns to off the call stack, give the caller
+// the value (both views of the slot: the callee's type is not known here),
+// and make the caller's frame current again.
+vm_pop(int fp, int a) {
+  int[] cs = (import ex_cs);
+  int d = pop(cs);
+  int cfp = pop(cs);
+} chain (int fp, int a) {
+  int rpc = pop(cs);
+  if (d >= 0) {
+    vm_give(fp, cfp + d, a);
+  }
+  vm_back(cfp);
+} return int rpc;
+given vb_boot given tf_set(6, 99) given vm_frame(15, 0, 3, 5) (5, 1):(15) then tf_v3:(99) then tf_rg:([0, 0, 0]) then tf_cs:([])
+given vb_boot given tf_set(6, 99) given vm_frame(20, 1, -1, 5) (5, 1):(20) then tf_v3:(0) then tf_rg:([1, 0, 0])
+given vb_boot given tf_set(6, 99) given vm_frame(15, 1, 2, 5) (5, 1):(15) then tf_v3:(99) then tf_rg:([1, 0, 0])
+
+vm_give(int fp, int to, int a) {
+  word[] vals = (import ex_vals);
+  float[] fvals = (import ex_fvals);
+  vals[to] = vals[fp + a];
+} chain (int fp, int to, int a) {
+  fvals[to] = fvals[fp + a];
+} return void;
+given vb_boot given tf_set(1, 5) given tf_setf(1, 2.5) (0, 3, 1):() then tf_v3:(5) then tf_f3:(2.5)
+given vb_boot given tf_set(2, 6) given tf_setf(2, 0.5) (1, 3, 1):() then tf_v3:(6) then tf_f3:(0.5)
+
+// Make a frame current.
+vm_back(int nfp) {
+  int[] rg = (import ex_rg);
+  rg[(import r_fp)] = nfp;
+} return void;
+given vb_boot (7):() then tf_rg:([7, 0, 0])
+given vb_boot (12):() then tf_rg:([12, 0, 0])

@@ -1,0 +1,38 @@
+// A project's constants come from its conf.id, one declaration per line, and
+// reach the compiler ahead of the sources as a `#const` marker and the line.
+dr_consts(string dir) {
+  string path = dir + "/conf.id";
+  string frag = "";
+  if (fs_exists(path) == 1) {
+    frag = dr_conf(dr_bytes(path));
+  }
+} return string frag;
+given tf_tree ((import tf_root)):("printf '#const\\n%s\\n' 'int k = 3;'; ") then tf_rmtree:(0)
+("/nonexistent/idrun-consts"):("")
+
+dr_conf(int[] buf) {
+  string[] ls = dr_lines(buf);
+  string frag = "";
+  int i = 0;
+} chain (int[] buf) {
+  while (i < len(ls)) {
+    frag = frag + dr_cline(ls[i]);
+    i = i + 1;
+  }
+} return string frag;
+given tf_bset("int a = 1;\nx\nstring s = \"q\";\n") ((import tf_by)):("printf '#const\\n%s\\n' 'int a = 1;'; printf '#const\\n%s\\n' 'string s = \"q\";'; ")
+([]):("")
+
+// An import is not read, and says so: a tree that needs one is not a tree
+// idrun can run yet.
+dr_cline(string line) {
+  string frag = "";
+  if (dr_isconst(line) == 1) {
+    frag = "printf '#const\\n%s\\n' " + dr_q(line) + "; ";
+  } else if (str_starts(line, "import") == 1) {
+    eprint("idrun: conf.id imports are not supported yet: " + line);
+  }
+} return string frag;
+("int a = 1;"):("printf '#const\\n%s\\n' 'int a = 1;'; ")
+("// c"):("")
+("import \"x\""):("") then eprints:("idrun: conf.id imports are not supported yet: import \"x\"\n")

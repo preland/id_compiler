@@ -1,0 +1,35 @@
+// add sub mul and or xor: the 32-bit form for an i32, the 64-bit one otherwise.
+ld_bin(int code, int d) {
+  int ty = ld_ty();
+  int a = ld_val(ty);
+  int b = ld_val(ty);
+} chain (int code, int d) {
+  ld_emit(ld_binop(code, ty), d, a, b, 0);
+} return void;
+given tf_ld("i32 %v1, %v2") (3, 8):() then tf_cd:([1, 8, 0, 1, 0])
+given tf_ld("i64 %v1, 5") (4, 8):() then tf_cd:([14, 8, 0, 1, 0]) then tf_kv:([5])
+
+ld_binop(int code, int ty) {
+  int k = code - (import p_add);
+  int op = (import bin64)[k];
+  if (ty == (import t_i32)) {
+    op = (import bin32)[k];
+  }
+} return int op;
+(3, 2):(1)
+(3, 3):(13)
+(4, 2):(9)
+(5, 2):(12)
+(6, 2):(16)
+(7, 3):(17)
+(8, 3):(18)
+
+// fadd fsub fmul fdiv are consecutive in both numberings.
+ld_fbin(int code, int d) {
+  int ty = ld_ty();
+  int fa = ld_val(ty);
+  ld_emit((import o_fadd) + code - (import p_fadd), d, fa, ld_val(ty), 0);
+} return void;
+given tf_ld("double %v1, %v2") (9, 4):() then tf_cd:([21, 4, 0, 1, 0])
+given tf_ld("double %v1, 2.5") (12, 4):() then tf_cd:([24, 4, 0, 1, 0]) then tf_kf:([2.5])
+given tf_ld("double %v1, %v2") given tf_ns (9, 4):() then tf_cd:([21, 4, 1, 2, 0])

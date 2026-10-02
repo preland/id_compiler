@@ -1,0 +1,63 @@
+// A string to the flat store and back, and the chain that picks among all ten
+// string helpers by id. Concatenation and the number conversions come first,
+// since a program builds text far more often than it measures it.
+vm_b_str_of_mem(word wa, word wb) {
+  int h = vm_sput(str_of_mem(wa, wb));
+} return int h;
+given vb_boot given tf_mem("hey") ((import tf_sa), 3):(1) then tf_strs:(["", "hey"])
+given vb_boot given tf_mem("hey") ((import tf_sa), 2):(1) then tf_strs:(["", "he"])
+
+vm_b_mem_of_str(word wa) {
+  int ia = wa;
+  word wr = mem_of_str((import ex_strs)[ia]);
+} return word wr;
+given vb_boot given tf_sput("hey") (1):(8)
+given vb_boot given tf_sput("hey") given tf_mem("zz") (1):(16)
+
+vm_bs(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_concat)) {
+    wr = vm_b_concat(wa, wb);
+    return wr;
+  }
+  if (id == (import b_str_of_int)) {
+    wr = vm_b_str_of_int(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_charat)) {
+    wr = vm_b_charat(wa, wb);
+    return wr;
+  }
+  if (id == (import b_len)) {
+    wr = vm_b_len(wa);
+    return wr;
+  }
+  if (id == (import b_str_of_word)) {
+    wr = vm_b_str_of_word(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_chr)) {
+    wr = vm_b_chr(wa);
+    return wr;
+  }
+  if (id == (import b_strcmp)) {
+    wr = vm_b_strcmp(wa, wb);
+    return wr;
+  }
+  if (id == (import b_to_int)) {
+    wr = vm_b_to_int(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_str_of_mem)) {
+    wr = vm_b_str_of_mem(wa, wb);
+    return wr;
+  }
+  wr = vm_b_mem_of_str(wa);
+} return word wr;
+given vb_boot given tf_sput("ab") given tf_sput("cd") (0, 1, 2, 0):(3) then tf_strs:(["", "ab", "cd", "abcd"])
+given vb_boot given tf_sput("hey") (9, 1, 0, 0):(8)
+given vb_boot given tf_sput("hello") (3, 1, 0, 0):(5)
+given vb_boot given tf_sput("a") given tf_sput("b") (6, 1, 2, 0):(-1)

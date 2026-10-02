@@ -1,0 +1,21 @@
+// Printing takes a string handle.
+vm_b_print(word wa) {
+  int ia = wa;
+  print((import ex_strs)[ia]);
+} return void;
+given vb_boot given tf_sput("hello") (1):() then prints:("hello\n")
+given vb_boot given tf_sput("a") given tf_sput("b") (2):() then prints:("b\n")
+
+vm_b_eprint(word wa) {
+  int ia = wa;
+  eprint((import ex_strs)[ia]);
+} return void;
+given vb_boot given tf_sput("warn") (1):() then eprints:("warn\n")
+given vb_boot given tf_sput("a") given tf_sput("b") (2):() then eprints:("b\n")
+
+vm_b_put(word wa) {
+  int ia = wa;
+  put((import ex_strs)[ia]);
+} return void;
+given vb_boot given tf_sput("hi") (1):() then prints:("hi")
+given vb_boot given tf_sput("") (1):() then prints:("")

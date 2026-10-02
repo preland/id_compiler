@@ -1,0 +1,38 @@
+// Run idlex and idparse over PATH, leaving the IR in dir/ll. Answers the shell's
+// status for the line: 0 when both stages succeeded (each prints its own
+// diagnostics when one does not), and 1 for a path that is not there.
+dr_compile(string path, string tool, string dir, int untested) {
+  int rc = 1;
+  if (fs_exists(path) == 1) {
+    rc = fs_run(dr_cmd(path, tool, dir, untested));
+  } else {
+    eprint("idrun: no such file or directory: " + path);
+  }
+} return int rc;
+given tf_file("main(int argc, string[] argv) {\n  int r = argc;\n} return int r;\n") given tf_cdir(1) ((import tf_path), "../../.idc-cache", (import tf_cdp), 1):(0) then tf_ll:(1) then tf_rmcd:(0) then tf_rm:(0)
+("/nonexistent/idrun-compile", "/t", "/d", 1):(1) then eprints:("idrun: no such file or directory: /nonexistent/idrun-compile\n")
+
+// The shell line. The sources are assembled by the shell (cat) rather than read
+// into this program, which keeps them out of its memory and out of the flat
+// store. The lexer's output goes through a file so that a failing lexer stops
+// the line, which a pipe would not.
+dr_cmd(string path, string tool, string dir, int untested) {
+  string prep = "{ " + dr_prep(path) + "} > " + dr_q(dir + "/src");
+  string lex = dr_q(tool + "/idlex") + " < " + dr_q(dir + "/src") + " > " + dr_q(dir + "/lex");
+  string flags = " --triple " + (import host_triple) + dr_gate(untested) + " --host-triple " + (import host_triple) + " --target llvm --opt 0";
+} chain (string path, string tool, string dir, int untested) {
+  string parse = dr_q(tool + "/idparse") + flags + " < " + dr_q(dir + "/lex") + " > " + dr_q(dir + "/ll");
+  string cmd = prep + " && " + lex + " && " + parse;
+} return string cmd;
+("/a.id", "/t", "/d", 1):("{ printf '#file 0|%s\\n' '/a.id'; cat '/a.id'; echo; } > '/d/src' && '/t/idlex' < '/d/src' > '/d/lex' && '/t/idparse' --triple x86_64-unknown-linux-gnu --host-triple x86_64-unknown-linux-gnu --target llvm --opt 0 < '/d/lex' > '/d/ll'")
+("/a.id", "/t", "/d", 0):("{ printf '#file 0|%s\\n' '/a.id'; cat '/a.id'; echo; } > '/d/src' && '/t/idlex' < '/d/src' > '/d/lex' && '/t/idparse' --triple x86_64-unknown-linux-gnu --require-tests --host-triple x86_64-unknown-linux-gnu --target llvm --opt 0 < '/d/lex' > '/d/ll'")
+
+// Two cases per function are required unless --allow-untested said not to.
+dr_gate(int untested) {
+  string gate = " --require-tests";
+  if (untested == 1) {
+    gate = "";
+  }
+} return string gate;
+(0):(" --require-tests")
+(1):("")

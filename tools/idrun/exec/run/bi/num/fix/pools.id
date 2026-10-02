@@ -1,0 +1,19 @@
+// More state read back: the code, the lists and their lock flags, the call
+// stack, and the length of the value stack.
+tf_cd() {
+  int[] cd = (import ex_cd);
+} return int[] cd;
+given vb_boot ():([])
+given vb_boot given ld_emit(1, 2, 3, 4, 5) ():([1, 2, 3, 4, 5])
+
+tf_lists() {
+  word[][] lt = (import ex_lists);
+} return word[][] lt;
+given vb_boot ():([[]])
+given vb_boot given tf_lnew ():([[], []])
+
+tf_llock() {
+  int[] lk = (import ex_llock);
+} return int[] lk;
+given vb_boot ():([0])
+given vb_boot given tf_lnew given vm_b_list_lock(1) ():([0, 1])

@@ -1,0 +1,18 @@
+// Reading makes a new string and answers its handle.
+vm_b_input() {
+  int h = vm_sput(input());
+} return int h;
+given vb_boot stdin "line1\nline2\n" ():(1) then tf_strs:(["", "line1"])
+given vb_boot stdin "" ():(1) then tf_strs:(["", ""])
+
+vm_b_read_all() {
+  int h = vm_sput(read_all());
+} return int h;
+given vb_boot stdin "ab\ncd" ():(1) then tf_strs:(["", "ab\ncd"])
+given vb_boot stdin "" ():(1) then tf_strs:(["", ""])
+
+vm_b_getkey() {
+  int k = getkey();
+} return int k;
+given vb_boot ():(-1)
+given vb_boot stdin "x" ():(120)

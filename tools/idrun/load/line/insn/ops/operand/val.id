@@ -1,0 +1,46 @@
+// An operand of type ty at the cursor, as a slot: a %name is its slot, and a
+// literal or a @name is a constant given a slot of its own.
+ld_val(int ty) {
+  ld_skip();
+  int c = ld_at();
+  int sl = ld_arg(c, ty);
+} return int sl;
+given tf_ld("%v4") (2):(0)
+given tf_ld(" 7") (2):(0) then tf_kv:([7]) then tf_ks:([0])
+given tf_ld("2.5") (5):(0) then tf_kf:([2.5])
+given tf_ld("@.str3") (4):(0) then tf_kv:([1]) then tf_strs:(["", ""])
+
+ld_arg(int c, int ty) {
+  int sl = 0;
+  if (c == 37) {
+    sl = ld_var();
+    return sl;
+  }
+  if (c == 64) {
+    sl = ld_cref();
+    return sl;
+  }
+} chain (int c, int ty) {
+  if (ty == (import t_dbl)) {
+    sl = ld_kfloat(ld_fnum());
+    return sl;
+  }
+  word wv = ld_const();
+  sl = ld_kword(wv);
+} return int sl;
+given tf_ld("%v4") (37, 2):(0)
+given tf_ld("@id_f") (64, 4):(0) then tf_kv:([0]) then tf_fnames:(["id_f"])
+given tf_ld("1.5") (49, 5):(0) then tf_kf:([1.5])
+given tf_ld("12") (49, 2):(0) then tf_kv:([12])
+
+// An integer literal, or null (which is zero).
+ld_const() {
+  word wv = 0;
+  if (ld_at() == 110) {
+    ld_word();
+  } else {
+    wv = ld_num();
+  }
+} return word wv;
+given tf_ld("null") ():(0) then ld_pos:(4)
+given tf_ld("-7") ():(-7)

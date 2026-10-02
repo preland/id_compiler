@@ -1,0 +1,42 @@
+// What a new name is: "f" a function-table row, "g" a global, "s" a string,
+// anything else a slot in the current frame.
+ld_make(string kind, string name) {
+  int id = 0;
+  if (kind == "f") {
+    id = ld_newfn();
+    push((import ld_fn), name);
+    return id;
+  }
+  if (kind == "g") {
+    id = ld_newg();
+    return id;
+  }
+} chain (string kind, string name) {
+  if (kind == "s") {
+    id = vm_sput("");
+    return id;
+  }
+  id = ld_newslot();
+} return int id;
+given lb_boot given vb_boot ("f", "id_a"):(0) then tf_fnames:(["id_a"]) then tf_ft:([-1, 0, 0, 0, 0])
+given lb_boot given vb_boot given tf_get("f", "id_a") ("f", "id_b"):(1) then tf_fnames:(["id_a", "id_b"])
+given lb_boot given vb_boot ("g", "x"):(0) then tf_gv:([0])
+given lb_boot given vb_boot ("s", ".a"):(1) then tf_strs:(["", ""])
+given lb_boot given vb_boot ("l", "c"):(0) then tf_pr:([0, 1, 0, 0, 0, 0, 0, 0])
+
+ld_newslot() {
+  int[] pr = (import ld_pr);
+  int sl = pr[(import pr_nslot)];
+  pr[(import pr_nslot)] = sl + 1;
+} return int sl;
+given lb_boot ():(0) then tf_pr:([0, 1, 0, 0, 0, 0, 0, 0])
+given lb_boot given tf_ns ():(1) then tf_pr:([0, 2, 0, 0, 0, 0, 0, 0])
+
+// A global starts as zero in both views.
+ld_newg() {
+  push((import ex_gv), 0);
+  push((import ex_gf), 0.0);
+  int g = len((import ex_gv)) - 1;
+} return int g;
+given vb_boot ():(0) then tf_gv:([0]) then tf_gf:([0.0])
+given vb_boot given tf_ng ():(1) then tf_gv:([0, 0]) then tf_gf:([0.0, 0.0])

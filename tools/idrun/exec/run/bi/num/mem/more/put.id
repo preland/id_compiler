@@ -1,0 +1,17 @@
+vm_b_poke8(word wa, word wb) {
+  poke8(wa, wb);
+} return void;
+given tf_mem8(-1) ((import tf_addr), 0):() then tf_pk:(-256)
+given tf_mem8(0) ((import tf_addr), 513):() then tf_pk:(1)
+
+vm_b_poke16(word wa, word wb) {
+  poke16(wa, wb);
+} return void;
+given tf_mem8(-1) ((import tf_addr), 0):() then tf_pk:(-65536)
+given tf_mem8(0) ((import tf_addr), 65537):() then tf_pk:(1)
+
+vm_b_poke32(word wa, word wb) {
+  poke32(wa, wb);
+} return void;
+given tf_mem8(-1) ((import tf_addr), 0):() then tf_pk:(-4294967296)
+given tf_mem8(0) ((import tf_addr), 4294967299):() then tf_pk:(3)

@@ -1,0 +1,16 @@
+
+// Compile into a scratch directory named from stem, run what came out, remove
+// the directory.
+dr_src(string[] argv, int at, int[] fl, string stem) {
+  string tool = dr_tools(argv[0]);
+  string dir = dr_tryd(stem, 0);
+  int rc = dr_compile(argv[at], tool, dir, fl[1]);
+} chain (string[] argv, int at, int[] fl, string stem) {
+  int code = 1;
+  if (rc == 0) {
+    code = dr_exec(dr_bytes(dir + "/ll"), lst_str_tail(argv, at));
+  }
+  dr_clean(dir);
+} return int code;
+given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem given tf_file("main(int argc, string[] argv) {\n  print(\"x\");\n} return int 3;\n") (["idrun", (import tf_path)], 1, [0, 1], (import tf_stm)):(3) then prints:("x\n") then tf_nod0:(1) then tf_rmstem:(0) then tf_rm:(0)
+given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem (["idrun", "/nonexistent/idrun-src"], 1, [0, 1], (import tf_stm)):(1) then eprints:("idrun: no such file or directory: /nonexistent/idrun-src\n") then tf_nod0:(1) then tf_rmstem:(0)

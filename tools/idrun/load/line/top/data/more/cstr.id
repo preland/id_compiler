@@ -1,0 +1,39 @@
+// The bytes of a c"..." constant. The printer writes every byte as \XX, three
+// characters, so the count is the quoted length over three. The last byte is
+// the NUL a C string ends in, which a string value here does not carry.
+ld_cstr() {
+  ld_to(34);
+  ld_adv(1);
+  int q0 = ld_pos();
+} chain () {
+  ld_to(34);
+  int n = (ld_pos() - q0) / 3;
+  string cv = ld_cbuild(q0, n - 1);
+} return string cv;
+given tf_ld("c\"\\68\\69\\00\"") ():("hi") then ld_pos:(11)
+given tf_ld("c\"\\00\"") ():("") then ld_pos:(5)
+
+// n bytes of escapes from q0 as a string: chunks of 64 built byte by byte and
+// joined, which keeps a long constant from being copied once per byte.
+ld_cbuild(int q0, int n) {
+  string cv = "";
+  int i = 0;
+  while (i < n) {
+    cv = cv + ld_chunk(q0, i, n);
+    i = i + 64;
+  }
+} return string cv;
+given tf_ld("\\68\\69\\6A") (0, 3):("hij")
+given tf_ld("\\68\\69\\6A") (0, 0):("")
+
+ld_chunk(int q0, int i, int n) {
+  string pe = "";
+  int e = i + 64;
+  while (i < e && i < n) {
+    pe = pe + chr(ld_byte(q0, i));
+    i = i + 1;
+  }
+} return string pe;
+given tf_ld("\\68\\69\\6A") (0, 0, 3):("hij")
+given tf_ld("\\68\\69\\6A") (0, 1, 3):("ij")
+given tf_ld("\\68\\69\\6A") (0, 0, 2):("hi")

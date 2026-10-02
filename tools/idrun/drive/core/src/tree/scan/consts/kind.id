@@ -1,0 +1,40 @@
+// Is this conf.id line a constant declaration: a type, a name, and an `=`.
+dr_isconst(string line) {
+  string tn = ld_sub(line, 0, str_find(line, " "));
+  int ok = tn == "int" || tn == "int[]" || tn == "word" || tn == "word[]" || tn == "float" || tn == "float[]" || tn == "string" || tn == "string[]";
+} return int ok;
+("int a = 1;"):(1)
+("string[] n = [\"a\"];"):(1)
+("float f = 1.5;"):(1)
+("// int a"):(0)
+("import \"x\""):(0)
+(""):(0)
+
+// The newline-separated lines of a byte list.
+dr_lines(int[] buf) {
+  string[] out = [];
+  int a = 0;
+  int i = 0;
+} chain (int[] buf) {
+  while (i < len(buf)) {
+    a = dr_cut(buf, out, a, i);
+    i = i + 1;
+  }
+  string last = dr_str(buf, a, len(buf));
+  push(out, last);
+} return string[] out;
+([104, 105, 10, 106]):(["hi", "j"])
+([]):([""])
+([10]):(["", ""])
+
+// At a newline, the line that ends there joins out and the next starts after
+// it; anywhere else the line carries on.
+dr_cut(int[] buf, string[] out, int a, int i) {
+  if (buf[i] == 10) {
+    string line = dr_str(buf, a, i);
+    push(out, line);
+    a = i + 1;
+  }
+} return int a;
+given tf_ol ([104, 10, 105], (import tf_out), 0, 1):(2) then tf_olr:(["h"])
+given tf_ol ([104, 10, 105], (import tf_out), 0, 0):(0) then tf_olr:([])

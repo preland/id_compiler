@@ -1,0 +1,21 @@
+// Eight bytes in the flat store holding v, their address exported as tf_addr,
+// and the first of them read back as a word or a byte.
+tf_mem8(word wv) {
+  word ad = alloc(8);
+  poke64(ad, wv);
+  export word tf_addr = ad;
+} return void;
+(578437695752307201):() then tf_pk:(578437695752307201)
+(-2):() then tf_pk:(-2)
+
+tf_pk() {
+  word wv = peek64((import tf_addr));
+} return word wv;
+given tf_mem8(5) ():(5)
+given tf_mem8(-7) ():(-7)
+
+tf_peek() {
+  word wv = peek8((import tf_sa));
+} return word wv;
+given vb_boot given tf_mem("A") ():(65)
+given vb_boot given tf_mem("") ():(0)

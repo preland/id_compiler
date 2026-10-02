@@ -1,0 +1,32 @@
+// Load the IR text and run it. A loader diagnostic means nothing runs.
+dr_exec(int[] bytes, string[] pargs) {
+  lb_boot();
+  vb_boot();
+  ld_all(bytes);
+} chain (int[] bytes, string[] pargs) {
+  int code = 2;
+  if ((import ld_pr)[(import pr_err)] == 0) {
+    code = dr_enter(ld_look("f:id_main"), pargs);
+  }
+} return int code;
+given tf_bset("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") ((import tf_by), ["p"]):(7)
+given tf_bset("define i32 @id_main(i32 %v1) {\nb0:\n  %v2 = select i1 1, i32 1, i32 2\n  ret i32 0\n}\n") ((import tf_by), []):(2) then eprints:("idrun: unsupported IR instruction 'select'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead\n")
+
+dr_enter(int fid, string[] pargs) {
+  int code = 2;
+  if (fid < 0) {
+    eprint("idrun: the program has no main");
+  } else {
+    code = dr_run(fid, pargs);
+  }
+} return int code;
+given tf_irload("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") (0, ["p"]):(7)
+given vb_boot (-1, []):(2) then eprints:("idrun: the program has no main\n")
+
+dr_run(int fid, string[] pargs) {
+  int pc = vm_start(fid, pargs);
+  vm_run(pc);
+  int code = vm_status();
+} return int code;
+given tf_irload("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") (0, ["p"]):(7)
+given tf_irload("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 %v1\n}\n") (0, ["a", "b", "c"]):(3)

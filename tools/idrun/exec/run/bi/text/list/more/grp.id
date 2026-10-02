@@ -1,0 +1,35 @@
+// The list helpers, reads first.
+vm_bl(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_list_get)) {
+    wr = vm_b_list_get(wa, wb);
+    return wr;
+  }
+  if (id == (import b_list_push)) {
+    vm_b_list_push(wa, wb);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_list_new)) {
+    wr = vm_lnew();
+    return wr;
+  }
+  if (id == (import b_list_set)) {
+    vm_b_list_set(wa, wb, wc);
+    return wr;
+  }
+  if (id == (import b_list_len)) {
+    wr = vm_b_list_len(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_list_pop)) {
+    wr = vm_b_list_pop(wa);
+    return wr;
+  }
+  vm_b_list_lock(wa);
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) (10, 1, 0, 0):(5)
+given vb_boot given tf_lnew (16, 1, 0, 0):(0) then tf_llock:([0, 1])
+given vb_boot given tf_lnew (11, 1, 7, 0):(0) then tf_lists:([[], [7]])
+given vb_boot (12, 0, 0, 0):(1) then tf_lists:([[], []])

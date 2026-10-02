@@ -1,0 +1,41 @@
+// A hidden directory is not source, and nor is the build output directory of
+// the project's own root.
+dr_sub(string dir, string name, int root) {
+  string frag = "";
+  if (charat(name, 0) != 46 && (root == 0 || name != "build/")) {
+    string sub = dir + "/" + ld_sub(name, 0, len(name) - 1);
+    frag = dr_walk(sub, 0);
+  }
+} return string frag;
+given tf_tree given tf_want ((import tf_root), "z/", 1):((import tf_wz)) then tf_rmtree:(0)
+given tf_tree ((import tf_root), ".hid/", 1):("") then tf_rmtree:(0)
+given tf_tree ((import tf_root), "build/", 1):("") then tf_rmtree:(0)
+given tf_tree given tf_want ((import tf_root), "build/", 0):((import tf_wbd)) then tf_rmtree:(0)
+
+// conf.id is a manifest and backend.id a link recipe; neither is compiled.
+dr_file(string dir, string name) {
+  string frag = "";
+  if (str_ends(name, ".id") == 1 && name != "conf.id" && name != "backend.id") {
+    frag = dr_one(dir + "/" + name);
+  }
+} return string frag;
+("/x", "a.id"):("printf '#file 0|%s\\n' '/x/a.id'; cat '/x/a.id'; echo; ")
+("/x", "conf.id"):("")
+("/x", "backend.id"):("")
+("/x", "a.txt"):("")
+
+// A string as one shell word: in single quotes, each quote inside closed,
+// escaped and reopened.
+dr_q(string s) {
+  string q = "'";
+  int i = 0;
+  while (i < len(s)) {
+    q = q + dr_qc(charat(s, i));
+    i = i + 1;
+  }
+} chain (string s) {
+  q = q + "'";
+} return string q;
+("a b"):("'a b'")
+("it's"):("'it'\\''s'")
+(""):("''")

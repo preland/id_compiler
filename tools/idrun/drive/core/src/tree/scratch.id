@@ -1,0 +1,10 @@
+// A directory of this run's own, made with mkdir so that two runs started in
+// the same millisecond cannot share one: the first mkdir to succeed wins.
+dr_tryd(string stem, int n) {
+  string dir = stem + n;
+  if (fs_mkdir(dir) != 0 && n < 1000) {
+    dir = dr_tryd(stem, n + 1);
+  }
+} return string dir;
+given tf_stem ((import tf_stm), 0):((import tf_d0)) then tf_rmstem:(0)
+given tf_stem given tf_mk0 ((import tf_stm), 0):((import tf_d1)) then tf_rmstem:(0)

@@ -1,0 +1,22 @@
+// Fixtures for the operation cases below: put a word or a float into a slot of
+// the value stack, and read slot 3 back. Every case boots the tables itself
+// with `given vb_boot`, since a case's process starts with nothing exported.
+tf_set(int sl, word wv) {
+  word[] vals = (import ex_vals);
+  vals[sl] = wv;
+} return void;
+given vb_boot (3, 9):() then tf_v3:(9)
+given vb_boot (3, -4):() then tf_v3:(-4)
+
+tf_setf(int sl, float f) {
+  float[] fvals = (import ex_fvals);
+  fvals[sl] = f;
+} return void;
+given vb_boot (3, 2.5):() then tf_f3:(2.5)
+given vb_boot (3, 0.25):() then tf_f3:(0.25)
+
+tf_v3() {
+  word wv = (import ex_vals)[3];
+} return word wv;
+given vb_boot ():(0)
+given vb_boot given tf_set(3, 77) ():(77)

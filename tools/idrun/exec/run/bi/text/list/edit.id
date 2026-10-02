@@ -1,0 +1,37 @@
+// Answers 1 when a write to list hl may go ahead. A write to a locked list is
+// the one trap this interpreter words itself: every other failure is the
+// host's own, with the host's own text.
+vm_mut(int hl) {
+  int ok = vm_live(hl);
+  if (ok == 1 && (import ex_llock)[hl] != 0) {
+    vm_trap("cannot mutate a constant list");
+    ok = 0;
+  }
+} return int ok;
+given vb_boot given tf_lnew (1):(1)
+given vb_boot given tf_lnew given vm_b_list_lock(1) (1):(0) then eprints:("id: cannot mutate a constant list\n") then tf_rg:([0, 1, 1])
+
+// The list writes. Each asks vm_mut first, so a locked list is a trap and not
+// a change.
+vm_b_list_push(word wa, word wb) {
+  int hl = wa;
+  int ok = vm_mut(hl);
+  if (ok == 1) {
+    push((import ex_lists)[hl], wb);
+  }
+} return void;
+given vb_boot given tf_lnew (1, 9):() then tf_lists:([[], [9]])
+given vb_boot given tf_lnew given vm_b_list_lock(1) (1, 9):() then tf_lists:([[], []]) then eprints:("id: cannot mutate a constant list\n")
+
+vm_b_list_set(word wa, word wb, word wc) {
+  int hl = wa;
+  int i = wb;
+  int ok = vm_mut(hl);
+} chain (word wa, word wb, word wc) {
+  if (ok == 1) {
+    word[] l = (import ex_lists)[hl];
+    l[i] = wc;
+  }
+} return void;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1, 1, 8):() then tf_lists:([[], [5, 8]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_lock(1) (1, 0, 8):() then tf_lists:([[], [5]]) then eprints:("id: cannot mutate a constant list\n")

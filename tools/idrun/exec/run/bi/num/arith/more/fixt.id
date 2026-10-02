@@ -1,0 +1,19 @@
+// The function table, a new empty list, and one more argument slot, for the
+// call and list cases.
+tf_ft() {
+  int[] ft = (import ex_ft);
+} return int[] ft;
+given vb_boot ():([])
+given vb_boot given tf_fn(3, 2, 6, 0, 1) ():([3, 2, 6, 0, 1])
+
+tf_lnew() {
+  int h = vm_lnew();
+} return void;
+given vb_boot ():() then tf_lists:([[], []])
+given vb_boot given tf_lnew ():() then tf_llock:([0, 0, 0])
+
+tf_ap(int sl) {
+  push((import ex_argp), sl);
+} return void;
+given vb_boot (4):() then tf_argp:([4])
+given vb_boot given tf_ap(1) (2):() then tf_argp:([1, 2])

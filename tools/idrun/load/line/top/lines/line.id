@@ -1,0 +1,51 @@
+// One line of the text, whatever it is, then on to the next.
+ld_line() {
+  int c = ld_at();
+  ld_dispatch(c, (import ld_pr)[(import pr_skip)]);
+  ld_eol();
+} return void;
+given tf_ld("  ret void\nnext") ():() then tf_cd:([7, 0, 0, 0, 0]) then ld_pos:(11)
+given tf_ld("; comment\n  ret void") ():() then tf_cd:([]) then ld_pos:(10)
+
+// The first byte says what a line is: a space is an instruction, @ a global,
+// d a define or declare, b a block label, } the end of a function. Inside the
+// wrapper main that is not read, only the } is.
+ld_dispatch(int c, int skip) {
+  if (c == 125) {
+    ld_fend();
+    return;
+  }
+  if (skip == 1) {
+    return;
+  }
+  if (c == 32) {
+    ld_insn();
+    return;
+  }
+} chain (int c, int skip) {
+  if (c == 64) {
+    ld_global();
+    return;
+  }
+  if (c == 100) {
+    ld_def();
+    return;
+  }
+  if (c == 98) {
+    ld_label_line();
+  }
+} return void;
+given tf_ld("  ret void") (32, 0):() then tf_cd:([7, 0, 0, 0, 0])
+given tf_ld("  ret void") (32, 1):() then tf_cd:([])
+given tf_ld("@x = global i32 4") (64, 0):() then tf_gv:([4])
+given tf_ld("define i32 @id_f()") (100, 0):() then tf_fnames:(["id_f"])
+given tf_ld("b3:") (98, 0):() then tf_blk:([-1, -1, -1, 0])
+given tf_ld("()") given ld_begin("main") (125, 1):() then tf_pr:([0, 0, 0, 0, 0, 0, 0, 0])
+
+ld_lines() {
+  while (ld_at() >= 0) {
+    ld_line();
+  }
+} return void;
+given tf_ld("b0:\n  ret void\n") ():() then tf_cd:([7, 0, 0, 0, 0]) then tf_blk:([0])
+given tf_ld("") ():() then tf_cd:([])

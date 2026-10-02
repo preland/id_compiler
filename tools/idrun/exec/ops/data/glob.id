@@ -1,0 +1,21 @@
+// The rest of the exported-variable traffic: the float read, and both writes.
+vm_gldf(int fp, int d, int g) {
+  float[] fvals = (import ex_fvals);
+  fvals[fp + d] = (import ex_gf)[g];
+} return void;
+given vb_boot given tf_gsetf(2, 3.5) (0, 3, 2):() then tf_f3:(3.5)
+given vb_boot given tf_gsetf(2, 1.25) (1, 2, 2):() then tf_f3:(1.25)
+
+vm_gst(int fp, int g, int a) {
+  word[] gv = (import ex_gv);
+  gv[g] = (import ex_vals)[fp + a];
+} return void;
+given vb_boot given tf_gset(2, 0) given tf_set(1, 44) (0, 2, 1):() then tf_g2:(44)
+given vb_boot given tf_gset(2, 0) given tf_set(2, 9) (1, 2, 1):() then tf_g2:(9)
+
+vm_gstf(int fp, int g, int a) {
+  float[] gf = (import ex_gf);
+  gf[g] = (import ex_fvals)[fp + a];
+} return void;
+given vb_boot given tf_gsetf(2, 0.0) given tf_setf(1, 6.5) (0, 2, 1):() then tf_gf2:(6.5)
+given vb_boot given tf_gsetf(2, 0.0) given tf_setf(2, 0.75) (1, 2, 1):() then tf_gf2:(0.75)

@@ -1,0 +1,26 @@
+// The `}` ending a function: what the function turned out to need.
+ld_fend() {
+  int[] pr = (import ld_pr);
+  int skip = pr[(import pr_skip)];
+  pr[(import pr_skip)] = 0;
+} chain () {
+  if (skip == 0) {
+    ld_seal();
+  }
+} return void;
+given tf_ld("()") given ld_begin("main") ():() then tf_pr:([0, 0, 0, 0, 0, 0, 0, 0]) then tf_ft:([])
+given tf_ld("()") given ld_begin("id_f") given tf_ns given tf_ns ():() then tf_ft:([0, 0, 2, 0, 0])
+
+// The frame size, the constant rows, and the frame size written into every
+// call the function makes: a callee's frame starts where the caller's ends.
+ld_seal() {
+  int[] pr = (import ld_pr);
+  int fid = pr[(import pr_fid)];
+  ld_ftset(fid, (import ft_sz), pr[(import pr_nslot)]);
+} chain () {
+  ld_ftset(fid, (import ft_k0), pr[(import pr_k0)]);
+  ld_ftset(fid, (import ft_k1), len((import ex_ks)));
+  ld_patch(pr[(import pr_pc0)], pr[(import pr_nslot)]);
+} return void;
+given tf_ld("()") given ld_begin("id_f") given tf_ns given tf_ns ():() then tf_ft:([0, 0, 2, 0, 0])
+given tf_ld("()") given ld_begin("id_f") given ld_kpush(0, 1, 0.0) given ld_emit(6, 0, 0, 0, 0) ():() then tf_ft:([0, 0, 0, 0, 1]) then tf_cd:([6, 0, 0, 0, 0])

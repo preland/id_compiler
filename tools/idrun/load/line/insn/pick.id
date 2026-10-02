@@ -1,0 +1,66 @@
+// Which parser an opcode's operands go to. The ranges rely on conf.id keeping
+// add..xor, fadd..fdiv and sext..bitcast consecutive.
+ld_op(int code, int d, string w) {
+  if (code == (import p_load)) {
+    ld_load(d);
+    return;
+  }
+  if (code == (import p_store)) {
+    ld_store();
+    return;
+  }
+  if (code >= (import p_add) && code <= (import p_xor)) {
+    ld_bin(code, d);
+    return;
+  }
+} chain (int code, int d, string w) {
+  if (code >= (import p_fadd) && code <= (import p_fdiv)) {
+    ld_fbin(code, d);
+    return;
+  }
+  if (code == (import p_icmp) || code == (import p_fcmp)) {
+    ld_cmp(d);
+    return;
+  }
+  if (code >= (import p_sext) && code <= (import p_bitcast)) {
+    ld_cast(code, d);
+    return;
+  }
+} chain (int code, int d, string w) {
+  if (code == (import p_call)) {
+    ld_call(d);
+    return;
+  }
+  if (code == (import p_br)) {
+    ld_br();
+    return;
+  }
+  if (code == (import p_ret)) {
+    ld_ret();
+    return;
+  }
+} chain (int code, int d, string w) {
+  if (code == (import p_alloca)) {
+    return;
+  }
+  ld_bad(w);
+} return void;
+given tf_ld("i32, ptr %v2") (1, 6, "load"):() then tf_cd:([0, 6, 0, 0, 0])
+given tf_ld("i32 %v3, ptr %v2") (2, -1, "store"):() then tf_cd:([0, 1, 0, 0, 0])
+given tf_ld("i32 %v1, %v2") (3, 8, "add"):() then tf_cd:([1, 8, 0, 1, 0])
+given tf_ld("double %v1, %v2") (9, 4, "fadd"):() then tf_cd:([21, 4, 0, 1, 0])
+given tf_ld("slt i32 %v1, %v2") (13, 6, "icmp"):() then tf_cd:([2, 6, 0, 1, 1])
+given tf_ld("i32 %v1 to i64") (16, 5, "zext"):() then tf_cd:([19, 5, 0, 0, 0])
+given tf_ld("i32 @id_f()") (23, 9, "call"):() then tf_cd:([6, 9, 0, 0, 0])
+given tf_ld("label %b3") (24, -1, "br"):() then tf_cd:([4, 0, 0, 0, 3])
+given tf_ld("void") (25, -1, "ret"):() then tf_cd:([7, 0, 0, 0, 0])
+given tf_ld("i32") (0, 3, "alloca"):() then tf_cd:([])
+given tf_ld("") (-1, -1, "frob"):() then eprints:("idrun: unsupported IR instruction 'frob'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead\n")
+
+ld_err(string msg) {
+  int[] pr = (import ld_pr);
+  eprint("idrun: " + msg);
+  pr[(import pr_err)] = pr[(import pr_err)] + 1;
+} return void;
+given lb_boot ("x"):() then eprints:("idrun: x\n") then tf_pr:([0, 0, 0, 0, 0, 0, 1, 0])
+given lb_boot given ld_err("a") ("b"):() then tf_pr:([0, 0, 0, 0, 0, 0, 2, 0])

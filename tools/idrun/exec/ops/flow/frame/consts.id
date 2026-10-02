@@ -1,0 +1,26 @@
+// Constant-pool rows k0 up to k1 into the new frame.
+vm_consts(int nfp, int k0, int k1) {
+  while (k0 < k1) {
+    vm_const(nfp, k0);
+    k0 = k0 + 1;
+  }
+} return void;
+given vb_boot given ld_kpush(2, 5, 0.0) given ld_kpush(4, 6, 1.5) (0, 0, 2):() then tf_v8:([0, 0, 5, 0, 6, 0, 0, 0]) then tf_f8:([0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.0])
+given vb_boot given ld_kpush(2, 5, 0.0) given ld_kpush(4, 6, 1.5) (2, 1, 2):() then tf_v8:([0, 0, 0, 0, 0, 0, 6, 0])
+
+vm_const(int nfp, int k) {
+  word[] vals = (import ex_vals);
+  float[] fvals = (import ex_fvals);
+  int sl = (import ex_ks)[k];
+} chain (int nfp, int k) {
+  vals[nfp + sl] = (import ex_kv)[k];
+  fvals[nfp + sl] = (import ex_kf)[k];
+} return void;
+given vb_boot given ld_kpush(3, 8, 0.5) (0, 0):() then tf_v3:(8) then tf_f3:(0.5)
+given vb_boot given ld_kpush(1, 4, 2.0) given ld_kpush(0, 9, 0.0) (3, 1):() then tf_v3:(9)
+
+tf_argp() {
+  int[] ap = (import ex_argp);
+} return int[] ap;
+given vb_boot ():([])
+given vb_boot given tf_ap(3) given tf_ap(4) ():([3, 4])

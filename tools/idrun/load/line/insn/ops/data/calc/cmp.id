@@ -1,0 +1,65 @@
+// icmp PRED T A, B and fcmp PRED double A, B: one instruction either way,
+// carrying the predicate as a mask. An unsigned integer predicate has no mask
+// here, so it is refused rather than run as a signed one.
+ld_cmp(int d) {
+  string pn = ld_word();
+  int ty = ld_ty();
+  int a = ld_val(ty);
+} chain (int d) {
+  int b = ld_val(ty);
+  int m = (import pred_mask)[ld_look("p:" + pn)];
+  ld_emit(ld_fsel(ty, (import o_icmp), (import o_fcmp)), d, a, b, m);
+} chain (int d) {
+  if (m >= 8 && ty != (import t_dbl)) {
+    ld_err("unsupported unsigned comparison '" + pn + "'; compile this program with idc instead of running it with idrun");
+  }
+} return void;
+given tf_ld("slt i32 %v1, %v2") (6):() then tf_cd:([2, 6, 0, 1, 1])
+given tf_ld("oeq double %v1, %v2") (6):() then tf_cd:([25, 6, 0, 1, 2])
+given tf_ld("uno double %v1, %v2") (6):() then tf_cd:([25, 6, 0, 1, 8])
+given tf_ld("sge i64 %v1, 3") (6):() then tf_cd:([2, 6, 0, 1, 6]) then tf_kv:([3])
+given tf_ld("slt i32 %v1, %v2") given tf_ns (6):() then tf_cd:([2, 6, 1, 2, 1])
+given tf_ld("ult i32 %v1, %v2") (6):() then eprints:("idrun: unsupported unsigned comparison 'ult'; compile this program with idc instead of running it with idrun\n") then tf_pr:([16, 2, 0, 0, 0, 0, 1, 0])
+
+// sext zext trunc sitofp fptosi ptrtoint inttoptr bitcast, written
+// `OP T1 A to T2`.
+ld_cast(int code, int d) {
+  int t1 = ld_ty();
+  int a = ld_val(t1);
+  ld_word();
+} chain (int code, int d) {
+  int t2 = ld_ty();
+  ld_emit(ld_castop(code, t1, t2), d, a, 0, 0);
+} return void;
+given tf_ld("i32 %v1 to i64") (15, 5):() then tf_cd:([0, 5, 0, 0, 0])
+given tf_ld("i32 %v1 to i64") (16, 5):() then tf_cd:([19, 5, 0, 0, 0])
+given tf_ld("i64 %v1 to i32") (17, 5):() then tf_cd:([20, 5, 0, 0, 0])
+given tf_ld("i32 %v1 to double") (18, 5):() then tf_cd:([26, 5, 0, 0, 0])
+given tf_ld("i32 %v1 to i64") given tf_ns (16, 5):() then tf_cd:([19, 5, 1, 0, 0])
+
+// Every slot holds a sign-extended value, so only a zero-extension from 32
+// bits, a truncation to 32 bits and the two float conversions change one.
+ld_castop(int code, int t1, int t2) {
+  int op = (import o_mov);
+  if (code == (import p_zext) && t1 == (import t_i32)) {
+    op = (import o_zext32);
+  }
+  if (code == (import p_trunc) && t2 == (import t_i32)) {
+    op = (import o_trunc32);
+  }
+} chain (int code, int t1, int t2) {
+  if (code == (import p_sitofp)) {
+    op = (import o_sitofp);
+  }
+  if (code == (import p_fptosi)) {
+    op = (import o_fptosi);
+  }
+} return int op;
+(15, 2, 3):(0)
+(16, 2, 3):(19)
+(16, 1, 2):(0)
+(17, 3, 2):(20)
+(17, 3, 1):(0)
+(18, 2, 5):(26)
+(19, 5, 2):(27)
+(20, 4, 3):(0)

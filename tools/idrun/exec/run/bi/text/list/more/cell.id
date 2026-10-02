@@ -1,0 +1,9 @@
+// The cell at i of list hl; zero, after the trap, when the list is the null one.
+vm_cell(int hl, int i) {
+  word wr = 0;
+  if (vm_live(hl) == 1) {
+    wr = (import ex_lists)[hl][i];
+  }
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 7) (1, 0):(7)
+given vb_boot (0, 0):(0) then eprints:("id: read of an uninitialised export (its declaring function has not run)\n")

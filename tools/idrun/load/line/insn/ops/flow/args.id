@@ -1,0 +1,38 @@
+// The argument list at the cursor: each `T V` becomes a slot pushed on
+// ex_argp. Answers how many.
+ld_args() {
+  ld_skip();
+  ld_adv(1);
+  int n = 0;
+} chain () {
+  ld_skip();
+  while (ld_at() != 41 && ld_at() >= 0) {
+    ld_arg1();
+    n = n + 1;
+    ld_skip();
+  }
+  ld_adv(1);
+} return int n;
+given tf_ld("(i32 %v1, ptr %v2)") ():(2) then tf_argp:([0, 1]) then ld_pos:(18)
+given tf_ld("()") ():(0) then tf_argp:([]) then ld_pos:(2)
+given tf_ld("(i32 5)") ():(1) then tf_kv:([5])
+
+ld_arg1() {
+  int ty = ld_ty();
+  int sl = ld_val(ty);
+  push((import ex_argp), sl);
+} return void;
+given tf_ld("i32 %v3") ():() then tf_argp:([0])
+given tf_ld("double 2.5") ():() then tf_argp:([0]) then tf_kf:([2.5])
+
+// A runtime helper reads three argument slots whatever its arity, so a call
+// to one is padded to three (slot 0, which exists in every frame).
+ld_pad(int bid, int n) {
+  while (bid >= 0 && n < 3) {
+    push((import ex_argp), 0);
+    n = n + 1;
+  }
+} return void;
+given vb_boot (3, 1):() then tf_argp:([0, 0])
+given vb_boot (-1, 1):() then tf_argp:([])
+given vb_boot (3, 3):() then tf_argp:([])

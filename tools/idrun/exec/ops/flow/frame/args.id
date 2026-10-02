@@ -1,0 +1,33 @@
+// Copy the caller's argument slots, in order, into the callee's first slots.
+vm_args(int fp, int nfp, int apos, int np) {
+  int i = 0;
+  while (i < np) {
+    vm_arg(fp, nfp, (import ex_argp)[apos + i], i);
+    i = i + 1;
+  }
+} return void;
+given vb_boot given tf_set(6, 11) given tf_set(7, 22) given tf_ap(6) given tf_ap(7) (0, 2, 0, 2):() then tf_v8:([0, 0, 11, 22, 0, 0, 11, 22])
+given vb_boot given tf_set(5, 9) given tf_ap(1) given tf_ap(5) (0, 1, 1, 1):() then tf_v8:([0, 9, 0, 0, 0, 9, 0, 0])
+
+vm_arg(int fp, int nfp, int sl, int i) {
+  word[] vals = (import ex_vals);
+  float[] fvals = (import ex_fvals);
+  vals[nfp + i] = vals[fp + sl];
+} chain (int fp, int nfp, int sl, int i) {
+  fvals[nfp + i] = fvals[fp + sl];
+} return void;
+given vb_boot given tf_set(5, 9) (0, 2, 5, 1):() then tf_v8:([0, 0, 0, 9, 0, 9, 0, 0])
+given vb_boot given tf_setf(4, 2.5) (1, 3, 3, 2):() then tf_f8:([0.0, 0.0, 0.0, 0.0, 2.5, 2.5, 0.0, 0.0])
+
+// Push the frame being left (its return pc, fp and result slot) and switch
+// to the callee's.
+vm_frame(int rpc, int fp, int d, int nfp) {
+  int[] cs = (import ex_cs);
+  push(cs, rpc);
+  push(cs, fp);
+} chain (int rpc, int fp, int d, int nfp) {
+  push(cs, d);
+  vm_back(nfp);
+} return void;
+given vb_boot (15, 2, 3, 9):() then tf_cs:([15, 2, 3]) then tf_rg:([9, 0, 0])
+given vb_boot given vm_frame(1, 2, 3, 4) (5, 6, 7, 8):() then tf_cs:([1, 2, 3, 5, 6, 7]) then tf_rg:([8, 0, 0])

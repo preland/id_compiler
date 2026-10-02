@@ -1,0 +1,21 @@
+// Block labels: `bN:` records that block N starts at the next instruction.
+ld_label_line() {
+  string w = ld_word();
+  int n = ld_pnum(w, 98);
+  if (n >= 0) {
+    ld_blkset(n, len((import ex_cd)));
+  }
+} return void;
+given tf_ld("b2:") ():() then tf_blk:([-1, -1, 0])
+given tf_ld("entry:") ():() then tf_blk:([])
+given tf_ld("b1:") given ld_emit(0, 0, 0, 0, 0) ():() then tf_blk:([-1, 5])
+
+ld_blkset(int n, int pc) {
+  int[] blk = (import ld_blk);
+  while (len(blk) <= n) {
+    push(blk, 0 - 1);
+  }
+  blk[n] = pc;
+} return void;
+given lb_boot (2, 15):() then tf_blk:([-1, -1, 15])
+given lb_boot given ld_blkset(0, 5) (1, 9):() then tf_blk:([5, 9])

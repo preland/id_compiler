@@ -1,0 +1,27 @@
+// A float in a list is a 64-bit cell. The program cannot read the bits, so
+// the cell is an index into ex_fbox rather than the bit pattern.
+vm_boxf(int fp, int d, int a) {
+  float[] fb = (import ex_fbox);
+  word[] vals = (import ex_vals);
+  push(fb, (import ex_fvals)[fp + a]);
+} chain (int fp, int d, int a) {
+  vals[fp + d] = len(fb) - 1;
+} return void;
+given vb_boot given tf_setf(1, 1.5) (0, 3, 1):() then tf_v3:(0) then tf_fbox:([1.5])
+given vb_boot given tf_setf(1, 1.5) given vm_boxf(0, 4, 1) given tf_setf(2, 9.5) (1, 2, 1):() then tf_v3:(1) then tf_fbox:([1.5, 9.5])
+
+vm_unboxf(int fp, int d, int a) {
+  float[] fvals = (import ex_fvals);
+  int h = (import ex_vals)[fp + a];
+  fvals[fp + d] = (import ex_fbox)[h];
+} return void;
+given vb_boot given tf_setf(1, 4.5) given vm_boxf(0, 2, 1) (0, 3, 2):() then tf_f3:(4.5)
+given vb_boot given tf_setf(1, 4.5) given vm_boxf(0, 2, 1) given tf_setf(1, 8.5) given vm_boxf(0, 2, 1) (0, 3, 2):() then tf_f3:(8.5)
+
+vm_strf(int fp, int d, int a) {
+  word[] vals = (import ex_vals);
+  int h = vm_sput("" + (import ex_fvals)[fp + a]);
+  vals[fp + d] = h;
+} return void;
+given vb_boot given tf_setf(1, 2.5) (0, 3, 1):() then tf_v3:(1) then tf_s1:("2.5")
+given vb_boot given tf_setf(2, 100.0) (1, 2, 1):() then tf_v3:(1) then tf_s1:("100")

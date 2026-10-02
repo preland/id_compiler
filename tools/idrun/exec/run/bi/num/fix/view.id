@@ -1,0 +1,33 @@
+// Fixtures that read the executor's state back for a `then`: the registers, the
+// first eight slots of each view of the value stack, and the stack's length.
+tf_rg() {
+  int[] rg = (import ex_rg);
+} return int[] rg;
+given vb_boot ():([0, 0, 0])
+given vb_boot given vm_back(6) ():([6, 0, 0])
+
+tf_v8() {
+  word[] vals = (import ex_vals);
+  word[] eight = [];
+  int i = 0;
+} chain () {
+  while (i < 8) {
+    push(eight, vals[i]);
+    i = i + 1;
+  }
+} return word[] eight;
+given vb_boot ():([0, 0, 0, 0, 0, 0, 0, 0])
+given vb_boot given tf_set(2, 5) given tf_set(7, -1) ():([0, 0, 5, 0, 0, 0, 0, -1])
+
+tf_f8() {
+  float[] fvals = (import ex_fvals);
+  float[] eightf = [];
+  int i = 0;
+} chain () {
+  while (i < 8) {
+    push(eightf, fvals[i]);
+    i = i + 1;
+  }
+} return float[] eightf;
+given vb_boot ():([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+given vb_boot given tf_setf(1, 2.5) given tf_setf(6, 0.5) ():([0.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0])

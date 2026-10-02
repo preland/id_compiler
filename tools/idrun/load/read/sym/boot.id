@@ -1,0 +1,34 @@
+// The loader's state. ld_pr holds the registers named pr_* in conf.id,
+// ld_vslot maps a %vN value number to its slot in the current frame, ld_blk
+// maps a block number to the pc it starts at, and ld_sk/sv/su/sn are one
+// string-keyed table for everything with a name: instruction words ("i:add"),
+// types ("t:i32"), predicates ("p:slt"), runtime helpers ("b:id_len"), and the
+// program's own functions ("f:"), globals ("g:"), string constants ("s:") and
+// unnamed locals ("l:").
+lb_tables() {
+  export int[] ld_pr = [0, 0, 0, 0, 0, 0, 0, 0];
+  export int[] ld_vslot = [];
+  export int[] ld_blk = [];
+} chain () {
+  export string[] ld_sk = [];
+  export int[] ld_sv = [];
+  export int[] ld_su = [];
+} chain () {
+  export int[] ld_sn = [];
+  export string[] ld_fn = [];
+  hmap_init((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn));
+} return void;
+():() then tf_pr:([0, 0, 0, 0, 0, 0, 0, 0])
+():() then tf_fnames:([])
+
+lb_boot() {
+  lb_tables();
+  lb_seed("i", (import ins_names));
+  lb_seed("t", (import ty_names));
+} chain () {
+  lb_seed("p", (import pred_names));
+  lb_seed("b", (import bi_names));
+  lb_seed("x", (import fbi_names));
+} return void;
+():() then tf_iadd:(3) then tf_bpoke:(45)
+():() then tf_xstr:(2) then tf_bpoke:(45)

@@ -1,0 +1,31 @@
+// A comparison is one instruction for every predicate: m has bit 1 for less,
+// bit 2 for equal and bit 4 for greater, and the answer is whether the
+// outcome's bit is among them. slt is 1, sle is 3, eq is 2, ne is 5.
+vm_icmp(int fp, int d, int a, int b, int m) {
+  word[] vals = (import ex_vals);
+  word wx = vals[fp + a];
+  word wy = vals[fp + b];
+} chain (int fp, int d, int a, int b, int m) {
+  int bits = (wx < wy) + (wx == wy) * 2 + (wx > wy) * 4;
+  vals[fp + d] = (bits & m) != 0;
+} return void;
+given vb_boot given tf_set(1, 3) given tf_set(2, 5) (0, 3, 1, 2, 1):() then tf_v3:(1)
+given vb_boot given tf_set(1, 5) given tf_set(2, 3) (0, 3, 1, 2, 1):() then tf_v3:(0)
+given vb_boot given tf_set(1, 5) given tf_set(2, 5) (0, 3, 1, 2, 6):() then tf_v3:(1)
+given vb_boot given tf_set(1, 5) given tf_set(2, 5) (0, 3, 1, 2, 5):() then tf_v3:(0)
+given vb_boot given tf_set(2, 9) given tf_set(1, 4) (1, 2, 1, 0, 4):() then tf_v3:(1)
+
+vm_zext32(int fp, int d, int a) {
+  word[] vals = (import ex_vals);
+  vals[fp + d] = vals[fp + a] & 4294967295;
+} return void;
+given vb_boot given tf_set(1, -1) (0, 3, 1):() then tf_v3:(4294967295)
+given vb_boot given tf_set(2, 7) (1, 2, 1):() then tf_v3:(7)
+
+vm_trunc32(int fp, int d, int a) {
+  word[] vals = (import ex_vals);
+  int x = vals[fp + a];
+  vals[fp + d] = x;
+} return void;
+given vb_boot given tf_set(1, 4294967297) (0, 3, 1):() then tf_v3:(1)
+given vb_boot given tf_set(2, 2147483648) (1, 2, 1):() then tf_v3:(-2147483648)

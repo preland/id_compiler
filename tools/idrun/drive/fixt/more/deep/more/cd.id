@@ -1,0 +1,21 @@
+// Has dr_clean taken the directory away.
+tf_gone() {
+  int gone = fs_exists((import tf_cdp)) == 0;
+} return int gone;
+given tf_cdir(1) ():(0) then tf_rmcd:(0)
+given tf_cdir(1) ():(0) then tf_rmcd:(0) then tf_gone:(1)
+
+// Remove the directory and its three files by hand; 0 when all went.
+tf_rmcd() {
+  int bad = fs_remove((import tf_cdp) + "/src") + fs_remove((import tf_cdp) + "/lex") + fs_remove((import tf_cdp) + "/ll");
+  bad = bad + fs_remove((import tf_cdp));
+} return int bad;
+given tf_cdir(1) ():(0)
+given tf_cdir(1) ():(0) then tf_rmcd:(-4)
+
+// Did idparse leave its output in the directory.
+tf_ll() {
+  int ok = fs_exists((import tf_cdp) + "/ll");
+} return int ok;
+given tf_cdir(1) ():(1) then tf_rmcd:(0)
+given tf_cdir(0) ():(0) then tf_rmcd:(-3)

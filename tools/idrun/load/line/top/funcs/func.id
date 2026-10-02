@@ -1,0 +1,44 @@
+// A function-table row starts with no entry pc (-1) and zeros.
+ld_newfn() {
+  int[] ft = (import ex_ft);
+  int fid = len(ft) / (import ft_n);
+  push(ft, 0 - 1);
+} chain () {
+  int i = 1;
+  while (i < (import ft_n)) {
+    push(ft, 0);
+    i = i + 1;
+  }
+} return int fid;
+given lb_boot given vb_boot ():(0) then tf_ft:([-1, 0, 0, 0, 0])
+given vb_boot given tf_fn(1, 2, 3, 4, 5) ():(1) then tf_ft:([1, 2, 3, 4, 5, -1, 0, 0, 0, 0])
+
+ld_ftset(int fid, int col, int v) {
+  int[] ft = (import ex_ft);
+  ft[fid * (import ft_n) + col] = v;
+} return void;
+given vb_boot given tf_fn(1, 2, 3, 4, 5) (0, 2, 99):() then tf_ft:([1, 2, 99, 4, 5])
+given vb_boot given tf_fn(1, 2, 3, 4, 5) given tf_fn(6, 7, 8, 9, 10) (1, 4, 0):() then tf_ft:([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
+
+// The start of a function: its id, its entry pc (the next instruction), and
+// its first constant row. main's own wrapper is not read at all: idrun builds
+// the argument list itself and calls id_main.
+ld_begin(string nm) {
+  int[] pr = (import ld_pr);
+  if (nm == "main") {
+    pr[(import pr_skip)] = 1;
+    return;
+  }
+  int fid = ld_get("f", nm);
+} chain (string nm) {
+  pr[(import pr_fid)] = fid;
+  pr[(import pr_nslot)] = 0;
+  pr[(import pr_pc0)] = len((import ex_cd));
+} chain (string nm) {
+  pr[(import pr_k0)] = len((import ex_ks));
+  ld_ftset(fid, (import ft_pc), pr[(import pr_pc0)]);
+  ld_params();
+} return void;
+given tf_ld("(i32 %v1, ptr %v2)") ("id_f"):() then tf_ft:([0, 2, 0, 0, 0]) then tf_fnames:(["id_f"])
+given tf_ld("()") given ld_emit(0, 0, 0, 0, 0) given ld_kpush(0, 1, 0.0) ("id_g"):() then tf_ft:([5, 0, 0, 0, 0]) then tf_pr:([1, 0, 0, 5, 0, 1, 0, 0])
+given tf_ld("(i32 %v1)") ("main"):() then tf_pr:([0, 0, 0, 0, 1, 0, 0, 0]) then tf_ft:([])

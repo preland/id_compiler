@@ -1,0 +1,19 @@
+// The loader's state, read back for a `then`: its registers, the names it has
+// given function ids, and the pc of each block.
+tf_pr() {
+  int[] pr = (import ld_pr);
+} return int[] pr;
+given lb_boot ():([0, 0, 0, 0, 0, 0, 0, 0])
+given lb_boot given ld_adv(3) ():([3, 0, 0, 0, 0, 0, 0, 0])
+
+tf_fnames() {
+  string[] fnames = (import ld_fn);
+} return string[] fnames;
+given lb_boot ():([])
+given lb_boot given vb_boot given tf_get("f", "id_a") ():(["id_a"])
+
+tf_blk() {
+  int[] blk = (import ld_blk);
+} return int[] blk;
+given lb_boot ():([])
+given lb_boot given ld_blkset(2, 15) ():([-1, -1, 15])

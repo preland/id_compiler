@@ -1,0 +1,22 @@
+// Bitwise operations are the same at 32 and 64 bits: both operands are
+// sign-extended, and so is the result.
+vm_and(int fp, int d, int a, int b) {
+  word[] vals = (import ex_vals);
+  vals[fp + d] = vals[fp + a] & vals[fp + b];
+} return void;
+given vb_boot given tf_set(1, 12) given tf_set(2, 10) (0, 3, 1, 2):() then tf_v3:(8)
+given vb_boot given tf_set(2, -1) given tf_set(1, 255) (1, 2, 1, 0):() then tf_v3:(255)
+
+vm_or(int fp, int d, int a, int b) {
+  word[] vals = (import ex_vals);
+  vals[fp + d] = vals[fp + a] | vals[fp + b];
+} return void;
+given vb_boot given tf_set(1, 12) given tf_set(2, 10) (0, 3, 1, 2):() then tf_v3:(14)
+given vb_boot given tf_set(2, 256) given tf_set(1, 1) (1, 2, 1, 0):() then tf_v3:(257)
+
+vm_xor(int fp, int d, int a, int b) {
+  word[] vals = (import ex_vals);
+  vals[fp + d] = vals[fp + a] ^ vals[fp + b];
+} return void;
+given vb_boot given tf_set(1, 12) given tf_set(2, 10) (0, 3, 1, 2):() then tf_v3:(6)
+given vb_boot given tf_set(2, -1) given tf_set(1, 5) (1, 2, 1, 0):() then tf_v3:(-6)

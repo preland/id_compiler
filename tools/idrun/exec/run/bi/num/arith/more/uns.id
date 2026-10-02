@@ -1,0 +1,18 @@
+// The unsigned readings.
+vm_b_ushr(word wa, word wb) {
+  word wr = ushr(wa, wb);
+} return word wr;
+(-1, 60):(15)
+(256, 4):(16)
+
+vm_b_udiv(word wa, word wb) {
+  word wr = udiv(wa, wb);
+} return word wr;
+(-1, 2):(9223372036854775807)
+(100, 7):(14)
+
+vm_b_umod(word wa, word wb) {
+  word wr = umod(wa, wb);
+} return word wr;
+(-1, 10):(5)
+(100, 7):(2)

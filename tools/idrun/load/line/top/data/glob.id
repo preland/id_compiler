@@ -1,0 +1,31 @@
+// A global line: `@name = global T init`, or a string constant
+// `@name = private unnamed_addr constant [N x i8] c"..."`.
+ld_global() {
+  ld_adv(1);
+  string nm = ld_word();
+  ld_to(61);
+} chain () {
+  ld_adv(1);
+  string kind = ld_word();
+  ld_gdef(nm, kind);
+} return void;
+given tf_ld("@x = global i32 7") ():() then tf_gv:([7])
+given tf_ld("@.s = private unnamed_addr constant [3 x i8] c\"\\68\\69\\00\"") ():() then tf_strs:(["", "hi"])
+
+ld_gdef(string nm, string kind) {
+  if (kind == "global") {
+    ld_gvar(nm);
+  } else {
+    ld_gstr(nm);
+  }
+} return void;
+given tf_ld(" i32 5") ("x", "global"):() then tf_gv:([5])
+given tf_ld(" c\"\\68\\00\"") (".s", "private"):() then tf_strs:(["", "h"])
+
+ld_gstr(string nm) {
+  string[] ts = (import ex_strs);
+  int h = ld_get("s", nm);
+  ts[h] = ld_cstr();
+} return void;
+given tf_ld("c\"\\68\\69\\00\"") (".a"):() then tf_strs:(["", "hi"])
+given tf_ld("c\"\\6F\\00\"") (".a"):() then tf_strs:(["", "o"])

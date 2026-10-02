@@ -1,0 +1,19 @@
+// The clock, and the output buffer.
+vm_b_sleep_ms(word wa) {
+  int n = wa;
+  sleep_ms(n);
+} return void;
+given vb_boot (0):()
+given vb_boot (1):()
+
+vm_b_ticks() {
+  int t = ticks();
+} return int t;
+given tf_clock ():((import tf_t0))
+given tf_clock ():((import tf_t0)) then tf_clock_ok:(1)
+
+vm_b_flush() {
+  flush();
+} return void;
+():() then prints:("")
+given vb_boot ():() then prints:("")

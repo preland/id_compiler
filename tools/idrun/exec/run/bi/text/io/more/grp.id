@@ -1,0 +1,45 @@
+// The console and clock helpers, by id.
+vm_bc(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_print)) {
+    vm_b_print(wa);
+    return wr;
+  }
+  if (id == (import b_eprint)) {
+    vm_b_eprint(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_put)) {
+    vm_b_put(wa);
+    return wr;
+  }
+  if (id == (import b_flush)) {
+    vm_b_flush();
+    return wr;
+  }
+  if (id == (import b_input)) {
+    wr = vm_b_input();
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_read_all)) {
+    wr = vm_b_read_all();
+    return wr;
+  }
+  if (id == (import b_getkey)) {
+    wr = vm_b_getkey();
+    return wr;
+  }
+  if (id == (import b_sleep_ms)) {
+    vm_b_sleep_ms(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  wr = vm_b_ticks();
+} return word wr;
+given vb_boot given tf_sput("z") (17, 1, 0, 0):(0) then prints:("z\n")
+given vb_boot given tf_sput("z") (18, 1, 0, 0):(0) then eprints:("z\n")
+given vb_boot stdin "k\n" (21, 0, 0, 0):(1) then tf_strs:(["", "k"])
+given vb_boot (24, 0, 0, 0):(0)
+given vb_boot given tf_sput("p") (19, 1, 0, 0):(0) then prints:("p")

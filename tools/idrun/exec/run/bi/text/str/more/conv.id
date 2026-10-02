@@ -1,0 +1,22 @@
+// One byte as a string, the order of two strings, and a leading integer.
+vm_b_chr(word wa) {
+  int n = wa;
+  int h = vm_sput(chr(n));
+} return int h;
+given vb_boot (65):(1) then tf_strs:(["", "A"])
+given vb_boot (122):(1) then tf_strs:(["", "z"])
+
+vm_b_strcmp(word wa, word wb) {
+  int ia = wa;
+  int ib = wb;
+  int c = str_cmp((import ex_strs)[ia], (import ex_strs)[ib]);
+} return int c;
+given vb_boot given tf_sput("a") given tf_sput("b") (1, 2):(-1)
+given vb_boot given tf_sput("a") given tf_sput("b") (2, 1):(1)
+
+vm_b_to_int(word wa) {
+  int ia = wa;
+  int n = to_int((import ex_strs)[ia]);
+} return int n;
+given vb_boot given tf_sput("123abc") (1):(123)
+given vb_boot given tf_sput("-45") (1):(-45)

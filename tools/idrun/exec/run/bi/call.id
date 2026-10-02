@@ -1,0 +1,54 @@
+// A call to a runtime helper. The loader pads every such call to three
+// argument slots, so all three are read; a helper takes the ones it needs.
+// The helper's answer lands in d unless d is -1, and a trap it raised ends
+// the run by turning the next pc into -1.
+vm_bcall(int fp, int d, int bid, int apos, int nx) {
+  int[] ap = (import ex_argp);
+  word[] vals = (import ex_vals);
+  word wa = vals[fp + ap[apos]];
+} chain (int fp, int d, int bid, int apos, int nx) {
+  word wb = vals[fp + ap[apos + 1]];
+  word wc = vals[fp + ap[apos + 2]];
+  word wr = vm_bi(bid, wa, wb, wc);
+} chain (int fp, int d, int bid, int apos, int nx) {
+  if (d >= 0) {
+    vals[fp + d] = wr;
+  }
+  if ((import ex_rg)[(import r_halt)] != 0) {
+    nx = 0 - 1;
+  }
+} return int nx;
+given vb_boot given tf_sput("hello") given tf_set(1, 1) given tf_ap(1) given tf_ap(0) given tf_ap(0) (0, 3, 3, 0, 5):(5) then tf_v3:(5)
+given vb_boot given tf_lnew given vm_b_list_lock(1) given tf_set(1, 1) given tf_set(2, 9) given tf_ap(1) given tf_ap(2) given tf_ap(0) (0, -1, 11, 0, 5):(-1) then eprints:("id: cannot mutate a constant list\n")
+given vb_boot given tf_lnew given tf_set(2, 1) given tf_set(3, 9) given tf_ap(7) given tf_ap(1) given tf_ap(2) given tf_ap(0) (1, 4, 11, 1, 5):(5) then tf_lists:([[], [9]]) then tf_v8:([0, 0, 1, 9, 0, 0, 0, 0])
+given vb_boot given tf_lnew given vm_b_list_push(1, 4) given vm_b_list_push(1, 5) given tf_set(2, 1) given tf_ap(1) given tf_ap(0) given tf_ap(0) (1, 4, 14, 0, 5):(5) then tf_v8:([0, 0, 1, 0, 0, 2, 0, 0])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given tf_set(2, 1) given tf_set(4, 8) given tf_ap(1) given tf_ap(2) given tf_ap(3) (1, 6, 13, 0, 5):(5) then tf_lists:([[], [8]])
+
+// Which group of helpers id belongs to (conf.id numbers them so a group is a
+// range), then that group's own chain.
+vm_bi(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id < (import b_strs_end)) {
+    wr = vm_bs(id, wa, wb, wc);
+    return wr;
+  }
+  if (id < (import b_lists_end)) {
+    wr = vm_bl(id, wa, wb, wc);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id < (import b_io_end)) {
+    wr = vm_bc(id, wa, wb, wc);
+    return wr;
+  }
+  if (id < (import b_arith_end)) {
+    wr = vm_ba(id, wa, wb, wc);
+    return wr;
+  }
+  wr = vm_bm(id, wa, wb, wc);
+} return word wr;
+given vb_boot given tf_sput("hello") (3, 1, 0, 0):(5)
+given vb_boot given tf_lnew given vm_b_list_push(1, 4) (14, 1, 0, 0):(1)
+given vb_boot given tf_sput("e") (18, 1, 0, 0):(0) then eprints:("e\n")
+given vb_boot (28, 9, 2, 0):(4)
+given vb_boot (37, 0, 0, 0):(1)

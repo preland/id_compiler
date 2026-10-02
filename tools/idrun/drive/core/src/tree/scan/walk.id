@@ -1,0 +1,41 @@
+// The entries of a directory, sorted as fs_list gives them; a subdirectory's
+// name ends in a slash.
+dr_ents(string dir) {
+  int[] buf = [];
+  int n = fs_list(dir, buf, 0);
+  lst_fill(buf, n, 0);
+} chain (string dir) {
+  int got = fs_list(dir, buf, n);
+  string[] ents = dr_lines(buf);
+} return string[] ents;
+given tf_tree ((import tf_root)):([".hid/", "a.id", "build/", "conf.id", "z/", ""]) then tf_rmtree:(0)
+("/nonexistent/idrun-ents"):([""])
+
+// Every .id file under dir, in sorted-full-path order, which is the order
+// bin/idc's `find | sort` gives: a directory's slash sorts it after a file
+// whose name merely starts the same.
+dr_walk(string dir, int root) {
+  string[] ents = dr_ents(dir);
+  string frag = "";
+  int i = 0;
+} chain (string dir, int root) {
+  while (i < len(ents)) {
+    frag = frag + dr_entry(dir, ents[i], root);
+    i = i + 1;
+  }
+} return string frag;
+given tf_tree given tf_want ((import tf_root), 1):((import tf_ww)) then tf_rmtree:(0)
+given tf_tree given tf_want ((import tf_root), 0):((import tf_wwb)) then tf_rmtree:(0)
+("/nonexistent/idrun-walk", 1):("")
+
+dr_entry(string dir, string name, int root) {
+  string frag = "";
+  if (charat(name, len(name) - 1) == 47) {
+    frag = dr_sub(dir, name, root);
+  } else {
+    frag = dr_file(dir, name);
+  }
+} return string frag;
+("/x", "a.id", 1):("printf '#file 0|%s\\n' '/x/a.id'; cat '/x/a.id'; echo; ")
+("/x", ".hid/", 1):("")
+given tf_tree given tf_want ((import tf_root), "z/", 1):((import tf_wz)) then tf_rmtree:(0)

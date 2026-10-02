@@ -1,0 +1,32 @@
+// The digits at the cursor, added onto wv. A word, so a 64-bit literal fits.
+ld_digits(word wv) {
+  int c = ld_at();
+  while (c >= 48 && c <= 57) {
+    wv = wv * 10 + (c - 48);
+    ld_adv(1);
+    c = ld_at();
+  }
+} return word wv;
+given tf_ld("123 x") (0):(123) then ld_pos:(3)
+given tf_ld("123") (5):(5123)
+given tf_ld("x") (7):(7) then ld_pos:(0)
+
+// Consume a leading '-', and say whether there was one.
+ld_neg() {
+  ld_skip();
+  int neg = ld_at() == 45;
+  ld_adv(neg);
+} return int neg;
+given tf_ld(" -5") ():(1) then ld_pos:(2)
+given tf_ld("5") ():(0) then ld_pos:(0)
+
+ld_num() {
+  int neg = ld_neg();
+  word wv = ld_digits(0);
+  if (neg == 1) {
+    wv = 0 - wv;
+  }
+} return word wv;
+given tf_ld(" 42,") ():(42)
+given tf_ld("-9") ():(-9)
+given tf_ld("9223372036854775807") ():(9223372036854775807)

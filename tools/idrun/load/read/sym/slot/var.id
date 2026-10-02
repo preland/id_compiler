@@ -1,0 +1,33 @@
+// The name after a sigil (% or @) at the cursor.
+ld_sig() {
+  ld_skip();
+  ld_adv(1);
+  string w = ld_word();
+} return string w;
+given tf_ld(" %v12 x") ():("v12") then ld_pos:(5)
+given tf_ld("@name,") ():("name") then ld_pos:(5)
+
+// A %name at the cursor. A %vN is one of the numbers idparse hands out; any
+// other name is local to the function that uses it, which is what the
+// function's own number in the key is for.
+ld_var() {
+  string w = ld_sig();
+  int n = ld_pnum(w, 118);
+  int sl = ld_slotof(n, w);
+} return int sl;
+given tf_ld("%v7") ():(0) then ld_pos:(3)
+given tf_ld("%v7 %v9") given tf_var ():(1)
+given tf_ld("%v7 %v7") given tf_var ():(0)
+given tf_ld("%c2") ():(0) then ld_pos:(3)
+
+ld_slotof(int n, string w) {
+  int sl = 0 - 1;
+  if (n >= 0) {
+    sl = ld_local(n);
+  } else {
+    sl = ld_get("l", (import ld_pr)[(import pr_fid)] + ":" + w);
+  }
+} return int sl;
+given tf_ld("") (5, "v5"):(0)
+given tf_ld("") (-1, "c2"):(0)
+given tf_ld("") given tf_ns (-1, "c2"):(1)

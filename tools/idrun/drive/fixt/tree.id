@@ -1,0 +1,40 @@
+// Write a file with the given text.
+tf_put(string path, string text) {
+  int h = fs_open(path, "w");
+  int wn = fs_write_mem(h, mem_of_str(text), len(text));
+  int shut = fs_close(h);
+} return void;
+given tf_file("") ((import tf_path), "hey"):() then tf_size:(3) then tf_rm:(0)
+given tf_file("long") ((import tf_path), ""):() then tf_size:(0) then tf_rm:(0)
+
+// A project tree: a conf.id, a source file, a source file in a subdirectory,
+// and a hidden directory and a build directory that are not source.
+tf_tree() {
+  export string tf_root = fs_mktemp("idrun_d_", 1);
+  tf_put((import tf_root) + "/conf.id", "int k = 3;\n// c\n");
+  tf_put((import tf_root) + "/a.id", "x\n");
+} chain () {
+  int m1 = fs_mkdir((import tf_root) + "/z");
+  tf_put((import tf_root) + "/z/b.id", "y\n");
+  int m2 = fs_mkdir((import tf_root) + "/.hid");
+} chain () {
+  tf_put((import tf_root) + "/.hid/c.id", "h\n");
+  int m3 = fs_mkdir((import tf_root) + "/build");
+  tf_put((import tf_root) + "/build/d.id", "b\n");
+} return void;
+():() then tf_rmtree:(0)
+():() then tf_rmtree:(0) then tf_rmtree:(-9)
+
+// What the walk should answer for that tree, built from dr_one: tf_ww for the
+// sources, tf_wwp with the constant ahead of it, tf_wwb when build is not the
+// output directory of the root, tf_wz for the subdirectory alone.
+tf_want() {
+  export string tf_ww = dr_one((import tf_root) + "/a.id") + dr_one((import tf_root) + "/z/b.id");
+  export string tf_wz = dr_one((import tf_root) + "/z/b.id");
+  export string tf_wwp = "printf '#const\\n%s\\n' 'int k = 3;'; " + (import tf_ww);
+} chain () {
+  export string tf_wbd = dr_one((import tf_root) + "/build/d.id");
+  export string tf_wwb = dr_one((import tf_root) + "/a.id") + (import tf_wbd) + (import tf_wz);
+} return void;
+given tf_tree ():() then tf_rmtree:(0)
+given tf_tree ():() then tf_rmtree:(0) then tf_rmtree:(-9)

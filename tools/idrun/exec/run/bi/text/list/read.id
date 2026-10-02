@@ -1,0 +1,31 @@
+// A new empty list, and what it is: an index into ex_lists, with a lock flag
+// in ex_llock that list_lock sets for a constant list.
+vm_lnew() {
+  word[][] lt = (import ex_lists);
+  word[] l = [];
+  push(lt, l);
+} chain () {
+  int[] lk = (import ex_llock);
+  push(lk, 0);
+  int h = len(lt) - 1;
+} return int h;
+given vb_boot ():(1) then tf_lists:([[], []]) then tf_llock:([0, 0])
+given vb_boot given tf_lnew ():(2) then tf_lists:([[], [], []])
+
+vm_b_list_get(word wa, word wb) {
+  int hl = wa;
+  int i = wb;
+  word wr = vm_cell(hl, i);
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1, 1):(6)
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1, 0):(5)
+
+vm_b_list_len(word wa) {
+  int hl = wa;
+  int n = 0;
+  if (vm_live(hl) == 1) {
+    n = len((import ex_lists)[hl]);
+  }
+} return int n;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1):(2)
+given vb_boot given tf_lnew (1):(0)

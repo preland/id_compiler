@@ -1,0 +1,181 @@
+// idrun -- an interpreter for the IR idparse prints with `--target llvm --opt 0`
+// (docs/INTERPRETER.md, option B). The front end runs as the compiler's own
+// idlex and idparse processes; this program reads the IR text they print,
+// lowers it once into the instruction table below, and executes that.
+//
+// An instruction is five consecutive cells of ex_cd: op, d, a, b, x. A pc is
+// the index of its op cell, so the next instruction is pc + 5. d is the slot
+// written (or a global's index for a global store), a and b are slots read,
+// x is the odd one out: a branch target, a predicate mask, a frame size.
+// A slot is an index into the frame, which is a window of ex_vals and
+// ex_fvals starting at the frame pointer.
+//
+// The VM's own opcodes, hottest first: vm_step tests them in this order.
+int o_mov = 0;
+int o_add32 = 1;
+int o_icmp = 2;
+int o_cbr = 3;
+int o_br = 4;
+int o_movf = 5;
+int o_call = 6;
+int o_ret = 7;
+int o_bcall = 8;
+int o_sub32 = 9;
+int o_gld = 10;
+int o_gst = 11;
+int o_mul32 = 12;
+int o_add64 = 13;
+int o_sub64 = 14;
+int o_mul64 = 15;
+int o_and = 16;
+int o_or = 17;
+int o_xor = 18;
+int o_zext32 = 19;
+int o_trunc32 = 20;
+int o_fadd = 21;
+int o_fsub = 22;
+int o_fmul = 23;
+int o_fdiv = 24;
+int o_fcmp = 25;
+int o_sitofp = 26;
+int o_fptosi = 27;
+int o_gldf = 28;
+int o_gstf = 29;
+int o_calli = 30;
+int o_boxf = 31;
+int o_unboxf = 32;
+int o_strf = 33;
+// Cells per instruction, and cells per function-table row.
+int i_n = 5;
+int ft_n = 5;
+// Function-table columns: entry pc, parameter count, frame size, and the
+// half-open range of constant-pool rows copied into every new frame.
+int ft_pc = 0;
+int ft_np = 1;
+int ft_sz = 2;
+int ft_k0 = 3;
+int ft_k1 = 4;
+// ex_rg: frame pointer, halt flag, exit status.
+int r_fp = 0;
+int r_halt = 1;
+int r_status = 2;
+// Value-stack size to start with, in slots; it grows by that much again.
+int stack_n = 4096;
+// ld_pr: the loader's registers. Cursor into the text, slots handed out in
+// the current function, the current function's id and first pc and first
+// constant row, whether the function being read is skipped, how many
+// diagnostics were printed, and the end of the last token.
+int pr_p = 0;
+int pr_nslot = 1;
+int pr_fid = 2;
+int pr_pc0 = 3;
+int pr_skip = 4;
+int pr_k0 = 5;
+int pr_err = 6;
+int pr_np = 7;
+// Type codes the loader keeps for a type word.
+int t_void = 0;
+int t_i1 = 1;
+int t_i32 = 2;
+int t_i64 = 3;
+int t_ptr = 4;
+int t_dbl = 5;
+// What the loader asks a symbol-table key for: a prefix and the name.
+string ty_names = "void i1 i32 i64 ptr double i8 i16";
+string ins_names = "alloca load store add sub mul and or xor fadd fsub fmul fdiv icmp fcmp sext zext trunc sitofp fptosi ptrtoint inttoptr bitcast call br ret";
+string pred_names = "eq ne slt sle sgt sge oeq one olt ole ogt oge une ueq ult ule ugt uge ord uno";
+int[] pred_mask = [2, 5, 1, 3, 4, 6, 2, 5, 1, 3, 4, 6, 13, 10, 9, 11, 12, 14, 7, 8];
+// Instruction codes, in ins_names order.
+int p_alloca = 0;
+int p_load = 1;
+int p_store = 2;
+int p_add = 3;
+int p_sub = 4;
+int p_mul = 5;
+int p_and = 6;
+int p_or = 7;
+int p_xor = 8;
+int p_fadd = 9;
+int p_fsub = 10;
+int p_fmul = 11;
+int p_fdiv = 12;
+int p_icmp = 13;
+int p_fcmp = 14;
+int p_sext = 15;
+int p_zext = 16;
+int p_trunc = 17;
+int p_sitofp = 18;
+int p_fptosi = 19;
+int p_ptrtoint = 20;
+int p_inttoptr = 21;
+int p_bitcast = 22;
+int p_call = 23;
+int p_br = 24;
+int p_ret = 25;
+// The runtime helpers the IR calls by name, in the order of the b_ ids below,
+// grouped by what they touch: strings, lists, console and clock, arithmetic
+// helpers, the flat store. The three that take or give a double are VM
+// opcodes of their own.
+string bi_names = "id_concat id_str_of_int id_charat id_len id_str_of_word id_chr strcmp id_to_int id_str_of_mem id_mem_of_str id_list_get id_list_push id_list_new id_list_set id_list_len id_list_pop id_list_lock id_print id_eprint id_put id_flush id_input id_read_all id_getkey id_sleep_ms id_ticks id_idiv id_imod id_sdiv id_smod id_shl id_sar id_ushr id_udiv id_umod id_ult id_mem_alloc id_mem_size id_peek8 id_peek16 id_peek32 id_peek64 id_poke8 id_poke16 id_poke32 id_poke64";
+string fbi_names = "id_box_f id_unbox_f id_str_of_float";
+int b_concat = 0;
+int b_str_of_int = 1;
+int b_charat = 2;
+int b_len = 3;
+int b_str_of_word = 4;
+int b_chr = 5;
+int b_strcmp = 6;
+int b_to_int = 7;
+int b_str_of_mem = 8;
+int b_mem_of_str = 9;
+int b_list_get = 10;
+int b_list_push = 11;
+int b_list_new = 12;
+int b_list_set = 13;
+int b_list_len = 14;
+int b_list_pop = 15;
+int b_list_lock = 16;
+int b_print = 17;
+int b_eprint = 18;
+int b_put = 19;
+int b_flush = 20;
+int b_input = 21;
+int b_read_all = 22;
+int b_getkey = 23;
+int b_sleep_ms = 24;
+int b_ticks = 25;
+int b_idiv = 26;
+int b_imod = 27;
+int b_sdiv = 28;
+int b_smod = 29;
+int b_shl = 30;
+int b_sar = 31;
+int b_ushr = 32;
+int b_udiv = 33;
+int b_umod = 34;
+int b_ult = 35;
+int b_mem_alloc = 36;
+int b_mem_size = 37;
+int b_peek8 = 38;
+int b_peek16 = 39;
+int b_peek32 = 40;
+int b_peek64 = 41;
+int b_poke8 = 42;
+int b_poke16 = 43;
+int b_poke32 = 44;
+int b_poke64 = 45;
+// Where each group of helpers ends: ids below b_strs_end are string helpers,
+// below b_lists_end list helpers, below b_io_end console and clock, below
+// b_arith_end arithmetic, and the rest touch the flat store.
+int b_strs_end = 10;
+int b_lists_end = 17;
+int b_io_end = 26;
+int b_arith_end = 36;
+// The VM ops for add sub mul and or xor, at 32 and at 64 bits, indexed by the
+// instruction's offset from p_add. They are the o_ numbers above, written out
+// because a list constant holds literals only; a case in ld_binop holds the
+// two sets together.
+int[] bin32 = [1, 9, 12, 16, 17, 18];
+int[] bin64 = [13, 14, 15, 16, 17, 18];
+// What idparse is told about the machine; the IR is the same either way.
+string host_triple = "x86_64-unknown-linux-gnu";

@@ -1,0 +1,24 @@
+// A @name that is a global variable: its index.
+ld_gref() {
+  ld_adv(1);
+  string nm = ld_word();
+  int g = ld_get("g", nm);
+} return int g;
+given tf_ld("@x") ():(0) then tf_gv:([0])
+given tf_ld("@x @y") given tf_gr ():(1) then tf_gv:([0, 0])
+
+ld_gread(int d, int ty) {
+  int g = ld_gref();
+  ld_emit(ld_fsel(ty, (import o_gld), (import o_gldf)), d, g, 0, 0);
+} return void;
+given tf_ld("@g") (3, 2):() then tf_cd:([10, 3, 0, 0, 0])
+given tf_ld("@g") (3, 5):() then tf_cd:([28, 3, 0, 0, 0])
+given tf_ld("@x @g") given tf_gr (3, 2):() then tf_cd:([10, 3, 1, 0, 0])
+
+ld_gwrite(int a, int ty) {
+  int g = ld_gref();
+  ld_emit(ld_fsel(ty, (import o_gst), (import o_gstf)), g, a, 0, 0);
+} return void;
+given tf_ld("@g") (4, 2):() then tf_cd:([11, 0, 4, 0, 0])
+given tf_ld("@g") (4, 5):() then tf_cd:([29, 0, 4, 0, 0])
+given tf_ld("@x @g") given tf_gr (4, 2):() then tf_cd:([11, 1, 4, 0, 0])

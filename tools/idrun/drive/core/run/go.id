@@ -1,0 +1,40 @@
+// The leading flags set cells of fl (--ll, --allow-untested); answers the index
+// of the first argument that is not one, which is PATH.
+dr_flags(string[] argv, int[] fl) {
+  int i = 1;
+  while (i < len(argv) && dr_isflag(argv[i], fl) == 1) {
+    i = i + 1;
+  }
+} return int i;
+given tf_fl (["idrun", "--ll", "x"], (import tf_flags)):(2) then tf_flr:([1, 0])
+given tf_fl (["idrun", "--allow-untested", "--ll", "x"], (import tf_flags)):(3) then tf_flr:([1, 1])
+given tf_fl (["idrun"], (import tf_flags)):(1) then tf_flr:([0, 0])
+
+dr_isflag(string arg, int[] fl) {
+  int hit = 0;
+  if (arg == "--ll") {
+    fl[0] = 1;
+    hit = 1;
+  }
+  if (arg == "--allow-untested") {
+    fl[1] = 1;
+    hit = 1;
+  }
+} return int hit;
+given tf_fl ("--ll", (import tf_flags)):(1) then tf_flr:([1, 0])
+given tf_fl ("--allow-untested", (import tf_flags)):(1) then tf_flr:([0, 1])
+given tf_fl ("prog", (import tf_flags)):(0) then tf_flr:([0, 0])
+
+// --ll runs IR text as it is; anything else is compiled first, in a scratch
+// directory named for the clock.
+dr_go(string[] argv, int at, int[] fl) {
+  int code = 1;
+  if (fl[0] == 1) {
+    code = dr_exec(dr_bytes(argv[at]), lst_str_tail(argv, at));
+  } else {
+    int t = ticks();
+    code = dr_src(argv, at, fl, "/tmp/idrun-" + t + "-");
+  }
+} return int code;
+given tf_file("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") (["idrun", "--ll", (import tf_path)], 2, [1, 0]):(7) then tf_rm:(0)
+given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("main(int argc, string[] argv) {\n} return int 5;\n") (["idrun", (import tf_path)], 1, [0, 1]):(5) then tf_rm:(0)

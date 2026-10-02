@@ -1,0 +1,34 @@
+ld_gvar(string nm) {
+  int ty = ld_ty();
+  int g = ld_get("g", nm);
+  ld_skip();
+} chain (string nm) {
+  ld_ginit(g, ty);
+} return void;
+given tf_ld("i32 7") ("x"):() then tf_gv:([7])
+given tf_ld("double 2.5") ("x"):() then tf_gf:([2.5]) then tf_gv:([0])
+given tf_ld("ptr null") ("x"):() then tf_gv:([0])
+
+// The initial value: a float, a @name (a string constant), or an integer;
+// null stays the zero the global started as.
+ld_ginit(int g, int ty) {
+  word[] gv = (import ex_gv);
+  float[] gf = (import ex_gf);
+  int c = ld_at();
+} chain (int g, int ty) {
+  if (ty == (import t_dbl)) {
+    gf[g] = ld_fnum();
+    return;
+  }
+  if (c == 64) {
+    gv[g] = ld_cptr();
+    return;
+  }
+  if (c != 110) {
+    gv[g] = ld_num();
+  }
+} return void;
+given tf_ld("7") given tf_gset(0, 0) given tf_gsetf(0, 0.0) (0, 2):() then tf_gv:([7])
+given tf_ld("2.5") given tf_gset(0, 0) given tf_gsetf(0, 0.0) (0, 5):() then tf_gf:([2.5])
+given tf_ld("@.s") given tf_gset(0, 0) given tf_gsetf(0, 0.0) (0, 4):() then tf_gv:([1])
+given tf_ld("null") given tf_gset(0, 9) given tf_gsetf(0, 0.0) (0, 4):() then tf_gv:([9])

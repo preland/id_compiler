@@ -1,0 +1,27 @@
+// A @name at the cursor as a value: a string constant's handle, or a
+// function's id when the name is one (its address is its id).
+ld_cptr() {
+  ld_adv(1);
+  string nm = ld_word();
+  int id = ld_cid(nm);
+} return int id;
+given tf_ld("@.str1") ():(1) then tf_strs:(["", ""])
+given tf_ld("@id_f") ():(0) then tf_fnames:(["id_f"])
+
+ld_cid(string nm) {
+  int id = 0;
+  if (charat(nm, 0) == 46) {
+    id = ld_get("s", nm);
+  } else {
+    id = ld_get("f", nm);
+  }
+} return int id;
+given lb_boot given vb_boot (".s"):(1)
+given lb_boot given vb_boot ("id_f"):(0)
+
+ld_cref() {
+  int id = ld_cptr();
+  int sl = ld_kword(id);
+} return int sl;
+given tf_ld("@id_f") ():(0) then tf_ks:([0]) then tf_kv:([0])
+given tf_ld("@.s") ():(0) then tf_kv:([1])

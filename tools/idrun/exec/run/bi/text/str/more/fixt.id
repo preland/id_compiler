@@ -1,0 +1,20 @@
+// Make a string, the way a program's own operations do, and read the table back.
+tf_sput(string s) {
+  int h = vm_sput(s);
+} return void;
+given vb_boot (""):() then tf_strs:(["", ""])
+given vb_boot ("a"):() then tf_strs:(["", "a"])
+
+tf_strs() {
+  string[] ts = (import ex_strs);
+} return string[] ts;
+given vb_boot ():([""])
+given vb_boot given tf_sput("x") given tf_sput("yz") ():(["", "x", "yz"])
+
+// A string put in the flat store, and where: the address is exported as
+// tf_addr, so a case can hand it to a function by name.
+tf_mem(string s) {
+  export word tf_sa = mem_of_str(s);
+} return void;
+given vb_boot ("hey"):() then tf_peek:(104)
+given vb_boot ("") :() then tf_peek:(0)

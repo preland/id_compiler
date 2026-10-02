@@ -1,0 +1,25 @@
+// Add a string to the table of every string the program has made, and answer
+// its index, which is what a string value is.
+vm_sput(string s) {
+  string[] ts = (import ex_strs);
+  push(ts, s);
+  int h = len(ts) - 1;
+} return int h;
+given vb_boot ("hi"):(1) then tf_strs:(["", "hi"])
+given vb_boot given tf_sput("a") ("b"):(2) then tf_strs:(["", "a", "b"])
+
+// Concatenation: the two operands are handles into ex_strs.
+vm_b_concat(word wa, word wb) {
+  int ia = wa;
+  int ib = wb;
+  int h = vm_sput((import ex_strs)[ia] + (import ex_strs)[ib]);
+} return int h;
+given vb_boot given tf_sput("ab") given tf_sput("cd") (1, 2):(3) then tf_strs:(["", "ab", "cd", "abcd"])
+given vb_boot given tf_sput("ab") given tf_sput("cd") (2, 1):(3) then tf_strs:(["", "ab", "cd", "cdab"])
+
+vm_b_str_of_int(word wa) {
+  int n = wa;
+  int h = vm_sput("" + n);
+} return int h;
+given vb_boot (42):(1) then tf_strs:(["", "42"])
+given vb_boot (-7):(1) then tf_strs:(["", "-7"])

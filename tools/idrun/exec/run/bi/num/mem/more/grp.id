@@ -1,0 +1,56 @@
+vm_b_poke64(word wa, word wb) {
+  poke64(wa, wb);
+} return void;
+given tf_mem8(0) ((import tf_addr), 99):() then tf_pk:(99)
+given tf_mem8(-1) ((import tf_addr), -5):() then tf_pk:(-5)
+
+// The store helpers, by id.
+vm_bm(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_mem_alloc)) {
+    wr = vm_b_alloc(wa);
+    return wr;
+  }
+  if (id == (import b_mem_size)) {
+    wr = vm_b_store_size();
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_peek8)) {
+    wr = vm_b_peek8(wa);
+    return wr;
+  }
+  if (id == (import b_peek16)) {
+    wr = vm_b_peek16(wa);
+    return wr;
+  }
+  if (id == (import b_peek32)) {
+    wr = vm_b_peek32(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_peek64)) {
+    wr = vm_b_peek64(wa);
+    return wr;
+  }
+  if (id == (import b_poke8)) {
+    vm_b_poke8(wa, wb);
+    return wr;
+  }
+  if (id == (import b_poke16)) {
+    vm_b_poke16(wa, wb);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_poke32)) {
+    vm_b_poke32(wa, wb);
+    return wr;
+  }
+  vm_b_poke64(wa, wb);
+} return word wr;
+(36, 8, 0, 0):(8)
+(37, 0, 0, 0):(1)
+given tf_mem8(578437695752307201) (39, (import tf_addr), 0, 0):(513)
+given tf_mem8(578437695752307201) (41, (import tf_addr), 0, 0):(578437695752307201)
+given tf_mem8(0) (42, (import tf_addr), 513, 0):(0) then tf_pk:(1)
+given tf_mem8(0) (45, (import tf_addr), 77, 0):(0) then tf_pk:(77)
