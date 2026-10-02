@@ -3,13 +3,13 @@
 This is the compiler submodule of [`id_development`](../README.md), the
 umbrella repository for the `id` language. It holds the self-hosted compiler
 (`compiler/lex`, `compiler/parse`), the `bin/idc` driver, the bootstrap C
-(`bootstrap/`), the frozen Python implementation (`idc.py`), the dev tools
+(`bootstrap/`), the dev tools
 (`tools/`), and the regression suite (`tests/`).
 
 For what `id` is, the language rules, and a quick start building
 `demos/hello`, see the [umbrella README](../README.md). This file covers what
 lives in this directory: the driver's internals, the two code generators,
-idstd's native backends, self-hosting, and `idc.py`'s freeze. See
+idstd's native backends and self-hosting. See
 [`../docs/SPEC.md`](../docs/SPEC.md) for the language specification and
 [`../docs/HACKING.md`](../docs/HACKING.md) before changing the compiler.
 
@@ -29,14 +29,12 @@ working tree, so nothing but that snapshot is ever frozen and no compiler for
 `id` has to exist on the machine beforehand. See
 [`bootstrap/README.md`](bootstrap/README.md). From then on, building
 `PATH` means: collect its `.id` file(s) (a single file, or every `.id` under a
-project directory, sorted by full path — the same order `idc.py` uses), run
+project directory, sorted by full path), run
 `cat files | idlex | idparse` to get C, then hand that C to `cc`. `-o`,
-`--emit-c`, `--keep-c`, and `--cc` all work the same as in `idc.py`. `--backend
+`--emit-c`, `--keep-c`, and `--cc` are listed in `bin/idc`'s usage text. `--backend
 DIR` is now an override, not how a program gets a backend: `DIR` holds a
 `backend.id` whose `name` matches an attached backend, plus its sources and no
-declarations, and it replaces how that backend is linked for the build —
-`idc.py`'s `resolve_backend` reads a `backend.json` no backend has any more,
-so `idc.py` can no longer link one regardless.
+declarations, and it replaces how that backend is linked for the build.
 
 **Coverage:** there is no fallback — `bin/idc` drives the self-hosted stages
 and nothing else. They implement the whole language and all of its rules: the
@@ -93,7 +91,8 @@ test harness ahead of the program on the same stream (so the program's own C
 is unchanged); it carries only the functions
 a case can reach. The driver splits it off, compiles it with the build's
 backends and runs it. Each case runs in a process
-of its own with 30 seconds and 4 GiB, so a case that traps or crashes is
+of its own with 30 seconds (or its own `timeout N`) and 4 GiB, so a case that
+traps or crashes is
 reported as that case. `[time:…]`/`[mem:…]` claims are counted exactly and
 judged after every case has passed. A build whose cases cannot run on this
 machine — `--freestanding`, or another platform's `--triple` — is refused,
@@ -308,27 +307,13 @@ reproduces itself exactly (a fixpoint) — `tests/run.sh` checks it. See
 self-hosted binaries into `id`'s primary build command — see "`bin/idc`: the
 self-hosted driver" above.
 
-## The compiler: one implementation, and a frozen bootstrap
+## The compiler: one implementation, and a checked-in bootstrap
 
-**`idc.py` is frozen.** It is not a second supported compiler, not a fallback,
-and not a place to add anything — not a line, not a rule, not a lint fix.
-`tests/run.sh` checks its sha256 against a recorded value and fails if it has
-changed at all. [`../docs/HACKING.md`](../docs/HACKING.md) says more.
-
-It is the original, self-contained Python implementation: lexer →
-recursive-descent parser → semantic checks (action limit, function-per-file
-limit, project entry-count limit, global name uniqueness, function-logic
-uniqueness, export/import access, light type checking) → C/LLVM/WASM emission
-→ `cc`/`clang`/`wat2wasm`. It **used to be stage 0 of the bootstrap**; that job
-went to [`bootstrap/`](bootstrap) — the compiler as C, compiled by `cc` — and
-`bin/idc` no longer executes `idc.py` at all. What still reaches it:
-
-- **The WASM codegen target**, `--target wasm` (and `--emit-wasm`) — the last
-  thing `bin/idc` does not have. `--target llvm` moved across and is now the
-  self-hosted compiler's own ([`../docs/LLVM.md`](../docs/LLVM.md)); WASM is
-  what is left, and porting it is what would let `idc.py` be deleted.
-  `tests/conform.sh`'s wasm lane and the wasm half of `tests/run.sh`'s
-  alt-target checks build with it for that reason.
+There is one compiler. The original Python implementation, `idc.py`, was
+frozen and then deleted; `bootstrap/` (the compiler as C, compiled by `cc`)
+took over its stage-0 job, and `bin/idc` implements `--target c`, `llvm` and
+`wasm` itself (`--target wasm` recompiles the C target's C for wasm32-wasi;
+`tests/wasm.sh` is its test).
 
 The **C runtime prelude** used to live in `idc.py`'s `RUNTIME` string, with
 `tools/gen_runtime_id.py` regenerating the `id`-side copy
@@ -337,15 +322,9 @@ are hand-maintained `id` source now, kept in step by hand rather than
 generated; `tests/stdlib.sh` checks that `compiler/parse/conf.id`'s reserved-name
 list has not drifted from `prelude.id`.
 
-**It was never where language features should be built**, and that is truer
-than ever now that it cannot change at all. "Reference implementation" is what
-the "one implementation" heading above used to call it, and that reading —
-*the definition of correct, so define the feature here and port it* — is why
-work kept landing in Python instead of in `id`. Stage 0 needs a construct only
-once the self-hosted compiler's own source uses that construct — and since
-`bootstrap/` landed, "stage 0" means the checked-in C rather than the Python,
-so teaching the language a construct is `tools/regen_bootstrap.sh` and not a
-second implementation. Read
+Language features are built in the self-hosted compiler. A construct reaches
+stage 0 only once the compiler's own source uses it, so teaching the language
+a construct is `tools/regen_bootstrap.sh`, not a second implementation. Read
 [`../docs/HACKING.md`](../docs/HACKING.md) before changing the language;
 [`compiler/parse/MAP.md`](compiler/parse/MAP.md) is the index
 that makes the self-hosted tree navigable, which was the other half of the
