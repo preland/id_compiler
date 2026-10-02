@@ -768,10 +768,10 @@ seen_dep() { # seen_dep RESOLVED -- true if already visited
 # A constant has one home: the conf.id of the root that declares it. A root can
 # be reached more than once -- imported whole, and through one or more of its
 # subdirectories -- so CONST_ROOTS holds each resolved directory whose
-# constants are already in CONSTS, and CONST_AT holds `name|manifest:line` for
+# constants are already in CONSTS, and CONST_AT maps each name to `manifest:line` for
 # each constant taken, so a second declaration of a name is reported at both.
 CONST_ROOTS=()
-CONST_AT=()
+declare -A CONST_AT=()
 
 # seen_const_root RESOLVED -- true if its constants are already taken.
 seen_const_root() {
@@ -782,13 +782,10 @@ seen_const_root() {
     return 1
 }
 
-# const_declared_at NAME -- print where NAME was already declared, if it was.
+# const_declared_at NAME -- true if NAME was already declared, with where in `at`.
 const_declared_at() {
-    local e
-    for e in ${CONST_AT+"${CONST_AT[@]}"}; do
-        [ "${e%%|*}" = "$1" ] && { printf '%s' "${e#*|}"; return 0; }
-    done
-    return 1
+    [ -n "${CONST_AT[$1]+x}" ] || return 1
+    at="${CONST_AT[$1]}"
 }
 
 # enclosing_root DIR -- the nearest directory strictly above DIR that has a
@@ -819,6 +816,7 @@ read_manifest() {
     # string.
     local root="$1" mode="${2:-}" lineno=0 line trimmed dep deppath manifest seen_const=0
     local root_key taken=0 name at up
+    local const_re='^(int|word|float|string)(\[\])?[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=.*;$'
     manifest="$root/conf.id"
     [ -f "$manifest" ] || return 0
     root_key="$(cd "$root" && pwd -P)"
@@ -836,16 +834,16 @@ read_manifest() {
         # from before what it is configured with. They are collected here and
         # injected into the source stream by emit_sources, because idparse is
         # what checks and emits them and `id` cannot read a file.
-        if printf '%s' "$trimmed" | grep -qE '^(int|word|float|string)(\[\])?[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=.*;$'; then
+        if [[ "$trimmed" =~ $const_re ]]; then
             seen_const=1
             [ "$taken" -eq 1 ] && continue
-            name=$(printf '%s' "$trimmed" | sed -E 's/^[a-z]+(\[\])?[[:space:]]+([A-Za-z_][A-Za-z0-9_]*).*/\2/')
-            if at=$(const_declared_at "$name"); then
+            name="${BASH_REMATCH[3]}"
+            if const_declared_at "$name"; then
                 echo "$manifest:$lineno: error: constant '$name' is already declared at $at; a constant has one home -- rename one of them" >&2
                 STRUCT_VIOLATIONS=1
                 continue
             fi
-            CONST_AT+=("$name|$manifest:$lineno")
+            CONST_AT[$name]="$manifest:$lineno"
             CONSTS+=("$trimmed")
             continue
         fi
@@ -1048,16 +1046,16 @@ fi
 # Per-unit C compilation (unit_build, below): idparse marks where each source
 # file's functions begin (--units), and the C is compiled as a handful of
 # translation units cached one by one, so an edit recompiles the unit it is
-# in. Off with the caches (IDC_NO_CACHE), under IDC_UNITS=0, and for the
-# driver's own compiler stages, which stage 0 compiles and which are built
-# once and then run by every build: they keep the one translation unit they
-# always had.
+# in. Off with the caches (IDC_NO_CACHE) and under IDC_UNITS=0. The driver's
+# own compiler stages use them too: a cold bootstrap is the one build that is
+# too long to start over, and a run stopped part way keeps every unit it had
+# finished. A stage 0 that predates --units writes no markers, unit_build then
+# says no, and the stage is compiled whole as it always was.
 # (Measured on idparse itself, built both ways from the same C: 7.75 s and
 # 7.78 s on the same input, so units cost the program nothing measurable.)
 UNITS_ON=1
 [ "${IDC_UNITS:-1}" = 0 ] && UNITS_ON=0
 [ -n "${IDC_NO_CACHE:-}" ] && UNITS_ON=0
-[ -n "${IDC_STAGE_LEX:-}" ] && UNITS_ON=0
 
 PARSE_ARGS=()
 # The target triple selects among a program's `asm` overloads, and is always
@@ -2371,11 +2369,23 @@ run_cases() {
 # run_lib_precheck), and the content of every file under ROOT (pruned the way
 # collect_ids prunes source: hidden directories and BUILD_DIR are never
 # source, and a library built in place must hash the same as one that was
-# never built). Nothing about the PROGRAM being built is in it, so two
-# different programs against the same library and compiler hit one entry.
+# never built -- which is also why a backend's .gen.o is left out: a build
+# running beside this one writes it into the library for as long as it runs,
+# and hashing it made every concurrent build miss). Nothing about the PROGRAM
+# being built is in it, so two different programs against the same library and
+# compiler hit one entry.
 lib_precheck_key() {
     local root="$1" cc_path
+    shift
     {
+        # A backend library that calls the standard library is checked with
+        # it, so the answer depends on that library's content as well as its
+        # own. The stdlib's own pre-check names itself and adds nothing.
+        if [ "${1:-}" = "--std" ] && [ "${2:-}" != "$root" ]; then
+            lib_precheck_key "$2"
+        else
+            echo "no separate library"
+        fi
         # Redirected (< "$f"), not "$f" as an argument: sha256sum prints the
         # path it was given alongside the hash, and ROOT's own path is not
         # part of what determines this answer (a checkout at a different
@@ -2389,7 +2399,7 @@ lib_precheck_key() {
         find "$root" -mindepth 1 \
              \( -type d -name '.*' -prune \) -o \
              \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
-             \( -type f -print \) \
+             \( -type f ! -name '*.gen.o' -print \) \
             | LC_ALL=C sort \
             | while IFS= read -r f; do sha256sum < "$f"; done
     } | sha256sum | cut -d' ' -f1
@@ -2403,6 +2413,10 @@ lib_precheck_key() {
 # so it costs no re-bootstrap -- but with its OWN fe/ and obj/
 # subdirectories, never this build's, which is what keeps a program build's
 # own cache-entry counts exactly what they always were (tests/cache.sh).
+# Only a pass is kept. A failure is found again by running again: the key names
+# the library's content, so a failure kept under it would outlast the cause --
+# and the cause can be the machine (two builds writing the same backend object
+# at once) rather than the library.
 # STDARG... is --std "$STDLIB" for the stdlib itself, or --no-std for a
 # backend directory checked standing alone -- exactly how a --no-std program
 # that imports it directly already has to build (fs's own README/comments:
@@ -2427,15 +2441,11 @@ run_lib_precheck() {
     local root="$1" kind="$2"; shift 2
     local key="" entry=""
     if [ "$CACHE_ON" -eq 1 ]; then
-        key=$(lib_precheck_key "$root")
+        key=$(lib_precheck_key "$root" "$@")
         entry="$STD_PRECHECK_DIR/$key"
-        if [ -f "$entry/rc" ]; then
+        if [ -f "$entry/rc" ] && [ "$(cat "$entry/rc")" -eq 0 ]; then
             touch "$entry"
-            [ "$(cat "$entry/rc")" -eq 0 ] && return 0
-            progress_clear
-            echo "idc: the $kind at $root failed its own test cases (this is not an error in your program):" >&2
-            cat "$entry/out" >&2
-            exit 1
+            return 0
         fi
     fi
 
@@ -2463,7 +2473,7 @@ run_lib_precheck() {
     rc=$?
     progress_clear
 
-    if [ "$CACHE_ON" -eq 1 ]; then
+    if [ "$CACHE_ON" -eq 1 ] && [ "$rc" -eq 0 ]; then
         mkdir -p "$lib_work/entry"
         cp "$out" "$lib_work/entry/out"
         printf '%s\n' "$rc" > "$lib_work/entry/rc"
@@ -2522,7 +2532,14 @@ run_backend_prechecks() {
     [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
     for i in "${!LIB_PRECHECK_DIRS[@]}"; do
         [ "${LIB_PRECHECK_DIRS[$i]}" = "$path_key" ] && continue
-        run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std
+        case "${LIB_PRECHECK_DIRS[$i]}/" in
+            "$STDLIB"/*) run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std ;;
+            *) if [ -n "$STDLIB" ]; then
+                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --std "$STDLIB"
+               else
+                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std
+               fi ;;
+        esac
     done
 }
 
