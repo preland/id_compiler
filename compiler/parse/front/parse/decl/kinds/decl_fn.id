@@ -1,0 +1,13 @@
+// The two declarations that are functions: an asm body or an ordinary one.
+// The third kind, a struct, is told apart before this is reached
+// (../top/decl/decl_top.id).
+
+parse_decl_fn(int[] pos) {
+  if(cur_text(pos) == "asm") {
+    push_asm(pos);
+  } else {
+    push_func(pos);
+  }
+} return void;
+given decl_tokens ([0]):() then check_failed:(0)
+given decl_tokens ([0]):() then prog_len:(1)

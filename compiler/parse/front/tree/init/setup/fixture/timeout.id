@@ -1,0 +1,41 @@
+// Token streams for a case's `timeout N` clause, for cases under
+// decl/func/cases/case/given/ (setup.id). One stream holds several clauses, each
+// a start position for the case to be pointed at:
+//
+//   0   timeout 5 (
+//   3   timeout 0
+//   5   timeout "x"
+//   7   timeout 3 timeout 4
+//   11  timeout 2 stdin
+//   14  timeout 99999999999
+//   16  timeout 6 y
+//
+// See toks/decl.id for toks_push.
+
+tmo_fix() {
+  env_init();
+  toks_push(["kw", "int", "op", "kw", "int", "kw", "str", "kw", "int", "kw", "int", "kw", "int", "kw", "kw", "int", "kw", "int", "ident"], ["timeout", "5", "(", "timeout", "0", "timeout", "\"x\"", "timeout", "3", "timeout", "4", "timeout", "2", "stdin", "timeout", "99999999999", "timeout", "6", "y"]);
+} return void;
+():() then init_units:(0)
+():() then check_failed:(0)
+
+// A casetimeout holding the one entry 7, for tmo_last to be checked against.
+tmo_one_fix() {
+  env_init();
+  push((import casetimeout), 7);
+} return void;
+():() then tmo_last:(7)
+():() then check_failed:(0)
+
+// The `timeout` entry the last case parsed pushed to casetimeout, or -1 with
+// none, for a case whose function under test returns nothing (a `then` check
+// takes no arguments).
+tmo_last() {
+  int tmo_v = -1;
+  int tmo_n = len((import casetimeout));
+  if(tmo_n > 0) {
+    tmo_v = (import casetimeout)[tmo_n - 1];
+  }
+} return int tmo_v;
+given tmo_fix ():(-1)
+given tmo_one_fix ():(7)

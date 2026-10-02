@@ -3,11 +3,16 @@
 // exactly where dce_prune decides to run at all -- a build with `main`, not
 // `--freestanding` (nat_all_live, back/drive/sink/natives/more/live.id).
 //
-// The test harness keeps every export. It narrows `prog` to the functions a
-// case reaches, and a kept function may still read an export whose declaring
-// function no case reaches -- a setup the program runs from main. Pruning that
-// export left the harness C with an undeclared global (qmon's `qm_qmph`), and
-// the saving is one C global, where the narrowing exists to save functions.
+// The test harness keeps every export a function declares. It narrows `prog`
+// to the functions a case reaches, and a kept function may still read an
+// export whose declaring function no case reaches -- a setup the program runs
+// from main. Pruning that export left the harness C with an undeclared global
+// (qmon's `qm_qmph`), and the saving is one C global, where the narrowing
+// exists to save functions.
+//
+// A constant has no declaring function, so it is kept when the code that is
+// emitted reads it (clive, live/mark.id) -- in the harness as well, where the
+// code is the narrowed functions and the cases.
 // The loose-duplicate canon (mid/form/decomp/checks/loose/)'s own env and
 // id 0: a "str" leaf -- uq_begin resets the position map canon_var/
 // canon_callee/canon_param read, which env_init's own chain never reaches.
@@ -37,7 +42,13 @@ keep_export(int i) {
   if(is_harn() == 0 && nat_all_live() == 0) {
     ok = is_reach((import eowners)[i]);
   }
+  if((import eowners)[i] == "conf.id" && nat_all_live() == 0) {
+    int const_at = find_str((import clive), (import enames)[i]);
+    ok = const_at >= 0;
+  }
 } return int ok;
 given keep_export_fixture_harn_on (0):(1)
 given keep_export_fixture_reg (0):(0)
 given keep_export_fixture_reg (1):(1)
+given cvl_setup given cvl_mark(0) (0):(1)
+given cvl_setup given cvl_mark(0) (2):(0)

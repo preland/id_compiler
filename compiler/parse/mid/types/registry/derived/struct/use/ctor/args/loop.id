@@ -1,0 +1,26 @@
+// The arguments of a constructor, judged like a function's: how many, and each
+// against its field, at the argument's own line (fit.id).
+
+ctor_arity_err(int id, string sd_nm) {
+  tc_err(id, "struct '" + sd_nm + "' takes " + sd_nfields(sd_nm) + " field(s) (" + sd_fields_text(sd_nm) + "), got " + flat_arg_count(id) + "; pass one value per field, in order");
+} return void;
+given sd_ctor_fixture ((import sd_c1), "P"):() then prints:("<stdin>:1: error: struct 'P' takes 2 field(s) (x, y), got 1; pass one value per field, in order\n")
+given sd_ctor_fixture ((import sd_c3), "Q"):() then prints:("<stdin>:1: error: struct 'Q' takes 1 field(s) (s), got 3; pass one value per field, in order\n")
+
+ctor_args(int id, string sd_nm) {
+  int sd_k = 0;
+  while(sd_k < flat_arg_count(id)) {
+    ctor_arg(id, sd_nm, sd_k);
+    sd_k = sd_k + 1;
+  }
+} return void;
+given sd_ctor_fixture ((import sd_c2), "P"):() then check_failed:(0)
+given sd_ctor_fixture ((import sd_cb), "P"):() then check_failed:(1)
+
+ctor_arg(int id, string sd_nm, int sd_k) {
+  int sd_a = l1_of(id)[sd_k];
+  string sd_ft = sd_ftype_at(sd_nm, sd_k);
+  ctor_fit(sd_a, sd_nm, sd_k, sd_ft);
+} return void;
+given sd_ctor_fixture ((import sd_c2), "P", 0):() then check_failed:(0)
+given sd_ctor_fixture ((import sd_cb), "P", 1):() then check_failed:(1)

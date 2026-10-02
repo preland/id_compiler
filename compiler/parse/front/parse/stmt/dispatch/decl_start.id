@@ -12,16 +12,23 @@ parse_stmt4(int[] pos) {
 given stmt_tokens ([16]):(1)
 given stmt_tokens ([42]):(1)
 
-// a declaration starts with `export` or a type keyword
+// a declaration starts with `export`, a type keyword, or a struct name
+// (written as an identifier followed by another, or by `[]`)
 is_decl_start(int[] pos) {
   int ok = 0;
   string cur_text_v = cur_text(pos);
   if(is_type(cur_text_v)) {
     ok = 1;
   }
+} chain (int[] pos) {
+  if(is_named_type_start(pos) == 1) {
+    ok = 1;
+  }
 } return int ok;
 given stmt_tokens ([0]):(1)
 given stmt_tokens ([9]):(0)
+given sd_stmt_toks ([0]):(1)
+given sd_stmt_toks ([12]):(0)
 
 is_type(string w) {
   int ok = 0;

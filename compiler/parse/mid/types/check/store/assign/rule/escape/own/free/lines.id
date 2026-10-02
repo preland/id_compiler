@@ -1,0 +1,33 @@
+// The C that frees every list the function being emitted owns: one
+// `id_list_free(name);` per owned local, in declaration order, each name once.
+// Empty when the analysis is off or the function owns nothing.
+
+esc_frees() {
+  string out = "";
+  if(esc_on() == 1) {
+    int fn = esc_cur();
+    out = esc_free_in(fn, l2_of(fn), out);
+  }
+} return string out;
+given esc_fix ():("id_list_free(w); ")
+given full_env ():("")
+
+esc_free_in(int fn, int[] stmts, string out) {
+  int i = 0;
+  while(i < len(stmts)) {
+    out = esc_free_one(fn, stmts[i], out);
+    i = i + 1;
+  }
+} return string out;
+given esc_fix ((import efc_fn), (import efc_stmts), ""):("id_list_free(w); ")
+given esc_fix ((import efc_fn), (import efc_stmts), "id_list_free(w); "):("id_list_free(w); ")
+
+esc_free_one(int fn, int sn, string out) {
+  if(k_of(sn) == "decl") {
+    out = esc_free_decl(fn, sn, out);
+  } else if(k_of(sn) == "if" || k_of(sn) == "while") {
+    out = esc_free_nest(fn, sn, out);
+  }
+} return string out;
+given esc_fix ((import efc_fn), (import efc_z), ""):("")
+given esc_fix ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")

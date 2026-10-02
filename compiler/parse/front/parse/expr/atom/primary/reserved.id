@@ -1,12 +1,12 @@
-// `given` and `stdin` begin the parts of a test case that come before its
-// tuple, and `then` the parts after (docs/TESTS.md); a case may follow any
-// function's return clause. `prints`, `eprints` and `calls` begin the three
-// clauses `then` may introduce. A function, variable or parameter by any of
+// `given`, `stdin` and `timeout` begin the parts of a test case that come
+// before its tuple, and `then` the parts after (docs/TESTS.md); a case may
+// follow any function's return clause. `prints`, `eprints` and `calls` begin
+// the three clauses `then` may introduce. A function, variable or parameter by any of
 // these names would read as a case to anyone scanning the source, and after a
 // return clause it would parse as one, so none is a name.
 
 no_case_word(int[] pos) {
-  if(cur_text(pos) == "given" || cur_text(pos) == "then" || cur_text(pos) == "prints" || cur_text(pos) == "eprints" || cur_text(pos) == "calls" || cur_text(pos) == "stdin") {
+  if(cur_text(pos) == "given" || cur_text(pos) == "then" || cur_text(pos) == "prints" || cur_text(pos) == "eprints" || cur_text(pos) == "calls" || cur_text(pos) == "stdin" || cur_text(pos) == "timeout") {
     string cur_text_v = cur_text(pos);
     syn_err(pos, "'" + cur_text_v + "' is a test case keyword (see docs/TESTS.md) and cannot be used as a name");
   }
@@ -22,6 +22,7 @@ no_func_word(int[] pos) {
   if(cur_text(pos) == "func") {
     syn_err(pos, "'func' is a keyword (it begins a function type, see docs/SPEC.md) and cannot be used as a name");
   }
+  no_struct_word(pos);
 } return void;
 given reserved_word_tokens ([0]):() then check_failed:(1)
 given reserved_word_tokens ([1]):() then check_failed:(0)

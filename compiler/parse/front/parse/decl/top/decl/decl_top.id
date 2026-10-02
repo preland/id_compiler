@@ -1,17 +1,18 @@
-// A declaration is either an asm body or an ordinary function; a function is
-// recorded together with the file it came from, which is what the
+// A declaration is a struct, an asm body or an ordinary function; a function
+// is recorded together with the file it came from, which is what the
 // 3-functions-per-file rule counts, and an asm declaration the same way
 // (push_asm, ../more.id), which is what lets --calls give it a fn row.
 parse_decl_top(int[] pos) {
   no_op_atom(pos);
-  if(cur_text(pos) == "asm") {
-    push_asm(pos);
+  if(cur_text(pos) == "struct") {
+    parse_struct(pos);
   } else {
-    push_func(pos);
+    parse_decl_fn(pos);
   }
 } return void;
 given decl_tokens ([0]):() then check_failed:(0)
 given decl_tokens ([0]):() then init_units:(0)
+given sd_toks ([0]):() then sd_count:(1)
 
 // Any test cases following the return clause are taken in the return clause
 // here, which is free under the action limit -- and which also runs after the

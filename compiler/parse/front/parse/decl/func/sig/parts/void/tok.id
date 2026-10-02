@@ -18,3 +18,15 @@ tok_str(int at) {
 } return string s;
 given expr_tokens (0):("1")
 given expr_tokens (19):(";")
+
+// A token index no later than the end of the store. A function that runs into
+// the end of the file has consumed past it, and a span ending there would be
+// walked by the digest as tokens that do not exist.
+tok_end(int at) {
+  int e = len((import tkind));
+  if(at < e) {
+    e = at;
+  }
+} return int e;
+given expr_tokens (0):(0)
+given expr_tokens (99):(21)

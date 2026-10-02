@@ -1,0 +1,36 @@
+// A written type is a type. A declaration, a parameter and a function's return
+// type can now name something other than a keyword -- a struct -- so one that
+// names nothing is reported where it is written, rather than being carried
+// through every check as a type none of them recognise (and so none of them
+// judges, the rule every check here follows).
+
+chk_declared_type(int id) {
+  if(k_of(id) == "decl" || k_of(id) == "param" || k_of(id) == "nparam") {
+    chk_type_known(id, s1_of(id));
+  }
+  if(k_of(id) == "func") {
+    chk_type_known(id, s2_of(id));
+  }
+} return void;
+given sd_decl_fixture ((import sd_dk)):() then check_failed:(0)
+given sd_decl_fixture ((import sd_dbad)):() then check_failed:(1)
+
+chk_type_known(int id, string sd_t) {
+  if(ty_known(sd_t) == 0) {
+    tc_err(id, "unknown type '" + sd_t + "'; a type is int, word, float, string, a struct declared in a file of its own (structs: " + sd_list_text() + "), or a list of one of those, as in 'int[]'");
+  }
+} return void;
+given sd_decl_fixture ((import sd_dk), "int"):() then check_failed:(0)
+given sd_decl_fixture ((import sd_dbad), "Pnt"):() then prints:("<stdin>:1: error: unknown type 'Pnt'; a type is int, word, float, string, a struct declared in a file of its own (structs: P, Q), or a list of one of those, as in 'int[]'\n")
+
+// "P, Q": the structs there are, for a message about a type that is not one.
+sd_list_text() {
+  int sd_i = 0;
+  string s = "none";
+  while(sd_i < len((import sdname))) {
+    s = sd_join(s, sd_i);
+    sd_i = sd_i + 1;
+  }
+} return string s;
+given sd_pair ():("P, Q")
+given env_init ():("none")

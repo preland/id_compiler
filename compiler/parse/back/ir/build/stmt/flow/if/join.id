@@ -12,3 +12,15 @@ lw_if3(int node, int c, int thn, int alt, int jn) {
 } return int ret_i;
 given nest_fixture ((import if_node), 5, 0, 1, 4):(4)
 given loop_fixture ((import while_node), 5, 0, 1, 4):(4)
+
+// An owned local starts as null, so a path that never reaches its declaration
+// frees nothing: the same NULL the C target initialises it with.
+lw_own_init(int ent, int v) {
+  if(esc_own(esc_cur(), ir_s(v)) == 1) {
+    int[] none = [];
+    int c = ir_leaf("const", ir_ty(v), 0 - 1, 0 - 1, "null");
+    ir_add(ent, ir_insn("store", "", v, c, "", none, none));
+  }
+} return void;
+given lwo_fixture ((import lwo_ent), (import lwo_w)):() then calls ir_add:[1] then calls ir_leaf:("const", "int[]", -1, -1, "null")
+given lwo_fixture ((import lwo_ent), (import lwo_z)):() then calls ir_add:[0]

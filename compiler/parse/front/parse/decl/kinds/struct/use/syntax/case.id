@@ -1,0 +1,35 @@
+// A struct in a test case: `(Point(1, 2), 7):(Point(3, 2))`. The parser cannot
+// know which names are structs -- the declaration may be in a file it has not
+// reached -- so a name followed by `(` is read as a "cctor" node, its
+// arguments read as any case element is (so they may be literals, lists,
+// `(import NAME)` or constructors in turn), and the checker that knows the
+// struct table decides whether it fits (mid/names/limits/shape/cases/).
+
+case_scalar(int[] pos) {
+  int v = 0 - 1;
+  if(at_case_ctor(pos) == 1) {
+    v = case_ctor(pos);
+  } else {
+    v = parse_expr(pos);
+    check_lit(v);
+  }
+} return int v;
+given sd_case_toks ([0]):(2)
+given sd_case_toks ([6]):(0)
+
+at_case_ctor(int[] pos) {
+  int ok = 0;
+  if(cur_kind(pos) == "ident" && cur2_text(pos) == "(") {
+    ok = 1;
+  }
+} return int ok;
+given sd_case_toks ([0]):(1)
+given sd_case_toks ([6]):(0)
+
+case_ctor(int[] pos) {
+  string sd_nm = read_name(pos);
+  int[] sd_it = case_tuple(pos);
+  int ret_i = newnode("cctor", 0, 0, sd_nm, "", sd_it, sd_it);
+} return int ret_i;
+given sd_case_toks ([0]):(2) then last_kind:("cctor") then last_s1:("P")
+given sd_case_toks ([0]):(2) then last_l1:([0, 1])

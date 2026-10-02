@@ -10,9 +10,10 @@ fit_value(int i, int e, string want) {
   } else if(ty_is_list(want) == 1) {
     fit_list(i, e, want);
   } else {
-    fit_scalar(i, e, want);
+    fit_other(i, e, want);
   }
 } return void;
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then check_failed:(0)
 given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then check_failed:(1)
 given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then check_failed:(0)
 

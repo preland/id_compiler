@@ -1,0 +1,38 @@
+// The constants the test harness's cases read. A case is a "case" node made
+// after the nodes of its arguments, expected values and checks, and it follows
+// the function it belongs to, so its nodes run from just past that function
+// through its own id. Only the harness walks them: the program itself runs no
+// case, and a library case is not one the harness runs (case_is_std).
+
+const_cases(int cv_on) {
+  int cv_ci = 0;
+  while(cv_ci < len((import casefn)) && cv_on == 1) {
+    const_case(cv_ci);
+    cv_ci = cv_ci + 1;
+  }
+} return void;
+given cvl_setup given cvl_case (1):() then clive_str:("cc")
+given cvl_setup given cvl_case (0):() then clive_str:("")
+
+const_case(int cv_ci) {
+  int cv_lo = (import casefn)[cv_ci] + 1;
+  int cv_hi = (import casenode)[cv_ci];
+  if(case_is_std(cv_ci) == 0) {
+    const_range(cv_lo, cv_hi);
+  }
+} return void;
+given cvl_setup given cvl_case (0):() then clive_str:("cc")
+given cvl_setup given cvl_case given cvl_std (0):() then clive_str:("")
+
+// Where the functions' nodes begin: just past the last constant's, which are
+// all made first. Filed here because scan/ has no other room; it is
+// const_funcs' starting point.
+const_base() {
+  int cv_base = 0;
+  if(len((import cdecl)) > 0) {
+    int cv_last = (import cdecl)[len((import cdecl)) - 1];
+    cv_base = cv_last + 1;
+  }
+} return int cv_base;
+given cvl_setup ():(8)
+given lc_dce_init ():(0)

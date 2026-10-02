@@ -10,12 +10,13 @@ given iassign_fixture ((import iassign_node), "  "):() then prints:("  id_list_s
 given iassign_fixture ((import iassign_node), ""):() then prints:("id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
 
 iassign2(int id, string ind, string type_of_v) {
-  string elem = elem_type(type_of_v);
+  string elem = idx_elem(type_of_v, id);
   int[] l1_of_v = l1_of(id);
   iassign3(id, ind, elem, l1_of_v);
 } return void;
 given iassign_fixture ((import iassign_node), "  ", "int[]"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")
 given iassign_fixture ((import iassign_node), "  ", "string[]"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(intptr_t)(7));\n")
+given sd_use_fixture ((import sd_wx), "  ", "P"):() then prints:("  id_list_set(p, 0, (long long)(1));\n")
 
 iassign3(int id, string ind, string elem, int[] l1_of_v) {
   string emit_expr_v = emit_expr(l1_of_v[0]);

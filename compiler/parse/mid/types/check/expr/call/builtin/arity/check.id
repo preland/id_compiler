@@ -11,6 +11,7 @@ chk_bi(int id) {
   if(is_builtin(s1_of_v) == 1) {
     chk_bi_arity(id);
     fv_bi_args(id);
+    sd_bi_args(id);
   }
 } return void;
 given call2_setup ((import cm_push_call)):() then calls chk_bi_arity:((import cm_push_call))

@@ -14,6 +14,8 @@ init_tcache() {
   export string[] tcache = [];
   export int[] tcache_ok = [];
   export int[] seqt = [];
+} chain () {
+  export int[] arrmark = [];
 } return void;
 given env_init ():() then check_failed:(0)
 given env_init ():() then init_units:(0)

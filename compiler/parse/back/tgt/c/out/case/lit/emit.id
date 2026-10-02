@@ -7,7 +7,7 @@ tc_lit(int e, string want) {
   if(ty_is_list(want) == 1) {
     so = tc_list(e, want);
   } else {
-    so = tc_scalar(e);
+    so = tc_other(e, want);
   }
 } return string so;
 given lit_int_fixture ((import lit_e), "int"):("5")

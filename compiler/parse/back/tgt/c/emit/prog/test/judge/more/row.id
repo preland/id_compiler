@@ -9,6 +9,11 @@
 // them, elsewhere in this directory) leaves casestdin short; a real parse
 // always pushes one casestdin entry per case (case/given/setup.id), so the
 // guard never triggers there.
+//
+// `idtc_secs[k]` is the case's own `timeout N`, written only for a case that
+// has one -- the array is zero otherwise, and idtc_secs_of (unit/more/text/
+// proc.id) reads zero as the default -- and read from casetimeout with the
+// same guard, for the same reason.
 
 emit_setup_line(int ci, string cw, string cc) {
   string f1 = s1_of((import casefn)[ci]);
@@ -37,10 +42,19 @@ emit_setup_line(int ci, string cw, string cc) {
     tv = tc_value(l1_of(tnid)[0], "string");
   }
   emit_line("    idtc_traps[" + ci + "] = " + tv + ";");
+  int secs_v = 0;
+} chain (int ci, string cw, string cc) {
+  if(ci < len((import casetimeout))) {
+    secs_v = (import casetimeout)[ci];
+  }
+  if(secs_v > 0) {
+    emit_line("    idtc_secs[" + ci + "] = " + secs_v + ";");
+  }
 } return void;
 given wrap_fixture (0, "a.id:1", "foo()"):() then prints:("    idtc_where[0] = \"a.id:1\"; idtc_call[0] = \"foo()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n")
 given wrap_fixture (0, "b.id:2", "bar()"):() then prints:("    idtc_where[0] = \"b.id:2\"; idtc_call[0] = \"bar()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n")
 given traps_case_fixture (0, "c.id:3", "boom()"):() then calls tc_value:[1]
+given secs_case_fixture (0, "d.id:4", "slow()"):() then prints:("    idtc_where[0] = \"d.id:4\"; idtc_call[0] = \"slow()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n    idtc_secs[0] = 7;\n")
 
 case_where_c(int ci) {
   string case_loc_v = case_loc(ci);

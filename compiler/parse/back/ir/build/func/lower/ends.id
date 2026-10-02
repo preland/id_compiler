@@ -20,6 +20,7 @@ given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
 lw_ret_val(int node, string ret) {
+  lw_free_all();
   if(i1_of(node) >= 0) {
     int i1_of_v = i1_of(node);
     int lw_as_v = lw_as(i1_of_v, ret);
@@ -30,3 +31,5 @@ lw_ret_val(int node, string ret) {
 } return void;
 given lw_func_fixture ((import g_fnnode), "int"):() then check_failed:(0)
 given lw_func_fixture ((import g_fnnode), "word"):() then check_failed:(0)
+given lwo_fixture ((import efc_fn), "int[]"):() then calls lw_callf:[1]
+given lw_func_fixture ((import g_fnnode), "int"):() then calls lw_callf:[0]

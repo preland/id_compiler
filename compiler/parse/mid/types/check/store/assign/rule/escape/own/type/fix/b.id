@@ -1,0 +1,25 @@
+// fa_loc's nodes (a.id describes the program).
+
+esc_fx_b() {
+  export int efb_vt = node_var("t");
+  export int efb_vp = node_var("p");
+  export int[] efb_args = [(import efb_vt), (import efb_vp)];
+} return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
+
+esc_fx_b2() {
+  export int efb_call = node_call("fa_sink", (import efb_args));
+  export int efb_dt = node_decl("int[]", "t", node_arr((import ef_none)), 0);
+  export int efb_dv = node_decl("int[]", "v", (import efb_vp), 0);
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)
+
+esc_fx_b3() {
+  export int efb_ret = newnode("ret", (import efb_vp), 0, "", "", (import ef_none), (import ef_none));
+  export int efb_ret0 = newnode("ret", 0 - 1, 0, "", "", (import ef_none), (import ef_none));
+  export int efb_fn = node_func("fa_loc", "int[]", (import efb_ps), (import efb_stmts), node_var("v"));
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)

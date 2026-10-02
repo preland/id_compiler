@@ -2,6 +2,9 @@
 // of those. Anything else -- a variable, a call, arithmetic -- is rejected here
 // rather than when the harness is emitted, where the diagnostic would be about
 // a name that is not in scope. idc.py's wording, word for word.
+//
+// A list is not checked here: it is read element by element as a tuple is
+// (case/given/elem/more/list.id), so each element is held to this on its own.
 
 check_lit(int e) {
   if(is_lit(e) == 0) {
@@ -15,23 +18,9 @@ given lit_fix (1):() then prints:("<stdin>:0: error: a test case takes literals 
 
 is_lit(int e) {
   int r = leaf_lit(e);
-  if(k_of(e) == "arr") {
-    int[] xs = l1_of(e);
-    r = all_lit(xs);
-  } else if(k_of(e) == "un") {
+  if(k_of(e) == "un") {
     r = neg_lit(e);
   }
 } return int r;
 given lit_fix (0):(1)
 given lit_fix (1):(0)
-
-all_lit(int[] xs) {
-  int r = 1;
-  int i = 0;
-  while(i < len(xs)) {
-    r = r * is_lit(xs[i]);
-    i = i + 1;
-  }
-} return int r;
-given lit_fix ([0, 0]):(1)
-given lit_fix ([0, 1]):(0)

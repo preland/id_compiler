@@ -12,6 +12,9 @@ init_sym() {
   init_sym_a();
   init_sym_b();
   init_asm_all();
+} chain () {
+  esc_init();
+  init_structs();
 } return void;
 given full_env ():() then check_failed:(0)
 given full_env ():() then init_units:(0)

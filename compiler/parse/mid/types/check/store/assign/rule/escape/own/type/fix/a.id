@@ -1,0 +1,36 @@
+// The fixture program the escape analysis's cases run against, three functions
+// built node by node (no parsing) and registered the way a real build would:
+//
+//   fa_sink(int[] a, int[] b) { push(a, b); }                          keeps b, reads a
+//   fa_loc(int[] p) { int[] t = []; fa_sink(t, p); int[] v = p; }      returns v
+//   fa_nest(int[] s) { while(len(s) < 3) { int[] w = []; int[] y = s; }
+//                      int[] z = []; }                                 returns z
+//
+// Every node a case needs is exported under an `ef` name; esc_fix (more/top.id)
+// builds all of it, seeds the summaries and makes fa_nest the function being
+// emitted. The bodies of the esc_fx_* functions are split only by the action
+// limit.
+
+esc_fx_a() {
+  export int efa_va = node_var("a");
+  export int efa_vb = node_var("b");
+  export int[] efa_args = [(import efa_va), (import efa_vb)];
+} return void;
+given full_env ():() then check_failed:(0)
+given full_env ():() then init_units:(0)
+
+esc_fx_a2() {
+  export int efa_push = node_call("push", (import efa_args));
+  export int efa_es = node_exprstmt((import efa_push));
+  export int efa_ia = node_iassign(node_index((import efa_va), (import efa_vb)), (import efa_vb));
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)
+
+esc_fx_a3() {
+  export int efa_pa = node_param("param", "int[]", "a");
+  export int efa_pb = node_param("param", "int[]", "b");
+  export int[] efa_ps = [(import efa_pa), (import efa_pb)];
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)

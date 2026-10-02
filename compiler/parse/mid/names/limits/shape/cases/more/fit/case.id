@@ -59,7 +59,7 @@ given traps_case_fixture ((import fixture_ci)):() then prints:(":4: error: a cas
 given traps_node_fixture ((import fixture_ci)):() then prints:("fixture.id:4: error: a case with 'traps' may not also check another 'then' clause: nothing after a trap is captured\n")
 
 // casegiven[i] populated with "" (a case with no `given`): fit_given
-// (../../given/valid.id), fit_import and imp_owner (../../given/read/
+// (../../given/setup/valid.id), fit_import and imp_owner (../../given/read/
 // impcheck.id) all need it, and no existing fixture sets it. Paired with
 // impcase_given (../more/value/more/text/items.id, room for only one of the
 // two there), which gives the non-empty case. etypes gets a matching row too

@@ -1,0 +1,36 @@
+// Two structs with the same field names and types are one struct declared
+// twice, the same rule two functions with the same body obey: the program
+// should say which one it means. The names of the fields are part of the
+// identity, so `{x, y}` and `{w, h}` do not collide.
+
+sd_same(int sd_i) {
+  int sd_j = sd_twin(sd_i);
+  if(sd_j >= 0 && (import sdname)[sd_j] != (import sdname)[sd_i]) {
+    sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' has the same fields as struct '" + (import sdname)[sd_j] + "' (declared at " + sd_where(sd_j) + "); two structs with the same field names and types are one struct -- use '" + (import sdname)[sd_j] + "', or give '" + (import sdname)[sd_i] + "' a field of another name or type");
+  }
+} return void;
+given sd_pair (1):() then check_failed:(0)
+given sd_pair given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):() then prints:("pt.id:3: error: struct 'Pt' has the same fields as struct 'P' (declared at p.id:1); two structs with the same field names and types are one struct -- use 'P', or give 'Pt' a field of another name or type\n")
+
+// The first earlier row with the same fields as row `sd_i`, or -1.
+sd_twin(int sd_i) {
+  int sd_j = 0;
+  int ret_i = 0 - 1;
+  string sd_ky = sd_key(sd_i);
+} chain (int sd_i) {
+  while(sd_j < sd_i && ret_i < 0) {
+    ret_i = sd_twin_at(sd_j, sd_ky);
+    sd_j = sd_j + 1;
+  }
+} return int ret_i;
+given sd_pair (1):(-1)
+given sd_pair given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):(0)
+
+sd_twin_at(int sd_j, string sd_ky) {
+  int ret_i = 0 - 1;
+  if(sd_key(sd_j) == sd_ky) {
+    ret_i = sd_j;
+  }
+} return int ret_i;
+given sd_pair (0, "x:int,y:int"):(0)
+given sd_pair (1, "x:int,y:int"):(-1)

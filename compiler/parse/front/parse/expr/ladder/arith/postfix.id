@@ -1,11 +1,12 @@
 // Postfix level: a primary followed by any number of `[ expr ]` index
-// suffixes (xs[i], or xs[i][j]). Sits between the multiplicative level and
-// the primary production, matching idc.py's parse_postfix.
+// suffixes (xs[i], or xs[i][j]) or `.field` suffixes (p.x, or xs[i].x). Sits
+// between the multiplicative level and the primary production, matching
+// idc.py's parse_postfix.
 
 parse_postfix(int[] pos) {
   int node = parse_primary(pos);
-  while(cur_text(pos) == "[") {
-    node = fold_index(pos, node);
+  while(cur_text(pos) == "[" || cur_text(pos) == ".") {
+    node = fold_post(pos, node);
   }
 } return int node;
 given atom_tokens ([33]):(2)

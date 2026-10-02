@@ -10,12 +10,16 @@ case_value(int[] pos) {
   if(at_case_fn(pos) == 1) {
     v = case_fn(pos);
   } else {
-    v = parse_expr(pos);
-    check_lit(v);
+    if(cur_text(pos) == "[") {
+      v = case_list(pos);
+    } else {
+      v = case_scalar(pos);
+    }
   }
 } return int v;
 given fnname_fix ([0]):(0)
 given tup1_fix ([0]):(0)
+given sd_case_toks ([0]):(2)
 
 // A bare name, and nothing after it but the end of the element: `f(1)` is a
 // call and `f[0]` an index, neither of which a case may hold.

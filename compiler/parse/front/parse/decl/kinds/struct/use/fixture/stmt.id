@@ -1,0 +1,24 @@
+// Token streams for the cases of the struct syntax: a run of statements that
+// start with a struct name or a plain name (`P p = 1; Q[] qs = 2; x[0] = 1;`),
+// and a field suffix (`.x;`).
+
+sd_stmt_toks() {
+  env_init();
+  push_toks(["ident", "ident", "op", "int", "op", "ident", "op", "op", "ident", "op", "int", "op", "ident", "op", "int", "op", "op", "int", "op", "eof"], ["P", "p", "=", "1", ";", "Q", "[", "]", "qs", "=", "2", ";", "x", "[", "0", "]", "=", "1", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(20)
+
+sd_dot_toks() {
+  env_init();
+  push_toks(["op", "ident", "op", "eof"], [".", "x", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(4)
+
+sd_dot_name_toks() {
+  env_init();
+  push_toks(["ident", "op", "ident", "op", "int", "op", "eof"], ["p", ".", "x", "=", "1", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(7)

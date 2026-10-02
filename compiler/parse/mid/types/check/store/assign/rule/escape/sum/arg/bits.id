@@ -1,0 +1,25 @@
+// One bit of a summary. Parameters past the thirtieth have no bit, so they are
+// reported as kept.
+esc_bit(int m, int i) {
+  int c = 1;
+  if(i < 30) {
+    c = (m >> i) & 1;
+  }
+} return int c;
+(2, 1):(1)
+(2, 0):(0)
+(0, 31):(1)
+
+// A function whose body cannot be read: a name that is no function of the
+// program (-1), a `native`, or one a test case's `calls` clause records -- the
+// recorder keeps the caller's arguments until the case judges them, so they
+// must outlive the caller.
+esc_opaque(int fn, string cname) {
+  int r = 1;
+  if(fn >= 0 && is_native(fn) == 0 && is_rec_target(cname) == 0) {
+    r = 0;
+  }
+} return int r;
+given esc_fix ((import efa_fn), "fa_sink"):(0)
+given esc_fix (-1, "nosuch"):(1)
+given calls_node_fixture ((import fixture_fn), "fx_target"):(1)

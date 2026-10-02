@@ -1,0 +1,47 @@
+// A struct declaration: `struct Name { T a; T b; }`, at the top level.
+//
+// Only the syntax is judged here (a missing brace, a field with no name). What
+// a struct may contain -- one to three fields, known types, no repeats, a file
+// of its own -- is decided once the whole program is read, from the table this
+// fills (table.id), because a field's type may be a struct declared in a file
+// the parser has not reached yet.
+
+parse_struct(int[] pos) {
+  string sd_file = cur_file();
+  int sd_ln = cur_ln(pos);
+  advance(pos);
+} chain (int[] pos) {
+  string sd_nm = read_name(pos);
+  expect_text(pos, "{");
+  advance(pos);
+} chain (int[] pos) {
+  string[] sd_fns = [];
+  string[] sd_fts = [];
+  sd_fields(pos, sd_fns, sd_fts);
+} chain (int[] pos) {
+  sd_note(sd_nm, sd_fns, sd_fts, sd_file, sd_ln);
+  expect_text(pos, "}");
+  advance(pos);
+} return void;
+given sd_toks ([0]):([10]) then sd_count:(1) then sd_last_nf:(2)
+given sd_toks_open ([0]):([7]) then sd_last_nf:(1) then check_failed:(1)
+
+sd_fields(int[] pos, string[] sd_fns, string[] sd_fts) {
+  while(cur_text(pos) != "}" && cur_kind(pos) != "eof") {
+    sd_field(pos, sd_fns, sd_fts);
+  }
+} return void;
+given sd_toks ([3], [], []):([9], ["x", "y"], ["int", "string"])
+given sd_toks ([9], [], []):([9], [], [])
+
+sd_field(int[] pos, string[] sd_fns, string[] sd_fts) {
+  string sd_t = parse_type(pos);
+  string sd_fl = read_name(pos);
+  push(sd_fts, sd_t);
+} chain (int[] pos, string[] sd_fns, string[] sd_fts) {
+  push(sd_fns, sd_fl);
+  expect_text(pos, ";");
+  advance(pos);
+} return void;
+given sd_toks ([3], [], []):([6], ["x"], ["int"])
+given sd_toks ([6], [], []):([9], ["y"], ["string"])

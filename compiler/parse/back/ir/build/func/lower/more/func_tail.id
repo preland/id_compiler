@@ -8,8 +8,10 @@ given lw_func_fixture ((import g_fnnode), "int", "g"):() then check_failed:(0)
 given lw_func_fixture ((import g_fnnode), "word", "h"):() then check_failed:(0)
 
 lw_func_tail(int node) {
+  esc_enter(node);
   lw_main_init(node);
   lw_locals(node);
+} chain (int node) {
   lw_fin(node);
 } return void;
 given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)

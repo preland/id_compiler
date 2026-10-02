@@ -1,0 +1,28 @@
+// The summaries are a table parallel to fnames, one int per function: -2 not
+// computed yet, otherwise the mask (../mask.id). The table stays empty until
+// a backend seeds it, and an empty table is how every query learns the
+// analysis is off -- so a test case that never seeds it sees no freeing at all.
+
+esc_init() {
+  export int[] esc_pe = [];
+} return void;
+():() then esc_on:(0)
+given esc_fix ():() then esc_on:(0)
+
+esc_seed() {
+  while(len((import esc_pe)) < len((import fnames))) {
+    push((import esc_pe), 0 - 2);
+  }
+} return void;
+given esc_fix ():() then esc_on:(1)
+given full_env ():() then esc_on:(0)
+
+// A backend that walks function bodies tells the analysis which function it is
+// inside before it asks esc_own about that function's locals.
+esc_enter(int fn) {
+  if(esc_on() == 1) {
+    lset((import sqbase), 0, fn);
+  }
+} return void;
+given esc_fix (-5):() then esc_cur:(-5)
+given full_env (7):() then esc_cur:(-1)

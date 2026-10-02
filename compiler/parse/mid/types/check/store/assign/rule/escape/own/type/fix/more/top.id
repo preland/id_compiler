@@ -1,0 +1,48 @@
+// The functions fa_sink's node, registration of all three, and the assembly.
+// The summaries are seeded last, which is what turns the analysis on; fa_nest
+// is left as the function whose body is being emitted.
+
+esc_fx_a4() {
+  export int efa_fn = node_func("fa_sink", "void", (import efa_ps), [(import efa_es)], 0 - 1);
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)
+
+esc_reg() {
+  add_func("fa_sink", "void", (import efa_fn));
+  add_func("fa_loc", "int[]", (import efb_fn));
+  add_func("fa_nest", "int[]", (import efc_fn));
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)
+
+esc_fix() {
+  full_env();
+  init_idx();
+  export int[] ef_none = [];
+} chain () {
+  init_rtc();
+  esc_fx_a();
+  esc_fx_a2();
+} chain () {
+  esc_fx_a3();
+  esc_fx_a4();
+  esc_fx_b();
+} chain () {
+  esc_fx_b2();
+  esc_fx_b4();
+  esc_fx_b5();
+} chain () {
+  esc_fx_b3();
+  esc_fx_c();
+  esc_fx_c2();
+} chain () {
+  esc_fx_c3();
+  esc_fx_c4();
+  esc_reg();
+} chain () {
+  esc_seed();
+  lset((import sqbase), 0, (import efc_fn));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

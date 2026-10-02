@@ -1,0 +1,35 @@
+// A struct name is an ordinary identifier, so a statement that starts with one
+// is a declaration only by what follows it: another identifier (`Point p = ...`)
+// or an empty pair of brackets (`Point[] ps = ...`). Nothing else in the
+// language puts two identifiers side by side or `[` `]` after a name, so the
+// test needs no table of struct names -- which the parser could not consult
+// anyway, since the struct may be declared in a file it has not reached.
+
+is_named_type_start(int[] pos) {
+  int ok = 0;
+  if(cur_kind(pos) == "ident" && cur2_kind(pos) == "ident") {
+    ok = 1;
+  } else if(cur_kind(pos) == "ident" && cur2_text(pos) == "[" && cur3_text(pos) == "]") {
+    ok = 1;
+  }
+} return int ok;
+given sd_stmt_toks ([0]):(1)
+given sd_stmt_toks ([5]):(1)
+
+cur2_kind(int[] pos) {
+  string k = "eof";
+  if(pos[0] + 1 < len((import tkind))) {
+    k = (import tkind)[pos[0] + 1];
+  }
+} return string k;
+given sd_stmt_toks ([0]):("ident")
+given sd_stmt_toks ([2]):("int")
+
+cur3_text(int[] pos) {
+  string s = "";
+  if(pos[0] + 2 < len((import ttext))) {
+    s = (import ttext)[pos[0] + 2];
+  }
+} return string s;
+given sd_stmt_toks ([5]):("]")
+given sd_stmt_toks ([0]):("=")

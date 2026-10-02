@@ -3,11 +3,16 @@
 // backend's object file defines and the IR never has to know about.
 
 lw_call(int node) {
-  string name = s1_of(node);
-  int v = lw_call_dispatch(node, name);
+  int v = 0 - 1;
+  if(sd_find(s1_of(node)) >= 0) {
+    v = lw_ctor(node);
+  } else {
+    v = lw_call_dispatch(node, s1_of(node));
+  }
 } return int v;
 given ocall_fixture ((import ocall_node)):(0)
 given bicall_fixture ((import bicall_node)):(2)
+given sr_fixture ((import sr_ic2)):(0)
 
 lw_ucall(int node) {
   string name = lw_ucall_name(node);

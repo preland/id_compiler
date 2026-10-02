@@ -10,19 +10,22 @@ is_alnum(int c) {
 (32):(0)
 
 // The id keywords. One big boolean keeps this within the action limit.
-// `stdin` has meaning only in case position (cases/case/given/), the same as
-// `given`/`then`/`prints`/`eprints`/`calls`/`traps` -- reserved everywhere so
-// a case never has to be told apart from a name, but with no syntax of its
-// own outside a case.
+// `stdin` and `timeout` have meaning only in case position
+// (cases/case/given/), the same as `given`/`then`/`prints`/`eprints`/`calls`/
+// `traps` -- reserved everywhere so a case never has to be told apart from a
+// name, but with no syntax of its own outside a case.
 is_kw(string w) {
   int ok = 0;
-  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank" || w == "break" || w == "stdin" || w == "traps") {
+  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "if" || w == "else" || w == "while" || w == "return" || w == "export" || w == "import" || w == "word" || w == "asm" || w == "native" || w == "given" || w == "then" || w == "func" || w == "prints" || w == "eprints" || w == "calls" || w == "chain" || w == "blank" || w == "break" || w == "stdin" || w == "traps" || w == "timeout" || w == "struct") {
     ok = 1;
   }
 } return int ok;
 ("break"):(1)
 ("foo"):(0)
 ("traps"):(1)
+("timeout"):(1)
+("struct"):(1)
+("Struct"):(0)
 
 kindof(string w) {
   string kind = "ident";

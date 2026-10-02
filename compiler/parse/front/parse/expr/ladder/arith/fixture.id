@@ -1,6 +1,6 @@
 // `otherfn:(6)` -- a check name and its value with no `then` keyword before
 // it (already consumed by the time then_check_clause runs). See
-// ../../../decl/func/cases/case/given/elem/fixture.id for toks_push's other
+// ../../../decl/func/cases/case/given/elem/more/fixture.id for toks_push's other
 // callers.
 
 chkname_fix() {

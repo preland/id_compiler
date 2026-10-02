@@ -1,0 +1,33 @@
+// Asking the struct table (front/parse/decl/kinds/struct/table.id) about a
+// struct by name. A struct is a list at run time -- one 64-bit cell per field,
+// in declaration order -- so a field is known by its position.
+
+// The row of a struct, or -1 when the name is not one.
+sd_find(string sd_s) {
+  int ret_i = find_str((import sdname), sd_s);
+} return int ret_i;
+given sd_pair ("Q"):(1)
+given sd_pair ("nope"):(-1)
+
+// How many fields a struct has; 0 for a name that is not a struct.
+sd_nfields(string sd_s) {
+  int sd_i = sd_find(sd_s);
+  int n = 0;
+  if(sd_i >= 0) {
+    n = len((import sdfname)[sd_i]);
+  }
+} return int n;
+given sd_pair ("P"):(2)
+given sd_pair ("Q"):(1)
+given sd_pair ("nope"):(0)
+
+// A field's position, or -1 when the struct has no such field.
+sd_fpos(string sd_s, string sd_f) {
+  int sd_i = sd_find(sd_s);
+  int ret_i = 0 - 1;
+  if(sd_i >= 0) {
+    ret_i = find_str((import sdfname)[sd_i], sd_f);
+  }
+} return int ret_i;
+given sd_pair ("P", "y"):(1)
+given sd_pair ("P", "z"):(-1)

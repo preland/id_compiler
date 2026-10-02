@@ -1,0 +1,26 @@
+// The postfix suffixes: `base[i]` and `base.field`. A field read is an index
+// node whose index is a `fld` leaf carrying the field's name, so every walk
+// that already visits both children of an index visits the base of a field
+// access too, and the one place that tells the two apart is the one that
+// knows the base's type (mid/types/check/expr/more/index/).
+
+fold_post(int[] pos, int base) {
+  int ret_i = 0;
+  if(cur_text(pos) == "[") {
+    ret_i = fold_index(pos, base);
+  } else {
+    ret_i = fold_field(pos, base);
+  }
+} return int ret_i;
+given atom_tokens ([34], 50):(1)
+given sd_dot_toks ([0], 5):(1)
+
+fold_field(int[] pos, int base) {
+  advance(pos);
+  string sd_fl = read_name(pos);
+  int sd_lf = newleaf("fld", 0, 0, sd_fl, "");
+} chain (int[] pos, int base) {
+  int ret_i = node_index(base, sd_lf);
+} return int ret_i;
+given sd_dot_toks ([0], 5):(1) then last_kind:("index") then calls newleaf:("fld", 0, 0, "x", "")
+given sd_dot_toks ([0], 9):(1) then last_i2:(0)

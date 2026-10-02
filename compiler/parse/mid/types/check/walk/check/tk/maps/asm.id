@@ -1,4 +1,4 @@
-// An asm routine's signature lives in its own tables (front/parse/decl/asm/),
+// An asm routine's signature lives in its own tables (front/parse/decl/kinds/asm/),
 // not in anything the key reads, so a run naming one is never given a key --
 // always checked, which costs a few kernel functions nothing. Its name is
 // entered after the exports, so a name that is both is taken as the asm one.

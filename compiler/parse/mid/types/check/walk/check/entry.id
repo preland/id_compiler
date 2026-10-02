@@ -31,7 +31,10 @@ given clean_check_fixture ():() then check_failed:(0)
 
 tc_all() {
   init_tyreg();
+  init_struct_rows();
   init_tcache();
+} chain () {
+  chk_structs();
   tc_nodes();
 } return void;
 given cmp_fixture ():() then check_failed:(1)

@@ -1,0 +1,35 @@
+// The struct types the harness needs helpers for: every struct a case passes,
+// expects or checks, a struct held in one of those, and the struct elements of
+// a list of structs. One compare and one print each, `idtc_eqs_NAME` and
+// `idtc_shows_NAME`, beside the list helpers (../../more/) and emitted with
+// them; a struct is noted before its fields are, so a struct that holds a list
+// of itself is noted once.
+//
+//   tcsts  every struct type the harness needs helpers for
+
+note_struct(string ty) {
+  if(ty_is_struct(ty) == 1 && find_str((import tcsts), ty) < 0) {
+    push((import tcsts), ty);
+    note_sfields(ty);
+  }
+} return void;
+given sd_note_fixture ("P"):() then tcsts_len:(1)
+given sd_note_fixture ("int"):() then tcsts_len:(0)
+given sd_note_fixture ("W"):() then tcsts_len:(2)
+
+note_sfields(string ty) {
+  int sd_k = 0;
+  while(sd_k < sd_nfields(ty)) {
+    note_ty(sd_ftype_at(ty, sd_k));
+    sd_k = sd_k + 1;
+  }
+} return void;
+given sd_note_fixture ("nope"):() then tcsts_len:(0)
+given sd_note_fixture ("W"):() then tcsts_len:(1)
+given sd_note_fixture ("P"):() then tcsts_len:(0)
+
+tcsts_len() {
+  int n = len((import tcsts));
+} return int n;
+given sd_note_fixture ():(0)
+given sd_note_fixture given note_struct("P") ():(1)

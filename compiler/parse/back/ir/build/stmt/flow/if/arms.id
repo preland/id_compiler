@@ -13,3 +13,14 @@ lw_if_arms2(int node, int alt, int jn) {
 } return int ret_i;
 given nest_fixture ((import if_node), 1, 4):(4)
 given loop_fixture ((import while_node), 1, 4):(4)
+
+// Every owned local of the function, freed ahead of a return.
+lw_free_all() {
+  int i = 0;
+  while(i < len((import lwslot))) {
+    lw_drop(lw_old((import lwslot)[i]));
+    i = i + 1;
+  }
+} return void;
+given lwo_fixture ():() then calls lw_callf:[1]
+given lw_fixture ():() then calls lw_callf:[0]

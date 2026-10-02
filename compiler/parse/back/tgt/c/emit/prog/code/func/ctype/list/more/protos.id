@@ -12,6 +12,7 @@ given tctys_note_one_setup ("int[]"):() then tctys_len:(1)
 
 tc_types_init() {
   export string[] tctys = [];
+  export string[] tcsts = [];
 } return void;
 given nz_env ():() then check_failed:(0)
 given nz_env ():() then init_units:(0)
@@ -22,6 +23,7 @@ emit_ty_protos() {
     emit_ty_proto((import tctys)[i]);
     i = i + 1;
   }
+  emit_st_protos();
 } return void;
 given tctys_note_one_setup ():() then prints:("static int idtc_eq_int(IdList* a, IdList* b);\nstatic void idtc_show_int(IdList* a);\n")
 given tc_types_init ():() then prints:("")

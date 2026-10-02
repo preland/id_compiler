@@ -3,7 +3,7 @@
 `idlex.c` and `idparse.c` are the C that `compiler/lex` and `compiler/parse`
 emitted about themselves. `cc` turns them back into a working `id` compiler,
 which is what lets a fresh checkout build `id` without a compiler for `id`
-already being on the machine — and therefore what lets `idc.py` go.
+already being on the machine, and so let the Python compiler, `idc.py`, be deleted.
 
 They are not a second implementation. They are the *same* implementation,
 frozen at the commit that regenerated them, in the one language every machine
@@ -59,3 +59,15 @@ tools/regen_bootstrap.sh --check  # fail if they are not what the tree emits
   and no program in this repository is built from them. Editing them by hand is
   meaningless: the next `tools/regen_bootstrap.sh` overwrites the edit, and
   `--check` fails until it does.
+
+## Stopping a cold bootstrap
+
+The first build in a fresh cache is this chain, and no step of it may run past
+a minute. Each stage is parsed (the parse is cached whole), compiled as
+translation units that are cached one by one, and has its cases run, so a run
+that is stopped part way keeps the parse and every unit it had finished, and the
+same command run again continues from there. Where the time goes is a question
+for a profile, not this file: the stage's own build keeps no type-check cache,
+so anything quadratic in the type check is paid in full on every cold run -- one
+such scan (`arr_ok`, over every node, once per empty list literal) was most of
+it until it was made a single pass.

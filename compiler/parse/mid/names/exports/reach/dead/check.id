@@ -25,6 +25,7 @@ chk_dead() {
   lset((import dphase), 0, 1);
 } chain () {
   reach_funcs(0, 0);
+  const_mark(0);
 } return void;
 given env_init ():() then calls init_reach:()
 given env_init ():() then calls reach_mark:()
@@ -39,11 +40,15 @@ given env_init ():() then calls reach_mark:()
 // "conf.id" is seeded alongside "main" because a constant has no declaring
 // function to reach: it is emitted as a static initialiser, so it holds its
 // value before main runs and can never be the uninitialised read this check
-// exists to find.
+// exists to find. Whether a constant is emitted at all is a separate question,
+// answered by clive (back/drive/run/check/dce/export/live/), the names of the
+// constants the reachable code reads.
 init_reach() {
   export string[] rfn = ["main", "conf.id"];
   export int[] dphase = [0];
   rfx_init();
+} chain () {
+  export string[] clive = [];
 } return void;
 given env_init ():() then reach_pass:(2)
 given full_env ():() then reach_pass:(2)

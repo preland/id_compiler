@@ -1,0 +1,41 @@
+// Whether a local list may be freed by the function that declares it. All
+// three conditions must hold, and each one is a proof obligation:
+//   * it is declared in this function, as a list, and not exported -- a
+//     parameter, an import or an element is somebody else's;
+//   * every store into it is a list literal, so the list is one this function
+//     made and nothing else named it first;
+//   * no use of it keeps it (walk/): it is not returned, not stored in another
+//     list or an export, not assigned to another name, and not passed to
+//     anything that keeps it.
+// That is what makes the free at the function's exit unable to leave a
+// dangling reference. The shallow free never touches the elements, which may
+// be shared with anything.
+
+// The body of a function: every statement, then the return clause, whose value
+// goes to the caller and so is kept.
+esc_func(int fn, string nm) {
+  int r = esc_block(l2_of(fn), nm);
+  if(i1_of(fn) >= 0) {
+    r = r | esc_expr(i1_of(fn), nm, 1);
+  }
+} return int r;
+given esc_fix ((import efb_fn), "p"):(1)
+given esc_fix ((import efb_fn), "t"):(0)
+given esc_fix ((import efb_fn), "v"):(3)
+
+esc_on() {
+  int on = len((import esc_pe)) > 0;
+} return int on;
+given esc_fix ():(1)
+given full_env ():(0)
+
+esc_own(int fn, string nm) {
+  int ok = 0;
+  if(esc_on() == 1) {
+    ok = esc_own2(fn, nm);
+  }
+} return int ok;
+given esc_fix ((import efc_fn), "w"):(1)
+given esc_fix ((import efc_fn), "z"):(0)
+given esc_fix ((import efb_fn), "t"):(1)
+given full_env (0, "w"):(0)

@@ -1,0 +1,37 @@
+// `Point(1, 2)` builds a struct, one value per field in declaration order. It
+// is a call to a name that is a struct rather than a function, and it is only
+// an initialiser: the shape `Point p = Point(1, 2);` and nothing wider, so a
+// struct is always built on a line of its own, named, where a reader of the
+// next line can see what it is (docs/SPEC.md, structs).
+
+chk_ctor(int id) {
+  string sd_nm = s1_of(id);
+  if(sd_find(sd_nm) >= 0) {
+    chk_ctor_at(id, sd_nm);
+  }
+} return void;
+given sd_ctor_fixture ((import sd_c2)):() then check_failed:(0)
+given sd_ctor_fixture ((import sd_c1)):() then check_failed:(1)
+
+chk_ctor_at(int id, string sd_nm) {
+  ctor_place(id);
+  if(flat_arg_count(id) != sd_nfields(sd_nm)) {
+    ctor_arity_err(id, sd_nm);
+  } else {
+    ctor_args(id, sd_nm);
+  }
+} return void;
+given sd_ctor_fixture ((import sd_c2), "P"):() then check_failed:(0)
+given sd_ctor_fixture ((import sd_c1), "P"):() then check_failed:(1)
+
+// What a constructor call evaluates to: the struct it builds, which is the name
+// written. "" for a name that is not a struct, so a call to anything else is
+// answered by the rules that already exist for it.
+sd_named(string sd_s) {
+  string t = "";
+  if(sd_find(sd_s) >= 0) {
+    t = sd_s;
+  }
+} return string t;
+given sd_pair ("Q"):("Q")
+given sd_pair ("len"):("")

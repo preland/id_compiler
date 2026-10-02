@@ -1,0 +1,11 @@
+// What to add to "cannot index a T" when T is a struct: a struct is not indexed,
+// its fields are read by name.
+
+ix_hint(string sd_bt) {
+  string sd_h = "";
+  if(ty_is_struct(sd_bt) == 1) {
+    sd_h = "; a struct's fields are read by name, as in p." + sd_fname_at(sd_bt, 0) + " (its fields are " + sd_fields_text(sd_bt) + ")";
+  }
+} return string sd_h;
+given sd_reg ("int"):("")
+given sd_reg ("P"):("; a struct's fields are read by name, as in p.x (its fields are x, y)")

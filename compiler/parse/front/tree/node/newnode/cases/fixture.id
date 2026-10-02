@@ -1,5 +1,5 @@
 // Synthetic afret/afretn state (see ../../../init/setup/fixture/toks/decl.id for the
-// token-stream half) for decl/asm/'s cases that push onto them.
+// token-stream half) for decl/kinds/asm/'s cases that push onto them.
 
 asm_reg_fix0() {
   env_init();

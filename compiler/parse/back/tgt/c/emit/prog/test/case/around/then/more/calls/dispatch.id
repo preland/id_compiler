@@ -2,7 +2,7 @@
 // what the `:(...)` form needs from outside its own block: one recorded row
 // written the way the clause writes it, for a miss to show
 // (args/cmp.id), and the list types among NAME's parameters, noted with
-// the ones cases compare at (ctype/list/note/then.id) -- the row condition
+// the ones cases compare at (ctype/list/note/from/then.id) -- the row condition
 // compares those columns with idtc_eq_K and the miss prints them with
 // idtc_show_K, and neither exists for a type nothing else noted.
 

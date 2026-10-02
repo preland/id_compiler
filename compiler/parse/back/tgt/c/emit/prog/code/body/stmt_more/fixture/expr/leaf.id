@@ -3,7 +3,7 @@
 // node has two distinct operands, plus a string literal for the string
 // cases (concat, strcmp, print's argument).
 
-// init_idx gives lookup_var (mid/types/registry/fn/node/type.id, on
+// init_idx gives lookup_var (mid/types/registry/derived/fn/node/type.id, on
 // type_of's dispatch chain) its vidx table -- without it, type_of on
 // anything but an int or str leaf reads past the end of an empty import and
 // segfaults, per docs/TESTS.md's note on synthetic node fixtures.

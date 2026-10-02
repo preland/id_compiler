@@ -41,7 +41,7 @@ init_resv_names() {
     i = take_resv_name((import resv_names_src), i);
   }
 } return void;
-():() then calls push_resv_name:[67]
+():() then calls push_resv_name:[71]
 ():() then resv_names_last:("ushr")
 
 resv_names_last() {

@@ -1,0 +1,23 @@
+// wrap_fixture's case (../pre/fixture.id) plus a `timeout 7` on it, for
+// emit_setup_line (judge/more/row.id) to be pointed at a case that has one.
+// Filed here because row.id and the pre/ fixture file are at the 3-function
+// limit and this directory has room.
+
+secs_case_fixture() {
+  wrap_fixture();
+  push((import casetimeout), 7);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// wrap_fixture's casenode/casefn (test/case/around/then/more/capture/pre/
+// fixture.id, pre-existing) plus a two-entry casegiven -- "" at 0 (a case
+// with no `given`), a real name at 1 -- neither of which that fixture sets.
+// Moved here from around/given.id, which needed its third slot for emit_setup.
+casegiven_fixture() {
+  wrap_fixture();
+  push((import casegiven), "");
+  push((import casegiven), "extra_setup");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

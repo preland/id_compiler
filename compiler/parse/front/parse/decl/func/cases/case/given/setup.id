@@ -4,7 +4,10 @@
 // needing a fixture written to call them. The names are recorded as one
 // space-separated entry per case in `casegiven`, "" for a case without any.
 // Whether a name is a setup at all is a check
-// (mid/names/limits/shape/cases/given/), not a parse.
+// (mid/names/limits/shape/cases/given/), not a parse. A setup may be written
+// `given NAME(LIT, ...)`: the literals are kept per setup, and one "gargs" node
+// per case lists them, in `casegargs` (elem/more/args.id), parallel to
+// `casegiven`.
 //
 // `stdin "TEXT"` follows any `given`, ahead of the arguments too: the text the
 // case's process sees as its whole standard input (docs/TESTS.md). It is
@@ -13,6 +16,15 @@
 // literal (back/tgt/c/emit/prog/test/judge/more/row.id). At most one per case;
 // a second is rejected here, on the same line as the rest of case parsing,
 // rather than left for a later pass to notice.
+//
+// `timeout N` follows any `stdin`, just ahead of the arguments: N is a positive
+// integer literal, the seconds that one case may run before the harness stops
+// it, where a case without one gets the default (docs/TESTS.md). It is
+// recorded one entry per case in `casetimeout` -- N, or 0 for a case without
+// one -- so the harness need not tell "none" from a limit of its own. At most
+// one per case, and every `given` and `stdin` must be written before it: a
+// clause after `timeout` is reported here with the fix, since the tokens after
+// `timeout N` would otherwise be read as the arguments.
 
 parse_case_args(int[] pos) {
   int[] args = case_tuple(pos);
@@ -23,11 +35,15 @@ given case_min_fix ([0]):(2) then check_failed:(0)
 
 case_given(int[] pos) {
   string setup_nm = "";
+  int[] gs = [];
   while(cur_kind(pos) == "kw" && cur_text(pos) == "given") {
-    string setup_one = given_name(pos);
+    string setup_one = given_name(pos, gs);
     setup_nm = setup_nm + setup_one + " ";
   }
+} chain (int[] pos) {
   push((import casegiven), setup_nm);
+  int gargs_n = newnode("gargs", 0, 0, "", "", gs, gs);
+  push((import casegargs), gargs_n);
 } chain (int[] pos) {
   int stdin_e = -1;
   if(cur_kind(pos) == "kw" && cur_text(pos) == "stdin") {
@@ -44,13 +60,51 @@ case_given(int[] pos) {
   }
 } chain (int[] pos) {
   push((import casestdin), stdin_e);
+  int has_tm = 0;
+  int secs_v = 0;
+} chain (int[] pos) {
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "timeout") {
+    advance(pos);
+    has_tm = 1;
+  }
+  string secs_txt = cur_text(pos);
+  if(has_tm == 1 && cur_kind(pos) == "int" && is_bigdec(secs_txt) == 0) {
+    secs_v = to_int(secs_txt);
+  }
+} chain (int[] pos) {
+  if(has_tm == 1 && secs_v < 1) {
+    syn_err(pos, "timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '" + secs_txt + "'");
+  }
+  if(secs_v > 0) {
+    advance(pos);
+  }
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "timeout") {
+    syn_err(pos, "a case may have at most one 'timeout' clause; keep the one number of seconds it needs and delete the other");
+  }
+} chain (int[] pos) {
+  if(has_tm == 1 && cur_kind(pos) == "kw" && (cur_text(pos) == "given" || cur_text(pos) == "stdin")) {
+    syn_err(pos, "'timeout N' comes after every 'given' and 'stdin' of a case and just before its argument tuple; move it to follow them");
+  }
+  if(secs_v > 0 && cur_kind(pos) != "kw" && cur_text(pos) != "(") {
+    syn_err(pos, "'timeout N' must be followed by the case's argument tuple, as in 'timeout 90 (1):(2)'; write it before the '(' that opens the arguments, not after the expected values");
+  }
+  push((import casetimeout), secs_v);
 } return void;
 given given_fix ([0]):()
 given tup1_fix ([0]):()
+given tmo_fix ([0]):() then tmo_last:(5)
+given tmo_fix ([0]):() then check_failed:(0)
+given tmo_fix ([3]):() then check_failed:(1)
+given tmo_fix ([5]):() then check_failed:(1)
+given tmo_fix ([7]):() then check_failed:(1)
+given tmo_fix ([11]):() then check_failed:(1)
+given tmo_fix ([14]):() then check_failed:(1)
+given tmo_fix ([16]):() then check_failed:(1)
 
-given_name(int[] pos) {
+given_name(int[] pos, int[] gs) {
   advance(pos);
   string setup_nm = case_fn_name(pos, "given");
+  given_call(pos, setup_nm, gs);
 } return string setup_nm;
-given given_fix ([0]):("mysetup")
-given given2_fix ([0]):("othersetup")
+given given_fix ([0], []):("mysetup") then calls given_call:[1]
+given given2_fix ([0], []):("othersetup") then calls given_call:[1]

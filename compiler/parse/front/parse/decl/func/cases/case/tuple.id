@@ -12,8 +12,8 @@ parse_case(int[] pos) {
   case_given(pos);
   int ret_i = parse_case_args(pos);
 } return int ret_i;
-given case_min_fix ([0]):(2)
-given tup1_fix ([0]):(1)
+given case_min_fix ([0]):(3)
+given tup1_fix ([0]):(2)
 
 parse_case_rhs(int[] pos, int[] args) {
   eat_colon(pos);

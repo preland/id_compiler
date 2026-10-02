@@ -1,0 +1,33 @@
+// A value stored into a name: the initialiser of a declaration or the right of
+// an assignment. Whatever the expression is, its value is kept by the name, so
+// a bare variable there is an alias of another variable and escapes.
+esc_store(int sn, string nm) {
+  string tg = s1_of(sn);
+  if(k_of(sn) == "decl") {
+    tg = s2_of(sn);
+  }
+  int r = esc_put(i1_of(sn), tg, nm);
+} return int r;
+given esc_fix ((import efb_dt), "t"):(0)
+given esc_fix ((import efb_dv), "v"):(2)
+given esc_fix ((import efb_dv), "p"):(1)
+
+esc_put(int e, string tg, string nm) {
+  int r = esc_expr(e, nm, 1);
+  int f = esc_fresh(e, tg, nm);
+  r = r | f;
+} return int r;
+given esc_fix ((import efb_vp), "v", "v"):(2)
+given esc_fix ((import efb_vp), "v", "p"):(1)
+
+// Bit 2: `nm` is the target of a store whose value is not a list literal, so
+// it may be an alias of a list somebody else owns (a parameter, an element, a
+// call's result) and must never be freed.
+esc_fresh(int e, string tg, string nm) {
+  int r = 0;
+  if(tg == nm && k_of(e) != "arr") {
+    r = 2;
+  }
+} return int r;
+given esc_fix ((import efb_vp), "v", "v"):(2)
+given esc_fix ((import efb_arr), "v", "v"):(0)

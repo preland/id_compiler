@@ -9,7 +9,7 @@
 chk_iassign(int id) {
   string bt = base_type(id);
   if(ty_known(bt) == 1 && ty_is_list(bt) == 0) {
-    tc_err(id, "cannot index a " + bt);
+    tc_err(id, "cannot index a " + bt + ix_hint(bt));
   } else {
     chk_iassign2(id, bt);
   }

@@ -9,11 +9,33 @@ lz_find(int i) {
 given lz_p (1):(0)
 given lz_p (0):(-1)
 
+// i and j are `prog` indexes, like cfp2's. The strict table is not: it holds
+// one entry per chain segment (mid/form/unique/scan/fill.id), so the strict
+// side is gathered per function by lz_strict, and only for a pair the loose
+// fingerprint already matched.
 lz_probe(int i, int j) {
   int found = 0 - 1;
-  if((import cfp2)[i] == (import cfp2)[j] && (import cfp)[i] != (import cfp)[j]) {
+  if((import cfp2)[i] == (import cfp2)[j] && lz_strict(i) != lz_strict(j)) {
     found = j;
   }
 } return int found;
 given lz_p (1, 0):(0)
 given lz_p (0, 0):(-1)
+
+// Every strict fingerprint that belongs to function p, each prefixed with its
+// length so that two different lists of segments cannot join to one string.
+lz_strict(int lz_sfn) {
+  string lz_sacc = "";
+  int lz_si = 0;
+  int lz_sn = len((import cfp));
+} chain (int lz_sfn) {
+  while(lz_si < lz_sn) {
+    if((import cfpfn)[lz_si] == lz_sfn) {
+      lz_sacc = lz_sacc + len((import cfp)[lz_si]) + ":" + (import cfp)[lz_si];
+    }
+    lz_si = lz_si + 1;
+  }
+} return string lz_sacc;
+given lz_p (0):("23:()->int=>v0{d:int 0=I5}")
+given lz_p (1):("23:()->int=>v0{d:int 0=I9}")
+given lz_p (7):("")

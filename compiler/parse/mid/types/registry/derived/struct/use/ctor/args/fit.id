@@ -1,0 +1,15 @@
+// One argument against its field, with the narrowing rule an argument has
+// everywhere: a word is not squeezed into an int field without the line that
+// does it being written (docs/SPEC.md, section 1).
+
+ctor_fit(int sd_a, string sd_nm, int sd_k, string sd_ft) {
+  string sd_at = type_of(sd_a);
+  if(bad_store(sd_ft, sd_a) == 1) {
+    tc_err(sd_a, "argument '" + sd_fname_at(sd_nm, sd_k) + "' of '" + sd_nm + "' expects " + sd_ft + ", got " + sd_at);
+  } else if(ty_narrows(sd_ft, sd_at) == 1) {
+    tc_err(sd_a, "argument '" + sd_fname_at(sd_nm, sd_k) + "' of '" + sd_nm + "' narrows " + sd_at + " to " + sd_ft + "; declare a " + sd_ft + " local and pass that");
+  }
+} return void;
+given sd_ctor_fixture ((import sd_one), "P", 0, "int"):() then check_failed:(0)
+given sd_ctor_fixture ((import sd_str), "P", 1, "int"):() then prints:("<stdin>:1: error: argument 'y' of 'P' expects int, got string\n")
+given sd_ctor_fixture ((import sd_big), "P", 0, "int"):() then prints:("<stdin>:1: error: argument 'x' of 'P' narrows word to int; declare a int local and pass that\n")

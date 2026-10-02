@@ -95,7 +95,7 @@ table suffices) drives type-dependent emission:
   `id_` + the name for the rest. `mem_of_str` takes a string, so it is the one
   that emits with no cast
 
-`idc.py` is frozen (`../docs/HACKING.md`) and no longer built against here for
+The deleted `idc.py` is no longer built against here for
 comparison; correctness is checked by running the emitted C
 (`tests/self_host_build.sh`, `tests/conform.sh`) rather than by diffing it
 against a second implementation.

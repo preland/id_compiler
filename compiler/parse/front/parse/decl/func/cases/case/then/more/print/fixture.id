@@ -1,4 +1,4 @@
-// More token streams (see ../../../given/elem/fixture.id for tup1_fix and
+// More token streams (see ../../../given/elem/more/fixture.id for tup1_fix and
 // friends): a bare name followed by `)` (a case-fn element), and two known
 // scaling bounds.
 

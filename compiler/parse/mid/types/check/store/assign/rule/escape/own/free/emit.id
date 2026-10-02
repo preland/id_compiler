@@ -1,0 +1,34 @@
+// The places the emitted C changes: a declaration that starts NULL, so a branch
+// that never reaches it frees nothing; a store that frees the value it
+// replaces (a declaration in a loop runs once per pass), and the free itself.
+
+esc_free_decl(int fn, int sn, string out) {
+  string nm = s2_of(sn);
+  string line = "id_list_free(" + nm + "); ";
+  if(esc_own(fn, nm) == 1 && str_find(out, line) < 0) {
+    out = out + line;
+  }
+} return string out;
+given esc_fix ((import efc_fn), (import efc_w), ""):("id_list_free(w); ")
+given esc_fix ((import efc_fn), (import efc_z), "x"):("x")
+
+esc_free_nest(int fn, int sn, string out) {
+  out = esc_free_in(fn, l1_of(sn), out);
+  out = esc_free_in(fn, l2_of(sn), out);
+} return string out;
+given esc_fix ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
+given esc_fix ((import efc_fn), (import efc_z), "q"):("q")
+given esc_fix ((import efc_fn), (import efc_ife), ""):("id_list_free(w); ")
+
+// `nm = code;`, or for an owned list a block that keeps the old value, stores
+// the new one and frees the old -- after the new is computed, because the new
+// value's expression may read the old list.
+esc_store_code(string nm, string code) {
+  string s = nm + " = " + code + ";";
+  if(esc_own(esc_cur(), nm) == 1) {
+    s = "{ IdList* idfe_o = " + nm + "; " + s + " id_list_free(idfe_o); }";
+  }
+} return string s;
+given esc_fix ("w", "v"):("{ IdList* idfe_o = w; w = v; id_list_free(idfe_o); }")
+given esc_fix ("z", "v"):("z = v;")
+given full_env ("w", "v"):("w = v;")

@@ -1,0 +1,50 @@
+// Escape analysis, the expression walk (docs/MEMORY.md). The question asked of
+// one expression is: does the value of the variable `nm` end up somewhere that
+// outlives the statement -- a list, a global, a return, another name, or a
+// callee that keeps it?  The answer is a flag word, 1 when it does and 0 when
+// it provably does not; the statement walk adds a second bit (walk/more/stmt/).
+//
+// `ctx` says where the value of `e` flows: 1 into something that keeps it, 0
+// into something that only reads it. Only a bare variable reads its own
+// context; every other node gives each child the context its own meaning
+// decides, so an operand of `+` or an index is read, an element of a list
+// literal is kept, and an argument is whatever the callee's summary says
+// (sum/). Any node kind not named here is treated as keeping nothing, because
+// it cannot hold a variable.
+
+esc_expr(int e, string nm, int ctx) {
+  int r = 0;
+  if(k_of(e) == "var") {
+    if(s1_of(e) == nm) {
+      r = ctx;
+    }
+  } else {
+    r = esc_node(e, nm);
+  }
+} return int r;
+given esc_fix ((import efa_vb), "b", 1):(1)
+given esc_fix ((import efa_vb), "b", 0):(0)
+given esc_fix ((import efa_va), "b", 1):(0)
+
+esc_node(int e, string nm) {
+  int r = 0;
+  if(k_of(e) == "call") {
+    r = esc_call(e, nm);
+  } else {
+    r = esc_node2(e, nm);
+  }
+} return int r;
+given esc_fix ((import efa_push), "b"):(1)
+given esc_fix ((import efa_push), "a"):(0)
+
+// `xs[i] = v`: the node carries the indexed list and the index, and the value
+// in its first child list. The list and the index are read; the value is kept.
+esc_iassign(int sn, string nm) {
+  int r = esc_two(sn, nm);
+  int[] vs = l1_of(sn);
+  r = r | esc_expr(vs[0], nm, 1);
+} return int r;
+given esc_fix ((import efa_ia), "a"):(0)
+given esc_fix ((import efa_ia), "b"):(1)
+given esc_sd_fix ((import esd_set), "ys"):(1)
+given esc_sd_fix ((import esd_set), "b"):(0)

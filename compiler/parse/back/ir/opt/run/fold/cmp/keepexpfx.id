@@ -4,6 +4,7 @@
 keep_export_fixture_harn_on() {
   keep_export_fixture();
   harn_set(1);
+  keep_export_fixture_tail();
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)

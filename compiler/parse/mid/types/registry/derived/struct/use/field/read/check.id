@@ -1,0 +1,29 @@
+// Reading a field: the base must be a struct, and the struct must have it. A
+// base whose type the compiler could not work out is not judged, the rule
+// every check follows, so one mistake is reported once and not again for what
+// it drags along.
+
+chk_field(int id, string sd_bt) {
+  string sd_f = s1_of(i2_of(id));
+  if(ty_known(sd_bt) == 1) {
+    chk_field_at(id, sd_bt, sd_f);
+  }
+} return void;
+given sd_use_fixture ((import sd_ix), "P"):() then check_failed:(0)
+given sd_use_fixture ((import sd_in), "int"):() then check_failed:(1)
+
+chk_field_at(int id, string sd_bt, string sd_f) {
+  if(ty_is_struct(sd_bt) == 0) {
+    ix_err(id, "cannot read field '" + sd_f + "' of a " + sd_bt + "; only a struct has fields (a list's length is len(list))");
+  } else if(sd_fpos(sd_bt, sd_f) < 0) {
+    ix_err(id, sd_nofield(sd_bt, sd_f));
+  }
+} return void;
+given sd_use_fixture ((import sd_in), "int", "x"):() then prints:("<stdin>:1: error: cannot read field 'x' of a int; only a struct has fields (a list's length is len(list))\n")
+given sd_use_fixture ((import sd_iz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y\n")
+
+sd_nofield(string sd_bt, string sd_f) {
+  string sd_m = "struct '" + sd_bt + "' has no field '" + sd_f + "'; its fields are " + sd_fields_text(sd_bt);
+} return string sd_m;
+given sd_use_fixture ("P", "z"):("struct 'P' has no field 'z'; its fields are x, y")
+given sd_use_fixture ("Q", "x"):("struct 'Q' has no field 'x'; its fields are s")

@@ -1,0 +1,35 @@
+// A return leaves the function, so the owned lists are freed on the way out.
+// The value returned is a name or a literal and is computed by the `return`
+// itself, after the frees, which is safe because a returned name is never an
+// owned list.
+
+esc_ret_code(string code) {
+  string frees = esc_frees();
+  string s = code;
+  if(frees != "") {
+    s = "{ " + frees + code + " }";
+  }
+} return string s;
+given esc_fix ("return z;"):("{ id_list_free(w); return z; }")
+given full_env ("return z;"):("return z;")
+
+// The function whose body is being emitted: emit_def (code/func/def/body/def.id)
+// leaves its node in slot 0 of sqbase. Read only when the analysis is on, since
+// a case that never seeded it never set sqbase either.
+esc_cur() {
+  int fn = 0 - 1;
+  if(esc_on() == 1) {
+    fn = (import sqbase)[0];
+  }
+} return int fn;
+given esc_fix ():((import efc_fn))
+given full_env ():(-1)
+
+esc_init_code(string nm) {
+  string s = "";
+  if(esc_own(esc_cur(), nm) == 1) {
+    s = " = NULL";
+  }
+} return string s;
+given esc_fix ("w"):(" = NULL")
+given esc_fix ("z"):("")

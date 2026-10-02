@@ -1,0 +1,39 @@
+// A struct cannot hold itself, directly or through the structs it holds: the
+// value would have to exist before it could be made, and `id` has no empty
+// struct to end the chain. A list of the struct is the way to say "any number
+// of these", because a list can be empty. Fields that are lists are not
+// followed.
+
+sd_cycle(int sd_i) {
+  string sd_nm = (import sdname)[sd_i];
+  if(sd_contains(sd_nm, sd_nm, len((import sdname))) > 0) {
+    sd_err(sd_i, "struct '" + sd_nm + "' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('" + sd_nm + "[] items')");
+  }
+} return void;
+given sd_reg (0):() then check_failed:(0)
+given sd_reg given sd_note("N", ["next"], ["N"], "n.id", 6) (2):() then prints:("n.id:6: error: struct 'N' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('N[] items')\n")
+
+// How many fields of a struct hold `sd_t`, directly or through the structs in
+// them, looking `sd_d` levels deep (as many as there are structs, so every
+// chain is followed to its end and a loop among them cannot go on forever).
+sd_contains(string sd_s, string sd_t, int sd_d) {
+  int ok = 0;
+  int sd_k = 0;
+  while(sd_k < sd_nfields(sd_s) && sd_d > 0) {
+    ok = ok + sd_holds(sd_ftype_at(sd_s, sd_k), sd_t, sd_d);
+    sd_k = sd_k + 1;
+  }
+} return int ok;
+given sd_reg ("P", "int", 2):(2)
+given sd_reg ("P", "string", 2):(0)
+
+sd_holds(string sd_ft, string sd_t, int sd_d) {
+  int ok = 0;
+  if(sd_ft == sd_t) {
+    ok = 1;
+  } else if(sd_find(sd_ft) >= 0) {
+    ok = sd_contains(sd_ft, sd_t, sd_d - 1);
+  }
+} return int ok;
+given sd_reg ("int", "int", 1):(1)
+given sd_reg given sd_note("W", ["p"], ["P"], "w.id", 6) ("P", "int", 3):(2)

@@ -24,7 +24,7 @@ given edge_fixture (0, "nosuchfn", 1):(1)
 // cases to count. aloc already holds "file:line" (push_asm, front/parse/
 // decl/top/decl/more.id); print_asm_cases (back/drive/run/check/dce/emit/
 // guard/guarded_emit.id) prints one of these per entry -- filed here rather
-// than beside afname (front/parse/decl/asm/) or print_call_cases (back/
+// than beside afname (front/parse/decl/kinds/asm/) or print_call_cases (back/
 // drive/run/check/dce/emit/calls/cases.id), both at their 3-function cap.
 asm_case_row(int i) {
   string loc = (import aloc)[i];

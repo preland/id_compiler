@@ -13,12 +13,13 @@ bt2(string name) {
 
 bt3(string name) {
   string t = bt4(name);
-  if(name == "to_int" || name == "len" || name == "charat" || name == "ult") {
+  if(name == "to_int" || name == "len" || name == "charat" || name == "ult" || name == "ticks" || name == "getkey") {
     t = "int";
   }
 } return string t;
 ("len"):("int")
 ("alloc"):("word")
+("ticks"):("int")
 
 // `+` with a string operand is concatenation (-> string); anything else is an
 // arithmetic/bitwise widening or a predicate, which tb2 decides.

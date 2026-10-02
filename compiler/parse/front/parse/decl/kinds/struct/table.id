@@ -1,0 +1,41 @@
+// The struct table: one row per `struct` declaration the parser has read, in
+// source order, in parallel lists like every other table in this compiler.
+//
+//   sdname   the struct's name
+//   sdfname  its field names, in declaration order
+//   sdftype  its field types, parallel to sdfname
+//   sdfile   the file it was declared in (the rule that a struct has a file of
+//            its own is checked from this, mid/types/struct/)
+//   sdline   the line `struct` was written on
+//
+// A struct is a program-wide type: it has no unit, so a declaration in an
+// imported tree and the same declaration in the program are one struct twice,
+// and the second is a duplicate (docs/SPEC.md, structs).
+
+init_structs() {
+  export string[] sdname = [];
+  export string[][] sdfname = [];
+  export string[][] sdftype = [];
+} chain () {
+  export string[] sdfile = [];
+  export int[] sdline = [];
+} return void;
+():() then sd_count:(0)
+given sd_pair ():() then sd_count:(0)
+
+sd_count() {
+  int n = len((import sdname));
+} return int n;
+given env_init ():(0)
+given sd_pair ():(2)
+
+sd_note(string sd_nm, string[] sd_fns, string[] sd_fts, string sd_file, int sd_ln) {
+  push((import sdname), sd_nm);
+  push((import sdfname), sd_fns);
+  push((import sdftype), sd_fts);
+} chain (string sd_nm, string[] sd_fns, string[] sd_fts, string sd_file, int sd_ln) {
+  push((import sdfile), sd_file);
+  push((import sdline), sd_ln);
+} return void;
+given env_init ("P", ["x"], ["int"], "p.id", 3):() then sd_count:(1)
+given sd_pair ("R", ["a"], ["string"], "r.id", 9):() then sd_count:(3)

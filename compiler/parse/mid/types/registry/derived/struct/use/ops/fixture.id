@@ -1,0 +1,37 @@
+// `print(p)` and `push(ps, p)` over a variable p of type P and ps of type P[],
+// and `p == p` and `if(p)` over the same p, for the cases of the operator and
+// builtin checks that refuse a struct.
+
+sd_bi_fixture() {
+  sd_use_fixture();
+  add_var("ps", "P[]", 0);
+  export int sd_vps = node_var("ps");
+} chain () {
+  export int sd_pc = node_call("print", [(import sd_vp)]);
+  export int sd_pushc = node_call("push", [(import sd_vps), (import sd_vp)]);
+  export int sd_eq = node_bin("==", (import sd_vp), (import sd_vp));
+} chain () {
+  int[] sd_none = [];
+  export int sd_if = node_if((import sd_vp), sd_none, sd_none, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// The escape analysis's fixtures with a struct Box { int[] xs; int n; } in the
+// table, and on it `Box(xs, n)` and `b.xs = ys`: the two ways a list a function
+// made can be put into a struct, for the cases that say neither lets the
+// function free it (docs/MEMORY.md, structs).
+esc_sd_fix() {
+  esc_fix();
+  sd_note("Box", ["xs", "n"], ["int[]", "int"], "box.id", 1);
+  export int esd_xs = node_var("xs");
+} chain () {
+  export int esd_n = node_var("n");
+  export int esd_ctor = node_call("Box", [(import esd_xs), (import esd_n)]);
+  export int esd_tgt = node_index(node_var("b"), newleaf("fld", 0, 0, "xs", ""));
+} chain () {
+  export int esd_ys = node_var("ys");
+  export int esd_set = node_iassign((import esd_tgt), (import esd_ys));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

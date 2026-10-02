@@ -1,0 +1,10 @@
+// `struct` begins a declaration that only the top level has, so a name spelled
+// that way would read as one to anyone scanning the source.
+
+no_struct_word(int[] pos) {
+  if(cur_text(pos) == "struct") {
+    syn_err(pos, "'struct' is a keyword (it declares a type, at the top level of a file of its own; see docs/SPEC.md, structs) and cannot be used as a name or inside a function");
+  }
+} return void;
+given sd_toks ([0]):() then check_failed:(1)
+given sd_toks ([1]):() then check_failed:(0)

@@ -1,0 +1,13 @@
+// The struct types P { int x; int y; }, Q { string s; } and W { P p; int n; }
+// registered, with the harness's helper tables started, for the cases of the
+// helpers that compare and print a struct.
+
+sd_note_fixture() {
+  sd_pair();
+  sd_note("W", ["p", "n"], ["P", "int"], "w.id", 9);
+  init_struct_rows();
+} chain () {
+  tc_types_init();
+} return void;
+():() then tcsts_len:(0)
+():() then sd_count:(3)

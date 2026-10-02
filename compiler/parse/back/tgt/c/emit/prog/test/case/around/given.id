@@ -17,7 +17,7 @@ emit_case_given(int ci) {
   int i = 0;
   while(i < len(setups)) {
     if(setups[i] != "") {
-      emit_line("    id_" + setups[i] + "();");
+      emit_setup(ci, i, setups[i]);
     }
     i = i + 1;
   }
@@ -25,13 +25,27 @@ emit_case_given(int ci) {
 given casegiven_fixture (0):() then prints:("")
 given casegiven_fixture (1):() then prints:("    id_extra_setup();\n")
 
-// wrap_fixture's casenode/casefn (test/case/around/then/more/capture/pre/
-// fixture.id, pre-existing) plus a two-entry casegiven -- "" at 0 (a case
-// with no `given`), a real name at 1 -- neither of which that fixture sets.
-casegiven_fixture() {
-  wrap_fixture();
-  push((import casegiven), "");
-  push((import casegiven), "extra_setup");
+// One setup of a case's `given`: `id_NAME();`, or -- when it was written with
+// arguments, `given NAME(LIT, ...)` -- its arguments built at the setup's own
+// parameter types, one C local each, in a block of their own so the names are
+// free again for the case's arguments that follow. An `(import NAME)` among
+// them is read here, after the setups written before this one have run.
+emit_setup(int ci, int si, string nm) {
+  int[] items = given_items(ci, si);
+  int[] ps = [];
+  if(len(items) > 0) {
+    ps = l1_of(func_node(nm));
+    emit_line("    {");
+  }
+} chain (int ci, int si, string nm) {
+  string an = names_upto(len(items));
+  emit_arg_lines(ps, items);
+  emit_line("    id_" + nm + "(" + an + ");");
+} chain (int ci, int si, string nm) {
+  if(len(items) > 0) {
+    emit_line("    }");
+  }
 } return void;
-():() then check_failed:(0)
-():() then init_units:(0)
+given gsetup_fixture (0, 1, "fx_set1"):() then prints:("    {\n    int idtc_a0 = 0;\n    id_fx_set1(idtc_a0);\n    }\n")
+given gsetup_fixture (0, 0, "fx_set1"):() then prints:("    id_fx_set1();\n")
+given casegiven_fixture (1, 0, "extra_setup"):() then prints:("    id_extra_setup();\n")

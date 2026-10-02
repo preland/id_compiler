@@ -7,6 +7,9 @@
 //   consbound  the claim's bound as canonical text, e.g. `O(n log n)`
 //   casegiven  each case's setup function, or "" (cases/case/given/)
 //   casestdin  each case's `stdin "TEXT"` node, or -1 (cases/case/given/)
+//   casetimeout  each case's `timeout N` seconds, or 0 (cases/case/given/)
+//   casegargs  each case's "gargs" node: one "gsetup" per `given`, in order,
+//              holding the literals a setup is called with (cases/case/given/)
 //   thennode   each `then` check, as a "then" node (cases/case/then/)
 //   ptoks      each function's first token, parallel to `prog` as parsed
 //   ptoke      one past its return clause's last token: the text a case
@@ -61,6 +64,9 @@ init_cases2() {
 } chain () {
   export int[] tkout = [0];
   export string[] uroots = [];
+  export int[] casetimeout = [];
+} chain () {
+  export int[] casegargs = [];
 } return void;
 ():() then consbound_len:(0)
 given claim_cols_fixture ():() then consbound_len:(0)

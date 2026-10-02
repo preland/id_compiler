@@ -1,4 +1,4 @@
-// The afretn reader for decl/asm/'s cases (see
+// The afretn reader for decl/kinds/asm/'s cases (see
 // ../../../tree/node/newnode/fixture.id and ../../../tree/make/array/fixture.id
 // for the afret/afretn scenarios themselves).
 

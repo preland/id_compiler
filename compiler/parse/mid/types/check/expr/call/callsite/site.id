@@ -21,7 +21,7 @@ given h_call_match ((import h_call_1)):() then calls chk_fcall:((import h_call_1
 // tables, and idc.py does not check a call to one either). A `native`
 // declaration is a func node like any other, so a call to one is checked.
 //
-// fn_node_of (mid/types/registry/fn/node/sig/lookup.id) answers the same
+// fn_node_of (mid/types/registry/derived/fn/node/sig/lookup.id) answers the same
 // question through the hash index, and every caller reached from a real
 // build's own compilation now calls it directly instead. This one stays a
 // plain find_str because several of its remaining callers' own cases build
@@ -47,6 +47,8 @@ chk_site_at(int id, int fn) {
   } else {
     chk_fcall(id);
   }
+  chk_ctor(id);
 } return void;
 given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then calls chk_arity:((import argfn_call_match), (import argfn_fn))
 given neg1_setup ((import cm_push_call), (import neg1)):() then calls chk_fcall:((import cm_push_call))
+given sd_ctor_fixture ((import sd_c2), (import sd_neg)):() then calls chk_ctor:((import sd_c2))

@@ -1,0 +1,57 @@
+// The nodes the cases of the field checks read: structs P { int x; int y; } and
+// Q { string s; } (sd_pair), a variable `p` of type P and a variable `n` of
+// type int, and on them
+//
+//   sd_ix  p.x        sd_iz  p.z        sd_in  n.x        sd_ii  p[1]
+//   sd_wx  p.x = 1    sd_wz  p.z = 1    sd_wn  n.x = 1    sd_ws  p.x = "s"
+//
+// The writes are built on index nodes of their own (sd_tx, sd_tz, sd_tn): an
+// iassign carries its target's children, and a read of a node whose children
+// an iassign carries is the target being written, which is not reported as a
+// read (mid/types/check/expr/more/index/target.id).
+
+sd_use_fixture() {
+  sd_reg();
+  init_idx();
+  add_var("p", "P", 0);
+} chain () {
+  add_var("n", "int", 0);
+  export int sd_vp = node_var("p");
+  export int sd_vn = node_var("n");
+} chain () {
+  export int sd_one = node_int("1", 1, 0);
+  export int sd_str = node_str("s");
+  sd_use_reads();
+} chain () {
+  sd_use_writes();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+sd_use_reads() {
+  export int sd_lx = newleaf("fld", 0, 0, "x", "");
+  export int sd_ix = node_index((import sd_vp), (import sd_lx));
+  export int sd_iz = node_index((import sd_vp), newleaf("fld", 0, 0, "z", ""));
+} chain () {
+  export int sd_in = node_index((import sd_vn), (import sd_lx));
+  export int sd_ii = node_index((import sd_vp), (import sd_one));
+  export int sd_iy = node_index((import sd_vp), newleaf("fld", 0, 0, "y", ""));
+} return void;
+given sd_use_fixture ():() then check_failed:(0)
+given sd_use_fixture ():() then init_units:(0)
+
+sd_use_writes() {
+  export int sd_vq = node_var("p");
+  export int sd_tx = node_index((import sd_vq), newleaf("fld", 0, 0, "x", ""));
+  export int sd_tz = node_index((import sd_vq), newleaf("fld", 0, 0, "z", ""));
+} chain () {
+  export int sd_vm = node_var("n");
+  export int sd_tn = node_index((import sd_vm), newleaf("fld", 0, 0, "x", ""));
+  export int sd_wx = node_iassign((import sd_tx), (import sd_one));
+} chain () {
+  export int sd_wz = node_iassign((import sd_tz), (import sd_one));
+  export int sd_wn = node_iassign((import sd_tn), (import sd_one));
+  export int sd_ws = node_iassign((import sd_tx), (import sd_str));
+} return void;
+given sd_use_fixture ():() then check_failed:(0)
+given sd_use_fixture ():() then init_units:(0)

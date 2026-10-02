@@ -18,10 +18,13 @@ cond_kind(int id, string msg, string t) {
     tc_err(id, msg);
   } else if(ty_kind(t) == "func") {
     tc_err(id, "a condition cannot be a function value (" + t + "); call it, and test what it returns");
+  } else if(ty_kind(t) == "struct") {
+    tc_err(id, "a condition cannot be a struct (" + t + "); test one of its fields, as in " + sd_fname_at(t, 0) + " > 0");
   }
 } return void;
 given cmp_fixture (0, "bad cond", "void"):() then check_failed:(1)
 given cmp_fixture (0, "bad cond", "int"):() then check_failed:(0)
+given sd_bi_fixture ((import sd_if), "bad cond", "P"):() then prints:("<stdin>:1: error: a condition cannot be a struct (P); test one of its fields, as in x > 0\n")
 
 // `==`, `!=` and id's bare `=` compare; `< <= > >=` order. is_eqop already
 // exists (in back/, for string equality's strcmp) and says exactly this --

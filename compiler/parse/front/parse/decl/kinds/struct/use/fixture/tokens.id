@@ -1,0 +1,24 @@
+// Token streams for the struct parser's own cases (../../decl.id): one whole
+// declaration, `struct P { int x; string y; }`, and one that stops before its
+// closing brace, `struct P { int x;`.
+
+sd_toks() {
+  env_init();
+  push_toks(["kw", "ident", "op", "kw", "ident", "op", "kw", "ident", "op", "op", "eof"], ["struct", "P", "{", "int", "x", ";", "string", "y", ";", "}", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(11)
+
+sd_toks_open() {
+  env_init();
+  push_toks(["kw", "ident", "op", "kw", "ident", "op", "eof"], ["struct", "P", "{", "int", "x", ";", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(7)
+
+sd_last_nf() {
+  int sd_i = len((import sdname)) - 1;
+  int sd_k = len((import sdfname)[sd_i]);
+} return int sd_k;
+given sd_pair ():(1)
+given sd_pair given sd_note("T", ["a", "b"], ["int", "int"], "t.id", 7) ():(2)

@@ -14,9 +14,12 @@ tc_g5(int id) {
   if(k_of(id) == "exprstmt") {
     chk_exprstmt(id);
   }
+} chain (int id) {
+  chk_declared_type(id);
 } return void;
 given badexpr_fixture ((import badexpr_fn)):() then check_failed:(1)
 given composite_fixture ((import un_neg)):() then check_failed:(0)
+given sd_decl_fixture ((import sd_dbad)):() then check_failed:(1)
 
 chk_un(int id) {
   int i1_of_v = i1_of(id);

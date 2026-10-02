@@ -1,0 +1,16 @@
+// The struct table as one hash. A function's text says which struct it names
+// but not what is in it, so a cached verdict about the function (a clean type
+// check, a passed case) would outlive a change to the struct it was a verdict
+// about. Both keys mix this in, so changing a struct's fields changes every
+// function's key in a program that has structs, and nothing in one that has none.
+
+dg_structs() {
+  word dgh = 0;
+  int dgi = 0;
+  while(dgi < len((import sdname))) {
+    dgh = dg_fnv(dgh, (import sdname)[dgi] + "|" + sd_key(dgi));
+    dgi = dgi + 1;
+  }
+} return word dgh;
+given env_init ():(0)
+given sd_pair ():(-7776637475115875254)

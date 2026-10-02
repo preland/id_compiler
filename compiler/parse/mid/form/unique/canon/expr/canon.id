@@ -32,9 +32,14 @@ canon_expr(int id) {
   if(k_of(id) == "float") {
     out = "F" + s1_of(id);
   }
+} chain (int id) {
+  if(k_of(id) == "fld") {
+    out = "f." + s1_of(id);
+  }
 } return string out;
 given un_fixture ((import ev_node)):("I7")
 given un_fixture ((import neg_node)):("u-(I7)")
+given sd_use_fixture ((import sd_lx)):("f.x")
 
 ce2(int id) {
   string out = ce3(id);

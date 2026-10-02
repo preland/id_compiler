@@ -1,0 +1,33 @@
+// The type a statement declares for `nm`, looking into the branches and loop
+// bodies where a declaration may also sit. "" when it declares none.
+
+esc_type_of(int sn, string nm) {
+  string t = "";
+  if(k_of(sn) == "decl") {
+    t = esc_type_decl(sn, nm);
+  } else if(k_of(sn) == "if" || k_of(sn) == "while") {
+    t = esc_type_nest(sn, nm);
+  }
+} return string t;
+given esc_fix ((import efc_z), "z"):("int[]")
+given esc_fix ((import efc_loop), "w"):("int[]")
+given esc_fix ((import efc_z), "w"):("")
+
+esc_type_decl(int sn, string nm) {
+  string t = "";
+  if(s2_of(sn) == nm && i2_of(sn) == 0) {
+    t = s1_of(sn);
+  }
+} return string t;
+given esc_fix ((import efc_z), "z"):("int[]")
+given esc_fix ((import efc_z), "w"):("")
+
+esc_type_nest(int sn, string nm) {
+  string t = esc_decl_type(l1_of(sn), nm);
+  if(t == "") {
+    t = esc_decl_type(l2_of(sn), nm);
+  }
+} return string t;
+given esc_fix ((import efc_loop), "w"):("int[]")
+given esc_fix ((import efc_loop), "q"):("")
+given esc_fix ((import efc_ife), "w"):("int[]")

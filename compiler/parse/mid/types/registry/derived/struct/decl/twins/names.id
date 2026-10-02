@@ -1,0 +1,36 @@
+// A struct's name: declared once, and not the name of a function or a builtin,
+// because `Point(1, 2)` builds a struct and `point(1, 2)` calls a function and
+// the compiler tells them apart by looking the name up.
+
+sd_names(int sd_i) {
+  string sd_nm = (import sdname)[sd_i];
+  int sd_j = sd_first_of(sd_nm);
+  if(sd_j < sd_i) {
+    sd_err(sd_i, "struct '" + sd_nm + "' is already declared at " + sd_where(sd_j) + "; declare each struct once, in a file of its own, and use that one");
+  }
+} chain (int sd_i) {
+  if(find_str((import fnames), sd_nm) >= 0) {
+    sd_err(sd_i, "struct '" + sd_nm + "' has the same name as a function; a call to it would be ambiguous with a struct constructor -- rename the struct or the function");
+  } else if(is_builtin(sd_nm) == 1) {
+    sd_err(sd_i, "struct '" + sd_nm + "' has the same name as a builtin; rename the struct");
+  }
+} return void;
+given sd_pair (0):() then check_failed:(0)
+given sd_pair given sd_note("Q", ["a"], ["int"], "r.id", 2) (2):() then prints:("r.id:2: error: struct 'Q' is already declared at q.id:5; declare each struct once, in a file of its own, and use that one\n")
+given sd_pair given sd_note("len", ["a"], ["int"], "l.id", 4) (2):() then check_failed:(1)
+
+// The first row with this name, which is `len` of the table when there is none.
+sd_first_of(string sd_s) {
+  int sd_j = 0;
+  while(sd_j < len((import sdname)) && (import sdname)[sd_j] != sd_s) {
+    sd_j = sd_j + 1;
+  }
+} return int sd_j;
+given sd_pair ("Q"):(1)
+given sd_pair ("none"):(2)
+
+sd_where(int sd_j) {
+  string s = (import sdfile)[sd_j] + ":" + (import sdline)[sd_j];
+} return string s;
+given sd_pair (0):("p.id:1")
+given sd_pair (1):("q.id:5")

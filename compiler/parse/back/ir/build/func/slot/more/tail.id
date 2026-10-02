@@ -2,9 +2,12 @@
 lw_alloca_tail(int lw_ent_v, int v, string name) {
   ir_add(lw_ent_v, v);
   int ret_i = lw_bind(name, v);
+  lw_own_init(lw_ent_v, v);
 } return int ret_i;
 given lw_fixture (2, 0, "x"):(0) then chk_lwvar_len:(1) then chk_home:(2)
 given lw_fixture_vars (2, 0, "z"):(0) then chk_lwvar_len:(2) then chk_home:(2)
+given lwo_fixture ((import lwo_ent), (import lwo_w), "w"):(0) then calls ir_add:[2]
+given lwo_fixture ((import lwo_ent), (import lwo_z), "z"):(3) then calls ir_add:[1]
 
 // The rest of lw_pslot, once the parameter's type and name are in hand.
 lw_pslot_tail(string ty, string name, int v) {

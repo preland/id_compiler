@@ -1,0 +1,29 @@
+// Blocks, branches and loops: the flags of every statement, or-ed together. A
+// condition only reads, so a variable there keeps nothing.
+
+esc_block(int[] stmts, string nm) {
+  int r = 0;
+  int i = 0;
+  while(i < len(stmts)) {
+    r = r | esc_stmt(stmts[i], nm);
+    i = i + 1;
+  }
+} return int r;
+given esc_fix ((import efb_stmts), "p"):(1)
+given esc_fix ((import efb_stmts), "v"):(2)
+given esc_fix ((import efb_stmts), "t"):(0)
+
+esc_if(int sn, string nm) {
+  int r = esc_expr(i1_of(sn), nm, 0);
+  r = r | esc_block(l1_of(sn), nm);
+  r = r | esc_block(l2_of(sn), nm);
+} return int r;
+given esc_fix ((import efc_if), "y"):(2)
+given esc_fix ((import efc_if), "s"):(1)
+
+esc_while(int sn, string nm) {
+  int r = esc_expr(i1_of(sn), nm, 0);
+  r = r | esc_block(l1_of(sn), nm);
+} return int r;
+given esc_fix ((import efc_loop), "s"):(1)
+given esc_fix ((import efc_loop), "w"):(0)

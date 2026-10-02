@@ -1,15 +1,16 @@
-// Index-assignment: an identifier followed by `[` begins a list-element
-// store `name[idx] = expr`. The lvalue is parsed with parse_postfix (an
-// "index" node), then `=`, then the value.
+// Index-assignment: an identifier followed by `[` or `.` begins a list-element
+// or field store `name[idx] = expr` / `name.field = expr`. The lvalue is parsed
+// with parse_postfix (an "index" node), then `=`, then the value.
 
 is_iassign(int[] pos) {
   int ok = 0;
-  if(cur_kind(pos) == "ident" && cur2_text(pos) == "[") {
+  if(cur_kind(pos) == "ident" && (cur2_text(pos) == "[" || cur2_text(pos) == ".")) {
     ok = 1;
   }
 } return int ok;
 given atom_tokens ([33]):(1)
 given atom_tokens ([0]):(0)
+given sd_dot_name_toks ([0]):(1)
 
 parse_iassign(int[] pos) {
   int target = parse_postfix(pos);

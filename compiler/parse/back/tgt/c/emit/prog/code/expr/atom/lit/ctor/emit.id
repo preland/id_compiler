@@ -1,0 +1,19 @@
+// A struct constructor as C. A struct is a list at run time -- one 64-bit cell
+// per field, in declaration order -- so `Point(1, 2)` is the list literal
+// `id_list_lit(2, cell, cell)`, each value boxed to its field's type (not to
+// its own: an int passed for a float field is boxed as the float it becomes).
+
+emit_ctor(int id) {
+  string sd_nm = s1_of(id);
+  int[] sd_as = l1_of(id);
+  string ret_s = ctor_lit(sd_nm, sd_as);
+} return string ret_s;
+given sd_ctor_fixture ((import sd_c2)):("id_list_lit(2, (long long)(1), (long long)(1))")
+given sd_ctor_fixture ((import sd_c3)):("id_list_lit(3, (long long)(intptr_t)(s), (long long)(intptr_t)(s), (long long)(intptr_t)(s))")
+
+ctor_lit(string sd_nm, int[] sd_as) {
+  string sd_cells = ctor_cells(sd_nm, sd_as);
+  string ret_s = "id_list_lit(" + len(sd_as) + ", " + sd_cells + ")";
+} return string ret_s;
+given sd_use_fixture ("P", [(import sd_one), (import sd_one)]):("id_list_lit(2, (long long)(1), (long long)(1))")
+given sd_use_fixture ("Q", [(import sd_str)]):("id_list_lit(1, (long long)(intptr_t)(s))")

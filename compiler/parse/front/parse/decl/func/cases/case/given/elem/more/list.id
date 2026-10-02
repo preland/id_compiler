@@ -1,0 +1,41 @@
+// A list in a case tuple: `[` elements `]`, each element read as any other
+// element of a tuple is (case_item, ../../cimport.id), so `(import NAME)` and a
+// nested list are allowed inside one. The node is the plain "arr" an array
+// literal in a function body makes, which is what lets the checker and the
+// harness treat it as they always have: they already go through fit_value and
+// tc_value for each element (mid/names/limits/shape/cases/more/fit/,
+// back/tgt/c/out/case/val/value.id), and an element that is a "cimport" is read
+// where the list is built -- after the setup for an argument, after the call
+// for an expected value.
+
+case_list(int[] pos) {
+  advance(pos);
+  int[] items = [];
+  while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
+    take_item(pos, items);
+    skip_comma(pos);
+  }
+} chain (int[] pos) {
+  expect_text(pos, "]");
+  advance(pos);
+  int ret_i = node_arr(items);
+} return int ret_i;
+given list_fix ([0]):(2) then calls node_arr:([0, 1])
+given list_fix ([8]):(2) then calls node_arr:([0])
+
+// Two lists: `[5, (import zz)]` from 0, and `[[5]]` from 8.
+list_fix() {
+  env_init();
+  toks_push(["op", "int", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op", "op"], ["[", "5", ",", "(", "import", "zz", ")", "]", "[", "[", "5", "]", "]"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// `given f (1, 2) (3):(4)` from 0 and `given g (3):(4)` from 14: one stream
+// with a setup that has arguments and one that has none, for args.id.
+gargs_fix() {
+  env_init();
+  toks_push(["kw", "ident", "op", "int", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op", "kw", "ident", "op", "int", "op", "op", "op", "int", "op"], ["given", "f", "(", "1", ",", "2", ")", "(", "3", ")", ":", "(", "4", ")", "given", "g", "(", "3", ")", ":", "(", "4", ")"]);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

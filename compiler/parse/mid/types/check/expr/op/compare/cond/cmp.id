@@ -27,6 +27,10 @@ fv_side(int id, int e, string side) {
     string op = s1_of(id);
     tc_err(id, "'" + op + "' cannot take a function value: its " + side + " operand is " + t + "; a function value can only be passed, stored or called");
   }
+  if(ty_is_struct(t) == 1) {
+    tc_err(id, "'" + s1_of(id) + "' cannot take a struct: its " + side + " operand is " + t + "; a struct is compared and combined by field, as in a." + sd_fname_at(t, 0) + " " + s1_of(id) + " b." + sd_fname_at(t, 0));
+  }
 } return void;
 given fnval_call_fixture ((import fnval_call), (import fnval_call), "left"):() then check_failed:(1)
 given cmp_fixture ((import bin_eq), (import lit_a), "left"):() then check_failed:(0)
+given sd_bi_fixture ((import sd_eq), (import sd_vp), "left"):() then prints:("<stdin>:1: error: '==' cannot take a struct: its left operand is P; a struct is compared and combined by field, as in a.x == b.x\n")

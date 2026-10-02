@@ -1,0 +1,25 @@
+// fa_nest's nodes (../a.id describes the program).
+
+esc_fx_c() {
+  export int efc_w = node_decl("int[]", "w", node_arr((import ef_none)), 0);
+  export int efc_y = node_decl("int[]", "y", node_var("s"), 0);
+  export int[] efc_wl = [(import efc_w), (import efc_y)];
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)
+
+esc_fx_c2() {
+  export int efc_len = node_call("len", [node_var("s")]);
+  export int efc_cond = node_bin("<", (import efc_len), node_int("3", 3, 0));
+  export int efc_loop = node_while((import efc_cond), (import efc_wl));
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)
+
+esc_fx_c3() {
+  export int efc_if = node_if((import efc_cond), (import efc_wl), (import ef_none), 0);
+  export int efc_z = node_decl("int[]", "z", node_arr((import ef_none)), 0);
+  export int[] efc_stmts = [(import efc_loop), (import efc_z)];
+} return void;
+given esc_fix ():() then check_failed:(0)
+given esc_fix ():() then init_units:(0)

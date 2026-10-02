@@ -16,9 +16,13 @@ call_ret(int id, string name) {
   if(t == "") {
     t = fcall_ret(id);
   }
+  if(t == "") {
+    t = sd_named(name);
+  }
 } return string t;
 (0, "print"):("void")
 given fnval_call_fixture ((import fnval_call), "nope"):("int")
+given sd_ctor_fixture ((import sd_c2), "P"):("P")
 
 fcall_ret(int id) {
   string vt = callee_var_type(id);

@@ -12,12 +12,16 @@ tk_key(int tkf) {
   tk_names(tkacc, tkf, tkfrom, tkto);
   string tkk = "";
 } chain (int tkf) {
+  if(len((import sdname)) > 0) {
+    tkacc[0] = dg_mix(tkacc[0], dg_structs());
+  }
   if(tkacc[1] == 0) {
     tkk = "" + tkacc[0];
   }
 } return string tkk;
 given tk_t_prep (0):("4208351378666089285")
 given tk_t_prep (1):("-8648083975898962277")
+given tk_t_prep given sd_note("P", ["x"], ["int"], "p.id", 1) (0):("-3241204359836069348")
 
 tk_names(word[] tkacc, int tkf, int tkfrom, int tkto) {
   while(tkfrom < tkto) {

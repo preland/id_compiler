@@ -1,0 +1,24 @@
+// Test-case values over the structs P { int x; int y; } and Q { string s; }, on
+// the case state fn_fixture builds (a case at fixture.id:4):
+//
+//   sd_ca  the literal 1       sd_cs  the literal "s"
+//   sd_ce  P(1, 1)             sd_cl  P(1)          sd_cn  nope(1, 1)
+
+sd_case_fixture() {
+  fn_fixture();
+  sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1);
+  sd_note("Q", ["s"], ["string"], "q.id", 5);
+} chain () {
+  init_struct_rows();
+  export int sd_ca = node_int("1", 1, 0);
+  export int sd_cs = node_str("s");
+} chain () {
+  int[] sd_ar2 = [(import sd_ca), (import sd_ca)];
+  int[] sd_ar1 = [(import sd_ca)];
+  export int sd_ce = newnode("cctor", 0, 0, "P", "", sd_ar2, sd_ar2);
+} chain () {
+  export int sd_cl = newnode("cctor", 0, 0, "P", "", sd_ar1, sd_ar1);
+  export int sd_cn = newnode("cctor", 0, 0, "nope", "", sd_ar2, sd_ar2);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

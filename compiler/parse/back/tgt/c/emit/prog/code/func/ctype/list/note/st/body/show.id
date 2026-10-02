@@ -1,0 +1,25 @@
+// A struct printed as a case writes it, `P(1, 2)`: its name, then each field
+// shown at the field's type, the way a list's helper shows its elements.
+
+st_show_stmts(string sd_nm) {
+  string out = "";
+  int sd_k = 0;
+  while(sd_k < sd_nfields(sd_nm)) {
+    out = out + st_show_at(sd_nm, sd_k);
+    sd_k = sd_k + 1;
+  }
+} return string out;
+given sd_note_fixture ("Q"):("    fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[0]));\n")
+given sd_note_fixture ("P"):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")
+
+st_show_at(string sd_nm, int sd_k) {
+  string sd_ft = sd_ftype_at(sd_nm, sd_k);
+  string sh = tc_show(unbox("a->data[" + sd_k + "]", sd_ft), sd_ft);
+  string so = "    " + sh + "\n";
+} chain (string sd_nm, int sd_k) {
+  if(sd_k > 0) {
+    so = "    fputs(\", \", stderr);\n" + so;
+  }
+} return string so;
+given sd_note_fixture ("P", 0):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n")
+given sd_note_fixture ("P", 1):("    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")

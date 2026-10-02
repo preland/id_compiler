@@ -12,6 +12,7 @@ given nz_prog_fixture ():() then prints:("int id_main(int argc);\nvoid id_run(vo
 given nz_prog_nomain_fixture ():() then prints:("void id_run(void);\n")
 
 def_all() {
+  esc_seed();
   int i = 0;
   while(i < len((import prog))) {
     emit_def_nl((import prog)[i]);

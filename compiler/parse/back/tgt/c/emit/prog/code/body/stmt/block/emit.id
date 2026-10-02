@@ -27,7 +27,10 @@ given stmt_fix (2, ""):() then prints:("z = 5;\n")
 // The tail of a decl statement, once its target name and initializer are known.
 emit_decl_line(string s2_of_v, int i1_of_v, string ind) {
   string emit_expr_v = emit_expr(i1_of_v);
-  emit_line(ind + s2_of_v + " = " + emit_expr_v + ";");
+  string esc_c = esc_store_code(s2_of_v, emit_expr_v);
+  emit_line(ind + esc_c);
 } return void;
 given stmt_fix ("y", 0, "  "):() then prints:("  y = 5;\n")
 given stmt_fix ("z", 0, ""):() then prints:("z = 5;\n")
+given esc_fix ("w", (import efc_three), "  "):() then prints:("  { IdList* idfe_o = w; w = 3; id_list_free(idfe_o); }\n")
+given esc_fix ("z", (import efc_three), ""):() then prints:("z = 3;\n")

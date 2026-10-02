@@ -1,5 +1,6 @@
 // An element of a case tuple: a literal, `(import NAME)` -- the value an
-// export holds once the case's setup has run -- or a function's name (fn.id).
+// export holds once the case's setup has run -- a function's name (fn.id), or a list of
+// these (more/list.id).
 //
 // It is a "cimport" node, not an "import". An import is a read inside a
 // function body, and the dead-export check walks bodies by node range

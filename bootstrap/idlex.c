@@ -30,7 +30,9 @@
 typedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;
 static IdAllocHdr* id_arena_head = NULL;
 static int id_arena_hooked = 0;
+static long id_nfree = 0;
 static void id_arena_free_all(void) {
+    if (getenv("ID_FREE_STATS")) fprintf(stderr, "id: freed %ld lists\n", id_nfree);
     IdAllocHdr* h = id_arena_head;
     while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
     id_arena_head = NULL;
@@ -89,12 +91,14 @@ static size_t id_slen(const char* s) {
     id_lm_n[i] = strlen(s);
     return id_lm_n[i];
 }
-/* A block that moved may be reused by a later string at the same address, so
-   every remembered length has to go with it. Only when it actually moved: a
-   realloc that grows in place invalidates nothing. */
-static void id_lm_forget(void) {
+/* A block that realloc releases may be reused by a later string at the same
+   address, so its entry has to go -- only its own: the remembered lengths of
+   every other string stay valid across list growth. An entry is dropped even
+   when the block grew in place, because a block that changed is no longer the
+   string that was measured. */
+static void id_lm_forget(const void* p) {
     unsigned i;
-    for (i = 0; i < ID_LEN_MEMO; i++) id_lm_s[i] = NULL;
+    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == (const char*)p) id_lm_s[i] = NULL;
 }
 void* id_alloc(size_t n) {
     IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), "alloc"));
@@ -108,7 +112,7 @@ static void* id_realloc(void* p, size_t n) {
     id_arena_unlink(h);
     IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), "realloc"));
     if (!nh) { fprintf(stderr, "id: out of memory (%zu bytes)\n", n); exit(1); }
-    if (nh != h) id_lm_forget();
+    id_lm_forget(p);
     id_arena_link(nh);
     return (void*)(nh + 1);
 }
@@ -148,9 +152,42 @@ static _Noreturn void id_null_read(void) {
     fprintf(stderr, "id: read of an uninitialised export (its declaring function has not run)\n");
     exit(1);
 }
+/* A list the compiler proved unreachable (docs/MEMORY.md) is released by
+   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test
+   harness, nothing goes back to malloc: the cells are filled with 0xDD and the
+   header is marked freed (len -1, cap INT_MIN), so a later use traps here
+   instead of reading whatever reused the block. */
+static int id_fguard = -1;
+#ifdef __GNUC__
+__attribute__((noinline, cold))
+#endif
+static _Noreturn void id_freed_trap(void) {
+    fprintf(stderr, "id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\n");
+    exit(1);
+}
+static void id_block_free(void* p) {
+    IdAllocHdr* h = (IdAllocHdr*)p - 1;
+    id_arena_unlink(h);
+    free(h);
+}
+static void id_list_free(IdList* L) {
+    if (!L) return;
+    id_nfree++;
+    if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
+    if (id_fguard) {
+        if (L->cap == INT_MIN) id_freed_trap();
+        int c = L->cap < 0 ? -L->cap : L->cap;
+        memset(L->data, 0xDD, (size_t)c * sizeof(long long));
+        L->len = -1; L->cap = INT_MIN;
+        return;
+    }
+    id_block_free(L->data);
+    id_block_free(L);
+}
 static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }
 static void id_list_mut_check(IdList* L) {
     if (L->cap < 0) {
+        if (L->cap == INT_MIN) id_freed_trap();
         fprintf(stderr, "id: cannot mutate a constant list\n");
         exit(1);
     }
@@ -172,6 +209,7 @@ static void id_list_push(IdList* L, long long v) {
 static long long id_list_get(IdList* L, int i) {
     if (!L) id_null_read();
     if (i < 0 || i >= L->len) {
+        if (L->cap == INT_MIN) id_freed_trap();
         fprintf(stderr, "id: index %d out of bounds (len %d)\n", i, L->len);
         exit(1);
     }
@@ -185,7 +223,7 @@ static void id_list_set(IdList* L, int i, long long v) {
     }
     L->data[i] = v;
 }
-static int id_list_len(IdList* L) { if (!L) id_null_read(); return L->len; }
+static int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }
 static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
     if (!L) id_null_read();
     id_list_mut_check(L); if (L->len <= 0) {
@@ -336,6 +374,17 @@ unsigned char* id_store_span(long long addr, long long n) {
     if (n < 0) id_trap("negative length");
     return id_at(addr, n);
 }
+/* stderr as a native sees it: n bytes, in order with print and eprint. It goes
+   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for
+   an `eprints` clause and plain stderr everywhere else -- and flushes stdout
+   first, as eprint does, so the two streams interleave as written. 0, or -1. */
+#ifndef IDTC_EPRINT_TO
+#define IDTC_EPRINT_TO stderr
+#endif
+int id_err_write(const unsigned char* p, size_t n) {
+    fflush(stdout);
+    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n ? 0 : -1;
+}
 /* Little-endian, byte at a time: the same bytes on every host, and no
    alignment requirement -- C code casts pointers to odd addresses freely. */
 static long long id_peek_n(long long addr, int width) {
@@ -363,6 +412,7 @@ static void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }
 static char* id_str_of_mem(long long addr, long long n) {
     if (n < 0) id_trap("negative length");
     unsigned char* p = id_at(addr, n);
+    if (memchr(p, 0, (size_t)n)) id_trap("a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
     char* r = (char*)id_alloc((size_t)n + 1);
     memcpy(r, p, (size_t)n);
     r[n] = '\0';
@@ -381,7 +431,11 @@ static void id_print(const char* s) { puts(s); }
 static char* id_input(void) {
     /* read one line from stdin, drop the trailing newline; "" on EOF */
     char buf[1024];
-    if (!fgets(buf, sizeof(buf), stdin)) {
+    size_t got = 0; int ch;
+    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\n') break; }
+    buf[got] = '\0';
+    if (memchr(buf, 0, got)) id_trap("a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
+    if (got == 0) {
         char* e = (char*)id_alloc(1); e[0] = '\0'; return e;
     }
     size_t n = strlen(buf);
@@ -405,6 +459,7 @@ static char* id_read_all(void) {
         n += got;
         if (got == 0) break;
     }
+    if (memchr(r, 0, n)) id_trap("a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
     r[n] = '\0';
     return r;
 }
@@ -417,13 +472,14 @@ static int id_len(const char* s) { return (int)id_slen(s); }
    The memo is keyed on the pointer, which is sound because an id string is
    immutable and its block is never released before exit. The one place a block
    can be released early is id_realloc (list growth), whose freed address could
-   later be handed to a new string -- so it clears the memo. */
+   later be handed to a new string -- so it drops the entry for the block it releases. */
 static int id_charat(const char* s, int i) {
     if (i < 0) return -1;
     if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */
     return (unsigned char)s[i];
 }
 static char* id_chr(int code) {
+    if ((char)code == 0) id_trap("a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data");
     char* r = (char*)id_alloc(2);
     r[0] = (char)code; r[1] = '\0';
     return r;
@@ -655,7 +711,7 @@ int id_is_alnum(int c) {
 int id_is_kw(char* w) {
     int ok;
     ok = 0;
-    if (((((((((((((((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0)) || (strcmp(w, "native") == 0)) || (strcmp(w, "given") == 0)) || (strcmp(w, "then") == 0)) || (strcmp(w, "func") == 0)) || (strcmp(w, "prints") == 0)) || (strcmp(w, "eprints") == 0)) || (strcmp(w, "calls") == 0)) || (strcmp(w, "chain") == 0)) || (strcmp(w, "blank") == 0)) || (strcmp(w, "break") == 0)) || (strcmp(w, "stdin") == 0)) || (strcmp(w, "traps") == 0))) {
+    if (((((((((((((((((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0)) || (strcmp(w, "native") == 0)) || (strcmp(w, "given") == 0)) || (strcmp(w, "then") == 0)) || (strcmp(w, "func") == 0)) || (strcmp(w, "prints") == 0)) || (strcmp(w, "eprints") == 0)) || (strcmp(w, "calls") == 0)) || (strcmp(w, "chain") == 0)) || (strcmp(w, "blank") == 0)) || (strcmp(w, "break") == 0)) || (strcmp(w, "stdin") == 0)) || (strcmp(w, "traps") == 0)) || (strcmp(w, "timeout") == 0)) || (strcmp(w, "struct") == 0))) {
         ok = 1;
     }
     return ok;

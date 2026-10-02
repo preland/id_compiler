@@ -1,0 +1,49 @@
+// `given NAME(LIT, ...)`: a setup that takes parameters, called with the
+// literals written after its name. The tokens after `given NAME` are either
+// those arguments or the case's own argument tuple -- `given f (1):(2)` and
+// `given f (1) (2):(3)` differ only in what follows the matching `)`: the
+// case's tuple is always followed by `:`, and a setup's arguments never are.
+// So the parentheses are matched first, and whitespace decides nothing.
+//
+// Each setup of a case is a "gsetup" node -- its name in s1, its arguments in
+// nl1, none for a bare `given NAME` -- and the case's are listed in the order
+// written by one "gargs" node (case/given/setup.id), parallel to `casegiven`.
+
+paren_end(int[] pos) {
+  int i = pos[0];
+  int depth = 0;
+  int n = len((import ttext));
+} chain (int[] pos) {
+  while(i < n && (i == pos[0] || depth > 0)) {
+    if((import ttext)[i] == "(") {
+      depth = depth + 1;
+    } else if((import ttext)[i] == ")") {
+      depth = depth - 1;
+    }
+    i = i + 1;
+  }
+} return int i;
+given gargs_fix ([2]):(7)
+given gargs_fix ([16]):(19)
+
+given_has_args(int[] pos) {
+  int has = 0;
+  int end_i = paren_end(pos);
+  if(cur_text(pos) == "(" && end_i < len((import ttext)) && (import ttext)[end_i] != ":") {
+    has = 1;
+  }
+} return int has;
+given gargs_fix ([2]):(1)
+given gargs_fix ([16]):(0)
+
+given_call(int[] pos, string name, int[] gs) {
+  int[] items = [];
+  if(given_has_args(pos) == 1) {
+    items = case_tuple(pos);
+  }
+  int gn = newnode("gsetup", 0, 0, name, "", items, items);
+} chain (int[] pos, string name, int[] gs) {
+  push(gs, gn);
+} return void;
+given gargs_fix ([2], "f", []):([7], "f", [2]) then calls newnode:("gsetup", 0, 0, "f", "", [0, 1], [0, 1])
+given gargs_fix ([16], "g", []):([16], "g", [0])

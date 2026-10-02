@@ -13,11 +13,12 @@ c_type(string t) {
   string ct = "IdList*";
   if(ty_is_func(t) == 1) {
     ct = c_fn_type(t);
-  } else if(ty_is_list(t) == 0) {
+  } else if(ty_is_list(t) == 0 && ty_is_struct(t) == 0) {
     ct = c_scalar(t);
   }
 } return string ct;
 given lc_env2 ("int[]"):("IdList*")
+given sd_reg ("P"):("IdList*")
 given lc_env2 ("func(int) return int"):("__typeof__(int (*)(int))")
 
 // C can spell a pointer to a function only around a name -- `void (*f)(int)` --

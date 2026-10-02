@@ -1,0 +1,36 @@
+// The constants the reachable functions read: reach_funcs' walk
+// (mid/names/exports/reach/dead/more/scan.id) over the same node ranges, with
+// const_range as the leaf instead of scan_reach. A function's own node is
+// created last of its nodes, so its nodes run from where the previous
+// function ended through its own id.
+
+const_funcs(int cv_f, int cv_lo) {
+  while(cv_f < len((import prog))) {
+    cv_lo = const_func(cv_f, cv_lo);
+    cv_f = cv_f + 1;
+  }
+} return void;
+given cvl_setup (0, 8):() then clive_str:("cb,cd")
+given cvl_setup (0, 0):() then clive_str:("ca,cb,cd")
+
+const_func(int cv_f, int cv_lo) {
+  string cv_name = s1_of((import prog)[cv_f]);
+  if(is_reach(cv_name) == 1) {
+    const_range(cv_lo, (import prog)[cv_f]);
+  }
+  int cv_next = (import prog)[cv_f] + 1;
+} return int cv_next;
+given cvl_setup (0, 9):(11) then clive_str:("cd")
+given cvl_setup given reach_seed("zz") (0, 8):(11) then clive_str:("")
+
+const_one(int cv_k, int cv_lo) {
+  int cv_d = (import cdecl)[cv_k];
+  string cv_name = s2_of(cv_d);
+  if(find_str((import clive), cv_name) >= 0) {
+    const_range(cv_lo, cv_d);
+  }
+} chain (int cv_k, int cv_lo) {
+  int cv_next = cv_d + 1;
+} return int cv_next;
+given cvl_setup given cvl_scan (1, 0):(4) then clive_str:("cb,cd,ca")
+given cvl_setup given cvl_scan (2, 4):(6) then clive_str:("cb,cd")

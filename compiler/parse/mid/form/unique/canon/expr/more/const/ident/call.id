@@ -32,7 +32,7 @@ call_fp_fixture() {
 // canon_iassign's second case (../../../../stmt/more/decl.id) needs an
 // `iassign` node distinct from that file's own iassign_begun_fixture, and
 // every directory near it (tail/, its parent) is at the 3-entry cap; iafix
-// (mid/types/registry/fn/split/last.id) already builds one from literals
+// (mid/types/registry/derived/fn/split/last.id) already builds one from literals
 // alone, so only the uq_begin this checker's canon_expr wants is added here.
 iassign2_fixture() {
   iafix();

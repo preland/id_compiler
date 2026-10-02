@@ -2,37 +2,59 @@
 // one level, from four places only: a typed declaration, an assignment to a
 // known variable, the value of an index-assignment, and push's second
 // argument. The AST has no parent links, so the same question is asked
-// backwards -- does any node hand THIS node a list type? A whole-store scan
-// per literal is affordable because empty literals are rare and this only
-// runs once, at check time.
+// backwards -- does any node hand THIS node a list type?
+//
+// That is answered once for the whole store, not once per literal: arrmark
+// holds a 1 for every node some other node hands a list type, built by one
+// pass over the store the first time a literal asks. A scan per literal looked
+// affordable while empty literals were rare; with hundreds of them it was
+// literals x nodes, and the type check's cold run spent four fifths of its
+// time in it.
 
 arr_ok(int id) {
-  int i = 0;
-  int ok = 0;
-  while(i < len((import nkind))) {
-    ok = arr_ok_at(i, id, ok);
-    i = i + 1;
+  if(len((import arrmark)) != len((import nkind))) {
+    arr_marks();
   }
+  int ok = (import arrmark)[id];
 } return int ok;
+given decltype_fixture ((import lit_a)):(1)
+given leaves_fixture ((import lit_a)):(0)
 given call2_setup ((import cm_push_call)):(0)
 given idxfix ((import rgidx_node)):(0)
 
-arr_ok_at(int i, int id, int ok) {
-  int r = ok;
-  if(want_list(i, id) == 1) {
-    r = 1;
+// Rebuilds arrmark for the store as it stands.
+arr_marks() {
+  lst_set_all((import arrmark), len((import arrmark)), 0);
+  lst_fill((import arrmark), len((import nkind)) - len((import arrmark)), 0);
+  int i = 0;
+} chain () {
+  while(i < len((import nkind))) {
+    int c = arr_mark_at(i);
+    if(c >= 0) {
+      lset((import arrmark), c, 1);
+    }
+    i = i + 1;
   }
-} return int r;
-given call2_setup (0, (import cm_push_call), 0):(0)
-given call2_setup (0, (import cm_push_call), 1):(1)
+} return void;
+given decltype_fixture ():() then calls lset:[1]
+given leaves_fixture ():() then calls lset:[0]
 
-want_list(int i, int id) {
-  int ok = 0;
-  if(want_decl(i, id) == 1 || want_asg(i, id) == 1) {
-    ok = 1;
-  } else {
-    ok = want_elem(i, id);
+// The child node `i` hands a list type to, or -1 if it is none of the four
+// positions (want/positions/): a declaration's, an assignment's and a return
+// clause's initialiser; an index-assignment's first list; push's second
+// argument.
+arr_mark_at(int i) {
+  int c = i1_of(i);
+  if(k_of(i) == "iassign") {
+    c = l1_of(i)[0];
   }
-} return int ok;
-given call2_setup (0, (import cm_push_call)):(0)
-given idxfix (0, (import rgidx_node)):(0)
+  if(is_push2(i) == 1) {
+    c = l1_of(i)[1];
+  }
+} chain (int i) {
+  if(want_decl(i, c) == 0 && want_asg(i, c) == 0 && want_elem(i, c) == 0) {
+    c = 0 - 1;
+  }
+} return int c;
+given decltype_fixture ((import decl_list)):((import lit_a))
+given decltype_fixture ((import decl_scalar)):(-1)

@@ -1,5 +1,5 @@
 // More synthetic token streams (see ../../../../../../../tree/init/setup/fixture/toks/decl.id
-// for toks_push/tkind_len/asm_fix_2str), for decl/asm/'s cases.
+// for toks_push/tkind_len/asm_fix_2str), for decl/kinds/asm/'s cases.
 
 // `{` `}` -- an empty asm body, no instruction lines.
 asm_fix_0str() {

@@ -1,0 +1,25 @@
+// The case and marking halves of cvl_setup's state (setup.id).
+
+cvl_case() {
+  int cvc_ic = node_import("cc");
+  int[] cvc_args = [cvc_ic];
+  int[] cvc_none = [];
+} chain () {
+  int cvc_node = newnode("case", 0, 0, "", "", cvc_args, cvc_none);
+  push((import casefn), (import cvf_main));
+  push((import casenode), cvc_node);
+} return void;
+given cvl_setup ():() then check_failed:(0)
+given cvl_setup ():() then init_units:(0)
+
+cvl_mark(int cvc_on) {
+  const_mark(cvc_on);
+} return void;
+given cvl_setup (0):() then clive_str:("cb,cd,ca")
+given cvl_setup (0):() then check_failed:(0)
+
+cvl_std() {
+  lset((import stdunit), 0, 0);
+} return void;
+given cvl_setup ():() then check_failed:(0)
+given cvl_setup ():() then init_units:(0)

@@ -1,0 +1,30 @@
+// A struct constructor, lowered as the list it is at run time: a new list, then
+// one push per field, each value converted to the field's type and boxed to the
+// runtime's uniform cell -- the same steps a list literal takes (../lit/arr.id),
+// except that the element type is the field's own and differs from one cell to
+// the next.
+
+lw_ctor(int node) {
+  string ty = lw_ety(node);
+  int a = lw_new(ty);
+  lw_ctor_els(node, a);
+} return int a;
+given sr_fixture ((import sr_ic2)):(0)
+given sr_fixture ((import sr_ic1)):(0)
+
+lw_ctor_els(int node, int a) {
+  int i = 0;
+  while(lw_args_more(node, i)) {
+    i = lw_ctor_one(node, i, a);
+  }
+} return void;
+given sr_fixture ((import sr_ic2), 0):() then calls lw_ctor_one:[2]
+given sr_fixture ((import sr_ic1), 0):() then calls lw_ctor_one:[1]
+
+lw_ctor_one(int node, int i, int a) {
+  string sd_ft = sd_ftype_at(s1_of(node), i);
+  lw_arr_push(node, i, a, sd_ft);
+  int ret_i = i + 1;
+} return int ret_i;
+given sr_fixture ((import sr_ic2), 0, 0):(1)
+given sr_fixture ((import sr_ic2), 1, 0):(2)

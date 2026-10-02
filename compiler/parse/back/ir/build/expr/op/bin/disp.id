@@ -9,3 +9,26 @@ lw_bin_op(int node, string op) {
 } return int v;
 given str_fixture2 ((import cmp_node), "<"):(6)
 given lw_fix_bin ((import fix_bin_n), "+"):(2)
+
+// The value an owned local holds before a store replaces it, loaded so the
+// store can free it afterwards; -1 for every other address. Only the slot lw_slot
+// resolves the name to counts: a name declared in both arms of an if gets two
+// slots and the lowering only ever reads and writes that one.
+lw_old(int addr) {
+  int o = 0 - 1;
+  if(ir_op(addr) == "alloca" && lw_slot(ir_s(addr)) == addr && esc_own(esc_cur(), ir_s(addr)) == 1) {
+    o = lw_op("load", ir_ty(addr), addr, 0 - 1, "");
+  }
+} return int o;
+given lwo_fixture ((import lwo_w)):(-1)
+given lwo_fixture ((import lwo_z)):(-1)
+given lwo_fixture ((import lwo_w2)):(7)
+
+lw_drop(int old) {
+  if(old >= 0) {
+    lw_callf("id_list_free", "", [old]);
+  }
+} return void;
+given lw_fixture (7):() then calls lw_callf:("id_list_free", "", [7])
+given lw_fixture (-1):() then calls lw_callf:[0]
+given lw_fixture (0):() then calls lw_callf:("id_list_free", "", [0])

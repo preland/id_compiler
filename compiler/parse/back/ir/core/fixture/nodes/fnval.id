@@ -1,7 +1,7 @@
 // A `var` node naming a function of the build ("fx_target"), registered
 // through the real indexed path (fidx_add, ../../../mid/names/symbols/
 // lookup/index/table/add.id) rather than a raw push, so fn_node_of finds it
-// and is_fn_value (../../../mid/types/registry/fn/node/value.id) says yes --
+// and is_fn_value (../../../mid/types/registry/derived/fn/node/value.id) says yes --
 // the branch lw_named (../../build/expr/atom/lit/more/fnref.id) takes to a
 // function's own name instead of to a variable read.
 

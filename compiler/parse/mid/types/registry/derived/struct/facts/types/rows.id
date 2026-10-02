@@ -1,0 +1,33 @@
+// A struct is a type like any other the moment it is declared: one registry row
+// of kind "struct", the width of a pointer, which is what a struct is at run
+// time (a list, one cell per field). The registry gets them after the scalar
+// rows, from the struct table the parser filled, so a struct is `known` to
+// every check that asks and a name that is not one stays "?".
+
+init_struct_rows() {
+  int sd_i = 0;
+  while(sd_i < len((import sdname))) {
+    ty_row((import sdname)[sd_i], "struct", 8, 0);
+    sd_i = sd_i + 1;
+  }
+} return void;
+given env_init ():() then reg_rows:(5)
+given sd_pair ():() then reg_rows:(7)
+
+ty_is_struct(string t) {
+  int ok = 0;
+  if(ty_kind(t) == "struct") {
+    ok = 1;
+  }
+} return int ok;
+given sd_reg ("P"):(1)
+given sd_reg ("int"):(0)
+
+// The registry as a program with structs P and Q has it: the scalar rows, then
+// the struct table's, which is the order tc_all gives a real build.
+sd_reg() {
+  sd_pair();
+  init_struct_rows();
+} return void;
+():() then reg_rows:(7)
+():() then reg_last_width:(8)

@@ -9,9 +9,13 @@ dg_own_of(int dgf, string dgnm) {
   if(dgf < len((import ptoke))) {
     dgh = dg_tokhash((import ptoks)[dgf], (import ptoke)[dgf]);
   }
+  if(len((import sdname)) > 0) {
+    dgh = dg_mix(dgh, dg_structs());
+  }
 } return word dgh;
 given dg_t_parsed (0, "fa"):(-4689288257431824535)
 given env_init (0, "a"):(106652627936467)
+given sd_pair (0, "a"):(-9052224311391053448)
 
 // Every exported variable, by name, to the row of the function that declares
 // it. Reading an export is a dependency on its declaration -- its type, and

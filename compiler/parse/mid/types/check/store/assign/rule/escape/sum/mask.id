@@ -1,0 +1,43 @@
+// A function's summary: bit i is set when its i-th parameter may be kept past
+// the call -- stored in a list, returned, exported, aliased, or passed on to
+// something that keeps it. A clear bit is a proof that the caller may free the
+// list it passed once the call returns. -1 is every bit, the answer for
+// anything unknown.
+//
+// Computed on demand and remembered in esc_pe. While a function is being
+// computed its row holds -1, so a call that reaches back to it (recursion)
+// sees every parameter kept: sound, and only imprecise for the recursive
+// cycle itself.
+
+esc_mask(string cname) {
+  int m = 0 - 1;
+  int ix = fix_fnix(cname);
+  if(ix >= 0) {
+    m = esc_mask_at(ix, cname);
+  }
+} return int m;
+given esc_fix ("fa_sink"):(2)
+given esc_fix ("fa_loc"):(1)
+given esc_fix ("nosuch"):(-1)
+
+esc_mask_at(int ix, string cname) {
+  int m = (import esc_pe)[ix];
+  if(m == 0 - 2) {
+    m = esc_compute(ix, cname);
+  }
+} return int m;
+given esc_fix (0, "fa_sink"):(2)
+given esc_fix (1, "fa_loc"):(1)
+
+esc_compute(int ix, string cname) {
+  int fn = fn_node_of(cname);
+  int m = 0 - 1;
+  lset((import esc_pe), ix, m);
+} chain (int ix, string cname) {
+  if(esc_opaque(fn, cname) == 0) {
+    m = esc_params(fn);
+  }
+  lset((import esc_pe), ix, m);
+} return int m;
+given esc_fix (0, "fa_sink"):(2)
+given esc_fix (2, "fa_nest"):(1)

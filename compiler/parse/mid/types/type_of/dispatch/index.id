@@ -23,7 +23,8 @@ given composite_fixture ((import bin_plus)):("int")
 type_index(int id) {
   int i1_of_v = i1_of(id);
   string type_of_v = type_of(i1_of_v);
-  string ret_s = elem_type(type_of_v);
+  string ret_s = idx_elem(type_of_v, id);
 } return string ret_s;
 given idx_build ((import idx_fix)):("int")
 given stridx_build ((import idx_str)):("string")
+given sd_use_fixture ((import sd_ix)):("int")

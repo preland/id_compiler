@@ -1,0 +1,63 @@
+// A case's `given`: the function it names must be a setup -- a function in the
+// build that returns void -- because the harness calls it and has nothing to
+// compare its result with. It takes as many parameters as the case passes it
+// literals: none for a bare `given NAME`, one per argument of
+// `given NAME(LIT, ...)` (args.id). Decided from the case and the declaration
+// it names, so a setup that is not one is an error at the case's line rather
+// than C that does not compile.
+
+fit_given(int i) {
+  string[] setups = str_split((import casegiven)[i], " ");
+  int si = 0;
+  while(si < len(setups)) {
+    if(setups[si] != "") {
+      given_fn(i, si, setups[si]);
+    }
+    si = si + 1;
+  }
+} return void;
+given impcase_empty (0):() then calls given_fn:[0]
+given impcase_given (0):() then calls given_fn:(0, 0, "fx_setup")
+
+given_fn(int i, int si, string setup_nm) {
+  int sfn = func_node(setup_nm);
+  blank;
+  blank;
+} chain (int i, int si, string setup_nm) {
+  if(sfn < 0) {
+    case_err(i, "'given' names '" + setup_nm + "', which is not a function in this build");
+  } else if(s2_of(sfn) != "void") {
+    string rt = s2_of(sfn);
+    case_err(i, "'given' names '" + setup_nm + "', which returns " + rt + "; a setup returns void, since the harness has nothing to compare its result with");
+  } else {
+    given_args(i, si, sfn);
+  }
+} return void;
+given impcase_given ((import fixture_ci), 0, "fx_setup"):() then check_failed:(0)
+given fn_fixture ((import fixture_ci), 0, "nosuchfn123"):() then check_failed:(1)
+given fn_fixture ((import fixture_ci), 0, "fx_target"):() then check_failed:(1)
+
+// A case whose `given` names fx_set1(int x) twice, a void function registered
+// the way fn_fixture registers fx_target: bare the first time, called with the
+// one literal fixture_zero the second. Its casegargs holds the "gargs" node the
+// parser would have made, so args.id and fit.id have a real setup call to read,
+// and the setup index si has two different answers.
+gsetup_fixture() {
+  fn_fixture();
+  int[] none = [];
+  export int fixture_set1 = node_func("fx_set1", "void", (import fixture_params), none, 0 - 1);
+} chain () {
+  push((import fnames), "fx_set1");
+  push((import fnodes), (import fixture_set1));
+  push((import casegiven), "fx_set1 fx_set1 ");
+} chain () {
+  int[] one = [(import fixture_zero)];
+  int gb_n = newnode("gsetup", 0, 0, "fx_set1", "", none, none);
+  int gs_n = newnode("gsetup", 0, 0, "fx_set1", "", one, one);
+} chain () {
+  int[] gl = [gb_n, gs_n];
+  int ga_n = newnode("gargs", 0, 0, "", "", gl, gl);
+  push((import casegargs), ga_n);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

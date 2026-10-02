@@ -8,6 +8,7 @@
 // tested and measured on its own.
 
 ir_lower() {
+  esc_seed();
   int i = 0;
   while(i < len((import prog))) {
     if(is_native((import prog)[i]) == 0) {

@@ -1,0 +1,13 @@
+// A field of a struct is a cell of the list the struct is, so a field read or
+// write lowers as the list index it is, with the field's position for the index.
+
+// The position of the field an index node names.
+lw_fpos(int node) {
+  string sd_bt = lw_ety(i1_of(node));
+  string sd_f = s1_of(i2_of(node));
+  string sd_p = "" + sd_fpos(sd_bt, sd_f);
+} chain (int node) {
+  int ret_i = lw_const("int", sd_p);
+} return int ret_i;
+given sr_fixture ((import sr_iy)):(0)
+given sr_fixture ((import sr_ix)):(0)

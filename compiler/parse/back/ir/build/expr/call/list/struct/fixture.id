@@ -1,0 +1,25 @@
+// A lowering context over the structs P { int x; int y; } and Q { string s; },
+// and on it the nodes the cases of the struct lowerings read:
+//
+//   sr_ic2  P(1, 1)    sr_ic1  P(1)
+//   sr_ix   P(1, 1).x  sr_iy   P(1, 1).y
+//   sr_iw   P(1, 1).x = 9, an assignment to a field
+//
+// The base of each field is a constructor and not a variable so that lowering
+// it needs no stack slot.
+
+sr_fixture() {
+  lw_env_fixture();
+  sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1);
+  init_struct_rows();
+} chain () {
+  export int sr_one = node_int("1", 1, 0);
+  export int sr_ic2 = node_call("P", [(import sr_one), (import sr_one)]);
+  export int sr_ic1 = node_call("P", [(import sr_one)]);
+} chain () {
+  export int sr_ix = node_index((import sr_ic2), newleaf("fld", 0, 0, "x", ""));
+  export int sr_iy = node_index((import sr_ic2), newleaf("fld", 0, 0, "y", ""));
+  export int sr_iw = node_iassign((import sr_ix), (import sr_one));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

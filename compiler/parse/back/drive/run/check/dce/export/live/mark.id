@@ -1,0 +1,52 @@
+// Which constants the build emits: those the reachable code reads.
+//
+// A function nothing reaches is dropped (sweep.id), and a constant is no
+// different -- it is only affordable to put a large constant table in a
+// library's conf.id if a program that never reads an entry pays nothing for
+// it. idstd's does: without this every program that merges it emitted all of
+// them and built every list at start-up.
+//
+// A constant is live when a reachable function reads it with (import name),
+// or when another live constant's initialiser does. The first is one walk of
+// the nodes of every reachable function (scan/funcs.id); the second is the
+// closure of that, run until a pass adds nothing. In the test harness the
+// nodes of the cases are walked as well (scan/cases.id), because a case's
+// arguments may name a constant too.
+//
+//   clive  the names of the live constants, in the order they were found
+//
+// keep_export (../keep.id) is the one reader. Exactly where functions are
+// kept unconditionally -- a project with no main, a freestanding object --
+// so are constants.
+
+const_mark(int cv_on) {
+  clear_strs((import clive));
+  int cv_base = const_base();
+  const_funcs(0, cv_base);
+} chain (int cv_on) {
+  const_cases(cv_on);
+  const_close();
+} return void;
+given cvl_setup (0):() then clive_str:("cb,cd,ca")
+given cvl_setup given cvl_case (1):() then clive_str:("cb,cd,cc,ca")
+
+const_close() {
+  int cv_n = 0 - 1;
+  while(cv_n != len((import clive))) {
+    cv_n = len((import clive));
+    const_pass();
+  }
+} return void;
+given cvl_setup given cvl_scan ():() then clive_str:("cb,cd,ca")
+given cvl_setup ():() then clive_str:("")
+
+const_pass() {
+  int cv_k = 0;
+  int cv_lo = 0;
+  while(cv_k < len((import cdecl))) {
+    cv_lo = const_one(cv_k, cv_lo);
+    cv_k = cv_k + 1;
+  }
+} return void;
+given cvl_setup given cvl_scan ():() then clive_str:("cb,cd,ca")
+given cvl_setup ():() then clive_str:("")

@@ -11,3 +11,12 @@ lz_loc(string name_i) {
 } return string ret_s;
 given env_init ("dup9"):("<stdin>:1: warning: ")
 given env_init ("f2"):("<stdin>:1: warning: ")
+
+// A `prog` index's function name. cfp2 is indexed by `prog`, so fname_at
+// (mid/form/unique/scan/more/report/dup.id), which reads an index of cfp, is
+// the wrong lookup here as soon as one function owns two fingerprints or none.
+lz_name(int i) {
+  string ret_s = s1_of((import prog)[i]);
+} return string ret_s;
+given lz_o (0):("dup5")
+given lz_o (1):("dup9")

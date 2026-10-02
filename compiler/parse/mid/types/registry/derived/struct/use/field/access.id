@@ -1,0 +1,38 @@
+// Reading `p.x` and writing `p.x = v`. The parser builds both as an index node
+// (an iassign for the write) whose index is a `fld` leaf carrying the field's
+// name; whether the base is a list or a struct is only known from its type, so
+// the two are told apart here, where the type is asked, and everywhere before
+// that the node is an index like any other.
+
+is_fld_idx(int id) {
+  int ok = 0;
+  if(k_of(i2_of(id)) == "fld") {
+    ok = 1;
+  }
+} return int ok;
+given sd_use_fixture ((import sd_ix)):(1)
+given sd_use_fixture ((import sd_ii)):(0)
+
+// A read of an index: a field when the index is a name, an element otherwise.
+chk_access(int id) {
+  string sd_bt = base_type(id);
+  if(is_fld_idx(id) == 1) {
+    chk_field(id, sd_bt);
+  } else {
+    chk_index(id);
+  }
+} return void;
+given sd_use_fixture ((import sd_ix)):() then check_failed:(0)
+given sd_use_fixture ((import sd_iz)):() then check_failed:(1)
+
+// A write through an index: the same split.
+chk_iasg(int id) {
+  string sd_bt = base_type(id);
+  if(is_fld_idx(id) == 1) {
+    chk_fstore(id, sd_bt);
+  } else {
+    chk_iassign(id);
+  }
+} return void;
+given sd_use_fixture ((import sd_wx)):() then check_failed:(0)
+given sd_use_fixture ((import sd_wz)):() then check_failed:(1)

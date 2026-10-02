@@ -28,6 +28,11 @@ chk_bi_arg(int id, int i) {
   if(ty_known(t) == 1 && want != "" && bi_ok(want, t) == 0) {
     bi_arg_err(id, i, want, t);
   }
+} chain (int id, int i) {
+  string nm = s1_of(id);
+  if((nm == "print" || nm == "eprint" || nm == "put") && ty_is_list(t) == 1) {
+    tc_err(id, "'" + nm + "' cannot take a list: argument " + i + " is " + t + "; a list has no text form -- write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them");
+  }
 } return void;
 given call2_setup ((import cm_push_call), 1):() then check_failed:(0)
 given bi_mismatch_setup ((import bi_mismatch_call), 0):() then calls bi_arg_err:((import bi_mismatch_call), 0, "list", "int")

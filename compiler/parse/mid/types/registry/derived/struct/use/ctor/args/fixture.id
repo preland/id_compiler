@@ -1,0 +1,23 @@
+// Constructor calls over the structs P { int x; int y; } and Q { string s; }
+// (sd_use_fixture has the nodes the arguments are):
+//
+//   sd_c2  P(1, 1), and the declaration `P q = P(1, 1)` made right after it
+//   sd_c1  P(1)         sd_c3  Q("s", "s", "s")
+//   sd_cb  P(1, "s")    sd_cx  P(1, 1) with no declaration after it
+//   sd_big a literal that is a word, for the narrowing rule
+
+sd_ctor_fixture() {
+  sd_use_fixture();
+  export int sd_big = node_int("99", 99, 1);
+  export int sd_c1 = node_call("P", [(import sd_one)]);
+} chain () {
+  export int sd_c3 = node_call("Q", [(import sd_str), (import sd_str), (import sd_str)]);
+  export int sd_cb = node_call("P", [(import sd_one), (import sd_str)]);
+  export int sd_cx = node_call("P", [(import sd_one), (import sd_one)]);
+} chain () {
+  export int sd_c2 = node_call("P", [(import sd_one), (import sd_one)]);
+  export int sd_d2 = node_decl("P", "q", (import sd_c2), 0);
+  export int sd_neg = 0 - 1;
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

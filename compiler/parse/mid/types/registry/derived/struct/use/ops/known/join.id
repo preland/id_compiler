@@ -1,0 +1,20 @@
+// The pieces of a comma-separated list of struct names, and the declarations
+// the cases of the unknown-type check judge.
+
+sd_join(string sd_s, int sd_i) {
+  string sd_r = (import sdname)[sd_i];
+  if(sd_i > 0) {
+    sd_r = sd_s + ", " + (import sdname)[sd_i];
+  }
+} return string sd_r;
+given sd_pair ("P", 1):("P, Q")
+given sd_pair ("none", 0):("P")
+
+// `P q = ...` and `Pnt q = ...` over the structs P and Q.
+sd_decl_fixture() {
+  sd_reg();
+  export int sd_dk = node_decl("P", "q", 0, 0);
+  export int sd_dbad = node_decl("Pnt", "q", 0, 0);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

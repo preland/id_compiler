@@ -1,0 +1,19 @@
+// A function named sd_fn in a file of the given name, for the cases of the rule
+// that a struct has a file of its own (../../alone.id): `prog` and `pfile`
+// each get one entry.
+
+sd_fnfile(string sd_f) {
+  int[] sd_none = [];
+  int sd_nd = node_func("sd_fn", "void", sd_none, sd_none, 0 - 1);
+  push((import prog), sd_nd);
+} chain (string sd_f) {
+  push((import pfile), sd_f);
+} return void;
+given sd_pair ("a.id"):() then prog_len:(1)
+given sd_pair ("b.id"):() then sd_fnfile_last:("b.id")
+
+sd_fnfile_last() {
+  string s = (import pfile)[len((import pfile)) - 1];
+} return string s;
+given sd_pair given sd_fnfile("x.id") ():("x.id")
+given sd_pair given sd_fnfile("y.id") ():("y.id")

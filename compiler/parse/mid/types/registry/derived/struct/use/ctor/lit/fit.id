@@ -1,0 +1,37 @@
+// A struct in a test case, `Point(1, 2)`, held to the type the signature
+// declares at that position, the way a list literal is: the name must be that
+// struct, and each argument must fit its field -- recursively, so a field that
+// is a list, a struct or `(import NAME)` is judged by the rule for its own kind.
+
+fit_other(int i, int e, string want) {
+  if(ty_is_struct(want) == 1 || k_of(e) == "cctor") {
+    fit_struct(i, e, want);
+  } else {
+    fit_scalar(i, e, want);
+  }
+} return void;
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "int"):() then prints:("fixture.id:4: error: this case builds a P where a int is required\n")
+given sd_case_fixture ((import fixture_ci), (import sd_ca), "int"):() then check_failed:(0)
+
+fit_struct(int i, int e, string want) {
+  if(k_of(e) != "cctor") {
+    case_err(i, "this case gives " + lit_text(e) + " where a " + want + " is required; write the struct as " + want + "(" + sd_fields_text(want) + ")");
+  } else {
+    fit_ctor(i, e, want);
+  }
+} return void;
+given sd_case_fixture ((import fixture_ci), (import sd_ca), "P"):() then prints:("fixture.id:4: error: this case gives 1 where a P is required; write the struct as P(x, y)\n")
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then check_failed:(0)
+
+fit_ctor(int i, int e, string want) {
+  if(sd_find(s1_of(e)) < 0) {
+    case_err(i, "a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); '" + s1_of(e) + "' is not a struct");
+  } else if(s1_of(e) != want) {
+    case_err(i, "this case builds a " + s1_of(e) + " where a " + want + " is required");
+  } else {
+    fit_fields(i, e, want);
+  }
+} return void;
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "Q"):() then prints:("fixture.id:4: error: this case builds a P where a Q is required\n")
+given sd_case_fixture ((import fixture_ci), (import sd_cn), "P"):() then prints:("fixture.id:4: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); 'nope' is not a struct\n")
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then check_failed:(0)

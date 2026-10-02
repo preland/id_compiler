@@ -1,23 +1,40 @@
-
-// An index reads a cell and unboxes it to the element type.
+// An index reads a cell and unboxes it to the element type, which is the type
+// of the index expression itself. A field read (`p.x`) is the same read: a
+// struct is a list at run time, one cell per field, and the index is the
+// field's position.
 //
-// i1_of(id) is read once and shared between the element-type lookup and the
-// generated call: both need the base list, and nothing between the two reads
-// changes the store.
+// i1_of(id) is read once and shared between the type lookup and the generated
+// call: both need the base list, and nothing between the two reads changes the
+// store.
 emit_index(int id) {
   int i1_of_v = i1_of(id);
-  string elem = index_elem(i1_of_v);
-  int i2_of_v = i2_of(id);
+  string elem = type_of(id);
+  string sd_ixc = emit_idx(id);
 } chain (int id) {
-  string g = "id_list_get(" + emit_expr(i1_of_v) + ", " + emit_expr(i2_of_v) + ")";
+  string g = "id_list_get(" + emit_expr(i1_of_v) + ", " + sd_ixc + ")";
   string ret_s = unbox(g, elem);
 } return string ret_s;
 given idx_build ((import idx_fix)):("(int)(id_list_get(id_list_lit(2, (long long)(2), (long long)(5)), 2))")
 given stridx_build ((import idx_str)):("(char*)(intptr_t)(id_list_get(id_list_lit(1, (long long)(intptr_t)(hi)), 2))")
+given sd_use_fixture ((import sd_iy)):("(int)(id_list_get(p, 1))")
 
-index_elem(int i1_of_v) {
-  string type_of_v = type_of(i1_of_v);
-  string elem = elem_type(type_of_v);
-} return string elem;
-given idx_build ((import arr_ints)):("int")
-given strarr_fixture ((import arr_strs)):("string")
+// The C text of an index: the expression the program wrote, or, for a field,
+// the field's position in its struct.
+emit_idx(int id) {
+  string sd_c = "";
+  if(is_fld_idx(id) == 1) {
+    sd_c = emit_fpos(id);
+  } else {
+    sd_c = emit_expr(i2_of(id));
+  }
+} return string sd_c;
+given idx_build ((import idx_fix)):("2")
+given sd_use_fixture ((import sd_iz)):("-1")
+
+emit_fpos(int id) {
+  string sd_bt = type_of(i1_of(id));
+  string sd_f = s1_of(i2_of(id));
+  string sd_c = "" + sd_fpos(sd_bt, sd_f);
+} return string sd_c;
+given sd_use_fixture ((import sd_ix)):("0")
+given sd_use_fixture ((import sd_iy)):("1")

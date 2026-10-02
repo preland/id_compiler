@@ -8,16 +8,22 @@ given lw_fix_index ((import fix_index_n)):(0)
 given lw_fix_iassign ((import fix_iassign_n)):(0)
 
 lw_index_idx(int node) {
-  int idx_node = i2_of(node);
-  int i = lw_as(idx_node, "int");
+  int i = 0 - 1;
+  if(is_fld_idx(node) == 1) {
+    i = lw_fpos(node);
+  } else {
+    i = lw_as(i2_of(node), "int");
+  }
 } return int i;
 given lw_fix_index ((import fix_index_n)):(0)
 given lw_fix_iassign ((import fix_iassign_n)):(0)
+given sr_fixture ((import sr_iy)):(0)
 
 lw_index_elem(int node) {
   int base_node = i1_of(node);
   string ty = lw_ety(base_node);
-  string elem = elem_type(ty);
+  string elem = idx_elem(ty, node);
 } return string elem;
 given lw_fix_index ((import fix_index_n)):("i")
 given lw_fix_iassign ((import fix_iassign_n)):("i")
+given sr_fixture ((import sr_iy)):("int")

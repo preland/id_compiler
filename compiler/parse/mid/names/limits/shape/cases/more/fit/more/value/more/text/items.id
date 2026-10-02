@@ -17,12 +17,16 @@ leaf_text(int e) {
   if(k_of(e) == "cimport") {
     lt = "(import " + lt + ")";
   }
+  if(k_of(e) == "cctor") {
+    lt = lt + "(" + items_text(l1_of(e)) + ")";
+  }
 } return string lt;
 given fn_fixture ((import fixture_zero)):("0")
+given sd_case_fixture ((import sd_ce)):("P(1, 1)")
 given lit_import_fixture ((import lit_cimport_e)):("(import gb)")
 
 // A `given` naming a real, resolvable, 0-parameter void setup, with
-// casegiven[i] non-empty: fit_given (../../../../given/valid.id) needs one
+// casegiven[i] non-empty: fit_given (../../../../given/setup/valid.id) needs one
 // case where a case's `given` really did run. "fx_setup" is registered here
 // (fn_fixture only registers "fx_target", which takes a parameter and
 // returns int, so given_shape would reject it) the way fn_fixture_reg

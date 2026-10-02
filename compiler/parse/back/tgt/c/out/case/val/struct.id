@@ -1,0 +1,23 @@
+// A struct in a test case as C: the list it is at run time, one cell per field,
+// each value built at its field's type (so a field that is a list, a string or
+// another struct is built by the same rules as a case's own argument of that
+// type) and boxed to a cell (field.id).
+
+tc_other(int e, string want) {
+  string so = "";
+  if(ty_is_struct(want) == 1) {
+    so = tc_struct(e, want);
+  } else {
+    so = tc_scalar(e);
+  }
+} return string so;
+given sd_case_fixture ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (long long)(1))")
+given lit_int_fixture ((import lit_e), "int"):("5")
+
+tc_struct(int e, string want) {
+  int[] xs = l1_of(e);
+  string cells = tc_fcells(xs, want);
+  string so = "id_list_lit(" + len(xs) + ", " + cells + ")";
+} return string so;
+given sd_case_fixture ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (long long)(1))")
+given sd_case_fixture ((import sd_cl), "P"):("id_list_lit(1, (long long)(1))")

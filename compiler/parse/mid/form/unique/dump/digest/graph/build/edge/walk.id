@@ -23,7 +23,7 @@ dg_edges(int dgf, int dglo) {
     dglo = dglo + 1;
   }
 } return int dglo;
-given dg_t_rows (1, 0):(20) then dg_nout1:(2)
+given dg_t_rows (1, 0):(22) then dg_nout1:(2)
 given dg_t_rows (0, 0):(7) then dg_nout1:(0)
 
 dg_edge(int dgf, int dgid) {

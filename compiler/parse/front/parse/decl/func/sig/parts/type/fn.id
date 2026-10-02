@@ -5,7 +5,7 @@
 // the two spellings are the same. So a function type is kept as one canonical
 // spelling -- "func(int, string) return void", one space after each comma and
 // either side of `return` -- whatever spacing the source used, and
-// mid/types/registry/fn/ reads its parts back out of it.
+// mid/types/registry/derived/fn/ reads its parts back out of it.
 
 parse_fn_type(int[] pos) {
   expect_text(pos, "(");

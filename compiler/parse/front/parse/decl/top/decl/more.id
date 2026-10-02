@@ -17,7 +17,8 @@ push_func_body(int[] pos) {
   int parse_func_v = parse_fn(pos);
   push((import prog), parse_func_v);
 } chain (int[] pos) {
-  ptok_note(ptok_first, pos[0], parse_func_v);
+  int ptok_last = tok_end(pos[0]);
+  ptok_note(ptok_first, ptok_last, parse_func_v);
   int ret_i = take_cases(pos);
 } return int ret_i;
 given decl_tokens ([0]):(0) then ptok_span:(37)
@@ -29,7 +30,7 @@ given decl_tokens ([0]):(0) then check_failed:(0)
 // report/more/loc/func_line.id; print_asm_cases, back/drive/run/check/dce/
 // emit/guard/guarded_emit.id) the way an ordinary function already gets one.
 // aloc holds "file:line" already joined, one entry per declaration, parallel
-// to afname (front/parse/decl/asm/asm_state.id).
+// to afname (front/parse/decl/kinds/asm/asm_state.id).
 push_asm(int[] pos) {
   string cur_file_v = cur_file();
   int cur_ln_v = cur_ln(pos);

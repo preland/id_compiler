@@ -1,0 +1,41 @@
+// A setup's arguments against its parameters. An `(import NAME)` among them is
+// the value an export holds once the setups written BEFORE this one have run,
+// so while they are checked casegiven[i] is cut down to those setups: the
+// export must be reached by one of them (given/read/impcheck.id, which reads
+// casegiven[i] and nothing else), and the first setup of a case has none. It is
+// put back before anything else looks.
+
+given_fit(int i, int si, int sfn, int[] items) {
+  string giv_all = (import casegiven)[i];
+  string giv_pre = given_prefix(i, si);
+  sset((import casegiven), i, giv_pre);
+} chain (int i, int si, int sfn, int[] items) {
+  int giv_j = 0;
+  while(giv_j < len(items)) {
+    given_arg(i, sfn, items, giv_j);
+    giv_j = giv_j + 1;
+  }
+  sset((import casegiven), i, giv_all);
+} return void;
+given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then check_failed:(0) then cg_zero:("fx_set1 fx_set1 ")
+given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then calls given_arg:[1]
+
+given_prefix(int i, int si) {
+  string[] giv_names = str_split((import casegiven)[i], " ");
+  string giv_out = "";
+  int giv_k = 0;
+} chain (int i, int si) {
+  while(giv_k < si) {
+    giv_out = giv_out + giv_names[giv_k] + " ";
+    giv_k = giv_k + 1;
+  }
+} return string giv_out;
+given impcase_given (0, 0):("")
+given impcase_given (0, 1):("fx_setup ")
+// casegiven[0] as it stands, for given_fit's cases: a check takes no
+// arguments, and what it must show is that the cut-down list was put back.
+cg_zero() {
+  string cg = (import casegiven)[0];
+} return string cg;
+given impcase_given ():("fx_setup")
+given gsetup_fixture ():("fx_set1 fx_set1 ")

@@ -1,0 +1,23 @@
+// The fields of a struct in a test case: one value for each, each held to its
+// field's type.
+
+fit_fields(int i, int e, string want) {
+  int[] sd_xs = l1_of(e);
+  if(len(sd_xs) != sd_nfields(want)) {
+    case_err(i, "struct '" + want + "' takes " + sd_nfields(want) + " field(s) (" + sd_fields_text(want) + "), but this case gives " + len(sd_xs));
+  } else {
+    fit_fvals(i, sd_xs, want);
+  }
+} return void;
+given sd_case_fixture ((import fixture_ci), (import sd_cl), "P"):() then prints:("fixture.id:4: error: struct 'P' takes 2 field(s) (x, y), but this case gives 1\n")
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then check_failed:(0)
+
+fit_fvals(int i, int[] sd_xs, string want) {
+  int sd_k = 0;
+  while(sd_k < len(sd_xs)) {
+    fit_value(i, sd_xs[sd_k], sd_ftype_at(want, sd_k));
+    sd_k = sd_k + 1;
+  }
+} return void;
+given sd_case_fixture ((import fixture_ci), [(import sd_ca), (import sd_ca)], "P"):() then check_failed:(0)
+given sd_case_fixture ((import fixture_ci), [(import sd_ca), (import sd_cs)], "P"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")

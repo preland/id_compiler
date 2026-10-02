@@ -1,0 +1,24 @@
+// Rows of the struct table compared pairwise: the same file, or the same
+// fields.
+
+// "x:int,y:int": a struct's identity as the uniqueness rule sees it. Field
+// names count, so `{x, y}` and `{w, h}` are two structs and `{x, y}` twice is
+// one declared twice.
+sd_key(int sd_i) {
+  int sd_k = 0;
+  string s = "";
+  while(sd_k < len((import sdfname)[sd_i])) {
+    s = s + sep_at(",", sd_k) + (import sdfname)[sd_i][sd_k] + ":" + (import sdftype)[sd_i][sd_k];
+    sd_k = sd_k + 1;
+  }
+} return string s;
+given sd_pair (0):("x:int,y:int")
+given sd_pair (1):("s:string")
+
+sd_sharepair(int sd_i, int sd_j) {
+  if((import sdfile)[sd_j] == (import sdfile)[sd_i]) {
+    sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' shares its file with struct '" + (import sdname)[sd_j] + "'; a struct is declared in a file of its own -- move one of them to another file");
+  }
+} return void;
+given sd_pair (1, 0):() then check_failed:(0)
+given sd_pair given sd_note("R", ["a"], ["int"], "p.id", 9) (2, 0):() then prints:("p.id:9: error: struct 'R' shares its file with struct 'P'; a struct is declared in a file of its own -- move one of them to another file\n")

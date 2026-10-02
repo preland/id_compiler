@@ -13,17 +13,18 @@ tc_g4(int id) {
     chk_arr(id);
   }
   if(k_of(id) == "index") {
-    chk_index(id);
+    chk_access(id);
   }
   tc_g5(id);
 } return void;
-given idxfix ((import rgidx_node)):() then calls chk_index:((import rgidx_node))
+given idxfix ((import rgidx_node)):() then calls chk_access:((import rgidx_node))
 given call2_setup ((import cm_push_call)):() then check_failed:(0)
+given sd_use_fixture ((import sd_iz)):() then check_failed:(1)
 
 chk_index(int id) {
   string bt = base_type(id);
   if(ty_known(bt) == 1 && ty_is_list(bt) == 0) {
-    ix_err(id, "cannot index a " + bt);
+    ix_err(id, "cannot index a " + bt + ix_hint(bt));
   } else {
     chk_index2(id);
   }

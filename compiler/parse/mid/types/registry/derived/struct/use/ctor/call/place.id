@@ -1,0 +1,21 @@
+// Where a constructor may be written: as the value of a declaration.
+
+// A constructor is an initialiser when the declaration it initialises is the
+// node made right after it: the parser builds a declaration's value, then the
+// declaration, with nothing in between.
+is_initialiser(int id) {
+  int ok = 0;
+  if(id + 1 < len((import nkind)) && k_of(id + 1) == "decl" && i1_of(id + 1) == id) {
+    ok = 1;
+  }
+} return int ok;
+given sd_ctor_fixture ((import sd_c2)):(1)
+given sd_ctor_fixture ((import sd_cx)):(0)
+
+ctor_place(int id) {
+  if(is_initialiser(id) == 0) {
+    tc_err(id, "'" + s1_of(id) + "(...)' builds a struct and can only initialise a declaration, as in '" + s1_of(id) + " p = " + s1_of(id) + "(...);' -- to change a struct that exists assign its fields ('p.x = 1;'), and to put one in a list or pass it to a function declare it first and use the name");
+  }
+} return void;
+given sd_ctor_fixture ((import sd_c2)):() then check_failed:(0)
+given sd_ctor_fixture ((import sd_cx)):() then prints:("<stdin>:1: error: 'P(...)' builds a struct and can only initialise a declaration, as in 'P p = P(...);' -- to change a struct that exists assign its fields ('p.x = 1;'), and to put one in a list or pass it to a function declare it first and use the name\n")

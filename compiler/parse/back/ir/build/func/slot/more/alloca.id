@@ -24,7 +24,11 @@ given lw_fixture ("int", "x"):(2) then chk_lwvar_len:(1)
 given lw_fixture2 ("word", "y"):(2) then chk_lwvar_len:(1)
 
 lw_store_at(int addr, int v) {
+  int old = lw_old(addr);
   lw_op("store", "", addr, v, "");
+  lw_drop(old);
 } return void;
 given lw_fixture (1, 2):() then check_failed:(0)
-given lw_fixture2 (3, 4):() then check_failed:(0)
+given lw_fixture2 (0, 1):() then check_failed:(0)
+given lwo_fixture ((import lwo_w2), 5):() then calls lw_callf:[1]
+given lwo_fixture ((import lwo_z), 5):() then calls lw_callf:[0]

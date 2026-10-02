@@ -24,6 +24,8 @@ note_ty(string ty) {
     note_one(ty);
     ty = list_elem(ty);
   }
+  note_struct(ty);
 } return void;
-given tc_types_init ("int[]"):() then tctys_len:(1)
-given tc_types_init ("int"):() then tctys_len:(0)
+given sd_note_fixture ("int[]"):() then tctys_len:(1)
+given sd_note_fixture ("int"):() then tctys_len:(0)
+given sd_note_fixture ("P[]"):() then tcsts_len:(1)

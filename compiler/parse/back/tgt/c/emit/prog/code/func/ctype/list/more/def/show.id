@@ -8,8 +8,8 @@ emit_show_body(string key, string et) {
   string sh = tc_show(ga, et);
   emit_line("static void idtc_show_" + key + "(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        " + sh + "\n    }\n    fputs(\"]\", stderr);\n}");
 } return void;
-("int", "int"):() then prints:("static void idtc_show_int(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
-("str", "string"):() then prints:("static void idtc_show_str(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+given sd_note_fixture ("int", "int"):() then prints:("static void idtc_show_int(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"%d\", (int)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
+given sd_note_fixture ("str", "string"):() then prints:("static void idtc_show_str(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[i]));\n    }\n    fputs(\"]\", stderr);\n}\n")
 
 tc_key(string type) {
   string et = list_elem(type);

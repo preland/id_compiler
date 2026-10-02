@@ -1,0 +1,16 @@
+// The type of `base[index]` or `base.field`, from the base's type and the index
+// node: a list's element type, or the type of the field the index names. A name
+// that is not a field of the struct has no type, "", which every check treats
+// as "do not judge this" -- chk_field is what reports it.
+
+idx_elem(string sd_bt, int id) {
+  string t = elem_type(sd_bt);
+  string sd_f = s1_of(i2_of(id));
+  if(ty_is_struct(sd_bt) == 1) {
+    int sd_k = sd_fpos(sd_bt, sd_f);
+    t = sd_ftype_at(sd_bt, sd_k);
+  }
+} return string t;
+given sd_use_fixture ("int[]", (import sd_ii)):("int")
+given sd_use_fixture ("P", (import sd_ix)):("int")
+given sd_use_fixture ("Q", (import sd_ix)):("")
