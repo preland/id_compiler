@@ -9,7 +9,7 @@
 // and neither notices when the cells are reallocated behind it.
 
 list_new() {
-  word p = mem_alloc(24);
+  word p = pool_take(0, 24);
   list_init(p);
   int[] ret_li = w2l(p);
 } return int[] ret_li;

@@ -1,9 +1,10 @@
 // Appending, and the growth that makes it always possible.
 //
 // Capacity doubles, so the copying a long run of pushes does is proportional
-// to the list rather than to the square of it. Nothing releases the old cells:
-// there is no free (docs/SPEC.md 6), so a list that grows through n doublings
-// leaves every earlier array of cells behind it in the arena.
+// to the list rather than to the square of it. Growth gives the old cell array
+// back to its size class (more/pool.id), as the hosted `realloc` does, so a
+// list that grows through n doublings does not leave every earlier array behind
+// it in the arena.
 
 list_push(int[] xs, word v) {
   word l2w_v = l2w(xs);
@@ -19,7 +20,10 @@ list_room(word p) {
 } return word p;
 
 list_grow(word p, word z) {
-  word a = mem_alloc(z * 8);
+  word cls = cell_cls(z);
+  word a = pool_take(cls, z * 8);
   word ld64_v = ld64(p + 16);
+} chain (word p, word z) {
   list_grow_copy(p, a, z, ld64_v);
+  pool_give(cls - 1, ld64_v);
 } return void;

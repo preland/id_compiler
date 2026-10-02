@@ -5,3 +5,11 @@ mem_size() {
   word heap_ptr_v = heap_ptr();
   word ret_w = arena_top(heap_ptr_v);
 } return word ret_w;
+
+// A block returned to its size class (pool.id): the old head of the list goes
+// in its first word and the block becomes the head.
+pool_give(word cls, word b) {
+  word h = pool_head(cls);
+  st64(b, ld64(h));
+  st64(h, b);
+} return void;

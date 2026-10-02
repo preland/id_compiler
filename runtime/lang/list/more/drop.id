@@ -1,0 +1,35 @@
+// Giving a list back. The compiler calls this (as id_list_free) for a local
+// list it proved nothing else can reach; the header and the cell array go onto
+// the free lists in mem/store/arena/more/pool.id and the elements are left to
+// whoever else holds them, the same shallow free the hosted runtime does.
+//
+// A kernel has no stderr to trap to, so the hosted runtime's use-after-free
+// guard has no equivalent here. The one thing this does check is a list freed
+// twice, by a cap of -1 that no live list has: a second free is ignored rather
+// than linking a block into a free list twice.
+
+list_free(int[] xs) {
+  word p = l2w(xs);
+  if(p != 0 && ld64(p + 8) > 0) {
+    list_give(p);
+  }
+} return void;
+
+list_give(word p) {
+  word cap = ld64(p + 8);
+  word cells = ld64(p + 16);
+  word cls = cell_cls(cap);
+} chain (word p) {
+  pool_give(cls, cells);
+  st64(p + 8, 0 - 1);
+  pool_give(0, p);
+} return void;
+
+cell_cls(word cap) {
+  word csz = 4;
+  word k = 1;
+  while(csz < cap) {
+    csz = csz * 2;
+    k = k + 1;
+  }
+} return word k;
