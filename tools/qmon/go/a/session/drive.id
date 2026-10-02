@@ -4,21 +4,17 @@
 // send/recv into it fail fast and harmlessly (idstd's sys/io/ipc/sock/README.md),
 // the same way qmon.py's background reader thread had nothing to read -- so
 // there is no separate "did setup succeed" branch to thread through here.
-// Not cased: run() calls setup() (setup/boot.id), which pairs a real,
-// freshly-spawned qemu process against sockets no given can see in advance
-// and races connecting to them -- see setup/boot.id's own note. A void
-// function could still take a weak, outcome-blind case here, but drive()
-// below cannot, and splitting cases between the two functions of one call
-// chain for that reason would be worse than skipping both.
+// Not cased: run() calls setup() (setup/boot.id), whose two 10s connect
+// timeouts against a dying qemu make any case here cost ~20s and blow the
+// 60s build budget; `then calls setup:[1]` still runs setup for real, so it
+// would not avoid that cost, and it only restates the two lines below.
 run() {
   setup();
   phase_wait();
 } return void;
 
-// Not cased: drive()'s return is (import qm_rc), set deep inside the same
-// setup() race (setup/boot.id's note) -- so the one value a case here must
-// match exactly is not decided by drive()'s own logic, only by which way
-// that race happened to fall on the machine running the build.
+// Not cased: drive() runs run() (see above) then cleanup(), and returns qm_rc,
+// which is 1 only because the connects timed out; the same 20s-per-case cost.
 drive() {
   run();
   cleanup();

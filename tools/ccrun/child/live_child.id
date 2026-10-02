@@ -1,0 +1,23 @@
+// Rebind cr_h to a live child that exits 7. run_capped is the sole exporter
+// of cr_h and always closes it, so this spawns afresh into the slot that
+// close just freed (idstd's proc_spawn takes the lowest free slot), leaving
+// cr_h naming a child pump_finish has yet to wait on.
+ccrun_fx_live_exit_seven() {
+  int ccrun_fx_les_h = proc_spawn_limited("sh\n-c\nsleep 0.1; exit 7\n", 0, 0);
+} return void;
+given ccrun_fx_run_capped_true ():() then ccrun_fx_wait_value:(7)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then ccrun_fx_wait_value:(7)
+
+// The same rebinding, for a child that exits 0 straight away.
+ccrun_fx_live_exit_zero() {
+  int ccrun_fx_lez_h = proc_spawn_limited("sh\n-c\nexit 0\n", 0, 0);
+} return void;
+given ccrun_fx_run_capped_true ():() then ccrun_fx_wait_value:(0)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then ccrun_fx_wait_value:(0)
+
+// What cr_h's child exits with, waited on for up to two seconds.
+ccrun_fx_wait_value() {
+  int ccrun_fx_wv_code = proc_wait((import cr_h), 2000);
+} return int ccrun_fx_wv_code;
+given ccrun_fx_run_capped_true given ccrun_fx_live_exit_seven ():(7)
+given ccrun_fx_run_capped_true given ccrun_fx_live_exit_zero ():(0)

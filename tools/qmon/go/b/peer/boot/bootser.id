@@ -16,9 +16,9 @@
 qmb_boot_ser(string ser_script) {
   init(2, ["qmon", "/nonexistent/kernel.elf"]);
   mk_paths();
-  int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early");
+  int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");
 } chain (string ser_script) {
-  int p2 = proc_spawn("sh\n-c\n" + ser_script + " | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early");
+  int p2 = proc_spawn("sh\n-c\n" + ser_script + " | socat -u - UNIX-LISTEN:" + (import qm_ser_path) + ",unlink-early,accept-timeout=30");
   spawn_qemu();
   connect_qmp();
 } chain (string ser_script) {

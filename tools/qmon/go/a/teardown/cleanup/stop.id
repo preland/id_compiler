@@ -19,18 +19,14 @@ kill_if_needed(int rc) {
 given qa_init_fast given mk_paths given spawn_qemu (0):() then qa_kill_check:(1)
 given qa_hang_qh (-1):() then qa_kill_check:(137) then qa_check_hang:(1)
 
-// Not cased: cleanup() needs a real qm_qh (spawn_qemu, tied to whatever
-// qm_ser_path/qm_qmp_path were current when it ran) and real qm_qmph/qm_serh
-// (connect_qmp/connect_serial, needing a live listener on those same two
-// paths) at once. Every ordering tried -- qa_both_ready's listeners before
-// spawn_qemu (a real bind conflict on qa_both_ready's own paths, confirmed
-// by hand: qemu's chardev realization competes with nc for the same path)
-// and after it (no bind conflict, but qa_check_nc1's post-cleanup probe
-// still measured the listener gone one run in several) -- leaves a
-// real-process race this suite could not pin down. reap_qemu, kill_if_needed
-// and close_sockets above cover cleanup()'s three pieces on their own terms.
+// Cased with listeners connected first, then a qemu spawned on the same
+// paths: qemu replaces the listeners' socket files, fails on its bad -kernel
+// and exits at once (its stale socket files are why qa_check_nc1 reads 0),
+// so the reap is prompt and never reaches kill_if_needed's kill.
 cleanup() {
   reap_qemu();
   close_sockets();
   output();
 } return void;
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial given spawn_qemu ():() then qa_check_nc1:(0) then qa_kill_check:(-1) then qa_check_close:(1) then prints:("")
+given qa_init_fast given qa_both_ready given connect_qmp given connect_serial given spawn_qemu given qa_push_hi ():() then qa_check_nc1:(0) then qa_kill_check:(-1) then qa_check_close:(1) then prints:("hi")

@@ -13,3 +13,12 @@ qa_kill_check() {
 } return int qa_rc;
 given qa_init_fast given mk_paths given spawn_qemu ():(1)
 given qa_init_fast given mk_paths given spawn_qemu ():(1) then qa_kill_check:(-1)
+
+// qm_buf holds "hi" (104, 105), pushed onto the list spawn_qemu exported.
+qa_push_hi() {
+  int[] qa_b = (import qm_buf);
+  push(qa_b, 104);
+  push(qa_b, 105);
+} return void;
+given qa_init_fast given mk_paths given spawn_qemu ():() then qa_check_bufhi:(1)
+given qa_init_fast given mk_paths given spawn_qemu ():() then qa_check_bufhi:(1) then qa_check_bufhi:(1)

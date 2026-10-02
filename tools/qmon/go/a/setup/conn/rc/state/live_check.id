@@ -2,7 +2,7 @@
 // all down: called twice per fixture's own 2 cases (see live.id), the first
 // call finds the real resource and removes it, the second finds it already
 // gone -- so nothing a case here makes ever outlives the case.
-// A real connect probe, not a file-existence check: `nc` binding its socket
+// A real connect probe, not a file-existence check: a listener binding its socket
 // races the given's own return under load, and sock_connect's built-in
 // ENOENT/ECONNREFUSED retry (up to the timeout given here) absorbs that,
 // where a single fs_exists could not.

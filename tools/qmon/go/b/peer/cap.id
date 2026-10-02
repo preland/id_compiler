@@ -1,18 +1,19 @@
-// Capturing what sock_send_str actually put on the wire: a real `nc` bound
+// Capturing what sock_send_str actually put on the wire: a real `socat` bound
 // at the QMP path writes every byte it receives to a scratch file, which
 // qmb_cap_read reads back -- sock_send/sock_recv are native, so `then
 // calls` cannot witness them directly (docs/TESTS.md), and this is the
-// honest alternative. `nc` does not remove its own socket file on exit
-// (unlike the `unlink-early` socat peers in qmp.id), so the check removes
-// both scratch paths itself -- but only after closing this process's own
-// end of the connection and waiting for it to actually exit: `nc` keeps the
-// socket open, and does not see EOF, flush its capture and exit, until this
-// side hangs up, so removing the paths on a fixed sleep after closing (with
-// no wait for `nc` itself) raced its exit under load and occasionally lost.
+// honest alternative. The listener gives up after 30 seconds without a
+// connection, so a case that fails before it connects cannot leave it behind
+// to hold the test harness's pipes open. The check removes both scratch paths
+// itself, but only after closing this process's own end of the connection and
+// waiting for the listener to actually exit: it keeps the socket open, and
+// does not see EOF, flush its capture and exit, until this side hangs up, so
+// removing the paths on a fixed sleep after closing (with no wait for it)
+// raced its exit under load and occasionally lost.
 qmb_qmp_capture_setup() {
   mk_paths();
   export string qmb_cap_path = (import qm_qmp_path) + ".cap";
-  export int qmb_cap_h = proc_spawn("sh\n-c\nnc -lU " + (import qm_qmp_path) + " > " + (import qmb_cap_path));
+  export int qmb_cap_h = proc_spawn("socat\n-u\nUNIX-LISTEN:" + (import qm_qmp_path) + ",accept-timeout=30\nOPEN:" + (import qmb_cap_path) + ",creat,trunc\n");
 } chain () {
   connect_qmp();
 } return void;

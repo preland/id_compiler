@@ -10,3 +10,17 @@ qa_reap_spawn() {
 } return void;
 given qa_init_fast given mk_paths given spawn_qemu ():() then qa_check_spawn:(1)
 given qa_init_fast given mk_paths given spawn_qemu ():() then qa_check_spawn:(1) then qa_check_spawn:(1)
+
+// The argv build_argv must return, laid out one flag per string so the
+// expectation is typed independently of build_argv's own concatenation: only
+// the kernel and the two socket paths come from exports.
+qa_want_argv() {
+  string qa_head = "qemu-system-x86_64\n-kernel\n" + (import qm_kernel) + "\n";
+  string qa_disp = "-display\nnone\n-vga\nstd\n-no-reboot\n";
+  string qa_ser = "-chardev\nsocket,id=s0,path=" + (import qm_ser_path) + ",server=on,wait=off\n-serial\nchardev:s0\n";
+} chain () {
+  string qa_qmp = "-qmp\nunix:" + (import qm_qmp_path) + ",server,nowait";
+  export string qa_want = qa_head + qa_disp + qa_ser + qa_qmp;
+} return void;
+given qa_init_fast given mk_paths ():() then qa_check_paths:(1)
+given qmb_init_seed_a given mk_paths ():() then qa_check_paths:(1)
