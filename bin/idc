@@ -409,6 +409,7 @@ ensure_idlayout() {
 run_idlayout() {
     ensure_idlayout
     if [ -x "$IDLAYOUT" ]; then
+        progress layout "$1"
         "$IDLAYOUT" "$1" "$BUILD_DIR" >&2
         [ $? -ne 0 ] && STRUCT_VIOLATIONS=1
     fi
@@ -459,11 +460,13 @@ capped_from() {
 run_lex_parse() {
     local src="$1"; shift
     local lex_out="$WORK/lex_out"
+    progress lex "$(plural "${#SRC_FILES[@]}" file)"
     capped_from "$src" "$IDLEX" "$@" 2>"$LEX_ERR" > "$lex_out"
     lex_rc=$?
     if [ -n "${TC_FILE:-}" ] && [ -s "$TC_FILE" ]; then
         { sed 's/^/tcc /' "$TC_FILE"; cat "$lex_out"; } > "$lex_out.tc" && lex_out="$lex_out.tc"
     fi
+    progress parse "tokens -> C"
     capped_from "$lex_out" "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
     parse_rc=$?
 }
@@ -552,29 +555,138 @@ STD_ARGS=()
 PROGRESS=0
 [ -t 2 ] && [ -z "${IDC_NO_PROGRESS:-}" ] && PROGRESS=1
 PROGRESS_OPEN=0
+PROG_COLS=80
+PROG_STAGE=""
+PROG_NOTE=""
+PROG_RAN=""
+PROG_CACHED=""
+PROG_T0=0
+PROG_S0=0
+PROG_FMT=""
+PROG_FIT=""
+TICK_PID=""
+TICK_FD=""
+if [ "$PROGRESS" -eq 1 ]; then
+    PROG_T0=$((${EPOCHREALTIME/[.,]/} / 1000))
+    PROG_S0=$PROG_T0
+    read -r _ PROG_COLS < <(stty size <&2 2>/dev/null)
+    case "$PROG_COLS" in ''|*[!0-9]*) PROG_COLS=80 ;; esac
+    [ "$PROG_COLS" -ge 40 ] || PROG_COLS=40
+fi
 
 # "1 file", not "1 files": the line is read on every build, so it is worth
 # the two lines it costs.
 plural() { [ "$1" -eq 1 ] && printf '%s %s' "$1" "$2" || printf '%s %ss' "$1" "$2"; }
 
+# progress_secs START_MS -- sets PROG_FMT to the time since START_MS, "4.21s".
+progress_secs() {
+    local d=$(( ${EPOCHREALTIME/[.,]/} / 1000 - $1 ))
+    printf -v PROG_FMT '%d.%02ds' "$((d / 1000))" "$(( (d % 1000) / 10 ))"
+}
+
+# progress_fit TEXT ROOM -- sets PROG_FIT to TEXT cut to ROOM columns, "..."
+# where it was cut, so a line never wraps (a wrapped line leaves its first
+# half behind when it is rewritten).
+progress_fit() {
+    if [ "${#1}" -le "$2" ]; then PROG_FIT="$1"; else PROG_FIT="${1:0:$(($2 - 3))}..."; fi
+}
+
+# A stage that ends is left on screen with the time it took; the stage after
+# it takes the live line. Calling progress with the stage already running only
+# rewrites its detail.
+progress_stage() { # progress_stage NAME
+    [ "$1" = "$PROG_STAGE" ] && return 0
+    progress_stop_ticker
+    if [ -n "$PROG_STAGE" ]; then
+        progress_secs "$PROG_S0"
+        progress_fit "$PROG_FMT${PROG_NOTE:+  ($PROG_NOTE)}" $((PROG_COLS - 14))
+        printf '\r\033[K  \033[2m%-9s %s\033[0m\n' "$PROG_STAGE" "$PROG_FIT" >&2
+    fi
+    PROG_NOTE=""
+    PROG_STAGE="$1"
+    PROG_S0=$((${EPOCHREALTIME/[.,]/} / 1000))
+}
+
 progress() { # progress STAGE [DETAIL]
     [ "$PROGRESS" -eq 1 ] || return 0
+    progress_stage "$1"
     PROGRESS_OPEN=1
-    printf '\r\033[K  %-8s %s' "$1" "${2:-}" >&2
+    progress_fit "${2:-}" $((PROG_COLS - 14))
+    printf '\r\033[K  %-9s %s' "$1" "$PROG_FIT" >&2
+}
+
+# The live case counter. The harness writes one '.' to $IDTC_TICK's descriptor
+# after each case it runs; every shard inherits the same pipe, so a one-byte
+# write (atomic) from any of them lands in one place and the renderer, a
+# background loop here, only counts bytes. Its read times out every tenth of a
+# second, which is what limits the redraw rate. The pipe is opened read-write
+# so it never reports end of file; progress_stop_ticker kills the loop.
+progress_render() { # progress_render TODO CACHED SHARDS
+    local todo="$1" got=0 last=-1 chunk bar pad filled note
+    note="$2 cached"
+    [ "$3" -gt 1 ] && note="$note, $3 shards"
+    while :; do
+        if [ "$got" -ne "$last" ]; then
+            last=$got
+            bar=""
+            if [ "$PROG_COLS" -ge 70 ]; then
+                filled=$((got * 20 / todo))
+                printf -v bar '%*s' "$filled" ''
+                printf -v pad '%*s' "$((20 - filled))" ''
+                bar="[${bar// /#}${pad// /.}] "
+            fi
+            progress_fit "$bar$got/$todo  ($note)" $((PROG_COLS - 14))
+            printf '\r\033[K  %-9s %s' test "$PROG_FIT" >&2
+        fi
+        read -r -t 0.1 -N 65536 -u "$TICK_FD" chunk
+        got=$((got + ${#chunk}))
+        [ "$got" -le "$todo" ] || got=$todo
+    done
+}
+
+progress_start_ticker() { # progress_start_ticker TODO CACHED SHARDS
+    [ "$PROGRESS" -eq 1 ] && [ "$1" -gt 0 ] || return 0
+    local fifo="$WORK/tick"
+    mkfifo "$fifo" 2>/dev/null || return 0
+    exec {TICK_FD}<>"$fifo" || { TICK_FD=""; return 0; }
+    rm -f "$fifo"
+    PROGRESS_OPEN=1
+    progress_render "$@" &
+    TICK_PID=$!
+}
+
+progress_stop_ticker() {
+    [ -n "$TICK_PID" ] || return 0
+    kill "$TICK_PID" 2>/dev/null
+    wait "$TICK_PID" 2>/dev/null
+    TICK_PID=""
+    [ -z "$TICK_FD" ] || exec {TICK_FD}<&-
+    TICK_FD=""
 }
 
 # Wipe the line. Called before any real output, and on exit, so nothing is
-# ever printed over a partial line and no terminal is left with one.
+# ever printed over a partial line and no terminal is left with one. The
+# counter loop is stopped first: a redraw after the wipe would land on top of
+# the diagnostic that follows.
 progress_clear() {
     [ "$PROGRESS" -eq 1 ] && [ "$PROGRESS_OPEN" -eq 1 ] || return 0
+    progress_stop_ticker
     printf '\r\033[K' >&2
     PROGRESS_OPEN=0
 }
 
+# The last stage's line, then one summary line: what was built, the time the
+# whole invocation took, and how many cases ran against how many were cached.
 progress_done() { # progress_done SUMMARY
     progress_clear
     [ "$PROGRESS" -eq 1 ] || return 0
-    printf '  %s\n' "$1" >&2
+    progress_stage ""
+    local tail
+    progress_secs "$PROG_T0"
+    tail="$PROG_FMT total"
+    [ -z "$PROG_RAN" ] || tail="$tail, $PROG_RAN cases run, $PROG_CACHED cached"
+    progress_fit "$1" $((PROG_COLS - 6 - ${#tail}))
+    printf '  %s  (%s)\n' "$PROG_FIT" "$tail" >&2
 }
 
 # exit_ok -- every success path below calls this instead of `exit 0`. A
@@ -1124,7 +1236,7 @@ else
 fi
 
 WORK=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
-trap '[ -n "${PRE_PID:-}" ] && stop_prechecks; rm -rf "$WORK"; for o in ${BACKEND_OBJS[@]+"${BACKEND_OBJS[@]}"}; do rm -f "$o"; done' EXIT
+trap '[ -n "${PRE_PID:-}" ] && stop_prechecks; progress_clear; rm -rf "$WORK"; for o in ${BACKEND_OBJS[@]+"${BACKEND_OBJS[@]}"}; do rm -f "$o"; done' EXIT
 
 if [ "$TARGET" = llvm ]; then
     PARSE_ARGS+=(--target llvm --opt "$OPT")
@@ -1288,7 +1400,7 @@ obj_cache_put() {
     cache_prune "$OBJ_CACHE_DIR" "$CACHE_MAX"
 }
 
-progress compile "$(plural "${#SRC_FILES[@]}" file) -> tokens -> C"
+progress read "$(plural "${#SRC_FILES[@]}" file)"
 FE_HIT=0
 # Materialised unconditionally, cache on or off: capped_from (see capped(),
 # above) needs a real path for idlex's input regardless, since ccrun no
@@ -1589,6 +1701,7 @@ stop_prechecks() {
 await_prechecks() {
     local rc
     [ -n "$PRE_PID" ] || { run_std_precheck; run_backend_prechecks; return 0; }
+    progress precheck "standard library"
     wait "$PRE_PID"
     rc=$?
     PRE_PID=""
@@ -2603,6 +2716,8 @@ shard_cases() {
             print c2 + 0
         }' "$HARNESS_C")
     [ "${live:-0}" -ge 2 ] || return 1
+    progress_start_ticker "$CASE_TODO" "$CASE_HITS" "$live"
+    [ -z "$TICK_FD" ] || export IDTC_TICK="$TICK_FD"
     for s in $(seq 0 "$n"); do
         [ -s "$WORK/smask.$s" ] || continue
         m=$(cat "$WORK/smask.$s")
@@ -2612,7 +2727,7 @@ shard_cases() {
     for p in "${pids[@]}"; do
         wait "$p" || ok=1
     done
-    [ "$ok" -eq 0 ] || return 1
+    [ "$ok" -eq 0 ] || { progress_stop_ticker; return 1; }
     cat "$WORK"/passed.* > "$WORK/passed"
 }
 
@@ -2635,13 +2750,16 @@ run_cases() {
     fi
     case_plan
     [ -n "${IDC_CASE_STATS:-}" ] && [ -n "$CASE_FILE" ] && echo "idc: cases: $n total, $CASE_HITS already passed, $CASE_TODO to run" >&2
+    PROG_RAN=$CASE_TODO PROG_CACHED=$CASE_HITS
+    [ -n "$CASE_MASK" ] || PROG_RAN=$n
     if [ "$CASE_TODO" -eq 0 ]; then
         progress test "$(plural "$n" case), all $CASE_HITS already passed"
+        PROG_NOTE="$PROG_RAN run, $PROG_CACHED cached"
         touch "$CASE_FILE" 2>/dev/null
         return 0
     fi
     backends_for harness
-    progress test "$(plural "$n" case) ($CASE_HITS already passed)"
+    progress harness "building the test runner"
     # The compile is cached by content (see obj_cache_key); running it is
     # not -- a hit only skips cc, and the cases below always run for real, so
     # a build whose cases fail can never come back green because it was
@@ -2674,13 +2792,21 @@ run_cases() {
     local case_dir="$PATH_ARG"
     [ -d "$case_dir" ] || case_dir=$(dirname "$case_dir")
     : > "$WORK/passed"
+    progress test "$(plural "$n" case) ($CASE_HITS already passed)"
+    unset IDTC_TICK
     if shard_cases "$case_dir"; then
         hrc=0
     else
         : > "$WORK/passed"
+        unset IDTC_TICK
+        progress_start_ticker "$PROG_RAN" "$CASE_HITS" 1
+        [ -z "$TICK_FD" ] || export IDTC_TICK="$TICK_FD"
         (cd "$case_dir" && IDTC_SKIP="$CASE_MASK" IDTC_PASSED="$WORK/passed" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err")
         hrc=$?
     fi
+    progress_stop_ticker
+    unset IDTC_TICK
+    PROG_NOTE="$PROG_RAN run, $PROG_CACHED cached"
     case_record
     [ "$hrc" -eq 0 ] && return 0
     progress_clear
@@ -3032,7 +3158,7 @@ else
     [ "$have_main" -eq 0 ] && cmd+=("-c")
     cmd+=("-std=c11" "-O2" "$c_path" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} "-o" "$OUT" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
 
-    progress link "cc -> $(basename "$OUT")"
+    progress cc "$CC -> $(basename "$OUT")"
     if [ "$UNITS_ON" -eq 1 ] && unit_build "$c_path" program "$OUT"; then
         cc_rc=0
     else
