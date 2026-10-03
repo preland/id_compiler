@@ -18,7 +18,7 @@ tc_scalar(int e) {
   if(k_of(e) == "un") {
     so = tc_neg(e);
   } else if(k_of(e) == "str") {
-    so = "ID_S(" + so + ")";
+    so = "ID_S(" + c_lit(so) + ")";
   }
 } return string so;
 given lit_int_fixture ((import lit_e)):("5")

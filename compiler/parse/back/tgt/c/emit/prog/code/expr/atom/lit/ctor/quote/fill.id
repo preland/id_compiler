@@ -1,0 +1,40 @@
+// c_lit's output, written into one store: the literal's length plus one byte
+// for each `?` that gains a backslash.
+
+lit_fill(string raw, int n) {
+  word ad = alloc(len(raw) + n + 1);
+  int end = lit_run(raw, ad);
+  string out = str_of_mem(ad, end);
+} return string out;
+("a?b", 1):("a\\?b")
+("??", 2):("\\?\\?")
+
+lit_run(string raw, word ad) {
+  int i = 0;
+  int j = 0;
+  while(i < len(raw)) {
+    j = lit_emit(raw, i, ad, j);
+    i = i + lit_width(raw, i);
+  }
+} return int j;
+given lit_buf ("ab", (import lit_ad)):(2)
+given lit_buf ("a?", (import lit_ad)):(3)
+
+// One unit of the literal written at j; the new j. A backslash pair is two
+// bytes as written, a `?` is the two bytes `\?`, anything else is itself.
+lit_emit(string raw, int i, word ad, int j) {
+  poke8(ad + j, charat(raw, i));
+  if(charat(raw, i) == 92) {
+    poke8(ad + j + 1, charat(raw, i + 1));
+  } else if(charat(raw, i) == 63) {
+    poke8(ad + j, 92);
+    poke8(ad + j + 1, 63);
+  }
+} chain (string raw, int i, word ad, int j) {
+  j = j + lit_width(raw, i);
+  if(charat(raw, i) == 63) {
+    j = j + 1;
+  }
+} return int j;
+given lit_buf ("ab", 0, (import lit_ad), 0):(1)
+given lit_buf ("a?", 1, (import lit_ad), 0):(2)

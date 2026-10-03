@@ -162,6 +162,39 @@ cst_expect ct7 6 "editing an exporting function reruns its readers' cases, its s
 cst_build ct8
 cst_expect ct8 0 "a rebuild after all of those"
 
+# A scalar constant initialised by another is folded when it is parsed, so the
+# emitted code for `fb` no longer reads `fa`. A case that reads `fb` must still
+# be keyed on `fa`'s tokens: this edit changes the value it computes, and the
+# cached result would be stale if the key only saw `fb`'s own tokens.
+CSF="$TMP/csf"; mkdir -p "$CSF"
+cat > "$CSF/conf.id" <<'EOF2'
+int fa = 3;
+int fb = (import fa);
+EOF2
+cat > "$CSF/main.id" <<'EOF2'
+rd_fb(int a) {
+  int b = a + (import fb);
+} return int b;
+(1):(4)
+(2):(5)
+
+main(int argc, string[] argv) {
+  print("fold");
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF2
+csf_build() {
+    IDC_CASE_STATS=1 $BIN_IDC "$CSF" -o "$TMP/$1" --no-std >"$TMP/$1.out" 2>&1
+    echo $? > "$TMP/$1.rc"
+    sed -n 's/^idc: cases: \([0-9]*\) total, \([0-9]*\) already passed, \([0-9]*\) to run$/\1 \2 \3/p' "$TMP/$1.out" > "$TMP/$1.st"
+}
+csf_build cf1
+if [ "$(rc_of cf1)" -eq 0 ] && [ "$(cst_runs cf1)" = 4 ]; then ok "a folded constant: a cold build runs every case"; else bad "a folded constant: cold build (rc $(rc_of cf1), stats '$(cat "$TMP/cf1.st")'): $(head -2 "$TMP/cf1.out")"; fi
+sed -i 's/^int fa = 3;/int fa = 5;/; s/(1):(4)/(1):(6)/; s/(2):(5)/(2):(7)/' "$CSF/conf.id" "$CSF/main.id"
+csf_build cf2
+if [ "$(rc_of cf2)" -eq 0 ] && [ "$(cst_runs cf2)" = 2 ]; then ok "a folded constant: editing the constant it was initialised from reruns the cases that read it"; else bad "a folded constant: edit of its source (rc $(rc_of cf2), stats '$(cat "$TMP/cf2.st")'): $(head -2 "$TMP/cf2.out")"; fi
+
 
 echo
 echo "$pass passed, $fail failed"

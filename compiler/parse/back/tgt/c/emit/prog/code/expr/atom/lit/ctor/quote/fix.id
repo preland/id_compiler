@@ -1,0 +1,8 @@
+// A store for lit_run and lit_emit to write into.
+
+lit_buf() {
+  env_init();
+  export word lit_ad = alloc(64);
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

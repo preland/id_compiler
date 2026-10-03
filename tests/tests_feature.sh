@@ -357,6 +357,28 @@ EOF
 self_refuse "bin/idc: a string case compares by content" \
     'test failed: greet("bob") = "hi bob", expected "hello bob"' --emit-c /dev/null
 
+
+# --- a trigraph in a string literal is its three characters ------------------
+cat > "$TMP/p.id" <<'EOF2'
+tag(string s) {
+  string r = s + "??>";
+} return string r;
+("??("):("??(??>")
+("x"):("x??)")
+EOF2
+self_refuse "bin/idc: a case literal and its message keep a trigraph as written" \
+    'test failed: tag("x") = "x??>", expected "x??)"' --emit-c /dev/null
+sed -i 's/"x??)"/"x??>"/' "$TMP/p.id"
+self_accept "bin/idc: a string case holding trigraph sequences passes" --allow-untested --emit-c /dev/null
+cat > "$TMP/p.id" <<'EOF2'
+measure(string s) {
+  int n = len(s);
+} return int n;
+("abcd"):(4)[time:O(n), mem:O(1)]
+("abcdefgh??/"):(11)[time:O(n), mem:O(1)]
+EOF2
+self_accept "bin/idc: a scaling claim sizes a literal ending in a trigraph by its bytes" --emit-c /dev/null
+
 # --- a case that stops on its own is that case failing -----------------------
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
@@ -1373,6 +1395,30 @@ main(int argc, string[] argv) {
 EOF
 self_refuse "bin/idc: a wrapper that reassigns its own local is rejected with the final value" \
     "p.id:1: error: 'last' only returns the constant 2;" --emit-c /dev/null
+
+# A scalar constant may be initialised by another, and a list constant's element
+# may read one: C needs a constant expression at file scope and LLVM needs a load
+# inside @idc_const_init, so each target would otherwise reject a conf.id that
+# builds on the other.
+CDIR="$TMP/cdir"; mkdir -p "$CDIR"
+cat > "$CDIR/conf.id" <<'EOF2'
+int base = 7;
+int again = (import base);
+int[] tbl = [(import base), 2];
+EOF2
+cat > "$CDIR/main.id" <<'EOF2'
+main(int argc, string[] argv) {
+  print("" + (import again) + " " + (import tbl)[0] + " " + (import tbl)[1]);
+} return int 0;
+EOF2
+for tgt in c llvm; do
+    rm -f "$TMP/cout"
+    if ../bin/idc "$CDIR" --allow-untested --target "$tgt" -o "$TMP/cout" >"$TMP/log" 2>&1 && [ "$("$TMP/cout" 2>&1)" = "7 7 2" ]; then
+        ok "bin/idc: constants that read constants build and agree, target $tgt"
+    else
+        bad "bin/idc: constants that read constants build and agree, target $tgt ($(grep -v warning "$TMP/log" | head -1))"
+    fi
+done
 
 # A list a function builds is not a constant: each call builds a fresh list,
 # so one caller's write is invisible to the next call -- a shared conf.id

@@ -21,7 +21,7 @@ size_leaf(int e) {
     string int_code_v = int_code(e);
     so = "(long long)(" + int_code_v + ")";
   } else if(k_of(e) == "str") {
-    so = "(long long)(sizeof(" + s1_of(e) + ") - 1)";
+    so = "(long long)(sizeof(" + c_lit(s1_of(e)) + ") - 1)";
   }
 } return string so;
 given lit_int_fixture ((import lit_e)):("(long long)(5)")

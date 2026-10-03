@@ -32,6 +32,8 @@ chk_bi_arg(int id, int i) {
   string nm = s1_of(id);
   if((nm == "print" || nm == "eprint" || nm == "put") && ty_is_list(t) == 1) {
     tc_err(id, "'" + nm + "' cannot take a list: argument " + i + " is " + t + "; a list has no text form -- write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them");
+  } else if(nm == "put" && ty_known(t) == 1 && t != "string") {
+    tc_err(id, "'put' takes a string, but argument " + i + " is " + t + "; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line");
   }
 } return void;
 given call2_setup ((import cm_push_call), 1):() then check_failed:(0)

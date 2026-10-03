@@ -30,7 +30,7 @@ given shapes_fixture ((import arr_ints)):("id_list_lit(2, (long long)(2), (long 
 import_text(int id) {
   string s = s1_of(id);
   if(k_of(id) == "str") {
-    s = "ID_S(" + s + ")";
+    s = "ID_S(" + c_lit(s) + ")";
   }
   if(k_of(id) == "import" && is_harn() == 1) {
     s = checked_read(s);

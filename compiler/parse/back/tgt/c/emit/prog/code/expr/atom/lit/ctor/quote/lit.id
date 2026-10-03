@@ -1,0 +1,44 @@
+// A string literal's source text as the body of a C string literal. C reads
+// `??>`, `??=`, `??(` and the other trigraphs before it reads anything else, so
+// `print("<??>")` would print `<}`; a `?` is written `\?`, which C reads as the
+// same `?`. A backslash and the character after it are copied as written, so
+// an escape the source already spelled (`\?` included) is never doubled.
+//
+// The compiler's own runtime is a few huge literals full of `?`, and strings
+// are never freed, so the result is built once in a store of exactly the right
+// size (fill.id) rather than one character at a time; a literal with no `?`
+// is returned as it came.
+
+c_lit(string raw) {
+  string out = raw;
+  int n = lit_qcount(raw);
+  if(n > 0) {
+    out = lit_fill(raw, n);
+  }
+} return string out;
+("a"):("a")
+("a?b"):("a\\?b")
+
+// How many `?` the literal holds that no backslash already escapes.
+lit_qcount(string raw) {
+  int n = 0;
+  int i = 0;
+  while(i < len(raw)) {
+    if(charat(raw, i) == 63) {
+      n = n + 1;
+    }
+    i = i + lit_width(raw, i);
+  }
+} return int n;
+("ab"):(0)
+("a?b?"):(2)
+
+// 92 is a backslash: it and the character after it are one unit.
+lit_width(string raw, int i) {
+  int lit_adv = 1;
+  if(charat(raw, i) == 92) {
+    lit_adv = 2;
+  }
+} return int lit_adv;
+("ab", 0):(1)
+("a\\?", 1):(2)

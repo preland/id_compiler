@@ -19,10 +19,11 @@ esc_at(string t, int i) {
 ("ab", 0):("a")
 ("a\"b", 1):("\\\"")
 
-// 92 is a backslash, 34 a double quote, 10 a newline.
+// 92 is a backslash, 34 a double quote, 63 a question mark (a trigraph's
+// lead, which C would read as another character), 10 a newline.
 esc_code(int ch) {
   string so = chr(ch);
-  if(ch == 92 || ch == 34) {
+  if(ch == 92 || ch == 34 || ch == 63) {
     so = "\\" + so;
   } else if(ch == 10) {
     so = "\\n";
@@ -30,3 +31,4 @@ esc_code(int ch) {
 } return string so;
 (97):("a")
 (10):("\\n")
+(63):("\\?")

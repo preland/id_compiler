@@ -26,7 +26,7 @@ given nz_int_big_fixture ((import nz_int_big)):("9999999999LL")
 // prelude.id) as a compound literal, which has static storage there. Every
 // other initialiser is the expression as emitted anywhere.
 file_init(int id) {
-  string s = "ID_SK(" + s1_of(id) + ")";
+  string s = "ID_SK(" + c_lit(s1_of(id)) + ")";
   if(k_of(id) != "str") {
     s = emit_expr(id);
   }

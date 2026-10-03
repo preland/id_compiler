@@ -1,0 +1,11 @@
+// An `(import NAME)` node for each kind of constant the list constants "a"
+// and scalar "b" of lc_dce_setup are, for build/load.id: the element
+// `int[] t = [(import b), (import a)];` would read.
+
+llim_setup() {
+  lc_dce_setup();
+  export int llim_e = node_import("b");
+  export int llim_a = node_import("a");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

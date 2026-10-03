@@ -1,11 +1,13 @@
 // One element as a cell, pushed. An integer or a word is its folded value,
 // written in place, as a scalar constant's is (str/const.id); a string and a
-// float take one instruction each to become a cell, named for the constant
-// and the position (named.id).
+// float take one instruction each to become a cell, named for the constant and
+// the position
+// (named.id); an element that reads another constant is a load of its global
+// (load.id).
 
 ll_init_elem(int i, int j, int e, string pass) {
   string t = elem_type((import etypes)[i]);
-  if(pass == "bytes" && t == "string") {
+  if(pass == "bytes" && t == "string" && k_of(e) != "import") {
     ll_elem_bytes(i, j, e);
   }
   if(pass == "build") {
@@ -23,10 +25,17 @@ given elems3_fixture (0, 0, (import llie_child), "int"):() then prints:("  call 
 given elems3_fixture (2, 0, (import llie_child), "int"):() then prints:("  call void @id_list_push(ptr %c2, i64 1)\n")
 
 ll_cell(int i, int j, int e, string t) {
-  string cell = ll_const_num(e);
-  if(t == "string" || t == "float") {
+  string cell = "";
+  if(k_of(e) == "import") {
+    cell = ll_cell_load(i, j, e);
+  } else if(t == "string" || t == "float") {
     cell = ll_cell_named(i, j, e, t);
   }
+} chain (int i, int j, int e, string t) {
+  if(cell == "") {
+    cell = ll_const_num(e);
+  }
 } return string cell;
+given llim_setup (0, 1, (import llim_e), "int"):("%s0.1") then prints:("  %l0.1 = load i32, ptr @b\n  %s0.1 = sext i32 %l0.1 to i64\n")
 given llc_int_setup (0, 0, (import llc_int_e), "int"):("5")
 given llc_str_setup (0, 3, (import llc_str_e), "string"):("%s0.3")

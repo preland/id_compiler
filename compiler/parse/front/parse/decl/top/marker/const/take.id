@@ -41,7 +41,8 @@ take_const(int[] pos) {
   int ctok_first = pos[0];
   int parse_decl_v = parse_decl(pos);
 } chain (int[] pos) {
-  reg_const(parse_decl_v, ctok_first, tok_end(pos[0]));
+  int fold_v = fold_const(parse_decl_v);
+  reg_const(fold_v, ctok_first, tok_end(pos[0]));
 } return void;
 given decl_tokens ([9]):([14]) then ctok_span:(4)
 given decl_tokens ([9]):([14]) then check_failed:(1)

@@ -1,0 +1,4 @@
+// EXPECT: 'put' takes a string, but argument 0 is float; write put("" + x)
+main(int argc, string[] argv) {
+  put(2.5);
+} return int 0;

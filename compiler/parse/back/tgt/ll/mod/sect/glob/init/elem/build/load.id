@@ -1,0 +1,39 @@
+// An element that reads another constant, as in `int[] t = [(import base), 2];`,
+// is a load of that constant's global, not the bare name: `i64 base` is not a
+// value, and llvm-as refused it. The list's initialiser runs in
+// @idc_const_init, a function, so a load is legal there -- which a global's own
+// initialiser is not (mod/sect/str/const.id), and why a scalar constant that
+// reads another is folded at parse time instead (front/parse/decl/top/marker/
+// const/fold.id). The load has the type the constant was declared with, and is
+// then made the i64 every cell is: widened, boxed or taken as an address.
+
+ll_cell_load(int i, int j, int e) {
+  string nm = "%s" + i + "." + j;
+  string name = s1_of(e);
+  string t = s1_of(const_decl(name));
+} chain (int i, int j, int e) {
+  emit_line("  %l" + i + "." + j + " = load " + ll_ty(t) + ", ptr @" + name);
+  emit_line("  " + nm + " = " + ll_cell_conv(t, "%l" + i + "." + j));
+} return string nm;
+given llim_setup (0, 1, (import llim_e)):("%s0.1") then prints:("  %l0.1 = load i32, ptr @b\n  %s0.1 = sext i32 %l0.1 to i64\n")
+given llim_setup (2, 0, (import llim_a)):("%s2.0") then prints:("  %l2.0 = load ptr, ptr @a\n  %s2.0 = ptrtoint ptr %l2.0 to i64\n")
+
+ll_cell_conv(string t, string ll_val_s) {
+  string insn = ll_cell_conv2(t, ll_val_s);
+  if(t == "float") {
+    insn = "call i64 @id_box_f(double " + ll_val_s + ")";
+  }
+} return string insn;
+("float", "%v"):("call i64 @id_box_f(double %v)")
+("word", "%v"):("add i64 %v, 0")
+
+ll_cell_conv2(string t, string ll_val_s) {
+  string insn = "add i64 " + ll_val_s + ", 0";
+  if(t == "int") {
+    insn = "sext i32 " + ll_val_s + " to i64";
+  } else if(t != "word") {
+    insn = "ptrtoint ptr " + ll_val_s + " to i64";
+  }
+} return string insn;
+("int", "%v"):("sext i32 %v to i64")
+("string", "%v"):("ptrtoint ptr %v to i64")

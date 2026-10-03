@@ -1,0 +1,18 @@
+// The constants fold.id reads, registered the way lc_reg does: an int `a`
+// whose initialiser is fold_e, an int[] `ls`, an `(import a)` and a declaration
+// `b` that reads it, and an `(import zz)` that names no constant.
+
+fold_setup() {
+  lc_env();
+  export int fold_e = node_int("5", 5, 0);
+  export int fold_a = lc_reg("int", "a", (import fold_e));
+} chain () {
+  export int fold_imp = node_import("a");
+  export int fold_dep = node_decl("int", "b", (import fold_imp), 1);
+  export int fold_unk = node_import("zz");
+} chain () {
+  export int fold_arr = node_arr([(import fold_e)]);
+  export int fold_ls = lc_reg("int[]", "ls", (import fold_arr));
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

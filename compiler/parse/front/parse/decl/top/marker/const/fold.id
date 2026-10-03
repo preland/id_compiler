@@ -1,0 +1,45 @@
+// A scalar constant initialised by `(import other)` is folded at parse time:
+// the import is replaced by the initialiser of the earlier scalar constant it
+// names, so `int b = (import a);` is written as `int b = <a's initialiser>;`.
+// C and LLVM both need a file-scope initialiser to be a constant expression,
+// and a read of another global is not one.
+//
+// The declaration is rebuilt rather than edited, since a node's fields are
+// never written after it is made. The old import node stays inside this
+// constant's node range, which is what the case cache reads the constant's
+// edges from (mid/form/unique/dump/digest/graph/build/consts/edges.id), so a
+// case reaching `b` is still keyed on `a`'s tokens even though `b` no longer
+// reads `a` in the emitted code. A list constant is not folded: its
+// initialiser runs in idc_const_init, where a read of a global is fine.
+
+fold_const(int d) {
+  int fold_src = const_src(i1_of(d));
+  int fold_out = d;
+  if(fold_src >= 0) {
+    fold_out = node_decl(s1_of(d), s2_of(d), i1_of(fold_src), 1);
+  }
+} return int fold_out;
+given fold_setup ((import fold_dep)):(7) then calls node_decl:("int", "b", (import fold_e), 1)
+given fold_setup ((import fold_a)):((import fold_a))
+
+const_src(int e) {
+  int fold_src = 0 - 1;
+  if(k_of(e) == "import") {
+    fold_src = const_find(s1_of(e));
+  }
+} return int fold_src;
+given fold_setup ((import fold_imp)):((import fold_a))
+given fold_setup ((import fold_e)):(-1)
+
+const_find(string name) {
+  int fold_src = 0 - 1;
+  int i = 0;
+  while(i < len((import cdecl))) {
+    if(s2_of((import cdecl)[i]) == name && ty_is_list(s1_of((import cdecl)[i])) == 0) {
+      fold_src = (import cdecl)[i];
+    }
+    i = i + 1;
+  }
+} return int fold_src;
+given fold_setup ("a"):((import fold_a))
+given fold_setup ("ls"):(-1)
