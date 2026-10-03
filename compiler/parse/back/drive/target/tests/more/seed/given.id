@@ -45,5 +45,5 @@ seed_thens() {
     ti = ti + 1;
   }
 } return void;
-given seed_then_fixture_bad ():() then rfn_len:(2)
-given seed_then_fixture ():() then rfn_len:(3)
+given then_node_fixture given seed_then_fixture((import fixture_then_bad)) ():() then rfn_len:(2)
+given then_node_fixture given seed_then_fixture((import fixture_then_node)) ():() then rfn_len:(3)

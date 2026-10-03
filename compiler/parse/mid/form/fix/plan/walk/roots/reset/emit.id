@@ -27,12 +27,7 @@ given fix_fixture ():() then init_units:(0)
 // observed through a reader of it -- fix_sep_at and fix_mark_sep
 // (../../../decide/touch/sep.id) are what this one is for.
 fixe_sep_count() {
-  int n = 0;
-  int i = 0;
-  while(i < len((import fixe_sep))) {
-    n = n + (import fixe_sep)[i];
-    i = i + 1;
-  }
+  int n = lst_sum((import fixe_sep));
 } return int n;
 given fix_fixture ():(0)
 given fix_touch_fixture ():(0)

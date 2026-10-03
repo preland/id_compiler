@@ -1,8 +1,7 @@
 // connect_serial's own export, reduced to a sign, the same way
 // setup/paths/fix.id's qa_check_qmph reduces connect_qmp's.
 qa_check_serh() {
-  int qa_v = (import qm_serh);
-  int qa_ok = qa_v >= 0;
+  int qa_ok = (import qm_serh) >= 0;
 } return int qa_ok;
 given qa_both_ready given connect_qmp given connect_serial ():(1) then qa_check_nc1:(1)
 given qa_both_ready given connect_qmp given connect_serial ():(1) then qa_check_nc1:(1) then qa_check_serh:(1)

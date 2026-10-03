@@ -13,7 +13,7 @@
 // A constant has no declaring function, so it is kept when the code that is
 // emitted reads it (clive, live/mark.id) -- in the harness as well, where the
 // code is the narrowed functions and the cases.
-// The loose-duplicate canon (mid/form/decomp/checks/loose/)'s own env and
+// The fingerprint canon (mid/form/unique/canon/)'s own env and
 // id 0: a "str" leaf -- uq_begin resets the position map canon_var/
 // canon_callee/canon_param read, which env_init's own chain never reaches.
 lz_a() {

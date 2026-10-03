@@ -24,11 +24,14 @@ given lwo_fixture ((import lwo_w)):(-1)
 given lwo_fixture ((import lwo_z)):(-1)
 given lwo_fixture ((import lwo_w2)):(7)
 
-lw_drop(int old) {
+lw_drop(int old, string nm) {
+  string freer = "";
   if(old >= 0) {
-    lw_callf("id_list_free", "", [old]);
+    freer = esc_free_fn(esc_cur(), nm);
+    lw_callf(freer, "", [old]);
   }
 } return void;
-given lw_fixture (7):() then calls lw_callf:("id_list_free", "", [7])
-given lw_fixture (-1):() then calls lw_callf:[0]
-given lw_fixture (0):() then calls lw_callf:("id_list_free", "", [0])
+given lw_fixture (7, "w"):() then calls lw_callf:("id_list_free", "", [7])
+given lw_fixture (-1, "w"):() then calls lw_callf:[0]
+given lw_fixture (0, "w"):() then calls lw_callf:("id_list_free", "", [0])
+given lwd_fixture (5, "a"):() then calls lw_callf:("id_list_free_deep", "", [5])

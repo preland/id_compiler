@@ -21,10 +21,7 @@ given env_init ():() then check_failed:(0)
 given env_init ():() then init_units:(0)
 
 tcache_has(int id) {
-  int ok = 0;
-  if(id < len((import tcache_ok))) {
-    ok = (import tcache_ok)[id];
-  }
+  int ok = lst_get_or((import tcache_ok), id, 0);
 } return int ok;
 given tcache_hit_fixture (0):(1)
 given env_init (0):(0)

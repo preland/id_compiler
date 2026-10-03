@@ -1,8 +1,5 @@
 fix_rcache_find_at(int ix) {
-  string name = "";
-  if(ix >= 0) {
-    name = (import fixd_rn)[ix];
-  }
+  string name = lst_str_get_or((import fixd_rn), ix, "");
 } return string name;
 given fix_fixture (-1):("")
 given fix_rcache_find_at_fixture (0):("cached")

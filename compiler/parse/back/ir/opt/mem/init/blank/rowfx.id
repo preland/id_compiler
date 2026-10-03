@@ -32,12 +32,7 @@ given m2r_outv_fixture ():(-1)
 // A row of its own: two nested loops are already at the nesting limit, so
 // the inner one cannot also sit in outv_sum.
 outv_row_sum(int i) {
-  int n = 0;
-  int j = 0;
-  while(j < len((import outv)[i])) {
-    n = n + (import outv)[i][j];
-    j = j + 1;
-  }
+  int n = lst_sum((import outv)[i]);
 } return int n;
 given m2r_row_fixture (0):(0)
 given m2r_outv_fixture (0):(-1)

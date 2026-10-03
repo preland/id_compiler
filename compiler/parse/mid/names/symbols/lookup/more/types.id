@@ -3,19 +3,13 @@
 // when the index missed.
 
 vtype_at(int idx) {
-  string t = "";
-  if(idx >= 0) {
-    t = (import vtypes)[idx];
-  }
+  string t = lst_str_get_or((import vtypes), idx, "");
 } return string t;
 given fcall_reg_b (0):("func(int) return int")
 given neg1_setup ((import neg1)):("")
 
 fret_at(int idx) {
-  string t = "";
-  if(idx >= 0) {
-    t = (import frets)[idx];
-  }
+  string t = lst_str_get_or((import frets), idx, "");
 } return string t;
 given argfn_d (0):("int")
 given neg1_setup ((import neg1)):("")

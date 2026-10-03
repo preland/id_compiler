@@ -1,0 +1,13 @@
+// A *.id file name (lay_file_kind: not conf.id, not backend.id, not a
+// directory), pushed onto the list `kf_dst` -- what lay_count_file_entry
+// (rule/dir/entrylimit/count.id) does onto lay_scratch_names and
+// lay_ns_collect_file (rule/dir/numbered/collect/entry.id) onto lay_ns_files.
+lay_keep_file(string[] kf_dst, int[] kf_buf, int kf_lo, int kf_hi) {
+  string kf_name = lay_name_of(kf_buf, kf_lo, kf_hi);
+  int kf_kind = lay_file_kind(kf_name);
+  if(kf_kind != 0 && kf_kind != 1 && kf_kind != 5) {
+    push(kf_dst, kf_name);
+  }
+} return void;
+([], [99, 111, 110, 102, 46, 105, 100], 0, 7):([])
+([], [109, 46, 105, 100], 0, 4):(["m.id"])

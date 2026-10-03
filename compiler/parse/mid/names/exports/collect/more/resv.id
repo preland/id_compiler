@@ -20,8 +20,16 @@ given init_resv_names ("cd", 0):(3)
 // one rejected that was fine, fails immediately in the checks that read this
 // table. A reader would be a second witness to something already unmissable.
 push_resv_name(string src, int i, int e) {
-  string slice_v = slice(src, i, e);
-  push((import resv_names), slice_v);
+  push_slice((import resv_names), src, i, e);
 } return void;
 given init_resv_names ("xyz", 0, 3):() then resv_names_last:("xyz")
 given init_resv_names ("wxyz", 2, 4):() then resv_names_last:("yz")
+
+// src[i..e] pushed onto a list: what push_resv_name and push_bname
+// (../../extern/builtin/more/type.id) do, each onto its own table.
+push_slice(string[] ps_dst, string ps_src, int ps_i, int ps_e) {
+  string ps_cut = slice(ps_src, ps_i, ps_e);
+  push(ps_dst, ps_cut);
+} return void;
+(["a"], "xyz", 0, 2):(["a", "xy"])
+([], "wxyz", 2, 4):(["yz"])

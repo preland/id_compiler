@@ -2,14 +2,7 @@
 // cases: how many functions have a key, are skipped, raised a diagnostic.
 
 tk_nkeys() {
-  int tkn = 0;
-  int tki = 0;
-  while(tki < len((import tkkey))) {
-    if((import tkkey)[tki] != "") {
-      tkn = tkn + 1;
-    }
-    tki = tki + 1;
-  }
+  int tkn = lst_str_filled((import tkkey));
 } return int tkn;
 given tk_t_prep ():(2)
 given tk_t_prep0 ():(0)

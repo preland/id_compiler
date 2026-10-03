@@ -22,10 +22,7 @@ given mk_two_toks (0, 0, 1):(1)
 given mk_two_toks (0, 1, 1):(0)
 
 tok_same(int i, int j) {
-  int r = 0;
-  if((import ttext)[i] == (import ttext)[j]) {
-    r = 1;
-  }
+  int r = lst_str_same_at((import ttext), i, j);
 } return int r;
 given mk_two_toks (0, 0):(1)
 given mk_two_toks (0, 1):(0)

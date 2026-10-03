@@ -1,9 +1,6 @@
 // One entry of `casefn` against one function node.
 case_hit(int i, int node) {
-  int n = 0;
-  if((import casefn)[i] == node) {
-    n = 1;
-  }
+  int n = lst_is_at((import casefn), i, node);
 } return int n;
 given wrap_fixture ((import fixture_ci), (import fixture_fn)):(1)
 given wrap_fixture ((import fixture_ci), (import fixture_zero)):(0)

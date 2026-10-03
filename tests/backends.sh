@@ -47,7 +47,8 @@ fi
 be_abs() {
     case "$1" in
         fs)     printf '%s' "$STD/sys/io/fs" ;;
-        proc|sock) printf '%s' "$STD/sys/io/ipc/$1" ;;
+        proc) printf '%s' "$STD/sys/io/ipc/proc/be" ;;
+        sock) printf '%s' "$STD/sys/io/ipc/sock" ;;
         gfx|gl) printf '%s' "$STD/sys/win/$1" ;;
     esac
 }

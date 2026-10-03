@@ -1,0 +1,14 @@
+// One cell of a per-struct table (struct/facts/field.id): field `sd_k`'s entry
+// in a table with a row per struct, or "" when the struct or the field is not
+// there. sd_fname_at and sd_ftype_at are this over the name table and the type
+// table.
+
+sd_cell(string[][] sd_tab, string sd_s, int sd_k) {
+  int sd_i = sd_find(sd_s);
+  string s = "";
+  if(sd_i >= 0 && sd_k >= 0 && sd_k < sd_nfields(sd_s)) {
+    s = sd_tab[sd_i][sd_k];
+  }
+} return string s;
+given sd_pair ((import sdfname), "P", 1):("y")
+given sd_pair ((import sdftype), "Q", 0):("string")

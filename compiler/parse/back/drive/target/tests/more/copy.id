@@ -22,15 +22,15 @@ keep_strs(string[] strs, string[] names) {
 (["a", "b"], []):(["a", "b"], ["a", "b"])
 ([], ["z"]):([], ["z"])
 
-// A single node in thennode (given.id's own seed_thens), naming a real
-// function (then_node_fixture's fixture_then_node, s1 = "fx_target") so
-// reach_add's fnames guard passes and rfn_len can see the loop ran. Filed
-// here (an unrelated list-copy step) because tests/more/seed/ is at its
-// 3-file cap.
-seed_then_fixture() {
-  then_node_fixture();
+// A single node in thennode (given.id's own seed_thens), after
+// then_node_fixture: given the node it names -- then_node_fixture's
+// fixture_then_node (s1 = "fx_target") passes reach_add's fnames guard so
+// rfn_len can see the loop ran, and its fixture_then_bad names no function in
+// the build, so the guard must block it. Filed here (an unrelated list-copy
+// step) because tests/more/seed/ is at its 3-file cap.
+seed_then_fixture(int stf_node) {
   init_reach();
-  push((import thennode), (import fixture_then_node));
+  push((import thennode), stf_node);
 } return void;
-():() then check_failed:(0)
-():() then rfn_len:(2)
+given then_node_fixture (0):() then check_failed:(0)
+given then_node_fixture (1):() then rfn_len:(2)

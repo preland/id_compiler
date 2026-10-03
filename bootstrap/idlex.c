@@ -62,44 +62,19 @@ static size_t id_mul_check(size_t a, size_t b, const char* what) {
     }
     return a * b;
 }
-/* String lengths, remembered.
-   A `string` is a NUL-terminated char*, so its length is a strlen -- and every
-   id program walks text with charat, which needs the length to know where the
-   end is. One remembered length made a single scan O(n) instead of O(n^2). It
-   did not make *two* scans O(n): a parser that reads its input and builds a
-   string alternates between two pointers, misses the memo on every call, and
-   pays a strlen of the whole input per character. Measured on an OpenDocument
-   content.xml, that was 46.8 seconds for 3.5 MB.
-   So the memo holds several. ID_LEN_MEMO is the number of strings that may be
-   walked at once before the cost comes back; eight covers a parser reading one
-   input while building a name and comparing against a keyword, with room over.
-   Raising it costs one pointer comparison per miss.
-   The real answer is a string that carries its own length, which would remove
-   the question rather than bound it -- and which means changing how a literal
-   is emitted, so it is a decision about the language rather than about this
-   file. See docs/FRICTION.md. */
-#define ID_LEN_MEMO 8
-static const char* id_lm_s[ID_LEN_MEMO];
-static size_t id_lm_n[ID_LEN_MEMO];
-static unsigned id_lm_at = 0;
-static size_t id_slen(const char* s) {
-    unsigned i;
-    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == s) return id_lm_n[i];
-    i = id_lm_at;
-    id_lm_at = (id_lm_at + 1) % ID_LEN_MEMO;
-    id_lm_s[i] = s;
-    id_lm_n[i] = strlen(s);
-    return id_lm_n[i];
-}
-/* A block that realloc releases may be reused by a later string at the same
-   address, so its entry has to go -- only its own: the remembered lengths of
-   every other string stay valid across list growth. An entry is dropped even
-   when the block grew in place, because a block that changed is no longer the
-   string that was measured. */
-static void id_lm_forget(const void* p) {
-    unsigned i;
-    for (i = 0; i < ID_LEN_MEMO; i++) if (id_lm_s[i] == (const char*)p) id_lm_s[i] = NULL;
-}
+/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte
+   count stored in the size_t just before them, so id_slen is one load: no
+   strlen and no memo. A string an id program holds is made one of three ways,
+   and each writes that count: id_str_new/id_str_from below (every runtime
+   allocator), ID_S (a literal in emitted code, counted to its first NUL, which
+   is where a strlen stopped), and id_str_of_cstr (a C string from the host,
+   such as argv). A native that only reads a `const char*` is unaffected,
+   because the bytes and their NUL are where they always were; one that
+   returns a string must build it with id_str_from. A NUL never enters a string
+   through any of these but a literal's `\0`, which ends the literal there. */
+static size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }
+#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })
+#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)
 void* id_alloc(size_t n) {
     IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), "alloc"));
     if (!h) { fprintf(stderr, "id: out of memory (%zu bytes)\n", n); exit(1); }
@@ -112,10 +87,23 @@ static void* id_realloc(void* p, size_t n) {
     id_arena_unlink(h);
     IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), "realloc"));
     if (!nh) { fprintf(stderr, "id: out of memory (%zu bytes)\n", n); exit(1); }
-    id_lm_forget(p);
     id_arena_link(nh);
     return (void*)(nh + 1);
 }
+/* The one place a heap string is born: n bytes, the count in front, the NUL after. */
+static char* id_str_new(size_t n) {
+    char* r = (char*)id_alloc(id_add_check(id_add_check(n, sizeof(size_t), "string"), 1, "string"));
+    *(size_t*)(void*)r = n;
+    r += sizeof(size_t);
+    r[n] = '\0';
+    return r;
+}
+static char* id_str_from(const char* p, size_t n) {
+    char* r = id_str_new(n);
+    memcpy(r, p, n);
+    return r;
+}
+char* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }
 
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
@@ -184,6 +172,11 @@ static void id_list_free(IdList* L) {
     id_block_free(L->data);
     id_block_free(L);
 }
+static void id_list_free_deep(IdList* L) {
+    if (!L) return;
+    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }
+    id_list_free(L);
+}
 static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }
 static void id_list_mut_check(IdList* L) {
     if (L->cap < 0) {
@@ -244,18 +237,17 @@ static double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }
 static int id_to_int(const char* s) { return atoi(s); }
 
 static char* id_concat(const char* a, const char* b) {
-    size_t la = strlen(a), lb = strlen(b);
-    size_t n = id_add_check(id_add_check(la, lb, "concat"), 1, "concat");
-    char* r = (char*)id_alloc(n);
+    size_t la = id_slen(a), lb = id_slen(b);
+    char* r = id_str_new(id_add_check(la, lb, "concat"));
     memcpy(r, a, la);
-    memcpy(r + la, b, lb + 1);
+    memcpy(r + la, b, lb);
     return r;
 }
 static char* id_str_of_int(int x) {
-    char* r = (char*)id_alloc(32); snprintf(r, 32, "%d", x); return r;
+    char b[32]; int n = snprintf(b, sizeof b, "%d", x); return id_str_from(b, (size_t)n);
 }
 static char* id_str_of_word(long long x) {
-    char* r = (char*)id_alloc(32); snprintf(r, 32, "%lld", x); return r;
+    char b[32]; int n = snprintf(b, sizeof b, "%lld", x); return id_str_from(b, (size_t)n);
 }
 
 /* ---- word arithmetic with no undefined behaviour ------------------------
@@ -413,19 +405,16 @@ static char* id_str_of_mem(long long addr, long long n) {
     if (n < 0) id_trap("negative length");
     unsigned char* p = id_at(addr, n);
     if (memchr(p, 0, (size_t)n)) id_trap("a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
-    char* r = (char*)id_alloc((size_t)n + 1);
-    memcpy(r, p, (size_t)n);
-    r[n] = '\0';
-    return r;
+    return id_str_from((const char*)p, (size_t)n);
 }
 static long long id_mem_of_str(const char* s) {
-    size_t n = strlen(s);
+    size_t n = id_slen(s);
     long long a = id_mem_alloc((long long)n + 1);
     memcpy(id_store + a, s, n + 1);
     return a;
 }
 static char* id_str_of_float(double x) {
-    char* r = (char*)id_alloc(64); snprintf(r, 64, "%g", x); return r;
+    char b[64]; int n = snprintf(b, sizeof b, "%g", x); return id_str_from(b, (size_t)n);
 }
 static void id_print(const char* s) { puts(s); }
 static char* id_input(void) {
@@ -436,18 +425,19 @@ static char* id_input(void) {
     buf[got] = '\0';
     if (memchr(buf, 0, got)) id_trap("a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
     if (got == 0) {
-        char* e = (char*)id_alloc(1); e[0] = '\0'; return e;
+        return id_str_new(0);
     }
     size_t n = strlen(buf);
     if (n > 0 && buf[n - 1] == '\n') { buf[--n] = '\0'; }
-    char* r = (char*)id_alloc(n + 1); memcpy(r, buf, n + 1); return r;
+    return id_str_from(buf, n);
 }
 static char* id_read_all(void) {
-    /* slurp all of stdin into one string (grows as needed) */
-    size_t cap = 4096, n = 0;
+    /* slurp all of stdin into one string (grows as needed); the count goes
+       in the block's first word, so the bytes are read in place after it */
+    size_t cap = 4096, n = 0, h = sizeof(size_t);
     char* r = (char*)id_alloc(cap);
     for (;;) {
-        if (n + 1 >= cap) {
+        if (h + n + 1 >= cap) {
             if (cap > SIZE_MAX / 2) {
                 fprintf(stderr, "id: allocation size overflow (read_all)\n");
                 exit(1);
@@ -455,24 +445,19 @@ static char* id_read_all(void) {
             cap *= 2;
             r = (char*)id_realloc(r, cap);
         }
-        size_t got = fread(r + n, 1, cap - n - 1, stdin);
+        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);
         n += got;
         if (got == 0) break;
     }
+    r += h;
     if (memchr(r, 0, n)) id_trap("a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
+    ((size_t*)(void*)r)[-1] = n;
     r[n] = '\0';
     return r;
 }
 static int id_len(const char* s) { return (int)id_slen(s); }
-/* charat's bounds check used to be a strlen per character, which makes walking
-   a string O(n^2) -- and walking a string with charat is how every id program
-   reads text, because there is no substr and no file I/O. Lexing a 128 KB
-   source took 378 ms; with the length of the last string remembered it takes
-   12 ms, and the answer is the same.
-   The memo is keyed on the pointer, which is sound because an id string is
-   immutable and its block is never released before exit. The one place a block
-   can be released early is id_realloc (list growth), whose freed address could
-   later be handed to a new string -- so it drops the entry for the block it releases. */
+/* charat's bounds check is one load of the stored length, so walking a string
+   is O(n) however many strings are walked at once. */
 static int id_charat(const char* s, int i) {
     if (i < 0) return -1;
     if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */
@@ -480,9 +465,8 @@ static int id_charat(const char* s, int i) {
 }
 static char* id_chr(int code) {
     if ((char)code == 0) id_trap("a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data");
-    char* r = (char*)id_alloc(2);
-    r[0] = (char)code; r[1] = '\0';
-    return r;
+    char c = (char)code;
+    return id_str_from(&c, 1);
 }
 
 /* real-time terminal I/O: write without a newline, flush, poll a single key
@@ -711,7 +695,7 @@ int id_is_alnum(int c) {
 int id_is_kw(char* w) {
     int ok;
     ok = 0;
-    if (((((((((((((((((((((((((((strcmp(w, "int") == 0) || (strcmp(w, "float") == 0)) || (strcmp(w, "string") == 0)) || (strcmp(w, "void") == 0)) || (strcmp(w, "if") == 0)) || (strcmp(w, "else") == 0)) || (strcmp(w, "while") == 0)) || (strcmp(w, "return") == 0)) || (strcmp(w, "export") == 0)) || (strcmp(w, "import") == 0)) || (strcmp(w, "word") == 0)) || (strcmp(w, "asm") == 0)) || (strcmp(w, "native") == 0)) || (strcmp(w, "given") == 0)) || (strcmp(w, "then") == 0)) || (strcmp(w, "func") == 0)) || (strcmp(w, "prints") == 0)) || (strcmp(w, "eprints") == 0)) || (strcmp(w, "calls") == 0)) || (strcmp(w, "chain") == 0)) || (strcmp(w, "blank") == 0)) || (strcmp(w, "break") == 0)) || (strcmp(w, "stdin") == 0)) || (strcmp(w, "traps") == 0)) || (strcmp(w, "timeout") == 0)) || (strcmp(w, "struct") == 0))) {
+    if (((((((((((((((((((((((((((strcmp(w, ID_S("int")) == 0) || (strcmp(w, ID_S("float")) == 0)) || (strcmp(w, ID_S("string")) == 0)) || (strcmp(w, ID_S("void")) == 0)) || (strcmp(w, ID_S("if")) == 0)) || (strcmp(w, ID_S("else")) == 0)) || (strcmp(w, ID_S("while")) == 0)) || (strcmp(w, ID_S("return")) == 0)) || (strcmp(w, ID_S("export")) == 0)) || (strcmp(w, ID_S("import")) == 0)) || (strcmp(w, ID_S("word")) == 0)) || (strcmp(w, ID_S("asm")) == 0)) || (strcmp(w, ID_S("native")) == 0)) || (strcmp(w, ID_S("given")) == 0)) || (strcmp(w, ID_S("then")) == 0)) || (strcmp(w, ID_S("func")) == 0)) || (strcmp(w, ID_S("prints")) == 0)) || (strcmp(w, ID_S("eprints")) == 0)) || (strcmp(w, ID_S("calls")) == 0)) || (strcmp(w, ID_S("chain")) == 0)) || (strcmp(w, ID_S("blank")) == 0)) || (strcmp(w, ID_S("break")) == 0)) || (strcmp(w, ID_S("stdin")) == 0)) || (strcmp(w, ID_S("traps")) == 0)) || (strcmp(w, ID_S("timeout")) == 0)) || (strcmp(w, ID_S("struct")) == 0))) {
         ok = 1;
     }
     return ok;
@@ -719,9 +703,9 @@ int id_is_kw(char* w) {
 
 char* id_kindof(char* w) {
     char* kind;
-    kind = "ident";
+    kind = ID_S("ident");
     if (id_is_kw(w)) {
-        kind = "kw";
+        kind = ID_S("kw");
     }
     return kind;
 }
@@ -794,7 +778,7 @@ int id_scan_block(char* src, int i) {
 
 int id_block_tok(char* src, int i) {
     int e;
-    id_print("op /*");
+    id_print(ID_S("op /*"));
     e = id_skip_block(src, (i + 2));
     return e;
 }
@@ -811,7 +795,7 @@ int id_skip_block(char* src, int i) {
 void id_bump_line(void) {
 IdList* idsq_17;
     (idsq_17 = lexline, id_lset(idsq_17, 0, ((int)(id_list_get(lexline, 0)) + 1)));
-    id_print(id_concat("line ", id_str_of_int((int)(id_list_get(lexline, 0)))));
+    id_print(id_concat(ID_S("line "), id_str_of_int((int)(id_list_get(lexline, 0)))));
     return;
 }
 
@@ -826,7 +810,7 @@ void id_span_out(char* src, int i, int ni) {
     int b;
     if ((((int)(id_list_get(lexcols, 0)) == 1) && (id_is_lcomment(src, i) == 0))) {
         b = (int)(id_list_get(lexbol, 0));
-        id_print(id_concat("span ", id_str_of_int(((((i - b) * 65536) + ni) - b))));
+        id_print(id_concat(ID_S("span "), id_str_of_int(((((i - b) * 65536) + ni) - b))));
     }
     return;
 }
@@ -927,9 +911,9 @@ int id_num_end(char* src, int i, int e) {
 
 char* id_numkind(int e, int fe) {
     char* kind;
-    kind = "int";
+    kind = ID_S("int");
     if ((fe > e)) {
-        kind = "float";
+        kind = ID_S("float");
     }
     return kind;
 }
@@ -992,17 +976,17 @@ char* id_udec(long long v) {
     char* s;
     long long umod_v;
     hi = id_udiv((long long)(v), (long long)(10000000000LL));
-    s = id_concat("", id_str_of_word(v));
+    s = id_concat(ID_S(""), id_str_of_word(v));
     if ((hi != 0)) {
         umod_v = id_umod((long long)(v), (long long)(10000000000LL));
-        s = id_concat(id_concat("", id_str_of_word(hi)), id_pad10(id_concat("", id_str_of_word(umod_v))));
+        s = id_concat(id_concat(ID_S(""), id_str_of_word(hi)), id_pad10(id_concat(ID_S(""), id_str_of_word(umod_v))));
     }
     return s;
 }
 
 char* id_pad10(char* s) {
     while ((id_len(s) < 10)) {
-        s = id_concat("0", s);
+        s = id_concat(ID_S("0"), s);
     }
     return s;
 }
@@ -1010,7 +994,7 @@ char* id_pad10(char* s) {
 void id_print_uint(long long v) {
     char* text;
     text = id_udec(v);
-    id_print(id_concat("int ", text));
+    id_print(id_concat(ID_S("int "), text));
     return;
 }
 
@@ -1058,7 +1042,7 @@ void id_lex_setup(int argc, IdList* argv) {
 void id_lex_cols(int argc, IdList* argv) {
     int on;
     on = 0;
-    if (((argc > 1) && (strcmp((char*)(intptr_t)(id_list_get(argv, 1)), "--cols") == 0))) {
+    if (((argc > 1) && (strcmp((char*)(intptr_t)(id_list_get(argv, 1)), ID_S("--cols")) == 0))) {
         on = 1;
     }
     lexcols = id_list_lit(1, (long long)(on));
@@ -1077,7 +1061,7 @@ int id_is_lcomment(char* src, int i) {
 int id_main(int argc, IdList* argv) {
     id_lex_setup(argc, argv);
     id_lex_all();
-    id_print("eof");
+    id_print(ID_S("eof"));
     return 0;
 }
 
@@ -1125,9 +1109,9 @@ void id_scan_op_out(char* src, int i, char* two) {
     char* one;
     one = id_one_at(src, i);
     if (id_is_two_op(two)) {
-        id_print(id_concat("op ", two));
+        id_print(id_concat(ID_S("op "), two));
     } else {
-        id_print(id_concat("op ", one));
+        id_print(id_concat(ID_S("op "), one));
     }
     return;
 }
@@ -1135,7 +1119,7 @@ void id_scan_op_out(char* src, int i, char* two) {
 int id_is_two_op(char* two) {
     int ok;
     ok = 0;
-    if (((((((((strcmp(two, "==") == 0) || (strcmp(two, "!=") == 0)) || (strcmp(two, "<=") == 0)) || (strcmp(two, ">=") == 0)) || (strcmp(two, "&&") == 0)) || (strcmp(two, "||") == 0)) || (strcmp(two, "<<") == 0)) || (strcmp(two, ">>") == 0))) {
+    if (((((((((strcmp(two, ID_S("==")) == 0) || (strcmp(two, ID_S("!=")) == 0)) || (strcmp(two, ID_S("<=")) == 0)) || (strcmp(two, ID_S(">=")) == 0)) || (strcmp(two, ID_S("&&")) == 0)) || (strcmp(two, ID_S("||")) == 0)) || (strcmp(two, ID_S("<<")) == 0)) || (strcmp(two, ID_S(">>")) == 0))) {
         ok = 1;
     }
     return ok;
@@ -1164,7 +1148,7 @@ int id_scan_op(char* src, int i) {
 void id_scan_ident_out(char* ident) {
     char* kind;
     kind = id_kindof(ident);
-    id_print(id_concat(id_concat(kind, " "), ident));
+    id_print(id_concat(id_concat(kind, ID_S(" ")), ident));
     return;
 }
 
@@ -1173,7 +1157,7 @@ void id_scan_num_out(char* src, int i, int e, int fe) {
     char* text;
     kind = id_numkind(e, fe);
     text = id_slice_str(src, i, fe);
-    id_print(id_concat(id_concat(kind, " "), text));
+    id_print(id_concat(id_concat(kind, ID_S(" ")), text));
     return;
 }
 
@@ -1182,7 +1166,7 @@ void id_scan_str_out(char* src, int i, int e) {
     char* text;
     q = id_chr(34);
     text = id_slice_str(src, i, e);
-    id_print(id_concat(id_concat(id_concat("str ", q), text), q));
+    id_print(id_concat(id_concat(id_concat(ID_S("str "), q), text), q));
     return;
 }
 
@@ -1212,7 +1196,7 @@ int id_adv_str(char* src, int i) {
 char* id_slice_str(char* src, int a, int b) {
     char* out;
     int charat_v;
-    out = "";
+    out = ID_S("");
     while ((a < b)) {
         charat_v = id_charat(src, a);
         out = id_concat(out, id_chr(charat_v));
@@ -1224,7 +1208,7 @@ char* id_slice_str(char* src, int a, int b) {
 int id_scan_ident(char* src, int i) {
     char* ident;
     int charat_v;
-    ident = "";
+    ident = ID_S("");
     while (id_is_alnum_at(src, i)) {
         charat_v = id_charat(src, i);
         ident = id_concat(ident, id_chr(charat_v));
@@ -1255,6 +1239,6 @@ int id_scan_string(char* src, int i) {
 int main(int argc, char** argv) { (void)argc; (void)argv;
     IdList* id_args = id_list_new();
     for (int i = 0; i < argc; i++)
-        id_list_push(id_args, (long long)(intptr_t)argv[i]);
+        id_list_push(id_args, (long long)(intptr_t)id_str_of_cstr(argv[i]));
     return id_main(argc, id_args); }
 

@@ -17,11 +17,7 @@ given lay_ns_scratch_reset ([46, 103, 105, 116], 0, 4, "build", 1):() then lay_n
 given lay_ns_scratch_reset ([115, 114, 99], 0, 3, "build", 1):() then lay_ns_dirs_len:(1)
 
 lay_ns_collect_file(int[] buf, int lo, int hi) {
-  string name = lay_name_of(buf, lo, hi);
-  int kind = lay_file_kind(name);
-  if(kind != 0 && kind != 1 && kind != 5) {
-    push((import lay_ns_files), name);
-  }
+  lay_keep_file((import lay_ns_files), buf, lo, hi);
 } return void;
 given lay_ns_scratch_reset ([99, 111, 110, 102, 46, 105, 100], 0, 7):() then lay_ns_files_len:(0)
 given lay_ns_scratch_reset ([109, 46, 105, 100], 0, 4):() then lay_ns_files_len:(1)

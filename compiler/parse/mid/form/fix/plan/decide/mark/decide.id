@@ -49,12 +49,7 @@ given fix_mark_case_fixture (5, 0):() then calls fix_refuse:(0, "a value that wo
 // that stayed still would also hide two writes that cancelled, which this
 // column cannot do, since the only value ever written to it here is 1.
 fixe_mv_sum() {
-  int n = 0;
-  int i = 0;
-  while(i < len((import fixe_mv))) {
-    n = n + (import fixe_mv)[i];
-    i = i + 1;
-  }
+  int n = lst_sum((import fixe_mv));
 } return int n;
 given fix_fixture ():(0)
 given fix_touch_fixture ():(1)

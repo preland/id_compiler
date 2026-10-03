@@ -14,14 +14,7 @@ given fix_decl_fixture (1):("n_v")
 // is the only writer that puts a real name in the column -- fix_push4 pushes
 // "" -- so no setup leaves one there to read.
 fixe_nm_named() {
-  int n = 0;
-  int i = 0;
-  while(i < len((import fixe_nm))) {
-    if((import fixe_nm)[i] != "") {
-      n = n + 1;
-    }
-    i = i + 1;
-  }
+  int n = lst_str_filled((import fixe_nm));
 } return int n;
 given fix_fixture ():(0)
 given fix_nameat_fixture ():(0) then check_failed:(0)

@@ -5,15 +5,13 @@
 // to see what they left behind.
 
 last_kind() {
-  int i = len((import nkind)) - 1;
-  string ret_s = (import nkind)[i];
+  string ret_s = lst_str_last((import nkind));
 } return string ret_s;
 given mk_two_nodes ():("func")
 given mk_list_nodes ():("arr")
 
 last_s1() {
-  int i = len((import ns1)) - 1;
-  string ret_s = (import ns1)[i];
+  string ret_s = lst_str_last((import ns1));
 } return string ret_s;
 given mk_two_nodes ():("y")
 given mk_list_nodes ():("")

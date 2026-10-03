@@ -16,8 +16,7 @@ given env_init (["kw"], ["int"]):() then check_failed:(0)
 // function under test returns a node id it cannot itself compare a field of
 // (a `then` check takes no arguments).
 last_i2() {
-  int n = len((import ni2));
-  int ret_i = (import ni2)[n - 1];
+  int ret_i = lst_last((import ni2));
 } return int ret_i;
 given fixture_neg_lit_node ():(0)
 given mk_two_nodes ():(1)

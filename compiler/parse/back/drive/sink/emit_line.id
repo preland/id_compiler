@@ -21,19 +21,6 @@ lz_d() {
 ():() then check_failed:(0)
 ():() then init_units:(0)
 
-// A thennode entry naming no function in the build (then_node_fixture's own
-// fixture_then_bad), for given.id's own seed_thens: reach_add's fnames guard
-// must block it, which seed_then_fixture's real name cannot show. Filed here
-// (an unrelated output pass-through) because tests/more/seed/ is at its
-// 3-file cap.
-seed_then_fixture_bad() {
-  then_node_fixture();
-  init_reach();
-  push((import thennode), (import fixture_then_bad));
-} return void;
-():() then check_failed:(0)
-():() then rfn_len:(2)
-
 emit_line(string s) {
   print(s);
 } return void;

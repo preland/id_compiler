@@ -18,9 +18,10 @@ given loop_fixture ((import while_node), 1, 4):(4)
 lw_free_all() {
   int i = 0;
   while(i < len((import lwslot))) {
-    lw_drop(lw_old((import lwslot)[i]));
+    lw_drop(lw_old((import lwslot)[i]), ir_s((import lwslot)[i]));
     i = i + 1;
   }
 } return void;
 given lwo_fixture ():() then calls lw_callf:[1]
 given lw_fixture ():() then calls lw_callf:[0]
+given lwd_fixture ():() then calls lw_callf:("id_list_free_deep", "", [3])
