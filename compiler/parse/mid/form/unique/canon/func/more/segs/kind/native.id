@@ -36,7 +36,7 @@ given lz_o (23, []):() then calls segs_native:[0]
 // it directly.
 segs_native(int id, string[] segs_out) {
   string fp = canon_func(id);
-  push(segs_out, fp);
+  push(segs_out, "|" + fp);
 } return void;
 given lz_o (22, []):() then calls canon_func:(22)
 given lz_o (23, []):() then calls canon_func:(23)

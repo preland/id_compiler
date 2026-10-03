@@ -1,0 +1,25 @@
+// EXPECT: differ only in the imported value they read
+// Two functions that differ only in which imported value they read are one
+// function written twice, with the value as the parameter it should have
+// been. The error names both functions and the fix: parameterise one and pass
+// the value in. (A literal-only difference, a second differing import, any
+// other difference, and a one-statement accessor are not this: tests_feature.sh
+// checks that they say nothing.)
+use_a(int x) {
+  int y = x + (import ia);
+  int z = y * 2;
+} return int z;
+
+use_b(int x) {
+  int y = x + (import ib);
+  int z = y * 2;
+} return int z;
+
+main(int argc, string[] argv) {
+  export int ia = 3;
+  export int ib = 4;
+  int a = use_a(1);
+} chain (int argc, string[] argv) {
+  int b = use_b(1);
+  print("" + a + " " + b);
+} return int 0;

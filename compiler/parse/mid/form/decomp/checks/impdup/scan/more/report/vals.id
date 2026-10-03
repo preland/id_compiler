@@ -1,0 +1,34 @@
+// The import each function reads where they differ: the import names of
+// function imd_x and of function imd_y, at the first place they are not the
+// same.
+imd_vals(int imd_x, int imd_y) {
+  string[] imd_xa = str_split((import imd_tab)[imd_x * 2 + 1], ",");
+  string[] imd_xb = str_split((import imd_tab)[imd_y * 2 + 1], ",");
+  int imd_k = imd_first(imd_xa, imd_xb);
+} chain (int imd_x, int imd_y) {
+  string ret_s = "(import " + imd_xa[imd_k] + ") in one, (import " + imd_xb[imd_k] + ") in the other";
+} return string ret_s;
+given imd_pair_base given imd_fill (1, 0):("(import beta) in one, (import alpha) in the other")
+given imd_pair_base given imd_fill (0, 1):("(import alpha) in one, (import beta) in the other")
+
+imd_first(string[] imd_xa, string[] imd_xb) {
+  int imd_k = 0;
+  while(imd_k < len(imd_xa) && imd_xa[imd_k] == imd_xb[imd_k]) {
+    imd_k = imd_k + 1;
+  }
+} return int imd_k;
+(["a", "b"], ["a", "c"]):(1)
+(["x"], ["y"]):(0)
+
+imd_count(string[] imd_xa, string[] imd_xb) {
+  int imd_n = 0;
+  int imd_k = 0;
+  while(imd_k < len(imd_xa)) {
+    if(imd_k >= len(imd_xb) || imd_xa[imd_k] != imd_xb[imd_k]) {
+      imd_n = imd_n + 1;
+    }
+    imd_k = imd_k + 1;
+  }
+} return int imd_n;
+(["a", "b"], ["c", "d"]):(2)
+(["a", "b"], ["a", "b"]):(0)

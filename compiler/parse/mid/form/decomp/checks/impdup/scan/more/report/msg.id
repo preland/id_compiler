@@ -1,0 +1,23 @@
+// A `prog` index's function name. imd_tab is indexed by `prog`, not by the
+// strict table, which has an entry per chain segment.
+imd_name(int imd_x) {
+  string ret_s = s1_of((import prog)[imd_x]);
+} return string ret_s;
+given lz_o (0):("dup5")
+given lz_o (1):("dup9")
+
+imd_msg(string imd_nx, string imd_ny, string imd_vs) {
+  string imd_loc = dup_loc(imd_nx);
+  string imd_def_y = imd_def(imd_ny);
+  string ret_s = imd_loc + "function '" + imd_nx + "' and " + imd_def_y + " differ only in the imported value they read (" + imd_vs + "); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other";
+} return string ret_s;
+given env_init ("pb", "pa", "V"):("<stdin>:1: error: function 'pb' and 'pa' (defined at <stdin>:1) differ only in the imported value they read (V); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other")
+given edge_fixture ("fx_target", "nosuchfn", "W"):("fixture.id:7: error: function 'fx_target' and 'nosuchfn' (defined at <stdin>:1) differ only in the imported value they read (W); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other")
+
+imd_def(string imd_nm) {
+  int imd_ln = func_line(imd_nm);
+  string imd_file = func_file(imd_nm);
+  string ret_s = "'" + imd_nm + "' (defined at " + imd_file + ":" + imd_ln + ")";
+} return string ret_s;
+given env_init ("pa"):("'pa' (defined at <stdin>:1)")
+given edge_fixture ("fx_target"):("'fx_target' (defined at fixture.id:7)")

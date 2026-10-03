@@ -51,18 +51,19 @@ ce2(int id) {
   }
 } return string out;
 given lz_a ((import lz_str)):("Shi")
-given lz_c ((import lz_imp)):("g(cfg)")
+given lz_c ((import lz_imp)):("g(0)")
 
-// An imported global keeps its name: two functions that differ only by which
+// An imported global is its position of first use (imp_fp, decomp/checks/impdup/canon/pos.id),
+// with the names kept beside the text: two functions that differ only by which
 // global they read are different functions.
 ce3(int id) {
   string out = ce4(id);
   if(k_of(id) == "import") {
-    out = "g(" + s1_of(id) + ")";
+    out = imp_fp(id);
   }
   if(k_of(id) == "bin") {
     out = canon_bin(id);
   }
 } return string out;
-given lz_c ((import lz_imp)):("g(cfg)")
+given lz_c ((import lz_imp)):("g(0)")
 given lz_c ((import lz_i1)):("?int#2")

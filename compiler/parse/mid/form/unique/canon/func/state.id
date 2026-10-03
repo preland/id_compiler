@@ -21,6 +21,7 @@ given canon_begun_j_fixture (15):("void")
 uq_begin(string name) {
   export string[] cself = [name];
   export string[] cnames = [];
+  export string[] cimps = [];
 } return void;
 given lz_g ("one"):() then cur_self:("one")
 given lz_g ("two"):() then cur_self:("two")

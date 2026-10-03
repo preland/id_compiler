@@ -1,0 +1,37 @@
+// The strict table (cfp, cfpfn) has one entry per chain segment; this pass
+// folds it to one pair per function, in `prog` order: `imd_tab` holds, at
+// 2*i, the function's segment texts with the import names cut off (each
+// prefixed with its length, so two lists of segments cannot join to one
+// string), and at 2*i+1 its import names -- the last segment's, which are the
+// most it read.
+
+imd_fill() {
+  string[] imd_rows = [];
+  export string[] imd_tab = imd_rows;
+  imd_size(imd_rows);
+} chain () {
+  imd_fold(imd_rows);
+} return void;
+given lz_o ():() then imd_dump:("23:()->int=>v0{d:int 0=I5}~~~23:()->int=>v0{d:int 0=I9}~~")
+given imd_pair_base ():() then imd_dump:("36:()->int=>g(0){d:int 0=I1;d:int 1=I1}~alpha~36:()->int=>g(0){d:int 0=I1;d:int 1=I1}~beta")
+
+imd_size(string[] imd_out) {
+  int imd_n = len((import prog)) * 2;
+  int imd_i = 0;
+  while(imd_i < imd_n) {
+    push(imd_out, "");
+    imd_i = imd_i + 1;
+  }
+} return void;
+given lz_o ([]):(["", "", "", ""])
+given lz_empty ([]):([])
+
+imd_fold(string[] imd_out) {
+  int imd_k = 0;
+  while(imd_k < len((import cfp))) {
+    imd_set(imd_out, (import cfpfn)[imd_k] * 2, (import cfp)[imd_k]);
+    imd_k = imd_k + 1;
+  }
+} return void;
+given lz_o (["", "", "", ""]):(["23:()->int=>v0{d:int 0=I5}", "~", "23:()->int=>v0{d:int 0=I9}", "~"])
+given lz_empty ([]):([])

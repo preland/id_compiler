@@ -34,11 +34,11 @@ given lz_o ((import lz_decl9), "S", [], []):() then calls segs_flush:[0]
 // (back/ir/opt/cfg/more/scan.id), which is the duplicate-logic rule working
 // correctly. A fourth way to empty a list is not what this needed.
 segs_flush(string sigtext, int[] cur, string[] segs_out) {
-  string segtext = sigtext + "{" + canon_body(cur) + "}";
+  string segtext = seg_text(sigtext, cur);
   push(segs_out, segtext);
   while(len(cur) > 0) {
     pop(cur);
   }
 } return void;
-given lz_o ("S", [], []):() then calls canon_body:([])
-given lz_o ("T", [1], []):() then calls canon_body:[1]
+given lz_o ("S", [], []):() then calls seg_text:("S", [])
+given lz_o ("T", [1], []):() then calls seg_text:[1]

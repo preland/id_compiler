@@ -1,0 +1,33 @@
+// One comparison. imd_x and imd_y are `prog` indexes. The texts have to be
+// equal, and the import names have to differ in exactly one place: two places
+// is two values to parameterise, not "an imported value", and none is the
+// strict duplicate-logic error, which this pass leaves to ../../../unique/.
+// The text test comes first so the names are only split for a pair that
+// already matches.
+
+imd_probe(int imd_x, int imd_y) {
+  int imd_found = 0 - 1;
+  if((import imd_tab)[imd_x * 2] == (import imd_tab)[imd_y * 2] && imd_pair((import imd_tab)[imd_x * 2 + 1], (import imd_tab)[imd_y * 2 + 1]) == 1) {
+    imd_found = imd_y;
+  }
+} return int imd_found;
+given imd_pair_base given imd_fill (1, 0):(0)
+given imd_pair_base given imd_fill (0, 0):(-1)
+
+imd_pair(string imd_va, string imd_vb) {
+  int imd_ok = 0;
+  if(str_starts(imd_va, "~") == 0 && imd_diff(imd_va, imd_vb) == 1) {
+    imd_ok = 1;
+  }
+} return int imd_ok;
+("a,b", "a,c"):(1)
+("~a", "~b"):(0)
+("a,b", "c,d"):(0)
+
+imd_diff(string imd_va, string imd_vb) {
+  string[] imd_xa = str_split(imd_va, ",");
+  string[] imd_xb = str_split(imd_vb, ",");
+  int imd_n = imd_count(imd_xa, imd_xb);
+} return int imd_n;
+("a,b", "a,c"):(1)
+("a", "a"):(0)

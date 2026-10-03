@@ -1,0 +1,52 @@
+// Two functions identical except for which imported value they read are one
+// function written twice: the value should be a parameter. A literal-only
+// difference is not this -- a named accessor or fixture per constant is how id
+// is written -- so only an import counts. It is a compile error, found from
+// the strict fingerprint table (mid/form/unique/), which writes an import as
+// its position of first use ("g(0)") and prefixes each segment with the
+// import names so far (canon/pos.id): the same text with a different prefix
+// is a pair this pass names, the same text with the same prefix is the
+// duplicate-logic error already reported.
+check_imp_dup() {
+  imd_fill();
+  imd_scan();
+} return void;
+given lz_o ():() then check_failed:(0)
+given imd_pair_base ():() then check_failed:(1)
+given imd_thin_base ():() then check_failed:(0)
+
+// prog = [dup5, dup9] (index 1: dup9), and the real strict fingerprint pass
+// over it: they differ in a literal, which the strict fingerprint keeps.
+lz_o() {
+  lz_n();
+  push((import prog), (import lz_fn9));
+  uq_fill();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)
+
+// prog = [ima, imb]: no parameters, two statements each, each returning a
+// different import, so their strict fingerprints differ only in the import
+// prefix. Built through node_func rather than parsed, like dup_pair_fixture
+// (mid/form/unique/scan/pass/fixture.id).
+imd_pair_base() {
+  env_init();
+  int[] imd_none = [];
+  int imd_one = node_int("1", 1, 0);
+} chain () {
+  int imd_d1 = node_decl("int", "x", imd_one, 0);
+  int imd_d2 = node_decl("int", "y", imd_one, 0);
+  int[] imd_two = [imd_d1, imd_d2];
+} chain () {
+  int imd_e1 = node_import("alpha");
+  int imd_f1 = node_func("ima", "int", imd_none, imd_two, imd_e1);
+  push((import prog), imd_f1);
+} chain () {
+  int imd_e2 = node_import("beta");
+  int imd_f2 = node_func("imb", "int", imd_none, imd_two, imd_e2);
+  push((import prog), imd_f2);
+} chain () {
+  uq_fill();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

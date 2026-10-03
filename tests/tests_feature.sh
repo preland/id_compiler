@@ -2176,18 +2176,123 @@ else
 fi
 rm -rf "$TMP/fwdval"
 
-# Warning 2: a literal-only near-duplicate -- the existing duplicate-logic
-# error (mid/form/unique/) does not catch this, because it keeps a literal's
-# value in the fingerprint (add10 fingerprints as "...+I10", add16 as
-# "...+I16").
+# Two functions that differ only in which imported value they read are one
+# function written twice: a compile error that names both and the fix. Every
+# other way of differing -- a literal, a second import, more logic -- and a
+# function of one statement (a named accessor) are quiet: no error and no
+# warning, which self_silent checks as an empty log.
+self_silent() {   # desc, flags...
+    local desc="$1"; shift
+    if self_build "$@" && [ -z "$(grep -v '^wrote ' "$TMP/log")" ]; then
+        ok "$desc"
+    else
+        bad "$desc ($(tr '\n' '|' < "$TMP/log"))"
+    fi
+}
 cat > "$TMP/p.id" <<'EOF'
-add10(int x) {
-  int r = x + 10;
+use_a(int x) {
+  int y = x + (import ia);
+  int z = y * 2;
+} return int z;
+
+use_b(int x) {
+  int y = x + (import ib);
+  int z = y * 2;
+} return int z;
+
+main(int argc, string[] argv) {
+  export int ia = 3;
+  export int ib = 4;
+  int a = use_a(1);
+} chain (int argc, string[] argv) {
+  int b = use_b(1);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_refuse "bin/idc: two functions differing only in an imported value are an error naming both" \
+    "p.id:6: error: function 'use_b' and 'use_a' (defined at " --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: ...and the error names the two imports and the fix" \
+    "p.id:1) differ only in the imported value they read ((import ib) in one, (import ia) in the other); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other" \
+    --allow-untested --emit-c /dev/null
+
+# An import AND another difference: not this pair. 3 instead of 2.
+cat > "$TMP/p.id" <<'EOF'
+use_a(int x) {
+  int y = x + (import ia);
+  int z = y * 2;
+} return int z;
+
+use_b(int x) {
+  int y = x + (import ib);
+  int z = y * 3;
+} return int z;
+
+main(int argc, string[] argv) {
+  export int ia = 3;
+  export int ib = 4;
+  int a = use_a(1);
+} chain (int argc, string[] argv) {
+  int b = use_b(1);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_silent "bin/idc: an import plus a literal difference is not reported" --allow-untested --emit-c /dev/null
+
+# Two imports differ: two values to parameterise, not "an imported value".
+cat > "$TMP/p.id" <<'EOF'
+use_a(int x) {
+  int y = x + (import ia) + (import ic);
+  int z = y * 2;
+} return int z;
+
+use_b(int x) {
+  int y = x + (import ib) + (import id);
+  int z = y * 2;
+} return int z;
+
+main(int argc, string[] argv) {
+  export int ia = 3;
+  export int ib = 4;
+  export int ic = 5;
+} chain (int argc, string[] argv) {
+  export int id = 6;
+  int a = use_a(1);
+  int b = use_b(1);
+} return int 0;
+EOF
+self_silent "bin/idc: two imports differing is not reported" --allow-untested --emit-c /dev/null
+
+# A function of one statement is a named accessor of a module's global:
+# s1_of and s2_of in the compiler itself. Nothing to share, so no error.
+cat > "$TMP/p.id" <<'EOF'
+get_a() {
+  int r = len((import la));
 } return int r;
 
-add16(int x) {
-  int r = x + 16;
+get_b() {
+  int r = len((import lb));
 } return int r;
+
+main(int argc, string[] argv) {
+  export int[] la = [1, 2];
+  export int[] lb = [3];
+  int n = get_a() + get_b();
+} return int n;
+EOF
+self_silent "bin/idc: one-statement accessors of two globals are not reported" --allow-untested --emit-c /dev/null
+
+# Former false positives: a literal-only difference never says anything. Named
+# accessors and fixtures that differ by a constant are how id is written.
+cat > "$TMP/p.id" <<'EOF'
+add10(int x) {
+  int y = x + 10;
+  int z = y * 2;
+} return int z;
+
+add16(int x) {
+  int y = x + 16;
+  int z = y * 2;
+} return int z;
 
 main(int argc, string[] argv) {
   int a = add10(3);
@@ -2195,79 +2300,55 @@ main(int argc, string[] argv) {
   print("" + a + " " + b);
 } return int 0;
 EOF
-self_warn "bin/idc: two functions differing only in a literal warn" \
-    "p.id:5: warning: 'add16' and 'add10' differ only in a literal value; parameterise one function" \
-    --allow-untested --emit-c /dev/null
+self_silent "bin/idc: two functions differing only in a literal are not reported" --allow-untested --emit-c /dev/null
 
-# A chained function owns two entries of the strict fingerprint table, so every
-# function after it sits at a different index there than in `prog`, which is
-# what the loose table is indexed by. The pair must still be named by `prog`
-# position: a lookup through the strict table's owner column named 'add10' and
-# 'chainy' here.
-cat > "$TMP/p.id" <<'EOF2'
-chainy(int x) {
-  int a = x + 1;
-  int b = a + 1;
-  int c = b + 1;
-} chain (int x) {
-  int d = c + 1;
-} return int d;
-
-add10(int x) {
-  int r = x + 10;
+cat > "$TMP/p.id" <<'EOF'
+slot_x() {
+  int c = charat("abc", 0);
+  int r = c + 1;
 } return int r;
 
-add16(int x) {
-  int r = x + 16;
+slot_y() {
+  int c = charat("abc", 1);
+  int r = c + 1;
 } return int r;
-EOF2
-self_warn "bin/idc: a near-duplicate pair after a chained function is named correctly" \
-    "p.id:13: warning: 'add16' and 'add10' differ only in a literal value; parameterise one function" \
-    --allow-untested --emit-c /dev/null
 
-# Two functions identical in every way are still the EXISTING error, not this
-# warning -- this warning is only the gap that rule leaves.
+main(int argc, string[] argv) {
+  int a = slot_x();
+  int b = slot_y();
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_silent "bin/idc: named accessors differing only in an index literal are not reported" --allow-untested --emit-c /dev/null
+
+# Two functions identical in every way, imports included, are the duplicate-logic
+# error, and only that one.
 cat > "$TMP/p.id" <<'EOF'
 same_a(int x) {
-  int r = x + 1;
-} return int r;
+  int y = x + (import ia);
+  int z = y * 2;
+} return int z;
 
 same_b(int x) {
-  int r = x + 1;
-} return int r;
+  int y = x + (import ia);
+  int z = y * 2;
+} return int z;
 
 main(int argc, string[] argv) {
-  int a = same_a(3);
-  int b = same_b(3);
+  export int ia = 3;
+  int a = same_a(1);
+} chain (int argc, string[] argv) {
+  int b = same_b(1);
   print("" + a + " " + b);
 } return int 0;
 EOF
-self_refuse "bin/idc: two functions identical in every way are the existing duplicate-logic error" \
+self_refuse "bin/idc: two functions identical but for nothing are the existing duplicate-logic error" \
     "has the same signature and logic as" --allow-untested --emit-c /dev/null
-if ! grep -qF "differ only in a literal value" "$TMP/log"; then
-    ok "bin/idc: ...not also this warning"
+if ! grep -qF "differ only in the imported value" "$TMP/log"; then
+    ok "bin/idc: ...not also the import-only error"
 else
-    bad "bin/idc: ...not also this warning ($(tr '\n' '|' < "$TMP/log"))"
+    bad "bin/idc: ...not also the import-only error ($(tr '\n' '|' < "$TMP/log"))"
 fi
-
-# Genuinely different logic: no warning either way.
-cat > "$TMP/p.id" <<'EOF'
-diff_a(int x) {
-  int r = x + 1;
-} return int r;
-
-diff_b(int x) {
-  int r = x * 2;
-} return int r;
-
-main(int argc, string[] argv) {
-  int a = diff_a(3);
-  int b = diff_b(3);
-  print("" + a + " " + b);
-} return int 0;
-EOF
-self_nowarn "bin/idc: genuinely different logic does not warn" \
-    "differ only in a literal value" --allow-untested --emit-c /dev/null
 
 # Warning 3: a generated parameter name.
 cat > "$TMP/p.id" <<'EOF'

@@ -1,0 +1,41 @@
+// An import in a fingerprint is the position at which the function first read
+// it, like a local (cn, ../../../../unique/canon/func/names.id), and the names
+// go in a separate list, `cimps`, that seg_text (./text.id) puts in front of
+// each segment. Two segments are one function written twice only if both the
+// text and the names agree; a pair that agrees on the text alone differs only
+// in which imports it reads (../scan/).
+//
+// A segment of at most one statement carries a "~" in front of its names. Such
+// a function is a named accessor or setter of a module's global -- s1_of is
+// `ns1[id]` and s2_of is `ns2[id]` -- and there is no logic in it to share:
+// parameterising it leaves the same one-line function behind for every global.
+// The mark keeps it out of the import-only error without touching the
+// duplicate-logic rule, which still sees the names.
+
+imp_fp(int imp_id) {
+  string imp_name = s1_of(imp_id);
+  int imp_at = imp_pos(imp_name);
+  string ret_s = "g(" + imp_at + ")";
+} return string ret_s;
+given lz_c ((import lz_imp)):("g(0)")
+given imp_seed_fixture ((import lz_imp)):("g(1)")
+
+imp_pos(string imp_key) {
+  string[] imp_seen = (import cimps);
+  int imp_idx = find_str(imp_seen, imp_key);
+  if(imp_idx < 0) {
+    push(imp_seen, imp_key);
+    imp_idx = len(imp_seen) - 1;
+  }
+} return int imp_idx;
+given lz_c ("cfg"):(0)
+given imp_seed_fixture ("cfg"):(1)
+
+imp_vec(int imp_stmts) {
+  string ret_s = str_join((import cimps), ",");
+  if(imp_stmts <= (import impdup_exempt_stmts)) {
+    ret_s = "~" + ret_s;
+  }
+} return string ret_s;
+given imp_seed_fixture (2):("first")
+given imp_seed_fixture (1):("~first")

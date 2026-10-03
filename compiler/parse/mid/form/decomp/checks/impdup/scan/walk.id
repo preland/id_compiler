@@ -1,0 +1,32 @@
+// Each function against every earlier one, reported against the first match,
+// the pairing mid/form/unique/scan/pass/compare.id uses for the strict rule.
+
+imd_scan() {
+  int imd_i = 0;
+  while(imd_i < len((import prog))) {
+    imd_at(imd_i);
+    imd_i = imd_i + 1;
+  }
+} return void;
+given lz_p ():() then check_failed:(0)
+given imd_pair_base given imd_fill ():() then check_failed:(1)
+
+imd_at(int imd_x) {
+  int imd_y = imd_find(imd_x);
+  if(imd_y >= 0) {
+    imd_report(imd_x, imd_y);
+  }
+} return void;
+given imd_pair_base given imd_fill (1):() then check_failed:(1)
+given imd_pair_base given imd_fill (0):() then check_failed:(0)
+
+imd_find(int imd_x) {
+  int imd_y = 0;
+  int imd_found = 0 - 1;
+  while(imd_y < imd_x && imd_found < 0) {
+    imd_found = imd_probe(imd_x, imd_y);
+    imd_y = imd_y + 1;
+  }
+} return int imd_found;
+given imd_pair_base given imd_fill (1):(0)
+given imd_pair_base given imd_fill (0):(-1)

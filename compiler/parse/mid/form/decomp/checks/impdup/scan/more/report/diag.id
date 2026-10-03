@@ -1,0 +1,41 @@
+// file:line: error: function 'F' and 'G' differ only in the imported value
+// they read -- an error, unlike the decomposition warnings: it calls
+// note_failure, because the fix (a parameter) is always available and a
+// build that keeps both is writing one function twice.
+
+imd_report(int imd_x, int imd_y) {
+  note_failure();
+  string imd_nx = imd_name(imd_x);
+  string imd_ny = imd_name(imd_y);
+} chain (int imd_x, int imd_y) {
+  string imd_vs = imd_vals(imd_x, imd_y);
+  string imd_line = imd_msg(imd_nx, imd_ny, imd_vs);
+  print(imd_line);
+} return void;
+given imd_pair_base given imd_fill (1, 0):() then check_failed:(1)
+given imd_pair_base given imd_fill (1, 0):() then prints:("<stdin>:1: error: function 'imb' and 'ima' (defined at <stdin>:1) differ only in the imported value they read ((import beta) in one, (import alpha) in the other); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other\n")
+
+// The `imd_tab` as one string, so a case can see what imd_fill filed.
+imd_dump() {
+  string ret_s = str_join((import imd_tab), "~");
+} return string ret_s;
+given lz_p ():("23:()->int=>v0{d:int 0=I5}~~~23:()->int=>v0{d:int 0=I9}~~")
+given lz_empty ():("")
+
+// prog = [tha, thb]: each returns a different import and has no statements,
+// so each is a named accessor and check_imp_dup must leave the pair alone.
+imd_thin_base() {
+  env_init();
+  int[] imd_none = [];
+  int imd_e1 = node_import("alpha");
+} chain () {
+  int imd_f1 = node_func("tha", "int", imd_none, imd_none, imd_e1);
+  push((import prog), imd_f1);
+  int imd_e2 = node_import("beta");
+} chain () {
+  int imd_f2 = node_func("thb", "int", imd_none, imd_none, imd_e2);
+  push((import prog), imd_f2);
+  uq_fill();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

@@ -27,8 +27,8 @@ canon_segs(int id) {
   string[] segs_out = [];
   segs_kind(id, segs_out);
 } return string[] segs_out;
-given lz_o (22):(["()->int=>v0{d:int 0=I5}"])
-given lz_o (23):(["()->int=>v0{d:int 0=I9}"])
+given lz_o (22):(["~|()->int=>v0{d:int 0=I5}"])
+given lz_o (23):(["~|()->int=>v0{d:int 0=I9}"])
 
 // A function with a real body: its signature, then its segments.
 segs_plain(int id, string[] segs_out) {
