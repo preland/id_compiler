@@ -24,5 +24,5 @@ ll_elem_bytes(int i, int j, int e) {
   string spell = s1_of(e);
   ll_str_bytes("@.cs." + (import enames)[i] + "." + j, spell);
 } return void;
-given elems3_fixture (0, 0, (import llie_child)):() then prints:("@.cs.a.0 = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
-given elems3_fixture (0, 5, (import llie_child)):() then prints:("@.cs.a.5 = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
+given elems3_fixture (0, 0, (import llie_child)):() then prints:("@.cs.a.0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.cs.a.0 = private alias i8, getelementptr inbounds (i8, ptr @.cs.a.0.d, i64 8)\n")
+given elems3_fixture (0, 5, (import llie_child)):() then prints:("@.cs.a.5.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.cs.a.5 = private alias i8, getelementptr inbounds (i8, ptr @.cs.a.5.d, i64 8)\n")

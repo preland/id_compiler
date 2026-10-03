@@ -1,5 +1,7 @@
 // A global line: `@name = global T init`, or a string constant
-// `@name = private unnamed_addr constant [N x i8] c"..."`.
+// `@name = private unnamed_addr constant [N x i8] c"..."`, with the string's length in front of its
+// bytes in the packed form `<{ i64, [N x i8] }>`, or the alias `@name = private alias i8, getelementptr
+// (i8, ptr @other, i64 8)` that names the bytes of one such constant.
 ld_global() {
   ld_adv(1);
   string nm = ld_word();
@@ -25,7 +27,14 @@ given tf_ld(" c\"\\68\\00\"") (".s", "private"):() then tf_strs:(["", "h"])
 ld_gstr(string nm) {
   string[] ts = (import ex_strs);
   int h = ld_get("s", nm);
+  string w = ld_word();
+} chain (string nm) {
+  if (w == "alias") {
+    ld_galias(h);
+    return;
+  }
   ts[h] = ld_cstr();
 } return void;
 given tf_ld("c\"\\68\\69\\00\"") (".a"):() then tf_strs:(["", "hi"])
 given tf_ld("c\"\\6F\\00\"") (".a"):() then tf_strs:(["", "o"])
+given tf_ld("c\"\\68\\69\\00\"\nalias i8, getelementptr inbounds (i8, ptr @.d, i64 8)") given ld_gstr(".d") given ld_eol() (".a"):() then tf_strs:(["", "hi", "hi"])

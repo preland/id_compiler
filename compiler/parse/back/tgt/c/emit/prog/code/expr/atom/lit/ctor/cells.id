@@ -10,7 +10,7 @@ ctor_cells(string sd_nm, int[] sd_as) {
   }
 } return string out;
 given sd_use_fixture ("P", [(import sd_one), (import sd_one)]):("(long long)(1), (long long)(1)")
-given sd_use_fixture ("Q", [(import sd_str)]):("(long long)(intptr_t)(s)")
+given sd_use_fixture ("Q", [(import sd_str)]):("(long long)(intptr_t)(ID_S(s))")
 
 ctor_cell(string sd_nm, int sd_a, int sd_k) {
   string sd_code = emit_expr(sd_a);
@@ -18,4 +18,4 @@ ctor_cell(string sd_nm, int sd_a, int sd_k) {
   string ret_s = box(sd_code, sd_ft);
 } return string ret_s;
 given sd_use_fixture ("P", (import sd_one), 1):("(long long)(1)")
-given sd_use_fixture ("Q", (import sd_str), 0):("(long long)(intptr_t)(s)")
+given sd_use_fixture ("Q", (import sd_str), 0):("(long long)(intptr_t)(ID_S(s))")

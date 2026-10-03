@@ -3,12 +3,13 @@
 //
 // Both hand back arena space that nothing will ever reclaim, which is what
 // docs/SPEC.md 6 promises and what makes string building in a loop a memory
-// cost rather than a bug.
+// cost rather than a bug. Each block is the count, the bytes, and a NUL; the
+// string is the address of the bytes.
 
 chr(int n) {
-  word p = mem_alloc(2);
-  st8(p, n);
-  string ret_s = chr_term(p);
+  word p = mem_alloc(10);
+  st64(p, 1);
+  string ret_s = chr_term(p, n);
 } return string ret_s;
 
 // `copy_bytes` answers with the count it copied, so the address just past each
@@ -18,7 +19,8 @@ concat(string s, string r) {
   string ret_s = concat_at(s, r, p);
 } return string ret_s;
 
-chr_term(word p) {
-  st8(p + 1, 0);
-  string ret_s = w2s(p);
+chr_term(word p, int n) {
+  st8(p + 8, n);
+  st8(p + 9, 0);
+  string ret_s = w2s(p + 8);
 } return string ret_s;

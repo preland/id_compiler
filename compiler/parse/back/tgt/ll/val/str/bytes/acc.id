@@ -12,3 +12,18 @@ ll_bytes_acc(string s) {
 } return string out;
 ("\"\""):("")
 ("\"a\""):("\\61")
+
+// How many bytes of a literal come before its first NUL: what a strlen would
+// have said, and so the count stored in front of the bytes (ll_str_bytes). A
+// literal with a `\0` in it is as long as its text up to there, on every
+// target, so `len` and a comparison can never disagree about where it ends.
+ll_zlen(string s) {
+  string zbytes = ll_bytes(s);
+  int i = 0;
+  while(charat(zbytes, i * 3 + 1) != 48 || charat(zbytes, i * 3 + 2) != 48) {
+    i = i + 1;
+  }
+} return int i;
+("\"\""):(0)
+("\"ab\""):(2)
+("\"a\\0b\""):(1)

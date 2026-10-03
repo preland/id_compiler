@@ -10,7 +10,7 @@ tc_fcells(int[] xs, string want) {
   }
 } return string out;
 given sd_case_fixture ([(import sd_ca), (import sd_ca)], "P"):("(long long)(1), (long long)(1)")
-given sd_case_fixture ([(import sd_cs)], "Q"):("(long long)(intptr_t)(s)")
+given sd_case_fixture ([(import sd_cs)], "Q"):("(long long)(intptr_t)(ID_S(s))")
 
 tc_fcell(int e, string want, int sd_k) {
   string sd_ft = sd_ftype_at(want, sd_k);
@@ -18,4 +18,4 @@ tc_fcell(int e, string want, int sd_k) {
   string so = box(cv, sd_ft);
 } return string so;
 given sd_case_fixture ((import sd_ca), "P", 1):("(long long)(1)")
-given sd_case_fixture ((import sd_cs), "Q", 0):("(long long)(intptr_t)(s)")
+given sd_case_fixture ((import sd_cs), "Q", 0):("(long long)(intptr_t)(ID_S(s))")

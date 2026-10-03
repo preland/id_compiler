@@ -2,14 +2,7 @@
 // `given tf_ld("text")` boots the loader and the executor and loads the text
 // as bytes, ready for a parser to read from the start.
 tf_bytes(string s) {
-  int[] by = [];
-  int i = 0;
-  int n = len(s);
-} chain (string s) {
-  while (i < n) {
-    push(by, charat(s, i));
-    i = i + 1;
-  }
+  int[] by = exec_bytes(s);
 } return int[] by;
 ("ab"):([97, 98])
 (""):([])

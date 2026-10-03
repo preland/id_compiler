@@ -1,11 +1,11 @@
 // Helper for find_main: keep the func id whose name is "main".
 
-// The loose fingerprint pass over prog = [dup5, dup9]: their loose fps are
-// identical (both keep only the literal's kind), so this is
-// mid/form/decomp/checks/loose/scan/'s one genuine positive case.
+// The import-duplicate table over prog = [dup5, dup9]: they differ in a
+// literal and read no import, so it is the quiet case for
+// mid/form/decomp/checks/impdup/scan/.
 lz_p() {
   lz_o();
-  lz_fill();
+  imd_fill();
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)

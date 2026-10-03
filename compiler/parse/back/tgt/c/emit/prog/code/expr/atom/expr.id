@@ -27,5 +27,5 @@ ee3(int id) {
     s = emit_call(id);
   }
 } return string s;
-given nz_call_print_fixture ((import nz_call_print)):("id_print(\"hi\")")
+given nz_call_print_fixture ((import nz_call_print)):("id_print(ID_S(\"hi\"))")
 given nz_env ((import nz_int)):("7")

@@ -2,10 +2,7 @@
 // emitted at its first appearance among its function's cases.
 
 claim_of(int j, int ci) {
-  int r = 0;
-  if((import conscase)[j] == ci) {
-    r = 1;
-  }
+  int r = lst_is_at((import conscase), j, ci);
 } return int r;
 given claim_conscase_fixture (0, 0):(1)
 given claim_conscase_fixture (0, 5):(0)

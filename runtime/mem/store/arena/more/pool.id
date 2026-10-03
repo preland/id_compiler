@@ -1,18 +1,16 @@
 // Giving list blocks back: one free list per size class, heads kept in the
-// arena after the string-length memo (../alloc.id), so a recycled block is
-// found without an initialiser having run.
+// arena after the bump pointer (../alloc.id), so a recycled block is found
+// without an initialiser having run.
 //
 // Class 0 is the 24-byte list header. Class k >= 1 is a cell array of
 // 4 * 2^(k-1) cells, which are the only capacities a list ever has because it
 // starts at four and doubles. A freed block's first word links to the next
-// block of its class. Strings and the flat store never come from these lists,
-// so the string-length memo's rule that an address never changes meaning
-// still holds.
+// block of its class. Strings and the flat store never come from these lists.
 
 pool_head(word cls) {
   word a = heap_ptr();
   word top = arena_top(a);
-  word ret_w = a + 152 + cls * 8;
+  word ret_w = a + 8 + cls * 8;
 } return word ret_w;
 
 pool_take(word cls, word z) {

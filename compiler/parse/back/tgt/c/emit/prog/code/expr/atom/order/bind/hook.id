@@ -23,10 +23,7 @@ given sq_fixture ((import sq_one)):("id_pair(id_foo(7), 7)")
 given sq_marked ((import nz_call_foo)):("idsq_7")
 
 is_seqd(int id) {
-  int ok = 0;
-  if(id < len((import seqt))) {
-    ok = (import seqt)[id];
-  }
+  int ok = lst_get_or((import seqt), id, 0);
 } return int ok;
 given sq_marked (7):(1)
 given sq_fixture (7):(0)

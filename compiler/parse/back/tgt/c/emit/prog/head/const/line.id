@@ -28,7 +28,7 @@ given cl_setup ("k"):("IdList* k;  /* constant from conf.id */")
 
 const_line_tail(int d, string s1_of_v) {
   int i1_of_v = i1_of(d);
-  string ret_s = c_type(s1_of_v) + " " + s2_of(d) + " = " + emit_expr(i1_of_v) + ";  /* constant from conf.id */";
+  string ret_s = c_type(s1_of_v) + " " + s2_of(d) + " = " + file_init(i1_of_v) + ";  /* constant from conf.id */";
   if(ty_is_list(s1_of_v) == 1) {
     ret_s = c_type(s1_of_v) + " " + s2_of(d) + ";  /* constant from conf.id */";
   }

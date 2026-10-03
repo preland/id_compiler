@@ -3,7 +3,7 @@
 concat_copy2(string r, word p, word a) {
   word copy_bytes_v = concat_copy2_write(r, a);
   st8(a + copy_bytes_v, 0);
-  string ret_s = w2s(p);
+  string ret_s = w2s(p + 8);
 } return string ret_s;
 
 concat_copy2_write(string r, word a) {

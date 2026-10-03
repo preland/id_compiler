@@ -20,10 +20,7 @@ given case_fidx_fixture (1):(1)
 given case_fidx_fixture2 (1):(0)
 
 case_same(int j, int ci) {
-  int r = 0;
-  if((import casefn)[j] == (import casefn)[ci]) {
-    r = 1;
-  }
+  int r = lst_same_at((import casefn), j, ci);
 } return int r;
 given case_fidx_fixture (0, 1):(1)
 given case_fidx_fixture2 (0, 1):(0)

@@ -3,23 +3,27 @@ ll_str_emit(int i) {
   string s = ir_s(i);
   ll_str_bytes("@.str" + i, s);
 } return void;
-given ll_str_fixture ((import ir_str_const)):() then prints:("@.str0 = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
-given ll_str_fixture ((import ir_str_const2)):() then prints:("@.str1 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")
+given ll_str_fixture ((import ir_str_const)):() then prints:("@.str0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str0 = private alias i8, getelementptr inbounds (i8, ptr @.str0.d, i64 8)\n")
+given ll_str_fixture ((import ir_str_const2)):() then prints:("@.str1.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.str1 = private alias i8, getelementptr inbounds (i8, ptr @.str1.d, i64 8)\n")
 
 // A string literal's bytes as a private global called `gname`. A literal in a
 // function body is named for its IR value; a conf.id constant's, for the
-// constant (./const.id).
+// constant (./const.id). A string carries its length in the word before its
+// bytes (runtime/prelude.id), so the bytes sit in a struct after an i64 count
+// and `gname` is an alias for the address of the bytes: every use of the
+// literal names `gname` and gets a pointer a runtime string would give.
 ll_str_bytes(string gname, string s) {
   int blen = ll_blen(s);
-  ll_str_emit2(gname, s, blen);
+  int zl = ll_zlen(s);
+  ll_str_emit2(gname, s, blen, zl);
 } return void;
-("@.g", "\"\""):() then prints:("@.g = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
-("@.g2", "\"a\""):() then prints:("@.g2 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")
+("@.g", "\"\""):() then prints:("@.g.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.g = private alias i8, getelementptr inbounds (i8, ptr @.g.d, i64 8)\n")
+("@.g2", "\"a\""):() then prints:("@.g2.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.g2 = private alias i8, getelementptr inbounds (i8, ptr @.g2.d, i64 8)\n")
 
-ll_str_emit2(string gname, string s, int blen) {
+ll_str_emit2(string gname, string s, int blen, int zl) {
   string q = chr(34);
   string bytes = ll_bytes(s);
-  emit_line(gname + " = private unnamed_addr constant [" + blen + " x i8] c" + q + bytes + q);
+  emit_line(gname + ".d = private unnamed_addr constant <{ i64, [" + blen + " x i8] }> <{ i64 " + zl + ", [" + blen + " x i8] c" + q + bytes + q + " }>, align 8\n" + gname + " = private alias i8, getelementptr inbounds (i8, ptr " + gname + ".d, i64 8)");
 } return void;
-("@.g", "\"\"", 1):() then prints:("@.g = private unnamed_addr constant [1 x i8] c\"\\00\"\n")
-("@.g2", "\"a\"", 2):() then prints:("@.g2 = private unnamed_addr constant [2 x i8] c\"\\61\\00\"\n")
+("@.g", "\"\"", 1, 0):() then prints:("@.g.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.g = private alias i8, getelementptr inbounds (i8, ptr @.g.d, i64 8)\n")
+("@.g2", "\"a\"", 2, 1):() then prints:("@.g2.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.g2 = private alias i8, getelementptr inbounds (i8, ptr @.g2.d, i64 8)\n")

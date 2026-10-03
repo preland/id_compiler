@@ -4,8 +4,9 @@
 #
 # Three things are checked, because "it links" is not "it works":
 #
-#   * the export list is exactly memory/_initialize/id_alloc plus the
-#     program's own top-level functions -- not the fixture idstd's, even
+#   * the export list is exactly memory/_initialize/id_alloc/id_str_of_cstr
+#     (a host writes a string's bytes with the first and has the second give
+#     them their length) plus the program's own top-level functions -- not the fixture idstd's, even
 #     though it is compiled in (--gc-sections plus the driver's own filter,
 #     idc/bin/idc);
 #   * an int function and a string-in/string-out function both give the
@@ -67,9 +68,9 @@ fi
 ok "the program builds"
 
 exports=$(wasm-objdump -x -j Export "$TMP/prog.wasm" 2>/dev/null | grep -oE '"[a-zA-Z_0-9]+"' | tr -d '"' | sort)
-want=$(printf '%s\n' memory id_alloc _initialize id_greet id_sum3 | sort)
+want=$(printf '%s\n' memory id_alloc id_str_of_cstr _initialize id_greet id_sum3 | sort)
 if [ "$exports" = "$want" ]; then
-    ok "exports are exactly memory/id_alloc/_initialize/id_greet/id_sum3 (no fixture idstd)"
+    ok "exports are exactly memory/id_alloc/id_str_of_cstr/_initialize/id_greet/id_sum3 (no fixture idstd)"
 else
     bad "export list (got: $(echo "$exports" | tr '\n' ' '))"
 fi
@@ -90,7 +91,7 @@ const { instance } = await WebAssembly.instantiate(
 const e = instance.exports;
 e._initialize();
 const enc = new TextEncoder(), dec = new TextDecoder();
-const w = (s) => { const b = enc.encode(s); const p = e.id_alloc(b.length + 1); const m = new Uint8Array(e.memory.buffer); m.set(b, p); m[p + b.length] = 0; return p; };
+const w = (s) => { const b = enc.encode(s); const p = e.id_alloc(b.length + 1); const m = new Uint8Array(e.memory.buffer); m.set(b, p); m[p + b.length] = 0; return e.id_str_of_cstr(p); };
 const r = (p) => { const m = new Uint8Array(e.memory.buffer); let q = p; while (m[q]) q++; return dec.decode(m.subarray(p, q)); };
 console.log(r(e.id_greet(w('web'))));
 console.log(e.id_sum3(-4, 10));

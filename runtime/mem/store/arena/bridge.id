@@ -15,8 +15,8 @@ copy_bytes(word a, word p, word z) {
 } return word z;
 
 str_of_mem(word a, word z) {
-  word p = mem_alloc(z + 1);
-  word copy_bytes_v = copy_bytes(a, p, z);
+  word p = mem_alloc(z + 9);
+  word copy_bytes_v = copy_bytes(a, p + 8, z);
   string ret_s = str_of_mem_at(p, copy_bytes_v);
 } return string ret_s;
 

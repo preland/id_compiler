@@ -20,3 +20,16 @@ int_code(int id) {
 } return string s;
 given nz_env ((import nz_int)):("7")
 given nz_int_big_fixture ((import nz_int_big)):("9999999999LL")
+
+// A constant's initialiser at file scope, where the statement expression ID_S
+// is not allowed: ID_SK builds the same length-prefixed object (runtime/
+// prelude.id) as a compound literal, which has static storage there. Every
+// other initialiser is the expression as emitted anywhere.
+file_init(int id) {
+  string s = "ID_SK(" + s1_of(id) + ")";
+  if(k_of(id) != "str") {
+    s = emit_expr(id);
+  }
+} return string s;
+given lit_str_fixture ((import lit_str_e)):("ID_SK(hi)")
+given lit_int_fixture ((import lit_e)):("5")

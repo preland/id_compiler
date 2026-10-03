@@ -12,12 +12,12 @@
 // and there is no function the runtime could hang that on. Reading zero there
 // means nobody has allocated yet.
 //
-// The next 144 bytes are the string-length memo (see ../../lm/). It lives
-// here for the same reason the pointer does, and it is reserved on the first
-// allocation rather than declared anywhere: a table at a known offset needs no
-// initialiser to be called, which matters because nothing in a freestanding
-// program is guaranteed to run before the first string is walked. The 288
-// bytes after it are the heads of the list free lists, 36 size classes.
+// The next 288 bytes are the heads of the list free lists, 36 size classes.
+// They live here for the same reason the pointer does, and they are reserved on
+// the first allocation rather than declared anywhere: a table at a known offset
+// needs no initialiser to be called, which matters because nothing in a
+// freestanding program is guaranteed to run before the first list is made. A
+// string needs no such table: it carries its own length (lang/str/core.id).
 
 arena_top(word a) {
   word p = ld64(a);
@@ -26,15 +26,11 @@ arena_top(word a) {
   }
 } return word p;
 
-// First use: the memo and the free-list heads are zeroed, because whatever the
-// firmware left above the kernel image would otherwise read as a remembered
-// length for an address nobody has ever handed out, or as a block to reuse.
+// First use: the free-list heads are zeroed, because whatever the firmware
+// left above the kernel image would otherwise read as a block to reuse.
 arena_open(word a) {
-  lm_wipe(a + 8, 0);
-  lm_wipe(a + 152, 0);
-  lm_wipe(a + 296, 0);
-} chain (word a) {
-  word ret_w = a + 440;
+  pool_wipe(a + 8, 0);
+  word ret_w = a + 296;
 } return word ret_w;
 
 // Rounded with `&` rather than `%`: a mask is one instruction, while `%` is a

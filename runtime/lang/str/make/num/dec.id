@@ -2,15 +2,16 @@
 //
 // The digits of a number come out least significant first, so they are written
 // backwards into the end of a fresh buffer and the string starts wherever they
-// stopped. Twenty-four bytes is more than the longest answer -- a minus sign
-// and nineteen digits, plus the NUL.
+// stopped, with its count in the eight bytes before that. Thirty-two bytes is
+// room for the longest answer -- a minus sign and nineteen digits, plus the
+// NUL -- and for that count word in front of it.
 //
 // A `word` prints signed, which is what the hosted runtime does with `%lld`
 // and therefore what a program compiled both ways has to see.
 
 str_of_word(word a) {
-  word p = mem_alloc(24);
-  st8(p + 23, 0);
+  word p = mem_alloc(32);
+  st8(p + 31, 0);
   string ret_s = str_of_word_at(a, p);
 } return string ret_s;
 

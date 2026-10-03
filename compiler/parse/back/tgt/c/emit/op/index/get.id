@@ -15,7 +15,7 @@ emit_index(int id) {
   string ret_s = unbox(g, elem);
 } return string ret_s;
 given idx_build ((import idx_fix)):("(int)(id_list_get(id_list_lit(2, (long long)(2), (long long)(5)), 2))")
-given stridx_build ((import idx_str)):("(char*)(intptr_t)(id_list_get(id_list_lit(1, (long long)(intptr_t)(hi)), 2))")
+given stridx_build ((import idx_str)):("(char*)(intptr_t)(id_list_get(id_list_lit(1, (long long)(intptr_t)(ID_S(hi))), 2))")
 given sd_use_fixture ((import sd_iy)):("(int)(id_list_get(p, 1))")
 
 // The C text of an index: the expression the program wrote, or, for a field,

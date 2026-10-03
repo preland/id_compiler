@@ -27,4 +27,4 @@ infix_line(int id, int i1_of_v, string s1_of_v) {
   string s = "(" + emit_expr(i1_of_v) + " " + map_op(s1_of_v) + " " + emit_expr(i2_of_v) + ")";
 } return string s;
 given nz_bin_add_fixture ((import nz_bin_add), (import nz_int), "+"):("(7 + 3)")
-given nz_bin_eq_fixture ((import nz_bin_eq), (import nz_strn), "=="):("(\"hi\" == \"yo\")")
+given nz_bin_eq_fixture ((import nz_bin_eq), (import nz_strn), "=="):("(ID_S(\"hi\") == ID_S(\"yo\"))")

@@ -17,9 +17,12 @@ tc_scalar(int e) {
   string so = int_code(e);
   if(k_of(e) == "un") {
     so = tc_neg(e);
+  } else if(k_of(e) == "str") {
+    so = "ID_S(" + so + ")";
   }
 } return string so;
 given lit_int_fixture ((import lit_e)):("5")
+given lit_str_fixture ((import lit_str_e)):("ID_S(hi)")
 given lit_un_fixture ((import lit_un_e)):("-5")
 
 tc_neg(int e) {

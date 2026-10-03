@@ -32,3 +32,17 @@ given tf_ld("7") given tf_gset(0, 0) given tf_gsetf(0, 0.0) (0, 2):() then tf_gv
 given tf_ld("2.5") given tf_gset(0, 0) given tf_gsetf(0, 0.0) (0, 5):() then tf_gf:([2.5])
 given tf_ld("@.s") given tf_gset(0, 0) given tf_gsetf(0, 0.0) (0, 4):() then tf_gv:([1])
 given tf_ld("null") given tf_gset(0, 9) given tf_gsetf(0, 0.0) (0, 4):() then tf_gv:([9])
+
+// The alias line of a string constant, `alias i8, getelementptr inbounds (i8, ptr @other, i64 8)`: the
+// name is the bytes of @other, past the length in front of them, so it is given the same text.
+ld_galias(int h) {
+  ld_to(64);
+  ld_adv(1);
+  string tn = ld_word();
+} chain (int h) {
+  string[] ts = (import ex_strs);
+  int hd = ld_get("s", tn);
+  ts[h] = ts[hd];
+} return void;
+given tf_ld("c\"\\68\\69\\00\"\nptr @.d, i64 8") given ld_gstr(".d") given ld_eol() given tf_get("s", ".a") (2):() then tf_strs:(["", "hi", "hi"])
+given tf_ld("c\"\\6F\\00\"\nx @.o") given ld_gstr(".o") given ld_eol() given tf_get("s", ".b") (2):() then tf_strs:(["", "o", "o"])

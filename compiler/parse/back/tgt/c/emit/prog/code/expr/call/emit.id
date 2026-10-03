@@ -14,5 +14,5 @@ emit_print(int id) {
   int arg = l1_of(id)[0];
   string s = "id_" + s1_of(id) + "(" + arg_str(arg) + ")";
 } return string s;
-given nz_call_print_fixture ((import nz_call_print)):("id_print(\"hi\")")
+given nz_call_print_fixture ((import nz_call_print)):("id_print(ID_S(\"hi\"))")
 given nz_call_eprint_fixture ((import nz_call_eprint)):("id_eprint(id_str_of_int(7))")
