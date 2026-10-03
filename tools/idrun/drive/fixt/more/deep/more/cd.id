@@ -1,9 +1,9 @@
 // Has dr_clean taken the directory away.
 tf_gone() {
-  int gone = fs_exists((import tf_cdp)) == 0;
-} return int gone;
-given tf_cdir(1) ():(0) then tf_rmcd:(0)
-given tf_cdir(1) ():(0) then tf_rmcd:(0) then tf_gone:(1)
+  string gone_t = "tf_gone " + (fs_exists((import tf_cdp)) == 0);
+} return string gone_t;
+given tf_cdir(1) ():("tf_gone 0") then tf_rmcd:(0)
+given tf_cdir(1) ():("tf_gone 0") then tf_rmcd:(0) then tf_gone:("tf_gone 1")
 
 // Remove the directory and its three files by hand; 0 when all went.
 tf_rmcd() {

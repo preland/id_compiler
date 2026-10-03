@@ -13,8 +13,8 @@ ld_local(int n) {
     vs[n] = sl;
   }
 } return int sl;
-given lb_boot (3):(0) then tf_vs:([-1, -1, -1, 0])
-given lb_boot given tf_ns (1):(1) then tf_vs:([-1, 1])
+given lb_boot (3):(0) then (import ld_vslot):([-1, -1, -1, 0])
+given lb_boot given tf_ns (1):(1) then (import ld_vslot):([-1, 1])
 
 // The number in a name that is ch followed by digits (%v12, b7), or -1.
 ld_pnum(string w, int ch) {

@@ -40,6 +40,6 @@ vm_bc(int id, word wa, word wb, word wc) {
 } return word wr;
 given vb_boot given tf_sput("z") (17, 1, 0, 0):(0) then prints:("z\n")
 given vb_boot given tf_sput("z") (18, 1, 0, 0):(0) then eprints:("z\n")
-given vb_boot stdin "k\n" (21, 0, 0, 0):(1) then tf_strs:(["", "k"])
+given vb_boot stdin "k\n" (21, 0, 0, 0):(1) then (import ex_strs):(["", "k"])
 given vb_boot (24, 0, 0, 0):(0)
 given vb_boot given tf_sput("p") (19, 1, 0, 0):(0) then prints:("p")

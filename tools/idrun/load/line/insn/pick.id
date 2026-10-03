@@ -45,16 +45,16 @@ ld_op(int code, int d, string w) {
   }
   ld_bad(w);
 } return void;
-given tf_ld("i32, ptr %v2") (1, 6, "load"):() then tf_cd:([0, 6, 0, 0, 0])
-given tf_ld("i32 %v3, ptr %v2") (2, -1, "store"):() then tf_cd:([0, 1, 0, 0, 0])
-given tf_ld("i32 %v1, %v2") (3, 8, "add"):() then tf_cd:([1, 8, 0, 1, 0])
-given tf_ld("double %v1, %v2") (9, 4, "fadd"):() then tf_cd:([21, 4, 0, 1, 0])
-given tf_ld("slt i32 %v1, %v2") (13, 6, "icmp"):() then tf_cd:([2, 6, 0, 1, 1])
-given tf_ld("i32 %v1 to i64") (16, 5, "zext"):() then tf_cd:([19, 5, 0, 0, 0])
-given tf_ld("i32 @id_f()") (23, 9, "call"):() then tf_cd:([6, 9, 0, 0, 0])
-given tf_ld("label %b3") (24, -1, "br"):() then tf_cd:([4, 0, 0, 0, 3])
-given tf_ld("void") (25, -1, "ret"):() then tf_cd:([7, 0, 0, 0, 0])
-given tf_ld("i32") (0, 3, "alloca"):() then tf_cd:([])
+given tf_ld("i32, ptr %v2") (1, 6, "load"):() then (import ex_cd):([0, 6, 0, 0, 0])
+given tf_ld("i32 %v3, ptr %v2") (2, -1, "store"):() then (import ex_cd):([0, 1, 0, 0, 0])
+given tf_ld("i32 %v1, %v2") (3, 8, "add"):() then (import ex_cd):([1, 8, 0, 1, 0])
+given tf_ld("double %v1, %v2") (9, 4, "fadd"):() then (import ex_cd):([21, 4, 0, 1, 0])
+given tf_ld("slt i32 %v1, %v2") (13, 6, "icmp"):() then (import ex_cd):([2, 6, 0, 1, 1])
+given tf_ld("i32 %v1 to i64") (16, 5, "zext"):() then (import ex_cd):([19, 5, 0, 0, 0])
+given tf_ld("i32 @id_f()") (23, 9, "call"):() then (import ex_cd):([6, 9, 0, 0, 0])
+given tf_ld("label %b3") (24, -1, "br"):() then (import ex_cd):([4, 0, 0, 0, 3])
+given tf_ld("void") (25, -1, "ret"):() then (import ex_cd):([7, 0, 0, 0, 0])
+given tf_ld("i32") (0, 3, "alloca"):() then (import ex_cd):([])
 given tf_ld("") (-1, -1, "frob"):() then eprints:("idrun: unsupported IR instruction 'frob'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead\n")
 
 ld_err(string msg) {
@@ -62,5 +62,5 @@ ld_err(string msg) {
   eprint("idrun: " + msg);
   pr[(import pr_err)] = pr[(import pr_err)] + 1;
 } return void;
-given lb_boot ("x"):() then eprints:("idrun: x\n") then tf_pr:([0, 0, 0, 0, 0, 0, 1, 0])
-given lb_boot given ld_err("a") ("b"):() then tf_pr:([0, 0, 0, 0, 0, 0, 2, 0])
+given lb_boot ("x"):() then eprints:("idrun: x\n") then (import ld_pr):([0, 0, 0, 0, 0, 0, 1, 0])
+given lb_boot given ld_err("a") ("b"):() then (import ld_pr):([0, 0, 0, 0, 0, 0, 2, 0])

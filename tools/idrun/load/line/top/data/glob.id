@@ -11,8 +11,8 @@ ld_global() {
   string kind = ld_word();
   ld_gdef(nm, kind);
 } return void;
-given tf_ld("@x = global i32 7") ():() then tf_gv:([7])
-given tf_ld("@.s = private unnamed_addr constant [3 x i8] c\"\\68\\69\\00\"") ():() then tf_strs:(["", "hi"])
+given tf_ld("@x = global i32 7") ():() then (import ex_gv):([7])
+given tf_ld("@.s = private unnamed_addr constant [3 x i8] c\"\\68\\69\\00\"") ():() then (import ex_strs):(["", "hi"])
 
 ld_gdef(string nm, string kind) {
   if (kind == "global") {
@@ -21,8 +21,8 @@ ld_gdef(string nm, string kind) {
     ld_gstr(nm);
   }
 } return void;
-given tf_ld(" i32 5") ("x", "global"):() then tf_gv:([5])
-given tf_ld(" c\"\\68\\00\"") (".s", "private"):() then tf_strs:(["", "h"])
+given tf_ld(" i32 5") ("x", "global"):() then (import ex_gv):([5])
+given tf_ld(" c\"\\68\\00\"") (".s", "private"):() then (import ex_strs):(["", "h"])
 
 ld_gstr(string nm) {
   string[] ts = (import ex_strs);
@@ -35,6 +35,6 @@ ld_gstr(string nm) {
   }
   ts[h] = ld_cstr();
 } return void;
-given tf_ld("c\"\\68\\69\\00\"") (".a"):() then tf_strs:(["", "hi"])
-given tf_ld("c\"\\6F\\00\"") (".a"):() then tf_strs:(["", "o"])
-given tf_ld("c\"\\68\\69\\00\"\nalias i8, getelementptr inbounds (i8, ptr @.d, i64 8)") given ld_gstr(".d") given ld_eol() (".a"):() then tf_strs:(["", "hi", "hi"])
+given tf_ld("c\"\\68\\69\\00\"") (".a"):() then (import ex_strs):(["", "hi"])
+given tf_ld("c\"\\6F\\00\"") (".a"):() then (import ex_strs):(["", "o"])
+given tf_ld("c\"\\68\\69\\00\"\nalias i8, getelementptr inbounds (i8, ptr @.d, i64 8)") given ld_gstr(".d") given ld_eol() (".a"):() then (import ex_strs):(["", "hi", "hi"])

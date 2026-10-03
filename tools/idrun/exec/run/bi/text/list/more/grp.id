@@ -30,6 +30,6 @@ vm_bl(int id, word wa, word wb, word wc) {
   vm_b_list_lock(wa);
 } return word wr;
 given vb_boot given tf_lnew given vm_b_list_push(1, 5) (10, 1, 0, 0):(5)
-given vb_boot given tf_lnew (16, 1, 0, 0):(0) then tf_llock:([0, 1])
-given vb_boot given tf_lnew (11, 1, 7, 0):(0) then tf_lists:([[], [7]])
-given vb_boot (12, 0, 0, 0):(1) then tf_lists:([[], []])
+given vb_boot given tf_lnew (16, 1, 0, 0):(0) then (import ex_llock):([0, 1])
+given vb_boot given tf_lnew (11, 1, 7, 0):(0) then (import ex_lists):([[], [7]])
+given vb_boot (12, 0, 0, 0):(1) then (import ex_lists):([[], []])

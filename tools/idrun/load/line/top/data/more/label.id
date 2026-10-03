@@ -6,9 +6,9 @@ ld_label_line() {
     ld_blkset(n, len((import ex_cd)));
   }
 } return void;
-given tf_ld("b2:") ():() then tf_blk:([-1, -1, 0])
-given tf_ld("entry:") ():() then tf_blk:([])
-given tf_ld("b1:") given ld_emit(0, 0, 0, 0, 0) ():() then tf_blk:([-1, 5])
+given tf_ld("b2:") ():() then (import ld_blk):([-1, -1, 0])
+given tf_ld("entry:") ():() then (import ld_blk):([])
+given tf_ld("b1:") given ld_emit(0, 0, 0, 0, 0) ():() then (import ld_blk):([-1, 5])
 
 ld_blkset(int n, int pc) {
   int[] blk = (import ld_blk);
@@ -17,5 +17,5 @@ ld_blkset(int n, int pc) {
   }
   blk[n] = pc;
 } return void;
-given lb_boot (2, 15):() then tf_blk:([-1, -1, 15])
-given lb_boot given ld_blkset(0, 5) (1, 9):() then tf_blk:([5, 9])
+given lb_boot (2, 15):() then (import ld_blk):([-1, -1, 15])
+given lb_boot given ld_blkset(0, 5) (1, 9):() then (import ld_blk):([5, 9])

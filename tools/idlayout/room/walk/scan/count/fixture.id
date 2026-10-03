@@ -7,10 +7,5 @@ lay_room_hits_reset() {
   export int[] room_func_hits = [];
 } return void;
 ():() then prints:("")
-():() then lay_room_hits_len:(0)
+given lay_room_hits_reset ():() then len((import room_func_hits)):(0)
 
-lay_room_hits_len() {
-  int n = len((import room_func_hits));
-} return int n;
-given lay_room_hits_reset ():(0)
-given lay_room_hits_reset ():(0) then prints:("")

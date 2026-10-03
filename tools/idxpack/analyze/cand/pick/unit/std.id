@@ -2,21 +2,15 @@
 // run with the same flags/env as the --calls run that produced this index),
 // or its absence when index.txt predates that line. main.id's run() calls
 // this once, from the parsed marker, before any reader's unit is decided.
+// ix_stdpresent: Whether this build actually resolved a stdlib -- read back, not just
+// written, so std_root_set's own cases have a witness instead of a bare
+// void call.
 std_root_set(string root, int present) {
   export string ix_stdroot = root;
   export int ix_stdpresent = present;
 } return void;
-("/repo/idstd", 1):() then std_present_get:(1)
-("", 0):() then std_present_get:(0)
-
-// Whether this build actually resolved a stdlib -- read back, not just
-// written, so std_root_set's own cases have a witness instead of a bare
-// void call.
-std_present_get() {
-  int ret_i = (import ix_stdpresent);
-} return int ret_i;
-given std_unit_fixture_root ():(1)
-given std_unit_fixture_fallback ():(0)
+("/repo/idstd", 1):() then (import ix_stdpresent):(1)
+("", 0):() then (import ix_stdpresent):(0)
 
 // A path is in the std unit when a root was named (===STD=== present and
 // non-empty) and the path starts with it followed by "/" -- not merely

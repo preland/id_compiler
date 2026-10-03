@@ -20,9 +20,9 @@ ld_load(int d) {
     ld_lread(d, ty);
   }
 } return void;
-given tf_ld("i32, ptr %v2") (6):() then tf_cd:([0, 6, 0, 0, 0])
-given tf_ld("double, ptr %v2") (6):() then tf_cd:([5, 6, 0, 0, 0])
-given tf_ld("i32, ptr @g") (6):() then tf_cd:([10, 6, 0, 0, 0])
+given tf_ld("i32, ptr %v2") (6):() then (import ex_cd):([0, 6, 0, 0, 0])
+given tf_ld("double, ptr %v2") (6):() then (import ex_cd):([5, 6, 0, 0, 0])
+given tf_ld("i32, ptr @g") (6):() then (import ex_cd):([10, 6, 0, 0, 0])
 
 // store T V, ptr P.
 ld_store() {
@@ -37,10 +37,10 @@ ld_store() {
     ld_lwrite(a, ty);
   }
 } return void;
-given tf_ld("i32 %v3, ptr %v2") ():() then tf_cd:([0, 1, 0, 0, 0])
-given tf_ld("i32 7, ptr %v2") ():() then tf_cd:([0, 1, 0, 0, 0]) then tf_kv:([7])
-given tf_ld("i32 %v3, ptr @g") ():() then tf_cd:([11, 0, 0, 0, 0])
-given tf_ld("double %v3, ptr %v2") ():() then tf_cd:([5, 1, 0, 0, 0])
-given tf_ld("i32 %v3, ptr %v2") given tf_ns ():() then tf_cd:([0, 2, 1, 0, 0])
-given tf_ld("i32 %v3, ptr @g") given tf_ns ():() then tf_cd:([11, 0, 1, 0, 0])
-given tf_ld("double %v3, ptr @g") given tf_ns ():() then tf_cd:([29, 0, 1, 0, 0])
+given tf_ld("i32 %v3, ptr %v2") ():() then (import ex_cd):([0, 1, 0, 0, 0])
+given tf_ld("i32 7, ptr %v2") ():() then (import ex_cd):([0, 1, 0, 0, 0]) then (import ex_kv):([7])
+given tf_ld("i32 %v3, ptr @g") ():() then (import ex_cd):([11, 0, 0, 0, 0])
+given tf_ld("double %v3, ptr %v2") ():() then (import ex_cd):([5, 1, 0, 0, 0])
+given tf_ld("i32 %v3, ptr %v2") given tf_ns ():() then (import ex_cd):([0, 2, 1, 0, 0])
+given tf_ld("i32 %v3, ptr @g") given tf_ns ():() then (import ex_cd):([11, 0, 1, 0, 0])
+given tf_ld("double %v3, ptr @g") given tf_ns ():() then (import ex_cd):([29, 0, 1, 0, 0])

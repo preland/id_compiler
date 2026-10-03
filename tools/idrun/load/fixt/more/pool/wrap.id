@@ -3,17 +3,17 @@
 tf_get(string kind, string name) {
   int id = ld_get(kind, name);
 } return void;
-given lb_boot given vb_boot ("g", "x"):() then tf_gv:([0])
-given lb_boot given vb_boot ("s", ".a"):() then tf_strs:(["", ""])
+given lb_boot given vb_boot ("g", "x"):() then (import ex_gv):([0])
+given lb_boot given vb_boot ("s", ".a"):() then (import ex_strs):(["", ""])
 
 tf_ns() {
   int sl = ld_newslot();
 } return void;
-given lb_boot ():() then tf_pr:([0, 1, 0, 0, 0, 0, 0, 0])
-given lb_boot given tf_ns ():() then tf_pr:([0, 2, 0, 0, 0, 0, 0, 0])
+given lb_boot ():() then (import ld_pr):([0, 1, 0, 0, 0, 0, 0, 0])
+given lb_boot given tf_ns ():() then (import ld_pr):([0, 2, 0, 0, 0, 0, 0, 0])
 
 tf_ng() {
   int g = ld_newg();
 } return void;
-given vb_boot ():() then tf_gv:([0])
-given vb_boot given tf_ng ():() then tf_gv:([0, 0])
+given vb_boot ():() then (import ex_gv):([0])
+given vb_boot given tf_ng ():() then (import ex_gv):([0, 0])

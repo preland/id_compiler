@@ -10,8 +10,8 @@ connect_qmp() {
   export int qm_qmph = sock_connect((import qm_qmp_path), 10000);
   warn_if_bad_qmp();
 } return void;
-given mk_paths given qa_sock_full ():() then qa_free_sock:(1) then qa_check_qmph:(0)
-given qa_both_ready ():() then qa_check_nc1:(1) then qa_check_qmph:(1)
+given mk_paths given qa_sock_full ():() then qa_free_sock:(1) then qa_check_qmph:("qa_check_qmph 0")
+given qa_both_ready ():() then qa_check_nc1:(1) then qa_check_qmph:("qa_check_qmph 1")
 
 // A connect that timed out is reported the way qmon.py's sys.exit did
 // (go/b/qmp/line.id's byte-at-a-time read returns nothing for a bad handle,

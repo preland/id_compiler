@@ -5,8 +5,8 @@ vb_boot() {
 } chain () {
   vb_nil();
 } return void;
-():() then tf_vlen:(4096) then tf_lists:([[]])
-():() then tf_llock:([0]) then tf_flen:(4096)
+():() then len((import ex_vals)):(4096) then (import ex_lists):([[]])
+():() then (import ex_llock):([0]) then len((import ex_fvals)):(4096)
 
 // List 0 and string 0 stand for an exported variable whose declaring function
 // has not run, which is what a zero cell holds. A list operation on list 0 is
@@ -16,11 +16,16 @@ vb_nil() {
   push((import ex_lists), nil);
   push((import ex_llock), 0);
 } return void;
-given vb_pools ():() then tf_lists:([[]])
-given vb_pools ():() then tf_llock:([0])
+given vb_pools ():() then (import ex_lists):([[]])
+given vb_pools ():() then (import ex_llock):([0])
 
-tf_s1() {
-  string s = (import ex_strs)[1];
-} return string s;
-given vb_boot given tf_sput("ab") ():("ab")
-given vb_boot given tf_sput("") given tf_sput("cd") ():("")
+
+// Test check: the whole argument-position list -- how many entries, then each.
+// ld_call and ld_calld read where the arguments of a call end, so a check of
+// one entry alone would repeat their own read.
+vm_argp_text() {
+  string vm_argp_t = lst_text((import ex_argp), ",");
+  string vm_argp_s = "args " + len((import ex_argp)) + ":" + vm_argp_t;
+} return string vm_argp_s;
+given vb_boot ():("args 0:")
+given vb_boot given lst_extend((import ex_argp), [5]) ():("args 1:5")

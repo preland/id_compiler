@@ -10,16 +10,5 @@ lay_ns_scratch_reset() {
   export string[] lay_ns_files = [];
 } return void;
 ():() then prints:("")
-():() then lay_ns_dirs_len:(0)
+given lay_ns_scratch_reset ():() then len((import lay_ns_dirs)):(0)
 
-lay_ns_dirs_len() {
-  int n = len((import lay_ns_dirs));
-} return int n;
-given lay_ns_scratch_reset ():(0)
-given lay_ns_scratch_reset ():(0) then prints:("")
-
-lay_ns_files_len() {
-  int n = len((import lay_ns_files));
-} return int n;
-given lay_ns_scratch_reset ():(0)
-given lay_ns_scratch_reset ():(0) then prints:("")

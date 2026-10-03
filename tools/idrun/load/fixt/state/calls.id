@@ -3,5 +3,5 @@
 tf_gr() {
   int g = ld_gref();
 } return void;
-given tf_ld("@x") ():() then tf_gv:([0])
-given tf_ld("@x @y") given tf_gr ():() then tf_gv:([0, 0])
+given tf_ld("@x") ():() then (import ex_gv):([0])
+given tf_ld("@x @y") given tf_gr ():() then (import ex_gv):([0, 0])

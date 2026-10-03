@@ -8,7 +8,7 @@ lay_room_one_fixture() {
   lay_room_push("/a", "dir", 2, 0);
 } return void;
 ():() then prints:("")
-():() then lay_room_count:(1)
+given lay_room_reset ():() then len((import room_paths)):(1)
 
 lay_room_two_fixture() {
   lay_room_reset();
@@ -16,4 +16,4 @@ lay_room_two_fixture() {
   lay_room_push("/b.id", "file", 1, 12);
 } return void;
 ():() then prints:("")
-():() then lay_room_count:(2)
+given lay_room_reset ():() then len((import room_paths)):(2)

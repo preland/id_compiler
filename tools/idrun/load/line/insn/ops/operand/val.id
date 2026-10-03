@@ -6,9 +6,9 @@ ld_val(int ty) {
   int sl = ld_arg(c, ty);
 } return int sl;
 given tf_ld("%v4") (2):(0)
-given tf_ld(" 7") (2):(0) then tf_kv:([7]) then tf_ks:([0])
-given tf_ld("2.5") (5):(0) then tf_kf:([2.5])
-given tf_ld("@.str3") (4):(0) then tf_kv:([1]) then tf_strs:(["", ""])
+given tf_ld(" 7") (2):(0) then (import ex_kv):([7]) then (import ex_ks):([0])
+given tf_ld("2.5") (5):(0) then (import ex_kf):([2.5])
+given tf_ld("@.str3") (4):(0) then (import ex_kv):([1]) then (import ex_strs):(["", ""])
 
 ld_arg(int c, int ty) {
   int sl = 0;
@@ -29,9 +29,9 @@ ld_arg(int c, int ty) {
   sl = ld_kword(wv);
 } return int sl;
 given tf_ld("%v4") (37, 2):(0)
-given tf_ld("@id_f") (64, 4):(0) then tf_kv:([0]) then tf_fnames:(["id_f"])
-given tf_ld("1.5") (49, 5):(0) then tf_kf:([1.5])
-given tf_ld("12") (49, 2):(0) then tf_kv:([12])
+given tf_ld("@id_f") (64, 4):(0) then (import ex_kv):([0]) then (import ld_fn):(["id_f"])
+given tf_ld("1.5") (49, 5):(0) then (import ex_kf):([1.5])
+given tf_ld("12") (49, 2):(0) then (import ex_kv):([12])
 
 // An integer literal, or null (which is zero).
 ld_const() {
@@ -42,5 +42,5 @@ ld_const() {
     wv = ld_num();
   }
 } return word wv;
-given tf_ld("null") ():(0) then ld_pos:(4)
+given tf_ld("null") ():(0) then (import ld_pr)[(import pr_p)]:(4)
 given tf_ld("-7") ():(-7)

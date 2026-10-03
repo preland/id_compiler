@@ -2,8 +2,8 @@ ld_adv(int n) {
   int[] pr = (import ld_pr);
   pr[(import pr_p)] = pr[(import pr_p)] + n;
 } return void;
-given tf_ld("abc") (2):() then ld_pos:(2)
-given tf_ld("abc") given ld_adv(1) (2):() then ld_pos:(3)
+given tf_ld("abc") (2):() then (import ld_pr)[(import pr_p)]:(2)
+given tf_ld("abc") given ld_adv(1) (2):() then (import ld_pr)[(import pr_p)]:(3)
 
 // The bytes from a up to e as a string, built a byte at a time because
 // slicing through the flat store would move the program's own addresses.

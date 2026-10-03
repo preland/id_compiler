@@ -4,14 +4,14 @@
 ld_cstr() {
   ld_to(34);
   ld_adv(1);
-  int q0 = ld_pos();
+  int q0 = (import ld_pr)[(import pr_p)];
 } chain () {
   ld_to(34);
-  int n = (ld_pos() - q0) / 3;
+  int n = ((import ld_pr)[(import pr_p)] - q0) / 3;
   string cv = ld_cbuild(q0, n - 1);
 } return string cv;
-given tf_ld("c\"\\68\\69\\00\"") ():("hi") then ld_pos:(11)
-given tf_ld("c\"\\00\"") ():("") then ld_pos:(5)
+given tf_ld("c\"\\68\\69\\00\"") ():("hi") then ld_pr_text:("parse 8:11,0,0,0,0,0,0,0")
+given tf_ld("c\"\\00\"") ():("") then ld_pr_text:("parse 8:5,0,0,0,0,0,0,0")
 
 // n bytes of escapes from q0 as a string: chunks of 64 built byte by byte and
 // joined, which keeps a long constant from being copied once per byte.

@@ -6,8 +6,8 @@ ld_skip() {
     c = ld_at();
   }
 } return void;
-given tf_ld("  , x") ():() then ld_pos:(4)
-given tf_ld("x") ():() then ld_pos:(0)
+given tf_ld("  , x") ():() then (import ld_pr)[(import pr_p)]:(4)
+given tf_ld("x") ():() then (import ld_pr)[(import pr_p)]:(0)
 
 // Where the word starting at e ends. A word is letters, digits, '_' and '.'.
 ld_wend(int e) {
@@ -21,11 +21,11 @@ given tf_ld("add i32") (3):(3)
 
 ld_word() {
   ld_skip();
-  int p = ld_pos();
+  int p = (import ld_pr)[(import pr_p)];
   int e = ld_wend(p);
 } chain () {
   string w = ld_str(p, e);
   ld_adv(e - p);
 } return string w;
-given tf_ld("  add i32") ():("add") then ld_pos:(5)
-given tf_ld("%v1") ():("") then ld_pos:(0)
+given tf_ld("  add i32") ():("add") then ld_pr_text:("parse 8:5,0,0,0,0,0,0,0")
+given tf_ld("%v1") ():("") then ld_pr_text:("parse 8:0,0,0,0,0,0,0,0")

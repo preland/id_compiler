@@ -5,8 +5,8 @@ ld_cptr() {
   string nm = ld_word();
   int id = ld_cid(nm);
 } return int id;
-given tf_ld("@.str1") ():(1) then tf_strs:(["", ""])
-given tf_ld("@id_f") ():(0) then tf_fnames:(["id_f"])
+given tf_ld("@.str1") ():(1) then (import ex_strs):(["", ""])
+given tf_ld("@id_f") ():(0) then (import ld_fn):(["id_f"])
 
 ld_cid(string nm) {
   int id = 0;
@@ -23,5 +23,5 @@ ld_cref() {
   int id = ld_cptr();
   int sl = ld_kword(id);
 } return int sl;
-given tf_ld("@id_f") ():(0) then tf_ks:([0]) then tf_kv:([0])
-given tf_ld("@.s") ():(0) then tf_kv:([1])
+given tf_ld("@id_f") ():(0) then (import ex_ks):([0]) then (import ex_kv):([0])
+given tf_ld("@.s") ():(0) then (import ex_kv):([1])

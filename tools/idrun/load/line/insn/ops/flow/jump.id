@@ -19,16 +19,16 @@ ld_br() {
 } chain () {
   ld_emit((import o_cbr), 0, a, tt, ff);
 } return void;
-given tf_ld("label %b7") ():() then tf_cd:([4, 0, 0, 0, 7])
-given tf_ld("i1 %v3, label %b1, label %b2") ():() then tf_cd:([3, 0, 0, 1, 2])
-given tf_ld("i1 %v3, label %b1, label %b2") given tf_ns ():() then tf_cd:([3, 0, 1, 1, 2])
+given tf_ld("label %b7") ():() then (import ex_cd):([4, 0, 0, 0, 7])
+given tf_ld("i1 %v3, label %b1, label %b2") ():() then (import ex_cd):([3, 0, 0, 1, 2])
+given tf_ld("i1 %v3, label %b1, label %b2") given tf_ns ():() then (import ex_cd):([3, 0, 1, 1, 2])
 
 // %bN: the number N. Any other label is not a branch target in the -O0 form.
 ld_label() {
   string w = ld_sig();
   int n = ld_pnum(w, 98);
 } return int n;
-given tf_ld(" %b12,") ():(12) then ld_pos:(5)
+given tf_ld(" %b12,") ():(12) then (import ld_pr)[(import pr_p)]:(5)
 given tf_ld("%v3") ():(-1)
 
 ld_ret() {
@@ -40,5 +40,5 @@ ld_ret() {
 } chain () {
   ld_emit((import o_ret), 0, a, 0, 0);
 } return void;
-given tf_ld("void") ():() then tf_cd:([7, 0, 0, 0, 0])
-given tf_ld("i32 %v4") given tf_ns ():() then tf_cd:([7, 0, 1, 0, 0])
+given tf_ld("void") ():() then (import ex_cd):([7, 0, 0, 0, 0])
+given tf_ld("i32 %v4") given tf_ns ():() then (import ex_cd):([7, 0, 1, 0, 0])

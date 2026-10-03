@@ -53,12 +53,3 @@ run_capped(string argv_lines, string input, int mem_kb, int cpu_s) {
 ("true\n", "-", 0, 0):(0)
 ("false\n", "-", 0, 0):(1)
 
-// Reads cr_in_done (child/setup.id's setup_io, its sole exporter, boxed so
-// input/close.id's do_close_in can flip it without a second exporter) back,
-// for cases that need to see the export itself rather than just count the
-// call that set it.
-ccrun_fx_in_done_value() {
-  int ccrun_fx_in_done_v = (import cr_in_done)[0];
-} return int ccrun_fx_in_done_v;
-given ccrun_fx_run_capped_true given ccrun_fx_after_close ():(1)
-given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main given ccrun_fx_after_close ():(1)

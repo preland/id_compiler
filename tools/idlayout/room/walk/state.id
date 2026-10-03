@@ -12,7 +12,7 @@ lay_room_reset() {
   export int[] room_dist = [];
 } return void;
 ():() then prints:("")
-():() then lay_room_count:(0)
+given lay_room_reset ():() then len((import room_paths)):(0)
 
 lay_room_push(string path, string role, int free, int dist) {
   push((import room_paths), path);
@@ -21,11 +21,6 @@ lay_room_push(string path, string role, int free, int dist) {
 } chain (string path, string role, int free, int dist) {
   push((import room_dist), dist);
 } return void;
-given lay_room_reset ("d", "dir", 2, 0):() then lay_room_count:(1)
-given lay_room_reset ("d/a.id", "file", 1, 1):() then lay_room_count:(1)
+given lay_room_reset ("d", "dir", 2, 0):() then len((import room_paths)):(1)
+given lay_room_reset ("d/a.id", "file", 1, 1):() then len((import room_paths)):(1)
 
-lay_room_count() {
-  int n = len((import room_paths));
-} return int n;
-given lay_room_reset ():(0)
-given lay_room_reset ():(0) then prints:("")

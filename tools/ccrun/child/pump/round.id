@@ -20,7 +20,7 @@ pump_round(int timeout_ms) {
   int wrote_err = fs_write((import cr_err), (import cr_chunk), n_err);
   int code = proc_wait((import cr_h), 0);
 } return int code;
-given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main (200):(-1) then ccrun_fx_pending_value:(3427)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main (200):(-1) then (import cr_pending_n)[0]:(2905)
 given ccrun_fx_run_capped_true (150):(-1)
 
 // Skip pump_in entirely on the "-" (no input) path: the common case -- most
@@ -34,7 +34,7 @@ maybe_pump_in(int timeout_ms) {
   }
 } return void;
 given ccrun_fx_run_capped_true (5):(5)
-given ccrun_fx_setup_input_main (200):(200) then ccrun_fx_pending_value:(3427)
+given ccrun_fx_setup_input_main (200):(200) then (import cr_pending_n)[0]:(2905)
 
 // do_close_in already run once: cr_in_done is 1 by the time this returns,
 // letting ccrun_fx_in_done_value's second case see the "already closed"

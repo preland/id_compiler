@@ -23,6 +23,12 @@
 // boxed list is still owned by one function -- this one -- but its cells
 // can be written from anywhere by index, the same way spawn_qemu's qm_buf
 // (tools/qmon) is pushed onto from outside its own exporter.
+// cr_in_done: Reads cr_in_done (child/setup.id's setup_io, its sole exporter, boxed so
+// input/close.id's do_close_in can flip it without a second exporter) back,
+// for cases that need to see the export itself rather than just count the
+// call that set it.
+// cr_pending_n: Reads child/setup.id's cr_pending_n box back, for cases that need pump_in's
+// (round.id) staged-byte count rather than just proving it was written.
 setup_io(string input) {
   export int[] cr_chunk = [];
   lst_fill((import cr_chunk), 4096, 0);

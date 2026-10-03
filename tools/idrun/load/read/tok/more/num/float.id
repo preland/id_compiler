@@ -3,8 +3,8 @@ ld_dot() {
   int dot = ld_at() == 46;
   ld_adv(dot);
 } return int dot;
-given tf_ld(".5") ():(1) then ld_pos:(1)
-given tf_ld("5") ():(0) then ld_pos:(0)
+given tf_ld(".5") ():(1) then (import ld_pr)[(import pr_p)]:(1)
+given tf_ld("5") ():(0) then (import ld_pr)[(import pr_p)]:(0)
 
 // Ten to the k as a float: exact up to 10^22, so a literal of at most 15
 // digits is the correctly rounded quotient of two exact floats.
@@ -25,11 +25,11 @@ ld_fnum() {
   word wv = ld_digits(0);
   int dot = ld_dot();
 } chain () {
-  int p0 = ld_pos();
+  int p0 = (import ld_pr)[(import pr_p)];
   wv = ld_digits(wv);
   float f = wv;
 } chain () {
-  f = f / ld_pow10(ld_pos() - p0);
+  f = f / ld_pow10((import ld_pr)[(import pr_p)] - p0);
   if (neg == 1) {
     f = 0.0 - f;
   }

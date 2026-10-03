@@ -21,7 +21,7 @@ ld_get(string kind, string name) {
     ld_put(key, id);
   }
 } return int id;
-given lb_boot given vb_boot ("s", ".a"):(1) then tf_strs:(["", ""])
-given lb_boot given vb_boot given tf_get("s", ".a") ("s", ".a"):(1) then tf_strs:(["", ""])
-given lb_boot given vb_boot given tf_get("s", ".a") ("s", ".b"):(2) then tf_strs:(["", "", ""])
-given lb_boot given vb_boot ("f", "id_x"):(0) then tf_fnames:(["id_x"])
+given lb_boot given vb_boot ("s", ".a"):(1) then (import ex_strs):(["", ""])
+given lb_boot given vb_boot given tf_get("s", ".a") ("s", ".a"):(1) then (import ex_strs):(["", ""])
+given lb_boot given vb_boot given tf_get("s", ".a") ("s", ".b"):(2) then (import ex_strs):(["", "", ""])
+given lb_boot given vb_boot ("f", "id_x"):(0) then (import ld_fn):(["id_x"])

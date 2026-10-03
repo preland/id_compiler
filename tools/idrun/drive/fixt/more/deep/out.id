@@ -3,17 +3,11 @@
 tf_fl() {
   export int[] tf_flags = [0, 0];
 } return void;
-():() then tf_flr:([0, 0])
-given tf_fl ():() then tf_flr:([0, 0])
-
-tf_flr() {
-  int[] fl = (import tf_flags);
-} return int[] fl;
-given tf_fl ():([0, 0])
-given tf_fl ():([0, 0]) then tf_flr:([0, 0])
+():() then (import tf_flags):([0, 0])
+given tf_fl ():() then (import tf_flags):([0, 0])
 
 tf_ol() {
   export string[] tf_out = [];
 } return void;
-():() then tf_olr:([])
-given tf_ol ():() then tf_olr:([])
+():() then (import tf_out):([])
+given tf_ol ():() then (import tf_out):([])

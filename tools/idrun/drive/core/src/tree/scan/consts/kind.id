@@ -36,5 +36,5 @@ dr_cut(int[] buf, string[] out, int a, int i) {
     a = i + 1;
   }
 } return int a;
-given tf_ol ([104, 10, 105], (import tf_out), 0, 1):(2) then tf_olr:(["h"])
-given tf_ol ([104, 10, 105], (import tf_out), 0, 0):(0) then tf_olr:([])
+given tf_ol ([104, 10, 105], (import tf_out), 0, 1):(2) then (import tf_out):(["h"])
+given tf_ol ([104, 10, 105], (import tf_out), 0, 0):(0) then (import tf_out):([])

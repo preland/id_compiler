@@ -17,5 +17,5 @@ given vb_boot given tf_sput("") (1):(0)
 vm_b_str_of_word(word wa) {
   int h = vm_sput("" + wa);
 } return int h;
-given vb_boot (5000000000):(1) then tf_strs:(["", "5000000000"])
-given vb_boot (-1):(1) then tf_strs:(["", "-1"])
+given vb_boot (5000000000):(1) then (import ex_strs):(["", "5000000000"])
+given vb_boot (-1):(1) then (import ex_strs):(["", "-1"])

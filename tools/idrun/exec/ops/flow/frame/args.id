@@ -6,8 +6,8 @@ vm_args(int fp, int nfp, int apos, int np) {
     i = i + 1;
   }
 } return void;
-given vb_boot given tf_set(6, 11) given tf_set(7, 22) given tf_ap(6) given tf_ap(7) (0, 2, 0, 2):() then tf_v8:([0, 0, 11, 22, 0, 0, 11, 22])
-given vb_boot given tf_set(5, 9) given tf_ap(1) given tf_ap(5) (0, 1, 1, 1):() then tf_v8:([0, 9, 0, 0, 0, 9, 0, 0])
+given vb_boot given tf_set(6, 11) given tf_set(7, 22) given lst_extend((import ex_argp), [6]) given lst_extend((import ex_argp), [7]) (0, 2, 0, 2):() then tf_v8:([0, 0, 11, 22, 0, 0, 11, 22])
+given vb_boot given tf_set(5, 9) given lst_extend((import ex_argp), [1]) given lst_extend((import ex_argp), [5]) (0, 1, 1, 1):() then tf_v8:([0, 9, 0, 0, 0, 9, 0, 0])
 
 vm_arg(int fp, int nfp, int sl, int i) {
   word[] vals = (import ex_vals);
@@ -29,5 +29,5 @@ vm_frame(int rpc, int fp, int d, int nfp) {
   push(cs, d);
   vm_back(nfp);
 } return void;
-given vb_boot (15, 2, 3, 9):() then tf_cs:([15, 2, 3]) then tf_rg:([9, 0, 0])
-given vb_boot given vm_frame(1, 2, 3, 4) (5, 6, 7, 8):() then tf_cs:([1, 2, 3, 5, 6, 7]) then tf_rg:([8, 0, 0])
+given vb_boot (15, 2, 3, 9):() then (import ex_cs):([15, 2, 3]) then (import ex_rg):([9, 0, 0])
+given vb_boot given vm_frame(1, 2, 3, 4) (5, 6, 7, 8):() then (import ex_cs):([1, 2, 3, 5, 6, 7]) then (import ex_rg):([8, 0, 0])

@@ -7,8 +7,8 @@ tf_gset(int g, word wv) {
   }
   gv[g] = wv;
 } return void;
-given vb_boot (2, 5):() then tf_g2:(5)
-given vb_boot (3, 8):() then tf_g2:(0)
+given vb_boot (2, 5):() then (import ex_gv)[2]:(5)
+given vb_boot (3, 8):() then (import ex_gv)[2]:(0)
 
 tf_gsetf(int g, float f) {
   float[] gf = (import ex_gf);
@@ -17,11 +17,6 @@ tf_gsetf(int g, float f) {
   }
   gf[g] = f;
 } return void;
-given vb_boot (2, 1.5):() then tf_gf2:(1.5)
-given vb_boot (4, 2.5):() then tf_gf2:(0.0)
+given vb_boot (2, 1.5):() then (import ex_gf)[2]:(1.5)
+given vb_boot (4, 2.5):() then (import ex_gf)[2]:(0.0)
 
-tf_g2() {
-  word wv = (import ex_gv)[2];
-} return word wv;
-given vb_boot given tf_gset(2, 31) ():(31)
-given vb_boot given tf_gset(3, 8) ():(0)

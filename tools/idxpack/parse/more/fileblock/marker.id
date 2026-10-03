@@ -26,11 +26,3 @@ find_next_file_marker_step(string[] lines, int i, int out_i) {
 (["a"], 0, -1):(-1)
 (["===F:x==="], 0, -1):(0)
 
-// How many functions ix_init has assigned a file-bucket id to -- a witness
-// for ix_file_bucket_step's own cases that does not depend on which id a
-// given file happened to get.
-ix_fbucket_count() {
-  int ret_i = len((import ix_fbucket));
-} return int ret_i;
-given ix_test_setup ():(1)
-given ix_test_setup_empty ():(0)

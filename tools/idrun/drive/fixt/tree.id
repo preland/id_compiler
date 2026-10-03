@@ -4,8 +4,8 @@ tf_put(string path, string text) {
   int wn = fs_write_mem(h, mem_of_str(text), len(text));
   int shut = fs_close(h);
 } return void;
-given tf_file("") ((import tf_path), "hey"):() then tf_size:(3) then tf_rm:(0)
-given tf_file("long") ((import tf_path), ""):() then tf_size:(0) then tf_rm:(0)
+given tf_file("") ((import tf_path), "hey"):() then tf_size:("tf_size 3") then tf_rm:(0)
+given tf_file("long") ((import tf_path), ""):() then tf_size:("tf_size 0") then tf_rm:(0)
 
 // A project tree: a conf.id, a source file, a source file in a subdirectory,
 // and a hidden directory and a build directory that are not source.

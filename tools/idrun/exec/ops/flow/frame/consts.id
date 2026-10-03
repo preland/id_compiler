@@ -16,11 +16,6 @@ vm_const(int nfp, int k) {
   vals[nfp + sl] = (import ex_kv)[k];
   fvals[nfp + sl] = (import ex_kf)[k];
 } return void;
-given vb_boot given ld_kpush(3, 8, 0.5) (0, 0):() then tf_v3:(8) then tf_f3:(0.5)
-given vb_boot given ld_kpush(1, 4, 2.0) given ld_kpush(0, 9, 0.0) (3, 1):() then tf_v3:(9)
+given vb_boot given ld_kpush(3, 8, 0.5) (0, 0):() then (import ex_vals)[3]:(8) then (import ex_fvals)[3]:(0.5)
+given vb_boot given ld_kpush(1, 4, 2.0) given ld_kpush(0, 9, 0.0) (3, 1):() then (import ex_vals)[3]:(9)
 
-tf_argp() {
-  int[] ap = (import ex_argp);
-} return int[] ap;
-given vb_boot ():([])
-given vb_boot given tf_ap(3) given tf_ap(4) ():([3, 4])

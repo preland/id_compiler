@@ -18,4 +18,4 @@ main(int argc, string[] argv) {
   int rc = br_go(argc, argv, at);
 } return int rc;
 (1, ["buildrun"]):(2) then eprints:("usage: buildrun [--stdin] IDC_ROOT TOOL [ARGS...]\n")
-given br_t_fake(0) (3, ["buildrun", (import br_t_root), "hello"]):(0) then prints:("tool\n") then br_t_done:(1)
+given br_t_fake(0) (3, ["buildrun", (import br_t_root), "hello"]):(0) then prints:("tool\n") then br_t_done:("done 1")

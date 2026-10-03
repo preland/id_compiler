@@ -9,8 +9,8 @@ lay_count_one(int[] buf, string build, int is_root, int at) {
   lay_count_check(buf, at, end, build, is_root);
   int next = end + 1;
 } return int next;
-given lay_scratch_reset ([97, 46, 105, 100, 10], "build", 0, 0):(5) then lay_scratch_len:(1)
-given lay_scratch_reset ([46, 103, 105, 116, 47, 10], "build", 1, 0):(6) then lay_scratch_len:(0)
+given lay_scratch_reset ([97, 46, 105, 100, 10], "build", 0, 0):(5) then len((import lay_scratch_names)):(1)
+given lay_scratch_reset ([46, 103, 105, 116, 47, 10], "build", 1, 0):(6) then len((import lay_scratch_names)):(0)
 
 lay_count_all(int[] buf, string build, int is_root) {
   lay_scratch_reset();
@@ -19,8 +19,8 @@ lay_count_all(int[] buf, string build, int is_root) {
     at = lay_count_one(buf, build, is_root, at);
   }
 } return void;
-([97, 46, 105, 100, 10], "build", 0):() then lay_scratch_len:(1)
-([], "build", 0):() then lay_scratch_len:(0)
+given lay_scratch_reset ([97, 46, 105, 100, 10], "build", 0):() then len((import lay_scratch_names)):(1)
+given lay_scratch_reset ([], "build", 0):() then len((import lay_scratch_names)):(0)
 
 lay_check_entrylimit(string dir) {
   int total = len((import lay_scratch_names));

@@ -9,8 +9,8 @@ vm_lnew() {
   push(lk, 0);
   int h = len(lt) - 1;
 } return int h;
-given vb_boot ():(1) then tf_lists:([[], []]) then tf_llock:([0, 0])
-given vb_boot given tf_lnew ():(2) then tf_lists:([[], [], []])
+given vb_boot ():(1) then (import ex_lists):([[], []]) then (import ex_llock):([0, 0])
+given vb_boot given tf_lnew ():(2) then (import ex_lists):([[], [], []])
 
 vm_b_list_get(word wa, word wb) {
   int hl = wa;

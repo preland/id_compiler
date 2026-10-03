@@ -11,8 +11,8 @@ lay_ns_collect_one(int[] buf, string build, int is_root, int at) {
   lay_ns_collect_entry(buf, at, end, build, is_root);
   int next = end + 1;
 } return int next;
-given lay_ns_scratch_reset ([97, 46, 105, 100, 10], "build", 0, 0):(5) then lay_ns_files_len:(1)
-given lay_ns_scratch_reset ([46, 103, 105, 116, 47, 10], "build", 1, 0):(6) then lay_ns_dirs_len:(0)
+given lay_ns_scratch_reset ([97, 46, 105, 100, 10], "build", 0, 0):(5) then len((import lay_ns_files)):(1)
+given lay_ns_scratch_reset ([46, 103, 105, 116, 47, 10], "build", 1, 0):(6) then len((import lay_ns_dirs)):(0)
 
 lay_ns_collect_all(int[] buf, string build, int is_root) {
   lay_ns_scratch_reset();
@@ -21,8 +21,8 @@ lay_ns_collect_all(int[] buf, string build, int is_root) {
     at = lay_ns_collect_one(buf, build, is_root, at);
   }
 } return void;
-([97, 46, 105, 100, 10], "build", 0):() then lay_ns_files_len:(1)
-([], "build", 0):() then lay_ns_files_len:(0)
+given lay_ns_scratch_reset ([97, 46, 105, 100, 10], "build", 0):() then len((import lay_ns_files)):(1)
+given lay_ns_scratch_reset ([], "build", 0):() then len((import lay_ns_files)):(0)
 
 lay_check_numbered(string dir, string build, int is_root, int[] buf) {
   lay_ns_collect_all(buf, build, is_root);

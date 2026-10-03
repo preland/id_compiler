@@ -3,8 +3,8 @@ vm_b_chr(word wa) {
   int n = wa;
   int h = vm_sput(chr(n));
 } return int h;
-given vb_boot (65):(1) then tf_strs:(["", "A"])
-given vb_boot (122):(1) then tf_strs:(["", "z"])
+given vb_boot (65):(1) then (import ex_strs):(["", "A"])
+given vb_boot (122):(1) then (import ex_strs):(["", "z"])
 
 vm_b_strcmp(word wa, word wb) {
   int ia = wa;

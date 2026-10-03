@@ -8,14 +8,14 @@ tf_file(string s) {
   int shut = fs_close(h);
   fs_drop_exit(tf_path);
 } return void;
-("abc"):() then tf_size:(3) then tf_rm:(0)
-(""):() then tf_size:(0) then tf_rm:(0)
+("abc"):() then tf_size:("tf_size 3") then tf_rm:(0)
+(""):() then tf_size:("tf_size 0") then tf_rm:(0)
 
 tf_size() {
-  int n = fs_size((import tf_path));
-} return int n;
-given tf_file("hello") ():(5) then tf_rm:(0)
-given tf_file("x") ():(1) then tf_rm:(0)
+  string n_t = "tf_size " + (fs_size((import tf_path)));
+} return string n_t;
+given tf_file("hello") ():("tf_size 5") then tf_rm:(0)
+given tf_file("x") ():("tf_size 1") then tf_rm:(0)
 
 // Remove the file tf_file made; 0 when it went.
 tf_rm() {

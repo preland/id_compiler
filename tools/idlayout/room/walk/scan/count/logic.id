@@ -38,8 +38,8 @@ lay_room_count_step(int[] bytes, int at) {
 } chain (int[] bytes, int at) {
   int next = eol + 1;
 } return int next;
-given lay_room_hits_reset ([102, 40, 41, 32, 123, 10], 0):(6) then lay_room_hits_len:(1)
-given lay_room_hits_reset ([32, 97, 10], 0):(3) then lay_room_hits_len:(0)
+given lay_room_hits_reset ([102, 40, 41, 32, 123, 10], 0):(6) then len((import room_func_hits)):(1)
+given lay_room_hits_reset ([32, 97, 10], 0):(3) then len((import room_func_hits)):(0)
 
 lay_room_count_funcs(int[] bytes) {
   lay_room_hits_reset();

@@ -29,8 +29,8 @@ pump_in(int timeout_ms) {
 } chain (int timeout_ms) {
   maybe_close_in();
 } return void;
-given ccrun_fx_setup_input_main (50):(50) then ccrun_fx_pending_value:(3427)
-given ccrun_fx_run_capped_true given ccrun_fx_empty_input (50):(50) then ccrun_fx_pending_value:(0) then ccrun_fx_in_done_value:(1)
+given ccrun_fx_setup_input_main (50):(50) then (import cr_pending_n)[0]:(2905)
+given ccrun_fx_run_capped_true given ccrun_fx_empty_input (50):(50) then (import cr_pending_n)[0]:(0) then (import cr_in_done)[0]:(1)
 
 // run_capped, spawning a real ("true") child under no limits with real
 // stdout/stderr streams, is the sole exporter of cr_h/cr_out/cr_err

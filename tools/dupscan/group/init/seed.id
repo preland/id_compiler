@@ -7,15 +7,8 @@ ds_test_setup() {
   string[] lines = ["projA" + t + "FPX" + t + "foo" + t + "fileA.id:10", "projB" + t + "FPX" + t + "foo" + t + "fileB.id:20", "projC" + t + "FPX" + t + "foo" + t + "fileC.id:30", "projD" + t + "FPY" + t + "baz" + t + "fileD.id:40", ""];
   ds_init(lines, t);
 } return void;
-given ds_test_setup ():() then ds_seen1:(0)
+given ds_test_setup ():() then (import ds_seen)[1]:(0)
 given ds_test_setup ():() then ds_hash_tail:(18652613)
-
-// Line 1's seen flag: 0 until something groups it with line 0.
-ds_seen1() {
-  int r = (import ds_seen)[1];
-} return int r;
-given ds_test_setup ():(0)
-given ds_test_setup given group_all ():(1)
 
 // The most recently pushed hash, read back for ds_push/ds_row/ds_fill.
 ds_hash_tail() {

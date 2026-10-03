@@ -11,8 +11,8 @@ ix_import_fixture() {
 } chain () {
   fx_init(["===F:f.id===", "r() {", "  int c = (import err_n)[0];", "} return int c;"]);
 } return void;
-():() then total_funcs:(1)
-():() then total_files:(1)
+():() then len((import ix_fn)):(1)
+():() then len((import fx_path)):(1)
 
 // The declaring function of every name in `imports` -- the actual required
 // set for `find_givens`, which checks reachability of FUNCTION names, not
@@ -42,5 +42,5 @@ ix_export_fixture() {
   ix_init(no_edges, ["setter|f.id|1|2"]);
   fx_init(["===F:f.id===", "setter() {", "  export int gv = 0;", "} return void;"]);
 } return void;
-():() then total_funcs:(1)
-():() then total_files:(1)
+():() then len((import ix_fn)):(1)
+():() then len((import fx_path)):(1)

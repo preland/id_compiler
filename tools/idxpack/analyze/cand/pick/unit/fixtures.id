@@ -9,21 +9,21 @@ std_unit_fixture_root() {
   ix_init(no_edges, ["z|f.id|1|2"]);
   std_root_set("/repo/idstd", 1);
 } return void;
-():() then total_funcs:(1)
-():() then std_present_get:(1)
+():() then len((import ix_fn)):(1)
+():() then (import ix_stdpresent):(1)
 
 std_unit_fixture_fallback() {
   string[] no_edges = [];
   ix_init(no_edges, no_edges);
   std_root_set("", 0);
 } return void;
-():() then total_funcs:(0)
-():() then std_present_get:(0)
+():() then len((import ix_fn)):(0)
+():() then (import ix_stdpresent):(0)
 
 std_unit_fixture_empty() {
   string[] no_edges = [];
   ix_init(no_edges, no_edges);
   std_root_set("", 1);
 } return void;
-():() then total_funcs:(0)
-():() then std_present_get:(1)
+():() then len((import ix_fn)):(0)
+():() then (import ix_stdpresent):(1)

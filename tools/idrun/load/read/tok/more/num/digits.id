@@ -7,9 +7,9 @@ ld_digits(word wv) {
     c = ld_at();
   }
 } return word wv;
-given tf_ld("123 x") (0):(123) then ld_pos:(3)
+given tf_ld("123 x") (0):(123) then (import ld_pr)[(import pr_p)]:(3)
 given tf_ld("123") (5):(5123)
-given tf_ld("x") (7):(7) then ld_pos:(0)
+given tf_ld("x") (7):(7) then (import ld_pr)[(import pr_p)]:(0)
 
 // Consume a leading '-', and say whether there was one.
 ld_neg() {
@@ -17,8 +17,8 @@ ld_neg() {
   int neg = ld_at() == 45;
   ld_adv(neg);
 } return int neg;
-given tf_ld(" -5") ():(1) then ld_pos:(2)
-given tf_ld("5") ():(0) then ld_pos:(0)
+given tf_ld(" -5") ():(1) then (import ld_pr)[(import pr_p)]:(2)
+given tf_ld("5") ():(0) then (import ld_pr)[(import pr_p)]:(0)
 
 ld_num() {
   int neg = ld_neg();

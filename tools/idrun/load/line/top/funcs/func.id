@@ -10,15 +10,15 @@ ld_newfn() {
     i = i + 1;
   }
 } return int fid;
-given lb_boot given vb_boot ():(0) then tf_ft:([-1, 0, 0, 0, 0])
-given vb_boot given tf_fn(1, 2, 3, 4, 5) ():(1) then tf_ft:([1, 2, 3, 4, 5, -1, 0, 0, 0, 0])
+given lb_boot given vb_boot ():(0) then (import ex_ft):([-1, 0, 0, 0, 0])
+given vb_boot given tf_fn(1, 2, 3, 4, 5) ():(1) then (import ex_ft):([1, 2, 3, 4, 5, -1, 0, 0, 0, 0])
 
 ld_ftset(int fid, int col, int v) {
   int[] ft = (import ex_ft);
   ft[fid * (import ft_n) + col] = v;
 } return void;
-given vb_boot given tf_fn(1, 2, 3, 4, 5) (0, 2, 99):() then tf_ft:([1, 2, 99, 4, 5])
-given vb_boot given tf_fn(1, 2, 3, 4, 5) given tf_fn(6, 7, 8, 9, 10) (1, 4, 0):() then tf_ft:([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
+given vb_boot given tf_fn(1, 2, 3, 4, 5) (0, 2, 99):() then (import ex_ft):([1, 2, 99, 4, 5])
+given vb_boot given tf_fn(1, 2, 3, 4, 5) given tf_fn(6, 7, 8, 9, 10) (1, 4, 0):() then (import ex_ft):([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 
 // The start of a function: its id, its entry pc (the next instruction), and
 // its first constant row. main's own wrapper is not read at all: idrun builds
@@ -39,6 +39,6 @@ ld_begin(string nm) {
   ld_ftset(fid, (import ft_pc), pr[(import pr_pc0)]);
   ld_params();
 } return void;
-given tf_ld("(i32 %v1, ptr %v2)") ("id_f"):() then tf_ft:([0, 2, 0, 0, 0]) then tf_fnames:(["id_f"])
-given tf_ld("()") given ld_emit(0, 0, 0, 0, 0) given ld_kpush(0, 1, 0.0) ("id_g"):() then tf_ft:([5, 0, 0, 0, 0]) then tf_pr:([1, 0, 0, 5, 0, 1, 0, 0])
-given tf_ld("(i32 %v1)") ("main"):() then tf_pr:([0, 0, 0, 0, 1, 0, 0, 0]) then tf_ft:([])
+given tf_ld("(i32 %v1, ptr %v2)") ("id_f"):() then (import ex_ft):([0, 2, 0, 0, 0]) then (import ld_fn):(["id_f"])
+given tf_ld("()") given ld_emit(0, 0, 0, 0, 0) given ld_kpush(0, 1, 0.0) ("id_g"):() then (import ex_ft):([5, 0, 0, 0, 0]) then (import ld_pr):([1, 0, 0, 5, 0, 1, 0, 0])
+given tf_ld("(i32 %v1)") ("main"):() then (import ld_pr):([0, 0, 0, 0, 1, 0, 0, 0]) then (import ex_ft):([])

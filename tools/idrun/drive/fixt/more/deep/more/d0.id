@@ -1,6 +1,6 @@
 // Has the scratch directory dr_tryd took first been removed.
 tf_nod0() {
-  int gone = fs_exists((import tf_d0)) == 0;
-} return int gone;
-given tf_stem ():(1) then tf_rmstem:(0)
-given tf_stem given tf_mk0 ():(0) then tf_rmstem:(0)
+  string gone_t = "tf_nod0 " + (fs_exists((import tf_d0)) == 0);
+} return string gone_t;
+given tf_stem ():("tf_nod0 1") then tf_rmstem:(0)
+given tf_stem given tf_mk0 ():("tf_nod0 0") then tf_rmstem:(0)

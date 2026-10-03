@@ -6,10 +6,5 @@ lay_scratch_reset() {
   export string[] lay_scratch_names = [];
 } return void;
 ():() then prints:("")
-():() then lay_scratch_len:(0)
+given lay_scratch_reset ():() then len((import lay_scratch_names)):(0)
 
-lay_scratch_len() {
-  int n = len((import lay_scratch_names));
-} return int n;
-given lay_scratch_reset ():(0)
-given lay_scratch_reset ():(0) then prints:("")

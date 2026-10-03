@@ -21,13 +21,13 @@ ld_to(int ch) {
     c = ld_at();
   }
 } return void;
-given tf_ld("abc;def") (59):() then ld_pos:(3)
-given tf_ld("abc;def") (120):() then ld_pos:(7)
+given tf_ld("abc;def") (59):() then (import ld_pr)[(import pr_p)]:(3)
+given tf_ld("abc;def") (120):() then (import ld_pr)[(import pr_p)]:(7)
 
 // Past the end of this line.
 ld_eol() {
   ld_to(10);
   ld_adv(1);
 } return void;
-given tf_ld("ab\ncd") ():() then ld_pos:(3)
-given tf_ld("abcd") ():() then ld_pos:(5)
+given tf_ld("ab\ncd") ():() then (import ld_pr)[(import pr_p)]:(3)
+given tf_ld("abcd") ():() then (import ld_pr)[(import pr_p)]:(5)

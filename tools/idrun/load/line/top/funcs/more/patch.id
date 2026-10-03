@@ -4,8 +4,8 @@ ld_patch(int pc, int sz) {
     pc = pc + (import i_n);
   }
 } return void;
-given vb_boot given ld_emit(6, 1, 0, 0, 0) given ld_emit(0, 1, 1, 0, 0) (0, 7):() then tf_cd:([6, 1, 0, 0, 7, 0, 1, 1, 0, 0])
-given vb_boot given ld_emit(6, 1, 0, 0, 0) given ld_emit(30, 1, 1, 0, 0) (5, 4):() then tf_cd:([6, 1, 0, 0, 0, 30, 1, 1, 0, 4])
+given vb_boot given ld_emit(6, 1, 0, 0, 0) given ld_emit(0, 1, 1, 0, 0) (0, 7):() then vm_cd_text:("code 10:6,1,0,0,7,0,1,1,0,0")
+given vb_boot given ld_emit(6, 1, 0, 0, 0) given ld_emit(30, 1, 1, 0, 0) (5, 4):() then vm_cd_text:("code 10:6,1,0,0,0,30,1,1,0,4")
 
 ld_patch1(int pc, int sz) {
   int[] cd = (import ex_cd);
@@ -14,6 +14,6 @@ ld_patch1(int pc, int sz) {
     cd[pc + 4] = sz;
   }
 } return void;
-given vb_boot given ld_emit(6, 1, 0, 0, 0) (0, 7):() then tf_cd:([6, 1, 0, 0, 7])
-given vb_boot given ld_emit(30, 1, 0, 0, 0) (0, 7):() then tf_cd:([30, 1, 0, 0, 7])
-given vb_boot given ld_emit(4, 1, 0, 0, 9) (0, 7):() then tf_cd:([4, 1, 0, 0, 9])
+given vb_boot given ld_emit(6, 1, 0, 0, 0) (0, 7):() then (import ex_cd):([6, 1, 0, 0, 7])
+given vb_boot given ld_emit(30, 1, 0, 0, 0) (0, 7):() then (import ex_cd):([30, 1, 0, 0, 7])
+given vb_boot given ld_emit(4, 1, 0, 0, 9) (0, 7):() then (import ex_cd):([4, 1, 0, 0, 9])

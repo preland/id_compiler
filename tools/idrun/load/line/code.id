@@ -3,7 +3,7 @@ ld_ty() {
   string w = ld_word();
   int ty = ld_look("t:" + w);
 } return int ty;
-given tf_ld("i32 x") ():(2) then ld_pos:(3)
+given tf_ld("i32 x") ():(2) then (import ld_pr)[(import pr_p)]:(3)
 given tf_ld(" double") ():(5)
 given tf_ld("foo") ():(-1)
 
@@ -23,5 +23,5 @@ ld_emit(int op, int d, int a, int b, int x) {
   push((import ex_cd), b);
   push((import ex_cd), x);
 } return void;
-given vb_boot (1, 2, 3, 4, 5):() then tf_cd:([1, 2, 3, 4, 5])
-given vb_boot given ld_emit(9, 9, 9, 9, 9) (1, 2, 3, 4, 5):() then tf_cd:([9, 9, 9, 9, 9, 1, 2, 3, 4, 5])
+given vb_boot (1, 2, 3, 4, 5):() then (import ex_cd):([1, 2, 3, 4, 5])
+given vb_boot given ld_emit(9, 9, 9, 9, 9) (1, 2, 3, 4, 5):() then (import ex_cd):([9, 9, 9, 9, 9, 1, 2, 3, 4, 5])

@@ -44,5 +44,5 @@ unmet_req_fixture() {
   fx_init(["===F:f.id===", "a() { } return void;", "b() { int x = (import zzz)[0]; } return int x;", "d() { export int zzz = 0; } return void;"]);
   std_root_set("", 0);
 } return void;
-():() then total_funcs:(3)
-():() then total_edges:(1)
+():() then len((import ix_fn)):(3)
+():() then len((import ix_ecaller)):(1)

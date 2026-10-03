@@ -5,6 +5,14 @@
 // types ("t:i32"), predicates ("p:slt"), runtime helpers ("b:id_len"), and the
 // program's own functions ("f:"), globals ("g:"), string constants ("s:") and
 // unnamed locals ("l:").
+// ld_pr: The loader reads its text, a list of bytes, one cursor at a time: the text
+// is ld_b, the cursor is a cell of ld_pr. It never touches the flat store, so
+// the program it loads sees the store exactly as a compiled one would: the
+// text is a list, and the words made from it are built with chr. Every token
+// reader below moves the cursor and returns what it read, so the instruction
+// parsers never pass an index.
+// ld_pr: The loader's state, read back for a `then`: its registers, the names it has
+// given function ids, and the pc of each block.
 lb_tables() {
   export int[] ld_pr = [0, 0, 0, 0, 0, 0, 0, 0];
   export int[] ld_vslot = [];
@@ -18,8 +26,8 @@ lb_tables() {
   export string[] ld_fn = [];
   hmap_init((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn));
 } return void;
-():() then tf_pr:([0, 0, 0, 0, 0, 0, 0, 0])
-():() then tf_fnames:([])
+():() then (import ld_pr):([0, 0, 0, 0, 0, 0, 0, 0])
+():() then (import ld_fn):([])
 
 lb_boot() {
   lb_tables();
@@ -32,3 +40,14 @@ lb_boot() {
 } return void;
 ():() then tf_iadd:(3) then tf_bpoke:(45)
 ():() then tf_xstr:(2) then tf_bpoke:(45)
+
+// Test check: the loader's whole parse state, one slot after another -- the
+// readers of a line (ld_word, ld_cstr, ld_line) advance its position and read
+// the rest of it, so a case about one of them states every slot rather than
+// the one it happens to read.
+ld_pr_text() {
+  string ld_pr_t = lst_text((import ld_pr), ",");
+  string ld_pr_s = "parse " + len((import ld_pr)) + ":" + ld_pr_t;
+} return string ld_pr_s;
+given lb_boot ():("parse 8:0,0,0,0,0,0,0,0")
+given lb_boot given lset((import ld_pr), 0, 3) ():("parse 8:3,0,0,0,0,0,0,0")

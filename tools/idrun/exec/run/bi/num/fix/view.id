@@ -1,11 +1,3 @@
-// Fixtures that read the executor's state back for a `then`: the registers, the
-// first eight slots of each view of the value stack, and the stack's length.
-tf_rg() {
-  int[] rg = (import ex_rg);
-} return int[] rg;
-given vb_boot ():([0, 0, 0])
-given vb_boot given vm_back(6) ():([6, 0, 0])
-
 tf_v8() {
   word[] vals = (import ex_vals);
   word[] eight = [];

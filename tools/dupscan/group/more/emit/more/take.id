@@ -16,8 +16,8 @@ take_eq(int[] grp, int j, string a, string b) {
     take_new(grp, j);
   }
 } return void;
-given ds_test_setup ([0], 1, "FPX", "FPX"):([0, 1], 1, "FPX", "FPX") then ds_seen1:(1)
-given ds_test_setup ([0], 1, "FPX", "FPY"):([0], 1, "FPX", "FPY") then ds_seen1:(0)
+given ds_test_setup ([0], 1, "FPX", "FPX"):([0, 1], 1, "FPX", "FPX") then (import ds_seen)[1]:(1)
+given ds_test_setup ([0], 1, "FPX", "FPY"):([0], 1, "FPX", "FPY") then (import ds_seen)[1]:(0)
 
 take_new(int[] grp, int j) {
   int dup = has_where(grp, j);

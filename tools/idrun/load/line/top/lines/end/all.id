@@ -4,8 +4,8 @@ ld_all(int[] bytes) {
   ld_lines();
   ld_finish();
 } return void;
-given lb_boot given vb_boot ([98, 48, 58, 10, 32, 32, 114, 101, 116, 32, 118, 111, 105, 100, 10]):() then tf_cd:([7, 0, 0, 0, 0]) then tf_blk:([0])
-given lb_boot given vb_boot ([]):() then tf_cd:([])
+given lb_boot given vb_boot ([98, 48, 58, 10, 32, 32, 114, 101, 116, 32, 118, 111, 105, 100, 10]):() then (import ex_cd):([7, 0, 0, 0, 0]) then (import ld_blk):([0])
+given lb_boot given vb_boot ([]):() then (import ex_cd):([])
 
 ld_start(int[] bytes) {
   export int[] ld_b = bytes;
@@ -19,5 +19,5 @@ ld_finish() {
   ld_link();
   ld_undef();
 } return void;
-given tf_ld("") given ld_blkset(1, 15) given ld_emit(4, 0, 0, 0, 1) ():() then tf_cd:([4, 0, 0, 0, 15])
+given tf_ld("") given ld_blkset(1, 15) given ld_emit(4, 0, 0, 0, 1) ():() then (import ex_cd):([4, 0, 0, 0, 15])
 given tf_ld("") given tf_get("f", "id_n") ():() then eprints:("idrun: 'id_n' is called but not defined: it is a native or comes from the standard library, which idrun cannot run yet (docs/INTERPRETER.md, milestone 2); compile this program with idc\n")

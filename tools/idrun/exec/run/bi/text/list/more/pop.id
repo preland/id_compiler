@@ -8,16 +8,16 @@ vm_b_list_pop(word wa) {
     wr = pop(l);
   }
 } return word wr;
-given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1):(6) then tf_lists:([[], [5]])
-given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_lock(1) (1):(0) then tf_lists:([[], [5]]) then eprints:("id: cannot mutate a constant list\n")
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1):(6) then (import ex_lists):([[], [5]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_lock(1) (1):(0) then (import ex_lists):([[], [5]]) then eprints:("id: cannot mutate a constant list\n")
 
 vm_b_list_lock(word wa) {
   int hl = wa;
   int[] lk = (import ex_llock);
   lk[hl] = 1;
 } return void;
-given vb_boot given tf_lnew (1):() then tf_llock:([0, 1])
-given vb_boot given tf_lnew given tf_lnew (2):() then tf_llock:([0, 0, 1])
+given vb_boot given tf_lnew (1):() then (import ex_llock):([0, 1])
+given vb_boot given tf_lnew given tf_lnew (2):() then (import ex_llock):([0, 0, 1])
 
 // Answers 1 for a list that exists. List 0 is the null list: using it traps.
 vm_live(int hl) {
@@ -28,4 +28,4 @@ vm_live(int hl) {
   }
 } return int ok;
 given vb_boot (1):(1)
-given vb_boot (0):(0) then eprints:("id: read of an uninitialised export (its declaring function has not run)\n") then tf_rg:([0, 1, 1])
+given vb_boot (0):(0) then eprints:("id: read of an uninitialised export (its declaring function has not run)\n") then (import ex_rg):([0, 1, 1])

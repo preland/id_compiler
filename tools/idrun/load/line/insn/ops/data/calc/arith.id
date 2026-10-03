@@ -6,8 +6,8 @@ ld_bin(int code, int d) {
 } chain (int code, int d) {
   ld_emit(ld_binop(code, ty), d, a, b, 0);
 } return void;
-given tf_ld("i32 %v1, %v2") (3, 8):() then tf_cd:([1, 8, 0, 1, 0])
-given tf_ld("i64 %v1, 5") (4, 8):() then tf_cd:([14, 8, 0, 1, 0]) then tf_kv:([5])
+given tf_ld("i32 %v1, %v2") (3, 8):() then (import ex_cd):([1, 8, 0, 1, 0])
+given tf_ld("i64 %v1, 5") (4, 8):() then (import ex_cd):([14, 8, 0, 1, 0]) then (import ex_kv):([5])
 
 ld_binop(int code, int ty) {
   int k = code - (import p_add);
@@ -30,6 +30,6 @@ ld_fbin(int code, int d) {
   int fa = ld_val(ty);
   ld_emit((import o_fadd) + code - (import p_fadd), d, fa, ld_val(ty), 0);
 } return void;
-given tf_ld("double %v1, %v2") (9, 4):() then tf_cd:([21, 4, 0, 1, 0])
-given tf_ld("double %v1, 2.5") (12, 4):() then tf_cd:([24, 4, 0, 1, 0]) then tf_kf:([2.5])
-given tf_ld("double %v1, %v2") given tf_ns (9, 4):() then tf_cd:([21, 4, 1, 2, 0])
+given tf_ld("double %v1, %v2") (9, 4):() then (import ex_cd):([21, 4, 0, 1, 0])
+given tf_ld("double %v1, 2.5") (12, 4):() then (import ex_cd):([24, 4, 0, 1, 0]) then (import ex_kf):([2.5])
+given tf_ld("double %v1, %v2") given tf_ns (9, 4):() then (import ex_cd):([21, 4, 1, 2, 0])

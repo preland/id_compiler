@@ -6,21 +6,21 @@ vm_add32(int fp, int d, int a, int b) {
   int r = vals[fp + a] + vals[fp + b];
   vals[fp + d] = r;
 } return void;
-given vb_boot given tf_set(1, 2147483647) given tf_set(2, 1) (0, 3, 1, 2):() then tf_v3:(-2147483648)
-given vb_boot given tf_set(2, 5) given tf_set(1, 7) (1, 2, 1, 0):() then tf_v3:(12)
+given vb_boot given tf_set(1, 2147483647) given tf_set(2, 1) (0, 3, 1, 2):() then (import ex_vals)[3]:(-2147483648)
+given vb_boot given tf_set(2, 5) given tf_set(1, 7) (1, 2, 1, 0):() then (import ex_vals)[3]:(12)
 
 vm_sub32(int fp, int d, int a, int b) {
   word[] vals = (import ex_vals);
   int r = vals[fp + a] - vals[fp + b];
   vals[fp + d] = r;
 } return void;
-given vb_boot given tf_set(1, -2147483648) given tf_set(2, 1) (0, 3, 1, 2):() then tf_v3:(2147483647)
-given vb_boot given tf_set(2, 5) given tf_set(1, 7) (1, 2, 1, 0):() then tf_v3:(-2)
+given vb_boot given tf_set(1, -2147483648) given tf_set(2, 1) (0, 3, 1, 2):() then (import ex_vals)[3]:(2147483647)
+given vb_boot given tf_set(2, 5) given tf_set(1, 7) (1, 2, 1, 0):() then (import ex_vals)[3]:(-2)
 
 vm_mul32(int fp, int d, int a, int b) {
   word[] vals = (import ex_vals);
   int r = vals[fp + a] * vals[fp + b];
   vals[fp + d] = r;
 } return void;
-given vb_boot given tf_set(1, 100000) given tf_set(2, 100000) (0, 3, 1, 2):() then tf_v3:(1410065408)
-given vb_boot given tf_set(2, 6) given tf_set(1, -7) (1, 2, 1, 0):() then tf_v3:(-42)
+given vb_boot given tf_set(1, 100000) given tf_set(2, 100000) (0, 3, 1, 2):() then (import ex_vals)[3]:(1410065408)
+given vb_boot given tf_set(2, 6) given tf_set(1, -7) (1, 2, 1, 0):() then (import ex_vals)[3]:(-42)

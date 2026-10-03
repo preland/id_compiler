@@ -9,8 +9,8 @@ vm_room(int n) {
     push(fvals, 0.0);
   }
 } return void;
-given vb_boot (5000):() then tf_vlen:(5000) then tf_flen:(5000)
-given vb_boot (10):() then tf_vlen:(4096) then tf_flen:(4096)
+given vb_boot (5000):() then len((import ex_vals)):(5000) then len((import ex_fvals)):(5000)
+given vb_boot (10):() then len((import ex_vals)):(4096) then len((import ex_fvals)):(4096)
 
 // A trap of this interpreter's own: the same line the compiled program's
 // runtime writes, then the run stops with status 1.
@@ -21,11 +21,17 @@ vm_trap(string msg) {
 } chain (string msg) {
   rg[(import r_status)] = 1;
 } return void;
-given vb_boot ("boom"):() then eprints:("id: boom\n") then tf_rg:([0, 1, 1])
-given vb_boot ("x y"):() then eprints:("id: x y\n") then tf_rg:([0, 1, 1])
+given vb_boot ("boom"):() then eprints:("id: boom\n") then (import ex_rg):([0, 1, 1])
+given vb_boot ("x y"):() then eprints:("id: x y\n") then (import ex_rg):([0, 1, 1])
 
-tf_gf2() {
-  float f = (import ex_gf)[2];
-} return float f;
-given vb_boot given tf_gsetf(2, 7.5) ():(7.5)
-given vb_boot given tf_gsetf(3, 7.5) ():(0.0)
+
+// Test check: the whole code list -- how many cells, then each one, five to an
+// instruction. The loader's writers (ld_link, ld_patch, ld_call) read the list's
+// length to know where the next instruction goes, so a check of one cell
+// alone would repeat their own read.
+vm_cd_text() {
+  string vm_cd_t = lst_text((import ex_cd), ",");
+  string vm_cd_s = "code " + len((import ex_cd)) + ":" + vm_cd_t;
+} return string vm_cd_s;
+given vb_boot ():("code 0:")
+given vb_boot given ld_emit(1, 3, 1, 2, 0) ():("code 5:1,3,1,2,0")

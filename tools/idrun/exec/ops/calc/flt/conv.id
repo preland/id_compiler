@@ -4,18 +4,6 @@ vm_fptosi(int fp, int d, int a) {
   int n = (import ex_fvals)[fp + a];
   vals[fp + d] = n;
 } return void;
-given vb_boot given tf_setf(1, 2.75) (0, 3, 1):() then tf_v3:(2)
-given vb_boot given tf_setf(2, -7.9) (1, 2, 1):() then tf_v3:(-7)
+given vb_boot given tf_setf(1, 2.75) (0, 3, 1):() then (import ex_vals)[3]:(2)
+given vb_boot given tf_setf(2, -7.9) (1, 2, 1):() then (import ex_vals)[3]:(-7)
 
-// Read slot 3 of the float view back, for the float operations' cases.
-tf_f3() {
-  float f = (import ex_fvals)[3];
-} return float f;
-given vb_boot ():(0.0)
-given vb_boot given tf_setf(3, 1.5) ():(1.5)
-
-tf_flen() {
-  int n = len((import ex_fvals));
-} return int n;
-given vb_boot ():(4096)
-given vb_boot given vm_room(5000) ():(5000)

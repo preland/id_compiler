@@ -19,9 +19,10 @@ warn_if_bad_serial() {
 given qa_both_ready given connect_qmp given qa_sock_full given connect_serial ():() then qa_free_sock:(1) then qa_check_nc1:(1) then eprints:("qmon: QEMU never opened its serial socket\n")
 given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then eprints:("")
 
+// qm_rc: set_rc's export, read back directly.
 set_rc() {
   int bad = conn_bad();
   export int qm_rc = bad;
 } return void;
-given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then qa_read_rc:(0)
-given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then qa_read_rc:(0) then calls conn_bad:[1]
+given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then (import qm_rc):(0)
+given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then (import qm_rc):(0) then calls conn_bad:[1]

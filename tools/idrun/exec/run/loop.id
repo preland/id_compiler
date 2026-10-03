@@ -6,8 +6,8 @@ vm_run(int pc) {
     pc = vm_step(pc, fp);
   }
 } return int pc;
-given vb_boot given ld_emit(1, 3, 1, 2, 0) given ld_emit(7, 0, 3, 0, 0) given tf_set(1, 20) given tf_set(2, 22) (0):(-1) then tf_rg:([0, 1, 42])
-given vb_boot given ld_emit(1, 3, 3, 4, 0) given ld_emit(9, 1, 1, 2, 0) given ld_emit(3, 0, 1, 0, 15) given ld_emit(7, 0, 3, 0, 0) given tf_set(1, 3) given tf_set(2, 1) given tf_set(4, 10) (0):(-1) then tf_rg:([0, 1, 30]) then tf_v3:(30)
+given vb_boot given ld_emit(1, 3, 1, 2, 0) given ld_emit(7, 0, 3, 0, 0) given tf_set(1, 20) given tf_set(2, 22) (0):(-1) then vm_rg_text:("regs 3:0,1,42")
+given vb_boot given ld_emit(1, 3, 3, 4, 0) given ld_emit(9, 1, 1, 2, 0) given ld_emit(3, 0, 1, 0, 15) given ld_emit(7, 0, 3, 0, 0) given tf_set(1, 3) given tf_set(2, 1) given tf_set(4, 10) (0):(-1) then vm_rg_text:("regs 3:0,1,30") then (import ex_vals)[3]:(30)
 
 // One instruction: the next pc, which is pc + 5 unless it jumps. The tests
 // run in conf.id's order, hottest first, three to a segment because that is
@@ -167,9 +167,20 @@ vm_step(int pc, int fp) {
   }
   vm_trap("unknown opcode " + op);
 } return int t;
-given vb_boot given ld_emit(0, 3, 1, 0, 0) given tf_set(1, 7) (0, 0):(5) then tf_v3:(7)
-given vb_boot given ld_emit(1, 3, 1, 2, 0) given tf_set(1, 20) given tf_set(2, 22) (0, 0):(5) then tf_v3:(42)
+given vb_boot given ld_emit(0, 3, 1, 0, 0) given tf_set(1, 7) (0, 0):(5) then (import ex_vals)[3]:(7)
+given vb_boot given ld_emit(1, 3, 1, 2, 0) given tf_set(1, 20) given tf_set(2, 22) (0, 0):(5) then (import ex_vals)[3]:(42)
 given vb_boot given ld_emit(4, 0, 0, 0, 25) (0, 0):(25)
 given vb_boot given tf_set(1, 1) given ld_emit(3, 0, 1, 10, 20) (0, 0):(10)
 given vb_boot given tf_set(1, 0) given ld_emit(3, 0, 1, 10, 20) (0, 0):(20)
 given vb_boot given ld_emit(99, 0, 0, 0, 0) (0, 0):(-1) then eprints:("id: unknown opcode 99\n")
+
+// Test check: the whole register file -- how many registers, then each -- the
+// state vm_run's loop leaves behind. The loop reads the frame pointer from it
+// on every instruction, so a check of one register alone would repeat part of
+// its own read.
+vm_rg_text() {
+  string vm_rg_t = lst_text((import ex_rg), ",");
+  string vm_rg_s = "regs " + len((import ex_rg)) + ":" + vm_rg_t;
+} return string vm_rg_s;
+given vb_boot ():("regs 3:0,0,0")
+given vb_boot given lset((import ex_rg), 1, 4) ():("regs 3:0,4,0")

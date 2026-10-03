@@ -48,5 +48,5 @@ rev_edge_fixture() {
   ix_init(["p|q|call"], ["p|f.id|1|2", "q|f.id|2|2"]);
   fx_init(["===F:f.id===", "p() { } return void;", "q() { } return void;"]);
 } return void;
-():() then total_funcs:(2)
-():() then total_edges:(1)
+():() then len((import ix_fn)):(2)
+():() then len((import ix_ecaller)):(1)

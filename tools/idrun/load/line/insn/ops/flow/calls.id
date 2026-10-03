@@ -10,17 +10,17 @@ ld_call(int d) {
     ld_calli(d, apos);
   }
 } return void;
-given tf_ld("i32 @id_f(i32 %v1)") (9):() then tf_cd:([6, 9, 0, 0, 0]) then tf_argp:([0]) then tf_fnames:(["id_f"])
-given tf_ld("void %v7(i32 %v1)") (-1):() then tf_cd:([30, -1, 0, 0, 0]) then tf_argp:([1])
+given tf_ld("i32 @id_f(i32 %v1)") (9):() then (import ex_cd):([6, 9, 0, 0, 0]) then vm_argp_text:("args 1:0") then (import ld_fn):(["id_f"])
+given tf_ld("void %v7(i32 %v1)") (-1):() then (import ex_cd):([30, -1, 0, 0, 0]) then vm_argp_text:("args 1:1")
 
 ld_calli(int d, int apos) {
   int sl = ld_var();
   int n = ld_args();
   ld_emit((import o_calli), d, sl, apos, 0);
 } return void;
-given tf_ld("%v7(i32 %v1)") (4, 0):() then tf_cd:([30, 4, 0, 0, 0]) then tf_argp:([1])
-given tf_ld("%v7()") (4, 6):() then tf_cd:([30, 4, 0, 6, 0]) then tf_argp:([])
-given tf_ld("%v7(i32 %v1)") given tf_ns (4, 0):() then tf_cd:([30, 4, 1, 0, 0]) then tf_argp:([2])
+given tf_ld("%v7(i32 %v1)") (4, 0):() then (import ex_cd):([30, 4, 0, 0, 0]) then (import ex_argp):([1])
+given tf_ld("%v7()") (4, 6):() then (import ex_cd):([30, 4, 0, 6, 0]) then (import ex_argp):([])
+given tf_ld("%v7(i32 %v1)") given tf_ns (4, 0):() then (import ex_cd):([30, 4, 1, 0, 0]) then (import ex_argp):([2])
 
 // A named callee is a runtime helper, one of the three float helpers, or a
 // function of the program, in that order of lookup.
@@ -43,11 +43,11 @@ ld_calld(int d, int apos) {
   }
   ld_emit((import o_call), d, ld_get("f", nm), apos, 0);
 } return void;
-given tf_ld("@id_len(ptr %v1)") (9, 0):() then tf_cd:([8, 9, 3, 0, 0]) then tf_argp:([0, 0, 0])
-given tf_ld("@id_box_f(double %v1)") (9, 0):() then tf_cd:([31, 9, 0, 0, 0])
-given tf_ld("@id_box_f(double %v1)") given tf_ns given tf_ap(5) (9, 1):() then tf_cd:([31, 9, 1, 0, 0])
-given tf_ld("@id_unbox_f(i64 %v1)") (9, 0):() then tf_cd:([32, 9, 0, 0, 0])
-given tf_ld("@id_g(i32 %v1, i32 %v2)") (9, 0):() then tf_cd:([6, 9, 0, 0, 0]) then tf_argp:([0, 1])
-given tf_ld("@id_g()") given tf_get("f", "id_a") (9, 0):() then tf_cd:([6, 9, 1, 0, 0])
-given tf_ld("@id_g(i32 %v1)") (9, 3):() then tf_cd:([6, 9, 0, 3, 0]) then tf_argp:([0])
-given tf_ld("@id_len(ptr %v1)") (9, 3):() then tf_cd:([8, 9, 3, 3, 0])
+given tf_ld("@id_len(ptr %v1)") (9, 0):() then (import ex_cd):([8, 9, 3, 0, 0]) then (import ex_argp):([0, 0, 0])
+given tf_ld("@id_box_f(double %v1)") (9, 0):() then (import ex_cd):([31, 9, 0, 0, 0])
+given tf_ld("@id_box_f(double %v1)") given tf_ns given lst_extend((import ex_argp), [5]) (9, 1):() then (import ex_cd):([31, 9, 1, 0, 0])
+given tf_ld("@id_unbox_f(i64 %v1)") (9, 0):() then (import ex_cd):([32, 9, 0, 0, 0])
+given tf_ld("@id_g(i32 %v1, i32 %v2)") (9, 0):() then (import ex_cd):([6, 9, 0, 0, 0]) then (import ex_argp):([0, 1])
+given tf_ld("@id_g()") given tf_get("f", "id_a") (9, 0):() then (import ex_cd):([6, 9, 1, 0, 0])
+given tf_ld("@id_g(i32 %v1)") (9, 3):() then (import ex_cd):([6, 9, 0, 3, 0]) then (import ex_argp):([0])
+given tf_ld("@id_len(ptr %v1)") (9, 3):() then (import ex_cd):([8, 9, 3, 3, 0])

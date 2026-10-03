@@ -19,13 +19,13 @@ vm_ret(int fp, int a) {
     vm_halt(fp, a);
   }
 } return int rpc;
-given vb_boot given tf_set(6, 99) given vm_frame(15, 0, 3, 5) (5, 1):(15) then tf_v3:(99) then tf_rg:([0, 0, 0])
-given vb_boot given tf_set(1, 42) (0, 1):(-1) then tf_rg:([0, 1, 42])
+given vb_boot given tf_set(6, 99) given vm_frame(15, 0, 3, 5) (5, 1):(15) then (import ex_vals)[3]:(99) then (import ex_rg):([0, 0, 0])
+given vb_boot given tf_set(1, 42) (0, 1):(-1) then (import ex_rg):([0, 1, 42])
 
 vm_halt(int fp, int a) {
   int[] rg = (import ex_rg);
   rg[(import r_status)] = (import ex_vals)[fp + a];
   rg[(import r_halt)] = 1;
 } return void;
-given vb_boot given tf_set(1, 7) (0, 1):() then tf_rg:([0, 1, 7])
-given vb_boot given tf_set(2, 9) (1, 1):() then tf_rg:([0, 1, 9])
+given vb_boot given tf_set(1, 7) (0, 1):() then (import ex_rg):([0, 1, 7])
+given vb_boot given tf_set(2, 9) (1, 1):() then (import ex_rg):([0, 1, 9])

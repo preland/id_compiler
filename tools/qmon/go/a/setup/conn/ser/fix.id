@@ -6,9 +6,3 @@ qa_check_serh() {
 given qa_both_ready given connect_qmp given connect_serial ():(1) then qa_check_nc1:(1)
 given qa_both_ready given connect_qmp given connect_serial ():(1) then qa_check_nc1:(1) then qa_check_serh:(1)
 
-// set_rc's export, read back directly.
-qa_read_rc() {
-  int qa_v = (import qm_rc);
-} return int qa_v;
-given qa_both_ready given connect_qmp given connect_serial ():(0) then qa_check_nc1:(1)
-given qa_both_ready given connect_qmp given qa_sock_full given connect_serial ():(1) then qa_free_sock:(1) then qa_check_nc1:(1)

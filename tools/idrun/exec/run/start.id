@@ -12,8 +12,8 @@ vm_start(int fid, string[] pargs) {
 } chain (int fid, string[] pargs) {
   int pc = vm_fn(fid, (import ft_pc));
 } return int pc;
-given vb_boot given tf_fn(40, 2, 6, 0, 1) given ld_kpush(4, 123, 0.0) (0, ["prog", "a"]):(40) then tf_v8:([2, 1, 0, 0, 123, 0, 0, 0]) then tf_strs:(["", "prog", "a"]) then tf_lists:([[], [1, 2]])
-given vb_boot given tf_fn(8, 2, 3, 0, 0) (0, []):(8) then tf_v8:([0, 1, 0, 0, 0, 0, 0, 0]) then tf_lists:([[], []])
+given vb_boot given tf_fn(40, 2, 6, 0, 1) given ld_kpush(4, 123, 0.0) (0, ["prog", "a"]):(40) then tf_v8:([2, 1, 0, 0, 123, 0, 0, 0]) then (import ex_strs):(["", "prog", "a"]) then (import ex_lists):([[], [1, 2]])
+given vb_boot given tf_fn(8, 2, 3, 0, 0) (0, []):(8) then tf_v8:([0, 1, 0, 0, 0, 0, 0, 0]) then (import ex_lists):([[], []])
 given vb_boot given tf_fn(1, 0, 0, 0, 0) given tf_fn(40, 2, 6, 0, 1) given ld_kpush(4, 123, 0.0) (1, ["x"]):(40) then tf_v8:([1, 1, 0, 0, 123, 0, 0, 0])
 
 vm_pushargs(int hl, string[] pargs) {
@@ -23,12 +23,6 @@ vm_pushargs(int hl, string[] pargs) {
     i = i + 1;
   }
 } return void;
-given vb_boot given tf_lnew (1, ["x", "y"]):() then tf_lists:([[], [1, 2]]) then tf_strs:(["", "x", "y"])
-given vb_boot given tf_lnew (1, []):() then tf_lists:([[], []]) then tf_strs:([""])
+given vb_boot given tf_lnew (1, ["x", "y"]):() then (import ex_lists):([[], [1, 2]]) then (import ex_strs):(["", "x", "y"])
+given vb_boot given tf_lnew (1, []):() then (import ex_lists):([[], []]) then (import ex_strs):([""])
 
-// What main returned, or 1 after a trap.
-vm_status() {
-  int st = (import ex_rg)[(import r_status)];
-} return int st;
-given vb_boot given tf_set(1, 7) given vm_halt(0, 1) ():(7)
-given vb_boot ():(0)

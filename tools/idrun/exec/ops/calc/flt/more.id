@@ -3,8 +3,8 @@ vm_fdiv(int fp, int d, int a, int b) {
   float[] fvals = (import ex_fvals);
   fvals[fp + d] = fvals[fp + a] / fvals[fp + b];
 } return void;
-given vb_boot given tf_setf(1, 1.0) given tf_setf(2, 4.0) (0, 3, 1, 2):() then tf_f3:(0.25)
-given vb_boot given tf_setf(2, 3.0) given tf_setf(1, 0.5) (1, 2, 1, 0):() then tf_f3:(6.0)
+given vb_boot given tf_setf(1, 1.0) given tf_setf(2, 4.0) (0, 3, 1, 2):() then (import ex_fvals)[3]:(0.25)
+given vb_boot given tf_setf(2, 3.0) given tf_setf(1, 0.5) (1, 2, 1, 0):() then (import ex_fvals)[3]:(6.0)
 
 // m is vm_icmp's mask, plus bit 8 for "either side is not a number": an
 // ordered predicate leaves it out, an unordered one includes it.
@@ -19,16 +19,16 @@ vm_fcmp(int fp, int d, int a, int b, int m) {
 } chain (int fp, int d, int a, int b, int m) {
   vals[fp + d] = (bits & m) != 0;
 } return void;
-given vb_boot given tf_setf(1, 1.5) given tf_setf(2, 2.5) (0, 3, 1, 2, 1):() then tf_v3:(1)
-given vb_boot given tf_setf(1, 2.5) given tf_setf(2, 1.5) (0, 3, 1, 2, 1):() then tf_v3:(0)
-given vb_boot given tf_setf(2, 2.5) given tf_setf(1, 2.5) (1, 2, 1, 0, 2):() then tf_v3:(1)
-given vb_boot given tf_setf(1, 0.0) given tf_setf(2, 0.0) given vm_fdiv(0, 1, 1, 2) (0, 3, 1, 2, 2):() then tf_v3:(0)
-given vb_boot given tf_setf(1, 0.0) given tf_setf(2, 0.0) given vm_fdiv(0, 1, 1, 2) (0, 3, 1, 2, 13):() then tf_v3:(1)
+given vb_boot given tf_setf(1, 1.5) given tf_setf(2, 2.5) (0, 3, 1, 2, 1):() then (import ex_vals)[3]:(1)
+given vb_boot given tf_setf(1, 2.5) given tf_setf(2, 1.5) (0, 3, 1, 2, 1):() then (import ex_vals)[3]:(0)
+given vb_boot given tf_setf(2, 2.5) given tf_setf(1, 2.5) (1, 2, 1, 0, 2):() then (import ex_vals)[3]:(1)
+given vb_boot given tf_setf(1, 0.0) given tf_setf(2, 0.0) given vm_fdiv(0, 1, 1, 2) (0, 3, 1, 2, 2):() then (import ex_vals)[3]:(0)
+given vb_boot given tf_setf(1, 0.0) given tf_setf(2, 0.0) given vm_fdiv(0, 1, 1, 2) (0, 3, 1, 2, 13):() then (import ex_vals)[3]:(1)
 
 vm_sitofp(int fp, int d, int a) {
   float[] fvals = (import ex_fvals);
   float f = (import ex_vals)[fp + a];
   fvals[fp + d] = f;
 } return void;
-given vb_boot given tf_set(1, 7) (0, 3, 1):() then tf_f3:(7.0)
-given vb_boot given tf_set(2, -3) (1, 2, 1):() then tf_f3:(-3.0)
+given vb_boot given tf_set(1, 7) (0, 3, 1):() then (import ex_fvals)[3]:(7.0)
+given vb_boot given tf_set(2, -3) (1, 2, 1):() then (import ex_fvals)[3]:(-3.0)

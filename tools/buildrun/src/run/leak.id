@@ -14,19 +14,19 @@ br_t_leaked() {
   }
 } return int n;
 ():(0)
-given br_t_probe ():(1) then br_t_dropped:(1)
+given br_t_probe ():(1) then br_t_dropped:("dropped 1")
 
 // Makes one scratch directory with the probe prefix and exports its path.
 br_t_probe() {
   export string br_t_probed = fs_mktemp("buildrun_probe_", 1);
   fs_drop_exit(br_t_probed);
 } return void;
-():() then br_t_dropped:(1)
-():() then br_t_leaked:(1) then br_t_dropped:(1)
+():() then br_t_dropped:("dropped 1")
+():() then br_t_leaked:(1) then br_t_dropped:("dropped 1")
 
 // Removes the directory br_t_probe made: 1 when it went.
 br_t_dropped() {
-  int ok = exec_drop((import br_t_probed));
-} return int ok;
-given br_t_probe ():(1)
-given br_t_probe ():(1) then br_t_leaked:(0)
+  string ok_t = "dropped " + (exec_drop((import br_t_probed)));
+} return string ok_t;
+given br_t_probe ():("dropped 1")
+given br_t_probe ():("dropped 1") then br_t_leaked:(0)

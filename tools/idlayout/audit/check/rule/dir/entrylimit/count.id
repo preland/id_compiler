@@ -14,14 +14,14 @@ lay_count_dir_entry(int[] buf, int lo, int hi, string build, int is_root) {
     push((import lay_scratch_names), name);
   }
 } return void;
-given lay_scratch_reset ([46, 103, 105, 116], 0, 4, "build", 1):() then lay_scratch_len:(0)
-given lay_scratch_reset ([115, 114, 99], 0, 3, "build", 1):() then lay_scratch_len:(1)
+given lay_scratch_reset ([46, 103, 105, 116], 0, 4, "build", 1):() then len((import lay_scratch_names)):(0)
+given lay_scratch_reset ([115, 114, 99], 0, 3, "build", 1):() then len((import lay_scratch_names)):(1)
 
 lay_count_file_entry(int[] buf, int lo, int hi) {
   lay_keep_file((import lay_scratch_names), buf, lo, hi);
 } return void;
-given lay_scratch_reset ([99, 111, 110, 102, 46, 105, 100], 0, 7):() then lay_scratch_len:(0)
-given lay_scratch_reset ([109, 46, 105, 100], 0, 4):() then lay_scratch_len:(1)
+given lay_scratch_reset ([99, 111, 110, 102, 46, 105, 100], 0, 7):() then len((import lay_scratch_names)):(0)
+given lay_scratch_reset ([109, 46, 105, 100], 0, 4):() then len((import lay_scratch_names)):(1)
 
 lay_count_check(int[] buf, int lo, int hi, string build, int is_root) {
   if(buf[hi - 1] == 47) {
@@ -30,5 +30,5 @@ lay_count_check(int[] buf, int lo, int hi, string build, int is_root) {
     lay_count_file_entry(buf, lo, hi);
   }
 } return void;
-given lay_scratch_reset ([100, 47], 0, 2, "build", 0):() then lay_scratch_len:(1)
-given lay_scratch_reset ([97, 46, 105, 100], 0, 4, "build", 0):() then lay_scratch_len:(1)
+given lay_scratch_reset ([100, 47], 0, 2, "build", 0):() then len((import lay_scratch_names)):(1)
+given lay_scratch_reset ([97, 46, 105, 100], 0, 4, "build", 0):() then len((import lay_scratch_names)):(1)

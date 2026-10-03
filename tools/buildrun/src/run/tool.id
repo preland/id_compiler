@@ -12,8 +12,8 @@ br_build(string root, string tool, string tmp) {
     eprint("buildrun: failed to build tools/" + tool);
   }
 } return int rc;
-given br_t_fake(0) ((import br_t_root), "hello", (import br_t_root)):(0) then br_t_done:(1)
-given br_t_fake(3) ((import br_t_root), "hello", (import br_t_root)):(3) then eprints:("buildrun: failed to build tools/hello\n") then br_t_done:(1)
+given br_t_fake(0) ((import br_t_root), "hello", (import br_t_root)):(0) then br_t_done:("done 1")
+given br_t_fake(3) ((import br_t_root), "hello", (import br_t_root)):(3) then eprints:("buildrun: failed to build tools/hello\n") then br_t_done:("done 1")
 
 // Runs tmp/argv[at + 1] with the arguments after it (argv up to argc), in as its
 // stdin. Answers the tool's exit status.

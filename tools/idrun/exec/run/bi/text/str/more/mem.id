@@ -4,8 +4,8 @@
 vm_b_str_of_mem(word wa, word wb) {
   int h = vm_sput(str_of_mem(wa, wb));
 } return int h;
-given vb_boot given tf_mem("hey") ((import tf_sa), 3):(1) then tf_strs:(["", "hey"])
-given vb_boot given tf_mem("hey") ((import tf_sa), 2):(1) then tf_strs:(["", "he"])
+given vb_boot given tf_mem("hey") ((import tf_sa), 3):(1) then (import ex_strs):(["", "hey"])
+given vb_boot given tf_mem("hey") ((import tf_sa), 2):(1) then (import ex_strs):(["", "he"])
 
 vm_b_mem_of_str(word wa) {
   int ia = wa;
@@ -57,7 +57,7 @@ vm_bs(int id, word wa, word wb, word wc) {
   }
   wr = vm_b_mem_of_str(wa);
 } return word wr;
-given vb_boot given tf_sput("ab") given tf_sput("cd") (0, 1, 2, 0):(3) then tf_strs:(["", "ab", "cd", "abcd"])
+given vb_boot given tf_sput("ab") given tf_sput("cd") (0, 1, 2, 0):(3) then (import ex_strs):(["", "ab", "cd", "abcd"])
 given vb_boot given tf_sput("hey") (9, 1, 0, 0):(8)
 given vb_boot given tf_sput("hello") (3, 1, 0, 0):(5)
 given vb_boot given tf_sput("a") given tf_sput("b") (6, 1, 2, 0):(-1)

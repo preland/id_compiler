@@ -13,15 +13,15 @@ maybe_close_in() {
     do_close_in();
   }
 } return void;
-given ccrun_fx_setup_input_main ():() then calls do_close_in:[0] then ccrun_fx_in_done_value:(0)
-given ccrun_fx_run_capped_true given ccrun_fx_empty_input given ccrun_fx_pump_once ():() then calls do_close_in:[0] then ccrun_fx_in_done_value:(1)
+given ccrun_fx_setup_input_main ():() then calls do_close_in:[0] then cr_in_text:("input 1:0")
+given ccrun_fx_run_capped_true given ccrun_fx_empty_input given ccrun_fx_pump_once ():() then calls do_close_in:[0] then cr_in_text:("input 1:1")
 
 do_close_in() {
   int closed = proc_close_in((import cr_h));
   lset((import cr_in_done), 0, 1);
 } return void;
-given ccrun_fx_run_capped_true ():() then ccrun_fx_in_done_value:(1)
-given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then ccrun_fx_in_done_value:(1)
+given ccrun_fx_run_capped_true ():() then (import cr_in_done)[0]:(1)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then (import cr_in_done)[0]:(1)
 
 // The file cr_in was opened from (child/setup.id's open_input), closed once
 // at the very end -- called from child/finish.id's close_all, only on the

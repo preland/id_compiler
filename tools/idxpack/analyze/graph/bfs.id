@@ -1,6 +1,8 @@
 // Breadth-first traversal of the call graph (parse/tables.id's ix_ecaller/
 // ix_ecallee, kind "call" only -- a function merely named as a value is not
 // necessarily invoked, so a "value" edge does not extend an import closure).
+// bfs_visited: How many names the last `bfs_run` reached -- a witness for BFS's own
+// tests that does not depend on the order names were visited in.
 bfs_run(string root_fn) {
   export string[] bfs_visited = [];
   bfs_visit(root_fn);
@@ -15,13 +17,6 @@ bfs_visit(string name) {
     bfs_visit_new(name);
   }
 } return void;
-given bfs_test_setup ("a"):() then bfs_seen_count:(2)
-given bfs_test_setup ("q"):() then bfs_seen_count:(3)
+given bfs_test_setup ("a"):() then len((import bfs_visited)):(2)
+given bfs_test_setup ("q"):() then len((import bfs_visited)):(3)
 
-// Table sizes, read once the parse stage (parse/tables.id) has run --
-// bounds for every later loop over "all functions".
-total_funcs() {
-  int ret_i = len((import ix_fn));
-} return int ret_i;
-given ix_test_setup ():(1)
-given ix_test_setup_empty ():(0)

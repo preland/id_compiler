@@ -28,7 +28,7 @@ given qa_init_fast given mk_paths given spawn_qemu ():(1) then qa_check_spawn:(1
 // connect_qmp's own export, reduced to a sign: -1 on the deterministic
 // ENOENT-timeout failure, >=0 once a real listener answers.
 qa_check_qmph() {
-  int qa_ok = (import qm_qmph) >= 0;
-} return int qa_ok;
-given qa_both_ready given connect_qmp ():(1) then qa_check_nc1:(1)
-given qa_both_ready given connect_qmp ():(1) then qa_check_nc1:(1) then qa_check_qmph:(1)
+  string qa_ok_t = "qa_check_qmph " + ((import qm_qmph) >= 0);
+} return string qa_ok_t;
+given qa_both_ready given connect_qmp ():("qa_check_qmph 1") then qa_check_nc1:(1)
+given qa_both_ready given connect_qmp ():("qa_check_qmph 1") then qa_check_nc1:(1) then qa_check_qmph:("qa_check_qmph 1")

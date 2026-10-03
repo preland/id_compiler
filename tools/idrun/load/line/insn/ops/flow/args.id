@@ -13,17 +13,17 @@ ld_args() {
   }
   ld_adv(1);
 } return int n;
-given tf_ld("(i32 %v1, ptr %v2)") ():(2) then tf_argp:([0, 1]) then ld_pos:(18)
-given tf_ld("()") ():(0) then tf_argp:([]) then ld_pos:(2)
-given tf_ld("(i32 5)") ():(1) then tf_kv:([5])
+given tf_ld("(i32 %v1, ptr %v2)") ():(2) then (import ex_argp):([0, 1]) then (import ld_pr)[(import pr_p)]:(18)
+given tf_ld("()") ():(0) then (import ex_argp):([]) then (import ld_pr)[(import pr_p)]:(2)
+given tf_ld("(i32 5)") ():(1) then (import ex_kv):([5])
 
 ld_arg1() {
   int ty = ld_ty();
   int sl = ld_val(ty);
   push((import ex_argp), sl);
 } return void;
-given tf_ld("i32 %v3") ():() then tf_argp:([0])
-given tf_ld("double 2.5") ():() then tf_argp:([0]) then tf_kf:([2.5])
+given tf_ld("i32 %v3") ():() then (import ex_argp):([0])
+given tf_ld("double 2.5") ():() then (import ex_argp):([0]) then (import ex_kf):([2.5])
 
 // A runtime helper reads three argument slots whatever its arity, so a call
 // to one is padded to three (slot 0, which exists in every frame).
@@ -33,6 +33,6 @@ ld_pad(int bid, int n) {
     n = n + 1;
   }
 } return void;
-given vb_boot (3, 1):() then tf_argp:([0, 0])
-given vb_boot (-1, 1):() then tf_argp:([])
-given vb_boot (3, 3):() then tf_argp:([])
+given vb_boot (3, 1):() then (import ex_argp):([0, 0])
+given vb_boot (-1, 1):() then (import ex_argp):([])
+given vb_boot (3, 3):() then (import ex_argp):([])

@@ -19,15 +19,15 @@ br_t_fake(int rc) {
 } chain (int rc) {
   exec_file_put(br_t_idc, script, 493);
 } return void;
-(0):() then br_t_done:(1)
+(0):() then br_t_done:("done 1")
 (3):() then br_t_ran:(3)
 
 // Removes the fixture directory: 1 when all of it went.
 br_t_done() {
-  int ok = exec_drop((import br_t_root));
-} return int ok;
-given br_t_fake(0) ():(1)
-given br_t_fake(0) ():(1) then br_t_done:(0)
+  string ok_t = "done " + (exec_drop((import br_t_root)));
+} return string ok_t;
+given br_t_fake(0) ():("done 1")
+given br_t_fake(0) ():("done 1") then br_t_done:("done 0")
 
 // Runs the fixture's bin/idc and answers its exit status, then removes the
 // directory: 3 for the script that fails the build, 1 for the one that builds a

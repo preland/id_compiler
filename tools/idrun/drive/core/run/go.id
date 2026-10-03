@@ -6,9 +6,9 @@ dr_flags(string[] argv, int[] fl) {
     i = i + 1;
   }
 } return int i;
-given tf_fl (["idrun", "--ll", "x"], (import tf_flags)):(2) then tf_flr:([1, 0])
-given tf_fl (["idrun", "--allow-untested", "--ll", "x"], (import tf_flags)):(3) then tf_flr:([1, 1])
-given tf_fl (["idrun"], (import tf_flags)):(1) then tf_flr:([0, 0])
+given tf_fl (["idrun", "--ll", "x"], (import tf_flags)):(2) then (import tf_flags):([1, 0])
+given tf_fl (["idrun", "--allow-untested", "--ll", "x"], (import tf_flags)):(3) then (import tf_flags):([1, 1])
+given tf_fl (["idrun"], (import tf_flags)):(1) then (import tf_flags):([0, 0])
 
 dr_isflag(string arg, int[] fl) {
   int hit = 0;
@@ -21,9 +21,9 @@ dr_isflag(string arg, int[] fl) {
     hit = 1;
   }
 } return int hit;
-given tf_fl ("--ll", (import tf_flags)):(1) then tf_flr:([1, 0])
-given tf_fl ("--allow-untested", (import tf_flags)):(1) then tf_flr:([0, 1])
-given tf_fl ("prog", (import tf_flags)):(0) then tf_flr:([0, 0])
+given tf_fl ("--ll", (import tf_flags)):(1) then (import tf_flags):([1, 0])
+given tf_fl ("--allow-untested", (import tf_flags)):(1) then (import tf_flags):([0, 1])
+given tf_fl ("prog", (import tf_flags)):(0) then (import tf_flags):([0, 0])
 
 // --ll runs IR text as it is; anything else is compiled first, in a scratch
 // directory named for the clock.

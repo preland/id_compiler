@@ -2,6 +2,11 @@
 // --calls's edge rows) and the function table (also ix_*, from --calls's
 // case-count rows, reformatted by idc/tools/idxpack.sh into
 // "name|file|line|cases" so nothing here has to split a colon).
+// ix_fbucket: How many functions ix_init has assigned a file-bucket id to -- a witness
+// for ix_file_bucket_step's own cases that does not depend on which id a
+// given file happened to get.
+// ix_fn: Table sizes, read once the parse stage (parse/tables.id) has run --
+// bounds for every later loop over "all functions".
 ix_init(string[] edge_lines, string[] fn_lines) {
   export string[] ix_ecaller = [];
   export string[] ix_ecallee = [];
@@ -62,8 +67,8 @@ ix_init(string[] edge_lines, string[] fn_lines) {
     ffi = ffi + 1;
   }
 } return void;
-([], []):() then total_funcs:(0)
-(["a|b|call"], ["x|y.id|1|2"]):() then total_funcs:(1)
+([], []):() then len((import ix_fn)):(0)
+(["a|b|call"], ["x|y.id|1|2"]):() then len((import ix_fn)):(1)
 
 // Get-or-assign this function's file-bucket id (first-seen order): a file
 // name already seen reuses its existing id, one seen for the first time
@@ -77,8 +82,8 @@ ix_file_bucket_step(int i) {
   }
   push((import ix_fbucket), b);
 } return void;
-given ix_test_setup (0):() then ix_fbucket_count:(2)
-given rev_edge_fixture (0):() then ix_fbucket_count:(3)
+given ix_test_setup (0):() then len((import ix_fbucket)):(2)
+given rev_edge_fixture (0):() then len((import ix_fbucket)):(3)
 
 // The concatenated source text of every file the shell wrapper attached,
 // split into one path and one line array per "===F:...===" block. Also
@@ -112,5 +117,5 @@ fx_init(string[] file_lines) {
     exi = exi + 1;
   }
 } return void;
-given ix_test_setup_empty (["===F:a.id===", "x"]):() then total_files:(1)
-given ix_test_setup_empty ([]):() then total_files:(0)
+given ix_test_setup_empty (["===F:a.id===", "x"]):() then len((import fx_path)):(1)
+given ix_test_setup_empty ([]):() then len((import fx_path)):(0)

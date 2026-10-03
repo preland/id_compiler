@@ -9,11 +9,11 @@ ld_plist() {
 } return int n;
 given tf_ld(" i32 %v1, i32 %v2)") ():(2)
 given tf_ld(")") ():(0)
-given tf_ld("ptr %v4)") ():(1) then ld_pos:(7)
+given tf_ld("ptr %v4)") ():(1) then (import ld_pr)[(import pr_p)]:(7)
 
 ld_param1() {
   ld_ty();
   ld_var();
 } return void;
-given tf_ld("i32 %v4,") ():() then ld_pos:(7) then tf_vs:([-1, -1, -1, -1, 0])
-given tf_ld("ptr %v1)") ():() then ld_pos:(7) then tf_vs:([-1, 0])
+given tf_ld("i32 %v4,") ():() then (import ld_pr)[(import pr_p)]:(7) then (import ld_vslot):([-1, -1, -1, -1, 0])
+given tf_ld("ptr %v1)") ():() then (import ld_pr)[(import pr_p)]:(7) then (import ld_vslot):([-1, 0])

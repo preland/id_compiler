@@ -9,12 +9,16 @@ ds_init(string[] lines, string tab) {
 (["a\tPX\tn\tw.id:1"], "\t"):() then ds_hash_tail:(956306805)
 (["a\tQZ\tm\tv.id:9"], "\t"):() then ds_hash_tail:(1962713682)
 
+// ds_hash: How many rows have been hashed so far -- the length witness ds_init2 and
+// ds_fill need, since a reset that silently no-ops would leave stale rows
+// behind instead of an empty list len() alone would not tell apart.
+// ds_seen: Line 1's seen flag: 0 until something groups it with line 0.
 ds_init2() {
   export int[] ds_seen = [];
   export int[] ds_hash = [];
   ds_fill(0);
 } return void;
-given ds_test_setup ():() then ds_hash_len:(5)
+given ds_test_setup ():() then len((import ds_hash)):(5)
 ():() then traps:("uninitialised export")
 
 // One pass to fingerprint-hash every line. Comparing is quadratic and hashing
@@ -25,5 +29,5 @@ ds_fill(int i) {
     i = i + 1;
   }
 } return void;
-given ds_test_setup (5):() then ds_hash_len:(5)
-given ds_test_setup (0):() then ds_hash_len:(10)
+given ds_test_setup (5):() then len((import ds_hash)):(5)
+given ds_test_setup (0):() then len((import ds_hash)):(10)

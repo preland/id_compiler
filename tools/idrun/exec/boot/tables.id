@@ -9,6 +9,13 @@
 // ex_argp    argument slots of every call, back to back
 // ex_ft      the function table: ft_n cells per function id
 // ex_ks/kv/kf  the constant pool: slot, integer value, float value
+// ex_cd: More state read back: the code, the lists and their lock flags, the call
+// stack, and the length of the value stack.
+// ex_ft: The function table, a new empty list, and one more argument slot, for the
+// call and list cases.
+// ex_rg: Fixtures that read the executor's state back for a `then`: the registers, the
+// first eight slots of each view of the value stack, and the stack's length.
+// ex_rg: What main returned, or 1 after a trap.
 vb_tables() {
   export int[] ex_cd = [];
   export int[] ex_rg = [0, 0, 0];
@@ -18,8 +25,8 @@ vb_tables() {
   export int[] ex_ft = [];
   export int[] ex_ks = [];
 } return void;
-():() then tf_rg:([0, 0, 0])
-():() then tf_cd:([])
+():() then (import ex_rg):([0, 0, 0])
+():() then (import ex_cd):([])
 
 // ex_vals/ex_fvals  the value stack, an integer view and a float view of the
 //                   same slots; a slot holds whichever its instruction wrote
@@ -28,6 +35,9 @@ vb_tables() {
 //             constant ones
 // ex_fbox     floats that went into a list, which stores 64-bit cells
 // ex_gv/gf    the program's exported variables
+// ex_fvals: Read slot 3 of the float view back, for the float operations' cases.
+// ex_gv: The program's exported variables, the slots handed out so far, and the
+// constant pool.
 vb_pools() {
   export word[] ex_kv = [];
   export float[] ex_kf = [];
@@ -43,11 +53,16 @@ vb_pools() {
 } chain () {
   export float[] ex_gf = [];
 } return void;
-():() then tf_strs:([""])
-():() then tf_fbox:([])
+():() then (import ex_strs):([""])
+():() then (import ex_fbox):([])
 
-tf_fbox() {
-  float[] fb = (import ex_fbox);
-} return float[] fb;
-given vb_boot ():([])
-given vb_boot given tf_setf(1, 2.5) given vm_boxf(0, 3, 1) ():([2.5])
+
+// Test check: the whole string pool -- how many strings, then each, joined by
+// "|". vm_b_concat reads two entries of it and a callee appends the result, so
+// a check of the pool's length alone would repeat part of its own read.
+vm_strs_text() {
+  string vm_strs_j = str_join((import ex_strs), "|");
+  string vm_strs_s = "strs " + len((import ex_strs)) + ":" + vm_strs_j;
+} return string vm_strs_s;
+given vb_boot ():("strs 1:")
+given vb_boot given tf_sput("ab") ():("strs 2:|ab")

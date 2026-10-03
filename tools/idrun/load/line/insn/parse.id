@@ -7,10 +7,10 @@ ld_insn() {
 } chain () {
   ld_op(code, d, w);
 } return void;
-given tf_ld("  %v3 = add i32 %v1, %v2") ():() then tf_cd:([1, 0, 1, 2, 0])
-given tf_ld("  %v3 = add i32 %v1, %v2") given tf_ns ():() then tf_cd:([1, 1, 2, 3, 0])
-given tf_ld("  store i32 %v1, ptr %v2") ():() then tf_cd:([0, 1, 0, 0, 0])
-given tf_ld("  %v0 = alloca i32") ():() then tf_cd:([])
+given tf_ld("  %v3 = add i32 %v1, %v2") ():() then (import ex_cd):([1, 0, 1, 2, 0])
+given tf_ld("  %v3 = add i32 %v1, %v2") given tf_ns ():() then (import ex_cd):([1, 1, 2, 3, 0])
+given tf_ld("  store i32 %v1, ptr %v2") ():() then (import ex_cd):([0, 1, 0, 0, 0])
+given tf_ld("  %v0 = alloca i32") ():() then (import ex_cd):([])
 given tf_ld("  frob") ():() then eprints:("idrun: unsupported IR instruction 'frob'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead\n")
 
 // The slot an instruction defines, or -1 when it defines nothing.
@@ -26,11 +26,11 @@ ld_dst() {
     ld_adv(1);
   }
 } return int d;
-given tf_ld("  %v3 = x") ():(0) then ld_pos:(7)
-given tf_ld("  ret void") ():(-1) then ld_pos:(2)
+given tf_ld("  %v3 = x") ():(0) then (import ld_pr)[(import pr_p)]:(7)
+given tf_ld("  ret void") ():(-1) then (import ld_pr)[(import pr_p)]:(2)
 
 ld_bad(string w) {
   ld_err("unsupported IR instruction '" + w + "'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead");
 } return void;
-given lb_boot ("select"):() then eprints:("idrun: unsupported IR instruction 'select'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead\n") then tf_pr:([0, 0, 0, 0, 0, 0, 1, 0])
-given lb_boot given ld_err("x") ("phi"):() then tf_pr:([0, 0, 0, 0, 0, 0, 2, 0])
+given lb_boot ("select"):() then eprints:("idrun: unsupported IR instruction 'select'; idrun runs the -O0 form of the IR (docs/INTERPRETER.md), so compile this program with idc instead\n") then (import ld_pr):([0, 0, 0, 0, 0, 0, 1, 0])
+given lb_boot given ld_err("x") ("phi"):() then (import ld_pr):([0, 0, 0, 0, 0, 0, 2, 0])

@@ -16,8 +16,8 @@ lay_room_emit_dir(string dir, string root, int total) {
     lay_room_push(dir, "dir", free, d);
   }
 } return void;
-given lay_room_ref_fixture ("/r", "/r", 2):() then lay_room_count:(1)
-given lay_room_ref_fixture ("/r", "/r", 3):() then lay_room_count:(0)
+given lay_room_ref_fixture ("/r", "/r", 2):() then len((import room_paths)):(1)
+given lay_room_ref_fixture ("/r", "/r", 3):() then len((import room_paths)):(0)
 
 lay_room_emit_file(string dir, string root, string name) {
   string path = dir + "/" + name;
@@ -33,8 +33,8 @@ lay_room_emit_file(string dir, string root, string name) {
     lay_room_push(path, "file", free, d);
   }
 } return void;
-given lay_room_ref_fixture ("/r", "/r", "does-not-exist-xyz-room-file.id"):() then lay_room_count:(1)
-given lay_room_ref_fixture ("room/walk/scan", "room", "push.id"):() then lay_room_count:(0)
+given lay_room_ref_fixture ("/r", "/r", "does-not-exist-xyz-room-file.id"):() then len((import room_paths)):(1)
+given lay_room_ref_fixture ("room/walk/scan", "room", "push.id"):() then len((import room_paths)):(0)
 
 // A known, empty DIR-reference for the two cases above: `given` takes no
 // arguments, and this is the only way to hand a case a fresh room_ref_segs
@@ -45,4 +45,4 @@ lay_room_ref_fixture() {
   lay_room_set_ref(no_segs);
 } return void;
 ():() then prints:("")
-():() then lay_room_count:(0)
+given lay_room_reset ():() then len((import room_paths)):(0)

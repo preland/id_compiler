@@ -5,19 +5,19 @@ ld_kpush(int sl, word wv, float f) {
   push((import ex_kv), wv);
   push((import ex_kf), f);
 } return void;
-given vb_boot (4, 9, 0.5):() then tf_ks:([4]) then tf_kv:([9]) then tf_kf:([0.5])
-given vb_boot given ld_kpush(1, 2, 3.0) (4, 9, 0.5):() then tf_ks:([1, 4]) then tf_kv:([2, 9]) then tf_kf:([3.0, 0.5])
+given vb_boot (4, 9, 0.5):() then (import ex_ks):([4]) then (import ex_kv):([9]) then (import ex_kf):([0.5])
+given vb_boot given ld_kpush(1, 2, 3.0) (4, 9, 0.5):() then (import ex_ks):([1, 4]) then (import ex_kv):([2, 9]) then (import ex_kf):([3.0, 0.5])
 
 ld_kword(word wv) {
   int sl = ld_newslot();
   ld_kpush(sl, wv, 0.0);
 } return int sl;
-given lb_boot given vb_boot (7):(0) then tf_ks:([0]) then tf_kv:([7]) then tf_kf:([0.0])
-given lb_boot given vb_boot given tf_ns (-3):(1) then tf_ks:([1]) then tf_kv:([-3])
+given lb_boot given vb_boot (7):(0) then (import ex_ks):([0]) then (import ex_kv):([7]) then (import ex_kf):([0.0])
+given lb_boot given vb_boot given tf_ns (-3):(1) then (import ex_ks):([1]) then (import ex_kv):([-3])
 
 ld_kfloat(float f) {
   int sl = ld_newslot();
   ld_kpush(sl, 0, f);
 } return int sl;
-given lb_boot given vb_boot (2.5):(0) then tf_kf:([2.5]) then tf_kv:([0])
-given lb_boot given vb_boot given tf_ns (1.5):(1) then tf_ks:([1])
+given lb_boot given vb_boot (2.5):(0) then (import ex_kf):([2.5]) then (import ex_kv):([0])
+given lb_boot given vb_boot given tf_ns (1.5):(1) then (import ex_ks):([1])

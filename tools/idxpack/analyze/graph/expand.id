@@ -4,16 +4,16 @@ bfs_visit_new(string name) {
   push((import bfs_visited), name);
   bfs_expand_loop(name, 0);
 } return void;
-given bfs_test_setup ("q"):() then bfs_seen_count:(3)
-given bfs_test_setup ("a"):() then bfs_seen_count:(3)
+given bfs_test_setup ("q"):() then len((import bfs_visited)):(3)
+given bfs_test_setup ("a"):() then len((import bfs_visited)):(3)
 
 bfs_expand_loop(string caller, int i) {
   while(i < len((import ix_ecaller))) {
     i = bfs_expand_step(i, caller);
   }
 } return void;
-given bfs_test_setup ("a", 0):() then bfs_seen_count:(2)
-given bfs_test_setup ("a", 1):() then bfs_seen_count:(2)
+given bfs_test_setup ("a", 0):() then len((import bfs_visited)):(2)
+given bfs_test_setup ("a", 1):() then len((import bfs_visited)):(2)
 
 bfs_expand_step(int i, string caller) {
   int m = edge_is_call_from(i, caller);

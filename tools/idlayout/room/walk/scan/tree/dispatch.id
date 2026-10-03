@@ -15,8 +15,8 @@ lay_room_scan_entry(int[] buf, int lo, int hi, string dir, string root, int is_r
     }
   }
 } return void;
-given lay_room_ref_fixture ([97, 46, 105, 100], 0, 4, "/r", "/r", 0):() then lay_room_count:(1)
-given lay_room_ref_fixture ([99, 111, 110, 102, 46, 105, 100], 0, 7, "/r", "/r", 0):() then lay_room_count:(0)
+given lay_room_ref_fixture ([97, 46, 105, 100], 0, 4, "/r", "/r", 0):() then len((import room_paths)):(1)
+given lay_room_ref_fixture ([99, 111, 110, 102, 46, 105, 100], 0, 7, "/r", "/r", 0):() then len((import room_paths)):(0)
 
 lay_room_scan_one(int[] buf, string dir, string root, int is_root, int at) {
   int end = lay_eol(buf, at);
@@ -31,5 +31,5 @@ lay_room_scan(int[] buf, string dir, string root, int is_root, int at) {
     at = lay_room_scan_one(buf, dir, root, is_root, at);
   }
 } return void;
-given lay_room_ref_fixture ([], "/r", "/r", 0, 0):() then lay_room_count:(0)
-given lay_room_ref_fixture ([97, 46, 105, 100, 10], "/r", "/r", 0, 0):() then lay_room_count:(1)
+given lay_room_ref_fixture ([], "/r", "/r", 0, 0):() then len((import room_paths)):(0)
+given lay_room_ref_fixture ([97, 46, 105, 100, 10], "/r", "/r", 0, 0):() then len((import room_paths)):(1)

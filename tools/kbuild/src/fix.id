@@ -12,19 +12,19 @@ kb_t_fake(int rc) {
   exec_file_put(kb_t_root + "/bin/idc", script, 493);
   fs_drop_exit(kb_t_root);
 } return void;
-(0):() then kb_t_done:(1)
-(5):() then kb_t_done:(1)
+(0):() then kb_t_done:("done 1")
+(5):() then kb_t_done:("done 1")
 
 // Removes the fixture directory: 1 when all of it went.
 kb_t_done() {
-  int ok = exec_drop((import kb_t_root));
-} return int ok;
-given kb_t_fake(0) ():(1)
-given kb_t_fake(0) ():(1) then kb_t_done:(0)
+  string ok_t = "done " + (exec_drop((import kb_t_root)));
+} return string ok_t;
+given kb_t_fake(0) ():("done 1")
+given kb_t_fake(0) ():("done 1") then kb_t_done:("done 0")
 
 // 1 when the build directory kbuild makes under the fixture's root is there.
 kb_t_built() {
   int ok = fs_exists((import kb_t_root) + "/build");
 } return int ok;
-given kb_t_fake(0) ():(0) then kb_t_done:(1)
-given kb_t_fake(0) ():(0) then kb_t_done:(1) then kb_t_built:(0)
+given kb_t_fake(0) ():(0) then kb_t_done:("done 1")
+given kb_t_fake(0) ():(0) then kb_t_done:("done 1") then kb_t_built:(0)

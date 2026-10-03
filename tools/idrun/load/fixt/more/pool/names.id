@@ -1,8 +1,8 @@
 tf_var() {
   int sl = ld_var();
 } return void;
-given tf_ld("%v7") ():() then tf_vs:([-1, -1, -1, -1, -1, -1, -1, 0])
-given tf_ld("%v7 %v2") given tf_var ():() then tf_vs:([-1, -1, 1, -1, -1, -1, -1, 0])
+given tf_ld("%v7") ():() then (import ld_vslot):([-1, -1, -1, -1, -1, -1, -1, 0])
+given tf_ld("%v7 %v2") given tf_var ():() then (import ld_vslot):([-1, -1, 1, -1, -1, -1, -1, 0])
 
 tf_k() {
   int k = ld_look("k:c");

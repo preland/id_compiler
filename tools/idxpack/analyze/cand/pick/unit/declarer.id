@@ -69,5 +69,5 @@ unit_fixture() {
 } chain () {
   std_root_set("", 0);
 } return void;
-():() then total_funcs:(2)
-():() then total_files:(2)
+():() then len((import ix_fn)):(2)
+():() then len((import fx_path)):(2)

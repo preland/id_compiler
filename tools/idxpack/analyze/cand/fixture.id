@@ -6,16 +6,16 @@ ix_test_setup() {
   ix_init(["a|b|call"], ["a|f.id|1|2"]);
   fx_init(["===F:f.id===", "a() { } return void;"]);
 } return void;
-():() then total_funcs:(1)
-():() then total_files:(1)
+():() then len((import ix_fn)):(1)
+():() then len((import fx_path)):(1)
 
 ix_test_setup_empty() {
   string[] no_lines = [];
   ix_init(no_lines, no_lines);
   fx_init(no_lines);
 } return void;
-():() then total_funcs:(0)
-():() then total_files:(0)
+():() then len((import ix_fn)):(0)
+():() then len((import fx_path)):(0)
 
 // bfs_visited exported and populated (parse state included), for cases
 // that exercise a single BFS step rather than the whole `bfs_run` sweep.
@@ -23,5 +23,5 @@ bfs_test_setup() {
   ix_init(["a|b|call"], ["a|f.id|1|2"]);
   bfs_run("a");
 } return void;
-():() then total_funcs:(1)
-():() then bfs_seen_count:(2)
+():() then len((import ix_fn)):(1)
+():() then len((import bfs_visited)):(2)
