@@ -1124,7 +1124,7 @@ else
 fi
 
 WORK=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
-trap 'rm -rf "$WORK"; for o in ${BACKEND_OBJS[@]+"${BACKEND_OBJS[@]}"}; do rm -f "$o"; done' EXIT
+trap '[ -n "${PRE_PID:-}" ] && stop_prechecks; rm -rf "$WORK"; for o in ${BACKEND_OBJS[@]+"${BACKEND_OBJS[@]}"}; do rm -f "$o"; done' EXIT
 
 if [ "$TARGET" = llvm ]; then
     PARSE_ARGS+=(--target llvm --opt "$OPT")
@@ -1375,6 +1375,229 @@ tc_record() {
     cache_prune "${TC_FILE%/*}" "$CACHE_MAX"
 }
 
+# ---------------------------------------------------------------------------
+# A library's own pre-check: its cases run once, as a check of the library
+# itself, before the program's own harness (run_cases, below) -- a failure
+# there must still fail the build, but reported as the library's, never the
+# program's. One routine (run_lib_precheck, below) does this for any library
+# root: the stdlib (run_std_precheck) and every backend directory that is its
+# own compilation unit and has id code to run (LIB_PRECHECK_DIRS/_UNITS,
+# computed above, once SRC_ROOTS was final).
+#
+# lib_precheck_key ROOT -- keyed by exactly what decides the answer: the two
+# stage binaries (a different compiler could parse or run a case
+# differently), the cc the pre-check itself builds ROOT with
+# (LIB_PRECHECK_CC, below -- never this build's own --cc: see
+# run_lib_precheck), and the content of every file under ROOT (pruned the way
+# collect_ids prunes source: hidden directories and BUILD_DIR are never
+# source, and a library built in place must hash the same as one that was
+# never built -- which is also why a backend's .gen.o is left out: a build
+# running beside this one writes it into the library for as long as it runs,
+# and hashing it made every concurrent build miss). Nothing about the PROGRAM
+# being built is in it, so two different programs against the same library and
+# compiler hit one entry.
+lib_precheck_key() {
+    local root="$1" cc_path
+    shift
+    {
+        # A backend library that calls the standard library is checked with
+        # it, so the answer depends on that library's content as well as its
+        # own. The stdlib's own pre-check names itself and adds nothing.
+        if [ "${1:-}" = "--std" ] && [ "${2:-}" != "$root" ]; then
+            lib_precheck_key "$2"
+        else
+            echo "no separate library"
+        fi
+        # One sha256sum over every file, run from inside ROOT so the paths it
+        # prints are relative: ROOT's own path is not part of what determines
+        # this answer (a checkout at a different path, or backends.sh's own
+        # fresh mktemp directory every run, must hit the same entry), while a
+        # file's name and place in the tree are. $IDLEX/$IDPARSE are exempt:
+        # their path is $CACHE_DIR, fixed for the whole build, so it costs
+        # nothing to include and matches obj_cache_key's own style above.
+        sha256sum "$IDLEX" "$IDPARSE"
+        cc_path="$(command -v "$LIB_PRECHECK_CC" 2>/dev/null)"
+        [ -n "$cc_path" ] && sha256sum < "$cc_path"
+        (cd "$root" && find . -mindepth 1 \
+             \( -type d -name '.*' -prune \) -o \
+             \( -type d -path "./$BUILD_DIR" -prune \) -o \
+             \( -type f ! -name '*.gen.o' -print0 \) \
+            | LC_ALL=C sort -z \
+            | xargs -0 -r sha256sum)
+    } | sha256sum | cut -d' ' -f1
+}
+
+# run_lib_precheck ROOT KIND STDARG... -- see the comment above. A miss
+# builds ROOT as its own project (a library with no main, so the output is a
+# discarded .o -- --allow-untested, since whether the library has enough
+# cases is --list-untested's question, not this one) through a SEPARATE
+# binary cache seeded from this build's own idlex/idparse/ccrun/idlayout --
+# so it costs no re-bootstrap -- but with its OWN fe/ and obj/
+# subdirectories, never this build's, which is what keeps a program build's
+# own cache-entry counts exactly what they always were (tests/cache.sh).
+# Only a pass is kept. A failure is found again by running again: the key names
+# the library's content, so a failure kept under it would outlast the cause --
+# and the cause can be the machine (two builds writing the same backend object
+# at once) rather than the library.
+# STDARG... is --std "$STDLIB" for the stdlib itself, or --no-std for a
+# backend directory checked standing alone -- exactly how a --no-std program
+# that imports it directly already has to build (fs's own README/comments:
+# it "still builds on its own, imported by a --no-std program"), so this
+# checks precisely the thing a program depending on it depends on.
+#
+# The library's own validation always builds with plain "cc", never this
+# build's own --cc: a caller's --cc is often a wrapper built to observe or
+# constrain THIS build (tests/backends.sh's cc-invocation loggers are
+# exactly that), and a library's own correctness is a property of the
+# library, not of whichever such wrapper happens to be in scope. A real
+# cross-cc concern (does the library also build clean under the triple's
+# actual toolchain) is a different question from "do its cases pass," which
+# is all this answers.
+#
+# IDC_BUILDING_LIB_PRECHECK marks the recursive build so it never triggers a
+# pre-check of its own (a backend nested inside another backend, or inside
+# the stdlib this same call is checking) -- the same reasoning run_std_precheck
+# already applied to itself before this generalised, now shared by both.
+LIB_PRECHECK_CC=cc
+run_lib_precheck() {
+    local root="$1" kind="$2"; shift 2
+    local key="" entry=""
+    if [ "$CACHE_ON" -eq 1 ]; then
+        key=$(lib_precheck_key "$root" "$@")
+        entry="$STD_PRECHECK_DIR/$key"
+        if [ -f "$entry/rc" ] && [ "$(cat "$entry/rc")" -eq 0 ]; then
+            touch "$entry"
+            return 0
+        fi
+    fi
+
+    progress lib "$root"
+    # idlex0/idparse0 copied first, idlex/idparse last: bin/idc rebuilds
+    # stage 1 from stage 0 whenever stage 0's mtime is newer than stage 1's
+    # (the bootstrap section, above), so copying stage 1 first would leave
+    # stage 0 the newer file by a few milliseconds and force a real
+    # stage-0-only rebuild here -- one the OLD, frozen stage 0 runs every
+    # case with, none of this file's narrowing included.
+    local inner_cache="$STD_PRECHECK_DIR/.bincache" f
+    mkdir -p "$inner_cache"
+    for f in idlex0 idparse0 ccrun idlayout idlex idparse; do
+        if [ -x "$CACHE_DIR/$f" ]; then
+            cp "$CACHE_DIR/$f" "$inner_cache/$f" 2>/dev/null && chmod +x "$inner_cache/$f"
+        fi
+    done
+
+    local lib_work out rc
+    lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
+    out="$lib_work/out"
+    IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 \
+        "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
+        >"$out" 2>&1
+    rc=$?
+    progress_clear
+
+    if [ "$CACHE_ON" -eq 1 ] && [ "$rc" -eq 0 ]; then
+        mkdir -p "$lib_work/entry"
+        cp "$out" "$lib_work/entry/out"
+        printf '%s\n' "$rc" > "$lib_work/entry/rc"
+        mkdir -p "$STD_PRECHECK_DIR"
+        rm -rf "$entry"
+        mv -f "$lib_work/entry" "$entry"
+        cache_prune "$STD_PRECHECK_DIR" "$CACHE_MAX"
+    fi
+
+    if [ "$rc" -ne 0 ]; then
+        echo "idc: the $kind at $root failed its own test cases (this is not an error in your program):" >&2
+        cat "$out" >&2
+        rm -rf "$lib_work"
+        exit 1
+    fi
+    rm -rf "$lib_work"
+}
+
+# run_std_precheck -- the stdlib through run_lib_precheck, above. Skipped for
+# --no-std/IDC_NO_STD (STDLIB is then ""), for the bootstrap's own re-entries
+# and tool builds (IDC_STAGE_LEX, IDC_BUILDING_CCRUN, IDC_BUILDING_IDLAYOUT),
+# for a nested library pre-check (IDC_BUILDING_LIB_PRECHECK), and when
+# PATH_ARG already IS the library: that build runs every one of its own
+# cases as itself (see STD_UNIT_START's comment, above), which this would
+# only repeat. --std "$STDLIB" pins the recursive build to exactly the
+# library this pre-check is of -- never IDSTD_HOME or a sibling idstd/,
+# which could name a different directory than --std/$IDSTD_HOME resolved
+# this build to and would otherwise merge a second, unrelated library into
+# the one under test (and recurse into a pre-check of THAT one, of
+# PATH_ARG=STDLIB again).
+run_std_precheck() {
+    [ -z "$STDLIB" ] && return 0
+    [ -n "${IDC_STAGE_LEX:-}" ] && return 0
+    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
+    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
+    [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
+    local path_key=""
+    [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
+    [ "$path_key" = "$STDLIB" ] && return 0
+    run_lib_precheck "$STDLIB" "standard library" --std "$STDLIB"
+}
+
+# run_backend_prechecks -- every LIB_PRECHECK_DIRS entry through
+# run_lib_precheck, above, standing alone (--no-std): a backend directory
+# has no conf.id of its own (Native backends, below -- backend.id is link
+# facts, not a dependency manifest), so it either builds on its own or it
+# does not, exactly as a --no-std program importing it directly finds out
+# today. Skipped for the same re-entries and tool builds run_std_precheck
+# skips, and for whichever of LIB_PRECHECK_DIRS PATH_ARG already IS.
+run_backend_prechecks() {
+    [ -n "${IDC_STAGE_LEX:-}" ] && return 0
+    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
+    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
+    [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
+    local path_key="" i
+    [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
+    for i in "${!LIB_PRECHECK_DIRS[@]}"; do
+        [ "${LIB_PRECHECK_DIRS[$i]}" = "$path_key" ] && continue
+        case "${LIB_PRECHECK_DIRS[$i]}/" in
+            "$STDLIB"/*) run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std ;;
+            *) if [ -n "$STDLIB" ]; then
+                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --std "$STDLIB"
+               else
+                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std
+               fi ;;
+        esac
+    done
+}
+
+# The library pre-checks (above) depend on nothing the program's own lex and
+# parse produce, and one that misses costs more than the parse itself, so they
+# start first and run beside it: start_prechecks, here, and await_prechecks at
+# the point the sequential build ran them. The job's stderr is held back and
+# replayed there, so a program's own diagnostics still come first and a library
+# failure reads exactly as before; a build that stops before that point kills
+# the job, along with everything it started (its own process group).
+PRE_PID=""
+start_prechecks() {
+    [ "$FIX" -eq 0 ] && [ "$LIST_UNTESTED" -eq 0 ] && [ "$CHECK" -eq 0 ] || return 0
+    set -m
+    ( PROGRESS=0; run_std_precheck; run_backend_prechecks ) </dev/null 2>"$WORK/pre.err" &
+    PRE_PID=$!
+    set +m
+}
+stop_prechecks() {
+    [ -n "$PRE_PID" ] || return 0
+    kill -- "-$PRE_PID" 2>/dev/null
+    wait "$PRE_PID" 2>/dev/null
+    PRE_PID=""
+}
+await_prechecks() {
+    local rc
+    [ -n "$PRE_PID" ] || { run_std_precheck; run_backend_prechecks; return 0; }
+    wait "$PRE_PID"
+    rc=$?
+    PRE_PID=""
+    [ "$rc" -eq 0 ] && return 0
+    progress_clear
+    cat "$WORK/pre.err" >&2
+    exit 1
+}
+[ "$FE_HIT" -eq 0 ] && start_prechecks
 if [ "$FE_HIT" -eq 0 ]; then
     run_lex_parse "$SOURCES_TMP" ${LEX_ARGS[@]+"${LEX_ARGS[@]}"}
     if [ "$CACHE_ON" -eq 1 ]; then
@@ -1859,11 +2082,47 @@ backend_decls() {
     done
 }
 
+# A backend's object is cached by content, so a build that already compiled
+# these sources does not run cc over them again (0.5 s a build for the three
+# the stdlib's windowing programs reach). Only with the default cc: an explicit
+# --cc is a wrapper built to observe this build's compiles (tests/backends.sh),
+# and a cache hit would hide the call. Kept apart from OBJ_CACHE_DIR, whose
+# entry counts tests/cache.sh asserts.
+BACKEND_OBJ_DIR="$CACHE_DIR/backend_obj"
+
+# backend_obj_key DIR SRC CFLAGS... -- what decides the object: cc and its
+# flags, the platform, and every file under DIR (the sources and the headers
+# beside them; a backend's own .gen.o is output, not input, and hidden
+# directories and BUILD_DIR are pruned as collect_ids prunes them).
+backend_obj_key() {
+    local d="$1" cc_path
+    shift
+    {
+        printf '%s\0' "$CC" "$TRIPLE" "$PLATKEY_BUILD" "$@"
+        cc_path="$(command -v "$CC" 2>/dev/null)"
+        [ -n "$cc_path" ] && sha256sum < "$cc_path"
+        (cd "$d" && find . -mindepth 1 \
+             \( -type d -name '.*' -prune \) -o \
+             \( -type d -path "./$BUILD_DIR" -prune \) -o \
+             \( -type f ! -name '*.gen.o' -print0 \) \
+            | LC_ALL=C sort -z \
+            | xargs -0 -r sha256sum)
+    } | sha256sum | cut -d' ' -f1
+}
+
+# backend_obj_put KEY OBJ -- keep OBJ under KEY. Best-effort, like obj_cache_put.
+backend_obj_put() {
+    local entry="$BACKEND_OBJ_DIR/$1" tmp
+    tmp=$(mktemp -d "$WORK/bo.XXXXXX") && cp "$2" "$tmp/o" || return 0
+    mkdir -p "$BACKEND_OBJ_DIR" && rm -rf "$entry" && mv -f "$tmp" "$entry"
+    cache_prune "$BACKEND_OBJ_DIR" "$CACHE_MAX"
+}
+
 # backend_build DIR -- compile DIR's sources for this platform, once per build.
 # Declarations that cannot serve this build set BE_ERR and return 1, so the
 # caller can say which reached native needed it.
 backend_build() {
-    local d="$1" sources_line cflags_line link_line src src_path obj backend_rc
+    local d="$1" sources_line cflags_line link_line src src_path obj backend_rc bkey
     local -a srcs=() cflags=() objs=()
     BE_ERR=""
     [ -n "${BE_BUILT[$d]:-}" ] && return 0
@@ -1877,15 +2136,22 @@ backend_build() {
         [ -z "$src" ] && continue
         src_path="$d/$src"
         obj="${src_path%.*}.gen.o"
-        capped "$CC" -O2 -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
-        if [ "$backend_rc" -ne 0 ]; then
-            progress_clear
-            if mem_ceiling_hit "$backend_rc"; then
-                mem_ceiling_error "cc (backend: $src_path)"
-            else
-                echo "idc: backend compile failed for $src_path" >&2
+        bkey=""
+        [ "$CACHE_ON" -eq 1 ] && [ "$CC_EXPLICIT" -eq 0 ] && bkey=$(backend_obj_key "$d" "$src_path" ${cflags[@]+"${cflags[@]}"})
+        if [ -n "$bkey" ] && [ -f "$BACKEND_OBJ_DIR/$bkey/o" ] && cp "$BACKEND_OBJ_DIR/$bkey/o" "$obj"; then
+            touch "$BACKEND_OBJ_DIR/$bkey"
+        else
+            capped "$CC" -O2 -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
+            if [ "$backend_rc" -ne 0 ]; then
+                progress_clear
+                if mem_ceiling_hit "$backend_rc"; then
+                    mem_ceiling_error "cc (backend: $src_path)"
+                else
+                    echo "idc: backend compile failed for $src_path" >&2
+                fi
+                exit 1
             fi
-            exit 1
+            [ -n "$bkey" ] && backend_obj_put "$bkey" "$obj"
         fi
         BACKEND_OBJS+=("$obj")
         objs+=("$obj")
@@ -1940,14 +2206,17 @@ backend_supports() {
 # question is asked: backend.id files are read and nothing is compiled.
 backends_for() {
     local kind="$1" mode="${2:-link}" from=main row_kind name site decl be d msg
-    local -A need_site=() need_name=()
+    local -A need_site=() need_name=() be_of=()
     local -a objs=() flags=()
     [ "$kind" = harness ] && from="a test case"
     LINK_OBJS=()
     LINK_FLAGS=()
     while IFS='|' read -r row_kind name site decl; do
         [ "$row_kind" = "$kind" ] || continue
-        be=$(backend_of "$decl")
+        if [ -z "${be_of[$decl]+x}" ]; then
+            be_of[$decl]=$(backend_of "$decl")
+        fi
+        be="${be_of[$decl]}"
         if [ -z "$be" ]; then
             progress_clear
             echo "$site: error: native '$name', reached from $from by this call, has no implementation for platform '$PLATKEY_BUILD' (building for '$TRIPLE'): it is declared in $decl, which is not in an attached backend" >&2
@@ -2290,6 +2559,63 @@ unit_build() {
     obj_cache_put "$lkey" "$out"
 }
 
+# shard_cases DIR -- run the harness as several processes at once, each given
+# its own $IDTC_SKIP, when the cache is on (CASE_MASK says which cases are
+# left): the cases keyed `-` (the ones that reach natives, which are never
+# cached and so run on every build) are dealt round-robin over up to 8 shards,
+# a scaling claim's cases all to one shard because the claim compares their
+# counts against each other, and the cases that do have a key to one more.
+# Returns 0 only when every shard passed, leaving every pass in $WORK/passed;
+# otherwise (cache off, one core, fewer than two shards, or any failure)
+# returns 1 and the caller runs the whole harness once, as it always has, so a
+# failure is reported in exactly the order and wording it had before.
+shard_cases() {
+    local dir="$1" n s m live p ok=0
+    local -a pids=() shards=()
+    [ -n "$CASE_MASK" ] || return 1
+    n=$(nproc 2>/dev/null || echo 1)
+    [ "$n" -gt 8 ] && n=8
+    [ "$n" -gt 1 ] || return 1
+    live=$(awk -v n="$n" -v mask="$CASE_MASK" -v dir="$WORK" '
+        function find(x) { while (par[x] != x) x = par[x]; return x }
+        /^\/\/ idtc key / && $5 == "-" { alw[$4] = 1 }
+        /idtc_claim\(\(int\[\]\)\{/ {
+            t = $0; sub(/^[^{]*\{/, "", t); sub(/\}.*$/, "", t)
+            c = split(t, a, ", ")
+            for (i = 1; i <= c; i++) { if (!(a[i] in par)) par[a[i]] = a[i] }
+            for (i = 2; i <= c; i++) par[find(a[i])] = find(a[1])
+        }
+        END {
+            for (k = 0; k < length(mask); k++) {
+                sh = -1
+                if (substr(mask, k + 1, 1) == "0") {
+                    if (!(k in alw)) sh = 0
+                    else if (k in par) {
+                        r = find(k)
+                        if (!(r in gs)) gs[r] = (rr++ % n) + 1
+                        sh = gs[r]
+                    } else sh = (rr++ % n) + 1
+                }
+                for (s = 0; s <= n; s++) line[s] = line[s] ((sh == s) ? "0" : "1")
+                if (sh >= 0) has[sh] = 1
+            }
+            for (s = 0; s <= n; s++) if (s in has) { print line[s] > (dir "/smask." s); close(dir "/smask." s); c2++ }
+            print c2 + 0
+        }' "$HARNESS_C")
+    [ "${live:-0}" -ge 2 ] || return 1
+    for s in $(seq 0 "$n"); do
+        [ -s "$WORK/smask.$s" ] || continue
+        m=$(cat "$WORK/smask.$s")
+        (cd "$dir" && IDTC_SKIP="$m" IDTC_PASSED="$WORK/passed.$s" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err.$s") &
+        pids+=($!)
+    done
+    for p in "${pids[@]}"; do
+        wait "$p" || ok=1
+    done
+    [ "$ok" -eq 0 ] || return 1
+    cat "$WORK"/passed.* > "$WORK/passed"
+}
+
 # The harness runs every case in a process of its own, with its own time and
 # memory limits, and prints each failure as FILE:LINE. It is built for and run
 # on this machine. A --freestanding build's harness is the same source built
@@ -2348,204 +2674,19 @@ run_cases() {
     local case_dir="$PATH_ARG"
     [ -d "$case_dir" ] || case_dir=$(dirname "$case_dir")
     : > "$WORK/passed"
-    (cd "$case_dir" && IDTC_SKIP="$CASE_MASK" IDTC_PASSED="$WORK/passed" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err")
-    hrc=$?
+    if shard_cases "$case_dir"; then
+        hrc=0
+    else
+        : > "$WORK/passed"
+        (cd "$case_dir" && IDTC_SKIP="$CASE_MASK" IDTC_PASSED="$WORK/passed" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err")
+        hrc=$?
+    fi
     case_record
     [ "$hrc" -eq 0 ] && return 0
     progress_clear
     cat "$WORK/cases.err" >&2
     [ -s "$WORK/cases.err" ] || echo "idc: the test harness stopped (status $hrc) without saying why" >&2
     exit 1
-}
-
-# ---------------------------------------------------------------------------
-# A library's own pre-check: its cases run once, as a check of the library
-# itself, before the program's own harness (run_cases, above) -- a failure
-# there must still fail the build, but reported as the library's, never the
-# program's. One routine (run_lib_precheck, below) does this for any library
-# root: the stdlib (run_std_precheck) and every backend directory that is its
-# own compilation unit and has id code to run (LIB_PRECHECK_DIRS/_UNITS,
-# computed above, once SRC_ROOTS was final).
-#
-# lib_precheck_key ROOT -- keyed by exactly what decides the answer: the two
-# stage binaries (a different compiler could parse or run a case
-# differently), the cc the pre-check itself builds ROOT with
-# (LIB_PRECHECK_CC, below -- never this build's own --cc: see
-# run_lib_precheck), and the content of every file under ROOT (pruned the way
-# collect_ids prunes source: hidden directories and BUILD_DIR are never
-# source, and a library built in place must hash the same as one that was
-# never built -- which is also why a backend's .gen.o is left out: a build
-# running beside this one writes it into the library for as long as it runs,
-# and hashing it made every concurrent build miss). Nothing about the PROGRAM
-# being built is in it, so two different programs against the same library and
-# compiler hit one entry.
-lib_precheck_key() {
-    local root="$1" cc_path
-    shift
-    {
-        # A backend library that calls the standard library is checked with
-        # it, so the answer depends on that library's content as well as its
-        # own. The stdlib's own pre-check names itself and adds nothing.
-        if [ "${1:-}" = "--std" ] && [ "${2:-}" != "$root" ]; then
-            lib_precheck_key "$2"
-        else
-            echo "no separate library"
-        fi
-        # Redirected (< "$f"), not "$f" as an argument: sha256sum prints the
-        # path it was given alongside the hash, and ROOT's own path is not
-        # part of what determines this answer (a checkout at a different
-        # path, or backends.sh's own fresh mktemp directory every run, must
-        # hit the same entry). $IDLEX/$IDPARSE are exempt: their path is
-        # $CACHE_DIR, fixed for the whole build, so it costs nothing to
-        # include and matches obj_cache_key's own style above.
-        sha256sum "$IDLEX" "$IDPARSE"
-        cc_path="$(command -v "$LIB_PRECHECK_CC" 2>/dev/null)"
-        [ -n "$cc_path" ] && sha256sum < "$cc_path"
-        find "$root" -mindepth 1 \
-             \( -type d -name '.*' -prune \) -o \
-             \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
-             \( -type f ! -name '*.gen.o' -print \) \
-            | LC_ALL=C sort \
-            | while IFS= read -r f; do sha256sum < "$f"; done
-    } | sha256sum | cut -d' ' -f1
-}
-
-# run_lib_precheck ROOT KIND STDARG... -- see the comment above. A miss
-# builds ROOT as its own project (a library with no main, so the output is a
-# discarded .o -- --allow-untested, since whether the library has enough
-# cases is --list-untested's question, not this one) through a SEPARATE
-# binary cache seeded from this build's own idlex/idparse/ccrun/idlayout --
-# so it costs no re-bootstrap -- but with its OWN fe/ and obj/
-# subdirectories, never this build's, which is what keeps a program build's
-# own cache-entry counts exactly what they always were (tests/cache.sh).
-# Only a pass is kept. A failure is found again by running again: the key names
-# the library's content, so a failure kept under it would outlast the cause --
-# and the cause can be the machine (two builds writing the same backend object
-# at once) rather than the library.
-# STDARG... is --std "$STDLIB" for the stdlib itself, or --no-std for a
-# backend directory checked standing alone -- exactly how a --no-std program
-# that imports it directly already has to build (fs's own README/comments:
-# it "still builds on its own, imported by a --no-std program"), so this
-# checks precisely the thing a program depending on it depends on.
-#
-# The library's own validation always builds with plain "cc", never this
-# build's own --cc: a caller's --cc is often a wrapper built to observe or
-# constrain THIS build (tests/backends.sh's cc-invocation loggers are
-# exactly that), and a library's own correctness is a property of the
-# library, not of whichever such wrapper happens to be in scope. A real
-# cross-cc concern (does the library also build clean under the triple's
-# actual toolchain) is a different question from "do its cases pass," which
-# is all this answers.
-#
-# IDC_BUILDING_LIB_PRECHECK marks the recursive build so it never triggers a
-# pre-check of its own (a backend nested inside another backend, or inside
-# the stdlib this same call is checking) -- the same reasoning run_std_precheck
-# already applied to itself before this generalised, now shared by both.
-LIB_PRECHECK_CC=cc
-run_lib_precheck() {
-    local root="$1" kind="$2"; shift 2
-    local key="" entry=""
-    if [ "$CACHE_ON" -eq 1 ]; then
-        key=$(lib_precheck_key "$root" "$@")
-        entry="$STD_PRECHECK_DIR/$key"
-        if [ -f "$entry/rc" ] && [ "$(cat "$entry/rc")" -eq 0 ]; then
-            touch "$entry"
-            return 0
-        fi
-    fi
-
-    progress lib "$root"
-    # idlex0/idparse0 copied first, idlex/idparse last: bin/idc rebuilds
-    # stage 1 from stage 0 whenever stage 0's mtime is newer than stage 1's
-    # (the bootstrap section, above), so copying stage 1 first would leave
-    # stage 0 the newer file by a few milliseconds and force a real
-    # stage-0-only rebuild here -- one the OLD, frozen stage 0 runs every
-    # case with, none of this file's narrowing included.
-    local inner_cache="$STD_PRECHECK_DIR/.bincache" f
-    mkdir -p "$inner_cache"
-    for f in idlex0 idparse0 ccrun idlayout idlex idparse; do
-        if [ -x "$CACHE_DIR/$f" ]; then
-            cp "$CACHE_DIR/$f" "$inner_cache/$f" 2>/dev/null && chmod +x "$inner_cache/$f"
-        fi
-    done
-
-    local lib_work out rc
-    lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
-    out="$lib_work/out"
-    IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 \
-        "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
-        >"$out" 2>&1
-    rc=$?
-    progress_clear
-
-    if [ "$CACHE_ON" -eq 1 ] && [ "$rc" -eq 0 ]; then
-        mkdir -p "$lib_work/entry"
-        cp "$out" "$lib_work/entry/out"
-        printf '%s\n' "$rc" > "$lib_work/entry/rc"
-        mkdir -p "$STD_PRECHECK_DIR"
-        rm -rf "$entry"
-        mv -f "$lib_work/entry" "$entry"
-        cache_prune "$STD_PRECHECK_DIR" "$CACHE_MAX"
-    fi
-
-    if [ "$rc" -ne 0 ]; then
-        echo "idc: the $kind at $root failed its own test cases (this is not an error in your program):" >&2
-        cat "$out" >&2
-        rm -rf "$lib_work"
-        exit 1
-    fi
-    rm -rf "$lib_work"
-}
-
-# run_std_precheck -- the stdlib through run_lib_precheck, above. Skipped for
-# --no-std/IDC_NO_STD (STDLIB is then ""), for the bootstrap's own re-entries
-# and tool builds (IDC_STAGE_LEX, IDC_BUILDING_CCRUN, IDC_BUILDING_IDLAYOUT),
-# for a nested library pre-check (IDC_BUILDING_LIB_PRECHECK), and when
-# PATH_ARG already IS the library: that build runs every one of its own
-# cases as itself (see STD_UNIT_START's comment, above), which this would
-# only repeat. --std "$STDLIB" pins the recursive build to exactly the
-# library this pre-check is of -- never IDSTD_HOME or a sibling idstd/,
-# which could name a different directory than --std/$IDSTD_HOME resolved
-# this build to and would otherwise merge a second, unrelated library into
-# the one under test (and recurse into a pre-check of THAT one, of
-# PATH_ARG=STDLIB again).
-run_std_precheck() {
-    [ -z "$STDLIB" ] && return 0
-    [ -n "${IDC_STAGE_LEX:-}" ] && return 0
-    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
-    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
-    [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
-    local path_key=""
-    [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
-    [ "$path_key" = "$STDLIB" ] && return 0
-    run_lib_precheck "$STDLIB" "standard library" --std "$STDLIB"
-}
-
-# run_backend_prechecks -- every LIB_PRECHECK_DIRS entry through
-# run_lib_precheck, above, standing alone (--no-std): a backend directory
-# has no conf.id of its own (Native backends, below -- backend.id is link
-# facts, not a dependency manifest), so it either builds on its own or it
-# does not, exactly as a --no-std program importing it directly finds out
-# today. Skipped for the same re-entries and tool builds run_std_precheck
-# skips, and for whichever of LIB_PRECHECK_DIRS PATH_ARG already IS.
-run_backend_prechecks() {
-    [ -n "${IDC_STAGE_LEX:-}" ] && return 0
-    [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
-    [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
-    [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
-    local path_key="" i
-    [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
-    for i in "${!LIB_PRECHECK_DIRS[@]}"; do
-        [ "${LIB_PRECHECK_DIRS[$i]}" = "$path_key" ] && continue
-        case "${LIB_PRECHECK_DIRS[$i]}/" in
-            "$STDLIB"/*) run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std ;;
-            *) if [ -n "$STDLIB" ]; then
-                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --std "$STDLIB"
-               else
-                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std
-               fi ;;
-        esac
-    done
 }
 
 split_harness
@@ -2564,8 +2705,7 @@ fi
 if [ "$TARGET" = c ] && [ -z "$EMIT_C" ] && grep -q '^int main(' "$C_OUT"; then
     backends_for program check
 fi
-run_std_precheck
-run_backend_prechecks
+await_prechecks
 run_cases
 
 # The output path, chosen the same way whichever target produced the code:
