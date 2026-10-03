@@ -19,6 +19,7 @@ given br_t_probe ():(1) then br_t_dropped:(1)
 // Makes one scratch directory with the probe prefix and exports its path.
 br_t_probe() {
   export string br_t_probed = fs_mktemp("buildrun_probe_", 1);
+  fs_drop_exit(br_t_probed);
 } return void;
 ():() then br_t_dropped:(1)
 ():() then br_t_leaked:(1) then br_t_dropped:(1)

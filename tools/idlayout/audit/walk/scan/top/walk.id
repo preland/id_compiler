@@ -10,7 +10,7 @@ lay_walk(string dir, string root, string build, int is_root) {
   }
 } return void;
 ("does-not-exist-xyz-idlayout-walk", "does-not-exist-xyz-idlayout-walk", "build", 1):() then prints:("")
-given lay_walk_fixture_bad ("/tmp/idlayout_wfb", "/tmp/idlayout_wfb", "build", 1):() then lay_report:(1)
+given lay_walk_fixture_bad ((import lay_wfb), (import lay_wfb), "build", 1):() then lay_report:(1)
 
 lay_walk_listed(string dir, string root, string build, int is_root, int size) {
   int[] buf = lay_list_read(dir, size);
@@ -21,5 +21,5 @@ lay_walk_listed(string dir, string root, string build, int is_root, int size) {
   lay_scan(buf, dir, root, build, is_root, self, 0);
   lay_check_numbered(dir, build, is_root, buf);
 } return void;
-given lay_walk_listed_fixture ("/tmp/idlayout_wfb", "/tmp/idlayout_wfb", "build", 1, (import lay_wl_size)):() then lay_report:(1)
-given lay_walk_listed_fixture ("/tmp/idlayout_wfb", "/tmp/idlayout_wfb", "build", 1, (import lay_wl_size)):() then calls lay_check_entrylimit:("/tmp/idlayout_wfb")
+given lay_walk_listed_fixture ((import lay_wfb), (import lay_wfb), "build", 1, (import lay_wl_size)):() then lay_report:(1)
+given lay_walk_listed_fixture ((import lay_wfb), (import lay_wfb), "build", 1, (import lay_wl_size)):() then calls lay_check_entrylimit:((import lay_wfb))

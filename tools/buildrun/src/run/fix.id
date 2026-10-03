@@ -9,12 +9,14 @@
 br_t_fake(int rc) {
   export string br_t_root = fs_mktemp("buildrun_t_", 1);
   export string br_t_idc = br_t_root + "/bin/idc";
-  int made = fs_mkdir(br_t_root + "/bin");
+  fs_drop_exit(br_t_root);
 } chain (int rc) {
+  int made = fs_mkdir(br_t_root + "/bin");
   string script = (import br_t_bad);
   if (rc == 0) {
     script = (import br_t_ok);
   }
+} chain (int rc) {
   exec_file_put(br_t_idc, script, 493);
 } return void;
 (0):() then br_t_done:(1)

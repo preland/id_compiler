@@ -6,6 +6,7 @@ qa_scratch_file() {
   export string qa_scratch_path = qa_p;
 } chain () {
   export int qa_scratch_h = qa_h;
+  fs_drop_exit(qa_p);
 } return void;
 ():() then calls fs_mktemp:[1] then qa_scratch_check:(0)
 ():() then calls fs_mktemp:("qa_scratch_", 0) then qa_scratch_check:(0)
@@ -35,6 +36,7 @@ qa_init_serial() {
   init(4, ["qmon", "/qa-nonexistent-kernel", "--serial", qa_p]);
 } chain () {
   export string qa_serial_path = qa_p;
+  fs_drop_exit(qa_p);
 } return void;
 ():() then calls init:[1]
 ():() then calls fs_mktemp:[1] then calls init:[1]

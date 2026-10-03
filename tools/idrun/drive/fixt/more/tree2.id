@@ -18,6 +18,7 @@ tf_stem() {
   export string tf_d0 = (import tf_stm) + "0";
 } chain () {
   export string tf_d1 = (import tf_stm) + "1";
+  fs_drop_exit(tf_base);
 } return void;
 ():() then tf_rmstem:(0)
 ():() then tf_rmstem:(0) then tf_rmstem:(-1)

@@ -1,0 +1,65 @@
+// tmpguard's top level: build each tree, list the watched directory around the
+// build, and say what the build left.
+
+// One line about a tree: how many entries its build added, which, and, when the
+// build itself failed, its status -- a failed build's count proves nothing.
+tg_report(string tg_tree_path, int tg_rc, string[] tg_fresh) {
+  string tg_line = tg_tree_path + ": " + len(tg_fresh) + " new entries";
+  string tg_names = str_join(tg_fresh, " ");
+  if (len(tg_fresh) > 0) {
+    tg_line = tg_line + ": " + tg_names;
+  }
+} chain (string tg_tree_path, int tg_rc, string[] tg_fresh) {
+  if (tg_rc != 0) {
+    tg_line = tg_line + " (build failed with status " + tg_rc + "; fix the build first)";
+  }
+  print(tg_line);
+} return void;
+("t", 0, []):() then prints:("t: 0 new entries\n")
+("t", 3, ["x", "y/"]):() then prints:("t: 2 new entries: x y/ (build failed with status 3; fix the build first)\n")
+("u", 0, ["z"]):() then prints:("u: 1 new entries: z\n")
+
+// Builds one tree and answers 1 when the build failed or added an entry to
+// tg_dir, otherwise 0. The build's own output directory is made under /tmp
+// with tmpguard's prefix, which the comparison ignores, and removed again.
+tg_tree(string tg_idc_root, string tg_tree_path, string tg_dir) {
+  string[] tg_before = exec_ls(tg_dir);
+  string tg_out = fs_mktemp((import tg_skip), 1);
+  fs_drop_exit(tg_out);
+} chain (string tg_idc_root, string tg_tree_path, string tg_dir) {
+  int tg_rc = tg_build(tg_idc_root, tg_tree_path, tg_out + "/bin");
+  string[] tg_after = exec_ls(tg_dir);
+  string[] tg_fresh = tg_new(tg_before, tg_after);
+} chain (string tg_idc_root, string tg_tree_path, string tg_dir) {
+  tg_report(tg_tree_path, tg_rc, tg_fresh);
+  exec_drop(tg_out);
+  int tg_bad = 0;
+} chain (string tg_idc_root, string tg_tree_path, string tg_dir) {
+  if (len(tg_fresh) > 0 || tg_rc != 0) {
+    tg_bad = 1;
+  }
+} return int tg_bad;
+given tg_t_fake(0, 0) ((import tg_t_root), "t", (import tg_t_w)):(0) then prints:("t: 0 new entries\n")
+given tg_t_fake(0, 1) ((import tg_t_root), "t", (import tg_t_w)):(1) then prints:("t: 1 new entries: leak\n")
+given tg_t_fake(3, 0) ((import tg_t_root), "t", (import tg_t_w)):(1) then prints:("t: 0 new entries (build failed with status 3; fix the build first)\n")
+
+// Every tree in argv from index 2, built against the idc directory argv[1]:
+// 2 and a usage line when there is no tree, otherwise 1 when any tree failed
+// the check.
+tg_go(int argc, string[] argv, string tg_dir) {
+  int tg_rc = 0;
+  int tg_i = 2;
+  if (argc < 3) {
+    eprint("usage: tmpguard IDC_ROOT TREE...");
+    tg_rc = 2;
+  }
+} chain (int argc, string[] argv, string tg_dir) {
+  while (tg_i < argc) {
+    if (tg_tree(argv[1], argv[tg_i], tg_dir) != 0) {
+      tg_rc = 1;
+    }
+    tg_i = tg_i + 1;
+  }
+} return int tg_rc;
+given tg_t_fake(0, 0) (3, ["tmpguard", (import tg_t_root), "t"], (import tg_t_w)):(0) then prints:("t: 0 new entries\n")
+given tg_t_fake(0, 1) (4, ["tmpguard", (import tg_t_root), "t", "u"], (import tg_t_w)):(1) then prints:("t: 1 new entries: leak\nu: 0 new entries\n")

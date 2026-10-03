@@ -16,6 +16,8 @@ set -u
 cd "$(dirname "$0")"
 
 SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
+TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo)
+for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
 WANTED=()
 resume=0
@@ -1140,6 +1142,32 @@ if want editor; then
     [ "$edit" -eq 0 ] && mark_done editor
 fi
 
-[ "$fail" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
+# --- no test case leaves anything in /tmp. tools/tmpguard (an `id` program)
+#     builds one tree with the compiler cache off, so every case of the tree
+#     and of idstd runs, and fails when /tmp has an entry afterwards that it did
+#     not have before. One section per tree, because one tree is a cold build
+#     of up to a minute; a case that makes a scratch path registers it with
+#     fs_drop_exit (idstd sys/io/fs), which removes it when the process ends
+#     whether the case passes or fails. Other programs writing to /tmp while
+#     this runs show up as entries: run it on a quiet machine.
+echo
+echo "--- no case leaves anything in /tmp (tools/tmpguard) ---"
+tmpg=0
+for i in "${!TMPGUARD_TREES[@]}"; do
+    if want "tmpguard_$i"; then
+        if [ ! -x "$TMP/tmpguard" ] && ! env -u IDC_NO_STD ../bin/idc ../tools/tmpguard -o "$TMP/tmpguard" >"$TMP/tmpguard.log" 2>&1; then
+            bad "tools/tmpguard builds ($(grep -v 'warning:' "$TMP/tmpguard.log" | head -1))"
+            tmpg=1
+        elif "$TMP/tmpguard" .. "../../${TMPGUARD_TREES[$i]}" >"$TMP/tmpguard.out" 2>&1; then
+            ok "$(cat "$TMP/tmpguard.out")"
+            mark_done "tmpguard_$i"
+        else
+            bad "$(cat "$TMP/tmpguard.out")"
+            tmpg=1
+        fi
+    fi
+done
+
+[ "$fail" -eq 0 ] && [ "$tmpg" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
     && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$conf" -eq 0 ] \
     && [ "$tst" -eq 0 ] && [ "$fixr" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]

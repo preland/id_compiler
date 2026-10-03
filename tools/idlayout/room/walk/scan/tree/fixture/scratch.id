@@ -13,6 +13,7 @@ lay_room_scratch_fixture() {
   string[] no_segs = [];
 } chain () {
   lay_room_set_ref(no_segs);
+  fs_drop_exit(lay_room_scratch);
 } return void;
 ():() then lay_room_scratch_clean:(0)
 ():() then lay_room_scratch_clean:(0) then lay_room_scratch_clean:(-1)

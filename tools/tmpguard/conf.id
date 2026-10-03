@@ -1,0 +1,13 @@
+// tmpguard builds trees, so it is built on the standard library's exec_run,
+// exec_ls and fs_mktemp.
+
+// The longest one tree's build may take, in milliseconds; a hung build is
+// killed and counted as a failure.
+int tg_ms = 600000;
+
+// The directory whose entries are counted before and after each build.
+string tg_watch = "/tmp";
+
+// The start of tmpguard's own scratch directory's name. Entries that start with
+// it are never counted, because they are tmpguard's, not the build's.
+string tg_skip = "tmpguard_";

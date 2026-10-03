@@ -24,20 +24,23 @@ qa_sock_full() {
   int qa_rm = fs_remove(qa_base);
   string qa_path = qa_base + ".sock";
 } chain () {
+  fs_drop_exit(qa_path);
+  fs_drop_exit(qa_base);
   int qa_listener = proc_spawn("socat\n-u\nUNIX-LISTEN:" + qa_path + ",fork,unlink-early,accept-timeout=30\n/dev/null\n");
+} chain () {
   export string qa_full_path = qa_path;
   export int qa_full_listener = qa_listener;
-} chain () {
   sleep_ms(50);
+} chain () {
   int[] qa_hs = [];
   int qa_h = 0;
-} chain () {
   while (qa_h >= 0 && len(qa_hs) < 256) {
     qa_h = sock_connect((import qa_full_path), 500);
     if (qa_h >= 0) {
       push(qa_hs, qa_h);
     }
   }
+} chain () {
   export int[] qa_full_hs = qa_hs;
 } return void;
 ():() then qa_free_sock:(1)

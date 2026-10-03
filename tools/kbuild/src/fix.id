@@ -10,6 +10,7 @@ kb_t_fake(int rc) {
   string script = "#!/bin/sh\nexit " + rc + "\n";
 } chain (int rc) {
   exec_file_put(kb_t_root + "/bin/idc", script, 493);
+  fs_drop_exit(kb_t_root);
 } return void;
 (0):() then kb_t_done:(1)
 (5):() then kb_t_done:(1)

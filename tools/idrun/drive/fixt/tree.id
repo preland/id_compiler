@@ -11,15 +11,17 @@ given tf_file("long") ((import tf_path), ""):() then tf_size:(0) then tf_rm:(0)
 // and a hidden directory and a build directory that are not source.
 tf_tree() {
   export string tf_root = fs_mktemp("idrun_d_", 1);
+  fs_drop_exit(tf_root);
   tf_put((import tf_root) + "/conf.id", "int k = 3;\n// c\n");
-  tf_put((import tf_root) + "/a.id", "x\n");
 } chain () {
+  tf_put((import tf_root) + "/a.id", "x\n");
   int m1 = fs_mkdir((import tf_root) + "/z");
   tf_put((import tf_root) + "/z/b.id", "y\n");
-  int m2 = fs_mkdir((import tf_root) + "/.hid");
 } chain () {
+  int m2 = fs_mkdir((import tf_root) + "/.hid");
   tf_put((import tf_root) + "/.hid/c.id", "h\n");
   int m3 = fs_mkdir((import tf_root) + "/build");
+} chain () {
   tf_put((import tf_root) + "/build/d.id", "b\n");
 } return void;
 ():() then tf_rmtree:(0)

@@ -1,0 +1,32 @@
+// Fixtures: a scratch directory standing in for the idc directory, whose
+// bin/idc is a script that exits with a chosen status and, when asked, leaves
+// a file in the directory tmpguard watches. The directory is registered with
+// fs_drop_exit, so it goes when the process does however the case ends.
+
+// Makes the directory with bin/idc in it executable, and w beside it for the
+// watched entries; exports the directory as tg_t_root and w as tg_t_w. The
+// script exits with rc, after creating tg_t_w/leak when leak is 1.
+tg_t_fake(int rc, int leak) {
+  export string tg_t_root = fs_mktemp("tgt_", 1);
+  export string tg_t_w = tg_t_root + "/w";
+  fs_drop_exit(tg_t_root);
+} chain (int rc, int leak) {
+  int tg_made = fs_mkdir(tg_t_root + "/bin");
+  int tg_made_w = fs_mkdir(tg_t_w);
+  string tg_script = "#!/bin/sh\n";
+} chain (int rc, int leak) {
+  if (leak == 1) {
+    tg_script = tg_script + ": > " + tg_t_w + "/leak\n";
+  }
+  tg_script = tg_script + "exit " + rc + "\n";
+  exec_file_put(tg_t_root + "/bin/idc", tg_script, 493);
+} return void;
+(0, 0):() then tg_t_script:("#!/bin/sh\nexit 0\n")
+(3, 0):() then tg_t_script:("#!/bin/sh\nexit 3\n")
+
+// The text of the fixture's bin/idc.
+tg_t_script() {
+  string tg_text = fs_read_text((import tg_t_root) + "/bin/idc");
+} return string tg_text;
+given tg_t_fake(0, 0) ():("#!/bin/sh\nexit 0\n")
+given tg_t_fake(7, 0) ():("#!/bin/sh\nexit 7\n")

@@ -22,7 +22,9 @@ given ccrun_fx_run_capped_true given ccrun_fx_empty_input ():() then calls pump_
 // real content.
 ccrun_fx_empty_input() {
   string p = fs_mktemp("ccrun_empty_", 0);
+  fs_drop_exit(p);
   setup_io(p);
+} chain () {
   int rm = fs_remove(p);
 } return void;
 ():() then ccrun_fx_pending_value:(0)

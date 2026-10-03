@@ -43,13 +43,14 @@ qa_qmp_only_ready() {
 // kill_if_needed's "still running" branch needs to prove a real kill.
 qa_hang_qh() {
   string qa_fifo = fs_mktemp("qa_fifo_", 0);
+  fs_drop_exit(qa_fifo);
   int qa_rm = fs_remove(qa_fifo);
-  int qa_mk = proc_spawn("mkfifo\n" + qa_fifo + "\n");
 } chain () {
+  int qa_mk = proc_spawn("mkfifo\n" + qa_fifo + "\n");
   int qa_mkwait = proc_wait(qa_mk, 2000);
   int qa_mkclose = proc_close(qa_mk);
-  export string qa_hang_fifo = qa_fifo;
 } chain () {
+  export string qa_hang_fifo = qa_fifo;
   init(2, ["qmon", qa_fifo]);
   boot();
 } return void;

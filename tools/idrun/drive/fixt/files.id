@@ -6,6 +6,7 @@ tf_file(string s) {
   int wn = fs_write_mem(h, mem_of_str(s), len(s));
 } chain (string s) {
   int shut = fs_close(h);
+  fs_drop_exit(tf_path);
 } return void;
 ("abc"):() then tf_size:(3) then tf_rm:(0)
 (""):() then tf_size:(0) then tf_rm:(0)

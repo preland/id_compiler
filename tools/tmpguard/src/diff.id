@@ -1,0 +1,32 @@
+// Which entries of a directory listing are new: the set difference between the
+// listing taken after a build and the one taken before it.
+
+// 1 when tg_name is one of the entries of tg_list.
+tg_has(string[] tg_list, string tg_name) {
+  int tg_i = 0;
+  int tg_found = 0;
+  while (tg_i < len(tg_list)) {
+    if (str_cmp(tg_list[tg_i], tg_name) == 0) {
+      tg_found = 1;
+    }
+    tg_i = tg_i + 1;
+  }
+} return int tg_found;
+(["a", "b/"], "b/"):(1)
+(["a", "b/"], "b"):(0)
+
+// The entries of tg_after that are not in tg_before and do not start with
+// tg_skip, in the order tg_after lists them.
+tg_new(string[] tg_before, string[] tg_after) {
+  string[] tg_fresh = [];
+  int tg_i = 0;
+  while (tg_i < len(tg_after)) {
+    if (tg_has(tg_before, tg_after[tg_i]) == 0 && str_starts(tg_after[tg_i], (import tg_skip)) == 0) {
+      push(tg_fresh, tg_after[tg_i]);
+    }
+    tg_i = tg_i + 1;
+  }
+} return string[] tg_fresh;
+(["a", "b/"], ["a", "b/", "c", "tmpguard_x/", "d/"]):(["c", "d/"])
+(["a", "b"], ["b"]):([])
+(["a"], ["a", "tmpguard_s/"]):([])

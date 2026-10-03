@@ -14,6 +14,7 @@ given tf_ol given tf_olp("a") ("b"):() then tf_olr:(["a", "b"])
 // 1, and empty otherwise.
 tf_cdir(int full) {
   export string tf_cdp = fs_mktemp("idrun_c_", 1);
+  fs_drop_exit(tf_cdp);
   if (full == 1) {
     tf_put((import tf_cdp) + "/src", "s");
     tf_put((import tf_cdp) + "/lex", "l");
