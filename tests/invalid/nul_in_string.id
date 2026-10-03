@@ -1,0 +1,6 @@
+// EXPECT: a string literal may not contain \0
+// a string never holds a NUL byte, so `\0` in a literal is refused rather than silently ending it
+main(int argc, string[] argv) {
+  string s = "ab\0cd";
+  print(s);
+} return int 0;

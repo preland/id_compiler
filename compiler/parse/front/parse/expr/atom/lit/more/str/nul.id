@@ -1,0 +1,42 @@
+// Whether a string literal's text spells a NUL byte: a backslash, a 0, and then no
+// further octal digit that makes the value nonzero (`\033` is ESC, not NUL).
+str_has_nul(string text) {
+  int nul_i = 0;
+  int nul_found = 0;
+  while(nul_i < len(text)) {
+    if(charat(text, nul_i) == 92 && charat(text, nul_i + 1) == 48 && nul_tail(text, nul_i + 2) == 1) {
+      nul_found = 1;
+    }
+    if(charat(text, nul_i) == 92) {
+      nul_i = nul_i + 1;
+    }
+    nul_i = nul_i + 1;
+  }
+} return int nul_found;
+("\"ab\\0cd\""):(1)
+("\"ab\\\\0\""):(0)
+("\"\\033[0m\""):(0)
+
+nul_tail(string text, int nul_at) {
+  int nul_d1 = charat(text, nul_at);
+  int nul_d2 = charat(text, nul_at + 1);
+  int nul_z = 1;
+} chain (string text, int nul_at) {
+  if(nul_d1 >= 49 && nul_d1 <= 55) {
+    nul_z = 0;
+  }
+  if(nul_d1 == 48 && nul_d2 >= 49 && nul_d2 <= 55) {
+    nul_z = 0;
+  }
+} return int nul_z;
+("\\0", 2):(1)
+("\\033", 2):(0)
+("\\001", 2):(0)
+("\\000", 2):(1)
+
+nul_tokens() {
+  env_init();
+  push_toks(["str", "eof"], ["\"a\\0b\"", ""]);
+} return void;
+():() then check_failed:(0)
+():() then tkind_len:(2)

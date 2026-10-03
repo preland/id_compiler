@@ -1,12 +1,4 @@
-// The string leaf, and the operator-class predicates.
-
-parse_str(int[] pos) {
-  string text = cur_text(pos);
-  advance(pos);
-  int ret_i = node_str(text);
-} return int ret_i;
-given atom_tokens ([15]):(0)
-given atom_tokens ([0]):(0)
+// The operator-class predicates.
 
 // `=` is included: in an expression a bare `=` means equality in id (assignment
 // is detected as a statement before we get here).

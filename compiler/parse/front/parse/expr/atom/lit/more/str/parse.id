@@ -1,0 +1,16 @@
+// The string leaf. A string never holds a NUL byte, so a literal that spells
+// one (`\0`, `\00`, `\000`) is refused here, at the literal: binary data goes
+// through stdio_read_mem, fs_read_mem or the store, not through a string.
+// `\033` and the other octal escapes that name a nonzero byte stay legal.
+parse_str(int[] pos) {
+  string text = cur_text(pos);
+  if(str_has_nul(text) == 1) {
+    syn_err(pos, "a string literal may not contain \\0: a string never holds a NUL byte, so keep binary data in stdio_read_mem, fs_read_mem or the store and not in a string");
+  }
+  advance(pos);
+} chain (int[] pos) {
+  int ret_i = node_str(text);
+} return int ret_i;
+given atom_tokens ([15]):(0)
+given atom_tokens ([0]):(0)
+given nul_tokens ([0]):(0) then check_failed:(1)
