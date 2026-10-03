@@ -2,21 +2,28 @@
 //   fixd_used         every name the function declares, and each new one
 //   fixd_lo, fixd_hi  the token ranges this run replaces, so that no other
 //                     edit lands inside text that is going away
+// fixd_lo: The low end of each token range this run replaces, one push per noted
+// range. A `then` check takes no parameters, so fix_note_tok (rec.id), whose
+// whole effect is that push, can only be observed through a reader of it.
 fix_state3() {
   export string[] fixd_used = [];
   export int[] fixd_lo = [];
   fix_state3b();
 } return void;
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
 // The repeated-call cache (out/emit/name/pick/reuse/) is a function's own
 // too: a name good in one function says nothing about another.
+// fixd_hi: The high end of the ranges fixd_lo_len counts, pushed in step with it by
+// fix_note_tok (out/emit/resid/rec.id). Filed here rather than beside its
+// export in grp/reset.id, which is at its three-function cap in a directory
+// at its three-entry one.
 fix_state3b() {
   export int[] fixd_hi = [];
   fix_rcache_reset();
 } return void;
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
 // The third span token (plan/walk/ev/push/one/ru.id's fix_span_fixture
@@ -26,5 +33,5 @@ fix_span_fixture4(int e) {
   push((import ttext), "len");
   fix_span_fixture5(e);
 } return void;
-given fix_span_fixture (0):() then check_failed:(0)
+given fix_span_fixture (0):() then (import chkfail)[0]:(0)
 given fix_span_fixture (0):() then init_units:(0)

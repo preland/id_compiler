@@ -46,5 +46,5 @@ m2r_reset() {
   m2r_wipe((import phiof));
   m2r_wipe((import outv));
 } return void;
-given m2r_outv_fixture ():() then pra_len_check:(0) then phiof_len:(0) then outv_len:(0)
-given m2r_row_fixture ():() then pra_len_check:(0) then phiof_len:(0) then outv_len:(0)
+given m2r_outv_fixture ():() then len((import pra)):(0) then len((import phiof)):(0) then len((import outv)):(0)
+given m2r_row_fixture ():() then len((import pra)):(0) then len((import phiof)):(0) then len((import outv)):(0)

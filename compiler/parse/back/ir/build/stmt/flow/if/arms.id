@@ -1,5 +1,5 @@
 lw_if_arms(int node, int thn, int alt, int jn) {
-  int[] l1_of_v = l1_of(node);
+  int[] l1_of_v = (import nl1)[node];
   lw_arm(thn, l1_of_v, jn);
   int ret_i = lw_if_arms2(node, alt, jn);
 } return int ret_i;
@@ -7,7 +7,7 @@ given nest_fixture ((import if_node), 0, 1, 4):(4)
 given loop_fixture ((import while_node), 0, 1, 4):(4)
 
 lw_if_arms2(int node, int alt, int jn) {
-  int[] l2_of_v = l2_of(node);
+  int[] l2_of_v = (import nl2)[node];
   lw_arm(alt, l2_of_v, jn);
   int ret_i = lw_go(jn);
 } return int ret_i;
@@ -18,7 +18,7 @@ given loop_fixture ((import while_node), 1, 4):(4)
 lw_free_all() {
   int i = 0;
   while(i < len((import lwslot))) {
-    lw_drop(lw_old((import lwslot)[i]), ir_s((import lwslot)[i]));
+    lw_drop(lw_old((import lwslot)[i]), (import istr)[((import lwslot)[i])]);
     i = i + 1;
   }
 } return void;

@@ -14,7 +14,7 @@
 
 seqk(int id) {
   int sk = 0;
-  if(is_seqd(id) == 0) {
+  if(lst_get_or((import seqt), id, 0) == 0) {
     int[] sq_kids = seq_kids(id);
     sk = seq_fold(sq_kids);
     sk = seq_own(id, sk);
@@ -42,7 +42,7 @@ given sq_fixture ((import sq_two), 2):(2)
 
 is_unit(int id) {
   int ok = div_traps(id);
-  if(k_of(id) == "call" || k_of(id) == "index" || k_of(id) == "import") {
+  if((import nkind)[id] == "call" || (import nkind)[id] == "index" || (import nkind)[id] == "import") {
     ok = 1;
   } else if(is_logic(id) == 1) {
     ok = 1;

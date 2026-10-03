@@ -16,7 +16,7 @@ cm_setup() {
   lc_reg_list1("clist", "1", 1);
   export int cm_push_call = cm_call("clist");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 cm_scalar_setup() {
@@ -24,5 +24,5 @@ cm_scalar_setup() {
   lc_reg_int("cscalar", "2", 2);
   export int cm_push_scalar_call = cm_call("cscalar");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -1,13 +1,13 @@
 // The variable's declared type, read from the symbol table by name.
 var_type_at(int i) {
-  string nm = s1_of(i);
+  string nm = (import ns1)[i];
   string vt = lookup_var(nm, (import nunit)[i]);
 } return string vt;
 given h_call_match ((import h_call_1)):("func(int) return int")
 given call2_setup ((import cm_push_call)):("")
 
 want_elem_ok(int i) {
-  int i1_of_v = i1_of(i);
+  int i1_of_v = (import ni1)[i];
   string type_of_v = type_of(i1_of_v);
   int ok = want_elem_ok2(type_of_v);
 } return int ok;

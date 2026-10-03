@@ -39,28 +39,30 @@ nat_init(int argc, string[] argv) {
   lset((import tkout), 0, arg_flag(argc, argv, 1, "--tc-keys"));
   ur_seed(arg_flag_val(argc, argv, 1, "--unit-roots", ""));
 } return void;
-given env_init (3, ["prog", "--unit-roots", "/r"]):() then ur_count:(1)
+given env_init (3, ["prog", "--unit-roots", "/r"]):() then len((import uroots)):(1)
 given env_init (2, ["prog", "--units"]):() then calls arg_flag:(2, ["prog", "--units"], 1, "--units")
-given env_init (1, ["prog"]):() then nat_on_check:(0) then stdunit_check:(-1)
-given env_init (2, ["prog", "--natives"]):() then nat_on_check:(1) then stdunit_check:(-1)
-given env_init (3, ["prog", "--std-unit", "5"]):() then stdunit_check:(5)
+given env_init (1, ["prog"]):() then (import natc)[0]:(0) then (import stdunit)[0]:(-1)
+given env_init (2, ["prog", "--natives"]):() then (import natc)[0]:(1) then (import stdunit)[0]:(-1)
+given env_init (3, ["prog", "--std-unit", "5"]):() then (import stdunit)[0]:(5)
 given env_init (3, ["prog", "--exclude-units", "5,9"]):() then calls exclunit_seed:("5,9")
 given env_init (1, ["prog"]):() then calls exclunit_seed:("")
 
 //   natkey  KIND|NAME of every row, so a native is listed once per kind
 //   natrow  the rows themselves (emit.id)
+// natrow: A `then` check for the void natives-row functions, which otherwise leave
+// no result to compare -- how many rows the walk has recorded so far.
 nat_lists() {
   export string[] natkey = [];
   export string[] natrow = [];
 } return void;
-given env_init ():() then nat_row_count:(0)
-given env_init ():() then check_failed:(0)
+given env_init ():() then len((import natrow)):(0)
+given env_init ():() then (import chkfail)[0]:(0)
 
 // Nothing is pruned with no main or when freestanding (sweep.id,
 // guarded_emit.id), so there every function is live and every native any of
 // them calls is one the object needs.
 nat_all_live() {
-  int all = is_freestanding() == 1 || find_str((import fnames), "main") < 0;
+  int all = (import fsc)[0] == 1 || find_str((import fnames), "main") < 0;
 } return int all;
 given flags_setup ():(1)
 given fs_on_fixture ():(1)

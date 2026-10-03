@@ -3,17 +3,17 @@
 // its own composition rather than a name computed ahead of the `if`.
 
 fold_isbool(int v) {
-  int a = ir_a(v);
-  string t = ir_ty(a);
+  int a = (import ia)[v];
+  string t = (import ity)[a];
   int r = t == "bool";
 } return int r;
 given irlfx_setup ((import irlfx_id)):(0)
 given fold_true_setup ((import ft_id)):(1)
 
 fold_zero_of(int id) {
-  int b = ir_b(id);
+  int b = (import ib)[id];
   int r = 0;
-  if(b >= 0 && ir_op(b) == "const" && ir_s(b) == "0") {
+  if(b >= 0 && (import iop)[b] == "const" && (import istr)[b] == "0") {
     r = 1;
   }
 } return int r;
@@ -31,5 +31,5 @@ fold_true_setup() {
   export int ft_id = ir_insn("add", "int", c0, c0, "", none, none);
   export int fz_id = ir_insn("zext", "int", c0, 0, "", none, none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

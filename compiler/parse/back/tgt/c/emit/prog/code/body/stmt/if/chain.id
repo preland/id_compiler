@@ -9,8 +9,8 @@
 collect_chain(int id) {
   int[] if_ids = [id];
   int cur_id = id;
-  while(i2_of(cur_id) == 1) {
-    int[] elsel = l2_of(cur_id);
+  while((import ni2)[cur_id] == 1) {
+    int[] elsel = (import nl2)[cur_id];
     cur_id = elsel[0];
     push(if_ids, cur_id);
   }
@@ -38,7 +38,7 @@ given stmt_fix ([]):([])
 render_chain(int[] if_ids, string[] cond_texts, int lvl, string ind) {
   string cond_text = cond_texts[lvl];
   int cur_id = if_ids[lvl];
-  int[] l1_of_v = l1_of(cur_id);
+  int[] l1_of_v = (import nl1)[cur_id];
 } chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
   string head = ind + "if (";
   if(lvl > 0) {
@@ -47,7 +47,7 @@ render_chain(int[] if_ids, string[] cond_texts, int lvl, string ind) {
   emit_line(head + cond_text + ") {");
 } chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
   emit_block(l1_of_v, ind + "    ");
-  int has_else = i2_of(cur_id);
+  int has_else = (import ni2)[cur_id];
   int next_k = lvl + 1;
 } chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
   if(has_else == 0) {

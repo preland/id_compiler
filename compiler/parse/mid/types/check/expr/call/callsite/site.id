@@ -9,7 +9,7 @@
 // undeclared-function error from `cc` about generated code.
 
 chk_callsite(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   int fn = fn_node_of(s1_of_v);
   chk_site_at(id, fn);
 } return void;

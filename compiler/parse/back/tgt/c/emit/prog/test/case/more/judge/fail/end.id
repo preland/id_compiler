@@ -7,7 +7,7 @@
 
 emit_case_fail(int ci) {
   int fn = (import casefn)[ci];
-  int[] expd = l2_of((import casenode)[ci]);
+  int[] expd = (import nl2)[((import casenode)[ci])];
   string cnd = case_cond(fn, expd);
 } chain (int ci) {
   emit_line("    if (!(" + cnd + ")) {\n        fprintf(stderr, \"%s: test failed: %s = \", idtc_where[" + ci + "], idtc_call[" + ci + "]);");

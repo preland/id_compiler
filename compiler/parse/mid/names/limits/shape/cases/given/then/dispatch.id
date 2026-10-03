@@ -7,7 +7,7 @@
 
 fit_then(int ti) {
   int chk_node = (import thennode)[ti];
-  string kind = k_of(chk_node);
+  string kind = (import nkind)[chk_node];
   fit_then_kind(kind, chk_node);
 } return void;
 given print_fixture (0):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
@@ -15,7 +15,7 @@ given calls_node_fixture (0):() then prints:("")
 
 fit_then_kind(string kind, int chk_node) {
   if(kind == "then") {
-    then_fn_entry(chk_node);
+    then_fn(chk_node, (import ns1)[chk_node]);
   } else if(kind == "thenprints" || kind == "theneprints") {
     fit_then_print(chk_node);
   } else {
@@ -27,16 +27,21 @@ given print_fixture ("thenprints", (import fixture_print_empty)):() then prints:
 given calls_node_fixture ("thencalls", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")
 given traps_node_fixture ("thentraps", (import fixture_traps_node)):() then calls fit_then_traps:[1]
 
-// `traps` is the fourth kind fit_then_kind tells apart -- folded in beside
-// `calls` rather than as a fourth branch there (that if/else-if chain already
-// spends its own action budget) -- fit_then_traps (../check/entry.id) is the
-// actual check.
+// `traps` and `thenimp` (`then (import NAME):(value)`, and `thenlen` for `then len((import NAME)):(value)`) are the fourth and
+// fifth kinds fit_then_kind tells apart -- folded in beside `calls` rather
+// than as further branches there (that if/else-if chain already spends its
+// own action budget) -- fit_then_traps and fit_then_imp (../check/entry.id)
+// are the actual checks.
 fit_then_traps_or_calls(string kind, int chk_node) {
   if(kind == "thentraps") {
     fit_then_traps(chk_node);
+  } else if(kind == "thenimp" || kind == "thenlen") {
+    fit_then_imp(chk_node);
   } else {
     fit_then_calls(kind, chk_node);
   }
 } return void;
 given traps_node_fixture ("thentraps", (import fixture_traps_node)):() then calls fit_then_traps:[1]
 given calls_node_fixture ("thencalls", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")
+given then_imp_fixture ("int", 0, 0) ("thenimp", (import then_imp_node)):() then calls fit_then_imp:[1]
+given then_imp_fixture ("int[]", 0, 0) given sset((import nkind), (import then_imp_node), "thenlen") ("thenlen", (import then_imp_node)):() then calls fit_then_imp:[1]

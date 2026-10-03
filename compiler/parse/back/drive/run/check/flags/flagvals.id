@@ -3,23 +3,23 @@
 
 arg_flags2(int argc, string[] argv) {
   int arg_reqtests_v = arg_reqtests(argc, argv, 1, 0);
-  reqtests_set(arg_reqtests_v);
+  lset((import reqc), 0, arg_reqtests_v);
   arg_flags3(argc, argv);
 } return void;
-given flags_setup (1, ["prog"]):() then require_tests:(0)
-given flags_setup (2, ["prog", "--require-tests"]):() then require_tests:(1)
+given flags_setup (1, ["prog"]):() then (import reqc)[0]:(0)
+given flags_setup (2, ["prog", "--require-tests"]):() then (import reqc)[0]:(1)
 
 arg_flags3(int argc, string[] argv) {
   int arg_flag_v = arg_flag(argc, argv, 1, "--runtime");
-  rt_set(arg_flag_v);
+  lset((import rtc), 0, arg_flag_v);
   arg_flags4(argc, argv);
 } return void;
-given flags_setup (1, ["prog"]):() then is_runtime:(0)
-given flags_setup (2, ["prog", "--runtime"]):() then is_runtime:(1)
+given flags_setup (1, ["prog"]):() then (import rtc)[0]:(0)
+given flags_setup (2, ["prog", "--runtime"]):() then (import rtc)[0]:(1)
 
 arg_flags4(int argc, string[] argv) {
   int arg_flag_v2 = arg_flag(argc, argv, 1, "--freestanding");
-  fs_set(arg_flag_v2);
+  lset((import fsc), 0, arg_flag_v2);
   string host_t = arg_flag_val(argc, argv, 1, "--host-triple", "");
 } chain (int argc, string[] argv) {
   if(host_t == "") {
@@ -28,5 +28,5 @@ arg_flags4(int argc, string[] argv) {
   export string[] hostc = [host_t];
   nat_init(argc, argv);
 } return void;
-given flags_setup (1, ["prog"]):() then is_freestanding:(0)
-given flags_setup (2, ["prog", "--freestanding"]):() then is_freestanding:(1)
+given flags_setup (1, ["prog"]):() then (import fsc)[0]:(0)
+given flags_setup (2, ["prog", "--freestanding"]):() then (import fsc)[0]:(1)

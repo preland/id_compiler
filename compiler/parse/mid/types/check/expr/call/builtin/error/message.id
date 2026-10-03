@@ -9,7 +9,7 @@ bi_arg_err(int id, int i, string want, string t) {
     bi_arg_err2(id, i, want, t);
   }
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "index", "string"):() then check_failed:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "index", "string"):() then (import chkfail)[0]:(1)
 given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err2:((import bi_mismatch_call), 0, "list", "int")
 
 // str_of_mem names neither the position nor the type: both of its arguments
@@ -21,7 +21,7 @@ bi_arg_err2(int id, int i, string want, string t) {
     bi_arg_err3(id, i, want, t);
   }
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "addr", "int"):() then check_failed:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "addr", "int"):() then (import chkfail)[0]:(1)
 given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_arg_err3:((import bi_mismatch_call), 0, "list", "int")
 
 // The flat-store group is the only family that reports at the *argument's*
@@ -30,14 +30,14 @@ given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then ca
 // several lines.
 bi_arg_err3(int id, int i, string want, string t) {
   if(want == "word") {
-    int[] l1_of_v = l1_of(id);
-    string s1_of_v = s1_of(id);
+    int[] l1_of_v = (import nl1)[id];
+    string s1_of_v = (import ns1)[id];
     tc_err(l1_of_v[i], s1_of_v + " expects int or word arguments, got " + t);
   } else {
-    string s1_of_v2 = s1_of(id);
+    string s1_of_v2 = (import ns1)[id];
     string bi_verb_v = bi_verb(want);
     tc_err(id, s1_of_v2 + " " + bi_verb_v + ", got " + t);
   }
 } return void;
-given bi_mismatch_setup ((import bi_mismatch_call), 0, "word", "string"):() then check_failed:(1)
+given bi_mismatch_setup ((import bi_mismatch_call), 0, "word", "string"):() then (import chkfail)[0]:(1)
 given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then calls bi_verb:("list")

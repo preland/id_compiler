@@ -6,33 +6,33 @@
 // program is explained the same way by both compilers or by neither.
 
 chk_bits(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_logop(s1_of_v) == 1 || is_bitop(s1_of_v) == 1) {
     chk_bits2(id);
-  } else if(s1_of(id) == "%") {
+  } else if((import ns1)[id] == "%") {
     chk_mod(id);
   }
 } return void;
-given cmp_fixture ((import bin_and)):() then check_failed:(0)
-given cmp_fixture ((import bin_bitand)):() then check_failed:(0)
+given cmp_fixture ((import bin_and)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_bitand)):() then (import chkfail)[0]:(0)
 
 chk_bits2(int id) {
-  int i1_of_v = i1_of(id);
-  int i2_of_v = i2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
   bits_types(id, i1_of_v, i2_of_v);
 } return void;
-given cmp_fixture ((import bin_bitand)):() then check_failed:(0)
-given composite_fixture ((import bin_concat)):() then check_failed:(1)
+given cmp_fixture ((import bin_bitand)):() then (import chkfail)[0]:(0)
+given composite_fixture ((import bin_concat)):() then (import chkfail)[0]:(1)
 
 // The logical pair names no types: `&&` on two lists is a mistake about what
 // the operator is for, not about which type it got, and idc.py says so.
 bits_err(int id, string lt, string rt) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_logop(s1_of_v) == 1) {
-    string s1_of_v2 = s1_of(id);
+    string s1_of_v2 = (import ns1)[id];
     tc_err(id, "'" + s1_of_v2 + "' requires int operands");
   } else {
-    string s1_of_v3 = s1_of(id);
+    string s1_of_v3 = (import ns1)[id];
     tc_err(id, "'" + s1_of_v3 + "' requires int or word operands, got " + lt + " and " + rt);
   }
 } return void;

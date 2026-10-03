@@ -1,13 +1,13 @@
 chk_cmp(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_eqop(s1_of_v) == 1) {
     chk_eq(id);
   } else {
     chk_ord(id);
   }
 } return void;
-given cmp_fixture ((import bin_eq)):() then check_failed:(0)
-given cmp_fixture ((import bin_lt)):() then check_failed:(0)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_lt)):() then (import chkfail)[0]:(0)
 
 // No binary operator takes a function value (docs/SPEC.md 1.1): arithmetic on
 // one is arithmetic on an address, and comparing two tells apart functions
@@ -18,19 +18,19 @@ fv_bin(int id) {
   fv_side(id, (import ni2)[id], "right");
   chk_cmp(id);
 } return void;
-given cmp_fixture ((import bin_eq)):() then check_failed:(0)
-given cmp_fixture ((import bin_lt)):() then check_failed:(0)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_lt)):() then (import chkfail)[0]:(0)
 
 fv_side(int id, int e, string side) {
   string t = type_of(e);
   if(ty_is_func(t) == 1) {
-    string op = s1_of(id);
+    string op = (import ns1)[id];
     tc_err(id, "'" + op + "' cannot take a function value: its " + side + " operand is " + t + "; a function value can only be passed, stored or called");
   }
   if(ty_is_struct(t) == 1) {
-    tc_err(id, "'" + s1_of(id) + "' cannot take a struct: its " + side + " operand is " + t + "; a struct is compared and combined by field, as in a." + sd_fname_at(t, 0) + " " + s1_of(id) + " b." + sd_fname_at(t, 0));
+    tc_err(id, "'" + (import ns1)[id] + "' cannot take a struct: its " + side + " operand is " + t + "; a struct is compared and combined by field, as in a." + sd_cell((import sdfname), t, 0) + " " + (import ns1)[id] + " b." + sd_cell((import sdfname), t, 0));
   }
 } return void;
-given fnval_call_fixture ((import fnval_call), (import fnval_call), "left"):() then check_failed:(1)
-given cmp_fixture ((import bin_eq), (import lit_a), "left"):() then check_failed:(0)
+given fnval_call_fixture ((import fnval_call), (import fnval_call), "left"):() then (import chkfail)[0]:(1)
+given cmp_fixture ((import bin_eq), (import lit_a), "left"):() then (import chkfail)[0]:(0)
 given sd_bi_fixture ((import sd_eq), (import sd_vp), "left"):() then prints:("<stdin>:1: error: '==' cannot take a struct: its left operand is P; a struct is compared and combined by field, as in a.x == b.x\n")

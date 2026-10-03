@@ -8,7 +8,7 @@ init_ir7() {
   export int[][] ilist = [];
   int ret_i = init_ir4();
 } return int ret_i;
-given ir_rows ():(0) then check_failed:(0)
+given ir_rows ():(0) then (import chkfail)[0]:(0)
 given ir_rows ():(0) then init_units:(0)
 
 init_ir8() {
@@ -16,7 +16,7 @@ init_ir8() {
   export int[][] bpred = [];
   int ret_i = init_ir9();
 } return int ret_i;
-given ir_rows ():(0) then check_failed:(0)
+given ir_rows ():(0) then (import chkfail)[0]:(0)
 given ir_rows ():(0) then init_units:(0)
 
 init_ir9() {
@@ -24,5 +24,5 @@ init_ir9() {
   export int[] irprog = [];
   int ret_i = init_lw();
 } return int ret_i;
-given ir_rows ():(0) then check_failed:(0)
+given ir_rows ():(0) then (import chkfail)[0]:(0)
 given ir_rows ():(0) then init_units:(0)

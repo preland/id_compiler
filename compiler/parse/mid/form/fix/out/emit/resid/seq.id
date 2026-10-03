@@ -13,11 +13,3 @@ fix_emit_pt(string p, string text) {
 given fix_fixture ("1|2", "hi"):() then prints:("@R||1|2|1|2|1|hi\n")
 given fix_fixture ("3|4", "bye"):() then prints:("@R||3|4|3|4|1|bye\n")
 
-// The low end of each token range this run replaces, one push per noted
-// range. A `then` check takes no parameters, so fix_note_tok (rec.id), whose
-// whole effect is that push, can only be observed through a reader of it.
-fixd_lo_len() {
-  int n = len((import fixd_lo));
-} return int n;
-given fix_fixture ():(0)
-given fix_note_fixture ():(1)

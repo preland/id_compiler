@@ -13,7 +13,7 @@ given sd_case_fixture ([(import sd_ca), (import sd_ca)], "P"):("(long long)(1), 
 given sd_case_fixture ([(import sd_cs)], "Q"):("(long long)(intptr_t)(ID_S(s))")
 
 tc_fcell(int e, string want, int sd_k) {
-  string sd_ft = sd_ftype_at(want, sd_k);
+  string sd_ft = sd_cell((import sdftype), want, sd_k);
   string cv = tc_value(e, sd_ft);
   string so = box(cv, sd_ft);
 } return string so;

@@ -7,7 +7,7 @@
 
 ll_init_elem(int i, int j, int e, string pass) {
   string t = elem_type((import etypes)[i]);
-  if(pass == "bytes" && t == "string" && k_of(e) != "import") {
+  if(pass == "bytes" && t == "string" && (import nkind)[e] != "import") {
     ll_elem_bytes(i, j, e);
   }
   if(pass == "build") {
@@ -26,7 +26,7 @@ given elems3_fixture (2, 0, (import llie_child), "int"):() then prints:("  call 
 
 ll_cell(int i, int j, int e, string t) {
   string cell = "";
-  if(k_of(e) == "import") {
+  if((import nkind)[e] == "import") {
     cell = ll_cell_load(i, j, e);
   } else if(t == "string" || t == "float") {
     cell = ll_cell_named(i, j, e, t);

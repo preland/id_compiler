@@ -2,7 +2,7 @@
 // and the home block.
 
 chk_l() {
-  int[] ret_li = ir_l((import chk_id)[0]);
+  int[] ret_li = (import ilist)[((import chk_id)[0])];
 } return int[] ret_li;
 given ir_rows ():([])
 given ir_rows_chk1 ():([])
@@ -15,7 +15,7 @@ given ir_rows_chk1 ():([])
 // from an lset of -1 somewhere else. There is no gap here, unlike the tables
 // recorded elsewhere as deliberately uncovered.
 chk_home() {
-  int ret_i = ir_home((import chk_id)[0]);
+  int ret_i = (import ihome)[((import chk_id)[0])];
 } return int ret_i;
 given ir_rows ():(0)
 given ir_rows_chk1 ():(-1)

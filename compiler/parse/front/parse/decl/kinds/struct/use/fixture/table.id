@@ -8,7 +8,7 @@ sd_pair() {
 } chain () {
   sd_note("Q", ["s"], ["string"], "q.id", 5);
 } return void;
-():() then sd_count:(2)
+():() then len((import sdname)):(2)
 ():() then sd_last_nf:(1)
 
 // A case element that is a constructor, then a literal: `P(1, 2) 7`.
@@ -16,5 +16,5 @@ sd_case_toks() {
   env_init();
   push_toks(["ident", "op", "int", "op", "int", "op", "int", "eof"], ["P", "(", "1", ",", "2", ")", "7", ""]);
 } return void;
-():() then check_failed:(0)
-():() then tkind_len:(8)
+():() then (import chkfail)[0]:(0)
+():() then len((import tkind)):(8)

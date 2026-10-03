@@ -4,8 +4,8 @@
 // a no-op at any width and fingerprints as x, the same as `x >> 0` does.
 
 call_fp(int id) {
-  string s1_of_v = s1_of(id);
-  int[] l1_of_v = l1_of(id);
+  string s1_of_v = (import ns1)[id];
+  int[] l1_of_v = (import nl1)[id];
   string ret_s = "c(" + canon_callee(s1_of_v) + ":" + canon_args(l1_of_v) + ")";
 } chain (int id) {
   if(s1_of_v == "ushr" && len(l1_of_v) == 2 && lit_is(l1_of_v[1], 0) == 1) {
@@ -26,7 +26,7 @@ call_fp_fixture() {
   int cfx_x = node_int("7", 7, 0);
   export int call_ushr = node_call("ushr", [cfx_x, lit0]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // canon_iassign's second case (../../../../stmt/more/decl.id) needs an
@@ -38,5 +38,5 @@ iassign2_fixture() {
   iafix();
   uq_begin("f");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

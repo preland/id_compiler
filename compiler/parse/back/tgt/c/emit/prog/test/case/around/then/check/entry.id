@@ -8,7 +8,7 @@
 // unconditionally, so either would crash rather than emit.
 
 emit_then_kind(string kind, int ci, int ti, int node) {
-  if(kind == "then") {
+  if(kind == "then" || kind == "thenimp" || kind == "thenlen") {
     emit_then_check(ci, ti, node);
   } else if(kind == "thenprints" || kind == "theneprints") {
     emit_then_print(ci, ti, node);
@@ -21,9 +21,44 @@ given calls_node_fixture ("thencalls", (import fixture_ci), 0, (import fixture_c
 given chk_fixture ("then", 0, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_then_check(int ci, int ti, int node) {
-  string chk_nm = s1_of(node);
-  int cfn = func_node(chk_nm);
-  emit_then_got(ci, ti, chk_nm, cfn);
+  string chk_nm = (import ns1)[node];
+  if((import nkind)[node] == "thenimp" || (import nkind)[node] == "thenlen") {
+    emit_then_imp(ci, ti, node);
+  } else {
+    emit_then_got(ci, ti, chk_nm, func_node(chk_nm));
+  }
 } return void;
 given chk_fixture (0, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 given chk_fixture (2, 0, (import fixture_chk_node)):() then prints:("    int idtc_chk0 = id_chk();\n    int idtc_want0 = 1;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[2], idtc_call[2]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
+
+// `then (import NAME):(value)` and `then (import NAME)[i]:(value)`: the export
+// is read where a check function's result would be -- after the call and
+// after the counters were read -- trapping first when nothing has set it
+// (checked_read, prog/head/decl/export/uninit.id), and an element is read the
+// way an index in a program is, unboxed to its type (op/index/get.id), or its
+// length taken for `then len((import NAME))` (then_len_call). From
+// there it is the same local, the same literal and the same failure line a
+// check function gets (got.id, fail.id), with `(import NAME)[i]` where the
+// function's name would be.
+emit_then_imp(int ci, int ti, int node) {
+  string vt = then_imp_type(node);
+  string rd = checked_read((import ns1)[node]);
+  string lbl = "(import " + (import ns1)[node] + ")";
+} chain (int ci, int ti, int node) {
+  int[] imp_ix = (import nl2)[node];
+  int[] items = (import nl1)[node];
+  if(len(imp_ix) == 1) {
+    rd = unbox("id_list_get(" + rd + ", " + tc_value(imp_ix[0], "int") + ")", vt);
+    lbl = lbl + "[" + lit_text(imp_ix[0]) + "]";
+  }
+} chain (int ci, int ti, int node) {
+  if((import nkind)[node] == "thenlen") {
+    rd = then_len_call((import ns1)[node]) + rd + ")";
+    lbl = "len(" + lbl + ")";
+  }
+  emit_line("    " + c_type(vt) + " idtc_chk" + ti + " = " + rd + ";");
+  emit_then_judge(ci, ti, lbl, vt, items);
+} return void;
+given then_imp_fixture ("int", 0, 0) (0, 0, (import then_imp_node)):() then prints:("    int idtc_chk0 = ((void)(idtc_set_gx || (id_null_read(), 0)), gx);\n    int idtc_want0 = 0;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then (import gx) = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")
+given then_imp_fixture ("int[]", 0, 1) (0, 0, (import then_imp_node)):() then prints:("    int idtc_chk0 = (int)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 0));\n    int idtc_want0 = 0;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then (import gx)[0] = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")
+given then_imp_fixture ("int[]", 0, 0) given sset((import nkind), (import then_imp_node), "thenlen") (0, 0, (import then_imp_node)):() then prints:("    int idtc_chk0 = id_list_len(((void)(idtc_set_gx || (id_null_read(), 0)), gx));\n    int idtc_want0 = 0;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then len((import gx)) = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")

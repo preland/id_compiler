@@ -8,16 +8,16 @@
 elems2_fixture() {
   lc_dce_setup();
   int d = const_decl("a");
-  export int llie_e = i1_of(d);
+  export int llie_e = (import ni1)[d];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 elems3_fixture() {
   elems2_fixture();
-  export int llie_child = l1_of((import llie_e))[0];
+  export int llie_child = (import nl1)[(import llie_e)][0];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // One whole asm row, for the operand-text translation in text/. asm_reg_fix1b
@@ -36,5 +36,5 @@ llasm_row_fixture() {
   push((import afname), "portout");
   push((import aftriple), "x86_64-unknown-none");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

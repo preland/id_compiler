@@ -1,5 +1,5 @@
 fix_ptype(int e, int i) {
-  string s1_of_v = s1_of(e);
+  string s1_of_v = (import ns1)[e];
   int fn = fn_node_of(s1_of_v);
   string pt = "";
 } chain (int e, int i) {
@@ -15,10 +15,10 @@ given fix_pparam_fixture ((import ppvarcall), 0):("int")
 // Only when the count matches: otherwise the checks report that instead and
 // judge no argument.
 fix_pparam(int e, int fn, int i) {
-  int[] ps = l1_of(fn);
+  int[] ps = (import nl1)[fn];
   string pt = "";
-  if(i < len(ps) && len(ps) == flat_arg_count(e)) {
-    pt = s1_of(ps[i]);
+  if(i < len(ps) && len(ps) == len(((import nl1)[e]))) {
+    pt = (import ns1)[(ps[i])];
   }
 } return string pt;
 given fix_pparam_fixture ((import ppcall), (import ppfn), 0):("int")
@@ -39,5 +39,5 @@ fix_pparam_fixture() {
 } chain () {
   export int ppwide = node_int("99999", 99999, 1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

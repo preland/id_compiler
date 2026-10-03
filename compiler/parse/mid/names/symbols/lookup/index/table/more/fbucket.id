@@ -3,15 +3,15 @@ push_fbucket() {
   int[] new_bucket_v2 = new_bucket();
   push((import fidx), new_bucket_v2);
 } return void;
-given call2_setup ():() then check_failed:(0)
-given argfn_d ():() then check_failed:(0)
+given call2_setup ():() then (import chkfail)[0]:(0)
+given argfn_d ():() then (import chkfail)[0]:(0)
 
 regrow_a() {
   env_init();
   init_reg();
   push((import dvfunc), "f");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A second declaration of the same name in the same unit, on top of
@@ -21,5 +21,5 @@ vx_dup_fixture() {
   fcall_reg_b();
   add_var("h", "func(int) return int", 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

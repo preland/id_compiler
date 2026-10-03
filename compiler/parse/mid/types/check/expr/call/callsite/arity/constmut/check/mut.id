@@ -8,14 +8,14 @@ chk_const_mut(int id) {
     chk_const_mut2(id);
   }
 } return void;
-given cm_setup ((import cm_push_call)):() then check_failed:(1)
-given cm_other_setup ((import cm_var_node)):() then check_failed:(0)
+given cm_setup ((import cm_push_call)):() then (import chkfail)[0]:(1)
+given cm_other_setup ((import cm_var_node)):() then (import chkfail)[0]:(0)
 
 is_mut_call(int id) {
   int ok = 0;
-  string k = k_of(id);
+  string k = (import nkind)[id];
   if(k == "call") {
-    string nm = s1_of(id);
+    string nm = (import ns1)[id];
     ok = is_mut_name(nm);
   }
 } return int ok;

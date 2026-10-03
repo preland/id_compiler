@@ -9,12 +9,12 @@ op_dce(int f) {
     n = dce_sweep(f, 0, 0);
   }
 } return void;
-given cfg_fixture (0):() then chk_op0:("nop")
+given cfg_fixture (0):() then (import iop)[0]:("nop")
 given cfg_fixture (0):() then chk_blk_count:(2)
 
 dce_sweep(int f, int i, int n) {
   while(i < blk_count(f)) {
-    int[] irf_blk_v = irf_blk(f);
+    int[] irf_blk_v = (import fnblk)[f];
     n = dce_blk(f, irf_blk_v[i], n);
     i = i + 1;
   }
@@ -24,8 +24,8 @@ given cfg_fixture (0, 1, 0):(0)
 
 dce_blk(int f, int b, int n) {
   int i = 0;
-  while(i < insn_count(b)) {
-    int[] blk_ins_v = blk_ins(b);
+  while(i < len(((import binsn)[b]))) {
+    int[] blk_ins_v = (import binsn)[b];
     n = dce_one(f, blk_ins_v[i], n);
     i = i + 1;
   }

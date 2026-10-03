@@ -58,4 +58,4 @@ print_asm_cases() {
   }
 } return void;
 given asm_row_fixture ():() then prints:("foo|<stdin>:1|0\nbar|<stdin>:1|0\n")
-given asm_row_fixture ():() then check_failed:(0)
+given asm_row_fixture ():() then (import chkfail)[0]:(0)

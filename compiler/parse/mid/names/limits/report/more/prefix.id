@@ -9,12 +9,6 @@ loc_at(string fname, int ln) {
 given edge_fixture ("fx_target", 4):("fixture.id:4: error: ")
 given edge_fixture ("nosuchfn", 9):("<stdin>:9: error: ")
 
-dvname_len() {
-  int n = len((import dvname));
-} return int n;
-given regrow_c ():(0)
-given regrow_d ():(1)
-
 // A chain continues a function that has run out of room, so a segment that
 // still had room should have kept writing rather than starting a new one.
 // Housed here because every file under shape/block/ and shape/actions/ is at

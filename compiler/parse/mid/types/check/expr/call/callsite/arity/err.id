@@ -1,14 +1,14 @@
 arity_err(int id, int fn) {
-  string name = s1_of(id);
+  string name = (import ns1)[id];
   string msg = arity_err_msg(id, fn, name);
   tc_err(id, msg);
 } return void;
-given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls arity_err_msg:((import argfn_call_mismatch), (import argfn_fn), "g") then check_failed:(1)
-given argfn_d ((import argfn_fn), (import argfn_fn)):() then calls arity_err_msg:((import argfn_fn), (import argfn_fn), "g") then check_failed:(1)
+given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls arity_err_msg:((import argfn_call_mismatch), (import argfn_fn), "g") then (import chkfail)[0]:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn)):() then calls arity_err_msg:((import argfn_fn), (import argfn_fn), "g") then (import chkfail)[0]:(1)
 
 arity_err_msg(int id, int fn, string name) {
-  int need = flat_arg_count(fn);
-  int have = flat_arg_count(id);
+  int need = len(((import nl1)[fn]));
+  int have = len(((import nl1)[id]));
   string msg = "function '" + name + "' takes " + need + " argument(s), got " + have;
 } return string msg;
 given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn), "g"):("function 'g' takes 1 argument(s), got 0")
@@ -19,5 +19,5 @@ argfn_mismatch_call() {
   int[] none = [];
   export int argfn_call_mismatch = node_call("g", none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -3,31 +3,33 @@
 // the body declared at its own top level.
 
 scope_func(int id) {
-  scope_cut(0);
-  int[] l1_of_v = l1_of(id);
+  while(len((import scnames)) > 0) {
+    pop((import scnames));
+  }
+  int[] l1_of_v = (import nl1)[id];
   scope_params(l1_of_v);
 } return void;
 given fnscope_fix ((import regrow_fn_node)):() then calls scope_params:((import regrow_plist))
-given scnames_fix ((import rgif_node)):() then check_failed:(0)
+given scnames_fix ((import rgif_node)):() then (import chkfail)[0]:(0)
 
 scope_params(int[] params) {
   int i = 0;
   while(i < len(params)) {
-    string s2_of_v = s2_of(params[i]);
+    string s2_of_v = (import ns2)[(params[i])];
     push((import scnames), s2_of_v);
     i = i + 1;
   }
 } return void;
-given fnscope_fix ((import regrow_plist)):() then check_failed:(0)
-given scnames_fix ([]):() then check_failed:(0)
+given fnscope_fix ((import regrow_plist)):() then (import chkfail)[0]:(0)
+given scnames_fix ([]):() then (import chkfail)[0]:(0)
 
 // Called after the statement's expression was walked, so `int n = n + 1;`
 // reads n before it exists.
 scope_add(int id) {
-  if(k_of(id) == "decl") {
-    string s2_of_v = s2_of(id);
+  if((import nkind)[id] == "decl") {
+    string s2_of_v = (import ns2)[id];
     push((import scnames), s2_of_v);
   }
 } return void;
-given scnames_fix ((import rgdecl_node)):() then check_failed:(0)
-given scnames_fix ((import rgif_node)):() then check_failed:(0)
+given scnames_fix ((import rgdecl_node)):() then (import chkfail)[0]:(0)
+given scnames_fix ((import rgif_node)):() then (import chkfail)[0]:(0)

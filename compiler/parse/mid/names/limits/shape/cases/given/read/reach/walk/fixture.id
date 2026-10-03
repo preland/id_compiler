@@ -6,18 +6,31 @@ rc_t_ready() {
   dg_t_parsed();
   rc_ready();
 } return void;
-():() then rc_nsets:(0)
-():() then dg_nrows:(3)
-
+():() then len((import rcsets)):(0)
+():() then len((import dg_comp)):(3)
 rc_t_one() {
   rc_t_ready();
   int rcfirst = rc_of("fb");
 } return void;
-():() then rc_nsets:(1)
-():() then dg_nrows:(3)
+():() then len((import rcsets)):(1)
+():() then len((import dg_comp)):(3)
 
-rc_nsets() {
-  int rcn = len((import rcsets));
-} return int rcn;
-given rc_t_ready ():(0)
-given rc_t_one ():(1)
+// Test check: the whole reach memo -- how many rows it holds, then every row's
+// flags in order -- so a case states all of it. rc_has (flags.id) computes a
+// row on demand through rc_of, so a check of the row count would be the
+// effect of that call and not a repeat of a read it makes.
+rcsets_state() {
+  string rcs_j = len((import rcsets)) + ":";
+  int rcs_f = 0;
+  int rcs_w = 0;
+} chain () {
+  if(len((import rcsets)) > 0) {
+    rcs_w = len((import rcsets)[0]);
+  }
+  while(rcs_f < len((import rcsets)) * rcs_w) {
+    rcs_j = rcs_j + (import rcsets)[rcs_f / rcs_w][rcs_f % rcs_w];
+    rcs_f = rcs_f + 1;
+  }
+} return string rcs_j;
+given rc_t_ready ():("0:")
+given rc_t_one ():("1:110")

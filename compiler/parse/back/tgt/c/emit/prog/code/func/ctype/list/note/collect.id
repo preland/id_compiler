@@ -2,7 +2,7 @@
 
 tc_collect_case(int ci) {
   int fn = (import casefn)[ci];
-  int[] expd = l2_of((import casenode)[ci]);
+  int[] expd = (import nl2)[((import casenode)[ci])];
   tc_collect_expd(fn, expd);
 } return void;
 given wrap_fixture (0):() then calls chk_type:((import fixture_fn), 0)
@@ -26,6 +26,6 @@ note_ty(string ty) {
   }
   note_struct(ty);
 } return void;
-given sd_note_fixture ("int[]"):() then tctys_len:(1)
-given sd_note_fixture ("int"):() then tctys_len:(0)
-given sd_note_fixture ("P[]"):() then tcsts_len:(1)
+given sd_note_fixture ("int[]"):() then len((import tctys)):(1)
+given sd_note_fixture ("int"):() then len((import tctys)):(0)
+given sd_note_fixture ("P[]"):() then len((import tcsts)):(1)

@@ -3,12 +3,12 @@
 // argument to a defined function obeys (../../args/).
 
 fcall_arg_at(int id, string vt, string[] pts, int i) {
-  int a = l1_of(id)[i];
+  int a = (import nl1)[id][i];
   string t = type_of(a);
   fcall_arg_check(id, vt, pts[i], a, i, t);
 } return void;
-given h_call_match ((import h_call_1), "func(int) return int", ["int"], 0):() then check_failed:(0)
-given argfn_narrow_call ((import argfn_call_narrow), "func(int) return int", ["int"], 0):() then check_failed:(1)
+given h_call_match ((import h_call_1), "func(int) return int", ["int"], 0):() then (import chkfail)[0]:(0)
+given argfn_narrow_call ((import argfn_call_narrow), "func(int) return int", ["int"], 0):() then (import chkfail)[0]:(1)
 
 fcall_arg_check(int id, string vt, string pt, int a, int i, string t) {
   if(bad_store(pt, a) == 1) {
@@ -25,5 +25,5 @@ argfn_narrow_call() {
   int a = node_int("99999", 99999, 1);
   export int argfn_call_narrow = node_call("g", [a]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

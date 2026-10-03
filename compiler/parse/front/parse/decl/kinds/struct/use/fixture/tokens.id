@@ -6,15 +6,15 @@ sd_toks() {
   env_init();
   push_toks(["kw", "ident", "op", "kw", "ident", "op", "kw", "ident", "op", "op", "eof"], ["struct", "P", "{", "int", "x", ";", "string", "y", ";", "}", ""]);
 } return void;
-():() then check_failed:(0)
-():() then tkind_len:(11)
+():() then (import chkfail)[0]:(0)
+():() then len((import tkind)):(11)
 
 sd_toks_open() {
   env_init();
   push_toks(["kw", "ident", "op", "kw", "ident", "op", "eof"], ["struct", "P", "{", "int", "x", ";", ""]);
 } return void;
-():() then check_failed:(0)
-():() then tkind_len:(7)
+():() then (import chkfail)[0]:(0)
+():() then len((import tkind)):(7)
 
 sd_last_nf() {
   int sd_i = len((import sdname)) - 1;

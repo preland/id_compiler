@@ -6,8 +6,8 @@ ir_col3(int[] bl) {
   push((import iblk), bl);
   push((import ihome), 0 - 1);
 } return void;
-given env_init ([9]):([9]) then chk0_bl:([9])
-given env_init ([]):([]) then chk0_home:(-1)
+given env_init ([9]):([9]) then (import iblk)[0]:([9])
+given env_init ([]):([]) then (import ihome)[0]:(-1)
 
 // The new instruction's own id, once every column has a row for it: the id
 // IS the row index, so this only has meaning after ir_col3 has pushed the
@@ -17,5 +17,5 @@ ir_insn_fin(int[] bl) {
   int ret_i = len((import iop)) - 1;
 } return int ret_i;
 given env_init ([9]):(-1)
-given env_init ([]):(-1) then chk0_bl:([])
+given env_init ([]):(-1) then (import iblk)[0]:([])
 

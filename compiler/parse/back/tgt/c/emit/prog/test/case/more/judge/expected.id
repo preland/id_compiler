@@ -3,7 +3,7 @@
 
 emit_case_expd(int ci) {
   int fn = (import casefn)[ci];
-  int[] expd = l2_of((import casenode)[ci]);
+  int[] expd = (import nl2)[((import casenode)[ci])];
   int j = 0;
 } chain (int ci) {
   while(j < len(expd)) {
@@ -22,7 +22,7 @@ given void_call_fixture (1):() then prints:("")
 // case that carries one.
 emit_case_traps_fail(int ci) {
   int tnid = case_traps_node(ci);
-  string want = tc_value(l1_of(tnid)[0], "string");
+  string want = tc_value((import nl1)[tnid][0], "string");
   emit_line("    fprintf(stderr, \"%s: test failed: %s \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", " + want + ");\n    return 3;");
 } return void;
 given traps_case_fixture ((import fixture_ci)):() then calls case_traps_node:[1]

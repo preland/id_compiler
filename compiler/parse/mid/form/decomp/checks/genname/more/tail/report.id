@@ -17,7 +17,7 @@ given farm_i (0, "v2"):() then eprints:("test.id:7: warning: parameter 'v2' of '
 given farm_i (0, "ret_i"):() then eprints:("test.id:7: warning: parameter 'ret_i' of 'fwd1' has a generated name; name it for what it holds\n")
 
 genname_msg(int i, string name) {
-  string fname = s1_of((import prog)[i]);
+  string fname = (import ns1)[((import prog)[i])];
   string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
   string ret_s = loc + "parameter '" + name + "' of '" + fname + "' has a generated name; name it for what it holds";
 } return string ret_s;

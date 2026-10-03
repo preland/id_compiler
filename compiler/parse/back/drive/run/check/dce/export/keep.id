@@ -21,7 +21,7 @@ lz_a() {
   uq_begin("test");
   export int lz_str = node_str("hi");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The last step of seed_cfn_fixture (tests/more/clear.id, dce/export/
@@ -34,12 +34,12 @@ seed_cfn_fixture_add(int[] args) {
   int caseid = newnode("case", 0, 0, "fixture.id", "", args, args);
   push((import casenode), caseid);
 } return void;
-given fn_fixture ([0]):() then check_failed:(0)
-given fn_fixture ([1]):() then check_failed:(0)
+given fn_fixture ([0]):() then (import chkfail)[0]:(0)
+given fn_fixture ([1]):() then (import chkfail)[0]:(0)
 
 keep_export(int i) {
   int ok = 1;
-  if(is_harn() == 0 && nat_all_live() == 0) {
+  if((import harn)[0] == 0 && nat_all_live() == 0) {
     ok = is_reach((import eowners)[i]);
   }
   if((import eowners)[i] == "conf.id" && nat_all_live() == 0) {
@@ -50,5 +50,5 @@ keep_export(int i) {
 given keep_export_fixture_harn_on (0):(1)
 given keep_export_fixture_reg (0):(0)
 given keep_export_fixture_reg (1):(1)
-given cvl_setup given cvl_mark(0) (0):(1)
-given cvl_setup given cvl_mark(0) (2):(0)
+given cvl_setup given const_mark(0) (0):(1)
+given cvl_setup given const_mark(0) (2):(0)

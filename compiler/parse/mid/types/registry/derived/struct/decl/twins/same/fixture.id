@@ -9,11 +9,11 @@ sd_fnfile(string sd_f) {
 } chain (string sd_f) {
   push((import pfile), sd_f);
 } return void;
-given sd_pair ("a.id"):() then prog_len:(1)
-given sd_pair ("b.id"):() then sd_fnfile_last:("b.id")
+given sd_pair ("a.id"):() then len((import prog)):(1)
+given sd_pair ("b.id"):() then sd_fnfile_last:("fnfile b.id")
 
 sd_fnfile_last() {
-  string s = (import pfile)[len((import pfile)) - 1];
-} return string s;
-given sd_pair given sd_fnfile("x.id") ():("x.id")
-given sd_pair given sd_fnfile("y.id") ():("y.id")
+  string s_t = "fnfile " + ((import pfile)[len((import pfile)) - 1]);
+} return string s_t;
+given sd_pair given sd_fnfile("x.id") ():("fnfile x.id")
+given sd_pair given sd_fnfile("y.id") ():("fnfile y.id")

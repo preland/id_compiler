@@ -1,21 +1,12 @@
 
 m2r_incs(int f, int b, int ph, int j) {
   int i = 0;
-  while(i < m2r_pre_count(b)) {
+  while(i < len(((import bpred)[b]))) {
     i = m2r_inc(f, b, ph, j, i);
   }
 } return void;
 given cfg_fixture (0, 0, 0, 0):() then calls m2r_inc:[0]
 given m2r_predfx (0, 1, 0, 0):() then calls m2r_inc:(0, 1, 0, 0, 0)
-
-// A block's predecessor count, composed so `blk_pre` -- a call -- does not
-// sit inside `len`'s own argument list.
-m2r_pre_count(int b) {
-  int[] blk_pre_v = blk_pre(b);
-  int n = len(blk_pre_v);
-} return int n;
-given br_fixture_p (0):(0)
-given br_fixture_p (1):(1)
 
 m2r_inc(int f, int b, int ph, int j, int i) {
   int pb = m2r_pre_at(b, i);

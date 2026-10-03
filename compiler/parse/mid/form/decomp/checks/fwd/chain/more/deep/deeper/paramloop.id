@@ -19,7 +19,7 @@ given farm_g ([0], [11], 0):(0)
 
 fwd_param_ok2(int pid, int cpid) {
   int ok = 0;
-  if(s1_of(pid) == s1_of(cpid)) {
+  if((import ns1)[pid] == (import ns1)[cpid]) {
     ok = 1;
   }
 } return int ok;

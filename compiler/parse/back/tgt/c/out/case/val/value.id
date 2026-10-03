@@ -6,19 +6,19 @@
 // needs no conversion.
 
 tc_value(int e, string want) {
-  string so = s1_of(e);
-  if(k_of(e) != "cimport") {
+  string so = (import ns1)[e];
+  if((import nkind)[e] != "cimport") {
     so = tc_lit(e, want);
   }
-  if(k_of(e) == "cfn") {
-    so = "id_" + s1_of(e);
+  if((import nkind)[e] == "cfn") {
+    so = "id_" + (import ns1)[e];
   }
 } return string so;
 given lit_import_fixture ((import lit_cimport_e), "int"):("gb")
 given lit_int_fixture ((import lit_e), "int"):("5")
 
 tc_list(int e, string want) {
-  int[] xs = l1_of(e);
+  int[] xs = (import nl1)[e];
   string et = list_elem(want);
   string so = tc_list_n(xs, et);
 } return string so;

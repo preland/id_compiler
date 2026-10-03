@@ -11,8 +11,8 @@ seal_rets(string name, string rt) {
     sset((import ns2), seal_r, rt);
   }
 } return void;
-given seal_fixture ("f", "int"):() then last_s1:("f")
-given seal_fixture ("g", "void"):() then last_s1:("g")
+given seal_fixture ("f", "int"):() then last_s1:("s1 f")
+given seal_fixture ("g", "void"):() then last_s1:("s1 g")
 
 // One pending early return, created with an empty name for seal_rets to fill.
 seal_fixture() {
@@ -20,5 +20,5 @@ seal_fixture() {
   int seal_n = newleaf("ret", 0 - 1, 0, "", "");
   push((import pend_rets), seal_n);
 } return void;
-():() then last_s1:("")
-():() then check_failed:(0)
+():() then last_s1:("s1 ")
+():() then (import chkfail)[0]:(0)

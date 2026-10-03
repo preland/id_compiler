@@ -8,9 +8,9 @@
 canon_decl(int id) {
   string out = decl_tag(id);
   string nm = decl_name(id);
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
 } chain (int id) {
-  string ret_s = out + s1_of(id) + " " + nm + "=" + canon_expr(i1_of_v);
+  string ret_s = out + (import ns1)[id] + " " + nm + "=" + canon_expr(i1_of_v);
 } return string ret_s;
 given lz_j ((import lz_edecl)):("ed:int z=I3")
 given canon_begun_fixture ((import lz_declid)):("d:int 0=I3")
@@ -19,8 +19,8 @@ given canon_begun_fixture ((import lz_declid)):("d:int 0=I3")
 // exported name is a reserved global that the rest of the program reads by
 // that name.
 decl_name(int id) {
-  string out = s2_of(id);
-  if(i2_of(id) != 1) {
+  string out = (import ns2)[id];
+  if((import ni2)[id] != 1) {
     out = cn(out);
   }
 } return string out;
@@ -30,7 +30,7 @@ given lz_j (16):("z")
 // `base[index] = value`. The parser folds the parsed index target into the
 // node's two int fields and puts the value in a one-element list.
 canon_iassign(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string head = canon_expr(i1_of_v);
   string ret_s = iassign_tail(id, head);
 } return string ret_s;

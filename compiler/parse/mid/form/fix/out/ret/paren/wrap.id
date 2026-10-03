@@ -11,7 +11,7 @@ given lz_c (0, 2):() then calls fix_paren_node:[3]
 given lz_c (2, 0):() then calls fix_paren_node:[0]
 
 fix_paren_node(int x) {
-  if(k_of(x) == "bin") {
+  if((import nkind)[x] == "bin") {
     fix_paren_pair(x);
   }
 } return void;
@@ -19,8 +19,8 @@ given lz_c ((import lz_binid)):() then calls fix_paren_pair:[1]
 given lz_c ((import lz_i1)):() then calls fix_paren_pair:[0]
 
 fix_paren_pair(int x) {
-  int a = i1_of(x);
-  int b = i2_of(x);
+  int a = (import ni1)[x];
+  int b = (import ni2)[x];
   fix_paren_two(x, a, b);
 } return void;
 given lz_c ((import lz_binid)):() then calls fix_paren_two:[1]

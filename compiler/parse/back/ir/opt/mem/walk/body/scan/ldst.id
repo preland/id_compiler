@@ -1,28 +1,28 @@
 
 m2r_load(int f, int id, int i) {
-  int ir_a_v = ir_a(id);
+  int ir_a_v = (import ia)[id];
   int j = m2r_slot(ir_a_v);
   if(j >= 0) {
     m2r_drop(f, id, (import outv)[i][j], 0);
   }
 } return void;
-given m2r_ldfx (0, (import ldfx_id), 0):() then chk_op:("nop") then chk_ty:("")
-given m2r_outv_fixture (0, 0, 0):() then chk_op:("add")
+given m2r_ldfx (0, (import ldfx_id), 0):() then chk_op:("op nop") then chk_ty:("ty ")
+given m2r_outv_fixture (0, 0, 0):() then chk_op:("op add")
 
 m2r_store(int id, int i) {
-  int ir_a_v = ir_a(id);
+  int ir_a_v = (import ia)[id];
   int j = m2r_slot(ir_a_v);
   if(j >= 0) {
     m2r_kept(id, i, j);
   }
 } return void;
-given m2r_ldfx ((import ldfx_id), 0):() then outv_sum:(42) then chk_op:("nop")
-given m2r_outv_fixture (0, 0):() then outv_sum:(-1) then chk_op:("add")
+given m2r_ldfx ((import ldfx_id), 0):() then outv_sum:("outv 42") then chk_op:("op nop")
+given m2r_outv_fixture (0, 0):() then outv_sum:("outv -1") then chk_op:("op add")
 
 m2r_kept(int id, int i, int j) {
-  int ir_b_v = ir_b(id);
+  int ir_b_v = (import ib)[id];
   lset((import outv)[i], j, ir_b_v);
   ir_kill(id);
 } return void;
-given m2r_outv_fixture (0, 0, 0):() then outv_sum:(4)
-given m2r_outv_fixture (2, 0, 0):() then outv_sum:(-1)
+given m2r_outv_fixture (0, 0, 0):() then outv_sum:("outv 4")
+given m2r_outv_fixture (2, 0, 0):() then outv_sum:("outv -1")

@@ -13,7 +13,7 @@ given sd_note_fixture ("Q"):("    fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr
 given sd_note_fixture ("P"):("    fprintf(stderr, \"%d\", (int)(a->data[0]));\n    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n")
 
 st_show_at(string sd_nm, int sd_k) {
-  string sd_ft = sd_ftype_at(sd_nm, sd_k);
+  string sd_ft = sd_cell((import sdftype), sd_nm, sd_k);
   string sh = tc_show(unbox("a->data[" + sd_k + "]", sd_ft), sd_ft);
   string so = "    " + sh + "\n";
 } chain (string sd_nm, int sd_k) {

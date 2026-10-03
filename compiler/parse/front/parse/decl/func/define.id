@@ -8,7 +8,7 @@ parse_program(int[] pos) {
   }
 } return void;
 given decl_tokens ([0]):([37])
-given decl_tokens ([0]):([37]) then check_failed:(0)
+given decl_tokens ([0]):([37]) then (import chkfail)[0]:(0)
 
 // function: name ( params ) { body } return TYPE expr ;   (or `return void;`)
 parse_func(int[] pos) {
@@ -16,7 +16,7 @@ parse_func(int[] pos) {
   int ret_i = func_sig(pos, name);
 } return int ret_i;
 given decl_tokens ([0]):(17)
-given decl_tokens ([0]):(17) then check_failed:(0)
+given decl_tokens ([0]):(17) then (import chkfail)[0]:(0)
 
 func_sig(int[] pos, string name) {
   int[] params = parse_params(pos, "param");
@@ -24,4 +24,4 @@ func_sig(int[] pos, string name) {
   int ret_i = func_ret(pos, name, params, body);
 } return int ret_i;
 given decl_tokens ([1], "add"):(17)
-given decl_tokens ([1], "add"):(17) then check_failed:(0)
+given decl_tokens ([1], "add"):(17) then (import chkfail)[0]:(0)

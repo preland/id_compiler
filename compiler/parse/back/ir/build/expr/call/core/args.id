@@ -1,6 +1,6 @@
 
 lw_args_more(int node, int i) {
-  int[] args = l1_of(node);
+  int[] args = (import nl1)[node];
   int ok = i < len(args);
 } return int ok;
 given ocall_fixture ((import ocall_node), 0):(0)
@@ -15,7 +15,7 @@ lw_fcall(int node) {
   int ret_i = lw_fcall_emit(node, callee, args);
 } return int ret_i;
 given fcallv_fixture ((import fcallv_node)):(2)
-given fcallv_fixture ((import fcallv_node)):(2) then check_failed:(0)
+given fcallv_fixture ((import fcallv_node)):(2) then (import chkfail)[0]:(0)
 
 // A call node's name is the variable's, so its slot is found as a read of the
 // variable finds it; the load is at the variable's type, not the call's.
@@ -25,4 +25,4 @@ lw_fcallee(int node) {
   int ret_i = lw_load_at(addr, vt);
 } return int ret_i;
 given fcallv_fixture ((import fcallv_node)):(1)
-given fcallv_fixture ((import fcallv_node)):(1) then check_failed:(0)
+given fcallv_fixture ((import fcallv_node)):(1) then (import chkfail)[0]:(0)

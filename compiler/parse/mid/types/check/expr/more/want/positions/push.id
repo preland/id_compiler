@@ -1,6 +1,6 @@
 want_push(int i, int id) {
   int ok = 0;
-  if(is_push2(i) == 1 && l1_of(i)[1] == id) {
+  if(is_push2(i) == 1 && (import nl1)[i][1] == id) {
     ok = want_push_ok(i);
   } else {
     ok = want_ret(i, id);
@@ -10,7 +10,7 @@ given push_build ((import push_call), (import lit_a)):(0)
 given decltype_fixture ((import decl_scalar), (import lit_a)):(0)
 
 want_push_ok(int i) {
-  int[] l1_of_v = l1_of(i);
+  int[] l1_of_v = (import nl1)[i];
   string type_of_v = type_of(l1_of_v[0]);
   int ok = want_elem_ok2(type_of_v);
 } return int ok;
@@ -22,5 +22,5 @@ argfn_badtype_arg() {
   int a = node_str("x");
   export int argfn_arg_badtype = a;
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -13,7 +13,7 @@ given sd_note_fixture ("P"):("((int)(a->data[0]) == (int)(b->data[0])) && ((int)
 given sd_note_fixture ("Q"):("(strcmp((char*)(intptr_t)(a->data[0]), (char*)(intptr_t)(b->data[0])) == 0)")
 
 st_eq_join(string out, string sd_nm, int sd_k) {
-  string sd_ft = sd_ftype_at(sd_nm, sd_k);
+  string sd_ft = sd_cell((import sdftype), sd_nm, sd_k);
   string ga = unbox("a->data[" + sd_k + "]", sd_ft);
   string gb = unbox("b->data[" + sd_k + "]", sd_ft);
 } chain (string out, string sd_nm, int sd_k) {

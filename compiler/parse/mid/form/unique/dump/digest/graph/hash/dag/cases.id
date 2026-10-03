@@ -20,7 +20,7 @@ given dg_t_built ():([0, 0, 1, 1])
 given env_init ():([])
 
 dg_case_comp(int dgc) {
-  string dgnm = s1_of((import casefn)[dgc]);
+  string dgnm = (import ns1)[((import casefn)[dgc])];
   int dgf = dg_fn_named(dgnm);
   int dgw = 0 - 1;
 } chain (int dgc) {

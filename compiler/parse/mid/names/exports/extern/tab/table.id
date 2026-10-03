@@ -14,6 +14,8 @@
 //           is a collision with a C runtime this build does not link
 //   bnames  the builtin names, split out of one literal (see builtin/more/)
 
+// rtc: Whether this project is the runtime. Read by the reserved-name check and by
+// the LLVM module header, which must not declare a symbol the module defines.
 init_rtc() {
   export int[] rtc = [0];
   export int[] fsc = [0];
@@ -21,11 +23,6 @@ init_rtc() {
 } chain () {
   init_resv_names();
 } return void;
-():() then is_runtime:(0)
-():() then is_freestanding:(0)
+():() then (import rtc)[0]:(0)
+():() then (import fsc)[0]:(0)
 
-rt_set(int v) {
-  lset((import rtc), 0, v);
-} return void;
-given init_rtc (1):() then is_runtime:(1)
-given init_rtc (0):() then is_runtime:(0)

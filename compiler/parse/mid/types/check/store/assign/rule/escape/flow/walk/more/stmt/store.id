@@ -2,11 +2,11 @@
 // an assignment. Whatever the expression is, its value is kept by the name, so
 // a bare variable there is an alias of another variable and escapes.
 esc_store(int sn, string nm) {
-  string tg = s1_of(sn);
-  if(k_of(sn) == "decl") {
-    tg = s2_of(sn);
+  string tg = (import ns1)[sn];
+  if((import nkind)[sn] == "decl") {
+    tg = (import ns2)[sn];
   }
-  int r = esc_put(i1_of(sn), tg, nm);
+  int r = esc_put((import ni1)[sn], tg, nm);
 } return int r;
 given esc_fix ((import efb_dt), "t"):(0)
 given esc_fix ((import efb_dv), "v"):(2)
@@ -26,10 +26,10 @@ given esc_fix ((import efb_vp), "v", "p"):(1)
 // elements are not themselves literals (deep/elem.id).
 esc_fresh(int e, string tg, string nm) {
   int r = 0;
-  if(tg == nm && k_of(e) != "arr") {
+  if(tg == nm && (import nkind)[e] != "arr") {
     r = 2;
   } else if(tg == nm) {
-    r = esc_litels(l1_of(e));
+    r = esc_litels((import nl1)[e]);
   }
 } return int r;
 given esc_fix ((import efb_vp), "v", "v"):(2)

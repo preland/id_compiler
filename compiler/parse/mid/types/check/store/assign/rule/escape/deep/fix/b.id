@@ -15,7 +15,7 @@ esc_fd_d() {
   export int efd_look = node_func("fd_look", "int", (import efd_gp), [(import efd_decn)], node_var("n"));
   export int efd_va = node_var("a");
 } return void;
-given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 
 esc_fd_e() {
@@ -31,7 +31,7 @@ esc_fd_e() {
   export int[] efd_gs = [(import efd_ad), (import efd_pushs), (import efd_ia), (import efd_fls)];
   export int[] efd_np = [node_param("param", "int", "n")];
 } return void;
-given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 
 esc_fd_f() {
@@ -45,5 +45,5 @@ esc_fd_f() {
 } chain () {
   export int efd_leak = node_func("fd_leak", "void", (import efd_np), [(import efd_dlb), (import efd_dlr)], 0 - 1);
 } return void;
-given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)

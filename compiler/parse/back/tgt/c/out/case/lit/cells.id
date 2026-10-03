@@ -15,9 +15,9 @@ given lit_cells_fixture ((import lit_cells_xs), "string"):("(long long)(intptr_t
 
 tc_scalar(int e) {
   string so = int_code(e);
-  if(k_of(e) == "un") {
+  if((import nkind)[e] == "un") {
     so = tc_neg(e);
-  } else if(k_of(e) == "str") {
+  } else if((import nkind)[e] == "str") {
     so = "ID_S(" + c_lit(so) + ")";
   }
 } return string so;
@@ -26,7 +26,7 @@ given lit_str_fixture ((import lit_str_e)):("ID_S(hi)")
 given lit_un_fixture ((import lit_un_e)):("-5")
 
 tc_neg(int e) {
-  int i1_of_v = i1_of(e);
+  int i1_of_v = (import ni1)[e];
   string so = "-" + int_code(i1_of_v);
 } return string so;
 given lit_un_fixture ((import lit_un_e)):("-5")

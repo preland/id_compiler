@@ -10,7 +10,7 @@ given bound_fixture (2, "float", 3):(3)
 // clause was parsed. `ret` is legal anywhere in LLVM IR; what follows it in
 // the source goes into a fresh, unreachable block.
 lw_early_ret(int node) {
-  string lw_ert_ty = s2_of(node);
+  string lw_ert_ty = (import ns2)[node];
   lw_ret_val(node, lw_ert_ty);
   lw_dead();
 } return void;
@@ -20,7 +20,7 @@ given flow_ir_fixture ((import flow_ir_ret)):() then calls lw_dead:[1]
 // Start a new block and lower into it: after a `br` or `ret` the block that
 // held it is closed, and a block may end in only one terminator.
 lw_dead() {
-  int lw_dead_fn = lw_fn();
+  int lw_dead_fn = (import lwfn)[0];
   int lw_dead_b = ir_block(lw_dead_fn, "dead");
   lw_go(lw_dead_b);
 } return void;

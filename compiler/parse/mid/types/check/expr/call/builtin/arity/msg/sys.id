@@ -1,5 +1,5 @@
 bi_sys_msg(int id) {
-  string name = s1_of(id);
+  string name = (import ns1)[id];
   string cw = bi_count_word(name);
   string msg = bi_sys_msg2(id, name, cw);
 } return string msg;
@@ -15,7 +15,7 @@ bi_count_word(string name) {
 ("alloc"):("1 argument")
 
 bi_sys_msg2(int id, string name, string cw) {
-  int argn_v = flat_arg_count(id);
+  int argn_v = len(((import nl1)[id]));
   string msg = name + " takes exactly " + cw + ", got " + argn_v;
 } return string msg;
 given bi_mismatch_sys_setup ((import bi_mismatch_sys_call), "ult", "2 arguments"):("ult takes exactly 2 arguments, got 1")

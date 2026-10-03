@@ -1,5 +1,5 @@
 fix_walk_arr(int e, int cd) {
-  int[] l1_of_v = l1_of(e);
+  int[] l1_of_v = (import nl1)[e];
   int i = 0;
   while(i < len(l1_of_v)) {
     fix_walk(l1_of_v[i], 0, cd, "", "");
@@ -18,7 +18,7 @@ fix_gcl_fill_fixture() {
   int e1 = node_int("1", 1, 0);
   int e2 = node_int("2", 2, 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fix_rkey_fixture_leaf2(int e) {
@@ -26,5 +26,5 @@ fix_rkey_fixture_leaf2(int e) {
   push((import fixd_gcl), 0 - 1);
   push((import ttext), "7");
 } return void;
-given fix_rkey_fixture_leaf (0):() then check_failed:(0)
+given fix_rkey_fixture_leaf (0):() then (import chkfail)[0]:(0)
 given fix_rkey_fixture_leaf (0):() then init_units:(0)

@@ -3,7 +3,7 @@
 
 emit_else(int id, string ind) {
   emit_line(ind + "} else {");
-  int[] l2_of_v = l2_of(id);
+  int[] l2_of_v = (import nl2)[id];
   emit_body_close(l2_of_v, ind);
 } return void;
 given stmt_fix (4, ""):() then prints:("} else {\n}\n")
@@ -23,9 +23,9 @@ given stmt_fix ([], "  "):() then prints:("  }\n")
 // so a `break` is C's; an early return is C's `return` at the statement's own
 // indent.
 es_flow(int id, string ind) {
-  if(k_of(id) == "break") {
+  if((import nkind)[id] == "break") {
     emit_line(ind + "break;");
-  } else if(k_of(id) == "ret") {
+  } else if((import nkind)[id] == "ret") {
     string ret_code_v = ret_code(id);
     emit_line(ind + ret_code_v);
   } else {

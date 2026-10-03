@@ -5,13 +5,13 @@ lz_l() {
   export int lz_dv = node_var("r");
   export int lz_decl5 = node_decl("int", "r", (import lz_r5), 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 es2(int id, string ind) {
-  if(k_of(id) == "assign") {
-    string s1_of_v = s1_of(id);
-    int i1_of_v = i1_of(id);
+  if((import nkind)[id] == "assign") {
+    string s1_of_v = (import ns1)[id];
+    int i1_of_v = (import ni1)[id];
     emit_decl_line(s1_of_v, i1_of_v, ind);
   } else {
     es3(id, ind);
@@ -22,10 +22,10 @@ given stmt_fix (5, ""):() then prints:("5;\n")
 
 // A decl statement, and in the harness an exported one's flag right after
 // its value is stored (prog/head/decl/export/uninit.id). The export bit is
-// tested before is_harn(), so a local's decl never reads the flag.
+// tested before (import harn)[0], so a local's decl never reads the flag.
 emit_decl_mark(int id, string nm, int e, string ind) {
   emit_decl_line(nm, e, ind);
-  if(is_export_decl(id) == 1 && is_harn() == 1) {
+  if(is_export_decl(id) == 1 && (import harn)[0] == 1) {
     emit_line(ind + "idtc_set_" + nm + " = 1;");
   }
 } return void;

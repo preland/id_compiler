@@ -17,7 +17,7 @@ given expr_tokens ([6], 200, "+"):(1)
 // fingerprints a function reads the record, so parentheses change neither.
 paren_primary(int[] pos) {
   int e = parse_paren(pos);
-  if(k_of(e) == "bin") {
+  if((import nkind)[e] == "bin") {
     push((import nparen), e);
   }
   grp_note(e, pos);

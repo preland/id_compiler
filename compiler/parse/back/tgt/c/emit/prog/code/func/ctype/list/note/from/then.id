@@ -22,10 +22,10 @@ given calls_node_fixture ():() then calls note_check:[1]
 
 note_check(int ti) {
   int node = (import thennode)[ti];
-  if(k_of(node) == "then") {
+  if((import nkind)[node] == "then" || (import nkind)[node] == "thenimp") {
     note_check_then(node);
   }
-  if(k_of(node) == "thencalls") {
+  if((import nkind)[node] == "thencalls") {
     note_calls(node);
   }
 } return void;
@@ -34,9 +34,13 @@ given calls_node_fixture (0):() then prints:("")
 given calls_node_fixture (0):() then calls note_calls:[1]
 
 note_check_then(int node) {
-  string chk_nm = s1_of(node);
-  int cfn = func_node(chk_nm);
-  note_fn_ret(cfn);
+  string chk_nm = (import ns1)[node];
+  if((import nkind)[node] == "thenimp") {
+    note_ty(then_imp_type(node));
+  } else {
+    note_fn_ret(func_node(chk_nm));
+  }
 } return void;
 given then_node_fixture ((import fixture_then_node)):() then prints:("")
 given then_node_fixture ((import fixture_then_bad)):() then prints:("")
+given then_imp_fixture ("int[]", 0, 0) given tc_types_init ((import then_imp_node)):() then calls note_ty:("int[]")

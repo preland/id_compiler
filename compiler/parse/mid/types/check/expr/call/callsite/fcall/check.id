@@ -12,11 +12,11 @@ chk_fcall(int id) {
   }
 } return void;
 given h_call_match ((import h_call_1)):() then calls fcall_arity:((import h_call_1), "func(int) return int")
-given call2_setup ((import cm_push_call)):() then check_failed:(0)
+given call2_setup ((import cm_push_call)):() then (import chkfail)[0]:(0)
 
 fcall_arity(int id, string vt) {
   string[] pts = fn_params(vt);
-  if(len(pts) != flat_arg_count(id)) {
+  if(len(pts) != len(((import nl1)[id]))) {
     fcall_arity_err(id, vt, pts);
   } else {
     fcall_args(id, vt, pts);

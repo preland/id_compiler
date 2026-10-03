@@ -5,7 +5,7 @@
 
 emit_rec_def(string nm, int fn) {
   string sigtext = param_str(fn);
-  int[] params = l1_of(fn);
+  int[] params = (import nl1)[fn];
   string fields = rec_row_fields(params);
 } chain (string nm, int fn) {
   emit_rec_types(nm, fields);

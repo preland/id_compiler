@@ -8,7 +8,7 @@
 
 ll_asm_all(string triple) {
   int i = 0;
-  while(i < asm_count()) {
+  while(i < len((import afname))) {
     ll_asm_row(i, triple);
     i = i + 1;
   }

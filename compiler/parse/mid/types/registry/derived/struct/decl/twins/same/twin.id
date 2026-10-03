@@ -9,7 +9,7 @@ sd_same(int sd_i) {
     sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' has the same fields as struct '" + (import sdname)[sd_j] + "' (declared at " + sd_where(sd_j) + "); two structs with the same field names and types are one struct -- use '" + (import sdname)[sd_j] + "', or give '" + (import sdname)[sd_i] + "' a field of another name or type");
   }
 } return void;
-given sd_pair (1):() then check_failed:(0)
+given sd_pair (1):() then (import chkfail)[0]:(0)
 given sd_pair given sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 3) (2):() then prints:("pt.id:3: error: struct 'Pt' has the same fields as struct 'P' (declared at p.id:1); two structs with the same field names and types are one struct -- use 'P', or give 'Pt' a field of another name or type\n")
 
 // The first earlier row with the same fields as row `sd_i`, or -1.

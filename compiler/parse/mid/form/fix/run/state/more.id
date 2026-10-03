@@ -11,6 +11,12 @@ given fix_gcl_fixture (1):() then calls lset:[1]
 // The events of one statement, reset by declaring them again (plan/walk/).
 //   fixe_n   each node, in the order it is evaluated
 //   fixe_lo  the index of the first event of its subtree
+// fixe_lo: The other column pushed in step with it: the first event of the subtree.
+// fixe_n: fixe_n gets one entry per event and is pushed here and nowhere else, so its
+// length is what this function changes. A `then` check takes no parameters,
+// so a function whose whole effect is a push can only be observed through a
+// reader of the column it pushes to -- fixe_cl already has fix_pr_cl0
+// (../one/push.id).
 fix_ev_reset() {
   export int[] fixe_n = [];
   export int[] fixe_lo = [];
@@ -19,12 +25,3 @@ fix_ev_reset() {
 given fix_fixture ():() then calls fix_ev_reset2:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset2:[1]
 
-// The high end of the ranges fixd_lo_len counts, pushed in step with it by
-// fix_note_tok (out/emit/resid/rec.id). Filed here rather than beside its
-// export in grp/reset.id, which is at its three-function cap in a directory
-// at its three-entry one.
-fixd_hi_len() {
-  int n = len((import fixd_hi));
-} return int n;
-given fix_fixture ():(0)
-given fix_note_fixture ():(1)

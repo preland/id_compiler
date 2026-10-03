@@ -19,6 +19,10 @@
 //             values alone, the graph a `given` setup reaches through
 //             (mid/names/limits/shape/cases/given/read/reach/)
 
+// dg_ctr: The number of components completed so far: the `then` check the walk's
+// own cases (../../scc/) compare.
+// dg_comp: How many functions have a row: the check for the builders above and in
+// ../build/, which fill every column together.
 dg_init() {
   export word[] dg_own = [];
   export int[][] dg_out = [];
@@ -38,8 +42,8 @@ dg_init() {
 } chain () {
   export int[][] dg_cout = [];
 } return void;
-():() then dg_ncomp:(0)
-given dg_t_graph ():() then dg_ncomp:(0)
+():() then (import dg_ctr)[1]:(0)
+given dg_t_graph ():() then (import dg_ctr)[1]:(0)
 
 // Two name tables over idstd's hmap: a function's name to its row, and an
 // exported variable's name to the row of the function that declares it.
@@ -61,10 +65,3 @@ dg_init_maps() {
 ():() then dg_nfn:(0)
 given dg_t_built ():() then dg_nfn:(0)
 
-// The number of components completed so far: the `then` check the walk's
-// own cases (../../scc/) compare.
-dg_ncomp() {
-  int dgn = (import dg_ctr)[1];
-} return int dgn;
-given dg_t_graph ():(0)
-given dg_t_scc ():(4)

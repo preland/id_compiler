@@ -1,13 +1,13 @@
 
 dce_one(int f, int id, int n) {
-  string ir_op_v = ir_op(id);
+  string ir_op_v = (import iop)[id];
   if(dce_pure(ir_op_v) == 1 && dce_used(f, id) == 0) {
     ir_kill(id);
     n = n + 1;
   }
 } return int n;
-given cfg_fixture (0, 0, 0):(1) then chk_op0:("nop")
-given cfg_fixture (0, 0, 5):(6) then chk_op0:("nop")
+given cfg_fixture (0, 0, 0):(1) then iop_state:("ops 1:nop")
+given cfg_fixture (0, 0, 5):(6) then iop_state:("ops 1:nop")
 
 // What may not be removed for having no users. A call is here because nothing
 // tells this compiler which calls are pure -- every builtin that matters is a
@@ -29,7 +29,7 @@ dce_used(int f, int id) {
   int n = 0;
   int i = 0;
   while(i < blk_count(f)) {
-    int[] irf_blk_v = irf_blk(f);
+    int[] irf_blk_v = (import fnblk)[f];
     n = dce_used_b(irf_blk_v[i], id, n);
     i = i + 1;
   }

@@ -14,13 +14,13 @@ mk_curtk5() {
   lset((import curtk), 0, 5);
   push_pos();
 } return void;
-():() then last_ntok:(5)
-():() then last_nst:(-1)
+():() then last_ntok:("ntok 5")
+():() then last_nst:("nst -1")
 
 mk_curtk9() {
   full_env();
   lset((import curtk), 0, 9);
   push_pos();
 } return void;
-():() then last_ntok:(9)
-():() then last_nst:(-1)
+():() then last_ntok:("ntok 9")
+():() then last_nst:("nst -1")

@@ -9,10 +9,10 @@
 
 ec2(int id) {
   string s = ec3(id);
-  if(s1_of(id) == "len") {
+  if((import ns1)[id] == "len") {
     s = emit_len(id);
   }
-  if(sd_find(s1_of(id)) >= 0) {
+  if(find_str((import sdname), ((import ns1)[id])) >= 0) {
     s = emit_ctor(id);
   }
 } return string s;
@@ -22,7 +22,7 @@ given sd_ctor_fixture ((import sd_c2)):("id_list_lit(2, (long long)(1), (long lo
 
 ec3(int id) {
   string s = ec4(id);
-  if(s1_of(id) == "push") {
+  if((import ns1)[id] == "push") {
     s = emit_push(id);
   }
 } return string s;
@@ -30,8 +30,8 @@ given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
 given call_names_fixture2 ((import call_e_push)):("id_list_push(5, (long long)(intptr_t)(4))")
 
 emit_gcall(int id) {
-  int[] l1_of_v = l1_of(id);
-  string s = "id_" + s1_of(id) + "(" + emit_args(l1_of_v) + ")";
+  int[] l1_of_v = (import nl1)[id];
+  string s = "id_" + (import ns1)[id] + "(" + emit_args(l1_of_v) + ")";
   string ret_s = emit_gcall_tail(id, s);
 } return string ret_s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")

@@ -14,9 +14,9 @@
 // The body of a function: every statement, then the return clause, whose value
 // goes to the caller and so is kept.
 esc_func(int fn, string nm) {
-  int r = esc_block(l2_of(fn), nm);
-  if(i1_of(fn) >= 0) {
-    r = r | esc_expr(i1_of(fn), nm, 1);
+  int r = esc_block((import nl2)[fn], nm);
+  if((import ni1)[fn] >= 0) {
+    r = r | esc_expr((import ni1)[fn], nm, 1);
   }
 } return int r;
 given esc_fix ((import efb_fn), "p"):(1)

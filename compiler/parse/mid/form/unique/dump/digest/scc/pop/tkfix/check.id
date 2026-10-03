@@ -1,10 +1,10 @@
 // Readers of the type check cache's tables, for `then` checks.
 
 tk_nin() {
-  int tkn = hmap_count((import tkic));
-} return int tkn;
-given tk_t_warm ():(1)
-given tk_t_prep ():(0)
+  string tkn_t = "in " + (hmap_count((import tkic)));
+} return string tkn_t;
+given tk_t_warm ():("in 1")
+given tk_t_prep ():("in 0")
 
 tk_etype_gx() {
   string tkt = tk_etype("gx");

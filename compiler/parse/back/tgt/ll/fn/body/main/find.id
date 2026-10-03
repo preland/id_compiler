@@ -12,7 +12,7 @@ given ir_rows ():(-1)
 
 ll_main_at(int f, int r) {
   int v = r;
-  if(irf_name(f) == "main") {
+  if((import fnname)[f] == "main") {
     v = f;
   }
 } return int v;
@@ -23,7 +23,7 @@ given ll_main_fixture (0, -1):(0)
 // simply unused, which costs one call and keeps the wrapper in one piece.
 ll_mcall(int f) {
   string s = "  %r = call i32 @id_main()";
-  int[] irf_par_v = irf_par(f);
+  int[] irf_par_v = (import fnpar)[f];
   if(len(irf_par_v) == 2) {
     s = "  %r = call i32 @id_main(i32 %argc, ptr %args)";
   }

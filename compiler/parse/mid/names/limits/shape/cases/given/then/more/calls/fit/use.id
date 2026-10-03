@@ -1,0 +1,86 @@
+// What one node does to an export, for fn_import_use (../../../../../report/
+// host/cases/given.id), which is how a `then (import NAME)` check tells a
+// function that only reads NAME (refused: the check would repeat the read)
+// from one that also writes it (allowed: the check sees the write's effect).
+//
+// A list export is written through a name for it, since an import cannot be
+// index-assigned directly: a declaration that binds a list to NAME
+// (`int[] c = (import NAME);`, then `c[k] = v;`; or of one of its elements,
+// `int[] row = (import NAME)[i];`, then `push(row, v);`), or a call that is handed NAME
+// whole, or one of its elements -- `lset`, `push`, a function taking the list
+// as a parameter. Any of
+// them may change it, and only `len` is known not to. So a name that is only
+// read through, or a callee that merely reads its list parameter, still counts
+// as a write here; that errs towards allowing a check, never towards refusing
+// one. An element read, `(import NAME)[i]`, is an "index" node over the import
+// and stays a read.
+//
+// Filed here because the directories that hold the check are at the
+// three-entry layout limit and this one has room.
+node_import_use(int nd, string imp_nm, int imu_cur) {
+  string kd = (import nkind)[nd];
+  int r = imu_cur;
+  if(kd == "import" && (import ns1)[nd] == imp_nm && r == 0) {
+    r = 1;
+  }
+} chain (int nd, string imp_nm, int imu_cur) {
+  if(kd == "decl" && ty_is_list((import ns1)[nd]) == 1 && (import nkind)[((import ni1)[nd])] == "import" && (import ns1)[((import ni1)[nd])] == imp_nm) {
+    r = 2;
+  }
+  if(kd == "call" && (import ns1)[nd] != "len") {
+    r = call_imp_arg(nd, imp_nm, r);
+  }
+  if(kd == "decl" && ty_is_list((import ns1)[nd]) == 1 && (import nkind)[((import ni1)[nd])] == "index") {
+    int imu_ini = (import ni1)[nd];
+    int imu_bs = (import ni1)[imu_ini];
+    if((import nkind)[imu_bs] == "import" && (import ns1)[imu_bs] == imp_nm) {
+      r = 2;
+    }
+  }
+} return int r;
+given imp_use_fixture ((import imp_use_rd), "gx", 0):(1)
+given imp_use_fixture ((import imp_use_alias), "gx", 1):(2)
+given imp_use_fixture ((import imp_use_call), "gx", 1):(2)
+given imp_use_fixture ((import imp_use_len), "gx", 1):(1)
+given imp_use_fixture ((import imp_use_row), "gx", 1):(2)
+given imp_use_fixture ((import imp_use_alias), "gy", 0):(0)
+
+call_imp_arg(int nd, string imp_nm, int imu_cur) {
+  int[] args = (import nl1)[nd];
+  int r = imu_cur;
+  int j = 0;
+} chain (int nd, string imp_nm, int imu_cur) {
+  while(j < len(args)) {
+    if((import nkind)[(args[j])] == "import" && (import ns1)[(args[j])] == imp_nm) {
+      r = 2;
+    }
+    if((import nkind)[(args[j])] == "index" && (import nkind)[((import ni1)[(args[j])])] == "import" && (import ns1)[((import ni1)[(args[j])])] == imp_nm) {
+      r = 2;
+    }
+    j = j + 1;
+  }
+} return int r;
+given imp_use_fixture ((import imp_use_call), "gx", 0):(2)
+given imp_use_fixture ((import imp_use_call), "gy", 0):(0)
+given imp_use_fixture ((import imp_use_elem), "gx", 0):(2)
+
+// One expression node of each kind node_import_use tells apart, over an import
+// of gx: the bare read, `int[] al = gx`, `lset(gx)`, `len(gx)`, `int[] row = gx[0]`
+// and `push(gx[0], ...)`.
+imp_use_fixture() {
+  fn_fixture();
+  export int imp_use_rd = node_import("gx");
+  export int imp_use_alias = node_decl("int[]", "al", (import imp_use_rd), 0);
+} chain () {
+  int[] imp_use_args = [(import imp_use_rd)];
+  export int imp_use_call = node_call("lset", imp_use_args);
+  int[] imp_use_one = [(import imp_use_rd)];
+} chain () {
+  export int imp_use_len = node_call("len", imp_use_one);
+  export int imp_use_row = node_decl("int[]", "row", node_index((import imp_use_rd), (import fixture_zero)), 0);
+  int[] imp_use_two = [node_index((import imp_use_rd), (import fixture_zero))];
+} chain () {
+  export int imp_use_elem = node_call("push", imp_use_two);
+} return void;
+():() then (import chkfail)[0]:(0)
+():() then init_units:(0)

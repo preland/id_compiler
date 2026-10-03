@@ -11,18 +11,18 @@ pred_wipe(int[] l) {
 // is its last instruction -- every block has one, because the lowering never
 // leaves a block open.
 pred_of(int b) {
-  int[] blk_ins_v = blk_ins(b);
+  int[] blk_ins_v = (import binsn)[b];
   int len_v = len(blk_ins_v);
   pred_succ(b, blk_ins_v[len_v - 1], 0);
 } return void;
-given br_fixture (0):() then chk_pred1:([0])
-given cfg_fixture (0):() then chk_pred1:([])
+given br_fixture (0):() then (import bpred)[1]:([0])
+given cfg_fixture (0):() then (import bpred)[1]:([])
 
 pred_succ(int b, int v, int i) {
-  while(i < succ_count(v)) {
+  while(i < len(((import iblk)[v]))) {
     pred_succ_at(b, v, i);
     i = i + 1;
   }
 } return void;
-given br_fixture (0, 1, 0):() then chk_pred1:([0])
-given br_fixture (0, 1, 1):() then chk_pred1:([])
+given br_fixture (0, 1, 0):() then (import bpred)[1]:([0])
+given br_fixture (0, 1, 1):() then (import bpred)[1]:([])

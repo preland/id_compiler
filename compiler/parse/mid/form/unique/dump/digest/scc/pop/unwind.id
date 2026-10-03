@@ -10,10 +10,12 @@ dg_pop(int dgv) {
   int dgp = dg_mark(dgv, dgc);
 } chain (int dgv) {
   dg_seal(dgp);
-  dg_trunc(dgp);
+  while(len((import dg_stk)) > dgp) {
+    pop((import dg_stk));
+  }
 } return void;
-given dg_t_stk2 (0):() then dg_ncomp:(2) then dg_nstk:(0)
-given dg_t_stk2 (1):() then dg_ncomp:(2) then dg_nstk:(1)
+given dg_t_stk2 (0):() then (import dg_ctr)[1]:(2) then len((import dg_stk)):(0)
+given dg_t_stk2 (1):() then (import dg_ctr)[1]:(2) then len((import dg_stk)):(1)
 
 // Marks the stack from its top down to dgv, returning dgv's position -- the
 // bottom of the component.
@@ -25,13 +27,13 @@ dg_mark(int dgv, int dgc) {
   }
   dg_own_comp(dgp, dgc);
 } return int dgp;
-given dg_t_stk2 (0, 3):(0) then dg_comp1:(3)
-given dg_t_stk2 (1, 3):(1) then dg_comp1:(3)
+given dg_t_stk2 (0, 3):(0) then (import dg_comp)[1]:(3)
+given dg_t_stk2 (1, 3):(1) then (import dg_comp)[1]:(3)
 
 dg_own_comp(int dgp, int dgc) {
   int dgm = (import dg_stk)[dgp];
   lset((import dg_comp), dgm, dgc);
   lset((import dg_on), dgm, 0);
 } return void;
-given dg_t_stk2 (1, 5):() then dg_comp1:(5)
-given dg_t_stk2 (0, 5):() then dg_comp1:(-1)
+given dg_t_stk2 (1, 5):() then (import dg_comp)[1]:(5)
+given dg_t_stk2 (0, 5):() then (import dg_comp)[1]:(-1)

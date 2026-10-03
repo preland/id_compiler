@@ -1,7 +1,7 @@
 // Recurse into compound statements when collecting exports.
 
 exp_nested(int id, string owner) {
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     exp_branches(id, owner);
   } else {
     exp_loop(id, owner);
@@ -11,9 +11,9 @@ given ifwhilefix ((import rgif_node), "main"):() then calls exp_branches:[1]
 given ifwhilefix ((import rgdecl_node), "main"):() then calls exp_loop:[1]
 
 exp_branches(int id, string owner) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   exp_list(l1_of_v, owner);
-  int[] l2_of_v = l2_of(id);
+  int[] l2_of_v = (import nl2)[id];
 } chain (int id, string owner) {
   exp_list(l2_of_v, owner);
 } return void;
@@ -21,8 +21,8 @@ given ifwhilefix ((import rgif_node), "main"):() then calls exp_list:[2]
 given ifwhilefix ((import rgif_node), "other"):() then calls exp_list:[2]
 
 exp_loop(int id, string owner) {
-  if(k_of(id) == "while") {
-    int[] l1_of_v = l1_of(id);
+  if((import nkind)[id] == "while") {
+    int[] l1_of_v = (import nl1)[id];
     exp_list(l1_of_v, owner);
   }
 } return void;

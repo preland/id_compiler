@@ -3,8 +3,8 @@
 ll_pstr(int f) {
   string s = "";
   int i = 0;
-  while(i < ll_pcount(f)) {
-    int[] pars = irf_par(f);
+  while(i < len(((import fnpar)[f]))) {
+    int[] pars = (import fnpar)[f];
     s = ll_pstr_step(s, i, pars[i]);
     i = i + 1;
   }
@@ -24,8 +24,8 @@ ll_sep(int i) {
 ll_block(int b) {
   emit_line("b" + b + ":");
   int i = 0;
-  while(i < insn_count(b)) {
-    int[] ins = blk_ins(b);
+  while(i < len(((import binsn)[b]))) {
+    int[] ins = (import binsn)[b];
     ll_insn(ins[i]);
     i = i + 1;
   }

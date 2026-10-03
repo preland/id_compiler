@@ -10,21 +10,21 @@ reg_decls(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
-given ifwhilefix ((import rgdeclist), "f"):() then dvname_len:(2)
-given regrow_d ([], "f"):() then dvname_len:(1)
+given ifwhilefix ((import rgdeclist), "f"):() then len((import dvname)):(2)
+given regrow_d ([], "f"):() then len((import dvname)):(1)
 
 reg_stmt(int id, string owner) {
-  if(k_of(id) == "decl") {
+  if((import nkind)[id] == "decl") {
     reg_decl_stmt(id, owner);
   } else {
     reg_nested(id, owner);
   }
 } return void;
-given declfix ((import rgdecl_node), "f"):() then dvname_len:(2)
-given regrow_param ((import regrow_p), "f"):() then dvname_len:(1)
+given declfix ((import rgdecl_node), "f"):() then len((import dvname)):(2)
+given regrow_param ((import regrow_p), "f"):() then len((import dvname)):(1)
 
 reg_nested(int id, string owner) {
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     reg_branches(id, owner);
   } else {
     reg_loop(id, owner);

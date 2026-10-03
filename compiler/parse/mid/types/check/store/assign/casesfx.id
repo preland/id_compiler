@@ -9,7 +9,7 @@ cases_fix() {
   init_files();
   push((import pfile), "fixture.id");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // `(5):(6)`, a whole case's tokens, on top of cases_fix.
@@ -17,7 +17,7 @@ cases_full_fix() {
   cases_fix();
   toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // `(1):(2)`, a second whole case, for cases whose two behaviours can only
@@ -26,5 +26,5 @@ cases_full_fix2() {
   cases_fix();
   toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "1", ")", ":", "(", "2", ")"]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

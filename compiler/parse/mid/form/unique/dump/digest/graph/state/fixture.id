@@ -22,20 +22,13 @@ dg_t_graph() {
 } chain () {
   dg_link(4, 3);
 } return void;
-():() then dg_ncomp:(0)
-():() then dg_nrows:(5)
+():() then (import dg_ctr)[1]:(0)
+():() then len((import dg_comp)):(5)
 
 dg_t_scc() {
   dg_t_graph();
   dg_scc_all();
 } return void;
-():() then dg_ncomp:(4)
-():() then dg_nrows:(5)
+():() then (import dg_ctr)[1]:(4)
+():() then len((import dg_comp)):(5)
 
-// How many functions have a row: the check for the builders above and in
-// ../build/, which fill every column together.
-dg_nrows() {
-  int dgn = len((import dg_comp));
-} return int dgn;
-given dg_t_graph ():(5)
-given dg_t_built ():(3)

@@ -7,17 +7,12 @@ dg_t_exp() {
   add_export("gx", "int", "fa");
   add_export("gy", "int", "nobody");
 } return void;
-():() then dg_nexp:(0)
+():() then dg_nexp:("exp 0")
 ():() then dg_nfn:(2)
 
 dg_nexp() {
-  int dgn = hmap_count((import dg_ec));
-} return int dgn;
-given dg_t_exp ():(0)
-given dg_t_built ():(0)
+  string dgn_t = "exp " + (hmap_count((import dg_ec)));
+} return string dgn_t;
+given dg_t_exp ():("exp 0")
+given dg_t_built ():("exp 0")
 
-dg_comp1() {
-  int dgc = (import dg_comp)[1];
-} return int dgc;
-given dg_t_marked ():(1)
-given dg_t_scc ():(1)

@@ -27,16 +27,16 @@ given shapes_fixture ("int[]", (import arr_ints)):(0)
 // the element nor the type it actually has.
 arr_els(string want, int e) {
   int i = 0;
-  while(i < flat_arg_count(e)) {
+  while(i < len(((import nl1)[e]))) {
     i = arr_el_at(want, e, i);
   }
 } return int 0;
-given shapes_fixture ("int[]", (import arr_ints)):(0) then check_failed:(0)
-given shapes_fixture ("string[]", (import arr_ints)):(0) then check_failed:(1)
+given shapes_fixture ("int[]", (import arr_ints)):(0) then (import chkfail)[0]:(0)
+given shapes_fixture ("string[]", (import arr_ints)):(0) then (import chkfail)[0]:(1)
 
 neg1_setup() {
   call2_setup();
   export int neg1 = 0 - 1;
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

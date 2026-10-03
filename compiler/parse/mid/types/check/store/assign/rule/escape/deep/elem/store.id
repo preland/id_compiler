@@ -5,7 +5,7 @@
 
 esc_pushel(int[] args, string cname, string nm) {
   int r = 0;
-  if(cname == "push" && k_of(args[0]) == "var" && s1_of(args[0]) == nm && k_of(args[1]) != "arr") {
+  if(cname == "push" && (import nkind)[(args[0])] == "var" && (import ns1)[(args[0])] == nm && (import nkind)[(args[1])] != "arr") {
     r = 8;
   }
 } return int r;
@@ -15,9 +15,9 @@ given esc_dfix ((import efd_pa), "push", "v"):(0)
 given esc_dfix ((import efd_pa), "len", "g"):(0)
 
 esc_setel(int sn, string nm) {
-  int[] vs = l1_of(sn);
+  int[] vs = (import nl1)[sn];
   int r = 0;
-  if(k_of(i1_of(sn)) == "var" && s1_of(i1_of(sn)) == nm && k_of(vs[0]) != "arr") {
+  if((import nkind)[((import ni1)[sn])] == "var" && (import ns1)[((import ni1)[sn])] == nm && (import nkind)[(vs[0])] != "arr") {
     r = 8;
   }
 } return int r;
@@ -29,7 +29,7 @@ esc_litels(int[] els) {
   int r = 0;
   int i = 0;
   while(i < len(els)) {
-    if(k_of(els[i]) != "arr") {
+    if((import nkind)[(els[i])] != "arr") {
       r = 8;
     }
     i = i + 1;

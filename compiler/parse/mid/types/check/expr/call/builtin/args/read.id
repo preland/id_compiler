@@ -1,7 +1,7 @@
 // Argument i's own type, read the same way a defined function's parameter
 // types are.
 arg_type_at(int id, int i) {
-  int[] args = l1_of(id);
+  int[] args = (import nl1)[id];
   string t = type_of(args[i]);
 } return string t;
 given call2_setup ((import cm_push_call), 1):("int")
@@ -9,7 +9,7 @@ given fv_fixture ((import fv_pos_call), 0):("func(int) return int")
 
 // What position i of this builtin requires, by name.
 bi_want_for(int id, int i) {
-  string name = s1_of(id);
+  string name = (import ns1)[id];
   string s = bi_wants(name, i);
 } return string s;
 given call2_setup ((import cm_push_call), 0):("list")
@@ -19,5 +19,5 @@ fv_fixture() {
   call2_setup();
   fv_build();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

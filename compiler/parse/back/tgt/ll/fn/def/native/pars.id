@@ -6,7 +6,7 @@ ll_native_pars(int[] ps) {
   string out = "";
   int i = 0;
   while(i < len(ps)) {
-    string s1_of_v = s1_of(ps[i]);
+    string s1_of_v = (import ns1)[(ps[i])];
     out = out + ll_sep(i) + ll_ty(s1_of_v);
     i = i + 1;
   }
@@ -31,5 +31,5 @@ ll_native_fixture() {
   export int[] nat_params0 = none2;
   export int nat_id0 = newnode("func", 0 - 1, 1, "getter", "word", none2, none2);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

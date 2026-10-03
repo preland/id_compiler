@@ -16,18 +16,13 @@ dg_t_stk2() {
   lset((import dg_on), 0, 1);
   lset((import dg_on), 1, 1);
 } return void;
-():() then dg_nstk:(2)
-():() then dg_ncomp:(1)
+():() then len((import dg_stk)):(2)
+():() then (import dg_ctr)[1]:(1)
 
 dg_t_marked() {
   dg_t_stk2();
   dg_mark(0, 1);
 } return void;
-():() then dg_nstk:(2)
-():() then dg_comp1:(1)
+():() then len((import dg_stk)):(2)
+():() then (import dg_comp)[1]:(1)
 
-dg_nstk() {
-  int dgn = len((import dg_stk));
-} return int dgn;
-given dg_t_stk2 ():(2)
-given dg_t_graph ():(0)

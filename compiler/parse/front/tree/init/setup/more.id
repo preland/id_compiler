@@ -7,7 +7,7 @@ setup_rest() {
   export int[] nparen = [];
   int ret_i = init_ir();
 } return int ret_i;
-given full_env ():(0) then check_failed:(0)
+given full_env ():(0) then (import chkfail)[0]:(0)
 given full_env ():(0) then init_units:(0)
 
 // The env a front/tokens or front/tree case needs beyond env_init's own
@@ -18,14 +18,14 @@ full_env() {
   env_init();
   init_files();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The column-packed value most recently pushed onto tspan, for set_span and
 // span_pad's own cases -- both are void and tspan is an imported list, not an
 // argument a case can read back.
 last_tspan() {
-  int ret_i = lst_last((import tspan));
-} return int ret_i;
-given mk_span1 ():(5)
-given mk_span2 ():(9)
+  string ret_i_t = "tspan " + (lst_last((import tspan)));
+} return string ret_i_t;
+given mk_span1 ():("tspan 5")
+given mk_span2 ():("tspan 9")

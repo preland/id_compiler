@@ -5,22 +5,11 @@
 // as is_freestanding (mid/names/exports/extern/tab/fs.id) and for the same
 // reason.
 
+// reqc: An exported scalar may only be assigned by its declaring function, so the
+// flag is a one-element list written through lset, like chkfail.
 reqtests_init() {
   export int[] reqc = [0];
 } return void;
-given env_init ():() then require_tests:(0)
-given flags_setup ():() then require_tests:(0)
+given env_init ():() then (import reqc)[0]:(0)
+given flags_setup ():() then (import reqc)[0]:(0)
 
-// An exported scalar may only be assigned by its declaring function, so the
-// flag is a one-element list written through lset, like chkfail.
-reqtests_set(int v) {
-  lset((import reqc), 0, v);
-} return void;
-given flags_setup (1):() then require_tests:(1)
-given flags_setup (0):() then require_tests:(0)
-
-require_tests() {
-  int ret_i = (import reqc)[0];
-} return int ret_i;
-given flags_setup ():(0)
-given reqtests_flagged ():(1)

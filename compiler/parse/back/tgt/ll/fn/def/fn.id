@@ -1,8 +1,8 @@
 
 ll_func(int f) {
-  string ret = irf_ret(f);
+  string ret = (import fnret)[f];
   string ty = ll_ty(ret);
-  string name = irf_name(f);
+  string name = (import fnname)[f];
 } chain (int f) {
   string plist = ll_pstr(f);
   emit_line("define " + ty + " @id_" + name + "(" + plist + ") {");

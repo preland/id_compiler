@@ -5,10 +5,10 @@
 
 tc_size(int e) {
   string so = size_leaf(e);
-  if(k_of(e) == "arr") {
-    int[] xs = l1_of(e);
+  if((import nkind)[e] == "arr") {
+    int[] xs = (import nl1)[e];
     so = "" + len(xs);
-  } else if(k_of(e) == "un") {
+  } else if((import nkind)[e] == "un") {
     so = size_neg(e);
   }
 } return string so;
@@ -17,18 +17,18 @@ given lit_arr_fixture ((import lit_arr_e)):("2")
 
 size_leaf(int e) {
   string so = "0";
-  if(k_of(e) == "int") {
+  if((import nkind)[e] == "int") {
     string int_code_v = int_code(e);
     so = "(long long)(" + int_code_v + ")";
-  } else if(k_of(e) == "str") {
-    so = "(long long)(sizeof(" + c_lit(s1_of(e)) + ") - 1)";
+  } else if((import nkind)[e] == "str") {
+    so = "(long long)(sizeof(" + c_lit((import ns1)[e]) + ") - 1)";
   }
 } return string so;
 given lit_int_fixture ((import lit_e)):("(long long)(5)")
 given lit_str_fixture ((import lit_str_e)):("(long long)(sizeof(hi) - 1)")
 
 size_neg(int e) {
-  int i1_of_v = i1_of(e);
+  int i1_of_v = (import ni1)[e];
   string so = "-" + size_leaf(i1_of_v);
 } return string so;
 given lit_un_fixture ((import lit_un_e)):("-(long long)(5)")

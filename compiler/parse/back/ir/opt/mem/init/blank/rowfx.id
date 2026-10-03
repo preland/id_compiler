@@ -8,8 +8,8 @@ m2r_row_fixture() {
   optfx_setup();
   m2r_row();
 } return void;
-():() then check_failed:(0)
-():() then phiof_len:(1)
+():() then (import chkfail)[0]:(0)
+():() then len((import phiof)):(1)
 
 // outv is written in place: m2r_kept (../../walk/body/scan/ldst.id),
 // m2r_seed1 and m2r_phi_make each lset a cell of a row m2r_row already
@@ -22,17 +22,12 @@ outv_sum() {
   int n = 0;
   int i = 0;
   while(i < len((import outv))) {
-    n = n + outv_row_sum(i);
+    n = n + lst_sum((import outv)[i]);
     i = i + 1;
   }
-} return int n;
-given m2r_row_fixture ():(0)
-given m2r_outv_fixture ():(-1)
+} chain () {
+  string outv_t = "outv " + n;
+} return string outv_t;
+given m2r_row_fixture ():("outv 0")
+given m2r_outv_fixture ():("outv -1")
 
-// A row of its own: two nested loops are already at the nesting limit, so
-// the inner one cannot also sit in outv_sum.
-outv_row_sum(int i) {
-  int n = lst_sum((import outv)[i]);
-} return int n;
-given m2r_row_fixture (0):(0)
-given m2r_outv_fixture (0):(-1)

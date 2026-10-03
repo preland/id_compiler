@@ -17,7 +17,7 @@ given_fit(int i, int si, int sfn, int[] items) {
   }
   sset((import casegiven), i, giv_all);
 } return void;
-given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then check_failed:(0) then cg_zero:("fx_set1 fx_set1 ")
+given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then (import chkfail)[0]:(0) then (import casegiven)[0]:("fx_set1 fx_set1 ")
 given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then calls given_arg:[1]
 
 given_prefix(int i, int si) {
@@ -32,10 +32,3 @@ given_prefix(int i, int si) {
 } return string giv_out;
 given impcase_given (0, 0):("")
 given impcase_given (0, 1):("fx_setup ")
-// casegiven[0] as it stands, for given_fit's cases: a check takes no
-// arguments, and what it must show is that the cut-down list was put back.
-cg_zero() {
-  string cg = (import casegiven)[0];
-} return string cg;
-given impcase_given ():("fx_setup")
-given gsetup_fixture ():("fx_set1 fx_set1 ")

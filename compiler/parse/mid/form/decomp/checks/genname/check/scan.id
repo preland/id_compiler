@@ -15,7 +15,7 @@ given farm_j ():() then calls genname_fn:(0) then calls genname_fn:(1)
 given farm_g ():() then calls genname_fn:[0]
 
 genname_fn(int i) {
-  int[] params = l1_of((import prog)[i]);
+  int[] params = (import nl1)[((import prog)[i])];
   genname_loop(i, params);
 } return void;
 given farm_i (0):() then calls genname_loop:(0, [0])

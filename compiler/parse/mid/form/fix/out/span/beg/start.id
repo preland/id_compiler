@@ -4,7 +4,7 @@
 // before its operand; `import name` at `import`; anything else is one token.
 fix_ibeg(int e) {
   int t0 = fix_ibeg2(e);
-  if(k_of(e) == "call") {
+  if((import nkind)[e] == "call") {
     int c = (import ntok)[e];
     t0 = fix_match(c, "(", ")") - 1;
   }
@@ -14,7 +14,7 @@ given fix_gcl_nodes (0):(0)
 
 fix_ibeg2(int e) {
   int t0 = fix_ibeg3(e);
-  if(k_of(e) == "arr") {
+  if((import nkind)[e] == "arr") {
     int c = (import ntok)[e];
     t0 = fix_match(c, "[", "]");
   }
@@ -24,8 +24,8 @@ given fix_gcl_nodes (0):(0)
 
 fix_ibeg3(int e) {
   int t0 = fix_ibeg4(e);
-  if(k_of(e) == "index" || k_of(e) == "bin") {
-    int a = i1_of(e);
+  if((import nkind)[e] == "index" || (import nkind)[e] == "bin") {
+    int a = (import ni1)[e];
     t0 = fix_nbeg(a);
   }
 } return int t0;

@@ -3,21 +3,21 @@
 // holding the next if. Walking the list therefore follows the whole chain.
 
 reg_branches(int id, string owner) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   reg_decls(l1_of_v, owner);
   reg_l2_decls(id, owner);
 } return void;
-given ifwhilefix ((import rgif_node), "f"):() then dvname_len:(3)
-given regrow_param ((import regrow_p), "f"):() then dvname_len:(1)
+given ifwhilefix ((import rgif_node), "f"):() then len((import dvname)):(3)
+given regrow_param ((import regrow_p), "f"):() then len((import dvname)):(1)
 
 reg_loop(int id, string owner) {
-  if(k_of(id) == "while") {
-    int[] l1_of_v = l1_of(id);
+  if((import nkind)[id] == "while") {
+    int[] l1_of_v = (import nl1)[id];
     reg_decls(l1_of_v, owner);
   }
 } return void;
-given whilefix ((import rgwhile_node), "f"):() then dvname_len:(2)
-given ifwhilefix ((import rgif_node), "f"):() then dvname_len:(1)
+given whilefix ((import rgwhile_node), "f"):() then len((import dvname)):(2)
+given ifwhilefix ((import rgif_node), "f"):() then len((import dvname)):(1)
 
 // One declaration: report whatever it conflicts with, then record it anyway.
 // idc.py raises at the first conflict; recording regardless is what lets this
@@ -33,6 +33,6 @@ reg_var(string name, string type, string owner, int exported, int ln, int unit) 
     var_report(loc_at_v + "names beginning 'idsq_' are reserved for the C target's temporaries; rename '" + name + "'");
   }
 } return void;
-given regrow_d ("q", "int", "f", 0, 10, 0):() then dvname_len:(2)
-given regrow_c ("q", "int", "f", 0, 10, 0):() then dvname_len:(1)
+given regrow_d ("q", "int", "f", 0, 10, 0):() then len((import dvname)):(2)
+given regrow_c ("q", "int", "f", 0, 10, 0):() then len((import dvname)):(1)
 given regrow_d ("idsq_x", "int", "f", 0, 10, 0):() then prints:("<stdin>:10: error: names beginning 'idsq_' are reserved for the C target's temporaries; rename 'idsq_x'\n")

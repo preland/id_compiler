@@ -10,7 +10,7 @@ fix_state() {
   fix_state2();
   fix_gcl();
 } return void;
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
 fix_state1() {
@@ -18,9 +18,18 @@ fix_state1() {
   export string[] fixd_ty = [];
   export int[] fixd_seq = [0];
 } return void;
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
+// fixd_file: A reader for run/walk/enter.id's fix_setfile: fixd_file holds one cell
+// (run/state/init.id), so, as fixd_std_on does for fixd_std, reading it is
+// the witness -- fix_setfile pops then pushes, leaving the length the same,
+// so a length check would not see the pop/push land the wrong string.
+// fixd_std: fixd_std is one cell, not a list that grows: fix_init (../entry.id) lsets
+// the answer into it and nothing pushes, so neither a length nor a sum is
+// the right witness -- reading the cell is, the same shape check_failed and
+// is_runtime use for their own flags. Filed here rather than beside the
+// export in ../state/init.id, which is at its three-function cap.
 fix_state2() {
   export int[] fixd_std = [0];
   export string[] fixd_file = [""];

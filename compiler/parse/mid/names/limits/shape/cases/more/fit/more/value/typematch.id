@@ -5,7 +5,7 @@
 // their own (../../../../given/read/).
 
 fit_value(int i, int e, string want) {
-  if(k_of(e) == "cimport" || k_of(e) == "cfn") {
+  if((import nkind)[e] == "cimport" || (import nkind)[e] == "cfn") {
     fit_named(i, e, want);
   } else if(ty_is_list(want) == 1) {
     fit_list(i, e, want);
@@ -13,23 +13,23 @@ fit_value(int i, int e, string want) {
     fit_other(i, e, want);
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then check_failed:(0)
-given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then check_failed:(1)
-given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then check_failed:(0)
+given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
+given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then (import chkfail)[0]:(1)
+given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then (import chkfail)[0]:(0)
 
 fit_list(int i, int e, string want) {
-  if(k_of(e) == "arr") {
+  if((import nkind)[e] == "arr") {
     fit_elems(i, e, want);
   } else {
     string lt = lit_text(e);
     case_err(i, "this case gives " + lt + " where a " + want + " is required");
   }
 } return void;
-given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then check_failed:(0)
-given fn_fixture ((import fixture_ci), (import fixture_zero), "int[]"):() then check_failed:(1)
+given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then (import chkfail)[0]:(0)
+given fn_fixture ((import fixture_ci), (import fixture_zero), "int[]"):() then (import chkfail)[0]:(1)
 
 fit_elems(int i, int e, string want) {
-  int[] xs = l1_of(e);
+  int[] xs = (import nl1)[e];
   string et = list_elem(want);
   int j = 0;
 } chain (int i, int e, string want) {
@@ -38,5 +38,5 @@ fit_elems(int i, int e, string want) {
     j = j + 1;
   }
 } return void;
-given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then check_failed:(0)
+given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then (import chkfail)[0]:(0)
 given lit_arr_fixture (0, (import lit_arr_e), "int[]"):() then calls fit_value:[2]

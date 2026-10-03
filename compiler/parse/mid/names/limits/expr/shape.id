@@ -25,10 +25,10 @@ given env_init ():() then calls shape_node:[0]
 given fn_fixture ():() then calls shape_node:(0)
 
 shape_node(int id) {
-  if(k_of(id) == "call") {
+  if((import nkind)[id] == "call") {
     chk_flat_args(id);
   }
-  if(k_of(id) == "func" || k_of(id) == "ret") {
+  if((import nkind)[id] == "func" || (import nkind)[id] == "ret") {
     chk_ret_name(id);
   }
 } return void;
@@ -37,7 +37,7 @@ given fn_fixture ((import fixture_fn)):() then calls chk_ret_name:((import fixtu
 
 // ni1 is -1 for `} return void;`, which has no expression to judge.
 chk_ret_name(int id) {
-  int e = i1_of(id);
+  int e = (import ni1)[id];
   if(e >= 0 && is_plain(e) == 0) {
     ret_shape_err(id, e);
   }

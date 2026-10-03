@@ -23,7 +23,7 @@ given fn_fixture ("&", (import fixture_zero), (import fixture_zero)):("")
 // int) can never be 0 or 1, so it needs no separate check here.
 lit_is(int nid, int v) {
   int ok = 0;
-  if(k_of(nid) == "int" && i1_of(nid) == v) {
+  if((import nkind)[nid] == "int" && (import ni1)[nid] == v) {
     ok = 1;
   }
 } return int ok;

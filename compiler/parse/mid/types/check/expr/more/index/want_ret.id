@@ -10,9 +10,9 @@
 // diagnostic the moment the parser stops being greedy.
 // The func node keeps the return expression in ni1 and the return type in ns2.
 want_ret(int i, int id) {
-  string rt = s2_of(i);
+  string rt = (import ns2)[i];
   int ok = 0;
-  if(k_of(i) == "func" && i1_of(i) == id && ty_is_list(rt) == 1) {
+  if((import nkind)[i] == "func" && (import ni1)[i] == id && ty_is_list(rt) == 1) {
     ok = 1;
   }
 } return int ok;
@@ -25,7 +25,7 @@ given argfn_d ((import argfn_fn), 99):(0)
 fn_covers(int i, int id) {
   string s = "";
   if((import prog)[i] >= id) {
-    s = s1_of((import prog)[i]);
+    s = (import ns1)[((import prog)[i])];
   }
 } return string s;
 given regrow_prog (0, (import regrow_fn_node)):("g2")

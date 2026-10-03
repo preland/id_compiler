@@ -29,8 +29,8 @@ check_file_at(int i) {
     report_funcs((import pfile)[i], n);
   }
 } return void;
-given many_file_fixture (0):() then check_failed:(1)
-given many_file_fixture (1):() then check_failed:(0)
+given many_file_fixture (0):() then (import chkfail)[0]:(1)
+given many_file_fixture (1):() then (import chkfail)[0]:(0)
 
 count_file(string name) {
   int i = 0;

@@ -1,5 +1,5 @@
 fix_walk_args(int e, int cd) {
-  int[] args = l1_of(e);
+  int[] args = (import nl1)[e];
   int i = 0;
   while(i < len(args)) {
     fix_walk_arg(e, i, cd);
@@ -17,7 +17,7 @@ fix_walk_arg2_fixture() {
   int[] none = [];
   fix_walk_arg2_fixture1(none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fix_walk_arg2_fixture1(int[] none) {
@@ -25,5 +25,5 @@ fix_walk_arg2_fixture1(int[] none) {
   int e1 = node_call("caller", [e2]);
   fix_walk_arg2_fixture2(e1, e2);
 } return void;
-given fix_walk_arg2_fixture ([]):() then check_failed:(0)
+given fix_walk_arg2_fixture ([]):() then (import chkfail)[0]:(0)
 given fix_walk_arg2_fixture ([]):() then init_units:(0)

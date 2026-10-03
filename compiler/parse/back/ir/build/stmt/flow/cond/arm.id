@@ -6,17 +6,17 @@ lw_arm(int b, int[] stmts, int jn) {
   lw_stmts(stmts);
   lw_term("br", 0 - 1, [jn]);
 } return void;
-given bound_fixture (0, [1], 5):() then chk_lwcur:(0)
-given bound_fixture (0, [], 5):() then chk_lwcur:(0)
+given bound_fixture (0, [1], 5):() then (import lwcur)[0]:(0)
+given bound_fixture (0, [], 5):() then (import lwcur)[0]:(0)
 
 // The loop test. Written out rather than folded into the cbr call because the
 // condition's own instructions have to land in the head block before the
 // branch does, and relying on argument evaluation order to arrange that is the
 // kind of thing that is true until it is not.
 lw_head(int node, int bdy, int ex) {
-  int i1_of_v = i1_of(node);
+  int i1_of_v = (import ni1)[node];
   int c = lw_cond(i1_of_v);
   lw_term("cbr", c, [bdy, ex]);
 } return void;
-given loop_fixture ((import while_node), 3, 4):() then check_failed:(0)
-given nest_fixture ((import if_node), 3, 4):() then check_failed:(0)
+given loop_fixture ((import while_node), 3, 4):() then (import chkfail)[0]:(0)
+given nest_fixture ((import if_node), 3, 4):() then (import chkfail)[0]:(0)

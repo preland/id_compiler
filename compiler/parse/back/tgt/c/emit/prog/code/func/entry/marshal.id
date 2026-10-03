@@ -18,7 +18,7 @@ given iassign_fixture_env ():() then prints:("    IdList* id_args = id_list_new(
 
 has_args(int m) {
   int ok = 0;
-  int[] l1_of_v = l1_of(m);
+  int[] l1_of_v = (import nl1)[m];
   if(len(l1_of_v) > 0) {
     ok = 1;
   }

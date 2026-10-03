@@ -13,9 +13,9 @@
 // slots are already spent (see ut_note's note, ../why/note.id, for the same
 // gap).
 ut_then(int node) {
-  string s1_of_v = s1_of(node);
-  if(ut_at(s1_of_v) >= 0) {
-    int ci = i1_of(node);
+  string s1_of_v = (import ns1)[node];
+  if(find_str((import utname), s1_of_v) >= 0) {
+    int ci = (import ni1)[node];
     string lead = ut_then_lead(node);
     ut_named(ci, lead, s1_of_v);
   }
@@ -25,10 +25,55 @@ given notes_base given calls_node_fixture ((import fixture_calls_bad)):() then c
 
 ut_then_lead(int node) {
   string lead = "'then' names '";
-  string kind = k_of(node);
+  string kind = (import nkind)[node];
   if(kind == "thencalls" || kind == "thencallsn") {
     lead = "'calls' names '";
   }
 } return string lead;
 given then_node_fixture ((import fixture_then_bad)):("'then' names '")
 given calls_node_fixture ((import fixture_calls_bad)):("'calls' names '")
+
+// What a `then (import NAME)[i]:(value)` and a `then len((import NAME)):(value)`
+// say besides the export they name (fit_then_imp, ../../../given/then/check/
+// entry.id): an index needs a list to index and is an int; a len needs a list
+// or a string; there is one value, a literal, of the type then_imp_type gives;
+// and the function under test does not only read NAME, because a check that
+// repeats the body's own read of what it just wrote passes whatever the body
+// does -- an explicit check function is the way to say it. A function that also
+// writes NAME (fn_import_use gives 2) is not refused: what the check finds
+// afterwards is the effect of that write. Filed here because the check/ and
+// given/ lanes are at the three-entry layout limit.
+then_imp_value(int ci, int chk_node, string want) {
+  int[] imp_ix = (import nl2)[chk_node];
+  int[] items = (import nl1)[chk_node];
+  string vt = then_imp_type(chk_node);
+} chain (int ci, int chk_node, string want) {
+  string imp_nm = (import ns1)[chk_node];
+  if(len(imp_ix) == 1 && ty_is_list(want) == 0) {
+    case_err(ci, "(import " + imp_nm + ")[...] reads one element, but '" + imp_nm + "' is a " + want + ", not a list; drop the index, or name a list export");
+  } else if(len(imp_ix) == 1) {
+    fit_then_ix(ci, imp_ix[0]);
+  }
+} chain (int ci, int chk_node, string want) {
+  if(len(items) != 1) {
+    int ne = len(items);
+    case_err(ci, "a 'then' check compares exactly one value, not " + ne);
+  } else if((import nkind)[(items[0])] == "cimport") {
+    case_err(ci, "a 'then' check compares a literal; (import " + (import ns1)[(items[0])] + ") may only be an argument or an expected value");
+  } else {
+    fit_value(ci, items[0], vt);
+  }
+} chain (int ci, int chk_node, string want) {
+  if((import nkind)[chk_node] == "thenlen" && ty_is_list(want) == 0 && want != "string") {
+    case_err(ci, "len((import " + imp_nm + ")) measures a list or a string, but '" + imp_nm + "' is a " + want + "; name a list or string export, or compare the value itself with then (import " + imp_nm + "):(value)");
+  }
+  if(fn_import_use((import casefn)[ci], imp_nm) == 1) {
+    case_err(ci, "then (import " + imp_nm + "): the function under test, '" + (import ns1)[((import casefn)[ci])] + "', reads (import " + imp_nm + ") but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'");
+  }
+} return void;
+given then_imp_fixture ("int", 0, 1) ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx)[...] reads one element, but 'gx' is a int, not a list; drop the index, or name a list export\n")
+given then_imp_fixture ("int[]", 1, 1) ((import fixture_ci), (import then_imp_node), "int[]"):() then prints:("fixture.id:4: error: then (import gx): the function under test, 'rd', reads (import gx) but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'\n")
+given then_imp_fixture ("int[]", 2, 1) ((import fixture_ci), (import then_imp_node), "int[]"):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given sset((import nkind), (import then_imp_node), "thenlen") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: len((import gx)) measures a list or a string, but 'gx' is a int; name a list or string export, or compare the value itself with then (import gx):(value)\n")
+given then_imp_fixture ("string", 0, 0) given sset((import nkind), (import then_imp_node), "thenlen") ((import fixture_ci), (import then_imp_node), "string"):() then prints:("")
+given then_imp_fixture ("int[]", 0, 2) ((import fixture_ci), (import then_imp_node), "int[]"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")

@@ -19,8 +19,8 @@ ix_err(int id, string msg) {
     tc_err(id, msg);
   }
 } return void;
-given idxfix ((import rgidx_node), "cannot index a int"):() then check_failed:(1)
-given idxquiet ((import idx_node3), "test"):() then check_failed:(1)
+given idxfix ((import rgidx_node), "cannot index a int"):() then (import chkfail)[0]:(1)
+given idxquiet ((import idx_node3), "test"):() then (import chkfail)[0]:(1)
 
 is_ia_target(int id) {
   int i = 0;
@@ -35,7 +35,7 @@ given idxfix ((import rgidx_node)):(0)
 
 ia_hit(int i, int id, int ok) {
   int r = ok;
-  if(k_of(i) == "iassign" && i1_of(i) == i1_of(id) && i2_of(i) == i2_of(id)) {
+  if((import nkind)[i] == "iassign" && (import ni1)[i] == (import ni1)[id] && (import ni2)[i] == (import ni2)[id]) {
     r = 1;
   }
 } return int r;

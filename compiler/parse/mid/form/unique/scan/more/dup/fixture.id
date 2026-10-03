@@ -1,5 +1,5 @@
 // env_init() plus init_rtc() (rtc/fsc/bnames/resv_names -- dupfn_at reads
-// is_runtime(), which needs rtc, as well as resv_names), shared by this
+// (import rtc)[0], which needs rtc, as well as resv_names), shared by this
 // file's two fixtures and by ../../reserved/check.id's resv_scan_fixture --
 // so the calling segment, not the setup itself, is what the per-segment
 // fingerprint sees.
@@ -7,7 +7,7 @@ resv_env_setup() {
   env_init();
   init_rtc();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // Two functions named "dupe", registered in `prog`/`pfile`/`pline` the way a
@@ -31,7 +31,7 @@ dupfn_fixture() {
 } chain () {
   push((import pline), 5);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A `prog` with no duplicate names, no reserved-name collisions and no
@@ -56,5 +56,5 @@ clean_prog_fixture() {
   push((import pfile), "b.id");
   push((import pline), 5);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

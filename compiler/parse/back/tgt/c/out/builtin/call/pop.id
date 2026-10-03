@@ -9,7 +9,7 @@
 
 ec4(int id) {
   string s = emit_gcall(id);
-  if(s1_of(id) == "pop") {
+  if((import ns1)[id] == "pop") {
     s = emit_pop(id);
   }
 } return string s;
@@ -17,7 +17,7 @@ given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
 given call_names_fixture2 ((import call_e_pop)):("(IdList*)(intptr_t)(id_list_pop(4))")
 
 emit_pop(int id) {
-  int arg = l1_of(id)[0];
+  int arg = (import nl1)[id][0];
   string type_of_v = type_of(arg);
   string ret_s = emit_pop_tail(arg, type_of_v);
 } return string ret_s;

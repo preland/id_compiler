@@ -8,12 +8,12 @@
 // because the rule is about the reader, not about this precedence table.
 
 chk_mixed(int id) {
-  int i1_of_v = i1_of(id);
-  int i2_of_v = i2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
   mixed_pair(id, i1_of_v, i2_of_v);
 } return void;
-given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
-given cmp_fixture ((import bin_eq)):() then check_failed:(0)
+given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(1)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
 
 // One report per operation, naming the left operand when both are bare; the
 // suggested spelling parenthesizes both.
@@ -26,14 +26,14 @@ mixed_pair(int id, int a, int b) {
     mixed_err(id, c);
   }
 } return void;
-given cmp_fixture ((import bin_mixed), (import bin_bitand), (import lit_a)):() then check_failed:(1)
-given cmp_fixture ((import bin_eq), (import lit_a), (import lit_b)):() then check_failed:(0)
+given cmp_fixture ((import bin_mixed), (import bin_bitand), (import lit_a)):() then (import chkfail)[0]:(1)
+given cmp_fixture ((import bin_eq), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
 
 // The parenthesis record is searched only once the operators already mix, so
 // the common operation costs two kind reads and nothing more.
 mixed_side(int id, int c) {
   int ok = 0;
-  if(k_of(c) == "bin" && ops_mixed(id, c) == 1) {
+  if((import nkind)[c] == "bin" && ops_mixed(id, c) == 1) {
     ok = paren_missing(c);
   }
 } return int ok;

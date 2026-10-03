@@ -4,8 +4,8 @@
 
 print_expr(int id) {
   string s = "";
-  if(k_of(id) == "int") {
-    s = "" + i1_of(id);
+  if((import nkind)[id] == "int") {
+    s = "" + (import ni1)[id];
   } else {
     s = pe_op(id);
   }
@@ -15,10 +15,10 @@ given bin_fix (2):("(+ 5 x)")
 
 pe_op(int id) {
   string s = "";
-  if(k_of(id) == "bin") {
-    int i1_of_v = i1_of(id);
-    int i2_of_v = i2_of(id);
-    s = "(" + s1_of(id) + " " + print_expr(i1_of_v) + " " + print_expr(i2_of_v) + ")";
+  if((import nkind)[id] == "bin") {
+    int i1_of_v = (import ni1)[id];
+    int i2_of_v = (import ni2)[id];
+    s = "(" + (import ns1)[id] + " " + print_expr(i1_of_v) + " " + print_expr(i2_of_v) + ")";
   } else {
     s = pe_atom(id);
   }
@@ -27,10 +27,10 @@ given bin_fix (2):("(+ 5 x)")
 given bin_fix (1):("x")
 
 pe_atom(int id) {
-  string s = s1_of(id);
-  if(k_of(id) == "call") {
-    int[] l1_of_v = l1_of(id);
-    s = "(call " + s1_of(id) + pe_args(l1_of_v) + ")";
+  string s = (import ns1)[id];
+  if((import nkind)[id] == "call") {
+    int[] l1_of_v = (import nl1)[id];
+    s = "(call " + (import ns1)[id] + pe_args(l1_of_v) + ")";
   }
 } return string s;
 given bin_fix (1):("x")

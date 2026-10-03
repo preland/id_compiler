@@ -24,9 +24,9 @@ given elif_fixture ((import no_stmts)):(0)
 // to it.
 stmt_actions(int id) {
   int n = 1;
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     n = 1 + count_elses(id);
-  } else if(k_of(id) == "chain" || k_of(id) == "break" || k_of(id) == "ret") {
+  } else if((import nkind)[id] == "chain" || (import nkind)[id] == "break" || (import nkind)[id] == "ret") {
     n = 0;
   }
 } return int n;
@@ -37,9 +37,9 @@ given elif_fixture ((import while_node)):(1)
 // empty else list but still costs an action, which is why the flag is asked
 // rather than the list.
 count_elses(int id) {
-  int[] els = l2_of(id);
+  int[] els = (import nl2)[id];
   int n = 0;
-  if(i2_of(id) > 0) {
+  if((import ni2)[id] > 0) {
     n = 1 + chain_elses(id, els);
   }
 } return int n;

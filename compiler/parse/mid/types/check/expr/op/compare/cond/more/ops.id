@@ -2,8 +2,8 @@
 // operator, and whether the operand was written inside parentheses.
 
 ops_mixed(int id, int c) {
-  string po = s1_of(id);
-  string co = s1_of(c);
+  string po = (import ns1)[id];
+  string co = (import ns1)[c];
   int ok = mixed_ops(po, co);
 } return int ok;
 given cmp_fixture ((import bin_mixed), (import bin_bitand)):(1)

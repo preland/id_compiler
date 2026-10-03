@@ -6,7 +6,7 @@ esc_frees() {
   string out = "";
   if(esc_on() == 1) {
     int fn = esc_cur();
-    out = esc_free_in(fn, l2_of(fn), out);
+    out = esc_free_in(fn, (import nl2)[fn], out);
   }
 } return string out;
 given esc_fix ():("id_list_free(w); ")
@@ -24,9 +24,9 @@ given esc_fix ((import efc_fn), (import efc_stmts), ""):("id_list_free(w); ")
 given esc_fix ((import efc_fn), (import efc_stmts), "id_list_free(w); "):("id_list_free(w); ")
 
 esc_free_one(int fn, int sn, string out) {
-  if(k_of(sn) == "decl") {
+  if((import nkind)[sn] == "decl") {
     out = esc_free_decl(fn, sn, out);
-  } else if(k_of(sn) == "if" || k_of(sn) == "while") {
+  } else if((import nkind)[sn] == "if" || (import nkind)[sn] == "while") {
     out = esc_free_nest(fn, sn, out);
   }
 } return string out;

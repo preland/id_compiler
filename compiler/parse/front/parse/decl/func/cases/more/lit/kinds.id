@@ -2,7 +2,7 @@
 
 leaf_lit(int e) {
   int r = 0;
-  if(k_of(e) == "int" || k_of(e) == "float" || k_of(e) == "str") {
+  if((import nkind)[e] == "int" || (import nkind)[e] == "float" || (import nkind)[e] == "str") {
     r = 1;
   }
 } return int r;
@@ -11,7 +11,7 @@ given mk_two_nodes (0):(0)
 
 leaf_num(int e) {
   int r = 0;
-  if(k_of(e) == "int" || k_of(e) == "float") {
+  if((import nkind)[e] == "int" || (import nkind)[e] == "float") {
     r = 1;
   }
 } return int r;
@@ -21,8 +21,8 @@ given mk_two_nodes (0):(0)
 // `-1` is a unary minus applied to a literal, not a literal of its own.
 neg_lit(int e) {
   int r = 0;
-  int i1_of_v = i1_of(e);
-  if(s1_of(e) == "-" && leaf_num(i1_of_v) == 1) {
+  int i1_of_v = (import ni1)[e];
+  if((import ns1)[e] == "-" && leaf_num(i1_of_v) == 1) {
     r = 1;
   }
 } return int r;

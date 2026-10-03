@@ -25,7 +25,7 @@ given pcall_fixture ("nosuchfn", 0, (import pcall_arg_n)):("int")
 lw_pty2(int f, int i, string t) {
   string p = t;
   if(f >= 0 && lw_has_par(f, i) == 1) {
-    p = param_type(f, i);
+    p = (import ns1)[(((import nl1)[f])[i])];
   }
 } return string p;
 given pcall_fixture ((import pcall_fn), 0, "fallback"):("word")

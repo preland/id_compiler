@@ -6,7 +6,7 @@ ll_natives_fixture2() {
   ll_native_fixture();
   push((import prog), (import nat_id0));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The `--runtime` side of the same fixture: rtc set, so ll_decl_block does
@@ -16,16 +16,16 @@ ll_natives_fixture3() {
   ll_native_fixture();
   push((import prog), (import nat_id0));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 ll_native_decl(int id) {
-  string s2_of_v = s2_of(id);
+  string s2_of_v = (import ns2)[id];
   string ty = ll_ty(s2_of_v);
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
 } chain (int id) {
   string plist = ll_native_pars(l1_of_v);
-  string ret_s = "declare " + ty + " @id_" + s1_of(id) + "(" + plist + ")";
+  string ret_s = "declare " + ty + " @id_" + (import ns1)[id] + "(" + plist + ")";
 } return string ret_s;
 given ll_native_fixture ((import nat_id)):("declare i32 @id_helper(i32, i64)")
 given ll_native_fixture ((import nat_id0)):("declare i64 @id_getter()")

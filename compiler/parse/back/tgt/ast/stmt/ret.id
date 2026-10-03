@@ -2,8 +2,8 @@
 
 print_ret(int id) {
   string s = " (return void)";
-  if(i1_of(id) >= 0) {
-    int i1_of_v = i1_of(id);
+  if((import ni1)[id] >= 0) {
+    int i1_of_v = (import ni1)[id];
     s = " (return " + print_expr(i1_of_v) + ")";
   }
 } return string s;
@@ -16,7 +16,7 @@ stmt_fix3(int e0) {
   int w0 = node_while(e0, none);
   stmt_fix4(e0, none);
 } return void;
-given stmt_fix (0):() then check_failed:(0)
+given stmt_fix (0):() then (import chkfail)[0]:(0)
 given stmt_fix (0):() then init_units:(0)
 
 // if0 = if(e0, then [], else []), x0 = exprstmt e0. Deterministic ids:
@@ -26,5 +26,5 @@ stmt_fix4(int e0, int[] none) {
   int x0 = node_exprstmt(e0);
   stmt_fix5(e0);
 } return void;
-given stmt_fix (0, []):() then check_failed:(0)
+given stmt_fix (0, []):() then (import chkfail)[0]:(0)
 given stmt_fix (0, []):() then init_units:(0)

@@ -11,8 +11,8 @@ init_struct_rows() {
     sd_i = sd_i + 1;
   }
 } return void;
-given env_init ():() then reg_rows:(5)
-given sd_pair ():() then reg_rows:(7)
+given env_init ():() then len((import tyname)):(5)
+given sd_pair ():() then len((import tyname)):(7)
 
 ty_is_struct(string t) {
   int ok = 0;
@@ -29,5 +29,5 @@ sd_reg() {
   sd_pair();
   init_struct_rows();
 } return void;
-():() then reg_rows:(7)
+():() then len((import tyname)):(7)
 ():() then reg_last_width:(8)

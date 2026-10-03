@@ -15,7 +15,7 @@ given sd_case_fixture ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (lo
 given lit_int_fixture ((import lit_e), "int"):("5")
 
 tc_struct(int e, string want) {
-  int[] xs = l1_of(e);
+  int[] xs = (import nl1)[e];
   string cells = tc_fcells(xs, want);
   string so = "id_list_lit(" + len(xs) + ", " + cells + ")";
 } return string so;

@@ -20,7 +20,7 @@ given fn_fixture (1):() then prints:("")
 
 emit_rec_at(int i) {
   int fn = (import prog)[i];
-  string nm = s1_of(fn);
+  string nm = (import ns1)[fn];
   if(is_rec_target(nm) == 1) {
     emit_rec_def(nm, fn);
   }

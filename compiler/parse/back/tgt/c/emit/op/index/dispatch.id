@@ -5,7 +5,7 @@
 
 ee4(int id) {
   string s = ee5(id);
-  if(k_of(id) == "index") {
+  if((import nkind)[id] == "index") {
     s = emit_index(id);
   }
 } return string s;
@@ -14,7 +14,7 @@ given idx_build ((import idx_fix)):("(int)(id_list_get(id_list_lit(2, (long long
 
 ee5(int id) {
   string s = ee6(id);
-  if(k_of(id) == "arr") {
+  if((import nkind)[id] == "arr") {
     s = emit_arr(id);
   }
 } return string s;
@@ -25,14 +25,14 @@ given shapes_fixture ((import arr_ints)):("id_list_lit(2, (long long)(2), (long 
 // the harness, which traps first when nothing has set it
 // (prog/head/decl/export/uninit.id), and a string literal, which a `string`
 // carries its length in front of (runtime/prelude.id): ID_S builds that object
-// around the literal. The kind is tested before is_harn(), so emitting any
+// around the literal. The kind is tested before (import harn)[0], so emitting any
 // other leaf never reads the flag.
 import_text(int id) {
-  string s = s1_of(id);
-  if(k_of(id) == "str") {
+  string s = (import ns1)[id];
+  if((import nkind)[id] == "str") {
     s = "ID_S(" + c_lit(s) + ")";
   }
-  if(k_of(id) == "import" && is_harn() == 1) {
+  if((import nkind)[id] == "import" && (import harn)[0] == 1) {
     s = checked_read(s);
   }
 } return string s;

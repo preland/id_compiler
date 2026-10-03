@@ -3,7 +3,7 @@
 // runtime-helper call when the callee is a syscall, and with a call through
 // the variable when the callee is a variable of function type.
 emit_gcall_tail(int id, string s) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_syscall(s1_of_v)) {
     s = emit_syscall(id);
   }

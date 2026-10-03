@@ -34,7 +34,7 @@ emit_setup(int ci, int si, string nm) {
   int[] items = given_items(ci, si);
   int[] ps = [];
   if(len(items) > 0) {
-    ps = l1_of(func_node(nm));
+    ps = (import nl1)[(func_node(nm))];
     emit_line("    {");
   }
 } chain (int ci, int si, string nm) {

@@ -2,6 +2,11 @@
 //   fixe_nm   the name it is given
 //   fixe_an   set only for the node at the top of a call's argument: the
 //             whole-argument name to use if it is named as one (out/emit/).
+// fixe_nm: fixe_nm holds one entry per event, pushed empty by fix_push4 (../../kind/
+// push.id) and set by fix_name_at (out/emit/name/drive.id), so its length is
+// what a function that resets or pushes an event column changes. Filed here
+// rather than beside its export in emit.id, which is at its three-function
+// cap in a directory at its three-entry one.
 fix_ev_reset4() {
   export int[] fixe_sep = [];
   export string[] fixe_nm = [];
@@ -14,11 +19,18 @@ given fix_touch_fixture ():() then calls fix_ev_reset5:[1]
 //            identical, still-trustworthy call (out/emit/name/pick/reuse/):
 //            its text is still replaced by the name, but it gets no
 //            declaration of its own -- the reused name's already has one.
+// fixe_ru: fixe_ru holds one entry per event, so its length is what a function that
+// resets or pushes an event column changes. fix_ev_reset5 ends the reset
+// chain -- it calls nothing, so a `calls` clause cannot reach it and only a
+// reader of one of its own columns can.
+// fixe_an: The name fix_walk_arg2's own call left at fixe_an[0] (kids/args.id's
+// fix_walk_arg2_fixture builds a fresh fixe_an per case, so the one entry a
+// single walk pushes is always at index 0).
 fix_ev_reset5() {
   export string[] fixe_an = [];
   export int[] fixe_ru = [];
 } return void;
-given fix_fixture ():() then check_failed:(0)
+given fix_fixture ():() then (import chkfail)[0]:(0)
 given fix_fixture ():() then init_units:(0)
 
 // How many events have been marked for a declaration of their own, and how
@@ -27,7 +39,7 @@ given fix_fixture ():() then init_units:(0)
 // observed through a reader of it -- fix_sep_at and fix_mark_sep
 // (../../../decide/touch/sep.id) are what this one is for.
 fixe_sep_count() {
-  int n = lst_sum((import fixe_sep));
-} return int n;
-given fix_fixture ():(0)
-given fix_touch_fixture ():(0)
+  string n_t = "sep " + (lst_sum((import fixe_sep)));
+} return string n_t;
+given fix_fixture ():("sep 0")
+given fix_touch_fixture ():("sep 0")

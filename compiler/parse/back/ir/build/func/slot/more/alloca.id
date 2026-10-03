@@ -17,19 +17,19 @@ given lw_fixture ("nope"):("")
 // it away again; until then the lowering never has to reason about dominance.
 lw_alloca(string ty, string name) {
   int v = ir_leaf("alloca", ty, 0 - 1, 0 - 1, name);
-  int lw_ent_v = lw_ent();
+  int lw_ent_v = (import lwent)[0];
   int ret_i = lw_alloca_tail(lw_ent_v, v, name);
 } return int ret_i;
-given lw_fixture ("int", "x"):(2) then chk_lwvar_len:(1)
-given lw_fixture2 ("word", "y"):(2) then chk_lwvar_len:(1)
+given lw_fixture ("int", "x"):(2) then len((import lwvar)):(1)
+given lw_fixture2 ("word", "y"):(2) then len((import lwvar)):(1)
 
 lw_store_at(int addr, int v) {
   int old = lw_old(addr);
   lw_op("store", "", addr, v, "");
-  lw_drop(old, ir_s(addr));
+  lw_drop(old, (import istr)[addr]);
 } return void;
-given lw_fixture (1, 2):() then check_failed:(0)
-given lw_fixture2 (0, 1):() then check_failed:(0)
+given lw_fixture (1, 2):() then (import chkfail)[0]:(0)
+given lw_fixture2 (0, 1):() then (import chkfail)[0]:(0)
 given lwo_fixture ((import lwo_w2), 5):() then calls lw_callf:[1]
 given lwo_fixture ((import lwo_z), 5):() then calls lw_callf:[0]
 given lwd_fixture ((import lwd_a), 5):() then calls lw_callf:("id_list_free_deep", "", [3])

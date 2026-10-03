@@ -3,19 +3,19 @@
 // effect is only visible through a function that returns something.
 
 chk_op() {
-  string ret_s = ir_op((import chk_id)[0]);
-} return string ret_s;
-given ir_rows ():("add")
-given ir_rows_chk1 ():("const")
+  string ret_s_t = "op " + ((import iop)[((import chk_id)[0])]);
+} return string ret_s_t;
+given ir_rows ():("op add")
+given ir_rows_chk1 ():("op const")
 
 chk_ty() {
-  string ret_s = ir_ty((import chk_id)[0]);
-} return string ret_s;
-given ir_rows ():("int")
-given ir_rows_chk1 ():("string")
+  string ret_s_t = "ty " + ((import ity)[((import chk_id)[0])]);
+} return string ret_s_t;
+given ir_rows ():("ty int")
+given ir_rows_chk1 ():("ty string")
 
 chk_a() {
-  int ret_i = ir_a((import chk_id)[0]);
-} return int ret_i;
-given ir_rows ():(3)
-given ir_rows_chk1 ():(-1)
+  string ret_i_t = "a " + ((import ia)[((import chk_id)[0])]);
+} return string ret_i_t;
+given ir_rows ():("a 3")
+given ir_rows_chk1 ():("a -1")

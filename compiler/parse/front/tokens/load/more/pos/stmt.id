@@ -27,5 +27,5 @@ grp_note(int e, int[] pos) {
   int c = pos[0] - 1;
   push((import ngrpc), c);
 } return void;
-given full_env (7, [5]):() then last_ngrp:(7) then last_ngrpc:(4)
-given full_env (9, [2]):() then last_ngrp:(9) then last_ngrpc:(1)
+given full_env (7, [5]):() then last_ngrp:("ngrp 7") then last_ngrpc:("ngrpc 4")
+given full_env (9, [2]):() then last_ngrp:("ngrp 9") then last_ngrpc:("ngrpc 1")

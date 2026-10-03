@@ -4,8 +4,8 @@
 // the value can disagree: when both hold units, the index is bound first.
 
 iset_hz(int id) {
-  int[] l1_of_v = l1_of(id);
-  int i2_of_v = i2_of(id);
+  int[] l1_of_v = (import nl1)[id];
+  int i2_of_v = (import ni2)[id];
   int ok = seq_both(i2_of_v, l1_of_v[0]);
 } return int ok;
 given sq_fixture ((import sq_iset)):(1)
@@ -26,7 +26,7 @@ given sq_fixture (0, 7):(0)
 // (its own code computed) before it is marked, so sq_code is its expression
 // and not its temporary.
 iset_seq(int id, string val) {
-  int i2_of_v = i2_of(id);
+  int i2_of_v = (import ni2)[id];
   string sq_code = emit_expr(i2_of_v);
   string sq_type_v = type_of(i2_of_v);
 } chain (int id, string val) {

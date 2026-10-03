@@ -2,7 +2,7 @@ pushfix() {
   call2_setup();
   init_reg();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 regrow_b() {
@@ -10,7 +10,7 @@ regrow_b() {
   push((import dvline), 10);
   push((import dvtype), "int");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A "var" node reachable together with the declaration registry: acc_var's
@@ -20,5 +20,5 @@ pushfix_var() {
   pushfix();
   export int pushfix_var_node = node_var("x");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

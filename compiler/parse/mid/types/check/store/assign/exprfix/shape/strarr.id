@@ -4,7 +4,7 @@ strarr_fixture() {
   shapes_fixture();
   strarr_build();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 strarr_build() {
@@ -12,5 +12,5 @@ strarr_build() {
   export int arr_strs = node_arr((import str_elems));
   export int call_pop_str = node_call("pop", [(import arr_strs)]);
 } return void;
-given shapes_fixture ():() then check_failed:(0)
+given shapes_fixture ():() then (import chkfail)[0]:(0)
 given shapes_fixture ():() then init_units:(0)

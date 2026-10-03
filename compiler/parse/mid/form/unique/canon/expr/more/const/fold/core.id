@@ -12,9 +12,9 @@
 
 bin_fold2(string op, int lid, int rid) {
   string ret_s = "";
-  if(i2_of(lid) == 0 && i2_of(rid) == 0) {
-    int a = i1_of(lid);
-    int b = i1_of(rid);
+  if((import ni2)[lid] == 0 && (import ni2)[rid] == 0) {
+    int a = (import ni1)[lid];
+    int b = (import ni1)[rid];
     ret_s = fold_op(op, a, b);
   }
 } return string ret_s;

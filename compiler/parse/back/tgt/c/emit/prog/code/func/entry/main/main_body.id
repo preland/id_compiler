@@ -3,7 +3,7 @@
 
 main_body(int m) {
   string bd = "return " + main_call(m) + ";";
-  if(s2_of(m) != "int") {
+  if((import ns2)[m] != "int") {
     bd = main_call(m) + "; return 0;";
   }
 } return string bd;

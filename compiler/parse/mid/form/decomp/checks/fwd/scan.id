@@ -27,7 +27,7 @@ given farm_j (1):() then calls fwd_check:[0]
 
 fwd_should(int fid) {
   int ok = 0;
-  if(is_native(fid) == 0 && s1_of(fid) != "main") {
+  if(is_native(fid) == 0 && (import ns1)[fid] != "main") {
     ok = 1;
   }
 } return int ok;

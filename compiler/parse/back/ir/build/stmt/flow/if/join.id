@@ -1,10 +1,10 @@
 lw_if_join(int node, int c, int thn, int alt) {
-  int lw_fn_v = lw_fn();
+  int lw_fn_v = (import lwfn)[0];
   int jn = ir_block(lw_fn_v, "join");
   lw_if3(node, c, thn, alt, jn);
 } return void;
-given nest_fixture ((import if_node), 5, 0, 1):() then check_failed:(0)
-given loop_fixture ((import while_node), 5, 0, 1):() then check_failed:(0)
+given nest_fixture ((import if_node), 5, 0, 1):() then (import chkfail)[0]:(0)
+given loop_fixture ((import while_node), 5, 0, 1):() then (import chkfail)[0]:(0)
 
 lw_if3(int node, int c, int thn, int alt, int jn) {
   lw_term("cbr", c, [thn, alt]);
@@ -16,9 +16,9 @@ given loop_fixture ((import while_node), 5, 0, 1, 4):(4)
 // An owned local starts as null, so a path that never reaches its declaration
 // frees nothing: the same NULL the C target initialises it with.
 lw_own_init(int ent, int v) {
-  if(esc_own(esc_cur(), ir_s(v)) == 1) {
+  if(esc_own(esc_cur(), (import istr)[v]) == 1) {
     int[] none = [];
-    int c = ir_leaf("const", ir_ty(v), 0 - 1, 0 - 1, "null");
+    int c = ir_leaf("const", (import ity)[v], 0 - 1, 0 - 1, "null");
     ir_add(ent, ir_insn("store", "", v, c, "", none, none));
   }
 } return void;

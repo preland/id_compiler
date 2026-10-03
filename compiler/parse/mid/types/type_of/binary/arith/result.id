@@ -4,7 +4,7 @@
 
 tb2(int id) {
   string t = "int";
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_arith(s1_of_v)) {
     t = tb2_arith(id);
   }

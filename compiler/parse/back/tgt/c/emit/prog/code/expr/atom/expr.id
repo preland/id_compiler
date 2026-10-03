@@ -3,7 +3,7 @@
 
 emit_expr(int id) {
   string s = int_code(id);
-  if(k_of(id) != "int") {
+  if((import nkind)[id] != "int") {
     s = ee_seq(id);
   }
 } return string s;
@@ -14,7 +14,7 @@ given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
 // eagerly would recurse into non-existent children of leaf nodes.
 ee2(int id) {
   string s = ee3(id);
-  if(k_of(id) == "bin") {
+  if((import nkind)[id] == "bin") {
     s = emit_bin(id);
   }
 } return string s;
@@ -23,7 +23,7 @@ given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
 
 ee3(int id) {
   string s = ee4(id);
-  if(k_of(id) == "call") {
+  if((import nkind)[id] == "call") {
     s = emit_call(id);
   }
 } return string s;

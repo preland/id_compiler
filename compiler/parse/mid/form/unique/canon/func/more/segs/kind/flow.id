@@ -7,10 +7,10 @@
 // under canon/stmt/ is at the three-entry limit: the slot within reach, not the
 // right label.
 cst_flow(int id) {
-  string out = "?" + k_of(id) + "#" + id;
-  if(k_of(id) == "break") {
+  string out = "?" + (import nkind)[id] + "#" + id;
+  if((import nkind)[id] == "break") {
     out = "brk";
-  } else if(k_of(id) == "ret") {
+  } else if((import nkind)[id] == "ret") {
     out = "ret(" + canon_ret(id) + ")";
   }
 } return string out;
@@ -26,5 +26,5 @@ flow_canon_fixture() {
   int[] canon_none = [];
   export int canon_retv = newnode("ret", (import canon_lit), 0, "f", "int", canon_none, canon_none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -19,8 +19,8 @@ dg_seal(int dgp) {
   push((import dg_deep), dgd);
   push((import dg_dirty), dgbad[0]);
 } return void;
-given dg_t_marked (0):() then dg_deep_last:(3498779809326236161) then dg_dirty_last:(0)
-given dg_t_marked (1):() then dg_deep_last:(5848896990758076257) then dg_dirty_last:(0)
+given dg_t_marked (0):() then dg_deep_last:(3498779809326236161) then dg_dirty_last:("dirty 0")
+given dg_t_marked (1):() then dg_deep_last:(5848896990758076257) then dg_dirty_last:("dirty 0")
 
 dg_seal_run(word[] dgacc, int[] dgbad, int dgp) {
   while(dgp < len((import dg_stk))) {

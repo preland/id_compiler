@@ -1,20 +1,8 @@
 // Readers of the walk's rows, for the `then` checks of this directory's cases
 // and of ../../keys/: none of the walk's steps returns what it changed.
 
-dg_comp_at(int dgf) {
-  int dgc = (import dg_comp)[dgf];
-} return int dgc;
-given dg_t_scc (1):(1)
-given dg_t_scc (2):(0)
-
-dg_low0() {
-  int dgl = (import dg_low)[0];
-} return int dgl;
-given dg_t_graph ():(0)
-given dg_t_scc ():(0)
-
 dg_nout1() {
-  int dgn = len((import dg_out)[1]);
-} return int dgn;
-given dg_t_graph ():(2)
-given dg_t_built ():(2)
+  string dgn_t = "out1 " + (len((import dg_out)[1]));
+} return string dgn_t;
+given dg_t_graph ():("out1 2")
+given dg_t_built ():("out1 2")

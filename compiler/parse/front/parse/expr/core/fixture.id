@@ -11,10 +11,10 @@ given asm_reg_fix1d ():("r")
 // The afname reader for decl/top/core/'s parse_asm cases: the function's own
 // name, the first thing parse_asm records, and top.id/more.id are both full.
 afname_last() {
-  string s = (import afname)[len((import afname)) - 1];
-} return string s;
-given asmfx_setup ():("foo")
-given llasm_row_fixture ():("portout")
+  string s_t = "afname " + ((import afname)[len((import afname)) - 1]);
+} return string s_t;
+given asmfx_setup ():("afname foo")
+given llasm_row_fixture ():("afname portout")
 
 // Two literal AST nodes for decl/func/cases/more/lit/'s cases: an int
 // literal and a plain variable reference (not a literal). Node ids are
@@ -24,5 +24,5 @@ lit_fix() {
   export int lit_int = node_int("5", 5, 0);
   export int lit_var = node_var("x");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

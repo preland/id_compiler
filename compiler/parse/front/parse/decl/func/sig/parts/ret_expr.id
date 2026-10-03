@@ -18,12 +18,12 @@ mk_grp7() {
   full_env();
   grp_note(7, [5]);
 } return void;
-():() then last_ngrp:(7)
-():() then last_ngrpc:(4)
+():() then last_ngrp:("ngrp 7")
+():() then last_ngrpc:("ngrpc 4")
 
 mk_grp9() {
   full_env();
   grp_note(9, [2]);
 } return void;
-():() then last_ngrp:(9)
-():() then last_ngrpc:(1)
+():() then last_ngrp:("ngrp 9")
+():() then last_ngrpc:("ngrpc 1")

@@ -2,7 +2,7 @@
 // every test case's function, since each case runs in a process of its own.
 
 emit_main_init(int id) {
-  if(s1_of(id) == "main") {
+  if((import ns1)[id] == "main") {
     emit_init_call();
   }
 } return void;

@@ -7,17 +7,17 @@ dg_t_claim() {
   push((import conscase), 0);
 } return void;
 ():() then dg_nfn:(2)
-():() then dg_ncomp:(3)
+():() then (import dg_ctr)[1]:(3)
 
 dg_t_std() {
   dg_t_built();
   lset((import stdunit), 0, 0);
 } return void;
 ():() then dg_nfn:(2)
-():() then dg_nrows:(3)
+():() then len((import dg_comp)):(3)
 
 dg_dirty_last() {
-  int dgn = lst_last((import dg_dirty));
-} return int dgn;
-given dg_t_scc ():(1)
-given dg_t_built ():(1)
+  string dgn_t = "dirty " + (lst_last((import dg_dirty)));
+} return string dgn_t;
+given dg_t_scc ():("dirty 1")
+given dg_t_built ():("dirty 1")

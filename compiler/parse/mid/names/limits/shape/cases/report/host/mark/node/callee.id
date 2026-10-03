@@ -2,19 +2,19 @@
 
 ut_callee(string fname, string callee_nm) {
   string ut_what_v = ut_what(callee_nm);
-  if(ut_what_v != "" && ut_at(fname) < 0) {
+  if(ut_what_v != "" && find_str((import utname), fname) < 0) {
     string ut_via_v = ut_via(callee_nm);
     ut_add(fname, ut_what_v, ut_via_v);
   }
 } return void;
-given ut_host_seeded ("newfn", "port_byte"):() then utwhat_len:(3)
-given ut_host_seeded ("port_byte", "port_byte"):() then utwhat_len:(2)
+given ut_host_seeded ("newfn", "port_byte"):() then len((import utwhat)):(3)
+given ut_host_seeded ("port_byte", "port_byte"):() then len((import utwhat)):(2)
 
 // A callee is named only when it is a caller itself. When it is the thing that
 // cannot run, the message names that thing directly instead.
 ut_via(string callee_nm) {
   string via_nm = "";
-  int ut_k = ut_at(callee_nm);
+  int ut_k = find_str((import utname), callee_nm);
   if(ut_k >= 0 && (import utvia)[ut_k] != "*") {
     via_nm = callee_nm;
   }
@@ -27,5 +27,5 @@ ut_add(string fname, string what_s, string via_s) {
   push((import utwhat), what_s);
   push((import utvia), via_s);
 } return void;
-given notes_base ("port_byte", "asm 'in8'", "*"):() then utwhat_len:(1)
-given ut_seeded ("caller", "asm 'in8'", "port_byte"):() then utvia_len:(2)
+given notes_base ("port_byte", "asm 'in8'", "*"):() then len((import utwhat)):(1)
+given ut_seeded ("caller", "asm 'in8'", "port_byte"):() then len((import utvia)):(2)

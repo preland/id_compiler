@@ -33,8 +33,8 @@ tk_prepare() {
     tk_setup();
   }
 } return void;
-given tk_t_parsed ():() then tk_nkeys:(2)
-given dg_t_parsed ():() then tk_nkeys:(0)
+given tk_t_parsed ():() then tk_nkeys:("keys 2")
+given dg_t_parsed ():() then tk_nkeys:("keys 0")
 
 tk_enabled() {
   int tkon = 0;
@@ -53,5 +53,5 @@ tk_setup() {
     tkf = tkf + 1;
   }
 } return void;
-given tk_t_prep0 ():() then tk_nkeys:(2)
-given tk_t_warm0 ():() then tk_nskip:(1)
+given tk_t_prep0 ():() then tk_nkeys:("keys 2")
+given tk_t_warm0 ():() then tk_nskip:("skip 1")

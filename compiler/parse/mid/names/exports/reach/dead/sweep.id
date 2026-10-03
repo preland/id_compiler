@@ -25,7 +25,7 @@ given natcall_fixture (0, 0):() then calls reach_func:[1]
 given natcall_fixture (1, 0):() then calls reach_func:[0]
 
 reach_func(int f, int lo) {
-  string s1_of_v = s1_of((import prog)[f]);
+  string s1_of_v = (import ns1)[((import prog)[f])];
   if(is_reach(s1_of_v) == 1) {
     reach_range(lo, (import prog)[f]);
   }

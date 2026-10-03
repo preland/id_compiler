@@ -4,7 +4,7 @@
 // table.
 
 sd_cell(string[][] sd_tab, string sd_s, int sd_k) {
-  int sd_i = sd_find(sd_s);
+  int sd_i = find_str((import sdname), sd_s);
   string s = "";
   if(sd_i >= 0 && sd_k >= 0 && sd_k < sd_nfields(sd_s)) {
     s = sd_tab[sd_i][sd_k];

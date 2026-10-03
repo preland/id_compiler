@@ -6,7 +6,7 @@
 // two-armed if rather than the usual eager default because both arms recurse.
 type_of7(int id) {
   string t = "int";
-  if(k_of(id) == "un") {
+  if((import nkind)[id] == "un") {
     t = type_un(id);
   } else {
     t = type_bin(id);
@@ -17,9 +17,9 @@ given composite_fixture ((import bin_concat)):("string")
 
 // `-x` and `~x` keep the operand's type; `!x` is a truth value, so int.
 type_un(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string t = type_of(i1_of_v);
-  if(s1_of(id) == "!") {
+  if((import ns1)[id] == "!") {
     t = "int";
   }
 } return string t;
@@ -31,5 +31,5 @@ h_call_match() {
   int a = node_int("1", 1, 0);
   export int h_call_1 = node_call("h", [a]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -2,9 +2,9 @@
 // function value carries the value as its first operand (back/ir/build/expr/
 // call/core/args.id), which is written where the symbol would be.
 ll_callee(int id) {
-  string s = "@" + ir_s(id);
-  if(ir_a(id) >= 0) {
-    int ir_a_v = ir_a(id);
+  string s = "@" + (import istr)[id];
+  if((import ia)[id] >= 0) {
+    int ir_a_v = (import ia)[id];
     s = ll_val(ir_a_v);
   }
 } return string s;

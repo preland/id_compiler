@@ -6,19 +6,14 @@ m2rphi_setup() {
   ir_rows();
   m2rphi_make();
 } return void;
-():() then check_failed:(0)
-():() then m2rphi_id_check:(2)
+():() then (import chkfail)[0]:(0)
+():() then (import m2rphi_id):(2)
 
 m2rphi_make() {
   int[] bl = [];
   export int m2rphi_id = ir_insn("phi", "int", 7, 7, "", [7, 7], bl);
   lset((import chk_id), 0, m2rphi_id);
 } return void;
-given ir_rows ():() then check_failed:(0)
-given ir_rows ():() then m2rphi_id_check:(2)
+given ir_rows ():() then (import chkfail)[0]:(0)
+given ir_rows ():() then (import m2rphi_id):(2)
 
-m2rphi_id_check() {
-  int n = (import m2rphi_id);
-} return int n;
-given m2rphi_setup ():(2)
-given m2rphi_setup ():(2) then check_failed:(0)

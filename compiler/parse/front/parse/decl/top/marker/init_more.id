@@ -7,7 +7,7 @@ init_files_rest() {
   int ret_i = init_units();
 } return int ret_i;
 ():(0)
-():(0) then check_failed:(0)
+():(0) then (import chkfail)[0]:(0)
 
 // The line each call was written on, for the natives list bin/idc reads
 // (back/drive/sink/natives/). Two columns rather than one indexed by node,
@@ -15,16 +15,19 @@ init_files_rest() {
 //
 //   cnode  a call node's id, in the order calls were parsed
 //   cline  the line its '(' was on
+// cnode: How many calls have been recorded, for init_more.id's init_calls/call_at
+// cases: both are void and touch only exported lists, which a case can only
+// read back through a check.
 init_calls() {
   export int[] cnode = [];
   export int[] cline = [];
 } return void;
-given env_init ():() then check_failed:(0)
-given env_init ():() then cnode_count:(0)
+given env_init ():() then (import chkfail)[0]:(0)
+given env_init ():() then len((import cnode)):(0)
 
 call_at(int node, int ln) {
   push((import cnode), node);
   push((import cline), ln);
 } return void;
-given init_calls (5, 10):() then cnode_count:(1)
-given init_calls (7, 20):() then cnode_count:(1)
+given init_calls (5, 10):() then len((import cnode)):(1)
+given init_calls (7, 20):() then len((import cnode)):(1)

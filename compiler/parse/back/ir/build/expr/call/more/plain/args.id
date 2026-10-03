@@ -10,12 +10,12 @@ given ocall_fixture ((import ocall_node)):([])
 given bicall_fixture ((import bicall_node)):([0])
 
 lw_barg_at(int node, int i, int[] vals) {
-  int[] l1_of_v = l1_of(node);
-  string s1_of_v = s1_of(node);
+  int[] l1_of_v = (import nl1)[node];
+  string s1_of_v = (import ns1)[node];
   int ret_i = lw_barg_val(i, vals, l1_of_v, s1_of_v);
 } return int ret_i;
 given bicall_fixture ((import bicall_node), 0, []):(1)
-given bicall_fixture ((import bicall_node), 0, []):(1) then check_failed:(0)
+given bicall_fixture ((import bicall_node), 0, []):(1) then (import chkfail)[0]:(0)
 
 // The type a builtin's i-th argument reaches its runtime helper as. "" means
 // the helper takes it as written -- print and put convert their own operand,

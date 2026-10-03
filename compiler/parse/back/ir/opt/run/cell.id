@@ -8,22 +8,23 @@
 // one function at a time and nothing crosses between them: an SSA value is
 // local to its function by construction.
 
+// outv: The other table m2r_row pushes a row onto, read as pra_len_check reads
+// pra. Filed here rather than beside its export in ../../cell.id, which this
+// leaves at its three-function cap.
+// outv: A row of its own: two nested loops are already at the nesting limit, so
+// the inner one cannot also sit in outv_sum.
+// phiof: One row per block, pushed by m2r_row (../../mem/init/blank/row.id) whose
+// whole effect is that push and outv's: nothing but a reader of one of the
+// two tables can see either happen.
+// phiof: One row of phiof, for phiof_sum (at.id): a loop inside a loop is already
+// at the nesting limit, so the inner one cannot sit in the reader itself.
 init_opt() {
   export int[] pra = [];
   export int[][] phiof = [];
   export int[][] outv = [];
 } return int 0;
-given env_init ():(0) then check_failed:(0)
-given env_init ():(0) then pra_len_check:(0)
-
-// One row per block, pushed by m2r_row (../../mem/init/blank/row.id) whose
-// whole effect is that push and outv's: nothing but a reader of one of the
-// two tables can see either happen.
-phiof_len() {
-  int n = len((import phiof));
-} return int n;
-given optfx_setup ():(0)
-given m2r_row_fixture ():(1)
+given env_init ():(0) then (import chkfail)[0]:(0)
+given env_init ():(0) then len((import pra)):(0)
 
 // The optimisation level, from `--opt N`. Level 0 emits the lowering as it
 // stands, which is the property that makes the lowering trustworthy: a program

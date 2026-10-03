@@ -1,5 +1,5 @@
 decl_err(int id, string t, int e) {
-  string s2_of_v = s2_of(id);
+  string s2_of_v = (import ns2)[id];
   string type_of_v = type_of(e);
   tc_err(id, "cannot initialize " + t + " '" + s2_of_v + "' with a " + type_of_v + " value");
 } return void;
@@ -8,7 +8,7 @@ given decltype_fixture ((import decl_scalar), "int", (import lit_str)):() then p
 
 assign_err(int id, string vt, int e) {
   string type_of_v = type_of(e);
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   tc_err(id, "cannot assign a " + type_of_v + " value to " + vt + " '" + s1_of_v + "'");
 } return void;
 given assign_build ((import assign_list), "int[]", (import lit_a)):() then prints:("<stdin>:1: error: cannot assign a int value to int[] 'xl'\n")

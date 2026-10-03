@@ -1,9 +1,9 @@
 fix_ibeg4(int e) {
   int t0 = (import ntok)[e];
-  if(k_of(e) == "un") {
-    int a = i1_of(e);
+  if((import nkind)[e] == "un") {
+    int a = (import ni1)[e];
     t0 = fix_nbeg(a) - 1;
-  } else if(k_of(e) == "import") {
+  } else if((import nkind)[e] == "import") {
     t0 = t0 - 1;
   }
 } return int t0;

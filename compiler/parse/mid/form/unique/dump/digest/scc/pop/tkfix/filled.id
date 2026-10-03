@@ -7,7 +7,7 @@ tk_t_exp() {
   tk_prepare();
 } return void;
 ():() then tk_etype_gx:("int")
-():() then tk_nkeys:(2)
+():() then tk_nkeys:("keys 2")
 
 tk_t_asm() {
   tk_t_parsed();
@@ -15,11 +15,11 @@ tk_t_asm() {
   tk_prepare();
 } return void;
 ():() then tk_asm_foo:(1)
-():() then tk_nkeys:(2)
+():() then tk_nkeys:("keys 2")
 
 tk_t_bad2() {
   tk_t_prep();
   lset((import tkbad), 0, 1);
 } return void;
-():() then tk_nbad:(1)
-():() then tk_nkeys:(2)
+():() then tk_nbad:("bad 1")
+():() then tk_nkeys:("keys 2")

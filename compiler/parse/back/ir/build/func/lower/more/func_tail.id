@@ -4,8 +4,8 @@ lw_func_mid(int node, string ty, string name) {
   lw_open(ir_func_v);
   lw_func_tail(node);
 } return void;
-given lw_func_fixture ((import g_fnnode), "int", "g"):() then check_failed:(0)
-given lw_func_fixture ((import g_fnnode), "word", "h"):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode), "int", "g"):() then (import chkfail)[0]:(0)
+given lw_func_fixture ((import g_fnnode), "word", "h"):() then (import chkfail)[0]:(0)
 
 lw_func_tail(int node) {
   esc_enter(node);
@@ -14,17 +14,17 @@ lw_func_tail(int node) {
 } chain (int node) {
   lw_fin(node);
 } return void;
-given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
 // id_main's first instruction builds the list constants
 // (dce/export/consts.id), on every LLVM build: hosted, where the C-ABI main
 // calls id_main, and freestanding, where the boot code jumps to it.
 lw_main_init(int node) {
-  if(s1_of(node) == "main" && list_consts_kept() > 0) {
+  if((import ns1)[node] == "main" && list_consts_kept() > 0) {
     int[] none = [];
     lw_callf("idc_const_init", "", none);
   }
 } return void;
-given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)
-given bound_fixture ((import decl_node)):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
+given bound_fixture ((import decl_node)):() then (import chkfail)[0]:(0)

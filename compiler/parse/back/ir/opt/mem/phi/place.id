@@ -27,5 +27,5 @@ m2r_phi_one(int f, int i, int j) {
   m2r_phi_place(f, i, ph);
   int ret_i = j + 1;
 } return int ret_i;
-given m2r_outv_fixture (0, 0, 0):(1) then phiof_sum:(3)
+given m2r_outv_fixture (0, 0, 0):(1) then phiof_sum:("phiof 3")
 given m2r_outv_fixture (0, 0, 0):(1) then calls m2r_phi_place:(0, 0, 3)

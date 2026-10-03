@@ -1,6 +1,6 @@
 fwd_sig_match2(int fid, int callee_fid) {
   int ok = 0;
-  if(s2_of(fid) == s2_of(callee_fid)) {
+  if((import ns2)[fid] == (import ns2)[callee_fid]) {
     ok = fwd_sig_params(fid, callee_fid);
   }
 } return int ok;
@@ -9,8 +9,8 @@ given farm_i (6, 12):(0)
 
 // The callee's parameters, positionally, against `fid`'s own (./deeper/).
 fwd_sig_params(int fid, int callee_fid) {
-  int[] paramsl = l1_of(fid);
-  int[] cparamsl = l1_of(callee_fid);
+  int[] paramsl = (import nl1)[fid];
+  int[] cparamsl = (import nl1)[callee_fid];
   int ok = fwd_sig_params2(paramsl, cparamsl);
 } return int ok;
 given farm_i (6, 5):(1)

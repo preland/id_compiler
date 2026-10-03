@@ -44,12 +44,12 @@ given leaves_fixture ():() then calls lset:[0]
 // clause's initialiser; an index-assignment's first list; push's second
 // argument.
 arr_mark_at(int i) {
-  int c = i1_of(i);
-  if(k_of(i) == "iassign") {
-    c = l1_of(i)[0];
+  int c = (import ni1)[i];
+  if((import nkind)[i] == "iassign") {
+    c = (import nl1)[i][0];
   }
   if(is_push2(i) == 1) {
-    c = l1_of(i)[1];
+    c = (import nl1)[i][1];
   }
 } chain (int i) {
   if(want_decl(i, c) == 0 && want_asg(i, c) == 0 && want_elem(i, c) == 0) {

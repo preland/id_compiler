@@ -18,7 +18,7 @@ given edge_fixture ("nosuchfn"):(-1)
 
 first_fn_at(int i, string fname, int n) {
   int r = n;
-  if(n < 0 && s1_of((import prog)[i]) == fname) {
+  if(n < 0 && (import ns1)[((import prog)[i])] == fname) {
     r = i;
   }
 } return int r;

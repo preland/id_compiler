@@ -19,7 +19,7 @@ calls_eprint() {
   int i = 0;
   int hit = 0;
   while(i < len((import nkind))) {
-    hit = hit || (k_of(i) == "call" && s1_of(i) == "eprint");
+    hit = hit || ((import nkind)[i] == "call" && (import ns1)[i] == "eprint");
     i = i + 1;
   }
 } return int hit;

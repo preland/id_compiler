@@ -2,7 +2,7 @@
 // a positive literal. A trap is an effect: a call moved ahead of one would run
 // where it did not before.
 fix_traps(int e) {
-  string op = s1_of(e);
+  string op = (import ns1)[e];
   int ok = 0;
   if(op == "/" || op == "%" || op == "<<" || op == ">>") {
     ok = fix_unsafe_rhs(e);
@@ -21,11 +21,11 @@ fix_traps_setup() {
   export int tr_unsafe = newleaf("bin", tr_one, tr_zero, "/", "");
 } return void;
 ():() then tr_unsafe_rhs_val:(0)
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 
 tr_unsafe_rhs_val() {
-  int b = i2_of((import tr_unsafe));
-  int v = i1_of(b);
+  int b = (import ni2)[(import tr_unsafe)];
+  int v = (import ni1)[b];
 } return int v;
 given fix_traps_setup ():(0)
-given fix_traps_setup ():(0) then check_failed:(0)
+given fix_traps_setup ():(0) then (import chkfail)[0]:(0)

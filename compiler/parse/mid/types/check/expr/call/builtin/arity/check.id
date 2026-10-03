@@ -7,7 +7,7 @@
 // coded, and adding one is three list entries instead of a new branch.
 
 chk_bi(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_builtin(s1_of_v) == 1) {
     chk_bi_arity(id);
     fv_bi_args(id);
@@ -15,7 +15,7 @@ chk_bi(int id) {
   }
 } return void;
 given call2_setup ((import cm_push_call)):() then calls chk_bi_arity:((import cm_push_call))
-given chk_bi_nonbuiltin_setup ((import cm_var_node)):() then check_failed:(0)
+given chk_bi_nonbuiltin_setup ((import cm_var_node)):() then (import chkfail)[0]:(0)
 
 // Arity first, and nothing else if it is wrong -- as at a call to a defined
 // function, asking what argument 2 should be when there is no argument 2
@@ -35,7 +35,7 @@ given bi_mismatch_setup ((import bi_mismatch_call)):() then calls bi_arity_err:(
 // group share one shape and say "takes exactly N argument(s), got M"; every
 // other builtin is written out by hand and spells the count as a word.
 bi_arity_err(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(is_sysbi(s1_of_v) == 1) {
     string msg = bi_sys_msg(id);
     tc_err(id, msg);

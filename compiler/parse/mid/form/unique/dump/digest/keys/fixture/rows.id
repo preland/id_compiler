@@ -5,7 +5,7 @@ dg_t_rows0() {
   dg_t_parsed();
   dg_init();
 } return void;
-():() then dg_nrows:(0)
+():() then len((import dg_comp)):(0)
 ():() then dg_nfn:(0)
 
 dg_t_rows() {
@@ -13,11 +13,6 @@ dg_t_rows() {
   dg_fill_one(0);
   dg_fill_one(1);
 } return void;
-():() then dg_nrows:(2)
-():() then dg_nout1:(0)
+():() then len((import dg_comp)):(2)
+():() then dg_nout1:("out1 0")
 
-dg_nat0() {
-  int dgn = (import dg_nat)[0];
-} return int dgn;
-given dg_t_rows ():(0)
-given dg_t_graph ():(0)

@@ -1,14 +1,14 @@
 ret_err_msg(int id, string t) {
-  string s1_of_v = s1_of(id);
-  string s2_of_v = s2_of(id);
+  string s1_of_v = (import ns1)[id];
+  string s2_of_v = (import ns2)[id];
   string msg = "function '" + s1_of_v + "' returns " + s2_of_v + " but the expression has type " + t;
 } return string msg;
 given fn_fixture ((import fixture_fn), "string"):("function 'fx_target' returns int but the expression has type string")
 given ret_narrows_fn ((import narrow_f), "word"):("function 'f' returns int but the expression has type word")
 
 ret_narrow_err_msg(int id, string t) {
-  string s1_of_v = s1_of(id);
-  string s2_of_v = s2_of(id);
+  string s1_of_v = (import ns1)[id];
+  string s2_of_v = (import ns2)[id];
   string msg = "the return clause of '" + s1_of_v + "' narrows " + t + " to " + s2_of_v + "; declare a " + s2_of_v + " local, assign it, and return that";
 } return string msg;
 given fn_fixture ((import fixture_fn), "word"):("the return clause of 'fx_target' narrows word to int; declare a int local, assign it, and return that")
@@ -19,5 +19,5 @@ h_call_mismatch() {
   int[] none = [];
   export int h_call_0 = node_call("h", none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

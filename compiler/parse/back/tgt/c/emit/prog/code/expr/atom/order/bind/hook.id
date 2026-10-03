@@ -12,22 +12,15 @@
 
 ee_seq(int id) {
   string s = sq_name(id);
-  if(is_seqd(id) == 0 && seqk(id) == 2) {
+  if(lst_get_or((import seqt), id, 0) == 0 && seqk(id) == 2) {
     s = emit_seq(id);
-  } else if(is_seqd(id) == 0) {
+  } else if(lst_get_or((import seqt), id, 0) == 0) {
     s = ee2(id);
   }
 } return string s;
 given sq_fixture ((import sq_two)):("(idsq_7 = id_foo(7), id_pair(idsq_7, id_bar(3)))")
 given sq_fixture ((import sq_one)):("id_pair(id_foo(7), 7)")
 given sq_marked ((import nz_call_foo)):("idsq_7")
-
-is_seqd(int id) {
-  int ok = lst_get_or((import seqt), id, 0);
-} return int ok;
-given sq_marked (7):(1)
-given sq_fixture (7):(0)
-given sq_marked (100000):(0)
 
 seq_mark(int id, int v) {
   while(len((import seqt)) <= id) {

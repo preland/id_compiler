@@ -4,8 +4,8 @@
 
 prefx2_setup() {
   br_fixture_p();
-  int[] blk_pre_v = blk_pre(1);
+  int[] blk_pre_v = (import bpred)[1];
   push(blk_pre_v, 9);
 } return void;
-():() then check_failed:(0)
-():() then chk_pred1:([0, 9])
+():() then (import chkfail)[0]:(0)
+():() then (import bpred)[1]:([0, 9])

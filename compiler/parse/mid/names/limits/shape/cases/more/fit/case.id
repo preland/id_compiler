@@ -14,8 +14,8 @@ fit_case(int i) {
   int node = (import casenode)[i];
   blank;
 } chain (int i) {
-  if(flat_arg_count(fn) != flat_arg_count(node)) {
-    int na = flat_arg_count(node);
+  if(len(((import nl1)[fn])) != len(((import nl1)[node]))) {
+    int na = len(((import nl1)[node]));
     case_arity_err(i, fn, na);
   } else if(case_has_out(i, "thentraps") == 1) {
     fit_traps(i);
@@ -38,7 +38,7 @@ given traps_case_fixture ((import fixture_ci)):() then calls fit_traps:[1]
 // does not re-test for that.
 fit_traps(int i) {
   int node = (import casenode)[i];
-  int nexp = len(l2_of(node));
+  int nexp = len((import nl2)[node]);
   if(nexp != 0) {
     case_err(i, "a case with 'traps' may not also give an expected return value");
   }
@@ -49,7 +49,7 @@ fit_traps(int i) {
 } chain (int i) {
   int trap_hc2 = case_has_out(i, "thencallsn");
   int trap_hchk = case_has_out(i, "then");
-  int trap_other = trap_hp + trap_he + trap_hc1 + trap_hc2 + trap_hchk;
+  int trap_other = trap_hp + trap_he + trap_hc1 + trap_hc2 + trap_hchk + case_has_out(i, "thenimp") + case_has_out(i, "thenlen");
 } chain (int i) {
   if(trap_other != 0) {
     case_err(i, "a case with 'traps' may not also check another 'then' clause: nothing after a trap is captured");
@@ -63,12 +63,15 @@ given traps_node_fixture ((import fixture_ci)):() then prints:("fixture.id:4: er
 // impcheck.id) all need it, and no existing fixture sets it. Paired with
 // impcase_given (../more/value/more/text/items.id, room for only one of the
 // two there), which gives the non-empty case. etypes gets a matching row too
-// so imp_owner's cases (../../given/read/impcheck.id) have a real ek to read.
+// so imp_owner's cases (../../given/read/impcheck.id) have a real ek to read, and
+// eowners a row naming the function "own" that exports it.
 // Filed here because given/ itself is at the 3-entry layout limit.
 impcase_empty() {
   fn_fixture();
   push((import casegiven), "");
   push((import etypes), "int");
+} chain () {
+  push((import eowners), "own");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

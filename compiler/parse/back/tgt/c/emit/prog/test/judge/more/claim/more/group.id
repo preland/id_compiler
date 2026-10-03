@@ -29,5 +29,5 @@ claim_cols_rest() {
   push((import conskind), "time");
   claim_cols_bounds();
 } return void;
-given case_fidx_fixture ():() then check_failed:(0)
+given case_fidx_fixture ():() then (import chkfail)[0]:(0)
 given case_fidx_fixture ():() then init_units:(0)

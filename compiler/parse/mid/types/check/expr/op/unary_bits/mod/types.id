@@ -3,7 +3,7 @@ farm_j3() {
   farm_j2();
   export int f_ustmt = node_exprstmt((import f_uvar));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 mod_types(int id, int a, int b) {
@@ -13,13 +13,13 @@ mod_types(int id, int a, int b) {
     tc_err(id, "'%' requires int operands");
   }
 } return void;
-given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_word)):() then check_failed:(0)
-given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_float)):() then check_failed:(1)
+given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_word)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_float)):() then (import chkfail)[0]:(1)
 
 fcall_reg_b() {
   fcall_reg_a();
   push((import vunit), 0);
   vidx_add("h");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

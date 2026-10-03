@@ -4,7 +4,7 @@
 // excluded here so the reason is plain.
 
 esc_own2(int fn, string nm) {
-  string t = esc_decl_type(l2_of(fn), nm);
+  string t = esc_decl_type((import nl2)[fn], nm);
   int ok = 0;
   if(is_list_ty(t) == 1) {
     ok = (esc_func(fn, nm) & 3) == 0;

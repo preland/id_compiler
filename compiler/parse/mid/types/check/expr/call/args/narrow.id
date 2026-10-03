@@ -8,21 +8,21 @@
 // both. It is now the strict one that is consistent.
 
 chk_narrow(int id, int fn, int i, string t) {
-  int[] l1_of_v = l1_of(fn);
-  string s1_of_v = s1_of(l1_of_v[i]);
+  int[] l1_of_v = (import nl1)[fn];
+  string s1_of_v = (import ns1)[(l1_of_v[i])];
   if(ty_narrows(s1_of_v, t) == 1) {
     narrow_err(id, fn, i, t);
   }
 } return void;
-given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then check_failed:(1)
-given argfn_d ((import argfn_fn), (import argfn_fn), 0, "int"):() then check_failed:(0)
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then (import chkfail)[0]:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "int"):() then (import chkfail)[0]:(0)
 
 narrow_err(int id, int fn, int i, string t) {
-  int argnode = l1_of(id)[i];
+  int argnode = (import nl1)[id][i];
   string msg = narrow_err_msg(id, fn, i, t);
   tc_err(argnode, msg);
 } return void;
-given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then check_failed:(1)
+given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then (import chkfail)[0]:(1)
 given argfn_d ((import argfn_fn), (import argfn_fn), 0, "float"):() then calls narrow_err_msg:((import argfn_fn), (import argfn_fn), 0, "float")
 
 argfn_a() {
@@ -30,5 +30,5 @@ argfn_a() {
   int pnode = node_param("param", "int", "p");
   export int argfn_param = pnode;
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

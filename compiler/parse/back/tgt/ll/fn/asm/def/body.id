@@ -3,7 +3,7 @@ ll_asm_par(int r) {
   string s = "";
   int i = 0;
   while(i < len((import afparams)[r])) {
-    string s1_of_v = s1_of((import afparams)[r][i]);
+    string s1_of_v = (import ns1)[((import afparams)[r][i])];
     s = s + ll_sep(i) + ll_ty(s1_of_v) + " %a" + i;
     i = i + 1;
   }

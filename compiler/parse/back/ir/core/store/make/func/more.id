@@ -14,14 +14,14 @@ given ir_rows_chk1 ():(1) then chk_irprog_last:(1)
 // arguments, and the row a case just built is always the last one.
 chk_last_fn_name() {
   int n = len((import fnname));
-  string ret_s = irf_name(n - 1);
+  string ret_s = (import fnname)[(n - 1)];
 } return string ret_s;
 given ir_rows ():("two")
 given ir_rows_chk1 ():("two")
 
 chk_last_fn_ret() {
   int n = len((import fnname));
-  string ret_s = irf_ret(n - 1);
+  string ret_s = (import fnret)[(n - 1)];
 } return string ret_s;
 given ir_rows ():("string")
 given ir_rows_chk1 ():("string")

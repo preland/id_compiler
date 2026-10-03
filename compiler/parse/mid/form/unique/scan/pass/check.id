@@ -27,8 +27,8 @@ check_bodies() {
     i = i + 1;
   }
 } return void;
-given dupfn_fixture ():() then check_failed:(1)
-given clean_prog_fixture ():() then check_failed:(0)
+given dupfn_fixture ():() then (import chkfail)[0]:(1)
+given clean_prog_fixture ():() then (import chkfail)[0]:(0)
 
 // Fingerprint every function once. Comparing is quadratic in the number of
 // functions but canonicalising is not, and canonicalising is the expensive
@@ -36,10 +36,12 @@ given clean_prog_fixture ():() then check_failed:(0)
 //
 // `cfpfn` records which function each fingerprint belongs to; the walk itself
 // is ../fill.id, which explains why the owner is kept separately.
+// cfp: len((import cfp)) has no other zero-argument reader; uq_fill's own effect
+// is exactly that this count changes to match the current `prog`.
 uq_fill() {
   export string[] cfp = [];
   export int[] cfpfn = [];
   uq_fill_all();
 } return void;
-given dupfn_fixture ():() then cfp_len:(2)
-given fn_fixture ():() then cfp_len:(1)
+given dupfn_fixture ():() then len((import cfp)):(2)
+given fn_fixture ():() then len((import cfp)):(1)

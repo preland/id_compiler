@@ -18,7 +18,7 @@ fix_tokline_node_fixture() {
   int e = newleaf("ident", 0, 0, "len", "");
   fix_span_fixture2(e);
 } return void;
-given fix_tokline_fixture2 ():() then check_failed:(0)
+given fix_tokline_fixture2 ():() then (import chkfail)[0]:(0)
 given fix_tokline_fixture2 ():() then init_units:(0)
 
 // Two events for out/emit/decl/{decl,head}.id's own cases: event 0 at token
@@ -52,5 +52,5 @@ fix_decl_fixture() {
   lset((import nst), 1, 1);
   push((import fixe_an), "");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

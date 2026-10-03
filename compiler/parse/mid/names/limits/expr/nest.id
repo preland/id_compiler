@@ -10,7 +10,7 @@
 
 chk_flat_args(int id) {
   int i = 0;
-  while(i < flat_arg_count(id)) {
+  while(i < len(((import nl1)[id]))) {
     i = chk_flat_at(id, i);
   }
 } return void;
@@ -18,21 +18,21 @@ given cm_setup ((import cm_push_call)):() then prints:("")
 given cm_other_setup ((import cm_var_node)):() then prints:("")
 
 chk_flat_at(int id, int i) {
-  int a = l1_of(id)[i];
+  int a = (import nl1)[id][i];
   if(has_call(a) > 1) {
-    string s1_of_v = s1_of(id);
+    string s1_of_v = (import ns1)[id];
     tc_err(a, "argument " + i + " of '" + s1_of_v + "' has a call nested inside a call; an argument may hold one level of call, not two -- name the inner call's result and pass the name");
   }
   int ret_i = i + 1;
 } return int ret_i;
-given flat_call_fixture ((import flat_outer_call), 0):(1) then check_failed:(0)
-given flat_deep_call_fixture ((import flat_deep_call), 1):(2) then check_failed:(1)
-given cm_setup ((import cm_push_call), 0):(1) then check_failed:(0)
+given flat_call_fixture ((import flat_outer_call), 0):(1) then (import chkfail)[0]:(0)
+given flat_deep_call_fixture ((import flat_deep_call), 1):(2) then (import chkfail)[0]:(1)
+given cm_setup ((import cm_push_call), 0):(1) then (import chkfail)[0]:(0)
 
 has_call(int e) {
   int ok = 0;
-  if(k_of(e) == "call") {
-    int[] l1_of_v = l1_of(e);
+  if((import nkind)[e] == "call") {
+    int[] l1_of_v = (import nl1)[e];
     ok = 1 + hc_list(l1_of_v);
   } else {
     ok = hc_kids(e);

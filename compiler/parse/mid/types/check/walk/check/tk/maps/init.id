@@ -23,8 +23,8 @@ tk_maps() {
 } chain () {
   tk_fill_asm(0);
 } return void;
-given tk_t_prep0 ():() then tk_nin:(0)
-given tk_t_warm0 ():() then tk_nin:(1)
+given tk_t_prep0 ():() then tk_nin:("in 0")
+given tk_t_warm0 ():() then tk_nin:("in 1")
 
 tk_fill_in(int tki) {
   while(tki < len((import tccin))) {
@@ -32,8 +32,8 @@ tk_fill_in(int tki) {
     tki = tki + 1;
   }
 } return void;
-given tk_t_in1 (0):() then tk_nin:(1)
-given tk_t_in1 (1):() then tk_nin:(0)
+given tk_t_in1 (0):() then tk_nin:("in 1")
+given tk_t_in1 (1):() then tk_nin:("in 0")
 
 tk_fill_ex(int tki) {
   while(tki < len((import enames))) {

@@ -12,7 +12,7 @@
 check_asm_targets(int argc, string[] argv) {
   string arg_triple_v = arg_triple(argc, argv);
   int i = 0;
-  while(i < asm_count()) {
+  while(i < len((import afname))) {
     asm_check(i, arg_triple_v);
     i = i + 1;
   }
@@ -29,12 +29,12 @@ emit_all_fixture_off() {
   notes_base();
   nat_init(1, ["prog"]);
 } return void;
-():() then check_failed:(0)
-():() then nat_on_check:(0)
+():() then (import chkfail)[0]:(0)
+():() then (import natc)[0]:(0)
 
 emit_all_fixture_on() {
   notes_base();
   nat_init(2, ["prog", "--natives"]);
 } return void;
-():() then check_failed:(0)
-():() then nat_on_check:(1)
+():() then (import chkfail)[0]:(0)
+():() then (import natc)[0]:(1)

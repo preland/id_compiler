@@ -7,7 +7,7 @@ init_ty_rows2() {
   ty_row("float", "float", 8, 1);
   init_ty_rows3();
 } return void;
-given init_tyreg ():() then reg_rows:(9)
+given init_tyreg ():() then len((import tyname)):(9)
 given init_tyreg ():() then reg_width_at5:(8)
 
 // `string` is a reference, so its width is a pointer's, not a character
@@ -16,7 +16,7 @@ init_ty_rows3() {
   ty_row("string", "ref", 8, 0);
   ty_row("void", "unit", 0, 0);
 } return void;
-given init_tyreg ():() then reg_rows:(7)
+given init_tyreg ():() then len((import tyname)):(7)
 given init_tyreg ():() then reg_width_at5:(8)
 
 ty_row(string tn, string tk, int tw, int ts) {
@@ -24,5 +24,5 @@ ty_row(string tn, string tk, int tw, int ts) {
   push((import tykind), tk);
   ty_row2(tw, ts);
 } return void;
-given init_tyreg ("bool", "int", 1, 1):() then reg_rows:(6)
+given init_tyreg ("bool", "int", 1, 1):() then len((import tyname)):(6)
 given init_tyreg ("byte", "int", 2, 0):() then reg_last_width:(2)

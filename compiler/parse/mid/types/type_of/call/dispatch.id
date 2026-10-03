@@ -2,7 +2,7 @@
 
 type_of4(int id) {
   string t = type_of5(id);
-  if(k_of(id) == "call") {
+  if((import nkind)[id] == "call") {
     t = call_type(id);
   }
 } return string t;

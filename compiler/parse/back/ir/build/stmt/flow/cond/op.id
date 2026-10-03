@@ -15,7 +15,7 @@ given ir_rows ("float"):("fcmp")
 // flow/exit/ is at the three-entry limit -- the slot within reach, not the
 // right label.
 lw_flow(int node) {
-  if(k_of(node) == "break") {
+  if((import nkind)[node] == "break") {
     lw_break();
   } else {
     lw_early_ret(node);

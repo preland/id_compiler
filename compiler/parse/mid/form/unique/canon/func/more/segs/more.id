@@ -1,7 +1,7 @@
 // The walk itself, and what happens at a seam.
 
 segs_loop(int id, string sigtext, int[] cur, string[] segs_out) {
-  int[] body = l2_of(id);
+  int[] body = (import nl2)[id];
   int i = 0;
   while(i < len(body)) {
     segs_step(body[i], sigtext, cur, segs_out);
@@ -16,7 +16,7 @@ given lz_o (23, "S", [], []):() then calls segs_step:[1]
 // One node, not a list and an index: the caller already has the index, and a
 // step that cannot see the rest of the body cannot come to depend on it.
 segs_step(int node, string sigtext, int[] cur, string[] segs_out) {
-  if(k_of(node) == "chain") {
+  if((import nkind)[node] == "chain") {
     segs_flush(sigtext, cur, segs_out);
   } else {
     push(cur, node);

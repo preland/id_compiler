@@ -17,7 +17,7 @@ given sq_fixture ((import sq_iset), "  ", "V"):() then prints:("int idsq_7;\n  (
 // iset_hz wraps this text in a binding -- a bound index's own text must not
 // carry a semicolon that would land inside the comma expression.
 iset_code(int id, string val) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string sd_ixc = emit_idx(id);
   string ret_s = "id_list_set(" + emit_expr(i1_of_v) + ", " + sd_ixc + ", " + val + ")";
 } return string ret_s;
@@ -32,9 +32,9 @@ given iassign_fixture ((import iassign_node), "OTHER"):("id_list_set(id_list_lit
 // arms both would fall through to es4, which treats anything that is not an
 // `if` as a `while`.
 es3b(int id, string ind) {
-  if(k_of(id) == "iassign") {
+  if((import nkind)[id] == "iassign") {
     emit_iassign(id, ind);
-  } else if(k_of(id) != "chain" && k_of(id) != "blank") {
+  } else if((import nkind)[id] != "chain" && (import nkind)[id] != "blank") {
     es_flow(id, ind);
   }
 } return void;

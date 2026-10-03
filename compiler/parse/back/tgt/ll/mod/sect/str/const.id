@@ -10,7 +10,7 @@
 
 ll_const_val(int e, string name) {
   string s = ll_const_num(e);
-  if(k_of(e) == "str") {
+  if((import nkind)[e] == "str") {
     s = ll_const_str(e, name);
   }
 } return string s;
@@ -21,7 +21,7 @@ given lit_str_fixture ((import lit_str_e), "x"):("@.cs.x")
 // tag I -- the same reduction the constant-wrapper rule reads); anything the
 // fold leaves alone is emitted as it is spelled, as before.
 ll_const_num(int e) {
-  string s = s1_of(e);
+  string s = (import ns1)[e];
   string fp = canon_expr(e);
   if(charat(fp, 0) == 73) {
     s = zeros_tail(fp, 1);
@@ -32,7 +32,7 @@ given lit_int_fixture ((import lit_e2)):("4")
 
 // The bytes are emitted here, just above the global that points at them.
 ll_const_str(int e, string name) {
-  string spell = s1_of(e);
+  string spell = (import ns1)[e];
   string gname = "@.cs." + name;
   ll_str_bytes(gname, spell);
 } return string gname;

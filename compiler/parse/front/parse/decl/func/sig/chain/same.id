@@ -13,8 +13,8 @@ chain_same(int[] pos, int[] params, int[] restated) {
     chain_each(pos, params, restated);
   }
 } return void;
-given decl_tokens ([33], [], []):() then check_failed:(0)
-given decl_tokens ([33], [0], []):() then check_failed:(1)
+given decl_tokens ([33], [], []):() then (import chkfail)[0]:(0)
+given decl_tokens ([33], [0], []):() then (import chkfail)[0]:(1)
 
 chain_each(int[] pos, int[] params, int[] restated) {
   int i = 0;
@@ -23,16 +23,16 @@ chain_each(int[] pos, int[] params, int[] restated) {
     i = i + 1;
   }
 } return void;
-given regrow_param ([33], [], []):() then check_failed:(0)
-given regrow_param ([33], (import regrow_plist), (import regrow_plist)):() then check_failed:(0)
+given regrow_param ([33], [], []):() then (import chkfail)[0]:(0)
+given regrow_param ([33], (import regrow_plist), (import regrow_plist)):() then (import chkfail)[0]:(0)
 
 // s1 is the type and s2 the name, so this compares both halves of the
 // parameter. Neither call is an argument to the other, so the condition stays
 // within the expression rules.
 chain_one(int[] pos, int a, int b) {
-  if(s1_of(a) != s1_of(b) || s2_of(a) != s2_of(b)) {
+  if((import ns1)[a] != (import ns1)[b] || (import ns2)[a] != (import ns2)[b]) {
     syn_err(pos, "a chain restates the function's parameters exactly; this one differs");
   }
 } return void;
-given farm_g ([33], (import f_pa), (import f_pa)):() then check_failed:(0)
-given farm_g ([33], (import f_pa), (import f_pb)):() then check_failed:(1)
+given farm_g ([33], (import f_pa), (import f_pa)):() then (import chkfail)[0]:(0)
+given farm_g ([33], (import f_pa), (import f_pb)):() then (import chkfail)[0]:(1)

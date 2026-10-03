@@ -1,8 +1,8 @@
 // Calls and list literals: where an argument or an element flows.
 
 esc_call(int e, string nm) {
-  string cname = s1_of(e);
-  int[] args = l1_of(e);
+  string cname = (import ns1)[e];
+  int[] args = (import nl1)[e];
   int r = esc_args(args, cname, nm);
 } return int r;
 given esc_fix ((import efb_call), "p"):(1)

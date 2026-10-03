@@ -12,7 +12,7 @@ given chk_fixture ((import fixture_fn), (import fixture_chk_zero), 0):() then pr
 
 chk_name(int fn, int j) {
   string nm = "idtc_got";
-  if(s2_of(fn) == "void") {
+  if((import ns2)[fn] == "void") {
     nm = "idtc_a" + j;
   }
 } return string nm;
@@ -20,10 +20,10 @@ given fn_fixture ((import fixture_fn), 0):("idtc_got")
 given ret_void_fix (8, 0):("idtc_a0")
 
 chk_type(int fn, int j) {
-  string pt = s2_of(fn);
+  string pt = (import ns2)[fn];
   if(pt == "void") {
-    int[] ps = l1_of(fn);
-    pt = s1_of(ps[j]);
+    int[] ps = (import nl1)[fn];
+    pt = (import ns1)[(ps[j])];
   }
 } return string pt;
 given fn_fixture ((import fixture_fn), 0):("int")

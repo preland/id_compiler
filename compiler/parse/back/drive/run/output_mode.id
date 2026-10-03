@@ -12,10 +12,10 @@ arg_triple(int argc, string[] argv) {
 // C passes a long long where a char* is expected.
 register_asm_syms() {
   int i = 0;
-  while(i < asm_count()) {
+  while(i < len((import afname))) {
     push_asm_sym(i);
     i = i + 1;
   }
 } return void;
-given env_init ():() then asmfx_fn_count:(0)
-given asmfx_setup ():() then asmfx_fn_count:(1)
+given env_init ():() then len((import fnames)):(0)
+given asmfx_setup ():() then len((import fnames)):(1)

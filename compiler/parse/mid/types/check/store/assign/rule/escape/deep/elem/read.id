@@ -7,7 +7,7 @@
 // nothing.
 esc_elem(int e, string nm, int ctx) {
   int r = 0;
-  if(k_of(e) == "index" && k_of(i1_of(e)) == "var" && s1_of(i1_of(e)) == nm) {
+  if((import nkind)[e] == "index" && (import nkind)[((import ni1)[e])] == "var" && (import ns1)[((import ni1)[e])] == nm) {
     r = (ctx & 1) << 2;
   }
 } return int r;

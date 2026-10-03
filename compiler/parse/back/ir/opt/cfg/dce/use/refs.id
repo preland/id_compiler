@@ -1,8 +1,8 @@
 
 dce_used_b(int b, int id, int n) {
   int i = 0;
-  while(i < insn_count(b)) {
-    int[] blk_ins_v = blk_ins(b);
+  while(i < len(((import binsn)[b]))) {
+    int[] blk_ins_v = (import binsn)[b];
     n = dce_refs(blk_ins_v[i], id, n);
     i = i + 1;
   }
@@ -16,7 +16,7 @@ given cfg_fixture (1, 0, 0):(0)
 // incoming edge is its own -- does not count as a use either.
 dce_refs(int at, int id, int n) {
   int r = n;
-  if(at != id && ir_op(at) != "nop" && dce_names(at, id) == 1) {
+  if(at != id && (import iop)[at] != "nop" && dce_names(at, id) == 1) {
     r = n + 1;
   }
 } return int r;
@@ -25,7 +25,7 @@ given dce_fixture (0, 0, 3):(3)
 
 dce_names(int at, int id) {
   int r = 0;
-  if(ir_a(at) == id || ir_b(at) == id || dce_lists(at, id) == 1) {
+  if((import ia)[at] == id || (import ib)[at] == id || dce_lists(at, id) == 1) {
     r = 1;
   }
 } return int r;

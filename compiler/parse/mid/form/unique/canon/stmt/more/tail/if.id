@@ -4,7 +4,7 @@
 // once these existed.
 
 iassign_val(int id, string head, string key) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   string val = canon_expr(l1_of_v[0]);
   string ret_s = "ia:" + head + "[" + key + "]=" + val;
 } return string ret_s;
@@ -12,11 +12,11 @@ given iassign_begun_fixture ((import fix_iassign_n), "H", "K"):("ia:H[K]=I9")
 given iassign_begun_fixture ((import fix_iassign_n), "X", "Y"):("ia:X[Y]=I9")
 
 cst_if(int id) {
-  int i1_of_v = i1_of(id);
-  int[] l1_of_v = l1_of(id);
-  int[] l2_of_v = l2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int[] l1_of_v = (import nl1)[id];
+  int[] l2_of_v = (import nl2)[id];
 } chain (int id) {
-  int i2_of_v = i2_of(id);
+  int i2_of_v = (import ni2)[id];
   string out = "if(" + canon_expr(i1_of_v) + "){" + canon_body(l1_of_v) + "}" + canon_else2(l2_of_v, i2_of_v);
 } return string out;
 given elif_begun_fixture ((import if_node)):("if(I7){d:int 0=I7}")
@@ -29,5 +29,5 @@ elif_begun_fixture() {
   elif_fixture();
   uq_begin("f");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

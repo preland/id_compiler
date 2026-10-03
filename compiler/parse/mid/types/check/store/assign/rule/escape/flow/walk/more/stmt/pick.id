@@ -7,7 +7,7 @@
 
 esc_stmt(int sn, string nm) {
   int r = 0;
-  if(k_of(sn) == "decl" || k_of(sn) == "assign") {
+  if((import nkind)[sn] == "decl" || (import nkind)[sn] == "assign") {
     r = esc_store(sn, nm);
   } else {
     r = esc_stmt2(sn, nm);
@@ -18,8 +18,8 @@ given esc_fix ((import efb_dv), "v"):(2)
 
 esc_stmt2(int sn, string nm) {
   int r = 0;
-  if(k_of(sn) == "exprstmt") {
-    r = esc_expr(i1_of(sn), nm, 0);
+  if((import nkind)[sn] == "exprstmt") {
+    r = esc_expr((import ni1)[sn], nm, 0);
   } else {
     r = esc_stmt3(sn, nm);
   }
@@ -29,7 +29,7 @@ given esc_fix ((import efa_es), "a"):(8)
 
 esc_stmt3(int sn, string nm) {
   int r = 0;
-  if(k_of(sn) == "iassign") {
+  if((import nkind)[sn] == "iassign") {
     r = esc_iassign(sn, nm);
   } else {
     r = esc_stmt4(sn, nm);

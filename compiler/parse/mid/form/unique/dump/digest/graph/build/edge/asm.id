@@ -8,8 +8,8 @@ dg_asm_row() {
   dg_add(0, 1);
   dg_asm_names(dgr, 0);
 } return void;
-given dg_t_rows ():() then dg_nrows:(3)
-given dg_t_built ():() then dg_nrows:(4)
+given dg_t_rows ():() then len((import dg_comp)):(3)
+given dg_t_built ():() then len((import dg_comp)):(4)
 
 dg_asm_names(int dgr, int dgi) {
   while(dgi < len((import afname))) {
@@ -25,4 +25,4 @@ dg_t_asm() {
   asmfx_push();
 } return void;
 ():() then dg_nfn:(2)
-():() then dg_nrows:(2)
+():() then len((import dg_comp)):(2)

@@ -4,7 +4,7 @@
 // The decomposition warnings (docs/PROJECT.md, "decomposition warnings") run
 // last: they read the whole parsed program, same as the checks above, but
 // report on stderr and never call note_failure, so a violation here never
-// changes what check_failed() answers. The last one, check_imp_dup, is the
+// changes what (import chkfail)[0] answers. The last one, check_imp_dup, is the
 // exception: two functions that differ only in an imported value are an error
 // (checks/impdup/).
 check_program_tail() {

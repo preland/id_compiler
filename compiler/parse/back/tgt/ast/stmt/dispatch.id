@@ -1,9 +1,9 @@
 // Remaining statement forms.
 
 ps2(int id) {
-  int i1_of_v = i1_of(id);
-  string s = "(assign " + s1_of(id) + " " + print_expr(i1_of_v) + ")";
-  if(k_of(id) != "assign") {
+  int i1_of_v = (import ni1)[id];
+  string s = "(assign " + (import ns1)[id] + " " + print_expr(i1_of_v) + ")";
+  if((import nkind)[id] != "assign") {
     s = ps3(id);
   }
 } return string s;
@@ -11,9 +11,9 @@ given stmt_fix (2):("(assign z 5)")
 given stmt_fix (5):("(expr 5)")
 
 ps3(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string s = "(expr " + print_expr(i1_of_v) + ")";
-  if(k_of(id) != "exprstmt") {
+  if((import nkind)[id] != "exprstmt") {
     s = ps4(id);
   }
 } return string s;
@@ -22,9 +22,9 @@ given stmt_fix (3):("(while 5 (body))")
 
 ps4(int id) {
   string s = ps4_while(id);
-  if(k_of(id) == "if") {
-    int i1_of_v2 = i1_of(id);
-    int[] l1_of_v2 = l1_of(id);
+  if((import nkind)[id] == "if") {
+    int i1_of_v2 = (import ni1)[id];
+    int[] l1_of_v2 = (import nl1)[id];
     s = ps4_if(id, i1_of_v2, l1_of_v2);
   }
 } return string s;

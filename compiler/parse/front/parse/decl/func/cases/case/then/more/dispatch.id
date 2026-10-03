@@ -27,11 +27,17 @@ given then_fix ([1]):()
 given then_prints_fix ([1]):()
 
 then_check_clause(int[] pos) {
-  string chk_nm = case_fn_name(pos, "then");
-  then_value(pos, chk_nm);
+  if(at_case_import(pos) == 1 || cur_text(pos) == "len") {
+    then_imp_clause(pos);
+  } else {
+    string chk_nm = case_fn_name(pos, "then");
+    then_value(pos, chk_nm);
+  }
 } return void;
 given then_fix ([1]):()
 given chkname_fix ([0]):()
+given import_fix ([0]):() then calls then_imp_clause:[1]
+given env_init given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_clause:[1]
 
 // `traps` is the fourth keyword then_dispatch tells apart, folded in here
 // rather than as a fourth branch above (that if/else-if chain already spends

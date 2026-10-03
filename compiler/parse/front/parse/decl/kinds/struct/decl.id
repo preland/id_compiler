@@ -23,8 +23,8 @@ parse_struct(int[] pos) {
   expect_text(pos, "}");
   advance(pos);
 } return void;
-given sd_toks ([0]):([10]) then sd_count:(1) then sd_last_nf:(2)
-given sd_toks_open ([0]):([7]) then sd_last_nf:(1) then check_failed:(1)
+given sd_toks ([0]):([10]) then len((import sdname)):(1) then sd_last_nf:(2)
+given sd_toks_open ([0]):([7]) then sd_last_nf:(1) then (import chkfail)[0]:(1)
 
 sd_fields(int[] pos, string[] sd_fns, string[] sd_fts) {
   while(cur_text(pos) != "}" && cur_kind(pos) != "eof") {

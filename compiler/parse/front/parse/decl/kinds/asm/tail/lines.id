@@ -5,20 +5,20 @@ asm_lines_tail(int[] pos, string[] alines) {
   push((import aflines), alines);
   int ret_i = asm_tail(pos);
 } return int ret_i;
-given asm_fix_full ([2], []):(0) then afret_last:("int") then afretn_last:("result")
-given asm_fix_full2 ([3], ["\"i1\""]):(0) then afret_last:("word") then afretn_last:("r")
+given asm_fix_full ([2], []):(0) then afret_last:("afret int") then afretn_last:("result")
+given asm_fix_full2 ([3], ["\"i1\""]):(0) then afret_last:("afret word") then afretn_last:("r")
 
 // tspan holding one column value, for set_span's and last_tspan's own cases.
 mk_span1() {
   full_env();
   set_span("5");
 } return void;
-():() then last_tspan:(5)
-():() then check_failed:(0)
+():() then last_tspan:("tspan 5")
+():() then (import chkfail)[0]:(0)
 
 mk_span2() {
   full_env();
   set_span("9");
 } return void;
-():() then last_tspan:(9)
-():() then check_failed:(0)
+():() then last_tspan:("tspan 9")
+():() then (import chkfail)[0]:(0)

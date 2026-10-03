@@ -1,12 +1,12 @@
 // flags_setup (back/drive/run/check/flags/args.id) plus --freestanding
 // applied, for a case on nat_all_live (back/drive/sink/natives/more/
-// live.id) that needs is_freestanding() true.
+// live.id) that needs (import fsc)[0] true.
 
 fs_on_fixture() {
   flags_setup();
   arg_flags4(2, ["prog", "--freestanding"]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A second, distinct --host-triple from ut_host_seeded's (xok.id), for
@@ -18,5 +18,5 @@ build_host_fixture2() {
   flags_setup();
   arg_flags4(3, ["prog", "--host-triple", "wasm32-unknown-unknown"]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

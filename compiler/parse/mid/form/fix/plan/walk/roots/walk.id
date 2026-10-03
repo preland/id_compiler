@@ -21,9 +21,9 @@ fix_walk(int e, int ca, int cd, string nt, string an) {
   fix_walk_kids(e, cd);
   int cl = fix_class3(e);
 } chain (int e, int ca, int cd, string nt, string an) {
-  if(k_of(e) == "call") {
+  if((import nkind)[e] == "call") {
     cl = 1;
-  } else if(k_of(e) == "index") {
+  } else if((import nkind)[e] == "index") {
     cl = 2;
   }
   blank;
@@ -41,9 +41,9 @@ given fix_tokline_node_fixture (0, 0, 0, "", ""):() then calls fix_walk_kids:(0,
 given fix_tokline_node_fixture (0, 1, 0, "int", "x"):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)
 
 fix_walk_kids(int e, int cd) {
-  if(k_of(e) == "call") {
+  if((import nkind)[e] == "call") {
     fix_walk_args(e, cd);
-  } else if(k_of(e) == "bin" || k_of(e) == "index") {
+  } else if((import nkind)[e] == "bin" || (import nkind)[e] == "index") {
     fix_walk_bin(e, cd);
   } else {
     fix_walk_more(e, cd);

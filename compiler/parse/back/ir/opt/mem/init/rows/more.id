@@ -3,7 +3,7 @@
 // of the entry block alone.
 
 entry_of(int f) {
-  int[] irf_blk_v = irf_blk(f);
+  int[] irf_blk_v = (import fnblk)[f];
   int b = irf_blk_v[0];
 } return int b;
 given ir_rows (0):(0)
@@ -11,17 +11,17 @@ given ir_rows (1):(1)
 
 entry_count(int f) {
   int b = entry_of(f);
-  int n = insn_count(b);
+  int n = len(((import binsn)[b]));
 } return int n;
 given ir_rows (0):(1)
 given ir_rows (1):(0)
 
 m2r_collect_at(int f, int i) {
   int b = entry_of(f);
-  int[] blk_ins_v = blk_ins(b);
-  if(ir_op(blk_ins_v[i]) == "alloca") {
+  int[] blk_ins_v = (import binsn)[b];
+  if((import iop)[(blk_ins_v[i])] == "alloca") {
     push((import pra), blk_ins_v[i]);
   }
 } return void;
-given m2r_alloca_fixture (0, 1):() then pra_len_check:(1)
-given m2r_alloca_fixture (0, 0):() then pra_len_check:(0)
+given m2r_alloca_fixture (0, 1):() then len((import pra)):(1)
+given m2r_alloca_fixture (0, 0):() then len((import pra)):(0)

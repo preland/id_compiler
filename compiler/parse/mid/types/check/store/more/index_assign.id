@@ -14,29 +14,29 @@ chk_iassign(int id) {
     chk_iassign2(id, bt);
   }
 } return void;
-given iassign_build ((import idx_iassign_node)):() then check_failed:(0)
-given cmp_fixture ((import bin_eq)):() then check_failed:(1)
+given iassign_build ((import idx_iassign_node)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(1)
 
 // `int` exactly, not "any integral type": idc.py indexes with a C int, so a
 // word index is a real narrowing and is reported rather than silently cast.
 chk_iassign2(int id, string bt) {
-  string it = index_type(id);
+  string it = type_of(((import ni2)[id]));
   if(ty_known(it) == 1 && it != "int") {
     tc_err(id, "list index must be int, got " + it);
   } else {
     chk_iassign3(id, bt);
   }
 } return void;
-given iassign_build ((import idx_iassign_node), "int[]"):() then check_failed:(0)
-given iassign_build ((import idx_iassign_node), "string[]"):() then check_failed:(1)
+given iassign_build ((import idx_iassign_node), "int[]"):() then (import chkfail)[0]:(0)
+given iassign_build ((import idx_iassign_node), "string[]"):() then (import chkfail)[0]:(1)
 
 chk_iassign3(int id, string bt) {
-  int v = l1_of(id)[0];
+  int v = (import nl1)[id][0];
   string elem_type_v = elem_type(bt);
   if(bad_store(elem_type_v, v) == 1) {
     string type_of_v = type_of(v);
     tc_err(id, "cannot store a " + type_of_v + " into a " + bt);
   }
 } return void;
-given iassign_build ((import idx_iassign_node), "int[]"):() then check_failed:(0)
-given iassign_build ((import idx_iassign_node), "string[]"):() then check_failed:(1)
+given iassign_build ((import idx_iassign_node), "int[]"):() then (import chkfail)[0]:(0)
+given iassign_build ((import idx_iassign_node), "string[]"):() then (import chkfail)[0]:(1)

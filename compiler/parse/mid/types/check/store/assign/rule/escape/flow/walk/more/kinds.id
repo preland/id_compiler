@@ -4,7 +4,7 @@
 
 esc_node2(int e, string nm) {
   int r = 0;
-  if(k_of(e) == "bin" || k_of(e) == "index") {
+  if((import nkind)[e] == "bin" || (import nkind)[e] == "index") {
     r = esc_two(e, nm);
   } else {
     r = esc_node3(e, nm);
@@ -15,10 +15,10 @@ given esc_fix ((import efb_bin), "t"):(8)
 
 esc_node3(int e, string nm) {
   int r = 0;
-  if(k_of(e) == "un") {
-    r = esc_expr(i1_of(e), nm, 0);
-  } else if(k_of(e) == "arr") {
-    r = esc_list(l1_of(e), nm, 1);
+  if((import nkind)[e] == "un") {
+    r = esc_expr((import ni1)[e], nm, 0);
+  } else if((import nkind)[e] == "arr") {
+    r = esc_list((import nl1)[e], nm, 1);
   }
 } return int r;
 given esc_fix ((import efb_un), "p"):(1)
@@ -26,8 +26,8 @@ given esc_fix ((import efb_arr), "t"):(1)
 given esc_fix ((import efb_bin), "p"):(0)
 
 esc_two(int e, string nm) {
-  int r = esc_expr(i1_of(e), nm, 0);
-  int b = esc_expr(i2_of(e), nm, 0);
+  int r = esc_expr((import ni1)[e], nm, 0);
+  int b = esc_expr((import ni2)[e], nm, 0);
   r = r | b;
 } return int r;
 given esc_fix ((import efb_bin), "p"):(1)

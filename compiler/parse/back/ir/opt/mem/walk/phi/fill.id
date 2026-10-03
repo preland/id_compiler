@@ -21,7 +21,7 @@ given m2r_outv_fixture (0, 0):() then calls m2r_fill_one:(0, 0, 0)
 given m2r_row_fixture (0, 0):() then calls m2r_fill_one:[0]
 
 m2r_fill_one(int f, int i, int j) {
-  int[] irf_blk_v = irf_blk(f);
+  int[] irf_blk_v = (import fnblk)[f];
   m2r_incs(f, irf_blk_v[i], (import phiof)[i][j], j);
   int ret_i = j + 1;
 } return int ret_i;

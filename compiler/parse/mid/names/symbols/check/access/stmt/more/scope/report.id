@@ -7,8 +7,8 @@ report_scope(string name, string owner, int ln) {
   string scope_msg_v = scope_msg(name, owner, ln);
   var_report(loc_at_v + "variable '" + name + "' is used on line " + ln + scope_msg_v + "; a variable exists only from its declaration to the end of the block that declares it");
 } return void;
-given regrow_d ("x", "f", 10):() then check_failed:(1)
-given regrow_d ("y", "g", 20):() then check_failed:(1)
+given regrow_d ("x", "f", 10):() then (import chkfail)[0]:(1)
+given regrow_d ("y", "g", 20):() then (import chkfail)[0]:(1)
 
 scope_msg(string name, string owner, int ln) {
   int dl = decl_line(name, owner);

@@ -1,27 +1,11 @@
 // A struct's fields, read back by position, and as text for a diagnostic.
 
-// The type of field `sd_k` of a struct, or "" when there is none.
-sd_ftype_at(string sd_s, int sd_k) {
-  string t = sd_cell((import sdftype), sd_s, sd_k);
-} return string t;
-given sd_pair ("P", 1):("int")
-given sd_pair ("Q", 0):("string")
-given sd_pair ("Q", 1):("")
-
-// The name of field `sd_k`, or "" when there is none.
-sd_fname_at(string sd_s, int sd_k) {
-  string s = sd_cell((import sdfname), sd_s, sd_k);
-} return string s;
-given sd_pair ("P", 1):("y")
-given sd_pair ("P", 0):("x")
-given sd_pair ("Q", 5):("")
-
 // "x, y": the field names, for a message that says what a struct has.
 sd_fields_text(string sd_s) {
   int sd_k = 0;
   string s = "";
   while(sd_k < sd_nfields(sd_s)) {
-    s = s + sep_at(", ", sd_k) + sd_fname_at(sd_s, sd_k);
+    s = s + sep_at(", ", sd_k) + sd_cell((import sdfname), sd_s, sd_k);
     sd_k = sd_k + 1;
   }
 } return string s;

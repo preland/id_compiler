@@ -2,8 +2,8 @@
 fold_kill(int f, int id, int v) {
   m2r_drop(f, id, v, 0);
 } return void;
-given ir_rows (0, 0, 5):() then chk_op:("nop")
-given ir_rows_chk1 (0, 1, 9):() then chk_ty:("")
+given ir_rows (0, 0, 5):() then chk_op:("op nop")
+given ir_rows_chk1 (0, 1, 9):() then chk_ty:("ty ")
 
 // An "icmp ne" whose operands satisfy fold_iszext and fold_zero_of, for
 // fold_cmp/fold_one's own cases, plus fmix_id (fold_iszext true, ir_b
@@ -31,11 +31,11 @@ fold_cmp_fixture() {
   export int fq_id = ir_leaf("const", "int", 0 - 1, 0 - 1, "5");
   export int fmix_id = ir_leaf("icmp", "int", (import fzc_id), (import fzc_id), "!=");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then fc_op_check:("icmp")
 
 fc_op_check() {
-  string ret_s = ir_op((import fcmp_row));
+  string ret_s = (import iop)[(import fcmp_row)];
 } return string ret_s;
 given fold_cmp_fixture ():("icmp")
-given fold_cmp_fixture ():("icmp") then check_failed:(0)
+given fold_cmp_fixture ():("icmp") then (import chkfail)[0]:(0)

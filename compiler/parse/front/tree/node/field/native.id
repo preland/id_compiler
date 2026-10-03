@@ -1,7 +1,7 @@
 // Whether a func node is a `native` declaration: the parser marks one with 1
 // in the second int field, which an ordinary function leaves 0.
 is_native(int id) {
-  int ok = i2_of(id) == 1;
+  int ok = (import ni2)[id] == 1;
 } return int ok;
 given mk_two_nodes (0):(0)
 given mk_two_nodes (1):(1)
@@ -9,13 +9,13 @@ given mk_two_nodes (1):(1)
 // The token index push_pos stamps a new node with, and the -1 it always
 // gives the node's first-token slot (only a statement fills that in).
 last_ntok() {
-  int ret_i = lst_last((import ntok));
-} return int ret_i;
-given mk_curtk5 ():(5)
-given mk_curtk9 ():(9)
+  string ret_i_t = "ntok " + (lst_last((import ntok)));
+} return string ret_i_t;
+given mk_curtk5 ():("ntok 5")
+given mk_curtk9 ():("ntok 9")
 
 last_nst() {
-  int ret_i = lst_last((import nst));
-} return int ret_i;
-given mk_curtk5 ():(-1)
-given mk_curtk9 ():(-1)
+  string ret_i_t = "nst " + (lst_last((import nst)));
+} return string ret_i_t;
+given mk_curtk5 ():("nst -1")
+given mk_curtk9 ():("nst -1")

@@ -27,8 +27,8 @@ const_mark(int cv_on) {
   const_cases(cv_on);
   const_close();
 } return void;
-given cvl_setup (0):() then clive_str:("cb,cd,ca")
-given cvl_setup given cvl_case (1):() then clive_str:("cb,cd,cc,ca")
+given cvl_setup (0):() then clive_str:("live cb,cd,ca")
+given cvl_setup given cvl_case (1):() then clive_str:("live cb,cd,cc,ca")
 
 const_close() {
   int cv_n = 0 - 1;
@@ -37,8 +37,8 @@ const_close() {
     const_pass();
   }
 } return void;
-given cvl_setup given cvl_scan ():() then clive_str:("cb,cd,ca")
-given cvl_setup ():() then clive_str:("")
+given cvl_setup given cvl_scan ():() then clive_str:("live cb,cd,ca")
+given cvl_setup ():() then clive_str:("live ")
 
 const_pass() {
   int cv_k = 0;
@@ -48,5 +48,5 @@ const_pass() {
     cv_k = cv_k + 1;
   }
 } return void;
-given cvl_setup given cvl_scan ():() then clive_str:("cb,cd,ca")
-given cvl_setup ():() then clive_str:("")
+given cvl_setup given cvl_scan ():() then clive_str:("live cb,cd,ca")
+given cvl_setup ():() then clive_str:("live ")

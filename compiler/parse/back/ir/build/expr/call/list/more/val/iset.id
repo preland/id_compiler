@@ -6,11 +6,11 @@ lz_i() {
   export int lz_bin2 = node_bin("*", (import lz_str), (import lz_var));
   export int lz_call2 = node_call("bar", [(import lz_var)]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 lw_iset_val(int node, string elem) {
-  int[] els = l1_of(node);
+  int[] els = (import nl1)[node];
   int v = lw_expr(els[0]);
   int boxed = lw_box(v, elem);
 } return int boxed;

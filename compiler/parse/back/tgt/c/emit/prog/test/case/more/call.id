@@ -4,12 +4,12 @@
 emit_case_call(int ci) {
   int fn = (import casefn)[ci];
   string cargs = arg_names(fn);
-  string f1 = s1_of(fn);
+  string f1 = (import ns1)[fn];
 } chain (int ci) {
-  if(s2_of(fn) == "void") {
+  if((import ns2)[fn] == "void") {
     emit_line("    id_" + f1 + "(" + cargs + ");");
   } else {
-    string rt = s2_of(fn);
+    string rt = (import ns2)[fn];
     emit_ret_call(f1, rt, cargs);
   }
 } return void;
@@ -35,7 +35,7 @@ void_call_fixture() {
   push((import casegiven), "");
   push((import casegiven), "");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 emit_ret_call(string f1, string rt, string cargs) {

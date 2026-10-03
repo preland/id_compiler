@@ -4,9 +4,9 @@
 cw_report(int id, string val) {
   note_failure();
   string lit = cw_spell(val);
-  string name = s1_of(id);
+  string name = (import ns1)[id];
 } chain (int id, string val) {
-  string rt = s2_of(id);
+  string rt = (import ns2)[id];
   cw_say(name, rt, lit);
 } return void;
 given ret_widens_fn ((import widen_f), "I5"):() then prints:("<stdin>:1: error: 'f' only returns the constant 5; declare it in conf.id as 'word f = 5;' and read it with (import f)\n")

@@ -5,9 +5,9 @@
 // one is the same complaint as a function that only returns a scalar. main is
 // the entry point whatever it returns, and a native declaration has no body.
 cw_shape(int id) {
-  string rt = s2_of(id);
+  string rt = (import ns2)[id];
   int ok = rt == "int" || rt == "word" || rt == "float" || rt == "string" || rt == "int[]" || rt == "word[]" || rt == "float[]" || rt == "string[]";
-  if(is_native(id) == 1 || s1_of(id) == "main") {
+  if(is_native(id) == 1 || (import ns1)[id] == "main") {
     ok = 0;
   }
 } return int ok;
@@ -15,9 +15,9 @@ given cwv_setup ((import cwv_func)):(1)
 given ret_widens_fn ((import widen_f)):(1)
 
 cw_body(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   cw_begin(s1_of_v);
-  int[] l2_of_v = l2_of(id);
+  int[] l2_of_v = (import nl2)[id];
 } chain (int id) {
   string val = "";
   if(cw_stmts(l2_of_v) == 1) {
@@ -37,5 +37,5 @@ cw_begin(string name) {
   export string[] cw_names = [];
   export string[] cw_vals = [];
 } return void;
-("foo"):() then cur_self:("foo")
-("bar"):() then cur_self:("bar")
+("foo"):() then (import cself)[0]:("foo")
+("bar"):() then (import cself)[0]:("bar")

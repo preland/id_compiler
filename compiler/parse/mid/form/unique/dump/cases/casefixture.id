@@ -4,14 +4,14 @@ incase_init() {
   varleaf_init();
   init_cases();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 incase_fixture() {
   incase_init();
   incase_setup();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // One case range, [0, 1000), well past any node id a fresh fixture builds.
@@ -20,5 +20,5 @@ incase_setup() {
   push((import casefn), 0 - 1);
   push((import casenode), 1000);
 } return void;
-given incase_init ():() then check_failed:(0)
+given incase_init ():() then (import chkfail)[0]:(0)
 given incase_init ():() then init_units:(0)

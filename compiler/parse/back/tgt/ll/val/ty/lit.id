@@ -1,6 +1,6 @@
 
 ll_lit(int v) {
-  string s = ir_s(v);
+  string s = (import istr)[v];
   if(ll_isstr(v) == 1) {
     s = "@.str" + v;
   }
@@ -19,8 +19,8 @@ given ir_fix3 (3):("ptr @gname")
 ll_args(int id) {
   string s = "";
   int i = 0;
-  while(i < ir_l_count(id)) {
-    int[] ir_l_v = ir_l(id);
+  while(i < len(((import ilist)[id]))) {
+    int[] ir_l_v = (import ilist)[id];
     s = s + ll_sep(i) + ll_op(ir_l_v[i]);
     i = i + 1;
   }

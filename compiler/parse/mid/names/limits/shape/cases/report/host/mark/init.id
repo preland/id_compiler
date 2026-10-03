@@ -23,13 +23,16 @@
 // The runtime's own helpers first, then the call graph to a fixpoint: a sweep
 // that marks nothing new ends it, so the number of sweeps is the length of the
 // longest chain to something that cannot run.
+// utnote: utnote is the one column ut_add does not touch: check_cases writes it
+// through ut_note, so notes_push (mid/form/decomp/notesfx.id) rather than
+// ut_seeded is what puts a row in it.
 ut_mark() {
   export string[] utname = [];
   export string[] utwhat = [];
   export string[] utvia = [];
 } chain () {
   export string[] utnote = [];
-  if(is_freestanding() == 1) {
+  if((import fsc)[0] == 1) {
     ut_seed_self();
     ut_loop();
   }

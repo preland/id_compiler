@@ -1,16 +1,10 @@
 // A check's signature: no parameters, and a value to compare.
 
-vnames_len() {
-  int n = len((import vnames));
-} return int n;
-given call2_setup ():(0)
-given fcall_reg_b ():(1)
-
 then_sig(int ci, int chk_node, int cfn, string chk_nm) {
-  if(flat_arg_count(cfn) != 0) {
-    int np = flat_arg_count(cfn);
+  if(len(((import nl1)[cfn])) != 0) {
+    int np = len(((import nl1)[cfn]));
     case_err(ci, "'then' names '" + chk_nm + "', which takes " + np + " parameter(s); a check takes none and returns the value it compares");
-  } else if(s2_of(cfn) == "void") {
+  } else if((import ns2)[cfn] == "void") {
     case_err(ci, "'then' names '" + chk_nm + "', which returns void; a check takes none and returns the value it compares");
   } else {
     then_value_fit(ci, chk_node, cfn);
@@ -28,5 +22,5 @@ dupeq_ends() {
   push((import caseend), 2);
   dupeq_fns();
 } return void;
-given dupeq_fixture ():() then check_failed:(0)
+given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)

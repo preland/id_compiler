@@ -13,8 +13,8 @@ given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then ca
 given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls arity_err:((import argfn_call_mismatch), (import argfn_fn))
 
 arity_mismatch(int id, int fn) {
-  int a = flat_arg_count(id);
-  int b = flat_arg_count(fn);
+  int a = len(((import nl1)[id]));
+  int b = len(((import nl1)[fn]));
   int ok = ne_flag(a, b);
 } return int ok;
 given argfn_match_call ((import argfn_call_match), (import argfn_fn)):(0)

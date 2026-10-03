@@ -3,14 +3,6 @@
 // is at the 3-entry cap, and this one had a function's worth of room left
 // once cfp_len and dup_pair_fixture existed.
 
-// len((import cfp)) has no other zero-argument reader; uq_fill's own effect
-// is exactly that this count changes to match the current `prog`.
-cfp_len() {
-  int n = len((import cfp));
-} return int n;
-given lz_o ():(2)
-given farm_k ():(3)
-
 // Two functions, no params, whose bodies are nothing but a literal return
 // -- so their strict fingerprints collide and find_dup(1) must name 0.
 // Built directly through node_func/newnode rather than parsed, since a
@@ -29,7 +21,7 @@ dup_pair_fixture() {
   push((import prog), dpf_f2);
   uq_fill();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A "blank" leaf and a literal, in a fresh tree so the pushed value can be
@@ -41,5 +33,5 @@ blank_push_fixture() {
 } chain () {
   export int[] bp_kept_after = [bp_lit];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

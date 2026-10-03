@@ -1,7 +1,7 @@
 
 lw_rhs(int node, int slot, int bdy, int jn) {
   lw_go(bdy);
-  int i2_of_v = i2_of(node);
+  int i2_of_v = (import ni2)[node];
   int ret_i = lw_rhs_val(node, slot, i2_of_v, jn);
 } return int ret_i;
 given logic_fixture ((import and_node), 2, 0, 1):(1)

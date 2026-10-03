@@ -7,7 +7,7 @@ print_calls() {
   print_call_cases();
   print_asm_cases();
 } return void;
-given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then (import chkfail)[0]:(0)
 given edge_fixture ():() then init_units:(0)
 
 // `--calls`'s case-count section: one row per function, printed after every
@@ -22,14 +22,14 @@ print_call_cases() {
     i = i + 1;
   }
 } return void;
-given edge_fixture ():() then check_failed:(0)
+given edge_fixture ():() then (import chkfail)[0]:(0)
 given edge_fixture ():() then init_units:(0)
 
 // count_cases (mid/names/limits/shape/cases/more/flag/count.id) already
 // counts a function's cases for the two-case minimum; this reads it rather
 // than re-scanning `casefn` a second time.
 call_case_row(int i) {
-  string name = s1_of((import prog)[i]);
+  string name = (import ns1)[((import prog)[i])];
   int n = count_cases((import prog)[i]);
   string ret_s = name + "|" + (import pfile)[i] + ":" + (import pline)[i] + "|" + n;
 } return string ret_s;

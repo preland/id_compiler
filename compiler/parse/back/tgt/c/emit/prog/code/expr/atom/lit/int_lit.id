@@ -9,13 +9,13 @@ lz_n() {
   export int lz_fn9 = node_func("dup9", "int", (import f_none), [(import lz_decl9)], (import lz_dv));
   push((import prog), (import lz_fn5));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 int_code(int id) {
-  string s = s1_of(id);
-  if(i2_of(id) == 1) {
-    s = s1_of(id) + "LL";
+  string s = (import ns1)[id];
+  if((import ni2)[id] == 1) {
+    s = (import ns1)[id] + "LL";
   }
 } return string s;
 given nz_env ((import nz_int)):("7")
@@ -26,8 +26,8 @@ given nz_int_big_fixture ((import nz_int_big)):("9999999999LL")
 // prelude.id) as a compound literal, which has static storage there. Every
 // other initialiser is the expression as emitted anywhere.
 file_init(int id) {
-  string s = "ID_SK(" + c_lit(s1_of(id)) + ")";
-  if(k_of(id) != "str") {
+  string s = "ID_SK(" + c_lit((import ns1)[id]) + ")";
+  if((import nkind)[id] != "str") {
     s = emit_expr(id);
   }
 } return string s;

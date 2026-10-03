@@ -5,8 +5,8 @@
 // report), not with tc_show's plain %s.
 
 emit_then_print(int ci, int ti, int node) {
-  string kind = k_of(node);
-  int[] items = l1_of(node);
+  string kind = (import nkind)[node];
+  int[] items = (import nl1)[node];
   emit_print_check(ci, kind, items[0]);
 } return void;
 given print_fixture ((import fixture_ci), 0, (import fixture_print_node)):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")

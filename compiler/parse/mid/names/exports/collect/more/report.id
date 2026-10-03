@@ -4,7 +4,7 @@
 // Nothing is emitted once a check has failed, so the extra row is never seen.
 dupexp_err(int id, string owner) {
   string loc_at_v = loc_at(owner, (import nline)[id]);
-  string s2_of_v = s2_of(id);
+  string s2_of_v = (import ns2)[id];
   string export_owner_v = export_owner(s2_of_v);
 } chain (int id, string owner) {
   print(loc_at_v + "'" + s2_of_v + "' is already an exported global (exported by '" + export_owner_v + "')");
@@ -18,15 +18,6 @@ ifwhilefix() {
   export int[] rgdeclist = [(import rgdecl_node)];
   export int rgif_node = node_if(0, rgdeclist, rgdeclist, 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
-// One entry per exported name, pushed by add_export (../add.id) in step with
-// enames and eowners. add_export returns void and the table it builds is what
-// the later checks read, so only a reader of one of its columns can see the
-// push happen; dead_exp_fixture (../../reach/dead/more/add.id) adds two.
-etypes_len() {
-  int n = len((import etypes));
-} return int n;
-given env_init ():(0)
-given dead_exp_fixture ():(2)

@@ -15,7 +15,7 @@ init_files() {
   int ret_i = init_files_rest();
 } return int ret_i;
 ():(0)
-():(0) then check_failed:(0)
+():(0) then (import chkfail)[0]:(0)
 
 cur_file() {
   string s = "<stdin>";

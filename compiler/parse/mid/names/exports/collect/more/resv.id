@@ -4,26 +4,15 @@
 // walked again here, since it only finds the next space and is not tied to
 // bnames at all.
 
-take_resv_name(string src, int i) {
+take_name(string src, int i, string[] tn_dst) {
   int e = bname_end(src, i);
-  push_resv_name(src, i, e);
+  push_slice(tn_dst, src, i, e);
   int ret_i = e + 1;
 } return int ret_i;
-given init_resv_names ("ab cd", 0):(3)
-given init_resv_names ("cd", 0):(3)
-
-// resv_names is deliberately left uncased, because a regression here is
-// caught louder downstream. --list-untested still reports it, and will keep
-// reporting it: that tool counts cases, and nothing in it records a decision
-// not to write them. The disagreement is expected, not a drift to repair.
-// A reserved word let through as an identifier, or
-// one rejected that was fine, fails immediately in the checks that read this
-// table. A reader would be a second witness to something already unmissable.
-push_resv_name(string src, int i, int e) {
-  push_slice((import resv_names), src, i, e);
-} return void;
-given init_resv_names ("xyz", 0, 3):() then resv_names_last:("xyz")
-given init_resv_names ("wxyz", 2, 4):() then resv_names_last:("yz")
+given init_resv_names ("ab cd", 0, (import resv_names)):(3)
+given init_rtc ("print input", 0, (import bnames)):(6)
+given init_resv_names ("cd", 0, (import resv_names)):(3)
+given init_rtc ("print input read_all", 6, (import bnames)):(12)
 
 // src[i..e] pushed onto a list: what push_resv_name and push_bname
 // (../../extern/builtin/more/type.id) do, each onto its own table.

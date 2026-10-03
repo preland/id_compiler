@@ -26,8 +26,8 @@ check_rest() {
   check_shape();
   tc_all();
 } return void;
-given full_check_fixture ():() then check_failed:(1)
-given clean_check_fixture ():() then check_failed:(0)
+given full_check_fixture ():() then (import chkfail)[0]:(1)
+given clean_check_fixture ():() then (import chkfail)[0]:(0)
 
 tc_all() {
   init_tyreg();
@@ -37,8 +37,8 @@ tc_all() {
   chk_structs();
   tc_nodes();
 } return void;
-given cmp_fixture ():() then check_failed:(1)
-given leaves_fixture ():() then check_failed:(0)
+given cmp_fixture ():() then (import chkfail)[0]:(1)
+given leaves_fixture ():() then (import chkfail)[0]:(0)
 
 // A function whose check came out clean in an earlier build, and whose key
 // says nothing it depends on has changed since, is not checked again: tk/
@@ -51,5 +51,5 @@ tc_nodes() {
     i = tk_node(i);
   }
 } return void;
-given cmp_fixture ():() then check_failed:(1)
-given leaves_fixture ():() then check_failed:(0)
+given cmp_fixture ():() then (import chkfail)[0]:(1)
+given leaves_fixture ():() then (import chkfail)[0]:(0)

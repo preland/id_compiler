@@ -23,7 +23,7 @@ given ir_rows ("&&"):("0")
 given ir_rows ("||"):("1")
 
 lw_logic2(int node, int slot) {
-  int lw_fn_v = lw_fn();
+  int lw_fn_v = (import lwfn)[0];
   int bdy = ir_block(lw_fn_v, "rhs");
   int ret_i = lw_logic2_join(node, slot, bdy);
 } return int ret_i;

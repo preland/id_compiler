@@ -15,9 +15,9 @@ sd_names(int sd_i) {
     sd_err(sd_i, "struct '" + sd_nm + "' has the same name as a builtin; rename the struct");
   }
 } return void;
-given sd_pair (0):() then check_failed:(0)
+given sd_pair (0):() then (import chkfail)[0]:(0)
 given sd_pair given sd_note("Q", ["a"], ["int"], "r.id", 2) (2):() then prints:("r.id:2: error: struct 'Q' is already declared at q.id:5; declare each struct once, in a file of its own, and use that one\n")
-given sd_pair given sd_note("len", ["a"], ["int"], "l.id", 4) (2):() then check_failed:(1)
+given sd_pair given sd_note("len", ["a"], ["int"], "l.id", 4) (2):() then (import chkfail)[0]:(1)
 
 // The first row with this name, which is `len` of the table when there is none.
 sd_first_of(string sd_s) {

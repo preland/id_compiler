@@ -42,5 +42,5 @@ uq_push_segs(string[] seglist, int i) {
     j = j + 1;
   }
 } return void;
-given lz_o ([], 0):() then check_failed:(0)
-given lz_o (["X"], 0):() then check_failed:(0)
+given lz_o ([], 0):() then (import chkfail)[0]:(0)
+given lz_o (["X"], 0):() then (import chkfail)[0]:(0)

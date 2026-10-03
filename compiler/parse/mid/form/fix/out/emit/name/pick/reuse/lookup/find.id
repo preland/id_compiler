@@ -3,10 +3,10 @@
 fix_rcache_find(int i) {
   int e = (import fixe_n)[i];
   string name = "";
-  if(k_of(e) == "call") {
+  if((import nkind)[e] == "call") {
     string key = fix_rkey(e);
     int ix = find_str((import fixd_rk), key);
-    name = fix_rcache_find_at(ix);
+    name = lst_str_get_or((import fixd_rn), ix, "");
   }
 } return string name;
 given fix_pick_fixture_n (0):("")
@@ -20,7 +20,7 @@ fix_rcache_find_hit() {
   push((import fixd_rk), "|len|(|)");
   push((import fixd_rn), "cachedname");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the
@@ -29,5 +29,5 @@ fix_span_fixture1() {
   int e = node_call("len", [0 - 1]);
   fix_span_fixture2(e);
 } return void;
-given fix_span_fixture ():() then check_failed:(0)
+given fix_span_fixture ():() then (import chkfail)[0]:(0)
 given fix_span_fixture ():() then init_units:(0)

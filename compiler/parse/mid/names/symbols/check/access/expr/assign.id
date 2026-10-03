@@ -7,9 +7,9 @@
 // actions; `i1_of_v` crosses the seam because a chain is a literal
 // continuation, not a call.
 acc_assign(int id, string owner) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   acc_name(s1_of_v, owner, (import nline)[id]);
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
 } chain (int id, string owner) {
   acc_expr(i1_of_v, owner, (import nline)[id]);
 } return void;
@@ -23,11 +23,11 @@ given regrow_assign ((import regrow_assign_node), "g"):() then calls acc_name:("
 // not resolved here -- it is the thing being introduced, and build_reg has
 // already had its say about it.
 acc_stmt4(int id, string owner) {
-  if(k_of(id) == "iassign") {
+  if((import nkind)[id] == "iassign") {
     acc_iassign(id, owner);
   } else {
-    if(i1_of(id) >= 0) {
-      int i1_of_v = i1_of(id);
+    if((import ni1)[id] >= 0) {
+      int i1_of_v = (import ni1)[id];
       acc_expr(i1_of_v, owner, (import nline)[id]);
     }
     scope_add(id);
@@ -45,5 +45,5 @@ regrow_assign() {
   export int regrow_assign_val = node_int("2", 2, 0);
   export int regrow_assign_node = node_assign("z", (import regrow_assign_val));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

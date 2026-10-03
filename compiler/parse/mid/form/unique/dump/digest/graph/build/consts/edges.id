@@ -17,16 +17,16 @@ dg_const_edges() {
     dgi = dgi + 1;
   }
 } return int dglo;
-given dg_t_crows2 ():(8) then dg_nout1:(1)
-given dg_t_rows0 ():(0) then dg_nrows:(0)
+given dg_t_crows2 ():(8) then dg_nout1:("out1 1")
+given dg_t_rows0 ():(0) then len((import dg_comp)):(0)
 
 dg_const_edges_of(int dgi, int dglo) {
-  int dgr = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), s2_of((import cdecl)[dgi]), 0 - 1);
+  int dgr = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), (import ns2)[((import cdecl)[dgi])], 0 - 1);
   int dghi = (import cdecl)[dgi];
   while(dglo <= dghi) {
     dg_edge(dgr, dglo);
     dglo = dglo + 1;
   }
 } return int dglo;
-given dg_t_crows2 (1, 0):(6) then dg_nout1:(1)
-given dg_t_crows2 (0, 0):(2) then dg_nout1:(0)
+given dg_t_crows2 (1, 0):(6) then dg_nout1:("out1 1")
+given dg_t_crows2 (0, 0):(2) then dg_nout1:("out1 0")

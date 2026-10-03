@@ -1,11 +1,11 @@
 // Whether function `id` gets the call-recording hook (its body is emitted
-// while is_harn() is true, same as work-counting -- code/func/def/body/
+// while (import harn)[0] is true, same as work-counting -- code/func/def/body/
 // entry.id), and the hook itself: NAME's own parameters, by name, passed
 // straight to its recorder (def/fn.id).
 
 emit_rec_call(int id) {
-  string nm = s1_of(id);
-  if(is_harn() == 1 && is_rec_target(nm) == 1) {
+  string nm = (import ns1)[id];
+  if((import harn)[0] == 1 && is_rec_target(nm) == 1) {
     emit_rec_call_line(id, nm);
   }
 } return void;
@@ -13,19 +13,19 @@ given call_fixture ((import fixture_fn)):() then prints:("    idtc_rec_fx_target
 given call_fixture ((import fixture_zero)):() then prints:("")
 
 emit_rec_call_line(int id, string nm) {
-  int[] params = l1_of(id);
+  int[] params = (import nl1)[id];
   string nmlist = rec_param_names(params);
   emit_line("    idtc_rec_" + nm + "(" + nmlist + ");");
 } return void;
 given fn_fixture ((import fixture_fn), "fx_target"):() then prints:("    idtc_rec_fx_target(x);\n")
 given fn_fixture ((import fixture_fn), "other"):() then prints:("    idtc_rec_other(x);\n")
 
-// is_harn() true (harn_init/harn_set, test/unit/more/flag.id) and fx_target a
+// (import harn)[0] true (harn_init/harn_set, test/unit/more/flag.id) and fx_target a
 // `calls` target (calls_node_fixture) together, for emit_rec_call's own gate.
 call_fixture() {
   calls_node_fixture();
   harn_init();
-  harn_set(1);
+  lset((import harn), 0, 1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

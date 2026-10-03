@@ -8,7 +8,7 @@ print_fixture() {
   fn_fixture();
   print_fixture_items();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 print_fixture_items() {
@@ -16,7 +16,7 @@ print_fixture_items() {
   export int[] fixture_print_none = [];
   print_fixture_nodes();
 } return void;
-given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)
 
 // fixture_print_node is pushed onto thennode at index 0: emission's
@@ -28,5 +28,5 @@ print_fixture_nodes() {
   export int fixture_print_empty = newnode("thenprints", (import fixture_ci), 0, "", "", (import fixture_print_none), (import fixture_print_none));
   push((import thennode), (import fixture_print_node));
 } return void;
-given print_fixture ():() then check_failed:(0)
+given print_fixture ():() then (import chkfail)[0]:(0)
 given print_fixture ():() then init_units:(0)

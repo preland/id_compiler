@@ -19,8 +19,8 @@ given case_fixture ("fx_target", 0, 0):(0)
 
 rec_target_step(string nm, int ti, int r) {
   int node = (import thennode)[ti];
-  string kind = k_of(node);
-  if((kind == "thencalls" || kind == "thencallsn") && s1_of(node) == nm) {
+  string kind = (import nkind)[node];
+  if((kind == "thencalls" || kind == "thencallsn") && (import ns1)[node] == nm) {
     r = 1;
   }
 } return int r;

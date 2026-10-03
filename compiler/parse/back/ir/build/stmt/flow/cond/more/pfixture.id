@@ -9,7 +9,7 @@ pcall_fixture_tail(int f) {
   export int pcall_arg_n = node_int("9", 9, 0);
   export int pcall_node = node_call("gparam", [(import pcall_arg_n)]);
 } return void;
-given pcall_fixture (0):() then check_failed:(0)
+given pcall_fixture (0):() then (import chkfail)[0]:(0)
 given pcall_fixture (0):() then init_units:(0)
 
 // Two enclosing loops exiting to blocks 1 and 2 (innermost last), a `break`,
@@ -24,5 +24,5 @@ flow_ir_fixture() {
   int[] flow_ir_none = [];
   export int flow_ir_ret = newnode("ret", (import ev_node), 0, "f", "int", flow_ir_none, flow_ir_none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

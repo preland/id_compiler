@@ -27,8 +27,8 @@ reach_seed(string src_fn) {
 } chain (string src_fn) {
   rfn_reindex();
 } return void;
-given case_fixture ("myfn"):() then check_failed:(0)
-given case_fixture ("other"):() then check_failed:(0)
+given case_fixture ("myfn"):() then (import chkfail)[0]:(0)
+given case_fixture ("other"):() then (import chkfail)[0]:(0)
 
 // One setup of a multi-setup `given` (../read.id's setups_miss): raises `hit`
 // when this name is a function in the build that reaches `owner`.

@@ -6,14 +6,14 @@ iassign_build() {
   idx_build();
   export int idx_iassign_node = node_iassign((import idx_fix), (import lit_b));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 push_build() {
   idx_build();
   export int push_call = node_call("push", [(import arr_ints), (import lit_a)]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A second, compatibly-typed assignment (exprfix/lit/decl.id's assign_build
@@ -23,5 +23,5 @@ assign_build2() {
   add_var("xi", "int", 0);
   export int assign_ok = node_assign("xi", (import lit_a));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -1,16 +1,16 @@
 // The rest of the dispatch, and the `void[]` rule.
 
 tc_g3(int id) {
-  if(k_of(id) == "bin") {
+  if((import nkind)[id] == "bin") {
     chk_bin(id);
   }
-  if(k_of(id) == "call") {
+  if((import nkind)[id] == "call") {
     chk_call(id);
   }
   tc_g4(id);
 } return void;
-given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
-given leaves_fixture ((import lit_a)):() then check_failed:(0)
+given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(1)
+given leaves_fixture ((import lit_a)):() then (import chkfail)[0]:(0)
 
 // idc.py rejects `void[]` in parse_type, so it applies to every written type:
 // a parameter's, a declaration's, and a return type. Those live in the string
@@ -20,17 +20,17 @@ given leaves_fixture ((import lit_a)):() then check_failed:(0)
 // identifier cannot contain a bracket, and a string literal's text still
 // carries its quotes.
 chk_voidarr(int id) {
-  string s1_of_v = s1_of(id);
-  string s2_of_v = s2_of(id);
+  string s1_of_v = (import ns1)[id];
+  string s2_of_v = (import ns2)[id];
   void_arr_pair(id, s1_of_v, s2_of_v);
 } return void;
-given voidarr_build ((import decl_voidarr)):() then check_failed:(1)
-given decltype_fixture ((import decl_scalar)):() then check_failed:(0)
+given voidarr_build ((import decl_voidarr)):() then (import chkfail)[0]:(1)
+given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)
 
 void_arr_type(int id, string t) {
   if(ty_is_list(t) == 1 && ty_base(t) == "void") {
     tc_err(id, "'void[]' is not a valid type");
   }
 } return void;
-given cmp_fixture (0, "void[]"):() then check_failed:(1)
-given cmp_fixture (0, "int[]"):() then check_failed:(0)
+given cmp_fixture (0, "void[]"):() then (import chkfail)[0]:(1)
+given cmp_fixture (0, "int[]"):() then (import chkfail)[0]:(0)

@@ -2,7 +2,7 @@
 ll_blocks(int f) {
   int i = 0;
   while(i < blk_count(f)) {
-    int[] blks = irf_blk(f);
+    int[] blks = (import fnblk)[f];
     ll_block(blks[i]);
     i = i + 1;
   }
@@ -13,7 +13,7 @@ given ir_rows (1):() then prints:("b1:\n")
 // A parameter is spelled in the signature and a nop is what a pass left
 // behind; neither is a line of the body.
 ll_insn(int id) {
-  if(ir_op(id) != "nop" && ir_op(id) != "param") {
+  if((import iop)[id] != "nop" && (import iop)[id] != "param") {
     string ll_text_v = ll_text(id);
     emit_line("  " + ll_text_v);
   }

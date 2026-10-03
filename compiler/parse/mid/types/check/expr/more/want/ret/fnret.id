@@ -9,18 +9,18 @@ farm_i() {
   push((import pline), 7);
   export int f_other = node_func("other", "int", [(import f_pb)], (import f_none), 0 - 1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fn_ret_type(int id) {
-  string rt = s2_of(id);
+  string rt = (import ns2)[id];
   if(ty_is_func(rt) == 1) {
-    string nm = s1_of(id);
+    string nm = (import ns1)[id];
     tc_err(id, "'" + nm + "' returns " + rt + "; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it");
   }
 } return void;
-given fnret_fixture ((import fnret_bad)):() then check_failed:(1)
-given fn_fixture ((import fixture_fn)):() then check_failed:(0)
+given fnret_fixture ((import fnret_bad)):() then (import chkfail)[0]:(1)
+given fn_fixture ((import fixture_fn)):() then (import chkfail)[0]:(0)
 
 // A function whose declared return type is itself a function type, for the
 // error branch above -- fn_fixture's own fixture_fn returns plain "int".
@@ -29,5 +29,5 @@ fnret_fixture() {
   int[] none = [];
   export int fnret_bad = node_func("badret", "func(int) return int", none, none, (import fixture_zero));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

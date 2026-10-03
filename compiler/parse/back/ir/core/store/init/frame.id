@@ -19,7 +19,7 @@ init_ir4() {
   export string[] blabel = [];
   int ret_i = init_ir5();
 } return int ret_i;
-given ir_rows ():(0) then check_failed:(0)
+given ir_rows ():(0) then (import chkfail)[0]:(0)
 given ir_rows ():(0) then init_units:(0)
 
 init_ir5() {
@@ -27,7 +27,7 @@ init_ir5() {
   export string[] fnret = [];
   int ret_i = init_ir6();
 } return int ret_i;
-given ir_rows ():(0) then check_failed:(0)
+given ir_rows ():(0) then (import chkfail)[0]:(0)
 given ir_rows ():(0) then init_units:(0)
 
 init_ir6() {
@@ -35,5 +35,5 @@ init_ir6() {
   export int[] fnnode = [];
   int ret_i = init_ir8();
 } return int ret_i;
-given ir_rows ():(0) then check_failed:(0)
+given ir_rows ():(0) then (import chkfail)[0]:(0)
 given ir_rows ():(0) then init_units:(0)

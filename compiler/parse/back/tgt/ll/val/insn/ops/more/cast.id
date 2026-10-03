@@ -20,9 +20,9 @@ given env_init ("int"):("sub")
 ll_phis(int id) {
   string s = "";
   int i = 0;
-  while(i < ir_l_count(id)) {
-    int[] ir_l_v = ir_l(id);
-    s = s + ll_sep(i) + "[ " + ll_val(ir_l_v[i]) + ", %b" + ir_bl(id)[i] + " ]";
+  while(i < len(((import ilist)[id]))) {
+    int[] ir_l_v = (import ilist)[id];
+    s = s + ll_sep(i) + "[ " + ll_val(ir_l_v[i]) + ", %b" + (import iblk)[id][i] + " ]";
     i = i + 1;
   }
 } return string s;

@@ -9,5 +9,5 @@ sd_note_fixture() {
 } chain () {
   tc_types_init();
 } return void;
-():() then tcsts_len:(0)
-():() then sd_count:(3)
+():() then len((import tcsts)):(0)
+():() then len((import sdname)):(3)

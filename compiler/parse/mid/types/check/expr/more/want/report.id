@@ -9,8 +9,8 @@ tc_err(int id, string msg) {
 } chain (int id, string msg) {
   lset((import tcerrs), 0, (import tcerrs)[0] + 1);
 } return void;
-given fn_fixture ((import fixture_zero), "boom"):() then prints:("<stdin>:1: error: boom\n") then check_failed:(1)
-given fn_fixture ((import fixture_zero), "nope"):() then prints:("<stdin>:1: error: nope\n") then check_failed:(1)
+given fn_fixture ((import fixture_zero), "boom"):() then prints:("<stdin>:1: error: boom\n") then (import chkfail)[0]:(1)
+given fn_fixture ((import fixture_zero), "nope"):() then prints:("<stdin>:1: error: nope\n") then (import chkfail)[0]:(1)
 
 // Which function a node belongs to. Nodes are created in source order and a
 // function's own node is created last of all of them, so the enclosing

@@ -31,24 +31,28 @@ init_tyreg() {
   init_ty_cols();
   init_ty_rows();
 } return void;
-():() then reg_rows:(5)
+():() then len((import tyname)):(5)
 ():() then reg_last_width:(0)
 
 // The four columns. An `export` is a statement, so the columns come into
 // existence when this runs -- which is why init_tyreg() must be called before
 // any lookup, and is the first thing ../check/ does.
+// tyname: Read-back helpers for the type table's own test cases: how many rows are
+// registered, and the width of the last one added.
+// tyname: The row index of a type name, or -1. Every other lookup goes through here,
+// so "type I have never heard of" has exactly one representation.
 init_ty_cols() {
   export string[] tyname = [];
   export string[] tykind = [];
   export int[] tywidth = [];
 } return void;
-given init_tyreg ():() then reg_rows:(0)
-():() then reg_rows:(0)
+given init_tyreg ():() then len((import tyname)):(0)
+():() then len((import tyname)):(0)
 
 init_ty_rows() {
   export int[] tysigned = [];
   ty_row("int", "int", 4, 1);
   init_ty_rows2();
 } return void;
-given init_ty_cols ():() then reg_rows:(5)
+given init_ty_cols ():() then len((import tyname)):(5)
 given init_ty_cols ():() then reg_last_width:(0)

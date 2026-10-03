@@ -12,8 +12,8 @@ chk_structs() {
     sd_i = sd_i + 1;
   }
 } return void;
-given sd_pair ():() then check_failed:(0)
-given sd_pair given sd_note("P", ["z"], ["int"], "z.id", 4) ():() then check_failed:(1)
+given sd_pair ():() then (import chkfail)[0]:(0)
+given sd_pair given sd_note("P", ["z"], ["int"], "z.id", 4) ():() then (import chkfail)[0]:(1)
 
 chk_struct_one(int sd_i) {
   sd_shape(sd_i);
@@ -24,12 +24,12 @@ chk_struct_one(int sd_i) {
   sd_alone(sd_i);
   sd_same(sd_i);
 } return void;
-given sd_pair (0):() then check_failed:(0)
-given sd_pair given sd_note("Z", [], [], "z.id", 4) (2):() then check_failed:(1)
+given sd_pair (0):() then (import chkfail)[0]:(0)
+given sd_pair given sd_note("Z", [], [], "z.id", 4) (2):() then (import chkfail)[0]:(1)
 
 sd_err(int sd_i, string sd_m) {
   print((import sdfile)[sd_i] + ":" + (import sdline)[sd_i] + ": error: " + sd_m);
   note_failure();
 } return void;
-given sd_pair (0, "boom"):() then prints:("p.id:1: error: boom\n") then check_failed:(1)
-given sd_pair (1, "bang"):() then prints:("q.id:5: error: bang\n") then check_failed:(1)
+given sd_pair (0, "boom"):() then prints:("p.id:1: error: boom\n") then (import chkfail)[0]:(1)
+given sd_pair (1, "bang"):() then prints:("q.id:5: error: bang\n") then (import chkfail)[0]:(1)

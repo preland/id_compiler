@@ -4,8 +4,8 @@
 // (back/tgt/c/emit/prog/test/).
 
 fit_then_print(int chk_node) {
-  int ci = i1_of(chk_node);
-  int[] items = l1_of(chk_node);
+  int ci = (import ni1)[chk_node];
+  int[] items = (import nl1)[chk_node];
   fit_print_items(ci, items);
 } return void;
 given print_fixture ((import fixture_print_node)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
@@ -44,5 +44,5 @@ chk_fixture() {
 } chain () {
   export int[] fixture_chk_zero = [(import fixture_zero)];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -10,7 +10,7 @@ call_names_fixture() {
   export int call_e_foo = newnode("call", 0, 0, "foo", "", (import call_args), (import call_args));
   export int call_e_len = newnode("call", 0, 0, "len", "", (import call_args), (import call_args));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 call_names_fixture2() {
@@ -18,7 +18,7 @@ call_names_fixture2() {
   export int call_e_push = newnode("call", 0, 0, "push", "", (import call_args), (import call_args));
   export int call_e_pop = newnode("call", 0, 0, "pop", "", (import call_args_rev), (import call_args_rev));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // Two syscall names: "peek8" (an ordinary is_wordfn helper) and "alloc"
@@ -29,5 +29,5 @@ call_sys_fixture() {
   export int call_e_sys = newnode("call", 0, 0, "peek8", "", (import call_args), (import call_args));
   export int call_e_sys2 = newnode("call", 0, 0, "alloc", "", (import call_args), (import call_args));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

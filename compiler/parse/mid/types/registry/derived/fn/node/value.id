@@ -3,9 +3,9 @@
 // function of this program denotes that function wherever it is read.
 
 is_fn_value(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   int ok = 0;
-  if(k_of(id) == "var" && fn_node_of(s1_of_v) >= 0) {
+  if((import nkind)[id] == "var" && fn_node_of(s1_of_v) >= 0) {
     ok = 1;
   }
 } return int ok;
@@ -25,7 +25,7 @@ given fnval_fixture ((import fnval_hit)):(0)
 // The declared type of the variable a call names, or "" when it names none. A
 // builtin's name is never such a variable: the builtin is what the call means.
 callee_var_type(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   string t = lookup_var(s1_of_v, (import nunit)[id]);
   if(is_builtin(s1_of_v) == 1) {
     t = "";

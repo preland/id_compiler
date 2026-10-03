@@ -3,7 +3,7 @@
 // the body's last statement, which runs exactly where the clause did, and
 // the clause returns the name -- ret_i, ret_s, ret_li, the tree's own names.
 fix_ret(int f) {
-  int e = i1_of(f);
+  int e = (import ni1)[f];
   if(e >= 0 && fix_ret_needs(f, e) == 1) {
     fix_ret_at(f, e);
   }
@@ -12,7 +12,7 @@ given fix_ret_fixture (2):() then calls fix_ret_at:(2, 0)
 given fix_ret_fixture (4):() then calls fix_ret_at:[0]
 
 fix_ret_at(int f, int e) {
-  string t = s2_of(f);
+  string t = (import ns2)[f];
   if(fix_ret_ok(e) == 1) {
     fix_ret_emit(f, e, t);
   }

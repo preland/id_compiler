@@ -1,8 +1,8 @@
 // String concatenation, and an operand coerced to string context.
 
 emit_concat(int id) {
-  int i1_of_v = i1_of(id);
-  int i2_of_v = i2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
   string s = "id_concat(" + arg_str(i1_of_v) + ", " + arg_str(i2_of_v) + ")";
 } return string s;
 given nz_bin_concat_fixture ((import nz_bin_concat)):("id_concat(ID_S(\"hi\"), ID_S(\"yo\"))")

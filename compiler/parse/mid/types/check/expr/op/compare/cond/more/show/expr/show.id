@@ -5,8 +5,8 @@
 
 show_expr(int id) {
   string out = show_more(id);
-  if(k_of(id) == "int" || k_of(id) == "float" || k_of(id) == "str" || k_of(id) == "var") {
-    out = s1_of(id);
+  if((import nkind)[id] == "int" || (import nkind)[id] == "float" || (import nkind)[id] == "str" || (import nkind)[id] == "var") {
+    out = (import ns1)[id];
   }
 } return string out;
 given leaves_fixture ((import lit_a)):("2")
@@ -14,11 +14,11 @@ given shapes_fixture ((import call_len)):("len(hi)")
 
 show_more(int id) {
   string out = show_rest(id);
-  if(k_of(id) == "bin") {
+  if((import nkind)[id] == "bin") {
     out = show_bin(id);
   }
-  if(k_of(id) == "import") {
-    out = "(import " + s1_of(id) + ")";
+  if((import nkind)[id] == "import") {
+    out = "(import " + (import ns1)[id] + ")";
   }
 } return string out;
 given cmp_fixture ((import bin_eq)):("2 == 5")
@@ -26,13 +26,13 @@ given varleaf_fixture ((import import_vi)):("(import vi)")
 
 show_rest(int id) {
   string out = show_list(id);
-  if(k_of(id) == "un") {
-    int i1_of_v = i1_of(id);
-    out = s1_of(id) + show_side(i1_of_v);
+  if((import nkind)[id] == "un") {
+    int i1_of_v = (import ni1)[id];
+    out = (import ns1)[id] + show_side(i1_of_v);
   }
-  if(k_of(id) == "index") {
-    int i1_of_v2 = i1_of(id);
-    int i2_of_v = i2_of(id);
+  if((import nkind)[id] == "index") {
+    int i1_of_v2 = (import ni1)[id];
+    int i2_of_v = (import ni2)[id];
     out = show_side(i1_of_v2) + "[" + show_expr(i2_of_v) + "]";
   }
 } return string out;

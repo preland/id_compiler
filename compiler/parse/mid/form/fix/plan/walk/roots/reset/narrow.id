@@ -1,5 +1,11 @@
 //   fixe_nt  the parameter type a narrowing argument is declared as
 //   fixe_mv  1 for an event that moves before the statement
+// fixe_mv: One entry per event, pushed by fix_push4 (../../walk/kind/push.id) and set
+// by fix_mark_cls (one.id), whose whole effect is that lset: only a reader of
+// this column can see either happen. Filed here rather than beside its export
+// in ../../walk/roots/reset/narrow.id, which is at its three-function cap in
+// a directory at its three-entry one.
+// fixe_nt: The narrowing type pushed beside it, which fix_touch_fixture does fill.
 fix_ev_reset3() {
   export string[] fixe_nt = [];
   export int[] fixe_mv = [];
@@ -8,17 +14,6 @@ fix_ev_reset3() {
 given fix_fixture ():() then calls fix_ev_reset4:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset4:[1]
 
-// fixe_nm holds one entry per event, pushed empty by fix_push4 (../../kind/
-// push.id) and set by fix_name_at (out/emit/name/drive.id), so its length is
-// what a function that resets or pushes an event column changes. Filed here
-// rather than beside its export in emit.id, which is at its three-function
-// cap in a directory at its three-entry one.
-fixe_nm_len() {
-  int n = len((import fixe_nm));
-} return int n;
-given fix_fixture ():(0)
-given fix_push4_fixture ():(1)
-
 // One event pushed the way the walk pushes them: fix_fixture exports every
 // fixe_ column but leaves them all empty, so a reader of one of the columns
 // fix_push4 fills has nothing to tell apart without this.
@@ -26,5 +21,5 @@ fix_push4_fixture() {
   fix_fixture();
   fix_push4(0, "int");
 } return void;
-():() then check_failed:(0)
-():() then fixe_nm_len:(1)
+():() then (import chkfail)[0]:(0)
+():() then len((import fixe_nm)):(1)

@@ -9,5 +9,5 @@ parse_decl_fn(int[] pos) {
     push_func(pos);
   }
 } return void;
-given decl_tokens ([0]):() then check_failed:(0)
-given decl_tokens ([0]):() then prog_len:(1)
+given decl_tokens ([0]):() then (import chkfail)[0]:(0)
+given decl_tokens ([0]):() then len((import prog)):(1)

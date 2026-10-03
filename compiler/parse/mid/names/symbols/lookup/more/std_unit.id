@@ -30,16 +30,6 @@ case_is_std(int ci) {
 given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
 
-// nat_init's own cases (live.id) read this back to check --std-unit landed
-// in the cell; case_unit_fixture (back/tgt/c/emit/prog/test/case/emit.id)
-// gives a second, differently-sourced value so this function's own two
-// cases are not both nat_init's default.
-stdunit_check() {
-  int n = (import stdunit)[0];
-} return int n;
-given case_unit_fixture ():(6)
-given natinit_fixture_off ():(-1)
-
 // exclunit is checked len() > 0 first, the same reason the boundary check
 // above reads `boundary >= 0` before touching (import nunit)[(import
 // casefn)[ci]]: several of this file's own callers (reach.id's seed_givens/
@@ -57,3 +47,14 @@ unit_excluded(int ci) {
 } return int r;
 given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
+
+// Test check: the whole variable-name table -- how many names and which,
+// joined by "|" -- so a case states the full state it expects, not one slot of
+// it. vidx_add (../index/table/add.id) reads the table's length itself, so a
+// check of that same length would repeat its own read.
+vnames_state() {
+  string vns_j = str_join((import vnames), "|");
+  string vns_s = "vars " + len((import vnames)) + ":" + vns_j;
+} return string vns_s;
+given call2_setup ():("vars 0:")
+given fcall_reg_b ():("vars 1:h")

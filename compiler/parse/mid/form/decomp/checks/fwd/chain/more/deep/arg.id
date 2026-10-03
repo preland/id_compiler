@@ -11,7 +11,7 @@ given farm_b ([0], [3], 0):(0)
 
 fwd_arg_ok2(int argid, int pid) {
   int ok = 0;
-  if(k_of(argid) == "var" && s1_of(argid) == s2_of(pid)) {
+  if((import nkind)[argid] == "var" && (import ns1)[argid] == (import ns2)[pid]) {
     ok = 1;
   }
 } return int ok;

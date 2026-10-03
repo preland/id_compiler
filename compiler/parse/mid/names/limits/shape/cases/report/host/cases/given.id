@@ -9,12 +9,84 @@
 // the lane's free function slots are already spent (see ut_note's note,
 // ../why/note.id, for the same gap).
 ut_case_val(int ci, int e) {
-  if(k_of(e) == "cfn") {
-    string s1_of_v = s1_of(e);
-    if(ut_at(s1_of_v) >= 0) {
+  if((import nkind)[e] == "cfn") {
+    string s1_of_v = (import ns1)[e];
+    if(find_str((import utname), s1_of_v) >= 0) {
       ut_named(ci, "this case passes '", s1_of_v);
     }
   }
 } return void;
 given fn_fixture (0, (import fixture_zero)):() then calls ut_named:[0]
 given fn_fixture (0, (import fixture_fn)):() then calls ut_named:[0]
+
+// How the nodes of function `fnode` use the export `imp_nm`: 0 not at all, 1
+// reading it only, 2 writing it too (node_import_use, ../../../given/then/more/
+// calls/fit/use.id, says what a write is). A function's own node is created
+// last of all its nodes, so they are the range from wherever the previous entry
+// of `prog` ended through `fnode` (the same walk reach_funcs makes,
+// mid/names/exports/reach/dead/sweep.id); a `then (import NAME)` check is
+// refused under a function that only reads (then_imp_value, ./then.id). The
+// range also holds the previous function's case nodes, none of which is an
+// "import": a case's is a "cimport" (front/.../case/given/elem/cimport.id).
+fn_import_use(int fnode, string imp_nm) {
+  int f = 0;
+  int lo = 0;
+  while(f < len((import prog)) && (import prog)[f] < fnode) {
+    lo = (import prog)[f] + 1;
+    f = f + 1;
+  }
+} chain (int fnode, string imp_nm) {
+  int hit = 0;
+  while(lo <= fnode) {
+    hit = node_import_use(lo, imp_nm, hit);
+    lo = lo + 1;
+  }
+} return int hit;
+given then_imp_fixture ("int", 1, 0) ((import then_imp_fn), "gx"):(1)
+given then_imp_fixture ("int", 1, 0) ((import fixture_fn), "gx"):(0)
+given then_imp_fixture ("int", 1, 0) ((import then_imp_fn), "gy"):(0)
+given then_imp_fixture ("int[]", 2, 0) ((import then_imp_fn), "gx"):(2)
+
+// The state a `then (import gx)` node is checked in: the case and fx_target
+// of fn_fixture, a `given` naming no function (so nothing for reaches() to
+// walk), `gx` exported with type `ty` by "mk", a function `rd` whose body
+// reads gx, and a "thenimp" node on gx whose one value is the literal 0 --
+// with an index (also 0, or the string "a" when `indexed` is 2) when `indexed`
+// is 1 or 2. `reads` 1 makes `rd` the function the case is written under, 0
+// leaves fx_target, which reads nothing, and 2 is 1 with `rd` also binding a list name to
+// gx. A case wanting a "thenlen" node says so with `given sset((import
+// nkind), (import then_imp_node), "thenlen")` after this setup.
+then_imp_fixture(string ty, int reads, int indexed) {
+  fn_fixture();
+  push((import casegiven), "nosuch");
+  add_export("gx", ty, "mk");
+} chain (string ty, int reads, int indexed) {
+  int[] none = [];
+  export int then_imp_rd = node_import("gx");
+  if(reads == 2) {
+    node_decl("int[]", "al", (import then_imp_rd), 0);
+  }
+} chain (string ty, int reads, int indexed) {
+  export int then_imp_fn = node_func("rd", "int", none, none, (import then_imp_rd));
+  push((import prog), (import then_imp_fn));
+  int[] ixs = [];
+} chain (string ty, int reads, int indexed) {
+  if(reads > 0) {
+    push((import casefn), (import then_imp_fn));
+  } else {
+    push((import casefn), (import fixture_fn));
+  }
+  int[] vals = [(import fixture_zero)];
+} chain (string ty, int reads, int indexed) {
+  if(indexed == 1) {
+    push(ixs, (import fixture_zero));
+  } else if(indexed == 2) {
+    push(ixs, node_str("a"));
+  }
+  export int then_imp_node = newnode("thenimp", (import fixture_ci), 0, "gx", "", vals, ixs);
+} chain (string ty, int reads, int indexed) {
+  push((import thennode), (import then_imp_node));
+  export int then_imp_cix = newleaf("cimport", 0, 0, "gx", "");
+} return void;
+("int", 1, 0):() then calls add_export:[1]
+("int[]", 0, 1):() then calls node_func:[2]

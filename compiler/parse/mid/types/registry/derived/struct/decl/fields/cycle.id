@@ -10,7 +10,7 @@ sd_cycle(int sd_i) {
     sd_err(sd_i, "struct '" + sd_nm + "' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('" + sd_nm + "[] items')");
   }
 } return void;
-given sd_reg (0):() then check_failed:(0)
+given sd_reg (0):() then (import chkfail)[0]:(0)
 given sd_reg given sd_note("N", ["next"], ["N"], "n.id", 6) (2):() then prints:("n.id:6: error: struct 'N' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('N[] items')\n")
 
 // How many fields of a struct hold `sd_t`, directly or through the structs in
@@ -20,7 +20,7 @@ sd_contains(string sd_s, string sd_t, int sd_d) {
   int ok = 0;
   int sd_k = 0;
   while(sd_k < sd_nfields(sd_s) && sd_d > 0) {
-    ok = ok + sd_holds(sd_ftype_at(sd_s, sd_k), sd_t, sd_d);
+    ok = ok + sd_holds(sd_cell((import sdftype), sd_s, sd_k), sd_t, sd_d);
     sd_k = sd_k + 1;
   }
 } return int ok;
@@ -31,7 +31,7 @@ sd_holds(string sd_ft, string sd_t, int sd_d) {
   int ok = 0;
   if(sd_ft == sd_t) {
     ok = 1;
-  } else if(sd_find(sd_ft) >= 0) {
+  } else if(find_str((import sdname), sd_ft) >= 0) {
     ok = sd_contains(sd_ft, sd_t, sd_d - 1);
   }
 } return int ok;

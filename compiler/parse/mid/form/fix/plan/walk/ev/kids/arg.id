@@ -1,5 +1,5 @@
 fix_walk_arg(int e, int i, int cd) {
-  int a = l1_of(e)[i];
+  int a = (import nl1)[e][i];
   string nt = fix_narrow(e, i, a);
   fix_walk_arg2(e, i, a, cd, nt);
 } return void;
@@ -9,11 +9,11 @@ given fix_walk_arg2_fixture ((import wa2_e1), 0, 1):() then calls fix_walk_arg2:
 // an: the name to use if this argument narrows nothing itself but is named as
 // a whole anyway, because a call sits somewhere inside it (plan/walk/kind/).
 fix_walk_arg2(int e, int i, int a, int cd, string nt) {
-  string an = s1_of(e) + "_a" + i;
+  string an = (import ns1)[e] + "_a" + i;
   fix_walk(a, 1, cd, nt, an);
 } return void;
-given fix_walk_arg2_fixture ((import wa2_e1), 0, (import wa2_e1), 0, ""):() then fix_walk_arg2_an0:("caller_a0")
-given fix_walk_arg2_fixture ((import wa2_e2), 2, (import wa2_e2), 0, ""):() then fix_walk_arg2_an0:("other_a2")
+given fix_walk_arg2_fixture ((import wa2_e1), 0, (import wa2_e1), 0, ""):() then (import fixe_an)[0]:("caller_a0")
+given fix_walk_arg2_fixture ((import wa2_e2), 2, (import wa2_e2), 0, ""):() then (import fixe_an)[0]:("other_a2")
 
 // A leaf node with a one-token span (out/emit/name/pick/reuse/key.id's
 // fix_rkey), simpler than a call's (plan/walk/ev/push/one/ru.id's
@@ -24,5 +24,5 @@ fix_rkey_fixture_leaf() {
   int e = node_int("7", 7, 0);
   fix_rkey_fixture_leaf2(e);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

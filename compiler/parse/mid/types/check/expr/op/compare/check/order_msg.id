@@ -5,7 +5,7 @@ farm_j() {
   export int f_main = node_func("main", "int", (import f_none), (import f_none), 0 - 1);
   push((import prog), (import f_main));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The real fingerprint pass (mid/form/unique/scan/pass/check.id's uq_fill), run
@@ -17,7 +17,7 @@ farm_k() {
   farm_j4();
   uq_fill();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 ord_report(int id, string lt, string rt) {
@@ -26,5 +26,5 @@ ord_report(int id, string lt, string rt) {
     tc_err(id, "cannot order " + lt + " and " + rt);
   }
 } return void;
-given cmp_fixture ((import bin_lt), "int", "int"):() then check_failed:(0)
-given cmp_fixture ((import bin_lt), "string", "int"):() then check_failed:(1)
+given cmp_fixture ((import bin_lt), "int", "int"):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_lt), "string", "int"):() then (import chkfail)[0]:(1)

@@ -22,8 +22,8 @@ init_idx() {
     i = i + 1;
   }
 } return void;
-given env_init ():() then check_failed:(0)
-given call2_setup ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
+given call2_setup ():() then (import chkfail)[0]:(0)
 
 // Both indexes get their buckets in one loop: they are the same size and are
 // built at the same moment, and two loops would be the same loop twice.
@@ -32,8 +32,8 @@ push_buckets() {
   push((import vidx), new_bucket_v);
   push_fbucket();
 } return void;
-given call2_setup ():() then check_failed:(0)
-given argfn_d ():() then check_failed:(0)
+given call2_setup ():() then (import chkfail)[0]:(0)
+given argfn_d ():() then (import chkfail)[0]:(0)
 
 // Two plain int leaves in one list, for acc_elems' own cases
 // (check/access/expr/walk.id) -- a call's or a var's argument list would also
@@ -48,5 +48,5 @@ elems_fixture() {
 } chain () {
   export int[] elems_two = [(import elems_e1), (import elems_e2)];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

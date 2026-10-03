@@ -13,14 +13,14 @@ given ir_rows_chk1 (0):(1)
 // ir_block/ir_blk2 (../build.id).
 chk_last_blk_lbl() {
   int n = len((import bfunc));
-  string ret_s = blk_lbl(n - 1);
+  string ret_s = (import blabel)[(n - 1)];
 } return string ret_s;
 given ir_rows ():("body")
 given ir_rows_chk1 ():("body")
 
 chk_last_blk_fn() {
   int n = len((import bfunc));
-  int ret_i = blk_fn(n - 1);
+  int ret_i = (import bfunc)[(n - 1)];
 } return int ret_i;
 given ir_rows ():(1)
 given ir_rows_chk1 ():(1)

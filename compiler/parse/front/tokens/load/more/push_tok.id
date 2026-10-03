@@ -32,5 +32,5 @@ push_real(string kind, string text) {
   push((import ttext), text);
   push_line();
 } return void;
-given full_env ("kw", "if"):() then last_tkind:("kw") then calls push_line:()
-given full_env ("ident", "x"):() then last_tkind:("ident") then calls push_line:()
+given full_env ("kw", "if"):() then last_tkind:("tkind kw") then calls push_line:()
+given full_env ("ident", "x"):() then last_tkind:("tkind ident") then calls push_line:()

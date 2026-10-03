@@ -22,8 +22,8 @@ given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_call
 given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_calls_one), "1", 1):("1")
 
 calls_row_step(string nm, int ti, int[] params, int[] items, string out, int i) {
-  string pt = s1_of(params[i]);
-  string fld = s2_of(params[i]);
+  string pt = (import ns1)[(params[i])];
+  string fld = (import ns2)[(params[i])];
   string ret_s = calls_row_cmp(nm, ti, pt, fld, items[i], out);
 } return string ret_s;
 given calls_items_fixture ("f", 0, (import fixture_params), (import fixture_calls_one), "1", 0):("1 && (idtc_rc_f_buf[idtc_j0].x == 1)")

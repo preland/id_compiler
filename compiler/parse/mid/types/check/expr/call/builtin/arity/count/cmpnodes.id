@@ -7,7 +7,7 @@ cmp_fixture() {
   cmp_build();
   cmp_build2();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 cmp_build() {
@@ -15,7 +15,7 @@ cmp_build() {
   export int bin_lt = node_bin("<", (import lit_a), (import lit_b));
   export int bin_bitand = node_bin("&", (import lit_a), (import lit_b));
 } return void;
-given composite_fixture ():() then check_failed:(0)
+given composite_fixture ():() then (import chkfail)[0]:(0)
 given composite_fixture ():() then init_units:(0)
 
 // bin_mixed is unparenthesized (nothing here pushes it to nparen), so it is
@@ -28,5 +28,5 @@ cmp_build2() {
   export int print_call = node_call("print", [(import lit_str)]);
   export int exprstmt_bin = node_exprstmt((import bin_eq));
 } return void;
-given cmp_fixture ():() then check_failed:(0)
+given cmp_fixture ():() then (import chkfail)[0]:(0)
 given cmp_fixture ():() then init_units:(0)

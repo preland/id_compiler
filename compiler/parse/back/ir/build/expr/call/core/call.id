@@ -4,10 +4,10 @@
 
 lw_call(int node) {
   int v = 0 - 1;
-  if(sd_find(s1_of(node)) >= 0) {
+  if(find_str((import sdname), ((import ns1)[node])) >= 0) {
     v = lw_ctor(node);
   } else {
-    v = lw_call_dispatch(node, s1_of(node));
+    v = lw_call_dispatch(node, (import ns1)[node]);
   }
 } return int v;
 given ocall_fixture ((import ocall_node)):(0)

@@ -9,8 +9,8 @@
 
 ll_cell_load(int i, int j, int e) {
   string nm = "%s" + i + "." + j;
-  string name = s1_of(e);
-  string t = s1_of(const_decl(name));
+  string name = (import ns1)[e];
+  string t = (import ns1)[(const_decl(name))];
 } chain (int i, int j, int e) {
   emit_line("  %l" + i + "." + j + " = load " + ll_ty(t) + ", ptr @" + name);
   emit_line("  " + nm + " = " + ll_cell_conv(t, "%l" + i + "." + j));

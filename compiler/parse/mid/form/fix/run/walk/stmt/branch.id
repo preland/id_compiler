@@ -4,9 +4,9 @@
 // is the same value only for 0.
 
 fix_stmt(int sn, int md) {
-  if(k_of(sn) == "if") {
+  if((import nkind)[sn] == "if") {
     fix_if(sn, md);
-  } else if(k_of(sn) == "while") {
+  } else if((import nkind)[sn] == "while") {
     fix_while(sn);
   } else {
     fix_simple(sn);
@@ -18,9 +18,9 @@ given fix_if_fixture (2, 0):() then calls fix_while:(2)
 fix_if(int sn, int md) {
   fix_cond(sn, md);
   fix_then(sn);
-  int[] els = l2_of(sn);
+  int[] els = (import nl2)[sn];
 } chain (int sn, int md) {
-  if(i2_of(sn) == 1) {
+  if((import ni2)[sn] == 1) {
     fix_stmt(els[0], 2);
   } else {
     fix_block(els);
@@ -32,7 +32,7 @@ given fix_if_fixture (1, 0):() then calls fix_block:[2]
 // A declaration, an assignment and an expression statement keep their one
 // expression where an if and a while keep their condition.
 fix_cond(int sn, int md) {
-  int c = i1_of(sn);
+  int c = (import ni1)[sn];
   int[] fixp_roots = [c];
   fix_plan(sn, fixp_roots, md);
 } return void;

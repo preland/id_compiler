@@ -1,6 +1,6 @@
 fix_condop(int e, int cd) {
   int c = cd;
-  if(s1_of(e) == "&&" || s1_of(e) == "||") {
+  if((import ns1)[e] == "&&" || (import ns1)[e] == "||") {
     c = 1;
   }
 } return int c;
@@ -8,10 +8,10 @@ given fix_walk_arg2_fixture ((import wa2_e1), 0):(0)
 given fix_walk_arg2_fixture ((import wa2_e2), 1):(1)
 
 fix_walk_more(int e, int cd) {
-  if(k_of(e) == "un") {
-    int a = i1_of(e);
+  if((import nkind)[e] == "un") {
+    int a = (import ni1)[e];
     fix_walk(a, 0, cd, "", "");
-  } else if(k_of(e) == "arr") {
+  } else if((import nkind)[e] == "arr") {
     fix_walk_arr(e, cd);
   }
 } return void;
@@ -26,5 +26,5 @@ fix_walk_more_fixture() {
   export int wm_un = newleaf("un", a, 0, "-", "");
   export int wm_arr = node_arr([a]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -16,7 +16,7 @@ chk_call(int id) {
   chk_call2(id);
 } return void;
 given call2_setup ((import cm_push_call)):() then calls chk_push:((import cm_push_call))
-given argfn_match_call ((import argfn_call_match)):() then check_failed:(0)
+given argfn_match_call ((import argfn_call_match)):() then (import chkfail)[0]:(0)
 
 // A two-argument `push`. The arity is part of the test because a call written
 // with the wrong number of arguments is a different diagnostic (idc.py's
@@ -24,7 +24,7 @@ given argfn_match_call ((import argfn_call_match)):() then check_failed:(0)
 // call would abort on the bounds check instead of reporting anything.
 is_push2(int id) {
   int ok = 0;
-  if(k_of(id) == "call" && s1_of(id) == "push" && flat_arg_count(id) == 2) {
+  if((import nkind)[id] == "call" && (import ns1)[id] == "push" && len(((import nl1)[id])) == 2) {
     ok = 1;
   }
 } return int ok;

@@ -6,7 +6,7 @@ init_rest() {
   init_d();
   init_sym();
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
 init_c() {
@@ -14,7 +14,7 @@ init_c() {
   export int[][] nl1 = [];
   export int[][] nl2 = [];
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
 init_d() {
@@ -22,5 +22,5 @@ init_d() {
   export string[] vnames = [];
   export string[] vtypes = [];
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

@@ -17,7 +17,7 @@ seed_tested() {
 } chain () {
   int ci = 0;
   while(ci < len((import casefn))) {
-    string s1_of_v = s1_of((import casefn)[ci]);
+    string s1_of_v = (import ns1)[((import casefn)[ci])];
     if(case_is_std(ci) == 0) {
       reach_add(s1_of_v);
     }
@@ -34,8 +34,8 @@ seed_tested() {
     ni = ni + 1;
   }
 } return void;
-given rfnfx_setup ():() then rfn_first:("conf.id")
-given seed_given_fixture ():() then rfn_len:(2)
+given rfnfx_setup ():() then (import rfn)[0]:("conf.id")
+given seed_given_fixture ():() then len((import rfn)):(2)
 
 // A "push" call whose own argument is itself a call, for chk_flat_at's
 // positive case (mid/names/limits/expr/nest.id) -- cm_setup's cm_push_call is
@@ -45,7 +45,7 @@ flat_call_fixture() {
   cm_setup();
   export int flat_outer_call = node_call("outer", [(import cm_push_call)]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // flat_outer_call is itself two calls deep (outer(push(...))), so wrapping it
@@ -57,5 +57,5 @@ flat_deep_call_fixture() {
   export int[] flat_deep_args = [(import cm_push_call), (import flat_outer_call)];
   export int flat_deep_call = node_call("mid", flat_deep_args);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

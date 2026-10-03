@@ -4,7 +4,7 @@
 // effect of emit_expr, inside emit_seq -- lands before the chain's first
 // line rather than at this level's own, possibly later, position.
 cond_text_of(int if_id) {
-  int cond_id = i1_of(if_id);
+  int cond_id = (import ni1)[if_id];
   string cond_text = emit_expr(cond_id);
 } return string cond_text;
 given stmt_fix (4):("5")
@@ -17,5 +17,5 @@ sq_based() {
   env_init();
   lset((import sqbase), 0, 20);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

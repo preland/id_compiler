@@ -5,7 +5,7 @@
 // them, and a declaration beside a definition of one symbol is not something
 // LLVM accepts.
 ll_declares() {
-  if(is_runtime() == 0) {
+  if((import rtc)[0] == 0) {
     ll_decl_block();
   }
   int i = 0;
@@ -32,11 +32,11 @@ ll_decl_block() {
   emit_line("");
 } return void;
 given ll_env_fixture2 ():() then calls ll_decl_cmp:[1]
-given ll_env_fixture2 ():() then check_failed:(0)
+given ll_env_fixture2 ():() then (import chkfail)[0]:(0)
 
 ll_decl_cmp() {
   string lw_strcmp_v = lw_strcmp();
   emit_line("declare i32 @" + lw_strcmp_v + "(ptr, ptr)");
 } return void;
 given ll_env_fixture1 ():() then prints:("declare i32 @strcmp(ptr, ptr)\n")
-given ll_env_fixture1 ():() then check_failed:(0)
+given ll_env_fixture1 ():() then (import chkfail)[0]:(0)

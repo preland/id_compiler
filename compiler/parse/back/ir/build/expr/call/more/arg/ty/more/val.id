@@ -10,7 +10,7 @@ given bicall_fixture ((import bicall_node), 0):(0)
 // has been shown to be a real node. The type itself is mid/'s param_type,
 // which is the same three lines -- writing them again is a compile error.
 lw_has_par(int f, int i) {
-  int[] pars = l1_of(f);
+  int[] pars = (import nl1)[f];
   int n = len(pars);
   int ok = i < n;
 } return int ok;

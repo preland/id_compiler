@@ -3,14 +3,14 @@
 // value in `outv` back to the predecessor that produced it.
 
 m2r_pre_at(int b, int i) {
-  int[] blk_pre_v = blk_pre(b);
+  int[] blk_pre_v = (import bpred)[b];
   int pb = blk_pre_v[i];
 } return int pb;
 given br_fixture_p (1, 0):(0)
 given prefx2_setup (1, 1):(9)
 
 m2r_pos(int f, int b) {
-  int[] irf_blk_v = irf_blk(f);
+  int[] irf_blk_v = (import fnblk)[f];
   int ret_i = lst_index_of(irf_blk_v, b);
 } return int ret_i;
 given cfg_fixture (0, 0):(0)
@@ -26,9 +26,11 @@ phiof_sum() {
   int n = 0;
   int i = 0;
   while(i < len((import phiof))) {
-    n = n + phiof_row_sum(i);
+    n = n + lst_sum((import phiof)[i]);
     i = i + 1;
   }
-} return int n;
-given m2r_row_fixture ():(0)
-given m2r_outv_fixture ():(-1)
+} chain () {
+  string phiof_t = "phiof " + n;
+} return string phiof_t;
+given m2r_row_fixture ():("phiof 0")
+given m2r_outv_fixture ():("phiof -1")

@@ -5,12 +5,12 @@
 // than assumed -- otherwise `"a" % 2` would draw the wrong explanation.
 
 chk_mod(int id) {
-  int i1_of_v = i1_of(id);
-  int i2_of_v = i2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
   mod_types(id, i1_of_v, i2_of_v);
 } return void;
-given cmp_fixture ((import bin_bitand)):() then check_failed:(0)
-given cmp_fixture ((import bin_eq)):() then check_failed:(0)
+given cmp_fixture ((import bin_bitand)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
 
 is_logop(string s) {
   int ok = 0;

@@ -5,7 +5,7 @@
 // naming, since two reads of one call and a write between them can all sit
 // in the one statement, after the whole statement has already been walked.
 fix_rcache_taint(int e) {
-  if(k_of(e) == "call" && fix_call_touch(e) == 1) {
+  if((import nkind)[e] == "call" && fix_call_touch(e) == 1) {
     fix_rcache_reset();
   }
 } return void;
@@ -21,7 +21,7 @@ fix_rcache_taint_fixture() {
   int e1 = node_call("unknownfn", [0 - 1]);
   fix_rcache_taint_fixture2(e1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fix_rcache_taint_fixture2(int e1) {
@@ -29,5 +29,5 @@ fix_rcache_taint_fixture2(int e1) {
   export int rt_e1 = e1;
   export int rt_e2 = e2;
 } return void;
-given fix_rcache_taint_fixture (0):() then check_failed:(0)
+given fix_rcache_taint_fixture (0):() then (import chkfail)[0]:(0)
 given fix_rcache_taint_fixture (0):() then init_units:(0)

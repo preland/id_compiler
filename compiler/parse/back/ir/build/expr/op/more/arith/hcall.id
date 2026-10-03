@@ -8,7 +8,7 @@
 // that both emit instructions, written as two arguments of one call, are
 // emitted in whichever order the C compiler chose.
 lw_hcall(int node, int a, int b, string t) {
-  string s1_of_v = s1_of(node);
+  string s1_of_v = (import ns1)[node];
   string h = lw_helper(s1_of_v, t);
   int ret_i = lw_hcall_lhs(h, a, b, t);
 } return int ret_i;

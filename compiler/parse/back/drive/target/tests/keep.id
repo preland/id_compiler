@@ -30,8 +30,8 @@ emit_test_kept(string triple) {
 } chain (string triple) {
   const_mark(0);
 } return void;
-given void_call_fixture given kept_natoff_fixture given init_reach given harn_init given init_asm given init_asm2 given dg_init ("abc"):() then calls emit_test_unit:("abc") then prog_len:(1)
-given void_call_fixture given kept_natoff_fixture given init_reach given harn_init given init_asm given init_asm2 given dg_init ("xyz"):() then calls emit_test_unit:("xyz") then prog_len:(1)
+given void_call_fixture given kept_natoff_fixture given init_reach given harn_init given init_asm given init_asm2 given dg_init ("abc"):() then calls emit_test_unit:("abc") then len((import prog)):(1)
+given void_call_fixture given kept_natoff_fixture given init_reach given harn_init given init_asm given init_asm2 given dg_init ("xyz"):() then calls emit_test_unit:("xyz") then len((import prog)):(1)
 
 // Two gaps void_call_fixture's narrower cases never hit: nat_scan's own
 // natc/natkey/natrow, without natcall_fixture's env_init (which would wipe
@@ -45,8 +45,8 @@ kept_natoff_fixture() {
   nat_init(1, ["prog"]);
   push((import casestart), 0);
 } return void;
-given env_init ():() then check_failed:(0)
-given env_init ():() then nat_on_check:(0)
+given env_init ():() then (import chkfail)[0]:(0)
+given env_init ():() then (import natc)[0]:(0)
 
 // A single name in casegiven (given.id's own seed_givens), for a case that
 // cannot otherwise see whether the loop reached reach_add: rfn_len reads the
@@ -57,5 +57,5 @@ seed_given_fixture() {
   init_reach();
   push((import casegiven), "fx_target");
 } return void;
-():() then check_failed:(0)
-():() then rfn_len:(2)
+():() then (import chkfail)[0]:(0)
+():() then len((import rfn)):(2)

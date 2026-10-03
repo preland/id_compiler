@@ -2,7 +2,7 @@
 // is asked whether it escapes.
 
 esc_params(int fn) {
-  int[] ps = l1_of(fn);
+  int[] ps = (import nl1)[fn];
   int m = 0 - 1;
   if(len(ps) <= 15) {
     m = esc_bits(fn, ps);
@@ -23,7 +23,7 @@ given esc_fix ((import efa_fn), (import efa_ps)):(32770)
 given esc_fix ((import efb_fn), (import efb_ps)):(1)
 
 esc_pbit(int fn, int pn, int i) {
-  string nm = s2_of(pn);
+  string nm = (import ns2)[pn];
   int f = esc_func(fn, nm);
   int b = ((f & 1) << i) | (((f & 12) != 0) << (15 + i));
 } return int b;

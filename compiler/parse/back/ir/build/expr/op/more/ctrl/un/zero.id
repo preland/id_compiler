@@ -17,7 +17,7 @@ given bound_fixture (5, "int", "icmp"):(4)
 given bound_fixture (5, "float", "fcmp"):(4)
 
 lw_not(int node) {
-  int i1_of_v = i1_of(node);
+  int i1_of_v = (import ni1)[node];
   string t = lw_ety(i1_of_v);
   int ret_i = lw_not_val(node, i1_of_v, t);
 } return int ret_i;

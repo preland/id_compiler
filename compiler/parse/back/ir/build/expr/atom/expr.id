@@ -5,7 +5,7 @@
 
 lw_expr(int node) {
   int v = 0 - 1;
-  if(k_of(node) == "var" || k_of(node) == "import") {
+  if((import nkind)[node] == "var" || (import nkind)[node] == "import") {
     v = lw_named(node);
   } else {
     v = le2(node);
@@ -16,7 +16,7 @@ given lw_fix_int ((import fix_int_n)):(0)
 
 le2(int node) {
   int v = 0 - 1;
-  if(k_of(node) == "int" || k_of(node) == "float" || k_of(node) == "str") {
+  if((import nkind)[node] == "int" || (import nkind)[node] == "float" || (import nkind)[node] == "str") {
     v = lw_lit(node);
   } else {
     v = le3(node);
@@ -27,7 +27,7 @@ given lw_fix_bin ((import fix_bin_n)):(2)
 
 le3(int node) {
   int v = 0 - 1;
-  if(k_of(node) == "bin") {
+  if((import nkind)[node] == "bin") {
     v = lw_bin(node);
   } else {
     v = le4(node);

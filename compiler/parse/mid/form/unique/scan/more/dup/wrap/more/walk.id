@@ -19,11 +19,11 @@ given cw_decl_fixture ((import cw_func_list)):(0)
 
 cw_stmt(int id) {
   int ok = 0;
-  if(k_of(id) == "decl" && i2_of(id) != 1) {
-    string s2_of_v = s2_of(id);
+  if((import nkind)[id] == "decl" && (import ni2)[id] != 1) {
+    string s2_of_v = (import ns2)[id];
     ok = cw_put(id, s2_of_v);
   }
-  if(k_of(id) == "assign") {
+  if((import nkind)[id] == "assign") {
     ok = cw_assign(id);
   }
 } return int ok;
@@ -40,5 +40,5 @@ cw_assign_fixture() {
   int e3 = node_int("5", 5, 0);
   export int cw_assign_y = node_assign("y", e3);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

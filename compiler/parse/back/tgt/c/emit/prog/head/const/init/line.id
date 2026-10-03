@@ -21,7 +21,7 @@ given cl_setup ("k"):() then prints:("    k = id_list_lit(1, (long long)(5));\n 
 
 init_line(string name) {
   int d = const_decl(name);
-  int i1_of_v = i1_of(d);
+  int i1_of_v = (import ni1)[d];
   string ret_s = "    " + name + " = " + emit_expr(i1_of_v) + ";";
 } return string ret_s;
 given cl_setup ("k"):("    k = id_list_lit(1, (long long)(5));")

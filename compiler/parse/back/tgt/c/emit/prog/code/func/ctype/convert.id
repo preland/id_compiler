@@ -38,7 +38,7 @@ given lc_env2 ("func() return void"):("__typeof__(void (*)(void))")
 // the checks have not already accepted -- but it is now one place rather than
 // four, and it cannot be reached by forgetting a case.
 c_scalar(string t) {
-  int r = ty_find(t);
+  int r = find_str((import tyname), t);
   string ct = "int";
   if(r >= 0) {
     ct = (import tyc)[r];

@@ -22,8 +22,8 @@ report_dup(int i, int j) {
   string tail_v = dup_tail(j);
   print(loc_at_v + "function '" + name_i + "' has the same signature and logic as " + tail_v);
 } return void;
-given lz_o (1, 0):() then check_failed:(1)
-given lz_o (0, 1):() then check_failed:(1)
+given lz_o (1, 0):() then (import chkfail)[0]:(1)
+given lz_o (0, 1):() then (import chkfail)[0]:(1)
 
 // The one place a fingerprint's index becomes a function. `cfpfn` (../../fill.id)
 // records the owner of every entry in `cfp`, so the two indexes stay distinct
@@ -32,7 +32,7 @@ given lz_o (0, 1):() then check_failed:(1)
 // reporting a collision against the wrong function.
 fname_at(int i) {
   int fi = (import cfpfn)[i];
-  string ret_s = s1_of((import prog)[fi]);
+  string ret_s = (import ns1)[((import prog)[fi])];
 } return string ret_s;
 given lz_o (0):("dup5")
 given lz_o (1):("dup9")

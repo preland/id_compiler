@@ -6,7 +6,7 @@
 
 is_fld_idx(int id) {
   int ok = 0;
-  if(k_of(i2_of(id)) == "fld") {
+  if((import nkind)[((import ni2)[id])] == "fld") {
     ok = 1;
   }
 } return int ok;
@@ -22,8 +22,8 @@ chk_access(int id) {
     chk_index(id);
   }
 } return void;
-given sd_use_fixture ((import sd_ix)):() then check_failed:(0)
-given sd_use_fixture ((import sd_iz)):() then check_failed:(1)
+given sd_use_fixture ((import sd_ix)):() then (import chkfail)[0]:(0)
+given sd_use_fixture ((import sd_iz)):() then (import chkfail)[0]:(1)
 
 // A write through an index: the same split.
 chk_iasg(int id) {
@@ -34,5 +34,5 @@ chk_iasg(int id) {
     chk_iassign(id);
   }
 } return void;
-given sd_use_fixture ((import sd_wx)):() then check_failed:(0)
-given sd_use_fixture ((import sd_wz)):() then check_failed:(1)
+given sd_use_fixture ((import sd_wx)):() then (import chkfail)[0]:(0)
+given sd_use_fixture ((import sd_wz)):() then (import chkfail)[0]:(1)

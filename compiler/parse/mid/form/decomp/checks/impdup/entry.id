@@ -11,9 +11,9 @@ check_imp_dup() {
   imd_fill();
   imd_scan();
 } return void;
-given lz_o ():() then check_failed:(0)
-given imd_pair_base ():() then check_failed:(1)
-given imd_thin_base ():() then check_failed:(0)
+given lz_o ():() then (import chkfail)[0]:(0)
+given imd_pair_base ():() then (import chkfail)[0]:(1)
+given imd_thin_base ():() then (import chkfail)[0]:(1)
 
 // prog = [dup5, dup9] (index 1: dup9), and the real strict fingerprint pass
 // over it: they differ in a literal, which the strict fingerprint keeps.
@@ -22,7 +22,7 @@ lz_o() {
   push((import prog), (import lz_fn9));
   uq_fill();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // prog = [ima, imb]: no parameters, two statements each, each returning a
@@ -48,5 +48,5 @@ imd_pair_base() {
 } chain () {
   uq_fill();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

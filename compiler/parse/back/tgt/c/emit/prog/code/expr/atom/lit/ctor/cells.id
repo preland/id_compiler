@@ -14,7 +14,7 @@ given sd_use_fixture ("Q", [(import sd_str)]):("(long long)(intptr_t)(ID_S(s))")
 
 ctor_cell(string sd_nm, int sd_a, int sd_k) {
   string sd_code = emit_expr(sd_a);
-  string sd_ft = sd_ftype_at(sd_nm, sd_k);
+  string sd_ft = sd_cell((import sdftype), sd_nm, sd_k);
   string ret_s = box(sd_code, sd_ft);
 } return string ret_s;
 given sd_use_fixture ("P", (import sd_one), 1):("(long long)(1)")

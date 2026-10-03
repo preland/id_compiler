@@ -2,7 +2,7 @@
 // helper's definition. A harness on the build host already has one, from the
 // host's C runtime, so it would run the host's and never this tree's.
 
-// Refused: ut_self_at calls is_runtime() (mid/names/exports/extern/note.id)
+// Refused: ut_self_at calls (import rtc)[0] (mid/names/exports/extern/note.id)
 // unconditionally, which traps unless a case's `given` also ran init_rtc;
 // fn_fixture and edge_fixture (../../given/then/more/fixture/fn.id, back/
 // drive/run/check/dce/emit/calls/fixture/setup.id), the fixtures with a real
@@ -21,7 +21,7 @@ ut_seed_self() {
 given resv_scan_fixture ():() then calls ut_self_at:(0) then calls ut_self_at:(1)
 given resv_scan_fixture given rt_fixture given ut_mark ():() then calls ut_add:("eprint", "the runtime helper 'eprint', which a harness on the build host takes from its own C runtime instead", "*")
 
-// Refused: ut_self_at's own marking branch needs is_runtime()==1 (only
+// Refused: ut_self_at's own marking branch needs (import rtc)[0]==1 (only
 // rt_fixture, mid/names/exports/extern/note.id, gives that) at the same time
 // as a real `prog` entry whose name is_reserved_name recognises (only
 // resv_scan_fixture, mid/form/unique/scan/more/reserved/check.id, gives that);
@@ -31,8 +31,8 @@ given resv_scan_fixture given rt_fixture given ut_mark ():() then calls ut_add:(
 // spare function slots in the lane are already spent on the dup-case and
 // given/read fixtures) to add the combining fixture this would need.
 ut_self_at(int i) {
-  if(is_runtime() == 1 && is_reserved_name(i)) {
-    string s1_of_v = s1_of((import prog)[i]);
+  if((import rtc)[0] == 1 && is_reserved_name(i)) {
+    string s1_of_v = (import ns1)[((import prog)[i])];
     ut_add(s1_of_v, "the runtime helper '" + s1_of_v + "', which a harness on the build host takes from its own C runtime instead", "*");
   }
 } return void;

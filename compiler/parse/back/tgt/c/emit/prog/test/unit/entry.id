@@ -18,7 +18,7 @@
 emit_tests_maybe(int argc, string[] argv) {
   harn_init();
   if(arg_flag(argc, argv, 1, "--harness") == 1) {
-    string build_host_v = build_host();
+    string build_host_v = (import hostc)[0];
     emit_tests(build_host_v);
   }
 } return void;
@@ -36,10 +36,10 @@ emit_tests(string triple) {
   emit_line("/* ---- end of test harness ---- */");
 } return void;
 given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n")
-given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then check_failed:(0)
+given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then (import chkfail)[0]:(0)
 
 emit_test_unit(string triple) {
-  harn_set(1);
+  lset((import harn), 0, 1);
   emit_test_head();
   emit_test_body(triple);
 } return void;

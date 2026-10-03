@@ -24,8 +24,8 @@ parse_blank(int[] pos) {
   skip_semi(pos);
   int ret_i = newleaf(bare_kw, 0 - 1, 0, "", "");
 } return int ret_i;
-given stmt_tokens ([42]):(0) then check_failed:(0)
-given flow_tokens ([0]):(0) then check_failed:(1)
+given stmt_tokens ([42]):(0) then (import chkfail)[0]:(0)
+given flow_tokens ([0]):(0) then (import chkfail)[0]:(1)
 
 // An early `return`, or on to the rest of the statement forms.
 parse_ret_or(int[] pos) {

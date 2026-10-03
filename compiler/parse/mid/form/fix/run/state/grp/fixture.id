@@ -10,7 +10,7 @@ fix_fixture() {
   fix_state();
   fix_fixture2();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fix_fixture2() {
@@ -18,7 +18,7 @@ fix_fixture2() {
   init_bnames();
   init_idx();
 } return void;
-given fix_fixture ():() then check_failed:(0)
+given fix_fixture ():() then (import chkfail)[0]:(0)
 given fix_fixture ():() then init_units:(0)
 
 // The two parenthesis tokens (plan/walk/ev/push/one/ru.id's fix_span_fixture
@@ -28,5 +28,5 @@ fix_span_fixture5(int e) {
   push((import ttext), ")");
   fix_span_fixture6(e);
 } return void;
-given fix_span_fixture (0):() then check_failed:(0)
+given fix_span_fixture (0):() then (import chkfail)[0]:(0)
 given fix_span_fixture (0):() then init_units:(0)

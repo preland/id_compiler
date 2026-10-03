@@ -1,20 +1,20 @@
 // The rest of lw_fin: the statements, once the parameters have their slots.
 lw_fin_tail(int node) {
-  int[] l2_of_v = l2_of(node);
+  int[] l2_of_v = (import nl2)[node];
   lw_stmts(l2_of_v);
   lw_ret(node);
 } return void;
-given lw_func_fixture ((import g_fnnode)):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode)):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
 // The rest of lw_ret, once the entry block and the branch into the body are
 // in hand.
 lw_ret_tail(int node, int lw_ent_v, int lw_brto_v) {
   ir_add(lw_ent_v, lw_brto_v);
-  string s2_of_v = s2_of(node);
+  string s2_of_v = (import ns2)[node];
   lw_ret_val(node, s2_of_v);
 } return void;
-given lw_func_fixture ((import g_fnnode), 0, 2):() then check_failed:(0)
+given lw_func_fixture ((import g_fnnode), 0, 2):() then (import chkfail)[0]:(0)
 given lw_func_fixture ((import g_fnnode), 0, 2):() then init_units:(0)
 
 // bound_fixture plus a minimal "func" node ("g" returning int, no params,
@@ -25,5 +25,5 @@ lw_func_fixture() {
   int[] none = [];
   export int g_fnnode = node_func("g", "int", none, [(import decl_node)], (import ev_node));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

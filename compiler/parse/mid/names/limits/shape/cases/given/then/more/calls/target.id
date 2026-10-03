@@ -4,8 +4,8 @@
 // backend's, not id's to instrument).
 
 fit_then_calls(string kind, int chk_node) {
-  int ci = i1_of(chk_node);
-  string nm = s1_of(chk_node);
+  int ci = (import ni1)[chk_node];
+  string nm = (import ns1)[chk_node];
   fit_calls_name(kind, ci, nm, chk_node);
 } return void;
 given calls_node_fixture ("thencalls", (import fixture_calls_node)):() then prints:("")

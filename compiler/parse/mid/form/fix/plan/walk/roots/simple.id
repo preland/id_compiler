@@ -1,7 +1,7 @@
 fix_simple(int sn) {
-  if(k_of(sn) == "iassign") {
+  if((import nkind)[sn] == "iassign") {
     fix_iassign(sn);
-  } else if(k_of(sn) == "decl" || k_of(sn) == "assign" || k_of(sn) == "exprstmt") {
+  } else if((import nkind)[sn] == "decl" || (import nkind)[sn] == "assign" || (import nkind)[sn] == "exprstmt") {
     fix_cond(sn, 0);
   }
 } return void;
@@ -10,8 +10,8 @@ given fix_simple_fixture ((import sim_decl)):() then calls fix_cond:((import sim
 
 // `xs[i] = v` evaluates the list, then the index, then the value (docs/SPEC.md 7).
 fix_iassign(int sn) {
-  int[] vl = l1_of(sn);
-  int[] fixp_roots = [i1_of(sn), i2_of(sn), vl[0]];
+  int[] vl = (import nl1)[sn];
+  int[] fixp_roots = [(import ni1)[sn], (import ni2)[sn], vl[0]];
   fix_plan(sn, fixp_roots, 0);
 } return void;
 given fix_simple_fixture ((import sim_ia)):() then calls fix_plan:((import sim_ia), (import sim_roots), 0)

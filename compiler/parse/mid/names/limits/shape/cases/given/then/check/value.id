@@ -4,7 +4,7 @@
 // name-vs-shape check itself is then_fn's chain (../entry.id).
 
 then_value_fit(int ci, int chk_node, int cfn) {
-  int[] items = l1_of(chk_node);
+  int[] items = (import nl1)[chk_node];
   if(len(items) != 1) {
     int ne = len(items);
     case_err(ci, "a 'then' check compares exactly one value, not " + ne);
@@ -16,11 +16,11 @@ given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixtu
 given then_node_fixture ((import fixture_ci), (import fixture_then_node), (import fixture_fn)):() then prints:("fixture.id:4: error: a 'then' check compares exactly one value, not 0\n")
 
 then_lit(int ci, int e, int cfn) {
-  if(k_of(e) == "cimport") {
+  if((import nkind)[e] == "cimport") {
     string lt = lit_text(e);
     case_err(ci, "a 'then' check compares a literal; " + lt + " may only be an argument or an expected value");
   } else {
-    string rt = s2_of(cfn);
+    string rt = (import ns2)[cfn];
     fit_value(ci, e, rt);
   }
 } return void;
@@ -36,5 +36,5 @@ dupeq_fns() {
   push((import casefn), (import dupeq_node));
   push((import casefn), (import dupeq_node));
 } return void;
-given dupeq_fixture ():() then check_failed:(0)
+given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)

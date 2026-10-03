@@ -2,7 +2,7 @@
 // literal as conf.id would take it, e.g. '[1, 2, 3]'.
 
 cw_arr_spell(int id) {
-  int[] els = l1_of(id);
+  int[] els = (import nl1)[id];
   string out = "[" + cw_arr_spell_items(els) + "]";
 } return string out;
 given cwv_setup ((import cwv_arr)):("[1, \"hi\"]")
@@ -21,10 +21,10 @@ given cwv_setup ([]):("")
 
 // A string element is re-quoted; an int or a float already reads as source.
 cw_elem_spell(int e) {
-  string k = k_of(e);
-  string out = s1_of(e);
+  string k = (import nkind)[e];
+  string out = (import ns1)[e];
   if(k == "str") {
-    out = "\"" + s1_of(e) + "\"";
+    out = "\"" + (import ns1)[e] + "\"";
   }
 } return string out;
 given cwv_setup (0):("1")

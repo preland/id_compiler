@@ -23,8 +23,3 @@ string builtin_src = "print input read_all len push pop to_int charat chr put fl
 // startup. Kept in step with runtime.id by hand; tests/stdlib.sh asserts the
 // two agree.
 string resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink at block_free box_f charat chr concat err_write flush freed_trap getkey idiv imod input len list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek32 peek64 peek8 peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore ticks to_int trap udiv ult umod unbox_f ushr";
-// A function of at most this many statements is exempt from the import-only
-// near-duplicate error (mid/form/decomp/checks/impdup/canon/pos.id): it is a
-// named accessor of a module's global, with no logic to share. The one place
-// to change when the exemption moves to a fingerprint-size threshold.
-int impdup_exempt_stmts = 1;

@@ -28,8 +28,8 @@ chain_loop(int[] pos, int[] params, int[] body) {
     take_chain(pos, params, body);
   }
 } return void;
-given decl_tokens ([33], [], []):() then check_failed:(0)
-given decl_tokens ([35], [], []):() then check_failed:(0)
+given decl_tokens ([33], [], []):() then (import chkfail)[0]:(0)
+given decl_tokens ([35], [], []):() then (import chkfail)[0]:(0)
 
 // The parameters are restated for the reader, and must match exactly -- they
 // name the same values, so a restatement that disagrees is a mistake about
@@ -39,5 +39,5 @@ take_chain(int[] pos, int[] params, int[] body) {
   int[] restated = parse_params(pos, "param");
   chain_tail(pos, params, restated, body);
 } return void;
-given decl_tokens ([33], [], []):() then check_failed:(1)
-given decl_tokens ([35], [], []):() then check_failed:(1)
+given decl_tokens ([33], [], []):() then (import chkfail)[0]:(1)
+given decl_tokens ([35], [], []):() then (import chkfail)[0]:(1)

@@ -8,8 +8,8 @@ dg_succ(int dgv, int dgi) {
     dgi = dgi + 1;
   }
 } return void;
-given dg_t_graph (4, 0):() then dg_ncomp:(1)
-given dg_t_graph (4, 1):() then dg_ncomp:(0)
+given dg_t_graph (4, 0):() then (import dg_ctr)[1]:(1)
+given dg_t_graph (4, 1):() then (import dg_ctr)[1]:(0)
 
 dg_step(int dgv, int dgw) {
   if((import dg_ix)[dgw] < 0) {
@@ -19,13 +19,13 @@ dg_step(int dgv, int dgw) {
     dg_lower(dgv, (import dg_ix)[dgw]);
   }
 } return void;
-given dg_t_graph (4, 3):() then dg_ncomp:(1)
-given dg_t_scc (4, 3):() then dg_ncomp:(4)
+given dg_t_graph (4, 3):() then (import dg_ctr)[1]:(1)
+given dg_t_scc (4, 3):() then (import dg_ctr)[1]:(4)
 
 dg_lower(int dgv, int dglv) {
   if(dglv < (import dg_low)[dgv]) {
     lset((import dg_low), dgv, dglv);
   }
 } return void;
-given dg_t_graph (0, -1):() then dg_low0:(-1)
-given dg_t_graph (0, 5):() then dg_low0:(0)
+given dg_t_graph (0, -1):() then (import dg_low)[0]:(-1)
+given dg_t_graph (0, 5):() then (import dg_low)[0]:(0)

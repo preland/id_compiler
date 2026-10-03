@@ -5,8 +5,8 @@
 
 add_export2(int id, string owner) {
   chk_dupexp(id, owner);
-  string s2_of_v = s2_of(id);
-  string s1_of_v = s1_of(id);
+  string s2_of_v = (import ns2)[id];
+  string s1_of_v = (import ns1)[id];
 } chain (int id, string owner) {
   add_export(s2_of_v, s1_of_v, owner);
 } return void;
@@ -14,7 +14,7 @@ given lz_j ((import lz_edecl), "fn1"):() then calls chk_dupexp:[1]
 given dead_exp_fixture ((import dead_imp_a), "fn2"):() then calls find_str:[1]
 
 chk_dupexp(int id, string owner) {
-  string s2_of_v = s2_of(id);
+  string s2_of_v = (import ns2)[id];
   if(find_str((import enames), s2_of_v) >= 0) {
     dupexp_err(id, owner);
   }

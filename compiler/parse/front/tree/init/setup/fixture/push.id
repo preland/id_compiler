@@ -9,14 +9,14 @@ push_toks(string[] kinds, string[] texts) {
     i = i + 1;
   }
 } return void;
-given env_init (["ident", "op"], ["x", "("]):() then check_failed:(0)
-given env_init (["kw"], ["int"]):() then check_failed:(0)
+given env_init (["ident", "op"], ["x", "("]):() then (import chkfail)[0]:(0)
+given env_init (["kw"], ["int"]):() then (import chkfail)[0]:(0)
 
 // The second int field of the most recently created node, for a case whose
 // function under test returns a node id it cannot itself compare a field of
 // (a `then` check takes no arguments).
 last_i2() {
-  int ret_i = lst_last((import ni2));
-} return int ret_i;
-given fixture_neg_lit_node ():(0)
-given mk_two_nodes ():(1)
+  string ret_i_t = "i2 " + (lst_last((import ni2)));
+} return string ret_i_t;
+given fixture_neg_lit_node ():("i2 0")
+given mk_two_nodes ():("i2 1")

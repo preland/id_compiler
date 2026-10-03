@@ -2,13 +2,13 @@
 // the value must fit the field's type the way a value fits any slot.
 
 chk_fstore(int id, string sd_bt) {
-  string sd_f = s1_of(i2_of(id));
+  string sd_f = (import ns1)[((import ni2)[id])];
   if(ty_known(sd_bt) == 1) {
     chk_fstore_at(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_wx), "P"):() then check_failed:(0)
-given sd_use_fixture ((import sd_wn), "int"):() then check_failed:(1)
+given sd_use_fixture ((import sd_wx), "P"):() then (import chkfail)[0]:(0)
+given sd_use_fixture ((import sd_wn), "int"):() then (import chkfail)[0]:(1)
 
 chk_fstore_at(int id, string sd_bt, string sd_f) {
   if(ty_is_struct(sd_bt) == 0) {
@@ -19,15 +19,15 @@ chk_fstore_at(int id, string sd_bt, string sd_f) {
     chk_fvalue(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_wx), "P", "x"):() then check_failed:(0)
+given sd_use_fixture ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
 given sd_use_fixture ((import sd_wz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y\n")
 
 chk_fvalue(int id, string sd_bt, string sd_f) {
-  int sd_v = l1_of(id)[0];
-  string sd_ft = sd_ftype_at(sd_bt, sd_fpos(sd_bt, sd_f));
+  int sd_v = (import nl1)[id][0];
+  string sd_ft = sd_cell((import sdftype), sd_bt, (sd_fpos(sd_bt, sd_f)));
   if(bad_store(sd_ft, sd_v) == 1) {
     tc_err(id, "cannot store a " + type_of(sd_v) + " into field '" + sd_f + "' (" + sd_ft + ") of struct '" + sd_bt + "'");
   }
 } return void;
-given sd_use_fixture ((import sd_wx), "P", "x"):() then check_failed:(0)
+given sd_use_fixture ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
 given sd_use_fixture ((import sd_ws), "P", "x"):() then prints:("<stdin>:1: error: cannot store a string into field 'x' (int) of struct 'P'\n")

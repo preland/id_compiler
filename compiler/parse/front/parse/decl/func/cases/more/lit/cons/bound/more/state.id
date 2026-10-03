@@ -41,6 +41,23 @@ init_cases() {
 ():() then calls init_cases2:[1]
 ():() then calls init_cases2:()
 
+// casegiven: casegiven[0] as it stands, for given_fit's cases: a check takes no
+// arguments, and what it must show is that the cut-down list was put back.
+// consbound: The bound a claim gives that kind, the third of the three. claim_cols_rest
+// (back/tgt/c/emit/prog/test/judge/more/claim/more/group.id) reaches
+// claim_cols_bounds, so the fixture that leaves one kind row leaves two.
+// conscase: cons_push (rest.id) pushes the three claim columns in step, one entry each
+// per claim, so a reader of any one of them sees that push happen -- but only
+// that one: deleting either of the other two pushes would leave this count
+// exactly where it was. That is why each column has a reader of its own, and
+// why cons_push's cases check all three at once: the columns must grow
+// together, and only asserting them together says so.
+// conskind: The kind a claim constrains, pushed by cons_push (../../../../more/lit/
+// cons/rest.id) beside the case index and the bound. Filed here because the
+// cons directory has one free function slot and the three parallel columns
+// need a reader each -- conscase_len (../../../../more/lit/cons/list.id) says
+// why one cannot stand for the others.
+// uroots: How many unit roots bin/idc passed (root.id), for its cases.
 init_cases2() {
   export int[] conscase = [];
   export string[] conskind = [];
@@ -68,5 +85,5 @@ init_cases2() {
 } chain () {
   export int[] casegargs = [];
 } return void;
-():() then consbound_len:(0)
-given claim_cols_fixture ():() then consbound_len:(0)
+():() then len((import consbound)):(0)
+given claim_cols_fixture ():() then len((import consbound)):(0)

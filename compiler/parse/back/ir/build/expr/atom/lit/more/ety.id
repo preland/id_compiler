@@ -5,7 +5,7 @@
 lw_ety(int node) {
   string t = type_of(node);
   if(t == "") {
-    string s1_of_v = s1_of(node);
+    string s1_of_v = (import ns1)[node];
     t = lw_vty(s1_of_v);
   }
 } return string t;
@@ -22,7 +22,7 @@ given lw_env_fixture (5, "word"):(0)
 // short-circuiting `&&`, and nothing else so far.
 lw_tmp(string ty) {
   int v = ir_leaf("alloca", ty, 0 - 1, 0 - 1, "");
-  int lw_ent_v = lw_ent();
+  int lw_ent_v = (import lwent)[0];
   ir_add(lw_ent_v, v);
 } return int v;
 given lw_env_fixture ("int"):(0) then ir_last_b:(0)

@@ -3,7 +3,7 @@
 // the count form's single value, an int.
 
 fit_calls_body(string kind, int ci, string nm, int cfn, int chk_node) {
-  int[] items = l1_of(chk_node);
+  int[] items = (import nl1)[chk_node];
   if(kind == "thencalls") {
     fit_calls_args(ci, nm, cfn, items);
   } else {
@@ -14,9 +14,9 @@ given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import
 given calls_node_fixture ("thencallsn", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
 
 fit_calls_args(int ci, string nm, int cfn, int[] items) {
-  if(len(items) != flat_arg_count(cfn)) {
+  if(len(items) != len(((import nl1)[cfn]))) {
     int na = len(items);
-    int np = flat_arg_count(cfn);
+    int np = len(((import nl1)[cfn]));
     case_err(ci, "this case's 'calls " + nm + "' passes " + na + " argument(s), which takes " + np);
   } else {
     fit_items(ci, cfn, items);

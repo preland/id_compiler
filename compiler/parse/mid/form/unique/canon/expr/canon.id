@@ -25,16 +25,16 @@
 // parser uses to size a literal (../../../front/parse/expr/atom/lit/int/is_bigdec.id).
 canon_expr(int id) {
   string out = ce2(id);
-  if(k_of(id) == "int") {
-    string spell = s1_of(id);
+  if((import nkind)[id] == "int") {
+    string spell = (import ns1)[id];
     out = "I" + strip_zeros(spell);
   }
-  if(k_of(id) == "float") {
-    out = "F" + s1_of(id);
+  if((import nkind)[id] == "float") {
+    out = "F" + (import ns1)[id];
   }
 } chain (int id) {
-  if(k_of(id) == "fld") {
-    out = "f." + s1_of(id);
+  if((import nkind)[id] == "fld") {
+    out = "f." + (import ns1)[id];
   }
 } return string out;
 given un_fixture ((import ev_node)):("I7")
@@ -43,10 +43,10 @@ given sd_use_fixture ((import sd_lx)):("f.x")
 
 ce2(int id) {
   string out = ce3(id);
-  if(k_of(id) == "str") {
-    out = "S" + s1_of(id);
+  if((import nkind)[id] == "str") {
+    out = "S" + (import ns1)[id];
   }
-  if(k_of(id) == "var") {
+  if((import nkind)[id] == "var") {
     out = canon_var(id);
   }
 } return string out;
@@ -58,10 +58,10 @@ given lz_c ((import lz_imp)):("g(0)")
 // global they read are different functions.
 ce3(int id) {
   string out = ce4(id);
-  if(k_of(id) == "import") {
+  if((import nkind)[id] == "import") {
     out = imp_fp(id);
   }
-  if(k_of(id) == "bin") {
+  if((import nkind)[id] == "bin") {
     out = canon_bin(id);
   }
 } return string out;

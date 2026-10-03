@@ -7,7 +7,7 @@
 // idtc_show_K, and neither exists for a type nothing else noted.
 
 emit_then_calls(int ci, int ti, int node) {
-  string kind = k_of(node);
+  string kind = (import nkind)[node];
   if(kind == "thencalls") {
     emit_calls_args(ci, ti, node);
   } else {
@@ -29,13 +29,13 @@ given calls_items_fixture ("fx_target", 0, (import fixture_params)):("fputs(\"fx
 ("g", 2, []):("fputs(\"g(\", stderr); ")
 
 note_calls(int node) {
-  string nm = s1_of(node);
+  string nm = (import ns1)[node];
   int cfn = func_node(nm);
-  int[] ps = l1_of(cfn);
+  int[] ps = (import nl1)[cfn];
 } chain (int node) {
   int i = 0;
   while(i < len(ps)) {
-    string pt = s1_of(ps[i]);
+    string pt = (import ns1)[(ps[i])];
     note_ty(pt);
     i = i + 1;
   }

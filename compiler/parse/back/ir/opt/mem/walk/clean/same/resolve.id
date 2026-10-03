@@ -5,7 +5,7 @@
 m2r_same(int id) {
   int v = 0 - 1;
   int i = 0;
-  while(i < ir_l_count(id)) {
+  while(i < len(((import ilist)[id]))) {
     v = m2r_pick(id, i, v);
     i = i + 1;
   }
@@ -15,10 +15,10 @@ given irlfx_setup ((import irlfx_id)):(-2)
 
 m2r_pick(int id, int i, int v) {
   int r = 0 - 2;
-  if(ir_l(id)[i] == id || ir_l(id)[i] == v) {
+  if((import ilist)[id][i] == id || (import ilist)[id][i] == v) {
     r = v;
   } else if(v == 0 - 1) {
-    r = ir_l(id)[i];
+    r = (import ilist)[id][i];
   }
 } return int r;
 given irlfx_setup ((import irlfx_id), 0, -1):(10)
@@ -32,5 +32,5 @@ m2r_drop(int f, int id, int v, int n) {
   ir_kill(id);
   int ret_i = n + 1;
 } return int ret_i;
-given ir_rows (0, 0, 99, 5):(6) then chk_op:("nop") then chk_ty:("")
-given ir_rows (1, 1, 77, 2):(3) then chk_op:("add") then chk_ty:("int")
+given ir_rows (0, 0, 99, 5):(6) then chk_op:("op nop") then chk_ty:("ty ")
+given ir_rows (1, 1, 77, 2):(3) then chk_op:("op add") then chk_ty:("ty int")

@@ -26,7 +26,7 @@ given lz_c ((import lz_binid)):("b+(v0,I3)")
 given arith_fixture ((import bin_node)):("I14")
 
 bin_op(int id) {
-  string op = s1_of(id);
+  string op = (import ns1)[id];
   if(op == "=") {
     op = "==";
   }
@@ -35,8 +35,8 @@ given lz_c ((import lz_binid)):("+")
 given lz_c ((import lz_i1)):("3")
 
 bin_pair(int id) {
-  int i1_of_v = i1_of(id);
-  int i2_of_v = i2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
   string ret_s = canon_pair(i1_of_v, i2_of_v);
 } return string ret_s;
 given lz_c ((import lz_binid)):("(v0,I3)")

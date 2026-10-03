@@ -2,14 +2,14 @@
 
 ll_init_elems(int i, string pass) {
   int d = const_decl((import enames)[i]);
-  int e = i1_of(d);
+  int e = (import ni1)[d];
   ll_init_elems2(i, e, pass);
 } return void;
 given lc_dce_setup (0, "build"):() then prints:("  call void @id_list_push(ptr %c0, i64 1)\n")
 given lc_dce_setup (0, "bytes"):() then prints:("")
 
 ll_init_elems2(int i, int e, string pass) {
-  int[] els = l1_of(e);
+  int[] els = (import nl1)[e];
   int j = 0;
   while(j < len(els)) {
     ll_init_elem(i, j, els[j], pass);
@@ -21,7 +21,7 @@ given elems2_fixture (0, (import llie_e), "bytes"):() then prints:("")
 
 // A string element's bytes, named for the constant and the position.
 ll_elem_bytes(int i, int j, int e) {
-  string spell = s1_of(e);
+  string spell = (import ns1)[e];
   ll_str_bytes("@.cs." + (import enames)[i] + "." + j, spell);
 } return void;
 given elems3_fixture (0, 0, (import llie_child)):() then prints:("@.cs.a.0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.cs.a.0 = private alias i8, getelementptr inbounds (i8, ptr @.cs.a.0.d, i64 8)\n")

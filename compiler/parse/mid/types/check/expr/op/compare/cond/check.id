@@ -4,12 +4,12 @@
 // registry answers directly: "unit" is the kind of a type with no values, and
 // a value is exactly what a condition needs.
 chk_cond(int id, string msg) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string type_of_v = type_of(i1_of_v);
   cond_kind(id, msg, type_of_v);
 } return void;
-given cmp_fixture ((import bin_eq), "bad cond"):() then check_failed:(0)
-given cmp_fixture ((import bin_mixed), "bad cond"):() then check_failed:(0)
+given cmp_fixture ((import bin_eq), "bad cond"):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_mixed), "bad cond"):() then (import chkfail)[0]:(0)
 
 // A function value is a value, but not a truth: C would test the address,
 // which is never zero, so the condition would always hold.
@@ -19,11 +19,11 @@ cond_kind(int id, string msg, string t) {
   } else if(ty_kind(t) == "func") {
     tc_err(id, "a condition cannot be a function value (" + t + "); call it, and test what it returns");
   } else if(ty_kind(t) == "struct") {
-    tc_err(id, "a condition cannot be a struct (" + t + "); test one of its fields, as in " + sd_fname_at(t, 0) + " > 0");
+    tc_err(id, "a condition cannot be a struct (" + t + "); test one of its fields, as in " + sd_cell((import sdfname), t, 0) + " > 0");
   }
 } return void;
-given cmp_fixture (0, "bad cond", "void"):() then check_failed:(1)
-given cmp_fixture (0, "bad cond", "int"):() then check_failed:(0)
+given cmp_fixture (0, "bad cond", "void"):() then (import chkfail)[0]:(1)
+given cmp_fixture (0, "bad cond", "int"):() then (import chkfail)[0]:(0)
 given sd_bi_fixture ((import sd_if), "bad cond", "P"):() then prints:("<stdin>:1: error: a condition cannot be a struct (P); test one of its fields, as in x > 0\n")
 
 // `==`, `!=` and id's bare `=` compare; `< <= > >=` order. is_eqop already
@@ -36,5 +36,5 @@ chk_bin(int id) {
   chk_bits(id);
   chk_mixed(id);
 } return void;
-given cmp_fixture ((import bin_eq)):() then check_failed:(0)
-given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(1)

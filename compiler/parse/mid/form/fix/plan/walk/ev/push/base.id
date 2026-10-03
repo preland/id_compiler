@@ -3,23 +3,6 @@ fix_push3(int e, int lo, int cl) {
   push((import fixe_lo), lo);
   push((import fixe_cl), cl);
 } return void;
-given fix_fixture (7, 0, 1):() then fixe_n_len:(1)
-given fix_touch_fixture (7, 0, 1):() then fixe_n_len:(3)
+given fix_fixture (7, 0, 1):() then len((import fixe_n)):(1)
+given fix_touch_fixture (7, 0, 1):() then len((import fixe_n)):(3)
 
-// fixe_n gets one entry per event and is pushed here and nowhere else, so its
-// length is what this function changes. A `then` check takes no parameters,
-// so a function whose whole effect is a push can only be observed through a
-// reader of the column it pushes to -- fixe_cl already has fix_pr_cl0
-// (../one/push.id).
-fixe_n_len() {
-  int n = len((import fixe_n));
-} return int n;
-given fix_fixture ():(0)
-given fix_touch_fixture ():(2)
-
-// The other column pushed in step with it: the first event of the subtree.
-fixe_lo_len() {
-  int n = len((import fixe_lo));
-} return int n;
-given fix_fixture ():(0)
-given fix_touch_fixture ():(2)

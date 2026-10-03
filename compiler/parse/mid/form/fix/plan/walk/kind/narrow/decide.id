@@ -1,7 +1,7 @@
 fix_unsafe_rhs(int e) {
-  int b = i2_of(e);
+  int b = (import ni2)[e];
   int ok = 1;
-  if(k_of(b) == "int" && i1_of(b) > 0 && i2_of(b) == 0) {
+  if((import nkind)[b] == "int" && (import ni1)[b] > 0 && (import ni2)[b] == 0) {
     ok = 0;
   }
 } return int ok;

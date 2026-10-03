@@ -2,7 +2,7 @@
 
 both_str(int id) {
   int ok = 0;
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   if(type_of(i1_of_v) == "string" && is_i2_str(id) == 1) {
     ok = 1;
   }
@@ -14,7 +14,7 @@ given nz_bin_add_fixture ((import nz_bin_add)):(0)
 // it is a name -- not a call -- on the right of `&&`, and so it is read only
 // when the left operand is already a string.
 is_i2_str(int id) {
-  int e = i2_of(id);
+  int e = (import ni2)[id];
   string t = type_of(e);
   int ok = t == "string";
 } return int ok;
@@ -23,7 +23,7 @@ given nz_bin_add_fixture ((import nz_bin_add)):(0)
 
 // The tail of emit_infix, once the left operand and the operator are known.
 infix_line(int id, int i1_of_v, string s1_of_v) {
-  int i2_of_v = i2_of(id);
+  int i2_of_v = (import ni2)[id];
   string s = "(" + emit_expr(i1_of_v) + " " + map_op(s1_of_v) + " " + emit_expr(i2_of_v) + ")";
 } return string s;
 given nz_bin_add_fixture ((import nz_bin_add), (import nz_int), "+"):("(7 + 3)")

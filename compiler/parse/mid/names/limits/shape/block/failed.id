@@ -3,12 +3,6 @@
 // driver decides what to do with it. An exported scalar may only be assigned
 // by the function that declares it, so the flag is a one-element list.
 
-check_failed() {
-  int ret_i = (import chkfail)[0];
-} return int ret_i;
-given env_init ():(0)
-given chkfail_raised ():(1)
-
 // Writing through an imported list needs the list as a parameter: an
 // index-assignment is only recognised when the target is a plain identifier.
 // That helper used to live here under a private name; it is idstd's `lset`,
@@ -17,12 +11,12 @@ given chkfail_raised ():(1)
 note_failure() {
   lset((import chkfail), 0, 1);
 } return void;
-given env_init ():() then check_failed:(1)
-given full_env ():() then check_failed:(1)
+given env_init ():() then (import chkfail)[0]:(1)
+given full_env ():() then (import chkfail)[0]:(1)
 
 regrow_fn() {
   regrow_param();
   export int regrow_fn_node = node_func("g2", "int", (import regrow_plist), (import regrow_plist), 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

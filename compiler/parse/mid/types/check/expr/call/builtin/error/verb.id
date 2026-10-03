@@ -8,7 +8,7 @@ farm_f() {
   export int f_weird = node_func("weird", "int", [(import f_pa)], [(import f_if)], 0 - 1);
   export int f_exprstmt = node_exprstmt((import f_call));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 bi_verb(string want) {
@@ -27,5 +27,5 @@ bi_flush_setup() {
   int[] none = [];
   export int bi_flush_call = node_call("flush", none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

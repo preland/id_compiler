@@ -1,10 +1,4 @@
 
-lw_ent() {
-  int ret_i = (import lwent)[0];
-} return int ret_i;
-given ir_rows ():(0)
-given lw_fixture ():(2)
-
 // Create an instruction and append it to the block being built. Everything
 // with an effect or a position goes through here; a constant and a global do
 // not, because neither is ever emitted -- both print as text at each use.
@@ -21,5 +15,5 @@ lw_reset() {
     pop((import lwslot));
   }
 } return void;
-given lw_fixture_vars ():() then chk_lwvar_len:(0)
-given lw_fixture ():() then chk_lwvar_len:(0)
+given lw_fixture_vars ():() then len((import lwvar)):(0)
+given lw_fixture ():() then len((import lwvar)):(0)

@@ -5,24 +5,17 @@
 m2r_inc_at(int f, int ph, int j, int pb) {
   int pi = m2r_pos(f, pb);
   m2r_inc_val(ph, j, pi);
-  int[] bl = ir_bl(ph);
+  int[] bl = (import iblk)[ph];
 } chain (int f, int ph, int j, int pb) {
   push(bl, pb);
 } return void;
-given m2r_outv_fixture (0, 0, 0, 0):() then chk_l:([-1]) then chk_bl:([0])
-given m2r_outv_fixture (1, 0, 0, 1):() then chk_l:([-1]) then chk_bl:([1])
+given m2r_outv_fixture (0, 0, 0, 0):() then chk_l:([-1]) then chk_bl:("bl 0")
+given m2r_outv_fixture (1, 0, 0, 1):() then chk_l:([-1]) then chk_bl:("bl 1")
 
 m2r_inc_val(int ph, int j, int pi) {
-  int[] l = ir_l(ph);
+  int[] l = (import ilist)[ph];
   push(l, (import outv)[pi][j]);
 } return void;
 given m2r_outv_fixture (0, 0, 0):() then chk_l:([-1])
-given m2r_outv_fixture (0, 0, 0):() then chk_bl:([])
+given m2r_outv_fixture (0, 0, 0):() then chk_bl:("bl ")
 
-// One row of phiof, for phiof_sum (at.id): a loop inside a loop is already
-// at the nesting limit, so the inner one cannot sit in the reader itself.
-phiof_row_sum(int i) {
-  int n = lst_sum((import phiof)[i]);
-} return int n;
-given m2r_row_fixture (0):(0)
-given m2r_outv_fixture (0):(-1)

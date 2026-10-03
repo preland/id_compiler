@@ -4,7 +4,7 @@
 
 ut_what(string callee_nm) {
   string what_s = ut_leaf(callee_nm);
-  int ut_k = ut_at(callee_nm);
+  int ut_k = find_str((import utname), callee_nm);
   if(ut_k >= 0) {
     what_s = (import utwhat)[ut_k];
   }
@@ -17,7 +17,7 @@ given ut_host_seeded ("nothing_marked"):("")
 // for that triple selects it (docs/ASM.md), so a function with one is runnable.
 ut_leaf(string callee_nm) {
   string what_s = ut_native(callee_nm);
-  string build_host_v = build_host();
+  string build_host_v = (import hostc)[0];
   if(find_str((import afname), callee_nm) >= 0 && asm_row(callee_nm, build_host_v) < 0) {
     string asm_triples_v = asm_triples(callee_nm);
     what_s = "asm '" + callee_nm + "', which has no body for that triple (defined for: " + asm_triples_v + ")";

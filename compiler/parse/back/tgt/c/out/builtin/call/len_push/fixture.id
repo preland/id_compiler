@@ -11,7 +11,7 @@ call_env_fixture() {
   init_bnames();
   init_idx();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 call_int_fixture() {
@@ -19,7 +19,7 @@ call_int_fixture() {
   export int call_e1 = node_int("5", 5, 0);
   export int call_e2 = node_int("4", 4, 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // call_args_rev is the same two nodes in the other order -- what gives
@@ -30,5 +30,5 @@ call_args_fixture() {
   export int[] call_args = [(import call_e1), (import call_e2)];
   export int[] call_args_rev = [(import call_e2), (import call_e1)];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

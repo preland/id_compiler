@@ -4,7 +4,7 @@
 
 emit_arr(int id) {
   string s = "id_list_lit(0)";
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   if(len(l1_of_v) > 0) {
     s = emit_arr_n(id);
   }
@@ -13,7 +13,7 @@ given lit_int_fixture ((import lit_e)):("id_list_lit(0)")
 given lit_arr_fixture ((import lit_arr_e)):("id_list_lit(2, (long long)(5), (long long)(4))")
 
 emit_arr_n(int id) {
-  int[] elems = l1_of(id);
+  int[] elems = (import nl1)[id];
   string etyp = type_of(elems[0]);
   string ret_s = arr_lit(elems, etyp);
 } return string ret_s;

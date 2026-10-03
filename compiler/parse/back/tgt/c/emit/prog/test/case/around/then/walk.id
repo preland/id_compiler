@@ -14,7 +14,7 @@ given print_fixture ((import fixture_ci)):() then prints:("    if (!((strcmp(idt
 given calls_node_fixture ((import fixture_ci)):() then prints:("    int idtc_hit0 = 0;\n    for (int idtc_j0 = 0; idtc_j0 < idtc_rc_fx_target_kept; idtc_j0++) {\n        if (idtc_rc_fx_target_seq[idtc_j0] > idtc_seek && (1 && (idtc_rc_fx_target_buf[idtc_j0].x == 1))) {\n            idtc_hit0 = 1;\n            idtc_seek = idtc_rc_fx_target_seq[idtc_j0];\n            break;\n        }\n    }\n    if (!idtc_hit0) {\n        int idtc_sk0 = idtc_calls_skipped(idtc_rc_fx_target_seq, idtc_rc_fx_target_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to 'fx_target'%s\", idtc_where[0], idtc_call[0], \"fx_target(1)\", idtc_rc_fx_target_kept - idtc_sk0, idtc_sk0 ? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k0 = 0; idtc_k0 < idtc_rc_fx_target_kept; idtc_k0++) {\n            int idtc_j0 = (idtc_k0 + idtc_sk0) % idtc_rc_fx_target_kept;\n            if (idtc_calls_item(idtc_k0, idtc_rc_fx_target_kept, idtc_sk0)) { fputs(\"fx_target(\", stderr); fprintf(stderr, \"%d\", idtc_rc_fx_target_buf[idtc_j0].x); fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_fx_target_n, idtc_rc_fx_target_kept);\n        return 3;\n    }\n")
 
 then_at(int ci, int ti) {
-  if(i1_of((import thennode)[ti]) == ci) {
+  if((import ni1)[((import thennode)[ti])] == ci) {
     emit_then(ci, ti);
   }
 } return void;
@@ -23,7 +23,7 @@ given print_fixture (99, 0):() then prints:("")
 
 emit_then(int ci, int ti) {
   int node = (import thennode)[ti];
-  string kind = k_of(node);
+  string kind = (import nkind)[node];
   emit_then_kind(kind, ci, ti, node);
 } return void;
 given print_fixture ((import fixture_ci), 0):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")

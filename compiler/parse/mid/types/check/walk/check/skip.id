@@ -26,8 +26,8 @@ tk_check(int i, int tkf) {
     lset((import tkbad), tkf, 1);
   }
 } return void;
-given tk_t_prep (0, 0):() then tk_nbad:(0)
-given tk_t_bad ((import decl_list), 0):() then tk_nbad:(1)
+given tk_t_prep (0, 0):() then tk_nbad:("bad 0")
+given tk_t_bad ((import decl_list), 0):() then tk_nbad:("bad 1")
 
 tk_row_at(int i) {
   int tkc = (import tkcur)[0];

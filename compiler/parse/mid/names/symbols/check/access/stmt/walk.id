@@ -14,7 +14,7 @@ given scnames_fix ((import rgdeclist), "f"):() then calls acc_stmt:[1]
 given scnames_fix ([], "f"):() then calls acc_stmt:[0]
 
 acc_stmt(int id, string owner) {
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     acc_if(id, owner);
   } else {
     acc_stmt2(id, owner);
@@ -24,7 +24,7 @@ given scnames_fix ((import rgif_node), "f"):() then calls acc_if:((import rgif_n
 given loopfix ((import rgwhile_node), "f"):() then calls acc_stmt2:((import rgwhile_node), "f")
 
 acc_if(int id, string owner) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   acc_expr(i1_of_v, owner, (import nline)[id]);
   acc_if_body(id, owner);
 } return void;

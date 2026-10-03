@@ -8,7 +8,7 @@ given gn_env (0, (import f_pgen_list), 0):() then calls genname_report:(0, "ret_
 given gn_env (0, [11], 0):() then calls genname_report:[0]
 
 genname_param(int i, int pid) {
-  string name = s2_of(pid);
+  string name = (import ns2)[pid];
   if(is_genparam(name) == 1) {
     genname_report(i, name);
   }

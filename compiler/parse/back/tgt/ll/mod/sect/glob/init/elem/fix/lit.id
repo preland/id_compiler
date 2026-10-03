@@ -6,7 +6,7 @@ llc_int_setup() {
   env_init();
   export int llc_int_e = node_int("5", 5, 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 llc_str_setup() {
@@ -14,7 +14,7 @@ llc_str_setup() {
   push((import enames), "k");
   export int llc_str_e = node_str("hi");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 llc_float_setup() {
@@ -22,5 +22,5 @@ llc_float_setup() {
   push((import enames), "m");
   export int llc_float_e = node_float("1.5");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

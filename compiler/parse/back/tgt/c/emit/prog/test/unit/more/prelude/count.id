@@ -20,7 +20,7 @@
 // harness's own bookkeeping is not the program's work.
 
 emit_count(string ind) {
-  if(is_harn() == 1) {
+  if((import harn)[0] == 1) {
     emit_line(ind + "id_ctr_time++;");
   }
 } return void;
@@ -37,10 +37,10 @@ emit_count_prelude() {
   emit_line("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target ? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic FILE* idtc_eprint_target = NULL;\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_concat idtc_rt_concat");
 } return void;
 ():() then prints:("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target ? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic FILE* idtc_eprint_target = NULL;\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\nstatic void* idtc_malloc(size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return malloc(n); }\nstatic void* idtc_realloc(void* p, size_t n) { id_ctr_mem += (long long)(n - 2 * sizeof(void*)); return realloc(p, n); }\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef malloc\n#undef realloc\n#undef strlen\n#define malloc(n) idtc_malloc(n)\n#define realloc(p, n) idtc_realloc(p, n)\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_concat idtc_rt_concat\n")
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 
 emit_count_postlude() {
   emit_line("#undef id_len\n#undef id_concat\nstatic int id_len(const char* s) { id_ctr_time += (long long)id_slen(s); return (int)id_slen(s); }\nstatic char* id_concat(const char* a, const char* b) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat(a, b);\n}\n#undef malloc\n#undef realloc\n#undef strlen");
 } return void;
 ():() then prints:("#undef id_len\n#undef id_concat\nstatic int id_len(const char* s) { id_ctr_time += (long long)id_slen(s); return (int)id_slen(s); }\nstatic char* id_concat(const char* a, const char* b) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat(a, b);\n}\n#undef malloc\n#undef realloc\n#undef strlen\n")
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)

@@ -13,8 +13,8 @@
 
 ty_width(string t) {
   int n = 0;
-  if(ty_find(t) >= 0) {
-    n = (import tywidth)[ty_find(t)];
+  if(find_str((import tyname), t) >= 0) {
+    n = (import tywidth)[find_str((import tyname), t)];
   }
 } return int n;
 given init_tyreg ("int"):(4)

@@ -22,7 +22,7 @@ given sr_fixture ((import sr_ic2), 0):() then calls lw_ctor_one:[2]
 given sr_fixture ((import sr_ic1), 0):() then calls lw_ctor_one:[1]
 
 lw_ctor_one(int node, int i, int a) {
-  string sd_ft = sd_ftype_at(s1_of(node), i);
+  string sd_ft = sd_cell((import sdftype), ((import ns1)[node]), i);
   lw_arr_push(node, i, a, sd_ft);
   int ret_i = i + 1;
 } return int ret_i;

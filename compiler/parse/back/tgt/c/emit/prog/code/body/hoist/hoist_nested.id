@@ -3,9 +3,9 @@
 // exported decls are C globals (emitted separately), so only non-exported
 // locals are hoisted into the function
 hoist_decl(int id) {
-  if(i2_of(id) == 0) {
-    string s1_of_v = s1_of(id);
-    string s2_of_v = s2_of(id);
+  if((import ni2)[id] == 0) {
+    string s1_of_v = (import ns1)[id];
+    string s2_of_v = (import ns2)[id];
     hoist_decl_line(s1_of_v, s2_of_v);
   }
 } return void;
@@ -13,7 +13,7 @@ given tyc_fix (1):() then prints:("    int y;\n")
 given tyc_fix (1):() then prints:("    int y;\n") then calls hoist_decl_line:("int", "y")
 
 hoist_nested(int id) {
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     hoist_branches(id);
   } else {
     hoist_loop(id);
@@ -23,7 +23,7 @@ given tyc_fix (4):() then calls hoist_branches:(4)
 given tyc_fix (3):() then calls hoist_loop:(3)
 
 hoist_branches(int id) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   hoist_list(l1_of_v);
   hoist(id);
 } return void;

@@ -3,7 +3,7 @@
 // prelude rather than in it (back/tgt/c/emit/prog/head/decl/eprint.id).
 
 is_reserved_name(int i) {
-  string s1_of_v = s1_of((import prog)[i]);
+  string s1_of_v = (import ns1)[((import prog)[i])];
   int ok = find_str((import resv_names), s1_of_v) >= 0 || s1_of_v == "eprint";
 } return int ok;
 given resv_scan_fixture (0):(1)
@@ -27,5 +27,5 @@ resv_scan_fixture() {
 } chain () {
   push((import pline), 9);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

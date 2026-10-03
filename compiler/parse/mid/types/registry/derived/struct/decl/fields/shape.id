@@ -10,7 +10,7 @@ sd_shape(int sd_i) {
     sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' has " + sd_n + " fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct " + (import sdname)[sd_i] + " { Part p; int a; int b; }'");
   }
 } return void;
-given sd_pair (0):() then check_failed:(0)
+given sd_pair (0):() then (import chkfail)[0]:(0)
 given sd_pair given sd_note("Z", [], [], "z.id", 4) (2):() then prints:("z.id:4: error: struct 'Z' has no fields; give it one to three, or use the value on its own\n")
 given sd_pair given sd_note("W", ["a", "b", "c", "d"], ["int", "int", "int", "int"], "w.id", 8) (2):() then prints:("w.id:8: error: struct 'W' has 4 fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct W { Part p; int a; int b; }'\n")
 
@@ -21,8 +21,8 @@ sd_dupfield(int sd_i) {
     sd_k = sd_k + 1;
   }
 } return void;
-given sd_pair (0):() then check_failed:(0)
-given sd_pair given sd_note("D", ["a", "a"], ["int", "int"], "d.id", 2) (2):() then check_failed:(1)
+given sd_pair (0):() then (import chkfail)[0]:(0)
+given sd_pair given sd_note("D", ["a", "a"], ["int", "int"], "d.id", 2) (2):() then (import chkfail)[0]:(1)
 
 sd_dupat(int sd_i, int sd_k) {
   string[] sd_fs = (import sdfname)[sd_i];
@@ -30,5 +30,5 @@ sd_dupat(int sd_i, int sd_k) {
     sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' declares field '" + sd_fs[sd_k] + "' more than once; give each field its own name");
   }
 } return void;
-given sd_pair (0, 1):() then check_failed:(0)
+given sd_pair (0, 1):() then (import chkfail)[0]:(0)
 given sd_pair given sd_note("D", ["a", "b", "a"], ["int", "int", "int"], "d.id", 2) (2, 0):() then prints:("d.id:2: error: struct 'D' declares field 'a' more than once; give each field its own name\n")

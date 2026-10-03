@@ -8,7 +8,7 @@
 
 cw_value_of(int e) {
   string val = canon_expr(e);
-  if(k_of(e) == "arr" && cw_arr_lit(e) == 1) {
+  if((import nkind)[e] == "arr" && cw_arr_lit(e) == 1) {
     val = "A" + cw_arr_spell(e);
   }
 } return string val;
@@ -30,5 +30,5 @@ cwv_els_fixture() {
 } chain () {
   export int[] cwv_mixed_els = [e0, fn];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

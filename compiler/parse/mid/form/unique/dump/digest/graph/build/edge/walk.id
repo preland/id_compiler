@@ -13,8 +13,8 @@ dg_edges_all() {
     dgf = dgf + 1;
   }
 } return void;
-given dg_t_rows ():() then dg_nout1:(2)
-given dg_t_built ():() then dg_nout1:(4)
+given dg_t_rows ():() then dg_nout1:("out1 2")
+given dg_t_built ():() then dg_nout1:("out1 4")
 
 dg_edges(int dgf, int dglo) {
   int dghi = (import prog)[dgf];
@@ -23,8 +23,8 @@ dg_edges(int dgf, int dglo) {
     dglo = dglo + 1;
   }
 } return int dglo;
-given dg_t_rows (1, 0):(22) then dg_nout1:(2)
-given dg_t_rows (0, 0):(7) then dg_nout1:(0)
+given dg_t_rows (1, 0):(22) then dg_nout1:("out1 2")
+given dg_t_rows (0, 0):(7) then dg_nout1:("out1 0")
 
 dg_edge(int dgf, int dgid) {
   int dgw = dg_target(dgid);
@@ -33,5 +33,5 @@ dg_edge(int dgf, int dgid) {
     dg_clink(dgf, dgw, dgid);
   }
 } return void;
-given dg_t_rows (1, 16):() then dg_nout1:(1) then dg_ncout1:(1)
-given dg_t_rows (1, 15):() then dg_nout1:(0) then dg_ncout1:(0)
+given dg_t_rows (1, 16):() then dg_nout1:("out1 1") then dg_ncout1:(1)
+given dg_t_rows (1, 15):() then dg_nout1:("out1 0") then dg_ncout1:(0)

@@ -16,21 +16,31 @@ init_sym() {
   esc_init();
   init_structs();
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
+// fnames: How many functions are registered -- a `then` check for the void
+// functions above, which otherwise leave no result to compare.
 init_sym_a() {
   export string[] fnames = [];
   export string[] frets = [];
   export string[] enames = [];
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
+// eowners: The owner recorded for each exported name, pushed by add_export
+// (../collect/add.id) in step with enames and etypes. dead_err
+// (dead/more/report.id) is what reads it back, and add_export returns void,
+// so only a reader of one of its columns can see the push that filled it.
+// etypes: One entry per exported name, pushed by add_export (../add.id) in step with
+// enames and eowners. add_export returns void and the table it builds is what
+// the later checks read, so only a reader of one of its columns can see the
+// push happen; dead_exp_fixture (../../reach/dead/more/add.id) adds two.
 init_sym_b() {
   export string[] etypes = [];
   export string[] eowners = [];
   export int[] fnodes = [];
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

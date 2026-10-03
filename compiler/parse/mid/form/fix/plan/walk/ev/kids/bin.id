@@ -3,9 +3,9 @@
 // are not threaded through: they belong only to the node fix_walk_arg calls
 // this from (plan/walk/roots/walk.id).
 fix_walk_bin(int e, int cd) {
-  int a = i1_of(e);
+  int a = (import ni1)[e];
   fix_walk(a, 0, cd, "", "");
-  int b = i2_of(e);
+  int b = (import ni2)[e];
 } chain (int e, int cd) {
   int c2 = fix_condop(e, cd);
   fix_walk(b, 0, c2, "", "");
@@ -13,18 +13,9 @@ fix_walk_bin(int e, int cd) {
 given fix_traps_setup ((import tr_safe), 0):() then calls fix_walk:[2]
 given fix_traps_setup ((import tr_unsafe), 1):() then calls fix_walk:[2]
 
-// The name fix_walk_arg2's own call left at fixe_an[0] (kids/args.id's
-// fix_walk_arg2_fixture builds a fresh fixe_an per case, so the one entry a
-// single walk pushes is always at index 0).
-fix_walk_arg2_an0() {
-  string s = (import fixe_an)[0];
-} return string s;
-given fix_pick_fixture_an_named ():("myarg")
-given fix_pick_fixture_an0 ():("")
-
 fix_walk_arg2_fixture2(int e1, int e2) {
   export int wa2_e1 = e1;
   export int wa2_e2 = e2;
 } return void;
-given fix_walk_arg2_fixture (0, 0):() then check_failed:(0)
+given fix_walk_arg2_fixture (0, 0):() then (import chkfail)[0]:(0)
 given fix_walk_arg2_fixture (0, 0):() then init_units:(0)

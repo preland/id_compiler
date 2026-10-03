@@ -13,7 +13,7 @@ ocall_fixture() {
   init_bnames();
   ocall_fixture_reg();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // fx_target (lw_fixture_n, already the function under lowering) registered
@@ -25,5 +25,5 @@ ocall_fixture_reg() {
   add_func("fx_target", "int", (import lw_fixture_n));
   export int ocall_node = node_call("fx_target", none);
 } return void;
-given ocall_fixture ():() then check_failed:(0)
+given ocall_fixture ():() then (import chkfail)[0]:(0)
 given ocall_fixture ():() then init_units:(0)

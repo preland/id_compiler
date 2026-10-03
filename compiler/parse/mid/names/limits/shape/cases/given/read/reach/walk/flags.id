@@ -7,8 +7,8 @@ rc_new(string src) {
   push((import rcsets), rc_flags(src));
   hmap_put((import rck), (import rcv), (import rcu), (import rcc), src, ri);
 } return int ri;
-given rc_t_ready ("fb"):(0) then rc_nsets:(1)
-given rc_t_one ("fa"):(1) then rc_nsets:(2)
+given rc_t_ready ("fb"):(0) then len((import rcsets)):(1)
+given rc_t_one ("fa"):(1) then len((import rcsets)):(2)
 
 // A flag per row, 1 where src reaches. src's own row is set first, the way
 // the fixpoint this replaces started with src in its set; a name that is no
@@ -30,5 +30,5 @@ rc_has(string src, string dst) {
   int dw = dg_fn_named(dst);
   int ok = dw >= 0 && (import rcsets)[ri][dw] == 1;
 } return int ok;
-given rc_t_one ("fb", "fa"):(1) then rc_nsets:(1)
-given rc_t_one ("fa", "fb"):(0) then rc_nsets:(2)
+given rc_t_one ("fb", "fa"):(1) then rcsets_state:("1:110")
+given rc_t_one ("fa", "fb"):(0) then rcsets_state:("2:110100")

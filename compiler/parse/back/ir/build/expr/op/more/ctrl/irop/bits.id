@@ -18,5 +18,5 @@ un_fixture() {
   export int neg_node = node_un("-", (import ev_node));
   export int not_node = node_un("!", (import ev_node));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -16,13 +16,13 @@ vidx_add(string name) {
   int len_v = len((import vnames));
   vidx_push(name_bucket_v, len_v, name);
 } return void;
-given call2_setup ("newv"):() then vnames_len:(1)
-given fcall_reg_b ("newv2"):() then vnames_len:(2)
+given call2_setup ("newv"):() then vnames_state:("vars 1:newv")
+given fcall_reg_b ("newv2"):() then vnames_state:("vars 2:h|newv2")
 
 fidx_add(string name) {
   int name_bucket_v = name_bucket(name);
   int len_v = len((import fnames));
   fidx_push(name_bucket_v, len_v, name);
 } return void;
-given call2_setup ("newf"):() then asmfx_fn_count:(1)
-given argfn_d ("newf2"):() then asmfx_fn_count:(2)
+given call2_setup ("newf"):() then fnames_state:("funcs 1:newf")
+given argfn_d ("newf2"):() then fnames_state:("funcs 2:g|newf2")

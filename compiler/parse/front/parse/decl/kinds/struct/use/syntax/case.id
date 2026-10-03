@@ -31,5 +31,5 @@ case_ctor(int[] pos) {
   int[] sd_it = case_tuple(pos);
   int ret_i = newnode("cctor", 0, 0, sd_nm, "", sd_it, sd_it);
 } return int ret_i;
-given sd_case_toks ([0]):(2) then last_kind:("cctor") then last_s1:("P")
+given sd_case_toks ([0]):(2) then last_kind:("kind cctor") then last_s1:("s1 P")
 given sd_case_toks ([0]):(2) then last_l1:([0, 1])

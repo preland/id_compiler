@@ -11,7 +11,7 @@
 
 type_of(int id) {
   string t = "";
-  if(tcache_has(id) == 1) {
+  if(lst_get_or((import tcache_ok), id, 0) == 1) {
     t = (import tcache)[id];
   } else {
     t = type_of_miss(id);
@@ -22,7 +22,7 @@ given leaves_fixture ((import lit_str)):("string")
 
 type_of2(int id) {
   string t = "string";
-  if(k_of(id) != "str") {
+  if((import nkind)[id] != "str") {
     t = type_of_float(id);
   }
 } return string t;
@@ -30,7 +30,7 @@ given leaves_fixture ((import lit_str)):("string")
 given leaves_fixture ((import lit_float)):("float")
 
 type_of3(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   string t = name_type(s1_of_v, (import nunit)[id]);
   if(is_nameref(id) == 0) {
     t = type_of4(id);

@@ -16,9 +16,9 @@
 // job -- see blank_drop below, which canon_body applies before joining.
 cst4(int id) {
   string out = cst_flow(id);
-  if(k_of(id) == "chain") {
+  if((import nkind)[id] == "chain") {
     out = "|";
-  } else if(k_of(id) == "blank") {
+  } else if((import nkind)[id] == "blank") {
     out = "";
   }
 } return string out;
@@ -41,7 +41,7 @@ given blank_stmts_fixture ((import blank_body)):((import kept_body))
 given elif_fixture ((import no_stmts)):([])
 
 blank_push(int[] kept, int id) {
-  if(k_of(id) != "blank") {
+  if((import nkind)[id] != "blank") {
     push(kept, id);
   }
 } return void;

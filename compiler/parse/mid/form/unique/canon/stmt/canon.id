@@ -6,12 +6,12 @@
 
 canon_stmt(int id) {
   string out = cst2(id);
-  if(k_of(id) == "decl") {
+  if((import nkind)[id] == "decl") {
     out = canon_decl(id);
   }
-  if(k_of(id) == "assign") {
-    string s1_of_v = s1_of(id);
-    int i1_of_v = i1_of(id);
+  if((import nkind)[id] == "assign") {
+    string s1_of_v = (import ns1)[id];
+    int i1_of_v = (import ni1)[id];
     out = "a:" + cn(s1_of_v) + "=" + canon_expr(i1_of_v);
   }
 } return string out;
@@ -20,11 +20,11 @@ given canon_begun_fixture ((import lz_assignid)):("a:0=I3")
 
 cst2(int id) {
   string out = cst3(id);
-  if(k_of(id) == "iassign") {
+  if((import nkind)[id] == "iassign") {
     out = canon_iassign(id);
   }
-  if(k_of(id) == "exprstmt") {
-    int i1_of_v = i1_of(id);
+  if((import nkind)[id] == "exprstmt") {
+    int i1_of_v = (import ni1)[id];
     out = "e:" + canon_expr(i1_of_v);
   }
 } return string out;
@@ -37,12 +37,12 @@ given blank_stmts_fixture ((import chain_node)):("|")
 // The seam and the default sit one link further along, in more/seam.id.
 cst3(int id) {
   string out = cst4(id);
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     out = cst_if(id);
   }
-  if(k_of(id) == "while") {
-    int i1_of_v2 = i1_of(id);
-    int[] l1_of_v2 = l1_of(id);
+  if((import nkind)[id] == "while") {
+    int i1_of_v2 = (import ni1)[id];
+    int[] l1_of_v2 = (import nl1)[id];
     out = "wh(" + canon_expr(i1_of_v2) + "){" + canon_body(l1_of_v2) + "}";
   }
 } return string out;

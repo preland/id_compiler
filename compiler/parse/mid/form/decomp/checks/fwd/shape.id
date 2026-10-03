@@ -4,7 +4,7 @@
 // `assign` or `iassign` as the only statement -- is not a forwarder shape.
 
 fwd_check(int i, int fid) {
-  int[] body = l2_of(fid);
+  int[] body = (import nl2)[fid];
   if(len(body) == 1) {
     fwd_stmt(i, fid, body[0]);
   }
@@ -23,11 +23,11 @@ given farm_i (0, 6, 7):() then calls fwd_verify:[0]
 // to.
 fwd_stmt_id(int fid, int stmt) {
   int callid = 0 - 1;
-  if(k_of(stmt) == "decl" && fwd_decl_ok(fid, stmt) == 1) {
-    callid = i1_of(stmt);
+  if((import nkind)[stmt] == "decl" && fwd_decl_ok(fid, stmt) == 1) {
+    callid = (import ni1)[stmt];
   }
-  if(k_of(stmt) == "exprstmt" && fwd_expr_ok(fid, stmt) == 1) {
-    callid = i1_of(stmt);
+  if((import nkind)[stmt] == "exprstmt" && fwd_expr_ok(fid, stmt) == 1) {
+    callid = (import ni1)[stmt];
   }
 } return int callid;
 given farm_i (6, 4):(2)

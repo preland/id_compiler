@@ -6,20 +6,20 @@ tk_t_warm0() {
   tk_t_prep0();
   push((import tccin), "4208351378666089285");
 } return void;
-():() then tk_nkeys:(0)
+():() then tk_nkeys:("keys 0")
 ():() then tk_enabled:(1)
 
 tk_t_warm() {
   tk_t_warm0();
   tk_setup();
 } return void;
-():() then tk_nskip:(1)
-():() then tk_nkeys:(2)
+():() then tk_nskip:("skip 1")
+():() then tk_nkeys:("keys 2")
 
 tk_t_bad() {
   decltype_fixture();
   tk_prepare();
   push((import tkbad), 0);
 } return void;
-():() then tk_nbad:(0)
-():() then tk_nkeys:(0)
+():() then tk_nbad:("bad 0")
+():() then tk_nkeys:("keys 0")

@@ -12,7 +12,7 @@ imd_fill() {
 } chain () {
   imd_fold(imd_rows);
 } return void;
-given lz_o ():() then imd_dump:("23:()->int=>v0{d:int 0=I5}~~~23:()->int=>v0{d:int 0=I9}~~")
+given lz_o ():() then imd_dump:("23:()->int=>v0{d:int 0=I5}~~23:()->int=>v0{d:int 0=I9}~")
 given imd_pair_base ():() then imd_dump:("36:()->int=>g(0){d:int 0=I1;d:int 1=I1}~alpha~36:()->int=>g(0){d:int 0=I1;d:int 1=I1}~beta")
 
 imd_size(string[] imd_out) {
@@ -33,5 +33,5 @@ imd_fold(string[] imd_out) {
     imd_k = imd_k + 1;
   }
 } return void;
-given lz_o (["", "", "", ""]):(["23:()->int=>v0{d:int 0=I5}", "~", "23:()->int=>v0{d:int 0=I9}", "~"])
+given lz_o (["", "", "", ""]):(["23:()->int=>v0{d:int 0=I5}", "", "23:()->int=>v0{d:int 0=I9}", ""])
 given lz_empty ([]):([])

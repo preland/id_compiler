@@ -12,7 +12,7 @@ given edge_fixture ("nosuchfn"):("<stdin>")
 
 func_file_at(int i, string fname, string s) {
   string fpath = s;
-  if(s1_of((import prog)[i]) == fname && i < len((import pfile))) {
+  if((import ns1)[((import prog)[i])] == fname && i < len((import pfile))) {
     fpath = (import pfile)[i];
   }
 } return string fpath;
@@ -27,5 +27,5 @@ chkfail_raised() {
   env_init();
   note_failure();
 } return void;
-():() then check_failed:(1)
+():() then (import chkfail)[0]:(1)
 ():() then init_units:(0)

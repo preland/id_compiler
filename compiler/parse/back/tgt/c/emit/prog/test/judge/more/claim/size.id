@@ -10,7 +10,7 @@ given claim_conscase_fixture (0):() then prints:("    idtc_n[0] = 0;\n")
 given case_fixture (0):() then prints:("")
 
 case_size(int ci) {
-  int[] args = l1_of((import casenode)[ci]);
+  int[] args = (import nl1)[((import casenode)[ci])];
   string so = "0";
   if(len(args) > 0) {
     so = sizes_c(args);
@@ -23,7 +23,7 @@ case_claims(int ci) {
   int r = 0;
   int j = 0;
   while(j < len((import conscase))) {
-    r = r + claim_of(j, ci);
+    r = r + lst_is_at((import conscase), j, ci);
     j = j + 1;
   }
 } return int r;

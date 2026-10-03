@@ -2,22 +2,10 @@
 // libc behind the runtime. Like the others, a decision the driver makes rather
 // than a property of the source, so it arrives as a flag and lives in a cell.
 
-fs_set(int v) {
-  lset((import fsc), 0, v);
-} return void;
-given init_rtc (1):() then is_freestanding:(1)
-given init_rtc (0):() then is_freestanding:(0)
-
-is_freestanding() {
-  int ret_i = (import fsc)[0];
-} return int ret_i;
-given init_rtc ():(0)
-given fs_fixture_extern ():(1)
-
 regrow_param() {
   regrow_d();
   export int regrow_p = node_param("param", "int", "p2");
   export int[] regrow_plist = [regrow_p];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

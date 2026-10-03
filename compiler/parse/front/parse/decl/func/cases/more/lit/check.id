@@ -18,7 +18,7 @@ given lit_fix (1):() then prints:("<stdin>:0: error: a test case takes literals 
 
 is_lit(int e) {
   int r = leaf_lit(e);
-  if(k_of(e) == "un") {
+  if((import nkind)[e] == "un") {
     r = neg_lit(e);
   }
 } return int r;

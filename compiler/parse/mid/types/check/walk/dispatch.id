@@ -8,33 +8,33 @@ tc_node(int id) {
   tc_g1(id);
   tc_g2(id);
 } return void;
-given decltype_fixture ((import decl_list)):() then check_failed:(1)
-given decltype_fixture ((import decl_scalar)):() then check_failed:(0)
+given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
+given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)
 
 tc_g1(int id) {
-  if(k_of(id) == "decl") {
+  if((import nkind)[id] == "decl") {
     chk_decl(id);
   }
-  if(k_of(id) == "assign") {
+  if((import nkind)[id] == "assign") {
     chk_assign(id);
   }
-  if(k_of(id) == "iassign") {
+  if((import nkind)[id] == "iassign") {
     chk_iasg(id);
   }
 } return void;
-given decltype_fixture ((import decl_list)):() then check_failed:(1)
-given assign_build2 ((import assign_ok)):() then check_failed:(0)
-given sd_use_fixture ((import sd_wz)):() then check_failed:(1)
+given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
+given assign_build2 ((import assign_ok)):() then (import chkfail)[0]:(0)
+given sd_use_fixture ((import sd_wz)):() then (import chkfail)[0]:(1)
 
 // The two conditions differ only in their message, so they share a check.
 tc_g2(int id) {
-  if(k_of(id) == "if") {
+  if((import nkind)[id] == "if") {
     chk_cond(id, "condition has type void");
   }
-  if(k_of(id) == "while") {
+  if((import nkind)[id] == "while") {
     chk_cond(id, "loop condition has type void");
   }
   tc_g3(id);
 } return void;
-given cmp_fixture ((import bin_mixed)):() then check_failed:(1)
-given cmp_fixture ((import bin_eq)):() then check_failed:(0)
+given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(1)
+given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)

@@ -14,8 +14,8 @@
 given_items(int i, int si) {
   int[] items = [];
   if(i < len((import casegargs))) {
-    int[] gs = l1_of((import casegargs)[i]);
-    items = l1_of(gs[si]);
+    int[] gs = (import nl1)[((import casegargs)[i])];
+    items = (import nl1)[(gs[si])];
   }
 } return int[] items;
 given gsetup_fixture (0, 1):([(import fixture_zero)])
@@ -24,24 +24,24 @@ given fn_fixture (0, 0):([])
 
 given_args(int i, int si, int sfn) {
   int[] items = given_items(i, si);
-  if(len(items) != flat_arg_count(sfn)) {
-    string nm = s1_of(sfn);
-    int np = flat_arg_count(sfn);
+  if(len(items) != len(((import nl1)[sfn]))) {
+    string nm = (import ns1)[sfn];
+    int np = len(((import nl1)[sfn]));
     case_err(i, "'given' names '" + nm + "', which takes " + np + " parameter(s), but this 'given' passes " + len(items) + "; a setup is called with one literal per parameter, as in 'given " + nm + "(1, 2)', and with none as 'given " + nm + "'");
   } else {
     given_fit(i, si, sfn, items);
   }
 } return void;
-given gsetup_fixture (0, 1, (import fixture_set1)):() then check_failed:(0)
-given gsetup_fixture (0, 0, (import fixture_set1)):() then check_failed:(1)
+given gsetup_fixture (0, 1, (import fixture_set1)):() then (import chkfail)[0]:(0)
+given gsetup_fixture (0, 0, (import fixture_set1)):() then (import chkfail)[0]:(1)
 
 given_arg(int i, int sfn, int[] items, int j) {
-  string pt = s1_of(l1_of(sfn)[j]);
-  if(k_of(items[j]) == "cfn") {
-    case_err(i, "a setup's arguments are literals or (import NAME); '" + s1_of(items[j]) + "' is a function name, which only a case's own arguments may pass");
+  string pt = (import ns1)[((import nl1)[sfn][j])];
+  if((import nkind)[(items[j])] == "cfn") {
+    case_err(i, "a setup's arguments are literals or (import NAME); '" + (import ns1)[(items[j])] + "' is a function name, which only a case's own arguments may pass");
   } else {
     fit_value(i, items[j], pt);
   }
 } return void;
-given fn_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then check_failed:(0)
+given fn_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then (import chkfail)[0]:(0)
 given cfn_fixture ((import fixture_ci), (import fixture_fn), [(import cfn_e)], 0):() then prints:("fixture.id:4: error: a setup's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass\n")

@@ -13,22 +13,22 @@ keep_export_fixture() {
   init_idx();
   harn_init();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
-// init_rtc() is only needed on this path: is_freestanding() (nat_all_live)
-// is short-circuited away entirely when is_harn() is true.
+// init_rtc() is only needed on this path: (import fsc)[0] (nat_all_live)
+// is short-circuited away entirely when (import harn)[0] is true.
 keep_export_fixture_reg() {
   keep_export_fixture();
   init_rtc();
   keep_export_fixture_mid();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 keep_export_fixture_mid() {
   add_func("main", "void", 0 - 1);
   keep_export_fixture_tail();
 } return void;
-given keep_export_fixture ():() then check_failed:(0)
+given keep_export_fixture ():() then (import chkfail)[0]:(0)
 given keep_export_fixture ():() then init_units:(0)

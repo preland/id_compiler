@@ -2,7 +2,7 @@
 
 esc_stmt4(int sn, string nm) {
   int r = 0;
-  if(k_of(sn) == "if") {
+  if((import nkind)[sn] == "if") {
     r = esc_if(sn, nm);
   } else {
     r = esc_stmt5(sn, nm);
@@ -13,9 +13,9 @@ given esc_fix ((import efc_if), "s"):(1)
 
 esc_stmt5(int sn, string nm) {
   int r = 0;
-  if(k_of(sn) == "while") {
+  if((import nkind)[sn] == "while") {
     r = esc_while(sn, nm);
-  } else if(k_of(sn) == "ret") {
+  } else if((import nkind)[sn] == "ret") {
     r = esc_ret(sn, nm);
   }
 } return int r;
@@ -27,8 +27,8 @@ given esc_fix ((import efb_ret0), "p"):(0)
 // has none.
 esc_ret(int sn, string nm) {
   int r = 0;
-  if(i1_of(sn) >= 0) {
-    r = esc_expr(i1_of(sn), nm, 1);
+  if((import ni1)[sn] >= 0) {
+    r = esc_expr((import ni1)[sn], nm, 1);
   }
 } return int r;
 given esc_fix ((import efb_ret), "p"):(1)

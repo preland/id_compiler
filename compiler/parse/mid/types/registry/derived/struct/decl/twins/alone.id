@@ -11,16 +11,16 @@ sd_alone(int sd_i) {
   }
   sd_sharest(sd_i);
 } return void;
-given sd_pair (0):() then check_failed:(0)
-given sd_pair given sd_fnfile("p.id") (0):() then check_failed:(1)
+given sd_pair (0):() then (import chkfail)[0]:(0)
+given sd_pair given sd_fnfile("p.id") (0):() then (import chkfail)[0]:(1)
 
 sd_sharef(int sd_i, int sd_j) {
   if((import pfile)[sd_j] == (import sdfile)[sd_i]) {
-    sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' shares its file with function '" + s1_of((import prog)[sd_j]) + "'; a struct is declared in a file of its own -- move the function to another file");
+    sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' shares its file with function '" + (import ns1)[((import prog)[sd_j])] + "'; a struct is declared in a file of its own -- move the function to another file");
   }
 } return void;
 given sd_pair given sd_fnfile("q.id") (1, 0):() then prints:("q.id:5: error: struct 'Q' shares its file with function 'sd_fn'; a struct is declared in a file of its own -- move the function to another file\n")
-given sd_pair given sd_fnfile("q.id") (0, 0):() then check_failed:(0)
+given sd_pair given sd_fnfile("q.id") (0, 0):() then (import chkfail)[0]:(0)
 
 sd_sharest(int sd_i) {
   int sd_j = 0;
@@ -29,5 +29,5 @@ sd_sharest(int sd_i) {
     sd_j = sd_j + 1;
   }
 } return void;
-given sd_pair (1):() then check_failed:(0)
-given sd_pair given sd_note("R", ["a"], ["int"], "p.id", 9) (2):() then check_failed:(1)
+given sd_pair (1):() then (import chkfail)[0]:(0)
+given sd_pair given sd_note("R", ["a"], ["int"], "p.id", 9) (2):() then (import chkfail)[0]:(1)

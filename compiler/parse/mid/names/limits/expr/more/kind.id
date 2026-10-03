@@ -6,9 +6,9 @@
 
 hc_kids(int e) {
   int ok = hc_more(e);
-  if(k_of(e) == "bin" || k_of(e) == "index") {
-    int i1_of_v = i1_of(e);
-    int i2_of_v = i2_of(e);
+  if((import nkind)[e] == "bin" || (import nkind)[e] == "index") {
+    int i1_of_v = (import ni1)[e];
+    int i2_of_v = (import ni2)[e];
     ok = hc_pair(i1_of_v, i2_of_v);
   }
 } return int ok;
@@ -17,11 +17,11 @@ given hidden_call_fixture ((import hc_call)):(0)
 
 hc_more(int e) {
   int ok = 0;
-  if(k_of(e) == "un") {
-    int i1_of_v = i1_of(e);
+  if((import nkind)[e] == "un") {
+    int i1_of_v = (import ni1)[e];
     ok = has_call(i1_of_v);
-  } else if(k_of(e) == "arr") {
-    int[] l1_of_v = l1_of(e);
+  } else if((import nkind)[e] == "arr") {
+    int[] l1_of_v = (import nl1)[e];
     ok = hc_list(l1_of_v);
   }
 } return int ok;

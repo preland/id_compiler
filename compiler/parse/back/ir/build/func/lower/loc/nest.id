@@ -1,28 +1,28 @@
 // An exported declaration is a global, which needs no slot.
 lw_loc_decl(int node) {
-  if(i2_of(node) == 0) {
-    string s1_of_v = s1_of(node);
-    string s2_of_v = s2_of(node);
+  if((import ni2)[node] == 0) {
+    string s1_of_v = (import ns1)[node];
+    string s2_of_v = (import ns2)[node];
     lw_alloca(s1_of_v, s2_of_v);
   }
 } return void;
-given bound_fixture ((import decl_node)):() then check_failed:(0)
-given gdecl_fixture ((import gdecl_node)):() then check_failed:(0)
+given bound_fixture ((import decl_node)):() then (import chkfail)[0]:(0)
+given gdecl_fixture ((import gdecl_node)):() then (import chkfail)[0]:(0)
 
 lw_loc_nest(int node) {
-  if(k_of(node) == "if") {
+  if((import nkind)[node] == "if") {
     lw_loc_branch(node);
   } else {
     lw_loc_loop(node);
   }
 } return void;
-given nest_fixture ((import if_node)):() then check_failed:(0)
-given loop_fixture ((import while_node)):() then check_failed:(0)
+given nest_fixture ((import if_node)):() then (import chkfail)[0]:(0)
+given loop_fixture ((import while_node)):() then (import chkfail)[0]:(0)
 
 lw_loc_branch(int node) {
-  int[] l1_of_v = l1_of(node);
+  int[] l1_of_v = (import nl1)[node];
   lw_loc_list(l1_of_v);
   lw_locals(node);
 } return void;
-given nest_fixture ((import if_node)):() then check_failed:(0)
-given bound_fixture ((import decl_node)):() then check_failed:(0)
+given nest_fixture ((import if_node)):() then (import chkfail)[0]:(0)
+given bound_fixture ((import decl_node)):() then (import chkfail)[0]:(0)

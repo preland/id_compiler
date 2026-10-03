@@ -18,5 +18,5 @@ report_call_var(string name, string owner, int ln) {
   print(loc_at_v + "'" + name + "' is a variable, not a function");
   note_failure();
 } return void;
-given regrow_d ("z", "f", 10):() then check_failed:(1)
-given regrow_d ("y", "g", 20):() then check_failed:(1)
+given regrow_d ("z", "f", 10):() then (import chkfail)[0]:(1)
+given regrow_d ("y", "g", 20):() then (import chkfail)[0]:(1)

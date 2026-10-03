@@ -5,14 +5,6 @@
 //   idlex < prog.id | idparse        # emit C
 //   idlex < prog.id | idparse ast    # print the AST as an S-expression
 
-// fixd_wadj has no reader elsewhere in the build, for fix_wrow's own cases
-// (plan/reach/build/fill.id is at the three-function cap).
-fixd_wadj_len() {
-  int n = len((import fixd_wadj));
-} return int n;
-given fix_wseed_fixture ():(0)
-given fix_wprop_fixture ():(2)
-
 // cmp_fixture's bin_mixed/bin_bitand (mid/types/.../cmpnodes.id) are a real
 // mixed-operator pair, unparenthesized; fix_state (not fix_fixture, which
 // would re-run env_init and wipe those nodes) sizes fixd_gcl to the nodes
@@ -29,7 +21,7 @@ fix_paren_side_fixture() {
 } chain () {
   push((import tline), 1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The exit code is whether the program broke a rule of the language: 1 if a
@@ -58,7 +50,7 @@ main(int argc, string[] argv) {
   } else {
     guarded_emit_tail(argc, argv);
   }
-  int ret_i = check_failed();
+  int ret_i = (import chkfail)[0];
 } return int ret_i;
 
 // stdin (docs/TESTS.md) is what makes these two possible: `load` reads the

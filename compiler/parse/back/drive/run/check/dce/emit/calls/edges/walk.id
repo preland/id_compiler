@@ -8,11 +8,11 @@ call_edges_funcs(int f, int lo) {
     f = f + 1;
   }
 } return void;
-given edge_fixture (0, 0):() then check_failed:(0)
-given edge_fixture (1, 0):() then check_failed:(0)
+given edge_fixture (0, 0):() then (import chkfail)[0]:(0)
+given edge_fixture (1, 0):() then (import chkfail)[0]:(0)
 
 call_edges_func(int f, int lo) {
-  string caller = s1_of((import prog)[f]);
+  string caller = (import ns1)[((import prog)[f])];
   call_edges_range(lo, (import prog)[f], caller);
   int ret_i = (import prog)[f] + 1;
 } return int ret_i;
@@ -25,5 +25,5 @@ call_edges_range(int lo, int hi, string caller) {
     lo = lo + 1;
   }
 } return void;
-given edge_fixture (0, 0, "edge_caller"):() then check_failed:(0)
-given edge_fixture (0, 1, "edge_caller"):() then check_failed:(0)
+given edge_fixture (0, 0, "edge_caller"):() then (import chkfail)[0]:(0)
+given edge_fixture (0, 1, "edge_caller"):() then (import chkfail)[0]:(0)

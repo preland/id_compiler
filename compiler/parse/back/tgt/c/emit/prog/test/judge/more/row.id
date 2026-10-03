@@ -16,7 +16,7 @@
 // same guard, for the same reason.
 
 emit_setup_line(int ci, string cw, string cc) {
-  string f1 = s1_of((import casefn)[ci]);
+  string f1 = (import ns1)[((import casefn)[ci])];
   int fx = case_fidx(ci);
   string fnref = "idtc_case_" + ci;
 } chain (int ci, string cw, string cc) {
@@ -39,7 +39,7 @@ emit_setup_line(int ci, string cw, string cc) {
   string tv = "NULL";
 } chain (int ci, string cw, string cc) {
   if(tnid != -1) {
-    tv = tc_value(l1_of(tnid)[0], "string");
+    tv = tc_value((import nl1)[tnid][0], "string");
   }
   emit_line("    idtc_traps[" + ci + "] = " + tv + ";");
   int secs_v = 0;
@@ -64,8 +64,8 @@ given case_fidx_fixture (0):("fixture.id:4")
 given wrap_fixture (0):(":4")
 
 case_call_c(int ci) {
-  string f1 = s1_of((import casefn)[ci]);
-  int[] args = l1_of((import casenode)[ci]);
+  string f1 = (import ns1)[((import casefn)[ci])];
+  int[] args = (import nl1)[((import casenode)[ci])];
   string so = call_c(f1, args);
 } return string so;
 given wrap_fixture (0):("fx_target(0)")

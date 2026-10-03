@@ -17,7 +17,7 @@ mk_line9() {
   push_tok("line", "9");
 } return void;
 ():() then src_line:(9)
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 
 // A third real token stacked on mk_two_toks.id's two, for a case that needs
 // to tell one token count apart from another.
@@ -25,5 +25,5 @@ mk_three_toks() {
   mk_two_toks();
   push_real("ident", "z");
 } return void;
-():() then last_tkind:("ident")
-():() then check_failed:(0)
+():() then last_tkind:("tkind ident")
+():() then (import chkfail)[0]:(0)

@@ -3,7 +3,7 @@
 
 lit_type(int id) {
   string t = "int";
-  if(i2_of(id) == 1) {
+  if((import ni2)[id] == 1) {
     t = "word";
   }
 } return string t;
@@ -14,9 +14,9 @@ given leaves_fixture ((import lit_word)):("word")
 // pop's, which is the element type of the list it was handed; a call through a
 // variable of function type has that type's return type.
 call_type(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   string t = call_ret(id, s1_of_v);
-  if(s1_of(id) == "pop") {
+  if((import ns1)[id] == "pop") {
     t = pop_elem(id);
   }
 } return string t;
@@ -24,7 +24,7 @@ given shapes_fixture ((import call_len)):("int")
 given idx_build ((import call_pop)):("int")
 
 pop_elem(int id) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   string type_of_v = type_of(l1_of_v[0]);
   string ret_s = elem_type(type_of_v);
 } return string ret_s;

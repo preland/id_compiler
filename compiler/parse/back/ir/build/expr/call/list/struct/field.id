@@ -3,8 +3,8 @@
 
 // The position of the field an index node names.
 lw_fpos(int node) {
-  string sd_bt = lw_ety(i1_of(node));
-  string sd_f = s1_of(i2_of(node));
+  string sd_bt = lw_ety((import ni1)[node]);
+  string sd_f = (import ns1)[((import ni2)[node])];
   string sd_p = "" + sd_fpos(sd_bt, sd_f);
 } chain (int node) {
   int ret_i = lw_const("int", sd_p);

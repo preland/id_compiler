@@ -7,10 +7,10 @@
 // and each `(import NAME)` the harness emits tests it first (op/index/
 // dispatch.id's import_text). A conf.id constant has no declaring function
 // and is set before main, so it gets neither. The program's C never sees a
-// flag: every piece is gated on is_harn().
+// flag: every piece is gated on (import harn)[0].
 
 emit_set_decl(int i) {
-  if((import eowners)[i] != "conf.id" && is_harn() == 1) {
+  if((import eowners)[i] != "conf.id" && (import harn)[0] == 1) {
     emit_line("char idtc_set_" + (import enames)[i] + ";");
   }
 } return void;
@@ -40,5 +40,5 @@ uninit_fixture() {
   add_export("gc", "int", "conf.id");
   export int uninit_imp = node_import("gx");
 } return void;
-():() then check_failed:(0)
-():() then is_harn:(1)
+():() then (import chkfail)[0]:(0)
+():() then (import harn)[0]:(1)

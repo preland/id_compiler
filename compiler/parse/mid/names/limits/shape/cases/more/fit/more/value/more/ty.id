@@ -4,8 +4,8 @@
 
 case_lit_type(int e) {
   string lt = leaf_type(e);
-  if(k_of(e) == "un") {
-    int i1_of_v = i1_of(e);
+  if((import nkind)[e] == "un") {
+    int i1_of_v = (import ni1)[e];
     lt = leaf_type(i1_of_v);
   }
 } return string lt;
@@ -14,9 +14,9 @@ given lw_fix_un ((import fix_un_n)):("int")
 
 leaf_type(int e) {
   string lt = "string";
-  if(k_of(e) == "int") {
+  if((import nkind)[e] == "int") {
     lt = lit_type(e);
-  } else if(k_of(e) == "float") {
+  } else if((import nkind)[e] == "float") {
     lt = "float";
   }
 } return string lt;
@@ -35,5 +35,5 @@ dupeq_fixture() {
   export int dupeq_node = node_int("0", 0, 0);
   dupeq_starts();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

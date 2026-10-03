@@ -28,8 +28,8 @@ parse_asm(int[] pos) {
 } chain (int[] pos) {
   int ret_i = asm_sig_tail(pos, parse_params_v);
 } return int ret_i;
-given asm_decl_fixture ([0]):(0) then afname_last:("foo") then afretn_last:("r")
-given asm_decl_fixture2 ([0]):(0) then afname_last:("bar") then afretn_last:("s")
+given asm_decl_fixture ([0]):(0) then afname_last:("afname foo") then afretn_last:("r")
+given asm_decl_fixture2 ([0]):(0) then afname_last:("afname bar") then afretn_last:("s")
 
 // A parsed function's token span and node, beside `prog` as parsed (the
 // columns are described with the case columns, func/cases/more/lit/cons/

@@ -29,7 +29,7 @@ canon_begun_fixture() {
   lz_g();
   uq_begin("f");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 blank_stmts_fixture() {
@@ -40,5 +40,5 @@ blank_stmts_fixture() {
   export int[] blank_body = [(import blank_node), (import lz_declid)];
   export int[] kept_body = [(import lz_declid)];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

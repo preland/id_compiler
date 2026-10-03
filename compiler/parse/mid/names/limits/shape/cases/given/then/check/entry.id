@@ -1,18 +1,44 @@
-// The entry point for a "then" (check) node: reads its name, then checks its
-// signature and value (sig.id, value.id). Split from fit_then_kind
-// (../then.id) so that dispatch stays within the action limit.
+// The entry points for the two checks of a `then` node that name something to
+// read: a check function (then_fn, which goes on to its signature and value,
+// sig.id and value.id) and an export (fit_then_imp, `then (import NAME):(value)`
+// and `then (import NAME)[i]:(value)`). fit_then_kind (../dispatch.id) calls
+// then_fn itself and routes the export's kind here.
 
-then_fn_entry(int chk_node) {
-  string chk_nm = s1_of(chk_node);
-  then_fn(chk_node, chk_nm);
+// An export read after the call: held to what an `(import NAME)` argument is
+// (fit_import, ../../read/impcheck.id: a `given`, an owner that setup reaches),
+// unless the function under test reaches the owner itself -- the call sets the
+// export, and a `given` of the owner would run it twice before the check
+// instead of once, so what the check finds could differ from what one call
+// leaves; a call that does not set it at run time traps as an uninitialised
+// export. Then its index and value (then_imp_value,
+// ../../../report/host/cases/then.id).
+fit_then_imp(int chk_node) {
+  int ci = (import ni1)[chk_node];
+  string imp_nm = (import ns1)[chk_node];
+  int ek = find_str((import enames), imp_nm);
+} chain (int chk_node) {
+  string want = "";
+  if(ek >= 0) {
+    want = (import etypes)[ek];
+  }
+  if(ek < 0 || reaches((import ns1)[((import casefn)[ci])], (import eowners)[ek]) == 0) {
+    fit_import(ci, chk_node, want);
+  }
+} chain (int chk_node) {
+  if(ek >= 0) {
+    then_imp_value(ci, chk_node, want);
+  }
 } return void;
-given then_node_fixture ((import fixture_then_node)):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
-given then_node_fixture ((import fixture_then_bad)):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
+given then_imp_fixture ("string", 0, 0) ((import then_imp_node)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
+given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") given sset((import eowners), 0, "fx_target") ((import then_imp_node)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") ((import then_imp_node)):() then prints:("fixture.id:4: error: (import gx) needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it\n")
+given then_imp_fixture ("int", 1, 0) ((import then_imp_node)):() then calls then_imp_value:[1]
+given then_imp_fixture ("int", 0, 0) ((import then_imp_node)):() then calls then_imp_value:[1]
 
 then_fn(int chk_node, string chk_nm) {
   int cfn = func_node(chk_nm);
-  int ci = i1_of(chk_node);
-  string chk_nm2 = s1_of(chk_node);
+  int ci = (import ni1)[chk_node];
+  string chk_nm2 = (import ns1)[chk_node];
 } chain (int chk_node, string chk_nm) {
   if(cfn < 0) {
     case_err(ci, "'then' names '" + chk_nm2 + "', which is not a function in this build");
@@ -29,8 +55,8 @@ given then_node_fixture ((import fixture_then_bad), "nope"):() then prints:("fix
 // `then` clause; this is only the shape of the traps node itself, the same
 // split fit_then_print/fit_print_items (../more/print/output.id) make.
 fit_then_traps(int chk_node) {
-  int ci = i1_of(chk_node);
-  int[] items = l1_of(chk_node);
+  int ci = (import ni1)[chk_node];
+  int[] items = (import nl1)[chk_node];
   int n = len(items);
 } chain (int chk_node) {
   if(n != 1) {

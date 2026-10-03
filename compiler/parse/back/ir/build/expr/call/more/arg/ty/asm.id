@@ -5,7 +5,7 @@ lw_apty(string name, int i, string t) {
   int r = find_str((import afname), name);
   string p = t;
   if(r >= 0 && i < len((import afparams)[r])) {
-    p = s1_of((import afparams)[r][i]);
+    p = (import ns1)[((import afparams)[r][i])];
   }
 } return string p;
 given asmfx_setup ("nosuchasm", 0, "fallback1"):("fallback1")

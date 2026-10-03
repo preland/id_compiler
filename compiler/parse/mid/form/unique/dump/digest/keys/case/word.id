@@ -17,7 +17,7 @@ given dg_t_claim (0):("-")
 dg_case_fn(int dgc) {
   int dgf = 0 - 1;
   if(dgc < len((import caseend)) && lst_index_of((import conscase), dgc) < 0) {
-    dgf = dg_fn_named(s1_of((import casefn)[dgc]));
+    dgf = dg_fn_named((import ns1)[((import casefn)[dgc])]);
   }
 } return int dgf;
 given dg_t_built (2):(1)

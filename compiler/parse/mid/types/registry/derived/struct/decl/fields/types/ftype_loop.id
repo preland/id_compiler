@@ -11,8 +11,8 @@ sd_ftypes(int sd_i) {
   }
   sd_cycle(sd_i);
 } return void;
-given sd_reg (0):() then check_failed:(0)
-given sd_reg given sd_note("B", ["v"], ["void"], "b.id", 3) (2):() then check_failed:(1)
+given sd_reg (0):() then (import chkfail)[0]:(0)
+given sd_reg given sd_note("B", ["v"], ["void"], "b.id", 3) (2):() then (import chkfail)[0]:(1)
 
 sd_ftype_chk(int sd_i, int sd_k) {
   string sd_t = (import sdftype)[sd_i][sd_k];
@@ -21,5 +21,5 @@ sd_ftype_chk(int sd_i, int sd_k) {
     sd_err(sd_i, "field '" + (import sdfname)[sd_i][sd_k] + "' of struct '" + (import sdname)[sd_i] + "'" + sd_why);
   }
 } return void;
-given sd_reg (0, 0):() then check_failed:(0)
+given sd_reg (0, 0):() then (import chkfail)[0]:(0)
 given sd_reg given sd_note("B", ["v"], ["void"], "b.id", 3) (2, 0):() then prints:("b.id:3: error: field 'v' of struct 'B' has type 'void'; a field holds a value, so give it int, word, float, string, a struct or a list of one\n")

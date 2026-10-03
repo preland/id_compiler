@@ -2,7 +2,7 @@
 // Index-assignment emission: `id_list_set(base, idx, box(value));`.
 
 emit_iassign(int id, string ind) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string type_of_v = type_of(i1_of_v);
   iassign2(id, ind, type_of_v);
 } return void;
@@ -11,7 +11,7 @@ given iassign_fixture ((import iassign_node), ""):() then prints:("id_list_set(i
 
 iassign2(int id, string ind, string type_of_v) {
   string elem = idx_elem(type_of_v, id);
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   iassign3(id, ind, elem, l1_of_v);
 } return void;
 given iassign_fixture ((import iassign_node), "  ", "int[]"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, (long long)(7));\n")

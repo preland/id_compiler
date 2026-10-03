@@ -2,7 +2,7 @@
 asm_triples(string name) {
   string out = "";
   int i = 0;
-  while(i < asm_count()) {
+  while(i < len((import afname))) {
     out = out + asm_tsep(i, name, out);
     i = i + 1;
   }

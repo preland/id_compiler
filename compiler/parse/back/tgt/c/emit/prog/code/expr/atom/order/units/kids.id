@@ -7,11 +7,11 @@
 // which C leaves unsequenced.
 
 seq_kids(int id) {
-  int[] sq_kids = l1_of(id);
-  if(k_of(id) == "bin" || k_of(id) == "index") {
-    sq_kids = [i1_of(id), i2_of(id)];
-  } else if(k_of(id) == "un") {
-    sq_kids = [i1_of(id)];
+  int[] sq_kids = (import nl1)[id];
+  if((import nkind)[id] == "bin" || (import nkind)[id] == "index") {
+    sq_kids = [(import ni1)[id], (import ni2)[id]];
+  } else if((import nkind)[id] == "un") {
+    sq_kids = [(import ni1)[id]];
   }
 } return int[] sq_kids;
 given sq_fixture ((import sq_two)):([7, 9])

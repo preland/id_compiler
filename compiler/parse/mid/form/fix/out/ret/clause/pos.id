@@ -17,7 +17,7 @@ given fix_ret_fixture (2, 0):("10|5|1|5")
 given fix_ret_fixture (3, 0):("10|5|1|0")
 
 fix_indent_line(int f) {
-  int[] body = l2_of(f);
+  int[] body = (import nl2)[f];
   int n = 0;
   if(len(body) > 0) {
     n = (import nline)[body[len(body) - 1]];

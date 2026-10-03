@@ -18,10 +18,10 @@ given ir_fix1 (0):("5")
 
 ll_val2(int v) {
   string s = "%v" + v;
-  if(ir_op(v) == "const") {
+  if((import iop)[v] == "const") {
     s = ll_lit(v);
-  } else if(ir_op(v) == "global") {
-    s = "@" + ir_s(v);
+  } else if((import iop)[v] == "global") {
+    s = "@" + (import istr)[v];
   }
 } return string s;
 given ir_fix1 (0):("5")
@@ -32,7 +32,7 @@ given ir_fix3 (3):("@gname")
 ll_vty(int v) {
   string t = "";
   if(v >= 0) {
-    t = ir_ty(v);
+    t = (import ity)[v];
   }
 } return string t;
 (-1):("")

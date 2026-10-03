@@ -1,5 +1,5 @@
 fix_then(int sn) {
-  int[] l1_of_v = l1_of(sn);
+  int[] l1_of_v = (import nl1)[sn];
   fix_block(l1_of_v);
 } return void;
 given fix_if_fixture (1):() then calls fix_block:([])
@@ -25,5 +25,5 @@ fix_if_fixture() {
 } chain () {
   int wn = node_while(0, none);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

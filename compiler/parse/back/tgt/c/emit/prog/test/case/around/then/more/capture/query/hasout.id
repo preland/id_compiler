@@ -21,7 +21,7 @@ given case_fixture ((import fixture_ci), "thencalls", 0, 1):(1)
 
 out_step(int ci, string kind, int ti, int r) {
   int node = (import thennode)[ti];
-  if(i1_of(node) == ci && k_of(node) == kind) {
+  if((import ni1)[node] == ci && (import nkind)[node] == kind) {
     r = 1;
   }
 } return int r;

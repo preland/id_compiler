@@ -11,12 +11,12 @@
 // are the one kind the checks here could misjudge, and they are rare.
 
 tc_node_at(int id) {
-  if(k_of(id) != "arr" || in_case(id) == 0) {
+  if((import nkind)[id] != "arr" || in_case(id) == 0) {
     tc_node(id);
   }
 } return void;
-given incase_fixture ((import lit_a)):() then check_failed:(0)
-given decltype_fixture ((import decl_list)):() then check_failed:(1)
+given incase_fixture ((import lit_a)):() then (import chkfail)[0]:(0)
+given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
 
 in_case(int id) {
   int i = 0;

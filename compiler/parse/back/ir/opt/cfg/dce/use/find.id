@@ -3,7 +3,7 @@
 // sit inside `lst_find`'s own argument list, which is the third arm of an
 // `||` and must only run when the first two arms miss.
 dce_lists(int at, int id) {
-  int[] l = ir_l(at);
+  int[] l = (import ilist)[at];
   int r = lst_find(l, id);
 } return int r;
 given dce_fixture (0, 5):(1)

@@ -1,7 +1,7 @@
 // Continues lw_cmp: the left operand's type is known, so the right operand's
 // is fetched next and the two are widened together.
 lw_cmp_t2(int node, string t1) {
-  int i2_of_v = i2_of(node);
+  int i2_of_v = (import ni2)[node];
   string lw_ety_v2 = lw_ety(i2_of_v);
   int ret_i = lw_cmp_wide(node, t1, lw_ety_v2);
 } return int ret_i;
@@ -29,7 +29,7 @@ lwo_fixture() {
   export int lwo_z = lw_alloca("int[]", "z");
 } chain () {
   export int lwo_w2 = lw_alloca("int[]", "w");
-  export int lwo_ent = lw_ent();
+  export int lwo_ent = (import lwent)[0];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

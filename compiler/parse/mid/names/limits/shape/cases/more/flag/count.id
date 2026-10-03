@@ -44,7 +44,7 @@ count_cases(int node) {
   int i = 0;
   int n = 0;
   while(i < len((import casefn))) {
-    n = n + case_hit(i, node);
+    n = n + lst_is_at((import casefn), i, node);
     i = i + 1;
   }
 } return int n;

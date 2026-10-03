@@ -6,5 +6,5 @@ no_struct_word(int[] pos) {
     syn_err(pos, "'struct' is a keyword (it declares a type, at the top level of a file of its own; see docs/SPEC.md, structs) and cannot be used as a name or inside a function");
   }
 } return void;
-given sd_toks ([0]):() then check_failed:(1)
-given sd_toks ([1]):() then check_failed:(0)
+given sd_toks ([0]):() then (import chkfail)[0]:(1)
+given sd_toks ([1]):() then (import chkfail)[0]:(0)

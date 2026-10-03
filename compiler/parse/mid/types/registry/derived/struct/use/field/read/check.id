@@ -4,13 +4,13 @@
 // it drags along.
 
 chk_field(int id, string sd_bt) {
-  string sd_f = s1_of(i2_of(id));
+  string sd_f = (import ns1)[((import ni2)[id])];
   if(ty_known(sd_bt) == 1) {
     chk_field_at(id, sd_bt, sd_f);
   }
 } return void;
-given sd_use_fixture ((import sd_ix), "P"):() then check_failed:(0)
-given sd_use_fixture ((import sd_in), "int"):() then check_failed:(1)
+given sd_use_fixture ((import sd_ix), "P"):() then (import chkfail)[0]:(0)
+given sd_use_fixture ((import sd_in), "int"):() then (import chkfail)[0]:(1)
 
 chk_field_at(int id, string sd_bt, string sd_f) {
   if(ty_is_struct(sd_bt) == 0) {

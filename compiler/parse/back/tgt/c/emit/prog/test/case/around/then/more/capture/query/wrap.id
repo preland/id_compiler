@@ -29,7 +29,7 @@ given traps_case_fixture ((import fixture_ci)):((import fixture_traps_case_node)
 
 traps_node_step(int ci, int ti, int r) {
   int node = (import thennode)[ti];
-  if(i1_of(node) == ci && k_of(node) == "thentraps") {
+  if((import ni1)[node] == ci && (import nkind)[node] == "thentraps") {
     r = node;
   }
 } return int r;

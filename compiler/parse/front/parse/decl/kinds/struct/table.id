@@ -12,6 +12,9 @@
 // imported tree and the same declaration in the program are one struct twice,
 // and the second is a duplicate (docs/SPEC.md, structs).
 
+// sdname: The row of a struct, or -1 when the name is not one.
+// sdfname: The name of field `sd_k`, or "" when there is none.
+// sdftype: The type of field `sd_k` of a struct, or "" when there is none.
 init_structs() {
   export string[] sdname = [];
   export string[][] sdfname = [];
@@ -20,14 +23,8 @@ init_structs() {
   export string[] sdfile = [];
   export int[] sdline = [];
 } return void;
-():() then sd_count:(0)
-given sd_pair ():() then sd_count:(0)
-
-sd_count() {
-  int n = len((import sdname));
-} return int n;
-given env_init ():(0)
-given sd_pair ():(2)
+():() then len((import sdname)):(0)
+given sd_pair ():() then len((import sdname)):(0)
 
 sd_note(string sd_nm, string[] sd_fns, string[] sd_fts, string sd_file, int sd_ln) {
   push((import sdname), sd_nm);
@@ -37,5 +34,5 @@ sd_note(string sd_nm, string[] sd_fns, string[] sd_fts, string sd_file, int sd_l
   push((import sdfile), sd_file);
   push((import sdline), sd_ln);
 } return void;
-given env_init ("P", ["x"], ["int"], "p.id", 3):() then sd_count:(1)
-given sd_pair ("R", ["a"], ["string"], "r.id", 9):() then sd_count:(3)
+given env_init ("P", ["x"], ["int"], "p.id", 3):() then len((import sdname)):(1)
+given sd_pair ("R", ["a"], ["string"], "r.id", 9):() then len((import sdname)):(3)

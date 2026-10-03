@@ -1,10 +1,10 @@
 lw_while_ex(int node, int hd, int bdy) {
-  int lw_fn_v2 = lw_fn();
+  int lw_fn_v2 = (import lwfn)[0];
   int ex = ir_block(lw_fn_v2, "exit");
   lw_while3(node, hd, bdy, ex);
 } return void;
-given loop_fixture ((import while_node), 0, 1):() then check_failed:(0)
-given nest_fixture ((import while_node), 0, 1):() then check_failed:(0)
+given loop_fixture ((import while_node), 0, 1):() then (import chkfail)[0]:(0)
+given nest_fixture ((import while_node), 0, 1):() then (import chkfail)[0]:(0)
 
 lw_while3(int node, int hd, int bdy, int ex) {
   lw_go(hd);
@@ -17,7 +17,7 @@ given nest_fixture ((import while_node), 0, 1, 4):(4)
 // The exit block is pushed while the body is lowered, so a `break` inside it
 // knows where to go (../cond/op.id).
 lw_while_body(int node, int bdy, int hd, int ex) {
-  int[] l1_of_v = l1_of(node);
+  int[] l1_of_v = (import nl1)[node];
   push((import lwloop), ex);
   lw_arm(bdy, l1_of_v, hd);
 } chain (int node, int bdy, int hd, int ex) {

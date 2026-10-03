@@ -3,7 +3,7 @@
 // value to the list's element type.
 
 emit_len(int id) {
-  int arg = l1_of(id)[0];
+  int arg = (import nl1)[id][0];
   string s = "id_list_len(" + emit_expr(arg) + ")";
   if(type_of(arg) == "string") {
     s = "id_len(" + emit_expr(arg) + ")";
@@ -13,7 +13,7 @@ given call_names_fixture ((import call_e_foo)):("id_list_len(5)")
 given call_names_fixture2 ((import call_e_pop)):("id_list_len(4)")
 
 emit_push(int id) {
-  int[] args = l1_of(id);
+  int[] args = (import nl1)[id];
   string type_of_v = type_of(args[0]);
   string ret_s = emit_push_tail(args, type_of_v);
 } return string ret_s;

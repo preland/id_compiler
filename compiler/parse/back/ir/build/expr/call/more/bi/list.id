@@ -1,7 +1,7 @@
 
 lb_b4(int node) {
   int v = 0 - 1;
-  if(s1_of(node) == "pop") {
+  if((import ns1)[node] == "pop") {
     v = lw_pop(node);
   } else {
     v = lw_plain(node);
@@ -13,12 +13,12 @@ given ocall_fixture ((import ocall_node)):(0)
 // `len` is two different runtime calls: a string knows its own length and a
 // list keeps a count.
 lw_len(int node) {
-  int[] l1_of_v = l1_of(node);
+  int[] l1_of_v = (import nl1)[node];
   string t = lw_ety(l1_of_v[0]);
   int ret_i = lw_len_tail(l1_of_v, t);
 } return int ret_i;
 given lencall_fixture ((import lencall_node)):(1)
-given lencall_fixture ((import lencall_node)):(1) then check_failed:(0)
+given lencall_fixture ((import lencall_node)):(1) then (import chkfail)[0]:(0)
 
 lw_lenfn(string t) {
   string s = "id_list_len";

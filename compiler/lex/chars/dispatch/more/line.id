@@ -8,7 +8,7 @@ bump_line() {
   print("line " + (import lexline)[0]);
 } return void;
 given lex_fix_setup ():() then prints:("line 2\n")
-given lex_fix_setup ():() then prints:("line 2\n") then lex_line_now:(2)
+given lex_fix_setup ():() then prints:("line 2\n") then (import lexline)[0]:(2)
 
 // Column tracking for `idc --fix`, which rewrites source and so has to know
 // where on its line each token starts and ends. The token is printed first and

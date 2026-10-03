@@ -4,7 +4,7 @@
 
 type_of5(int id) {
   string t = type_of6(id);
-  if(k_of(id) == "index") {
+  if((import nkind)[id] == "index") {
     t = type_index(id);
   }
 } return string t;
@@ -13,7 +13,7 @@ given composite_fixture ((import bin_concat)):("string")
 
 type_of6(int id) {
   string t = type_of7(id);
-  if(k_of(id) == "arr") {
+  if((import nkind)[id] == "arr") {
     t = type_arr(id);
   }
 } return string t;
@@ -21,7 +21,7 @@ given shapes_fixture ((import arr_ints)):("int[]")
 given composite_fixture ((import bin_plus)):("int")
 
 type_index(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string type_of_v = type_of(i1_of_v);
   string ret_s = idx_elem(type_of_v, id);
 } return string ret_s;

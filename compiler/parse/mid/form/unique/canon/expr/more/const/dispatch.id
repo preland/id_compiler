@@ -7,11 +7,11 @@
 // simplification did not fire.
 
 bin_simplify(int id, string op) {
-  int lid = i1_of(id);
-  int rid = i2_of(id);
+  int lid = (import ni1)[id];
+  int rid = (import ni2)[id];
   string ret_s = "";
 } chain (int id, string op) {
-  if(k_of(lid) == "int" && k_of(rid) == "int") {
+  if((import nkind)[lid] == "int" && (import nkind)[rid] == "int") {
     ret_s = bin_fold2(op, lid, rid);
   }
   if(ret_s == "") {

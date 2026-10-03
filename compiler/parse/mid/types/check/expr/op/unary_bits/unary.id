@@ -5,41 +5,41 @@
 // could not work out is not judged, as everywhere else in tc.
 
 tc_g5(int id) {
-  if(k_of(id) == "func" || k_of(id) == "ret") {
+  if((import nkind)[id] == "func" || (import nkind)[id] == "ret") {
     chk_retexpr(id);
   }
-  if(k_of(id) == "un") {
+  if((import nkind)[id] == "un") {
     chk_un(id);
   }
-  if(k_of(id) == "exprstmt") {
+  if((import nkind)[id] == "exprstmt") {
     chk_exprstmt(id);
   }
 } chain (int id) {
   chk_declared_type(id);
 } return void;
-given badexpr_fixture ((import badexpr_fn)):() then check_failed:(1)
-given composite_fixture ((import un_neg)):() then check_failed:(0)
-given sd_decl_fixture ((import sd_dbad)):() then check_failed:(1)
+given badexpr_fixture ((import badexpr_fn)):() then (import chkfail)[0]:(1)
+given composite_fixture ((import un_neg)):() then (import chkfail)[0]:(0)
+given sd_decl_fixture ((import sd_dbad)):() then (import chkfail)[0]:(1)
 
 chk_un(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string t = type_of(i1_of_v);
   if(ty_known(t) == 1) {
     chk_un2(id, t);
   }
 } return void;
-given composite_fixture ((import un_float)):() then check_failed:(0)
-given composite_fixture ((import un_neg)):() then check_failed:(0)
+given composite_fixture ((import un_float)):() then (import chkfail)[0]:(0)
+given composite_fixture ((import un_neg)):() then (import chkfail)[0]:(0)
 
 // Negation is the one with its own wording in idc.py; `!` and `~` share
 // theirs, and naming the operator in it is what tells them apart.
 chk_un2(int id, string t) {
-  if(s1_of(id) == "-" && ty_num(t) == 0) {
+  if((import ns1)[id] == "-" && ty_num(t) == 0) {
     tc_err(id, "cannot negate a " + t);
-  } else if(s1_of(id) != "-" && ty_int(t) == 0) {
-    string s1_of_v = s1_of(id);
+  } else if((import ns1)[id] != "-" && ty_int(t) == 0) {
+    string s1_of_v = (import ns1)[id];
     tc_err(id, "cannot apply '" + s1_of_v + "' to a " + t);
   }
 } return void;
-given composite_fixture ((import un_neg), "int"):() then check_failed:(0)
-given composite_fixture ((import un_not), "float"):() then check_failed:(1)
+given composite_fixture ((import un_neg), "int"):() then (import chkfail)[0]:(0)
+given composite_fixture ((import un_not), "float"):() then (import chkfail)[0]:(1)

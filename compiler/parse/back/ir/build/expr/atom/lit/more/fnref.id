@@ -17,7 +17,7 @@ given lw_fix_var ((import fix_var_n)):(1)
 
 lw_fnref(int node) {
   string ety = lw_ety(node);
-  string s1_of_v = s1_of(node);
+  string s1_of_v = (import ns1)[node];
   int ret_i = ir_leaf("global", ety, 0 - 1, 0 - 1, "id_" + s1_of_v);
 } return int ret_i;
 given lw_fix_fnval ((import fix_fnval_n)):(0) then ir_last_b:(0)
@@ -31,7 +31,7 @@ given lw_fix_var ((import fix_var_n)):(0)
 // something to fail.
 ir_last_b() {
   int n = len((import iop));
-  int ret_i = ir_b(n - 1) + 1;
+  int ret_i = (import ib)[(n - 1)] + 1;
 } return int ret_i;
 given ir_last_fix ():(0)
 given ir_last_fix2 ():(6)

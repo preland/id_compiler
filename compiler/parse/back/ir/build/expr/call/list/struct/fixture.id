@@ -21,5 +21,5 @@ sr_fixture() {
   export int sr_iy = node_index((import sr_ic2), newleaf("fld", 0, 0, "y", ""));
   export int sr_iw = node_iassign((import sr_ix), (import sr_one));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -13,9 +13,9 @@ given stmt_fix ([1, 2], ""):() then prints:("y = 5;\nz = 5;\n")
 given stmt_fix ([], ""):() then prints:("")
 
 emit_stmt(int id, string ind) {
-  if(k_of(id) == "decl") {
-    string s2_of_v = s2_of(id);
-    int i1_of_v = i1_of(id);
+  if((import nkind)[id] == "decl") {
+    string s2_of_v = (import ns2)[id];
+    int i1_of_v = (import ni1)[id];
     emit_decl_mark(id, s2_of_v, i1_of_v, ind);
   } else {
     es2(id, ind);

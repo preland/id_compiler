@@ -19,6 +19,11 @@ given full_env ():() then calls fix_wprop:[0]
 
 //   fixd_wadj  for each function, the functions that call or name it
 //   fixd_wq    marked functions whose callers are not marked yet
+// fixd_wadj: fixd_wadj as a whole, for fix_wedge's own cases (edge/ref/main.id is at
+// the three-function cap) -- push cannot be witnessed with 'then calls' (it
+// is a builtin), and reading the whole table avoids hard-coding which row.
+// fixd_wadj: fixd_wadj has no reader elsewhere in the build, for fix_wrow's own cases
+// (plan/reach/build/fill.id is at the three-function cap).
 fix_winit() {
   export int[] fixd_wm = [];
   export int[][] fixd_wadj = [];
@@ -36,5 +41,5 @@ fix_winit2() {
     i = i + 1;
   }
 } return void;
-given fix_wfill_fixture ():() then fixd_wadj_len:(2)
-given fix_wfill_fixture ():() then fixd_wadj_all:([[], []])
+given fix_wfill_fixture ():() then len((import fixd_wadj)):(2)
+given fix_wfill_fixture ():() then (import fixd_wadj):([[], []])

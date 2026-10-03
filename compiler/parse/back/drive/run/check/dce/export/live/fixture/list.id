@@ -8,7 +8,7 @@ lc_dce_init() {
   lc_env();
   harn_init();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // One list constant ("a") and one scalar constant ("b"), at export indices 0
@@ -18,7 +18,7 @@ lc_dce_setup() {
   lc_reg_list1("a", "1", 1);
   lc_reg_int("b", "2", 2);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // A scalar constant only -- no list constant survives, for list_consts_kept's
@@ -27,5 +27,5 @@ lc_dce_setup2() {
   lc_dce_init();
   lc_reg_int("b", "2", 2);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

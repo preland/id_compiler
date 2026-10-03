@@ -6,17 +6,6 @@ ir_seed() {
   env_init();
   ir_col3([9]);
 } return void;
-():() then chk0_bl:([9])
-():() then chk0_home:(-1)
+():() then (import iblk)[0]:([9])
+():() then (import ihome)[0]:(-1)
 
-chk0_bl() {
-  int[] ret_li = ir_bl(0);
-} return int[] ret_li;
-given ir_seed ():([9])
-given ir_seed ():([9]) then chk0_home:(-1)
-
-chk0_home() {
-  int ret_i = ir_home(0);
-} return int ret_i;
-given ir_seed ():(-1)
-given ir_seed ():(-1) then chk0_bl:([9])

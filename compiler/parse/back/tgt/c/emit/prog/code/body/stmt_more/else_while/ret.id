@@ -7,7 +7,7 @@ lz_m() {
   export int lz_decl9 = node_decl("int", "r", (import lz_r9), 0);
   export int lz_fn5 = node_func("dup5", "int", (import f_none), [(import lz_decl5)], (import lz_dv));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 emit_ret(int id) {
@@ -21,8 +21,8 @@ given ret_void_fix (8):() then prints:("    return;\n")
 // statement alike: both keep the value in ni1, -1 when there is none.
 ret_code(int id) {
   string ret_s = "return;";
-  if(i1_of(id) >= 0) {
-    int i1_of_v = i1_of(id);
+  if((import ni1)[id] >= 0) {
+    int i1_of_v = (import ni1)[id];
     string emit_expr_v = emit_expr(i1_of_v);
     ret_s = "return " + emit_expr_v + ";";
   }

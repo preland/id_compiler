@@ -12,7 +12,7 @@
 // (compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id) is exactly
 // this: every hash bucket has to be its own list.
 cw_arr_lit(int id) {
-  int[] els = l1_of(id);
+  int[] els = (import nl1)[id];
   int ok = 0;
   if(len(els) > 0) {
     ok = cw_arr_lit2(els);
@@ -33,7 +33,7 @@ given cwv_els_fixture ((import cwv_els)):(1)
 given cwv_els_fixture ((import cwv_mixed_els)):(0)
 
 cw_arr_elem_lit(int e) {
-  string k = k_of(e);
+  string k = (import nkind)[e];
   int ok = k == "int" || k == "float" || k == "str";
 } return int ok;
 given ret_widens_fn ((import widen_e)):(1)

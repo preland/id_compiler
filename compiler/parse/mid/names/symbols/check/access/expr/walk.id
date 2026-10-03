@@ -14,8 +14,8 @@ given elems_fixture ((import elems_two), "f", 10):() then calls acc_expr:((impor
 // exported global. The rest are operators and literals, walked for the names
 // underneath them.
 acc_expr(int id, string owner, int ln) {
-  if(k_of(id) == "var") {
-    string s1_of_v = s1_of(id);
+  if((import nkind)[id] == "var") {
+    string s1_of_v = (import ns1)[id];
     acc_var(s1_of_v, owner, ln);
   } else {
     acc_expr2(id, owner, ln);
@@ -25,8 +25,8 @@ given pushfix_var ((import pushfix_var_node), "f", 10):() then calls acc_var:("x
 given cm_setup ((import cm_push_call), "f", 10):() then calls acc_expr2:((import cm_push_call), "f", 10)
 
 acc_expr2(int id, string owner, int ln) {
-  if(k_of(id) == "import") {
-    string s1_of_v = s1_of(id);
+  if((import nkind)[id] == "import") {
+    string s1_of_v = (import ns1)[id];
     acc_import(s1_of_v, owner, ln);
   } else {
     acc_expr3(id, owner, ln);

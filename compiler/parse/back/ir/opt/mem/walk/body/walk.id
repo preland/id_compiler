@@ -10,11 +10,11 @@ given ir_rows (1, 1):() then calls m2r_blk:[0]
 
 m2r_blk(int f, int i) {
   m2r_seed(i, 0);
-  int[] irf_blk_v = irf_blk(f);
+  int[] irf_blk_v = (import fnblk)[f];
   int n = 0;
 } chain (int f, int i) {
-  while(n < insn_count(irf_blk_v[i])) {
-    int[] blk_ins_v = blk_ins(irf_blk_v[i]);
+  while(n < len(((import binsn)[(irf_blk_v[i])]))) {
+    int[] blk_ins_v = (import binsn)[(irf_blk_v[i])];
     m2r_step(f, blk_ins_v[n], i);
     n = n + 1;
   }

@@ -26,7 +26,7 @@
 
 resv_err(int i) {
   string prog_loc_v = prog_loc(i);
-  string s1_of_v = s1_of((import prog)[i]);
+  string s1_of_v = (import ns1)[((import prog)[i])];
   print(prog_loc_v + "function '" + s1_of_v + "' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_" + s1_of_v + "'. Choose another name");
 } chain (int i) {
   note_failure();
@@ -34,19 +34,20 @@ resv_err(int i) {
 given resv_scan_fixture (0):() then prints:("a.id:3: error: function 'eprint' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_eprint'. Choose another name\n")
 given resv_scan_fixture (1):() then prints:("b.id:9: error: function 'plain_name' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_plain_name'. Choose another name\n")
 
+// resv_names: resv_names is deliberately left uncased, because a regression here is
+// caught louder downstream. --list-untested still reports it, and will keep
+// reporting it: that tool counts cases, and nothing in it records a decision
+// not to write them. The disagreement is expected, not a drift to repair.
+// A reserved word let through as an identifier, or
+// one rejected that was fine, fails immediately in the checks that read this
+// table. A reader would be a second witness to something already unmissable.
 init_resv_names() {
   export string[] resv_names = [];
   int i = 0;
   while(i < len((import resv_names_src))) {
-    i = take_resv_name((import resv_names_src), i);
+    i = take_name((import resv_names_src), i, (import resv_names));
   }
 } return void;
-():() then calls push_resv_name:[74]
-():() then resv_names_last:("ushr")
+():() then calls take_name:[74]
+():() then (import resv_names)[73]:("ushr")
 
-resv_names_last() {
-  int n = len((import resv_names));
-  string last_s = (import resv_names)[n - 1];
-} return string last_s;
-given init_resv_names ():("ushr")
-given init_rtc ():("ushr")

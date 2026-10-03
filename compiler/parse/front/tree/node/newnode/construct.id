@@ -16,8 +16,3 @@ newleaf(string k, int a, int b, string s1, string s2) {
 given full_env ("var", 0, 0, "x", ""):(0) then calls newnode:("var", 0, 0, "x", "", [], [])
 given full_env ("int", 5, 0, "5", ""):(0) then calls newnode:("int", 5, 0, "5", "", [], [])
 
-k_of(int id) {
-  string ret_s = (import nkind)[id];
-} return string ret_s;
-given mk_two_nodes (0):("kw")
-given mk_two_nodes (1):("func")

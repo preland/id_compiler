@@ -14,12 +14,12 @@
 natives_then_prune() {
   int all = nat_all_live();
   nat_scan("program", all);
-  if(is_freestanding() == 0) {
+  if((import fsc)[0] == 0) {
     dce_prune();
   }
 } return void;
 given natcall_fixture ():() then calls nat_scan:("program", 1)
-given natcall_fixture ():() then calls nat_scan:("program", 1) then check_failed:(0)
+given natcall_fixture ():() then calls nat_scan:("program", 1) then (import chkfail)[0]:(0)
 
 nat_print() {
   int i = 0;

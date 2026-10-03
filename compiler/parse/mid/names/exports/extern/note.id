@@ -1,22 +1,14 @@
-// Whether this project is the runtime. Read by the reserved-name check and by
-// the LLVM module header, which must not declare a symbol the module defines.
-is_runtime() {
-  int ret_i = (import rtc)[0];
-} return int ret_i;
-given init_rtc ():(0)
-given rt_fixture ():(1)
-
 rt_fixture() {
   init_rtc();
-  rt_set(1);
+  lset((import rtc), 0, 1);
 } return void;
-():() then is_runtime:(1)
-():() then is_freestanding:(0)
+():() then (import rtc)[0]:(1)
+():() then (import fsc)[0]:(0)
 
 declfix() {
   regrow_d();
   int e = node_int("1", 1, 0);
   export int rgdecl_node = node_decl("int", "q", e, 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

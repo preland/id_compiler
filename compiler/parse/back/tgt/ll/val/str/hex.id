@@ -23,7 +23,7 @@ ll_nib(int n) {
 // constant for a value that has none.
 ll_isstr(int v) {
   int r = 0;
-  if(ir_op(v) == "const" && ir_ty(v) == "string" && ir_s(v) != "undef") {
+  if((import iop)[v] == "const" && (import ity)[v] == "string" && (import istr)[v] != "undef") {
     r = 1;
   }
 } return int r;

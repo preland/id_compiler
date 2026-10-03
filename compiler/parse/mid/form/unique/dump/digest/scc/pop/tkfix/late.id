@@ -8,19 +8,19 @@ tk_t_in1() {
   tk_t_prep();
   push((import tccin), "x");
 } return void;
-():() then tk_nin:(0)
-():() then tk_nkeys:(2)
+():() then tk_nin:("in 0")
+():() then tk_nkeys:("keys 2")
 
 tk_t_exp_late() {
   tk_t_prep();
   add_export("gx", "int", "fa");
 } return void;
 ():() then tk_etype_gx:("")
-():() then tk_nkeys:(2)
+():() then tk_nkeys:("keys 2")
 
 tk_t_asm_late() {
   tk_t_prep();
   asmfx_push();
 } return void;
 ():() then tk_asm_foo:(0)
-():() then tk_nkeys:(2)
+():() then tk_nkeys:("keys 2")

@@ -8,15 +8,15 @@ fix_wfill_fixture() {
   push((import fnames), "main");
   fix_winit();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fix_wrow() {
   int[] row = [];
   push((import fixd_wadj), row);
 } return void;
-given fix_wseed_fixture ():() then fixd_wadj_len:(1)
-given fix_wprop_fixture ():() then fixd_wadj_len:(3)
+given fix_wseed_fixture ():() then len((import fixd_wadj)):(1)
+given fix_wprop_fixture ():() then len((import fixd_wadj)):(3)
 
 fix_wedges(int f, int lo) {
   while(f < len((import prog))) {

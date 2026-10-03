@@ -13,7 +13,7 @@ given llc_float_setup (0, 1, (import llc_float_e), "float"):("%s0.1")
 ll_cell_line(int i, int j, int e, string t) {
   string insn = "ptrtoint ptr @.cs." + (import enames)[i] + "." + j + " to i64";
   if(t == "float") {
-    insn = "call i64 @id_box_f(double " + s1_of(e) + ")";
+    insn = "call i64 @id_box_f(double " + (import ns1)[e] + ")";
   }
 } return string insn;
 given llc_str_setup (0, 3, (import llc_str_e), "string"):("ptrtoint ptr @.cs.k.3 to i64")

@@ -1,8 +1,8 @@
 // A case's arguments, one C local each: `idtc_a0`, `idtc_a1`, ...
 
 emit_case_args(int ci) {
-  int[] ps = l1_of((import casefn)[ci]);
-  int[] args = l1_of((import casenode)[ci]);
+  int[] ps = (import nl1)[((import casefn)[ci])];
+  int[] args = (import nl1)[((import casenode)[ci])];
   emit_arg_lines(ps, args);
 } return void;
 given wrap_fixture (0):() then prints:("    int idtc_a0 = 0;\n")
@@ -19,7 +19,7 @@ given calls_items_fixture ((import fixture_params), (import fixture_calls_one)):
 given calls_items_fixture ((import fixture_params), (import fixture_calls_none)):() then prints:("")
 
 emit_arg_line(int[] ps, int[] args, int j) {
-  string pt = s1_of(ps[j]);
+  string pt = (import ns1)[(ps[j])];
   string cv = tc_value(args[j], pt);
   emit_tc_decl(pt, "idtc_a" + j, cv);
 } return void;

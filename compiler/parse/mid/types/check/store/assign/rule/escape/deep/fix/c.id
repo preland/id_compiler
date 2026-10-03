@@ -29,7 +29,7 @@ esc_fd_g() {
   export int efd_pks = node_exprstmt((import efd_pkc));
   export int efd_via = node_func("fd_via", "void", (import efd_np), [(import efd_dd), (import efd_pks)], 0 - 1);
 } return void;
-given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 
 esc_fd_h() {
@@ -39,7 +39,7 @@ esc_fd_h() {
 } chain () {
   lset((import sqbase), 0, (import efd_good));
 } return void;
-given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 
 esc_dfix() {
@@ -55,5 +55,5 @@ esc_dfix() {
   esc_fd_g();
   esc_fd_h();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

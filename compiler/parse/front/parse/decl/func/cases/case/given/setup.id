@@ -31,7 +31,7 @@ parse_case_args(int[] pos) {
   int ret_i = parse_case_rhs(pos, args);
 } return int ret_i;
 given case_min_fix ([0]):(2)
-given case_min_fix ([0]):(2) then check_failed:(0)
+given case_min_fix ([0]):(2) then (import chkfail)[0]:(0)
 
 case_given(int[] pos) {
   string setup_nm = "";
@@ -93,13 +93,13 @@ case_given(int[] pos) {
 given given_fix ([0]):()
 given tup1_fix ([0]):()
 given tmo_fix ([0]):() then tmo_last:(5)
-given tmo_fix ([0]):() then check_failed:(0)
-given tmo_fix ([3]):() then check_failed:(1)
-given tmo_fix ([5]):() then check_failed:(1)
-given tmo_fix ([7]):() then check_failed:(1)
-given tmo_fix ([11]):() then check_failed:(1)
-given tmo_fix ([14]):() then check_failed:(1)
-given tmo_fix ([16]):() then check_failed:(1)
+given tmo_fix ([0]):() then (import chkfail)[0]:(0)
+given tmo_fix ([3]):() then (import chkfail)[0]:(1)
+given tmo_fix ([5]):() then (import chkfail)[0]:(1)
+given tmo_fix ([7]):() then (import chkfail)[0]:(1)
+given tmo_fix ([11]):() then (import chkfail)[0]:(1)
+given tmo_fix ([14]):() then (import chkfail)[0]:(1)
+given tmo_fix ([16]):() then (import chkfail)[0]:(1)
 
 given_name(int[] pos, int[] gs) {
   advance(pos);

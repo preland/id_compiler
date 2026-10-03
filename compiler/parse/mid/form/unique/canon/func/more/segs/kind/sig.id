@@ -11,7 +11,7 @@
 // cross-function collision detection for later segments, and is the open half
 // of this design.
 segs_sig(int id) {
-  string nm = s1_of(id);
+  string nm = (import ns1)[id];
   uq_begin(nm);
   string ret_s = segs_sig2(id);
 } return string ret_s;
@@ -23,9 +23,9 @@ given lz_o (23):("()->int=>v0")
 // Split from segs_sig so that it stays within the action limit once the
 // position map is reset there.
 segs_sig2(int id) {
-  int[] params = l1_of(id);
+  int[] params = (import nl1)[id];
   string sigparams = canon_params(params);
-  string ret_s = "(" + sigparams + ")->" + s2_of(id) + "=>" + canon_ret(id);
+  string ret_s = "(" + sigparams + ")->" + (import ns2)[id] + "=>" + canon_ret(id);
 } return string ret_s;
 given lz_o (22):("()->int=>v0")
 given lz_o (23):("()->int=>v0")

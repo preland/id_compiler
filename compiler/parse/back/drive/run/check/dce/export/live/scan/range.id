@@ -1,4 +1,5 @@
-// The leaf of the constant walk: every import node in a range of the node
+// The leaf of the constant walk: every import node (and a case's cimport, the
+// index of a `then (import tbl)[(import NAME)]` check) in a range of the node
 // store, and what it makes live.
 
 const_range(int cv_lo, int cv_hi) {
@@ -7,18 +8,18 @@ const_range(int cv_lo, int cv_hi) {
     cv_lo = cv_lo + 1;
   }
 } return void;
-given cvl_setup (8, 9):() then clive_str:("cb,cd")
-given cvl_setup (9, 9):() then clive_str:("cd")
+given cvl_setup (8, 9):() then clive_str:("live cb,cd")
+given cvl_setup (9, 9):() then clive_str:("live cd")
 
 const_take(int cv_id) {
-  if(k_of(cv_id) == "import" || k_of(cv_id) == "var") {
-    string cv_name = s1_of(cv_id);
+  if((import nkind)[cv_id] == "import" || (import nkind)[cv_id] == "var" || (import nkind)[cv_id] == "cimport") {
+    string cv_name = (import ns1)[cv_id];
     const_add(cv_name);
   }
 } return void;
-given cvl_setup (8):() then clive_str:("cb")
-given cvl_setup (4):() then clive_str:("")
-given cvl_setup (2):() then clive_str:("ca")
+given cvl_setup (8):() then clive_str:("live cb")
+given cvl_setup (4):() then clive_str:("live ")
+given cvl_setup (2):() then clive_str:("live ca")
 
 const_add(string cv_name) {
   int cv_ek = find_str((import enames), cv_name);
@@ -26,6 +27,6 @@ const_add(string cv_name) {
     push((import clive), cv_name);
   }
 } return void;
-given cvl_setup ("ca"):() then clive_str:("ca")
-given cvl_setup given cvl_scan ("cb"):() then clive_str:("cb,cd")
-given cvl_setup ("zz"):() then clive_str:("")
+given cvl_setup ("ca"):() then clive_str:("live ca")
+given cvl_setup given cvl_scan ("cb"):() then clive_str:("live cb,cd")
+given cvl_setup ("zz"):() then clive_str:("live ")

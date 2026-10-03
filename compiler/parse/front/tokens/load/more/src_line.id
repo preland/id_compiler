@@ -14,13 +14,13 @@ push_line() {
   int src_line_v = src_line();
   push((import tline), src_line_v);
 } return void;
-given full_env ():() then last_tline:(1)
-given mk_line9 ():() then last_tline:(9)
+given full_env ():() then last_tline:("tline 1")
+given mk_line9 ():() then last_tline:("tline 9")
 
 // The line most recently pushed onto tline, for push_line's own cases and
 // take_line/load_at's -- all three are void and tline is an imported list.
 last_tline() {
-  int ret_i = lst_last((import tline));
-} return int ret_i;
-given mk_two_toks ():(1)
-given mk_three_toks ():(1)
+  string ret_i_t = "tline " + (lst_last((import tline)));
+} return string ret_i_t;
+given mk_two_toks ():("tline 1")
+given mk_three_toks ():("tline 1")

@@ -4,8 +4,8 @@
 // its own: an int passed for a float field is boxed as the float it becomes).
 
 emit_ctor(int id) {
-  string sd_nm = s1_of(id);
-  int[] sd_as = l1_of(id);
+  string sd_nm = (import ns1)[id];
+  int[] sd_as = (import nl1)[id];
   string ret_s = ctor_lit(sd_nm, sd_as);
 } return string ret_s;
 given sd_ctor_fixture ((import sd_c2)):("id_list_lit(2, (long long)(1), (long long)(1))")

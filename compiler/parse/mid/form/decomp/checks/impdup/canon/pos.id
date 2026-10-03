@@ -3,17 +3,12 @@
 // go in a separate list, `cimps`, that seg_text (./text.id) puts in front of
 // each segment. Two segments are one function written twice only if both the
 // text and the names agree; a pair that agrees on the text alone differs only
-// in which imports it reads (../scan/).
-//
-// A segment of at most one statement carries a "~" in front of its names. Such
-// a function is a named accessor or setter of a module's global -- s1_of is
-// `ns1[id]` and s2_of is `ns2[id]` -- and there is no logic in it to share:
-// parameterising it leaves the same one-line function behind for every global.
-// The mark keeps it out of the import-only error without touching the
-// duplicate-logic rule, which still sees the names.
+// in which imports it reads (../scan/). No segment is exempt, however short: a
+// one-statement accessor per global is the same function written once per
+// global, and the fix is the same parameter.
 
 imp_fp(int imp_id) {
-  string imp_name = s1_of(imp_id);
+  string imp_name = (import ns1)[imp_id];
   int imp_at = imp_pos(imp_name);
   string ret_s = "g(" + imp_at + ")";
 } return string ret_s;
@@ -31,11 +26,8 @@ imp_pos(string imp_key) {
 given lz_c ("cfg"):(0)
 given imp_seed_fixture ("cfg"):(1)
 
-imp_vec(int imp_stmts) {
+imp_vec() {
   string ret_s = str_join((import cimps), ",");
-  if(imp_stmts <= (import impdup_exempt_stmts)) {
-    ret_s = "~" + ret_s;
-  }
 } return string ret_s;
-given imp_seed_fixture (2):("first")
-given imp_seed_fixture (1):("~first")
+given imp_seed_fixture ():("first")
+given lz_c ():("")

@@ -1,15 +1,15 @@
 // Argument i converted to the type it must arrive as, and the fallback type
 // for a callee with no parameter list to ask.
 lw_arg_pty(int node, int i) {
-  int[] args = l1_of(node);
-  string name = s1_of(node);
+  int[] args = (import nl1)[node];
+  string name = (import ns1)[node];
   string pty = lw_pty(name, i, args[i]);
 } return string pty;
 given pcall_fixture ((import pcall_node), 0):("word")
 given bicall_fixture ((import bicall_node), 0):("int")
 
 lw_arg_conv(int node, int i, string pty) {
-  int[] args = l1_of(node);
+  int[] args = (import nl1)[node];
   int v = lw_as(args[i], pty);
 } return int v;
 given pcall_fixture ((import pcall_node), 0, "int"):(0)

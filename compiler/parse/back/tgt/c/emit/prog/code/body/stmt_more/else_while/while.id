@@ -2,7 +2,7 @@
 // The while loop.
 
 emit_while(int id, string ind) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string emit_expr_v = emit_expr(i1_of_v);
   emit_while_head(id, ind, emit_expr_v);
 } return void;
@@ -20,7 +20,7 @@ given harn_fix (3, "  ", "5"):() then calls emit_while_body:(3, "  ")
 // nothing outside it.
 emit_while_body(int id, string ind) {
   emit_count(ind + "    ");
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   emit_body_close(l1_of_v, ind);
 } return void;
 given harn_fix (3, ""):() then calls emit_count:("    ") then calls emit_body_close:([], "")

@@ -4,13 +4,13 @@
 
 ce4(int id) {
   string out = ce5(id);
-  if(k_of(id) == "un") {
-    int i1_of_v = i1_of(id);
-    out = "u" + s1_of(id) + "(" + canon_expr(i1_of_v) + ")";
+  if((import nkind)[id] == "un") {
+    int i1_of_v = (import ni1)[id];
+    out = "u" + (import ns1)[id] + "(" + canon_expr(i1_of_v) + ")";
   }
-  if(k_of(id) == "index") {
-    int i1_of_v2 = i1_of(id);
-    int i2_of_v = i2_of(id);
+  if((import nkind)[id] == "index") {
+    int i1_of_v2 = (import ni1)[id];
+    int i2_of_v = (import ni2)[id];
     out = "ix" + canon_pair(i1_of_v2, i2_of_v);
   }
 } return string out;
@@ -25,12 +25,12 @@ given lw_fix_arr ((import fix_arr_n)):("ar(I1)")
 // they are. A missed duplicate is a gap; a duplicate reported against a legal
 // program stops work.
 ce5(int id) {
-  string out = "?" + k_of(id) + "#" + id;
-  if(k_of(id) == "call") {
+  string out = "?" + (import nkind)[id] + "#" + id;
+  if((import nkind)[id] == "call") {
     out = call_fp(id);
   }
-  if(k_of(id) == "arr") {
-    int[] l1_of_v2 = l1_of(id);
+  if((import nkind)[id] == "arr") {
+    int[] l1_of_v2 = (import nl1)[id];
     out = "ar(" + canon_args(l1_of_v2) + ")";
   }
 } return string out;
@@ -45,7 +45,7 @@ given lw_fix_arr_empty ((import fix_arr_empty_n)):("ar()")
 // function's own variables, and no variable shares a function's name.
 canon_callee(string name) {
   string out = name;
-  if(name == cur_self()) {
+  if(name == (import cself)[0]) {
     out = "self";
   }
   if(find_str((import cnames), name) >= 0) {

@@ -27,7 +27,7 @@ given init_tyreg ("int"):("int")
 given init_tyreg ("int[]"):("list")
 
 ty_row_kind(string t) {
-  int r = ty_find(t);
+  int r = find_str((import tyname), t);
   string s = "?";
   if(r >= 0) {
     s = (import tykind)[r];

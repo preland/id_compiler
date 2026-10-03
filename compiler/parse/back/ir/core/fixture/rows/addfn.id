@@ -12,7 +12,7 @@ ir_rows() {
   int ret_i = init_ir();
   ir_rows_fn0();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 ir_rows_fn0() {
@@ -20,7 +20,7 @@ ir_rows_fn0() {
   int b0 = ir_block(f0, "entry");
   ir_rows_fn0_insn();
 } return void;
-given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then (import chkfail)[0]:(0)
 given ir_rows ():() then init_units:(0)
 
 ir_rows_fn0_insn() {
@@ -28,5 +28,5 @@ ir_rows_fn0_insn() {
   ir_add(0, v0);
   ir_rows_fn1();
 } return void;
-given ir_rows ():() then check_failed:(0)
+given ir_rows ():() then (import chkfail)[0]:(0)
 given ir_rows ():() then init_units:(0)

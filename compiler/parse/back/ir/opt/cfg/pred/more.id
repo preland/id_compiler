@@ -1,11 +1,11 @@
 // One block's predecessor list, wiped before the rescan refills it.
 pred_clear_at(int f, int i) {
-  int[] irf_blk_v = irf_blk(f);
-  int[] blk_pre_v = blk_pre(irf_blk_v[i]);
+  int[] irf_blk_v = (import fnblk)[f];
+  int[] blk_pre_v = (import bpred)[(irf_blk_v[i])];
   pred_wipe(blk_pre_v);
 } return void;
-given br_fixture_p (0, 1):() then chk_pred1:([])
-given br_fixture_p (0, 0):() then chk_pred1:([0])
+given br_fixture_p (0, 1):() then (import bpred)[1]:([])
+given br_fixture_p (0, 0):() then (import bpred)[1]:([0])
 
 // cfg_fixture plus a second, branching terminator in block 0 (id 1, "br",
 // targeting block 1) -- so pred_of/pred_succ have a real edge to compute.
@@ -15,7 +15,7 @@ br_fixture() {
   br_add();
   ret1_add();
 } return void;
-():() then chk_pred1:([])
+():() then (import bpred)[1]:([])
 ():() then chk_blk_count:(2)
 
 br_add() {

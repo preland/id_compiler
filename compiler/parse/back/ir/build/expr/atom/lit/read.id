@@ -4,7 +4,7 @@
 // rather than a rewrite of the instruction stream.
 lw_lit(int node) {
   string lw_ety_v = lw_ety(node);
-  string s1_of_v = s1_of(node);
+  string s1_of_v = (import ns1)[node];
   int ret_i = lw_const(lw_ety_v, s1_of_v);
 } return int ret_i;
 given lw_fix_int ((import fix_int_n)):(0)

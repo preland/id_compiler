@@ -14,7 +14,7 @@ init_lines3() {
   export int[] curtl = [0];
   init_lines4();
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
 //   casefn     the function node each case was written under
@@ -23,10 +23,11 @@ given full_env ():() then init_units:(0)
 //              rebuilding its text: identical cases are rejected, and the
 //              token store is already the canonical form.
 // The rest of the case columns are declared by init_cases.
+// casefn: One entry of `casefn` against one function node.
 init_lines4() {
   export int[] casefn = [];
   export int[] casestart = [];
   init_cases();
 } return void;
-given full_env ():() then check_failed:(0)
+given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

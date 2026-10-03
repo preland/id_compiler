@@ -7,7 +7,7 @@
 // call: both need the base list, and nothing between the two reads changes the
 // store.
 emit_index(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string elem = type_of(id);
   string sd_ixc = emit_idx(id);
 } chain (int id) {
@@ -25,15 +25,15 @@ emit_idx(int id) {
   if(is_fld_idx(id) == 1) {
     sd_c = emit_fpos(id);
   } else {
-    sd_c = emit_expr(i2_of(id));
+    sd_c = emit_expr((import ni2)[id]);
   }
 } return string sd_c;
 given idx_build ((import idx_fix)):("2")
 given sd_use_fixture ((import sd_iz)):("-1")
 
 emit_fpos(int id) {
-  string sd_bt = type_of(i1_of(id));
-  string sd_f = s1_of(i2_of(id));
+  string sd_bt = type_of((import ni1)[id]);
+  string sd_f = (import ns1)[((import ni2)[id])];
   string sd_c = "" + sd_fpos(sd_bt, sd_f);
 } return string sd_c;
 given sd_use_fixture ((import sd_ix)):("0")

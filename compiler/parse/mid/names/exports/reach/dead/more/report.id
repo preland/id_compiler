@@ -1,7 +1,7 @@
 // A read of an exported name whose owner is not reachable. Reached only from
 // the final sweep, which already established that the reading function is.
 chk_import_at(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   if(find_str((import enames), s1_of_v) >= 0 && is_reach_owner(id) == 0) {
     dead_err(id);
   }
@@ -12,7 +12,7 @@ given dead_exp_reach_fixture ((import dead_imp_b)):() then prints:("<stdin>:1: e
 // Whether the function that owns the export id reads is reachable. Named so
 // the call in chk_import_at's condition is not itself an argument to is_reach.
 is_reach_owner(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   string export_owner_v = export_owner(s1_of_v);
   int ok = is_reach(export_owner_v);
 } return int ok;
@@ -22,9 +22,9 @@ given dead_exp_reach_fixture ((import reach_imp_m)):(1)
 // s1_of(id) and export_owner(s1_of_v) are read once and reused: nothing
 // between the reads changes the node store or the export table.
 dead_err(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   string export_owner_v = export_owner(s1_of_v);
   tc_err(id, "'" + s1_of_v + "' is exported by '" + export_owner_v + "', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call '" + export_owner_v + "' from main's setup chain");
 } return void;
-given dead_exp_reach_fixture ((import dead_imp_a)):() then prints:("<stdin>:1: error: 'gx' is exported by 'setup_fn', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call 'setup_fn' from main's setup chain\n") then check_failed:(1)
-given dead_exp_reach_fixture ((import dead_imp_b)):() then prints:("<stdin>:1: error: 'gy' is exported by 'other_fn', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call 'other_fn' from main's setup chain\n") then check_failed:(1)
+given dead_exp_reach_fixture ((import dead_imp_a)):() then prints:("<stdin>:1: error: 'gx' is exported by 'setup_fn', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call 'setup_fn' from main's setup chain\n") then (import chkfail)[0]:(1)
+given dead_exp_reach_fixture ((import dead_imp_b)):() then prints:("<stdin>:1: error: 'gy' is exported by 'other_fn', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call 'other_fn' from main's setup chain\n") then (import chkfail)[0]:(1)

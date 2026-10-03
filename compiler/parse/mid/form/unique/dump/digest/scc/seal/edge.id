@@ -24,11 +24,3 @@ dg_seal_edge(word[] dgacc, int[] dgbad, int dgw) {
 given dg_t_marked ([0, 0], [0], 2):([0, 3433123315665011780], [0])
 given dg_t_marked ([0, 0], [0], 3):([0, 0], [1])
 
-// The stack cut back to its first dgp entries once a component is sealed.
-dg_trunc(int dgp) {
-  while(len((import dg_stk)) > dgp) {
-    pop((import dg_stk));
-  }
-} return void;
-given dg_t_stk2 (0):() then dg_nstk:(0)
-given dg_t_stk2 (1):() then dg_nstk:(1)

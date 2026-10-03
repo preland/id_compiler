@@ -19,3 +19,15 @@ print_label(string kind) {
 } return string lab;
 ("thenprints"):("prints")
 ("theneprints"):("eprints")
+
+// The C call that measures an export for `then len((import NAME))` (check/
+// entry.id): a list's length and a string's are different runtime calls.
+// Filed here because the check/ lane is at the three-function limit.
+then_len_call(string nm) {
+  string lc = "id_len(";
+  if(ty_is_list((import etypes)[find_str((import enames), nm)]) == 1) {
+    lc = "id_list_len(";
+  }
+} return string lc;
+given then_imp_fixture ("int[]", 0, 0) ("gx"):("id_list_len(")
+given then_imp_fixture ("string", 0, 0) ("gx"):("id_len(")

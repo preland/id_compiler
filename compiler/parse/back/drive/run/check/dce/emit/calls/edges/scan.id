@@ -5,7 +5,7 @@
 // rather than gated by reachability, because --calls reports the whole graph
 // a build would prune from, not what a build would keep.
 scan_call_edge(int id, string caller) {
-  string k = k_of(id);
+  string k = (import nkind)[id];
   if(k == "call") {
     call_edge_emit(caller, id, "call");
   }
@@ -13,8 +13,8 @@ scan_call_edge(int id, string caller) {
     scan_call_value(id, caller);
   }
 } return void;
-given edge_fixture ((import edge_call_node), "edge_caller"):() then check_failed:(0)
-given edge_fixture ((import edge_var_node), "edge_caller"):() then check_failed:(0)
+given edge_fixture ((import edge_call_node), "edge_caller"):() then (import chkfail)[0]:(0)
+given edge_fixture ((import edge_var_node), "edge_caller"):() then (import chkfail)[0]:(0)
 
 // A name used as a value is an edge only when it names a function
 // (call_callee_loc's membership test again, ../line.id) -- reach_add ignores
@@ -37,20 +37,20 @@ given edge_fixture ((import edge_var_node), "edge_caller"):() then check_failed:
 // task's scope; idc/README.md's "The function dependency tree" section says
 // so.
 scan_call_value(int id, string caller) {
-  string name = s1_of(id);
+  string name = (import ns1)[id];
   if(find_str((import fnames), name) >= 0) {
     call_edge_emit(caller, id, "value");
   }
 } return void;
-given edge_fixture ((import edge_var_node), "edge_caller"):() then check_failed:(0)
-given edge_fixture ((import edge_call_node), "edge_caller"):() then check_failed:(0)
+given edge_fixture ((import edge_var_node), "edge_caller"):() then (import chkfail)[0]:(0)
+given edge_fixture ((import edge_call_node), "edge_caller"):() then (import chkfail)[0]:(0)
 
 // One printed row, built from the callee's own node so caller and callee
 // never disagree with what k_of/s1_of already resolved.
 call_edge_emit(string caller, int id, string kind) {
-  string callee_name = s1_of(id);
+  string callee_name = (import ns1)[id];
   string line = call_edge_line(caller, callee_name, kind);
   print(line);
 } return void;
-given edge_fixture ("edge_caller", (import edge_call_node), "call"):() then check_failed:(0)
-given edge_fixture ("edge_caller", (import edge_var_node), "value"):() then check_failed:(0)
+given edge_fixture ("edge_caller", (import edge_call_node), "call"):() then (import chkfail)[0]:(0)
+given edge_fixture ("edge_caller", (import edge_var_node), "value"):() then (import chkfail)[0]:(0)

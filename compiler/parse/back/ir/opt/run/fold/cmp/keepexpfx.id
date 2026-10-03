@@ -1,12 +1,12 @@
-// keep_export_fixture (../../../cfg/dce/use/cases/keepexpfx.id) plus is_harn()
+// keep_export_fixture (../../../cfg/dce/use/cases/keepexpfx.id) plus (import harn)[0]
 // forced true, for keep_export's own short-circuit case.
 
 keep_export_fixture_harn_on() {
   keep_export_fixture();
-  harn_set(1);
+  lset((import harn), 0, 1);
   keep_export_fixture_tail();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The rest of keep_export_fixture_reg's chain: main reachable and two
@@ -16,7 +16,7 @@ keep_export_fixture_tail() {
   push((import eowners), "nat_target");
   push((import eowners), "main");
 } return void;
-given keep_export_fixture_reg ():() then check_failed:(0)
+given keep_export_fixture_reg ():() then (import chkfail)[0]:(0)
 given keep_export_fixture_reg ():() then init_units:(0)
 
 // The registration and the export owners together: the one setup that gives
@@ -26,5 +26,5 @@ keep_export_fixture_all() {
   keep_export_fixture_reg();
   keep_export_fixture_tail();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

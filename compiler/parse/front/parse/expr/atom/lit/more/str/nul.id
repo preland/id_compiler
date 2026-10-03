@@ -38,5 +38,5 @@ nul_tokens() {
   env_init();
   push_toks(["str", "eof"], ["\"a\\0b\"", ""]);
 } return void;
-():() then check_failed:(0)
-():() then tkind_len:(2)
+():() then (import chkfail)[0]:(0)
+():() then len((import tkind)):(2)

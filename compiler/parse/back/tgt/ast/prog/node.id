@@ -14,8 +14,8 @@ given stmt_fix ([1, 2]):(" (decl int y 5) (assign z 5)")
 given stmt_fix ([]):("")
 
 print_node(int id) {
-  string s = "(param " + s1_of(id) + " " + s2_of(id) + ")";
-  if(k_of(id) != "param" && k_of(id) != "nparam") {
+  string s = "(param " + (import ns1)[id] + " " + (import ns2)[id] + ")";
+  if((import nkind)[id] != "param" && (import nkind)[id] != "nparam") {
     s = print_stmt(id);
   }
 } return string s;
@@ -24,9 +24,9 @@ given stmt_fix (1):("(decl int y 5)")
 
 print_stmt(int id) {
   string s = "";
-  if(k_of(id) == "decl") {
-    int i1_of_v = i1_of(id);
-    s = "(decl " + s1_of(id) + " " + s2_of(id) + " " + print_expr(i1_of_v) + ")";
+  if((import nkind)[id] == "decl") {
+    int i1_of_v = (import ni1)[id];
+    s = "(decl " + (import ns1)[id] + " " + (import ns2)[id] + " " + print_expr(i1_of_v) + ")";
   } else {
     s = ps2(id);
   }

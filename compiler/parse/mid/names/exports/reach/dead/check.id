@@ -43,6 +43,12 @@ given env_init ():() then calls reach_mark:()
 // exists to find. Whether a constant is emitted at all is a separate question,
 // answered by clive (back/drive/run/check/dce/export/live/), the names of the
 // constants the reachable code reads.
+// rfn: The first entry of rfn, for seed_tested's own cases (back/drive/target/
+// tests/reach.id): clear_strs then push guarantees index 0 is "conf.id"
+// regardless of what seed_cases appends after it, which a plain rfn_len
+// cannot say once other cases in the build add their own names. Filed here
+// (main's own tail) because tests/reach.id's directory is at its 3-entry
+// cap.
 init_reach() {
   export string[] rfn = ["main", "conf.id"];
   export int[] dphase = [0];

@@ -4,8 +4,8 @@ asm_lines(int[] pos) {
   scan_asm(pos, alines);
   int ret_i = asm_lines_tail(pos, alines);
 } return int ret_i;
-given asm_fix_full ([0]):(0) then afret_last:("int") then afretn_last:("result")
-given asm_fix_full2 ([0]):(0) then afret_last:("word") then afretn_last:("r")
+given asm_fix_full ([0]):(0) then afret_last:("afret int") then afretn_last:("result")
+given asm_fix_full2 ([0]):(0) then afret_last:("afret word") then afretn_last:("r")
 
 scan_asm(int[] pos, string[] alines) {
   advance(pos);

@@ -3,7 +3,7 @@
 
 fit_scalar(int i, int e, string want) {
   string lt = case_lit_type(e);
-  if(k_of(e) == "arr") {
+  if((import nkind)[e] == "arr") {
     case_err(i, "this case gives a list where a " + want + " is required");
   } else if(ty_fits(want, lt) == 0) {
     case_err(i, "this case gives a " + lt + " where a " + want + " is required");
@@ -22,7 +22,7 @@ dupeq_starts() {
   push((import casestart), 1);
   dupeq_ends();
 } return void;
-given dupeq_fixture ():() then check_failed:(0)
+given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)
 
 // idc.py's `compatible`: the same type, or two numeric ones.

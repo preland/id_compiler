@@ -12,7 +12,7 @@ given edge_fixture ("nosuchfn"):(1)
 
 func_line_at(int i, string fname, int n) {
   int r = n;
-  if(s1_of((import prog)[i]) == fname && i < len((import pline))) {
+  if((import ns1)[((import prog)[i])] == fname && i < len((import pline))) {
     r = (import pline)[i];
   }
 } return int r;

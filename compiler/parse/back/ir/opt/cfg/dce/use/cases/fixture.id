@@ -7,17 +7,22 @@ dce_fixture() {
   int[] l = [5, 7];
   int id0 = ir_insn("call", "int", 0 - 1, 0 - 1, "f", l, l);
 } return void;
-():() then chk_op0:("call")
-():() then chk_a0:(-1)
-
-chk_op0() {
-  string ret_s = ir_op(0);
-} return string ret_s;
-given dce_fixture ():("call")
-given dce_fixture ():("call") then chk_a0:(-1)
+():() then (import iop)[0]:("call")
+():() then chk_a0:("a0 -1")
 
 chk_a0() {
-  int ret_i = ir_a(0);
-} return int ret_i;
-given dce_fixture ():(-1)
-given dce_fixture ():(-1) then chk_op0:("call")
+  string ret_i_t = "a0 " + ((import ia)[0]);
+} return string ret_i_t;
+given dce_fixture ():("a0 -1")
+given dce_fixture ():("a0 -1") then (import iop)[0]:("call")
+
+// Test check: every instruction's op, how many there are first and then each,
+// joined by "|". dce_one (../one.id) reads one op to decide whether to kill an
+// instruction and a callee rewrites it, so a check of that one op would repeat
+// part of its own read.
+iop_state() {
+  string iop_j = str_join((import iop), "|");
+  string iop_s = "ops " + len((import iop)) + ":" + iop_j;
+} return string iop_s;
+given cfg_fixture ():("ops 1:add")
+given cfg_fixture_u ():("ops 2:add|add")

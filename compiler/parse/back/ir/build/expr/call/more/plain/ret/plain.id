@@ -3,7 +3,7 @@
 // works in machine words, so `peek8` returns an i64 that the program reads as
 // whatever `id` says the expression is.
 lw_plain(int node) {
-  string s1_of_v = s1_of(node);
+  string s1_of_v = (import ns1)[node];
   string h = lw_bret(s1_of_v);
   int ret_i = lw_plain_mid(node, s1_of_v, h);
 } return int ret_i;

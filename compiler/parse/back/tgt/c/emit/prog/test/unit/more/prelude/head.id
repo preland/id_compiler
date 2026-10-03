@@ -3,11 +3,11 @@
 
 emit_test_body(string triple) {
   emit_asm_then_main(triple);
-  harn_set(0);
+  lset((import harn), 0, 0);
   emit_test_tail();
 } return void;
-given test_body_fixture ("x86_64-linux-gnu"):() then calls harn_set:(0) then calls emit_test_tail:[1]
-given test_body_fixture ("wasm32"):() then calls harn_set:(0) then calls emit_test_tail:[1]
+given test_body_fixture ("x86_64-linux-gnu"):() then calls lset:((import harn), 0, 0) then calls emit_test_tail:[1]
+given test_body_fixture ("wasm32"):() then calls lset:((import harn), 0, 0) then calls emit_test_tail:[1]
 
 emit_test_head() {
   emit_count_prelude();
@@ -15,7 +15,7 @@ emit_test_head() {
   emit_test_decls();
 } return void;
 given env_init ():() then calls emit_count_prelude:[1] then calls emit_runtime:[1] then calls emit_test_decls:[1]
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 
 emit_test_decls() {
   emit_count_postlude();
@@ -23,4 +23,4 @@ emit_test_decls() {
   emit_decls();
 } return void;
 given env_init ():() then calls emit_count_postlude:[1] then calls emit_rec_prelude:[1] then calls emit_decls:[1]
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)

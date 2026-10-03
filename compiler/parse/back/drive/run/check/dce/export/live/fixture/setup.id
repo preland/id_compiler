@@ -25,18 +25,18 @@ cvl_setup() {
   add_func("main", "int", (import cvf_main));
   push((import prog), (import cvf_main));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 clive_str() {
-  string cvf_s = str_join((import clive), ",");
-} return string cvf_s;
-given cvl_setup ():("")
-given cvl_setup given cvl_mark(0) ():("cb,cd,ca")
+  string cvf_s_t = "live " + (str_join((import clive), ","));
+} return string cvf_s_t;
+given cvl_setup ():("live ")
+given cvl_setup given const_mark(0) ():("live cb,cd,ca")
 
 cvl_scan() {
   int cvf_base = const_base();
   const_funcs(0, cvf_base);
 } return void;
-given cvl_setup ():() then check_failed:(0)
-given cvl_setup ():() then clive_str:("cb,cd")
+given cvl_setup ():() then (import chkfail)[0]:(0)
+given cvl_setup ():() then clive_str:("live cb,cd")

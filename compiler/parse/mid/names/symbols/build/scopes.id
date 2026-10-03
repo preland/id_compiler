@@ -34,12 +34,12 @@ check_scopes() {
   }
 } chain () {
   check_case_runs();
-  if(require_tests() == 1) {
+  if((import reqc)[0] == 1) {
     check_cases();
   }
 } return void;
-given clean_check_fixture given init_rtc given reqtests_init ():() then check_failed:(0)
-given full_check_fixture given init_rtc given reqtests_init ():() then check_failed:(1)
+given clean_check_fixture given init_rtc given reqtests_init ():() then (import chkfail)[0]:(0)
+given full_check_fixture given init_rtc given reqtests_init ():() then (import chkfail)[0]:(1)
 
 // Two passes, in idc.py's order: register every declaration (reporting what
 // each one conflicts with), then resolve every name a function mentions
@@ -64,5 +64,5 @@ init_reg() {
   export string[] dvfunc = [];
   init_reg2();
 } return void;
-given regrow_d ():() then dvname_len:(0)
+given regrow_d ():() then len((import dvname)):(0)
 given regrow_d ():() then calls init_reg2:[1]

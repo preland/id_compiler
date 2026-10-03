@@ -3,7 +3,7 @@
 // returning it so the next ask for the same node is a cache hit.
 type_of_miss(int id) {
   string t = lit_type(id);
-  if(k_of(id) != "int") {
+  if((import nkind)[id] != "int") {
     t = type_of2(id);
   }
   tcache_set(id, t);

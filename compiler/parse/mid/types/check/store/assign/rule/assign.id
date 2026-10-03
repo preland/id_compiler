@@ -3,30 +3,30 @@
 // only a name, and the declared type comes from the symbol table.
 
 chk_decl(int id) {
-  string s1_of_v = s1_of(id);
-  int i1_of_v = i1_of(id);
+  string s1_of_v = (import ns1)[id];
+  int i1_of_v = (import ni1)[id];
   if(bad_store(s1_of_v, i1_of_v) == 1) {
     decl_err(id, s1_of_v, i1_of_v);
   }
 } return void;
-given decltype_fixture ((import decl_list)):() then check_failed:(1)
-given decltype_fixture ((import decl_scalar)):() then check_failed:(0)
+given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
+given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)
 
 chk_assign(int id) {
   string vt = var_type_at(id);
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   if(bad_store(vt, i1_of_v) == 1) {
     assign_err(id, vt, i1_of_v);
   }
 } return void;
-given assign_build ((import assign_list)):() then check_failed:(1)
-given assign_build2 ((import assign_ok)):() then check_failed:(0)
+given assign_build ((import assign_list)):() then (import chkfail)[0]:(1)
+given assign_build2 ((import assign_ok)):() then (import chkfail)[0]:(0)
 
 // The one place that decides "this value may not go here". An array literal
 // is not judged by its own type, because it has none -- see more/arr.id.
 bad_store(string want, int e) {
   int ok = 0;
-  if(k_of(e) == "arr") {
+  if((import nkind)[e] == "arr") {
     ok = bad_arr(want, e);
   } else {
     ok = bad_store2(want, e);

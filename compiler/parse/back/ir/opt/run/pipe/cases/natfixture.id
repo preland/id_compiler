@@ -8,20 +8,12 @@ natcall_fixture_tail(int natfn, int[] none) {
   push((import prog), natfn);
   export int natcall_node = node_call("nat_target", none);
 } return void;
-given natcall_fixture (0, []):() then check_failed:(0)
+given natcall_fixture (0, []):() then (import chkfail)[0]:(0)
 given natcall_fixture (0, []):() then init_units:(0)
-
-// A `then` check for the void natives-row functions, which otherwise leave
-// no result to compare -- how many rows the walk has recorded so far.
-nat_row_count() {
-  int n = len((import natrow));
-} return int n;
-given natcall_fixture ():(0)
-given nat_row_setup ():(1)
 
 nat_row_setup() {
   natcall_fixture();
   nat_add("harness", (import natcall_node), "nat_target");
 } return void;
-():() then check_failed:(0)
-():() then nat_row_count:(1)
+():() then (import chkfail)[0]:(0)
+():() then len((import natrow)):(1)

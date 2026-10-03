@@ -3,8 +3,8 @@
 // the if would run it on every node, resolved or not.
 is_unresolved_call(int id) {
   int ok = 0;
-  if(k_of(id) == "call") {
-    string s1_of_v = s1_of(id);
+  if((import nkind)[id] == "call") {
+    string s1_of_v = (import ns1)[id];
     ok = unresolved_fn(s1_of_v);
   }
 } return int ok;
@@ -17,7 +17,7 @@ given declfix ((import rgdecl_node)):(0)
 // question is asked of the real list instead.
 unresolved_fn(string name) {
   int ok = 0;
-  if(find_str((import fnames), name) < 0 && is_builtin(name) == 0 && find_str((import dvname), name) < 0 && sd_find(name) < 0) {
+  if(find_str((import fnames), name) < 0 && is_builtin(name) == 0 && find_str((import dvname), name) < 0 && find_str((import sdname), name) < 0) {
     ok = 1;
   }
 } return int ok;

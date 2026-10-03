@@ -4,8 +4,8 @@
 
 lw_builtin(int node) {
   int v = 0 - 1;
-  if(s1_of(node) == "print" || s1_of(node) == "eprint") {
-    string fn_v = "id_" + s1_of(node);
+  if((import ns1)[node] == "print" || (import ns1)[node] == "eprint") {
+    string fn_v = "id_" + (import ns1)[node];
     v = lw_print(fn_v, node);
   } else {
     v = lb_b2(node);
@@ -16,7 +16,7 @@ given lencall_fixture ((import lencall_node)):(1)
 
 lb_b2(int node) {
   int v = 0 - 1;
-  if(s1_of(node) == "len") {
+  if((import ns1)[node] == "len") {
     v = lw_len(node);
   } else {
     v = lb_b3(node);
@@ -27,7 +27,7 @@ given pushcall_fixture ((import pushcall_node)):(3)
 
 lb_b3(int node) {
   int v = 0 - 1;
-  if(s1_of(node) == "push") {
+  if((import ns1)[node] == "push") {
     v = lw_push(node);
   } else {
     v = lb_b4(node);

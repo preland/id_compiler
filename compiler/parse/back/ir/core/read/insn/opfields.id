@@ -1,20 +1,3 @@
 // Reading an instruction. Every pass and the printer go through these rather
 // than indexing the columns, so a column can move without a sweep of the tree.
 
-ir_op(int id) {
-  string ret_s = (import iop)[id];
-} return string ret_s;
-given ir_rows (0):("add")
-given ir_rows (1):("const")
-
-ir_ty(int id) {
-  string ret_s = (import ity)[id];
-} return string ret_s;
-given ir_rows (0):("int")
-given ir_rows (1):("string")
-
-ir_a(int id) {
-  int ret_i = (import ia)[id];
-} return int ret_i;
-given ir_rows (0):(3)
-given ir_rows (1):(-1)

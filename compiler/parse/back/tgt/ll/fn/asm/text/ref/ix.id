@@ -22,7 +22,7 @@ given llasm_row_fixture (0, "nosuch"):(-1)
 
 ll_asm_pm(int r, int i, string nm, int found) {
   int v = found;
-  if(s2_of((import afparams)[r][i]) == nm) {
+  if((import ns2)[((import afparams)[r][i])] == nm) {
     v = i;
   }
 } return int v;

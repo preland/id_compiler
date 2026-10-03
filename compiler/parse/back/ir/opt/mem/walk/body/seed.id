@@ -7,8 +7,8 @@ m2r_seed(int i, int j) {
     j = m2r_seed1(i, j);
   }
 } return void;
-given m2r_outv_fixture (0, 0):() then outv_sum:(3)
-given m2r_row_fixture (0, 0):() then outv_sum:(0)
+given m2r_outv_fixture (0, 0):() then outv_sum:("outv 3")
+given m2r_row_fixture (0, 0):() then outv_sum:("outv 0")
 
 // What this function is for is the value it writes; what it returns is
 // j + 1, arithmetic on its own argument that a case can pin green while the
@@ -22,15 +22,15 @@ m2r_seed1(int i, int j) {
   lset((import outv)[i], j, m2r_in_v);
   int ret_i = j + 1;
 } return int ret_i;
-given m2r_outv_fixture (0, 0):(1) then outv_sum:(3)
-given m2r_outv_fixture (0, 0):(1) then check_failed:(0)
+given m2r_outv_fixture (0, 0):(1) then outv_sum:("outv 3")
+given m2r_outv_fixture (0, 0):(1) then (import chkfail)[0]:(0)
 
 m2r_in(int i, int j) {
   int v = (import phiof)[i][j];
   if(i == 0) {
-    string ir_ty_v = ir_ty((import pra)[j]);
+    string ir_ty_v = (import ity)[((import pra)[j])];
     v = ir_leaf("const", ir_ty_v, 0 - 1, 0 - 1, "undef");
   }
 } return int v;
 given m2r_outv_fixture (0, 0):(3)
-given m2r_outv_fixture (0, 0):(3) then phiof_sum:(-1)
+given m2r_outv_fixture (0, 0):(3) then phiof_sum:("phiof -1")

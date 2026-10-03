@@ -17,7 +17,7 @@ fixe_nm_named() {
   int n = lst_str_filled((import fixe_nm));
 } return int n;
 given fix_fixture ():(0)
-given fix_nameat_fixture ():(0) then check_failed:(0)
+given fix_nameat_fixture ():(0) then (import chkfail)[0]:(0)
 
 // fix_name_pick_miss_fixture (../reuse/lookup/pick.id) leaves the naming
 // machinery ready but fixe_sep and fixe_nm empty, and fix_name_at reads the
@@ -32,4 +32,4 @@ fix_nameat_fixture() {
   push((import fixe_sep), 0);
 } return void;
 ():() then fixe_nm_named:(0)
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)

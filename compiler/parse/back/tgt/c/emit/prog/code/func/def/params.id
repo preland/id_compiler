@@ -1,7 +1,7 @@
 // Parameter list for a signature: "void" if none, else "c_type name, ...".
 
 param_str(int id) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   string ret_s = pstr(l1_of_v);
 } return string ret_s;
 given nz_prog_fixture ((import nz_mainfn)):("int argc")
@@ -20,8 +20,8 @@ list_params(int[] params) {
   string out = "";
   int i = 0;
   while(i < len(params)) {
-    string s1_of_v = s1_of(params[i]);
-    out = out + sep_arg(i) + c_type(s1_of_v) + " " + s2_of(params[i]);
+    string s1_of_v = (import ns1)[(params[i])];
+    out = out + sep_arg(i) + c_type(s1_of_v) + " " + (import ns2)[(params[i])];
     i = i + 1;
   }
 } return string out;

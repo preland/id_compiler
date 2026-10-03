@@ -5,18 +5,18 @@ asm_reg_fix1c() {
   asm_reg_fix0();
   push((import afret), "word");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 asm_reg_fix1d() {
   asm_reg_fix1c();
   push((import afretn), "r");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 afret_last() {
-  string s = (import afret)[len((import afret)) - 1];
-} return string s;
-given asm_reg_fix1 ():("int")
-given asm_reg_fix1c ():("word")
+  string s_t = "afret " + ((import afret)[len((import afret)) - 1]);
+} return string s_t;
+given asm_reg_fix1 ():("afret int")
+given asm_reg_fix1c ():("afret word")

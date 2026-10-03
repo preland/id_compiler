@@ -4,8 +4,8 @@
 
 div_traps(int id) {
   int ok = 0;
-  if(k_of(id) == "bin" && hop_div(id) != "") {
-    int i2_of_v = i2_of(id);
+  if((import nkind)[id] == "bin" && hop_div(id) != "") {
+    int i2_of_v = (import ni2)[id];
     ok = 1 - safe_div(i2_of_v);
   }
 } return int ok;
@@ -17,7 +17,7 @@ given sq_fixture ((import nz_call_foo)):(0)
 // could trap: the cost is a temporary, never a wrong order.
 safe_div(int e) {
   int ok = 0;
-  if(k_of(e) == "int" && i1_of(e) != 0) {
+  if((import nkind)[e] == "int" && (import ni1)[e] != 0) {
     ok = 1;
   }
 } return int ok;
@@ -27,8 +27,8 @@ given sq_fixture ((import nz_call_foo)):(0)
 
 is_logic(int id) {
   int ok = 0;
-  string s1_of_v = s1_of(id);
-  if(k_of(id) == "bin" && is_logop(s1_of_v) == 1) {
+  string s1_of_v = (import ns1)[id];
+  if((import nkind)[id] == "bin" && is_logop(s1_of_v) == 1) {
     ok = 1;
   }
 } return int ok;

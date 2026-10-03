@@ -12,18 +12,28 @@ check_access() {
     i = i + 1;
   }
 } return void;
-given regrow_d ():() then check_failed:(0)
+given regrow_d ():() then (import chkfail)[0]:(0)
 given regrow_prog ():() then calls acc_func:((import regrow_fn_node))
 
 acc_func(int id) {
-  int[] l2_of_v = l2_of(id);
-  string s1_of_v = s1_of(id);
+  int[] l2_of_v = (import nl2)[id];
+  string s1_of_v = (import ns1)[id];
   acc_func_body(l2_of_v, s1_of_v, id);
 } return void;
 given fnscope_fix ((import regrow_fn_node)):() then calls acc_func_body:((import regrow_plist), "g2", (import regrow_fn_node))
-given fnscope_fix ((import regrow_fn_node)):() then check_failed:(0)
+given fnscope_fix ((import regrow_fn_node)):() then (import chkfail)[0]:(0)
 
 // The return clause is not a statement of the body, so the body walk never
 // reaches it -- but it is an expression the function evaluates, and idc.py
 // resolves the names in it like any other. It is -1 for `return void`.
 //
+
+// Test check: the whole function-name table -- how many names and which,
+// joined by "|" -- so a case states the full state it expects (see
+// vnames_state, ../../../lookup/more/std_unit.id).
+fnames_state() {
+  string fns_j = str_join((import fnames), "|");
+  string fns_s = "funcs " + len((import fnames)) + ":" + fns_j;
+} return string fns_s;
+given call2_setup ():("funcs 0:")
+given argfn_d ():("funcs 1:g")

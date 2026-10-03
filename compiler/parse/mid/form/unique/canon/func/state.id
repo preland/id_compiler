@@ -6,8 +6,8 @@
 
 canon_ret(int id) {
   string out = "void";
-  if(i1_of(id) >= 0) {
-    int i1_of_v = i1_of(id);
+  if((import ni1)[id] >= 0) {
+    int i1_of_v = (import ni1)[id];
     out = canon_expr(i1_of_v);
   }
 } return string out;
@@ -23,11 +23,6 @@ uq_begin(string name) {
   export string[] cnames = [];
   export string[] cimps = [];
 } return void;
-given lz_g ("one"):() then cur_self:("one")
-given lz_g ("two"):() then cur_self:("two")
+given lz_g ("one"):() then (import cself)[0]:("one")
+given lz_g ("two"):() then (import cself)[0]:("two")
 
-cur_self() {
-  string ret_s = (import cself)[0];
-} return string ret_s;
-given lz_a ():("test")
-given canon_begun_fixture ():("f")

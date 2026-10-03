@@ -12,8 +12,8 @@ given fn_fixture ():() then calls scan_func_exports:[1]
 given env_init ():() then calls scan_func_exports:[0]
 
 scan_func_exports(int id) {
-  int[] l2_of_v = l2_of(id);
-  string s1_of_v = s1_of(id);
+  int[] l2_of_v = (import nl2)[id];
+  string s1_of_v = (import ns1)[id];
   exp_list(l2_of_v, s1_of_v);
 } return void;
 given lz_j ((import lz_func2)):() then calls exp_one:[1]

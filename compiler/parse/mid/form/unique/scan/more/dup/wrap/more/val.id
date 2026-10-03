@@ -3,7 +3,7 @@
 // An assignment counts only when its target is a local this walk has already
 // declared. A parameter is not one: assigning it is a use of it.
 cw_assign(int id) {
-  string s1_of_v = s1_of(id);
+  string s1_of_v = (import ns1)[id];
   int ok = 0;
   if(cw_get(s1_of_v) != "") {
     ok = cw_put(id, s1_of_v);
@@ -15,7 +15,7 @@ given cw_assign_fixture ((import cw_assign_y)):(0)
 // Appended rather than overwritten, so an assignment needs no search to write;
 // the latest entry for a name is its value (cw_get).
 cw_put(int id, string name) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string val = cw_value_of(i1_of_v);
   push((import cw_names), name);
 } chain (int id, string name) {
@@ -35,5 +35,5 @@ cw_decl_fixture() {
   export int[] cw_decl_list = [(import cw_decl_x)];
   export int[] cw_func_list = [(import cwv_func)];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -15,7 +15,7 @@ rc_ready() {
     rc_build();
   }
 } return void;
-given dg_t_parsed ():() then rc_nsets:(0)
+given dg_t_parsed ():() then len((import rcsets)):(0)
 given dg_t_parsed ():() then dg_nfn:(2)
 
 rc_build() {
@@ -30,8 +30,8 @@ rc_build() {
   hmap_init((import rck), (import rcv), (import rcu), (import rcc));
   lset((import rcon), 0, 1);
 } return void;
-given dg_t_parsed ():() then rc_nsets:(0) then dg_nfn:(2)
-given env_init ():() then rc_nsets:(0) then dg_nfn:(0)
+given dg_t_parsed ():() then len((import rcsets)):(0) then dg_nfn:(2)
+given env_init ():() then len((import rcsets)):(0) then dg_nfn:(0)
 
 // The index of src's set, walking the graph the first time src is asked for.
 rc_of(string src) {
@@ -40,5 +40,5 @@ rc_of(string src) {
     ri = rc_new(src);
   }
 } return int ri;
-given rc_t_ready ("fb"):(0) then rc_nsets:(1)
-given rc_t_one ("fb"):(0) then rc_nsets:(1)
+given rc_t_ready ("fb"):(0) then len((import rcsets)):(1)
+given rc_t_one ("fb"):(0) then len((import rcsets)):(1)

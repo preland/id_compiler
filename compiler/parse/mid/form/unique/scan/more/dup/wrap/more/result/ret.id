@@ -3,10 +3,10 @@
 // the locals walked -- a parameter's name is not among them, and answers "".
 
 cw_ret(int id) {
-  int i1_of_v = i1_of(id);
+  int i1_of_v = (import ni1)[id];
   string val = cw_value_of(i1_of_v);
-  if(k_of(i1_of_v) == "var") {
-    string s1_of_v = s1_of(i1_of_v);
+  if((import nkind)[i1_of_v] == "var") {
+    string s1_of_v = (import ns1)[i1_of_v];
     val = cw_get(s1_of_v);
   }
 } return string val;

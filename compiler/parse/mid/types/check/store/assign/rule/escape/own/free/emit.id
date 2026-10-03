@@ -3,7 +3,7 @@
 // replaces (a declaration in a loop runs once per pass), and the free itself.
 
 esc_free_decl(int fn, int sn, string out) {
-  string nm = s2_of(sn);
+  string nm = (import ns2)[sn];
   string line = esc_free_fn(fn, nm) + "(" + nm + "); ";
   if(esc_own(fn, nm) == 1 && str_find(out, line) < 0) {
     out = out + line;
@@ -14,8 +14,8 @@ given esc_fix ((import efc_fn), (import efc_z), "x"):("x")
 given esc_dfix ((import efd_good), (import efd_ad), ""):("id_list_free_deep(a); ")
 
 esc_free_nest(int fn, int sn, string out) {
-  out = esc_free_in(fn, l1_of(sn), out);
-  out = esc_free_in(fn, l2_of(sn), out);
+  out = esc_free_in(fn, (import nl1)[sn], out);
+  out = esc_free_in(fn, (import nl2)[sn], out);
 } return string out;
 given esc_fix ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
 given esc_fix ((import efc_fn), (import efc_z), "q"):("q")

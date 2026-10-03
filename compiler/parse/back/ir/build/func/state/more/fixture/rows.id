@@ -6,7 +6,7 @@ lw_fixture() {
   ir_rows();
   int ret_i = lw_open(0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // The same, opening fn 1 (fn1id) instead of fn 0.
@@ -14,11 +14,6 @@ lw_fixture2() {
   ir_rows();
   int ret_i = lw_open(1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
-chk_lwcur() {
-  int ret_i = (import lwcur)[0];
-} return int ret_i;
-given lw_fixture ():(3)
-given lw_fixture2 ():(3)

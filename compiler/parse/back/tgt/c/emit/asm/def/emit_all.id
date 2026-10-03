@@ -3,7 +3,7 @@
 
 emit_asm_all(string triple) {
   int i = 0;
-  while(i < asm_count()) {
+  while(i < len((import afname))) {
     emit_asm_row(i, triple);
     i = i + 1;
   }
@@ -27,5 +27,5 @@ asm_check(int i, string triple) {
     asm_error((import afname)[i], triple);
   }
 } return void;
-given asmfx_setup (0, "x86_64-unknown-linux-gnu"):() then check_failed:(0)
-given asmfx_setup (0, "aarch64-unknown-linux-gnu"):() then prints:("error: no 'asm' definition of 'foo' for target 'aarch64-unknown-linux-gnu'; defined for: x86_64-unknown-linux-gnu\n") then check_failed:(1)
+given asmfx_setup (0, "x86_64-unknown-linux-gnu"):() then (import chkfail)[0]:(0)
+given asmfx_setup (0, "aarch64-unknown-linux-gnu"):() then prints:("error: no 'asm' definition of 'foo' for target 'aarch64-unknown-linux-gnu'; defined for: x86_64-unknown-linux-gnu\n") then (import chkfail)[0]:(1)

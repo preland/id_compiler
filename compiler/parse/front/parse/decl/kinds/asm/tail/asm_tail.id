@@ -4,8 +4,8 @@ asm_tail(int[] pos) {
   string rt = parse_type(pos);
   int ret_i = asm_tail_mid(pos, rt);
 } return int ret_i;
-given asm_fix_full ([2]):(0) then afret_last:("int") then afretn_last:("result")
-given asm_fix_full2 ([3]):(0) then afret_last:("word") then afretn_last:("r")
+given asm_fix_full ([2]):(0) then afret_last:("afret int") then afretn_last:("result")
+given asm_fix_full2 ([3]):(0) then afret_last:("afret word") then afretn_last:("r")
 
 asm_fin(int[] pos) {
   advance(pos);
@@ -19,5 +19,5 @@ init_asm_all() {
   init_asm2();
   int ret_i = init_asm_rest();
 } return int ret_i;
-given env_init ():(0) then check_failed:(0)
+given env_init ():(0) then (import chkfail)[0]:(0)
 given env_init ():(0) then init_units:(0)

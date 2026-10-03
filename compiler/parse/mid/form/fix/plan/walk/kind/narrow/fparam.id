@@ -3,7 +3,7 @@ fix_fparam(int e, int i) {
   string[] pts = fn_params(vt);
   string pt = "";
 } chain (int e, int i) {
-  if(i < len(pts) && len(pts) == flat_arg_count(e)) {
+  if(i < len(pts) && len(pts) == len(((import nl1)[e]))) {
     pt = pts[i];
   }
 } return string pt;
@@ -23,7 +23,7 @@ fix_simple_fixture() {
   export int[] sim_roots = [sim_v, sim_decl, sim_v2];
   export int[] sim_roots2 = [sim_v2, sim_v, sim_v];
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 fix_type_ok_fixture() {
@@ -34,5 +34,5 @@ fix_type_ok_fixture() {
   push((import fixe_n), 0);
   push((import fixe_nt), "void");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -2,8 +2,8 @@
 // call is named after what it reads first -- a list, an import, a variable.
 fix_stem(int e) {
   string s = fix_stem2(e);
-  if(k_of(e) == "index" || k_of(e) == "bin" || k_of(e) == "un") {
-    int a = i1_of(e);
+  if((import nkind)[e] == "index" || (import nkind)[e] == "bin" || (import nkind)[e] == "un") {
+    int a = (import ni1)[e];
     s = fix_stem(a);
   }
 } return string s;
@@ -11,10 +11,10 @@ given fix_stem_fixture (0):("list")
 given fix_stem_fixture (2):("len")
 
 fix_stem2(int e) {
-  string s = s1_of(e);
-  if(k_of(e) == "arr") {
+  string s = (import ns1)[e];
+  if((import nkind)[e] == "arr") {
     s = "list";
-  } else if(k_of(e) == "int" || k_of(e) == "float" || k_of(e) == "str") {
+  } else if((import nkind)[e] == "int" || (import nkind)[e] == "float" || (import nkind)[e] == "str") {
     s = "lit";
   }
 } return string s;
@@ -31,5 +31,5 @@ fix_stem_fixture() {
   int e1 = newleaf("ident", 0, 0, "len", "");
   int e2 = node_un("-", e1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

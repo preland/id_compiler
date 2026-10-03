@@ -25,8 +25,8 @@ given nz_bin_eq_fixture ((import nz_bin_eq)):("(strcmp(ID_S(\"hi\"), ID_S(\"yo\"
 given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")
 
 emit_infix(int id) {
-  int i1_of_v = i1_of(id);
-  string s1_of_v = s1_of(id);
+  int i1_of_v = (import ni1)[id];
+  string s1_of_v = (import ns1)[id];
   string s = infix_line(id, i1_of_v, s1_of_v);
 } return string s;
 given nz_bin_add_fixture ((import nz_bin_add)):("(7 + 3)")

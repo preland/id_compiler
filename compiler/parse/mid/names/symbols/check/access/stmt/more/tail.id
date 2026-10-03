@@ -6,9 +6,9 @@
 acc_func_body(int[] l2_of_v, string s1_of_v, int id) {
   scope_func(id);
   acc_list(l2_of_v, s1_of_v);
-  if(i1_of(id) >= 0) {
-    int i1_of_v = i1_of(id);
-    string ret_owner = s1_of(id);
+  if((import ni1)[id] >= 0) {
+    int i1_of_v = (import ni1)[id];
+    string ret_owner = (import ns1)[id];
     acc_expr(i1_of_v, ret_owner, (import nline)[i1_of_v]);
   }
 } return void;
@@ -16,16 +16,10 @@ given fnscope_fix ((import regrow_plist), "g2", (import regrow_fn_node)):() then
 given fnscope_fix ([], "g2", (import regrow_fn_node)):() then calls scope_func:((import regrow_fn_node))
 
 acc_if_body(int id, string owner) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   acc_block(l1_of_v, owner);
-  acc_if_else(id, owner);
+  acc_block(((import nl2)[id]), owner);
 } return void;
-given scnames_fix ((import rgif_node), "f"):() then calls acc_if_else:((import rgif_node), "f")
-given scnames_fix ((import rgif_node), "g"):() then calls acc_if_else:((import rgif_node), "g")
+given scnames_fix ((import rgif_node), "f"):() then calls acc_block:((import rgdeclist), "f")
+given scnames_fix ((import rgif_node), "g"):() then calls acc_block:((import rgdeclist), "g")
 
-acc_if_else(int id, string owner) {
-  int[] l2_of_v = l2_of(id);
-  acc_block(l2_of_v, owner);
-} return void;
-given scnames_fix ((import rgif_node), "f"):() then calls acc_list:((import rgdeclist), "f")
-given scnames_fix ((import rgif_node), "g"):() then calls acc_list:((import rgdeclist), "g")

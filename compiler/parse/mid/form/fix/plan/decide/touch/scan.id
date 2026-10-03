@@ -13,7 +13,7 @@ given fix_touch_fixture (0):(0)
 
 fix_touch_at(int i, int ok) {
   int r = ok;
-  if((import fixe_mv)[i] == 1 && k_of((import fixe_n)[i]) == "call") {
+  if((import fixe_mv)[i] == 1 && (import nkind)[((import fixe_n)[i])] == "call") {
     r = r | fix_call_touch((import fixe_n)[i]);
   }
 } return int r;
@@ -23,7 +23,7 @@ given fix_touch_fixture (0, 0):(0)
 // A builtin runs no id code. A call through a function value, or to a name
 // that is no function, could run anything.
 fix_call_touch(int e) {
-  string s1_of_v = s1_of(e);
+  string s1_of_v = (import ns1)[e];
   int ci = fix_fnix(s1_of_v);
   int ok = 1;
 } chain (int e) {

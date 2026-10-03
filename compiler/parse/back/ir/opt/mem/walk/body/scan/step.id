@@ -4,9 +4,9 @@
 // The scan itself is m2r_blk's chain (../walk.id).
 
 m2r_step(int f, int id, int i) {
-  if(ir_op(id) == "load") {
+  if((import iop)[id] == "load") {
     m2r_load(f, id, i);
-  } else if(ir_op(id) == "store") {
+  } else if((import iop)[id] == "store") {
     m2r_store(id, i);
   }
 } return void;
@@ -30,5 +30,5 @@ m2r_ldfx() {
   export int ldfx_id2 = ir_insn("store", "int", (import pra)[0], 42, "", none, none);
   lset((import chk_id), 0, ldfx_id);
 } return void;
-():() then check_failed:(0)
-():() then chk_op:("load")
+():() then (import chkfail)[0]:(0)
+():() then chk_op:("op load")

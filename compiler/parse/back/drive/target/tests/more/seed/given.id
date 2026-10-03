@@ -15,8 +15,8 @@ seed_givens() {
     ci = ci + 1;
   }
 } return void;
-given seed_given_fixture_bad ():() then rfn_len:(2)
-given seed_given_fixture ():() then rfn_len:(3)
+given seed_given_fixture_bad ():() then len((import rfn)):(2)
+given seed_given_fixture ():() then len((import rfn)):(3)
 
 // One case's setups: a `given` may name several, so each entry is a
 // space-separated list.
@@ -27,8 +27,8 @@ seed_given_list(string[] setups) {
     gi = gi + 1;
   }
 } return void;
-given seed_given_fixture (["fx_target"]):() then rfn_len:(3)
-given seed_given_fixture_bad (["nope"]):() then rfn_len:(2)
+given seed_given_fixture (["fx_target"]):() then len((import rfn)):(3)
+given seed_given_fixture_bad (["nope"]):() then len((import rfn)):(2)
 
 // case_is_std takes a case index, and a thennode carries the index of the
 // case it was written on in i1 (case/then/push.id's then_store), not its own
@@ -37,13 +37,13 @@ given seed_given_fixture_bad (["nope"]):() then rfn_len:(2)
 seed_thens() {
   int ti = 0;
   while(ti < len((import thennode))) {
-    int case_of_then = i1_of((import thennode)[ti]);
+    int case_of_then = (import ni1)[((import thennode)[ti])];
     if(case_is_std(case_of_then) == 0) {
-      string s1_of_v = s1_of((import thennode)[ti]);
+      string s1_of_v = (import ns1)[((import thennode)[ti])];
       reach_add(s1_of_v);
     }
     ti = ti + 1;
   }
 } return void;
-given then_node_fixture given seed_then_fixture((import fixture_then_bad)) ():() then rfn_len:(2)
-given then_node_fixture given seed_then_fixture((import fixture_then_node)) ():() then rfn_len:(3)
+given then_node_fixture given init_reach given lst_extend((import thennode), [(import fixture_then_bad)]) ():() then len((import rfn)):(2)
+given then_node_fixture given init_reach given lst_extend((import thennode), [(import fixture_then_node)]) ():() then len((import rfn)):(3)

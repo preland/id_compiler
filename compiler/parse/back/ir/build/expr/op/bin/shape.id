@@ -3,7 +3,7 @@
 // ordinary arithmetic.
 
 lw_bin(int node) {
-  string op = s1_of(node);
+  string op = (import ns1)[node];
   int ret_i = lw_bin_op(node, op);
 } return int ret_i;
 given lw_fix_bin ((import fix_bin_n)):(2)
@@ -25,7 +25,7 @@ given lw_fix_bin ((import fix_bin_n)):(2)
 // happens to -- which is what makes the two agree on `a != 0 && b / a > 1`.
 lb3(int node) {
   int v = 0 - 1;
-  if(s1_of(node) == "&&" || s1_of(node) == "||") {
+  if((import ns1)[node] == "&&" || (import ns1)[node] == "||") {
     v = lw_logic(node);
   } else {
     v = lw_arith(node);

@@ -8,10 +8,10 @@
 
 ll_text(int id) {
   string s = ll_t2(id);
-  if(ir_op(id) == "ret") {
+  if((import iop)[id] == "ret") {
     s = ll_ret(id);
-  } else if(ir_op(id) == "br") {
-    s = "br label %b" + ir_bl(id)[0];
+  } else if((import iop)[id] == "br") {
+    s = "br label %b" + (import iblk)[id][0];
   }
 } return string s;
 given ir_fixture3 ((import ir_retvoid)):("ret void")
@@ -19,8 +19,8 @@ given ir_fixture3 ((import ir_br)):("br label %b3")
 
 ll_ret(int id) {
   string s = "ret void";
-  if(ir_a(id) >= 0) {
-    int ir_a_v = ir_a(id);
+  if((import ia)[id] >= 0) {
+    int ir_a_v = (import ia)[id];
     s = "ret " + ll_op(ir_a_v);
   }
 } return string s;
@@ -29,11 +29,11 @@ given fixture1 ((import ir_retval)):("ret i32 5")
 
 ll_t2(int id) {
   string s = ll_t3(id);
-  if(ir_op(id) == "cbr") {
-    int ir_a_v = ir_a(id);
-    s = "br i1 " + ll_val(ir_a_v) + ", label %b" + ir_bl(id)[0] + ", label %b" + ir_bl(id)[1];
-  } else if(ir_op(id) == "alloca") {
-    string ir_ty_v = ir_ty(id);
+  if((import iop)[id] == "cbr") {
+    int ir_a_v = (import ia)[id];
+    s = "br i1 " + ll_val(ir_a_v) + ", label %b" + (import iblk)[id][0] + ", label %b" + (import iblk)[id][1];
+  } else if((import iop)[id] == "alloca") {
+    string ir_ty_v = (import ity)[id];
     s = "%v" + id + " = alloca " + ll_ty(ir_ty_v);
   }
 } return string s;

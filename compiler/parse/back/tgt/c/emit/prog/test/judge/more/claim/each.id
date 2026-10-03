@@ -1,12 +1,6 @@
 // Every claim is written on a case, but judged once per function: a claim is
 // emitted at its first appearance among its function's cases.
 
-claim_of(int j, int ci) {
-  int r = lst_is_at((import conscase), j, ci);
-} return int r;
-given claim_conscase_fixture (0, 0):(1)
-given claim_conscase_fixture (0, 5):(0)
-
 claim_at(int c) {
   if(first_claim(c) == 1) {
     emit_claim(c);
@@ -24,5 +18,5 @@ claim_cols_bounds() {
   push((import consbound), "O(n)");
   push((import consbound), "O(n)");
 } return void;
-given case_fidx_fixture ():() then check_failed:(0)
+given case_fidx_fixture ():() then (import chkfail)[0]:(0)
 given case_fidx_fixture ():() then init_units:(0)

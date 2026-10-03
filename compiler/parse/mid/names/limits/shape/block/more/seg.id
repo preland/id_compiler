@@ -19,11 +19,11 @@ seg_walk(int[] body, string fname, int ln, int[] acc) {
     i = i + 1;
   }
 } return void;
-given full_env ([], "f", 1, [0, 0]):() then check_failed:(0)
-given full_env ([], "g", 2, [0, 0]):() then check_failed:(0)
+given full_env ([], "f", 1, [0, 0]):() then (import chkfail)[0]:(0)
+given full_env ([], "g", 2, [0, 0]):() then (import chkfail)[0]:(0)
 
 seg_step(int[] body, string fname, int ln, int[] acc, int i) {
-  if(k_of(body[i]) == "chain") {
+  if((import nkind)[(body[i])] == "chain") {
     int nxt = next_cost(body, i);
     seg_close(fname, ln, acc, 1, nxt);
   } else {
@@ -32,8 +32,8 @@ seg_step(int[] body, string fname, int ln, int[] acc, int i) {
     blank_tally(acc, body[i]);
   }
 } return void;
-given fn_fixture ((import fixture_params), "f", 1, [0, 0], 0):() then check_failed:(0)
-given fn_fixture ((import fixture_params), "g", 2, [0, 0], 0):() then check_failed:(0)
+given fn_fixture ((import fixture_params), "f", 1, [0, 0], 0):() then (import chkfail)[0]:(0)
+given fn_fixture ((import fixture_params), "g", 2, [0, 0], 0):() then (import chkfail)[0]:(0)
 
 // Closing a segment: report it if it ran over, report it if a chain follows a
 // segment that still had room, then start the next at zero. `at_seam` is 1
@@ -57,6 +57,6 @@ seg_close(string fname, int ln, int[] acc, int at_seam, int nxt) {
   lset(acc, 0, 0);
   lset(acc, 1, 0);
 } return void;
-given full_env ("f", 1, [0, 0], 0, 0):() then check_failed:(0)
-given full_env ("f", 1, [4, 0], 0, 0):() then check_failed:(1)
-given full_env ("f", 1, [2, 0], 1, 0):() then check_failed:(1)
+given full_env ("f", 1, [0, 0], 0, 0):() then (import chkfail)[0]:(0)
+given full_env ("f", 1, [4, 0], 0, 0):() then (import chkfail)[0]:(1)
+given full_env ("f", 1, [2, 0], 1, 0):() then (import chkfail)[0]:(1)

@@ -1,7 +1,7 @@
 // The left operand, converted to the widened type -- split out so lw_arith
 // stays within the action limit; lw_arith2 does the same for the right one.
 lw_arith_lhs(int node, string t) {
-  int i1_of_v = i1_of(node);
+  int i1_of_v = (import ni1)[node];
   int a = lw_as(i1_of_v, t);
 } return int a;
 given arith_fixture ((import bin_node), "int"):(3)
@@ -30,5 +30,5 @@ arith_fixture() {
   export int bin_node = node_bin("+", (import ev_node), (import ev_node));
   export int div_node = node_bin("/", (import ev_node), (import ev_node));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

@@ -8,19 +8,19 @@ dg_t_crows() {
   dg_t_cparsed();
   dg_init();
 } return void;
-():() then dg_nrows:(0)
-():() then dg_nexp:(0)
+():() then len((import dg_comp)):(0)
+():() then dg_nexp:("exp 0")
 
 dg_t_crows2() {
   dg_t_crows();
   dg_const_rows();
 } return void;
-():() then dg_nrows:(3)
-():() then dg_nout1:(0)
+():() then len((import dg_comp)):(3)
+():() then dg_nout1:("out1 0")
 
 dg_t_cdirty() {
   dg_t_crows();
   int dgq = lc_reg_int("qq", "1", 1);
 } return void;
-():() then dg_nrows:(0)
+():() then len((import dg_comp)):(0)
 ():() then ctok_span:(5)

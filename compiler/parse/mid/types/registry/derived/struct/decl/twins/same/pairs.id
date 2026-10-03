@@ -20,5 +20,5 @@ sd_sharepair(int sd_i, int sd_j) {
     sd_err(sd_i, "struct '" + (import sdname)[sd_i] + "' shares its file with struct '" + (import sdname)[sd_j] + "'; a struct is declared in a file of its own -- move one of them to another file");
   }
 } return void;
-given sd_pair (1, 0):() then check_failed:(0)
+given sd_pair (1, 0):() then (import chkfail)[0]:(0)
 given sd_pair given sd_note("R", ["a"], ["int"], "p.id", 9) (2, 0):() then prints:("p.id:9: error: struct 'R' shares its file with struct 'P'; a struct is declared in a file of its own -- move one of them to another file\n")

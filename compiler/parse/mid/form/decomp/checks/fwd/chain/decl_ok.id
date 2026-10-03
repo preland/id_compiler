@@ -12,7 +12,7 @@ given farm_d (-1, 2, 4):(0)
 
 fwd_decl_ok3(int retvar, int callid, int stmt) {
   int ok = 0;
-  if(k_of(retvar) == "var" && s1_of(retvar) == s2_of(stmt) && k_of(callid) == "call") {
+  if((import nkind)[retvar] == "var" && (import ns1)[retvar] == (import ns2)[stmt] && (import nkind)[callid] == "call") {
     ok = 1;
   }
 } return int ok;
@@ -25,5 +25,5 @@ fs_build2() {
   export int fwd_fid_plain = fs_build("plain");
   export int fwd_fid_main = fs_build("main");
 } return void;
-given env_init ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)

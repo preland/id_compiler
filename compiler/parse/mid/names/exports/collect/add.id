@@ -12,7 +12,7 @@ given dead_exp_fixture ((import dead_imp_a), "setup_fn"):() then calls exp_neste
 
 is_export_decl(int id) {
   int ok = 0;
-  if(k_of(id) == "decl" && i2_of(id) == 1) {
+  if((import nkind)[id] == "decl" && (import ni2)[id] == 1) {
     ok = 1;
   }
 } return int ok;
@@ -24,5 +24,5 @@ add_export(string name, string type, string owner) {
   push((import etypes), type);
   push((import eowners), owner);
 } return void;
-given env_init ("gx", "int", "setup_fn"):() then etypes_len:(1)
-given dead_exp_fixture ("gz", "int", "setup_fn"):() then eowners_len:(3)
+given env_init ("gx", "int", "setup_fn"):() then len((import etypes)):(1)
+given dead_exp_fixture ("gz", "int", "setup_fn"):() then len((import eowners)):(3)

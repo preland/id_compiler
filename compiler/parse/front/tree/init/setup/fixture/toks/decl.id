@@ -10,19 +10,13 @@ toks_push(string[] kinds, string[] texts) {
     i = i + 1;
   }
 } return void;
-given env_init (["op"], ["{"]):() then tkind_len:(1)
-given env_init (["op", "str"], ["{", "\"a\""]):() then tkind_len:(2)
-
-tkind_len() {
-  int n = len((import tkind));
-} return int n;
-given env_init ():(0)
-given asm_fix_2str ():(4)
+given env_init (["op"], ["{"]):() then len((import tkind)):(1)
+given env_init (["op", "str"], ["{", "\"a\""]):() then len((import tkind)):(2)
 
 // `{` "i1" "i2" `}` -- an asm body with two instruction lines.
 asm_fix_2str() {
   env_init();
   toks_push(["op", "str", "str", "op"], ["{", "\"i1\"", "\"i2\"", "}"]);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

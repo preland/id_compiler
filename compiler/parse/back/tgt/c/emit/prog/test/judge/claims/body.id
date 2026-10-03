@@ -23,9 +23,3 @@ claim_sizes() {
 given wrap_fixture ():() then calls size_row:[1]
 given void_call_fixture ():() then calls size_row:(0) then calls size_row:(1)
 
-// How many unit roots bin/idc passed (root.id), for its cases.
-ur_count() {
-  int urn = len((import uroots));
-} return int urn;
-given ur_t ():(1)
-given dg_t_parsed ():(0)

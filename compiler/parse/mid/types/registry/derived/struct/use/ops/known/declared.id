@@ -5,22 +5,22 @@
 // judges, the rule every check here follows).
 
 chk_declared_type(int id) {
-  if(k_of(id) == "decl" || k_of(id) == "param" || k_of(id) == "nparam") {
-    chk_type_known(id, s1_of(id));
+  if((import nkind)[id] == "decl" || (import nkind)[id] == "param" || (import nkind)[id] == "nparam") {
+    chk_type_known(id, (import ns1)[id]);
   }
-  if(k_of(id) == "func") {
-    chk_type_known(id, s2_of(id));
+  if((import nkind)[id] == "func") {
+    chk_type_known(id, (import ns2)[id]);
   }
 } return void;
-given sd_decl_fixture ((import sd_dk)):() then check_failed:(0)
-given sd_decl_fixture ((import sd_dbad)):() then check_failed:(1)
+given sd_decl_fixture ((import sd_dk)):() then (import chkfail)[0]:(0)
+given sd_decl_fixture ((import sd_dbad)):() then (import chkfail)[0]:(1)
 
 chk_type_known(int id, string sd_t) {
   if(ty_known(sd_t) == 0) {
     tc_err(id, "unknown type '" + sd_t + "'; a type is int, word, float, string, a struct declared in a file of its own (structs: " + sd_list_text() + "), or a list of one of those, as in 'int[]'");
   }
 } return void;
-given sd_decl_fixture ((import sd_dk), "int"):() then check_failed:(0)
+given sd_decl_fixture ((import sd_dk), "int"):() then (import chkfail)[0]:(0)
 given sd_decl_fixture ((import sd_dbad), "Pnt"):() then prints:("<stdin>:1: error: unknown type 'Pnt'; a type is int, word, float, string, a struct declared in a file of its own (structs: P, Q), or a list of one of those, as in 'int[]'\n")
 
 // "P, Q": the structs there are, for a message about a type that is not one.

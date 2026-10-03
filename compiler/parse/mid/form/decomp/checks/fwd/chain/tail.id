@@ -11,8 +11,8 @@ given farm_k (0, 6, -1):() then calls fwd_verify:[0]
 // The non-void forwarder shape: the declared local is exactly `return` and
 // the local's init is a call.
 fwd_decl_ok(int fid, int stmt) {
-  int retvar = i1_of(fid);
-  int callid = i1_of(stmt);
+  int retvar = (import ni1)[fid];
+  int callid = (import ni1)[stmt];
   int ok = fwd_decl_ok2(retvar, callid, stmt);
 } return int ok;
 given farm_i (6, 4):(1)

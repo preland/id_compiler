@@ -14,8 +14,8 @@
 
 esc_expr(int e, string nm, int ctx) {
   int r = 0;
-  if(k_of(e) == "var") {
-    if(s1_of(e) == nm) {
+  if((import nkind)[e] == "var") {
+    if((import ns1)[e] == nm) {
       r = ctx;
     }
   } else {
@@ -29,7 +29,7 @@ given esc_fix ((import efa_va), "b", 1):(0)
 
 esc_node(int e, string nm) {
   int r = 0;
-  if(k_of(e) == "call") {
+  if((import nkind)[e] == "call") {
     r = esc_call(e, nm);
   } else {
     r = esc_node2(e, nm);
@@ -42,7 +42,7 @@ given esc_fix ((import efa_push), "a"):(8)
 // in its first child list. The list and the index are read; the value is kept.
 esc_iassign(int sn, string nm) {
   int r = esc_two(sn, nm) | esc_setel(sn, nm);
-  int[] vs = l1_of(sn);
+  int[] vs = (import nl1)[sn];
   r = r | esc_expr(vs[0], nm, 1);
 } return int r;
 given esc_fix ((import efa_ia), "a"):(8)

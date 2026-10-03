@@ -4,7 +4,7 @@ farm_j2() {
   farm_j();
   export int f_uvar = node_var("target");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 bits_types(int id, int a, int b) {
@@ -14,12 +14,12 @@ bits_types(int id, int a, int b) {
     bits_err(id, lt, rt);
   }
 } return void;
-given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_b)):() then check_failed:(0)
-given cmp_fixture ((import bin_bitand), (import lit_str), (import lit_a)):() then check_failed:(1)
+given cmp_fixture ((import bin_bitand), (import lit_a), (import lit_b)):() then (import chkfail)[0]:(0)
+given cmp_fixture ((import bin_bitand), (import lit_str), (import lit_a)):() then (import chkfail)[0]:(1)
 
 fcall_reg_a() {
   call2_setup();
   push((import vtypes), "func(int) return int");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

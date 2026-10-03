@@ -29,9 +29,9 @@ given clean_prog_fixture ():() then calls dupfn_err:[0]
 // action, so its one action (../reserved/runtime.id) is inlined directly
 // above rather than kept as a separate function.
 dupfn_at(int i) {
-  string s1_of_v = s1_of((import prog)[i]);
+  string s1_of_v = (import ns1)[((import prog)[i])];
   int j = first_fn(s1_of_v);
-  if(is_runtime() == 0 && is_reserved_name(i)) {
+  if((import rtc)[0] == 0 && is_reserved_name(i)) {
     resv_err(i);
   }
 } chain (int i) {
@@ -48,7 +48,7 @@ given dupfn_fixture (1):() then calls dupfn_err:(1, 0)
 
 dupfn_err(int i, int j) {
   string prog_loc_v = prog_loc(i);
-  string s1_of_v = s1_of((import prog)[i]);
+  string s1_of_v = (import ns1)[((import prog)[i])];
   print(prog_loc_v + "function '" + s1_of_v + "' already defined at " + (import pfile)[j] + ":" + (import pline)[j]);
 } chain (int i, int j) {
   note_failure();

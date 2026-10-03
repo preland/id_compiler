@@ -9,17 +9,17 @@
 // range -- m2r_outv_fixture leaves one row of one cell -- so the second case
 // differs in what it checks, not in what it does.
 m2r_phi_make(int i, int j) {
-  string ir_ty_v = ir_ty((import pra)[j]);
+  string ir_ty_v = (import ity)[((import pra)[j])];
   int ph = ir_leaf("phi", ir_ty_v, 0 - 1, 0 - 1, "");
   lset((import phiof)[i], j, ph);
 } return int ph;
-given m2r_outv_fixture (0, 0):(3) then phiof_sum:(3)
-given m2r_outv_fixture (0, 0):(3) then check_failed:(0)
+given m2r_outv_fixture (0, 0):(3) then phiof_sum:("phiof 3")
+given m2r_outv_fixture (0, 0):(3) then (import chkfail)[0]:(0)
 
 m2r_phi_place(int f, int i, int ph) {
-  int[] irf_blk_v = irf_blk(f);
+  int[] irf_blk_v = (import fnblk)[f];
   int b = irf_blk_v[i];
-  int[] blk_ins_v = blk_ins(b);
+  int[] blk_ins_v = (import binsn)[b];
 } chain (int f, int i, int ph) {
   push(blk_ins_v, ph);
   int len_v = len(blk_ins_v);

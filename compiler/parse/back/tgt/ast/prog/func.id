@@ -18,8 +18,8 @@ given func_fix (0):() then prints:("(func f (params (param int p)) int (body (de
 given ret_void_fix (1):() then prints:("(func g (params (param int p)) void (body (decl int y 5) (assign z 5)) (return void))\n")
 
 print_func(int id) {
-  int[] l1_of_v = l1_of(id);
-  string s = "(func " + s1_of(id) + " (params" + print_list(l1_of_v) + ") " + s2_of(id);
+  int[] l1_of_v = (import nl1)[id];
+  string s = "(func " + (import ns1)[id] + " (params" + print_list(l1_of_v) + ") " + (import ns2)[id];
   string ret_s = print_func_tail(id, s);
 } return string ret_s;
 given func_fix (7):("(func f (params (param int p)) int (body (decl int y 5) (assign z 5)) (return 5))")

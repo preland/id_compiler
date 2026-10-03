@@ -4,9 +4,9 @@
 // signature is an exact match of spelling.
 
 fn_sig(int fn) {
-  int[] ps = l1_of(fn);
+  int[] ps = (import nl1)[fn];
   string pl = fn_type_list(ps);
-  string t = "func(" + pl + ") return " + s2_of(fn);
+  string t = "func(" + pl + ") return " + (import ns2)[fn];
 } return string t;
 given fn_idx_fixture ((import fixture_fn)):("func(int) return int")
 given ret_narrows_fn ((import narrow_f)):("func() return int")
@@ -24,7 +24,7 @@ fn_type_list(int[] ps) {
   string out = "";
   int i = 0;
   while(i < len(ps)) {
-    out = out + sep_at(", ", i) + s1_of(ps[i]);
+    out = out + sep_at(", ", i) + (import ns1)[(ps[i])];
     i = i + 1;
   }
 } return string out;

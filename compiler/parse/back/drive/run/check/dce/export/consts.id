@@ -26,7 +26,7 @@ seed_cfn_fixture_node() {
   int[] args = [cfnid];
   seed_cfn_fixture_add(args);
 } return void;
-given fn_fixture ():() then check_failed:(0)
+given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)
 
 list_consts_kept() {

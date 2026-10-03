@@ -21,7 +21,7 @@ given fn_fixture ((import fixture_params), "buf", "", 0):("buf.x = x; ")
 given fn_fixture ((import fixture_params), "buf", "", 1):("")
 
 rec_assign_add(int[] params, string pfx, string out, int i) {
-  string nm = s2_of(params[i]);
+  string nm = (import ns2)[(params[i])];
   string so = out + pfx + "." + nm + " = " + nm + "; ";
 } return string so;
 given fn_fixture ((import fixture_params), "buf", "", 0):("buf.x = x; ")

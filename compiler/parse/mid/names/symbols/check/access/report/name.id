@@ -4,14 +4,14 @@
 // empty child list, so walking it does nothing. What is left of a call is its
 // name, which is not a variable reference and so is judged separately.
 acc_expr5(int id, string owner, int ln) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   acc_elems(l1_of_v, owner, ln);
-  if(k_of(id) == "call" && is_call_var(id)) {
+  if((import nkind)[id] == "call" && is_call_var(id)) {
     acc_call_var(id, owner, ln);
   }
 } chain (int id, string owner, int ln) {
   if(is_unresolved_call(id) == 1) {
-    string s1_of_v = s1_of(id);
+    string s1_of_v = (import ns1)[id];
     report_nosuchfn(s1_of_v, owner, ln);
   }
 } return void;
@@ -38,5 +38,5 @@ acc_import(string name, string owner, int ln) {
     report_bad_import(name, owner, ln);
   }
 } return void;
-given pushfix ("clist", "f", 10):() then check_failed:(0)
+given pushfix ("clist", "f", 10):() then (import chkfail)[0]:(0)
 given pushfix ("nope", "f", 10):() then calls report_bad_import:("nope", "f", 10)

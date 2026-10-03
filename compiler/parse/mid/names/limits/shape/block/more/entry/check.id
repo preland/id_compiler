@@ -6,7 +6,7 @@
 //
 // check_program() is the entry point: call it after parse_program. Every
 // violation is printed (idc.py stops at the first; this reports them all) and
-// check_failed() then answers 1.
+// (import chkfail)[0] then answers 1.
 
 // clean_check_fixture/full_check_fixture (mid/form/unique/dump/cases/
 // checkfiles.id) give the node environment; init_rtc and reqtests_init are
@@ -17,8 +17,8 @@ check_program() {
   check_scopes();
   check_program_tail();
 } return void;
-given clean_check_fixture given init_rtc given reqtests_init ():() then check_failed:(0)
-given full_check_fixture given init_rtc given reqtests_init ():() then check_failed:(1)
+given clean_check_fixture given init_rtc given reqtests_init ():() then (import chkfail)[0]:(0)
+given full_check_fixture given init_rtc given reqtests_init ():() then (import chkfail)[0]:(1)
 
 check_funcs() {
   check_main();
@@ -34,8 +34,8 @@ given fn_fixture ():() then calls check_main:[1] then calls check_func_body:[1]
 // A function's own body is the outermost block, at depth 0. Its name labels
 // every diagnostic found anywhere inside it, as in idc.py.
 check_func_body(int id) {
-  int[] l2_of_v = l2_of(id);
-  string s1_of_v = s1_of(id);
+  int[] l2_of_v = (import nl2)[id];
+  string s1_of_v = (import ns1)[id];
   int func_line_v = func_line(s1_of_v);
 } chain (int id) {
   check_block(l2_of_v, 0, s1_of_v, func_line_v);

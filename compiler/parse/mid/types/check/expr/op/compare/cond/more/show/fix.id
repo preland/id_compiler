@@ -10,8 +10,8 @@ given cmp_fixture ((import bin_mixed), (import bin_bitand)):("(2 & 5)")
 given cmp_fixture ((import bin_mixed), (import lit_a)):("2")
 
 mixed_words(int id, int c) {
-  string po = s1_of(id);
-  string co = s1_of(c);
+  string po = (import ns1)[id];
+  string co = (import ns1)[c];
   string ret_s = bit_cmp_words(po, co);
 } return string ret_s;
 given cmp_fixture ((import bin_mixed), (import bin_bitand)):("a bitwise '&' with a comparison '<'")

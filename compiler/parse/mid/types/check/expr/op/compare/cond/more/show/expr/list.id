@@ -4,9 +4,9 @@
 
 show_list(int id) {
   string out = show_arr(id);
-  if(k_of(id) == "call") {
-    int[] args = l1_of(id);
-    out = s1_of(id) + "(" + show_args(args) + ")";
+  if((import nkind)[id] == "call") {
+    int[] args = (import nl1)[id];
+    out = (import ns1)[id] + "(" + show_args(args) + ")";
   }
 } return string out;
 given shapes_fixture ((import call_len)):("len(hi)")
@@ -14,8 +14,8 @@ given shapes_fixture ((import arr_ints)):("[2, 5]")
 
 show_arr(int id) {
   string out = "...";
-  if(k_of(id) == "arr") {
-    int[] elems = l1_of(id);
+  if((import nkind)[id] == "arr") {
+    int[] elems = (import nl1)[id];
     out = "[" + show_args(elems) + "]";
   }
 } return string out;

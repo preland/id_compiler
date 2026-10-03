@@ -8,11 +8,11 @@ lz_h() {
   export int lz_func1 = node_func("f1", "int", (import f_none), (import lz_body1), (import lz_retvar));
   export int lz_idx2 = node_index((import lz_str), (import lz_var));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 lw_name_addr(int node) {
-  string name = s1_of(node);
+  string name = (import ns1)[node];
   int addr = lw_addr(name);
 } return int addr;
 given lw_fix_var ((import fix_var_n)):(0)

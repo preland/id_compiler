@@ -11,7 +11,7 @@ is_peekfn(string name) {
 
 chk_bi_args(int id) {
   int i = 0;
-  while(i < flat_arg_count(id)) {
+  while(i < len(((import nl1)[id]))) {
     chk_bi_arg(id, i);
     i = i + 1;
   }
@@ -29,12 +29,12 @@ chk_bi_arg(int id, int i) {
     bi_arg_err(id, i, want, t);
   }
 } chain (int id, int i) {
-  string nm = s1_of(id);
+  string nm = (import ns1)[id];
   if((nm == "print" || nm == "eprint" || nm == "put") && ty_is_list(t) == 1) {
     tc_err(id, "'" + nm + "' cannot take a list: argument " + i + " is " + t + "; a list has no text form -- write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them");
   } else if(nm == "put" && ty_known(t) == 1 && t != "string") {
     tc_err(id, "'put' takes a string, but argument " + i + " is " + t + "; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line");
   }
 } return void;
-given call2_setup ((import cm_push_call), 1):() then check_failed:(0)
+given call2_setup ((import cm_push_call), 1):() then (import chkfail)[0]:(0)
 given bi_mismatch_setup ((import bi_mismatch_call), 0):() then calls bi_arg_err:((import bi_mismatch_call), 0, "list", "int")

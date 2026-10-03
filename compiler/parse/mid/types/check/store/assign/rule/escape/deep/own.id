@@ -18,7 +18,7 @@ esc_deep_ty(string t) {
 ("func(int) return int[][]"):(0)
 
 esc_deep(int fn, string nm) {
-  string t = esc_decl_type(l2_of(fn), nm);
+  string t = esc_decl_type((import nl2)[fn], nm);
   int ok = 0;
   if(esc_deep_ty(t) == 1 && esc_own(fn, nm) == 1) {
     ok = (esc_func(fn, nm) & 12) == 0;

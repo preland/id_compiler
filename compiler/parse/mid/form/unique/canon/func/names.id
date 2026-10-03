@@ -31,7 +31,7 @@ given cn_seeded_fixture ("second"):(1)
 // them the same. The recursion marker applies to it for the same reason it
 // applies to a call.
 canon_var(int id) {
-  string name = s1_of(id);
+  string name = (import ns1)[id];
   string out = "fv(" + canon_callee(name) + ")";
   if(is_fn_value(id) == 0) {
     out = "v" + cn(name);

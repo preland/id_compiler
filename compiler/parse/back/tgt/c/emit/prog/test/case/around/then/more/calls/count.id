@@ -3,8 +3,8 @@
 // happened.
 
 emit_calls_count(int ci, int ti, int node) {
-  string nm = s1_of(node);
-  int[] items = l1_of(node);
+  string nm = (import ns1)[node];
+  int[] items = (import nl1)[node];
   string want = tc_value(items[0], "int");
 } chain (int ci, int ti, int node) {
   string cntexpr = "idtc_rc_" + nm + "_n";

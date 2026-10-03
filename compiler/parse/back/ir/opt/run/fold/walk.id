@@ -14,7 +14,7 @@
 op_fold(int f) {
   int i = 0;
   while(i < blk_count(f)) {
-    int[] irf_blk_v = irf_blk(f);
+    int[] irf_blk_v = (import fnblk)[f];
     fold_blk(f, irf_blk_v[i]);
     i = i + 1;
   }
@@ -24,8 +24,8 @@ given ir_rows (1):() then calls fold_blk:(1, 1)
 
 fold_blk(int f, int b) {
   int i = 0;
-  while(i < insn_count(b)) {
-    int[] blk_ins_v = blk_ins(b);
+  while(i < len(((import binsn)[b]))) {
+    int[] blk_ins_v = (import binsn)[b];
     fold_one(f, blk_ins_v[i]);
     i = i + 1;
   }
@@ -34,7 +34,7 @@ given cfg_fixture (0, 0):() then calls fold_one:(0, 0)
 given cfg_fixture (0, 1):() then calls fold_one:[0]
 
 fold_one(int f, int id) {
-  if(ir_op(id) == "icmp" && ir_s(id) == "!=") {
+  if((import iop)[id] == "icmp" && (import istr)[id] == "!=") {
     fold_cmp(f, id);
   }
 } return void;

@@ -2,9 +2,9 @@
 // that call can run the function declaring the export (plan/reach/).
 fix_class3(int e) {
   int cl = 0;
-  if(k_of(e) == "import") {
+  if((import nkind)[e] == "import") {
     cl = 4;
-  } else if(k_of(e) == "bin" && fix_traps(e) == 1) {
+  } else if((import nkind)[e] == "bin" && fix_traps(e) == 1) {
     cl = 2;
   }
 } return int cl;
@@ -17,10 +17,10 @@ fix_class3_setup() {
   export int ck_int = newleaf("int", 1, 0, "1", "");
 } return void;
 ():() then ck_import_check:("import")
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 
 ck_import_check() {
-  string k = k_of((import ck_import));
+  string k = (import nkind)[(import ck_import)];
 } return string k;
 given fix_class3_setup ():("import")
-given fix_class3_setup ():("import") then check_failed:(0)
+given fix_class3_setup ():("import") then (import chkfail)[0]:(0)

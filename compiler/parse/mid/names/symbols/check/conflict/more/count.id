@@ -30,7 +30,7 @@ given fncount_setup ("x", "int", "nope", 0, 10, 0):() then calls report_var_twic
 
 fn_count_at(int i, string fname, int n) {
   int r = n;
-  if(s1_of((import prog)[i]) == fname) {
+  if((import ns1)[((import prog)[i])] == fname) {
     r = n + 1;
   }
 } return int r;

@@ -4,7 +4,7 @@
 
 decl_tag(int id) {
   string out = "d:";
-  if(i2_of(id) == 1) {
+  if((import ni2)[id] == 1) {
     out = "ed:";
   }
 } return string out;
@@ -12,7 +12,7 @@ given gdecl_fixture ((import decl_node)):("d:")
 given gdecl_fixture ((import gdecl_node)):("ed:")
 
 iassign_tail(int id, string head) {
-  int i2_of_v = i2_of(id);
+  int i2_of_v = (import ni2)[id];
   string key = canon_expr(i2_of_v);
   string ret_s = iassign_val(id, head, key);
 } return string ret_s;
@@ -26,5 +26,5 @@ iassign_begun_fixture() {
   lw_fix_iassign();
   uq_begin("f");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

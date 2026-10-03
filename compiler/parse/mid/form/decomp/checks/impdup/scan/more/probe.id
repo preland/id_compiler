@@ -16,12 +16,12 @@ given imd_pair_base given imd_fill (0, 0):(-1)
 
 imd_pair(string imd_va, string imd_vb) {
   int imd_ok = 0;
-  if(str_starts(imd_va, "~") == 0 && imd_diff(imd_va, imd_vb) == 1) {
+  if(imd_diff(imd_va, imd_vb) == 1) {
     imd_ok = 1;
   }
 } return int imd_ok;
 ("a,b", "a,c"):(1)
-("~a", "~b"):(0)
+("a", "b"):(1)
 ("a,b", "c,d"):(0)
 
 imd_diff(string imd_va, string imd_vb) {

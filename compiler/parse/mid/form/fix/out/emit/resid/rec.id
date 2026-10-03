@@ -18,5 +18,5 @@ fix_note_tok(int b, int c) {
   push((import fixd_lo), b);
   push((import fixd_hi), c);
 } return void;
-given fix_fixture (1, 2):() then fixd_lo_len:(1)
-given fix_note_fixture (3, 4):() then fixd_hi_len:(2)
+given fix_fixture (1, 2):() then len((import fixd_lo)):(1)
+given fix_note_fixture (3, 4):() then len((import fixd_hi)):(2)

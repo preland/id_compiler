@@ -4,7 +4,7 @@
 
 is_concat(int id) {
   int ok = 0;
-  if(s1_of(id) == "+" && one_is_str(id)) {
+  if((import ns1)[id] == "+" && one_is_str(id)) {
     ok = 1;
   }
 } return int ok;
@@ -12,8 +12,8 @@ given composite_fixture ((import bin_concat)):(1)
 given composite_fixture ((import bin_plus)):(0)
 
 one_is_str(int id) {
-  int i1_of_v = i1_of(id);
-  int i2_of_v = i2_of(id);
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
   int ok = is_str_pair(i1_of_v, i2_of_v);
 } return int ok;
 given composite_fixture ((import bin_concat)):(1)

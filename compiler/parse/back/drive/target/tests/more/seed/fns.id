@@ -3,21 +3,21 @@
 // the build calls it.
 
 seed_fn_args(int ci) {
-  int[] args = l1_of((import casenode)[ci]);
+  int[] args = (import nl1)[((import casenode)[ci])];
   int j = 0;
   while(j < len(args)) {
     seed_fn_arg(args[j]);
     j = j + 1;
   }
 } return void;
-given seed_cfn_fixture (0):() then rfn_len:(2)
-given seed_cfn_fixture (1):() then rfn_len:(3)
+given seed_cfn_fixture (0):() then len((import rfn)):(2)
+given seed_cfn_fixture (1):() then len((import rfn)):(3)
 
 seed_fn_arg(int e) {
-  if(k_of(e) == "cfn") {
-    string s1_of_v = s1_of(e);
+  if((import nkind)[e] == "cfn") {
+    string s1_of_v = (import ns1)[e];
     reach_add(s1_of_v);
   }
 } return void;
-given seed_cfn_fixture ((import fixture_zero)):() then rfn_len:(2)
-given seed_cfn_fixture ((import cfnid)):() then rfn_len:(3)
+given seed_cfn_fixture ((import fixture_zero)):() then len((import rfn)):(2)
+given seed_cfn_fixture ((import cfnid)):() then len((import rfn)):(3)

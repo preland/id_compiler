@@ -4,8 +4,8 @@ report_var_type(string name, string type, string prev, string owner, int ln) {
   print(loc_at_v + "variable '" + name + "' is declared " + type + " here but " + prev + " elsewhere; a name must keep one type across the whole program");
   note_failure();
 } return void;
-given regrow_d ("x", "string", "int", "f", 10):() then check_failed:(1)
-given regrow_d ("y", "word", "float", "f", 10):() then check_failed:(1)
+given regrow_d ("x", "string", "int", "f", 10):() then (import chkfail)[0]:(1)
+given regrow_d ("y", "word", "float", "f", 10):() then (import chkfail)[0]:(1)
 
 // The function that exported `name`, from the table collect_exports built.
 export_owner(string name) {

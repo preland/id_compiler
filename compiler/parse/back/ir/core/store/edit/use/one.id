@@ -1,6 +1,6 @@
 
 ir_rauw_l(int i, int old, int fresh) {
-  int[] l = ir_l(i);
+  int[] l = (import ilist)[i];
   int j = 0;
   while(j < len(l)) {
     j = ir_rauw_one(l, j, old, fresh);
@@ -22,7 +22,7 @@ ir_rauw_one(int[] l, int j, int old, int fresh) {
 // ir_rauw_l's while loop has more than one candidate to walk over.
 ir_rows_lst() {
   ir_rows();
-  ir_set_l(0, [5, 7, 5]);
+  lset2((import ilist), 0, ([5, 7, 5]));
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

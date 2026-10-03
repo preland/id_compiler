@@ -25,6 +25,10 @@
 // back/drive/sink/natives/more/emit.id's exclunit_seed, never lset in
 // place: a name is exported once, and a list export is populated the same
 // push-based way every other one in this file is.
+// stdunit: nat_init's own cases (live.id) read this back to check --std-unit landed
+// in the cell; case_unit_fixture (back/tgt/c/emit/prog/test/case/emit.id)
+// gives a second, differently-sourced value so this function's own two
+// cases are not both nat_init's default.
 init_units() {
   export int[] nunit = [];
   export int[] ucur = [0];
@@ -34,7 +38,7 @@ init_units() {
   export int[] exclunit = [];
 } return int 0;
 given env_init ():(0)
-given env_init ():(0) then check_failed:(0)
+given env_init ():(0) then (import chkfail)[0]:(0)
 
 // The rest of cur_file.id's take_file, split across two more steps to stay
 // under the action limit -- and a natural fit here, since the second step

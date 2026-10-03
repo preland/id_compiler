@@ -4,9 +4,9 @@
 // still an error even though a declaration is one of the four places.
 
 want_decl(int i, int id) {
-  string t = s1_of(i);
+  string t = (import ns1)[i];
   int ok = 0;
-  if(k_of(i) == "decl" && i1_of(i) == id && ty_is_list(t) == 1) {
+  if((import nkind)[i] == "decl" && (import ni1)[i] == id && ty_is_list(t) == 1) {
     ok = 1;
   }
 } return int ok;
@@ -18,7 +18,7 @@ given idxfix (0, (import rgidx_node)):(0)
 want_asg(int i, int id) {
   string vt = var_type_at(i);
   int ok = 0;
-  if(k_of(i) == "assign" && i1_of(i) == id && ty_is_list(vt) == 1) {
+  if((import nkind)[i] == "assign" && (import ni1)[i] == id && ty_is_list(vt) == 1) {
     ok = 1;
   }
 } return int ok;
@@ -30,7 +30,7 @@ given idxfix (0, (import rgidx_node)):(0)
 // The element of a list of lists: `xss[0] = []` is fine when xss is int[][].
 want_elem(int i, int id) {
   int ok = 0;
-  if(k_of(i) == "iassign" && l1_of(i)[0] == id) {
+  if((import nkind)[i] == "iassign" && (import nl1)[i][0] == id) {
     ok = want_elem_ok(i);
   } else {
     ok = want_push(i, id);

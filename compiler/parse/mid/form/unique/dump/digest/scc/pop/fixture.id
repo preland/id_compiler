@@ -9,7 +9,7 @@ dg_t_exp_node() {
   export int dg_t_imp = node_import("gx");
 } return void;
 ():() then dg_ncout1:(0)
-():() then dg_nrows:(2)
+():() then len((import dg_comp)):(2)
 
 // rfn refilled by hand with "conf.id" alone and its index not yet rebuilt,
 // for rfn_reindex's own case (mid/names/exports/reach/dead/more/add/, at its
@@ -21,7 +21,7 @@ rfn_hand() {
   push((import rfn), "conf.id");
 } return void;
 ():() then conf_reached:(0)
-():() then rfn_len:(1)
+():() then len((import rfn)):(1)
 
 dg_ncout1() {
   int dgn = len((import dg_cout)[1]);

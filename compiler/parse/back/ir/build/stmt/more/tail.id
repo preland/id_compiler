@@ -1,36 +1,36 @@
 
 ls3(int node) {
-  if(k_of(node) == "exprstmt") {
-    int i1_of_v = i1_of(node);
+  if((import nkind)[node] == "exprstmt") {
+    int i1_of_v = (import ni1)[node];
     lw_expr(i1_of_v);
   } else {
     ls4(node);
   }
 } return void;
-given decl_fixture2 ((import expr_node)):() then check_failed:(0)
-given nest_fixture ((import if_node)):() then check_failed:(0)
+given decl_fixture2 ((import expr_node)):() then (import chkfail)[0]:(0)
+given nest_fixture ((import if_node)):() then (import chkfail)[0]:(0)
 
 // The chain marker lowers to nothing: the segments it separates are one
 // function's body, and control simply falls from one into the next. Without
 // this arm it would reach ls5, which lowers a non-`if` as a `while`.
 ls4(int node) {
-  if(k_of(node) == "iassign") {
+  if((import nkind)[node] == "iassign") {
     lw_iassign(node);
-  } else if(k_of(node) != "chain" && k_of(node) != "blank") {
+  } else if((import nkind)[node] != "chain" && (import nkind)[node] != "blank") {
     ls5(node);
   }
 } return void;
-given nest_fixture ((import if_node)):() then check_failed:(0)
-given loop_fixture ((import while_node)):() then check_failed:(0)
+given nest_fixture ((import if_node)):() then (import chkfail)[0]:(0)
+given loop_fixture ((import while_node)):() then (import chkfail)[0]:(0)
 
 ls5(int node) {
-  if(k_of(node) == "if") {
+  if((import nkind)[node] == "if") {
     lw_if(node);
-  } else if(k_of(node) == "while") {
+  } else if((import nkind)[node] == "while") {
     lw_while(node);
   } else {
     lw_flow(node);
   }
 } return void;
-given nest_fixture ((import if_node)):() then check_failed:(0)
-given loop_fixture ((import while_node)):() then check_failed:(0)
+given nest_fixture ((import if_node)):() then (import chkfail)[0]:(0)
+given loop_fixture ((import while_node)):() then (import chkfail)[0]:(0)

@@ -32,5 +32,5 @@ tk_row(int tkf) {
   push((import tkskip), tkhit);
   push((import tkbad), 0);
 } return void;
-given tk_t_prep (0):() then tk_nkeys:(3) then tk_nskip:(0)
-given tk_t_warm (0):() then tk_nkeys:(3) then tk_nskip:(2)
+given tk_t_prep (0):() then tk_nkeys:("keys 3") then tk_nskip:("skip 0")
+given tk_t_warm (0):() then tk_nkeys:("keys 3") then tk_nskip:("skip 2")

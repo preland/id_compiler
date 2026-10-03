@@ -1,7 +1,7 @@
 // A `prog` index's function name. imd_tab is indexed by `prog`, not by the
 // strict table, which has an entry per chain segment.
 imd_name(int imd_x) {
-  string ret_s = s1_of((import prog)[imd_x]);
+  string ret_s = (import ns1)[((import prog)[imd_x])];
 } return string ret_s;
 given lz_o (0):("dup5")
 given lz_o (1):("dup9")

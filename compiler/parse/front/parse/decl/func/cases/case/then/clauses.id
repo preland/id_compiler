@@ -21,15 +21,53 @@ given then_fix ([0]):()
 
 case_thens(int[] pos) {
   while(cur_kind(pos) == "kw" && cur_text(pos) == "then") {
-    then_one(pos);
+    advance(pos);
+    then_dispatch(pos);
   }
 } return void;
 given fn_fixture ([0]):()
 given then_fix ([0]):()
 
-then_one(int[] pos) {
-  advance(pos);
-  then_dispatch(pos);
+// `then (import NAME):(value)` and `then (import NAME)[i]:(value)`: the
+// export, or one element of it, read after the call and compared with a
+// literal -- no function is named, so s1 is the export's name, l2 holds the
+// index's node when there is one, and the kind is "thenimp". The index is a
+// single scalar, or an `(import NAME)` naming a conf.id constant (a "cimport"
+// node, as in a tuple), held to being an int by the checker (mid/names/limits/
+// shape/cases/given/then/check/). `then len((import NAME)):(value)` is the same node
+// with the kind "thenlen" and no index: the length of the export, an int.
+then_imp_clause(int[] pos) {
+  int is_len = 0;
+  if(cur_text(pos) == "len") {
+    advance(pos);
+    advance(pos);
+    is_len = 1;
+  }
+  int e = case_import(pos);
+} chain (int[] pos) {
+  int[] imp_ix = [];
+  if(cur_text(pos) == "[") {
+    advance(pos);
+    push(imp_ix, case_item(pos));
+    expect_text(pos, "]");
+  }
+  if(is_len == 1) {
+    eat_close(pos);
+  }
+} chain (int[] pos) {
+  if(len(imp_ix) == 1 && cur_text(pos) == "]") {
+    advance(pos);
+  }
+  eat_colon(pos);
+  int[] items = case_tuple(pos);
+} chain (int[] pos) {
+  string kd = "thenimp";
+  if(is_len == 1) {
+    kd = "thenlen";
+  }
+  then_store(kd, (import ns1)[e], items, len((import casestart)) - 1, imp_ix);
 } return void;
-given then_fix ([0]):()
-given then_prints_fix ([0]):()
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenimp", "zz", [1], -1, [])
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "2", "]", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenimp", "zz", [2], -1, [1])
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "(", "import", "kk", ")", "]", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenimp", "zz", [2], -1, [1])
+given env_init given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenlen", "zz", [1], -1, [])

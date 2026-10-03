@@ -7,12 +7,12 @@ lz_p() {
   lz_o();
   imd_fill();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 main_at(int i, int m) {
   int r = m;
-  if(s1_of((import prog)[i]) == "main") {
+  if((import ns1)[((import prog)[i])] == "main") {
     r = (import prog)[i];
   }
 } return int r;
@@ -25,5 +25,5 @@ unit_t_late() {
   unit_t_two();
   lset((import unitc), 1, 1);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then ptok_span:(19)

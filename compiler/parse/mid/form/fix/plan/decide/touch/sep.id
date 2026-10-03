@@ -16,8 +16,8 @@ fix_sep_at(int i, int last) {
     lset((import fixe_sep), i, 1);
   }
 } return void;
-given fix_sep_fixture (1, 1):() then fixe_sep_count:(1)
-given fix_sep_fixture (0, 1):() then fixe_sep_count:(0)
+given fix_sep_fixture (1, 1):() then fixe_sep_count:("sep 1")
+given fix_sep_fixture (0, 1):() then fixe_sep_count:("sep 0")
 
 // Two events for the decide/ walks. fix_fixture exports every fixe_ column
 // but leaves them all empty, so a function that indexes one has nothing to
@@ -45,5 +45,5 @@ fix_touch_fixture() {
   push((import fixe_nt), "int");
   push((import fixe_nt), "word");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

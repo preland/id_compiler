@@ -19,8 +19,8 @@ given fn_fixture ((import fixture_params), "", 0):("int x; ")
 given fn_fixture ((import fixture_params), "", 1):("")
 
 rec_row_add(int[] params, string out, int i) {
-  string pt = s1_of(params[i]);
-  string nm = s2_of(params[i]);
+  string pt = (import ns1)[(params[i])];
+  string nm = (import ns2)[(params[i])];
   string so = out + c_type(pt) + " " + nm + "; ";
 } return string so;
 given fn_fixture ((import fixture_params), "", 0):("int x; ")

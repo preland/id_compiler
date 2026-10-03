@@ -5,8 +5,8 @@ init_reg2() {
   export int[] dvexp = [];
   init_didx();
 } return void;
-given env_init ():() then check_failed:(0)
-given call2_setup ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
+given call2_setup ():() then (import chkfail)[0]:(0)
 
 // How many registry rows declare `name` inside `owner`. One scan answers two
 // questions: asked before a row is added, a hit means the name is declared

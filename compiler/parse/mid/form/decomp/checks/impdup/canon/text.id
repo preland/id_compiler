@@ -1,13 +1,12 @@
-// One segment's fingerprint: the imports read so far (marked "~" when the
-// segment is at most one statement, ./pos.id), a bar, then the text. The
-// names are identifiers, so the first bar ends them whatever the text holds (a
-// string literal may hold a bar; the names cannot).
+// One segment's fingerprint: the imports read so far (./pos.id), a bar, then
+// the text. The names are identifiers, so the first bar ends them whatever the
+// text holds (a string literal may hold a bar; the names cannot).
 seg_text(string seg_sig, int[] seg_cur) {
   string seg_body = canon_body(seg_cur);
-  string seg_vec = imp_vec(len(seg_cur));
+  string seg_vec = imp_vec();
   string ret_s = seg_vec + "|" + seg_sig + "{" + seg_body + "}";
 } return string ret_s;
-given imp_decl_fixture ("S", [(import imp_decl)]):("~cfg|S{d:int 0=g(0)}")
+given imp_decl_fixture ("S", [(import imp_decl)]):("cfg|S{d:int 0=g(0)}")
 given imp_decl_fixture ("S", [(import imp_decl), (import imp_decl)]):("cfg|S{d:int 0=g(0);d:int 0=g(0)}")
 
 // lz_c, then one import already read by the function being fingerprinted, so
@@ -17,7 +16,7 @@ imp_seed_fixture() {
   string[] imp_have = (import cimps);
   push(imp_have, "first");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // lz_c, then `int q = (import cfg);` as a node.
@@ -25,5 +24,5 @@ imp_decl_fixture() {
   lz_c();
   export int imp_decl = node_decl("int", "q", (import lz_imp), 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

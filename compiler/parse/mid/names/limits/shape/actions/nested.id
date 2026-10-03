@@ -6,13 +6,13 @@
 // if is handed straight back to check_if with the depth unchanged.
 
 check_loop(int id, int depth, string fname) {
-  if(k_of(id) == "while") {
-    int[] l1_of_v = l1_of(id);
+  if((import nkind)[id] == "while") {
+    int[] l1_of_v = (import nl1)[id];
     check_block(l1_of_v, depth + 1, fname, (import nline)[id]);
   }
 } return void;
-given elif_fixture ((import while_node), 2, "f"):() then check_failed:(1)
-given elif_fixture ((import decl_node), 2, "f"):() then check_failed:(0)
+given elif_fixture ((import while_node), 2, "f"):() then (import chkfail)[0]:(1)
+given elif_fixture ((import decl_node), 2, "f"):() then (import chkfail)[0]:(0)
 
 // The rest of elif_fixture (../actions/else_chain.id), which ran out of
 // actions. The `else if` node's else arm holds exactly one nested if -- the
@@ -24,19 +24,19 @@ elif_fixture2() {
   export int[] elif_body = [(import elif_node)];
   elif_lists();
 } return void;
-given elif_fixture ():() then check_failed:(0)
+given elif_fixture ():() then (import chkfail)[0]:(0)
 given elif_fixture ():() then init_units:(0)
 
 check_if(int id, int depth, string fname) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   check_block(l1_of_v, depth + 1, fname, (import nline)[id]);
-  int[] els = l2_of(id);
+  int[] els = (import nl2)[id];
 } chain (int id, int depth, string fname) {
-  if(i2_of(id) == 1) {
+  if((import ni2)[id] == 1) {
     check_if(els[0], depth, fname);
   } else {
     check_plain_else(els, depth, fname, (import nline)[id]);
   }
 } return void;
-given elif_fixture ((import if_node), 2, "f"):() then check_failed:(1)
-given elif_fixture ((import if_node), 0, "f"):() then check_failed:(0)
+given elif_fixture ((import if_node), 2, "f"):() then (import chkfail)[0]:(1)
+given elif_fixture ((import if_node), 0, "f"):() then (import chkfail)[0]:(0)

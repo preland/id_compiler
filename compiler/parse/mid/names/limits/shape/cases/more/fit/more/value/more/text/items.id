@@ -13,12 +13,12 @@ given calls_node_fixture ((import fixture_calls_one)):("1")
 // A leaf as written: its own text, or `(import NAME)` for an export a case
 // reads (front/parse/decl/func/cases/case/given/elem.id).
 leaf_text(int e) {
-  string lt = s1_of(e);
-  if(k_of(e) == "cimport") {
+  string lt = (import ns1)[e];
+  if((import nkind)[e] == "cimport") {
     lt = "(import " + lt + ")";
   }
-  if(k_of(e) == "cctor") {
-    lt = lt + "(" + items_text(l1_of(e)) + ")";
+  if((import nkind)[e] == "cctor") {
+    lt = lt + "(" + items_text((import nl1)[e]) + ")";
   }
 } return string lt;
 given fn_fixture ((import fixture_zero)):("0")
@@ -41,5 +41,5 @@ impcase_given() {
   push((import fnodes), setup_node);
   push((import casegiven), "fx_setup");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

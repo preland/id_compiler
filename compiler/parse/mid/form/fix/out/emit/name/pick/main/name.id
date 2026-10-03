@@ -10,7 +10,7 @@ fix_pick_fixture_an0() {
   fix_pick_fixture_n();
   push((import fixe_an), "");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 // fixe_an[0] set, and fixe_cl[0] forced (fix_pick_fixture_named): fix_pick_name2
@@ -19,5 +19,5 @@ fix_pick_fixture_an_named() {
   fix_pick_fixture_named();
   push((import fixe_an), "myarg");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

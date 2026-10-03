@@ -10,8 +10,8 @@ fix_gcl() {
     i = i + 1;
   }
 } return void;
-given env_init ():() then check_failed:(0)
-given fix_gcl_nodes ():() then check_failed:(0)
+given env_init ():() then (import chkfail)[0]:(0)
+given fix_gcl_nodes ():() then (import chkfail)[0]:(0)
 
 // fixd_gcl is deliberately left uncased, on fixture cost. fix_gcl exports it
 // and runs both writers in one chain -- this fill, then fix_gcl_at over ngrp
@@ -27,8 +27,8 @@ fix_gcl_fill() {
     i = i + 1;
   }
 } return void;
-given fix_fixture ():() then check_failed:(0)
-given fix_gcl_fill_fixture ():() then check_failed:(0)
+given fix_fixture ():() then (import chkfail)[0]:(0)
+given fix_gcl_fill_fixture ():() then (import chkfail)[0]:(0)
 
 // Two nodes, so fix_gcl's own cases have something other than an empty tree
 // to size fixd_gcl against.
@@ -37,5 +37,5 @@ fix_gcl_nodes() {
   int e1 = node_int("1", 1, 0);
   int e2 = node_int("2", 2, 0);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

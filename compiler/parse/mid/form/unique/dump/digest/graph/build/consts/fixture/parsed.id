@@ -25,15 +25,15 @@ dg_t_cparsed() {
   int[] dgpos = [0];
   parse_program(dgpos);
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then ctok_span:(5)
 
 dg_t_cbuilt() {
   dg_t_cparsed();
   dg_build();
 } return void;
-():() then dg_nrows:(6)
-():() then dg_ncomp:(6)
+():() then len((import dg_comp)):(6)
+():() then (import dg_ctr)[1]:(6)
 
 dg_cflip(int dgtok, int dgc) {
   string dgk1 = dg_case_key(dgc);

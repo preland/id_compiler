@@ -10,7 +10,7 @@ given un_fixture ((import not_node)):(6)
 
 lw_un2(int node, string t) {
   int v = 0 - 1;
-  if(s1_of(node) == "!") {
+  if((import ns1)[node] == "!") {
     v = lw_not(node);
   } else {
     v = lw_un2_op(node, t);

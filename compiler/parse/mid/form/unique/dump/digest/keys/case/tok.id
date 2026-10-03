@@ -1,7 +1,10 @@
 // One token of a case: its text, and -- when it names a function of the
 // build -- that function's component, which is how a `given` setup, a `then`
 // check, a `calls` target and a function passed as an argument all come to
-// be part of the key without the case line being parsed a second time.
+// be part of the key without the case line being parsed a second time. A name
+// that is an export or a conf.id constant (an `(import NAME)` argument,
+// expected value or `then` check) brings in what declares it, the way a read
+// of it in a function does (../../graph/build/edge/target.id).
 
 dg_case_tok(word[] dgacc, int dgt) {
   dgacc[0] = dg_tok1(dgacc[0], dgt);
@@ -14,6 +17,9 @@ given dg_t_built ([0, 0], 19):([-8617499241897732819, 0])
 
 dg_case_ref(word[] dgacc, string dgnm) {
   int dgg = dg_fn_named(dgnm);
+  if(dgg < 0) {
+    dgg = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgg);
+  }
   if(dgg >= 0) {
     dgacc[0] = dg_mix(dgacc[0], dg_deep_fn(dgg));
     dgacc[1] = dgacc[1] + (import dg_dirty)[(import dg_comp)[dgg]];
@@ -21,6 +27,8 @@ dg_case_ref(word[] dgacc, string dgnm) {
 } return void;
 given dg_t_built ([0, 0], "fa"):([-8546436610636599953, 0])
 given dg_t_built ([0, 0], "nope"):([0, 0])
+given dg_t_exp given dg_exports(0) ([0, 0], "gx"):([-8546436610636599953, 0])
+given dg_t_exp given dg_exports(0) ([0, 0], "gy"):([0, 0])
 
 // The hash of the component sealed last, for dg_seal's own cases (../../scc/
 // seal/hash.id, whose directory is at its three-entry cap).

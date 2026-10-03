@@ -1,6 +1,6 @@
 // The rest of canon_func, split so that block stays within the action limit.
 canon_func_body(int id) {
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   string out = canon_params(l1_of_v);
   string ret_s = canon_func_tail(id, out);
 } return string ret_s;
@@ -19,9 +19,9 @@ given canon_begun_j_fixture (11, ""):("()->int{d:int 0=I3;e:c(foo:I3)}=>v0")
 given canon_begun_j_fixture (15, ""):("()->void{d:int 0=I3}=>void")
 
 canon_logic(int id, string out) {
-  int[] l2_of_v = l2_of(id);
+  int[] l2_of_v = (import nl2)[id];
   string val = canon_body(l2_of_v);
-  string ret_s = "(" + out + ")->" + s2_of(id) + "{" + val + "}=>" + canon_ret(id);
+  string ret_s = "(" + out + ")->" + (import ns2)[id] + "{" + val + "}=>" + canon_ret(id);
 } return string ret_s;
 given canon_begun_j_fixture (11, ""):("()->int{d:int 0=I3;e:c(foo:I3)}=>v0")
 given canon_begun_j_fixture (15, ""):("()->void{d:int 0=I3}=>void")

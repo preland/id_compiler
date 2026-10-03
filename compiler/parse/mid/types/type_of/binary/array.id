@@ -5,9 +5,9 @@
 
 type_arr(int id) {
   string t = "int[]";
-  int[] l1_of_v = l1_of(id);
+  int[] l1_of_v = (import nl1)[id];
   if(len(l1_of_v) > 0) {
-    int[] l1_of_v2 = l1_of(id);
+    int[] l1_of_v2 = (import nl1)[id];
     t = type_of(l1_of_v2[0]) + "[]";
   }
 } return string t;
@@ -19,7 +19,7 @@ call2_setup() {
   init_rtc();
   init_idx();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
 call2_scalar_setup() {
@@ -27,5 +27,5 @@ call2_scalar_setup() {
   init_rtc();
   init_idx();
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

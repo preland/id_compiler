@@ -5,18 +5,6 @@
 // for. host_init was called exactly once, as the last action of arg_flags4
 // (back/drive/run/check/flags/flagvals.id); it now folds into that chain.
 
-build_host() {
-  string ret_s = (import hostc)[0];
-} return string ret_s;
-given ut_host_seeded ():("x86_64-unknown-none")
-given build_host_fixture2 ():("wasm32-unknown-unknown")
-
-fs_fixture_extern() {
-  init_rtc();
-  fs_set(1);
-} return void;
-():() then is_freestanding:(1)
-():() then is_runtime:(0)
 
 
 // dead_exp_fixture (../../reach/dead/more/add.id) declares the dead-export
@@ -32,5 +20,5 @@ dead_exp_reach_fixture() {
 } chain () {
   export int reach_imp_m = node_import("gm");
 } return void;
-():() then check_failed:(0)
+():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
