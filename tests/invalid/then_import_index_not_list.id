@@ -1,0 +1,10 @@
+// EXPECT: reads one element, but 'total' is a int, not a list; drop the index, or name a list export
+mk() {
+  export int total = 4;
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then (import total)[0]:(4)
+given mk (1):() then (import total):(4)

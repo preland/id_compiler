@@ -748,6 +748,175 @@ sed -i 's/("x"):("x") then count:(1)/("x"):("x") then count:(2)/' "$TMP/p.id"
 self_refuse "bin/idc: ... and a check that does not hold fails it" \
     'p.id:9: test failed: err_report("x") then count() = 1, expected 2' --allow-untested --emit-c /dev/null
 
+# --- then (import NAME) and then (import NAME)[i] ----------------------------------
+# A check may read an export, or one element of it, instead of naming a
+# function that does. The function under test may not read that export itself.
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+  export string tag = "a";
+} return void;
+
+bump(int k) {
+  int[] c = (import cnt);
+  c[k] = c[k] + 1;
+} return void;
+
+wrap(int k) {
+  bump(k);
+} return void;
+given mk (0):() then (import cnt)[0]:(1) then (import cnt)[1]:(5) then (import tag):("a") then (import cnt):([1, 5])
+given mk (1):() then (import cnt)[1]:(6)
+EOF
+self_accept "bin/idc: a check reads an export, an element of it, or the whole list" --allow-untested --emit-c /dev/null
+
+sed -i 's/then (import cnt)\[1\]:(6)$/then (import cnt)[1]:(7)/' "$TMP/p.id"
+self_refuse "bin/idc: an element check that does not hold fails the case, naming the element" \
+    "p.id:15: test failed: wrap(1) then (import cnt)[1] = 6, expected 7" --allow-untested --emit-c /dev/null
+
+sed -i 's/then (import cnt)\[1\]:(7)$/then (import cnt)[1]:(6) then (import cnt):([0, 7])/' "$TMP/p.id"
+self_refuse "bin/idc: a whole-export check that does not hold fails the case, showing the list" \
+    "p.id:15: test failed: wrap(1) then (import cnt) = [0, 6], expected [0, 7]" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+wrap(int k) {
+  int a = (import cnt)[k];
+} return void;
+given mk (0):() then (import cnt)[0]:(0)
+given mk (1):() then (import cnt)[1]:(5)
+EOF
+self_refuse "bin/idc: then (import NAME) under a function that only reads NAME is rejected, naming the fix" \
+    "p.id:8: error: then (import cnt): the function under test, 'wrap', reads (import cnt) but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+wrap(int k) {
+  int[] c = (import cnt);
+  c[k] = c[k] + 1;
+} return void;
+given mk (0):() then (import cnt)[0]:(1)
+given mk (1):() then (import cnt)[1]:(6)
+EOF
+self_accept "bin/idc: then (import NAME) under a function that reads NAME and writes it is accepted" --allow-untested --emit-c /dev/null
+
+sed -i 's/then (import cnt)\[1\]:(6)$/then (import cnt)[1]:(5)/' "$TMP/p.id"
+self_refuse "bin/idc: ... and the check holds the write to its effect" \
+    "p.id:10: test failed: wrap(1) then (import cnt)[1] = 6, expected 5" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+  export string tag = "ab";
+} return void;
+
+grow(int k) {
+  push((import cnt), k);
+} return void;
+given mk (0):() then len((import cnt)):(3) then len((import tag)):(2)
+given mk (1):() then len((import cnt)):(3)
+EOF
+self_accept "bin/idc: then len((import NAME)) measures a list or a string export" --allow-untested --emit-c /dev/null
+
+sed -i 's/then len((import cnt)):(3)$/then len((import cnt)):(2)/' "$TMP/p.id"
+self_refuse "bin/idc: a len check that does not hold fails the case, naming the length" \
+    "p.id:10: test failed: grow(1) then len((import cnt)) = 3, expected 2" --allow-untested --emit-c /dev/null
+
+
+# A conf.id constant may stand in a check's index: it says where to look, and
+# the value compared with stays a literal. Nothing but the case line names it,
+# so a changed constant must change the case's cache key or the old pass is
+# reused.
+IXDIR="$TMP/ixdir"; mkdir -p "$IXDIR"
+printf 'int slot = 1;\n' > "$IXDIR/conf.id"
+cat > "$IXDIR/main.id" <<'EOF2'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+bump(int k) {
+  int[] c = (import cnt);
+  c[k] = c[k] + 1;
+} return void;
+
+wrap(int k) {
+  bump(k);
+} return void;
+given mk (0):() then (import cnt)[(import slot)]:(5)
+given mk (1):() then (import cnt)[(import slot)]:(6)
+EOF2
+cat > "$IXDIR/run.id" <<'EOF2'
+main(int argc, string[] argv) {
+} return int 0;
+EOF2
+if ../bin/idc "$IXDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    ok "bin/idc: a conf.id constant names a check's index"
+else
+    bad "bin/idc: a conf.id constant names a check's index ($(grep -v warning "$TMP/log" | head -1))"
+fi
+printf 'int slot = 0;\n' > "$IXDIR/conf.id"
+if ../bin/idc "$IXDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    bad "bin/idc: a changed index constant re-runs the case (built; it should not have)"
+elif grep -qF "main.id:13: test failed: wrap(0) then (import cnt)[(import slot)] = 1, expected 5" "$TMP/log"; then
+    ok "bin/idc: a changed index constant re-runs the case"
+else
+    bad "bin/idc: a changed index constant re-runs the case ($(grep -v warning "$TMP/log" | head -1))"
+fi
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+(0):() then (import cnt)[0]:(0)
+(1):() then (import cnt)[1]:(5)
+EOF
+self_refuse "bin/idc: then (import NAME) without a given is rejected" \
+    "p.id:8: error: (import cnt) needs a 'given'" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+other() {
+  export int[] away = [1];
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then (import away):([1])
+given mk (1):() then (import away)[0]:(1)
+EOF
+self_refuse "bin/idc: then (import NAME) of an export the setup does not reach is rejected" \
+    "p.id:13: error: (import away): 'away' is exported by 'other', which the setup 'mk' does not reach" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int total = 4;
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then (import total)[0]:(4)
+given mk (1):() then (import total):("4")
+EOF
+self_refuse "bin/idc: an index on an export that is not a list is rejected, naming the fix" \
+    "p.id:8: error: (import total)[...] reads one element, but 'total' is a int, not a list; drop the index, or name a list export" --allow-untested --emit-c /dev/null
+
+self_refuse "bin/idc: then (import NAME) holds its value to the export's type" \
+    "p.id:9: error: this case gives a string where a int is required" --allow-untested --emit-c /dev/null
+
 # The larger case's setup does 20000 iterations and the smaller's none, so
 # this claim holds only if a setup's work is not counted as the call's.
 cat > "$TMP/p.id" <<'EOF'
@@ -2223,10 +2392,11 @@ fi
 rm -rf "$TMP/fwdval"
 
 # Two functions that differ only in which imported value they read are one
-# function written twice: a compile error that names both and the fix. Every
-# other way of differing -- a literal, a second import, more logic -- and a
-# function of one statement (a named accessor) are quiet: no error and no
-# warning, which self_silent checks as an empty log.
+# function written twice: a compile error that names both and the fix, however
+# short they are -- a one-statement accessor per global is the same function
+# written once per global. Every other way of differing -- a literal, a second
+# import, more logic -- is quiet: no error and no warning, which self_silent
+# checks as an empty log.
 self_silent() {   # desc, flags...
     local desc="$1"; shift
     if self_build "$@" && [ -z "$(grep -v '^wrote ' "$TMP/log")" ]; then
@@ -2308,8 +2478,8 @@ main(int argc, string[] argv) {
 EOF
 self_silent "bin/idc: two imports differing is not reported" --allow-untested --emit-c /dev/null
 
-# A function of one statement is a named accessor of a module's global:
-# s1_of and s2_of in the compiler itself. Nothing to share, so no error.
+# A function of one statement is no exception: s1_of and s2_of were once two
+# accessors of two globals, and the fix is the same parameter.
 cat > "$TMP/p.id" <<'EOF'
 get_a() {
   int r = len((import la));
@@ -2325,7 +2495,8 @@ main(int argc, string[] argv) {
   int n = get_a() + get_b();
 } return int n;
 EOF
-self_silent "bin/idc: one-statement accessors of two globals are not reported" --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: one-statement accessors of two globals are an error naming both" \
+    "p.id:5: error: function 'get_b' and 'get_a' (defined at " --allow-untested --emit-c /dev/null
 
 # Former false positives: a literal-only difference never says anything. Named
 # accessors and fixtures that differ by a constant are how id is written.

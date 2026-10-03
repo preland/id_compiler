@@ -1,0 +1,10 @@
+// EXPECT: len((import total)) measures a list or a string, but 'total' is a int; name a list or string export
+mk() {
+  export int total = 4;
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then len((import total)):(4)
+given mk (1):() then len((import total)):(4)

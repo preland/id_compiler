@@ -44,7 +44,7 @@ tst_show() {
 } return void;
 
 tst_p(int i) {
-  while(i < odt_paras()) {
+  while(i < len((import odt_plo))) {
     show_p_line(i);
     i = i + 1;
   }
@@ -59,7 +59,7 @@ IDEOF
 
 cat > "$P/show/print.id" <<'IDEOF'
 show_paras() {
-  int n = odt_paras();
+  int n = len((import odt_plo));
   print("paras " + n);
 } return void;
 
@@ -70,15 +70,15 @@ show_p_line(int i) {
 } return void;
 
 show_err() {
-  string e = odt_err();
-  int at = odt_at();
+  string e = (import xml_strs)[1];
+  int at = (import xml_st)[5];
   print("err |" + e + "| at " + at);
 } return void;
 IDEOF
 
 cat > "$P/show/more/runs.id" <<'IDEOF'
 tst_r(int r) {
-  while(r < odt_runs()) {
+  while(r < len((import odt_txts))) {
     show_r_line(r);
     r = r + 1;
   }
@@ -102,7 +102,7 @@ IDEOF
 
 cat > "$P/show/more/print.id" <<'IDEOF'
 show_r_line(int r) {
-  string style = odt_run_style(r);
+  string style = (import odt_stys)[r];
   string text = odt_run_text(r);
   print("r" + r + " " + style + " |" + text + "|");
 } return void;

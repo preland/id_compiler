@@ -1,0 +1,13 @@
+// EXPECT: a 'then' check compares a literal; (import slot) may only be an argument or an expected value
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then (import cnt)[1]:((import slot))
+given mk (1):() then (import cnt)[1]:((import slot))
+
+main(int argc, string[] argv) {
+} return int 0;

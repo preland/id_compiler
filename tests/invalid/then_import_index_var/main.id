@@ -1,0 +1,14 @@
+// EXPECT: (import slot) is an exported variable, and only a conf.id constant may stand in a then check's index
+mk() {
+  export int[] cnt = [0, 5];
+  export int slot = 1;
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then (import cnt)[(import slot)]:(5)
+given mk (1):() then (import cnt)[(import slot)]:(5)
+
+main(int argc, string[] argv) {
+} return int 0;

@@ -1,0 +1,10 @@
+// EXPECT: this case gives a string where a int is required
+mk() {
+  export int total = 4;
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+given mk (0):() then (import total):("4")
+given mk (1):() then (import total):(4)

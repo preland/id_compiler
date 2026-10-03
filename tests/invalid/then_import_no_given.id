@@ -1,0 +1,10 @@
+// EXPECT: (import cnt) needs a 'given'
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+wrap(int k) {
+  int a = k + 1;
+} return void;
+(0):() then (import cnt)[0]:(0)
+(1):() then (import cnt)[1]:(5)

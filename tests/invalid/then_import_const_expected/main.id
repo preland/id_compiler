@@ -1,0 +1,13 @@
+// EXPECT: (import slot) is a conf.id constant, and a case names one only as a then check's index
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+pick(int k) {
+  int a = k + 1;
+} return int a;
+given mk (0):((import slot))
+given mk (1):((import slot))
+
+main(int argc, string[] argv) {
+} return int 0;

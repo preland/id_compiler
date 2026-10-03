@@ -1,0 +1,10 @@
+// EXPECT: reads (import cnt) but never writes it, so this check would only repeat its own read; check an export the function changes
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+wrap(int k) {
+  int a = (import cnt)[k];
+} return void;
+given mk (0):() then (import cnt)[0]:(0)
+given mk (1):() then (import cnt)[1]:(5)
