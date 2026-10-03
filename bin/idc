@@ -2052,16 +2052,19 @@ split_harness() {
 # The case-result cache. idparse writes a key for every case at the top of
 # the harness, `// idtc key N KEY` (compiler/parse/mid/form/unique/dump/
 # digest/keys/emit.id): a hash of the case's own tokens and of every function
-# it can reach, `-` for a case that must run on every build, or `std` for a
-# library case the program's harness never runs. What the source cannot say
-# is hashed here, once per build, into the name of the pass list the keys are
-# looked up in: the two compiler stages (which also write the runtime and the
-# harness), cc, the host, and the conf.id constants. A case whose key is on
+# it can reach -- the conf.id constants it reads, directly or through another
+# constant's initialiser, included -- `-` for a case that must run on every
+# build, or `std` for a library case the program's harness never runs. What
+# the source cannot say is hashed here, once per build, into the name of the
+# pass list the keys are looked up in: the two compiler stages (which also
+# write the runtime and the harness), cc, and the host. A case whose key is on
 # that list is not run; when no case is left, the harness is neither compiled
 # nor run. A key joins the list only when the harness itself reports its case
 # as passed, so a failing case is never taken for a pass.
 #
 # IDC_NO_CACHE=1 turns this off with the other caches: every case runs.
+# IDC_CASE_STATS=1 prints `idc: cases: N total, H already passed, T to run`
+# on stderr once the plan is made, which tests/cache.sh counts reruns by.
 CASE_CACHE_DIR="$CACHE_DIR/cases"
 CASE_KEEP="${IDC_CASE_KEYS:-200000}"
 
@@ -2071,7 +2074,7 @@ case_cache_global() {
     {
         sha256sum < "$IDLEX"
         sha256sum < "$IDPARSE"
-        printf '%s\0' "$CC" "$(host_triple)" ${CONSTS[@]+"${CONSTS[@]}"}
+        printf '%s\0' "$CC" "$(host_triple)"
         cc_path="$(command -v "$CC" 2>/dev/null)"
         [ -n "$cc_path" ] && sha256sum < "$cc_path"
     } | sha256sum | cut -d' ' -f1
@@ -2153,8 +2156,9 @@ case_record() {
 # The prelude's functions stay `static` in idc.h, so every unit can still
 # inline them -- `static inline`, which is what keeps cc from generating all
 # of them in every unit at -O0 (0.35 s a unit on the compiler's harness,
-# against 0.07 s) -- and the two it defines with external linkage (id_alloc,
-# id_store_span, which native backends call) become weak. `list` is the units
+# against 0.07 s) -- and the three it defines with external linkage (id_alloc,
+# id_store_span, which native backends call, and id_str_of_cstr, which the wasm
+# host calls) become weak. `list` is the units
 # in link order; `syms` names what was `static` state, which a relocatable
 # object (a program with no main) makes local again after linking.
 unit_split() { # unit_split C_FILE DIR MASK
@@ -2304,6 +2308,7 @@ run_cases() {
         exit 1
     fi
     case_plan
+    [ -n "${IDC_CASE_STATS:-}" ] && [ -n "$CASE_FILE" ] && echo "idc: cases: $n total, $CASE_HITS already passed, $CASE_TODO to run" >&2
     if [ "$CASE_TODO" -eq 0 ]; then
         progress test "$(plural "$n" case), all $CASE_HITS already passed"
         touch "$CASE_FILE" 2>/dev/null
@@ -2773,7 +2778,7 @@ if [ "$TARGET" = wasm ]; then
             *) PROGRAM_FILES+=("$f") ;;
         esac
     done
-    WEXPORTS=(id_alloc _initialize)
+    WEXPORTS=(id_alloc id_str_of_cstr _initialize)
     if [ "${#PROGRAM_FILES[@]}" -gt 0 ]; then
         while IFS= read -r name; do
             [ -n "$name" ] && WEXPORTS+=("id_$name")

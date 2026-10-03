@@ -13,6 +13,9 @@
 // initialiser for all of them and calls it before main.
 //
 //   cdecl  the declaration node of each constant, in conf.id order
+//   ctoks  each constant's first token, parallel to cdecl, and
+//   ctoke  one past its last: the text a case key hashes for the constants
+//          a case reaches (mid/form/unique/dump/digest/graph/build/consts/)
 //
 // Two pieces of parse state that are not about constants ride along, because
 // this is the parser's one init with room: pend_rets holds the early `return`
@@ -27,16 +30,20 @@ init_consts() {
   export int[] pend_rets = [];
 } chain () {
   export int[] loopd = [0];
+  export int[] ctoks = [];
+  export int[] ctoke = [];
 } return int 0;
 given env_init ():(0)
 given env_init ():(0) then check_failed:(0)
 
 take_const(int[] pos) {
   advance(pos);
+  int ctok_first = pos[0];
   int parse_decl_v = parse_decl(pos);
-  reg_const(parse_decl_v);
+} chain (int[] pos) {
+  reg_const(parse_decl_v, ctok_first, tok_end(pos[0]));
 } return void;
-given decl_tokens ([9]):([14])
+given decl_tokens ([9]):([14]) then ctok_span:(4)
 given decl_tokens ([9]):([14]) then check_failed:(1)
 
 // Registered in the same export tables an in-function `export` fills, so the
@@ -45,9 +52,12 @@ given decl_tokens ([9]):([14]) then check_failed:(1)
 // the constant was written in -- rather than a function name, because there is
 // no function: an identifier cannot contain a dot, so no program can define a
 // function by that name and claim to own a constant.
-reg_const(int d) {
+reg_const(int d, int ctok_first, int ctok_last) {
   add_export2(d, "conf.id");
   push((import cdecl), d);
+  push((import ctoks), ctok_first);
+} chain (int d, int ctok_first, int ctok_last) {
+  push((import ctoke), ctok_last);
 } return void;
-given lc_reg_setup (0):() then check_failed:(0)
-given lc_reg_setup (1):() then check_failed:(0)
+given lc_reg_setup (0, 3, 8):() then ctok_span:(5)
+given lc_reg_setup (1, 10, 10):() then ctok_span:(0)

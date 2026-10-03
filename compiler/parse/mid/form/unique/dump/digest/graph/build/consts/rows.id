@@ -1,0 +1,47 @@
+// The conf.id constants as rows of the digest, after the functions' and the
+// asm row, one per constant in conf.id order. A constant is a node of the
+// graph like a function: its own hash is its tokens -- type, name and
+// initialiser -- and its edges are the other constants its initialiser reads
+// (edges.id), so a case reaching a constant, however far, is keyed on exactly
+// the constants it reads and on no others. A constant whose tokens were not
+// recorded (only a hand-built fixture's) is marked like a native: its key
+// could not see an edit to it.
+//
+// The row is also the constant's entry in dg_ek, so an `(import NAME)` of it
+// is an edge the same way an import of a function's export is.
+
+dg_const_rows() {
+  int dgi = 0;
+  while(dgi < len((import cdecl))) {
+    dg_const_row(dgi);
+    dgi = dgi + 1;
+  }
+} return void;
+given dg_t_crows ():() then dg_nrows:(3)
+given dg_t_crows ():() then dg_nexp:(3)
+
+dg_const_row(int dgi) {
+  int dgr = len((import dg_own));
+  string dgnm = s2_of((import cdecl)[dgi]);
+  word dgo = dg_fnv(0, dgnm);
+} chain (int dgi) {
+  int dgn = 1;
+  if(dgi < len((import ctoke))) {
+    dgo = dg_tokhash((import ctoks)[dgi], (import ctoke)[dgi]);
+    dgn = 0;
+  }
+  dg_add(dgo, dgn);
+} chain (int dgi) {
+  hmap_put((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec), dgnm, dgr);
+} return void;
+given dg_t_crows (1):() then dg_nrows:(1) then dg_nat0:(0)
+given dg_t_cdirty (3):() then dg_nat0:(1)
+
+// The span of the last constant the parser recorded: the one reader of
+// ctoks/ctoke outside this directory's own build, for take_const's cases.
+ctok_span() {
+  int dgl = len((import ctoks)) - 1;
+  int dgn = (import ctoke)[dgl] - (import ctoks)[dgl];
+} return int dgn;
+given dg_t_cparsed ():(5)
+given dg_t_cbuilt ():(5)

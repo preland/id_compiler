@@ -17,8 +17,7 @@ dg_t_std() {
 ():() then dg_nrows:(3)
 
 dg_dirty_last() {
-  int dgl = len((import dg_dirty)) - 1;
-  int dgn = (import dg_dirty)[dgl];
+  int dgn = lst_last((import dg_dirty));
 } return int dgn;
 given dg_t_scc ():(1)
 given dg_t_built ():(1)

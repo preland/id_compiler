@@ -1,0 +1,54 @@
+// A real parse with conf.id constants in it, for the constants' own cases
+// (../rows.id, ../edges.id). The three constants come first, as bin/idc's
+// emit_sources puts them:
+//
+//   int zk = 3;                       tokens 0..5
+//   int[] zl = [(import zk), 7];      6..20      reads zk
+//   int zu = 9;                       21..26     read by nothing
+//
+// then two functions:
+//
+//   fa(int a) { int b = a + (import zl)[0]; } return int b;    27..50
+//   (1):(4)  (2):(5)                                           51..64
+//   fb(int a) { int b = a + 1; } return int b;                 65..82
+//   (1):(2)  (2):(3)                                           83..96
+//
+// so fa reaches zl directly and zk through it, and nothing reaches zu. (A case
+// line cannot name a constant: no setup reaches conf.id.)
+
+dg_t_cparsed() {
+  full_env();
+  push_toks(["const", "kw", "ident", "op", "int", "op", "const", "kw", "op", "op", "ident", "op", "op", "op", "kw", "ident", "op", "op", "int", "op", "op", "const", "kw", "ident", "op", "int", "op"], ["", "int", "zk", "=", "3", ";", "", "int", "[", "]", "zl", "=", "[", "(", "import", "zk", ")", ",", "7", "]", ";", "", "int", "zu", "=", "9", ";"]);
+  push_toks(["ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "op", "kw", "ident", "op", "op", "int", "op", "op", "op", "kw", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op"], ["fa", "(", "int", "a", ")", "{", "int", "b", "=", "a", "+", "(", "import", "zl", ")", "[", "0", "]", ";", "}", "return", "int", "b", ";", "(", "1", ")", ":", "(", "4", ")", "(", "2", ")", ":", "(", "5", ")"]);
+} chain () {
+  push_toks(["ident", "op", "kw", "ident", "op", "op", "kw", "ident", "op", "ident", "op", "int", "op", "op", "kw", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op", "op", "int", "op", "op", "op", "int", "op", "eof"], ["fb", "(", "int", "a", ")", "{", "int", "b", "=", "a", "+", "1", ";", "}", "return", "int", "b", ";", "(", "1", ")", ":", "(", "2", ")", "(", "2", ")", ":", "(", "3", ")", ""]);
+  int[] dgpos = [0];
+  parse_program(dgpos);
+} return void;
+():() then check_failed:(0)
+():() then ctok_span:(5)
+
+dg_t_cbuilt() {
+  dg_t_cparsed();
+  dg_build();
+} return void;
+():() then dg_nrows:(6)
+():() then dg_ncomp:(6)
+
+dg_cflip(int dgtok, int dgc) {
+  string dgk1 = dg_case_key(dgc);
+  sset((import ttext), dgtok, (import ttext)[dgtok] + "0");
+  dg_build();
+} chain (int dgtok, int dgc) {
+  string dgk2 = dg_case_key(dgc);
+  int dgdiff = 0;
+  if(dgk1 != dgk2) {
+    dgdiff = 1;
+  }
+} return int dgdiff;
+given dg_t_cbuilt (4, 0):(1)
+given dg_t_cbuilt (4, 2):(0)
+given dg_t_cbuilt (18, 0):(1)
+given dg_t_cbuilt (25, 0):(0)
+given dg_t_cbuilt (18, 2):(0)
+given dg_t_cbuilt (25, 2):(0)

@@ -12,9 +12,10 @@ dg_build() {
   }
 } chain () {
   dg_asm_row();
+  dg_const_rows();
   dg_exports(0);
-  dg_edges_all();
 } chain () {
+  dg_edges_all();
   dg_scc_all();
 } return void;
 given dg_t_parsed ():() then dg_nfn:(2) then dg_ncomp:(3)

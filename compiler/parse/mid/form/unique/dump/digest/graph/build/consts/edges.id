@@ -1,0 +1,32 @@
+// Each constant's out-edges, read off its nodes the way a function's are
+// (../edge/walk.id): a constant's nodes run from where the previous
+// constant's ended through its own declaration node, which the parser
+// creates last. The edges that matter are the `(import NAME)` nodes of a list
+// constant's initialiser, each pointing at the constant it reads.
+//
+// Returns the node after the last constant's: the constants are injected
+// ahead of every source (bin/idc's emit_sources), so that is where the first
+// function's nodes begin, and dg_edges_all starts its walk there rather than
+// charge a constant's reads to the first function.
+
+dg_const_edges() {
+  int dgi = 0;
+  int dglo = 0;
+  while(dgi < len((import cdecl))) {
+    dglo = dg_const_edges_of(dgi, dglo);
+    dgi = dgi + 1;
+  }
+} return int dglo;
+given dg_t_crows2 ():(8) then dg_nout1:(1)
+given dg_t_rows0 ():(0) then dg_nrows:(0)
+
+dg_const_edges_of(int dgi, int dglo) {
+  int dgr = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), s2_of((import cdecl)[dgi]), 0 - 1);
+  int dghi = (import cdecl)[dgi];
+  while(dglo <= dghi) {
+    dg_edge(dgr, dglo);
+    dglo = dglo + 1;
+  }
+} return int dglo;
+given dg_t_crows2 (1, 0):(6) then dg_nout1:(1)
+given dg_t_crows2 (0, 0):(2) then dg_nout1:(0)

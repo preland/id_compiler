@@ -3,7 +3,7 @@
 // (scan_reach, mid/names/exports/reach/dead/sweep.id) -- point at that
 // function; a name that is a builtin, a local or an asm routine is in
 // neither table and points nowhere. An `(import NAME)` points at the
-// function that declares NAME (../own.id's dg_exports).
+// function that declares NAME (../rows/own.id's dg_exports).
 
 dg_target(int dgid) {
   string dgkd = k_of(dgid);

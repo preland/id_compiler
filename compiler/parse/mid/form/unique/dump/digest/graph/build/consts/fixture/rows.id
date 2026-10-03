@@ -1,0 +1,26 @@
+// parsed.id's parse with the digest part-built, the way keys/fixture/rows.id
+// does for the functions: crows has the state and no rows, crows2 has the
+// three constants' rows and no edges yet, and cdirty is crows with a fourth
+// constant registered by hand -- no tokens recorded, which is what marks its
+// row like a native.
+
+dg_t_crows() {
+  dg_t_cparsed();
+  dg_init();
+} return void;
+():() then dg_nrows:(0)
+():() then dg_nexp:(0)
+
+dg_t_crows2() {
+  dg_t_crows();
+  dg_const_rows();
+} return void;
+():() then dg_nrows:(3)
+():() then dg_nout1:(0)
+
+dg_t_cdirty() {
+  dg_t_crows();
+  int dgq = lc_reg_int("qq", "1", 1);
+} return void;
+():() then dg_nrows:(0)
+():() then ctok_span:(5)

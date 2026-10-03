@@ -7,7 +7,7 @@
 
 dg_edges_all() {
   int dgf = 0;
-  int dglo = 0;
+  int dglo = dg_const_edges();
   while(dgf < len((import prog))) {
     dglo = dg_edges(dgf, dglo);
     dgf = dgf + 1;

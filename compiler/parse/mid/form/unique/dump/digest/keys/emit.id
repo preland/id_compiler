@@ -12,8 +12,9 @@
 // every build, because it carries a scaling claim (judged against the other
 // cases carrying it), or reaches a native (whose body, and whatever file or
 // device it reads, no hash here can see). bin/idc keeps a case's pass under
-// its KEY and adds what the hashes here cannot know: the compiler, cc, and
-// the conf.id constants.
+// its KEY and adds what the hashes here cannot know: the compiler, cc and the
+// host. The conf.id constants a case reads are in the hashes here (graph/build/
+// consts/).
 //
 // The lines are C comments, so the harness compiles as it did.
 

@@ -26,8 +26,8 @@ print_fp_line(int i) {
   string line = fp_line(name, (import cfp)[i]);
   print(line);
 } return void;
-given lz_o (0):() then prints:("()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n")
-given lz_o (1):() then prints:("()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
+given lz_o (0):() then prints:("~|()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n")
+given lz_o (1):() then prints:("~|()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
 
 // file:line, the same two facts a diagnostic's prefix names (../../names/
 // limits/report/more/prefix.id), without the ": error: " a diagnostic adds.

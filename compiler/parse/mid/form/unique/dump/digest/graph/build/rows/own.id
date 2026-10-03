@@ -21,8 +21,8 @@ given sd_pair (0, "a"):(-9052224311391053448)
 // it. Reading an export is a dependency on its declaration -- its type, and
 // the value its initialiser gives it -- even though nothing calls the
 // declaring function, so dg_target (edge/) follows an import to it. A
-// constant's owner is "conf.id", which is no function: constants are hashed
-// into bin/idc's own part of the key instead.
+// constant's owner is "conf.id", which is no function: a constant is a row of
+// its own instead (../consts/).
 dg_exports(int dgi) {
   while(dgi < len((import enames))) {
     dg_export_one(dgi);
