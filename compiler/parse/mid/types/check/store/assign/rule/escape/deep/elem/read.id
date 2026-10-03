@@ -1,0 +1,16 @@
+// An element read out of a list that is meant to own its elements
+// (docs/MEMORY.md 3.2). `xs[i]` is another name for the element, so when its
+// value goes somewhere that keeps it -- ctx 1: a store, a return, a callee that
+// keeps the argument -- the list no longer owns that element alone, and
+// freeing it with the list would leave the keeper dangling. Flag bit 4. A read
+// that only looks (ctx 0: an operand, a length, an index of the element) sets
+// nothing.
+esc_elem(int e, string nm, int ctx) {
+  int r = 0;
+  if(k_of(e) == "index" && k_of(i1_of(e)) == "var" && s1_of(i1_of(e)) == nm) {
+    r = (ctx & 1) << 2;
+  }
+} return int r;
+given esc_dfix ((import efd_ix), "g", 1):(4)
+given esc_dfix ((import efd_ix), "g", 0):(0)
+given esc_dfix ((import efd_ix), "h", 1):(0)

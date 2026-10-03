@@ -11,7 +11,7 @@ esc_node2(int e, string nm) {
   }
 } return int r;
 given esc_fix ((import efb_bin), "p"):(1)
-given esc_fix ((import efb_bin), "t"):(0)
+given esc_fix ((import efb_bin), "t"):(8)
 
 esc_node3(int e, string nm) {
   int r = 0;
@@ -31,4 +31,4 @@ esc_two(int e, string nm) {
   r = r | b;
 } return int r;
 given esc_fix ((import efb_bin), "p"):(1)
-given esc_fix ((import efb_bin), "t"):(0)
+given esc_fix ((import efb_bin), "t"):(8)

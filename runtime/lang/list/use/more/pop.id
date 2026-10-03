@@ -11,3 +11,12 @@ list_pop_read(word p) {
   word count = ld64(p);
   word ret_w = ld64(addr + count * 8);
 } return word ret_w;
+
+// One cell of a list being freed with its elements (more/init.id,
+// list_free_deep): the cell is a list, and goes back as one. Filed here beside
+// the other cell reader because init.id has no room for it.
+list_free_at(word fa_p, word fa_k) {
+  word fa_cells = ld64(fa_p + 16);
+  word fa_e = ld64(fa_cells + 8 * fa_k);
+  list_free(w2l(fa_e));
+} return void;

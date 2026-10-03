@@ -1,5 +1,6 @@
-// Where an argument flows, decided by what is being called. 1 keeps the value,
-// 0 only reads it.
+// Where an argument flows, decided by what is being called. Bit 1 keeps the
+// value, bit 8 says the callee may break the ownership of the elements of a
+// list (esc_dbit); 0 only reads it.
 //
 // A builtin reads every argument except the value `push` stores. Anything else
 // is a function written in id, whose answer is its summary (../mask.id): one
@@ -17,7 +18,7 @@ arg_ctx(string cname, int i) {
 } return int c;
 given esc_fix ("push", 1):(1)
 given esc_fix ("len", 0):(0)
-given esc_fix ("fa_sink", 0):(0)
+given esc_fix ("fa_sink", 0):(8)
 
 arg_ctx_b(string cname, int i) {
   int c = 0;
@@ -31,8 +32,8 @@ given esc_fix ("print", 1):(0)
 
 arg_ctx_u(string cname, int i) {
   int m = esc_mask(cname);
-  int c = esc_bit(m, i);
+  int c = esc_bit(m, i) | (esc_dbit(m, i) << 3);
 } return int c;
 given esc_fix ("fa_sink", 1):(1)
-given esc_fix ("fa_sink", 0):(0)
-given esc_fix ("nosuch", 0):(1)
+given esc_fix ("fa_sink", 0):(8)
+given esc_fix ("nosuch", 0):(9)

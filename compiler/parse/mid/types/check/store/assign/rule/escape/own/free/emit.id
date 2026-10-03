@@ -4,13 +4,14 @@
 
 esc_free_decl(int fn, int sn, string out) {
   string nm = s2_of(sn);
-  string line = "id_list_free(" + nm + "); ";
+  string line = esc_free_fn(fn, nm) + "(" + nm + "); ";
   if(esc_own(fn, nm) == 1 && str_find(out, line) < 0) {
     out = out + line;
   }
 } return string out;
 given esc_fix ((import efc_fn), (import efc_w), ""):("id_list_free(w); ")
 given esc_fix ((import efc_fn), (import efc_z), "x"):("x")
+given esc_dfix ((import efd_good), (import efd_ad), ""):("id_list_free_deep(a); ")
 
 esc_free_nest(int fn, int sn, string out) {
   out = esc_free_in(fn, l1_of(sn), out);
@@ -26,9 +27,10 @@ given esc_fix ((import efc_fn), (import efc_ife), ""):("id_list_free(w); ")
 esc_store_code(string nm, string code) {
   string s = nm + " = " + code + ";";
   if(esc_own(esc_cur(), nm) == 1) {
-    s = "{ IdList* idfe_o = " + nm + "; " + s + " id_list_free(idfe_o); }";
+    s = "{ IdList* idfe_o = " + nm + "; " + s + " " + esc_free_fn(esc_cur(), nm) + "(idfe_o); }";
   }
 } return string s;
 given esc_fix ("w", "v"):("{ IdList* idfe_o = w; w = v; id_list_free(idfe_o); }")
+given esc_dfix ("a", "v"):("{ IdList* idfe_o = a; a = v; id_list_free_deep(idfe_o); }")
 given esc_fix ("z", "v"):("z = v;")
 given full_env ("w", "v"):("w = v;")

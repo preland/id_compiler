@@ -1,0 +1,17 @@
+// A list of strings' lists passed to a function that only looks at its
+// elements is still owned by its maker, and is freed with them. The strings in
+// the elements are left: only list elements are freed.
+width(string[][] t) {
+  int w = len(t[0]);
+} return int w;
+
+count(int n) {
+  string[][] t = [["a", "b"], ["c"]];
+  push(t, ["d" + n]);
+  int w = width(t);
+} return int w;
+
+main(int argc, string[] argv) {
+  int w = count(7);
+  print("" + w);
+} return int 0;

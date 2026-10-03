@@ -1,0 +1,8 @@
+take(int[][] g) {
+  int[] k = g[0];
+} return int[] k;
+
+via(int n) {
+  int[][] g = [[n, n]];
+  int[] e = take(g);
+} return int[] e;

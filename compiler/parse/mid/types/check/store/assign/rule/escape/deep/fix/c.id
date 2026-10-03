@@ -1,0 +1,59 @@
+// The program the deep-ownership cases run against, on top of esc_fix's:
+//
+//   fd_peek(int[][] g) { int[] r = g[0]; }                 reads an element into a name
+//   fd_look(int[][] g) { int n = len(g[0]); }              only looks at one
+//   fd_good(int n) { int[][] a = [[], []]; push(a, []); a[0] = [];
+//                    fd_look(a); }                         owns its elements
+//   fd_leak(int n) { int[][] b = [[]]; int[] r = b[0]; }   reads one out
+//   fd_alias(int[] w) { int[][] c = []; push(c, w); }      stores a name
+//   fd_via(int n) { int[][] d = [[]]; fd_peek(d); }        passes it to a reader
+//
+// fd_peek and fd_look are registered, because the others call them; the rest
+// are reached by their nodes. The summaries are seeded again, which gives the
+// two new functions their rows, and fd_good is left as the function being
+// emitted.
+
+esc_fd_g() {
+  export int efd_vc = node_var("c");
+  export int efd_vw = node_var("w");
+  export int efd_dc = node_decl("int[][]", "c", (import efd_lit), 0);
+} chain () {
+  export int efd_pwc = node_call("push", [(import efd_vc), (import efd_vw)]);
+  export int efd_pws = node_exprstmt((import efd_pwc));
+  export int[] efd_wp = [node_param("param", "int[]", "w")];
+} chain () {
+  export int efd_alias = node_func("fd_alias", "void", (import efd_wp), [(import efd_dc), (import efd_pws)], 0 - 1);
+  export int efd_dd = node_decl("int[][]", "d", (import efd_lbl), 0);
+  export int efd_pkc = node_call("fd_peek", [node_var("d")]);
+} chain () {
+  export int efd_pks = node_exprstmt((import efd_pkc));
+  export int efd_via = node_func("fd_via", "void", (import efd_np), [(import efd_dd), (import efd_pks)], 0 - 1);
+} return void;
+given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then init_units:(0)
+
+esc_fd_h() {
+  add_func("fd_peek", "void", (import efd_peek));
+  add_func("fd_look", "int", (import efd_look));
+  esc_seed();
+} chain () {
+  lset((import sqbase), 0, (import efd_good));
+} return void;
+given esc_dfix ():() then check_failed:(0)
+given esc_dfix ():() then init_units:(0)
+
+esc_dfix() {
+  esc_fix();
+  esc_fd_a();
+  esc_fd_b();
+} chain () {
+  esc_fd_c();
+  esc_fd_d();
+  esc_fd_e();
+} chain () {
+  esc_fd_f();
+  esc_fd_g();
+  esc_fd_h();
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

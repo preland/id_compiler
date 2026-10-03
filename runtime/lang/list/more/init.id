@@ -4,3 +4,24 @@ list_init_cells(word p) {
   word mem_alloc_v = pool_take(1, 32);
   st64(p + 16, mem_alloc_v);
 } return void;
+
+// Giving back a list and the lists it holds (drop.id's list_free for the
+// elements as well). The compiler calls this (as id_list_free_deep) for a local
+// list of lists whose elements it proved nothing else can reach, so each cell is
+// freed as a list; the elements' own elements are left, as list_free leaves
+// them. Filed here because drop.id is full. The loop reads the length and cap
+// from the header, so a list already freed (cap -1) frees nothing and is
+// ignored the way list_free ignores it.
+list_free_deep(int[] xs) {
+  word fd_p = l2w(xs);
+  list_free_cells(fd_p);
+  list_free(xs);
+} return void;
+
+list_free_cells(word fc_p) {
+  word fc_k = 0;
+  while(fc_p != 0 && ld64(fc_p + 8) > 0 && fc_k < ld64(fc_p)) {
+    list_free_at(fc_p, fc_k);
+    fc_k = fc_k + 1;
+  }
+} return void;

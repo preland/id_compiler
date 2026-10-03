@@ -1,0 +1,9 @@
+main(int argc, string[] argv) {
+  int[] a = grab(1);
+  int[][] pool = [];
+  lend(pool, 2);
+} chain (int argc, string[] argv) {
+  int[] c = adopt(3);
+  int[] d = via(4);
+  print("" + len(a) + " " + len(pool[0]) + " " + len(c) + " " + d[1]);
+} return int 0;

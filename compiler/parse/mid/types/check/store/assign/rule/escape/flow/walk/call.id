@@ -6,13 +6,14 @@ esc_call(int e, string nm) {
   int r = esc_args(args, cname, nm);
 } return int r;
 given esc_fix ((import efb_call), "p"):(1)
-given esc_fix ((import efb_call), "t"):(0)
-given esc_sd_fix ((import esd_ctor), "xs"):(1)
+given esc_fix ((import efb_call), "t"):(8)
+given esc_sd_fix ((import esd_ctor), "xs"):(9)
 given esc_sd_fix ((import esd_ctor), "other"):(0)
 
-// Each argument gets the context its position has in the callee (sum/).
+// Each argument gets the context its position has in the callee (sum/). A
+// push onto `nm` of anything but a list literal is flagged first (deep/).
 esc_args(int[] args, string cname, string nm) {
-  int r = 0;
+  int r = esc_pushel(args, cname, nm);
   int i = 0;
   while(i < len(args)) {
     int c = arg_ctx(cname, i);
@@ -21,7 +22,7 @@ esc_args(int[] args, string cname, string nm) {
   }
 } return int r;
 given esc_fix ((import efb_args), "fa_sink", "p"):(1)
-given esc_fix ((import efb_args), "fa_sink", "t"):(0)
+given esc_fix ((import efb_args), "fa_sink", "t"):(8)
 given esc_fix ((import efa_args), "len", "b"):(0)
 
 // An element of a list literal is kept by the list.

@@ -10,6 +10,7 @@ esc_frees() {
   }
 } return string out;
 given esc_fix ():("id_list_free(w); ")
+given esc_dfix ():("id_list_free_deep(a); ")
 given full_env ():("")
 
 esc_free_in(int fn, int[] stmts, string out) {

@@ -1,0 +1,40 @@
+// The ways an element gets into a list: `push(xs, v)`, `xs[i] = v` and a list
+// literal. A list owns the element only when it is a list literal, which is a
+// block nothing else holds yet. Anything else -- a name, a call's result -- may
+// be held by someone else already. Flag bit 8.
+
+esc_pushel(int[] args, string cname, string nm) {
+  int r = 0;
+  if(cname == "push" && k_of(args[0]) == "var" && s1_of(args[0]) == nm && k_of(args[1]) != "arr") {
+    r = 8;
+  }
+} return int r;
+given esc_dfix ((import efd_pa), "push", "g"):(8)
+given esc_dfix ((import efd_pb), "push", "g"):(0)
+given esc_dfix ((import efd_pa), "push", "v"):(0)
+given esc_dfix ((import efd_pa), "len", "g"):(0)
+
+esc_setel(int sn, string nm) {
+  int[] vs = l1_of(sn);
+  int r = 0;
+  if(k_of(i1_of(sn)) == "var" && s1_of(i1_of(sn)) == nm && k_of(vs[0]) != "arr") {
+    r = 8;
+  }
+} return int r;
+given esc_dfix ((import efd_setb), "g"):(8)
+given esc_dfix ((import efd_setl), "g"):(0)
+given esc_dfix ((import efd_setb), "h"):(0)
+
+esc_litels(int[] els) {
+  int r = 0;
+  int i = 0;
+  while(i < len(els)) {
+    if(k_of(els[i]) != "arr") {
+      r = 8;
+    }
+    i = i + 1;
+  }
+} return int r;
+given esc_dfix ((import efd_elok)):(0)
+given esc_dfix ((import efd_elbad)):(8)
+given esc_dfix ((import ef_none)):(0)

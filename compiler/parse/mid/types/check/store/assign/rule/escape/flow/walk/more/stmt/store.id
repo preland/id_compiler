@@ -22,12 +22,16 @@ given esc_fix ((import efb_vp), "v", "p"):(1)
 
 // Bit 2: `nm` is the target of a store whose value is not a list literal, so
 // it may be an alias of a list somebody else owns (a parameter, an element, a
-// call's result) and must never be freed.
+// call's result) and must never be freed. Bit 8 is added for a literal whose
+// elements are not themselves literals (deep/elem.id).
 esc_fresh(int e, string tg, string nm) {
   int r = 0;
   if(tg == nm && k_of(e) != "arr") {
     r = 2;
+  } else if(tg == nm) {
+    r = esc_litels(l1_of(e));
   }
 } return int r;
 given esc_fix ((import efb_vp), "v", "v"):(2)
-given esc_fix ((import efb_arr), "v", "v"):(0)
+given esc_fix ((import efb_arr), "v", "v"):(8)
+given esc_dfix ((import efd_lits), "v", "v"):(0)

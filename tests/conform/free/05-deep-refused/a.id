@@ -1,0 +1,20 @@
+// A list of lists is freed with its elements only when every element is one it
+// built itself and none was handed out. Each function here and in b.id breaks
+// one of those conditions and gives the element to its caller, which reads it
+// after the function has returned: under the guard a free of that element is a
+// trap. Only the outer lists are freed.
+grab(int n) {
+  int[][] g = [[n, n], [n]];
+  int[] r = g[0];
+} return int[] r;
+
+lend(int[][] pool, int n) {
+  int[][] g = [[n], [n, n]];
+  push(pool, g[1]);
+} return void;
+
+adopt(int n) {
+  int[] w = [n, n, n];
+  int[][] g = [[n]];
+  push(g, w);
+} return int[] w;

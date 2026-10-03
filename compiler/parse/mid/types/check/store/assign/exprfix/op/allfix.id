@@ -7,3 +7,19 @@ allfix() {
 } return void;
 ():() then check_failed:(0)
 ():() then init_units:(0)
+
+// lwo_fixture (back/ir/build/expr/op/cmp/wide.id) over the deep-ownership
+// program of esc_dfix, in fd_good: its one local, the list of lists a, as a
+// slot, for the cases of the lowering's free hooks that must pick the call that
+// frees a list's elements too. Filed here because the directory beside lwo_fixture
+// has no room for another function.
+lwd_fixture() {
+  esc_dfix();
+  int r = init_ir();
+  int f = ir_func(0 - 1, "fd_good", "void");
+} chain () {
+  int o = lw_open(f);
+  export int lwd_a = lw_alloca("int[][]", "a");
+} return void;
+():() then check_failed:(0)
+():() then init_units:(0)

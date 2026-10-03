@@ -1,0 +1,28 @@
+// A list of lists whose every element is a list literal built for it owns them,
+// so freeing it frees them too: the elements it was built with, the ones pushed
+// and the one an assignment put in place of another. The one replaced is not
+// freed (nothing proves it unreachable once it left the list), and a list
+// declared in a loop frees its whole value once per pass.
+tally(int n) {
+  int[][] g = [[n], [n, n]];
+  push(g, [n + 1]);
+  g[0] = [n + 2];
+} chain (int n) {
+  int s = len(g[0]) + g[1][1] + len(g);
+} return int s;
+
+loopy(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    int[][] row = [[i], [i, i]];
+    t = t + row[1][0];
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = tally(2);
+  int b = loopy(4);
+  print("" + a + " " + b);
+} return int 0;

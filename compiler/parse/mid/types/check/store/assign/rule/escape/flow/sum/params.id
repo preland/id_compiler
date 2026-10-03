@@ -4,11 +4,11 @@
 esc_params(int fn) {
   int[] ps = l1_of(fn);
   int m = 0 - 1;
-  if(len(ps) <= 30) {
+  if(len(ps) <= 15) {
     m = esc_bits(fn, ps);
   }
 } return int m;
-given esc_fix ((import efa_fn)):(2)
+given esc_fix ((import efa_fn)):(32770)
 given esc_fix ((import efc_fn)):(1)
 
 esc_bits(int fn, int[] ps) {
@@ -19,13 +19,13 @@ esc_bits(int fn, int[] ps) {
     i = i + 1;
   }
 } return int m;
-given esc_fix ((import efa_fn), (import efa_ps)):(2)
+given esc_fix ((import efa_fn), (import efa_ps)):(32770)
 given esc_fix ((import efb_fn), (import efb_ps)):(1)
 
 esc_pbit(int fn, int pn, int i) {
   string nm = s2_of(pn);
   int f = esc_func(fn, nm);
-  int b = (f & 1) << i;
+  int b = ((f & 1) << i) | (((f & 12) != 0) << (15 + i));
 } return int b;
 given esc_fix ((import efa_fn), (import efa_pb), 1):(2)
-given esc_fix ((import efa_fn), (import efa_pa), 0):(0)
+given esc_fix ((import efa_fn), (import efa_pa), 0):(32768)

@@ -1,14 +1,27 @@
-// One bit of a summary. Parameters past the thirtieth have no bit, so they are
-// reported as kept.
+// One bit of a summary. A summary holds two masks of fifteen bits: bit i says
+// parameter i may be kept, bit 15 + i says the callee may break the ownership
+// of the elements of parameter i (see esc_dbit). Parameters past the
+// fifteenth have no bit, so they are reported as kept.
 esc_bit(int m, int i) {
   int c = 1;
-  if(i < 30) {
+  if(i < 15) {
     c = (m >> i) & 1;
   }
 } return int c;
 (2, 1):(1)
 (2, 0):(0)
 (0, 31):(1)
+
+// The second mask: 1 when the callee may read an element of parameter i into a
+// position that keeps it, or store into it an element that is not a list
+// literal. A list whose elements the caller means to free with it cannot be
+// passed there.
+esc_dbit(int m, int i) {
+  int c = esc_bit(m >> 15, i);
+} return int c;
+(32768, 0):(1)
+(2, 1):(0)
+(0, 15):(1)
 
 // A function whose body cannot be read: a name that is no function of the
 // program (-1), a `native`, or one a test case's `calls` clause records -- the
