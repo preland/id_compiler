@@ -32,3 +32,14 @@ dg_t_scc() {
 ():() then (import dg_ctr)[1]:(4)
 ():() then len((import dg_comp)):(5)
 
+
+// The parsed pair's second function calling `ticks` where it called fa: a
+// call to a volatile builtin, which dg_target sends to the row every asm
+// routine shares (../build/edge/asm.id), the one past prog.
+dg_t_vol() {
+  dg_t_rows();
+  sset((import ns1), 16, "ticks");
+  sset((import nkind), 16, "call");
+} return void;
+():() then (import ns1)[16]:("ticks")
+():() then len((import dg_comp)):(2)

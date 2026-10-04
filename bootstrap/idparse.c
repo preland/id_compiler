@@ -553,6 +553,7 @@ int id_lst_same_at(IdList* idstd_xs, int idstd_i, int idstd_j);
 int id_lst_str_same_at(IdList* idstd_sx, int idstd_i, int idstd_j);
 int id_lst_index_of(IdList* idstd_xs, int idstd_v);
 int id_lst_find(IdList* idstd_xs, int idstd_v);
+int id_lst_str_index(IdList* idstd_sx, char* idstd_sw);
 int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
 int id_fx_max(int idstd_a, int idstd_b);
 int id_chr_is_space(int idstd_c);
@@ -2260,6 +2261,7 @@ void id_dg_edge(int dgf, int dgid);
 void id_dg_build(void);
 void id_dg_fill_one(int dgf);
 void id_dg_add(long long dgo, int dgn);
+int id_dg_nat_class(int dgf, char* dgnm);
 long long id_dg_own_of(int dgf, char* dgnm);
 void id_dg_exports(int dgi);
 void id_dg_export_one(int dgi);
@@ -3086,6 +3088,9 @@ char* id_type_of3(int id);
 int idx_n = 251;  /* constant from conf.id */
 char* builtin_src = ID_SK("print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint");  /* constant from conf.id */
 char* resv_names_src = ID_SK("add_check alloc arena_free_all arena_link arena_unlink at block_free box_f charat chr concat err_write flush freed_trap getkey idiv imod input len list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek32 peek64 peek8 peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore ticks to_int trap udiv ult umod unbox_f ushr");  /* constant from conf.id */
+IdList* cache_file_natives;  /* constant from conf.id */
+IdList* cache_taint_natives;  /* constant from conf.id */
+IdList* cache_volatile_builtins;  /* constant from conf.id */
 IdList* hostc;  /* exported by arg_flags4() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
@@ -3308,6 +3313,14 @@ IdList* tcache_ok;  /* exported by init_tcache() */
 IdList* seqt;  /* exported by init_tcache() */
 IdList* arrmark;  /* exported by init_tcache() */
 
+static void idc_const_init(void) {
+    cache_file_natives = id_list_lit(10, (long long)(intptr_t)(ID_S("fs_open")), (long long)(intptr_t)(ID_S("fs_close")), (long long)(intptr_t)(ID_S("fs_error")), (long long)(intptr_t)(ID_S("fs_read")), (long long)(intptr_t)(ID_S("fs_read_mem")), (long long)(intptr_t)(ID_S("fs_size")), (long long)(intptr_t)(ID_S("fs_exists")), (long long)(intptr_t)(ID_S("fs_mtime")), (long long)(intptr_t)(ID_S("fs_list")), (long long)(intptr_t)(ID_S("fs_drop_exit")));
+    id_list_lock(cache_file_natives);
+    cache_taint_natives = id_list_lit(11, (long long)(intptr_t)(ID_S("fs_write")), (long long)(intptr_t)(ID_S("fs_write_mem")), (long long)(intptr_t)(ID_S("fs_flush")), (long long)(intptr_t)(ID_S("fs_mkdir")), (long long)(intptr_t)(ID_S("fs_remove")), (long long)(intptr_t)(ID_S("fs_rename")), (long long)(intptr_t)(ID_S("fs_chmod")), (long long)(intptr_t)(ID_S("env_has")), (long long)(intptr_t)(ID_S("env_get")), (long long)(intptr_t)(ID_S("env_set")), (long long)(intptr_t)(ID_S("env_error")));
+    id_list_lock(cache_taint_natives);
+    cache_volatile_builtins = id_list_lit(2, (long long)(intptr_t)(ID_S("ticks")), (long long)(intptr_t)(ID_S("getkey")));
+    id_list_lock(cache_volatile_builtins);
+}
 void id_hmap_init(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt) {
     id_idstd_hmap_fill(idstd_keys, idstd_vals, idstd_used, 8);
     id_list_push(idstd_cnt, (long long)(0));
@@ -3560,6 +3573,20 @@ int id_lst_find(IdList* idstd_xs, int idstd_v) {
     int idstd_ret_i;
     idstd_ret_i = (id_lst_index_of(idstd_xs, idstd_v) >= 0);
     return idstd_ret_i;
+}
+
+int id_lst_str_index(IdList* idstd_sx, char* idstd_sw) {
+    int idstd_si;
+    int idstd_sat;
+    idstd_si = 0;
+    idstd_sat = (-1);
+    while (((idstd_si < id_list_len(idstd_sx)) && (idstd_sat < 0))) {
+        if ((strcmp((char*)(intptr_t)(id_list_get(idstd_sx, idstd_si)), idstd_sw) == 0)) {
+            idstd_sat = idstd_si;
+        }
+        idstd_si = (idstd_si + 1);
+    }
+    return idstd_sat;
 }
 
 int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit) {
@@ -4294,6 +4321,7 @@ int id_arg_flag(int argc, IdList* argv, int i, char* name) {
 int id_main(int argc, IdList* argv) {
     IdList* pos;
     int ret_i;
+    idc_const_init();
     id_setup();
     id_load();
     pos = id_list_lit(1, (long long)(0));
@@ -11865,7 +11893,7 @@ void id_emit_tc_support(void) {
 }
 
 void id_emit_tc_one(void) {
-    id_emit_line(ID_S("static int idtc_one(int k) {\n    int err[2], cnt[2], st = 0;\n    char msg[4096], chunk[512];\n    size_t used = 0;\n    ssize_t r;\n    long long c[2] = {0, 0};\n    pid_t pid;\n    if (pipe(err) != 0 || pipe(cnt) != 0) { perror(\"idc: test harness\"); return 1; }\n    fflush(NULL);\n    pid = fork();\n    if (pid < 0) { perror(\"idc: test harness\"); return 1; }\n    if (pid == 0) {\n        close(err[0]);\n        close(cnt[0]);\n        dup2(err[1], 2);\n        if (idtc_dir[k] && chdir(idtc_dir[k]) != 0) {\n            fprintf(stderr, \"%s: test failed: %s could not run in %s: %s\\n\", idtc_where[k], idtc_call[k], idtc_dir[k], strerror(errno));\n            exit(3);\n        }\n        idtc_stdin_set(k);\n        idtc_limit(k);\n        exit(idtc_case[k](cnt[1]));\n    }\n    close(err[1]);\n    close(cnt[1]);\n    while ((r = read(err[0], chunk, sizeof chunk)) != 0) {\n        if (r < 0 && errno == EINTR) continue;\n        if (r < 0) break;\n        if ((size_t)r > sizeof msg - 1 - used) r = (ssize_t)(sizeof msg - 1 - used);\n        memcpy(msg + used, chunk, (size_t)r);\n        used += (size_t)r;\n    }\n    msg[used] = '\\0';\n    r = read(cnt[0], c, sizeof c);\n    close(err[0]);\n    close(cnt[0]);\n    while (waitpid(pid, &st, 0) < 0) {\n        if (errno != EINTR) { perror(\"idc: test harness\"); return 1; }\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 0 && r == (ssize_t)sizeof c) {\n        idtc_t[k] = c[0];\n        idtc_m[k] = c[1];\n        return 0;\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 3) {\n        fputs(msg, stderr);\n        return 1;\n    }\n    if (idtc_traps[k]) {\n        return idtc_trap_match(k, st, msg);\n    }\n    idtc_report(k, st, msg);\n    return 1;\n}"));
+    id_emit_line(ID_S("static int idtc_one(int k) {\n    int err[2], cnt[2], st = 0;\n    char msg[4096], chunk[512];\n    size_t used = 0;\n    ssize_t r;\n    long long c[2] = {0, 0};\n    pid_t pid;\n    if (pipe(err) != 0 || pipe(cnt) != 0) { perror(\"idc: test harness\"); return 1; }\n    fflush(NULL);\n    pid = fork();\n    if (pid < 0) { perror(\"idc: test harness\"); return 1; }\n    if (pid == 0) {\n        close(err[0]);\n        close(cnt[0]);\n        dup2(err[1], 2);\n        if (getenv(\"IDTC_READS\")) {\n            char rp[4096];\n            snprintf(rp, sizeof rp, \"%s/%d\", getenv(\"IDTC_READS\"), k);\n            setenv(\"IDTC_READLOG\", rp, 1);\n        }\n        if (idtc_dir[k] && chdir(idtc_dir[k]) != 0) {\n            fprintf(stderr, \"%s: test failed: %s could not run in %s: %s\\n\", idtc_where[k], idtc_call[k], idtc_dir[k], strerror(errno));\n            exit(3);\n        }\n        idtc_stdin_set(k);\n        idtc_limit(k);\n        exit(idtc_case[k](cnt[1]));\n    }\n    close(err[1]);\n    close(cnt[1]);\n    while ((r = read(err[0], chunk, sizeof chunk)) != 0) {\n        if (r < 0 && errno == EINTR) continue;\n        if (r < 0) break;\n        if ((size_t)r > sizeof msg - 1 - used) r = (ssize_t)(sizeof msg - 1 - used);\n        memcpy(msg + used, chunk, (size_t)r);\n        used += (size_t)r;\n    }\n    msg[used] = '\\0';\n    r = read(cnt[0], c, sizeof c);\n    close(err[0]);\n    close(cnt[0]);\n    while (waitpid(pid, &st, 0) < 0) {\n        if (errno != EINTR) { perror(\"idc: test harness\"); return 1; }\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 0 && r == (ssize_t)sizeof c) {\n        idtc_t[k] = c[0];\n        idtc_m[k] = c[1];\n        return 0;\n    }\n    if (WIFEXITED(st) && WEXITSTATUS(st) == 3) {\n        fputs(msg, stderr);\n        return 1;\n    }\n    if (idtc_traps[k]) {\n        return idtc_trap_match(k, st, msg);\n    }\n    idtc_report(k, st, msg);\n    return 1;\n}"));
     return;
 }
 
@@ -20322,13 +20350,16 @@ int id_dg_target(int dgid) {
     dgnm = (char*)(intptr_t)(id_list_get(ns1, dgid));
     dgw = (0 - 1);
     if (((strcmp(dgkd, ID_S("call")) == 0) || (strcmp(dgkd, ID_S("var")) == 0))) {
-IdList* idsq_22;
-IdList* idsq_21;
-        dgw = (idsq_22 = dg_fk, idsq_21 = dg_fv, id_hmap_get(idsq_22, idsq_21, dg_fu, dgnm, dgw));
+IdList* idsq_41;
+IdList* idsq_40;
+        dgw = (idsq_41 = dg_fk, idsq_40 = dg_fv, id_hmap_get(idsq_41, idsq_40, dg_fu, dgnm, dgw));
     } else if ((strcmp(dgkd, ID_S("import")) == 0)) {
-IdList* idsq_11;
-IdList* idsq_10;
-        dgw = (idsq_11 = dg_ek, idsq_10 = dg_ev, id_hmap_get(idsq_11, idsq_10, dg_eu, dgnm, dgw));
+IdList* idsq_30;
+IdList* idsq_29;
+        dgw = (idsq_30 = dg_ek, idsq_29 = dg_ev, id_hmap_get(idsq_30, idsq_29, dg_eu, dgnm, dgw));
+    }
+    if ((((dgw < 0) && (strcmp(dgkd, ID_S("call")) == 0)) && (id_lst_str_index(cache_volatile_builtins, dgnm) >= 0))) {
+        dgw = id_list_len(prog);
     }
     return dgw;
 }
@@ -20397,14 +20428,15 @@ void id_dg_fill_one(int dgf) {
     char* dgnm;
     long long dgo;
     int dgn;
-IdList* idsq_41;
-    dgnm = (idsq_41 = ns1, (char*)(intptr_t)(id_list_get(idsq_41, (int)(id_list_get(prog, dgf)))));
-IdList* idsq_34;
-IdList* idsq_33;
-IdList* idsq_32;
-    (idsq_34 = dg_fk, idsq_33 = dg_fv, idsq_32 = dg_fu, id_hmap_put(idsq_34, idsq_33, idsq_32, dg_fc, dgnm, dgf));
+IdList* idsq_36;
+    dgnm = (idsq_36 = ns1, (char*)(intptr_t)(id_list_get(idsq_36, (int)(id_list_get(prog, dgf)))));
+IdList* idsq_29;
+IdList* idsq_28;
+IdList* idsq_27;
+    (idsq_29 = dg_fk, idsq_28 = dg_fv, idsq_27 = dg_fu, id_hmap_put(idsq_29, idsq_28, idsq_27, dg_fc, dgnm, dgf));
     dgo = id_dg_own_of(dgf, dgnm);
-    dgn = ((id_is_native((int)(id_list_get(prog, dgf))) == 1) || (dgf >= id_list_len(ptoke)));
+IdList* idsq_13;
+    dgn = (idsq_13 = ns1, id_dg_nat_class(dgf, (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(prog, dgf))))));
     id_dg_add(dgo, dgn);
     return;
 }
@@ -20419,6 +20451,20 @@ void id_dg_add(long long dgo, int dgn) {
     id_list_push(dg_comp, (long long)((0 - 1)));
     id_list_push(dg_cout, (long long)(intptr_t)(id_list_lit(0)));
     return;
+}
+
+int id_dg_nat_class(int dgf, char* dgnm) {
+    int dgc;
+    dgc = 0;
+    if ((dgf >= id_list_len(ptoke))) {
+        dgc = 1;
+    } else if ((id_is_native((int)(id_list_get(prog, dgf))) == 1)) {
+        dgc = 1;
+        if (((id_lst_str_index(cache_file_natives, dgnm) >= 0) || (id_lst_str_index(cache_taint_natives, dgnm) >= 0))) {
+            dgc = 2;
+        }
+    }
+    return dgc;
 }
 
 long long id_dg_own_of(int dgf, char* dgnm) {
@@ -20599,14 +20645,17 @@ char* id_dg_case_hash(int dgc, int dgf) {
     char* dgs;
     { IdList* idfe_o = dgacc; dgacc = id_list_lit(2, (long long)(0), (long long)(0)); id_list_free(idfe_o); }
     id_list_set(dgacc, 0, (long long)(id_dg_mix(id_dg_deep_fn(dgf), 3)));
-IdList* idsq_34;
-    id_list_set(dgacc, 1, (long long)((idsq_34 = dg_dirty, (int)(id_list_get(idsq_34, (int)(id_list_get(dg_comp, dgf)))))));
-IdList* idsq_24;
-int idsq_22;
-    (idsq_24 = casestart, idsq_22 = (int)(id_list_get(idsq_24, dgc)), id_dg_case_toks(dgacc, idsq_22, (int)(id_list_get(caseend, dgc))));
+IdList* idsq_46;
+    id_list_set(dgacc, 1, (long long)((idsq_46 = dg_dirty, (int)(id_list_get(idsq_46, (int)(id_list_get(dg_comp, dgf)))))));
+IdList* idsq_36;
+int idsq_34;
+    (idsq_36 = casestart, idsq_34 = (int)(id_list_get(idsq_36, dgc)), id_dg_case_toks(dgacc, idsq_34, (int)(id_list_get(caseend, dgc))));
     dgs = ID_S("-");
-    if (((long long)(id_list_get(dgacc, 1)) == 0)) {
+    if ((((long long)(id_list_get(dgacc, 1)) & 1) == 0)) {
         dgs = id_concat(ID_S(""), id_str_of_word((long long)(id_list_get(dgacc, 0))));
+        if (((long long)(id_list_get(dgacc, 1)) == 2)) {
+            dgs = id_concat(dgs, ID_S(" f"));
+        }
     }
     { id_list_free(dgacc); return dgs; }
 }
@@ -20647,7 +20696,7 @@ long long idsq_20;
         id_list_set(dgacc, 0, (long long)((idsq_20 = (long long)(id_list_get(dgacc, 0)), id_dg_mix(idsq_20, id_dg_deep_fn(dgg)))));
 long long idsq_9;
 IdList* idsq_8;
-        id_list_set(dgacc, 1, (long long)((idsq_9 = (long long)(id_list_get(dgacc, 1)), idsq_8 = dg_dirty, (idsq_9 + (int)(id_list_get(idsq_8, (int)(id_list_get(dg_comp, dgg))))))));
+        id_list_set(dgacc, 1, (long long)((idsq_9 = (long long)(id_list_get(dgacc, 1)), idsq_8 = dg_dirty, (idsq_9 | (int)(id_list_get(idsq_8, (int)(id_list_get(dg_comp, dgg))))))));
     }
     return;
 }

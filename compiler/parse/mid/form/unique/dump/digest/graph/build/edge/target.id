@@ -1,9 +1,12 @@
 // The row a node points at, or -1. A call, and a variable read that names a
 // function -- a function value, reached exactly as a call reaches it
 // (scan_reach, mid/names/exports/reach/dead/sweep.id) -- point at that
-// function; a name that is a builtin, a local or an asm routine is in
-// neither table and points nowhere. An `(import NAME)` points at the
-// function that declares NAME (../rows/own.id's dg_exports).
+// function; a name that is a builtin or a local is in neither table and points
+// nowhere -- except a call to one of cache_volatile_builtins (compiler/parse/
+// conf.id: the clock, the terminal), which points at the row every asm routine
+// shares (../edge/asm.id, the one past prog), so a case calling it is never
+// cached. An `(import NAME)` points at the function that declares NAME
+// (../rows/own.id's dg_exports).
 
 dg_target(int dgid) {
   string dgkd = (import nkind)[dgid];
@@ -15,9 +18,14 @@ dg_target(int dgid) {
   } else if(dgkd == "import") {
     dgw = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgw);
   }
+  if(dgw < 0 && dgkd == "call" && lst_str_index((import cache_volatile_builtins), dgnm) >= 0) {
+    dgw = len((import prog));
+  }
 } return int dgw;
 given dg_t_rows (16):(0)
 given dg_t_rows (1):(-1)
+given dg_t_vol (16):(2)
+given dg_t_vol (1):(-1)
 
 dg_link(int dgf, int dgw) {
   push((import dg_out)[dgf], dgw);

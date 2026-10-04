@@ -1,7 +1,7 @@
 // Case keys: one line per case, in the harness's own case order (the index
 // idtc_case_N and IDTC_N use), ahead of the harness C:
 //
-//   // idtc key N KEY
+//   // idtc key N KEY [f]
 //
 // KEY is a decimal hash of everything the case's result can depend on in
 // the source -- its own tokens, and the hashes of the components of its
@@ -10,9 +10,13 @@
 // words: `std`, a case of the standard library, which the harness never runs
 // here (bin/idc's library pre-check does); or `-`, a case that must run on
 // every build, because it carries a scaling claim (judged against the other
-// cases carrying it), or reaches a native (whose body, and whatever file or
-// device it reads, no hash here can see). bin/idc keeps a case's pass under
-// its KEY and adds what the hashes here cannot know: the compiler, cc and the
+// cases carrying it), or reaches a volatile native or builtin (the clock, the
+// environment, a process, a window, a write: what no hash here can see). A KEY
+// followed by ` f` is a case whose only natives are file-pure
+// (compiler/parse/conf.id cache_file_natives): it is keyed, and bin/idc also
+// records the files it read and reruns it when one of them changes. bin/idc
+// keeps a case's pass under its KEY and adds what the hashes here cannot know:
+// the compiler, cc and the
 // host. The conf.id constants a case reads are in the hashes here (graph/build/
 // consts/).
 //

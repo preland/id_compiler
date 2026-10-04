@@ -1,6 +1,9 @@
 // A case's hash: its function's component, then each of its tokens. dgacc is
-// [hash, dirt]; dirt counts the dirty components the case reaches, and any at
-// all makes the key "-".
+// [hash, dirt]; dirt is the classes of the components the case reaches folded
+// together with `|` (../../graph/build/rows/nat.id). Bit 1 makes the key "-";
+// bit 2 alone -- the case reaches file-pure natives and nothing volatile --
+// keeps the hash and adds " f" after it, which tells bin/idc to record the
+// files the case reads beside the key.
 
 dg_case_hash(int dgc, int dgf) {
   word[] dgacc = [0, 0];
@@ -9,12 +12,18 @@ dg_case_hash(int dgc, int dgf) {
 } chain (int dgc, int dgf) {
   dg_case_toks(dgacc, (import casestart)[dgc], (import caseend)[dgc]);
   string dgs = "-";
-  if(dgacc[1] == 0) {
+  if((dgacc[1] & 1) == 0) {
     dgs = "" + dgacc[0];
+    if(dgacc[1] == 2) {
+      dgs = dgs + " f";
+    }
   }
 } return string dgs;
 given dg_t_built (0, 0):("-5465788173469261037")
 given dg_t_built (2, 1):("1118206258217500576")
+given dg_t_nat (0, 0):("-5465788173469261037 f")
+given dg_t_nat (2, 1):("-3492214503910558658 f")
+given dg_t_natv (2, 1):("-")
 
 dg_deep_fn(int dgf) {
   word dgd = (import dg_deep)[(import dg_comp)[dgf]];

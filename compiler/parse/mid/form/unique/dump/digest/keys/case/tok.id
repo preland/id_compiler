@@ -22,7 +22,7 @@ dg_case_ref(word[] dgacc, string dgnm) {
   }
   if(dgg >= 0) {
     dgacc[0] = dg_mix(dgacc[0], dg_deep_fn(dgg));
-    dgacc[1] = dgacc[1] + (import dg_dirty)[(import dg_comp)[dgg]];
+    dgacc[1] = dgacc[1] | (import dg_dirty)[(import dg_comp)[dgg]];
   }
 } return void;
 given dg_t_built ([0, 0], "fa"):([-8546436610636599953, 0])

@@ -29,7 +29,7 @@ dg_fill_one(int dgf) {
   hmap_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), dgnm, dgf);
   word dgo = dg_own_of(dgf, dgnm);
 } chain (int dgf) {
-  int dgn = is_native((import prog)[dgf]) == 1 || dgf >= len((import ptoke));
+  int dgn = dg_nat_class(dgf, (import ns1)[((import prog)[dgf])]);
   dg_add(dgo, dgn);
 } return void;
 given dg_t_rows0 (0):() then dg_nfn:(1) then len((import dg_comp)):(1)

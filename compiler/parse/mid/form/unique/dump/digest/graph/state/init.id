@@ -6,15 +6,16 @@
 //   dg_own    the hash of the function's own tokens (../hash/)
 //   dg_out    the functions it names: callees, function values, and the
 //             owner of every export it imports
-//   dg_nat    1 when it is a `native`, the asm row, or its tokens were not
-//             recorded -- a body this digest cannot see, so nothing reaching
-//             it is cached
+//   dg_nat    1 when it is a `native` not on cache_file_natives, the asm row, or
+//             its tokens were not recorded -- a body this digest cannot see, so
+//             nothing reaching it is cached; 2 for a file-pure native
+//             (graph/build/rows/nat.id)
 //   dg_ix, dg_low, dg_on, dg_stk   Tarjan's walk
 //   dg_comp   the component each function landed in
 //   dg_ctr    [next walk index, next component]
 //   dg_deep   per component: its members' hashes and every component it
 //             reaches, folded into one
-//   dg_dirty  per component: 1 when it reaches a dg_nat function
+//   dg_dirty  per component: the dg_nat classes it reaches, folded with `|`
 //   dg_cout   dg_out without the import edges: the calls and function
 //             values alone, the graph a `given` setup reaches through
 //             (mid/names/limits/shape/cases/given/read/reach/)

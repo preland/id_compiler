@@ -1,0 +1,48 @@
+// What a function's row says about the code a case cannot see into: 0 for an
+// ordinary function, 1 for a body the digest cannot see and whose result may
+// differ between runs (a native that is not file-pure, or a function whose
+// tokens were never recorded -- only a hand-built fixture's), 2 for a native
+// named in cache_file_natives or cache_taint_natives (compiler/parse/conf.id),
+// whose backend logs what it reads or marks the case when it does something
+// else. dg_seal (../../../scc/seal/) folds the classes of everything a
+// component reaches together with `|`, so a case's dirt is 0, 2 (key it, and
+// record the files it reads) or has bit 1 (never key it).
+dg_nat_class(int dgf, string dgnm) {
+  int dgc = 0;
+  if(dgf >= len((import ptoke))) {
+    dgc = 1;
+  } else if(is_native((import prog)[dgf]) == 1) {
+    dgc = 1;
+    if(lst_str_index((import cache_file_natives), dgnm) >= 0 || lst_str_index((import cache_taint_natives), dgnm) >= 0) {
+      dgc = 2;
+    }
+  }
+} return int dgc;
+given dg_t_parsed (0, "fs_open"):(0)
+given dg_t_parsed (5, "fs_open"):(1)
+given dg_t_nat (0, "fs_open"):(2)
+given dg_t_natv (0, "fa"):(1)
+
+// The parsed pair with its first function made a `native`, which is all a
+// native is to the digest (front/tree/node/field/native.id), and built.
+// fixture dg_t_natv leaves it named fa, which is not on a purity list.
+dg_t_natv() {
+  dg_t_parsed();
+  lset((import ni2), (import prog)[0], 1);
+  dg_build();
+} return void;
+():() then (import ni2)[6]:(1)
+():() then (import dg_dirty)[0]:(1)
+
+// The same, with the native named fs_open, and the one call to it in the second
+// function too: both functions are then file-pure.
+dg_t_nat() {
+  dg_t_parsed();
+  lset((import ni2), (import prog)[0], 1);
+  sset((import ns1), (import prog)[0], "fs_open");
+} chain () {
+  sset((import ns1), 16, "fs_open");
+  dg_build();
+} return void;
+():() then (import dg_dirty)[0]:(2)
+():() then (import dg_dirty)[1]:(2)

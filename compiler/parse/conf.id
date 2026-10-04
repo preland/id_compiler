@@ -23,3 +23,28 @@ string builtin_src = "print input read_all len push pop to_int charat chr put fl
 // startup. Kept in step with runtime.id by hand; tests/stdlib.sh asserts the
 // two agree.
 string resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink at block_free box_f charat chr concat err_write flush freed_trap getkey idiv imod input len list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek32 peek64 peek8 peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore ticks to_int trap udiv ult umod unbox_f ushr";
+// What a case's key may promise about the natives and builtins it reaches
+// (mid/form/unique/dump/digest/). A native is volatile unless it is on one of
+// the two lists below, and a case that reaches a volatile one is never cached,
+// whether or not it calls it. A case that reaches only listed natives is
+// cached with the files it read recorded beside its key (docs/TESTS.md, "Files
+// a case reads"). A name goes on a list only when the backend that implements
+// it keeps the list's promise through the harness's read log ($IDTC_READLOG);
+// a name listed without that would be cached with nothing to invalidate it.
+// Processes, sockets, windows, stdio and temp files are on neither list.
+//
+// cache_file_natives: depends only on its arguments and the files it reads, and
+// the backend logs every path it reads or probes, found or not (idstd's
+// sys/io/fs/fs_posix.c). fs_drop_exit only registers a /tmp tree for removal at
+// exit, which is what lets fs_posix.c let a write into that tree through.
+string[] cache_file_natives = ["fs_open", "fs_close", "fs_error", "fs_read", "fs_read_mem", "fs_size", "fs_exists", "fs_mtime", "fs_list", "fs_drop_exit"];
+// cache_taint_natives: changes or reads something no read set can stand for (a
+// write, the environment). The backend marks the case in the log when one is
+// called, which keeps that case from being cached; a case that reaches one and
+// never calls it is cached, since nothing it did depended on it. fs_posix.c
+// lets a write through only when it is inside a tree the case registered with
+// fs_drop_exit.
+string[] cache_taint_natives = ["fs_write", "fs_write_mem", "fs_flush", "fs_mkdir", "fs_remove", "fs_rename", "fs_chmod", "env_has", "env_get", "env_set", "env_error"];
+// Builtins whose result is not a function of the case and its files: the clock
+// and the terminal. A case calling one is never cached.
+string[] cache_volatile_builtins = ["ticks", "getkey"];
