@@ -9,8 +9,8 @@ given lw_func_fixture ((import g_fnnode)):() then init_units:(0)
 
 // The rest of lw_ret, once the entry block and the branch into the body are
 // in hand.
-lw_ret_tail(int node, int lw_ent_v, int lw_brto_v) {
-  ir_add(lw_ent_v, lw_brto_v);
+lw_ret_tail(int node, int lw_entry_blk, int lw_body_blk) {
+  ir_add(lw_entry_blk, lw_body_blk);
   string s2_of_v = (import ns2)[node];
   lw_ret_val(node, s2_of_v);
 } return void;

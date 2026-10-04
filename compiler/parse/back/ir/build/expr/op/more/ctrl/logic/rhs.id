@@ -18,8 +18,8 @@ given logic_fixture (1, 2, (import ev_node), 0):(0)
 
 // Continues lw_rhs_val: store the value, then join the way lb2/lw_logic2
 // already set up.
-lw_rhs_store(int slot, int lw_conv_v, int jn) {
-  lw_store_at(slot, lw_conv_v);
+lw_rhs_store(int slot, int lw_rhs_int, int jn) {
+  lw_store_at(slot, lw_rhs_int);
   lw_term("br", 0 - 1, [jn]);
   int ret_i = lw_go(jn);
 } return int ret_i;

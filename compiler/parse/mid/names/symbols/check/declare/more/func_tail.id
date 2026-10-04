@@ -1,13 +1,13 @@
 // The rest of reg_func, split out so each of its blocks stays within the
-// action limit. s1_of_v is the function's own name, threaded through rather
+// action limit. rfp_fn_name is the function's own name, threaded through rather
 // than re-read: nothing between reg_func and reg_l2_decls changes the node
 // store. The body registration itself is reg_l2_decls (declare/more/
 // decl_tail.id) -- reg_branches needs the same "register id's second
 // statement list" operation, so it is not repeated here.
-reg_func_params(int id, int[] l1_of_v, string s1_of_v) {
-  int func_line_v = func_line(s1_of_v);
-  reg_params(l1_of_v, s1_of_v, func_line_v);
-  reg_l2_decls(id, s1_of_v);
+reg_func_params(int id, int[] rfp_param_ids, string rfp_fn_name) {
+  int func_line_v = func_line(rfp_fn_name);
+  reg_params(rfp_param_ids, rfp_fn_name, func_line_v);
+  reg_l2_decls(id, rfp_fn_name);
 } return void;
 given regrow_param ((import regrow_p), (import regrow_plist), "f"):() then len((import dvname)):(2)
 given regrow_param ((import regrow_p), [], "z"):() then len((import dvname)):(1)

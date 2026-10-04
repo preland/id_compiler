@@ -10,9 +10,9 @@ fold_add_tail(int[] pos, int left, string op) {
 given expr_tokens ([2], 100, "+"):(3)
 given expr_tokens ([6], 100, "+"):(1)
 
-unary_or_postfix(int[] pos, string cur_text_v) {
+unary_or_postfix(int[] pos, string tok_text) {
   int node = 0;
-  if(is_unop(cur_text_v)) {
+  if(is_unop(tok_text)) {
     node = fold_unary(pos);
   } else {
     node = parse_postfix(pos);

@@ -3,22 +3,22 @@
 // pair of tables they push to, which is exactly the kind of difference the
 // duplicate-logic rule counts.
 
-vidx_push(int name_bucket_v, int didx_len, string name) {
-  push((import vidx)[name_bucket_v], didx_len);
+vidx_push(int bucket_slot, int didx_len, string name) {
+  push((import vidx)[bucket_slot], didx_len);
   push((import vnames), name);
 } return void;
 given call2_setup (0, 0, "newv"):() then len((import vnames)):(1)
 given fcall_reg_b (0, 1, "newv2"):() then len((import vnames)):(2)
 
-fidx_push(int name_bucket_v, int didx_len, string name) {
-  push((import fidx)[name_bucket_v], didx_len);
+fidx_push(int bucket_slot, int didx_len, string name) {
+  push((import fidx)[bucket_slot], didx_len);
   push((import fnames), name);
 } return void;
 given call2_setup (0, 0, "newf"):() then len((import fnames)):(1)
 given argfn_d (0, 1, "newf2"):() then len((import fnames)):(2)
 
-didx_push(int name_bucket_v, int didx_len, string name) {
-  push((import didx)[name_bucket_v], didx_len);
+didx_push(int bucket_slot, int didx_len, string name) {
+  push((import didx)[bucket_slot], didx_len);
   push((import dvname), name);
 } return void;
 given regrow_c (0, 0, "y"):() then len((import dvname)):(1)

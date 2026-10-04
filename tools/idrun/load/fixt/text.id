@@ -1,14 +1,8 @@
 // Fixtures for the loader's cases. A case starts with nothing exported, so
 // `given tf_ld("text")` boots the loader and the executor and loads the text
 // as bytes, ready for a parser to read from the start.
-tf_bytes(string s) {
-  int[] by = exec_bytes(s);
-} return int[] by;
-("ab"):([97, 98])
-(""):([])
-
 tf_text(string s) {
-  ld_start(tf_bytes(s));
+  ld_start(exec_bytes(s));
 } return void;
 given lb_boot ("ab"):() then ld_at:(97)
 given lb_boot (""):() then ld_at:(-1)

@@ -9,9 +9,9 @@ given stmt_fix (3):("(while 5 (body))")
 given func_fix (7):("(while 5 (body (param int p)))")
 
 // The if form of ps4, once the condition and the then-branch are known.
-ps4_if(int id, int i1_of_v2, int[] l1_of_v2) {
+ps4_if(int id, int if_cond_id, int[] if_then_ids) {
   int[] l2_of_v = (import nl2)[id];
-  string s = "(if " + print_expr(i1_of_v2) + " (then" + print_list(l1_of_v2) + ") (else" + print_list(l2_of_v) + "))";
+  string s = "(if " + print_expr(if_cond_id) + " (then" + print_list(if_then_ids) + ") (else" + print_list(l2_of_v) + "))";
 } return string s;
 given stmt_fix (4, 0, []):("(if 5 (then) (else))")
 given stmt_fix (3, 0, [6]):("(if 5 (then (param int p)) (else))")

@@ -22,9 +22,9 @@ given nz_bin_eq_fixture ((import nz_bin_eq)):(1)
 given nz_bin_add_fixture ((import nz_bin_add)):(0)
 
 // The tail of emit_infix, once the left operand and the operator are known.
-infix_line(int id, int i1_of_v, string s1_of_v) {
+infix_line(int id, int infix_lhs_id, string infix_op_name) {
   int i2_of_v = (import ni2)[id];
-  string s = "(" + emit_expr(i1_of_v) + " " + map_op(s1_of_v) + " " + emit_expr(i2_of_v) + ")";
+  string s = "(" + emit_expr(infix_lhs_id) + " " + map_op(infix_op_name) + " " + emit_expr(i2_of_v) + ")";
 } return string s;
 given nz_bin_add_fixture ((import nz_bin_add), (import nz_int), "+"):("(7 + 3)")
 given nz_bin_eq_fixture ((import nz_bin_eq), (import nz_strn), "=="):("(ID_S(\"hi\") == ID_S(\"yo\"))")

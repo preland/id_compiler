@@ -28,8 +28,8 @@ unexpected_msg(string t) {
 ("/*"):("block comments are not supported; use // for a line comment")
 
 // The tail of syn_err.id's syn_err -- that file is already full.
-syn_err_tail(string cur_file_v, int cur_ln_v, string msg) {
-  print(cur_file_v + ":" + cur_ln_v + ": error: " + msg);
+syn_err_tail(string err_file, int err_line, string msg) {
+  print(err_file + ":" + err_line + ": error: " + msg);
   note_failure();
   lset((import synfail), 0, 1);
 } return void;

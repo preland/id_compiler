@@ -27,13 +27,13 @@ fx_fill_block(string[] paths, string[][] blocks, string[] lines, int i, string c
 // One body line's export name, registered against `fn_idx` in the export
 // hmap and appended to ix_ename/ix_efn -- a line that does not declare an
 // export contributes nothing to either.
-ix_scan_export_line(string line_v, int fn_idx) {
-  int p = str_find(line_v, "export ");
-  int rest_n = len(line_v) - p - 7;
+ix_scan_export_line(string export_src_line, int fn_idx) {
+  int p = str_find(export_src_line, "export ");
+  int rest_n = len(export_src_line) - p - 7;
   string name = "";
-} chain (string line_v, int fn_idx) {
+} chain (string export_src_line, int fn_idx) {
   if(p >= 0) {
-    string rest = str_slice(line_v, p + 7, rest_n);
+    string rest = str_slice(export_src_line, p + 7, rest_n);
     string[] parts = str_split(rest, " ");
     name = parts[1];
   }

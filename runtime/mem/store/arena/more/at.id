@@ -1,7 +1,7 @@
 // The tail of `str_of_mem`: the count in front of the copy, the NUL past it,
 // and the bytes wrapped as a string.
-str_of_mem_at(word p, word copy_bytes_v) {
-  st64(p, copy_bytes_v);
-  st8(p + 8 + copy_bytes_v, 0);
+str_of_mem_at(word p, word copy_len_bytes) {
+  st64(p, copy_len_bytes);
+  st8(p + 8 + copy_len_bytes, 0);
   string ret_s = w2s(p + 8);
 } return string ret_s;

@@ -3,9 +3,9 @@
 // rather than split across their callers' files, all three of which were
 // already at the 3-function limit.
 
-acc_func_body(int[] l2_of_v, string s1_of_v, int id) {
+acc_func_body(int[] acc_body_ids, string acc_fn_name, int id) {
   scope_func(id);
-  acc_list(l2_of_v, s1_of_v);
+  acc_list(acc_body_ids, acc_fn_name);
   if((import ni1)[id] >= 0) {
     int i1_of_v = (import ni1)[id];
     string ret_owner = (import ns1)[id];

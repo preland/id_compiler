@@ -6,8 +6,8 @@ lw_decl_tail(int node, int a) {
 given decl_fixture ((import decl_node), 0):() then (import chkfail)[0]:(0)
 given decl_fixture ((import decl_node), 1):() then (import chkfail)[0]:(0)
 
-lw_decl_tail2(int a, int i1_of_v, string s1_of_v) {
-  int lw_as_v = lw_as(i1_of_v, s1_of_v);
+lw_decl_tail2(int a, int decl_val_id, string decl_ty_name) {
+  int lw_as_v = lw_as(decl_val_id, decl_ty_name);
   lw_store_at(a, lw_as_v);
 } return void;
 given decl_fixture (0, (import ev_node), "int"):() then (import chkfail)[0]:(0)

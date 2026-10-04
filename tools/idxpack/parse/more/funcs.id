@@ -10,15 +10,15 @@ ix_fill_funcs(string[] fn, string[] file_l, int[] line_l, int[] cases, string[] 
 ([], [], [], [], [], 0):([], [], [], [], [])
 ([], [], [], [], ["a|b.id|3|2"], 0):(["a"], ["b.id"], [3], [2], ["a|b.id|3|2"])
 
-ix_row_fn(string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v) {
-  string[] parts = str_split(line_v, "|");
+ix_row_fn(string[] fn, string[] file_l, int[] line_l, int[] cases, string fn_row_text) {
+  string[] parts = str_split(fn_row_text, "|");
   int line_n = to_int(parts[2]);
   int cases_n = to_int(parts[3]);
-} chain (string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v) {
+} chain (string[] fn, string[] file_l, int[] line_l, int[] cases, string fn_row_text) {
   push(fn, parts[0]);
   push(file_l, parts[1]);
   push(line_l, line_n);
-} chain (string[] fn, string[] file_l, int[] line_l, int[] cases, string line_v) {
+} chain (string[] fn, string[] file_l, int[] line_l, int[] cases, string fn_row_text) {
   push(cases, cases_n);
 } return void;
 ([], [], [], [], "a|b.id|3|2"):(["a"], ["b.id"], [3], [2])

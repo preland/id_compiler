@@ -26,11 +26,11 @@ const_line(string name) {
 given cl_scalar_setup ("m"):("int m = 9;  /* constant from conf.id */")
 given cl_setup ("k"):("IdList* k;  /* constant from conf.id */")
 
-const_line_tail(int d, string s1_of_v) {
+const_line_tail(int d, string const_ty_name) {
   int i1_of_v = (import ni1)[d];
-  string ret_s = c_type(s1_of_v) + " " + (import ns2)[d] + " = " + file_init(i1_of_v) + ";  /* constant from conf.id */";
-  if(ty_is_list(s1_of_v) == 1) {
-    ret_s = c_type(s1_of_v) + " " + (import ns2)[d] + ";  /* constant from conf.id */";
+  string ret_s = c_type(const_ty_name) + " " + (import ns2)[d] + " = " + file_init(i1_of_v) + ";  /* constant from conf.id */";
+  if(ty_is_list(const_ty_name) == 1) {
+    ret_s = c_type(const_ty_name) + " " + (import ns2)[d] + ";  /* constant from conf.id */";
   }
 } return string ret_s;
 given cl_scalar_setup ((import cl_scalar_d), "int"):("int m = 9;  /* constant from conf.id */")

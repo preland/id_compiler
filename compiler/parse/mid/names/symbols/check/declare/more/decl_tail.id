@@ -9,9 +9,9 @@ reg_decl_stmt(int id, string owner) {
 given declfix ((import rgdecl_node), "f"):() then len((import dvname)):(2)
 given regrow_param ((import regrow_p), "f"):() then len((import dvname)):(2)
 
-reg_decl_var(int id, string owner, string s2_of_v, string s1_of_v) {
+reg_decl_var(int id, string owner, string rdv_name, string rdv_type) {
   int i2_of_v = (import ni2)[id];
-  reg_var(s2_of_v, s1_of_v, owner, i2_of_v, (import nline)[id], (import nunit)[id]);
+  reg_var(rdv_name, rdv_type, owner, i2_of_v, (import nline)[id], (import nunit)[id]);
 } return void;
 given declfix ((import rgdecl_node), "f", "q", "int"):() then len((import dvname)):(2)
 given declfix ((import rgdecl_node), "g2", "z", "word"):() then len((import dvname)):(2)

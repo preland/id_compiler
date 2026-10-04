@@ -24,8 +24,8 @@ emit_pop(int id) {
 given call_names_fixture ((import call_e_foo)):("(IdList*)(intptr_t)(id_list_pop(5))")
 given call_names_fixture2 ((import call_e_pop)):("(IdList*)(intptr_t)(id_list_pop(4))")
 
-emit_pop_tail(int arg, string type_of_v) {
-  string elem = elem_type(type_of_v);
+emit_pop_tail(int arg, string pop_list_type) {
+  string elem = elem_type(pop_list_type);
   string emit_expr_v = emit_expr(arg);
   string ret_s = unbox("id_list_pop(" + emit_expr_v + ")", elem);
 } return string ret_s;

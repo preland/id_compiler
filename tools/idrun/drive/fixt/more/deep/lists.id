@@ -1,6 +1,6 @@
 // Bytes a case hands a function by name: tf_by is the text as byte cells.
 tf_bset(string text) {
-  export int[] tf_by = tf_bytes(text);
+  export int[] tf_by = exec_bytes(text);
 } return void;
 ("ab"):() then len((import tf_by)):(2)
 (""):() then len((import tf_by)):(0)
@@ -9,7 +9,7 @@ tf_bset(string text) {
 tf_irload(string text) {
   lb_boot();
   vb_boot();
-  ld_all(tf_bytes(text));
+  ld_all(exec_bytes(text));
 } return void;
 ("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n"):() then (import ld_fn):(["id_main"])
 (""):() then (import ld_fn):([])

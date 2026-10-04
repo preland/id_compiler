@@ -2,8 +2,12 @@
 //
 // A kernel has one place to write, so eprint writes there rather than being
 // refused at compile time: code shared with a hosted build keeps building, and
-// a port with no buffer keeps the lines in the order they were written.
+// a port with no buffer keeps the lines in the order they were written. Like
+// the hosted eprint it flushes what print has written first, which here is
+// nothing to wait for, so the two share a port without sharing a body.
 
 eprint(string s) {
-  print(s);
+  flush();
+  put(s);
+  com1_out(10);
 } return void;

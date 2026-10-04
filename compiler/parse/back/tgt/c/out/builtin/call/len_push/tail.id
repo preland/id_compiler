@@ -1,6 +1,6 @@
 
-emit_push_tail(int[] args, string type_of_v) {
-  string elem = elem_type(type_of_v);
+emit_push_tail(int[] args, string push_list_type) {
+  string elem = elem_type(push_list_type);
   string ret_s = push_code(args, elem);
 } return string ret_s;
 given call_args_fixture ((import call_args), "int[]"):("id_list_push(5, (long long)(4))")
