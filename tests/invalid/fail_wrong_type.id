@@ -1,0 +1,4 @@
+// EXPECT: fail expects a string, got int
+main(int argc, string[] argv) {
+  fail(7);
+} return int 0;

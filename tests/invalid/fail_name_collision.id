@@ -1,0 +1,8 @@
+// EXPECT: collides with a runtime helper
+// fail is a builtin now, so a function of that name is the same mistake as print.
+fail(int v) {
+} return int v;
+
+main(int argc, string[] argv) {
+  fail(1);
+} return int 0;

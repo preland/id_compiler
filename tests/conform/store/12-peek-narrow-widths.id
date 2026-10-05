@@ -1,0 +1,16 @@
+main(int argc, string[] argv) {
+  word p = alloc(8);
+  fill(p);
+  show(p);
+} return int 0;
+
+fill(word p) {
+  poke16(p, 65535);
+  poke8(p + 2, 127);
+} return void;
+
+show(word p) {
+  string a = "" + peek8s(p) + " " + peek8u(p) + " " + peek16s(p) + " " + peek16u(p);
+  string b = "" + peek8s(p + 2) + " " + peek16s(p + 1) + " " + peek16u(p + 1);
+  print(a + " " + b);
+} return void;

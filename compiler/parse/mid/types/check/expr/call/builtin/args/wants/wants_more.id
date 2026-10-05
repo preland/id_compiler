@@ -10,7 +10,7 @@ bi_wants4(string name) {
 
 bi_wants5(string name) {
   string s = "";
-  if(is_sysbi(name) == 1) {
+  if(is_sysbi(name) == 1 || name == "float_of_bits" || name == "float_of_bits32") {
     s = "word";
   } else if(name == "str_of_mem") {
     s = "addr";
@@ -18,6 +18,7 @@ bi_wants5(string name) {
 } return string s;
 ("poke8"):("word")
 ("push"):("")
+("float_of_bits32"):("word")
 
 // Is `t` acceptable where `want` is required? A chain rather than one
 // expression, because each link is a rule with its own diagnostic in the
@@ -25,9 +26,11 @@ bi_wants5(string name) {
 // the same order.
 bi_ok(string want, string t) {
   int ok = bi_ok2(want, t);
-  if(want == "string" && t != "string" || want == "int" && t != "int" || want == "index" && t != "int") {
+  if(want == "string" && t != "string" || want == "int" && t != "int" || want == "index" && t != "int" || want == "float" && t != "float") {
     ok = 0;
   }
 } return int ok;
 ("string", "string"):(1)
 ("string", "int"):(0)
+("float", "float"):(1)
+("float", "int"):(0)

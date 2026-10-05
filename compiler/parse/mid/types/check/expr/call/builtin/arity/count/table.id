@@ -23,9 +23,11 @@ bi_zero(string name) {
 
 bi_one(string name) {
   int ok = 0;
-  if(name == "print" || name == "eprint" || name == "len" || name == "pop" || name == "to_int" || name == "chr" || name == "put" || name == "sleep_ms" || name == "mem_of_str" || name == "alloc" || is_peekfn(name) == 1) {
+  if(name == "print" || name == "eprint" || name == "len" || name == "pop" || name == "to_int" || name == "chr" || name == "put" || name == "sleep_ms" || name == "mem_of_str" || name == "alloc" || name == "fail" || name == "bits_of_float" || name == "float_of_bits" || name == "bits32_of_float" || name == "float_of_bits32" || is_peekfn(name) == 1) {
     ok = 1;
   }
 } return int ok;
 ("print"):(1)
 ("push"):(0)
+("fail"):(1)
+("bits32_of_float"):(1)

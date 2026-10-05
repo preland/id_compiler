@@ -1,0 +1,4 @@
+// EXPECT: fail takes exactly one argument
+main(int argc, string[] argv) {
+  fail("a", "b");
+} return int 0;

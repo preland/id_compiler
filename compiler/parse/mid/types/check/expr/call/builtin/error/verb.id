@@ -18,9 +18,14 @@ bi_verb(string want) {
   } else if(want == "strlist") {
     s = "expects a string or list";
   }
+} chain (string want) {
+  if(want == "float") {
+    s = "expects a float (an int becomes one by adding 0.0)";
+  }
 } return string s;
 ("list"):("expects a list")
 ("int"):("expects an int")
+("float"):("expects a float (an int becomes one by adding 0.0)")
 
 bi_flush_setup() {
   call2_setup();

@@ -13,7 +13,7 @@
 // same under both compilers -- up to eprint, which idc.py does not have and so
 // comes last.
 int idx_n = 251;
-string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint";
+string builtin_src = "print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint peek8s peek16s peek32s peek8u peek16u peek32u bits_of_float float_of_bits bits32_of_float float_of_bits32 fail";
 // The runtime helper names (compiler/parse/back/tgt/c/runtime/prelude.id),
 // space-separated: an id function may not be named after one of these,
 // because every id function is emitted as id_<name> and would collide with
@@ -22,7 +22,7 @@ string builtin_src = "print input read_all len push pop to_int charat chr put fl
 // extern/builtin/more/names.id's init_resv_names splits this string into at
 // startup. Kept in step with runtime.id by hand; tests/stdlib.sh asserts the
 // two agree.
-string resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink at block_free box_f charat chr concat err_write flush freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek32 peek64 peek8 peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap udiv ult umod unbox_f ushr";
+string resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink at bits32_of_float bits_of_float block_free box_f charat chr concat err_write fail float_of_bits float_of_bits32 flush freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek16s peek16u peek32 peek32s peek32u peek64 peek8 peek8s peek8u peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap udiv ult umod unbox_f ushr";
 // What a case's key may promise about the natives and builtins it reaches
 // (mid/form/unique/dump/digest/). A native is volatile unless it is on one of
 // the two lists below, and a case that reaches a volatile one is never cached,

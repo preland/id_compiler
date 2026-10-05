@@ -1,0 +1,21 @@
+main(int argc, string[] argv) {
+  show64();
+  show32();
+} return int 0;
+
+show64() {
+  float inf = float_of_bits(9218868437227405312);
+  float back = float_of_bits(bits_of_float(0.1));
+  print("" + bits_of_float(1.0) + " " + float_of_bits(4609434218613702656) + " " + inf);
+} chain () {
+  word neg = bits_of_float(0.0 - 2.5);
+  print("" + (back == 0.1) + " " + neg);
+} return void;
+
+show32() {
+  float pi = float_of_bits32(1078530011);
+  float back = float_of_bits32(bits32_of_float(0.1));
+  print("" + bits32_of_float(1.0) + " " + bits32_of_float(0.0 - 2.5) + " " + pi);
+} chain () {
+  print("" + back + " " + (back == 0.1));
+} return void;

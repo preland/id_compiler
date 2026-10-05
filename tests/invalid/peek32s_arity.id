@@ -1,0 +1,4 @@
+// EXPECT: peek32s takes exactly 1 argument, got 2
+main(int argc, string[] argv) {
+  word w = peek32s(8, 4);
+} return int 0;

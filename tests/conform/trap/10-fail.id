@@ -1,0 +1,10 @@
+check(int n) {
+  if(n > 2) {
+    fail("n is too large");
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  check(1);
+  check(5);
+} return int 0;

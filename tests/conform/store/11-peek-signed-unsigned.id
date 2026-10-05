@@ -1,0 +1,11 @@
+main(int argc, string[] argv) {
+  word p = alloc(8);
+  poke32(p, 3204448256);
+  show(p);
+} return int 0;
+
+show(word p) {
+  int a = peek32(p);
+  string h = "" + a + " " + (peek32(p) + 0) + " " + peek32u(p) + " " + peek32s(p);
+  print(h + " " + (peek32s(p) + 0));
+} return void;

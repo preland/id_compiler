@@ -205,6 +205,16 @@ EOF
     if build deep "$TMP/deep" --no-std && [ "$(exports_of "$TMP/deep.d/libdeep.a" a | tr '\n' ' ')" = "deep_error deep_free deep_inner_triple deep_shutdown deep_strs_free deep_table_free " ]; then
         ok "a listed function in a subdirectory is exported, and an unlisted root function is not"
     else bad "a listed function in a subdirectory is exported, and an unlisted root function is not ($(tail -1 "$TMP/deep.log"); $(exports_of "$TMP/deep.d/libdeep.a" a | tr '\n' ' '))"; fi
+
+    mkdir -p "$TMP/failer"
+    printf 'string[] lib_exports = ["must_pos"];\n' > "$TMP/failer/conf.id"
+    printf 'must_pos(int a) {\n  if (a < 1) {\n    fail("must_pos: need a positive number, got " + a);\n  }\n} return int a;\n(3):(3)\n(9):(9)\n(0):() then traps:("must_pos: need a positive number, got 0")\n' > "$TMP/failer/m.id"
+    printf '#include <stdio.h>\n#include <string.h>\n#include <stdint.h>\n#include "failer.h"\nint main(void) {\n  int32_t r = 0;\n  int a = failer_must_pos(4, &r) == 0 && r == 4;\n  int b = failer_must_pos(-3, &r) == 1 && strstr(failer_error(), "id: must_pos: need a positive number, got -3") != NULL;\n  int c = failer_must_pos(5, &r) == 0 && failer_error()[0] == 0;\n  printf("%%s: fail returns status 1 with its own message, and the next call works\\n", a && b && c ? "PASS" : "FAIL");\n  return 0;\n}\n' > "$TMP/failer_host.c"
+    if build failer "$TMP/failer" --no-std; then
+        for mode in static shared; do
+            if host failer "$TMP/failer_host.c" "$mode" && grep -q '^PASS' "$TMP/failer.$mode.out"; then ok "fail: a --lib call returns status 1 and NAME_error() holds the message ($mode)"; else bad "fail: a --lib call returns status 1 and NAME_error() holds the message ($mode: $(head -1 "$TMP/failer.$mode.out"))"; fi
+        done
+    else bad "fail: a library that calls fail builds ($(tail -1 "$TMP/failer.log"))"; fi
 else
     # --- csvlib: a real library, over csvq's parser, with the real idstd -----
     if build csv ../../trials/csvlib; then ok "trials/csvlib builds as a library"; else bad "trials/csvlib builds as a library ($(tail -1 "$TMP/csv.log"))"; fi

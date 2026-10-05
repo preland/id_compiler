@@ -251,6 +251,10 @@ static IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */
 }
 static long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }
 static double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }
+static long long id_bits_of_float(double d) { return id_box_f(d); }
+static double id_float_of_bits(long long x) { return id_unbox_f(x); }
+static long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }
+static double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }
 static int id_to_int(const char* s) { return atoi(s); }
 
 static char* id_concat(const char* a, const char* b) {
@@ -421,6 +425,13 @@ static void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }
 static void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }
 static void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }
 static void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }
+static long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }
+static long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }
+static long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }
+static long long id_peek8u(long long a)  { return id_peek_n(a, 1); }
+static long long id_peek16u(long long a) { return id_peek_n(a, 2); }
+static long long id_peek32u(long long a) { return id_peek_n(a, 4); }
+static void id_fail(const char* m) { id_trap(m); }
 
 /* Bridges between the store and id's own strings, so a program working in
    the store can still print. */

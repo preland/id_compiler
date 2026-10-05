@@ -54,3 +54,43 @@ given tf_mem8(578437695752307201) (39, (import tf_addr), 0, 0):(513)
 given tf_mem8(578437695752307201) (41, (import tf_addr), 0, 0):(578437695752307201)
 given tf_mem8(0) (42, (import tf_addr), 513, 0):(0) then tf_pk:(1)
 given tf_mem8(0) (45, (import tf_addr), 77, 0):(0) then tf_pk:(77)
+
+// The sign-extending and zero-extending peeks, and fail: ids 46 to 52.
+vm_bn(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_peek8s)) {
+    wr = peek8s(wa);
+    return wr;
+  }
+  if (id == (import b_peek16s)) {
+    wr = peek16s(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_peek32s)) {
+    wr = peek32s(wa);
+    return wr;
+  }
+  if (id == (import b_peek8u)) {
+    wr = peek8u(wa);
+    return wr;
+  }
+  if (id == (import b_peek16u)) {
+    wr = peek16u(wa);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_peek32u)) {
+    wr = peek32u(wa);
+    return wr;
+  }
+  int ia = wa;
+  vm_trap((import ex_strs)[ia]);
+} return word wr;
+given tf_mem8(-1) (46, (import tf_addr), 0, 0):(-1)
+given tf_mem8(-1) (47, (import tf_addr), 0, 0):(-1)
+given tf_mem8(-1) (48, (import tf_addr), 0, 0):(-1)
+given tf_mem8(-1) (49, (import tf_addr), 0, 0):(255)
+given tf_mem8(-1) (50, (import tf_addr), 0, 0):(65535)
+given tf_mem8(-1) (51, (import tf_addr), 0, 0):(4294967295)
+given vb_boot given tf_sput("boom") (52, 1, 0, 0):(0) then eprints:("id: boom\n")

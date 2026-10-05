@@ -49,11 +49,16 @@ vm_bi(int id, word wa, word wb, word wc) {
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
+  if (id >= (import b_peek8s)) {
+    wr = vm_bn(id, wa, wb, wc);
+    return wr;
+  }
   wr = vm_bm(id, wa, wb, wc);
 } return word wr;
 given vb_boot given tf_sput("hello") (3, 1, 0, 0):(5)
 given vb_boot given tf_lnew given vm_b_list_push(1, 4) (14, 1, 0, 0):(1)
 given vb_boot given tf_sput("e") (18, 1, 0, 0):(0) then eprints:("e\n")
-given vb_boot (46, 1, 0, 0):(0)
+given vb_boot (53, 1, 0, 0):(0)
+given vb_boot given tf_mem8(-1) (48, (import tf_addr), 0, 0):(-1)
 given vb_boot (28, 9, 2, 0):(4)
 given vb_boot (37, 0, 0, 0):(1)

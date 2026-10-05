@@ -5,15 +5,17 @@
 //   int      exactly an int            strlist  a string or any T[]
 //   index    an int, worded as an index (charat's second argument)
 //   word     an int or a word          addr     the same, worded as an address
+//   float    exactly a float
 
 bi_wants(string name, int i) {
   string s = bi_wants2(name, i);
-  if(name == "to_int" || name == "mem_of_str" || name == "charat" && i == 0) {
+  if(name == "to_int" || name == "mem_of_str" || name == "fail" || name == "charat" && i == 0) {
     s = "string";
   }
 } return string s;
 ("to_int", 0):("string")
 ("push", 0):("list")
+("fail", 0):("string")
 
 // charat's first argument was taken above, so what reaches here is its
 // second: the index, which idc.py words as an index rather than as a type.
@@ -24,9 +26,14 @@ bi_wants2(string name, int i) {
   } else if(name == "charat") {
     s = "index";
   }
+} chain (string name, int i) {
+  if(name == "bits_of_float" || name == "bits32_of_float") {
+    s = "float";
+  }
 } return string s;
 ("chr", 0):("int")
 ("charat", 1):("index")
+("bits32_of_float", 0):("float")
 
 bi_wants3(string name, int i) {
   string s = bi_wants4(name);

@@ -36,7 +36,7 @@ printf 'add(int x, int y) {\n  int sum = x + y;\n} return int sum;\n' | ./idlex 
   write `(flags & MASK) != 0`.
 - **Systems types:** the 64-bit `word`, integer literals wider than an `int`
   (emitted with C's `LL` suffix), the flat-store builtins (`alloc`,
-  `store_size`, `peek8/16/32/64`, `poke8/16/32/64`), the unsigned operations
+  `store_size`, `peek8/16/32/64`, `peek8s/16s/32s`, `peek8u/16u/32u`, `poke8/16/32/64`), the unsigned operations
   (`udiv`, `umod`, `ult`, `ushr`), and the store/string bridges (`str_of_mem`,
   `mem_of_str`).
 

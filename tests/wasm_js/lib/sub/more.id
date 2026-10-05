@@ -3,3 +3,11 @@ measure(string ms) {
 } return int mn;
 ("abc"):(4)
 (""):(1)
+
+mustpos(int mp) {
+  if (mp < 1) {
+    fail("mustpos: need a positive number, got " + mp);
+  }
+} return int mp;
+(3):(3)
+(0):() then traps:("mustpos: need a positive number, got 0")

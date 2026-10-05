@@ -48,6 +48,6 @@ init_resv_names() {
     i = take_name((import resv_names_src), i, (import resv_names));
   }
 } return void;
-():() then calls take_name:[77]
-():() then (import resv_names)[76]:("ushr")
+():() then calls take_name:[88]
+():() then (import resv_names)[87]:("ushr")
 

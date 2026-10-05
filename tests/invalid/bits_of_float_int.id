@@ -1,0 +1,4 @@
+// EXPECT: bits_of_float expects a float (an int becomes one by adding 0.0), got int
+main(int argc, string[] argv) {
+  word w = bits_of_float(1);
+} return int 0;

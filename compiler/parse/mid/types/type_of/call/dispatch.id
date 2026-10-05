@@ -21,7 +21,7 @@ given fn_idx_fixture ("nope"):("")
 // return type of a builtin, or "?" if `name` is not a builtin
 builtin_type(string name) {
   string t = "?";
-  if(name == "print" || name == "eprint") {
+  if(name == "print" || name == "eprint" || name == "fail") {
     t = "void";
   } else {
     t = bt2(name);
@@ -29,3 +29,4 @@ builtin_type(string name) {
 } return string t;
 ("print"):("void")
 ("len"):("int")
+("fail"):("void")

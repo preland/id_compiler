@@ -165,6 +165,11 @@ vm_step(int pc, int fp) {
     vm_strf(fp, cd[pc + 1], cd[pc + 2]);
     return nx;
   }
+  if (op >= (import o_bitsf) && op <= (import o_f32bits)) {
+    vm_bitsop(op, fp, cd[pc + 1], cd[pc + 2]);
+    return nx;
+  }
+} chain (int pc, int fp) {
   vm_trap("unknown opcode " + op);
 } return int t;
 given vb_boot given ld_emit(0, 3, 1, 0, 0) given tf_set(1, 7) (0, 0):(5) then (import ex_vals)[3]:(7)
@@ -173,6 +178,7 @@ given vb_boot given ld_emit(4, 0, 0, 0, 25) (0, 0):(25)
 given vb_boot given tf_set(1, 1) given ld_emit(3, 0, 1, 10, 20) (0, 0):(10)
 given vb_boot given tf_set(1, 0) given ld_emit(3, 0, 1, 10, 20) (0, 0):(20)
 given vb_boot given ld_emit(99, 0, 0, 0, 0) (0, 0):(-1) then eprints:("id: unknown opcode 99\n")
+given vb_boot given ld_emit(34, 3, 1, 0, 0) given tf_setf(1, 1.0) (0, 0):(5) then (import ex_vals)[3]:(4607182418800017408)
 
 // Test check: the whole register file -- how many registers, then each -- the
 // state vm_run's loop leaves behind. The loop reads the frame pointer from it

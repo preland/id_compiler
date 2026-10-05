@@ -96,6 +96,21 @@ await check("division by zero is an IdTrap, not a wasm RuntimeError", async () =
   assert.throws(() => m.halve(1, 0), (e) => e instanceof all.IdTrap && /division by zero/.test(e.message));
 });
 
+await check("fail(msg) is an IdTrap carrying id's own line, and kills the instance", async () => {
+  const m = await all.load(undefined, { stderr: () => {} });
+  assert.equal(m.mustpos(3), 3);
+  let err;
+  try {
+    m.mustpos(0);
+  } catch (e) {
+    err = e;
+  }
+  assert.ok(err instanceof all.IdTrap, "IdTrap");
+  assert.equal(err.code, 1);
+  assert.match(err.message, /id: mustpos: need a positive number, got 0/);
+  assert.equal(m.alive, false);
+});
+
 await check("stderr the program wrote reaches the stderr sink exactly once", async () => {
   const seen = [];
   const m = await all.load(undefined, { stderr: (b) => seen.push(text(b)) });

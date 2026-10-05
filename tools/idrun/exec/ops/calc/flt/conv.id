@@ -7,3 +7,27 @@ vm_fptosi(int fp, int d, int a) {
 given vb_boot given tf_setf(1, 2.75) (0, 3, 1):() then (import ex_vals)[3]:(2)
 given vb_boot given tf_setf(2, -7.9) (1, 2, 1):() then (import ex_vals)[3]:(-7)
 
+// The four float bit-cast helpers (id_bits_of_float, id_float_of_bits and the
+// binary32 pair), which cross between the word and float register files.
+vm_bitsop(int op, int fp, int d, int a) {
+  word[] vals = (import ex_vals);
+  float[] fvals = (import ex_fvals);
+  if (op == (import o_bitsf)) {
+    vals[fp + d] = bits_of_float(fvals[fp + a]);
+  }
+} chain (int op, int fp, int d, int a) {
+  if (op == (import o_bits32f)) {
+    vals[fp + d] = bits32_of_float(fvals[fp + a]);
+  }
+  if (op == (import o_fbits)) {
+    fvals[fp + d] = float_of_bits(vals[fp + a]);
+  }
+  if (op == (import o_f32bits)) {
+    fvals[fp + d] = float_of_bits32(vals[fp + a]);
+  }
+} return void;
+given vb_boot given tf_setf(1, 1.0) (34, 0, 3, 1):() then (import ex_vals)[3]:(4607182418800017408)
+given vb_boot given tf_setf(1, 1.0) (36, 0, 3, 1):() then (import ex_vals)[3]:(1065353216)
+given vb_boot given tf_set(1, 4611686018427387904) (35, 0, 3, 1):() then (import ex_fvals)[3]:(2.0)
+given vb_boot given tf_set(1, 1073741824) (37, 0, 3, 1):() then (import ex_fvals)[3]:(2.0)
+

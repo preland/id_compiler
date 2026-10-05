@@ -45,6 +45,10 @@ int o_calli = 30;
 int o_boxf = 31;
 int o_unboxf = 32;
 int o_strf = 33;
+int o_bitsf = 34;
+int o_fbits = 35;
+int o_bits32f = 36;
+int o_f32bits = 37;
 // Cells per instruction, and cells per function-table row.
 int i_n = 5;
 int ft_n = 5;
@@ -116,8 +120,8 @@ int p_ret = 25;
 // grouped by what they touch: strings, lists, console and clock, arithmetic
 // helpers, the flat store. The three that take or give a double are VM
 // opcodes of their own.
-string bi_names = "id_concat id_str_of_int id_charat id_len id_str_of_word id_chr strcmp id_to_int id_str_of_mem id_mem_of_str id_list_get id_list_push id_list_new id_list_set id_list_len id_list_pop id_list_lock id_print id_eprint id_put id_flush id_input id_read_all id_getkey id_sleep_ms id_ticks id_idiv id_imod id_sdiv id_smod id_shl id_sar id_ushr id_udiv id_umod id_ult id_mem_alloc id_mem_size id_peek8 id_peek16 id_peek32 id_peek64 id_poke8 id_poke16 id_poke32 id_poke64 id_list_free id_list_free_deep";
-string fbi_names = "id_box_f id_unbox_f id_str_of_float";
+string bi_names = "id_concat id_str_of_int id_charat id_len id_str_of_word id_chr strcmp id_to_int id_str_of_mem id_mem_of_str id_list_get id_list_push id_list_new id_list_set id_list_len id_list_pop id_list_lock id_print id_eprint id_put id_flush id_input id_read_all id_getkey id_sleep_ms id_ticks id_idiv id_imod id_sdiv id_smod id_shl id_sar id_ushr id_udiv id_umod id_ult id_mem_alloc id_mem_size id_peek8 id_peek16 id_peek32 id_peek64 id_poke8 id_poke16 id_poke32 id_poke64 id_peek8s id_peek16s id_peek32s id_peek8u id_peek16u id_peek32u id_fail id_list_free id_list_free_deep";
+string fbi_names = "id_box_f id_unbox_f id_str_of_float id_bits_of_float id_float_of_bits id_bits32_of_float id_float_of_bits32";
 int b_concat = 0;
 int b_str_of_int = 1;
 int b_charat = 2;
@@ -164,6 +168,13 @@ int b_poke8 = 42;
 int b_poke16 = 43;
 int b_poke32 = 44;
 int b_poke64 = 45;
+int b_peek8s = 46;
+int b_peek16s = 47;
+int b_peek32s = 48;
+int b_peek8u = 49;
+int b_peek16u = 50;
+int b_peek32u = 51;
+int b_fail = 52;
 // Where each group of helpers ends: ids below b_strs_end are string helpers,
 // below b_lists_end list helpers, below b_io_end console and clock, below
 // b_arith_end arithmetic, and the rest touch the flat store.
@@ -173,7 +184,7 @@ int b_io_end = 26;
 int b_arith_end = 36;
 // Ids from here are the two list-freeing helpers the memory-safe emitter adds
 // (id_list_free, id_list_free_deep). The interpreter never frees, so they do nothing.
-int b_free0 = 46;
+int b_free0 = 53;
 // The VM ops for add sub mul and or xor, at 32 and at 64 bits, indexed by the
 // instruction's offset from p_add. They are the o_ numbers above, written out
 // because a list constant holds literals only; a case in ld_binop holds the
