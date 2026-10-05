@@ -1,0 +1,67 @@
+// One parameter of a prototype as a record: its class, its name, and its type as C writes it.
+
+// The name of the parameter whose tokens are fn_pw, or "" when it has none: the last token is the name when there are two or more, it is not a type word, a typedef name or const, and the token before it is not struct, union or enum.
+fn_pname(string[] fn_pw, string[] fn_tn) {
+  int fn_n = len(fn_pw);
+  string fn_nm = "";
+  if (fn_n >= 2) {
+    fn_nm = fn_pw[fn_n - 1];
+  }
+} chain (string[] fn_pw, string[] fn_tn) {
+  int fn_ty = lst_str_index(fn_tn, fn_nm) >= 0 || lst_str_index((import kw_words), fn_nm) >= 0 || fn_nm == "const";
+  int fn_tag = fn_n >= 2 && lst_str_index(["struct", "union", "enum"], fn_pw[fn_n - 2]) >= 0;
+  int fn_idn = hx_kind(charat(fn_nm, 0)) == 1;
+} chain (string[] fn_pw, string[] fn_tn) {
+  if (fn_ty == 1 || fn_tag == 1 || fn_idn == 0) {
+    fn_nm = "";
+  }
+} return string fn_nm;
+(["const", "char", "*", "format"], []):("format")
+(["uLong"], []):("")
+(["const", "Bytef", "*"], []):("")
+(["struct", "foo"], []):("")
+(["unsigned"], []):("")
+(["uInt", "len"], ["uInt"]):("len")
+(["int", "const"], []):("")
+
+// The words of the parameter fn_pw without its name fn_nm, joined by single spaces: the type as the shim casts to it.
+fn_ptype(string[] fn_pw, string fn_nm) {
+  string[] fn_w = [];
+  int fn_j = 0;
+  while (fn_j < len(fn_pw) - (fn_nm != "")) {
+    push(fn_w, fn_pw[fn_j]);
+    fn_j = fn_j + 1;
+  }
+} chain (string[] fn_pw, string fn_nm) {
+  string fn_ct = str_join(fn_w, " ");
+} return string fn_ct;
+(["const", "char", "*", "format"], "format"):("const char *")
+(["uLong"], ""):("uLong")
+
+// The record cls|name|type of parameter number fn_ix, written fn_ps, read against the type table: its class (... for a variable argument list, A for an array), its name, or a<number> when it is unnamed, and its type words.
+fn_rec(string fn_ps, int fn_ix, string[] fn_tn, string[] fn_tc) {
+  string[] fn_pw = str_split(fn_ps, " ");
+  string fn_nm = fn_pname(fn_pw, fn_tn);
+  string fn_ct = fn_ptype(fn_pw, fn_nm);
+} chain (string fn_ps, int fn_ix, string[] fn_tn, string[] fn_tc) {
+  string fn_cl = ty_class(str_split(fn_ct, " "), fn_tn, fn_tc);
+  if (fn_ps == "...") {
+    fn_cl = "...";
+  }
+  if (lst_str_index(fn_pw, "[") >= 0) {
+    fn_cl = "A";
+  }
+} chain (string fn_ps, int fn_ix, string[] fn_tn, string[] fn_tc) {
+  if (fn_nm == "") {
+    fn_nm = "a" + fn_ix;
+  }
+  if (lst_str_index(fn_pw, "(") >= 0) {
+    fn_cl = "F";
+  }
+  string fn_rc = fn_cl + "|" + fn_nm + "|" + fn_ct;
+} return string fn_rc;
+("const char * format", 2, [], []):("s|format|const char *")
+("uLong", 0, ["uLong"], ["i8"]):("i8|a0|uLong")
+("...", 1, [], []):("...|a1|...")
+("int v [ ]", 0, [], []):("A|a0|int v [ ]")
+("int ( * cb ) ( int )", 0, [], []):("F|a0|int ( * cb ) ( int )")

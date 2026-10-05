@@ -1,0 +1,47 @@
+// A type with its pointers.
+
+// One more star on class ty_c. A const char pointer is a string, s, when ty_cf says the char was const; a pointer to an incomplete struct is a handle, H:tag; any other is P then ty_c.
+ty_wrap(string ty_c, int ty_cf) {
+  string ty_r = "P" + ty_c;
+  if (ty_c == "c1" && ty_cf == 1) {
+    ty_r = "s";
+  }
+  if (str_starts(ty_r, "PO:") == 1) {
+    ty_r = "H:" + str_slice(ty_r, 3, len(ty_r) - 3);
+  }
+} return string ty_r;
+("c1", 1):("s")
+("c1", 0):("Pc1")
+("O:x", 0):("H:x")
+("i4", 1):("Pi4")
+("v", 0):("Pv")
+
+// The class of the type ty_w names, stars included: char *, const char *, void **, uLongf * and gzFile each come out as the class a shim treats them as.
+ty_class(string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  string ty_c = ty_base(ty_w, ty_tn, ty_tc);
+  int ty_cf = lst_str_index(ty_w, "const") >= 0;
+  int ty_i = ty_stars(ty_w);
+} chain (string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  while (ty_i > 0) {
+    ty_c = ty_wrap(ty_c, ty_cf);
+    ty_cf = 0;
+    ty_i = ty_i - 1;
+  }
+} return string ty_c;
+(["const", "char", "*"], [], []):("s")
+(["char", "*"], [], []):("Pc1")
+(["struct", "gz", "*"], [], []):("H:gz")
+(["uLongf", "*"], ["uLongf"], ["i8"]):("Pi8")
+(["void", "const", "*"], [], []):("Pv")
+(["int"], [], []):("i4")
+
+// The class a typedef statement ty_t gives its name at ty_a: F for a function pointer, written ( * name ), otherwise the class of the type's words (ty_g names the struct when it has no tag of its own).
+ty_kind(string[] ty_t, int ty_a, string ty_g, string[] ty_tn, string[] ty_tc) {
+  int ty_p = lst_str_index(ty_t, "(");
+  string ty_c = "F";
+  if (ty_p < 0 || ty_t[ty_p + 1] != "*") {
+    ty_c = ty_class(ty_words(ty_t, ty_a, ty_g), ty_tn, ty_tc);
+  }
+} return string ty_c;
+(["typedef", "unsigned", "char", "Byte", ";"], 3, "", [], []):("i1")
+(["typedef", "void", "(", "*", "cb", ")", "(", ")", ";"], 4, "", [], []):("F")

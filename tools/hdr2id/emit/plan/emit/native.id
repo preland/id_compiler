@@ -1,0 +1,37 @@
+// The native declaration of a signature, in id.
+
+// The parameter name pl_nm as a native may spell it: one that is a word id reads as syntax gets an underscore after it.
+pl_pname(string pl_nm) {
+  string pl_r = pl_nm;
+  if (lst_str_index((import id_keywords), pl_nm) >= 0) {
+    pl_r = pl_nm + "_";
+  }
+} return string pl_r;
+("len"):("len")
+("string"):("string_")
+("func"):("func_")
+
+// The parameters of the signature pl_s as a native declares them: id type then name, separated by commas.
+pl_params(string[] pl_s) {
+  string[] pl_w = [];
+  int pl_j = 1;
+  while (pl_j < len(pl_s)) {
+    string[] pl_f = str_split(pl_s[pl_j], "|");
+    push(pl_w, pl_idtype(pl_f[0]) + " " + pl_pname(pl_f[1]));
+    pl_j = pl_j + 1;
+  }
+} chain (string[] pl_s) {
+  string pl_r = str_join(pl_w, ", ");
+} return string pl_r;
+(["f|i4|int", "s|path|const char *", "i8|n|long"]):("string path, word n")
+(["f|i4|int"]):("")
+(["f|i4|int", "i4|int|int"]):("int int_")
+
+// The declaration of the native that stands for the function of signature pl_s, named pl_pre then an underscore then the C name.
+pl_native(string pl_pre, string[] pl_s) {
+  string pl_nm = pl_field(pl_s[0], 0);
+  string pl_it = pl_idtype(pl_field(pl_s[0], 1));
+  string pl_r = "native " + pl_pre + "_" + pl_nm + "(" + pl_params(pl_s) + ") return " + pl_it + ";";
+} return string pl_r;
+("zh", ["gzputs|i4|int", "H:gzFile_s|file|gzFile", "s|s|const char *"]):("native zh_gzputs(int file, string s) return int;")
+("zh", ["zlibVersion|s|const char *"]):("native zh_zlibVersion() return string;")

@@ -1,0 +1,57 @@
+// The parts of a prototype: its parameters as separate statements, and the words before its name.
+
+// How a token moves the parenthesis depth: 1 for an open one, -1 for a close one, 0 otherwise.
+fn_depth(string fn_tk) {
+  int fn_dd = 0;
+  if (fn_tk == "(") {
+    fn_dd = 1;
+  }
+  if (fn_tk == ")") {
+    fn_dd = 0 - 1;
+  }
+} return int fn_dd;
+("("):(1)
+(")"):(-1)
+("x"):(0)
+
+// The parameters between the parentheses fn_p and fn_q of fn_t, each as its tokens joined by single spaces. A list that is only void has none. A variable argument list is the parameter ...
+fn_params(string[] fn_t, int fn_p, int fn_q) {
+  string[] fn_o = [];
+  int fn_j = fn_p + 1;
+  int fn_s = fn_p + 1;
+} chain (string[] fn_t, int fn_p, int fn_q) {
+  int fn_d = 0;
+  while (fn_j < fn_q) {
+    fn_d = fn_d + fn_depth(fn_t[fn_j]);
+    if (fn_t[fn_j] == "," && fn_d == 0) {
+      push(fn_o, sm_join(fn_t, fn_s, fn_j));
+      fn_s = fn_j + 1;
+    }
+    fn_j = fn_j + 1;
+  }
+  if (fn_s < fn_q) {
+    push(fn_o, sm_join(fn_t, fn_s, fn_q));
+  }
+} chain (string[] fn_t, int fn_p, int fn_q) {
+  if (len(fn_o) == 1 && fn_o[0] == "void") {
+    fn_o = [];
+  }
+} return string[] fn_o;
+(["f", "(", "int", "a", ",", "const", "char", "*", "s", ")", ";"], 1, 9):(["int a", "const char * s"])
+(["f", "(", "void", ")", ";"], 1, 3):([])
+(["f", "(", "int", "a", ",", "...", ")", ";"], 1, 6):(["int a", "..."])
+(["f", "(", "cb", "(", "int", ",", "int", ")", ",", "int", "x", ")", ";"], 1, 11):(["cb ( int , int )", "int x"])
+
+// The words that make the return type of the prototype fn_t whose name is token fn_p - 1: everything before it except extern and __extension__.
+fn_retw(string[] fn_t, int fn_p) {
+  string[] fn_w = [];
+  int fn_j = 0;
+  while (fn_j < fn_p - 1) {
+    if (fn_t[fn_j] != "extern" && fn_t[fn_j] != "__extension__") {
+      push(fn_w, fn_t[fn_j]);
+    }
+    fn_j = fn_j + 1;
+  }
+} return string[] fn_w;
+(["extern", "const", "char", "*", "f", "(", ")", ";"], 5):(["const", "char", "*"])
+(["int", "g", "(", ")", ";"], 2):(["int"])

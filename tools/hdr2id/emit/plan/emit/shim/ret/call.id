@@ -1,0 +1,61 @@
+// The call into C and the return to id.
+
+// The table name of a handle class H:tag, which is tag.
+pl_tag(string pl_c) {
+  string pl_g = str_slice(pl_c, 2, len(pl_c) - 2);
+} return string pl_g;
+("H:gzFile_s"):("gzFile_s")
+("H:x"):("x")
+
+// The line that forgets the handle after the call, for a function whose name has one of release_words in it and whose first parameter is a handle; "" for any other.
+pl_drop(string[] pl_s) {
+  string pl_lw = str_lower(pl_field(pl_s[0], 0));
+  int pl_i = 0;
+  string pl_r = "";
+} chain (string[] pl_s) {
+  string[] pl_ws = (import release_words);
+  while (pl_i < len(pl_ws) && len(pl_s) > 1 && str_starts(pl_field(pl_s[1], 0), "H:") == 1) {
+    if (str_find(pl_lw, pl_ws[pl_i]) >= 0) {
+      pl_r = "    h_drop(&h_" + pl_tag(pl_field(pl_s[1], 0)) + ", p1);\n";
+    }
+    pl_i = pl_i + 1;
+  }
+} return string pl_r;
+(["gzclose|i4|int", "H:gz|file|gzFile"]):("    h_drop(&h_gz, p1);\n")
+(["gzread|i4|int", "H:gz|file|gzFile"]):("")
+(["adler32|i8|uLong", "i8|a|uLong"]):("")
+
+// The lines that call the C function of signature pl_s with the arguments its parameters were brought in as, forget a handle it released, and return the result to id converted to the type of its native.
+pl_ret(string[] pl_s) {
+  string pl_rc = pl_field(pl_s[0], 1);
+  string pl_call = pl_field(pl_s[0], 0) + "(" + pl_args(pl_s) + ")";
+  string pl_ex = "(int)r";
+} chain (string[] pl_s) {
+  string pl_ln = "    " + pl_field(pl_s[0], 2) + " r = " + pl_call + ";";
+  if (pl_rc == "i8") {
+    pl_ex = "(long long)r";
+  }
+  if (pl_rc == "f") {
+    pl_ex = "(double)r";
+  }
+} chain (string[] pl_s) {
+  if (pl_rc == "s") {
+    pl_ex = "id_str_of_cstr(r ? r : \"\")";
+  }
+  if (str_starts(pl_rc, "H:") == 1) {
+    pl_ex = "r ? h_put(&h_" + pl_tag(pl_rc) + ", r) : -1";
+  }
+  if (pl_rc == "v") {
+    pl_ln = "    " + pl_call + ";";
+    pl_ex = "0";
+  }
+} chain (string[] pl_s) {
+  string pl_gd = "    if (!" + pl_field(pl_s[0], 0) + ") return " + pl_err(pl_rc) + ";\n";
+  string pl_r = pl_gd + pl_ln + "\n" + pl_post(pl_s) + pl_drop(pl_s) + "    return " + pl_ex + ";";
+} return string pl_r;
+(["gzclose|i4|int", "H:gz|file|gzFile"]):("    if (!gzclose) return -1;\n    int r = gzclose(a1);\n    h_drop(&h_gz, p1);\n    return (int)r;")
+(["crc32|i8|uLong", "i8|crc|uLong"]):("    if (!crc32) return -1;\n    uLong r = crc32(a1);\n    return (long long)r;")
+(["zlibVersion|s|const char *"]):("    if (!zlibVersion) return id_str_of_cstr(\"\");\n    const char * r = zlibVersion();\n    return id_str_of_cstr(r ? r : \"\");")
+(["gzopen|H:gz|gzFile", "s|path|const char *"]):("    if (!gzopen) return -1;\n    gzFile r = gzopen(a1);\n    return r ? h_put(&h_gz, r) : -1;")
+(["gzclearerr|v|void", "H:gz|file|gzFile"]):("    if (!gzclearerr) return -1;\n    gzclearerr(a1);\n    return 0;")
+(["gzopen2|i4|int", "PH:gz|pp|gzFile *"]):("    if (!gzopen2) return -1;\n    int r = gzopen2(a1);\n    *(int*)id_store_span(p1, 4) = o1 ? h_put(&h_gz, o1) : -1;\n    return (int)r;")

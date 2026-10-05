@@ -1,0 +1,32 @@
+// Whether a function can be a native, and how sure that is.
+
+// "" when the signature pl_s can be made a native, otherwise the reason it cannot: the return class first, then the first parameter that cannot be passed.
+pl_verdict(string[] pl_s) {
+  string pl_v = pl_rwhy(pl_field(pl_s[0], 1));
+  int pl_j = 1;
+  while (pl_j < len(pl_s) && pl_v == "") {
+    pl_v = pl_pwhy(pl_s, pl_j);
+    pl_j = pl_j + 1;
+  }
+} return string pl_v;
+(["f|i4|int", "i4|a|int", "s|n|const char *"]):("")
+(["f|Pi4|int *", "i4|a|int"]):("returns class Pi4, a pointer or struct id cannot hold: return a handle or write a shim that copies what it points at into the store")
+(["f|i4|int", "i4|a|int", "...|a1|..."]):("variable arguments (...): a native has a fixed arity, so write one shim per call shape you need and declare each")
+
+// H for a signature every parameter of which is a scalar, a string or a handle, which the shim converts exactly; HH when one is a buffer or a pointer to a scalar, which it can only convert by trusting a length it infers from the names or the size of one scalar.
+pl_status(string[] pl_s) {
+  int pl_j = 1;
+  int pl_hh = 0;
+  string pl_st = "H";
+} chain (string[] pl_s) {
+  while (pl_j < len(pl_s)) {
+    pl_hh = pl_hh || pl_pk(pl_field(pl_s[pl_j], 0)) > 0;
+    pl_j = pl_j + 1;
+  }
+  if (pl_hh == 1) {
+    pl_st = "HH";
+  }
+} return string pl_st;
+(["f|i4|int", "i4|a|int", "s|n|const char *"]):("H")
+(["f|i4|int", "Pi1|b|void *", "i4|len|int"]):("HH")
+(["f|i4|int", "Pi8|out|uLongf *"]):("HH")

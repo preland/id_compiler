@@ -1,0 +1,41 @@
+// From preprocessed text to signatures: the type table is built as the statements go by, and each statement of the header itself that declares a function becomes one signature.
+
+// Adds the signature of the statement hd_stm, if it declares a function, to hd_sigs as its lines joined by newlines.
+hd_add(string hd_stm, string[] hd_tn, string[] hd_tc, string[] hd_sigs) {
+  string[] hd_sg = fn_sig(hd_stm, hd_tn, hd_tc);
+  if (len(hd_sg) > 0) {
+    push(hd_sigs, str_join(hd_sg, "\n"));
+  }
+} return void;
+("extern int f ( void ) ;", [], [], []):("extern int f ( void ) ;", [], [], ["f|i4|int"])
+("typedef int t ;", [], [], []):("typedef int t ;", [], [], [])
+
+// Reads the statements hd_st in order, adding each to the type table, and keeps the signatures of those hd_in marks as the header's own.
+hd_walk(string[] hd_st, int[] hd_in, string[] hd_sigs) {
+  string[] hd_tn = [];
+  string[] hd_tc = [];
+  int hd_i = 0;
+} chain (string[] hd_st, int[] hd_in, string[] hd_sigs) {
+  while (hd_i < len(hd_st)) {
+    ty_def(hd_st[hd_i], hd_tn, hd_tc);
+    if (hd_in[hd_i] == 1) {
+      hd_add(hd_st[hd_i], hd_tn, hd_tc, hd_sigs);
+    }
+    hd_i = hd_i + 1;
+  }
+} return void;
+(["typedef int T ;", "extern T f ( T a ) ;"], [0, 1], []):(["typedef int T ;", "extern T f ( T a ) ;"], [0, 1], ["f|i4|T\ni4|a|T"])
+(["extern int f ( void ) ;"], [0], []):(["extern int f ( void ) ;"], [0], [])
+
+// Reads the preprocessed header hd_text, the part of it that came from the file ending with hd_suffix being the header, and adds the signature of each function it declares to hd_sigs.
+hd_read(string hd_text, string hd_suffix, string[] hd_sigs) {
+  string[] hd_toks = [];
+  hx_all(hd_text, hd_suffix, hd_toks);
+  string[] hd_st = [];
+} chain (string hd_text, string hd_suffix, string[] hd_sigs) {
+  int[] hd_in = [];
+  sm_all(hd_toks, hd_st, hd_in);
+  hd_walk(hd_st, hd_in, hd_sigs);
+} return void;
+("# 1 \"a/h.h\"\ntypedef long L;\nextern L f(L a, const char *s);\n# 2 \"b.h\"\nextern int g(void);\n", "h.h", []):("# 1 \"a/h.h\"\ntypedef long L;\nextern L f(L a, const char *s);\n# 2 \"b.h\"\nextern int g(void);\n", "h.h", ["f|i8|L\ni8|a|L\ns|s|const char *"])
+("", "h.h", []):("", "h.h", [])

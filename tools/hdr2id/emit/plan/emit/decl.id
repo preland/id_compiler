@@ -1,0 +1,59 @@
+// The C a shim writes to bring one parameter in from id.
+
+// The value a shim returns to id when a handle it was given is no longer one, written for return class pl_c: -1 for a number or a handle, -1.0 for a float, an empty string for a string.
+pl_err(string pl_c) {
+  string pl_e = "-1";
+  if (pl_c == "f") {
+    pl_e = "-1.0";
+  }
+  if (pl_c == "s") {
+    pl_e = "id_str_of_cstr(\"\")";
+  }
+} return string pl_e;
+("i4"):("-1")
+("f"):("-1.0")
+("s"):("id_str_of_cstr(\"\")")
+
+// The C expression for the length in bytes that parameter pl_pj of the signature pl_s gives the buffer it bounds: the value of an integer parameter, or what a pointer to an integer points at, which the shim has already brought in as a<number>.
+pl_lenx(string[] pl_s, int pl_pj) {
+  string pl_x = "(long long)a" + pl_pj;
+  if (str_starts(pl_field(pl_s[pl_pj], 0), "P") == 1) {
+    pl_x = "(long long)*a" + pl_pj;
+  }
+} return string pl_x;
+(["f|i4|int", "i8|n|size_t"], 1):("(long long)a1")
+(["f|i4|int", "Pi8|n|uLongf *"], 1):("(long long)*a1")
+
+// The C that brings parameter pl_j of the signature pl_s in from id as the variable a<number>, from the native's own p<number>: a cast for a number, the pointer itself for a string, a table lookup for a handle (returning the error value when it is stale), a span of the store the size of one scalar for a pointer to a scalar, or the length the buffer's length parameter gives for a buffer.
+pl_decl(string[] pl_s, int pl_j) {
+  string pl_c = pl_field(pl_s[pl_j], 0);
+  string pl_ct = pl_field(pl_s[pl_j], 2);
+  int pl_k = pl_pk(pl_c);
+} chain (string[] pl_s, int pl_j) {
+  string pl_v = "a" + pl_j;
+  string pl_p = "p" + pl_j;
+  string pl_ln = pl_ct + " " + pl_v + " = (" + pl_ct + ")" + pl_p + ";";
+} chain (string[] pl_s, int pl_j) {
+  if (pl_c == "s") {
+    pl_ln = "const char* " + pl_v + " = " + pl_p + ";";
+  }
+  if (str_starts(pl_c, "H:") == 1) {
+    pl_ln = pl_ct + " " + pl_v + " = (" + pl_ct + ")h_get(&h_" + pl_tag(pl_c) + ", " + pl_p + ");\n    if (!" + pl_v + ") return " + pl_err(pl_field(pl_s[0], 1)) + ";";
+  }
+  if (pl_k == 2) {
+    pl_ln = pl_ct + " " + pl_v + " = (" + pl_ct + ")id_store_span(" + pl_p + ", sizeof(*" + pl_v + "));";
+  }
+} chain (string[] pl_s, int pl_j) {
+  if (pl_k == 1) {
+    pl_ln = pl_ct + " " + pl_v + " = (" + pl_ct + ")id_store_span(" + pl_p + ", " + pl_lenx(pl_s, pl_pick(pl_s, pl_j)) + ");";
+  }
+  if (pl_k == 3) {
+    pl_ln = str_slice(pl_ct, 0, len(pl_ct) - 2) + " o" + pl_j + " = 0;\n    " + pl_ct + " " + pl_v + " = &o" + pl_j + ";";
+  }
+} return string pl_ln;
+(["f|i4|int", "i4|a|unsigned"], 1):("unsigned a1 = (unsigned)p1;")
+(["f|i4|int", "s|s|const char *"], 1):("const char* a1 = p1;")
+(["f|i4|int", "H:gz|file|gzFile"], 1):("gzFile a1 = (gzFile)h_get(&h_gz, p1);\n    if (!a1) return -1;")
+(["f|i4|int", "Pi8|n|uLongf *"], 1):("uLongf * a1 = (uLongf *)id_store_span(p1, sizeof(*a1));")
+(["f|i4|int", "Pi1|buf|void *", "i4|len|unsigned"], 1):("void * a1 = (void *)id_store_span(p1, (long long)a2);")
+(["f|i4|int", "PH:gz|ppFile|gzFile *"], 1):("gzFile o1 = 0;\n    gzFile * a1 = &o1;")

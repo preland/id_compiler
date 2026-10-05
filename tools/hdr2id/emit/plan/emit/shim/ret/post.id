@@ -1,0 +1,25 @@
+// What a shim does after the call for the parameters that hand a new handle back.
+
+// The C lines that, after the call, write the handle of each out-handle parameter of the signature pl_s (a pointer to a pointer to an opaque struct, which the shim passed the address of a local for) into the four bytes of the store its native was given, -1 when C left the pointer null. Each ends with a newline; "" when no parameter is one.
+pl_post(string[] pl_s) {
+  string pl_r = "";
+  int pl_j = 1;
+  while (pl_j < len(pl_s)) {
+    pl_r = pl_r + pl_posts(pl_s, pl_j);
+    pl_j = pl_j + 1;
+  }
+} return string pl_r;
+(["f|i4|int", "s|a|const char *"]):("")
+(["f|i4|int", "PH:gz|pp|gzFile *", "i4|n|int"]):("    *(int*)id_store_span(p1, 4) = o1 ? h_put(&h_gz, o1) : -1;\n")
+
+// The line pl_post gives for parameter pl_j, or "" when it is not an out-handle.
+pl_posts(string[] pl_s, int pl_j) {
+  string pl_c = pl_field(pl_s[pl_j], 0);
+  string pl_r = "";
+  if (str_starts(pl_c, "PH:") == 1) {
+    string pl_hc = str_slice(pl_c, 1, len(pl_c) - 1);
+    pl_r = "    *(int*)id_store_span(p" + pl_j + ", 4) = o" + pl_j + " ? h_put(&h_" + pl_tag(pl_hc) + ", o" + pl_j + ") : -1;\n";
+  }
+} return string pl_r;
+(["f|i4|int", "PH:db|pp|sqlite3 * *"], 1):("    *(int*)id_store_span(p1, 4) = o1 ? h_put(&h_db, o1) : -1;\n")
+(["f|i4|int", "i4|n|int"], 1):("")

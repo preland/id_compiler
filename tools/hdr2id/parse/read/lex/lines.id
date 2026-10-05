@@ -1,0 +1,51 @@
+// A line of C as tokens, and a whole preprocessed file as a stream of them.
+
+// The index just past the token that starts at lx_i: an identifier or number, a quoted literal, the three dots of a variable argument list, or one character.
+hx_end(string lx_line, int lx_i) {
+  int lx_c = charat(lx_line, lx_i);
+  int lx_j = lx_i + 1;
+  int lx_k = hx_kind(lx_c);
+} chain (string lx_line, int lx_i) {
+  if (lx_k == 1) {
+    lx_j = hx_run(lx_line, lx_i + 1);
+  }
+  if (lx_k == 2) {
+    lx_j = hx_quote(lx_line, lx_i + 1, lx_c);
+  }
+  if (lx_k == 3 && str_eqat(lx_line, lx_i, "...") == 1) {
+    lx_j = lx_i + 3;
+  }
+} return int lx_j;
+("abc def", 0):(3)
+("\"a b\" c", 0):(5)
+("x ... y", 2):(5)
+("x.y", 1):(2)
+("(a", 0):(1)
+
+// Adds the tokens of lx_line to lx_toks, leaving out white space.
+hx_line(string lx_line, string[] lx_toks) {
+  int lx_i = 0;
+  int lx_n = len(lx_line);
+  while (lx_i < lx_n) {
+    int lx_j = hx_end(lx_line, lx_i);
+    if (charat(lx_line, lx_i) > 32) {
+      push(lx_toks, str_slice(lx_line, lx_i, lx_j - lx_i));
+    }
+    lx_i = lx_j;
+  }
+} return void;
+("int  *p;", []):("int  *p;", ["int", "*", "p", ";"])
+("  ", ["a"]):("  ", ["a"])
+("f(\"a b\")", []):("f(\"a b\")", ["f", "(", "\"a b\"", ")"])
+
+// Tokenizes the whole preprocessed text lx_text into lx_toks, with an @in or @out token wherever the file the lines come from changes, @in being the header that ends with lx_suffix.
+hx_all(string lx_text, string lx_suffix, string[] lx_toks) {
+  string[] lx_lines = str_split(lx_text, "\n");
+  int lx_i = 0;
+  while (lx_i < len(lx_lines)) {
+    hx_feed(lx_lines[lx_i], lx_suffix, lx_toks);
+    lx_i = lx_i + 1;
+  }
+} return void;
+("# 1 \"a/h.h\"\nint x;\n# 2 \"b.h\"\nint y;\n", "h.h", []):("# 1 \"a/h.h\"\nint x;\n# 2 \"b.h\"\nint y;\n", "h.h", ["@in", "int", "x", ";", "@out", "int", "y", ";"])
+("", "h.h", []):("", "h.h", [])

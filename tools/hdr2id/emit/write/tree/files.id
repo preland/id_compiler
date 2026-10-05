@@ -1,0 +1,15 @@
+// The whole natives tree.
+
+// Writes the declarations wr_lines, whose natives are named wr_names, as files under wr_out as path.id lays them out. Answers how many files it wrote.
+wr_natives(string wr_out, string[] wr_names, string[] wr_lines) {
+  string[] wr_lf = wr_leaves(wr_names);
+  int wr_dp = wr_depth(len(wr_lf));
+  int wr_k = 0;
+} chain (string wr_out, string[] wr_names, string[] wr_lines) {
+  while (wr_k < len(wr_lf)) {
+    wr_put(wr_out, wr_rel(wr_k, wr_dp, wr_lf), wr_leaf(wr_lines, wr_k));
+    wr_k = wr_k + 1;
+  }
+} return int wr_k;
+given wr_t_dir("a_natives.id") ((import wr_t_out), ["a", "b", "c"], ["na", "nb", "nc"]):(1) then wr_t_text:("na\n\nnb\n\nnc\n")
+given wr_t_dir("a_l1/d_natives.id") ((import wr_t_out), ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"], ["na", "nb", "nc", "nd", "ne", "nf", "ng", "nh", "ni", "nj"]):(4) then wr_t_text:("nd\n\nne\n\nnf\n")

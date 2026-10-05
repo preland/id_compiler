@@ -1,0 +1,44 @@
+// The class of a type before its pointers are counted, and how many pointers there are.
+
+// The class of the first word of ty_w that the table knows as a type name, or ? when none is.
+ty_named(string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  int ty_i = 0;
+  string ty_r = "";
+  while (ty_i < len(ty_w) && ty_r == "") {
+    ty_r = ty_get(ty_tn, ty_tc, ty_w[ty_i]);
+    ty_i = ty_i + 1;
+  }
+} chain (string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  if (ty_r == "") {
+    ty_r = "?";
+  }
+} return string ty_r;
+(["const", "uInt"], ["uInt"], ["i4"]):("i4")
+(["zzz"], [], []):("?")
+
+// The class of the type ty_w names, ignoring its stars: its size words, else its struct or union tag, else its typedef name.
+ty_base(string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  string ty_r = ty_kw(ty_w);
+  if (ty_r == "") {
+    ty_r = ty_tagged(ty_w, ty_tn, ty_tc);
+  }
+  if (ty_r == "") {
+    ty_r = ty_named(ty_w, ty_tn, ty_tc);
+  }
+} return string ty_r;
+(["unsigned", "int"], [], []):("i4")
+(["struct", "q"], [], []):("O:q")
+(["Bytef"], ["Bytef"], ["i1"]):("i1")
+
+// How many stars ty_w holds.
+ty_stars(string[] ty_w) {
+  int ty_i = 0;
+  int ty_s = 0;
+  while (ty_i < len(ty_w)) {
+    ty_s = ty_s + (ty_w[ty_i] == "*");
+    ty_i = ty_i + 1;
+  }
+} return int ty_s;
+(["const", "char", "*"]):(1)
+(["void", "*", "*"]):(2)
+(["int"]):(0)

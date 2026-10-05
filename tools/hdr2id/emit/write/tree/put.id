@@ -1,0 +1,37 @@
+// Writing the natives out.
+
+// Writes the text wr_tx to the file wr_rp under the directory wr_out, making the directories on the way, and answers the bytes written, or -1.
+wr_put(string wr_out, string wr_rp, string wr_tx) {
+  string wr_path = wr_out + "/" + wr_rp;
+  int wr_mk = fs_mkdir_p(fs_dir_of(wr_path));
+  int wr_n = exec_file_put(wr_path, wr_tx, 420);
+} return int wr_n;
+given wr_t_dir("a/b.txt") ((import wr_t_out), "a/b.txt", "hi"):(2) then wr_t_text:("hi")
+given wr_t_dir("x/y/z.txt") ((import wr_t_out), "x/y/z.txt", "hello"):(5) then wr_t_text:("hello")
+
+// The first native of each file when wr_names, the natives' names in order, are shared out per_file to a file.
+wr_leaves(string[] wr_names) {
+  string[] wr_lf = [];
+  int wr_i = 0;
+  while (wr_i < len(wr_names)) {
+    push(wr_lf, wr_names[wr_i]);
+    wr_i = wr_i + (import per_file);
+  }
+} return string[] wr_lf;
+(["a", "b", "c", "d"]):(["a", "d"])
+(["a"]):(["a"])
+([]):([])
+
+// The text of file wr_k of the natives wr_lines shared out per_file to a file: its declarations with a blank line between them and a newline at the end.
+wr_leaf(string[] wr_lines, int wr_k) {
+  string[] wr_one = [];
+  int wr_i = wr_k * (import per_file);
+  while (wr_i < len(wr_lines) && wr_i < (wr_k + 1) * (import per_file)) {
+    push(wr_one, wr_lines[wr_i]);
+    wr_i = wr_i + 1;
+  }
+} chain (string[] wr_lines, int wr_k) {
+  string wr_tx = str_join(wr_one, "\n\n") + "\n";
+} return string wr_tx;
+(["na", "nb", "nc", "nd"], 0):("na\n\nnb\n\nnc\n")
+(["na", "nb", "nc", "nd"], 1):("nd\n")

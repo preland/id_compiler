@@ -1,0 +1,60 @@
+// The C types and argument lists of a shim.
+
+// The C type of a value of class pl_c as a native receives it, or returns it when pl_rt is 1: a string comes in as const char* and goes out as char*.
+pl_ctype(string pl_c, int pl_rt) {
+  string pl_it = pl_idtype(pl_c);
+  string pl_r = "int";
+  if (pl_it == "word") {
+    pl_r = "long long";
+  }
+} chain (string pl_c, int pl_rt) {
+  if (pl_it == "float") {
+    pl_r = "double";
+  }
+  if (pl_it == "string") {
+    pl_r = "const char*";
+  }
+  if (pl_it == "string" && pl_rt == 1) {
+    pl_r = "char*";
+  }
+} return string pl_r;
+("i4", 0):("int")
+("i8", 1):("long long")
+("Pi1", 0):("long long")
+("f", 0):("double")
+("s", 0):("const char*")
+("s", 1):("char*")
+
+// The parameters of the shim for signature pl_s as C declares them: the C type of each then p<number>; void when it has none.
+pl_cparams(string[] pl_s) {
+  string[] pl_w = [];
+  int pl_j = 1;
+  while (pl_j < len(pl_s)) {
+    string[] pl_f = str_split(pl_s[pl_j], "|");
+    push(pl_w, pl_ctype(pl_f[0], 0) + " p" + pl_j);
+    pl_j = pl_j + 1;
+  }
+} chain (string[] pl_s) {
+  string pl_r = "void";
+  if (len(pl_w) > 0) {
+    pl_r = str_join(pl_w, ", ");
+  }
+} return string pl_r;
+(["f|i4|int", "s|s|const char *", "i8|n|long"]):("const char* p1, long long p2")
+(["f|i4|int"]):("void")
+
+// The arguments of the call to the C function: a<number> for each parameter, separated by commas.
+pl_args(string[] pl_s) {
+  string pl_r = "";
+  int pl_j = 1;
+  while (pl_j < len(pl_s)) {
+    pl_r = pl_r + ", a" + pl_j;
+    pl_j = pl_j + 1;
+  }
+} chain (string[] pl_s) {
+  if (len(pl_r) > 0) {
+    pl_r = str_slice(pl_r, 2, len(pl_r) - 2);
+  }
+} return string pl_r;
+(["f|i4|int", "s|s|const char *", "i8|n|long"]):("a1, a2")
+(["f|i4|int"]):("")

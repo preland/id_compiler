@@ -1,0 +1,48 @@
+// Finding the parameter that says how long a buffer is.
+
+// 1 when the parameter name pl_nm is named like a length: it has one of len_words in it, lower-cased, or is n.
+pl_lenish(string pl_nm) {
+  string pl_lw = str_lower(pl_nm);
+  int pl_i = 0;
+  int pl_l = pl_lw == "n";
+} chain (string pl_nm) {
+  string[] pl_ws = (import len_words);
+  while (pl_i < len(pl_ws)) {
+    pl_l = pl_l || str_find(pl_lw, pl_ws[pl_i]) >= 0;
+    pl_i = pl_i + 1;
+  }
+} return int pl_l;
+("destLen"):(1)
+("size"):(1)
+("n"):(1)
+("nitems"):(1)
+("flush"):(0)
+
+// How many leading characters, ignoring case, the names pl_x and pl_y share.
+pl_prefix(string pl_x, string pl_y) {
+  string pl_lx = str_lower(pl_x);
+  string pl_ly = str_lower(pl_y);
+  int pl_i = 0;
+} chain (string pl_x, string pl_y) {
+  while (pl_i < len(pl_lx) && pl_i < len(pl_ly) && charat(pl_lx, pl_i) == charat(pl_ly, pl_i)) {
+    pl_i = pl_i + 1;
+  }
+} return int pl_i;
+("dest", "destLen"):(4)
+("source", "destLen"):(0)
+("buf", "BUF"):(3)
+
+// How well parameter pl_j of the signature pl_s names the length of the buffer that is parameter pl_b: -1 when it cannot (it is the buffer itself, not an integer or a pointer to one, or not named like a length), otherwise how long a prefix its name shares with the buffer's.
+pl_score(string[] pl_s, int pl_b, int pl_j) {
+  string pl_cj = pl_field(pl_s[pl_j], 0);
+  string pl_nj = pl_field(pl_s[pl_j], 1);
+  int pl_ok = pl_b != pl_j && lst_str_index(["i4", "i8", "Pi4", "Pi8"], pl_cj) >= 0 && pl_lenish(pl_nj) == 1;
+} chain (string[] pl_s, int pl_b, int pl_j) {
+  int pl_sc = 0 - 1;
+  if (pl_ok == 1) {
+    pl_sc = pl_prefix(pl_field(pl_s[pl_b], 1), pl_nj);
+  }
+} return int pl_sc;
+(["f|i4|int", "Pi1|dest|Bytef *", "Pi8|destLen|uLongf *"], 1, 2):(4)
+(["f|i4|int", "Pi1|dest|Bytef *", "Pi8|destLen|uLongf *"], 1, 1):(-1)
+(["f|i4|int", "Pi1|dest|Bytef *", "i4|flush|int"], 1, 2):(-1)

@@ -1,0 +1,38 @@
+// The three questions a tokenizer asks of characters: what kind starts a token, where an identifier or number stops, where a string or character literal stops.
+
+// 1 for a character that can be in an identifier or a number, 2 for a quote of either kind, 3 for a dot, 0 for anything else.
+hx_kind(int lx_c) {
+  int lx_k = chr_is_alnum(lx_c) || lx_c == 95;
+  if (lx_c == 34 || lx_c == 39) {
+    lx_k = 2;
+  }
+  if (lx_c == 46) {
+    lx_k = 3;
+  }
+} return int lx_k;
+(97):(1)
+(95):(1)
+(34):(2)
+(46):(3)
+(42):(0)
+
+// The index where the run of identifier characters in lx_s that reaches lx_i stops.
+hx_run(string lx_s, int lx_i) {
+  while (hx_kind(charat(lx_s, lx_i)) == 1) {
+    lx_i = lx_i + 1;
+  }
+} return int lx_i;
+("abc def", 0):(3)
+("a_1+b", 0):(3)
+("xy", 1):(2)
+
+// The index just past the literal that began before lx_i and closes with the quote lx_q, skipping a backslash and the character after it. A literal the line ends inside stops at the end of the line.
+hx_quote(string lx_s, int lx_i, int lx_q) {
+  while (charat(lx_s, lx_i) >= 0 && charat(lx_s, lx_i) != lx_q) {
+    lx_i = lx_i + 1 + (charat(lx_s, lx_i) == 92);
+  }
+  int lx_e = fx_min(lx_i + 1, len(lx_s));
+} return int lx_e;
+("abc\" x", 0, 34):(4)
+("a\\\"b\" z", 0, 34):(5)
+("open", 0, 34):(4)

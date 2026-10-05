@@ -1,0 +1,29 @@
+// hdr2id PREFIX HEADER LIB OUTDIR < preprocessed.i reads a header, preprocessed with its linemarkers (cc -E HEADER), and turns each function it declares into a native of the id backend PREFIX with a C shim, written under OUTDIR as backend.id, PREFIX.c and a tree natives/. HEADER names the header (zlib.h); declarations of any other file the input includes are only read for the types they define. LIB is the library to link (z for -lz). OUTDIR of - writes nothing. The report, a row for each function and a summary, goes to standard output.
+
+// Runs a header's text through the whole tool: signatures, the mapping, the files, and the report on standard output. Answers how many files of natives it wrote.
+hd_go(string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text) {
+  string[] hd_sg = [];
+  string[][] hd_o = hd_fresh(5);
+  hd_read(hd_text, hd_hdr, hd_sg);
+} chain (string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text) {
+  hd_emit(hd_pre, hd_sg, hd_o);
+  int hd_nf = hd_write(hd_pre, hd_hdr, hd_lib, hd_out, hd_o);
+  print(str_join(hd_o[(import out_rows)], "\n"));
+} chain (string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text) {
+  put(rp_sum(hd_o[(import out_rows)]));
+} return int hd_nf;
+("zh", "h.h", "z", "-", "# 1 \"h.h\"\nextern int f(int a);\nextern int g(void);\n"):(0) then prints:("H f\nH g\nfunctions: 2\n  mapped exactly (scalars, strings, handles): 2 (100.0%)\n  mapped on an inferred buffer length or an out-parameter: 0 (0.0%)\n  left out: 0 (0.0%)\n")
+("zh", "h.h", "z", "-", "# 1 \"h.h\"\nextern int f(int (*cb)(int));\n"):(0) then prints:("U f callback parameter 'a0': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim\nfunctions: 1\n  mapped exactly (scalars, strings, handles): 0 (0.0%)\n  mapped on an inferred buffer length or an out-parameter: 0 (0.0%)\n  left out: 1 (100.0%)\n  callback: 1\n")
+
+// Checks the command line and runs the tool on standard input.
+main(int argc, string[] argv) {
+  int hd_status = 2;
+  if (argc == 5) {
+    hd_status = hd_go(argv[1], argv[2], argv[3], argv[4], read_all()) * 0;
+  } else {
+    eprint("usage: hdr2id PREFIX HEADER LIB OUTDIR < preprocessed.i   (OUTDIR - for the report alone)");
+  }
+} return int hd_status;
+(1, ["hdr2id"]):(2) then eprints:("usage: hdr2id PREFIX HEADER LIB OUTDIR < preprocessed.i   (OUTDIR - for the report alone)\n")
+(3, ["hdr2id", "a", "b"]):(2) then eprints:("usage: hdr2id PREFIX HEADER LIB OUTDIR < preprocessed.i   (OUTDIR - for the report alone)\n")
+stdin "# 1 \"h.h\"\nextern int f(int a);\n" (5, ["hdr2id", "zh", "h.h", "z", "-"]):(0) then prints:("H f\nfunctions: 1\n  mapped exactly (scalars, strings, handles): 1 (100.0%)\n  mapped on an inferred buffer length or an out-parameter: 0 (0.0%)\n  left out: 0 (0.0%)\n")

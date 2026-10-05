@@ -1,0 +1,57 @@
+// Why a function cannot be a native, in words that say what to do about it.
+
+// The reason a parameter pl_nm of class pl_c cannot be passed: what is unmappable about it, and what writing the shim by hand would involve.
+pl_why(string pl_c, string pl_nm) {
+  string pl_wy = "parameter '" + pl_nm + "' has class " + pl_c + ", which no native can carry; write the shim by hand";
+  if (pl_c == "...") {
+    pl_wy = "variable arguments (...): a native has a fixed arity, so write one shim per call shape you need and declare each";
+  }
+  if (pl_c == "F") {
+    pl_wy = "callback parameter '" + pl_nm + "': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim";
+  }
+} chain (string pl_c, string pl_nm) {
+  if (str_starts(pl_c, "S:") == 1) {
+    pl_wy = "struct parameter '" + pl_nm + "' by value: id cannot build a C struct, so pass its fields as scalars and let a shim assemble it";
+  }
+  if (str_starts(pl_c, "PS:") == 1) {
+    pl_wy = "parameter '" + pl_nm + "' points at a struct the caller must allocate and fill: id cannot, so wrap its creation, its fields and its use in a shim that keeps it behind a handle";
+  }
+  if (pl_c == "A" || pl_c == "?") {
+    pl_wy = "parameter '" + pl_nm + "' is an array or a type this tool has not seen: add the typedef to the preprocessed input or write the shim by hand";
+  }
+} return string pl_wy;
+("...", "x"):("variable arguments (...): a native has a fixed arity, so write one shim per call shape you need and declare each")
+("F", "cb"):("callback parameter 'cb': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim")
+("S:z", "s"):("struct parameter 's' by value: id cannot build a C struct, so pass its fields as scalars and let a shim assemble it")
+("PS:z", "strm"):("parameter 'strm' points at a struct the caller must allocate and fill: id cannot, so wrap its creation, its fields and its use in a shim that keeps it behind a handle")
+("?", "t"):("parameter 't' is an array or a type this tool has not seen: add the typedef to the preprocessed input or write the shim by hand")
+("PPi4", "q"):("parameter 'q' has class PPi4, which no native can carry; write the shim by hand")
+
+// The reason a return class pl_c cannot be given back, or "" when it can: a pointer or struct comes back to id as nothing it can hold.
+pl_rwhy(string pl_c) {
+  string pl_wy = "";
+  if (pl_pk(pl_c) != 0 && pl_c != "v") {
+    pl_wy = "returns class " + pl_c + ", a pointer or struct id cannot hold: return a handle or write a shim that copies what it points at into the store";
+  }
+} return string pl_wy;
+("i4"):("")
+("v"):("")
+("Pi4"):("returns class Pi4, a pointer or struct id cannot hold: return a handle or write a shim that copies what it points at into the store")
+
+// The reason parameter pl_j of the signature pl_s cannot be passed, or "": its class has no mapping, or it is a buffer with no single parameter to give its length.
+pl_pwhy(string[] pl_s, int pl_j) {
+  string pl_c = pl_field(pl_s[pl_j], 0);
+  string pl_nm = pl_field(pl_s[pl_j], 1);
+  string pl_wy = "";
+} chain (string[] pl_s, int pl_j) {
+  if (pl_pk(pl_c) < 0) {
+    pl_wy = pl_why(pl_c, pl_nm);
+  }
+  if (pl_pk(pl_c) == 1 && pl_pick(pl_s, pl_j) < 0) {
+    pl_wy = "buffer parameter '" + pl_nm + "' has no single length parameter to bound its span: name one, or write the shim by hand";
+  }
+} return string pl_wy;
+(["f|i4|int", "i4|a|int"], 1):("")
+(["f|i4|int", "F|cb|cb"], 1):("callback parameter 'cb': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim")
+(["f|i4|int", "Pi1|b|void *"], 1):("buffer parameter 'b' has no single length parameter to bound its span: name one, or write the shim by hand")
+(["f|i4|int", "Pi1|b|void *", "i4|len|int"], 1):("")

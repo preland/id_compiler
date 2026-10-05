@@ -1,0 +1,56 @@
+// Looking a C type up. A type is described by a class string: v void, f float, i1 a byte, c1 a char, i4 and i8 integers of up to 32 and of 64 bits, s a const char pointer, H:tag a pointer to a struct nothing is known of (a handle), S:tag a struct with fields, O:tag an incomplete struct, F a function pointer, ? a type not seen, and P in front for a pointer to whatever follows. The typedef table is two lists: names, and the class each stands for; a struct with fields is kept in it under struct:tag.
+
+// The class the table gives ty_key, or "" when it is not there.
+ty_get(string[] ty_tn, string[] ty_tc, string ty_key) {
+  int ty_a = lst_str_index(ty_tn, ty_key);
+  string ty_r = "";
+  if (ty_a >= 0) {
+    ty_r = ty_tc[ty_a];
+  }
+} return string ty_r;
+(["a", "b"], ["i4", "f"], "b"):("f")
+(["a"], ["i4"], "z"):("")
+
+// The class the C type words ty_w fix by themselves (long, unsigned, char, void and the rest of conf.id's kw_words), or "" when they name no such type. An unsigned char is the byte class i1.
+ty_kw(string[] ty_w) {
+  int ty_i = 0;
+  string ty_r = "";
+  string[] ty_ws = (import kw_words);
+} chain (string[] ty_w) {
+  string[] ty_cs = (import kw_class);
+  while (ty_i < len(ty_ws) && ty_r == "") {
+    if (lst_str_index(ty_w, ty_ws[ty_i]) >= 0) {
+      ty_r = ty_cs[ty_i];
+    }
+    ty_i = ty_i + 1;
+  }
+  if (ty_r == "c1" && lst_str_index(ty_w, "unsigned") >= 0) {
+    ty_r = "i1";
+  }
+} return string ty_r;
+(["unsigned", "char"]):("i1")
+(["const", "char"]):("c1")
+(["unsigned", "long", "int"]):("i8")
+(["long", "double"]):("f")
+(["unsigned"]):("i4")
+(["const", "Bytef"]):("")
+
+// The class of a type written struct tag or union tag: what the table holds for it, else O:tag, an incomplete struct. "" when ty_w has neither word.
+ty_tagged(string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  int ty_b = lst_str_index(ty_w, "struct");
+  int ty_j = lst_str_index(ty_w, "union");
+  string ty_r = "";
+} chain (string[] ty_w, string[] ty_tn, string[] ty_tc) {
+  if (ty_b < 0) {
+    ty_b = ty_j;
+  }
+  if (ty_b >= 0 && ty_b + 1 < len(ty_w)) {
+    ty_r = ty_get(ty_tn, ty_tc, "struct:" + ty_w[ty_b + 1]);
+  }
+  if (ty_b >= 0 && ty_b + 1 < len(ty_w) && ty_r == "") {
+    ty_r = "O:" + ty_w[ty_b + 1];
+  }
+} return string ty_r;
+(["struct", "gz"], ["struct:gz"], ["S:gz"]):("S:gz")
+(["const", "struct", "x"], [], []):("O:x")
+(["int"], [], []):("")

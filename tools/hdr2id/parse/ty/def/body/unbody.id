@@ -1,0 +1,45 @@
+// A statement with the inside of its braces cut out. A typedef of a struct with fields is a typedef of a struct whatever the fields are, and the fields would only be in the way.
+
+// 1 when token ty_tk, which leaves the brace depth at ty_d, stays in a statement whose braced body is cut out: every token outside braces except a closing one, and the opening brace itself, which stands for the whole body.
+ty_keep(string ty_tk, int ty_d) {
+  int ty_k = (ty_d == 0 && ty_tk != "}") || (ty_d == 1 && ty_tk == "{");
+} return int ty_k;
+("int", 0):(1)
+("}", 0):(0)
+("{", 1):(1)
+("x", 1):(0)
+("{", 2):(0)
+
+// The tokens of ty_t with each outermost braced body reduced to its opening brace.
+ty_unbody(string[] ty_t) {
+  string[] ty_o = [];
+  int ty_d = 0;
+  int ty_i = 0;
+} chain (string[] ty_t) {
+  while (ty_i < len(ty_t)) {
+    ty_d = ty_d + sm_delta(ty_t[ty_i]);
+    if (ty_keep(ty_t[ty_i], ty_d) == 1) {
+      push(ty_o, ty_t[ty_i]);
+    }
+    ty_i = ty_i + 1;
+  }
+} return string[] ty_o;
+(["typedef", "struct", "a", "{", "int", "x", ";", "}", "n", ";"]):(["typedef", "struct", "a", "{", "n", ";"])
+(["int", "x", ";"]):(["int", "x", ";"])
+
+// The tag of the first struct or union in ty_t: the word after it, or "" when it has no tag (a brace follows) or there is none.
+ty_tag(string[] ty_t) {
+  int ty_b = lst_str_index(ty_t, "struct");
+  int ty_j = lst_str_index(ty_t, "union");
+  string ty_g = "";
+} chain (string[] ty_t) {
+  if (ty_b < 0) {
+    ty_b = ty_j;
+  }
+  if (ty_b >= 0 && ty_b + 1 < len(ty_t) && ty_t[ty_b + 1] != "{") {
+    ty_g = ty_t[ty_b + 1];
+  }
+} return string ty_g;
+(["struct", "a", "{"]):("a")
+(["union", "{"]):("")
+(["int"]):("")

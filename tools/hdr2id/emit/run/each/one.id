@@ -1,0 +1,40 @@
+// Sorting every signature into the mapped and the left out.
+
+// Maps the signature whose lines are joined by newlines in hd_line when pl_verdict allows it, and otherwise adds a row to the report saying why not.
+hd_one(string hd_pre, string hd_line, string[][] hd_o) {
+  string[] hd_s = str_split(hd_line, "\n");
+  string hd_why = pl_verdict(hd_s);
+  if (hd_why == "") {
+    hd_take(hd_pre, hd_s, hd_o);
+  }
+} chain (string hd_pre, string hd_line, string[][] hd_o) {
+  if (hd_why != "") {
+    push(hd_o[(import out_rows)], "U " + pl_field(hd_s[0], 0) + " " + hd_why);
+  }
+} return void;
+("zh", "f|i4|int\ni4|a|int", [[], [], [], [], []]):("zh", "f|i4|int\ni4|a|int", [["native zh_f(int a) return int;"], ["f"], ["int id_zh_f(int p1) {\n    int a1 = (int)p1;\n    if (!f) return -1;\n    int r = f(a1);\n    return (int)r;\n}\n"], ["H f"], []])
+("zh", "f|i4|int\nF|cb|cb", [[], [], [], [], []]):("zh", "f|i4|int\nF|cb|cb", [[], [], [], ["U f callback parameter 'cb': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim"], []])
+
+// Runs hd_one over every signature in hd_sigs.
+hd_emit(string hd_pre, string[] hd_sigs, string[][] hd_o) {
+  int hd_i = 0;
+  while (hd_i < len(hd_sigs)) {
+    hd_one(hd_pre, hd_sigs[hd_i], hd_o);
+    hd_i = hd_i + 1;
+  }
+} return void;
+("zh", ["f|i4|int\ni4|a|int"], [[], [], [], [], []]):("zh", ["f|i4|int\ni4|a|int"], [["native zh_f(int a) return int;"], ["f"], ["int id_zh_f(int p1) {\n    int a1 = (int)p1;\n    if (!f) return -1;\n    int r = f(a1);\n    return (int)r;\n}\n"], ["H f"], []])
+("zh", [], [[], [], [], [], []]):("zh", [], [[], [], [], [], []])
+
+// A list of hd_n new empty string lists, which is how a run starts its results: lists to fill, and no way to write them as one literal that says what they hold.
+hd_fresh(int hd_n) {
+  string[][] hd_f = [];
+  int hd_i = 0;
+  while (hd_i < hd_n) {
+    string[] hd_e = [];
+    push(hd_f, hd_e);
+    hd_i = hd_i + 1;
+  }
+} return string[][] hd_f;
+(2):([[], []])
+(0):([])

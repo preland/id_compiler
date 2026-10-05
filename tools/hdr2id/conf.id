@@ -1,0 +1,35 @@
+// The C type words that fix a type's size, in the order they are looked for, and the class each stands for: v void, f a float or double, c1 a signed char, i4 an integer of 32 bits or fewer, i8 an integer of 64 bits (long and long long on the hosts id targets). unsigned char is c1 until the declaration is seen to say unsigned. Keep the two lists the same length and in the same order: long comes before int so that unsigned long is i8, and double before long so that long double is f.
+string[] kw_words = ["void", "float", "double", "char", "short", "long", "int", "unsigned", "signed", "_Bool", "enum"];
+string[] kw_class = ["v", "f", "f", "c1", "i4", "i8", "i4", "i4", "i4", "i4", "i4"];
+
+// The classes a native can take directly, as a buffer, or as a pointer to one scalar; a handle class H:tag is also direct. A buffer is spanned in the store by a length parameter, a pointer to a scalar by its size.
+string[] cls_direct = ["i1", "c1", "i4", "i8", "f", "s"];
+string[] cls_buffer = ["Pi1", "Pc1", "Pv"];
+string[] cls_scalar_out = ["Pi4", "Pi8", "Pf"];
+
+// The words that mark a parameter as the length of a buffer, matched inside a lower-cased name; n alone counts too.
+string[] len_words = ["len", "size", "count", "items", "memb", "bytes"];
+
+// Words id reads as syntax, which a native's parameter name may not be.
+string[] id_keywords = ["int", "word", "float", "string", "func", "return", "if", "else", "while", "export", "import", "native", "struct", "chain", "given", "then", "void", "asm", "stdin", "timeout"];
+
+// A function whose name has one of these words, lower-cased, gives its handle back to C: the shim forgets the handle after the call.
+string[] release_words = ["close", "end", "free", "destroy", "delete", "release"];
+
+// The C every shim file starts with after its includes: the two runtime entry points idc exports to backends, and a table that stands for C pointers as small integers. A handle is (kind << 24) | (generation << 8) | slot. Each struct tag has a table and a kind number, so a handle of one kind given to a function of another is refused instead of being taken for whatever object holds that slot; a slot's generation advances when it is filled and again when it is emptied, so a handle that outlived its object is refused too (h_get answers 0 for both). The generation is 16 bits, so a stale handle is caught until its slot has been reused 65536 times.
+string[] shim_prelude = ["extern unsigned char* id_store_span(long long addr, long long n);", "extern char* id_str_of_cstr(const char* p);", "", "#define H_MAX 64", "typedef struct { void* p[H_MAX]; unsigned g[H_MAX]; unsigned kind; } HTab;", "", "static int h_put(HTab* t, void* p) {", "    for (int i = 0; i < H_MAX; i++) {", "        if (!t->p[i]) {", "            t->p[i] = p;", "            t->g[i] += 1;", "            return (int)((t->kind << 24) | ((t->g[i] & 0xffff) << 8) | (unsigned)i);", "        }", "    }", "    return -1;", "}", "", "static void* h_get(HTab* t, int h) {", "    int s = h & 255;", "    if (h <= 0 || s >= H_MAX || ((unsigned)h >> 24) != t->kind) return 0;", "    if ((((unsigned)h >> 8) & 0xffff) != (t->g[s] & 0xffff)) return 0;", "    return t->p[s];", "}", "", "static void h_drop(HTab* t, int h) {", "    if (h_get(t, h)) {", "        t->p[h & 255] = 0;", "        t->g[h & 255] += 1;", "    }", "}"];
+
+// How many natives share one declaration file, which is id's own limit on functions per file, and how many entries a directory of the generated tree may hold.
+int per_file = 3;
+int per_dir = 3;
+
+// The reasons a function is left out, as the words each one's reason contains and the name the summary gives them: the two lists are read in step.
+string[] cat_keys = ["variable arguments", "callback parameter", "struct parameter", "points at a struct", "buffer parameter", "returns class", "array or a type", "which no native can carry"];
+string[] cat_names = ["variable arguments", "callback", "struct by value", "caller-allocated struct", "buffer with no length", "returns a pointer", "unknown type or array", "other class (a pointer to a pointer, a handle to a handle)"];
+
+// Where each list lives in the string[][] a run keeps its results in: the declarations of the natives, their names, the C of their shims, the report rows, and the struct tags that need a handle table. Read the lists by these, never by number.
+int out_nat = 0;
+int out_nm = 1;
+int out_sh = 2;
+int out_rows = 3;
+int out_tags = 4;

@@ -1,0 +1,41 @@
+// Reading a preprocessed header line by line. A line the preprocessor writes as `# 37 "path" 2` says which file the lines after it came from; every other line starting with # is a directive and is dropped, and the rest is C to tokenize.
+
+// The path a linemarker line names, or "" for any line that is not one. A linemarker is # then a space then a line number.
+hx_marker(string lx_line) {
+  int lx_ok = str_starts(lx_line, "# ") && chr_is_digit(charat(lx_line, 2));
+  int lx_a = str_find(lx_line, "\"");
+  int lx_b = str_findat(lx_line, "\"", lx_a + 1);
+} chain (string lx_line) {
+  string lx_path = "";
+  if (lx_ok == 1 && lx_a >= 0 && lx_b > lx_a) {
+    lx_path = str_slice(lx_line, lx_a + 1, lx_b - lx_a - 1);
+  }
+} return string lx_path;
+("# 37 \"/x/zlib.h\" 2"):("/x/zlib.h")
+("# 1 \"<built-in>\""):("<built-in>")
+("int x;"):("")
+("#pragma GCC \"x\""):("")
+
+// "@in" when the file at lx_path is the header being read, which ends with lx_suffix, and "@out" when it is any other file: the marker tokens that tell the statement reader whose declarations it is looking at.
+hx_side(string lx_path, string lx_suffix) {
+  string lx_side = "@out";
+  if (str_ends(lx_path, lx_suffix) == 1) {
+    lx_side = "@in";
+  }
+} return string lx_side;
+("/x/zlib.h", "zlib.h"):("@in")
+("/usr/include/stdio.h", "zlib.h"):("@out")
+
+// Adds the tokens of one line to lx_toks: a linemarker adds its side marker, any other # line adds nothing, anything else is tokenized.
+hx_feed(string lx_line, string lx_suffix, string[] lx_toks) {
+  string lx_path = hx_marker(lx_line);
+  if (lx_path != "") {
+    push(lx_toks, hx_side(lx_path, lx_suffix));
+  }
+  if (lx_path == "" && str_starts(lx_line, "#") == 0) {
+    hx_line(lx_line, lx_toks);
+  }
+} return void;
+("# 1 \"/z/zlib.h\" 1", "zlib.h", []):("# 1 \"/z/zlib.h\" 1", "zlib.h", ["@in"])
+("int f(int a);", "zlib.h", ["x"]):("int f(int a);", "zlib.h", ["x", "int", "f", "(", "int", "a", ")", ";"])
+("#pragma once", "zlib.h", ["x"]):("#pragma once", "zlib.h", ["x"])

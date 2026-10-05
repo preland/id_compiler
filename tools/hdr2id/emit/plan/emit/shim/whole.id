@@ -1,0 +1,38 @@
+// A whole shim function.
+
+// Adds to pl_acc the C that brings in each parameter of the signature pl_s, those that are buffers when pl_bf is 1 and the others when it is 0: a buffer's length is another parameter, so that one has to be in first.
+pl_pass(string[] pl_s, int pl_bf, string[] pl_acc) {
+  int pl_j = 1;
+  while (pl_j < len(pl_s)) {
+    int pl_isb = pl_pk(pl_field(pl_s[pl_j], 0)) == 1;
+    if (pl_isb == pl_bf) {
+      push(pl_acc, pl_decl(pl_s, pl_j));
+    }
+    pl_j = pl_j + 1;
+  }
+} return void;
+(["f|i4|int", "Pi1|b|void *", "i4|n|int"], 0, []):(["f|i4|int", "Pi1|b|void *", "i4|n|int"], 0, ["int a2 = (int)p2;"])
+(["f|i4|int", "Pi1|b|void *", "i4|n|int"], 1, []):(["f|i4|int", "Pi1|b|void *", "i4|n|int"], 1, ["void * a1 = (void *)id_store_span(p1, (long long)a2);"])
+
+// The lines pl_ls as the body of a C function, each indented four spaces and ended by a newline; "" when there are none.
+pl_indent(string[] pl_ls) {
+  string pl_r = "";
+  if (len(pl_ls) > 0) {
+    pl_r = "    " + str_join(pl_ls, "\n    ") + "\n";
+  }
+} return string pl_r;
+(["int a;", "int b;"]):("    int a;\n    int b;\n")
+([]):("")
+
+// The C source of the shim for the function of signature pl_s, named id_ then pl_pre then an underscore then the C name, which is the symbol idc calls for the native of that name: its parameters brought in, the call, the return.
+pl_shim(string pl_pre, string[] pl_s) {
+  string[] pl_ls = [];
+  string pl_rc = pl_field(pl_s[0], 1);
+  string pl_hd = pl_ctype(pl_rc, 1) + " id_" + pl_pre + "_" + pl_field(pl_s[0], 0) + "(" + pl_cparams(pl_s) + ") {\n";
+} chain (string pl_pre, string[] pl_s) {
+  pl_pass(pl_s, 0, pl_ls);
+  pl_pass(pl_s, 1, pl_ls);
+  string pl_r = pl_hd + pl_indent(pl_ls) + pl_ret(pl_s) + "\n}\n";
+} return string pl_r;
+("zh", ["gzclose|i4|int", "H:gz|file|gzFile"]):("int id_zh_gzclose(int p1) {\n    gzFile a1 = (gzFile)h_get(&h_gz, p1);\n    if (!a1) return -1;\n    if (!gzclose) return -1;\n    int r = gzclose(a1);\n    h_drop(&h_gz, p1);\n    return (int)r;\n}\n")
+("zh", ["zlibVersion|s|const char *"]):("char* id_zh_zlibVersion(void) {\n    if (!zlibVersion) return id_str_of_cstr(\"\");\n    const char * r = zlibVersion();\n    return id_str_of_cstr(r ? r : \"\");\n}\n")

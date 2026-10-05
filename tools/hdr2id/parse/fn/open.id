@@ -1,0 +1,41 @@
+// Telling a function prototype from every other statement of a header, and finding its parameter list.
+
+// 1 when the statement fn_t, whose first open parenthesis is token fn_p, declares a function: it is not a typedef, a static function, a definition or an initialisation, the token before the parenthesis is a name, and the parenthesis is not the start of a function pointer declarator.
+fn_decl(string[] fn_t, int fn_p) {
+  int fn_bad = lst_str_index(fn_t, "typedef") >= 0 || lst_str_index(fn_t, "static") >= 0 || lst_str_index(fn_t, "{") >= 0;
+  int fn_eq = lst_str_index(fn_t, "=") >= 0 || fn_t[fn_p + 1] == "*";
+  int fn_id = hx_kind(charat(fn_t[fn_p - 1], 0)) == 1;
+} chain (string[] fn_t, int fn_p) {
+  int fn_ok = fn_bad == 0 && fn_eq == 0 && fn_id == 1;
+} return int fn_ok;
+(["extern", "int", "f", "(", "void", ")", ";"], 3):(1)
+(["extern", "int", "(", "*", "f", ")", "(", ")", ";"], 2):(0)
+(["static", "int", "f", "(", ")", ";"], 3):(0)
+(["typedef", "int", "f", "(", ")", ";"], 3):(0)
+(["int", "x", "=", "f", "(", ")", ";"], 4):(0)
+
+// The index of the open parenthesis of the parameter list of the statement fn_t when it declares a function, else -1.
+fn_open(string[] fn_t) {
+  int fn_p = lst_str_index(fn_t, "(");
+  int fn_r = 0 - 1;
+  if (fn_p >= 1 && len(fn_t) > fn_p + 2 && fn_t[len(fn_t) - 1] == ";" && fn_decl(fn_t, fn_p) == 1) {
+    fn_r = fn_p;
+  }
+} return int fn_r;
+(["extern", "int", "f", "(", "void", ")", ";"]):(3)
+(["typedef", "int", "t", ";"]):(-1)
+(["int", "x", ";"]):(-1)
+(["int", "f", "(", "int", "{"]):(-1)
+
+// The index of the parenthesis that closes the one at fn_p.
+fn_close(string[] fn_t, int fn_p) {
+  int fn_d = 0;
+  int fn_c = 0 - 1;
+  while (fn_c < 0 && fn_p < len(fn_t)) {
+    fn_d = fn_d + fn_depth(fn_t[fn_p]);
+    fn_c = fn_p * (fn_d == 0) + (0 - 1) * (fn_d != 0);
+    fn_p = fn_p + 1;
+  }
+} return int fn_c;
+(["f", "(", "int", ")", ";"], 1):(3)
+(["f", "(", "g", "(", ")", ")", ";"], 1):(5)

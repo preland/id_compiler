@@ -1,0 +1,41 @@
+// Where the files of the generated natives go. A directory may hold per_dir entries and a file per_file natives, so the files hang from a tree as deep as it takes, every file at the same depth, and each directory is named for the first native under it.
+
+// per_dir to the power wr_e: how many files one directory wr_e levels above the files holds.
+wr_pow(int wr_e) {
+  int wr_p = 1;
+  int wr_i = 0;
+  while (wr_i < wr_e) {
+    wr_p = wr_p * (import per_dir);
+    wr_i = wr_i + 1;
+  }
+} return int wr_p;
+(0):(1)
+(2):(9)
+
+// How many levels of directory wr_n files need: 0 when one directory holds them all, otherwise the least wr_dp with per_dir to the power wr_dp + 1 at least wr_n.
+wr_depth(int wr_n) {
+  int wr_dp = 0;
+  int wr_cap = (import per_dir);
+  while (wr_cap < wr_n) {
+    wr_cap = wr_cap * (import per_dir);
+    wr_dp = wr_dp + 1;
+  }
+} return int wr_dp;
+(3):(0)
+(4):(1)
+(10):(2)
+
+// The path, relative to the output directory, of file wr_i of a tree wr_dp levels deep whose files' first natives are named wr_lf: the directories from the top down, each named for the first file under it and its level, then the file, named for its first native.
+wr_rel(int wr_i, int wr_dp, string[] wr_lf) {
+  string wr_r = "";
+  int wr_lv = wr_dp;
+  while (wr_lv > 0) {
+    wr_r = wr_r + wr_lf[(wr_i / wr_pow(wr_lv)) * wr_pow(wr_lv)] + "_l" + wr_lv + "/";
+    wr_lv = wr_lv - 1;
+  }
+} chain (int wr_i, int wr_dp, string[] wr_lf) {
+  string wr_f = wr_r + wr_lf[wr_i] + "_natives.id";
+} return string wr_f;
+(0, 0, ["a", "b"]):("a_natives.id")
+(4, 2, ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]):("a_l2/d_l1/e_natives.id")
+(9, 2, ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]):("j_l2/j_l1/j_natives.id")

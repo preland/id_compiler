@@ -1,0 +1,41 @@
+// Taking a typedef statement apart: where the name it declares is, and the words of the type it gives that name.
+
+// The index of the name a typedef statement ty_t declares: the identifier after the star in a function pointer, written ( * name ), and otherwise the token before the closing semicolon.
+ty_declname(string[] ty_t) {
+  int ty_p = lst_str_index(ty_t, "(");
+  int ty_a = len(ty_t) - 2;
+  if (ty_p >= 0 && ty_p + 2 < len(ty_t) && ty_t[ty_p + 1] == "*") {
+    ty_a = ty_p + 2;
+  }
+} return int ty_a;
+(["typedef", "int", "t", ";"]):(2)
+(["typedef", "void", "(", "*", "cb", ")", "(", "int", ")", ";"]):(4)
+
+// The word token ty_i of ty_t contributes to the type: itself, nothing for the brace that stands for the body of a struct that has a tag, and ty_g, the typedef's own name, for the brace of a struct or union that has none.
+ty_word(string[] ty_t, int ty_i, string ty_g) {
+  string ty_m = ty_t[ty_i];
+  if (ty_m == "{") {
+    ty_m = "";
+  }
+  if (ty_t[ty_i] == "{" && (ty_t[ty_i - 1] == "struct" || ty_t[ty_i - 1] == "union")) {
+    ty_m = ty_g;
+  }
+} return string ty_m;
+(["struct", "{"], 1, "z"):("z")
+(["struct", "a", "{"], 2, "z"):("")
+(["unsigned", "int"], 1, "z"):("int")
+
+// The words of the type a typedef statement gives its name: the tokens from 1 up to the name at ty_a, a struct body replaced as ty_word says.
+ty_words(string[] ty_t, int ty_a, string ty_g) {
+  string[] ty_w = [];
+  int ty_i = 1;
+  while (ty_i < ty_a) {
+    if (ty_word(ty_t, ty_i, ty_g) != "") {
+      push(ty_w, ty_word(ty_t, ty_i, ty_g));
+    }
+    ty_i = ty_i + 1;
+  }
+} return string[] ty_w;
+(["typedef", "unsigned", "char", "Byte", ";"], 3, ""):(["unsigned", "char"])
+(["typedef", "struct", "{", "z", ";"], 3, "z"):(["struct", "z"])
+(["typedef", "struct", "a", "{", "z", ";"], 4, "a"):(["struct", "a"])

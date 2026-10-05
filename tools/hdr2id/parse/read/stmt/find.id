@@ -1,0 +1,54 @@
+// One statement out of a token stream: where it ends, its tokens as a line of text, and what becomes of it.
+
+// The index just past the statement that begins at sm_t[sm_s], or the end of the stream when it never ends.
+sm_end(string[] sm_t, int sm_s) {
+  int sm_j = sm_s;
+  int sm_d = 0;
+  int sm_e = 0 - 1;
+} chain (string[] sm_t, int sm_s) {
+  while (sm_e < 0 && sm_j < len(sm_t)) {
+    sm_d = sm_d + sm_delta(sm_t[sm_j]);
+    sm_e = sm_stop(sm_t, sm_s, sm_j, sm_d);
+    sm_j = sm_j + 1;
+  }
+  if (sm_e < 0) {
+    sm_e = len(sm_t);
+  }
+} return int sm_e;
+(["int", "x", ";", "int"], 0):(3)
+(["f", "(", "{", "a", ";", "}", ";"], 0):(6)
+(["struct", "s", "{", "a", ";", "}", ";"], 0):(7)
+(["int", "x"], 0):(2)
+(["@out", "int"], 0):(1)
+
+// The tokens sm_t[sm_s .. sm_e) joined by single spaces.
+sm_join(string[] sm_t, int sm_s, int sm_e) {
+  string[] sm_w = [];
+  while (sm_s < sm_e) {
+    push(sm_w, sm_t[sm_s]);
+    sm_s = sm_s + 1;
+  }
+  string sm_r = str_join(sm_w, " ");
+} return string sm_r;
+(["a", "b", "c"], 0, 2):("a b")
+(["a", "b", "c"], 1, 3):("b c")
+(["a"], 0, 0):("")
+
+// Handles the statement sm_t[sm_s .. sm_e): a marker changes the side sm_cur to 1 for @in and 0 for @out, anything else is added to sm_out as a line of text with sm_cur added to sm_in. Answers the side after it.
+sm_take(string[] sm_t, int sm_s, int sm_e, int sm_cur, string[] sm_out, int[] sm_in) {
+  int sm_side = sm_cur;
+  if (sm_t[sm_s] == "@in") {
+    sm_side = 1;
+  }
+  if (sm_t[sm_s] == "@out") {
+    sm_side = 0;
+  }
+} chain (string[] sm_t, int sm_s, int sm_e, int sm_cur, string[] sm_out, int[] sm_in) {
+  if (str_starts(sm_t[sm_s], "@") == 0) {
+    push(sm_out, sm_join(sm_t, sm_s, sm_e));
+    push(sm_in, sm_cur);
+  }
+} return int sm_side;
+(["@in"], 0, 1, 0, [], []):(1)
+(["@out"], 0, 1, 1, [], []):(0)
+(["int", "x", ";"], 0, 3, 1, [], []):(1)

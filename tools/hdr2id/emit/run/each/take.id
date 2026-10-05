@@ -1,0 +1,45 @@
+// What becomes of a signature that can be mapped. A run keeps its results in one string[][], the lists of which are named by out_nat, out_nm, out_sh, out_rows and out_tags in conf.id.
+
+// Adds hd_cls to hd_tl as a struct tag when it is a handle class H:tag the list does not hold yet.
+hd_tag1(string hd_cls, string[] hd_tl) {
+  string hd_hc = hd_cls;
+  if (str_starts(hd_cls, "PH:") == 1) {
+    hd_hc = str_slice(hd_cls, 1, len(hd_cls) - 1);
+  }
+  int hd_h = str_starts(hd_hc, "H:");
+} chain (string hd_cls, string[] hd_tl) {
+  if (hd_h == 1) {
+    string hd_tg = pl_tag(hd_hc);
+    if (lst_str_index(hd_tl, hd_tg) < 0) {
+      push(hd_tl, hd_tg);
+    }
+  }
+} return void;
+("PH:db", []):("PH:db", ["db"])
+("H:gz", []):("H:gz", ["gz"])
+("H:gz", ["gz"]):("H:gz", ["gz"])
+("i4", []):("i4", [])
+
+// Adds to hd_tl every struct tag the signature hd_s passes or returns by handle, once each.
+hd_tags(string[] hd_s, string[] hd_tl) {
+  int hd_j = 0;
+  while (hd_j < len(hd_s)) {
+    hd_tag1(pl_field(hd_s[hd_j], 1 - (hd_j > 0)), hd_tl);
+    hd_j = hd_j + 1;
+  }
+} return void;
+(["gzopen|H:gz|gzFile", "s|p|const char *"], []):(["gzopen|H:gz|gzFile", "s|p|const char *"], ["gz"])
+(["gzclose|i4|int", "H:gz|f|gzFile", "H:other|g|o"], []):(["gzclose|i4|int", "H:gz|f|gzFile", "H:other|g|o"], ["gz", "other"])
+
+// Records the signature hd_s, which can be mapped, in hd_o: its native, its name, its shim, its row of the report, and its struct tags.
+hd_take(string hd_pre, string[] hd_s, string[][] hd_o) {
+  push(hd_o[(import out_nat)], pl_native(hd_pre, hd_s));
+  push(hd_o[(import out_nm)], pl_field(hd_s[0], 0));
+  push(hd_o[(import out_sh)], pl_shim(hd_pre, hd_s));
+} chain (string hd_pre, string[] hd_s, string[][] hd_o) {
+  push(hd_o[(import out_rows)], pl_status(hd_s) + " " + pl_field(hd_s[0], 0));
+  hd_tags(hd_s, hd_o[(import out_tags)]);
+} return void;
+("zh", ["f|i4|int", "i4|a|int"], [[], [], [], [], []]):("zh", ["f|i4|int", "i4|a|int"], [["native zh_f(int a) return int;"], ["f"], ["int id_zh_f(int p1) {\n    int a1 = (int)p1;\n    if (!f) return -1;\n    int r = f(a1);\n    return (int)r;\n}\n"], ["H f"], []])
+("zh", ["gzopen|H:gz|gzFile", "s|p|const char *"], [[], [], [], [], []]):("zh", ["gzopen|H:gz|gzFile", "s|p|const char *"], [["native zh_gzopen(string p) return int;"], ["gzopen"], ["int id_zh_gzopen(const char* p1) {\n    const char* a1 = p1;\n    if (!gzopen) return -1;\n    gzFile r = gzopen(a1);\n    return r ? h_put(&h_gz, r) : -1;\n}\n"], ["H gzopen"], ["gz"]])
+

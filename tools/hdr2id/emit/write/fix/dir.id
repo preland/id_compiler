@@ -1,0 +1,27 @@
+// A scratch directory for the cases that write files, and a way to read one back.
+
+// Makes a scratch directory, its path in (import wr_t_out), and names the file wr_tr under it that wr_t_text reads, in (import wr_t_rel). The directory and everything the case writes under it go when the case's process exits.
+wr_t_dir(string wr_tr) {
+  string wr_td = fs_mktemp("wr_t_", 1);
+  export string wr_t_out = wr_td;
+  fs_drop_exit(wr_td);
+} chain (string wr_tr) {
+  export string wr_t_rel = wr_tr;
+} return void;
+("a"):() then wr_t_text:("")
+("b/c"):() then wr_t_text:("")
+
+// The text of the file (import wr_t_rel) under (import wr_t_out), "" when there is none.
+wr_t_text() {
+  string wr_tp = (import wr_t_out) + "/" + (import wr_t_rel);
+  string wr_tt = fs_read_text(wr_tp);
+} return string wr_tt;
+given wr_t_dir("a") ():("")
+given wr_t_dir("b/c") ():("")
+
+// Writes the text wr_tf to the file (import wr_t_rel) under (import wr_t_out), which wr_t_dir made the name of.
+wr_t_fill(string wr_tf) {
+  int wr_tn = wr_put((import wr_t_out), (import wr_t_rel), wr_tf);
+} return void;
+given wr_t_dir("a") ("zz"):() then wr_t_text:("zz")
+given wr_t_dir("b/c") ("q"):() then wr_t_text:("q")

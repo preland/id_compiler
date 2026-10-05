@@ -1,0 +1,40 @@
+// Where a C statement ends in a token stream: at a semicolon outside braces, or at the brace that closes a function body.
+
+// How a token moves the brace depth: 1 for an opening brace, -1 for a closing one, 0 otherwise.
+sm_delta(string sm_tok) {
+  int sm_d = 0;
+  if (sm_tok == "{") {
+    sm_d = 1;
+  }
+  if (sm_tok == "}") {
+    sm_d = 0 - 1;
+  }
+} return int sm_d;
+("{"):(1)
+("}"):(-1)
+("int"):(0)
+
+// 1 when a statement whose first token is sm_t[sm_s] may be a function definition, which ends at its closing brace; 0 when it starts with typedef, struct, union or enum, whose braces are followed by a name or a semicolon.
+sm_body(string[] sm_t, int sm_s) {
+  int sm_b = lst_str_index(["typedef", "struct", "union", "enum"], sm_t[sm_s]) < 0;
+} return int sm_b;
+(["int", "f"], 0):(1)
+(["x", "typedef"], 1):(0)
+(["struct", "a"], 0):(0)
+
+// The index just past the statement that sm_t[sm_s .. sm_j] completes at depth sm_d, or -1 if token sm_j does not complete one. An @in or @out marker is a statement of its own.
+sm_stop(string[] sm_t, int sm_s, int sm_j, int sm_d) {
+  int sm_e = 0 - 1;
+  if (sm_d == 0 && (sm_t[sm_j] == ";" || (sm_t[sm_j] == "}" && sm_body(sm_t, sm_s) == 1))) {
+    sm_e = sm_j + 1;
+  }
+  if (sm_j == sm_s && str_starts(sm_t[sm_j], "@") == 1) {
+    sm_e = sm_s + 1;
+  }
+} return int sm_e;
+(["int", "x", ";"], 0, 2, 0):(3)
+(["int", "x", ";"], 0, 1, 0):(-1)
+(["f", "{", "}"], 0, 2, 0):(3)
+(["struct", "{", "}", "n", ";"], 0, 2, 0):(-1)
+(["@in"], 0, 0, 0):(1)
+(["a", "{", ";"], 0, 2, 1):(-1)

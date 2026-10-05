@@ -1,0 +1,76 @@
+// Reading a record of a signature and sorting a class by how id can pass it. A signature is a list of strings: the first is name|return class|return type, each other is cls|name|type for one parameter.
+
+// Field pl_k (counted from 0) of the | separated record pl_rec, or "" when it has no such field.
+pl_field(string pl_rec, int pl_k) {
+  string[] pl_f = str_split(pl_rec, "|");
+  string pl_r = "";
+  if (pl_k < len(pl_f)) {
+    pl_r = pl_f[pl_k];
+  }
+} return string pl_r;
+("i4|a|int", 0):("i4")
+("i4|a|int", 2):("int")
+("i4|a|int", 3):("")
+
+// How id can pass a parameter of class pl_c: 0 as a scalar, string or handle, 1 as the address of a buffer in the store, 2 as the address of one scalar to be filled in, 3 as the address of four bytes the shim fills with a new handle (a pointer to a pointer to an opaque struct), -1 not at all.
+pl_pk(string pl_c) {
+  int pl_d = lst_str_index((import cls_direct), pl_c) >= 0 || str_starts(pl_c, "H:") == 1;
+  int pl_b = lst_str_index((import cls_buffer), pl_c) >= 0;
+  int pl_so = lst_str_index((import cls_scalar_out), pl_c) >= 0;
+} chain (string pl_c) {
+  int pl_ho = str_starts(pl_c, "PH:");
+  int pl_k = 0 - 1;
+  if (pl_d == 1) {
+    pl_k = 0;
+  }
+} chain (string pl_c) {
+  if (pl_b == 1) {
+    pl_k = 1;
+  }
+  if (pl_so == 1) {
+    pl_k = 2;
+  }
+  if (pl_ho == 1) {
+    pl_k = 3;
+  }
+} return int pl_k;
+("i4"):(0)
+("H:gz"):(0)
+("s"):(0)
+("Pi1"):(1)
+("Pv"):(1)
+("Pi8"):(2)
+("PH:x"):(3)
+("PS:z"):(-1)
+("F"):(-1)
+
+// The id type that carries class pl_c: int, word, float or string, word for the address of a buffer or of a scalar; "" when none does. v is int, the type of the 0 a shim returns for a void function.
+pl_idtype(string pl_c) {
+  int pl_k = pl_pk(pl_c);
+  string pl_t = "int";
+  if (pl_k > 0) {
+    pl_t = "word";
+  }
+} chain (string pl_c) {
+  if (pl_c == "i8") {
+    pl_t = "word";
+  }
+  if (pl_c == "f") {
+    pl_t = "float";
+  }
+  if (pl_c == "s") {
+    pl_t = "string";
+  }
+} chain (string pl_c) {
+  if (pl_k < 0 && pl_c != "v") {
+    pl_t = "";
+  }
+} return string pl_t;
+("i4"):("int")
+("i8"):("word")
+("f"):("float")
+("s"):("string")
+("Pi1"):("word")
+("H:x"):("int")
+("v"):("int")
+("F"):("")

@@ -1,0 +1,34 @@
+// Choosing the length of a buffer: the one parameter that scores best, if no other scores as well.
+
+// The best score any parameter of the signature pl_s has as the length of the buffer that is parameter pl_b, -1 when none can be.
+pl_top(string[] pl_s, int pl_b) {
+  int pl_j = 1;
+  int pl_mx = 0 - 1;
+  while (pl_j < len(pl_s)) {
+    pl_mx = fx_max(pl_mx, pl_score(pl_s, pl_b, pl_j));
+    pl_j = pl_j + 1;
+  }
+} return int pl_mx;
+(["f|i4|int", "Pi1|dest|Bytef *", "Pi8|destLen|uLongf *"], 1):(4)
+(["f|i4|int", "Pi1|buf|Bytef *", "i4|flush|int"], 1):(-1)
+
+// The parameter that is the length of the buffer that is parameter pl_b of the signature pl_s: the one whose name scores best, but only when it is the only one with that score and can be a score at all. Otherwise -1, which a shim cannot make safe and the tool reports.
+pl_pick(string[] pl_s, int pl_b) {
+  int pl_j = 1;
+  int pl_best = 0 - 1;
+  int pl_cnt = 0;
+} chain (string[] pl_s, int pl_b) {
+  int pl_hi = pl_top(pl_s, pl_b);
+  while (pl_j < len(pl_s)) {
+    if (pl_hi >= 0 && pl_score(pl_s, pl_b, pl_j) == pl_hi) {
+      pl_best = pl_j;
+      pl_cnt = pl_cnt + 1;
+    }
+    pl_j = pl_j + 1;
+  }
+  int pl_res = pl_best * (pl_cnt == 1) + (0 - 1) * (pl_cnt != 1);
+} return int pl_res;
+(["f|i4|int", "Pi1|dest|Bytef *", "Pi8|destLen|uLongf *", "Pi1|source|const Bytef *", "i8|sourceLen|uLong"], 1):(2)
+(["f|i4|int", "Pi1|dest|Bytef *", "Pi8|destLen|uLongf *", "Pi1|source|const Bytef *", "i8|sourceLen|uLong"], 3):(4)
+(["f|i4|int", "Pi1|buf|void *", "i8|size|size_t", "i8|nitems|size_t"], 1):(-1)
+(["f|i4|int", "Pi1|buf|void *", "i4|len|unsigned"], 1):(2)

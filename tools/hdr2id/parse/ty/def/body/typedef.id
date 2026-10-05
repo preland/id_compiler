@@ -1,0 +1,48 @@
+// Reading a typedef or a struct definition into the table of type names.
+
+// Adds ty_nm to the table with the class ty_c.
+ty_put(string[] ty_tn, string[] ty_tc, string ty_nm, string ty_c) {
+  push(ty_tn, ty_nm);
+  push(ty_tc, ty_c);
+} return void;
+([], [], "a", "i4"):(["a"], ["i4"], "a", "i4")
+(["a"], ["i4"], "b", "f"):(["a", "b"], ["i4", "f"], "b", "f")
+
+// 1 when the statement ty_t defines the fields of a struct or union: it has a body and the word struct or union.
+ty_struct(string[] ty_t) {
+  int ty_b = lst_str_index(ty_t, "{") >= 0;
+  int ty_j = lst_str_index(ty_t, "struct") >= 0 || lst_str_index(ty_t, "union") >= 0;
+  int ty_s = ty_b && ty_j;
+} return int ty_s;
+(["struct", "a", "{", ";"]):(1)
+(["typedef", "enum", "{", "x"]):(0)
+(["struct", "a", ";"]):(0)
+
+// Reads the statement ty_st, tokens joined by single spaces, into the table: a struct or union with a body is recorded under struct:tag (the typedef's own name when it has no tag), a typedef adds its name with the class of its type, F for a function pointer. Any other statement adds nothing.
+ty_def(string ty_st, string[] ty_tn, string[] ty_tc) {
+  string[] ty_t = ty_unbody(str_split(ty_st, " "));
+  int ty_a = ty_declname(ty_t);
+  int ty_td = ty_t[0] == "typedef";
+} chain (string ty_st, string[] ty_tn, string[] ty_tc) {
+  string ty_nm = "";
+  string ty_g = ty_tag(ty_t);
+  if (ty_td == 1) {
+    ty_nm = ty_t[ty_a];
+  }
+} chain (string ty_st, string[] ty_tn, string[] ty_tc) {
+  if (ty_g == "") {
+    ty_g = ty_nm;
+  }
+  if (ty_struct(ty_t) == 1) {
+    ty_put(ty_tn, ty_tc, "struct:" + ty_g, "S:" + ty_g);
+  }
+  if (ty_td == 1) {
+    ty_put(ty_tn, ty_tc, ty_nm, ty_kind(ty_t, ty_a, ty_g, ty_tn, ty_tc));
+  }
+} return void;
+("typedef unsigned char Byte ;", [], []):("typedef unsigned char Byte ;", ["Byte"], ["i1"])
+("typedef struct z_s { int a ; } z_t ;", [], []):("typedef struct z_s { int a ; } z_t ;", ["struct:z_s", "z_t"], ["S:z_s", "S:z_s"])
+("typedef struct gz_s * gzFile ;", [], []):("typedef struct gz_s * gzFile ;", ["gzFile"], ["H:gz_s"])
+("typedef int ( * cb ) ( int ) ;", [], []):("typedef int ( * cb ) ( int ) ;", ["cb"], ["F"])
+("extern int f ( void ) ;", ["x"], ["i4"]):("extern int f ( void ) ;", ["x"], ["i4"])
+("struct q { int a ; } ;", [], []):("struct q { int a ; } ;", ["struct:q"], ["S:q"])

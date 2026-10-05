@@ -1,0 +1,37 @@
+// A prototype as a signature.
+
+// The first line of a signature: name|return class|return type of the prototype fn_t whose parameter list opens at token fn_p.
+fn_sigtop(string[] fn_t, int fn_p, string[] fn_tn, string[] fn_tc) {
+  string[] fn_rw = fn_retw(fn_t, fn_p);
+  string fn_rcl = ty_class(fn_rw, fn_tn, fn_tc);
+  string fn_top = fn_t[fn_p - 1] + "|" + fn_rcl + "|" + str_join(fn_rw, " ");
+} return string fn_top;
+(["extern", "const", "char", "*", "f", "(", ")", ";"], 5, [], []):("f|s|const char *")
+(["int", "g", "(", ")", ";"], 2, [], []):("g|i4|int")
+
+// Adds to fn_o the record of each parameter of the prototype fn_t whose parameter list opens at token fn_p.
+fn_sigtail(string[] fn_t, int fn_p, string[] fn_tn, string[] fn_tc, string[] fn_o) {
+  string[] fn_pl = fn_params(fn_t, fn_p, fn_close(fn_t, fn_p));
+  int fn_k = 0;
+  while (fn_k < len(fn_pl)) {
+    push(fn_o, fn_rec(fn_pl[fn_k], fn_k, fn_tn, fn_tc));
+    fn_k = fn_k + 1;
+  }
+} return void;
+(["int", "g", "(", "int", "a", ",", "...", ")", ";"], 2, [], [], []):(["int", "g", "(", "int", "a", ",", "...", ")", ";"], 2, [], [], ["i4|a|int", "...|a1|..."])
+(["int", "g", "(", "void", ")", ";"], 2, [], [], []):(["int", "g", "(", "void", ")", ";"], 2, [], [], [])
+
+// The signature of the statement fn_st, its tokens joined by single spaces, read against the type table: a list whose first element is name|return class|return type and whose others are the parameters' cls|name|type records; an empty list when fn_st does not declare a function.
+fn_sig(string fn_st, string[] fn_tn, string[] fn_tc) {
+  string[] fn_t = str_split(fn_st, " ");
+  int fn_p = fn_open(fn_t);
+  string[] fn_o = [];
+} chain (string fn_st, string[] fn_tn, string[] fn_tc) {
+  if (fn_p >= 0) {
+    push(fn_o, fn_sigtop(fn_t, fn_p, fn_tn, fn_tc));
+    fn_sigtail(fn_t, fn_p, fn_tn, fn_tc, fn_o);
+  }
+} return string[] fn_o;
+("extern int compress ( Bytef * dest , uLongf * destLen , const Bytef * source , uLong sourceLen ) ;", ["Bytef", "uLongf", "uLong"], ["i1", "i8", "i8"]):(["compress|i4|int", "Pi1|dest|Bytef *", "Pi8|destLen|uLongf *", "Pi1|source|const Bytef *", "i8|sourceLen|uLong"])
+("typedef int t ;", [], []):([])
+("extern int gzclose ( gzFile ) ;", ["gzFile"], ["H:gzFile_s"]):(["gzclose|i4|int", "H:gzFile_s|a0|gzFile"])

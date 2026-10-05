@@ -1,0 +1,16 @@
+// Every statement of a token stream.
+
+// Splits the tokens sm_t into statements: each is added to sm_out as one line of space-separated tokens, and sm_in gets 1 beside it when it came from the header being read (between @in and @out markers) and 0 when it came from an include.
+sm_all(string[] sm_t, string[] sm_out, int[] sm_in) {
+  int sm_s = 0;
+  int sm_cur = 0;
+  int sm_e = 0;
+} chain (string[] sm_t, string[] sm_out, int[] sm_in) {
+  while (sm_s < len(sm_t)) {
+    sm_e = sm_end(sm_t, sm_s);
+    sm_cur = sm_take(sm_t, sm_s, sm_e, sm_cur, sm_out, sm_in);
+    sm_s = sm_e;
+  }
+} return void;
+(["typedef", "int", "t", ";", "@in", "int", "f", "(", "void", ")", ";"], [], []):(["typedef", "int", "t", ";", "@in", "int", "f", "(", "void", ")", ";"], ["typedef int t ;", "int f ( void ) ;"], [0, 1])
+(["@in", "static", "int", "g", "(", ")", "{", "return", "0", ";", "}", "int", "x", ";"], [], []):(["@in", "static", "int", "g", "(", ")", "{", "return", "0", ";", "}", "int", "x", ";"], ["static int g ( ) { return 0 ; }", "int x ;"], [1, 1])
