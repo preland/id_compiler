@@ -30,7 +30,7 @@ given tf_fl ("prog", (import tf_flags)):(0) then (import tf_flags):([0, 0])
 dr_go(string[] argv, int at, int[] fl) {
   int code = 1;
   if (fl[0] == 1) {
-    code = dr_exec(dr_bytes(argv[at]), lst_str_tail(argv, at));
+    code = dr_exec(fs_read_bytes(argv[at]), lst_str_tail(argv, at));
   } else {
     int t = ticks();
     code = dr_src(argv, at, fl, "/tmp/idrun-" + t + "-");
@@ -38,3 +38,4 @@ dr_go(string[] argv, int at, int[] fl) {
 } return int code;
 given tf_file("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") (["idrun", "--ll", (import tf_path)], 2, [1, 0]):(7) then tf_rm:(0)
 given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("main(int argc, string[] argv) {\n} return int 5;\n") (["idrun", (import tf_path)], 1, [0, 1]):(5) then tf_rm:(0)
+given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("#!/usr/bin/env idrun\nmain(int argc, string[] argv) {\n} return int 6;\n") (["idrun", (import tf_path)], 1, [0, 1]):(6) then tf_rm:(0)

@@ -4,10 +4,3 @@ tf_mk0() {
 } return void;
 given tf_stem ():() then tf_rmstem:(0)
 given tf_stem given tf_mk0 ():() then tf_rmstem:(0)
-
-// What dr_env reads back for the variable a case set.
-tf_ev() {
-  string s = dr_env("IDRUN_T_A");
-} return string s;
-given env_put("IDRUN_T_A", "v1") ():("v1")
-():("")

@@ -8,7 +8,7 @@ dr_src(string[] argv, int at, int[] fl, string stem) {
 } chain (string[] argv, int at, int[] fl, string stem) {
   int code = 1;
   if (rc == 0) {
-    code = dr_exec(dr_bytes(dir + "/ll"), lst_str_tail(argv, at));
+    code = dr_exec(fs_read_bytes(dir + "/ll"), lst_str_tail(argv, at));
   }
   dr_clean(dir);
 } return int code;

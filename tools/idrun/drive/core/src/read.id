@@ -10,28 +10,28 @@ dr_str(int[] buf, int a, int e) {
 ([104, 105, 106], 0, 3):("hij")
 ([104, 105, 106], 1, 2):("i")
 
-// A whole file as byte cells; empty when it cannot be read.
-dr_bytes(string path) {
-  int[] by = [];
-  int n = fs_size(path);
-  if (n > 0) {
-    dr_fill(by, path, n);
+// The first directory on $PATH that holds name, or "." when none does.
+dr_which(string name) {
+  string[] dirs = str_split(env_text("PATH"), ":");
+  string pdir = "";
+  int i = 0;
+} chain (string name) {
+  while (i < len(dirs) && pdir == "") {
+    pdir = dr_pick(dirs[i], name);
+    i = i + 1;
   }
-} return int[] by;
-given tf_file("ab") ((import tf_path)):([97, 98]) then tf_rm:(0)
-given tf_file("") ((import tf_path)):([]) then tf_rm:(0)
-("/nonexistent/idrun-bytes"):([])
+  if (pdir == "") {
+    pdir = ".";
+  }
+} return string pdir;
+given idstd_exec_t_tree given env_put("PATH", (import idstd_exec_root)) ("a"):((import idstd_exec_root)) then idstd_exec_t_done:(1)
+given idstd_exec_t_tree given env_put("PATH", (import idstd_exec_root)) ("zz_none"):(".") then idstd_exec_t_done:(1)
 
-dr_fill(int[] by, string path, int n) {
-  lst_fill(by, n, 0);
-  int h = fs_open(path, "r");
-  int got = fs_read(h, by, n);
-} chain (int[] by, string path, int n) {
-  int shut = fs_close(h);
-  while (len(by) > got) {
-    pop(by);
+dr_pick(string dir, string name) {
+  string pfound = "";
+  if (fs_exists(dir + "/" + name) == 1) {
+    pfound = dir;
   }
-} return void;
-given tf_file("abc") ([], (import tf_path), 3):([97, 98, 99], (import tf_path), 3) then tf_rm:(0)
-given tf_file("abc") ([], (import tf_path), 2):([97, 98], (import tf_path), 2) then tf_rm:(0)
-given tf_file("abc") ([], (import tf_path), 5):([97, 98, 99], (import tf_path), 5) then tf_rm:(0)
+} return string pfound;
+given idstd_exec_t_tree ((import idstd_exec_root), "a"):((import idstd_exec_root)) then idstd_exec_t_done:(1)
+given idstd_exec_t_tree ((import idstd_exec_root), "zz"):("") then idstd_exec_t_done:(1)

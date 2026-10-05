@@ -4,7 +4,7 @@ dr_consts(string dir) {
   string path = dir + "/conf.id";
   string frag = "";
   if (fs_exists(path) == 1) {
-    frag = dr_conf(dr_bytes(path));
+    frag = dr_conf(fs_read_bytes(path));
   }
 } return string frag;
 given tf_tree ((import tf_root)):("printf '#const\\n%s\\n' 'int k = 3;'; ") then tf_rmtree:(0)
