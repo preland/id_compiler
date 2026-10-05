@@ -46,6 +46,7 @@ usage() {
     echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O 0|1|2|3|s] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std] [--exports list|all] [--no-js]" >&2
     echo "       idc PATH [--diagnostics human|json|plain] [--color auto|always|never]    how diagnostics are printed (docs/DIAGNOSTICS.md)" >&2
     echo "       idc --explain CODE                                                       the long explanation of an error code, e.g. E0501" >&2
+    echo "       idc --where NAME [PATH]                                                  FILE:LINE and signature of a function, in PATH or idstd; NAME or FILE::NAME" >&2
 }
 
 PATH_ARG=""
@@ -91,10 +92,11 @@ CONSTS=()            # constant declarations from every conf.id reached
 STRUCT_VIOLATIONS=0
 # How diagnostics are printed (docs/DIAGNOSTICS.md): human is a source snippet
 # with a caret under each, json is one object per line, plain is the compiler's
-# own text; the colour is only ever on for a terminal.
-DIAG_FORMAT="${IDC_DIAGNOSTICS:-human}"
+# own text; the colour is only ever on for a terminal. The default, auto, is human on a terminal and plain when stderr is piped, so a grep or a parser sees FILE:LINE: error: ... as it always has.
+DIAG_FORMAT="${IDC_DIAGNOSTICS:-auto}"
 DIAG_COLOR=auto
 EXPLAIN=""
+WHERE=""
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -150,6 +152,8 @@ while [ $# -gt 0 ]; do
             DIAG_COLOR="${2:?idc: --color needs auto, always or never}"; shift 2 ;;
         --explain)
             EXPLAIN="${2:?idc: --explain needs an error code, such as E0501}"; shift 2 ;;
+        --where)
+            WHERE="${2:?idc: --where needs a function name, such as add or src/a.id::add}"; shift 2 ;;
         --no-js)
             NO_JS=1; shift ;;
         --no-std)
@@ -191,6 +195,9 @@ done
 if [ -n "${1:-}" ] && [ -z "$PATH_ARG" ]; then
     PATH_ARG="$1"; shift
 fi
+if [ "$DIAG_FORMAT" = auto ]; then
+    if [ -t 2 ]; then DIAG_FORMAT=human; else DIAG_FORMAT=plain; fi
+fi
 case "$DIAG_FORMAT" in
     human|json|plain) ;;
     *) echo "idc: --diagnostics takes 'human' (a source snippet under each diagnostic), 'json' (one object per line) or 'plain' (the compiler's own text), not '$DIAG_FORMAT'" >&2
@@ -222,7 +229,7 @@ if [ -n "$EXPLAIN" ]; then
     exit $?
 fi
 
-if [ -z "$PATH_ARG" ]; then
+if [ -z "$PATH_ARG" ] && [ -z "$WHERE" ]; then
     echo "idc: missing PATH" >&2; usage; exit 2
 fi
 
@@ -319,7 +326,7 @@ fi
 # stage, a driver tool, a library pre-check) is part of its parent's work and
 # takes no second slot, which is also what keeps a nested build from waiting
 # on its own parent.
-if [ -z "${IDC_SLOT_HELD:-}" ] && command -v flock >/dev/null 2>&1; then
+if [ -z "${IDC_SLOT_HELD:-}" ] && [ -z "$WHERE" ] && command -v flock >/dev/null 2>&1; then
     idc_jobs=${IDC_JOBS:-$(( $(nproc 2>/dev/null || echo 4) / 4 ))}
     [ "$idc_jobs" -ge 1 ] 2>/dev/null || idc_jobs=1
     slot_dir="${XDG_RUNTIME_DIR:-/tmp}/idc-slots"
@@ -957,6 +964,27 @@ stale() { # stale BIN SRC_DIR -- true if BIN is missing or older than any .id un
     find "$src" -name '*.id' -newer "$bin" 2>/dev/null | grep -q . && return 0
     return 1
 }
+
+# idc --where NAME [PATH] -- where a function is defined: `FILE:LINE: SIGNATURE ->
+# TYPE` for NAME in PATH (a project directory, default the current one), and in
+# the standard library when PATH has none. NAME may be FILE::NAME to pick one of
+# several by the end of its path. It reads source text and answers without
+# parsing, so it takes no build slot and never rebuilds the compiler; tools/idwhere,
+# an `id` program, is built and cached the way tools/iddiag is, and rebuilt only
+# when its own source changes.
+if [ -n "$WHERE" ]; then
+    resolve_stdlib
+    resolve_tool_std
+    IDWHERE="$CACHE_DIR/idwhere"
+    if [ ! -x "$IDWHERE" ] || find "$ROOT/tools/idwhere" "$ROOT/tools/lib/fnhead" -name '*.id' -newer "$IDWHERE" 2>/dev/null | grep -q .; then
+        env -u IDC_NO_STD "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idwhere" -o "$IDWHERE" >&2 \
+            || { echo "idc: failed to build tools/idwhere; see the errors above" >&2; exit 1; }
+    fi
+    where_roots=("${PATH_ARG:-.}")
+    [ -f "$PATH_ARG" ] && where_roots=("$(dirname "$PATH_ARG")")
+    [ -n "$STDLIB" ] && where_roots+=("$STDLIB")
+    exec "$IDWHERE" "$WHERE" "${where_roots[@]}"
+fi
 
 # The bootstrap stages are built WITH the standard library, because they use it:
 # both call idstd's `lset`, and each used to carry a private copy of it. The

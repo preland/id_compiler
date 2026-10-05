@@ -1,0 +1,36 @@
+// A function header, the way every tool that reads source without parsing it
+// finds one: a line that begins in column 0 with a name and `(`. Test cases
+// begin with `(`, `given`, `stdin` or `timeout`, and a comment with `//`, so none
+// of them is taken for one. tools/iddiag names the function a diagnostic is in
+// with it and tools/idwhere finds a function by name with it.
+
+fh_name(string fh_line) {
+  int fh_p = str_find(fh_line, "(");
+  string fh_head = "";
+  string fh_r = "";
+} chain (string fh_line) {
+  if(fh_p > 0) {
+    fh_head = str_slice(fh_line, 0, fh_p);
+  }
+  if(fh_head != "" && fh_is_name(fh_head) == 1) {
+    fh_r = fh_head;
+  }
+} return string fh_r;
+("add(int a, int b) {"):("add")
+("given add_fixture (1):(2)"):("")
+("(1, 2):(3)"):("")
+("  helper(x);"):("")
+
+fh_is_name(string fh_s) {
+  int fh_i = 0;
+  int fh_ok = len(fh_s) > 0;
+  while(fh_i < len(fh_s) && fh_ok == 1) {
+    int fh_c = charat(fh_s, fh_i);
+    fh_ok = fh_c == 95 || chr_is_alpha(fh_c) == 1 || (fh_i > 0 && chr_is_digit(fh_c) == 1);
+    fh_i = fh_i + 1;
+  }
+} return int fh_ok;
+("a_b2"):(1)
+("2ab"):(0)
+("a b"):(0)
+(""):(0)

@@ -66,8 +66,8 @@ layout_check() {
             printf 'f%s(int x) {\n  int y = x + %s;\n} return int y;\n' "$n" "$n" > "$proj/$f"
         fi
     done
-    $BIN_IDC "$proj" --allow-untested -o "$proj.bin" > "$proj.log" 2>&1
-    if grep -qE "error: .*\[$code\]\$" "$proj.log" && grep -q "= why: " "$proj.log" && grep -q "= help: " "$proj.log"; then
+    $BIN_IDC "$proj" --allow-untested --diagnostics=human -o "$proj.bin" > "$proj.log" 2>&1
+    if grep -qE "^error\[$code\]: " "$proj.log" && grep -q "= why: " "$proj.log" && grep -q "= help: " "$proj.log"; then
         ok "layout $code: reported with its code, a why and a help"
     else
         bad "layout $code: $(grep -m2 'error' "$proj.log" | cut -c1-160 | tr '\n' '|')"
@@ -127,12 +127,14 @@ main(int argc, string[] argv) {
 EOF
     TERM=xterm $BIN_IDC "$TMP/t.id" --diagnostics=human -o "$TMP/t.bin" > "$TMP/human.out" 2>&1; rc=$?
     if [ "$rc" -eq 1 ] \
-       && grep -qE "t\.id:1: error: function 'add' has 0 test case\(s\).* \[E0501\]$" "$TMP/human.out" \
+       && grep -qE "^error\[E0501\]: function 'add' has 0 test case\(s\)" "$TMP/human.out" \
+       && grep -qE '^  --> .*t\.id:1:1$' "$TMP/human.out" && grep -qxF '  in add' "$TMP/human.out" \
+       && ! grep -qE ': error: ' "$TMP/human.out" \
        && grep -qxF '1 | add(int a, int b) {' "$TMP/human.out" \
        && grep -qE '^  \| \^\^\^$' "$TMP/human.out" \
        && grep -q '= why: ' "$TMP/human.out" && grep -q '= help: ' "$TMP/human.out" \
        && grep -qxF 'error: aborting due to 2 previous errors' "$TMP/human.out"; then
-        ok "human format: the compiler's own head line, the source line, a caret under the function name, why, help, a summary"
+        ok "human format: a rustc-style head with the place and the function, the source line, a caret under the function name, why, help, a summary"
     else
         bad "human format (rc=$rc): $(head -4 "$TMP/human.out" | tr '\n' '|')"
     fi
@@ -141,21 +143,35 @@ EOF
     else
         bad "no colour when output is not a terminal"
     fi
-    $BIN_IDC "$TMP/t.id" --color=always -o "$TMP/t.bin" > "$TMP/color.out" 2>&1
+    $BIN_IDC "$TMP/t.id" --diagnostics=human --color=always -o "$TMP/t.bin" > "$TMP/color.out" 2>&1
     if grep -q $'\033\\[1;31merror' "$TMP/color.out"; then
         ok "--color=always colours the severity"
     else
         bad "--color=always colours the severity"
     fi
-    NO_COLOR=1 $BIN_IDC "$TMP/t.id" --color=auto -o "$TMP/t.bin" > "$TMP/nocolor.out" 2>&1
+    NO_COLOR=1 $BIN_IDC "$TMP/t.id" --diagnostics=human --color=auto -o "$TMP/t.bin" > "$TMP/nocolor.out" 2>&1
     if ! grep -q $'\033' "$TMP/nocolor.out"; then
         ok "NO_COLOR keeps --color=auto plain"
     else
         bad "NO_COLOR keeps --color=auto plain"
     fi
+    $BIN_IDC "$TMP/t.id" -o "$TMP/t.bin" > "$TMP/piped.out" 2>&1; rc=$?
+    if [ "$rc" -eq 1 ] && grep -qE "t\.id:1: error: function 'add' has 0 test case\(s\).* \[E0501\]$" "$TMP/piped.out" \
+       && ! grep -qE '^error\[|^ *--> |^ *\| ' "$TMP/piped.out"; then
+        ok "default format with stderr piped is plain: FILE:LINE: error: MESSAGE [CODE], no snippet"
+    else
+        bad "default format with stderr piped (rc=$rc): $(head -3 "$TMP/piped.out" | tr '\n' '|')"
+    fi
+    IDC_DIAGNOSTICS=human $BIN_IDC "$TMP/t.id" -o "$TMP/t.bin" > "$TMP/envh.out" 2>&1
+    if grep -q '^error\[E0501\]: ' "$TMP/envh.out"; then
+        ok "IDC_DIAGNOSTICS=human overrides the piped default"
+    else
+        bad "IDC_DIAGNOSTICS=human overrides the piped default"
+    fi
     $BIN_IDC "$TMP/t.id" --diagnostics=plain -o "$TMP/t.bin" > "$TMP/plain.out" 2>&1; rc=$?
     if [ "$rc" -eq 1 ] && grep -qE "t\.id:1: error: function 'add' has 0 test case\(s\).* \[E0501\]$" "$TMP/plain.out" \
-       && grep -qxF '  at: add' "$TMP/plain.out" && ! grep -q '^ *| ' "$TMP/plain.out"; then
+       && grep -qxF '  at: add' "$TMP/plain.out" && ! grep -q '^ *| ' "$TMP/plain.out" \
+       && ! grep -qE '^error\[|^ *--> |^ *in |follows' "$TMP/plain.out"; then
         ok "plain format: the compiler's own lines, no snippet, the at/why/help/edit lines indented under the head"
     else
         bad "plain format (rc=$rc): $(head -3 "$TMP/plain.out" | tr '\n' '|')"
@@ -175,6 +191,8 @@ if (d.code !== 'E0501' || d.severity !== 'error') fail('code/severity ' + d.code
 if (d.line !== 1 || d.column !== 1 || d.end_column !== 4) fail('span ' + d.line + ':' + d.column + '-' + d.end_column);
 if (!d.file.endsWith('t.id') || !d.message.startsWith("function 'add' has 0 test case(s)")) fail('file/message');
 if (!d.why || !d.rendered.includes('^^^')) fail('why/rendered');
+if (d.function !== 'add' || d.follows !== null) fail('function/follows ' + d.function + ' ' + JSON.stringify(d.follows));
+if (!d.rendered.startsWith('error[E0501]: function')) fail('rendered head ' + d.rendered.split('\n')[0]);
 const fx = d.fixes[0];
 if (!fx || fx.applicability !== 'has-placeholders' || fx.edits.length !== 1) fail('fix ' + JSON.stringify(fx));
 const e = fx.edits[0];
@@ -190,6 +208,67 @@ EOF
         ok "json format: one object per line; code, severity, span, message, why, a fix with an edit at the right line, a summary"
     else
         bad "json format (rc=$rc): $(node "$TMP/check.js" "$TMP/json.out" 2>&1 | head -2)"
+    fi
+
+    printf 'main(int argc, string[] argv) {\n  int x 5;\n  int y = z;\n} return int 0;\n' > "$TMP/c.id"
+    $BIN_IDC "$TMP/c.id" --allow-untested --diagnostics=human -o "$TMP/c.bin" > "$TMP/c.human" 2>&1
+    $BIN_IDC "$TMP/c.id" --allow-untested --diagnostics=plain -o "$TMP/c.bin" > "$TMP/c.plain" 2>&1
+    $BIN_IDC "$TMP/c.id" --allow-untested --diagnostics=json -o "$TMP/c.bin" > "$TMP/c.json" 2>&1
+    cat > "$TMP/follow.js" <<'EOF'
+const fs = require('fs');
+const ds = fs.readFileSync(process.argv[2], 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)).filter((o) => o.kind === 'diagnostic');
+const fail = (m) => { console.log('FAIL ' + m); process.exit(1); };
+const by = (code, msg) => ds.find((o) => o.code === code && o.message.includes(msg));
+const root = by('E0101', "expected '='");
+const brace = by('E0102', "unexpected token ';'");
+const semi = by('E0301', "undefined variable ';'");
+const real = by('E0301', "undefined variable 'z'");
+if (!root || !brace || !semi || !real) fail('missing diagnostic ' + ds.map((o) => o.code + ':' + o.message).join(' | '));
+if (root.follows !== null) fail('the syntax error follows nothing');
+for (const o of [brace, semi]) if (!o.follows || o.follows.code !== 'E0101' || o.follows.line !== root.line || o.follows.file !== root.file) fail('follow-on ' + JSON.stringify(o.follows));
+if (real.follows !== null) fail('a mistake of its own on another line is not tagged: ' + JSON.stringify(real.follows));
+if (root.function !== 'main' || real.function !== 'main') fail('function ' + root.function);
+if (!semi.rendered.includes('= note: follows from the error at ') || !semi.rendered.includes(' above')) fail('rendered note');
+console.log('ok');
+EOF
+    if [ "$(grep -c '^  = note: follows from the error at .*c\.id:2 above$' "$TMP/c.human")" = 2 ] \
+       && [ "$(grep -c '^error\[' "$TMP/c.human")" = 4 ] && ! grep -q 'follows' "$TMP/c.plain" \
+       && [ "$(grep -c ': error: ' "$TMP/c.plain")" = 4 ]; then
+        ok "after a syntax error, the diagnostics it caused are tagged 'follows from' (human) and left as they were (plain), not suppressed"
+    else
+        bad "follow-on tagging, human/plain: $(grep -c 'follows' "$TMP/c.human") notes, $(grep -c '^error\[' "$TMP/c.human") errors"
+    fi
+    if ! command -v node >/dev/null 2>&1; then
+        echo "SKIP: follow-on tagging in json (needs node on PATH)"
+    elif [ "$(node "$TMP/follow.js" "$TMP/c.json" 2>&1)" = ok ]; then
+        ok "json: a diagnostic caused by a syntax error carries follows {file, line, code}; the real error on the next line and the syntax error carry null"
+    else
+        bad "follow-on tagging, json: $(node "$TMP/follow.js" "$TMP/c.json" 2>&1 | head -2)"
+    fi
+
+    mkdir -p "$TMP/wh/sub" "$TMP/wh/.hid"
+    printf 'f() {\n} return void;\n' > "$TMP/wh/a.id"
+    printf '// c\ng(int x) {\n} return int x;\n' > "$TMP/wh/sub/b.id"
+    printf 'g(string s) {\n} return string s;\n' > "$TMP/wh/.hid/c.id"
+    out=$($BIN_IDC --where g "$TMP/wh" 2>&1); rc=$?
+    if [ "$rc" -eq 0 ] && [ "$out" = "$TMP/wh/sub/b.id:2: g(int x) -> int" ]; then
+        ok "--where NAME PATH prints FILE:LINE, the signature and the return type, and does not enter a hidden directory"
+    else
+        bad "--where NAME PATH (rc=$rc): $out"
+    fi
+    out=$($BIN_IDC --where sub/b.id::g "$TMP/wh" 2>&1); out2=$($BIN_IDC --where other.id::g "$TMP/wh" 2>&1); rc=$?
+    if [ "$out" = "$TMP/wh/sub/b.id:2: g(int x) -> int" ] && [ "$rc" -eq 1 ] && printf '%s' "$out2" | grep -q "no function 'other.id::g'"; then
+        ok "--where FILE::NAME keeps only the functions of that file, and a miss names what to check"
+    else
+        bad "--where FILE::NAME (rc=$rc): $out / $out2"
+    fi
+    start=$(date +%s%N); $BIN_IDC --where no_such_function_zz ../compiler > /dev/null 2>&1; end=$(date +%s%N)
+    start2=$(date +%s%N); $BIN_IDC --where no_such_function_zz ../compiler > /dev/null 2>&1; end2=$(date +%s%N)
+    ms=$(( (end2 - start2) / 1000000 ))
+    if [ "$ms" -lt 1000 ]; then
+        ok "--where scans the whole compiler tree in ${ms} ms warm (limit 1000)"
+    else
+        bad "--where on the compiler took ${ms} ms warm; the limit is 1000"
     fi
 
     layout_check E0701 'main.id a.id' 'b.id c.id d.id' ''

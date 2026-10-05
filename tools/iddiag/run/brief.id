@@ -17,9 +17,9 @@ dg_show_human(string dg_sh_b, int dg_sh_on, string[] dg_sh_seen) {
   }
   string dg_sh_r = dg_human(dg_sh_s, dg_sh_on);
 } return string dg_sh_r;
-("sample.txt:1: error: x [E0001]\n  why: w\n  help: h", 0, ["E0001"]):("sample.txt:1: error: x [E0001]\n  |\n1 | first line\n  = why: (as for the first [E0001] above)")
-("sample.txt:1: error: x [E0001]\n  why: w\n  help: h", 0, []):("sample.txt:1: error: x [E0001]\n  |\n1 | first line\n  = why: w\n  = help: h")
-("sample.txt:1: error: x\n  why: w", 0, ["E0001"]):("sample.txt:1: error: x\n  |\n1 | first line\n  = why: w")
+("sample.txt:1: error: x [E0001]\n  why: w\n  help: h", 0, ["E0001"]):("error[E0001]: x\n  --> sample.txt:1\n  |\n1 | first line\n  = why: (as for the first [E0001] above)")
+("sample.txt:1: error: x [E0001]\n  why: w\n  help: h", 0, []):("error[E0001]: x\n  --> sample.txt:1\n  |\n1 | first line\n  = why: w\n  = help: h")
+("sample.txt:1: error: x\n  why: w", 0, ["E0001"]):("error: x\n  --> sample.txt:1\n  |\n1 | first line\n  = why: w")
 
 // The block without its why and help: the reasoning and the advice that the first
 // diagnostic of the code already gave, in place of which one line says so.

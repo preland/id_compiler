@@ -1,0 +1,46 @@
+// One source file, asked for the function called NAME: `LINE: SIGNATURE -> TYPE`,
+// or "" when the file does not define one. A definition is NAME and `(` at the
+// start of a line; the text is searched, not parsed.
+
+iw_scan(string iw_sp, string iw_sn) {
+  string iw_stx = fs_read_text(iw_sp);
+  int iw_sat = str_find("\n" + iw_stx, "\n" + iw_sn + "(");
+  string iw_srow = "";
+} chain (string iw_sp, string iw_sn) {
+  if(iw_sat >= 0) {
+    iw_srow = iw_row(iw_stx, iw_sat);
+  }
+} return string iw_srow;
+given fs_temp_text("// c\nf(int a) {\n} return int a;\n") ((import fs_temp_path), "f"):("2: f(int a) -> int")
+given fs_temp_text("// c\nf(int a) {\n} return int a;\n") ((import fs_temp_path), "g"):("")
+("/nonexistent/iw_scan.id", "f"):("")
+
+iw_row(string iw_rt, int iw_rat) {
+  int iw_reol = str_findat(iw_rt, "\n", iw_rat);
+  string iw_rhead = str_slice(iw_rt, iw_rat, iw_reol - iw_rat);
+  string iw_rbefore = str_slice(iw_rt, 0, iw_rat);
+} chain (string iw_rt, int iw_rat) {
+  string[] iw_rls = str_split(iw_rbefore, "\n");
+  string iw_rsig = fh_sig(iw_rhead);
+  string iw_rtype = iw_ret(iw_rt, iw_rat);
+} chain (string iw_rt, int iw_rat) {
+  int iw_rn = len(iw_rls);
+  string iw_rres = "" + iw_rn + ": " + iw_rsig + " -> " + iw_rtype;
+} return string iw_rres;
+("a(int p) {\n} return string s;\n", 0):("1: a(int p) -> string")
+("k\n\nb() {\n} return void;\n", 3):("3: b() -> void")
+
+iw_ret(string iw_tt, int iw_tat) {
+  int iw_tr = str_findat(iw_tt, "\n} return ", iw_tat);
+  string iw_tw = "?";
+  int iw_tsemi = str_findat(iw_tt, ";", iw_tr + 1);
+} chain (string iw_tt, int iw_tat) {
+  if(iw_tr >= 0) {
+    string iw_tclause = str_slice(iw_tt, iw_tr + 10, iw_tsemi - iw_tr - 10);
+    string[] iw_twl = str_words(iw_tclause);
+    iw_tw = iw_twl[0];
+  }
+} return string iw_tw;
+("f() {\n} return int x;\n", 0):("int")
+("f() {\n} return void;\n():()\n", 0):("void")
+("f() {\n", 0):("?")

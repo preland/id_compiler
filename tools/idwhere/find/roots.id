@@ -1,0 +1,44 @@
+// The roots in the order given, stopping at the first that has the function: a
+// project's own function hides none of the standard library's, because a name is
+// unique across a build. Prints the rows found; answers 0 when there were some,
+// 1 when there were none, and then says what to try.
+
+iw_roots(string iw_xarg, string[] iw_xroots) {
+  string iw_xname = iw_name_of(iw_xarg);
+  string iw_xfile = iw_file_of(iw_xarg);
+  int iw_xi = 0;
+} chain (string iw_xarg, string[] iw_xroots) {
+  int iw_xn = 0;
+  while(iw_xi < len(iw_xroots) && iw_xn == 0) {
+    iw_xn = iw_show(iw_xroots[iw_xi], iw_walk(iw_xroots[iw_xi], iw_xname, iw_xfile));
+    iw_xi = iw_xi + 1;
+  }
+  int iw_xcode = iw_xn == 0;
+} chain (string iw_xarg, string[] iw_xroots) {
+  if(iw_xn == 0) {
+    eprint("idwhere: no function '" + iw_xarg + "' under " + str_join(iw_xroots, ", ") + "; NAME is the exact function name (or FILE::NAME, FILE being the end of its path), so check the spelling, and pass the project and the standard library as roots");
+  }
+} return int iw_xcode;
+("iw_usage", ["."]):(0) then prints:("main.id:11: iw_usage() -> void\n")
+("nonexistent_iw_fn", ["."]):(1) then prints:("") then eprints:("idwhere: no function 'nonexistent_iw_fn' under .; NAME is the exact function name (or FILE::NAME, FILE being the end of its path), so check the spelling, and pass the project and the standard library as roots\n")
+("find/tree.id::iw_tree_make", [".", "/nonexistent_iw_root"]):(0) then prints:("find/tree.id:7: iw_tree_make() -> void\n")
+("find/walk.id::iw_visit", ["."]):(0) then prints:("find/walk.id:19: iw_visit(string[] iw_vtodo, string[] iw_vrows, string iw_vroot, string iw_vdir, string iw_vname, string iw_vfile) -> void\n")
+
+iw_show(string iw_hroot, string[] iw_hrows) {
+  int iw_hi = 0;
+  while(iw_hi < len(iw_hrows)) {
+    print(iw_shown(iw_hroot, iw_hrows[iw_hi]));
+    iw_hi = iw_hi + 1;
+  }
+} return int iw_hi;
+("/nonexistent_iw_root", ["a.id:1: f() -> void", "b.id:2: g() -> void"]):(2) then prints:("/nonexistent_iw_root/a.id:1: f() -> void\n/nonexistent_iw_root/b.id:2: g() -> void\n")
+(".", []):(0) then prints:("")
+
+iw_shown(string iw_nroot, string iw_nrow) {
+  string iw_npath = path_join(iw_nroot, iw_nrow);
+  if(str_starts(iw_npath, "./") == 1) {
+    iw_npath = str_slice(iw_npath, 2, len(iw_npath) - 2);
+  }
+} return string iw_npath;
+(".", "a.id:1: f() -> void"):("a.id:1: f() -> void")
+("d/e", "a.id:1: f() -> void"):("d/e/a.id:1: f() -> void")

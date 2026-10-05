@@ -1,0 +1,40 @@
+// Which earlier diagnostic a later one follows from. After a syntax error the
+// parser skips tokens to recover, so the stages after it see a program that is not
+// the one written, and what they report on that spot is the same mistake again
+// (`int x 5;` gives `undefined variable ';'`). The record keeps those diagnostics
+// and says which error they follow.
+//
+// A diagnostic follows the first earlier syntax error of the same file and line;
+// a semantic one that names a symbol which is not a name (`undefined variable
+// ';'`, `a block in ':'`) follows the nearest earlier syntax error of its file,
+// because only recovery produces such a name. Anything else, even in the same
+// function, is a mistake of its own and is not tagged.
+
+dg_follows(string dg_fl_h, string[] dg_fl_roots) {
+  string dg_fl_f = dg_file(dg_fl_h);
+  int dg_fl_n = dg_ln(dg_fl_h);
+  string dg_fl_r = dg_root_line(dg_fl_roots, dg_fl_f, dg_fl_n);
+} chain (string dg_fl_h, string[] dg_fl_roots) {
+  if(dg_fl_r == "" && dg_is_syntax(dg_fl_h) == 0 && dg_artefact(dg_fl_h) == 1) {
+    dg_fl_r = dg_root_near(dg_fl_roots, dg_fl_f, dg_fl_n);
+  }
+} return string dg_fl_r;
+("a.id:2: error: undefined variable ';' [E0301]", ["a.id:2: error: expected '=' [E0101]"]):("a.id:2: error: expected '=' [E0101]")
+("a.id:5: error: undefined variable 'z' [E0301]", ["a.id:2: error: expected '=' [E0101]"]):("")
+("a.id:9: error: no such function ')' [E0304]", ["a.id:2: error: x [E0101]", "a.id:7: error: y [E0101]"]):("a.id:7: error: y [E0101]")
+("a.id:2: error: unexpected token ';' [E0102]", ["a.id:2: error: expected '=' [E0101]"]):("a.id:2: error: expected '=' [E0101]")
+
+dg_root_line(string[] dg_rl_roots, string dg_rl_f, int dg_rl_n) {
+  int dg_rl_i = 0;
+  string dg_rl_r = "";
+  while(dg_rl_i < len(dg_rl_roots) && dg_rl_r == "") {
+    if(dg_file(dg_rl_roots[dg_rl_i]) == dg_rl_f && dg_ln(dg_rl_roots[dg_rl_i]) == dg_rl_n) {
+      dg_rl_r = dg_rl_roots[dg_rl_i];
+    }
+    dg_rl_i = dg_rl_i + 1;
+  }
+} return string dg_rl_r;
+(["a.id:2: error: x", "a.id:2: error: y"], "a.id", 2):("a.id:2: error: x")
+(["a.id:2: error: x", "b.id:3: error: y"], "a.id", 3):("")
+([], "a.id", 1):("")
+

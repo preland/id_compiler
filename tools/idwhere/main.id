@@ -1,0 +1,29 @@
+// idwhere NAME ROOT... -- where a function is defined, without a file path.
+//
+// Prints one `FILE:LINE: SIGNATURE -> RETURN_TYPE` row for each function called
+// NAME under the first ROOT that has one, so `idc --where NAME` can look in the
+// project and then in the standard library. NAME may be qualified, FILE::NAME,
+// to pick one of several functions of that name by the end of its path. It reads
+// source text and does not parse it (lib/fnhead), which is why it answers in
+// well under a second on the compiler's own tree. Exit status 0 when a row was
+// printed, 1 when none was.
+
+iw_usage() {
+  eprint("usage: idwhere NAME ROOT...    (NAME or FILE::NAME; see idc --where)");
+} return void;
+():() then eprints:("usage: idwhere NAME ROOT...    (NAME or FILE::NAME; see idc --where)\n")
+():() then prints:("") then eprints:("usage: idwhere NAME ROOT...    (NAME or FILE::NAME; see idc --where)\n")
+
+main(int argc, string[] argv) {
+  int iw_code = 1;
+  string[] iw_rootl = lst_str_tail(argv, 2);
+  if(argc < 3) {
+    iw_usage();
+  }
+} chain (int argc, string[] argv) {
+  if(argc >= 3) {
+    iw_code = iw_roots(argv[1], iw_rootl);
+  }
+} return int iw_code;
+(1, ["idwhere"]):(1) then eprints:("usage: idwhere NAME ROOT...    (NAME or FILE::NAME; see idc --where)\n")
+(3, ["idwhere", "iw_usage", "."]):(0) then prints:("main.id:11: iw_usage() -> void\n")

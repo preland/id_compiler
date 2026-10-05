@@ -295,7 +295,7 @@ sed -i 's/1 + a/a + 2/' "$SLOW/leaf.id"
 slow_build sc5
 if [ "$(rc_of sc5)" -ne 0 ] && [ "$(ms_of sc5)" -lt 3000 ] \
    && grep -q 'leaf.id:4: test failed: slow_leaf(1) = 3, expected 2' "$TMP/sc5.out" \
-   && grep -q 'leaf.id:11: not run: slow_caller(1) depends on slow_leaf, whose case at .*leaf.id:4 failed' "$TMP/sc5.out" \
+   && grep -q "more not run, because a function they call failed a case (the first failure was a case of 'slow_leaf' at .*leaf.id:4;" "$TMP/sc5.out" \
    && ! grep -q 'test failed: slow_caller' "$TMP/sc5.out"; then
     ok "a callee's broken edit fails its own cases, and its caller's are not run ($(ms_of sc5)ms)"
 else

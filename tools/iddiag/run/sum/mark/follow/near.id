@@ -1,0 +1,35 @@
+// The earlier syntax error nearest a line of a file: the last one at or above the
+// line, or when every one is below it the last one of the file. "" when the file
+// has none.
+
+dg_root_near(string[] dg_rn_roots, string dg_rn_f, int dg_rn_n) {
+  int dg_rn_best = dg_root_best(dg_rn_roots, dg_rn_f, dg_rn_n);
+  int dg_rn_k = dg_rn_best;
+  string dg_rn_r = "";
+} chain (string[] dg_rn_roots, string dg_rn_f, int dg_rn_n) {
+  if(dg_rn_best < 0) {
+    dg_rn_k = dg_root_best(dg_rn_roots, dg_rn_f, 0 - 1);
+  }
+  if(dg_rn_k >= 0) {
+    dg_rn_r = dg_rn_roots[dg_rn_k];
+  }
+} return string dg_rn_r;
+(["a.id:2: error: x", "a.id:7: error: y"], "a.id", 9):("a.id:7: error: y")
+(["a.id:5: error: x", "a.id:7: error: y"], "a.id", 3):("a.id:7: error: y")
+(["a.id:2: error: x", "a.id:7: error: y"], "a.id", 4):("a.id:2: error: x")
+(["b.id:2: error: x"], "a.id", 4):("")
+
+dg_root_best(string[] dg_rb_roots, string dg_rb_f, int dg_rb_n) {
+  int dg_rb_i = 0;
+  int dg_rb_k = 0 - 1;
+  while(dg_rb_i < len(dg_rb_roots)) {
+    if(dg_file(dg_rb_roots[dg_rb_i]) == dg_rb_f && (dg_rb_n < 0 || dg_ln(dg_rb_roots[dg_rb_i]) <= dg_rb_n)) {
+      dg_rb_k = dg_rb_i;
+    }
+    dg_rb_i = dg_rb_i + 1;
+  }
+} return int dg_rb_k;
+(["a.id:2: error: x", "a.id:7: error: y"], "a.id", 4):(0)
+(["a.id:2: error: x", "a.id:7: error: y"], "a.id", -1):(1)
+(["a.id:9: error: x"], "a.id", 4):(-1)
+(["a.id:2: error: x"], "b.id", 4):(-1)

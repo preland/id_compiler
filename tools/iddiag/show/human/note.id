@@ -56,8 +56,12 @@ dg_note(string dg_no_l, int dg_no_w, int dg_no_on) {
   if(dg_no_k == "edit") {
     dg_no_r = dg_edit_text(dg_no_v, str_repeat(" ", dg_no_w), dg_no_on);
   }
+  if(dg_no_k == "follows") {
+    dg_no_r = dg_no_p + dg_paint("note", "1;36", dg_no_on) + ": follows from the error at " + dg_prefix(dg_no_v) + " above";
+  }
 } return string dg_no_r;
 ("  why: a", 1, 0):("  = why: a")
 ("  help: b", 1, 0):("  = help: b")
 ("  related: x.id:4: note: first defined here", 1, 0):("  = note: first defined here (x.id:4)")
+("  follows: a.id:4: error: x [E0101]", 1, 0):("  = note: follows from the error at a.id:4 above")
 ("  at: x", 1, 0):("")

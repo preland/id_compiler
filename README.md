@@ -68,9 +68,11 @@ cannot see, which is also why the driver exists.
 with a stable code (`... [E0501]`); the lines under it say why the rule exists
 and what to do, and an edit that does it when there is one. `--diagnostics
 human|json|plain` chooses how `bin/idc` prints them (`tools/iddiag` renders the
-snippet and the JSON; colour only on a terminal, never with `NO_COLOR`), and `idc
---explain E0501` prints the long explanation from
-[`docs/ERRORS.md`](../docs/ERRORS.md). See
+snippet and the JSON; colour only on a terminal, never with `NO_COLOR`; a tool
+that parses the output asks for `plain`, whose head is `FILE:LINE: error: MESSAGE
+[CODE]`), `idc --explain E0501` prints the long explanation from
+[`docs/ERRORS.md`](../docs/ERRORS.md), and `idc --where NAME [PATH]` prints
+`FILE:LINE` and the signature of a function, in PATH or in idstd. See
 [`docs/DIAGNOSTICS.md`](../docs/DIAGNOSTICS.md).
 
 **Memory ceiling:** every subprocess that does real compilation work —

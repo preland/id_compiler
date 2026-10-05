@@ -1,5 +1,5 @@
 // The key of a continuation line: `  why: text` is `why`. A line that is not
-// one of the five keys the compiler prints (why, help, at, edit, related) has no
+// one of the keys a block carries (why, help, at, edit, related, and the follows and in that dg_mark adds) has no
 // key, which is what keeps an ordinary indented line of some other tool's output
 // from being folded into the diagnostic above it.
 dg_key(string dg_kl) {
@@ -9,13 +9,14 @@ dg_key(string dg_kl) {
     dg_kk = str_slice(dg_kl, 2, dg_kp - 2);
   }
 } chain (string dg_kl) {
-  int dg_ks = str_find(" why help at edit related ", " " + dg_kk + " ");
+  int dg_ks = str_find(" why help at edit related follows in ", " " + dg_kk + " ");
   if(dg_ks < 0) {
     dg_kk = "";
   }
 } return string dg_kk;
 ("  why: because"):("why")
 ("  related: a.id:1: x"):("related")
+("  in: dg_x"):("in")
 ("  note: something else"):("")
 ("a.id:1: error: x"):("")
 

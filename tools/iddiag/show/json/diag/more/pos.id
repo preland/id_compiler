@@ -1,4 +1,5 @@
-// The first fields of a diagnostic's JSON object: what it is and where.
+// The first fields of a diagnostic's JSON object: what it is, where, and which
+// earlier diagnostic it follows from.
 
 // The span of the text a diagnostic underlines, or nulls when the compiler named
 // none or it is not on the line. Columns count bytes from 1; the end is
@@ -26,3 +27,17 @@ dg_jhead(string dg_jh_h) {
 } return string dg_jh_r;
 ("a.id:5: error: x [E0100]"):("\"severity\":\"error\",\"code\":\"E0100\",\"file\":\"a.id\",\"line\":5")
 ("a.id:5: note: x"):("\"severity\":\"note\",\"code\":null,\"file\":\"a.id\",\"line\":5")
+
+// The diagnostic this one follows from (run/sum/mark), as {file, line, code}, or
+// null when it follows from none.
+dg_jfollow(string dg_fw_b) {
+  string dg_fw_h = dg_val(dg_fw_b, "follows");
+  string dg_fw_r = "null";
+  string dg_fw_c = dg_code(dg_fw_h);
+} chain (string dg_fw_b) {
+  if(dg_fw_h != "") {
+    dg_fw_r = "{\"file\":" + dg_jq(dg_file(dg_fw_h)) + ",\"line\":" + dg_ln(dg_fw_h) + ",\"code\":" + dg_jq(dg_fw_c) + "}";
+  }
+} return string dg_fw_r;
+("h\n  follows: a.id:3: error: x [E0101]"):("{\"file\":\"a.id\",\"line\":3,\"code\":\"E0101\"}")
+("h\n  why: w"):("null")

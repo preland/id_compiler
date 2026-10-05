@@ -4,7 +4,9 @@
 // and writes them again for a person -- a source snippet with a caret under the
 // text each one names, and its why and help lines -- or, with --format=json, one
 // JSON object per line. bin/idc runs it on its own diagnostics; it is also the
-// way to re-render a saved log. Lines that are not diagnostics pass through.
+// way to re-render a saved log. Lines that are not diagnostics pass through. Each
+// diagnostic is also given the function it is in and, after a syntax error, the
+// error it follows from (run/sum/mark).
 
 main(int argc, string[] argv) {
   int dg_mn_j = lst_str_index(argv, "--format=json") >= 0;
@@ -13,11 +15,11 @@ main(int argc, string[] argv) {
 } chain (int argc, string[] argv) {
   dg_run(dg_mn_t, dg_mn_j, dg_mn_c);
 } return int 0;
-stdin "sample.txt:2: error: bad [E0100]\n  at: count\n" (1, ["iddiag"]):(0) then prints:("sample.txt:2: error: bad [E0100]\n  |\n2 |   int count = 1;\n  |       ^^^^^\nerror: aborting due to 1 previous error\nSome errors have detailed explanations: E0100.\nFor more information about an error, try `idc --explain E0100`.\n")
-stdin "sample.txt:2: error: bad\nplain\n" (2, ["iddiag", "--format=json"]):(0) then prints:("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"rendered\":\"sample.txt:2: error: bad\\n  |\\n2 |   int count = 1;\"}\n{\"kind\":\"text\",\"text\":\"plain\"}\n{\"kind\":\"summary\",\"errors\":1,\"warnings\":0,\"codes\":[]}\n")
+stdin "sample.txt:2: error: bad [E0100]\n  at: count\n" (1, ["iddiag"]):(0) then prints:("error[E0100]: bad\n  --> sample.txt:2:7\n  |\n2 |   int count = 1;\n  |       ^^^^^\nerror: aborting due to 1 previous error\nSome errors have detailed explanations: E0100.\nFor more information about an error, try `idc --explain E0100`.\n")
+stdin "sample.txt:2: error: bad\nplain\n" (2, ["iddiag", "--format=json"]):(0) then prints:("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"function\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"follows\":null,\"rendered\":\"error: bad\\n  --> sample.txt:2\\n  |\\n2 |   int count = 1;\"}\n{\"kind\":\"text\",\"text\":\"plain\"}\n{\"kind\":\"summary\",\"errors\":1,\"warnings\":0,\"codes\":[]}\n")
 
 dg_run(string dg_rn_t, int dg_rn_j, int dg_rn_c) {
-  string[] dg_rn_b = dg_blocks(dg_rn_t);
+  string[] dg_rn_b = dg_mark(dg_blocks(dg_rn_t));
   dg_print_all(dg_rn_b, dg_rn_j, dg_rn_c);
   string dg_rn_s = dg_summary(dg_rn_b, dg_rn_j);
 } chain (string dg_rn_t, int dg_rn_j, int dg_rn_c) {
@@ -25,7 +27,7 @@ dg_run(string dg_rn_t, int dg_rn_j, int dg_rn_c) {
     print(dg_rn_s);
   }
 } return void;
-("sample.txt:1: note: n\n", 0, 0):() then prints:("sample.txt:1: note: n\n  |\n1 | first line\n")
+("sample.txt:1: note: n\n", 0, 0):() then prints:("note: n\n  --> sample.txt:1\n  |\n1 | first line\n")
 ("x\n", 1, 0):() then prints:("{\"kind\":\"text\",\"text\":\"x\"}\n{\"kind\":\"summary\",\"errors\":0,\"warnings\":0,\"codes\":[]}\n")
 
 dg_print_all(string[] dg_pa_b, int dg_pa_j, int dg_pa_c) {
@@ -43,4 +45,4 @@ dg_print_all(string[] dg_pa_b, int dg_pa_j, int dg_pa_c) {
 } return void;
 (["a"], 0, 0):() then prints:("a\n")
 (["a", "b"], 1, 0):() then prints:("{\"kind\":\"text\",\"text\":\"a\"}\n{\"kind\":\"text\",\"text\":\"b\"}\n")
-(["sample.txt:1: error: x [E0001]\n  why: w", "sample.txt:3: error: y [E0001]\n  why: w"], 0, 0):() then prints:("sample.txt:1: error: x [E0001]\n  |\n1 | first line\n  = why: w\nsample.txt:3: error: y [E0001]\n  |\n3 | third line\n  = why: (as for the first [E0001] above)\n")
+(["sample.txt:1: error: x [E0001]\n  why: w", "sample.txt:3: error: y [E0001]\n  why: w"], 0, 0):() then prints:("error[E0001]: x\n  --> sample.txt:1\n  |\n1 | first line\n  = why: w\nerror[E0001]: y\n  --> sample.txt:3\n  |\n3 | third line\n  = why: (as for the first [E0001] above)\n")

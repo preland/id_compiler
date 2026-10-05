@@ -1,0 +1,54 @@
+// What the stream says about a diagnostic that the compiler's own text does not:
+// the diagnostic it follows from, and the function it is in. Each is added as one
+// more indented line under the head (`follows: HEAD`, `in: NAME`), so that the
+// human and the JSON views read them the way they read `why:` and `help:`; a line
+// the compiler printed itself is kept and not added twice.
+
+dg_mark(string[] dg_mk_b) {
+  string[] dg_mk_roots = [];
+  string[] dg_mk_o = [];
+  int dg_mk_i = 0;
+} chain (string[] dg_mk_b) {
+  while(dg_mk_i < len(dg_mk_b)) {
+    push(dg_mk_o, dg_mark_one(dg_mk_b[dg_mk_i], dg_mk_roots));
+    dg_mk_i = dg_mk_i + 1;
+  }
+} return string[] dg_mk_o;
+(["a.id:1: error: x [E0101]", "plain"]):(["a.id:1: error: x [E0101]", "plain"])
+(["/nonexistent/a.id:1: error: x [E0101]", "/nonexistent/a.id:1: error: y [E0301]"]):(["/nonexistent/a.id:1: error: x [E0101]", "/nonexistent/a.id:1: error: y [E0301]\n  follows: /nonexistent/a.id:1: error: x [E0101]"])
+
+dg_mark_one(string dg_mo_b, string[] dg_mo_roots) {
+  string dg_mo_h = dg_head(dg_mo_b);
+  int dg_mo_n = dg_ln(dg_mo_h);
+  string dg_mo_r = dg_mo_b;
+} chain (string dg_mo_b, string[] dg_mo_roots) {
+  string dg_mo_x = "";
+  if(dg_mo_n > 0) {
+    dg_mo_x = dg_extra(dg_mo_b, dg_mo_h, dg_mo_roots);
+  }
+  string dg_mo_t = str_slice(dg_mo_b, len(dg_mo_h), len(dg_mo_b) - len(dg_mo_h));
+} chain (string dg_mo_b, string[] dg_mo_roots) {
+  if(dg_mo_x != "") {
+    dg_mo_r = dg_mo_h + dg_mo_x + dg_mo_t;
+  }
+} return string dg_mo_r;
+("plain", []):("plain")
+("/nonexistent/a.id:3: error: x\n  why: w", []):("/nonexistent/a.id:3: error: x\n  why: w")
+("/nonexistent/a.id:3: error: y [E0301]\n  why: w", ["/nonexistent/a.id:3: error: x [E0101]"]):("/nonexistent/a.id:3: error: y [E0301]\n  follows: /nonexistent/a.id:3: error: x [E0101]\n  why: w")
+
+dg_extra(string dg_ex_b, string dg_ex_h, string[] dg_ex_roots) {
+  string dg_ex_f = dg_follows(dg_ex_h, dg_ex_roots);
+  string dg_ex_n = dg_fn_of(dg_file(dg_ex_h), dg_ln(dg_ex_h));
+  string dg_ex_r = "";
+} chain (string dg_ex_b, string dg_ex_h, string[] dg_ex_roots) {
+  dg_note_root(dg_ex_roots, dg_ex_h, dg_ex_f);
+  if(dg_ex_f != "" && dg_val(dg_ex_b, "follows") == "") {
+    dg_ex_r = "\n  follows: " + dg_ex_f;
+  }
+  if(dg_ex_n != "" && dg_val(dg_ex_b, "in") == "") {
+    dg_ex_r = dg_ex_r + "\n  in: " + dg_ex_n;
+  }
+} return string dg_ex_r;
+("x.id:1: error: a [E0101]", "x.id:1: error: a [E0101]", []):("")
+("x.id:1: error: a [E0301]\n  follows: q", "x.id:1: error: a [E0301]", ["x.id:1: error: r [E0101]"]):("")
+("parse/head/where.id:4: error: x", "parse/head/where.id:4: error: x", []):("\n  in: dg_prefix")

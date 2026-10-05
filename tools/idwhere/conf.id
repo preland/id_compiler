@@ -1,0 +1,3 @@
+// The one thing the locator and tools/iddiag read source with: what a function
+// header looks like.
+import "../lib/fnhead"

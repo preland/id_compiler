@@ -1,0 +1,19 @@
+// The function a line of a file is in: the nearest header at or above it (see
+// lib/fnhead), which for a line of a function's test cases is the function they
+// are under. "" when the file cannot be read or no function starts above the line.
+
+dg_fn_of(string dg_fo_f, int dg_fo_n) {
+  string[] dg_fo_l = str_lines(dg_slurp(dg_fo_f));
+  int dg_fo_i = dg_fo_n - 1;
+  string dg_fo_r = "";
+} chain (string dg_fo_f, int dg_fo_n) {
+  while(dg_fo_i >= 0 && dg_fo_i < len(dg_fo_l) && dg_fo_r == "") {
+    dg_fo_r = fh_name(dg_fo_l[dg_fo_i]);
+    dg_fo_i = dg_fo_i - 1;
+  }
+} return string dg_fo_r;
+given fs_temp_text("// c\n\nf(int a) {\n  x;\n} return int a;\n(1):(1)\n\ng() {\n} return void;\n") ((import fs_temp_path), 4):("f")
+given fs_temp_text("// c\n\nf(int a) {\n  x;\n} return int a;\n(1):(1)\n\ng() {\n} return void;\n") ((import fs_temp_path), 6):("f")
+given fs_temp_text("// c\n\nf(int a) {\n  x;\n} return int a;\n(1):(1)\n\ng() {\n} return void;\n") ((import fs_temp_path), 8):("g")
+given fs_temp_text("// c\n\nf(int a) {\n") ((import fs_temp_path), 2):("")
+("/nonexistent/iddiag-fn.id", 3):("")

@@ -1,13 +1,19 @@
-// One block of the stream, for a person: a diagnostic gets its head line, the
-// source line it is about with a caret run under the text it names, and then its
-// why / help / edit / related lines; any other line is returned as it was.
+// One block of the stream, for a person: a diagnostic gets its head line, where it
+// is (and the function it is in), the source line it is about with a caret run
+// under the text it names, and then its why / help / edit / related lines; any
+// other line is returned as it was. The head is rustc's:
 //
-//   FILE:LINE: error: MESSAGE [E0123]
+//   error[E0123]: MESSAGE
+//     --> FILE:LINE:COLUMN
+//     in FUNCTION
 //     |
 //   12 | the source line
 //     |     ^^^^
 //     = why: the reason the rule exists
 //     = help: what to do
+//
+// The plain form keeps `FILE:LINE: error: MESSAGE [E0123]`, which is what the
+// tools that parse idc's output read; this is for a person.
 
 dg_human(string dg_hu_b, int dg_hu_on) {
   string dg_hu_h = dg_head(dg_hu_b);
@@ -15,30 +21,30 @@ dg_human(string dg_hu_b, int dg_hu_on) {
   string dg_hu_r = dg_hu_b;
 } chain (string dg_hu_b, int dg_hu_on) {
   if(dg_hu_n >= 0) {
-    string dg_hu_t = dg_title(dg_hu_h, dg_hu_on);
+    string dg_hu_t = dg_title(dg_hu_h, dg_hu_on) + dg_loc(dg_hu_b, dg_hu_h, dg_hu_on);
     string dg_hu_y = dg_body(dg_hu_b, dg_hu_h, dg_hu_on);
     dg_hu_r = dg_hu_t + dg_hu_y;
   }
 } return string dg_hu_r;
 ("not a diagnostic", 0):("not a diagnostic")
-("/nonexistent/iddiag.id:3: error: bad thing [E0123]\n  why: because\n  help: do this", 0):("/nonexistent/iddiag.id:3: error: bad thing [E0123]\n  = why: because\n  = help: do this")
-("/nonexistent/iddiag.id:3: note: only a note", 0):("/nonexistent/iddiag.id:3: note: only a note")
+("/nonexistent/iddiag.id:3: error: bad thing [E0123]\n  why: because\n  help: do this", 0):("error[E0123]: bad thing\n  --> /nonexistent/iddiag.id:3\n  = why: because\n  = help: do this")
+("/nonexistent/iddiag.id:3: note: only a note", 0):("note: only a note\n  --> /nonexistent/iddiag.id:3")
+("/nonexistent/iddiag.id:3: error: x [E0301]\n  follows: /nonexistent/iddiag.id:2: error: y [E0101]\n  in: dg_fn\n  why: z", 0):("error[E0301]: x\n  --> /nonexistent/iddiag.id:3\n  in dg_fn\n  = note: follows from the error at /nonexistent/iddiag.id:2 above\n  = why: z")
 
-// The head line with the severity and the code coloured; with colour off it is
-// the compiler's own line, so `grep ': error:'` finds it.
+// The first line: the severity with the code in brackets, and the message. Colour
+// goes on the severity and the code together, as rustc has it.
 dg_title(string dg_ti_h, int dg_ti_on) {
   string dg_ti_s = dg_sev(dg_ti_h);
-  string dg_ti_g = dg_paint(dg_ti_s, dg_sevcol(dg_ti_s), dg_ti_on);
   string dg_ti_c = dg_code(dg_ti_h);
+  string dg_ti_g = dg_ti_s;
 } chain (string dg_ti_h, int dg_ti_on) {
-  string dg_ti_k = "";
   if(dg_ti_c != "") {
-    dg_ti_k = " [" + dg_paint(dg_ti_c, "1", dg_ti_on) + "]";
+    dg_ti_g = dg_ti_s + "[" + dg_ti_c + "]";
   }
-  string dg_ti_r = dg_prefix(dg_ti_h) + ": " + dg_ti_g + ": " + dg_msg(dg_ti_h) + dg_ti_k;
+  string dg_ti_r = dg_paint(dg_ti_g, dg_sevcol(dg_ti_s), dg_ti_on) + ": " + dg_msg(dg_ti_h);
 } return string dg_ti_r;
-("a.id:2: error: bad [E0001]", 0):("a.id:2: error: bad [E0001]")
-("a.id:2: warning: odd", 0):("a.id:2: warning: odd")
+("a.id:2: error: bad [E0001]", 0):("error[E0001]: bad")
+("a.id:2: warning: odd", 0):("warning: odd")
 
 dg_sevcol(string dg_sc_s) {
   string dg_sc_r = "1;36";

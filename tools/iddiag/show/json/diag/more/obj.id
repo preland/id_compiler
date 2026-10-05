@@ -13,7 +13,7 @@ dg_json(string dg_js_b) {
   }
 } return string dg_js_r;
 ("not a diagnostic"):("{\"kind\":\"text\",\"text\":\"not a diagnostic\"}")
-("sample.txt:2: error: bad [E0100]\n  at: count"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":\"E0100\",\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_column\":12,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"rendered\":\"sample.txt:2: error: bad [E0100]\\n  |\\n2 |   int count = 1;\\n  |       ^^^^^\"}")
+("sample.txt:2: error: bad [E0100]\n  at: count"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":\"E0100\",\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_column\":12,\"function\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"follows\":null,\"rendered\":\"error[E0100]: bad\\n  --> sample.txt:2:7\\n  |\\n2 |   int count = 1;\\n  |       ^^^^^\"}")
 
 dg_jdiag(string dg_jd_b, string dg_jd_h) {
   string dg_jd_f = dg_file(dg_jd_h);
@@ -25,8 +25,21 @@ dg_jdiag(string dg_jd_b, string dg_jd_h) {
   string dg_jd_w = dg_jq(dg_val(dg_jd_b, "why"));
 } chain (string dg_jd_b, string dg_jd_h) {
   string dg_jd_m = dg_jq(dg_msg(dg_jd_h));
-  string dg_jd_o = "{\"kind\":\"diagnostic\"," + dg_jhead(dg_jd_h) + "," + dg_jd_p + ",\"message\":" + dg_jd_m;
-  string dg_jd_r = dg_jd_o + ",\"why\":" + dg_jd_w + ",\"fixes\":" + dg_jd_x + ",\"related\":" + dg_jd_l + ",\"rendered\":" + dg_jd_t + "}";
+  string dg_jd_o = "{\"kind\":\"diagnostic\"," + dg_jhead(dg_jd_h) + "," + dg_jd_p + ",\"function\":" + dg_jfn(dg_jd_b) + ",\"message\":" + dg_jd_m;
+  string dg_jd_r = dg_jd_o + ",\"why\":" + dg_jd_w + ",\"fixes\":" + dg_jd_x + ",\"related\":" + dg_jd_l + ",\"follows\":" + dg_jfollow(dg_jd_b) + ",\"rendered\":" + dg_jd_t + "}";
 } return string dg_jd_r;
-("sample.txt:3: warning: odd\n  why: because", "sample.txt:3: warning: odd"):("{\"kind\":\"diagnostic\",\"severity\":\"warning\",\"code\":null,\"file\":\"sample.txt\",\"line\":3,\"column\":null,\"end_column\":null,\"message\":\"odd\",\"why\":\"because\",\"fixes\":[],\"related\":[],\"rendered\":\"sample.txt:3: warning: odd\\n  |\\n3 | third line\\n  = why: because\"}")
-("sample.txt:2: error: bad\n  help: h\n  edit: machine\treplace\t2\tcount\ttotal\n  related: z.id:8: note: other", "sample.txt:2: error: bad"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[{\"description\":\"h\",\"applicability\":\"machine-applicable\",\"edits\":[{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"total\"}]}],\"related\":[{\"file\":\"z.id\",\"line\":8,\"message\":\"other\"}],\"rendered\":\"sample.txt:2: error: bad\\n  |\\n2 |   int count = 1;\\n  = help: h\\n  = edit: replace `count` with `total` on line 2 (machine-applicable)\\n  = note: other (z.id:8)\"}")
+("sample.txt:3: warning: odd\n  why: because", "sample.txt:3: warning: odd"):("{\"kind\":\"diagnostic\",\"severity\":\"warning\",\"code\":null,\"file\":\"sample.txt\",\"line\":3,\"column\":null,\"end_column\":null,\"function\":null,\"message\":\"odd\",\"why\":\"because\",\"fixes\":[],\"related\":[],\"follows\":null,\"rendered\":\"warning: odd\\n  --> sample.txt:3\\n  |\\n3 | third line\\n  = why: because\"}")
+("sample.txt:2: error: bad\n  help: h\n  edit: machine\treplace\t2\tcount\ttotal\n  related: z.id:8: note: other", "sample.txt:2: error: bad"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"function\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[{\"description\":\"h\",\"applicability\":\"machine-applicable\",\"edits\":[{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"total\"}]}],\"related\":[{\"file\":\"z.id\",\"line\":8,\"message\":\"other\"}],\"follows\":null,\"rendered\":\"error: bad\\n  --> sample.txt:2\\n  |\\n2 |   int count = 1;\\n  = help: h\\n  = edit: replace `count` with `total` on line 2 (machine-applicable)\\n  = note: other (z.id:8)\"}")
+("sample.txt:3: error: bad [E0301]\n  follows: sample.txt:2: error: first [E0101]\n  in: dg_fn", "sample.txt:3: error: bad [E0301]"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":\"E0301\",\"file\":\"sample.txt\",\"line\":3,\"column\":null,\"end_column\":null,\"function\":\"dg_fn\",\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"follows\":{\"file\":\"sample.txt\",\"line\":2,\"code\":\"E0101\"},\"rendered\":\"error[E0301]: bad\\n  --> sample.txt:3\\n  in dg_fn\\n  |\\n3 | third line\\n  = note: follows from the error at sample.txt:2 above\"}")
+
+// The function the diagnostic is in (run/sum/mark), quoted, or null when the
+// block does not say.
+dg_jfn(string dg_jn_b) {
+  string dg_jn_f = dg_val(dg_jn_b, "in");
+  string dg_jn_r = "null";
+  if(dg_jn_f != "") {
+    dg_jn_r = dg_jq(dg_jn_f);
+  }
+} return string dg_jn_r;
+("h\n  in: dg_fn"):("\"dg_fn\"")
+("h\n  why: w"):("null")

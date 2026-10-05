@@ -1,0 +1,32 @@
+// A scratch tree for the walk's cases, removed when the run ends:
+//   a.id       f()
+//   note.txt   a line that looks like a header of g, in a file that is not source
+//   sub/b.id   g(int x)
+//   .hid/c.id  h(), in a directory the walk must not enter
+
+iw_tree_make() {
+  export string iw_troot = fs_mktemp("idwhere_", 1);
+  int iw_tdrop = fs_drop_exit((import iw_troot));
+  int iw_tsub = fs_mkdir((import iw_troot) + "/sub");
+} chain () {
+  int iw_thid = fs_mkdir((import iw_troot) + "/.hid");
+  int iw_ta = exec_file_put((import iw_troot) + "/a.id", "f() {\n} return void;\n", 420);
+  int iw_tn = exec_file_put((import iw_troot) + "/note.txt", "\ng(int x) {\n", 420);
+} chain () {
+  int iw_tb = exec_file_put((import iw_troot) + "/sub/b.id", "g(int x) {\n} return int x;\n", 420);
+  int iw_tc = exec_file_put((import iw_troot) + "/.hid/c.id", "h() {\n} return void;\n", 420);
+} return void export iw_troot;
+():() then iw_tree_note:("\ng(int x) {\n")
+():() then iw_tree_note:("\ng(int x) {\n") then prints:("")
+
+iw_tree_note() {
+  string iw_tnote = fs_read_text((import iw_troot) + "/note.txt");
+} return string iw_tnote;
+given iw_tree_make ():("\ng(int x) {\n")
+given iw_tree_make ():("\ng(int x) {\n") then prints:("")
+
+iw_tree_text(string iw_brel) {
+  string iw_btext = fs_read_text((import iw_troot) + "/" + iw_brel);
+} return string iw_btext;
+given iw_tree_make ("a.id"):("f() {\n} return void;\n")
+given iw_tree_make ("sub/b.id"):("g(int x) {\n} return int x;\n")

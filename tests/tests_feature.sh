@@ -433,7 +433,8 @@ leaf(int a) {
 (0):() then traps:("division by zero")
 (3):(3)
 EOF
-self_refuse "bin/idc: a caller of a function whose case failed is reported not run" \
+export IDC_SHOW_NOT_RUN=1
+self_refuse "bin/idc: a caller of a function whose case failed is reported not run (IDC_SHOW_NOT_RUN lists each)" \
     "p.id:12: not run: mid(1) depends on leaf, whose case at $TMP/p.id:19 failed" --emit-c /dev/null
 grep -qF "p.id:5: not run: top(1) depends on leaf, whose case at $TMP/p.id:19 failed" "$TMP/log" \
     && grep -qF "p.id:6: not run: top(2) depends on leaf" "$TMP/log" \
@@ -446,6 +447,12 @@ top_at=$(grep -n 'p.id:5: not run' "$TMP/log" | cut -d: -f1)
 [ -n "$leaf_at" ] && [ -n "$top_at" ] && [ "$leaf_at" -lt "$top_at" ] \
     && ok "bin/idc: a callee's cases run before its callers', whatever the file order" \
     || bad "bin/idc: a callee's cases run before its callers', whatever the file order ($(cat "$TMP/log"))"
+unset IDC_SHOW_NOT_RUN
+self_refuse "bin/idc: without IDC_SHOW_NOT_RUN the cases not run are one summary line, not one line each" \
+    "idc: 1 case(s) failed; 4 more not run, because a function they call failed a case (the first failure was a case of 'leaf' at $TMP/p.id:19; set IDC_SHOW_NOT_RUN=1 to list each case not run)" --emit-c /dev/null
+! grep -q 'not run:' "$TMP/log" \
+    && ok "bin/idc: a failing case is followed by one summary line, not a line for each case that depended on it" \
+    || bad "bin/idc: a failing case is followed by one summary line, not a line for each case that depended on it ($(cat "$TMP/log"))"
 
 # other is independent of caller and leaf, and fails on its own.
 cat > "$TMP/p.id" <<'EOF'
@@ -470,8 +477,8 @@ leaf(int a) {
 EOF
 self_refuse "bin/idc: an independent function's cases still run beside a skipped caller" \
     "p.id:11: test failed: other(1) = 2, expected 3" --emit-c /dev/null
-grep -qF "p.id:5: not run: caller(1) depends on leaf, whose case at $TMP/p.id:18 failed" "$TMP/log" \
-    && grep -qF "idc: 2 case(s) failed; 2 more not run, because a function they call failed a case" "$TMP/log" \
+! grep -q 'not run:' "$TMP/log" \
+    && grep -qF "idc: 2 case(s) failed; 2 more not run, because a function they call failed a case (the first failure was a case of 'leaf' at $TMP/p.id:18" "$TMP/log" \
     && ok "bin/idc: the summary counts the failed cases and the ones not run" \
     || bad "bin/idc: the summary counts the failed cases and the ones not run ($(cat "$TMP/log"))"
 
