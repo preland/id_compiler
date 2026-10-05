@@ -239,6 +239,18 @@ EOF
 expect_output "parser: if/else + bare-= equality" \
     "(func chk (params (param int x)) int (body (decl int r 0) (if (= x 0) (then (assign r 1)) (else))) (return r))" \
     "$("$TMP/idlex" < "$TMP/p_if.id" | "$TMP/idparse" ast)"
+cat > "$TMP/p_chain.id" <<'EOF'
+f(int x) {
+  int a = 1;
+  int b = 2;
+  int c = 3;
+} chain (int x) {
+  print(a + b + c);
+} return int c;
+EOF
+expect_output "parser: ast of a chain function shows the seam" \
+    "(func f (params (param int x)) int (body (decl int a 1) (decl int b 2) (decl int c 3) (chain) (expr (call print (+ (+ a b) c)))) (return c))" \
+    "$("$TMP/idlex" < "$TMP/p_chain.id" | "$TMP/idparse" ast)"
 
 # --- stage 3 end to end: id source -> (id lexer) -> (id parser+codegen) -> C,
 #     then compiled by cc and run. The whole front+middle is written in id.

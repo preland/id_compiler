@@ -24,6 +24,8 @@ lw_ucall_rest(int node, string name) {
   string ety = lw_ety(node);
   int[] args = lw_args(node);
   int ret_i = lw_callf(name, ety, args);
+} chain (int node, string name) {
+  ret_i = lw_adopt((import ns1)[node], ret_i, ety);
 } return int ret_i;
 given ocall_fixture ((import ocall_node), "id_fx_target"):(0)
 given fcallv_fixture ((import fcallv_node), "id_gfunc"):(0)

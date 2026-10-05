@@ -225,6 +225,16 @@ static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
     }
     return L->data[--L->len];
 }
+static IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */
+    if (!f) return NULL;
+    if (f->len < 0 || (f->len > 0 && !f->data)) {
+        fprintf(stderr, "id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\n", f->len);
+        exit(1);
+    }
+    IdList* L = id_list_new();
+    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);
+    return L;
+}
 static IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */
     IdList* L = id_list_new();
     va_list ap; va_start(ap, n);

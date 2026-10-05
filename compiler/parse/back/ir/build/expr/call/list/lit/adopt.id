@@ -1,0 +1,33 @@
+// A list or struct a native returns is an IdList* its backend built with malloc,
+// which push and the end-of-life free would treat as an arena block and crash
+// on. Every call to such a native is followed by a call to the runtime's
+// id_list_adopt, which copies the cells into a list the runtime owns. The C
+// target does the same with a macro (back/tgt/c/emit/prog/head/decl/fwd.id).
+
+lw_adopt(string name, int v, string ety) {
+  int f = fn_node_of(name);
+  int ret_i = v;
+  if(lw_native_list(f, ety) == 1) {
+    ret_i = lw_callf("id_list_adopt", ety, [v]);
+  }
+} return int ret_i;
+given lw_nl_fixture ("t", 5, "int[]"):(5)
+given lw_nl_fixture ("nat", 5, "int[]"):(0)
+
+// A lowering environment holding one native, "nat", that returns int[]: node 1,
+// registered as a callable beside the fixture function "t" (node 0).
+lw_nl_fixture() {
+  lw_env_fixture();
+  int[] none = [];
+  export int nl_id = newnode("func", 0 - 1, 1, "nat", "int[]", none, none);
+} chain () {
+  add_func("nat", "int[]", (import nl_id));
+} return void;
+():() then (import nl_id):(1)
+():() then init_units:(0)
+
+lw_native_list(int f, string ety) {
+  int ok = f >= 0 && is_native(f) == 1 && (ty_is_list(ety) == 1 || ty_is_struct(ety) == 1);
+} return int ok;
+given mk_two_nodes (1, "int[]"):(1)
+given mk_two_nodes (0, "int[]"):(0)

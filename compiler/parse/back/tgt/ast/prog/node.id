@@ -1,6 +1,8 @@
 // List joiner (params or statements), node routing, and the first statement
 // form. print_node sends params to a param rendering and everything else to
-// the statement printer.
+// the statement printer. A chain seam is a node with no operands (ni1 is -1), so
+// it is rendered as `(chain)` before the statement printer, which would read
+// that -1 as an expression, ever sees it.
 
 print_list(int[] list) {
   string out = "";
@@ -15,12 +17,16 @@ given stmt_fix ([]):("")
 
 print_node(int id) {
   string s = "(param " + (import ns1)[id] + " " + (import ns2)[id] + ")";
-  if((import nkind)[id] != "param" && (import nkind)[id] != "nparam") {
+  if((import nkind)[id] != "param" && (import nkind)[id] != "nparam" && (import nkind)[id] != "chain") {
     s = print_stmt(id);
+  }
+  if((import nkind)[id] == "chain") {
+    s = "(chain)";
   }
 } return string s;
 given stmt_fix (6):("(param int p)")
 given stmt_fix (1):("(decl int y 5)")
+given stmt_fix given chain_add ([], []) (7):("(chain)")
 
 print_stmt(int id) {
   string s = "";

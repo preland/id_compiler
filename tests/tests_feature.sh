@@ -2884,6 +2884,83 @@ printf 'struct Solo {\n  int a;\n}\n\nmain(int argc, string[] argv) {\n} return 
 self_refuse "structs: a struct beside a function is refused" \
     "a struct is declared in a file of its own" --allow-untested
 
+# A list a native returns is built by C with malloc. push and the end-of-life
+# free used to treat it as an arena block and segfault (exit 139); every call to
+# a list-returning native now copies the result into a list the runtime owns, on
+# the C target (a macro over the prototype) and the LLVM target (a call after the
+# call). A malformed result traps with the fix named.
+NL="$TMP/natlist"
+mkdir -p "$NL/nb"
+cat > "$NL/nb/backend.id" <<'EOF'
+string name = "nb";
+string c_header = "nb.h";
+
+string[] c_linux_sources = ["nb.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] c_darwin_sources = ["nb.c"];
+string[] c_darwin_cflags = [];
+string[] c_darwin_link = [];
+EOF
+cat > "$NL/nb/nb.h" <<'EOF'
+#ifndef ID_NB_H
+#define ID_NB_H
+typedef struct { int len, cap; long long* data; } IdList;
+extern IdList* id_nb_three(void);
+extern IdList* id_nb_bad(void);
+#endif
+EOF
+cat > "$NL/nb/nb.c" <<'EOF'
+#include "nb.h"
+#include <stdlib.h>
+IdList* id_nb_three(void) {
+    IdList* L = malloc(sizeof(IdList));
+    L->len = 3; L->cap = 3;
+    L->data = malloc(3 * sizeof(long long));
+    L->data[0] = 5; L->data[1] = 6; L->data[2] = 7;
+    return L;
+}
+IdList* id_nb_bad(void) {
+    IdList* L = malloc(sizeof(IdList));
+    L->len = -1; L->cap = 0; L->data = NULL;
+    return L;
+}
+EOF
+cat > "$NL/nb/decl.id" <<'EOF'
+native nb_three() return int[];
+
+native nb_bad() return int[];
+EOF
+cat > "$NL/entry.id" <<'EOF'
+main(int argc, string[] argv) {
+  int[] xs = nb_three();
+  print(len(xs));
+  print(xs[0]);
+} chain (int argc, string[] argv) {
+  push(xs, 9);
+  push(xs, 10);
+  print(len(xs));
+} chain (int argc, string[] argv) {
+  print(xs[3]);
+  int s = xs[0] + xs[1] + xs[2] + xs[3] + xs[4];
+  print(s);
+} chain (int argc, string[] argv) {
+  if (argc > 1) {
+    int[] ys = nb_bad();
+  }
+} return int 0;
+EOF
+for tgt in c llvm; do
+    if ../bin/idc "$NL" --target "$tgt" --allow-untested -o "$TMP/natlist.$tgt" >"$TMP/log" 2>&1; then
+        got=$("$TMP/natlist.$tgt" 2>&1 | tr '\n' ' ')
+        if [ "$got" = "3 5 5 9 37 " ]; then ok "natives: a list returned from C can be pushed to and read ($tgt)"; else bad "natives: a list returned from C can be pushed to and read ($tgt: got '$got')"; fi
+        err=$("$TMP/natlist.$tgt" x 2>&1 >/dev/null)
+        if printf '%s' "$err" | grep -qF "a native returned a malformed list"; then ok "natives: a malformed list from C traps with the fix named ($tgt)"; else bad "natives: a malformed list from C traps with the fix named ($tgt: got '$err')"; fi
+    else
+        bad "natives: the list-returning fixture builds ($tgt: $(head -1 "$TMP/log"))"
+    fi
+done
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

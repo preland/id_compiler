@@ -3,7 +3,34 @@
 emit_fwds() {
   emit_line("/* forward declarations */");
   fwd_all();
+  fwd_adopts();
+} chain () {
   emit_line("");
 } return void;
 given nz_prog_fixture ():() then prints:("/* forward declarations */\nint id_main(int argc);\nvoid id_run(void);\n\n")
 given nz_prog_nomain_fixture ():() then prints:("/* forward declarations */\nvoid id_run(void);\n\n")
+
+// A native that returns a list or a struct hands back an IdList* its backend
+// built with malloc, which push and the end-of-life free would otherwise treat
+// as an arena block and crash on. Every call to one is wrapped so the result is
+// copied into a list this runtime owns (id_list_adopt). The macro sits after the
+// prototypes it shadows, and a function-like macro does not expand inside its
+// own expansion, so the inner call is the native itself.
+fwd_adopts() {
+  int i = 0;
+  while(i < len((import prog))) {
+    fwd_adopt_one((import prog)[i]);
+    i = i + 1;
+  }
+} return void;
+given nz_prog_fixture ():() then prints:("")
+given ll_natives_fixture2 ():() then prints:("")
+
+fwd_adopt_one(int id) {
+  string rt = (import ns2)[id];
+  if(is_native(id) == 1 && (ty_is_list(rt) == 1 || ty_is_struct(rt) == 1)) {
+    emit_line("#define id_" + (import ns1)[id] + "(...) id_list_adopt(id_" + (import ns1)[id] + "(__VA_ARGS__))");
+  }
+} return void;
+given lw_nl_fixture (1):() then prints:("#define id_nat(...) id_list_adopt(id_nat(__VA_ARGS__))\n")
+given lw_nl_fixture (0):() then prints:("")
