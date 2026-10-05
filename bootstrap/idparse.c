@@ -3688,7 +3688,7 @@ int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
     int idstd_end;
     int idstd_ok;
     idstd_end = (idstd_i + idstd_n);
-    idstd_ok = (((idstd_i >= 0) && (idstd_n >= 0)) && ((idstd_end == 0) || (id_charat(idstd_s, (idstd_end - 1)) >= 0)));
+    idstd_ok = (((idstd_i >= 0) && (idstd_n >= 0)) && ((idstd_n == 0) || (id_charat(idstd_s, (idstd_end - 1)) >= 0)));
     if ((idstd_ok == 0)) {
         id_idstd_str_span_trap(idstd_s, idstd_i, idstd_n);
     }
@@ -13263,7 +13263,7 @@ char* id_ll_cell_line(int i, int j, int e, char* t) {
     char* insn;
     insn = id_concat(id_concat(id_concat(id_concat(ID_S("ptrtoint ptr @.cs."), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(".")), id_str_of_int(j)), ID_S(" to i64"));
     if ((strcmp(t, ID_S("float")) == 0)) {
-        insn = id_concat(id_concat(ID_S("call i64 @id_box_f(double "), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S(")"));
+        insn = id_concat(id_concat(ID_S("call i64 @id_box_f(double "), id_ll_const_num(e)), ID_S(")"));
     }
     return insn;
 }
@@ -13323,10 +13323,21 @@ char* id_ll_const_val(int e, char* name) {
 char* id_ll_const_num(int e) {
     char* s;
     char* fp;
+    char* inner;
     s = (char*)(intptr_t)(id_list_get(ns1, e));
     fp = id_canon_expr(e);
     if ((id_charat(fp, 0) == 73)) {
         s = id_zeros_tail(fp, 1);
+    }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("-")) == 0))) {
+        inner = id_ll_const_num((int)(id_list_get(ni1, e)));
+        s = id_concat(ID_S("-"), inner);
+        if ((id_charat(inner, 0) == 45)) {
+            s = id_zeros_tail(inner, 1);
+        }
+    }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("~")) == 0))) {
+        s = id_concat(ID_S(""), id_str_of_int(((0 - 1) - id_to_int(id_ll_const_num((int)(id_list_get(ni1, e)))))));
     }
     return s;
 }

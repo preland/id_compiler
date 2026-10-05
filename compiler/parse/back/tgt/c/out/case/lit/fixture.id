@@ -14,6 +14,9 @@ lit_un_fixture() {
   lit_int_fixture();
   export int lit_un_e = newleaf("un", (import lit_e), 0, "-", "");
   export int lit_un_e2 = newleaf("un", (import lit_e2), 0, "-", "");
+} chain () {
+  export int lit_un_dbl = newleaf("un", (import lit_un_e), 0, "-", "");
+  export int lit_un_cpl = newleaf("un", (import lit_e), 0, "~", "");
 } return void;
 ():() then calls lit_int_fixture:[1]
 ():() then init_units:(0)

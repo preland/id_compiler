@@ -21,6 +21,8 @@ llc_float_setup() {
   env_init();
   push((import enames), "m");
   export int llc_float_e = node_float("1.5");
+} chain () {
+  export int llc_negf_e = newleaf("un", (import llc_float_e), 0, "-", "");
 } return void;
 ():() then calls node_float:("1.5")
 ():() then init_units:(0)

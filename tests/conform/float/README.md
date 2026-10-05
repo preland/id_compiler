@@ -14,6 +14,7 @@ byte, and every case here exits 0 (no `.exit` file).
 - `07-int-float-arith` — `int + float` widens the `int` operand and produces a `float` result (`3 + 2.0` prints `5`, not `5.0`, again because of `%g`).
 - `08-int-float-compare` — `<` between an `int` and a `float` widens the `int` operand for the comparison (`3 < 4.0` is true) rather than being a type error.
 - `09-float-in-list` — a `float[]` literal and indexing (`[1.5, 2.5, 3.0][1]`) round-trip the element's value exactly.
+- `11-negative-constants` — a `conf.id` float constant or `float[]` element written with a unary `-` (`-2.5`, `-0.0`, `-(-4.5)`) holds that value on every target. `--target llvm` once emitted `double -` for a list element.
 - `10-float-equality-imprecision` — `==` on `float` is bit-exact IEEE equality, not tolerance-based: `(0.1 + 0.2) == 0.3` is false even though both sides print identically as `0.3`.
 
 **Cross-target note:** `05-div-by-zero-variants`'s `0.0 / 0.0` line is the one

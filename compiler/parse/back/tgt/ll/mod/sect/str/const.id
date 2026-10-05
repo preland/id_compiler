@@ -19,16 +19,34 @@ given lit_str_fixture ((import lit_str_e), "x"):("@.cs.x")
 
 // An integer is the value the fingerprint canonicaliser folds it to (canon_expr,
 // tag I -- the same reduction the constant-wrapper rule reads); anything the
-// fold leaves alone is emitted as it is spelled, as before.
+// fold leaves alone is emitted as it is spelled, as before. A unary minus is
+// not folded by the canonicaliser, and its spelling is the bare "-", so it is
+// negated here: `-5` and `-1.5` are the value an LLVM operand can hold, and
+// `-(-5)` drops the sign instead of writing `--5`.
 ll_const_num(int e) {
   string s = (import ns1)[e];
   string fp = canon_expr(e);
   if(charat(fp, 0) == 73) {
     s = zeros_tail(fp, 1);
   }
+} chain (int e) {
+  if((import nkind)[e] == "un" && (import ns1)[e] == "-") {
+    string inner = ll_const_num((import ni1)[e]);
+    s = "-" + inner;
+    if(charat(inner, 0) == 45) {
+      s = zeros_tail(inner, 1);
+    }
+  }
+  if((import nkind)[e] == "un" && (import ns1)[e] == "~") {
+    s = "" + (0 - 1 - to_int(ll_const_num((import ni1)[e])));
+  }
 } return string s;
 given lit_int_fixture ((import lit_e)):("5")
 given lit_int_fixture ((import lit_e2)):("4")
+given lit_un_fixture ((import lit_un_e)):("-5")
+given lit_un_fixture ((import lit_un_e2)):("-4")
+given lit_un_fixture ((import lit_un_dbl)):("5")
+given lit_un_fixture ((import lit_un_cpl)):("-6")
 
 // The bytes are emitted here, just above the global that points at them.
 ll_const_str(int e, string name) {

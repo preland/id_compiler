@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  print((import k_neg) + " " + (import k_zero) + " " + (import k_dbl));
+  print((import k_list)[0] + " " + (import k_list)[1] + " " + (import k_list)[2] + " " + (import k_list)[3]);
+} return int 0;
