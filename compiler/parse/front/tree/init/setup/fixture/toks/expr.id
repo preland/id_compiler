@@ -6,7 +6,7 @@ expr_tokens() {
   env_init();
   push_toks(["int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "eof"], ["1", "+", "2", "*", "3", "<<", "1", "&", "2", "|", "3", "^", "4", "==", "5", "&&", "6", "||", "7", ";", ""]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls push_toks:(["int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "int", "op", "eof"], ["1", "+", "2", "*", "3", "<<", "1", "&", "2", "|", "3", "^", "4", "==", "5", "&&", "6", "||", "7", ";", ""])
 ():() then len((import tkind)):(21)
 
 // A token stream covering one of each atom kind, `;`-separated so each
@@ -16,7 +16,7 @@ atom_tokens() {
   env_init();
   push_toks(["ident", "op", "int", "op", "int", "op", "op", "op", "int", "op", "int", "op", "int", "op", "op", "str", "op", "float", "op", "op", "kw", "ident", "op", "op", "op", "ident", "op", "op", "ident", "op", "op", "ident", "op", "ident", "op", "int", "op", "op", "eof"], ["foo", "(", "1", ",", "2", ")", ";", "[", "1", ",", "2", ",", "3", "]", ";", "\"hi\"", ";", "1.5", ";", "(", "import", "g", ")", ";", "-", "x", ";", "!", "y", ";", "~", "z", ";", "a", "[", "0", "]", ";", ""]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls push_toks:(["ident", "op", "int", "op", "int", "op", "op", "op", "int", "op", "int", "op", "int", "op", "op", "str", "op", "float", "op", "op", "kw", "ident", "op", "op", "op", "ident", "op", "op", "ident", "op", "op", "ident", "op", "ident", "op", "int", "op", "op", "eof"], ["foo", "(", "1", ",", "2", ")", ";", "[", "1", ",", "2", ",", "3", "]", ";", "\"hi\"", ";", "1.5", ";", "(", "import", "g", ")", ";", "-", "x", ";", "!", "y", ";", "~", "z", ";", "a", "[", "0", "]", ";", ""])
 ():() then len((import tkind)):(39)
 
 // A grouped expression: `(1 + 2);` -- the one construct neither expr_tokens
@@ -25,5 +25,5 @@ paren_tokens() {
   env_init();
   push_toks(["op", "int", "op", "int", "op", "op", "eof"], ["(", "1", "+", "2", ")", ";", ""]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls push_toks:(["op", "int", "op", "int", "op", "op", "eof"], ["(", "1", "+", "2", ")", ";", ""])
 ():() then len((import tkind)):(7)

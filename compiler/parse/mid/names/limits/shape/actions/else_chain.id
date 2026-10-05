@@ -23,7 +23,7 @@ elif_fixture() {
   export int else_node = node_if((import ev_node), [(import decl_node)], [(import decl_node)], 2);
   elif_fixture2();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls nest_fixture:[1]
 ():() then init_units:(0)
 
 // Descending into the compound statements of a block that fits happens in

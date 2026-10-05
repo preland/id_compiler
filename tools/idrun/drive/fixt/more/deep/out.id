@@ -2,12 +2,12 @@
 // a `then` can read them after.
 tf_fl() {
   export int[] tf_flags = [0, 0];
-} return void;
+} return void export tf_flags;
 ():() then (import tf_flags):([0, 0])
 given tf_fl ():() then (import tf_flags):([0, 0])
 
 tf_ol() {
   export string[] tf_out = [];
-} return void;
+} return void export tf_out;
 ():() then (import tf_out):([])
 given tf_ol ():() then (import tf_out):([])

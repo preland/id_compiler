@@ -13,5 +13,5 @@ paramlist_begun_fixture() {
   gn_env();
   uq_begin("f");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls uq_begin:("f")
 ():() then init_units:(0)

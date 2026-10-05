@@ -17,7 +17,7 @@ canon_begun_j_fixture() {
   lz_j();
   uq_begin("f");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls uq_begin:("f")
 ():() then init_units:(0)
 
 segs_kind(int id, string[] segs_out) {

@@ -1,0 +1,7 @@
+// EXPECT: 'ghost' is named by the return clause of 'mk' (return void export ghost), but 'mk' does not export it in its own body
+mk() {
+  export int[] cnt = [0];
+} return void export ghost;
+
+main(int argc, string[] argv) {
+} return int 0;

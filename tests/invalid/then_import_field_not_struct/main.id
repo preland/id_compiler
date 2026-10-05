@@ -1,0 +1,13 @@
+// EXPECT: (import cnt).len: (import cnt) is a int, not a struct, so it has no fields; drop '.len', or name an export that is a struct
+mk() {
+  export int cnt = 0;
+} return void;
+
+wrap(int k) {
+  int a = (import cnt) + k;
+} return void;
+given mk (1):() then (import cnt).len:(1)
+given mk (2):() then (import cnt).len:(2)
+
+main(int argc, string[] argv) {
+} return int 0;

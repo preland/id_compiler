@@ -5,7 +5,7 @@ lz_l() {
   export int lz_dv = node_var("r");
   export int lz_decl5 = node_decl("int", "r", (import lz_r5), 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_var:("r")
 ():() then init_units:(0)
 
 es2(int id, string ind) {

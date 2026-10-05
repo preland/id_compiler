@@ -7,6 +7,6 @@ rfnfx_setup() {
   lw_env_fixture();
   init_reach();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lw_env_fixture:[1]
 ():() then len((import rfn)):(2)
 

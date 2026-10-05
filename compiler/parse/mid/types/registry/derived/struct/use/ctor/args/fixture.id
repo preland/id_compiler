@@ -19,5 +19,5 @@ sd_ctor_fixture() {
   export int sd_d2 = node_decl("P", "q", (import sd_c2), 0);
   export int sd_neg = 0 - 1;
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("99", 99, 1)
 ():() then init_units:(0)

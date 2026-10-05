@@ -21,7 +21,7 @@ lz_a() {
   uq_begin("test");
   export int lz_str = node_str("hi");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls uq_begin:("test")
 ():() then init_units:(0)
 
 // The last step of seed_cfn_fixture (tests/more/clear.id, dce/export/

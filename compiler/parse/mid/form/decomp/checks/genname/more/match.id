@@ -7,7 +7,7 @@ farm_b() {
   export int f_call = node_call("target", [(import f_argv)]);
   export int f_ret = node_var("ret");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_var:("ret")
 ():() then init_units:(0)
 
 ends_v(string name) {

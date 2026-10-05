@@ -23,5 +23,5 @@ func_fix() {
   int f0 = node_func("f", "int", [6], [1, 2], 0);
   push((import prog), f0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_func:("f", "int", [6], [1, 2], 0)
 ():() then init_units:(0)

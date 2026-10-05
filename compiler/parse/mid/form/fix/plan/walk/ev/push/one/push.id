@@ -23,5 +23,5 @@ fix_mark_case_fixture() {
 } chain () {
   fix_push_rest((import mfe), 0, 3, 1, "", "");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("1", 1, 0)
 ():() then init_units:(0)

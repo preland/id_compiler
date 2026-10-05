@@ -6,7 +6,7 @@ composite_fixture() {
   composite_build();
   un_call_build();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls leaves_fixture:[1]
 ():() then init_units:(0)
 
 composite_build() {

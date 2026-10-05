@@ -4,7 +4,7 @@ mk_one_call() {
   init_calls();
   call_at(5, 10);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls call_at:(5, 10)
 ():() then len((import cnode)):(1)
 
 // One file marker taken, for cur_file.id's cur_file/take_file cases.
@@ -13,5 +13,5 @@ mk_one_file() {
   init_files();
   take_file_mid([0], "x.id");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls take_file_mid:([1], "x.id")
 ():() then cur_file:("x.id")

@@ -6,7 +6,7 @@ ll_natives_fixture2() {
   ll_native_fixture();
   push((import prog), (import nat_id0));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ll_env_fixture2:[1]
 ():() then init_units:(0)
 
 // The `--runtime` side of the same fixture: rtc set, so ll_decl_block does
@@ -16,7 +16,7 @@ ll_natives_fixture3() {
   ll_native_fixture();
   push((import prog), (import nat_id0));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ll_env_fixture3:[1]
 ():() then init_units:(0)
 
 ll_native_decl(int id) {

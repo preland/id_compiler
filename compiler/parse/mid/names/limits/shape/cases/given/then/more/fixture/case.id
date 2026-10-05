@@ -13,7 +13,7 @@ case_fixture() {
   case_fixture_init();
   case_fixture_line();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 // One line, and the node -- a "case" whose file is "fixture.id", so

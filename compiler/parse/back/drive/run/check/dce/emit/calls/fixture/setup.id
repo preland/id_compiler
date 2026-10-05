@@ -10,7 +10,7 @@ edge_fixture() {
   edge_fixture_target_loc();
   edge_fixture_caller();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 
 edge_fixture_target_loc() {

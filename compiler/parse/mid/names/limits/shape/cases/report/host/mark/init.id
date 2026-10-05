@@ -39,3 +39,31 @@ ut_mark() {
 } return void;
 given notes_base ():() then ut_sweep:(0)
 given ut_seeded ():() then ut_sweep:(0)
+
+// What an element or field access is made over: `(import NAME).a.b[i]` is an
+// "index" node over an "index" node over the import, and the root is the
+// import. A node that is not an index is its own root. Filed here, with
+// decl_alias_use, because the lane that reads them (given/then/more/calls/fit/
+// use.id) is at the three-function limit.
+imp_root(int nd) {
+  int imp_rt = nd;
+  while((import nkind)[imp_rt] == "index") {
+    imp_rt = (import ni1)[imp_rt];
+  }
+} return int imp_rt;
+given imp_use_fixture ((import imp_use_deep)):((import imp_use_rd))
+given imp_use_fixture ((import imp_use_rd)):((import imp_use_rd))
+
+// Whether a declaration binds a name to a list or a struct reached from the
+// import NAME -- itself, or an element or field of it, however deep -- so that
+// writing through the name may change the export (see use.id).
+decl_alias_use(int nd, string imp_nm) {
+  int imp_rt = imp_root((import ni1)[nd]);
+  int hit = 0;
+  if((import nkind)[imp_rt] == "import" && (import ns1)[imp_rt] == imp_nm && (ty_is_list((import ns1)[nd]) == 1 || sd_nfields((import ns1)[nd]) > 0)) {
+    hit = 1;
+  }
+} return int hit;
+given imp_use_fixture ((import imp_use_alias), "gx"):(1)
+given imp_use_fixture given sd_note("P", ["x"], ["int"], "p.id", 1) ((import imp_use_sdecl), "gx"):(1)
+given imp_use_fixture ((import imp_use_alias), "gy"):(0)

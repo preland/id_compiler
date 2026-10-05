@@ -1,0 +1,11 @@
+// EXPECT: 'cnt' is named by the return clause of 'wrap' (return void export cnt), but 'wrap' does not export it in its own body
+mk() {
+  export int[] cnt = [0];
+} return void;
+
+wrap() {
+  mk();
+} return void export cnt;
+
+main(int argc, string[] argv) {
+} return int 0;

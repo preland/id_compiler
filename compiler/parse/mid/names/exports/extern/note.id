@@ -3,12 +3,20 @@ rt_fixture() {
   lset((import rtc), 0, 1);
 } return void;
 ():() then (import rtc)[0]:(1)
-():() then (import fsc)[0]:(0)
+():() then calls init_rtc:[1]
 
 declfix() {
   regrow_d();
   int e = node_int("1", 1, 0);
   export int rgdecl_node = node_decl("int", "q", e, 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("1", 1, 0)
 ():() then init_units:(0)
+
+// One row of the write table (wr_ready, report/diagnostics.id).
+wr_row(string wr_key, string wr_fname) {
+  push((import wrx), wr_key);
+  push((import wrf), wr_fname);
+} return void;
+given env_init given wr_build ("i:gx", "f"):() then (import wrx)[0]:("i:gx")
+given env_init given wr_build ("v:p", "g"):() then (import wrf)[0]:("g")

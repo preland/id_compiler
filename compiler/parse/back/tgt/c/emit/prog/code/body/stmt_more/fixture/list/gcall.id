@@ -6,12 +6,12 @@ nz_call_foo_fixture() {
   nz_pair_fixture();
   export int nz_call_foo = node_call("foo", [(import nz_int)]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls nz_pair_fixture:[1]
 ():() then init_units:(0)
 
 nz_call_eprint_fixture() {
   nz_call_foo_fixture();
   export int nz_call_eprint = node_call("eprint", [(import nz_int)]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls nz_call_foo_fixture:[1]
 ():() then init_units:(0)

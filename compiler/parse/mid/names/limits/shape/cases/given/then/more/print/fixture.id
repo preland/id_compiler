@@ -8,7 +8,7 @@ print_fixture() {
   fn_fixture();
   print_fixture_items();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 
 print_fixture_items() {

@@ -12,5 +12,5 @@ xvarfix() {
   regrow_d();
   export int xvar_node = node_var("x");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_var:("x")
 ():() then init_units:(0)

@@ -45,4 +45,4 @@ lay_room_ref_fixture() {
   lay_room_set_ref(no_segs);
 } return void;
 ():() then prints:("")
-given lay_room_reset ():() then len((import room_paths)):(0)
+given lay_room_reset ():() then calls lay_room_reset:[1]

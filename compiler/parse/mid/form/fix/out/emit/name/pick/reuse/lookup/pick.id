@@ -24,7 +24,7 @@ fix_name_pick_miss_fixture() {
   push((import fixe_nt), "int");
   fix_name_pick_miss_fixture2();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_pick_fixture_n:[1]
 ():() then init_units:(0)
 
 fix_name_pick_miss_fixture2() {

@@ -22,3 +22,16 @@ push_slice(string[] ps_dst, string ps_src, int ps_i, int ps_e) {
 } return void;
 (["a"], "xyz", 0, 2):(["a", "xy"])
 ([], "wxyz", 2, 4):(["yz"])
+
+// The export a function's `} return void export NAME;` clause names, or "" for a
+// function without one: the func node's second int field is 2 plus the name's
+// position in retexp (front/parse/decl/func/sig/params/seal.id's retexp_bind).
+// Filed here because add.id's directory lane has no room for a third file.
+fn_ret_export(int fnode) {
+  string re_nm = "";
+  if((import ni2)[fnode] >= 2) {
+    re_nm = (import retexp)[((import ni2)[fnode] - 2)];
+  }
+} return string re_nm;
+given fn_fixture given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):("gx")
+given fn_fixture ((import fixture_fn)):("")

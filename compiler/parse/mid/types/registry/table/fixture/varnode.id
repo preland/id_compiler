@@ -8,7 +8,7 @@ fnval_fixture() {
   export int fnval_hit = node_var("fx_target");
   export int fnval_push = node_var("push");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_var:("fx_target")
 ():() then init_units:(0)
 
 // A variable actually registered with a function type, for is_fcall's "yes"
@@ -19,7 +19,7 @@ fnval_call_fixture() {
   add_var("cv", "func(int) return int", 0);
   export int fnval_call = node_var("cv");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_var:("cv", "func(int) return int", 0)
 ():() then init_units:(0)
 
 // A call one level down inside a unary node, for has_call's recursive
@@ -33,5 +33,5 @@ hidden_call_fixture() {
   export int hc_call = node_call("fx_target", (import fixture_params));
   export int hc_un = node_un("!", (import hc_call));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_idx_fixture:[1]
 ():() then init_units:(0)

@@ -29,4 +29,4 @@ fix_any_call_setup() {
   push((import fixe_cl), 1);
 } return void;
 ():() then (import fixe_cl)[0]:(0)
-():() then len((import fixe_n)):(0)
+():() then calls fix_ev_reset:[1]

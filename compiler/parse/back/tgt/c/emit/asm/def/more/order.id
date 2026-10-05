@@ -32,5 +32,5 @@ casm_row2_fixture() {
   init_tyc();
   push((import afretn), "out");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls llasm_row2_fixture:[1]
 ():() then init_units:(0)

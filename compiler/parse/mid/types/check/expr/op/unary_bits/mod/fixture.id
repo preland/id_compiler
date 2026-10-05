@@ -7,7 +7,7 @@ chkret_fixture() {
   fn_fixture();
   leaves_build();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 
 // A function returning "int" whose own return expression is a string --
@@ -17,7 +17,7 @@ badexpr_fixture() {
   chkret_fixture();
   badexpr_build();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls chkret_fixture:[1]
 ():() then init_units:(0)
 
 badexpr_build() {

@@ -36,6 +36,6 @@ m2r_predfx() {
   m2r_row();
   m2r_row();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ir_leaf:("alloca", "int", -1, -1, "x")
 ():() then (import bpred)[1]:([0])
 

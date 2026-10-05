@@ -29,12 +29,12 @@ emit_all_fixture_off() {
   notes_base();
   nat_init(1, ["prog"]);
 } return void;
-():() then (import chkfail)[0]:(0)
-():() then (import natc)[0]:(0)
+():() then calls nat_init:(1, ["prog"])
+():() then calls notes_base:[1]
 
 emit_all_fixture_on() {
   notes_base();
   nat_init(2, ["prog", "--natives"]);
 } return void;
-():() then (import chkfail)[0]:(0)
-():() then (import natc)[0]:(1)
+():() then calls nat_init:(2, ["prog", "--natives"])
+():() then calls notes_base:[1]

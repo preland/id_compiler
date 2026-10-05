@@ -32,5 +32,5 @@ reserved_word_tokens() {
   env_init();
   push_toks(["kw", "op", "kw", "op", "eof"], ["func", ";", "given", ";", ""]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls push_toks:(["kw", "op", "kw", "op", "eof"], ["func", ";", "given", ";", ""])
 ():() then len((import tkind)):(5)

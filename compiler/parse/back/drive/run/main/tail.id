@@ -13,7 +13,7 @@ ut_asm_seeded() {
   ut_host_seeded();
   asmfx_push();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ut_host_seeded:[1]
 ():() then init_units:(0)
 
 // The tail of main, once setup and load have already run.
@@ -23,6 +23,6 @@ lz_c() {
   export int lz_imp = node_import("cfg");
   export int lz_binid = node_bin("+", (import lz_var), (import lz_i1));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_import:("cfg")
 ():() then init_units:(0)
 

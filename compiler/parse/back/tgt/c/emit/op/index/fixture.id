@@ -6,7 +6,7 @@ arith_fix() {
   int ai0 = node_int("6", 6, 0);
   arith_fix2(ai0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("6", 6, 0)
 ():() then init_units:(0)
 
 arith_fix2(int ai0) {
@@ -24,5 +24,5 @@ arith_fix3() {
   int[] none = [];
   int ab1 = newnode("bin", 0, 1, "<<", "", none, none);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls arith_fix:[1]
 ():() then init_units:(0)

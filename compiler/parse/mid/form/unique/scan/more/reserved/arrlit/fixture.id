@@ -16,5 +16,5 @@ cwv_setup() {
 } chain () {
   export int cwv_func = node_func("f", "int[]", none, none, (import cwv_arr));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls cw_begin:("t")
 ():() then init_units:(0)

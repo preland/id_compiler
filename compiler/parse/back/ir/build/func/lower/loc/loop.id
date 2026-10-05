@@ -14,7 +14,7 @@ loop_fixture() {
   bound_fixture();
   export int while_node = node_while((import ev_node), [(import decl_node)]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls bound_fixture:[1]
 ():() then init_units:(0)
 
 // loop_fixture plus an "if" node (cond ev_node, then [decl_node], no else).
@@ -23,5 +23,5 @@ nest_fixture() {
   int[] none = [];
   export int if_node = node_if((import ev_node), [(import decl_node)], none, 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls loop_fixture:[1]
 ():() then init_units:(0)

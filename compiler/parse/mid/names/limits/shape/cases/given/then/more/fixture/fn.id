@@ -13,7 +13,7 @@ fn_fixture() {
   case_fixture();
   fn_fixture_build();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls case_fixture:[1]
 ():() then init_units:(0)
 
 fn_fixture_build() {

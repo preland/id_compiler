@@ -50,7 +50,7 @@ then_imp_value(int ci, int chk_node, string want) {
 } chain (int ci, int chk_node, string want) {
   string imp_nm = (import ns1)[chk_node];
   if(len(imp_ix) == 1 && ty_is_list(want) == 0) {
-    case_err(ci, "(import " + imp_nm + ")[...] reads one element, but '" + imp_nm + "' is a " + want + ", not a list; drop the index, or name a list export");
+    case_err(ci, "(import " + imp_nm + ")" + (import ns2)[chk_node] + "[...] reads one element, but '" + imp_nm + (import ns2)[chk_node] + "' is a " + want + ", not a list; drop the index, or name a list export");
   } else if(len(imp_ix) == 1) {
     fit_then_ix(ci, imp_ix[0]);
   }
@@ -65,10 +65,10 @@ then_imp_value(int ci, int chk_node, string want) {
   }
 } chain (int ci, int chk_node, string want) {
   if((import nkind)[chk_node] == "thenlen" && ty_is_list(want) == 0 && want != "string") {
-    case_err(ci, "len((import " + imp_nm + ")) measures a list or a string, but '" + imp_nm + "' is a " + want + "; name a list or string export, or compare the value itself with then (import " + imp_nm + "):(value)");
+    case_err(ci, "len((import " + imp_nm + ")" + (import ns2)[chk_node] + ") measures a list or a string, but '" + imp_nm + (import ns2)[chk_node] + "' is a " + want + "; name a list or string export, or compare the value itself with then (import " + imp_nm + ")" + (import ns2)[chk_node] + ":(value)");
   }
   if(fn_import_use((import casefn)[ci], imp_nm) == 1) {
-    case_err(ci, "then (import " + imp_nm + "): the function under test, '" + (import ns1)[((import casefn)[ci])] + "', reads (import " + imp_nm + ") but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'");
+    case_err(ci, "then (import " + imp_nm + ")" + (import ns2)[chk_node] + ": the function under test, '" + (import ns1)[((import casefn)[ci])] + "', reads (import " + imp_nm + ") but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'");
   }
 } return void;
 given then_imp_fixture ("int", 0, 1) ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx)[...] reads one element, but 'gx' is a int, not a list; drop the index, or name a list export\n")

@@ -25,5 +25,5 @@ fix_if_fixture() {
 } chain () {
   int wn = node_while(0, none);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_tokline_node_fixture:[1]
 ():() then init_units:(0)

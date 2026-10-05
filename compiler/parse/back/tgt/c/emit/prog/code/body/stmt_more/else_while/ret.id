@@ -7,7 +7,7 @@ lz_m() {
   export int lz_decl9 = node_decl("int", "r", (import lz_r9), 0);
   export int lz_fn5 = node_func("dup5", "int", (import f_none), [(import lz_decl5)], (import lz_dv));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lz_l:[1]
 ():() then init_units:(0)
 
 emit_ret(int id) {

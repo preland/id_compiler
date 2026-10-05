@@ -20,5 +20,5 @@ fix_tokline_node_fixture2() {
   int e = newleaf("ident", 0, 0, "len", "");
   fix_span_fixture2(e);
 } return void;
-given fix_tokline_fixture3 ():() then (import chkfail)[0]:(0)
+given fix_tokline_fixture3 ():() then calls newleaf:("ident", 0, 0, "len", "")
 given fix_tokline_fixture3 ():() then init_units:(0)

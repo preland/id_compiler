@@ -23,6 +23,6 @@ fix_wseed_fixture() {
   fix_winit();
   push((import fixd_wm), 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls full_env:[1]
 ():() then init_units:(0)
 

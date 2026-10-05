@@ -22,7 +22,7 @@ dg_t_graph() {
 } chain () {
   dg_link(4, 3);
 } return void;
-():() then (import dg_ctr)[1]:(0)
+():() then calls dg_add:(1, 0)
 ():() then len((import dg_comp)):(5)
 
 dg_t_scc() {

@@ -15,3 +15,19 @@ ut_because(string name) {
 } return string ret_s;
 given ut_host_seeded ("port_byte"):("it is asm 'in8'")
 given ut_host_seeded ("caller"):("it calls 'port_byte', which reaches asm 'in8'")
+
+// The write table (wr_ready, ../../diagnostics.id): the columns, then every
+// function's statements in turn.
+wr_build() {
+  export string[] wrx = [];
+  export string[] wrf = [];
+  int wr_i = 0;
+} chain () {
+  while(wr_i < len((import prog))) {
+    wr_fn(wr_i);
+    wr_i = wr_i + 1;
+  }
+  lset((import wrdone), 0, 1);
+} return void;
+given then_imp_fixture ("int[]", 2, 0) ():() then (import wrx):(["i:gx"])
+given then_imp_fixture ("int", 1, 0) ():() then len((import wrf)):(0)

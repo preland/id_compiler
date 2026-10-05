@@ -10,7 +10,7 @@ fit_named(int i, int e, string want) {
   if((import nkind)[e] == "cfn") {
     fit_fn(i, e, want);
   } else {
-    fit_import(i, e, want);
+    fit_case_import(i, e, want);
   }
 } return void;
 given cfn_fixture ((import fixture_ci), (import cfn_e), "func(int) return int"):() then (import chkfail)[0]:(0)

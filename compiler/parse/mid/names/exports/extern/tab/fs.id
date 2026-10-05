@@ -7,5 +7,5 @@ regrow_param() {
   export int regrow_p = node_param("param", "int", "p2");
   export int[] regrow_plist = [regrow_p];
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_param:("param", "int", "p2")
 ():() then init_units:(0)

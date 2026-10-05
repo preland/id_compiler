@@ -15,7 +15,7 @@ regrow_prog() {
   regrow_fn();
   push((import prog), (import regrow_fn_node));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls regrow_fn:[1]
 ():() then init_units:(0)
 
 // Two exported names whose owners are not in rfn, and an import node reading
@@ -30,5 +30,5 @@ dead_exp_fixture() {
   export int dead_imp_a = node_import("gx");
   export int dead_imp_b = node_import("gy");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_export:("gx", "int", "setup_fn")
 ():() then init_units:(0)

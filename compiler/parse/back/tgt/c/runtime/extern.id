@@ -14,7 +14,7 @@ ret_void_fix() {
   int fv0 = node_func("g", "void", [6], [1, 2], 0 - 1);
   push((import prog), fv0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_func:("g", "void", [6], [1, 2], -1)
 ():() then init_units:(0)
 
 // p0 = param "int p". Deterministic id: p0=6.

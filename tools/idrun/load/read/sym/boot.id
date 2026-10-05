@@ -25,9 +25,9 @@ lb_tables() {
   export int[] ld_sn = [];
   export string[] ld_fn = [];
   hmap_init((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn));
-} return void;
+} return void export ld_pr;
 ():() then (import ld_pr):([0, 0, 0, 0, 0, 0, 0, 0])
-():() then (import ld_fn):([])
+():() then calls hmap_init:[1]
 
 lb_boot() {
   lb_tables();

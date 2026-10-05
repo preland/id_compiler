@@ -32,5 +32,5 @@ fix_std_row_fixture() {
 } chain () {
   push((import dvexp), 1);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_std_fixture:[1]
 ():() then init_units:(0)

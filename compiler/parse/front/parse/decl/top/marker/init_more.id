@@ -7,7 +7,7 @@ init_files_rest() {
   int ret_i = init_units();
 } return int ret_i;
 ():(0)
-():(0) then (import chkfail)[0]:(0)
+():(0) then calls init_files2:[1]
 
 // The line each call was written on, for the natives list bin/idc reads
 // (back/drive/sink/natives/). Two columns rather than one indexed by node,
@@ -21,7 +21,7 @@ init_files_rest() {
 init_calls() {
   export int[] cnode = [];
   export int[] cline = [];
-} return void;
+} return void export cnode;
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then len((import cnode)):(0)
 

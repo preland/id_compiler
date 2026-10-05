@@ -828,6 +828,177 @@ sed -i 's/then len((import cnt)):(3)$/then len((import cnt)):(2)/' "$TMP/p.id"
 self_refuse "bin/idc: a len check that does not hold fails the case, naming the length" \
     "p.id:10: test failed: grow(1) then len((import cnt)) = 3, expected 2" --allow-untested --emit-c /dev/null
 
+# A check may read a field of a struct export, nested fields, an element of a
+# list field and the length of one, and the value is held to the field's type.
+# A struct is declared in a file of its own.
+FLDIR="$TMP/fldir"; mkdir -p "$FLDIR/types"
+printf 'struct Page {\n  int[] starts;\n  int count;\n}\n' > "$FLDIR/types/page.id"
+printf 'struct Book {\n  Page pages;\n  string title;\n}\n' > "$FLDIR/types/book.id"
+cat > "$FLDIR/main.id" <<'EOF2'
+book_open() {
+  Page pg = Page([0, 0], 2);
+  export Book bk = Book(pg, "t");
+} return void;
+
+book_grow(Book b, int n) {
+  b.pages.count = b.pages.count + n;
+  push(b.pages.starts, n);
+} return void;
+
+book_add(int n) {
+  book_grow((import bk), n);
+} return void;
+given book_open (1):() then (import bk).pages.count:(3) then len((import bk).pages.starts):(3)
+given book_open (2):() then (import bk).pages.starts[2]:(2) then (import bk).title:("t") then (import bk).pages.starts:([0, 0, 2])
+EOF2
+cat > "$FLDIR/run.id" <<'EOF2'
+book_push(int n) {
+  push((import bk).pages.starts, n);
+} return void;
+given book_open (7):() then (import bk).pages.starts[2]:(7) then len((import bk).pages.starts):(3)
+given book_open (8):() then (import bk).pages.starts:([0, 0, 8])
+
+main(int argc, string[] argv) {
+} return int 0;
+EOF2
+if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    ok "bin/idc: a check reads a field, a nested field, an element and the length of a list field"
+else
+    bad "bin/idc: a check reads a field, a nested field, an element and the length of a list field ($(grep -v warning "$TMP/log" | head -1))"
+fi
+sed -i 's/then (import bk).pages.count:(3)/then (import bk).pages.count:(4)/' "$FLDIR/main.id"
+if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    bad "bin/idc: a field check that does not hold fails the case (built; it should not have)"
+elif grep -qF "main.id:14: test failed: book_add(1) then (import bk).pages.count = 3, expected 4" "$TMP/log"; then
+    ok "bin/idc: a field check that does not hold fails the case, naming the path"
+else
+    bad "bin/idc: a field check that does not hold fails the case, naming the path ($(grep -v warning "$TMP/log" | head -1))"
+fi
+sed -i 's/then (import bk).pages.count:(4)/then (import bk).pages.count:(3)/; s/then (import bk).title:("t")/then (import bk).title:(5)/' "$FLDIR/main.id"
+if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    bad "bin/idc: a field check holds its value to the field's type (built; it should not have)"
+elif grep -qF "main.id:15: error: this case gives a int where a string is required" "$TMP/log"; then
+    ok "bin/idc: a field check holds its value to the field's type"
+else
+    bad "bin/idc: a field check holds its value to the field's type ($(grep -v warning "$TMP/log" | head -1))"
+fi
+
+# A field is a position in the struct, so the struct's own file is part of what
+# a field check reads: changing the order of the fields must run the case again,
+# not reuse its earlier pass.
+CKDIR="$TMP/ckdir"; mkdir -p "$CKDIR/types"
+printf 'struct Pt {\n  int x;\n  int y;\n}\n' > "$CKDIR/types/pt.id"
+cat > "$CKDIR/main.id" <<'EOF2'
+pt_open() {
+  Pt p = Pt(1, 2);
+  export Pt pt = p;
+} return void;
+
+pt_set(Pt q, int d) {
+  q.x = q.x + d;
+} return void;
+
+pt_move(int d) {
+  pt_set((import pt), d);
+} return void;
+given pt_open (1):() then (import pt).y:(2)
+given pt_open (2):() then (import pt).x:(3)
+EOF2
+cat > "$CKDIR/run.id" <<'EOF2'
+main(int argc, string[] argv) {
+} return int 0;
+EOF2
+if ../bin/idc "$CKDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    ok "bin/idc: a field check of a struct builds"
+else
+    bad "bin/idc: a field check of a struct builds ($(grep -v warning "$TMP/log" | head -1))"
+fi
+printf 'struct Pt {\n  int y;\n  int x;\n}\n' > "$CKDIR/types/pt.id"
+if ../bin/idc "$CKDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    bad "bin/idc: reordering a struct's fields re-runs a field check (built; it should not have)"
+elif grep -qF "main.id:13: test failed: pt_move(1) then (import pt).y = 1, expected 2" "$TMP/log"; then
+    ok "bin/idc: reordering a struct's fields re-runs a field check"
+else
+    bad "bin/idc: reordering a struct's fields re-runs a field check ($(grep -v warning "$TMP/log" | head -1))"
+fi
+
+# A setup's own arguments are read before the call, so they may name an export
+# the function under test declares: that is how a case shows that a second run
+# starts from scratch. An expected value is read after the call and may not.
+cat > "$TMP/p.id" <<'EOF'
+bump(int[] t) {
+  t[1] = 9;
+} return void;
+
+mk(int n) {
+  export int[] st = [n, 0];
+} return void;
+given mk(1) given bump((import st)) (2):()
+given mk(1) given bump((import st)) (3):()
+EOF
+self_accept "bin/idc: a setup's argument may name an export the function under test declares" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk(int k) {
+  int[] b = [k];
+  export int[] box = b;
+} return int[] b;
+given mk(1) (3):((import box))
+(5):([5])
+EOF
+self_refuse "bin/idc: an expected value may not be an export the function under test declares" \
+    "'box' is exported by 'mk', which the function under test, 'mk', is or calls" --allow-untested --emit-c /dev/null
+
+# A variable something in the call writes after declaring it may be checked: the
+# case sees an effect. One that the call only declares may not, unless the
+# function exists to initialize it, which its return clause says.
+cat > "$TMP/p.id" <<'EOF'
+mk() {
+  export int[] box = [0, 0];
+  box[1] = 5;
+} return void;
+given mk ():() then (import box)[1]:(5)
+given mk ():() then (import box):([0, 5])
+EOF
+self_accept "bin/idc: a variable the call writes after declaring it may be read back" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+init_tab() {
+  export int[] tab = [0, 0, 7];
+} return void;
+given init_tab ():() then (import tab)[2]:(7)
+given init_tab ():() then len((import tab)):(3)
+EOF
+self_refuse "bin/idc: a variable the call only declares may not be read back" \
+    "nothing in that call writes it after declaring it" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+init_tab() {
+  export int[] tab = [0, 0, 7];
+} return void export tab;
+given init_tab ():() then (import tab)[2]:(7) then len((import tab)):(3)
+given init_tab ():() then (import tab):([0, 0, 7])
+EOF
+self_accept "bin/idc: a function that returns void export NAME may check NAME in every form" --allow-untested --emit-c /dev/null
+
+sed -i 's/then (import tab):(\[0, 0, 7\])/then (import tab):([0, 0, 8])/' "$TMP/p.id"
+self_refuse "bin/idc: ... and the check holds the export to its value" \
+    "p.id:5: test failed: init_tab() then (import tab) = [0, 0, 7], expected [0, 0, 8]" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+init_tab() {
+  export int[] tab = [0, 0, 7];
+} return void export tab;
+
+use() {
+  init_tab();
+} return void;
+():() then (import tab)[2]:(7)
+():() then len((import tab)):(3)
+EOF
+self_refuse "bin/idc: the cases of a caller are still held to the rule for NAME" \
+    "'tab' is exported by 'init_tab', which the function under test, 'use', is or calls" --allow-untested --emit-c /dev/null
+
 
 # A conf.id constant may stand in a check's index: it says where to look, and
 # the value compared with stays a literal. Nothing but the case line names it,

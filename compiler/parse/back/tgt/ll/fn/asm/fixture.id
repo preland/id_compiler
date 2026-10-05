@@ -36,5 +36,5 @@ llasm_row_fixture() {
   push((import afname), "portout");
   push((import aftriple), "x86_64-unknown-none");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_param:("param", "int", "x")
 ():() then init_units:(0)

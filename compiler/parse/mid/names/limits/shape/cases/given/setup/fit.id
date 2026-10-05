@@ -32,3 +32,15 @@ given_prefix(int i, int si) {
 } return string giv_out;
 given impcase_given (0, 0):("")
 given impcase_given (0, 1):("fx_setup ")
+
+// Every `(import NAME)` a case writes -- an argument, an expected value, a
+// `then` check -- is held to the rule of chk_own_import (../../more/flag/
+// reqtests.id: a case may not read back what its own call just made), then
+// goes on to fit_import (../read/impcheck.id). Filed here because ../read/ is
+// at the three-entry layout limit.
+fit_case_import(int i, int e, string want) {
+  chk_own_import(i, e);
+  fit_import(i, e, want);
+} return void;
+given then_imp_fixture ("int", 0, 0) given sset((import eowners), 0, "fx_target") ((import fixture_ci), (import then_imp_cix), "int"):() then calls chk_own_import:[1]
+given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_cix), "int"):() then calls fit_import:[1]

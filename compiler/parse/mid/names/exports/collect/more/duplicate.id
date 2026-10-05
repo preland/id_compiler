@@ -21,3 +21,16 @@ chk_dupexp(int id, string owner) {
 } return void;
 given lz_j_dup ((import lz_edecl), "fn2"):() then calls dupexp_err:[1]
 given lz_j ((import lz_edecl), "fn2"):() then calls dupexp_err:[0]
+
+// A `} return void export NAME;` clause is a claim that the function exports NAME in
+// its own body, and the function's exports are all collected by now (exp_list),
+// so the claim is checked here: NAME must be exported, and by this function.
+chk_retexp(int id) {
+  string cr_nm = fn_ret_export(id);
+  int cr_ek = find_str((import enames), cr_nm);
+  if(cr_nm != "" && (cr_ek < 0 || (import eowners)[cr_ek] != (import ns1)[id])) {
+    retexp_err(id, cr_nm);
+  }
+} return void;
+given fn_fixture given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[1]
+given fn_fixture given add_export("gx", "int", "fx_target") given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[0]

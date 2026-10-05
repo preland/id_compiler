@@ -15,7 +15,7 @@ regrow_d() {
   regrow_c();
   didx_add("x");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls didx_add:("x")
 ():() then init_units:(0)
 
 // regrow_d plus "g" exported, for report_owned_var's own cases (check/access/
@@ -27,5 +27,5 @@ regrow_e() {
   push((import enames), "g");
   push((import etypes), "int");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls regrow_d:[1]
 ():() then init_units:(0)

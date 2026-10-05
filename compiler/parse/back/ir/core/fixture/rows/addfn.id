@@ -12,7 +12,7 @@ ir_rows() {
   int ret_i = init_ir();
   ir_rows_fn0();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 ir_rows_fn0() {

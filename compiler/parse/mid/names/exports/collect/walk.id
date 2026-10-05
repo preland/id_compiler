@@ -15,6 +15,8 @@ scan_func_exports(int id) {
   int[] l2_of_v = (import nl2)[id];
   string s1_of_v = (import ns1)[id];
   exp_list(l2_of_v, s1_of_v);
+} chain (int id) {
+  chk_retexp(id);
 } return void;
 given lz_j ((import lz_func2)):() then calls exp_one:[1]
 given ifwhilefix ((import rgif_node)):() then calls exp_one:[1]

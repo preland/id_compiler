@@ -17,12 +17,12 @@ cm_other_setup() {
   export int cm_var_node = node_var("x");
   export int cm_push_local_call = cm_call_var("locallist");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_var:("x")
 ():() then init_units:(0)
 
 chk_bi_nonbuiltin_setup() {
   cm_other_setup();
   init_rtc();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls cm_other_setup:[1]
 ():() then init_units:(0)

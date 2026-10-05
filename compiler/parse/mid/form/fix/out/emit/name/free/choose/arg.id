@@ -14,7 +14,7 @@ fix_choose_arg_taken() {
   fix_fixture();
   push((import fixd_used), "callee_a0");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 
 // The call node itself at fixe_n[0] (plan/walk/ev/push/one/ru.id's

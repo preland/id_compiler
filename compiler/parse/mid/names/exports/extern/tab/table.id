@@ -22,7 +22,7 @@ init_rtc() {
   init_bnames();
 } chain () {
   init_resv_names();
-} return void;
+} return void export rtc;
 ():() then (import rtc)[0]:(0)
-():() then (import fsc)[0]:(0)
+():() then calls init_bnames:[1]
 

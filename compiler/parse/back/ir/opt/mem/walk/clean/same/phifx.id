@@ -6,7 +6,7 @@ m2rphi_setup() {
   ir_rows();
   m2rphi_make();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ir_rows:[1]
 ():() then (import m2rphi_id):(2)
 
 m2rphi_make() {

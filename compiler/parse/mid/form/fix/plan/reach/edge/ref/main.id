@@ -9,7 +9,7 @@ fix_wref_fixture() {
 } chain () {
   push((import fixd_wm), 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_touch_fixture:[1]
 ():() then init_units:(0)
 
 fix_wedge(int ci, int ow) {

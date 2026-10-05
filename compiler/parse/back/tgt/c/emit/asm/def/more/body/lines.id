@@ -10,7 +10,7 @@ lz_k() {
   export int lz_r5 = node_int("5", 5, 0);
   export int lz_r9 = node_int("9", 9, 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("5", 5, 0)
 ():() then init_units:(0)
 
 // c_type reads tyc through c_scalar (prog/code/func/ctype/convert.id), and
@@ -21,5 +21,5 @@ casm_row_fixture() {
   llasm_row_fixture();
   init_tyc();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls llasm_row_fixture:[1]
 ():() then init_units:(0)

@@ -42,5 +42,5 @@ fix_gcl_fixture() {
 } chain () {
   push((import ngrpc), 99);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)

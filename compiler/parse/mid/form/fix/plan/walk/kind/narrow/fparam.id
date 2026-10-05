@@ -23,7 +23,7 @@ fix_simple_fixture() {
   export int[] sim_roots = [sim_v, sim_decl, sim_v2];
   export int[] sim_roots2 = [sim_v2, sim_v, sim_v];
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("5", 5, 0)
 ():() then init_units:(0)
 
 fix_type_ok_fixture() {
@@ -34,5 +34,5 @@ fix_type_ok_fixture() {
   push((import fixe_n), 0);
   push((import fixe_nt), "void");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_ret_fixture:[1]
 ():() then init_units:(0)

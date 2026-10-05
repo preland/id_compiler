@@ -6,7 +6,7 @@ rc_t_ready() {
   dg_t_parsed();
   rc_ready();
 } return void;
-():() then len((import rcsets)):(0)
+():() then calls dg_t_parsed:[1]
 ():() then len((import dg_comp)):(3)
 rc_t_one() {
   rc_t_ready();

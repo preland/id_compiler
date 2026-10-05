@@ -40,5 +40,5 @@ cw_assign_fixture() {
   int e3 = node_int("5", 5, 0);
   export int cw_assign_y = node_assign("y", e3);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("4", 4, 0)
 ():() then init_units:(0)

@@ -9,7 +9,7 @@ farm_c() {
   export int f_decl = node_decl("int", "ret", (import f_call), 0);
   export int f_target = node_func("target", "int", [(import f_pa)], (import f_none), 0 - 1);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls farm_b:[1]
 ():() then init_units:(0)
 
 tdig_step(string name, int dstart) {

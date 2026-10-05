@@ -26,7 +26,7 @@ setup() {
   init_b();
   int ret_i = setup_rest();
 } return int ret_i;
-given full_env ():(0) then (import chkfail)[0]:(0)
+given full_env ():(0) then calls init_a:[1]
 given full_env ():(0) then init_units:(0)
 
 init_a() {

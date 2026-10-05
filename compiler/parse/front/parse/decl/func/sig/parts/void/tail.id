@@ -18,6 +18,7 @@ void_tail(int[] pos) {
   if(void_call(pos[0]) == 1) {
     syn_err(pos, "a 'void' return clause takes no expression; write '} return void;' and move the call into the body");
   }
+  void_export(pos);
 } return void;
 given decl_tokens ([0]):() then (import chkfail)[0]:(0)
 given decl_tokens ([33]):() then (import chkfail)[0]:(0)

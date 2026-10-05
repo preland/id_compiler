@@ -63,6 +63,6 @@ init_reg() {
   export string[] dvname = [];
   export string[] dvfunc = [];
   init_reg2();
-} return void;
+} return void export dvname;
 given regrow_d ():() then len((import dvname)):(0)
 given regrow_d ():() then calls init_reg2:[1]

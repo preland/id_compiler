@@ -9,5 +9,5 @@ sd_note_fixture() {
 } chain () {
   tc_types_init();
 } return void;
-():() then len((import tcsts)):(0)
+():() then calls sd_note:("W", ["p", "n"], ["P", "int"], "w.id", 9)
 ():() then len((import sdname)):(3)

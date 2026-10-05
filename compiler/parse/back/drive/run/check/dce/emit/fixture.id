@@ -10,7 +10,7 @@ dce_fx_setup() {
   push((import fnames), "main");
   reach_seed("fx_target");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls reach_seed:("fx_target")
 ():() then init_units:(0)
 
 dce_fx_setup_unreached() {
@@ -18,6 +18,6 @@ dce_fx_setup_unreached() {
   push((import fnames), "main");
   reach_seed("nope");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls reach_seed:("nope")
 ():() then init_units:(0)
 

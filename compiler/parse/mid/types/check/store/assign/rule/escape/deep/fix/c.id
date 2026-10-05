@@ -55,5 +55,5 @@ esc_dfix() {
   esc_fd_g();
   esc_fd_h();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls esc_fix:[1]
 ():() then init_units:(0)

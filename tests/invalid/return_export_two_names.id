@@ -1,0 +1,8 @@
+// EXPECT: a return clause names exactly one exported variable
+mk() {
+  export int[] a = [0];
+  export int[] b = [1];
+} return void export a, b;
+
+main(int argc, string[] argv) {
+} return int 0;

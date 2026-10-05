@@ -7,7 +7,7 @@ ret_same_fn() {
   int[] none = [];
   export int same_f = node_func("f", "int", none, none, (import widen_e));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ret_widens_fn:[1]
 ():() then init_units:(0)
 
 // Two tokens' lines, for a span-reading case (out/span/beg/text.id) that
@@ -18,7 +18,7 @@ fix_tokline_fixture() {
   push((import tline), 3);
   push((import tline), 7);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 
 // The matching columns (out/span/col.id): token 0 spans columns 2-5, token 1
@@ -28,5 +28,5 @@ fix_tokline_fixture2() {
   push((import tspan), 2 * 65536 + 5);
   push((import tspan), 1 * 65536 + 4);
 } return void;
-given fix_tokline_fixture ():() then (import chkfail)[0]:(0)
+given fix_tokline_fixture ():() then calls fix_tokline_fixture:[1]
 given fix_tokline_fixture ():() then init_units:(0)

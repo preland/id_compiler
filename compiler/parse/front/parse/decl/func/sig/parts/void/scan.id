@@ -19,3 +19,19 @@ void_step(int at, int n) {
 } return int r;
 given decl_tokens (1, 0):(1)
 given decl_tokens (7, 1):(0)
+
+// `} return void export NAME;`: the function is still void, and the clause says
+// which exported variable it exists to initialize (docs/SPEC.md 7.5). The name is
+// held until the func node exists (retexp_bind, ../../params/seal.id). Exactly one
+// name: a comma after it is the mistake of listing two.
+void_export(int[] pos) {
+  if(cur_kind(pos) == "kw" && cur_text(pos) == "export") {
+    advance(pos);
+    push((import retexp_pend), read_name(pos));
+    if(cur_text(pos) == ",") {
+      syn_err(pos, "a return clause names exactly one exported variable: write '} return void export NAME;' with the one variable this function exists to initialize");
+    }
+  }
+} return void;
+given env_init given toks_push(["kw", "ident", "op"], ["export", "gx", ";"]) ([0]):() then (import retexp_pend)[0]:("gx")
+given env_init given toks_push(["kw", "ident", "op", "ident"], ["export", "gx", ",", "gy"]) ([0]):() then prints:("<stdin>:1: error: a return clause names exactly one exported variable: write '} return void export NAME;' with the one variable this function exists to initialize\n")

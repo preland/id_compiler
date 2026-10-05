@@ -7,4 +7,4 @@ lex_fix_bol1() {
   int ig = eat_space("\n", 0);
 } return void;
 ():() then prints:("line 2\n")
-():() then prints:("line 2\n") then (import lexcols)[0]:(1)
+():() then prints:("line 2\n") then calls eat_space:("\n", 0)

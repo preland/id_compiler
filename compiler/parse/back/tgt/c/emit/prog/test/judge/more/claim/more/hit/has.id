@@ -31,5 +31,5 @@ claim_cols_fixture() {
   push((import conscase), 0);
   claim_cols_rest();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls case_fidx_fixture:[1]
 ():() then init_units:(0)

@@ -28,5 +28,5 @@ m2r_2blk_fixture() {
   cfg_fixture();
   int r = init_opt();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls cfg_fixture:[1]
 ():() then chk_blk_count:(2)

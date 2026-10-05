@@ -1,0 +1,14 @@
+// EXPECT: then (import pt).x: the function under test, 'look', reads (import pt) but never writes it
+mk() {
+  Pt p = Pt(1, 2);
+  export Pt pt = p;
+} return void;
+
+look(int d) {
+  int a = (import pt).x + d;
+} return void;
+given mk (1):() then (import pt).x:(1)
+given mk (2):() then (import pt).y:(2)
+
+main(int argc, string[] argv) {
+} return int 0;

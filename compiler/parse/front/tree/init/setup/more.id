@@ -7,7 +7,7 @@ setup_rest() {
   export int[] nparen = [];
   int ret_i = init_ir();
 } return int ret_i;
-given full_env ():(0) then (import chkfail)[0]:(0)
+given full_env ():(0) then calls init_rest:[1]
 given full_env ():(0) then init_units:(0)
 
 // The env a front/tokens or front/tree case needs beyond env_init's own
@@ -18,7 +18,7 @@ full_env() {
   env_init();
   init_files();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 // The column-packed value most recently pushed onto tspan, for set_span and

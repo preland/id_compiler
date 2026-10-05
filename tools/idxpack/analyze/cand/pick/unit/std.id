@@ -8,7 +8,7 @@
 std_root_set(string root, int present) {
   export string ix_stdroot = root;
   export int ix_stdpresent = present;
-} return void;
+} return void export ix_stdpresent;
 ("/repo/idstd", 1):() then (import ix_stdpresent):(1)
 ("", 0):() then (import ix_stdpresent):(0)
 

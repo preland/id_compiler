@@ -1,0 +1,7 @@
+// EXPECT: 'box' is exported by 'mk', which the function under test, 'mk', is or calls
+mk(int k) {
+  int[] b = [k];
+  export int[] box = b;
+} return int[] b;
+given mk(1) (3):((import box))
+(5):([5])

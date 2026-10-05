@@ -8,7 +8,7 @@ m2r_row_fixture() {
   optfx_setup();
   m2r_row();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls optfx_setup:[1]
 ():() then len((import phiof)):(1)
 
 // outv is written in place: m2r_kept (../../walk/body/scan/ldst.id),

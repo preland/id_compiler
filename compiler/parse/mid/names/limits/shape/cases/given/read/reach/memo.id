@@ -15,7 +15,7 @@ rc_ready() {
     rc_build();
   }
 } return void;
-given dg_t_parsed ():() then len((import rcsets)):(0)
+given dg_t_parsed ():() then calls rc_build:[1]
 given dg_t_parsed ():() then dg_nfn:(2)
 
 rc_build() {
@@ -29,7 +29,7 @@ rc_build() {
 } chain () {
   hmap_init((import rck), (import rcv), (import rcu), (import rcc));
   lset((import rcon), 0, 1);
-} return void;
+} return void export rcsets;
 given dg_t_parsed ():() then len((import rcsets)):(0) then dg_nfn:(2)
 given env_init ():() then len((import rcsets)):(0) then dg_nfn:(0)
 

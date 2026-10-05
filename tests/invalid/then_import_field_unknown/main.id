@@ -1,0 +1,14 @@
+// EXPECT: (import pt).z: struct 'Point' has no field 'z'; its fields are x, y; name one of them
+mk() {
+  Point p = Point(1, 2);
+  export Point pt = p;
+} return void;
+
+shift(int d) {
+  int a = (import pt).x + d;
+} return void;
+given mk (1):() then (import pt).z:(2)
+given mk (2):() then (import pt).z:(3)
+
+main(int argc, string[] argv) {
+} return int 0;

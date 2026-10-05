@@ -5,7 +5,7 @@ lz_f() {
   export int lz_assignid = node_assign("y", (import lz_i1));
   export int lz_exprstmt = node_exprstmt((import lz_callid));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lz_e:[1]
 ():() then init_units:(0)
 
 // A case node naming fx_target as a function-value argument (a "cfn" leaf,
@@ -19,7 +19,7 @@ seed_cfn_fixture() {
   init_reach();
   seed_cfn_fixture_node();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_fixture:[1]
 ():() then len((import rfn)):(2)
 
 clear_strs(string[] names) {

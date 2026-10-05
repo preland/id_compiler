@@ -1,7 +1,7 @@
 // Bytes a case hands a function by name: tf_by is the text as byte cells.
 tf_bset(string text) {
   export int[] tf_by = exec_bytes(text);
-} return void;
+} return void export tf_by;
 ("ab"):() then len((import tf_by)):(2)
 (""):() then len((import tf_by)):(0)
 

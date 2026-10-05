@@ -19,8 +19,8 @@ ccrun_fx_empty_input() {
 } chain () {
   int rm = fs_remove(p);
 } return void;
-():() then (import cr_pending_n)[0]:(0)
-given ccrun_fx_empty_input ():() then (import cr_pending_n)[0]:(0)
+():() then calls fs_mktemp:("ccrun_empty_", 0)
+given ccrun_fx_empty_input ():() then calls fs_mktemp:("ccrun_empty_", 0)
 
 // Test check: whether the child's stdin has been closed, as the whole input
 // flag list. maybe_close_in (close.id) reads the flag to decide whether to

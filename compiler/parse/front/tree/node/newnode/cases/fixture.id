@@ -6,19 +6,19 @@ asm_reg_fix0() {
   init_asm();
   init_asm2();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 asm_reg_fix1() {
   asm_reg_fix0();
   push((import afret), "int");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls asm_reg_fix0:[1]
 ():() then init_units:(0)
 
 asm_reg_fix1b() {
   asm_reg_fix1();
   push((import afretn), "result");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls asm_reg_fix1:[1]
 ():() then init_units:(0)

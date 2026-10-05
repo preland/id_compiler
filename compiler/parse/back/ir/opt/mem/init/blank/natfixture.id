@@ -9,12 +9,12 @@ natinit_fixture_off() {
   env_init();
   nat_init(1, ["prog"]);
 } return void;
-():() then (import chkfail)[0]:(0)
-():() then (import natc)[0]:(0)
+():() then calls nat_init:(1, ["prog"])
+():() then calls env_init:[1]
 
 natinit_fixture_on() {
   env_init();
   nat_init(2, ["prog", "--natives"]);
 } return void;
-():() then (import chkfail)[0]:(0)
-():() then (import natc)[0]:(1)
+():() then calls nat_init:(2, ["prog", "--natives"])
+():() then calls env_init:[1]

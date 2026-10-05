@@ -4,13 +4,13 @@ tcache_hit_fixture() {
   env_init();
   tcache_set(0, "int");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls tcache_set:(0, "int")
 ():() then init_units:(0)
 
 tcache_hit_fixture2() {
   env_init();
   tcache_set(0, "string");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls tcache_set:(0, "string")
 ():() then init_units:(0)
 

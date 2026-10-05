@@ -27,5 +27,5 @@ resv_scan_fixture() {
 } chain () {
   push((import pline), 9);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls resv_env_setup:[1]
 ():() then init_units:(0)

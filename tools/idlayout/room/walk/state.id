@@ -10,7 +10,7 @@ lay_room_reset() {
   export int[] room_free = [];
 } chain () {
   export int[] room_dist = [];
-} return void;
+} return void export room_paths;
 ():() then prints:("")
 given lay_room_reset ():() then len((import room_paths)):(0)
 

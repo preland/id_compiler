@@ -4,7 +4,7 @@
 
 harn_init() {
   export int[] harn = [0];
-} return void;
+} return void export harn;
 ():() then (import harn)[0]:(0)
 ():() then init_units:(0)
 

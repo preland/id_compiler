@@ -6,7 +6,7 @@ init_rest() {
   init_d();
   init_sym();
 } return void;
-given full_env ():() then (import chkfail)[0]:(0)
+given full_env ():() then calls init_c:[1]
 given full_env ():() then init_units:(0)
 
 init_c() {

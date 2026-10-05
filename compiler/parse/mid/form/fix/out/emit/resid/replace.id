@@ -20,5 +20,5 @@ fix_note_fixture() {
   fix_fixture();
   fix_note_tok(1, 2);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_note_tok:(1, 2)
 ():() then len((import fixd_lo)):(1)

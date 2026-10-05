@@ -21,7 +21,7 @@ fix_paren_side_fixture() {
 } chain () {
   push((import tline), 1);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls cmp_fixture:[1]
 ():() then init_units:(0)
 
 // The exit code is whether the program broke a rule of the language: 1 if a

@@ -8,14 +8,14 @@ asm_decl_fixture() {
   env_init();
   toks_push(["ident", "str", "ident", "op", "op", "op", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"abc\"", "foo", "(", ")", "{", "\"i1\"", "}", "return", "int", "r", ";"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["ident", "str", "ident", "op", "op", "op", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"abc\"", "foo", "(", ")", "{", "\"i1\"", "}", "return", "int", "r", ";"])
 ():() then init_units:(0)
 
 asm_decl_fixture2() {
   env_init();
   toks_push(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"])
 ():() then init_units:(0)
 
 // Two asm declarations back to back, both pushed through push_asm (../decl/

@@ -6,3 +6,52 @@
 // report/host/ is at the 3-entry layout limit and every file in it already
 // holds three functions.
 
+// The fields a `then (import NAME).a.b:(value)` check reads through (docs/TESTS.md): the type of field `name`
+// of the struct `ty`, "" when `ty` is not a struct or has no such field.
+then_path_step(string ty, string name) {
+  string ft = sd_cell((import sdftype), ty, sd_fpos(ty, name));
+} return string ft;
+given sd_pair ("P", "y"):("int")
+given sd_pair ("P", "z"):("")
+
+// The type a path of fields ".a.b" (the clause's s2, "" for none) reaches from an export of type `ty`: "" when a
+// step is not a field of the struct before it.
+then_path_type(string ty, string path) {
+  string[] steps = str_split(path, ".");
+  string pt = ty;
+  int pi = 1;
+} chain (string ty, string path) {
+  while(pi < len(steps) && pt != "") {
+    pt = then_path_step(pt, steps[pi]);
+    pi = pi + 1;
+  }
+} return string pt;
+given sd_pair ("P", ""):("P")
+given sd_pair given sd_note("R", ["p", "q"], ["P", "int"], "r.id", 9) ("R", ".p.y"):("int")
+given sd_pair ("P", ".z"):("")
+
+// What is wrong with a path then_path_type found no type for: the first step that is not a field, named with
+// what comes before it, and what would fix it.
+then_path_why(int chk_node, string want) {
+  string[] steps = str_split((import ns2)[chk_node], ".");
+  string pt = want;
+  int pi = 1;
+} chain (int chk_node, string want) {
+  string path_at = "(import " + (import ns1)[chk_node] + ")";
+  while(then_path_step(pt, steps[pi]) != "") {
+    path_at = path_at + "." + steps[pi];
+    pt = then_path_step(pt, steps[pi]);
+    pi = pi + 1;
+  }
+  string why = "";
+} chain (int chk_node, string want) {
+  if(sd_nfields(pt) == 0) {
+    why = path_at + "." + steps[pi] + ": " + path_at + " is a " + pt + ", not a struct, so it has no fields; drop '." + steps[pi] + "', or name an export that is a struct";
+  } else {
+    why = path_at + "." + steps[pi] + ": " + sd_nofield(pt, steps[pi]) + "; name one of them";
+  }
+} return string why;
+given then_imp_fixture ("int", 0, 0) given sset((import ns2), (import then_imp_node), ".z") ((import then_imp_node), "int"):("(import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct")
+given then_imp_fixture ("P", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sset((import ns2), (import then_imp_node), ".z") ((import then_imp_node), "P"):("(import gx).z: struct 'P' has no field 'z'; its fields are x, y; name one of them")
+given then_imp_fixture ("P", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sset((import ns2), (import then_imp_node), ".x.q") ((import then_imp_node), "P"):("(import gx).x.q: (import gx).x is a int, not a struct, so it has no fields; drop '.q', or name an export that is a struct")
+

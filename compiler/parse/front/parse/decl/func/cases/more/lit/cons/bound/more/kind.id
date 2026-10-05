@@ -15,7 +15,7 @@ fixture_int_leaf() {
   env_init();
   node_int("1", 1, 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("1", 1, 0)
 ():() then last_i2:("i2 0")
 
 // `-1`: a unary minus (id 1) wrapping a literal (id 0), for
@@ -25,5 +25,5 @@ fixture_neg_lit_node() {
   node_int("1", 1, 0);
   node_un("-", 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("1", 1, 0)
 ():() then last_i2:("i2 0")

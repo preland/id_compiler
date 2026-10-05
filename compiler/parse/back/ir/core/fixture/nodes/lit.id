@@ -11,7 +11,7 @@ lw_fix_int() {
   lw_env_fixture();
   export int fix_int_n = node_int("5", 5, 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_int:("5", 5, 0)
 ():() then init_units:(0)
 
 lw_fix_var() {
@@ -19,7 +19,7 @@ lw_fix_var() {
   export int fix_var_n = node_var("x");
   lw_fix_var_ty();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_var:("x")
 ():() then init_units:(0)
 
 lw_fix_var_ty() {

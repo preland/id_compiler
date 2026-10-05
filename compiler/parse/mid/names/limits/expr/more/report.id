@@ -23,3 +23,28 @@ shape_word(int e) {
 given lencall_fixture ((import lencall_node)):("a call")
 given arith_fixture ((import ev_node)):("an expression")
 
+
+// What one statement writes. A call writes what it is handed (only `len` is
+// known not to), `name = v` writes name, `name[i] = v` and `name.f = v` write
+// what name is a path into, and a declaration that binds a list or a struct to a
+// variable, or a path into one, lets the variable write it (the rules
+// node_import_use, given/then/more/calls/fit/use.id, applies to an import).
+// The declaring statement itself, `export T name = v`, writes nothing.
+wr_node(int nd, string wr_fname) {
+  string wr_kd = (import nkind)[nd];
+  if(wr_kd == "call" && (import ns1)[nd] != "len") {
+    wr_args(nd, wr_fname);
+  }
+  if(wr_kd == "assign") {
+    wr_row("v:" + (import ns1)[nd], wr_fname);
+  }
+} chain (int nd, string wr_fname) {
+  if(wr_kd == "iassign") {
+    wr_root((import ni1)[nd], wr_fname);
+  }
+  if(wr_kd == "decl" && (import ni2)[nd] == 0 && (ty_is_list((import ns1)[nd]) == 1 || sd_nfields((import ns1)[nd]) > 0)) {
+    wr_root((import ni1)[nd], wr_fname);
+  }
+} return void;
+given imp_use_fixture given wr_build ((import imp_use_call), "f"):() then (import wrx):(["i:gx"])
+given imp_use_fixture given wr_build ((import imp_use_len), "f"):() then len((import wrx)):(0)

@@ -28,5 +28,5 @@ cfn_fixture() {
   export int cfn_e = newleaf("cfn", 0, 0, "fx_target", "");
   push((import casegiven), "");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls newleaf:("cfn", 0, 0, "fx_target", "")
 ():() then init_units:(0)

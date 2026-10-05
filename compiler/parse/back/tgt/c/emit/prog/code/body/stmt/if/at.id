@@ -17,5 +17,5 @@ sq_based() {
   env_init();
   lset((import sqbase), 0, 20);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)

@@ -17,3 +17,19 @@ report_dup_case(int i) {
 } return void;
 given wrap_fixture ((import fixture_ci)):() then prints:("<stdin>:4: error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)\n")
 given dupeq_fixture (0):() then prints:("<stdin>:1: error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)\n")
+
+// The writes of the whole program, found once: for every function, which
+// exported variables its statements write (wr_node says what a write is), as
+// two parallel columns -- wrx a key, "i:NAME" for a write through (import NAME)
+// and "v:NAME" for one through the bare name the declaring function uses, and
+// wrf the function that does it. A case may not read back a variable that the
+// function under test only declares (chk_own_import, ../more/flag/reqtests.id),
+// and "only declares" is decided from this table. Built from `prog` as it
+// stands when the first case asks, as reach's memo is (given/read/reach/memo.id).
+wr_ready() {
+  if((import wrdone)[0] == 0) {
+    wr_build();
+  }
+} return void;
+given then_imp_fixture ("int[]", 2, 0) ():() then (import wrx):(["i:gx"])
+given then_imp_fixture ("int[]", 2, 0) given wr_build ():() then calls wr_build:[0]

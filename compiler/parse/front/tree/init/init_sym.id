@@ -16,7 +16,7 @@ init_sym() {
   esc_init();
   init_structs();
 } return void;
-given full_env ():() then (import chkfail)[0]:(0)
+given full_env ():() then calls init_sym_a:[1]
 given full_env ():() then init_units:(0)
 
 // fnames: How many functions are registered -- a `then` check for the void

@@ -30,7 +30,8 @@ given then_fix ([0]):()
 
 // `then (import NAME):(value)` and `then (import NAME)[i]:(value)`: the
 // export, or one element of it, read after the call and compared with a
-// literal -- no function is named, so s1 is the export's name, l2 holds the
+// literal -- no function is named, so s1 is the export's name, s2 the fields
+// named after it (`(import NAME).a.b` is ".a.b", "" for none), l2 holds the
 // index's node when there is one, and the kind is "thenimp". The index is a
 // single scalar, or an `(import NAME)` naming a conf.id constant (a "cimport"
 // node, as in a tuple), held to being an int by the checker (mid/names/limits/
@@ -43,7 +44,7 @@ then_imp_clause(int[] pos) {
     advance(pos);
     is_len = 1;
   }
-  int e = case_import(pos);
+  int e = then_imp_item(pos);
 } chain (int[] pos) {
   int[] imp_ix = [];
   if(cur_text(pos) == "[") {
@@ -65,9 +66,9 @@ then_imp_clause(int[] pos) {
   if(is_len == 1) {
     kd = "thenlen";
   }
-  then_store(kd, (import ns1)[e], items, len((import casestart)) - 1, imp_ix);
+  then_imp_store(kd, e, items, imp_ix);
 } return void;
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenimp", "zz", [1], -1, [])
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "2", "]", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenimp", "zz", [2], -1, [1])
-given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "(", "import", "kk", ")", "]", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenimp", "zz", [2], -1, [1])
-given env_init given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_store:("thenlen", "zz", [1], -1, [])
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [1], [])
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "int", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "2", "]", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [2], [1])
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["(", "import", "zz", ")", "[", "(", "import", "kk", ")", "]", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenimp", 0, [2], [1])
+given env_init given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_store:("thenlen", 0, [1], [])

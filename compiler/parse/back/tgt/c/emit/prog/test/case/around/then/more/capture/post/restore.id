@@ -26,5 +26,5 @@ eprints_post_fixture() {
   int en = newnode("theneprints", (import fixture_ci), 0, "", "", (import fixture_print_two), (import fixture_print_two));
   push((import thennode), en);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls print_fixture:[1]
 ():() then init_units:(0)

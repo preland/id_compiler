@@ -33,5 +33,5 @@ cw_named_fixture() {
   cw_decl_fixture();
   int ok = cw_put((import cw_decl_x), "x");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls cw_decl_fixture:[1]
 ():() then init_units:(0)

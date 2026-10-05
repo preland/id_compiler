@@ -9,7 +9,7 @@ leaves_fixture() {
   leaves_build();
   leaves_build2();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls varleaf_init:[1]
 ():() then init_units:(0)
 
 leaves_build() {

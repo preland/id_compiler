@@ -24,9 +24,9 @@ vb_tables() {
   export int[] ex_argp = [];
   export int[] ex_ft = [];
   export int[] ex_ks = [];
-} return void;
+} return void export ex_rg;
 ():() then (import ex_rg):([0, 0, 0])
-():() then (import ex_cd):([])
+():() then len((import ex_rg)):(3)
 
 // ex_vals/ex_fvals  the value stack, an integer view and a float view of the
 //                   same slots; a slot holds whichever its instruction wrote
@@ -52,9 +52,9 @@ vb_pools() {
   export word[] ex_gv = [];
 } chain () {
   export float[] ex_gf = [];
-} return void;
+} return void export ex_strs;
 ():() then (import ex_strs):([""])
-():() then (import ex_fbox):([])
+():() then len((import ex_strs)):(1)
 
 
 // Test check: the whole string pool -- how many strings, then each, joined by

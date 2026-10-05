@@ -18,5 +18,23 @@ regrow_fn() {
   regrow_param();
   export int regrow_fn_node = node_func("g2", "int", (import regrow_plist), (import regrow_plist), 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls regrow_param:[1]
 ():() then init_units:(0)
+
+// One function's statements: the nodes from just past the previous entry of
+// `prog` through its own, which is made last (the range fn_import_use, given/
+// then/more/calls/fit/use.id's neighbour in report/host/cases/given.id, walks).
+wr_fn(int wr_f) {
+  int wr_lo = 0;
+  if(wr_f > 0) {
+    wr_lo = (import prog)[(wr_f - 1)] + 1;
+  }
+  int wr_nd = wr_lo;
+} chain (int wr_f) {
+  while(wr_nd <= (import prog)[wr_f]) {
+    wr_node(wr_nd, (import ns1)[((import prog)[wr_f])]);
+    wr_nd = wr_nd + 1;
+  }
+} return void;
+given then_imp_fixture ("int[]", 2, 0) given wr_build (1):() then len((import wrx)):(2)
+given then_imp_fixture ("int", 1, 0) given wr_build (1):() then len((import wrx)):(0)

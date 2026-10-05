@@ -10,7 +10,8 @@ list_elem(string t) {
 ("string[]"):("string")
 
 // The type a `then (import NAME)[i]:(value)` clause compares at: int for a `then len((import NAME))`, else the type of
-// the export it names, or of one element of it when the clause has an index.
+// the export it names -- or of the field its `.a.b` path reaches (then_path_type,
+// ../../../../dup/utread.id) -- or of one element of it when the clause has an index.
 // "" for a name nothing exports (fit_import has said so by then). Read by the
 // checker (then_imp_value, ../../../../../report/host/cases/then.id) and by
 // emission and the type notes (back/.../test/case/around/then/), so all three
@@ -19,7 +20,7 @@ then_imp_type(int chk_node) {
   int ek = find_str((import enames), (import ns1)[chk_node]);
   string vt = "";
   if(ek >= 0) {
-    vt = (import etypes)[ek];
+    vt = then_path_type((import etypes)[ek], (import ns2)[chk_node]);
   }
 } chain (int chk_node) {
   if(len((import nl2)[chk_node]) == 1 && ty_is_list(vt) == 1) {
@@ -47,5 +48,5 @@ traps_node_fixture() {
   export int fixture_traps_node = newnode("thentraps", ci, 0, "", "", (import fixture_print_two), (import fixture_print_two));
   export int fixture_traps_one = newnode("thentraps", ci, 0, "", "", trap_one, trap_one);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls print_fixture:[1]
 ():() then init_units:(0)

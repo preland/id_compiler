@@ -6,7 +6,7 @@ keep_export_fixture_harn_on() {
   lset((import harn), 0, 1);
   keep_export_fixture_tail();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls keep_export_fixture:[1]
 ():() then init_units:(0)
 
 // The rest of keep_export_fixture_reg's chain: main reachable and two
@@ -26,5 +26,5 @@ keep_export_fixture_all() {
   keep_export_fixture_reg();
   keep_export_fixture_tail();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls keep_export_fixture_reg:[1]
 ():() then init_units:(0)

@@ -35,7 +35,7 @@ void_call_fixture() {
   push((import casegiven), "");
   push((import casegiven), "");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls wrap_fixture:[1]
 ():() then init_units:(0)
 
 emit_ret_call(string f1, string rt, string cargs) {

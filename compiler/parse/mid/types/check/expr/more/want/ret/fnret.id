@@ -9,7 +9,7 @@ farm_i() {
   push((import pline), 7);
   export int f_other = node_func("other", "int", [(import f_pb)], (import f_none), 0 - 1);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls farm_h:[1]
 ():() then init_units:(0)
 
 fn_ret_type(int id) {
@@ -29,5 +29,5 @@ fnret_fixture() {
   int[] none = [];
   export int fnret_bad = node_func("badret", "func(int) return int", none, none, (import fixture_zero));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_fixture:[1]
 ():() then init_units:(0)

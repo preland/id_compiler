@@ -13,7 +13,7 @@ init_lines3() {
   export int[] chkfail = [0];
   export int[] curtl = [0];
   init_lines4();
-} return void;
+} return void export chkfail;
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 

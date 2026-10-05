@@ -16,7 +16,7 @@ pcall_fixture() {
   init_bnames();
   pcall_fixture_reg();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
 
 pcall_fixture_reg() {

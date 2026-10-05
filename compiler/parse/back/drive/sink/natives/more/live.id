@@ -38,7 +38,7 @@ nat_init(int argc, string[] argv) {
 } chain (int argc, string[] argv) {
   lset((import tkout), 0, arg_flag(argc, argv, 1, "--tc-keys"));
   ur_seed(arg_flag_val(argc, argv, 1, "--unit-roots", ""));
-} return void;
+} return void export natc;
 given env_init (3, ["prog", "--unit-roots", "/r"]):() then len((import uroots)):(1)
 given env_init (2, ["prog", "--units"]):() then calls arg_flag:(2, ["prog", "--units"], 1, "--units")
 given env_init (1, ["prog"]):() then (import natc)[0]:(0) then (import stdunit)[0]:(-1)
@@ -54,7 +54,7 @@ given env_init (1, ["prog"]):() then calls exclunit_seed:("")
 nat_lists() {
   export string[] natkey = [];
   export string[] natrow = [];
-} return void;
+} return void export natrow;
 given env_init ():() then len((import natrow)):(0)
 given env_init ():() then (import chkfail)[0]:(0)
 

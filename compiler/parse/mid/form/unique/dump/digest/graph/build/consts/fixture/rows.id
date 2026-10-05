@@ -8,7 +8,7 @@ dg_t_crows() {
   dg_t_cparsed();
   dg_init();
 } return void;
-():() then len((import dg_comp)):(0)
+():() then calls dg_t_cparsed:[1]
 ():() then dg_nexp:("exp 0")
 
 dg_t_crows2() {
@@ -22,5 +22,5 @@ dg_t_cdirty() {
   dg_t_crows();
   int dgq = lc_reg_int("qq", "1", 1);
 } return void;
-():() then len((import dg_comp)):(0)
+():() then calls lc_reg_int:("qq", "1", 1)
 ():() then ctok_span:(5)

@@ -26,5 +26,5 @@ fix_walk_more_fixture() {
   export int wm_un = newleaf("un", a, 0, "-", "");
   export int wm_arr = node_arr([a]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls newleaf:("int", 1, 0, "1", "")
 ():() then init_units:(0)

@@ -9,7 +9,7 @@ lz_n() {
   export int lz_fn9 = node_func("dup9", "int", (import f_none), [(import lz_decl9)], (import lz_dv));
   push((import prog), (import lz_fn5));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lz_m:[1]
 ():() then init_units:(0)
 
 int_code(int id) {

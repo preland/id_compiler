@@ -14,11 +14,11 @@ mk_span1() {
   set_span("5");
 } return void;
 ():() then last_tspan:("tspan 5")
-():() then (import chkfail)[0]:(0)
+():() then calls set_span:("5")
 
 mk_span2() {
   full_env();
   set_span("9");
 } return void;
 ():() then last_tspan:("tspan 9")
-():() then (import chkfail)[0]:(0)
+():() then calls set_span:("9")

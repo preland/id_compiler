@@ -7,7 +7,7 @@ resv_env_setup() {
   env_init();
   init_rtc();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 // Two functions named "dupe", registered in `prog`/`pfile`/`pline` the way a
@@ -31,7 +31,7 @@ dupfn_fixture() {
 } chain () {
   push((import pline), 5);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls resv_env_setup:[1]
 ():() then init_units:(0)
 
 // A `prog` with no duplicate names, no reserved-name collisions and no
@@ -56,5 +56,5 @@ clean_prog_fixture() {
   push((import pfile), "b.id");
   push((import pline), 5);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls resv_env_setup:[1]
 ():() then init_units:(0)

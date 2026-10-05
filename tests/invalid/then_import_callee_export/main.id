@@ -1,0 +1,13 @@
+// EXPECT: (import made): 'made' is exported by 'make', which the function under test, 'outer', is or calls
+make() {
+  export int made = 2;
+} return void;
+
+outer() {
+  make();
+} return void;
+given make ():() then (import made):(2)
+():() then (import made):(2)
+
+main(int argc, string[] argv) {
+} return int 0;

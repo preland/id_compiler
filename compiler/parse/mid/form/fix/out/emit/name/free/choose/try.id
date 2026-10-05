@@ -16,7 +16,7 @@ fix_env3() {
   fix_fixture();
   push((import fixd_used), "bar");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 
 // out/ret/more/within.id's fix_ret_fixture plus a noted range (1..2, run/
@@ -27,5 +27,5 @@ fix_moved_fixture() {
   fix_ret_fixture();
   fix_note_tok(1, 2);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_note_tok:(1, 2)
 ():() then init_units:(0)

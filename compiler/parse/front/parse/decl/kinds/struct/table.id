@@ -22,7 +22,7 @@ init_structs() {
 } chain () {
   export string[] sdfile = [];
   export int[] sdline = [];
-} return void;
+} return void export sdname;
 ():() then len((import sdname)):(0)
 given sd_pair ():() then len((import sdname)):(0)
 

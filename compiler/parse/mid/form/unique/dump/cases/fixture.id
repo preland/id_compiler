@@ -7,5 +7,5 @@ given2_fix() {
   env_init();
   toks_push(["kw", "ident"], ["given", "othersetup"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["kw", "ident"], ["given", "othersetup"])
 ():() then init_units:(0)

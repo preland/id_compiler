@@ -4,7 +4,7 @@
 
 lay_scratch_reset() {
   export string[] lay_scratch_names = [];
-} return void;
+} return void export lay_scratch_names;
 ():() then prints:("")
 given lay_scratch_reset ():() then len((import lay_scratch_names)):(0)
 

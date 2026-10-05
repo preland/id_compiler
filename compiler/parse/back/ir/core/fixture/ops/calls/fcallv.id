@@ -8,7 +8,7 @@ fcallv_fixture() {
   init_bnames();
   fcallv_fixture_reg();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
 
 // "gfunc" declared as a variable of function type (add_var, unlike

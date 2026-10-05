@@ -18,5 +18,5 @@ asm_fix_2str() {
   env_init();
   toks_push(["op", "str", "str", "op"], ["{", "\"i1\"", "\"i2\"", "}"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["op", "str", "str", "op"], ["{", "\"i1\"", "\"i2\"", "}"])
 ():() then init_units:(0)

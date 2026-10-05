@@ -4,12 +4,12 @@
 qmb_keys_pause_seed() {
   init_rest(4, ["qmon", "k.elf", "--keys", "| |"]);
 } return void;
-():() then (import qm_keys):("| |")
-():() then calls init_rest:(4, ["qmon", "k.elf", "--keys", "| |"]) then (import qm_keys):("| |")
+():() then calls init_rest:(4, ["qmon", "k.elf", "--keys", "| |"])
+():() then calls init_rest:[1]
 
 qmb_keys_empty_seed() {
   init_rest(2, ["qmon", "k.elf"]);
 } return void;
-():() then (import qm_keys):("")
-():() then calls init_rest:(2, ["qmon", "k.elf"]) then (import qm_keys):("")
+():() then calls init_rest:(2, ["qmon", "k.elf"])
+():() then calls init_rest:[1]
 

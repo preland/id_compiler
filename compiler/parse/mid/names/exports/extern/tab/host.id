@@ -20,5 +20,5 @@ dead_exp_reach_fixture() {
 } chain () {
   export int reach_imp_m = node_import("gm");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_export:("gm", "int", "main")
 ():() then init_units:(0)

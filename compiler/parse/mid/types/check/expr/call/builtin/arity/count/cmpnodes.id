@@ -7,7 +7,7 @@ cmp_fixture() {
   cmp_build();
   cmp_build2();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls composite_fixture:[1]
 ():() then init_units:(0)
 
 cmp_build() {

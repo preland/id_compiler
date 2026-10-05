@@ -29,4 +29,4 @@ mk_two_toks() {
   push_real("kw", "return");
 } return void;
 ():() then last_tkind:("tkind kw")
-():() then (import chkfail)[0]:(0)
+():() then calls push_real:("op", "=")

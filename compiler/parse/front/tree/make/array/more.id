@@ -16,7 +16,7 @@ mk_two_nodes() {
   newleaf("func", 2, 1, "y", "z");
 } return void;
 ():() then last_kind:("kind func")
-():() then (import chkfail)[0]:(0)
+():() then calls newleaf:("kw", 1, 0, "if", "")
 
 // Two "arr" nodes with real child lists, for l1_of/l2_of and last_l1's cases.
 mk_list_nodes() {
@@ -25,4 +25,4 @@ mk_list_nodes() {
   newnode("arr", 0, 0, "", "", [3], [9, 10]);
 } return void;
 ():() then last_kind:("kind arr")
-():() then (import chkfail)[0]:(0)
+():() then calls newnode:("arr", 0, 0, "", "", [7, 8], [9])

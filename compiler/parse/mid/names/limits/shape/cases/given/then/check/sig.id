@@ -24,3 +24,20 @@ dupeq_ends() {
 } return void;
 given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)
+
+// A `then (import NAME).a.b` clause's fields, followed to the type they reach
+// (then_path_type, ../../../more/dup/utread.id): a path that is not one is
+// refused there, in words that say which step and what to write instead, and
+// otherwise the clause's index and value are held to that type
+// (then_imp_value, ../../../report/host/cases/then.id). Filed here because
+// the lane above it is at the three-entry layout limit.
+then_imp_field(int ci, int chk_node, string want) {
+  string ft = then_path_type(want, (import ns2)[chk_node]);
+  if(ft == "") {
+    case_err(ci, then_path_why(chk_node, want));
+  } else {
+    then_imp_value(ci, chk_node, ft);
+  }
+} return void;
+given then_imp_fixture ("int", 0, 0) given sset((import ns2), (import then_imp_node), ".z") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct\n")
+given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_node), "int"):() then calls then_imp_value:[1]

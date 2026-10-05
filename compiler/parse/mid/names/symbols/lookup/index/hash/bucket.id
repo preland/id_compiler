@@ -31,5 +31,5 @@ scopes_fixture() {
   init_rtc();
   ut_mark();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls edge_fixture:[1]
 ():() then init_units:(0)

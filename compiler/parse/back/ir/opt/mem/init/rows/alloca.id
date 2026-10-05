@@ -11,8 +11,8 @@ m2r_alloca_fixture() {
 } chain () {
   ir_add(0, v);
 } return void;
-():() then len((import pra)):(0)
-():() then (import chkfail)[0]:(0)
+():() then calls ir_leaf:("alloca", "int", -1, -1, "x")
+():() then calls ir_add:[2]
 
 // A row with a cell in it. m2r_row fills each row to len(pra), so outv's
 // rows stay empty until a slot has been collected, and a sum over an empty

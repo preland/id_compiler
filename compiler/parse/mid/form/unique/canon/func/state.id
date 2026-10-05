@@ -22,7 +22,7 @@ uq_begin(string name) {
   export string[] cself = [name];
   export string[] cnames = [];
   export string[] cimps = [];
-} return void;
+} return void export cself;
 given lz_g ("one"):() then (import cself)[0]:("one")
 given lz_g ("two"):() then (import cself)[0]:("two")
 

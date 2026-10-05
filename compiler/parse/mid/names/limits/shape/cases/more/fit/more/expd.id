@@ -39,5 +39,5 @@ traps_case_fixture() {
 } chain () {
   push((import thennode), (import fixture_traps_case_node));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls wrap_fixture:[1]
 ():() then init_units:(0)

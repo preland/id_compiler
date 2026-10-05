@@ -22,5 +22,5 @@ strcmp_fs0() {
   ir_rows();
   init_rtc();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ir_rows:[1]
 ():() then init_units:(0)

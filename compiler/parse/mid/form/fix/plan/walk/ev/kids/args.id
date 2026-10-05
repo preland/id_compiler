@@ -17,7 +17,7 @@ fix_walk_arg2_fixture() {
   int[] none = [];
   fix_walk_arg2_fixture1(none);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 
 fix_walk_arg2_fixture1(int[] none) {

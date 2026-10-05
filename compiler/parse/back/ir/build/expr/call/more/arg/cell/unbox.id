@@ -6,7 +6,7 @@ lz_j() {
   export int lz_func2 = node_func("f2", "void", (import f_none), [(import lz_declid)], 0 - 1);
   export int lz_edecl = node_decl("int", "z", (import lz_i1), 1);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lz_i:[1]
 ():() then init_units:(0)
 
 lw_unbox2(int v, string t) {
@@ -30,5 +30,5 @@ lz_j_dup() {
   lz_j();
   add_export("z", "int", "fn1");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_export:("z", "int", "fn1")
 ():() then init_units:(0)

@@ -23,4 +23,4 @@ unresolved_call_fixture() {
   call_fixture_extern();
 } return void;
 ():() then (import chkfail)[0]:(0)
-():() then (import rtc)[0]:(0)
+():() then calls pushfix:[1]

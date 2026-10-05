@@ -40,8 +40,11 @@ given_arg(int i, int sfn, int[] items, int j) {
   if((import nkind)[(items[j])] == "cfn") {
     case_err(i, "a setup's arguments are literals or (import NAME); '" + (import ns1)[(items[j])] + "' is a function name, which only a case's own arguments may pass");
   } else {
+    lset((import setupargs), 0, 1);
     fit_value(i, items[j], pt);
   }
+} chain (int i, int sfn, int[] items, int j) {
+  lset((import setupargs), 0, 0);
 } return void;
-given fn_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then (import chkfail)[0]:(0)
+given fn_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then (import chkfail)[0]:(0) then (import setupargs)[0]:(0)
 given cfn_fixture ((import fixture_ci), (import fixture_fn), [(import cfn_e)], 0):() then prints:("fixture.id:4: error: a setup's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass\n")

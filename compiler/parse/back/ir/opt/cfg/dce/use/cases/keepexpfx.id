@@ -13,7 +13,7 @@ keep_export_fixture() {
   init_idx();
   harn_init();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 // init_rtc() is only needed on this path: (import fsc)[0] (nat_all_live)
@@ -23,7 +23,7 @@ keep_export_fixture_reg() {
   init_rtc();
   keep_export_fixture_mid();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls keep_export_fixture:[1]
 ():() then init_units:(0)
 
 keep_export_fixture_mid() {

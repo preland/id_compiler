@@ -10,8 +10,9 @@
 // export, and a `given` of the owner would run it twice before the check
 // instead of once, so what the check finds could differ from what one call
 // leaves; a call that does not set it at run time traps as an uninitialised
-// export. Then its index and value (then_imp_value,
-// ../../../report/host/cases/then.id).
+// export. It may not read back what that call only declared (chk_own_import,
+// ../../more/flag/reqtests.id). Then its fields, index and value (then_imp_field,
+// ./sig.id).
 fit_then_imp(int chk_node) {
   int ci = (import ni1)[chk_node];
   string imp_nm = (import ns1)[chk_node];
@@ -25,15 +26,17 @@ fit_then_imp(int chk_node) {
     fit_import(ci, chk_node, want);
   }
 } chain (int chk_node) {
+  chk_own_import(ci, chk_node);
   if(ek >= 0) {
-    then_imp_value(ci, chk_node, want);
+    then_imp_field(ci, chk_node, want);
   }
 } return void;
 given then_imp_fixture ("string", 0, 0) ((import then_imp_node)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
-given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") given sset((import eowners), 0, "fx_target") ((import then_imp_node)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") given sset((import eowners), 0, "fx_target") given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import then_imp_node)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") given sset((import eowners), 0, "fx_target") ((import then_imp_node)):() then calls chk_own_import:[1]
 given then_imp_fixture ("int", 0, 0) given sset((import casegiven), (import fixture_ci), "") ((import then_imp_node)):() then prints:("fixture.id:4: error: (import gx) needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it\n")
-given then_imp_fixture ("int", 1, 0) ((import then_imp_node)):() then calls then_imp_value:[1]
-given then_imp_fixture ("int", 0, 0) ((import then_imp_node)):() then calls then_imp_value:[1]
+given then_imp_fixture ("int", 1, 0) ((import then_imp_node)):() then calls then_imp_field:[1]
+given then_imp_fixture ("int", 0, 0) ((import then_imp_node)):() then calls then_imp_field:[1]
 
 then_fn(int chk_node, string chk_nm) {
   int cfn = func_node(chk_nm);

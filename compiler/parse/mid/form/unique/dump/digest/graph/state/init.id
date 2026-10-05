@@ -42,7 +42,7 @@ dg_init() {
   dg_init_maps();
 } chain () {
   export int[][] dg_cout = [];
-} return void;
+} return void export dg_ctr;
 ():() then (import dg_ctr)[1]:(0)
 given dg_t_graph ():() then (import dg_ctr)[1]:(0)
 

@@ -37,5 +37,5 @@ imd_thin_base() {
   push((import prog), imd_f2);
   uq_fill();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_import:("alpha")
 ():() then init_units:(0)

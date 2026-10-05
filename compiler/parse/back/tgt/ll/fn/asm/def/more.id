@@ -20,7 +20,7 @@ llasm_row2_fixture() {
   push((import afret), "string");
   push((import afparams), []);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls llasm_row_fixture:[1]
 ():() then init_units:(0)
 
 // The rest of `ll_asm_body`: the text and constraint string, then the two

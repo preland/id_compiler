@@ -10,3 +10,29 @@ then_push_kind(string kind, string s1v, int[] items) {
 given fn_fixture ("thenprints", "", []):()
 given fn_fixture ("theneprints", "", [1]):()
 
+
+// `(import NAME)` and the fields after it, `.a.b`, of a `then (import NAME).a.b:(value)` check (../../clauses.id). The
+// "cimport" node's s2 holds them as ".a.b" -- "" when there are none --
+// which then_imp_store copies onto the check.
+then_imp_item(int[] pos) {
+  int e = case_import(pos);
+  string path = "";
+  while(cur_text(pos) == ".") {
+    advance(pos);
+    path = path + "." + read_name(pos);
+  }
+} chain (int[] pos) {
+  sset((import ns2), e, path);
+} return int e;
+given env_init given toks_push(["op", "kw", "ident", "op", "op", "ident", "op", "ident", "op"], ["(", "import", "zz", ")", ".", "a", ".", "b", ":"]) ([0]):(0) then (import ns2)[0]:(".a.b")
+given env_init given toks_push(["op", "kw", "ident", "op", "op"], ["(", "import", "zz", ")", ":"]) ([0]):(0) then (import ns2)[0]:("")
+
+// The check node for a then-import clause: the export's name and its field path are the leaf's, the
+// index and the value are the clause's.
+then_imp_store(string kind, int e, int[] items, int[] imp_ix) {
+  int n = len((import casestart));
+  int node = newnode(kind, n - 1, 0, (import ns1)[e], (import ns2)[e], items, imp_ix);
+  push((import thennode), node);
+} return void;
+given fn_fixture given sset((import ns2), (import fixture_zero), ".a") ("thenimp", (import fixture_zero), [], []):() then calls newnode:("thenimp", 0, 0, "0", ".a", [], [])
+given fn_fixture ("thenlen", (import fixture_zero), [], []):() then calls newnode:("thenlen", 0, 0, "0", "", [], [])

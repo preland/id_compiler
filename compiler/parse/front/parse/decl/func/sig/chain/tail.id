@@ -21,3 +21,16 @@ chain_add(int[] body, int[] seg) {
 } return void;
 given full_env ([], []):() then (import chkfail)[0]:(0)
 given full_env ([1], [2]):() then (import chkfail)[0]:(0)
+
+// `export NAME` after a return type that is not void: only a void function says
+// which export it initializes, since a function that returns a value has a
+// result to say instead. The two tokens are skipped so one mistake is reported once.
+non_void_export(int[] pos, string rt) {
+  if(rt != "void" && cur_kind(pos) == "kw" && cur_text(pos) == "export") {
+    syn_err(pos, "only a void function can name the export it initializes: '} return " + rt + " export NAME;' gives a value and a variable at once; drop 'export NAME' from the return clause, or make the function void");
+    advance(pos);
+    advance(pos);
+  }
+} return void;
+given env_init given toks_push(["kw", "ident", "op"], ["export", "gx", ";"]) ([0], "int"):() then prints:("<stdin>:1: error: only a void function can name the export it initializes: '} return int export NAME;' gives a value and a variable at once; drop 'export NAME' from the return clause, or make the function void\n")
+given env_init given toks_push(["kw", "ident", "op"], ["export", "gx", ";"]) ([0], "void"):() then prints:("")

@@ -31,5 +31,5 @@ lwo_fixture() {
   export int lwo_w2 = lw_alloca("int[]", "w");
   export int lwo_ent = (import lwent)[0];
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ir_func:(-1, "fa_nest", "int[]")
 ():() then init_units:(0)

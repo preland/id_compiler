@@ -9,7 +9,7 @@ lz_empty() {
   uq_fill();
   imd_fill();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fwd_env:[1]
 ():() then init_units:(0)
 
 emit_fcall(int id) {

@@ -9,14 +9,14 @@ notes_base() {
   init_rtc();
   ut_mark();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 notes_setup() {
   notes_base();
   notes_push();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls notes_base:[1]
 ():() then init_units:(0)
 
 notes_push() {

@@ -15,7 +15,7 @@ fix_env4() {
   fix_fixture();
   fix_take("baz_v", "int");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_take:("baz_v", "int")
 ():() then init_units:(0)
 
 lw_brto(int b) {

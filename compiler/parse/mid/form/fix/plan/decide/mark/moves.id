@@ -33,4 +33,4 @@ fix_sep_fixture() {
   push((import fixe_sep), 0);
 } return void;
 ():() then fixe_sep_count:("sep 0")
-():() then (import chkfail)[0]:(0)
+():() then calls fix_touch_fixture:[1]

@@ -31,7 +31,7 @@ fold_cmp_fixture() {
   export int fq_id = ir_leaf("const", "int", 0 - 1, 0 - 1, "5");
   export int fmix_id = ir_leaf("icmp", "int", (import fzc_id), (import fzc_id), "!=");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ir_leaf:("const", "bool", -1, -1, "0")
 ():() then fc_op_check:("icmp")
 
 fc_op_check() {

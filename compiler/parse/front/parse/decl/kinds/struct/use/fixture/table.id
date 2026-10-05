@@ -16,5 +16,5 @@ sd_case_toks() {
   env_init();
   push_toks(["ident", "op", "int", "op", "int", "op", "int", "eof"], ["P", "(", "1", ",", "2", ")", "7", ""]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls push_toks:(["ident", "op", "int", "op", "int", "op", "int", "eof"], ["P", "(", "1", ",", "2", ")", "7", ""])
 ():() then len((import tkind)):(8)

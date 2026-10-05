@@ -5,7 +5,7 @@ farm_j() {
   export int f_main = node_func("main", "int", (import f_none), (import f_none), 0 - 1);
   push((import prog), (import f_main));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls farm_i:[1]
 ():() then init_units:(0)
 
 // The real fingerprint pass (mid/form/unique/scan/pass/check.id's uq_fill), run
@@ -17,7 +17,7 @@ farm_k() {
   farm_j4();
   uq_fill();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls farm_j4:[1]
 ():() then init_units:(0)
 
 ord_report(int id, string lt, string rt) {

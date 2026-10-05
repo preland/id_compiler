@@ -32,5 +32,5 @@ fix_wbuild_fixture() {
 } chain () {
   fidx_add("foo");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_decl:("int", "x", 0, 1)
 ():() then init_units:(0)

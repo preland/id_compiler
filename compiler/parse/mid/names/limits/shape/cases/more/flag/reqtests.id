@@ -9,7 +9,54 @@
 // flag is a one-element list written through lset, like chkfail.
 reqtests_init() {
   export int[] reqc = [0];
-} return void;
+} return void export reqc;
 given env_init ():() then (import reqc)[0]:(0)
 given flags_setup ():() then (import reqc)[0]:(0)
 
+
+// Whether any function in the call closure of `wc_src` -- itself included --
+// writes the exported variable `wc_nm` declared by `wc_owner`: a write through
+// (import NAME) by any of them, or through the bare name by the declaring
+// function (the write table, report/diagnostics.id's wr_ready).
+wr_closure(string wc_src, string wc_nm, string wc_owner) {
+  wr_ready();
+  string wc_ik = "i:" + wc_nm;
+  string wc_vk = "v:" + wc_nm;
+} chain (string wc_src, string wc_nm, string wc_owner) {
+  int wc_hit = 0;
+  int wc_k = 0;
+  while(wc_k < len((import wrx)) && wc_hit == 0) {
+    if((import wrx)[wc_k] == wc_ik || ((import wrx)[wc_k] == wc_vk && (import wrf)[wc_k] == wc_owner)) {
+      wc_hit = reaches(wc_src, (import wrf)[wc_k]);
+    }
+    wc_k = wc_k + 1;
+  }
+} return int wc_hit;
+given then_imp_fixture ("int[]", 2, 0) ("rd", "gx", "mk"):(1)
+given then_imp_fixture ("int[]", 2, 0) ("rd", "gy", "mk"):(0)
+
+// A case may not read back what its own call made: `(import NAME)` is refused
+// when the function that declares NAME is the function under test or anything it
+// calls, and nothing in that call writes NAME after declaring it -- the case
+// would read the value the call just built and stay green whatever the body did
+// (docs/TESTS.md). Not refused: a variable some function in the call writes
+// (the case then sees an effect), a function whose return clause says it exists
+// to initialize NAME (`} return void export NAME;`), and a `given` setup's own
+// arguments, which are read before the call (given_arg, ../../given/setup/args.id,
+// raises setupargs while it checks them).
+chk_own_import(int i, int e) {
+  string oi_x = (import ns1)[e];
+  int oi_ek = find_str((import enames), oi_x);
+  string oi_f = "";
+} chain (int i, int e) {
+  if(i < len((import casefn))) {
+    oi_f = (import ns1)[((import casefn)[i])];
+  }
+  if(oi_f != "" && oi_ek >= 0 && (import setupargs)[0] == 0 && reaches(oi_f, (import eowners)[oi_ek]) == 1 && fn_ret_export((import casefn)[i]) != oi_x && wr_closure(oi_f, oi_x, (import eowners)[oi_ek]) == 0) {
+    case_err(i, "(import " + oi_x + "): '" + oi_x + "' is exported by '" + (import eowners)[oi_ek] + "', which the function under test, '" + oi_f + "', is or calls, and nothing in that call writes it after declaring it, so this case would read back a value its own call just made and stay green whatever the body did; check a variable the call changes (such as then (import other)[0]:(value)), or the return value, or, if '" + (import eowners)[oi_ek] + "' exists to initialize '" + oi_x + "', say so in its return clause: '} return void export " + oi_x + ";'");
+  }
+} return void;
+given then_imp_fixture ("int", 0, 0) given sset((import eowners), 0, "fx_target") ((import fixture_ci), (import then_imp_cix)):() then prints:("fixture.id:4: error: (import gx): 'gx' is exported by 'fx_target', which the function under test, 'fx_target', is or calls, and nothing in that call writes it after declaring it, so this case would read back a value its own call just made and stay green whatever the body did; check a variable the call changes (such as then (import other)[0]:(value)), or the return value, or, if 'fx_target' exists to initialize 'gx', say so in its return clause: '} return void export gx;'\n")
+given then_imp_fixture ("int[]", 2, 0) given sset((import eowners), 0, "rd") ((import fixture_ci), (import then_imp_cix)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given sset((import eowners), 0, "fx_target") given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_ci), (import then_imp_cix)):() then prints:("")
+given then_imp_fixture ("int", 0, 0) given sset((import eowners), 0, "fx_target") given lset((import setupargs), 0, 1) ((import fixture_ci), (import then_imp_cix)):() then prints:("")

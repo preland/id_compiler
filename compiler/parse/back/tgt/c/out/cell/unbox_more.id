@@ -9,7 +9,7 @@ fix_env2() {
   push((import fixd_nm), "foo");
   push((import fixd_ty), "string");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 
 // A second asm row sharing asmfx_setup's own name "foo", for asm_first's
@@ -21,7 +21,7 @@ asmfx_dup_fixture() {
   asmfx_setup();
   asmfx_push();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls asmfx_setup:[1]
 ():() then init_units:(0)
 
 unbox4(string code, string type) {

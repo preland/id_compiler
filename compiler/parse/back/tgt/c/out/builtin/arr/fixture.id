@@ -8,7 +8,7 @@ arr1_fixture() {
   int[] one = [(import lit_e)];
   export int arr1_e = newnode("arr", 0, 0, "", "", one, one);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls lit_int_fixture:[1]
 ():() then init_units:(0)
 
 // Two claims on two different cases of the same function, same kind and
@@ -28,7 +28,7 @@ claim_dup_fixture() {
 } chain () {
   push((import consbound), "O(n)");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls case_fidx_fixture:[1]
 ():() then init_units:(0)
 
 // One claim on a case whose function differs from case 0's -- for
@@ -43,5 +43,5 @@ claim_other_fn_fixture() {
   push((import conskind), k);
   push((import consbound), "O(n)");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls case_fidx_fixture2:[1]
 ():() then init_units:(0)

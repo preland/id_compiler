@@ -22,6 +22,8 @@ func_done(int[] pos, string name, int[] params, int[] body, string rt) {
   int ret_i = node_func(name, rt, params, body, rexpr);
 } chain (int[] pos, string name, int[] params, int[] body, string rt) {
   seal_rets(name, rt);
+  non_void_export(pos, rt);
+  retexp_bind(ret_i);
 } return int ret_i;
 given decl_tokens ([35], "f", [9], [8], "int"):(1)
 given decl_tokens ([35], "g", [1], [2], "int"):(1)

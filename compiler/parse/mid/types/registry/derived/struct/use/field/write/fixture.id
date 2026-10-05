@@ -25,7 +25,7 @@ sd_use_fixture() {
 } chain () {
   sd_use_writes();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_var:("p", "P", 0)
 ():() then init_units:(0)
 
 sd_use_reads() {

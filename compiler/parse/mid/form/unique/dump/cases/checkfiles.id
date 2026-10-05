@@ -8,14 +8,14 @@ full_check_fixture() {
   full_env();
   cmp_fixture();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls full_env:[1]
 ():() then init_units:(0)
 
 clean_check_fixture() {
   full_env();
   leaves_fixture();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls full_env:[1]
 ():() then init_units:(0)
 
 // A declaration typed "void[]", for chk_voidarr's error case.
@@ -23,5 +23,5 @@ voidarr_build() {
   leaves_fixture();
   export int decl_voidarr = node_decl("void[]", "y", (import lit_a), 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls leaves_fixture:[1]
 ():() then init_units:(0)

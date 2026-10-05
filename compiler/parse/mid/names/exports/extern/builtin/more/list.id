@@ -18,7 +18,7 @@ call_fixture_extern() {
   export int unresolved_call = node_call("unknown", args);
 } return void;
 given pushfix ():()
-given pushfix ():() then (import rtc)[0]:(0)
+given pushfix ():() then calls init_rtc:[1]
 
 scnames_fix() {
   ifwhilefix();

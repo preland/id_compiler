@@ -6,6 +6,6 @@ optfx_setup() {
   env_init();
   int r = init_opt();
 } return void;
-():() then (import chkfail)[0]:(0)
-():() then len((import pra)):(0)
+():() then calls env_init:[1]
+():() then calls init_opt:[2]
 

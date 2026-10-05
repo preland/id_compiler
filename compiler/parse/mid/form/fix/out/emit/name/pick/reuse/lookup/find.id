@@ -20,7 +20,7 @@ fix_rcache_find_hit() {
   push((import fixd_rk), "|len|(|)");
   push((import fixd_rn), "cachedname");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_span_fixture:[1]
 ():() then init_units:(0)
 
 // plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the

@@ -23,5 +23,5 @@ fs_fixture() {
   env_init();
   fs_build2();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)

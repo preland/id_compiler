@@ -21,7 +21,7 @@ fix_traps_setup() {
   export int tr_unsafe = newleaf("bin", tr_one, tr_zero, "/", "");
 } return void;
 ():() then tr_unsafe_rhs_val:(0)
-():() then (import chkfail)[0]:(0)
+():() then calls newleaf:("int", 1, 0, "1", "")
 
 tr_unsafe_rhs_val() {
   int b = (import ni2)[(import tr_unsafe)];

@@ -7,19 +7,19 @@ tup1_fix() {
   env_init();
   toks_push(["op", "int", "op"], ["(", "5", ")"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["op", "int", "op"], ["(", "5", ")"])
 ():() then init_units:(0)
 
 tup2_fix() {
   env_init();
   toks_push(["op", "int", "op", "int", "op"], ["(", "5", ",", "6", ")"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["op", "int", "op", "int", "op"], ["(", "5", ",", "6", ")"])
 ():() then init_units:(0)
 
 colon_fix() {
   env_init();
   toks_push(["op"], [":"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["op"], [":"])
 ():() then init_units:(0)

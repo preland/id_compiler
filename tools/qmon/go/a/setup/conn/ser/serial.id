@@ -23,6 +23,6 @@ given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_n
 set_rc() {
   int bad = conn_bad();
   export int qm_rc = bad;
-} return void;
+} return void export qm_rc;
 given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then (import qm_rc):(0)
 given qa_both_ready given connect_qmp given connect_serial ():() then qa_check_nc1:(1) then (import qm_rc):(0) then calls conn_bad:[1]

@@ -27,5 +27,5 @@ regrow_c() {
   push((import dvexp), 0);
   push((import dvunit), 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls regrow_b:[1]
 ():() then init_units:(0)

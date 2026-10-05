@@ -18,6 +18,18 @@ ifwhilefix() {
   export int[] rgdeclist = [(import rgdecl_node)];
   export int rgif_node = node_if(0, rgdeclist, rgdeclist, 0);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls declfix:[1]
 ():() then init_units:(0)
 
+
+// A return clause names an export the function does not make. The fix is in the
+// message: export it in this function's body, or leave the name out.
+retexp_err(int id, string nm) {
+  string re_fn = (import ns1)[id];
+  string re_loc = loc_at(re_fn, func_line(re_fn));
+  print(re_loc + "'" + nm + "' is named by the return clause of '" + re_fn + "' (return void export " + nm + "), but '" + re_fn + "' does not export it in its own body; add 'export TYPE " + nm + " = VALUE;' to '" + re_fn + "', or drop 'export " + nm + "' from its return clause");
+} chain (int id, string nm) {
+  note_failure();
+} return void;
+given fn_fixture ((import fixture_fn), "gx"):() then calls note_failure:[1]
+given fn_fixture ((import fixture_fn), "gx"):() then (import chkfail)[0]:(1)

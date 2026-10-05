@@ -40,5 +40,5 @@ uninit_fixture() {
   add_export("gc", "int", "conf.id");
   export int uninit_imp = node_import("gx");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_export:("gx", "int", "setup_fn")
 ():() then (import harn)[0]:(1)

@@ -21,4 +21,18 @@ seal_fixture() {
   push((import pend_rets), seal_n);
 } return void;
 ():() then last_s1:("s1 ")
-():() then (import chkfail)[0]:(0)
+():() then calls newleaf:("ret", -1, 0, "", "")
+
+// The export a `} return void export NAME;` clause named (void_export,
+// ../parts/void/scan.id), recorded for the func node `fnode`: its name goes in
+// retexp, and the node's second int field -- 0 for a function, 1 for a native --
+// holds 2 plus its position there. A function with no such clause has none pending.
+retexp_bind(int fnode) {
+  if(len((import retexp_pend)) > 0) {
+    string rb_nm = pop((import retexp_pend));
+    push((import retexp), rb_nm);
+    lset((import ni2), fnode, len((import retexp)) + 1);
+  }
+} return void;
+given fn_fixture given lst_str_extend((import retexp_pend), ["gx"]) ((import fixture_fn)):() then len((import retexp)):(1) then len((import retexp_pend)):(0)
+given fn_fixture ((import fixture_fn)):() then len((import retexp)):(0)

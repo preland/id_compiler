@@ -2,7 +2,7 @@ irlfx_setup() {
   env_init();
   int[] bl = [];
   export int irlfx_id = ir_insn("add", "int", 0, 1, "", [10, 11, 12], bl);
-} return void;
-():() then (import chkfail)[0]:(0)
+} return void export irlfx_id;
+():() then calls ir_insn:("add", "int", 0, 1, "", [10, 11, 12], [])
 ():() then (import irlfx_id):(0)
 

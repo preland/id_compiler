@@ -16,3 +16,25 @@ emit_print_final(int ci, string lab, string cnd, string shown, string lt) {
 } return void;
 (0, "prints", "1", "idtc_show_esc(idtc_out_buf);", "hi"):() then prints:("    if (!(1)) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[0], idtc_call[0]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected hi\\n\", stderr);\n        return 3;\n    }\n")
 (1, "eprints", "0", "idtc_show_esc(idtc_err_buf);", "bye"):() then prints:("    if (!(0)) {\n        fprintf(stderr, \"%s: test failed: %s eprints = \", idtc_where[1], idtc_call[1]);\n        idtc_show_esc(idtc_err_buf);\n        fputs(\", expected bye\\n\", stderr);\n        return 3;\n    }\n")
+
+// The C expression a `then (import NAME).a.b` clause reads, before an index or
+// a length is taken from it (check/entry.id): the export read the way checked_read
+// reads it, then one list cell, unboxed to its field's type, for each field of
+// the path. A struct is a list at run time, one cell per field in declaration
+// order, so a field is its position. Filed here because the check/ lane is at
+// the three-function limit.
+then_imp_get(int node) {
+  string rd = checked_read((import ns1)[node]);
+  string[] steps = str_split((import ns2)[node], ".");
+  string pt = (import etypes)[find_str((import enames), (import ns1)[node])];
+} chain (int node) {
+  int pi = 1;
+  while(pi < len(steps)) {
+    rd = unbox("id_list_get(" + rd + ", " + sd_fpos(pt, steps[pi]) + ")", then_path_step(pt, steps[pi]));
+    pt = then_path_step(pt, steps[pi]);
+    pi = pi + 1;
+  }
+} return string rd;
+given then_imp_fixture ("int", 0, 0) ((import then_imp_node)):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
+given then_imp_fixture ("P", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sset((import ns2), (import then_imp_node), ".y") ((import then_imp_node)):("(int)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 1))")
+given then_imp_fixture ("R", 0, 0) given sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1) given sd_note("R", ["p", "q"], ["P", "int"], "r.id", 9) given sset((import ns2), (import then_imp_node), ".p.y") ((import then_imp_node)):("(int)(id_list_get((IdList*)(intptr_t)(id_list_get(((void)(idtc_set_gx || (id_null_read(), 0)), gx), 0)), 1))")

@@ -33,5 +33,5 @@ fix_std_fixture() {
   fix_fixture();
   init_reg();
 } return void;
-():() then (import fixd_std)[0]:(0)
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
+():() then calls init_reg:[1]

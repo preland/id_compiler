@@ -11,7 +11,7 @@ lc_env2() {
   init_rtc();
   init_tyc();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls env_init:[1]
 ():() then init_units:(0)
 
 lc_reg_int(string name, string text, int nval) {

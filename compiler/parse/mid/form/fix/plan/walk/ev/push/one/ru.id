@@ -13,7 +13,7 @@ fix_span_fixture() {
   lset((import curtk), 0, 2);
   fix_span_fixture1();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 
 fix_span_fixture2(int e) {

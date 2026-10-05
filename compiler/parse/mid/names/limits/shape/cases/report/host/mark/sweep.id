@@ -12,7 +12,7 @@ ut_seeded() {
   notes_base();
   ut_add("port_byte", "asm 'in8'", "*");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls ut_add:("port_byte", "asm 'in8'", "*")
 ():() then init_units:(0)
 
 // ut_loop and ut_sweep both read utname (../../why/reason.id's ut_at does too),

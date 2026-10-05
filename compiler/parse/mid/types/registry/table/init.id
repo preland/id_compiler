@@ -45,7 +45,7 @@ init_ty_cols() {
   export string[] tyname = [];
   export string[] tykind = [];
   export int[] tywidth = [];
-} return void;
+} return void export tyname;
 given init_tyreg ():() then len((import tyname)):(0)
 ():() then len((import tyname)):(0)
 

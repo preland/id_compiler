@@ -8,7 +8,7 @@ calls_node_fixture() {
   calls_items_fixture();
   calls_node_build();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls calls_items_fixture:[1]
 ():() then init_units:(0)
 
 calls_node_build() {

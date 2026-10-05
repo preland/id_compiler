@@ -5,14 +5,14 @@ calls_args_fix() {
   fn_fixture();
   toks_push(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "(", "6", ")"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "(", "6", ")"])
 ():() then init_units:(0)
 
 calls_count_fix() {
   fn_fixture();
   toks_push(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]);
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls toks_push:(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"])
 ():() then init_units:(0)
 
 // `traps:("...")` (docs/TESTS.md): its own kind, "thentraps", since the

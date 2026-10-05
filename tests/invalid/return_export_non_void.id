@@ -1,0 +1,8 @@
+// EXPECT: only a void function can name the export it initializes
+mk() {
+  int b = 1;
+  export int a = 2;
+} return int b export a;
+
+main(int argc, string[] argv) {
+} return int 0;

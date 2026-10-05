@@ -4,7 +4,7 @@ decltype_fixture() {
   leaves_fixture();
   decl_build();
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls leaves_fixture:[1]
 ():() then init_units:(0)
 
 decl_build() {
@@ -21,5 +21,5 @@ assign_build() {
   add_var("xl", "int[]", 0);
   export int assign_list = node_assign("xl", (import lit_a));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls add_var:("xl", "int[]", 0)
 ():() then init_units:(0)

@@ -6,7 +6,7 @@ gn_env() {
   export int f_pgen = node_param("param", "int", "ret_i");
   export int[] f_pgen_list = [(import f_pgen)];
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls node_param:("param", "int", "ret_i")
 ():() then init_units:(0)
 
 fncount_setup() {
@@ -16,3 +16,15 @@ fncount_setup() {
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
+
+// Every argument of a call is a path into something the callee may write.
+wr_args(int nd, string wr_fname) {
+  int[] wr_as = (import nl1)[nd];
+  int wr_j = 0;
+  while(wr_j < len(wr_as)) {
+    wr_root(wr_as[wr_j], wr_fname);
+    wr_j = wr_j + 1;
+  }
+} return void;
+given imp_use_fixture given wr_build ((import imp_use_dcall), "f"):() then (import wrx):(["i:gx"])
+given imp_use_fixture given wr_build ((import imp_use_call), "g"):() then (import wrf):(["g"])

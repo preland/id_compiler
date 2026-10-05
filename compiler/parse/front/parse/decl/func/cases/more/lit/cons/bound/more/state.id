@@ -10,6 +10,12 @@
 //   casetimeout  each case's `timeout N` seconds, or 0 (cases/case/given/)
 //   casegargs  each case's "gargs" node: one "gsetup" per `given`, in order,
 //              holding the literals a setup is called with (cases/case/given/)
+//   setupargs  [1 while a `given` setup's own arguments are being checked
+//              (mid/names/limits/shape/cases/given/setup/args.id)]
+//   wrdone     [1 once the write table (wrx, wrf) is built, mid/names/limits/shape/cases/report/diagnostics.id]
+//   retexp     the names `} return void export NAME;` clauses gave, in order;
+//              a func node's second int field is 2 plus its position here
+//   retexp_pend  the name just read, until its func node exists
 //   thennode   each `then` check, as a "then" node (cases/case/then/)
 //   ptoks      each function's first token, parallel to `prog` as parsed
 //   ptoke      one past its return clause's last token: the text a case
@@ -84,6 +90,11 @@ init_cases2() {
   export int[] casetimeout = [];
 } chain () {
   export int[] casegargs = [];
-} return void;
+  export int[] setupargs = [0];
+  export int[] wrdone = [0];
+} chain () {
+  export string[] retexp = [];
+  export string[] retexp_pend = [];
+} return void export consbound;
 ():() then len((import consbound)):(0)
 given claim_cols_fixture ():() then len((import consbound)):(0)

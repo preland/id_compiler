@@ -10,7 +10,7 @@ std_unit_fixture_root() {
   std_root_set("/repo/idstd", 1);
 } return void;
 ():() then len((import ix_fn)):(1)
-():() then (import ix_stdpresent):(1)
+():() then calls std_root_set:("/repo/idstd", 1)
 
 std_unit_fixture_fallback() {
   string[] no_edges = [];
@@ -18,7 +18,7 @@ std_unit_fixture_fallback() {
   std_root_set("", 0);
 } return void;
 ():() then len((import ix_fn)):(0)
-():() then (import ix_stdpresent):(0)
+():() then calls std_root_set:("", 0)
 
 std_unit_fixture_empty() {
   string[] no_edges = [];
@@ -26,4 +26,4 @@ std_unit_fixture_empty() {
   std_root_set("", 1);
 } return void;
 ():() then len((import ix_fn)):(0)
-():() then (import ix_stdpresent):(1)
+():() then calls std_root_set:("", 1)

@@ -25,4 +25,4 @@ mk_one_kind() {
   push_kii("shell", 9, 9);
 } return void;
 ():() then last_kind:("kind shell")
-():() then (import chkfail)[0]:(0)
+():() then calls push_kii:("shell", 9, 9)

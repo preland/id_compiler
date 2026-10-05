@@ -44,5 +44,5 @@ esc_fix() {
   esc_seed();
   lset((import sqbase), 0, (import efc_fn));
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls full_env:[1]
 ():() then init_units:(0)

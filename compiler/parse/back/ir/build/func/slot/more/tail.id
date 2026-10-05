@@ -26,5 +26,5 @@ lw_fixture_pnode() {
   int a = newleaf("param", 0, 0, "int", "x");
   int b = newleaf("param", 0, 0, "word", "y");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls newleaf:("param", 0, 0, "int", "x")
 ():() then init_units:(0)

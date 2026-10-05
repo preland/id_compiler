@@ -10,7 +10,7 @@ regrow_b() {
   push((import dvline), 10);
   push((import dvtype), "int");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls regrow_a:[1]
 ():() then init_units:(0)
 
 // A "var" node reachable together with the declaration registry: acc_var's

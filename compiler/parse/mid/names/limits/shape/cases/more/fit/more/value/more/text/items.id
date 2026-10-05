@@ -41,5 +41,5 @@ impcase_given() {
   push((import fnodes), setup_node);
   push((import casegiven), "fx_setup");
 } return void;
-():() then (import chkfail)[0]:(0)
+():() then calls fn_fixture:[1]
 ():() then init_units:(0)
