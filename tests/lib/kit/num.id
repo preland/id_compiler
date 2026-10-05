@@ -1,0 +1,44 @@
+// Numbers in, numbers out: every scalar and number-list type the C interface carries.
+
+// The dot product of two int lists. A shorter second list makes the index
+// trap, which the host sees as status 1.
+kit_dot(int[] kt_a, int[] kt_b) {
+  int kt_sum = 0;
+  int kt_i = 0;
+  int kt_n = len(kt_a);
+} chain (int[] kt_a, int[] kt_b) {
+  while (kt_i < kt_n) {
+    kt_sum = kt_sum + kt_a[kt_i] * kt_b[kt_i];
+    kt_i = kt_i + 1;
+  }
+} return int kt_sum;
+([1, 2, 3], [4, 5, 6]):(32)
+([], []):(0)
+
+// Every element of a float list times a factor.
+kit_scale(float[] kt_x, float kt_f) {
+  float[] kt_out = [];
+  int kt_j = 0;
+  int kt_m = len(kt_x);
+} chain (float[] kt_x, float kt_f) {
+  while (kt_j < kt_m) {
+    push(kt_out, kt_x[kt_j] * kt_f);
+    kt_j = kt_j + 1;
+  }
+} return float[] kt_out;
+([1.5, -2.0], 2.0):([3.0, -4.0])
+([], 9.0):([])
+
+// The sum of a word list, in 64 bits.
+kit_wsum(word[] kt_w) {
+  word kt_tot = 0;
+  int kt_k = 0;
+  int kt_c = len(kt_w);
+} chain (word[] kt_w) {
+  while (kt_k < kt_c) {
+    kt_tot = kt_tot + kt_w[kt_k];
+    kt_k = kt_k + 1;
+  }
+} return word kt_tot;
+([4000000000, 4000000000]):(8000000000)
+([]):(0)

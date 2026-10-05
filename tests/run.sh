@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
+SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1083,6 +1083,24 @@ if want wasm_js_std; then
     [ "$wjss" -eq 0 ] && mark_done wasm_js_std
 fi
 
+# --- --lib: an id project as a shared library, a static archive and a C
+#     header, called from C (docs/INTEROP.md). lib builds fixtures with no
+#     standard library; lib_csv builds trials/csvlib, which needs the real one.
+echo
+echo "--- --lib (docs/INTEROP.md, id as a library) ---"
+lbs=0
+if want lib; then
+    ./lib.sh
+    lbs=$?
+    [ "$lbs" -eq 0 ] && mark_done lib
+fi
+if want lib_csv; then
+    ./lib.sh csv
+    lbc=$?
+    [ "$lbc" -eq 0 ] && mark_done lib_csv
+    [ "$lbc" -eq 0 ] || lbs=1
+fi
+
 # --- conformance: every code-generation target must agree about what a
 #     program means. Comparing emitted text against idc.py, which the tree
 #     used to do, is only a question while both compilers emit C; this
@@ -1188,5 +1206,5 @@ for i in "${!TMPGUARD_TREES[@]}"; do
 done
 
 [ "$fail" -eq 0 ] && [ "$tmpg" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
-    && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$wjs" -eq 0 ] && [ "$wjss" -eq 0 ] && [ "$conf" -eq 0 ] \
+    && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$wjs" -eq 0 ] && [ "$wjss" -eq 0 ] && [ "$lbs" -eq 0 ] && [ "$conf" -eq 0 ] \
     && [ "$tst" -eq 0 ] && [ "$fixr" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]

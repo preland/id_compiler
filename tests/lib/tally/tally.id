@@ -1,0 +1,28 @@
+// A library with state: reset makes a list that add and total read through
+// `import`. That list is an id heap value that has to outlive the call that made
+// it, which only a --lib-state build allows.
+
+tally_reset() {
+  export int[] tl_vals = [];
+} return void export tl_vals;
+():() then len((import tl_vals)):(0)
+():() then (import tl_vals):([])
+
+tally_add(int tl_item) {
+  push((import tl_vals), tl_item);
+} return void;
+given tally_reset (5):() then len((import tl_vals)):(1)
+given tally_reset (6):() then (import tl_vals)[0]:(6)
+
+tally_total() {
+  int tl_sum = 0;
+  int tl_i = 0;
+  int tl_n = len((import tl_vals));
+} chain () {
+  while (tl_i < tl_n) {
+    tl_sum = tl_sum + (import tl_vals)[tl_i];
+    tl_i = tl_i + 1;
+  }
+} return int tl_sum;
+given tally_reset ():(0)
+given tl_hold ():(7)

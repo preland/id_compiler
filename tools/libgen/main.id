@@ -1,0 +1,46 @@
+// libgen -- the C interface of an id library.
+//
+//   idparse --fingerprints < program.tokens | libgen header|wrap NAME FUNCTION...
+//
+// Reads the program's fingerprint text (`idparse --fingerprints`) on standard input. `header` prints
+// the C header for the named exported functions and `wrap` prints the C
+// wrapper that implements each; NAME prefixes every C symbol. Exit status: 0
+// on success, 1 when a function cannot be exported (stderr says why and what
+// to do), 2 for a usage error.
+
+// The names from position lg_k on.
+lg_after(string[] lg_xs, int lg_k) {
+  string[] lg_names_out = [];
+  int lg_i = lg_k;
+  int lg_n = len(lg_xs);
+} chain (string[] lg_xs, int lg_k) {
+  while (lg_i < lg_n) {
+    push(lg_names_out, lg_xs[lg_i]);
+    lg_i = lg_i + 1;
+  }
+} return string[] lg_names_out;
+(["a", "b", "c"], 1):(["b", "c"])
+(["a"], 3):([])
+
+// Run the generator, or explain the command line. 0, 1 or 2.
+lg_go(int lg_argc, string[] lg_argv) {
+  int lg_rc = 2;
+  string[] lg_fns = lg_after(lg_argv, 3);
+  string[] lg_lines = str_split(read_all(), "\n");
+} chain (int lg_argc, string[] lg_argv) {
+  if (lg_argc >= 3 && (lg_argv[1] == "header" || lg_argv[1] == "wrap")) {
+    lg_rc = lg_all(lg_argv[1], lg_argv[2], lg_fns, lg_lines);
+  } else {
+    eprint("usage: libgen header|wrap NAME FUNCTION...");
+  }
+} return int lg_rc;
+(1, ["libgen"]):(2) then eprints:("usage: libgen header|wrap NAME FUNCTION...\n")
+(3, ["libgen", "other", "m"]):(2) then eprints:("usage: libgen header|wrap NAME FUNCTION...\n")
+stdin "|()->void=>b\ta\tf.id:1" (4, ["libgen", "wrap", "m", "a"]):(0)
+stdin "" (4, ["libgen", "wrap", "m", "a"]):(1) then eprints:("libgen: the program has no function 'a'\n")
+
+main(int argc, string[] argv) {
+  int lg_rc = lg_go(argc, argv);
+} return int lg_rc;
+(1, ["libgen"]):(2) then eprints:("usage: libgen header|wrap NAME FUNCTION...\n")
+(2, ["libgen", "header"]):(2) then eprints:("usage: libgen header|wrap NAME FUNCTION...\n")

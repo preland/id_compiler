@@ -1,0 +1,55 @@
+// Strings in, strings out, and lists of strings both ways.
+
+// The pieces joined with a separator.
+kit_join(string[] kt_parts, string kt_sep) {
+  string kt_all = "";
+  int kt_i = 0;
+  int kt_n = len(kt_parts);
+} chain (string[] kt_parts, string kt_sep) {
+  while (kt_i < kt_n) {
+    if (kt_i > 0) {
+      kt_all = kt_all + kt_sep;
+    }
+    kt_all = kt_all + kt_parts[kt_i];
+    kt_i = kt_i + 1;
+  }
+} return string kt_all;
+(["a", "b", "c"], "-"):("a-b-c")
+([], ","):("")
+
+// A text cut at every one-character separator.
+kit_split(string kt_text, string kt_cut) {
+  string[] kt_pieces = [];
+  string kt_cur = "";
+  int kt_p = 0;
+} chain (string kt_text, string kt_cut) {
+  int kt_end = len(kt_text);
+  int kt_sepc = charat(kt_cut, 0);
+  while (kt_p < kt_end) {
+    if (charat(kt_text, kt_p) == kt_sepc) {
+      push(kt_pieces, kt_cur);
+      kt_cur = "";
+    } else {
+      kt_cur = kt_cur + chr(charat(kt_text, kt_p));
+    }
+    kt_p = kt_p + 1;
+  }
+} chain (string kt_text, string kt_cut) {
+  push(kt_pieces, kt_cur);
+} return string[] kt_pieces;
+("a,b,,c", ","):(["a", "b", "", "c"])
+("", ","):([""])
+
+// A text cut into lines, each line into words: the one function that returns a table.
+kit_grid(string kt_doc) {
+  string[] kt_lines = kit_split(kt_doc, "\n");
+  string[][] kt_grid = [];
+  int kt_r = 0;
+} chain (string kt_doc) {
+  while (kt_r < len(kt_lines)) {
+    push(kt_grid, kit_split(kt_lines[kt_r], " "));
+    kt_r = kt_r + 1;
+  }
+} return string[][] kt_grid;
+("a b\nc"):([["a", "b"], ["c"]])
+("x"):([["x"]])

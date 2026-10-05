@@ -1,0 +1,45 @@
+// A signature's parameters as a list, and a type's row in the tables.
+
+// One column of a signature's parameters, in order: the types when lg_w is 0,
+// the names otherwise.
+lg_cols(string lg_hd, int lg_w) {
+  string[] lg_es = lg_entries(lg_hd);
+  string[] lg_col = [];
+  int lg_i = 0;
+} chain (string lg_hd, int lg_w) {
+  while (lg_i < len(lg_es)) {
+    if (lg_w == 0) {
+      push(lg_col, lg_ptype(lg_es[lg_i]));
+    } else {
+      push(lg_col, lg_pname(lg_es[lg_i]));
+    }
+    lg_i = lg_i + 1;
+  }
+} return string[] lg_col;
+("int 0,string[] 1", 0):(["int", "string[]"])
+("int 0,string[] 1", 1):(["0", "1"])
+("", 0):([])
+
+// A type's row in every table, or -1 for a type the C interface has no form for.
+lg_idx(string lg_t) {
+  int lg_row = lst_str_index((import lg_tname), lg_t);
+} return int lg_row;
+("int"):(0)
+("func(int)"):(-1)
+("void"):(9)
+
+// Where the last space of a string is, or -1 when it has none.
+lg_lastsp(string lg_s) {
+  int lg_at = -1;
+  int lg_i = 0;
+  int lg_n = len(lg_s);
+} chain (string lg_s) {
+  while (lg_i < lg_n) {
+    if (charat(lg_s, lg_i) == 32) {
+      lg_at = lg_i;
+    }
+    lg_i = lg_i + 1;
+  }
+} return int lg_at;
+("a b c"):(3)
+("abc"):(-1)

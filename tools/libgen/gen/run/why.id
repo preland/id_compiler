@@ -1,0 +1,21 @@
+// Whether the function the host named can be exported.
+
+// The reason the named function cannot be exported, or "" when it can.
+lg_why_of(string lg_ln, string lg_lib, string lg_nm) {
+  string lg_wy = "libgen: the program has no function '" + lg_nm + "'";
+  if (lg_ln != "") {
+    lg_wy = lg_bad(lg_ln, lg_lib);
+  }
+} return string lg_wy;
+("", "m", "zz"):("libgen: the program has no function 'zz'")
+("|()->void=>b\ta\tf.id:1", "m", "a"):("")
+
+// 1 when there is a reason, 0 when there is none.
+lg_flag(string lg_wy) {
+  int lg_f = 1;
+  if (lg_wy == "") {
+    lg_f = 0;
+  }
+} return int lg_f;
+(""):(0)
+("any reason"):(1)

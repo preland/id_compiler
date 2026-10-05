@@ -1,0 +1,29 @@
+// The first parameter type with no C form, or "" when every one has.
+lg_badparam(string[] lg_ts) {
+  string lg_bt = "";
+  int lg_i = 0;
+  int lg_n = len(lg_ts);
+} chain (string[] lg_ts) {
+  while (lg_i < lg_n) {
+    lg_bt = lg_pick(lg_bt, lg_ts[lg_i]);
+    lg_i = lg_i + 1;
+  }
+} return string lg_bt;
+(["int", "string[]"]):("")
+(["int", "string[][]", "word"]):("string[][]")
+(["func(int)", "string[][]"]):("func(int)")
+
+// The type to report once one has been: the earlier bad type if there is one,
+// else this type when it has no C form as a parameter, else "".
+lg_pick(string lg_seen, string lg_t) {
+  int lg_row = lg_idx(lg_t);
+  string lg_got = lg_seen;
+  if (lg_seen == "" && (lg_row < 0 || (import lg_tparam)[lg_row] == "")) {
+    lg_got = lg_t;
+  }
+} return string lg_got;
+("", "int"):("")
+("", "string[][]"):("string[][]")
+("int[][]", "int"):("int[][]")
+("", "func(int)"):("func(int)")
+

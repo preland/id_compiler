@@ -1,0 +1,17 @@
+// The C function a host's call lands in. IDL_BEGIN takes the library's lock,
+// arms the trap handler and opens the call's memory frame; IDL_END releases
+// the frame and the lock (idc/interop/idl.c).
+lg_wrap(string lg_ln, string lg_lib) {
+  string lg_hd = lg_header(lg_ln);
+  string lg_nm = lg_name(lg_ln);
+  int lg_rk = lg_idx(lg_ret(lg_ln));
+} chain (string lg_ln, string lg_lib) {
+  string lg_sigl = "IDL_API int " + lg_lib + "_" + lg_short(lg_lib, lg_nm) + "(" + lg_cparams(lg_hd, lg_ret(lg_ln), lg_lib) + ") {\n";
+  string lg_zero = lg_line((import lg_tzero)[lg_rk]);
+  string lg_work = "    IDL_BEGIN\n" + lg_line(lg_call(lg_hd, lg_nm, lg_rk));
+} chain (string lg_ln, string lg_lib) {
+  string lg_wt = lg_sigl + lg_zero + lg_work + lg_line((import lg_tstore)[lg_rk]) + "    IDL_END\n}\n";
+} return string lg_wt;
+("|(int 0,int 1)->int=>b\tadd\tf.id:1", "m"):("IDL_API int m_add(int32_t in_0, int32_t in_1, int32_t* out) {\n    *out = 0;\n    IDL_BEGIN\n    int r = id_add(in_0, in_1);\n    *out = r;\n    IDL_END\n}\n")
+("|()->void=>b\ttick\tf.id:2", "m"):("IDL_API int m_tick(void) {\n    IDL_BEGIN\n    id_tick();\n    IDL_END\n}\n")
+("|(string 0)->string=>b\tup\tf.id:3", "m"):("IDL_API int m_up(const char* in_0, size_t in_0_len, char** out, size_t* out_len) {\n    *out = NULL; *out_len = 0;\n    IDL_BEGIN\n    char* r = id_up(idl_in_str(in_0, in_0_len));\n    idl_out_str(out, out_len, r);\n    IDL_END\n}\n")

@@ -25,6 +25,10 @@
 # Usage:
 #   bin/idc PATH [-o OUTPUT] [--emit-c FILE] [--keep-c] [--cc CC]
 #           [--backend DIR]... [--triple TRIPLE]
+#   bin/idc PATH --lib [-o DIR/NAME]   a project with no main as DIR/libNAME.so,
+#                            DIR/libNAME.a and DIR/NAME.h, callable from C and
+#                            anything that can call C (docs/INTEROP.md);
+#                            --lib-state keeps memory between calls
 #   bin/idc PATH --check     the rules only: no C, no cc, no cases, no link
 #   bin/idc PATH --fix       rewrite PATH's own .id files to resolve what has
 #                            one mechanical, behaviour-preserving repair
@@ -39,7 +43,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std] [--exports root|all] [--no-js]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std] [--exports root|all] [--no-js]" >&2
 }
 
 PATH_ARG=""
@@ -52,6 +56,8 @@ OPT=1
 FREESTANDING=0
 RUNTIME=0
 KEEP_C=0
+LIB=0
+LIB_STATE=0
 CC=cc
 CC_EXPLICIT=0
 TRIPLE=""
@@ -89,6 +95,10 @@ while [ $# -gt 0 ]; do
             EMIT_C="${2:?idc: --emit-c needs an argument}"; shift 2 ;;
         --keep-c)
             KEEP_C=1; shift ;;
+        --lib)
+            LIB=1; shift ;;
+        --lib-state)
+            LIB=1; LIB_STATE=1; shift ;;
         --cc)
             CC="${2:?idc: --cc needs an argument}"; CC_EXPLICIT=1; shift 2 ;;
         --backend)
@@ -414,6 +424,21 @@ ensure_idlayout() {
     fi
 }
 
+# tools/libgen, built and cached the way idlayout is. Only a --lib build asks
+# for it, so no other build pays for it.
+LIBGEN_CHECKED=0
+ensure_libgen() {
+    [ "$LIBGEN_CHECKED" -eq 1 ] && return 0
+    LIBGEN_CHECKED=1
+    if stale "$LIBGEN" "$ROOT/tools/libgen"; then
+        resolve_tool_std
+        progress bootstrap "libgen (from tools/libgen)"
+        env -u IDC_NO_STD \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" "$ROOT/tools/libgen" -o "$LIBGEN" >&2 \
+            || { progress_clear; echo "idc: failed to build tools/libgen; see the errors above" >&2; exit 1; }
+    fi
+}
+
 # run_idlayout ROOT -- every one of the seven structural checks over ROOT's
 # tree, in one call. Used at every place that used to call the seven bash
 # check_* functions: the project itself, each dependency a conf.id names,
@@ -542,6 +567,8 @@ CCRUN="$CACHE_DIR/ccrun"
 # tools/idlayout -- see ensure_idlayout below. Set here for the same reason
 # CCRUN is: ensure_idlayout reads it by name at call time.
 IDLAYOUT="$CACHE_DIR/idlayout"
+# tools/libgen -- the C header and wrappers of a --lib build (ensure_libgen).
+LIBGEN="$CACHE_DIR/libgen"
 
 # --std, if given, points the bootstrap at the same library the build will use.
 # --no-std deliberately does NOT propagate: it says the user's program wants no
@@ -2257,6 +2284,7 @@ backend_build() {
     link_line="${BD[c_${PLATKEY_BUILD}_link]:-}"
     IFS=$'\x1f' read -ra srcs <<< "$sources_line"
     IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
+    [ "$LIB" -eq 1 ] && cflags+=(-fPIC -ffunction-sections -fdata-sections)
     for src in ${srcs[@]+"${srcs[@]}"}; do
         [ -z "$src" ] && continue
         src_path="$d/$src"
@@ -3394,6 +3422,123 @@ if [ "$TARGET" = wasm ]; then
         fi
     fi
     progress_done "built $WOUT ($(wc -c < "$WOUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"), $(plural "${#WEXPORTS[@]}" export)$WBIND)"
+    exit_ok
+fi
+
+# ---------------------------------------------------------------------------
+# --lib: a project with no `main` becomes a shared library, a static archive
+# and a C header (docs/INTEROP.md, "id as a library").
+#
+# The cases have already run (run_cases, above), so a library whose cases fail
+# does not build. What is exported is the top-level functions of the files
+# directly in the project's root directory -- a project's root is its facade --
+# found the way the wasm target finds its exports. Their signatures come from
+# `idparse --fingerprints` over the whole program, and tools/libgen turns those into the
+# header and one C wrapper per function. The wrappers, idc/interop/idl.c and
+# the program's C are compiled as one translation unit, so the wrappers can
+# reach the runtime's own statics; -fvisibility=hidden plus objcopy
+# --localize-hidden leave the library's own entry points as its only symbols.
+if [ "$LIB" -eq 1 ]; then
+    if [ "$TARGET" != c ]; then
+        echo "idc: --lib builds through the C target; drop --target $TARGET (the wasm target already exports a project's functions to JavaScript)" >&2
+        exit 1
+    fi
+    if grep -q '^int main(' "$C_OUT"; then
+        echo "idc: --lib needs a project with no main, and this one has one; move what main does into functions in the project's root directory, or build the executable without --lib" >&2
+        exit 1
+    fi
+    if [ -n "$OUTPUT" ]; then
+        LIBDIR="$(dirname "$OUTPUT")"
+        LIBBASE="$(basename "$OUTPUT")"
+    else
+        first="${PATH_ARG%/}"
+        LIBBASE="$(basename "$first")"
+        [ -f "$first" ] && LIBBASE="${LIBBASE%.*}"
+        LIBDIR="$BUILD_DIR"
+    fi
+    mkdir -p "$LIBDIR" || exit 1
+    LIBNAME="$(printf '%s' "$LIBBASE" | tr -c 'A-Za-z0-9_' '_')"
+    case "$LIBNAME" in
+        [0-9]*|"")
+            echo "idc: the library name '$LIBBASE' is not a C identifier; name it with -o, for example -o build/my_lib" >&2
+            exit 1 ;;
+    esac
+
+    LIBROOT="${PATH_ARG%/}"
+    LIB_FILES=()
+    for f in "${SRC_FILES[@]}"; do
+        if [ -d "$LIBROOT" ]; then
+            [ "$(dirname "$f")" = "$LIBROOT" ] || continue
+        fi
+        if [ -n "$STDLIB" ]; then
+            case "$f" in "$STDLIB"/*) continue ;; esac
+        fi
+        case "$f" in "$ROOT"/runtime/*) continue ;; esac
+        LIB_FILES+=("$f")
+    done
+    LIB_EXPORTS=()
+    if [ "${#LIB_FILES[@]}" -gt 0 ]; then
+        while IFS= read -r name; do
+            [ -n "$name" ] && LIB_EXPORTS+=("$name")
+        done < <(grep -hoE '^[A-Za-z_][A-Za-z0-9_]*\(' "${LIB_FILES[@]}" | tr -d '(' | sort -u)
+    fi
+    if [ "${#LIB_EXPORTS[@]}" -eq 0 ]; then
+        echo "idc: --lib exports the top-level functions of the files directly in '$LIBROOT', and there are none; put the functions a host should call in a file in that directory (their helpers can stay in subdirectories)" >&2
+        exit 1
+    fi
+
+    if [ "$LIB_STATE" -eq 0 ]; then
+        for name in "${LIB_EXPORTS[@]}"; do
+            if grep -qF "/* exported by $name() */" "$C_OUT"; then
+                echo "idc: '$name' declares an exported variable, which later calls would read; a library frees what each call allocated, so that value would not survive the call. Build with --lib-state to keep memory until NAME_shutdown(), or pass the value in and out as arguments and results" >&2
+                exit 1
+            fi
+        done
+    fi
+
+    ensure_libgen
+    progress libgen "signatures of ${#LIB_EXPORTS[@]} functions"
+    capped_from "$SOURCES_TMP" "$IDLEX" > "$WORK/lib_lex" 2>/dev/null \
+        && capped_from "$WORK/lib_lex" "$IDPARSE" --host-triple "$(host_triple)" --fingerprints > "$WORK/lib_ast" 2>"$WORK/lib_ast.err" || {
+        progress_clear; cat "$WORK/lib_ast.err" >&2; echo "idc: could not read the program's signatures (idparse --fingerprints failed)" >&2; exit 1; }
+    "$LIBGEN" header "$LIBNAME" "${LIB_EXPORTS[@]}" < "$WORK/lib_ast" > "$LIBDIR/$LIBNAME.h" || { progress_clear; rm -f "$LIBDIR/$LIBNAME.h"; exit 1; }
+    "$LIBGEN" wrap "$LIBNAME" "${LIB_EXPORTS[@]}" < "$WORK/lib_ast" > "$WORK/lib_wrappers.c" 2>/dev/null || exit 1
+
+    LIB_DEFS=(-DIDL_LIB="$LIBNAME")
+    grep -q 'idc_const_init' "$C_OUT" && LIB_DEFS+=(-DIDL_HAS_CONST_INIT)
+    [ "$LIB_STATE" -eq 1 ] && LIB_DEFS+=(-DIDL_KEEP)
+    { cat "$ROOT/interop/idl_pre.h" "$LIBDIR/$LIBNAME.h" "$C_OUT" "$ROOT/interop/idl.c" "$WORK/lib_wrappers.c"; } > "$WORK/lib_unit.c"
+
+    backends_for program
+    progress cc "$CC -> lib$LIBNAME"
+    lcmd=("$CC" -std=c11 -O2 -fPIC -fvisibility=hidden -ffunction-sections -fdata-sections -pthread "${LIB_DEFS[@]}" -c "$WORK/lib_unit.c" -o "$WORK/lib_unit.o")
+    capped "${lcmd[@]}" 2>"$WORK/lib_cc.err"; lib_rc=$?
+    if [ "$lib_rc" -ne 0 ]; then
+        progress_clear
+        sed 's/^/idc:   /' "$WORK/lib_cc.err" >&2
+        echo "idc: the library did not compile (command: ${lcmd[*]})" >&2
+        exit 1
+    fi
+    printf '{\n  global: %s_*;\n  local: *;\n};\n' "$LIBNAME" > "$WORK/lib.map"
+    LIB_KEEP=()
+    for name in error free strs_free table_free shutdown "${LIB_EXPORTS[@]}"; do
+        LIB_KEEP+=(-u "${LIBNAME}_${name#"${LIBNAME}"_}")
+    done
+    LIB_AR=("$WORK/lib_unit.o" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"})
+    if command -v objcopy >/dev/null 2>&1 && command -v ld >/dev/null 2>&1; then
+        if ld -r --gc-sections "${LIB_KEEP[@]}" "${LIB_AR[@]}" -o "$WORK/lib_all.o" 2>/dev/null \
+           && objcopy -w --keep-global-symbol="${LIBNAME}_*" -K "${LIBNAME}_*" --strip-unneeded "$WORK/lib_all.o" "$WORK/lib_local.o" 2>/dev/null; then
+            LIB_AR=("$WORK/lib_local.o")
+        fi
+    fi
+    rm -f "$LIBDIR/lib$LIBNAME.a" "$LIBDIR/lib$LIBNAME.so"
+    ar rcs "$LIBDIR/lib$LIBNAME.a" "${LIB_AR[@]}" || { progress_clear; echo "idc: ar failed" >&2; exit 1; }
+    scmd=("$CC" -shared -pthread -Wl,--gc-sections -Wl,--as-needed -Wl,--version-script="$WORK/lib.map" "${LIB_AR[@]}" -o "$LIBDIR/lib$LIBNAME.so" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
+    capped "${scmd[@]}" 2>"$WORK/lib_ld.err" || {
+        progress_clear; sed 's/^/idc:   /' "$WORK/lib_ld.err" >&2
+        echo "idc: linking the shared library failed (command: ${scmd[*]})" >&2; exit 1; }
+    for o in ${BACKEND_OBJS[@]+"${BACKEND_OBJS[@]}"}; do rm -f "$o"; done
+    progress_done "built $LIBDIR/lib$LIBNAME.so, lib$LIBNAME.a and $LIBNAME.h (${#LIB_EXPORTS[@]} functions; link the archive with -pthread)"
     exit_ok
 fi
 

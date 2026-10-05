@@ -1,0 +1,34 @@
+// A function as `idparse --fingerprints` prints it, on one line:
+//   |(int[] 0,int 1)->int=>BODY<TAB>NAME<TAB>FILE:LINE
+// The body is the logic the uniqueness check compares; only the types matter here.
+
+// The function's name, or "" for a line that is not a function.
+lg_name(string lg_ln) {
+  string[] lg_fields = str_split(lg_ln, "\t");
+  string lg_nm = "";
+  if (len(lg_fields) >= 3 && str_find(lg_ln, "|(") >= 0) {
+    lg_nm = lg_fields[1];
+  }
+} return string lg_nm;
+("|(int 0,int 1)->int=>x\tadd\tf.id:1"):("add")
+("fn|file:line|cases"):("")
+("tl_vals|(int 0)->void=>x\ttally_add\tf.id:1"):("tally_add")
+
+// The parameter types, comma-separated, each followed by its position.
+lg_header(string lg_ln) {
+  int lg_to = str_find(lg_ln, ")->");
+  int lg_from = str_find(lg_ln, "|(") + 2;
+  string lg_hd = str_slice(lg_ln, lg_from, lg_to - lg_from);
+} return string lg_hd;
+("|(int[] 0,int 1)->int=>x\tf\tf.id:1"):("int[] 0,int 1")
+("|()->void=>x\tg\tf.id:2"):("")
+("tl_vals,k|(string 0)->int=>x\tg\tf.id:2"):("string 0")
+
+// The return type: between `)->` and the body.
+lg_ret(string lg_ln) {
+  int lg_from = str_find(lg_ln, ")->") + 3;
+  int lg_to = str_find(lg_ln, "=>");
+  string lg_rt = str_slice(lg_ln, lg_from, lg_to - lg_from);
+} return string lg_rt;
+("|(int 0)->string[][]=>x\tf\tf.id:1"):("string[][]")
+("|()->void=>x\tg\tf.id:2"):("void")

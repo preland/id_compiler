@@ -1,0 +1,27 @@
+// The parameters of a signature, each as `TYPE POSITION`, and the two halves.
+
+// The entries of a signature, in order. A signature with no parameters has none.
+lg_entries(string lg_hd) {
+  string[] lg_es = [];
+  if (lg_hd != "") {
+    lg_es = str_split(lg_hd, ",");
+  }
+} return string[] lg_es;
+("int[] 0,int 1"):(["int[] 0", "int 1"])
+(""):([])
+
+// An entry's type: everything before its last space (a function type has spaces of its own).
+lg_ptype(string lg_e) {
+  int lg_cut = lg_lastsp(lg_e);
+  string lg_ty = str_slice(lg_e, 0, lg_cut);
+} return string lg_ty;
+("int 0"):("int")
+("func(int) return int 2"):("func(int) return int")
+
+// An entry's position: what follows its last space. The C parameter is named after it.
+lg_pname(string lg_e) {
+  int lg_cut = lg_lastsp(lg_e);
+  string lg_pn = str_slice(lg_e, lg_cut + 1, len(lg_e) - lg_cut - 1);
+} return string lg_pn;
+("int 0"):("0")
+("string[] 12"):("12")

@@ -1,0 +1,7 @@
+// A setup for tally's cases: a list that already holds one value.
+tl_hold() {
+  tally_reset();
+  tally_add(7);
+} return void;
+():() then (import tl_vals):([7])
+():() then len((import tl_vals)):(1)

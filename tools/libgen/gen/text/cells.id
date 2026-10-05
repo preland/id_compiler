@@ -1,0 +1,43 @@
+// Filling a table's text in for a signature's parameters.
+
+// A table entry with every mark replaced by a value.
+lg_sub(string lg_text, string lg_mark, string lg_value) {
+  string lg_done = str_join(str_split(lg_text, lg_mark), lg_value);
+} return string lg_done;
+("int32_t $", "$", "in_x"):("int32_t in_x")
+("$ and $_len", "$", "k"):("k and k_len")
+
+// The table's entry for each parameter, named in_NAME. Every type must have a
+// row (lg_bad checks that before this runs).
+lg_cells(string[] lg_ts, string[] lg_ns, string[] lg_tab) {
+  string[] lg_out = [];
+  int lg_i = 0;
+  int lg_n = len(lg_ts);
+} chain (string[] lg_ts, string[] lg_ns, string[] lg_tab) {
+  while (lg_i < lg_n) {
+    string lg_form = lg_tab[lg_idx(lg_ts[lg_i])];
+    push(lg_out, lg_sub(lg_form, "$", "in_" + lg_ns[lg_i]));
+    lg_i = lg_i + 1;
+  }
+} return string[] lg_out;
+(["int", "string"], ["a", "s"], ["I $", "W $", "F $", "S $, $_len"]):(["I in_a", "S in_s, in_s_len"])
+([], [], ["I $"]):([])
+
+// The C parameter list of a function's wrapper: its inputs, then the out
+// parameters of its result, or `void` when there is neither.
+lg_cparams(string lg_hd, string lg_rt, string lg_lib) {
+  string[] lg_ps = lg_cells(lg_cols(lg_hd, 0), lg_cols(lg_hd, 1), (import lg_tparam));
+  string lg_rform = (import lg_tout)[lg_idx(lg_rt)];
+  string lg_o = lg_sub(lg_rform, "@", lg_lib);
+} chain (string lg_hd, string lg_rt, string lg_lib) {
+  if (lg_o != "") {
+    push(lg_ps, lg_o);
+  }
+  if (len(lg_ps) == 0) {
+    push(lg_ps, "void");
+  }
+  string lg_pc = str_join(lg_ps, ", ");
+} return string lg_pc;
+("int 0,string 1", "string", "csv"):("int32_t in_0, const char* in_1, size_t in_1_len, char** out, size_t* out_len")
+("", "void", "csv"):("void")
+("string[] 0", "string[][]", "t"):("const char* const* in_0, const size_t* in_0_lens, size_t in_0_count, t_table* out")

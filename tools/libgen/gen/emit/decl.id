@@ -1,0 +1,11 @@
+// The header's line for one function: the id signature as a comment, then
+// the C prototype a host calls.
+lg_decl(string lg_ln, string lg_lib) {
+  string lg_hd = lg_header(lg_ln);
+  string lg_nm = lg_name(lg_ln);
+  string lg_sg = lg_nm + "(" + str_join(lg_cols(lg_hd, 0), ", ") + ") return " + lg_ret(lg_ln);
+} chain (string lg_ln, string lg_lib) {
+  string lg_dc = "/* " + lg_sg + " */\nIDL_API int " + lg_lib + "_" + lg_short(lg_lib, lg_nm) + "(" + lg_cparams(lg_hd, lg_ret(lg_ln), lg_lib) + ");\n";
+} return string lg_dc;
+("|(int 0,string 1)->int=>b\tadd\tf.id:1", "m"):("/* add(int, string) return int */\nIDL_API int m_add(int32_t in_0, const char* in_1, size_t in_1_len, int32_t* out);\n")
+("|()->void=>b\ttick\tf.id:2", "m"):("/* tick() return void */\nIDL_API int m_tick(void);\n")

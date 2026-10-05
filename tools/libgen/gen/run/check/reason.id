@@ -1,0 +1,24 @@
+// What is wrong with exporting this function, or "" when nothing is. The text
+// says what to do about it.
+lg_bad(string lg_ln, string lg_lib) {
+  string lg_hd = lg_header(lg_ln);
+  string lg_nm = lg_name(lg_ln);
+  string lg_badp = lg_badparam(lg_cols(lg_hd, 0));
+} chain (string lg_ln, string lg_lib) {
+  string lg_why = "";
+  if (lst_str_index((import lg_reserved), lg_short(lg_lib, lg_nm)) >= 0) {
+    lg_why = "libgen: '" + lg_nm + "' would be exported as " + lg_lib + "_" + lg_short(lg_lib, lg_nm) + ", the name of one of the library's own entry points; rename the function";
+  } else if (lg_badp != "") {
+    lg_why = "libgen: '" + lg_nm + "' takes a parameter of type '" + lg_badp + "', which has no C form; an exported function may take int, word, float, string, int[], word[], float[] and string[] -- wrap it in a root-level function with those parameters and move '" + lg_nm + "' into a subdirectory so it is not exported";
+  }
+} chain (string lg_ln, string lg_lib) {
+  if (lg_why == "" && lg_idx(lg_ret(lg_ln)) < 0) {
+    lg_why = "libgen: '" + lg_nm + "' returns '" + lg_ret(lg_ln) + "', which has no C form; an exported function may return void, string[][] or any type it may take -- return one of those, or move '" + lg_nm + "' into a subdirectory so it is not exported";
+  }
+} return string lg_why;
+("|(int 0)->int=>b\tadd\tf.id:1", "m"):("")
+("|()->void=>b\tfree\tf.id:1", "m"):("libgen: 'free' would be exported as m_free, the name of one of the library's own entry points; rename the function")
+("|(func(int) return int 0)->void=>b\tf\tf.id:1", "m"):("libgen: 'f' takes a parameter of type 'func(int) return int', which has no C form; an exported function may take int, word, float, string, int[], word[], float[] and string[] -- wrap it in a root-level function with those parameters and move 'f' into a subdirectory so it is not exported")
+("|()->int[][]=>b\tg\tf.id:1", "m"):("libgen: 'g' returns 'int[][]', which has no C form; an exported function may return void, string[][] or any type it may take -- return one of those, or move 'g' into a subdirectory so it is not exported")
+
+("|()->void=>b\tm_free\tf.id:1", "m"):("libgen: 'm_free' would be exported as m_free, the name of one of the library's own entry points; rename the function")

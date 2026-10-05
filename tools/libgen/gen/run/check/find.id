@@ -1,0 +1,23 @@
+// The AST line of the function called lg_nm, or "" when the program has none.
+lg_find(string[] lg_lines, string lg_nm) {
+  string lg_hit = "";
+  int lg_i = 0;
+  int lg_n = len(lg_lines);
+} chain (string[] lg_lines, string lg_nm) {
+  while (lg_i < lg_n) {
+    lg_hit = lg_prefer(lg_hit, lg_lines[lg_i], lg_nm);
+    lg_i = lg_i + 1;
+  }
+} return string lg_hit;
+(["|()->int=>b\ta\tf.id:1", "|()->int=>b\tab\tf.id:2"], "a"):("|()->int=>b\ta\tf.id:1")
+(["|()->int=>b\ta\tf.id:1"], "b"):("")
+
+// The line already found, or this one when it is the function called lg_nm.
+lg_prefer(string lg_hit, string lg_ln, string lg_nm) {
+  string lg_keep = lg_hit;
+  if (lg_name(lg_ln) == lg_nm) {
+    lg_keep = lg_ln;
+  }
+} return string lg_keep;
+("", "|()->int=>b\ta\tf.id:1", "a"):("|()->int=>b\ta\tf.id:1")
+("|()->int=>b\ta\tf.id:1", "|()->int=>b\tab\tf.id:2", "a"):("|()->int=>b\ta\tf.id:1")

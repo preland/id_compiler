@@ -1,0 +1,37 @@
+// Small text builders shared by the declaration and the wrapper.
+
+// One indented line of a function body, or nothing for an empty statement.
+lg_line(string lg_s) {
+  string lg_ln = "";
+  if (lg_s != "") {
+    lg_ln = "    " + lg_s + "\n";
+  }
+} return string lg_ln;
+("*out = r;"):("    *out = r;\n")
+(""):("")
+
+// What a function of the program does when the host calls the wrapper: the id
+// function applied to the converted arguments, its result kept in `r`.
+lg_call(string lg_hd, string lg_nm, int lg_rk) {
+  string[] lg_conv = lg_cells(lg_cols(lg_hd, 0), lg_cols(lg_hd, 1), (import lg_targ));
+  string lg_ct = (import lg_tctype)[lg_rk];
+  string lg_ex = "id_" + lg_nm + "(" + str_join(lg_conv, ", ") + ");";
+} chain (string lg_hd, string lg_nm, int lg_rk) {
+  if (lg_ct != "") {
+    lg_ex = lg_ct + " r = " + lg_ex;
+  }
+} return string lg_ex;
+("int 0,string 1", "f", 0):("int r = id_f(in_0, idl_in_str(in_1, in_1_len));")
+("", "g", 9):("id_g();")
+
+// A function's name as the library exports it, without the library's own
+// prefix: `csv_rows` in the library `csv` is csv_rows, not csv_csv_rows.
+lg_short(string lg_lib, string lg_nm) {
+  string lg_sh = lg_nm;
+  if (str_starts(lg_nm, lg_lib + "_")) {
+    lg_sh = str_slice(lg_nm, len(lg_lib) + 1, len(lg_nm) - len(lg_lib) - 1);
+  }
+} return string lg_sh;
+("csv", "csv_rows"):("rows")
+("csv", "rows"):("rows")
+("csv", "csvx_rows"):("csvx_rows")
