@@ -927,6 +927,60 @@ else
     bad "two attached backends declaring the same names and platform keys do not collide: $(grep -v warning "$TMP/two.err" | head -1 | cut -c1-160)"
 fi
 
+# -- c_PLATFORM_pkg: pkg-config supplies a backend's compile and link flags ---
+# A fixture package, tp.pc, says -DPKG_K=7 and -lm; the backend declares only
+# its source and the package. The source is compiled with the package's
+# cflags and the program linked with its libs. The object cache is keyed by the
+# resolved flags: a package that later says -DPKG_K=9 rebuilds the object (the
+# cache is on for these two builds, with a cache dir of their own).
+if command -v pkg-config >/dev/null 2>&1; then
+    pkd="$TMP/pkd"; mkdir -p "$pkd/pc" "$pkd/be" "$pkd/prog"
+    printf 'Name: tp\nDescription: fixture\nVersion: 1\nCflags: -DPKG_K=7\nLibs: -lm\n' > "$pkd/pc/tp.pc"
+    printf 'string name = "bpk";\nstring[] c_linux_sources = ["val.c"];\nstring[] c_linux_pkg = ["tp"];\nstring[] c_darwin_sources = ["val.c"];\nstring[] c_darwin_pkg = ["tp"];\n' > "$pkd/be/backend.id"
+    printf 'int id_bpk_val(int k) { return k * PKG_K; }\n' > "$pkd/be/val.c"
+    printf 'native bpk_val(int k) return int;\n' > "$pkd/be/val.id"
+    printf 'import "%s"\n' "$pkd/be" > "$pkd/prog/conf.id"
+    printf 'main(int argc, string[] argv) {\n  int a = bpk_val(1);\n  print(a);\n} return int 0;\n' > "$pkd/prog/main.id"
+    : > "$TMP/cc.log"
+    if PKG_CONFIG_PATH="$pkd/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" $BIN_IDC "$pkd/prog" --cc "$cclog" -o "$pkd/p.bin" >"$pkd/p.err" 2>&1 \
+       && [ "$("$pkd/p.bin")" = "7" ] \
+       && grep -q "be/val\.c .*-DPKG_K=7" "$TMP/cc.log" \
+       && grep -F -- "-o $pkd/p.bin" "$TMP/cc.log" | grep -q ' -lm'; then
+        ok "a backend's c_linux_pkg adds the package's --cflags to its sources and --libs to the link"
+    else
+        bad "a backend's c_linux_pkg adds the package's --cflags to its sources and --libs to the link: $(grep -v warning "$pkd/p.err" | head -1 | cut -c1-160)"
+    fi
+    pkc="$pkd/cache"
+    r1=$(PKG_CONFIG_PATH="$pkd/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" IDC_CACHE_DIR="$pkc" $BIN_IDC "$pkd/prog" -o "$pkd/c1.bin" >"$pkd/c1.err" 2>&1 && "$pkd/c1.bin")
+    sed -i 's/PKG_K=7/PKG_K=9/' "$pkd/pc/tp.pc"
+    r2=$(PKG_CONFIG_PATH="$pkd/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" IDC_CACHE_DIR="$pkc" $BIN_IDC "$pkd/prog" -o "$pkd/c2.bin" >"$pkd/c2.err" 2>&1 && "$pkd/c2.bin")
+    if [ "$r1" = 7 ] && [ "$r2" = 9 ]; then
+        ok "a package whose resolved flags changed rebuilds the backend object and the program, not a cached 7"
+    else
+        bad "a package whose resolved flags changed rebuilds the backend object and the program (got '$r1' then '$r2')"
+    fi
+    printf 'string name = "bpk";\nstring[] c_linux_sources = ["val.c"];\nstring[] c_linux_pkg = ["tp", "idc-no-such-package"];\nstring[] c_darwin_sources = ["val.c"];\nstring[] c_darwin_pkg = ["tp", "idc-no-such-package"];\n' > "$pkd/be/backend.id"
+    out=$(PKG_CONFIG_PATH="$pkd/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" $BIN_IDC "$pkd/prog" -o "$pkd/m.bin" 2>&1)
+    if [ $? -ne 0 ] && printf '%s\n' "$out" | grep -qF "c_" && printf '%s\n' "$out" | grep -qF "_pkg names 'idc-no-such-package', and pkg-config cannot find it" \
+       && printf '%s\n' "$out" | grep -qF 'add the package that provides it to the devshell (flake.nix buildInputs)' && printf '%s\n' "$out" | grep -qF 'idc-no-such-package.pc'; then
+        ok "a c_linux_pkg package pkg-config cannot find is refused, naming the package and the fix"
+    else
+        bad "a c_linux_pkg package pkg-config cannot find is refused, naming the package and the fix: $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-200)"
+    fi
+    nopk=""
+    while IFS= read -r pdir; do
+        [ -n "$pdir" ] && [ ! -e "$pdir/pkg-config" ] && nopk="${nopk:+$nopk:}$pdir"
+    done < <(printf '%s' "$PATH" | tr ':' '\n')
+    out=$(PATH="$nopk" $BIN_IDC "$pkd/prog" -o "$pkd/n.bin" 2>&1)
+    if [ $? -ne 0 ] && printf '%s\n' "$out" | grep -qF "which needs pkg-config, and none is on PATH; run under the devshell"; then
+        ok "a c_linux_pkg with no pkg-config on PATH is refused, naming the fix"
+    else
+        bad "a c_linux_pkg with no pkg-config on PATH is refused, naming the fix: $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-200)"
+    fi
+else
+    skip "c_PLATFORM_pkg checks: pkg-config is not on PATH (run under the devshell)"
+fi
+
 if ! cc -fsyntax-only "$(be_abs gfx)/gfx_linux.c" -I"$(be_abs gfx)" 2>/dev/null; then
     # Only the windowed half of this file needs them; the fs and output-path
     # checks above ran and their tally still counts.

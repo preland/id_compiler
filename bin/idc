@@ -543,6 +543,21 @@ ensure_libgen() {
     fi
 }
 
+# tools/jsgen, built and cached the way libgen is. Only a --target wasm build
+# that writes bindings asks for it, so no other build pays for it.
+JSGEN_CHECKED=0
+ensure_jsgen() {
+    [ "$JSGEN_CHECKED" -eq 1 ] && return 0
+    JSGEN_CHECKED=1
+    if stale "$JSGEN" "$ROOT/tools/jsgen"; then
+        resolve_tool_std
+        progress bootstrap "jsgen (from tools/jsgen)"
+        env -u IDC_NO_STD \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" "$ROOT/tools/jsgen" -o "$JSGEN" >&2 \
+            || { progress_clear; echo "idc: failed to build tools/jsgen; see the errors above" >&2; exit 1; }
+    fi
+}
+
 # resolve_export_list WHAT -- the functions a library or a wasm module exports:
 # exactly those named in `string[] lib_exports = [...];` in the project's root
 # conf.id, wherever in the tree they are defined (docs/INTEROP.md, "Which
@@ -788,6 +803,8 @@ CCRUN="$CACHE_DIR/ccrun"
 IDLAYOUT="$CACHE_DIR/idlayout"
 # tools/libgen -- the C header and wrappers of a --lib build (ensure_libgen).
 LIBGEN="$CACHE_DIR/libgen"
+# tools/jsgen -- the JS and TypeScript bindings of a --target wasm build (ensure_jsgen).
+JSGEN="$CACHE_DIR/jsgen"
 # tools/iddiag -- prints diagnostics for a person or as JSON (show_diag).
 IDDIAG="$CACHE_DIR/iddiag"
 
@@ -2415,9 +2432,11 @@ backend_name() {
 #   string[] c_linux_sources = ["gfx_linux.c"];    TARGET_PLATFORM_sources
 #   string[] c_linux_cflags = [];                  TARGET_PLATFORM_cflags
 #   string[] c_linux_link = ["-lX11"];             TARGET_PLATFORM_link
+#   string[] c_linux_pkg = ["sqlite3"];            TARGET_PLATFORM_pkg
 #
-# A platform exists for a target when its _sources is declared; _cflags and
-# _link default to empty. The target of any other name is the text before its
+# A platform exists for a target when its _sources is declared; _cflags, _link
+# and _pkg default to empty. _pkg names pkg-config packages: their --cflags
+# join _cflags and their --libs join _link (backend_pkg). The target of any other name is the text before its
 # first underscore, which is how "its manifest declares" lists them.
 #
 # The file is never compiled. Were these constants, every name in it would be
@@ -2429,7 +2448,7 @@ backend_name() {
 # other line is refused at its line rather than guessed at.
 BD_STR='^string[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=[[:space:]]*"([^"\\]*)"[[:space:]]*;$'
 BD_LIST='^string\[\][[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=[[:space:]]*\[[[:space:]]*("[^"\\]*"([[:space:]]*,[[:space:]]*"[^"\\]*")*)?[[:space:]]*\][[:space:]]*;$'
-BD_PLAT='^([A-Za-z0-9]+_.+)_(sources|cflags|link)$'
+BD_PLAT='^([A-Za-z0-9]+_.+)_(sources|cflags|link|pkg)$'
 BD_FIELD='^[A-Za-z0-9]+_[A-Za-z0-9]+$'
 
 bd_fail() { # bd_fail LINE REASON
@@ -2461,7 +2480,7 @@ bd_line() {
     elif [[ "$name" =~ $BD_PLAT ]]; then
         want="string[]"
     else
-        bd_fail "$n" "'$name' is not name, TARGET_FIELD, or TARGET_PLATFORM_sources, _cflags or _link"
+        bd_fail "$n" "'$name' is not name, TARGET_FIELD, or TARGET_PLATFORM_sources, _cflags, _link or _pkg"
     fi
     [ "$kind" = "$want" ] || bd_fail "$n" "'$name' is a $want, not a $kind"
     BD_AT[$name]="$n"
@@ -2526,12 +2545,40 @@ backend_obj_put() {
     cache_prune "$BACKEND_OBJ_DIR" "$CACHE_MAX"
 }
 
+# backend_pkg DIR PKG... -- resolve pkg-config packages a backend.id names into
+# PKG_CFLAGS and PKG_LIBS. A missing pkg-config or package stops the build and
+# names the fix. The resolved flags are appended to the backend's own, so they
+# are in backend_obj_key (the object) and in LINK_FLAGS, which obj_cache_key
+# hashes (the program): a library that moved or changed flags rebuilds both.
+backend_pkg() {
+    local d="$1" pkg out
+    shift
+    PKG_CFLAGS=()
+    PKG_LIBS=()
+    if ! command -v pkg-config >/dev/null 2>&1; then
+        progress_clear
+        echo "idc: $d/backend.id: c_${PLATKEY_BUILD}_pkg names '$*', which needs pkg-config, and none is on PATH; run under the devshell (nix develop), or install pkg-config, or replace _pkg with literal _cflags and _link" >&2
+        exit 1
+    fi
+    for pkg in "$@"; do
+        [ -z "$pkg" ] && continue
+        if ! out=$(pkg-config --print-errors --exists "$pkg" 2>&1); then
+            progress_clear
+            echo "idc: $d/backend.id: c_${PLATKEY_BUILD}_pkg names '$pkg', and pkg-config cannot find it (${out%%$'\n'*}); add the package that provides it to the devshell (flake.nix buildInputs), or install its development files, or point PKG_CONFIG_PATH at the directory holding $pkg.pc" >&2
+            exit 1
+        fi
+    done
+    out=$(pkg-config --cflags "$@") && read -ra PKG_CFLAGS <<< "$out"
+    out=$(pkg-config --libs "$@") && read -ra PKG_LIBS <<< "$out"
+}
+
 # backend_build DIR -- compile DIR's sources for this platform, once per build.
 # Declarations that cannot serve this build set BE_ERR and return 1, so the
 # caller can say which reached native needed it.
 backend_build() {
-    local d="$1" sources_line cflags_line link_line src src_path obj backend_rc bkey
-    local -a srcs=() cflags=() objs=()
+    local d="$1" sources_line cflags_line link_line pkg_line src src_path obj backend_rc bkey
+    local -a srcs=() cflags=() objs=() pkgs=() links=()
+    local -a PKG_CFLAGS=() PKG_LIBS=()
     BE_ERR=""
     [ -n "${BE_BUILT[$d]:-}" ] && return 0
     backend_supports "$d" || return 1
@@ -2540,6 +2587,15 @@ backend_build() {
     link_line="${BD[c_${PLATKEY_BUILD}_link]:-}"
     IFS=$'\x1f' read -ra srcs <<< "$sources_line"
     IFS=$'\x1f' read -ra cflags <<< "$cflags_line"
+    pkg_line="${BD[c_${PLATKEY_BUILD}_pkg]:-}"
+    if [ -n "$pkg_line" ]; then
+        IFS=$'\x1f' read -ra pkgs <<< "$pkg_line"
+        backend_pkg "$d" "${pkgs[@]}"
+        cflags+=(${PKG_CFLAGS[@]+"${PKG_CFLAGS[@]}"})
+        IFS=$'\x1f' read -ra links <<< "$link_line"
+        links+=(${PKG_LIBS[@]+"${PKG_LIBS[@]}"})
+        link_line=$(IFS=$'\x1f'; printf '%s' "${links[*]}")
+    fi
     [ "$LIB" -eq 1 ] && cflags+=(-fPIC -ffunction-sections -fdata-sections)
     for src in ${srcs[@]+"${srcs[@]}"}; do
         [ -z "$src" ] && continue
@@ -3572,7 +3628,7 @@ if [ "$TARGET" = wasm ]; then
     # declares wasm_wasi_sources has them compiled for wasm32-wasi and linked
     # (libc over WASI: standard input and output), and one that declares
     # wasm_js has the rest left as imports, `env.id_NAME`, that its JS module
-    # answers once gen.mjs bundles it into the module's .mjs. A backend that
+    # answers once jsgen bundles it into the module's .mjs. A backend that
     # declares neither contributes nothing, so a reached native of it is an
     # undefined symbol at the link, reported below at the call that reaches it.
     # Like the C target, a native is only linked when something reaches it:
@@ -3685,23 +3741,19 @@ if [ "$TARGET" = wasm ]; then
     fi
     WBIND=""
     if [ "$NO_JS" -eq 0 ]; then
-        if command -v node >/dev/null 2>&1; then
-            wgen=(--wasm "$WOUT" --glue "$ROOT/tools/jsbind/glue.mjs" --natives "$WNAT_MAP")
-            if [ "$WEXPORT_SCOPE" = list ]; then
-                wgen+=(--strict 1)
-                [ "${#WEXPORT_NAMES[@]}" -gt 0 ] && wgen+=(--names "$(IFS=,; echo "${WEXPORT_NAMES[*]}")")
-            fi
-            for f in "${PROGRAM_FILES[@]}"; do wgen+=(--src "$f"); done
-            if ! node "$ROOT/tools/jsbind/gen.mjs" "${wgen[@]}"; then
-                progress_clear
-                echo "idc: the JS bindings could not be written; the .wasm is built (--no-js stops idc writing them)" >&2
-                exit 1
-            fi
-            WBIND=", bindings ${WOUT%.wasm}.mjs, .d.mts and .d.ts"
-        else
-            progress_clear
-            echo "idc: note: node is not on PATH, so ${WOUT%.wasm}.mjs, .d.mts and .d.ts were not written (--no-js silences this)" >&2
+        ensure_jsgen
+        wgen=(--wasm "$WOUT" --glue "$ROOT/tools/jsbind/glue.mjs" --natives "$WNAT_MAP")
+        if [ "$WEXPORT_SCOPE" = list ]; then
+            wgen+=(--strict 1)
+            [ "${#WEXPORT_NAMES[@]}" -gt 0 ] && wgen+=(--names "$(IFS=,; echo "${WEXPORT_NAMES[*]}")")
         fi
+        for f in "${PROGRAM_FILES[@]}"; do wgen+=(--src "$f"); done
+        if ! "$JSGEN" "${wgen[@]}"; then
+            progress_clear
+            echo "idc: the JS bindings could not be written; the .wasm is built (--no-js stops idc writing them)" >&2
+            exit 1
+        fi
+        WBIND=", bindings ${WOUT%.wasm}.mjs, .d.mts and .d.ts"
     fi
     progress_done "built $WOUT ($(wc -c < "$WOUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"), $(plural "${#WEXPORTS[@]}" export)$WBIND)"
     exit_ok
