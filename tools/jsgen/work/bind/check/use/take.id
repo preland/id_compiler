@@ -1,0 +1,35 @@
+// The module's imports. `wasi_snapshot_preview1` is the host's; every other
+// import must be `env.id_NATIVE`, a native of a backend whose wasm_js module
+// answers it. The natives used, with their backend, and the backends, with their
+// module, are kept in order in the four lists of ub: [native names, their
+// backends, backend names, their js files].
+
+jg_import_bad(string jg_mod, string jg_nm) {
+  string jg_er = "";
+  if (jg_mod != "wasi_snapshot_preview1" && (jg_mod != "env" || str_starts(jg_nm, "id_") == 0)) {
+    jg_er = "the module imports " + jg_mod + "." + jg_nm + ", which nothing here can answer";
+  }
+} return string jg_er;
+("wasi_snapshot_preview1", "fd_write"):("")
+("env", "id_x"):("")
+("env", "memory"):("the module imports env.memory, which nothing here can answer")
+("host", "id_x"):("the module imports host.id_x, which nothing here can answer")
+
+jg_import_js(string[] jg_rows, string jg_nm) {
+  int jg_at = jg_nat_at(jg_rows, jg_fn_of(jg_nm));
+  string jg_js = "";
+  if (jg_at >= 0) {
+    jg_js = jg_field(jg_rows[jg_at], 2);
+  }
+} return string jg_js;
+(["x\tb\tb.mjs"], "id_x"):("b.mjs")
+(["x\tb"], "id_x"):("")
+(["y\tb\tb.mjs"], "id_x"):("")
+
+jg_import_note(string jg_nm, string[] jg_rows, string[][] jg_ub) {
+  int jg_at = jg_nat_at(jg_rows, jg_fn_of(jg_nm));
+  jg_put(jg_ub[0], jg_ub[1], jg_fn_of(jg_nm), jg_field(jg_rows[jg_at], 1));
+  jg_put(jg_ub[2], jg_ub[3], jg_field(jg_rows[jg_at], 1), jg_field(jg_rows[jg_at], 2));
+} return void;
+("id_x", ["x\tb\tb.mjs"], [[], [], [], []]):("id_x", ["x\tb\tb.mjs"], [["x"], ["b"], ["b"], ["b.mjs"]])
+("id_y", ["x\tb\tb.mjs", "y\tb\tc.mjs"], [["x"], ["b"], ["b"], ["b.mjs"]]):("id_y", ["x\tb\tb.mjs", "y\tb\tc.mjs"], [["x", "y"], ["b", "b"], ["b"], ["c.mjs"]])

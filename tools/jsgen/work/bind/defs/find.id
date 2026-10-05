@@ -1,0 +1,41 @@
+// The definitions found in the source files, one row each: [name, return type,
+// "file:line", parameter...]. A name found twice keeps its first row.
+
+jg_def_find(string[][] jg_defs, string jg_nm) {
+  int jg_at = -1;
+  int jg_i = 0;
+  while (jg_i < len(jg_defs) && jg_at < 0) {
+    if (jg_defs[jg_i][0] == jg_nm) {
+      jg_at = jg_i;
+    }
+    jg_i = jg_i + 1;
+  }
+} return int jg_at;
+([["a", "int", "f:1"], ["b", "int", "f:2"]], "b"):(1)
+([["a", "int", "f:1"]], "z"):(-1)
+([], "a"):(-1)
+
+jg_defs_add(string[][] jg_defs, string[][] jg_extra) {
+  int jg_i = 0;
+  while (jg_i < len(jg_extra)) {
+    if (jg_def_find(jg_defs, jg_extra[jg_i][0]) < 0) {
+      push(jg_defs, jg_extra[jg_i]);
+    }
+    jg_i = jg_i + 1;
+  }
+} return void;
+([["a", "int", "f:1"]], [["a", "void", "g:1"], ["b", "int", "g:2"]]):([["a", "int", "f:1"], ["b", "int", "g:2"]], [["a", "void", "g:1"], ["b", "int", "g:2"]])
+([], [["a", "int", "g:1"], ["a", "void", "g:2"]]):([["a", "int", "g:1"]], [["a", "int", "g:1"], ["a", "void", "g:2"]])
+
+jg_unreadable(string[] jg_paths) {
+  string jg_unr = "";
+  int jg_i = 0;
+  while (jg_i < len(jg_paths) && jg_unr == "") {
+    if (fs_size(jg_paths[jg_i]) < 0) {
+      jg_unr = jg_paths[jg_i];
+    }
+    jg_i = jg_i + 1;
+  }
+} return string jg_unr;
+(["/nonexistent/jg_a.id"]):("/nonexistent/jg_a.id")
+([]):("")

@@ -1,0 +1,36 @@
+// A wasm binary is an 8-byte header and then sections: an id byte, a size
+// (LEB128) and the payload. Only the import and export sections are read; the
+// others are stepped over by their size.
+
+jg_is_wasm(int[] jg_b) {
+  int jg_ok = 0;
+  if (len(jg_b) >= 8 && jg_b[0] == 0 && jg_b[1] == 97) {
+    jg_ok = jg_b[2] == 115 && jg_b[3] == 109;
+  }
+} return int jg_ok;
+([0, 97, 115, 109, 1, 0, 0, 0]):(1)
+([0, 97, 115, 110, 1, 0, 0, 0]):(0)
+([0, 97, 115, 109]):(0)
+([1, 97, 115, 109, 1, 0, 0, 0]):(0)
+
+jg_sec_end(int[] jg_b, int jg_p) {
+  int jg_s0 = jg_p + 1 + jg_leb_len(jg_b, jg_p + 1);
+  int jg_e = jg_s0 + jg_leb_val(jg_b, jg_p + 1);
+} return int jg_e;
+([2, 3, 7, 7, 7, 9], 0):(5)
+([9, 7, 2, 3, 4, 9], 1):(5)
+
+jg_sec_take(int[] jg_b, int jg_p, string[] jg_mods, string[] jg_names, string[] jg_exps) {
+  int jg_id = jg_b[jg_p];
+  int jg_s0 = jg_p + 1 + jg_leb_len(jg_b, jg_p + 1);
+  if (jg_id == (import jg_sec_import)) {
+    jg_imports(jg_b, jg_s0, jg_mods, jg_names);
+  }
+} chain (int[] jg_b, int jg_p, string[] jg_mods, string[] jg_names, string[] jg_exps) {
+  if (jg_id == (import jg_sec_export)) {
+    jg_exports(jg_b, jg_s0, jg_exps);
+  }
+} return void;
+([2, 10, 1, 1, 109, 1, 110, 0, 0, 0, 0, 0], 0, [], [], []):([2, 10, 1, 1, 109, 1, 110, 0, 0, 0, 0, 0], 0, ["m"], ["n"], [])
+([7, 8, 1, 4, 105, 100, 95, 120, 0, 0], 0, [], [], []):([7, 8, 1, 4, 105, 100, 95, 120, 0, 0], 0, [], [], ["id_x"])
+([3, 2, 1, 0], 0, [], [], []):([3, 2, 1, 0], 0, [], [], [])

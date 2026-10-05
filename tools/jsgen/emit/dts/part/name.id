@@ -1,0 +1,27 @@
+// The TypeScript spelling of a function's types and names. A type is mapped
+// through the two tables in conf.id; a parameter named like a TypeScript
+// reserved word, or a function named like a member of the instance, gets an
+// underscore after it (the list it is looked up in is the second argument).
+
+jg_ts(string jg_ty) {
+  int jg_at = lst_str_index((import jg_ts_from), jg_ty);
+  string jg_tt = "";
+  if (jg_at >= 0) {
+    jg_tt = (import jg_ts_to)[jg_at];
+  }
+} return string jg_tt;
+("int"):("number")
+("word"):("bigint")
+("string[]"):("string[]")
+("void"):("void")
+("Point"):("")
+
+jg_us(string jg_nm, string[] jg_res) {
+  string jg_un = jg_nm;
+  if (lst_str_index(jg_res, jg_nm) >= 0) {
+    jg_un = jg_nm + "_";
+  }
+} return string jg_un;
+("a", ["new"]):("a")
+("new", ["new", "var"]):("new_")
+("run", []):("run")

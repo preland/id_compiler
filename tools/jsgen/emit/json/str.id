@@ -1,0 +1,57 @@
+// A string as JSON.stringify writes it: in double quotes, with the quote, the
+// backslash and the control characters escaped. Bytes of 128 and above are
+// passed through, since they are the UTF-8 of what the string holds.
+
+jg_json_esc(int jg_c) {
+  string jg_es = chr(jg_c);
+  int jg_at = lst_index_of((import jg_ctl_codes), jg_c);
+  if (jg_at >= 0) {
+    jg_es = (import jg_ctl_text)[jg_at];
+  }
+} chain (int jg_c) {
+  if (jg_c == (import jg_quote) || jg_c == (import jg_bslash)) {
+    jg_es = "\\" + chr(jg_c);
+  }
+  if (jg_c < 32 && jg_at < 0) {
+    jg_es = "\\u" + fmt_hex4(jg_c);
+  }
+} return string jg_es;
+(97):("a")
+(34):("\\\"")
+(92):("\\\\")
+(10):("\\n")
+(1):("\\u0001")
+(31):("\\u001f")
+(126):("~")
+
+jg_json(string jg_s) {
+  string[] jg_ps = ["\""];
+  int jg_i = 0;
+  while (jg_i < len(jg_s)) {
+    int jg_c = charat(jg_s, jg_i);
+    push(jg_ps, jg_json_esc(jg_c));
+    jg_i = jg_i + 1;
+  }
+} chain (string jg_s) {
+  push(jg_ps, "\"");
+  string jg_qt = str_join(jg_ps, "");
+} return string jg_qt;
+("ab"):("\"ab\"")
+("a\"b\n"):("\"a\\\"b\\n\"")
+(""):("\"\"")
+
+jg_ident(string jg_s) {
+  string jg_o = "";
+  int jg_i = 0;
+  while (jg_i < len(jg_s)) {
+    if (jg_isid(charat(jg_s, jg_i)) == 1) {
+      jg_o = jg_o + chr(charat(jg_s, jg_i));
+    } else {
+      jg_o = jg_o + "_";
+    }
+    jg_i = jg_i + 1;
+  }
+} return string jg_o;
+("jsx"):("jsx")
+("a-b.c"):("a_b_c")
+(""):("")

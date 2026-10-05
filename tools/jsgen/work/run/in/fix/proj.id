@@ -1,0 +1,35 @@
+// A small project on disk for the cases that run the whole generator, in a
+// scratch directory removed when the case's process ends: the wasm module a.wasm
+// (imports env.id_jsx_ping and wasi_snapshot_preview1.fd_write; exports id_alloc,
+// id_twice, id_bad and memory), the runtime glue.mjs with its four //@gen lines,
+// the natives map n.map, the source api.id (twice, and bad, whose parameter is
+// not one that crosses the boundary), and jsx.mjs, the module of the backend jsx.
+// The outputs would go to jg_t_pre.
+
+jg_t_proj() {
+  string jg_dir = fs_mktemp("jg_t_", 1);
+  int jg_reg = fs_drop_exit(jg_dir);
+  export string jg_t_dir = jg_dir;
+} chain () {
+  export string jg_t_wasm = jg_dir + "/a.wasm";
+  export string jg_t_glue = jg_dir + "/glue.mjs";
+  export string jg_t_map = jg_dir + "/n.map";
+} chain () {
+  export string jg_t_src = jg_dir + "/api.id";
+  export string jg_t_pre = jg_dir + "/a";
+  export string jg_t_jsx = jg_dir + "/jsx.mjs";
+} chain () {
+  export string jg_t_row = "jsx_ping\tjsx\t" + (import jg_t_jsx);
+  int[] jg_by = [0, 97, 115, 109, 1, 0, 0, 0, 2, 53, 2, 3, 101, 110, 118, 11, 105, 100, 95, 106, 115, 120, 95, 112, 105, 110, 103, 0, 0, 22, 119, 97, 115, 105, 95, 115, 110, 97, 112, 115, 104, 111, 116, 95, 112, 114, 101, 118, 105, 101, 119, 49, 8, 102, 100, 95, 119, 114, 105, 116, 101, 0, 1, 7, 41, 4, 8, 105, 100, 95, 97, 108, 108, 111, 99, 0, 0, 8, 105, 100, 95, 116, 119, 105, 99, 101, 0, 1, 6, 105, 100, 95, 98, 97, 100, 0, 2, 6, 109, 101, 109, 111, 114, 121, 2, 0];
+  int jg_h = fs_open((import jg_t_wasm), "w");
+} chain () {
+  int jg_nb = fs_write(jg_h, jg_by, len(jg_by));
+  int jg_cl = fs_close(jg_h);
+  int jg_p1 = exec_file_put((import jg_t_glue), "const A = 1;\nconst IDW_NAME = \"\"; //@gen NAME\nconst IDW_SIGS = {}; //@gen SIGS\nconst IDW_NATIVES = {}; //@gen NATIVES\nconst IDW_BACKENDS_BY_NAME = {}; //@gen BACKENDS\nconst Z = 2;\n", 420);
+} chain () {
+  int jg_p2 = exec_file_put((import jg_t_src), "twice(int a) {\n  int b = a * 2;\n} return int b;\nbad(string[][] g) {\n} return int z;\n", 420);
+  int jg_p3 = exec_file_put((import jg_t_jsx), "export default function (host) {\n  return { jsx_ping() { return 1; } };\n}\n", 420);
+  int jg_p4 = exec_file_put((import jg_t_map), (import jg_t_row), 420);
+} return void export jg_t_dir;
+():() then len((import jg_t_dir)):(16)
+():() then jg_t_nlines:(7)

@@ -1,0 +1,34 @@
+// The names a refusal lists, quoted and joined.
+
+jg_note_missing(string jg_nm, string[] jg_exps, string[] jg_ms) {
+  if (jg_nm != "" && lst_str_index(jg_exps, "id_" + jg_nm) < 0) {
+    push(jg_ms, jg_nm);
+  }
+} return void;
+("a", ["id_b"], []):("a", ["id_b"], ["a"])
+("b", ["id_b"], ["x"]):("b", ["id_b"], ["x"])
+("", ["id_b"], []):("", ["id_b"], [])
+
+jg_missing(string jg_nms, string[] jg_exps) {
+  string[] jg_ns = str_split(jg_nms, ",");
+  string[] jg_ms = [];
+  int jg_i = 0;
+} chain (string jg_nms, string[] jg_exps) {
+  while (jg_i < len(jg_ns)) {
+    jg_note_missing(jg_ns[jg_i], jg_exps, jg_ms);
+    jg_i = jg_i + 1;
+  }
+} return string[] jg_ms;
+("a,b,,c", ["id_b"]):(["a", "c"])
+("a,b", ["id_a", "id_b"]):([])
+("", ["id_a"]):([])
+
+jg_quoted(string[] jg_xs) {
+  string jg_all = "";
+  if (len(jg_xs) > 0) {
+    jg_all = "'" + str_join(jg_xs, "', '") + "'";
+  }
+} return string jg_all;
+(["a", "b"]):("'a', 'b'")
+(["a"]):("'a'")
+([]):("")

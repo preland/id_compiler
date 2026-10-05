@@ -1,0 +1,37 @@
+// The two refusals that come after the signatures are read. --names lists what
+// conf.id's lib_exports named, and one the module does not contain is an error;
+// --strict makes a named function that cannot be bound an error too.
+
+jg_names_err(string jg_nms, string[] jg_exps) {
+  string[] jg_ms = jg_missing(jg_nms, jg_exps);
+  string jg_er = "";
+  if (len(jg_ms) > 0) {
+    jg_er = "conf.id's lib_exports lists " + jg_quoted(jg_ms) + ", which the module does not contain: a program with a main keeps only the functions main reaches; call it from main, or build the project without a main to keep every function";
+  }
+} return string jg_er;
+("a,b", ["id_a"]):("conf.id's lib_exports lists 'b', which the module does not contain: a program with a main keeps only the functions main reaches; call it from main, or build the project without a main to keep every function")
+("a", ["id_a"]):("")
+("", []):("")
+
+jg_skip_list(string[][] jg_skips) {
+  string[] jg_ps = [];
+  int jg_i = 0;
+  while (jg_i < len(jg_skips)) {
+    push(jg_ps, "'" + jg_skips[jg_i][0] + "' (" + jg_skips[jg_i][1] + ")");
+    jg_i = jg_i + 1;
+  }
+} chain (string[][] jg_skips) {
+  string jg_all = str_join(jg_ps, "; ");
+} return string jg_all;
+([["a", "why a"], ["b", "why b"]]):("'a' (why a); 'b' (why b)")
+([]):("")
+
+jg_strict_err(string jg_strict, string[][] jg_skips) {
+  string jg_er = "";
+  if (jg_strict != "" && len(jg_skips) > 0) {
+    jg_er = "conf.id's lib_exports lists " + jg_skip_list(jg_skips) + "; remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)";
+  }
+} return string jg_er;
+("1", [["a", "why a"]]):("conf.id's lib_exports lists 'a' (why a); remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)")
+("", [["a", "why a"]]):("")
+("1", []):("")

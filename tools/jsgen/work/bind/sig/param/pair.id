@@ -1,0 +1,35 @@
+// A parameter as [name, type]. Text that is not `TYPE NAME` is [text, "?"],
+// which is no type that crosses the boundary.
+
+jg_param_ok(string jg_pm, int jg_a, int jg_w) {
+  int jg_ok = jg_a < len(jg_pm) && jg_w > 0 && jg_w < jg_a && jg_isstart(charat(jg_pm, jg_a)) == 1;
+} return int jg_ok;
+("int xs", 4, 3):(1)
+("int 9a", 4, 3):(0)
+("xs", 0, 0):(0)
+("intxs", 3, 3):(0)
+("int ", 4, 3):(0)
+
+jg_pair(string jg_pm, int jg_a, int jg_w) {
+  string jg_nm = str_slice(jg_pm, jg_a, len(jg_pm) - jg_a);
+  string jg_ty0 = str_slice(jg_pm, 0, jg_w);
+  string[] jg_pr = [jg_nm, jg_nows(jg_ty0)];
+} return string[] jg_pr;
+("int xs", 4, 3):(["xs", "int"])
+("func(int, int) return int f", 26, 25):(["f", "func(int,int)returnint"])
+
+jg_param(string jg_pm) {
+  int jg_a = jg_tail_start(jg_pm);
+  int jg_w = jg_type_cut(jg_pm, jg_a);
+  string[] jg_pr = [jg_pm, "?"];
+} chain (string jg_pm) {
+  if (jg_param_ok(jg_pm, jg_a, jg_w) == 1) {
+    jg_pr = jg_pair(jg_pm, jg_a, jg_w);
+  }
+} return string[] jg_pr;
+("int a"):(["a", "int"])
+("func(int, int) return int f"):(["f", "func(int,int)returnint"])
+("string[]  names"):(["names", "string[]"])
+("x"):(["x", "?"])
+("int 9a"):(["int 9a", "?"])
+("a b c"):(["c", "ab"])

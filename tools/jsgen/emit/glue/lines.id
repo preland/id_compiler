@@ -1,0 +1,38 @@
+// The runtime, glue.mjs, as lines. Four of them end in `//@gen TAG` and are
+// replaced by this build's facts, in the order of jg_gen_tags: the first line
+// that ends so is the one.
+
+jg_tag_at(string[] jg_ls, string jg_tag) {
+  int jg_at = -1;
+  int jg_i = 0;
+  while (jg_i < len(jg_ls) && jg_at < 0) {
+    if (str_ends(jg_ls[jg_i], "//@gen " + jg_tag) == 1) {
+      jg_at = jg_i;
+    }
+    jg_i = jg_i + 1;
+  }
+} return int jg_at;
+(["a", "const X = 1; //@gen X", "b //@gen X"], "X"):(1)
+(["a //@gen XY"], "X"):(-1)
+([], "X"):(-1)
+
+jg_glue_set(string[] jg_ls, string jg_tag, string jg_text, string jg_gp, string[] jg_errs) {
+  int jg_at = jg_tag_at(jg_ls, jg_tag);
+  if (jg_at >= 0) {
+    jg_ls[jg_at] = jg_text;
+  } else {
+    push(jg_errs, jg_gp + " has no //@gen " + jg_tag + " line");
+  }
+} return void;
+(["a", "x //@gen T"], "T", "y", "g.mjs", []):(["a", "y"], "T", "y", "g.mjs", [])
+(["a"], "T", "y", "g.mjs", []):(["a"], "T", "y", "g.mjs", ["g.mjs has no //@gen T line"])
+
+jg_glue_apply(string[] jg_ls, string[] jg_texts, string jg_gp, string[] jg_errs) {
+  int jg_i = 0;
+  while (jg_i < len((import jg_gen_tags)) && len(jg_errs) == 0) {
+    jg_glue_set(jg_ls, (import jg_gen_tags)[jg_i], jg_texts[jg_i], jg_gp, jg_errs);
+    jg_i = jg_i + 1;
+  }
+} return void;
+(["a //@gen NAME", "b //@gen SIGS", "c //@gen NATIVES", "d //@gen BACKENDS"], ["1", "2", "3", "4"], "g.mjs", []):(["1", "2", "3", "4"], ["1", "2", "3", "4"], "g.mjs", [])
+(["a //@gen NAME", "c //@gen NATIVES"], ["1", "2", "3", "4"], "g.mjs", []):(["1", "c //@gen NATIVES"], ["1", "2", "3", "4"], "g.mjs", ["g.mjs has no //@gen SIGS line"])

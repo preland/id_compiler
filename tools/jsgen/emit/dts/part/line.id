@@ -1,0 +1,32 @@
+// One function's lines in the .d.ts: a doc comment naming where it is defined,
+// and its signature.
+
+jg_sig_params(string[] jg_sr) {
+  string[] jg_ps = [];
+  int jg_i = 3;
+  while (jg_i < len(jg_sr)) {
+    push(jg_ps, jg_us(jg_sr[jg_i], (import jg_ts_reserved)) + ": " + jg_ts(jg_sr[jg_i + 1]));
+    jg_i = jg_i + 2;
+  }
+} chain (string[] jg_sr) {
+  string jg_all = str_join(jg_ps, ", ");
+} return string jg_all;
+(["f", "int", "x:1", "a", "int", "s", "string[]"]):("a: number, s: string[]")
+(["f", "int", "x:1", "new", "word"]):("new_: bigint")
+(["f", "int", "x:1"]):("")
+
+jg_sig_lines(string[] jg_sr) {
+  string jg_doc = "  /** " + jg_sr[0] + " (" + jg_sr[2] + ") */";
+  string jg_pt = jg_sig_params(jg_sr);
+  string jg_ln = "  " + jg_us(jg_sr[0], (import jg_api_reserved)) + "(" + jg_pt + "): " + jg_ts(jg_sr[1]) + ";";
+} chain (string[] jg_sr) {
+  string jg_two = jg_doc + "\n" + jg_ln;
+} return string jg_two;
+(["twice", "int", "api.id:3", "a", "int"]):("  /** twice (api.id:3) */\n  twice(a: number): number;")
+(["run", "void", "api.id:9"]):("  /** run (api.id:9) */\n  run_(): void;")
+
+jg_skip_line(string[] jg_sk) {
+  string jg_ln = "// not bound: " + jg_sk[0] + " -- " + jg_sk[1] + " (still callable as raw.id_" + jg_sk[0] + ")";
+} return string jg_ln;
+(["f", "why"]):("// not bound: f -- why (still callable as raw.id_f)")
+(["g", "it returns null, which does not cross the boundary"]):("// not bound: g -- it returns null, which does not cross the boundary (still callable as raw.id_g)")

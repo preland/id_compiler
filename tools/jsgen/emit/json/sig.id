@@ -1,0 +1,36 @@
+// A sig row [name, return type, "file:line", name, type, ...] as the JSON the
+// generated module holds: {"params":[["name","type"],...],"ret":"type"}.
+
+jg_json_pairs(string[] jg_sr) {
+  string[] jg_ps = [];
+  int jg_i = 3;
+  while (jg_i < len(jg_sr)) {
+    push(jg_ps, "[" + jg_json(jg_sr[jg_i]) + "," + jg_json(jg_sr[jg_i + 1]) + "]");
+    jg_i = jg_i + 2;
+  }
+} chain (string[] jg_sr) {
+  string jg_all = "[" + str_join(jg_ps, ",") + "]";
+} return string jg_all;
+(["f", "int", "x:1", "a", "int", "s", "string[]"]):("[[\"a\",\"int\"],[\"s\",\"string[]\"]]")
+(["f", "int", "x:1"]):("[]")
+
+jg_json_sig(string[] jg_sr) {
+  string jg_pj = jg_json_pairs(jg_sr);
+  string jg_rt = jg_json(jg_sr[1]);
+  string jg_o = "{\"params\":" + jg_pj + ",\"ret\":" + jg_rt + "}";
+} return string jg_o;
+(["f", "int", "x:1", "a", "int"]):("{\"params\":[[\"a\",\"int\"]],\"ret\":\"int\"}")
+(["g", "void", "y:2"]):("{\"params\":[],\"ret\":\"void\"}")
+
+jg_json_sigs(string[][] jg_sigs) {
+  string[] jg_ps = [];
+  int jg_i = 0;
+  while (jg_i < len(jg_sigs)) {
+    push(jg_ps, jg_json(jg_sigs[jg_i][0]) + ":" + jg_json_sig(jg_sigs[jg_i]));
+    jg_i = jg_i + 1;
+  }
+} chain (string[][] jg_sigs) {
+  string jg_all = "{" + str_join(jg_ps, ",") + "}";
+} return string jg_all;
+([["f", "int", "x:1", "a", "int"], ["g", "void", "y:2"]]):("{\"f\":{\"params\":[[\"a\",\"int\"]],\"ret\":\"int\"},\"g\":{\"params\":[],\"ret\":\"void\"}}")
+([]):("{}")

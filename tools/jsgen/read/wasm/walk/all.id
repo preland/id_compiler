@@ -1,0 +1,12 @@
+// The imports and exports of a wasm binary, in the order the binary lists
+// them: the module and field name of each import, and the name of each export.
+
+jg_wasm(int[] jg_b, string[] jg_mods, string[] jg_names, string[] jg_exps) {
+  int jg_p = (import jg_wasm_hdr);
+  while (jg_p < len(jg_b)) {
+    jg_sec_take(jg_b, jg_p, jg_mods, jg_names, jg_exps);
+    jg_p = jg_sec_end(jg_b, jg_p);
+  }
+} return void;
+([0, 97, 115, 109, 1, 0, 0, 0, 2, 27, 2, 3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0, 3, 101, 110, 118, 6, 109, 101, 109, 111, 114, 121, 2, 1, 1, 2, 7, 8, 1, 4, 105, 100, 95, 120, 0, 0], [], [], []):([0, 97, 115, 109, 1, 0, 0, 0, 2, 27, 2, 3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0, 3, 101, 110, 118, 6, 109, 101, 109, 111, 114, 121, 2, 1, 1, 2, 7, 8, 1, 4, 105, 100, 95, 120, 0, 0], ["env", "env"], ["id_x", "memory"], ["id_x"])
+([0, 97, 115, 109, 1, 0, 0, 0, 3, 2, 1, 0, 7, 8, 1, 4, 105, 100, 95, 120, 0, 0], [], [], []):([0, 97, 115, 109, 1, 0, 0, 0, 3, 2, 1, 0, 7, 8, 1, 4, 105, 100, 95, 120, 0, 0], [], [], ["id_x"])

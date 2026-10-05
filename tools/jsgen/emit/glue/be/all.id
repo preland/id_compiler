@@ -1,0 +1,23 @@
+// Every backend the module reaches: its JS file is read, and bundled, or
+// refused when it has no default-exported function.
+
+jg_be_one(string jg_bk, string jg_js, string[] jg_bodies, string[] jg_errs) {
+  string jg_src = fs_read_text(jg_js);
+  if (jg_exp_find(jg_src) >= 0) {
+    push(jg_bodies, jg_be_text(jg_bk, jg_js, jg_src));
+  } else {
+    push(jg_errs, jg_js + " must contain `export default function (host) { ... }` returning an object of natives");
+  }
+} return void;
+given jg_t_file ("be.mjs", "export default function (h) {}") ("fs", (import jg_t_path), [], []):("fs", (import jg_t_path), ["\n// ---- backend fs (be.mjs) ----\nfunction idw_be_fs(h) {}"], [])
+("fs", "/nonexistent/jg_be.mjs", [], []):("fs", "/nonexistent/jg_be.mjs", [], ["/nonexistent/jg_be.mjs must contain `export default function (host) { ... }` returning an object of natives"])
+
+jg_be_all(string[] jg_bks, string[] jg_jss, string[] jg_bodies, string[] jg_errs) {
+  int jg_i = 0;
+  while (jg_i < len(jg_bks) && len(jg_errs) == 0) {
+    jg_be_one(jg_bks[jg_i], jg_jss[jg_i], jg_bodies, jg_errs);
+    jg_i = jg_i + 1;
+  }
+} return void;
+([], [], [], []):([], [], [], [])
+(["fs"], ["/nonexistent/jg_be.mjs"], [], []):(["fs"], ["/nonexistent/jg_be.mjs"], [], ["/nonexistent/jg_be.mjs must contain `export default function (host) { ... }` returning an object of natives"])

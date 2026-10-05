@@ -1,0 +1,41 @@
+// Resolving the imports: what is wrong with one is pushed onto errs, which is
+// where the walk over all of them stops.
+
+jg_import_nojs(string jg_nm) {
+  string jg_er = "the module imports env." + jg_nm + " (native '" + jg_fn_of(jg_nm) + "') but no backend with a wasm_js module declares it; add `string wasm_js = \"FILE.mjs\";` to that backend's backend.id (docs/INTEROP.md, \"id and JavaScript\")";
+} return string jg_er;
+("id_x"):("the module imports env.id_x (native 'x') but no backend with a wasm_js module declares it; add `string wasm_js = \"FILE.mjs\";` to that backend's backend.id (docs/INTEROP.md, \"id and JavaScript\")")
+("id_fs_open"):("the module imports env.id_fs_open (native 'fs_open') but no backend with a wasm_js module declares it; add `string wasm_js = \"FILE.mjs\";` to that backend's backend.id (docs/INTEROP.md, \"id and JavaScript\")")
+
+jg_import_take(string jg_mod, string jg_nm, string[] jg_rows, string[][] jg_ub, string[] jg_errs) {
+  string jg_er = jg_import_bad(jg_mod, jg_nm);
+  string jg_js = "";
+  if (jg_er == "" && jg_mod == "env") {
+    jg_js = jg_import_js(jg_rows, jg_nm);
+  }
+} chain (string jg_mod, string jg_nm, string[] jg_rows, string[][] jg_ub, string[] jg_errs) {
+  if (jg_er == "" && jg_mod == "env" && jg_js == "") {
+    jg_er = jg_import_nojs(jg_nm);
+  }
+  if (jg_er != "") {
+    push(jg_errs, jg_er);
+  }
+  if (jg_er == "" && jg_js != "") {
+    jg_import_note(jg_nm, jg_rows, jg_ub);
+  }
+} return void;
+("wasi_snapshot_preview1", "fd_write", [], [[], [], [], []], []):("wasi_snapshot_preview1", "fd_write", [], [[], [], [], []], [])
+("env", "id_x", ["x\tb\tb.mjs"], [[], [], [], []], []):("env", "id_x", ["x\tb\tb.mjs"], [["x"], ["b"], ["b"], ["b.mjs"]], [])
+("env", "id_x", [], [[], [], [], []], []):("env", "id_x", [], [[], [], [], []], ["the module imports env.id_x (native 'x') but no backend with a wasm_js module declares it; add `string wasm_js = \"FILE.mjs\";` to that backend's backend.id (docs/INTEROP.md, \"id and JavaScript\")"])
+("host", "id_x", ["x\tb\tb.mjs"], [[], [], [], []], []):("host", "id_x", ["x\tb\tb.mjs"], [[], [], [], []], ["the module imports host.id_x, which nothing here can answer"])
+
+jg_imports_all(string[] jg_mods, string[] jg_names, string[] jg_rows, string[][] jg_ub, string[] jg_errs) {
+  int jg_i = 0;
+  while (jg_i < len(jg_mods) && len(jg_errs) == 0) {
+    jg_import_take(jg_mods[jg_i], jg_names[jg_i], jg_rows, jg_ub, jg_errs);
+    jg_i = jg_i + 1;
+  }
+} return void;
+(["wasi_snapshot_preview1", "env"], ["fd_write", "id_x"], ["x\tb\tb.mjs"], [[], [], [], []], []):(["wasi_snapshot_preview1", "env"], ["fd_write", "id_x"], ["x\tb\tb.mjs"], [["x"], ["b"], ["b"], ["b.mjs"]], [])
+(["env", "env"], ["memory", "id_x"], ["x\tb\tb.mjs"], [[], [], [], []], []):(["env", "env"], ["memory", "id_x"], ["x\tb\tb.mjs"], [[], [], [], []], ["the module imports env.memory, which nothing here can answer"])
+([], [], [], [[], [], [], []], []):([], [], [], [[], [], [], []], [])

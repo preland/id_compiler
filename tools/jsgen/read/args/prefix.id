@@ -1,0 +1,14 @@
+// Where the outputs go: --out, or the wasm's own path without its .wasm; and
+// the name they carry, which is the last path component.
+
+jg_prefix(string jg_wp, string jg_op) {
+  string jg_pre = jg_op;
+  if (jg_op == "" && str_ends(jg_wp, ".wasm") == 1) {
+    jg_pre = str_slice(jg_wp, 0, len(jg_wp) - 5);
+  } else if (jg_op == "") {
+    jg_pre = jg_wp;
+  }
+} return string jg_pre;
+("a/x.wasm", ""):("a/x")
+("a/x.wasm", "out/p"):("out/p")
+("a/x", ""):("a/x")

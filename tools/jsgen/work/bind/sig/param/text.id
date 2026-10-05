@@ -1,0 +1,38 @@
+// Taking a parameter's text apart. A parameter is `TYPE NAME`: the name is the
+// identifier that ends it, the type is everything before the white space ahead
+// of the name, with its white space removed.
+
+jg_nows(string jg_s) {
+  string jg_o = "";
+  int jg_i = 0;
+  while (jg_i < len(jg_s)) {
+    if (jg_ws(charat(jg_s, jg_i)) == 0) {
+      jg_o = jg_o + chr(charat(jg_s, jg_i));
+    }
+    jg_i = jg_i + 1;
+  }
+} return string jg_o;
+("int [] "):("int[]")
+("a\tb\nc"):("abc")
+(""):("")
+
+jg_tail_start(string jg_pm) {
+  int jg_a = len(jg_pm);
+  while (jg_a > 0 && jg_isid(charat(jg_pm, jg_a - 1)) == 1) {
+    jg_a = jg_a - 1;
+  }
+} return int jg_a;
+("int xs"):(4)
+("int 9a"):(4)
+("int "):(4)
+("x"):(0)
+
+jg_type_cut(string jg_pm, int jg_a) {
+  int jg_w = jg_a;
+  while (jg_w > 0 && jg_ws(charat(jg_pm, jg_w - 1)) == 1) {
+    jg_w = jg_w - 1;
+  }
+} return int jg_w;
+("int  xs", 5):(3)
+("int xs", 0):(0)
+("intxs", 3):(3)

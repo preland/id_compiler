@@ -1,0 +1,18 @@
+// What the generator wrote beside the wasm: how long the .d.ts is, and whether
+// the .d.mts is the same file.
+
+jg_t_dts_n() {
+  string[] jg_ls = str_split(fs_read_text((import jg_t_pre) + ".d.ts"), "\n");
+  int jg_nd = len(jg_ls);
+} return int jg_nd;
+given jg_t_proj ():(1)
+given jg_t_proj given jg_t_put(".d.ts", "a\nb\n") ():(3)
+
+jg_t_same() {
+  string jg_one = fs_read_text((import jg_t_pre) + ".d.ts");
+  string jg_two = fs_read_text((import jg_t_pre) + ".d.mts");
+  int jg_eq = jg_one == jg_two && len(jg_one) > 0;
+} return int jg_eq;
+given jg_t_proj ():(0)
+given jg_t_proj given jg_t_put(".d.ts", "x") given jg_t_put(".d.mts", "x") ():(1)
+given jg_t_proj given jg_t_put(".d.ts", "x") given jg_t_put(".d.mts", "y") ():(0)

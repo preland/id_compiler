@@ -1,0 +1,13 @@
+// The .d.ts from its parts: the top, a line pair per bound function, the bottom,
+// and one comment line per function that could not be bound.
+
+jg_dts_join(string jg_top, string jg_bottom, string[][] jg_sigs, string[][] jg_skips) {
+  string[] jg_ls = [jg_top];
+  jg_dts_sigs(jg_sigs, jg_ls);
+  push(jg_ls, jg_bottom);
+} chain (string jg_top, string jg_bottom, string[][] jg_sigs, string[][] jg_skips) {
+  jg_dts_skips(jg_skips, jg_ls);
+  string jg_tx = str_join(jg_ls, "\n") + "\n";
+} return string jg_tx;
+("TOP", "BOTTOM", [["f", "int", "x:1", "a", "int"]], [["g", "why"]]):("TOP\n  /** f (x:1) */\n  f(a: number): number;\nBOTTOM\n// not bound: g -- why (still callable as raw.id_g)\n")
+("T", "B", [], []):("T\nB\n")

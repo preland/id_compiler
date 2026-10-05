@@ -1,0 +1,46 @@
+// One step of the scan over a source file: a comment, a string literal, a brace
+// that changes the depth, a definition at depth 0, or just the next character.
+// The state is [position, depth].
+
+jg_scan_step(string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
+  int jg_i = jg_st[0];
+  int jg_c = charat(jg_t, jg_i);
+  int jg_nx = jg_i + 1;
+} chain (string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
+  if (jg_c == (import jg_slash) && charat(jg_t, jg_i + 1) == (import jg_slash)) {
+    jg_nx = str_eol(jg_t, jg_i);
+  } else if (jg_c == (import jg_quote)) {
+    jg_nx = jg_str_end(jg_t, jg_i + 1) + 1;
+  }
+  if (jg_c == (import jg_lbrace)) {
+    jg_st[1] = jg_st[1] + 1;
+  }
+} chain (string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
+  if (jg_c == (import jg_rbrace)) {
+    jg_st[1] = jg_st[1] - 1;
+  }
+  jg_st[0] = jg_nx;
+  if (jg_st[1] == 0 && jg_isstart(jg_c) == 1 && jg_fresh(jg_t, jg_i) == 1) {
+    jg_def_at(jg_t, jg_path, jg_i, jg_st, jg_defs);
+  }
+} return void;
+("a // b\nc", "f.id", [0, 0], []):("a // b\nc", "f.id", [1, 0], [])
+("// b\nc", "f.id", [0, 0], []):("// b\nc", "f.id", [4, 0], [])
+("\"a{\" b", "f.id", [0, 0], []):("\"a{\" b", "f.id", [4, 0], [])
+("{ x", "f.id", [0, 0], []):("{ x", "f.id", [1, 1], [])
+("} x", "f.id", [0, 1], []):("} x", "f.id", [1, 0], [])
+("f() {\n} return int a;", "f.id", [0, 0], []):("f() {\n} return int a;", "f.id", [8, 0], [["f", "int", "f.id:1"]])
+("f() {\n} return int a;", "f.id", [0, 1], []):("f() {\n} return int a;", "f.id", [1, 1], [])
+("af() {\n} return int a;", "f.id", [1, 0], []):("af() {\n} return int a;", "f.id", [2, 0], [])
+
+jg_scan(string jg_t, string jg_path) {
+  string[][] jg_defs = [];
+  int[] jg_st = [0, 0];
+  while (jg_st[0] < len(jg_t)) {
+    jg_scan_step(jg_t, jg_path, jg_st, jg_defs);
+  }
+} return string[][] jg_defs;
+("twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n", "p/f.id"):([["twice", "int", "f.id:1", "int a"]])
+("a(int x, string[] y) {\n} chain (int x, string[] y) {\n} return void;\n\nb() {\n} return string s;\n", "g.id"):([["a", "void", "g.id:1", "int x", "string[] y"], ["b", "string", "g.id:5"]])
+("// x(int a) {\ny\nc() {\n} return int d;", "h.id"):([["c", "int", "h.id:3"]])
+("native f(int a) return int;\nn() {\n} return int k;", "h.id"):([["n", "int", "h.id:2"]])

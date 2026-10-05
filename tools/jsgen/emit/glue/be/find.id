@@ -1,0 +1,27 @@
+// The module a backend ships for the wasm target is an ES module whose default
+// export is a function taking the host. It is bundled into the generated module
+// by turning `export default function (` into `function idw_be_NAME(`.
+
+jg_exp_find(string jg_src) {
+  int jg_at = str_find(jg_src, "export default function");
+  while (jg_at >= 0 && charat(jg_src, jg_skip_ws(jg_src, jg_at + 23)) != (import jg_lparen)) {
+    jg_at = str_findat(jg_src, "export default function", jg_at + 1);
+  }
+} return int jg_at;
+("export default function (host) {}"):(0)
+("x\nexport default function(h) {}"):(2)
+("export default function foo(h) {}\nexport default function\n  (h) {}"):(34)
+("const f = function (h) {}"):(-1)
+("export default function"):(-1)
+
+jg_be_text(string jg_bk, string jg_js, string jg_src) {
+  int jg_at = jg_exp_find(jg_src);
+  int jg_cut = jg_skip_ws(jg_src, jg_at + 23) + 1;
+  string jg_hd = "\n// ---- backend " + jg_bk + " (" + path_base(jg_js) + ") ----\n";
+} chain (string jg_bk, string jg_js, string jg_src) {
+  string jg_pre = str_slice(jg_src, 0, jg_at);
+  string jg_post = str_slice(jg_src, jg_cut, len(jg_src) - jg_cut);
+  string jg_tx = jg_hd + jg_pre + "function idw_be_" + jg_ident(jg_bk) + "(" + jg_post;
+} return string jg_tx;
+("fs", "d/fs.mjs", "export default function (host) { return {}; }"):("\n// ---- backend fs (fs.mjs) ----\nfunction idw_be_fs(host) { return {}; }")
+("my-be", "x.mjs", "// k\nexport default function(h) {}\n"):("\n// ---- backend my-be (x.mjs) ----\n// k\nfunction idw_be_my_be(h) {}\n")

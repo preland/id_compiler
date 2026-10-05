@@ -1,0 +1,44 @@
+// The source files, and what is checked once the module and the signatures are
+// known: the command line itself, and the two refusals about the names conf.id
+// listed.
+
+jg_usage_err(string[] jg_cf, string[] jg_errs) {
+  if (jg_cf[(import jg_c_wasm)] == "" || jg_cf[(import jg_c_glue)] == "") {
+    push(jg_errs, (import jg_usage));
+  }
+} return void;
+(["a.wasm", "g.mjs", "", "", "", ""], []):(["a.wasm", "g.mjs", "", "", "", ""], [])
+(["", "g.mjs", "", "", "", ""], []):(["", "g.mjs", "", "", "", ""], ["usage: jsgen --wasm FILE --glue glue.mjs [--natives MAP] [--out PREFIX] [--strict 1] [--names A,B] --src FILE..."])
+(["a.wasm", "", "", "", "", ""], ["x"]):(["a.wasm", "", "", "", "", ""], ["x", "usage: jsgen --wasm FILE --glue glue.mjs [--natives MAP] [--out PREFIX] [--strict 1] [--names A,B] --src FILE..."])
+
+jg_read_src(string[] jg_sl, string[][] jg_defs, string[] jg_errs) {
+  string jg_unr = "";
+  if (len(jg_errs) == 0) {
+    jg_unr = jg_unreadable(jg_sl);
+  }
+  blank;
+} chain (string[] jg_sl, string[][] jg_defs, string[] jg_errs) {
+  if (jg_unr != "") {
+    push(jg_errs, "cannot read " + jg_unr);
+  } else if (len(jg_errs) == 0) {
+    jg_defs_add(jg_defs, jg_defs_load(jg_sl));
+  }
+} return void;
+given jg_t_proj ([(import jg_t_src)], [], []):([(import jg_t_src)], [["twice", "int", "api.id:1", "int a"], ["bad", "int", "api.id:4", "string[][] g"]], [])
+(["/nonexistent/jg_x.id"], [], []):(["/nonexistent/jg_x.id"], [], ["cannot read /nonexistent/jg_x.id"])
+(["/nonexistent/jg_x.id"], [], ["early"]):(["/nonexistent/jg_x.id"], [], ["early"])
+
+jg_check(string[] jg_cf, string[] jg_exps, string[][] jg_skips, string[] jg_errs) {
+  string jg_e1 = jg_names_err(jg_cf[(import jg_c_names)], jg_exps);
+  string jg_e2 = jg_strict_err(jg_cf[(import jg_c_strict)], jg_skips);
+  blank;
+} chain (string[] jg_cf, string[] jg_exps, string[][] jg_skips, string[] jg_errs) {
+  if (len(jg_errs) == 0 && jg_e1 != "") {
+    push(jg_errs, jg_e1);
+  } else if (len(jg_errs) == 0 && jg_e2 != "") {
+    push(jg_errs, jg_e2);
+  }
+} return void;
+(["w", "g", "", "", "", "a,b"], ["id_a"], [], []):(["w", "g", "", "", "", "a,b"], ["id_a"], [], ["conf.id's lib_exports lists 'b', which the module does not contain: a program with a main keeps only the functions main reaches; call it from main, or build the project without a main to keep every function"])
+(["w", "g", "", "", "1", ""], ["id_a"], [["a", "why a"]], []):(["w", "g", "", "", "1", ""], ["id_a"], [["a", "why a"]], ["conf.id's lib_exports lists 'a' (why a); remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)"])
+(["w", "g", "", "", "", ""], ["id_a"], [["a", "why a"]], []):(["w", "g", "", "", "", ""], ["id_a"], [["a", "why a"]], [])

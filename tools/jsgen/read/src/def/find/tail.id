@@ -1,0 +1,47 @@
+// What follows a definition's body: more `chain (params) { ... }` segments, and
+// then the `return TYPE ...;` clause, whose type is the definition's.
+
+jg_chain_open(string jg_t, int jg_cl) {
+  int jg_at = jg_skip_ws(jg_t, jg_cl);
+  int jg_e = -1;
+  if (charat(jg_t, jg_at) == (import jg_lbrace)) {
+    jg_e = jg_match_close(jg_t, jg_at, (import jg_lbrace), (import jg_rbrace));
+  }
+} return int jg_e;
+("chain (a) { x } y", 9):(15)
+("chain (a) y", 9):(-1)
+("chain (a)\n  {}", 9):(14)
+
+jg_chain_end(string jg_t, int jg_r) {
+  int jg_po = str_findat(jg_t, "(", jg_r);
+  int jg_pc = -1;
+  int jg_e = -1;
+} chain (string jg_t, int jg_r) {
+  if (jg_po >= 0) {
+    jg_pc = jg_match_close(jg_t, jg_po, (import jg_lparen), (import jg_rparen));
+  }
+  if (jg_pc >= 0) {
+    jg_e = jg_chain_open(jg_t, jg_pc);
+  }
+} return int jg_e;
+("chain (a) { x } y", 0):(15)
+("chain (a, (b)) {} z", 0):(17)
+("chain y", 0):(-1)
+("chain (a) y", 0):(-1)
+
+jg_tail_pos(string jg_t, int jg_e) {
+  int jg_r = -1;
+  while (jg_e > 0) {
+    int jg_at = jg_skip_ws(jg_t, jg_e);
+    if (str_eqat(jg_t, jg_at, "chain") == 1) {
+      jg_e = jg_chain_end(jg_t, jg_at);
+    } else {
+      jg_r = jg_at;
+      jg_e = -1;
+    }
+  }
+} return int jg_r;
+("{ a } return int x;", 5):(6)
+("{ a } chain (p) { b } return int y;", 5):(22)
+("{ a } chain y", 5):(-1)
+("x", -1):(-1)

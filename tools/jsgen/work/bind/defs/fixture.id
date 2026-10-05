@@ -1,0 +1,13 @@
+// A file the cases can read, made in a scratch directory of its own so that its
+// base name, and with it the file:line of a definition, is the same on every
+// run. The directory is removed when the case's process ends.
+
+jg_t_file(string jg_nm, string jg_text) {
+  string jg_dir = fs_mktemp("jg_t_", 1);
+  int jg_reg = fs_drop_exit(jg_dir);
+  export string jg_t_path = jg_dir + "/" + jg_nm;
+} chain (string jg_nm, string jg_text) {
+  int jg_wr = exec_file_put((import jg_t_path), jg_text, 420);
+} return void export jg_t_path;
+("jg_fix.id", "x"):() then len((import jg_t_path)):(26)
+("a.id", "yy"):() then len((import jg_t_path)):(21)

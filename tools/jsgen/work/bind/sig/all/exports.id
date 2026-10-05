@@ -1,0 +1,25 @@
+// Every wanted export of the module, in the module's order, becomes a sig row or
+// a skip row.
+
+jg_derive_exp(string[][] jg_defs, string jg_ex, string[][] jg_sigs, string[][] jg_skips) {
+  int jg_at = jg_def_find(jg_defs, jg_fn_of(jg_ex));
+  if (jg_at >= 0) {
+    jg_derive_one(jg_defs[jg_at], jg_sigs, jg_skips);
+  } else {
+    push(jg_skips, [jg_fn_of(jg_ex), "no definition of it was found in the project's source files"]);
+  }
+} return void;
+([["f", "int", "x:1", "int a"]], "id_f", [], []):([["f", "int", "x:1", "int a"]], "id_f", [["f", "int", "x:1", "a", "int"]], [])
+([["f", "int", "x:1"]], "id_g", [], []):([["f", "int", "x:1"]], "id_g", [], [["g", "no definition of it was found in the project's source files"]])
+
+jg_derive(string[][] jg_defs, string[] jg_exps, string[][] jg_sigs, string[][] jg_skips) {
+  int jg_i = 0;
+  while (jg_i < len(jg_exps)) {
+    if (jg_wanted(jg_exps[jg_i]) == 1) {
+      jg_derive_exp(jg_defs, jg_exps[jg_i], jg_sigs, jg_skips);
+    }
+    jg_i = jg_i + 1;
+  }
+} return void;
+([["f", "int", "x:1"], ["g", "void", "x:2", "string s"]], ["id_alloc", "id_g", "memory", "id_f", "id_zz"], [], []):([["f", "int", "x:1"], ["g", "void", "x:2", "string s"]], ["id_alloc", "id_g", "memory", "id_f", "id_zz"], [["g", "void", "x:2", "s", "string"], ["f", "int", "x:1"]], [["zz", "no definition of it was found in the project's source files"]])
+([], ["id_alloc"], [], []):([], ["id_alloc"], [], [])

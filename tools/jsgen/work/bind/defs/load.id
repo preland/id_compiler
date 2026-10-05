@@ -1,0 +1,24 @@
+// Reading the source files: each is scanned and its definitions added to the
+// list. A file that cannot be read has no definitions.
+
+jg_load_one(string jg_path, string[][] jg_defs) {
+  string[][] jg_extra = jg_scan(fs_read_text(jg_path), jg_path);
+  jg_defs_add(jg_defs, jg_extra);
+  int jg_n = len(jg_defs);
+} return int jg_n;
+given jg_t_file ("jg_fix.id", "a(int x) {\n} return int k;\n") ((import jg_t_path), []):(1)
+given jg_t_file ("jg_fix.id", "a(int x) {\n} return int k;\n") ((import jg_t_path), [["b", "int", "y:1"]]):(2)
+given jg_t_file ("jg_fix.id", "a(int x) {\n} return int k;\n") ((import jg_t_path), [["a", "void", "y:1"]]):(1)
+("/nonexistent/jg_x.id", []):(0)
+
+jg_defs_load(string[] jg_paths) {
+  string[][] jg_defs = [];
+  int jg_i = 0;
+  while (jg_i < len(jg_paths)) {
+    jg_load_one(jg_paths[jg_i], jg_defs);
+    jg_i = jg_i + 1;
+  }
+} return string[][] jg_defs;
+given jg_t_file ("jg_fix.id", "a(int x) {\n} return int k;\n") ([(import jg_t_path)]):([["a", "int", "jg_fix.id:1", "int x"]])
+given jg_t_file ("jg_fix.id", "a(int x) {\n} return int k;\n") ([(import jg_t_path), (import jg_t_path)]):([["a", "int", "jg_fix.id:1", "int x"]])
+([]):([])

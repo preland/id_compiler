@@ -1,0 +1,32 @@
+// The import section of a wasm binary: a count, then per import a module name,
+// a field name, a kind byte and a descriptor.
+
+jg_imp_end(int[] jg_b, int jg_p) {
+  int jg_m = jg_name_end(jg_b, jg_p);
+  int jg_f = jg_name_end(jg_b, jg_m);
+  int jg_e = jg_desc_end(jg_b, jg_f + 1, jg_b[jg_f]);
+} return int jg_e;
+([3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0, 99], 0):(11)
+([3, 101, 110, 118, 6, 109, 101, 109, 111, 114, 121, 2, 1, 1, 2], 0):(15)
+
+jg_imp_note(int[] jg_b, int jg_p, string[] jg_mods, string[] jg_names) {
+  int jg_m = jg_name_end(jg_b, jg_p);
+  push(jg_mods, jg_name_at(jg_b, jg_p));
+  push(jg_names, jg_name_at(jg_b, jg_m));
+} return void;
+([3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0], 0, [], []):([3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0], 0, ["env"], ["id_x"])
+([9, 1, 97, 1, 98, 0, 0], 1, ["m"], ["n"]):([9, 1, 97, 1, 98, 0, 0], 1, ["m", "a"], ["n", "b"])
+
+jg_imports(int[] jg_b, int jg_p, string[] jg_mods, string[] jg_names) {
+  int jg_n = jg_leb_val(jg_b, jg_p);
+  int jg_q = jg_p + jg_leb_len(jg_b, jg_p);
+  int jg_i = 0;
+} chain (int[] jg_b, int jg_p, string[] jg_mods, string[] jg_names) {
+  while (jg_i < jg_n) {
+    jg_imp_note(jg_b, jg_q, jg_mods, jg_names);
+    jg_q = jg_imp_end(jg_b, jg_q);
+    jg_i = jg_i + 1;
+  }
+} return void;
+([2, 3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0, 3, 101, 110, 118, 6, 109, 101, 109, 111, 114, 121, 2, 1, 1, 2], 0, [], []):([2, 3, 101, 110, 118, 4, 105, 100, 95, 120, 0, 0, 3, 101, 110, 118, 6, 109, 101, 109, 111, 114, 121, 2, 1, 1, 2], 0, ["env", "env"], ["id_x", "memory"])
+([0, 9], 0, [], []):([0, 9], 0, [], [])

@@ -1,0 +1,44 @@
+// The inputs the generator is given: the wasm binary and the natives map. A
+// stage does nothing once an earlier one has gone wrong, and says what went wrong
+// in errs; `in` holds the module's [import modules, import names, export names,
+// natives map rows].
+
+jg_wasm_err(string jg_wp, int[] jg_by) {
+  string jg_er = "";
+  if (fs_size(jg_wp) < 0) {
+    jg_er = "cannot read " + jg_wp;
+  } else if (jg_is_wasm(jg_by) == 0) {
+    jg_er = jg_wp + " is not a WebAssembly module";
+  }
+} return string jg_er;
+("/nonexistent/jg.wasm", []):("cannot read /nonexistent/jg.wasm")
+("/dev/null", []):("/dev/null is not a WebAssembly module")
+("/dev/null", [0, 97, 115, 109, 1, 0, 0, 0]):("")
+
+jg_read_wasm(string[] jg_cf, string[][] jg_in, string[] jg_errs) {
+  int[] jg_by = [];
+  string jg_er = "";
+  if (len(jg_errs) == 0) {
+    jg_by = fs_read_bytes(jg_cf[(import jg_c_wasm)]);
+    jg_er = jg_wasm_err(jg_cf[(import jg_c_wasm)], jg_by);
+  }
+} chain (string[] jg_cf, string[][] jg_in, string[] jg_errs) {
+  if (jg_er != "") {
+    push(jg_errs, jg_er);
+  } else if (len(jg_errs) == 0) {
+    jg_wasm(jg_by, jg_in[0], jg_in[1], jg_in[2]);
+  }
+} return void;
+given jg_t_proj ([(import jg_t_wasm), "", "", "", "", ""], [[], [], [], []], []):([(import jg_t_wasm), "", "", "", "", ""], [["env", "wasi_snapshot_preview1"], ["id_jsx_ping", "fd_write"], ["id_alloc", "id_twice", "id_bad", "memory"], []], [])
+(["/nonexistent/jg.wasm", "", "", "", "", ""], [[], [], [], []], []):(["/nonexistent/jg.wasm", "", "", "", "", ""], [[], [], [], []], ["cannot read /nonexistent/jg.wasm"])
+(["/nonexistent/jg.wasm", "", "", "", "", ""], [[], [], [], []], ["x"]):(["/nonexistent/jg.wasm", "", "", "", "", ""], [[], [], [], []], ["x"])
+
+jg_read_nat(string[] jg_cf, string[][] jg_in, string[] jg_errs) {
+  if (len(jg_errs) == 0 && jg_cf[(import jg_c_nat)] != "" && fs_exists(jg_cf[(import jg_c_nat)]) == 1) {
+    string jg_tx = fs_read_text(jg_cf[(import jg_c_nat)]);
+    lst_str_extend(jg_in[3], jg_nat_rows(jg_tx));
+  }
+} return void;
+given jg_t_proj (["", "", (import jg_t_map), "", "", ""], [[], [], [], []], []):(["", "", (import jg_t_map), "", "", ""], [[], [], [], [(import jg_t_row)]], [])
+(["", "", "/nonexistent/jg.map", "", "", ""], [[], [], [], []], []):(["", "", "/nonexistent/jg.map", "", "", ""], [[], [], [], []], [])
+(["", "", "", "", "", ""], [[], [], [], []], []):(["", "", "", "", "", ""], [[], [], [], []], [])

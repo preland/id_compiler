@@ -1,0 +1,16 @@
+// The exported functions of the wasm module that a host calls are `id_NAME`,
+// except the three the runtime itself exports.
+
+jg_wanted(string jg_ex) {
+  int jg_yes = str_starts(jg_ex, "id_") == 1 && lst_str_index((import jg_skip_exports), jg_ex) < 0;
+} return int jg_yes;
+("id_twice"):(1)
+("id_alloc"):(0)
+("memory"):(0)
+("id_str_of_cstr"):(0)
+
+jg_fn_of(string jg_ex) {
+  string jg_fn = str_slice(jg_ex, 3, len(jg_ex) - 3);
+} return string jg_fn;
+("id_twice"):("twice")
+("id_a"):("a")

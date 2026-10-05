@@ -1,0 +1,35 @@
+// A definition's row: [name, return type, "file:line", parameter...]. The
+// return type is "" when no `return TYPE` follows the body; r is where the text
+// after the body begins.
+
+jg_def_row(string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int jg_r) {
+  string[] jg_ps = jg_params(str_slice(jg_t, jg_k + 1, jg_cl - jg_k - 2));
+  string jg_ret = jg_ret_of(jg_window(jg_t, jg_r));
+  string jg_loc = path_base(jg_path) + ":" + jg_line(jg_t, jg_k);
+} chain (string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int jg_r) {
+  string[] jg_rw = [jg_nm, jg_ret, jg_loc];
+  lst_str_extend(jg_rw, jg_ps);
+} return string[] jg_rw;
+("f(int a) {\n} return int a;", "d/f.id", "f", 1, 8, 13):(["f", "int", "f.id:1", "int a"])
+("\nk() {\n} chain () {} return string[] s;", "k.id", "k", 2, 4, 21):(["k", "string[]", "k.id:2"])
+
+jg_def_at(string jg_t, string jg_path, int jg_i, int[] jg_st, string[][] jg_defs) {
+  int jg_j = jg_ident_end(jg_t, jg_i);
+  string jg_nm = str_slice(jg_t, jg_i, jg_j - jg_i);
+  int jg_k = jg_skip_hs(jg_t, jg_j);
+} chain (string jg_t, string jg_path, int jg_i, int[] jg_st, string[][] jg_defs) {
+  int jg_cl = jg_close_of(jg_t, jg_nm, jg_k);
+  int jg_q = jg_open_at(jg_t, jg_cl);
+  int jg_r = jg_tail_of(jg_t, jg_q);
+} chain (string jg_t, string jg_path, int jg_i, int[] jg_st, string[][] jg_defs) {
+  if (jg_q >= 0) {
+    push(jg_defs, jg_def_row(jg_t, jg_path, jg_nm, jg_k, jg_cl, jg_r));
+  }
+  jg_st[0] = jg_j;
+  if (jg_r >= 0) {
+    jg_st[0] = jg_r;
+  }
+} return void;
+("f(int a) {\n} return int a;", "d/f.id", 0, [1, 0], []):("f(int a) {\n} return int a;", "d/f.id", 0, [13, 0], [["f", "int", "f.id:1", "int a"]])
+("g(x) y", "g.id", 0, [1, 0], []):("g(x) y", "g.id", 0, [1, 0], [])
+("chain (a) {\n} return int a;", "g.id", 0, [1, 0], []):("chain (a) {\n} return int a;", "g.id", 0, [5, 0], [])

@@ -1,0 +1,15 @@
+// An ordered map held as two lists, keys and values: a key keeps the position
+// it first had, and a later value replaces the earlier one.
+
+jg_put(string[] jg_ks, string[] jg_vs, string jg_kk, string jg_vv) {
+  int jg_at = lst_str_index(jg_ks, jg_kk);
+  if (jg_at >= 0) {
+    jg_vs[jg_at] = jg_vv;
+  } else {
+    push(jg_ks, jg_kk);
+    push(jg_vs, jg_vv);
+  }
+} return void;
+([], [], "a", "1"):(["a"], ["1"], "a", "1")
+(["a", "b"], ["1", "2"], "a", "3"):(["a", "b"], ["3", "2"], "a", "3")
+(["a"], ["1"], "b", "2"):(["a", "b"], ["1", "2"], "b", "2")

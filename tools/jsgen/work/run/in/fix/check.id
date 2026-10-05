@@ -1,0 +1,20 @@
+// Writing into, and reading back from, the files of jg_t_proj.
+
+jg_t_nlines() {
+  string[] jg_ls = str_split(fs_read_text((import jg_t_glue)), "\n");
+  int jg_nl2 = len(jg_ls);
+} return int jg_nl2;
+given jg_t_proj ():(7)
+given jg_t_proj given jg_t_proj ():(7)
+
+jg_t_put(string jg_ext, string jg_tx) {
+  int jg_p5 = exec_file_put((import jg_t_pre) + jg_ext, jg_tx, 420);
+} return void;
+given jg_t_proj (".mjs", "x"):() then jg_t_mjs:("x")
+given jg_t_proj (".mjs", "yy"):() then jg_t_mjs:("yy")
+
+jg_t_mjs() {
+  string jg_got = fs_read_text((import jg_t_pre) + ".mjs");
+} return string jg_got;
+given jg_t_proj ():("")
+given jg_t_proj given jg_t_put(".mjs", "hi") ():("hi")

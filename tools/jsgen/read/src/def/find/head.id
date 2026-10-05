@@ -1,0 +1,36 @@
+// The head of a definition: `name(params) {`, found at an identifier that is
+// not inside braces. Anything else that looks like a call -- a keyword, a
+// parenthesis that is not followed by a brace -- is not a definition.
+
+jg_close_of(string jg_t, string jg_nm, int jg_k) {
+  int jg_cl = -1;
+  if (charat(jg_t, jg_k) == (import jg_lparen) && lst_str_index((import jg_kw), jg_nm) < 0) {
+    jg_cl = jg_match_close(jg_t, jg_k, (import jg_lparen), (import jg_rparen));
+  }
+} return int jg_cl;
+("f(a) {", "f", 1):(4)
+("chain (a) {", "chain", 6):(-1)
+("f x", "f", 1):(-1)
+("f(a", "f", 1):(-1)
+
+jg_open_at(string jg_t, int jg_cl) {
+  int jg_q = -1;
+  int jg_at = jg_skip_ws(jg_t, jg_cl);
+  if (jg_cl >= 0 && charat(jg_t, jg_at) == (import jg_lbrace)) {
+    jg_q = jg_at;
+  }
+} return int jg_q;
+("f(a) {", 4):(5)
+("f(a)\n\n  {", 4):(8)
+("f(a) x", 4):(-1)
+("f(a) {", -1):(-1)
+
+jg_tail_of(string jg_t, int jg_q) {
+  int jg_r = -1;
+  if (jg_q >= 0) {
+    jg_r = jg_tail_pos(jg_t, jg_match_close(jg_t, jg_q, (import jg_lbrace), (import jg_rbrace)));
+  }
+} return int jg_r;
+("f() { } return int x;", 4):(8)
+("f() { } return int x;", -1):(-1)
+("f() { return int x;", 4):(-1)

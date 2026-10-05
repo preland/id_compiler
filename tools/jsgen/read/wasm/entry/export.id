@@ -1,0 +1,23 @@
+// The export section of a wasm binary: a count, then per export a name, a kind
+// byte and an index.
+
+jg_exp_end(int[] jg_b, int jg_p) {
+  int jg_f = jg_name_end(jg_b, jg_p);
+  int jg_e = jg_f + 1 + jg_leb_len(jg_b, jg_f + 1);
+} return int jg_e;
+([4, 105, 100, 95, 120, 0, 0, 9], 0):(7)
+([9, 1, 97, 3, 200, 1, 9], 1):(6)
+
+jg_exports(int[] jg_b, int jg_p, string[] jg_names) {
+  int jg_n = jg_leb_val(jg_b, jg_p);
+  int jg_q = jg_p + jg_leb_len(jg_b, jg_p);
+  int jg_i = 0;
+} chain (int[] jg_b, int jg_p, string[] jg_names) {
+  while (jg_i < jg_n) {
+    push(jg_names, jg_name_at(jg_b, jg_q));
+    jg_q = jg_exp_end(jg_b, jg_q);
+    jg_i = jg_i + 1;
+  }
+} return void;
+([2, 4, 105, 100, 95, 120, 0, 0, 1, 97, 2, 5], 0, []):([2, 4, 105, 100, 95, 120, 0, 0, 1, 97, 2, 5], 0, ["id_x", "a"])
+([0], 0, ["k"]):([0], 0, ["k"])

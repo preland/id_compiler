@@ -1,0 +1,27 @@
+// Strings and lines in id source: where a string literal ends, and which line
+// a position is on.
+
+jg_str_end(string jg_t, int jg_i) {
+  while (jg_i < len(jg_t) && charat(jg_t, jg_i) != (import jg_quote)) {
+    jg_i = jg_i + 1 + (charat(jg_t, jg_i) == (import jg_bslash));
+  }
+} return int jg_i;
+("ab\"c", 0):(2)
+("a\\\"b\"c", 0):(4)
+("abc", 0):(3)
+
+jg_line(string jg_t, int jg_k) {
+  string jg_head = str_slice(jg_t, 0, jg_k);
+  string[] jg_ls = str_split(jg_head, "\n");
+  int jg_n = len(jg_ls);
+} return int jg_n;
+("a\nb\nc", 4):(3)
+("a\nb\nc", 2):(2)
+("a\nb", 0):(1)
+
+jg_fresh(string jg_t, int jg_i) {
+  int jg_r = jg_i == 0 || jg_isid(charat(jg_t, jg_i - 1)) == 0;
+} return int jg_r;
+("ab", 0):(1)
+("a b", 2):(1)
+("ab", 1):(0)

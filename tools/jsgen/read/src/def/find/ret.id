@@ -1,0 +1,50 @@
+// The type a return clause names: the first word of `return TYPE ...`, where a
+// type is an identifier followed by any number of `[]`. It is read from a
+// window of the text, not the whole of it.
+
+jg_type_end(string jg_win, int jg_p) {
+  int jg_e = jg_p;
+  if (jg_isstart(charat(jg_win, jg_p)) == 1) {
+    jg_e = jg_ident_end(jg_win, jg_p);
+  }
+  while (jg_e > jg_p && str_eqat(jg_win, jg_e, "[]") == 1) {
+    jg_e = jg_e + 2;
+  }
+} return int jg_e;
+("int x", 0):(3)
+("int[][] x", 0):(7)
+("9a", 0):(0)
+("a[]b", 0):(3)
+("[]", 0):(0)
+
+jg_ret_of(string jg_win) {
+  string jg_ty = "";
+  int jg_p = jg_skip_ws(jg_win, 6);
+  int jg_e = jg_type_end(jg_win, jg_p);
+} chain (string jg_win) {
+  if (str_starts(jg_win, "return") == 1 && jg_ws(charat(jg_win, 6)) == 1 && jg_e > jg_p) {
+    jg_ty = str_slice(jg_win, jg_p, jg_e - jg_p);
+  }
+} return string jg_ty;
+("return int x;"):("int")
+("return string[][] y;"):("string[][]")
+("return   void;"):("void")
+("returns int"):("")
+("returnint x"):("")
+("return 9;"):("")
+("} x"):("")
+
+jg_window(string jg_t, int jg_r) {
+  string jg_win = "";
+  int jg_n = len(jg_t) - jg_r;
+  if (jg_n > (import jg_ret_window)) {
+    jg_n = (import jg_ret_window);
+  }
+} chain (string jg_t, int jg_r) {
+  if (jg_r >= 0) {
+    jg_win = str_slice(jg_t, jg_r, jg_n);
+  }
+} return string jg_win;
+("abcdef", 2):("cdef")
+("abcdef", -1):("")
+("abcdef", 6):("")

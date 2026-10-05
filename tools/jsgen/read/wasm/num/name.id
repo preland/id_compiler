@@ -1,0 +1,30 @@
+// A name in a wasm binary: a length (LEB128) and then that many bytes.
+
+jg_bytes_str(int[] jg_b, int jg_p, int jg_n) {
+  string jg_s = "";
+  int jg_i = 0;
+  while (jg_i < jg_n) {
+    jg_s = jg_s + chr(jg_b[jg_p + jg_i]);
+    jg_i = jg_i + 1;
+  }
+} return string jg_s;
+([104, 105, 106], 0, 2):("hi")
+([104, 105, 106], 1, 2):("ij")
+([1], 0, 0):("")
+
+jg_name_end(int[] jg_b, int jg_p) {
+  int jg_n = jg_leb_val(jg_b, jg_p);
+  int jg_l = jg_leb_len(jg_b, jg_p);
+  int jg_e = jg_p + jg_l + jg_n;
+} return int jg_e;
+([2, 104, 105, 9], 0):(3)
+([9, 3, 97, 98, 99], 1):(5)
+
+jg_name_at(int[] jg_b, int jg_p) {
+  int jg_n = jg_leb_val(jg_b, jg_p);
+  int jg_l = jg_leb_len(jg_b, jg_p);
+  string jg_s = jg_bytes_str(jg_b, jg_p + jg_l, jg_n);
+} return string jg_s;
+([2, 104, 105, 9], 0):("hi")
+([9, 3, 97, 98, 99], 1):("abc")
+([0], 0):("")

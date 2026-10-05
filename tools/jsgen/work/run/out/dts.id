@@ -1,0 +1,42 @@
+// Writing the TypeScript view, as <name>.d.mts and <name>.d.ts with the same
+// text, and saying so.
+
+jg_emit_dts(string[] jg_cf, string[][] jg_sigs, string[][] jg_skips, string[] jg_errs) {
+  string jg_pre = jg_prefix(jg_cf[(import jg_c_wasm)], jg_cf[(import jg_c_out)]);
+  string jg_top = jg_dts_top(path_base(jg_cf[(import jg_c_wasm)]), path_base(jg_pre));
+  string jg_dt = jg_dts_join(jg_top, str_join((import jg_dts_tail), "\n"), jg_sigs, jg_skips);
+} chain (string[] jg_cf, string[][] jg_sigs, string[][] jg_skips, string[] jg_errs) {
+  if (len(jg_errs) == 0) {
+    jg_write(jg_pre + ".d.mts", jg_dt, jg_errs);
+  }
+  if (len(jg_errs) == 0) {
+    jg_write(jg_pre + ".d.ts", jg_dt, jg_errs);
+  }
+} return void;
+given jg_t_proj ([(import jg_t_wasm), "", "", (import jg_t_pre), "", ""], [["twice", "int", "api.id:1", "a", "int"]], [["bad", "why"]], []):([(import jg_t_wasm), "", "", (import jg_t_pre), "", ""], [["twice", "int", "api.id:1", "a", "int"]], [["bad", "why"]], []) then jg_t_same:(1) then jg_t_dts_n:(56)
+given jg_t_proj ([(import jg_t_wasm), "", "", (import jg_t_pre), "", ""], [], [], ["early"]):([(import jg_t_wasm), "", "", (import jg_t_pre), "", ""], [], [], ["early"]) then jg_t_same:(0)
+
+jg_say(string[] jg_cf, string[][] jg_sigs, string[][] jg_skips, string[][] jg_ub, string[] jg_errs) {
+  string jg_pre = jg_prefix(jg_cf[(import jg_c_wasm)], jg_cf[(import jg_c_out)]);
+  string jg_msg = jg_report(path_base(jg_pre), len(jg_sigs), jg_ub[2], len(jg_skips));
+  if (len(jg_errs) == 0) {
+    print(jg_msg);
+  }
+} return void;
+(["d/a.wasm", "", "", "", "", ""], [["f", "int", "x:1"]], [], [[], [], ["jsx"], []], []):(["d/a.wasm", "", "", "", "", ""], [["f", "int", "x:1"]], [], [[], [], ["jsx"], []], []) then prints:("idc: jsbind: wrote a.mjs, .d.mts and .d.ts (1 functions, backends jsx)\n")
+(["d/a.wasm", "", "", "o/b", "", ""], [], [["g", "why"]], [[], [], [], []], ["early"]):(["d/a.wasm", "", "", "o/b", "", ""], [], [["g", "why"]], [[], [], [], []], ["early"]) then prints:("")
+
+jg_report(string jg_base, int jg_nsig, string[] jg_bks, int jg_nskip) {
+  string jg_be = "";
+  string jg_skn = "";
+  if (len(jg_bks) > 0) {
+    jg_be = ", backends " + str_join(jg_bks, "+");
+  }
+} chain (string jg_base, int jg_nsig, string[] jg_bks, int jg_nskip) {
+  if (jg_nskip > 0) {
+    jg_skn = ", " + jg_nskip + " not bound";
+  }
+  string jg_msg = "idc: jsbind: wrote " + jg_base + ".mjs, .d.mts and .d.ts (" + jg_nsig + " functions" + jg_be + jg_skn + ")";
+} return string jg_msg;
+("a", 2, [], 0):("idc: jsbind: wrote a.mjs, .d.mts and .d.ts (2 functions)")
+("b", 0, ["fs", "env"], 3):("idc: jsbind: wrote b.mjs, .d.mts and .d.ts (0 functions, backends fs+env, 3 not bound)")

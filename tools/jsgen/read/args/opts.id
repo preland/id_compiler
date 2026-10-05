@@ -1,0 +1,43 @@
+// The command line: `--key value` pairs after the program name. A key is its
+// argument without one leading `--`; a later pair for the same key wins, except
+// --src, which collects every value.
+
+jg_key(string jg_arg) {
+  string jg_k2 = jg_arg;
+  if (str_starts(jg_arg, "--") == 1) {
+    jg_k2 = str_slice(jg_arg, 2, len(jg_arg) - 2);
+  }
+} return string jg_k2;
+("--wasm"):("wasm")
+("src"):("src")
+("--"):("")
+("---x"):("-x")
+
+jg_opt(string[] jg_av, string jg_nm) {
+  string jg_val = "";
+  int jg_i = 1;
+  while (jg_i < len(jg_av)) {
+    if (jg_key(jg_av[jg_i]) == jg_nm) {
+      jg_val = lst_str_get_or(jg_av, jg_i + 1, "");
+    }
+    jg_i = jg_i + 2;
+  }
+} return string jg_val;
+(["g", "--wasm", "a.wasm", "--glue", "g.mjs"], "glue"):("g.mjs")
+(["g", "--wasm", "a.wasm", "--wasm", "b.wasm"], "wasm"):("b.wasm")
+(["g", "--strict"], "strict"):("")
+(["g", "--wasm", "--glue", "x"], "glue"):("")
+
+jg_srcs(string[] jg_av) {
+  string[] jg_xs = [];
+  int jg_i = 1;
+  while (jg_i < len(jg_av)) {
+    if (jg_key(jg_av[jg_i]) == "src") {
+      push(jg_xs, lst_str_get_or(jg_av, jg_i + 1, ""));
+    }
+    jg_i = jg_i + 2;
+  }
+} return string[] jg_xs;
+(["g", "--src", "a.id", "--wasm", "w", "--src", "b.id"]):(["a.id", "b.id"])
+(["g", "--wasm", "w"]):([])
+(["g", "--src"]):([""])

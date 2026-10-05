@@ -1,0 +1,27 @@
+// An unsigned LEB128 integer in a wasm binary held as one byte per cell: the
+// value, and how many bytes it takes. Each answers for the integer that
+// starts at position p.
+
+jg_leb_val(int[] jg_b, int jg_p) {
+  int jg_x = jg_b[jg_p];
+  int jg_v = jg_x & 127;
+  if (jg_x >= 128) {
+    int jg_rest = jg_leb_val(jg_b, jg_p + 1);
+    jg_v = jg_v | (jg_rest << 7);
+  }
+} return int jg_v;
+([5], 0):(5)
+([200, 1], 0):(200)
+([229, 142, 38], 0):(624485)
+([9, 229, 3], 1):(485)
+
+jg_leb_len(int[] jg_b, int jg_p) {
+  int jg_n = 1;
+  if (jg_b[jg_p] >= 128) {
+    int jg_more = jg_leb_len(jg_b, jg_p + 1);
+    jg_n = jg_n + jg_more;
+  }
+} return int jg_n;
+([5], 0):(1)
+([229, 142, 38], 0):(3)
+([9, 200, 1, 7], 1):(2)

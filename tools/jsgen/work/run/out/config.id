@@ -1,0 +1,24 @@
+// The command line as a configuration: [wasm, glue, natives, out, strict, names],
+// in the order of jg_c_wasm and the rest; an option that was not given is "".
+
+jg_cfg_of(string[] jg_av) {
+  string[] jg_cf = [jg_opt(jg_av, "wasm"), jg_opt(jg_av, "glue"), jg_opt(jg_av, "natives")];
+  push(jg_cf, jg_opt(jg_av, "out"));
+  push(jg_cf, jg_opt(jg_av, "strict"));
+} chain (string[] jg_av) {
+  push(jg_cf, jg_opt(jg_av, "names"));
+} return string[] jg_cf;
+(["g", "--wasm", "a.wasm", "--glue", "g.mjs", "--natives", "n", "--out", "o", "--strict", "1", "--names", "a,b"]):(["a.wasm", "g.mjs", "n", "o", "1", "a,b"])
+(["g", "--src", "x.id", "--glue", "g.mjs"]):(["", "g.mjs", "", "", "", ""])
+
+jg_lists(int jg_n) {
+  string[][] jg_ls2 = [];
+  int jg_i = 0;
+  while (jg_i < jg_n) {
+    string[] jg_em = [];
+    push(jg_ls2, jg_em);
+    jg_i = jg_i + 1;
+  }
+} return string[][] jg_ls2;
+(2):([[], []])
+(0):([])
