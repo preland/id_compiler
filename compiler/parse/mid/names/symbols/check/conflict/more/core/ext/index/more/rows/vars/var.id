@@ -1,0 +1,42 @@
+// A variable that is not an export: exports are the X records.
+
+ixw_var(int ixw_k) {
+  if((import dvexp)[ixw_k] == 0) {
+    ixw_put(["V", (import dvfunc)[ixw_k], (import dvname)[ixw_k], (import dvtype)[ixw_k]]);
+  }
+} return void;
+given regrow_d (0):() then prints:("V\tf\tx\tint\n")
+given regrow_d given reg_push("e", "int", "g", 1, 0) (1):() then prints:("")
+
+// One node of each kind the walk tells apart, numbered from 0: a call, a
+// variable, an import, an int literal, a declaration whose type is a list of a
+// struct, and a parameter. Their ids are the exports.
+ixn_fx() {
+  env_init();
+  int[] ixn_none = [];
+  export int ixn_call = node_call("foo", ixn_none);
+} chain () {
+  export int ixn_var = node_var("zz");
+  export int ixn_imp = node_import("gx");
+  export int ixn_lit = node_int("7", 7, 0);
+} chain () {
+  export int ixn_decl = node_decl("Point[]", "pts", (import ixn_lit), 0);
+  export int ixn_param = node_param("param", "int", "arg");
+} return void;
+():() then calls node_call:("foo", [])
+():() then init_units:(0)
+
+// The walk positioned at function ixw_f, as ixw_func would have it: begun, the
+// functions before it written, its own cases spanned.
+ixw_at(int ixw_f) {
+  ixw_begin();
+  int ixw_i = 0;
+  while(ixw_i < ixw_f) {
+    ixw_func(ixw_i);
+    ixw_i = ixw_i + 1;
+  }
+} chain (int ixw_f) {
+  ixw_span((import prog)[ixw_f]);
+} return void;
+given ixw_fx stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 2\nop )\nop :\nop (\nint 3\nop )\nline 6\nline 7\nident fb\nop (\nkw int\nident b\nop )\nop {\nline 8\nkw int\nident t\nop =\nident fa\nop (\nident b\nop )\nop ;\nline 9\nkw int\nident u\nop =\nident t\nop +\nop (\nkw import\nident gx\nop )\nop ;\nline 10\nop }\nkw return\nkw int\nident u\nop ;\nline 11\nkw given\nident fa_setup\nop (\nint 1\nop )\nop :\nop (\nint 4\nop )\nline 12\nline 13\nident fa_setup\nop (\nop )\nop {\nline 14\nkw export\nkw int\nident gx\nop =\nint 3\nop ;\nline 15\nop }\nkw return\nkw void\nop ;\nline 16\neof\n" (0):() then (import ixw_c)[1]:(2)
+given ixw_fx stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 2\nop )\nop :\nop (\nint 3\nop )\nline 6\nline 7\nident fb\nop (\nkw int\nident b\nop )\nop {\nline 8\nkw int\nident t\nop =\nident fa\nop (\nident b\nop )\nop ;\nline 9\nkw int\nident u\nop =\nident t\nop +\nop (\nkw import\nident gx\nop )\nop ;\nline 10\nop }\nkw return\nkw int\nident u\nop ;\nline 11\nkw given\nident fa_setup\nop (\nint 1\nop )\nop :\nop (\nint 4\nop )\nline 12\nline 13\nident fa_setup\nop (\nop )\nop {\nline 14\nkw export\nkw int\nident gx\nop =\nint 3\nop ;\nline 15\nop }\nkw return\nkw void\nop ;\nline 16\neof\n" (1):() then (import ixw_c)[1]:(3)

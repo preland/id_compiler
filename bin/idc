@@ -37,6 +37,25 @@
 # the same sorted-full-path order idc.py uses).
 set -u
 
+# phase NAME -- under IDC_TIMES=1, one stderr line with the wall time since
+# this invocation started, so a build's slow stage can be named rather than
+# guessed. No fork: EPOCHREALTIME is read, not date.
+PHASE_T0="${EPOCHREALTIME/[.,]/}"
+phase() {
+    [ -n "${IDC_TIMES:-}" ] || return 0
+    local now="${EPOCHREALTIME/[.,]/}" us
+    us=$((now - PHASE_T0))
+    printf 'idc: times: phase %-10s +%d.%03ds\n' "$1" $((us / 1000000)) $((us % 1000000 / 1000)) >&2
+}
+
+# A build that checks only the part of the library a program reaches is handed
+# the plan naming it (run_std_precheck_lazy) and the library's root. Taken off
+# the environment here so that no build this one starts -- a tool, a backend --
+# inherits it and takes itself for that check.
+STD_PLAN_IN="${IDC_STD_PLAN:-}"
+STD_PLAN_ROOT="${IDC_STD_PLAN_ROOT:-}"
+unset IDC_STD_PLAN IDC_STD_PLAN_ROOT
+
 # ---------------------------------------------------------------------------
 # locate the repo root (this script lives in <root>/bin/idc)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -734,8 +753,12 @@ run_lex_parse() {
     progress lex "$(plural "${#SRC_FILES[@]}" file)"
     capped_from "$src" "$IDLEX" "$@" 2>"$LEX_ERR" > "$lex_out"
     lex_rc=$?
-    if [ -n "${TC_FILE:-}" ] && [ -s "$TC_FILE" ]; then
-        { sed 's/^/tcc /' "$TC_FILE"; cat "$lex_out"; } > "$lex_out.tc" && lex_out="$lex_out.tc"
+    if [ -n "$EXT_HEAD" ] || { [ -n "${TC_FILE:-}" ] && [ -s "$TC_FILE" ]; }; then
+        {
+            [ -z "$EXT_HEAD" ] || cat "$EXT_HEAD" "$EXT_STREAM"
+            [ -z "${TC_FILE:-}" ] || [ ! -s "$TC_FILE" ] || sed 's/^/tcc /' "$TC_FILE"
+            cat "$lex_out"
+        } > "$lex_out.tc" && lex_out="$lex_out.tc"
     fi
     progress parse "tokens -> C"
     capped_from "$lex_out" "$IDPARSE" "${PARSE_ARGS[@]}" > "$RAW_OUT" 2>"$PARSE_ERR"
@@ -1128,6 +1151,33 @@ collect_ids() {
             | LC_ALL=C sort)
 }
 
+STD_PLAN_MODE=0
+STD_PLAN_FILE=""
+
+# std_plan_collect ROOT -- ROOT, the library, as a project of the files and
+# constants a plan names (IDC_STD_PLAN, written by run_std_precheck_lazy) in
+# place of its whole tree: the library's own check of the functions a program
+# reaches, and no others.
+std_plan_collect() {
+    local root="$1" f entry
+    local -a plan_consts
+    SRC_ROOTS+=("$root")
+    STD_PLAN_FILE="$STD_PLAN_IN"
+    while IFS= read -r f; do
+        SRC_FILES+=("$f")
+    done < <(awk -F'\t' '$1 == "S" { print $2 }' "$STD_PLAN_IN" | LC_ALL=C sort -u)
+    while IFS= read -r f; do
+        FOUND_BACKENDS+=("${f%/backend.id}")
+    done < <(find "$root" -mindepth 1 \
+                 \( -type d -name '.*' -prune \) -o \
+                 \( -type d -path "${root%/}/$BUILD_DIR" -prune \) -o \
+                 \( -name backend.id -print \) | LC_ALL=C sort)
+    mapfile -t plan_consts < <(awk -F'\t' '$1 == "K" { print $4 }' "$STD_PLAN_IN")
+    for entry in ${plan_consts[@]+"${plan_consts[@]}"}; do
+        CONSTS+=("$entry")
+    done
+}
+
 # ---------------------------------------------------------------------------
 # collect .id source files: a single file is just itself; a project directory
 # is its whole tree.
@@ -1136,6 +1186,9 @@ SRC_ROOTS=()
 if [ -f "$PATH_ARG" ]; then
     SRC_FILES=("$PATH_ARG")
     SRC_ROOTS=("$PATH_ARG")
+elif [ -d "$PATH_ARG" ] && [ -n "$STD_PLAN_IN" ] && [ "$(cd "$PATH_ARG" && pwd -P)" = "$STD_PLAN_ROOT" ]; then
+    STD_PLAN_MODE=1
+    std_plan_collect "$PATH_ARG"
 elif [ -d "$PATH_ARG" ]; then
     collect_ids "$PATH_ARG"
 else
@@ -1328,7 +1381,7 @@ walk_deps() {
 
 if [ -d "$PATH_ARG" ]; then
     SEEN_DEPS=("$(cd "$PATH_ARG" && pwd -P)")
-    walk_deps "$PATH_ARG"
+    [ "$STD_PLAN_MODE" -eq 1 ] || walk_deps "$PATH_ARG"
 fi
 
 # A --backend directory is merged exactly as a conf.id import of it is, so a
@@ -1343,6 +1396,360 @@ for b in ${BACKENDS[@]+"${BACKENDS[@]}"}; do
     collect_ids "$b"
     walk_deps "$b"
 done
+
+# cache_prune DIR MAX -- keep only the MAX most-recently-touched entries
+# directly under DIR, deleting the rest, so neither cache below can grow
+# without bound. Recency is mtime, and a hit touch(1)es its entry, so "most
+# recently touched" is "most recently reused or created".
+cache_prune() {
+    local dir="$1" max="$2"
+    [ -d "$dir" ] || return 0
+    find "$dir" -mindepth 1 -maxdepth 1 -printf '%T@ %p\n' 2>/dev/null \
+        | LC_ALL=C sort -rn | tail -n +"$((max + 1))" | cut -d' ' -f2- \
+        | while IFS= read -r old; do rm -rf "$old"; done
+}
+
+# ---------------------------------------------------------------------------
+# The standard library is loaded by use.
+#
+# idstd is implicit in every build, but a build parses, checks and compiles
+# only the part of it the program reaches. Parsing all of it cost 0.3 s on a
+# four-line program and grew with the library. Three things make that sound:
+#
+#   * an INDEX of the library, built once per content and kept in $STD_IDX_BASE
+#     (default $CACHE_DIR/stdidx). idparse --index reads each source file and
+#     writes, per function, native and struct: its name, file and line, its
+#     fingerprints, the names its body reaches and the names its cases reach,
+#     its exports and its variables. A file's records are kept under that
+#     file's content hash, so a changed file is the only one re-read, and a
+#     moved file is not re-read at all: a record carries no path, the path is
+#     put back when the index is assembled.
+#   * a PLAN per build: the program's own tokens name what it reaches (every
+#     identifier, which over-reaches harmlessly), and the index's edges give
+#     the closure. The plan lists the line ranges of the library files to
+#     load, so a function nothing reaches is blank lines in the stream and is
+#     never parsed. A function loaded here has its cases cut: the library's
+#     own cases are never run in a program's harness.
+#   * the rest of the index goes to idparse as `ext` lines ahead of the tokens,
+#     for the two checks that compare the program against functions it did not
+#     load: duplicate logic and import-duplicates. A name collision needs no
+#     such line: a name the program writes is an identifier, so the function
+#     it collides with is reached and loaded, and the ordinary check finds it.
+#
+# IDC_STD_FULL=1 turns all of it off and merges the whole library as before.
+# So does a build that lists or rewrites the library (--fingerprints, --calls,
+# --list-untested, --fix, --emit-sources), the compiler's own stage builds, a
+# program that lives inside the library's own tree (its files would be both the
+# program's and the library's), and a library the index cannot describe (a syntax
+# error, an asm declaration, a name defined twice, a conf.id line that is not a
+# constant).
+STD_LAZY=0
+STD_IDX_BASE="${IDC_STD_IDX_DIR:-$CACHE_DIR/stdidx}"
+STD_IDX=""
+STD_PKEY=""
+EXT_HEAD=""
+EXT_STREAM=""
+EXT_ID=""
+
+std_lazy_wanted() {
+    [ -n "$STDLIB" ] || return 1
+    [ -z "${IDC_STD_FULL:-}" ] || return 1
+    [ -z "${IDC_NO_CACHE:-}" ] || return 1
+    [ -z "${IDC_STAGE_LEX:-}" ] || return 1
+    [ "$FINGERPRINTS$CALLS$LIST_UNTESTED$FIX$EMIT_SOURCES" = 00000 ] || return 1
+    [ -x "$IDLEX" ] && [ -x "$IDPARSE" ] || return 1
+    local r
+    for r in "${SRC_ROOTS[@]}"; do
+        [ -d "$r" ] || r=$(dirname "$r")
+        r=$(cd "$r" 2>/dev/null && pwd -P) || continue
+        case "$r/" in "$STDLIB"/*) return 1 ;; esac
+    done
+    return 0
+}
+
+# std_source_list -- the library's source files exactly as collect_ids would
+# list them, less the backend.id files it files separately.
+std_source_list() {
+    find "$STDLIB" -mindepth 1 \
+         \( -type d -name '.*' -prune \) -o \
+         \( -type d -path "${STDLIB%/}/$BUILD_DIR" -prune \) -o \
+         \( -name '*.id' ! -name 'conf.id' ! -name 'backend.id' -print \) \
+        | LC_ALL=C sort
+}
+
+# std_consts_k -- the library's conf.id as K records: `K NAME LINE EDGES TEXT`,
+# one per constant, EDGES the other constants its initialiser names. Exit 3 for
+# a line that is not a constant on one line, which the index cannot carry.
+std_consts_k() {
+    [ -f "$STDLIB/conf.id" ] || return 0
+    awk '
+        BEGIN { FS = "\t"; OFS = "\t" }
+        {
+            t = $0
+            sub(/^[ \t]+/, "", t); sub(/[ \t]+$/, "", t)
+            if (t == "" || t ~ /^\/\//) next
+            if (t ~ /^(int|word|float|string)(\[\])?[ \t]+[A-Za-z_][A-Za-z0-9_]*[ \t]*=.*;$/) {
+                head = t; sub(/[ \t]*=.*$/, "", head)
+                m = split(head, hw, /[ \t]+/)
+                if (hw[m] == "lib_exports") next
+                k++; NM[k] = hw[m]; TX[k] = t; LN[k] = FNR; IS[hw[m]] = 1
+                next
+            }
+            bad = 1
+        }
+        END {
+            if (bad) exit 3
+            for (k = 1; k <= length(NM); k++) {
+                rhs = TX[k]; sub(/^[^=]*=/, "", rhs)
+                m = split(rhs, w, /[^A-Za-z0-9_]+/)
+                e = ""
+                for (i = 1; i <= m; i++) if (w[i] in IS && w[i] != NM[k] && index(" " e " ", " " w[i] " ") == 0) e = e " " w[i]
+                print "K", NM[k], LN[k], substr(e, 2), TX[k]
+            }
+        }' "$STDLIB/conf.id"
+}
+
+# std_index_build BASE MAP TMP -- idparse --index over the files of MAP (`PATH
+# TAB HASH` lines) that have no records yet, and the records filed under their
+# hashes. 0 done, 3 the library cannot be indexed, anything else a failure
+# that may not recur.
+std_index_build() {
+    local base="$1" map="$2" tmp="$3" miss="$3/idx.miss" src="$3/idx.src" rc f
+    awk -F'\t' -v dir="$base/shards" '
+        BEGIN { cmd = "ls \"" dir "\" 2>/dev/null"; while ((cmd | getline h) > 0) have[h] = 1; close(cmd) }
+        !($2 in have) { print }' "$map" > "$miss"
+    [ -s "$miss" ] || return 0
+    std_consts_k > "$tmp/idx.consts"
+    [ $? -eq 0 ] || return 3
+    {
+        awk -F'\t' '{ printf "#const\n%s\n", $5 }' "$tmp/idx.consts"
+        awk -F'\t' '{ printf "#file 0|%s\n", $1; while ((getline line < $1) > 0) print line; close($1); print "" }' "$miss"
+    } > "$src"
+    capped_from "$src" "$IDLEX" > "$tmp/idx.lex" 2>/dev/null || return 1
+    capped_from "$tmp/idx.lex" "$IDPARSE" --triple "$(host_triple)" --index > "$tmp/idx.out" 2>/dev/null
+    awk -v map="$miss" -v dir="$base/shards" -v pid="$$" '
+        BEGIN { FS = "\t"; while ((getline l < map) > 0) { split(l, a, "\t"); H[a[1]] = a[2] } }
+        /^\/\* ---- index ---- \*\/$/ { on = 1; next }
+        on == 0 { next }
+        $1 == "@" { cur = $2; next }
+        $1 == "Z" { bad = bad $2 " "; next }
+        $1 == "F" { OWN[$2] = cur; B[cur] = B[cur] $0 "\n"; next }
+        $1 == "X" || $1 == "V" { XV[++nxv] = $0; next }
+        { B[cur] = B[cur] $0 "\n" }
+        END {
+            if (!on) exit 2
+            if (bad != "") exit 3
+            for (i = 1; i <= nxv; i++) { split(XV[i], f, "\t"); p = OWN[f[2]]; if (p != "") B[p] = B[p] XV[i] "\n" }
+            for (p in H) { out = dir "/" H[p] ".tmp." pid; printf "%s", B[p] > out; close(out) }
+        }' "$tmp/idx.out"
+    rc=$?
+    [ "$rc" -eq 0 ] || return "$rc"
+    for f in "$base/shards/"*".tmp.$$"; do
+        [ -e "$f" ] && mv -f "$f" "${f%.tmp.$$}"
+    done
+    return 0
+}
+
+# std_index_assemble BASE MAP KEY TMP -- the records of every file, in path
+# order, as the three files a build reads: graph (the edges and extents, for
+# the plan), ext (the lines idparse is handed) and full (everything, for a
+# reader). 0 done, 3 the library cannot be indexed.
+std_index_assemble() {
+    local base="$1" map="$2" key="$3" out="$1/idx/$3.tmp.$$" rc
+    local -a args
+    cut -f2 "$map" | LC_ALL=C sort | uniq -d | grep -q . && return 3
+    mkdir -p "$out" || return 1
+    mapfile -t args < <(awk -F'\t' -v dir="$base/shards" '{ print dir "/" $2 }' "$map")
+    [ "${#args[@]}" -gt 0 ] || return 1
+    awk -v list="$map" -v dir="$base/shards" -v graph="$out/graph" -v full="$out/full" -v ext="$out/ext" '
+        BEGIN {
+            FS = "\t"; OFS = "\t"
+            while ((getline l < list) > 0) { split(l, a, "\t"); PATHOF[dir "/" a[2]] = a[1]; HASHOF[a[1]] = a[2] }
+        }
+        FNR == 1 { path = PATHOF[FILENAME] }
+        $1 == "F" { id = ++n; NAME[id] = $2; KIND[id] = $3; FILE[id] = path; LINE[id] = $4; CEND[id] = $5; NF_[path] = NF_[path] " " id; FPN[id] = 0; next }
+        $1 == "P" { FPN[id]++; PK[id, FPN[id]] = $2; FP[id, FPN[id]] = $3; next }
+        $1 == "I" { IK[id] = $2; IN[id] = $3; next }
+        $1 == "D" { DE[id] = $2; next }
+        $1 == "C" { CE[id] = $2; next }
+        $1 == "X" { XO[++nx] = $2; XNM[nx] = $3; XTY[nx] = $4; next }
+        $1 == "V" { VROWS[++nv] = $0; next }
+        END {
+            lastf = ""
+            for (id = 1; id <= n; id++) {
+                if (NAME[id] in SEEN) exit 4
+                SEEN[NAME[id]] = 1
+                if ((FILE[id] SUBSEP LINE[id]) in AT) exit 4
+                AT[FILE[id], LINE[id]] = 1
+                nxt = 0
+                m = split(NF_[FILE[id]], ids, " ")
+                for (j = 1; j <= m; j++) { o = ids[j]; if (o != id && LINE[o] > LINE[id] && (nxt == 0 || LINE[o] < nxt)) nxt = LINE[o] }
+                fend = (nxt > 0) ? nxt - 1 : 0
+                bend = (CEND[id] > 0) ? CEND[id] : fend
+                sig = ""
+                if (FPN[id] > 0) { sig = FP[id, 1]; sub(/^[^|]*\|/, "", sig); sub(/=>.*/, "", sig) }
+                print "E", id, NAME[id], KIND[id], FILE[id], LINE[id], bend, fend, DE[id], CE[id], HASHOF[FILE[id]] > graph
+                print "F", NAME[id], KIND[id], FILE[id], LINE[id], CEND[id], sig > full
+                if (FILE[id] != lastf) { printf "ext Z\t%s\n", FILE[id] > ext; lastf = FILE[id] }
+                printf "ext F\t%s\t%s\t%s\n", NAME[id], KIND[id], LINE[id] > ext
+                for (k = 1; k <= FPN[id]; k++) { printf "ext P\t%s\n", PK[id, k] > ext; print "P", PK[id, k], FP[id, k] > full }
+                if (IK[id] != "") { printf "ext I\t%s\t%s\n", IK[id], IN[id] > ext; print "I", IK[id], IN[id] > full }
+            }
+            for (k = 1; k <= nx; k++) { print "X", XNM[k], XO[k] > graph; print "X", XO[k], XNM[k], XTY[k] > full }
+            for (k = 1; k <= nv; k++) print VROWS[k] > full
+        }' "${args[@]}"
+    rc=$?
+    [ "$rc" -eq 0 ] || { rm -rf "$out"; return 3; }
+    cat "$4/idx.consts" >> "$out/graph" 2>/dev/null
+    printf ok > "$out/ok"
+    mv -T "$out" "$STD_IDX" 2>/dev/null || { rm -rf "$out"; [ -f "$STD_IDX/ok" ]; }
+}
+
+# std_index_ensure -- STD_IDX, the index of the library as it is now, built
+# if no build has yet. False when the library cannot be indexed: the caller
+# merges it whole.
+std_index_ensure() {
+    local cid base tmp map files conf key sig rc=0
+    cid=$(stat -c '%s %Y %Z' "$IDLEX" "$IDPARSE" | sha256sum | cut -c1-16)
+    base="$STD_IDX_BASE/$cid"
+    mkdir -p "$base/shards" "$base/idx" "$base/bad" "$base/stat" 2>/dev/null || return 1
+    sig=$(find "$STDLIB" -mindepth 1 \
+              \( -type d -name '.*' -prune \) -o \
+              \( -type d -path "${STDLIB%/}/$BUILD_DIR" -prune \) -o \
+              \( -name '*.id' ! -name 'backend.id' -printf '%p\0%s\0%T@\0%C@\0' \) \
+          | LC_ALL=C sort -z | sha256sum | cut -c1-40)
+    if [ -f "$base/stat/$sig" ]; then
+        STD_IDX="$base/idx/$(cat "$base/stat/$sig")"
+        if [ -f "$STD_IDX/ok" ]; then touch "$base/stat/$sig"; return 0; fi
+    fi
+    tmp=$(mktemp -d) || return 1
+    map="$tmp/std.map"; files="$tmp/std.files"
+    std_source_list > "$files"
+    if [ ! -s "$files" ]; then rm -rf "$tmp"; return 1; fi
+    xargs -d '\n' -r sha256sum < "$files" | awk '{ h = $1; sub(/^[0-9a-f]+  /, ""); printf "%s\t%s\n", $0, h }' > "$map"
+    conf=""
+    [ -f "$STDLIB/conf.id" ] && conf=$(sha256sum < "$STDLIB/conf.id")
+    key=$({ printf 'v1\n%s\n' "$conf"; cat "$map"; } | sha256sum | cut -c1-40)
+    STD_IDX="$base/idx/$key"
+    if [ -f "$STD_IDX/ok" ]; then printf '%s' "$key" > "$base/stat/$sig"; rm -rf "$tmp"; return 0; fi
+    if [ -f "$base/bad/$key" ]; then rm -rf "$tmp"; return 1; fi
+    progress index "the standard library"
+    std_index_build "$base" "$map" "$tmp"; rc=$?
+    if [ "$rc" -eq 0 ]; then
+        [ -f "$tmp/idx.consts" ] || std_consts_k > "$tmp/idx.consts" || rc=3
+    fi
+    [ "$rc" -eq 0 ] && { std_index_assemble "$base" "$map" "$key" "$tmp"; rc=$?; }
+    progress_clear
+    [ "$rc" -eq 3 ] && : > "$base/bad/$key"
+    rm -rf "$tmp"
+    cache_prune "$STD_IDX_BASE" 4
+    cache_prune "$base/idx" 8
+    cache_prune "$base/shards" 8000
+    cache_prune "$base/stat" 64
+    [ "$rc" -eq 0 ] && [ -f "$STD_IDX/ok" ] || return 1
+    printf '%s' "$key" > "$base/stat/$sig"
+}
+
+# std_closure MODE ROOTS GRAPH -- the plan, on stdout: what the names in ROOTS
+# reach through GRAPH's edges. Mode A is what a program needs, a function's
+# body; mode B is what its cases need as well, which is what the library's own
+# check of those functions loads. A plan is lines of
+#   S PATH FROM TO HASH    a range of a file, and that file's content hash
+#   K NAME LINE TEXT       a constant, in conf.id order
+#   L NAME ...             the names loaded, a hundred to a line
+std_closure() {
+    awk -v mode="$1" -v roots="$2" '
+        function push(id) { if (!(id in VIS)) { VIS[id] = 1; Q[++qn] = id } }
+        function pushc(c) { if (!(c in CVIS)) { CVIS[c] = 1; CQ[++cn] = c } }
+        function want(n,   o) {
+            if (n in BYNAME) push(BYNAME[n])
+            else if (n in OWNER) { o = OWNER[n]; if (o in BYNAME) push(BYNAME[o]) }
+            else if (n in KT) pushc(n)
+        }
+        BEGIN { FS = "\t"; OFS = "\t" }
+        $1 == "E" { NAME[$2] = $3; PATH[$2] = $5; LINE[$2] = $6; BEND[$2] = $7; FEND[$2] = $8; DE[$2] = $9; CE[$2] = $10; HASH[$2] = $11; BYNAME[$3] = $2; next }
+        $1 == "X" { OWNER[$2] = $3; next }
+        $1 == "K" { KT[$2] = $5; KE[$2] = $4; KL[$2] = $3; KORD[++nk] = $2; next }
+        END {
+            while ((getline r < roots) > 0) want(r)
+            qh = 1; ch = 1
+            while (qh <= qn || ch <= cn) {
+                while (qh <= qn) {
+                    id = Q[qh++]
+                    m = split(DE[id], w, " "); for (i = 1; i <= m; i++) want(w[i])
+                    if (mode == "B") { m = split(CE[id], w, " "); for (i = 1; i <= m; i++) want(w[i]) }
+                }
+                while (ch <= cn) {
+                    c = CQ[ch++]
+                    m = split(KE[c], w, " "); for (i = 1; i <= m; i++) want(w[i])
+                }
+            }
+            for (id = 1; id in NAME; id++) if (id in VIS) {
+                to = (mode == "B") ? FEND[id] : BEND[id]
+                if (to == 0) to = 999999999
+                print "S", PATH[id], LINE[id], to, HASH[id]
+                nm = nm " " NAME[id]
+                if (++cnt % 100 == 0) { print "L", substr(nm, 2); nm = "" }
+            }
+            for (o = 1; o <= nk; o++) if (KORD[o] in CVIS) {
+                print "K", KORD[o], KL[KORD[o]], KT[KORD[o]]
+                nm = nm " " KORD[o]
+                if (++cnt % 100 == 0) { print "L", substr(nm, 2); nm = "" }
+            }
+            if (nm != "") print "L", substr(nm, 2)
+        }' "$3"
+}
+
+# std_lazy_plan -- once the program's own files and constants are known and
+# emit_sources exists: lex the program alone, take its identifiers for roots,
+# and add what the plan loads to SRC_FILES and CONSTS. Sets STD_PLAN_FILE,
+# STD_PKEY, EXT_HEAD, EXT_STREAM and EXT_ID. The plan is a pure function of the
+# program's own stream, the index and the names conf.id's lib_exports lists
+# (they are functions of the program that no token of it spells), so it is kept
+# under the hash of those and a build of an unchanged program does not lex or
+# search again. False, with nothing changed, when it cannot be done.
+std_lazy_plan() {
+    local progsrc="$WORK/prog.src" roots="$WORK/roots" plan="$WORK/std.plan" pdir pkey name line entry exports=""
+    local -a std_paths std_consts
+    emit_sources > "$progsrc"
+    if [ -d "$PATH_ARG" ] && grep -q lib_exports "$PATH_ARG/conf.id" 2>/dev/null; then
+        exports=$(sed 's://.*$::' "$PATH_ARG/conf.id" | awk '/^string\[\][ \t]+lib_exports[ \t]*=/ {on=1} on {print} on && /;/ {exit}' | grep -oE '"[^"]*"' | tr -d '"')
+    fi
+    pdir="${STD_IDX%/idx/*}/plans"
+    pkey=$({ cat "$progsrc"; printf '\0plan-v1\0%s\0%s\0' "${STD_IDX##*/}" "$exports"; } | sha256sum | cut -c1-40)
+    STD_PKEY="$pkey"
+    if [ -f "$pdir/$pkey" ]; then
+        cp "$pdir/$pkey" "$plan" && touch "$pdir/$pkey"
+    else
+        { capped_from "$progsrc" "$IDLEX" 2>/dev/null | awk '$1 == "ident" { print $2 }'; printf '%s\n' $exports; } | LC_ALL=C sort -u > "$roots"
+        std_closure A "$roots" "$STD_IDX/graph" > "$plan" || return 1
+        mkdir -p "$pdir" && cp "$plan" "$pdir/$pkey.tmp.$$" && mv -f "$pdir/$pkey.tmp.$$" "$pdir/$pkey"
+        cache_prune "$pdir" 300
+    fi
+    if [ "${#CONST_AT[@]}" -gt 0 ] && ! seen_const_root "$STDLIB"; then
+        while IFS=$'\t' read -r _ name line _; do
+            if const_declared_at "$name"; then
+                echo "$STDLIB/conf.id:$line: error: constant '$name' is already declared at $at; a constant has one home -- rename one of them" >&2
+                STRUCT_VIOLATIONS=1
+            fi
+        done < <(awk -F'\t' '$1 == "K"' "$STD_IDX/graph")
+    fi
+    [ -z "${IDC_TIMES:-}" ] || echo "idc: times: stdlib: $(grep -c '^S' "$plan") of $(grep -c '^E' "$STD_IDX/graph") functions loaded" >&2
+    mapfile -t std_paths < <(awk -F'\t' '$1 == "S" { print $2 }' "$plan" | LC_ALL=C sort -u)
+    mapfile -t std_consts < <(awk -F'\t' '$1 == "K" { print $2 "\t" $4 }' "$plan")
+    if ! seen_const_root "$STDLIB"; then
+        for entry in ${std_consts[@]+"${std_consts[@]}"}; do
+            const_declared_at "${entry%%$'\t'*}" || CONSTS+=("${entry#*$'\t'}")
+        done
+    fi
+    SRC_FILES+=(${std_paths[@]+"${std_paths[@]}"})
+    mapfile -t SRC_FILES < <(printf '%s\n' "${SRC_FILES[@]}" | LC_ALL=C sort -u)
+    STD_PLAN_FILE="$plan"
+    EXT_HEAD="$WORK/ext.head"
+    { printf 'ext M\tlazy\n'; awk -F'\t' '$1 == "L" { print "ext L\t" $2 }' "$plan"; } > "$EXT_HEAD"
+    EXT_STREAM="$STD_IDX/ext"
+    EXT_ID="${STD_IDX##*/}"
+}
 
 # ---------------------------------------------------------------------------
 # The standard library, imported by DEFAULT -- no conf.id line, no flag. It
@@ -1374,8 +1781,19 @@ if [ -n "$STDLIB" ]; then
     if ! seen_dep "$STDLIB"; then
         SEEN_DEPS+=("$STDLIB")
         run_idlayout "$STDLIB"
-        collect_ids "$STDLIB"
-        walk_deps "$STDLIB"
+        if std_lazy_wanted && std_index_ensure; then
+            STD_LAZY=1
+            SRC_ROOTS+=("$STDLIB")
+            while IFS= read -r f; do
+                FOUND_BACKENDS+=("${f%/backend.id}")
+            done < <(find "$STDLIB" -mindepth 1 \
+                         \( -type d -name '.*' -prune \) -o \
+                         \( -type d -path "${STDLIB%/}/$BUILD_DIR" -prune \) -o \
+                         \( -name backend.id -print \) | LC_ALL=C sort)
+        else
+            collect_ids "$STDLIB"
+            walk_deps "$STDLIB"
+        fi
     fi
 fi
 
@@ -1515,6 +1933,7 @@ elif [ "$FIX" -eq 1 ]; then
     PARSE_ARGS+=(--fixes)
 elif [ "$CHECK" -eq 1 ]; then
     PARSE_ARGS+=(--check)
+    [ "$STD_LAZY" -eq 0 ] || PARSE_ARGS+=(--std-unit "$STD_UNIT_START")
 else
     PARSE_ARGS+=(--harness)
     PARSE_ARGS+=(--natives)
@@ -1586,7 +2005,8 @@ emit_sources() {
     # second parser having to be written for a marker's payload.
     for c in ${CONSTS[@]+"${CONSTS[@]}"}; do printf '#const\n%s\n' "$c"; done
     { printf '%s\n' "${SRC_ROOTS[@]}"; printf '%s\n' "${SRC_FILES[@]}"; } \
-    | awk -v nroots="${#SRC_ROOTS[@]}" '
+    | awk -v nroots="${#SRC_ROOTS[@]}" -v plan="$STD_PLAN_FILE" '
+        BEGIN { if (plan != "") while ((getline l < plan) > 0) { split(l, a, "\t"); if (a[1] == "S") { k = ++SN[a[2]]; SF[a[2], k] = a[3] + 0; ST[a[2], k] = a[4] + 0 } } }
         NR <= nroots { root[NR - 1] = $0; next }
         { best = -1; unit = 0
           for (i = 0; i < nroots; i++) {
@@ -1594,7 +2014,14 @@ emit_sources() {
               if (n > best && substr($0, 1, n) == root[i]) { best = n; unit = i }
           }
           printf "#file %d|%s\n", unit, $0
-          while ((getline line < $0) > 0) print line
+          if ($0 in SN) {
+              ln = 0
+              while ((getline line < $0) > 0) {
+                  ln++; keep = 0
+                  for (k = 1; k <= SN[$0]; k++) if (ln >= SF[$0, k] && ln <= ST[$0, k]) keep = 1
+                  print (keep ? line : "")
+              }
+          } else while ((getline line < $0) > 0) print line
           close($0)
           print "" }'
 }
@@ -1622,6 +2049,11 @@ if [ "$FIX" -eq 1 ]; then
     fi
 fi
 
+if [ "$STD_LAZY" -eq 1 ]; then
+    std_lazy_plan || { progress_clear; echo "idc: could not work out which of the standard library this program reaches; set IDC_STD_FULL=1 to merge all of it" >&2; exit 1; }
+    phase planned
+fi
+
 # ---------------------------------------------------------------------------
 # Build cache. idlex|idparse is the expensive part of a build (measured at
 # ~80% of the wall time on compiler/parse -- idlex itself is under a second),
@@ -1644,17 +2076,6 @@ CACHE_ON=1
 [ -n "${IDC_NO_CACHE:-}" ] && CACHE_ON=0
 [ "$FIX" -eq 1 ] && CACHE_ON=0
 
-# cache_prune DIR MAX -- keep only the MAX most-recently-touched entries
-# directly under DIR, deleting the rest, so neither cache below can grow
-# without bound. Recency is mtime, and a hit touch(1)es its entry, so "most
-# recently touched" is "most recently reused or created".
-cache_prune() {
-    local dir="$1" max="$2"
-    [ -d "$dir" ] || return 0
-    find "$dir" -mindepth 1 -maxdepth 1 -printf '%T@ %p\n' 2>/dev/null \
-        | LC_ALL=C sort -rn | tail -n +"$((max + 1))" | cut -d' ' -f2- \
-        | while IFS= read -r old; do rm -rf "$old"; done
-}
 CACHE_MAX="${IDC_CACHE_ENTRIES:-50}"
 OBJ_CACHE_DIR="$CACHE_DIR/obj"
 # The library pre-check's own cache (run_lib_precheck, below -- the stdlib's
@@ -1709,6 +2130,7 @@ obj_cache_put() {
     cache_prune "$OBJ_CACHE_DIR" "$CACHE_MAX"
 }
 
+phase collected
 progress read "$(plural "${#SRC_FILES[@]}" file)"
 FE_HIT=0
 # Materialised unconditionally, cache on or off: capped_from (see capped(),
@@ -1717,7 +2139,7 @@ FE_HIT=0
 # cache-on path already needed this file for its hash, so there is now one
 # copy of "emit the source stream" instead of two.
 SOURCES_TMP="$WORK/sources"
-emit_sources > "$SOURCES_TMP"
+[ "$STD_LAZY" -eq 1 ] || emit_sources > "$SOURCES_TMP"
 if [ "$CACHE_ON" -eq 1 ]; then
     FE_CACHE_DIR="$CACHE_DIR/fe"
     # cc's identity is not part of what idlex|idparse can vary with -- it
@@ -1735,7 +2157,8 @@ if [ "$CACHE_ON" -eq 1 ]; then
           fi
           cc_path="$(command -v "$CC" 2>/dev/null)"
           [ -n "$cc_path" ] && sha256sum "$cc_path"
-          cat "$SOURCES_TMP"
+          [ -z "$EXT_HEAD" ] || { printf 'EXT=%s\0' "$EXT_ID"; cat "$EXT_HEAD"; }
+          if [ "$STD_LAZY" -eq 1 ]; then printf 'STDPLAN=%s\0' "$STD_PKEY"; else cat "$SOURCES_TMP"; fi
         } | sha256sum | cut -d' ' -f1
     )
     FE_ENTRY="$FE_CACHE_DIR/$FE_KEY"
@@ -1839,12 +2262,26 @@ lib_precheck_key() {
         sha256sum "$IDLEX" "$IDPARSE"
         cc_path="$(command -v "$LIB_PRECHECK_CC" 2>/dev/null)"
         [ -n "$cc_path" ] && sha256sum < "$cc_path"
-        (cd "$root" && find . -mindepth 1 \
-             \( -type d -name '.*' -prune \) -o \
-             \( -type d -path "./$BUILD_DIR" -prune \) -o \
-             \( -type f ! -name '*.gen.o' -print0 \) \
-            | LC_ALL=C sort -z \
-            | xargs -0 -r sha256sum)
+        # A pre-check of only what a program reaches (LIB_PRECHECK_PLAN) is
+        # decided by those functions' text, which the plan carries by content
+        # hash, and by the files that are not source -- a backend's C and
+        # headers, which a case that reads or links them depends on.
+        if [ -n "${LIB_PRECHECK_PLAN:-}" ]; then
+            cat "$LIB_PRECHECK_PLAN"
+            (cd "$root" && find . -mindepth 1 \
+                 \( -type d -name '.*' -prune \) -o \
+                 \( -type d -path "./$BUILD_DIR" -prune \) -o \
+                 \( -type f ! -name '*.gen.o' ! \( -name '*.id' ! -name backend.id ! -name conf.id \) ! -name conf.id -print0 \) \
+                | LC_ALL=C sort -z \
+                | xargs -0 -r sha256sum)
+        else
+            (cd "$root" && find . -mindepth 1 \
+                 \( -type d -name '.*' -prune \) -o \
+                 \( -type d -path "./$BUILD_DIR" -prune \) -o \
+                 \( -type f ! -name '*.gen.o' -print0 \) \
+                | LC_ALL=C sort -z \
+                | xargs -0 -r sha256sum)
+        fi
     } | sha256sum | cut -d' ' -f1
 }
 
@@ -1910,7 +2347,7 @@ run_lib_precheck() {
     local lib_work out rc
     lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
     out="$lib_work/out"
-    IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 \
+    IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 IDC_STD_PLAN="${LIB_PRECHECK_PLAN:-}" IDC_STD_PLAN_ROOT="$root" IDC_STD_IDX_DIR="$STD_IDX_BASE" \
         "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
         >"$out" 2>&1
     rc=$?
@@ -1956,11 +2393,38 @@ run_std_precheck() {
     local path_key=""
     [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
     [ "$path_key" = "$STDLIB" ] && return 0
+    if [ "$STD_LAZY" -eq 1 ]; then
+        run_std_precheck_lazy
+        return $?
+    fi
     run_lib_precheck "$STDLIB" "standard library" --std "$STDLIB"
 }
 
+# run_std_precheck_lazy -- the library's own check of what this program
+# reaches and no more: the functions the plan loaded, and what their cases
+# reach (mode B of std_closure), built as a project of their own with their
+# cases run. Cached by the plan, so a program build that reaches the same
+# functions of an unchanged library runs nothing, and a changed function is the
+# only one whose cases run again. A type error in a function the program does
+# not reach is not this program's concern, and never fails it: the library's
+# own build (idc IDSTD, idstd/run.sh) is what finds it.
+run_std_precheck_lazy() {
+    local roots="$WORK/roots.b" plan="$WORK/std.plan.b" pdir="${STD_IDX%/idx/*}/plans"
+    if [ -f "$pdir/B-$STD_PKEY" ]; then
+        cp "$pdir/B-$STD_PKEY" "$plan" && touch "$pdir/B-$STD_PKEY"
+    else
+        awk -F'\t' '$1 == "L" { n = split($2, w, " "); for (i = 1; i <= n; i++) print w[i] }' "$STD_PLAN_FILE" > "$roots"
+        std_closure B "$roots" "$STD_IDX/graph" > "$plan" || return 1
+        cp "$plan" "$pdir/B-$STD_PKEY.tmp.$$" && mv -f "$pdir/B-$STD_PKEY.tmp.$$" "$pdir/B-$STD_PKEY"
+    fi
+    grep -q '^S' "$plan" || return 0
+    LIB_PRECHECK_PLAN="$plan" run_lib_precheck "$STDLIB" "standard library" --std "$STDLIB"
+}
+
 # run_backend_prechecks -- every LIB_PRECHECK_DIRS entry through
-# run_lib_precheck, above, standing alone (--no-std): a backend directory
+# run_lib_precheck, above, standing alone (--no-std) -- of the library's own
+# backends, only those a lazy build's plan loads a declaration from, as the rest
+# of the library is checked only where the program reaches it: a backend directory
 # has no conf.id of its own (Native backends, below -- backend.id is link
 # facts, not a dependency manifest), so it either builds on its own or it
 # does not, exactly as a --no-std program importing it directly finds out
@@ -1976,7 +2440,11 @@ run_backend_prechecks() {
     for i in "${!LIB_PRECHECK_DIRS[@]}"; do
         [ "${LIB_PRECHECK_DIRS[$i]}" = "$path_key" ] && continue
         case "${LIB_PRECHECK_DIRS[$i]}/" in
-            "$STDLIB"/*) run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std ;;
+            "$STDLIB"/*)
+                if [ "$STD_LAZY" -eq 1 ] && ! awk -F'\t' -v d="${LIB_PRECHECK_DIRS[$i]}/" '$1 == "S" && index($2, d) == 1 { f = 1 } END { exit !f }' "$STD_PLAN_FILE"; then
+                    continue
+                fi
+                run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std ;;
             *) if [ -n "$STDLIB" ]; then
                    run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --std "$STDLIB"
                else
@@ -2019,8 +2487,10 @@ await_prechecks() {
     cat "$WORK/pre.err" >&2
     exit 1
 }
+phase fe_key
 [ "$FE_HIT" -eq 0 ] && start_prechecks
 if [ "$FE_HIT" -eq 0 ]; then
+    [ "$STD_LAZY" -eq 0 ] || emit_sources > "$SOURCES_TMP"
     run_lex_parse "$SOURCES_TMP" ${LEX_ARGS[@]+"${LEX_ARGS[@]}"}
     if [ "$CACHE_ON" -eq 1 ]; then
         rm -rf "$WORK/fe_entry"
@@ -2037,6 +2507,7 @@ if [ "$FE_HIT" -eq 0 ]; then
     fi
 fi
 tc_record
+phase frontend
 
 # The self-hosted stages cover the whole language, so a failure here is a bug
 # in this compiler, not an input it cannot reach. Falling back to idc.py would
@@ -3371,12 +3842,14 @@ if [ "$TARGET" = c ] && [ -z "$EMIT_C" ] && grep -q '^int main(' "$C_OUT"; then
     backends_for program check
 fi
 await_prechecks
+phase prechecks
 if [ "$LIB" -eq 1 ] && [ "$TARGET" = c ] && ! grep -q '^int main(' "$C_OUT"; then
     resolve_export_list "--lib"
 elif [ "$TARGET" = wasm ]; then
     resolve_export_list "a wasm build of a project with no main"
 fi
 run_cases
+phase cases
 
 # The output path, chosen the same way whichever target produced the code:
 # the project directory's name or the file's stem, an executable when the
@@ -3944,5 +4417,6 @@ if [ "$cc_rc" -ne 0 ]; then
 fi
 UNIT_NOTE=""
 [ $((UNIT_BUILT + UNIT_HITS)) -gt 0 ] && UNIT_NOTE=", $UNIT_BUILT of $((UNIT_BUILT + UNIT_HITS)) units compiled"
+phase linked
 progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file")$UNIT_NOTE)"
 exit_ok

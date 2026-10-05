@@ -18,6 +18,9 @@ check_program_tail2() {
   check_genname();
   check_fwd();
   check_imp_dup();
+} chain () {
+  ext_check();
 } return void;
 given lz_empty ():() then calls check_genname:() then calls check_fwd:() then calls check_imp_dup:()
 given lz_o ():() then calls check_genname:() then calls check_fwd:() then calls check_imp_dup:()
+given lz_empty ():() then calls ext_check:[1]

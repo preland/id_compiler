@@ -2,11 +2,7 @@
 // function imd_x and of function imd_y, at the first place they are not the
 // same.
 imd_vals(int imd_x, int imd_y) {
-  string[] imd_xa = str_split((import imd_tab)[imd_x * 2 + 1], ",");
-  string[] imd_xb = str_split((import imd_tab)[imd_y * 2 + 1], ",");
-  int imd_k = imd_first(imd_xa, imd_xb);
-} chain (int imd_x, int imd_y) {
-  string ret_s = "(import " + imd_xa[imd_k] + ") in one, (import " + imd_xb[imd_k] + ") in the other";
+  string ret_s = imd_vals_of((import imd_tab)[imd_x * 2 + 1], (import imd_tab)[imd_y * 2 + 1]);
 } return string ret_s;
 given imd_pair_base given imd_fill (1, 0):("(import beta) in one, (import alpha) in the other")
 given imd_pair_base given imd_fill (0, 1):("(import alpha) in one, (import beta) in the other")

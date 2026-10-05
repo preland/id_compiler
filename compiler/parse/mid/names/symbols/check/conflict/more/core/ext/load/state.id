@@ -1,0 +1,51 @@
+// The library's index as bin/idc hands it in, for a build that loaded only the
+// functions it reaches (docs/PROJECT.md, "the standard library is loaded by
+// use"). The program may not repeat the body of a function it did not load, so
+// the bodies of those arrive as `ext` lines ahead of the tokens and are kept
+// here, one row per unloaded function, native or struct.
+//
+//   ext_n, ext_k, ext_f, ext_l   name, kind (f, n or s), file and line of each
+//   ext_s       1 when the build loaded it after all: the program parsed it
+//   ext_cfp, ext_cfe   the key of each fingerprint segment, and its row
+//   ext_inm     the import names of each row's last segment (check_imp_dup)
+//   ext_mode    [1 when the build is lazy: the library's cases are not its own]
+//   ext_cur     [the row the last F line made]
+//   ext_path    [the file the F lines that follow are in]
+//   ext_mk...   one name table over idstd's hmap, keys told apart by a prefix:
+//               f: a fingerprint, i: an import-duplicate text, l: a loaded name
+ext_init() {
+  export string[] ext_n = [];
+  export string[] ext_k = [];
+  export string[] ext_f = [];
+} chain () {
+  export int[] ext_l = [];
+  export int[] ext_s = [];
+  export int[] ext_cur = [0 - 1];
+} chain () {
+  export string[] ext_cfp = [];
+  export int[] ext_cfe = [];
+  export string[] ext_inm = [];
+} chain () {
+  export string[] ext_path = [""];
+  export int[] ext_mode = [0];
+  export string[] ext_mk = [];
+} chain () {
+  export int[] ext_mv = [];
+  export int[] ext_mu = [];
+  export int[] ext_mc = [];
+} chain () {
+  hmap_init((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc));
+} return void;
+():() then calls hmap_init:[1]
+():() then init_units:(0)
+
+// A body is compared by its key, not its text, so the index carries 40 bytes
+// of it rather than 150: the length and two FNV-1a hashes from different
+// starting points, which together leave no collision a build could meet.
+ext_key(string xe_str) {
+  word xe_h1 = dg_fnv(0, xe_str);
+  word xe_h2 = dg_fnv(1469598103934665603, xe_str);
+  string xe_key = "" + len(xe_str) + ":" + xe_h1 + ":" + xe_h2;
+} return string xe_key;
+(""):("0:0:1469598103934665603")
+("abc"):("3:5171236289873516512:-2204510569963675907")

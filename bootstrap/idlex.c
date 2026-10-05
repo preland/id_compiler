@@ -541,10 +541,6 @@ static int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding 
     return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
-#ifndef IDTC_EPRINT_TO
-#define IDTC_EPRINT_TO stderr
-#endif
-static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 int id_str_eol(char* idstd_s, int idstd_i);
@@ -619,7 +615,6 @@ int id_scan_number(char* src, int i);
 int id_scan_string(char* src, int i);
 
 /* exported variables */
-int idstd_wl_s_newid = 11;  /* constant from conf.id */
 IdList* lexline;  /* exported by lex_setup() */
 IdList* lexbol;  /* exported by lex_setup() */
 IdList* lexcols;  /* exported by lex_cols() */

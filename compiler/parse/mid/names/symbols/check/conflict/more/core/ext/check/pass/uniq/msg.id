@@ -1,0 +1,33 @@
+// The messages of a body written twice (mid/form/unique/scan/more/report/dup.id),
+// for a pair with one function in the index. def_at is the part both ends of
+// the pair share.
+
+ext_dup_later(int xe_fi, int xe_k) {
+  string xe_nm = (import ns1)[((import prog)[xe_fi])];
+  string xe_mine = (import pfile)[xe_fi] + ":" + (import pline)[xe_fi];
+  string xe_tail = def_at((import ext_n)[xe_k], ext_where(xe_k));
+} chain (int xe_fi, int xe_k) {
+  diag("E0402", xe_mine, "function '" + xe_nm + "' has the same signature and logic as " + xe_tail, xe_nm, (import dupd_why), (import dupd_help));
+  diag_related(ext_where(xe_k), "the function this one repeats");
+} return void;
+given ixw_fx given ext_line("Z\t/a/lib.id") given ext_line("F\tlib\tf\t7") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0, 0):() then prints:("x.id:1: error: function 'fa' has the same signature and logic as 'lib' (defined at /a/lib.id:7) [E0402]\n  at: fa\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: /a/lib.id:7: note: the function this one repeats\n") then (import chkfail)[0]:(1)
+given ixw_fx given ext_line("Z\tq/lib2.id") given ext_line("F\tlib2\tf\t3") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0, 0):() then prints:("x.id:1: error: function 'fa' has the same signature and logic as 'lib2' (defined at q/lib2.id:3) [E0402]\n  at: fa\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: q/lib2.id:3: note: the function this one repeats\n")
+
+ext_dup_first(int xe_fi, int xe_k) {
+  string xe_nm = (import ns1)[((import prog)[xe_fi])];
+  string xe_mine = (import pfile)[xe_fi] + ":" + (import pline)[xe_fi];
+  string xe_tail = def_at(xe_nm, xe_mine);
+} chain (int xe_fi, int xe_k) {
+  diag("E0402", ext_where(xe_k), "function '" + (import ext_n)[xe_k] + "' has the same signature and logic as " + xe_tail, (import ext_n)[xe_k], (import dupd_why), (import dupd_help));
+  diag_related(xe_mine, "the function this one repeats");
+} return void;
+given ixw_fx given ext_line("Z\tz/lib.id") given ext_line("F\tlib\tf\t7") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0, 0):() then prints:("z/lib.id:7: error: function 'lib' has the same signature and logic as 'fa' (defined at x.id:1) [E0402]\n  at: lib\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: x.id:1: note: the function this one repeats\n") then (import chkfail)[0]:(1)
+given ixw_fx given ext_line("Z\ty.id") given ext_line("F\tlib2\tf\t3") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0, 0):() then prints:("y.id:3: error: function 'lib2' has the same signature and logic as 'fa' (defined at x.id:1) [E0402]\n  at: lib2\n  why: two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice\n  help: delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic\n  related: x.id:1: note: the function this one repeats\n")
+
+// The earlier function of a pair, as mid/form/unique/scan/more/report/tail.id
+// names it, from a name and where it was defined.
+def_at(string xe_nm, string xe_whr) {
+  string xe_msg = "'" + xe_nm + "' (defined at " + xe_whr + ")";
+} return string xe_msg;
+("f", "a.id:3"):("'f' (defined at a.id:3)")
+("g", "/z/b.id:9"):("'g' (defined at /z/b.id:9)")

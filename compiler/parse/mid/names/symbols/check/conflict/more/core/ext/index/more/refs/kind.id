@@ -1,0 +1,28 @@
+// Which nodes name something outside the function, and the type a declaration
+// reaches.
+
+ixw_is_ref(string ixw_kd) {
+  string[] ixw_kinds = ["call", "var", "import", "cimport", "cctor", "gsetup", "cfn", "then", "thencalls", "thencallsn", "thenimp"];
+  int ixw_hit = lst_str_index(ixw_kinds, ixw_kd) >= 0;
+} return int ixw_hit;
+("thencallsn"):(1)
+("decl"):(0)
+
+ixw_type_name(string ixw_kd, int ixw_id) {
+  string ixw_t = "";
+  if(ixw_kd == "decl" || ixw_kd == "param") {
+    ixw_t = ixw_base((import ns1)[ixw_id]);
+  } else if(ixw_kd == "func") {
+    ixw_t = ixw_base((import ns2)[ixw_id]);
+  }
+} return string ixw_t;
+given ixn_fx ("decl", (import ixn_decl)):("Point")
+given ixn_fx ("call", (import ixn_call)):("")
+
+ixw_base(string ixw_t) {
+  while(str_ends(ixw_t, "[]") == 1) {
+    ixw_t = str_slice(ixw_t, 0, len(ixw_t) - 2);
+  }
+} return string ixw_t;
+("int[][]"):("int")
+("Point"):("Point")

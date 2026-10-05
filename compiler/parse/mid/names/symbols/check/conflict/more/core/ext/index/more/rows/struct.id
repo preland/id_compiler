@@ -1,0 +1,36 @@
+// A struct is an entity of its own: it has a file and a line, and it reaches
+// the types of its fields.
+
+ixw_structs() {
+  int ixw_k = 0;
+  while(ixw_k < len((import sdname))) {
+    ixw_struct(ixw_k);
+    ixw_k = ixw_k + 1;
+  }
+} return void;
+given sd_pair ():() then prints:("@\tp.id\nF\tP\ts\t1\t0\nD\tint int\n@\tq.id\nF\tQ\ts\t5\t0\nD\tstring\n")
+given env_init ():() then prints:("")
+
+ixw_struct(int ixw_k) {
+  ixw_put(["@", (import sdfile)[ixw_k]]);
+  ixw_put(["F", (import sdname)[ixw_k], "s", "" + (import sdline)[ixw_k], "0"]);
+  string ixw_fields = ixw_field_types(ixw_k);
+} chain (int ixw_k) {
+  ixw_tag("D", ixw_fields);
+} return void;
+given sd_pair (0):() then prints:("@\tp.id\nF\tP\ts\t1\t0\nD\tint int\n")
+given sd_pair (1):() then prints:("@\tq.id\nF\tQ\ts\t5\t0\nD\tstring\n")
+
+ixw_field_types(int ixw_k) {
+  string[] ixw_ts = [];
+  string[] ixw_row_types = (import sdftype)[ixw_k];
+  int ixw_j = 0;
+} chain (int ixw_k) {
+  while(ixw_j < len(ixw_row_types)) {
+    push(ixw_ts, ixw_base(ixw_row_types[ixw_j]));
+    ixw_j = ixw_j + 1;
+  }
+  string ixw_joined = str_join(ixw_ts, " ");
+} return string ixw_joined;
+given sd_pair (0):("int int")
+given sd_pair given sd_note("R", ["a"], ["Pt[]"], "r.id", 9) (2):("Pt")

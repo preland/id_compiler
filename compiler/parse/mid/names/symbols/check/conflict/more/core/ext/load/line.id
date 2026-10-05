@@ -1,0 +1,40 @@
+// One `ext` line from the token stream: a tag, then tab-separated fields.
+//
+//   M lazy               this build is lazy
+//   L NAME NAME ...      the names the program loaded after all
+//   Z PATH               the file the F lines that follow are in
+//   F NAME KIND LINE     a function, native or struct the build did not load
+//   P KEY                the key of one fingerprint segment of the F above
+//   I KEY NAMES          the key of its import-duplicate text, and the names
+//
+// L lines come first, so an F can tell what the build did load.
+
+ext_line(string xe_text) {
+  string xe_sep = chr(9);
+  string[] xe_f = str_split(xe_text, xe_sep);
+  ext_route(xe_f[0], xe_f);
+} return void;
+given env_init ("M\tlazy"):() then (import ext_mode)[0]:(1)
+given env_init given ext_line("L\tgone") given ext_line("F\tgone\tf\t1") ("F\tkept\tf\t2"):() then (import ext_s)[0]:(1)
+
+ext_route(string xe_tag, string[] xe_f) {
+  if(xe_tag == "F") {
+    ext_put_fn(xe_f);
+  } else if(xe_tag == "P") {
+    ext_put_fp(xe_f);
+  } else {
+    ext_route2(xe_tag, xe_f);
+  }
+} return void;
+given env_init ("F", ["F", "foo", "f", "3"]):() then (import ext_n)[0]:("foo")
+given env_init given ext_line("F\tfoo\tf\t3") ("P", ["P", "k1"]):() then (import ext_cfp)[0]:("k1")
+
+ext_route2(string xe_tag, string[] xe_f) {
+  if(xe_tag == "I") {
+    ext_put_imd(xe_f);
+  } else {
+    ext_route3(xe_tag, xe_f);
+  }
+} return void;
+given env_init given ext_line("F\tfoo\tf\t3") ("I", ["I", "kk", "g,h"]):() then (import ext_inm)[0]:("g,h")
+given env_init ("M", ["M"]):() then (import ext_mode)[0]:(1)

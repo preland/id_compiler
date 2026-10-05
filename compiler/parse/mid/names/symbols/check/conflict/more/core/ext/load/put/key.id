@@ -1,0 +1,32 @@
+// The I line, and the three tags that set state rather than add a row.
+
+ext_route3(string xe_tag, string[] xe_f) {
+  if(xe_tag == "L") {
+    ext_put_loaded(xe_f);
+  } else if(xe_tag == "Z") {
+    sset((import ext_path), 0, xe_f[1]);
+  } else if(xe_tag == "M") {
+    lset((import ext_mode), 0, 1);
+  }
+} return void;
+given env_init ("Z", ["Z", "q.id"]):() then (import ext_path)[0]:("q.id")
+given env_init ("M", ["M"]):() then (import ext_mode)[0]:(1)
+
+ext_put_imd(string[] xe_f) {
+  int xe_at = (import ext_cur)[0];
+  sset((import ext_inm), xe_at, xe_f[2]);
+  hmap_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "i:" + xe_f[1], xe_at);
+} return void;
+given env_init given ext_line("F\tfoo\tf\t3") (["I", "kk", "g"]):() then (import ext_inm)[0]:("g")
+given env_init given ext_line("F\tfoo\tf\t3") (["I", "kk", "g"]):() then calls hmap_put:[1]
+
+ext_put_loaded(string[] xe_f) {
+  string[] xe_names = str_split(xe_f[1], " ");
+  int xe_j = 0;
+  while(xe_j < len(xe_names)) {
+    hmap_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "l:" + xe_names[xe_j], 1);
+    xe_j = xe_j + 1;
+  }
+} return void;
+given env_init (["L", "a b"]):() then calls hmap_put:[2]
+given env_init (["L", "a"]):() then calls hmap_put:[1]

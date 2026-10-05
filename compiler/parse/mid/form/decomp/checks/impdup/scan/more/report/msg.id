@@ -8,7 +8,7 @@ given lz_o (1):("dup9")
 
 imd_msg(string imd_nx, string imd_ny, string imd_vs) {
   string imd_def_y = imd_def(imd_ny);
-  string ret_s = "function '" + imd_nx + "' and " + imd_def_y + " differ only in the imported value they read (" + imd_vs + ")";
+  string ret_s = imd_sentence(imd_nx, imd_def_y, imd_vs);
 } return string ret_s;
 given env_init ("pb", "pa", "V"):("function 'pb' and 'pa' (defined at <stdin>:1) differ only in the imported value they read (V)")
 given edge_fixture ("fx_target", "nosuchfn", "W"):("function 'fx_target' and 'nosuchfn' (defined at <stdin>:1) differ only in the imported value they read (W)")
@@ -16,7 +16,7 @@ given edge_fixture ("fx_target", "nosuchfn", "W"):("function 'fx_target' and 'no
 imd_def(string imd_nm) {
   int imd_ln = func_line(imd_nm);
   string imd_file = func_file(imd_nm);
-  string ret_s = "'" + imd_nm + "' (defined at " + imd_file + ":" + imd_ln + ")";
+  string ret_s = def_at(imd_nm, imd_file + ":" + imd_ln);
 } return string ret_s;
 given env_init ("pa"):("'pa' (defined at <stdin>:1)")
 given edge_fixture ("fx_target"):("'fx_target' (defined at fixture.id:7)")

@@ -33,7 +33,7 @@ given case_fixture ():() then calls check_cases_at:[0]
 // row (exempt) -- the guard's two ways to skip.
 check_cases_at(int i) {
   int n = count_cases((import prog)[i]);
-  if(n < 2 && is_native((import prog)[i]) == 0) {
+  if(n < 2 && is_native((import prog)[i]) == 0 && ext_exempt(i) == 0) {
     cases_short(i, n);
   }
 } return void;

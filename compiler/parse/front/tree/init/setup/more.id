@@ -6,9 +6,12 @@ setup_rest() {
   init_rest();
   export int[] nparen = [];
   int ret_i = init_ir();
+} chain () {
+  ext_init();
 } return int ret_i;
 given full_env ():(0) then calls init_rest:[1]
 given full_env ():(0) then init_units:(0)
+given full_env ():(0) then calls ext_init:[1]
 
 // The env a front/tokens or front/tree case needs beyond env_init's own
 // chain: env_init never reaches init_files (fseen/pfile, and its own tail's

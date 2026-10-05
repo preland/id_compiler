@@ -27,13 +27,19 @@ given mk_two_toks ([1], "="):() then (import chkfail)[0]:(1) then prints:("<stdi
 
 // The rest of push_tok (../load/more/push_tok.id, at its three-function cap):
 // a `tcc KEY` line is not a token either -- it is a type-check key bin/idc
-// has on record as clean (mid/types/check/walk/check/tk/), kept in tccin.
+// has on record as clean (mid/types/check/walk/check/tk/), kept in tccin. An
+// `ext` line is no token either: it is one row of the library's index, for
+// a build that did not load the library whole (mid/names/symbols/check/
+// conflict/more/core/ext/).
 push_tok2(string kind, string text) {
   if(kind == "tcc") {
     push((import tccin), text);
+  } else if(kind == "ext") {
+    ext_line(text);
   } else {
     push_real(kind, text);
   }
 } return void;
 given full_env ("tcc", "123"):() then len((import tkind)):(0)
 given full_env ("kw", "int"):() then len((import tkind)):(1)
+given full_env ("ext", "M\tlazy"):() then len((import tkind)):(0)

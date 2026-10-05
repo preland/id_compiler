@@ -1,0 +1,29 @@
+// The one name a node reaches, or "" when it reaches none.
+
+ixw_local(string[] ixw_names, int ixw_id) {
+  string ixw_kd = (import nkind)[ixw_id];
+  if(ixw_kd == "decl" || ixw_kd == "param") {
+    push(ixw_names, (import ns2)[ixw_id]);
+  }
+} return void;
+given ixn_fx ([], (import ixn_decl)):(["pts"])
+given ixn_fx ([], (import ixn_call)):([])
+
+ixw_ref(string[] ixw_out, string[] ixw_own, int ixw_id) {
+  string ixw_nm = ixw_name_of(ixw_id);
+  if(ixw_nm != "" && lst_str_index(ixw_own, ixw_nm) < 0 && lst_str_index(ixw_out, ixw_nm) < 0) {
+    push(ixw_out, ixw_nm);
+  }
+} return void;
+given ixn_fx ([], [], (import ixn_call)):(["foo"])
+given ixn_fx ([], ["zz"], (import ixn_var)):([])
+
+ixw_name_of(int ixw_id) {
+  string ixw_kd = (import nkind)[ixw_id];
+  string ixw_nm = ixw_type_name(ixw_kd, ixw_id);
+  if(ixw_is_ref(ixw_kd) == 1) {
+    ixw_nm = (import ns1)[ixw_id];
+  }
+} return string ixw_nm;
+given ixn_fx ((import ixn_call)):("foo")
+given ixn_fx ((import ixn_decl)):("Point")

@@ -1,0 +1,34 @@
+// The names a run of nodes reaches. A node range is a function's body or its
+// cases; a name is kept once, and a name the function declares itself is a
+// variable, not a reach.
+
+ixw_refs(int ixw_lo, int ixw_hi) {
+  string[] ixw_own = ixw_locals(ixw_lo, ixw_hi);
+  string[] ixw_out = [];
+  ixw_walk(ixw_out, ixw_own, ixw_lo, ixw_hi);
+} chain (int ixw_lo, int ixw_hi) {
+  string ixw_row = str_join(ixw_out, " ");
+} return string ixw_row;
+given ixn_fx (0, 5):("foo zz gx Point int")
+given ixn_fx (0, 3):("foo zz gx")
+
+ixw_locals(int ixw_lo, int ixw_hi) {
+  string[] ixw_names = [];
+  int ixw_id = ixw_lo;
+  while(ixw_id <= ixw_hi) {
+    ixw_local(ixw_names, ixw_id);
+    ixw_id = ixw_id + 1;
+  }
+} return string[] ixw_names;
+given ixn_fx (0, 5):(["pts", "arg"])
+given ixn_fx (0, 3):([])
+
+ixw_walk(string[] ixw_out, string[] ixw_own, int ixw_lo, int ixw_hi) {
+  int ixw_id = ixw_lo;
+  while(ixw_id <= ixw_hi) {
+    ixw_ref(ixw_out, ixw_own, ixw_id);
+    ixw_id = ixw_id + 1;
+  }
+} return void;
+given ixn_fx ([], [], 0, 5):(["foo", "zz", "gx", "Point", "int"])
+given ixn_fx ([], ["zz", "int"], 0, 5):(["foo", "gx", "Point"])

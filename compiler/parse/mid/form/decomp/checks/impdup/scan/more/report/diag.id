@@ -10,7 +10,7 @@ imd_report(int imd_x, int imd_y) {
 } chain (int imd_x, int imd_y) {
   string imd_line = imd_msg(imd_nx, imd_ny, imd_vs);
   string imd_where = dup_loc(imd_nx);
-  diag("E0405", imd_where, imd_line, imd_nx, "two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter", "replace the import with a parameter, call that one function from both places, and delete the other");
+  diag("E0405", imd_where, imd_line, imd_nx, (import imdd_why), (import imdd_help));
 } return void;
 given imd_pair_base given imd_fill (1, 0):() then (import chkfail)[0]:(1)
 given imd_pair_base given imd_fill (1, 0):() then prints:("<stdin>:1: error: function 'imb' and 'ima' (defined at <stdin>:1) differ only in the imported value they read ((import beta) in one, (import alpha) in the other) [E0405]\n  at: imb\n  why: two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter\n  help: replace the import with a parameter, call that one function from both places, and delete the other\n")

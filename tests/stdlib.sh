@@ -455,11 +455,13 @@ fi
 # -- 26. a broken idstd case fails a program build with the library's own
 # message, never the program's -- bin/idc's pre-check (run_std_precheck),
 # against a scratch COPY of the fixture stdlib, never fixtures/idstd itself.
+# The pre-check is of the functions the program reaches and their cases, so the
+# program calls the one whose case is broken.
 rm -rf "$TMP/idstd_broken"; cp -r "$FIXTURE" "$TMP/idstd_broken"
 sed -i 's/(3, 9):(9)/(3, 9):(999)/' "$TMP/idstd_broken/math/fx.id"
 broken=$(cd "$TMP/idstd_broken" && pwd -P)
 rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
-printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$TMP/proj/main.id"
+printf 'main(int argc, string[] argv) {\n  int r = tfx_max(1, 2);\n  print(r);\n} return int 0;\n' > "$TMP/proj/main.id"
 out=$($BIN_IDC "$TMP/proj" --std "$broken" -o "$TMP/out26" 2>&1)
 if printf '%s\n' "$out" | grep -qF "idc: the standard library at $broken failed its own test cases (this is not an error in your program):" \
    && printf '%s\n' "$out" | grep -qF "test failed: tfx_max(3, 9) = 9, expected 999" \
@@ -496,7 +498,7 @@ fi
 # library creates no new pre-check cache entry -------------------------------
 rm -rf "$TMP/proj" "$TMP/idstd_cachetest"; mkdir -p "$TMP/proj"
 cp -r "$FIXTURE" "$TMP/idstd_cachetest"
-printf 'main(int argc, string[] argv) {\n  print(2);\n} return int 0;\n' > "$TMP/proj/main.id"
+printf 'main(int argc, string[] argv) {\n  int r = tfx_max(1, 2);\n  print(r);\n} return int 0;\n' > "$TMP/proj/main.id"
 precheck_entries() {
     find "$ROOT/.idc-cache/std_precheck" -mindepth 1 -maxdepth 1 -type d ! -name '.bincache' 2>/dev/null \
         | wc -l | tr -d ' '
@@ -579,6 +581,181 @@ if ! $BIN_IDC --allow-untested --std "$TMP/under" "$TMP/proj27" -o "$TMP/x" >"$T
 else
     bad "an underscore-numbered sibling (x.id, x_2.id) is rejected"
 fi
+
+# -- 34. the library is loaded by use: the program is checked against all of
+# it, and the part it does not reach is not checked itself ---------------------
+# bin/idc loads only the library functions a program reaches ("The standard
+# library is loaded by use") and holds the rest as an index. A program still
+# may not take a library function's name, or repeat its body, by not calling it,
+# and what a build says about that is what it said when it merged the whole
+# library (IDC_STD_FULL=1). Each comparison below runs the build both ways.
+unset IDC_STD_FULL
+ABS_IDC="$(cd .. && pwd)/bin/idc"
+LZ_FLAGS=""
+lazy_same() { # lazy_same PROJECT STDDIR -- LAZY_OUT/FULL_OUT: --check's words, both ways
+    LAZY_OUT=$(cd "$TMP" && "$ABS_IDC" --allow-untested --std "$2" "$1" --check $LZ_FLAGS 2>&1); LAZY_RC=$?
+    FULL_OUT=$(cd "$TMP" && IDC_STD_FULL=1 "$ABS_IDC" --allow-untested --std "$2" "$1" --check $LZ_FLAGS 2>&1); FULL_RC=$?
+    [ "$LAZY_RC" -eq "$FULL_RC" ] && [ "$LAZY_OUT" = "$FULL_OUT" ]
+}
+rm -rf "$TMP/p34"; mkdir -p "$TMP/p34"
+cat > "$TMP/p34/main.id" <<'EOF'
+tstr_twice(string a) {
+  string b = a + "!";
+} return string b;
+("a"):("a!")
+("b"):("b!")
+
+main(int argc, string[] argv) {
+  print(1);
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF
+if lazy_same p34 "$FIXTURE" && [ "$LAZY_RC" -ne 0 ] \
+   && printf '%s\n' "$LAZY_OUT" | grep -q "function 'tstr_twice' already defined at"; then
+    ok "a function named like a library function nothing calls is reported, as when the library is merged whole"
+else
+    bad "a function named like a library function nothing calls is reported, as when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | tr '\n' ' ')"
+fi
+
+# -- 35. ...and a body written again is reported, on whichever of the two the
+# build reads second: tstr_twice is never called, so the program's own copy is
+# the only place its logic appears.
+rm -rf "$TMP/p35"; mkdir -p "$TMP/p35"
+cat > "$TMP/p35/main.id" <<'EOF'
+mine_twice(string x) {
+  string y = x + x;
+} return string y;
+("a"):("aa")
+("b"):("bb")
+
+main(int argc, string[] argv) {
+  string s = mine_twice("c");
+  print(s);
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF
+want35="function 'mine_twice' has the same signature and logic as 'tstr_twice' (defined at"
+want35b="function 'tstr_twice' has the same signature and logic as 'mine_twice' (defined at"
+rm -rf "$TMP/zz_std" "$TMP/aa_proj"; cp -r "$FIXTURE" "$TMP/zz_std"; mkdir -p "$TMP/aa_proj"; cp "$TMP/p35/main.id" "$TMP/aa_proj/main.id"
+if lazy_same p35 "$FIXTURE" && [ "$LAZY_RC" -ne 0 ] && printf '%s\n' "$LAZY_OUT" | grep -qF "$want35"; then
+    ok "a body that repeats a library function nothing calls is reported against the library's, when the library is read first"
+else
+    bad "a body that repeats a library function nothing calls is reported against the library's, when the library is read first: $(printf '%s\n' "$LAZY_OUT" | head -2 | tr '\n' ' ')"
+fi
+if lazy_same "$TMP/aa_proj" "$TMP/zz_std" && [ "$LAZY_RC" -ne 0 ] && printf '%s\n' "$LAZY_OUT" | grep -qF "$want35b"; then
+    ok "a body that repeats a library function nothing calls is reported at the library's, when the program is read first"
+else
+    bad "a body that repeats a library function nothing calls is reported at the library's, when the program is read first: $(printf '%s\n' "$LAZY_OUT" | head -2 | tr '\n' ' ')"
+fi
+
+# -- 36. a type error in a library function the program does not reach does not
+# fail the program's build, and does fail the library's own: the library built
+# as the project is what idstd/run.sh's `whole` section runs --------------------
+rm -rf "$TMP/idstd_te"; cp -r "$FIXTURE" "$TMP/idstd_te"
+sed -i 's/int m = tfx_max(a, 0 - a);/int m = tfx_max(a, "x");/' "$TMP/idstd_te/math/fx.id"
+te=$(cd "$TMP/idstd_te" && pwd -P)
+rm -rf "$TMP/p36"; mkdir -p "$TMP/p36"
+printf 'main(int argc, string[] argv) {\n  int r = tfx_max(4, 9);\n  print(r);\n} return int 0;\n' > "$TMP/p36/main.id"
+if $BIN_IDC --std "$te" "$TMP/p36" -o "$TMP/out36" >"$TMP/o36.err" 2>&1 && [ "$("$TMP/out36")" = "9" ]; then
+    ok "a type error in a library function the program does not reach does not fail the program"
+else
+    bad "a type error in a library function the program does not reach does not fail the program: $(head -2 "$TMP/o36.err" | tr '\n' ' ')"
+fi
+if ! IDC_STD_FULL=1 $BIN_IDC --std "$te" "$TMP/p36" -o "$TMP/out36f" >"$TMP/o36f.err" 2>&1 \
+   && ! $BIN_IDC --std "$te" "$te" -o "$TMP/lib36.o" >"$TMP/l36.err" 2>&1 \
+   && grep -q "fx.id" "$TMP/o36f.err" && grep -q "fx.id" "$TMP/l36.err"; then
+    ok "that type error is found by building the library whole, as a project and merged"
+else
+    bad "that type error is found by building the library whole, as a project and merged: $(head -2 "$TMP/l36.err" | tr '\n' ' ')"
+fi
+
+# -- 37. the same for a case: a failing case of a function the program does not
+# reach is the library's concern, one of a function it does reach is the
+# program build's (26) -----------------------------------------------------------
+rm -rf "$TMP/idstd_fc"; cp -r "$FIXTURE" "$TMP/idstd_fc"
+sed -i 's/(-4):(4)/(-4):(5)/' "$TMP/idstd_fc/math/fx.id"
+fc=$(cd "$TMP/idstd_fc" && pwd -P)
+if $BIN_IDC --std "$fc" "$TMP/p36" -o "$TMP/out37" >"$TMP/o37.err" 2>&1 && [ "$("$TMP/out37")" = "9" ]; then
+    ok "a failing case of a library function the program does not reach does not fail the program"
+else
+    bad "a failing case of a library function the program does not reach does not fail the program: $(head -2 "$TMP/o37.err" | tr '\n' ' ')"
+fi
+rm -rf "$TMP/p37"; mkdir -p "$TMP/p37"
+printf 'main(int argc, string[] argv) {\n  int r = tfx_abs(0 - 4);\n  print(r);\n} return int 0;\n' > "$TMP/p37/main.id"
+out=$($BIN_IDC "$TMP/p37" --std "$fc" -o "$TMP/out37b" 2>&1)
+if printf '%s\n' "$out" | grep -qF "failed its own test cases" && printf '%s\n' "$out" | grep -qF "tfx_abs(-4)"; then
+    ok "a failing case of a library function the program does reach fails it, as the library's"
+else
+    bad "a failing case of a library function the program does reach fails it, as the library's: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ')"
+fi
+
+# -- 38. the library's conf.id constants are loaded by use too: a library
+# function that reads one brings it, and one the program does not reach is not
+# emitted; a program that declares a constant of the same name is told so -------
+rm -rf "$TMP/libc"; mkdir -p "$TMP/libc/num"
+printf 'int lc_k = 5;\nint lc_unused = 9;\n' > "$TMP/libc/conf.id"
+cat > "$TMP/libc/num/get.id" <<'EOF'
+lc_get(int a) {
+  int b = a + (import lc_k);
+} return int b;
+(1):(6)
+(2):(7)
+EOF
+rm -rf "$TMP/p38"; mkdir -p "$TMP/p38"
+printf 'main(int argc, string[] argv) {\n  int r = lc_get(3);\n  print(r);\n} return int 0;\n' > "$TMP/p38/main.id"
+if $BIN_IDC --std "$TMP/libc" "$TMP/p38" -o "$TMP/out38" --emit-c "$TMP/c38.c" >"$TMP/o38.err" 2>&1 \
+   && grep -q "lc_k" "$TMP/c38.c" && ! grep -q "lc_unused" "$TMP/c38.c" \
+   && $BIN_IDC --std "$TMP/libc" "$TMP/p38" -o "$TMP/out38" >/dev/null 2>&1 && [ "$("$TMP/out38")" = "8" ]; then
+    ok "a library constant a reached function reads is loaded, and one nothing reads is not"
+else
+    bad "a library constant a reached function reads is loaded, and one nothing reads is not: $(head -2 "$TMP/o38.err" | tr '\n' ' ')"
+fi
+mkdir -p "$TMP/p38c"
+printf 'int lc_k = 7;\n' > "$TMP/p38c/conf.id"
+cp "$TMP/p38/main.id" "$TMP/p38c/main.id"
+lazy_same p38c "$TMP/libc"
+if [ "$LAZY_RC" -ne 0 ] && printf '%s\n' "$LAZY_OUT" | grep -q "constant 'lc_k' is already declared at"; then
+    ok "a program constant named like a library constant is reported, as when the library is merged whole"
+else
+    bad "a program constant named like a library constant is reported, as when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | tr '\n' ' ')"
+fi
+
+# -- 39. a program that lives inside the library's own tree is built with the
+# whole library, which is also what reads the constants once through its
+# enclosing root (idstd/.tests/tool/names is built this way) ------------------
+rm -rf "$TMP/libc/app"; mkdir -p "$TMP/libc/app"
+cp "$TMP/p38/main.id" "$TMP/libc/app/main.id"
+if $BIN_IDC --std "$TMP/libc" "$TMP/libc/app" -o "$TMP/out39" >"$TMP/o39.err" 2>&1 && [ "$("$TMP/out39")" = "8" ]; then
+    ok "a program inside the library's tree builds, and reads the library's constants once"
+else
+    bad "a program inside the library's tree builds, and reads the library's constants once: $(head -2 "$TMP/o39.err" | tr '\n' ' ')"
+fi
+
+# -- 40. a collision with a library function the program does not reach is a
+# diagnostic of the same record as one inside the program: the code, the why, the
+# help and a related place pointing at the library's definition, in each format ---
+for fmt in plain json human; do
+    LZ_FLAGS="--diagnostics=$fmt"
+    case "$fmt" in
+        json)  pat='"code":"E0402"'; rel='"related":[{"file":' ;;
+        plain) pat='[E0402]'; rel='  related: ' ;;
+        human) pat='[E0402]'; rel='the function this one repeats (' ;;
+    esac
+    if lazy_same p35 "$FIXTURE" && [ "$LAZY_RC" -ne 0 ] && printf '%s\n' "$LAZY_OUT" | grep -qF -- "$pat" && printf '%s\n' "$LAZY_OUT" | grep -qF -- "$rel"; then
+        ok "a collision with an unreached library function carries E0402 and a related place in $fmt, as when the library is merged whole"
+    else
+        bad "a collision with an unreached library function carries E0402 and a related place in $fmt, as when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | cut -c1-200 | tr '\n' ' ')"
+    fi
+done
+LZ_FLAGS="--diagnostics=json"
+if lazy_same p34 "$FIXTURE" && printf '%s\n' "$LAZY_OUT" | grep -qF '"code":"E0'; then
+    ok "a name collision with an unreached library function is a coded diagnostic in json, as when the library is merged whole"
+else
+    bad "a name collision with an unreached library function is a coded diagnostic in json, as when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | cut -c1-200 | tr '\n' ' ')"
+fi
+LZ_FLAGS=""
 
 echo
 echo "$pass passed, $fail failed"

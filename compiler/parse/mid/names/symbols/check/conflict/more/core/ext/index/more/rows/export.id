@@ -1,0 +1,31 @@
+// X and V records: the exports and the variables each function declares. The
+// owner is named in the record rather than implied by position, because the
+// tables are not in function order.
+
+ixw_exports() {
+  int ixw_k = 0;
+  while(ixw_k < len((import enames))) {
+    ixw_export(ixw_k);
+    ixw_k = ixw_k + 1;
+  }
+} return void;
+given env_init given add_export("gx", "int", "o1") given add_export("gy", "string", "o2") ():() then prints:("X\to1\tgx\tint\nX\to2\tgy\tstring\n")
+given env_init ():() then prints:("")
+
+ixw_export(int ixw_k) {
+  if((import eowners)[ixw_k] != "conf.id") {
+    ixw_put(["X", (import eowners)[ixw_k], (import enames)[ixw_k], (import etypes)[ixw_k]]);
+  }
+} return void;
+given env_init given add_export("gx", "int", "o1") (0):() then prints:("X\to1\tgx\tint\n")
+given env_init given add_export("cc", "int", "conf.id") (0):() then prints:("")
+
+ixw_vars() {
+  int ixw_k = 0;
+  while(ixw_k < len((import dvname))) {
+    ixw_var(ixw_k);
+    ixw_k = ixw_k + 1;
+  }
+} return void;
+given regrow_d given reg_push("e", "int", "g", 1, 0) given reg_push("y", "string", "h", 0, 0) ():() then prints:("V\tf\tx\tint\nV\th\ty\tstring\n")
+given regrow_d ():() then prints:("V\tf\tx\tint\n")

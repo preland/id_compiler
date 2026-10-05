@@ -48,3 +48,13 @@ string[] cache_taint_natives = ["fs_write", "fs_write_mem", "fs_flush", "fs_mkdi
 // Builtins whose result is not a function of the case and its files: the clock
 // and the terminal. A case calling one is never cached.
 string[] cache_volatile_builtins = ["ticks", "getkey"];
+// The why and help lines of E0402 and E0405. Each is written by two places: the
+// check of two functions of the program (mid/form/unique/.../report/dup.id,
+// mid/form/decomp/checks/impdup/.../report/diag.id) and the check of a function
+// of the program against one of the library that is not loaded
+// (mid/names/symbols/check/conflict/more/core/ext/check/), so a collision with
+// the library reads exactly as one inside the program does.
+string dupd_why = "two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice";
+string dupd_help = "delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic";
+string imdd_why = "two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter";
+string imdd_help = "replace the import with a parameter, call that one function from both places, and delete the other";
