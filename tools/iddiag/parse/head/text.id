@@ -1,0 +1,45 @@
+// What a head line says after its severity marker: the message, and the stable
+// error code the compiler appends as ` [E0123]`.
+
+dg_rest(string dg_rh) {
+  int dg_rp = dg_sevpos(dg_rh);
+  string dg_rs = dg_sev(dg_rh);
+  string dg_rr = "";
+} chain (string dg_rh) {
+  int dg_rb = dg_rp + 4 + len(dg_rs);
+  if(dg_rp >= 0) {
+    dg_rr = str_slice(dg_rh, dg_rb, len(dg_rh) - dg_rb);
+  }
+} return string dg_rr;
+("a.id:1: error: x y [E0001]"):("x y [E0001]")
+("a.id:1: note: n"):("n")
+("plain"):("")
+
+// The code, or "" for a message that carries none (a diagnostic the compiler
+// has not been migrated to give one for yet).
+dg_code(string dg_ch) {
+  string dg_cr = dg_rest(dg_ch);
+  int dg_cn = len(dg_cr);
+  string dg_cc = "";
+} chain (string dg_ch) {
+  if(dg_cn >= 8 && str_eqat(dg_cr, dg_cn - 8, " [") == 1 && charat(dg_cr, dg_cn - 1) == 93 && chr_is_upper(charat(dg_cr, dg_cn - 6)) == 1) {
+    dg_cc = str_slice(dg_cr, dg_cn - 6, 5);
+  }
+} return string dg_cc;
+("a.id:1: error: bad [E0012]"):("E0012")
+("a.id:1: error: bad [x] [E0012]"):("E0012")
+("a.id:1: error: indexes [e0123]"):("")
+("a.id:1: error: no code"):("")
+
+// The message without its code.
+dg_msg(string dg_mh) {
+  string dg_mr = dg_rest(dg_mh);
+  string dg_mc = dg_code(dg_mh);
+  string dg_mt = dg_mr;
+} chain (string dg_mh) {
+  if(dg_mc != "") {
+    dg_mt = str_slice(dg_mr, 0, len(dg_mr) - 8);
+  }
+} return string dg_mt;
+("a.id:1: error: bad thing [E0123]"):("bad thing")
+("a.id:1: error: bad thing"):("bad thing")

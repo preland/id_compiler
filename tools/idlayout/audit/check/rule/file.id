@@ -7,24 +7,24 @@
 lay_check_file(string dir, int is_root, string name, int kind) {
   string full = dir + "/" + name;
   if(kind == 2) {
-    string msg = lay_msg(full, "'import.id' is now called 'conf.id' -- it holds constants as well as dependencies. Rename it");
+    string msg = lay_diag(full, "E0706", "'import.id' is now called 'conf.id'", "conf.id holds a project's constants as well as the dependencies it names, so the manifest has one name", "rename the file to conf.id, in the same directory, with the same contents");
     push((import lay_hit_legacy), msg);
   }
   if(kind == 0 && is_root == 0) {
-    string msg2 = lay_msg(full, "'conf.id' is the dependency manifest and is only read at the root of a project or a dependency. Here it is neither compiled nor read, so anything it defines silently does not exist; rename it");
+    string msg2 = lay_diag(full, "E0707", "'conf.id' is the dependency manifest and is only read at the root of a project or a dependency", "here it is neither compiled nor read, so anything it defines silently does not exist", "rename the file for what it holds, or move its constants and imports to the conf.id at the root");
     push((import lay_hit_nested), msg2);
   }
 } chain (string dir, int is_root, string name, int kind) {
   if(kind == 3) {
-    string text = "file '" + full + "' has a generic name '" + name + "'; name it for what it holds";
-    string msg3 = lay_msg(full, text);
+    string text = "file '" + full + "' has a generic name '" + name + "'";
+    string msg3 = lay_diag(full, "E0702", text, "a name like util.id or helper.id says nothing about what the file is for, so unrelated code collects in it", "name the file for what it holds: the functions in it say what that is");
     push((import lay_hit_generic), msg3);
   }
 } return void;
-given lay_reset ("d", 0, "import.id", 2):() then lay_report:(1)
-given lay_reset ("d", 0, "conf.id", 0):() then lay_report:(1)
+given lay_reset ("d", 0, "import.id", 2):() then lay_report:(1) then (import lay_hit_legacy)[0]:("d/import.id:1: error: 'import.id' is now called 'conf.id' [E0706]\n  why: conf.id holds a project's constants as well as the dependencies it names, so the manifest has one name\n  help: rename the file to conf.id, in the same directory, with the same contents")
+given lay_reset ("d", 0, "conf.id", 0):() then lay_report:(1) then (import lay_hit_nested)[0]:("d/conf.id:1: error: 'conf.id' is the dependency manifest and is only read at the root of a project or a dependency [E0707]\n  why: here it is neither compiled nor read, so anything it defines silently does not exist\n  help: rename the file for what it holds, or move its constants and imports to the conf.id at the root")
 given lay_reset ("root", 1, "conf.id", 0):() then lay_report:(0)
-given lay_reset ("d", 0, "util.id", 3):() then lay_report:(1)
+given lay_reset ("d", 0, "util.id", 3):() then lay_report:(1) then (import lay_hit_generic)[0]:("d/util.id:1: error: file 'd/util.id' has a generic name 'util.id' [E0702]\n  why: a name like util.id or helper.id says nothing about what the file is for, so unrelated code collects in it\n  help: name the file for what it holds: the functions in it say what that is")
 given lay_reset ("d", 0, "main.id", 4):() then lay_report:(0)
 
 // Every violation is reported "PATH:1: error: TEXT" -- the same shape
@@ -45,10 +45,10 @@ lay_check_samefile(string dir, int is_root, string self, string name, int kind) 
   string stem = lay_strip_id(name);
   if(is_root == 0 && kind != 0 && kind != 1 && stem == self) {
     string full = dir + "/" + name;
-    string msg = lay_msg(full, "file '" + full + "' has the same name as its directory; name it for what it holds");
+    string msg = lay_diag(full, "E0703", "file '" + full + "' has the same name as its directory", "a file named like the directory that holds it says nothing about why it exists", "name the file for what it holds, or merge it into the directory's other files");
     push((import lay_hit_samefile), msg);
   }
 } return void;
-given lay_reset ("a/loop", 0, "loop", "loop.id", 4):() then lay_report:(1)
+given lay_reset ("a/loop", 0, "loop", "loop.id", 4):() then lay_report:(1) then (import lay_hit_samefile)[0]:("a/loop/loop.id:1: error: file 'a/loop/loop.id' has the same name as its directory [E0703]\n  why: a file named like the directory that holds it says nothing about why it exists\n  help: name the file for what it holds, or merge it into the directory's other files")
 given lay_reset ("a/loop", 0, "loop", "main.id", 4):() then lay_report:(0)
 given lay_reset ("root", 1, "root", "root.id", 4):() then lay_report:(0)

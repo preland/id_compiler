@@ -1,12 +1,12 @@
-// The i-side of report_dup's message: the location the diagnostic points at.
-// Split out so that block stays within the action limit -- fname_at(i) was
-// read three times over in the original and nothing between the reads could
-// change it, so it is read once, in report_dup's own chain, and passed
-// through.
+// The i-side of report_dup's message: the place the diagnostic points at, as
+// `FILE:LINE`. Split out so that block stays within the action limit --
+// fname_at(i) was read three times over in the original and nothing between
+// the reads could change it, so it is read once, in report_dup's own chain, and
+// passed through.
 
 dup_loc(string name_i) {
   int func_line_v = func_line(name_i);
-  string loc_at_v = loc_at(name_i, func_line_v);
-} return string loc_at_v;
-given edge_fixture ("fx_target"):("fixture.id:7: error: ")
-given edge_fixture ("edge_caller"):("fixture.id:20: error: ")
+  string loc_v = diag_fn_loc(name_i, func_line_v);
+} return string loc_v;
+given edge_fixture ("fx_target"):("fixture.id:7")
+given edge_fixture ("edge_caller"):("fixture.id:20")

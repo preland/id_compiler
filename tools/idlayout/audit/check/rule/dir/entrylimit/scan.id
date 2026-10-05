@@ -22,13 +22,13 @@ lay_count_all(int[] buf, string build, int is_root) {
 given lay_scratch_reset ([97, 46, 105, 100, 10], "build", 0):() then len((import lay_scratch_names)):(1)
 given lay_scratch_reset ([], "build", 0):() then len((import lay_scratch_names)):(0)
 
-lay_check_entrylimit(string dir) {
+lay_check_entrylimit(string dir, string root) {
   int total = len((import lay_scratch_names));
   if(total > 3) {
     string list = str_join((import lay_scratch_names), ", ");
-    string msg = lay_msg(dir, "a project directory may contain at most 3 files and directories combined, but this one has " + total + " (.id files and subdirectories); split it into subdirectories (entries: " + list + ")");
+    string msg = lay_entry_msg(dir, total, list, root);
     push((import lay_hit_entry), msg);
   }
 } return void;
-given lay_fixture_over ("d"):() then lay_report:(1)
-given lay_fixture_under ("d"):() then lay_report:(0)
+given lay_fixture_over ("d", "does-not-exist-xyz-entry-root"):() then lay_report:(1) then (import lay_hit_entry)[0]:("d:1: error: a project directory may contain at most 3 files and directories combined, but this one has 4: a.id, b.id, c.id, d.id [E0701]\n  why: three entries to a directory (its .id files and subdirectories; conf.id and backend.id do not count) keeps every listing readable at a glance, so the tree, not one long directory, carries the structure (docs/PROJECT.md)\n  help: split the entries into subdirectories named for what they have in common, or move some into a neighbouring directory that has room; `idc/.idc-cache/idlayout --room PROJECT_ROOT d` lists the nearest places with a free entry")
+given lay_fixture_under ("d", "does-not-exist-xyz-entry-root"):() then lay_report:(0)

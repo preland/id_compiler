@@ -1,0 +1,41 @@
+// The two lines a diagnostic can add after `diag`: a change that fixes it, and
+// another place that matters to it.
+//
+// An edit is five tab-separated fields, so that it stays on one line:
+//
+//   APPLICABILITY  OP  LINE  NEEDLE  TEXT
+//
+//   APPLICABILITY  machine      applying it gives a correct program
+//                  maybe        applying it gives a program that may not do what was meant
+//                  placeholder  TEXT has parts the author has to fill in
+//   OP             replace          the first whole-word NEEDLE on LINE becomes TEXT
+//                  after-function   TEXT is added after the function declared on LINE
+//                                   (its return clause and its cases)
+//
+// NEEDLE and TEXT write a backslash as \\, a newline as \n and a tab as \t.
+// The edit belongs to the `help:` line before it; tools/iddiag places it in the
+// file (the compiler knows lines, not columns) or says that it could not.
+
+diag_edit(string dgn_appl, string dgn_op, int dgn_at_line, string dgn_needle, string dgn_text) {
+  string dgn_need_esc = diag_esc(dgn_needle);
+  string dgn_text_esc = diag_esc(dgn_text);
+  print("  edit: " + dgn_appl + "\t" + dgn_op + "\t" + dgn_at_line + "\t" + dgn_need_esc + "\t" + dgn_text_esc);
+} return void;
+("machine", "replace", 4, "a b", "(a) b"):() then prints:("  edit: machine\treplace\t4\ta b\t(a) b\n")
+("placeholder", "after-function", 7, "", "(0):(0)\n"):() then prints:("  edit: placeholder\tafter-function\t7\t\t(0):(0)\\n\n")
+
+diag_esc(string dgn_raw) {
+  string dgn_esc_bs = str_replace(dgn_raw, "\\", "\\\\");
+  string dgn_esc_nl = str_replace(dgn_esc_bs, "\n", "\\n");
+  string dgn_esc_tab = str_replace(dgn_esc_nl, "\t", "\\t");
+} return string dgn_esc_tab;
+("a\\b"):("a\\\\b")
+("a\nb\tc"):("a\\nb\\tc")
+("plain"):("plain")
+
+// Another place the reader needs: where the thing this one clashes with is.
+diag_related(string dgn_rel_loc, string dgn_rel_msg) {
+  print("  related: " + dgn_rel_loc + ": note: " + dgn_rel_msg);
+} return void;
+("a.id:3", "first defined here"):() then prints:("  related: a.id:3: note: first defined here\n")
+("dir/b.id:12", "the other"):() then prints:("  related: dir/b.id:12: note: the other\n")

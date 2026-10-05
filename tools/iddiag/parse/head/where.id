@@ -1,0 +1,45 @@
+// Where a diagnostic says it is: the `FILE:LINE` before the severity marker.
+
+dg_prefix(string dg_xh) {
+  int dg_xp = dg_sevpos(dg_xh);
+  string dg_xr = "";
+  if(dg_xp >= 0) {
+    dg_xr = str_slice(dg_xh, 0, dg_xp);
+  }
+} return string dg_xr;
+("a.id:7: error: x"):("a.id:7")
+("plain"):("")
+
+// The line, or -1 when the head is not `FILE:LINE: SEVERITY: ...`, which is
+// how a line of some other tool's output is told from a diagnostic. Line 0 is a
+// diagnostic with no line to show.
+dg_ln(string dg_nh) {
+  string dg_np = dg_prefix(dg_nh);
+  string[] dg_nl = str_split(dg_np, ":");
+  string dg_nt = dg_nl[len(dg_nl) - 1];
+} chain (string dg_nh) {
+  int dg_nv = to_int(dg_nt);
+  int dg_nr = 0 - 1;
+  if("" + dg_nv == dg_nt && len(dg_nl) > 1) {
+    dg_nr = dg_nv;
+  }
+} return int dg_nr;
+("a.id:7: error: x"):(7)
+("<stdin>:0: error: x"):(0)
+("a.id: error: x"):(-1)
+("plain"):(-1)
+
+// The file: everything before the last colon of the prefix, so a path with a
+// colon in it survives.
+dg_file(string dg_wh) {
+  string dg_wx = dg_prefix(dg_wh);
+  string[] dg_wl = str_split(dg_wx, ":");
+  int dg_wn = len(dg_wx) - len(dg_wl[len(dg_wl) - 1]) - 1;
+} chain (string dg_wh) {
+  string dg_wr = "";
+  if(dg_wn >= 0) {
+    dg_wr = str_slice(dg_wx, 0, dg_wn);
+  }
+} return string dg_wr;
+("a.id:7: error: x"):("a.id")
+("c:/x.id:7: error: x"):("c:/x.id")

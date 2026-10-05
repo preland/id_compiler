@@ -1,0 +1,27 @@
+// `FILE:LINE` for a diagnostic's head line, from the two ways the compiler holds
+// a place: a function's name and a line, and a row of `prog`. loc_at and prog_loc
+// make the same place with `: error: ` after it, for the diagnostics that have
+// not moved to the record yet.
+
+diag_fn_loc(string dgn_fn, int dgn_ln) {
+  string dgn_file = func_file(dgn_fn);
+  string dgn_loc = dgn_file + ":" + dgn_ln;
+} return string dgn_loc;
+given edge_fixture ("fx_target", 4):("fixture.id:4")
+given edge_fixture ("nosuchfn", 9):("<stdin>:9")
+
+diag_prog_loc(int dgn_row) {
+  string dgn_loc = (import pfile)[dgn_row] + ":" + (import pline)[dgn_row];
+} return string dgn_loc;
+given edge_fixture (0):("fixture.id:7")
+given edge_fixture (1):("fixture.id:20")
+
+// The place of an AST node: the function it belongs to, and its line there
+// (tc_loc makes the same place with `: error: ` after it).
+tc_at(int dgn_node) {
+  string dgn_node_fn = node_fn(dgn_node);
+  int dgn_node_line = tc_line(dgn_node);
+  string dgn_node_loc = diag_fn_loc(dgn_node_fn, dgn_node_line);
+} return string dgn_node_loc;
+given fn_fixture ((import fixture_zero)):("<stdin>:1")
+given fn_fixture ((import fixture_fn)):("<stdin>:1")

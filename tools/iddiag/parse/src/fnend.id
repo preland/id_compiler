@@ -1,0 +1,48 @@
+// Where a function ends, for an edit that adds to it. A function declared on
+// line N ends at its return clause (the first line from N on that begins
+// `} return`) plus the test cases written under it, one per line, which begin
+// `(`, `given `, `stdin ` or `timeout `. The answer is that last line's number,
+// or 0 when no return clause follows N.
+
+dg_fn_end(string dg_gt, int dg_gn) {
+  string[] dg_gl = str_lines(dg_gt);
+  int dg_gr = dg_ret_line(dg_gl, dg_gn);
+  int dg_gk = dg_gr;
+} chain (string dg_gt, int dg_gn) {
+  while(dg_gr > 0 && dg_gk < len(dg_gl) && dg_is_case(dg_gl[dg_gk]) == 1) {
+    dg_gk = dg_gk + 1;
+  }
+} return int dg_gk;
+("f(int a) {\n} return int a;\n(1):(1)\n(2):(2)\n\ng(int b) {\n} return int b;\n", 1):(4)
+("f(int a) {\n} return int a;\n\ng(int b) {\n} return int b;\n", 1):(2)
+("f(int a) {\n  int b = a;\n", 1):(0)
+
+dg_ret_line(string[] dg_ql, int dg_qn) {
+  int dg_qi = dg_qn - 1;
+  while(dg_qi >= 0 && dg_qi < len(dg_ql) && str_starts(dg_ql[dg_qi], "} return") == 0) {
+    dg_qi = dg_qi + 1;
+  }
+  int dg_qr = 0;
+} chain (string[] dg_ql, int dg_qn) {
+  if(dg_qi >= 0 && dg_qi < len(dg_ql)) {
+    dg_qr = dg_qi + 1;
+  }
+} return int dg_qr;
+(["f() {", "} return void;"], 1):(2)
+(["f() {", "} return void;", "g() {", "} return void;"], 3):(4)
+(["f() {"], 1):(0)
+
+dg_is_case(string dg_ol) {
+  int dg_oc = 0;
+  if(str_starts(dg_ol, "(") == 1 || str_starts(dg_ol, "given ") == 1) {
+    dg_oc = 1;
+  }
+  if(str_starts(dg_ol, "stdin ") == 1 || str_starts(dg_ol, "timeout ") == 1) {
+    dg_oc = 1;
+  }
+} return int dg_oc;
+("(1):(2)"):(1)
+("given f (1):(2)"):(1)
+("stdin \"x\" (1):(2)"):(1)
+("g(int b) {"):(0)
+("// (note)"):(0)

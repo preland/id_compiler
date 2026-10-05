@@ -2598,8 +2598,11 @@ main(int argc, string[] argv) {
 EOF
 self_refuse "bin/idc: two functions differing only in an imported value are an error naming both" \
     "p.id:6: error: function 'use_b' and 'use_a' (defined at " --allow-untested --emit-c /dev/null
-self_refuse "bin/idc: ...and the error names the two imports and the fix" \
-    "p.id:1) differ only in the imported value they read ((import ib) in one, (import ia) in the other); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other" \
+self_refuse "bin/idc: ...and the error names the two imports" \
+    "p.id:1) differ only in the imported value they read ((import ib) in one, (import ia) in the other) [E0405]" \
+    --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: ...and its help names the fix" \
+    "replace the import with a parameter, call that one function from both places, and delete the other" \
     --allow-untested --emit-c /dev/null
 
 # An import AND another difference: not this pair. 3 instead of 2.

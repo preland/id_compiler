@@ -1,7 +1,9 @@
 arity_err(int id, int fn) {
   string name = (import ns1)[id];
   string msg = arity_err_msg(id, fn, name);
-  tc_err(id, msg);
+  string arity_sig = diag_sig(fn);
+} chain (int id, int fn) {
+  tc_diag(id, "E0605", msg, name, "a call passes exactly the arguments the function declares, in order, so that every parameter gets a value", "call it as " + arity_sig + ", with a value for each parameter");
 } return void;
 given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls arity_err_msg:((import argfn_call_mismatch), (import argfn_fn), "g") then (import chkfail)[0]:(1)
 given argfn_d ((import argfn_fn), (import argfn_fn)):() then calls arity_err_msg:((import argfn_fn), (import argfn_fn), "g") then (import chkfail)[0]:(1)

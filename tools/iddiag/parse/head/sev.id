@@ -1,0 +1,34 @@
+// The head line of a diagnostic is `FILE:LINE: SEVERITY: MESSAGE`, which is what
+// editors, `grep` and the tools that read idc's output already look for. These
+// two find where the severity marker sits and which severity it is.
+
+dg_sevpos(string dg_sh) {
+  int dg_se = str_find(dg_sh, ": error: ");
+  int dg_sw = str_find(dg_sh, ": warning: ");
+  int dg_sn = str_find(dg_sh, ": note: ");
+} chain (string dg_sh) {
+  int dg_sp = dg_se;
+  if(dg_sw >= 0 && (dg_sp < 0 || dg_sw < dg_sp)) {
+    dg_sp = dg_sw;
+  }
+  if(dg_sn >= 0 && (dg_sp < 0 || dg_sn < dg_sp)) {
+    dg_sp = dg_sn;
+  }
+} return int dg_sp;
+("a.id:1: error: x"):(6)
+("a.id:1: note: x: error: y"):(6)
+("a.id:1: warning: x"):(6)
+("nothing here"):(-1)
+
+dg_sev(string dg_vh) {
+  int dg_vp = dg_sevpos(dg_vh);
+  int dg_vq = str_findat(dg_vh, ":", dg_vp + 2);
+  string dg_vw = "";
+} chain (string dg_vh) {
+  if(dg_vp >= 0) {
+    dg_vw = str_slice(dg_vh, dg_vp + 2, dg_vq - dg_vp - 2);
+  }
+} return string dg_vw;
+("a.id:1: error: x"):("error")
+("a.id:1: note: x"):("note")
+("plain"):("")

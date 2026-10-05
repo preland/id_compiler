@@ -1,0 +1,10 @@
+// What a coloured run writes, spelled out independently of dg_paint, for the
+// cases of the functions that paint to compare against. An export holds it
+// because a case's literal cannot spell the ESC byte.
+
+dg_paint_ref(string dg_pr_s, string dg_pr_c) {
+  string dg_pr_e = chr(27);
+  export string dg_pr_full = dg_pr_e + "[" + dg_pr_c + "m" + dg_pr_s + dg_pr_e + "[0m";
+} return void export dg_pr_full;
+("x", "1;31"):()
+("a b", "7"):()

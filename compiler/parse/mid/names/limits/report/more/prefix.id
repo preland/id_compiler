@@ -15,12 +15,12 @@ given edge_fixture ("nosuchfn", 9):("<stdin>:9: error: ")
 // the three-function limit and this was the only slot within reach; it is an
 // imperfect fit for a file otherwise about the `file:line:` prefix.
 report_short_seg(string fname, int n, int ln) {
-  string loc_at_v = loc_at(fname, ln);
-  print(loc_at_v + "a segment of '" + fname + "' performs " + n + " actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead");
-  note_failure();
+  string seg_where = diag_fn_loc(fname, ln);
+  string seg_msg = "a segment of '" + fname + "' performs " + n + " actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions";
+  diag("E0204", seg_where, seg_msg, "", "a function has one way to continue past the action limit, so a chain is only for a segment that has run out of room (docs/SPEC.md, section 9)", "move the chain's work into this segment instead: a segment that still has room should keep writing rather than starting a new one");
 } return void;
-given edge_fixture ("fx_target", 2, 4):() then prints:("fixture.id:4: error: a segment of 'fx_target' performs 2 actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead\n")
-given edge_fixture ("nosuchfn", 1, 9):() then prints:("<stdin>:9: error: a segment of 'nosuchfn' performs 1 actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead\n")
+given edge_fixture ("fx_target", 2, 4):() then prints:("fixture.id:4: error: a segment of 'fx_target' performs 2 actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions [E0204]\n  why: a function has one way to continue past the action limit, so a chain is only for a segment that has run out of room (docs/SPEC.md, section 9)\n  help: move the chain's work into this segment instead: a segment that still has room should keep writing rather than starting a new one\n")
+given edge_fixture ("nosuchfn", 1, 9):() then prints:("<stdin>:9: error: a segment of 'nosuchfn' performs 1 actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions [E0204]\n  why: a function has one way to continue past the action limit, so a chain is only for a segment that has run out of room (docs/SPEC.md, section 9)\n  help: move the chain's work into this segment instead: a segment that still has room should keep writing rather than starting a new one\n")
 
 // What a statement's expression is a path into: its root is an (import NAME) or
 // a bare variable name, recorded as a write of that variable by `wr_fname`.

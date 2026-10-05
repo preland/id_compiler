@@ -1,0 +1,50 @@
+// An edit as the lines a person reads under a diagnostic: what to change, where,
+// and how far to trust it. Each line is led by the gutter's width in spaces and
+// a `+`, so an added line reads as one in a diff.
+
+dg_edit_text(string dg_et_e, string dg_et_p, int dg_et_on) {
+  string dg_et_o = dg_ef(dg_et_e, 1);
+  string dg_et_w = dg_appl_words(dg_ef(dg_et_e, 0));
+  string dg_et_n = dg_ef(dg_et_e, 2);
+} chain (string dg_et_e, string dg_et_p, int dg_et_on) {
+  string dg_et_d = dg_need(dg_et_e);
+  string dg_et_t = dg_unesc(dg_ef(dg_et_e, 4));
+  string dg_et_r = "";
+} chain (string dg_et_e, string dg_et_p, int dg_et_on) {
+  if(dg_et_o == "replace") {
+    dg_et_r = dg_et_p + " = edit: replace `" + dg_et_d + "` with `" + dg_et_t + "` on line " + dg_et_n + " (" + dg_et_w + ")";
+  }
+  if(dg_et_o == "after-function") {
+    dg_et_r = dg_et_p + " = edit: add after the function declared on line " + dg_et_n + " (" + dg_et_w + "):\n" + dg_plus(dg_et_t, dg_et_p);
+  }
+} return string dg_et_r;
+("machine\treplace\t4\tx\ty", " ", 0):("  = edit: replace `x` with `y` on line 4 (machine-applicable)")
+("placeholder\tafter-function\t4\t\t(A):(B)\\n(C):(D)\\n", " ", 0):("  = edit: add after the function declared on line 4 (fill in the placeholders):\n  + (A):(B)\n  + (C):(D)")
+("machine\tmystery\t4\tx\ty", " ", 0):("")
+
+dg_appl_words(string dg_aw_a) {
+  string dg_aw_r = "unspecified";
+  if(dg_aw_a == "machine") {
+    dg_aw_r = "machine-applicable";
+  }
+  if(dg_aw_a == "maybe") {
+    dg_aw_r = "check it before applying";
+  }
+} chain (string dg_aw_a) {
+  if(dg_aw_a == "placeholder") {
+    dg_aw_r = "fill in the placeholders";
+  }
+} return string dg_aw_r;
+("machine"):("machine-applicable")
+("maybe"):("check it before applying")
+("placeholder"):("fill in the placeholders")
+("other"):("unspecified")
+
+// Added text, one line to a line, each behind the gutter and a `+`.
+dg_plus(string dg_pl_t, string dg_pl_p) {
+  string[] dg_pl_l = str_lines(dg_pl_t);
+  string dg_pl_j = str_join(dg_pl_l, "\n" + dg_pl_p + " + ");
+  string dg_pl_r = dg_pl_p + " + " + dg_pl_j;
+} return string dg_pl_r;
+("a\nb\n", " "):("  + a\n  + b")
+("a", ""):(" + a")

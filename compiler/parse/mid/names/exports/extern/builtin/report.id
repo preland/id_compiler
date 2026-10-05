@@ -10,18 +10,17 @@ given init_rtc ("print"):(1)
 given init_rtc ("notabuiltin"):(0)
 
 // idc.py also offers a "did you mean the builtin 'X'?" hint here, computed
-// with Python's difflib. That is not reproduced yet, so the message is its
-// text without the hint; the builtin list, which is the part that answers the
-// question, is the same.
+// with Python's difflib. That is not reproduced yet; the builtin list, which is
+// the part that answers the question, moved from the message to the help line.
 report_nosuchfn(string name, string owner, int ln) {
-  string loc_at_v = loc_at(owner, ln);
+  string nofn_where = diag_fn_loc(owner, ln);
   string builtin_list_v = builtin_list();
-  print(loc_at_v + "no such function '" + name + "'; available builtins: " + builtin_list_v);
+  string nofn_help = "check the spelling of '" + name + "', or define it as a function; the builtins are: " + builtin_list_v + "; a function of the standard library is found only when idstd is (--std DIR or $IDSTD_HOME), and idstd/NAMES.md lists them";
 } chain (string name, string owner, int ln) {
-  note_failure();
+  diag("E0304", nofn_where, "no such function '" + name + "'", name, "a call names a function this program defines, a builtin, or a function of the standard library, and nothing by this name is any of them", nofn_help);
 } return void;
-given pushfix ("foo", "test.id", 1):() then prints:("<stdin>:1: error: no such function 'foo'; available builtins: print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint\n")
-given pushfix ("bar", "file.id", 5):() then prints:("<stdin>:5: error: no such function 'bar'; available builtins: print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint\n")
+given pushfix ("foo", "test.id", 1):() then prints:("<stdin>:1: error: no such function 'foo' [E0304]\n  at: foo\n  why: a call names a function this program defines, a builtin, or a function of the standard library, and nothing by this name is any of them\n  help: check the spelling of 'foo', or define it as a function; the builtins are: print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint; a function of the standard library is found only when idstd is (--std DIR or $IDSTD_HOME), and idstd/NAMES.md lists them\n")
+given pushfix ("bar", "file.id", 5):() then prints:("<stdin>:5: error: no such function 'bar' [E0304]\n  at: bar\n  why: a call names a function this program defines, a builtin, or a function of the standard library, and nothing by this name is any of them\n  help: check the spelling of 'bar', or define it as a function; the builtins are: print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint; a function of the standard library is found only when idstd is (--std DIR or $IDSTD_HOME), and idstd/NAMES.md lists them\n")
 
 whilefix() {
   ifwhilefix();

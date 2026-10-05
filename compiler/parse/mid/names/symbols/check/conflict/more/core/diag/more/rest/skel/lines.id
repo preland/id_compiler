@@ -1,0 +1,27 @@
+// One line of case_skeleton, and the arguments in it.
+
+case_skeleton_line(int dgn_np, int dgn_j, string dgn_rt) {
+  string dgn_args = case_skeleton_args(dgn_np, dgn_j);
+  string dgn_want = "(EXPECTED" + dgn_j + ")";
+  if(dgn_rt == "void") {
+    dgn_want = "() then CHECK:(VALUE)";
+  }
+} chain (int dgn_np, int dgn_j, string dgn_rt) {
+  string dgn_one = "(" + dgn_args + "):" + dgn_want + "\n";
+} return string dgn_one;
+(2, 1, "int"):("(ARG1_1, ARG1_2):(EXPECTED1)\n")
+(0, 2, "string"):("():(EXPECTED2)\n")
+(1, 1, "void"):("(ARG1_1):() then CHECK:(VALUE)\n")
+
+case_skeleton_args(int dgn_np, int dgn_j) {
+  string[] dgn_parts = [];
+  int dgn_p = 1;
+  while(dgn_p <= dgn_np) {
+    push(dgn_parts, "ARG" + dgn_j + "_" + dgn_p);
+    dgn_p = dgn_p + 1;
+  }
+} chain (int dgn_np, int dgn_j) {
+  string dgn_joined = str_join(dgn_parts, ", ");
+} return string dgn_joined;
+(2, 1):("ARG1_1, ARG1_2")
+(0, 1):("")

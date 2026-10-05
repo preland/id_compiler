@@ -1,0 +1,51 @@
+// An edit resolved against the file it is for: the span it replaces, as
+// [line, column, end line, end column] (1-based, the end exclusive, columns in
+// bytes), or [] when the file or the text the edit names is not there. The same
+// coordinates `idc --fix` uses (`@R|FILE|L0|C0|L1|C1|SEQ|TEXT`).
+//
+//   replace         the first whole-word NEEDLE on LINE
+//   after-function  the start of the line after the function declared on LINE
+//                   (its return clause and its cases), which a TEXT ending in a
+//                   newline is inserted at
+
+dg_span(string dg_sp_f, string dg_sp_e) {
+  string dg_sp_o = dg_ef(dg_sp_e, 1);
+  int dg_sp_n = to_int(dg_ef(dg_sp_e, 2));
+  int[] dg_sp_r = [];
+} chain (string dg_sp_f, string dg_sp_e) {
+  if(dg_sp_o == "replace") {
+    string dg_sp_m = dg_need(dg_sp_e);
+    dg_sp_r = dg_span_at(dg_sp_f, dg_sp_n, dg_sp_m);
+  }
+  if(dg_sp_o == "after-function") {
+    dg_sp_r = dg_span_end(dg_sp_f, dg_sp_n);
+  }
+} return int[] dg_sp_r;
+given fs_temp_text("a = b;\n") ((import fs_temp_path), "machine\treplace\t1\tb\tc"):([1, 5, 1, 6])
+given fs_temp_text("f() {\n} return void;\n") ((import fs_temp_path), "placeholder\tafter-function\t1\t\tx"):([3, 1, 3, 1])
+given fs_temp_text("a = b;\n") ((import fs_temp_path), "machine\treplace\t1\tzzz\tc"):([])
+given fs_temp_text("a = b;\n") ((import fs_temp_path), "machine\tmystery\t1\tb\tc"):([])
+
+dg_span_at(string dg_sa_f, int dg_sa_n, string dg_sa_m) {
+  string dg_sa_s = dg_srcline(dg_sa_f, dg_sa_n);
+  int dg_sa_c = dg_col(dg_sa_s, dg_sa_m);
+  int[] dg_sa_r = [];
+} chain (string dg_sa_f, int dg_sa_n, string dg_sa_m) {
+  if(dg_sa_c > 0) {
+    dg_sa_r = [dg_sa_n, dg_sa_c, dg_sa_n, dg_sa_c + len(dg_sa_m)];
+  }
+} return int[] dg_sa_r;
+given fs_temp_text("let x = 1;\n") ((import fs_temp_path), 1, "x"):([1, 5, 1, 6])
+given fs_temp_text("let x = 1;\n") ((import fs_temp_path), 1, "y"):([])
+
+dg_span_end(string dg_se_f, int dg_se_n) {
+  string dg_se_t = dg_slurp(dg_se_f);
+  int dg_se_e = dg_fn_end(dg_se_t, dg_se_n);
+  int[] dg_se_r = [];
+} chain (string dg_se_f, int dg_se_n) {
+  if(dg_se_e > 0) {
+    dg_se_r = [dg_se_e + 1, 1, dg_se_e + 1, 1];
+  }
+} return int[] dg_se_r;
+given fs_temp_text("f() {\n} return void;\n(0):()\n") ((import fs_temp_path), 1):([4, 1, 4, 1])
+given fs_temp_text("f() {\n") ((import fs_temp_path), 1):([])

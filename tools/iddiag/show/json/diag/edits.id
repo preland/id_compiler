@@ -1,0 +1,52 @@
+// The edits of one fix, placed in the file they are for.
+
+dg_jedits(string dg_ed_g, string dg_ed_f) {
+  string[] dg_ed_v = dg_vals(dg_ed_g, "edit");
+  string[] dg_ed_o = [];
+  int dg_ed_i = 0;
+} chain (string dg_ed_g, string dg_ed_f) {
+  while(dg_ed_i < len(dg_ed_v)) {
+    string dg_ed_j = dg_jedit(dg_ed_f, dg_ed_v[dg_ed_i]);
+    if(dg_ed_j != "") {
+      push(dg_ed_o, dg_ed_j);
+    }
+    dg_ed_i = dg_ed_i + 1;
+  }
+  string dg_ed_r = "[" + str_join(dg_ed_o, ",") + "]";
+} return string dg_ed_r;
+("  help: h\n  edit: machine\treplace\t2\tcount\tx\n  edit: machine\treplace\t2\tnothere\ty", "sample.txt"):("[{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"x\"}]")
+("  help: h", "sample.txt"):("[]")
+
+// How many of the edits could be placed.
+dg_resolved(string[] dg_rs_edits, string dg_rs_f) {
+  int dg_rs_n = 0;
+  int dg_rs_i = 0;
+  while(dg_rs_i < len(dg_rs_edits)) {
+    string dg_rs_j = dg_jedit(dg_rs_f, dg_rs_edits[dg_rs_i]);
+    if(dg_rs_j != "") {
+      dg_rs_n = dg_rs_n + 1;
+    }
+    dg_rs_i = dg_rs_i + 1;
+  }
+} return int dg_rs_n;
+(["machine\treplace\t2\tcount\tx", "machine\treplace\t2\tnothere\ty"], "sample.txt"):(1)
+([], "sample.txt"):(0)
+
+// The fix's applicability: "none" for advice with no edit, "unresolved" when an
+// edit names text that is not where it says, else what the first edit states.
+dg_japp(string dg_ap_g, string dg_ap_f) {
+  string[] dg_ap_v = dg_vals(dg_ap_g, "edit");
+  int dg_ap_n = len(dg_ap_v);
+  int dg_ap_k = dg_resolved(dg_ap_v, dg_ap_f);
+} chain (string dg_ap_g, string dg_ap_f) {
+  string dg_ap_r = "none";
+  if(dg_ap_n > 0) {
+    dg_ap_r = dg_jappl(dg_ef(dg_ap_v[0], 0));
+  }
+  if(dg_ap_k < dg_ap_n) {
+    dg_ap_r = "unresolved";
+  }
+} return string dg_ap_r;
+("  help: h", "sample.txt"):("none")
+("  help: h\n  edit: placeholder\treplace\t2\tcount\tx", "sample.txt"):("has-placeholders")
+("  help: h\n  edit: machine\treplace\t2\tnothere\tx", "sample.txt"):("unresolved")

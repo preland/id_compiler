@@ -1,0 +1,38 @@
+// An `edit:` line is five tab-separated fields (docs/DIAGNOSTICS.md, "the plain
+// format"):
+//
+//   APPLICABILITY  OP  LINE  NEEDLE  TEXT
+//
+// NEEDLE and TEXT write a backslash as `\\`, a newline as `\n` and a tab as `\t`,
+// so each edit stays on the one line a stream of diagnostics is cut by.
+
+dg_ef(string dg_ef_e, int dg_ef_k) {
+  string[] dg_ef_l = str_split(dg_ef_e, "\t");
+  string dg_ef_r = "";
+  if(dg_ef_k < len(dg_ef_l)) {
+    dg_ef_r = dg_ef_l[dg_ef_k];
+  }
+} return string dg_ef_r;
+("machine\treplace\t3\tx\ty", 1):("replace")
+("machine\treplace\t3\tx\ty", 4):("y")
+("machine\treplace", 4):("")
+
+dg_unesc(string dg_ue_s) {
+  string dg_ue_a = str_replace(dg_ue_s, "\\\\", chr(1));
+  string dg_ue_b = str_replace(dg_ue_a, "\\n", "\n");
+  string dg_ue_c = str_replace(dg_ue_b, "\\t", "\t");
+} chain (string dg_ue_s) {
+  string dg_ue_d = str_replace(dg_ue_c, chr(1), "\\");
+} return string dg_ue_d;
+("a\\nb"):("a\nb")
+("a\\tb"):("a\tb")
+("a\\\\nb"):("a\\nb")
+("plain"):("plain")
+
+// The needle and the replacement text of an edit, with the escapes undone.
+dg_need(string dg_nd_e) {
+  string dg_nd_f = dg_ef(dg_nd_e, 3);
+  string dg_nd_r = dg_unesc(dg_nd_f);
+} return string dg_nd_r;
+("machine\treplace\t3\ta\\nb\ty"):("a\nb")
+("machine\treplace\t3\tx\ty"):("x")

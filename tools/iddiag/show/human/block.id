@@ -1,0 +1,54 @@
+// One block of the stream, for a person: a diagnostic gets its head line, the
+// source line it is about with a caret run under the text it names, and then its
+// why / help / edit / related lines; any other line is returned as it was.
+//
+//   FILE:LINE: error: MESSAGE [E0123]
+//     |
+//   12 | the source line
+//     |     ^^^^
+//     = why: the reason the rule exists
+//     = help: what to do
+
+dg_human(string dg_hu_b, int dg_hu_on) {
+  string dg_hu_h = dg_head(dg_hu_b);
+  int dg_hu_n = dg_ln(dg_hu_h);
+  string dg_hu_r = dg_hu_b;
+} chain (string dg_hu_b, int dg_hu_on) {
+  if(dg_hu_n >= 0) {
+    string dg_hu_t = dg_title(dg_hu_h, dg_hu_on);
+    string dg_hu_y = dg_body(dg_hu_b, dg_hu_h, dg_hu_on);
+    dg_hu_r = dg_hu_t + dg_hu_y;
+  }
+} return string dg_hu_r;
+("not a diagnostic", 0):("not a diagnostic")
+("/nonexistent/iddiag.id:3: error: bad thing [E0123]\n  why: because\n  help: do this", 0):("/nonexistent/iddiag.id:3: error: bad thing [E0123]\n  = why: because\n  = help: do this")
+("/nonexistent/iddiag.id:3: note: only a note", 0):("/nonexistent/iddiag.id:3: note: only a note")
+
+// The head line with the severity and the code coloured; with colour off it is
+// the compiler's own line, so `grep ': error:'` finds it.
+dg_title(string dg_ti_h, int dg_ti_on) {
+  string dg_ti_s = dg_sev(dg_ti_h);
+  string dg_ti_g = dg_paint(dg_ti_s, dg_sevcol(dg_ti_s), dg_ti_on);
+  string dg_ti_c = dg_code(dg_ti_h);
+} chain (string dg_ti_h, int dg_ti_on) {
+  string dg_ti_k = "";
+  if(dg_ti_c != "") {
+    dg_ti_k = " [" + dg_paint(dg_ti_c, "1", dg_ti_on) + "]";
+  }
+  string dg_ti_r = dg_prefix(dg_ti_h) + ": " + dg_ti_g + ": " + dg_msg(dg_ti_h) + dg_ti_k;
+} return string dg_ti_r;
+("a.id:2: error: bad [E0001]", 0):("a.id:2: error: bad [E0001]")
+("a.id:2: warning: odd", 0):("a.id:2: warning: odd")
+
+dg_sevcol(string dg_sc_s) {
+  string dg_sc_r = "1;36";
+  if(dg_sc_s == "error") {
+    dg_sc_r = "1;31";
+  }
+  if(dg_sc_s == "warning") {
+    dg_sc_r = "1;33";
+  }
+} return string dg_sc_r;
+("error"):("1;31")
+("warning"):("1;33")
+("note"):("1;36")

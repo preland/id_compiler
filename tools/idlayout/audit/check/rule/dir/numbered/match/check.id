@@ -8,12 +8,12 @@
 lay_ns_push_hit(string[] names, int i, int other, string dir, string noun) {
   string numbered = dir + "/" + names[i];
   string base_path = dir + "/" + names[other];
-  string msg = lay_msg(numbered, noun + " '" + numbered + "' is a numbered copy of '" + base_path + "'; name it for what it holds");
+  string msg = lay_diag(numbered, "E0705", noun + " '" + numbered + "' is a numbered copy of '" + base_path + "'", "a numbered sibling says only that it came after the first, not what it is for", "name each for what it holds, so that the names say how they differ");
 } chain (string[] names, int i, int other, string dir, string noun) {
   push((import lay_hit_numbered), msg);
 } return void;
-given lay_reset (["chunk.id", "chunk2.id"], 1, 0, "d", "file"):() then lay_report:(1)
-given lay_reset (["pane", "pane2"], 1, 0, "d", "directory"):() then lay_report:(1)
+given lay_reset (["chunk.id", "chunk2.id"], 1, 0, "d", "file"):() then lay_report:(1) then (import lay_hit_numbered)[0]:("d/chunk2.id:1: error: file 'd/chunk2.id' is a numbered copy of 'd/chunk.id' [E0705]\n  why: a numbered sibling says only that it came after the first, not what it is for\n  help: name each for what it holds, so that the names say how they differ")
+given lay_reset (["pane", "pane2"], 1, 0, "d", "directory"):() then lay_report:(1) then (import lay_hit_numbered)[0]:("d/pane2:1: error: directory 'd/pane2' is a numbered copy of 'd/pane' [E0705]\n  why: a numbered sibling says only that it came after the first, not what it is for\n  help: name each for what it holds, so that the names say how they differ")
 
 lay_ns_check_numbered(string[] stems, string[] names, int n, int i, string base, string dir, string noun) {
   int bare_idx = lay_ns_find_bare(stems, n, base);

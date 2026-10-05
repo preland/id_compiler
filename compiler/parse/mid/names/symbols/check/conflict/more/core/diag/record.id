@@ -1,0 +1,43 @@
+// The diagnostic record: the one place a migrated diagnostic is built
+// (docs/DIAGNOSTICS.md). A diagnostic is its head line, which stays
+// `FILE:LINE: error: MESSAGE` so that editors, `grep` and the tools that read
+// idc's output keep working, plus a stable code, and then indented lines:
+//
+//   FILE:LINE: error: MESSAGE [E0123]
+//     at: TEXT        the text on that line to underline
+//     why: TEXT       why the rule exists, in one line
+//     help: TEXT      what to do about it
+//     edit: ...       a change that does it, when there is one (diag_edit)
+//     related: ...    another place that matters (diag_related)
+//
+// tools/iddiag turns that into the snippet-and-caret form for a person, or one
+// JSON object per diagnostic; nothing else reads the indented lines. LOC is
+// `FILE:LINE`, which is what every location function here already makes.
+
+diag(string dgn_code, string dgn_loc, string dgn_msg, string dgn_at, string dgn_why, string dgn_help) {
+  diag_head(dgn_code, dgn_loc, dgn_msg);
+  diag_line("at", dgn_at);
+  diag_line("why", dgn_why);
+} chain (string dgn_code, string dgn_loc, string dgn_msg, string dgn_at, string dgn_why, string dgn_help) {
+  diag_line("help", dgn_help);
+} return void;
+given env_init ("E0001", "f.id:3", "bad", "x", "because", "do this"):() then prints:("f.id:3: error: bad [E0001]\n  at: x\n  why: because\n  help: do this\n") then (import chkfail)[0]:(1)
+given env_init ("E0002", "g.id:9", "worse", "", "", ""):() then prints:("g.id:9: error: worse [E0002]\n") then (import chkfail)[0]:(1)
+
+// Printing the head line is what makes a build fail: every diagnostic raises
+// the flag the driver turns into an exit status.
+diag_head(string dgn_code, string dgn_loc, string dgn_msg) {
+  print(dgn_loc + ": error: " + dgn_msg + " [" + dgn_code + "]");
+  note_failure();
+} return void;
+given env_init ("E0001", "f.id:3", "bad"):() then prints:("f.id:3: error: bad [E0001]\n") then (import chkfail)[0]:(1)
+given env_init ("E0042", "dir/g.id:12", "worse"):() then prints:("dir/g.id:12: error: worse [E0042]\n") then (import chkfail)[0]:(1)
+
+// An indented line, left out when it has nothing to say.
+diag_line(string dgn_key, string dgn_text) {
+  if(dgn_text != "") {
+    print("  " + dgn_key + ": " + dgn_text);
+  }
+} return void;
+("why", "because"):() then prints:("  why: because\n")
+("why", ""):() then prints:("")

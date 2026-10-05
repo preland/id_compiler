@@ -1,0 +1,63 @@
+// Everything under a diagnostic's head line: the snippet, then one line for each
+// why, help, edit and related line the compiler printed.
+
+dg_body(string dg_bo_b, string dg_bo_h, int dg_bo_on) {
+  int dg_bo_n = dg_ln(dg_bo_h);
+  string dg_bo_s = dg_snippet(dg_file(dg_bo_h), dg_bo_n, dg_val(dg_bo_b, "at"), dg_bo_on);
+  string dg_bo_t = dg_notes(dg_bo_b, len("" + dg_bo_n), dg_bo_on);
+} chain (string dg_bo_b, string dg_bo_h, int dg_bo_on) {
+  string dg_bo_r = "";
+  if(dg_bo_s != "") {
+    dg_bo_r = "\n" + dg_bo_s;
+  }
+  if(dg_bo_t != "") {
+    dg_bo_r = dg_bo_r + "\n" + dg_bo_t;
+  }
+} return string dg_bo_r;
+("/nonexistent/iddiag.id:3: error: x\n  why: y", "/nonexistent/iddiag.id:3: error: x", 0):("\n  = why: y")
+("/nonexistent/iddiag.id:3: error: x", "/nonexistent/iddiag.id:3: error: x", 0):("")
+("sample.txt:2: error: x\n  at: count\n  why: y", "sample.txt:2: error: x", 0):("\n  |\n2 |   int count = 1;\n  |       ^^^^^\n  = why: y")
+
+dg_notes(string dg_nt_b, int dg_nt_w, int dg_nt_on) {
+  string[] dg_nt_l = str_split(dg_nt_b, "\n");
+  string[] dg_nt_o = [];
+  int dg_nt_i = 1;
+} chain (string dg_nt_b, int dg_nt_w, int dg_nt_on) {
+  while(dg_nt_i < len(dg_nt_l)) {
+    string dg_nt_s = dg_note(dg_nt_l[dg_nt_i], dg_nt_w, dg_nt_on);
+    if(dg_nt_s != "") {
+      push(dg_nt_o, dg_nt_s);
+    }
+    dg_nt_i = dg_nt_i + 1;
+  }
+  string dg_nt_r = str_join(dg_nt_o, "\n");
+} return string dg_nt_r;
+("h\n  why: a\n  at: x\n  help: b", 2, 0):("   = why: a\n   = help: b")
+("h", 2, 0):("")
+
+// One continuation line, as the line a person reads. An `at:` line only says
+// where the caret goes, so it has no line of its own.
+dg_note(string dg_no_l, int dg_no_w, int dg_no_on) {
+  string dg_no_k = dg_key(dg_no_l);
+  string dg_no_v = dg_kv(dg_no_l);
+  string dg_no_p = str_repeat(" ", dg_no_w) + " = ";
+} chain (string dg_no_l, int dg_no_w, int dg_no_on) {
+  string dg_no_r = "";
+  if(dg_no_k == "why") {
+    dg_no_r = dg_no_p + dg_paint("why", "1;36", dg_no_on) + ": " + dg_no_v;
+  }
+  if(dg_no_k == "help") {
+    dg_no_r = dg_no_p + dg_paint("help", "1;32", dg_no_on) + ": " + dg_no_v;
+  }
+} chain (string dg_no_l, int dg_no_w, int dg_no_on) {
+  if(dg_no_k == "related") {
+    dg_no_r = dg_no_p + dg_paint("note", "1;36", dg_no_on) + ": " + dg_msg(dg_no_v) + " (" + dg_prefix(dg_no_v) + ")";
+  }
+  if(dg_no_k == "edit") {
+    dg_no_r = dg_edit_text(dg_no_v, str_repeat(" ", dg_no_w), dg_no_on);
+  }
+} return string dg_no_r;
+("  why: a", 1, 0):("  = why: a")
+("  help: b", 1, 0):("  = help: b")
+("  related: x.id:4: note: first defined here", 1, 0):("  = note: first defined here (x.id:4)")
+("  at: x", 1, 0):("")

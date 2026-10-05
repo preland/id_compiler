@@ -1,0 +1,35 @@
+// A line of a source file, for the snippet under a diagnostic. A file that
+// cannot be read, or a line outside it, gives "": the diagnostic is then shown
+// without a snippet rather than not at all.
+
+dg_srcline(string dg_sf, int dg_sn) {
+  string dg_st = dg_slurp(dg_sf);
+  string dg_sr = dg_nth(dg_st, dg_sn);
+} return string dg_sr;
+given fs_temp_text("alpha\nbeta\n") ((import fs_temp_path), 2):("beta")
+given fs_temp_text("alpha\nbeta\n") ((import fs_temp_path), 9):("")
+("/nonexistent/iddiag-srcline", 1):("")
+
+// A source file's text, or "" for a path that is not a readable file. A layout
+// diagnostic is about a directory, and reading one as text would trap on the
+// zeros it is made of.
+dg_slurp(string dg_sl_f) {
+  string dg_sl_t = "";
+  if(fs_is_dir(dg_sl_f) == 0) {
+    dg_sl_t = fs_read_text(dg_sl_f);
+  }
+} return string dg_sl_t;
+given fs_temp_text("alpha\n") ((import fs_temp_path)):("alpha\n")
+("."):("")
+
+// Line N (counting from 1) of a text.
+dg_nth(string dg_ht, int dg_hn) {
+  string[] dg_hl = str_lines(dg_ht);
+  string dg_hr = "";
+  if(dg_hn >= 1 && dg_hn <= len(dg_hl)) {
+    dg_hr = dg_hl[dg_hn - 1];
+  }
+} return string dg_hr;
+("a\nb\nc\n", 2):("b")
+("a\nb\n", 3):("")
+("a\nb\n", 0):("")

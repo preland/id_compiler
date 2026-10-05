@@ -64,6 +64,15 @@ The one rule checked in the driver rather than in `id` is the
 3-entries-per-directory limit — it is a property of the filesystem, which `id`
 cannot see, which is also why the driver exists.
 
+**Diagnostics.** A diagnostic that has moved to the record ends its first line
+with a stable code (`... [E0501]`); the lines under it say why the rule exists
+and what to do, and an edit that does it when there is one. `--diagnostics
+human|json|plain` chooses how `bin/idc` prints them (`tools/iddiag` renders the
+snippet and the JSON; colour only on a terminal, never with `NO_COLOR`), and `idc
+--explain E0501` prints the long explanation from
+[`docs/ERRORS.md`](../docs/ERRORS.md). See
+[`docs/DIAGNOSTICS.md`](../docs/DIAGNOSTICS.md).
+
 **Memory ceiling:** every subprocess that does real compilation work —
 `idlex`, `idparse`, and the C compiler or `clang` — runs under a virtual-memory
 ceiling (`ulimit -v`), `IDC_MEM_LIMIT` megabytes, 4096 by default. This is

@@ -44,6 +44,8 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
     echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O 0|1|2|3|s] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std] [--exports list|all] [--no-js]" >&2
+    echo "       idc PATH [--diagnostics human|json|plain] [--color auto|always|never]    how diagnostics are printed (docs/DIAGNOSTICS.md)" >&2
+    echo "       idc --explain CODE                                                       the long explanation of an error code, e.g. E0501" >&2
 }
 
 PATH_ARG=""
@@ -87,6 +89,12 @@ CONSTS=()            # constant declarations from every conf.id reached
 # diagnostics, which is how idem/engine's 1,115 errors were once read as "1
 # error". Checked at every success exit below; any violation turns it into 1.
 STRUCT_VIOLATIONS=0
+# How diagnostics are printed (docs/DIAGNOSTICS.md): human is a source snippet
+# with a caret under each, json is one object per line, plain is the compiler's
+# own text; the colour is only ever on for a terminal.
+DIAG_FORMAT="${IDC_DIAGNOSTICS:-human}"
+DIAG_COLOR=auto
+EXPLAIN=""
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -132,6 +140,16 @@ while [ $# -gt 0 ]; do
                    exit 2 ;;
             esac
             shift 2 ;;
+        --diagnostics=*)
+            DIAG_FORMAT="${1#*=}"; shift ;;
+        --diagnostics)
+            DIAG_FORMAT="${2:?idc: --diagnostics needs human, json or plain}"; shift 2 ;;
+        --color=*)
+            DIAG_COLOR="${1#*=}"; shift ;;
+        --color)
+            DIAG_COLOR="${2:?idc: --color needs auto, always or never}"; shift 2 ;;
+        --explain)
+            EXPLAIN="${2:?idc: --explain needs an error code, such as E0501}"; shift 2 ;;
         --no-js)
             NO_JS=1; shift ;;
         --no-std)
@@ -173,6 +191,37 @@ done
 if [ -n "${1:-}" ] && [ -z "$PATH_ARG" ]; then
     PATH_ARG="$1"; shift
 fi
+case "$DIAG_FORMAT" in
+    human|json|plain) ;;
+    *) echo "idc: --diagnostics takes 'human' (a source snippet under each diagnostic), 'json' (one object per line) or 'plain' (the compiler's own text), not '$DIAG_FORMAT'" >&2
+       exit 2 ;;
+esac
+case "$DIAG_COLOR" in
+    auto|always|never) ;;
+    *) echo "idc: --color takes 'auto' (a terminal, and NO_COLOR unset), 'always' or 'never', not '$DIAG_COLOR'" >&2
+       exit 2 ;;
+esac
+
+# explain_code CODE -- the section of docs/ERRORS.md headed `## CODE`: what the
+# error means, why the rule exists, and an incorrect and a correct program.
+explain_code() {
+    local code doc="$ROOT/../docs/ERRORS.md" text codes
+    code=$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')
+    case "$code" in [0-9]*) code=$(printf 'E%04d' "$((10#$code))" 2>/dev/null) || code="E$code" ;; esac
+    [ -f "$doc" ] || { echo "idc: --explain reads $doc, which does not exist; the explanations are docs/ERRORS.md in the id_development checkout" >&2; return 1; }
+    text=$(awk -v c="$code" '$1 == "##" && $2 == c { p = 1; sub(/^## /, ""); print; next } /^## / { p = 0 } p' "$doc")
+    if [ -z "$text" ]; then
+        codes=$(awk '$1 == "##" && $2 ~ /^E[0-9]+$/ { printf "%s ", $2 }' "$doc")
+        echo "idc: no error code '$1'; the codes that have an explanation are: $codes" >&2
+        return 1
+    fi
+    printf '%s\n' "$text"
+}
+if [ -n "$EXPLAIN" ]; then
+    explain_code "$EXPLAIN"
+    exit $?
+fi
+
 if [ -z "$PATH_ARG" ]; then
     echo "idc: missing PATH" >&2; usage; exit 2
 fi
@@ -551,6 +600,52 @@ resolve_export_list() {
     [ "$bad" -eq 0 ] || exit 1
 }
 
+# tools/iddiag, built and cached the way idlayout is, and only when there is a
+# diagnostic to print: a build that passes never pays for it. A build that cannot
+# make it prints its diagnostics as the compiler wrote them.
+IDDIAG_CHECKED=0
+ensure_iddiag() {
+    [ "$IDDIAG_CHECKED" -eq 1 ] && return 0
+    IDDIAG_CHECKED=1
+    if stale "$IDDIAG" "$ROOT/tools/iddiag"; then
+        resolve_tool_std
+        progress bootstrap "iddiag (from tools/iddiag)"
+        IDC_BUILDING_IDDIAG=1 \
+            env -u IDC_NO_STD \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/iddiag" -o "$IDDIAG" >&2 \
+            || { progress_clear; echo "idc: failed to build tools/iddiag; printing diagnostics as the compiler wrote them" >&2; rm -f "$IDDIAG"; }
+    fi
+}
+
+# show_diag FILE... -- the diagnostics in the FILEs, printed to stderr in the
+# format --diagnostics chose. Plain is the compiler's own text, which is also what
+# every build nested inside another one (a tool, a library check, a bootstrap
+# stage) prints, since its parent prints it again.
+show_diag() {
+    local f stream color=never
+    stream=$(mktemp "${TMPDIR:-/tmp}/idc-diag.XXXXXX") || { cat "$@" >&2; return 0; }
+    for f in "$@"; do
+        if [ -s "$f" ]; then cat "$f" >> "$stream"; fi
+    done
+    if [ ! -s "$stream" ]; then
+        rm -f "$stream"
+        return 0
+    fi
+    if [ "$DIAG_FORMAT" != plain ] && [ -z "${IDC_BUILDING_CCRUN:-}${IDC_BUILDING_IDLAYOUT:-}${IDC_BUILDING_IDDIAG:-}${IDC_BUILDING_LIB_PRECHECK:-}${IDC_STAGE_LEX:-}" ]; then
+        ensure_iddiag
+    fi
+    if [ "$DIAG_FORMAT" = plain ] || [ ! -x "$IDDIAG" ] || [ -n "${IDC_BUILDING_CCRUN:-}${IDC_BUILDING_IDLAYOUT:-}${IDC_BUILDING_IDDIAG:-}${IDC_BUILDING_LIB_PRECHECK:-}${IDC_STAGE_LEX:-}" ]; then
+        cat "$stream" >&2
+    else
+        case "$DIAG_COLOR" in
+            always) color=always ;;
+            auto) if [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != dumb ] && [ -t 2 ]; then color=always; fi ;;
+        esac
+        "$IDDIAG" "--format=$DIAG_FORMAT" "--color=$color" < "$stream" >&2
+    fi
+    rm -f "$stream"
+}
+
 # run_idlayout ROOT -- every one of the seven structural checks over ROOT's
 # tree, in one call. Used at every place that used to call the seven bash
 # check_* functions: the project itself, each dependency a conf.id names,
@@ -558,9 +653,14 @@ resolve_export_list() {
 run_idlayout() {
     ensure_idlayout
     if [ -x "$IDLAYOUT" ]; then
+        local layout_out layout_rc
         progress layout "$1"
-        "$IDLAYOUT" "$1" "$BUILD_DIR" >&2
-        [ $? -ne 0 ] && STRUCT_VIOLATIONS=1
+        layout_out=$(mktemp "${TMPDIR:-/tmp}/idc-layout.XXXXXX") || layout_out=/dev/null
+        "$IDLAYOUT" "$1" "$BUILD_DIR" > "$layout_out"
+        layout_rc=$?
+        show_diag "$layout_out"
+        [ "$layout_out" = /dev/null ] || rm -f "$layout_out"
+        [ "$layout_rc" -ne 0 ] && STRUCT_VIOLATIONS=1
     fi
 }
 capped() {
@@ -681,6 +781,8 @@ CCRUN="$CACHE_DIR/ccrun"
 IDLAYOUT="$CACHE_DIR/idlayout"
 # tools/libgen -- the C header and wrappers of a --lib build (ensure_libgen).
 LIBGEN="$CACHE_DIR/libgen"
+# tools/iddiag -- prints diagnostics for a person or as JSON (show_diag).
+IDDIAG="$CACHE_DIR/iddiag"
 
 # --std, if given, points the bootstrap at the same library the build will use.
 # --no-std deliberately does NOT propagate: it says the user's program wants no
@@ -1991,7 +2093,7 @@ fix_report_rest() {
     echo "idc --fix: $nedits edit(s) in $(plural "${#FIX_ORDER[@]}" file), $1 run(s)"
     grep '^@N|' "$RAW_OUT" | awk -F'|' '{ r = $0; sub(/^@N\|[^|]*\|[^|]*\|/, "", r)
         if ($2 == "") print "not fixed: " r; else print $2 ":" $3 ": not fixed: " r }'
-    grep -v '^@' "$RAW_OUT" > "$WORK/left"
+    grep -v '^@\|^  \(at\|why\|help\|edit\|related\): ' "$RAW_OUT" > "$WORK/left"
     if [ -s "$WORK/left" ]; then
         echo "left for a person ($(wc -l < "$WORK/left") diagnostic(s)), by kind:"
         sed -E 's/^[^ ]*:[0-9]+: (error|note): //' "$WORK/left" \
@@ -2021,8 +2123,8 @@ run_fix() {
     progress_clear
     fix_report_edits
     fix_report_rest "$((round + 1))"
-    grep -v '^@' "$RAW_OUT" >&2
-    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    grep -v '^@' "$RAW_OUT" > "$WORK/left_diag"
+    show_diag "$WORK/left_diag" "$PARSE_ERR"
     [ "$parse_rc" -eq 1 ] && exit 1
     exit_ok
 }
@@ -2116,7 +2218,12 @@ if [ "$LIST_UNTESTED" -eq 1 ]; then
     SHORT_RE="^(.*):([0-9]+): error: function '([^']*)' has ([0-9]+) test case\(s\); --require-tests needs at least 2 .*"
     EXEMPT_RE="^(.*):([0-9]+): note: function '([^']*)' cannot be tested on the build host .*"
     sed -E -n -e "s/$SHORT_RE/short|\1:\2|\3|\4/p" -e "s/$EXEMPT_RE/exempt|\1:\2|\3/p" "$RAW_OUT"
-    OTHER=$(sed -E -e "/$SHORT_RE/d" -e "/$EXEMPT_RE/d" "$RAW_OUT")
+    OTHER=$(awk '
+        /^  (at|why|help|edit|related): / { if (keep) print; next }
+        /: error: function .* has [0-9]+ test case\(s\); --require-tests needs at least 2 / { keep = 0; next }
+        /: note: function .* cannot be tested on the build host / { keep = 0; next }
+        { keep = 1; print }
+    ' "$RAW_OUT")
     [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
     if [ -n "$OTHER" ]; then
         printf '%s\n' "$OTHER" >&2
@@ -2132,8 +2239,7 @@ fi
 # check, quietly accept it.
 if [ "$parse_rc" -eq 1 ]; then
     progress_clear
-    cat "$RAW_OUT" >&2
-    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    show_diag "$RAW_OUT" "$PARSE_ERR"
     rm -f "$RAW_OUT"
     exit 1
 fi
@@ -2148,8 +2254,7 @@ if [ "$CHECK" -eq 1 ]; then
         [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
         compiler_bug "idlex or idparse failed on this input"
     fi
-    [ -s "$RAW_OUT" ] && cat "$RAW_OUT" >&2
-    [ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+    show_diag "$RAW_OUT" "$PARSE_ERR"
     exit_ok
 fi
 
@@ -2165,7 +2270,7 @@ fi
 # warnings") are on stderr, separate from the notes embedded in RAW_OUT above:
 # a normal build reaches here having emitted real C, and this is the one place
 # on that path where PARSE_ERR is otherwise never read.
-[ -s "$PARSE_ERR" ] && cat "$PARSE_ERR" >&2
+show_diag "$PARSE_ERR"
 
 # ---------------------------------------------------------------------------
 # Native backends, linked by what the build reaches.

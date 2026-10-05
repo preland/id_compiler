@@ -39,7 +39,7 @@ given dupeq_fixture (1):() then calls dup_hit:[1]
 
 dup_hit(int i, int j) {
   if((import casefn)[i] == (import casefn)[j] && case_eq(i, j) == 1) {
-    report_dup_case(i);
+    report_dup_case(i, j);
   }
 } return void;
 given dupeq_fixture (0, 0):() then (import chkfail)[0]:(1)

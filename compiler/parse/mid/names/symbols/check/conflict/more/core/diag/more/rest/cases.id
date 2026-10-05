@@ -1,0 +1,10 @@
+// A diagnostic about a test case is a diagnostic at the line its first token is
+// on, the line the reader has to change (case_loc, mid/names/limits/shape/cases/
+// more/fit/more/value/more/text/loc.id, makes `FILE:LINE`).
+
+case_diag(int dgn_case, string dgn_code, string dgn_msg, string dgn_why, string dgn_help) {
+  string dgn_case_where = case_loc(dgn_case);
+  diag(dgn_code, dgn_case_where, dgn_msg, "", dgn_why, dgn_help);
+} return void;
+given case_fixture (0, "E0099", "bad", "because", "do this"):() then prints:("fixture.id:4: error: bad [E0099]\n  why: because\n  help: do this\n") then (import chkfail)[0]:(1)
+given case_fixture (0, "E0098", "worse", "", ""):() then prints:("fixture.id:4: error: worse [E0098]\n") then (import chkfail)[0]:(1)

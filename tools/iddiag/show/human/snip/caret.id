@@ -1,0 +1,48 @@
+// The source snippet under a human-rendered diagnostic: the line, and under it a
+// caret run beneath the text the diagnostic names. Colour is added only when ON
+// is 1; the driver decides that (a terminal, and NO_COLOR unset).
+
+dg_paint(string dg_pt_s, string dg_pt_c, int dg_pt_on) {
+  string dg_pt_r = dg_pt_s;
+  if(dg_pt_on == 1) {
+    dg_pt_r = chr(27) + "[" + dg_pt_c + "m" + dg_pt_s + chr(27) + "[0m";
+  }
+} return string dg_pt_r;
+("x", "1;31", 0):("x")
+given dg_paint_ref ("x", "1;31") ("x", "1;31", 1):((import dg_pr_full))
+
+// The caret line's text: spaces up to the match, then one caret per byte of it;
+// "" when the text is not on the line.
+dg_caret(string dg_cr_s, string dg_cr_m, int dg_cr_on) {
+  int dg_cr_c = dg_col(dg_cr_s, dg_cr_m);
+  string dg_cr_k = str_repeat("^", len(dg_cr_m));
+  string dg_cr_a = "";
+} chain (string dg_cr_s, string dg_cr_m, int dg_cr_on) {
+  if(dg_cr_c > 0) {
+    dg_cr_a = str_repeat(" ", dg_cr_c - 1) + dg_paint(dg_cr_k, "1;31", dg_cr_on);
+  }
+} return string dg_cr_a;
+("  int count = 1;", "count", 0):("      ^^^^^")
+("  int count = 1;", "nope", 0):("")
+
+// `   |`, the line, and the carets, each behind the gutter that the line number
+// sets the width of. A line that cannot be read gives "" and no snippet.
+dg_snippet(string dg_sn_f, int dg_sn_n, string dg_sn_m, int dg_sn_on) {
+  string dg_sn_s = dg_srcline(dg_sn_f, dg_sn_n);
+  string dg_sn_p = str_repeat(" ", len("" + dg_sn_n));
+  string dg_sn_b = dg_paint("|", "1;34", dg_sn_on);
+} chain (string dg_sn_f, int dg_sn_n, string dg_sn_m, int dg_sn_on) {
+  string dg_sn_c = dg_caret(dg_sn_s, dg_sn_m, dg_sn_on);
+  string dg_sn_l = dg_paint("" + dg_sn_n, "1;34", dg_sn_on);
+  string dg_sn_r = dg_sn_p + " " + dg_sn_b + "\n" + dg_sn_l + " " + dg_sn_b + " " + dg_sn_s;
+} chain (string dg_sn_f, int dg_sn_n, string dg_sn_m, int dg_sn_on) {
+  if(dg_sn_c != "") {
+    dg_sn_r = dg_sn_r + "\n" + dg_sn_p + " " + dg_sn_b + " " + dg_sn_c;
+  }
+  if(dg_sn_s == "") {
+    dg_sn_r = "";
+  }
+} return string dg_sn_r;
+given fs_temp_text("one\n  int count = 1;\n") ((import fs_temp_path), 2, "count", 0):("  |\n2 |   int count = 1;\n  |       ^^^^^")
+given fs_temp_text("one\ntwo\n") ((import fs_temp_path), 2, "", 0):("  |\n2 | two")
+given fs_temp_text("one\n") ((import fs_temp_path), 9, "x", 0):("")

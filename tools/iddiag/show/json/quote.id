@@ -1,0 +1,50 @@
+// The JSON pieces every diagnostic object is built from.
+
+// A string as a JSON string: quote, backslash, newline, tab and carriage return
+// escaped; every other byte, UTF-8 included, written as it is.
+dg_jq(string dg_jq_s) {
+  string dg_jq_a = str_replace(dg_jq_s, "\\", "\\\\");
+  string dg_jq_b = str_replace(dg_jq_a, "\"", "\\\"");
+  string dg_jq_c = str_replace(dg_jq_b, "\n", "\\n");
+} chain (string dg_jq_s) {
+  string dg_jq_d = str_replace(dg_jq_c, "\t", "\\t");
+  string dg_jq_e = str_replace(dg_jq_d, "\r", "\\r");
+  string dg_jq_r = "\"" + dg_jq_e + "\"";
+} return string dg_jq_r;
+("a\"b"):("\"a\\\"b\"")
+("a\\b\nc\td"):("\"a\\\\b\\nc\\td\"")
+(""):("\"\"")
+
+// The applicability an `edit:` line states, in the words a JSON consumer
+// switches on (the same four rustc's suggestions use, less "unspecified").
+dg_jappl(string dg_ja_a) {
+  string dg_ja_r = "unspecified";
+  if(dg_ja_a == "machine") {
+    dg_ja_r = "machine-applicable";
+  }
+  if(dg_ja_a == "maybe") {
+    dg_ja_r = "maybe-incorrect";
+  }
+} chain (string dg_ja_a) {
+  if(dg_ja_a == "placeholder") {
+    dg_ja_r = "has-placeholders";
+  }
+} return string dg_ja_r;
+("machine"):("machine-applicable")
+("maybe"):("maybe-incorrect")
+("placeholder"):("has-placeholders")
+("x"):("unspecified")
+
+// One edit as a JSON object with the span it replaces, or "" when the edit
+// cannot be placed in the file (see dg_span).
+dg_jedit(string dg_je_f, string dg_je_e) {
+  int[] dg_je_s = dg_span(dg_je_f, dg_je_e);
+  string dg_je_t = dg_unesc(dg_ef(dg_je_e, 4));
+  string dg_je_r = "";
+} chain (string dg_je_f, string dg_je_e) {
+  if(len(dg_je_s) == 4) {
+    dg_je_r = "{\"file\":" + dg_jq(dg_je_f) + ",\"line\":" + dg_je_s[0] + ",\"column\":" + dg_je_s[1] + ",\"end_line\":" + dg_je_s[2] + ",\"end_column\":" + dg_je_s[3] + ",\"text\":" + dg_jq(dg_je_t) + "}";
+  }
+} return string dg_je_r;
+("sample.txt", "machine\treplace\t2\tcount\ttotal\\n"):("{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"total\\n\"}")
+("sample.txt", "machine\treplace\t2\tnothere\tq"):("")

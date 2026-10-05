@@ -1,0 +1,32 @@
+// One block of the stream as one line of JSON (docs/DIAGNOSTICS.md, "the JSON
+// format"): a diagnostic is an object with its code, place, message, why, fixes
+// and related locations, and `rendered`, the text a person would have been
+// shown; any other line is {"kind":"text","text":...}.
+
+dg_json(string dg_js_b) {
+  string dg_js_h = dg_head(dg_js_b);
+  int dg_js_n = dg_ln(dg_js_h);
+  string dg_js_r = "{\"kind\":\"text\",\"text\":" + dg_jq(dg_js_b) + "}";
+} chain (string dg_js_b) {
+  if(dg_js_n >= 0) {
+    dg_js_r = dg_jdiag(dg_js_b, dg_js_h);
+  }
+} return string dg_js_r;
+("not a diagnostic"):("{\"kind\":\"text\",\"text\":\"not a diagnostic\"}")
+("sample.txt:2: error: bad [E0100]\n  at: count"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":\"E0100\",\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_column\":12,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"rendered\":\"sample.txt:2: error: bad [E0100]\\n  |\\n2 |   int count = 1;\\n  |       ^^^^^\"}")
+
+dg_jdiag(string dg_jd_b, string dg_jd_h) {
+  string dg_jd_f = dg_file(dg_jd_h);
+  string dg_jd_p = dg_jpos(dg_jd_f, dg_ln(dg_jd_h), dg_val(dg_jd_b, "at"));
+  string dg_jd_x = dg_jfixes(dg_jd_b, dg_jd_f);
+} chain (string dg_jd_b, string dg_jd_h) {
+  string dg_jd_l = dg_jrels(dg_jd_b);
+  string dg_jd_t = dg_jq(dg_human(dg_jd_b, 0));
+  string dg_jd_w = dg_jq(dg_val(dg_jd_b, "why"));
+} chain (string dg_jd_b, string dg_jd_h) {
+  string dg_jd_m = dg_jq(dg_msg(dg_jd_h));
+  string dg_jd_o = "{\"kind\":\"diagnostic\"," + dg_jhead(dg_jd_h) + "," + dg_jd_p + ",\"message\":" + dg_jd_m;
+  string dg_jd_r = dg_jd_o + ",\"why\":" + dg_jd_w + ",\"fixes\":" + dg_jd_x + ",\"related\":" + dg_jd_l + ",\"rendered\":" + dg_jd_t + "}";
+} return string dg_jd_r;
+("sample.txt:3: warning: odd\n  why: because", "sample.txt:3: warning: odd"):("{\"kind\":\"diagnostic\",\"severity\":\"warning\",\"code\":null,\"file\":\"sample.txt\",\"line\":3,\"column\":null,\"end_column\":null,\"message\":\"odd\",\"why\":\"because\",\"fixes\":[],\"related\":[],\"rendered\":\"sample.txt:3: warning: odd\\n  |\\n3 | third line\\n  = why: because\"}")
+("sample.txt:2: error: bad\n  help: h\n  edit: machine\treplace\t2\tcount\ttotal\n  related: z.id:8: note: other", "sample.txt:2: error: bad"):("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[{\"description\":\"h\",\"applicability\":\"machine-applicable\",\"edits\":[{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"total\"}]}],\"related\":[{\"file\":\"z.id\",\"line\":8,\"message\":\"other\"}],\"rendered\":\"sample.txt:2: error: bad\\n  |\\n2 |   int count = 1;\\n  = help: h\\n  = edit: replace `count` with `total` on line 2 (machine-applicable)\\n  = note: other (z.id:8)\"}")

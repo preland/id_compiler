@@ -6,9 +6,9 @@
 lay_check_samename(string dir, string self, string name) {
   if(name == self) {
     string full = dir + "/" + name;
-    string msg = lay_msg(full, "directory '" + full + "' has the same name as its parent; name it for what it holds, or merge it into the parent");
+    string msg = lay_diag(full, "E0704", "directory '" + full + "' has the same name as its parent", "a directory named like the one that holds it says nothing about why it exists", "name it for what it holds, or merge it into the parent");
     push((import lay_hit_samename), msg);
   }
 } return void;
-given lay_reset ("root", "loop", "loop"):() then lay_report:(1)
+given lay_reset ("root", "loop", "loop"):() then lay_report:(1) then (import lay_hit_samename)[0]:("root/loop:1: error: directory 'root/loop' has the same name as its parent [E0704]\n  why: a directory named like the one that holds it says nothing about why it exists\n  help: name it for what it holds, or merge it into the parent")
 given lay_reset ("root", "loop", "other"):() then lay_report:(0)

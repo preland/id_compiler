@@ -51,7 +51,7 @@ given chkret_fixture ((import fixture_fn), (import lit_a)):() then (import chkfa
 ret_err(int id, string t) {
   int i1_of_v = (import ni1)[id];
   string msg = ret_err_msg(id, t);
-  tc_err(i1_of_v, msg);
+  tc_diag(i1_of_v, "E0602", msg, "", "a function's return clause must have exactly the type the function declares, so that every caller can rely on what it gets back", "return a value of type " + (import ns2)[id] + ", convert the value before returning it, or change the declared return type of '" + (import ns1)[id] + "'");
 } return void;
-given fn_fixture ((import fixture_fn), "string"):() then prints:("<stdin>:1: error: function 'fx_target' returns int but the expression has type string\n")
-given fn_fixture ((import fixture_fn), "word"):() then prints:("<stdin>:1: error: function 'fx_target' returns int but the expression has type word\n")
+given fn_fixture ((import fixture_fn), "string"):() then prints:("<stdin>:1: error: function 'fx_target' returns int but the expression has type string [E0602]\n  why: a function's return clause must have exactly the type the function declares, so that every caller can rely on what it gets back\n  help: return a value of type int, convert the value before returning it, or change the declared return type of 'fx_target'\n")
+given fn_fixture ((import fixture_fn), "word"):() then prints:("<stdin>:1: error: function 'fx_target' returns int but the expression has type word [E0602]\n  why: a function's return clause must have exactly the type the function declares, so that every caller can rely on what it gets back\n  help: return a value of type int, convert the value before returning it, or change the declared return type of 'fx_target'\n")

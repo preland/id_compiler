@@ -120,7 +120,7 @@ main(int argc, string[] argv) {
 EOF
 typo_out=$($BIN_IDC "$TMP/typo.id" -o "$TMP/typo.bin" 2>&1)
 if printf '%s' "$typo_out" | grep -q "error: no such function 'to_flot'" \
-   && printf '%s' "$typo_out" | grep -q "available builtins:" \
+   && printf '%s' "$typo_out" | grep -q "the builtins are:" \
    && ! printf '%s' "$typo_out" | grep -q "internal error"; then
     ok "unresolved call with no backend is a 'no such function' error"
 else

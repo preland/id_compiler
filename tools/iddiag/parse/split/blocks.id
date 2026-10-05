@@ -1,0 +1,36 @@
+// A diagnostic stream, cut into blocks: one diagnostic is its head line plus
+// the indented `why:`, `help:`, `at:`, `edit:` and `related:` lines the compiler
+// printed under it (docs/DIAGNOSTICS.md, "the plain format"). Any other line is
+// a block of its own, passed through untouched.
+
+dg_blocks(string dg_bt) {
+  string[] dg_bl = str_lines(dg_bt);
+  string[] dg_bo = [];
+  int dg_bi = 0;
+} chain (string dg_bt) {
+  while(dg_bi < len(dg_bl)) {
+    dg_fold(dg_bo, dg_bl[dg_bi]);
+    dg_bi = dg_bi + 1;
+  }
+} return string[] dg_bo;
+("a.id:1: error: x\n  why: y\nplain\n"):(["a.id:1: error: x\n  why: y", "plain"])
+("a.id:1: error: x\nb.id:2: error: z\n"):(["a.id:1: error: x", "b.id:2: error: z"])
+(""):([])
+
+// A continuation line joins the block before it; with no block yet, or any
+// other kind of line, it starts a new one.
+dg_fold(string[] dg_fo, string dg_fl) {
+  string dg_fk = dg_key(dg_fl);
+  int dg_fn = len(dg_fo);
+  int dg_fc = (dg_fk != "") && (dg_fn > 0);
+} chain (string[] dg_fo, string dg_fl) {
+  if(dg_fc == 1) {
+    dg_fo[dg_fn - 1] = dg_fo[dg_fn - 1] + "\n" + dg_fl;
+  }
+  if(dg_fc == 0) {
+    push(dg_fo, dg_fl);
+  }
+} return void;
+(["h"], "  why: w"):(["h\n  why: w"])
+([], "  why: w"):(["  why: w"])
+(["h"], "plain"):(["h", "plain"])

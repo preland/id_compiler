@@ -4,16 +4,16 @@
 // build that keeps both is writing one function twice.
 
 imd_report(int imd_x, int imd_y) {
-  note_failure();
   string imd_nx = imd_name(imd_x);
   string imd_ny = imd_name(imd_y);
-} chain (int imd_x, int imd_y) {
   string imd_vs = imd_vals(imd_x, imd_y);
+} chain (int imd_x, int imd_y) {
   string imd_line = imd_msg(imd_nx, imd_ny, imd_vs);
-  print(imd_line);
+  string imd_where = dup_loc(imd_nx);
+  diag("E0405", imd_where, imd_line, imd_nx, "two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter", "replace the import with a parameter, call that one function from both places, and delete the other");
 } return void;
 given imd_pair_base given imd_fill (1, 0):() then (import chkfail)[0]:(1)
-given imd_pair_base given imd_fill (1, 0):() then prints:("<stdin>:1: error: function 'imb' and 'ima' (defined at <stdin>:1) differ only in the imported value they read ((import beta) in one, (import alpha) in the other); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other\n")
+given imd_pair_base given imd_fill (1, 0):() then prints:("<stdin>:1: error: function 'imb' and 'ima' (defined at <stdin>:1) differ only in the imported value they read ((import beta) in one, (import alpha) in the other) [E0405]\n  at: imb\n  why: two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter\n  help: replace the import with a parameter, call that one function from both places, and delete the other\n")
 
 // The `imd_tab` as one string, so a case can see what imd_fill filed.
 imd_dump() {

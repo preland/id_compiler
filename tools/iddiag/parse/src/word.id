@@ -1,0 +1,48 @@
+// Where a name sits in a source line. The compiler does not know columns (its
+// tokens carry lines only), so a diagnostic names the text to underline and this
+// finds it: the first whole-word occurrence, counted in bytes from 1, or 0 when
+// the text is not on the line.
+
+dg_col(string dg_cs, string dg_cm) {
+  int dg_cp = 0 - 1;
+  if(dg_cm != "") {
+    dg_cp = dg_find_word(dg_cs, dg_cm, 0);
+  }
+  int dg_cq = dg_cp + 1;
+} return int dg_cq;
+("  int count = 1;", "count"):(7)
+("  int count = 1;", "missing"):(0)
+("x", ""):(0)
+
+dg_find_word(string dg_ws, string dg_wm, int dg_wf) {
+  int dg_wp = str_findat(dg_ws, dg_wm, dg_wf);
+  while(dg_wp >= 0 && dg_edge(dg_ws, dg_wm, dg_wp) == 0) {
+    dg_wp = str_findat(dg_ws, dg_wm, dg_wp + 1);
+  }
+} return int dg_wp;
+("a ab a", "a", 0):(0)
+("ab a", "a", 0):(3)
+("ab", "a", 0):(-1)
+
+// Whether the match at I stands alone: a name that begins or ends in a letter or
+// digit is not allowed to be the inside of a longer one, so `x` is not found in
+// `max`.
+dg_edge(string dg_es, string dg_em, int dg_ei) {
+  int dg_el = charat(dg_es, dg_ei - 1);
+  int dg_er = charat(dg_es, dg_ei + len(dg_em));
+  int dg_ek = 1;
+} chain (string dg_es, string dg_em, int dg_ei) {
+  int dg_ef0 = charat(dg_em, 0);
+  int dg_efn = charat(dg_em, len(dg_em) - 1);
+  if(chr_is_alnum(dg_ef0) == 1 && chr_is_alnum(dg_el) == 1) {
+    dg_ek = 0;
+  }
+} chain (string dg_es, string dg_em, int dg_ei) {
+  if(chr_is_alnum(dg_efn) == 1 && chr_is_alnum(dg_er) == 1) {
+    dg_ek = 0;
+  }
+} return int dg_ek;
+("max", "x", 2):(0)
+("xs", "x", 0):(0)
+("a x b", "x", 2):(1)
+("(x)", "(x)", 0):(1)

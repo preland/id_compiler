@@ -11,7 +11,7 @@ fit_void(int i, int fn, int[] expd) {
     fit_items(i, fn, expd);
   }
 } return void;
-given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1\n")
+given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
 given print_fixture (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:[1]
 
 fit_ret(int i, int fn, int[] expd) {
@@ -23,7 +23,7 @@ fit_ret(int i, int fn, int[] expd) {
     fit_value(i, expd[0], rt);
   }
 } return void;
-given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2\n")
+given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
 given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one)):() then calls fit_value:[1]
 
 // wrap_fixture's own case (../../../../back/.../capture/pre/fixture.id)

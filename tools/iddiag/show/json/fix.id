@@ -1,0 +1,44 @@
+// A fix is a `help:` line and the `edit:` lines right after it. The compiler
+// prints a suggestion that is only advice as a lone `help:`, and one that can be
+// applied as a `help:` followed by its edits.
+
+dg_groups(string dg_gr_b) {
+  string[] dg_gr_l = str_split(dg_gr_b, "\n");
+  string[] dg_gr_o = [];
+  int dg_gr_i = 1;
+} chain (string dg_gr_b) {
+  while(dg_gr_i < len(dg_gr_l)) {
+    dg_gfold(dg_gr_o, dg_gr_l[dg_gr_i]);
+    dg_gr_i = dg_gr_i + 1;
+  }
+} return string[] dg_gr_o;
+("h\n  why: w\n  help: a\n  edit: e1\n  edit: e2\n  help: b"):(["  help: a\n  edit: e1\n  edit: e2", "  help: b"])
+("h\n  why: w"):([])
+
+dg_gfold(string[] dg_gf_o, string dg_gf_l) {
+  string dg_gf_k = dg_key(dg_gf_l);
+  int dg_gf_n = len(dg_gf_o);
+  if(dg_gf_k == "help") {
+    push(dg_gf_o, dg_gf_l);
+  }
+} chain (string[] dg_gf_o, string dg_gf_l) {
+  if(dg_gf_k == "edit" && dg_gf_n > 0) {
+    dg_gf_o[dg_gf_n - 1] = dg_gf_o[dg_gf_n - 1] + "\n" + dg_gf_l;
+  }
+} return void;
+(["  help: a"], "  edit: e"):(["  help: a\n  edit: e"])
+([], "  edit: e"):([])
+([], "  help: a"):(["  help: a"])
+
+// One fix as a JSON object: its text, whether and how far it can be applied, and
+// the edits that were placed in the file.
+dg_jfix(string dg_jf_g, string dg_jf_f) {
+  string[] dg_jf_l = str_split(dg_jf_g, "\n");
+  string dg_jf_d = dg_kv(dg_jf_l[0]);
+  string dg_jf_e = dg_jedits(dg_jf_g, dg_jf_f);
+} chain (string dg_jf_g, string dg_jf_f) {
+  string dg_jf_a = dg_japp(dg_jf_g, dg_jf_f);
+  string dg_jf_r = "{\"description\":" + dg_jq(dg_jf_d) + ",\"applicability\":" + dg_jq(dg_jf_a) + ",\"edits\":" + dg_jf_e + "}";
+} return string dg_jf_r;
+("  help: just advice", "sample.txt"):("{\"description\":\"just advice\",\"applicability\":\"none\",\"edits\":[]}")
+("  help: rename\n  edit: machine\treplace\t2\tcount\ttotal", "sample.txt"):("{\"description\":\"rename\",\"applicability\":\"machine-applicable\",\"edits\":[{\"file\":\"sample.txt\",\"line\":2,\"column\":7,\"end_line\":2,\"end_column\":12,\"text\":\"total\"}]}")

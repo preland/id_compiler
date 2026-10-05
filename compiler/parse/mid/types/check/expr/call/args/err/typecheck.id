@@ -17,7 +17,9 @@ given argfn_narrow_arg ((import argfn_fn), (import argfn_fn), 0, (import argfn_a
 arg_err(int id, int fn, int i, string t) {
   int argnode = (import nl1)[id][i];
   string msg = arg_err_msg(id, fn, i, t);
-  tc_err(argnode, msg);
+  string arg_sig = diag_sig(fn);
+} chain (int id, int fn, int i, string t) {
+  tc_diag(argnode, "E0606", msg, (import ns1)[id], "an argument must have exactly the type of its parameter; id converts nothing silently", "pass a value of the parameter's type, or convert it first; the function is " + arg_sig);
 } return void;
 given argfn_d ((import argfn_fn), (import argfn_fn), 0, "string"):() then (import chkfail)[0]:(1)
 given argfn_d ((import argfn_fn), (import argfn_fn), 0, "word"):() then calls arg_err_msg:((import argfn_fn), (import argfn_fn), 0, "word")

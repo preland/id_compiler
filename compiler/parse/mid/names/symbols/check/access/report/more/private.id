@@ -1,20 +1,20 @@
 // The global is there for the taking; the reader just has to say so.
 report_var_import(string name, string owner, int ln) {
-  string loc_at_v = loc_at(owner, ln);
+  string imp_where = diag_fn_loc(owner, ln);
   string owner_of_v = owner_of(name);
-  var_report(loc_at_v + "variable '" + name + "' belongs to function '" + owner_of_v + "'; read it with 'import " + name + "'");
+  diag("E0305", imp_where, "variable '" + name + "' belongs to function '" + owner_of_v + "'", name, "a variable is private to the function that declares it, and a function that exports one is how another reads it", "read it with `(import " + name + ")`");
 } return void;
-given regrow_d ("x", "f", 10):() then (import chkfail)[0]:(1)
-given regrow_d ("y", "g", 20):() then (import chkfail)[0]:(1)
+given regrow_d ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' belongs to function 'f' [E0305]\n  at: x\n  why: a variable is private to the function that declares it, and a function that exports one is how another reads it\n  help: read it with `(import x)`\n") then (import chkfail)[0]:(1)
+given regrow_d ("x", "g", 20):() then prints:("<stdin>:20: error: variable 'x' belongs to function 'f' [E0305]\n  at: x\n  why: a variable is private to the function that declares it, and a function that exports one is how another reads it\n  help: read it with `(import x)`\n") then (import chkfail)[0]:(1)
 
 // Nothing to import: the owner has to export it first.
 report_var_private(string name, string owner, int ln) {
-  string loc_at_v = loc_at(owner, ln);
+  string priv_where = diag_fn_loc(owner, ln);
   string owner_of_v = owner_of(name);
-  var_report(loc_at_v + "variable '" + name + "' belongs to function '" + owner_of_v + "' and is not exported; variables are only globally accessible if export/import is used");
+  diag("E0305", priv_where, "variable '" + name + "' belongs to function '" + owner_of_v + "' and is not exported", name, "a variable is private to the function that declares it; variables are only globally accessible if export/import is used", "declare it in '" + owner_of_v + "' as `export TYPE " + name + " = ...;` and read it here with `(import " + name + ")`, or pass the value in as an argument");
 } return void;
-given regrow_d ("x", "f", 10):() then (import chkfail)[0]:(1)
-given regrow_d ("y", "g", 20):() then (import chkfail)[0]:(1)
+given regrow_d ("x", "f", 10):() then prints:("<stdin>:10: error: variable 'x' belongs to function 'f' and is not exported [E0305]\n  at: x\n  why: a variable is private to the function that declares it; variables are only globally accessible if export/import is used\n  help: declare it in 'f' as `export TYPE x = ...;` and read it here with `(import x)`, or pass the value in as an argument\n") then (import chkfail)[0]:(1)
+given regrow_d ("x", "g", 20):() then prints:("<stdin>:20: error: variable 'x' belongs to function 'f' and is not exported [E0305]\n  at: x\n  why: a variable is private to the function that declares it; variables are only globally accessible if export/import is used\n  help: declare it in 'f' as `export TYPE x = ...;` and read it here with `(import x)`, or pass the value in as an argument\n") then (import chkfail)[0]:(1)
 
 report_bad_import(string name, string owner, int ln) {
   if(find_str((import dvname), name) < 0) {

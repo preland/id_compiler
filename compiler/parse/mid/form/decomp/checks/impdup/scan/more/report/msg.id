@@ -7,12 +7,11 @@ given lz_o (0):("dup5")
 given lz_o (1):("dup9")
 
 imd_msg(string imd_nx, string imd_ny, string imd_vs) {
-  string imd_loc = dup_loc(imd_nx);
   string imd_def_y = imd_def(imd_ny);
-  string ret_s = imd_loc + "function '" + imd_nx + "' and " + imd_def_y + " differ only in the imported value they read (" + imd_vs + "); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other";
+  string ret_s = "function '" + imd_nx + "' and " + imd_def_y + " differ only in the imported value they read (" + imd_vs + ")";
 } return string ret_s;
-given env_init ("pb", "pa", "V"):("<stdin>:1: error: function 'pb' and 'pa' (defined at <stdin>:1) differ only in the imported value they read (V); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other")
-given edge_fixture ("fx_target", "nosuchfn", "W"):("fixture.id:7: error: function 'fx_target' and 'nosuchfn' (defined at <stdin>:1) differ only in the imported value they read (W); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other")
+given env_init ("pb", "pa", "V"):("function 'pb' and 'pa' (defined at <stdin>:1) differ only in the imported value they read (V)")
+given edge_fixture ("fx_target", "nosuchfn", "W"):("function 'fx_target' and 'nosuchfn' (defined at <stdin>:1) differ only in the imported value they read (W)")
 
 imd_def(string imd_nm) {
   int imd_ln = func_line(imd_nm);

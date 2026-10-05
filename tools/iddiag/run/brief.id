@@ -1,0 +1,49 @@
+// A code that repeats. A build with a hundred functions short of test cases would
+// print the same why and help a hundred times, so only the first diagnostic of a
+// code is shown whole; the rest keep their head line, snippet and edits, and say
+// that their reasoning is the first one's. (The JSON form is never shortened: each
+// object stands alone.)
+
+dg_show_human(string dg_sh_b, int dg_sh_on, string[] dg_sh_seen) {
+  string dg_sh_c = dg_code(dg_head(dg_sh_b));
+  string dg_sh_s = dg_sh_b;
+  int dg_sh_again = dg_sh_c != "" && lst_str_index(dg_sh_seen, dg_sh_c) >= 0;
+} chain (string dg_sh_b, int dg_sh_on, string[] dg_sh_seen) {
+  if(dg_sh_again == 1) {
+    dg_sh_s = dg_brief(dg_sh_b, dg_sh_c);
+  }
+  if(dg_sh_c != "" && dg_sh_again == 0) {
+    push(dg_sh_seen, dg_sh_c);
+  }
+  string dg_sh_r = dg_human(dg_sh_s, dg_sh_on);
+} return string dg_sh_r;
+("sample.txt:1: error: x [E0001]\n  why: w\n  help: h", 0, ["E0001"]):("sample.txt:1: error: x [E0001]\n  |\n1 | first line\n  = why: (as for the first [E0001] above)")
+("sample.txt:1: error: x [E0001]\n  why: w\n  help: h", 0, []):("sample.txt:1: error: x [E0001]\n  |\n1 | first line\n  = why: w\n  = help: h")
+("sample.txt:1: error: x\n  why: w", 0, ["E0001"]):("sample.txt:1: error: x\n  |\n1 | first line\n  = why: w")
+
+// The block without its why and help: the reasoning and the advice that the first
+// diagnostic of the code already gave, in place of which one line says so.
+dg_brief(string dg_br_b, string dg_br_c) {
+  string[] dg_br_l = str_split(dg_br_b, "\n");
+  string[] dg_br_o = [dg_br_l[0]];
+  int dg_br_i = 1;
+} chain (string dg_br_b, string dg_br_c) {
+  while(dg_br_i < len(dg_br_l)) {
+    dg_keep(dg_br_o, dg_br_l[dg_br_i]);
+    dg_br_i = dg_br_i + 1;
+  }
+  push(dg_br_o, "  why: (as for the first [" + dg_br_c + "] above)");
+  string dg_br_r = str_join(dg_br_o, "\n");
+} return string dg_br_r;
+("h\n  why: w\n  help: x\n  at: a", "E0001"):("h\n  at: a\n  why: (as for the first [E0001] above)")
+("h\n  edit: e", "E0002"):("h\n  edit: e\n  why: (as for the first [E0002] above)")
+
+dg_keep(string[] dg_kp_o, string dg_kp_l) {
+  string dg_kp_k = dg_key(dg_kp_l);
+  if(dg_kp_k != "why" && dg_kp_k != "help") {
+    push(dg_kp_o, dg_kp_l);
+  }
+} return void;
+([], "  why: w"):([])
+(["h"], "  at: a"):(["h", "  at: a"])
+(["h"], "  help: x"):(["h"])

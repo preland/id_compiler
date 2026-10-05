@@ -1,0 +1,28 @@
+// The first fields of a diagnostic's JSON object: what it is and where.
+
+// The span of the text a diagnostic underlines, or nulls when the compiler named
+// none or it is not on the line. Columns count bytes from 1; the end is
+// exclusive.
+dg_jpos(string dg_jp_f, int dg_jp_n, string dg_jp_m) {
+  string dg_jp_s = dg_srcline(dg_jp_f, dg_jp_n);
+  int dg_jp_c = dg_col(dg_jp_s, dg_jp_m);
+  string dg_jp_r = "\"column\":null,\"end_column\":null";
+} chain (string dg_jp_f, int dg_jp_n, string dg_jp_m) {
+  if(dg_jp_c > 0) {
+    dg_jp_r = "\"column\":" + dg_jp_c + ",\"end_column\":" + (dg_jp_c + len(dg_jp_m));
+  }
+} return string dg_jp_r;
+("sample.txt", 2, "count"):("\"column\":7,\"end_column\":12")
+("sample.txt", 2, ""):("\"column\":null,\"end_column\":null")
+
+dg_jhead(string dg_jh_h) {
+  string dg_jh_c = dg_code(dg_jh_h);
+  string dg_jh_k = "null";
+  if(dg_jh_c != "") {
+    dg_jh_k = dg_jq(dg_jh_c);
+  }
+} chain (string dg_jh_h) {
+  string dg_jh_r = "\"severity\":" + dg_jq(dg_sev(dg_jh_h)) + ",\"code\":" + dg_jh_k + ",\"file\":" + dg_jq(dg_file(dg_jh_h)) + ",\"line\":" + dg_ln(dg_jh_h);
+} return string dg_jh_r;
+("a.id:5: error: x [E0100]"):("\"severity\":\"error\",\"code\":\"E0100\",\"file\":\"a.id\",\"line\":5")
+("a.id:5: note: x"):("\"severity\":\"note\",\"code\":null,\"file\":\"a.id\",\"line\":5")

@@ -530,7 +530,8 @@ wait 2>/dev/null
 chk="$TMP/chk"; mkdir -p "$chk"
 printf 'import "%s"\n' "$(be_abs fs)" > "$chk/conf.id"
 printf 'main(int argc, string[] argv) {\n  int h = fs_opne("x", "r");\n  print(h);\n} return int 0;\n' > "$chk/main.id"
-if $BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1 | grep -qF "no such function 'fs_opne'; available builtins:"; then
+chk_out=$($BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1)
+if printf '%s' "$chk_out" | grep -qF "no such function 'fs_opne' [E0304]" && printf '%s' "$chk_out" | grep -qF "the builtins are:"; then
     ok "a typo'd backend call is 'no such function' (bin/idc)"
 else
     bad "a typo'd backend call is 'no such function' (bin/idc)"

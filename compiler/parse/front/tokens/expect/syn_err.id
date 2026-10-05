@@ -19,11 +19,11 @@ given mk_two_toks ([1], "other msg"):() then prints:("<stdin>:1: error: other ms
 expect_text(int[] pos, string want) {
   if(cur_text(pos) != want) {
     string cur_text_v = cur_text(pos);
-    syn_err(pos, "expected '" + want + "', found '" + cur_text_v + "'");
+    syn_expected(pos, want, cur_text_v);
   }
 } return void;
 given mk_two_toks ([0], "="):() then (import chkfail)[0]:(0)
-given mk_two_toks ([1], "="):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: expected '=', found 'return'\n")
+given mk_two_toks ([1], "="):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
 
 // The rest of push_tok (../load/more/push_tok.id, at its three-function cap):
 // a `tcc KEY` line is not a token either -- it is a type-check key bin/idc

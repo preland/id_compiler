@@ -551,6 +551,7 @@ int id_hmap_get(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, char
 int id_hmap_has(IdList* idstd_keys, IdList* idstd_used, char* idstd_key);
 void id_hmap_put(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt, char* idstd_key, int idstd_val);
 void id_hset_add(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt, char* idstd_key);
+char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to);
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s);
 int id_lst_get_or(IdList* idstd_xs, int idstd_i, int idstd_lg_d);
@@ -2354,6 +2355,7 @@ void id_report_dup(int i, int j);
 char* id_fname_at(int i);
 char* id_dup_loc(char* name_i);
 char* id_dup_tail(int j);
+char* id_dup_loc_of(int j);
 int id_cw_arr_lit(int id);
 int id_cw_arr_lit2(IdList* els);
 int id_cw_arr_elem_lit(int e);
@@ -2564,7 +2566,7 @@ void id_reqtests_init(void);
 int id_wr_closure(char* wc_src, char* wc_nm, char* wc_owner);
 void id_chk_own_import(int i, int e);
 void id_report_cases(int i, int n);
-void id_report_dup_case(int i);
+void id_report_dup_case(int i, int j);
 void id_wr_ready(void);
 void id_ut_case_val(int ci, int e);
 int id_fn_import_use(int fnode, char* imp_nm);
@@ -2598,7 +2600,7 @@ void id_ut_seed_self(void);
 void id_ut_self_at(int i);
 void id_ut_named(int ci, char* lead, char* name);
 void id_cases_report(char* report_loc, char* report_fn_name, int n);
-void id_dup_case_report(char* dup_file, int i);
+void id_dup_case_report(char* dup_file, int i, int j);
 void id_sym_func(int id);
 void id_add_var(char* name, char* type, int unit);
 void id_add_func(char* name, char* ret, int id);
@@ -2656,6 +2658,26 @@ void id_acc_if(int id, char* owner);
 void id_reg_report(char* name, char* type, char* owner, int exported, int ln, int unit);
 void id_reg_report2(char* name, char* type, char* owner, int exported, int ln, int unit);
 void id_reg_report3(char* name, char* type, char* owner, int exported, int ln, int unit);
+void id_diag_edit(char* dgn_appl, char* dgn_op, int dgn_at_line, char* dgn_needle, char* dgn_text);
+char* id_diag_esc(char* dgn_raw);
+void id_diag_related(char* dgn_rel_loc, char* dgn_rel_msg);
+char* id_diag_fn_loc(char* dgn_fn, int dgn_ln);
+char* id_diag_prog_loc(int dgn_row);
+char* id_tc_at(int dgn_node);
+void id_case_diag(int dgn_case, char* dgn_code, char* dgn_msg, char* dgn_why, char* dgn_help);
+char* id_case_skeleton_line(int dgn_np, int dgn_j, char* dgn_rt);
+char* id_case_skeleton_args(int dgn_np, int dgn_j);
+void id_case_skeleton_edit(int dgn_row, int dgn_have);
+char* id_case_skeleton(int dgn_np, int dgn_need, char* dgn_rt);
+void id_tc_diag(int dgn_node, char* dgn_code, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help);
+char* id_diag_sig(int dgn_sigfn);
+char* id_diag_param(int dgn_sigfn, int dgn_k);
+void id_syn_diag(IdList* pos, char* dgn_code, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help);
+void id_syn_expected(IdList* pos, char* dgn_want, char* dgn_found);
+void id_syn_unexpected(IdList* pos, char* dgn_tok, char* dgn_umsg);
+void id_diag(char* dgn_code, char* dgn_loc, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help);
+void id_diag_head(char* dgn_code, char* dgn_loc, char* dgn_msg);
+void id_diag_line(char* dgn_key, char* dgn_text);
 char* id_owner_at(int i, char* name, char* s);
 char* id_first_type(char* name, int unit);
 char* id_first_type_at(int i, char* name, char* t, int unit);
@@ -3525,6 +3547,14 @@ void id_hmap_put(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdL
 void id_hset_add(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt, char* idstd_key) {
     id_hmap_put(idstd_keys, idstd_vals, idstd_used, idstd_cnt, idstd_key, 0);
     return;
+}
+
+char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to) {
+    IdList* idstd_ln_parts;
+    char* idstd_ln_r;
+    idstd_ln_parts = id_str_split(idstd_ln_s, idstd_ln_from);
+    idstd_ln_r = id_str_join(idstd_ln_parts, idstd_ln_to);
+    return idstd_ln_r;
 }
 
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
@@ -16750,7 +16780,7 @@ void id_expect_text(IdList* pos, char* want) {
     char* cur_text_v;
     if ((strcmp(id_cur_text(pos), want) != 0)) {
         cur_text_v = id_cur_text(pos);
-        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat(ID_S("expected '"), want), ID_S("', found '")), cur_text_v), ID_S("'")));
+        id_syn_expected(pos, want, cur_text_v);
     }
     return;
 }
@@ -16770,7 +16800,7 @@ void id_no_op_atom(IdList* pos) {
     if ((strcmp(id_cur_kind(pos), ID_S("op")) == 0)) {
         cur_text_v = id_cur_text(pos);
         unexpected_msg_v = id_unexpected_msg(cur_text_v);
-        id_syn_err(pos, unexpected_msg_v);
+        id_syn_unexpected(pos, cur_text_v, unexpected_msg_v);
     }
     return;
 }
@@ -17830,12 +17860,13 @@ void id_imd_report(int imd_x, int imd_y) {
     char* imd_ny;
     char* imd_vs;
     char* imd_line;
-    id_note_failure();
+    char* imd_where;
     imd_nx = id_imd_name(imd_x);
     imd_ny = id_imd_name(imd_y);
     imd_vs = id_imd_vals(imd_x, imd_y);
     imd_line = id_imd_msg(imd_nx, imd_ny, imd_vs);
-    id_print(imd_line);
+    imd_where = id_dup_loc(imd_nx);
+    id_diag(ID_S("E0405"), imd_where, imd_line, imd_nx, ID_S("two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter"), ID_S("replace the import with a parameter, call that one function from both places, and delete the other"));
     return;
 }
 
@@ -17847,12 +17878,10 @@ IdList* idsq_7;
 }
 
 char* id_imd_msg(char* imd_nx, char* imd_ny, char* imd_vs) {
-    char* imd_loc;
     char* imd_def_y;
     char* ret_s;
-    imd_loc = id_dup_loc(imd_nx);
     imd_def_y = id_imd_def(imd_ny);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(imd_loc, ID_S("function '")), imd_nx), ID_S("' and ")), imd_def_y), ID_S(" differ only in the imported value they read (")), imd_vs), ID_S("); parameterise one function and pass the value in -- replace the import with a parameter, call that one function from both places, and delete the other"));
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("function '"), imd_nx), ID_S("' and ")), imd_def_y), ID_S(" differ only in the imported value they read (")), imd_vs), ID_S(")"));
     return ret_s;
 }
 
@@ -21220,15 +21249,15 @@ IdList* idsq_62;
 }
 
 void id_dupfn_err(int i, int j) {
-    char* prog_loc_v;
-    char* s1_of_v;
-    prog_loc_v = id_prog_loc(i);
-IdList* idsq_32;
-    s1_of_v = (idsq_32 = ns1, (char*)(intptr_t)(id_list_get(idsq_32, (int)(id_list_get(prog, i)))));
-IdList* idsq_18;
-char* idsq_16;
-    (idsq_18 = pfile, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, j)), id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(prog_loc_v, ID_S("function '")), s1_of_v), ID_S("' already defined at ")), idsq_16), ID_S(":")), id_str_of_int((int)(id_list_get(pline, j))))));
-    id_note_failure();
+    char* dupfn_where;
+    char* dupfn_first;
+    char* dupfn_name;
+    dupfn_where = id_diag_prog_loc(i);
+    dupfn_first = id_diag_prog_loc(j);
+IdList* idsq_33;
+    dupfn_name = (idsq_33 = ns1, (char*)(intptr_t)(id_list_get(idsq_33, (int)(id_list_get(prog, i)))));
+    id_diag(ID_S("E0401"), dupfn_where, id_concat(id_concat(id_concat(ID_S("function '"), dupfn_name), ID_S("' already defined at ")), dupfn_first), dupfn_name, ID_S("a function is called by its name alone, so a name can mean only one function"), ID_S("rename this function so each name is its own; if the two do the same thing, keep one and call it from both places"));
+    id_diag_related(dupfn_first, id_concat(id_concat(ID_S("the first definition of '"), dupfn_name), ID_S("'")));
     return;
 }
 
@@ -21296,9 +21325,11 @@ void id_cw_report(int id, char* val) {
 }
 
 void id_cw_say(char* name, char* rt, char* lit) {
-    char* loc_at_v;
-    loc_at_v = id_dup_loc(name);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("'")), name), ID_S("' only returns the constant ")), lit), ID_S("; declare it in conf.id as '")), rt), ID_S(" ")), name), ID_S(" = ")), lit), ID_S(";' and read it with (import ")), name), ID_S(")")));
+    char* cw_where;
+    char* cw_msg;
+    cw_where = id_dup_loc(name);
+    cw_msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), name), ID_S("' only returns the constant ")), lit), ID_S("; declare it in conf.id as '")), rt), ID_S(" ")), name), ID_S(" = ")), lit), ID_S(";' and read it with (import ")), name), ID_S(")"));
+    id_diag(ID_S("E0403"), cw_where, cw_msg, name, ID_S("a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)"), ID_S(""));
     return;
 }
 
@@ -21416,13 +21447,15 @@ char* idsq_9;
 
 void id_report_dup(int i, int j) {
     char* name_i;
-    char* loc_at_v;
+    char* dup_where;
     char* tail_v;
-    id_note_failure();
+    char* dup_there;
     name_i = id_fname_at(i);
-    loc_at_v = id_dup_loc(name_i);
+    dup_where = id_dup_loc(name_i);
     tail_v = id_dup_tail(j);
-    id_print(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("function '")), name_i), ID_S("' has the same signature and logic as ")), tail_v));
+    dup_there = id_dup_loc_of(j);
+    id_diag(ID_S("E0402"), dup_where, id_concat(id_concat(id_concat(ID_S("function '"), name_i), ID_S("' has the same signature and logic as ")), tail_v), name_i, ID_S("two functions with the same signature and the same logic are one function written twice, and every later fix would have to be made twice"), ID_S("delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic"));
+    id_diag_related(dup_there, ID_S("the function this one repeats"));
     return;
 }
 
@@ -21437,10 +21470,10 @@ IdList* idsq_7;
 
 char* id_dup_loc(char* name_i) {
     int func_line_v;
-    char* loc_at_v;
+    char* loc_v;
     func_line_v = id_func_line(name_i);
-    loc_at_v = id_loc_at(name_i, func_line_v);
-    return loc_at_v;
+    loc_v = id_diag_fn_loc(name_i, func_line_v);
+    return loc_v;
 }
 
 char* id_dup_tail(int j) {
@@ -21451,8 +21484,18 @@ char* id_dup_tail(int j) {
     name_j = id_fname_at(j);
     func_file_v = id_func_file(name_j);
     func_line_v2 = id_func_line(name_j);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), name_j), ID_S("' (defined at ")), func_file_v), ID_S(":")), id_str_of_int(func_line_v2)), ID_S("); functions must be unique -- remove one and call it from both places, or make them genuinely differ"));
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), name_j), ID_S("' (defined at ")), func_file_v), ID_S(":")), id_str_of_int(func_line_v2)), ID_S(")"));
     return ret_s;
+}
+
+char* id_dup_loc_of(int j) {
+    char* name_j;
+    int line_j;
+    char* loc_j;
+    name_j = id_fname_at(j);
+    line_j = id_func_line(name_j);
+    loc_j = id_diag_fn_loc(name_j, line_j);
+    return loc_j;
 }
 
 int id_cw_arr_lit(int id) {
@@ -21786,12 +21829,13 @@ int id_is_builtin(char* name) {
 }
 
 void id_report_nosuchfn(char* name, char* owner, int ln) {
-    char* loc_at_v;
+    char* nofn_where;
     char* builtin_list_v;
-    loc_at_v = id_loc_at(owner, ln);
+    char* nofn_help;
+    nofn_where = id_diag_fn_loc(owner, ln);
     builtin_list_v = id_builtin_list();
-    id_print(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("no such function '")), name), ID_S("'; available builtins: ")), builtin_list_v));
-    id_note_failure();
+    nofn_help = id_concat(id_concat(id_concat(id_concat(ID_S("check the spelling of '"), name), ID_S("', or define it as a function; the builtins are: ")), builtin_list_v), ID_S("; a function of the standard library is found only when idstd is (--std DIR or $IDSTD_HOME), and idstd/NAMES.md lists them"));
+    id_diag(ID_S("E0304"), nofn_where, id_concat(id_concat(ID_S("no such function '"), name), ID_S("'")), name, ID_S("a call names a function this program defines, a builtin, or a function of the standard library, and nothing by this name is any of them"), nofn_help);
     return;
 }
 
@@ -22228,18 +22272,20 @@ void id_check_plain_else(IdList* els, int depth, char* fname, int ln) {
 }
 
 void id_report_actions(char* fname, int n, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(fname, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("a block in '")), fname), ID_S("' performs ")), id_str_of_int(n)), ID_S(" actions; the limit is 3 (each statement, if, else, and while is one action; return is free) -- continue the function into a chain: `} chain (same parameters) {`")));
-    id_note_failure();
+    char* at_where;
+    char* at_msg;
+    at_where = id_diag_fn_loc(fname, ln);
+    at_msg = id_concat(id_concat(id_concat(id_concat(ID_S("a block in '"), fname), ID_S("' performs ")), id_str_of_int(n)), ID_S(" actions; the limit is 3 (each statement, if, else, and while is one action; return is free)"));
+    id_diag(ID_S("E0201"), at_where, at_msg, ID_S(""), ID_S("a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does"), ID_S("continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function"));
     return;
 }
 
 void id_report_deep(char* fname, int depth, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(fname, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("code in '")), fname), ID_S("' is nested too deeply (")), id_str_of_int(depth)), ID_S(" levels); the maximum is 2. Split the inner block into its own function")));
-    id_note_failure();
+    char* deep_where;
+    char* deep_msg;
+    deep_where = id_diag_fn_loc(fname, ln);
+    deep_msg = id_concat(id_concat(id_concat(id_concat(ID_S("code in '"), fname), ID_S("' is nested too deeply (")), id_str_of_int(depth)), ID_S(" levels); the maximum is 2"));
+    id_diag(ID_S("E0202"), deep_where, deep_msg, ID_S(""), ID_S("three open conditions or loops at once is more than a reader can hold in mind, so the language caps nesting at two levels"), ID_S("move the innermost block into its own function and call it from here; the new function gets its own two levels and its own test cases"));
     return;
 }
 
@@ -22296,8 +22342,11 @@ int id_first_of_file(int i) {
 }
 
 void id_report_funcs(char* name, int n) {
-    id_note_failure();
-    id_print(id_concat(id_concat(id_concat(name, ID_S(":1: error: too many functions in this file (")), id_str_of_int(n)), ID_S("); the limit is 3 per file")));
+    char* funcs_msg;
+    char* funcs_help;
+    funcs_msg = id_concat(id_concat(ID_S("too many functions in this file ("), id_str_of_int(n)), ID_S("); the limit is 3 per file"));
+    funcs_help = id_concat(id_concat(ID_S("move "), id_str_of_int((n - 3))), ID_S(" of its functions into another file (a directory may hold at most 3 files and directories, so the file may need a directory of its own; `idc/.idc-cache/idlayout --room PROJECT_ROOT DIR` lists the nearest places with room)"));
+    id_diag(ID_S("E0203"), id_concat(name, ID_S(":1")), funcs_msg, ID_S(""), ID_S("a file holds at most three functions so that the tree, not the file, carries the structure, and no file grows into a place where unrelated code gathers (docs/PROJECT.md)"), funcs_help);
     return;
 }
 
@@ -22390,10 +22439,11 @@ char* id_loc_at(char* fname, int ln) {
 }
 
 void id_report_short_seg(char* fname, int n, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(fname, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("a segment of '")), fname), ID_S("' performs ")), id_str_of_int(n)), ID_S(" actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions -- move the chain's work into this segment instead")));
-    id_note_failure();
+    char* seg_where;
+    char* seg_msg;
+    seg_where = id_diag_fn_loc(fname, ln);
+    seg_msg = id_concat(id_concat(id_concat(id_concat(ID_S("a segment of '"), fname), ID_S("' performs ")), id_str_of_int(n)), ID_S(" actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions"));
+    id_diag(ID_S("E0204"), seg_where, seg_msg, ID_S(""), ID_S("a function has one way to continue past the action limit, so a chain is only for a segment that has run out of room (docs/SPEC.md, section 9)"), ID_S("move the chain's work into this segment instead: a segment that still has room should keep writing rather than starting a new one"));
     return;
 }
 
@@ -23294,10 +23344,10 @@ void id_dup_scan(int i) {
 }
 
 void id_dup_hit(int i, int j) {
-IdList* idsq_19;
-int idsq_17;
-    if (((idsq_19 = casefn, idsq_17 = (int)(id_list_get(idsq_19, i)), (idsq_17 == (int)(id_list_get(casefn, j)))) && (id_case_eq(i, j) == 1))) {
-        id_report_dup_case(i);
+IdList* idsq_20;
+int idsq_18;
+    if (((idsq_20 = casefn, idsq_18 = (int)(id_list_get(idsq_20, i)), (idsq_18 == (int)(id_list_get(casefn, j)))) && (id_case_eq(i, j) == 1))) {
+        id_report_dup_case(i, j);
     }
     return;
 }
@@ -23433,18 +23483,22 @@ int idsq_20;
 void id_case_arity_err(int i, int fn, int na) {
     char* f1;
     int np;
+    char* arity_case_sig;
     f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
     np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn)));
-    id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case passes "), id_str_of_int(na)), ID_S(" argument(s) to '")), f1), ID_S("', which takes ")), id_str_of_int(np)));
+    arity_case_sig = id_diag_sig(fn);
+    id_case_diag(i, ID_S("E0503"), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case passes "), id_str_of_int(na)), ID_S(" argument(s) to '")), f1), ID_S("', which takes ")), id_str_of_int(np)), ID_S("a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares"), id_concat(ID_S("write one literal per parameter in the case's first tuple: "), arity_case_sig));
     return;
 }
 
 void id_case_void_err(int i, int fn, int ne) {
-    char* f1;
+    char* void_case_sig;
     int np;
-    f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
+    char* f1;
+    void_case_sig = id_diag_sig(fn);
     np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn)));
-    id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case expects "), id_str_of_int(ne)), ID_S(" argument(s) after the call, but '")), f1), ID_S("' takes ")), id_str_of_int(np)));
+    f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
+    id_case_diag(i, ID_S("E0504"), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case expects "), id_str_of_int(ne)), ID_S(" argument(s) after the call, but '")), f1), ID_S("' takes ")), id_str_of_int(np)), ID_S("the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has"), id_concat(id_concat(ID_S("list at most the parameters of "), void_case_sig), ID_S(" in the expected tuple, or none at all")));
     return;
 }
 
@@ -23453,7 +23507,7 @@ void id_case_ret_err(int i, int fn, int ne) {
     char* rt;
     f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
     rt = (char*)(intptr_t)(id_list_get(ns2, fn));
-    id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), f1), ID_S("' returns ")), rt), ID_S(", so its case expects exactly one value, not ")), id_str_of_int(ne)));
+    id_case_diag(i, ID_S("E0505"), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), f1), ID_S("' returns ")), rt), ID_S(", so its case expects exactly one value, not ")), id_str_of_int(ne)), ID_S("a function that returns a value is checked against that one value, so the expected tuple holds exactly one"), id_concat(id_concat(ID_S("write the expected tuple as (VALUE), one "), rt), ID_S(" literal")));
     return;
 }
 
@@ -23765,20 +23819,21 @@ char* idsq_26;
 void id_report_cases(int i, int n) {
     char* prog_loc_v;
     char* s1_of_v;
-    prog_loc_v = id_prog_loc(i);
-IdList* idsq_12;
-    s1_of_v = (idsq_12 = ns1, (char*)(intptr_t)(id_list_get(idsq_12, (int)(id_list_get(prog, i)))));
+    prog_loc_v = id_diag_prog_loc(i);
+IdList* idsq_20;
+    s1_of_v = (idsq_20 = ns1, (char*)(intptr_t)(id_list_get(idsq_20, (int)(id_list_get(prog, i)))));
     id_cases_report(prog_loc_v, s1_of_v, n);
+    id_case_skeleton_edit(i, n);
     return;
 }
 
-void id_report_dup_case(int i) {
+void id_report_dup_case(int i, int j) {
     char* s1_of_v;
     char* func_file_v;
-IdList* idsq_15;
-    s1_of_v = (idsq_15 = ns1, (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get(casefn, i)))));
+IdList* idsq_16;
+    s1_of_v = (idsq_16 = ns1, (char*)(intptr_t)(id_list_get(idsq_16, (int)(id_list_get(casefn, i)))));
     func_file_v = id_func_file(s1_of_v);
-    id_dup_case_report(func_file_v, i);
+    id_dup_case_report(func_file_v, i, j);
     return;
 }
 
@@ -24179,15 +24234,21 @@ void id_ut_named(int ci, char* lead, char* name) {
 }
 
 void id_cases_report(char* report_loc, char* report_fn_name, int n) {
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(report_loc, ID_S("function '")), report_fn_name), ID_S("' has ")), id_str_of_int(n)), ID_S(" test case(s); --require-tests needs at least 2 (see docs/TESTS.md)")));
-    id_note_failure();
+    char* report_msg;
+    report_msg = id_concat(id_concat(id_concat(id_concat(ID_S("function '"), report_fn_name), ID_S("' has ")), id_str_of_int(n)), ID_S(" test case(s); --require-tests needs at least 2 (see docs/TESTS.md)"));
+    id_diag(ID_S("E0501"), report_loc, report_msg, report_fn_name, ID_S("a function is finished when two cases pass: the cases run on every build, so they document the function and cannot drift from it (docs/TESTS.md)"), ID_S("write two cases directly under the function, one per line as (ARGS):(EXPECTED); they must describe two different behaviours, and each must be able to fail if the function is wrong"));
     return;
 }
 
-void id_dup_case_report(char* dup_file, int i) {
-IdList* idsq_13;
-    (idsq_13 = tline, id_print(id_concat(id_concat(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_13, (int)(id_list_get(casestart, i)))))), ID_S(": error: this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)"))));
-    id_note_failure();
+void id_dup_case_report(char* dup_file, int i, int j) {
+    char* dup_where;
+    char* dup_first;
+IdList* idsq_35;
+    dup_where = (idsq_35 = tline, id_concat(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_35, (int)(id_list_get(casestart, i)))))));
+IdList* idsq_25;
+    dup_first = (idsq_25 = tline, id_concat(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_25, (int)(id_list_get(casestart, j)))))));
+    id_diag(ID_S("E0502"), dup_where, ID_S("this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)"), ID_S(""), ID_S("a second case that spells the same call proves nothing the first did not; cases are compared as tokens, so changing the spacing does not make one different"), ID_S("change the arguments or the expected value so this case exercises a different behaviour, or delete it; each of a function's two cases must be able to fail on its own"));
+    id_diag_related(dup_first, ID_S("the case this one repeats"));
     return;
 }
 
@@ -24395,10 +24456,11 @@ void id_report_bad_var(char* name, char* owner, int ln) {
 }
 
 void id_report_undef_var(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(loc_at_v, ID_S("undefined variable '")), name), ID_S("'")));
-    id_note_failure();
+    char* undef_where;
+    char* undef_help;
+    undef_where = id_diag_fn_loc(owner, ln);
+    undef_help = id_concat(id_concat(id_concat(id_concat(ID_S("declare '"), name), ID_S("' before this line, as in `int ")), name), ID_S(" = 0;`, or correct the spelling if it is a typo for a variable that exists"));
+    id_diag(ID_S("E0301"), undef_where, id_concat(id_concat(ID_S("undefined variable '"), name), ID_S("'")), name, ID_S("a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program"), undef_help);
     return;
 }
 
@@ -24421,10 +24483,9 @@ int id_is_unknown_fn(char* name) {
 }
 
 void id_report_call_var(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(loc_at_v, ID_S("'")), name), ID_S("' is a variable, not a function")));
-    id_note_failure();
+    char* callvar_where;
+    callvar_where = id_diag_fn_loc(owner, ln);
+    id_diag(ID_S("E0306"), callvar_where, id_concat(id_concat(ID_S("'"), name), ID_S("' is a variable, not a function")), name, ID_S("a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called"), ID_S("call a function by its own name, or drop the parentheses if you meant to read the variable"));
     return;
 }
 
@@ -24490,20 +24551,20 @@ void id_var_report(char* msg) {
 }
 
 void id_report_var_import(char* name, char* owner, int ln) {
-    char* loc_at_v;
+    char* imp_where;
     char* owner_of_v;
-    loc_at_v = id_loc_at(owner, ln);
+    imp_where = id_diag_fn_loc(owner, ln);
     owner_of_v = id_owner_of(name);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("variable '")), name), ID_S("' belongs to function '")), owner_of_v), ID_S("'; read it with 'import ")), name), ID_S("'")));
+    id_diag(ID_S("E0305"), imp_where, id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' belongs to function '")), owner_of_v), ID_S("'")), name, ID_S("a variable is private to the function that declares it, and a function that exports one is how another reads it"), id_concat(id_concat(ID_S("read it with `(import "), name), ID_S(")`")));
     return;
 }
 
 void id_report_var_private(char* name, char* owner, int ln) {
-    char* loc_at_v;
+    char* priv_where;
     char* owner_of_v;
-    loc_at_v = id_loc_at(owner, ln);
+    priv_where = id_diag_fn_loc(owner, ln);
     owner_of_v = id_owner_of(name);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("variable '")), name), ID_S("' belongs to function '")), owner_of_v), ID_S("' and is not exported; variables are only globally accessible if export/import is used")));
+    id_diag(ID_S("E0305"), priv_where, id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' belongs to function '")), owner_of_v), ID_S("' and is not exported")), name, ID_S("a variable is private to the function that declares it; variables are only globally accessible if export/import is used"), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("declare it in '"), owner_of_v), ID_S("' as `export TYPE ")), name), ID_S(" = ...;` and read it here with `(import ")), name), ID_S(")`, or pass the value in as an argument")));
     return;
 }
 
@@ -24617,11 +24678,11 @@ void id_scope_add(int id) {
 }
 
 void id_report_scope(char* name, char* owner, int ln) {
-    char* loc_at_v;
+    char* scope_where;
     char* scope_msg_v;
-    loc_at_v = id_loc_at(owner, ln);
+    scope_where = id_diag_fn_loc(owner, ln);
     scope_msg_v = id_scope_msg(name, owner, ln);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("variable '")), name), ID_S("' is used on line ")), id_str_of_int(ln)), scope_msg_v), ID_S("; a variable exists only from its declaration to the end of the block that declares it")));
+    id_diag(ID_S("E0307"), scope_where, id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' is used on line ")), id_str_of_int(ln)), scope_msg_v), name, ID_S("a variable exists only from its declaration to the end of the block that declares it"), ID_S("declare it above this use, in a block that also holds the use, or pass the value in"));
     return;
 }
 
@@ -24751,6 +24812,210 @@ void id_reg_report3(char* name, char* type, char* owner, int exported, int ln, i
     return;
 }
 
+void id_diag_edit(char* dgn_appl, char* dgn_op, int dgn_at_line, char* dgn_needle, char* dgn_text) {
+    char* dgn_need_esc;
+    char* dgn_text_esc;
+    dgn_need_esc = id_diag_esc(dgn_needle);
+    dgn_text_esc = id_diag_esc(dgn_text);
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("  edit: "), dgn_appl), ID_S("\t")), dgn_op), ID_S("\t")), id_str_of_int(dgn_at_line)), ID_S("\t")), dgn_need_esc), ID_S("\t")), dgn_text_esc));
+    return;
+}
+
+char* id_diag_esc(char* dgn_raw) {
+    char* dgn_esc_bs;
+    char* dgn_esc_nl;
+    char* dgn_esc_tab;
+    dgn_esc_bs = id_str_replace(dgn_raw, ID_S("\\"), ID_S("\\\\"));
+    dgn_esc_nl = id_str_replace(dgn_esc_bs, ID_S("\n"), ID_S("\\n"));
+    dgn_esc_tab = id_str_replace(dgn_esc_nl, ID_S("\t"), ID_S("\\t"));
+    return dgn_esc_tab;
+}
+
+void id_diag_related(char* dgn_rel_loc, char* dgn_rel_msg) {
+    id_print(id_concat(id_concat(id_concat(ID_S("  related: "), dgn_rel_loc), ID_S(": note: ")), dgn_rel_msg));
+    return;
+}
+
+char* id_diag_fn_loc(char* dgn_fn, int dgn_ln) {
+    char* dgn_file;
+    char* dgn_loc;
+    dgn_file = id_func_file(dgn_fn);
+    dgn_loc = id_concat(id_concat(dgn_file, ID_S(":")), id_str_of_int(dgn_ln));
+    return dgn_loc;
+}
+
+char* id_diag_prog_loc(int dgn_row) {
+    char* dgn_loc;
+IdList* idsq_11;
+char* idsq_9;
+    dgn_loc = (idsq_11 = pfile, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, dgn_row)), id_concat(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(pline, dgn_row)))));
+    return dgn_loc;
+}
+
+char* id_tc_at(int dgn_node) {
+    char* dgn_node_fn;
+    int dgn_node_line;
+    char* dgn_node_loc;
+    dgn_node_fn = id_node_fn(dgn_node);
+    dgn_node_line = id_tc_line(dgn_node);
+    dgn_node_loc = id_diag_fn_loc(dgn_node_fn, dgn_node_line);
+    return dgn_node_loc;
+}
+
+void id_case_diag(int dgn_case, char* dgn_code, char* dgn_msg, char* dgn_why, char* dgn_help) {
+    char* dgn_case_where;
+    dgn_case_where = id_case_loc(dgn_case);
+    id_diag(dgn_code, dgn_case_where, dgn_msg, ID_S(""), dgn_why, dgn_help);
+    return;
+}
+
+char* id_case_skeleton_line(int dgn_np, int dgn_j, char* dgn_rt) {
+    char* dgn_args;
+    char* dgn_want;
+    char* dgn_one;
+    dgn_args = id_case_skeleton_args(dgn_np, dgn_j);
+    dgn_want = id_concat(id_concat(ID_S("(EXPECTED"), id_str_of_int(dgn_j)), ID_S(")"));
+    if ((strcmp(dgn_rt, ID_S("void")) == 0)) {
+        dgn_want = ID_S("() then CHECK:(VALUE)");
+    }
+    dgn_one = id_concat(id_concat(id_concat(id_concat(ID_S("("), dgn_args), ID_S("):")), dgn_want), ID_S("\n"));
+    return dgn_one;
+}
+
+char* id_case_skeleton_args(int dgn_np, int dgn_j) {
+    IdList* dgn_parts = NULL;
+    int dgn_p;
+    char* dgn_joined;
+    { IdList* idfe_o = dgn_parts; dgn_parts = id_list_lit(0); id_list_free(idfe_o); }
+    dgn_p = 1;
+    while ((dgn_p <= dgn_np)) {
+        id_list_push(dgn_parts, (long long)(intptr_t)(id_concat(id_concat(id_concat(ID_S("ARG"), id_str_of_int(dgn_j)), ID_S("_")), id_str_of_int(dgn_p))));
+        dgn_p = (dgn_p + 1);
+    }
+    dgn_joined = id_str_join(dgn_parts, ID_S(", "));
+    { id_list_free(dgn_parts); return dgn_joined; }
+}
+
+void id_case_skeleton_edit(int dgn_row, int dgn_have) {
+    int dgn_fnode;
+    int dgn_np;
+    char* dgn_rt;
+    char* dgn_text;
+    dgn_fnode = (int)(id_list_get(prog, dgn_row));
+    dgn_np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, dgn_fnode)));
+    dgn_rt = (char*)(intptr_t)(id_list_get(ns2, dgn_fnode));
+    dgn_text = id_case_skeleton(dgn_np, (2 - dgn_have), dgn_rt);
+    if ((dgn_have < 2)) {
+        id_diag_edit(ID_S("placeholder"), ID_S("after-function"), (int)(id_list_get(pline, dgn_row)), ID_S(""), dgn_text);
+    }
+    return;
+}
+
+char* id_case_skeleton(int dgn_np, int dgn_need, char* dgn_rt) {
+    char* dgn_all;
+    int dgn_j;
+    char* dgn_line;
+    dgn_all = ID_S("");
+    dgn_j = 1;
+    while ((dgn_j <= dgn_need)) {
+        dgn_line = id_case_skeleton_line(dgn_np, dgn_j, dgn_rt);
+        dgn_all = id_concat(dgn_all, dgn_line);
+        dgn_j = (dgn_j + 1);
+    }
+    return dgn_all;
+}
+
+void id_tc_diag(int dgn_node, char* dgn_code, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help) {
+    char* dgn_tc_where;
+    dgn_tc_where = id_tc_at(dgn_node);
+    id_diag(dgn_code, dgn_tc_where, dgn_msg, dgn_at, dgn_why, dgn_help);
+IdList* idsq_9;
+    (idsq_9 = tcerrs, id_lset(idsq_9, 0, ((int)(id_list_get(tcerrs, 0)) + 1)));
+    return;
+}
+
+char* id_diag_sig(int dgn_sigfn) {
+    IdList* dgn_parts = NULL;
+    int dgn_k;
+    char* dgn_sig;
+    { IdList* idfe_o = dgn_parts; dgn_parts = id_list_lit(0); id_list_free(idfe_o); }
+    dgn_k = 0;
+    while ((dgn_k < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, dgn_sigfn))))) {
+        id_list_push(dgn_parts, (long long)(intptr_t)(id_diag_param(dgn_sigfn, dgn_k)));
+        dgn_k = (dgn_k + 1);
+    }
+IdList* idsq_15;
+char* idsq_13;
+    dgn_sig = (idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, dgn_sigfn)), id_concat(id_concat(id_concat(idsq_13, ID_S("(")), id_str_join(dgn_parts, ID_S(", "))), ID_S(")")));
+    { id_list_free(dgn_parts); return dgn_sig; }
+}
+
+char* id_diag_param(int dgn_sigfn, int dgn_k) {
+    char* dgn_pname;
+    char* dgn_ptype;
+    char* dgn_pdecl;
+    dgn_pname = id_param_name(dgn_sigfn, dgn_k);
+IdList* idsq_15;
+    dgn_ptype = (idsq_15 = ns1, (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, dgn_sigfn)), dgn_k)))));
+    dgn_pdecl = id_concat(id_concat(dgn_ptype, ID_S(" ")), dgn_pname);
+    return dgn_pdecl;
+}
+
+void id_syn_diag(IdList* pos, char* dgn_code, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help) {
+    char* dgn_sfile;
+    int dgn_sline;
+    char* dgn_sloc;
+    dgn_sfile = id_cur_file();
+    dgn_sline = id_cur_ln(pos);
+    dgn_sloc = id_concat(id_concat(dgn_sfile, ID_S(":")), id_str_of_int(dgn_sline));
+    id_diag(dgn_code, dgn_sloc, dgn_msg, dgn_at, dgn_why, dgn_help);
+    id_lset(synfail, 0, 1);
+    return;
+}
+
+void id_syn_expected(IdList* pos, char* dgn_want, char* dgn_found) {
+    char* dgn_ewhy;
+    char* dgn_ehelp;
+    dgn_ewhy = id_concat(id_concat(ID_S("the grammar needs '"), dgn_want), ID_S("' here to finish what it was reading, so the construct before this point is incomplete or mistyped"));
+    dgn_ehelp = id_concat(id_concat(ID_S("put '"), dgn_want), ID_S("' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late"));
+    id_syn_diag(pos, ID_S("E0101"), id_concat(id_concat(id_concat(id_concat(ID_S("expected '"), dgn_want), ID_S("', found '")), dgn_found), ID_S("'")), dgn_found, dgn_ewhy, dgn_ehelp);
+    return;
+}
+
+void id_syn_unexpected(IdList* pos, char* dgn_tok, char* dgn_umsg) {
+    char* dgn_uwhy;
+    char* dgn_uhelp;
+    dgn_uwhy = ID_S("an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type");
+    dgn_uhelp = id_concat(id_concat(ID_S("write an operand where '"), dgn_tok), ID_S("' is, or remove it; a missing operand just before it is the usual cause"));
+    if ((strcmp(dgn_tok, ID_S("/*")) == 0)) {
+        dgn_uwhy = ID_S("id has line comments only, so a comment always ends where its line ends and can never swallow code");
+        dgn_uhelp = ID_S("write // at the start of each commented line");
+    }
+    id_syn_diag(pos, ID_S("E0102"), dgn_umsg, dgn_tok, dgn_uwhy, dgn_uhelp);
+    return;
+}
+
+void id_diag(char* dgn_code, char* dgn_loc, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help) {
+    id_diag_head(dgn_code, dgn_loc, dgn_msg);
+    id_diag_line(ID_S("at"), dgn_at);
+    id_diag_line(ID_S("why"), dgn_why);
+    id_diag_line(ID_S("help"), dgn_help);
+    return;
+}
+
+void id_diag_head(char* dgn_code, char* dgn_loc, char* dgn_msg) {
+    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(dgn_loc, ID_S(": error: ")), dgn_msg), ID_S(" [")), dgn_code), ID_S("]")));
+    id_note_failure();
+    return;
+}
+
+void id_diag_line(char* dgn_key, char* dgn_text) {
+    if ((strcmp(dgn_text, ID_S("")) != 0)) {
+        id_print(id_concat(id_concat(id_concat(ID_S("  "), dgn_key), ID_S(": ")), dgn_text));
+    }
+    return;
+}
+
 char* id_owner_at(int i, char* name, char* s) {
     char* t;
     t = s;
@@ -24780,10 +25045,16 @@ char* id_first_type_at(int i, char* name, char* t, int unit) {
 }
 
 void id_report_var_type(char* name, char* type, char* prev, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("variable '")), name), ID_S("' is declared ")), type), ID_S(" here but ")), prev), ID_S(" elsewhere; a name must keep one type across the whole program")));
-    id_note_failure();
+    char* type_where;
+    char* type_msg;
+    char* type_first;
+    int type_first_ln;
+    type_where = id_diag_fn_loc(owner, ln);
+    type_msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' is declared ")), type), ID_S(" here but ")), prev), ID_S(" elsewhere"));
+    id_diag(ID_S("E0303"), type_where, type_msg, name, ID_S("a name must keep one type across the whole program, so that one name always means one kind of value wherever it appears"), ID_S("rename this variable so that it differs from the other one, or declare both with the same type"));
+    type_first = id_owner_of(name);
+    type_first_ln = id_decl_line(name, type_first);
+    id_diag_related(id_diag_fn_loc(type_first, type_first_ln), id_concat(ID_S("the other declaration, which is "), prev));
     return;
 }
 
@@ -24838,27 +25109,27 @@ IdList* idsq_13;
 }
 
 void id_report_var_is_func(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(loc_at_v, ID_S("'")), name), ID_S("' is already the name of a function")));
-    id_note_failure();
+    char* isfn_where;
+    isfn_where = id_diag_fn_loc(owner, ln);
+    id_diag(ID_S("E0308"), isfn_where, id_concat(id_concat(ID_S("'"), name), ID_S("' is already the name of a function")), name, ID_S("a function and a variable cannot share a name, because a call and a read of the name would look alike"), ID_S("rename the variable, or the function if the variable's name is the better one"));
     return;
 }
 
 void id_report_var_twice(char* name, char* owner, int ln) {
-    char* loc_at_v;
-    loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("variable '")), name), ID_S("' is declared twice in function '")), owner), ID_S("'")));
-    id_note_failure();
+    char* twice_where;
+    char* twice_msg;
+    twice_where = id_diag_fn_loc(owner, ln);
+    twice_msg = id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' is declared twice in function '")), owner), ID_S("'"));
+    id_diag(ID_S("E0302"), twice_where, twice_msg, name, ID_S("a name inside a function means one variable, so declaring it twice would make every later use ambiguous"), id_concat(id_concat(ID_S("rename one of the two, or drop the type from the second so that it assigns to the first, as in `"), name), ID_S(" = ...;`")));
     return;
 }
 
 void id_report_var_exported(char* name, char* owner, int ln) {
-    char* loc_at_v;
+    char* exp_where;
     char* export_owner_v;
-    loc_at_v = id_loc_at(owner, ln);
+    exp_where = id_diag_fn_loc(owner, ln);
     export_owner_v = id_export_owner(name);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("'")), name), ID_S("' is an exported global (by '")), export_owner_v), ID_S("'); another variable cannot reuse that name -- read the global with 'import ")), name), ID_S("'")));
+    id_diag(ID_S("E0309"), exp_where, id_concat(id_concat(id_concat(id_concat(ID_S("'"), name), ID_S("' is an exported global (by '")), export_owner_v), ID_S("'); another variable cannot reuse that name")), name, ID_S("an exported global is visible to the whole program through `import`, so a local of the same name would hide it from the reader"), id_concat(id_concat(ID_S("read the global with `(import "), name), ID_S(")`, or give this variable another name")));
     return;
 }
 
@@ -25391,9 +25662,11 @@ IdList* idsq_37;
 void id_arg_err(int id, int fn, int i, char* t) {
     int argnode;
     char* msg;
+    char* arg_sig;
     argnode = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), i));
     msg = id_arg_err_msg(id, fn, i, t);
-    id_tc_err(argnode, msg);
+    arg_sig = id_diag_sig(fn);
+    id_tc_diag(argnode, ID_S("E0606"), msg, (char*)(intptr_t)(id_list_get(ns1, id)), ID_S("an argument must have exactly the type of its parameter; id converts nothing silently"), id_concat(ID_S("pass a value of the parameter's type, or convert it first; the function is "), arg_sig));
     return;
 }
 
@@ -25851,9 +26124,11 @@ int id_is_mut_name(char* name) {
 void id_arity_err(int id, int fn) {
     char* name;
     char* msg;
+    char* arity_sig;
     name = (char*)(intptr_t)(id_list_get(ns1, id));
     msg = id_arity_err_msg(id, fn, name);
-    id_tc_err(id, msg);
+    arity_sig = id_diag_sig(fn);
+    id_tc_diag(id, ID_S("E0605"), msg, name, ID_S("a call passes exactly the arguments the function declares, in order, so that every parameter gets a value"), id_concat(id_concat(ID_S("call it as "), arity_sig), ID_S(", with a value for each parameter")));
     return;
 }
 
@@ -26400,7 +26675,9 @@ void id_ret_err(int id, char* t) {
     char* msg;
     i1_of_v = (int)(id_list_get(ni1, id));
     msg = id_ret_err_msg(id, t);
-    id_tc_err(i1_of_v, msg);
+IdList* idsq_14;
+char* idsq_12;
+    (idsq_14 = ns2, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_tc_diag(i1_of_v, ID_S("E0602"), msg, ID_S(""), ID_S("a function's return clause must have exactly the type the function declares, so that every caller can rely on what it gets back"), id_concat(id_concat(id_concat(id_concat(ID_S("return a value of type "), idsq_12), ID_S(", convert the value before returning it, or change the declared return type of '")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("'"))));
     return;
 }
 
@@ -26426,7 +26703,7 @@ void id_eq_report(int id, char* lt, char* rt) {
     int eq_ok_v;
     eq_ok_v = id_eq_ok(lt, rt);
     if ((id_cmp_bad(lt, rt, eq_ok_v) == 1)) {
-        id_tc_err(id, id_concat(id_concat(id_concat(ID_S("cannot compare "), lt), ID_S(" with ")), rt));
+        id_tc_diag(id, ID_S("E0604"), id_concat(id_concat(id_concat(ID_S("cannot compare "), lt), ID_S(" with ")), rt), ID_S(""), ID_S("== and != compare two strings or two numbers, and < <= > >= compare two numbers; id has no ordering on strings and no silent conversion between a string and a number"), ID_S("compare like with like: convert one side first (to_int(s) makes a number of a string, and \"\" + n makes a string of a number), or to order strings use idstd's str_cmp(a, b)"));
     }
     return;
 }
@@ -26606,8 +26883,11 @@ void id_mixed_err(int id, int c) {
 
 void id_mixed_say(int id, char* words, char* want) {
     char* was;
+    int mixed_ln;
     was = id_show_bin(id);
-    id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), was), ID_S("' mixes ")), words), ID_S("; parenthesize it as the current precedence reads it: '")), want), ID_S("'")));
+    mixed_ln = id_tc_line(id);
+    id_tc_diag(id, ID_S("E0601"), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), was), ID_S("' mixes ")), words), ID_S("; parenthesize it as the current precedence reads it: '")), want), ID_S("'")), was, ID_S("the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down"), ID_S("write the parentheses the current precedence implies"));
+    id_diag_edit(ID_S("machine"), ID_S("replace"), mixed_ln, was, want);
     return;
 }
 

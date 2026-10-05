@@ -1,0 +1,30 @@
+// Picking from a block: its head line, and the values its continuation lines
+// give for a key.
+
+dg_take(string[] dg_ta, string dg_tl, string dg_tk) {
+  string dg_tn = dg_key(dg_tl);
+  if(dg_tn == dg_tk) {
+    string dg_tv = dg_kv(dg_tl);
+    push(dg_ta, dg_tv);
+  }
+} return void;
+([], "  why: w", "why"):(["w"])
+(["a"], "  help: h", "why"):(["a"])
+
+dg_head(string dg_hb) {
+  string[] dg_hl = str_split(dg_hb, "\n");
+  string dg_hr = dg_hl[0];
+} return string dg_hr;
+("a.id:1: error: x\n  why: y"):("a.id:1: error: x")
+("plain"):("plain")
+
+// The first value for a key, or "" when the block has none.
+dg_val(string dg_vb, string dg_vk) {
+  string[] dg_vs = dg_vals(dg_vb, dg_vk);
+  string dg_vr = "";
+  if(len(dg_vs) > 0) {
+    dg_vr = dg_vs[0];
+  }
+} return string dg_vr;
+("h\n  why: w\n  why: z", "why"):("w")
+("h\n  why: w", "help"):("")

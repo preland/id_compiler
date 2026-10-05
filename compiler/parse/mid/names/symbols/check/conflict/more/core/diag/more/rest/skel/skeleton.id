@@ -1,0 +1,33 @@
+// The cases a function that has too few is offered: one line each, `(ARGS):
+// (EXPECTED)`, with a name for every part the author has to supply -- an argument
+// per parameter, and what the call must give. The names differ from line to line
+// because two identical cases are an error of their own (check_dup_cases). A
+// void function has no value to expect, so its line ends in `() then CHECK:
+// (VALUE)`, the form docs/TESTS.md gives for checking an effect.
+
+case_skeleton_edit(int dgn_row, int dgn_have) {
+  int dgn_fnode = (import prog)[dgn_row];
+  int dgn_np = len(((import nl1)[dgn_fnode]));
+  string dgn_rt = (import ns2)[dgn_fnode];
+} chain (int dgn_row, int dgn_have) {
+  string dgn_text = case_skeleton(dgn_np, 2 - dgn_have, dgn_rt);
+  if(dgn_have < 2) {
+    diag_edit("placeholder", "after-function", (import pline)[dgn_row], "", dgn_text);
+  }
+} return void;
+given edge_fixture (0, 0):() then prints:("  edit: placeholder\tafter-function\t7\t\t(ARG1_1):(EXPECTED1)\\n(ARG2_1):(EXPECTED2)\\n\n")
+given edge_fixture (0, 1):() then prints:("  edit: placeholder\tafter-function\t7\t\t(ARG1_1):(EXPECTED1)\\n\n")
+given edge_fixture (0, 2):() then prints:("")
+
+case_skeleton(int dgn_np, int dgn_need, string dgn_rt) {
+  string dgn_all = "";
+  int dgn_j = 1;
+  while(dgn_j <= dgn_need) {
+    string dgn_line = case_skeleton_line(dgn_np, dgn_j, dgn_rt);
+    dgn_all = dgn_all + dgn_line;
+    dgn_j = dgn_j + 1;
+  }
+} return string dgn_all;
+(1, 2, "int"):("(ARG1_1):(EXPECTED1)\n(ARG2_1):(EXPECTED2)\n")
+(0, 1, "void"):("():() then CHECK:(VALUE)\n")
+(2, 0, "int"):("")

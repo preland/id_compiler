@@ -1,0 +1,42 @@
+// The last thing a run prints: for a person, `error: aborting due to N previous
+// errors` and the codes that have an explanation to read; for a program, one
+// {"kind":"summary",...} line with the same counts.
+
+dg_summary(string[] dg_su_b, int dg_su_j) {
+  int dg_su_e = dg_nsev(dg_su_b, "error");
+  int dg_su_w = dg_nsev(dg_su_b, "warning");
+  string[] dg_su_c = dg_codes(dg_su_b);
+} chain (string[] dg_su_b, int dg_su_j) {
+  string dg_su_r = "";
+  if(dg_su_j == 1) {
+    dg_su_r = dg_sum_json(dg_su_e, dg_su_w, dg_su_c);
+  }
+  if(dg_su_j == 0 && dg_su_e > 0) {
+    dg_su_r = dg_sum_text(dg_su_e, dg_su_c);
+  }
+} return string dg_su_r;
+(["a.id:1: error: x [E0001]"], 0):("error: aborting due to 1 previous error\nSome errors have detailed explanations: E0001.\nFor more information about an error, try `idc --explain E0001`.")
+(["a.id:1: error: x [E0001]", "b.id:2: warning: w"], 1):("{\"kind\":\"summary\",\"errors\":1,\"warnings\":1,\"codes\":[\"E0001\"]}")
+(["b.id:2: warning: w", "plain"], 0):("")
+
+dg_sum_json(int dg_sj_e, int dg_sj_w, string[] dg_sj_c) {
+  string dg_sj_l = "";
+  if(len(dg_sj_c) > 0) {
+    dg_sj_l = "\"" + str_join(dg_sj_c, "\",\"") + "\"";
+  }
+  string dg_sj_r = "{\"kind\":\"summary\",\"errors\":" + dg_sj_e + ",\"warnings\":" + dg_sj_w + ",\"codes\":[" + dg_sj_l + "]}";
+} return string dg_sj_r;
+(2, 0, []):("{\"kind\":\"summary\",\"errors\":2,\"warnings\":0,\"codes\":[]}")
+(1, 3, ["E0001", "E0002"]):("{\"kind\":\"summary\",\"errors\":1,\"warnings\":3,\"codes\":[\"E0001\",\"E0002\"]}")
+
+dg_sum_text(int dg_st_e, string[] dg_st_c) {
+  string dg_st_r = "error: aborting due to " + dg_st_e + " previous errors";
+  if(dg_st_e == 1) {
+    dg_st_r = "error: aborting due to 1 previous error";
+  }
+  if(len(dg_st_c) > 0) {
+    dg_st_r = dg_st_r + "\nSome errors have detailed explanations: " + str_join(dg_st_c, ", ") + ".\nFor more information about an error, try `idc --explain " + dg_st_c[0] + "`.";
+  }
+} return string dg_st_r;
+(3, []):("error: aborting due to 3 previous errors")
+(1, ["E0002", "E0001"]):("error: aborting due to 1 previous error\nSome errors have detailed explanations: E0002, E0001.\nFor more information about an error, try `idc --explain E0002`.")

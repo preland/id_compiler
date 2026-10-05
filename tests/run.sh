@@ -15,8 +15,8 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
-TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo)
+SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
+TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
 WANTED=()
@@ -1011,6 +1011,23 @@ if want invalid; then
     [ "$neg" -eq 0 ] && mark_done invalid
 fi
 
+# --- the diagnostic record and what reads it: the renderers, --explain, the code
+#     registry, and the examples of docs/ERRORS.md (tests/diagnostics.sh). The
+#     examples are three slices so that each stays under the minute.
+echo
+echo "--- diagnostics (tests/diagnostics.sh, docs/ERRORS.md) ---"
+dgs=0
+if want diagnostics; then
+    ./diagnostics.sh basic
+    [ $? -eq 0 ] && mark_done diagnostics || dgs=1
+fi
+for i in 0 1 2; do
+    if want "diagnostics_docs_$i"; then
+        ./diagnostics.sh docs "$i" 3
+        [ $? -eq 0 ] && mark_done "diagnostics_docs_$i" || dgs=1
+    fi
+done
+
 # --- runtime-safety negative tests: every file in tests/runtime_invalid/
 #     compiles fine but must ABORT when run (bounds/empty-pop violations),
 #     printing the message named on its `// EXPECT:` line to stderr and
@@ -1228,6 +1245,6 @@ for i in "${!TMPGUARD_TREES[@]}"; do
     fi
 done
 
-[ "$fail" -eq 0 ] && [ "$tmpg" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
+[ "$fail" -eq 0 ] && [ "$tmpg" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$dgs" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
     && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$wjs" -eq 0 ] && [ "$wjss" -eq 0 ] && [ "$lbs" -eq 0 ] && [ "$opts" -eq 0 ] && [ "$conf" -eq 0 ] \
     && [ "$tst" -eq 0 ] && [ "$fixr" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]

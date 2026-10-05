@@ -1,0 +1,35 @@
+// A type-check diagnostic is a diagnostic at an AST node, and it is counted
+// (tcerrs), which is how the type check's cache knows a function's check was not
+// clean (mid/types/check/walk/check/skip.id): the same two effects tc_err has
+// for a diagnostic not yet moved to the record.
+
+tc_diag(int dgn_node, string dgn_code, string dgn_msg, string dgn_at, string dgn_why, string dgn_help) {
+  string dgn_tc_where = tc_at(dgn_node);
+  diag(dgn_code, dgn_tc_where, dgn_msg, dgn_at, dgn_why, dgn_help);
+  lset((import tcerrs), 0, (import tcerrs)[0] + 1);
+} return void;
+given fn_fixture ((import fixture_zero), "E0099", "bad", "x", "because", "do this"):() then prints:("<stdin>:1: error: bad [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import tcerrs)[0]:(1)
+given fn_fixture ((import fixture_zero), "E0098", "worse", "", "", ""):() then prints:("<stdin>:1: error: worse [E0098]\n") then (import chkfail)[0]:(1)
+
+// A function as its signature is written, `g(int p, string q)`, for a help line
+// that says how to call it.
+diag_sig(int dgn_sigfn) {
+  string[] dgn_parts = [];
+  int dgn_k = 0;
+  while(dgn_k < len(((import nl1)[dgn_sigfn]))) {
+    push(dgn_parts, diag_param(dgn_sigfn, dgn_k));
+    dgn_k = dgn_k + 1;
+  }
+} chain (int dgn_sigfn) {
+  string dgn_sig = (import ns1)[dgn_sigfn] + "(" + str_join(dgn_parts, ", ") + ")";
+} return string dgn_sig;
+given argfn_d ((import argfn_fn)):("g(int p)")
+given farm_g ((import f_vfwd)):("vfwd(int a)")
+
+diag_param(int dgn_sigfn, int dgn_k) {
+  string dgn_pname = param_name(dgn_sigfn, dgn_k);
+  string dgn_ptype = (import ns1)[(((import nl1)[dgn_sigfn])[dgn_k])];
+  string dgn_pdecl = dgn_ptype + " " + dgn_pname;
+} return string dgn_pdecl;
+given argfn_d ((import argfn_fn), 0):("int p")
+given farm_g ((import f_vfwd), 0):("int a")
