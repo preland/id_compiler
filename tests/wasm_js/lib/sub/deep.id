@@ -1,0 +1,17 @@
+hidden(int hn) {
+  int hr = hn * 7;
+} return int hr;
+(2):(14)
+(0):(0)
+
+peekat(int[] ax, int ai) {
+  int av = ax[ai] + 9;
+} return int av;
+([1, 2], 1):(11)
+([5], 0):(14)
+
+halve(int qn, int qd) {
+  int qr = qn / qd + 100;
+} return int qr;
+(8, 2):(104)
+(9, 3):(103)

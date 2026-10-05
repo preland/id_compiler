@@ -1,0 +1,3 @@
+reach(int rn) {
+  int rr = nw_one(rn) + 1;
+} return int rr;

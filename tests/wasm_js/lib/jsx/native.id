@@ -1,0 +1,5 @@
+native jsx_twice(int n) return int;
+
+native jsx_shout(string s) return string;
+
+native jsx_fill(int[] xs, int n) return int;

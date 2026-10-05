@@ -1,0 +1,5 @@
+plain(int pn) {
+  int pr = pn + 5;
+} return int pr;
+(1):(6)
+(2):(7)

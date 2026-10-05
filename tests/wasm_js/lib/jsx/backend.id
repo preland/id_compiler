@@ -1,0 +1,11 @@
+string name = "jsx";
+string c_header = "jsx.h";
+
+string[] c_linux_sources = ["jsx.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] c_darwin_sources = ["jsx.c"];
+string[] c_darwin_cflags = [];
+string[] c_darwin_link = [];
+
+string wasm_js = "jsx.mjs";

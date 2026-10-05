@@ -1,0 +1,18 @@
+shout(string ws) {
+  string wr = jsx_shout(ws) + "?";
+} return string wr;
+("hi"):("HI!?")
+("a b"):("A B!?")
+
+twice(int tn) {
+  int tr = jsx_twice(tn) + 1;
+} return int tr;
+(3):(7)
+(0):(1)
+
+squares(int sn) {
+  int[] sx = [0, 0, 0, 0, 0];
+  int sc = jsx_fill(sx, sn);
+} return int[] sx;
+(3):([0, 1, 4, 0, 0])
+(5):([0, 1, 4, 9, 16])

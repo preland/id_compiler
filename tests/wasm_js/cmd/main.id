@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  string ln = input();
+  print(ln + "|" + argv[1] + "|" + ticks());
+} return int argc;

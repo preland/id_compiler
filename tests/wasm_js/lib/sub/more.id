@@ -1,0 +1,5 @@
+measure(string ms) {
+  int mn = len(ms) + 1;
+} return int mn;
+("abc"):(4)
+(""):(1)

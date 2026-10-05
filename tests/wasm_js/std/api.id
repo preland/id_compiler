@@ -1,0 +1,22 @@
+slurp(string path) {
+  string t = fs_read_text(path) + "";
+} return string t;
+("/nonexistent/x"):("")
+("/nonexistent/y"):("")
+
+envlen(string name) {
+  int[] ebuf = [0, 0, 0, 0, 0, 0, 0, 0];
+  int en = env_get(name, ebuf, 8);
+} return int en;
+("NOPE_NOT_SET_X"):(-1)
+("NOPE_NOT_SET_Y"):(-1)
+
+roundtrip(string rbody) {
+  string rpath = fs_mktemp("idw", 0);
+  int rdrop = fs_drop_exit(rpath);
+  int rput = exec_file_put(rpath, rbody, 420);
+} chain (string rbody) {
+  string rback = fs_read_text(rpath) + "" + fs_size(rpath);
+} return string rback;
+("hello"):("hello5")
+(""):("0")

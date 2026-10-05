@@ -1,0 +1,2 @@
+string name = "nw";
+string[] c_linux_sources = ["nw.c"];

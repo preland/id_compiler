@@ -1,0 +1,1 @@
+native nw_one(int n) return int;

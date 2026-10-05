@@ -6,7 +6,8 @@
 #
 #   * the export list is exactly memory/_initialize/id_alloc/id_str_of_cstr
 #     (a host writes a string's bytes with the first and has the second give
-#     them their length) plus the program's own top-level functions -- not the fixture idstd's, even
+#     them their length), the idw_* shim idc/tools/jsbind/shim.c adds, plus the
+#     program's own root-file functions -- not the fixture idstd's, even
 #     though it is compiled in (--gc-sections plus the driver's own filter,
 #     idc/bin/idc);
 #   * an int function and a string-in/string-out function both give the
@@ -68,9 +69,9 @@ fi
 ok "the program builds"
 
 exports=$(wasm-objdump -x -j Export "$TMP/prog.wasm" 2>/dev/null | grep -oE '"[a-zA-Z_0-9]+"' | tr -d '"' | sort)
-want=$(printf '%s\n' memory id_alloc id_str_of_cstr _initialize id_greet id_sum3 | sort)
+want=$(printf '%s\n' memory id_alloc id_str_of_cstr _initialize id_greet id_sum3 idw_abi idw_str idw_list idw_span idw_flush idw_release_str idw_release_list | sort)
 if [ "$exports" = "$want" ]; then
-    ok "exports are exactly memory/id_alloc/id_str_of_cstr/_initialize/id_greet/id_sum3 (no fixture idstd)"
+    ok "exports are exactly memory/id_alloc/id_str_of_cstr/_initialize/the idw_* binding shim/id_greet/id_sum3 (no fixture idstd)"
 else
     bad "export list (got: $(echo "$exports" | tr '\n' ' '))"
 fi

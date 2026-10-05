@@ -39,7 +39,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O LEVEL] [--emit-c FILE] [--emit-llvm FILE] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std] [--exports root|all] [--no-js]" >&2
 }
 
 PATH_ARG=""
@@ -64,6 +64,8 @@ CALLS=0
 CHECK=0
 FIX=0
 PRINT_STD=0
+WEXPORT_SCOPE=root
+NO_JS=0
 NO_STD=0
 STD_DIR=""
 BACKENDS=()          # from --backend flags: an override, or a backend of its own
@@ -111,6 +113,16 @@ while [ $# -gt 0 ]; do
             FIX=1; shift ;;
         --print-std)
             PRINT_STD=1; shift ;;
+        --exports)
+            WEXPORT_SCOPE="${2:?idc: --exports needs root or all}"
+            case "$WEXPORT_SCOPE" in
+                root|all) ;;
+                *) echo "idc: --exports takes 'root' (the functions in the project's root files) or 'all' (every function of the project and its imports, idstd excluded), not '$WEXPORT_SCOPE'" >&2
+                   exit 2 ;;
+            esac
+            shift 2 ;;
+        --no-js)
+            NO_JS=1; shift ;;
         --no-std)
             NO_STD=1; shift ;;
         --std)
@@ -3216,11 +3228,32 @@ if [ "$TARGET" = wasm ]; then
             *) PROGRAM_FILES+=("$f") ;;
         esac
     done
+    # Which of those are public (docs/INTEROP.md, "id and JavaScript"): by
+    # default the functions in the project's root files -- the directory named
+    # on the command line, or the one file -- because a root file is what a
+    # project shows its users and a subdirectory is how it is built. --exports
+    # all gives every function of the project and its imports. A `--lib` C ABI
+    # would read the same rule.
+    EXPORT_FILES=()
+    if [ "$WEXPORT_SCOPE" = all ]; then
+        EXPORT_FILES=("${PROGRAM_FILES[@]}")
+    elif [ -f "$PATH_ARG" ]; then
+        EXPORT_FILES=("$PATH_ARG")
+    else
+        for f in "${PROGRAM_FILES[@]}"; do
+            [ "$(dirname "$f")" = "${PATH_ARG%/}" ] && EXPORT_FILES+=("$f")
+        done
+    fi
     WEXPORTS=(id_alloc id_str_of_cstr _initialize)
-    if [ "${#PROGRAM_FILES[@]}" -gt 0 ]; then
+    WEXPORT_NAMES=()
+    if [ "${#EXPORT_FILES[@]}" -gt 0 ]; then
         while IFS= read -r name; do
-            [ -n "$name" ] && WEXPORTS+=("id_$name")
-        done < <(grep -hoE '^[A-Za-z_][A-Za-z0-9_]*\(' "${PROGRAM_FILES[@]}" | tr -d '(' | sort -u)
+            [ -n "$name" ] && WEXPORTS+=("id_$name") && WEXPORT_NAMES+=("$name")
+        done < <(grep -hoE '^[A-Za-z_][A-Za-z0-9_]*\(' "${EXPORT_FILES[@]}" | tr -d '(' | sort -u)
+    fi
+    if [ "${#WEXPORT_NAMES[@]}" -eq 0 ] && ! grep -q '^int main(' "$C_OUT"; then
+        progress_clear
+        echo "idc: note: no function in this project's root files, so the module exports none (--exports all exports every function of the project and its imports; docs/INTEROP.md)" >&2
     fi
 
     WEXPORT_FLAGS=()
@@ -3231,6 +3264,71 @@ if [ "$TARGET" = wasm ]; then
         c_path="${WOUT%.*}.c"
     fi
     cp "$C_OUT" "$c_path" || exit 1
+    cat "$ROOT/tools/jsbind/shim.c" >> "$c_path" || exit 1
+
+    # The natives this program reaches (the same rows the C target links
+    # backends from) and how the wasm target answers each one: a backend that
+    # declares wasm_wasi_sources has them compiled for wasm32-wasi and linked
+    # (libc over WASI: standard input and output), and one that declares
+    # wasm_js has the rest left as imports, `env.id_NAME`, that its JS module
+    # answers once gen.mjs bundles it into the module's .mjs. A backend that
+    # declares neither contributes nothing, so a reached native of it is an
+    # undefined symbol at the link, reported below at the call that reaches it.
+    # Like the C target, a native is only linked when something reaches it:
+    # wasm-ld's --gc-sections drops the code that would have imported it.
+    WNAT_MAP="$WORK/wasm_natives"
+    WALLOW="$WORK/wasm_allow"
+    : > "$WNAT_MAP"
+    : > "$WALLOW"
+    WBE_OBJS=()
+    declare -A WBE_OF=() WBE_NAME=() WBE_JS=() WBE_SRCS=() WBE_CF=() WBE_DONE=() WBE_SITE=() WBE_NATIVE_BE=()
+    while IFS='|' read -r row_kind name site decl; do
+        [ "$row_kind" = program ] || continue
+        if [ -z "${WBE_OF[$decl]+x}" ]; then WBE_OF[$decl]=$(backend_of "$decl"); fi
+        be="${WBE_OF[$decl]}"
+        [ -n "$be" ] || continue
+        if [ -z "${WBE_NAME[$be]+x}" ]; then
+            backend_impl "$be"
+            backend_decls "$BE_IMPL/backend.id"
+            WBE_NAME[$be]="${BD[name]:-$(basename "$BE_IMPL")}"
+            WBE_JS[$be]="${BD[wasm_js]:-}"
+            WBE_SRCS[$be]="${BD[wasm_wasi_sources]:-}"
+            WBE_CF[$be]="${BD[wasm_wasi_cflags]:-}"
+            WBE_DONE[$be]="$BE_IMPL"
+            if [ -n "${WBE_JS[$be]}" ] && [ ! -f "$BE_IMPL/${WBE_JS[$be]}" ]; then
+                progress_clear
+                echo "idc: $BE_IMPL/backend.id: wasm_js names '${WBE_JS[$be]}', which is not a file in $BE_IMPL; write it (an ES module whose default export is function(host) returning the natives) or remove the line" >&2
+                exit 1
+            fi
+        fi
+        WBE_SITE[$name]="$site"
+        WBE_NATIVE_BE[$name]="${WBE_NAME[$be]}"
+        [ -n "${WBE_JS[$be]}${WBE_SRCS[$be]}" ] || continue
+        printf '%s\t%s\t%s\n' "$name" "${WBE_NAME[$be]}" "${WBE_JS[$be]:+${WBE_DONE[$be]}/${WBE_JS[$be]}}" >> "$WNAT_MAP"
+        echo "id_$name" >> "$WALLOW"
+        if [ -n "${WBE_SRCS[$be]}" ] && [ "${WBE_SRCS[$be]}" != compiled ]; then
+            IFS=$'\x1f' read -ra wsrcs <<< "${WBE_SRCS[$be]}"
+            IFS=$'\x1f' read -ra wcfl <<< "${WBE_CF[$be]}"
+            progress compile "clang -> wasm32-wasi (backend ${WBE_NAME[$be]})"
+            for wsrc in "${wsrcs[@]}"; do
+                [ -n "$wsrc" ] || continue
+                wobj="$WORK/wbe_${#WBE_OBJS[@]}.o"
+                wbcmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -isystem "$IDC_WASI_SYSROOT_INCLUDE"
+                       -O2 -ffunction-sections -fdata-sections -I"${WBE_DONE[$be]}" ${wcfl[@]+"${wcfl[@]}"}
+                       -c "${WBE_DONE[$be]}/$wsrc" -o "$wobj")
+                capped "${wbcmd[@]}" 2>"$WORK/wasibe.err"; wbe_rc=$?
+                if [ "$wbe_rc" -ne 0 ]; then
+                    progress_clear
+                    sed 's/^/idc:   /' "$WORK/wasibe.err" >&2
+                    echo "idc: wasm32-wasi compilation of backend source ${WBE_DONE[$be]}/$wsrc failed (command: ${wbcmd[*]})" >&2
+                    exit 1
+                fi
+                WBE_OBJS+=("$wobj")
+            done
+            WBE_SRCS[$be]=compiled
+        fi
+    done < "$NATIVES"
+    sort -u -o "$WALLOW" "$WALLOW"
 
     progress compile "clang -> wasm32-wasi"
     ccmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -isystem "$IDC_WASI_SYSROOT_INCLUDE"
@@ -3258,8 +3356,9 @@ if [ "$TARGET" = wasm ]; then
     fi
 
     progress link "wasm-ld -> $(basename "$WOUT")"
-    lcmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -nostdlib "$WORK/out.o"
+    lcmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -nostdlib "$WORK/out.o" ${WBE_OBJS[@]+"${WBE_OBJS[@]}"}
           "$wcrt" -L"$IDC_WASI_LIBDIR" -lc "$IDC_WASI_COMPILER_RT"
+          -Wl,--allow-undefined-file="$WALLOW"
           -Wl,--gc-sections ${wentry[@]+"${wentry[@]}"} -o "$WOUT")
     capped "${lcmd[@]}" 2>"$WORK/wasild.err"; wld_rc=$?
     [ "$KEEP_C" -eq 1 ] || rm -f "$c_path"
@@ -3268,12 +3367,33 @@ if [ "$TARGET" = wasm ]; then
         if mem_ceiling_hit "$wld_rc" "$WORK/wasild.err"; then
             mem_ceiling_error "$IDC_WASI_CLANG (link)"
         else
-            sed 's/^/idc:   /' "$WORK/wasild.err" >&2
+            wundef=$(sed -n 's/.*undefined symbol: id_\([A-Za-z0-9_]*\).*/\1/p' "$WORK/wasild.err" | head -1)
+            if [ -n "$wundef" ] && [ -n "${WBE_SITE[$wundef]:-}" ]; then
+                echo "${WBE_SITE[$wundef]}: error: native '$wundef', reached from this program by this call, is declared by backend '${WBE_NATIVE_BE[$wundef]}', which has no implementation for the wasm target; add \`string wasm_js = \"FILE.mjs\";\` (a JS module) or \`string[] wasm_wasi_sources = [...];\` to its backend.id (docs/INTEROP.md, \"id and JavaScript\"), or stop calling it from code this module keeps" >&2
+            else
+                sed 's/^/idc:   /' "$WORK/wasild.err" >&2
+            fi
             echo "idc: wasm32-wasi link failed (command: ${lcmd[*]})" >&2
         fi
         exit 1
     fi
-    progress_done "built $WOUT ($(wc -c < "$WOUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"), $(plural "${#WEXPORTS[@]}" export))"
+    WBIND=""
+    if [ "$NO_JS" -eq 0 ]; then
+        if command -v node >/dev/null 2>&1; then
+            wgen=(--wasm "$WOUT" --glue "$ROOT/tools/jsbind/glue.mjs" --natives "$WNAT_MAP")
+            for f in "${EXPORT_FILES[@]}"; do wgen+=(--src "$f"); done
+            if ! node "$ROOT/tools/jsbind/gen.mjs" "${wgen[@]}"; then
+                progress_clear
+                echo "idc: the JS bindings could not be written; the .wasm is built (--no-js stops idc writing them)" >&2
+                exit 1
+            fi
+            WBIND=", bindings ${WOUT%.wasm}.mjs, .d.mts and .d.ts"
+        else
+            progress_clear
+            echo "idc: note: node is not on PATH, so ${WOUT%.wasm}.mjs, .d.mts and .d.ts were not written (--no-js silences this)" >&2
+        fi
+    fi
+    progress_done "built $WOUT ($(wc -c < "$WOUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"), $(plural "${#WEXPORTS[@]}" export)$WBIND)"
     exit_ok
 fi
 
