@@ -56,4 +56,4 @@ done
     exit 1
 }
 
-DISPLAY="$DISP" "$@"
+DISPLAY="$DISP" IDSTD_GFX=x11 "$@"

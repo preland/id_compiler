@@ -1076,7 +1076,7 @@ for d in $(demo_list display galaxy_run); do
     if ! env -u IDC_NO_STD $BIN_IDC "$ORG/demos/$d" -o "$TMP/$d.bin" >/dev/null 2>&1; then
         bad "$d: builds for the no-display check"; continue
     fi
-    DISPLAY= WAYLAND_DISPLAY= timeout 5 "$TMP/$d.bin" >/dev/null 2>&1
+    IDSTD_GFX=none timeout 5 "$TMP/$d.bin" >/dev/null 2>&1
     if [ $? -eq 124 ]; then
         bad "$d: hangs with no display (gfx_open's result is being ignored)"
     else

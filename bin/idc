@@ -3167,7 +3167,7 @@ shard_cases() {
     for s in $(seq 0 "$n"); do
         [ -s "$WORK/smask.$s" ] || continue
         m=$(cat "$WORK/smask.$s")
-        (cd "$dir" && IDTC_SKIP="$m" IDTC_PASSED="$WORK/passed.$s" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err.$s") &
+        (cd "$dir" && IDSTD_GFX=none IDTC_SKIP="$m" IDTC_PASSED="$WORK/passed.$s" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err.$s") &
         pids+=($!)
     done
     for p in "${pids[@]}"; do
@@ -3184,6 +3184,11 @@ shard_cases() {
 # here; a function that cannot run here was already exempted, or its cases
 # refused, by idparse (docs/TESTS.md). A hosted build for another triple is
 # refused, naming why, rather than built without its cases.
+#
+# Every case runs with IDSTD_GFX=none, which makes gfx_open and glwin_open
+# report "no display" without touching X11 or Wayland, so a build opens no
+# window whatever session it runs in. A case that needs a window sets
+# IDSTD_GFX itself with env_put (docs/TESTS.md).
 run_cases() {
     [ -s "$HARNESS_C" ] || return 0
     local n host hrc
@@ -3251,7 +3256,7 @@ run_cases() {
         unset IDTC_TICK
         progress_start_ticker "$PROG_RAN" "$CASE_HITS" 1
         [ -z "$TICK_FD" ] || export IDTC_TICK="$TICK_FD"
-        (cd "$case_dir" && IDTC_SKIP="$CASE_MASK" IDTC_PASSED="$WORK/passed" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err")
+        (cd "$case_dir" && IDSTD_GFX=none IDTC_SKIP="$CASE_MASK" IDTC_PASSED="$WORK/passed" "$WORK/harness" </dev/null >/dev/null 2>"$WORK/cases.err")
         hrc=$?
     fi
     progress_stop_ticker
