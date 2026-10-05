@@ -28,9 +28,16 @@
    aborting with a clear message instead of continuing with a NULL pointer or
    a wrapped-around size. */
 typedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;
-static IdAllocHdr* id_arena_head = NULL;
-static int id_arena_hooked = 0;
-static long id_nfree = 0;
+#ifndef ID_TLS
+#ifdef __wasm__
+#define ID_TLS
+#else
+#define ID_TLS __thread
+#endif
+#endif
+static ID_TLS IdAllocHdr* id_arena_head = NULL;
+static ID_TLS int id_arena_hooked = 0;
+static ID_TLS long id_nfree = 0;
 static void id_arena_free_all(void) {
     if (getenv("ID_FREE_STATS")) fprintf(stderr, "id: freed %ld lists\n", id_nfree);
     IdAllocHdr* h = id_arena_head;
@@ -145,7 +152,7 @@ static _Noreturn void id_null_read(void) {
    harness, nothing goes back to malloc: the cells are filled with 0xDD and the
    header is marked freed (len -1, cap INT_MIN), so a later use traps here
    instead of reading whatever reused the block. */
-static int id_fguard = -1;
+static ID_TLS int id_fguard = -1;
 #ifdef __GNUC__
 __attribute__((noinline, cold))
 #endif
@@ -334,9 +341,9 @@ static long long id_ult(long long a, long long b) {
    abort here, which is the entire reason the store is a primitive rather
    than a library. The store grows on demand and is freed at exit with the
    rest of the arena. */
-static unsigned char* id_store = NULL;
-static long long id_store_used = 1;    /* 0 is reserved for null */
-static long long id_store_cap = 0;
+static ID_TLS unsigned char* id_store = NULL;
+static ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */
+static ID_TLS long long id_store_cap = 0;
 
 static void id_store_grow(long long need) {
     long long cap = id_store_cap ? id_store_cap : 65536;
@@ -359,6 +366,12 @@ static long long id_mem_alloc(long long n) {
     return base;
 }
 static long long id_mem_size(void) { return id_store_used; }
+void id_thread_enter(void) { id_arena_hooked = 1; }
+void id_thread_leave(void) {
+    IdAllocHdr* h = id_arena_head;
+    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
+    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;
+}
 
 /* Every load and store funnels through this one check. */
 static unsigned char* id_at(long long addr, long long width) {

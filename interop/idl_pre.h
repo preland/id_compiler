@@ -28,6 +28,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#define ID_TLS
+
 #define IDL_CAT2(a, b) a##_##b
 #define IDL_CAT(a, b) IDL_CAT2(a, b)
 #define idl_free IDL_CAT(IDL_LIB, free)

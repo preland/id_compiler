@@ -8,13 +8,9 @@
 // the CSR build.
 rev_counts(int fcount) {
   int[] counts = [];
-  int i = 0;
-  while(i < fcount) {
-    push(counts, 0);
-    i = i + 1;
-  }
-} chain (int fcount) {
+  lst_fill(counts, fcount, 0);
   int ei = 0;
+} chain (int fcount) {
   while(ei < len((import ix_ekind))) {
     int ci = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
     if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0) {
