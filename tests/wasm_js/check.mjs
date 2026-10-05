@@ -34,10 +34,12 @@ await check("a JS native that returns a string hands id a real id string (length
   assert.equal(m.shout("a longer string than the others"), "A LONGER STRING THAN THE OTHERS!?");
 });
 
-await check("only the root file's functions are bound by default", () => {
+await check("exactly the functions conf.id's lib_exports names are bound, a subdirectory's measure among them", async () => {
   const d = fs.readFileSync(path.join(dir, "lib.d.ts"), "utf8");
-  for (const f of ["shout", "twice", "squares"]) assert.match(d, new RegExp("\\b" + f + "\\("));
+  for (const f of ["shout", "twice", "squares", "measure"]) assert.match(d, new RegExp("\\b" + f + "\\("));
   for (const f of ["hidden", "peekat", "halve"]) assert.doesNotMatch(d, new RegExp("\\b" + f + "\\("));
+  const m = await lib.load();
+  assert.equal(m.measure("abc"), 4);
 });
 
 await check("--exports all binds the subdirectory's functions too", async () => {

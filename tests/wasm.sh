@@ -7,9 +7,9 @@
 #   * the export list is exactly memory/_initialize/id_alloc/id_str_of_cstr
 #     (a host writes a string's bytes with the first and has the second give
 #     them their length), the idw_* shim idc/tools/jsbind/shim.c adds, plus the
-#     program's own root-file functions -- not the fixture idstd's, even
-#     though it is compiled in (--gc-sections plus the driver's own filter,
-#     idc/bin/idc);
+#     functions the project's conf.id lists in lib_exports -- not the fixture
+#     idstd's, even though it is compiled in (--gc-sections plus the
+#     driver's own list, idc/bin/idc);
 #   * an int function and a string-in/string-out function both give the
 #     right answer, called from node the way lib/id-runtime.ts calls one;
 #   * idstd is still reachable code (tfx_abs is called), it is just not
@@ -50,7 +50,9 @@ unset IDSTD_HOME IDC_NO_STD
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-cat > "$TMP/prog.id" <<'EOF'
+mkdir "$TMP/prog"
+printf 'string[] lib_exports = ["greet", "sum3"];\n' > "$TMP/prog/conf.id"
+cat > "$TMP/prog/prog.id" <<'EOF'
 greet(string who) {
   string g = "hi " + who;
 } return string g;
@@ -61,7 +63,7 @@ sum3(int a, int b) {
 } return int s;
 EOF
 
-if ! "$ROOT/bin/idc" --std "$FIXTURE" --allow-untested "$TMP/prog.id" \
+if ! "$ROOT/bin/idc" --std "$FIXTURE" --allow-untested "$TMP/prog" \
         --target wasm -o "$TMP/prog.wasm" >"$TMP/build.err" 2>&1; then
     bad "the program builds ($(head -1 "$TMP/build.err"))"
     echo; echo "$pass passed, $fail failed"; exit 1

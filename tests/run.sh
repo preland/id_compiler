@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
+SECTIONS=(core core_self core_rest invalid runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1113,6 +1113,17 @@ if want lib_csv; then
     [ "$lbc" -eq 0 ] || lbs=1
 fi
 
+# --- -O LEVEL: what each optimisation level does to a program, and that none of
+#     them changes what it means (docs/BACKENDS.md, "Optimisation levels").
+echo
+echo "--- -O levels (docs/BACKENDS.md) ---"
+opts=0
+if want opt; then
+    ./opt.sh
+    opts=$?
+    [ "$opts" -eq 0 ] && mark_done opt
+fi
+
 # --- conformance: every code-generation target must agree about what a
 #     program means. Comparing emitted text against idc.py, which the tree
 #     used to do, is only a question while both compilers emit C; this
@@ -1218,5 +1229,5 @@ for i in "${!TMPGUARD_TREES[@]}"; do
 done
 
 [ "$fail" -eq 0 ] && [ "$tmpg" -eq 0 ] && [ "$neg" -eq 0 ] && [ "$rneg" -eq 0 ] && [ "$shneg" -eq 0 ] \
-    && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$wjs" -eq 0 ] && [ "$wjss" -eq 0 ] && [ "$lbs" -eq 0 ] && [ "$conf" -eq 0 ] \
+    && [ "$bend" -eq 0 ] && [ "$std" -eq 0 ] && [ "$wsm" -eq 0 ] && [ "$wjs" -eq 0 ] && [ "$wjss" -eq 0 ] && [ "$lbs" -eq 0 ] && [ "$opts" -eq 0 ] && [ "$conf" -eq 0 ] \
     && [ "$tst" -eq 0 ] && [ "$fixr" -eq 0 ] && [ "$real" -eq 0 ] && [ "$kern" -eq 0 ] && [ "$edit" -eq 0 ]

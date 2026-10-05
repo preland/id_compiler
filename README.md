@@ -112,7 +112,10 @@ See [`../docs/TESTS.md`](../docs/TESTS.md), "Enforcement, and the migration".
 representation of `id`'s own -- a control-flow graph with phi nodes, a pass
 pipeline over it, and an LLVM IR printer at the end -- rather than through a
 second walk of the syntax tree. That is what makes optimisation possible at
-all, and `-O1` (the default) already removes a third of the emitted IR.
+all, and `-O1` (the IR's default level) already removes a third of the emitted IR.
+`-O` on its own chooses how much of the program the C compiler inlines on every
+target (`-O0` nothing, `-O2` the default, `-Os` smallest binary):
+[`../docs/BACKENDS.md`](../docs/BACKENDS.md), "Optimisation levels".
 
 ```sh
 bin/idc ../demos/calc --allow-untested --target llvm -o calc     # through the IR and its passes

@@ -56,6 +56,16 @@ if [ "${1:-}" = std ]; then
         *id_fs_open*id_fs_size*|*id_fs_size*id_fs_open*) ok "the fs natives the program reaches are imports ($imports)" ;;
         *) bad "fs natives are imports (got: $imports)" ;;
     esac
+    mkdir "$TMP/stdname"
+    printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/stdname/twice.id"
+    printf 'string[] lib_exports = ["twice", "lst_str_index"];\n' > "$TMP/stdname/conf.id"
+    if $BIN_IDC "$TMP/stdname" --target wasm -o "$TMP/stdname.wasm" >"$TMP/stdname.err" 2>&1; then
+        bad "a lib_exports name that is an idstd function is refused (built)"
+    elif grep -q "'lst_str_index', a function of the standard library" "$TMP/stdname.err" && grep -q 'define a function of your own that calls it' "$TMP/stdname.err"; then
+        ok "a lib_exports name that is an idstd function is refused, naming it and the fix"
+    else
+        bad "a lib_exports name that is an idstd function is refused ($(head -2 "$TMP/stdname.err" | tr '\n' ' '))"
+    fi
     if node wasm_js/std_check.mjs "$TMP" > "$TMP/std.out" 2>&1; then
         cat "$TMP/std.out"
         pass=$((pass + $(grep -c '^PASS' "$TMP/std.out")))
@@ -89,9 +99,9 @@ for f in lib.mjs lib.d.ts liball.mjs nobe.mjs cmd.mjs; do
 done
 
 exports=$(wasm-objdump -x -j Export "$TMP/lib.wasm" 2>/dev/null | grep -oE '"[a-zA-Z_0-9]+"' | tr -d '"' | grep '^id_' | sort | tr '\n' ' ')
-want="id_alloc id_shout id_squares id_str_of_cstr id_twice "
+want="id_alloc id_measure id_shout id_squares id_str_of_cstr id_twice "
 if [ "$exports" = "$want" ]; then
-    ok "the default export rule is the root file's functions (not sub/'s)"
+    ok "the export rule is exactly conf.id's lib_exports (a function of sub/ included, the other sub/ functions not)"
 else
     bad "the default export rule (got: $exports)"
 fi
@@ -121,6 +131,38 @@ else
         bad "the refusal names the native, its call and the fix ($(head -3 "$TMP/nowasm.err" | tr '\n' ' '))"
     fi
 fi
+
+TW='twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n'
+refuse() { # refuse NAME CONF-OR-EMPTY WHAT PATTERN... : a project that must not build, and the words its error must hold
+    local name="$1" conf="$2" what="$3"; shift 3
+    mkdir -p "$TMP/$name"
+    printf "$TW" > "$TMP/$name/twice.id"
+    [ -n "$conf" ] && printf '%s\n' "$conf" > "$TMP/$name/conf.id"
+    if build "$name" "$TMP/$name"; then bad "$what (built)"; return; fi
+    local p
+    for p in "$@"; do
+        grep -qF -- "$p" "$TMP/$name.err" || { bad "$what (the error lacks '$p': $(head -2 "$TMP/$name.err" | tr '\n' ' '))"; return; }
+    done
+    ok "$what"
+}
+refuse wnolist "" "a wasm library with no lib_exports list is refused, showing the line to add" 'lib_exports = [' 'wnolist/conf.id'
+refuse wbadname 'string[] lib_exports = ["twice", "twicce"];' "a lib_exports name that is not a function is refused, naming it and the fix" "'twicce', which is not a function of this project" 'check the spelling'
+refuse wdupname 'string[] lib_exports = ["twice", "twice"];' "a duplicate lib_exports entry is refused, naming it and the fix" "lists 'twice' twice; remove one"
+refuse wmainname 'string[] lib_exports = ["twice", "main"];' "listing main is refused, naming the fix" "lists 'main', which cannot be exported"
+mkdir -p "$TMP/wnomarsh"
+printf 'grid(int[][] gx) {\n  int gn = len(gx);\n} return int gn;\n([[1]]):(1)\n([[1], [2]]):(2)\n' > "$TMP/wnomarsh/grid.id"
+printf 'string[] lib_exports = ["grid"];\n' > "$TMP/wnomarsh/conf.id"
+if build wnomarsh "$TMP/wnomarsh"; then bad "an unmarshallable listed function is refused (built)"
+elif grep -q "lists 'grid'" "$TMP/wnomarsh.err" && grep -q 'does not cross the boundary' "$TMP/wnomarsh.err" && grep -q 'remove the entry' "$TMP/wnomarsh.err"; then ok "an unmarshallable listed function is refused, naming it and the fix"
+else bad "an unmarshallable listed function is refused ($(head -2 "$TMP/wnomarsh.err" | tr '\n' ' '))"; fi
+
+mkdir -p "$TMP/wunreached"
+cp wasm_js/cmd/main.id "$TMP/wunreached/main.id"
+printf "$TW" > "$TMP/wunreached/twice.id"
+printf 'string[] lib_exports = ["twice"];\n' > "$TMP/wunreached/conf.id"
+if build wunreached "$TMP/wunreached"; then bad "a listed function a program's main never reaches is refused (built)"
+elif grep -q "'twice', which the module does not contain" "$TMP/wunreached.err" && grep -q 'call it from main' "$TMP/wunreached.err"; then ok "a listed function a program's main never reaches is refused, naming the fix"
+else bad "a listed function a program's main never reaches is refused ($(head -2 "$TMP/wunreached.err" | tr '\n' ' '))"; fi
 
 if $BIN_IDC wasm_js/lib --allow-untested --target wasm --no-js -o "$TMP/nojs.wasm" >/dev/null 2>&1 && [ -s "$TMP/nojs.wasm" ] && [ ! -e "$TMP/nojs.mjs" ]; then
     ok "--no-js writes the .wasm alone"

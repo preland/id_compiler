@@ -1,12 +1,15 @@
 // gen.mjs -- write <name>.mjs and <name>.d.ts beside an id-built <name>.wasm.
 //
-//   node gen.mjs --wasm FILE --glue glue.mjs --natives MAP [--out PREFIX] --src FILE...
+//   node gen.mjs --wasm FILE --glue glue.mjs --natives MAP [--out PREFIX] [--strict 1] [--names A,B] --src FILE...
 //
-// bin/idc runs it at the end of `--target wasm`. The module is glue.mjs with
+// bin/idc runs it at the end of `--target wasm`. --strict 1 (a build driven by
+// conf.id's lib_exports) makes an export that cannot be bound an error rather
+// than a comment in the .d.ts, and --names says which functions the list
+// named, so one the module does not contain is an error too. The module is glue.mjs with
 // this build's facts written into its three `//@gen` lines and the JS module of
 // every backend whose native the wasm actually imports appended; the .d.ts is
 // the TypeScript view of the same signatures. The signatures are read from the
-// --src files (the functions bin/idc exported) with a scanner, not a parser:
+// --src files (the program's files; the functions the wasm exports are found by name) with a scanner, not a parser:
 // a definition is `name(params) {`, its body is the balanced braces after it,
 // and its type is the first word of the `} return TYPE ...;` that closes it
 // (docs/PROJECT.md section 3 for `chain`). MAP lines are NATIVE TAB BACKEND TAB JSFILE.
@@ -145,7 +148,7 @@ for (const e of exportNames) {
   const fn = e.slice(3);
   const d = defs.get(fn);
   if (!d) {
-    skipped.push([fn, "no definition of it was found in the exported source files"]);
+    skipped.push([fn, "no definition of it was found in the project's source files"]);
     continue;
   }
   const params = d.params.map((p) => {
@@ -156,6 +159,14 @@ for (const e of exportNames) {
   if (bad) skipped.push([fn, "parameter '" + bad[0] + "' has type " + bad[1] + ", which does not cross the boundary (int, float, word, string and lists of int, float or string do)"]);
   else if (!d.ret || (d.ret !== "void" && !SUPPORTED.has(d.ret))) skipped.push([fn, "it returns " + d.ret + ", which does not cross the boundary"]);
   else sigs[fn] = { params, ret: d.ret, file: d.file, line: d.line };
+}
+
+if (opt.names) {
+  const missing = opt.names.split(",").filter((n) => n && !exportNames.has("id_" + n));
+  if (missing.length) die("conf.id's lib_exports lists " + missing.map((n) => "'" + n + "'").join(", ") + ", which the module does not contain: a program with a main keeps only the functions main reaches; call it from main, or build the project without a main to keep every function");
+}
+if (opt.strict && skipped.length) {
+  die("conf.id's lib_exports lists " + skipped.map(([fn, why]) => "'" + fn + "' (" + why + ")").join("; ") + "; remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)");
 }
 
 const used = {};

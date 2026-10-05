@@ -149,9 +149,61 @@ EOF
     mkdir "$TMP/hasfunc"
     printf 'apply(func(int) return int fn, int v) {\n  int out_v = fn(v);\n} return int out_v;\n' > "$TMP/hasfunc/apply.id"
     printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/hasfunc/twice.id"
+    printf 'string[] lib_exports = ["apply", "twice"];\n' > "$TMP/hasfunc/conf.id"
     if build hasfunc "$TMP/hasfunc" --no-std --allow-untested; then bad "an exported function taking a function value is refused (built)"
-    elif grep -q "has no C form" "$TMP/hasfunc.log"; then ok "an exported function taking a function value is refused, naming the type and the fix"
+    elif grep -q "has no C form" "$TMP/hasfunc.log" && grep -q "remove 'apply' from lib_exports" "$TMP/hasfunc.log"; then ok "an exported function taking a function value is refused, naming the type and the fix"
     else bad "an exported function taking a function value is refused ($(tail -1 "$TMP/hasfunc.log"))"; fi
+
+    mkdir "$TMP/nolist"
+    printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/nolist/twice.id"
+    if build nolist "$TMP/nolist" --no-std; then bad "a library with no lib_exports list is refused (built)"
+    elif grep -q 'string\[\] lib_exports = \[' "$TMP/nolist.log" && grep -q 'nolist/conf.id' "$TMP/nolist.log"; then ok "a library with no lib_exports list is refused, showing the line to add and where"
+    else bad "a library with no lib_exports list is refused ($(tail -1 "$TMP/nolist.log"))"; fi
+
+    mkdir "$TMP/emptylist"
+    cp "$TMP/nolist/twice.id" "$TMP/emptylist/twice.id"
+    printf 'string[] lib_exports = [];\n' > "$TMP/emptylist/conf.id"
+    if build emptylist "$TMP/emptylist" --no-std; then bad "an empty lib_exports list is refused (built)"
+    elif grep -q 'lists no function' "$TMP/emptylist.log"; then ok "an empty lib_exports list is refused, with an example entry"
+    else bad "an empty lib_exports list is refused ($(tail -1 "$TMP/emptylist.log"))"; fi
+
+    mkdir "$TMP/badname"
+    cp "$TMP/nolist/twice.id" "$TMP/badname/twice.id"
+    printf 'string[] lib_exports = ["twice", "twicce"];\n' > "$TMP/badname/conf.id"
+    if build badname "$TMP/badname" --no-std; then bad "a lib_exports name that is not a function is refused (built)"
+    elif grep -q "'twicce', which is not a function of this project" "$TMP/badname.log" && grep -q 'check the spelling' "$TMP/badname.log"; then ok "a lib_exports name that is not a function is refused, naming it and the fix"
+    else bad "a lib_exports name that is not a function is refused ($(tail -1 "$TMP/badname.log"))"; fi
+
+    mkdir "$TMP/dupname"
+    cp "$TMP/nolist/twice.id" "$TMP/dupname/twice.id"
+    printf 'string[] lib_exports = ["twice", "twice"];\n' > "$TMP/dupname/conf.id"
+    if build dupname "$TMP/dupname" --no-std; then bad "a duplicate lib_exports entry is refused (built)"
+    elif grep -q "lists 'twice' twice; remove one" "$TMP/dupname.log"; then ok "a duplicate lib_exports entry is refused, naming it and the fix"
+    else bad "a duplicate lib_exports entry is refused ($(tail -1 "$TMP/dupname.log"))"; fi
+
+    mkdir "$TMP/badtype"
+    cp "$TMP/nolist/twice.id" "$TMP/badtype/twice.id"
+    printf 'int lib_exports = 3;\n' > "$TMP/badtype/conf.id"
+    if build badtype "$TMP/badtype" --no-std; then bad "a lib_exports that is not a string list is refused (built)"
+    elif grep -q 'lib_exports must be a list of strings' "$TMP/badtype.log"; then ok "a lib_exports that is not a string list is refused, with the form to write"
+    else bad "a lib_exports that is not a string list is refused ($(tail -1 "$TMP/badtype.log"))"; fi
+
+    mkdir -p "$TMP/impb" "$TMP/impa"
+    printf 'string[] lib_exports = ["inner_t"];\n' > "$TMP/impb/conf.id"
+    printf 'inner_t(int a) {\n  int b = a * 3;\n} return int b;\n(2):(6)\n(5):(15)\n' > "$TMP/impb/t.id"
+    printf 'import "../impb"\nstring[] lib_exports = ["outer_w"];\n' > "$TMP/impa/conf.id"
+    printf 'outer_w(int a) {\n  int b = inner_t(a) + 1;\n} return int b;\n(2):(7)\n(5):(16)\n' > "$TMP/impa/w.id"
+    if build impa "$TMP/impa" --no-std && [ "$(exports_of "$TMP/impa.d/libimpa.a" a | tr '\n' ' ')" = "impa_error impa_free impa_outer_w impa_shutdown impa_strs_free impa_table_free " ]; then
+        ok "a library that imports another library exports only its own list (the dependency's lib_exports is not a clash)"
+    else bad "a library that imports another library exports only its own list ($(tail -1 "$TMP/impa.log"))"; fi
+
+    mkdir -p "$TMP/deep/inner"
+    printf 'string[] lib_exports = ["inner_triple"];\n' > "$TMP/deep/conf.id"
+    printf 'inner_triple(int a) {\n  int b = a * 3;\n} return int b;\n(2):(6)\n(5):(15)\n' > "$TMP/deep/inner/triple.id"
+    printf 'outer_wrap(int a) {\n  int b = a * 5;\n} return int b;\n(1):(5)\n(4):(20)\n' > "$TMP/deep/outer.id"
+    if build deep "$TMP/deep" --no-std && [ "$(exports_of "$TMP/deep.d/libdeep.a" a | tr '\n' ' ')" = "deep_error deep_free deep_inner_triple deep_shutdown deep_strs_free deep_table_free " ]; then
+        ok "a listed function in a subdirectory is exported, and an unlisted root function is not"
+    else bad "a listed function in a subdirectory is exported, and an unlisted root function is not ($(tail -1 "$TMP/deep.log"); $(exports_of "$TMP/deep.d/libdeep.a" a | tr '\n' ' '))"; fi
 else
     # --- csvlib: a real library, over csvq's parser, with the real idstd -----
     if build csv ../../trials/csvlib; then ok "trials/csvlib builds as a library"; else bad "trials/csvlib builds as a library ($(tail -1 "$TMP/csv.log"))"; fi
@@ -165,6 +217,12 @@ else
     else
         ok "csv: libcsv.so depends only on libc (unreached backends are not linked)"
     fi
+    mkdir "$TMP/stdname"
+    printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/stdname/twice.id"
+    printf 'string[] lib_exports = ["twice", "lst_str_index"];\n' > "$TMP/stdname/conf.id"
+    if build stdname "$TMP/stdname"; then bad "a lib_exports name that is an idstd function is refused (built)"
+    elif grep -q "'lst_str_index', a function of the standard library" "$TMP/stdname.log" && grep -q 'define a function of your own that calls it' "$TMP/stdname.log"; then ok "a lib_exports name that is an idstd function is refused, naming it and the fix"
+    else bad "a lib_exports name that is an idstd function is refused ($(tail -1 "$TMP/stdname.log"))"; fi
     for mode in static shared; do
         if host csv lib/csv_host.c "$mode"; then
             ok "csv: the C host passes against the $mode library ($(grep -c '^PASS' "$TMP/csv.$mode.out") checks)"
