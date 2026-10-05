@@ -1,0 +1,19 @@
+// wlgen XML... prints the protocol tables sys/win/wl reads, as the block that goes at the end of idstd/conf.id: interface names and versions, each request and event's signature, which interface its new_id creates, its flat index as a named constant, and the enum entries. The XML files are the ones under idstd/sys/win/wl/proto, read in the order given; idstd/run.sh's wl section regenerates the block and fails when conf.id differs.
+main(int argc, string[] argv) {
+  wg_init();
+  wg_all(argv);
+  wg_emit();
+} return int 0;
+(1, ["wlgen"]):(0) then calls wg_emit:[1]
+(2, ["wlgen", "p.xml"]):(0) then calls wg_all:[1]
+
+// Every file on the command line, in order, after the program's own name.
+wg_all(string[] vz_argv) {
+  int vi_i = 1;
+  while (vi_i < len(vz_argv)) {
+    wg_scan(vz_argv[vi_i]);
+    vi_i = vi_i + 1;
+  }
+} return void;
+given wg_init (["wlgen"]):() then wg_t_state:("0 0 0")
+given wg_init (["wlgen", "/nonexistent/none.xml"]):() then wg_t_state:("0 0 0")

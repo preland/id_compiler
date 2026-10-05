@@ -1,0 +1,35 @@
+// The message being read is complete: write it into the lists. A kind of "event" is direction 1, anything else a request.
+wg_commit(string vs_kind) {
+  int vi_d = 0;
+  if (vs_kind == "event") {
+    vi_d = 1;
+  }
+  wg_row(vi_d);
+} return void;
+given wg_init given wg_iface("a", "1") given wg_begin("go") ("request"):() then wg_t_state:("1 1 0")
+given wg_init given wg_iface("a", "1") given wg_begin("go") ("event"):() then wg_t_row:("1 a_go 0")
+
+// The row itself: direction, name, signature, new interface name, interface number and opcode, where the opcode counts the messages of this direction the interface had before.
+wg_row(int vi_d) {
+  string[] vz_cur = (import wg_cur);
+  int[] vl_ct = (import wg_ct);
+  push((import wg_md), vi_d);
+} chain (int vi_d) {
+  push((import wg_mn), vz_cur[0]);
+  push((import wg_ms), vz_cur[1]);
+  push((import wg_mw), vz_cur[2]);
+} chain (int vi_d) {
+  push((import wg_mi), len((import wg_ifn)) - 1);
+  push((import wg_mo), vl_ct[vi_d]);
+  vl_ct[vi_d] = vl_ct[vi_d] + 1;
+} return void;
+given wg_init given wg_iface("a", "1") given wg_begin("go") (0):() then wg_t_row:("0 a_go 0")
+given wg_init given wg_iface("a", "1") given wg_begin("go") given wg_row(0) (0):() then wg_t_row:("0 a_go 1")
+
+// Test check: the last row as "direction name opcode".
+wg_t_row() {
+  int vi_n = len((import wg_mn)) - 1;
+  string vs_s = (import wg_md)[vi_n] + " " + (import wg_mn)[vi_n] + " " + (import wg_mo)[vi_n];
+} return string vs_s;
+given wg_init given wg_iface("a", "1") given wg_begin("go") given wg_row(1) ():("1 a_go 0")
+given wg_init given wg_iface("a", "1") given wg_begin("go") given wg_row(1) given wg_row(1) ():("1 a_go 1")

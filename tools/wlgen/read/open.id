@@ -1,0 +1,42 @@
+// One element event: k is 1 for a start, 2 for an end, 4 for an element that is both. vs_n is the element's name and vz_a its attributes (name, value, version, type, interface).
+wg_step(int vi_k, string vs_n, string[] vz_a) {
+  if (vi_k == 1 || vi_k == 4) {
+    wg_open(vs_n, vz_a);
+  }
+  if (vi_k == 2 || vi_k == 4) {
+    wg_shut(vs_n);
+  }
+} return void;
+given wg_init (4, "interface", ["a", "", "2", "", ""]):() then wg_t_state:("1 0 0")
+given wg_init (3, "interface", ["a", "", "2", "", ""]):() then wg_t_state:("0 0 0")
+
+// What a start tag begins: an interface, a message, an argument of the message, an enum or one of its entries.
+wg_open(string vs_n, string[] vz_a) {
+  if (vs_n == "interface") {
+    wg_iface(vz_a[0], vz_a[2]);
+  }
+  if (vs_n == "arg") {
+    wg_arg(vz_a[3], vz_a[4]);
+  }
+  if (vs_n == "request" || vs_n == "event") {
+    wg_begin(vz_a[0]);
+  }
+} chain (string vs_n, string[] vz_a) {
+  if (vs_n == "enum") {
+    wg_enum(vz_a[0]);
+  }
+  if (vs_n == "entry") {
+    wg_entry(vz_a[0], vz_a[1]);
+  }
+} return void;
+given wg_init ("interface", ["a", "", "2", "", ""]):() then wg_t_state:("1 0 0")
+given wg_init given wg_iface("a", "1") ("enum", ["e", "", "", "", ""]):() then wg_t_cur:(["", "", "", "a_e"])
+
+// What an end tag finishes: a message is written down once its arguments are all in.
+wg_shut(string vs_n) {
+  if (vs_n == "request" || vs_n == "event") {
+    wg_commit(vs_n);
+  }
+} return void;
+given wg_init given wg_iface("a", "1") given wg_begin("go") ("request"):() then wg_t_state:("1 1 0")
+given wg_init given wg_iface("a", "1") given wg_begin("go") ("interface"):() then wg_t_state:("1 0 0")

@@ -1,0 +1,35 @@
+// One direction's constants and tables. vi_d is 0 for requests and 1 for events.
+wg_dir(int vi_d) {
+  int[] vl_rows = wg_rows(vi_d);
+  string vs_p = wg_tag(vi_d);
+  wg_consts(vl_rows, wg_ctag(vi_d));
+} chain (int vi_d) {
+  wg_put_s("idstd_wl_" + vs_p + "s", wg_col_s(vl_rows, (import wg_ms)));
+  wg_put_i("idstd_wl_" + vs_p + "i", wg_col_i(vl_rows, (import wg_mi)));
+  wg_put_i("idstd_wl_" + vs_p + "o", wg_col_i(vl_rows, (import wg_mo)));
+} chain (int vi_d) {
+  wg_put_i("idstd_wl_" + vs_p + "n", wg_col_n(vl_rows));
+  wg_put_i("idstd_wl_" + vs_p + "b", wg_bases(vl_rows));
+} return void;
+given wg_t_load (0):() then prints:("int idstd_wl_q_a_go = 0;\nstring[] idstd_wl_rs = [\"un\"];\nint[] idstd_wl_ri = [0];\nint[] idstd_wl_ro = [0];\nint[] idstd_wl_rn = [1];\nint[] idstd_wl_rb = [0, 1, 1];\n")
+given wg_t_load (1):() then prints:("int idstd_wl_e_a_up = 0;\nint idstd_wl_e_b_dn = 1;\nstring[] idstd_wl_es = [\"i\", \"\"];\nint[] idstd_wl_ei = [0, 1];\nint[] idstd_wl_eo = [0, 0];\nint[] idstd_wl_en = [-1, -1];\nint[] idstd_wl_eb = [0, 1, 2];\n")
+
+// The table-name letter of a direction: r for requests, e for events.
+wg_tag(int vi_d) {
+  string vs_t = "r";
+  if (vi_d == 1) {
+    vs_t = "e";
+  }
+} return string vs_t;
+(0):("r")
+(1):("e")
+
+// The constant-name letter of a direction: q for requests, e for events.
+wg_ctag(int vi_d) {
+  string vs_t = "q";
+  if (vi_d == 1) {
+    vs_t = "e";
+  }
+} return string vs_t;
+(0):("q")
+(1):("e")

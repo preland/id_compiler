@@ -1,0 +1,34 @@
+// A column of the message table, for the rows of one direction.
+wg_col_s(int[] vl_rows, string[] vz_src) {
+  string[] vz_out = [];
+  int vi_k = 0;
+  while (vi_k < len(vl_rows)) {
+    push(vz_out, vz_src[vl_rows[vi_k]]);
+    vi_k = vi_k + 1;
+  }
+} return string[] vz_out;
+given wg_t_load ([1, 2], (import wg_ms)):(["i", ""])
+given wg_t_load ([0], (import wg_mn)):(["a_go"])
+
+wg_col_i(int[] vl_rows, int[] vl_src) {
+  int[] vl_out = [];
+  int vi_k = 0;
+  while (vi_k < len(vl_rows)) {
+    push(vl_out, vl_src[vl_rows[vi_k]]);
+    vi_k = vi_k + 1;
+  }
+} return int[] vl_out;
+given wg_t_load ([1, 2], (import wg_mi)):([0, 1])
+given wg_t_load ([0, 1], (import wg_mo)):([0, 0])
+
+// The number of the interface each message's new_id creates, -1 for a message that creates none.
+wg_col_n(int[] vl_rows) {
+  int[] vl_out = [];
+  int vi_k = 0;
+  while (vi_k < len(vl_rows)) {
+    push(vl_out, lst_str_index((import wg_ifn), (import wg_mw)[vl_rows[vi_k]]));
+    vi_k = vi_k + 1;
+  }
+} return int[] vl_out;
+given wg_t_load ([0]):([1])
+given wg_t_load ([1, 2]):([-1, -1])

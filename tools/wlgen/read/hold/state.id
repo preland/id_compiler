@@ -1,0 +1,35 @@
+// Everything read so far, as parallel lists: the interfaces and their versions, the messages (direction 0 for a request, 1 for an event, name, signature, the interface its new_id creates, the interface it belongs to and its opcode there), the enum entries, the message being read and how many requests and events the current interface has had.
+wg_init() {
+  export string[] wg_ifn = [];
+  export int[] wg_ifv = [];
+  export int[] wg_md = [];
+} chain () {
+  export string[] wg_mn = [];
+  export string[] wg_ms = [];
+  export string[] wg_mw = [];
+} chain () {
+  export int[] wg_mi = [];
+  export int[] wg_mo = [];
+  export string[] wg_cn = [];
+} chain () {
+  export string[] wg_cv = [];
+  export string[] wg_cur = ["", "", "", ""];
+  export int[] wg_ct = [0, 0];
+} return void;
+():() then wg_t_state:("0 0 0")
+():() then wg_t_cur:(["", "", "", ""])
+
+// Test check: how many interfaces, messages and enum entries have been read.
+wg_t_state() {
+  string vs_s = len((import wg_ifn)) + " " + len((import wg_mn)) + " " + len((import wg_cn));
+} return string vs_s;
+given wg_init ():("0 0 0")
+given wg_init given wg_iface("a", "1") ():("1 0 0")
+
+// Test fixture: two interfaces, three messages and an enum entry.
+wg_t_load() {
+  wg_init();
+  wg_walk("<p><interface name=\"a\" version=\"2\"><request name=\"go\"><arg name=\"x\" type=\"uint\"/><arg name=\"n\" type=\"new_id\" interface=\"b\"/></request><event name=\"up\"><arg name=\"y\" type=\"int\"/></event></interface><interface name=\"b\" version=\"1\"><event name=\"dn\"/><enum name=\"e\"><entry name=\"x\" value=\"0x1\"/></enum></interface></p>");
+} return void;
+():() then wg_t_state:("2 3 1")
+():() then wg_t_cur:(["b_dn", "", "", "b_e"])

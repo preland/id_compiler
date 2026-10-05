@@ -1,0 +1,16 @@
+// A new enum: its entries are named for the interface, the enum and the entry.
+wg_enum(string vs_ename) {
+  string vs_pre = lst_str_last((import wg_ifn));
+  sset((import wg_cur), 3, vs_pre + "_" + vs_ename);
+} return void;
+given wg_init given wg_iface("a", "1") ("e"):() then wg_t_cur:(["", "", "", "a_e"])
+given wg_init given wg_iface("b", "1") ("f"):() then wg_t_cur:(["", "", "", "b_f"])
+
+// One entry of the enum being read, its value as written (decimal or 0x hexadecimal, which id also reads).
+wg_entry(string vs_ename, string vs_value) {
+  string[] vz_cur = (import wg_cur);
+  push((import wg_cn), vz_cur[3] + "_" + vs_ename);
+  push((import wg_cv), vs_value);
+} return void;
+given wg_init given wg_iface("a", "1") given wg_enum("e") ("x", "1"):() then wg_t_state:("1 0 1")
+given wg_init given wg_iface("a", "1") given wg_enum("e") ("y", "0x10"):() then wg_t_state:("1 0 1")

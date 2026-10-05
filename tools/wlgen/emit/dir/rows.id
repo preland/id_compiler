@@ -1,0 +1,30 @@
+// The rows of the messages that go in direction vi_d, in the order they were read; a message's place in this list is its flat index.
+wg_rows(int vi_d) {
+  int[] vl_rows = [];
+  int vi_i = 0;
+  while (vi_i < len((import wg_md))) {
+    wg_take(vl_rows, vi_d, vi_i);
+    vi_i = vi_i + 1;
+  }
+} return int[] vl_rows;
+given wg_t_load (0):([0])
+given wg_t_load (1):([1, 2])
+
+wg_take(int[] vl_rows, int vi_d, int vi_i) {
+  if ((import wg_md)[vi_i] == vi_d) {
+    push(vl_rows, vi_i);
+  }
+} return void;
+given wg_t_load ([], 0, 0):([0])
+given wg_t_load ([], 1, 0):([])
+
+// One constant per message: its flat index under the name idstd_wl_<c>_<message>.
+wg_consts(int[] vl_rows, string vs_c) {
+  int vi_k = 0;
+  while (vi_k < len(vl_rows)) {
+    put("int idstd_wl_" + vs_c + "_" + (import wg_mn)[vl_rows[vi_k]] + " = " + vi_k + ";\n");
+    vi_k = vi_k + 1;
+  }
+} return void;
+given wg_t_load ([0], "q"):() then prints:("int idstd_wl_q_a_go = 0;\n")
+given wg_t_load ([1, 2], "e"):() then prints:("int idstd_wl_e_a_up = 0;\nint idstd_wl_e_b_dn = 1;\n")

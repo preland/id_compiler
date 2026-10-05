@@ -1,0 +1,31 @@
+// The whole block, in the order idstd's conf.id keeps it.
+wg_emit() {
+  put((import wg_head));
+  wg_ifaces();
+  wg_dir(0);
+} chain () {
+  wg_dir(1);
+  wg_enums();
+  put("// END GENERATED\n");
+} return void;
+given wg_t_load ():() then calls wg_dir:[2]
+given wg_t_load ():() then calls wg_enums:[1]
+
+// The interfaces: names and versions.
+wg_ifaces() {
+  wg_put_s("idstd_wl_ifn", (import wg_ifn));
+  wg_put_i("idstd_wl_ifv", (import wg_ifv));
+} return void;
+given wg_t_load ():() then prints:("string[] idstd_wl_ifn = [\"a\", \"b\"];\nint[] idstd_wl_ifv = [2, 1];\n")
+given wg_init ():() then prints:("string[] idstd_wl_ifn = [];\nint[] idstd_wl_ifv = [];\n")
+
+// One constant per enum entry, named for its interface, enum and entry, holding the value as the protocol wrote it.
+wg_enums() {
+  int vi_i = 0;
+  while (vi_i < len((import wg_cn))) {
+    put("int idstd_wl_n_" + (import wg_cn)[vi_i] + " = " + (import wg_cv)[vi_i] + ";\n");
+    vi_i = vi_i + 1;
+  }
+} return void;
+given wg_t_load ():() then prints:("int idstd_wl_n_b_e_x = 0x1;\n")
+given wg_init ():() then prints:("")

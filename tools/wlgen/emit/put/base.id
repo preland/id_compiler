@@ -1,0 +1,32 @@
+// Where each interface's first message of a direction sits in the flat list: one entry per interface and a last one that is the count, so interface i owns the flat indexes from entry i up to entry i + 1.
+wg_bases(int[] vl_rows) {
+  int[] vl_b = wg_zeros(len((import wg_ifn)) + 1);
+  int vi_k = 0;
+  while (vi_k < len(vl_rows)) {
+    wg_count(vl_b, (import wg_mi)[vl_rows[vi_k]] + 1);
+    vi_k = vi_k + 1;
+  }
+} chain (int[] vl_rows) {
+  int vi_i = 1;
+  while (vi_i < len(vl_b)) {
+    lset(vl_b, vi_i, vl_b[vi_i] + vl_b[vi_i - 1]);
+    vi_i = vi_i + 1;
+  }
+} return int[] vl_b;
+given wg_t_load ([0]):([0, 1, 1])
+given wg_t_load ([1, 2]):([0, 1, 2])
+
+wg_count(int[] vl_b, int vi_at) {
+  lset(vl_b, vi_at, vl_b[vi_at] + 1);
+} return void;
+([0, 0], 1):([0, 1])
+([5, 6, 7], 2):([5, 6, 8])
+
+wg_zeros(int vi_n) {
+  int[] vl_z = [];
+  while (len(vl_z) < vi_n) {
+    push(vl_z, 0);
+  }
+} return int[] vl_z;
+(3):([0, 0, 0])
+(0):([])

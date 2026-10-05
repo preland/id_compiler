@@ -1,0 +1,22 @@
+// A new interface: its name and version, and the counts of its requests and events start again.
+wg_iface(string vs_name, string vs_ver) {
+  push((import wg_ifn), vs_name);
+  push((import wg_ifv), to_int(vs_ver));
+  wg_zero((import wg_ct));
+} return void;
+given wg_init ("wl_a", "3"):() then wg_t_state:("1 0 0")
+given wg_init given wg_iface("x", "1") ("wl_b", "2"):() then wg_t_state:("2 0 0")
+
+wg_zero(int[] vl_ct) {
+  lset(vl_ct, 0, 0);
+  lset(vl_ct, 1, 0);
+} return void;
+([5, 6]):([0, 0])
+([1, 1]):([0, 0])
+
+// Test check: the message being read.
+wg_t_cur() {
+  string[] vz_cur = (import wg_cur);
+} return string[] vz_cur;
+given wg_init ():(["", "", "", ""])
+given wg_init given wg_iface("a", "1") given wg_begin("go") ():(["a_go", "", "", ""])

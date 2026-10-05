@@ -1,0 +1,25 @@
+// A list as a constant declaration, one line.
+wg_put_s(string vs_name, string[] vz_xs) {
+  string vs_body = str_join(wg_quote(vz_xs), ", ");
+  put("string[] " + vs_name + " = [" + vs_body + "];\n");
+} return void;
+("n", ["a", "b\""]):() then prints:("string[] n = [\"a\", \"b\\\"\"];\n")
+("n", []):() then prints:("string[] n = [];\n")
+
+wg_put_i(string vs_name, int[] vl_xs) {
+  string vs_body = lst_text(vl_xs, ", ");
+  put("int[] " + vs_name + " = [" + vs_body + "];\n");
+} return void;
+("n", [1, 20]):() then prints:("int[] n = [1, 20];\n")
+("n", [-1]):() then prints:("int[] n = [-1];\n")
+
+wg_quote(string[] vz_xs) {
+  string[] vz_out = [];
+  int vi_i = 0;
+  while (vi_i < len(vz_xs)) {
+    push(vz_out, str_quote(vz_xs[vi_i]));
+    vi_i = vi_i + 1;
+  }
+} return string[] vz_out;
+(["a", "b"]):(["\"a\"", "\"b\""])
+([]):([])

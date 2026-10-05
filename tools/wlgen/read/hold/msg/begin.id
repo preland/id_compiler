@@ -1,0 +1,58 @@
+// A new message of the current interface: its name, with no arguments yet.
+wg_begin(string vs_mname) {
+  string[] vz_cur = (import wg_cur);
+  string vs_pre = lst_str_last((import wg_ifn));
+  sset(vz_cur, 0, vs_pre + "_" + vs_mname);
+} chain (string vs_mname) {
+  sset(vz_cur, 1, "");
+  sset(vz_cur, 2, "");
+} return void;
+given wg_init given wg_iface("a", "1") ("go"):() then wg_t_cur:(["a_go", "", "", ""])
+given wg_init given wg_iface("a", "1") given wg_arg("uint", "") ("go"):() then wg_t_cur:(["a_go", "", "", ""])
+
+// One argument of the message: its letter joins the signature, and a new_id names the interface it creates.
+wg_arg(string vs_ty, string vs_target) {
+  string[] vz_cur = (import wg_cur);
+  string vs_letter = wg_letter(vs_ty);
+  sset(vz_cur, 1, vz_cur[1] + vs_letter);
+} chain (string vs_ty, string vs_target) {
+  if (vs_ty == "new_id") {
+    sset(vz_cur, 2, vs_target);
+  }
+} return void;
+given wg_init ("uint", ""):() then wg_t_cur:(["", "u", "", ""])
+given wg_init ("new_id", "wl_x"):() then wg_t_cur:(["", "n", "wl_x", ""])
+
+// The letter the wire format calls a type: i int, u uint, f fixed, s string, o object, n new_id, a array, h fd.
+wg_letter(string vs_ty) {
+  string vs_l = "?";
+  if (vs_ty == "int") {
+    vs_l = "i";
+  }
+  if (vs_ty == "uint") {
+    vs_l = "u";
+  }
+} chain (string vs_ty) {
+  if (vs_ty == "fixed") {
+    vs_l = "f";
+  }
+  if (vs_ty == "string") {
+    vs_l = "s";
+  }
+  if (vs_ty == "object") {
+    vs_l = "o";
+  }
+} chain (string vs_ty) {
+  if (vs_ty == "new_id") {
+    vs_l = "n";
+  }
+  if (vs_ty == "array") {
+    vs_l = "a";
+  }
+  if (vs_ty == "fd") {
+    vs_l = "h";
+  }
+} return string vs_l;
+("fd"):("h")
+("fixed"):("f")
+("bogus"):("?")
