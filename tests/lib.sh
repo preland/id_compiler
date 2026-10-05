@@ -29,6 +29,7 @@ cd "$(dirname "$0")"
 
 unset IDSTD_HOME
 which=${1:-fixtures}
+[ "$which" = csv ] && unset IDC_NO_STD
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 pass=0 fail=0
