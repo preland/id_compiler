@@ -1,0 +1,45 @@
+// A float literal's exponent as an int, for deciding whether it overflows. A
+// run of digits too long to matter is clamped to a million: no mantissa is
+// long enough for it to change the answer, and to_int cannot hold more.
+
+flt_exp(string text) {
+  int flk = flt_e_at(text);
+  int fln = len(text);
+  int flv = 0;
+} chain (string text) {
+  if(flk < fln) {
+    string fles = slice(text, flk + 1, fln);
+    flv = flt_exp_of(fles);
+  }
+} return int flv;
+("2.5"):(0)
+("1e308"):(308)
+("1e-5"):(-5)
+("1e+7"):(7)
+
+flt_exp_of(string fles) {
+  int flsg = charat(fles, 0);
+  int fla = flsg == 43 || flsg == 45;
+  int fln = len(fles);
+} chain (string fles) {
+  string flds = slice(fles, fla, fln);
+  string flz = strip_zeros(flds);
+  int flv = flt_clamp(flz);
+} chain (string fles) {
+  if(flsg == 45) {
+    flv = 0 - flv;
+  }
+} return int flv;
+("308"):(308)
+("-0005"):(-5)
+("+12"):(12)
+("-99999999999"):(-1000000)
+
+flt_clamp(string flz) {
+  int flv = 1000000;
+  if(len(flz) <= 6) {
+    flv = to_int(flz);
+  }
+} return int flv;
+("12"):(12)
+("1234567"):(1000000)

@@ -17,6 +17,9 @@ byte, and every case here exits 0 (no `.exit` file).
 - `11-negative-constants` — a `conf.id` float constant or `float[]` element written with a unary `-` (`-2.5`, `-0.0`, `-(-4.5)`) holds that value on every target. `--target llvm` once emitted `double -` for a list element.
 - `10-float-equality-imprecision` — `==` on `float` is bit-exact IEEE equality, not tolerance-based: `(0.1 + 0.2) == 0.3` is false even though both sides print identically as `0.3`.
 
+- `12-exponent-exact` — a literal with an exponent is exactly what C's `strtod` gives, on every target: the smallest subnormal (`4.9e-324`), the largest (`2.2250738585072009e-308`), the two sides of half the smallest subnormal (rounds to `0.0` or to it), `DBL_MAX` and the decimal just below the infinity threshold, and ties-to-even at `2^53`. Each is compared with a value built by exact power-of-two scaling, so a wrong rounding prints `0`.
+- `13-exponent-forms` — every spelling (`1e-30`, `6.02e23`, `1.5E+3`, `2e10`) is a `float` as a `conf.id` constant, in a list and in an expression: `2e10` prints as `2e+10`, where an integer would print `20000000000`.
+
 **Cross-target note:** `05-div-by-zero-variants`'s `0.0 / 0.0` line is the one
 case in this directory where `tests/conform.sh` disagrees across targets —
 the C target (this directory's `.expected`, and what `bin/idc` builds) prints

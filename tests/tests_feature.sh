@@ -2989,6 +2989,26 @@ case "${1:-all}" in
     *) echo "usage: tests_feature.sh [0-4]   (no argument runs every chunk)" >&2; exit 2 ;;
 esac
 
+# --- a first line `#!` is a shebang, read by the lexer and by nothing else ----
+# The line is skipped and its newline is not, so a diagnostic below it keeps the
+# line number the file shows. Anywhere else a `#!` is an error (tests/invalid/).
+SB="$TMP/sb.id"
+printf '%s\n' '#!/usr/bin/env idrun' 'add(int a, int b) {' '  int s = a + b;' '} return int s;' '(1, 2):(3)' '(0, 0):(0)' > "$SB"
+printf '%s\n' 'main(int argc, string[] argv) {' '  print(add(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("2\n")' '(2, ["a", "b"]):(0) then prints:("3\n")' >> "$SB"
+if ../bin/idc "$SB" -o "$TMP/sb.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/sb.bin" x)" = "3" ]; then
+    ok "a script with a #! first line builds with every rule and runs"
+else
+    bad "a script with a #! first line builds and runs ($(head -1 "$TMP/log"))"
+fi
+printf '%s\n' '#!/usr/bin/env idrun' 'main(int argc, string[] argv) {' '  y = 2;' '} return int 0;' > "$SB"
+if ../bin/idc "$SB" --allow-untested -o "$TMP/sb.bin" >"$TMP/log" 2>&1; then
+    bad "a diagnostic below a #! line (built; it should not have)"
+elif grep -qF "sb.id:3: error: undefined variable 'y'" "$TMP/log"; then
+    ok "a diagnostic below a #! line keeps its own line number"
+else
+    bad "a diagnostic below a #! line keeps its own line number ($(head -1 "$TMP/log"))"
+fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

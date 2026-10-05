@@ -19,7 +19,7 @@ dr_file(string dir, string name) {
     frag = dr_one(dir + "/" + name);
   }
 } return string frag;
-("/x", "a.id"):("printf '#file 0|%s\\n' '/x/a.id'; sed '1s/^#!.*//' '/x/a.id'; echo; ")
+("/x", "a.id"):("printf '#file 0|%s\\n' '/x/a.id'; cat '/x/a.id'; echo; ")
 ("/x", "conf.id"):("")
 ("/x", "backend.id"):("")
 ("/x", "a.txt"):("")

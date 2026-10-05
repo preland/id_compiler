@@ -36,7 +36,17 @@ syn_unexpected(int[] pos, string dgn_tok, string dgn_umsg) {
     dgn_uhelp = "write // at the start of each commented line";
   }
 } chain (int[] pos, string dgn_tok, string dgn_umsg) {
+  if(dgn_tok == ".") {
+    dgn_uwhy = "a float literal is digits, a point and digits, so it never starts with the point and an exponent cannot stand alone";
+    dgn_uhelp = "write the digit before the point, as in 0.5 for .5, and put an exponent after digits, as in 0.5e3 or 1e-9";
+  }
+  if(dgn_tok == "#!") {
+    dgn_uwhy = "a '#!' line is only a shebang, and only on line 1, so that ./script.id can run; anywhere else nothing in id starts with '#'";
+    dgn_uhelp = "move the line to the top of the file, or turn it into a // comment";
+  }
   syn_diag(pos, "E0102", dgn_umsg, dgn_tok, dgn_uwhy, dgn_uhelp);
 } return void;
 given mk_two_toks ([0], "=", "unexpected token '='"):() then prints:("<stdin>:1: error: unexpected token '=' [E0102]\n  at: =\n  why: an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type\n  help: write an operand where '=' is, or remove it; a missing operand just before it is the usual cause\n")
 given mk_two_toks ([0], "/*", "block comments are not supported; use // for a line comment"):() then prints:("<stdin>:1: error: block comments are not supported; use // for a line comment [E0102]\n  at: /*\n  why: id has line comments only, so a comment always ends where its line ends and can never swallow code\n  help: write // at the start of each commented line\n")
+given mk_two_toks ([0], ".", "unexpected token '.'; a float literal cannot start with the point"):() then prints:("<stdin>:1: error: unexpected token '.'; a float literal cannot start with the point [E0102]\n  at: .\n  why: a float literal is digits, a point and digits, so it never starts with the point and an exponent cannot stand alone\n  help: write the digit before the point, as in 0.5 for .5, and put an exponent after digits, as in 0.5e3 or 1e-9\n")
+given mk_two_toks ([0], "#!", "'#!' is only allowed as the first line of a file"):() then prints:("<stdin>:1: error: '#!' is only allowed as the first line of a file [E0102]\n  at: #!\n  why: a '#!' line is only a shebang, and only on line 1, so that ./script.id can run; anywhere else nothing in id starts with '#'\n  help: move the line to the top of the file, or turn it into a // comment\n")

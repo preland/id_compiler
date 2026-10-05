@@ -36,6 +36,6 @@ dr_entry(string dir, string name, int root) {
     frag = dr_file(dir, name);
   }
 } return string frag;
-("/x", "a.id", 1):("printf '#file 0|%s\\n' '/x/a.id'; sed '1s/^#!.*//' '/x/a.id'; echo; ")
+("/x", "a.id", 1):("printf '#file 0|%s\\n' '/x/a.id'; cat '/x/a.id'; echo; ")
 ("/x", ".hid/", 1):("")
 given tf_tree given tf_want ((import tf_root), "z/", 1):((import tf_wz)) then tf_rmtree:(0)

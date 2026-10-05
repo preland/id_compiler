@@ -1,0 +1,4 @@
+// EXPECT: a float literal cannot start with the point
+main(int argc, string[] argv) {
+  float x = .e5;
+} return int 0;

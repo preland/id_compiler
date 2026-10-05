@@ -18,8 +18,8 @@ ld_pow10(int k) {
 (0):(1.0)
 (3):(1000.0)
 
-// A decimal literal: all its digits as one integer, divided by ten to the
-// number that came after the point.
+// A decimal literal: all its digits as one integer, scaled by ten to the
+// exponent less the number of digits that came after the point.
 ld_fnum() {
   int neg = ld_neg();
   word wv = ld_digits(0);
@@ -29,7 +29,10 @@ ld_fnum() {
   wv = ld_digits(wv);
   float f = wv;
 } chain () {
-  f = f / ld_pow10((import ld_pr)[(import pr_p)] - p0);
+  int fd = (import ld_pr)[(import pr_p)] - p0;
+  int ex = ld_exp();
+  f = ld_scale(f, ex - fd);
+} chain () {
   if (neg == 1) {
     f = 0.0 - f;
   }
@@ -39,3 +42,6 @@ given tf_ld("-2.25") ():(-2.25)
 given tf_ld("3") ():(3.0)
 given tf_ld("0.1") ():(0.1)
 given tf_ld("123456789.0") ():(123456789.0)
+given tf_ld("2.0e10") ():(20000000000.0)
+given tf_ld("2.5e-3") ():(0.0025)
+given tf_ld("-1.5E+3") ():(-1500.0)

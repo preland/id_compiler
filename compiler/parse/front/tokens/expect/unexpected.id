@@ -23,9 +23,18 @@ unexpected_msg(string t) {
   if(t == "/*") {
     s = "block comments are not supported; use // for a line comment";
   }
+  if(t == ".") {
+    s = "unexpected token '.'; a float literal cannot start with the point";
+  }
+} chain (string t) {
+  if(t == "#!") {
+    s = "'#!' is only allowed as the first line of a file";
+  }
 } return string s;
 ("+"):("unexpected token '+'")
 ("/*"):("block comments are not supported; use // for a line comment")
+("."):("unexpected token '.'; a float literal cannot start with the point")
+("#!"):("'#!' is only allowed as the first line of a file")
 
 // The tail of syn_err.id's syn_err -- that file is already full.
 syn_err_tail(string err_file, int err_line, string msg) {

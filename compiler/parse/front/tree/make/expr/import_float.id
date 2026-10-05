@@ -11,10 +11,12 @@ given full_env ("bar"):(0) then calls newleaf:("import", 0, 0, "bar", "")
 // verbatim in ns1, since idc.py's C emitter prints a float literal's spelling
 // unchanged.
 node_float(string text) {
-  int ret_i = newleaf("float", 0, 0, text, "");
+  string norm = flt_norm(text);
+  int ret_i = newleaf("float", 0, 0, norm, "");
 } return int ret_i;
 given full_env ("0.8"):(0) then calls newleaf:("float", 0, 0, "0.8", "")
 given full_env ("3.14"):(0) then calls newleaf:("float", 0, 0, "3.14", "")
+given full_env ("2e10"):(0) then calls newleaf:("float", 0, 0, "2.0e10", "")
 
 // The kind word of the most recently loaded real token, for push_real/push_tok
 // and split_line.id's proc_line -- none of them return or mutate an argument

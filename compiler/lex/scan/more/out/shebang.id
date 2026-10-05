@@ -1,0 +1,42 @@
+// A first line that begins `#!` is a shebang, so that an id file can be run as
+// `./script.id`. It is source, not a marker, and it is read here and nowhere
+// else: the driver's `#file` marker leaves the line counter at 0, so the first
+// source line is the one where it reads 1 and the line starts at lexbol.
+// Anywhere else `#!` is an error, which scan_shebang prints as one `op #!`
+// token for the parser to name.
+
+is_shebang(string src, int i) {
+  int ok = 0;
+  if(charat(src, i) == 35 && charat(src, i + 1) == 33 && i == (import lexbol)[0] && (import lexline)[0] == 1) {
+    ok = 1;
+  }
+} return int ok;
+given lex_fix_setup ("#!x", 0):(1)
+given lex_fix_setup ("a#!x", 1):(0)
+given lex_fix_bol1 ("a#!x", 1):(0)
+given lex_fix_setup ("x!", 0):(0)
+
+// A `#`: `#!` is a shebang or an error, any other `#word` is a driver marker.
+scan_bang(string src, int i) {
+  int e = 0;
+  if(charat(src, i + 1) == 33) {
+    e = scan_shebang(src, i);
+  } else {
+    e = scan_hash(src, i);
+  }
+} return int e;
+given lex_fix_setup ("#!x", 0):(3) then prints:("")
+given lex_fix_setup ("#abc", 0):(4) then prints:("abc\n")
+
+// The whole line goes, up to but not including its newline, which is still
+// eaten as whitespace so that line 2 stays line 2. The first line prints
+// nothing; a `#!` anywhere else prints a token the parser rejects, and takes
+// the rest of its line with it so that one mistake is one error.
+scan_shebang(string src, int i) {
+  int e = str_eol(src, i);
+  if(is_shebang(src, i) == 0) {
+    print("op #!");
+  }
+} return int e;
+given lex_fix_setup ("#!x\n", 0):(3) then prints:("")
+given lex_fix_bol1 ("#!x", 0):(3) then prints:("op #!\n")

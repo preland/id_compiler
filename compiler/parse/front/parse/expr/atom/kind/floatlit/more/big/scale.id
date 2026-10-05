@@ -1,0 +1,39 @@
+// Where a float literal's decimal point falls, counted from its first nonzero
+// digit: the literal is 0.DIGITS x 10^p. p is all that decides overflow, plus
+// the digits themselves when p is exactly at the limit (over.id), which is why
+// the digits are also cut or padded to the limit's width here.
+
+// How many digits stand before the point in the text: all of them when it has none.
+flt_ilen(string text) {
+  int fldot = str_find(text, ".");
+  int flk = flt_e_at(text);
+  if(fldot >= 0) {
+    flk = fldot;
+  }
+} return int flk;
+("123.45"):(3)
+("12e5"):(2)
+("0.5e3"):(1)
+
+// p = digits before the point, minus the leading zeros dropped from the front,
+// plus the exponent: 0.0125e3 is 0.125 x 10^2, so p is 2.
+flt_scale(string text, string flraw, string flds) {
+  int fla = flt_ilen(text);
+  int fle = flt_exp(text);
+  int flp = fla + fle - len(flraw) + len(flds);
+} return int flp;
+("0.0125e3", "00125", "125"):(2)
+("1e308", "1", "1"):(309)
+("100", "100", "100"):(3)
+
+// The digits as exactly flw digits: padded with zeros when short, cut when long.
+flt_head(string flds, int flw) {
+  int fln = len(flds);
+  int flmin = fx_min(fln, flw);
+  string flz = str_repeat("0", flw - flmin);
+} chain (string flds, int flw) {
+  string flh = str_slice(flds, 0, flmin) + flz;
+} return string flh;
+("1", 3):("100")
+("12345", 3):("123")
+("123", 3):("123")

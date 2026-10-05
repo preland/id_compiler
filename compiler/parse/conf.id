@@ -58,3 +58,9 @@ string dupd_why = "two functions with the same signature and the same logic are 
 string dupd_help = "delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic";
 string imdd_why = "two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter";
 string imdd_help = "replace the import with a parameter, call that one function from both places, and delete the other";
+// Where a float literal overflows to infinity (front/parse/expr/atom/kind/floatlit/
+// more/big/over.id). flt_inf_digits is 2^1024 - 2^970, the exact point half an
+// ulp past DBL_MAX where round-to-nearest-even goes to infinity, as the 309
+// digits of an integer; flt_inf_pt is 309, the number of those digits.
+int flt_inf_pt = 309;
+string flt_inf_digits = "179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792";

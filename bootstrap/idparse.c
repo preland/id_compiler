@@ -579,11 +579,16 @@ int id_lst_index_of(IdList* idstd_xs, int idstd_v);
 int id_lst_find(IdList* idstd_xs, int idstd_v);
 int id_lst_str_index(IdList* idstd_sx, char* idstd_sw);
 int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
+int id_fx_min(int idstd_a, int idstd_b);
 int id_fx_max(int idstd_a, int idstd_b);
 int id_fx_sign(int idstd_a);
 int id_chr_is_space(int idstd_c);
 char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n);
 void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad);
+int id_idstd_str_rep_width(char* idstd_s, int idstd_n);
+char* id_idstd_str_rep_build(char* idstd_s, long long idstd_ad, int idstd_m, int idstd_n);
+void id_idstd_str_rep_loop(char* idstd_s, long long idstd_ad, int idstd_n);
+char* id_str_repeat(char* idstd_s, int idstd_n);
 int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n);
 void id_idstd_str_span_trap(char* idstd_s, int idstd_i, int idstd_n);
 int id_idstd_str_span_at(int idstd_i, int idstd_n);
@@ -1793,9 +1798,27 @@ void id_call_at(int node, int ln);
 int id_parse_atom(IdList* pos);
 int id_parse_atom2(IdList* pos);
 int id_parse_ident_or_call(IdList* pos);
+int id_flt_e_at(char* text);
+int id_flt_exp_ok(char* text);
+void id_flt_check(IdList* pos, char* text);
 int id_parse_atom_float(IdList* pos);
 int id_parse_float(IdList* pos);
 char* id_read_name(IdList* pos);
+int id_flt_exp(char* text);
+int id_flt_exp_of(char* fles);
+int id_flt_clamp(char* flz);
+int id_flt_over(char* text);
+int id_flt_over_at(int flp, char* flds);
+int id_flt_ge_max(char* flds);
+int id_flt_ilen(char* text);
+int id_flt_scale(char* text, char* flraw, char* flds);
+char* id_flt_head(char* flds, int flw);
+int id_flt_exp_has(char* text, int flj);
+void id_flt_bad_exp(IdList* pos, char* text);
+void id_flt_bad_big(IdList* pos, char* text);
+char* id_flt_mant(char* text);
+char* id_flt_lstrip(char* flraw);
+char* id_flt_norm(char* text);
 int id_parse_atom3(IdList* pos);
 int id_parse_import(IdList* pos);
 void id_fill_args(IdList* pos, IdList* args);
@@ -3239,6 +3262,8 @@ char* dupd_why = ID_SK("two functions with the same signature and the same logic
 char* dupd_help = ID_SK("delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic");  /* constant from conf.id */
 char* imdd_why = ID_SK("two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter");  /* constant from conf.id */
 char* imdd_help = ID_SK("replace the import with a parameter, call that one function from both places, and delete the other");  /* constant from conf.id */
+int flt_inf_pt = 309;  /* constant from conf.id */
+char* flt_inf_digits = ID_SK("179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792");  /* constant from conf.id */
 IdList* hostc;  /* exported by arg_flags4() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
@@ -3777,6 +3802,15 @@ int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit) {
     return idstd_v;
 }
 
+int id_fx_min(int idstd_a, int idstd_b) {
+    int idstd_m;
+    idstd_m = idstd_a;
+    if ((idstd_b < idstd_a)) {
+        idstd_m = idstd_b;
+    }
+    return idstd_m;
+}
+
 int id_fx_max(int idstd_a, int idstd_b) {
     int idstd_m;
     idstd_m = idstd_a;
@@ -3819,6 +3853,43 @@ void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad) {
         idstd_j = (idstd_j + 1);
     }
     return;
+}
+
+int id_idstd_str_rep_width(char* idstd_s, int idstd_n) {
+    int idstd_len_v;
+    int idstd_ret_i;
+    idstd_len_v = id_len(idstd_s);
+    idstd_ret_i = id_fx_max((idstd_len_v * idstd_n), 0);
+    return idstd_ret_i;
+}
+
+char* id_idstd_str_rep_build(char* idstd_s, long long idstd_ad, int idstd_m, int idstd_n) {
+    char* idstd_ret_s;
+    id_idstd_str_rep_loop(idstd_s, idstd_ad, idstd_n);
+    idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_m));
+    return idstd_ret_s;
+}
+
+void id_idstd_str_rep_loop(char* idstd_s, long long idstd_ad, int idstd_n) {
+    int idstd_i;
+    int idstd_len_v;
+    idstd_i = 0;
+    while ((idstd_i < idstd_n)) {
+        idstd_len_v = id_len(idstd_s);
+        id_str_blit(idstd_s, 0, idstd_len_v, (idstd_ad + (idstd_i * idstd_len_v)));
+        idstd_i = (idstd_i + 1);
+    }
+    return;
+}
+
+char* id_str_repeat(char* idstd_s, int idstd_n) {
+    int idstd_m;
+    long long idstd_ad;
+    char* idstd_ret_s;
+    idstd_m = id_idstd_str_rep_width(idstd_s, idstd_n);
+    idstd_ad = id_mem_alloc((long long)((idstd_m + 1)));
+    idstd_ret_s = id_idstd_str_rep_build(idstd_s, idstd_ad, idstd_m, idstd_n);
+    return idstd_ret_s;
 }
 
 int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
@@ -15865,6 +15936,37 @@ int id_parse_ident_or_call(IdList* pos) {
     return ret_i;
 }
 
+int id_flt_e_at(char* text) {
+    int flk;
+    flk = 0;
+    while ((((flk < id_len(text)) && (id_charat(text, flk) != 101)) && (id_charat(text, flk) != 69))) {
+        flk = (flk + 1);
+    }
+    return flk;
+}
+
+int id_flt_exp_ok(char* text) {
+    int flk;
+    int flok;
+    flk = id_flt_e_at(text);
+    flok = 1;
+    if ((flk < id_len(text))) {
+        flok = id_flt_exp_has(text, (flk + 1));
+    }
+    return flok;
+}
+
+void id_flt_check(IdList* pos, char* text) {
+    int flok;
+    flok = id_flt_exp_ok(text);
+    if ((flok == 0)) {
+        id_flt_bad_exp(pos, text);
+    } else if ((id_flt_over(text) == 1)) {
+        id_flt_bad_big(pos, text);
+    }
+    return;
+}
+
 int id_parse_atom_float(IdList* pos) {
     int node;
     node = 0;
@@ -15880,6 +15982,7 @@ int id_parse_float(IdList* pos) {
     char* text;
     int ret_i;
     text = id_cur_text(pos);
+    id_flt_check(pos, text);
     id_advance(pos);
     ret_i = id_node_float(text);
     return ret_i;
@@ -15891,6 +15994,184 @@ char* id_read_name(IdList* pos) {
     name = id_cur_text(pos);
     id_advance(pos);
     return name;
+}
+
+int id_flt_exp(char* text) {
+    int flk;
+    int fln;
+    int flv;
+    char* fles;
+    flk = id_flt_e_at(text);
+    fln = id_len(text);
+    flv = 0;
+    if ((flk < fln)) {
+        fles = id_slice(text, (flk + 1), fln);
+        flv = id_flt_exp_of(fles);
+    }
+    return flv;
+}
+
+int id_flt_exp_of(char* fles) {
+    int flsg;
+    int fla;
+    int fln;
+    char* flds;
+    char* flz;
+    int flv;
+    flsg = id_charat(fles, 0);
+    fla = ((flsg == 43) || (flsg == 45));
+    fln = id_len(fles);
+    flds = id_slice(fles, fla, fln);
+    flz = id_strip_zeros(flds);
+    flv = id_flt_clamp(flz);
+    if ((flsg == 45)) {
+        flv = (0 - flv);
+    }
+    return flv;
+}
+
+int id_flt_clamp(char* flz) {
+    int flv;
+    flv = 1000000;
+    if ((id_len(flz) <= 6)) {
+        flv = id_to_int(flz);
+    }
+    return flv;
+}
+
+int id_flt_over(char* text) {
+    char* flraw;
+    char* flds;
+    int flov;
+    int flp;
+    flraw = id_flt_mant(text);
+    flds = id_flt_lstrip(flraw);
+    flov = 0;
+    if ((id_len(flds) > 0)) {
+        flp = id_flt_scale(text, flraw, flds);
+        flov = id_flt_over_at(flp, flds);
+    }
+    return flov;
+}
+
+int id_flt_over_at(int flp, char* flds) {
+    int flov;
+    flov = 0;
+    if ((flp > flt_inf_pt)) {
+        flov = 1;
+    } else if ((flp == flt_inf_pt)) {
+        flov = id_flt_ge_max(flds);
+    }
+    return flov;
+}
+
+int id_flt_ge_max(char* flds) {
+    char* flhead;
+    int flc;
+    int flge;
+    flhead = id_flt_head(flds, flt_inf_pt);
+    flc = id_str_cmp(flhead, flt_inf_digits);
+    flge = (flc >= 0);
+    return flge;
+}
+
+int id_flt_ilen(char* text) {
+    int fldot;
+    int flk;
+    fldot = id_str_find(text, ID_S("."));
+    flk = id_flt_e_at(text);
+    if ((fldot >= 0)) {
+        flk = fldot;
+    }
+    return flk;
+}
+
+int id_flt_scale(char* text, char* flraw, char* flds) {
+    int fla;
+    int fle;
+    int flp;
+    fla = id_flt_ilen(text);
+    fle = id_flt_exp(text);
+int idsq_8;
+    flp = (idsq_8 = id_len(flraw), (((fla + fle) - idsq_8) + id_len(flds)));
+    return flp;
+}
+
+char* id_flt_head(char* flds, int flw) {
+    int fln;
+    int flmin;
+    char* flz;
+    char* flh;
+    fln = id_len(flds);
+    flmin = id_fx_min(fln, flw);
+    flz = id_str_repeat(ID_S("0"), (flw - flmin));
+    flh = id_concat(id_str_slice(flds, 0, flmin), flz);
+    return flh;
+}
+
+int id_flt_exp_has(char* text, int flj) {
+    int flc;
+    int fldg;
+    int flok;
+    flc = id_charat(text, flj);
+    fldg = id_charat(text, (flj + ((flc == 43) || (flc == 45))));
+    flok = ((fldg >= 48) && (fldg <= 57));
+    return flok;
+}
+
+void id_flt_bad_exp(IdList* pos, char* text) {
+    char* flwhy;
+    char* flhelp;
+    flwhy = ID_S("an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e");
+    flhelp = ID_S("write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo");
+    id_syn_diag(pos, ID_S("E0103"), id_concat(id_concat(ID_S("float literal '"), text), ID_S("' has an exponent with no digits")), text, flwhy, flhelp);
+    return;
+}
+
+void id_flt_bad_big(IdList* pos, char* text) {
+    char* flwhy;
+    char* flhelp;
+    flwhy = ID_S("a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be");
+    flhelp = ID_S("write a value no larger than 1.7976931348623157e308, or lower the exponent");
+    id_syn_diag(pos, ID_S("E0104"), id_concat(id_concat(ID_S("float literal '"), text), ID_S("' is too large: it overflows to infinity")), text, flwhy, flhelp);
+    return;
+}
+
+char* id_flt_mant(char* text) {
+    int flk;
+    char* flm;
+    char* flraw;
+    flk = id_flt_e_at(text);
+    flm = id_slice(text, 0, flk);
+    flraw = id_str_replace(flm, ID_S("."), ID_S(""));
+    return flraw;
+}
+
+char* id_flt_lstrip(char* flraw) {
+    int fli;
+    int fln;
+    char* flds;
+    fli = 0;
+    while ((id_charat(flraw, fli) == 48)) {
+        fli = (fli + 1);
+    }
+    fln = id_len(flraw);
+    flds = id_slice(flraw, fli, fln);
+    return flds;
+}
+
+char* id_flt_norm(char* text) {
+    int flk;
+    int fln;
+    char* flout;
+    flk = id_flt_e_at(text);
+    fln = id_len(text);
+    flout = text;
+    if (((flk < fln) && (id_str_find(text, ID_S(".")) < 0))) {
+char* idsq_13;
+        flout = (idsq_13 = id_slice(text, 0, flk), id_concat(id_concat(idsq_13, ID_S(".0")), id_slice(text, flk, fln)));
+    }
+    return flout;
 }
 
 int id_parse_atom3(IdList* pos) {
@@ -16947,6 +17228,12 @@ char* id_unexpected_msg(char* t) {
     if ((strcmp(t, ID_S("/*")) == 0)) {
         s = ID_S("block comments are not supported; use // for a line comment");
     }
+    if ((strcmp(t, ID_S(".")) == 0)) {
+        s = ID_S("unexpected token '.'; a float literal cannot start with the point");
+    }
+    if ((strcmp(t, ID_S("#!")) == 0)) {
+        s = ID_S("'#!' is only allowed as the first line of a file");
+    }
     return s;
 }
 
@@ -17237,8 +17524,10 @@ int id_node_import(char* name) {
 }
 
 int id_node_float(char* text) {
+    char* norm;
     int ret_i;
-    ret_i = id_newleaf(ID_S("float"), 0, 0, text, ID_S(""));
+    norm = id_flt_norm(text);
+    ret_i = id_newleaf(ID_S("float"), 0, 0, norm, ID_S(""));
     return ret_i;
 }
 
@@ -25127,6 +25416,14 @@ void id_syn_unexpected(IdList* pos, char* dgn_tok, char* dgn_umsg) {
     if ((strcmp(dgn_tok, ID_S("/*")) == 0)) {
         dgn_uwhy = ID_S("id has line comments only, so a comment always ends where its line ends and can never swallow code");
         dgn_uhelp = ID_S("write // at the start of each commented line");
+    }
+    if ((strcmp(dgn_tok, ID_S(".")) == 0)) {
+        dgn_uwhy = ID_S("a float literal is digits, a point and digits, so it never starts with the point and an exponent cannot stand alone");
+        dgn_uhelp = ID_S("write the digit before the point, as in 0.5 for .5, and put an exponent after digits, as in 0.5e3 or 1e-9");
+    }
+    if ((strcmp(dgn_tok, ID_S("#!")) == 0)) {
+        dgn_uwhy = ID_S("a '#!' line is only a shebang, and only on line 1, so that ./script.id can run; anywhere else nothing in id starts with '#'");
+        dgn_uhelp = ID_S("move the line to the top of the file, or turn it into a // comment");
     }
     id_syn_diag(pos, ID_S("E0102"), dgn_umsg, dgn_tok, dgn_uwhy, dgn_uhelp);
     return;

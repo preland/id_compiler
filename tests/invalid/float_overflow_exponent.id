@@ -1,0 +1,4 @@
+// EXPECT: float literal '1e999' is too large: it overflows to infinity
+main(int argc, string[] argv) {
+  float x = 1e999;
+} return int 0;

@@ -1,0 +1,43 @@
+// The digits of a float literal, and its spelling as the backends need it.
+
+// The mantissa's digits with the point taken out: "0.0125e3" is "00125".
+flt_mant(string text) {
+  int flk = flt_e_at(text);
+  string flm = slice(text, 0, flk);
+  string flraw = str_replace(flm, ".", "");
+} return string flraw;
+("0.0125e3"):("00125")
+("42"):("42")
+("6.02e23"):("602")
+
+// Without its leading zeros: "00125" is "125", and all zeros is "" (the value
+// is zero, which can overflow nothing).
+flt_lstrip(string flraw) {
+  int fli = 0;
+  while(charat(flraw, fli) == 48) {
+    fli = fli + 1;
+  }
+  int fln = len(flraw);
+} chain (string flraw) {
+  string flds = slice(flraw, fli, fln);
+} return string flds;
+("00125"):("125")
+("000"):("")
+("105"):("105")
+
+// LLVM's text form wants a point before an exponent (`1.0e10`, not `1e10`);
+// C and wasm read either. Spelling `2e10` as `2.0e10` for everyone leaves the
+// value alone and gives every backend the same text to parse.
+flt_norm(string text) {
+  int flk = flt_e_at(text);
+  int fln = len(text);
+  string flout = text;
+} chain (string text) {
+  if(flk < fln && str_find(text, ".") < 0) {
+    flout = slice(text, 0, flk) + ".0" + slice(text, flk, fln);
+  }
+} return string flout;
+("2e10"):("2.0e10")
+("1.5E+3"):("1.5E+3")
+("0.8"):("0.8")
+("1e-30"):("1.0e-30")

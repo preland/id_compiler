@@ -24,8 +24,8 @@ dr_cmd(string path, string tool, string dir, int untested) {
   string parse = dr_q(tool + "/idparse") + flags + " < " + dr_q(dir + "/lex") + " > " + dr_q(dir + "/ll");
   string cmd = prep + " && " + lex + " && " + parse;
 } return string cmd;
-("/a.id", "/t", "/d", 1):("{ printf '#file 0|%s\\n' '/a.id'; sed '1s/^#!.*//' '/a.id'; echo; } > '/d/src' && '/t/idlex' < '/d/src' > '/d/lex' && '/t/idparse' --triple x86_64-unknown-linux-gnu --host-triple x86_64-unknown-linux-gnu --target llvm --opt 0 < '/d/lex' > '/d/ll'")
-("/a.id", "/t", "/d", 0):("{ printf '#file 0|%s\\n' '/a.id'; sed '1s/^#!.*//' '/a.id'; echo; } > '/d/src' && '/t/idlex' < '/d/src' > '/d/lex' && '/t/idparse' --triple x86_64-unknown-linux-gnu --require-tests --host-triple x86_64-unknown-linux-gnu --target llvm --opt 0 < '/d/lex' > '/d/ll'")
+("/a.id", "/t", "/d", 1):("{ printf '#file 0|%s\\n' '/a.id'; cat '/a.id'; echo; } > '/d/src' && '/t/idlex' < '/d/src' > '/d/lex' && '/t/idparse' --triple x86_64-unknown-linux-gnu --host-triple x86_64-unknown-linux-gnu --target llvm --opt 0 < '/d/lex' > '/d/ll'")
+("/a.id", "/t", "/d", 0):("{ printf '#file 0|%s\\n' '/a.id'; cat '/a.id'; echo; } > '/d/src' && '/t/idlex' < '/d/src' > '/d/lex' && '/t/idparse' --triple x86_64-unknown-linux-gnu --require-tests --host-triple x86_64-unknown-linux-gnu --target llvm --opt 0 < '/d/lex' > '/d/ll'")
 
 // Two cases per function are required unless --allow-untested said not to.
 dr_gate(int untested) {

@@ -24,12 +24,13 @@ given lex_fix_setup ("x", 0):(1) then prints:("ident x\n")
 given lex_fix_setup_cols ("x", 0):(1) then prints:("ident x\nspan 1\n")
 
 // Only under --cols, so an ordinary build's token stream is unchanged. A `//`
-// comment prints no token, so it prints no span either.
+// comment prints no token, so it prints no span either, and nor does a shebang.
 span_out(string src, int i, int ni) {
-  if((import lexcols)[0] == 1 && is_lcomment(src, i) == 0) {
+  if((import lexcols)[0] == 1 && is_lcomment(src, i) == 0 && is_shebang(src, i) == 0) {
     int b = (import lexbol)[0];
     print("span " + ((i - b) * 65536 + ni - b));
   }
 } return void;
 given lex_fix_setup ("x", 0, 1):() then prints:("")
 given lex_fix_bol1 ("abcdef", 3, 5):() then prints:("span 131076\n")
+given lex_fix_setup_cols ("#!x", 0, 3):() then prints:("")

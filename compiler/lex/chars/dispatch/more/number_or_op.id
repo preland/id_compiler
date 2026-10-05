@@ -21,17 +21,19 @@ scan_decop(string src, int i) {
 //   #const TYPE name = ...;  a constant from conf.id, which has no declaring
 //                            function because it needs no initialiser
 //
-// A `#` cannot begin an id token otherwise, so nothing legal is shadowed.
+// A `#` cannot begin an id token otherwise, so nothing legal is shadowed. The
+// one `#` the source itself may hold is `#!` on its first line (scan_bang).
 scan_hashop(string src, int i) {
   int ni = 0;
   if(charat(src, i) == 35) {
-    ni = scan_hash(src, i);
+    ni = scan_bang(src, i);
   } else {
     ni = scan_token(src, i);
   }
 } return int ni;
 ("x", 0):(1) then prints:("ident x\n")
 given lex_fix_setup ("#abc", 0):(4) then prints:("abc\n")
+given lex_fix_setup ("#!x", 0):(3) then prints:("")
 
 // The marker word is not parsed here: dropping the `#` and passing the rest of
 // the line through is enough, and it means a third marker needs no change to

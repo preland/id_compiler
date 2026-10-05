@@ -1,0 +1,49 @@
+// A float literal with an exponent is read exactly as C's strtod reads it, on
+// every target. Each check compares the literal with a value built by exact
+// arithmetic (scaling by a power of two never rounds, down to the smallest
+// subnormal), so a target that rounds a literal wrongly, flushes a subnormal to
+// zero or breaks a tie the wrong way prints 0 where the others print 1. The
+// reference side is built from 1.0 and from 9007199254740991.0, which is 2^53-1
+// and exactly representable.
+scale(float x, int n) {
+  while(n > 0) {
+    x = x * 2.0;
+    n = n - 1;
+  }
+  while(n < 0) {
+    x = x / 2.0;
+    n = n + 1;
+  }
+} return float x;
+
+check(int ok) {
+  print(ok);
+} return void;
+
+main(int argc, string[] argv) {
+  float tiny = scale(1.0, 0 - 1074);
+  float tmin = scale(1.0, 0 - 1022);
+  float big = scale(9007199254740991.0, 971);
+} chain (int argc, string[] argv) {
+  check(4.9e-324 == tiny);
+  check(5e-324 == tiny);
+  check(2.2250738585072014e-308 == tmin);
+} chain (int argc, string[] argv) {
+  check(2.2250738585072009e-308 == tmin - tiny);
+  check(2.4703282292062327e-324 == 0.0);
+  check(2.4703282292062328e-324 == tiny);
+} chain (int argc, string[] argv) {
+  check(1.7976931348623157e308 == big);
+  check(9.007199254740993e15 == 9007199254740992.0);
+  check(9.0071992547409931e15 == 9007199254740994.0);
+} chain (int argc, string[] argv) {
+  check(1.4e-45 * scale(1.0, 149) == 0.999073384894172);
+  check(1.4e-45 < scale(1.0, 0 - 149));
+  check(6.02e23 == 602000000000000000000000.0);
+} chain (int argc, string[] argv) {
+  check(1.5E+3 == 1500.0);
+  check(2e10 == 20000000000.0);
+  check(1e23 == 100000000000000000000000.0);
+} chain (int argc, string[] argv) {
+  check(179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497791.0 == big);
+} return int 0;

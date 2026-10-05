@@ -580,6 +580,7 @@ int id_num_end(char* src, int i, int e);
 char* id_numkind(int e, int fe);
 int id_digit_run_end(char* src, int i);
 int id_has_frac(char* src, int e);
+int id_exp_end(char* src, int fe);
 int id_hex_start(char* src, int i);
 int id_hex_end(char* src, int i);
 long long id_hex_val(char* src, int i, int e);
@@ -607,6 +608,9 @@ void id_scan_ident_out(char* ident);
 void id_scan_num_out(char* src, int i, int e, int fe);
 void id_scan_str_out(char* src, int i, int e);
 void id_scan_hash_out(char* src, int i, int e);
+int id_is_shebang(char* src, int i);
+int id_scan_bang(char* src, int i);
+int id_scan_shebang(char* src, int i);
 int id_str_end(char* src, int i);
 int id_adv_str(char* src, int i);
 char* id_slice_str(char* src, int a, int b);
@@ -831,7 +835,7 @@ int id_scan_tok_span(char* src, int i) {
 
 void id_span_out(char* src, int i, int ni) {
     int b;
-    if ((((int)(id_list_get(lexcols, 0)) == 1) && (id_is_lcomment(src, i) == 0))) {
+    if (((((int)(id_list_get(lexcols, 0)) == 1) && (id_is_lcomment(src, i) == 0)) && (id_is_shebang(src, i) == 0))) {
         b = (int)(id_list_get(lexbol, 0));
         id_print(id_concat(ID_S("span "), id_str_of_int(((((i - b) * 65536) + ni) - b))));
     }
@@ -853,7 +857,7 @@ int id_scan_hashop(char* src, int i) {
     int ni;
     ni = 0;
     if ((id_charat(src, i) == 35)) {
-        ni = id_scan_hash(src, i);
+        ni = id_scan_bang(src, i);
     } else {
         ni = id_scan_token(src, i);
     }
@@ -929,6 +933,7 @@ int id_num_end(char* src, int i, int e) {
     if (id_has_frac(src, e)) {
         fe = id_digit_run_end(src, (e + 1));
     }
+    fe = id_exp_end(src, fe);
     return fe;
 }
 
@@ -955,6 +960,19 @@ int id_has_frac(char* src, int e) {
         ok = 1;
     }
     return ok;
+}
+
+int id_exp_end(char* src, int fe) {
+    int c;
+    int ee;
+    int sg;
+    c = id_charat(src, fe);
+    ee = fe;
+    if (((c == 101) || (c == 69))) {
+        sg = id_charat(src, (fe + 1));
+        ee = id_digit_run_end(src, ((fe + 1) + ((sg == 43) || (sg == 45))));
+    }
+    return ee;
 }
 
 int id_hex_start(char* src, int i) {
@@ -1198,6 +1216,35 @@ void id_scan_hash_out(char* src, int i, int e) {
     text = id_slice_str(src, (i + 1), e);
     id_print(text);
     return;
+}
+
+int id_is_shebang(char* src, int i) {
+    int ok;
+    ok = 0;
+    if (((((id_charat(src, i) == 35) && (id_charat(src, (i + 1)) == 33)) && (i == (int)(id_list_get(lexbol, 0)))) && ((int)(id_list_get(lexline, 0)) == 1))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_scan_bang(char* src, int i) {
+    int e;
+    e = 0;
+    if ((id_charat(src, (i + 1)) == 33)) {
+        e = id_scan_shebang(src, i);
+    } else {
+        e = id_scan_hash(src, i);
+    }
+    return e;
+}
+
+int id_scan_shebang(char* src, int i) {
+    int e;
+    e = id_str_eol(src, i);
+    if ((id_is_shebang(src, i) == 0)) {
+        id_print(ID_S("op #!"));
+    }
+    return e;
 }
 
 int id_str_end(char* src, int i) {

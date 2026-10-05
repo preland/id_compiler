@@ -1,0 +1,46 @@
+// Does a float literal round to infinity? Exactly, and without a bignum: a
+// finite double is at most DBL_MAX, and a value rounds up to infinity when it
+// reaches half an ulp past that, which is 2^1024 - 2^970. That number has 309
+// digits (conf.id's flt_inf_digits), so a literal whose point falls beyond the
+// 309th digit overflows, one whose point falls before it does not, and one that
+// falls on it overflows when its digits, padded or cut to 309, are not below
+// those. Cutting is exact: a number below the cut one is below the limit, and
+// a tie goes up, because DBL_MAX's last bit is odd.
+
+flt_over(string text) {
+  string flraw = flt_mant(text);
+  string flds = flt_lstrip(flraw);
+  int flov = 0;
+} chain (string text) {
+  if(len(flds) > 0) {
+    int flp = flt_scale(text, flraw, flds);
+    flov = flt_over_at(flp, flds);
+  }
+} return int flov;
+("1.5"):(0)
+("1e999"):(1)
+("0e999"):(0)
+("0.000e5"):(0)
+
+flt_over_at(int flp, string flds) {
+  int flov = 0;
+  if(flp > (import flt_inf_pt)) {
+    flov = 1;
+  } else if(flp == (import flt_inf_pt)) {
+    flov = flt_ge_max(flds);
+  }
+} return int flov;
+(310, "1"):(1)
+(308, "9"):(0)
+(309, "17976931348623157081452742373170235"):(0)
+(309, "179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497791"):(0)
+(309, "179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792"):(1)
+(309, "1797693134862315807937289714053034150799341327100378269361737789804449682927647509466490179775872070963302864166928879109465555478519404026306574886715058206819089020007083836762738548458177115317644757302700698555713669596228429148198608349364752927190741684443655107043427115596995080930428801779041744977920"):(1)
+
+flt_ge_max(string flds) {
+  string flhead = flt_head(flds, (import flt_inf_pt));
+  int flc = str_cmp(flhead, (import flt_inf_digits));
+  int flge = flc >= 0;
+} return int flge;
+("17976931348623157081"):(0)
+("9"):(1)

@@ -1,0 +1,4 @@
+// EXPECT: float literal '1e+' has an exponent with no digits
+main(int argc, string[] argv) {
+  float x = 1e+;
+} return int 0;

@@ -1,0 +1,40 @@
+// What a float literal's text may be: digits, an optional point and fraction,
+// and an optional exponent (`e` or `E`, an optional sign, digits). The lexer
+// cuts `1e` and `1e+` as whole tokens, so a literal with a broken exponent is
+// named here (E0103) instead of reading as `1` followed by a variable `e`. A
+// literal that rounds to infinity is refused too (E0104): a literal cannot name
+// infinity, so it is an error here rather than a silent inf in the program.
+
+flt_e_at(string text) {
+  int flk = 0;
+  while(flk < len(text) && charat(text, flk) != 101 && charat(text, flk) != 69) {
+    flk = flk + 1;
+  }
+} return int flk;
+("1e5"):(1)
+("1.5E3"):(3)
+("25"):(2)
+
+flt_exp_ok(string text) {
+  int flk = flt_e_at(text);
+  int flok = 1;
+  if(flk < len(text)) {
+    flok = flt_exp_has(text, flk + 1);
+  }
+} return int flok;
+("1.5"):(1)
+("1e5"):(1)
+("1e"):(0)
+("2.5E+"):(0)
+
+flt_check(int[] pos, string text) {
+  int flok = flt_exp_ok(text);
+  if(flok == 0) {
+    flt_bad_exp(pos, text);
+  } else if(flt_over(text) == 1) {
+    flt_bad_big(pos, text);
+  }
+} return void;
+given mk_two_toks ([0], "1.5"):() then prints:("")
+given mk_two_toks ([0], "1e"):() then calls flt_bad_exp:[1]
+given mk_two_toks ([0], "1e999"):() then calls flt_bad_big:[1]
