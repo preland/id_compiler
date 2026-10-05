@@ -10,7 +10,10 @@
 # library merged into the program would put its own functions (and its own
 # allocations) into the same harness.
 #
-# Run from anywhere: tests/tests_feature.sh
+# Run from anywhere: tests/tests_feature.sh [0-4]
+#
+# The checks are five chunks, tf_chunk_0..4, so that none runs over the minute;
+# tests/run.sh runs them as tests_feature_0..4. No argument runs all five.
 set -u
 cd "$(dirname "$0")"
 
@@ -46,6 +49,7 @@ self_refuse() {   # desc, expected message (fixed string), flags...
     fi
 }
 
+tf_chunk_0() {
 printf '%s' 'add(int a, int b) {
   int s = a + b;
 } return int s;
@@ -356,8 +360,9 @@ greet(string who) {
 EOF
 self_refuse "bin/idc: a string case compares by content" \
     'test failed: greet("bob") = "hi bob", expected "hello bob"' --emit-c /dev/null
+}
 
-
+tf_chunk_1() {
 # --- a trigraph in a string literal is its three characters ------------------
 cat > "$TMP/p.id" <<'EOF2'
 tag(string s) {
@@ -1293,7 +1298,9 @@ stdin "hi\n" ():() then prints:("hi\n\n")
 ():() then prints:("\n")
 EOF
 self_accept "bin/idc: a case's stdin clause is what read_all() sees, and a case without one sees empty stdin" --emit-c /dev/null
+}
 
+tf_chunk_2() {
 # --- a case's timeout clause: its own limit in place of the default 30 -------
 # Short limits stand in for the real thing (no case may run near 30s here):
 # `timeout 1` on a case that spins for about 3s must be stopped at ITS limit,
@@ -1346,7 +1353,9 @@ stdin "hi\n" timeout 20 ():() then prints:("hi\n\n")
 ():() then prints:("\n")
 EOF
 self_accept "bin/idc: timeout follows stdin and precedes the arguments" --emit-c /dev/null
+}
 
+tf_chunk_3() {
 # --- (import NAME) inside a list literal of a case -----------------------------
 # An element of a list in ARGS or EXPECTED may be (import NAME), nested lists
 # included: read after the setup on the argument side and after the call on the
@@ -1842,7 +1851,9 @@ main(int argc, string[] argv) {
 } return int 0;
 EOF
 self_accept "bin/idc: a function that assigns its parameter is not a constant wrapper" --allow-untested --emit-c /dev/null
+}
 
+tf_chunk_4() {
 # --- function values (docs/SPEC.md 1.1) --------------------------------------
 # bin/idc only: idc.py has no function values. The harness builds and runs a
 # tested function that takes one, handed in through an export its setup stores.
@@ -2963,6 +2974,13 @@ for tgt in c llvm; do
         bad "natives: the list-returning fixture builds ($tgt: $(head -1 "$TMP/log"))"
     fi
 done
+}
+
+case "${1:-all}" in
+    all) for k in 0 1 2 3 4; do "tf_chunk_$k"; done ;;
+    [0-4]) "tf_chunk_$1" ;;
+    *) echo "usage: tests_feature.sh [0-4]   (no argument runs every chunk)" >&2; exit 2 ;;
+esac
 
 echo
 echo "$pass passed, $fail failed"

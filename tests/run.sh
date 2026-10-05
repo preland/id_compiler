@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature fix idstd_real kernel editor)
+SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel editor)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1163,11 +1163,13 @@ done
 echo
 echo "--- test clauses (docs/TESTS.md) ---"
 tst=0
-if want tests_feature; then
-    ./tests_feature.sh
-    tst=$?
-    [ "$tst" -eq 0 ] && mark_done tests_feature
-fi
+for i in 0 1 2 3 4; do
+    if want "tests_feature_$i"; then
+        ./tests_feature.sh "$i"
+        rc=$?
+        [ "$rc" -eq 0 ] && mark_done "tests_feature_$i" || tst=1
+    fi
+done
 
 # --- bin/idc --check and --fix: each case's before/ tree, fixed, is its
 #     expect/ tree, a second --fix changes nothing, --check says what a build
