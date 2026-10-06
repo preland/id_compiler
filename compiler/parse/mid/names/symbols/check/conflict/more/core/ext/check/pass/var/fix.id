@@ -1,0 +1,22 @@
+// The registry std_var_pass reads, built by hand: row 0 is the program's `x`
+// (int, in 'f', line 10, unit 0) and, from sv_fx, row 1 is the library's `x`
+// (the type given, in 'g', line 20, unit 2, the first library unit). sv_xfx has
+// no library row: the library's `x` is an index line, as in a lazy build.
+
+sv_fx(string sv_ty) {
+  regrow_d();
+  reg_push("x", sv_ty, "g", 0, 2);
+  push((import dvline), 20);
+} chain (string sv_ty) {
+  lset((import stdunit), 0, 2);
+} return void;
+("string"):() then (import dvline)[1]:(20)
+("int"):() then (import dvtype)[1]:("int")
+
+sv_xfx(string sv_ty) {
+  regrow_d();
+  lset((import stdunit), 0, 2);
+  ext_line("V\tx\t" + sv_ty + "\tlib.id\t7");
+} return void;
+("string"):() then (import ext_vt)[0]:("string")
+("int"):() then (import stdunit)[0]:(2)

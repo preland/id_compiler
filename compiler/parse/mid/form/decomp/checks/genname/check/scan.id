@@ -1,5 +1,5 @@
-// Warning 3: a parameter whose name is one `--fix` invents rather than one a
-// person chose (docs/PROJECT.md, "decomposition warnings"). Checked over every
+// E0310: a parameter whose name is one `--fix` invents rather than one a
+// person chose (docs/PROJECT.md, "Decomposition errors"). Checked over every
 // declared function's own parameter list -- a local is out of scope, because a
 // generated local inside one function is fine; only a parameter leaks the name
 // across the call.

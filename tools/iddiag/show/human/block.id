@@ -44,17 +44,13 @@ dg_title(string dg_ti_h, int dg_ti_on) {
   string dg_ti_r = dg_paint(dg_ti_g, dg_sevcol(dg_ti_s), dg_ti_on) + ": " + dg_msg(dg_ti_h);
 } return string dg_ti_r;
 ("a.id:2: error: bad [E0001]", 0):("error[E0001]: bad")
-("a.id:2: warning: odd", 0):("warning: odd")
+("a.id:2: note: odd", 0):("note: odd")
 
 dg_sevcol(string dg_sc_s) {
   string dg_sc_r = "1;36";
   if(dg_sc_s == "error") {
     dg_sc_r = "1;31";
   }
-  if(dg_sc_s == "warning") {
-    dg_sc_r = "1;33";
-  }
 } return string dg_sc_r;
 ("error"):("1;31")
-("warning"):("1;33")
 ("note"):("1;36")

@@ -5,6 +5,7 @@ level2(int[] xs) {
 
 level1(int[] xs) {
   level2(xs);
+  xs[2] = 9;
 } return void;
 
 main(int argc, string[] argv) {

@@ -1,21 +1,23 @@
-// file:line: warning: 'F' only forwards to 'G'; call 'G' directly -- own
-// diagnostic channel, on stderr (docs/PROJECT.md, "decomposition warnings"):
-// it never calls note_failure, so it cannot turn a build that would
-// otherwise succeed into one that fails.
+// file:line: error: function 'F' only forwards to 'G' [E0406], with the rule's
+// why and, as the help, the deletion and the call sites to rewrite
+// (docs/ERRORS.md). It calls diag, so the build fails: the fix is always
+// available, and a build that keeps the forwarder keeps a name that adds nothing.
 fwd_report(int i, string callee_name) {
-  string msg = fwd_msg(i, callee_name);
-  eprint(msg);
+  string fwd_m = fwd_msg(i, callee_name);
+  string fwd_h = fwd_help(i, callee_name);
+  string fwd_loc = diag_prog_loc(i);
+} chain (int i, string callee_name) {
+  diag("E0406", fwd_loc, fwd_m, (import ns1)[((import prog)[i])], (import fwdd_why), fwd_h);
 } return void;
-given farm_i (0, "target"):() then eprints:("test.id:7: warning: 'fwd1' only forwards to 'target'; call 'target' directly\n")
-given farm_i (0, "other"):() then eprints:("test.id:7: warning: 'fwd1' only forwards to 'other'; call 'other' directly\n")
+given farm_i (0, "target"):() then prints:("test.id:7: error: function 'fwd1' only forwards to 'target' [E0406]\n  at: fwd1\n  why: a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not\n  help: delete 'fwd1' and call 'target' directly at every site that called it; move any test cases of 'fwd1' onto 'target'\n") then (import chkfail)[0]:(1)
+given farm_i (0, "other"):() then prints:("test.id:7: error: function 'fwd1' only forwards to 'other' [E0406]\n  at: fwd1\n  why: a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not\n  help: delete 'fwd1' and call 'other' directly at every site that called it; move any test cases of 'fwd1' onto 'other'\n") then (import chkfail)[0]:(1)
 
 fwd_msg(int i, string callee_name) {
   string fname = (import ns1)[((import prog)[i])];
-  string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
-  string ret_s = loc + "'" + fname + "' only forwards to '" + callee_name + "'; call '" + callee_name + "' directly";
+  string ret_s = "function '" + fname + "' only forwards to '" + callee_name + "'";
 } return string ret_s;
-given farm_i (0, "target"):("test.id:7: warning: 'fwd1' only forwards to 'target'; call 'target' directly")
-given farm_i (0, "other"):("test.id:7: warning: 'fwd1' only forwards to 'other'; call 'other' directly")
+given farm_i (0, "target"):("function 'fwd1' only forwards to 'target'")
+given farm_i (0, "other"):("function 'fwd1' only forwards to 'other'")
 
 // (import fwd_fids) [0] a plain function, [1] one named "main"
 // (../../../decl_ok.id's fs_build2).

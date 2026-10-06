@@ -1,4 +1,4 @@
-// Warning 1: a pure forwarder -- a function whose body is exactly one
+// E0406: a pure forwarder -- a function whose body is exactly one
 // statement that calls another function with its own parameters, all of
 // them, unchanged, in the same order, and returns that call's result (or
 // returns void after the call). Excluded: `main`, a native, and a function

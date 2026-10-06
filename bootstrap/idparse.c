@@ -615,10 +615,6 @@ ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
     if (used < 64) tab[used++] = o;
     return o;
 }
-#ifndef IDTC_EPRINT_TO
-#define IDTC_EPRINT_TO stderr
-#endif
-static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
 void id_hmap_init(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt);
 void id_idstd_hmap_fill(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, int idstd_n);
@@ -2129,6 +2125,7 @@ int id_fwd_decl_ok3(int retvar, int callid, int stmt);
 int id_fwd_arg_ok(IdList* paramsl, IdList* argsl, int idx);
 int id_fwd_arg_ok2(int argid, int pid);
 int id_fwd_sig_match(int fid, char* callee_name);
+char* id_fwd_help(int i, char* callee_name);
 int id_fwd_sig_params_loop(IdList* paramsl, IdList* cparamsl, int idx);
 int id_fwd_param_ok(IdList* paramsl, IdList* cparamsl, int idx);
 int id_fwd_param_ok2(int pid, int cpid);
@@ -2874,6 +2871,16 @@ void id_ext_uniq_pick(int xe_r, int xe_k, int xe_fi, int xe_first);
 void id_ext_uniq_pass(void);
 void id_ext_uniq_at(int xe_r);
 void id_ext_uniq_hit(int xe_r, int xe_k);
+void id_sv_find(int sv_r);
+int id_sv_std_row(char* sv_nm);
+int id_sv_scan(IdList* sv_bk, char* sv_nm, int sv_k, int sv_hit);
+void id_sv_report(int sv_r, char* sv_ty, char* sv_loc);
+int id_sv_pick(int sv_r, char* sv_nm, int sv_cur);
+void id_sv_loaded(int sv_r, int sv_j);
+void id_sv_ext(int sv_r);
+void id_std_var_pass(void);
+void id_sv_row(int sv_r);
+int id_sv_mine(int sv_r);
 void id_ixw_print(void);
 void id_ixw_begin(void);
 void id_ixw_flags(void);
@@ -2916,6 +2923,8 @@ void id_ext_put_fp(IdList* xe_f);
 void id_ext_route3(char* xe_tag, IdList* xe_f);
 void id_ext_put_imd(IdList* xe_f);
 void id_ext_put_loaded(IdList* xe_f);
+void id_ext_route4(char* xe_tag, IdList* xe_f);
+void id_ext_put_var(IdList* xe_f);
 void id_ext_init(void);
 char* id_ext_key(char* xe_str);
 char* id_owner_at(int i, char* name, char* s);
@@ -2924,6 +2933,7 @@ char* id_first_type_at(int i, char* name, char* t, int unit);
 void id_report_var_type(char* name, char* type, char* prev, char* owner, int ln);
 char* id_export_owner(char* name);
 char* id_owner_of(char* name);
+int id_unit_scope(int unit);
 int id_fn_count(char* fname);
 void id_reg_twice(char* name, char* type, char* owner, int exported, int ln, int unit);
 int id_fn_count_at(int i, char* fname, int n);
@@ -3460,6 +3470,11 @@ char* dupd_why = ID_SK("two functions with the same signature and the same logic
 char* dupd_help = ID_SK("delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic");  /* constant from conf.id */
 char* imdd_why = ID_SK("two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter");  /* constant from conf.id */
 char* imdd_help = ID_SK("replace the import with a parameter, call that one function from both places, and delete the other");  /* constant from conf.id */
+char* svd_why = ID_SK("a name must keep one type across the whole program, the standard library included, so that one name always means one kind of value wherever it appears");  /* constant from conf.id */
+char* svd_help = ID_SK("rename this variable so that it differs from the library's; the library's declaration is the one that cannot change");  /* constant from conf.id */
+char* gnd_why = ID_SK("a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it");  /* constant from conf.id */
+char* gnd_help = ID_SK("rename the parameter to what it holds, in the signature and at every use of it in the body");  /* constant from conf.id */
+char* fwdd_why = ID_SK("a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not");  /* constant from conf.id */
 int flt_inf_pt = 309;  /* constant from conf.id */
 char* flt_inf_digits = ID_SK("179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792");  /* constant from conf.id */
 IdList* pure_builtins;  /* constant from conf.id */
@@ -3682,6 +3697,9 @@ IdList* ext_mk;  /* exported by ext_init() */
 IdList* ext_mv;  /* exported by ext_init() */
 IdList* ext_mu;  /* exported by ext_init() */
 IdList* ext_mc;  /* exported by ext_init() */
+IdList* ext_vt;  /* exported by ext_init() */
+IdList* ext_vf;  /* exported by ext_init() */
+IdList* ext_vl;  /* exported by ext_init() */
 IdList* didx;  /* exported by init_didx() */
 IdList* dvunit;  /* exported by init_didx() */
 IdList* dvline;  /* exported by fill_didx() */
@@ -18592,6 +18610,15 @@ int id_fwd_sig_match(int fid, char* callee_name) {
     return ok;
 }
 
+char* id_fwd_help(int i, char* callee_name) {
+    char* fname;
+    char* ret_s;
+IdList* idsq_25;
+    fname = (idsq_25 = ns1, (char*)(intptr_t)(id_list_get(idsq_25, (int)(id_list_get(prog, i)))));
+    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("delete '"), fname), ID_S("' and call '")), callee_name), ID_S("' directly at every site that called it; move any test cases of '")), fname), ID_S("' onto '")), callee_name), ID_S("'"));
+    return ret_s;
+}
+
 int id_fwd_sig_params_loop(IdList* paramsl, IdList* cparamsl, int idx) {
     int ok;
     ok = 1;
@@ -18624,22 +18651,26 @@ char* idsq_9;
 }
 
 void id_fwd_report(int i, char* callee_name) {
-    char* msg;
-    msg = id_fwd_msg(i, callee_name);
-    id_eprint(msg);
+    char* fwd_m;
+    char* fwd_h;
+    char* fwd_loc;
+    fwd_m = id_fwd_msg(i, callee_name);
+    fwd_h = id_fwd_help(i, callee_name);
+    fwd_loc = id_diag_prog_loc(i);
+IdList* idsq_10;
+IdList* idsq_9;
+int idsq_7;
+char* idsq_6;
+    (idsq_10 = ns1, idsq_9 = prog, idsq_7 = (int)(id_list_get(idsq_9, i)), idsq_6 = (char*)(intptr_t)(id_list_get(idsq_10, idsq_7)), id_diag(ID_S("E0406"), fwd_loc, fwd_m, idsq_6, fwdd_why, fwd_h));
     return;
 }
 
 char* id_fwd_msg(int i, char* callee_name) {
     char* fname;
-    char* loc;
     char* ret_s;
-IdList* idsq_35;
-    fname = (idsq_35 = ns1, (char*)(intptr_t)(id_list_get(idsq_35, (int)(id_list_get(prog, i)))));
-IdList* idsq_29;
-char* idsq_27;
-    loc = (idsq_29 = pfile, idsq_27 = (char*)(intptr_t)(id_list_get(idsq_29, i)), id_concat(id_concat(id_concat(idsq_27, ID_S(":")), id_str_of_int((int)(id_list_get(pline, i)))), ID_S(": warning: ")));
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(loc, ID_S("'")), fname), ID_S("' only forwards to '")), callee_name), ID_S("'; call '")), callee_name), ID_S("' directly"));
+IdList* idsq_17;
+    fname = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(prog, i)))));
+    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("function '"), fname), ID_S("' only forwards to '")), callee_name), ID_S("'"));
     return ret_s;
 }
 
@@ -18960,22 +18991,21 @@ int id_is_digit_c(int ch) {
 }
 
 void id_genname_report(int i, char* name) {
-    char* msg;
-    msg = id_genname_msg(i, name);
-    id_eprint(msg);
+    char* gn_msg;
+    char* gn_loc;
+    gn_msg = id_genname_msg(i, name);
+    gn_loc = id_diag_prog_loc(i);
+char* idsq_4;
+    (idsq_4 = gnd_why, id_diag(ID_S("E0310"), gn_loc, gn_msg, name, idsq_4, gnd_help));
     return;
 }
 
 char* id_genname_msg(int i, char* name) {
     char* fname;
-    char* loc;
     char* ret_s;
-IdList* idsq_31;
-    fname = (idsq_31 = ns1, (char*)(intptr_t)(id_list_get(idsq_31, (int)(id_list_get(prog, i)))));
-IdList* idsq_25;
-char* idsq_23;
-    loc = (idsq_25 = pfile, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, i)), id_concat(id_concat(id_concat(idsq_23, ID_S(":")), id_str_of_int((int)(id_list_get(pline, i)))), ID_S(": warning: ")));
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(loc, ID_S("parameter '")), name), ID_S("' of '")), fname), ID_S("' has a generated name; name it for what it holds"));
+IdList* idsq_17;
+    fname = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(prog, i)))));
+    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("parameter '"), name), ID_S("' of '")), fname), ID_S("' has a generated name"));
     return ret_s;
 }
 
@@ -19264,6 +19294,7 @@ void id_check_program_tail2(void) {
     id_check_genname();
     id_check_fwd();
     id_check_imp_dup();
+    id_std_var_pass();
     id_ext_check();
     return;
 }
@@ -26562,6 +26593,119 @@ char* idsq_13;
     return;
 }
 
+void id_sv_find(int sv_r) {
+    int sv_j;
+    sv_j = id_sv_std_row((char*)(intptr_t)(id_list_get(dvname, sv_r)));
+    if ((sv_j >= 0)) {
+        id_sv_loaded(sv_r, sv_j);
+    } else {
+        id_sv_ext(sv_r);
+    }
+    return;
+}
+
+int id_sv_std_row(char* sv_nm) {
+    IdList* sv_bk;
+    int sv_hit;
+IdList* idsq_16;
+    sv_bk = (idsq_16 = didx, (IdList*)(intptr_t)(id_list_get(idsq_16, id_name_bucket(sv_nm))));
+    sv_hit = id_sv_scan(sv_bk, sv_nm, 0, (0 - 1));
+    return sv_hit;
+}
+
+int id_sv_scan(IdList* sv_bk, char* sv_nm, int sv_k, int sv_hit) {
+    while ((sv_k < id_list_len(sv_bk))) {
+        sv_hit = id_sv_pick((int)(id_list_get(sv_bk, sv_k)), sv_nm, sv_hit);
+        sv_k = (sv_k + 1);
+    }
+    return sv_hit;
+}
+
+void id_sv_report(int sv_r, char* sv_ty, char* sv_loc) {
+    char* sv_nm;
+    char* sv_here;
+    char* sv_msg;
+    sv_nm = (char*)(intptr_t)(id_list_get(dvname, sv_r));
+IdList* idsq_44;
+char* idsq_42;
+    sv_here = (idsq_44 = dvfunc, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, sv_r)), id_diag_fn_loc(idsq_42, (int)(id_list_get(dvline, sv_r))));
+    sv_msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), sv_nm), ID_S("' is declared ")), (char*)(intptr_t)(id_list_get(dvtype, sv_r))), ID_S(" here but ")), sv_ty), ID_S(" in the standard library"));
+char* idsq_12;
+    (idsq_12 = svd_why, id_diag(ID_S("E0303"), sv_here, sv_msg, sv_nm, idsq_12, svd_help));
+    id_diag_related(sv_loc, id_concat(ID_S("the standard library's declaration, which is "), sv_ty));
+    return;
+}
+
+int id_sv_pick(int sv_r, char* sv_nm, int sv_cur) {
+    int sv_h;
+    sv_h = sv_cur;
+IdList* idsq_12;
+int idsq_10;
+    if (((((sv_cur < 0) && (strcmp((char*)(intptr_t)(id_list_get(dvname, sv_r)), sv_nm) == 0)) && ((int)(id_list_get(dvexp, sv_r)) == 0)) && (idsq_12 = dvunit, idsq_10 = (int)(id_list_get(idsq_12, sv_r)), (idsq_10 >= (int)(id_list_get(stdunit, 0)))))) {
+        sv_h = sv_r;
+    }
+    return sv_h;
+}
+
+void id_sv_loaded(int sv_r, int sv_j) {
+    char* sv_where;
+IdList* idsq_25;
+char* idsq_23;
+    if ((idsq_25 = dvtype, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, sv_r)), (strcmp(idsq_23, (char*)(intptr_t)(id_list_get(dvtype, sv_j))) != 0))) {
+IdList* idsq_17;
+char* idsq_15;
+        sv_where = (idsq_17 = dvfunc, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sv_j)), id_diag_fn_loc(idsq_15, (int)(id_list_get(dvline, sv_j))));
+        id_sv_report(sv_r, (char*)(intptr_t)(id_list_get(dvtype, sv_j)), sv_where);
+    }
+    return;
+}
+
+void id_sv_ext(int sv_r) {
+    int sv_k;
+IdList* idsq_41;
+IdList* idsq_40;
+IdList* idsq_39;
+    sv_k = (idsq_41 = ext_mk, idsq_40 = ext_mv, idsq_39 = ext_mu, id_hmap_get(idsq_41, idsq_40, idsq_39, id_concat(ID_S("v:"), (char*)(intptr_t)(id_list_get(dvname, sv_r))), (0 - 1)));
+IdList* idsq_25;
+char* idsq_23;
+    if (((sv_k >= 0) && (idsq_25 = ext_vt, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, sv_k)), (strcmp(idsq_23, (char*)(intptr_t)(id_list_get(dvtype, sv_r))) != 0)))) {
+IdList* idsq_15;
+char* idsq_13;
+IdList* idsq_12;
+char* idsq_10;
+        (idsq_15 = ext_vt, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sv_k)), idsq_12 = ext_vf, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, sv_k)), id_sv_report(sv_r, idsq_13, id_concat(id_concat(idsq_10, ID_S(":")), id_str_of_int((int)(id_list_get(ext_vl, sv_k))))));
+    }
+    return;
+}
+
+void id_std_var_pass(void) {
+    int sv_i;
+    sv_i = 0;
+    while ((sv_i < id_list_len(dvname))) {
+        id_sv_row(sv_i);
+        sv_i = (sv_i + 1);
+    }
+    return;
+}
+
+void id_sv_row(int sv_r) {
+    if ((id_sv_mine(sv_r) == 1)) {
+        id_sv_find(sv_r);
+    }
+    return;
+}
+
+int id_sv_mine(int sv_r) {
+    int sv_ok;
+    sv_ok = 0;
+IdList* idsq_12;
+int idsq_10;
+    if (((((int)(id_list_get(stdunit, 0)) >= 0) && ((int)(id_list_get(dvexp, sv_r)) == 0)) && (idsq_12 = dvunit, idsq_10 = (int)(id_list_get(idsq_12, sv_r)), (idsq_10 < (int)(id_list_get(stdunit, 0)))))) {
+        sv_ok = 1;
+    }
+    return sv_ok;
+}
+
 void id_ixw_print(void) {
     id_ixw_begin();
     id_print(ID_S("/* ---- index ---- */"));
@@ -26892,11 +27036,13 @@ int id_ixw_end(int ixw_f) {
 
 void id_ixw_var(int ixw_k) {
     if (((int)(id_list_get(dvexp, ixw_k)) == 0)) {
-IdList* idsq_13;
-char* idsq_11;
-IdList* idsq_10;
-char* idsq_8;
-        (idsq_13 = dvfunc, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, ixw_k)), idsq_10 = dvname, idsq_8 = (char*)(intptr_t)(id_list_get(idsq_10, ixw_k)), id_ixw_put(id_list_lit(4, (long long)(intptr_t)(ID_S("V")), (long long)(intptr_t)(idsq_11), (long long)(intptr_t)(idsq_8), (long long)(intptr_t)((char*)(intptr_t)(id_list_get(dvtype, ixw_k))))));
+IdList* idsq_18;
+char* idsq_16;
+IdList* idsq_15;
+char* idsq_13;
+IdList* idsq_12;
+char* idsq_10;
+        (idsq_18 = dvfunc, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, ixw_k)), idsq_15 = dvname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, ixw_k)), idsq_12 = dvtype, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, ixw_k)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("V")), (long long)(intptr_t)(idsq_16), (long long)(intptr_t)(idsq_13), (long long)(intptr_t)(idsq_10), (long long)(intptr_t)(id_concat(ID_S(""), id_str_of_int((int)(id_list_get(dvline, ixw_k))))))));
     }
     return;
 }
@@ -26981,10 +27127,10 @@ void id_ext_route3(char* xe_tag, IdList* xe_f) {
     if ((strcmp(xe_tag, ID_S("L")) == 0)) {
         id_ext_put_loaded(xe_f);
     } else if ((strcmp(xe_tag, ID_S("Z")) == 0)) {
-IdList* idsq_19;
-        (idsq_19 = ext_path, id_sset(idsq_19, 0, (char*)(intptr_t)(id_list_get(xe_f, 1))));
-    } else if ((strcmp(xe_tag, ID_S("M")) == 0)) {
-        id_lset(ext_mode, 0, 1);
+IdList* idsq_14;
+        (idsq_14 = ext_path, id_sset(idsq_14, 0, (char*)(intptr_t)(id_list_get(xe_f, 1))));
+    } else {
+        id_ext_route4(xe_tag, xe_f);
     }
     return;
 }
@@ -27018,6 +27164,33 @@ IdList* idsq_14;
     return;
 }
 
+void id_ext_route4(char* xe_tag, IdList* xe_f) {
+    if ((strcmp(xe_tag, ID_S("M")) == 0)) {
+        id_lset(ext_mode, 0, 1);
+    } else if ((strcmp(xe_tag, ID_S("V")) == 0)) {
+        id_ext_put_var(xe_f);
+    }
+    return;
+}
+
+void id_ext_put_var(IdList* xe_f) {
+    int xe_vln;
+    int xe_vrow;
+IdList* idsq_45;
+    (idsq_45 = ext_vt, id_list_push(idsq_45, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(xe_f, 2)))));
+IdList* idsq_38;
+    (idsq_38 = ext_vf, id_list_push(idsq_38, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(xe_f, 3)))));
+    xe_vln = id_to_int((char*)(intptr_t)(id_list_get(xe_f, 4)));
+    id_list_push(ext_vl, (long long)(xe_vln));
+    xe_vrow = (id_list_len(ext_vt) - 1);
+IdList* idsq_13;
+IdList* idsq_12;
+IdList* idsq_11;
+IdList* idsq_10;
+    (idsq_13 = ext_mk, idsq_12 = ext_mv, idsq_11 = ext_mu, idsq_10 = ext_mc, id_hmap_put(idsq_13, idsq_12, idsq_11, idsq_10, id_concat(ID_S("v:"), (char*)(intptr_t)(id_list_get(xe_f, 1))), xe_vrow));
+    return;
+}
+
 void id_ext_init(void) {
     ext_n = id_list_lit(0);
     ext_k = id_list_lit(0);
@@ -27034,6 +27207,9 @@ void id_ext_init(void) {
     ext_mv = id_list_lit(0);
     ext_mu = id_list_lit(0);
     ext_mc = id_list_lit(0);
+    ext_vt = id_list_lit(0);
+    ext_vf = id_list_lit(0);
+    ext_vl = id_list_lit(0);
 IdList* idsq_7;
 IdList* idsq_6;
 IdList* idsq_5;
@@ -27073,7 +27249,10 @@ IdList* idsq_17;
 char* id_first_type_at(int i, char* name, char* t, int unit) {
     char* s;
     s = t;
-    if (((((strcmp(t, ID_S("")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(dvname, i)), name) == 0)) && ((int)(id_list_get(dvexp, i)) == 0)) && ((int)(id_list_get(dvunit, i)) == unit))) {
+IdList* idsq_15;
+int idsq_13;
+int idsq_12;
+    if (((((strcmp(t, ID_S("")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(dvname, i)), name) == 0)) && ((int)(id_list_get(dvexp, i)) == 0)) && (idsq_15 = dvunit, idsq_13 = (int)(id_list_get(idsq_15, i)), idsq_12 = id_unit_scope(idsq_13), (idsq_12 == id_unit_scope(unit))))) {
         s = (char*)(intptr_t)(id_list_get(dvtype, i));
     }
     return s;
@@ -27110,6 +27289,15 @@ char* id_owner_of(char* name) {
         i = (i + 1);
     }
     return s;
+}
+
+int id_unit_scope(int unit) {
+    int scope;
+    scope = 0;
+    if ((((int)(id_list_get(stdunit, 0)) >= 0) && (unit >= (int)(id_list_get(stdunit, 0))))) {
+        scope = (int)(id_list_get(stdunit, 0));
+    }
+    return scope;
 }
 
 int id_fn_count(char* fname) {

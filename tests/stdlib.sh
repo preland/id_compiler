@@ -177,7 +177,8 @@ printf 'native bk_exists(string path) return int;\n' > "$TMP/bk/be/bk.id"
 printf 'import "../be"\n' > "$TMP/bk/lib/conf.id"
 cat > "$TMP/bk/lib/l.id" <<'EOF'
 bklib_has(string path) {
-  int found = bk_exists(path);
+  string shown = path + "";
+  int found = bk_exists(shown);
 } return int found;
 EOF
 printf 'import "../lib"\n' > "$TMP/bk/app/conf.id"
@@ -379,15 +380,14 @@ else
     bad "the id-side reserved-name list matches the runtime prelude (drift: $(diff <(echo "$runtime_names") <(echo "$conf_names") | head -1))"
 fi
 
-# -- 21. the library does not reserve the user's local names (C4) ----------
-# The one-type-per-name rule applies within a compilation unit -- the user's
-# own tree, or one imported dependency -- and not across them. `s` is a string
-# in the fixture library (tstr_twice's parameter); while the rule spanned the
-# import boundary, an `int s` in a user's own function was rejected by two
-# diagnostics that both named library files the user had never opened, and
-# renaming the local was the only cure.
+# -- 21. the library's variable names have the library's types -------------
+# One type per name is program-wide, the library included. `s` is a string in
+# the fixture library (tstr_twice's parameter), so an `int s` in a user's own
+# function is refused, at the user's declaration with the library's as the
+# related place; the same name with the same type is fine. Whether the build
+# held tstr_twice or only its index is tests 41-43's concern.
 rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
-cat > "$TMP/proj/main.id" <<'EOF'
+cat > "$TMP/proj/main.id" <<'EOF2'
 total(int a, int b) {
   int s = a + b;
 } return int s;
@@ -395,11 +395,26 @@ main(int argc, string[] argv) {
   int n = total(2, 3);
   print(n);
 } return int 0;
-EOF
-run_one "a library name does not reserve the user's local name" "5"
+EOF2
+if ! $BIN_IDC --std "$FIXTURE" "$TMP/proj" -o "$TMP/out21" >"$TMP/o21.err" 2>&1 \
+   && grep -qF "variable 's' is declared int here but string in the standard library [E0303]" "$TMP/o21.err" \
+   && grep -qF "the standard library's declaration, which is string" "$TMP/o21.err"; then
+    ok "a variable named like a library variable with another type is refused, naming both declarations"
+else
+    bad "a variable named like a library variable with another type is refused, naming both declarations ($(head -1 "$TMP/o21.err"))"
+fi
+cat > "$TMP/proj/main.id" <<'EOF2'
+twice_of(string s) {
+  string t = s + "-" + s;
+} return string t;
+main(int argc, string[] argv) {
+  print(twice_of("ab"));
+} return int 0;
+EOF2
+run_one "a variable named like a library variable with the same type is accepted" "ab-ab"
 
-# -- 22. ...but the rule still holds inside the user's own tree ------------
-# Per-unit is not per-file: every file of one project is one unit, so a name
+# -- 22. ...and it still holds inside the user's own tree ------------------
+# Every file of one project is one scope, so a name
 # that changes type between two of them is still the error it has always been.
 rm -rf "$TMP/two"; mkdir -p "$TMP/two"
 cat > "$TMP/two/main.id" <<'EOF'
@@ -759,6 +774,67 @@ if lazy_same p34 "$FIXTURE" && printf '%s\n' "$LAZY_OUT" | grep -qF '"code":"E0'
 else
     bad "a name collision with an unreached library function is a coded diagnostic in json, as when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | cut -c1-200 | tr '\n' ' ')"
 fi
+LZ_FLAGS=""
+
+# -- 41. a variable named like a library variable with another type is one
+# diagnostic, whether the build held the library function that declares it or
+# only its index -----------------------------------------------------------
+# `s` is a string in tstr_twice. p41 never calls it, so a lazy build knows it
+# only as a V line of the library's index; p42 calls it, so the build loaded it
+# and the registry holds the row. Both must say what the whole library says.
+rm -rf "$TMP/p41" "$TMP/p42" "$TMP/p43"; mkdir -p "$TMP/p41" "$TMP/p42" "$TMP/p43"
+cat > "$TMP/p41/main.id" <<'EOF2'
+total(int a, int b) {
+  int s = a + b;
+} return int s;
+main(int argc, string[] argv) {
+  int n = total(2, 3);
+  print(n);
+} return int 0;
+EOF2
+cat > "$TMP/p42/main.id" <<'EOF2'
+total(int a, int b) {
+  int s = a + b;
+} return int s;
+main(int argc, string[] argv) {
+  int n = total(2, 3);
+  print(tstr_twice("x") + n);
+} return int 0;
+EOF2
+cat > "$TMP/p43/main.id" <<'EOF2'
+total(string s) {
+  string u = s + "?";
+} return string u;
+main(int argc, string[] argv) {
+  print(total("x"));
+} return int 0;
+EOF2
+want41="variable 's' is declared int here but string in the standard library [E0303]"
+for p in p41 p42; do
+    if lazy_same $p "$FIXTURE" && [ "$LAZY_RC" -ne 0 ] && printf '%s\n' "$LAZY_OUT" | grep -qF "$want41"; then
+        ok "$p: a variable named like a library variable with another type is reported the same way when the library is merged whole"
+    else
+        bad "$p: a variable named like a library variable with another type is reported the same way when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | cut -c1-200 | tr '\n' ' ') | $(printf '%s\n' "$FULL_OUT" | head -2 | cut -c1-200 | tr '\n' ' ')"
+    fi
+done
+if lazy_same p43 "$FIXTURE" && [ "$LAZY_RC" -eq 0 ]; then
+    ok "a variable named like a library variable with the same type is accepted, loaded or only indexed"
+else
+    bad "a variable named like a library variable with the same type is accepted, loaded or only indexed: $(printf '%s\n' "$LAZY_OUT" | head -2 | cut -c1-200 | tr '\n' ' ')"
+fi
+for fmt in plain json human; do
+    LZ_FLAGS="--diagnostics=$fmt"
+    case "$fmt" in
+        json)  pat='"code":"E0303"'; rel='"related":[{"file":' ;;
+        plain) pat='[E0303]'; rel='  related: ' ;;
+        human) pat='[E0303]'; rel="the standard library's declaration, which is string (" ;;
+    esac
+    if lazy_same p41 "$FIXTURE" && [ "$LAZY_RC" -ne 0 ] && printf '%s\n' "$LAZY_OUT" | grep -qF -- "$pat" && printf '%s\n' "$LAZY_OUT" | grep -qF -- "$rel"; then
+        ok "a collision of a variable with the library's carries E0303 and a related place in $fmt, as when the library is merged whole"
+    else
+        bad "a collision of a variable with the library's carries E0303 and a related place in $fmt, as when the library is merged whole: $(printf '%s\n' "$LAZY_OUT" | head -2 | cut -c1-200 | tr '\n' ' ')"
+    fi
+done
 LZ_FLAGS=""
 
 echo

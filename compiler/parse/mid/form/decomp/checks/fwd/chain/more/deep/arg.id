@@ -19,8 +19,8 @@ given farm_a (1, 0):(1)
 given farm_b (3, 0):(0)
 
 // The callee's return type and parameter types must match `fid`'s
-// (./sig.id): a forwarder whose signature differs adapts, and does not warn
-// (docs/PROJECT.md, "decomposition warnings"). `callee_fid` -1 (a builtin,
+// (./sig.id): a forwarder whose signature differs adapts, and is not reported
+// (docs/PROJECT.md, "Decomposition errors"). `callee_fid` -1 (a builtin,
 // which has no node) is checked on its own first, for the same reason
 // fwd_decl_ok2 (../../decl_ok.id) checks a void return first.
 fwd_sig_match(int fid, string callee_name) {

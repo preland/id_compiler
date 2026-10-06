@@ -1,0 +1,14 @@
+// E0303 for a variable the library also declares, in the program's own words:
+// the same wording whether the library's declaration was loaded or only
+// indexed, so a lazy build and a full one agree.
+
+sv_report(int sv_r, string sv_ty, string sv_loc) {
+  string sv_nm = (import dvname)[sv_r];
+  string sv_here = diag_fn_loc((import dvfunc)[sv_r], (import dvline)[sv_r]);
+  string sv_msg = "variable '" + sv_nm + "' is declared " + (import dvtype)[sv_r] + " here but " + sv_ty + " in the standard library";
+} chain (int sv_r, string sv_ty, string sv_loc) {
+  diag("E0303", sv_here, sv_msg, sv_nm, (import svd_why), (import svd_help));
+  diag_related(sv_loc, "the standard library's declaration, which is " + sv_ty);
+} return void;
+given sv_fx("string") (0, "string", "lib.id:7"):() then prints:("<stdin>:10: error: variable 'x' is declared int here but string in the standard library [E0303]\n  at: x\n  why: a name must keep one type across the whole program, the standard library included, so that one name always means one kind of value wherever it appears\n  help: rename this variable so that it differs from the library's; the library's declaration is the one that cannot change\n  related: lib.id:7: note: the standard library's declaration, which is string\n") then (import chkfail)[0]:(1)
+given sv_fx("word") (0, "word", "m.id:3"):() then prints:("<stdin>:10: error: variable 'x' is declared int here but word in the standard library [E0303]\n  at: x\n  why: a name must keep one type across the whole program, the standard library included, so that one name always means one kind of value wherever it appears\n  help: rename this variable so that it differs from the library's; the library's declaration is the one that cannot change\n  related: m.id:3: note: the standard library's declaration, which is word\n") then (import chkfail)[0]:(1)

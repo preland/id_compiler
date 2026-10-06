@@ -2,10 +2,10 @@
 
 ixw_var(int ixw_k) {
   if((import dvexp)[ixw_k] == 0) {
-    ixw_put(["V", (import dvfunc)[ixw_k], (import dvname)[ixw_k], (import dvtype)[ixw_k]]);
+    ixw_put(["V", (import dvfunc)[ixw_k], (import dvname)[ixw_k], (import dvtype)[ixw_k], "" + (import dvline)[ixw_k]]);
   }
 } return void;
-given regrow_d (0):() then prints:("V\tf\tx\tint\n")
+given regrow_d (0):() then prints:("V\tf\tx\tint\t10\n")
 given regrow_d given reg_push("e", "int", "g", 1, 0) (1):() then prints:("")
 
 // One node of each kind the walk tells apart, numbered from 0: a call, a

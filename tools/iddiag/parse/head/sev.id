@@ -4,20 +4,16 @@
 
 dg_sevpos(string dg_sh) {
   int dg_se = str_find(dg_sh, ": error: ");
-  int dg_sw = str_find(dg_sh, ": warning: ");
   int dg_sn = str_find(dg_sh, ": note: ");
-} chain (string dg_sh) {
   int dg_sp = dg_se;
-  if(dg_sw >= 0 && (dg_sp < 0 || dg_sw < dg_sp)) {
-    dg_sp = dg_sw;
-  }
+} chain (string dg_sh) {
   if(dg_sn >= 0 && (dg_sp < 0 || dg_sn < dg_sp)) {
     dg_sp = dg_sn;
   }
 } return int dg_sp;
 ("a.id:1: error: x"):(6)
 ("a.id:1: note: x: error: y"):(6)
-("a.id:1: warning: x"):(6)
+("a.id:1: warning: x"):(-1)
 ("nothing here"):(-1)
 
 dg_sev(string dg_vh) {

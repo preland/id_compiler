@@ -6,6 +6,7 @@
 //   F NAME KIND LINE     a function, native or struct the build did not load
 //   P KEY                the key of one fingerprint segment of the F above
 //   I KEY NAMES          the key of its import-duplicate text, and the names
+//   V NAME TYPE FILE LINE  a variable the library declares, its first declaration
 //
 // L lines come first, so an F can tell what the build did load.
 

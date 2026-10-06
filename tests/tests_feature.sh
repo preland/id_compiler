@@ -775,7 +775,7 @@ bump(int k) {
 } return void;
 
 wrap(int k) {
-  bump(k);
+  bump(k + 0);
 } return void;
 given mk (0):() then (import cnt)[0]:(1) then (import cnt)[1]:(5) then (import tag):("a") then (import cnt):([1, 5])
 given mk (1):() then (import cnt)[1]:(6)
@@ -1029,7 +1029,7 @@ bump(int k) {
 } return void;
 
 wrap(int k) {
-  bump(k);
+  bump(k + 0);
 } return void;
 given mk (0):() then (import cnt)[(import slot)]:(5)
 given mk (1):() then (import cnt)[(import slot)]:(6)
@@ -2254,7 +2254,7 @@ helper(int x) {
 (5):(6)
 
 runner(int n) {
-  int h = helper(n);
+  int h = helper(n + 0);
 } return int h;
 (1):(2) then calls helper:(1)
 (2):(3) then calls helper:(2)
@@ -2269,7 +2269,7 @@ helper(int x) {
 (5):(6)
 
 runner(int n) {
-  int h = helper(n);
+  int h = helper(n + 0);
 } return int h;
 (1):(2) then calls helper:(99)
 (2):(3) then calls helper:(2)
@@ -2373,13 +2373,13 @@ helper(int x) {
 (5):(6)
 
 mid(int x) {
-  int y = helper(x);
+  int y = helper(x + 0);
 } return int y;
 (1):(2)
 (5):(6)
 
 runner(int n) {
-  int h = mid(n);
+  int h = mid(n + 0);
 } return int h;
 (1):(2) then calls helper:(1)
 (2):(3) then calls helper:(2)
@@ -2566,19 +2566,11 @@ self_refuse "bin/idc: a 'calls' miss shows at most 16 elements of a list" \
     --emit-c /dev/null
 
 # --------------------------------------------------------------------------
-# Decomposition warnings (docs/PROJECT.md, "decomposition warnings"): a
-# violation is reported but the build still succeeds, on stderr, so every
-# case here checks the exact text with self_build + grep rather than
-# self_accept/self_refuse (which only know "built" or "did not").
-self_warn() {   # desc, expected message (fixed string), flags...
-    local desc="$1" want="$2"; shift 2
-    if self_build "$@" && grep -qF "$want" "$TMP/log"; then
-        ok "$desc"
-    else
-        bad "$desc ($(tr '\n' '|' < "$TMP/log"))"
-    fi
-}
-self_nowarn() {   # desc, message that must NOT appear, flags...
+# Decomposition errors (docs/PROJECT.md, "decomposition errors"): E0406 and
+# E0310 fail the build like any other, so a violation is self_refuse. What each
+# rule leaves alone is self_unflagged: the build must succeed and the log must
+# not name the shape.
+self_unflagged() {   # desc, message that must NOT appear, flags...
     local desc="$1" absent="$2"; shift 2
     if self_build "$@" && ! grep -qF "$absent" "$TMP/log"; then
         ok "$desc"
@@ -2587,7 +2579,7 @@ self_nowarn() {   # desc, message that must NOT appear, flags...
     fi
 }
 
-# Warning 1: a pure forwarder.
+# E0406: a pure forwarder.
 cat > "$TMP/p.id" <<'EOF'
 callee(int x) {
   int r = x * 2;
@@ -2602,8 +2594,8 @@ main(int argc, string[] argv) {
   print("" + r);
 } return int 0;
 EOF
-self_warn "bin/idc: a pure forwarder warns" \
-    "p.id:5: warning: 'forwarder' only forwards to 'callee'; call 'callee' directly" \
+self_refuse "bin/idc: a pure forwarder is an error (E0406)" \
+    "p.id:5: error: function 'forwarder' only forwards to 'callee' [E0406]" \
     --allow-untested --emit-c /dev/null
 
 # Excluded: main, even when it would otherwise match.
@@ -2616,7 +2608,7 @@ main(int argc, string[] argv) {
   int r = only_main_body(argc, argv);
 } return int r;
 EOF
-self_nowarn "bin/idc: 'main' is excluded from the forwarder warning" \
+self_unflagged "bin/idc: 'main' is excluded from the forwarder error" \
     "'main' only forwards" --allow-untested --emit-c /dev/null
 
 # Excluded: a forwarder whose signature differs from its callee's (here, it
@@ -2636,7 +2628,7 @@ main(int argc, string[] argv) {
   print("" + r);
 } return int 0;
 EOF
-self_nowarn "bin/idc: a forwarder that drops a parameter (signature differs) is excluded" \
+self_unflagged "bin/idc: a forwarder that drops a parameter (signature differs) is excluded" \
     "only forwards" --allow-untested --emit-c /dev/null
 
 # Excluded: a forwarder-shaped function whose own name is also used as a
@@ -2673,7 +2665,7 @@ rm -rf "$TMP/fwdval"
 # function written twice: a compile error that names both and the fix, however
 # short they are -- a one-statement accessor per global is the same function
 # written once per global. Every other way of differing -- a literal, a second
-# import, more logic -- is quiet: no error and no warning, which self_silent
+# import, more logic -- is quiet: no diagnostic at all, which self_silent
 # checks as an empty log.
 self_silent() {   # desc, flags...
     local desc="$1"; shift
@@ -2848,7 +2840,7 @@ else
     bad "bin/idc: ...not also the import-only error ($(tr '\n' '|' < "$TMP/log"))"
 fi
 
-# Warning 3: a generated parameter name.
+# E0310: a generated parameter name.
 cat > "$TMP/p.id" <<'EOF'
 helper(int asset_at_v) {
   int r = asset_at_v + 1;
@@ -2859,8 +2851,8 @@ main(int argc, string[] argv) {
   print("" + r);
 } return int 0;
 EOF
-self_warn "bin/idc: a '--fix'-style '_v' parameter name warns" \
-    "p.id:1: warning: parameter 'asset_at_v' of 'helper' has a generated name; name it for what it holds" \
+self_refuse "bin/idc: a '--fix'-style '_v' parameter name is an error (E0310)" \
+    "p.id:1: error: parameter 'asset_at_v' of 'helper' has a generated name [E0310]" \
     --allow-untested --emit-c /dev/null
 
 # Excluded: a generated name on a LOCAL, not a parameter.
@@ -2874,10 +2866,10 @@ main(int argc, string[] argv) {
   print("" + r);
 } return int 0;
 EOF
-self_nowarn "bin/idc: a generated-looking LOCAL name is excluded (parameters only)" \
+self_unflagged "bin/idc: a generated-looking LOCAL name is excluded (parameters only)" \
     "has a generated name" --allow-untested --emit-c /dev/null
 
-# An idstd_-prefixed parameter that looks generated after stripping should not warn.
+# An idstd_-prefixed parameter that looks generated after stripping is not reported.
 cat > "$TMP/p.id" <<'EOF'
 fill(int idstd_v) {
   int i = 0;
@@ -2891,7 +2883,7 @@ main(int argc, string[] argv) {
   fill(5);
 } return int 0;
 EOF
-self_nowarn "bin/idc: an idstd_-prefixed parameter is not a generated name (idstd_v)" \
+self_unflagged "bin/idc: an idstd_-prefixed parameter is not a generated name (idstd_v)" \
     "has a generated name" --allow-untested --emit-c /dev/null
 
 # A chain's seam marker used to be built with its "return expression" field

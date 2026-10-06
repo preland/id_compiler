@@ -1,4 +1,4 @@
-// What a stream of diagnostics adds up to: how many errors and warnings it holds
+// What a stream of diagnostics adds up to: how many errors it holds
 // and which error codes appear in it, for the summary line at the end.
 
 dg_nsev(string[] dg_ns_b, string dg_ns_s) {
@@ -13,7 +13,7 @@ dg_nsev(string[] dg_ns_b, string dg_ns_s) {
   }
 } return int dg_ns_n;
 (["a.id:1: error: x", "plain", "b.id:2: error: y\n  why: z", "c.id:3: note: n"], "error"):(2)
-(["a.id:1: error: x", "plain"], "warning"):(0)
+(["a.id:1: error: x", "plain"], "note"):(0)
 
 // The distinct codes, in the order they first appear.
 dg_codes(string[] dg_cd_b) {

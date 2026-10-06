@@ -58,6 +58,17 @@ string dupd_why = "two functions with the same signature and the same logic are 
 string dupd_help = "delete one and call the other from both places, or make them genuinely differ: a different signature, or different logic";
 string imdd_why = "two functions that differ only in which imported value they read are one function written twice; the value is the only thing that varies, so it belongs in a parameter";
 string imdd_help = "replace the import with a parameter, call that one function from both places, and delete the other";
+// The why and help lines of E0303 for a variable the standard library also
+// declares (mid/names/symbols/check/conflict/more/core/ext/check/pass/var/).
+string svd_why = "a name must keep one type across the whole program, the standard library included, so that one name always means one kind of value wherever it appears";
+string svd_help = "rename this variable so that it differs from the library's; the library's declaration is the one that cannot change";
+// The why and help lines of E0310(a parameter with a generated name,
+// mid/form/decomp/checks/genname/) and the why of E0406 (a pure forwarder,
+// mid/form/decomp/checks/fwd/); E0406's help names the two functions, so it is
+// built where it is reported.
+string gnd_why = "a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it";
+string gnd_help = "rename the parameter to what it holds, in the signature and at every use of it in the body";
+string fwdd_why = "a function that passes all its parameters unchanged to another and returns the result adds a name to read and a call to follow, and says nothing the target does not";
 // Where a float literal overflows to infinity (front/parse/expr/atom/kind/floatlit/
 // more/big/over.id). flt_inf_digits is 2^1024 - 2^970, the exact point half an
 // ulp past DBL_MAX where round-to-nearest-even goes to infinity, as the 309

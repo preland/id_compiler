@@ -1,0 +1,30 @@
+// The two ways a program's variable meets the library's: against a row of the
+// registry, or against the index's V line of a function the build did not load.
+
+sv_pick(int sv_r, string sv_nm, int sv_cur) {
+  int sv_h = sv_cur;
+  if(sv_cur < 0 && (import dvname)[sv_r] == sv_nm && (import dvexp)[sv_r] == 0 && (import dvunit)[sv_r] >= (import stdunit)[0]) {
+    sv_h = sv_r;
+  }
+} return int sv_h;
+given sv_fx("int") (1, "x", -1):(1)
+given sv_fx("int") (0, "x", -1):(-1)
+given sv_fx("int") (1, "x", 0):(0)
+
+sv_loaded(int sv_r, int sv_j) {
+  if((import dvtype)[sv_r] != (import dvtype)[sv_j]) {
+    string sv_where = diag_fn_loc((import dvfunc)[sv_j], (import dvline)[sv_j]);
+    sv_report(sv_r, (import dvtype)[sv_j], sv_where);
+  }
+} return void;
+given sv_fx("string") (0, 1):() then calls sv_report:(0, "string", "<stdin>:20")
+given sv_fx("int") (0, 1):() then calls sv_report:[0]
+
+sv_ext(int sv_r) {
+  int sv_k = hmap_get((import ext_mk), (import ext_mv), (import ext_mu), "v:" + (import dvname)[sv_r], 0 - 1);
+  if(sv_k >= 0 && (import ext_vt)[sv_k] != (import dvtype)[sv_r]) {
+    sv_report(sv_r, (import ext_vt)[sv_k], (import ext_vf)[sv_k] + ":" + (import ext_vl)[sv_k]);
+  }
+} return void;
+given sv_xfx("string") (0):() then calls sv_report:(0, "string", "lib.id:7")
+given sv_xfx("int") (0):() then calls sv_report:[0]

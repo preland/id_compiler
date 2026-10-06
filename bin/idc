@@ -1603,7 +1603,12 @@ std_index_assemble() {
                 if (IK[id] != "") { printf "ext I\t%s\t%s\n", IK[id], IN[id] > ext; print "I", IK[id], IN[id] > full }
             }
             for (k = 1; k <= nx; k++) { print "X", XNM[k], XO[k] > graph; print "X", XO[k], XNM[k], XTY[k] > full }
-            for (k = 1; k <= nv; k++) print VROWS[k] > full
+            for (id = 1; id <= n; id++) FILEOF[NAME[id]] = FILE[id]
+            for (k = 1; k <= nv; k++) {
+                print VROWS[k] > full
+                split(VROWS[k], vf, "\t")
+                if (!(vf[3] in VSEEN) && (vf[2] in FILEOF)) { VSEEN[vf[3]] = 1; printf "ext V\t%s\t%s\t%s\t%s\n", vf[3], vf[4], FILEOF[vf[2]], vf[5] > ext }
+            }
         }' "${args[@]}"
     rc=$?
     [ "$rc" -eq 0 ] || { rm -rf "$out"; return 3; }
@@ -1940,7 +1945,7 @@ elif [ "$FIX" -eq 1 ]; then
     PARSE_ARGS+=(--fixes)
 elif [ "$CHECK" -eq 1 ]; then
     PARSE_ARGS+=(--check)
-    [ "$STD_LAZY" -eq 0 ] || PARSE_ARGS+=(--std-unit "$STD_UNIT_START")
+    PARSE_ARGS+=(--std-unit "$STD_UNIT_START")
 else
     PARSE_ARGS+=(--harness)
     PARSE_ARGS+=(--natives)
@@ -1960,9 +1965,8 @@ else
         UNIT_ROOTS="$UNIT_ROOTS$r"
     done
     PARSE_ARGS+=(--unit-roots "$UNIT_ROOTS")
-    # Only the harness build narrows by unit: STD_UNIT_START means nothing to
-    # --check/--fix/--calls/--fingerprints/--list-untested, which build no
-    # harness to narrow.
+    # The harness narrows by unit with it, and every build uses it to tell the
+    # library's variables from the program's (one type per name, E0303).
     PARSE_ARGS+=(--std-unit "$STD_UNIT_START")
     if [ "${#EXCLUDE_UNITS[@]}" -gt 0 ]; then
         EXCLUDE_UNITS_CSV=$(IFS=,; echo "${EXCLUDE_UNITS[*]}")

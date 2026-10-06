@@ -1,0 +1,9 @@
+// The help line of E0406: the two functions are named, because the fix is a
+// deletion and a rewrite of calls, and a reader should not have to find which.
+
+fwd_help(int i, string callee_name) {
+  string fname = (import ns1)[((import prog)[i])];
+  string ret_s = "delete '" + fname + "' and call '" + callee_name + "' directly at every site that called it; move any test cases of '" + fname + "' onto '" + callee_name + "'";
+} return string ret_s;
+given farm_i (0, "target"):("delete 'fwd1' and call 'target' directly at every site that called it; move any test cases of 'fwd1' onto 'target'")
+given farm_i (0, "other"):("delete 'fwd1' and call 'other' directly at every site that called it; move any test cases of 'fwd1' onto 'other'")

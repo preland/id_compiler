@@ -16,7 +16,7 @@ main(int argc, string[] argv) {
   dg_run(dg_mn_t, dg_mn_j, dg_mn_c);
 } return int 0;
 stdin "sample.txt:2: error: bad [E0100]\n  at: count\n" (1, ["iddiag"]):(0) then prints:("error[E0100]: bad\n  --> sample.txt:2:7\n  |\n2 |   int count = 1;\n  |       ^^^^^\nerror: aborting due to 1 previous error\nSome errors have detailed explanations: E0100.\nFor more information about an error, try `idc --explain E0100`.\n")
-stdin "sample.txt:2: error: bad\nplain\n" (2, ["iddiag", "--format=json"]):(0) then prints:("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"function\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"follows\":null,\"rendered\":\"error: bad\\n  --> sample.txt:2\\n  |\\n2 |   int count = 1;\"}\n{\"kind\":\"text\",\"text\":\"plain\"}\n{\"kind\":\"summary\",\"errors\":1,\"warnings\":0,\"codes\":[]}\n")
+stdin "sample.txt:2: error: bad\nplain\n" (2, ["iddiag", "--format=json"]):(0) then prints:("{\"kind\":\"diagnostic\",\"severity\":\"error\",\"code\":null,\"file\":\"sample.txt\",\"line\":2,\"column\":null,\"end_column\":null,\"function\":null,\"message\":\"bad\",\"why\":\"\",\"fixes\":[],\"related\":[],\"follows\":null,\"rendered\":\"error: bad\\n  --> sample.txt:2\\n  |\\n2 |   int count = 1;\"}\n{\"kind\":\"text\",\"text\":\"plain\"}\n{\"kind\":\"summary\",\"errors\":1,\"codes\":[]}\n")
 
 dg_run(string dg_rn_t, int dg_rn_j, int dg_rn_c) {
   string[] dg_rn_b = dg_mark(dg_blocks(dg_rn_t));
@@ -28,7 +28,7 @@ dg_run(string dg_rn_t, int dg_rn_j, int dg_rn_c) {
   }
 } return void;
 ("sample.txt:1: note: n\n", 0, 0):() then prints:("note: n\n  --> sample.txt:1\n  |\n1 | first line\n")
-("x\n", 1, 0):() then prints:("{\"kind\":\"text\",\"text\":\"x\"}\n{\"kind\":\"summary\",\"errors\":0,\"warnings\":0,\"codes\":[]}\n")
+("x\n", 1, 0):() then prints:("{\"kind\":\"text\",\"text\":\"x\"}\n{\"kind\":\"summary\",\"errors\":0,\"codes\":[]}\n")
 
 dg_print_all(string[] dg_pa_b, int dg_pa_j, int dg_pa_c) {
   string[] dg_pa_seen = [];

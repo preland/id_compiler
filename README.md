@@ -112,7 +112,8 @@ naming why.
 
 **Two cases per function are required by default.** A function with fewer is a
 compile error; `--require-tests` restates the default. `--allow-untested` turns
-the minimum off for a build whose tree does not have its cases yet and changes
+the minimum off for a build whose tree does not have its cases yet, silently
+(`id` has no warnings), and changes
 nothing else; it is removed once every function has its cases, and the
 `statusgen` section of `tests/run.sh` fails once no function is short and the
 flag is still here. Which trees still need it, and which functions are short, is

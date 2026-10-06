@@ -1,0 +1,38 @@
+// A name the program shares with the standard library has the library's type
+// (E0303). The program's own variables are compared with the library's, loaded
+// or not: a library function the build holds is rows of the registry in a
+// library unit, and one it did not load is a V line of the index (ext_vt), so a
+// lazy build and a full one report the same pair. The diagnostic is about the
+// program's declaration -- the library's cannot change -- with the library's
+// as the related location. Within the program, and within the library, the
+// rule is check_names' own (../../../vartype/).
+
+std_var_pass() {
+  int sv_i = 0;
+  while(sv_i < len((import dvname))) {
+    sv_row(sv_i);
+    sv_i = sv_i + 1;
+  }
+} return void;
+given sv_fx("string") ():() then (import chkfail)[0]:(1)
+given sv_fx("int") ():() then (import chkfail)[0]:(0)
+given sv_xfx("string") ():() then (import chkfail)[0]:(1)
+given sv_xfx("int") ():() then (import chkfail)[0]:(0)
+
+sv_row(int sv_r) {
+  if(sv_mine(sv_r) == 1) {
+    sv_find(sv_r);
+  }
+} return void;
+given sv_fx("string") (0):() then calls sv_find:(0)
+given sv_fx("string") (1):() then calls sv_find:[0]
+
+sv_mine(int sv_r) {
+  int sv_ok = 0;
+  if((import stdunit)[0] >= 0 && (import dvexp)[sv_r] == 0 && (import dvunit)[sv_r] < (import stdunit)[0]) {
+    sv_ok = 1;
+  }
+} return int sv_ok;
+given sv_fx("string") (0):(1)
+given sv_fx("string") (1):(0)
+given regrow_d (0):(0)

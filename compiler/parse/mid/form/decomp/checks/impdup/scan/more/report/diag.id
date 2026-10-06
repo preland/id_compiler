@@ -1,6 +1,5 @@
 // file:line: error: function 'F' and 'G' differ only in the imported value
-// they read -- an error, unlike the decomposition warnings: it calls
-// note_failure, because the fix (a parameter) is always available and a
+// they read -- an error: it calls note_failure, because the fix (a parameter) is always available and a
 // build that keeps both is writing one function twice.
 
 imd_report(int imd_x, int imd_y) {

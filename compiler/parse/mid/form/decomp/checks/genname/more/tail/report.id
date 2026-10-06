@@ -1,25 +1,19 @@
-// file:line: warning: parameter 'NAME' of 'FUNC' has a generated name; name it
-// for what it holds -- own diagnostic channel, on stderr (docs/PROJECT.md,
-// "decomposition warnings"): it never calls note_failure, so it cannot turn a
-// build that would otherwise succeed into one that fails.
-//
-// Both read `prog`/`pfile`/`pline` by index, so they are exercised end to end
-// by tests/tests_feature.sh rather than by a synthetic fixture here: building
-// one within the 3-action/3-function limits this module keeps everywhere else
-// costs more new surface than it proves (docs/PROJECT.md, "decomposition
-// warnings").
+// file:line: error: parameter 'NAME' of 'FUNC' has a generated name [E0310],
+// with the rule's why and the rename as the help (docs/ERRORS.md). It calls
+// diag, so the build fails: a generated spelling is carried into every caller
+// that reads the parameter, and renaming it is always available.
 
 genname_report(int i, string name) {
-  string msg = genname_msg(i, name);
-  eprint(msg);
+  string gn_msg = genname_msg(i, name);
+  string gn_loc = diag_prog_loc(i);
+  diag("E0310", gn_loc, gn_msg, name, (import gnd_why), (import gnd_help));
 } return void;
-given farm_i (0, "v2"):() then eprints:("test.id:7: warning: parameter 'v2' of 'fwd1' has a generated name; name it for what it holds\n")
-given farm_i (0, "ret_i"):() then eprints:("test.id:7: warning: parameter 'ret_i' of 'fwd1' has a generated name; name it for what it holds\n")
+given farm_i (0, "v2"):() then prints:("test.id:7: error: parameter 'v2' of 'fwd1' has a generated name [E0310]\n  at: v2\n  why: a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it\n  help: rename the parameter to what it holds, in the signature and at every use of it in the body\n") then (import chkfail)[0]:(1)
+given farm_i (0, "ret_i"):() then prints:("test.id:7: error: parameter 'ret_i' of 'fwd1' has a generated name [E0310]\n  at: ret_i\n  why: a name that a rule invented says nothing about what the value is, and every caller that reads the parameter inherits it\n  help: rename the parameter to what it holds, in the signature and at every use of it in the body\n") then (import chkfail)[0]:(1)
 
 genname_msg(int i, string name) {
   string fname = (import ns1)[((import prog)[i])];
-  string loc = (import pfile)[i] + ":" + (import pline)[i] + ": warning: ";
-  string ret_s = loc + "parameter '" + name + "' of '" + fname + "' has a generated name; name it for what it holds";
+  string ret_s = "parameter '" + name + "' of '" + fname + "' has a generated name";
 } return string ret_s;
-given farm_i (0, "v2"):("test.id:7: warning: parameter 'v2' of 'fwd1' has a generated name; name it for what it holds")
-given farm_i (0, "ret_i"):("test.id:7: warning: parameter 'ret_i' of 'fwd1' has a generated name; name it for what it holds")
+given farm_i (0, "v2"):("parameter 'v2' of 'fwd1' has a generated name")
+given farm_i (0, "ret_i"):("parameter 'ret_i' of 'fwd1' has a generated name")

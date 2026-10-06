@@ -5,8 +5,8 @@ ext_route3(string xe_tag, string[] xe_f) {
     ext_put_loaded(xe_f);
   } else if(xe_tag == "Z") {
     sset((import ext_path), 0, xe_f[1]);
-  } else if(xe_tag == "M") {
-    lset((import ext_mode), 0, 1);
+  } else {
+    ext_route4(xe_tag, xe_f);
   }
 } return void;
 given env_init ("Z", ["Z", "q.id"]):() then (import ext_path)[0]:("q.id")

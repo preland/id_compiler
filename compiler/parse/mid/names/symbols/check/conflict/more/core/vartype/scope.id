@@ -1,0 +1,16 @@
+// The scope one name keeps one type in. Every unit of the program -- its own
+// tree and each tree it imports -- is one scope, and the standard library's
+// units are the other: a library's internals are checked against each other by
+// the library's own build, and against the program by std_var_pass
+// (../ext/check/pass/var/), which reports at the program's declaration. A build
+// with no library (`stdunit` -1) has the one scope.
+
+unit_scope(int unit) {
+  int scope = 0;
+  if((import stdunit)[0] >= 0 && unit >= (import stdunit)[0]) {
+    scope = (import stdunit)[0];
+  }
+} return int scope;
+given regrow_d (3):(0)
+given regrow_d given lset((import stdunit), 0, 2) (3):(2)
+given regrow_d given lset((import stdunit), 0, 2) (1):(0)

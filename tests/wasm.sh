@@ -58,9 +58,9 @@ greet(string who) {
 } return string g;
 
 sum3(int a, int b) {
-  int t = tfx_abs(a);
-  int s = t + b;
-} return int s;
+  int abs_a = tfx_abs(a);
+  int summed = abs_a + b;
+} return int summed;
 EOF
 
 if ! "$ROOT/bin/idc" --std "$FIXTURE" --allow-untested "$TMP/prog" \
