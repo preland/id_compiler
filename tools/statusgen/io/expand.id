@@ -1,0 +1,32 @@
+// Appends a label for each directory sgx_depth levels below sgx_dir, written with
+// the prefix sgx_prefix and the directory names, skipping one named sgx_skip. A
+// directory with no directory in it, shallower than the depth asked for, is
+// labelled itself.
+sg_expand(string[] sgx_out, string sgx_dir, string sgx_prefix, int sgx_depth, string sgx_skip) {
+  string[] sgx_names = sg_subdirs(sgx_dir);
+  int sgx_i = 0;
+  while(sgx_i < len(sgx_names)) {
+    if(sgx_names[sgx_i] != sgx_skip) {
+      sg_expand1(sgx_out, sgx_dir, sgx_prefix, sgx_depth, sgx_names[sgx_i]);
+    }
+    sgx_i = sgx_i + 1;
+  }
+} return void;
+given sg_t_tree ([], (import sg_t_root), "p/", 1, ""):(["p/sub"])
+given sg_t_tree ([], (import sg_t_root), "p/", 2, ""):(["p/sub/more"])
+given sg_t_tree ([], (import sg_t_root), "p/", 1, "sub"):([])
+
+sg_expand1(string[] sgy_out, string sgy_dir, string sgy_prefix, int sgy_depth, string sgy_name) {
+  string sgy_label = sgy_prefix + sgy_name;
+  int sgy_n = len(sgy_out);
+  if(sgy_depth > 1) {
+    sg_expand(sgy_out, path_join(sgy_dir, sgy_name), sgy_label + "/", sgy_depth - 1, "");
+  }
+} chain (string[] sgy_out, string sgy_dir, string sgy_prefix, int sgy_depth, string sgy_name) {
+  if(len(sgy_out) == sgy_n) {
+    push(sgy_out, sgy_label);
+  }
+} return void;
+([], "/nonexistent_sg_root", "p/", 2, "x"):(["p/x"])
+([], "/nonexistent_sg_root", "p/", 1, "x"):(["p/x"])
+given sg_t_tree ([], (import sg_t_root), "p/", 2, "sub"):(["p/sub/more"])

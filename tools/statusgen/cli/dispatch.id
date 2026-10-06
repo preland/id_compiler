@@ -1,0 +1,19 @@
+// The command line: help, an option that is not known, or the work (sg_go).
+sg_run(string[] sgr_argv, string sgr_pwd) {
+  string sgr_bad = sg_unknown(sgr_argv);
+  int sgr_help = lst_str_index(sgr_argv, "--help") >= 0 || lst_str_index(sgr_argv, "-h") >= 0;
+  int sgr_rc = 0;
+} chain (string[] sgr_argv, string sgr_pwd) {
+  if(sgr_help == 1) {
+    print((import sg_usage));
+  }
+  if(sgr_bad != "") {
+    eprint("statusgen: unknown option '" + sgr_bad + "'\n" + (import sg_usage));
+    sgr_rc = 2;
+  }
+  if(sgr_help == 0 && sgr_bad == "") {
+    sgr_rc = sg_go(sgr_argv, sgr_pwd);
+  }
+} return int sgr_rc;
+(["s", "--help"], "/w"):(0) then prints:("usage: statusgen [--write | --check | --untested [TREE]] [--root DIR] [--mut DIR]\n  (none)       print the status page to stdout\n  --write      write DIR/docs/STATUS.md\n  --check      exit 1 when DIR/docs/STATUS.md is not what would be printed now\n  --untested   list each function with fewer than two cases (TREE: a row label such as idc/tools)\n  --root DIR   the checkout root (default: the working directory)\n  --mut DIR    mutscore results (default: ROOT/bench/results/mutscore)\n")
+(["s", "--bogus"], "/w"):(2) then eprints:("statusgen: unknown option '--bogus'\nusage: statusgen [--write | --check | --untested [TREE]] [--root DIR] [--mut DIR]\n  (none)       print the status page to stdout\n  --write      write DIR/docs/STATUS.md\n  --check      exit 1 when DIR/docs/STATUS.md is not what would be printed now\n  --untested   list each function with fewer than two cases (TREE: a row label such as idc/tools)\n  --root DIR   the checkout root (default: the working directory)\n  --mut DIR    mutscore results (default: ROOT/bench/results/mutscore)\n")

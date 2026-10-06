@@ -1,0 +1,37 @@
+// The directory of the tree labelled sgdi_label: a label is the tree's path under
+// the checkout sgdi_root, except that "idstd/" stands for the standard library at
+// sgdi_std.
+sg_dir(string sgdi_root, string sgdi_std, string sgdi_label) {
+  string sgdi_d = path_join(sgdi_root, sgdi_label);
+  if(str_starts(sgdi_label, "idstd/") == 1) {
+    string sgdi_rel = str_slice(sgdi_label, 6, len(sgdi_label) - 6);
+    sgdi_d = path_join(sgdi_std, sgdi_rel);
+  }
+} return string sgdi_d;
+("/r", "/s", "idstd/core/data"):("/s/core/data")
+("/r", "/s", "idc/tools"):("/r/idc/tools")
+
+// Every tree the page has a row for: each top-level directory of the checkout
+// except idc, each directory of idc but tests, and each directory two levels into the
+// standard library (core/data, sys/io, ...).
+sg_trees(string sgtr_root, string sgtr_std) {
+  string[] sgtr_l = [];
+  sg_expand(sgtr_l, sgtr_root, "", 1, "idc");
+  sg_expand(sgtr_l, path_join(sgtr_root, "idc"), "idc/", 1, "tests");
+} chain (string sgtr_root, string sgtr_std) {
+  sg_expand(sgtr_l, sgtr_std, "idstd/", 2, "");
+} return string[] sgtr_l;
+given sg_t_tree ((import sg_t_root), "/nonexistent_sg_root"):(["sub"])
+("/nonexistent_sg_root", "/nonexistent_sg_root"):([])
+
+// Pushes the tally of each of the trees sgal_labels onto sgal_ts, in order.
+sg_all(int[][] sgal_ts, string sgal_mut, string sgal_idc, string sgal_root, string sgal_std, string[] sgal_labels) {
+  int sgal_i = 0;
+  while(sgal_i < len(sgal_labels)) {
+    int[] sgal_t = sg_tree(sgal_mut, sgal_idc, sgal_root, sgal_labels[sgal_i], sg_dir(sgal_root, sgal_std, sgal_labels[sgal_i]));
+    push(sgal_ts, sgal_t);
+    sgal_i = sgal_i + 1;
+  }
+} return void;
+given sg_t_tree ([], "sh\n-c\nprintf 'summary\\t0\\t0\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", ["sub"]):([[2, 2, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+([], "false", "idc", "/r", "/s", []):([])

@@ -1,0 +1,9 @@
+sg_sec1(string sgec_e) {
+  string[] sgec_f = str_split(sgec_e, "\t");
+  string sgec_r = "`" + sgec_f[0] + "`";
+  if(sgec_f[1] != "1") {
+    sgec_r = sgec_r + " (" + sgec_f[1] + " parts)";
+  }
+} return string sgec_r;
+("a\t1"):("`a`")
+("b\t21"):("`b` (21 parts)")

@@ -1,0 +1,48 @@
+// What is done with the page once it is made: written, compared, or printed.
+
+// Writes the page to ROOT/REL; answers 0, or 2 when the file cannot be written.
+sg_write(string sgw_root, string sgw_rel, string sgw_page) {
+  int sgw_n = exec_file_put(path_join(sgw_root, sgw_rel), sgw_page, 420);
+  int sgw_rc = 2 * (sgw_n < 0);
+  if(sgw_n >= 0) {
+    print("statusgen: wrote " + sgw_rel + " (" + sgw_n + " bytes)");
+  }
+} chain (string sgw_root, string sgw_rel, string sgw_page) {
+  if(sgw_n < 0) {
+    eprint("statusgen: cannot write " + sgw_rel + " under " + sgw_root + "; run from the checkout root, or pass --root DIR");
+  }
+} return int sgw_rc;
+given sg_t_tree ((import sg_t_root), "status.md", "page"):(0) then prints:("statusgen: wrote status.md (4 bytes)\n") then sg_t_status:("page")
+("/nonexistent_sg_root", "x.md", "p"):(2) then eprints:("statusgen: cannot write x.md under /nonexistent_sg_root; run from the checkout root, or pass --root DIR\n")
+
+// 0 when ROOT/REL is exactly the page, 1 when it is not (or is missing).
+sg_check(string sgc_root, string sgc_rel, string sgc_page) {
+  string sgc_cur = fs_read_text(path_join(sgc_root, sgc_rel));
+  int sgc_rc = sgc_cur != sgc_page;
+  if(sgc_rc == 1) {
+    eprint("statusgen: " + sgc_rel + " is stale: it is not what statusgen prints now; regenerate it with 'statusgen --write' (idc/bin/idc idc/tools/statusgen -o statusgen), from the checkout root");
+  }
+} return int sgc_rc;
+given sg_t_tree ((import sg_t_root), "note.txt", "k() {\n"):(0)
+given sg_t_tree ((import sg_t_root), "note.txt", "other"):(1) then eprints:("statusgen: note.txt is stale: it is not what statusgen prints now; regenerate it with 'statusgen --write' (idc/bin/idc idc/tools/statusgen -o statusgen), from the checkout root\n")
+
+// The page as the command line asks: --write writes it, --check compares it,
+// neither prints it.
+sg_emit(string[] sge_argv, string sge_root, string sge_rel, string sge_page) {
+  int sge_w = lst_str_index(sge_argv, "--write") >= 0;
+  int sge_c = lst_str_index(sge_argv, "--check") >= 0;
+  int sge_rc = 0;
+} chain (string[] sge_argv, string sge_root, string sge_rel, string sge_page) {
+  if(sge_w == 1) {
+    sge_rc = sg_write(sge_root, sge_rel, sge_page);
+  }
+  if(sge_c == 1) {
+    sge_rc = sg_check(sge_root, sge_rel, sge_page);
+  }
+  if(sge_w + sge_c == 0) {
+    print(sge_page);
+  }
+} return int sge_rc;
+(["s"], "/r", "x.md", "page"):(0) then prints:("page\n")
+given sg_t_tree (["s", "--write"], (import sg_t_root), "status.md", "pg"):(0) then prints:("statusgen: wrote status.md (2 bytes)\n") then sg_t_status:("pg")
+given sg_t_tree (["s", "--check"], (import sg_t_root), "note.txt", "k() {\n"):(0)

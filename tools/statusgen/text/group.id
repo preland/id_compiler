@@ -1,0 +1,31 @@
+// The sections as `STEM TAB COUNT`, in listing order: every second word of the
+// listing is a section's name, the others its index.
+sg_group(string sgo_listing) {
+  string sgo_flat = str_replace(sgo_listing, "\n", " ");
+  string[] sgo_w = str_words(sgo_flat);
+  string[] sgo_out = [];
+} chain (string sgo_listing) {
+  int sgo_i = 1;
+  while(sgo_i < len(sgo_w)) {
+    sg_gadd(sgo_out, sg_stem(sgo_w[sgo_i]));
+    sgo_i = sgo_i + 2;
+  }
+} return string[] sgo_out;
+("0  a\n1  b_0\n2  b_1\n"):(["a\t1", "b\t2"])
+(""):([])
+
+// The listing as one sentence: each section in backticks, a section run in parts
+// with its number of parts.
+sg_sections(string sgc_listing) {
+  string[] sgc_g = sg_group(sgc_listing);
+  string[] sgc_t = [];
+  int sgc_i = 0;
+} chain (string sgc_listing) {
+  while(sgc_i < len(sgc_g)) {
+    push(sgc_t, sg_sec1(sgc_g[sgc_i]));
+    sgc_i = sgc_i + 1;
+  }
+  string sgc_r = str_join(sgc_t, ", ");
+} return string sgc_r;
+("0  a\n1  b_0\n2  b_1\n3  b_2\n"):("`a`, `b` (3 parts)")
+(""):("")

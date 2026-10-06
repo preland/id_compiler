@@ -1,0 +1,35 @@
+// A tally is the int[] that conf.id lays out. These make one, say which
+// distribution cell a function with N cases belongs in, and add one tally into
+// another for the total rows.
+
+sg_zeros(int sgz_n) {
+  int[] sgz_l = [];
+  while(len(sgz_l) < sgz_n) {
+    push(sgz_l, 0);
+  }
+} return int[] sgz_l;
+(3):([0, 0, 0])
+(0):([])
+
+// The tally cell for a function with sgb_n cases: none, one, two, three or four,
+// five or more are the five cells from sg_k_z on.
+sg_bucket(int sgb_n) {
+  int sgb_k = (import sg_k_z) + (sgb_n > 0) + (sgb_n > 1) + (sgb_n > 2) + (sgb_n > 4);
+} return int sgb_k;
+(0):(3)
+(1):(4)
+(2):(5)
+(3):(6)
+(4):(6)
+(5):(7)
+(40):(7)
+
+sg_acc(int[] sga_a, int[] sga_b) {
+  int sga_i = 0;
+  while(sga_i < len(sga_a) && sga_i < len(sga_b)) {
+    sga_a[sga_i] = sga_a[sga_i] + sga_b[sga_i];
+    sga_i = sga_i + 1;
+  }
+} return void;
+([1, 2], [10, 20]):([11, 22])
+([5], [1, 1]):([6])

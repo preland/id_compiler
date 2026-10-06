@@ -1,0 +1,43 @@
+// How many mutscore result files, r-I-of-N.tsv, a directory listing holds.
+sg_hasres(string[] sgrh_ls) {
+  int sgrh_n = 0;
+  int sgrh_i = 0;
+  while(sgrh_i < len(sgrh_ls)) {
+    sgrh_n = sgrh_n + (str_starts(sgrh_ls[sgrh_i], "r-") == 1 && str_ends(sgrh_ls[sgrh_i], ".tsv") == 1);
+    sgrh_i = sgrh_i + 1;
+  }
+} return int sgrh_n;
+(["a.id", "r-0-of-4.tsv", "r-1-of-4.tsv"]):(2)
+(["r-.txt", "base.ok", ""]):(0)
+
+// The tree row of `mutscore report DIR --tsv` as a sentence: its columns are
+// level, file, function, killed, survived, invalid, other and the score.
+sg_mutline(string[] sgrl_rows) {
+  string[] sgrl_p = str_split(sg_pick(sgrl_rows, "tree\t"), "\t");
+  string sgrl_r = "";
+  if(len(sgrl_p) > 7) {
+    sgrl_r = sgrl_p[7] + "% (" + sgrl_p[3] + " killed, " + sgrl_p[4] + " survived; " + sgrl_p[5] + " invalid, " + sgrl_p[6] + " other)";
+  }
+} return string sgrl_r;
+(["#g", "tree\t\t\t8\t4\t2\t1\t66.6"]):("66.6% (8 killed, 4 survived; 2 invalid, 1 other)")
+(["#g", "file\ta.id\t\t1\t0\t0\t0\t100.0"]):("")
+
+// The mutation score of the results in sgrm_dir, as sg_mutline says it; "" when
+// the directory has none, and "unreadable" when mutscore (the command sgrm_mut)
+// cannot report them.
+sg_mut(string sgrm_mut, string sgrm_dir) {
+  string[] sgrm_ls = exec_ls(sgrm_dir);
+  string sgrm_r = "";
+  int[] sgrm_code = [0];
+} chain (string sgrm_mut, string sgrm_dir) {
+  if(sg_hasres(sgrm_ls) > 0) {
+    string sgrm_text = exec_out(sgrm_mut + "\nreport\n" + sgrm_dir + "\n--tsv\n", sgrm_code);
+    sgrm_r = sg_mutline(str_split(sgrm_text, "\n"));
+  }
+  if(sgrm_r == "" && len(sgrm_ls) > 1 && sg_hasres(sgrm_ls) > 0) {
+    sgrm_r = "unreadable";
+  }
+} return string sgrm_r;
+given sg_t_tree ("sh\n-c\nprintf '#g\\ntree\\t\\t\\t8\\t4\\t2\\t1\\t66.6\\n'\nsh", (import sg_t_root)):("66.6% (8 killed, 4 survived; 2 invalid, 1 other)")
+given sg_t_tree ("false", (import sg_t_root)):("unreadable")
+("false", "/nonexistent_sg_root"):("")

@@ -1,0 +1,27 @@
+// The compiler's own list of the functions a freestanding tree is exempt from the
+// two-case minimum for, because they reach an `asm` body: its rows are
+// `exempt|FILE:LINE|NAME` and `short|FILE:LINE|NAME|CASES`, FILE absolute.
+
+// The rows for sgr_path built with sgr_flags, asked of the compiler sgr_idc (the
+// command's words, one per line).
+sg_exrun(string sgr_idc, string sgr_path, string sgr_flags) {
+  int[] sgr_code = [0];
+  string sgr_text = exec_out(sg_exargv(sgr_idc, sgr_path, sgr_flags), sgr_code);
+  string[] sgr_rows = str_split(sgr_text, "\n");
+} return string[] sgr_rows;
+("sh\n-c\nprintf 'exempt|/a.id:3|f\\n'\nsh", "/p", "--a"):(["exempt|/a.id:3|f", ""])
+("sh\n-c\nprintf 'short|/a.id:3|f|0\\n'\nsh", "/p", ""):(["short|/a.id:3|f|0", ""])
+
+// The rows of the tree labelled sge_label under the checkout sge_root; none for a
+// tree built for the host.
+sg_exempt(string sge_idc, string sge_root, string sge_label) {
+  string sge_row = sg_fsrow(sge_label);
+  string[] sge_p = str_split(sge_row, "\t");
+  string[] sge_out = [];
+} chain (string sge_idc, string sge_root, string sge_label) {
+  if(sge_row != "") {
+    sge_out = sg_exrun(sge_idc, path_join(sge_root, sge_p[0]), sge_p[1]);
+  }
+} return string[] sge_out;
+("idc", "/r", "word"):([])
+("sh\n-c\nprintf 'exempt|/a.id:3|f\\n'\nsh", "/r", "kernel"):(["exempt|/a.id:3|f", ""])

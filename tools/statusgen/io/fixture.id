@@ -1,0 +1,45 @@
+// A scratch tree for the cases that read a directory, removed when the run ends:
+//   a.id            f, with two cases
+//   sub/b.id        g, with none
+//   sub/more/c.id   h, with one
+//   .hid/d.id       in a directory the walk must not enter
+//   build/e.id      in a directory the walk must not enter
+//   note.txt        not source
+//   r-0-of-1.tsv    a mutscore result file, for sg_mut
+//   lst.sh          prints one run.sh --list row, for sg_runlist
+//   bench.md        a bench result table, for sg_bench
+
+sg_t_tree() {
+  export string sg_t_root = fs_mktemp("statusgen_", 1);
+  int sg_t_drop = fs_drop_exit((import sg_t_root));
+  int sg_t_deep = fs_mkdir_p((import sg_t_root) + "/sub/more");
+} chain () {
+  int sg_t_hid = fs_mkdir((import sg_t_root) + "/.hid");
+  int sg_t_bld = fs_mkdir((import sg_t_root) + "/build");
+  int sg_t_a = exec_file_put((import sg_t_root) + "/a.id", "f(int x) {\n} return int x;\n(1):(1)\n(2):(2)\n", 420);
+} chain () {
+  int sg_t_b = exec_file_put((import sg_t_root) + "/sub/b.id", "g() {\n} return void;\n", 420);
+  int sg_t_c = exec_file_put((import sg_t_root) + "/sub/more/c.id", "h() {\n} return void;\n():()\n", 420);
+  int sg_t_d = exec_file_put((import sg_t_root) + "/.hid/d.id", "i() {\n} return void;\n", 420);
+} chain () {
+  int sg_t_e = exec_file_put((import sg_t_root) + "/build/e.id", "j() {\n} return void;\n", 420);
+  int sg_t_n = exec_file_put((import sg_t_root) + "/note.txt", "k() {\n", 420);
+  int sg_t_r = exec_file_put((import sg_t_root) + "/r-0-of-1.tsv", "x\n", 420);
+} chain () {
+  int sg_t_l = exec_file_put((import sg_t_root) + "/lst.sh", "echo \"0  core\"\n", 420);
+  int sg_t_m = exec_file_put((import sg_t_root) + "/bench.md", "### Wall time, ratio to x\n| a |\n|--|\n| b |\n", 420);
+} return void export sg_t_root;
+():() then sg_t_note:("k() {\n")
+():() then sg_t_note:("k() {\n") then prints:("")
+
+sg_t_note() {
+  string sg_t_nt = fs_read_text((import sg_t_root) + "/note.txt");
+} return string sg_t_nt;
+given sg_t_tree ():("k() {\n")
+given sg_t_tree ():("k() {\n") then prints:("")
+
+sg_t_text(string sg_t_rel) {
+  string sg_t_tx = fs_read_text((import sg_t_root) + "/" + sg_t_rel);
+} return string sg_t_tx;
+given sg_t_tree ("sub/b.id"):("g() {\n} return void;\n")
+given sg_t_tree ("a.id"):("f(int x) {\n} return int x;\n(1):(1)\n(2):(2)\n")

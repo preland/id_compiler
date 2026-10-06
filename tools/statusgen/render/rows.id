@@ -1,0 +1,33 @@
+// A table of trees: a row for each tree that has files, then the total.
+
+sg_row1(string[] sgr_out, string sgr_label, int[] sgr_t, int sgr_kind) {
+  if(sgr_t[(import sg_k_files)] != 0) {
+    int[] sgr_v = sg_vals(sgr_t, sgr_kind);
+    push(sgr_out, sg_line("`" + sgr_label + "`", sgr_v));
+  }
+} return void;
+([], "a", [4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1):(["| `a` | 4 | 10 | 14 | 2 | 1 |"])
+([], "a", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1):([])
+
+// The row sgq_title for the sum of the trees whose label starts with sgq_pre.
+sg_trow(string[] sgq_out, string sgq_title, string[] sgq_labels, int[][] sgq_ts, string sgq_pre, int sgq_kind) {
+  int[] sgq_s = sg_sum(sgq_labels, sgq_ts, sgq_pre);
+  int[] sgq_v = sg_vals(sgq_s, sgq_kind);
+  push(sgq_out, sg_line(sgq_title, sgq_v));
+} return void;
+([], "**all**", ["a"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], "", 1):(["| **all** | 4 | 10 | 14 | 2 | 1 |"])
+([], "**x**", ["a"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], "zz", 2):(["| **x** | 0 | 0 | 0 | 0 | 0 |"])
+
+sg_rows(string[] sgw_labels, int[][] sgw_ts, int sgw_kind) {
+  string[] sgw_out = [];
+  int sgw_i = 0;
+  while(sgw_i < len(sgw_labels)) {
+    sg_row1(sgw_out, sgw_labels[sgw_i], sgw_ts[sgw_i], sgw_kind);
+    sgw_i = sgw_i + 1;
+  }
+} chain (string[] sgw_labels, int[][] sgw_ts, int sgw_kind) {
+  sg_trow(sgw_out, "**all**", sgw_labels, sgw_ts, "", sgw_kind);
+  sg_trow(sgw_out, "of which idstd", sgw_labels, sgw_ts, "idstd/", sgw_kind);
+} return string[] sgw_out;
+(["a", "idstd/b"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], 1):(["| `a` | 4 | 10 | 14 | 2 | 1 |", "| `idstd/b` | 2 | 3 | 3 | 1 | 0 |", "| **all** | 6 | 13 | 17 | 3 | 1 |", "| of which idstd | 2 | 3 | 3 | 1 | 0 |"])
+([], [], 2):(["| **all** | 0 | 0 | 0 | 0 | 0 |", "| of which idstd | 0 | 0 | 0 | 0 | 0 |"])

@@ -11,7 +11,7 @@
 // freestanding build runs its cases on the build host, and a function that
 // reaches an `asm` body with no host row is exempt from the minimum with a note;
 // every other function needs its two (docs/TESTS.md, "A freestanding build runs
-// its cases on the build host"). idc/tools/statusgen.sh lists both trees with
+// its cases on the build host"). idc/tools/statusgen asks the compiler about both trees with
 // these same flags.
 //
 // This replaces tools/kbuild.sh. Each step's own output goes to stderr, as it

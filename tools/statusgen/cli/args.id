@@ -1,0 +1,38 @@
+// Reading the command line.
+
+// The word after sga_name in sga_argv, "" when sga_name is absent or last.
+sg_arg(string[] sga_argv, string sga_name) {
+  int sga_at = lst_str_index(sga_argv, sga_name);
+  string sga_v = "";
+  if(sga_at >= 0) {
+    sga_v = lst_str_get_or(sga_argv, sga_at + 1, "");
+  }
+} return string sga_v;
+(["s", "--root", "/x"], "--root"):("/x")
+(["s"], "--root"):("")
+(["s", "--root"], "--root"):("")
+
+// The word after --untested when it names a tree (not another option), "" when
+// there is none, which asks for every tree.
+sg_tree_arg(string[] sgt_argv) {
+  string sgt_v = sg_arg(sgt_argv, "--untested");
+  if(str_starts(sgt_v, "--") == 1) {
+    sgt_v = "";
+  }
+} return string sgt_v;
+(["s", "--untested", "idc/tools"]):("idc/tools")
+(["s", "--untested", "--root", "/x"]):("")
+(["s"]):("")
+
+// The checkout root: --root, else the working directory sgr_pwd; a relative
+// --root is taken from the working directory.
+sg_root(string[] sgr_argv, string sgr_pwd) {
+  string sgr_a = sg_arg(sgr_argv, "--root");
+  string sgr_r = sg_or(sgr_a, sgr_pwd);
+  if(sgr_a != "" && str_starts(sgr_a, "/") == 0) {
+    sgr_r = path_join(sgr_pwd, sgr_a);
+  }
+} return string sgr_r;
+(["s"], "/w"):("/w")
+(["s", "--root", "/a"], "/w"):("/a")
+(["s", "--root", "x"], "/w"):("/w/x")

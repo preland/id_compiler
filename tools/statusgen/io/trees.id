@@ -1,0 +1,27 @@
+// Which trees the page has a row for.
+
+// The names of the directories directly under sgd_dir that hold source: not a
+// dot directory and not "build". An unreadable directory has none.
+sg_subdirs(string sgd_dir) {
+  string[] sgd_ls = exec_ls(sgd_dir);
+  string[] sgd_r = [];
+  int sgd_i = 0;
+} chain (string sgd_dir) {
+  while(sgd_i < len(sgd_ls)) {
+    sg_sub1(sgd_r, sgd_ls[sgd_i]);
+    sgd_i = sgd_i + 1;
+  }
+} return string[] sgd_r;
+given sg_t_tree ((import sg_t_root)):(["sub"])
+("/nonexistent_sg_root"):([])
+
+sg_sub1(string[] sgb_r, string sgb_e) {
+  if(str_ends(sgb_e, "/") == 1 && str_starts(sgb_e, ".") == 0 && sgb_e != "build/") {
+    string sgb_nm = str_slice(sgb_e, 0, len(sgb_e) - 1);
+    push(sgb_r, sgb_nm);
+  }
+} return void;
+([], "a/"):(["a"])
+(["x"], ".hid/"):(["x"])
+(["x"], "build/"):(["x"])
+(["x"], "a.id"):(["x"])

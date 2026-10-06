@@ -1,0 +1,43 @@
+// What the command line asks for once the checkout, the compiler and the mutscore
+// program are known.
+
+// `--untested`: the short functions of the trees sgu_tree asks for, one per line.
+sg_modeU(string sgu_mut, string sgu_idc, string sgu_root, string sgu_std, string sgu_tree) {
+  string[] sgu_out = [];
+  sg_ulist(sgu_out, sgu_mut, sgu_idc, sgu_root, sgu_std, sgu_tree);
+  if(len(sgu_out) > 0) {
+    print(str_join(sgu_out, "\n"));
+  }
+} return int 0;
+given sg_t_tree ("sh\n-c\nprintf '#h\\ncase\\ta.id\\tf\\t3\\tc\\ncase\\ta.id\\tf\\t4\\tc\\nsummary\\t2\\t1\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", ""):(0) then prints:("sub/b.id:1 g (0 cases)\nsub/more/c.id:1 h (0 cases)\n")
+("false", "idc", "/nonexistent_sg_root", "/nonexistent_sg_root", ""):(0) then prints:("")
+
+// The page itself: made, then written, compared or printed (sg_emit). 2 when it
+// could not be made.
+sg_modeP(string[] sgp_argv, string sgp_mut, string sgp_idc, string sgp_root, string sgp_std, string sgp_res) {
+  string sgp_page = sg_report((import sg_pg), sgp_mut, sgp_idc, sgp_root, sgp_std, sgp_res);
+  int sgp_rc = 2;
+  if(sgp_page != "") {
+    sgp_rc = sg_emit(sgp_argv, sgp_root, (import sg_page_rel), sgp_page);
+  }
+} return int sgp_rc;
+given sg_t_tree (["s"], "false", "idc", (import sg_t_root), "/nonexistent_sg_root", "/nonexistent_sg_root"):(2) then eprints:("statusgen: mutscore lint printed no summary for the tree 'sub', so its numbers would be wrong; build idc/tools/mutscore and run 'mutscore lint DIR --tsv' on that tree to see why\n")
+(["s", "--write"], "false", "idc", "/nonexistent_sg_root", "/nonexistent_sg_root", "/nonexistent_sg_root"):(2) then eprints:("statusgen: cannot write docs/STATUS.md under /nonexistent_sg_root; run from the checkout root, or pass --root DIR\n")
+(["s", "--check"], "false", "idc", "/nonexistent_sg_root", "/nonexistent_sg_root", "/nonexistent_sg_root"):(1) then eprints:("statusgen: docs/STATUS.md is stale: it is not what statusgen prints now; regenerate it with 'statusgen --write' (idc/bin/idc idc/tools/statusgen -o statusgen), from the checkout root\n")
+
+// Dispatches on --untested; --mut names the mutscore results.
+sg_mode(string[] sgm_argv, string sgm_mut, string sgm_root, string sgm_std) {
+  string sgm_idc = path_join(sgm_root, "idc/bin/idc");
+  string sgm_res = sg_or(sg_arg(sgm_argv, "--mut"), path_join(sgm_root, "bench/results/mutscore"));
+  int sgm_un = lst_str_index(sgm_argv, "--untested") >= 0;
+} chain (string[] sgm_argv, string sgm_mut, string sgm_root, string sgm_std) {
+  int sgm_rc = 0;
+  if(sgm_un == 1) {
+    sgm_rc = sg_modeU(sgm_mut, sgm_idc, sgm_root, sgm_std, sg_tree_arg(sgm_argv));
+  }
+  if(sgm_un == 0) {
+    sgm_rc = sg_modeP(sgm_argv, sgm_mut, sgm_idc, sgm_root, sgm_std, sgm_res);
+  }
+} return int sgm_rc;
+(["s", "--untested"], "false", "/nonexistent_sg_root", "/nonexistent_sg_root"):(0) then prints:("")
+(["s", "--check"], "false", "/nonexistent_sg_root", "/nonexistent_sg_root"):(1) then eprints:("statusgen: docs/STATUS.md is stale: it is not what statusgen prints now; regenerate it with 'statusgen --write' (idc/bin/idc idc/tools/statusgen -o statusgen), from the checkout root\n")

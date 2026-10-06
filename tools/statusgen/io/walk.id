@@ -1,0 +1,44 @@
+// The files and directories under a tree, as paths relative to it, a directory's
+// with its trailing "/". A directory whose name starts with "." (.git,
+// .idc-cache, idstd's .tests) or is "build" holds generated or tooling files,
+// not the tree's source, and is neither listed nor entered.
+
+sg_walk(string sgk_root) {
+  string[] sgk_todo = [""];
+  string[] sgk_ents = [];
+  while(len(sgk_todo) > 0) {
+    string sgk_dir = pop(sgk_todo);
+    sg_visit(sgk_todo, sgk_ents, sgk_root, sgk_dir);
+  }
+} return string[] sgk_ents;
+given sg_t_tree ((import sg_t_root)):(["a.id", "sub/", "sub/b.id", "sub/more/", "sub/more/c.id"])
+("/nonexistent_sg_root"):([])
+
+sg_visit(string[] sgv_todo, string[] sgv_ents, string sgv_root, string sgv_dir) {
+  string[] sgv_ls = exec_ls(path_join(sgv_root, sgv_dir));
+  int sgv_i = 0;
+  while(sgv_i < len(sgv_ls)) {
+    sg_entry(sgv_todo, sgv_ents, sgv_dir, sgv_ls[sgv_i]);
+    sgv_i = sgv_i + 1;
+  }
+} return void;
+given sg_t_tree ([], [], (import sg_t_root), ""):(["sub/"], ["a.id", "sub/"])
+given sg_t_tree ([], [], (import sg_t_root), "sub/"):(["sub/more/"], ["sub/b.id", "sub/more/"])
+
+sg_entry(string[] sge_todo, string[] sge_ents, string sge_dir, string sge_e) {
+  string sge_rel = path_join(sge_dir, sge_e);
+  int sge_src = str_ends(sge_e, ".id");
+  int sge_sub = str_ends(sge_e, "/") && str_starts(sge_e, ".") == 0 && sge_e != "build/";
+} chain (string[] sge_todo, string[] sge_ents, string sge_dir, string sge_e) {
+  if(sge_src == 1 || sge_sub == 1) {
+    push(sge_ents, sge_rel);
+  }
+  if(sge_sub == 1) {
+    push(sge_todo, sge_rel);
+  }
+} return void;
+([], [], "", "a.id"):([], ["a.id"])
+(["x/"], [], "p/", "q/"):(["x/", "p/q/"], ["p/q/"])
+([], [], "", ".hid/"):([], [])
+([], [], "", "build/"):([], [])
+([], [], "", "note.txt"):([], [])

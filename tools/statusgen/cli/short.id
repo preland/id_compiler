@@ -1,0 +1,43 @@
+// The functions with fewer than two cases that the compiler does not exempt, one
+// line each: `PATH:LINE NAME (N cases)`, PATH being the tree's label and the file
+// under it.
+
+// The line for the sg_frow row sgu_row of the tree labelled sgu_label in sgu_dir,
+// appended to sgu_out when it is short and not exempt (sgu_ex: the compiler's
+// rows).
+sg_u1(string[] sgu_out, string sgu_row, string[] sgu_ex, string sgu_dir, string sgu_label) {
+  string[] sgu_p = str_split(sgu_row, "\t");
+  int sgu_n = to_int(sgu_p[3]);
+  string sgu_key = "exempt|" + path_join(sgu_dir, sgu_p[0]) + ":" + sgu_p[1] + "|" + sgu_p[2];
+} chain (string[] sgu_out, string sgu_row, string[] sgu_ex, string sgu_dir, string sgu_label) {
+  if(sgu_n < 2 && lst_str_index(sgu_ex, sgu_key) < 0) {
+    push(sgu_out, sgu_label + "/" + sgu_p[0] + ":" + sgu_p[1] + " " + sgu_p[2] + " (" + sgu_n + " cases)");
+  }
+} return void;
+([], "a.id\t3\tf\t1", [], "/r", "idc/x"):(["idc/x/a.id:3 f (1 cases)"])
+([], "a.id\t3\tf\t2", [], "/r", "idc/x"):([])
+([], "a.id\t3\tf\t0", ["exempt|/r/a.id:3|f"], "/r", "idc/x"):([])
+
+sg_ulines(string[] sgv_out, string[] sgv_fr, string[] sgv_ex, string sgv_dir, string sgv_label) {
+  int sgv_i = 0;
+  while(sgv_i < len(sgv_fr)) {
+    sg_u1(sgv_out, sgv_fr[sgv_i], sgv_ex, sgv_dir, sgv_label);
+    sgv_i = sgv_i + 1;
+  }
+} return void;
+([], ["a.id\t3\tf\t1", "b.id\t1\tg\t5"], [], "/r", "t"):(["t/a.id:3 f (1 cases)"])
+([], [], [], "/r", "t"):([])
+
+// The short functions of the tree labelled sgz_label in sgz_dir, measured the way
+// sg_tree measures it.
+sg_untested(string[] sgz_out, string sgz_mut, string sgz_idc, string sgz_root, string sgz_label, string sgz_dir) {
+  string[] sgz_rows = sg_lint(sgz_mut, sgz_dir);
+  string[] sgz_ents = sg_walk(sgz_dir);
+  string[] sgz_ex = sg_exempt(sgz_idc, sgz_root, sgz_label);
+} chain (string[] sgz_out, string sgz_mut, string sgz_idc, string sgz_root, string sgz_label, string sgz_dir) {
+  string[] sgz_idx = sg_idx(sgz_rows);
+  string[] sgz_fr = sg_collect(sgz_dir, sgz_ents, sgz_rows, sgz_idx);
+  sg_ulines(sgz_out, sgz_fr, sgz_ex, sgz_dir, sgz_label);
+} return void;
+given sg_t_tree ([], "sh\n-c\nprintf '#h\\ncase\\ta.id\\tf\\t3\\tc\\ncase\\ta.id\\tf\\t4\\tc\\nsummary\\t2\\t1\\t0\\t0\\t0\\n'\nsh", "idc", "/r", "t", (import sg_t_root)):(["t/sub/b.id:1 g (0 cases)", "t/sub/more/c.id:1 h (0 cases)"])
+given sg_t_tree ([], "false", "idc", "/r", "t", (import sg_t_root)):(["t/a.id:1 f (0 cases)", "t/sub/b.id:1 g (0 cases)", "t/sub/more/c.id:1 h (0 cases)"])

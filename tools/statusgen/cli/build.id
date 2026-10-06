@@ -1,0 +1,17 @@
+// Building the program the page asks about its cases.
+
+// Builds the tree sgb_src, with the standard library even when IDC_NO_STD is set
+// (the test runner sets it), with the compiler sgb_idc (its command, one word per
+// line) into the program sgb_out; answers the compiler's status, and shows what
+// it said when that is not 0.
+sg_mutbuild(string sgb_idc, string sgb_src, string sgb_out) {
+  int[] sgb_in = [];
+  int[] sgb_ob = [];
+  int sgb_rc = exec_run("env\n-u\nIDC_NO_STD\n" + sgb_idc + "\n" + sgb_src + "\n-o\n" + sgb_out + "\n", 0, 0, sgb_in, sgb_ob, sgb_ob, 55000);
+} chain (string sgb_idc, string sgb_src, string sgb_out) {
+  if(sgb_rc != 0) {
+    eprint(exec_text(sgb_ob));
+  }
+} return int sgb_rc;
+("sh\n-c\necho oops; exit 3\nsh", "/s", "/o"):(3) then eprints:("oops\n\n")
+("true", "/s", "/o"):(0)

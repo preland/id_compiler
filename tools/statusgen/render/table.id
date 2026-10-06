@@ -1,0 +1,9 @@
+// A whole table, head and rows.
+
+sg_table(int sgt_kind, string[] sgt_labels, int[][] sgt_ts) {
+  string[] sgt_rows = sg_rows(sgt_labels, sgt_ts, sgt_kind);
+  string sgt_body = str_join(sgt_rows, "\n");
+  string sgt_text = (import sg_hdr)[sgt_kind - 1] + "\n" + sgt_body;
+} return string sgt_text;
+(2, ["a"], [[2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]):("| tree | 0 cases | 1 | 2 | 3-4 | 5+ |\n|---|---:|---:|---:|---:|---:|\n| `a` | 1 | 0 | 2 | 0 | 0 |\n| **all** | 1 | 0 | 2 | 0 | 0 |\n| of which idstd | 0 | 0 | 0 | 0 | 0 |")
+(3, [], []):("| tree | filler dirs | max depth | median depth | silent | echo | bare |\n|---|---:|---:|---:|---:|---:|---:|\n| **all** | 0 | 0 | 0 | 0 | 0 | 0 |\n| of which idstd | 0 | 0 | 0 | 0 | 0 | 0 |")

@@ -1,0 +1,39 @@
+// The two programs statusgen asks instead of re-deriving what they know: mutscore
+// says which cases there are and which prove nothing (docs/TESTS.md, "Mutation
+// score"), and the compiler says which functions a freestanding build exempts
+// from the two-case minimum. Each is given as the command's words, one per line,
+// so a test can stand a script in for it.
+
+// The rows of `mutscore lint SGL_ROOT --tsv`: SGL_MUT is the mutscore command.
+sg_lint(string sgl_mut, string sgl_root) {
+  int[] sgl_code = [0];
+  string sgl_text = exec_out(sgl_mut + "\nlint\n" + sgl_root + "\n--tsv\n", sgl_code);
+  string[] sgl_rows = str_split(sgl_text, "\n");
+} return string[] sgl_rows;
+("echo", "/x"):(["lint /x --tsv", ""])
+("sh\n-c\nprintf 'a\\nb\\n'\nx", "/x"):(["a", "b", ""])
+
+// What a freestanding tree is built with when the compiler is asked which of its
+// functions it exempts: `SUBDIR TAB FLAGS`, "" for a tree built for the host.
+// These are the flags tools/kbuild builds the two trees with.
+sg_fsrow(string sgs_label) {
+  string sgs_r = "";
+  if(sgs_label == "kernel") {
+    sgs_r = "kernel/prog\t--no-std --freestanding --triple x86_64-unknown-none";
+  }
+  if(sgs_label == "idc/runtime") {
+    sgs_r = "idc/runtime\t--no-std --runtime --triple x86_64-unknown-none";
+  }
+} return string sgs_r;
+("kernel"):("kernel/prog\t--no-std --freestanding --triple x86_64-unknown-none")
+("idc/runtime"):("idc/runtime\t--no-std --runtime --triple x86_64-unknown-none")
+("word"):("")
+
+// The command line that lists the exempt functions of sgv_path: sgv_idc is the
+// compiler command, sgv_flags its flags separated by spaces.
+sg_exargv(string sgv_idc, string sgv_path, string sgv_flags) {
+  string sgv_fl = str_replace(sgv_flags, " ", "\n");
+  string sgv_a = sgv_idc + "\n" + sgv_path + "\n" + sgv_fl + "\n--list-untested\n";
+} return string sgv_a;
+("idc", "/r/k", "--a --b"):("idc\n/r/k\n--a\n--b\n--list-untested\n")
+("sh\n-c\nx", "/p", ""):("sh\n-c\nx\n/p\n\n--list-untested\n")

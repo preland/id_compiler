@@ -1,0 +1,41 @@
+// The first option of the command line that statusgen does not know, "" when all
+// are known. A value after an option (a path, a tree) never starts with "-".
+sg_unknown(string[] sgk_argv) {
+  string sgk_r = "";
+  int sgk_i = 1;
+  while(sgk_i < len(sgk_argv) && sgk_r == "") {
+    if(str_starts(sgk_argv[sgk_i], "-") == 1 && lst_str_index((import sg_flags), sgk_argv[sgk_i]) < 0) {
+      sgk_r = sgk_argv[sgk_i];
+    }
+    sgk_i = sgk_i + 1;
+  }
+} return string sgk_r;
+(["s", "--root", "x", "--check"]):("")
+(["s", "--chek"]):("--chek")
+(["s", "-x", "--bogus"]):("-x")
+
+// The standard library: sgs_env ($IDSTD_HOME) when set, else the directory
+// beside the checkout, as bin/idc looks for it.
+sg_std(string sgs_root, string sgs_env) {
+  string sgs_r = sg_or(sgs_env, path_join(sgs_root, "../idstd"));
+} return string sgs_r;
+("/r", ""):("/r/../idstd")
+("/r", "/s"):("/s")
+
+// Builds mutscore into a scratch directory and runs what was asked; 2 when the
+// build failed.
+sg_go(string[] sgo_argv, string sgo_pwd) {
+  string sgo_root = sg_root(sgo_argv, sgo_pwd);
+  string sgo_tmp = fs_mktemp("statusgen_", 1);
+  int sgo_drop = fs_drop_exit(sgo_tmp);
+} chain (string[] sgo_argv, string sgo_pwd) {
+  string sgo_bin = path_join(sgo_tmp, "mutscore");
+  int sgo_rc = 2 * (sg_mutbuild(path_join(sgo_root, "idc/bin/idc"), path_join(sgo_root, "idc/tools/mutscore"), sgo_bin) != 0);
+  string sgo_std = sg_std(sgo_root, env_text("IDSTD_HOME"));
+} chain (string[] sgo_argv, string sgo_pwd) {
+  if(sgo_rc == 0) {
+    sgo_rc = sg_mode(sgo_argv, sgo_bin, sgo_root, sgo_std);
+  }
+} return int sgo_rc;
+(["s", "--root", "/nonexistent_sg_root"], "/w"):(2)
+(["s", "--root", "/nonexistent_sg_root", "--untested"], "/w"):(2)

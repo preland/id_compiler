@@ -1,0 +1,45 @@
+// `mutscore lint --tsv` prints one `SHAPE FILE FUNCTION LINE CASE` row per case,
+// files in path order and a file's rows together, between `#` header rows and a
+// `summary` row. These find where each file's rows sit, so a function's cases
+// are counted among its own file's rows and not among every row of the tree.
+
+// The FILE of a case row, "" for a header, the summary or a blank line.
+sg_rfile(string sgr_row) {
+  string[] sgr_p = str_split(sgr_row, "\t");
+  string sgr_f = "";
+  if(len(sgr_p) > 3 && str_starts(sgr_row, "#") == 0 && sgr_p[0] != "summary") {
+    sgr_f = sgr_p[1];
+  }
+} return string sgr_f;
+("case\ta.id\tf\t3\t(1):(2)"):("a.id")
+("silent\tdir/b.id\tg\t9\t():()"):("dir/b.id")
+("summary\t1\t2\t3\t4\t5"):("")
+("#a\tb\tc\td"):("")
+(""):("")
+
+// One entry `FILE TAB FIRST_ROW` for each file that has case rows, in row order.
+sg_idx(string[] sgi_rows) {
+  string[] sgi_e = [];
+  string sgi_last = "";
+  int sgi_i = 0;
+} chain (string[] sgi_rows) {
+  while(sgi_i < len(sgi_rows)) {
+    string sgi_f = sg_rfile(sgi_rows[sgi_i]);
+    if(sgi_f != "" && sgi_f != sgi_last) {
+      push(sgi_e, sgi_f + "\t" + sgi_i);
+      sgi_last = sgi_f;
+    }
+    sgi_i = sgi_i + 1;
+  }
+} return string[] sgi_e;
+(["#x", "case\ta.id\tf\t1\tc", "case\ta.id\tg\t2\tc", "silent\tb.id\tf\t1\tc", "summary\t3\t2\t0\t0\t0"]):(["a.id\t1", "b.id\t3"])
+([]):([])
+
+// The row number in an entry of sg_idx.
+sg_from(string sgm_e) {
+  int sgm_t = str_find(sgm_e, "\t");
+  string sgm_s = str_slice(sgm_e, sgm_t + 1, len(sgm_e) - sgm_t - 1);
+  int sgm_v = to_int(sgm_s);
+} return int sgm_v;
+("a.id\t12"):(12)
+("dir/b.id\t0"):(0)

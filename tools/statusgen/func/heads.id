@@ -1,0 +1,44 @@
+// The functions of one source file, each with how many cases it has.
+
+// `LINE TAB NAME` for each function header in the text of a file (lib/fnhead
+// says what a header is).
+sg_heads(string sgh_t) {
+  string[] sgh_ls = str_split(sgh_t, "\n");
+  string[] sgh_r = [];
+  int sgh_i = 0;
+} chain (string sgh_t) {
+  while(sgh_i < len(sgh_ls)) {
+    string sgh_nm = fh_name(sgh_ls[sgh_i]);
+    if(sgh_nm != "") {
+      push(sgh_r, "" + (sgh_i + 1) + "\t" + sgh_nm);
+    }
+    sgh_i = sgh_i + 1;
+  }
+} return string[] sgh_r;
+("a(int x) {\n} return int x;\n(1):(1)\npure b() {\n}"):(["1\ta", "4\tb"])
+("// c\n(1):(2)\ngiven f (1):(2)"):([])
+
+// `FILE TAB LINE TAB NAME TAB CASES` for the header sgw_head (an sg_heads row)
+// of the file sgw_rel, whose case rows are sgw_rows[sgw_rg[0]] up to sgw_rg[1].
+sg_frow(string sgw_rel, string sgw_head, string[] sgw_rows, int[] sgw_rg) {
+  string[] sgw_p = str_split(sgw_head, "\t");
+  int sgw_n = sg_count(sgw_rows, sgw_rg[0], sgw_rg[1], sgw_rel, sgw_p[1]);
+  string sgw_r = sgw_rel + "\t" + sgw_p[0] + "\t" + sgw_p[1] + "\t" + sgw_n;
+} return string sgw_r;
+("a.id", "2\tf", ["case\ta.id\tf\t3\tc"], [0, 1]):("a.id\t2\tf\t1")
+("a.id", "7\tg", ["case\ta.id\tf\t3\tc"], [0, 1]):("a.id\t7\tg\t0")
+
+// An sg_frow for every function of the file sgf_rel, whose text is sgf_text.
+sg_funcs(string sgf_rel, string sgf_text, string[] sgf_rows, string[] sgf_idx) {
+  string[] sgf_hs = sg_heads(sgf_text);
+  int[] sgf_rg = sg_range(sgf_idx, sgf_rel, len(sgf_rows));
+  string[] sgf_out = [];
+} chain (string sgf_rel, string sgf_text, string[] sgf_rows, string[] sgf_idx) {
+  int sgf_i = 0;
+  while(sgf_i < len(sgf_hs)) {
+    push(sgf_out, sg_frow(sgf_rel, sgf_hs[sgf_i], sgf_rows, sgf_rg));
+    sgf_i = sgf_i + 1;
+  }
+} return string[] sgf_out;
+("a.id", "f() {\n}\n(1):(2)\n(2):(3)\ng() {\n}", ["#h", "case\ta.id\tf\t3\tc", "case\ta.id\tf\t4\tc"], ["a.id\t1"]):(["a.id\t1\tf\t2", "a.id\t5\tg\t0"])
+("b.id", "h() {\n}", [], []):(["b.id\t1\th\t0"])

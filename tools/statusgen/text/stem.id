@@ -1,0 +1,40 @@
+// The test sections of idc/tests/run.sh, listed by `run.sh --list` as `INDEX  NAME`
+// and grouped: the parts of one section (tests_feature_0, tests_feature_1, ...)
+// are one entry, with how many parts there are.
+
+// A section's name without a trailing "_" and number.
+sg_stem(string sgs_n) {
+  int sgs_i = len(sgs_n);
+  while(sgs_i > 0 && chr_is_digit(charat(sgs_n, sgs_i - 1)) == 1) {
+    sgs_i = sgs_i - 1;
+  }
+  string sgs_r = sgs_n;
+} chain (string sgs_n) {
+  if(sgs_i > 1 && sgs_i < len(sgs_n) && charat(sgs_n, sgs_i - 1) == 95) {
+    sgs_r = str_slice(sgs_n, 0, sgs_i - 1);
+  }
+} return string sgs_r;
+("tmpguard_12"):("tmpguard")
+("core_rest"):("core_rest")
+("diagnostics_docs_2"):("diagnostics_docs")
+("_3"):("_3")
+("lib2"):("lib2")
+
+// Counts sgad_stem into sgad_out, a list of `STEM TAB COUNT`: one more for the last
+// entry when it is the same stem, a new entry otherwise.
+sg_gadd(string[] sgad_out, string sgad_stem) {
+  string sgad_last = lst_str_get_or(sgad_out, len(sgad_out) - 1, "");
+  string[] sgad_p = str_split(sgad_last, "\t");
+  int sgad_same = sgad_p[0] == sgad_stem;
+} chain (string[] sgad_out, string sgad_stem) {
+  if(sgad_same == 1) {
+    pop(sgad_out);
+    push(sgad_out, sgad_stem + "\t" + (to_int(sgad_p[1]) + 1));
+  }
+  if(sgad_same == 0) {
+    push(sgad_out, sgad_stem + "\t1");
+  }
+} return void;
+([], "a"):(["a\t1"])
+(["a\t1"], "a"):(["a\t2"])
+(["a\t2"], "b"):(["a\t2", "b\t1"])

@@ -1,0 +1,26 @@
+// The whole page for the checkout sgr_root, with the prose sgr_p between its
+// tables: sgr_mut is the mutscore command, sgr_idc the compiler, sgr_std the
+// standard library and sgr_res the mutscore results. "" when a tree could not be
+// measured, after saying which.
+sg_report(string[] sgr_p, string sgr_mut, string sgr_idc, string sgr_root, string sgr_std, string sgr_res) {
+  string[] sgr_labels = sg_trees(sgr_root, sgr_std);
+  int[][] sgr_ts = [];
+  sg_all(sgr_ts, sgr_mut, sgr_idc, sgr_root, sgr_std, sgr_labels);
+} chain (string[] sgr_p, string sgr_mut, string sgr_idc, string sgr_root, string sgr_std, string sgr_res) {
+  string sgr_t1 = sg_table(1, sgr_labels, sgr_ts);
+  string sgr_t2 = sg_table(2, sgr_labels, sgr_ts);
+  string sgr_t3 = sg_table(3, sgr_labels, sgr_ts);
+} chain (string[] sgr_p, string sgr_mut, string sgr_idc, string sgr_root, string sgr_std, string sgr_res) {
+  string sgr_sec = sg_sections(sg_runlist(sgr_root, "idc/tests/run.sh"));
+  string sgr_bench = sg_bench(sgr_root, "bench/results/results.md");
+  string sgr_ms = sg_mut(sgr_mut, sgr_res);
+} chain (string[] sgr_p, string sgr_mut, string sgr_idc, string sgr_root, string sgr_std, string sgr_res) {
+  string sgr_bad = sg_bad(sgr_labels, sgr_ts);
+  string sgr_page = sg_page(sgr_p, sgr_t1, sgr_t2, sgr_t3, sgr_sec, sgr_bench, sgr_ms);
+  if(sgr_bad != "") {
+    eprint("statusgen: mutscore lint printed no summary for the tree '" + sgr_bad + "', so its numbers would be wrong; build idc/tools/mutscore and run 'mutscore lint DIR --tsv' on that tree to see why");
+    sgr_page = "";
+  }
+} return string sgr_page;
+(["", "", "", "", "", "", "", "", "", "", "", ""], "false", "idc", "/nonexistent_sg_root", "/nonexistent_sg_root", "/nonexistent_sg_root"):("\n\n| tree | files | functions | cases | short of two | exempt |\n|---|---:|---:|---:|---:|---:|\n| **all** | 0 | 0 | 0 | 0 | 0 |\n| of which idstd | 0 | 0 | 0 | 0 | 0 || tree | 0 cases | 1 | 2 | 3-4 | 5+ |\n|---|---:|---:|---:|---:|---:|\n| **all** | 0 | 0 | 0 | 0 | 0 |\n| of which idstd | 0 | 0 | 0 | 0 | 0 || tree | filler dirs | max depth | median depth | silent | echo | bare |\n|---|---:|---:|---:|---:|---:|---:|\n| **all** | 0 | 0 | 0 | 0 | 0 | 0 |\n| of which idstd | 0 | 0 | 0 | 0 | 0 | 0 |No bench results: `bench/results/results.md` has no wall-time ratio table.No mutscore results. Run `mutscore run ROOT --out bench/results/mutscore` until it says `0 left`; `mutscore report bench/results/mutscore --tsv` then prints the score this page reads (docs/TESTS.md, \"Mutation score\").")
+given sg_t_tree (["", "", "", "", "", "", "", "", "", "", "", ""], "false", "idc", (import sg_t_root), "/nonexistent_sg_root", "/nonexistent_sg_root"):("") then eprints:("statusgen: mutscore lint printed no summary for the tree 'sub', so its numbers would be wrong; build idc/tools/mutscore and run 'mutscore lint DIR --tsv' on that tree to see why\n")

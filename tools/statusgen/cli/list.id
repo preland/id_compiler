@@ -1,0 +1,25 @@
+// 1 when the tree labelled sgwn_label is asked for by sgwn_tree: "" asks for all,
+// otherwise the label is that tree or under it.
+sg_want(string sgwn_label, string sgwn_tree) {
+  string sgwn_sub = sgwn_tree + "/";
+  int sgwn_r = sgwn_tree == "" || sgwn_label == sgwn_tree || str_starts(sgwn_label, sgwn_sub) == 1;
+} return int sgwn_r;
+("idc/tools", ""):(1)
+("idc/tools", "idc"):(1)
+("idc/tools", "idc/tools"):(1)
+("idstd/core", "idc"):(0)
+("idc/toolsx", "idc/tools"):(0)
+
+// The short functions of every tree sgl_tree asks for, in the order of the page.
+sg_ulist(string[] sgl_out, string sgl_mut, string sgl_idc, string sgl_root, string sgl_std, string sgl_tree) {
+  string[] sgl_labels = sg_trees(sgl_root, sgl_std);
+  int sgl_i = 0;
+  while(sgl_i < len(sgl_labels)) {
+    if(sg_want(sgl_labels[sgl_i], sgl_tree) == 1) {
+      sg_untested(sgl_out, sgl_mut, sgl_idc, sgl_root, sgl_labels[sgl_i], sg_dir(sgl_root, sgl_std, sgl_labels[sgl_i]));
+    }
+    sgl_i = sgl_i + 1;
+  }
+} return void;
+given sg_t_tree ([], "sh\n-c\nprintf '#h\\ncase\\ta.id\\tf\\t3\\tc\\ncase\\ta.id\\tf\\t4\\tc\\nsummary\\t2\\t1\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", ""):(["sub/b.id:1 g (0 cases)", "sub/more/c.id:1 h (0 cases)"])
+given sg_t_tree ([], "sh\n-c\nprintf '#h\\ncase\\ta.id\\tf\\t3\\tc\\ncase\\ta.id\\tf\\t4\\tc\\nsummary\\t2\\t1\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", "zz"):([])

@@ -1,0 +1,33 @@
+// Folding functions into a tally: each sg_frow says how many cases its function
+// has.
+
+// One function: counted, its cases added, put in its distribution cell, and
+// counted exempt when the compiler exempts it (sgf_ex holds its rows as
+// exempt|FILE:LINE|NAME, FILE absolute) and it has fewer than two cases.
+sg_tfn(int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {
+  string[] sgf_p = str_split(sgf_r, "\t");
+  int sgf_n = to_int(sgf_p[3]);
+  string sgf_key = "exempt|" + path_join(sgf_root, sgf_p[0]) + ":" + sgf_p[1] + "|" + sgf_p[2];
+} chain (int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {
+  int sgf_b = sg_bucket(sgf_n);
+  sgf_t[(import sg_k_fn)] = sgf_t[(import sg_k_fn)] + 1;
+  sgf_t[(import sg_k_cases)] = sgf_t[(import sg_k_cases)] + sgf_n;
+} chain (int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {
+  sgf_t[sgf_b] = sgf_t[sgf_b] + 1;
+  if(sgf_n < 2 && lst_str_index(sgf_ex, sgf_key) >= 0) {
+    sgf_t[(import sg_k_ex)] = sgf_t[(import sg_k_ex)] + 1;
+  }
+} return void;
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "a.id\t1\tf\t1", [], "/r"):([0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "a.id\t1\tf\t0", ["exempt|/r/a.id:1|f"], "/r"):([0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "a.id\t1\tf\t5", ["exempt|/r/a.id:1|f"], "/r"):([0, 1, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+sg_tfuncs(int[] sgu_t, string[] sgu_r, string[] sgu_ex, string sgu_root) {
+  int sgu_i = 0;
+  while(sgu_i < len(sgu_r)) {
+    sg_tfn(sgu_t, sgu_r[sgu_i], sgu_ex, sgu_root);
+    sgu_i = sgu_i + 1;
+  }
+} return void;
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ["a.id\t1\tf\t2", "b.id\t4\tg\t0"], [], "/r"):([0, 2, 2, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [], [], "/r"):([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])

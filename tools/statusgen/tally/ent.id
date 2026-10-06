@@ -1,0 +1,40 @@
+// What a path under a tree says about its shape: how deep it is, and whether a
+// directory is named like the filler the structure rules used to breed
+// (more, rest, tail, cont, partN).
+
+sg_depth(string sgq_e) {
+  string[] sgq_p = str_split(sgq_e, "/");
+  int sgq_d = len(sgq_p) - 1;
+  if(sgq_d > (import sg_k_ndep) - 1) {
+    sgq_d = (import sg_k_ndep) - 1;
+  }
+} return int sgq_d;
+("a.id"):(0)
+("a/b/c.id"):(2)
+("a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/x.id"):(15)
+
+sg_digits(string sgg_s) {
+  int sgg_ok = len(sgg_s) > 0;
+  int sgg_i = 0;
+  while(sgg_i < len(sgg_s)) {
+    int sgg_c = charat(sgg_s, sgg_i);
+    sgg_ok = sgg_ok * chr_is_digit(sgg_c);
+    sgg_i = sgg_i + 1;
+  }
+} return int sgg_ok;
+("12"):(1)
+("1a"):(0)
+(""):(0)
+
+sg_fillname(string sgn_n) {
+  int sgn_r = lst_str_index((import sg_fills), sgn_n) >= 0;
+  if(str_starts(sgn_n, "part") == 1) {
+    string sgn_rest = str_slice(sgn_n, 4, len(sgn_n) - 4);
+    sgn_r = sg_digits(sgn_rest);
+  }
+} return int sgn_r;
+("more"):(1)
+("part12"):(1)
+("part"):(0)
+("parts"):(0)
+("lex"):(0)

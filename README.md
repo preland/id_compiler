@@ -85,8 +85,8 @@ one clear line instead of exhausting the machine it runs on. The default was
 chosen with ample headroom over the largest legitimate builds in this tree —
 building the compiler's own stages from a cold cache, the editor, the kernel,
 `demos/solitaire`, `demos/gl3dgame` with the `gl` backend, and even
-`idem/engine`, which currently fails to compile with over a thousand real
-errors — every one of which completes well under 512 MB. Set `IDC_MEM_LIMIT=0`
+`idem/engine`, a tree that fails to compile with many real errors — every one
+of which completes well under the default. Set `IDC_MEM_LIMIT=0`
 to disable the ceiling entirely. When a stage dies against it (the `id`
 runtime reports its own allocation failures in words; a C compiler that
 doesn't dies by signal instead), `bin/idc` prints one line naming the stage,
@@ -112,10 +112,11 @@ naming why.
 
 **Two cases per function are required by default.** A function with fewer is a
 compile error; `--require-tests` restates the default. `--allow-untested` turns
-the minimum off for a build whose tree does not have its cases yet, prints one
-deprecation warning on stderr, and changes nothing else; it is removed once
-every function has its cases, and `tests/run.sh` fails once adoption is 100%
-and the flag is still here. Every build in this repository passes it today.
+the minimum off for a build whose tree does not have its cases yet and changes
+nothing else; it is removed once every function has its cases, and the
+`statusgen` section of `tests/run.sh` fails once no function is short and the
+flag is still here. Which trees still need it, and which functions are short, is
+`tools/statusgen --untested` (the counts are in [`../docs/STATUS.md`](../docs/STATUS.md)).
 See [`../docs/TESTS.md`](../docs/TESTS.md), "Enforcement, and the migration".
 
 ## Two code generators, and one of them optimises

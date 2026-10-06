@@ -1,0 +1,39 @@
+// The first row of lines that starts with sgj_p, "" when none does.
+sg_pick(string[] sgj_ls, string sgj_p) {
+  string sgj_r = "";
+  int sgj_i = 0;
+  while(sgj_i < len(sgj_ls) && sgj_r == "") {
+    if(str_starts(sgj_ls[sgj_i], sgj_p) == 1) {
+      sgj_r = sgj_ls[sgj_i];
+    }
+    sgj_i = sgj_i + 1;
+  }
+} return string sgj_r;
+(["a", "bx", "by"], "b"):("bx")
+(["a"], "z"):("")
+
+// The vacuous cases mutscore lint counted, from the summary row of its output.
+sg_tlint(int[] sgs_t, string[] sgs_rows) {
+  string sgs_row = sg_pick(sgs_rows, "summary\t");
+  string[] sgs_p = str_split(sgs_row, "\t");
+  if(len(sgs_p) > 5) {
+    sgs_t[(import sg_k_sil)] = to_int(sgs_p[3]);
+    sgs_t[(import sg_k_ech)] = to_int(sgs_p[4]);
+    sgs_t[(import sg_k_bar)] = to_int(sgs_p[5]);
+  }
+} return void;
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ["summary\t10\t4\t1\t2\t3"]):([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ["case\ta.id\tf\t1\tc"]):([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+// The tally of a tree: sgk_e its walk entries, sgk_fr its functions (sg_frow
+// rows), sgk_ex the exempt rows, sgk_root the tree's directory, sgk_rows the
+// lint output.
+sg_tally(string[] sgk_e, string[] sgk_fr, string[] sgk_ex, string sgk_root, string[] sgk_rows) {
+  int[] sgk_t = sg_zeros((import sg_k_len));
+  sg_tfiles(sgk_t, sgk_e);
+  sg_tfuncs(sgk_t, sgk_fr, sgk_ex, sgk_root);
+} chain (string[] sgk_e, string[] sgk_fr, string[] sgk_ex, string sgk_root, string[] sgk_rows) {
+  sg_tlint(sgk_t, sgk_rows);
+} return int[] sgk_t;
+(["a.id"], ["a.id\t1\tf\t2"], [], "/r", ["#x", "case\ta.id\tf\t1\tc", "summary\t1\t1\t0\t0\t1"]):([1, 1, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+([], [], [], "/r", []):([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])

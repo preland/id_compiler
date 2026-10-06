@@ -2728,7 +2728,7 @@ fi
 #   exempt|FILE:LINE|NAME       a function that cannot be tested on the build host
 #
 # The rows are the compiler's own diagnostics for those two rules, re-spelled,
-# so the list cannot disagree with what a build prints. idc/tools/statusgen.sh
+# so the list cannot disagree with what a build prints. idc/tools/statusgen
 # counts by it. Any other diagnostic goes to stderr and fails the listing,
 # because a list from a program that breaks another rule is not the whole list.
 if [ "$LIST_UNTESTED" -eq 1 ]; then

@@ -1,0 +1,48 @@
+// Where a file's case rows are, and how many of them belong to one function.
+
+// The rows [FROM, TO) of entry sgp_i of an index of sgp_n rows: it ends where
+// the next file's rows begin.
+sg_span(string[] sgp_e, int sgp_i, int sgp_n) {
+  int sgp_to = sgp_n;
+  if(sgp_i + 1 < len(sgp_e)) {
+    sgp_to = sg_from(sgp_e[sgp_i + 1]);
+  }
+  int[] sgp_r = [sg_from(sgp_e[sgp_i]), sgp_to];
+} return int[] sgp_r;
+(["a.id\t1", "b.id\t3"], 0, 9):([1, 3])
+(["a.id\t1", "b.id\t3"], 1, 9):([3, 9])
+
+// The rows of the file sgg_f, as [FROM, TO); [0, 0] when it has none.
+sg_range(string[] sgg_e, string sgg_f, int sgg_n) {
+  int sgg_i = 0;
+  int[] sgg_r = [0, 0];
+  string sgg_p = sgg_f + "\t";
+} chain (string[] sgg_e, string sgg_f, int sgg_n) {
+  while(sgg_i < len(sgg_e) && sgg_r[1] == 0) {
+    if(str_starts(sgg_e[sgg_i], sgg_p) == 1) {
+      sgg_r = sg_span(sgg_e, sgg_i, sgg_n);
+    }
+    sgg_i = sgg_i + 1;
+  }
+} return int[] sgg_r;
+(["a.id\t1", "b.id\t3"], "b.id", 9):([3, 9])
+(["a.id\t1", "b.id\t3"], "a.id", 9):([1, 3])
+(["a.id\t1", "b.id\t3"], "c.id", 9):([0, 0])
+
+// How many of the rows [sgc_from, sgc_to) are cases of the function sgc_fn of
+// the file sgc_file. A row says FILE and FUNCTION right after its shape (at most
+// "silent", six letters), so a match later in the row is a case's own text.
+sg_count(string[] sgc_rows, int sgc_from, int sgc_to, string sgc_file, string sgc_fn) {
+  string sgc_nd = "\t" + sgc_file + "\t" + sgc_fn + "\t";
+  int sgc_n = 0;
+  int sgc_i = sgc_from;
+} chain (string[] sgc_rows, int sgc_from, int sgc_to, string sgc_file, string sgc_fn) {
+  while(sgc_i < sgc_to) {
+    int sgc_at = str_find(sgc_rows[sgc_i], sgc_nd);
+    sgc_n = sgc_n + (sgc_at > 0 && sgc_at < 8);
+    sgc_i = sgc_i + 1;
+  }
+} return int sgc_n;
+(["case\ta.id\tf\t1\tc", "silent\ta.id\tf\t2\tc", "case\ta.id\tg\t3\tc", "case\ta.id\th\t4\tx\ta.id\tg\t5"], 0, 4, "a.id", "f"):(2)
+(["case\ta.id\tf\t1\tc", "silent\ta.id\tf\t2\tc", "case\ta.id\tg\t3\tc", "case\ta.id\th\t4\tx\ta.id\tg\t5"], 0, 4, "a.id", "g"):(1)
+(["case\ta.id\tf\t1\tc", "case\ta.id\tf\t2\tc"], 1, 2, "a.id", "f"):(1)

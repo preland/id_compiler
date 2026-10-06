@@ -1,0 +1,7 @@
+// What the fixture's status.md holds, read back after a case writes it.
+
+sg_t_status() {
+  string sg_t_st = fs_read_text((import sg_t_root) + "/status.md");
+} return string sg_t_st;
+given sg_t_tree ():("")
+given sg_t_tree ():("") then prints:("")

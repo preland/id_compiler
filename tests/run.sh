@@ -15,8 +15,8 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel editor mutscore)
-TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq)
+SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel editor mutscore statusgen)
+TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq idc/tools/statusgen)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
 WANTED=()
@@ -984,21 +984,25 @@ else
     bad "no '> **Status:' line in:$undocumented -- say whether the doc is a description, a plan, or a proposal"
 fi
 
-# --- --allow-untested excuses a tree that does not have its cases yet, and
-#     nothing else. Once no function in any tree is short of two cases there is
-#     nothing left for it to excuse, and a way out nobody needs is a way out
-#     somebody will use: so from then on this fails until the flag is deleted
-#     from bin/idc. The count is measured now by statusgen, not read from a
-#     doc. It counts functions, not cases, so functions with many cases cannot
-#     hide one with none.
-short=$(../tools/statusgen.sh 2>/dev/null | sed -n "s/^Functions short of two cases: \([0-9]*\) of .*/\1/p")
-if [ -z "$short" ]; then
-    bad "tools/statusgen.sh printed no short-of-cases count"
-elif [ "$short" -eq 0 ] && grep -q -- '--allow-untested' ../bin/idc; then
-    bad "no function is short of two cases and bin/idc still has --allow-untested -- delete the flag from bin/idc and every build that passes it"
+# --- docs/README.md lists every doc and nothing that is not there. The old
+#     index in README.md named five documents that did not exist and missed
+#     most of those that did; a table nobody checks is a table that drifts.
+unindexed=""
+for d in ../../docs/*.md; do
+    n=$(basename "$d")
+    [ "$n" = "README.md" ] && continue
+    grep -qF "[\`$n\`]($n)" ../../docs/README.md || unindexed="$unindexed $n"
+done
+phantom=""
+for n in $(grep -o '\](\([A-Za-z_]*\.md\))' ../../docs/README.md | sed 's/^](//; s/)$//'); do
+    [ -f "../../docs/$n" ] || phantom="$phantom $n"
+done
+if [ -z "$unindexed" ] && [ -z "$phantom" ]; then
+    ok "docs/README.md lists every doc and only docs that exist"
 else
-    ok "--allow-untested has not outlived the migration ($short functions still short of two cases)"
+    bad "docs/README.md is out of step with docs/: not listed:${unindexed:- none}; listed but missing:${phantom:- none} -- add a row, or remove it"
 fi
+
 
 echo
 echo "$pass passed, $fail failed"
@@ -1251,6 +1255,40 @@ if want mutscore; then
         expect_output "mutscore counts three kills" "3" "$(printf '%s\n' "$tsv" | grep -c $'\tkilled\t')"
         if diff -r "$MS_FIX" "$TMP/ms_before" >/dev/null; then ok "mutscore left the source tree's bytes unchanged"; else bad "mutscore changed the source tree"; fi
         [ "$fail" -eq 0 ] && mark_done mutscore
+    fi
+fi
+
+# --- the status page. tools/statusgen (an `id` program) measures the tree and
+#     writes docs/STATUS.md, the one place the changing numbers live. This
+#     fails when the committed page is not what statusgen prints now, so the
+#     page cannot go stale unnoticed; regenerate it with `statusgen --write`.
+#     It also holds two things the old statusgen.sh did: a freestanding function
+#     that reaches `asm` is exempt from the two-case minimum (the kernel has
+#     many and no function short of its cases), and --allow-untested is deleted
+#     from bin/idc once no function in any tree is short of two cases: a way out
+#     nobody needs is a way out somebody will use. It counts functions, not
+#     cases, so functions with many cases cannot hide one with none.
+echo
+echo "--- the status page (tools/statusgen, docs/STATUS.md) ---"
+if want statusgen; then
+    SG_ROOT=$(cd ../.. && pwd)
+    if ! env -u IDC_NO_STD ../bin/idc ../tools/statusgen -o "$TMP/statusgen" >"$TMP/statusgen.log" 2>&1; then
+        bad "tools/statusgen builds ($(grep -v 'warning:' "$TMP/statusgen.log" | head -1))"
+    else
+        if "$TMP/statusgen" --check --root "$SG_ROOT" >"$TMP/sg_check.out" 2>&1; then
+            ok "docs/STATUS.md is what statusgen prints now"
+        else
+            bad "docs/STATUS.md is stale: $(head -1 "$TMP/sg_check.out")"
+        fi
+        "$TMP/statusgen" --untested --root "$SG_ROOT" >"$TMP/sg_short.out" 2>&1
+        expect_output "statusgen: no function of the freestanding kernel is short of its cases" "0" "$(grep -c '^kernel/' "$TMP/sg_short.out")"
+        sg_short=$(wc -l < "$TMP/sg_short.out")
+        if [ "$sg_short" -eq 0 ] && grep -q -- '--allow-untested' ../bin/idc; then
+            bad "no function is short of two cases and bin/idc still has --allow-untested -- delete the flag from bin/idc and every build that passes it"
+        else
+            ok "--allow-untested has not outlived the migration ($sg_short functions still short of two cases)"
+        fi
+        [ "$fail" -eq 0 ] && mark_done statusgen
     fi
 fi
 

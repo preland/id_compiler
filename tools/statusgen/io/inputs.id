@@ -1,0 +1,33 @@
+// The files and programs the page reads besides the source trees.
+
+// The sections of the test runner: the output of `bash ROOT/SCRIPT --list`.
+sg_runlist(string sgi_root, string sgi_rel) {
+  int[] sgi_code = [0];
+  string sgi_text = exec_out("bash\n" + path_join(sgi_root, sgi_rel) + "\n--list\n", sgi_code);
+} return string sgi_text;
+given sg_t_tree ((import sg_t_root), "lst.sh"):("0  core\n")
+("/nonexistent_sg_root", "idc/tests/run.sh"):("")
+
+// The wall-time ratio table of the benchmark results file ROOT/REL, "" when the
+// file or the table is not there.
+sg_bench(string sgj_root, string sgj_rel) {
+  string sgj_text = fs_read_text(path_join(sgj_root, sgj_rel));
+  string sgj_b = sg_block(sgj_text, "### Wall time, ratio");
+} return string sgj_b;
+given sg_t_tree ((import sg_t_root), "bench.md"):("### Wall time, ratio to x\n| a |\n|--|\n| b |")
+("/nonexistent_sg_root", "bench.md"):("")
+
+// The label of the first tree that could not be measured (a file cell of -1), ""
+// when every tree was.
+sg_bad(string[] sgk_labels, int[][] sgk_ts) {
+  string sgk_r = "";
+  int sgk_i = 0;
+  while(sgk_i < len(sgk_labels) && sgk_r == "") {
+    if(sgk_ts[sgk_i][(import sg_k_files)] < 0) {
+      sgk_r = sgk_labels[sgk_i];
+    }
+    sgk_i = sgk_i + 1;
+  }
+} return string sgk_r;
+(["a", "b"], [[1], [-1]]):("b")
+(["a"], [[0]]):("")

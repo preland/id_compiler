@@ -1,0 +1,58 @@
+// statusgen writes docs/STATUS.md: every number about the tree that changes
+// (functions, cases, untested functions, depth, mutation score, benchmark
+// ratios) is measured here and printed, never typed into a document by hand.
+import "../lib/fnhead"
+
+// The slots of one tree's tally, an int[] of sg_k_len cells: how many files and
+// functions, how many cases, how many functions have none, one, two, three or
+// four, five or more (these five are contiguous: sg_bucket indexes them), how
+// many directories are named like filler, how many short functions the compiler
+// exempts, the vacuous cases mutscore lint found, and then a histogram of how
+// many files sit at each directory depth (the last slot is "that deep or deeper").
+int sg_k_files = 0;
+int sg_k_fn = 1;
+int sg_k_cases = 2;
+int sg_k_z = 3;
+int sg_k_one = 4;
+int sg_k_two = 5;
+int sg_k_few = 6;
+int sg_k_many = 7;
+int sg_k_fill = 8;
+int sg_k_ex = 9;
+int sg_k_sil = 10;
+int sg_k_ech = 11;
+int sg_k_bar = 12;
+int sg_k_dep = 13;
+int sg_k_ndep = 16;
+int sg_k_len = 29;
+
+// What statusgen says when it is called wrongly. A tally whose file cell is -1
+// is a tree mutscore could not read.
+string sg_usage = "usage: statusgen [--write | --check | --untested [TREE]] [--root DIR] [--mut DIR]\n  (none)       print the status page to stdout\n  --write      write DIR/docs/STATUS.md\n  --check      exit 1 when DIR/docs/STATUS.md is not what would be printed now\n  --untested   list each function with fewer than two cases (TREE: a row label such as idc/tools)\n  --root DIR   the checkout root (default: the working directory)\n  --mut DIR    mutscore results (default: ROOT/bench/results/mutscore)";
+
+// The directory names the structure rules bred when a directory could hold only
+// three entries ("partN", N a number, is the fifth).
+string[] sg_fills = ["more", "rest", "tail", "cont"];
+
+// The heads of the three tables of trees: counts, the distribution of cases per
+// function, and shape (filler, depth) with the vacuous cases.
+string[] sg_hdr = ["| tree | files | functions | cases | short of two | exempt |\n|---|---:|---:|---:|---:|---:|", "| tree | 0 cases | 1 | 2 | 3-4 | 5+ |\n|---|---:|---:|---:|---:|---:|", "| tree | filler dirs | max depth | median depth | silent | echo | bare |\n|---|---:|---:|---:|---:|---:|---:|"];
+
+// The fixed prose of the page, in the order sg_assemble puts it between the
+// tables: the head, then for each of the three tables its title and the note
+// under it, then the title of the test sections and of the benchmarks, the note
+// under the benchmark table, the title of the mutation score, and the last
+// section.
+string[] sg_pg = ["# Status\n\n> **Status: generated.** Written by `statusgen --write` from the working tree, never by hand. A number that changes belongs here and nowhere else: other documents point to this page or to the command that prints the number.\n\nRegenerate it from the checkout root, with `IDSTD_HOME` set when the standard library is not beside the checkout:\n\n```\nidc/bin/idc idc/tools/statusgen -o statusgen\n./statusgen --write\n```\n\n`idc/tests/run.sh statusgen` fails when this page is not what `statusgen` prints now, so a merge that changes a count also regenerates the page.", "## Trees\n\n", "\n\n*short of two* counts the functions with fewer than two test cases that the compiler does not exempt: a freestanding function that reaches an `asm` body is exempt, and `kernel` and `idc/runtime` are asked of the compiler with the flags `idc/tools/kbuild` builds them with. Functions are found by their headers (`idc/tools/lib/fnhead`) and their cases by `mutscore lint`, not by the compiler's own parse. `idc/tests` is not counted: it holds the inputs of the compiler's own tests, some of which break the rules on purpose. `statusgen --untested [TREE]` lists the functions that are short.\n\n", "## Cases per function\n\n", "\n\nA distribution, not a mean: a mean of two is met by one function with many cases beside others with none.\n\n", "## Shape\n\n", "\n\n*filler dirs* are directories named more, rest, tail, cont or partN. *depth* is the number of directories between a tree's root and a source file; *median* is the lower median. *silent*, *echo* and *bare* are the cases `mutscore lint` finds that prove nothing (docs/TESTS.md, \"Mutation score\").\n\n", "## Test sections\n\n`idc/tests/run.sh --list` shows the sections and their indices: ", "\n\n## Benchmarks\n\n", "\n\nFrom `bench/results/results.md`, which the benchmark program `bench/run` writes (docs/PERFORMANCE.md).", "\n\n## Mutation score\n\n", "\n\n## Untested functions\n\n`statusgen --untested [TREE]` prints each function with fewer than two cases as `PATH:LINE NAME (N cases)`; the list is not copied here because it changes with every function written.\n"];
+
+// What the benchmark and mutation sections say when there is nothing to show.
+string sg_pg_bench_none = "No bench results: `bench/results/results.md` has no wall-time ratio table.";
+string sg_pg_mut_none = "No mutscore results. Run `mutscore run ROOT --out bench/results/mutscore` until it says `0 left`; `mutscore report bench/results/mutscore --tsv` then prints the score this page reads (docs/TESTS.md, \"Mutation score\").";
+string sg_pg_mut_score = "Mutation score of the last run in `bench/results/mutscore`: ";
+
+// Where the page is written, relative to the checkout root, and what a stale one
+// is told.
+string sg_page_rel = "docs/STATUS.md";
+
+// The options statusgen knows.
+string[] sg_flags = ["--write", "--check", "--untested", "--root", "--mut", "--help", "-h"];
