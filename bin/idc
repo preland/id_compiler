@@ -2266,6 +2266,7 @@ lib_precheck_key() {
             if [ -n "${LIB_PRECHECK_TIER:-}" ]; then
                 echo "tier root"
                 [ -f "$LIB_PRECHECK_TIER/conf.id" ] && sha256sum < "$LIB_PRECHECK_TIER/conf.id"
+                tier_shim_key "$LIB_PRECHECK_TIER" "$root"
             fi
         else
             echo "no separate library"
@@ -2315,6 +2316,61 @@ tier_reach_hint() {
         [ -n "$hit" ] || continue
         echo "idc: '$name' is defined at $hit, outside idstd's core/ tier, and a backend library (the one at $root) is built with core/ alone so that backends stay below host/ and kit/. Move '$name' into core/ if it needs no host service, or move the code that calls it out of the backend into the host/ or kit/ library that wraps it." >&2
     done < <(grep -oE "no such function '[A-Za-z0-9_]+'" "$out" | sed "s/.*'\\(.*\\)'/\\1/" | sort -u | head -5)
+}
+
+# tier_other_backends TIER SELF -- every backend directory of the idstd checkout
+# TIER (a directory holding a backend.id, under host/ or kit/, hidden
+# directories skipped) except SELF, one per line, in a fixed order.
+tier_other_backends() {
+    local tier="$1" self="$2" b
+    find "$tier/host" "$tier/kit" \( -type d -name '.*' -prune \) -o -name backend.id -printf '%h\n' 2>/dev/null \
+        | LC_ALL=C sort | while IFS= read -r b; do [ "$b" = "$self" ] || printf '%s\n' "$b"; done
+}
+
+# tier_native_lines DIR -- the `native` declarations of the id files under DIR
+# (hidden directories and BUILD_DIR skipped), in file order.
+tier_native_lines() {
+    (cd "$1" && find . -mindepth 1 \( -type d -name '.*' -prune \) -o \( -type d -path "./$BUILD_DIR" -prune \) \
+         -o \( -type f -name '*.id' ! -name backend.id ! -name conf.id -print0 \) \
+        | LC_ALL=C sort -z | xargs -0 -r grep -h '^native ')
+}
+
+# tier_native_shims TIER SELF DEST -- sets TIER_SHIM_ARGS to a `--backend DIR`
+# pair for every other backend of TIER that declares a native. Each DIR under
+# DEST holds that backend's backend.id and its non-id files (its C, headers and
+# scripts, so a case that calls one of its natives links) and its native
+# declarations as an id file each, named for the native (a file holds at most three functions, and a numbered file is refused).
+# A backend may call any backend's natives -- a native is
+# a leaf C call, so the id layering above it still holds -- but not another
+# backend's id functions, which are what is left out. A backend's pre-check is
+# built with core/ alone (run_backend_prechecks), so this is how another
+# backend's natives are there to call and nothing else of it is.
+tier_native_shims() {
+    local tier="$1" self="$2" dest="$3" b n l d i=0
+    TIER_SHIM_ARGS=()
+    while IFS= read -r b; do
+        [ -n "$(tier_native_lines "$b")" ] || continue
+        n="$dest/s$i"; i=$((i + 1))
+        mkdir -p "$n"
+        (cd "$b" && find . -mindepth 1 \( -type d -name '.*' -prune \) -o \( -type d -path "./$BUILD_DIR" -prune \) \
+             -o \( -type f ! -name '*.id' ! -name '*.gen.o' -print0 \) | xargs -0 -r cp --parents -t "$n")
+        cp "$b/backend.id" "$n/backend.id"
+        while IFS= read -r l; do d="${l#native }"; printf '%s\n' "$l" > "$n/${d%%(*}.id"; done < <(tier_native_lines "$b")
+        TIER_SHIM_ARGS+=(--backend "$n")
+    done < <(tier_other_backends "$tier" "$self")
+}
+
+# tier_shim_key TIER SELF -- what tier_native_shims would build, as a hash: each
+# other backend's native declarations and non-id files by relative path, so the
+# pre-check's cache entry follows them and not where they are checked out.
+tier_shim_key() {
+    local tier="$1" self="$2" b
+    while IFS= read -r b; do
+        tier_native_lines "$b" | sha256sum
+        (cd "$b" && find . -mindepth 1 \( -type d -name '.*' -prune \) -o \( -type d -path "./$BUILD_DIR" -prune \) \
+             -o \( -type f ! -name '*.id' ! -name '*.gen.o' -print0 \) | LC_ALL=C sort -z | xargs -0 -r sha256sum)
+        sha256sum < "$b/backend.id"
+    done < <(tier_other_backends "$tier" "$self")
 }
 
 # run_lib_precheck ROOT KIND STDARG... -- see the comment above. A miss
@@ -2379,8 +2435,10 @@ run_lib_precheck() {
     local lib_work out rc
     lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
     out="$lib_work/out"
+    TIER_SHIM_ARGS=()
+    [ -n "${LIB_PRECHECK_TIER:-}" ] && tier_native_shims "$LIB_PRECHECK_TIER" "$root" "$lib_work/shims"
     env IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 IDC_STD_CONF_DIR="${LIB_PRECHECK_TIER:-}" IDC_STD_PLAN="${LIB_PRECHECK_PLAN:-}" IDC_STD_PLAN_ROOT="$root" IDC_STD_IDX_DIR="$STD_IDX_BASE" \
-        "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
+        "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" ${TIER_SHIM_ARGS[@]+"${TIER_SHIM_ARGS[@]}"} "$root" -o "$lib_work/out.bin" \
         >"$out" 2>&1
     rc=$?
     progress_clear

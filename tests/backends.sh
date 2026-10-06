@@ -843,6 +843,38 @@ if printf '%s\n' "$out" | grep -qF "idc: the backend library at $tstd/host/io/pe
 else
     bad "a backend library calling a host/ function is refused, naming where it is and how to fix it: $(printf '%s\n' "$out" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-240)"
 fi
+# A backend may call another backend's natives, which are leaf C calls, and
+# not another backend's id functions. usr_sum calls natb_now, a native of the
+# backend natb; usr2_wrap calls natb_wrap, an id function of it. The pre-check
+# is built with core/ and the other backends' native declarations (their C and
+# backend.id with them, so a case that calls one links), nothing else of them.
+mkdir -p "$tstd/host/io/natb" "$tstd/host/io/usr" "$tstd/host/io/idcall" "$TMP/tmain_nat" "$TMP/tmain_nid"
+printf 'string name = "natb";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["lin.c"];\n' > "$tstd/host/io/natb/backend.id"
+printf 'int id_natb_now(void) { return 41; }\n' > "$tstd/host/io/natb/lin.c"
+printf 'native natb_now() return int;\n\nnatb_wrap(int n) {\n  int w = natb_now() + n;\n} return int w;\n(1):(42)\n(0):(41)\n' > "$tstd/host/io/natb/now.id"
+printf 'string name = "usr";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["lin.c"];\n' > "$tstd/host/io/usr/backend.id"
+printf 'int id_usr_now(void) { return 7; }\n' > "$tstd/host/io/usr/lin.c"
+printf 'native usr_now() return int;\n\nusr_sum(int n) {\n  int s = natb_now() - n;\n} return int s;\n(1):(40)\n(2):(39)\n' > "$tstd/host/io/usr/use.id"
+printf 'string name = "usr2";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["lin.c"];\n' > "$tstd/host/io/idcall/backend.id"
+printf 'int id_usr2_now(void) { return 8; }\n' > "$tstd/host/io/idcall/lin.c"
+printf 'native usr2_now() return int;\n\nusr2_wrap(int n) {\n  int s = natb_wrap(n) + 1;\n} return int s;\n(1):(43)\n(0):(42)\n' > "$tstd/host/io/idcall/use.id"
+printf 'main(int argc, string[] argv) {\n  int s = usr_sum(1);\n  print(s);\n} return int 0;\n' > "$TMP/tmain_nat/main.id"
+printf 'main(int argc, string[] argv) {\n  int s = usr2_wrap(1);\n  print(s);\n} return int 0;\n' > "$TMP/tmain_nid/main.id"
+out=$($BIN_IDC "$TMP/tmain_nat" --std "$tstd" --backend "$tstd/host/io/usr" -o "$TMP/tmain_nat.bin" 2>&1)
+if [ "$("$TMP/tmain_nat.bin" 2>/dev/null)" = "40" ] && ! printf '%s\n' "$out" | grep -q "failed its own test cases"; then
+    ok "a backend library's id code and its cases may call another backend's natives"
+else
+    bad "a backend library's id code and its cases may call another backend's natives: $(printf '%s\n' "$out" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-240)"
+fi
+out=$($BIN_IDC "$TMP/tmain_nid" --std "$tstd" --backend "$tstd/host/io/idcall" -o "$TMP/tmain_nid.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "idc: the backend library at $tstd/host/io/idcall failed its own test cases" \
+   && printf '%s\n' "$out" | grep -qF "no such function 'natb_wrap' [E0304]" \
+   && printf '%s\n' "$out" | grep -qF "idc: 'natb_wrap' is defined at $tstd/host/io/natb/now.id:3, outside idstd's core/ tier" \
+   && [ ! -e "$TMP/tmain_nid.bin" ]; then
+    ok "a backend library calling another backend's id function is refused, naming where it is"
+else
+    bad "a backend library calling another backend's id function is refused, naming where it is: $(printf '%s\n' "$out" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-240)"
+fi
 tcount() { find "$ROOT/.idc-cache/std_precheck" -mindepth 1 -maxdepth 1 -type d ! -name '.bincache' -printf '%f\n' 2>/dev/null | LC_ALL=C sort | sha256sum | cut -c1-16; }
 mkdir -p "$TMP/tmain_nd"
 printf 'import "%s"\nimport "%s"\n' "$tstd/host/io/tick" "$tstd/core" > "$TMP/tmain_nd/conf.id"
