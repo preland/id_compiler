@@ -75,6 +75,11 @@ mark_done() { mkdir -p "$(dirname "$STATE")"; printf '%s ' "$1" >> "$STATE"; }
 # happen until idstd has the functions to port them onto.
 export IDC_NO_STD=1
 
+# The suite is one serial run, and a check that times a compile (timeout, ulimit)
+# must not count a wait for a build slot as the compile being slow. bin/idc
+# takes no slot while this is set; a suite run is the unit that gets throttled.
+export IDC_NO_SLOTS=1
+
 # Nothing this file builds with bin/idc has two cases per function -- not the
 # compiler, not the demos -- so every such build passes --allow-untested.
 # docs/TESTS.md, "Enforcement, and the migration"; the check near the end of

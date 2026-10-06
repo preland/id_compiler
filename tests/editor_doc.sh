@@ -120,7 +120,7 @@ if ! "$ROOT/bin/idc" "$P" --allow-untested -o "$TMP/doctest" >"$TMP/build.log" 2
 fi
 ok "editor/lib/doc builds"
 
-python3 -c "import zipfile;print(zipfile.ZipFile('fixtures/sample.odt').read('content.xml').decode())" > "$TMP/content.xml" 2>/dev/null \
+{ unzip -p fixtures/sample.odt content.xml && echo; } > "$TMP/content.xml" 2>/dev/null \
     || { bad "tests/fixtures/sample.odt has a content.xml"; echo; echo "$pass passed, $fail failed"; exit 1; }
 ok "tests/fixtures/sample.odt has a content.xml"
 

@@ -344,8 +344,11 @@ fi
 # on one rather than polling. A build started from inside another (a compiler
 # stage, a driver tool, a library pre-check) is part of its parent's work and
 # takes no second slot, which is also what keeps a nested build from waiting
-# on its own parent.
-if [ -z "${IDC_SLOT_HELD:-}" ] && [ -z "$WHERE" ] && command -v flock >/dev/null 2>&1; then
+# on its own parent. A build that waits longer than a second says so on
+# stderr (a terminal, or IDC_PROGRESS set), so a stalled build is not mistaken
+# for a slow one. IDC_NO_SLOTS=1 takes no slot at all: tests/run.sh sets it, so
+# a check that times one compile never counts the wait for a slot.
+if [ -z "${IDC_SLOT_HELD:-}" ] && [ -z "${IDC_NO_SLOTS:-}" ] && [ -z "$WHERE" ] && command -v flock >/dev/null 2>&1; then
     idc_jobs=${IDC_JOBS:-$(( $(nproc 2>/dev/null || echo 4) / 4 ))}
     [ "$idc_jobs" -ge 1 ] 2>/dev/null || idc_jobs=1
     slot_dir="${XDG_RUNTIME_DIR:-/tmp}/idc-slots"
@@ -358,7 +361,12 @@ if [ -z "${IDC_SLOT_HELD:-}" ] && [ -z "$WHERE" ] && command -v flock >/dev/null
     done
     if [ "$slot_got" -eq 0 ]; then
         exec 8>>"$slot_dir/slot$((RANDOM % idc_jobs))"
-        flock 8
+        if ! flock -w 1 8; then
+            if [ -n "${IDC_PROGRESS:-}" ] || { [ -t 2 ] && [ -z "${IDC_NO_PROGRESS:-}" ]; }; then
+                echo "idc: waiting for a build slot ($idc_jobs in use; IDC_JOBS raises the limit)" >&2
+            fi
+            flock 8
+        fi
     fi
     export IDC_SLOT_HELD=1
 fi

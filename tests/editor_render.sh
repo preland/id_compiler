@@ -55,36 +55,52 @@ want_line "an empty paragraph survives as one"      "[3] 0 run(s)"
 want_line "entities came through decoded"           "Entities survive too & so do <angle"
 
 # And the pixels.
-python3 - "$TMP/page.ppm" > "$TMP/facts.txt" <<'PY'
-import sys
-d = open(sys.argv[1], "rb").read()
-h = d.split(b"\n", 3)
-w, ht = map(int, h[1].split())
-px = h[3]
-lum = lambda x, y: px[(y * w + x) * 3]
+node - "$TMP/page.ppm" > "$TMP/facts.txt" <<'JSEOF'
+const d = require("fs").readFileSync(process.argv[2]);
+let pos = 0;
+const lines = [];
+while (lines.length < 3) {
+    const nl = d.indexOf(10, pos);
+    lines.push(d.toString("latin1", pos, nl));
+    pos = nl + 1;
+}
+const [w, ht] = lines[1].split(/\s+/).map(Number);
+const px = d.subarray(pos);
+const lum = (x, y) => px[(y * w + x) * 3];
 
-rows = [sum(1 for x in range(w) if lum(x, y) < 200) for y in range(ht)]
-bands, run = [], None
-for y, n in enumerate(rows):
-    if n and run is None:
-        run = y
-    elif not n and run is not None:
-        bands.append((run, y - 1))
-        run = None
-if run is not None:
-    bands.append((run, ht - 1))
+const rows = [];
+let right = 0;
+for (let y = 0; y < ht; y++) {
+    let n = 0;
+    for (let x = 0; x < w; x++) {
+        if (lum(x, y) < 200) {
+            n++;
+            if (x > right) right = x;
+        }
+    }
+    rows.push(n);
+}
+const bands = [];
+let run = null;
+rows.forEach((n, y) => {
+    if (n && run === null) run = y;
+    else if (!n && run !== null) {
+        bands.push([run, y - 1]);
+        run = null;
+    }
+});
+if (run !== null) bands.push([run, ht - 1]);
 
-right = max((x for y in range(ht) for x in range(w) if lum(x, y) < 200), default=0)
-ink = sum(rows)
-print("size", w, ht)
-print("ink", ink)
-print("bands", len(bands))
-print("first_height", (bands[0][1] - bands[0][0] + 1) if bands else 0)
-print("body_height", (bands[1][1] - bands[1][0] + 1) if len(bands) > 1 else 0)
-print("rightmost", right)
-gaps = [bands[i + 1][0] - bands[i][1] for i in range(len(bands) - 1)]
-print("biggest_gap", max(gaps) if gaps else 0)
-PY
+const gaps = [];
+for (let i = 0; i + 1 < bands.length; i++) gaps.push(bands[i + 1][0] - bands[i][1]);
+console.log("size", w, ht);
+console.log("ink", rows.reduce((a, b) => a + b, 0));
+console.log("bands", bands.length);
+console.log("first_height", bands.length ? bands[0][1] - bands[0][0] + 1 : 0);
+console.log("body_height", bands.length > 1 ? bands[1][1] - bands[1][0] + 1 : 0);
+console.log("rightmost", right);
+console.log("biggest_gap", gaps.length ? Math.max(...gaps) : 0);
+JSEOF
 fact() { grep "^$1 " "$TMP/facts.txt" | cut -d' ' -f2-; }
 
 [ "$(fact size)" = "640 480" ] && ok "the page is the size that was asked for" \

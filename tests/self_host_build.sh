@@ -758,7 +758,7 @@ printf 'main(int argc, string[] argv) {\n  print("bootstrapped");\n} return int 
     > "$TMP/hello_boot.id"
 if [ -z "$STD_REAL" ]; then
     echo "SKIP: cold bootstrap (no idstd checkout to build the compiler against)"
-elif IDC_CACHE_DIR="$TMP/bootcache" "$BOOTROOT/bin/idc" --std "$STD_REAL" --allow-untested \
+elif IDSTD_HOME="$STD_REAL" IDC_CACHE_DIR="$TMP/bootcache" "$BOOTROOT/bin/idc" --std "$STD_REAL" --allow-untested \
          "$TMP/hello_boot.id" -o "$TMP/hello_boot" >"$TMP/boot.err" 2>&1 \
      && [ "$("$TMP/hello_boot")" = "bootstrapped" ]; then
     ok "a cold cache bootstraps from bootstrap/*.c"
@@ -798,14 +798,14 @@ printf 'main(int argc, string[] argv) {\n  int x = %s;\n  print(x);\n} return in
 printf 'main(int argc, string[] argv) {\n  string x = %s;\n  print(x);\n} return int 0;\n' \
     "$str_chain" > "$TMP/chain_str.id"
 
-if (ulimit -v 2000000; IDC_JOBS=1000 timeout 5 $BIN_IDC "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
+if (ulimit -v 2000000; IDC_NO_SLOTS=1 timeout 5 $BIN_IDC "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
         >"$TMP/chain_int.err" 2>&1; then
     ok "250-term int + chain compiles in linear time under a 2 GB cap"
 else
     bad "250-term int + chain compiles in linear time under a 2 GB cap: $(head -1 "$TMP/chain_int.err")"
 fi
 
-if (ulimit -v 2000000; IDC_JOBS=1000 timeout 5 $BIN_IDC "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
+if (ulimit -v 2000000; IDC_NO_SLOTS=1 timeout 5 $BIN_IDC "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
         >"$TMP/chain_str.err" 2>&1; then
     ok "250-term string + chain compiles in linear time under a 2 GB cap"
 else

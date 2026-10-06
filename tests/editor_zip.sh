@@ -2,7 +2,7 @@
 # editor/lib/zip -- DEFLATE and the ZIP archive, checked against zlib.
 #
 # The point of this file is that nothing in it is a golden blob. Every expected
-# byte is produced by Python's zipfile/zlib at the moment the test runs, and the
+# byte is produced by Info-ZIP unzip and node's zlib at the moment the test runs, and the
 # `id` reader has to agree with it byte for byte. A checked-in expected output
 # would only prove that the reader still does what it did the day it was
 # written; agreeing with the reference implementation of the format is what
@@ -12,9 +12,9 @@
 # builds a throwaway project out of a copy of editor/lib/zip and a five-line
 # driver: `ziptest ARCHIVE NAME` writes that entry's bytes to stdout, and
 # `ziptest FILE` inflates the file as a raw DEFLATE stream. Everything below is
-# a comparison of that stdout with Python's answer.
+# a comparison of that stdout with the reference's answer.
 #
-# Run from anywhere: tests/editor_zip.sh   (needs python3 and a C compiler)
+# Run from anywhere: tests/editor_zip.sh   (needs node, unzip and a C compiler)
 set -u
 cd "$(dirname "$0")"
 ROOT=..
@@ -23,7 +23,7 @@ pass=0 fail=0
 ok()  { pass=$((pass+1)); echo "PASS: $1"; }
 bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 
-for tool in python3 cc; do
+for tool in node unzip cc; do
     if ! command -v "$tool" >/dev/null 2>&1; then
         echo "SKIP: editor/lib/zip tests (need $tool on PATH)"
         exit 0
@@ -110,29 +110,25 @@ if ! "$ROOT/bin/idc" "$TMP" --allow-untested -o "$BIN" >"$TMP/build.log" 2>&1; t
 fi
 ok "editor/lib/zip builds"
 
-# -- every entry of the fixture, against zipfile ---------------------------
+# -- every entry of the fixture, against unzip -----------------------------
 # The .odt has a stored entry (mimetype, which the OpenDocument specification
 # requires to be stored and first) and three deflated ones, so this single
 # loop covers both compression methods the reader implements.
-names=$(python3 -c "
-import zipfile
-print('\n'.join(zipfile.ZipFile('fixtures/sample.odt').namelist()))")
+names=$(unzip -Z1 fixtures/sample.odt)
 if [ -z "$names" ]; then
     bad "the fixture lists its entries"
 else
     miss=0
     while read -r n; do
         [ -z "$n" ] && continue
-        python3 -c "
-import zipfile, sys
-sys.stdout.buffer.write(zipfile.ZipFile('fixtures/sample.odt').read('$n'))" > "$TMP/want"
+        unzip -p fixtures/sample.odt "$n" > "$TMP/want"
         if ! "$BIN" fixtures/sample.odt "$n" > "$TMP/got" 2>"$TMP/err"; then
             bad "sample.odt: $n reads back ($(head -1 "$TMP/err"))"; miss=1
         elif ! cmp -s "$TMP/got" "$TMP/want"; then
-            bad "sample.odt: $n is byte-identical to what zipfile extracts"; miss=1
+            bad "sample.odt: $n is byte-identical to what unzip extracts"; miss=1
         fi
     done <<< "$names"
-    [ "$miss" -eq 0 ] && ok "every entry of sample.odt is found by name and matches zipfile"
+    [ "$miss" -eq 0 ] && ok "every entry of sample.odt is found by name and matches unzip"
 fi
 
 # The mimetype entry is the one whose exact text identifies the format, and it
@@ -148,14 +144,12 @@ fi
 
 # content.xml on its own, called out because it is the entry an editor
 # actually wants and the one that exercises dynamic Huffman.
-python3 -c "
-import zipfile, sys
-sys.stdout.buffer.write(zipfile.ZipFile('fixtures/sample.odt').read('content.xml'))" > "$TMP/want"
+unzip -p fixtures/sample.odt content.xml > "$TMP/want"
 if "$BIN" fixtures/sample.odt content.xml > "$TMP/got" 2>"$TMP/err" \
    && cmp -s "$TMP/got" "$TMP/want"; then
-    ok "the deflated content.xml is byte-identical to what zipfile extracts"
+    ok "the deflated content.xml is byte-identical to what unzip extracts"
 else
-    bad "the deflated content.xml is byte-identical to what zipfile extracts"
+    bad "the deflated content.xml is byte-identical to what unzip extracts"
     cmp "$TMP/got" "$TMP/want" 2>&1 | head -3
 fi
 
@@ -172,21 +166,24 @@ fi
 # the whole source before writing any of it produces the right length of the
 # wrong bytes. "abcabc..." compresses to a distance of 3 with lengths up to
 # 258, and "xxxx..." to a distance of 1, which is the extreme of it.
-python3 - "$TMP" <<'PYEOF'
-import sys, zlib
-tmp = sys.argv[1]
-cases = {
-    "overlap": (("abc" * 4000).encode(), 9),   # dynamic Huffman, distance 3 < length
-    "rle":     ((b"x" * 5000), 9),             # distance 1: a run
-    "fixed":   (b"aaaa", 9),                   # too small for a code table: fixed Huffman
-    "stored":  (bytes(1 + (i * 37 + 11) % 250 for i in range(200000)), 0),
-    "empty":   (b"", 6),
+node - "$TMP" <<'JSEOF'
+const fs = require("fs");
+const zlib = require("zlib");
+const tmp = process.argv[2];
+const stored = Buffer.alloc(200000);
+for (let i = 0; i < stored.length; i++) stored[i] = 1 + (i * 37 + 11) % 250;
+const cases = {
+    overlap: [Buffer.from("abc".repeat(4000)), 9],
+    rle: [Buffer.from("x".repeat(5000)), 9],
+    fixed: [Buffer.from("aaaa"), 9],
+    stored: [stored, 0],
+    empty: [Buffer.alloc(0), 6],
+};
+for (const [name, [data, level]] of Object.entries(cases)) {
+    fs.writeFileSync(tmp + "/" + name + ".def", zlib.deflateRawSync(data, { level }));
+    fs.writeFileSync(tmp + "/" + name + ".want", data);
 }
-for name, (data, lvl) in cases.items():
-    c = zlib.compressobj(lvl, zlib.DEFLATED, -15)
-    open("%s/%s.def" % (tmp, name), "wb").write(c.compress(data) + c.flush())
-    open("%s/%s.want" % (tmp, name), "wb").write(data)
-PYEOF
+JSEOF
 for case in overlap rle fixed stored empty; do
     if "$BIN" "$TMP/$case.def" > "$TMP/$case.got" 2>"$TMP/err" \
        && cmp -s "$TMP/$case.got" "$TMP/$case.want"; then
