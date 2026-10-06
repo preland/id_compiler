@@ -1,0 +1,17 @@
+// Reading a function value's object (make.id): the word at a position, and the
+// two header words that are the adapter to call and the plain function a native
+// is given (0 for a closure: there is no stderr here to say that a closure
+// cannot cross, so the native gets a null and the cases that pass one run on the
+// hosted targets).
+
+clo_word(word ko, int kk) {
+  word kw = ld64(ko + kk * 8);
+} return word kw;
+
+clo_fn(word ko) {
+  word kf = clo_word(ko, 0);
+} return word kf;
+
+fn_raw(word ko) {
+  word kr = clo_word(ko, 1);
+} return word kr;

@@ -1,0 +1,24 @@
+// Function values on the freestanding target (docs/SPEC.md 1.1.1): the objects
+// the hosted runtimes make, as raw words in the arena. A module the LLVM target
+// printed never looks inside one; it calls these. An object is three words --
+// the adapter, the plain function (0 for a closure), the number of captured
+// cells -- and then the cells, eight bytes each. A word is an address here, as a
+// `ptr` is in the module that calls it, and an object is not freed: nothing
+// proves it dead (docs/MEMORY.md 3.5), and the arena only bumps.
+
+clo_make(word kfn, int kn) {
+  word ko = mem_alloc(24 + kn * 8);
+  st64(ko, kfn);
+  st64(ko + 8, 0);
+} chain (word kfn, int kn) {
+  st64(ko + 16, kn);
+} return word ko;
+
+clo_set(word ko, int ki, word kv) {
+  st64(ko + 24 + ki * 8, kv);
+} return word ko;
+
+fn_plain(word kfn, word kraw) {
+  word ko = clo_make(kfn, 0);
+  st64(ko + 8, kraw);
+} return word ko;

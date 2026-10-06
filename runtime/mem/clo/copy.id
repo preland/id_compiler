@@ -1,0 +1,19 @@
+// A captured cell, and what a closure holds of a list value it was made from: a
+// copy of the cells. The hosted runtimes lock the copy too (a write to it is the
+// trap `id: cannot mutate a constant list`); there is nowhere to trap to here,
+// the same want that makes list_lock (lang/list/use/tail.id) a no-op, so the
+// copy is unlocked and a write to it is unchecked. The cells are read with the
+// runtime's own list calls, as a cell is eight bytes whatever the list holds.
+
+clo_cell(word ko, int ki) {
+  word kv = clo_word(ko, ki + 3);
+} return word kv;
+
+clo_copy(int[] kxs) {
+  int[] kcp = list_new();
+  int kj = 0;
+  while(kj < list_len(kxs)) {
+    list_push(kcp, list_get(kxs, kj));
+    kj = kj + 1;
+  }
+} return int[] kcp;
