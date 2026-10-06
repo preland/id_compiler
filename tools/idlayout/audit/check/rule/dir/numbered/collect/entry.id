@@ -1,10 +1,9 @@
 // What one fs_list entry means for the numbered-sibling check: a
 // subdirectory is collected unless hidden or (only directly under the root)
-// the build output directory -- the same filter dir/entrylimit/count.id
-// applies for its own reasons -- and a file is collected unless it is
+// the build output directory -- and a file is collected unless it is
 // conf.id or backend.id, regardless of a generic or legacy name (those are
 // still candidates for a numbered copy). `lay_ns_collect_entry` dispatches on
-// the trailing '/' fs_list already writes, same as lay_count_check.
+// the trailing '/' fs_list already writes.
 
 lay_ns_collect_dir(int[] buf, int lo, int hi, string build, int is_root) {
   string name = lay_name_of(buf, lo, hi);

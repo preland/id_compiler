@@ -271,7 +271,16 @@ EOF
         bad "--where on the compiler took ${ms} ms warm; the limit is 1000"
     fi
 
-    layout_check E0701 'main.id a.id' 'b.id c.id d.id' ''
+    wide="$TMP/lay_wide"
+    mkdir -p "$wide"
+    printf 'main(int argc, string[] argv) {\n  int r = argc;\n} return int r;\n' > "$wide/main.id"
+    n=0
+    for f in alpha bravo charlie delta echo foxtrot golf hotel india; do n=$((n + 1)); printf 'wide%s(int x) {\n  int y = x + %s;\n} return int y;\n' "$n" "$n" > "$wide/$f.id"; done
+    if $BIN_IDC "$wide" --allow-untested -o "$wide.bin" > "$wide.log" 2>&1 && [ ! -s "$wide.log" ]; then
+        ok "layout: a directory of ten files builds, with nothing reported"
+    else
+        bad "layout: a directory of ten files builds: $(head -c 300 "$wide.log" | tr '\n' '|')"
+    fi
     layout_check E0702 'util.id' '' ''
     layout_check E0703 'loop/loop.id' '' ''
     layout_check E0704 'loop/loop/main.id' '' ''

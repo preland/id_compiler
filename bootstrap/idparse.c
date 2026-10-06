@@ -23484,7 +23484,7 @@ void id_report_funcs(char* name, int n) {
     char* funcs_msg;
     char* funcs_help;
     funcs_msg = id_concat(id_concat(ID_S("too many functions in this file ("), id_str_of_int(n)), ID_S("); the limit is 3 per file"));
-    funcs_help = id_concat(id_concat(ID_S("move "), id_str_of_int((n - 3))), ID_S(" of its functions into another file (a directory may hold at most 3 files and directories, so the file may need a directory of its own; `idc/.idc-cache/idlayout --room PROJECT_ROOT DIR` lists the nearest places with room)"));
+    funcs_help = id_concat(id_concat(ID_S("move "), id_str_of_int((n - 3))), ID_S(" of its functions into another file in the same directory, named for what those functions do"));
     id_diag(ID_S("E0203"), id_concat(name, ID_S(":1")), funcs_msg, ID_S(""), ID_S("a file holds at most three functions so that the tree, not the file, carries the structure, and no file grows into a place where unrelated code gathers (docs/PROJECT.md)"), funcs_help);
     return;
 }

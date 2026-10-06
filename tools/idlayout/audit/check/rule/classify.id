@@ -1,7 +1,7 @@
 // What a file's own name says about it: the dependency manifest, a backend's
 // link facts, the old manifest name, a generic dump, or an ordinary source
-// file. Mirrors bin/idc's own filters (check_entry_limit's `! -name` list,
-// check_legacy_manifest, check_generic_names).
+// file. Mirrors bin/idc's own filters (check_legacy_manifest,
+// check_generic_names).
 
 lay_is_generic(string name) {
   int hit = 0;
@@ -28,7 +28,7 @@ lay_is_generic(string name) {
 ("temperature.id"):(0)
 
 // 0 conf.id, 1 backend.id, 2 import.id (the old manifest name), 3 a generic
-// dump, 4 an ordinary *.id file that counts toward the entry limit, 5
+// dump, 4 an ordinary *.id file, 5
 // anything else (not a *.id file at all, so no check below ever sees it).
 lay_file_kind(string name) {
   int kind = 5;

@@ -1,7 +1,6 @@
 // Printing every violation, grouped and ordered exactly as bin/idc used to
-// call the seven bash checks -- legacy, entry limit, nested manifest, same
-// name as parent, generic name, numbered sibling, file named like its
-// directory -- so the first line a multi-violation build prints is the same
+// call the six bash checks -- legacy, nested manifest, same name as parent,
+// generic name, numbered sibling, file named like its directory -- so the first line a multi-violation build prints is the same
 // line the bash checks would have printed first, and every line after it is
 // new.
 
@@ -24,16 +23,14 @@ lay_print_all(string[] msgs) {
 
 lay_report() {
   int a = lay_print_all((import lay_hit_legacy));
-  int b = lay_print_all((import lay_hit_entry));
   int c = lay_print_all((import lay_hit_nested));
-} chain () {
   int d = lay_print_all((import lay_hit_samename));
-  int e = lay_print_all((import lay_hit_generic));
-  int total = a + b + c + d + e;
 } chain () {
+  int e = lay_print_all((import lay_hit_generic));
   int f = lay_print_all((import lay_hit_numbered));
   int g = lay_print_all((import lay_hit_samefile));
-  total = total + f + g;
+} chain () {
+  int total = a + c + d + e + f + g;
 } return int total;
 given lay_reset ():(0) then prints:("")
 given lay_fixture_two_hits ():(2) then prints:("a.id:1: error: x\nb.id:1: error: y\n")

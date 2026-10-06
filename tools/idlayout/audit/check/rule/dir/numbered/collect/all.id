@@ -3,8 +3,7 @@
 // (lay_check_numbered): the subdirectories against each other, then the
 // *.id files (stems with their own extension already stripped) against each
 // other. Called once per directory from walk/scan/top/walk.id, beside the
-// entry-limit count and the recursive scan it already does over the same
-// buffer.
+// recursive scan it already does over the same buffer.
 
 lay_ns_collect_one(int[] buf, string build, int is_root, int at) {
   int end = lay_eol(buf, at);

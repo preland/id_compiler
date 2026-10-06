@@ -13,9 +13,9 @@
 # The semantic checks live in idparse, in id: the action-per-block limit,
 # nesting depth, 3-functions-per-file, name-type consistency, export/import
 # access, function-logic uniqueness, the type checks, and unresolved calls.
-# The 3-entries-per-directory limit and its six neighbours (a legacy-named
-# or nested conf.id, a directory sharing its parent's name, a generic file
-# name, a numbered sibling, a file named like its own directory) are checked
+# The six structural checks (a legacy-named or nested conf.id, a directory
+# sharing its parent's name, a generic file name, a numbered sibling, a file
+# named like its own directory; a directory has no entry limit) are checked
 # by tools/idlayout, an `id` program this driver builds
 # and runs (run_idlayout below) -- `id` reads a directory's own listing
 # through idstd's fs_list now, so this is no longer a rule the language
@@ -520,8 +520,8 @@ ensure_ccrun() {
     fi
 }
 
-# tools/idlayout -- the id-written 3-entries-per-directory walk and its four
-# neighbours (run_idlayout below), built and cached the same lazy way as
+# tools/idlayout -- the id-written walk of the six structural checks
+# (run_idlayout below), built and cached the same lazy way as
 # ccrun above, and for the same reason: it needs a working idlex/idparse, so
 # it is not ready the first few times a directory's structure has to be
 # checked in a from-scratch build. IDC_BUILDING_IDLAYOUT breaks the same
@@ -687,8 +687,8 @@ show_diag() {
     rm -f "$stream"
 }
 
-# run_idlayout ROOT -- every one of the seven structural checks over ROOT's
-# tree, in one call. Used at every place that used to call the seven bash
+# run_idlayout ROOT -- every one of the six structural checks over ROOT's
+# tree, in one call. Used at every place that used to call the bash
 # check_* functions: the project itself, each dependency a conf.id names,
 # each --backend directory, and the standard library.
 run_idlayout() {
@@ -1195,8 +1195,7 @@ else
     echo "idc: no such file or directory: '$PATH_ARG'" >&2
     exit 1
 fi
-# The 3-entries-per-directory rule and its four neighbours (run_idlayout,
-# above). Everything else belongs in idparse.
+# The six structural checks (run_idlayout, above). Everything else belongs in idparse.
 if [ -d "$PATH_ARG" ]; then
     run_idlayout "$PATH_ARG"
 fi
@@ -1753,7 +1752,7 @@ std_lazy_plan() {
 
 # ---------------------------------------------------------------------------
 # The standard library, imported by DEFAULT -- no conf.id line, no flag. It
-# is merged exactly like a source dependency: same entry-count rule, and its
+# is merged exactly like a source dependency: same layout checks, and its
 # own conf.id is followed. The backends it carries are found by their
 # backend.id (collect_ids), so every program has them and none links one it
 # does not reach.

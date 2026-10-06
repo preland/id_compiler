@@ -48,8 +48,6 @@ fi
 # -- the throwaway project -------------------------------------------------
 # $TMP holds main.id and t/; t/ holds show.id and the copied module. fs is the
 # standard library's.
-# Both directories are at the three-entry limit `id` imposes, which is why the
-# driver is two files rather than one.
 mkdir -p "$TMP/t/zip"
 cp -r "$ABS/../editor/lib/zip/." "$TMP/t/zip/"
 cat > "$TMP/main.id" <<'IDEOF'

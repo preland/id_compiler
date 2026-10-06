@@ -3,9 +3,8 @@
 // `#file` markers and the parser records, in `pfile`, which file each entry
 // of `prog` came from.
 //
-// The sibling rule -- 3 entries per directory -- cannot be checked here at
-// all: it is a property of the filesystem, which `id` has no access to, so it
-// lives in the driver.
+// The directory-layout rules are a property of the filesystem, which this
+// pass has no access to, so they live in the driver (tools/idlayout).
 
 check_files() {
   int i = 0;

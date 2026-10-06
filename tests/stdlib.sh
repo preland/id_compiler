@@ -194,17 +194,19 @@ else
     bad "a backend named by an imported library is linked"
 fi
 
-# -- 11. the stdlib obeys the 3-entries-per-directory rule -----------------
-# It is imported source like any other, so the rule applies to it -- and a
-# violation must name the stdlib's directory, not the user's project.
+# -- 11. a stdlib directory has no entry limit -------------------------------
+# It is imported source like any other, and a directory holds any number of
+# files, so ten of them in one stdlib directory build.
 rm -rf "$TMP/fat"; mkdir -p "$TMP/fat"
-for n in 1 2 3 4; do printf 'fat%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/fat/f$n.id"; done
-if ! $BIN_IDC --std "$TMP/fat" "$TMP/proj" -o "$TMP/x" >"$TMP/fat.err" 2>&1 \
-   && grep -q "at most 3 files and directories" "$TMP/fat.err" \
-   && grep -q "$TMP/fat" "$TMP/fat.err"; then
-    ok "the entry-count rule applies to the stdlib, and names it"
+n=0
+for f in alpha bravo charlie delta echo foxtrot golf hotel india juliet; do n=$((n + 1)); printf 'fat%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/fat/$f.id"; done
+rm -rf "$TMP/proj11"; mkdir -p "$TMP/proj11"
+printf 'main(int argc, string[] argv) {\n  print(fat3(4));\n} return int 0;\n' > "$TMP/proj11/main.id"
+if $BIN_IDC --allow-untested --std "$TMP/fat" "$TMP/proj11" -o "$TMP/x" >"$TMP/fat.err" 2>&1 \
+   && [ "$("$TMP/x")" = "7" ]; then
+    ok "a stdlib directory of ten files is accepted"
 else
-    bad "the entry-count rule applies to the stdlib, and names it"
+    bad "a stdlib directory of ten files is accepted"
 fi
 
 # -- 12. the stdlib rejects a directory with the same name as its parent -----

@@ -30,18 +30,12 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/p"
 
-# One entry per module, plus main.id, and a project directory holds at most 3.
 n=0
 for d in "$@"; do
     [ -d "$d" ] || { echo "idtest: not a directory: $d" >&2; exit 2; }
     cp -r "$d" "$TMP/p/m$n" || exit 2
     n=$((n + 1))
 done
-if [ "$n" -gt 2 ]; then
-    echo "idtest: at most 2 modules at a time -- a directory holds 3 entries and" >&2
-    echo "        one of them is main.id" >&2
-    exit 2
-fi
 
 # A main that does nothing: the harness generates its own entry point per case,
 # and a project still has to have one function called main to be a program.

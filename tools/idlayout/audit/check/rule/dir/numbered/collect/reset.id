@@ -2,8 +2,7 @@
 // its subdirectory names and its *.id file names, kept apart because a
 // directory is never a numbered copy of a file, or the reverse. Reset once
 // per directory (all.id) before either is filled; the two `_len` checks are
-// what a case reads back, the same role fixture/scratch.id's own
-// `lay_scratch_len` plays for the entry-limit count.
+// what a case reads back.
 
 lay_ns_scratch_reset() {
   export string[] lay_ns_dirs = [];

@@ -60,9 +60,10 @@ what is left by kind; run again, it makes no edit. The edits are computed by
 (`compiler/parse/mid/form/fix/`), and applied by `tools/fixapply.awk`.
 See [`docs/PROJECT.md`](../docs/PROJECT.md) §3.
 
-The one rule checked in the driver rather than in `id` is the
-3-entries-per-directory limit — it is a property of the filesystem, which `id`
-cannot see, which is also why the driver exists.
+The rules checked in the driver rather than in `id` are the layout checks
+(manifest names, generic and numbered names, a file or directory named like its
+parent) — they are properties of the filesystem, which `id` cannot see, which
+is also why the driver exists. A directory has no entry limit.
 
 **Diagnostics.** A diagnostic that has moved to the record ends its first line
 with a stable code (`... [E0501]`); the lines under it say why the rule exists
@@ -162,8 +163,7 @@ never collide. See [`../docs/BACKENDS.md`](../docs/BACKENDS.md).
 
 A `native` declaration is a function whose body is native code. The directory
 is merged into the build like any other dependency, so its declarations obey
-the same rules as any source — at most 3 functions per file and 3 entries per
-directory, one type per name, no duplicate names — and a call into the backend
+the same rules as any source — at most 3 functions per file, one type per name, no duplicate names — and a call into the backend
 is resolved and checked like any call: a wrong argument count or type gets the
 diagnostic an `id` function gets, and a misspelled name is `no such function`.
 Nothing is left to the linker to discover. The C target emits each native as a

@@ -1,18 +1,16 @@
-// One bucket per bash check (check_legacy_manifest, check_entry_limit,
-// check_nested_manifest, check_same_name_as_parent, check_generic_names,
-// check_numbered_sibling, check_file_named_like_dir), holding every
-// violation it finds rather than bash's `head -1`. Reset once, at the start
-// of a run, before the walk pushes into any of them.
+// One bucket per bash check (check_legacy_manifest, check_nested_manifest,
+// check_same_name_as_parent, check_generic_names, check_numbered_sibling,
+// check_file_named_like_dir), holding every violation it finds rather than
+// bash's `head -1`. Reset once, at the start of a run, before the walk
+// pushes into any of them.
 
 lay_reset() {
   export string[] lay_hit_legacy = [];
-  export string[] lay_hit_entry = [];
   export string[] lay_hit_nested = [];
-} chain () {
   export string[] lay_hit_samename = [];
+} chain () {
   export string[] lay_hit_generic = [];
   export string[] lay_hit_numbered = [];
-} chain () {
   export string[] lay_hit_samefile = [];
 } return void;
 ():() then prints:("")
@@ -25,19 +23,4 @@ lay_diag(string path, string lay_code, string text, string why, string help) {
   string full = head + "\n  why: " + why + "\n  help: " + help;
 } return string full;
 ("a/b.id", "E0090", "bad", "because", "do this"):("a/b.id:1: error: bad [E0090]\n  why: because\n  help: do this")
-("d", "E0701", "worse", "reason", "fix"):("d:1: error: worse [E0701]\n  why: reason\n  help: fix")
-
-// The over-full directory's diagnostic. Its help names the nearest places that
-// have room for what there is too much of, found by the same walk as `idlayout
-// --room ROOT DIR` makes; with none found, it says how to run that.
-lay_entry_msg(string dir, int total, string list, string root) {
-  string rooms = lay_room_hint(root, dir);
-  string tail = "; `idc/.idc-cache/idlayout --room PROJECT_ROOT " + dir + "` lists the nearest places with a free entry";
-  if(rooms != "") {
-    tail = "; the nearest places with room (a dir row has that many free entries, a file row has room for that many more functions): " + rooms;
-  }
-} chain (string dir, int total, string list, string root) {
-  string msg = lay_diag(dir, "E0701", "a project directory may contain at most 3 files and directories combined, but this one has " + total + ": " + list, "three entries to a directory (its .id files and subdirectories; conf.id and backend.id do not count) keeps every listing readable at a glance, so the tree, not one long directory, carries the structure (docs/PROJECT.md)", "split the entries into subdirectories named for what they have in common, or move some into a neighbouring directory that has room" + tail);
-} return string msg;
-("d", 4, "a.id, b.id, c.id, d.id", "does-not-exist-xyz-entry-msg-root"):("d:1: error: a project directory may contain at most 3 files and directories combined, but this one has 4: a.id, b.id, c.id, d.id [E0701]\n  why: three entries to a directory (its .id files and subdirectories; conf.id and backend.id do not count) keeps every listing readable at a glance, so the tree, not one long directory, carries the structure (docs/PROJECT.md)\n  help: split the entries into subdirectories named for what they have in common, or move some into a neighbouring directory that has room; `idc/.idc-cache/idlayout --room PROJECT_ROOT d` lists the nearest places with a free entry")
-given lay_room_scratch_fixture ("d", 4, "a.id, b.id, c.id, d.id", (import lay_room_scratch)):("d:1: error: a project directory may contain at most 3 files and directories combined, but this one has 4: a.id, b.id, c.id, d.id [E0701]\n  why: three entries to a directory (its .id files and subdirectories; conf.id and backend.id do not count) keeps every listing readable at a glance, so the tree, not one long directory, carries the structure (docs/PROJECT.md)\n  help: split the entries into subdirectories named for what they have in common, or move some into a neighbouring directory that has room; the nearest places with room (a dir row has that many free entries, a file row has room for that many more functions): dir . 2; file a.id 3") then lay_room_scratch_clean:(0)
+("d", "E0704", "worse", "reason", "fix"):("d:1: error: worse [E0704]\n  why: reason\n  help: fix")

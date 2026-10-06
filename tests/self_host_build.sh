@@ -148,8 +148,7 @@ done
 # These are filesystem questions, answered in bash rather than in id, so they
 # are the ones most likely to be gotten wrong. Each one was, once.
 
-# (a) hidden directories are neither counted toward the 3-entry limit nor
-#     descended into for source.
+# (a) hidden directories are not descended into for source.
 proj="$TMP/hid"
 mkdir -p "$proj/.git" "$proj/a" "$proj/b"
 cat > "$proj/m.id" <<'EOF'
@@ -676,13 +675,13 @@ else
     bad "a nested conf.id is reported"
 fi
 
-# An over-full directory must not swallow a real semantic error elsewhere in
-# the same project: check_entry_limit used to exit before idlex/idparse ever
-# ran, so a project mixing the two reported only the directory violation and
+# A layout violation must not swallow a real semantic error elsewhere in
+# the same project: the layout check used to exit before idlex/idparse ever
+# ran, so a project mixing the two reported only the layout violation and
 # hid everything idparse had to say about the rest -- this is exactly how
 # idem/engine's 1,115 real errors were once read as "1 error".
 mkdir -p "$TMP/mixed"
-for n in 1 2 3 4; do printf 'mx%d(int a) {\n  int v = a + %d;\n} return int v;\n' "$n" "$n" > "$TMP/mixed/f$n.id"; done
+printf 'mx(int a) {\n  int v = a + 1;\n} return int v;\n' > "$TMP/mixed/util.id"
 cat > "$TMP/mixed/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int r = no_such_function();
@@ -692,11 +691,11 @@ EOF
 mixed_out=$($BIN_IDC "$TMP/mixed" -o "$TMP/mixed.bin" 2>&1)
 mixed_rc=$?
 if [ "$mixed_rc" -ne 0 ] \
-   && printf '%s\n' "$mixed_out" | grep -q "at most 3 files and directories" \
+   && printf '%s\n' "$mixed_out" | grep -q "has a generic name" \
    && printf '%s\n' "$mixed_out" | grep -q "no such function 'no_such_function'"; then
-    ok "an over-full directory does not hide a real semantic error"
+    ok "a layout violation does not hide a real semantic error"
 else
-    bad "an over-full directory does not hide a real semantic error"
+    bad "a layout violation does not hide a real semantic error"
 fi
 
 # Test clauses (docs/TESTS.md) are part of a declaration: bin/idc runs the

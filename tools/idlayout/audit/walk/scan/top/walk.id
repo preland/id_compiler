@@ -1,6 +1,5 @@
-// One directory, fully: list it (walk/list.id), count its own entries and
-// check them against the limit, then scan each one for the other six
-// violations and recurse into every subdirectory reached. A directory that
+// One directory, fully: list it (walk/list.id), scan each entry for
+// the six structural violations and recurse into every subdirectory reached. A directory that
 // cannot be read (fs_list < 0) lists as nothing, same as `find` skipping it.
 
 lay_walk(string dir, string root, string build, int is_root) {
@@ -14,12 +13,10 @@ given lay_walk_fixture_bad ((import lay_wfb), (import lay_wfb), "build", 1):() t
 
 lay_walk_listed(string dir, string root, string build, int is_root, int size) {
   int[] buf = lay_list_read(dir, size);
-  lay_count_all(buf, build, is_root);
-  lay_check_entrylimit(dir, root);
-} chain (string dir, string root, string build, int is_root, int size) {
   string self = lay_basename(dir);
   lay_scan(buf, dir, root, build, is_root, self, 0);
+} chain (string dir, string root, string build, int is_root, int size) {
   lay_check_numbered(dir, build, is_root, buf);
 } return void;
 given lay_walk_listed_fixture ((import lay_wfb), (import lay_wfb), "build", 1, (import lay_wl_size)):() then lay_report:(1)
-given lay_walk_listed_fixture ((import lay_wfb), (import lay_wfb), "build", 1, (import lay_wl_size)):() then calls lay_check_entrylimit:((import lay_wfb), (import lay_wfb))
+given lay_walk_listed_fixture ((import lay_wfb), (import lay_wfb), "build", 1, (import lay_wl_size)):() then calls lay_basename:((import lay_wfb))
