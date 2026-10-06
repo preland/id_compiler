@@ -89,7 +89,7 @@ fi
 
 # a no-main project (a library) must build to a .o with bin/idc too. This used to
 # build demos/engine, the one no-main project in the tree; that engine is idstd's
-# sys/io/term now, so the library is written here.
+# host/io/term now, so the library is written here.
 mkdir -p "$TMP/nomain"
 cat > "$TMP/nomain/twice.id" <<'EOF'
 lib_twice(int n) {

@@ -42,7 +42,7 @@ compiler/parse   needs-std
 
 # ---------------------------------------------------------------------------
 # moonbuggy, solitaire -- the two terminal games. The engine they each bundled
-#   (and demos/engine, its reference copy) is idstd's sys/io/term now.
+#   (and demos/engine, its reference copy) is idstd's host/io/term now.
 moonbuggy        needs-std
 solitaire        needs-std
 

@@ -1136,9 +1136,9 @@ fi
 #
 # A directory holding a backend.id is a backend, wherever a collected tree
 # holds it, and goes on FOUND_BACKENDS. That is how a library carries the
-# backends its modules wrap without naming them: idstd's sys/io/fs is a backend
+# backends its modules wrap without naming them: idstd's host/io/fs is a backend
 # because its backend.id is there, not because a manifest says so. The other
-# way -- a self-relative `import "sys/io/fs"` in the library's own conf.id --
+# way -- a self-relative `import "host/io/fs"` in the library's own conf.id --
 # is a second copy of the layout to keep in step with the tree, and would make
 # each such subdirectory a compilation unit of its own (a unit is a root; see
 # emit_sources). Finding a backend costs a program nothing: what is compiled
@@ -1818,7 +1818,7 @@ fi
 # them is the backend's fault, never the program's (run_lib_precheck,
 # further down). STD_UNIT_START's boundary already covers a backend merged
 # into the stdlib's own range by directory walk alone (collect_ids's
-# FOUND_BACKENDS comment, above) -- idstd's sys/io/fs is such a backend, and
+# FOUND_BACKENDS comment, above) -- idstd's host/io/fs is such a backend, and
 # every one of its cases is already >= STD_UNIT_START. What it cannot name is
 # a backend that is its own compilation unit -- --backend, or a conf.id
 # import, by the project or one of its dependencies (or, in principle, the
@@ -3351,7 +3351,7 @@ case_cache_global() {
 # f`) is a case whose only natives are file-pure (compiler/parse/conf.id,
 # cache_file_natives): it has a real key, but what it passes on also depends on
 # the files it read. idstd's fs backend logs every path a case reads or probes,
-# found or not, to $IDTC_READS/N (idstd sys/io/fs/fs_posix.c), and a write or a
+# found or not, to $IDTC_READS/N (idstd host/io/fs/fs_posix.c), and a write or a
 # device marks the case with a T line, which is never cached. When the case
 # passes, case_record hashes each logged path and stores the key, with every
 # (kind, hash, path) the case read, as one tab-separated line of the pass

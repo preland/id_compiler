@@ -3,7 +3,7 @@
 #
 # Two suites test the pieces against references of their own -- node's zlib
 # and Info-ZIP unzip for the archive, and the fixture's own XML for the model. The font
-# is idstd's now (core/data/seq/byte/ttf) and is tested there. The last checks
+# is idstd's now (kit/media/font/ttf) and is tested there. The last checks
 # what none of them can: that the chain ends with the right ink in the right
 # places.
 #

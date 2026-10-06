@@ -13,7 +13,7 @@ sg_dir(string sgdi_root, string sgdi_std, string sgdi_label) {
 
 // Every tree the page has a row for: each top-level directory of the checkout
 // except idc, each directory of idc but tests, and each directory two levels into the
-// standard library (core/data, sys/io, ...).
+// standard library (core/data, host/io, ...).
 sg_trees(string sgtr_root, string sgtr_std) {
   string[] sgtr_l = [];
   sg_expand(sgtr_l, sgtr_root, "", 1, "idc");

@@ -6,7 +6,7 @@
 // where bin/idc started the harness, the project root.
 //
 // With $IDTC_READS, a directory, the child also sets $IDTC_READLOG to
-// $IDTC_READS/k, the file idstd's fs backend (sys/io/fs/fs_posix.c) appends
+// $IDTC_READS/k, the file idstd's fs backend (host/io/fs/fs_posix.c) appends
 // every path the case reads or probes to; bin/idc turns those files into the
 // read sets of the cases keyed `KEY f` (compiler/parse/conf.id).
 //

@@ -117,7 +117,7 @@ function memErr(code, op, path) {
 }
 
 // A Node-fs-shaped, in-memory file system: the same synchronous subset the fs
-// backend module (idstd/sys/io/fs/fs.mjs) calls, for a browser or for a test
+// backend module (idstd/host/io/fs/fs.mjs) calls, for a browser or for a test
 // that must not touch the disk. Paths are absolute and POSIX.
 export function createMemFs(files) {
   const root = memNode(true, 0o777);

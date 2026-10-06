@@ -1,4 +1,4 @@
-// The fs and env backends (idstd sys/io/fs/fs.mjs, sys/io/ipc/env/env.mjs) answering
+// The fs and env backends (idstd host/io/fs/fs.mjs, host/os/env/env.mjs) answering
 // real idstd programs from JS. argv[2] is the directory holding std.mjs.
 import assert from "node:assert/strict";
 import fs from "node:fs";

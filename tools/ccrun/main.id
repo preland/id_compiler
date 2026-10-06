@@ -7,7 +7,7 @@
 // Replaces bin/idc's capped()'s `( ulimit -v MEM_CAP_KB; exec "$@" )`:
 // proc_spawn_limited sets the same RLIMIT_AS -- in kilobytes, the unit
 // ulimit -v takes -- before the child execs (idstd's
-// sys/io/ipc/proc/README.md). ARGV_LINES is the child's argv, one entry per
+// host/os/proc/README.md). ARGV_LINES is the child's argv, one entry per
 // line, exactly what that same README documents; bin/idc's capped() builds
 // it with `printf '%s\n' "$@"`, which never leaves a trailing blank line for
 // proc_split_argv to turn into a spurious empty argument.

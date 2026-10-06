@@ -29,7 +29,7 @@ pump_in(int timeout_ms) {
 } chain (int timeout_ms) {
   maybe_close_in();
 } return void;
-given ccrun_fx_setup_input_main (50):(50) then (import cr_pending_n)[0]:(2905)
+given ccrun_fx_setup_input_main (50):(50) then (import cr_pending_n)[0]:(2902)
 given ccrun_fx_run_capped_true given ccrun_fx_empty_input (50):(50) then (import cr_pending_n)[0]:(0) then (import cr_in_done)[0]:(1)
 
 // run_capped, spawning a real ("true") child under no limits with real

@@ -14,7 +14,7 @@ mk_paths() {
 ():() then qa_check_paths:(1) then qa_check_paths:(1)
 
 // The full command line, one argument per line -- see
-// idstd's sys/io/ipc/proc/README.md for why proc_spawn takes it that way.
+// idstd's host/os/proc/README.md for why proc_spawn takes it that way.
 // Matches qmon.py's qemu list exactly: a socket chardev carries the serial
 // port (rather than a plain -serial file) so the same port can be typed at
 // and read from, and QMP is the second socket.

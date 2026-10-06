@@ -35,7 +35,7 @@ string resv_names_src = "add_check alloc arena_free_all arena_link arena_unlink 
 //
 // cache_file_natives: depends only on its arguments and the files it reads, and
 // the backend logs every path it reads or probes, found or not (idstd's
-// sys/io/fs/fs_posix.c). fs_drop_exit only registers a /tmp tree for removal at
+// host/io/fs/fs_posix.c). fs_drop_exit only registers a /tmp tree for removal at
 // exit, which is what lets fs_posix.c let a write into that tree through.
 string[] cache_file_natives = ["fs_open", "fs_close", "fs_error", "fs_read", "fs_read_mem", "fs_size", "fs_exists", "fs_mtime", "fs_list", "fs_drop_exit"];
 // cache_taint_natives: changes or reads something no read set can stand for (a
