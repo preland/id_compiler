@@ -30,3 +30,4 @@ machine. `--target wasm` cannot run any case that prints a `float` at all —
 `print`/`+` on a `float` raises "float-to-string is not implemented for this
 target" and is counted as a GAP, not a FAIL, matching the existing
 `list/08-float-list-boxing` precedent.
+- `14-nan-compare` — every comparison with a NaN operand is false except `!=`, which is true (IEEE unordered, as C gives it); `--target llvm` once emitted `fcmp one` for `!=`, so `x != x` was false there.

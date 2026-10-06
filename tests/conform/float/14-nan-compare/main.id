@@ -1,0 +1,14 @@
+// Every comparison with a NaN operand is false except `!=`, which is true:
+// IEEE 754 unordered semantics, as C gives them. --target llvm once emitted
+// `fcmp one` for `!=`, which is false for NaN, so `x != x` disagreed with C.
+// Each `|`-ended field lists the comparisons that hold for one pair: (n, n),
+// (n, 1), (1, n) and (1, 1).
+row(float a, float b) {
+  string s = rel_eq(a, b) + rel_lt(a, b) + rel_le(a, b) + "|";
+} return string s;
+
+main(int argc, string[] argv) {
+  float z = 0.0;
+  float n = z / z;
+  print(row(n, n) + row(n, 1.0) + row(1.0, n) + row(1.0, 1.0));
+} return int 0;

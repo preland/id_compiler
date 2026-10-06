@@ -1323,6 +1323,8 @@ void id_init_line_emit(char* name);
 char* id_init_line(char* name);
 void id_emit_main_init(int id);
 void id_emit_init_call(void);
+int id_const_root(int e);
+int id_const_hop(int e);
 char* id_export_line(int i);
 char* id_const_line(char* name);
 char* id_const_line_tail(int d, char* const_ty_name);
@@ -10752,6 +10754,27 @@ void id_emit_init_call(void) {
     return;
 }
 
+int id_const_root(int e) {
+    int hops;
+    hops = 0;
+    while ((hops < id_list_len(cdecl))) {
+        e = id_const_hop(e);
+        hops = (hops + 1);
+    }
+    return e;
+}
+
+int id_const_hop(int e) {
+    int d;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("import")) == 0)) {
+        d = id_const_decl((char*)(intptr_t)(id_list_get(ns1, e)));
+        if (((d >= 0) && (id_ty_is_list((char*)(intptr_t)(id_list_get(ns1, d))) == 0))) {
+            e = (int)(id_list_get(ni1, d));
+        }
+    }
+    return e;
+}
+
 char* id_export_line(int i) {
     char* s;
 IdList* idsq_32;
@@ -10780,10 +10803,10 @@ char* id_const_line_tail(int d, char* const_ty_name) {
     int i1_of_v;
     char* ret_s;
     i1_of_v = (int)(id_list_get(ni1, d));
-char* idsq_35;
-IdList* idsq_32;
-char* idsq_30;
-    ret_s = (idsq_35 = id_c_type(const_ty_name), idsq_32 = ns2, idsq_30 = (char*)(intptr_t)(id_list_get(idsq_32, d)), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_35, ID_S(" ")), idsq_30), ID_S(" = ")), id_file_init(i1_of_v)), ID_S(";  /* constant from conf.id */")));
+char* idsq_37;
+IdList* idsq_34;
+char* idsq_32;
+    ret_s = (idsq_37 = id_c_type(const_ty_name), idsq_34 = ns2, idsq_32 = (char*)(intptr_t)(id_list_get(idsq_34, d)), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_37, ID_S(" ")), idsq_32), ID_S(" = ")), id_file_init(id_const_root(i1_of_v))), ID_S(";  /* constant from conf.id */")));
     if ((id_ty_is_list(const_ty_name) == 1)) {
 char* idsq_12;
         ret_s = (idsq_12 = id_c_type(const_ty_name), id_concat(id_concat(id_concat(idsq_12, ID_S(" ")), (char*)(intptr_t)(id_list_get(ns2, d))), ID_S(";  /* constant from conf.id */")));
@@ -14079,7 +14102,8 @@ char* id_ll_init(int i) {
     if (((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), ID_S("conf.id")) == 0) && (id_ty_is_list((char*)(intptr_t)(id_list_get(etypes, i))) == 0))) {
         const_decl_v = id_const_decl((char*)(intptr_t)(id_list_get(enames, i)));
         i1_of_v = (int)(id_list_get(ni1, const_decl_v));
-        s = id_ll_const_val(i1_of_v, (char*)(intptr_t)(id_list_get(enames, i)));
+int idsq_8;
+        s = (idsq_8 = id_const_root(i1_of_v), id_ll_const_val(idsq_8, (char*)(intptr_t)(id_list_get(enames, i))));
     }
     return s;
 }
@@ -14484,7 +14508,7 @@ char* id_ll_pred(char* op, char* t) {
     char* s;
     s = id_ll_ipred(op);
     if ((strcmp(id_ty_kind(t), ID_S("float")) == 0)) {
-        s = id_concat(ID_S("o"), id_ll_fpred(op));
+        s = id_ll_fpred(op);
     }
     return s;
 }
@@ -14502,11 +14526,11 @@ char* id_ll_ipred(char* op) {
 
 char* id_ll_fpred(char* op) {
     char* s;
-    s = ID_S("eq");
+    s = ID_S("oeq");
     if ((strcmp(op, ID_S("!=")) == 0)) {
-        s = ID_S("ne");
+        s = ID_S("une");
     } else if (((strcmp(op, ID_S("=")) != 0) && (strcmp(op, ID_S("==")) != 0))) {
-        s = id_ll_rel(op);
+        s = id_concat(ID_S("o"), id_ll_rel(op));
     }
     return s;
 }

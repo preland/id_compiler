@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  print((import a_k));
+  print((import c_k));
+} return int 0;

@@ -1,0 +1,17 @@
+rel_eq(float a, float b) {
+  string s = "";
+  if (a == b) { s = s + "eq "; }
+  if (a != b) { s = s + "ne "; }
+} return string s;
+
+rel_lt(float a, float b) {
+  string s = "";
+  if (a < b) { s = s + "lt "; }
+  if (a > b) { s = s + "gt "; }
+} return string s;
+
+rel_le(float a, float b) {
+  string s = "";
+  if (a <= b) { s = s + "le "; }
+  if (a >= b) { s = s + "ge "; }
+} return string s;

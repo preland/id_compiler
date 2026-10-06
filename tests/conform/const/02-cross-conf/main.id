@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  print((import app_k));
+  print((import lib_k));
+} return int 0;

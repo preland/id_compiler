@@ -1,0 +1,4 @@
+// The dependency's conf.id sorts after this one, so its constants are declared
+// later than the constant that reads them.
+import "../../../fixtures/constlib"
+int app_k = (import lib_j);

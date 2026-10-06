@@ -1,0 +1,5 @@
+// A constant may read a constant declared further down, directly or through
+// another constant. The C file-scope initialiser needs the value, not the name.
+int a_k = (import b_k);
+int c_k = (import a_k);
+int b_k = 3;

@@ -1,0 +1,34 @@
+// A scalar constant whose initialiser is a bare `(import other)` is emitted
+// as the initialiser of the constant it names, because a file-scope
+// initialiser must be a constant expression and a read of another global is
+// not one. The parser does this for an earlier constant (front/parse/decl/top/
+// marker/const/fold.id), but a later constant, or one from a conf.id that
+// sorts after this one, is not known yet when the import is parsed, so the
+// backends finish the job here, on the finished tables, where order no longer
+// matters. The node tables are left alone: the case cache reads a constant's
+// edges from the import node, which stays where it was parsed.
+//
+// const_root follows the chain one hop per constant at most, so a cycle ends
+// at an import node, which both C and LLVM then reject as a read of a global.
+
+const_root(int e) {
+  int hops = 0;
+  while(hops < len((import cdecl))) {
+    e = const_hop(e);
+    hops = hops + 1;
+  }
+} return int e;
+given cl_fwd_setup ((import cl_fwd_ie)):((import cl_fwd_lit))
+given cl_fwd_setup ((import cl_fwd_lit)):((import cl_fwd_lit))
+given cl_fwd_setup ((import cl_cyc_ic)):((import cl_cyc_ic))
+
+const_hop(int e) {
+  if((import nkind)[e] == "import") {
+    int d = const_decl((import ns1)[e]);
+    if(d >= 0 && ty_is_list((import ns1)[d]) == 0) {
+      e = (import ni1)[d];
+    }
+  }
+} return int e;
+given cl_fwd_setup ((import cl_fwd_ie)):((import cl_fwd_lit))
+given cl_fwd_setup ((import cl_fwd_lit)):((import cl_fwd_lit))
