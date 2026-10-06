@@ -301,14 +301,18 @@ cc_lto_setup() {
 
 # resolve_stdlib -- the standard library this invocation would merge, if any,
 # left in STDLIB (absolute, no trailing slash, or "" for none). Resolution
-# order: --no-std / IDC_NO_STD, then --std, then $IDSTD_HOME, then an `idstd`
+# order: --no-std, then --std, then IDC_NO_STD, then $IDSTD_HOME, then an `idstd`
 # directory beside this repository or the one above it. Mirrors idc.py's
 # resolve_stdlib. Shared by --print-std (below) and the real merge further
 # down, which collects STDLIB's source once this has answered which directory
 # it is.
 resolve_stdlib() {
     STDLIB=""
-    if [ "$NO_STD" -eq 0 ] && [ -z "${IDC_NO_STD:-}" ]; then
+    if [ "$NO_STD" -eq 1 ] && [ -n "$STD_DIR" ]; then
+        echo "idc: --no-std and --std $STD_DIR contradict each other; drop --no-std to build against that library, or drop --std to build without one" >&2
+        exit 1
+    fi
+    if [ "$NO_STD" -eq 0 ] && { [ -n "$STD_DIR" ] || [ -z "${IDC_NO_STD:-}" ]; }; then
         if [ -n "$STD_DIR" ]; then
             [ -d "$STD_DIR" ] || { echo "idc: --std: not a directory: $STD_DIR" >&2; exit 1; }
             STDLIB="$STD_DIR"
@@ -522,7 +526,6 @@ ensure_ccrun() {
         resolve_tool_std
         progress bootstrap "ccrun (from tools/ccrun)"
         IDC_BUILDING_CCRUN=1 \
-            env -u IDC_NO_STD \
             "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/ccrun" -o "$CCRUN" >&2 \
             || { progress_clear; echo "idc: failed to build tools/ccrun; falling back to a plain ulimit subshell" >&2; }
     fi
@@ -549,7 +552,6 @@ ensure_idlayout() {
         resolve_tool_std
         progress bootstrap "idlayout (from tools/idlayout)"
         IDC_BUILDING_IDLAYOUT=1 \
-            env -u IDC_NO_STD \
             "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idlayout" -o "$IDLAYOUT" >&2 \
             || { progress_clear; echo "idc: failed to build tools/idlayout; see the errors above" >&2; exit 1; }
     fi
@@ -564,7 +566,6 @@ ensure_libgen() {
     if stale "$LIBGEN" "$ROOT/tools/libgen"; then
         resolve_tool_std
         progress bootstrap "libgen (from tools/libgen)"
-        env -u IDC_NO_STD \
             "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" "$ROOT/tools/libgen" -o "$LIBGEN" >&2 \
             || { progress_clear; echo "idc: failed to build tools/libgen; see the errors above" >&2; exit 1; }
     fi
@@ -579,7 +580,6 @@ ensure_jsgen() {
     if stale "$JSGEN" "$ROOT/tools/jsgen"; then
         resolve_tool_std
         progress bootstrap "jsgen (from tools/jsgen)"
-        env -u IDC_NO_STD \
             "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" "$ROOT/tools/jsgen" -o "$JSGEN" >&2 \
             || { progress_clear; echo "idc: failed to build tools/jsgen; see the errors above" >&2; exit 1; }
     fi
@@ -660,7 +660,6 @@ ensure_iddiag() {
         resolve_tool_std
         progress bootstrap "iddiag (from tools/iddiag)"
         IDC_BUILDING_IDDIAG=1 \
-            env -u IDC_NO_STD \
             "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/iddiag" -o "$IDDIAG" >&2 \
             || { progress_clear; echo "idc: failed to build tools/iddiag; printing diagnostics as the compiler wrote them" >&2; rm -f "$IDDIAG"; }
     fi
@@ -1025,7 +1024,7 @@ if [ -n "$WHERE" ]; then
     resolve_tool_std
     IDWHERE="$CACHE_DIR/idwhere"
     if [ ! -x "$IDWHERE" ] || find "$ROOT/tools/idwhere" "$ROOT/tools/lib/fnhead" -name '*.id' -newer "$IDWHERE" 2>/dev/null | grep -q .; then
-        env -u IDC_NO_STD "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idwhere" -o "$IDWHERE" >&2 \
+        "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idwhere" -o "$IDWHERE" >&2 \
             || { echo "idc: failed to build tools/idwhere; see the errors above" >&2; exit 1; }
     fi
     where_roots=("${PATH_ARG:-.}")
@@ -2164,8 +2163,8 @@ if [ "$CACHE_ON" -eq 1 ]; then
     FE_KEY=$(
         { sha256sum "$IDLEX" "$IDPARSE"
           printf '%s\0' "${LEX_ARGS[@]+"${LEX_ARGS[@]}"}" "${PARSE_ARGS[@]}"
-          printf 'IDSTD_HOME=%s\0IDC_NO_STD=%s\0IDC_MEM_LIMIT=%s\0CC=%s\0' \
-              "${IDSTD_HOME:-}" "${IDC_NO_STD:-}" "${IDC_MEM_LIMIT:-}" "$CC"
+          printf 'IDSTD_HOME=%s\0IDC_NO_STD=%s\0STDLIB=%s\0IDC_MEM_LIMIT=%s\0CC=%s\0' \
+              "${IDSTD_HOME:-}" "${IDC_NO_STD:-}" "$STDLIB" "${IDC_MEM_LIMIT:-}" "$CC"
           if [ "$TARGET" = wasm ]; then
               printf 'WASI=%s|%s|%s|%s\0' "${IDC_WASI_CLANG:-}" \
                   "${IDC_WASI_SYSROOT_INCLUDE:-}" "${IDC_WASI_LIBDIR:-}" "${IDC_WASI_COMPILER_RT:-}"
@@ -2380,7 +2379,7 @@ run_lib_precheck() {
     local lib_work out rc
     lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
     out="$lib_work/out"
-    env ${LIB_PRECHECK_TIER:+-u IDC_NO_STD} IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 IDC_STD_CONF_DIR="${LIB_PRECHECK_TIER:-}" IDC_STD_PLAN="${LIB_PRECHECK_PLAN:-}" IDC_STD_PLAN_ROOT="$root" IDC_STD_IDX_DIR="$STD_IDX_BASE" \
+    env IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 IDC_STD_CONF_DIR="${LIB_PRECHECK_TIER:-}" IDC_STD_PLAN="${LIB_PRECHECK_PLAN:-}" IDC_STD_PLAN_ROOT="$root" IDC_STD_IDX_DIR="$STD_IDX_BASE" \
         "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
         >"$out" 2>&1
     rc=$?

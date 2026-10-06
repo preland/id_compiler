@@ -96,7 +96,7 @@ main(int argc, string[] argv) {
     print(r);
 } return int 0;
 EOF
-if $BIN_IDC --no-std --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
+if IDSTD_HOME="$FIXTURE" $BIN_IDC --no-std "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
     bad "--no-std removes the stdlib"   # it built, so the stdlib was still there
 elif grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
     ok "--no-std removes the stdlib"
@@ -105,7 +105,7 @@ else
 fi
 
 # -- 5. IDC_NO_STD does the same, for scripts that cannot pass a flag ------
-if IDC_NO_STD=1 $BIN_IDC --std "$FIXTURE" "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
+if IDSTD_HOME="$FIXTURE" IDC_NO_STD=1 $BIN_IDC "$TMP/proj" -o "$TMP/ns" >"$TMP/ns.err" 2>&1; then
     bad "IDC_NO_STD=1 removes the stdlib"
 elif grep -q "no such function 'tfx_max'" "$TMP/ns.err"; then
     ok "IDC_NO_STD=1 removes the stdlib"
@@ -462,13 +462,37 @@ else
 fi
 
 # -- 25. --print-std prints nothing under --no-std --------------------------
-# A --std given alongside --no-std must not leak through: --no-std wins, same
+# An $IDSTD_HOME alongside --no-std must not leak through: --no-std wins, same
 # as it does for the real build (test 4, above).
-got=$($BIN_IDC --no-std --std "$FIXTURE" "$TMP/proj" --print-std)
+got=$(IDSTD_HOME="$FIXTURE" $BIN_IDC --no-std "$TMP/proj" --print-std)
 if [ "$got" = "" ]; then
     ok "--print-std prints nothing under --no-std"
 else
     bad "--print-std prints nothing under --no-std (got '$got')"
+fi
+
+# -- 25b. an explicit --std beats IDC_NO_STD; IDC_NO_STD alone still means none
+want=$(cd "$FIXTURE" && pwd -P)
+got=$(IDC_NO_STD=1 $BIN_IDC "$TMP/proj" --std "$FIXTURE" --print-std)
+if [ "$got" = "$want" ]; then
+    ok "--std DIR beats IDC_NO_STD=1"
+else
+    bad "--std DIR beats IDC_NO_STD=1 (got '$got', want '$want')"
+fi
+got=$(IDSTD_HOME="$FIXTURE" IDC_NO_STD=1 $BIN_IDC "$TMP/proj" --print-std)
+if [ "$got" = "" ]; then
+    ok "IDC_NO_STD=1 alone still means no stdlib"
+else
+    bad "IDC_NO_STD=1 alone still means no stdlib (got '$got')"
+fi
+
+# -- 25c. --no-std with --std is a contradiction, and the message names the fix
+if $BIN_IDC --no-std --std "$FIXTURE" "$TMP/proj" --print-std >"$TMP/both.out" 2>"$TMP/both.err"; then
+    bad "--no-std with --std is refused"
+elif grep -q "drop --no-std" "$TMP/both.err" && grep -q "drop --std" "$TMP/both.err"; then
+    ok "--no-std with --std is refused"
+else
+    bad "--no-std with --std is refused (wrong reason: $(head -1 "$TMP/both.err"))"
 fi
 
 # -- 26. a broken idstd case fails a program build with the library's own

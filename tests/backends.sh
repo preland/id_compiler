@@ -704,7 +704,7 @@ cp "$c7none/conf.id" "$c7std/conf.id"
 printf 'c7_width() {\n  int cw = gfx_sys_width() + 0;\n} return int cw;\n' > "$c7std/win/w.id"
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/c7hello/main.id"
 : > "$TMP/cc.log"
-if env -u IDC_NO_STD $BIN_IDC "$TMP/c7hello" --std "$c7std" --cc "$cclog" -o "$TMP/c7hello.bin" >"$TMP/c7hello.err" 2>&1 \
+if $BIN_IDC "$TMP/c7hello" --std "$c7std" --cc "$cclog" -o "$TMP/c7hello.bin" >"$TMP/c7hello.err" 2>&1 \
    && [ "$("$TMP/c7hello.bin")" = "hi" ] \
    && ! grep -qE 'gfx_linux|gl_linux|fs_posix|-lX11|-lGL' "$TMP/cc.log" \
    && ! needs_lib "$TMP/c7hello.bin" libX11; then
@@ -770,10 +770,10 @@ dstd=$(cd "$dstd" && pwd -P)
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/dhello/main.id"
 printf 'main(int argc, string[] argv) {\n  int t = dstd_now();\n  print(t);\n} return int 0;\n' > "$TMP/dcall/main.id"
 : > "$TMP/cc.log"
-if env -u IDC_NO_STD $BIN_IDC "$TMP/dhello" --std "$dstd" --cc "$cclog" -o "$TMP/dhello.bin" >"$TMP/dhello.err" 2>&1 \
+if $BIN_IDC "$TMP/dhello" --std "$dstd" --cc "$cclog" -o "$TMP/dhello.bin" >"$TMP/dhello.err" 2>&1 \
    && [ "$("$TMP/dhello.bin")" = "hi" ] && ! grep -qE 'lin\.c|mac\.c' "$TMP/cc.log"; then
     : > "$TMP/cc.log"
-    if env -u IDC_NO_STD $BIN_IDC "$TMP/dcall" --std "$dstd" --cc "$cclog" -o "$TMP/dcall.bin" >"$TMP/dcall.err" 2>&1 \
+    if $BIN_IDC "$TMP/dcall" --std "$dstd" --cc "$cclog" -o "$TMP/dcall.bin" >"$TMP/dcall.err" 2>&1 \
        && [ "$("$TMP/dcall.bin")" = "41" ] && grep -q 'io/tick/lin\.c' "$TMP/cc.log" && ! grep -q 'mac\.c' "$TMP/cc.log"; then
         ok "a backend.id inside a library attaches its backend with no conf.id, linked only where its native is reached"
     else
@@ -786,7 +786,7 @@ fi
 # The platform key the triple names picks the sources: mac.c for darwin. --cc
 # says the compiler is the user's, so the build goes ahead on this machine.
 : > "$TMP/cc.log"
-if env -u IDC_NO_STD $BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-apple-darwin --cc "$cclog" -o "$TMP/dmac.bin" >"$TMP/dmac.err" 2>&1 \
+if $BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-apple-darwin --cc "$cclog" -o "$TMP/dmac.bin" >"$TMP/dmac.err" 2>&1 \
    && grep -q 'io/tick/mac\.c' "$TMP/cc.log" && ! grep -q 'lin\.c' "$TMP/cc.log" && [ "$("$TMP/dmac.bin")" = "42" ]; then
     ok "the triple's platform picks which sources of a library's backend are compiled"
 else
@@ -796,7 +796,7 @@ fi
 # A platform the backend has no sources for stops the build at the call that
 # reaches the native -- here inside the library -- in the wording it has always
 # had.
-out=$(env -u IDC_NO_STD $BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-unknown-freebsd -o "$TMP/dbsd.bin" 2>&1)
+out=$($BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-unknown-freebsd -o "$TMP/dbsd.bin" 2>&1)
 if printf '%s\n' "$out" | grep -qxF "$dstd/io/now.id:2: error: native 'tick_now', reached from main by this call, is implemented by backend 'tick', which has no support for platform 'freebsd' (building for 'x86_64-unknown-freebsd'); it is implemented for: darwin, linux"; then
     ok "a library backend with no sources for the platform is diagnosed at the reaching call"
 else
@@ -827,13 +827,13 @@ printf 'peek_host(int n) {\n  int p = tier_host_five(n) * 3;\n} return int p;\n(
 tstd=$(cd "$tstd" && pwd -P)
 printf 'main(int argc, string[] argv) {\n  int t = tick_core(4);\n  print(t);\n} return int 0;\n' > "$TMP/tmain_core/main.id"
 printf 'main(int argc, string[] argv) {\n  int p = peek_host(2);\n  print(p);\n} return int 0;\n' > "$TMP/tmain_host/main.id"
-out=$(env -u IDC_NO_STD $BIN_IDC "$TMP/tmain_core" --std "$tstd" --backend "$tstd/host/io/tick" -o "$TMP/tmain_core.bin" 2>&1)
+out=$($BIN_IDC "$TMP/tmain_core" --std "$tstd" --backend "$tstd/host/io/tick" -o "$TMP/tmain_core.bin" 2>&1)
 if [ "$("$TMP/tmain_core.bin" 2>/dev/null)" = "9" ] && ! printf '%s\n' "$out" | grep -q "failed its own test cases"; then
     ok "a backend library's id code and its cases may call idstd's core/"
 else
     bad "a backend library's id code and its cases may call idstd's core/: $(printf '%s\n' "$out" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-240)"
 fi
-out=$(env -u IDC_NO_STD $BIN_IDC "$TMP/tmain_host" --std "$tstd" --backend "$tstd/host/io/peek" -o "$TMP/tmain_host.bin" 2>&1)
+out=$($BIN_IDC "$TMP/tmain_host" --std "$tstd" --backend "$tstd/host/io/peek" -o "$TMP/tmain_host.bin" 2>&1)
 if printf '%s\n' "$out" | grep -qF "idc: the backend library at $tstd/host/io/peek failed its own test cases" \
    && printf '%s\n' "$out" | grep -qF "no such function 'tier_host_five' [E0304]" \
    && printf '%s\n' "$out" | grep -qF "idc: 'tier_host_five' is defined at $tstd/host/os/five.id:1, outside idstd's core/ tier" \
@@ -897,11 +897,11 @@ printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$
 printf 'main(int argc, string[] argv) {\n  int e = fs_exists("/nonexistent-bkstd");\n  print(e);\n} return int 0;\n' > "$rs/call/main.id"
 printf 'main(int argc, string[] argv) {\n  int gw = gl_width();\n  print(gw);\n} return int 0;\n' > "$rs/gl/main.id"
 : > "$TMP/cc.log"
-if env -u IDC_NO_STD $BIN_IDC "$rs/hello" --std "$STD" --cc "$cclog" -o "$TMP/rhello.bin" >"$TMP/rhello.err" 2>&1 \
+if $BIN_IDC "$rs/hello" --std "$STD" --cc "$cclog" -o "$TMP/rhello.bin" >"$TMP/rhello.err" 2>&1 \
    && [ "$("$TMP/rhello.bin")" = "hi" ] && ! grep -qE 'fs_posix|gfx_linux|gl_linux|-lX11|-lGL' "$TMP/cc.log" \
    && ! needs_lib "$TMP/rhello.bin" libX11 && ! needs_lib "$TMP/rhello.bin" libGL; then
     : > "$TMP/cc.log"
-    if env -u IDC_NO_STD $BIN_IDC "$rs/call" --std "$STD" --cc "$cclog" -o "$TMP/rcall.bin" >"$TMP/rcall.err" 2>&1 \
+    if $BIN_IDC "$rs/call" --std "$STD" --cc "$cclog" -o "$TMP/rcall.bin" >"$TMP/rcall.err" 2>&1 \
        && [ "$("$TMP/rcall.bin")" = "0" ] && grep -q 'host/io/fs/fs_posix\.c' "$TMP/cc.log" \
        && ! grep -qE 'gfx_linux|gl_linux|-lX11|-lGL' "$TMP/cc.log"; then
         ok "idstd carries fs: a program calling fs_exists links fs alone, and hello-world links no backend"
@@ -911,7 +911,7 @@ if env -u IDC_NO_STD $BIN_IDC "$rs/hello" --std "$STD" --cc "$cclog" -o "$TMP/rh
 else
     bad "idstd carries fs: a program calling fs_exists links fs alone, and hello-world links no backend: hello $(grep -v warning "$TMP/rhello.err" | head -1 | cut -c1-160)"
 fi
-out=$(env -u IDC_NO_STD $BIN_IDC "$rs/gl" --std "$STD" --triple aarch64-apple-darwin -o "$TMP/rgl.bin" 2>&1)
+out=$($BIN_IDC "$rs/gl" --std "$STD" --triple aarch64-apple-darwin -o "$TMP/rgl.bin" 2>&1)
 if printf '%s\n' "$out" | grep -qF "rstd/gl/main.id:2: error: native 'gl_width', reached from main by this call, is implemented by backend 'gl', which has no support for platform 'darwin' (building for 'aarch64-apple-darwin'); it is implemented for: linux"; then
     ok "idstd's gl reached for darwin names the native, the call and the triple, ahead of the cases"
 else
@@ -1062,7 +1062,7 @@ fi
 # gfx, and gl -- attached by the same conf.id -- stays out.
 printf 'main(int argc, string[] argv) {\n  int cw = c7_width();\n  print(cw);\n} return int 0;\n' > "$TMP/c7win/main.id"
 : > "$TMP/cc.log"
-if env -u IDC_NO_STD $BIN_IDC "$TMP/c7win" --std "$c7std" --cc "$cclog" -o "$TMP/c7win.bin" >"$TMP/c7win.err" 2>&1 \
+if $BIN_IDC "$TMP/c7win" --std "$c7std" --cc "$cclog" -o "$TMP/c7win.bin" >"$TMP/c7win.err" 2>&1 \
    && grep -q 'gfx_linux\.c' "$TMP/cc.log" && ! grep -qE 'gl_linux|fs_posix|-lGL' "$TMP/cc.log" \
    && needs_lib "$TMP/c7win.bin" libX11 && ! needs_lib "$TMP/c7win.bin" libGL; then
     ok "a program reaching a gfx native through the library links gfx and nothing else"
