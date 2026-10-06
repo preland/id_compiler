@@ -6,7 +6,7 @@
 #   tools/mapgen.sh --check    # fail if that file is out of date
 #
 # Why this exists: the compiler is 258 files and 9 directories deep, because
-# the rule of 3 makes a program that size into a deep tree. Every file is now
+# the 3-functions-per-file rule (and the then-current 3-entry cap) made a program that size into a deep tree. Every file is now
 # named after what it does -- 212 of them were not, and finding anything meant
 # already knowing a symbol to grep for, which is why new work kept landing in
 # idc.py instead. The names carry most of the weight now; this index carries

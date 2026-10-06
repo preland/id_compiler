@@ -14,8 +14,8 @@ given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixtu
 given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_fn), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
 
 // The third step of the dup-case-detection fixture (more/dup/), filed here
-// because more/dup/ itself and every directory above it are at the 3-entry
-// layout limit and this file had the one free function slot left in the
+// because more/dup/ itself and every directory above it were at the since-dropped 3-entry
+// limit and this file had the one free function slot left in the
 // lane. Continues dupeq_starts (../../../more/fit/more/value/scalar.id).
 dupeq_ends() {
   push((import caseend), 1);
@@ -30,7 +30,7 @@ given dupeq_fixture ():() then init_units:(0)
 // refused there, in words that say which step and what to write instead, and
 // otherwise the clause's index and value are held to that type
 // (then_imp_value, ../../../report/host/cases/then.id). Filed here because
-// the lane above it is at the three-entry layout limit.
+// the lane above it was at the since-dropped three-entry limit.
 then_imp_field(int ci, int chk_node, string want) {
   string ft = then_path_type(want, (import ns2)[chk_node]);
   if(ft == "") {

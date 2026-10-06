@@ -3,7 +3,7 @@
 // note.id) both return void and their whole effect is a push, so a case can
 // only see either happen through the length of a column they push to --
 // utname already has ut_sweep. Filed here because every directory under
-// report/host/ is at the 3-entry layout limit and every file in it already
+// report/host/ was at the since-dropped 3-entry limit and every file in it already
 // holds three functions.
 
 // The fields a `then (import NAME).a.b:(value)` check reads through (docs/TESTS.md): the type of field `name`

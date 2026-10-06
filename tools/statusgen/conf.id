@@ -31,7 +31,7 @@ int sg_k_len = 29;
 string sg_usage = "usage: statusgen [--write | --check | --untested [TREE]] [--root DIR] [--mut DIR]\n  (none)       print the status page to stdout\n  --write      write DIR/docs/STATUS.md\n  --check      exit 1 when DIR/docs/STATUS.md is not what would be printed now\n  --untested   list each function with fewer than two cases (TREE: a row label such as idc/tools)\n  --root DIR   the checkout root (default: the working directory)\n  --mut DIR    mutscore results (default: ROOT/bench/results/mutscore)";
 
 // The directory names the structure rules bred when a directory could hold only
-// three entries ("partN", N a number, is the fifth).
+// three entries, a since-dropped cap ("partN", N a number, is the fifth).
 string[] sg_fills = ["more", "rest", "tail", "cont"];
 
 // The heads of the three tables of trees: counts, the distribution of cases per

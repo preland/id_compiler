@@ -47,8 +47,8 @@ given env_init ():() then calls reach_mark:()
 // tests/reach.id): clear_strs then push guarantees index 0 is "conf.id"
 // regardless of what seed_cases appends after it, which a plain rfn_len
 // cannot say once other cases in the build add their own names. Filed here
-// (main's own tail) because tests/reach.id's directory is at its 3-entry
-// cap.
+// (main's own tail) because tests/reach.id's directory was then at the
+// since-dropped 3-entry cap.
 init_reach() {
   export string[] rfn = ["main", "conf.id"];
   export int[] dphase = [0];

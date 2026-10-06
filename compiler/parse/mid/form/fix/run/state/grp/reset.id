@@ -18,7 +18,7 @@ given env_init ():() then init_units:(0)
 // fixd_hi: The high end of the ranges fixd_lo_len counts, pushed in step with it by
 // fix_note_tok (out/emit/resid/rec.id). Filed here rather than beside its
 // export in grp/reset.id, which is at its three-function cap in a directory
-// at its three-entry one.
+// at the since-dropped three-entry one.
 fix_state3b() {
   export int[] fixd_hi = [];
   fix_rcache_reset();

@@ -1,8 +1,8 @@
 // A var node naming a registered function ("fx_target", registered by
 // fn_idx_fixture -- registry/derived/fn/node/sig/idx.id), for is_fn_value/
 // is_fcall's "yes" case. Filed alongside the table's own fixtures for lack of
-// any directory under registry/derived/fn/node/ with room left (each is at the 3-entry
-// cap already).
+// any directory under registry/derived/fn/node/ with room left (each was then at the
+// since-dropped 3-entry cap).
 fnval_fixture() {
   fn_idx_fixture();
   export int fnval_hit = node_var("fx_target");
@@ -27,7 +27,7 @@ fnval_call_fixture() {
 // every un, bin, index and arr fixture is built over a literal, so hc_more's
 // `un` arm had no case that could reach it. Filed here because every file
 // under limits/expr/ is at the three-function cap and both of its
-// directories are at the three-entry one.
+// directories were at the since-dropped three-entry one.
 hidden_call_fixture() {
   fn_idx_fixture();
   export int hc_call = node_call("fx_target", (import fixture_params));

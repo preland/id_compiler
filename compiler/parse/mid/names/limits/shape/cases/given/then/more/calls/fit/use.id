@@ -19,7 +19,7 @@
 // root of the path.
 //
 // Filed here because the directories that hold the check are at the
-// three-entry layout limit and this one has room.
+// since-dropped three-entry limit and this one has room.
 node_import_use(int nd, string imp_nm, int imu_cur) {
   string kd = (import nkind)[nd];
   int r = imu_cur;

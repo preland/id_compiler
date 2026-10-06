@@ -2,7 +2,7 @@
 // tuple pushed after it, for decl/func/cases/collect.id's cases -- case_owner
 // reads `pfile[len(prog)-1]`, which nothing else in this build sets up for
 // a case to call it standalone. Filed here, away from decl/func/cases/
-// itself, because every directory near it is at the 3-entry layout limit.
+// itself, because every directory near it was then at the since-dropped 3-entry limit.
 
 cases_fix() {
   fn_fixture();

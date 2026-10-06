@@ -110,7 +110,7 @@ fi
 # idc.py no longer builds a backend here, nor in the two checks after this one.
 # It reads backend.json, which backend.id replaced, and idc.py is frozen
 # and will not change: it cannot parse the standard library, and it counts a
-# backend.id toward the 3-entries rule, which bin/idc exempts it from.
+# backend.id toward the since-dropped 3-entries rule, which bin/idc exempted it from.
 expected='wrote 44 bytes to fsdemo.txt (close 0)
 read 44 bytes back (close 0):
 the quick brown fox

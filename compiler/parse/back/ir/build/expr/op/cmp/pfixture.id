@@ -8,7 +8,7 @@
 // {bicall,fcallv}.id) gives them. The final step, pcall_fixture_tail, is at
 // ../../../stmt/flow/cond/more/pfixture.id -- a file holds at most 3
 // functions and this fixture needs four. Filed here rather than under
-// call/ (every directory there is at the 3-entry cap) -- this directory
+// call/ (every directory there was then at the since-dropped 3-entry cap) -- this directory
 // (cmp.id/wide.id, comparison lowering) had the spare slot.
 
 pcall_fixture() {

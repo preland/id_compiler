@@ -8,7 +8,7 @@
 //
 // It is still a chain rather than a column of the type registry -- that is
 // docs/BACKENDS.md's next item, and it needs a directory with two free slots
-// under the rule of 3, which back/ does not currently have.
+// under the since-dropped rule of 3, which back/ did not have.
 
 to_str(string code, string type) {
   string s = code;

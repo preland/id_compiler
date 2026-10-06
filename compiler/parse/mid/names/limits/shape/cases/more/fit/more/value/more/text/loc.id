@@ -21,8 +21,8 @@ given wrap_fixture ((import fixture_ci)):(":4")
 // registered where fn_sig_of looks it up), for fit_named/fit_fn (../../../../
 // given/read/fn.id) -- neither existing "cfn" fixture (seed_cfn_fixture_node,
 // back/drive/.../export/consts.id; cfnid, back/.../export/consts.id) is built
-// on the indexed lookup fn_sig_of needs. Filed here because given/read/ is at
-// the 3-entry limit and this was the lane's last free slot.
+// on the indexed lookup fn_sig_of needs. Filed here because given/read/ was at
+// the since-dropped 3-entry limit and this was the lane's last free slot.
 cfn_fixture() {
   fn_idx_fixture();
   export int cfn_e = newleaf("cfn", 0, 0, "fx_target", "");

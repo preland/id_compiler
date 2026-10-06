@@ -27,7 +27,7 @@ given print_fixture ((import fixture_ci), (import fixture_print_none)):() then p
 // "then" node pushed onto thennode -- what emission's check branch
 // (back/.../then/check/entry.id) needs and no fixture had. Here rather than
 // beside fixture_then_node (node.id) because that file is at the
-// three-function limit and this directory at the three-entry one; one
+// three-function limit and this directory at the since-dropped three-entry one; one
 // function with two chain seams is what the remaining slot holds.
 chk_fixture() {
   fixture_one_fx();

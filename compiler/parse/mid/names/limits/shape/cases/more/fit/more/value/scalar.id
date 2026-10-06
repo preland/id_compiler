@@ -16,7 +16,7 @@ given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then print
 // (0 and 1) over mk_two_toks's two tokens. Continues dupeq_fixture
 // (../more/ty.id); continued by dupeq_ends (../../../../given/then/check/
 // sig.id). Filed here for the same reason as its neighbours: every directory
-// from here up to more/dup/ itself is at the 3-entry limit.
+// from here up to more/dup/ itself was at the since-dropped 3-entry limit.
 dupeq_starts() {
   push((import casestart), 0);
   push((import casestart), 1);

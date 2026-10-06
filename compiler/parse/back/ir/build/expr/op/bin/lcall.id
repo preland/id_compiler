@@ -2,7 +2,7 @@
 // cases: "len" over one int-literal argument, and the start of a "pop"
 // fixture (finished at ../../../../stmt/flow/loop/lcall.id -- a file holds
 // at most 3 functions and popcall_fixture needs a second one). Filed here
-// rather than under call/ (every directory there is at the 3-entry cap) --
+// rather than under call/ (every directory there was then at the since-dropped 3-entry cap) --
 // this directory (bin.id/disp.id, binary-expression dispatch) had the
 // spare slot.
 

@@ -23,7 +23,7 @@ given fix_sep_fixture (0, 1):() then fixe_sep_count:("sep 0")
 // but leaves them all empty, so a function that indexes one has nothing to
 // read: event 0 is a plain int node that does not move, event 1 a call to an
 // unregistered name that does. Seven columns is more than three actions, and
-// this directory is at its three-entry cap, so it is a chain rather than a
+// this directory was at the since-dropped three-entry cap, so it is a chain rather than a
 // second file.
 fix_touch_fixture() {
   fix_fixture();

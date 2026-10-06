@@ -42,7 +42,7 @@ given calls_node_fixture ((import fixture_calls_bad)):("'calls' names '")
 // does -- an explicit check function is the way to say it. A function that also
 // writes NAME (fn_import_use gives 2) is not refused: what the check finds
 // afterwards is the effect of that write. Filed here because the check/ and
-// given/ lanes are at the three-entry layout limit.
+// given/ lanes were at the since-dropped three-entry limit.
 then_imp_value(int ci, int chk_node, string want) {
   int[] imp_ix = (import nl2)[chk_node];
   int[] items = (import nl1)[chk_node];

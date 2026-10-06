@@ -11,8 +11,8 @@
 // Anywhere else the author had room to keep writing, or no chain to reach, and
 // the padding is just an evasion of the action limit.
 //
-// Housed under entry/ because every other directory under shape/ is at the
-// three-entry limit; like report_short_seg in limits/report/more/prefix.id,
+// Housed under entry/ because every other directory under shape/ was at the
+// since-dropped three-entry limit; like report_short_seg in limits/report/more/prefix.id,
 // this is the only slot within reach rather than the right label.
 
 next_cost(int[] body, int i) {

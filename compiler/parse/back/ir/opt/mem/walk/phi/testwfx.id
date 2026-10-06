@@ -1,7 +1,7 @@
 // Two `then` checks for test_widen/test_widen2 (back/drive/target/tests/
 // more/seed/widen.id), which read module state (prog, rfn, dphase) rather
 // than returning it. Filed here (an unrelated phi-node walk) rather than
-// under back/drive/, which is at its 3-entry cap.
+// under back/drive/, which was then at the since-dropped 3-entry cap.
 
 rfnfx_setup() {
   lw_env_fixture();

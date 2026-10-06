@@ -1,6 +1,6 @@
 // Shared expression-node fixtures for mid/types (type_of/* and the store
 // checks below): two int literals, a string literal. Filed here because no
-// directory under type_of/ has room left (each is at the 3-entry cap).
+// directory under type_of/ has room left (each was at the since-dropped 3-entry cap).
 // varleaf_init (../var.id) is env_init()+init_idx(): type_of3 always calls
 // name_type first, even for a node that is not a name, so every node
 // needs the var index ready, not only var/import ones.

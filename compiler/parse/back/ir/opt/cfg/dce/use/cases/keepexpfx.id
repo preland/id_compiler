@@ -5,8 +5,8 @@
 // (keep_export_fixture_harn_on, keep_export_fixture_tail) is at
 // ../../../../run/fold/cmp/keepexpfx.id -- a file holds at most 3 functions
 // and this fixture needs five. Filed here (an unrelated CFG dead-use-
-// elimination pass) rather than under back/drive/, which is at its
-// 3-entry cap.
+// elimination pass) rather than under back/drive/, which was then at
+// the since-dropped 3-entry cap.
 
 keep_export_fixture() {
   env_init();

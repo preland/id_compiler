@@ -1,6 +1,6 @@
 // Fixtures for this directory's own cases (uq_fill, find_dup) and for
 // blank_push (../../canon/stmt/more/seam.id): every directory near seam.id
-// is at the 3-entry cap, and this one had a function's worth of room left
+// was at the since-dropped 3-entry cap, and this one had a function's worth of room left
 // once cfp_len and dup_pair_fixture existed.
 
 // Two functions, no params, whose bodies are nothing but a literal return

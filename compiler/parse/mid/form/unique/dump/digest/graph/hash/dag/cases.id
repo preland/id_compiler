@@ -1,6 +1,6 @@
 // The component DAG the test harness orders and skips its cases by (back/
 // tgt/c/emit/prog/test/unit/more/text/judge.id's emit_tc_graph). Filed under
-// hash/ because graph/ and digest/ are at their three-entry caps.
+// hash/ because graph/ and digest/ were at the since-dropped three-entry cap.
 //
 // Each case's function's component, in the harness's own case order, or -1
 // when its function has no row or no component: such a case runs where it

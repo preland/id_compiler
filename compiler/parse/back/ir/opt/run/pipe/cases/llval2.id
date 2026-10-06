@@ -1,7 +1,7 @@
 // The rest of back/ir/core/fixture/ops/llval.id's chain: two unary
 // instructions and one with a populated operand list, for cases that read
 // ir_l/ir_l_count. Filed here, away from the rest of the chain, because
-// every directory near it is at the 3-entry layout limit.
+// every directory near it was then at the since-dropped 3-entry limit.
 
 ir_fix4() {
   ir_fix3();

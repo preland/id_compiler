@@ -31,7 +31,7 @@ given dg_t_exp given dg_exports(0) ([0, 0], "gx"):([-8546436610636599953, 0])
 given dg_t_exp given dg_exports(0) ([0, 0], "gy"):([0, 0])
 
 // The hash of the component sealed last, for dg_seal's own cases (../../scc/
-// seal/hash.id, whose directory is at its three-entry cap).
+// seal/hash.id, whose directory was at the since-dropped three-entry cap).
 dg_deep_last() {
   int dgl = len((import dg_deep)) - 1;
   word dgd = (import dg_deep)[dgl];

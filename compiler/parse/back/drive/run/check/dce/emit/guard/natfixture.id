@@ -12,7 +12,7 @@
 // most 3 functions and this fixture needs four. Filed here (this
 // directory, asm_targets.id/guarded_emit.id, is otherwise unrelated)
 // rather than under sink/natives/ itself, where every directory is
-// already at the 3-entry cap.
+// then at the since-dropped 3-entry cap.
 
 natcall_fixture() {
   lw_env_fixture();

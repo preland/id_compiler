@@ -27,7 +27,7 @@ given resv_scan_fixture given rt_fixture given ut_mark ():() then calls ut_add:(
 // resv_scan_fixture, mid/form/unique/scan/more/reserved/check.id, gives that);
 // rt_fixture builds no `prog` at all, so combining them traps on prog[i] out
 // of range. No existing fixture does both, and this lane has no free function
-// slot left (every directory here is at the 3-entry layout limit, and all 7
+// slot left (every directory here was at the since-dropped 3-entry limit, and all 7
 // spare function slots in the lane are already spent on the dup-case and
 // given/read fixtures) to add the combining fixture this would need.
 ut_self_at(int i) {

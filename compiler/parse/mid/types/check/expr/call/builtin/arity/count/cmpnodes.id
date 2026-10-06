@@ -1,7 +1,7 @@
 // Comparison/bitwise/mixed-precedence nodes on composite_fixture's leaves,
 // for the compare/cond cluster (check/expr/op/compare/, .../unary_bits/).
 // Filed here because it was the one directory left anywhere under
-// mid/types/ with room -- every other one is at the 3-entry cap.
+// mid/types/ with room -- every other one was at the since-dropped 3-entry cap.
 cmp_fixture() {
   composite_fixture();
   cmp_build();

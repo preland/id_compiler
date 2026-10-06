@@ -8,7 +8,7 @@
 // only thing that exports hostc, and sets the triple to x86_64-unknown-none;
 // asmfx_push seeds a row for x86_64-unknown-linux-gnu. Filed beside asmfx.id's
 // own fixture because every directory under cases/report/ is at the
-// three-entry cap and every file in it at the three-function cap.
+// since-dropped three-entry cap and every file in it at the three-function cap.
 ut_asm_seeded() {
   ut_host_seeded();
   asmfx_push();

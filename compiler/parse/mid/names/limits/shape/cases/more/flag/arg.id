@@ -18,7 +18,7 @@ arg_reqtests(int argc, string[] argv, int i, int ok) {
 // has a pair proving the cell flips, but require_tests takes no arguments, so
 // its two cases have to differ by setup rather than by argument. Filed beside
 // the flag scanner because flag.id and count.id are both at the
-// three-function cap and this directory is at the three-entry one.
+// three-function cap and this directory was at the since-dropped three-entry one.
 reqtests_flagged() {
   flags_setup();
   lset((import reqc), 0, 1);

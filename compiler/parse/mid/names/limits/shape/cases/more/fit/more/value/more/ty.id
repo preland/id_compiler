@@ -28,7 +28,7 @@ given fn_fixture ((import fixture_fn)):("string")
 // split_line.id) plus one real node to report through, since neither array
 // case_fixture builds (front/parse/decl/func/cases/more/lit/cons/bound/more/
 // state.id: caseend, casefn) has an entry at all. Filed here because more/dup/
-// and everything above it are at the 3-entry limit and this was a free slot.
+// and everything above it were at the since-dropped 3-entry limit and this was a free slot.
 // Continued by dupeq_starts (../scalar.id).
 dupeq_fixture() {
   mk_two_toks();

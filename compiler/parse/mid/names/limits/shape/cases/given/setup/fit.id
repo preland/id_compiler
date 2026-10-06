@@ -37,7 +37,7 @@ given impcase_given (0, 1):("fx_setup ")
 // `then` check -- is held to the rule of chk_own_import (../../more/flag/
 // reqtests.id: a case may not read back what its own call just made), then
 // goes on to fit_import (../read/impcheck.id). Filed here because ../read/ is
-// at the three-entry layout limit.
+// at the since-dropped three-entry limit.
 fit_case_import(int i, int e, string want) {
   chk_own_import(i, e);
   fit_import(i, e, want);

@@ -2,8 +2,8 @@
 // nat_on_check reads back natc[0] (the --natives flag cell, a void
 // function's only observable effect), and natinit_fixture_off/_on run
 // nat_init with and without the flag. Filed here (an unrelated memory-init
-// optimization pass) rather than under back/drive/, which is at its
-// 3-entry cap.
+// optimization pass) rather than under back/drive/, which was then at
+// the since-dropped 3-entry cap.
 
 natinit_fixture_off() {
   env_init();

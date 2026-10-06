@@ -4,7 +4,7 @@
 // unique, so the duplicate rule could never see two copies of it. An early
 // return keeps its value where the return clause does, so canon_ret
 // (../../../state.id) reads it unchanged. Housed here because every directory
-// under canon/stmt/ is at the three-entry limit: the slot within reach, not the
+// under canon/stmt/ was at the since-dropped three-entry limit: the slot within reach, not the
 // right label.
 cst_flow(int id) {
   string out = "?" + (import nkind)[id] + "#" + id;

@@ -16,7 +16,7 @@
 //
 // Filed here (an unrelated name-lookup module) rather than under
 // back/drive/target/tests/ or back/tgt/c/emit/prog/test/case/, both of which
-// are at their 3-entry cap two levels up already -- this directory has the
+// were at the since-dropped 3-entry cap two levels up -- this directory has the
 // room, and a case's own function is looked up by unit the same way a
 // variable's type is (lookup.id, above).
 
