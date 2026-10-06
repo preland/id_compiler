@@ -798,14 +798,14 @@ printf 'main(int argc, string[] argv) {\n  int x = %s;\n  print(x);\n} return in
 printf 'main(int argc, string[] argv) {\n  string x = %s;\n  print(x);\n} return int 0;\n' \
     "$str_chain" > "$TMP/chain_str.id"
 
-if (ulimit -v 2000000; timeout 5 $BIN_IDC "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
+if (ulimit -v 2000000; IDC_JOBS=1000 timeout 5 $BIN_IDC "$TMP/chain_int.id" -o "$TMP/chain_int_bin") \
         >"$TMP/chain_int.err" 2>&1; then
     ok "250-term int + chain compiles in linear time under a 2 GB cap"
 else
     bad "250-term int + chain compiles in linear time under a 2 GB cap: $(head -1 "$TMP/chain_int.err")"
 fi
 
-if (ulimit -v 2000000; timeout 5 $BIN_IDC "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
+if (ulimit -v 2000000; IDC_JOBS=1000 timeout 5 $BIN_IDC "$TMP/chain_str.id" -o "$TMP/chain_str_bin") \
         >"$TMP/chain_str.err" 2>&1; then
     ok "250-term string + chain compiles in linear time under a 2 GB cap"
 else
