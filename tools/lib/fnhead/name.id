@@ -12,11 +12,15 @@ fh_name(string fh_line) {
   if(fh_p > 0) {
     fh_head = str_slice(fh_line, 0, fh_p);
   }
+  if(str_starts(fh_head, "pure ") == 1) {
+    fh_head = str_slice(fh_head, 5, len(fh_head) - 5);
+  }
   if(fh_head != "" && fh_is_name(fh_head) == 1) {
     fh_r = fh_head;
   }
 } return string fh_r;
 ("add(int a, int b) {"):("add")
+("pure add(int a, int b) {"):("add")
 ("given add_fixture (1):(2)"):("")
 ("(1, 2):(3)"):("")
 ("  helper(x);"):("")

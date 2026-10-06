@@ -596,7 +596,7 @@ resolve_export_list() {
         if [ -n "$STDLIB" ] && [[ "$f" == "$STDLIB"/* ]]; then std_files+=("$f")
         elif [[ "$f" != "$ROOT"/runtime/* ]]; then PROGRAM_FILES+=("$f"); fi
     done
-    [ "${#PROGRAM_FILES[@]}" -gt 0 ] && own=$(grep -hoE '^[A-Za-z_][A-Za-z0-9_]*\(' "${PROGRAM_FILES[@]}" | tr -d '(' | sort -u)
+    [ "${#PROGRAM_FILES[@]}" -gt 0 ] && own=$(grep -hoE '^(pure )?[A-Za-z_][A-Za-z0-9_]*\(' "${PROGRAM_FILES[@]}" | sed -E 's/^pure //' | tr -d '(' | sort -u)
     if [ "$WEXPORT_SCOPE" = all ]; then
         while IFS= read -r name; do [ -n "$name" ] && ELIST+=("$name"); done <<< "$own"
         return 0
@@ -620,7 +620,7 @@ resolve_export_list() {
         echo "idc: lib_exports in $conf lists no function; name at least one, e.g. \`string[] lib_exports = [\"first_fn\"];\`" >&2
         exit 1
     fi
-    [ "${#std_files[@]}" -gt 0 ] && std=$(grep -hoE '^[A-Za-z_][A-Za-z0-9_]*\(' "${std_files[@]}" | tr -d '(' | sort -u)
+    [ "${#std_files[@]}" -gt 0 ] && std=$(grep -hoE '^(pure )?[A-Za-z_][A-Za-z0-9_]*\(' "${std_files[@]}" | sed -E 's/^pure //' | tr -d '(' | sort -u)
     local -A seen=()
     progress_clear
     for name in "${names[@]}"; do

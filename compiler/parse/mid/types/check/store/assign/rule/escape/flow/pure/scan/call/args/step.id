@@ -1,0 +1,31 @@
+// A call's arguments against the callee's parameters: for each parameter
+// declared `pure`, the argument written in its place (ok.id) has to be a pure
+// function. A call to something that is not a function of the program (a
+// builtin, a function value) has no parameters to look at.
+
+pure_args(int id, int fn) {
+  int pq_cn = fn_node_of((import ns1)[id]);
+  if(pq_cn >= 0) {
+    pure_arg_loop(id, fn, pq_cn);
+  }
+} return void;
+given pure_fix_prog ((import pfx_mg), (import pfx_fb)):() then (import chkfail)[0]:(1)
+given pure_fix_prog ((import pfx_cio), (import pfx_fb)):() then (import chkfail)[0]:(0)
+
+pure_arg_loop(int id, int fn, int pq_cn) {
+  int pq_j = 0;
+  while(pq_j < len(((import nl1)[pq_cn])) && pq_j < len(((import nl1)[id]))) {
+    pure_arg(id, fn, pq_cn, pq_j);
+    pq_j = pq_j + 1;
+  }
+} return void;
+given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(1)
+given pure_fix_prog ((import pfx_mh), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(0)
+
+pure_arg(int id, int fn, int pq_cn, int j) {
+  if(lst_find((import purenode), (((import nl1)[pq_cn])[j])) == 1) {
+    pure_arg_check(id, fn, pq_cn, j);
+  }
+} return void;
+given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_fa), 1):() then (import chkfail)[0]:(0)

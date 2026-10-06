@@ -1,0 +1,12 @@
+// EXPECT: 'outer' is pure but calls 'inner', which is not pure
+inner(int x) {
+  int y = x + 1;
+} return int y;
+
+pure outer(int x) {
+  int y = inner(x);
+} return int y;
+
+main(int argc, string[] argv) {
+  int r = outer(1);
+} return int r;

@@ -1,0 +1,38 @@
+// The purity check (docs/SPEC.md, "Pure functions"): a function marked `pure`
+// (front/parse/decl/top/decl/native/more/pure/) is proved to write no export,
+// do no I/O, read no mutable export and call only pure functions, and a call
+// that passes a function to a parameter marked `pure` is proved to pass a pure
+// one. Every violation is an error that names the offending call or write and
+// the fix (diag/).
+//
+// The walk is the one reach_funcs makes (mid/names/exports/reach/dead/sweep.id):
+// the nodes of function `f` are exactly the range from wherever the previous
+// function ended through prog[f]. A program with no `pure` anywhere is not
+// walked at all.
+
+check_pure() {
+  if(len((import purenode)) > 0) {
+    pure_funcs(0, 0);
+    pure_cases(0);
+  }
+} return void;
+given pure_fix_prog ():() then (import chkfail)[0]:(1)
+given pure_fix_clean ():() then (import chkfail)[0]:(0)
+
+pure_funcs(int pf_f, int pf_lo) {
+  while(pf_f < len((import prog))) {
+    pf_lo = pure_func(pf_f, pf_lo);
+    pf_f = pf_f + 1;
+  }
+} return void;
+given pure_fix_prog (0, 0):() then (import chkfail)[0]:(1)
+given pure_fix_clean (0, 0):() then (import chkfail)[0]:(0)
+
+pure_func(int pf_f, int pf_lo) {
+  int pf_fn = (import prog)[pf_f];
+  pure_range(pf_lo, pf_fn, pf_fn);
+  int pf_next = pf_fn + 1;
+} return int pf_next;
+given pure_fix_prog (0, 0):(2)
+given pure_fix_prog (3, 4):(6) then (import chkfail)[0]:(0)
+given pure_fix_prog (4, 6):(29) then (import chkfail)[0]:(1)

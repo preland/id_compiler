@@ -1,0 +1,45 @@
+// What a pure function's call is to: "ok" for something it may call, and for
+// something it may not, "builtin" (I/O, the clock, the flat store), "fn" (a
+// function that is not pure, a native not declared pure, or an asm function) or
+// "value" (a call through a function value that is not a pure parameter). The
+// answer is built in three steps, each of which only decides what the one
+// before left open (the empty string).
+
+pure_kind(string name, int fn) {
+  string pq_kind = pure_kind_b(name);
+  pq_kind = pure_kind_f(name, pq_kind);
+  pq_kind = pure_kind_v(name, fn, pq_kind);
+} return string pq_kind;
+given pure_fix_prog ("print", (import pfx_fa)):("builtin")
+given pure_fix_prog ("pfh", (import pfx_fa)):("ok")
+given pure_fix_prog ("pfg", (import pfx_fa)):("fn")
+given pure_fix_prog ("uv", (import pfx_fa)):("value")
+given pure_fix_prog ("pv", (import pfx_fa)):("ok")
+
+pure_kind_b(string name) {
+  string pq_kb = "";
+  if(is_builtin(name) == 1) {
+    pq_kb = "builtin";
+    if(lst_str_index((import pure_builtins), name) >= 0) {
+      pq_kb = "ok";
+    }
+  }
+  if(find_str((import sdname), name) >= 0) {
+    pq_kb = "ok";
+  }
+} return string pq_kb;
+given pure_fix_prog ("print"):("builtin")
+given pure_fix_prog ("len"):("ok")
+given pure_fix_prog ("zzz"):("")
+
+pure_kind_f(string name, string pq_kind) {
+  if(pq_kind == "" && find_str((import fnames), name) >= 0) {
+    pq_kind = "fn";
+    if(pure_fn_named(name) == 1) {
+      pq_kind = "ok";
+    }
+  }
+} return string pq_kind;
+given pure_fix_prog ("pfh", ""):("ok")
+given pure_fix_prog ("pfg", ""):("fn")
+given pure_fix_prog ("pfg", "ok"):("ok")

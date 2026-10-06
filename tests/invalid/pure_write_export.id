@@ -1,0 +1,8 @@
+// EXPECT: 'bump' is pure but writes the export 'counter'
+pure bump(int x) {
+  export int counter = x;
+} return int x;
+
+main(int argc, string[] argv) {
+  int r = bump(1);
+} return int r;

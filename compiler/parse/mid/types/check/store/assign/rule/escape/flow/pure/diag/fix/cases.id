@@ -1,0 +1,27 @@
+// pure_fix_prog (prog.id) and two test cases written under pfm, whose parameter
+// is pure: case 0 passes the function pfg, which is not pure, and case 1 passes
+// pfh, which is. Both are reported as p.id:7.
+
+pure_fix_cases() {
+  pure_fix_prog();
+  int[] pcz_none = [];
+  export int pcz_bad = newleaf("cfn", 0, 0, "pfg", "");
+} chain () {
+  export int pcz_good = newleaf("cfn", 0, 0, "pfh", "");
+  int[] pcz_a0 = [(import pcz_bad)];
+  int[] pcz_a1 = [(import pcz_good)];
+} chain () {
+  export int pcz_c0 = newnode("case", 0, 0, "p.id", "", pcz_a0, pcz_none);
+  export int pcz_c1 = newnode("case", 0, 0, "p.id", "", pcz_a1, pcz_none);
+  push((import casenode), (import pcz_c0));
+} chain () {
+  push((import casenode), (import pcz_c1));
+  push((import casefn), (import pfx_pm));
+  push((import casefn), (import pfx_pm));
+} chain () {
+  push((import casestart), 0);
+  push((import casestart), 0);
+  push((import tline), 7);
+} return void;
+():() then len((import casenode)):(2)
+():() then len((import casestart)):(2)

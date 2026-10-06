@@ -1,0 +1,99 @@
+// A program for the purity check's cases, built by hand with the node
+// constructors and then given the symbol and export tables a build has when
+// the checks run. Node ids, in creation order (each is also an export, pfx_*):
+//
+//   0 one  1 pfh (pure, returns 1)  2 pfg (not pure)  3 pfn (a native, not pure)
+//   4 pp  5 pfm(pure func pf)  6 pv  7 uv  8-11 vh vg vpv vuv  (values by name)
+//   12 cio  print(1)   13 clen  len(1)   14 cg  pfg()   15 ch  pfh()
+//   16 cn   pfn()      17 cuv   uv(1)     18 cpv pv(1)
+//   19 mh pfm(pfh)  20 mg pfm(pfg)  21 mpv pfm(pv)  22 muv pfm(uv)  23 mi pfm(1)
+//   24 dcl  export int pfgx = 1   25 imp (import pfgx)   26 impk (import pfk)
+//   27 k    int pfk = 1, registered as a conf.id constant
+//   28 pfa  (pure; params pv, uv; body [dcl])   29 pfb (not pure)
+//
+// prog is [pfh, pfg, pfn, pfm, pfa, pfb]; purenode holds pfh, pfa, the pure
+// parameters pp and pv, and not pfg, pfn, pfm, uv or pfb.
+
+pure_fix_prog() {
+  env_init();
+  int[] pfx_none = [];
+  export int pfx_one = node_int("1", 1, 0);
+} chain () {
+  export int pfx_h = node_func("pfh", "int", pfx_none, pfx_none, (import pfx_one));
+  export int pfx_g = node_func("pfg", "int", pfx_none, pfx_none, (import pfx_one));
+  export int pfx_n = newnode("func", 0 - 1, 1, "pfn", "int", pfx_none, pfx_none);
+} chain () {
+  export int pfx_pp = node_param("param", "func(int) return int", "pf");
+  int[] pfx_pms = [(import pfx_pp)];
+  export int pfx_pm = node_func("pfm", "void", pfx_pms, pfx_none, 0 - 1);
+} chain () {
+  export int pfx_pv = node_param("param", "func(int) return int", "pv");
+  export int pfx_uv = node_param("param", "func(int) return int", "uv");
+  export int pfx_vh = node_var("pfh");
+} chain () {
+  export int pfx_vg = node_var("pfg");
+  export int pfx_vpv = node_var("pv");
+  export int pfx_vuv = node_var("uv");
+} chain () {
+  int[] pfx_a1 = [(import pfx_one)];
+  export int pfx_cio = node_call("print", pfx_a1);
+  export int pfx_clen = node_call("len", pfx_a1);
+} chain () {
+  export int pfx_cg = node_call("pfg", pfx_none);
+  export int pfx_ch = node_call("pfh", pfx_none);
+  export int pfx_cn = node_call("pfn", pfx_none);
+} chain () {
+  int[] pfx_a6 = [(import pfx_one)];
+  export int pfx_cuv = node_call("uv", pfx_a6);
+  export int pfx_cpv = node_call("pv", pfx_a6);
+} chain () {
+  int[] pfx_a2 = [(import pfx_vh)];
+  int[] pfx_a3 = [(import pfx_vg)];
+  int[] pfx_a4 = [(import pfx_vpv)];
+} chain () {
+  int[] pfx_a5 = [(import pfx_vuv)];
+  export int pfx_mh = node_call("pfm", pfx_a2);
+  export int pfx_mg = node_call("pfm", pfx_a3);
+} chain () {
+  export int pfx_mpv = node_call("pfm", pfx_a4);
+  int[] pfx_a7 = [(import pfx_one)];
+  export int pfx_muv = node_call("pfm", pfx_a5);
+} chain () {
+  export int pfx_mi = node_call("pfm", pfx_a7);
+  export int pfx_dcl = node_decl("int", "pfgx", (import pfx_one), 1);
+  export int pfx_imp = node_import("pfgx");
+} chain () {
+  export int pfx_impk = node_import("pfk");
+  export int pfx_k = node_decl("int", "pfk", (import pfx_one), 0);
+  int[] pfx_ps = [(import pfx_pv), (import pfx_uv)];
+} chain () {
+  int[] pfx_body = [(import pfx_dcl)];
+  export int pfx_fa = node_func("pfa", "void", pfx_ps, pfx_body, 0 - 1);
+  export int pfx_fb = node_func("pfb", "void", pfx_none, pfx_none, 0 - 1);
+} chain () {
+  push((import prog), (import pfx_h));
+  push((import prog), (import pfx_g));
+  push((import prog), (import pfx_n));
+} chain () {
+  push((import prog), (import pfx_pm));
+  push((import prog), (import pfx_fa));
+  push((import prog), (import pfx_fb));
+} chain () {
+  push((import purenode), (import pfx_h));
+  push((import purenode), (import pfx_fa));
+  push((import purenode), (import pfx_pp));
+} chain () {
+  push((import purenode), (import pfx_pv));
+  build_syms();
+  collect_exports();
+} chain () {
+  add_export2((import pfx_k), "conf.id");
+  init_bnames();
+  int[] pfx_b1 = [(import pfx_vh), (import pfx_one)];
+} chain () {
+  int[] pfx_b2 = [(import pfx_vg), (import pfx_one)];
+  export int pfx_bh = node_call("bind", pfx_b1);
+  export int pfx_bg = node_call("bind", pfx_b2);
+} return void;
+():() then len((import prog)):(6)
+():() then len((import purenode)):(4)

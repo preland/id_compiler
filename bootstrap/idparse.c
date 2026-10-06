@@ -35,6 +35,31 @@ typedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } 
 #define ID_TLS __thread
 #endif
 #endif
+#if !defined(exit) && !defined(__wasm__)
+#define ID_TRAPS 1
+#endif
+#ifdef ID_TRAPS
+#include <setjmp.h>
+static ID_TLS jmp_buf* id_trap_jb = NULL;
+static ID_TLS char id_trap_msg[512];
+static int id_fprintf(FILE* f, const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int r = (f == stderr && id_trap_jb) ? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);
+    va_end(ap);
+    return r;
+}
+static _Noreturn void id_exit(int code) {
+    if (id_trap_jb) longjmp(*id_trap_jb, 1);
+    (exit)(code);
+}
+#define exit(code) id_exit(code)
+#define fprintf id_fprintf
+jmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }
+void id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }
+const char* id_trap_text(void) { return id_trap_msg; }
+_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, "%s", msg); exit(1); }
+#endif
 static ID_TLS IdAllocHdr* id_arena_head = NULL;
 static ID_TLS int id_arena_hooked = 0;
 static ID_TLS long id_nfree = 0;
@@ -1877,6 +1902,12 @@ int id_push_asm(IdList* pos);
 int id_parse_fn(IdList* pos);
 int id_parse_native(IdList* pos);
 int id_native_sig(IdList* pos, char* name);
+int id_parse_fn_kind(IdList* pos);
+void id_pure_mark_param(IdList* pos, int pflag, int node);
+void id_pure_misplaced(IdList* pos, char* name, char* type);
+int id_at_pure(IdList* pos);
+void id_skip_pure(IdList* pos);
+void id_pure_mark_fn(int pflag, int node);
 int id_native_ret(IdList* pos, char* name, IdList* params);
 int id_native_type(IdList* pos, char* name, IdList* params);
 int id_native_node(IdList* pos, char* name, char* rt, IdList* params);
@@ -3135,6 +3166,43 @@ int id_esc_litels(IdList* els);
 int id_esc_deep_ty(char* t);
 int id_esc_deep(int fn, char* nm);
 char* id_esc_free_fn(int fn, char* nm);
+void id_pure_err_value(int id, int fn);
+char* id_pure_arg_text(int arg);
+void id_pure_err_arg(int id, int pq_cn, int j);
+void id_pure_err_builtin(int id, int fn);
+void id_pure_err_fn(int id, int fn);
+char* id_pure_callee_what(char* pq_cname);
+void id_pure_err_export(int id, int fn);
+void id_pure_err_import(int id, int fn);
+char* id_pure_callee_fix(char* pq_cname);
+void id_check_pure(void);
+void id_pure_funcs(int pf_f, int pf_lo);
+int id_pure_func(int pf_f, int pf_lo);
+void id_pure_cases(int pq_k);
+void id_pure_case(int pq_k);
+void id_pure_case_arg(int pq_k, int pq_owner, int pq_j);
+void id_pure_arg_check(int id, int fn, int pq_cn, int j);
+int id_pure_arg_ok(int arg, int fn);
+int id_pure_name_ok(char* name, int fn);
+int id_pure_bind_ok(int pq_b, int pq_bfn);
+void id_pure_err_case(int pq_k, int pq_owner, int pq_j);
+void id_pure_args(int id, int fn);
+void id_pure_arg_loop(int id, int fn, int pq_cn);
+void id_pure_arg(int id, int fn, int pq_cn, int j);
+char* id_pure_kind_v(char* name, int fn, char* pq_kind);
+int id_pure_fn_named(char* name);
+int id_pure_param(char* name, int fn);
+char* id_pure_kind(char* name, int fn);
+char* id_pure_kind_b(char* name);
+char* id_pure_kind_f(char* name, char* pq_kind);
+void id_pure_call(int id, int fn);
+void id_pure_callee(int id, int fn);
+void id_pure_report(int id, int fn, char* kind);
+void id_pure_range(int lo, int hi, int fn);
+void id_pure_node(int id, int fn);
+void id_pure_decl(int id, int fn);
+void id_pure_import(int id, int fn);
+int id_pure_mutable(char* name);
 int id_esc_bit(int m, int i);
 int id_esc_dbit(int m, int i);
 int id_esc_opaque(int fn, char* cname);
@@ -3384,7 +3452,7 @@ char* id_type_of3(int id);
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
 char* builtin_src = ID_SK("print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint peek8s peek16s peek32s peek8u peek16u peek32u bits_of_float float_of_bits bits32_of_float float_of_bits32 fail bind");  /* constant from conf.id */
-char* resv_names_src = ID_SK("add_check alloc arena_free_all arena_link arena_unlink at bits32_of_float bits_of_float block_free box_f charat chr clo_cell clo_copy clo_fn clo_make clo_new clo_set concat err_write fail float_of_bits float_of_bits32 flush fn_eq fn_plain fn_raw freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek16s peek16u peek32 peek32s peek32u peek64 peek8 peek8s peek8u peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap udiv ult umod unbox_f ushr");  /* constant from conf.id */
+char* resv_names_src = ID_SK("add_check alloc arena_free_all arena_link arena_unlink at bits32_of_float bits_of_float block_free box_f charat chr clo_cell clo_copy clo_fn clo_make clo_new clo_set concat err_write exit fail float_of_bits float_of_bits32 flush fn_eq fn_plain fn_raw fprintf freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek16s peek16u peek32 peek32s peek32u peek64 peek8 peek8s peek8u peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap trap_arm trap_disarm trap_raise trap_text udiv ult umod unbox_f ushr");  /* constant from conf.id */
 IdList* cache_file_natives;  /* constant from conf.id */
 IdList* cache_taint_natives;  /* constant from conf.id */
 IdList* cache_volatile_builtins;  /* constant from conf.id */
@@ -3394,6 +3462,7 @@ char* imdd_why = ID_SK("two functions that differ only in which imported value t
 char* imdd_help = ID_SK("replace the import with a parameter, call that one function from both places, and delete the other");  /* constant from conf.id */
 int flt_inf_pt = 309;  /* constant from conf.id */
 char* flt_inf_digits = ID_SK("179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792");  /* constant from conf.id */
+IdList* pure_builtins;  /* constant from conf.id */
 IdList* hostc;  /* exported by arg_flags4() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
@@ -3621,6 +3690,7 @@ IdList* fidx;  /* exported by init_idx() */
 IdList* dvtype;  /* exported by init_reg2() */
 IdList* dvexp;  /* exported by init_reg2() */
 IdList* esc_pe;  /* exported by esc_init() */
+IdList* purenode;  /* exported by esc_init() */
 IdList* tkik;  /* exported by tk_maps() */
 IdList* tkiv;  /* exported by tk_maps() */
 IdList* tkiu;  /* exported by tk_maps() */
@@ -3649,6 +3719,8 @@ static void idc_const_init(void) {
     id_list_lock(cache_taint_natives);
     cache_volatile_builtins = id_list_lit(2, (long long)(intptr_t)(ID_S("ticks")), (long long)(intptr_t)(ID_S("getkey")));
     id_list_lock(cache_volatile_builtins);
+    pure_builtins = id_list_lit(16, (long long)(intptr_t)(ID_S("len")), (long long)(intptr_t)(ID_S("push")), (long long)(intptr_t)(ID_S("pop")), (long long)(intptr_t)(ID_S("to_int")), (long long)(intptr_t)(ID_S("charat")), (long long)(intptr_t)(ID_S("chr")), (long long)(intptr_t)(ID_S("udiv")), (long long)(intptr_t)(ID_S("umod")), (long long)(intptr_t)(ID_S("ult")), (long long)(intptr_t)(ID_S("ushr")), (long long)(intptr_t)(ID_S("fail")), (long long)(intptr_t)(ID_S("bind")), (long long)(intptr_t)(ID_S("bits_of_float")), (long long)(intptr_t)(ID_S("float_of_bits")), (long long)(intptr_t)(ID_S("bits32_of_float")), (long long)(intptr_t)(ID_S("float_of_bits32")));
+    id_list_lock(pure_builtins);
 }
 void id_hmap_init(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt) {
     id_idstd_hmap_fill(idstd_keys, idstd_vals, idstd_used, 8);
@@ -13600,12 +13672,12 @@ void id_fv_ll_def(char* name, int nd) {
 }
 
 void id_emit_crt(void) {
-    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\nID_TLS IdAllocHdr* id_arena_head = NULL;\nID_TLS int id_arena_hooked = 0;\nID_TLS long id_nfree = 0;\nvoid id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. The layout is the one prelude.id documents; an LLVM\n   module writes the count itself, in front of each literal's bytes, and\n   builds argv strings with id_str_of_cstr. */\nsize_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\nvoid* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\nchar* id_str_new(size_t n) {\n    char* r = (char*)id_alloc(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nchar* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\nIdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\nID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\nvoid id_block_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nvoid id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    id_block_free(L->data);\n    id_block_free(L);\n}\nvoid id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nvoid id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nint id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nlong long id_bits_of_float(double d) { return id_box_f(d); }\ndouble id_float_of_bits(long long x) { return id_unbox_f(x); }\nlong long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\ndouble id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nchar* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nID_TLS unsigned char* id_store = NULL;\nID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nID_TLS long long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n}\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nlong long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nlong long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nlong long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nlong long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16u(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32u(long long a) { return id_peek_n(a, 4); }\nvoid id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nint id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
+    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\nID_TLS IdAllocHdr* id_arena_head = NULL;\nID_TLS int id_arena_hooked = 0;\nID_TLS long id_nfree = 0;\nvoid id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. The layout is the one prelude.id documents; an LLVM\n   module writes the count itself, in front of each literal's bytes, and\n   builds argv strings with id_str_of_cstr. */\nsize_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\nvoid* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\nchar* id_str_new(size_t n) {\n    char* r = (char*)id_alloc(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nchar* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\nIdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\nID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\nvoid id_block_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nvoid id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    id_block_free(L->data);\n    id_block_free(L);\n}\nvoid id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nvoid id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nint id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nlong long id_bits_of_float(double d) { return id_box_f(d); }\ndouble id_float_of_bits(long long x) { return id_unbox_f(x); }\nlong long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\ndouble id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nchar* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nID_TLS unsigned char* id_store = NULL;\nID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nID_TLS long long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n}\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nlong long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nlong long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nlong long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nlong long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16u(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32u(long long a) { return id_peek_n(a, 4); }\nvoid id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nint id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
     return;
 }
 
 void id_emit_runtime(void) {
-    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#ifndef __wasi__\n#include <termios.h>\n#endif\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\nstatic ID_TLS IdAllocHdr* id_arena_head = NULL;\nstatic ID_TLS int id_arena_hooked = 0;\nstatic ID_TLS long id_nfree = 0;\nstatic void id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. A string an id program holds is made one of three ways,\n   and each writes that count: id_str_new/id_str_from below (every runtime\n   allocator), ID_S (a literal in emitted code, counted to its first NUL, which\n   is where a strlen stopped), and id_str_of_cstr (a C string from the host,\n   such as argv). A native that only reads a `const char*` is unaffected,\n   because the bytes and their NUL are where they always were; one that\n   returns a string must build it with id_str_from. A NUL never enters a string\n   through any of these but a literal's `\\0`, which ends the literal there. */\nstatic size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\nvoid* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\n/* The one place a heap string is born: n bytes, the count in front, the NUL after. */\nstatic char* id_str_new(size_t n) {\n    char* r = (char*)id_alloc(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\nstatic IdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\n/* A list the compiler proved unreachable (docs/MEMORY.md) is released by\n   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test\n   harness, nothing goes back to malloc: the cells are filled with 0xDD and the\n   header is marked freed (len -1, cap INT_MIN), so a later use traps here\n   instead of reading whatever reused the block. */\nstatic ID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\nstatic void id_block_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nstatic void id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    id_block_free(L->data);\n    id_block_free(L);\n}\nstatic void id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nstatic void id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic long long id_bits_of_float(double d) { return id_box_f(d); }\nstatic double id_float_of_bits(long long x) { return id_unbox_f(x); }\nstatic long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\nstatic double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nstatic char* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic ID_TLS unsigned char* id_store = NULL;\nstatic ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nstatic ID_TLS long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n}\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nstatic long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nstatic long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nstatic long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nstatic long long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16u(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32u(long long a) { return id_peek_n(a, 4); }\nstatic void id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nstatic int id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\n#ifndef __wasi__\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\n#else\nstatic void id_term_restore(void) {}\nstatic void id_term_raw(void) {}\nstatic int id_getkey(void) { return -1; }\n#endif\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
+    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#ifndef __wasi__\n#include <termios.h>\n#endif\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation arena -----------------------------------------------------\n   Every heap block the runtime allocates (list headers/cells, and the C\n   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is\n   wrapped with a small intrusive header and linked into one list, so the\n   whole arena can be released in a single pass at process exit (the free-all\n   is registered with atexit on the first allocation). id programs never call\n   free() themselves, so without this a long-running program (e.g. string\n   concatenation in a loop) would leak every intermediate string forever;\n   with it, nothing outlives the process. This bounds *leaks*, not *peak*\n   memory during the run -- a program that builds one huge string still holds\n   every intermediate allocation live until exit, same as before this change.\n   Every allocation in this file goes through id_alloc/id_realloc below, which\n   also check for allocation failure and for size-computation overflow,\n   aborting with a clear message instead of continuing with a NULL pointer or\n   a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\nstatic ID_TLS IdAllocHdr* id_arena_head = NULL;\nstatic ID_TLS int id_arena_hooked = 0;\nstatic ID_TLS long id_nfree = 0;\nstatic void id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. A string an id program holds is made one of three ways,\n   and each writes that count: id_str_new/id_str_from below (every runtime\n   allocator), ID_S (a literal in emitted code, counted to its first NUL, which\n   is where a strlen stopped), and id_str_of_cstr (a C string from the host,\n   such as argv). A native that only reads a `const char*` is unaffected,\n   because the bytes and their NUL are where they always were; one that\n   returns a string must build it with id_str_from. A NUL never enters a string\n   through any of these but a literal's `\\0`, which ends the literal there. */\nstatic size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\nvoid* id_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void* id_realloc(void* p, size_t n) {\n    if (!p) return id_alloc(n);\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n    if (!nh) { fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n); exit(1); }\n    id_arena_link(nh);\n    return (void*)(nh + 1);\n}\n/* The one place a heap string is born: n bytes, the count in front, the NUL after. */\nstatic char* id_str_new(size_t n) {\n    char* r = (char*)id_alloc(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\nstatic IdList* id_list_new(void) {\n    IdList* L = (IdList*)id_alloc(sizeof(IdList));\n    L->len = 0; L->cap = 4;\n    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, \"list init\"));\n    return L;\n}\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\n/* A list the compiler proved unreachable (docs/MEMORY.md) is released by\n   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test\n   harness, nothing goes back to malloc: the cells are filled with 0xDD and the\n   header is marked freed (len -1, cap INT_MIN), so a later use traps here\n   instead of reading whatever reused the block. */\nstatic ID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\nstatic void id_block_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nstatic void id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    id_block_free(L->data);\n    id_block_free(L);\n}\nstatic void id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nstatic void id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) {\n        if (L->cap > INT_MAX / 2) {\n            fprintf(stderr, \"id: list capacity overflow\\n\");\n            exit(1);\n        }\n        int ncap = L->cap * 2;\n        L->data = (long long*)id_realloc(L->data,\n            id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\"));\n        L->cap = ncap;\n    }\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_new();\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic long long id_bits_of_float(double d) { return id_box_f(d); }\nstatic double id_float_of_bits(long long x) { return id_unbox_f(x); }\nstatic long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\nstatic double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nstatic char* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic ID_TLS unsigned char* id_store = NULL;\nstatic ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nstatic ID_TLS long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n}\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nstatic long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nstatic long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nstatic long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nstatic long long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16u(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32u(long long a) { return id_peek_n(a, 4); }\nstatic void id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_alloc(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            cap *= 2;\n            r = (char*)id_realloc(r, cap);\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nstatic int id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\n#ifndef __wasi__\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\n#else\nstatic void id_term_restore(void) {}\nstatic void id_term_raw(void) {}\nstatic int id_getkey(void) { return -1; }\n#endif\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
     return;
 }
 
@@ -15738,12 +15810,16 @@ void id_fill_params(IdList* pos, IdList* params, char* kind) {
 }
 
 int id_one_param(IdList* pos, char* kind) {
+    int pure_v;
     char* type;
     char* name;
     int ret_i;
+    pure_v = id_at_pure(pos);
+    id_skip_pure(pos);
     type = id_parse_type(pos);
     name = id_read_name(pos);
     ret_i = id_node_param(kind, type, name);
+    id_pure_mark_param(pos, pure_v, ret_i);
     return ret_i;
 }
 
@@ -16383,13 +16459,12 @@ int id_push_asm(IdList* pos) {
 }
 
 int id_parse_fn(IdList* pos) {
+    int pure_v;
     int n;
-    n = 0;
-    if ((strcmp(id_cur_text(pos), ID_S("native")) == 0)) {
-        n = id_parse_native(pos);
-    } else {
-        n = id_parse_func(pos);
-    }
+    pure_v = id_at_pure(pos);
+    id_skip_pure(pos);
+    n = id_parse_fn_kind(pos);
+    id_pure_mark_fn(pure_v, n);
     return n;
 }
 
@@ -16409,6 +16484,61 @@ int id_native_sig(IdList* pos, char* name) {
     params = id_parse_params(pos, ID_S("nparam"));
     ret_i = id_native_ret(pos, name, params);
     return ret_i;
+}
+
+int id_parse_fn_kind(IdList* pos) {
+    int n;
+    n = 0;
+    if ((strcmp(id_cur_text(pos), ID_S("native")) == 0)) {
+        n = id_parse_native(pos);
+    } else {
+        n = id_parse_func(pos);
+    }
+    return n;
+}
+
+void id_pure_mark_param(IdList* pos, int pflag, int node) {
+    if (((pflag == 1) && (id_str_starts((char*)(intptr_t)(id_list_get(ns1, node)), ID_S("func(")) == 0))) {
+IdList* idsq_14;
+char* idsq_12;
+        (idsq_14 = ns2, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, node)), id_pure_misplaced(pos, idsq_12, (char*)(intptr_t)(id_list_get(ns1, node))));
+    }
+    id_pure_mark_fn(pflag, node);
+    return;
+}
+
+void id_pure_misplaced(IdList* pos, char* name, char* type) {
+    char* msg;
+    char* why;
+    char* help;
+    msg = id_concat(id_concat(id_concat(ID_S("'pure' belongs before a parameter whose type is a function type, and '"), name), ID_S("' is ")), type);
+    why = id_concat(ID_S("'pure' promises that the function a caller passes writes no export and does no I/O, which says nothing about a value of type "), type);
+    help = id_concat(id_concat(ID_S("write 'pure func(...) return ...' only for a function-typed parameter; remove 'pure' from '"), name), ID_S("', or give it a function type"));
+    id_syn_diag(pos, ID_S("E0807"), msg, name, why, help);
+    return;
+}
+
+int id_at_pure(IdList* pos) {
+    int pure_v;
+    pure_v = 0;
+    if ((strcmp(id_cur_text(pos), ID_S("pure")) == 0)) {
+        pure_v = 1;
+    }
+    return pure_v;
+}
+
+void id_skip_pure(IdList* pos) {
+    if ((id_at_pure(pos) == 1)) {
+        id_advance(pos);
+    }
+    return;
+}
+
+void id_pure_mark_fn(int pflag, int node) {
+    if ((pflag == 1)) {
+        id_list_push(purenode, (long long)(node));
+    }
+    return;
 }
 
 int id_native_ret(IdList* pos, char* name, IdList* params) {
@@ -19125,6 +19255,7 @@ int id_imd_find(int imd_x) {
 
 void id_check_program_tail(void) {
     id_chk_dead();
+    id_check_pure();
     id_check_program_tail2();
     return;
 }
@@ -29473,6 +29604,390 @@ char* id_esc_free_fn(int fn, char* nm) {
     return fname;
 }
 
+void id_pure_err_value(int id, int fn) {
+    char* pq_fn;
+    char* pq_callee;
+    char* pq_help;
+    pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
+    pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
+    pq_help = id_concat(id_concat(id_concat(id_concat(ID_S("declare the parameter 'pure func(...) return ... "), pq_callee), ID_S("', so that every caller has to pass a pure function; or remove 'pure' from '")), pq_fn), ID_S("'"));
+    id_diag(ID_S("E0805"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls the function value '")), pq_callee), ID_S("', which is not a pure parameter")), pq_callee, ID_S("a call through a function value runs a function the compiler cannot see from here, so it can only be proved pure if the value is a parameter declared pure"), pq_help);
+    return;
+}
+
+char* id_pure_arg_text(int arg) {
+    char* pq_text;
+    pq_text = ID_S("an expression that is not a function name");
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("var")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("cfn")) == 0))) {
+        pq_text = id_concat(id_concat(ID_S("'"), (char*)(intptr_t)(id_list_get(ns1, arg))), ID_S("'"));
+    }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("call")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, arg)), ID_S("bind")) == 0))) {
+IdList* idsq_13;
+        pq_text = (idsq_13 = ns1, id_concat(id_concat(ID_S("'bind("), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, arg)), 0))))), ID_S(", ...)'")));
+    }
+    return pq_text;
+}
+
+void id_pure_err_arg(int id, int pq_cn, int j) {
+    char* pq_callee;
+    char* pq_param;
+    char* pq_text;
+    char* pq_help;
+    pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
+IdList* idsq_45;
+    pq_param = (idsq_45 = ns2, (char*)(intptr_t)(id_list_get(idsq_45, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, pq_cn)), j)))));
+    pq_text = id_pure_arg_text((int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), j)));
+    pq_help = ID_S("pass the name of a function declared pure -- write 'pure' before its definition and fix what that then reports -- or a parameter of your own declared 'pure func(...)'");
+    id_diag(ID_S("E0806"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("parameter '"), pq_param), ID_S("' of '")), pq_callee), ID_S("' is declared pure, but the argument is ")), pq_text), ID_S(", which is not known to be a pure function")), pq_callee, ID_S("'pure' on a parameter is a promise to the callee that whatever it calls through the parameter writes no export and does no I/O, and the compiler can check it only where the function value is a name"), pq_help);
+    return;
+}
+
+void id_pure_err_builtin(int id, int fn) {
+    char* pq_fn;
+    char* pq_callee;
+    char* pq_help;
+    pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
+    pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
+    pq_help = id_concat(id_concat(id_concat(id_concat(ID_S("do the call in the caller of '"), pq_fn), ID_S("' and pass the result in, or remove 'pure' from '")), pq_fn), ID_S("'; the builtins a pure function may call are listed in docs/SPEC.md, section 1.3"));
+    id_diag(ID_S("E0802"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls the builtin '")), pq_callee), ID_S("', which does I/O or reads state outside its arguments")), pq_callee, ID_S("print, input, the clock and the flat store are effects: two calls with the same arguments can give different results, or leave the world different"), pq_help);
+    return;
+}
+
+void id_pure_err_fn(int id, int fn) {
+    char* pq_fn;
+    char* pq_callee;
+    char* pq_what;
+    char* pq_help;
+    pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
+    pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
+    pq_what = id_pure_callee_what(pq_callee);
+    pq_help = id_concat(id_concat(id_concat(id_concat(id_concat(id_pure_callee_fix(pq_callee), ID_S(", or stop calling it from '")), pq_fn), ID_S("', or remove 'pure' from '")), pq_fn), ID_S("'"));
+    id_diag(ID_S("E0803"), id_tc_at(id), id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls ")), pq_what), pq_callee, ID_S("a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller"), pq_help);
+    return;
+}
+
+char* id_pure_callee_what(char* pq_cname) {
+    int pq_cn;
+    char* pq_what;
+    pq_cn = id_fn_node_of(pq_cname);
+    pq_what = id_concat(id_concat(ID_S("'"), pq_cname), ID_S("', which is not pure"));
+    if (((pq_cn >= 0) && ((int)(id_list_get(ni2, pq_cn)) == 1))) {
+        pq_what = id_concat(id_concat(ID_S("the native '"), pq_cname), ID_S("', which is not declared pure"));
+    }
+    return pq_what;
+}
+
+void id_pure_err_export(int id, int fn) {
+    char* pq_fn;
+    char* pq_name;
+    char* pq_help;
+    pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
+    pq_name = (char*)(intptr_t)(id_list_get(ns2, id));
+    pq_help = id_concat(id_concat(ID_S("return the value and let the caller store it in an export, or remove 'pure' from '"), pq_fn), ID_S("'"));
+    id_diag(ID_S("E0801"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but writes the export '")), pq_name), ID_S("'")), pq_name, ID_S("a pure function's result depends only on its arguments; an export is state every function can read, so writing one is an effect"), pq_help);
+    return;
+}
+
+void id_pure_err_import(int id, int fn) {
+    char* pq_fn;
+    char* pq_name;
+    char* pq_help;
+    pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
+    pq_name = (char*)(intptr_t)(id_list_get(ns1, id));
+    pq_help = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("pass '"), pq_name), ID_S("' to '")), pq_fn), ID_S("' as a parameter, or declare it in conf.id, where it is a constant; or remove 'pure' from '")), pq_fn), ID_S("'"));
+    id_diag(ID_S("E0804"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but reads the export '")), pq_name), ID_S("', which a function writes")), pq_name, ID_S("a pure function may read only its arguments and the constants of conf.id; an export written by a function can change between two calls, so the result would depend on when it ran"), pq_help);
+    return;
+}
+
+char* id_pure_callee_fix(char* pq_cname) {
+    int pq_cn;
+    char* pq_fix;
+    pq_cn = id_fn_node_of(pq_cname);
+    pq_fix = id_concat(id_concat(ID_S("write 'pure' before '"), pq_cname), ID_S("' and fix what it then reports"));
+    if (((pq_cn >= 0) && ((int)(id_list_get(ni2, pq_cn)) == 1))) {
+        pq_fix = id_concat(id_concat(ID_S("declare it 'pure native "), pq_cname), ID_S("(...)' if the C it links writes no global state and does no I/O"));
+    }
+    return pq_fix;
+}
+
+void id_check_pure(void) {
+    if ((id_list_len(purenode) > 0)) {
+        id_pure_funcs(0, 0);
+        id_pure_cases(0);
+    }
+    return;
+}
+
+void id_pure_funcs(int pf_f, int pf_lo) {
+    while ((pf_f < id_list_len(prog))) {
+        pf_lo = id_pure_func(pf_f, pf_lo);
+        pf_f = (pf_f + 1);
+    }
+    return;
+}
+
+int id_pure_func(int pf_f, int pf_lo) {
+    int pf_fn;
+    int pf_next;
+    pf_fn = (int)(id_list_get(prog, pf_f));
+    id_pure_range(pf_lo, pf_fn, pf_fn);
+    pf_next = (pf_fn + 1);
+    return pf_next;
+}
+
+void id_pure_cases(int pq_k) {
+    while ((pq_k < id_list_len(casenode))) {
+        id_pure_case(pq_k);
+        pq_k = (pq_k + 1);
+    }
+    return;
+}
+
+void id_pure_case(int pq_k) {
+    int pq_owner;
+    int pq_j;
+    pq_owner = (int)(id_list_get(casefn, pq_k));
+    pq_j = 0;
+IdList* idsq_19;
+    while (((pq_j < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, pq_owner)))) && (idsq_19 = nl1, (pq_j < id_list_len((IdList*)(intptr_t)(id_list_get(idsq_19, (int)(id_list_get(casenode, pq_k))))))))) {
+        id_pure_case_arg(pq_k, pq_owner, pq_j);
+        pq_j = (pq_j + 1);
+    }
+    return;
+}
+
+void id_pure_case_arg(int pq_k, int pq_owner, int pq_j) {
+    int pq_arg;
+IdList* idsq_39;
+    pq_arg = (idsq_39 = nl1, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(idsq_39, (int)(id_list_get(casenode, pq_k)))), pq_j)));
+IdList* idsq_30;
+    if ((((idsq_30 = purenode, (id_lst_find(idsq_30, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, pq_owner)), pq_j))) == 1)) && (strcmp((char*)(intptr_t)(id_list_get(nkind, pq_arg)), ID_S("cfn")) == 0)) && (id_pure_fn_named((char*)(intptr_t)(id_list_get(ns1, pq_arg))) == 0))) {
+        id_pure_err_case(pq_k, pq_owner, pq_j);
+    }
+    return;
+}
+
+void id_pure_arg_check(int id, int fn, int pq_cn, int j) {
+    if ((id_pure_arg_ok((int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), j)), fn) == 0)) {
+        id_pure_err_arg(id, pq_cn, j);
+    }
+    return;
+}
+
+int id_pure_arg_ok(int arg, int fn) {
+    int pq_ok;
+    pq_ok = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("var")) == 0)) {
+        pq_ok = id_pure_name_ok((char*)(intptr_t)(id_list_get(ns1, arg)), fn);
+    }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("call")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, arg)), ID_S("bind")) == 0))) {
+        pq_ok = id_pure_bind_ok(arg, fn);
+    }
+    return pq_ok;
+}
+
+int id_pure_name_ok(char* name, int fn) {
+    int pq_ok2;
+    pq_ok2 = id_pure_fn_named(name);
+    if ((pq_ok2 == 0)) {
+        pq_ok2 = id_pure_param(name, fn);
+    }
+    return pq_ok2;
+}
+
+int id_pure_bind_ok(int pq_b, int pq_bfn) {
+    int pq_bok;
+    int pq_first;
+    pq_bok = 0;
+    pq_first = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, pq_b)), 0));
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, pq_first)), ID_S("var")) == 0)) {
+        pq_bok = id_pure_name_ok((char*)(intptr_t)(id_list_get(ns1, pq_first)), pq_bfn);
+    }
+    return pq_bok;
+}
+
+void id_pure_err_case(int pq_k, int pq_owner, int pq_j) {
+    char* pq_param;
+    char* pq_text;
+    char* pq_fn;
+IdList* idsq_46;
+    pq_param = (idsq_46 = ns2, (char*)(intptr_t)(id_list_get(idsq_46, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, pq_owner)), pq_j)))));
+IdList* idsq_37;
+    pq_text = (idsq_37 = nl1, id_pure_arg_text((int)(id_list_get((IdList*)(intptr_t)(id_list_get(idsq_37, (int)(id_list_get(casenode, pq_k)))), pq_j))));
+    pq_fn = (char*)(intptr_t)(id_list_get(ns1, pq_owner));
+    id_case_diag(pq_k, ID_S("E0806"), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("parameter '"), pq_param), ID_S("' of '")), pq_fn), ID_S("' is declared pure, but this case passes ")), pq_text), ID_S(", which is not known to be a pure function")), ID_S("'pure' on a parameter is a promise that whatever the function calls through it writes no export and does no I/O, and a test case runs the function at build time"), ID_S("write 'pure' before the definition of the function the case names and fix what that then reports, or name another function"));
+    return;
+}
+
+void id_pure_args(int id, int fn) {
+    int pq_cn;
+    pq_cn = id_fn_node_of((char*)(intptr_t)(id_list_get(ns1, id)));
+    if ((pq_cn >= 0)) {
+        id_pure_arg_loop(id, fn, pq_cn);
+    }
+    return;
+}
+
+void id_pure_arg_loop(int id, int fn, int pq_cn) {
+    int pq_j;
+    pq_j = 0;
+    while (((pq_j < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, pq_cn)))) && (pq_j < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)))))) {
+        id_pure_arg(id, fn, pq_cn, pq_j);
+        pq_j = (pq_j + 1);
+    }
+    return;
+}
+
+void id_pure_arg(int id, int fn, int pq_cn, int j) {
+IdList* idsq_17;
+    if ((idsq_17 = purenode, (id_lst_find(idsq_17, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, pq_cn)), j))) == 1))) {
+        id_pure_arg_check(id, fn, pq_cn, j);
+    }
+    return;
+}
+
+char* id_pure_kind_v(char* name, int fn, char* pq_kind) {
+    if ((strcmp(pq_kind, ID_S("")) == 0)) {
+        pq_kind = ID_S("value");
+        if ((id_pure_param(name, fn) == 1)) {
+            pq_kind = ID_S("ok");
+        }
+    }
+    return pq_kind;
+}
+
+int id_pure_fn_named(char* name) {
+    int pq_cn;
+    int pq_named;
+    pq_cn = id_fn_node_of(name);
+    pq_named = 0;
+    if (((pq_cn >= 0) && (id_lst_find(purenode, pq_cn) == 1))) {
+        pq_named = 1;
+    }
+    return pq_named;
+}
+
+int id_pure_param(char* name, int fn) {
+    int pq_j;
+    int pq_found;
+    pq_j = 0;
+    pq_found = 0;
+    while ((pq_j < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn))))) {
+IdList* idsq_29;
+IdList* idsq_19;
+        if (((idsq_29 = ns2, (strcmp((char*)(intptr_t)(id_list_get(idsq_29, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), pq_j)))), name) == 0)) && (idsq_19 = purenode, (id_lst_find(idsq_19, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), pq_j))) == 1)))) {
+            pq_found = 1;
+        }
+        pq_j = (pq_j + 1);
+    }
+    return pq_found;
+}
+
+char* id_pure_kind(char* name, int fn) {
+    char* pq_kind;
+    pq_kind = id_pure_kind_b(name);
+    pq_kind = id_pure_kind_f(name, pq_kind);
+    pq_kind = id_pure_kind_v(name, fn, pq_kind);
+    return pq_kind;
+}
+
+char* id_pure_kind_b(char* name) {
+    char* pq_kb;
+    pq_kb = ID_S("");
+    if ((id_is_builtin(name) == 1)) {
+        pq_kb = ID_S("builtin");
+        if ((id_lst_str_index(pure_builtins, name) >= 0)) {
+            pq_kb = ID_S("ok");
+        }
+    }
+    if ((id_find_str(sdname, name) >= 0)) {
+        pq_kb = ID_S("ok");
+    }
+    return pq_kb;
+}
+
+char* id_pure_kind_f(char* name, char* pq_kind) {
+    if (((strcmp(pq_kind, ID_S("")) == 0) && (id_find_str(fnames, name) >= 0))) {
+        pq_kind = ID_S("fn");
+        if ((id_pure_fn_named(name) == 1)) {
+            pq_kind = ID_S("ok");
+        }
+    }
+    return pq_kind;
+}
+
+void id_pure_call(int id, int fn) {
+    id_pure_args(id, fn);
+    id_pure_callee(id, fn);
+    return;
+}
+
+void id_pure_callee(int id, int fn) {
+    if ((id_lst_find(purenode, fn) == 1)) {
+        id_pure_report(id, fn, id_pure_kind((char*)(intptr_t)(id_list_get(ns1, id)), fn));
+    }
+    return;
+}
+
+void id_pure_report(int id, int fn, char* kind) {
+    if ((strcmp(kind, ID_S("builtin")) == 0)) {
+        id_pure_err_builtin(id, fn);
+    }
+    if ((strcmp(kind, ID_S("fn")) == 0)) {
+        id_pure_err_fn(id, fn);
+    }
+    if ((strcmp(kind, ID_S("value")) == 0)) {
+        id_pure_err_value(id, fn);
+    }
+    return;
+}
+
+void id_pure_range(int lo, int hi, int fn) {
+    while ((lo <= hi)) {
+        id_pure_node(lo, fn);
+        lo = (lo + 1);
+    }
+    return;
+}
+
+void id_pure_node(int id, int fn) {
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("call")) == 0)) {
+        id_pure_call(id, fn);
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("import")) == 0)) {
+        id_pure_import(id, fn);
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("decl")) == 0)) {
+        id_pure_decl(id, fn);
+    }
+    return;
+}
+
+void id_pure_decl(int id, int fn) {
+    if (((((int)(id_list_get(ni2, id)) == 1) && (id_lst_find(cdecl, id) == 0)) && (id_lst_find(purenode, fn) == 1))) {
+        id_pure_err_export(id, fn);
+    }
+    return;
+}
+
+void id_pure_import(int id, int fn) {
+    if (((id_lst_find(purenode, fn) == 1) && (id_pure_mutable((char*)(intptr_t)(id_list_get(ns1, id))) == 1))) {
+        id_pure_err_import(id, fn);
+    }
+    return;
+}
+
+int id_pure_mutable(char* name) {
+    int pq_idx;
+    int pq_mut;
+    pq_idx = id_find_str(enames, name);
+    pq_mut = 0;
+    if (((pq_idx >= 0) && (strcmp((char*)(intptr_t)(id_list_get(eowners, pq_idx)), ID_S("conf.id")) != 0))) {
+        pq_mut = 1;
+    }
+    return pq_mut;
+}
+
 int id_esc_bit(int m, int i) {
     int c;
     c = 1;
@@ -29528,6 +30043,7 @@ int idsq_10;
 
 void id_esc_init(void) {
     esc_pe = id_list_lit(0);
+    purenode = id_list_lit(0);
     return;
 }
 

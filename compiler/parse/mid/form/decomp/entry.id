@@ -9,10 +9,11 @@
 // (checks/impdup/).
 check_program_tail() {
   chk_dead();
+  check_pure();
   check_program_tail2();
 } return void;
-given lz_empty ():() then calls chk_dead:() then calls check_program_tail2:()
-given lz_o ():() then calls chk_dead:() then calls check_program_tail2:()
+given lz_empty ():() then calls chk_dead:() then calls check_pure:() then calls check_program_tail2:()
+given lz_o ():() then calls chk_dead:() then calls check_pure:() then calls check_program_tail2:()
 
 check_program_tail2() {
   check_genname();

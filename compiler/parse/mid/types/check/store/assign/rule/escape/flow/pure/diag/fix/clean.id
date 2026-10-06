@@ -1,0 +1,34 @@
+// A program every purity rule is satisfied by, for the check's cases: a pure
+// native pcn, and a pure function pcf with a pure parameter pf that calls pcn,
+// calls pf and calls len. Node ids: 0 one, 1 pcn, 2 pp, 3 call pcn(), 4 call
+// pf(1), 5 call len(1), 6 pcf; prog is [pcn, pcf] and both are pure.
+
+pure_fix_clean() {
+  env_init();
+  int[] pcx_none = [];
+  export int pcx_one = node_int("1", 1, 0);
+} chain () {
+  export int pcx_n = newnode("func", 0 - 1, 1, "pcn", "int", pcx_none, pcx_none);
+  export int pcx_pp = node_param("param", "func(int) return int", "pf");
+  export int pcx_c1 = node_call("pcn", pcx_none);
+} chain () {
+  int[] pcx_a1 = [(import pcx_one)];
+  export int pcx_c2 = node_call("pf", pcx_a1);
+  export int pcx_c3 = node_call("len", pcx_a1);
+} chain () {
+  int[] pcx_ps = [(import pcx_pp)];
+  export int pcx_f = node_func("pcf", "int", pcx_ps, pcx_none, (import pcx_one));
+  push((import prog), (import pcx_n));
+} chain () {
+  push((import prog), (import pcx_f));
+  push((import purenode), (import pcx_n));
+  push((import purenode), (import pcx_pp));
+} chain () {
+  push((import purenode), (import pcx_f));
+  build_syms();
+  collect_exports();
+} chain () {
+  init_bnames();
+} return void;
+():() then len((import prog)):(2)
+():() then len((import purenode)):(3)

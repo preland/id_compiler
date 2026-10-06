@@ -1,0 +1,40 @@
+// The last step of pure_kind (../kind.id), and the two questions about names it
+// and the argument check (ok.id) both ask: is this name a function declared
+// pure, and is it a parameter of the caller declared `pure func(...)`.
+
+pure_kind_v(string name, int fn, string pq_kind) {
+  if(pq_kind == "") {
+    pq_kind = "value";
+    if(pure_param(name, fn) == 1) {
+      pq_kind = "ok";
+    }
+  }
+} return string pq_kind;
+given pure_fix_prog ("uv", (import pfx_fa), ""):("value")
+given pure_fix_prog ("pv", (import pfx_fa), ""):("ok")
+given pure_fix_prog ("uv", (import pfx_fa), "fn"):("fn")
+
+pure_fn_named(string name) {
+  int pq_cn = fn_node_of(name);
+  int pq_named = 0;
+  if(pq_cn >= 0 && lst_find((import purenode), pq_cn) == 1) {
+    pq_named = 1;
+  }
+} return int pq_named;
+given pure_fix_prog ("pfh"):(1)
+given pure_fix_prog ("pfg"):(0)
+given pure_fix_prog ("nosuch"):(0)
+
+pure_param(string name, int fn) {
+  int pq_j = 0;
+  int pq_found = 0;
+  while(pq_j < len(((import nl1)[fn]))) {
+    if((import ns2)[(((import nl1)[fn])[pq_j])] == name && lst_find((import purenode), (((import nl1)[fn])[pq_j])) == 1) {
+      pq_found = 1;
+    }
+    pq_j = pq_j + 1;
+  }
+} return int pq_found;
+given pure_fix_prog ("pv", (import pfx_fa)):(1)
+given pure_fix_prog ("uv", (import pfx_fa)):(0)
+given pure_fix_prog ("pv", (import pfx_fb)):(0)

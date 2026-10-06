@@ -1,0 +1,8 @@
+// EXPECT: 'pure' belongs before a parameter whose type is a function type, and 'x' is int
+pure id2(pure int x) {
+  int y = x;
+} return int y;
+
+main(int argc, string[] argv) {
+  int r = id2(1);
+} return int r;

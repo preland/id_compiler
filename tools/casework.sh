@@ -43,7 +43,7 @@ fn_end() {
 # takes the comment text as the function's name -- which makes its verdict
 # grep for "test failed: <comment>(" and report a real KILLED as indirect.
 fn_header_name() {
-    sed -n "${2}p" "$1" | sed -nE 's/^([a-z_][a-z0-9_]*)\(.*/\1/p'
+    sed -n "${2}p" "$1" | sed -nE 's/^(pure )?([a-z_][a-z0-9_]*)\(.*/\2/p'
 }
 
 build() {

@@ -1,0 +1,35 @@
+// A test case is a call too: it passes the function it names (a "cfn" node) to
+// the function under test, and a case that names an impure function for a pure
+// parameter would run it on a worker thread at build time. So each case's
+// arguments are held to the rule ../step.id holds a call's to (E0806, reported at
+// the case). A case argument that is not a function name is a literal, which is
+// not a function value.
+
+pure_cases(int pq_k) {
+  while(pq_k < len((import casenode))) {
+    pure_case(pq_k);
+    pq_k = pq_k + 1;
+  }
+} return void;
+given pure_fix_cases (0):() then (import chkfail)[0]:(1)
+given pure_fix_cases (1):() then (import chkfail)[0]:(0)
+
+pure_case(int pq_k) {
+  int pq_owner = (import casefn)[pq_k];
+  int pq_j = 0;
+  while(pq_j < len(((import nl1)[pq_owner])) && pq_j < len(((import nl1)[((import casenode)[pq_k])]))) {
+    pure_case_arg(pq_k, pq_owner, pq_j);
+    pq_j = pq_j + 1;
+  }
+} return void;
+given pure_fix_cases (0):() then (import chkfail)[0]:(1)
+given pure_fix_cases (1):() then (import chkfail)[0]:(0)
+
+pure_case_arg(int pq_k, int pq_owner, int pq_j) {
+  int pq_arg = (((import nl1)[((import casenode)[pq_k])])[pq_j]);
+  if(lst_find((import purenode), (((import nl1)[pq_owner])[pq_j])) == 1 && (import nkind)[pq_arg] == "cfn" && pure_fn_named((import ns1)[pq_arg]) == 0) {
+    pure_err_case(pq_k, pq_owner, pq_j);
+  }
+} return void;
+given pure_fix_cases (0, (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+given pure_fix_cases (1, (import pfx_pm), 0):() then (import chkfail)[0]:(0)

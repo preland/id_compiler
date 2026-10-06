@@ -14,12 +14,11 @@
 // export or retype a name a backend's parameter happens to use.
 
 parse_fn(int[] pos) {
-  int n = 0;
-  if(cur_text(pos) == "native") {
-    n = parse_native(pos);
-  } else {
-    n = parse_func(pos);
-  }
+  int pure_v = at_pure(pos);
+  skip_pure(pos);
+  int n = parse_fn_kind(pos);
+} chain (int[] pos) {
+  pure_mark_fn(pure_v, n);
 } return int n;
 given decl_tokens ([0]):(17)
 given decl_tokens ([0]):(17) then (import chkfail)[0]:(0)

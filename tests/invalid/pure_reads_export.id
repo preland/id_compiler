@@ -1,0 +1,13 @@
+// EXPECT: 'peek_it' is pure but reads the export 'level', which a function writes
+setup() {
+  export int level = 3;
+} return void;
+
+pure peek_it(int x) {
+  int y = x + (import level);
+} return int y;
+
+main(int argc, string[] argv) {
+  setup();
+  int r = peek_it(1);
+} return int r;

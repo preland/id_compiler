@@ -1,0 +1,12 @@
+// EXPECT: the argument is 'bind(inc, ...)', which is not known to be a pure function
+pure apply(pure func(int) return int f, int x) {
+  int y = f(x);
+} return int y;
+
+inc(int k, int x) {
+  int y = k + x;
+} return int y;
+
+main(int argc, string[] argv) {
+  int r = apply(bind(inc, 1), 1);
+} return int r;

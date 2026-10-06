@@ -1,0 +1,38 @@
+// Whether one argument of a call is a pure function: a name that is a function
+// declared pure, or a parameter of the caller declared `pure func(...)`. A
+// local or an export that holds a function value is not accepted, because what
+// it holds is decided where it is assigned, which this check does not follow;
+// pass the function by name instead. Anything that is not a name is not
+// accepted either.
+
+pure_arg_check(int id, int fn, int pq_cn, int j) {
+  if(pure_arg_ok((((import nl1)[id])[j]), fn) == 0) {
+    pure_err_arg(id, pq_cn, j);
+  }
+} return void;
+given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_pm), 0):() then (import chkfail)[0]:(1)
+given pure_fix_prog ((import pfx_mh), (import pfx_fb), (import pfx_pm), 0):() then (import chkfail)[0]:(0)
+
+pure_arg_ok(int arg, int fn) {
+  int pq_ok = 0;
+  if((import nkind)[arg] == "var") {
+    pq_ok = pure_name_ok((import ns1)[arg], fn);
+  }
+  if((import nkind)[arg] == "call" && (import ns1)[arg] == "bind") {
+    pq_ok = pure_bind_ok(arg, fn);
+  }
+} return int pq_ok;
+given pure_fix_prog ((import pfx_vh), (import pfx_fb)):(1)
+given pure_fix_prog ((import pfx_one), (import pfx_fb)):(0)
+given pure_fix_prog ((import pfx_bh), (import pfx_fb)):(1)
+given pure_fix_prog ((import pfx_bg), (import pfx_fb)):(0)
+
+pure_name_ok(string name, int fn) {
+  int pq_ok2 = pure_fn_named(name);
+  if(pq_ok2 == 0) {
+    pq_ok2 = pure_param(name, fn);
+  }
+} return int pq_ok2;
+given pure_fix_prog ("pfh", (import pfx_fb)):(1)
+given pure_fix_prog ("pv", (import pfx_fa)):(1)
+given pure_fix_prog ("uv", (import pfx_fa)):(0)

@@ -1,0 +1,30 @@
+// `pure` (docs/SPEC.md, "Pure functions") is a marker written before a
+// function's name, before `native`, and before a parameter's function type.
+// at_pure and skip_pure read it; the node it marked is recorded in purenode, so
+// a function's purity and a parameter's are the same kind of fact, asked of a
+// node id (mid/types/check/store/assign/rule/escape/flow/pure/).
+
+at_pure(int[] pos) {
+  int pure_v = 0;
+  if(cur_text(pos) == "pure") {
+    pure_v = 1;
+  }
+} return int pure_v;
+given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):(1)
+given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):(0)
+
+skip_pure(int[] pos) {
+  if(at_pure(pos) == 1) {
+    advance(pos);
+  }
+} return void;
+given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):([1])
+given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):([1])
+
+pure_mark_fn(int pflag, int node) {
+  if(pflag == 1) {
+    push((import purenode), node);
+  }
+} return void;
+given env_init (1, 7):() then (import purenode)[0]:(7)
+given env_init (0, 7):() then len((import purenode)):(0)

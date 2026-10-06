@@ -1,0 +1,37 @@
+// What follows a function's `pure` marker (pure/pure.id): a native declaration
+// or an ordinary function. Split from parse_fn (../head.id), which is at its
+// file's three-function cap, so that the marker is read before either form.
+
+parse_fn_kind(int[] pos) {
+  int n = 0;
+  if(cur_text(pos) == "native") {
+    n = parse_native(pos);
+  } else {
+    n = parse_func(pos);
+  }
+} return int n;
+given decl_tokens ([0]):(17)
+given decl_tokens ([0]):(17) then (import chkfail)[0]:(0)
+
+// `pure` on a parameter is a promise about the function value passed: the
+// parameter's type has to be a function type, or there is nothing to promise.
+pure_mark_param(int[] pos, int pflag, int node) {
+  if(pflag == 1 && str_starts((import ns1)[node], "func(") == 0) {
+    pure_misplaced(pos, (import ns2)[node], (import ns1)[node]);
+  }
+  pure_mark_fn(pflag, node);
+} return void;
+given pure_fix_fn_param ([0], 1, 0):() then (import purenode)[0]:(0)
+given pure_fix_fn_param ([0], 0, 0):() then len((import purenode)):(0)
+given pure_fix_int_param ([0], 1, 0):() then (import synfail)[0]:(1)
+
+// A `pure` that is not before a function type: E0807.
+pure_misplaced(int[] pos, string name, string type) {
+  string msg = "'pure' belongs before a parameter whose type is a function type, and '" + name + "' is " + type;
+  string why = "'pure' promises that the function a caller passes writes no export and does no I/O, which says nothing about a value of type " + type;
+  string help = "write 'pure func(...) return ...' only for a function-typed parameter; remove 'pure' from '" + name + "', or give it a function type";
+} chain (int[] pos, string name, string type) {
+  syn_diag(pos, "E0807", msg, name, why, help);
+} return void;
+given full_env given push_toks(["ident"], ["g"]) ([0], "g", "int"):() then (import chkfail)[0]:(1)
+given full_env given push_toks(["ident"], ["h"]) ([0], "h", "string"):() then (import synfail)[0]:(1)

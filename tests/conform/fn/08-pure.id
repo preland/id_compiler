@@ -1,0 +1,19 @@
+pure sq(int x) {
+  int r = x * x;
+} return int r;
+(3):(9)
+(0):(0)
+
+pure twice(pure func(int) return int f, int x) {
+  int a = f(x);
+  int r = f(a);
+} return int r;
+(sq, 3):(81)
+(sq, 2):(16)
+
+main(int argc, string[] argv) {
+  int r = twice(sq, 3);
+  print(r);
+} return int 0;
+(1, ["p"]):(0) then prints:("81\n")
+(2, ["p", "q"]):(0) then prints:("81\n")

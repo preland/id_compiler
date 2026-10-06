@@ -1,0 +1,18 @@
+pure add(int k, int x) {
+  int s = k + x;
+} return int s;
+(2, 5):(7)
+(0, 0):(0)
+
+pure apply(pure func(int) return int f, int x) {
+  int y = f(x);
+} return int y;
+(bind(add, 2), 5):(7)
+(bind(add, 0), 3):(3)
+
+main(int argc, string[] argv) {
+  int r = apply(bind(add, 2), 5);
+  print(r);
+} return int 0;
+(1, ["p"]):(0) then prints:("7\n")
+(2, ["p", "q"]):(0) then prints:("7\n")

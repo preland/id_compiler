@@ -35,6 +35,31 @@ typedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } 
 #define ID_TLS __thread
 #endif
 #endif
+#if !defined(exit) && !defined(__wasm__)
+#define ID_TRAPS 1
+#endif
+#ifdef ID_TRAPS
+#include <setjmp.h>
+static ID_TLS jmp_buf* id_trap_jb = NULL;
+static ID_TLS char id_trap_msg[512];
+static int id_fprintf(FILE* f, const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int r = (f == stderr && id_trap_jb) ? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);
+    va_end(ap);
+    return r;
+}
+static _Noreturn void id_exit(int code) {
+    if (id_trap_jb) longjmp(*id_trap_jb, 1);
+    (exit)(code);
+}
+#define exit(code) id_exit(code)
+#define fprintf id_fprintf
+jmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }
+void id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }
+const char* id_trap_text(void) { return id_trap_msg; }
+_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, "%s", msg); exit(1); }
+#endif
 static ID_TLS IdAllocHdr* id_arena_head = NULL;
 static ID_TLS int id_arena_hooked = 0;
 static ID_TLS long id_nfree = 0;
@@ -771,7 +796,7 @@ int id_is_alnum(int c) {
 int id_is_kw(char* w) {
     int ok;
     ok = 0;
-    if (((((((((((((((((((((((((((strcmp(w, ID_S("int")) == 0) || (strcmp(w, ID_S("float")) == 0)) || (strcmp(w, ID_S("string")) == 0)) || (strcmp(w, ID_S("void")) == 0)) || (strcmp(w, ID_S("if")) == 0)) || (strcmp(w, ID_S("else")) == 0)) || (strcmp(w, ID_S("while")) == 0)) || (strcmp(w, ID_S("return")) == 0)) || (strcmp(w, ID_S("export")) == 0)) || (strcmp(w, ID_S("import")) == 0)) || (strcmp(w, ID_S("word")) == 0)) || (strcmp(w, ID_S("asm")) == 0)) || (strcmp(w, ID_S("native")) == 0)) || (strcmp(w, ID_S("given")) == 0)) || (strcmp(w, ID_S("then")) == 0)) || (strcmp(w, ID_S("func")) == 0)) || (strcmp(w, ID_S("prints")) == 0)) || (strcmp(w, ID_S("eprints")) == 0)) || (strcmp(w, ID_S("calls")) == 0)) || (strcmp(w, ID_S("chain")) == 0)) || (strcmp(w, ID_S("blank")) == 0)) || (strcmp(w, ID_S("break")) == 0)) || (strcmp(w, ID_S("stdin")) == 0)) || (strcmp(w, ID_S("traps")) == 0)) || (strcmp(w, ID_S("timeout")) == 0)) || (strcmp(w, ID_S("struct")) == 0))) {
+    if ((((((((((((((((((((((((((((strcmp(w, ID_S("int")) == 0) || (strcmp(w, ID_S("float")) == 0)) || (strcmp(w, ID_S("string")) == 0)) || (strcmp(w, ID_S("void")) == 0)) || (strcmp(w, ID_S("if")) == 0)) || (strcmp(w, ID_S("else")) == 0)) || (strcmp(w, ID_S("while")) == 0)) || (strcmp(w, ID_S("return")) == 0)) || (strcmp(w, ID_S("export")) == 0)) || (strcmp(w, ID_S("import")) == 0)) || (strcmp(w, ID_S("word")) == 0)) || (strcmp(w, ID_S("asm")) == 0)) || (strcmp(w, ID_S("native")) == 0)) || (strcmp(w, ID_S("given")) == 0)) || (strcmp(w, ID_S("then")) == 0)) || (strcmp(w, ID_S("func")) == 0)) || (strcmp(w, ID_S("prints")) == 0)) || (strcmp(w, ID_S("eprints")) == 0)) || (strcmp(w, ID_S("calls")) == 0)) || (strcmp(w, ID_S("chain")) == 0)) || (strcmp(w, ID_S("blank")) == 0)) || (strcmp(w, ID_S("break")) == 0)) || (strcmp(w, ID_S("stdin")) == 0)) || (strcmp(w, ID_S("traps")) == 0)) || (strcmp(w, ID_S("timeout")) == 0)) || (strcmp(w, ID_S("struct")) == 0)) || (strcmp(w, ID_S("pure")) == 0))) {
         ok = 1;
     }
     return ok;

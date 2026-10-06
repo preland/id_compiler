@@ -1,0 +1,26 @@
+// A `bind(NAME, v, ...)` (docs/SPEC.md, section 1.1.1) is accepted for a pure
+// parameter when NAME is a pure function or a pure parameter: the captured
+// values are immutable copies, so the closure does what NAME does and nothing
+// more. Anything else bind could name is not a name this check can follow.
+pure_bind_ok(int pq_b, int pq_bfn) {
+  int pq_bok = 0;
+  int pq_first = (((import nl1)[pq_b])[0]);
+  if((import nkind)[pq_first] == "var") {
+    pq_bok = pure_name_ok((import ns1)[pq_first], pq_bfn);
+  }
+} return int pq_bok;
+given pure_fix_prog ((import pfx_bh), (import pfx_fb)):(1)
+given pure_fix_prog ((import pfx_bg), (import pfx_fb)):(0)
+
+// E0806 at a test case: the message of diag/msg/arg.id's pure_err_arg, for an
+// argument written in a case rather than in a call, located at the case.
+
+pure_err_case(int pq_k, int pq_owner, int pq_j) {
+  string pq_param = (import ns2)[(((import nl1)[pq_owner])[pq_j])];
+  string pq_text = pure_arg_text((((import nl1)[((import casenode)[pq_k])])[pq_j]));
+  string pq_fn = (import ns1)[pq_owner];
+} chain (int pq_k, int pq_owner, int pq_j) {
+  case_diag(pq_k, "E0806", "parameter '" + pq_param + "' of '" + pq_fn + "' is declared pure, but this case passes " + pq_text + ", which is not known to be a pure function", "'pure' on a parameter is a promise that whatever the function calls through it writes no export and does no I/O, and a test case runs the function at build time", "write 'pure' before the definition of the function the case names and fix what that then reports, or name another function");
+} return void;
+given pure_fix_cases (0, (import pfx_pm), 0):() then prints:("p.id:7: error: parameter 'pf' of 'pfm' is declared pure, but this case passes 'pfg', which is not known to be a pure function [E0806]\n  why: 'pure' on a parameter is a promise that whatever the function calls through it writes no export and does no I/O, and a test case runs the function at build time\n  help: write 'pure' before the definition of the function the case names and fix what that then reports, or name another function\n")
+given pure_fix_cases (1, (import pfx_pm), 0):() then (import chkfail)[0]:(1)

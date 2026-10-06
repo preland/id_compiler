@@ -1,0 +1,10 @@
+// EXPECT: 'wrap' is pure but calls the native 'host', which is not declared pure
+native host(int x) return int;
+
+pure wrap(int x) {
+  int y = host(x);
+} return int y;
+
+main(int argc, string[] argv) {
+  int r = wrap(1);
+} return int r;

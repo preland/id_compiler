@@ -1,0 +1,14 @@
+// Where a function called NAME begins in a file's text: at `NAME(` at the start
+// of a line, or at `NAME(` after the `pure ` marker a pure function is written
+// with (docs/SPEC.md, section 1.3). -1 when the file defines none.
+
+iw_find(string iw_pt, string iw_pn) {
+  int iw_pat = str_find("\n" + iw_pt, "\n" + iw_pn + "(");
+  int iw_ppure = str_find("\n" + iw_pt, "\npure " + iw_pn + "(");
+  if(iw_pat < 0 && iw_ppure >= 0) {
+    iw_pat = iw_ppure + 5;
+  }
+} return int iw_pat;
+("f(int a) {\n}", "f"):(0)
+("// c\npure f(int a) {\n}", "f"):(10)
+("g() {\n}", "f"):(-1)

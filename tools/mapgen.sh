@@ -53,8 +53,8 @@ extract() {
             if (!incomment) { own = line; incomment = 1 }
             next
         }
-        /^[a-z_][a-z_0-9]*\(/ {
-            name = $0; sub(/\(.*/, "", name)
+        /^(pure )?[a-z_][a-z_0-9]*\(/ {
+            name = $0; sub(/\(.*/, "", name); sub(/^pure /, "", name)
             printf "%s\t%s\t%s\n", name, FILENAME, (incomment ? own : header)
             incomment = 0; own = ""; inheader = 0
             next

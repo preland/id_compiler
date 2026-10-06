@@ -38,7 +38,7 @@ cd "$(dirname "$0")/.."
 # sequences, which turns every \( into ( and leaves an invalid regular
 # expression that counts nothing.
 export CASE_RE='^[ \t]*(given +[A-Za-z_][A-Za-z0-9_]*( *\((\(([^()"]|"([^"\\]|\\.)*")*\)|"([^"\\]|\\.)*"|[^)"])*\) *| +))*(stdin +"([^"\\]|\\.)*" +)?(timeout +[0-9]+ +)?\((\(([^()"]|"([^"\\]|\\.)*")*\)|"([^"\\]|\\.)*"|[^)"])*\) *: *\('
-export FN_RE='^[a-z_][a-z0-9_]*\('
+export FN_RE='^(pure )?[a-z_][a-z0-9_]*\('
 id_files() { find "$@" -name build -prune -o -name '*.id' -type f -print 2>/dev/null | LC_ALL=C sort; }
 count_tree() {
     id_files "$@" | tr '\n' '\0' | xargs -0 -r awk '
@@ -46,7 +46,7 @@ count_tree() {
                      while ((getline row < ENVIRON["EXEMPT"]) > 0) exempt[row] = 1 }
         function close_fn() { if (infn && cases < 2 && !(key in exempt)) short++; infn = 0; cases = 0 }
         FNR == 1   { close_fn() }
-        $0 ~ fre   { close_fn(); fns++; infn = 1; key = FILENAME "|" substr($0, 1, index($0, "(") - 1); next }
+        $0 ~ fre   { close_fn(); fns++; infn = 1; key = FILENAME "|" substr($0, 1, index($0, "(") - 1); sub(/\|pure /, "|", key); next }
         $0 ~ cre   { total++; if (infn) cases++ }
         END        { close_fn(); printf "%d %d %d\n", fns + 0, total + 0, short + 0 }
     ' | awk 'NF == 3 { f += $1; c += $2; s += $3 } END { printf "%d %d %d\n", f + 0, c + 0, s + 0 }'

@@ -1,0 +1,12 @@
+// EXPECT: parameter 'f' of 'apply' is declared pure, but the argument is 'inc', which is not known to be a pure function
+pure apply(pure func(int) return int f, int x) {
+  int y = f(x);
+} return int y;
+
+inc(int x) {
+  int y = x + 1;
+} return int y;
+
+main(int argc, string[] argv) {
+  int r = apply(inc, 1);
+} return int r;

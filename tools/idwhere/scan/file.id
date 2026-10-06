@@ -4,7 +4,7 @@
 
 iw_scan(string iw_sp, string iw_sn) {
   string iw_stx = fs_read_text(iw_sp);
-  int iw_sat = str_find("\n" + iw_stx, "\n" + iw_sn + "(");
+  int iw_sat = iw_find(iw_stx, iw_sn);
   string iw_srow = "";
 } chain (string iw_sp, string iw_sn) {
   if(iw_sat >= 0) {
@@ -13,6 +13,7 @@ iw_scan(string iw_sp, string iw_sn) {
 } return string iw_srow;
 given fs_temp_text("// c\nf(int a) {\n} return int a;\n") ((import fs_temp_path), "f"):("2: f(int a) -> int")
 given fs_temp_text("// c\nf(int a) {\n} return int a;\n") ((import fs_temp_path), "g"):("")
+given fs_temp_text("// c\npure f(int a) {\n} return int a;\n") ((import fs_temp_path), "f"):("2: f(int a) -> int")
 ("/nonexistent/iw_scan.id", "f"):("")
 
 iw_row(string iw_rt, int iw_rat) {

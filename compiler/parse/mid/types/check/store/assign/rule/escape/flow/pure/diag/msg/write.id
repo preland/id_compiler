@@ -1,0 +1,36 @@
+// The diagnostics of the purity check that are about what a pure function
+// touches rather than what it calls: an export it writes (E0801) and a
+// mutable export it reads (E0804). Each names the function and the thing, says
+// why the rule exists in one line, and says what to write instead. The wording
+// of the fix for a callee that is not pure (E0803, ../call.id) is here because
+// that file is at its function cap.
+
+pure_err_export(int id, int fn) {
+  string pq_fn = (import ns1)[fn];
+  string pq_name = (import ns2)[id];
+  string pq_help = "return the value and let the caller store it in an export, or remove 'pure' from '" + pq_fn + "'";
+} chain (int id, int fn) {
+  diag("E0801", tc_at(id), "'" + pq_fn + "' is pure but writes the export '" + pq_name + "'", pq_name, "a pure function's result depends only on its arguments; an export is state every function can read, so writing one is an effect", pq_help);
+} return void;
+given pure_fix_prog ((import pfx_dcl), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but writes the export 'pfgx' [E0801]\n  at: pfgx\n  why: a pure function's result depends only on its arguments; an export is state every function can read, so writing one is an effect\n  help: return the value and let the caller store it in an export, or remove 'pure' from 'pfa'\n")
+given pure_fix_prog ((import pfx_dcl), (import pfx_fb)):() then (import chkfail)[0]:(1)
+
+pure_err_import(int id, int fn) {
+  string pq_fn = (import ns1)[fn];
+  string pq_name = (import ns1)[id];
+  string pq_help = "pass '" + pq_name + "' to '" + pq_fn + "' as a parameter, or declare it in conf.id, where it is a constant; or remove 'pure' from '" + pq_fn + "'";
+} chain (int id, int fn) {
+  diag("E0804", tc_at(id), "'" + pq_fn + "' is pure but reads the export '" + pq_name + "', which a function writes", pq_name, "a pure function may read only its arguments and the constants of conf.id; an export written by a function can change between two calls, so the result would depend on when it ran", pq_help);
+} return void;
+given pure_fix_prog ((import pfx_imp), (import pfx_fa)):() then prints:("<stdin>:1: error: 'pfa' is pure but reads the export 'pfgx', which a function writes [E0804]\n  at: pfgx\n  why: a pure function may read only its arguments and the constants of conf.id; an export written by a function can change between two calls, so the result would depend on when it ran\n  help: pass 'pfgx' to 'pfa' as a parameter, or declare it in conf.id, where it is a constant; or remove 'pure' from 'pfa'\n")
+given pure_fix_prog ((import pfx_imp), (import pfx_fb)):() then (import chkfail)[0]:(1)
+
+pure_callee_fix(string pq_cname) {
+  int pq_cn = fn_node_of(pq_cname);
+  string pq_fix = "write 'pure' before '" + pq_cname + "' and fix what it then reports";
+  if(pq_cn >= 0 && (import ni2)[pq_cn] == 1) {
+    pq_fix = "declare it 'pure native " + pq_cname + "(...)' if the C it links writes no global state and does no I/O";
+  }
+} return string pq_fix;
+given pure_fix_prog ("pfg"):("write 'pure' before 'pfg' and fix what it then reports")
+given pure_fix_prog ("pfn"):("declare it 'pure native pfn(...)' if the C it links writes no global state and does no I/O")

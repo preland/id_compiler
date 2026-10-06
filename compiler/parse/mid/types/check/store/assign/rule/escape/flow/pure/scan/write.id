@@ -1,0 +1,34 @@
+// What a pure function may do to an export: nothing. Declaring one is a write
+// (a function's only way to assign an export), and reading one is allowed only
+// when it is a constant of conf.id, which is built before main and never
+// assigned again; any other export can be assigned by a function that runs
+// between two calls, so a read of it makes the result depend on when it ran.
+
+pure_decl(int id, int fn) {
+  if((import ni2)[id] == 1 && lst_find((import cdecl), id) == 0 && lst_find((import purenode), fn) == 1) {
+    pure_err_export(id, fn);
+  }
+} return void;
+given pure_fix_prog ((import pfx_dcl), (import pfx_fa)):() then (import chkfail)[0]:(1)
+given pure_fix_prog ((import pfx_dcl), (import pfx_fb)):() then (import chkfail)[0]:(0)
+given pure_fix_prog ((import pfx_k), (import pfx_fa)):() then (import chkfail)[0]:(0)
+
+pure_import(int id, int fn) {
+  if(lst_find((import purenode), fn) == 1 && pure_mutable((import ns1)[id]) == 1) {
+    pure_err_import(id, fn);
+  }
+} return void;
+given pure_fix_prog ((import pfx_imp), (import pfx_fa)):() then (import chkfail)[0]:(1)
+given pure_fix_prog ((import pfx_imp), (import pfx_fb)):() then (import chkfail)[0]:(0)
+given pure_fix_prog ((import pfx_impk), (import pfx_fa)):() then (import chkfail)[0]:(0)
+
+pure_mutable(string name) {
+  int pq_idx = find_str((import enames), name);
+  int pq_mut = 0;
+  if(pq_idx >= 0 && (import eowners)[pq_idx] != "conf.id") {
+    pq_mut = 1;
+  }
+} return int pq_mut;
+given pure_fix_prog ("pfgx"):(1)
+given pure_fix_prog ("pfk"):(0)
+given pure_fix_prog ("nosuch"):(0)

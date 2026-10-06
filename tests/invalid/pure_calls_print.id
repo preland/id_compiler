@@ -1,0 +1,8 @@
+// EXPECT: 'shout' is pure but calls the builtin 'print'
+pure shout(int x) {
+  print(x);
+} return int x;
+
+main(int argc, string[] argv) {
+  int r = shout(1);
+} return int r;
