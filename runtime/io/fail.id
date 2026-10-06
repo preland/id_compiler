@@ -1,0 +1,26 @@
+// fail, the trap a program raises itself.
+//
+// The hosted runtime writes `id: MSG` to stderr and exits 1. A kernel has
+// neither, so the line goes to the serial port -- the one place the runtime
+// writes -- and the machine stops the way kernel/prog/sys/trap/panic does:
+// ACPI's shutdown register, port 0x604, which QEMU's default machine honours.
+// Anything that ignores the write falls through to a halt loop, so the
+// function never returns. It writes with put and print rather than building
+// the line with `+`, because a fail that allocates cannot report running out
+// of memory.
+
+asm "x86_64-unknown-none" fail_stop() {
+  "movq $0x2000, %%rax"
+  "movq $0x604, %%rdx"
+  "outw %%ax, %%dx"
+  "cli"
+  "1: hlt"
+  "jmp 1b"
+  "xorq %[ret], %[ret]"
+} return word ret;
+
+fail(string msg) {
+  put("id: ");
+  print(msg);
+  fail_stop();
+} return void;

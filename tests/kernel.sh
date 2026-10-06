@@ -84,6 +84,17 @@ if command -v llvm-nm >/dev/null 2>&1; then
     fi
 fi
 
+# `fail(msg)` is the trap a program raises itself, and 51 idstd core functions
+# reach it. The freestanding runtime defines id_fail, so a kernel that calls one
+# of them links; its message goes to the serial port and the machine stops.
+if command -v llvm-nm >/dev/null 2>&1; then
+    if llvm-nm --defined-only "$ELF" 2>/dev/null | grep -q ' id_fail$'; then
+        ok "the runtime defines fail"
+    else
+        bad "the runtime defines fail"
+    fi
+fi
+
 # -- boot, then drive the shell over the serial port ------------------------
 # The shell reads the keyboard and the serial port through one function, so a
 # test types at it the same way a person does.
