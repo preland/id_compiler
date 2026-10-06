@@ -1,0 +1,48 @@
+// The results file of a shard, and what is still to do given what it holds.
+
+// Appends ms_tx to the file ms_pa, creating it. Answers the bytes written,
+// -1 when the file cannot be opened.
+ms_dr_add(string ms_pa, string ms_tx) {
+  int ms_h = fs_open(ms_pa, "a");
+  int ms_n = -1;
+  if(ms_h >= 0) {
+    ms_n = fs_write(ms_h, exec_bytes(ms_tx), len(ms_tx));
+  }
+} chain (string ms_pa, string ms_tx) {
+  fs_close(ms_h);
+} return int ms_n;
+given ms_t_tree ((import ms_t_log), "a\n"):(2) then ms_t_logtxt:("a\n")
+given ms_t_tree given ms_t_wres ((import ms_t_log), "b\n"):(2) then ms_t_logtxt:("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\nb\n")
+("/no/such/dir_ms/r.tsv", "a"):(-1)
+
+// The mutants a results file already has an answer for, as keys.
+ms_dr_done(string ms_pa) {
+  string[] ms_lns = str_lines(fs_read_text(ms_pa));
+  string[] ms_ks = [];
+  int ms_i = 0;
+} chain (string ms_pa) {
+  while(ms_i < len(ms_lns)) {
+    if(len(ms_dr_key(ms_lns[ms_i])) > 0) {
+      push(ms_ks, ms_dr_key(ms_lns[ms_i]));
+    }
+    ms_i = ms_i + 1;
+  }
+} return string[] ms_ks;
+given ms_t_tree given ms_t_wres ((import ms_t_log)):(["a.id\tf\t3\t4\tcmp\t<=", "a.id\tf\t3\t9\tdel\t"])
+("/no/such/file_ms"):([])
+
+// The indexes, in order, of the mutants of ms_al that shard ms_sh owns and
+// ms_ks has no answer for.
+ms_dr_todo(string[] ms_al, int[] ms_sh, string[] ms_ks) {
+  int[] ms_td = [];
+  int ms_i = 0;
+  while(ms_i < len(ms_al)) {
+    if(ms_dr_mine(ms_i, ms_sh) == 1 && lst_str_index(ms_ks, ms_al[ms_i]) < 0) {
+      push(ms_td, ms_i);
+    }
+    ms_i = ms_i + 1;
+  }
+} return int[] ms_td;
+(["a", "b", "c", "d", "e"], [1, 2], []):([1, 3])
+(["a", "b", "c", "d", "e"], [0, 2], ["c"]):([0, 4])
+(["a", "b"], [0, 1], ["b", "a"]):([])

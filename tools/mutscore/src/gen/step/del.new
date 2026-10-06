@@ -1,0 +1,43 @@
+// Deleting a statement, and the constants a return value may be replaced by.
+
+// 1 when the statement starting at token ms_h declares something, returns or
+// pads: a word of ms_dl, or a struct type (a name, or a name and `[]`, then a
+// name).
+ms_mu_decl(string ms_s, int[] ms_tk, int ms_h) {
+  int ms_w = lst_str_index((import ms_dl), ms_tk_str(ms_s, ms_tk, ms_h));
+  int ms_n = ms_tk_get(ms_tk, ms_h, 0) == (import ms_k_id) && (ms_tk_get(ms_tk, ms_h + 1, 0) == (import ms_k_id) || (ms_tk_ch(ms_s, ms_tk, ms_h + 1) == 91 && ms_tk_ch(ms_s, ms_tk, ms_h + 2) == 93));
+  int ms_d = ms_w >= 0 || ms_n;
+} return int ms_d;
+given ms_t_lex("int a = 1;") ("int a = 1;", (import ms_t_tk), 0):(1)
+given ms_t_lex("Page p = f();") ("Page p = f();", (import ms_t_tk), 0):(1)
+given ms_t_lex("Page[] p = f();") ("Page[] p = f();", (import ms_t_tk), 0):(1)
+given ms_t_lex("return a;") ("return a;", (import ms_t_tk), 0):(1)
+given ms_t_lex("a = f();") ("a = f();", (import ms_t_tk), 0):(0)
+given ms_t_lex("a[0] = 1;") ("a[0] = 1;", (import ms_t_tk), 0):(0)
+given ms_t_lex("push(a, 1);") ("push(a, 1);", (import ms_t_tk), 0):(0)
+
+// The constant a value of type ms_y (a list when ms_l is 1) is replaced by,
+// or "" when there is none (a struct, a function value, void).
+ms_mu_zero(string ms_y, int ms_l) {
+  string ms_z = "";
+  if(ms_y == "int" || ms_y == "word") {
+    ms_z = "0";
+  }
+  if(ms_y == "float") {
+    ms_z = "0.0";
+  }
+} chain (string ms_y, int ms_l) {
+  if(ms_y == "string") {
+    ms_z = "\"\"";
+  }
+  if(ms_l == 1) {
+    ms_z = "[]";
+  }
+} return string ms_z;
+("int", 0):("0")
+("word", 0):("0")
+("float", 0):("0.0")
+("string", 0):("\"\"")
+("Page", 1):("[]")
+("Page", 0):("")
+("void", 0):("")

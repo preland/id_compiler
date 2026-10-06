@@ -1,0 +1,28 @@
+// What a mutant looks like to a person: the line it makes.
+
+// The line holding byte ms_a with the bytes from ms_a up to ms_b replaced by
+// ms_rp, trimmed; the replaced span is cut at the line's end, with "..."
+// added, when it runs over it.
+ms_df_new(string ms_s, int ms_a, int ms_b, string ms_rp) {
+  int ms_ls = ms_df_bol(ms_s, ms_a);
+  int ms_le = str_eol(ms_s, ms_a);
+  int ms_m = fx_min(ms_b, ms_le);
+} chain (string ms_s, int ms_a, int ms_b, string ms_rp) {
+  string ms_nw = str_trim(str_slice(ms_s, ms_ls, ms_a - ms_ls) + ms_rp + str_slice(ms_s, ms_m, ms_le - ms_m));
+  if(ms_b > ms_le) {
+    ms_nw = ms_nw + " ...";
+  }
+} return string ms_nw;
+("  x = a + b;\ny", 8, 9, "-"):("x = a - b;")
+("  x = 1;\ny = 2;", 2, 12, ""):(" ...")
+("a;", 0, 2, ""):("")
+
+// The line holding byte ms_a, trimmed, then "  =>  " and the line the
+// mutant makes.
+ms_df_show(string ms_s, int ms_a, int ms_b, string ms_rp) {
+  int ms_ls = ms_df_bol(ms_s, ms_a);
+  int ms_le = str_eol(ms_s, ms_a);
+  string ms_nw = str_trim(str_slice(ms_s, ms_ls, ms_le - ms_ls)) + "  =>  " + ms_df_new(ms_s, ms_a, ms_b, ms_rp);
+} return string ms_nw;
+("  x = a + b;\ny", 8, 9, "-"):("x = a + b;  =>  x = a - b;")
+("a;\nb;", 3, 5, ""):("b;  =>  ")

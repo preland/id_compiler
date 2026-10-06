@@ -1,0 +1,45 @@
+// Which test cases prove nothing. Three shapes are flagged:
+//   silent  the case asserts only that nothing is printed (`prints:("")`),
+//           so it pins no result;
+//   echo    the expected values are the arguments, written again, and no
+//           `then` clause checks anything else;
+//   bare    the expected values are empty and there is no `then` clause, so
+//           the case only shows the call does not trap, for a function that
+//           returns a value or does something.
+
+// 1 when the clauses ms_rs (after the expected values) are nothing but
+// `then prints:("")` and `then eprints:("")`, and there is at least one.
+ms_lt_quiet(string ms_rs) {
+  string ms_q = str_replace(str_replace(ms_rs, "then prints:(\"\")", ""), "then eprints:(\"\")", "");
+  int ms_ok = len(ms_rs) > 0 && len(str_trim(ms_q)) == 0;
+} return int ms_ok;
+("then prints:(\"\")"):(1)
+("then prints:(\"\") then eprints:(\"\")"):(1)
+("then prints:(\"x\\n\")"):(0)
+("then prints:(\"\") then calls f:[1]"):(0)
+(""):(0)
+
+// The shape ms_kd of a case, "case" when it proves something: ms_ag, ms_ex, ms_rs
+// are its arguments, expected values and clauses; ms_vd is 1 for a void
+// function and ms_ef 1 when the function has a statement that does something.
+ms_lt_kind(string ms_ag, string ms_ex, string ms_rs, int ms_vd, int ms_ef) {
+  string ms_kd = "case";
+  if(len(ms_ex) == 0 && ms_lt_quiet(ms_rs) == 1) {
+    ms_kd = "silent";
+  }
+  if(len(ms_ex) > 0 && len(ms_rs) == 0 && str_replace(ms_ag, " ", "") == str_replace(ms_ex, " ", "")) {
+    ms_kd = "echo";
+  }
+} chain (string ms_ag, string ms_ex, string ms_rs, int ms_vd, int ms_ef) {
+  if(len(ms_ex) == 0 && len(ms_rs) == 0 && (ms_vd == 0 || ms_ef == 1)) {
+    ms_kd = "bare";
+  }
+} return string ms_kd;
+("1", "", "then prints:(\"\")", 1, 1):("silent")
+("1", "", "then prints:(\"\") then calls g:[1]", 1, 1):("case")
+("1, 2", "1,2", "", 0, 1):("echo")
+("1", "2", "", 0, 1):("case")
+("", "", "", 1, 1):("bare")
+("", "", "", 1, 0):("case")
+("", "", "", 0, 0):("bare")
+("1", "1", "then count:(2)", 0, 1):("case")

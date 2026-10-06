@@ -1,0 +1,51 @@
+// Reading a run's results back: every shard's file in the out directory,
+// merged, with one row per mutant.
+
+// The results files of the out directory ms_out (r-I-of-N.tsv), by name, in
+// name order.
+ms_rp_files(string ms_out) {
+  string[] ms_nms = exec_ls(ms_out);
+  string[] ms_fl = [];
+  int ms_i = 0;
+} chain (string ms_out) {
+  while(ms_i < len(ms_nms)) {
+    if(str_starts(ms_nms[ms_i], "r-") == 1 && str_ends(ms_nms[ms_i], ".tsv") == 1) {
+      push(ms_fl, ms_nms[ms_i]);
+    }
+    ms_i = ms_i + 1;
+  }
+  string[] ms_so = ord_by_strs(ms_fl, ord_strs(ms_fl));
+} return string[] ms_so;
+given ms_t_tree given ms_t_wrs ((import ms_t_work)):(["r-0-of-2.tsv", "r-1-of-2.tsv"])
+("/no/such/dir_ms"):([])
+
+// Adds the result line ms_rl to ms_rows, in place of the line already there
+// for the same mutant (ms_ks holds each row's key); a line that is not a
+// result is dropped.
+ms_rp_one(string[] ms_rows, string[] ms_ks, string ms_rl) {
+  string ms_ky = ms_dr_key(ms_rl);
+  int ms_at = lst_str_index(ms_ks, ms_ky);
+  if(len(ms_ky) > 0 && ms_at < 0) {
+    push(ms_ks, ms_ky);
+    push(ms_rows, ms_rl);
+  }
+} chain (string[] ms_rows, string[] ms_ks, string ms_rl) {
+  if(len(ms_ky) > 0 && ms_at >= 0) {
+    ms_rows[ms_at] = ms_rl;
+  }
+} return void;
+(["a"], ["k"], "junk"):(["a"], ["k"])
+(["a"], ["k"], "killed\t1\tf.id\tg\t1\t2\tcmp\t<\tx"):(["a", "killed\t1\tf.id\tg\t1\t2\tcmp\t<\tx"], ["k", "f.id\tg\t1\t2\tcmp\t<"])
+(["old"], ["f.id\tg\t1\t2\tcmp\t<"], "survived\t1\tf.id\tg\t1\t2\tcmp\t<\tx"):(["survived\t1\tf.id\tg\t1\t2\tcmp\t<\tx"], ["f.id\tg\t1\t2\tcmp\t<"])
+
+// Adds every result line of the file ms_pa to ms_rows (see ms_rp_one).
+ms_rp_add(string[] ms_rows, string[] ms_ks, string ms_pa) {
+  string[] ms_lns = str_lines(fs_read_text(ms_pa));
+  int ms_i = 0;
+  while(ms_i < len(ms_lns)) {
+    ms_rp_one(ms_rows, ms_ks, ms_lns[ms_i]);
+    ms_i = ms_i + 1;
+  }
+} return void;
+given ms_t_tree given ms_t_wrs ([], [], (import ms_t_r0)):(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz  =>  w", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq;  =>  "], ["a.id\tf\t3\t4\tcmp\t<=", "a.id\tf\t6\t7\tlit\t2", "a.id\tg\t1\t2\tdel\t"])
+([], [], "/no/such/file_ms"):([], [])

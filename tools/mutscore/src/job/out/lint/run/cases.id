@@ -1,0 +1,46 @@
+// The test cases under a function, found in the source text.
+
+// Where the cases of function ms_k of ms_fs end: where the next function's
+// name begins, or the end of the text.
+ms_lt_end(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
+  int ms_zz = len(ms_s);
+  if(4 * (ms_k + 1) < len(ms_fs)) {
+    ms_zz = ms_tk_get(ms_tk, ms_fs[4 * ms_k + 4], 1);
+  }
+} return int ms_zz;
+given ms_t_lex("f() {\n} return void;\n(1):()\ng() {\n} return void;") ("f() {\n} return void;\n(1):()\ng() {\n} return void;", (import ms_t_tk), [0, 4, 5, 7, 14, 18, 19, 21], 0):(28)
+given ms_t_lex("f() {\n} return void;\n(1):()\ng() {\n} return void;") ("f() {\n} return void;\n(1):()\ng() {\n} return void;", (import ms_t_tk), [0, 4, 5, 7, 14, 18, 19, 21], 1):(48)
+
+// The lines under function ms_k that are test cases, as "LINE" and the line's
+// text, tab-separated: everything between its return clause and the next
+// function that is neither blank nor a comment.
+ms_lt_cases(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
+  int ms_a = ms_tk_get(ms_tk, ms_fs[4 * ms_k + 3], 2);
+  int ms_zz = ms_lt_end(ms_s, ms_tk, ms_fs, ms_k);
+  string[] ms_lns = str_split(str_slice(ms_s, ms_a, ms_zz - ms_a), "\n");
+} chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
+  int ms_ln0 = ms_df_ln(ms_s, ms_a - 1);
+  string[] ms_o = [];
+  int ms_i = 0;
+} chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
+  while(ms_i < len(ms_lns)) {
+    lst_str_extend(ms_o, ms_lt_pick(ms_lns[ms_i], ms_ln0 + ms_i));
+    ms_i = ms_i + 1;
+  }
+} return string[] ms_o;
+
+given ms_t_lex("f() {\n} return void;\n(1):()\n\n// note\n(2):()\ng() {\n} return void;") ("f() {\n} return void;\n(1):()\n\n// note\n(2):()\ng() {\n} return void;", (import ms_t_tk), [0, 4, 5, 7, 20, 24, 25, 27], 0):(["3\t(1):()", "6\t(2):()"])
+given ms_t_lex("f() {\n} return void;\n(1):()\n\n// note\n(2):()\ng() {\n} return void;") ("f() {\n} return void;\n(1):()\n\n// note\n(2):()\ng() {\n} return void;", (import ms_t_tk), [0, 4, 5, 7, 20, 24, 25, 27], 1):([])
+
+// ["LINE\ttext"] for the line ms_tx (number ms_no) when it can be a case
+// (it is not blank and not a comment), [] otherwise.
+ms_lt_pick(string ms_tx, int ms_no) {
+  string ms_tt = str_trim(ms_tx);
+  string[] ms_o = [];
+  if(len(ms_tt) > 0 && str_starts(ms_tt, "//") == 0) {
+    push(ms_o, "" + ms_no + "\t" + ms_tt);
+  }
+} return string[] ms_o;
+("  (1):(2) ", 7):(["7\t(1):(2)"])
+("   ", 7):([])
+("// (1):(2)", 7):([])

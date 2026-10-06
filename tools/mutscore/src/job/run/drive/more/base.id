@@ -1,0 +1,49 @@
+// Is the unmutated copy green? Every verdict about a mutant assumes it is.
+
+// What the output ms_ot of ms_rn_run (exit status, newline, text) says:
+// the class of ms_rn_class.
+ms_dr_cls(string ms_ot) {
+  int ms_nl = str_find(ms_ot, "\n");
+  string ms_tx = str_slice(ms_ot, ms_nl + 1, len(ms_ot) - ms_nl - 1);
+  int ms_rc = to_int(str_slice(ms_ot, 0, ms_nl));
+} chain (string ms_ot) {
+  string ms_st = ms_rn_class(ms_tx, ms_rc);
+} return string ms_st;
+("0\n"):("survived")
+("1\nx.id:3: test failed: f\n"):("killed")
+("-2\n"):("timeout")
+("1\nboom\n"):("error")
+
+// Builds the unmutated copy (at most ms_ms milliseconds). Green: writes the
+// key ms_ky to the marker ms_mk and answers 1. Still running: answers 2.
+// Otherwise answers 0 and keeps the output in base.log beside the marker.
+ms_dr_try(string[] ms_cf, string ms_ky, string ms_mk, int ms_ms) {
+  string ms_ot = ms_rn_run(ms_cf, ms_ms);
+  string ms_st = ms_dr_cls(ms_ot);
+  int ms_v = (ms_st == "survived") + 2 * (ms_st == "timeout");
+} chain (string[] ms_cf, string ms_ky, string ms_mk, int ms_ms) {
+  if(ms_v == 1) {
+    exec_file_put(ms_mk, ms_ky, 420);
+  }
+  if(ms_v == 0) {
+    exec_file_put(path_join(ms_cf[(import ms_cf_out)], "base.log"), ms_ot, 420);
+  }
+} return int ms_v;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nexit 0\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", (import ms_t_log), 20000):(1) then ms_t_logtxt:("K")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", (import ms_t_log), 20000):(0) then ms_t_logtxt:("")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nsleep 5\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", (import ms_t_log), 100):(2)
+
+// 1 when the unmutated copy builds and passes its cases, 0 when it does not,
+// 2 when it has not finished within ms_ms milliseconds (the cases it did finish are
+// cached, so running again continues). A green copy is remembered in the out
+// directory under the key ms_ky, which names the source, so the next run of
+// the same source does not build it again.
+ms_dr_base(string[] ms_cf, string ms_ky, int ms_ms) {
+  string ms_mk = path_join(ms_cf[(import ms_cf_out)], "base.ok");
+  int ms_v = 1;
+  if(fs_read_text(ms_mk) != ms_ky) {
+    ms_v = ms_dr_try(ms_cf, ms_ky, ms_mk, ms_ms);
+  }
+} return int ms_v;
+given ms_t_tree given ms_t_wmk ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", 20000):(1)
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", 20000):(0)

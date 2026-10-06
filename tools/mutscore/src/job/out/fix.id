@@ -1,0 +1,28 @@
+// Fixtures for the cases of the report: a work directory holding two shards'
+// results and a file that is not one.
+
+// Setup: writes r-0-of-2.tsv (a.id: f killed once and survived once, g
+// invalid), r-1-of-2.tsv (b.id: h killed, survived, timed out) and notes.txt
+// into the work directory.
+ms_t_wrs() {
+  int ms_n = exec_file_put((import ms_t_work) + "/r-0-of-2.tsv", "killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t6\t7\tlit\t2\tz  =>  w\ninvalid\t7\ta.id\tg\t1\t2\tdel\t\tq;  =>  \n", 420);
+  int ms_m = exec_file_put((import ms_t_work) + "/r-1-of-2.tsv", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm\nsurvived\t4\tb.id\th\t3\t4\tarith\t+\tn\ntimeout\t1\tb.id\th\t5\t6\tret0\t0\to\n", 420);
+  int ms_k = exec_file_put((import ms_t_work) + "/notes.txt", "r-x\n", 420);
+} return void;
+given ms_t_tree ():() then ms_t_wn:(3)
+given ms_t_tree ():() then ms_t_wn:(3) then ms_t_ns:(3)
+
+// Test check: how many entries the work directory holds (exec_ls ends its list
+// with an empty name).
+ms_t_wn() {
+  int ms_c = len(exec_ls((import ms_t_work))) - 1;
+} return int ms_c;
+given ms_t_tree ():(0)
+given ms_t_tree given ms_t_wrs ():(3)
+
+// Test check: what the first shard's results file holds, tabs shown as ~.
+ms_t_rtxt() {
+  string ms_q = str_replace(fs_read_text((import ms_t_r0)), "\t", "~");
+} return string ms_q;
+given ms_t_tree ():("")
+given ms_t_tree given ms_t_wrs ():("killed~2~a.id~f~3~4~cmp~<=~x  =>  y\nsurvived~5~a.id~f~6~7~lit~2~z  =>  w\ninvalid~7~a.id~g~1~2~del~~q;  =>  \n")

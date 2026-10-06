@@ -1,0 +1,27 @@
+// Matching brackets in a token list.
+
+// +1 for a token that opens a bracket, -1 for one that closes it, 0 otherwise.
+ms_fn_dep(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_c = ms_tk_ch(ms_s, ms_tk, ms_t);
+  int ms_d = (ms_c == 40 || ms_c == 123 || ms_c == 91) - (ms_c == 41 || ms_c == 125 || ms_c == 93);
+} return int ms_d;
+("(a)", [4, 0, 1, 0, 1, 2, 4, 2, 3], 0):(1)
+("(a)", [4, 0, 1, 0, 1, 2, 4, 2, 3], 1):(0)
+("(a)", [4, 0, 1, 0, 1, 2, 4, 2, 3], 2):(-1)
+("]", [4, 0, 1], 0):(-1)
+
+// The index of the token that closes the bracket opened by token ms_t; ms_t
+// itself when it opens nothing, the last token when the bracket never closes.
+ms_fn_close(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_d = ms_fn_dep(ms_s, ms_tk, ms_t);
+  int ms_u = ms_t;
+  while(3 * (ms_u + 1) < len(ms_tk) && ms_d > 0) {
+    ms_u = ms_u + 1;
+    ms_d = ms_d + ms_fn_dep(ms_s, ms_tk, ms_u);
+  }
+} return int ms_u;
+("(a)", [4, 0, 1, 0, 1, 2, 4, 2, 3], 0):(2)
+("{(a)}", [4, 0, 1, 4, 1, 2, 0, 2, 3, 4, 3, 4, 4, 4, 5], 0):(4)
+("{(a)}", [4, 0, 1, 4, 1, 2, 0, 2, 3, 4, 3, 4, 4, 4, 5], 1):(3)
+("a", [0, 0, 1], 0):(0)
+("(a", [4, 0, 1, 0, 1, 2], 0):(1)

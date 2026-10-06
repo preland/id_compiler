@@ -1,0 +1,23 @@
+// Checks on the scratch copy the fixture's cases build.
+
+// What sib/x.txt reads as through the work directory ("" while nothing links
+// it there).
+ms_t_sib() {
+  string ms_q = fs_read_text((import ms_t_work) + "/sib/x.txt");
+} return string ms_q;
+given ms_t_tree ():("")
+given ms_t_tree given ms_t_wsib ():("sib\n")
+
+// Setup: links the fixture's sibling into the work directory.
+ms_t_wsib() {
+  int ms_rc = ms_rn_link((import ms_t_root), "sib", (import ms_t_work));
+} return void;
+given ms_t_tree ():() then ms_t_sib:("sib\n")
+given ms_t_tree ():() then ms_t_sib:("sib\n") then ms_t_ns:(3)
+
+// What the copy's src/a.id reads as in the work directory.
+ms_t_cpa() {
+  string ms_q = fs_read_text((import ms_t_work) + "/" + path_base((import ms_t_root)) + "/src/a.id");
+} return string ms_q;
+given ms_t_tree ():("")
+given ms_t_tree given ms_t_wcp ():("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")

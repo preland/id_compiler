@@ -1,0 +1,43 @@
+// Every mutant of a source file, as one tab-separated line each: the file's
+// path, the function, then the row of src/gen (start, end, operator,
+// replacement).
+
+// Each row of ms_rows with ms_pre in front.
+ms_en_tag(string[] ms_rows, string ms_pre) {
+  string[] ms_o = [];
+  int ms_i = 0;
+  while(ms_i < len(ms_rows)) {
+    push(ms_o, ms_pre + ms_rows[ms_i]);
+    ms_i = ms_i + 1;
+  }
+} return string[] ms_o;
+(["1\t2\tcmp\t<="], "a.id\tf\t"):(["a.id\tf\t1\t2\tcmp\t<="])
+([], "x"):([])
+(["a", "b"], "-"):(["-a", "-b"])
+
+// The lines for the function that record ms_k of ms_fs describes.
+ms_en_rec(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k, string ms_rel) {
+  int ms_b = 4 * ms_k;
+  string ms_nm = ms_tk_str(ms_s, ms_tk, ms_fs[ms_b]);
+  string[] ms_rows = ms_mu_fn(ms_s, ms_tk, ms_fs[ms_b + 1], ms_fs[ms_b + 2], ms_fs[ms_b + 3]);
+} chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k, string ms_rel) {
+  string[] ms_o = ms_en_tag(ms_rows, ms_rel + "\t" + ms_nm + "\t");
+} return string[] ms_o;
+given ms_t_lex("f(a) {\n a = a + 1;\n} return int a;") ("f(a) {\n a = a + 1;\n} return int a;", (import ms_t_tk), [0, 5, 12, 15], 0, "x.id"):(["x.id\tf\t14\t15\tarith\t-", "x.id\tf\t16\t17\tlit\t2", "x.id\tf\t8\t18\tdel\t", "x.id\tf\t32\t33\tret0\t0", "x.id\tf\t32\t33\tret1\t1"])
+given ms_t_lex("f(a) {\n} return void;\ng(a) {\n a = a - 1;\n} return void;") ("f(a) {\n} return void;\ng(a) {\n a = a - 1;\n} return void;", (import ms_t_tk), [0, 5, 6, 8, 9, 14, 21, 23], 1, "y.id"):(["y.id\tg\t36\t37\tarith\t+", "y.id\tg\t38\t39\tlit\t2", "y.id\tg\t30\t40\tdel\t"])
+
+// Every mutant line of the file ms_rel under ms_root.
+ms_en_file(string ms_root, string ms_rel) {
+  string ms_s = fs_read_text(path_join(ms_root, ms_rel));
+  int[] ms_tk = ms_lex(ms_s);
+  int[] ms_fs = ms_fn_scan(ms_s, ms_tk);
+} chain (string ms_root, string ms_rel) {
+  string[] ms_o = [];
+  int ms_k = 0;
+  while(4 * ms_k < len(ms_fs)) {
+    lst_str_extend(ms_o, ms_en_rec(ms_s, ms_tk, ms_fs, ms_k, ms_rel));
+    ms_k = ms_k + 1;
+  }
+} return string[] ms_o;
+given ms_t_tree ((import ms_t_root), "src/a.id"):(["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0", "src/a.id\tadd\t50\t51\tret1\t1"])
+given ms_t_tree ((import ms_t_root), "src/b.txt"):([])

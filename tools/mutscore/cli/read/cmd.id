@@ -1,0 +1,47 @@
+// The commands that only read: report, lint and list.
+
+// Prints the report of the results in the out directory ms_out, to read or
+// (ms_tab 1) in tabs. Answers 0, or 1 when there are no results.
+ms_cm_report(string ms_out, int ms_tab) {
+  string[] ms_rows = ms_rp_rows(ms_out);
+  int ms_rc = 1;
+  if(len(ms_rows) == 0) {
+    eprint("mutscore: no results in " + ms_out + "; run 'mutscore run ROOT --out " + ms_out + " --idc IDC' first");
+  }
+} chain (string ms_out, int ms_tab) {
+  if(len(ms_rows) > 0 && ms_tab == 0) {
+    put(ms_rp_text(ms_rows));
+    ms_rc = 0;
+  }
+  if(len(ms_rows) > 0 && ms_tab == 1) {
+    put(ms_rp_tsv(ms_rows));
+    ms_rc = 0;
+  }
+} return int ms_rc;
+("/no/such/dir_ms", 0):(1) then eprints:("mutscore: no results in /no/such/dir_ms; run 'mutscore run ROOT --out /no/such/dir_ms --idc IDC' first\n")
+("/no/such/dir_ms", 1):(1) then eprints:("mutscore: no results in /no/such/dir_ms; run 'mutscore run ROOT --out /no/such/dir_ms --idc IDC' first\n")
+
+// Prints the lint of the test cases under ms_root (the area ms_ar), to read or
+// (ms_tab 1) in tabs. Answers 0.
+ms_cm_lint(string ms_root, string ms_ar, int ms_tab) {
+  string ms_lx = ms_lt_tree(ms_root, ms_ar);
+  put(ms_lt_say(ms_lx, ms_tab));
+} return int 0;
+given ms_t_tree ((import ms_t_root), "", 0):(0) then prints:("lint: 2 cases in 1 functions; silent 0, echo 0, bare 0\n")
+given ms_t_tree ((import ms_t_root), "lib/", 1):(0) then prints:("#lint: shape file fn line case\n#summary: cases functions silent echo bare\nsummary\t0\t0\t0\t0\t0\n")
+
+// Prints how many mutants ms_root (the area ms_ar) has, in all and for each
+// operator. Answers 0.
+ms_cm_list(string ms_root, string ms_ar) {
+  string[] ms_al = ms_en_all(ms_root, ms_ar);
+  string ms_ls1 = "mutscore: " + len(ms_al) + " mutants\n";
+  int ms_i = 0;
+} chain (string ms_root, string ms_ar) {
+  while(ms_i < len((import ms_op_names))) {
+    ms_ls1 = ms_ls1 + "  " + (import ms_op_names)[ms_i] + " " + ms_cm_nop(ms_al, (import ms_op_names)[ms_i]) + "\n";
+    ms_i = ms_i + 1;
+  }
+  put(ms_ls1);
+} return int 0;
+given ms_t_tree ((import ms_t_root), ""):(0) then prints:("mutscore: 3 mutants\n  cmp 0\n  arith 1\n  logic 0\n  lit 0\n  idx 0\n  del 0\n  ret0 1\n  ret1 1\n")
+given ms_t_tree ((import ms_t_root), "lib/"):(0) then prints:("mutscore: 0 mutants\n  cmp 0\n  arith 0\n  logic 0\n  lit 0\n  idx 0\n  del 0\n  ret0 0\n  ret1 0\n")

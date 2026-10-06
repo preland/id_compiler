@@ -1,0 +1,27 @@
+// The settings of a `run`, read off the command line.
+
+// ms_val, or ms_dflt when it is empty.
+ms_cl_or(string ms_val, string ms_dflt) {
+  string ms_r2 = ms_val;
+  if(len(ms_val) == 0) {
+    ms_r2 = ms_dflt;
+  }
+} return string ms_r2;
+("x", "d"):("x")
+("", "d"):("d")
+
+// The run's list of strings (the slots named ms_cf_* in conf.id) for the
+// command line ms_av, relative paths taken from ms_wd: the root and the out
+// directory made absolute, the area, the idc command, "1" in the library slot
+// for --std, the siblings to link, the shard and the budget with their
+// defaults. The slots for the scratch directory stay empty.
+ms_cm_cfg(string[] ms_av, string ms_wd) {
+  string ms_std = str_slice("1", 0, ms_cl_has(ms_av, "--std"));
+  string ms_idc = ms_cl_or(ms_cl_arg(ms_av, "--idc"), "idc");
+  string ms_shd = ms_cl_or(ms_cl_arg(ms_av, "--shard"), "0/1");
+} chain (string[] ms_av, string ms_wd) {
+  string ms_bud = ms_cl_or(ms_cl_arg(ms_av, "--budget"), "40");
+  string[] ms_cf = [ms_cl_abs(ms_av[2], ms_wd), ms_cl_arg(ms_av, "--area"), ms_idc, ms_cl_abs(ms_cl_arg(ms_av, "--out"), ms_wd), "", "", ms_std, "", ms_cl_arg(ms_av, "--with"), ms_shd, ms_bud];
+} return string[] ms_cf;
+(["m", "run", "word", "--out", "o", "--idc", "/i", "--area", "a/", "--with", "editor"], "/w"):(["/w/word", "a/", "/i", "/w/o", "", "", "", "", "editor", "0/1", "40"])
+(["m", "run", "/r/", "--out", "/o", "--std", "--shard", "1/4", "--budget", "9"], "/w"):(["/r", "", "idc", "/o", "", "", "1", "", "", "1/4", "9"])

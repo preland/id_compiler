@@ -1,0 +1,27 @@
+// What a mutant looks like to a person: the line it is on and the line it
+// makes.
+
+// The 1-based line number of byte offset ms_off in ms_s.
+ms_df_ln(string ms_s, int ms_off) {
+  int ms_i = 0;
+  int ms_n = 1;
+  while(ms_i < ms_off) {
+    ms_n = ms_n + (charat(ms_s, ms_i) == 10);
+    ms_i = ms_i + 1;
+  }
+} return int ms_n;
+("ab\ncd\nef", 0):(1)
+("ab\ncd\nef", 3):(2)
+("ab\ncd\nef", 7):(3)
+("ab\ncd\nef", 2):(1)
+
+// The offset where the line holding byte ms_a starts.
+ms_df_bol(string ms_s, int ms_a) {
+  while(ms_a > 0 && charat(ms_s, ms_a - 1) != 10) {
+    ms_a = ms_a - 1;
+  }
+} return int ms_a;
+("ab\ncd", 4):(3)
+("ab\ncd", 3):(3)
+("ab\ncd", 1):(0)
+

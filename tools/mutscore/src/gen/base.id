@@ -1,0 +1,35 @@
+// A mutant is one text row: START, END (byte offsets of the span it
+// replaces), the operator's name and the replacement, separated by tabs.
+
+// The row that replaces tokens ms_a through ms_b (inclusive) with ms_rp.
+ms_mu_row(string ms_s, int[] ms_tk, int ms_a, int ms_b, string ms_op, string ms_rp) {
+  string ms_row = "" + ms_tk_get(ms_tk, ms_a, 1) + "\t" + ms_tk_get(ms_tk, ms_b, 2) + "\t" + ms_op + "\t" + ms_rp;
+} return string ms_row;
+("a+b", [0, 0, 1, 4, 1, 2, 0, 2, 3], 1, 1, "arith", "-"):("1\t2\tarith\t-")
+("a+b", [0, 0, 1, 4, 1, 2, 0, 2, 3], 0, 2, "del", ""):("0\t3\tdel\t")
+
+// The rows ms_fv answers for each token index from ms_a up to, not
+// including, ms_b, in order.
+ms_mu_each(string ms_s, int[] ms_tk, int ms_a, int ms_b, func(string, int[], int) return string[] ms_fv) {
+  string[] ms_o = [];
+  while(ms_a < ms_b) {
+    lst_str_extend(ms_o, ms_fv(ms_s, ms_tk, ms_a));
+    ms_a = ms_a + 1;
+  }
+} return string[] ms_o;
+("a<b+c", [0, 0, 1, 4, 1, 2, 0, 2, 3, 4, 3, 4, 0, 4, 5], 0, 5, ms_st_swap):(["1\t2\tcmp\t<=", "3\t4\tarith\t-"])
+("a<b+c", [0, 0, 1, 4, 1, 2, 0, 2, 3, 4, 3, 4, 0, 4, 5], 2, 3, ms_st_swap):([])
+
+// Every mutant row of one function: its body is tokens ms_bo up to ms_rt
+// (the `return`), and its return clause ends at token ms_en. Operator swaps
+// come first, then literals, indexes, statement deletions and return values.
+ms_mu_fn(string ms_s, int[] ms_tk, int ms_bo, int ms_rt, int ms_en) {
+  string[] ms_o = ms_mu_each(ms_s, ms_tk, ms_bo, ms_rt, ms_st_swap);
+  lst_str_extend(ms_o, ms_mu_each(ms_s, ms_tk, ms_bo, ms_rt, ms_st_lit));
+  lst_str_extend(ms_o, ms_mu_each(ms_s, ms_tk, ms_bo, ms_rt, ms_st_idx));
+} chain (string ms_s, int[] ms_tk, int ms_bo, int ms_rt, int ms_en) {
+  lst_str_extend(ms_o, ms_mu_each(ms_s, ms_tk, ms_bo, ms_rt, ms_st_del));
+  lst_str_extend(ms_o, ms_mu_ret(ms_s, ms_tk, ms_rt, ms_en));
+} return string[] ms_o;
+given ms_t_lex("f(a) {\n a = a + 1;\n} return int a;") ("f(a) {\n a = a + 1;\n} return int a;", (import ms_t_tk), 5, 12, 15):(["14\t15\tarith\t-", "16\t17\tlit\t2", "8\t18\tdel\t", "32\t33\tret0\t0", "32\t33\tret1\t1"])
+given ms_t_lex("f(a) {\n a[0] = 1;\n} return void;") ("f(a) {\n a[0] = 1;\n} return void;", (import ms_t_tk), 5, 14, 16):(["10\t11\tlit\t1", "15\t16\tlit\t2", "11\t12\tidx\t + 1]", "8\t17\tdel\t"])

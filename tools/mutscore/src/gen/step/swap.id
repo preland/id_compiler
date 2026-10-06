@@ -1,0 +1,57 @@
+// Mutants of a single token: an operator for its neighbour, a literal for the
+// next one.
+
+// The row swapping the operator at token ms_t for its counterpart in the
+// ms_sw tables, when it has one.
+ms_st_swap(string ms_s, int[] ms_tk, int ms_t) {
+  string[] ms_o = [];
+  int ms_i = lst_str_index((import ms_sw_from), ms_tk_str(ms_s, ms_tk, ms_t));
+  if(ms_i >= 0) {
+    push(ms_o, ms_mu_row(ms_s, ms_tk, ms_t, ms_t, (import ms_sw_op)[ms_i], (import ms_sw_to)[ms_i]));
+  }
+} return string[] ms_o;
+("a<b", [0, 0, 1, 4, 1, 2, 0, 2, 3], 1):(["1\t2\tcmp\t<="])
+("a&&b", [0, 0, 1, 4, 1, 3, 0, 3, 4], 1):(["1\t3\tlogic\t||"])
+("a>>b", [0, 0, 1, 4, 1, 3, 0, 3, 4], 1):(["1\t3\tarith\t<<"])
+("a+b", [0, 0, 1, 4, 1, 2, 0, 2, 3], 0):([])
+("\"+\"", [3, 0, 3], 0):([])
+
+// The decimal float spelled ms_q with its last digit, or its exponent, one
+// higher.
+ms_mu_flt(string ms_q) {
+  int ms_p = str_find(ms_q, "e") + str_find(ms_q, "E") + 1;
+  int ms_n = len(ms_q);
+  string ms_y = str_slice(ms_q, 0, ms_n - 1) + (charat(ms_q, ms_n - 1) - 47) % 10;
+} chain (string ms_q) {
+  if(ms_p >= 0) {
+    ms_y = str_slice(ms_q, 0, ms_p + 1) + (to_int(str_slice(ms_q, ms_p + 1, ms_n - ms_p - 1)) + 1);
+  }
+} return string ms_y;
+("2.5"):("2.6")
+("0.9"):("0.0")
+("1e-30"):("1e-29")
+("2E4"):("2E5")
+
+// The row that makes the number at token ms_t one higher (an integer, not a
+// 0x or 0b one) or one decimal place different (a float).
+ms_st_lit(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_k = ms_tk_get(ms_tk, ms_t, 0);
+  string ms_q = ms_tk_str(ms_s, ms_tk, ms_t);
+  string ms_y = "";
+} chain (string ms_s, int[] ms_tk, int ms_t) {
+  if(ms_k == (import ms_k_int) && ms_lx_radix(ms_q, 0) == 0) {
+    ms_y = "" + (to_int(ms_q) + 1);
+  }
+  if(ms_k == (import ms_k_flt)) {
+    ms_y = ms_mu_flt(ms_q);
+  }
+  string[] ms_o = [];
+} chain (string ms_s, int[] ms_tk, int ms_t) {
+  if(len(ms_y) > 0) {
+    push(ms_o, ms_mu_row(ms_s, ms_tk, ms_t, ms_t, "lit", ms_y));
+  }
+} return string[] ms_o;
+("a=7", [0, 0, 1, 4, 1, 2, 1, 2, 3], 2):(["2\t3\tlit\t8"])
+("x=1e-30", [0, 0, 1, 4, 1, 2, 2, 2, 7], 2):(["2\t7\tlit\t1e-29"])
+("0x1f", [1, 0, 4], 0):([])
+("a", [0, 0, 1], 0):([])

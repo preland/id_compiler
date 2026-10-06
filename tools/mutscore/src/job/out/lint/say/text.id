@@ -1,0 +1,45 @@
+// The lint report: the flagged cases, and how many cases there are.
+
+// The row ms_rw in the form to read, file:line: function: shape: case, when
+// its shape is not "case"; "" otherwise.
+ms_lt_one(string ms_rw) {
+  string[] ms_fd = str_split(ms_rw, "\t");
+  string ms_ln = "";
+  if(len(ms_fd) >= 5 && ms_fd[0] != "case") {
+    ms_ln = ms_fd[1] + ":" + ms_fd[3] + ": " + ms_fd[2] + ": " + ms_fd[0] + ": " + ms_fd[4] + "\n";
+  }
+} return string ms_ln;
+("bare\ta.id\tf\t4\t(1):()"):("a.id:4: f: bare: (1):()\n")
+("case\ta.id\tf\t4\t(1):(2)"):("")
+("junk"):("")
+
+// The flagged rows of ms_lr in the form to read, in order.
+ms_lt_flag(string[] ms_lr) {
+  string ms_fx = "";
+  int ms_i = 0;
+  while(ms_i < len(ms_lr)) {
+    ms_fx = ms_fx + ms_lt_one(ms_lr[ms_i]);
+    ms_i = ms_i + 1;
+  }
+} return string ms_fx;
+(["case\ta.id\tf\t1\tx", "echo\ta.id\tf\t2\t(1):(1)", "silent\tb.id\tg\t3\t():() then prints:(\"\")"]):("a.id:2: f: echo: (1):(1)\nb.id:3: g: silent: ():() then prints:(\"\")\n")
+([]):("")
+
+// The lint report for the rows in ms_tx (one per line): in the form to read
+// (ms_tab 0) the flagged cases then a summary line; in tabs (ms_tab 1) two
+// comments naming the columns, every row, then a summary row.
+ms_lt_say(string ms_tx, int ms_tab) {
+  string[] ms_lr = ms_lt_split(ms_tx);
+  int[] ms_sm = ms_lt_sum(ms_lr);
+  string ms_rp = "";
+} chain (string ms_tx, int ms_tab) {
+  if(ms_tab == 0) {
+    ms_rp = ms_lt_flag(ms_lr) + "lint: " + ms_sm[0] + " cases in " + ms_sm[1] + " functions; silent " + ms_sm[2] + ", echo " + ms_sm[3] + ", bare " + ms_sm[4] + "\n";
+  }
+  if(ms_tab == 1) {
+    ms_rp = "#lint: shape file fn line case\n#summary: cases functions silent echo bare\n" + ms_tx + "summary\t" + ms_sm[0] + "\t" + ms_sm[1] + "\t" + ms_sm[2] + "\t" + ms_sm[3] + "\t" + ms_sm[4] + "\n";
+  }
+} return string ms_rp;
+("bare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\n", 0):("a.id:4: f: bare: (1):()\nlint: 2 cases in 1 functions; silent 0, echo 0, bare 1\n")
+("bare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\n", 1):("#lint: shape file fn line case\n#summary: cases functions silent echo bare\nbare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\nsummary\t2\t1\t0\t0\t1\n")
+("", 0):("lint: 0 cases in 0 functions; silent 0, echo 0, bare 0\n")

@@ -1,0 +1,29 @@
+// Running a shard.
+
+// The siblings of the root to link beside its copy: the comma-separated names
+// in the run's "with" slot.
+ms_cm_wi(string[] ms_cf) {
+  string[] ms_wi = [];
+  if(len(ms_cf[(import ms_cf_with)]) > 0) {
+    ms_wi = str_split(ms_cf[(import ms_cf_with)], ",");
+  }
+} return string[] ms_wi;
+(["", "", "", "", "", "", "", "", "", "", ""]):([])
+(["", "", "", "", "", "", "", "", "editor,idstd", "", ""]):(["editor", "idstd"])
+
+// The key that names the source being mutated: how many mutants it has and a
+// hash of all of them. The baseline marker holds it, so a changed source is
+// built again.
+ms_cm_key(string[] ms_al) {
+  string ms_jn = str_join(ms_al, "\n");
+  string ms_ky = "" + len(ms_al) + ":" + str_hash(ms_jn);
+} return string ms_ky;
+(["a\tf\t1\t2\tcmp\t<"]):("1:2090518854")
+(["a\tf\t1\t2\tcmp\t<", "a\tf\t3\t4\tcmp\t<="]):("2:1016490036")
+
+// The path of shard ms_sh's results file in the out directory.
+ms_cm_pa(string[] ms_cf, int[] ms_sh) {
+  string ms_pa = path_join(ms_cf[(import ms_cf_out)], "r-" + ms_sh[0] + "-of-" + ms_sh[1] + ".tsv");
+} return string ms_pa;
+(["", "", "", "/o", "", "", "", "", "", "", ""], [1, 4]):("/o/r-1-of-4.tsv")
+(["", "", "", "/o/", "", "", "", "", "", "", ""], [0, 1]):("/o/r-0-of-1.tsv")

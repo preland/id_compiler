@@ -1,0 +1,10 @@
+// A function whose cases leave a gap, for tests/run.sh's `mutscore` section:
+// 10 is above the line and 3 below it, but nothing pins where the line is, so
+// moving it from > 9 to >= 9 goes unnoticed. The other three mutants (the line
+// moved to 10, the result forced to 0, the result forced to 1) each fail a
+// case. Four mutants, three killed, one survived: a score of 75.0.
+big(int n) {
+  int r = n > 9;
+} return int r;
+(10):(1)
+(3):(0)

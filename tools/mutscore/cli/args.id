@@ -1,0 +1,38 @@
+// Reading the command line.
+
+// The word after ms_nm (such as "--out") in ms_av, "" when ms_nm is not there
+// or is the last word.
+ms_cl_arg(string[] ms_av, string ms_nm) {
+  int ms_at = lst_str_index(ms_av, ms_nm);
+  string ms_val = "";
+  if(ms_at >= 0 && ms_at + 1 < len(ms_av)) {
+    ms_val = ms_av[ms_at + 1];
+  }
+} return string ms_val;
+(["m", "run", "--out", "d", "--idc", "i"], "--out"):("d")
+(["m", "run", "--out", "d", "--idc", "i"], "--idc"):("i")
+(["m", "run", "--out"], "--out"):("")
+(["m", "run"], "--out"):("")
+
+// 1 when the word ms_nm (a flag such as "--tsv") is among ms_av.
+ms_cl_has(string[] ms_av, string ms_nm) {
+  int ms_h = lst_str_index(ms_av, ms_nm) >= 0;
+} return int ms_h;
+(["m", "--tsv"], "--tsv"):(1)
+(["m", "report"], "--tsv"):(0)
+
+// The absolute form of the path ms_pt (relative ones are taken from the
+// working directory ms_wd), without a trailing slash.
+ms_cl_abs(string ms_pt, string ms_wd) {
+  string ms_ap = ms_pt;
+  if(str_starts(ms_pt, "/") == 0) {
+    ms_ap = path_join(ms_wd, ms_pt);
+  }
+  if(len(ms_ap) > 1 && str_ends(ms_ap, "/") == 1) {
+    ms_ap = str_slice(ms_ap, 0, len(ms_ap) - 1);
+  }
+} return string ms_ap;
+("/a/b", "/w"):("/a/b")
+("word", "/w"):("/w/word")
+("/a/b/", "/w"):("/a/b")
+("/", "/w"):("/")

@@ -1,0 +1,57 @@
+// What kind of token starts at a position, and where it ends.
+
+// 1 when the two bytes at ms_i spell an operator of two characters.
+ms_lx_two(string ms_s, int ms_i) {
+  int ms_a = charat(ms_s, ms_i);
+  int ms_b = charat(ms_s, ms_i + 1);
+  int ms_t = (ms_b == 61 && (ms_a == 61 || ms_a == 33 || ms_a == 60 || ms_a == 62)) || (ms_a == ms_b && (ms_a == 38 || ms_a == 124 || ms_a == 60 || ms_a == 62));
+} return int ms_t;
+("<=", 0):(1)
+("&&", 0):(1)
+(">>", 0):(1)
+("=<", 0):(0)
+("&|", 0):(0)
+
+// The kind (ms_k_id and its neighbours in conf.id) of the token at ms_i.
+ms_lx_kind(string ms_s, int ms_i) {
+  int ms_c = charat(ms_s, ms_i);
+  int ms_k = (import ms_k_op);
+  if(chr_is_digit(ms_c) == 1) {
+    ms_k = (import ms_k_int) + (ms_lx_real(ms_s, ms_i) > ms_lx_digits(ms_s, ms_i));
+  }
+} chain (string ms_s, int ms_i) {
+  if(ms_c == 34) {
+    ms_k = (import ms_k_str);
+  }
+  if(chr_is_alpha(ms_c) == 1 || ms_c == 95) {
+    ms_k = (import ms_k_id);
+  }
+} return int ms_k;
+("ab", 0):(0)
+("12", 0):(1)
+("1.5", 0):(2)
+("1e-3", 0):(2)
+("0x1e", 0):(1)
+("\"s\"", 0):(3)
+("<=", 0):(4)
+
+// The end of the token at ms_i.
+ms_lx_end(string ms_s, int ms_i) {
+  int ms_k = ms_lx_kind(ms_s, ms_i);
+  int ms_e = ms_i + 1 + ms_lx_two(ms_s, ms_i);
+  if(ms_k == (import ms_k_id)) {
+    ms_e = ms_lx_word(ms_s, ms_i);
+  }
+} chain (string ms_s, int ms_i) {
+  if(ms_k == (import ms_k_int) || ms_k == (import ms_k_flt)) {
+    ms_e = ms_lx_num(ms_s, ms_i);
+  }
+  if(ms_k == (import ms_k_str)) {
+    ms_e = ms_lx_str(ms_s, ms_i);
+  }
+} return int ms_e;
+("abc d", 0):(3)
+("2.5e3 ", 0):(5)
+("\"a b\" c", 0):(5)
+("== 1", 0):(2)
+("; x", 0):(1)

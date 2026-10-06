@@ -1,0 +1,43 @@
+// Where a function's header ends, and where its return clause does.
+
+// The index of the `{` that opens the body when token ms_t is the name of a
+// function whose header is NAME ( ... ) {, otherwise -1.
+ms_fn_head(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_h = -1;
+  int ms_m = ms_fn_close(ms_s, ms_tk, ms_t + 1);
+  if(ms_tk_get(ms_tk, ms_t, 0) == (import ms_k_id) && ms_tk_ch(ms_s, ms_tk, ms_t + 1) == 40 && ms_tk_ch(ms_s, ms_tk, ms_m + 1) == 123) {
+    ms_h = ms_m + 1;
+  }
+} return int ms_h;
+given ms_t_lex("f(a) {}") ("f(a) {}", (import ms_t_tk), 0):(4)
+given ms_t_lex("f(a);") ("f(a);", (import ms_t_tk), 0):(-1)
+given ms_t_lex("x f") ("x f", (import ms_t_tk), 0):(-1)
+given ms_t_lex("(a) {}") ("(a) {}", (import ms_t_tk), 0):(-1)
+
+// The index of the `return` token that ends the function whose body closes at
+// token ms_c, stepping over `chain (...) {...}` continuations; -1 when what
+// follows is not a return clause.
+ms_fn_tail(string ms_s, int[] ms_tk, int ms_c) {
+  int ms_u = ms_c + 1;
+  while(ms_tk_is(ms_s, ms_tk, ms_u, "chain") == 1) {
+    ms_u = ms_fn_close(ms_s, ms_tk, ms_fn_close(ms_s, ms_tk, ms_u + 1) + 1) + 1;
+  }
+  int ms_r = -1;
+} chain (string ms_s, int[] ms_tk, int ms_c) {
+  if(ms_tk_is(ms_s, ms_tk, ms_u, "return") == 1) {
+    ms_r = ms_u;
+  }
+} return int ms_r;
+given ms_t_lex("} return") ("} return", (import ms_t_tk), 0):(1)
+given ms_t_lex("} chain () {} return") ("} chain () {} return", (import ms_t_tk), 0):(6)
+given ms_t_lex("} x") ("} x", (import ms_t_tk), 0):(-1)
+
+// The index of the first `;` at or after token ms_r.
+ms_fn_semi(string ms_s, int[] ms_tk, int ms_r) {
+  while(ms_tk_ch(ms_s, ms_tk, ms_r) != 59 && ms_tk_ch(ms_s, ms_tk, ms_r) != -1) {
+    ms_r = ms_r + 1;
+  }
+} return int ms_r;
+given ms_t_lex("a;b;") ("a;b;", (import ms_t_tk), 2):(3)
+given ms_t_lex("a;") ("a;", (import ms_t_tk), 0):(1)
+given ms_t_lex("a") ("a", (import ms_t_tk), 0):(1)

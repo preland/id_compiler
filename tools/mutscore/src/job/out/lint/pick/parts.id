@@ -1,0 +1,47 @@
+// Taking a test case apart: its arguments, its expected values and the rest
+// (the `then` clauses). A case is lexed like source, so a colon or a bracket
+// inside a string never counts.
+
+// The index of the first `:` outside every bracket in the tokens ms_tk of a
+// case line (the one between the arguments and the expected values), or the
+// number of tokens when there is none.
+ms_lt_colon(string ms_s, int[] ms_tk) {
+  int ms_d = 0;
+  int ms_t = 0;
+  while(3 * ms_t < len(ms_tk) && (ms_tk_ch(ms_s, ms_tk, ms_t) != 58 || ms_d != 0)) {
+    ms_d = ms_d + ms_fn_dep(ms_s, ms_tk, ms_t);
+    ms_t = ms_t + 1;
+  }
+} return int ms_t;
+given ms_t_lex("(1, [2]):(3)") ("(1, [2]):(3)", (import ms_t_tk)):(7)
+given ms_t_lex("given f(1) (2):(3)") ("given f(1) (2):(3)", (import ms_t_tk)):(8)
+given ms_t_lex("(\":\")") ("(\":\")", (import ms_t_tk)):(3)
+
+// The index of the `(` that the `)` at token ms_t closes.
+ms_lt_open(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_d = ms_fn_dep(ms_s, ms_tk, ms_t);
+  int ms_u = ms_t;
+  while(ms_u > 0 && ms_d < 0) {
+    ms_u = ms_u - 1;
+    ms_d = ms_d + ms_fn_dep(ms_s, ms_tk, ms_u);
+  }
+} return int ms_u;
+given ms_t_lex("f(1, (2))") ("f(1, (2))", (import ms_t_tk), 7):(1)
+given ms_t_lex("f(1, (2))") ("f(1, (2))", (import ms_t_tk), 6):(4)
+
+// The pieces of the test case on the line ms_ln: its arguments, its expected
+// values (each without its brackets) and everything after them, all trimmed.
+// [] for a line with no `:` between brackets.
+ms_lt_parts(string ms_ln) {
+  int[] ms_tk = ms_lex(ms_ln);
+  int ms_c = ms_lt_colon(ms_ln, ms_tk);
+  string[] ms_pcs = [];
+} chain (string ms_ln) {
+  if(3 * ms_c < len(ms_tk) && ms_c > 0) {
+    ms_pcs = ms_lt_cut(ms_ln, ms_tk, ms_c);
+  }
+} return string[] ms_pcs;
+("(1, 2):(3) then x:(4)"):(["1, 2", "3", "then x:(4)"])
+("(\"a:b\"):()"):(["\"a:b\"", "", ""])
+("junk with no colon"):([])
+("// comment: yes"):([])

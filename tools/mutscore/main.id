@@ -1,0 +1,43 @@
+// mutscore -- how well do a tree's test cases catch bugs.
+//
+//   mutscore list ROOT [--area SUB]
+//   mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB]
+//                [--with A,B] [--std] [--budget SECONDS]
+//   mutscore report DIR [--tsv]
+//   mutscore lint ROOT [--area SUB] [--tsv]
+//
+// `run` breaks one function of a scratch COPY of ROOT at a time (never ROOT
+// itself) and builds the copy with IDC: a mutant is killed when a case fails
+// or traps, survived when every case passes, invalid when it does not compile.
+// Mutants are numbered; shard I of N takes those numbered I modulo N, writes
+// DIR/r-I-of-N.tsv, and stops by itself before a minute is up, so the same
+// command is run again until it says the shard is complete. `report` merges
+// DIR into scores and the list of survivors; `lint` flags cases that prove
+// nothing. docs/TESTS.md, "Mutation score", has the rest.
+main(int argc, string[] argv) {
+  int ms_rc = ms_cl_cmd(argv, lst_str_get_or(argv, 1, ""));
+} return int ms_rc;
+(1, ["mutscore"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
+(3, ["mutscore", "run", "/r"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
+
+// The `run` command: parses its options, checks the shard and that there are
+// mutants, then builds this shard's share (see ms_cm_next). Answers its exit
+// status.
+ms_cm_run(string[] ms_av) {
+  int ms_t0 = ticks();
+  string[] ms_cf = ms_cm_cfg(ms_av, env_text("PWD"));
+  int[] ms_sh = ms_dr_sh(ms_cf[(import ms_cf_shard)]);
+} chain (string[] ms_av) {
+  string[] ms_al = ms_en_all(ms_cf[(import ms_cf_root)], ms_cf[(import ms_cf_area)]);
+  string ms_wy = ms_cm_why(ms_cf, ms_sh, ms_al);
+  int ms_rc = 2;
+} chain (string[] ms_av) {
+  if(len(ms_wy) > 0) {
+    eprint(ms_wy);
+  }
+  if(len(ms_wy) == 0) {
+    ms_rc = ms_cm_next(ms_cf, ms_al, ms_sh, ticks() - ms_t0);
+  }
+} return int ms_rc;
+given ms_t_tree (["m", "run", (import ms_t_root), "--out", (import ms_t_work), "--idc", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", "--shard", "0/2"]):(0) then prints:("mutscore: shard 0/2: built 2 of 2 mutants, 0 left\n") then ms_t_a:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+(["m", "run", "/r", "--out", "/o", "--shard", "5/2"]):(2) then eprints:("mutscore: --shard must be I/N with 0 <= I < N, such as 0/4 (got 5/2)\n")

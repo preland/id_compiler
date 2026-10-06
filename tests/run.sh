@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel editor)
+SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel editor mutscore)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1219,6 +1219,34 @@ if want editor; then
     ./editor.sh
     edit=$?
     [ "$edit" -eq 0 ] && mark_done editor
+fi
+
+# --- the mutation score. tools/mutscore (an `id` program) breaks a scratch COPY
+#     of fixtures/mutscore one function at a time. The fixture has four
+#     mutants and is built so that exactly one survives: three killed and one
+#     survived is 75.0, and the survivor is the `>` that became `>=`. The
+#     section also proves the source tree's bytes are the same afterwards.
+#     Under a minute: the fixture builds without the standard library, and
+#     each run stops itself before the minute is up and is resumable.
+echo
+echo "--- the mutation score (tools/mutscore, docs/TESTS.md) ---"
+if want mutscore; then
+    MS_FIX=$(cd fixtures/mutscore && pwd)
+    cp -r "$MS_FIX" "$TMP/ms_before"
+    if ! env -u IDC_NO_STD ../bin/idc ../tools/mutscore -o "$TMP/mutscore" >"$TMP/mutscore.log" 2>&1; then
+        bad "tools/mutscore builds ($(grep -v 'warning:' "$TMP/mutscore.log" | head -1))"
+    else
+        for _ in 1 2 3; do
+            "$TMP/mutscore" run "$MS_FIX" --out "$TMP/ms_out" --idc "$(cd .. && pwd)/bin/idc" --budget 30 >"$TMP/ms_run.out" 2>&1
+            grep -q ', 0 left\|is complete' "$TMP/ms_run.out" && break
+        done
+        tsv=$("$TMP/mutscore" report "$TMP/ms_out" --tsv 2>&1)
+        expect_output "mutscore scores the fixture 3 killed, 1 survived" $'tree\t\t\t3\t1\t0\t0\t75.0' "$(printf '%s\n' "$tsv" | grep '^tree')"
+        expect_output "mutscore names the survivor" $'mutant\tcheck.id\tbig\tcmp\t7\tsurvived\tint r = n > 9;  =>  int r = n >= 9;' "$(printf '%s\n' "$tsv" | grep $'\tsurvived\t')"
+        expect_output "mutscore counts three kills" "3" "$(printf '%s\n' "$tsv" | grep -c $'\tkilled\t')"
+        if diff -r "$MS_FIX" "$TMP/ms_before" >/dev/null; then ok "mutscore left the source tree's bytes unchanged"; else bad "mutscore changed the source tree"; fi
+        [ "$fail" -eq 0 ] && mark_done mutscore
+    fi
 fi
 
 # --- no test case leaves anything in /tmp. tools/tmpguard (an `id` program)

@@ -1,0 +1,57 @@
+// mutscore measures how well a tree's test cases catch bugs: it breaks one
+// function at a time and counts the breaks no case notices (docs/TESTS.md,
+// "Mutation score").
+
+// A token's kind, stored first in each triple of a token list.
+int ms_k_id = 0;
+int ms_k_int = 1;
+int ms_k_flt = 2;
+int ms_k_str = 3;
+int ms_k_op = 4;
+
+// One-token swaps, as three parallel lists: the token, what replaces it, and
+// the operator family the mutant is reported under.
+string[] ms_sw_from = ["<", "<=", ">", ">=", "==", "!=", "+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "&&", "||"];
+string[] ms_sw_to = ["<=", "<", ">=", ">", "!=", "==", "-", "+", "/", "*", "*", "|", "&", "&", ">>", "<<", "||", "&&"];
+string[] ms_sw_op = ["cmp", "cmp", "cmp", "cmp", "cmp", "cmp", "arith", "arith", "arith", "arith", "arith", "arith", "arith", "arith", "arith", "arith", "logic", "logic"];
+
+// Words a statement may start with that make it a declaration, a return or a
+// padding statement: deleting those either cannot compile or changes nothing.
+string[] ms_dl = ["int", "word", "float", "string", "func", "export", "blank", "void", "return"];
+
+// Where each setting of a run sits in the list of strings the runner passes
+// around: the tree's root, the area, the idc command (one word per line), the
+// output directory, the scratch directory, what idc is pointed at, the
+// standard library home ("" unless a library is the subject), the copy of the
+// root that mutants are written into.
+int ms_cf_root = 0;
+int ms_cf_area = 1;
+int ms_cf_idc = 2;
+int ms_cf_out = 3;
+int ms_cf_work = 4;
+int ms_cf_prog = 5;
+int ms_cf_std = 6;
+int ms_cf_copy = 7;
+
+// The answers a mutant can get, in the order the report counts them; any
+// other answer (a timeout, an error) is counted last, as "other".
+string[] ms_st_names = ["killed", "survived", "invalid"];
+
+// What a group of results is called in the report, by level: a file, a
+// function, the whole tree.
+string[] ms_lv_names = ["file", "fn", "tree"];
+
+// The operator names a mutant row can carry, in the order `list` counts them.
+string[] ms_op_names = ["cmp", "arith", "logic", "lit", "idx", "del", "ret0", "ret1"];
+
+// More slots of the run's list of strings: the siblings to link beside the
+// copy (comma-separated), the shard ("I/N") and the time budget in seconds.
+int ms_cf_with = 8;
+int ms_cf_shard = 9;
+int ms_cf_budget = 10;
+
+// What mutscore says when it is called wrongly.
+string ms_usage = "usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]";
+
+// The commands mutscore knows.
+string[] ms_cmds = ["list", "run", "report", "lint"];

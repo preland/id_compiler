@@ -1,0 +1,43 @@
+// A real tree under a fs_mktemp directory for the cases of the enumeration and
+// the runner. The project is ms_t_root (src/a.id holds one tested function,
+// src/b.txt is not source, .hid/c.id is hidden); beside it, in the same parent,
+// sits sib/x.txt; ms_t_work is an empty scratch directory. All of it is
+// registered with fs_drop_exit, so it goes when the case's process does.
+
+// Makes the trees and exports the project's root as ms_t_root.
+ms_t_tree() {
+  export string ms_t_up = fs_mktemp("ms_t_", 1);
+  export string ms_t_root = ms_t_up + "/proj";
+  export string ms_t_work = fs_mktemp("ms_w_", 1);
+} chain () {
+  int ms_d = fs_mkdir(ms_t_root) + fs_mkdir(ms_t_up + "/sib") + fs_mkdir(ms_t_root + "/src") + fs_mkdir(ms_t_root + "/.hid");
+  fs_drop_exit(ms_t_up);
+  fs_drop_exit(ms_t_work);
+} chain () {
+  exec_file_put(ms_t_root + "/src/a.id", "add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n", 420);
+  exec_file_put(ms_t_root + "/src/b.txt", "x < y\n", 420);
+  exec_file_put(ms_t_root + "/.hid/c.id", "f() {\n} return void;\n", 420);
+} chain () {
+  exec_file_put(ms_t_up + "/sib/x.txt", "sib\n", 420);
+  export string ms_t_log = ms_t_work + "/base.ok";
+  export string ms_t_r0 = ms_t_work + "/r-0-of-2.tsv";
+} chain () {
+  export string ms_t_w2 = fs_mktemp("ms_x_", 1);
+  fs_drop_exit(ms_t_w2);
+} return void export ms_t_root;
+():() then ms_t_ns:(3) then ms_t_a:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+():() then ms_t_ns:(3)
+
+// Test check: how many files the fixture's tree holds.
+ms_t_ns() {
+  int ms_n = len(path_files((import ms_t_root)));
+} return int ms_n;
+given ms_t_tree ():(3)
+given ms_t_tree ():(3) then ms_t_a:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+
+// Test check: what src/a.id holds.
+ms_t_a() {
+  string ms_q = fs_read_text((import ms_t_root) + "/src/a.id");
+} return string ms_q;
+given ms_t_tree ():("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+given ms_t_tree ():("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n") then ms_t_ns:(3)

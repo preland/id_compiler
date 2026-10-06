@@ -1,0 +1,32 @@
+// Identifiers, keywords and string literals.
+
+// 1 for a byte that may continue a name: a letter, a digit or an underscore.
+ms_lx_idc(int ms_c) {
+  int ms_ok = chr_is_alnum(ms_c) == 1 || ms_c == 95;
+} return int ms_ok;
+(95):(1)
+(45):(0)
+
+// The end of the name or run of letters and digits that starts at ms_i.
+ms_lx_word(string ms_s, int ms_i) {
+  while(ms_lx_idc(charat(ms_s, ms_i)) == 1) {
+    ms_i = ms_i + 1;
+  }
+} return int ms_i;
+("ab_1+", 0):(4)
+("x", 0):(1)
+
+// The end of the string literal whose opening quote is at ms_i; a backslash
+// takes the byte after it, and a literal left open ends with the text.
+ms_lx_str(string ms_s, int ms_i) {
+  int ms_j = ms_i + 1;
+  int ms_c = charat(ms_s, ms_j);
+  while(ms_c != 34 && ms_c != -1) {
+    ms_j = ms_j + 1 + (ms_c == 92);
+    ms_c = charat(ms_s, ms_j);
+  }
+} chain (string ms_s, int ms_i) {
+  ms_j = ms_j + (ms_c == 34);
+} return int ms_j;
+("\"a\\\"b\" x", 0):(6)
+("\"open", 0):(5)

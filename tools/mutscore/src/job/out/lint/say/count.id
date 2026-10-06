@@ -1,0 +1,40 @@
+// Counting lint rows.
+
+// How many of the rows ms_lr have the shape ms_kd.
+ms_lt_count(string[] ms_lr, string ms_kd) {
+  int ms_n = 0;
+  int ms_i = 0;
+  while(ms_i < len(ms_lr)) {
+    ms_n = ms_n + str_starts(ms_lr[ms_i], ms_kd + "\t");
+    ms_i = ms_i + 1;
+  }
+} return int ms_n;
+(["bare\ta", "case\tb", "bare\tc"], "bare"):(2)
+(["bare\ta", "barely\tb"], "bare"):(1)
+([], "echo"):(0)
+
+// Adds the function of the row ms_rw (its second and third columns) to ms_ks
+// unless it is there already.
+ms_lt_seen(string[] ms_ks, string ms_rw) {
+  string[] ms_fd = str_split(ms_rw, "\t");
+  string ms_ky = ms_fd[1] + "\t" + ms_fd[2];
+  if(lst_str_index(ms_ks, ms_ky) < 0) {
+    push(ms_ks, ms_ky);
+  }
+} return void;
+(["a\tf"], "case\ta\tg\t1\tx"):(["a\tf", "a\tg"])
+(["a\tf"], "bare\ta\tf\t2\tx"):(["a\tf"])
+
+// How many different functions the rows ms_lr come from.
+ms_lt_fns(string[] ms_lr) {
+  string[] ms_ks = [];
+  int ms_i = 0;
+  while(ms_i < len(ms_lr)) {
+    ms_lt_seen(ms_ks, ms_lr[ms_i]);
+    ms_i = ms_i + 1;
+  }
+} chain (string[] ms_lr) {
+  int ms_n = len(ms_ks);
+} return int ms_n;
+(["case\ta\tf\t1\tx", "bare\ta\tf\t2\ty", "case\ta\tg\t3\tz"]):(2)
+([]):(0)

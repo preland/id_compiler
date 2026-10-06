@@ -1,0 +1,24 @@
+// The lint rows as a list, and their totals.
+
+// The non-empty lines of ms_tx.
+ms_lt_split(string ms_tx) {
+  string[] ms_ab = str_split(ms_tx, "\n");
+  string[] ms_lr = [];
+  int ms_i = 0;
+} chain (string ms_tx) {
+  while(ms_i < len(ms_ab)) {
+    if(len(ms_ab[ms_i]) > 0) {
+      push(ms_lr, ms_ab[ms_i]);
+    }
+    ms_i = ms_i + 1;
+  }
+} return string[] ms_lr;
+("a\n\nb\n"):(["a", "b"])
+(""):([])
+
+// [cases, functions, silent, echo, bare] for the rows ms_lr.
+ms_lt_sum(string[] ms_lr) {
+  int[] ms_sm = [len(ms_lr), ms_lt_fns(ms_lr), ms_lt_count(ms_lr, "silent"), ms_lt_count(ms_lr, "echo"), ms_lt_count(ms_lr, "bare")];
+} return int[] ms_sm;
+(["bare\ta\tf\t1\tx", "echo\ta\tf\t2\ty", "case\ta\tg\t3\tz"]):([3, 2, 0, 1, 1])
+([]):([0, 0, 0, 0, 0])

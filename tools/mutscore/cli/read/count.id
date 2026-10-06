@@ -1,0 +1,13 @@
+// Counting mutants.
+
+// How many of the mutant lines ms_al are of the operator ms_op.
+ms_cm_nop(string[] ms_al, string ms_op) {
+  int ms_n = 0;
+  int ms_i = 0;
+  while(ms_i < len(ms_al)) {
+    ms_n = ms_n + (str_find(ms_al[ms_i], "\t" + ms_op + "\t") >= 0);
+    ms_i = ms_i + 1;
+  }
+} return int ms_n;
+(["a\tf\t1\t2\tcmp\t<=", "a\tf\t3\t4\tarith\t-", "a\tf\t5\t6\tcmp\t<"], "cmp"):(2)
+(["a\tf\t1\t2\tcmp\t<="], "del"):(0)

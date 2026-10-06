@@ -1,0 +1,61 @@
+// Preparing and running one shard.
+
+// Copies the tree into the scratch directory ms_work and fills the run's
+// scratch slots. Answers 1, or 0 after saying what failed.
+ms_cm_prep(string[] ms_cf, string ms_work) {
+  string[] ms_wi = ms_cm_wi(ms_cf);
+  int ms_ok = ms_rn_prep(ms_cf[(import ms_cf_root)], ms_wi, len(ms_cf[(import ms_cf_std)]) > 0, ms_work);
+  if(ms_ok == 1) {
+    ms_rn_cfg(ms_cf, ms_work);
+  }
+} chain (string[] ms_cf, string ms_work) {
+  if(ms_ok == 0) {
+    eprint("mutscore: could not copy " + ms_cf[(import ms_cf_root)] + " into " + ms_work + "; check that it exists and that every --with name is a sibling directory of it");
+  }
+} return int ms_ok;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), "", "", "", "", "", "0/2", "40"], (import ms_t_w2)):(1)
+(["/no/such/root_ms", "", "idc", "/o", "", "", "", "", "", "0/1", "40"], "/no/such/work_ms"):(0) then eprints:("mutscore: could not copy /no/such/root_ms into /no/such/work_ms; check that it exists and that every --with name is a sibling directory of it\n")
+
+// Builds the unmutated copy (see ms_dr_base) for the source whose mutants are
+// ms_al. Answers 0 when it is green, 3 when it is red, 4 when it has not
+// finished; the last two say so.
+ms_cm_base(string[] ms_cf, string[] ms_al, int ms_ms) {
+  string ms_ky = ms_cm_key(ms_al);
+  int ms_v = ms_dr_base(ms_cf, ms_ky, ms_ms);
+  int ms_rc = 0;
+} chain (string[] ms_cf, string[] ms_al, int ms_ms) {
+  if(ms_v == 0) {
+    eprint("mutscore: the unmutated copy does not build and pass its cases, so no mutant can be judged; its output is in base.log in the --out directory");
+    ms_rc = 3;
+  }
+  if(ms_v == 2) {
+    eprint("mutscore: building the unmutated copy took more than a minute; the cases it passed are cached, so run the same command again");
+    ms_rc = 4;
+  }
+} return int ms_rc;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), "", "", "", "", "", "0/2", "40"], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0", "src/a.id\tadd\t50\t51\tret1\t1"], 20000):(0)
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), "", "", "", "", "", "0/2", "40"], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0", "src/a.id\tadd\t50\t51\tret1\t1"], 20000):(3) then eprints:("mutscore: the unmutated copy does not build and pass its cases, so no mutant can be judged; its output is in base.log in the --out directory\n")
+
+// Runs the mutants ms_td of ms_al (this shard's share) in a scratch copy:
+// copies the tree, checks the unmutated copy, builds mutants until the budget
+// is used, appending to the results file ms_pa, and says how many it built.
+// ms_el is how long this run has been going, in milliseconds. Answers 0, or
+// what ms_cm_prep and ms_cm_base answer when they fail.
+ms_cm_go(string[] ms_cf, string[] ms_al, int[] ms_td, string ms_pa, int ms_el) {
+  string ms_work = fs_mktemp("mutscore_", 1);
+  fs_drop_exit(ms_work);
+  int ms_ok = ms_cm_prep(ms_cf, ms_work);
+} chain (string[] ms_cf, string[] ms_al, int[] ms_td, string ms_pa, int ms_el) {
+  int ms_rc = 2 * (ms_ok == 0);
+  if(ms_ok == 1) {
+    ms_rc = ms_cm_base(ms_cf, ms_al, 57000 - ms_el);
+  }
+  int ms_ran = 0;
+} chain (string[] ms_cf, string[] ms_al, int[] ms_td, string ms_pa, int ms_el) {
+  if(ms_rc == 0) {
+    ms_ran = ms_dr_loop(ms_cf, ms_al, ms_td, ms_pa, to_int(ms_cf[(import ms_cf_budget)]) * 1000, 57000 - ms_el);
+    put("mutscore: shard " + ms_cf[(import ms_cf_shard)] + ": built " + ms_ran + " of " + len(ms_td) + " mutants, " + (len(ms_td) - ms_ran) + " left\n");
+  }
+} return int ms_rc;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), "", "", "", "", "", "0/2", "40"], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0", "src/a.id\tadd\t50\t51\tret1\t1"], [0, 2], (import ms_t_r0), 0):(0) then prints:("mutscore: shard 0/2: built 2 of 2 mutants, 0 left\n") then ms_t_a:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n") then ms_t_rtxt:("killed~2~src/a.id~add~32~33~arith~-~int s = a + b;  =>  int s = a - b;\nsurvived~3~src/a.id~add~50~51~ret1~1~} return int s;  =>  } return int 1;\n")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), "", "", "", "", "", "0/2", "40"], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0", "src/a.id\tadd\t50\t51\tret1\t1"], [0, 2], (import ms_t_r0), 0):(3) then ms_t_rtxt:("")

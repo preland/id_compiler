@@ -1,0 +1,32 @@
+// Turning a source text into tokens.
+
+// Appends the token starting at ms_i to ms_tk (kind, start, end) and answers
+// where the next token starts.
+ms_lx_one(int[] ms_tk, string ms_s, int ms_i) {
+  int ms_e = ms_lx_end(ms_s, ms_i);
+  lst_extend(ms_tk, [ms_lx_kind(ms_s, ms_i), ms_i, ms_e]);
+  int ms_n = ms_lx_skip(ms_s, ms_e);
+} return int ms_n;
+([], "ab cd", 0):(3)
+([7], "+", 0):(1)
+
+// Every token of ms_s as consecutive triples: kind, start, end (end excluded).
+// Blanks and comments are not tokens, so offsets stay those of the text.
+ms_lex(string ms_s) {
+  int[] ms_tk = [];
+  int ms_i = ms_lx_skip(ms_s, 0);
+  while(charat(ms_s, ms_i) != -1) {
+    ms_i = ms_lx_one(ms_tk, ms_s, ms_i);
+  }
+} return int[] ms_tk;
+("a=1;"):([0, 0, 1, 4, 1, 2, 1, 2, 3, 4, 3, 4])
+("1e-30 \"a//b\""):([2, 0, 5, 3, 6, 12])
+("// c\n"):([])
+
+// Test fixture: exports the tokens of ms_s as ms_t_tk, so a case of a
+// token-list reader can name them.
+ms_t_lex(string ms_s) {
+  export int[] ms_t_tk = ms_lex(ms_s);
+} return void export ms_t_tk;
+(""):() then len((import ms_t_tk)):(0)
+("a b"):() then (import ms_t_tk):([0, 0, 1, 0, 2, 3])

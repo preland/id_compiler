@@ -1,0 +1,48 @@
+// A lint row for each test case: its shape (silent, echo, bare, or case for
+// one that proves something), the file, the function, the line and the
+// case's text, tab-separated.
+
+// The row for the case line ms_lc ("LINE", a tab, the text) of function ms_nm
+// in ms_rel; "" when the text is not a case. ms_vd is 1 for a void function
+// and ms_ef 1 when it has a statement that does something.
+ms_lt_row(string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
+  int ms_ix = str_find(ms_lc, "\t");
+  string ms_tt = str_slice(ms_lc, ms_ix + 1, len(ms_lc) - ms_ix - 1);
+  string[] ms_pcs = ms_lt_parts(ms_tt);
+} chain (string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
+  string ms_kd = ms_lt_kind(lst_str_get_or(ms_pcs, 0, ""), lst_str_get_or(ms_pcs, 1, ""), lst_str_get_or(ms_pcs, 2, ""), ms_vd, ms_ef);
+  string ms_res = "";
+  if(len(ms_pcs) == 3) {
+    ms_res = ms_rel + "\t" + ms_nm + "\t";
+  }
+} chain (string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
+  if(len(ms_res) > 0) {
+    ms_res = ms_kd + "\t" + ms_res + str_slice(ms_lc, 0, ms_ix) + "\t" + ms_tt;
+  }
+} return string ms_res;
+("a.id", "f", 1, 1, "3\t(1):()"):("bare\ta.id\tf\t3\t(1):()")
+("a.id", "f", 0, 1, "4\t(1):(2)"):("case\ta.id\tf\t4\t(1):(2)")
+("a.id", "f", 1, 1, "5\tnot a case"):("")
+("a.id", "f", 1, 1, "6\t(1):() then prints:(\"\")"):("silent\ta.id\tf\t6\t(1):() then prints:(\"\")")
+
+// The rows, one per line, for every case under function ms_k of ms_fs in the
+// file ms_rel.
+ms_lt_fn(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k, string ms_rel) {
+  string ms_nm = ms_tk_str(ms_s, ms_tk, ms_fs[4 * ms_k]);
+  int ms_vd = ms_tk_str(ms_s, ms_tk, ms_fs[4 * ms_k + 2] + 1) == "void";
+  int ms_ef = len(ms_mu_each(ms_s, ms_tk, ms_fs[4 * ms_k + 1], ms_fs[4 * ms_k + 2], ms_st_del)) > 0;
+} chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k, string ms_rel) {
+  string[] ms_cs = ms_lt_cases(ms_s, ms_tk, ms_fs, ms_k);
+  string ms_rs = "";
+  int ms_i = 0;
+} chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k, string ms_rel) {
+  while(ms_i < len(ms_cs)) {
+    string ms_rw = ms_lt_row(ms_rel, ms_nm, ms_vd, ms_ef, ms_cs[ms_i]);
+    if(len(ms_rw) > 0) {
+      ms_rs = ms_rs + ms_rw + "\n";
+    }
+    ms_i = ms_i + 1;
+  }
+} return string ms_rs;
+given ms_t_lex("f(a) {\n a = a + 1;\n} return void;\n(1):()\n(2):(3)\n\ng() {\n} return int 0;\n(1):()") ("f(a) {\n a = a + 1;\n} return void;\n(1):()\n(2):(3)\n\ng() {\n} return int 0;\n(1):()", (import ms_t_tk), [0, 5, 12, 14, 28, 32, 33, 36], 0, "x.id"):("bare\tx.id\tf\t4\t(1):()\ncase\tx.id\tf\t5\t(2):(3)\n")
+given ms_t_lex("f(a) {\n a = a + 1;\n} return void;\n(1):()\n(2):(3)\n\ng() {\n} return int 0;\n(1):()") ("f(a) {\n a = a + 1;\n} return void;\n(1):()\n(2):(3)\n\ng() {\n} return int 0;\n(1):()", (import ms_t_tk), [0, 5, 12, 14, 28, 32, 33, 36], 1, "x.id"):("bare\tx.id\tg\t9\t(1):()\n")

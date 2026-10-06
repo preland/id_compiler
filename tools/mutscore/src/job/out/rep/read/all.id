@@ -1,0 +1,48 @@
+// Every result of the out directory ms_out, one row per mutant, the later
+// shard's line standing where two files disagree.
+ms_rp_rows(string ms_out) {
+  string[] ms_fl = ms_rp_files(ms_out);
+  string[] ms_rows = [];
+  string[] ms_ks = [];
+} chain (string ms_out) {
+  int ms_i = 0;
+  while(ms_i < len(ms_fl)) {
+    ms_rp_add(ms_rows, ms_ks, path_join(ms_out, ms_fl[ms_i]));
+    ms_i = ms_i + 1;
+  }
+} return string[] ms_rows;
+given ms_t_tree given ms_t_wrs ((import ms_t_work)):(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz  =>  w", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq;  =>  ", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"])
+("/no/such/dir_ms"):([])
+
+// The report line for the result row ms_rw: in the tab form (ms_tab 1) every
+// row as mutant, file, function, operator, line, answer, change; in the form
+// to read only a survivor, as file:line: function [operator] change. "" for
+// a row that gets no line.
+ms_rg_m1(string ms_rw, int ms_tab) {
+  string[] ms_fd = str_split(ms_rw, "\t");
+  string ms_df = lst_str_get_or(ms_fd, 8, "");
+  string ms_ln = "";
+} chain (string ms_rw, int ms_tab) {
+  if(ms_tab == 1) {
+    ms_ln = "mutant\t" + ms_fd[2] + "\t" + ms_fd[3] + "\t" + ms_fd[6] + "\t" + ms_fd[1] + "\t" + ms_fd[0] + "\t" + ms_df + "\n";
+  }
+  if(ms_tab == 0 && ms_fd[0] == "survived") {
+    ms_ln = ms_fd[2] + ":" + ms_fd[1] + ": " + ms_fd[3] + " [" + ms_fd[6] + "]  " + ms_df + "\n";
+  }
+} return string ms_ln;
+("survived\t5\ta.id\tf\t6\t7\tlit\t2\tz  =>  w", 0):("a.id:5: f [lit]  z  =>  w\n")
+("killed\t5\ta.id\tf\t6\t7\tlit\t2\tz  =>  w", 0):("")
+("killed\t5\ta.id\tf\t6\t7\tlit\t2\tz  =>  w", 1):("mutant\ta.id\tf\tlit\t5\tkilled\tz  =>  w\n")
+("invalid\t7\ta.id\tg\t1\t2\tdel\t", 1):("mutant\ta.id\tg\tdel\t7\tinvalid\t\n")
+
+// The lines of ms_rg_m1 for every row of ms_rows that gets one.
+ms_rg_muts(string[] ms_rows, int ms_tab) {
+  string ms_ml = "";
+  int ms_i = 0;
+  while(ms_i < len(ms_rows)) {
+    ms_ml = ms_ml + ms_rg_m1(ms_rows[ms_i], ms_tab);
+    ms_i = ms_i + 1;
+  }
+} return string ms_ml;
+(["killed\t1\ta.id\tf\t1\t2\tcmp\t<\tx", "survived\t2\ta.id\tf\t3\t4\tcmp\t<\ty"], 0):("a.id:2: f [cmp]  y\n")
+(["killed\t1\ta.id\tf\t1\t2\tcmp\t<\tx", "survived\t2\ta.id\tf\t3\t4\tcmp\t<\ty"], 1):("mutant\ta.id\tf\tcmp\t1\tkilled\tx\nmutant\ta.id\tf\tcmp\t2\tsurvived\ty\n")

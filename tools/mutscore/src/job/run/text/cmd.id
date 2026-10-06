@@ -1,0 +1,50 @@
+// Building one mutant: the text it makes, the command that builds it, and what
+// the build's answer means.
+
+// ms_s with the bytes from ms_a up to ms_b replaced by ms_rp.
+ms_rn_cut(string ms_s, int ms_a, int ms_b, string ms_rp) {
+  string ms_nw = str_slice(ms_s, 0, ms_a) + ms_rp + str_slice(ms_s, ms_b, len(ms_s) - ms_b);
+} return string ms_nw;
+("a + b", 2, 3, "-"):("a - b")
+("a;b", 1, 2, ""):("ab")
+("ab", 2, 2, "c"):("abc")
+
+// The command that builds what the run is pointed at, one word per line: the
+// idc command, the program, and the flags that run its cases without leaving
+// a binary. A run on a library sets IDC_STD_FULL and IDSTD_HOME in front, so
+// every library case runs against the copy being mutated.
+ms_rn_argv(string[] ms_cf) {
+  string ms_ln = ms_cf[(import ms_cf_idc)] + "\n" + ms_cf[(import ms_cf_prog)] + "\n--allow-untested\n--emit-c\n" + ms_cf[(import ms_cf_work)] + "/out.c\n";
+  if(len(ms_cf[(import ms_cf_std)]) > 0) {
+    ms_ln = "env\nIDC_STD_FULL=1\nIDSTD_HOME=" + ms_cf[(import ms_cf_std)] + "\n" + ms_ln;
+  }
+} return string ms_ln;
+(["/r", "", "idc", "/o", "/w", "/w/r", "", "/w/r"]):("idc\n/w/r\n--allow-untested\n--emit-c\n/w/out.c\n")
+(["/r", "", "/b/idc", "/o", "/w", "/w/prog", "/w/r", "/w/r"]):("env\nIDC_STD_FULL=1\nIDSTD_HOME=/w/r\n/b/idc\n/w/prog\n--allow-untested\n--emit-c\n/w/out.c\n")
+
+// What a build's output ms_tx and exit status ms_rc say about a mutant:
+// "timeout" (-2), "killed" (a case failed), "survived" (the build passed),
+// "invalid" (it did not compile), or "error" (it failed some other way).
+ms_rn_class(string ms_tx, int ms_rc) {
+  string ms_st = "error";
+  if(str_find(ms_tx, ": error:") >= 0) {
+    ms_st = "invalid";
+  }
+  if(ms_rc == 0) {
+    ms_st = "survived";
+  }
+} chain (string ms_tx, int ms_rc) {
+  if(str_find(ms_tx, ": test failed") >= 0) {
+    ms_st = "killed";
+  }
+  if(ms_rc == -2) {
+    ms_st = "timeout";
+  }
+} return string ms_st;
+("x.id:3: test failed: f() = 1, expected 2\n", 1):("killed")
+("x.id:1: error: bad\n", 1):("invalid")
+("", 0):("survived")
+("boom", 1):("error")
+("", -2):("timeout")
+("x.id:3: test failed: f()\n", -2):("timeout")
+("x.id:3: test failed: f()\n", 0):("killed")

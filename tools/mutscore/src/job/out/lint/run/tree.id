@@ -1,0 +1,34 @@
+// The lint rows of a file and of a tree.
+
+// The rows of every function of the file ms_rel under ms_root.
+ms_lt_file(string ms_root, string ms_rel) {
+  string ms_s = fs_read_text(path_join(ms_root, ms_rel));
+  int[] ms_tk = ms_lex(ms_s);
+  int[] ms_fs = ms_fn_scan(ms_s, ms_tk);
+} chain (string ms_root, string ms_rel) {
+  string ms_rs = "";
+  int ms_k = 0;
+  while(4 * ms_k < len(ms_fs)) {
+    ms_rs = ms_rs + ms_lt_fn(ms_s, ms_tk, ms_fs, ms_k, ms_rel);
+    ms_k = ms_k + 1;
+  }
+} return string ms_rs;
+given ms_t_tree ((import ms_t_root), "src/a.id"):("case\tsrc/a.id\tadd\t4\t(1, 2):(3)\ncase\tsrc/a.id\tadd\t5\t(0, 0):(0)\n")
+given ms_t_tree ((import ms_t_root), "src/b.txt"):("")
+
+// The rows of every source file under ms_root that ms_en_ok accepts for the
+// area ms_ar.
+ms_lt_tree(string ms_root, string ms_ar) {
+  string[] ms_fl = path_files(ms_root);
+  string ms_rs = "";
+  int ms_i = 0;
+} chain (string ms_root, string ms_ar) {
+  while(ms_i < len(ms_fl)) {
+    if(ms_en_ok(ms_fl[ms_i], ms_ar) == 1) {
+      ms_rs = ms_rs + ms_lt_file(ms_root, ms_fl[ms_i]);
+    }
+    ms_i = ms_i + 1;
+  }
+} return string ms_rs;
+given ms_t_tree ((import ms_t_root), ""):("case\tsrc/a.id\tadd\t4\t(1, 2):(3)\ncase\tsrc/a.id\tadd\t5\t(0, 0):(0)\n")
+given ms_t_tree ((import ms_t_root), "lib/"):("")

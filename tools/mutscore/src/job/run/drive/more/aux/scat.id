@@ -1,0 +1,19 @@
+// The order a shard builds its mutants in: scattered, so that a run that is
+// stopped early has built a sample spread over the whole tree, not the first
+// files only.
+
+// The indexes ms_td in a fixed order that does not follow their size: sorted
+// by a hash of each.
+ms_dr_scat(int[] ms_td) {
+  int[] ms_hk = [];
+  int ms_i = 0;
+  while(ms_i < len(ms_td)) {
+    push(ms_hk, ushr(ms_td[ms_i] * (0 - 1640531535), 8));
+    ms_i = ms_i + 1;
+  }
+} chain (int[] ms_td) {
+  int[] ms_sc = ord_by_ints(ms_td, ord_ints(ms_hk));
+} return int[] ms_sc;
+([0, 1, 2, 3, 4, 5]):([0, 5, 2, 4, 1, 3])
+([7]):([7])
+([]):([])

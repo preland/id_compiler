@@ -1,0 +1,36 @@
+// Making the scratch copy the mutants are built in. Nothing here writes
+// outside the directory the caller made with fs_mktemp.
+
+// Runs the program ms_ag (one word per line) to its end, 30 s at most, and
+// answers its exit status.
+ms_rn_sh(string ms_ag) {
+  int[] ms_in = [];
+  int[] ms_ob = [];
+  int ms_rc = exec_run(ms_ag, 0, 0, ms_in, ms_ob, ms_ob, 30000);
+} return int ms_rc;
+("true\n"):(0)
+("sh\n-c\nexit 4\n"):(4)
+
+// Links the sibling ms_nm of ms_root into ms_work under the same name, so a
+// tree that reads ../ms_nm finds it. Answers the exit status of ln.
+ms_rn_link(string ms_root, string ms_nm, string ms_work) {
+  string ms_tg = path_join(fs_dir_of(ms_root), ms_nm);
+  string ms_lk = path_join(ms_work, ms_nm);
+  int ms_rc = ms_rn_sh("ln\n-s\n" + ms_tg + "\n" + ms_lk + "\n");
+} return int ms_rc;
+given ms_t_tree ((import ms_t_root), "sib", (import ms_t_work)):(0) then ms_t_sib:("sib\n")
+given ms_t_tree ((import ms_t_root), "sib", "/no/such/dir_ms"):(1)
+
+// Links every name of ms_wi (siblings of ms_root) into ms_work. Answers how
+// many links failed.
+ms_rn_links(string ms_root, string[] ms_wi, string ms_work) {
+  int ms_bad = 0;
+  int ms_i = 0;
+  while(ms_i < len(ms_wi)) {
+    ms_bad = ms_bad + (ms_rn_link(ms_root, ms_wi[ms_i], ms_work) != 0);
+    ms_i = ms_i + 1;
+  }
+} return int ms_bad;
+given ms_t_tree ((import ms_t_root), ["sib"], (import ms_t_work)):(0) then ms_t_sib:("sib\n")
+given ms_t_tree ((import ms_t_root), ["sib", "no/x"], (import ms_t_work)):(1)
+("", [], ""):(0)

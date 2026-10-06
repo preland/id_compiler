@@ -1,0 +1,34 @@
+// The tail of a decimal number, and a number in any spelling.
+
+// The end of an exponent (e or E, an optional sign, digits) starting at ms_e,
+// or ms_e when there is none.
+ms_lx_exp(string ms_s, int ms_e) {
+  int ms_c = charat(ms_s, ms_e);
+  int ms_x = ms_e;
+  if(ms_c == 101 || ms_c == 69) {
+    int ms_g = charat(ms_s, ms_e + 1);
+    ms_x = ms_lx_digits(ms_s, ms_e + 1 + (ms_g == 43 || ms_g == 45));
+  }
+} return int ms_x;
+("1e-30+x", 1):(5)
+("2E4", 1):(3)
+("1+2", 1):(1)
+
+// The end of a decimal number at ms_i: digits, fraction, exponent.
+ms_lx_real(string ms_s, int ms_i) {
+  int ms_d = ms_lx_digits(ms_s, ms_i);
+  int ms_f = ms_lx_frac(ms_s, ms_d);
+  int ms_e = ms_lx_exp(ms_s, ms_f);
+} return int ms_e;
+("2.5e3-1", 0):(5)
+("7;", 0):(1)
+
+// The end of the number at ms_i, in whichever spelling it has.
+ms_lx_num(string ms_s, int ms_i) {
+  int ms_e = ms_lx_real(ms_s, ms_i);
+  if(ms_lx_radix(ms_s, ms_i) == 1) {
+    ms_e = ms_lx_word(ms_s, ms_i);
+  }
+} return int ms_e;
+("0xe+1", 0):(3)
+("1e-30", 0):(5)

@@ -1,0 +1,44 @@
+// The report's blocks: the groups of one level, worst score first, and the
+// mutants.
+
+// The groups of ms_cn (ms_n of them) from the lowest ms_rg_sk to the highest,
+// as the order to take them in; groups that tie keep their order.
+ms_rg_ord(int[] ms_cn, int ms_n) {
+  int[] ms_sk = [];
+  int ms_i = 0;
+  while(ms_i < ms_n) {
+    push(ms_sk, ms_rg_sk(ms_cn, ms_i));
+    ms_i = ms_i + 1;
+  }
+} chain (int[] ms_cn, int ms_n) {
+  int[] ms_ordr = ord_ints(ms_sk);
+} return int[] ms_ordr;
+([3, 1, 0, 0, 1, 3, 0, 0, 0, 0, 5, 0], 3):([1, 0, 2])
+([], 0):([])
+
+// The line for group ms_ix in the form ms_tab selects (1 tabs, 0 to read).
+ms_rg_pick(string[] ms_ks, int[] ms_cn, int ms_ix, int ms_lv, int ms_tab) {
+  string ms_ln = ms_rg_txt(ms_ks, ms_cn, ms_ix);
+  if(ms_tab == 1) {
+    ms_ln = ms_rg_tsv(ms_ks, ms_cn, ms_ix, ms_lv);
+  }
+} return string ms_ln;
+(["a"], [1, 0, 0, 0], 0, 0, 0):(" 100.0% killed 1, survived 0, invalid 0, other 0  a")
+(["a"], [1, 0, 0, 0], 0, 0, 1):("file\ta\t\t1\t0\t0\t0\t100.0")
+
+// One line for each group of the rows ms_rows at level ms_lv, worst first.
+ms_rg_block(string[] ms_rows, int ms_lv, int ms_tab) {
+  string[] ms_ks = ms_rp_keys(ms_rows, ms_lv);
+  int[] ms_cn = ms_rp_counts(ms_rows, ms_lv, ms_ks);
+  int[] ms_ordr = ms_rg_ord(ms_cn, len(ms_ks));
+} chain (string[] ms_rows, int ms_lv, int ms_tab) {
+  string ms_bl = "";
+  int ms_i = 0;
+  while(ms_i < len(ms_ordr)) {
+    ms_bl = ms_bl + ms_rg_pick(ms_ks, ms_cn, ms_ordr[ms_i], ms_lv, ms_tab) + "\n";
+    ms_i = ms_i + 1;
+  }
+} return string ms_bl;
+(["killed\t1\ta.id\tf\t1\t2\tcmp\t<\tx", "survived\t2\tb.id\tg\t1\t2\tcmp\t<\ty", "killed\t3\tb.id\tg\t3\t4\tcmp\t<\ty"], 0, 0):("  50.0% killed 1, survived 1, invalid 0, other 0  b.id\n 100.0% killed 1, survived 0, invalid 0, other 0  a.id\n")
+(["killed\t1\ta.id\tf\t1\t2\tcmp\t<\tx"], 2, 1):("tree\t\t\t1\t0\t0\t0\t100.0\n")
+([], 1, 0):("")

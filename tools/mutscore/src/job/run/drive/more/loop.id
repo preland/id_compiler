@@ -1,0 +1,47 @@
+// Going through the mutants a run owns, as many as its time allows.
+
+// The result line for the mutant ms_ml, built with ms_lim milliseconds to
+// spare. A build that runs out of them when ms_first is 1 (it had a whole run to
+// itself) is a "hang": it is not known whether a case never ends or the machine was
+// too slow, so it is not scored. Otherwise "" is answered and the mutant is left for the
+// next run.
+ms_dr_step(string[] ms_cf, string ms_ml, int ms_lim, int ms_first) {
+  string ms_res = ms_rn_one(ms_cf, ms_ml, ms_lim);
+  if(str_starts(ms_res, "timeout") == 1 && ms_first == 0) {
+    ms_res = "";
+  }
+  if(str_starts(ms_res, "timeout") == 1) {
+    ms_res = "hang" + str_slice(ms_res, 7, len(ms_res) - 7);
+  }
+} return string ms_res;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nsleep 5\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t50\t51\tret0\t0", 100, 1):("hang\t3\tsrc/a.id\tadd\t50\t51\tret0\t0\t} return int s;  =>  } return int 0;")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nsleep 5\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t50\t51\tret0\t0", 100, 0):("")
+
+// Builds one mutant and appends its result line to the file ms_pa. Answers 1
+// when it did, 0 when the mutant was left for the next run.
+ms_dr_do(string[] ms_cf, string ms_ml, string ms_pa, int ms_lim, int ms_first) {
+  string ms_res = ms_dr_step(ms_cf, ms_ml, ms_lim, ms_first);
+  int ms_ok = 0;
+  if(len(ms_res) > 0) {
+    ms_ok = ms_dr_add(ms_pa, ms_res + "\n") > 0;
+  }
+} return int ms_ok;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t32\t33\tarith\t-", (import ms_t_log), 20000, 1):(1) then ms_t_logtxt:("killed|2|src/a.id|add|32|33|arith|-|int s = a + b;  =>  int s = a - b;\n")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nsleep 5\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t32\t33\tarith\t-", (import ms_t_log), 100, 0):(0) then ms_t_logtxt:("")
+
+// Builds the mutants ms_td (indexes into ms_al) one after another, appending
+// each result to ms_pa, while less than ms_bg milliseconds have passed since
+// it began and each build has been given what is left of ms_hl. Answers how
+// many were built.
+ms_dr_loop(string[] ms_cf, string[] ms_al, int[] ms_td, string ms_pa, int ms_bg, int ms_hl) {
+  int ms_t1 = ticks();
+  int ms_i = 0;
+  int ms_go = 1;
+} chain (string[] ms_cf, string[] ms_al, int[] ms_td, string ms_pa, int ms_bg, int ms_hl) {
+  while(ms_i < len(ms_td) && ms_go == 1 && ticks() - ms_t1 < ms_bg) {
+    ms_go = ms_dr_do(ms_cf, ms_al[ms_td[ms_i]], ms_pa, ms_hl - (ticks() - ms_t1), ms_i == 0);
+    ms_i = ms_i + ms_go;
+  }
+} return int ms_i;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], ["src/a.id\tadd\t32\t33\tarith\t-", "src/a.id\tadd\t50\t51\tret0\t0"], [0, 1], (import ms_t_log), 100000, 50000):(2) then ms_t_logtxt:("killed|2|src/a.id|add|32|33|arith|-|int s = a + b;  =>  int s = a - b;\nsurvived|3|src/a.id|add|50|51|ret0|0|} return int s;  =>  } return int 0;\n")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], ["src/a.id\tadd\t32\t33\tarith\t-"], [0], (import ms_t_log), 0, 50000):(0) then ms_t_logtxt:("")

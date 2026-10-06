@@ -1,0 +1,24 @@
+// Cutting a case line at its brackets.
+
+// The text between the end of token ms_a and the start of token ms_b of the
+// case line ms_ln, trimmed; to the end of the line when there is no token
+// ms_b.
+ms_lt_sl(string ms_ln, int[] ms_tk, int ms_a, int ms_b) {
+  int ms_e = ms_tk_get(ms_tk, ms_b, 1);
+  int ms_f = ms_tk_get(ms_tk, ms_a, 2);
+  int ms_g = ms_e + (ms_e < 0) * (len(ms_ln) + 1);
+} chain (string ms_ln, int[] ms_tk, int ms_a, int ms_b) {
+  string ms_q = str_trim(str_slice(ms_ln, ms_f, ms_g - ms_f));
+} return string ms_q;
+given ms_t_lex("(1):(2) then x") ("(1):(2) then x", (import ms_t_tk), 0, 2):("1")
+given ms_t_lex("(1):(2) then x") ("(1):(2) then x", (import ms_t_tk), 6, 9):("then x")
+
+// The arguments, expected values and clauses of the case line ms_ln, whose
+// tokens are ms_tk and whose argument/expected colon is token ms_c.
+ms_lt_cut(string ms_ln, int[] ms_tk, int ms_c) {
+  int ms_o1 = ms_lt_open(ms_ln, ms_tk, ms_c - 1);
+  int ms_cl = ms_fn_close(ms_ln, ms_tk, ms_c + 1);
+  string[] ms_pcs = [ms_lt_sl(ms_ln, ms_tk, ms_o1, ms_c - 1), ms_lt_sl(ms_ln, ms_tk, ms_c + 1, ms_cl), ms_lt_sl(ms_ln, ms_tk, ms_cl, ms_cl + 99)];
+} return string[] ms_pcs;
+given ms_t_lex("(1, 2):(3) then x:(4)") ("(1, 2):(3) then x:(4)", (import ms_t_tk), 5):(["1, 2", "3", "then x:(4)"])
+given ms_t_lex("given f(1) ():()") ("given f(1) ():()", (import ms_t_tk), 7):(["", "", ""])

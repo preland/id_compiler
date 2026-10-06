@@ -1,0 +1,27 @@
+// What lies between tokens: white space and `//` comments.
+
+// Where the one blank or comment starting at ms_i ends; ms_i itself when a
+// token starts there (or the text has ended).
+ms_lx_gap(string ms_s, int ms_i) {
+  int ms_c = charat(ms_s, ms_i);
+  int ms_j = ms_i + chr_is_space(ms_c);
+  if(ms_c == 47 && charat(ms_s, ms_i + 1) == 47) {
+    ms_j = str_eol(ms_s, ms_i);
+  }
+} return int ms_j;
+(" x", 0):(1)
+("a // c\nb", 2):(6)
+("a b", 0):(0)
+
+// The start of the next token at or after ms_i, or the text's length when only
+// blanks and comments remain.
+ms_lx_skip(string ms_s, int ms_i) {
+  int ms_j = ms_i;
+  int ms_g = ms_lx_gap(ms_s, ms_j);
+  while(ms_g != ms_j) {
+    ms_j = ms_g;
+    ms_g = ms_lx_gap(ms_s, ms_j);
+  }
+} return int ms_j;
+("  // c\n  x", 0):(9)
+("ab", 0):(0)

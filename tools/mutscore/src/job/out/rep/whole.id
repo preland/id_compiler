@@ -1,0 +1,26 @@
+// The whole report, in the form to read and in tabs.
+
+// The report to read: the tree's score, every surviving mutant, then the
+// functions and the files from the worst score up.
+ms_rp_text(string[] ms_rows) {
+  string ms_tr = ms_rg_block(ms_rows, 2, 0);
+  string ms_sur = ms_rg_muts(ms_rows, 0);
+  string ms_fn = ms_rg_block(ms_rows, 1, 0);
+} chain (string[] ms_rows) {
+  string ms_fi = ms_rg_block(ms_rows, 0, 0);
+  string ms_rep = "tree:\n" + ms_tr + "\nsurviving mutants (the cases do not notice these changes):\n" + ms_sur + "\nper function, worst first:\n" + ms_fn + "\nper file, worst first:\n" + ms_fi;
+} return string ms_rep;
+(["killed\t1\ta.id\tf\t1\t2\tcmp\t<\tx", "survived\t2\tb.id\tg\t1\t2\tcmp\t<\ty", "killed\t3\tb.id\tg\t3\t4\tcmp\t<\ty"]):("tree:\n  66.6% killed 2, survived 1, invalid 0, other 0  (whole tree)\n\nsurviving mutants (the cases do not notice these changes):\nb.id:2: g [cmp]  y\n\nper function, worst first:\n  50.0% killed 1, survived 1, invalid 0, other 0  b.id g\n 100.0% killed 1, survived 0, invalid 0, other 0  a.id f\n\nper file, worst first:\n  50.0% killed 1, survived 1, invalid 0, other 0  b.id\n 100.0% killed 1, survived 0, invalid 0, other 0  a.id\n")
+([]):("tree:\n\nsurviving mutants (the cases do not notice these changes):\n\nper function, worst first:\n\nper file, worst first:\n")
+
+// The report in tabs: two comment lines naming the columns, a row for the
+// tree, each file and each function, then a row for every mutant.
+ms_rp_tsv(string[] ms_rows) {
+  string ms_hd = "#group: level file fn killed survived invalid other score_pct\n#mutant: mutant file fn op line status change\n";
+  string ms_gr = ms_rg_block(ms_rows, 2, 1) + ms_rg_block(ms_rows, 0, 1) + ms_rg_block(ms_rows, 1, 1);
+  string ms_mu = ms_rg_muts(ms_rows, 1);
+} chain (string[] ms_rows) {
+  string ms_all = ms_hd + ms_gr + ms_mu;
+} return string ms_all;
+(["killed\t1\ta.id\tf\t1\t2\tcmp\t<\tx", "survived\t2\tb.id\tg\t1\t2\tcmp\t<\ty", "killed\t3\tb.id\tg\t3\t4\tcmp\t<\ty"]):("#group: level file fn killed survived invalid other score_pct\n#mutant: mutant file fn op line status change\ntree\t\t\t2\t1\t0\t0\t66.6\nfile\tb.id\t\t1\t1\t0\t0\t50.0\nfile\ta.id\t\t1\t0\t0\t0\t100.0\nfn\tb.id\tg\t1\t1\t0\t0\t50.0\nfn\ta.id\tf\t1\t0\t0\t0\t100.0\nmutant\ta.id\tf\tcmp\t1\tkilled\tx\nmutant\tb.id\tg\tcmp\t2\tsurvived\ty\nmutant\tb.id\tg\tcmp\t3\tkilled\ty\n")
+(["timeout\t1\ta.id\tf\t1\t2\tret0\t0"]):("#group: level file fn killed survived invalid other score_pct\n#mutant: mutant file fn op line status change\ntree\t\t\t0\t0\t0\t1\t-\nfile\ta.id\t\t0\t0\t0\t1\t-\nfn\ta.id\tf\t0\t0\t0\t1\t-\nmutant\ta.id\tf\tret0\t1\ttimeout\t\n")

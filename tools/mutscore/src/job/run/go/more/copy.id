@@ -1,0 +1,46 @@
+// The scratch copy of a tree: made once per run, then mutated in place.
+
+// Writes a program that builds and passes by itself, prog/main.id under
+// ms_work, for a run whose subject is the library: building it is what runs
+// the library's cases. Answers the bytes written.
+ms_rn_prog(string ms_work) {
+  int ms_d = fs_mkdir(path_join(ms_work, "prog"));
+  string ms_pm = path_join(ms_work, "prog/main.id");
+  int ms_n = exec_file_put(ms_pm, "main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n", 420);
+} return int ms_n;
+given ms_t_tree ((import ms_t_work)):(83) then ms_t_pm:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
+("/no/such/dir_ms"):(-1)
+
+// Copies the tree ms_root into ms_work (as a directory of the same name),
+// links the siblings of ms_wi beside it, and, when ms_sd is 1, writes the
+// library's program. Answers 1 when every step worked.
+ms_rn_prep(string ms_root, string[] ms_wi, int ms_sd, string ms_work) {
+  string ms_dst = path_join(ms_work, path_base(ms_root));
+  int ms_rc = ms_rn_sh("cp\n-r\n" + ms_root + "\n" + ms_dst + "\n");
+  int ms_k = ms_rn_links(ms_root, ms_wi, ms_work);
+} chain (string ms_root, string[] ms_wi, int ms_sd, string ms_work) {
+  int ms_ok = ms_rc == 0 && ms_k == 0;
+  if(ms_sd == 1 && ms_ok == 1) {
+    ms_ok = ms_rn_prog(ms_work) > 0;
+  }
+} return int ms_ok;
+given ms_t_tree ((import ms_t_root), [], 0, (import ms_t_work)):(1) then ms_t_cpa:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+given ms_t_tree ((import ms_t_root), ["sib"], 1, (import ms_t_work)):(1) then ms_t_sib:("sib\n") then ms_t_pm:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
+given ms_t_tree ("/no/such/root_ms", [], 0, (import ms_t_work)):(0)
+
+// Fills in the fields of the configuration ms_cf that depend on the scratch
+// directory ms_work: it, the copy of the root, what idc is pointed at, and the
+// library home. A run on a library has a non-empty library field to begin with.
+ms_rn_cfg(string[] ms_cf, string ms_work) {
+  string ms_dst = path_join(ms_work, path_base(ms_cf[(import ms_cf_root)]));
+  ms_cf[(import ms_cf_work)] = ms_work;
+  ms_cf[(import ms_cf_copy)] = ms_dst;
+} chain (string[] ms_cf, string ms_work) {
+  ms_cf[(import ms_cf_prog)] = ms_dst;
+  if(len(ms_cf[(import ms_cf_std)]) > 0) {
+    ms_cf[(import ms_cf_prog)] = path_join(ms_work, "prog");
+    ms_cf[(import ms_cf_std)] = ms_dst;
+  }
+} return void;
+(["/r", "a", "idc", "/o", "", "", "", ""], "/w"):(["/r", "a", "idc", "/o", "/w", "/w/r", "", "/w/r"])
+(["/r", "a", "idc", "/o", "", "", "1", ""], "/w"):(["/r", "a", "idc", "/o", "/w", "/w/prog", "/w/r", "/w/r"])

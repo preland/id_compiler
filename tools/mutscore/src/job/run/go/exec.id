@@ -1,0 +1,45 @@
+// Running the build of one mutant, and turning its answer into a result line.
+
+// Runs the build the configuration describes, killing it after ms_ms
+// milliseconds; answers its exit status (-2 for the kill), a newline, then
+// everything it printed.
+ms_rn_run(string[] ms_cf, int ms_ms) {
+  string ms_ag = ms_rn_argv(ms_cf);
+  int[] ms_in = [];
+  int[] ms_ob = [];
+} chain (string[] ms_cf, int ms_ms) {
+  int ms_rc = exec_run(ms_ag, 0, 0, ms_in, ms_ob, ms_ob, ms_ms);
+  string ms_tx = "" + ms_rc + "\n" + exec_text(ms_ob);
+} return string ms_tx;
+(["/r", "", "sh\n-c\necho hi; exit 3\nidc", "/o", "/w", "/w/r", "", "/w/r"], 5000):("3\nhi\n")
+(["/r", "", "sh\n-c\nsleep 5\nidc", "/o", "/w", "/w/r", "", "/w/r"], 100):("-2\n")
+
+// Builds the mutant on line ms_ml (file, function, start, end, operator,
+// replacement, tab-separated) inside the copy of the tree, then puts the file
+// back as it was. Answers STATUS, the mutated line's number, the mutant's own
+// fields and the line it makes, tab-separated.
+ms_rn_one(string[] ms_cf, string ms_ml, int ms_ms) {
+  string[] ms_fd = str_split(ms_ml, "\t");
+  string ms_pa = path_join(ms_cf[(import ms_cf_copy)], ms_fd[0]);
+  string ms_src = fs_read_text(ms_pa);
+} chain (string[] ms_cf, string ms_ml, int ms_ms) {
+  int ms_a = to_int(ms_fd[2]);
+  int ms_b = to_int(ms_fd[3]);
+  string ms_nw = ms_rn_cut(ms_src, ms_a, ms_b, ms_fd[5]);
+} chain (string[] ms_cf, string ms_ml, int ms_ms) {
+  exec_file_put(ms_pa, ms_nw, 420);
+  string ms_out = ms_rn_run(ms_cf, ms_ms);
+  exec_file_put(ms_pa, ms_src, 420);
+} chain (string[] ms_cf, string ms_ml, int ms_ms) {
+  int ms_nl = str_find(ms_out, "\n");
+  string ms_tx = str_slice(ms_out, ms_nl + 1, len(ms_out) - ms_nl - 1);
+  int ms_rc = to_int(str_slice(ms_out, 0, ms_nl));
+} chain (string[] ms_cf, string ms_ml, int ms_ms) {
+  string ms_st = ms_rn_class(ms_tx, ms_rc);
+  string ms_df = str_replace(ms_df_show(ms_src, ms_a, ms_b, ms_fd[5]), "\t", " ");
+  int ms_lno = ms_df_ln(ms_src, ms_a);
+} chain (string[] ms_cf, string ms_ml, int ms_ms) {
+  string ms_res = ms_st + "\t" + ms_lno + "\t" + ms_ml + "\t" + ms_df;
+} return string ms_res;
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", "/o", (import ms_t_root), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t32\t33\tarith\t-", 20000):("killed\t2\tsrc/a.id\tadd\t32\t33\tarith\t-\tint s = a + b;  =>  int s = a - b;") then ms_t_a:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", "/o", (import ms_t_root), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t50\t51\tret0\t0", 20000):("survived\t3\tsrc/a.id\tadd\t50\t51\tret0\t0\t} return int s;  =>  } return int 0;") then ms_t_a:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")

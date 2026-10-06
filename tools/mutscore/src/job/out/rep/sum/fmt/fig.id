@@ -1,0 +1,36 @@
+// A group's figures as text.
+
+// The score of ms_ko killed against ms_su survived mutants as a percentage with
+// one decimal ("-" when there are none of either): invalid and other mutants
+// are not counted.
+ms_rp_pct(int ms_ko, int ms_su) {
+  string ms_pc = "-";
+  int ms_t = 1000 * ms_ko / (ms_ko + ms_su + (ms_ko + ms_su == 0));
+  if(ms_ko + ms_su > 0) {
+    ms_pc = "" + ms_t / 10 + "." + ms_t % 10;
+  }
+} return string ms_pc;
+(14, 1):("93.3")
+(1, 2):("33.3")
+(0, 0):("-")
+(0, 3):("0.0")
+(5, 0):("100.0")
+
+// The figures of group ms_ix in the counts ms_cn, tab-separated: killed,
+// survived, invalid, other, score.
+ms_rp_fig(int[] ms_cn, int ms_ix) {
+  int ms_b = 4 * ms_ix;
+  string ms_pc = ms_rp_pct(ms_cn[ms_b], ms_cn[ms_b + 1]);
+  string ms_fg = ms_cn[ms_b] + "\t" + ms_cn[ms_b + 1] + "\t" + ms_cn[ms_b + 2] + "\t" + ms_cn[ms_b + 3] + "\t" + ms_pc;
+} return string ms_fg;
+([2, 1, 0, 0, 1, 1, 4, 5], 0):("2\t1\t0\t0\t66.6")
+([2, 1, 0, 0, 1, 1, 4, 5], 1):("1\t1\t4\t5\t50.0")
+
+// The same figures to read: score, then the four counts named.
+ms_rp_say(int[] ms_cn, int ms_ix) {
+  int ms_b = 4 * ms_ix;
+  string ms_pc = ms_rp_pct(ms_cn[ms_b], ms_cn[ms_b + 1]);
+  string ms_fg = fmt_pad(ms_pc + "%", 7) + " killed " + ms_cn[ms_b] + ", survived " + ms_cn[ms_b + 1] + ", invalid " + ms_cn[ms_b + 2] + ", other " + ms_cn[ms_b + 3];
+} return string ms_fg;
+([2, 1, 0, 0, 1, 1, 4, 5], 0):("  66.6% killed 2, survived 1, invalid 0, other 0")
+([2, 1, 0, 0, 1, 1, 4, 5], 1):("  50.0% killed 1, survived 1, invalid 4, other 5")

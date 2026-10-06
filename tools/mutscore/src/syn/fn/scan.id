@@ -1,0 +1,41 @@
+// A source's functions: one record of four token indices for each.
+
+// Appends the record [name, first body token, `return`, `;` ending the
+// return clause] for the function named by token ms_t whose body opens at
+// token ms_h, and answers the token to resume scanning at.
+ms_fn_take(string ms_s, int[] ms_tk, int ms_t, int ms_h, int[] ms_fs) {
+  int ms_c = ms_fn_close(ms_s, ms_tk, ms_h);
+  int ms_r = ms_fn_tail(ms_s, ms_tk, ms_c);
+  int ms_e = ms_t + 1;
+} chain (string ms_s, int[] ms_tk, int ms_t, int ms_h, int[] ms_fs) {
+  if(ms_r >= 0) {
+    ms_e = ms_fn_semi(ms_s, ms_tk, ms_r);
+    lst_extend(ms_fs, [ms_t, ms_h + 1, ms_r, ms_e]);
+  }
+} return int ms_e;
+given ms_t_lex("f() {} return int 0;") ("f() {} return int 0;", (import ms_t_tk), 0, 4, []):(8)
+given ms_t_lex("f() {} x") ("f() {} x", (import ms_t_tk), 0, 4, []):(1)
+
+// The token to continue at after looking at token ms_t: past the function it
+// names when it starts one (recording it in ms_fs), else the next token.
+ms_fn_next(string ms_s, int[] ms_tk, int ms_t, int[] ms_fs) {
+  int ms_h = ms_fn_head(ms_s, ms_tk, ms_t);
+  int ms_e = ms_t + 1;
+  if(ms_h >= 0) {
+    ms_e = ms_fn_take(ms_s, ms_tk, ms_t, ms_h, ms_fs) + 1;
+  }
+} return int ms_e;
+given ms_t_lex("f() {} return int 0;") ("f() {} return int 0;", (import ms_t_tk), 0, []):(9)
+given ms_t_lex("f() {} return int 0;") ("f() {} return int 0;", (import ms_t_tk), 1, []):(2)
+
+// Every function of the source ms_s (tokens ms_tk) as records of four token
+// indices: name, first body token, `return`, the `;` that ends the clause.
+ms_fn_scan(string ms_s, int[] ms_tk) {
+  int[] ms_fs = [];
+  int ms_t = 0;
+  while(3 * ms_t < len(ms_tk)) {
+    ms_t = ms_fn_next(ms_s, ms_tk, ms_t, ms_fs);
+  }
+} return int[] ms_fs;
+given ms_t_lex("f(a) {\n a = 1;\n} return int a;\n(1):(1)\ng() {\n} chain () {\n} return void;") ("f(a) {\n a = 1;\n} return int a;\n(1):(1)\ng() {\n} chain () {\n} return void;", (import ms_t_tk)):([0, 5, 10, 13, 21, 25, 31, 33])
+given ms_t_lex("struct P {\n int x;\n}\nnative n(int a) return int;") ("struct P {\n int x;\n}\nnative n(int a) return int;", (import ms_t_tk)):([])

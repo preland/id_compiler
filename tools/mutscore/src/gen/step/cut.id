@@ -1,0 +1,39 @@
+// Mutants that change an index or remove a statement.
+
+// The row that moves the index opened by the `[` at token ms_t one element
+// along, when that `[` follows a name, `]` or `)` and is not empty.
+ms_st_idx(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_c = ms_fn_close(ms_s, ms_tk, ms_t);
+  int ms_p = ms_tk_ch(ms_s, ms_tk, ms_t - 1);
+  int ms_ix = ms_tk_ch(ms_s, ms_tk, ms_t) == 91 && ms_c > ms_t + 1 && (ms_tk_get(ms_tk, ms_t - 1, 0) == (import ms_k_id) || ms_p == 93 || ms_p == 41);
+} chain (string ms_s, int[] ms_tk, int ms_t) {
+  string[] ms_o = [];
+  if(ms_ix == 1) {
+    push(ms_o, ms_mu_row(ms_s, ms_tk, ms_c, ms_c, "idx", " + 1]"));
+  }
+} return string[] ms_o;
+("a[i]", [0, 0, 1, 4, 1, 2, 0, 2, 3, 4, 3, 4], 1):(["3\t4\tidx\t + 1]"])
+("a[]", [0, 0, 1, 4, 1, 2, 4, 2, 3], 1):([])
+("[1]", [4, 0, 1, 1, 1, 2, 4, 2, 3], 0):([])
+("=[1]", [4, 0, 1, 4, 1, 2, 1, 2, 3, 4, 3, 4], 1):([])
+("a", [0, 0, 1], 0):([])
+
+// 1 when token ms_t is a `;`, `{` or `}`: the tokens a statement starts after.
+ms_mu_bound(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_c = ms_tk_ch(ms_s, ms_tk, ms_t);
+  int ms_b = ms_c == 59 || ms_c == 123 || ms_c == 125;
+} return int ms_b;
+("{", [4, 0, 1], 0):(1)
+("}", [4, 0, 1], 0):(1)
+(";", [4, 0, 1], 0):(1)
+("a", [0, 0, 1], 0):(0)
+
+// The first token of the statement that ends at token ms_t.
+ms_mu_head(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_u = ms_t;
+  while(ms_u > 0 && ms_mu_bound(ms_s, ms_tk, ms_u - 1) == 0) {
+    ms_u = ms_u - 1;
+  }
+} return int ms_u;
+("{a=1;}", [4, 0, 1, 0, 1, 2, 4, 2, 3, 1, 3, 4, 4, 4, 5, 4, 5, 6], 4):(1)
+("a;", [0, 0, 1, 4, 1, 2], 1):(0)

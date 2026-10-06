@@ -1,0 +1,39 @@
+// Reading a token list (consecutive triples: kind, start, end). Every reader
+// answers -1 or 0 for a token that is not there, so a scan may look past the
+// end without trapping.
+
+// Field ms_f (0 kind, 1 start, 2 end) of token ms_t, or -1 when there is no such token.
+ms_tk_get(int[] ms_tk, int ms_t, int ms_f) {
+  int ms_v = -1;
+  if(ms_t >= 0 && 3 * ms_t + 2 < len(ms_tk)) {
+    ms_v = ms_tk[3 * ms_t + ms_f];
+  }
+} return int ms_v;
+([0, 4, 7, 4, 8, 9], 1, 1):(8)
+([0, 4, 7], 1, 1):(-1)
+([0, 4, 7], -1, 0):(-1)
+([0, 4, 7, 4, 8, 9], 0, 2):(7)
+
+// The first byte of token ms_t's text, or -1 when there is no such token.
+ms_tk_ch(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_a = ms_tk_get(ms_tk, ms_t, 1);
+  int ms_c = -1;
+  if(ms_a >= 0) {
+    ms_c = charat(ms_s, ms_a);
+  }
+} return int ms_c;
+("a;", [0, 0, 1, 4, 1, 2], 1):(59)
+("a;", [0, 0, 1, 4, 1, 2], 2):(-1)
+
+// 1 when token ms_t's text is exactly ms_wd.
+ms_tk_is(string ms_s, int[] ms_tk, int ms_t, string ms_wd) {
+  int ms_a = ms_tk_get(ms_tk, ms_t, 1);
+  int ms_ok = 0;
+  if(ms_a >= 0) {
+    ms_ok = str_eqat(ms_s, ms_a, ms_wd) && ms_tk[3 * ms_t + 2] - ms_a == len(ms_wd);
+  }
+} return int ms_ok;
+("ab cd", [0, 0, 2, 0, 3, 5], 1, "cd"):(1)
+("ab cd", [0, 0, 2, 0, 3, 5], 0, "abc"):(0)
+("ab cd", [0, 0, 2, 0, 3, 5], 0, "a"):(0)
+("ab cd", [0, 0, 2, 0, 3, 5], 5, "a"):(0)

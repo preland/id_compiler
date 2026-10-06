@@ -1,0 +1,45 @@
+// Counting results: how many mutants of each answer, per function, per file
+// and in all. A key names the group a row belongs to; counts come four to a
+// key (killed, survived, invalid, other).
+
+// The count slot of the answer ms_st: its place in ms_st_names, 3 for any
+// other answer. A hang is an other answer: it is not scored.
+ms_rp_cls(string ms_st) {
+  int ms_c = lst_str_index((import ms_st_names), ms_st);
+  if(ms_c < 0) {
+    ms_c = 3;
+  }
+} return int ms_c;
+("killed"):(0)
+("survived"):(1)
+("invalid"):(2)
+("timeout"):(3)
+("hang"):(3)
+
+// The group of the result row whose tab-separated fields are ms_fd, at level
+// ms_lv: 0 its file, 1 its file and function, 2 everything ("").
+ms_rp_key(string[] ms_fd, int ms_lv) {
+  string ms_ky = "";
+  if(ms_lv == 0) {
+    ms_ky = ms_fd[2];
+  }
+  if(ms_lv == 1) {
+    ms_ky = ms_fd[2] + "\t" + ms_fd[3];
+  }
+} return string ms_ky;
+(["killed", "2", "a.id", "f"], 0):("a.id")
+(["killed", "2", "a.id", "f"], 1):("a.id\tf")
+(["killed", "2", "a.id", "f"], 2):("")
+
+// Adds the group of the row ms_rw (at level ms_lv) to ms_ks unless it is
+// there already.
+ms_rp_note(string[] ms_ks, string ms_rw, int ms_lv) {
+  string[] ms_fd = str_split(ms_rw, "\t");
+  string ms_ky = ms_rp_key(ms_fd, ms_lv);
+  if(lst_str_index(ms_ks, ms_ky) < 0) {
+    push(ms_ks, ms_ky);
+  }
+} return void;
+(["a"], "killed\t1\tb.id\tf", 0):(["a", "b.id"])
+(["b.id"], "killed\t1\tb.id\tf", 0):(["b.id"])
+

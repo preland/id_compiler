@@ -1,0 +1,23 @@
+// More checks on the scratch copy, and the setups that make it.
+
+// What the written program prog/main.id reads as in the work directory.
+ms_t_pm() {
+  string ms_q = fs_read_text((import ms_t_work) + "/prog/main.id");
+} return string ms_q;
+given ms_t_tree ():("")
+given ms_t_tree given ms_t_wpg ():("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
+
+// Setup: copies the fixture's project into the work directory.
+ms_t_wcp() {
+  string[] ms_wi = [];
+  int ms_rc = ms_rn_prep((import ms_t_root), ms_wi, 0, (import ms_t_work));
+} return void;
+given ms_t_tree ():() then ms_t_cpa:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
+given ms_t_tree ():() then ms_t_cpa:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n") then ms_t_ns:(3)
+
+// Setup: writes the library program into the work directory.
+ms_t_wpg() {
+  int ms_n = ms_rn_prog((import ms_t_work));
+} return void;
+given ms_t_tree ():() then ms_t_pm:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
+given ms_t_tree ():() then ms_t_pm:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n") then ms_t_ns:(3)

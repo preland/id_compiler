@@ -1,0 +1,40 @@
+// The groups of the rows ms_rows at level ms_lv, in the order they first
+// appear.
+ms_rp_keys(string[] ms_rows, int ms_lv) {
+  string[] ms_ks = [];
+  int ms_i = 0;
+  while(ms_i < len(ms_rows)) {
+    ms_rp_note(ms_ks, ms_rows[ms_i], ms_lv);
+    ms_i = ms_i + 1;
+  }
+} return string[] ms_ks;
+(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"], 0):(["a.id", "b.id"])
+(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"], 1):(["a.id\tf", "a.id\tg", "b.id\th"])
+(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"], 2):([""])
+([], 1):([])
+
+// Adds one to the slot for row ms_rw's answer in the counts ms_cn, whose
+// groups are ms_ks, at level ms_lv.
+ms_rp_tick(int[] ms_cn, string[] ms_ks, string ms_rw, int ms_lv) {
+  string[] ms_fd = str_split(ms_rw, "\t");
+  int ms_at = 4 * lst_str_index(ms_ks, ms_rp_key(ms_fd, ms_lv)) + ms_rp_cls(ms_fd[0]);
+  ms_cn[ms_at] = ms_cn[ms_at] + 1;
+} return void;
+([0, 0, 0, 0, 0, 0, 0, 0], ["a", "b"], "survived\t1\tb\tf", 0):([0, 0, 0, 0, 0, 1, 0, 0])
+([0, 0, 0, 0, 0, 0, 0, 0], ["a", "b"], "timeout\t1\ta\tf", 0):([0, 0, 0, 1, 0, 0, 0, 0])
+
+// The counts of ms_rows at level ms_lv, four to each group of ms_ks:
+// killed, survived, invalid, other.
+ms_rp_counts(string[] ms_rows, int ms_lv, string[] ms_ks) {
+  int[] ms_cn = [];
+  lst_fill(ms_cn, 4 * len(ms_ks), 0);
+  int ms_i = 0;
+} chain (string[] ms_rows, int ms_lv, string[] ms_ks) {
+  while(ms_i < len(ms_rows)) {
+    ms_rp_tick(ms_cn, ms_ks, ms_rows[ms_i], ms_lv);
+    ms_i = ms_i + 1;
+  }
+} return int[] ms_cn;
+(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"], 0, ["a.id", "b.id"]):([1, 1, 1, 0, 1, 1, 0, 1])
+(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"], 1, ["a.id\tf", "a.id\tg", "b.id\th"]):([1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1])
+(["killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx", "survived\t5\ta.id\tf\t6\t7\tlit\t2\tz", "invalid\t7\ta.id\tg\t1\t2\tdel\t\tq", "killed\t9\tb.id\th\t1\t2\tarith\t-\tm", "survived\t4\tb.id\th\t3\t4\tarith\t+\tn", "timeout\t1\tb.id\th\t5\t6\tret0\t0\to"], 2, [""]):([2, 2, 1, 1])
