@@ -634,7 +634,6 @@ int id_hmap_get(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, char
 int id_hmap_has(IdList* idstd_keys, IdList* idstd_used, char* idstd_key);
 void id_hmap_put(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt, char* idstd_key, int idstd_val);
 void id_hset_add(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdList* idstd_cnt, char* idstd_key);
-char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to);
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s);
 int id_lst_get_or(IdList* idstd_xs, int idstd_i, int idstd_lg_d);
@@ -653,6 +652,7 @@ int id_fx_min(int idstd_a, int idstd_b);
 int id_fx_max(int idstd_a, int idstd_b);
 int id_fx_sign(int idstd_a);
 int id_chr_is_space(int idstd_c);
+char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to);
 char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n);
 void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad);
 int id_idstd_str_rep_width(char* idstd_s, int idstd_n);
@@ -3898,14 +3898,6 @@ void id_hset_add(IdList* idstd_keys, IdList* idstd_vals, IdList* idstd_used, IdL
     return;
 }
 
-char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to) {
-    IdList* idstd_ln_parts;
-    char* idstd_ln_r;
-    idstd_ln_parts = id_str_split(idstd_ln_s, idstd_ln_from);
-    idstd_ln_r = id_str_join(idstd_ln_parts, idstd_ln_to);
-    return idstd_ln_r;
-}
-
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
     id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;
@@ -4053,6 +4045,14 @@ int id_chr_is_space(int idstd_c) {
     int idstd_ret_i;
     idstd_ret_i = ((((idstd_c == 32) || (idstd_c == 9)) || (idstd_c == 10)) || (idstd_c == 13));
     return idstd_ret_i;
+}
+
+char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to) {
+    IdList* idstd_ln_parts;
+    char* idstd_ln_r;
+    idstd_ln_parts = id_str_split(idstd_ln_s, idstd_ln_from);
+    idstd_ln_r = id_str_join(idstd_ln_parts, idstd_ln_to);
+    return idstd_ln_r;
 }
 
 char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n) {
