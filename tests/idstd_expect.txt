@@ -45,3 +45,7 @@ compiler/parse   needs-std
 #   (and demos/engine, its reference copy) is idstd's sys/io/term now.
 moonbuggy        needs-std
 solitaire        needs-std
+
+# demos/thrdemo: threads (thr_map) and its serial reference (thr_map_serial) are the
+# library's, so it needs it. Serial and 4-thread runs both print "hash 4135956".
+thrdemo          needs-std

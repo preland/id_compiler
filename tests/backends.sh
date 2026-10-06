@@ -690,7 +690,7 @@ fi
 # The same through a library whose conf.id imports every backend.
 c7std="$TMP/c7std"; mkdir -p "$c7std/win" "$TMP/c7hello" "$TMP/c7win"
 cp "$c7none/conf.id" "$c7std/conf.id"
-printf 'c7_width() {\n  int cw = gfx_width();\n} return int cw;\n' > "$c7std/win/w.id"
+printf 'c7_width() {\n  int cw = gfx_sys_width();\n} return int cw;\n' > "$c7std/win/w.id"
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/c7hello/main.id"
 : > "$TMP/cc.log"
 if env -u IDC_NO_STD $BIN_IDC "$TMP/c7hello" --std "$c7std" --cc "$cclog" -o "$TMP/c7hello.bin" >"$TMP/c7hello.err" 2>&1 \
@@ -1007,7 +1007,7 @@ c7h="$TMP/c7harn"; mkdir -p "$c7h"
 printf 'import "%s"\nimport "%s"\n' "$(be_abs fs)" "$(be_abs gfx)" > "$c7h/conf.id"
 cat > "$c7h/main.id" <<'EOF'
 main(int argc, string[] argv) {
-  int w = gfx_width();
+  int w = gfx_sys_width();
   int p = probe("/nonexistent-c7");
   print(p + w);
 } return int 0;
@@ -1049,7 +1049,7 @@ printf 'import "%s"\nimport "%s"\n' \
     "$(be_abs gfx)" "$(be_abs gl)" > "$dual/conf.id"
 cat > "$dual/main.id" <<'EOF'
 main(int argc, string[] argv) {
-  int sw = gfx_open(64, 48, "dual soft");
+  int sw = gfx_sys_open(64, 48, "dual soft");
   int hw = glwin_open(64, 48, "dual gpu");
   boot(sw, hw);
 } return int 0;
@@ -1082,13 +1082,13 @@ one(int t) {
 
 finish() {
   gl_end_frame();
-  string msg = "soft " + gfx_width() + " gpu " + gl_width();
+  string msg = "soft " + gfx_sys_width() +" gpu " + gl_width();
   print(msg);
 } return void;
 EOF
 cat > "$dual/loop/more.id" <<'EOF'
 render() {
-  gfx_present((import fb));
+  gfx_sys_present((import fb));
   gl_begin_frame(200, 30, 30);
   finish();
 } return void;

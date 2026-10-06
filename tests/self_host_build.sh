@@ -136,7 +136,7 @@ for prog in ../../demos/gfxdemo; do
         bad "backend emit-c: bin/idc failed on $prog"
         continue
     fi
-    if grep -qx 'int id_gfx_open(int w, int h, char\* title);' "$TMP/be_self.c" \
+    if grep -qE '^int id_gfx_open\(int [A-Za-z_0-9]+, int [A-Za-z_0-9]+, char\* [A-Za-z_0-9]+\);$' "$TMP/be_self.c" \
        && ! grep -q '^extern int id_' "$TMP/be_self.c"; then
         ok "backend calls are emitted as prototypes via bin/idc ($prog)"
     else

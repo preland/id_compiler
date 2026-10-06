@@ -1,0 +1,2 @@
+int lib_k = 7;
+int lib_j = (import lib_k);
