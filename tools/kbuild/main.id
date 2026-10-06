@@ -4,7 +4,9 @@
 //
 //   kbuild IDC_ROOT [OUT]        (OUT defaults to build/kernel.elf, under IDC_ROOT)
 //
-// IDC_ROOT is the idc directory; the kernel lives beside it, in ../kernel.
+// IDC_ROOT is the idc directory; the kernel lives beside it, in ../kernel. Between
+// the runtime and the kernel, kbuild stages the library the kernel is built against,
+// idstd's core tier and the constants it reads, in IDC_ROOT/build/std_core.
 // Nothing here compiles C. clang appears twice -- once as an assembler for each
 // of the boot stub's two files, never as a C compiler -- and the two programs
 // are compiled with --allow-untested until their functions have cases. A

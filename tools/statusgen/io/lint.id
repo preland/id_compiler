@@ -15,7 +15,8 @@ sg_lint(string sgl_mut, string sgl_root) {
 
 // What a freestanding tree is built with when the compiler is asked which of its
 // functions it exempts: `SUBDIR TAB FLAGS`, "" for a tree built for the host.
-// These are the flags tools/kbuild builds the two trees with.
+// These are the flags tools/kbuild builds the two trees with, except that the
+// kernel's staged library is left off: the answer is about its own functions.
 sg_fsrow(string sgs_label) {
   string sgs_r = "";
   if(sgs_label == "kernel") {

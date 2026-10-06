@@ -1,0 +1,27 @@
+// The steps after the library is staged: the kernel, the boot stub, the link.
+
+// The commands that make the image from the staged library under root/build/std_core,
+// as the lines exec_run takes: the kernel built against it, the two assembler runs
+// over the boot stub, and the link into out.
+kb_plan_img(string root, string out) {
+  string[] steps = [];
+  string flags = "--std\n" + root + "/" + (import kb_std) + "\n--freestanding\n--allow-untested";
+  push(steps, kb_idc(root, root + "/../kernel/prog", flags, root + "/build/kernel.o"));
+} chain (string root, string out) {
+  push(steps, kb_clang(root + "/../kernel/boot/boot.S", root + "/build/boot.o"));
+  push(steps, kb_clang(root + "/../kernel/boot/isr.S", root + "/build/isr.o"));
+  push(steps, kb_link(root, out));
+} return string[] steps;
+("/r", "/o"):(["/r/bin/idc\n/r/../kernel/prog\n--std\n/r/build/std_core\n--freestanding\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/r/build/kernel.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/../kernel/boot/boot.S\n-o\n/r/build/boot.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/../kernel/boot/isr.S\n-o\n/r/build/isr.o\n", "ld.lld\n-n\n-T\n/r/../kernel/boot/kernel.ld\n/r/build/boot.o\n/r/build/isr.o\n/r/build/runtime.o\n/r/build/kernel.o\n-o\n/o\n"])
+("/idc", "/x/k.elf"):(["/idc/bin/idc\n/idc/../kernel/prog\n--std\n/idc/build/std_core\n--freestanding\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/idc/build/kernel.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/idc/../kernel/boot/boot.S\n-o\n/idc/build/boot.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/idc/../kernel/boot/isr.S\n-o\n/idc/build/isr.o\n", "ld.lld\n-n\n-T\n/idc/../kernel/boot/kernel.ld\n/idc/build/boot.o\n/idc/build/isr.o\n/idc/build/runtime.o\n/idc/build/kernel.o\n-o\n/x/k.elf\n"])
+
+// Stages the library from idstd, then runs the steps that make the image. 0 when the
+// image is made, otherwise the status of what failed first.
+kb_image(string root, string out) {
+  int rc = kb_stage(root, kb_std_home(root));
+  if (rc == 0) {
+    rc = kb_steps(kb_plan_img(root, out));
+  }
+} return int rc;
+given kb_t_std(7) ((import kb_t_root), "/x/k.elf"):(7) then kb_t_staged:("int K1 = 1;\nint K2 = K4;\nint K4 = 4;\n|1,1,0,0") then kb_t_done:("done 1")
+given env_put("IDSTD_HOME", "/no/such/idstd") ("/no/such/idc", "/o"):(1) then eprints:("kbuild: no .id files under /no/such/idstd/core; set IDSTD_HOME to the idstd checkout\n")

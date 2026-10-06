@@ -1,18 +1,14 @@
-// The five steps in order, and running them until one fails.
+// The steps in order, and running them until one fails.
 
-// The commands, in the order they have to run: the runtime, the kernel, the
-// two assembler runs over the boot stub, and the link into out.
-kb_plan(string root, string out) {
+// The command that has to run first, as the line exec_run takes: the runtime, which
+// is the one thing built without a library. The library staging (kb_stage) comes
+// after it and the rest (kb_plan_img) after that.
+kb_plan_rt(string root) {
   string[] steps = [];
   push(steps, kb_idc(root, root + "/runtime", "--no-std\n--runtime\n--allow-untested", root + "/build/runtime.o"));
-  push(steps, kb_idc(root, root + "/../kernel/prog", "--no-std\n--freestanding\n--allow-untested", root + "/build/kernel.o"));
-} chain (string root, string out) {
-  push(steps, kb_clang(root + "/../kernel/boot/boot.S", root + "/build/boot.o"));
-  push(steps, kb_clang(root + "/../kernel/boot/isr.S", root + "/build/isr.o"));
-  push(steps, kb_link(root, out));
 } return string[] steps;
-("/r", "/o"):(["/r/bin/idc\n/r/runtime\n--no-std\n--runtime\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/r/build/runtime.o\n", "/r/bin/idc\n/r/../kernel/prog\n--no-std\n--freestanding\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/r/build/kernel.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/../kernel/boot/boot.S\n-o\n/r/build/boot.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/r/../kernel/boot/isr.S\n-o\n/r/build/isr.o\n", "ld.lld\n-n\n-T\n/r/../kernel/boot/kernel.ld\n/r/build/boot.o\n/r/build/isr.o\n/r/build/runtime.o\n/r/build/kernel.o\n-o\n/o\n"])
-("/idc", "/x/k.elf"):(["/idc/bin/idc\n/idc/runtime\n--no-std\n--runtime\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/idc/build/runtime.o\n", "/idc/bin/idc\n/idc/../kernel/prog\n--no-std\n--freestanding\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/idc/build/kernel.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/idc/../kernel/boot/boot.S\n-o\n/idc/build/boot.o\n", "clang\n-target\nx86_64-unknown-none\n-ffreestanding\n-c\n/idc/../kernel/boot/isr.S\n-o\n/idc/build/isr.o\n", "ld.lld\n-n\n-T\n/idc/../kernel/boot/kernel.ld\n/idc/build/boot.o\n/idc/build/isr.o\n/idc/build/runtime.o\n/idc/build/kernel.o\n-o\n/x/k.elf\n"])
+("/r"):(["/r/bin/idc\n/r/runtime\n--no-std\n--runtime\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/r/build/runtime.o\n"])
+("/idc"):(["/idc/bin/idc\n/idc/runtime\n--no-std\n--runtime\n--allow-untested\n--triple\nx86_64-unknown-none\n-o\n/idc/build/runtime.o\n"])
 
 // Runs each command of plan in order and stops at the first that fails, its
 // output shown as it would have been from a shell. Answers 0 when every step

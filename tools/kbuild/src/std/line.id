@@ -1,0 +1,35 @@
+// Every identifier of a text, line by line.
+
+// Pushes onto found each identifier of line, in order.
+kb_line_words(string line, string[] found) {
+  int at = 0;
+  while (at < len(line)) {
+    at = kb_word_step(line, at, found);
+  }
+} return void;
+("a + b_2", []):("a + b_2", ["a", "b_2"])
+("  ", []):("  ", [])
+
+// kb_line_words, except that a line whose first non-blank characters are // says
+// nothing and is skipped.
+kb_text_line(string line, string[] found) {
+  if (str_starts(str_trim(line), "//") == 0) {
+    kb_line_words(line, found);
+  }
+} return void;
+("x = y", []):("x = y", ["x", "y"])
+("  // x = y", []):("  // x = y", [])
+
+// The identifiers of every line of text that is not a comment, in order.
+kb_words(string text) {
+  string[] rows = str_lines(text);
+  string[] found = [];
+  int i = 0;
+} chain (string text) {
+  while (i < len(rows)) {
+    kb_text_line(rows[i], found);
+    i = i + 1;
+  }
+} return string[] found;
+("a b\n// c\nd"):(["a", "b", "d"])
+(""):([])

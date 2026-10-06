@@ -34,8 +34,10 @@ kb_build(string root, string out) {
   }
   int made = fs_mkdir_p(root + "/build");
 } chain (string root, string out) {
-  string[] plan = kb_plan(root, full);
-  int rc = kb_steps(plan);
+  int rc = kb_steps(kb_plan_rt(root));
+  if (rc == 0) {
+    rc = kb_image(root, full);
+  }
   int size = fs_size(full);
 } chain (string root, string out) {
   if (rc == 0) {

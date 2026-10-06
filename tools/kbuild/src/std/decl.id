@@ -1,0 +1,41 @@
+// A constant's declaration, one line of conf.id, and the table that tells which
+// names the kernel's library reads.
+
+// The name a line of conf.id declares ("int a = 1;" declares a), or "" for any
+// other line: a comment, a blank line.
+kb_decl_name(string line) {
+  string[] parts = str_split(line, " ");
+  string name = "";
+  if (len(parts) >= 3) {
+    name = kb_decl_pick(parts);
+  }
+} return string name;
+("string[] kb_pg = [\"a\"];"):("kb_pg")
+("// int a = 1;"):("")
+("int a = 1;"):("a")
+("a b"):("")
+
+// parts[1] when parts is a type, a name and an equals sign, otherwise "".
+kb_decl_pick(string[] parts) {
+  string base = str_replace(parts[0], "[]", "");
+  string name = "";
+  if (parts[2] == "=" && (base == "int" || base == "string" || base == "word" || base == "float")) {
+    name = parts[1];
+  }
+} return string name;
+(["int", "a", "=", "1;"]):("a")
+(["foo", "a", "=", "1;"]):("")
+(["int", "a", "+", "1;"]):("")
+
+// Makes the table of the names read so far: a string set (hmap_), each name with
+// 0 when it was only read and 1 when it is a constant whose own line has been read.
+kb_tables() {
+  export string[] kb_tk = [];
+  export int[] kb_tv = [];
+  export int[] kb_tu = [];
+} chain () {
+  export int[] kb_tn = [];
+  hmap_init((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn));
+} return void export kb_tk;
+():() then (import kb_tn):([0])
+():() then len((import kb_tk)):(8)

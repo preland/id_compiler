@@ -42,7 +42,7 @@ for t in buildrun kbuild; do
     fi
 done
 
-if ! "$TMP/kbuild" "$IDCROOT" "$ELF" >"$TMP/build.log" 2>&1; then
+if ! env -u IDC_NO_STD "$TMP/kbuild" "$IDCROOT" "$ELF" >"$TMP/build.log" 2>&1; then
     bad "the kernel builds ($(grep -v 'warning:\|cc-wrapper\|un-wrapped' "$TMP/build.log" | head -1))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi
@@ -53,13 +53,23 @@ ok "the kernel builds"
 # the edges above, with no row naming the file it lives in, and
 # tools/idxpack.sh's FILES section has nothing to index it by.
 CALLS_LOG="$TMP/calls.log"
-if "$ROOT/bin/idc" "$ORG/kernel/prog" --calls --no-std --freestanding --triple x86_64-unknown-none \
+if env -u IDC_NO_STD "$ROOT/bin/idc" "$ORG/kernel/prog" --calls --std "$IDCROOT/build/std_core" --freestanding --triple x86_64-unknown-none \
         >"$TMP/calls.out" 2>"$CALLS_LOG" \
    && grep -qE '^lidt_load\|.*sys/trap/asm\.id:[0-9]+\|0$' "$TMP/calls.out" \
    && grep -qE '^cpu_halt\|.*sys/hw/io/halt\.id:[0-9]+\|0$' "$TMP/calls.out"; then
     ok "--calls lists asm functions (lidt_load, cpu_halt) as fn rows with their file"
 else
     bad "--calls lists asm functions (lidt_load, cpu_halt) as fn rows with their file" "$(cat "$CALLS_LOG")"
+fi
+
+# The kernel is built against idstd's core tier, staged by kbuild, and carries no copy
+# of what that tier has: lset, sset and wset are core's, not the kernel's own.
+if grep -qE '^lset\|.*/std_core/core/data/list/access\.id:[0-9]+\|' "$TMP/calls.out" \
+   && grep -qE '^sset\|.*/std_core/core/data/list/access\.id:[0-9]+\|' "$TMP/calls.out" \
+   && grep -qE '^wset\|.*/std_core/core/data/list/pick\.id:[0-9]+\|' "$TMP/calls.out"; then
+    ok "the kernel uses idstd core's lset, sset and wset"
+else
+    bad "the kernel uses idstd core's lset, sset and wset"
 fi
 
 # Nothing in the image may have come from a C compiler. The runtime's own

@@ -1,0 +1,36 @@
+// Reading the lines of conf.id again and again until no constant is newly needed.
+
+// Adopts the constant line declares when its name has been read (kb_adopt).
+// 1 when it did.
+kb_pass_line(string line) {
+  string name = kb_decl_name(line);
+  int got = 0;
+  if (name != "") {
+    got = kb_adopt(name, line);
+  }
+} return int got;
+given kb_t_seen("a") ("int a = b;"):(1)
+given kb_t_seen("a") ("// int a = b;"):(0)
+
+// One pass over every line of conf.id: how many constants it adopted.
+kb_pass(string[] rows) {
+  int i = 0;
+  int got = 0;
+  while (i < len(rows)) {
+    got = got + kb_pass_line(rows[i]);
+    i = i + 1;
+  }
+} return int got;
+given kb_t_seen("b") (["int a = b;", "int b = c;", "int d = 1;"]):(1)
+given kb_t_seen("z") (["int a = b;"]):(0)
+
+// Passes until one adopts nothing, which is when a constant that another one's
+// value names, however far up conf.id, has been adopted too.
+kb_close(string[] rows) {
+  int more = 1;
+  while (more > 0) {
+    more = kb_pass(rows);
+  }
+} return void;
+given kb_t_seen("b") (["int a = b;", "int b = c;", "int c = 1;", "int d = 1;"]):() then (import kb_tn)[0]:(4)
+given kb_t_seen("z") (["int a = 1;"]):() then (import kb_tn)[0]:(1)

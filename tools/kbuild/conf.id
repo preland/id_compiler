@@ -9,3 +9,7 @@ string kb_out = "build/kernel.elf";
 
 // The longest any one step may take, in milliseconds.
 int kb_ms = 300000;
+
+// Where the staged core tier goes, relative to the idc directory: the library the
+// kernel is built against.
+string kb_std = "build/std_core";

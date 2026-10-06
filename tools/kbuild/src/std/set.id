@@ -1,0 +1,38 @@
+// Adding to the table of names read (kb_tables).
+
+// Adds word to the table, with 0, unless it is there already. 1 when it was added.
+kb_note(string word) {
+  int fresh = 0;
+  if (hmap_has((import kb_tk), (import kb_tu), word) == 0) {
+    hmap_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), word, 0);
+    fresh = 1;
+  }
+} return int fresh;
+given kb_tables ("a"):(1)
+given kb_t_seen("a") ("a"):(0)
+
+// kb_note for each of words.
+kb_notes(string[] words) {
+  int i = 0;
+  while (i < len(words)) {
+    int fresh = kb_note(words[i]);
+    i = i + 1;
+  }
+} return void;
+given kb_tables (["a", "b", "a"]):() then (import kb_tn)[0]:(2)
+given kb_tables ([]):() then (import kb_tn)[0]:(0)
+
+// The line of conf.id that declares name, when name has been read and its line has
+// not: the line's own identifiers are read in turn, and the name is marked with 1.
+// 1 when that was done.
+kb_adopt(string name, string line) {
+  int seen = hmap_get((import kb_tk), (import kb_tv), (import kb_tu), name, 0 - 1);
+  int got = 0;
+  if (seen == 0) {
+    hmap_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), name, 1);
+    kb_notes(kb_words(line));
+    got = 1;
+  }
+} return int got;
+given kb_t_seen("a") ("a", "int a = b;"):(1) then (import kb_tn)[0]:(3)
+given kb_t_seen("c") ("a", "int a = b;"):(0)

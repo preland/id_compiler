@@ -1,0 +1,50 @@
+// Staging, continued: the files, the conf.id, and the whole.
+
+// Stages every file of home/core into dir/core and answers the texts of the source
+// files, in the order the walk found them.
+kb_stage_files(string dir, string home, string[] names) {
+  string[] texts = [];
+  int i = 0;
+  while (i < len(names)) {
+    kb_stage_one(dir, home, names[i], texts);
+    i = i + 1;
+  }
+} return string[] texts;
+given kb_t_std(0) ((import kb_t_root), (import kb_t_home), ["a.id", "n.txt", "d/b.id"]):(["f() { x = K1; }\n", "g() { y = K2; }\n"]) then kb_t_done:("done 1")
+given kb_t_std(0) ((import kb_t_root), (import kb_t_home), []):([]) then kb_t_done:("done 1")
+
+// Writes dir/conf.id: home's conf.id cut down to what texts read. 0 when it was
+// written, 1 when it could not be, with a line saying so.
+kb_stage_conf(string dir, string home, string[] texts) {
+  string conf = kb_slice(fs_read_text(home + "/conf.id"), texts);
+  int put = exec_file_put(dir + "/conf.id", conf, 420);
+  int rc = 0;
+} chain (string dir, string home, string[] texts) {
+  if (put < 0) {
+    eprint("kbuild: cannot write " + dir + "/conf.id; check that the build directory can be written");
+    rc = 1;
+  }
+} return int rc;
+given kb_t_std(0) ((import kb_t_root), (import kb_t_home), ["g() { y = K2; }"]):(0) then kb_t_done:("done 1")
+given kb_t_std(0) ("/no/such/dir", (import kb_t_home), []):(1) then eprints:("kbuild: cannot write /no/such/dir/conf.id; check that the build directory can be written\n")
+
+// Replaces root/build/std_core with a copy of home/core and the conf.id that goes
+// with it. 0 when it is there, 1 when home holds no source files or it could not be
+// written, with a line saying why.
+kb_stage(string root, string home) {
+  string dir = root + "/build/std_core";
+  int gone = exec_drop(dir);
+  string[] names = path_files(home + "/core");
+} chain (string root, string home) {
+  string[] texts = kb_stage_files(dir, home, names);
+  int rc = 1;
+  if (len(texts) == 0) {
+    eprint("kbuild: no .id files under " + home + "/core; set IDSTD_HOME to the idstd checkout");
+  }
+} chain (string root, string home) {
+  if (len(texts) > 0) {
+    rc = kb_stage_conf(dir, home, texts);
+  }
+} return int rc;
+given kb_t_std(0) ((import kb_t_root), (import kb_t_home)):(0) then kb_t_staged:("int K1 = 1;\nint K2 = K4;\nint K4 = 4;\n|1,1,0,0") then kb_t_done:("done 1")
+given kb_t_std(0) ((import kb_t_root), "/no/such/idstd"):(1) then eprints:("kbuild: no .id files under /no/such/idstd/core; set IDSTD_HOME to the idstd checkout\n") then kb_t_staged:("|0,0,0,0") then kb_t_done:("done 1")

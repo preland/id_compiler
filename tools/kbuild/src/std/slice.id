@@ -1,0 +1,44 @@
+// The part of idstd's conf.id that the kernel's library reads. conf.id is read only
+// at the root of a library (E0707), so the core tier the kernel is built against
+// cannot own the constants it reads, and kbuild stages a conf.id of just those.
+
+// The line of conf.id when it declares a constant that was read, with its newline.
+// Otherwise "".
+kb_kept_line(string line) {
+  string name = kb_decl_name(line);
+  string kept = "";
+  if (name != "" && hmap_has((import kb_tk), (import kb_tu), name) == 1) {
+    kept = line + "\n";
+  }
+} return string kept;
+given kb_t_seen("a") ("int a = 1;"):("int a = 1;\n")
+given kb_t_seen("a") ("int b = 1;"):("")
+
+// The lines of conf.id that declare a constant that was read, in the order conf.id has them.
+kb_kept(string[] rows) {
+  string text = "";
+  int i = 0;
+  while (i < len(rows)) {
+    text = text + kb_kept_line(rows[i]);
+    i = i + 1;
+  }
+} return string text;
+given kb_t_seen("a") (["int a = 1;", "int b = 1;"]):("int a = 1;\n")
+given kb_t_seen("a") ([]):("")
+
+// The text of a conf.id holding the constants that sources read: those named in any
+// of sources, and those named in the value of one of those, however long a chain.
+kb_slice(string conf, string[] sources) {
+  kb_tables();
+  string[] rows = str_lines(conf);
+  int i = 0;
+} chain (string conf, string[] sources) {
+  while (i < len(sources)) {
+    kb_notes(kb_words(sources[i]));
+    i = i + 1;
+  }
+  kb_close(rows);
+  string text = kb_kept(rows);
+} return string text;
+("int a = 1;\nint b = a + 1;\nint c = 3;\n", ["f() { x = b; }"]):("int a = 1;\nint b = a + 1;\n")
+("int a = 1;\n// int b = 1;\n", ["// b\n", "f() { x = 1; }"]):("")

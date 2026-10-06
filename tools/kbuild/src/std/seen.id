@@ -1,0 +1,9 @@
+// A fixture for the table of names read: the table, with one name in it.
+
+// Makes the table (kb_tables) and adds word to it with 0.
+kb_t_seen(string word) {
+  kb_tables();
+  int fresh = kb_note(word);
+} return void;
+("a"):() then (import kb_tn)[0]:(1)
+("a"):() then len((import kb_tk)):(8)

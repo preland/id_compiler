@@ -1,0 +1,35 @@
+// Staging the library the kernel is built against: a copy of idstd's core tier and a
+// conf.id of the constants that tier reads, in one directory the compiler takes as
+// --std. The kernel is then built against the pure tier alone; the whole-program
+// checks (one name, one type; no duplicate logic) span that tier and the kernel and
+// nothing else in idstd.
+
+// Where idstd is: $IDSTD_HOME, else the idstd directory beside the checkout that
+// holds root (the idc directory), as the compiler looks for it.
+kb_std_home(string root) {
+  string home = env_text("IDSTD_HOME");
+  if (home == "") {
+    home = root + "/../../idstd";
+  }
+} return string home;
+given env_put("IDSTD_HOME", "/h") ("/r"):("/h")
+given env_put("IDSTD_HOME", "") ("/r"):("/r/../../idstd")
+
+// Copies the file src to dst, making dst's directory, and answers the text copied.
+kb_copy(string src, string dst) {
+  string text = fs_read_text(src);
+  int made = fs_mkdir_p(fs_dir_of(dst));
+  int put = exec_file_put(dst, text, 420);
+} return string text;
+given kb_t_std(0) ((import kb_t_src), (import kb_t_dst)):("f() { x = K1; }\n") then kb_t_done:("done 1")
+given kb_t_std(0) ("/no/such/file", (import kb_t_dst)):("") then kb_t_done:("done 1")
+
+// Copies name, a path under home/core, to the same place under dir/core when it is
+// a source file, and adds its text to texts. Other files are not part of the library.
+kb_stage_one(string dir, string home, string name, string[] texts) {
+  if (str_ends(name, ".id") == 1) {
+    push(texts, kb_copy(home + "/core/" + name, dir + "/core/" + name));
+  }
+} return void;
+given kb_t_std(0) ((import kb_t_root), (import kb_t_home), "a.id", []):((import kb_t_root), (import kb_t_home), "a.id", ["f() { x = K1; }\n"]) then kb_t_done:("done 1")
+given kb_t_std(0) ((import kb_t_root), (import kb_t_home), "n.txt", []):((import kb_t_root), (import kb_t_home), "n.txt", []) then kb_t_done:("done 1")

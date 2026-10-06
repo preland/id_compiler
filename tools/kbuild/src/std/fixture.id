@@ -1,0 +1,53 @@
+// Fixtures for staging: a scratch directory holding a miniature idstd, and what a
+// stage of it leaves behind.
+
+// Makes kb_t_fake's directory (its bin/idc exits with rc), and in it home (std):
+// core/a.id, core/d/b.id and core/n.txt, and a conf.id of four constants, one of
+// which only n.txt reads and one of which only another constant's value names. Points
+// IDSTD_HOME at home. Exports home, and src and dst, the paths a copy of core/a.id
+// goes between.
+kb_t_std(int rc) {
+  kb_t_fake(rc);
+  export string kb_t_home = (import kb_t_root) + "/std";
+  int made = fs_mkdir_p(kb_t_home + "/core/d");
+} chain (int rc) {
+  int put_a = exec_file_put(kb_t_home + "/core/a.id", "f() { x = K1; }\n", 420);
+  int put_b = exec_file_put(kb_t_home + "/core/d/b.id", "g() { y = K2; }\n", 420);
+  int put_n = exec_file_put(kb_t_home + "/core/n.txt", "K3\n", 420);
+} chain (int rc) {
+  int put_c = exec_file_put(kb_t_home + "/conf.id", "int K1 = 1;\nint K2 = K4;\nint K3 = 3;\nint K4 = 4;\n", 420);
+  export string kb_t_src = kb_t_home + "/core/a.id";
+  export string kb_t_dst = (import kb_t_root) + "/out/core/a.id";
+} chain (int rc) {
+  env_put("IDSTD_HOME", kb_t_home);
+} return void export kb_t_home;
+(0):() then kb_t_done:("done 1")
+(5):() then kb_t_staged:("|0,0,0,0") then kb_t_done:("done 1")
+
+// The miniature idstd, and a stage of it; with stale 1, a file of an earlier stage that
+// idstd no longer has is left under the staged core first.
+kb_t_run(int stale) {
+  kb_t_std(0);
+  string old = (import kb_t_root) + "/" + (import kb_std) + "/core/old.id";
+  int made = 0;
+} chain (int stale) {
+  if (stale == 1) {
+    made = fs_mkdir_p(fs_dir_of(old));
+    int put = exec_file_put(old, "stale\n", 420);
+  }
+  int rc = kb_stage((import kb_t_root), (import kb_t_home));
+} return void;
+(0):() then kb_t_staged:("int K1 = 1;\nint K2 = K4;\nint K4 = 4;\n|1,1,0,0") then kb_t_done:("done 1")
+(1):() then kb_t_staged:("int K1 = 1;\nint K2 = K4;\nint K4 = 4;\n|1,1,0,0") then kb_t_done:("done 1")
+
+// What a stage left under the fixture: the staged conf.id, a bar, then 1 or 0 for
+// each of core/a.id, core/d/b.id, core/n.txt and core/old.id being under the staged core.
+kb_t_staged() {
+  string stage_dir = (import kb_t_root) + "/" + (import kb_std);
+  string conf_text = fs_read_text(stage_dir + "/conf.id");
+  string marks = fs_exists(stage_dir + "/core/a.id") + "," + fs_exists(stage_dir + "/core/d/b.id") + "," + fs_exists(stage_dir + "/core/n.txt") + "," + fs_exists(stage_dir + "/core/old.id");
+} chain () {
+  string both = conf_text + "|" + marks;
+} return string both;
+given kb_t_std(0) ():("|0,0,0,0")
+given kb_t_run(1) ():("int K1 = 1;\nint K2 = K4;\nint K4 = 4;\n|1,1,0,0")
