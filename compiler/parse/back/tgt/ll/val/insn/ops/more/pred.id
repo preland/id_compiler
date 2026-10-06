@@ -5,7 +5,7 @@
 ll_pred(string op, string t) {
   string s = ll_ipred(op);
   if(ty_kind(t) == "float") {
-    s = "o" + ll_fpred(op);
+    s = ll_fpred(op);
   }
 } return string s;
 given init_tyreg ("<", "int"):("slt")
@@ -23,13 +23,13 @@ ll_ipred(string op) {
 ("<"):("slt")
 
 ll_fpred(string op) {
-  string s = "eq";
+  string s = "oeq";
   if(op == "!=") {
-    s = "ne";
+    s = "une";
   } else if(op != "=" && op != "==") {
-    s = ll_rel(op);
+    s = "o" + ll_rel(op);
   }
 } return string s;
-("=="):("eq")
-("!="):("ne")
-("<"):("lt")
+("=="):("oeq")
+("!="):("une")
+("<"):("olt")

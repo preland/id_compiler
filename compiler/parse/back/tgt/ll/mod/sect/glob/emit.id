@@ -25,7 +25,7 @@ ll_init(int i) {
   if((import eowners)[i] == "conf.id" && ty_is_list((import etypes)[i]) == 0) {
     int const_decl_v = const_decl((import enames)[i]);
     int i1_of_v = (import ni1)[const_decl_v];
-    s = ll_const_val(i1_of_v, (import enames)[i]);
+    s = ll_const_val(const_root(i1_of_v), (import enames)[i]);
   }
 } return string s;
 given lc_dce_setup (0):("null")
