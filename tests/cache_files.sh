@@ -42,7 +42,7 @@ if [ -z "$STD" ]; then
         [ -d "$up" ] && { STD="$up"; break; }
     done
 fi
-if [ ! -f "${STD:-/nonexistent}/sys/io/fs/fs_posix.c" ] || [ ! -f "${STD:-/nonexistent}/sys/io/ipc/env/env_posix.c" ]; then
+if [ ! -f "${STD:-/nonexistent}/host/io/fs/fs_posix.c" ] || [ ! -f "${STD:-/nonexistent}/host/os/env/env_posix.c" ]; then
     echo "SKIP: no standard library at '${STD:-}' (set IDSTD_HOME to point at one)"
     exit 0
 fi
@@ -64,8 +64,8 @@ export IDC_CACHE_DIR="$CACHE"
 
 CF="$TMP/cf"
 mkdir -p "$CF/be/fs" "$CF/be/env" "$CF/code" "$CF/data/d"
-cp "$STD/sys/io/fs/fs_posix.c" "$STD/sys/io/fs/fs.h" "$STD/sys/io/fs/backend.id" "$CF/be/fs/"
-cp "$STD/sys/io/ipc/env/env_posix.c" "$STD/sys/io/ipc/env/env.h" "$STD/sys/io/ipc/env/backend.id" "$CF/be/env/"
+cp "$STD/host/io/fs/fs_posix.c" "$STD/host/io/fs/fs.h" "$STD/host/io/fs/backend.id" "$CF/be/fs/"
+cp "$STD/host/os/env/env_posix.c" "$STD/host/os/env/env.h" "$STD/host/os/env/backend.id" "$CF/be/env/"
 cat > "$CF/be/fs/handle.id" <<'EOF'
 native fs_open(string path, string mode) return int;
 native fs_close(int handle) return int;

@@ -46,10 +46,10 @@ fi
 # be_abs NAME -- the directory of one of idstd's backends.
 be_abs() {
     case "$1" in
-        fs)     printf '%s' "$STD/sys/io/fs" ;;
-        proc) printf '%s' "$STD/sys/io/ipc/proc/be" ;;
-        sock) printf '%s' "$STD/sys/io/ipc/sock" ;;
-        gfx|gl) printf '%s' "$STD/sys/win/$1" ;;
+        fs)     printf '%s' "$STD/host/io/fs" ;;
+        proc) printf '%s' "$STD/host/os/proc/be" ;;
+        sock) printf '%s' "$STD/host/io/net/sock" ;;
+        gfx|gl) printf '%s' "$STD/host/dev/win/$1" ;;
     esac
 }
 # bin/idc takes --allow-untested throughout: none of the programs built here has
@@ -98,9 +98,9 @@ if want fs; then
 # extern block resolve, do both compilers agree -- are all answerable here.
 fsout="$TMP/fs"
 if cc -O2 -c "$(be_abs fs)/fs_posix.c" -I"$(be_abs fs)" -o "$TMP/fs.o" 2>"$TMP/fs.err"; then
-    ok "sys/io/fs/fs_posix.c compiles"
+    ok "host/io/fs/fs_posix.c compiles"
 else
-    bad "sys/io/fs/fs_posix.c compiles ($(head -1 "$TMP/fs.err"))"
+    bad "host/io/fs/fs_posix.c compiles ($(head -1 "$TMP/fs.err"))"
 fi
 
 # The demo names no backend: fs is the standard library's, so the demo is built
@@ -286,7 +286,7 @@ fi
 if want ipc; then
 # Deliberately above the X11 gate below, like fs: this is fork/pipe/waitpid,
 # so it needs nothing but a shell. This is the seam tools/qmon is written
-# against (idstd's sys/io/ipc/proc/README.md).
+# against (idstd's host/os/proc/README.md).
 procdir="$TMP/proc"; mkdir -p "$procdir/out"
 printf 'import "%s"\n' "$(be_abs proc)" > "$procdir/conf.id"
 cat > "$procdir/main.id" <<'EOF'
@@ -833,7 +833,7 @@ if env -u IDC_NO_STD $BIN_IDC "$rs/hello" --std "$STD" --cc "$cclog" -o "$TMP/rh
    && ! needs_lib "$TMP/rhello.bin" libX11 && ! needs_lib "$TMP/rhello.bin" libGL; then
     : > "$TMP/cc.log"
     if env -u IDC_NO_STD $BIN_IDC "$rs/call" --std "$STD" --cc "$cclog" -o "$TMP/rcall.bin" >"$TMP/rcall.err" 2>&1 \
-       && [ "$("$TMP/rcall.bin")" = "0" ] && grep -q 'sys/io/fs/fs_posix\.c' "$TMP/cc.log" \
+       && [ "$("$TMP/rcall.bin")" = "0" ] && grep -q 'host/io/fs/fs_posix\.c' "$TMP/cc.log" \
        && ! grep -qE 'gfx_linux|gl_linux|-lX11|-lGL' "$TMP/cc.log"; then
         ok "idstd carries fs: a program calling fs_exists links fs alone, and hello-world links no backend"
     else
@@ -1032,9 +1032,9 @@ fi
 for be in gfx/gfx_linux gl/gl_linux; do
     if cc -O2 -c "$(be_abs "${be%%/*}")/${be#*/}.c" -I"$(be_abs "${be%%/*}")" \
          -o "$TMP/$(basename "$be").o" 2>"$TMP/cc.err"; then
-        ok "sys/win/$be.c compiles"
+        ok "host/dev/win/$be.c compiles"
     else
-        bad "sys/win/$be.c compiles ($(head -1 "$TMP/cc.err"))"
+        bad "host/dev/win/$be.c compiles ($(head -1 "$TMP/cc.err"))"
     fi
 done
 

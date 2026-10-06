@@ -190,16 +190,16 @@ on its resolved path.
 
 | backend | what it adds |
 | --- | --- |
-| `sys/io/fs` (idstd) | files: open/read/write/close/size/exists/remove. Needs no system libraries |
-| `sys/win/gfx` (idstd) | a window and a software framebuffer (X11 / Cocoa) |
-| `sys/win/gl` (idstd) | a hardware-accelerated OpenGL window |
+| `host/io/fs` (idstd) | files: open/read/write/close/size/exists/remove. Needs no system libraries |
+| `host/dev/win/gfx` (idstd) | a window and a software framebuffer (X11 / Cocoa) |
+| `host/dev/win/gl` (idstd) | a hardware-accelerated OpenGL window |
 
 A backend separates *what* it promises from *how* a given compiler obtains it:
 its `native` declarations state the functions in `id`'s own types, and the
 manifest's `targets` maps a code generator (`"c"` today; an LLVM, wasm or
 interpreter target tomorrow) to the implementation it should use. Adding a target is a change to the manifest
 and the driver that reads it, never to a program's `id` source — see idstd's
-`sys/io/fs/README.md`, which is written up as the worked example. `gfx` and
+`host/io/fs/README.md`, which is written up as the worked example. `gfx` and
 `gl` predate `targets` and carry a bare `platforms` table, which is read as
 the C target's.
 

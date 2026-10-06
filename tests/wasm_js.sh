@@ -38,7 +38,7 @@ trap 'rm -rf "$TMP"' EXIT
 if [ "${1:-}" = std ]; then
     STD="${IDSTD_HOME:-}"
     [ -z "$STD" ] && [ -d ../../../idstd ] && STD=$(cd ../../../idstd && pwd)
-    if [ -z "$STD" ] || [ ! -d "$STD/sys/io/fs" ]; then
+    if [ -z "$STD" ] || [ ! -d "$STD/host/io/fs" ]; then
         echo "SKIP: wasm_js std tests (no idstd found; set IDSTD_HOME)"
         exit 0
     fi

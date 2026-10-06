@@ -1066,7 +1066,7 @@ fi
 #     graphics demos build at byte parity, and no windowed demo hangs when
 #     there is no display. Skips itself when the X11/GL headers are absent.
 echo
-echo "--- native backends (idstd's sys/io/fs, sys/win/gfx, sys/win/gl) ---"
+echo "--- native backends (idstd's host/io/fs, host/dev/win/gfx, host/dev/win/gl) ---"
 bend=0
 for bs in fs ipc link demos display galaxy galaxy_run; do
     if want "backends_$bs"; then
@@ -1297,7 +1297,7 @@ fi
 #     and of idstd runs, and fails when /tmp has an entry afterwards that it did
 #     not have before. One section per tree, because one tree is a cold build
 #     of up to a minute; a case that makes a scratch path registers it with
-#     fs_drop_exit (idstd sys/io/fs), which removes it when the process ends
+#     fs_drop_exit (idstd host/io/fs), which removes it when the process ends
 #     whether the case passes or fails. Other programs writing to /tmp while
 #     this runs show up as entries: run it on a quiet machine.
 echo
