@@ -1,0 +1,19 @@
+by_key(int[] keys, int a, int b) {
+  int r = keys[a] > keys[b];
+} return int r;
+
+first(func(int, int) return int gt, int a, int b) {
+  int r = a;
+  if(gt(a, b) == 1) {
+    r = b;
+  }
+} return int r;
+
+main(int argc, string[] argv) {
+  int[] keys = [30, 10, 20];
+  func(int, int) return int gt = bind(by_key, keys);
+  int a = first(gt, 0, 1);
+} chain (int argc, string[] argv) {
+  int m = first(gt, a, 2);
+  print(m);
+} return int 0;

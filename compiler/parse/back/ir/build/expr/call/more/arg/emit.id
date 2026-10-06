@@ -10,7 +10,7 @@ lw_ocall(int node) {
   }
 } return int v;
 given ocall_fixture ((import ocall_node)):(0)
-given fcallv_fixture ((import fcallv_node)):(2)
+given fcallv_fixture ((import fcallv_node)):(3)
 
 lw_callf(string name, string ret, int[] args) {
   int[] none = [];

@@ -1,0 +1,26 @@
+// A use of a function value in C (closure/fv.id's registry): `ID_FNV(name__k)`
+// declares the object where it is used (c/text.id), so no use has to come
+// after the object's definition, and the pair is recorded to be defined at the
+// end of the unit.
+
+fv_ref(string name, int nd) {
+  fv_note(name, nd);
+  string s = "ID_FNV(" + fv_key(name, nd) + ")";
+} return string s;
+given fv_init ("tick", 0):("ID_FNV(tick__0)") then len((import fvname)):(1)
+given fv_init ("pick", 2):("ID_FNV(pick__2)") then (import fvk)[0]:(2)
+
+fv_add(string key, string name, int nd) {
+  push((import fvkey), key);
+  push((import fvname), name);
+  push((import fvk), nd);
+} return void;
+given fv_init ("a__1", "a", 1):() then (import fvk)[0]:(1)
+given fv_init ("b__0", "b", 0):() then (import fvkey)[0]:("b__0")
+
+fv_seeded() {
+  fv_init();
+  fv_add("tick__0", "tick", 0);
+} return void;
+():() then calls fv_init:[1]
+():() then len((import fvname)):(1)

@@ -24,6 +24,7 @@ given nz_prog_fixture (1, ["prog"]):() then calls emit_target2:("c", 1, ["prog"]
 emit_target2(string t, int argc, string[] argv) {
   if(t == "crt") {
     emit_crt();
+    emit_closure_rt("");
     emit_crt_eprint();
   } else {
     string arg_triple_v = arg_triple(argc, argv);

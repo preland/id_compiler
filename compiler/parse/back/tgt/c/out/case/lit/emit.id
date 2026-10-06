@@ -12,3 +12,24 @@ tc_lit(int e, string want) {
 } return string so;
 given lit_int_fixture ((import lit_e), "int"):("5")
 given lit_arr_fixture ((import lit_arr_e), "int[]"):("id_list_lit(2, (long long)(5), (long long)(4))")
+
+// The values of a bind in a case (val/struct.id's tc_cbind), each built at the
+// type of the parameter it fixes by the rule every case value is, then copied
+// and boxed as a bound value is.
+tc_cbsets(string clo0, int fn, int[] items) {
+  string s = clo0;
+  int j = 1;
+  while(j < len(items)) {
+    s = "id_clo_set(" + s + ", " + (j - 1) + ", " + tc_cbcell(fn, j - 1, items[j]) + ")";
+    j = j + 1;
+  }
+} return string s;
+given clo_case_fixture ("n", (import fixture_fn), [(import clo_cfn), (import cb_lit)]):("id_clo_set(n, 0, (long long)(7))")
+given clo_case_fixture ("n", (import fixture_fn), [(import clo_cfn)]):("n")
+
+tc_cbcell(int fn, int i, int v) {
+  string pt = bind_pt(fn, i);
+  string s = bind_cell(fn, i, tc_value(v, pt));
+} return string s;
+given clo_case_fixture ((import fixture_fn), 0, (import cb_lit)):("(long long)(7)")
+given clo_case_fixture ((import fixture_fn), 0, (import cb_lit2)):("(long long)(9)")

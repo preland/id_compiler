@@ -1,0 +1,37 @@
+// A cell holds every type as 64 bits, as a list cell does: an `int` is the low
+// half, a `float` is what id_box_f made of it (id_unbox_f reads it back, as it
+// does a list cell, because a runtime may not store the bits), a pointer (a
+// string, a list, a function value) is an address, and a `word` is the cell
+// itself, so it needs no instruction and is read as %w, every other type as the
+// converted %u.
+
+fv_ll_conv(int i, string pt) {
+  string s = fv_ll_conv2(i, pt);
+  if(pt == "int") {
+    s = "  %u" + i + " = trunc i64 %w" + i + " to i32\n";
+  } else if(pt == "float") {
+    s = "  %u" + i + " = call double @id_unbox_f(i64 %w" + i + ")\n";
+  }
+} return string s;
+(0, "int"):("  %u0 = trunc i64 %w0 to i32\n")
+(2, "float"):("  %u2 = call double @id_unbox_f(i64 %w2)\n")
+(1, "word"):("")
+(1, "int[]"):("  %u1 = inttoptr i64 %w1 to ptr\n")
+
+fv_ll_conv2(int i, string pt) {
+  string s = "  %u" + i + " = inttoptr i64 %w" + i + " to ptr\n";
+  if(pt == "word") {
+    s = "";
+  }
+} return string s;
+(1, "word"):("")
+(1, "string"):("  %u1 = inttoptr i64 %w1 to ptr\n")
+
+fv_ll_val(int i, string pt) {
+  string s = "%u" + i;
+  if(pt == "word") {
+    s = "%w" + i;
+  }
+} return string s;
+(0, "int"):("%u0")
+(3, "word"):("%w3")

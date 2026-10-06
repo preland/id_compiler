@@ -1,0 +1,30 @@
+// The adapter of (name, nd), `fn` of the object: it takes the object, then the
+// parameters that were not bound, loads the bound ones from the object's cells
+// and calls the real function with them in front, so the real function is an
+// ordinary function that does not know it was bound.
+
+fv_ll_adapter(int fn, string name, int nd) {
+  string head = fv_ll_head(fn, name, nd);
+  string cells = fv_ll_cells(fn, nd);
+  string s = head + "\n" + cells + fv_ll_call(fn, name, nd) + "\n}";
+} return string s;
+given clo_fixture ((import fixture_fn), "fx_target", 0):("define i32 @idfn_a_fx_target__0(ptr %c, i32 %a0) {\n  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r\n}")
+given clo_fixture ((import fixture_fn), "fx_target", 1):("define i32 @idfn_a_fx_target__1(ptr %c) {\n  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n  %u0 = trunc i64 %w0 to i32\n  %r = call i32 @id_fx_target(i32 %u0)\n  ret i32 %r\n}")
+
+fv_ll_head(int fn, string name, int nd) {
+  string rt = (import ns2)[fn];
+  string s = "define " + ll_ty(rt) + " @idfn_a_" + fv_key(name, nd) + "(ptr %c" + fv_ll_params(fn, nd) + ") {";
+} return string s;
+given clo_fixture ((import fixture_fn), "fx_target", 0):("define i32 @idfn_a_fx_target__0(ptr %c, i32 %a0) {")
+given clo_fixture ((import fixture_fn), "fx_target", 1):("define i32 @idfn_a_fx_target__1(ptr %c) {")
+
+fv_ll_params(int fn, int nd) {
+  string out = "";
+  int i = nd;
+  while(i < len((import nl1)[fn])) {
+    out = out + ", " + ll_ty((import ns1)[(import nl1)[fn][i]]) + " %a" + (i - nd);
+    i = i + 1;
+  }
+} return string out;
+given clo_fixture ((import fixture_fn), 0):(", i32 %a0")
+given clo_fixture ((import fixture_fn), 1):("")

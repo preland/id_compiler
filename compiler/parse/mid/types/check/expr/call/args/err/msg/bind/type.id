@@ -1,0 +1,39 @@
+// What `bind(NAME, v1, ..., vk)` is (docs/SPEC.md 1.1.1): NAME's function type
+// with its leading k parameters dropped. The first argument is typed as any
+// function value is, so a first argument that is not a function has no result
+// type, and "" is the answer every check in the type pass already stays quiet
+// about -- bind's own checks (check.id) are what report it, once.
+
+bind_type(int id) {
+  int[] args = (import nl1)[id];
+  string t = "";
+  if(len(args) > 1 && bind_isfn(args[0]) == 1) {
+    t = bind_tail(type_of(args[0]), len(args) - 1);
+  }
+} return string t;
+given bind_fixture ((import bind_ok)):("func() return int")
+given bind_fixture ((import bind_none)):("")
+given bind_fixture ((import bind_var)):("")
+
+// ft with its first nd parameters dropped, spelled as the parser spells every
+// function type; "" when ft is not a function type or has fewer parameters.
+bind_tail(string ft, int nd) {
+  string t = "";
+  if(ty_is_func(ft) == 1 && nd <= len(fn_params(ft))) {
+    t = "func(" + bind_join(fn_params(ft), nd) + ") return " + fn_ret(ft);
+  }
+} return string t;
+("func(int, int[]) return string", 1):("func(int[]) return string")
+("int", 1):("")
+("func(int) return string", 2):("")
+
+bind_join(string[] pts, int nd) {
+  string out = "";
+  int i = nd;
+  while(i < len(pts)) {
+    out = out + sep_at(", ", i - nd) + pts[i];
+    i = i + 1;
+  }
+} return string out;
+(["int", "string", "float"], 1):("string, float")
+(["int"], 1):("")

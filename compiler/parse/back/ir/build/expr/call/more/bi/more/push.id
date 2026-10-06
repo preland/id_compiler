@@ -14,3 +14,16 @@ lw_push2_tail(int a, int v, string elem) {
 } return int ret_i;
 given lw_env_fixture (0, 0, "int"):(1)
 given lw_env_fixture (0, 1, "word"):(0)
+
+// The last builtin the dispatch (../list.id) asks about: bind makes a closure
+// (runtime/closure/ll/ir/bind.id), and everything else is a plain runtime call.
+lb_b5(int node) {
+  int v = 0 - 1;
+  if((import ns1)[node] == "bind") {
+    v = lw_clo(node);
+  } else {
+    v = lw_plain(node);
+  }
+} return int v;
+given lw_clo_fixture ((import lb_call)):(2)
+given ocall_fixture ((import ocall_node)):(0)

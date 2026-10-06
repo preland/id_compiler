@@ -14,8 +14,8 @@ lw_fcall(int node) {
   int[] args = lw_args(node);
   int ret_i = lw_fcall_emit(node, callee, args);
 } return int ret_i;
-given fcallv_fixture ((import fcallv_node)):(2)
-given fcallv_fixture ((import fcallv_node)):(2) then (import chkfail)[0]:(0)
+given fcallv_fixture ((import fcallv_node)):(3) then (import istr)[2]:("id_clo_fn")
+given fcallv_fixture ((import fcallv_node)):(3) then (import chkfail)[0]:(0)
 
 // A call node's name is the variable's, so its slot is found as a read of the
 // variable finds it; the load is at the variable's type, not the call's.

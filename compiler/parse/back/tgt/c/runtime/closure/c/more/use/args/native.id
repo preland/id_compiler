@@ -1,0 +1,38 @@
+// Whether parameter i of the function a call names is a function type and that
+// function is a native: the one place a function value leaves id for C, so the
+// one place it must be a plain function pointer rather than an object.
+
+native_fn_param(int id, int i) {
+  int fn = fn_node_of((import ns1)[id]);
+  int ok = 0;
+  if(fn >= 0 && is_native(fn) == 1) {
+    ok = param_is_func(fn, i);
+  }
+} return int ok;
+given clo_native_fixture ((import cn_call), 0):(1)
+given clo_native_fixture ((import cn_call), 1):(0)
+
+param_is_func(int fn, int i) {
+  int ok = 0;
+  if(i < len((import nl1)[fn])) {
+    ok = ty_is_func((import ns1)[(import nl1)[fn][i]]);
+  }
+} return int ok;
+given clo_native_fixture ((import cn_fn), 0):(1)
+given clo_native_fixture ((import cn_fn), 2):(0)
+
+clo_native_fixture() {
+  clo_bind_fixture();
+  int[] ps = [node_param("param", "func(int) return int", "f"), node_param("param", "int", "n")];
+  int[] none = [];
+} chain () {
+  export int cn_fn = newnode("func", 0, 1, "cn_take", "int", ps, none);
+  fidx_add("cn_take");
+  push((import fnames), "cn_take");
+} chain () {
+  push((import fnodes), cn_fn);
+  export int[] cn_args = [(import cb_name), (import cb_lit)];
+  export int cn_call = node_call("cn_take", cn_args);
+} return void;
+():() then calls clo_bind_fixture:[1]
+():() then init_units:(0)

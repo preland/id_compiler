@@ -11,14 +11,19 @@ lw_fpty(string name, int i, int node, string t) {
 given fcallv_fixture ("gfunc", 0, (import fcallv_node), "fallback"):("int")
 given pcall_fixture ("gparam", 0, (import pcall_node), "fallback"):("fallback")
 
-// A call whose callee is a value rather than a symbol. The value is the first
-// operand, so every pass that follows operands -- mem2reg replacing the load,
-// dce keeping it alive -- already sees it, and the printer writes it where a
-// symbol would go (back/tgt/ll/val/insn/mem/call.id).
+// A call whose callee is a value rather than a symbol. The value is an object
+// (runtime/closure/): the function to call is read from it with the runtime
+// (id_clo_fn, so the module never looks inside the object), and is called with
+// the object in front of the arguments. The function is the first operand, so
+// every pass that follows operands -- mem2reg replacing the load of the
+// variable, dce keeping it alive -- already sees it, and the printer writes it
+// where a symbol would go (back/tgt/ll/val/insn/mem/call.id).
 lw_fcall_emit(int node, int callee, int[] args) {
   string ety = lw_ety(node);
   int[] none = [];
-  int ret_i = lw_emit("call", ety, callee, 0 - 1, "", args, none);
+  int fnp = lw_callf("id_clo_fn", "string", [callee]);
+} chain (int node, int callee, int[] args) {
+  int ret_i = lw_emit("call", ety, fnp, 0 - 1, "", lw_obj_args(callee, args), none);
 } return int ret_i;
-given fcallv_fixture ((import fcallv_node), 0, []):(0) then ir_last_b:(0)
-given fcallv_fixture ((import fcallv_node), 0, [1, 2]):(0)
+given fcallv_fixture ((import fcallv_node), 5, []):(1) then ir_last_b:(0) then (import istr)[0]:("id_clo_fn")
+given fcallv_fixture ((import fcallv_node), 5, [1, 2]):(1) then (import ilist)[1]:([5, 1, 2]) then (import ia)[1]:(0)

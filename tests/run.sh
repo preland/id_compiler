@@ -1149,7 +1149,7 @@ fi
 echo
 echo "--- conformance across targets (docs/SPEC.md) ---"
 conf=0
-for cp in "1 eprint float flow fn free" "2 int list order" "3 store str struct trap"; do
+for cp in "1 eprint float flow fn free" "2 int list order" "3 store str struct trap closure"; do
     if want "conform_${cp%% *}"; then
         ./conform.sh ${cp#* }
         crc=$?

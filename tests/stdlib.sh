@@ -365,7 +365,9 @@ fi
 # collide with the runtime in the generated C -- this is what makes forgetting
 # it a test failure, extracting each side with grep/sed rather than a second
 # implementation of either.
-runtime_names=$(grep -oE 'id_[a-zA-Z_0-9]+\(' "$ROOT/compiler/parse/back/tgt/c/runtime/prelude.id" \
+runtime_names=$(grep -ohE 'id_[a-zA-Z_0-9]+\(' "$ROOT/compiler/parse/back/tgt/c/runtime/prelude.id" \
+    "$ROOT/compiler/parse/back/tgt/c/runtime/closure/c/text.id" \
+    "$ROOT/compiler/parse/back/tgt/c/runtime/closure/c/more/cmp.id" \
     | sed -E 's/^id_//; s/\($//' | sort -u)
 conf_names=$(grep -oE 'string resv_names_src = "[^"]*"' "$ROOT/compiler/parse/conf.id" \
     | sed -E 's/^string resv_names_src = "//; s/"$//' | tr ' ' '\n' | sort -u)

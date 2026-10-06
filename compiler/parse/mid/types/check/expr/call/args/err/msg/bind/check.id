@@ -1,0 +1,34 @@
+// Checking a `bind` (docs/SPEC.md 1.1.1): a function's name, then at least one
+// value, no more values than the function has parameters, and each value
+// fitting its parameter the way an argument does and being something a
+// closure can hold. The shape is checked first and nothing else if it is
+// wrong, for the reason a call's arity is (callsite/arity/mismatch.id): pairing
+// values with parameters that are not there reports an invented second error.
+
+chk_bind(int id) {
+  int n = len((import nl1)[id]);
+  if(n < 2) {
+    bind_few(id);
+  } else {
+    bind_first(id, n);
+  }
+} return void;
+given bind_fixture ((import bind_none)):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_ok)):() then (import chkfail)[0]:(0)
+
+bind_few(int id) {
+  tc_err(id, "'bind' takes the name of a function and at least one value to capture: write bind(NAME, value, ...); with no value to capture, NAME alone is already a function value");
+} return void;
+given bind_fixture ((import bind_none)):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_one)):() then (import chkfail)[0]:(1)
+
+bind_first(int id, int n) {
+  int a = (import nl1)[id][0];
+  if(bind_isfn(a) == 0) {
+    bind_notfn(id, a);
+  } else {
+    bind_fit(id, n);
+  }
+} return void;
+given bind_fixture ((import bind_var), 2):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_ok), 2):() then (import chkfail)[0]:(0)

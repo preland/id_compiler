@@ -1360,6 +1360,65 @@ stdin "hi\n" timeout 20 ():() then prints:("hi\n\n")
 ():() then prints:("\n")
 EOF
 self_accept "bin/idc: timeout follows stdin and precedes the arguments" --emit-c /dev/null
+# A native's func(...) parameter is a C function pointer (docs/INTEROP.md): a plain
+# function crosses as one, and a closure (docs/SPEC.md 1.1.1) has none to give, so
+# passing one is the trap that names the fix, on both targets that link C.
+NF="$TMP/natfn"
+mkdir -p "$NF/nf"
+cat > "$NF/nf/backend.id" <<'EOF'
+string name = "nf";
+string c_header = "nf.h";
+
+string[] c_linux_sources = ["nf.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = [];
+string[] c_darwin_sources = ["nf.c"];
+string[] c_darwin_cflags = [];
+string[] c_darwin_link = [];
+EOF
+cat > "$NF/nf/nf.h" <<'EOF'
+#ifndef ID_NF_H
+#define ID_NF_H
+extern int id_nf_call(int (*f)(int), int x);
+#endif
+EOF
+cat > "$NF/nf/nf.c" <<'EOF'
+#include "nf.h"
+int id_nf_call(int (*f)(int), int x) { return f(x) + 1; }
+EOF
+cat > "$NF/nf/decl.id" <<'EOF'
+native nf_call(func(int) return int f, int x) return int;
+EOF
+cat > "$NF/entry.id" <<'EOF'
+inc(int n) {
+  int r = n + 1;
+} return int r;
+
+add_to(int n, int x) {
+  int r = n + x;
+} return int r;
+
+main(int argc, string[] argv) {
+  func(int) return int p = inc;
+  int a = nf_call(p, 10);
+  print(a);
+} chain (int argc, string[] argv) {
+  if (argc > 1) {
+    func(int) return int c = bind(add_to, 5);
+    print(nf_call(c, 1));
+  }
+} return int 0;
+EOF
+for tgt in c llvm; do
+    if ../bin/idc "$NF" --target "$tgt" --allow-untested -o "$TMP/natfn.$tgt" >"$TMP/log" 2>&1; then
+        got=$("$TMP/natfn.$tgt" 2>&1 | tr '\n' ' ')
+        if [ "$got" = "12 " ]; then ok "natives: a plain function crosses to C as a function pointer ($tgt)"; else bad "natives: a plain function crosses to C as a function pointer ($tgt: got '$got')"; fi
+        err=$("$TMP/natfn.$tgt" x 2>&1 >/dev/null)
+        if printf '%s' "$err" | grep -qF "a closure cannot be passed to a native"; then ok "natives: a closure passed to a native traps with the fix named ($tgt)"; else bad "natives: a closure passed to a native traps with the fix named ($tgt: got '$err')"; fi
+    else
+        bad "natives: the function-pointer fixture builds ($tgt: $(head -1 "$TMP/log"))"
+    fi
+done
 }
 
 tf_chunk_3() {
@@ -1989,6 +2048,39 @@ grep -qF "p.id:11: error: a test case takes literals only (a number, a string, o
     && ok "bin/idc: a case naming no function is rejected" \
     || bad "bin/idc: a case naming no function is rejected ($(head -1 "$TMP/log"))"
 
+# A case builds a closure where a function value goes, with bind written as a
+# function value's name is (docs/TESTS.md): the values are case literals, and the
+# function it names is carried by the harness though nothing else calls it.
+cat > "$TMP/p.id" <<'EOF'
+by_key(int[] keys, int a, int b) {
+  int r = keys[a] > keys[b];
+} return int r;
+([5, 3], 0, 1):(1)
+([5, 5], 0, 1):(0)
+
+first(func(int, int) return int gt, int a, int b) {
+  int r = a;
+  if(gt(a, b) == 1) {
+    r = b;
+  }
+} return int r;
+(bind(by_key, [5, 3]), 0, 1):(1)
+(bind(by_key, [3, 5]), 0, 1):(0)
+EOF
+self_accept "bin/idc: a case passes a closure it builds with bind" --emit-c /dev/null
+
+sed -i 's/^(bind(by_key, \[3, 5\]), 0, 1):(0)$/(bind(by_key, [3, 5]), 0, 1):(1)/' "$TMP/p.id"
+self_refuse "bin/idc: a false case with a closure argument fails the build" \
+    "p.id:14: test failed: first(bind(by_key, [3, 5]), 0, 1) = 0, expected 1" --emit-c /dev/null
+
+sed -i 's/^(bind(by_key, \[3, 5\]), 0, 1):(1)$/(bind(by_key, "x"), 0, 1):(0)/' "$TMP/p.id"
+self_refuse "bin/idc: a case's bind holds each value to the parameter it fixes" \
+    "p.id:14: error: this case gives \"x\" where a int[] is required" --emit-c /dev/null
+
+sed -i 's/^(bind(by_key, "x"), 0, 1):(0)$/(bind(by_key, [5, 3], 0), 0, 1):(0)/' "$TMP/p.id"
+self_refuse "bin/idc: a case's bind must make the function type the position wants" \
+    "p.id:14: error: this case builds a func(int) return int with bind(by_key, ...) where a func(int, int) return int is required" --emit-c /dev/null
+
 # --freestanding has no host to run a harness on and builds through LLVM only.
 cat > "$TMP/p.id" <<'EOF'
 run(func(int) return int step, int dt) {
@@ -2005,9 +2097,9 @@ use(int n) {
 EOF
 self_accept "bin/idc: a --freestanding object passes and calls a function value" --allow-untested --freestanding -o "$TMP/lib.o"
 self_build --allow-untested --freestanding --emit-llvm "$TMP/lib.ll"
-grep -qF "call i32 @id_run(ptr @id_twice" "$TMP/lib.ll" && grep -qE "call i32 %v[0-9]+\(i32 " "$TMP/lib.ll" \
-    && ok "bin/idc: --freestanding LLVM passes the symbol and calls the pointer" \
-    || bad "bin/idc: --freestanding LLVM passes the symbol and calls the pointer"
+grep -qF "call ptr @id_fn_plain(ptr @idfn_a_twice__0, ptr @id_twice)" "$TMP/lib.ll" && grep -qE "call i32 %v[0-9]+\(ptr %v[0-9]+, i32 " "$TMP/lib.ll" \
+    && ok "bin/idc: --freestanding LLVM gets the function's object from the runtime and calls the adapter" \
+    || bad "bin/idc: --freestanding LLVM gets the function's object from the runtime and calls the adapter"
 
 # --- eprint inside a function under test ---------------------------------------
 # A case's stderr is the harness's own channel: the runtime's trap line and the

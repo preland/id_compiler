@@ -1,7 +1,8 @@
 // A case value as C: a literal, built by tc_lit (lit/emit.id), or
 // `(import NAME)`, which is the export's C global, read where the value is
 // built -- after the setup for an argument, after the call for an expected
-// value -- or a function's name, which is the C function id_NAME. Either type
+// value -- or a function's name, which is that function's object
+// (runtime/closure/), the same one every use of it shares. Either type
 // was checked to be exactly the one wanted (mid/.../cases/given/read/), so it
 // needs no conversion.
 
@@ -11,11 +12,12 @@ tc_value(int e, string want) {
     so = tc_lit(e, want);
   }
   if((import nkind)[e] == "cfn") {
-    so = "id_" + (import ns1)[e];
+    so = fv_ref((import ns1)[e], 0);
   }
 } return string so;
 given lit_import_fixture ((import lit_cimport_e), "int"):("gb")
 given lit_int_fixture ((import lit_e), "int"):("5")
+given clo_bind_fixture ((import clo_cfn), "func(int) return int"):("ID_FNV(fx_target__0)")
 
 tc_list(int e, string want) {
   int[] xs = (import nl1)[e];

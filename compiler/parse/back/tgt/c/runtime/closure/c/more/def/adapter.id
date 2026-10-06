@@ -1,0 +1,34 @@
+// The adapter of (name, nd): `fn` of the object. It takes the object, then the
+// parameters that were not bound, and calls the real function with the bound
+// ones read back out of the object's cells in front of them, so the real
+// function is an ordinary function that does not know it was bound.
+
+fv_adapter(int fn, string name, int nd) {
+  string head = c_type((import ns2)[fn]) + " idfn_a_" + fv_key(name, nd) + "(IdFn* c" + fv_params(fn, nd) + ") { ";
+  string call = "id_" + name + "(" + fv_args(fn, nd) + ");";
+  string s = head + fv_ret((import ns2)[fn]) + call + " }";
+} return string s;
+given clo_fixture ((import fixture_fn), "fx_target", 0):("int idfn_a_fx_target__0(IdFn* c, int a0) { return id_fx_target(a0); }")
+given clo_fixture ((import fixture_fn), "fx_target", 1):("int idfn_a_fx_target__1(IdFn* c) { return id_fx_target((int)(ID_FNC(c)[0])); }")
+
+fv_params(int fn, int nd) {
+  string out = "";
+  int i = nd;
+  while(i < len((import nl1)[fn])) {
+    out = out + ", " + c_type((import ns1)[(import nl1)[fn][i]]) + " a" + (i - nd);
+    i = i + 1;
+  }
+} return string out;
+given clo_fixture ((import fixture_fn), 0):(", int a0")
+given clo_fixture ((import fixture_fn), 1):("")
+
+fv_args(int fn, int nd) {
+  string out = "";
+  int i = 0;
+  while(i < len((import nl1)[fn])) {
+    out = out + sep_arg(i) + fv_arg(fn, nd, i);
+    i = i + 1;
+  }
+} return string out;
+given clo_fixture ((import fixture_fn), 0):("a0")
+given clo_fixture ((import fixture_fn), 1):("(int)(ID_FNC(c)[0])")

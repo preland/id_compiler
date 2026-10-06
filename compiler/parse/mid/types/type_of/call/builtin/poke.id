@@ -9,3 +9,18 @@ is_pokefn(string name) {
 } return int ok;
 ("poke32"):(1)
 ("peek32"):(0)
+
+// A call's type once the name has said what it can: pop's is the element type
+// of the list it was handed, and bind's is its first argument's function type
+// less the values it fixes. Neither follows from the name alone.
+call_shaped(int id, string t) {
+  string ret_s = t;
+  if((import ns1)[id] == "pop") {
+    ret_s = pop_elem(id);
+  }
+  if((import ns1)[id] == "bind") {
+    ret_s = bind_type(id);
+  }
+} return string ret_s;
+given idx_build ((import call_pop), "?"):("int")
+given bind_fixture ((import bind_ok), "func"):("func() return int")

@@ -1,8 +1,8 @@
-// A function named as a value is the function's own symbol: a constant, like
-// a literal, with no home block and nothing to load. It prints as the name the
-// function is defined or declared under, `@id_<name>`, and a function type is
-// a pointer in LLVM's spelling.
-// A name read in an expression: a function's name is its symbol, and any
+// A function named as a value is that function's object, which the runtime
+// makes from the function's adapter and the function itself and the module
+// never defines (runtime/closure/ll/ir/sym.id); a function type is a pointer in
+// LLVM's spelling.
+// A name read in an expression: a function's name is its object, and any
 // other name is a variable's slot, loaded.
 lw_named(int node) {
   int v = 0 - 1;
@@ -12,16 +12,16 @@ lw_named(int node) {
     v = lw_name(node);
   }
 } return int v;
-given lw_fix_fnval ((import fix_fnval_n)):(0)
+given lw_fix_fnval ((import fix_fnval_n)):(2)
 given lw_fix_var ((import fix_var_n)):(1)
 
 lw_fnref(int node) {
   string ety = lw_ety(node);
   string s1_of_v = (import ns1)[node];
-  int ret_i = ir_leaf("global", ety, 0 - 1, 0 - 1, "id_" + s1_of_v);
+  int ret_i = lw_fnval(s1_of_v, ety);
 } return int ret_i;
-given lw_fix_fnval ((import fix_fnval_n)):(0) then ir_last_b:(0)
-given lw_fix_var ((import fix_var_n)):(0)
+given lw_fix_fnval ((import fix_fnval_n)):(2) then (import istr)[2]:("id_fn_plain")
+given lw_fix_fnval ((import fix_fnval_n)):(2) then (import istr)[0]:("idfn_a_fx_target__0")
 
 // Operand B of the most recently created instruction, offset by one since a
 // case's literal cannot spell a negative number and B's usual value is -1 --

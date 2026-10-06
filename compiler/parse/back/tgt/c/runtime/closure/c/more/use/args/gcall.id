@@ -1,0 +1,36 @@
+// The generic call's arguments, written unless the call is a bind: bind's
+// first argument is a function's name, which written as an argument would be a
+// use of that function as a plain value (an object nothing needs), and the
+// text of the whole call is emit_bind's. Every other argument is the
+// expression, except one a native takes as a function type: a native is C and
+// is given a plain function pointer, so the value goes through id_fn_raw,
+// which stops the program if it is a closure (docs/SPEC.md 1.1.1).
+
+emit_gcall_args(int id, int[] args) {
+  string s = "";
+  if((import ns1)[id] != "bind") {
+    s = emit_raw_args(id, args);
+  }
+} return string s;
+given clo_bind_fixture ((import cb_call), [(import cb_lit)]):("")
+given call_names_fixture ((import call_e_foo), (import call_args)):("5, 4")
+
+emit_raw_args(int id, int[] args) {
+  string out = "";
+  int i = 0;
+  while(i < len(args)) {
+    out = out + sep_arg(i) + raw_arg(id, i, args[i]);
+    i = i + 1;
+  }
+} return string out;
+given call_names_fixture ((import call_e_foo), (import call_args)):("5, 4")
+given clo_native_fixture ((import cn_call), (import cn_args)):("id_fn_raw(ID_FNV(fx_target__0)), 7")
+
+raw_arg(int id, int i, int a) {
+  string s = emit_expr(a);
+  if(native_fn_param(id, i) == 1) {
+    s = "id_fn_raw(" + s + ")";
+  }
+} return string s;
+given clo_native_fixture ((import cn_call), 0, (import cb_name)):("id_fn_raw(ID_FNV(fx_target__0))")
+given clo_native_fixture ((import cn_call), 1, (import cb_lit)):("7")

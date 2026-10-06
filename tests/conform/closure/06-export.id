@@ -1,0 +1,13 @@
+add_to(int n, int x) {
+  int r = n + x;
+} return int r;
+
+mk(int n) {
+  export func(int) return int stored = bind(add_to, n);
+} return void;
+
+main(int argc, string[] argv) {
+  mk(7);
+  func(int) return int g = (import stored);
+  print(g(1));
+} return int 0;

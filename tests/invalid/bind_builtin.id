@@ -1,0 +1,4 @@
+// EXPECT: 'bind' cannot bind 'len': it is a builtin, not a function defined in id; write a function that calls 'len' and bind that
+main(int argc, string[] argv) {
+  func() return int f = bind(len, "abc");
+} return int 0;

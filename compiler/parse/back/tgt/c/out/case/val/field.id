@@ -19,3 +19,14 @@ tc_fcell(int e, string want, int sd_k) {
 } return string so;
 given sd_case_fixture ((import sd_ca), "P", 1):("(long long)(1)")
 given sd_case_fixture ((import sd_cs), "Q", 0):("(long long)(intptr_t)(ID_S(s))")
+
+// What is neither a struct nor a list at a position of a test case: a closure,
+// written bind(NAME, 1, [2]) where a function type is wanted, or a scalar.
+tc_other2(int e, string want) {
+  string so = tc_scalar(e);
+  if(ty_is_func(want) == 1 && (import nkind)[e] == "cctor") {
+    so = tc_cbind(e);
+  }
+} return string so;
+given clo_case_fixture ((import cc_e), "func() return int"):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
+given lit_int_fixture ((import lit_e), "int"):("5")

@@ -7,3 +7,40 @@ vm_cell(int hl, int i) {
 } return word wr;
 given vb_boot given tf_lnew given vm_b_list_push(1, 7) (1, 0):(7)
 given vb_boot (0, 0):(0) then eprints:("id: read of an uninitialised export (its declaring function has not run)\n")
+
+// A function value's object (conf.id, b_fn_plain): a list whose cells are the
+// adapter's function id, the plain function's id (wr0, 0 for a closure), the
+// number of captured cells, and then those cells, zero until id_clo_set.
+vm_k_make(word wa, word wcells, word wr0) {
+  word[] l = [wa, wr0, wcells];
+  push((import ex_lists), l);
+  push((import ex_llock), 0);
+} chain (word wa, word wcells, word wr0) {
+  int h = len((import ex_lists)) - 1;
+  int nc = wcells;
+  while (nc > 0) {
+    push(l, 0);
+    nc = nc - 1;
+  }
+} return int h;
+given vb_boot (7, 2, 0):(1) then (import ex_lists):([[], [7, 0, 2, 0, 0]])
+given vb_boot (7, 0, 9):(1) then (import ex_lists):([[], [7, 9, 0]])
+
+// id_clo_copy: a new list with the same cells, locked, so a write to it is the
+// trap a constant list gives (docs/SPEC.md 1.1.1).
+vm_k_copy(word wa) {
+  int h = vm_lnew();
+  int hs = wa;
+  word[] cells0 = (import ex_lists)[hs];
+} chain (word wa) {
+  word[] cells1 = (import ex_lists)[h];
+  int i = 0;
+  while (i < len(cells0)) {
+    push(cells1, cells0[i]);
+    i = i + 1;
+  }
+} chain (word wa) {
+  vm_b_list_lock(h);
+} return int h;
+given vb_boot given tf_lnew given vm_b_list_push(1, 5) given vm_b_list_push(1, 6) (1):(2) then (import ex_lists):([[], [5, 6], [5, 6]]) then (import ex_llock):([0, 0, 1])
+given vb_boot given tf_lnew (1):(2) then (import ex_lists):([[], [], []]) then (import ex_llock):([0, 0, 1])

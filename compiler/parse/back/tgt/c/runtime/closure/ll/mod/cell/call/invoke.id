@@ -1,0 +1,32 @@
+// The call an adapter ends with: the real function, the bound values (read
+// from the cells) first and the adapter's own parameters after them, and its
+// result returned. A void function has no result to name, and LLVM will not
+// name one.
+
+fv_ll_call(int fn, string name, int nd) {
+  string rt = (import ns2)[fn];
+  string call = "call " + ll_ty(rt) + " @id_" + name + "(" + fv_ll_args(fn, nd) + ")";
+  string s = fv_ll_ret(rt, call);
+} return string s;
+given clo_fixture ((import fixture_fn), "fx_target", 0):("  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r")
+given clo_fixture ((import fixture_fn), "fx_target", 1):("  %r = call i32 @id_fx_target(i32 %u0)\n  ret i32 %r")
+
+fv_ll_args(int fn, int nd) {
+  string out = "";
+  int i = 0;
+  while(i < len((import nl1)[fn])) {
+    out = out + sep_arg(i) + fv_ll_arg(fn, nd, i);
+    i = i + 1;
+  }
+} return string out;
+given clo_fixture ((import fixture_fn), 0):("i32 %a0")
+given clo_fixture ((import fixture_fn), 1):("i32 %u0")
+
+fv_ll_ret(string rt, string call) {
+  string s = "  %r = " + call + "\n  ret " + ll_ty(rt) + " %r";
+  if(rt == "void") {
+    s = "  " + call + "\n  ret void";
+  }
+} return string s;
+("int", "call i32 @f()"):("  %r = call i32 @f()\n  ret i32 %r")
+("void", "call void @g()"):("  call void @g()\n  ret void")

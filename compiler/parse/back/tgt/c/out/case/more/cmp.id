@@ -1,8 +1,10 @@
 // Comparing and printing a value of an id type, in C. A list goes through the
 // harness's per-type helpers (ctype/list/), which do the same element by
-// element. A function value compares as the pointer it is, and has no
-// spelling a case could have written but its name, which the running harness
-// does not know -- so a failing case says only that it was a function.
+// element. A function value compares by id_fn_eq: the same object, which is
+// how two uses of one plain function compare, or the same function holding the
+// same cells (docs/SPEC.md 1.1.1). It has no spelling a case could have written
+// but its name, which the running harness does not know -- so a failing case
+// says only that it was a function.
 
 tc_compare(string ga, string gb, string type) {
   string so = "(" + ga + " == " + gb + ")";
@@ -15,12 +17,15 @@ tc_compare(string ga, string gb, string type) {
 } chain (string ga, string gb, string type) {
   if(ty_is_struct(type) == 1) {
     so = "idtc_eqs_" + type + "(" + ga + ", " + gb + ")";
+  } else if(ty_is_func(type) == 1) {
+    so = "id_fn_eq(" + ga + ", " + gb + ")";
   }
 } return string so;
 given sd_note_fixture ("a", "b", "int"):("(a == b)")
 given sd_note_fixture ("a", "b", "string"):("(strcmp(a, b) == 0)")
 given sd_note_fixture ("a", "b", "int[]"):("idtc_eq_int(a, b)")
 given sd_note_fixture ("a", "b", "P"):("idtc_eqs_P(a, b)")
+given sd_note_fixture ("a", "b", "func(int) return int"):("id_fn_eq(a, b)")
 
 tc_show(string code, string type) {
   string so = show_scalar(code, type);

@@ -1,0 +1,9 @@
+// EXPECT: 'bind' value 0 for 'inc' narrows word to int; declare a int local and pass that
+inc(int n) {
+  int r = n + 1;
+} return int r;
+
+main(int argc, string[] argv) {
+  word w = 5;
+  func() return int f = bind(inc, w);
+} return int 0;

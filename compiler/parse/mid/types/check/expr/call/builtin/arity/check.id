@@ -8,14 +8,18 @@
 
 chk_bi(int id) {
   string s1_of_v = (import ns1)[id];
-  if(is_builtin(s1_of_v) == 1) {
+  if(is_builtin(s1_of_v) == 1 && s1_of_v != "bind") {
     chk_bi_arity(id);
     fv_bi_args(id);
     sd_bi_args(id);
   }
+  if(s1_of_v == "bind") {
+    chk_bind(id);
+  }
 } return void;
 given call2_setup ((import cm_push_call)):() then calls chk_bi_arity:((import cm_push_call))
 given chk_bi_nonbuiltin_setup ((import cm_var_node)):() then (import chkfail)[0]:(0)
+given bind_fixture ((import bind_none)):() then calls chk_bind:((import bind_none))
 
 // Arity first, and nothing else if it is wrong -- as at a call to a defined
 // function, asking what argument 2 should be when there is no argument 2

@@ -1,0 +1,8 @@
+// EXPECT: 'bind' gives 3 values to 'inc', which takes 1 parameter(s); bind fixes the leading parameters, so give at most 1
+inc(int n) {
+  int r = n + 1;
+} return int r;
+
+main(int argc, string[] argv) {
+  func() return int f = bind(inc, 1, 2, 3);
+} return int 0;

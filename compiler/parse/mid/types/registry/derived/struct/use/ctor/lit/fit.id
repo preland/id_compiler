@@ -2,9 +2,13 @@
 // declares at that position, the way a list literal is: the name must be that
 // struct, and each argument must fit its field -- recursively, so a field that
 // is a list, a struct or `(import NAME)` is judged by the rule for its own kind.
+// The same shape written where a function type is wanted is a closure,
+// bind(NAME, 1, [2]), and is held to the rules of a bind (../call/bind.id).
 
 fit_other(int i, int e, string want) {
-  if(ty_is_struct(want) == 1 || (import nkind)[e] == "cctor") {
+  if(ty_is_func(want) == 1 && (import nkind)[e] == "cctor") {
+    fit_cbind(i, e, want);
+  } else if(ty_is_struct(want) == 1 || (import nkind)[e] == "cctor") {
     fit_struct(i, e, want);
   } else {
     fit_scalar(i, e, want);
@@ -12,6 +16,7 @@ fit_other(int i, int e, string want) {
 } return void;
 given sd_case_fixture ((import fixture_ci), (import sd_ce), "int"):() then prints:("fixture.id:4: error: this case builds a P where a int is required\n")
 given sd_case_fixture ((import fixture_ci), (import sd_ca), "int"):() then (import chkfail)[0]:(0)
+given cbind_fixture ((import fixture_ci), (import cb_e), "func() return int"):() then (import chkfail)[0]:(0)
 
 fit_struct(int i, int e, string want) {
   if((import nkind)[e] != "cctor") {

@@ -4,7 +4,7 @@ lb_b4(int node) {
   if((import ns1)[node] == "pop") {
     v = lw_pop(node);
   } else {
-    v = lw_plain(node);
+    v = lb_b5(node);
   }
 } return int v;
 given popcall_fixture ((import popcall_node)):(2)

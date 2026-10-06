@@ -33,3 +33,69 @@ given vb_boot given tf_lnew given vm_b_list_push(1, 5) (10, 1, 0, 0):(5)
 given vb_boot given tf_lnew (16, 1, 0, 0):(0) then (import ex_llock):([0, 1])
 given vb_boot given tf_lnew (11, 1, 7, 0):(0) then (import ex_lists):([[], [7]])
 given vb_boot (12, 0, 0, 0):(1) then (import ex_lists):([[], []])
+
+// The function-value helpers (conf.id, b_clo0 and after), by what they do to the
+// object, which is a list (cell.id's vm_k_make): make a plain function's, make a
+// closure's, store a captured cell, copy a list, and read the plain function,
+// the adapter or a captured cell.
+vm_bk(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  int hl = wa;
+  int ci = wb + 3;
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_fn_plain)) {
+    wr = vm_k_plain(wa, wb);
+    return wr;
+  }
+  if (id == (import b_clo_make)) {
+    wr = vm_k_make(wa, wb, 0);
+    return wr;
+  }
+  if (id == (import b_clo_set)) {
+    word[] l = (import ex_lists)[hl];
+    l[ci] = wc;
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_clo_copy)) {
+    wr = vm_k_copy(wa);
+    return wr;
+  }
+  if (id == (import b_clo_cell)) {
+    wr = vm_cell(hl, ci);
+    return wr;
+  }
+  if (id == (import b_clo_fn)) {
+    wr = vm_cell(hl, 0);
+    return wr;
+  }
+} chain (int id, word wa, word wb, word wc) {
+  wr = vm_cell(hl, 1);
+} return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 7) given vm_b_list_push(1, 8) (60, 1, 0, 0):(7)
+given vb_boot given tf_lnew given vm_b_list_push(1, 7) given vm_b_list_push(1, 8) given vm_b_list_push(1, 9) given vm_b_list_push(1, 10) (61, 1, 0, 0):(10)
+given vb_boot (56, 3, 1, 0):(1) then (import ex_lists):([[], [3, 0, 1, 0]])
+given vb_boot (56, 3, 1, 0):(1) then (import ex_llock):([0, 0])
+
+// id_fn_plain: the object of a plain function, made once for each adapter (wa)
+// and kept in ex_fo, so every use of a function is one object, as in the other
+// runtimes. wb is the function itself.
+vm_k_plain(word wa, word wb) {
+  int[] fo = (import ex_fo);
+  int h = 0 - 1;
+  int i = 0;
+} chain (word wa, word wb) {
+  while (i < len(fo) && h < 0) {
+    word[] o = (import ex_lists)[fo[i]];
+    if (o[0] == wa) {
+      h = fo[i];
+    }
+    i = i + 1;
+  }
+  if (h < 0) {
+    h = vm_k_make(wa, 0, wb);
+    push(fo, h);
+  }
+} return int h;
+given vb_boot (7, 3):(1) then (import ex_lists):([[], [7, 3, 0]]) then (import ex_fo):([1])
+given vb_boot given tf_fo(7, 3) (7, 3):(1) then (import ex_lists):([[], [7, 3, 0]])

@@ -1,0 +1,17 @@
+pick_at(int[] xs, int i) {
+  int r = xs[i];
+} return int r;
+
+edit(int[] xs) {
+  xs[0] = 99;
+  push(xs, 4);
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3];
+  func(int) return int f = bind(pick_at, xs);
+  edit(xs);
+} chain (int argc, string[] argv) {
+  print(f(0));
+  print(xs[0]);
+} return int 0;

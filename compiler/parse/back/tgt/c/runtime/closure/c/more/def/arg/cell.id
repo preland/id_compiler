@@ -1,0 +1,34 @@
+// One argument of an adapter's call: parameter i of the real function is read
+// from cell i of the object when it was bound (i < nd), and is the adapter's
+// own parameter a(i - nd) when it was not. A cell holds every type but
+// `float` as the bits of an 8-byte integer, as a list cell does; a function
+// value is a pointer, which unbox (out/cell/) would read back as a list.
+
+fv_arg(int fn, int nd, int i) {
+  string pt = (import ns1)[(import nl1)[fn][i]];
+  string s = "a" + (i - nd);
+  if(i < nd) {
+    s = fv_cell(i, pt);
+  }
+} return string s;
+given clo_fixture ((import fixture_fn), 0, 0):("a0")
+given clo_fixture ((import fixture_fn), 1, 0):("(int)(ID_FNC(c)[0])")
+
+fv_cell(int i, string pt) {
+  string code = "ID_FNC(c)[" + i + "]";
+  string s = unbox(code, pt);
+  if(ty_is_func(pt) == 1) {
+    s = "(IdFn*)(intptr_t)(" + code + ")";
+  }
+} return string s;
+(2, "string"):("(char*)(intptr_t)(ID_FNC(c)[2])")
+(0, "func(int) return int"):("(IdFn*)(intptr_t)(ID_FNC(c)[0])")
+
+fv_ret(string rt) {
+  string s = "return ";
+  if(rt == "void") {
+    s = "";
+  }
+} return string s;
+("int"):("return ")
+("void"):("")

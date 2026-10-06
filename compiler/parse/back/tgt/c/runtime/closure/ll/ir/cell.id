@@ -1,0 +1,29 @@
+// One value of a bind in the IR: converted to the type of the parameter it
+// fixes (a C call converts implicitly and LLVM will not), copied if that type
+// is a list so the closure holds its own locked copy, boxed into the 8-byte
+// cell the way a list element is, and stored with id_clo_set at its index.
+
+lw_clo_set(int o, int fn, int idx, int i, int a) {
+  string pt = (import ns1)[(import nl1)[fn][i]];
+  int cellv = lw_clo_cell(a, pt);
+  lw_callf("id_clo_set", "string", [o, idx, cellv]);
+} return void;
+given lw_clo_fixture (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[0]:("7")
+given lw_clo_fixture (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[2]:("id_clo_set")
+
+lw_clo_cell(int a, string pt) {
+  int v = lw_as(a, pt);
+  int cpy = lw_clo_copy(v, pt);
+  int ret_i = lw_box(cpy, pt);
+} return int ret_i;
+given lw_clo_fixture ((import lb_lit), "int"):(1) then (import iop)[1]:("sext")
+given lw_clo_fixture ((import lb_lit), "float"):(2) then (import istr)[2]:("id_box_f")
+
+lw_clo_copy(int v, string pt) {
+  int ret_i = v;
+  if(ty_is_list(pt) == 1) {
+    ret_i = lw_callf("id_clo_copy", pt, [v]);
+  }
+} return int ret_i;
+given lw_clo_fixture (5, "int[]"):(0) then (import istr)[0]:("id_clo_copy")
+given lw_clo_fixture (5, "string"):(5)

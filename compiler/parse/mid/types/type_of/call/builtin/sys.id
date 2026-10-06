@@ -19,11 +19,16 @@ bt5(string name) {
   } else if(name == "float_of_bits" || name == "float_of_bits32") {
     t = "float";
   }
+} chain (string name) {
+  if(name == "bind") {
+    t = "func";
+  }
 } return string t;
 ("poke32"):("void")
 ("alloc"):("?")
 ("float_of_bits"):("float")
 ("float_of_bits32"):("float")
+("bind"):("func")
 
 // Builtins yielding a machine word. `ult` is not among them -- it answers a
 // question, so it is an int like every other comparison.

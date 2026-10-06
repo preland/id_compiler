@@ -1,0 +1,30 @@
+// The first argument of a `bind` is a function when it is a name that
+// fn_node_of finds: a function of the program, of the standard library, or a
+// `native`. A variable of function type is not one, and neither is a builtin.
+
+bind_isfn(int a) {
+  int ok = 0;
+  if((import nkind)[a] == "var" && fn_node_of((import ns1)[a]) >= 0) {
+    ok = 1;
+  }
+} return int ok;
+given bind_fixture ((import bind_fnname)):(1)
+given bind_fixture ((import bind_lit)):(0)
+
+bind_fit(int id, int n) {
+  string[] pts = fn_params(type_of((import nl1)[id][0]));
+  if(n - 1 > len(pts)) {
+    bind_many(id, len(pts));
+  } else {
+    bind_vals(id, pts, n - 1);
+  }
+} return void;
+given bind_fixture ((import bind_toomany), 3):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_ok), 2):() then (import chkfail)[0]:(0)
+
+bind_many(int id, int np) {
+  string msg = "'bind' gives " + (len((import nl1)[id]) - 1) + " values to '" + (import ns1)[(import nl1)[id][0]] + "', which takes " + np + " parameter(s); bind fixes the leading parameters, so give at most " + np;
+  tc_err(id, msg);
+} return void;
+given bind_fixture ((import bind_toomany), 1):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_toomany), 1):() then prints:("<stdin>:1: error: 'bind' gives 2 values to 'fx_target', which takes 1 parameter(s); bind fixes the leading parameters, so give at most 1\n")

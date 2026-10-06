@@ -17,10 +17,13 @@ init_files_rest() {
 //   cline  the line its '(' was on
 // cnode: How many calls have been recorded, for init_more.id's init_calls/call_at
 // cases: both are void and touch only exported lists, which a case can only
-// read back through a check.
+// read back through a check. It also starts the function-value registry
+// (back/tgt/c/runtime/closure/fv.id), which every environment that emits needs
+// and nothing else would start in a case's setup.
 init_calls() {
   export int[] cnode = [];
   export int[] cline = [];
+  fv_init();
 } return void export cnode;
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then len((import cnode)):(0)

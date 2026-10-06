@@ -1,0 +1,9 @@
+grow(int[] xs, int n) {
+  push(xs, n);
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [1];
+  func(int) return void f = bind(grow, xs);
+  f(2);
+} return int 0;

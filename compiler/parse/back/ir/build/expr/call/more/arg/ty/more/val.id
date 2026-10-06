@@ -2,6 +2,9 @@
 lw_arg_val(int node, int i) {
   string pty = lw_arg_pty(node, i);
   int v = lw_arg_conv(node, i, pty);
+  if(native_fn_param(node, i) == 1) {
+    v = lw_callf("id_fn_raw", pty, [v]);
+  }
 } return int v;
 given pcall_fixture ((import pcall_node), 0):(1)
 given bicall_fixture ((import bicall_node), 0):(0)

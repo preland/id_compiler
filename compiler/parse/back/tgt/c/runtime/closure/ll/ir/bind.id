@@ -1,0 +1,34 @@
+// `bind(NAME, v1, ..., vk)` in the IR (docs/SPEC.md 1.1.1): the object is made
+// by the runtime from the adapter of (NAME, k) that the module defines and the
+// number of values, and each value is stored into its cell with the runtime too
+// -- the same calls the C target writes as one nested expression, in the order
+// the values were written.
+
+lw_clo(int node) {
+  int[] args = (import nl1)[node];
+  int o = lw_clo_new(args);
+  int ret_i = lw_clo_sets(o, fn_node_of((import ns1)[args[0]]), args);
+} return int ret_i;
+given lw_clo_fixture ((import lb_call)):(2) then (import istr)[0]:("idfn_a_bf__1")
+given lw_clo_fixture ((import lb_call)):(2) then (import istr)[2]:("id_clo_make")
+
+lw_clo_new(int[] args) {
+  string sym = fv_sym((import ns1)[args[0]], len(args) - 1);
+  int fa = ir_leaf("global", "string", 0 - 1, 0 - 1, sym);
+  int nc = ir_leaf("const", "int", 0 - 1, 0 - 1, "" + (len(args) - 1));
+} chain (int[] args) {
+  int ret_i = lw_callf("id_clo_make", "string", [fa, nc]);
+} return int ret_i;
+given lw_clo_fixture ([(import lb_name), (import lb_lit)]):(2) then (import istr)[1]:("1")
+given lw_clo_fixture ([(import lb_name)]):(2) then (import istr)[0]:("idfn_a_bf__0")
+
+lw_clo_sets(int o, int fn, int[] args) {
+  int i = 1;
+  while(i < len(args)) {
+    int idx = ir_leaf("const", "int", 0 - 1, 0 - 1, "" + (i - 1));
+    lw_clo_set(o, fn, idx, i - 1, args[i]);
+    i = i + 1;
+  }
+} return int o;
+given lw_clo_fixture (5, (import lb_fn), [(import lb_name), (import lb_lit)]):(5) then (import istr)[3]:("id_clo_set")
+given lw_clo_fixture (5, (import lb_fn), [(import lb_name)]):(5) then len((import iop)):(0)

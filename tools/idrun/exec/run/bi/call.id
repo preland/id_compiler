@@ -46,6 +46,7 @@ vm_bi(int id, word wa, word wb, word wc) {
     return wr;
   }
   if (id >= (import b_free0)) {
+    wr = vm_bf(id, wa, wb, wc);
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
@@ -62,3 +63,15 @@ given vb_boot (53, 1, 0, 0):(0)
 given vb_boot given tf_mem8(-1) (48, (import tf_addr), 0, 0):(-1)
 given vb_boot (28, 9, 2, 0):(4)
 given vb_boot (37, 0, 0, 0):(1)
+given vb_boot (56, 7, 2, 0):(1) then (import ex_lists):([[], [7, 0, 2, 0, 0]])
+
+// The helpers after the list-freeing pair: the interpreter never frees, so those
+// answer nothing, and the function-value helpers (conf.id) are one group.
+vm_bf(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id >= (import b_clo0)) {
+    wr = vm_bk(id, wa, wb, wc);
+  }
+} return word wr;
+given vb_boot (54, 1, 0, 0):(0)
+given vb_boot (56, 7, 1, 0):(1) then (import ex_lists):([[], [7, 0, 1, 0]])

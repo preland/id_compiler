@@ -1,0 +1,21 @@
+// The bound values an adapter reads back, as instructions: for each bound value
+// its cell, read with the runtime as the 64 bits a cell holds -- the object is
+// opaque to the module, which is what lets the same module run under idrun --
+// and converted to the parameter's type (conv.id).
+
+fv_ll_cells(int fn, int nd) {
+  string out = "";
+  int i = 0;
+  while(i < nd) {
+    out = out + fv_ll_cell(i, (import ns1)[(import nl1)[fn][i]]);
+    i = i + 1;
+  }
+} return string out;
+given clo_fixture ((import fixture_fn), 0):("")
+given clo_fixture ((import fixture_fn), 1):("  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n  %u0 = trunc i64 %w0 to i32\n")
+
+fv_ll_cell(int i, string pt) {
+  string s = "  %w" + i + " = call i64 @id_clo_cell(ptr %c, i32 " + i + ")\n" + fv_ll_conv(i, pt);
+} return string s;
+(1, "string"):("  %w1 = call i64 @id_clo_cell(ptr %c, i32 1)\n  %u1 = inttoptr i64 %w1 to ptr\n")
+(0, "word"):("  %w0 = call i64 @id_clo_cell(ptr %c, i32 0)\n")

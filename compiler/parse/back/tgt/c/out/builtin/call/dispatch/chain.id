@@ -25,13 +25,17 @@ ec3(int id) {
   if((import ns1)[id] == "push") {
     s = emit_push(id);
   }
+  if((import ns1)[id] == "bind") {
+    s = emit_bind(id);
+  }
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
 given call_names_fixture2 ((import call_e_push)):("id_list_push(5, (long long)(intptr_t)(4))")
+given clo_bind_fixture ((import cb_call)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
 
 emit_gcall(int id) {
   int[] l1_of_v = (import nl1)[id];
-  string s = "id_" + (import ns1)[id] + "(" + emit_args(l1_of_v) + ")";
+  string s = "id_" + (import ns1)[id] + "(" + emit_gcall_args(id, l1_of_v) + ")";
   string ret_s = emit_gcall_tail(id, s);
 } return string ret_s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")

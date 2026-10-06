@@ -1,0 +1,31 @@
+// The function values one translation unit needs, found as its code is
+// emitted: a plain function used as a value is the pair (name, 0), and
+// bind(name, v1, ..., vk) is (name, k). Each pair needs an adapter and an
+// object, written after the unit's last function (c/more/def/ for C, ll/ for
+// LLVM) because the code that refers to them is emitted first and is the only
+// thing that knows which there are. This registry is the one thing both targets
+// share: fvname and fvk are the pairs in the order they were first used, fvkey
+// the same pairs spelled as one string so a repeat is found by find_str.
+
+fv_init() {
+  export string[] fvname = [];
+  export int[] fvk = [];
+  export string[] fvkey = [];
+} return void export fvname;
+given env_init ():() then (import chkfail)[0]:(0)
+given env_init ():() then len((import fvname)):(0)
+
+fv_note(string name, int nd) {
+  string key = fv_key(name, nd);
+  if(find_str((import fvkey), key) < 0) {
+    fv_add(key, name, nd);
+  }
+} return void;
+given fv_init ("tick", 0):() then len((import fvname)):(1)
+given fv_seeded ("tick", 0):() then len((import fvname)):(1)
+
+fv_key(string name, int nd) {
+  string key = name + "__" + nd;
+} return string key;
+("tick", 0):("tick__0")
+("pick", 12):("pick__12")

@@ -1,0 +1,29 @@
+// The values of a `bind`, one at a time, each against the parameter it fixes.
+// The values are the arguments after the first, so value i is argument i + 1.
+
+bind_vals(int id, string[] pts, int nbound) {
+  int i = 0;
+  while(i < nbound) {
+    bind_val(id, pts, i);
+    i = i + 1;
+  }
+} return void;
+given bind_fixture ((import bind_str), ["int"], 1):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_ok), ["int"], 1):() then (import chkfail)[0]:(0)
+
+bind_val(int id, string[] pts, int i) {
+  int v = (import nl1)[id][i + 1];
+  string msg = bind_val_msg(id, i, pts[i], v);
+  if(msg != "") {
+    tc_err(v, msg);
+  }
+} return void;
+given bind_fixture ((import bind_word), ["int"], 0):() then (import chkfail)[0]:(1)
+given bind_fixture ((import bind_ok), ["int"], 0):() then (import chkfail)[0]:(0)
+
+bind_who(int id, int i) {
+  string nm = (import ns1)[(import nl1)[id][0]];
+  string who = "'bind' value " + i + " for '" + nm + "'";
+} return string who;
+given bind_fixture ((import bind_ok), 0):("'bind' value 0 for 'fx_target'")
+given bind_fixture ((import bind_ok), 3):("'bind' value 3 for 'fx_target'")

@@ -1,0 +1,9 @@
+// EXPECT: 'bind' takes the name of a function written in id, but 'step' is a variable of type func(int) return int
+inc(int n) {
+  int r = n + 1;
+} return int r;
+
+main(int argc, string[] argv) {
+  func(int) return int step = inc;
+  func() return int g = bind(step, 3);
+} return int 0;

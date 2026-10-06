@@ -1,3 +1,11 @@
+// A plain function's object made once (id_fn_plain, list/more/grp.id), for the case
+// that asks for it again.
+tf_fo(word wa, word wr) {
+  int h = vm_k_plain(wa, wr);
+} return void;
+given vb_boot (7, 3):() then (import ex_fo):([1])
+given vb_boot (8, 4):() then (import ex_lists):([[], [8, 4, 0]])
+
 // A wall clock has no literal to compare against, so a case stamps ticks()
 // just before the call under test, and expects the same millisecond back.
 tf_clock() {

@@ -1,0 +1,11 @@
+show(float f, word w, string s, string[] ss, int k) {
+  print(s + " " + ss[1] + " " + k);
+  print(f + 0.5);
+  print(w + 1);
+} return void;
+
+main(int argc, string[] argv) {
+  word big = 5000000000;
+  func(int) return void g = bind(show, 1.25, big, "left", ["a", "b"]);
+  g(7);
+} return int 0;

@@ -1,0 +1,28 @@
+// One value of a bind, given as its C: copied if the parameter it fixes is a
+// list, then boxed into the 8-byte cell as that parameter is typed, so an
+// `int` argument for a `float` parameter is converted before it is stored. The
+// C is an expression's (emit_bind) or a test case literal's (a bind in a case,
+// out/case/val/), which is why this takes it written and not the node.
+
+bind_cell(int fn, int i, string code) {
+  string pt = bind_pt(fn, i);
+  string cp = bind_copy(code, pt);
+  string s = box(cp, pt);
+} return string s;
+given clo_bind_fixture ((import fixture_fn), 0, "7"):("(long long)(7)")
+given clo_bind_fixture ((import fixture_fn), 0, "n"):("(long long)(n)")
+
+bind_copy(string code, string pt) {
+  string s = code;
+  if(ty_is_list(pt) == 1) {
+    s = "id_clo_copy(" + code + ")";
+  }
+} return string s;
+("xs", "int[]"):("id_clo_copy(xs)")
+("xs", "string"):("xs")
+
+bind_pt(int fn, int i) {
+  string pt = (import ns1)[(import nl1)[fn][i]];
+} return string pt;
+given clo_native_fixture ((import cn_fn), 0):("func(int) return int")
+given clo_native_fixture ((import cn_fn), 1):("int")

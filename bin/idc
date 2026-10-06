@@ -3558,6 +3558,7 @@ unit_split() { # unit_split C_FILE DIR MASK
             if ($0 ~ /^static / && $0 !~ /\(/ && $0 ~ /;[ \t]*(\/\*.*\*\/)?[ \t]*$/) {
                 print extern_of($0) > h; d = $0; sub(/^static /, "", d); print d > (dir "/u0.c")
                 print declname(substr(extern_of($0), 8)) > (dir "/syms"); next }
+            if ($0 ~ /^ID_CLO [A-Za-z_][^;=]*\) *\{/) { sub(/^ID_CLO /, "ID_CLO inline "); print > h; next }
             if ($0 ~ /^[A-Za-z_].*\) *\{/ && $0 !~ /^(static|typedef)/) { print "__attribute__((weak)) " $0 > h; next }
             if ($0 ~ /^static [A-Za-z_][^;=]*\) *\{/) { if ($0 !~ /^static inline /) sub(/^static /, "static inline "); print > h; next }
             print > h; next }

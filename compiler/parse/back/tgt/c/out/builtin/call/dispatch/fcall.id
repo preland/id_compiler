@@ -1,7 +1,8 @@
-// A call through a variable of function type. The variable is a C function
-// pointer under its own name, and C calls one as it calls a function; the
-// pointer's type carries the prototype, so each argument converts to its
-// parameter's type exactly as it would at a call to id_NAME.
+// A call through a variable of function type. The variable is an IdFn* under
+// its own name; its `fn` is called as the type the variable's own type spells,
+// with the object first (c_clo_ptr), so each argument converts to its
+// parameter's type exactly as it would at a call to id_NAME, and a plain
+// function and a closure are called the same way.
 // The strict fingerprint pass and then the import-duplicate table over an
 // empty prog, for the import-duplicate scan's own "nothing to compare" cases.
 lz_empty() {
@@ -14,7 +15,8 @@ lz_empty() {
 
 emit_fcall(int id) {
   int[] l1_of_v = (import nl1)[id];
-  string ret_s = (import ns1)[id] + "(" + emit_args(l1_of_v) + ")";
+  string nm = (import ns1)[id];
+  string ret_s = "((" + c_clo_ptr(callee_var_type(id)) + ")" + nm + "->fn)(" + nm + sep_arg(len(l1_of_v)) + emit_args(l1_of_v) + ")";
 } return string ret_s;
-given call_names_fixture ((import call_e_foo)):("foo(5, 4)")
-given call_names_fixture ((import call_e_len)):("len(5, 4)")
+given clo_call_fixture ((import cv_call)):("((int (*)(IdFn*, int))cv->fn)(cv, 5)")
+given clo_call_fixture ((import cw_call)):("((void (*)(IdFn*))cw->fn)(cw)")

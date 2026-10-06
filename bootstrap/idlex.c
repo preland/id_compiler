@@ -551,7 +551,45 @@ static int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding 
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
-
+#define ID_CLO static 
+/* closures: every function value is a pointer to one of these (docs/SPEC.md 1.1.1) */
+typedef struct IdFn { void* fn; void* raw; long long n; } IdFn;
+#define ID_FNC(f) ((long long*)((char*)(f) + sizeof(IdFn)))
+#define ID_FNV(x) ({ extern IdFn idfn_o_##x; &idfn_o_##x; })
+ID_CLO IdFn* id_clo_make(void* fn, int n) {
+    IdFn* o = (IdFn*)id_alloc(id_add_check(sizeof(IdFn), id_mul_check(sizeof(long long), (size_t)n, "closure"), "closure"));
+    memset(ID_FNC(o), 0, (size_t)n * sizeof(long long));
+    o->fn = fn; o->raw = 0; o->n = n;
+    return o;
+}
+ID_CLO IdFn* id_clo_new(const IdFn* t) { return id_clo_make(t->fn, (int)t->n); }
+ID_CLO IdFn* id_clo_set(IdFn* o, int i, long long v) { ID_FNC(o)[i] = v; return o; }
+ID_CLO IdList* id_clo_copy(IdList* L) {
+    if (!L) id_null_read();
+    IdList* M = id_list_new();
+    for (int i = 0; i < L->len; i++) id_list_push(M, L->data[i]);
+    id_list_lock(M);
+    return M;
+}
+ID_CLO void* id_fn_raw(const IdFn* f) {
+    if (!f) id_null_read();
+    if (!f->raw) { fprintf(stderr, "id: a closure cannot be passed to a native: it takes a plain function pointer; pass the function by name, or give the native the values another way\n"); exit(1); }
+    return f->raw;
+}
+ID_CLO int id_fn_eq(const IdFn* a, const IdFn* b) {
+    return a == b || (a && b && a->fn == b->fn && a->raw == b->raw && a->n == b->n && memcmp(ID_FNC(a), ID_FNC(b), (size_t)a->n * sizeof(long long)) == 0);
+}
+ID_CLO void* id_clo_fn(const IdFn* f) { if (!f) id_null_read(); return f->fn; }
+ID_CLO long long id_clo_cell(const IdFn* f, int i) { if (!f) id_null_read(); return ID_FNC(f)[i]; }
+ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
+    static ID_TLS IdFn* tab[64];
+    static ID_TLS int used = 0;
+    for (int i = 0; i < used; i++) if (tab[i]->fn == fn) return tab[i];
+    IdFn* o = id_clo_make(fn, 0);
+    o->raw = raw;
+    if (used < 64) tab[used++] = o;
+    return o;
+}
 /* forward declarations */
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 int id_str_eol(char* idstd_s, int idstd_i);

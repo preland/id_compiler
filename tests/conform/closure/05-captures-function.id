@@ -1,0 +1,13 @@
+add_to(int n, int x) {
+  int r = n + x;
+} return int r;
+
+apply_to(func(int) return int f, int x) {
+  int r = f(x);
+} return int r;
+
+main(int argc, string[] argv) {
+  func(int) return int inc = bind(add_to, 10);
+  func(int) return int g = bind(apply_to, inc);
+  print(g(4));
+} return int 0;

@@ -1,0 +1,45 @@
+// The nodes the closure emitters' cases (use/) are about, on top of
+// clo_fixture (raw.id): cb_name is the name fx_target as a value, cb_lit and
+// cb_n a literal and a variable to bind, cb_call and cb_var the bind of each,
+// and cv_call and cw_call calls through variables of type func(int) return int
+// and func() return void.
+
+clo_bind_fixture() {
+  clo_fixture();
+  export int cb_name = node_var("fx_target");
+  export int cb_lit = node_int("7", 7, 0);
+} chain () {
+  export int cb_n = node_var("n");
+  export int cb_call = node_call("bind", [cb_name, cb_lit]);
+  export int cb_var = node_call("bind", [cb_name, cb_n]);
+} chain () {
+  export int clo_cfn = newleaf("cfn", 0, 0, "fx_target", "");
+} return void;
+():() then calls clo_fixture:[1]
+():() then init_units:(0)
+
+clo_call_fixture() {
+  clo_fixture();
+  add_var("cv", "func(int) return int", 0);
+  add_var("cw", "func() return void", 0);
+} chain () {
+  int[] none = [];
+  export int cv_call = node_call("cv", [node_int("5", 5, 0)]);
+  export int cw_call = node_call("cw", none);
+} return void;
+():() then calls clo_fixture:[1]
+():() then init_units:(0)
+
+// A bind in a test case (a "cctor" named bind, mid/types/registry/derived/struct/
+// use/ctor/call/bind.id): cc_e is bind(fx_target, 7), cc_f is bind(fx_target)
+// with no value, which the checks refuse and the emitter still writes, and
+// cb_lit2 is a second literal, 9.
+clo_case_fixture() {
+  clo_bind_fixture();
+  export int cb_lit2 = node_int("9", 9, 0);
+  export int cc_e = newnode("cctor", 0, 0, "bind", "", [(import clo_cfn), (import cb_lit)], [(import clo_cfn), (import cb_lit)]);
+} chain () {
+  export int cc_f = newnode("cctor", 0, 0, "bind", "", [(import clo_cfn)], [(import clo_cfn)]);
+} return void;
+():() then calls clo_bind_fixture:[1]
+():() then init_units:(0)

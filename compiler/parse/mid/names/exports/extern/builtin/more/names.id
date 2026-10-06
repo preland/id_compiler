@@ -12,8 +12,8 @@ init_bnames() {
     i = take_name((import builtin_src), i, (import bnames));
   }
 } return void;
-():() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail")
-given init_rtc ():() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail")
+():() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail, bind")
+given init_rtc ():() then builtin_list:("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail, bind")
 // call_fixture_extern (list.id) builds its node with node_call, which needs
 // the node store pushfix creates -- its own cases say so with `given pushfix`.
 // Named as a `given` elsewhere it runs bare and traps, so the two are composed

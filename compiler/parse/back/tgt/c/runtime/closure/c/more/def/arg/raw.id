@@ -1,0 +1,30 @@
+// The `raw` field of an object (flush.id): the function itself for a plain
+// function used as a value, which is what a native's function-pointer
+// parameter is given, and 0 for the template of a bind, because no function
+// pointer is a closure. clo_fixture and clo_seeded are what the cases of the
+// closure emitters share: fx_target(int x) return int, registered with the
+// C type column, and with fx_target noted as a plain value.
+
+fv_raw(string name, int nd) {
+  string s = "0";
+  if(nd == 0) {
+    s = "(void*)id_" + name;
+  }
+} return string s;
+("tick", 0):("(void*)id_tick")
+("tick", 3):("0")
+
+clo_fixture() {
+  fn_idx_fixture();
+  init_tyc();
+  init_rtc();
+} return void;
+():() then calls fn_idx_fixture:[1]
+():() then init_units:(0)
+
+clo_seeded() {
+  clo_fixture();
+  fv_add("fx_target__0", "fx_target", 0);
+} return void;
+():() then calls clo_fixture:[1]
+():() then len((import fvname)):(1)

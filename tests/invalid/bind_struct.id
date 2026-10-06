@@ -1,0 +1,13 @@
+// EXPECT: 'bind' value 0 for 'getx' cannot be captured: it is a Pt, a struct, which is a reference the closure would share with its owner
+struct Pt {
+  int x;
+  int y;
+}
+getx(Pt p) {
+  int r = p.x;
+} return int r;
+
+main(int argc, string[] argv) {
+  Pt p = Pt(1, 2);
+  func() return int f = bind(getx, p);
+} return int 0;

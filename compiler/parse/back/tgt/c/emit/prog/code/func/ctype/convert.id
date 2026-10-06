@@ -1,7 +1,11 @@
 // id type -> C type. Any list type is the generic IdList*; a function type is
-// a pointer to a function (c_fn_type); otherwise the scalar's spelling is a
-// lookup in this target's own column of the type registry, not a chain of
-// `if`.
+// a pointer to a function value's object, IdFn*, whatever its signature --
+// every function value, plain or a closure, is one (runtime/closure/text.id),
+// and the signature is spelled only where a call through the value casts `fn`
+// to the type it is called as (c_clo_ptr). That is what lets a closure and a
+// plain function be the same type, and a library take either. Otherwise the
+// scalar's spelling is a lookup in this target's own column of the type
+// registry, not a chain of `if`.
 //
 // docs/BACKENDS.md asks for exactly this: mid/types/registry/ holds the facts that
 // are true of a type in any target (kind, width, signedness) and each target
@@ -12,26 +16,15 @@
 c_type(string t) {
   string ct = "IdList*";
   if(ty_is_func(t) == 1) {
-    ct = c_fn_type(t);
+    ct = "IdFn*";
   } else if(ty_is_list(t) == 0 && ty_is_struct(t) == 0) {
     ct = c_scalar(t);
   }
 } return string ct;
 given lc_env2 ("int[]"):("IdList*")
 given sd_reg ("P"):("IdList*")
-given lc_env2 ("func(int) return int"):("__typeof__(int (*)(int))")
-
-// C can spell a pointer to a function only around a name -- `void (*f)(int)` --
-// and every declaration this emitter writes is a type followed by a name.
-// __typeof__ makes the pointer type one that stands in front of a name, and
-// nests: `__typeof__(void (*)(int)) f`.
-c_fn_type(string t) {
-  string rt = fn_ret(t);
-  string[] pts = fn_params(t);
-  string ct = "__typeof__(" + c_type(rt) + " (*)(" + c_fn_params(pts) + "))";
-} return string ct;
-given lc_env2 ("func(int) return int"):("__typeof__(int (*)(int))")
-given lc_env2 ("func() return void"):("__typeof__(void (*)(void))")
+given lc_env2 ("func(int) return int"):("IdFn*")
+given lc_env2 ("func() return void"):("IdFn*")
 
 // A type with no registry row has no spelling either. It answers `int` for
 // the same reason the old chain ended there -- nothing upstream emits a type

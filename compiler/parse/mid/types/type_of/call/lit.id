@@ -11,15 +11,13 @@ given leaves_fixture ((import lit_a)):("int")
 given leaves_fixture ((import lit_word)):("word")
 
 // A call's result type. Every builtin's type follows from its name except
-// pop's, which is the element type of the list it was handed; a call through a
-// variable of function type has that type's return type.
+// pop's and bind's (builtin/poke.id's call_shaped); a call through a variable
+// of function type has that type's return type.
 call_type(int id) {
   string s1_of_v = (import ns1)[id];
   string t = call_ret(id, s1_of_v);
-  if((import ns1)[id] == "pop") {
-    t = pop_elem(id);
-  }
-} return string t;
+  string t2 = call_shaped(id, t);
+} return string t2;
 given shapes_fixture ((import call_len)):("int")
 given idx_build ((import call_pop)):("int")
 

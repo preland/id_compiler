@@ -18,6 +18,20 @@ seed_fn_arg(int e) {
     string s1_of_v = (import ns1)[e];
     reach_add(s1_of_v);
   }
+  if((import nkind)[e] == "cctor" && (import ns1)[e] == "bind") {
+    seed_fn_arg((import nl1)[e][0]);
+  }
 } return void;
 given seed_cfn_fixture ((import fixture_zero)):() then len((import rfn)):(2)
 given seed_cfn_fixture ((import cfnid)):() then len((import rfn)):(3)
+given seed_bind_fixture ((import bindid)):() then len((import rfn)):(3)
+
+// A case's bind(fx_target) as the argument seed_fn_arg is asked about: the
+// function it names is carried by the harness like one named on its own
+// (docs/TESTS.md).
+seed_bind_fixture() {
+  seed_cfn_fixture();
+  export int bindid = newnode("cctor", 0, 0, "bind", "", [(import cfnid)], [(import cfnid)]);
+} return void;
+():() then calls seed_cfn_fixture:[1]
+():() then init_units:(0)

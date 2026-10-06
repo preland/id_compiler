@@ -34,6 +34,8 @@ vb_tables() {
 // ex_lists    every list; a list value is an index, and ex_llock marks the
 //             constant ones
 // ex_fbox     floats that went into a list, which stores 64-bit cells
+// ex_fo       the list handle of the object id_fn_plain made for each plain
+//             function used as a value, so a function is one object
 // ex_gv/gf    the program's exported variables
 // ex_fvals: Read slot 3 of the float view back, for the float operations' cases.
 // ex_gv: The program's exported variables, the slots handed out so far, and the
@@ -52,6 +54,7 @@ vb_pools() {
   export word[] ex_gv = [];
 } chain () {
   export float[] ex_gf = [];
+  export int[] ex_fo = [];
 } return void export ex_strs;
 ():() then (import ex_strs):([""])
 ():() then len((import ex_strs)):(1)

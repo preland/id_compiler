@@ -1,0 +1,13 @@
+// One argument of an adapter's call (invoke.id): a bound one, so read from its
+// cell, or the adapter's own parameter. The module names the cells it read as
+// %w and, converted to the parameter's type, as %u.
+
+fv_ll_arg(int fn, int nd, int i) {
+  string pt = (import ns1)[(import nl1)[fn][i]];
+  string s = ll_ty(pt) + " %a" + (i - nd);
+  if(i < nd) {
+    s = ll_ty(pt) + " " + fv_ll_val(i, pt);
+  }
+} return string s;
+given clo_fixture ((import fixture_fn), 0, 0):("i32 %a0")
+given clo_fixture ((import fixture_fn), 1, 0):("i32 %u0")

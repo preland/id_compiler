@@ -1,0 +1,14 @@
+add_to(int n, int x) {
+  int r = n + x;
+} return int r;
+
+twice(func(int) return int f, int x) {
+  int a = f(x);
+  int r = f(a);
+} return int r;
+
+main(int argc, string[] argv) {
+  func(int) return int inc = bind(add_to, 5);
+  int r = twice(inc, 1);
+  print(r);
+} return int 0;

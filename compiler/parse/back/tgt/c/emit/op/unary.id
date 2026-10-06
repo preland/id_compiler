@@ -1,6 +1,7 @@
 // Unary-expression emission: `(OP operand)`, e.g. `(-1)`. Extends the
 // emit_expr chain (... -> ee5 -> ee6 -> the var/str/import text default). A
-// function named as a value is the C function it is emitted as, id_NAME.
+// function named as a value is the object of that function, written where the
+// translation unit ends (runtime/closure/).
 
 ee6(int id) {
   string s = import_text(id);
@@ -8,11 +9,12 @@ ee6(int id) {
     s = emit_un(id);
   }
   if(is_fn_value(id) == 1) {
-    s = "id_" + (import ns1)[id];
+    s = fv_ref((import ns1)[id], 0);
   }
 } return string s;
 given un_fix (3):("(-6)")
 given arith_fix (0):("6")
+given clo_bind_fixture ((import cb_name)):("ID_FNV(fx_target__0)")
 
 emit_un(int id) {
   int i1_of_v = (import ni1)[id];

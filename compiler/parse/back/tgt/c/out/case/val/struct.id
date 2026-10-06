@@ -8,11 +8,12 @@ tc_other(int e, string want) {
   if(ty_is_struct(want) == 1) {
     so = tc_struct(e, want);
   } else {
-    so = tc_scalar(e);
+    so = tc_other2(e, want);
   }
 } return string so;
 given sd_case_fixture ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (long long)(1))")
 given lit_int_fixture ((import lit_e), "int"):("5")
+given clo_case_fixture ((import cc_e), "func() return int"):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
 
 tc_struct(int e, string want) {
   int[] xs = (import nl1)[e];
@@ -21,3 +22,14 @@ tc_struct(int e, string want) {
 } return string so;
 given sd_case_fixture ((import sd_ce), "P"):("id_list_lit(2, (long long)(1), (long long)(1))")
 given sd_case_fixture ((import sd_cl), "P"):("id_list_lit(1, (long long)(1))")
+
+// bind(NAME, v1, ..., vk) in a test case (docs/TESTS.md): the object the bind of
+// a program makes (runtime/closure/c/more/use/bind.id), from the template of
+// (NAME, k), then each value stored in its cell.
+tc_cbind(int e) {
+  int[] items = (import nl1)[e];
+  string clo0 = "id_clo_new(" + fv_ref((import ns1)[items[0]], len(items) - 1) + ")";
+  string so = tc_cbsets(clo0, fn_node_of((import ns1)[items[0]]), items);
+} return string so;
+given clo_case_fixture ((import cc_e)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
+given clo_case_fixture ((import cc_f)):("id_clo_new(ID_FNV(fx_target__0))")

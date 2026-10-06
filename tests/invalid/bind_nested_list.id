@@ -1,0 +1,9 @@
+// EXPECT: 'bind' value 0 for 'first' cannot be captured: it is a int[][], a list whose elements are themselves lists or structs
+first(int[][] rows) {
+  int r = len(rows);
+} return int r;
+
+main(int argc, string[] argv) {
+  int[][] rows = [[1], [2]];
+  func() return int f = bind(first, rows);
+} return int 0;
