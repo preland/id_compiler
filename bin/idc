@@ -1450,6 +1450,7 @@ cache_prune() {
 # program's and the library's), and a library the index cannot describe (a syntax
 # error, an asm declaration, a name defined twice, a conf.id line that is not a
 # constant).
+STD_CONF_DIR=""
 STD_LAZY=0
 STD_IDX_BASE="${IDC_STD_IDX_DIR:-$CACHE_DIR/stdidx}"
 STD_IDX=""
@@ -1488,7 +1489,7 @@ std_source_list() {
 # one per constant, EDGES the other constants its initialiser names. Exit 3 for
 # a line that is not a constant on one line, which the index cannot carry.
 std_consts_k() {
-    [ -f "$STDLIB/conf.id" ] || return 0
+    [ -f "$STD_CONF_DIR/conf.id" ] || return 0
     awk '
         BEGIN { FS = "\t"; OFS = "\t" }
         {
@@ -1513,7 +1514,7 @@ std_consts_k() {
                 for (i = 1; i <= m; i++) if (w[i] in IS && w[i] != NM[k] && index(" " e " ", " " w[i] " ") == 0) e = e " " w[i]
                 print "K", NM[k], LN[k], substr(e, 2), TX[k]
             }
-        }' "$STDLIB/conf.id"
+        }' "$STD_CONF_DIR/conf.id"
 }
 
 # std_index_build BASE MAP TMP -- idparse --index over the files of MAP (`PATH
@@ -1625,11 +1626,12 @@ std_index_ensure() {
     cid=$(stat -c '%s %Y %Z' "$IDLEX" "$IDPARSE" | sha256sum | cut -c1-16)
     base="$STD_IDX_BASE/$cid"
     mkdir -p "$base/shards" "$base/idx" "$base/bad" "$base/stat" 2>/dev/null || return 1
-    sig=$(find "$STDLIB" -mindepth 1 \
+    sig=$({ find "$STDLIB" -mindepth 1 \
               \( -type d -name '.*' -prune \) -o \
               \( -type d -path "${STDLIB%/}/$BUILD_DIR" -prune \) -o \
-              \( -name '*.id' ! -name 'backend.id' -printf '%p\0%s\0%T@\0%C@\0' \) \
-          | LC_ALL=C sort -z | sha256sum | cut -c1-40)
+              \( -name '*.id' ! -name 'backend.id' -printf '%p\0%s\0%T@\0%C@\0' \)
+            [ "$STD_CONF_DIR" = "$STDLIB" ] || find "$STD_CONF_DIR" -maxdepth 1 -name conf.id -printf '%p\0%s\0%T@\0%C@\0'
+          } | LC_ALL=C sort -z | sha256sum | cut -c1-40)
     if [ -f "$base/stat/$sig" ]; then
         STD_IDX="$base/idx/$(cat "$base/stat/$sig")"
         if [ -f "$STD_IDX/ok" ]; then touch "$base/stat/$sig"; return 0; fi
@@ -1640,7 +1642,7 @@ std_index_ensure() {
     if [ ! -s "$files" ]; then rm -rf "$tmp"; return 1; fi
     xargs -d '\n' -r sha256sum < "$files" | awk '{ h = $1; sub(/^[0-9a-f]+  /, ""); printf "%s\t%s\n", $0, h }' > "$map"
     conf=""
-    [ -f "$STDLIB/conf.id" ] && conf=$(sha256sum < "$STDLIB/conf.id")
+    [ -f "$STD_CONF_DIR/conf.id" ] && conf=$(sha256sum < "$STD_CONF_DIR/conf.id")
     key=$({ printf 'v1\n%s\n' "$conf"; cat "$map"; } | sha256sum | cut -c1-40)
     STD_IDX="$base/idx/$key"
     if [ -f "$STD_IDX/ok" ]; then printf '%s' "$key" > "$base/stat/$sig"; rm -rf "$tmp"; return 0; fi
@@ -1738,10 +1740,10 @@ std_lazy_plan() {
         mkdir -p "$pdir" && cp "$plan" "$pdir/$pkey.tmp.$$" && mv -f "$pdir/$pkey.tmp.$$" "$pdir/$pkey"
         cache_prune "$pdir" 300
     fi
-    if [ "${#CONST_AT[@]}" -gt 0 ] && ! seen_const_root "$STDLIB"; then
+    if [ "${#CONST_AT[@]}" -gt 0 ] && ! seen_const_root "$STD_CONF_DIR"; then
         while IFS=$'\t' read -r _ name line _; do
             if const_declared_at "$name"; then
-                echo "$STDLIB/conf.id:$line: error: constant '$name' is already declared at $at; a constant has one home -- rename one of them" >&2
+                echo "$STD_CONF_DIR/conf.id:$line: error: constant '$name' is already declared at $at; a constant has one home -- rename one of them" >&2
                 STRUCT_VIOLATIONS=1
             fi
         done < <(awk -F'\t' '$1 == "K"' "$STD_IDX/graph")
@@ -1749,7 +1751,7 @@ std_lazy_plan() {
     [ -z "${IDC_TIMES:-}" ] || echo "idc: times: stdlib: $(grep -c '^S' "$plan") of $(grep -c '^E' "$STD_IDX/graph") functions loaded" >&2
     mapfile -t std_paths < <(awk -F'\t' '$1 == "S" { print $2 }' "$plan" | LC_ALL=C sort -u)
     mapfile -t std_consts < <(awk -F'\t' '$1 == "K" { print $2 "\t" $4 }' "$plan")
-    if ! seen_const_root "$STDLIB"; then
+    if ! seen_const_root "$STD_CONF_DIR"; then
         for entry in ${std_consts[@]+"${std_consts[@]}"}; do
             const_declared_at "${entry%%$'\t'*}" || CONSTS+=("${entry#*$'\t'}")
         done
@@ -1788,6 +1790,8 @@ std_lazy_plan() {
 # every one of the library's own cases stays seeded, which is what its own
 # build (and bin/idc's pre-check of it, below) needs.
 resolve_stdlib
+STD_CONF_DIR="$STDLIB"
+[ -n "$STDLIB" ] && [ -n "${IDC_STD_CONF_DIR:-}" ] && STD_CONF_DIR="$(cd "$IDC_STD_CONF_DIR" && pwd -P)"
 STD_UNIT_START=${#SRC_ROOTS[@]}
 if [ -n "$STDLIB" ]; then
     if ! seen_dep "$STDLIB"; then
@@ -1804,7 +1808,7 @@ if [ -n "$STDLIB" ]; then
                          \( -name backend.id -print \) | LC_ALL=C sort)
         else
             collect_ids "$STDLIB"
-            walk_deps "$STDLIB"
+            if [ "$STD_CONF_DIR" = "$STDLIB" ]; then walk_deps "$STDLIB"; else read_manifest "$STD_CONF_DIR" consts; fi
         fi
     fi
 fi
@@ -2260,6 +2264,10 @@ lib_precheck_key() {
         # own. The stdlib's own pre-check names itself and adds nothing.
         if [ "${1:-}" = "--std" ] && [ "${2:-}" != "$root" ]; then
             lib_precheck_key "$2"
+            if [ -n "${LIB_PRECHECK_TIER:-}" ]; then
+                echo "tier root"
+                [ -f "$LIB_PRECHECK_TIER/conf.id" ] && sha256sum < "$LIB_PRECHECK_TIER/conf.id"
+            fi
         else
             echo "no separate library"
         fi
@@ -2294,6 +2302,20 @@ lib_precheck_key() {
                 | xargs -0 -r sha256sum)
         fi
     } | sha256sum | cut -d' ' -f1
+}
+
+# tier_reach_hint TIER ROOT OUT -- after a backend library's pre-check failed:
+# each function OUT says does not exist that the library TIER (idstd) defines
+# outside its core/, with the fix. A backend is built with core/ alone, the
+# freestanding tier everything stands on, so a host/ or kit/ function is not
+# there to call; the plain "no such function" would not say why.
+tier_reach_hint() {
+    local tier="$1" root="$2" out="$3" name hit
+    while IFS= read -r name; do
+        hit=$(grep -rnE --include='*.id' "^(pure |native )?$name\\(" "$tier" 2>/dev/null | grep -v "^$tier/core/" | head -1 | cut -d: -f1,2)
+        [ -n "$hit" ] || continue
+        echo "idc: '$name' is defined at $hit, outside idstd's core/ tier, and a backend library (the one at $root) is built with core/ alone so that backends stay below host/ and kit/. Move '$name' into core/ if it needs no host service, or move the code that calls it out of the backend into the host/ or kit/ library that wraps it." >&2
+    done < <(grep -oE "no such function '[A-Za-z0-9_]+'" "$out" | sed "s/.*'\\(.*\\)'/\\1/" | sort -u | head -5)
 }
 
 # run_lib_precheck ROOT KIND STDARG... -- see the comment above. A miss
@@ -2358,7 +2380,7 @@ run_lib_precheck() {
     local lib_work out rc
     lib_work=$(mktemp -d) || { echo "idc: mktemp failed" >&2; exit 1; }
     out="$lib_work/out"
-    IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 IDC_STD_PLAN="${LIB_PRECHECK_PLAN:-}" IDC_STD_PLAN_ROOT="$root" IDC_STD_IDX_DIR="$STD_IDX_BASE" \
+    env ${LIB_PRECHECK_TIER:+-u IDC_NO_STD} IDC_CACHE_DIR="$inner_cache" IDC_BUILDING_LIB_PRECHECK=1 IDC_STD_CONF_DIR="${LIB_PRECHECK_TIER:-}" IDC_STD_PLAN="${LIB_PRECHECK_PLAN:-}" IDC_STD_PLAN_ROOT="$root" IDC_STD_IDX_DIR="$STD_IDX_BASE" \
         "$SCRIPT_DIR/idc" --cc "$LIB_PRECHECK_CC" --allow-untested "$@" "$root" -o "$lib_work/out.bin" \
         >"$out" 2>&1
     rc=$?
@@ -2377,6 +2399,7 @@ run_lib_precheck() {
     if [ "$rc" -ne 0 ]; then
         echo "idc: the $kind at $root failed its own test cases (this is not an error in your program):" >&2
         cat "$out" >&2
+        [ -n "${LIB_PRECHECK_TIER:-}" ] && tier_reach_hint "$LIB_PRECHECK_TIER" "$root" "$out"
         rm -rf "$lib_work"
         exit 1
     fi
@@ -2432,36 +2455,62 @@ run_std_precheck_lazy() {
     LIB_PRECHECK_PLAN="$plan" run_lib_precheck "$STDLIB" "standard library" --std "$STDLIB"
 }
 
+# tier_root_of DIR -- the idstd checkout DIR lies inside, printed; nothing and
+# false if it lies inside none. An idstd checkout is the nearest ancestor with
+# core/, host/ and a conf.id (the constants core's functions read). A backend
+# library found by this is built with that checkout's core/, so the answer does
+# not depend on whether the program being built attaches idstd at all.
+tier_root_of() {
+    local d="$1"
+    while [ "$d" != / ]; do
+        d="$(dirname "$d")"
+        [ -d "$d/core" ] && [ -d "$d/host" ] && [ -f "$d/conf.id" ] && { printf '%s' "$d"; return 0; }
+    done
+    return 1
+}
+
 # run_backend_prechecks -- every LIB_PRECHECK_DIRS entry through
-# run_lib_precheck, above, standing alone (--no-std) -- of the library's own
+# run_lib_precheck, above, with idstd's core/ and nothing else of idstd -- of
+# the library's own
 # backends, only those a lazy build's plan loads a declaration from, as the rest
 # of the library is checked only where the program reaches it: a backend directory
 # has no conf.id of its own (Native backends, below -- backend.id is link
-# facts, not a dependency manifest), so it either builds on its own or it
-# does not, exactly as a --no-std program importing it directly finds out
-# today. Skipped for the same re-entries and tool builds run_std_precheck
+# facts, not a dependency manifest), so it either builds with core/ or it
+# does not. core/ is the freestanding foundation, always present, so a backend
+# may call it; host/ and kit/ are above backends, so a backend that calls one
+# fails (tier_reach_hint says so). A backend outside any idstd checkout is built
+# with the whole standard library when there is one, else standing alone
+# (--no-std). Skipped for the same re-entries and tool builds run_std_precheck
 # skips, and for whichever of LIB_PRECHECK_DIRS PATH_ARG already IS.
 run_backend_prechecks() {
     [ -n "${IDC_STAGE_LEX:-}" ] && return 0
     [ -n "${IDC_BUILDING_CCRUN:-}" ] && return 0
     [ -n "${IDC_BUILDING_IDLAYOUT:-}" ] && return 0
     [ -n "${IDC_BUILDING_LIB_PRECHECK:-}" ] && return 0
-    local path_key="" i
+    local path_key="" i dir tier in_std
     [ -d "$PATH_ARG" ] && path_key="$(cd "$PATH_ARG" && pwd -P)"
     for i in "${!LIB_PRECHECK_DIRS[@]}"; do
-        [ "${LIB_PRECHECK_DIRS[$i]}" = "$path_key" ] && continue
-        case "${LIB_PRECHECK_DIRS[$i]}/" in
-            "$STDLIB"/*)
-                if [ "$STD_LAZY" -eq 1 ] && ! awk -F'\t' -v d="${LIB_PRECHECK_DIRS[$i]}/" '$1 == "S" && index($2, d) == 1 { f = 1 } END { exit !f }' "$STD_PLAN_FILE"; then
-                    continue
-                fi
-                run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std ;;
-            *) if [ -n "$STDLIB" ]; then
-                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --std "$STDLIB"
-               else
-                   run_lib_precheck "${LIB_PRECHECK_DIRS[$i]}" "backend library" --no-std
-               fi ;;
-        esac
+        dir="${LIB_PRECHECK_DIRS[$i]}"
+        [ "$dir" = "$path_key" ] && continue
+        tier=""
+        in_std=0
+        [ -n "$STDLIB" ] && [[ "$dir/" == "$STDLIB"/* ]] && in_std=1
+        if [ "$in_std" -eq 1 ]; then
+            if [ "$STD_LAZY" -eq 1 ] && ! awk -F'\t' -v d="$dir/" '$1 == "S" && index($2, d) == 1 { f = 1 } END { exit !f }' "$STD_PLAN_FILE"; then
+                continue
+            fi
+            [ -d "$STDLIB/core" ] && tier="$STDLIB"
+        else
+            tier=$(tier_root_of "$dir") || tier=""
+        fi
+        [ -n "$tier" ] && [[ "$dir/" == "$tier"/core/* ]] && tier=""
+        if [ -n "$tier" ]; then
+            LIB_PRECHECK_TIER="$tier" run_lib_precheck "$dir" "backend library" --std "$tier/core"
+        elif [ "$in_std" -eq 0 ] && [ -n "$STDLIB" ]; then
+            run_lib_precheck "$dir" "backend library" --std "$STDLIB"
+        else
+            run_lib_precheck "$dir" "backend library" --no-std
+        fi
     done
 }
 

@@ -50,6 +50,7 @@ be_abs() {
         proc) printf '%s' "$STD/host/os/proc/be" ;;
         sock) printf '%s' "$STD/host/io/net/sock" ;;
         gfx|gl) printf '%s' "$STD/host/dev/win/$1" ;;
+        core) printf '%s' "$STD/core" ;;
     esac
 }
 # bin/idc takes --allow-untested throughout: none of the programs built here has
@@ -528,7 +529,7 @@ wait 2>/dev/null
 # the compiler and fail at the C linker, and a wrong argument count compiled
 # and dumped core when run; both are now the diagnostics an `id` function gets.
 chk="$TMP/chk"; mkdir -p "$chk"
-printf 'import "%s"\n' "$(be_abs fs)" > "$chk/conf.id"
+printf 'import "%s"\nimport "%s"\n' "$(be_abs fs)" "$(be_abs core)" > "$chk/conf.id"
 printf 'main(int argc, string[] argv) {\n  int h = fs_opne("x", "r");\n  print(h);\n} return int 0;\n' > "$chk/main.id"
 chk_out=$($BIN_IDC "$chk" -o "$TMP/chk.bin" 2>&1)
 if printf '%s' "$chk_out" | grep -qF "no such function 'fs_opne' [E0304]" && printf '%s' "$chk_out" | grep -qF "the builtins are:"; then
@@ -629,7 +630,7 @@ chmod +x "$cclog"
 needs_lib() { readelf -d "$1" 2>/dev/null | grep -q "NEEDED.*$2"; }
 
 c7none="$TMP/c7none"; mkdir -p "$c7none"
-printf 'import "%s"\nimport "%s"\nimport "%s"\n' "$(be_abs gfx)" "$(be_abs gl)" "$(be_abs fs)" > "$c7none/conf.id"
+printf 'import "%s"\nimport "%s"\nimport "%s"\nimport "%s"\n' "$(be_abs gfx)" "$(be_abs gl)" "$(be_abs fs)" "$(be_abs core)" > "$c7none/conf.id"
 printf 'main(int argc, string[] argv) {\n  print(7);\n} return int 0;\n' > "$c7none/main.id"
 : > "$TMP/cc.log"
 if $BIN_IDC "$c7none" --cc "$cclog" -o "$TMP/c7none.bin" >"$TMP/c7none.err" 2>&1 \
@@ -656,11 +657,21 @@ precheck_entries() {
         | wc -l | tr -d ' '
 }
 
-rm -rf "$TMP/fs_broken"; cp -r "$(be_abs fs)" "$TMP/fs_broken"
-sed -i 's#("/tmp/"):(1)#("/tmp/"):(999)#' "$TMP/fs_broken/path/edit/mkdir/deep.id"
-brokenfs=$(cd "$TMP/fs_broken" && pwd -P)
+mini_idstd() { # mini_idstd NAME -- a scratch idstd layout (core/ and conf.id copied, so one home for each constant) holding a copy of fs at host/io/NAME
+    local m="$TMP/mini_$1"
+    rm -rf "$m"; mkdir -p "$m/host/io"
+    cp -r "$(be_abs core)" "$m/core"
+    cp "$STD/conf.id" "$m/conf.id"
+    cp -r "$(be_abs fs)" "$m/host/io/$1"
+    printf '%s' "$m"
+}
+fs_mini=$(mini_idstd fs_broken)
+fs_broken="$fs_mini/host/io/fs_broken"
+sed -i 's#("/tmp/"):(1)#("/tmp/"):(999)#' "$fs_broken/path/deep.id"
+grep -qF '("/tmp/"):(999)' "$fs_broken/path/deep.id" || bad "the broken-backend fixture was not broken: path/deep.id has no (\"/tmp/\"):(1) case to edit"
+brokenfs=$(cd "$fs_broken" && pwd -P)
 c7broken="$TMP/c7broken"; mkdir -p "$c7broken"
-printf 'import "%s"\n' "$brokenfs" > "$c7broken/conf.id"
+printf 'import "%s"\nimport "%s"\n' "$brokenfs" "$fs_mini/core" > "$c7broken/conf.id"
 printf 'main(int argc, string[] argv) {\n  print(1);\n} return int 0;\n' > "$c7broken/main.id"
 out=$($BIN_IDC "$c7broken" -o "$TMP/c7broken.bin" 2>&1)
 if printf '%s\n' "$out" | grep -qF "idc: the backend library at $brokenfs failed its own test cases (this is not an error in your program):" \
@@ -671,10 +682,10 @@ else
     bad "a broken case in an attached backend's own id code fails the build with the backend-library message: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ' | cut -c1-200)"
 fi
 
-rm -rf "$TMP/fs_cachetest"; cp -r "$(be_abs fs)" "$TMP/fs_cachetest"
-cachefs=$(cd "$TMP/fs_cachetest" && pwd -P)
+cache_mini=$(mini_idstd fs_cachetest)
+cachefs=$(cd "$cache_mini/host/io/fs_cachetest" && pwd -P)
 c7cache="$TMP/c7cache"; mkdir -p "$c7cache"
-printf 'import "%s"\n' "$cachefs" > "$c7cache/conf.id"
+printf 'import "%s"\nimport "%s"\n' "$cachefs" "$cache_mini/core" > "$c7cache/conf.id"
 printf 'main(int argc, string[] argv) {\n  print(2);\n} return int 0;\n' > "$c7cache/main.id"
 e0=$(precheck_entries)
 $BIN_IDC "$c7cache" -o "$TMP/c7cache.bin" >/dev/null 2>&1
@@ -790,6 +801,64 @@ if printf '%s\n' "$out" | grep -qxF "$dstd/io/now.id:2: error: native 'tick_now'
     ok "a library backend with no sources for the platform is diagnosed at the reaching call"
 else
     bad "a library backend with no sources for the platform is diagnosed at the reaching call: $(printf '%s\n' "$out" | grep -v warning | head -1 | cut -c1-200)"
+fi
+
+# -- a backend library may call idstd's core/, and nothing above it ---------
+# core/ is the freestanding foundation, so a backend's own build and its cases
+# get it: tick's id code calls tier_core_twice. host/ is a tier above the
+# backends, so peek's call of tier_host_five is refused, in words that name the
+# fix. The checkout is a scratch one (conf.id, core/, host/), so what is under
+# test is the rule and not what idstd's own modules happen to call.
+# A backend is built on its own when a program names it with --backend (or a
+# conf.id import); reached only through the library it is part of, it is built
+# in the one library build, so these name it.
+tstd="$TMP/tstd"; rm -rf "$tstd"; mkdir -p "$tstd/core/num" "$tstd/host/os" "$tstd/host/io/tick" "$tstd/host/io/peek" "$TMP/tmain_core" "$TMP/tmain_host"
+: > "$tstd/conf.id"
+printf 'tier_core_twice(int n) {\n  int r = n * 2;\n} return int r;\n(3):(6)\n(0):(0)\n' > "$tstd/core/num/twice.id"
+printf 'tier_host_five(int n) {\n  int r = n + 5;\n} return int r;\n(1):(6)\n(0):(5)\n' > "$tstd/host/os/five.id"
+printf 'string name = "tick";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["lin.c"];\n' > "$tstd/host/io/tick/backend.id"
+printf 'int id_tick_now(void) { return 41; }\n' > "$tstd/host/io/tick/lin.c"
+printf 'native tick_now() return int;\n' > "$tstd/host/io/tick/now.id"
+printf 'tick_core(int n) {\n  int t = tier_core_twice(n) + 1;\n} return int t;\n(4):(9)\n(1):(3)\n' > "$tstd/host/io/tick/use.id"
+printf 'string name = "peek";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c_darwin_sources = ["lin.c"];\n' > "$tstd/host/io/peek/backend.id"
+printf 'int id_peek_now(void) { return 43; }\n' > "$tstd/host/io/peek/lin.c"
+printf 'native peek_now() return int;\n' > "$tstd/host/io/peek/now.id"
+printf 'peek_host(int n) {\n  int p = tier_host_five(n) * 3;\n} return int p;\n(2):(21)\n(0):(15)\n' > "$tstd/host/io/peek/use.id"
+tstd=$(cd "$tstd" && pwd -P)
+printf 'main(int argc, string[] argv) {\n  int t = tick_core(4);\n  print(t);\n} return int 0;\n' > "$TMP/tmain_core/main.id"
+printf 'main(int argc, string[] argv) {\n  int p = peek_host(2);\n  print(p);\n} return int 0;\n' > "$TMP/tmain_host/main.id"
+out=$(env -u IDC_NO_STD $BIN_IDC "$TMP/tmain_core" --std "$tstd" --backend "$tstd/host/io/tick" -o "$TMP/tmain_core.bin" 2>&1)
+if [ "$("$TMP/tmain_core.bin" 2>/dev/null)" = "9" ] && ! printf '%s\n' "$out" | grep -q "failed its own test cases"; then
+    ok "a backend library's id code and its cases may call idstd's core/"
+else
+    bad "a backend library's id code and its cases may call idstd's core/: $(printf '%s\n' "$out" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-240)"
+fi
+out=$(env -u IDC_NO_STD $BIN_IDC "$TMP/tmain_host" --std "$tstd" --backend "$tstd/host/io/peek" -o "$TMP/tmain_host.bin" 2>&1)
+if printf '%s\n' "$out" | grep -qF "idc: the backend library at $tstd/host/io/peek failed its own test cases" \
+   && printf '%s\n' "$out" | grep -qF "no such function 'tier_host_five' [E0304]" \
+   && printf '%s\n' "$out" | grep -qF "idc: 'tier_host_five' is defined at $tstd/host/os/five.id:1, outside idstd's core/ tier" \
+   && printf '%s\n' "$out" | grep -qF "Move 'tier_host_five' into core/" \
+   && [ ! -e "$TMP/tmain_host.bin" ]; then
+    ok "a backend library calling a host/ function is refused, naming where it is and how to fix it"
+else
+    bad "a backend library calling a host/ function is refused, naming where it is and how to fix it: $(printf '%s\n' "$out" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-240)"
+fi
+tcount() { find "$ROOT/.idc-cache/std_precheck" -mindepth 1 -maxdepth 1 -type d ! -name '.bincache' -printf '%f\n' 2>/dev/null | LC_ALL=C sort | sha256sum | cut -c1-16; }
+mkdir -p "$TMP/tmain_nd"
+printf 'import "%s"\nimport "%s"\n' "$tstd/host/io/tick" "$tstd/core" > "$TMP/tmain_nd/conf.id"
+cp "$TMP/tmain_core/main.id" "$TMP/tmain_nd/main.id"
+out_a=$($BIN_IDC "$TMP/tmain_nd" -o "$TMP/tmain_nd.bin" 2>&1)
+t0=$(tcount)
+$BIN_IDC "$TMP/tmain_nd" -o "$TMP/tmain_nd.bin2" >/dev/null 2>&1
+t1=$(tcount)
+sed -i 's/int r = n \* 2;/int r = n * 2 + (n == 4);/' "$tstd/core/num/twice.id"
+out_c=$($BIN_IDC "$TMP/tmain_nd" -o "$TMP/tmain_nd.bin3" 2>&1)
+if [ "$("$TMP/tmain_nd.bin" 2>/dev/null)" = "9" ] && [ "$t1" = "$t0" ] \
+   && printf '%s\n' "$out_c" | grep -qF "idc: the backend library at $tstd/host/io/tick failed its own test cases" \
+   && printf '%s\n' "$out_c" | grep -qF 'test failed: tick_core(4) = 10, expected 9'; then
+    ok "a --no-std program importing a backend and core/ builds it once, and a core/ change that breaks the backend's cases fails it"
+else
+    bad "a --no-std program importing a backend and core/ builds it once, and a core/ change that breaks the backend's cases fails it: $(printf '%s\n' "$out_a" | grep -v warning | head -1 | cut -c1-160) / sets $t0 $t1 / $(printf '%s\n' "$out_c" | grep -v warning | head -2 | tr '\n' ' ' | cut -c1-200)"
 fi
 
 # --backend is the override, not the way in. A directory holding only a
@@ -1004,7 +1073,7 @@ fi
 # The harness links what the cases reach, not what main does: probe's cases
 # reach fs, main reaches fs and gfx.
 c7h="$TMP/c7harn"; mkdir -p "$c7h"
-printf 'import "%s"\nimport "%s"\n' "$(be_abs fs)" "$(be_abs gfx)" > "$c7h/conf.id"
+printf 'import "%s"\nimport "%s"\nimport "%s"\n' "$(be_abs fs)" "$(be_abs gfx)" "$(be_abs core)" > "$c7h/conf.id"
 cat > "$c7h/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int w = gfx_sys_width();
