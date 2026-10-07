@@ -12,12 +12,16 @@ ms_fn_dep(string ms_s, int[] ms_tk, int ms_t) {
 
 // The index of the token that closes the bracket opened by token ms_t; ms_t
 // itself when it opens nothing, the last token when the bracket never closes.
+// Only brackets of the same kind count, so a stray `(` cannot hide a `}`.
 ms_fn_close(string ms_s, int[] ms_tk, int ms_t) {
+  int ms_oc = ms_tk_ch(ms_s, ms_tk, ms_t);
+  int ms_xc = ms_oc + 1 + (ms_oc != 40);
   int ms_d = ms_fn_dep(ms_s, ms_tk, ms_t);
+} chain (string ms_s, int[] ms_tk, int ms_t) {
   int ms_u = ms_t;
   while(3 * (ms_u + 1) < len(ms_tk) && ms_d > 0) {
     ms_u = ms_u + 1;
-    ms_d = ms_d + ms_fn_dep(ms_s, ms_tk, ms_u);
+    ms_d = ms_d + (ms_tk_ch(ms_s, ms_tk, ms_u) == ms_oc) - (ms_tk_ch(ms_s, ms_tk, ms_u) == ms_xc);
   }
 } return int ms_u;
 ("(a)", [4, 0, 1, 0, 1, 2, 4, 2, 3], 0):(2)
@@ -25,3 +29,5 @@ ms_fn_close(string ms_s, int[] ms_tk, int ms_t) {
 ("{(a)}", [4, 0, 1, 4, 1, 2, 0, 2, 3, 4, 3, 4, 4, 4, 5], 1):(3)
 ("a", [0, 0, 1], 0):(0)
 ("(a", [4, 0, 1, 0, 1, 2], 0):(1)
+("{(}x", [4, 0, 1, 4, 1, 2, 4, 2, 3, 0, 3, 4], 0):(2)
+("[(]x", [4, 0, 1, 4, 1, 2, 4, 2, 3, 0, 3, 4], 0):(2)

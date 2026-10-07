@@ -19,6 +19,23 @@ ms_lt_quiet(string ms_rs) {
 ("then prints:(\"\") then calls f:[1]"):(0)
 (""):(0)
 
+// The text ms_sx with every blank outside a string literal removed, so
+// `1, 2` and `1,2` read the same while `"a b"` and `"ab"` do not.
+ms_lt_flat(string ms_sx) {
+  int[] ms_ft = ms_lex(ms_sx);
+  string ms_fo = "";
+  int ms_fz = 0;
+} chain (string ms_sx) {
+  while(3 * ms_fz < len(ms_ft)) {
+    ms_fo = ms_fo + ms_tk_str(ms_sx, ms_ft, ms_fz);
+    ms_fz = ms_fz + 1;
+  }
+} return string ms_fo;
+("1, 2"):("1,2")
+("\"a b\", x"):("\"a b\",x")
+("\"q\\\" r\" + 1"):("\"q\\\" r\"+1")
+(""):("")
+
 // The shape ms_kd of a case, "case" when it proves something: ms_ag, ms_ex, ms_rs
 // are its arguments, expected values and clauses; ms_vd is 1 for a void
 // function and ms_ef 1 when the function has a statement that does something.
@@ -27,7 +44,7 @@ ms_lt_kind(string ms_ag, string ms_ex, string ms_rs, int ms_vd, int ms_ef) {
   if(len(ms_ex) == 0 && ms_lt_quiet(ms_rs) == 1) {
     ms_kd = "silent";
   }
-  if(len(ms_ex) > 0 && len(ms_rs) == 0 && str_replace(ms_ag, " ", "") == str_replace(ms_ex, " ", "")) {
+  if(len(ms_ex) > 0 && len(ms_rs) == 0 && ms_lt_flat(ms_ag) == ms_lt_flat(ms_ex)) {
     ms_kd = "echo";
   }
 } chain (string ms_ag, string ms_ex, string ms_rs, int ms_vd, int ms_ef) {
@@ -43,3 +60,5 @@ ms_lt_kind(string ms_ag, string ms_ex, string ms_rs, int ms_vd, int ms_ef) {
 ("", "", "", 1, 0):("case")
 ("", "", "", 0, 0):("bare")
 ("1", "1", "then count:(2)", 0, 1):("case")
+("\"  hi  \"", "\"hi\"", "", 0, 1):("case")
+("\"a b\"", "\"a b\"", "", 0, 1):("echo")
