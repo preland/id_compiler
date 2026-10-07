@@ -625,18 +625,26 @@ int id_err_write(const unsigned char* p, size_t n) {
     fflush(stdout);
     return fwrite(p, 1, n, IDTC_EPRINT_TO) == n ? 0 : -1;
 }
-/* Little-endian, byte at a time: the same bytes on every host, and no
-   alignment requirement -- C code casts pointers to odd addresses freely. */
+/* Little-endian (one memcpy on a little-endian host, byte at a time
+   elsewhere): the same bytes on every host, and no alignment requirement -- C code casts pointers to odd addresses freely. */
 static long long id_peek_n(long long addr, int width) {
     unsigned char* p = id_at(addr, width);
     unsigned long long v = 0;
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    memcpy(&v, p, (size_t)width);
+#else
     for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];
+#endif
     return (long long)v;
 }
 static void id_poke_n(long long addr, long long value, int width) {
     unsigned char* p = id_at(addr, width);
     unsigned long long v = (unsigned long long)value;
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    memcpy(p, &v, (size_t)width);
+#else
     for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }
+#endif
 }
 static long long id_peek8(long long a)  { return id_peek_n(a, 1); }
 static long long id_peek16(long long a) { return id_peek_n(a, 2); }
