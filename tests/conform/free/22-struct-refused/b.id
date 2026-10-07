@@ -1,0 +1,13 @@
+kidsof(Node nd) {
+  Node[] k = nd.kids;
+} return Node[] k;
+
+via(int n) {
+  Node t = leaf(n);
+  Node[] ks = kidsof(t);
+} return Node[] ks;
+
+stash(int n) {
+  Node t = leaf(n);
+  export Node held = t;
+} return void;

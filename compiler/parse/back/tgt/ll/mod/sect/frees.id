@@ -1,0 +1,23 @@
+// The same free functions as the C target's (back/tgt/c/emit/prog/head/decl/
+// frees.id), as LLVM: the descriptor is a constant and `@idfr_NAME` calls the
+// runtime's id_free_walk with it.
+
+ll_frees() {
+  int i = 0;
+  while(i < len((import sdname))) {
+    ll_free_one((import sdname)[i]);
+    i = i + 1;
+  }
+} return void;
+given esc_fm_fix ():() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")
+given full_env ():() then prints:("")
+
+ll_free_one(string nm) {
+  string dz_d = esc_desc(nm);
+  if(esc_dkind(nm) == 3) {
+    emit_line("@idfrd_" + nm + " = private unnamed_addr constant [" + (len(dz_d) + 1) + " x i8] c\"" + dz_d + "\\00\"");
+    emit_line("define void @idfr_" + nm + "(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_" + nm + ")\n  ret void\n}");
+  }
+} return void;
+given esc_fm_fix ("Tr"):() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")
+given esc_fm_fix ("int"):() then prints:("")

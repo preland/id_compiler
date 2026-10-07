@@ -1,0 +1,42 @@
+// The flags of a parameter, for its summary: the walk of the whole body, except
+// for the local names that only read it. `ks = t.kids;` makes `ks` another name
+// for what `t` holds, which the walk counts as keeping it; but when `ks` is
+// then only looked at -- never stored, returned, handed to a callee that keeps
+// it or may break what it holds, nor an element of it read out the same way
+// -- nothing outlives the call, and the caller may free what it passed. Only a
+// declaration at the top of the body is looked for, and only for a parameter:
+// a local the function itself frees could be freed under its reader.
+
+esc_pflags(int fn, string nm) {
+  int r = esc_block(esc_pstmts(fn, nm), nm);
+  if((import ni1)[fn] >= 0) {
+    r = r | esc_expr((import ni1)[fn], nm, 1);
+  }
+} return int r;
+given esc_fix ((import efe_fn), "p"):(0)
+given esc_fix ((import efb_fn), "p"):(1)
+
+esc_pstmts(int fn, string nm) {
+  int[] dz_st = (import nl2)[fn];
+  int[] dz_out = [];
+  int i = 0;
+} chain (int fn, string nm) {
+  while(i < len(dz_st)) {
+    if(esc_alias(fn, dz_st[i], nm) == 0) {
+      push(dz_out, dz_st[i]);
+    }
+    i = i + 1;
+  }
+} return int[] dz_out;
+given esc_fix ((import efe_fn), "p"):([(import efe_dn)])
+given esc_fix ((import efb_fn), "p"):((import efb_stmts))
+
+esc_alias(int fn, int sn, string nm) {
+  int ok = 0;
+  if((import nkind)[sn] == "decl" && (import ni2)[sn] == 0 && (import ns2)[sn] != nm) {
+    ok = esc_isvar(imp_root((import ni1)[sn]), nm) && esc_ro(fn, (import ns2)[sn]);
+  }
+} return int ok;
+given esc_fix ((import efb_fn), (import efb_dv), "p"):(0)
+given esc_fix ((import efe_fn), (import efe_dq), "p"):(1)
+

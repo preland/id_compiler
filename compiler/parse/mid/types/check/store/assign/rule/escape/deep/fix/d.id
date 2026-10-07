@@ -1,0 +1,8 @@
+// A list literal with an element that is not itself a literal, for the
+// literal rules of deep/elem/arr.id.
+
+esc_fd_i() {
+  export int efd_blit = node_arr((import efd_elbad));
+} return void;
+given esc_dfix ():() then (import chkfail)[0]:(0)
+given esc_dfix ():() then init_units:(0)

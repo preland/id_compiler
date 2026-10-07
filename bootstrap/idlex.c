@@ -373,6 +373,52 @@ static void id_list_free_deep(IdList* L) {
     if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }
     id_list_free(L);
 }
+static void id_list_free_strs(IdList* L) {
+    if (!L) return;
+    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_str_free((char*)(intptr_t)L->data[i]); }
+    id_list_free(L);
+}
+static const char* id_fr_skip(const char* d) {
+    if (*d == 'l') return id_fr_skip(d + 1);
+    if (*d == 'S') { int n = d[1] - '0'; d += 2; while (n-- > 0) d = id_fr_skip(d); return d; }
+    if (*d == '@') { while (*d != ';') d++; return d + 1; }
+    return d + 1;
+}
+typedef struct { void* p; const char* d; } IdFrWork;
+static void id_free_walk(IdList* root, const char* base) {
+    IdFrWork loc[64];
+    IdFrWork* stk = loc;
+    size_t cap = 64, n = 0;
+    stk[n].p = root; stk[n].d = base; n++;
+    while (n > 0) {
+        n--;
+        void* p = stk[n].p;
+        const char* d = stk[n].d;
+        while (*d == '@') d = base + atoi(d + 1);
+        if (!p || *d == '.') continue;
+        if (*d == 's') { id_str_free((char*)p); continue; }
+        IdList* L = (IdList*)p;
+        if (L->cap != INT_MIN) {
+            int k = *d == 'S' ? d[1] - '0' : (d[1] == '.' ? 0 : L->len);
+            if (n + (size_t)k > cap) {
+                size_t nc = cap * 2;
+                while (nc < n + (size_t)k) nc *= 2;
+                IdFrWork* ns = (IdFrWork*)id_pool_blk(nc * sizeof(IdFrWork));
+                memcpy(ns, stk, n * sizeof(IdFrWork));
+                if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));
+                stk = ns; cap = nc;
+            }
+            if (*d == 'S') {
+                const char* f = d + 2;
+                for (int i = 0; i < k; i++) { if (*f != '.') { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = f; n++; } f = id_fr_skip(f); }
+            } else {
+                for (int i = 0; i < k; i++) { stk[n].p = (void*)(intptr_t)L->data[i]; stk[n].d = d + 1; n++; }
+            }
+        }
+        id_list_free(L);
+    }
+    if (stk != loc) id_pool_free(stk, cap * sizeof(IdFrWork));
+}
 static void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }
 static void id_list_mut_check(IdList* L) {
     if (L->cap < 0) {

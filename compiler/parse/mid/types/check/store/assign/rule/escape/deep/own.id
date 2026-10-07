@@ -1,14 +1,16 @@
-// Whether a local list also owns its elements, so that freeing it frees them
-// (docs/MEMORY.md 3.2). Three conditions, each a proof obligation:
-//   * the list is owned in the shallow sense (own/query.id): declared here,
-//     every store a list literal, no use keeps it;
-//   * its elements are lists, so there is something to free (esc_deep_ty);
-//   * every element it holds was built for it -- a list literal, never a name
-//     or a call's result -- and no element was read out into a position that
-//     keeps it (bits 8 and 4 of the walk, deep/elem/), including by a callee
-//     the list was passed to (esc_dbit).
-// Only the elements are freed, shallowly: a list of lists of lists keeps its
-// innermost lists, and a list of strings keeps its strings.
+// Whether a local list, list of strings or struct also owns what it holds, so
+// that freeing it frees that too (docs/MEMORY.md 3.2, 3.5b). Three conditions,
+// each a proof obligation:
+//   * it is owned in the shallow sense (own/query.id): declared here, every
+//     store fresh, no use keeps it;
+//   * its type has something to free below it (esc_dkind, ty/kind.id);
+//   * everything it holds was built for it and is not held by anything else,
+//     which esc_deepk spells out by kind: no element or field read out into a
+//     position that keeps it, none stored that something else holds, and
+//     nothing passed to a callee that may do either (esc_dbit).
+// A list of lists frees its rows, shallowly; a list of strings frees its
+// strings; a struct is freed by its type, all the way down, with a work list
+// of its own (runtime id_free_walk).
 
 esc_deep_ty(string t) {
   int ok = is_list_ty(t) == 1 && is_list_ty(list_elem(t)) == 1;
@@ -20,8 +22,8 @@ esc_deep_ty(string t) {
 esc_deep(int fn, string nm) {
   string t = esc_decl_type((import nl2)[fn], nm);
   int ok = 0;
-  if(esc_deep_ty(t) == 1 && esc_own(fn, nm) == 1) {
-    ok = (esc_func(fn, nm) & 12) == 0;
+  if(esc_dkind(t) > 0 && esc_own(fn, nm) == 1) {
+    ok = esc_deepk(fn, nm, esc_dkind(t));
   }
 } return int ok;
 given esc_dfix ((import efd_good), "a"):(1)
@@ -36,10 +38,11 @@ given esc_ffix ((import eff_shallow), "y"):(0)
 esc_free_fn(int fn, string nm) {
   string fname = esc_free_base(fn, nm);
   if(esc_on() == 1 && esc_deep(fn, nm) == 1) {
-    fname = "id_list_free_deep";
+    fname = esc_dfn(esc_decl_type((import nl2)[fn], nm));
   }
 } return string fname;
 given esc_dfix ((import efd_good), "a"):("id_list_free_deep")
 given esc_dfix ((import efd_leak), "b"):("id_list_free")
 given full_env (-1, "a"):("id_list_free")
 given esc_sfix ((import efs_acc), "s"):("id_str_free")
+given esc_fm_fix ((import efm_fn), "t"):("idfr_Tr")

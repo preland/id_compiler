@@ -1,0 +1,4 @@
+struct Row {
+  string[] cells;
+  int n;
+}

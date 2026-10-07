@@ -1,0 +1,26 @@
+// Whether a constructor has an argument its struct cannot own (docs/MEMORY.md
+// 3.5b): something that can be freed (a string, a list, a struct) that is
+// neither fresh (esc_ownv) nor a name the statement walk may still prove is
+// moved in (a local list of a type esc_mvty, checked by esc_deepk).
+
+esc_cbad(int e) {
+  int r = 0;
+  int i = 0;
+  int[] dz_as = (import nl1)[e];
+} chain (int e) {
+  while(i < len(dz_as) && r == 0) {
+    r = esc_abad(dz_as[i]);
+    i = i + 1;
+  }
+} return int r;
+given esc_dfix ((import efd_pc)):(1)
+given esc_ffix ((import eff_ctor)):(0)
+
+esc_abad(int a) {
+  int r = 0;
+  if(esc_heap_ty(type_of(a)) == 1 && esc_ownv(a) == 0) {
+    r = (import nkind)[a] != "var" || esc_mvty(type_of(a)) == 0;
+  }
+} return int r;
+given esc_dfix ((import efd_ix)):(1)
+given esc_dfix ((import efd_v)):(0)

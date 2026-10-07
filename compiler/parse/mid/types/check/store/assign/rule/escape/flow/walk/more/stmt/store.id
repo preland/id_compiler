@@ -31,7 +31,7 @@ esc_fresh(int e, string tg, string nm) {
   if(tg == nm && (import nkind)[e] != "arr") {
     r = esc_nonlit(e);
   } else if(tg == nm) {
-    r = esc_litels((import nl1)[e]);
+    r = esc_arrbad(e);
   }
 } return int r;
 given esc_fix ((import efb_vp), "v", "v"):(2)

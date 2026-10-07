@@ -1,0 +1,17 @@
+// A struct with a list of strings. mk fills a local list with strings it
+// builds, each of which only that list holds, and hands the list to the struct;
+// whoever owns the struct frees the struct, the list and both strings. show only
+// looks at the cells. Freed in main's use of one row: the struct and the list
+// (2 lists) and the 2 strings.
+mk(string s) {
+  string[] cs = [];
+  push(cs, s + "a");
+  push(cs, s + "b");
+} chain (string s) {
+  Row r = Row(cs, 2);
+} return Row r;
+
+show(Row r) {
+  string[] cs = r.cells;
+  print(cs[0] + cs[1]);
+} return void;

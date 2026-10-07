@@ -1,0 +1,23 @@
+// The element-ownership questions asked of a list type (docs/MEMORY.md 3.5b).
+
+// Whether the elements of a list of type `t` are owned by it under the
+// stricter rule: each one is a string or a struct that the list alone holds,
+// to be freed by type, not as a list. A list of lists of ints is not (its rows
+// are freed shallowly, so a row may hold anything).
+esc_strong(string t) {
+  int ok = t == "string[]" || esc_sbear(t) == 1;
+} return int ok;
+given esc_ty_fix ("string[]"):(1)
+given esc_ty_fix ("Tr[]"):(1)
+given esc_ty_fix ("int[][]"):(0)
+given esc_ty_fix ("string"):(0)
+
+// A list type a constructor may take over from a local: its elements are not
+// lists themselves, so one stricter proof covers all of them.
+esc_mvty(string t) {
+  int ok = is_list_ty(t) == 1 && is_list_ty(list_elem(t)) == 0;
+} return int ok;
+given esc_ty_fix ("Tr[]"):(1)
+given esc_ty_fix ("string[]"):(1)
+given esc_ty_fix ("int[][]"):(0)
+given esc_ty_fix ("Tr"):(0)

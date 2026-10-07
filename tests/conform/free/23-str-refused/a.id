@@ -1,0 +1,24 @@
+// A list of strings is freed with its strings only when each is a string built
+// for it and none was handed on. stash keeps its argument, so the piece split2
+// gives it is read after split2 has returned; a literal is not a heap block at
+// all and mixed puts one in a list beside a built string. Only the lists are
+// freed: freeing either string would be a trap under the guard.
+stash(string[] sink, string s) {
+  push(sink, s);
+} return void;
+
+split2(string[] sink, int n) {
+  string[] xs = [];
+  push(xs, "k" + n);
+  push(xs, "v" + n);
+} chain (string[] sink, int n) {
+  stash(sink, xs[0]);
+} return void;
+
+mixed(int n) {
+  string[] ys = [];
+  push(ys, "lit");
+  push(ys, "m" + n);
+} chain (int n) {
+  print(ys[0] + ys[1]);
+} return void;

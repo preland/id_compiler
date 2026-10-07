@@ -1,0 +1,41 @@
+// How many times a name is mentioned in a statement, read or written
+// (docs/MEMORY.md 3.5b): the proof that a name is not used outside the span
+// where a struct takes it over counts every mention in the function and in
+// that span and asks that they agree. esc_cnt (own/str/leaf.id) counts an
+// expression.
+
+esc_cnt1(int sn, string nm) {
+  int r = esc_cnt2s(sn, nm);
+  if((import nkind)[sn] == "decl") {
+    r = esc_cnt((import ni1)[sn], nm) + ((import ns2)[sn] == nm);
+  } else if((import nkind)[sn] == "assign") {
+    r = esc_cnt((import ni1)[sn], nm) + ((import ns1)[sn] == nm);
+  }
+} return int r;
+given esc_fm_fix ((import efm_ds), "kids"):(1)
+given esc_fm_fix ((import efm_ct), "kids"):(1)
+given esc_fm_fix ((import efm_ct), "t"):(1)
+
+esc_cnt2s(int sn, string nm) {
+  int r = esc_cnt3s(sn, nm);
+  if((import nkind)[sn] == "exprstmt" || ((import nkind)[sn] == "ret" && (import ni1)[sn] >= 0)) {
+    r = esc_cnt((import ni1)[sn], nm);
+  } else if((import nkind)[sn] == "iassign") {
+    r = esc_cnt((import ni1)[sn], nm) + esc_cnt((import ni2)[sn], nm) + esc_cntl((import nl1)[sn], nm);
+  }
+} return int r;
+given esc_fm_fix ((import efm_ps), "kids"):(1)
+given esc_fm_fix ((import efm_ps), "d"):(1)
+given esc_fm_fix ((import efm_ds), "kids"):(0)
+
+esc_cnt3s(int sn, string nm) {
+  int r = 0;
+  if((import nkind)[sn] == "if") {
+    r = esc_cnt((import ni1)[sn], nm) + esc_cnts((import nl1)[sn], nm) + esc_cnts((import nl2)[sn], nm);
+  } else if((import nkind)[sn] == "while") {
+    r = esc_cnt((import ni1)[sn], nm) + esc_cnts((import nl1)[sn], nm);
+  }
+} return int r;
+given esc_fm_fix ((import efm_if), "d"):(2)
+given esc_fm_fix ((import efm_if), "kids"):(1)
+given esc_fm_fix ((import efm_ds), "d"):(0)

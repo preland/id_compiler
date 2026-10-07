@@ -1,0 +1,45 @@
+// One constructor argument that is a name, and the proof that its struct may
+// take the list it names (scan.id).
+
+// 1 when the argument `a` of the constructor at statement `i` of `stmts` is not
+// a name, or is one the struct may own.
+esc_mvarg(int fn, int[] stmts, int i, int a) {
+  int ok = 1;
+  if((import nkind)[a] == "var" && esc_heap_ty(type_of(a)) == 1) {
+    ok = esc_movable(fn, stmts, i, (import ns1)[a]);
+  }
+} return int ok;
+given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_kv)):(1)
+given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, (import efm_kv)):(0)
+given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_if)):(1)
+
+// The list `kn` may be taken over at statement `i` when: it is declared at an
+// earlier statement `j` of the same list; the statement mentions it once; it is
+// mentioned nowhere in the function outside statements `j` to `i`; and the walk
+// finds no keeping use, no store that is not fresh, no element read out and no
+// element that something else holds (bit 64, the constructor itself, aside).
+esc_movable(int fn, int[] stmts, int i, string kn) {
+  int dz_j = esc_declat(stmts, i, kn);
+  int ok = 0;
+  if(dz_j >= 0 && esc_cnt((import ni1)[(stmts[i])], kn) == 1) {
+    ok = esc_cntr(stmts, dz_j, i, kn) == esc_cntf(fn, kn) && (esc_block((import nl2)[fn], kn) & 47) == 0;
+  }
+} return int ok;
+given esc_fm_fix ((import efm_fn), (import efm_body), 2, "kids"):(1)
+given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, "kids"):(0)
+given esc_fm_fix ((import efm_fn), (import efm_body), 0, "kids"):(0)
+
+// The index of the first declaration of `kn` before statement `i`, or -1.
+esc_declat(int[] stmts, int i, string kn) {
+  int dz_j = 0 - 1;
+  int dz_k = 0;
+  while(dz_k < i && dz_j < 0) {
+    if(esc_stgt(stmts[dz_k]) == kn && (import nkind)[(stmts[dz_k])] == "decl") {
+      dz_j = dz_k;
+    }
+    dz_k = dz_k + 1;
+  }
+} return int dz_j;
+given esc_fm_fix ((import efm_body), 2, "kids"):(0)
+given esc_fm_fix ((import efm_body), 0, "kids"):(-1)
+given esc_fm_fix ((import efm_body), 2, "t"):(-1)

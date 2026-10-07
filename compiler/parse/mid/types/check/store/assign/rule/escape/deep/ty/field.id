@@ -1,0 +1,12 @@
+// The fields of a struct's node of a descriptor (node.id).
+
+esc_dscf(int dz_s, string dz_a, string[] dz_sn, int[] dz_sp) {
+  string dz_r = dz_a;
+  int i = 0;
+  while(i < len((import sdftype)[dz_s])) {
+    dz_r = esc_dsc((import sdftype)[dz_s][i], dz_r, dz_sn, dz_sp);
+    i = i + 1;
+  }
+} return string dz_r;
+given esc_ty_fix (1, "x", [], []):("x..")
+given esc_ty_fix (0, "", ["Tr"], [0]):("l@0;")

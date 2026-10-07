@@ -19,14 +19,27 @@ given esc_ffix ((import eff_cmk)):(16)
 esc_nonlit2(int e) {
   int r = 2;
   if(esc_fresh_node(e) == 1) {
-    r = 16 + 8 * esc_ndf(e);
+    r = 16 + esc_fbad(e);
   } else if(str_fresh_node(e) == 1) {
     r = 16;
   }
 } return int r;
 given esc_sfix ((import efs_vn)):(2)
 given esc_sfix ((import efs_cl)):(2)
-given esc_ffix ((import eff_ctor)):(24)
+given esc_ffix ((import eff_ctor)):(16)
 given esc_ffix ((import eff_crows)):(16)
 given esc_ffix ((import eff_cleak)):(24)
 given esc_sfix ((import efs_sum)):(16)
+
+// The deep-ownership flag of a fresh block's store: bit 128 for a constructor
+// with an argument its struct could not own (esc_cbad), bit 8 for a call whose
+// result's elements may be held elsewhere (esc_ndf).
+esc_fbad(int e) {
+  int r = 8 * esc_ndf(e);
+  if(esc_ctor(e) == 1) {
+    r = 128 * esc_cbad(e);
+  }
+} return int r;
+given esc_ffix ((import eff_cleak)):(8)
+given esc_ffix ((import eff_cmk)):(0)
+given esc_ffix ((import eff_ctor)):(0)

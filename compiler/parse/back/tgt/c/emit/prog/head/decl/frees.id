@@ -1,0 +1,23 @@
+// One free function per struct that has something to free below its own block
+// (docs/MEMORY.md 3.5b): `idfr_NAME(p)` hands the struct and its descriptor
+// (esc_desc) to the runtime's id_free_walk. The analysis names it
+// (esc_dfn) wherever a deep-owned struct is given back, so a wrapper exists
+// for exactly the structs it can ask for.
+
+emit_frees() {
+  int i = 0;
+  while(i < len((import sdname))) {
+    emit_free_one((import sdname)[i]);
+    i = i + 1;
+  }
+} return void;
+given esc_fm_fix ():() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")
+given full_env ():() then prints:("")
+
+emit_free_one(string nm) {
+  if(esc_dkind(nm) == 3) {
+    emit_line("static void idfr_" + nm + "(IdList* p) { id_free_walk(p, \"" + esc_desc(nm) + "\"); }");
+  }
+} return void;
+given esc_fm_fix ("Tr"):() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")
+given esc_fm_fix ("int"):() then prints:("")

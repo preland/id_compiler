@@ -1,0 +1,23 @@
+// A struct frees what it holds only when nothing else holds it. Each function
+// here and in b.id and c.id breaks that one way and hands what it broke to its
+// caller, which reads it after the function has returned: under the guard a free
+// of any of it is a trap. leaf is the one fresh tree here; it is freed
+// completely wherever nothing is lost by it.
+leaf(int n) {
+  Node[] ks = [];
+  Node x = Node(ks, n);
+} return Node x;
+
+grab(int n) {
+  Node t = leaf(n);
+  Node[] k = t.kids;
+} return Node[] k;
+
+share(int n) {
+  Node s = leaf(n);
+  Node[] k1 = [s];
+  Node[] k2 = [s];
+} chain (int n) {
+  Node t1 = Node(k1, 0);
+  Node t2 = Node(k2, 1);
+} return Node t1;

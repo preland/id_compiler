@@ -30,6 +30,8 @@ emit_decls() {
   emit_eprint_def();
   emit_fwds();
   emit_exports();
+} chain () {
+  emit_frees();
 } return void;
 given nz_prog_fixture ():() then prints:("/* forward declarations */\nint id_main(int argc);\nvoid id_run(void);\n\n")
 given nz_prog_nomain_fixture ():() then prints:("/* forward declarations */\nvoid id_run(void);\n\n")

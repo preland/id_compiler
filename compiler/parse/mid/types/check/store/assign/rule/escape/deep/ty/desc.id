@@ -1,0 +1,40 @@
+// The descriptor of a type: the string the runtime's id_free_walk reads to
+// free a value of that type by its shape (docs/MEMORY.md 3.5b). One character
+// per node: `s` a string, `.` something with nothing to free, `l` then the
+// descriptor of the elements of a list, `S` then the field count and the
+// descriptors of the fields of a struct, and `@N;` the struct node that starts
+// at offset N of the descriptor, which is how a type that holds itself (a tree
+// of trees) ends. dz_sn and dz_sp are the structs being described, outermost
+// first, and where each began.
+
+esc_desc(string t) {
+  string[] dz_sn = [];
+  int[] dz_sp = [];
+  string dz_d = esc_dsc(t, "", dz_sn, dz_sp);
+} return string dz_d;
+given esc_ty_fix ("Tr"):("S1l@0;")
+given esc_ty_fix ("Pg"):("S3sl.S1l@5;")
+given esc_ty_fix ("string[]"):("ls")
+
+esc_dsc(string t, string dz_a, string[] dz_sn, int[] dz_sp) {
+  string dz_r = esc_dsct2(t, dz_a, dz_sn, dz_sp);
+  if(t == "string") {
+    dz_r = dz_a + "s";
+  } else if(is_list_ty(t) == 1) {
+    dz_r = esc_dsc(list_elem(t), dz_a + "l", dz_sn, dz_sp);
+  }
+} return string dz_r;
+given esc_ty_fix ("int", "x", [], []):("x.")
+given esc_ty_fix ("string", "x", [], []):("xs")
+given esc_ty_fix ("int[]", "", [], []):("l.")
+given esc_ty_fix ("Tr[]", "", [], []):("lS1l@1;")
+
+// A type that is neither a string nor a list: a struct's node, or nothing to free.
+esc_dsct2(string t, string dz_a, string[] dz_sn, int[] dz_sp) {
+  string dz_r = dz_a + ".";
+  if(find_str((import sdname), t) >= 0) {
+    dz_r = esc_dsct(t, dz_a, dz_sn, dz_sp);
+  }
+} return string dz_r;
+given esc_ty_fix ("Tr", "", [], []):("S1l@0;")
+given esc_ty_fix ("float", "k", [], []):("k.")

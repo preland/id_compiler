@@ -1,8 +1,10 @@
 // The runtime call that gives back a block the expression `e` made, a string
 // and a list being different blocks, and the text of a statement that does so
 // to a fresh call whose value nothing reads: `f(x);` is `id_list_free(id_f(x));`.
+// A call whose result owns what it holds (a list of strings, a struct with
+// fields: esc_dkind) gives back all of it.
 
-esc_free_of(int e) {
+esc_free_sh(int e) {
   string etx_fn = "id_list_free";
   if(type_of(e) == "string") {
     etx_fn = "id_str_free";
@@ -11,12 +13,23 @@ esc_free_of(int e) {
 given esc_ffix ((import eff_cmk)):("id_list_free")
 given esc_ffix ((import eff_csr)):("id_str_free")
 
-esc_discard(int e, string code) {
-  string etx_code = code;
-  if(esc_fresh_call(e) == 1) {
-    etx_code = esc_free_of(e) + "(" + code + ")";
+esc_free_of(int e) {
+  string etx_fn = esc_free_sh(e);
+  if(esc_deepcall(e) == 1) {
+    etx_fn = esc_dfn(type_of(e));
   }
-} return string etx_code;
-given esc_ffix ((import eff_cmk), "id_ff_make(n)"):("id_list_free(id_ff_make(n))")
-given esc_ffix ((import eff_csr), "id_fs_ret(n)"):("id_str_free(id_fs_ret(n))")
-given esc_ffix ((import eff_cl), "id_len(ys)"):("id_len(ys)")
+} return string etx_fn;
+given esc_ffix ((import eff_cmk)):("id_list_free")
+given esc_ffix ((import eff_csr)):("id_str_free")
+given esc_ffix ((import eff_crows)):("id_list_free_deep")
+
+esc_deepcall(int e) {
+  int ok = 0;
+  if(esc_ctor(e) == 0 && esc_fresh_call(e) == 1 && esc_dkind(type_of(e)) > 0) {
+    ok = esc_ndf(e) == 0;
+  }
+} return int ok;
+given esc_ffix ((import eff_crows)):(1)
+given esc_ffix ((import eff_cleak)):(0)
+given esc_ffix ((import eff_cmk)):(0)
+

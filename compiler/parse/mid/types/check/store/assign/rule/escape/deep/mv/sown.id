@@ -1,0 +1,19 @@
+// Whether an owned local is deep-owned, by the kind of its type
+// (ty/kind.id, docs/MEMORY.md 3.2, 3.5b).
+
+// A list of lists or of strings: no element read out into a position that
+// keeps it, and no element stored that something else holds (bits 4 and 8).
+// A struct: those, and also no field path read out or handed to a callee that
+// may break it (bit 32), and no constructor with an argument it could not own
+// (bit 128), and every list it takes over proved moved (scan.id).
+esc_deepk(int fn, string nm, int dz_k) {
+  int f = esc_func(fn, nm);
+  int ok = (f & 12) == 0;
+  if(dz_k == 3) {
+    ok = (f & 172) == 0 && esc_mvok(fn, nm) == 1;
+  }
+} return int ok;
+given esc_dfix ((import efd_good), "a", 1):(1)
+given esc_dfix ((import efd_leak), "b", 1):(0)
+given esc_fm_fix ((import efm_fn), "t", 3):(1)
+given esc_fm_fix ((import efm_bad), "t", 3):(0)

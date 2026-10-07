@@ -1,12 +1,16 @@
-// The ways an element gets into a list: `push(xs, v)`, `xs[i] = v` and a list
-// literal. A list owns the element only when it is a list literal, which is a
-// block nothing else holds yet. Anything else -- a name, a call's result -- may
-// be held by someone else already. Flag bit 8.
+// The ways an element gets into a list, or a value into a field: `push(xs, v)`,
+// `xs[i] = v`, `t.f = v` and a list literal. A list of lists owns the element
+// only when it is a list literal, which is a block nothing else holds yet;
+// anything else -- a name, a call's result -- may be held by someone else
+// already. A list of strings, a list of structs and a struct are freed by their
+// type, all the way down, so what goes into them must be a string or a struct
+// that nothing else holds, with the same held of whatever it holds (esc_ownv).
+// Anything with nothing to free (an int, a float) is always fine. Flag bit 8.
 
 esc_pushel(int[] args, string cname, string nm) {
   int r = 0;
-  if(cname == "push" && (import nkind)[(args[0])] == "var" && (import ns1)[(args[0])] == nm && (import nkind)[(args[1])] != "arr") {
-    r = 8;
+  if(cname == "push") {
+    r = esc_elbad(args[0], args[1], nm);
   }
 } return int r;
 given esc_dfix ((import efd_pa), "push", "g"):(8)
@@ -16,25 +20,22 @@ given esc_dfix ((import efd_pa), "len", "g"):(0)
 
 esc_setel(int sn, string nm) {
   int[] vs = (import nl1)[sn];
-  int r = 0;
-  if((import nkind)[((import ni1)[sn])] == "var" && (import ns1)[((import ni1)[sn])] == nm && (import nkind)[(vs[0])] != "arr") {
-    r = 8;
-  }
+  int r = esc_elbad((import ni1)[sn], vs[0], nm);
 } return int r;
 given esc_dfix ((import efd_setb), "g"):(8)
 given esc_dfix ((import efd_setl), "g"):(0)
 given esc_dfix ((import efd_setb), "h"):(0)
 
-esc_litels(int[] els) {
+// The flag for the value `v` stored into `b`, a path that starts at `nm`: 8
+// when it may be held by something else too, 0 when it is not stored under
+// `nm` at all.
+esc_elbad(int b, int v, string nm) {
+  int dz_dp = esc_tdep(b, nm);
   int r = 0;
-  int i = 0;
-  while(i < len(els)) {
-    if((import nkind)[(els[i])] != "arr") {
-      r = 8;
-    }
-    i = i + 1;
+  if(dz_dp > 0) {
+    r = esc_elbad2(b, v, dz_dp);
   }
 } return int r;
-given esc_dfix ((import efd_elok)):(0)
-given esc_dfix ((import efd_elbad)):(8)
-given esc_dfix ((import ef_none)):(0)
+given esc_dfix ((import efd_g), (import efd_v), "g"):(8)
+given esc_dfix ((import efd_g), (import efd_lit), "g"):(0)
+given esc_dfix ((import efd_g), (import efd_v), "h"):(0)

@@ -1,0 +1,17 @@
+main(int argc, string[] argv) {
+  Node[] g = grab(5);
+  Node s = share(6);
+  Node[] v = via(7);
+} chain (int argc, string[] argv) {
+  stash(8);
+  Node l = late(9);
+  Node w = swap(10);
+} chain (int argc, string[] argv) {
+  print(len(g));
+  print(s.kids[0].v);
+  print(len(v));
+} chain (int argc, string[] argv) {
+  print((import held).v);
+  print(len(l.kids));
+  print(w.kids[0].v);
+} return int 0;

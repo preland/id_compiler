@@ -1,0 +1,34 @@
+// The mentions of a name in a list of statements, in a stretch of one, and in a
+// whole function (its body and its return clause).
+
+esc_cnts(int[] stmts, string nm) {
+  int r = 0;
+  int i = 0;
+  while(i < len(stmts)) {
+    r = r + esc_cnt1(stmts[i], nm);
+    i = i + 1;
+  }
+} return int r;
+given esc_fm_fix ((import efm_body), "kids"):(3)
+given esc_fm_fix ((import efm_body), "t"):(1)
+
+// Statements `lo` to `hi`, both included.
+esc_cntr(int[] stmts, int lo, int hi, string nm) {
+  int r = 0;
+  int i = lo;
+  while(i <= hi) {
+    r = r + esc_cnt1(stmts[i], nm);
+    i = i + 1;
+  }
+} return int r;
+given esc_fm_fix ((import efm_body), 0, 1, "kids"):(2)
+given esc_fm_fix ((import efm_body), 1, 2, "kids"):(2)
+
+esc_cntf(int fn, string nm) {
+  int r = esc_cnts((import nl2)[fn], nm);
+  if((import ni1)[fn] >= 0) {
+    r = r + esc_cnt((import ni1)[fn], nm);
+  }
+} return int r;
+given esc_fm_fix ((import efm_fn), "kids"):(3)
+given esc_fm_fix ((import efm_fn), "t"):(2)

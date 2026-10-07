@@ -1,0 +1,4 @@
+struct Node {
+  Node[] kids;
+  int v;
+}

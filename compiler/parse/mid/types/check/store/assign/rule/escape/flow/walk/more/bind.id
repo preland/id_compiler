@@ -12,3 +12,19 @@ given esc_sfix ("bind", 1, (import efs_lit0)):(1)
 given esc_sfix ("bind", 0, (import efs_lit0)):(0)
 given esc_sfix ("len", 1, (import efs_lit0)):(0)
 given esc_sfix ("bind", 1, (import efs_one)):(0)
+
+// Where argument `i` of a call flows: what the callee's summary says, with
+// `bind`'s captured strings (above). A bare name handed to a struct's
+// constructor is flag bit 64 instead: the struct holds it from then on, which
+// is a keeper for everything except the proof that the struct owns it
+// (deep/mv/), so every user of the flags treats 64 as 1 unless it has that proof.
+esc_actx(string cname, int i, int a) {
+  int c = arg_ctx(cname, i) | esc_bindc(cname, i, a);
+  if(find_str((import sdname), cname) >= 0 && (import nkind)[a] == "var") {
+    c = 64;
+  }
+} return int c;
+given esc_sfix ("bind", 1, (import efs_lit0)):(1)
+given esc_sfix ("len", 0, (import efs_lit0)):(0)
+given esc_sd_fix ("Box", 0, (import esd_xs)):(64)
+given esc_sd_fix ("Box", 0, (import esd_set)):(9)

@@ -1,0 +1,19 @@
+// A linked list of 3000 cells (what a wasm stack holds when it is built), each holding a list of at most one successor.
+// Freeing it with idfr_Cell must not recurse once per cell, or the C stack would
+// not hold it (and a wasm stack even less): the runtime walks a work list of
+// its own. Freed: a struct and a list of successors per cell, 6000 lists.
+build(int n) {
+  Cell[] nx = [];
+  if(n > 1) {
+    push(nx, build(n - 1));
+  }
+  Cell c = Cell(nx, n);
+} return Cell c;
+
+total(Cell c) {
+  Cell[] nx = c.next;
+  int s = c.v;
+  if(len(nx) > 0) {
+    s = s + nx[0].v;
+  }
+} return int s;

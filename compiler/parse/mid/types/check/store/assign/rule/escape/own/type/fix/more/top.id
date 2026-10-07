@@ -41,6 +41,7 @@ esc_fix() {
   esc_fx_c4();
   esc_reg();
 } chain () {
+  esc_fx_e();
   esc_seed();
   lset((import sqbase), 0, (import efc_fn));
 } return void;

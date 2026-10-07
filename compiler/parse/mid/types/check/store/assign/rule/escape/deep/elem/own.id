@@ -1,0 +1,50 @@
+// Whether an expression's value is a block, or a tree of blocks, that nothing
+// else holds, so a struct, a list of strings or a list of structs may take it
+// and free it by type with the rest. Nothing is read from a name: a name may be
+// held by another, and moving one in is a statement-level proof (deep/mv/).
+// A list literal is fresh, and so are its elements when they are; a
+// constructor is fresh and so are its arguments when they are; a call of a
+// function that returns fresh with fields of its own is fresh (the summary's two
+// bits, flow/sum/fresh/); a concatenation or a builtin that makes a string is.
+// A string literal is not, and neither is a name or a field read.
+
+esc_ownv(int e) {
+  int dz_o = 0;
+  if((import nkind)[e] == "arr") {
+    dz_o = esc_okl((import nl1)[e]);
+  } else {
+    dz_o = esc_ownc(e);
+  }
+} return int dz_o;
+given esc_dfix ((import efd_lit)):(1)
+given esc_dfix ((import efd_v)):(0)
+given esc_dfix ((import efd_lbl)):(1)
+
+esc_ownc(int e) {
+  int dz_o = str_fresh_node(e);
+  if(esc_ctor(e) == 1) {
+    dz_o = esc_okl((import nl1)[e]);
+  } else if(esc_fresh_call(e) == 1) {
+    dz_o = esc_ndf(e) == 0;
+  }
+} return int dz_o;
+given esc_ffix ((import eff_cmk)):(1)
+given esc_ffix ((import eff_cleak)):(0)
+given esc_ffix ((import eff_vn)):(0)
+given esc_ffix ((import eff_csr)):(1)
+
+// 1 when every element of the list or argument list is something with nothing
+// to free, or is fresh.
+esc_okl(int[] els) {
+  int ok = 1;
+  int i = 0;
+  while(i < len(els)) {
+    if(esc_heap_ty(type_of(els[i])) == 1 && esc_ownv(els[i]) == 0) {
+      ok = 0;
+    }
+    i = i + 1;
+  }
+} return int ok;
+given esc_dfix ((import efd_elok)):(1)
+given esc_dfix ((import efd_elbad)):(0)
+given esc_dfix ((import ef_none)):(1)

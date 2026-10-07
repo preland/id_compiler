@@ -1,0 +1,11 @@
+late(int n) {
+  Node[] ks = [];
+  Node t = Node(ks, n);
+  push(ks, leaf(n));
+} return Node t;
+
+swap(int n) {
+  Node t = leaf(n);
+  Node o = leaf(n + 1);
+  t.kids = [o];
+} return Node t;

@@ -1,0 +1,4 @@
+struct Cell {
+  Cell[] next;
+  int v;
+}

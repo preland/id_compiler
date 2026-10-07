@@ -1,0 +1,14 @@
+// A struct table for the cases of the type predicates and the descriptor
+// (bear.id, kind.id, desc.id): Tr { Tr[] kids; }, Pt { int x; int y; } and
+// Pg { string name; int[] vals; Tr tr; }.
+
+esc_ty_fix() {
+  full_env();
+  init_rtc();
+  sd_note("Tr", ["kids"], ["Tr[]"], "tr.id", 1);
+} chain () {
+  sd_note("Pt", ["x", "y"], ["int", "int"], "pt.id", 1);
+  sd_note("Pg", ["name", "vals", "tr"], ["string", "int[]", "Tr"], "pg.id", 1);
+} return void;
+():() then len((import sdname)):(3)
+():() then calls sd_note:("Pg", ["name", "vals", "tr"], ["string", "int[]", "Tr"], "pg.id", 1)

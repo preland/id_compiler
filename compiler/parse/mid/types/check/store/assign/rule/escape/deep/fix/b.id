@@ -11,7 +11,7 @@ esc_fd_d() {
   export int efd_lenc = node_call("len", [(import efd_ix)]);
   export int efd_decn = node_decl("int", "n", (import efd_lenc), 0);
 } chain () {
-  export int efd_peek = node_func("fd_peek", "void", (import efd_gp), [(import efd_decr)], 0 - 1);
+  export int efd_peek = node_func("fd_peek", "int[]", (import efd_gp), [(import efd_decr)], node_var("r"));
   export int efd_look = node_func("fd_look", "int", (import efd_gp), [(import efd_decn)], node_var("n"));
   export int efd_va = node_var("a");
 } return void;

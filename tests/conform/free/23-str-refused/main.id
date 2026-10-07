@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  string[] sink = [];
+  split2(sink, 4);
+  mixed(5);
+} chain (int argc, string[] argv) {
+  print(sink[0]);
+} return int 0;

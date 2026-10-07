@@ -1,0 +1,8 @@
+main(int argc, string[] argv) {
+  int c = count(mk(3));
+  print(c);
+  Node t = mk(2);
+} chain (int argc, string[] argv) {
+  int d = count(t);
+  print(d);
+} return int 0;

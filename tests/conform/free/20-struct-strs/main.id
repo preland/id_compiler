@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  Row r = mk("x");
+  show(r);
+  print(r.n);
+} return int 0;

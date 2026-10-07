@@ -1,0 +1,23 @@
+// A tree built by a recursive constructor. mk's list of children is taken over
+// by the struct it builds, and every child is a fresh result of mk, so what
+// mk returns owns the whole tree and whoever receives it frees all of it with
+// idfr_Node. count only reads, through an alias that is read and nothing more,
+// so the tree handed to it as `count(mk(3))` is freed after the call: 15 nodes,
+// each a struct and a list of children, 30 lists; the 7-node tree t is freed at
+// the exit of main, 14 more.
+mk(int d) {
+  Node[] ks = [];
+  if(d > 0) {
+    push(ks, mk(d - 1));
+    push(ks, mk(d - 1));
+  }
+  Node n = Node(ks);
+} return Node n;
+
+count(Node n) {
+  Node[] ks = n.kids;
+  int c = 1;
+  if(len(ks) > 0) {
+    c = 1 + count(ks[0]) + count(ks[1]);
+  }
+} return int c;

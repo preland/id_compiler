@@ -1,0 +1,35 @@
+// fa_ro's nodes: fa_ro(int[] p) { int[] q = p; int n = len(q); }, where `q` only
+// reads what `p` holds (flow/sum/alias.id).
+
+esc_fx_e() {
+  export int efe_vq = node_var("q");
+  export int efe_dq = node_decl("int[]", "q", node_var("p"), 0);
+  export int efe_dn = node_decl("int", "n", node_call("len", [(import efe_vq)]), 0);
+} chain () {
+  export int[] efe_ps = [node_param("param", "int[]", "p")];
+  export int efe_fn = node_func("fa_ro", "void", (import efe_ps), [(import efe_dq), (import efe_dn)], 0 - 1);
+  esc_fx_v();
+} return void;
+given esc_fix ():() then (import chkfail)[0]:(0)
+given esc_fix ():() then init_units:(0)
+
+// The variables the cases read paths of, with the types the programs give them:
+// a path's type is asked of its variable (type_of), and only a string, a list
+// or a struct is something the walk has to follow.
+esc_fx_v() {
+  add_var("a", "int[][]", 0);
+  add_var("b", "int[][]", 0);
+  add_var("g", "int[][]", 0);
+} chain () {
+  add_var("c", "int[][]", 0);
+  add_var("y", "int[][]", 0);
+  add_var("z", "int[][]", 0);
+} chain () {
+  add_var("p", "int[]", 0);
+  add_var("v", "int[]", 0);
+  add_var("w", "int[]", 0);
+} chain () {
+  add_var("q", "int[]", 0);
+} return void;
+given esc_fix ():() then calls add_var:("q", "int[]", 0)
+given esc_fix ():() then (import chkfail)[0]:(0)

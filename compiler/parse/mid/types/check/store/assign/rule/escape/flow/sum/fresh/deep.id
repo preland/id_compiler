@@ -17,7 +17,7 @@ given esc_ffix ((import eff_make)):(0)
 esc_deep_val(int fn, int e) {
   int ok = 0;
   if((import nkind)[e] == "arr") {
-    ok = esc_litels((import nl1)[e]) == 0;
+    ok = esc_arrbad(e) == 0;
   } else if((import nkind)[e] == "var") {
     ok = esc_deep(fn, (import ns1)[e]);
   }
@@ -28,7 +28,7 @@ given esc_ffix ((import eff_rows), (import eff_vn)):(0)
 given esc_ffix ((import eff_rows), (import eff_rlb)):(1)
 
 esc_deep_ok(int fn) {
-  int ok = esc_deep_ty((import ns2)[fn]) == 0 || esc_deep_ret(fn) == 1;
+  int ok = esc_dkind((import ns2)[fn]) == 0 || esc_deep_ret(fn) == 1;
 } return int ok;
 given esc_ffix ((import eff_make)):(1)
 given esc_ffix ((import eff_rows)):(1)

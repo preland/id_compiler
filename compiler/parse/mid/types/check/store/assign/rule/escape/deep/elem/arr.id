@@ -1,0 +1,29 @@
+// A list literal stored into a name, or returned (docs/MEMORY.md 3.2, 3.5b).
+
+// Flag bit 8 when the elements of the literal are not all lists the literal
+// alone holds (a list of lists), or not all fresh (a list of strings or of
+// structs, by esc_okl): the stricter rule is asked of the literal's own type.
+esc_arrbad(int e) {
+  string t = type_of(e);
+  int r = esc_litels((import nl1)[e]);
+  if(esc_strong(t) == 1) {
+    r = 8 * (1 - esc_okl((import nl1)[e]));
+  }
+} return int r;
+given esc_dfix ((import efd_lits)):(0)
+given esc_dfix ((import efd_lbl)):(0)
+given esc_dfix ((import efd_blit)):(8)
+
+esc_litels(int[] els) {
+  int r = 0;
+  int i = 0;
+  while(i < len(els)) {
+    if((import nkind)[(els[i])] != "arr") {
+      r = 8;
+    }
+    i = i + 1;
+  }
+} return int r;
+given esc_dfix ((import efd_elok)):(0)
+given esc_dfix ((import efd_elbad)):(8)
+given esc_dfix ((import ef_none)):(0)

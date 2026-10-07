@@ -4,13 +4,41 @@
 // keeps the argument -- the list no longer owns that element alone, and
 // freeing it with the list would leave the keeper dangling. Flag bit 4. A read
 // that only looks (ctx 0: an operand, a length, an index of the element) sets
-// nothing.
+// nothing, and neither does a read of something with nothing to free (an int,
+// a float): only a string, a list or a struct can be freed under its holder.
+//
+// A struct is freed by its type, all the way down (3.5b), so for a type that
+// carries one the read need not be of an element: any path `t.a[i].b` from the
+// name that reaches a string, a list or a struct, and goes into a position that
+// keeps it or whose callee may break the ownership of what it is handed (ctx
+// bit 8), sets bit 32.
 esc_elem(int e, string nm, int ctx) {
   int r = 0;
-  if((import nkind)[e] == "index" && (import nkind)[((import ni1)[e])] == "var" && (import ns1)[((import ni1)[e])] == nm) {
-    r = (ctx & 1) << 2;
+  if(esc_chain(e, nm) == 1 && esc_heap_ty(type_of(e)) == 1) {
+    r = esc_elem2(e, ctx);
   }
 } return int r;
 given esc_dfix ((import efd_ix), "g", 1):(4)
 given esc_dfix ((import efd_ix), "g", 0):(0)
 given esc_dfix ((import efd_ix), "h", 1):(0)
+
+esc_elem2(int e, int ctx) {
+  int r = esc_elem3(e, ctx);
+  if((import nkind)[((import ni1)[e])] == "var") {
+    r = r | ((ctx & 1) << 2);
+  }
+} return int r;
+given esc_dfix ((import efd_ix), 1):(4)
+given esc_dfix ((import efd_ix), 0):(0)
+given esc_dfix ((import efd_ix), 8):(0)
+
+esc_elem3(int e, int ctx) {
+  string dz_t = type_of(imp_root(e));
+  int r = 0;
+  if(esc_sbear(dz_t) == 1 && (ctx & 9) != 0) {
+    r = 32;
+  }
+} return int r;
+given esc_fm_fix ((import efm_ix), 1):(32)
+given esc_fm_fix ((import efm_ix), 0):(0)
+given esc_dfix ((import efd_ix), 1):(0)

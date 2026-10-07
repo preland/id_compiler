@@ -1,0 +1,11 @@
+// The statement `f(x);` whose value nothing reads (drop.id).
+
+esc_discard(int e, string code) {
+  string etx_code = code;
+  if(esc_fresh_call(e) == 1) {
+    etx_code = esc_free_of(e) + "(" + code + ")";
+  }
+} return string etx_code;
+given esc_ffix ((import eff_cmk), "id_ff_make(n)"):("id_list_free(id_ff_make(n))")
+given esc_ffix ((import eff_csr), "id_fs_ret(n)"):("id_str_free(id_fs_ret(n))")
+given esc_ffix ((import eff_cl), "id_len(ys)"):("id_len(ys)")

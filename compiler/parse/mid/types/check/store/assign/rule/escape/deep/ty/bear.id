@@ -1,0 +1,44 @@
+// Which types carry a struct, and which structs hold something to free
+// (docs/MEMORY.md 3.5b). A type carries a struct when, after the `[]` of a
+// list of lists of ... are peeled off, what is left is a struct's name. Only
+// such a type needs the stricter element rules (a struct's fields are freed
+// by its type, not by the list that happens to hold them), and only a struct
+// with a field that is a string, a list or another struct has anything to free
+// beyond its own block.
+
+esc_sbear(string t) {
+  string dz_b = t;
+  while(is_list_ty(dz_b) == 1) {
+    dz_b = list_elem(dz_b);
+  }
+  int ok = find_str((import sdname), dz_b) >= 0;
+} return int ok;
+given esc_ty_fix ("Tr"):(1)
+given esc_ty_fix ("Tr[][]"):(1)
+given esc_ty_fix ("int[]"):(0)
+given esc_ty_fix ("string"):(0)
+
+esc_sheap(string t) {
+  int dz_s = find_str((import sdname), t);
+  int ok = 0;
+  if(dz_s >= 0) {
+    ok = esc_hfields((import sdftype)[dz_s]);
+  }
+} return int ok;
+given esc_ty_fix ("Tr"):(1)
+given esc_ty_fix ("Pt"):(0)
+given esc_ty_fix ("Pg"):(1)
+given esc_ty_fix ("int"):(0)
+
+esc_hfields(string[] dz_fts) {
+  int ok = 0;
+  int i = 0;
+  while(i < len(dz_fts)) {
+    ok = ok | esc_heap_ty(dz_fts[i]);
+    i = i + 1;
+  }
+} return int ok;
+given esc_ty_fix (["int", "string"]):(1)
+given esc_ty_fix (["int", "float"]):(0)
+given esc_ty_fix (["Tr[]"]):(1)
+given esc_ty_fix ([]):(0)

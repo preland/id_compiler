@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  string[] a = pieces("ab");
+  print(cut(a));
+  int n = cut(pieces("cde"));
+} chain (int argc, string[] argv) {
+  print(n);
+} return int 0;

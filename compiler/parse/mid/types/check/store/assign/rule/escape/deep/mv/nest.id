@@ -1,0 +1,38 @@
+// The statement-level halves of the constructor proof (scan.id).
+
+// The name a statement stores into: a declaration's, or an assignment's. "" for
+// any other statement.
+esc_stgt(int sn) {
+  string dz_g = "";
+  if((import nkind)[sn] == "decl") {
+    dz_g = (import ns2)[sn];
+  } else if((import nkind)[sn] == "assign") {
+    dz_g = (import ns1)[sn];
+  }
+} return string dz_g;
+given esc_fm_fix ((import efm_ds)):("kids")
+given esc_fm_fix ((import efm_ps)):("")
+
+// The proof for the statements inside a branch or a loop; 1 for any other.
+esc_mvnest(int fn, int sn, string nm) {
+  int ok = 1;
+  if((import nkind)[sn] == "if" || (import nkind)[sn] == "while") {
+    ok = esc_mvin(fn, (import nl1)[sn], nm) & esc_mvin(fn, (import nl2)[sn], nm);
+  }
+} return int ok;
+given esc_fm_fix ((import efm_fn), (import efm_if), "t"):(1)
+given esc_fm_fix ((import efm_bad), (import efm_bif), "t"):(0)
+
+// Every heap argument that is a name, at statement `i` of `stmts`.
+esc_mvctor(int fn, int[] stmts, int i, int e) {
+  int[] dz_as = (import nl1)[e];
+  int ok = 1;
+  int dz_k = 0;
+} chain (int fn, int[] stmts, int i, int e) {
+  while(dz_k < len(dz_as)) {
+    ok = ok & esc_mvarg(fn, stmts, i, dz_as[dz_k]);
+    dz_k = dz_k + 1;
+  }
+} return int ok;
+given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_cc)):(1)
+given esc_fm_fix ((import efm_bad), (import efm_bbody), 1, (import efm_cc)):(0)

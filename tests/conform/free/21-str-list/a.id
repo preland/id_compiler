@@ -1,0 +1,14 @@
+// A list of strings is freed with its strings when it holds only strings built
+// for it and none was read out where something keeps it. pieces is such a list
+// and is fresh, so the caller owns it (and both strings); cut reads a piece into
+// an operand only. Freed: the list and 2 strings from each of the 2 calls to
+// pieces, which main binds to a name and passes straight to cut.
+pieces(string s) {
+  string[] xs = [];
+  push(xs, s + "1");
+  push(xs, s + "2");
+} return string[] xs;
+
+cut(string[] ys) {
+  int n = len(ys[0]) + len(ys[1]);
+} return int n;
