@@ -342,7 +342,7 @@ this compiler uses a construct on itself.
 | `parse_atom_float` | `compiler/parse/front/parse/expr/atom/kind/floatlit/float.id` | Extends the primary-atom dispatch chain (parse_atom -> parse_atom2 -> here |
 | `parse_float` | `compiler/parse/front/parse/expr/atom/kind/floatlit/float.id` | Extends the primary-atom dispatch chain (parse_atom -> parse_atom2 -> here |
 | `read_name` | `compiler/parse/front/parse/expr/atom/kind/floatlit/float.id` | Shared by parse_ident_or_call and parse_import (atom.id, import_expr.id): |
-| `flt_exp` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/big/exp.id` | A float literal's exponent as an int, for deciding whether it overflows. A |
+| `flt_lit_exp` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/big/exp.id` | A float literal's exponent as an int, for deciding whether it overflows. A |
 | `flt_exp_of` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/big/exp.id` | A float literal's exponent as an int, for deciding whether it overflows. A |
 | `flt_clamp` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/big/exp.id` | A float literal's exponent as an int, for deciding whether it overflows. A |
 | `flt_over` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/big/over.id` | Does a float literal round to infinity? Exactly, and without a bignum: a |
@@ -354,7 +354,7 @@ this compiler uses a construct on itself.
 | `flt_exp_has` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/diag.id` | The two ways a float literal is refused (check.id decides which), and the |
 | `flt_bad_exp` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/diag.id` | The two ways a float literal is refused (check.id decides which), and the |
 | `flt_bad_big` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/diag.id` | The two ways a float literal is refused (check.id decides which), and the |
-| `flt_mant` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/mant.id` | The mantissa's digits with the point taken out: "0.0125e3" is "00125". |
+| `flt_lit_mant` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/mant.id` | The mantissa's digits with the point taken out: "0.0125e3" is "00125". |
 | `flt_lstrip` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/mant.id` | Without its leading zeros: "00125" is "125", and all zeros is "" (the value |
 | `flt_norm` | `compiler/parse/front/parse/expr/atom/kind/floatlit/more/mant.id` | LLVM's text form wants a point before an exponent (`1.0e10`, not `1e10`); |
 | `parse_atom3` | `compiler/parse/front/parse/expr/atom/kind/import_expr.id` | `import name` (usually written `(import name)`) vs a plain identifier/call. |

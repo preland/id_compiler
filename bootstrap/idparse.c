@@ -814,7 +814,7 @@ void id_idstd_str_split_loop(IdList* idstd_strs, char* idstd_s, char* idstd_sep,
 int id_idstd_str_split_one(IdList* idstd_strs, char* idstd_s, char* idstd_sep, int idstd_i);
 int id_str_find(char* idstd_s, char* idstd_txt);
 int id_str_findat(char* idstd_s, char* idstd_txt, int idstd_i);
-int id_idstd_str_find_end(char* idstd_s, int idstd_i, char* idstd_txt);
+int id_idstd_str_find_run(char* idstd_s, char* idstd_txt, int idstd_i);
 int id_str_hash(char* idstd_s);
 int id_idstd_str_hash_run(char* idstd_s, int idstd_hv, int idstd_i);
 char* id_str_replace(char* idstd_ln_s, char* idstd_ln_from, char* idstd_ln_to);
@@ -839,6 +839,7 @@ int id_str_starts(char* idstd_s, char* idstd_txt);
 int id_str_ends(char* idstd_s, char* idstd_txt);
 int id_idstd_str_join_base(IdList* idstd_strs, char* idstd_sep);
 int id_idstd_str_join_sep(char* idstd_sep, long long idstd_ad, int idstd_p, int idstd_more);
+int id_idstd_str_skip_to(char* idstd_s, int idstd_i, int idstd_byte);
 void id_print_calls(void);
 void id_print_call_cases(void);
 char* id_call_case_row(int i);
@@ -2084,7 +2085,7 @@ void id_flt_check(IdList* pos, char* text);
 int id_parse_atom_float(IdList* pos);
 int id_parse_float(IdList* pos);
 char* id_read_name(IdList* pos);
-int id_flt_exp(char* text);
+int id_flt_lit_exp(char* text);
 int id_flt_exp_of(char* fles);
 int id_flt_clamp(char* flz);
 int id_flt_over(char* text);
@@ -2096,7 +2097,7 @@ char* id_flt_head(char* flds, int flw);
 int id_flt_exp_has(char* text, int flj);
 void id_flt_bad_exp(IdList* pos, char* text);
 void id_flt_bad_big(IdList* pos, char* text);
-char* id_flt_mant(char* text);
+char* id_flt_lit_mant(char* text);
 char* id_flt_lstrip(char* flraw);
 char* id_flt_norm(char* text);
 int id_parse_atom3(IdList* pos);
@@ -4040,8 +4041,8 @@ int id_idstd_hmap_slot(IdList* idstd_keys, IdList* idstd_used, char* idstd_key) 
 
 int id_idstd_hmap_full(IdList* idstd_used, IdList* idstd_cnt) {
     int idstd_ret_i;
-int idsq_13;
-    idstd_ret_i = (idsq_13 = (int)(id_list_get(idstd_cnt, 0)), (((idsq_13 + 1) * 4) > (id_list_len(idstd_used) * 3)));
+int idsq_11;
+    idstd_ret_i = (idsq_11 = (int)(id_list_get(idstd_cnt, 0)), (((idsq_11 + 1) * 2) > id_list_len(idstd_used)));
     return idstd_ret_i;
 }
 
@@ -4323,18 +4324,24 @@ int id_str_find(char* idstd_s, char* idstd_txt) {
 }
 
 int id_str_findat(char* idstd_s, char* idstd_txt, int idstd_i) {
-    int idstd_ret_i;
-    while (((id_charat(idstd_s, idstd_i) >= 0) && (id_str_eqat(idstd_s, idstd_i, idstd_txt) == 0))) {
-        idstd_i = (idstd_i + 1);
-    }
-    idstd_ret_i = id_idstd_str_find_end(idstd_s, idstd_i, idstd_txt);
-    return idstd_ret_i;
-}
-
-int id_idstd_str_find_end(char* idstd_s, int idstd_i, char* idstd_txt) {
     int idstd_at;
     idstd_at = idstd_i;
-    if (((id_charat(idstd_s, idstd_i) < 0) && (id_str_eqat(idstd_s, idstd_i, idstd_txt) == 0))) {
+    if ((id_charat(idstd_txt, 0) >= 0)) {
+        idstd_at = id_idstd_str_find_run(idstd_s, idstd_txt, idstd_i);
+    }
+    return idstd_at;
+}
+
+int id_idstd_str_find_run(char* idstd_s, char* idstd_txt, int idstd_i) {
+    int idstd_head;
+    int idstd_at;
+    idstd_head = id_charat(idstd_txt, 0);
+    idstd_i = id_idstd_str_skip_to(idstd_s, idstd_i, idstd_head);
+    while (((id_charat(idstd_s, idstd_i) >= 0) && (id_str_eqat(idstd_s, idstd_i, idstd_txt) == 0))) {
+        idstd_i = id_idstd_str_skip_to(idstd_s, (idstd_i + 1), idstd_head);
+    }
+    idstd_at = idstd_i;
+    if ((id_charat(idstd_s, idstd_i) < 0)) {
         idstd_at = (0 - 1);
     }
     return idstd_at;
@@ -4554,6 +4561,13 @@ int id_idstd_str_join_sep(char* idstd_sep, long long idstd_ad, int idstd_p, int 
         idstd_q = id_idstd_str_join_put(idstd_sep, idstd_ad, idstd_p);
     }
     return idstd_q;
+}
+
+int id_idstd_str_skip_to(char* idstd_s, int idstd_i, int idstd_byte) {
+    while (((id_charat(idstd_s, idstd_i) >= 0) && (id_charat(idstd_s, idstd_i) != idstd_byte))) {
+        idstd_i = (idstd_i + 1);
+    }
+    return idstd_i;
 }
 
 void id_print_calls(void) {
@@ -17028,7 +17042,7 @@ char* id_read_name(IdList* pos) {
     return name;
 }
 
-int id_flt_exp(char* text) {
+int id_flt_lit_exp(char* text) {
     int flk;
     int fln;
     int flv;
@@ -17076,7 +17090,7 @@ int id_flt_over(char* text) {
     char* flds;
     int flov;
     int flp;
-    flraw = id_flt_mant(text);
+    flraw = id_flt_lit_mant(text);
     flds = id_flt_lstrip(flraw);
     flov = 0;
     if ((id_len(flds) > 0)) {
@@ -17123,7 +17137,7 @@ int id_flt_scale(char* text, char* flraw, char* flds) {
     int fle;
     int flp;
     fla = id_flt_ilen(text);
-    fle = id_flt_exp(text);
+    fle = id_flt_lit_exp(text);
 int idsq_8;
     flp = (idsq_8 = id_len(flraw), (((fla + fle) - idsq_8) + id_len(flds)));
     return flp;
@@ -17169,7 +17183,7 @@ void id_flt_bad_big(IdList* pos, char* text) {
     return;
 }
 
-char* id_flt_mant(char* text) {
+char* id_flt_lit_mant(char* text) {
     int flk;
     char* flm;
     char* flraw;

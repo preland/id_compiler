@@ -19,7 +19,7 @@ flt_ilen(string text) {
 // plus the exponent: 0.0125e3 is 0.125 x 10^2, so p is 2.
 flt_scale(string text, string flraw, string flds) {
   int fla = flt_ilen(text);
-  int fle = flt_exp(text);
+  int fle = flt_lit_exp(text);
   int flp = fla + fle - len(flraw) + len(flds);
 } return int flp;
 ("0.0125e3", "00125", "125"):(2)

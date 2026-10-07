@@ -2,7 +2,7 @@
 // run of digits too long to matter is clamped to a million: no mantissa is
 // long enough for it to change the answer, and to_int cannot hold more.
 
-flt_exp(string text) {
+flt_lit_exp(string text) {
   int flk = flt_e_at(text);
   int fln = len(text);
   int flv = 0;

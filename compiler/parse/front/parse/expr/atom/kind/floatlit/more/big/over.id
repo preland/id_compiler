@@ -8,7 +8,7 @@
 // a tie goes up, because DBL_MAX's last bit is odd.
 
 flt_over(string text) {
-  string flraw = flt_mant(text);
+  string flraw = flt_lit_mant(text);
   string flds = flt_lstrip(flraw);
   int flov = 0;
 } chain (string text) {

@@ -1,7 +1,7 @@
 // The digits of a float literal, and its spelling as the backends need it.
 
 // The mantissa's digits with the point taken out: "0.0125e3" is "00125".
-flt_mant(string text) {
+flt_lit_mant(string text) {
   int flk = flt_e_at(text);
   string flm = slice(text, 0, flk);
   string flraw = str_replace(flm, ".", "");
