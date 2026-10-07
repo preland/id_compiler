@@ -36,6 +36,10 @@ esc_own(int fn, string nm) {
   }
 } return int ok;
 given esc_fix ((import efc_fn), "w"):(1)
-given esc_fix ((import efc_fn), "z"):(0)
+given esc_fix ((import efc_fn), "z"):(1)
+given esc_fix ((import efb_fn), "v"):(0)
 given esc_fix ((import efb_fn), "t"):(1)
+given esc_ffix ((import eff_use), "ys"):(1)
+given esc_ffix ((import eff_bad), "r"):(0)
+given esc_ffix ((import eff_sown), "c"):(1)
 given full_env (0, "w"):(0)

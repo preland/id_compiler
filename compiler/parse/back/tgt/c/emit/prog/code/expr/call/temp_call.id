@@ -1,0 +1,33 @@
+// A call with a temporary argument (esc_tmp_free): the fresh block `f(x)` that
+// `g(f(x))` passes is held in a C variable for the call and given back after
+// it, as a GNU statement expression whose value is the call's. The arguments
+// keep their order: each temporary is evaluated first, in argument order, and
+// every other argument at the call.
+
+tmp_wrap(int id, string s) {
+  string tx_w = s;
+  if(esc_tmp_any(id) == 1) {
+    tx_w = tmp_text(id);
+  }
+} return string tx_w;
+given esc_ffix ((import eff_ctp), "id_ff_len(x)"):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
+given esc_ffix ((import eff_cmk), "id_ff_make(n)"):("id_ff_make(n)")
+
+tmp_text(int id) {
+  string tx_call = "id_" + (import ns1)[id] + "(" + tmp_all(id, 1) + ")";
+  string tx_pre = tmp_all(id, 0);
+  string tx_fr = tmp_all(id, 2);
+} chain (int id) {
+  string tx_t = tmp_join(type_of(id), tx_pre, tx_call, tx_fr);
+} return string tx_t;
+given esc_ffix ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
+given esc_ffix ((import eff_csc)):("({ char* idft0 = id_fs_ret(n); int idfr = id_ff_slen(idft0); id_str_free(idft0); idfr; })")
+
+tmp_join(string tx_rt, string tx_pre, string tx_cl, string tx_fr) {
+  string tx_j = "({ " + tx_pre + tx_cl + "; " + tx_fr + "})";
+  if(tx_rt != "void") {
+    tx_j = "({ " + tx_pre + c_type(tx_rt) + " idfr = " + tx_cl + "; " + tx_fr + "idfr; })";
+  }
+} return string tx_j;
+given full_env ("void", "T x = 1; ", "id_g(x)", "id_list_free(x); "):("({ T x = 1; id_g(x); id_list_free(x); })")
+given lc_env2 ("int", "T x = 1; ", "id_g(x)", "id_list_free(x); "):("({ T x = 1; int idfr = id_g(x); id_list_free(x); idfr; })")

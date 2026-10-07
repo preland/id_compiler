@@ -1,0 +1,22 @@
+// The runtime call that gives back a block the expression `e` made, a string
+// and a list being different blocks, and the text of a statement that does so
+// to a fresh call whose value nothing reads: `f(x);` is `id_list_free(id_f(x));`.
+
+esc_free_of(int e) {
+  string etx_fn = "id_list_free";
+  if(type_of(e) == "string") {
+    etx_fn = "id_str_free";
+  }
+} return string etx_fn;
+given esc_ffix ((import eff_cmk)):("id_list_free")
+given esc_ffix ((import eff_csr)):("id_str_free")
+
+esc_discard(int e, string code) {
+  string etx_code = code;
+  if(esc_fresh_call(e) == 1) {
+    etx_code = esc_free_of(e) + "(" + code + ")";
+  }
+} return string etx_code;
+given esc_ffix ((import eff_cmk), "id_ff_make(n)"):("id_list_free(id_ff_make(n))")
+given esc_ffix ((import eff_csr), "id_fs_ret(n)"):("id_str_free(id_fs_ret(n))")
+given esc_ffix ((import eff_cl), "id_len(ys)"):("id_len(ys)")

@@ -28,6 +28,8 @@ given esc_dfix ((import efd_good), "a"):(1)
 given esc_dfix ((import efd_leak), "b"):(0)
 given esc_dfix ((import efd_alias), "c"):(0)
 given esc_dfix ((import efd_via), "d"):(0)
+given esc_ffix ((import eff_deep), "z"):(1)
+given esc_ffix ((import eff_shallow), "y"):(0)
 
 // The runtime call that frees the list or string `nm` of function `fn` when it
 // dies.

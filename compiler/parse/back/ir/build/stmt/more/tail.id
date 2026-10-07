@@ -2,7 +2,8 @@
 ls3(int node) {
   if((import nkind)[node] == "exprstmt") {
     int i1_of_v = (import ni1)[node];
-    lw_expr(i1_of_v);
+    int ls_v = lw_expr(i1_of_v);
+    lw_discard(i1_of_v, ls_v);
   } else {
     ls4(node);
   }

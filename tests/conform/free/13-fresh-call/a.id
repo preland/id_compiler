@@ -1,0 +1,25 @@
+// A function that returns a list it made hands the caller its ownership, so the
+// caller frees what it receives like any list of its own.
+//   make   builds [n, n + 1] and returns it
+//   twice  owns two of them: both freed at the exit, 2 per call
+//   loop   owns one per pass: the one it replaced is freed on each pass after
+//          the first and the last at the exit, 4 for n = 4
+make(int n) {
+  int[] xs = [n, n + 1];
+} return int[] xs;
+
+twice(int n) {
+  int[] a = make(n);
+  int[] b = make(n + 1);
+  int t = a[0] + b[1];
+} return int t;
+
+loop(int n) {
+  int i = 0;
+  int t = 0;
+  while(i < n) {
+    int[] ys = make(i);
+    t = t + ys[1];
+    i = i + 1;
+  }
+} return int t;

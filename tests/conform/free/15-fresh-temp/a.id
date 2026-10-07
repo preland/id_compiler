@@ -1,0 +1,17 @@
+// A fresh block passed straight to a function that does not keep it is given
+// back once the call returns. lsum and width only read their argument, so the
+// list from make and the string from mk are freed after the call; hold keeps
+// its argument in an export, so the one it is handed is not.
+make(int n) {
+  int[] xs = [n, n + 1];
+} return int[] xs;
+
+mk(int n) {
+  string s = "";
+  s = s + n;
+  s = s + "x";
+} return string s;
+
+lsum(int[] q) {
+  int t = q[0] + q[1];
+} return int t;

@@ -1,0 +1,36 @@
+// Whether a function leaves early with something other than a list literal. A
+// list literal is a block the function makes at that very statement; any other
+// value (a name, a string literal) may be held by another name or not be a
+// block at all, so it takes the freshness of the whole function away.
+
+esc_early(int fn) {
+  int ee = esc_early_in((import nl2)[fn]);
+} return int ee;
+given esc_ffix ((import eff_early)):(1)
+given esc_ffix ((import eff_elit)):(0)
+
+esc_early_in(int[] stmts) {
+  int ee = 0;
+  int i = 0;
+  while(i < len(stmts)) {
+    ee = ee | esc_early_one(stmts[i]);
+    i = i + 1;
+  }
+} return int ee;
+given esc_ffix ([(import eff_rtp)]):(1)
+given esc_ffix ([(import eff_rtl)]):(0)
+given esc_ffix ([(import eff_dz), (import eff_ife)]):(1)
+
+esc_early_one(int sn) {
+  int ee = 0;
+  if((import nkind)[sn] == "ret") {
+    ee = esc_early_val(sn);
+  } else if((import nkind)[sn] == "if" || (import nkind)[sn] == "while") {
+    ee = esc_early_nest(sn);
+  }
+} return int ee;
+given esc_ffix ((import eff_rtp)):(1)
+given esc_ffix ((import eff_ife)):(1)
+given esc_ffix ((import eff_ifl)):(0)
+given esc_ffix ((import eff_dz)):(0)
+

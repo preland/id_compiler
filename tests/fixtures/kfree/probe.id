@@ -6,6 +6,7 @@ probe_freed(int pn) {
 
 probe_kept(int pm) {
   int[] pk = [pm, pm, pm, pm, pm, pm];
+  export int[] pkeep = pk;
 } return int[] pk;
 
 probe_step(int sn, int skeep) {

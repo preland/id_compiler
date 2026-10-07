@@ -1,0 +1,40 @@
+// One piece of a call with temporaries (temp_call.id), for every argument in
+// order: kind 0 the C variables that hold the temporaries, kind 1 the argument
+// list that names them, kind 2 the frees that follow the call.
+
+tmp_all(int id, int tx_kind) {
+  int[] args = (import nl1)[id];
+  string tx_all = "";
+  int i = 0;
+} chain (int id, int tx_kind) {
+  while(i < len(args)) {
+    tx_all = tx_all + tmp_one(id, i, tx_kind);
+    i = i + 1;
+  }
+} return string tx_all;
+given esc_ffix ((import eff_ctp), 0):("IdList* idft0 = id_ff_make(n); ")
+given esc_ffix ((import eff_ctp), 1):("idft0")
+given esc_ffix ((import eff_ctp), 2):("id_list_free(idft0); ")
+given esc_ffix ((import eff_cmk), 1):("n")
+
+tmp_one(int id, int i, int tx_kind) {
+  string tx_one = "";
+  if(tx_kind == 0) {
+    tx_one = tmp_decl(id, i);
+  } else {
+    tx_one = tmp_one2(id, i, tx_kind);
+  }
+} return string tx_one;
+given esc_ffix ((import eff_ctp), 0, 0):("IdList* idft0 = id_ff_make(n); ")
+given esc_ffix ((import eff_ctp), 0, 2):("id_list_free(idft0); ")
+given esc_ffix ((import eff_cmk), 0, 1):("n")
+
+tmp_one2(int id, int i, int tx_kind) {
+  string tx_two = tmp_free(id, i);
+  if(tx_kind == 1) {
+    tx_two = sep_arg(i) + tmp_arg(id, i);
+  }
+} return string tx_two;
+given esc_ffix ((import eff_ctp), 0, 1):("idft0")
+given esc_ffix ((import eff_cmk), 0, 1):("n")
+given esc_ffix ((import eff_cmk), 0, 2):("")

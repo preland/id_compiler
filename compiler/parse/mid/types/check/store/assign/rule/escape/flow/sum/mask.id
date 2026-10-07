@@ -3,13 +3,18 @@
 // something that keeps it. A clear bit is a proof that the caller may free the
 // list it passed once the call returns. Bit 15 + i is the second mask (see
 // esc_dbit): the body may read an element of that parameter out into a keeping
-// position or store a non-literal element into it. -1 is every bit, the answer
-// for anything unknown.
+// position or store a non-literal element into it. Bit 30 says the function
+// may return something that is not a block it made itself (fresh/ret.id): a
+// clear bit is a proof that the caller owns what it gets back. -1 is every
+// bit, the answer for anything unknown, and every bit set is the cautious
+// answer for all three.
 //
-// Computed on demand and remembered in esc_pe. While a function is being
-// computed its row holds -1, so a call that reaches back to it (recursion)
-// sees every parameter kept: sound, and only imprecise for the recursive
-// cycle itself.
+// Computed on demand and remembered in esc_pe, one function at a time, by
+// scc/: a function that calls itself, directly or through others, is computed
+// by repeating its body from "nothing kept, everything fresh" until no mask
+// grows, which is the least fixpoint and is sound because every bit only ever
+// turns on. While it runs, a call that reaches back to it reads its mask so
+// far.
 
 esc_mask(string cname) {
   int m = 0 - 1;
@@ -19,27 +24,31 @@ esc_mask(string cname) {
   }
 } return int m;
 given esc_fix ("fa_sink"):(32770)
-given esc_fix ("fa_loc"):(1)
+given esc_fix ("fa_loc"):(-1073741823)
 given esc_fix ("nosuch"):(-1)
+given esc_ffix ("ff_rec"):(0)
+given esc_ffix ("ff_ping"):(0)
+given esc_ffix ("ff_pong"):(0)
+given esc_ffix ("ff_bad"):(-1073741823)
 
 esc_mask_at(int ix, string cname) {
+  if((import esc_st)[ix] == 0) {
+    esc_compute(ix, cname);
+  } else {
+    esc_low(ix);
+  }
   int m = (import esc_pe)[ix];
-  if(m == 0 - 2) {
-    m = esc_compute(ix, cname);
-  }
 } return int m;
 given esc_fix (0, "fa_sink"):(32770)
-given esc_fix (1, "fa_loc"):(1)
+given esc_fix (1, "fa_loc"):(-1073741823)
 
-esc_compute(int ix, string cname) {
-  int fn = fn_node_of(cname);
-  int m = 0 - 1;
-  lset((import esc_pe), ix, m);
-} chain (int ix, string cname) {
-  if(esc_opaque(fn, cname) == 0) {
-    m = esc_params(fn);
+esc_low(int ix) {
+  int elo = (import esc_dp)[ix];
+  if((import esc_st)[ix] != 3 && elo < (import esc_fx)[1]) {
+    lset((import esc_fx), 1, elo);
   }
-  lset((import esc_pe), ix, m);
-} return int m;
-given esc_fix (0, "fa_sink"):(32770)
-given esc_fix (2, "fa_nest"):(1)
+} return void;
+given esc_scx (0, 1, 4) (0):() then (import esc_fx)[1]:(4)
+given esc_scx (0, 3, 4) (0):() then (import esc_fx)[1]:(1000000)
+given esc_scx (0, 2, 4) (0):() then (import esc_fx)[1]:(4)
+given esc_scx (0, 1, 2000000) (0):() then (import esc_fx)[1]:(1000000)

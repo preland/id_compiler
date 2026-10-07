@@ -1,0 +1,34 @@
+// After a call whose argument is a fresh block the callee does not keep
+// (esc_tmp_free), the argument's value is given back: the same free the C target
+// writes around `g(f(x))` (back/tgt/c/emit/prog/code/expr/call/temp_call.id).
+// `vals` are the arguments as lowered, in order.
+
+lw_tmp_free(int node, int[] vals) {
+  int i = 0;
+  while(i < len(vals)) {
+    lw_tmp_one(node, i, vals);
+    i = i + 1;
+  }
+} return void;
+given lwt_fixture ((import eff_ctp), [7]):() then calls lw_callf:("id_list_free", "", [7])
+given lwt_fixture ((import eff_cmk), [7]):() then calls lw_callf:[0]
+
+lw_tmp_one(int node, int i, int[] vals) {
+  int v = vals[i];
+  if(esc_tmp_free(node, i) == 1) {
+    lw_callf(esc_tmp_fn(node, i), "", [v]);
+  }
+} return void;
+given lwt_fixture ((import eff_ctp), 0, [7]):() then calls lw_callf:("id_list_free", "", [7])
+given lwt_fixture ((import eff_ctp), 1, [7, 8]):() then calls lw_callf:[0]
+given lwt_fixture ((import eff_csc), 0, [9]):() then calls lw_callf:("id_str_free", "", [9])
+
+lwt_fixture() {
+  esc_ffix();
+  int r = init_ir();
+  int f = ir_func(0 - 1, "ff_tmp", "int");
+} chain () {
+  int o = lw_open(f);
+} return void;
+():() then calls ir_func:(-1, "ff_tmp", "int")
+():() then init_units:(0)

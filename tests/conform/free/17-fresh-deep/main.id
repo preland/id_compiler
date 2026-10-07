@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  print(deep(3));
+  print(shallow(3));
+  keeprow(5);
+} chain (int argc, string[] argv) {
+  print((import held)[0]);
+} return int 0;

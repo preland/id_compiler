@@ -1,0 +1,16 @@
+// A function whose result something else holds is not fresh, and its caller
+// must not free it: ident returns its parameter, stash stores what it returns
+// in an export first, viaexp returns an export. refused reads all three
+// results and then main reads the export once more, so a free of any of them
+// would trap under the guard. Nothing is freed.
+ident(int[] p) {
+} return int[] p;
+
+stash(int n) {
+  int[] r = [n, n];
+  export int[] kept = r;
+} return int[] r;
+
+viaexp(int n) {
+  int[] g = (import kept);
+} return int[] g;

@@ -36,4 +36,4 @@ emit_decl_line(string decl_target, int decl_init_id, string ind) {
 given stmt_fix ("y", 0, "  "):() then prints:("  y = 5;\n")
 given stmt_fix ("z", 0, ""):() then prints:("z = 5;\n")
 given esc_fix ("w", (import efc_three), "  "):() then prints:("  { IdList* idfe_o = w; w = 3; id_list_free(idfe_o); }\n")
-given esc_fix ("z", (import efc_three), ""):() then prints:("z = 3;\n")
+given esc_fix ("s", (import efc_three), ""):() then prints:("s = 3;\n")

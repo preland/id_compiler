@@ -1,0 +1,19 @@
+// The types whose values a function can hand over as a block it made: a list, a
+// struct (a list at run time) and a string. Anything else -- an int, a float, a
+// function value -- is not a block the caller could free, so it never asks
+// whether the callee returned a fresh one.
+
+esc_heap_list(string t) {
+  int ok = is_list_ty(t) == 1 || find_str((import sdname), t) >= 0;
+} return int ok;
+given full_env ("int[]"):(1)
+given full_env ("int"):(0)
+given full_env ("func(int) return int[]"):(0)
+given esc_ffix ("FfPt"):(1)
+
+esc_heap_ty(string t) {
+  int ok = esc_heap_list(t) == 1 || t == "string";
+} return int ok;
+given full_env ("string"):(1)
+given full_env ("int"):(0)
+given full_env ("int[][]"):(1)

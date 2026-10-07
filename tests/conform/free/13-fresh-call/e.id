@@ -1,0 +1,4 @@
+around(int n) {
+  int[] a = tri1(n);
+  int t = len(a) + a[0];
+} return int t;

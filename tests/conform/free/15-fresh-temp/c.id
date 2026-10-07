@@ -1,0 +1,19 @@
+// lists: make's list is freed after lsum, so 1; the held one is not
+// strings: mk frees the digit string it appends (1) and width's argument is freed
+// after the call (1); lit's result is a literal and is never freed
+temps(int n) {
+  int a = lsum(make(n));
+  int b = width(mk(n));
+  int c = width(lit(n));
+} chain (int n) {
+  hold(make(n + 1));
+  int d = (import held)[1];
+  int e = a + b + c + d;
+} return int e;
+
+// A call whose value nothing reads: both results are given back, the list and
+// the string, and so is the digit string mk appended inside it. 2 per call.
+drops(int n) {
+  make(n);
+  mk(n);
+} return void;

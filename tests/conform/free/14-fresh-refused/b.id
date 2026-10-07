@@ -1,0 +1,8 @@
+refused(int n) {
+  int[] src = [n, n + 1];
+  int[] c = ident(src);
+  int[] k = stash(n);
+} chain (int n) {
+  int[] v = viaexp(n);
+  int t = c[0] + k[1] + v[0];
+} return int t;

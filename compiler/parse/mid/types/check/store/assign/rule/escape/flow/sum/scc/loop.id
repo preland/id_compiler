@@ -1,0 +1,40 @@
+// Repeating a function's body. A pass computes the summary of the body with the
+// masks as they stand and ors it into the function's own mask. Another pass is
+// needed when this function is the first of its cycle (nothing it read is
+// still running above it), some mask grew during the pass, and the pass did
+// read a running function -- itself, or one it called that waits on it.
+
+esc_iter(int ix, int fn, int esd, int emk) {
+  int eit = 1;
+  while(eit == 1) {
+    eit = esc_pass(ix, fn, esd, emk);
+  }
+} return void;
+given esc_ffo (10) (10, (import eff_bad), 0, 0):() then (import esc_pe)[10]:(-1073741823)
+given esc_ffo (4) (4, (import eff_make), 0, 0):() then (import esc_pe)[4]:(1)
+
+esc_pass(int ix, int fn, int esd, int emk) {
+  int ecg = (import esc_fx)[2];
+  lset((import esc_fx), 1, 1000000);
+  esc_join(ix, esc_summary(fn));
+} chain (int ix, int fn, int esd, int emk) {
+  int ean = esc_again(esd, emk, ecg);
+} return int ean;
+given esc_ffo (10) (10, (import eff_bad), 0, 0):(1)
+given esc_ffo (7) (7, (import eff_rec), 0, 0):(0)
+given esc_ffo (4) (4, (import eff_make), 0, 0):(0)
+
+esc_again(int esd, int emk, int ecg) {
+  int elo = (import esc_fx)[1];
+  int ean = 0;
+  if(elo >= esd && (import esc_fx)[2] != ecg && (elo == esd || len((import esc_mem)) > emk)) {
+    ean = 1;
+    esc_drain(emk, 0);
+  }
+} return int ean;
+given esc_scy (3, 5, 0) (3, 0, 4):(1)
+given esc_scy (3, 4, 0) (3, 0, 4):(0)
+given esc_scy (1000000, 5, 0) (3, 0, 4):(0)
+given esc_scy (1000000, 5, 1) (3, 0, 4):(1)
+given esc_scy (2, 5, 1) (3, 0, 4):(0)
+given esc_scy (1000000, 5, 2) (3, 0, 4):(1)

@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  print(refused(2));
+  print((import kept)[0]);
+  print(strs(3));
+} return int 0;

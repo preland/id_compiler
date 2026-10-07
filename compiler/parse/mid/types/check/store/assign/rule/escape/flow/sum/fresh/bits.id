@@ -1,0 +1,18 @@
+// Bit 30 of a function's summary says the result may be held by something else;
+// the sign bit says its elements may be (see ret.id). A result that is not fresh
+// has both.
+
+esc_nf_bits(int fn) {
+  int efr = esc_fresh_ret(fn);
+  int enb = (1 - efr) << 30;
+  int ewd = esc_deep_ok(fn);
+} chain (int fn) {
+  int enc = enb;
+  if(efr == 0 || ewd == 0) {
+    enc = enb - 2147483647 - 1;
+  }
+} return int enc;
+given esc_ffix ((import eff_rows)):(0)
+given esc_ffix ((import eff_rleak)):(-2147483648)
+given esc_ffix ((import eff_pass)):(-1073741824)
+given esc_ffix ((import eff_make)):(0)

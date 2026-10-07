@@ -1,0 +1,16 @@
+// The two halves of esc_early's walk that look into a branch or loop, and at the
+// value an early `return` carries (early.id).
+
+esc_early_nest(int sn) {
+  int ee = esc_early_in((import nl1)[sn]) | esc_early_in((import nl2)[sn]);
+} return int ee;
+given esc_ffix ((import eff_ife)):(1)
+given esc_ffix ((import eff_ifl)):(0)
+given esc_ffix ((import eff_ifb)):(0)
+
+esc_early_val(int sn) {
+  int ee = (import ni1)[sn] >= 0 && (import nkind)[((import ni1)[sn])] != "arr";
+} return int ee;
+given esc_ffix ((import eff_rtp)):(1)
+given esc_ffix ((import eff_rtl)):(0)
+given esc_ffix ((import efb_ret0)):(0)

@@ -9,12 +9,14 @@
 
 ec4(int id) {
   string s = emit_gcall(id);
+  s = tmp_wrap(id, s);
   if((import ns1)[id] == "pop") {
     s = emit_pop(id);
   }
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
 given call_names_fixture2 ((import call_e_pop)):("(IdList*)(intptr_t)(id_list_pop(4))")
+given esc_ffix ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
 
 emit_pop(int id) {
   int arg = (import nl1)[id][0];

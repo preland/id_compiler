@@ -1,0 +1,35 @@
+// Whether the elements of what a function returns are its alone: its return
+// clause is a list of list literals, or a name that is deep-owned
+// (escape/deep/own.id), so that nothing else holds an element. A result whose
+// type has no lists to own is vacuously fine (esc_deep_ok).
+
+esc_deep_ret(int fn) {
+  int e = (import ni1)[fn];
+  int ok = 0;
+  if(e >= 0) {
+    ok = esc_deep_val(fn, e);
+  }
+} return int ok;
+given esc_ffix ((import eff_rows)):(1)
+given esc_ffix ((import eff_rleak)):(0)
+given esc_ffix ((import eff_make)):(0)
+
+esc_deep_val(int fn, int e) {
+  int ok = 0;
+  if((import nkind)[e] == "arr") {
+    ok = esc_litels((import nl1)[e]) == 0;
+  } else if((import nkind)[e] == "var") {
+    ok = esc_deep(fn, (import ns1)[e]);
+  }
+} return int ok;
+given esc_ffix ((import eff_rows), (import eff_rl)):(1)
+given esc_ffix ((import eff_rows), (import eff_vr)):(0)
+given esc_ffix ((import eff_rows), (import eff_vn)):(0)
+given esc_ffix ((import eff_rows), (import eff_rlb)):(1)
+
+esc_deep_ok(int fn) {
+  int ok = esc_deep_ty((import ns2)[fn]) == 0 || esc_deep_ret(fn) == 1;
+} return int ok;
+given esc_ffix ((import eff_make)):(1)
+given esc_ffix ((import eff_rows)):(1)
+given esc_ffix ((import eff_rleak)):(0)

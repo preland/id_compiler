@@ -1,0 +1,12 @@
+// The same for a string: sid returns its parameter, so what strs gets back is
+// base itself, and neither name is freed (the digit string `"b" + n` consumed
+// is the one string freed). A free of either would make the length read below
+// a trap under the guard.
+sid(string sp) {
+} return string sp;
+
+strs(int n) {
+  string sx_base = "b" + n;
+  string sx_back = sid(sx_base);
+  int sx_len = len(sx_back) + len(sx_base);
+} return int sx_len;

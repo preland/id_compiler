@@ -1,0 +1,17 @@
+// Whether a call has a temporary to give back: some argument for which
+// esc_tmp_free says so. The backends ask it first, so a call without one is
+// emitted exactly as before.
+
+esc_tmp_any(int etc_node) {
+  int[] args = (import nl1)[etc_node];
+  int eta = 0;
+  int i = 0;
+} chain (int etc_node) {
+  while(i < len(args)) {
+    eta = eta | esc_tmp_free(etc_node, i);
+    i = i + 1;
+  }
+} return int eta;
+given esc_ffix ((import eff_ctp)):(1)
+given esc_ffix ((import eff_cmk)):(0)
+given esc_ffix ((import eff_cbad)):(0)

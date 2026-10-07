@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  print(use(3));
+  print((import held).y);
+} return int 0;

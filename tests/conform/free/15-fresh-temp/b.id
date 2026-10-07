@@ -1,0 +1,14 @@
+width(string qs) {
+  int l = len(qs);
+} return int l;
+
+hold(int[] q) {
+  export int[] held = q;
+} return void;
+
+lit(int n) {
+  string s = "lit";
+  if(n > 9) {
+    s = "other";
+  }
+} return string s;

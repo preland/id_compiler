@@ -1,0 +1,66 @@
+// The assembly of the "returns fresh" fixture (a.id describes the program): the
+// struct FfPt, every function registered by name in the order the cases index
+// them (ff_make is row 4, after fa_sink, fa_loc, fa_nest and fs_ret), the
+// summaries seeded again for the new rows, and ff_use left as the function
+// whose body is being emitted.
+
+esc_ff_reg() {
+  sd_note("FfPt", ["x"], ["int"], "ff.id", 1);
+  add_func("fs_ret", "string", (import efs_ret));
+  add_func("ff_make", "int[]", (import eff_make));
+} chain () {
+  add_func("ff_pass", "int[]", (import eff_pass));
+  add_func("ff_glob", "int[]", (import eff_glob));
+  add_func("ff_rec", "int[]", (import eff_rec));
+} chain () {
+  add_func("ff_ping", "int[]", (import eff_ping));
+  add_func("ff_pong", "int[]", (import eff_pong));
+  add_func("ff_bad", "int[]", (import eff_bad));
+} chain () {
+  add_func("ff_len", "int", (import eff_len));
+  add_func("ff_tmp", "int", (import eff_tmp));
+  add_func("ff_pt", "FfPt", (import eff_pt));
+} chain () {
+  add_func("ff_slen", "int", (import eff_slen));
+  add_func("ff_rows", "int[][]", (import eff_rows));
+  add_func("ff_rleak", "int[][]", (import eff_rleak));
+} return void;
+given esc_ffix ():() then (import chkfail)[0]:(0)
+given esc_ffix ():() then init_units:(0)
+
+esc_ffix() {
+  esc_sfix();
+  esc_ff_a();
+  esc_ff_b();
+} chain () {
+  esc_ff_c();
+  esc_ff_d();
+  esc_ff_e();
+} chain () {
+  esc_ff_f();
+  esc_ff_g();
+  esc_ff_h();
+} chain () {
+  esc_ff_i();
+  esc_ff_reg();
+  esc_seed();
+} chain () {
+  init_tyc();
+  lset((import sqbase), 0, (import eff_use));
+} return void;
+():() then calls esc_sfix:[1]
+():() then init_units:(0)
+
+esc_ff_d() {
+  export int eff_vp = node_var("p");
+  export int eff_sbp = node_assign("r", (import eff_vp));
+  export int eff_cbad = node_call("ff_bad", [(import eff_vp), (import eff_sub)]);
+} chain () {
+  export int eff_asb = node_assign("r", (import eff_cbad));
+  export int eff_ifb = node_if((import eff_cond), [(import eff_asb)], [(import eff_sbp)], 0);
+  export int[] eff_bp = [node_param("param", "int[]", "p"), node_param("param", "int", "n")];
+} chain () {
+  export int eff_bad = node_func("ff_bad", "int[]", (import eff_bp), [(import eff_d0), (import eff_ifb)], (import eff_vr));
+} return void;
+given esc_ffix ():() then (import chkfail)[0]:(0)
+given esc_ffix ():() then init_units:(0)

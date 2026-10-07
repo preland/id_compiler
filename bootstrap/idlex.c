@@ -1349,10 +1349,10 @@ char* id_pad10(char* s) {
 }
 
 void id_print_uint(long long v) {
-    char* text;
-    text = id_udec(v);
+    char* text = NULL;
+    { char* idfe_o = text; text = id_udec(v); id_str_free(idfe_o); }
     id_print(id_concat(ID_S("int "), text));
-    return;
+    { id_str_free(text); return; }
 }
 
 int id_is_hex(int c) {
@@ -1463,14 +1463,14 @@ char* id_one_at(char* src, int i) {
 }
 
 void id_scan_op_out(char* src, int i, char* two) {
-    char* one;
-    one = id_one_at(src, i);
+    char* one = NULL;
+    { char* idfe_o = one; one = id_one_at(src, i); id_str_free(idfe_o); }
     if (id_is_two_op(two)) {
         id_print(id_concat(ID_S("op "), two));
     } else {
         id_print(id_concat(ID_S("op "), one));
     }
-    return;
+    { id_str_free(one); return; }
 }
 
 int id_is_two_op(char* two) {
@@ -1484,22 +1484,22 @@ int id_is_two_op(char* two) {
 
 int id_oplen(char* src, int i) {
     int n;
-    char* two;
+    char* two = NULL;
     n = 1;
-    two = id_two_at(src, i);
+    { char* idfe_o = two; two = id_two_at(src, i); id_str_free(idfe_o); }
     if (id_is_two_op(two)) {
         n = 2;
     }
-    return n;
+    { id_str_free(two); return n; }
 }
 
 int id_scan_op(char* src, int i) {
-    char* two;
+    char* two = NULL;
     int ret_i;
-    two = id_two_at(src, i);
+    { char* idfe_o = two; two = id_two_at(src, i); id_str_free(idfe_o); }
     id_scan_op_out(src, i, two);
     ret_i = (i + id_oplen(src, i));
-    return ret_i;
+    { id_str_free(two); return ret_i; }
 }
 
 void id_scan_ident_out(char* ident) {
@@ -1511,27 +1511,27 @@ void id_scan_ident_out(char* ident) {
 
 void id_scan_num_out(char* src, int i, int e, int fe) {
     char* kind;
-    char* text;
+    char* text = NULL;
     kind = id_numkind(e, fe);
-    text = id_slice_str(src, i, fe);
+    { char* idfe_o = text; text = id_slice_str(src, i, fe); id_str_free(idfe_o); }
     id_print(id_concat_f(id_concat(kind, ID_S(" ")), text, 1));
-    return;
+    { id_str_free(text); return; }
 }
 
 void id_scan_str_out(char* src, int i, int e) {
     char* q = NULL;
-    char* text;
+    char* text = NULL;
     { char* idfe_o = q; q = id_chr(34); id_str_free(idfe_o); }
-    text = id_slice_str(src, i, e);
+    { char* idfe_o = text; text = id_slice_str(src, i, e); id_str_free(idfe_o); }
     id_print(id_concat_f(id_concat_f(id_concat(ID_S("str "), q), text, 1), q, 1));
-    { id_str_free(q); return; }
+    { id_str_free(q); id_str_free(text); return; }
 }
 
 void id_scan_hash_out(char* src, int i, int e) {
-    char* text;
-    text = id_slice_str(src, (i + 1), e);
+    char* text = NULL;
+    { char* idfe_o = text; text = id_slice_str(src, (i + 1), e); id_str_free(idfe_o); }
     id_print(text);
-    return;
+    { id_str_free(text); return; }
 }
 
 int id_is_shebang(char* src, int i) {
@@ -1580,10 +1580,10 @@ int id_adv_str(char* src, int i) {
 }
 
 char* id_slice_str(char* src, int a, int b) {
-    char* out;
-    out = ID_S("");
+    char* out = NULL;
+    { char* idfe_o = out; out = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((a < b)) {
-        out = id_str_slice(src, a, (b - a));
+        { char* idfe_o = out; out = id_str_slice(src, a, (b - a)); id_str_free(idfe_o); }
     }
     return out;
 }

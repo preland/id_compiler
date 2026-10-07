@@ -1,0 +1,35 @@
+// A fresh block passed straight to a function that does not keep it, as in
+// `g(f(x))`: nothing names it, so once the call returns it is dead and the
+// caller gives it back. Both questions are the summaries' (flow/sum/): the
+// argument is a fresh call or constructor (esc_fresh_node), and the callee is
+// a function of the program whose bit for that parameter is clear. A builtin,
+// a native, a call through a function value and a constructor all keep, or are
+// not asked.
+
+esc_tmp_free(int etc_node, int i) {
+  int[] args = (import nl1)[etc_node];
+  int ok = 0;
+  if(esc_on() == 1 && (import nkind)[etc_node] == "call" && is_builtin((import ns1)[etc_node]) == 0 && i < len(args)) {
+    ok = esc_tmp_arg(etc_node, args[i], i);
+  }
+} return int ok;
+given esc_ffix ((import eff_ctp), 0):(1)
+given esc_ffix ((import eff_ctp), 1):(0)
+given esc_ffix ((import eff_cl), 0):(0)
+given esc_ffix ((import eff_cbad), 0):(0)
+
+esc_tmp_arg(int etc_node, int a, int i) {
+  int m = esc_mask((import ns1)[etc_node]);
+  int ok = esc_bit(m, i) == 0 && esc_fresh_node(a) == 1;
+} return int ok;
+given esc_ffix ((import eff_ctp), (import eff_cmk), 0):(1)
+given esc_ffix ((import eff_ctp), (import eff_vn), 0):(0)
+given esc_ffix ((import eff_cbad), (import eff_cmk), 0):(0)
+
+// The runtime call that gives back the temporary argument `i` of a call.
+esc_tmp_fn(int etc_node, int i) {
+  int[] args = (import nl1)[etc_node];
+  string etx_fn = esc_free_of(args[i]);
+} return string etx_fn;
+given esc_ffix ((import eff_ctp), 0):("id_list_free")
+given esc_ffix ((import eff_csc), 0):("id_str_free")

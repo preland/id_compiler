@@ -32,4 +32,5 @@ esc_init_code(string nm) {
   }
 } return string s;
 given esc_fix ("w"):(" = NULL")
-given esc_fix ("z"):("")
+given esc_fix ("s"):("")
+given esc_fix ("z"):(" = NULL")

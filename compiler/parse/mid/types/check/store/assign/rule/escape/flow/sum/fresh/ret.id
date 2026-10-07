@@ -1,0 +1,51 @@
+// The "returns fresh" bits of a summary. Bit 30 is set when the function may
+// hand back a block that something else holds: a parameter, a block it stored
+// in an export or a list, a literal string. It is clear when every path
+// returns a block this very call made and nothing else names, which is what
+// lets a caller own the result (`ys = f()`). Bit 31, the sign, is set unless
+// the elements are the result's alone as well (esc_deep_ret), which is what
+// lets a caller free a list of lists with them. Only a function that returns a
+// list, a struct or a string has the question asked; for any other return type
+// both bits are clear and mean nothing.
+//
+// A function is fresh when its return clause is a list literal, or a name this
+// function owns (own/query.id, with the return clause itself not counted as a
+// use), and every early `return` hands back a list literal. An owned string
+// holds heap copies only (own/str/), so the same test serves strings.
+
+esc_nf(int fn) {
+  int enf = 0;
+  if(esc_heap_ty((import ns2)[fn]) == 1) {
+    enf = esc_nf_bits(fn);
+  }
+} return int enf;
+given esc_ffix ((import eff_pass)):(-1073741824)
+given esc_ffix ((import eff_make)):(0)
+given esc_ffix ((import eff_rleak)):(-2147483648)
+given esc_ffix ((import eff_use)):(0)
+given esc_ffix ((import eff_rows)):(0)
+
+esc_fresh_ret(int fn) {
+  int e = (import ni1)[fn];
+  int ok = 0;
+  if(e >= 0 && esc_early(fn) == 0) {
+    ok = esc_fresh_val(fn, e);
+  }
+} return int ok;
+given esc_ffix ((import eff_make)):(1)
+given esc_ffix ((import eff_early)):(0)
+given esc_ffix ((import eff_elit)):(1)
+given esc_ffix ((import eff_use)):(0)
+
+esc_fresh_val(int fn, int e) {
+  int ok = 0;
+  if((import nkind)[e] == "arr") {
+    ok = 1;
+  } else if((import nkind)[e] == "var") {
+    ok = esc_own(fn, (import ns1)[e]);
+  }
+} return int ok;
+given esc_ffix ((import eff_make), (import eff_vr)):(1)
+given esc_ffix ((import eff_make), (import eff_vn)):(0)
+given esc_ffix ((import eff_glob), (import eff_vr)):(0)
+given esc_ffix ((import eff_make), (import eff_arr)):(1)

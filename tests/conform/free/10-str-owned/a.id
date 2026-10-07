@@ -5,6 +5,7 @@
 //   count  frees the digit string, then t at the exit: 2 per call
 //   over   (b.id) frees the digit string, the old u when `n + u` replaces it, and
 //          u at the exit: 3 per call
+//   main   owns the string build returns, freed at its exit: 1
 build(int n) {
   string s = "";
   int i = 0;

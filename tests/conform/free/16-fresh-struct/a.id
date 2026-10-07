@@ -1,0 +1,16 @@
+// A struct is a list at run time, and one a function builds and returns is
+// fresh like any list: mk's caller owns it. dist only reads its argument, so
+// the struct from mk in `dist(mk(n))` is freed after the call; keep stores its
+// argument in an export, so the one it is handed is not, and same returns its
+// parameter, so its caller does not own what it gets back. Freed: the
+// temporary and b in use, 2 per call.
+mk(int n) {
+  Pt p = Pt(n, n + 1);
+} return Pt p;
+
+dist(Pt q) {
+  int d = q.x + q.y;
+} return int d;
+
+same(Pt s) {
+} return Pt s;

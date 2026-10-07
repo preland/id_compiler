@@ -18,7 +18,7 @@ hoist_decl_line(string hoist_ty_name, string hoist_var_name) {
 } return void;
 given tyc_fix ("int", "y"):() then prints:("    int y;\n")
 given esc_fix ("int[]", "w"):() then prints:("    IdList* w = NULL;\n")
-given esc_fix ("int[]", "z"):() then prints:("    IdList* z;\n")
+given esc_fix ("int[]", "s"):() then prints:("    IdList* s;\n")
 given tyc_fix ("int", "z"):() then prints:("    int z;\n")
 
 // A sequencing temporary's name (../../expr/atom/order/): idsq_ and the

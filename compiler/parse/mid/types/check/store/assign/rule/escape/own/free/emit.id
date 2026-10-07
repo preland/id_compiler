@@ -34,7 +34,8 @@ esc_store_code(string nm, string code, int e) {
 } return string s;
 given esc_fix ("w", "v", (import efc_y)):("{ IdList* idfe_o = w; w = v; id_list_free(idfe_o); }")
 given esc_dfix ("a", "v", (import efc_y)):("{ IdList* idfe_o = a; a = v; id_list_free_deep(idfe_o); }")
-given esc_fix ("z", "v", (import efc_y)):("z = v;")
+given esc_fix ("s", "v", (import efc_y)):("s = v;")
+given esc_fix ("z", "v", (import efc_y)):("{ IdList* idfe_o = z; z = v; id_list_free(idfe_o); }")
 given full_env ("w", "v", 0):("w = v;")
 given esc_sfix ("s", "v", (import efs_sum)):("{ char* idfe_o = s; s = v; id_str_free(idfe_o); }")
 given esc_sfix ("s", "ID_S(\"\")", (import efs_lit0)):("{ char* idfe_o = s; s = id_str_dup(ID_S(\"\")); id_str_free(idfe_o); }")

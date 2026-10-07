@@ -1,0 +1,17 @@
+// deep frees the list and its three rows, 4; shallow only the list, 1; keeprow
+// reads a row into an export, so only the list again, 1. The row the export
+// holds is read at the end of main, under the guard.
+deep(int n) {
+  int[][] z = rows(n);
+  int s = len(z) + z[0][0] + z[1][0];
+} return int s;
+
+shallow(int n) {
+  int[][] y = leaky(n);
+  int t = len(y);
+} return int t;
+
+keeprow(int n) {
+  int[][] w = rows(n);
+  export int[] held = w[0];
+} return void;

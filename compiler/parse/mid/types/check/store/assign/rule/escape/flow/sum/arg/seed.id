@@ -1,11 +1,23 @@
-// The summaries are a table parallel to fnames, one int per function: -2 not
-// computed yet, otherwise the mask (../mask.id). The table stays empty until
-// a backend seeds it, and an empty table is how every query learns the
-// analysis is off -- so a test case that never seeds it sees no freeing at all.
+// The summaries are tables parallel to fnames, one int per function: esc_pe
+// holds the mask (../mask.id), esc_st how far its computation has got (0 not
+// started, 1 running, 2 finished but waiting on a function that is still
+// running, 3 final) and esc_dp the depth it ran at, or the shallowest running
+// function it was found to wait on (../scc/). esc_mem lists the functions
+// waiting, and esc_fx holds the depth now, the shallowest running function
+// the pass in progress has read, and how many masks have grown. The tables
+// stay empty until a backend seeds them, and an empty esc_pe is how every
+// query learns the analysis is off -- so a test case that never seeds it sees
+// no freeing at all.
 
 esc_init() {
   export int[] esc_pe = [];
+  export int[] esc_st = [];
+  export int[] esc_dp = [];
+} chain () {
+  export int[] esc_mem = [];
+  export int[] esc_fx = [0, 1000000, 0];
   export int[] purenode = [];
+} chain () {
   export int[] esc_cons = [0 - 1];
 } return void;
 ():() then esc_on:(0)
@@ -13,10 +25,14 @@ given esc_fix ():() then esc_on:(0)
 
 esc_seed() {
   while(len((import esc_pe)) < len((import fnames))) {
-    push((import esc_pe), 0 - 2);
+    push((import esc_pe), 0);
+    push((import esc_st), 0);
+    push((import esc_dp), 0);
   }
 } return void;
 given esc_fix ():() then esc_on:(1)
+given esc_fix ():() then len((import esc_st)):(3)
+given esc_fix ():() then len((import esc_dp)):(3)
 given full_env ():() then esc_on:(0)
 
 // A backend that walks function bodies tells the analysis which function it is

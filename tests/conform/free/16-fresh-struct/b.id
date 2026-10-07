@@ -1,0 +1,13 @@
+keep(Pt k) {
+  export Pt held = k;
+} return void;
+
+use(int n) {
+  int a = dist(mk(n));
+  Pt b = mk(n + 2);
+  int c = b.y;
+} chain (int n) {
+  keep(mk(n));
+  Pt e = same((import held));
+  int t = a + c + e.x;
+} return int t;

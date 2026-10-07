@@ -195,7 +195,7 @@ fi
 # -- the runtime gives lists back --------------------------------------------
 # docs/MEMORY.md 2a: every target frees the same allocations, and here that is
 # the runtime's free lists. fixtures/kfree builds a thousand lists the compiler
-# frees and a thousand it cannot (each is returned), and prints how far the
+# frees and a thousand it cannot (each is stored in an export), and prints how far the
 # arena's high-water mark moved for each. Freed lists reuse their blocks, so
 # that mark barely moves; kept ones each take fresh memory.
 KFREE="$TMP/kfree"

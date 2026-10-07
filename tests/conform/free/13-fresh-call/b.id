@@ -1,0 +1,25 @@
+// Recursion does not hide freshness. build returns what it gets from itself
+// with one more cell, so it is fresh only if the call graph is solved as a
+// whole; ping and pong return each other's result. Each level frees the list
+// its own call replaced: build(3) frees 3, ping(3) frees 3.
+build(int n) {
+  int[] r = [];
+  if(n > 0) {
+    r = build(n - 1);
+    push(r, n);
+  }
+} return int[] r;
+
+ping(int n) {
+  int[] r = [n];
+  if(n > 0) {
+    r = pong(n - 1);
+  }
+} return int[] r;
+
+pong(int n) {
+  int[] r = [n + 100];
+  if(n > 0) {
+    r = ping(n - 1);
+  }
+} return int[] r;

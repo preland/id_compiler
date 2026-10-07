@@ -1,0 +1,7 @@
+// chains owns what build and ping return: 3 + 3 inside them, then both at the
+// exit, 8 in all.
+chains(int n) {
+  int[] a = build(n);
+  int[] b = ping(n);
+  int t = len(a) + len(b) + b[0];
+} return int t;

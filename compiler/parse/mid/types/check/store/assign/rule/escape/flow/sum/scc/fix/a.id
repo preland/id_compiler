@@ -1,0 +1,38 @@
+// The states the cases of scc/ start from, on top of esc_fix's three functions
+// (own/type/fix/) or esc_ffix's (fresh/fix/).
+//
+//   esc_scx(i, s, d)       function i is in state s at depth d
+//   esc_scy(lo, ch, mn)    the pass in progress has read down to depth lo and
+//                          seen ch masks grow, and mn functions (numbered 0 to
+//                          mn - 1) are waiting
+//   esc_ffo(i)             esc_ffix with function i running at depth 0
+
+esc_scx(int sx_i, int sx_s, int sx_d) {
+  esc_fix();
+  lset((import esc_st), sx_i, sx_s);
+  lset((import esc_dp), sx_i, sx_d);
+} return void;
+(1, 2, 3):() then (import esc_st)[1]:(2)
+(1, 2, 3):() then (import esc_dp)[1]:(3)
+
+esc_scy(int sy_lo, int sy_ch, int sy_mn) {
+  esc_fix();
+  lset((import esc_fx), 1, sy_lo);
+  lset((import esc_fx), 2, sy_ch);
+} chain (int sy_lo, int sy_ch, int sy_mn) {
+  int sy_i = 0;
+  while(sy_i < sy_mn) {
+    push((import esc_mem), sy_i);
+    sy_i = sy_i + 1;
+  }
+} return void;
+(1000000, 0, 0):() then (import esc_fx)[1]:(1000000)
+(5, 7, 2):() then len((import esc_mem)):(2)
+(5, 7, 0):() then (import esc_fx)[2]:(7)
+
+esc_ffo(int fo_i) {
+  esc_ffix();
+  esc_open(fo_i, 0);
+} return void;
+(3):() then (import esc_st)[3]:(1)
+(4):() then (import esc_fx)[0]:(1)

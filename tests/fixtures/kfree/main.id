@@ -1,6 +1,6 @@
 // A freestanding program that measures what the runtime's free lists give back:
 // the arena's high-water mark after a thousand lists the compiler frees, and
-// after a thousand it cannot (each one is returned, so it is kept). It stands
+// after a thousand it cannot (each one is stored in an export, so it is kept). It stands
 // in for a kernel only as far as boot.S needs: id_main to run, and the id_kpanic
 // that isr.S names.
 main(int argc, string[] argv) {

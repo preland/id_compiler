@@ -1,0 +1,39 @@
+// The list-of-lists part of the "returns fresh" program (a.id describes the
+// rest):
+//
+//   ff_rows    { int[][] a = [[n], []]; push(a, []); }            return a   fresh, owns its rows
+//   ff_rleak   { int[][] b = [[n]]; int[] r = b[0]; }             return b   fresh, a row is read out
+//   ff_deep    { int[][] z = ff_rows(n); }                        return n   owns z and its rows
+//   ff_shallow { int[][] y = ff_rleak(n); }                       return n   owns y, not its rows
+
+esc_ff_h() {
+  export int eff_row1 = node_arr([(import eff_vn)]);
+  export int eff_row2 = node_arr((import ef_none));
+  export int eff_rl = node_arr([(import eff_row1), (import eff_row2)]);
+} chain () {
+  export int eff_ra = node_decl("int[][]", "a", (import eff_rl), 0);
+  export int eff_pa = node_call("push", [node_var("a"), (import eff_row2)]);
+  export int eff_pas = node_exprstmt((import eff_pa));
+} chain () {
+  export int eff_rows = node_func("ff_rows", "int[][]", (import eff_np), [(import eff_ra), (import eff_pas)], node_var("a"));
+  export int eff_rlb = node_arr([(import eff_row1)]);
+  export int eff_rdb = node_decl("int[][]", "b", (import eff_rlb), 0);
+} return void;
+given esc_ffix ():() then (import chkfail)[0]:(0)
+given esc_ffix ():() then init_units:(0)
+
+esc_ff_i() {
+  export int eff_bi = node_index(node_var("b"), node_int("0", 0, 0));
+  export int eff_dbr = node_decl("int[]", "r", (import eff_bi), 0);
+  export int eff_rleak = node_func("ff_rleak", "int[][]", (import eff_np), [(import eff_rdb), (import eff_dbr)], node_var("b"));
+} chain () {
+  export int eff_crows = node_call("ff_rows", [(import eff_vn)]);
+  export int eff_ddz = node_decl("int[][]", "z", (import eff_crows), 0);
+  export int eff_deep = node_func("ff_deep", "int", (import eff_np), [(import eff_ddz)], (import eff_vn));
+} chain () {
+  export int eff_cleak = node_call("ff_rleak", [(import eff_vn)]);
+  export int eff_dsy = node_decl("int[][]", "y", (import eff_cleak), 0);
+  export int eff_shallow = node_func("ff_shallow", "int", (import eff_np), [(import eff_dsy)], (import eff_vn));
+} return void;
+given esc_ffix ():() then (import chkfail)[0]:(0)
+given esc_ffix ():() then init_units:(0)

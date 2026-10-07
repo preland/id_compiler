@@ -1,0 +1,13 @@
+// A list of lists a function builds from list literals owns its rows, and
+// returning it hands the caller the rows too: rows is fresh all the way down,
+// leaky is fresh but has read one of its rows out into a name, so the caller
+// may own the list and not what is in it.
+rows(int n) {
+  int[][] a = [[n], [n + 1]];
+  push(a, []);
+} return int[][] a;
+
+leaky(int n) {
+  int[][] b = [[n]];
+  int[] r = b[0];
+} return int[][] b;

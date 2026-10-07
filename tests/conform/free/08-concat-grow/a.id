@@ -2,7 +2,7 @@
 // 3 grows past its size class, then past the 16 KB pool limit into a malloc'd
 // block, and keeps its first bytes. The two named strings are never touched.
 // Freed: the digit strings on the right of the first and last `+` in grow, and
-// three of the ones probe makes, five in all.
+// three of the ones probe makes, and x, which main owns, six in all.
 rep(string s, int n) {
   string r = s;
   int i = 0;

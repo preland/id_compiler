@@ -18,7 +18,7 @@ given lw_fix_bin ((import fix_bin_n), "word", "int"):(5)
 
 // lw_alloca's slots in a function the escape analysis has summarised, so the
 // free hooks have something to decide about: an owned list (w, twice, as a name
-// declared in both arms of an if gets two slots) and a returned one (z).
+// declared in both arms of an if gets two slots) and a parameter (s).
 lwo_fixture() {
   esc_fix();
   int r = init_ir();
@@ -26,7 +26,7 @@ lwo_fixture() {
 } chain () {
   int o = lw_open(f);
   export int lwo_w = lw_alloca("int[]", "w");
-  export int lwo_z = lw_alloca("int[]", "z");
+  export int lwo_z = lw_alloca("int[]", "s");
 } chain () {
   export int lwo_w2 = lw_alloca("int[]", "w");
   export int lwo_ent = (import lwent)[0];

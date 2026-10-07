@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  print(temps(4));
+  drops(1);
+} return int 0;

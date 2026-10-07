@@ -1,0 +1,23 @@
+// A cycle of three, entered at the first: nothing in it is fresh until the
+// whole cycle is solved, and each function frees the list its own call
+// replaced, 3 in all for tri1(3), and `around` (e.id) owns the result, 1 more.
+tri1(int n) {
+  int[] r = [n];
+  if(n > 0) {
+    r = tri2(n - 1);
+  }
+} return int[] r;
+
+tri2(int n) {
+  int[] r = [n + 10];
+  if(n > 0) {
+    r = tri3(n - 1);
+  }
+} return int[] r;
+
+tri3(int n) {
+  int[] r = [n * 2];
+  if(n > 0) {
+    r = tri1(n - 1);
+  }
+} return int[] r;

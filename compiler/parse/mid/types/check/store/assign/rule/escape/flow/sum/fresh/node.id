@@ -1,0 +1,19 @@
+// A value that is a block made at this very expression: a struct constructor
+// (a list literal at run time), or a call of a function that returns fresh.
+
+esc_fresh_node(int e) {
+  int ok = esc_fresh_call(e);
+  if(esc_ctor(e) == 1) {
+    ok = 1;
+  }
+} return int ok;
+given esc_ffix ((import eff_cmk)):(1)
+given esc_ffix ((import eff_cbad)):(0)
+given esc_ffix ((import eff_ctor)):(1)
+
+esc_ctor(int e) {
+  int ok = (import nkind)[e] == "call" && find_str((import sdname), (import ns1)[e]) >= 0;
+} return int ok;
+given esc_ffix ((import eff_ctor)):(1)
+given esc_ffix ((import eff_cmk)):(0)
+given esc_ffix ((import eff_vn)):(0)
