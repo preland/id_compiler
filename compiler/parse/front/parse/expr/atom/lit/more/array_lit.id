@@ -10,15 +10,17 @@ given atom_tokens ([7]):(3)
 given atom_tokens ([34]):(1)
 
 scan_elems(int[] pos, int[] elems) {
+  int se_ln = cur_ln(pos);
   advance(pos);
   fill_elems(pos, elems);
-  advance(pos);
+} chain (int[] pos, int[] elems) {
+  close_bracket(pos, "]", se_ln);
 } return void;
 given atom_tokens ([7], []):([14], [0, 1, 2])
 given atom_tokens ([34], []):([37], [0])
 
 fill_elems(int[] pos, int[] elems) {
-  while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
+  while(cur_text(pos) != "]" && cur_text(pos) != ";" && cur_kind(pos) != "eof") {
     int parse_expr_v = parse_expr(pos);
     push(elems, parse_expr_v);
     skip_comma(pos);

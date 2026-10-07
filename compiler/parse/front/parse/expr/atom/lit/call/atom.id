@@ -25,9 +25,11 @@ given atom_tokens ("g", [19]):(1)
 
 // consume '(' args ')', pushing each argument node id onto `args`
 scan_args(int[] pos, int[] args) {
+  int sa_ln = cur_ln(pos);
   advance(pos);
   fill_args(pos, args);
-  advance(pos);
+} chain (int[] pos, int[] args) {
+  close_bracket(pos, ")", sa_ln);
 } return void;
 given atom_tokens ([1], []):([6], [0, 1])
 given atom_tokens ([19], []):([23], [0])

@@ -1,0 +1,12 @@
+// Consume the `)` or `]` that closes a bracket opened on line OPEN_LN. When
+// the token is anything else the bracket is unclosed: the cursor stays put, so
+// the statement ends where it ends instead of swallowing the token after it.
+close_bracket(int[] pos, string cb_close, int open_ln) {
+  if(cur_text(pos) == cb_close) {
+    advance(pos);
+  } else {
+    syn_unclosed(pos, cb_close, open_ln);
+  }
+} return void;
+given close_fix ([0], ")", 1):([1])
+given mk_two_toks ([0], ")", 1):([0]) then (import chkfail)[0]:(1)

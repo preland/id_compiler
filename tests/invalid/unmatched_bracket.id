@@ -1,0 +1,4 @@
+// EXPECT: unmatched ']' [E0106]
+main(int argc, string[] argv) {
+  int[] xs = [1, 2]];
+} return int 0;

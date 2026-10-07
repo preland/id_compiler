@@ -9,8 +9,7 @@
 no_op_atom(int[] pos) {
   if(cur_kind(pos) == "op") {
     string cur_text_v = cur_text(pos);
-    string unexpected_msg_v = unexpected_msg(cur_text_v);
-    syn_unexpected(pos, cur_text_v, unexpected_msg_v);
+    op_atom_diag(pos, cur_text_v);
   }
 } return void;
 given mk_two_toks ([0]):() then (import chkfail)[0]:(1) then prints:("<stdin>:1: error: unexpected token '=' [E0102]\n  at: =\n  why: an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type\n  help: write an operand where '=' is, or remove it; a missing operand just before it is the usual cause\n")

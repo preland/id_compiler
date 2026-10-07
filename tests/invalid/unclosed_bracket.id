@@ -1,0 +1,5 @@
+// EXPECT: unclosed '[': expected ']', found ';' [E0105]
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3];
+  int x = xs[1;
+} return int x;

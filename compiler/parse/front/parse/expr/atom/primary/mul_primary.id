@@ -21,9 +21,11 @@ given paren_tokens ([0]):(2)
 given expr_tokens ([0]):(0)
 
 parse_paren(int[] pos) {
+  int pp_ln = cur_ln(pos);
   advance(pos);
   int e = parse_expr(pos);
-  advance(pos);
+} chain (int[] pos) {
+  close_bracket(pos, ")", pp_ln);
 } return int e;
 given paren_tokens ([0]):(2)
 given decl_tokens ([1]):(0)

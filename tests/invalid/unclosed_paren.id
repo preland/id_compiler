@@ -1,0 +1,5 @@
+// EXPECT: unclosed '(': expected ')', found ';' [E0105]
+// A missing `)` used to be supplied silently at the `;`.
+main(int argc, string[] argv) {
+  int x = (1 + (2 * 3);
+} return int x;

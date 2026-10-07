@@ -2054,7 +2054,7 @@ void id_push_case(IdList* pos);
 void id_case_owner(int node);
 IdList* id_case_tuple(IdList* pos);
 void id_scan_tuple(IdList* pos, IdList* items);
-void id_fill_tuple(IdList* pos, IdList* items);
+void id_fill_tuple(IdList* pos, IdList* items, int open_ln);
 void id_take_item(IdList* pos, IdList* items);
 void id_eat_colon(IdList* pos);
 void id_eat_close(IdList* pos);
@@ -2268,7 +2268,7 @@ int id_fold_unary(IdList* pos);
 int id_is_unop(char* s);
 int id_parse_postfix(IdList* pos);
 int id_fold_index(IdList* pos, int base);
-int id_fold_index_tail(IdList* pos, int base, int idx);
+int id_fold_index_tail(IdList* pos, int base, int idx, int open_ln);
 int id_fold_bitxor(IdList* pos, int left);
 int id_parse_bitand(IdList* pos);
 int id_fold_bitand(IdList* pos, int left);
@@ -2322,9 +2322,11 @@ int id_finish_decl_tail(IdList* pos, char* type, char* name, int exported);
 char* id_cur_kind(IdList* pos);
 char* id_cur_text(IdList* pos);
 void id_advance(IdList* pos);
+void id_close_bracket(IdList* pos, char* cb_close, int open_ln);
 void id_eat_eq(IdList* pos);
 void id_init_lines3(void);
 void id_init_lines4(void);
+void id_op_atom_diag(IdList* pos, char* oa_tok);
 void id_syn_err(IdList* pos, char* msg);
 void id_expect_text(IdList* pos, char* want);
 void id_push_tok2(char* kind, char* text);
@@ -3116,6 +3118,9 @@ char* id_diag_param(int dgn_sigfn, int dgn_k);
 void id_syn_diag(IdList* pos, char* dgn_code, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help);
 void id_syn_expected(IdList* pos, char* dgn_want, char* dgn_found);
 void id_syn_unexpected(IdList* pos, char* dgn_tok, char* dgn_umsg);
+char* id_bracket_open(char* dgn_close);
+void id_syn_unclosed(IdList* pos, char* dgn_close, int dgn_open_ln);
+void id_syn_stray(IdList* pos, char* dgn_stray);
 void id_diag(char* dgn_code, char* dgn_loc, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help);
 void id_diag_head(char* dgn_code, char* dgn_loc, char* dgn_msg);
 void id_diag_line(char* dgn_key, char* dgn_text);
@@ -16529,20 +16534,22 @@ IdList* id_case_tuple(IdList* pos) {
 }
 
 void id_scan_tuple(IdList* pos, IdList* items) {
+    int st_ln;
     id_expect_text(pos, ID_S("("));
     if ((strcmp(id_cur_text(pos), ID_S("(")) == 0)) {
+        st_ln = id_cur_ln(pos);
         id_advance(pos);
-        id_fill_tuple(pos, items);
+        id_fill_tuple(pos, items, st_ln);
     }
     return;
 }
 
-void id_fill_tuple(IdList* pos, IdList* items) {
-    while (((strcmp(id_cur_text(pos), ID_S(")")) != 0) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
+void id_fill_tuple(IdList* pos, IdList* items, int open_ln) {
+    while ((((strcmp(id_cur_text(pos), ID_S(")")) != 0) && (strcmp(id_cur_text(pos), ID_S(":")) != 0)) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
         id_take_item(pos, items);
         id_skip_comma(pos);
     }
-    id_eat_close(pos);
+    id_close_bracket(pos, ID_S(")"), open_ln);
     return;
 }
 
@@ -16893,15 +16900,17 @@ IdList* id_parse_params(IdList* pos, char* kind) {
 }
 
 void id_scan_params(IdList* pos, IdList* params, char* kind) {
+    int sp_ln;
+    sp_ln = id_cur_ln(pos);
     id_advance(pos);
     id_fill_params(pos, params, kind);
-    id_advance(pos);
+    id_close_bracket(pos, ID_S(")"), sp_ln);
     return;
 }
 
 void id_fill_params(IdList* pos, IdList* params, char* kind) {
     int one_param_v;
-    while (((strcmp(id_cur_text(pos), ID_S(")")) != 0) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
+    while ((((strcmp(id_cur_text(pos), ID_S(")")) != 0) && (strcmp(id_cur_text(pos), ID_S("{")) != 0)) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
         one_param_v = id_one_param(pos, kind);
         id_list_push(params, (long long)(one_param_v));
         id_skip_comma(pos);
@@ -18163,7 +18172,7 @@ int id_parse_import(IdList* pos) {
 
 void id_fill_args(IdList* pos, IdList* args) {
     int parse_expr_v;
-    while (((strcmp(id_cur_text(pos), ID_S(")")) != 0) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
+    while ((((strcmp(id_cur_text(pos), ID_S(")")) != 0) && (strcmp(id_cur_text(pos), ID_S(";")) != 0)) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
         parse_expr_v = id_parse_expr(pos);
         id_list_push(args, (long long)(parse_expr_v));
         id_skip_comma(pos);
@@ -18209,9 +18218,11 @@ int id_parse_call(char* name, IdList* pos) {
 }
 
 void id_scan_args(IdList* pos, IdList* args) {
+    int sa_ln;
+    sa_ln = id_cur_ln(pos);
     id_advance(pos);
     id_fill_args(pos, args);
-    id_advance(pos);
+    id_close_bracket(pos, ID_S(")"), sa_ln);
     return;
 }
 
@@ -18300,15 +18311,17 @@ int id_parse_arr(IdList* pos) {
 }
 
 void id_scan_elems(IdList* pos, IdList* elems) {
+    int se_ln;
+    se_ln = id_cur_ln(pos);
     id_advance(pos);
     id_fill_elems(pos, elems);
-    id_advance(pos);
+    id_close_bracket(pos, ID_S("]"), se_ln);
     return;
 }
 
 void id_fill_elems(IdList* pos, IdList* elems) {
     int parse_expr_v;
-    while (((strcmp(id_cur_text(pos), ID_S("]")) != 0) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
+    while ((((strcmp(id_cur_text(pos), ID_S("]")) != 0) && (strcmp(id_cur_text(pos), ID_S(";")) != 0)) && (strcmp(id_cur_kind(pos), ID_S("eof")) != 0))) {
         parse_expr_v = id_parse_expr(pos);
         id_list_push(elems, (long long)(parse_expr_v));
         id_skip_comma(pos);
@@ -18443,10 +18456,12 @@ int id_parse_primary(IdList* pos) {
 }
 
 int id_parse_paren(IdList* pos) {
+    int pp_ln;
     int e;
+    pp_ln = id_cur_ln(pos);
     id_advance(pos);
     e = id_parse_expr(pos);
-    id_advance(pos);
+    id_close_bracket(pos, ID_S(")"), pp_ln);
     return e;
 }
 
@@ -18593,17 +18608,19 @@ int id_parse_postfix(IdList* pos) {
 }
 
 int id_fold_index(IdList* pos, int base) {
+    int fi_ln;
     int idx;
     int ret_i;
+    fi_ln = id_cur_ln(pos);
     id_advance(pos);
     idx = id_parse_expr(pos);
-    ret_i = id_fold_index_tail(pos, base, idx);
+    ret_i = id_fold_index_tail(pos, base, idx, fi_ln);
     return ret_i;
 }
 
-int id_fold_index_tail(IdList* pos, int base, int idx) {
+int id_fold_index_tail(IdList* pos, int base, int idx, int open_ln) {
     int ret_i;
-    id_advance(pos);
+    id_close_bracket(pos, ID_S("]"), open_ln);
     ret_i = id_node_index(base, idx);
     return ret_i;
 }
@@ -19129,6 +19146,15 @@ void id_advance(IdList* pos) {
     return;
 }
 
+void id_close_bracket(IdList* pos, char* cb_close, int open_ln) {
+    if ((strcmp(id_cur_text(pos), cb_close) == 0)) {
+        id_advance(pos);
+    } else {
+        id_syn_unclosed(pos, cb_close, open_ln);
+    }
+    return;
+}
+
 void id_eat_eq(IdList* pos) {
     id_expect_text(pos, ID_S("="));
     id_advance(pos);
@@ -19146,6 +19172,17 @@ void id_init_lines4(void) {
     casefn = id_list_lit(0);
     casestart = id_list_lit(0);
     id_init_cases();
+    return;
+}
+
+void id_op_atom_diag(IdList* pos, char* oa_tok) {
+    char* unexpected_msg_v;
+    if (((strcmp(oa_tok, ID_S(")")) == 0) || (strcmp(oa_tok, ID_S("]")) == 0))) {
+        id_syn_stray(pos, oa_tok);
+    } else {
+        unexpected_msg_v = id_unexpected_msg(oa_tok);
+        id_syn_unexpected(pos, oa_tok, unexpected_msg_v);
+    }
     return;
 }
 
@@ -19180,11 +19217,9 @@ void id_push_tok2(char* kind, char* text) {
 
 void id_no_op_atom(IdList* pos) {
     char* cur_text_v;
-    char* unexpected_msg_v;
     if ((strcmp(id_cur_kind(pos), ID_S("op")) == 0)) {
         cur_text_v = id_cur_text(pos);
-        unexpected_msg_v = id_unexpected_msg(cur_text_v);
-        id_syn_unexpected(pos, cur_text_v, unexpected_msg_v);
+        id_op_atom_diag(pos, cur_text_v);
     }
     return;
 }
@@ -27441,6 +27476,42 @@ void id_syn_unexpected(IdList* pos, char* dgn_tok, char* dgn_umsg) {
     }
     id_syn_diag(pos, ID_S("E0102"), dgn_umsg, dgn_tok, dgn_uwhy, dgn_uhelp);
     { id_str_free(dgn_uhelp); return; }
+}
+
+char* id_bracket_open(char* dgn_close) {
+    char* dgn_bopen;
+    dgn_bopen = ID_S("(");
+    if ((strcmp(dgn_close, ID_S("]")) == 0)) {
+        dgn_bopen = ID_S("[");
+    }
+    return dgn_bopen;
+}
+
+void id_syn_unclosed(IdList* pos, char* dgn_close, int dgn_open_ln) {
+    char* dgn_uopen;
+    char* dgn_ufound;
+    char* dgn_ufile;
+    char* dgn_ucwhy = NULL;
+    char* dgn_uchelp = NULL;
+    dgn_uopen = id_bracket_open(dgn_close);
+    dgn_ufound = id_cur_text(pos);
+    dgn_ufile = id_cur_file();
+    { char* idfe_o = dgn_ucwhy; dgn_ucwhy = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("every '"), dgn_uopen), ID_S("' needs its '"), 1), dgn_close, 1), ID_S("', and the parser will not supply a missing one at the end of the statement"), 1); id_str_free(idfe_o); }
+    { char* idfe_o = dgn_uchelp; dgn_uchelp = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("add '"), dgn_close), ID_S("' to close the '"), 1), dgn_uopen, 1), ID_S("' opened on line "), 1), id_str_of_int(dgn_open_ln), 3), ID_S("; it usually belongs just before the token named in 'at'"), 1); id_str_free(idfe_o); }
+    id_syn_diag(pos, ID_S("E0105"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("unclosed '"), dgn_uopen), ID_S("': expected '"), 1), dgn_close, 1), ID_S("', found '"), 1), dgn_ufound, 1), ID_S("'"), 1), dgn_ufound, dgn_ucwhy, dgn_uchelp);
+    id_diag_related(id_concat_f(id_concat(dgn_ufile, ID_S(":")), id_str_of_int(dgn_open_ln), 3), id_concat_f(id_concat(ID_S("the '"), dgn_uopen), ID_S("' that is not closed was opened here"), 1));
+    { id_str_free(dgn_ucwhy); id_str_free(dgn_uchelp); return; }
+}
+
+void id_syn_stray(IdList* pos, char* dgn_stray) {
+    char* dgn_sbopen;
+    char* dgn_swhy = NULL;
+    char* dgn_shelp = NULL;
+    dgn_sbopen = id_bracket_open(dgn_stray);
+    { char* idfe_o = dgn_swhy; dgn_swhy = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this '"), dgn_stray), ID_S("' closes a '"), 1), dgn_sbopen, 1), ID_S("' that was never opened, so the brackets on this statement do not balance"), 1); id_str_free(idfe_o); }
+    { char* idfe_o = dgn_shelp; dgn_shelp = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("remove this '"), dgn_stray), ID_S("', or add the missing '"), 1), dgn_sbopen, 1), ID_S("' earlier in the statement"), 1); id_str_free(idfe_o); }
+    id_syn_diag(pos, ID_S("E0106"), id_concat_f(id_concat(ID_S("unmatched '"), dgn_stray), ID_S("'"), 1), dgn_stray, dgn_swhy, dgn_shelp);
+    { id_str_free(dgn_swhy); id_str_free(dgn_shelp); return; }
 }
 
 void id_diag(char* dgn_code, char* dgn_loc, char* dgn_msg, char* dgn_at, char* dgn_why, char* dgn_help) {

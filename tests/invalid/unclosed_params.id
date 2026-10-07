@@ -1,0 +1,4 @@
+// EXPECT: unclosed '(': expected ')', found '{' [E0105]
+inc(int n {
+  int r = n + 1;
+} return int r;

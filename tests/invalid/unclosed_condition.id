@@ -1,0 +1,7 @@
+// EXPECT: unclosed '(': expected ')', found '{' [E0105]
+main(int argc, string[] argv) {
+  int x = 1;
+  if((x > 0) {
+    x = 2;
+  }
+} return int x;

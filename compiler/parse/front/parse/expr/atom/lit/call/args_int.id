@@ -1,7 +1,7 @@
 // Argument list body + the integer leaf.
 
 fill_args(int[] pos, int[] args) {
-  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+  while(cur_text(pos) != ")" && cur_text(pos) != ";" && cur_kind(pos) != "eof") {
     int parse_expr_v = parse_expr(pos);
     push(args, parse_expr_v);
     skip_comma(pos);

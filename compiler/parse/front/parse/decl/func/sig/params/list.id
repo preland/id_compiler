@@ -12,15 +12,17 @@ given decl_tokens ([1], "param"):([0, 1])
 given decl_tokens ([1], "nparam"):([0, 1])
 
 scan_params(int[] pos, int[] params, string kind) {
+  int sp_ln = cur_ln(pos);
   advance(pos);
   fill_params(pos, params, kind);
-  advance(pos);
+} chain (int[] pos, int[] params, string kind) {
+  close_bracket(pos, ")", sp_ln);
 } return void;
 given decl_tokens ([1], [], "param"):([8], [0, 1])
 given decl_tokens ([1], [], "nparam"):([8], [0, 1])
 
 fill_params(int[] pos, int[] params, string kind) {
-  while(cur_text(pos) != ")" && cur_kind(pos) != "eof") {
+  while(cur_text(pos) != ")" && cur_text(pos) != "{" && cur_kind(pos) != "eof") {
     int one_param_v = one_param(pos, kind);
     push(params, one_param_v);
     skip_comma(pos);
