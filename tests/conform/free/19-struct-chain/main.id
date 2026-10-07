@@ -1,4 +1,4 @@
 main(int argc, string[] argv) {
-  Cell head = build(3000);
+  Cell head = build(10000);
   print(total(head));
 } return int 0;

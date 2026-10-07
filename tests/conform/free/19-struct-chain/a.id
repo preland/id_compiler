@@ -1,7 +1,7 @@
-// A linked list of 3000 cells (what a wasm stack holds when it is built), each holding a list of at most one successor.
+// A linked list of 10000 cells, each holding a list of at most one successor (built by recursion: the wasm build links an 8 MiB stack, and wasmtime's own call-stack limit is what stops a much longer chain there).
 // Freeing it with idfr_Cell must not recurse once per cell, or the C stack would
 // not hold it (and a wasm stack even less): the runtime walks a work list of
-// its own. Freed: a struct and a list of successors per cell, 6000 lists.
+// its own. Freed: a struct and a list of successors per cell, 20000 lists.
 build(int n) {
   Cell[] nx = [];
   if(n > 1) {

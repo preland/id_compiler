@@ -4324,7 +4324,7 @@ if [ "$TARGET" = wasm ]; then
     lcmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -nostdlib "$WORK/out.o" ${WBE_OBJS[@]+"${WBE_OBJS[@]}"}
           "$wcrt" -L"$IDC_WASI_LIBDIR" -lc "$IDC_WASI_COMPILER_RT"
           -Wl,--allow-undefined-file="$WALLOW" ${WLTO_LINK[@]+"${WLTO_LINK[@]}"}
-          -Wl,--gc-sections ${wentry[@]+"${wentry[@]}"} -o "$WOUT")
+          -Wl,-z,stack-size=8388608 -Wl,--gc-sections ${wentry[@]+"${wentry[@]}"} -o "$WOUT")
     capped "${lcmd[@]}" 2>"$WORK/wasild.err"; wld_rc=$?
     [ "$KEEP_C" -eq 1 ] || rm -f "$c_path"
     if [ "$wld_rc" -ne 0 ]; then
