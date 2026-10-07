@@ -2840,6 +2840,32 @@ else
     bad "bin/idc: ...not also the import-only error ($(tr '\n' '|' < "$TMP/log"))"
 fi
 
+# A chain function is one unit of logic, compared whole: two chain functions
+# whose last segments happen to match are not duplicates, as two plain functions
+# sharing a final statement are not.
+cat > "$TMP/p.id" <<'EOF'
+fa(int ia, int ib) {
+  int x = ia * 3;
+  int y = ib;
+  int w = ia;
+} chain (int ia, int ib) {
+  int r = x + y;
+} return int r;
+
+fb(int ia, int ib) {
+  int x = ia - 7;
+  int y = ib;
+  int w = ia;
+} chain (int ia, int ib) {
+  int r = x + y;
+} return int r;
+
+main(int argc, string[] argv) {
+  int t = fa(1, 2) + fb(3, 4);
+} return int 0;
+EOF
+self_accept "bin/idc: chain functions sharing only a last segment are not duplicates" --allow-untested --emit-c /dev/null
+
 # E0310: a generated parameter name.
 cat > "$TMP/p.id" <<'EOF'
 helper(int asset_at_v) {

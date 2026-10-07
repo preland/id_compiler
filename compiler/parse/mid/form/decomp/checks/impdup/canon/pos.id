@@ -1,9 +1,9 @@
 // An import in a fingerprint is the position at which the function first read
 // it, like a local (cn, ../../../../unique/canon/func/names.id), and the names
 // go in a separate list, `cimps`, that seg_text (./text.id) puts in front of
-// each segment. Two segments are one function written twice only if both the
-// text and the names agree; a pair that agrees on the text alone differs only
-// in which imports it reads (../scan/). No segment is exempt, however short: a
+// each function's text. Two functions are one function written twice only if
+// both the text and the names agree; a pair that agrees on the text alone
+// differs only in which imports it reads (../scan/). No function is exempt, however short: a
 // one-statement accessor per global is the same function written once per
 // global, and the fix is the same parameter.
 

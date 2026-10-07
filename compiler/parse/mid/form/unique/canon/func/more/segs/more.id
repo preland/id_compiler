@@ -1,44 +1,8 @@
-// The walk itself, and what happens at a seam.
+// The body, all of it at once.
 
-segs_loop(int id, string sigtext, int[] cur, string[] segs_out) {
-  int[] body = (import nl2)[id];
-  int i = 0;
-  while(i < len(body)) {
-    segs_step(body[i], sigtext, cur, segs_out);
-    i = i + 1;
-  }
-} return void;
-given lz_o (22, "S", [], []):() then calls segs_step:[1]
-given lz_o (23, "S", [], []):() then calls segs_step:[1]
-
-// A marker ends the current segment; anything else belongs to it. The marker
-// itself is never added, so it contributes nothing to any segment's text.
-// One node, not a list and an index: the caller already has the index, and a
-// step that cannot see the rest of the body cannot come to depend on it.
-segs_step(int node, string sigtext, int[] cur, string[] segs_out) {
-  if((import nkind)[node] == "chain") {
-    segs_flush(sigtext, cur, segs_out);
-  } else {
-    push(cur, node);
-  }
-} return void;
-given lz_o ((import lz_decl5), "S", [], []):() then calls segs_flush:[0]
-given lz_o ((import lz_decl9), "S", [], []):() then calls segs_flush:[0]
-
-// One finished segment, and the accumulator emptied for the next. `cur` is
-// emptied rather than rebound because a list is a reference: the caller's
-// accumulator has to be the one that empties.
-//
-// The emptying is written out here rather than given its own function: as a
-// helper it was rejected as identical in signature and logic to pred_wipe
-// (back/ir/opt/cfg/more/scan.id), which is the duplicate-logic rule working
-// correctly. A fourth way to empty a list is not what this needed.
-segs_flush(string sigtext, int[] cur, string[] segs_out) {
-  string segtext = seg_text(sigtext, cur);
-  push(segs_out, segtext);
-  while(len(cur) > 0) {
-    pop(cur);
-  }
-} return void;
-given lz_o ("S", [], []):() then calls seg_text:("S", [])
-given lz_o ("T", [1], []):() then calls seg_text:[1]
+unit_walk(int id, string unit_sigtext) {
+  int[] unit_nodes = (import nl2)[id];
+  string unit_fp = seg_text(unit_sigtext, unit_nodes);
+} return string unit_fp;
+given lz_o (22, "S"):("|S{d:int 0=I5}")
+given lz_o (23, "T"):("|T{d:int 0=I9}")

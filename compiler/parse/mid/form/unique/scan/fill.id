@@ -2,16 +2,14 @@
 // belongs to.
 //
 // `cfp` holds the fingerprints and `cfpfn` holds, for each one, the `prog`
-// index of the function it came from. Today that is simply 0, 1, 2, ... -- one
-// entry per function -- and the two lists could be collapsed into one. They are
-// kept apart because a chained function is meant to contribute one fingerprint
-// per segment (each chain block, and the initial function, being its own unit
-// for duplicate checking), and then the two lists stop being the same length.
-//
-// Keeping the owner explicit means the index of a fingerprint and the index of
-// a function are different things with different names, rather than one number
-// used for both -- which is what `fname_at` (./more/report/dup.id) resolves,
-// and the only place in the checker that maps one to the other.
+// index of the function it came from. That is simply 0, 1, 2, ... -- one entry
+// per function, a chained function included: a chain function is one unit of
+// logic, fingerprinted whole (../canon/func/more/segs/chain.id). The two lists
+// could be collapsed into one. They are kept apart so that the index of a
+// fingerprint and the index of a function stay different things with
+// different names, rather than one number used for both -- which is what
+// `fname_at` (./more/report/dup.id) resolves, and the only place in the
+// checker that maps one to the other.
 
 uq_fill_all() {
   int i = 0;
@@ -23,24 +21,19 @@ uq_fill_all() {
 given lz_o ():() then calls uq_fill_at:[2]
 given farm_g ():() then calls uq_fill_at:[0]
 
-// One entry per segment, each recording the same owning function. For an
-// unchained function that is exactly one entry, so `cfp` and `prog` keep the
-// same length and nothing downstream sees a difference.
+// One entry, recording the owning function, so `cfp` and `prog` keep the same
+// length.
 uq_fill_at(int i) {
   int fid = (import prog)[i];
-  string[] seglist = canon_segs(fid);
-  uq_push_segs(seglist, i);
+  string fp = unit_kind(fid);
+  uq_push_unit(fp, i);
 } return void;
-given lz_o (0):() then calls canon_segs:(22)
-given lz_o (1):() then calls canon_segs:(23)
+given lz_o (0):() then calls unit_kind:(22)
+given lz_o (1):() then calls unit_kind:(23)
 
-uq_push_segs(string[] seglist, int i) {
-  int j = 0;
-  while(j < len(seglist)) {
-    push((import cfp), seglist[j]);
-    push((import cfpfn), i);
-    j = j + 1;
-  }
+uq_push_unit(string fp, int i) {
+  push((import cfp), fp);
+  push((import cfpfn), i);
 } return void;
-given lz_o ([], 0):() then (import chkfail)[0]:(0)
-given lz_o (["X"], 0):() then (import chkfail)[0]:(0)
+given lz_o ("X", 7):() then (import cfpfn)[2]:(7)
+given lz_o ("Y", 3):() then (import cfp)[2]:("Y")

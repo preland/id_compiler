@@ -1,9 +1,8 @@
-// The strict table (cfp, cfpfn) has one entry per chain segment; this pass
-// folds it to one pair per function, in `prog` order: `imd_tab` holds, at
-// 2*i, the function's segment texts with the import names cut off (each
-// prefixed with its length, so two lists of segments cannot join to one
-// string), and at 2*i+1 its import names -- the last segment's, which are the
-// most it read.
+// The strict table (cfp, cfpfn) has one entry per function; this pass folds it
+// to one pair per function, in `prog` order: `imd_tab` holds, at 2*i, the
+// function's text with the import names cut off (prefixed with its length, so
+// two lists of texts cannot join to one string), and at 2*i+1 its import
+// names.
 
 imd_fill() {
   string[] imd_rows = [];

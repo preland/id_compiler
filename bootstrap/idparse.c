@@ -2856,17 +2856,13 @@ char* id_canon_native(int id, char* out);
 char* id_canon_func_body(int id);
 char* id_canon_func_tail(int id, char* out);
 char* id_canon_logic(int id, char* out);
-IdList* id_canon_segs(int id);
-void id_segs_plain(int id, IdList* segs_out);
-void id_segs_walk(int id, char* sigtext, IdList* segs_out);
+char* id_unit_plain(int id);
 char* id_cst_flow(int id);
-void id_segs_kind(int id, IdList* segs_out);
-void id_segs_native(int id, IdList* segs_out);
-char* id_segs_sig(int id);
-char* id_segs_sig2(int id);
-void id_segs_loop(int id, char* sigtext, IdList* cur, IdList* segs_out);
-void id_segs_step(int node, char* sigtext, IdList* cur, IdList* segs_out);
-void id_segs_flush(char* sigtext, IdList* cur, IdList* segs_out);
+char* id_unit_kind(int id);
+char* id_unit_native(int id);
+char* id_unit_sig(int id);
+char* id_unit_sig2(int id);
+char* id_unit_walk(int id, char* unit_sigtext);
 char* id_cn(char* name);
 int id_cn_add(char* name);
 char* id_canon_var(int id);
@@ -2949,7 +2945,7 @@ void id_print_fp_line(int i);
 char* id_fp_line(char* name, char* fp);
 void id_uq_fill_all(void);
 void id_uq_fill_at(int i);
-void id_uq_push_segs(IdList* seglist, int i);
+void id_uq_push_unit(char* fp, int i);
 void id_chk_dupfn(void);
 void id_dupfn_at(int i);
 void id_dupfn_err(int i, int j);
@@ -24072,26 +24068,12 @@ char* idsq_14;
     { id_str_free(val); return ret_s; }
 }
 
-IdList* id_canon_segs(int id) {
-    IdList* segs_out;
-    segs_out = id_list_lit(0);
-    id_segs_kind(id, segs_out);
-    return segs_out;
-}
-
-void id_segs_plain(int id, IdList* segs_out) {
-    char* sigtext;
-    sigtext = id_segs_sig(id);
-    id_segs_walk(id, sigtext, segs_out);
-    return;
-}
-
-void id_segs_walk(int id, char* sigtext, IdList* segs_out) {
-    IdList* cur;
-    cur = id_list_lit(0);
-    id_segs_loop(id, sigtext, cur, segs_out);
-    id_segs_flush(sigtext, cur, segs_out);
-    return;
+char* id_unit_plain(int id) {
+    char* unit_sigtext = NULL;
+    char* unit_fp = NULL;
+    { char* idfe_o = unit_sigtext; unit_sigtext = id_unit_sig(id); id_str_free(idfe_o); }
+    { char* idfe_o = unit_fp; unit_fp = id_unit_walk(id, unit_sigtext); id_str_free(idfe_o); }
+    { id_str_free(unit_sigtext); return unit_fp; }
 }
 
 char* id_cst_flow(int id) {
@@ -24105,32 +24087,35 @@ char* id_cst_flow(int id) {
     return out;
 }
 
-void id_segs_kind(int id, IdList* segs_out) {
+char* id_unit_kind(int id) {
+    char* unit_fp = NULL;
+    { char* idfe_o = unit_fp; unit_fp = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((id_is_native(id) == 1)) {
-        id_segs_native(id, segs_out);
+        { char* idfe_o = unit_fp; unit_fp = id_unit_native(id); id_str_free(idfe_o); }
     } else {
-        id_segs_plain(id, segs_out);
+        { char* idfe_o = unit_fp; unit_fp = id_unit_plain(id); id_str_free(idfe_o); }
     }
-    return;
+    return unit_fp;
 }
 
-void id_segs_native(int id, IdList* segs_out) {
-    char* fp;
-    fp = id_canon_func(id);
-    id_list_push(segs_out, (long long)(intptr_t)(id_concat(ID_S("|"), fp)));
-    return;
+char* id_unit_native(int id) {
+    char* fp = NULL;
+    char* unit_fp = NULL;
+    { char* idfe_o = fp; fp = id_canon_func(id); id_str_free(idfe_o); }
+    { char* idfe_o = unit_fp; unit_fp = id_concat(ID_S("|"), fp); id_str_free(idfe_o); }
+    { id_str_free(fp); return unit_fp; }
 }
 
-char* id_segs_sig(int id) {
+char* id_unit_sig(int id) {
     char* nm;
     char* ret_s = NULL;
     nm = (char*)(intptr_t)(id_list_get(ns1, id));
     id_uq_begin(nm);
-    { char* idfe_o = ret_s; ret_s = id_segs_sig2(id); id_str_free(idfe_o); }
+    { char* idfe_o = ret_s; ret_s = id_unit_sig2(id); id_str_free(idfe_o); }
     return ret_s;
 }
 
-char* id_segs_sig2(int id) {
+char* id_unit_sig2(int id) {
     IdList* params;
     char* sigparams = NULL;
     char* ret_s = NULL;
@@ -24142,35 +24127,12 @@ char* idsq_10;
     { id_str_free(sigparams); return ret_s; }
 }
 
-void id_segs_loop(int id, char* sigtext, IdList* cur, IdList* segs_out) {
-    IdList* body;
-    int i;
-    body = (IdList*)(intptr_t)(id_list_get(nl2, id));
-    i = 0;
-    while ((i < id_list_len(body))) {
-        id_segs_step((int)(id_list_get(body, i)), sigtext, cur, segs_out);
-        i = (i + 1);
-    }
-    return;
-}
-
-void id_segs_step(int node, char* sigtext, IdList* cur, IdList* segs_out) {
-    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, node)), ID_S("chain")) == 0)) {
-        id_segs_flush(sigtext, cur, segs_out);
-    } else {
-        id_list_push(cur, (long long)(node));
-    }
-    return;
-}
-
-void id_segs_flush(char* sigtext, IdList* cur, IdList* segs_out) {
-    char* segtext;
-    segtext = id_seg_text(sigtext, cur);
-    id_list_push(segs_out, (long long)(intptr_t)(segtext));
-    while ((id_list_len(cur) > 0)) {
-        (int)(id_list_pop(cur));
-    }
-    return;
+char* id_unit_walk(int id, char* unit_sigtext) {
+    IdList* unit_nodes;
+    char* unit_fp = NULL;
+    unit_nodes = (IdList*)(intptr_t)(id_list_get(nl2, id));
+    { char* idfe_o = unit_fp; unit_fp = id_seg_text(unit_sigtext, unit_nodes); id_str_free(idfe_o); }
+    return unit_fp;
 }
 
 char* id_cn(char* name) {
@@ -25100,22 +25062,16 @@ void id_uq_fill_all(void) {
 
 void id_uq_fill_at(int i) {
     int fid;
-    IdList* seglist;
+    char* fp;
     fid = (int)(id_list_get(prog, i));
-    seglist = id_canon_segs(fid);
-    id_uq_push_segs(seglist, i);
+    fp = id_unit_kind(fid);
+    id_uq_push_unit(fp, i);
     return;
 }
 
-void id_uq_push_segs(IdList* seglist, int i) {
-    int j;
-    j = 0;
-    while ((j < id_list_len(seglist))) {
-IdList* idsq_16;
-        (idsq_16 = cfp, id_list_push(idsq_16, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(seglist, j)))));
-        id_list_push(cfpfn, (long long)(i));
-        j = (j + 1);
-    }
+void id_uq_push_unit(char* fp, int i) {
+    id_list_push(cfp, (long long)(intptr_t)(fp));
+    id_list_push(cfpfn, (long long)(i));
     return;
 }
 

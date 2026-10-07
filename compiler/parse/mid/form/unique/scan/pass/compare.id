@@ -15,6 +15,7 @@ uq_scan() {
 } return void;
 given lz_o ():() then calls uq_at:(0) then calls uq_at:(1)
 given lz_o ():() then calls uq_at:[2]
+given chain_dup_fixture ():() then (import chkfail)[0]:(1)
 
 // dup5 and dup9 differ in a literal, which the strict fingerprint keeps, so
 // neither is reported against the other: the case pins the quiet path, which
@@ -41,3 +42,6 @@ find_dup(int i) {
 } return int found;
 given dup_pair_fixture (0):(-1)
 given dup_pair_fixture (1):(0)
+given chain_dup_fixture (1):(0)
+given chain_dup_fixture (2):(-1)
+given chain_dup_fixture (3):(-1)

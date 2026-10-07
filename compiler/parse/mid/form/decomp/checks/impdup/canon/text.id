@@ -1,4 +1,4 @@
-// One segment's fingerprint: the imports read so far (./pos.id), a bar, then
+// A function's fingerprint: the imports it read (./pos.id), a bar, then
 // the text. The names are identifiers, so the first bar ends them whatever the
 // text holds (a string literal may hold a bar; the names cannot).
 seg_text(string seg_sig, int[] seg_cur) {

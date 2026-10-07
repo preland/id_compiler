@@ -20,23 +20,24 @@ canon_begun_j_fixture() {
 ():() then calls uq_begin:("f")
 ():() then init_units:(0)
 
-segs_kind(int id, string[] segs_out) {
+unit_kind(int id) {
+  string unit_fp = "";
   if(is_native(id) == 1) {
-    segs_native(id, segs_out);
+    unit_fp = unit_native(id);
   } else {
-    segs_plain(id, segs_out);
+    unit_fp = unit_plain(id);
   }
-} return void;
-given lz_o (22, []):() then calls segs_plain:[1]
-given lz_o (23, []):() then calls segs_native:[0]
+} return string unit_fp;
+given lz_o (22):("|()->int=>v0{d:int 0=I5}")
+given lz_o (23):("|()->int=>v0{d:int 0=I9}")
 
 // One unit, from canon_func, which already dispatches a native to canon_native
 // and resets the position map on the way. Delegating rather than repeating it
 // is also what keeps canon_func reachable now that uq_fill_at no longer calls
 // it directly.
-segs_native(int id, string[] segs_out) {
+unit_native(int id) {
   string fp = canon_func(id);
-  push(segs_out, "|" + fp);
-} return void;
-given lz_o (22, []):() then calls canon_func:(22)
-given lz_o (23, []):() then calls canon_func:(23)
+  string unit_fp = "|" + fp;
+} return string unit_fp;
+given lz_o (22):("|()->int{d:int 0=I5}=>v0")
+given lz_o (23):("|()->int{d:int 0=I9}=>v0")
