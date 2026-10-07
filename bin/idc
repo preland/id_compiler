@@ -268,7 +268,7 @@ case "$OPT" in
 esac
 CLEVEL=2
 [ "$OPT_GIVEN" -eq 1 ] && CLEVEL="$OPT"
-CC_OFLAGS=("-O$CLEVEL")
+CC_OFLAGS=("-O$CLEVEL" -fwrapv)
 CC_INLINE=()
 CC_LTO=0
 case "$CLEVEL" in
@@ -3731,7 +3731,7 @@ UNIT_BUILT=0
 unit_build() {
     local src="$1" kind="$2" out="$3" udir="$WORK/units.$2" mask="" xcf=() xlf=() t0="${EPOCHREALTIME:-0}" t1=0
     local opt=("${CC_OFLAGS[@]}" ${CC_INLINE[@]+"${CC_INLINE[@]}"})
-    [ "$kind" = harness ] && { opt=(-O0); mask="$CASE_MASK"; }
+    [ "$kind" = harness ] && { opt=(-O0 -fwrapv); mask="$CASE_MASK"; }
     if [ "$kind" = program ] && [ "$have_main" -eq 1 ] && [ "$CC_LTO" -eq 1 ] && cc_lto_setup; then
         xcf=("${CC_LTO_COMPILE[@]}"); xlf=("${CC_LTO_LINK[@]}")
     fi
@@ -3893,7 +3893,7 @@ run_cases() {
     if [ "$UNITS_ON" -eq 1 ] && unit_build "$HARNESS_C" harness "$WORK/harness"; then
         :
     elif [ -z "$hkey" ] || ! obj_cache_get "$hkey" "$WORK/harness"; then
-        local hcmd=("$CC" -std=c11 -O0 "$HARNESS_C" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$WORK/harness" -lm ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
+        local hcmd=("$CC" -std=c11 -O0 -fwrapv "$HARNESS_C" ${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$WORK/harness" -lm ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
         capped "${hcmd[@]}" 2>"$WORK/harness.err"; hbuild_rc=$?
         if [ "$hbuild_rc" -ne 0 ]; then
             progress_clear
@@ -4285,7 +4285,7 @@ if [ "$TARGET" = wasm ]; then
         WLTO=(-flto); WLTO_LINK=(-flto "-Wl,--lto-O$wlto_level")
     fi
     ccmd=("$IDC_WASI_CLANG" --target=wasm32-wasi -isystem "$IDC_WASI_SYSROOT_INCLUDE"
-          "-O$CLEVEL" ${WLTO[@]+"${WLTO[@]}"} -ffunction-sections -fdata-sections -c "$c_path" -o "$WORK/out.o")
+          "-O$CLEVEL" -fwrapv ${WLTO[@]+"${WLTO[@]}"} -ffunction-sections -fdata-sections -c "$c_path" -o "$WORK/out.o")
     capped "${ccmd[@]}" 2>"$WORK/wasicc.err"; wcc_rc=$?
     if [ "$wcc_rc" -ne 0 ]; then
         progress_clear

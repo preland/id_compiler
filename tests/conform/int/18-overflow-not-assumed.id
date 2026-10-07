@@ -1,0 +1,7 @@
+ov_after(int ov_x) {
+  int ov_r = ov_x + 1 > ov_x;
+} return int ov_r;
+
+main(int argc, string[] argv) {
+  print("" + ov_after(2147483646 + argc));
+} return int 0;
