@@ -1,0 +1,41 @@
+// A loop with a call to a function of the program in its body is emitted twice,
+// and so is the call: gcc then counts twice the call sites when it decides
+// whether to inline the callee, and at -O2 stops short of inlining a callee
+// that it inlined into the one loop. A function holding such a loop is
+// therefore written `flatten`, which inlines every call in it, so the guarded
+// copy keeps the callee's body in its loop. Flattening is only safe to leave
+// to gcc when every call in the function is to a leaf or a builtin
+// (lp_fnok); a loop in any other function is not versioned if it calls a
+// function of the program.
+
+lp_flat(int lq_fn) {
+  string lq_s = "";
+  if(lp_some(lp_lo(lq_fn), lq_fn) == 1) {
+    lq_s = "__attribute__((flatten)) ";
+  }
+} return string lq_s;
+given lpf_in(1) ((import lpf_f2)):("__attribute__((flatten)) ")
+given lpf_in(2) ((import lpf_f3)):("")
+given lpf_in(0) ((import lpf_f1)):("")
+
+lp_some(int lq_lo, int lq_hi) {
+  int lq_r = 0;
+  int lq_i = lq_lo;
+  while(lq_i <= lq_hi && lq_r == 0) {
+    lq_r = lp_calls(lq_i);
+    lq_i = lq_i + 1;
+  }
+} return int lq_r;
+given lpf_in(1) ((import lpf_l2), (import lpf_f2)):(1)
+given lpf_in(0) ((import lpf_l1), (import lpf_f1)):(0)
+
+lp_calls(int lq_w) {
+  int lq_r = 0;
+  if((import nkind)[lq_w] == "while" && lp_plan(lq_w) == 1) {
+    lq_r = lp_uany((import ni1)[lq_w] + 1, lq_w - 1);
+  }
+} return int lq_r;
+given lpf_in(1) ((import lpf_wg)):(1)
+given lpf_in(2) ((import lpf_wy)):(0)
+given lpf_in(0) ((import lpf_wa)):(0)
+given lpf_in(0) ((import lpf_xa)):(0)

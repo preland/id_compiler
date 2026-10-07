@@ -1,0 +1,16 @@
+// A conjunct `counter < limit` read as a bound, or, when the counter is not a
+// variable or the limit is not one the guard can read, as junk (lp_cond).
+
+lp_bound(int lq_c) {
+  int lq_l = (import ni1)[lq_c];
+  if((import nkind)[lq_l] == "var" && lp_limit((import ni2)[lq_c]) == 1) {
+    push((import lpj), (import ns1)[lq_l]);
+    push((import lpn), (import ni2)[lq_c]);
+  } else {
+    lset((import lpbad), 0, 1);
+  }
+} return void;
+given lpf_more ((import lpf_ca)):() then (import lpj)[0]:("laj")
+given lpf_more ((import lpf_cb)):() then (import lpj)[0]:("lbj")
+given lpf_more ((import lpf_negl)):() then (import lpbad)[0]:(1)
+given lpf_more ((import lpf_bigr)):() then len((import lpn)):(0)

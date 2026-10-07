@@ -1,0 +1,40 @@
+// Recording a covered access: its node, and the clauses of the guard it needs.
+// The guard says, before the loop, that the list exists, that the limit does
+// not pass the list's end once the access's literal offset is added, that the
+// counter starts at zero or more, and for a write, that the list is not a
+// constant (its capacity is not negative). Clauses are joined by `&&`, so a
+// list is tested for NULL before its length is read; and the length of the
+// list `len(xs)` limits the counter by is read here as a field, never by
+// calling len, which would trap in the guard where the loop might not.
+
+lp_take(int lq_id, int lq_jn, int lq_k) {
+  push((import lpset), lq_id);
+  lp_len(lq_id, lq_jn, lq_k);
+  lp_low(lq_id, lq_jn);
+} return void;
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then len((import lpcond)):(3)
+given lpf_cs(1) ((import lpf_sb), (import lpf_oj), 1):() then len((import lpcond)):(4)
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then len((import lpset)):(1)
+
+lp_len(int lq_id, int lq_jn, int lq_k) {
+  int lq_nn = (import lpn)[find_str((import lpj), (import ns1)[lq_jn])];
+  string lq_ltxt = emit_expr((import ni1)[lq_id]);
+  string lq_room = "(long long)(" + lq_ltxt + ")->len - " + lq_k;
+} chain (int lq_id, int lq_jn, int lq_k) {
+  lp_add((import lpcond), "(" + lq_ltxt + ") != NULL");
+  lp_nul(lq_nn);
+  lp_add((import lpcond), lp_ntxt(lq_nn) + " <= " + lq_room);
+} return void;
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[0]:("(lav) != NULL")
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[1]:("(lan) <= (long long)(lav)->len - 0")
+given lpf_cs(1) ((import lpf_rb), (import lpf_jb), 2):() then (import lpcond)[1]:("(long long)(lbv)->len <= (long long)(lbv)->len - 2")
+
+lp_low(int lq_id, int lq_jn) {
+  lp_add((import lpcond), "(" + emit_expr(lq_jn) + ") >= 0");
+  if((import nkind)[lq_id] == "iassign") {
+    lp_add((import lpcond), "(" + emit_expr((import ni1)[lq_id]) + ")->cap >= 0");
+  }
+} return void;
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja)):() then (import lpcond)[0]:("(laj) >= 0")
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja)):() then len((import lpcond)):(1)
+given lpf_cs(1) ((import lpf_sb), (import lpf_oj)):() then (import lpcond)[1]:("(lbv)->cap >= 0")

@@ -1,0 +1,14 @@
+shift(int[] xs) {
+  int j = 0;
+  while(j < len(xs)) {
+    xs[j + 1] = xs[j];
+    print("" + j + " " + xs[j + 1]);
+    j = j + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [7, 8, 9];
+  shift(xs);
+  print("unreachable");
+} return int 0;

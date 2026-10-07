@@ -1,0 +1,23 @@
+// The list is not written in the body, and the counter is only stepped, after
+// the access.
+
+lp_held(int lq_id, int lq_bx, int lq_lo, int lq_hi) {
+  string lq_ls = (import ns1)[((import ni1)[lq_id])];
+  int lq_r = lp_cnt(lq_lo, lq_hi, lq_ls, 0) == 0;
+  if(lq_r == 1) {
+    lq_r = lp_steps(lq_id, (import lpj)[lq_bx], lq_lo, lq_hi);
+  }
+} return int lq_r;
+given lpf_cs(0) ((import lpf_xa), 0, (import lpf_loa), (import lpf_hia)):(1)
+given lpf_cs(6) ((import lpf_xw), 0, (import lpf_low), (import lpf_hiw)):(0)
+given lpf_cs(3) ((import lpf_xd), 0, (import lpf_lod), (import lpf_hid)):(0)
+
+lp_steps(int lq_id, string lq_js, int lq_lo, int lq_hi) {
+  int lq_r = lp_cnt(lq_lo, lq_hi, lq_js, 2) == 0;
+  if(lq_r == 1) {
+    lq_r = lq_id < lp_first(lq_lo, lq_hi, lq_js);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_xa), "laj", (import lpf_loa), (import lpf_hia)):(1)
+given lpf_more ((import lpf_xd), "ldj", (import lpf_lod), (import lpf_hid)):(0)
+given lpf_more ((import lpf_xe), "lej", (import lpf_loe), (import lpf_hie)):(0)

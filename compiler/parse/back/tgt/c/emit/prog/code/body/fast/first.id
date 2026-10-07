@@ -1,0 +1,14 @@
+// The node of a name's first write in lo..hi, or hi + 1 when there is none:
+// every access numbered below it is read before the name changes, because
+// nodes are numbered in the order the source is read and a body runs in that
+// order, one pass.
+
+lp_first(int lq_lo, int lq_hi, string lq_nm) {
+  int lq_i = lq_lo;
+  while(lq_i <= lq_hi && lp_w(lq_i, lq_nm, 0) == 0) {
+    lq_i = lq_i + 1;
+  }
+} return int lq_i;
+given lpf_more ((import lpf_lod), (import lpf_hid), "ldj"):((import lpf_id))
+given lpf_more ((import lpf_lod), (import lpf_hid), "zzz"):((import lpf_wd))
+given lpf_more ((import lpf_loa), (import lpf_hia), "las"):((import lpf_sa))

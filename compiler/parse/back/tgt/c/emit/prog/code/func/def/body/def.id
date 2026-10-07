@@ -6,8 +6,9 @@
 emit_def(int id) {
   string sig_v = sig(id);
   lset((import sqbase), 0, id);
-  emit_line(sig_v + " {");
+  string lq_attr = lp_flat(id);
 } chain (int id) {
+  emit_line(lq_attr + sig_v + " {");
   emit_def_body(id);
 } return void;
 given nz_prog_fixture ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n")

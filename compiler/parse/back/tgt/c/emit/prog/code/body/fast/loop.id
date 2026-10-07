@@ -1,0 +1,30 @@
+// A while loop, emitted twice when lp_plan covers some of its accesses: the
+// guarded copy under the guard, and the unchanged loop under its `else`. The
+// guard runs once, before the loop, so a loop whose guard fails runs exactly
+// as it would have, and traps at the same iteration with the same message.
+
+emit_loop(int id, string ind) {
+  int lq_fast = lp_plan(id);
+  if(lq_fast == 1) {
+    emit_loop_fast(id, ind);
+  } else {
+    emit_while(id, ind);
+  }
+} return void;
+given lpf_in(0) ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
+given lpf_in(0) ((import lpf_wc), ""):() then prints:("while ((lcj < lcn)) {\n    id_list_push(lcv, (long long)(intptr_t)((IdList*)(intptr_t)(id_list_get(lcv, lcj))));\n    lcj = (lcj + 1);\n}\n")
+
+emit_loop_fast(int id, string ind) {
+  string lq_pre = lp_pre();
+  emit_line(ind + "if (" + lq_pre + ") {");
+  lset((import lpon), 0, 1);
+} chain (int id, string ind) {
+  emit_while(id, ind + "    ");
+  lset((import lpon), 0, 0);
+  emit_line(ind + "} else {");
+} chain (int id, string ind) {
+  emit_while(id, ind + "    ");
+  emit_line(ind + "}");
+} return void;
+given lpf_in(0) given lpf_planned ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
+given lpf_in(0) given lpf_planned ((import lpf_wa), "  "):() then prints:("  if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n          laj = (laj + 1);\n      }\n  } else {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n          laj = (laj + 1);\n      }\n  }\n")

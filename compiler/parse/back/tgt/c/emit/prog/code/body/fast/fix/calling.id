@@ -1,0 +1,52 @@
+// LG, a loop that calls the leaf, in a function G2 whose only call is that
+// one; and LH, a loop that calls lpf_grow, in G3.
+
+lpf_lg() {
+  lpf_g1();
+  export int lpf_ng = node_var("lgn");
+  export int lpf_cg = lpf_lt("lgj", lpf_ng);
+} chain () {
+  export int lpf_xg = lpf_ix("lgv", node_var("lgj"));
+  export int lpf_kg = lpf_call1("lpf_leaf", lpf_xg);
+  export int lpf_sg = lpf_acc("lgs", lpf_kg);
+} chain () {
+  export int lpf_ig = lpf_inc("lgj", 1);
+  export int lpf_wg = lpf_wh(lpf_cg, lpf_sg, lpf_ig);
+  export int lpf_log = (import ni1)[(import lpf_wg)] + 1;
+} chain () {
+  export int lpf_hig = lpf_wg - 1;
+  int[] lfl_pn = [];
+  int[] lfl_g2 = [(import lpf_wg)];
+} chain () {
+  export int lpf_f2 = node_func("lpf_g2", "void", lfl_pn, lfl_g2, 0 - 1);
+  push((import prog), lpf_f2);
+  sym_func(lpf_f2);
+} return void;
+():() then calls lpf_g1:[1]
+():() then init_units:(0)
+
+lpf_lh() {
+  lpf_lg();
+  export int lpf_nh = node_var("lhn");
+  export int lpf_ch = lpf_lt("lhj", lpf_nh);
+} chain () {
+  export int lpf_vh = node_var("lhv");
+  export int lpf_kh = lpf_call1("lpf_grow", lpf_vh);
+  export int lpf_th = node_exprstmt(lpf_kh);
+} chain () {
+  export int lpf_xh = lpf_ix("lhv", node_var("lhj"));
+  export int lpf_sh = lpf_acc("lhs", lpf_xh);
+  export int lpf_wy = lpf_wh(lpf_ch, lpf_th, lpf_sh);
+} chain () {
+  export int lpf_loy = (import ni1)[(import lpf_wy)] + 1;
+  export int lpf_hiy = lpf_wy - 1;
+  int[] lfl_pn = [];
+} chain () {
+  int[] lfl_g3 = [(import lpf_wy)];
+  export int lpf_f3 = node_func("lpf_g3", "void", lfl_pn, lfl_g3, 0 - 1);
+  push((import prog), lpf_f3);
+} chain () {
+  sym_func(lpf_f3);
+} return void;
+():() then calls lpf_lg:[1]
+():() then init_units:(0)

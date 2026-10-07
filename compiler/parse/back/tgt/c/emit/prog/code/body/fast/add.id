@@ -1,0 +1,11 @@
+// A clause added to the guard once, however many accesses ask for it.
+
+lp_add(string[] lq_set, string lq_cl) {
+  if(find_str(lq_set, lq_cl) < 0) {
+    push(lq_set, lq_cl);
+  }
+} return void;
+given lpf_conds ((import lpcond), "x"):(["x", "y"], "x")
+given lpf_conds ((import lpcond), "w"):(["x", "y", "w"], "w")
+(["a"], "b"):(["a", "b"], "b")
+([], "c"):(["c"], "c")

@@ -15,6 +15,7 @@ init_sym() {
 } chain () {
   esc_init();
   init_structs();
+  lp_reset();
 } return void;
 given full_env ():() then calls init_sym_a:[1]
 given full_env ():() then init_units:(0)

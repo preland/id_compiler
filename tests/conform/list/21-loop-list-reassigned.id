@@ -1,0 +1,14 @@
+swap_short(int[] xs, int[] ys, int n) {
+  int j = 0;
+  while(j < n) {
+    print("" + j + " " + xs[j]);
+    xs = ys;
+    j = j + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3];
+  int[] ys = [4];
+  swap_short(xs, ys, 3);
+} return int 0;

@@ -11,7 +11,8 @@ emit_index(int id) {
   string elem = type_of(id);
   string sd_ixc = emit_idx(id);
 } chain (int id) {
-  string g = "id_list_get(" + emit_expr(i1_of_v) + ", " + sd_ixc + ")";
+  string lp_base = emit_expr(i1_of_v);
+  string g = lp_get(id, lp_base, sd_ixc);
   string ret_s = unbox(g, elem);
 } return string ret_s;
 given idx_build ((import idx_fix)):("(int)(id_list_get(id_list_lit(2, (long long)(2), (long long)(5)), 2))")

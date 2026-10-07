@@ -19,7 +19,9 @@ given sq_fixture ((import sq_iset), "  ", "V"):() then prints:("int idsq_7;\n  (
 iset_code(int id, string val) {
   int i1_of_v = (import ni1)[id];
   string sd_ixc = emit_idx(id);
-  string ret_s = "id_list_set(" + emit_expr(i1_of_v) + ", " + sd_ixc + ", " + val + ")";
+  string lp_base = emit_expr(i1_of_v);
+} chain (int id, string val) {
+  string ret_s = lp_set(id, lp_base, sd_ixc, val);
 } return string ret_s;
 given iassign_fixture ((import iassign_node), "BOXED"):("id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED)")
 given iassign_fixture ((import iassign_node), "OTHER"):("id_list_set(id_list_lit(1, (long long)(1)), 0, OTHER)")

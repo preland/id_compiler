@@ -1,0 +1,9 @@
+// Whether the nodes lo..hi are few enough for a function to be a leaf.
+
+lp_small(int lq_lo, int lq_hi) {
+  int lq_r = lq_hi - lq_lo < 64;
+} return int lq_r;
+(0, 63):(1)
+(0, 64):(0)
+(10, 20):(1)
+(5, 100):(0)

@@ -1,0 +1,24 @@
+// Fixtures that leave the loop state half-made: lpf_cs runs lp_cond on the
+// condition number k of lpf_cl, lpf_push1 puts one node in lpset, lpf_on turns
+// the guarded copy on with LA's access in lpset, and lpf_conds fills lpcond.
+
+lpf_cs(int lfi_k) {
+  lpf_more();
+  lp_cond((import lpf_cl)[lfi_k]);
+} return void;
+(0):() then (import lpj)[0]:("laj")
+(1):() then (import lpj)[0]:("lbj")
+
+lpf_push1() {
+  push((import lpset), 1);
+} return void;
+given lpf_env ():() then (import lpset)[0]:(1)
+given lpf_env ():() then len((import lpset)):(1)
+
+lpf_on() {
+  lpf_more();
+  lset((import lpon), 0, 1);
+  push((import lpset), (import lpf_xa));
+} return void;
+():() then (import lpon)[0]:(1)
+():() then len((import lpset)):(1)

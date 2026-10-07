@@ -1,0 +1,17 @@
+quiet(int[] xs) {
+  pop(xs);
+  int z = 0;
+} return int z;
+
+walk(int[] xs, int n) {
+  int j = 0;
+  while(j < n && quiet(xs) == 0) {
+    print("" + j + " " + xs[j]);
+    j = j + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [5, 6, 7, 8];
+  walk(xs, 4);
+} return int 0;

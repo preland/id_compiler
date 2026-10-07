@@ -1,0 +1,19 @@
+// The limit as the guard reads it: a variable or literal as written, and
+// `len(xs)` as xs's length field, after a clause that xs exists (lp_nul).
+
+lp_ntxt(int lq_nn) {
+  string lq_s = "(" + emit_expr(lq_nn) + ")";
+  if((import nkind)[lq_nn] == "call") {
+    lq_s = "(long long)(" + emit_expr((import nl1)[lq_nn][0]) + ")->len";
+  }
+} return string lq_s;
+given lpf_more ((import lpf_na)):("(lan)")
+given lpf_more ((import lpf_nb)):("(long long)(lbv)->len")
+
+lp_nul(int lq_nn) {
+  if((import nkind)[lq_nn] == "call") {
+    lp_add((import lpcond), "(" + emit_expr((import nl1)[lq_nn][0]) + ") != NULL");
+  }
+} return void;
+given lpf_more ((import lpf_nb)):() then (import lpcond)[0]:("(lbv) != NULL")
+given lpf_more ((import lpf_na)):() then len((import lpcond)):(0)

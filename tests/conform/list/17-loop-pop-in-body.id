@@ -1,0 +1,14 @@
+drain(int[] xs, int n) {
+  int j = 0;
+  while(j < n) {
+    print("" + j + " " + xs[j]);
+    pop(xs);
+    j = j + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [5, 6, 7, 8];
+  drain(xs, 4);
+  print("unreachable");
+} return int 0;

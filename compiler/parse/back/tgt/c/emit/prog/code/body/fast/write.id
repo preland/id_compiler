@@ -1,0 +1,38 @@
+// What a loop body does to a name. A write is an assignment or a declaration
+// (a declaration inside a loop is an assignment in the C); an increment is
+// the one assignment `name = name + 1`, which is all a counter may do.
+
+lp_wname(int lq_id) {
+  string lq_s = "";
+  if((import nkind)[lq_id] == "assign") {
+    lq_s = (import ns1)[lq_id];
+  }
+  if((import nkind)[lq_id] == "decl") {
+    lq_s = (import ns2)[lq_id];
+  }
+} return string lq_s;
+given lpf_more ((import lpf_sa)):("las")
+given lpf_more ((import lpf_dz)):("lpfz")
+given lpf_more ((import lpf_q)):("")
+
+lp_isinc(int lq_id) {
+  int lq_r = 0;
+  if((import nkind)[lq_id] == "assign") {
+    lq_r = lp_step(lq_id, (import ni1)[lq_id]);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_ia)):(1)
+given lpf_more ((import lpf_ie)):(0)
+given lpf_more ((import lpf_sa)):(0)
+given lpf_more ((import lpf_q)):(0)
+
+lp_step(int lq_id, int lq_e) {
+  int lq_a = (import ni1)[lq_e];
+  int lq_r = 0;
+  if((import ns1)[lq_e] == "+" && (import nkind)[lq_a] == "var" && (import ns1)[lq_a] == (import ns1)[lq_id]) {
+    lq_r = lp_one((import ni2)[lq_e]);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_ia), (import lpf_ea)):(1)
+given lpf_more ((import lpf_ie), (import lpf_ee)):(0)
+given lpf_more ((import lpf_sa), (import lpf_ea)):(0)

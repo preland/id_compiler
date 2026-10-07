@@ -16,7 +16,7 @@ es4(int id, string ind) {
   if((import nkind)[id] == "if") {
     emit_if(id, ind);
   } else {
-    emit_while(id, ind);
+    emit_loop(id, ind);
   }
 } return void;
 given nz_if_fixture ((import nz_ifn), "  "):() then prints:("  if (7) {\n  }\n")

@@ -1,0 +1,44 @@
+// Counting the writes to a name over the nodes lo..hi of a loop's body, and
+// finding the first. `mode` picks which writes count: 0 every write, 1 only
+// increments, 2 every write that is not an increment.
+
+lp_w(int lq_id, string lq_nm, int lq_md) {
+  int lq_r = 0;
+  if(lp_wname(lq_id) == lq_nm) {
+    lq_r = lp_pick(lq_md, lp_isinc(lq_id));
+  }
+} return int lq_r;
+given lpf_more ((import lpf_ia), "laj", 0):(1)
+given lpf_more ((import lpf_ia), "laj", 2):(0)
+given lpf_more ((import lpf_sa), "las", 2):(1)
+given lpf_more ((import lpf_ia), "zzz", 0):(0)
+
+lp_pick(int lq_md, int lq_inc) {
+  int lq_r = 1;
+  if(lq_md == 1) {
+    lq_r = lq_inc;
+  }
+  if(lq_md == 2) {
+    lq_r = 1 - lq_inc;
+  }
+} return int lq_r;
+(0, 0):(1)
+(0, 1):(1)
+(1, 1):(1)
+(1, 0):(0)
+(2, 0):(1)
+(2, 1):(0)
+
+lp_cnt(int lq_lo, int lq_hi, string lq_nm, int lq_md) {
+  int lq_n = 0;
+  int lq_i = lq_lo;
+  while(lq_i <= lq_hi) {
+    lq_n = lq_n + lp_w(lq_i, lq_nm, lq_md);
+    lq_i = lq_i + 1;
+  }
+} return int lq_n;
+given lpf_more ((import lpf_loa), (import lpf_hia), "laj", 0):(1)
+given lpf_more ((import lpf_loa), (import lpf_hia), "laj", 2):(0)
+given lpf_more ((import lpf_loe), (import lpf_hie), "lej", 0):(1)
+given lpf_more ((import lpf_loe), (import lpf_hie), "lej", 1):(0)
+given lpf_more ((import lpf_loa), (import lpf_hia), "zzz", 0):(0)

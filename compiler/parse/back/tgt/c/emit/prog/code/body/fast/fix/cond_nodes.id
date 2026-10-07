@@ -1,0 +1,24 @@
+// More builders: a `counter < limit` condition, a loop with two statements,
+// `counter + k`, and `len(xs)`.
+
+lpf_lt(string lfs_j, int lfi_n) {
+  int lfi_a = node_var(lfs_j);
+  int lfi_r = node_bin("<", lfi_a, lfi_n);
+} return int lfi_r;
+given lpf_one ("j", 0):(2) then (import ns1)[2]:("<")
+given lpf_one ("k", 0):(2) then (import ns1)[1]:("k")
+
+lpf_wh(int lfi_c, int lfi_a, int lfi_b) {
+  int[] lfl_body = [lfi_a, lfi_b];
+  int lfi_r = node_while(lfi_c, lfl_body);
+} return int lfi_r;
+given lpf_two (1, 0, 0):(2) then (import ni1)[2]:(1)
+given lpf_two (0, 1, 1):(2) then (import ni1)[2]:(0)
+
+lpf_off(string lfs_j, int lfi_k) {
+  int lfi_a = node_var(lfs_j);
+  int lfi_b = node_int("" + lfi_k, lfi_k, 0);
+  int lfi_r = node_bin("+", lfi_a, lfi_b);
+} return int lfi_r;
+given lpf_env ("j", 1):(2) then (import ni1)[1]:(1)
+given lpf_env ("q", 3):(2) then (import ni1)[1]:(3)

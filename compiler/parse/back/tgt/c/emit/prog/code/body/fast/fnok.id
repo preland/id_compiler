@@ -1,0 +1,20 @@
+// A loop that calls a function of the program is versioned only inside a
+// function whose every call is to a leaf or a builtin (lp_cls), which the
+// `flatten` of flat.id can then inline without growing without bound.
+
+lp_calls_ok(int lq_lo, int lq_hi) {
+  if(lp_uany(lq_lo, lq_hi) == 1 && lp_fnok() == 0) {
+    lp_reset();
+  }
+} return void;
+given lpf_in(2) given lpf_push1 ((import lpf_loy), (import lpf_hiy)):() then lpf_nset:(0)
+given lpf_in(1) given lpf_push1 ((import lpf_log), (import lpf_hig)):() then lpf_nset:(1)
+given lpf_in(2) given lpf_push1 ((import lpf_loa), (import lpf_hia)):() then lpf_nset:(1)
+
+lp_fnok() {
+  int lq_fn = (import sqbase)[0];
+  int lq_r = 1 - lp_range(lp_lo(lq_fn), lq_fn, 1);
+} return int lq_r;
+given lpf_in(1) ():(1)
+given lpf_in(2) ():(0)
+given lpf_in(0) ():(0)

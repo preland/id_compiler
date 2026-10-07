@@ -1,0 +1,42 @@
+// Whether a call can change a list's length, or is to a callee this pass
+// cannot see into: 1 for push and pop, for a call through a function value,
+// for a native or asm function, and for a function that is not a leaf. A
+// builtin other than push and pop, a struct constructor and a leaf function
+// cannot. A leaf is a function of at most 64 nodes whose calls are all
+// builtins or struct constructors that cannot (lp_known): it cannot reach a
+// list but through its parameters, and cannot resize one.
+
+lp_cls(string lq_nm) {
+  int lq_ix = fix_fnix(lq_nm);
+  int lq_r = lp_known(lq_nm);
+  if(lq_ix >= 0) {
+    lq_r = lp_unleaf((import fnodes)[lq_ix]);
+  }
+} return int lq_r;
+given lpf_more ("push"):(1)
+given lpf_more ("len"):(0)
+given lpf_more ("lpf_leaf"):(0)
+given lpf_more ("lpf_grow"):(1)
+given lpf_more ("nosuchfn"):(1)
+
+lp_known(string lq_nm) {
+  int lq_r = 1;
+  if(lq_nm != "push" && lq_nm != "pop" && (is_builtin(lq_nm) == 1 || find_str((import sdname), lq_nm) >= 0)) {
+    lq_r = 0;
+  }
+} return int lq_r;
+given lpf_more ("push"):(1)
+given lpf_more ("pop"):(1)
+given lpf_more ("len"):(0)
+given lpf_more ("lpf_leaf"):(1)
+given lpf_more given sd_note("P", ["a"], ["int"], "p.id", 1) ("P"):(0)
+
+lp_unleaf(int lq_fn) {
+  int lq_r = 1;
+  if(lq_fn >= 0 && is_native(lq_fn) == 0) {
+    lq_r = lp_wide(lq_fn);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_leaf)):(0)
+given lpf_more ((import lpf_grow)):(1)
+given lpf_more (-1):(1)

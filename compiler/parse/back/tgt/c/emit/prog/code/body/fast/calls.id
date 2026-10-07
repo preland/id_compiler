@@ -1,0 +1,34 @@
+// 1 for a call node the guard cannot allow for: by lp_known (md 0, what a leaf
+// may call) or by lp_cls (md 1, what the function holding a loop may call).
+
+lp_callbad(int lq_id, int lq_md) {
+  int lq_r = 0;
+  if((import nkind)[lq_id] == "call") {
+    lq_r = lp_named((import ns1)[lq_id], lq_md);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_kg), 0):(1)
+given lpf_more ((import lpf_kg), 1):(0)
+given lpf_more ((import lpf_kc), 1):(1)
+given lpf_more ((import lpf_xa), 0):(0)
+
+lp_named(string lq_nm, int lq_md) {
+  int lq_r = lp_known(lq_nm);
+  if(lq_md == 1) {
+    lq_r = lp_cls(lq_nm);
+  }
+} return int lq_r;
+given lpf_more ("lpf_leaf", 0):(1)
+given lpf_more ("lpf_leaf", 1):(0)
+given lpf_more ("push", 1):(1)
+given lpf_more ("len", 0):(0)
+
+lp_ucall(int lq_id) {
+  int lq_r = 0;
+  if((import nkind)[lq_id] == "call") {
+    lq_r = fix_fnix((import ns1)[lq_id]) >= 0;
+  }
+} return int lq_r;
+given lpf_more ((import lpf_kg)):(1)
+given lpf_more ((import lpf_kc)):(0)
+given lpf_more ((import lpf_xa)):(0)

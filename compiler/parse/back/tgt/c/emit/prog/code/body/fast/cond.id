@@ -1,0 +1,40 @@
+// The bounds a loop's condition guarantees on entry to every iteration: each
+// conjunct of the form `counter < limit`, where the limit is a variable, an
+// integer literal or `len(variable)`. A `&&` holds both sides inside the body.
+// The condition is run once per iteration, outside the body the guard looks at,
+// so it may hold nothing else -- a call in it could resize a list -- and
+// anything else in it marks the loop as not coverable (lpbad).
+
+lp_cond(int lq_c) {
+  if((import nkind)[lq_c] == "bin") {
+    lp_bin(lq_c);
+  } else {
+    lset((import lpbad), 0, 1);
+  }
+} return void;
+given lpf_more ((import lpf_andn)):() then len((import lpj)):(2)
+given lpf_more ((import lpf_q)):() then (import lpbad)[0]:(1)
+
+lp_bin(int lq_c) {
+  string lq_op = (import ns1)[lq_c];
+  if(lq_op == "&&") {
+    lp_cond((import ni1)[lq_c]);
+    lp_cond((import ni2)[lq_c]);
+  }
+  if(lq_op != "&&") {
+    lp_cmp(lq_c);
+  }
+} return void;
+given lpf_more ((import lpf_andn)):() then len((import lpj)):(2)
+given lpf_more ((import lpf_ca)):() then (import lpj)[0]:("laj")
+given lpf_more ((import lpf_vvs)):() then (import lpbad)[0]:(1)
+
+lp_cmp(int lq_c) {
+  if((import ns1)[lq_c] == "<") {
+    lp_bound(lq_c);
+  } else {
+    lset((import lpbad), 0, 1);
+  }
+} return void;
+given lpf_more ((import lpf_ca)):() then (import lpbad)[0]:(0)
+given lpf_more ((import lpf_vvs)):() then (import lpbad)[0]:(1)

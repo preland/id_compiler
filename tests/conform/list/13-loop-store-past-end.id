@@ -1,0 +1,14 @@
+fill(int[] out, int n) {
+  int i = 0;
+  while(i < n) {
+    out[i] = i * 2;
+    print("" + i + " " + out[i]);
+    i = i + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] out = [0, 0];
+  fill(out, 4);
+  print("unreachable");
+} return int 0;

@@ -1,0 +1,25 @@
+// Loop versioning (docs/PERFORMANCE.md): a `while (j < n)` loop whose list
+// accesses can be proved in range once, before the loop, is emitted twice --
+// a copy that reads and writes the cells directly, guarded by one check that
+// the whole range is in bounds, and the checked copy as the fallback -- so
+// every out-of-range access still traps, at the same iteration, with the same
+// message, because the fallback is the unchanged loop.
+//
+//   lpset   the index and index-assignment nodes the guard covers
+//   lpon    [1] while the guarded copy is being emitted
+//   lpcond  the guard's clauses, one C condition each
+//   lpj     the loop condition's bounds: the counter's name, and in lpn the
+//           node of the limit it is compared with
+//   lpbad   [1] when the condition holds something the guard cannot read
+
+lp_reset() {
+  export int[] lpset = [];
+  export int[] lpon = [0];
+  export string[] lpcond = [];
+} chain () {
+  export string[] lpj = [];
+  export int[] lpn = [];
+  export int[] lpbad = [0];
+} return void export lpset;
+given lpf_on ():() then lpf_nset:(0)
+given lpf_on ():() then lpf_flag:(1)

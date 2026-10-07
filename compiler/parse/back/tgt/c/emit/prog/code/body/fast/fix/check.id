@@ -1,0 +1,16 @@
+// Check functions for cases whose function under test only reads the loop
+// state, or declares it: one that states how many accesses lpset holds, one
+// that states whether the guarded copy is on (its one cell, plus the cell
+// count, so that 2 is on and 1 is off).
+
+lpf_nset() {
+  int lfi_n = len((import lpset));
+} return int lfi_n;
+given lpf_on ():(1)
+given lpf_more ():(0)
+
+lpf_flag() {
+  int lfi_f = (import lpon)[0] + len((import lpon));
+} return int lfi_f;
+given lpf_on ():(2)
+given lpf_more ():(1)

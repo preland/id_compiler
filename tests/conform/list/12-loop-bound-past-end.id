@@ -1,0 +1,15 @@
+sum_to(int[] xs, int n) {
+  int s = 0;
+  int j = 0;
+  while(j < n) {
+    s = s + xs[j];
+    print("" + j + " " + s);
+    j = j + 1;
+  }
+} return int s;
+
+main(int argc, string[] argv) {
+  int[] xs = [10, 20, 30];
+  int t = sum_to(xs, 5);
+  print("unreachable " + t);
+} return int 0;

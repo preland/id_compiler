@@ -1,0 +1,26 @@
+dot(int[] a, float[] b, int n) {
+  float s = 0.0;
+  int j = 0;
+  while(j < n) {
+    s = s + a[j] * b[j];
+    j = j + 1;
+  }
+} return float s;
+
+scale(float[] b, int n) {
+  int i = 0;
+  while(i < len(b)) {
+    b[i] = b[i] * 2.0;
+    i = i + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] a = [1, 2, 3, 4];
+  float[] b = [0.5, 1.5, 2.5, 3.5];
+  print("" + dot(a, b, 4));
+} chain (int argc, string[] argv) {
+  scale(b, 4);
+  print("" + dot(a, b, 4));
+  print("" + b[4]);
+} return int 0;

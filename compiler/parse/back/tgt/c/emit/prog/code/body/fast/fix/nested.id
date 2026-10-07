@@ -1,0 +1,32 @@
+// LF, a loop inside a loop, and G1, the function that holds LA to LF.
+
+lpf_lf() {
+  lpf_le();
+  export int lpf_nf = node_var("lfn");
+  export int lpf_cf = lpf_lt("lfj", lpf_nf);
+} chain () {
+  export int lpf_ci = lpf_lt("lfk", lpf_nf);
+  export int lpf_xf = lpf_ix("lfv", node_var("lfj"));
+  export int lpf_sf = lpf_acc("lfs", lpf_xf);
+} chain () {
+  export int lpf_wi = lpf_wh(lpf_ci, lpf_sf, lpf_sf);
+  export int lpf_jf = lpf_inc("lfj", 1);
+  export int lpf_wf = lpf_wh(lpf_cf, lpf_wi, lpf_jf);
+} chain () {
+  export int lpf_lof = (import ni1)[lpf_wf] + 1;
+  export int lpf_hif = lpf_wf - 1;
+} return void;
+():() then calls lpf_le:[1]
+():() then init_units:(0)
+
+lpf_g1() {
+  lpf_lf();
+  int[] lfl_pn = [];
+  int[] lfl_g1 = [(import lpf_wa), (import lpf_wb), (import lpf_wc), (import lpf_wd), (import lpf_we), (import lpf_wf)];
+} chain () {
+  export int lpf_f1 = node_func("lpf_g1", "void", lfl_pn, lfl_g1, 0 - 1);
+  push((import prog), lpf_f1);
+  sym_func(lpf_f1);
+} return void;
+():() then calls lpf_lf:[1]
+():() then init_units:(0)

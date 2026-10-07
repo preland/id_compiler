@@ -1,0 +1,39 @@
+// The two index shapes the guard covers: `j`, and `j + k` with k a
+// non-negative integer literal. lp_ixnode answers the node of the variable
+// (-1 for any other shape), lp_ixoff the literal added to it.
+
+lp_ixnode(int lq_x) {
+  int lq_v = 0 - 1;
+  if((import nkind)[lq_x] == "var") {
+    lq_v = lq_x;
+  }
+  if(lp_plus(lq_x) == 1) {
+    lq_v = (import ni1)[lq_x];
+  }
+} return int lq_v;
+given lpf_more ((import lpf_ob)):((import lpf_oj))
+given lpf_more ((import lpf_n0)):(-1)
+
+lp_ixoff(int lq_x) {
+  int lq_k = 0;
+  if(lp_plus(lq_x) == 1) {
+    lq_k = (import ni1)[((import ni2)[lq_x])];
+  }
+  if((import nkind)[lq_x] != "var" && lp_plus(lq_x) == 0) {
+    lq_k = 0 - 1;
+  }
+} return int lq_k;
+given lpf_more ((import lpf_na)):(0)
+given lpf_more ((import lpf_ob)):(1)
+given lpf_more ((import lpf_n0)):(-1)
+
+lp_plus(int lq_x) {
+  int lq_r = 0;
+  if((import nkind)[lq_x] == "bin" && (import ns1)[lq_x] == "+") {
+    lq_r = lp_tail(lq_x);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_ob)):(1)
+given lpf_more ((import lpf_na)):(0)
+given lpf_more ((import lpf_bigr)):(0)
+given lpf_more ((import lpf_vvs)):(0)

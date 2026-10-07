@@ -1,0 +1,48 @@
+// Planning a loop: its bounds, the accesses they cover, and, if there are any,
+// whether the body is clean. A body that is not clean covers nothing.
+
+lp_plan(int lq_w) {
+  lp_reset();
+  lp_cond((import ni1)[lq_w]);
+  lp_scan((import ni1)[lq_w] + 1, lq_w - 1);
+} chain (int lq_w) {
+  lp_guard((import ni1)[lq_w] + 1, lq_w - 1);
+  int lq_r = len((import lpset)) > 0;
+} return int lq_r;
+given lpf_in(0) ((import lpf_wa)):(1) then len((import lpcond)):(3)
+given lpf_in(0) ((import lpf_wb)):(1) then lpf_nset:(3)
+given lpf_in(0) ((import lpf_wc)):(0)
+given lpf_in(0) ((import lpf_wd)):(0)
+given lpf_in(0) ((import lpf_we)):(0)
+given lpf_in(0) ((import lpf_wf)):(0)
+given lpf_in(0) ((import lpf_wr)):(0)
+given lpf_in(0) ((import lpf_ww)):(0)
+given lpf_in(0) ((import lpf_wx)):(0)
+given lpf_in(1) ((import lpf_wg)):(1)
+given lpf_in(2) ((import lpf_wy)):(0)
+
+lp_guard(int lq_lo, int lq_hi) {
+  if(len((import lpset)) > 0 && lp_clean(lq_lo, lq_hi) == 0) {
+    lp_reset();
+  }
+  if(len((import lpset)) > 0) {
+    lp_calls_ok(lq_lo, lq_hi);
+  }
+  if((import lpbad)[0] == 1) {
+    lp_reset();
+  }
+} return void;
+given lpf_in(0) given lpf_push1 ((import lpf_loc), (import lpf_hic)):() then lpf_nset:(0)
+given lpf_in(0) given lpf_push1 ((import lpf_loa), (import lpf_hia)):() then lpf_nset:(1)
+given lpf_in(2) given lpf_push1 ((import lpf_loy), (import lpf_hiy)):() then lpf_nset:(0)
+
+lp_pre() {
+  string lq_s = (import lpcond)[0];
+  int lq_i = 1;
+  while(lq_i < len((import lpcond))) {
+    lq_s = lq_s + " && " + (import lpcond)[lq_i];
+    lq_i = lq_i + 1;
+  }
+} return string lq_s;
+given lpf_conds ():("x && y")
+given lpf_conds3 ():("x && y && z")

@@ -1,0 +1,31 @@
+// The text of a covered access in the guarded copy of a loop: the cell itself,
+// where the checked copy calls id_list_get / id_list_set. Anything the guard
+// does not cover keeps the call.
+
+lp_hit(int lq_id) {
+  int lq_r = 0;
+  if((import lpon)[0] == 1) {
+    lq_r = lst_find((import lpset), lq_id);
+  }
+} return int lq_r;
+given lpf_on ((import lpf_xa)):(1)
+given lpf_on ((import lpf_xb)):(0)
+given lpf_more ((import lpf_xa)):(0)
+
+lp_get(int lq_id, string lq_btxt, string lq_xtxt) {
+  string lq_s = "id_list_get(" + lq_btxt + ", " + lq_xtxt + ")";
+  if(lp_hit(lq_id) == 1) {
+    lq_s = "(" + lq_btxt + ")->data[" + lq_xtxt + "]";
+  }
+} return string lq_s;
+given lpf_on ((import lpf_xa), "v", "j"):("(v)->data[j]")
+given lpf_on ((import lpf_xb), "w", "k"):("id_list_get(w, k)")
+
+lp_set(int lq_id, string lq_btxt, string lq_xtxt, string lq_vtxt) {
+  string lq_s = "id_list_set(" + lq_btxt + ", " + lq_xtxt + ", " + lq_vtxt + ")";
+  if(lp_hit(lq_id) == 1) {
+    lq_s = "(" + lq_btxt + ")->data[" + lq_xtxt + "] = " + lq_vtxt;
+  }
+} return string lq_s;
+given lpf_on ((import lpf_xa), "v", "j", "7"):("(v)->data[j] = 7")
+given lpf_more ((import lpf_xa), "w", "k", "8"):("id_list_set(w, k, 8)")

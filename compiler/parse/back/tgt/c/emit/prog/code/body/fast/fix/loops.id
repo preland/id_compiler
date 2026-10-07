@@ -1,0 +1,53 @@
+// The other loops the cases plan. LC pushes onto the list it reads, LD reads
+// after its counter has stepped, LE steps by two, LF holds an inner loop. All
+// four have an access that would be covered if the body allowed it.
+
+lpf_lc() {
+  lpf_lb();
+  export int lpf_nc = node_var("lcn");
+  export int lpf_cc = lpf_lt("lcj", lpf_nc);
+} chain () {
+  export int lpf_xc = lpf_ix("lcv", node_var("lcj"));
+  export int lpf_kc = lpf_pushx("lcv", lpf_xc);
+  export int lpf_sc = node_exprstmt(lpf_kc);
+} chain () {
+  export int lpf_ic = lpf_inc("lcj", 1);
+  export int lpf_wc = lpf_wh(lpf_cc, lpf_sc, lpf_ic);
+  export int lpf_loc = (import ni1)[lpf_wc] + 1;
+} chain () {
+  export int lpf_hic = lpf_wc - 1;
+} return void;
+():() then calls lpf_lb:[1]
+():() then init_units:(0)
+
+lpf_ld() {
+  lpf_lc();
+  export int lpf_nd = node_var("ldn");
+  export int lpf_cd = lpf_lt("ldj", lpf_nd);
+} chain () {
+  export int lpf_id = lpf_inc("ldj", 1);
+  export int lpf_xd = lpf_ix("ldv", node_var("ldj"));
+  export int lpf_sd = lpf_acc("lds", lpf_xd);
+} chain () {
+  export int lpf_wd = lpf_wh(lpf_cd, lpf_id, lpf_sd);
+  export int lpf_lod = (import ni1)[lpf_wd] + 1;
+  export int lpf_hid = lpf_wd - 1;
+} return void;
+():() then calls lpf_lc:[1]
+():() then init_units:(0)
+
+lpf_le() {
+  lpf_ld();
+  export int lpf_ne = node_var("len2");
+  export int lpf_ce = lpf_lt("lej", lpf_ne);
+} chain () {
+  export int lpf_xe = lpf_ix("lev", node_var("lej"));
+  export int lpf_se = lpf_acc("les", lpf_xe);
+  export int lpf_ie = lpf_inc("lej", 2);
+} chain () {
+  export int lpf_we = lpf_wh(lpf_ce, lpf_se, lpf_ie);
+  export int lpf_loe = (import ni1)[lpf_we] + 1;
+  export int lpf_hie = lpf_we - 1;
+} return void;
+():() then calls lpf_ld:[1]
+():() then init_units:(0)

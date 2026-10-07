@@ -1,0 +1,22 @@
+// lpcond with two or three clauses, for lp_pre's cases.
+
+lpf_conds() {
+  lpf_env();
+  push((import lpcond), "x");
+  push((import lpcond), "y");
+} return void;
+():() then len((import lpcond)):(2)
+():() then (import lpcond)[1]:("y")
+
+lpf_conds3() {
+  lpf_conds();
+  push((import lpcond), "z");
+} return void;
+():() then len((import lpcond)):(3)
+():() then (import lpcond)[2]:("z")
+
+lpf_planned() {
+  lp_plan((import lpf_wa));
+} return void;
+given lpf_in(0) ():() then lpf_nset:(1)
+given lpf_in(0) ():() then lpf_flag:(1)

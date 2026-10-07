@@ -1,0 +1,71 @@
+// Two small functions the loop cases call, registered in `prog` and in the
+// function table the way a parse leaves them: lpf_leaf, a leaf (`z = q + 1`),
+// and lpf_grow, which pushes onto its parameter and so is not one. Then the
+// first two loops (loops.id has the rest): LA, a plain sum over a list whose
+// limit is a variable, and LB, a copy within one list, bounded by its own
+// length, that writes at an offset.
+
+lpf_base() {
+  lpf_two();
+  export int lpf_q = node_var("lpfq");
+  export int lpf_z1 = node_bin("+", lpf_q, (import lpf_n0));
+} chain () {
+  export int lpf_dz = node_decl("int", "lpfz", lpf_z1, 0);
+  export int lpf_rz = node_var("lpfz");
+  export int lpf_pq = node_param("param", "int", "lpfq");
+} chain () {
+  int[] lfl_pl = [lpf_pq];
+  int[] lfl_db = [lpf_dz];
+  export int lpf_leaf = node_func("lpf_leaf", "int", lfl_pl, lfl_db, lpf_rz);
+} chain () {
+  push((import prog), lpf_leaf);
+  sym_func(lpf_leaf);
+  export int lpf_gc = lpf_pushx("lpfg", (import lpf_n0));
+} chain () {
+  export int lpf_gs = node_exprstmt(lpf_gc);
+  export int lpf_pg = node_param("param", "int[]", "lpfg");
+  int[] lfl_gp = [lpf_pg];
+} chain () {
+  int[] lfl_gb = [lpf_gs];
+  export int lpf_grow = node_func("lpf_grow", "void", lfl_gp, lfl_gb, 0 - 1);
+  push((import prog), lpf_grow);
+} chain () {
+  sym_func(lpf_grow);
+} return void;
+():() then calls lpf_two:[1]
+():() then init_units:(0)
+
+lpf_la() {
+  lpf_base();
+  export int lpf_na = node_var("lan");
+  export int lpf_ca = lpf_lt("laj", lpf_na);
+} chain () {
+  export int lpf_xa = lpf_ix("lav", node_var("laj"));
+  export int lpf_sa = lpf_acc("las", lpf_xa);
+  export int lpf_ia = lpf_inc("laj", 1);
+} chain () {
+  export int lpf_wa = lpf_wh(lpf_ca, lpf_sa, lpf_ia);
+  export int lpf_loa = (import ni1)[lpf_wa] + 1;
+  export int lpf_hia = lpf_wa - 1;
+} return void;
+():() then calls lpf_base:[1]
+():() then init_units:(0)
+
+lpf_lb() {
+  lpf_la();
+  export int lpf_nb = lpf_len("lbv");
+  export int lpf_cb = lpf_lt("lbj", lpf_nb);
+} chain () {
+  export int lpf_ob = lpf_off("lbj", 1);
+  export int lpf_xb = lpf_ix("lbv", lpf_ob);
+  export int lpf_rb = lpf_ix("lbv", node_var("lbj"));
+} chain () {
+  export int lpf_sb = node_iassign(lpf_xb, lpf_rb);
+  export int lpf_ib = lpf_inc("lbj", 1);
+  export int lpf_wb = lpf_wh(lpf_cb, lpf_sb, lpf_ib);
+} chain () {
+  export int lpf_lob = (import ni1)[lpf_wb] + 1;
+  export int lpf_hib = lpf_wb - 1;
+} return void;
+():() then calls lpf_la:[1]
+():() then init_units:(0)

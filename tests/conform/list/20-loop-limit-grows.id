@@ -1,0 +1,13 @@
+grow_limit(int[] xs, int n) {
+  int j = 0;
+  while(j < n) {
+    n = n + 1;
+    print("" + j + " " + xs[j]);
+    j = j + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3];
+  grow_limit(xs, 3);
+} return int 0;

@@ -1,0 +1,42 @@
+// What a loop's bound may compare the counter with, and the variable whose
+// value it is read from. `len(xs)` is read as xs's length, which the guard
+// takes once: it is the same length for every iteration while nothing in the
+// body resizes or reassigns xs.
+
+lp_limit(int lq_r) {
+  int lq_ok = 0;
+  if((import nkind)[lq_r] == "var" || (import nkind)[lq_r] == "int") {
+    lq_ok = 1;
+  }
+  if((import nkind)[lq_r] == "call" && (import ns1)[lq_r] == "len") {
+    lq_ok = lp_lenarg(lq_r);
+  }
+} return int lq_ok;
+given lpf_more ((import lpf_na)):(1)
+given lpf_more ((import lpf_n0)):(1)
+given lpf_more ((import lpf_nb)):(1)
+given lpf_more ((import lpf_z1)):(0)
+given lpf_more ((import lpf_kc)):(0)
+
+lp_lenarg(int lq_r) {
+  int[] lq_args = (import nl1)[lq_r];
+  int lq_ok = 0;
+  if(len(lq_args) == 1 && (import nkind)[lq_args[0]] == "var") {
+    lq_ok = 1;
+  }
+} return int lq_ok;
+given lpf_more ((import lpf_nb)):(1)
+given lpf_more ((import lpf_kc)):(0)
+
+lp_lname(int lq_r) {
+  string lq_s = "";
+  if((import nkind)[lq_r] == "var") {
+    lq_s = (import ns1)[lq_r];
+  }
+  if((import nkind)[lq_r] == "call") {
+    lq_s = (import ns1)[((import nl1)[lq_r][0])];
+  }
+} return string lq_s;
+given lpf_more ((import lpf_na)):("lan")
+given lpf_more ((import lpf_nb)):("lbv")
+given lpf_more ((import lpf_n0)):("")

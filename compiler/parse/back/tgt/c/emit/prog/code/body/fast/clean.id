@@ -1,0 +1,34 @@
+// Whether a body leaves every list's length alone: it has no loop inside (a
+// counter stepped in an inner loop is stepped many times between two reads in
+// the text), and every call in it is one that cannot push or pop a list
+// (lp_cls). The guard compares lengths once, so a push or a pop in the body is
+// what it cannot allow for.
+
+lp_clean(int lq_lo, int lq_hi) {
+  int lq_r = 1;
+  int lq_i = lq_lo;
+  while(lq_i <= lq_hi && lq_r == 1) {
+    lq_r = lp_clear(lq_i);
+    lq_i = lq_i + 1;
+  }
+} return int lq_r;
+given lpf_more ((import lpf_loa), (import lpf_hia)):(1)
+given lpf_more ((import lpf_loc), (import lpf_hic)):(0)
+given lpf_more ((import lpf_lof), (import lpf_hif)):(0)
+given lpf_more ((import lpf_log), (import lpf_hig)):(1)
+given lpf_more ((import lpf_loy), (import lpf_hiy)):(0)
+
+lp_clear(int lq_id) {
+  int lq_r = 1;
+  if((import nkind)[lq_id] == "while") {
+    lq_r = 0;
+  }
+  if((import nkind)[lq_id] == "call") {
+    lq_r = 1 - lp_cls((import ns1)[lq_id]);
+  }
+} return int lq_r;
+given lpf_more ((import lpf_xa)):(1)
+given lpf_more ((import lpf_wi)):(0)
+given lpf_more ((import lpf_kc)):(0)
+given lpf_more ((import lpf_kg)):(1)
+given lpf_more ((import lpf_kh)):(0)

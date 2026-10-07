@@ -1,0 +1,11 @@
+// A fixture with the emitter inside one of the functions lpf_fl lists, which
+// is what sqbase says while a function is being emitted and what lp_fnok
+// reads: 0 is G1, 1 is G2 (a loop calling the leaf), 2 is G3 (a loop calling
+// lpf_grow).
+
+lpf_in(int lfi_k) {
+  lpf_more();
+  lset((import sqbase), 0, (import lpf_fl)[lfi_k]);
+} return void;
+(0):() then calls lpf_more:[1]
+(1):() then init_units:(0)
