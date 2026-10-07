@@ -1,0 +1,11 @@
+// A fixture that has read the condition number k of lpq_cl, as the planner
+// does before it looks at a body: lpj and lpn hold its counters and limits.
+// The conditions are those of LS, LV, LK, LM, LN, LT, LU, LP, LI, LW and LZ.
+
+lpq_cs(int lfi_k) {
+  lpq_lw();
+  lp_cond((import lpq_cl)[lfi_k]);
+} return void;
+(0):() then (import lpj)[0]:("lsj")
+(3):() then len((import lpj)):(2)
+(9):() then (import lpj)[0]:("lwj2")

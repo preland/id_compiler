@@ -1,0 +1,28 @@
+// Recording an access the sum-of-terms index covers: its node, and the clauses
+// of the guard it needs. The list is tested for NULL first, then each term adds
+// its own clauses while the largest value of the index is built, and the last
+// clause compares that value with the list's length, as a field and in 64 bits
+// (no term is wider than 31 bits and at most one is a product, so the sum
+// cannot overflow). A store also needs the list not to be a constant.
+
+lx_take(int lg_id, int lg_e, int lg_lo, int lg_hi) {
+  string lg_ls = emit_expr((import ni1)[lg_id]);
+  push((import lpset), lg_id);
+  lp_add((import lpcond), "(" + lg_ls + ") != NULL");
+} chain (int lg_id, int lg_e, int lg_lo, int lg_hi) {
+  string lg_h = lx_hi(lg_e, lg_id, lg_lo, lg_hi, 0);
+  lp_add((import lpcond), lg_h + " < (long long)(" + lg_ls + ")->len");
+  lx_cap(lg_id, lg_ls);
+} return void;
+given lpq_cs(0) ((import lpq_xs), (import lpq_us), (import lpq_los), (import lpq_his)):() then len((import lpset)):(1)
+given lpq_cs(0) ((import lpq_xs), (import lpq_us), (import lpq_los), (import lpq_his)):() then (import lpcond)[3]:("((((long long)(lsn) - 1) * (long long)(3)) + (long long)(lsc)) < (long long)(lsv)->len")
+given lpq_cs(2) ((import lpq_ak), (import lpq_vk), (import lpq_lok), (import lpq_hik)):() then (import lpcond)[3]:("(lkv)->cap >= 0")
+given lpq_cs(2) ((import lpq_ak), (import lpq_vk), (import lpq_lok), (import lpq_hik)):() then (import lpcond)[0]:("(lkv) != NULL")
+
+lx_cap(int lg_id, string lg_ls) {
+  if((import nkind)[lg_id] == "iassign") {
+    lp_add((import lpcond), "(" + lg_ls + ")->cap >= 0");
+  }
+} return void;
+given lpq_cs(2) ((import lpq_ak), "lkv"):() then (import lpcond)[0]:("(lkv)->cap >= 0")
+given lpq_cs(0) ((import lpq_xs), "lsv"):() then len((import lpcond)):(0)

@@ -1,0 +1,17 @@
+// Builders for the index shapes the sum-of-terms loops use: `counter * k`, and
+// a loop with three statements.
+
+lpq_mul(string lfs_j, int lfi_k) {
+  int lfi_a = node_var(lfs_j);
+  int lfi_b = node_int("" + lfi_k, lfi_k, 0);
+  int lfi_r = node_bin("*", lfi_a, lfi_b);
+} return int lfi_r;
+given lpf_env ("j", 3):(2) then (import ns1)[2]:("*")
+given lpf_env ("q", 7):(2) then (import ni1)[1]:(7)
+
+lpq_wh3(int lfi_c, int lfi_a, int lfi_b, int lfi_d) {
+  int[] lfl_body = [lfi_a, lfi_b, lfi_d];
+  int lfi_r = node_while(lfi_c, lfl_body);
+} return int lfi_r;
+given lpf_two (1, 0, 0, 1):(2) then (import nl1)[2]:([0, 0, 1])
+given lpf_two (0, 1, 1, 0):(2) then (import ni1)[2]:(0)

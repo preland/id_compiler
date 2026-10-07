@@ -1,0 +1,15 @@
+far(int[] xs, int n) {
+  int s = 0;
+  int j = 0;
+  while(j < n) {
+    s = s + xs[j * 65536 + 1];
+    print("" + j + " " + s);
+    j = j + 1;
+  }
+} return int s;
+
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3, 4, 5, 6, 7, 8];
+  int t = far(xs, 65537);
+  print("unreachable " + t);
+} return int 0;

@@ -1,0 +1,18 @@
+fill(int[] dst, int n) {
+  int j = 0;
+  int k = 0;
+  while(j < n) {
+    k = k + 1;
+    dst[k] = j;
+    j = j + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] dst = [9, 9, 9];
+  fill(dst, 2);
+  print("" + dst[0] + dst[1] + dst[2]);
+} chain (int argc, string[] argv) {
+  fill(dst, 3);
+  print("unreachable");
+} return int 0;

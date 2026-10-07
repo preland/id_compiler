@@ -1416,6 +1416,39 @@ void id_lp_calls_ok(int lq_lo, int lq_hi);
 int id_lp_fnok(void);
 int id_lp_held(int lq_id, int lq_bx, int lq_lo, int lq_hi);
 int id_lp_steps(int lq_id, char* lq_js, int lq_lo, int lq_hi);
+char* id_lx_hi(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+char* id_lx_hbin(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+char* id_lx_hleaf(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+void id_lx_gen(int lg_id, int lg_lo, int lg_hi);
+int id_lx_cover(int lg_id, int lg_e, int lg_lo, int lg_hi);
+int id_lx_base(int lg_id, int lg_lo, int lg_hi);
+int id_lx_kind(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_inv(int lg_e, int lg_lo, int lg_hi);
+int id_lx_var(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_leaf(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_def(int lg_e, int lg_lo, int lg_hi);
+int id_lx_plain(int lg_k);
+char* id_lx_hlim(void);
+char* id_lx_hone(int lg_bx);
+int id_lx_prog(IdList* lg_sl);
+int id_lx_pstmt(int lg_st);
+int id_lx_pboth(IdList* lg_ua, IdList* lg_ub);
+void id_lx_hcl(int lg_e, int lg_k);
+char* id_lx_hctr(int lg_e);
+char* id_lx_hsec(int lg_e);
+int id_lx_sec(int lg_f, int lg_id, int lg_lo, int lg_hi);
+int id_lx_dec(int lg_f, int lg_id, int lg_lo, int lg_hi);
+int id_lx_psec(int lg_lo, int lg_hi);
+int id_lx_pure(int lg_lo, int lg_hi);
+int id_lx_pone(int lg_bx, int lg_lo, int lg_hi);
+void id_lx_take(int lg_id, int lg_e, int lg_lo, int lg_hi);
+void id_lx_cap(int lg_id, char* lg_ls);
+int id_lx_ok(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_sum(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_mul(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_wr(char* lg_nm, int lg_id, int lg_lo, int lg_hi, int lg_dp);
+int id_lx_one(char* lg_nm, int lg_id, int lg_lo, int lg_hi);
+int id_lx_ctr(int lg_bx, int lg_id, char* lg_nm, int lg_lo, int lg_hi);
 int id_lp_wide(int lq_fn);
 int id_lp_lo(int lq_fn);
 int id_lp_range(int lq_lo, int lq_hi, int lq_md);
@@ -9627,11 +9660,11 @@ void id_lp_node(int lq_id, int lq_lo, int lq_hi) {
 
 void id_lp_acc(int lq_id, int lq_lo, int lq_hi) {
     int lq_jn;
-    int lq_k;
     lq_jn = id_lp_ixnode((int)(id_list_get(ni2, lq_id)));
-    lq_k = id_lp_ixoff((int)(id_list_get(ni2, lq_id)));
     if (((lq_jn >= 0) && (id_lp_ok(lq_id, lq_jn, lq_lo, lq_hi) == 1))) {
-        id_lp_take(lq_id, lq_jn, lq_k);
+        id_lp_take(lq_id, lq_jn, id_lp_ixoff((int)(id_list_get(ni2, lq_id))));
+    } else {
+        id_lx_gen(lq_id, lq_lo, lq_hi);
     }
     return;
 }
@@ -9874,6 +9907,371 @@ int id_lp_steps(int lq_id, char* lq_js, int lq_lo, int lq_hi) {
         lq_r = (lq_id < id_lp_first(lq_lo, lq_hi, lq_js));
     }
     return lq_r;
+}
+
+char* id_lx_hi(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    char* lg_s;
+    lg_s = ID_S("");
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_e)), ID_S("bin")) == 0)) {
+        lg_s = id_lx_hbin(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    } else {
+        lg_s = id_lx_hleaf(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    }
+    return lg_s;
+}
+
+char* id_lx_hbin(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    char* lg_lt;
+    char* lg_rt;
+    char* lg_s = NULL;
+    lg_lt = id_lx_hi((int)(id_list_get(ni1, lg_e)), lg_id, lg_lo, lg_hi, lg_dp);
+    lg_rt = id_lx_hi((int)(id_list_get(ni2, lg_e)), lg_id, lg_lo, lg_hi, lg_dp);
+    { char* idfe_o = lg_s; lg_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), lg_lt), ID_S(" "), 1), (char*)(intptr_t)(id_list_get(ns1, lg_e)), 1), ID_S(" "), 1), lg_rt, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    return lg_s;
+}
+
+char* id_lx_hleaf(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_k;
+    char* lg_s;
+    lg_k = id_lx_kind(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    lg_s = id_concat_f(id_concat(ID_S("(long long)("), id_emit_expr(lg_e)), ID_S(")"), 1);
+    id_lx_hcl(lg_e, lg_k);
+    if ((lg_k == 3)) {
+        lg_s = id_lx_hctr(lg_e);
+    }
+    if ((lg_k == 4)) {
+        lg_s = id_lx_hsec(lg_e);
+    }
+    if ((lg_k == 5)) {
+        lg_s = id_lx_hi(id_lx_def(lg_e, lg_lo, lg_hi), lg_id, lg_lo, lg_hi, 1);
+    }
+    return lg_s;
+}
+
+void id_lx_gen(int lg_id, int lg_lo, int lg_hi) {
+    int lg_e;
+    lg_e = (int)(id_list_get(ni2, lg_id));
+    if ((id_lx_cover(lg_id, lg_e, lg_lo, lg_hi) == 1)) {
+        id_lx_take(lg_id, lg_e, lg_lo, lg_hi);
+    }
+    return;
+}
+
+int id_lx_cover(int lg_id, int lg_e, int lg_lo, int lg_hi) {
+    int lg_n;
+    int lg_r;
+    lg_n = (0 - 1);
+    if ((id_lx_base(lg_id, lg_lo, lg_hi) == 1)) {
+        lg_n = id_lx_ok(lg_e, lg_id, lg_lo, lg_hi, 0);
+    }
+    lg_r = ((lg_n >= 0) && (lg_n <= 1));
+    return lg_r;
+}
+
+int id_lx_base(int lg_id, int lg_lo, int lg_hi) {
+    int lg_r;
+    lg_r = 0;
+IdList* idsq_22;
+    if ((idsq_22 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get(ni1, lg_id)))), ID_S("var")) == 0))) {
+IdList* idsq_12;
+        lg_r = (idsq_12 = ns1, (id_lp_cnt(lg_lo, lg_hi, (char*)(intptr_t)(id_list_get(idsq_12, (int)(id_list_get(ni1, lg_id)))), 0) == 0));
+    }
+    return lg_r;
+}
+
+int id_lx_kind(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_k;
+    lg_k = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_e)), ID_S("int")) == 0)) {
+        lg_k = id_lp_lit(lg_e);
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_e)), ID_S("import")) == 0)) {
+        lg_k = (2 * id_lx_inv(lg_e, lg_lo, lg_hi));
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_e)), ID_S("var")) == 0)) {
+        lg_k = id_lx_var(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    }
+    return lg_k;
+}
+
+int id_lx_inv(int lg_e, int lg_lo, int lg_hi) {
+    int lg_r;
+    lg_r = 0;
+    if ((((int)(id_list_get(harn, 0)) == 0) && (id_lp_uany(lg_lo, lg_hi) == 0))) {
+        lg_r = (id_lp_cnt(lg_lo, lg_hi, (char*)(intptr_t)(id_list_get(ns1, lg_e)), 0) == 0);
+    }
+    return lg_r;
+}
+
+int id_lx_var(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    char* lg_nm;
+    int lg_bx;
+    int lg_k;
+    lg_nm = (char*)(intptr_t)(id_list_get(ns1, lg_e));
+    lg_bx = id_find_str(lpj, lg_nm);
+    lg_k = 0;
+    if ((lg_bx >= 0)) {
+        lg_k = (3 * id_lx_ctr(lg_bx, lg_id, lg_nm, lg_lo, lg_hi));
+    } else {
+        lg_k = id_lx_wr(lg_nm, lg_id, lg_lo, lg_hi, lg_dp);
+    }
+    return lg_k;
+}
+
+int id_lx_leaf(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_k;
+    int lg_n;
+    lg_k = id_lx_kind(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    lg_n = (0 - 1);
+    if (((lg_k >= 1) && (lg_k <= 4))) {
+        lg_n = 0;
+    }
+    if ((lg_k == 5)) {
+        lg_n = id_lx_ok(id_lx_def(lg_e, lg_lo, lg_hi), lg_id, lg_lo, lg_hi, 1);
+    }
+    return lg_n;
+}
+
+int id_lx_def(int lg_e, int lg_lo, int lg_hi) {
+    int lg_d;
+    int lg_x;
+    lg_d = id_lp_first(lg_lo, lg_hi, (char*)(intptr_t)(id_list_get(ns1, lg_e)));
+    lg_x = (int)(id_list_get(ni1, lg_d));
+    return lg_x;
+}
+
+int id_lx_plain(int lg_k) {
+    int lg_r;
+    lg_r = ((lg_k >= 1) && (lg_k <= 3));
+    return lg_r;
+}
+
+char* id_lx_hlim(void) {
+    char* lg_s = NULL;
+    int lg_i;
+    { char* idfe_o = lg_s; lg_s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    lg_i = 0;
+    while ((lg_i < id_list_len(lpj))) {
+        lg_s = id_concat_f(lg_s, id_lx_hone(lg_i), 1);
+        lg_i = (lg_i + 1);
+    }
+    return lg_s;
+}
+
+char* id_lx_hone(int lg_bx) {
+    int lg_nn;
+    char* lg_s = NULL;
+    lg_nn = (int)(id_list_get(lpn, lg_bx));
+    id_lp_nul(lg_nn);
+char* idsq_12;
+    { char* idfe_o = lg_s; lg_s = (idsq_12 = id_lp_ntxt(lg_nn), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S(" + ((long long)"), idsq_12), ID_S(" - (long long)("), 1), (char*)(intptr_t)(id_list_get(lpj, lg_bx)), 1), ID_S(") - 1)"), 1)); id_str_free(idfe_o); }
+    return lg_s;
+}
+
+int id_lx_prog(IdList* lg_sl) {
+    int lg_r;
+    int lg_i;
+    lg_r = 0;
+    lg_i = 0;
+    while (((lg_i < id_list_len(lg_sl)) && (lg_r == 0))) {
+        lg_r = id_lx_pstmt((int)(id_list_get(lg_sl, lg_i)));
+        lg_i = (lg_i + 1);
+    }
+    return lg_r;
+}
+
+int id_lx_pstmt(int lg_st) {
+    int lg_r;
+    lg_r = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_st)), ID_S("assign")) == 0) && (id_lp_isinc(lg_st) == 1))) {
+IdList* idsq_25;
+        lg_r = (idsq_25 = lpj, (id_find_str(idsq_25, (char*)(intptr_t)(id_list_get(ns1, lg_st))) >= 0));
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_st)), ID_S("if")) == 0)) {
+IdList* idsq_10;
+IdList* idsq_8;
+        lg_r = (idsq_10 = nl1, idsq_8 = (IdList*)(intptr_t)(id_list_get(idsq_10, lg_st)), id_lx_pboth(idsq_8, (IdList*)(intptr_t)(id_list_get(nl2, lg_st))));
+    }
+    return lg_r;
+}
+
+int id_lx_pboth(IdList* lg_ua, IdList* lg_ub) {
+    int lg_r;
+    lg_r = id_lx_prog(lg_ua);
+    if ((lg_r == 1)) {
+        lg_r = id_lx_prog(lg_ub);
+    }
+    return lg_r;
+}
+
+void id_lx_hcl(int lg_e, int lg_k) {
+    if (((lg_k >= 2) && (lg_k <= 4))) {
+IdList* idsq_11;
+        (idsq_11 = lpcond, id_lp_add(idsq_11, id_concat_f(id_concat(ID_S("("), id_emit_expr(lg_e)), ID_S(") >= 0"), 1)));
+    }
+    return;
+}
+
+char* id_lx_hctr(int lg_e) {
+    int lg_nn;
+    char* lg_s = NULL;
+IdList* idsq_22;
+IdList* idsq_20;
+    lg_nn = (idsq_22 = lpn, idsq_20 = lpj, (int)(id_list_get(idsq_22, id_find_str(idsq_20, (char*)(intptr_t)(id_list_get(ns1, lg_e))))));
+    id_lp_nul(lg_nn);
+    { char* idfe_o = lg_s; lg_s = id_concat_f(id_concat(ID_S("((long long)"), id_lp_ntxt(lg_nn)), ID_S(" - 1)"), 1); id_str_free(idfe_o); }
+    return lg_s;
+}
+
+char* id_lx_hsec(int lg_e) {
+    char* lg_s = NULL;
+    { char* idfe_o = lg_s; lg_s = id_concat_f(id_concat(ID_S("((long long)("), id_emit_expr(lg_e)), ID_S(")"), 1); id_str_free(idfe_o); }
+    lg_s = id_concat_f(id_concat_f(lg_s, id_lx_hlim(), 1), ID_S(")"), 1);
+    return lg_s;
+}
+
+int id_lx_sec(int lg_f, int lg_id, int lg_lo, int lg_hi) {
+    int lg_r;
+    lg_r = ((lg_id < lg_f) && (id_lp_isinc(lg_f) == 1));
+    if ((lg_r == 1)) {
+        lg_r = id_lx_psec(lg_lo, lg_hi);
+    }
+    return lg_r;
+}
+
+int id_lx_dec(int lg_f, int lg_id, int lg_lo, int lg_hi) {
+    int lg_r;
+    lg_r = 0;
+    if ((((lg_f < lg_id) && (strcmp((char*)(intptr_t)(id_list_get(ns1, lg_f)), ID_S("int")) == 0)) && ((int)(id_list_get(ni2, lg_f)) == 0))) {
+        lg_r = id_lst_find((IdList*)(intptr_t)(id_list_get(nl1, (lg_hi + 1))), lg_f);
+    }
+    return lg_r;
+}
+
+int id_lx_psec(int lg_lo, int lg_hi) {
+    int lg_r;
+    lg_r = id_lx_pure(lg_lo, lg_hi);
+    if ((lg_r == 1)) {
+        lg_r = id_lx_prog((IdList*)(intptr_t)(id_list_get(nl1, (lg_hi + 1))));
+    }
+    return lg_r;
+}
+
+int id_lx_pure(int lg_lo, int lg_hi) {
+    int lg_r;
+    int lg_i;
+    lg_r = 1;
+    lg_i = 0;
+    while (((lg_i < id_list_len(lpj)) && (lg_r == 1))) {
+        lg_r = id_lx_pone(lg_i, lg_lo, lg_hi);
+        lg_i = (lg_i + 1);
+    }
+    return lg_r;
+}
+
+int id_lx_pone(int lg_bx, int lg_lo, int lg_hi) {
+    char* lg_nm;
+    int lg_r;
+    lg_nm = (char*)(intptr_t)(id_list_get(lpj, lg_bx));
+    lg_r = id_lp_lim(lg_bx, lg_lo, lg_hi);
+    if ((lg_r == 1)) {
+        lg_r = ((id_lp_cnt(lg_lo, lg_hi, lg_nm, 2) == 0) && (id_lp_cnt(lg_lo, lg_hi, lg_nm, 0) == 1));
+    }
+    return lg_r;
+}
+
+void id_lx_take(int lg_id, int lg_e, int lg_lo, int lg_hi) {
+    char* lg_ls;
+    char* lg_h;
+    lg_ls = id_emit_expr((int)(id_list_get(ni1, lg_id)));
+    id_list_push(lpset, (long long)(lg_id));
+    id_lp_add(lpcond, id_concat_f(id_concat(ID_S("("), lg_ls), ID_S(") != NULL"), 1));
+    lg_h = id_lx_hi(lg_e, lg_id, lg_lo, lg_hi, 0);
+    id_lp_add(lpcond, id_concat_f(id_concat_f(id_concat(lg_h, ID_S(" < (long long)(")), lg_ls, 1), ID_S(")->len"), 1));
+    id_lx_cap(lg_id, lg_ls);
+    return;
+}
+
+void id_lx_cap(int lg_id, char* lg_ls) {
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_id)), ID_S("iassign")) == 0)) {
+        id_lp_add(lpcond, id_concat_f(id_concat(ID_S("("), lg_ls), ID_S(")->cap >= 0"), 1));
+    }
+    return;
+}
+
+int id_lx_ok(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_n;
+    lg_n = id_lx_leaf(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_e)), ID_S("bin")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, lg_e)), ID_S("+")) == 0))) {
+        lg_n = id_lx_sum(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_e)), ID_S("bin")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, lg_e)), ID_S("*")) == 0))) {
+        lg_n = id_lx_mul(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    }
+    return lg_n;
+}
+
+int id_lx_sum(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_a;
+    int lg_b;
+    int lg_n;
+    lg_a = id_lx_ok((int)(id_list_get(ni1, lg_e)), lg_id, lg_lo, lg_hi, lg_dp);
+    lg_b = id_lx_ok((int)(id_list_get(ni2, lg_e)), lg_id, lg_lo, lg_hi, lg_dp);
+    lg_n = (0 - 1);
+    if (((lg_a >= 0) && (lg_b >= 0))) {
+        lg_n = (lg_a + lg_b);
+    }
+    return lg_n;
+}
+
+int id_lx_mul(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_a;
+    int lg_b;
+    int lg_n;
+    lg_a = id_lx_kind((int)(id_list_get(ni1, lg_e)), lg_id, lg_lo, lg_hi, lg_dp);
+    lg_b = id_lx_kind((int)(id_list_get(ni2, lg_e)), lg_id, lg_lo, lg_hi, lg_dp);
+    lg_n = (0 - 1);
+    if (((id_lx_plain(lg_a) == 1) && (id_lx_plain(lg_b) == 1))) {
+        lg_n = 1;
+    }
+    return lg_n;
+}
+
+int id_lx_wr(char* lg_nm, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+    int lg_w;
+    int lg_k;
+    lg_w = id_lp_cnt(lg_lo, lg_hi, lg_nm, 0);
+    lg_k = 0;
+    if ((lg_w == 0)) {
+        lg_k = 2;
+    }
+    if (((lg_w == 1) && (lg_dp == 0))) {
+        lg_k = id_lx_one(lg_nm, lg_id, lg_lo, lg_hi);
+    }
+    return lg_k;
+}
+
+int id_lx_one(char* lg_nm, int lg_id, int lg_lo, int lg_hi) {
+    int lg_f;
+    int lg_k;
+    lg_f = id_lp_first(lg_lo, lg_hi, lg_nm);
+    lg_k = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_f)), ID_S("assign")) == 0)) {
+        lg_k = (4 * id_lx_sec(lg_f, lg_id, lg_lo, lg_hi));
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, lg_f)), ID_S("decl")) == 0)) {
+        lg_k = (5 * id_lx_dec(lg_f, lg_id, lg_lo, lg_hi));
+    }
+    return lg_k;
+}
+
+int id_lx_ctr(int lg_bx, int lg_id, char* lg_nm, int lg_lo, int lg_hi) {
+    int lg_r;
+    lg_r = id_lp_lim(lg_bx, lg_lo, lg_hi);
+    if ((lg_r == 1)) {
+        lg_r = id_lp_steps(lg_id, lg_nm, lg_lo, lg_hi);
+    }
+    return lg_r;
 }
 
 int id_lp_wide(int lq_fn) {

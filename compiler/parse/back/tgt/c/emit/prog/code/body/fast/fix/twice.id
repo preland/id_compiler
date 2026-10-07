@@ -1,0 +1,17 @@
+// LZ, a loop that steps its counter twice, so that its counter is written
+// twice and the iteration bound of a second counter would not hold.
+
+lpq_lz() {
+  lpq_li();
+  export int lpq_nz = node_var("lzn");
+  export int lpq_kz = lpf_lt("lzj", lpq_nz);
+} chain () {
+  export int lpq_i1z = lpf_inc("lzj", 1);
+  export int lpq_i2z = lpf_inc("lzj", 1);
+  export int lpq_wz = lpf_wh(lpq_kz, lpq_i1z, lpq_i2z);
+} chain () {
+  export int lpq_loz = (import ni1)[lpq_wz] + 1;
+  export int lpq_hiz = lpq_wz - 1;
+} return void;
+():() then calls lpq_li:[1]
+():() then init_units:(0)

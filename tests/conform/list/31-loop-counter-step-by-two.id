@@ -1,0 +1,18 @@
+stride(int[] dst, int n) {
+  int j = 0;
+  int k = 0;
+  while(j < n) {
+    dst[k] = j + 1;
+    j = j + 1;
+    k = k + 2;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] dst = [9, 9, 9, 9, 9];
+  stride(dst, 3);
+  print("" + dst[0] + dst[2] + dst[4]);
+} chain (int argc, string[] argv) {
+  stride(dst, 4);
+  print("unreachable");
+} return int 0;

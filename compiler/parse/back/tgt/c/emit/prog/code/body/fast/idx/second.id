@@ -1,0 +1,27 @@
+// The two single writes an index may read through. A second counter is stepped
+// once, after the access, and only while every counter of the condition is
+// stepped once and some step is made on every path of the body (lx_psec): then
+// it is at most its entry value plus the number of iterations so far. A local
+// is the one write of a declaration of an int at the top of the body, before
+// the access, whose terms keep their values until the access.
+
+lx_sec(int lg_f, int lg_id, int lg_lo, int lg_hi) {
+  int lg_r = lg_id < lg_f && lp_isinc(lg_f) == 1;
+  if(lg_r == 1) {
+    lg_r = lx_psec(lg_lo, lg_hi);
+  }
+} return int lg_r;
+given lpq_cs(2) ((import lpq_jk), (import lpq_xk), (import lpq_lok), (import lpq_hik)):(1)
+given lpq_cs(5) ((import lpq_jt), (import lpq_xt), (import lpq_lot), (import lpq_hit)):(0)
+given lpq_cs(4) ((import lpq_jn), (import lpq_xn), (import lpq_lon), (import lpq_hin)):(0)
+given lpq_cs(6) ((import lpq_ju), (import lpq_xu), (import lpq_lou), (import lpq_hiu)):(0)
+
+lx_dec(int lg_f, int lg_id, int lg_lo, int lg_hi) {
+  int lg_r = 0;
+  if(lg_f < lg_id && (import ns1)[lg_f] == "int" && (import ni2)[lg_f] == 0) {
+    lg_r = lst_find((import nl1)[lg_hi + 1], lg_f);
+  }
+} return int lg_r;
+given lpq_cs(1) ((import lpq_dv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(1)
+given lpq_cs(1) ((import lpq_dv), (import lpq_mv), (import lpq_lov), (import lpq_hiv)):(0)
+given lpq_cs(1) ((import lpq_mv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(0)

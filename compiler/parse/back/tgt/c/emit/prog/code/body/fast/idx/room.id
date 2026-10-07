@@ -1,0 +1,28 @@
+// The pieces of the largest value: the clause that a term is not negative,
+// a counter's last value, and a second counter's, which adds up the room each
+// counter of the condition has left (lx_psec says why that bounds it).
+
+lx_hcl(int lg_e, int lg_k) {
+  if(lg_k >= 2 && lg_k <= 4) {
+    lp_add((import lpcond), "(" + emit_expr(lg_e) + ") >= 0");
+  }
+} return void;
+given lpq_cs(0) ((import lpq_vc), 2):() then (import lpcond)[0]:("(lsc) >= 0")
+given lpq_cs(0) ((import lpq_l3), 1):() then len((import lpcond)):(0)
+given lpq_cs(2) ((import lpq_vk), 4):() then (import lpcond)[0]:("(lkk) >= 0")
+given lpq_cs(0) ((import lpq_js), 3):() then (import lpcond)[0]:("(lsj) >= 0")
+
+lx_hctr(int lg_e) {
+  int lg_nn = (import lpn)[find_str((import lpj), (import ns1)[lg_e])];
+  lp_nul(lg_nn);
+  string lg_s = "((long long)" + lp_ntxt(lg_nn) + " - 1)";
+} return string lg_s;
+given lpq_cs(0) ((import lpq_js)):("((long long)(lsn) - 1)")
+given lpf_cs(1) ((import lpf_oj)):("((long long)(long long)(lbv)->len - 1)") then (import lpcond)[0]:("(lbv) != NULL")
+
+lx_hsec(int lg_e) {
+  string lg_s = "((long long)(" + emit_expr(lg_e) + ")";
+  lg_s = lg_s + lx_hlim() + ")";
+} return string lg_s;
+given lpq_cs(2) ((import lpq_vk)):("((long long)(lkk) + ((long long)(lkn) - (long long)(lkj) - 1))")
+given lpq_cs(3) ((import lpq_vm)):("((long long)(lmk) + ((long long)(lmn) - (long long)(lmi) - 1) + ((long long)(lmm) - (long long)(lmj) - 1))")

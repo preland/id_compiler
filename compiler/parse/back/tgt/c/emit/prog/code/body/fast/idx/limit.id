@@ -1,0 +1,21 @@
+// The room each counter of the loop's condition has left, for a second
+// counter's largest value: its limit less its value less one, summed.
+
+lx_hlim() {
+  string lg_s = "";
+  int lg_i = 0;
+  while(lg_i < len((import lpj))) {
+    lg_s = lg_s + lx_hone(lg_i);
+    lg_i = lg_i + 1;
+  }
+} return string lg_s;
+given lpq_cs(2) ():(" + ((long long)(lkn) - (long long)(lkj) - 1)")
+given lpq_cs(3) ():(" + ((long long)(lmn) - (long long)(lmi) - 1) + ((long long)(lmm) - (long long)(lmj) - 1)")
+
+lx_hone(int lg_bx) {
+  int lg_nn = (import lpn)[lg_bx];
+  lp_nul(lg_nn);
+  string lg_s = " + ((long long)" + lp_ntxt(lg_nn) + " - (long long)(" + (import lpj)[lg_bx] + ") - 1)";
+} return string lg_s;
+given lpq_cs(3) (1):(" + ((long long)(lmm) - (long long)(lmj) - 1)")
+given lpf_cs(1) (0):(" + ((long long)(long long)(lbv)->len - (long long)(lbj) - 1)") then (import lpcond)[0]:("(lbv) != NULL")

@@ -1,0 +1,16 @@
+shifted(int[] xs, int n, int c) {
+  int s = 0;
+  int j = 0;
+  while(j < n) {
+    s = s + xs[j + c];
+    j = j + 1;
+  }
+} return int s;
+
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3, 4, 5, 6, 7, 8];
+  print("" + shifted(xs, 3, 2));
+  int t = shifted(xs, 3, 0 - 2);
+} chain (int argc, string[] argv) {
+  print("unreachable " + t);
+} return int 0;

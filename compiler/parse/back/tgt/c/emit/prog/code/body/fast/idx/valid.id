@@ -1,0 +1,49 @@
+// Whether an index is a sum of terms the guard can bound, and how many of its
+// terms are products: -1 when it is not, else the count, which may not pass one
+// (a product of two 31-bit terms is under 2^62, and the sum of the rest stays
+// under 2^63). `+` joins terms, and `*` is allowed only between two leaves
+// that are literals, names the body leaves alone, or counters of the loop's
+// condition. A local the body sets once stands for the terms it was set from,
+// one level down (dp is 1 inside such a definition).
+
+lx_ok(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  int lg_n = lx_leaf(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+  if((import nkind)[lg_e] == "bin" && (import ns1)[lg_e] == "+") {
+    lg_n = lx_sum(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+  }
+  if((import nkind)[lg_e] == "bin" && (import ns1)[lg_e] == "*") {
+    lg_n = lx_mul(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+  }
+} return int lg_n;
+given lpq_cs(0) ((import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(1)
+given lpq_cs(7) ((import lpq_up), (import lpq_xp), (import lpq_lop), (import lpq_hip), 0):(2)
+given lpq_cs(9) ((import lpq_dw), (import lpq_xw), (import lpq_low), (import lpq_hiw), 0):(-1)
+given lpq_cs(2) ((import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):(0)
+
+lx_sum(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  int lg_a = lx_ok((import ni1)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
+  int lg_b = lx_ok((import ni2)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
+  int lg_n = 0 - 1;
+} chain (int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  if(lg_a >= 0 && lg_b >= 0) {
+    lg_n = lg_a + lg_b;
+  }
+} return int lg_n;
+given lpq_cs(0) ((import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(1)
+given lpq_cs(7) ((import lpq_up), (import lpq_xp), (import lpq_lop), (import lpq_hip), 0):(2)
+given lpq_cs(1) ((import lpq_uv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):(1)
+
+lx_mul(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  int lg_a = lx_kind((import ni1)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
+  int lg_b = lx_kind((import ni2)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
+  int lg_n = 0 - 1;
+} chain (int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  if(lx_plain(lg_a) == 1 && lx_plain(lg_b) == 1) {
+    lg_n = 1;
+  }
+} return int lg_n;
+given lpq_cs(0) ((import lpq_ms), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(1)
+given lpq_cs(8) ((import lpq_mi), (import lpq_xi), (import lpq_loi), (import lpq_hii), 0):(1)
+given lpq_cs(0) ((import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(-1)
+given lpq_cs(2) ((import lpq_pk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):(-1)
+given lpq_cs(1) ((import lpq_pv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):(-1)

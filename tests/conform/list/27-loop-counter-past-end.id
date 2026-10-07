@@ -1,0 +1,18 @@
+copy(int[] src, int[] dst, int n, int k) {
+  int j = 0;
+  while(j < n) {
+    dst[k] = src[j];
+    j = j + 1;
+    k = k + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] src = [5, 6, 7, 8, 9];
+  int[] dst = [0, 0, 0, 0, 0, 0];
+  copy(src, dst, 3, 3);
+} chain (int argc, string[] argv) {
+  print("" + dst[3] + dst[4] + dst[5]);
+  copy(src, dst, 5, 3);
+  print("unreachable");
+} return int 0;

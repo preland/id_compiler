@@ -1,0 +1,18 @@
+// An `if` with one statement in each arm, and one with a statement in the
+// first arm only.
+
+lpq_if(int lfi_c, int lfi_t, int lfi_e) {
+  int[] lfl_t = [lfi_t];
+  int[] lfl_e = [lfi_e];
+  int lfi_r = node_if(lfi_c, lfl_t, lfl_e, 0);
+} return int lfi_r;
+given lpf_two (0, 1, 1):(2) then (import nl2)[2]:([1])
+given lpf_two (1, 0, 1):(2) then (import nl1)[2]:([0])
+
+lpq_ifn(int lfi_c, int lfi_t) {
+  int[] lfl_t = [lfi_t];
+  int[] lfl_e = [];
+  int lfi_r = node_if(lfi_c, lfl_t, lfl_e, 0);
+} return int lfi_r;
+given lpf_two (0, 1):(2) then (import nl1)[2]:([1])
+given lpf_two (1, 0):(2) then (import ni1)[2]:(1)

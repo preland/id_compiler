@@ -1,0 +1,49 @@
+// LS, a sum over `v[j * 3 + c]` with the limit a variable and the step after
+// the access, and LV, which reads `v[q + 3]` with `q` set to `j * 7` at the
+// top of the body, so that both are covered through the sum of their terms.
+
+lpq_ls() {
+  lpf_more();
+  export int lpq_ns = node_var("lsn");
+  export int lpq_ks = lpf_lt("lsj", lpq_ns);
+} chain () {
+  export int lpq_ms = lpq_mul("lsj", 3);
+  export int lpq_us = node_bin("+", lpq_ms, node_var("lsc"));
+  export int lpq_xs = lpf_ix("lsv", lpq_us);
+} chain () {
+  export int lpq_as = lpf_acc("lss", lpq_xs);
+  export int lpq_is = lpf_inc("lsj", 1);
+  export int lpq_ws = lpf_wh(lpq_ks, lpq_as, lpq_is);
+} chain () {
+  export int lpq_los = (import ni1)[lpq_ws] + 1;
+  export int lpq_his = lpq_ws - 1;
+  export int lpq_js = (import ni1)[lpq_ms];
+} chain () {
+  export int lpq_l3 = (import ni2)[lpq_ms];
+  export int lpq_vc = (import ni2)[lpq_us];
+} return void;
+():() then calls lpf_more:[1]
+():() then init_units:(0)
+
+lpq_lv() {
+  lpq_ls();
+  export int lpq_nv = node_var("lvn");
+  export int lpq_kv = lpf_lt("lvj", lpq_nv);
+} chain () {
+  export int lpq_mv = lpq_mul("lvj", 7);
+  export int lpq_dv = node_decl("int", "lvq", lpq_mv, 0);
+  export int lpq_uv = lpf_off("lvq", 3);
+} chain () {
+  export int lpq_xv = lpf_ix("lvv", lpq_uv);
+  export int lpq_av = lpf_acc("lvs", lpq_xv);
+  export int lpq_iv = lpf_inc("lvj", 1);
+} chain () {
+  export int lpq_wv = lpq_wh3(lpq_kv, lpq_dv, lpq_av, lpq_iv);
+  export int lpq_lov = (import ni1)[lpq_wv] + 1;
+  export int lpq_hiv = lpq_wv - 1;
+} chain () {
+  export int lpq_qv = (import ni1)[lpq_uv];
+  export int lpq_pv = lpq_mul("lvq", 3);
+} return void;
+():() then calls lpq_ls:[1]
+():() then init_units:(0)

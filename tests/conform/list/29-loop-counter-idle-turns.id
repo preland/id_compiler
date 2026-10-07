@@ -1,0 +1,23 @@
+slow(int[] dst, int n) {
+  int i = 0;
+  int k = 0;
+  int t = 0;
+} chain (int[] dst, int n) {
+  while(i < n) {
+    if(t == 1) {
+      dst[k] = i;
+      i = i + 1;
+      t = 0;
+    } else {
+      dst[k] = 0 - i;
+      t = 1;
+    }
+    k = k + 1;
+  }
+} return void;
+
+main(int argc, string[] argv) {
+  int[] dst = [9, 9, 9, 9];
+  slow(dst, 3);
+  print("unreachable");
+} return int 0;

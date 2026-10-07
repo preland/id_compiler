@@ -1,0 +1,57 @@
+// The loops with a second counter, `v[k] = z` with `k` stepped after the
+// store. LK has one counter in its condition and steps both; LM is the merge
+// shape, two counters in the condition and one of them stepped in each arm of
+// an `if`.
+
+lpq_lk() {
+  lpq_lv();
+  export int lpq_nk = node_var("lkn");
+  export int lpq_kk = lpf_lt("lkj", lpq_nk);
+} chain () {
+  export int lpq_xk = lpf_ix("lkv", node_var("lkk"));
+  export int lpq_ak = node_iassign(lpq_xk, node_var("lkz"));
+  export int lpq_ik = lpf_inc("lkj", 1);
+} chain () {
+  export int lpq_jk = lpf_inc("lkk", 1);
+  export int lpq_wk = lpq_wh3(lpq_kk, lpq_ak, lpq_ik, lpq_jk);
+  export int lpq_lok = (import ni1)[lpq_wk] + 1;
+} chain () {
+  export int lpq_hik = lpq_wk - 1;
+  export int lpq_vk = (import ni2)[lpq_xk];
+  export int lpq_bk = (import ni1)[lpq_jk];
+} chain () {
+  export int lpq_pk = lpq_mul("lkk", 5);
+} return void;
+():() then calls lpq_lv:[1]
+():() then init_units:(0)
+
+lpq_lm() {
+  lpq_lk();
+  export int lpq_n1 = node_var("lmn");
+  export int lpq_n2 = node_var("lmm");
+} chain () {
+  export int lpq_k1 = lpf_lt("lmi", lpq_n1);
+  export int lpq_k2 = lpf_lt("lmj", lpq_n2);
+  export int lpq_km = node_bin("&&", lpq_k1, lpq_k2);
+} chain () {
+  export int lpq_xm = lpf_ix("lmv", node_var("lmk"));
+  export int lpq_am = node_iassign(lpq_xm, node_var("lmz"));
+  export int lpq_i1 = lpf_inc("lmi", 1);
+} chain () {
+  export int lpq_i2 = lpf_inc("lmj", 1);
+  export int lpq_fm = node_bin("!=", node_var("lmf"), (import lpf_n0));
+  export int lpq_qm = lpq_if(lpq_fm, lpq_i1, lpq_i2);
+} chain () {
+  export int lpq_jm = lpf_inc("lmk", 1);
+  export int lpq_wm = lpq_wh3(lpq_km, lpq_am, lpq_qm, lpq_jm);
+  export int lpq_lom = (import ni1)[lpq_wm] + 1;
+} chain () {
+  export int lpq_him = lpq_wm - 1;
+  export int lpq_vm = (import ni2)[lpq_xm];
+  export int[] lpq_bm = (import nl1)[lpq_wm];
+} chain () {
+  export int[] lpq_tm = (import nl1)[lpq_qm];
+  export int[] lpq_em = (import nl2)[lpq_qm];
+} return void;
+():() then calls lpq_lk:[1]
+():() then init_units:(0)

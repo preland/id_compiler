@@ -1,0 +1,17 @@
+peek(int[] xs, int n, int c) {
+  int s = 0;
+  int j = 0;
+  while(j < n) {
+    print("" + j);
+    s = s + xs[c];
+    j = j + 1;
+  }
+} return int s;
+
+main(int argc, string[] argv) {
+  int[] xs = [4, 5, 6];
+  print("" + peek(xs, 2, 1));
+  int t = peek(xs, 2, 3);
+} chain (int argc, string[] argv) {
+  print("unreachable " + t);
+} return int 0;

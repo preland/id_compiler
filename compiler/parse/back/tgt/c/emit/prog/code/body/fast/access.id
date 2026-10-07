@@ -25,11 +25,14 @@ given lpf_cs(1) ((import lpf_sb), (import lpf_lob), (import lpf_hib)):() then le
 
 lp_acc(int lq_id, int lq_lo, int lq_hi) {
   int lq_jn = lp_ixnode((import ni2)[lq_id]);
-  int lq_k = lp_ixoff((import ni2)[lq_id]);
   if(lq_jn >= 0 && lp_ok(lq_id, lq_jn, lq_lo, lq_hi) == 1) {
-    lp_take(lq_id, lq_jn, lq_k);
+    lp_take(lq_id, lq_jn, lp_ixoff((import ni2)[lq_id]));
+  } else {
+    lx_gen(lq_id, lq_lo, lq_hi);
   }
 } return void;
 given lpf_cs(0) ((import lpf_xa), (import lpf_loa), (import lpf_hia)):() then len((import lpset)):(1)
 given lpf_cs(0) ((import lpf_rb), (import lpf_lob), (import lpf_hib)):() then len((import lpset)):(0)
 given lpf_cs(3) ((import lpf_xd), (import lpf_lod), (import lpf_hid)):() then len((import lpset)):(0)
+given lpq_cs(0) ((import lpq_xs), (import lpq_los), (import lpq_his)):() then len((import lpset)):(1)
+given lpq_cs(5) ((import lpq_xt), (import lpq_lot), (import lpq_hit)):() then len((import lpset)):(0)

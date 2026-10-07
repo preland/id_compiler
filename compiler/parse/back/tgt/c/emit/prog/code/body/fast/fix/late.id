@@ -1,0 +1,65 @@
+// More loops with a second counter: LN steps a counter of the condition only in
+// the first arm of an `if`, so an iteration may make no step; LT steps the
+// second counter before the store; LU steps it by two.
+
+lpq_ln() {
+  lpq_lm();
+  export int lpq_nn = node_var("lnn");
+  export int lpq_kn = lpf_lt("lnj", lpq_nn);
+} chain () {
+  export int lpq_xn = lpf_ix("lnv", node_var("lnk"));
+  export int lpq_an = node_iassign(lpq_xn, node_var("lnz"));
+  export int lpq_fn = node_bin("!=", node_var("lnf"), (import lpf_n0));
+} chain () {
+  export int lpq_in = lpf_inc("lnj", 1);
+  export int lpq_qn = lpq_ifn(lpq_fn, lpq_in);
+  export int lpq_jn = lpf_inc("lnk", 1);
+} chain () {
+  export int lpq_wn = lpq_wh3(lpq_kn, lpq_an, lpq_qn, lpq_jn);
+  export int lpq_lon = (import ni1)[lpq_wn] + 1;
+  export int lpq_hin = lpq_wn - 1;
+} chain () {
+  export int[] lpq_bn = (import nl1)[lpq_wn];
+  export int[] lpq_tn = (import nl1)[lpq_qn];
+  export int[] lpq_en = (import nl2)[lpq_qn];
+} return void;
+():() then calls lpq_lm:[1]
+():() then init_units:(0)
+
+lpq_lt() {
+  lpq_ln();
+  export int lpq_nt = node_var("ltn");
+  export int lpq_kt = lpf_lt("ltj", lpq_nt);
+} chain () {
+  export int lpq_jt = lpf_inc("ltk", 1);
+  export int lpq_xt = lpf_ix("ltv", node_var("ltk"));
+  export int lpq_at = node_iassign(lpq_xt, node_var("ltz"));
+} chain () {
+  export int lpq_it = lpf_inc("ltj", 1);
+  export int lpq_wt = lpq_wh3(lpq_kt, lpq_jt, lpq_at, lpq_it);
+  export int lpq_lot = (import ni1)[lpq_wt] + 1;
+} chain () {
+  export int lpq_hit = lpq_wt - 1;
+  export int lpq_vt = (import ni2)[lpq_xt];
+} return void;
+():() then calls lpq_ln:[1]
+():() then init_units:(0)
+
+lpq_lu() {
+  lpq_lt();
+  export int lpq_nu = node_var("lun");
+  export int lpq_ku = lpf_lt("luj", lpq_nu);
+} chain () {
+  export int lpq_xu = lpf_ix("luv", node_var("luk"));
+  export int lpq_au = node_iassign(lpq_xu, node_var("luz"));
+  export int lpq_iu = lpf_inc("luj", 1);
+} chain () {
+  export int lpq_ju = lpf_inc("luk", 2);
+  export int lpq_wu = lpq_wh3(lpq_ku, lpq_au, lpq_iu, lpq_ju);
+  export int lpq_lou = (import ni1)[lpq_wu] + 1;
+} chain () {
+  export int lpq_hiu = lpq_wu - 1;
+  export int lpq_vu = (import ni2)[lpq_xu];
+} return void;
+():() then calls lpq_lt:[1]
+():() then init_units:(0)

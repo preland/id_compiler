@@ -1,0 +1,44 @@
+// Whether a loop's counters are all stepped once and no iteration can finish
+// without a step. Each counter of the condition is written once, by the step
+// `counter = counter + 1`, and its limit is not written, so a counter is below
+// its limit at the start of every iteration; and a statement at the top of the
+// body is a step, or an `if` with an `else` whose two arms both are, so the sum
+// of the counters grows by one at least in every iteration and the number of
+// iterations is at most the sum of (limit - entry value - 1) over the counters.
+
+lx_psec(int lg_lo, int lg_hi) {
+  int lg_r = lx_pure(lg_lo, lg_hi);
+  if(lg_r == 1) {
+    lg_r = lx_prog((import nl1)[lg_hi + 1]);
+  }
+} return int lg_r;
+given lpq_cs(2) ((import lpq_lok), (import lpq_hik)):(1)
+given lpq_cs(3) ((import lpq_lom), (import lpq_him)):(1)
+given lpq_cs(4) ((import lpq_lon), (import lpq_hin)):(0)
+given lpf_cs(4) ((import lpf_loe), (import lpf_hie)):(0)
+given lpq_cs(10) ((import lpq_loz), (import lpq_hiz)):(0)
+
+lx_pure(int lg_lo, int lg_hi) {
+  int lg_r = 1;
+  int lg_i = 0;
+  while(lg_i < len((import lpj)) && lg_r == 1) {
+    lg_r = lx_pone(lg_i, lg_lo, lg_hi);
+    lg_i = lg_i + 1;
+  }
+} return int lg_r;
+given lpq_cs(3) ((import lpq_lom), (import lpq_him)):(1)
+given lpf_cs(4) ((import lpf_loe), (import lpf_hie)):(0)
+given lpf_cs(5) ((import lpf_lor), (import lpf_hir)):(0)
+given lpq_cs(10) ((import lpq_loz), (import lpq_hiz)):(0)
+
+lx_pone(int lg_bx, int lg_lo, int lg_hi) {
+  string lg_nm = (import lpj)[lg_bx];
+  int lg_r = lp_lim(lg_bx, lg_lo, lg_hi);
+  if(lg_r == 1) {
+    lg_r = lp_cnt(lg_lo, lg_hi, lg_nm, 2) == 0 && lp_cnt(lg_lo, lg_hi, lg_nm, 0) == 1;
+  }
+} return int lg_r;
+given lpq_cs(3) (1, (import lpq_lom), (import lpq_him)):(1)
+given lpf_cs(4) (0, (import lpf_loe), (import lpf_hie)):(0)
+given lpf_cs(5) (0, (import lpf_lor), (import lpf_hir)):(0)
+given lpq_cs(10) (0, (import lpq_loz), (import lpq_hiz)):(0)

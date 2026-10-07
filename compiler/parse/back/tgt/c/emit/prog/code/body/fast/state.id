@@ -3,7 +3,9 @@
 // a copy that reads and writes the cells directly, guarded by one check that
 // the whole range is in bounds, and the checked copy as the fallback -- so
 // every out-of-range access still traps, at the same iteration, with the same
-// message, because the fallback is the unchanged loop.
+// message, because the fallback is the unchanged loop. An index that is more
+// than `j` or `j + k` is read by idx/, which reaches lpset and lpcond the same
+// way.
 //
 //   lpset   the index and index-assignment nodes the guard covers
 //   lpon    [1] while the guarded copy is being emitted

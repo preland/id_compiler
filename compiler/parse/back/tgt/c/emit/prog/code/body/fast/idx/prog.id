@@ -1,0 +1,39 @@
+// Whether a list of statements makes a step on every path through it: it has
+// a step of a counter of the condition at its top level, or an `if` whose two
+// arms both do. A `break` or an arm without a step does not count: that is
+// the safe answer, since more steps only make the iteration bound smaller.
+
+lx_prog(int[] lg_sl) {
+  int lg_r = 0;
+  int lg_i = 0;
+  while(lg_i < len(lg_sl) && lg_r == 0) {
+    lg_r = lx_pstmt(lg_sl[lg_i]);
+    lg_i = lg_i + 1;
+  }
+} return int lg_r;
+given lpq_cs(3) ((import lpq_bm)):(1)
+given lpq_cs(4) ((import lpq_bn)):(0)
+given lpq_cs(2) ([]):(0)
+
+lx_pstmt(int lg_st) {
+  int lg_r = 0;
+  if((import nkind)[lg_st] == "assign" && lp_isinc(lg_st) == 1) {
+    lg_r = find_str((import lpj), (import ns1)[lg_st]) >= 0;
+  }
+  if((import nkind)[lg_st] == "if") {
+    lg_r = lx_pboth((import nl1)[lg_st], (import nl2)[lg_st]);
+  }
+} return int lg_r;
+given lpq_cs(2) ((import lpq_ik)):(1)
+given lpq_cs(2) ((import lpq_jk)):(0)
+given lpq_cs(3) ((import lpq_qm)):(1)
+given lpq_cs(4) ((import lpq_qn)):(0)
+
+lx_pboth(int[] lg_ua, int[] lg_ub) {
+  int lg_r = lx_prog(lg_ua);
+  if(lg_r == 1) {
+    lg_r = lx_prog(lg_ub);
+  }
+} return int lg_r;
+given lpq_cs(3) ((import lpq_tm), (import lpq_em)):(1)
+given lpq_cs(4) ((import lpq_tn), (import lpq_en)):(0)

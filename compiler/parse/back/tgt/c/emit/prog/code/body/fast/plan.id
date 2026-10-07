@@ -20,6 +20,10 @@ given lpf_in(0) ((import lpf_ww)):(0)
 given lpf_in(0) ((import lpf_wx)):(0)
 given lpf_in(1) ((import lpf_wg)):(1)
 given lpf_in(2) ((import lpf_wy)):(0)
+given lpq_lw ((import lpq_ws)):(1) then len((import lpcond)):(4)
+given lpq_lw ((import lpq_wm)):(1) then lpf_nset:(2)
+given lpq_lw ((import lpq_wn)):(0)
+given lpq_lw ((import lpq_wp)):(0)
 
 lp_guard(int lq_lo, int lq_hi) {
   if(len((import lpset)) > 0 && lp_clean(lq_lo, lq_hi) == 0) {

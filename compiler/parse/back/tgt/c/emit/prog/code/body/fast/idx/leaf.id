@@ -1,0 +1,33 @@
+// A leaf of an index: -1 when it is not one the guard can bound, else the
+// number of products in it (0, but for a local whose definition has one). A
+// local the body sets once (kind 5) is read through its definition.
+
+lx_leaf(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  int lg_k = lx_kind(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+  int lg_n = 0 - 1;
+  if(lg_k >= 1 && lg_k <= 4) {
+    lg_n = 0;
+  }
+} chain (int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  if(lg_k == 5) {
+    lg_n = lx_ok(lx_def(lg_e, lg_lo, lg_hi), lg_id, lg_lo, lg_hi, 1);
+  }
+} return int lg_n;
+given lpq_cs(1) ((import lpq_qv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):(1)
+given lpq_cs(0) ((import lpq_js), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(0)
+given lpq_cs(9) ((import lpq_dw), (import lpq_xw), (import lpq_low), (import lpq_hiw), 0):(-1)
+
+lx_def(int lg_e, int lg_lo, int lg_hi) {
+  int lg_d = lp_first(lg_lo, lg_hi, (import ns1)[lg_e]);
+  int lg_x = (import ni1)[lg_d];
+} return int lg_x;
+given lpq_cs(1) ((import lpq_qv), (import lpq_lov), (import lpq_hiv)):((import lpq_mv))
+given lpq_cs(2) ((import lpq_vk), (import lpq_lok), (import lpq_hik)):((import lpq_bk))
+
+lx_plain(int lg_k) {
+  int lg_r = lg_k >= 1 && lg_k <= 3;
+} return int lg_r;
+(2):(1)
+(3):(1)
+(4):(0)
+(5):(0)

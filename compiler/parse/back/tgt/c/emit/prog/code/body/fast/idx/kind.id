@@ -1,0 +1,55 @@
+// What a leaf of an index is, as a code: 0 none the guard can bound, 1 a
+// literal, 2 a name nothing in the body writes (a parameter or local set before
+// the loop, or an import while no function of the program can be called and the
+// harness is not reading it), 3 a counter of the loop's condition that no
+// covered access follows a step of, 4 a second counter, 5 a local the body sets
+// once.
+
+lx_kind(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  int lg_k = 0;
+  if((import nkind)[lg_e] == "int") {
+    lg_k = lp_lit(lg_e);
+  }
+  if((import nkind)[lg_e] == "import") {
+    lg_k = 2 * lx_inv(lg_e, lg_lo, lg_hi);
+  }
+} chain (int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  if((import nkind)[lg_e] == "var") {
+    lg_k = lx_var(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+  }
+} return int lg_k;
+given lpq_cs(0) ((import lpq_js), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(3)
+given lpq_cs(0) ((import lpq_vc), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(2)
+given lpq_cs(0) ((import lpq_l3), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(1)
+given lpq_cs(2) ((import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):(4)
+given lpq_cs(1) ((import lpq_qv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):(5)
+given lpq_cs(5) ((import lpq_vt), (import lpq_xt), (import lpq_lot), (import lpq_hit), 0):(0)
+given lpq_cs(8) ((import lpq_gi), (import lpq_xi), (import lpq_loi), (import lpq_hii), 0):(2)
+given lpq_cs(0) ((import lpq_ms), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(0)
+
+lx_inv(int lg_e, int lg_lo, int lg_hi) {
+  int lg_r = 0;
+  if((import harn)[0] == 0 && lp_uany(lg_lo, lg_hi) == 0) {
+    lg_r = lp_cnt(lg_lo, lg_hi, (import ns1)[lg_e], 0) == 0;
+  }
+} return int lg_r;
+given lpq_cs(0) ((import lpq_gi), (import lpq_loi), (import lpq_hii)):(1)
+given lpq_cs(0) ((import lpq_gj), (import lpq_loi), (import lpq_hii)):(0)
+given lpq_cs(0) given lset((import harn), 0, 1) ((import lpq_gi), (import lpq_loi), (import lpq_hii)):(0)
+given lpq_cs(0) ((import lpq_gi), (import lpf_log), (import lpf_hig)):(0)
+
+lx_var(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  string lg_nm = (import ns1)[lg_e];
+  int lg_bx = find_str((import lpj), lg_nm);
+  int lg_k = 0;
+} chain (int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  if(lg_bx >= 0) {
+    lg_k = 3 * lx_ctr(lg_bx, lg_id, lg_nm, lg_lo, lg_hi);
+  } else {
+    lg_k = lx_wr(lg_nm, lg_id, lg_lo, lg_hi, lg_dp);
+  }
+} return int lg_k;
+given lpq_cs(0) ((import lpq_js), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(3)
+given lpq_cs(2) ((import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):(4)
+given lpq_cs(2) ((import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 1):(0)
+given lpq_cs(0) ((import lpq_vc), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(2)

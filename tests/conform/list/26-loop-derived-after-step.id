@@ -1,0 +1,17 @@
+lag(int[] xs, int n) {
+  int s = 0;
+  int j = 0;
+  while(j < n) {
+    j = j + 1;
+    int q = j * 2;
+    s = s + xs[q];
+  }
+} return int s;
+
+main(int argc, string[] argv) {
+  int[] xs = [1, 2, 3, 4, 5, 6];
+  print("" + lag(xs, 2));
+  int t = lag(xs, 3);
+} chain (int argc, string[] argv) {
+  print("unreachable " + t);
+} return int 0;
