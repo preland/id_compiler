@@ -69,12 +69,13 @@ given vb_boot (56, 7, 2, 0):(1) then (import ex_lists):([[], [7, 0, 2, 0, 0]])
 // answer nothing, and the function-value helpers (conf.id) are one group.
 vm_bf(int id, word wa, word wb, word wc) {
   word wr = 0;
-  if (id == (import b_str_sub)) {
-    wr = vm_b_str_sub(wa, wb, wc);
+  if (id >= (import b_str_sub)) {
+    wr = vm_bg(id, wa, wb, wc);
   } else if (id >= (import b_clo0)) {
     wr = vm_bk(id, wa, wb, wc);
   }
 } return word wr;
 given vb_boot given tf_sput("hello") (62, 1, 1, 3):(2) then (import ex_strs):(["", "hello", "ell"])
+given vb_boot given tf_sput("ab") given tf_sput("cd") (63, 1, 2, 3):(3) then (import ex_strs):(["", "ab", "cd", "abcd"])
 given vb_boot (54, 1, 0, 0):(0)
 given vb_boot (56, 7, 1, 0):(1) then (import ex_lists):([[], [7, 0, 1, 0]])

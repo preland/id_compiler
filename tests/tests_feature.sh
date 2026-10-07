@@ -3088,6 +3088,30 @@ for tgt in c llvm; do
         bad "natives: the list-returning fixture builds ($tgt: $(head -1 "$TMP/log"))"
     fi
 done
+
+# idrun dispatches the runtime helpers the IR calls by a numbered list
+# (tools/idrun/conf.id bi_names, fbi_names). A helper the compiler starts to emit
+# and that list lacks makes idrun refuse every program that reaches it, so the
+# set the LLVM declarations and the IR builder's lw_callf calls can name must be
+# inside that list, less these, which the interpreter cannot see: the loop-versioning
+# readers exist only at -O>0 (back/ir/build/stmt/flow/loop/ver.id) and idrun runs
+# --opt 0; id_list_adopt and id_str_of_cstr wrap what a native returns, and idrun
+# has no natives (docs/INTERPRETER.md, milestone 2).
+IDR_DECL=../compiler/parse/back/tgt/ll/mod/sect/decl.id
+IDR_CONF=../tools/idrun/conf.id
+IDR_SKIP=" id_list_cell id_list_cell_set id_list_len_raw id_list_cap_raw id_list_adopt id_str_of_cstr "
+{ grep -F 'declare ptr @id_list_new()' "$IDR_DECL" | grep -o '@id_[a-z0-9_]*' | tr -d '@'; grep -rhoE 'lw_callf\("id_[a-z0-9_]+"' ../compiler/parse/back/ir/build | grep -o 'id_[a-z0-9_]*'; } | sort -u > "$TMP/idr_emit"
+grep -E '^string f?bi_names' "$IDR_CONF" | grep -o 'id_[a-z0-9_]*' | sort -u > "$TMP/idr_have"
+idr_missing=""
+while read -r idr_name; do
+    case "$IDR_SKIP" in *" $idr_name "*) continue ;; esac
+    grep -qxF "$idr_name" "$TMP/idr_have" || idr_missing="$idr_missing $idr_name"
+done < "$TMP/idr_emit"
+if [ -s "$TMP/idr_emit" ] && [ -z "$idr_missing" ]; then
+    ok "idrun dispatches every runtime helper the IR can call ($(wc -l < "$TMP/idr_emit") emitted, $(wc -l < "$TMP/idr_have") dispatched)"
+else
+    bad "idrun lacks runtime helpers the IR can call:${idr_missing:- (none found: the emitted set came out empty)}; add each to bi_names and a b_ id in tools/idrun/conf.id and dispatch it in exec/run/bi, or list it in IDR_SKIP with the reason"
+fi
 }
 
 case "${1:-all}" in

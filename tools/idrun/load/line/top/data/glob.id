@@ -33,8 +33,13 @@ ld_gstr(string nm) {
     ld_galias(h);
     return;
   }
+  if (str_starts(nm, "idfrd_") == 1) {
+    return;
+  }
   ts[h] = ld_cstr();
 } return void;
+given tf_ld("c\"S1l@0;\\00\"") ("idfrd_Node"):() then (import ex_strs):(["", ""])
+given tf_ld("c\"S2ss;\\00\"") ("idfrd_P"):() then (import ex_strs):(["", ""])
 given tf_ld("c\"\\68\\69\\00\"") (".a"):() then (import ex_strs):(["", "hi"])
 given tf_ld("c\"\\6F\\00\"") (".a"):() then (import ex_strs):(["", "o"])
 given tf_ld("c\"\\68\\69\\00\"\nalias i8, getelementptr inbounds (i8, ptr @.d, i64 8)") given ld_gstr(".d") given ld_eol() (".a"):() then (import ex_strs):(["", "hi", "hi"])

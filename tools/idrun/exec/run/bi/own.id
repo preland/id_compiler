@@ -1,0 +1,24 @@
+// The helpers from id_str_sub on that are not function values (conf.id):
+// id_concat_f is a concatenation whatever its freshness mask says, id_str_dup
+// answers the string it was given, and the three frees answer nothing and touch
+// nothing. Strings and lists live for the whole run, so a program that frees
+// what it should not still reads what it wrote.
+vm_bg(int id, word wa, word wb, word wc) {
+  word wr = 0;
+  if (id == (import b_str_sub)) {
+    wr = vm_b_str_sub(wa, wb, wc);
+  } else if (id == (import b_concat_f)) {
+    wr = vm_b_concat(wa, wb);
+  }
+} chain (int id, word wa, word wb, word wc) {
+  if (id == (import b_str_dup)) {
+    wr = wa;
+  }
+} return word wr;
+given vb_boot given tf_sput("hello") (62, 1, 1, 3):(2) then (import ex_strs):(["", "hello", "ell"])
+given vb_boot given tf_sput("ab") given tf_sput("cd") (63, 1, 2, 3):(3) then (import ex_strs):(["", "ab", "cd", "abcd"])
+given vb_boot given tf_sput("ab") given tf_sput("cd") (63, 1, 2, 0):(3) then (import ex_strs):(["", "ab", "cd", "abcd"])
+given vb_boot given tf_sput("ab") (65, 1, 0, 0):(1) then (import ex_strs):(["", "ab"])
+given vb_boot given tf_sput("ab") (64, 1, 0, 0):(0) then (import ex_strs):(["", "ab"])
+given vb_boot given tf_lnew given vm_b_list_push(1, 4) (66, 1, 0, 0):(0) then (import ex_lists):([[], [4]])
+given vb_boot given tf_lnew given vm_b_list_push(1, 4) (67, 1, 0, 0):(0) then (import ex_lists):([[], [4]])
