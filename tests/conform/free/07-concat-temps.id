@@ -1,0 +1,17 @@
+// `a + b + c` makes a string per `+`; the inner ones are unnamed and consumed
+// once by the next `+`, so the compiler gives them back. Per call, tag frees the
+// string made from n twice over (the `+ n` after "a" and the last one), and wide
+// frees each right-hand chr result: two strings each, four in all. The result of
+// the chain is built in the first temporary, so it is never one of the frees.
+tag(int n) {
+  string s = "a" + n + "b" + n;
+} return string s;
+
+wide(int n) {
+  string s = chr(n) + chr(n + 1) + chr(n + 2);
+} return string s;
+
+main(int argc, string[] argv) {
+  print(tag(7));
+  print(wide(65));
+} return int 0;

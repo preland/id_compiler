@@ -87,6 +87,7 @@ typedef struct IdChunk { struct IdChunk* next; } IdChunk;
 static ID_TLS IdAllocHdr* id_arena_head = NULL;
 static ID_TLS int id_arena_hooked = 0;
 static ID_TLS long id_nfree = 0;
+static ID_TLS long id_nfree_s = 0;
 static ID_TLS void* id_pool_fl[ID_NCLASS];
 static ID_TLS char* id_pool_bump = NULL;
 static ID_TLS size_t id_pool_left = 0;
@@ -100,7 +101,10 @@ static void id_pool_drop(void) {
     memset(id_pool_fl, 0, sizeof id_pool_fl);
 }
 static void id_arena_free_all(void) {
-    if (getenv("ID_FREE_STATS")) fprintf(stderr, "id: freed %ld lists\n", id_nfree);
+    if (getenv("ID_FREE_STATS")) {
+        fprintf(stderr, "id: freed %ld lists\n", id_nfree);
+        if (id_nfree_s) fprintf(stderr, "id: freed %ld strings\n", id_nfree_s);
+    }
     IdAllocHdr* h = id_arena_head;
     while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
     id_arena_head = NULL;
@@ -262,7 +266,6 @@ static char* id_str_from(const char* p, size_t n) {
     return r;
 }
 char* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }
-static void id_str_free(char* s) { id_pool_free(s - sizeof(size_t), id_slen(s) + sizeof(size_t) + 1); }
 
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
@@ -320,6 +323,28 @@ __attribute__((noinline, cold))
 static _Noreturn void id_freed_trap(void) {
     fprintf(stderr, "id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\n");
     exit(1);
+}
+#ifdef __GNUC__
+__attribute__((noinline, cold))
+#endif
+static _Noreturn void id_freed_str_trap(void) {
+    fprintf(stderr, "id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\n");
+    exit(1);
+}
+/* A string block the compiler proved dead is given back by id_str_free; with the
+   guard on it is filled with 0xDD and its count becomes SIZE_MAX instead, so a
+   second free traps and a later use fails in the size checks. */
+static void id_str_free(char* s) {
+    size_t n = id_slen(s);
+    id_nfree_s++;
+    if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
+    if (id_fguard) {
+        if (n == SIZE_MAX) id_freed_str_trap();
+        memset(s, 0xDD, n + 1);
+        ((size_t*)(void*)s)[-1] = SIZE_MAX;
+        return;
+    }
+    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);
 }
 static void id_list_free(IdList* L) {
     if (!L) return;
@@ -432,6 +457,27 @@ static char* id_concat(const char* a, const char* b) {
     char* r = id_str_new(id_add_check(la, lb, "concat"));
     memcpy(r, a, la);
     memcpy(r + la, b, lb);
+    return r;
+}
+/* `+` whose operand is an unnamed temporary (docs/MEMORY.md 3.3). Bit 1 of m: a
+   is fresh, so the result is built in a's block (a pool block grows in place
+   while its size class has room; a large one is realloc'd); bit 2: b is fresh
+   and is given back once copied. */
+static char* id_concat_f(char* a, char* b, int m) {
+    size_t la = id_slen(a), lb = id_slen(b);
+    size_t n = id_add_check(la, lb, "concat");
+    char* r;
+    if (m & 1) {
+        size_t hb = id_add_check(n, sizeof(size_t) + 1, "concat");
+        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);
+        ((size_t*)(void*)r)[-1] = n;
+    } else {
+        r = id_str_new(n);
+        memcpy(r, a, la);
+    }
+    memcpy(r + la, b, lb);
+    r[n] = '\0';
+    if (m & 2) id_str_free(b);
     return r;
 }
 static char* id_str_of_int(int x) {
@@ -1072,6 +1118,9 @@ int id_lw_not_val(int node, int lhs, char* t);
 int id_lw_iszero(int v, char* t);
 int id_lw_iszero_cmp(int v, char* t, char* op);
 int id_lw_not(int node);
+int id_lw_concat_call(int node, int a, int b);
+int id_lw_concat_pick(int a, int b, int m);
+int id_lw_concat_f(int a, int b, int m);
 int id_lw_ncmp_b(int node, char* t, int a);
 int id_lw_ncmp_op(int node, char* t, int a, int b);
 int id_lw_scmp_b(int node, int a);
@@ -1412,6 +1461,7 @@ char* id_emit_args(IdList* args);
 char* id_sep_arg(int i);
 char* id_map_op(char* op);
 char* id_emit_concat(int id);
+char* id_concat_text(char* cxa, char* cxb, int m);
 char* id_arg_str(int id);
 char* id_emit_call(int id);
 char* id_emit_print(int id);
@@ -3580,6 +3630,11 @@ char* id_type_arr(int id);
 int id_is_concat(int id);
 int id_one_is_str(int id);
 int id_is_str_pair(int a, int b);
+int id_str_fresh(int id);
+int id_str_fresh_node(int id);
+int id_str_mask(int id);
+int id_str_fresh_call(int id);
+int id_fresh_builtin(char* nm);
 int id_is_pokefn(char* name);
 char* id_call_shaped(int id, char* t);
 char* id_bt4(char* name);
@@ -3610,7 +3665,7 @@ char* id_type_of3(int id);
 /* exported variables */
 int idx_n = 251;  /* constant from conf.id */
 char* builtin_src = ID_SK("print input read_all len push pop to_int charat chr put flush getkey sleep_ms ticks alloc store_size peek8 peek16 peek32 peek64 poke8 poke16 poke32 poke64 udiv umod ult ushr str_of_mem mem_of_str eprint peek8s peek16s peek32s peek8u peek16u peek32u bits_of_float float_of_bits bits32_of_float float_of_bits32 fail bind");  /* constant from conf.id */
-char* resv_names_src = ID_SK("add_check alloc arena_free_all arena_link arena_unlink at bits32_of_float bits_of_float box_f charat chr clo_cell clo_copy clo_fn clo_make clo_new clo_set concat err_write exit fail float_of_bits float_of_bits32 flush fn_eq fn_plain fn_raw fprintf freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek16s peek16u peek32 peek32s peek32u peek64 peek8 peek8s peek8u peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap trap_arm trap_disarm trap_raise trap_text udiv ult umod unbox_f ushr arena_hook list_grow list_make list_sized pool_blk pool_carve pool_class pool_class_bytes pool_drop pool_free pool_get pool_has pool_large_alloc pool_large_free pool_oom pool_span str_free");  /* constant from conf.id */
+char* resv_names_src = ID_SK("add_check alloc arena_free_all arena_link arena_unlink at bits32_of_float bits_of_float box_f charat chr clo_cell clo_copy clo_fn clo_make clo_new clo_set concat err_write exit fail float_of_bits float_of_bits32 flush fn_eq fn_plain fn_raw fprintf freed_trap getkey idiv imod input len list_adopt list_free list_free_deep list_get list_len list_lit list_lock list_mut_check list_new list_pop list_push list_set mem_alloc mem_of_str mem_size mul_check null_read peek16 peek16s peek16u peek32 peek32s peek32u peek64 peek8 peek8s peek8u peek_n poke16 poke32 poke64 poke8 poke_n print put read_all realloc sar sdiv shl sleep_ms slen smod store_grow store_span str_from str_new str_of_cstr str_of_float str_of_int str_of_mem str_of_word term_raw term_restore thread_enter thread_leave ticks to_int trap trap_arm trap_disarm trap_raise trap_text udiv ult umod unbox_f ushr arena_hook list_grow list_make list_sized pool_blk pool_carve pool_class pool_class_bytes pool_drop pool_free pool_get pool_has pool_large_alloc pool_large_free pool_oom pool_span str_free concat_f freed_str_trap");  /* constant from conf.id */
 IdList* cache_file_natives;  /* constant from conf.id */
 IdList* cache_taint_natives;  /* constant from conf.id */
 IdList* cache_volatile_builtins;  /* constant from conf.id */
@@ -4463,7 +4518,7 @@ int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
     idstd_end = (idstd_i + idstd_n);
     idstd_ok = (((idstd_i >= 0) && (idstd_n >= 0)) && ((idstd_n == 0) || (id_charat(idstd_s, (idstd_end - 1)) >= 0)));
     if ((idstd_ok == 0)) {
-        id_fail(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i)), ID_S(" n=")), id_str_of_int(idstd_n)), ID_S(" in a string of length ")), id_str_of_int(id_len(idstd_s))), ID_S("; clamp i and n first (fx_min, fx_max)")));
+        id_fail(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i), 2), ID_S(" n="), 1), id_str_of_int(idstd_n), 3), ID_S(" in a string of length "), 1), id_str_of_int(id_len(idstd_s)), 3), ID_S("; clamp i and n first (fx_min, fx_max)"), 1));
     }
     return idstd_n;
 }
@@ -4598,7 +4653,7 @@ IdList* idsq_31;
     n = id_count_cases((int)(id_list_get(prog, i)));
 IdList* idsq_16;
 char* idsq_14;
-    ret_s = (idsq_16 = pfile, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, i)), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(name, ID_S("|")), idsq_14), ID_S(":")), id_str_of_int((int)(id_list_get(pline, i)))), ID_S("|")), id_str_of_int(n)));
+    ret_s = (idsq_16 = pfile, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, i)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(name, ID_S("|")), idsq_14, 1), ID_S(":"), 1), id_str_of_int((int)(id_list_get(pline, i))), 3), ID_S("|"), 1), id_str_of_int(n), 3));
     return ret_s;
 }
 
@@ -4608,7 +4663,7 @@ char* id_call_loc(char* name) {
     char* ret_s;
     file_v = id_func_file(name);
     line_v = id_func_line(name);
-    ret_s = id_concat(id_concat(file_v, ID_S(":")), id_str_of_int(line_v));
+    ret_s = id_concat_f(id_concat(file_v, ID_S(":")), id_str_of_int(line_v), 3);
     return ret_s;
 }
 
@@ -4627,7 +4682,7 @@ char* id_call_edge_line(char* caller, char* callee_name, char* kind) {
     char* ret_s;
     caller_loc = id_call_loc(caller);
     callee_loc = id_call_callee_loc(callee_name);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(caller, ID_S("|")), caller_loc), ID_S("|")), callee_name), ID_S("|")), callee_loc), ID_S("|")), kind);
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(caller, ID_S("|")), caller_loc, 1), ID_S("|"), 1), callee_name, 1), ID_S("|"), 1), callee_loc, 1), ID_S("|"), 1), kind, 1);
     return ret_s;
 }
 
@@ -5116,8 +5171,8 @@ void id_nat_push(char* key, int id, char* name) {
     char* site;
     id_list_push(natkey, (long long)(intptr_t)(key));
 char* idsq_17;
-    site = (idsq_17 = id_nat_site(id), id_concat(id_concat(idsq_17, ID_S("|")), id_func_file(name)));
-    id_list_push(natrow, (long long)(intptr_t)(id_concat(id_concat(key, ID_S("|")), site)));
+    site = (idsq_17 = id_nat_site(id), id_concat_f(id_concat(idsq_17, ID_S("|")), id_func_file(name), 1));
+    id_list_push(natrow, (long long)(intptr_t)(id_concat_f(id_concat(key, ID_S("|")), site, 1)));
     return;
 }
 
@@ -5127,7 +5182,7 @@ char* id_nat_site(int id) {
     char* site;
     node_fn_v = id_node_fn(id);
     call_line_v = id_call_line(id);
-    site = id_concat(id_concat(id_func_file(node_fn_v), ID_S(":")), id_str_of_int(call_line_v));
+    site = id_concat_f(id_concat(id_func_file(node_fn_v), ID_S(":")), id_str_of_int(call_line_v), 3);
     return site;
 }
 
@@ -5162,7 +5217,7 @@ void id_nat_call(char* kind, int id) {
 
 void id_nat_add(char* kind, int id, char* name) {
     char* key;
-    key = id_concat(id_concat(kind, ID_S("|")), name);
+    key = id_concat_f(id_concat(kind, ID_S("|")), name, 1);
     if ((id_find_str(natkey, key) < 0)) {
         id_nat_push(key, id, name);
     }
@@ -5950,7 +6005,7 @@ int id_lw_fpos(int node) {
     sd_bt = id_lw_ety((int)(id_list_get(ni1, node)));
 IdList* idsq_21;
     sd_f = (idsq_21 = ns1, (char*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(ni2, node)))));
-    sd_p = id_concat(ID_S(""), id_str_of_int(id_sd_fpos(sd_bt, sd_f)));
+    sd_p = id_concat_f(ID_S(""), id_str_of_int(id_sd_fpos(sd_bt, sd_f)), 2);
     ret_i = id_lw_const(ID_S("int"), sd_p);
     return ret_i;
 }
@@ -6652,7 +6707,7 @@ char* id_lw_divfn(char* op, char* t) {
     h = ID_S("");
     if (((id_ty_int(t) == 1) && ((strcmp(op, ID_S("/")) == 0) || (strcmp(op, ID_S("%")) == 0)))) {
 char* idsq_9;
-        h = (idsq_9 = id_div_pfx(t), id_concat(id_concat(ID_S("id_"), idsq_9), id_div_sfx(op)));
+        h = (idsq_9 = id_div_pfx(t), id_concat_f(id_concat(ID_S("id_"), idsq_9), id_div_sfx(op), 1));
     }
     return h;
 }
@@ -6930,6 +6985,35 @@ int id_lw_not(int node) {
     return ret_i;
 }
 
+int id_lw_concat_call(int node, int a, int b) {
+    int m;
+    int ret_i;
+    m = id_str_mask(node);
+    ret_i = id_lw_concat_pick(a, b, m);
+    return ret_i;
+}
+
+int id_lw_concat_pick(int a, int b, int m) {
+    int ret_i;
+    ret_i = 0;
+    if (((m > 0) && ((int)(id_list_get(fsc, 0)) == 0))) {
+        ret_i = id_lw_concat_f(a, b, m);
+    } else {
+        ret_i = id_lw_callf(ID_S("id_concat"), ID_S("string"), id_list_lit(2, (long long)(a), (long long)(b)));
+    }
+    return ret_i;
+}
+
+int id_lw_concat_f(int a, int b, int m) {
+    char* txt;
+    int ckk;
+    int ret_i;
+    txt = id_concat_f(ID_S(""), id_str_of_int(m), 2);
+    ckk = id_lw_const(ID_S("int"), txt);
+    ret_i = id_lw_callf(ID_S("id_concat_f"), ID_S("string"), id_list_lit(3, (long long)(a), (long long)(b), (long long)(ckk)));
+    return ret_i;
+}
+
 int id_lw_ncmp_b(int node, char* t, int a) {
     int i2_of_v;
     int b;
@@ -6976,7 +7060,7 @@ int id_lw_concat_b(int node, int a) {
     int ret_i;
     i2_of_v = (int)(id_list_get(ni2, node));
     b = id_lw_tostr(i2_of_v);
-    ret_i = id_lw_callf(ID_S("id_concat"), ID_S("string"), id_list_lit(2, (long long)(a), (long long)(b)));
+    ret_i = id_lw_concat_call(node, a, b);
     return ret_i;
 }
 
@@ -8753,7 +8837,7 @@ char* id_pe_args(IdList* args) {
     out = ID_S("");
     i = 0;
     while ((i < id_list_len(args))) {
-        out = id_concat(id_concat(out, ID_S(" ")), id_print_expr((int)(id_list_get(args, i))));
+        out = id_concat_f(id_concat(out, ID_S(" ")), id_print_expr((int)(id_list_get(args, i))), 1);
         i = (i + 1);
     }
     return out;
@@ -8763,7 +8847,7 @@ char* id_print_expr(int id) {
     char* s;
     s = ID_S("");
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("int")) == 0)) {
-        s = id_concat(ID_S(""), id_str_of_int((int)(id_list_get(ni1, id))));
+        s = id_concat_f(ID_S(""), id_str_of_int((int)(id_list_get(ni1, id))), 2);
     } else {
         s = id_pe_op(id);
     }
@@ -8781,7 +8865,7 @@ char* id_pe_op(int id) {
 IdList* idsq_25;
 char* idsq_23;
 char* idsq_17;
-        s = (idsq_25 = ns1, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, id)), idsq_17 = id_print_expr(i1_of_v), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("("), idsq_23), ID_S(" ")), idsq_17), ID_S(" ")), id_print_expr(i2_of_v)), ID_S(")")));
+        s = (idsq_25 = ns1, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, id)), idsq_17 = id_print_expr(i1_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), idsq_23), ID_S(" "), 1), idsq_17, 1), ID_S(" "), 1), id_print_expr(i2_of_v), 1), ID_S(")"), 1));
     } else {
         s = id_pe_atom(id);
     }
@@ -8796,7 +8880,7 @@ char* id_pe_atom(int id) {
         l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
 IdList* idsq_13;
 char* idsq_11;
-        s = (idsq_13 = ns1, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, id)), id_concat(id_concat(id_concat(ID_S("(call "), idsq_11), id_pe_args(l1_of_v)), ID_S(")")));
+        s = (idsq_13 = ns1, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, id)), id_concat_f(id_concat_f(id_concat(ID_S("(call "), idsq_11), id_pe_args(l1_of_v), 1), ID_S(")"), 1));
     }
     return s;
 }
@@ -8826,7 +8910,7 @@ char* id_print_func(int id) {
 IdList* idsq_23;
 char* idsq_21;
 char* idsq_15;
-    s = (idsq_23 = ns1, idsq_21 = (char*)(intptr_t)(id_list_get(idsq_23, id)), idsq_15 = id_print_list(l1_of_v), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(func "), idsq_21), ID_S(" (params")), idsq_15), ID_S(") ")), (char*)(intptr_t)(id_list_get(ns2, id))));
+    s = (idsq_23 = ns1, idsq_21 = (char*)(intptr_t)(id_list_get(idsq_23, id)), idsq_15 = id_print_list(l1_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(func "), idsq_21), ID_S(" (params"), 1), idsq_15, 1), ID_S(") "), 1), (char*)(intptr_t)(id_list_get(ns2, id)), 1));
     ret_s = id_print_func_tail(id, s);
     return ret_s;
 }
@@ -8837,7 +8921,7 @@ char* id_print_list(IdList* list) {
     out = ID_S("");
     i = 0;
     while ((i < id_list_len(list))) {
-        out = id_concat(id_concat(out, ID_S(" ")), id_print_node((int)(id_list_get(list, i))));
+        out = id_concat_f(id_concat(out, ID_S(" ")), id_print_node((int)(id_list_get(list, i))), 1);
         i = (i + 1);
     }
     return out;
@@ -8847,7 +8931,7 @@ char* id_print_node(int id) {
     char* s;
 IdList* idsq_44;
 char* idsq_42;
-    s = (idsq_44 = ns1, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, id)), id_concat(id_concat(id_concat(id_concat(ID_S("(param "), idsq_42), ID_S(" ")), (char*)(intptr_t)(id_list_get(ns2, id))), ID_S(")")));
+    s = (idsq_44 = ns1, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(param "), idsq_42), ID_S(" "), 1), (char*)(intptr_t)(id_list_get(ns2, id)), 1), ID_S(")"), 1));
     if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("param")) != 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("nparam")) != 0)) && (strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("chain")) != 0))) {
         s = id_print_stmt(id);
     }
@@ -8867,7 +8951,7 @@ IdList* idsq_25;
 char* idsq_23;
 IdList* idsq_19;
 char* idsq_17;
-        s = (idsq_25 = ns1, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, id)), idsq_19 = ns2, idsq_17 = (char*)(intptr_t)(id_list_get(idsq_19, id)), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(decl "), idsq_23), ID_S(" ")), idsq_17), ID_S(" ")), id_print_expr(i1_of_v)), ID_S(")")));
+        s = (idsq_25 = ns1, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, id)), idsq_19 = ns2, idsq_17 = (char*)(intptr_t)(id_list_get(idsq_19, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(decl "), idsq_23), ID_S(" "), 1), idsq_17, 1), ID_S(" "), 1), id_print_expr(i1_of_v), 1), ID_S(")"), 1));
     } else {
         s = id_ps2(id);
     }
@@ -8879,7 +8963,7 @@ char* id_print_func_tail(int id, char* s) {
     char* ret_s;
     l2_of_v = (IdList*)(intptr_t)(id_list_get(nl2, id));
 char* idsq_12;
-    ret_s = (idsq_12 = id_print_list(l2_of_v), id_concat(id_concat(id_concat(id_concat(id_concat(s, ID_S(" (body")), idsq_12), ID_S(")")), id_print_ret(id)), ID_S(")")));
+    ret_s = (idsq_12 = id_print_list(l2_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(s, ID_S(" (body")), idsq_12, 1), ID_S(")"), 1), id_print_ret(id), 1), ID_S(")"), 1));
     return ret_s;
 }
 
@@ -8889,7 +8973,7 @@ char* id_ps2(int id) {
     i1_of_v = (int)(id_list_get(ni1, id));
 IdList* idsq_24;
 char* idsq_22;
-    s = (idsq_24 = ns1, idsq_22 = (char*)(intptr_t)(id_list_get(idsq_24, id)), id_concat(id_concat(id_concat(id_concat(ID_S("(assign "), idsq_22), ID_S(" ")), id_print_expr(i1_of_v)), ID_S(")")));
+    s = (idsq_24 = ns1, idsq_22 = (char*)(intptr_t)(id_list_get(idsq_24, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(assign "), idsq_22), ID_S(" "), 1), id_print_expr(i1_of_v), 1), ID_S(")"), 1));
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("assign")) != 0)) {
         s = id_ps3(id);
     }
@@ -8900,7 +8984,7 @@ char* id_ps3(int id) {
     int i1_of_v;
     char* s;
     i1_of_v = (int)(id_list_get(ni1, id));
-    s = id_concat(id_concat(ID_S("(expr "), id_print_expr(i1_of_v)), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("(expr "), id_print_expr(i1_of_v)), ID_S(")"), 1);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("exprstmt")) != 0)) {
         s = id_ps4(id);
     }
@@ -8926,7 +9010,7 @@ char* id_print_ret(int id) {
     s = ID_S(" (return void)");
     if (((int)(id_list_get(ni1, id)) >= 0)) {
         i1_of_v = (int)(id_list_get(ni1, id));
-        s = id_concat(id_concat(ID_S(" (return "), id_print_expr(i1_of_v)), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S(" (return "), id_print_expr(i1_of_v)), ID_S(")"), 1);
     }
     return s;
 }
@@ -8938,7 +9022,7 @@ char* id_ps4_while(int id) {
     i1_of_v = (int)(id_list_get(ni1, id));
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
 char* idsq_12;
-    s = (idsq_12 = id_print_expr(i1_of_v), id_concat(id_concat(id_concat(id_concat(ID_S("(while "), idsq_12), ID_S(" (body")), id_print_list(l1_of_v)), ID_S("))")));
+    s = (idsq_12 = id_print_expr(i1_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(while "), idsq_12), ID_S(" (body"), 1), id_print_list(l1_of_v), 1), ID_S("))"), 1));
     return s;
 }
 
@@ -8948,7 +9032,7 @@ char* id_ps4_if(int id, int if_cond_id, IdList* if_then_ids) {
     l2_of_v = (IdList*)(intptr_t)(id_list_get(nl2, id));
 char* idsq_18;
 char* idsq_12;
-    s = (idsq_18 = id_print_expr(if_cond_id), idsq_12 = id_print_list(if_then_ids), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(if "), idsq_18), ID_S(" (then")), idsq_12), ID_S(") (else")), id_print_list(l2_of_v)), ID_S("))")));
+    s = (idsq_18 = id_print_expr(if_cond_id), idsq_12 = id_print_list(if_then_ids), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(if "), idsq_18), ID_S(" (then"), 1), idsq_12, 1), ID_S(") (else"), 1), id_print_list(l2_of_v), 1), ID_S("))"), 1));
     return s;
 }
 
@@ -9012,9 +9096,9 @@ void id_emit_asm_one(int r) {
     char* c_type_v2;
     c_type_v = id_c_type((char*)(intptr_t)(id_list_get(afret, r)));
     list_params_v = id_list_params((IdList*)(intptr_t)(id_list_get(afparams, r)));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(c_type_v, ID_S(" id_")), (char*)(intptr_t)(id_list_get(afname, r))), ID_S("(")), list_params_v), ID_S(") {")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(c_type_v, ID_S(" id_")), (char*)(intptr_t)(id_list_get(afname, r)), 1), ID_S("("), 1), list_params_v, 1), ID_S(") {"), 1));
     c_type_v2 = id_c_type((char*)(intptr_t)(id_list_get(afret, r)));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    "), c_type_v2), ID_S(" ")), (char*)(intptr_t)(id_list_get(afretn, r))), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), c_type_v2), ID_S(" "), 1), (char*)(intptr_t)(id_list_get(afretn, r)), 1), ID_S(";"), 1));
     id_asm_stmt(r);
     return;
 }
@@ -9044,8 +9128,8 @@ void id_asm_stmt3(int r, char* asm_body_text, char* asm_quote1, char* asm_quote2
     chr_v4 = id_chr(34);
 IdList* idsq_54;
 char* idsq_52;
-    (idsq_54 = afretn, idsq_52 = (char*)(intptr_t)(id_list_get(idsq_54, r)), id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    __asm__ __volatile__("), asm_body_text), ID_S(" : [")), idsq_52), ID_S("] ")), asm_quote1), ID_S("=r")), asm_quote2), ID_S(" (")), (char*)(intptr_t)(id_list_get(afretn, r))), ID_S(") : ")), asm_in_text), ID_S(" : ")), chr_v3), ID_S("memory")), chr_v4), ID_S(");"))));
-    id_emit_line(id_concat(id_concat(ID_S("    return "), (char*)(intptr_t)(id_list_get(afretn, r))), ID_S(";")));
+    (idsq_54 = afretn, idsq_52 = (char*)(intptr_t)(id_list_get(idsq_54, r)), id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    __asm__ __volatile__("), asm_body_text), ID_S(" : ["), 1), idsq_52, 1), ID_S("] "), 1), asm_quote1, 1), ID_S("=r"), 1), asm_quote2, 1), ID_S(" ("), 1), (char*)(intptr_t)(id_list_get(afretn, r)), 1), ID_S(") : "), 1), asm_in_text, 1), ID_S(" : "), 1), chr_v3, 1), ID_S("memory"), 1), chr_v4, 1), ID_S(");"), 1)));
+    id_emit_line(id_concat_f(id_concat(ID_S("    return "), (char*)(intptr_t)(id_list_get(afretn, r))), ID_S(";"), 1));
     id_emit_line(ID_S("}"));
     return;
 }
@@ -9057,7 +9141,7 @@ char* id_asm_text(int r) {
     i = 0;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(aflines, r))))) {
 char* idsq_15;
-        out = (idsq_15 = id_asm_sep(i), id_concat(id_concat(out, idsq_15), (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(aflines, r)), i))));
+        out = (idsq_15 = id_asm_sep(i), id_concat_f(id_concat(out, idsq_15), (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(aflines, r)), i)), 1));
         i = (i + 1);
     }
     return out;
@@ -9068,7 +9152,7 @@ char* id_asm_sep(int i) {
     s = ID_S("");
     if ((i > 0)) {
 char* idsq_13;
-        s = (idsq_13 = id_chr(34), id_concat(id_concat(id_concat(id_concat(ID_S(" "), idsq_13), ID_S("\\n\\t")), id_chr(34)), ID_S(" ")));
+        s = (idsq_13 = id_chr(34), id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S(" "), idsq_13, 2), ID_S("\\n\\t"), 1), id_chr(34), 3), ID_S(" "), 1));
     }
     return s;
 }
@@ -9086,7 +9170,7 @@ char* idsq_31;
 char* idsq_25;
 char* idsq_19;
 IdList* idsq_15;
-        out = (idsq_39 = id_sep_arg(i), idsq_35 = ns2, idsq_32 = (int)(id_list_get(params, i)), idsq_31 = (char*)(intptr_t)(id_list_get(idsq_35, idsq_32)), idsq_25 = id_chr(34), idsq_19 = id_chr(34), idsq_15 = ns2, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(out, idsq_39), ID_S("[")), idsq_31), ID_S("] ")), idsq_25), ID_S("r")), idsq_19), ID_S(" (")), (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get(params, i))))), ID_S(")")));
+        out = (idsq_39 = id_sep_arg(i), idsq_35 = ns2, idsq_32 = (int)(id_list_get(params, i)), idsq_31 = (char*)(intptr_t)(id_list_get(idsq_35, idsq_32)), idsq_25 = id_chr(34), idsq_19 = id_chr(34), idsq_15 = ns2, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(out, idsq_39), ID_S("["), 1), idsq_31, 1), ID_S("] "), 1), idsq_25, 3), ID_S("r"), 1), idsq_19, 3), ID_S(" ("), 1), (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get(params, i)))), 1), ID_S(")"), 1));
         i = (i + 1);
     }
     return out;
@@ -9101,7 +9185,7 @@ void id_emit_asm_then_main(char* triple) {
 void id_asm_error(char* name, char* triple) {
     char* asm_triples_v;
     asm_triples_v = id_asm_triples(name);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("error: no 'asm' definition of '"), name), ID_S("' for target '")), triple), ID_S("'; defined for: ")), asm_triples_v));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("error: no 'asm' definition of '"), name), ID_S("' for target '"), 1), triple, 1), ID_S("'; defined for: "), 1), asm_triples_v, 1));
     id_note_failure();
     return;
 }
@@ -9163,7 +9247,7 @@ char* id_hop_dw(char* op, char* t) {
     h = ID_S("");
     if (((strcmp(op, ID_S("/")) == 0) || (strcmp(op, ID_S("%")) == 0))) {
 char* idsq_9;
-        h = (idsq_9 = id_div_pfx(t), id_concat(id_concat(ID_S("id_"), idsq_9), id_div_sfx(op)));
+        h = (idsq_9 = id_div_pfx(t), id_concat_f(id_concat(ID_S("id_"), idsq_9), id_div_sfx(op), 1));
     }
     return h;
 }
@@ -9205,7 +9289,7 @@ char* id_emit_helper(int id) {
     i2_of_v = (int)(id_list_get(ni2, id));
 char* idsq_17;
 char* idsq_12;
-    ret_s = (idsq_17 = id_helper_op(id), idsq_12 = id_emit_expr(i1_of_v), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_17, ID_S("(")), idsq_12), ID_S(", ")), id_emit_expr(i2_of_v)), ID_S(")")));
+    ret_s = (idsq_17 = id_helper_op(id), idsq_12 = id_emit_expr(i1_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_17, ID_S("(")), idsq_12, 1), ID_S(", "), 1), id_emit_expr(i2_of_v), 1), ID_S(")"), 1));
     return ret_s;
 }
 
@@ -9273,7 +9357,7 @@ char* id_import_text(int id) {
     char* s;
     s = (char*)(intptr_t)(id_list_get(ns1, id));
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("str")) == 0)) {
-        s = id_concat(id_concat(ID_S("ID_S("), id_c_lit(s)), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("ID_S("), id_c_lit(s)), ID_S(")"), 1);
     }
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("import")) == 0) && ((int)(id_list_get(harn, 0)) == 1))) {
         s = id_checked_read(s);
@@ -9290,7 +9374,7 @@ char* id_emit_index(int id) {
     i1_of_v = (int)(id_list_get(ni1, id));
     elem = id_type_of(id);
     sd_ixc = id_emit_idx(id);
-    g = id_concat(id_concat(id_concat(id_concat(ID_S("id_list_get("), id_emit_expr(i1_of_v)), ID_S(", ")), sd_ixc), ID_S(")"));
+    g = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_get("), id_emit_expr(i1_of_v)), ID_S(", "), 1), sd_ixc, 1), ID_S(")"), 1);
     ret_s = id_unbox(g, elem);
     return ret_s;
 }
@@ -9313,7 +9397,7 @@ char* id_emit_fpos(int id) {
     sd_bt = id_type_of((int)(id_list_get(ni1, id)));
 IdList* idsq_14;
     sd_f = (idsq_14 = ns1, (char*)(intptr_t)(id_list_get(idsq_14, (int)(id_list_get(ni2, id)))));
-    sd_c = id_concat(ID_S(""), id_str_of_int(id_sd_fpos(sd_bt, sd_f)));
+    sd_c = id_concat_f(ID_S(""), id_str_of_int(id_sd_fpos(sd_bt, sd_f)), 2);
     return sd_c;
 }
 
@@ -9335,7 +9419,7 @@ char* id_emit_un(int id) {
     i1_of_v = (int)(id_list_get(ni1, id));
 IdList* idsq_12;
 char* idsq_10;
-    ret_s = (idsq_12 = ns1, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat(id_concat(id_concat(ID_S("("), idsq_10), id_emit_expr(i1_of_v)), ID_S(")")));
+    ret_s = (idsq_12 = ns1, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat_f(id_concat_f(id_concat(ID_S("("), idsq_10), id_emit_expr(i1_of_v), 1), ID_S(")"), 1));
     return ret_s;
 }
 
@@ -9353,7 +9437,7 @@ void id_hoist_decl_line(char* hoist_ty_name, char* hoist_var_name) {
     char* esc_i;
     c_type_v = id_c_type(hoist_ty_name);
     esc_i = id_esc_init_code(hoist_var_name);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    "), c_type_v), ID_S(" ")), hoist_var_name), esc_i), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), c_type_v), ID_S(" "), 1), hoist_var_name, 1), esc_i, 1), ID_S(";"), 1));
     return;
 }
 
@@ -9364,7 +9448,7 @@ char* id_sq_name(int u) {
     if (((int)(id_list_get(sqbase, 0)) > u)) {
         sqn = ((int)(id_list_get(sqbase, 0)) - u);
     }
-    s = id_concat(ID_S("idsq_"), id_str_of_int(sqn));
+    s = id_concat_f(ID_S("idsq_"), id_str_of_int(sqn), 2);
     return s;
 }
 
@@ -9470,7 +9554,7 @@ void id_es2(int id, char* ind) {
 void id_emit_decl_mark(int id, char* nm, int e, char* ind) {
     id_emit_decl_line(nm, e, ind);
     if (((id_is_export_decl(id) == 1) && ((int)(id_list_get(harn, 0)) == 1))) {
-        id_emit_line(id_concat(id_concat(id_concat(ind, ID_S("idtc_set_")), nm), ID_S(" = 1;")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat(ind, ID_S("idtc_set_")), nm, 1), ID_S(" = 1;"), 1));
     }
     return;
 }
@@ -9481,7 +9565,7 @@ void id_es3(int id, char* ind) {
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("exprstmt")) == 0)) {
         i1_of_v = (int)(id_list_get(ni1, id));
         emit_expr_v = id_emit_expr(i1_of_v);
-        id_emit_line(id_concat(id_concat(ind, emit_expr_v), ID_S(";")));
+        id_emit_line(id_concat_f(id_concat(ind, emit_expr_v), ID_S(";"), 1));
     } else {
         id_es3b(id, ind);
     }
@@ -9556,7 +9640,7 @@ void id_render_chain(IdList* if_ids, IdList* cond_texts, int lvl, char* ind) {
     if ((lvl > 0)) {
         head = id_concat(ind, ID_S("} else if ("));
     }
-    id_emit_line(id_concat(id_concat(head, cond_text), ID_S(") {")));
+    id_emit_line(id_concat_f(id_concat(head, cond_text), ID_S(") {"), 1));
     id_emit_block(l1_of_v, id_concat(ind, ID_S("    ")));
     has_else = (int)(id_list_get(ni2, cur_id));
     next_k = (lvl + 1);
@@ -9612,7 +9696,7 @@ char* id_ret_code(int id) {
     if (((int)(id_list_get(ni1, id)) >= 0)) {
         i1_of_v = (int)(id_list_get(ni1, id));
         emit_expr_v = id_emit_expr(i1_of_v);
-        ret_s = id_concat(id_concat(ID_S("return "), emit_expr_v), ID_S(";"));
+        ret_s = id_concat_f(id_concat(ID_S("return "), emit_expr_v), ID_S(";"), 1);
     }
     ret_s = id_esc_ret_code(ret_s);
     return ret_s;
@@ -9628,7 +9712,7 @@ void id_emit_while(int id, char* ind) {
 }
 
 void id_emit_while_head(int id, char* ind, char* while_cond_c) {
-    id_emit_line(id_concat(id_concat(id_concat(ind, ID_S("while (")), while_cond_c), ID_S(") {")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat(ind, ID_S("while (")), while_cond_c, 1), ID_S(") {"), 1));
     id_emit_while_body(id, ind);
     return;
 }
@@ -9674,7 +9758,7 @@ void id_iassign4(int id, char* ind, char* val) {
     if ((id_iset_hz(id) == 1)) {
         iset_code_v = id_iset_seq(id, val);
     }
-    id_emit_line(id_concat(id_concat(ind, iset_code_v), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat(ind, iset_code_v), ID_S(";"), 1));
     return;
 }
 
@@ -9684,7 +9768,7 @@ char* id_iset_code(int id, char* val) {
     char* ret_s;
     i1_of_v = (int)(id_list_get(ni1, id));
     sd_ixc = id_emit_idx(id);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("id_list_set("), id_emit_expr(i1_of_v)), ID_S(", ")), sd_ixc), ID_S(", ")), val), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_set("), id_emit_expr(i1_of_v)), ID_S(", "), 1), sd_ixc, 1), ID_S(", "), 1), val, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -9731,7 +9815,7 @@ char* id_ctor_cells(char* sd_nm, IdList* sd_as) {
     sd_k = 0;
     while ((sd_k < id_list_len(sd_as))) {
 char* idsq_17;
-        out = (idsq_17 = id_sep_arg(sd_k), id_concat(id_concat(out, idsq_17), id_ctor_cell(sd_nm, (int)(id_list_get(sd_as, sd_k)), sd_k)));
+        out = (idsq_17 = id_sep_arg(sd_k), id_concat_f(id_concat(out, idsq_17), id_ctor_cell(sd_nm, (int)(id_list_get(sd_as, sd_k)), sd_k), 1));
         sd_k = (sd_k + 1);
     }
     return out;
@@ -9761,7 +9845,7 @@ char* id_ctor_lit(char* sd_nm, IdList* sd_as) {
     char* sd_cells;
     char* ret_s;
     sd_cells = id_ctor_cells(sd_nm, sd_as);
-    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("id_list_lit("), id_str_of_int(id_list_len(sd_as))), ID_S(", ")), sd_cells), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("id_list_lit("), id_str_of_int(id_list_len(sd_as)), 2), ID_S(", "), 1), sd_cells, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -9847,7 +9931,7 @@ char* id_int_code(int id) {
 
 char* id_file_init(int id) {
     char* s;
-    s = id_concat(id_concat(ID_S("ID_SK("), id_c_lit((char*)(intptr_t)(id_list_get(ns1, id)))), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("ID_SK("), id_c_lit((char*)(intptr_t)(id_list_get(ns1, id)))), ID_S(")"), 1);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("str")) != 0)) {
         s = id_emit_expr(id);
     }
@@ -9858,7 +9942,7 @@ char* id_to_str(char* code, char* type) {
     char* s;
     s = code;
     if ((strcmp(type, ID_S("int")) == 0)) {
-        s = id_concat(id_concat(ID_S("id_str_of_int("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_str_of_int("), code), ID_S(")"), 1);
     } else {
         s = id_to_str2(code, type);
     }
@@ -9869,7 +9953,7 @@ char* id_to_str2(char* code, char* type) {
     char* s;
     s = id_to_str3(code, type);
     if ((strcmp(type, ID_S("float")) == 0)) {
-        s = id_concat(id_concat(ID_S("id_str_of_float("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_str_of_float("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -9878,7 +9962,7 @@ char* id_to_str3(char* code, char* type) {
     char* s;
     s = code;
     if ((strcmp(type, ID_S("word")) == 0)) {
-        s = id_concat(id_concat(ID_S("id_str_of_word("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_str_of_word("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -9944,7 +10028,7 @@ char* id_emit_seq(int id) {
     sq_pre = id_seq_binds(sq_units, id);
     sq_body = id_emit_expr(id);
     id_seq_clear(sq_units);
-    ret_s = id_concat(id_concat(id_concat(ID_S("("), sq_pre), sq_body), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat(ID_S("("), sq_pre), sq_body, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -9968,9 +10052,9 @@ char* id_seq_bind(int u) {
     sq_code = id_emit_expr(u);
     sq_type_v = id_type_of(u);
     sq_ctype = id_c_type(sq_type_v);
-    id_emit_line(id_concat(id_concat(id_concat(sq_ctype, ID_S(" ")), id_sq_name(u)), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat(sq_ctype, ID_S(" ")), id_sq_name(u), 1), ID_S(";"), 1));
     id_seq_mark(u, 1);
-    ret_s = id_concat(id_concat(id_concat(id_sq_name(u), ID_S(" = ")), sq_code), ID_S(", "));
+    ret_s = id_concat_f(id_concat_f(id_concat(id_sq_name(u), ID_S(" = ")), sq_code, 1), ID_S(", "), 1);
     return ret_s;
 }
 
@@ -10004,11 +10088,11 @@ char* id_iset_seq(int id, char* val) {
     sq_code = id_emit_expr(i2_of_v);
     sq_type_v = id_type_of(i2_of_v);
     sq_ctype = id_c_type(sq_type_v);
-    id_emit_line(id_concat(id_concat(id_concat(sq_ctype, ID_S(" ")), id_sq_name(i2_of_v)), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat(sq_ctype, ID_S(" ")), id_sq_name(i2_of_v), 1), ID_S(";"), 1));
     id_seq_mark(i2_of_v, 1);
     iset_code_v = id_iset_code(id, val);
     id_seq_mark(i2_of_v, 0);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("("), id_sq_name(i2_of_v)), ID_S(" = ")), sq_code), ID_S(", ")), iset_code_v), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), id_sq_name(i2_of_v)), ID_S(" = "), 1), sq_code, 1), ID_S(", "), 1), iset_code_v, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -10173,7 +10257,7 @@ char* id_infix_line(int id, int infix_lhs_id, char* infix_op_name) {
     i2_of_v = (int)(id_list_get(ni2, id));
 char* idsq_18;
 char* idsq_12;
-    s = (idsq_18 = id_emit_expr(infix_lhs_id), idsq_12 = id_map_op(infix_op_name), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("("), idsq_18), ID_S(" ")), idsq_12), ID_S(" ")), id_emit_expr(i2_of_v)), ID_S(")")));
+    s = (idsq_18 = id_emit_expr(infix_lhs_id), idsq_12 = id_map_op(infix_op_name), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), idsq_18), ID_S(" "), 1), idsq_12, 1), ID_S(" "), 1), id_emit_expr(i2_of_v), 1), ID_S(")"), 1));
     return s;
 }
 
@@ -10193,7 +10277,7 @@ char* id_strcmp_line(int id, int cmp_lhs_id, int cmp_rhs_id) {
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
 char* idsq_18;
 char* idsq_12;
-    s = (idsq_18 = id_emit_expr(cmp_lhs_id), idsq_12 = id_emit_expr(cmp_rhs_id), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(strcmp("), idsq_18), ID_S(", ")), idsq_12), ID_S(") ")), id_map_op(s1_of_v)), ID_S(" 0)")));
+    s = (idsq_18 = id_emit_expr(cmp_lhs_id), idsq_12 = id_emit_expr(cmp_rhs_id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(strcmp("), idsq_18), ID_S(", "), 1), idsq_12, 1), ID_S(") "), 1), id_map_op(s1_of_v), 1), ID_S(" 0)"), 1));
     return s;
 }
 
@@ -10224,7 +10308,7 @@ char* id_emit_args(IdList* args) {
     i = 0;
     while ((i < id_list_len(args))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_arg(i), id_concat(id_concat(out, idsq_15), id_emit_expr((int)(id_list_get(args, i)))));
+        out = (idsq_15 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_15), id_emit_expr((int)(id_list_get(args, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -10251,11 +10335,25 @@ char* id_map_op(char* op) {
 char* id_emit_concat(int id) {
     int i1_of_v;
     int i2_of_v;
+    int m;
+    char* cxa;
+    char* cxb;
     char* s;
     i1_of_v = (int)(id_list_get(ni1, id));
     i2_of_v = (int)(id_list_get(ni2, id));
-char* idsq_12;
-    s = (idsq_12 = id_arg_str(i1_of_v), id_concat(id_concat(id_concat(id_concat(ID_S("id_concat("), idsq_12), ID_S(", ")), id_arg_str(i2_of_v)), ID_S(")")));
+    m = id_str_mask(id);
+    cxa = id_arg_str(i1_of_v);
+    cxb = id_arg_str(i2_of_v);
+    s = id_concat_text(cxa, cxb, m);
+    return s;
+}
+
+char* id_concat_text(char* cxa, char* cxb, int m) {
+    char* s;
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_concat("), cxa), ID_S(", "), 1), cxb, 1), ID_S(")"), 1);
+    if ((m > 0)) {
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_concat_f("), cxa), ID_S(", "), 1), cxb, 1), ID_S(", "), 1), id_str_of_int(m), 3), ID_S(")"), 1);
+    }
     return s;
 }
 
@@ -10284,7 +10382,7 @@ char* id_emit_print(int id) {
     arg = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0));
 IdList* idsq_14;
 char* idsq_12;
-    s = (idsq_14 = ns1, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_concat(id_concat(id_concat(id_concat(ID_S("id_"), idsq_12), ID_S("(")), id_arg_str(arg)), ID_S(")")));
+    s = (idsq_14 = ns1, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_"), idsq_12), ID_S("("), 1), id_arg_str(arg), 1), ID_S(")"), 1));
     return s;
 }
 
@@ -10337,7 +10435,7 @@ void id_tc_collect(void) {
 void id_emit_ty_proto(char* ty) {
     char* key;
     key = id_tc_key(ty);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("static int idtc_eq_"), key), ID_S("(IdList* a, IdList* b);\nstatic void idtc_show_")), key), ID_S("(IdList* a);")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static int idtc_eq_"), key), ID_S("(IdList* a, IdList* b);\nstatic void idtc_show_"), 1), key, 1), ID_S("(IdList* a);"), 1));
     return;
 }
 
@@ -10380,7 +10478,7 @@ char* id_eq_cond(char* et) {
 void id_emit_eq_body(char* key, char* et) {
     char* cmp;
     cmp = id_eq_cond(et);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("static int idtc_eq_"), key), ID_S("(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!")), cmp), ID_S(") return 0;\n    return 1;\n}")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static int idtc_eq_"), key), ID_S("(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!"), 1), cmp, 1), ID_S(") return 0;\n    return 1;\n}"), 1));
     return;
 }
 
@@ -10408,7 +10506,7 @@ void id_emit_show_body(char* key, char* et) {
     char* sh;
     ga = id_unbox(ID_S("a->data[i]"), et);
     sh = id_tc_show(ga, et);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("static void idtc_show_"), key), ID_S("(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        ")), sh), ID_S("\n    }\n    fputs(\"]\", stderr);\n}")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static void idtc_show_"), key), ID_S("(IdList* a) {\n    idtc_show_listed = 1;\n    fputs(\"[\", stderr);\n    for (int i = 0; i < a->len; i++) {\n        if (i) fputs(\", \", stderr);\n        if (idtc_show_cap && i == idtc_show_cap) { fputs(\"...\", stderr); break; }\n        "), 1), sh, 1), ID_S("\n    }\n    fputs(\"]\", stderr);\n}"), 1));
     return;
 }
 
@@ -10547,11 +10645,11 @@ char* id_st_eq_join(char* out, char* sd_nm, int sd_k) {
     char* gb;
     char* so;
     sd_ft = id_sd_cell(sdftype, sd_nm, sd_k);
-    ga = id_unbox(id_concat(id_concat(ID_S("a->data["), id_str_of_int(sd_k)), ID_S("]")), sd_ft);
-    gb = id_unbox(id_concat(id_concat(ID_S("b->data["), id_str_of_int(sd_k)), ID_S("]")), sd_ft);
+    ga = id_unbox(id_concat_f(id_concat_f(ID_S("a->data["), id_str_of_int(sd_k), 2), ID_S("]"), 1), sd_ft);
+    gb = id_unbox(id_concat_f(id_concat_f(ID_S("b->data["), id_str_of_int(sd_k), 2), ID_S("]"), 1), sd_ft);
     so = id_tc_compare(ga, gb, sd_ft);
     if ((sd_k > 0)) {
-        so = id_concat(id_concat(out, ID_S(" && ")), so);
+        so = id_concat_f(id_concat(out, ID_S(" && ")), so, 1);
     }
     return so;
 }
@@ -10573,8 +10671,8 @@ char* id_st_show_at(char* sd_nm, int sd_k) {
     char* sh;
     char* so;
     sd_ft = id_sd_cell(sdftype, sd_nm, sd_k);
-    sh = id_tc_show(id_unbox(id_concat(id_concat(ID_S("a->data["), id_str_of_int(sd_k)), ID_S("]")), sd_ft), sd_ft);
-    so = id_concat(id_concat(ID_S("    "), sh), ID_S("\n"));
+    sh = id_tc_show(id_unbox(id_concat_f(id_concat_f(ID_S("a->data["), id_str_of_int(sd_k), 2), ID_S("]"), 1), sd_ft), sd_ft);
+    so = id_concat_f(id_concat(ID_S("    "), sh), ID_S("\n"), 1);
     if ((sd_k > 0)) {
         so = id_concat(ID_S("    fputs(\", \", stderr);\n"), so);
     }
@@ -10587,7 +10685,7 @@ void id_emit_st_protos(void) {
     while ((sd_i < id_list_len(tcsts))) {
 IdList* idsq_19;
 char* idsq_17;
-        (idsq_19 = tcsts, idsq_17 = (char*)(intptr_t)(id_list_get(idsq_19, sd_i)), id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("static int idtc_eqs_"), idsq_17), ID_S("(IdList* a, IdList* b);\nstatic void idtc_shows_")), (char*)(intptr_t)(id_list_get(tcsts, sd_i))), ID_S("(IdList* a);"))));
+        (idsq_19 = tcsts, idsq_17 = (char*)(intptr_t)(id_list_get(idsq_19, sd_i)), id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static int idtc_eqs_"), idsq_17), ID_S("(IdList* a, IdList* b);\nstatic void idtc_shows_"), 1), (char*)(intptr_t)(id_list_get(tcsts, sd_i)), 1), ID_S("(IdList* a);"), 1)));
         sd_i = (sd_i + 1);
     }
     return;
@@ -10608,7 +10706,7 @@ void id_emit_st_body(char* sd_nm) {
     char* sd_sh;
     sd_cmp = id_st_eq_expr(sd_nm);
     sd_sh = id_st_show_stmts(sd_nm);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("static int idtc_eqs_"), sd_nm), ID_S("(IdList* a, IdList* b) {\n    return ")), sd_cmp), ID_S(";\n}\nstatic void idtc_shows_")), sd_nm), ID_S("(IdList* a) {\n    fputs(\"")), sd_nm), ID_S("(\", stderr);\n")), sd_sh), ID_S("    fputs(\")\", stderr);\n}")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static int idtc_eqs_"), sd_nm), ID_S("(IdList* a, IdList* b) {\n    return "), 1), sd_cmp, 1), ID_S(";\n}\nstatic void idtc_shows_"), 1), sd_nm, 1), ID_S("(IdList* a) {\n    fputs(\""), 1), sd_nm, 1), ID_S("(\", stderr);\n"), 1), sd_sh, 1), ID_S("    fputs(\")\", stderr);\n}"), 1));
     return;
 }
 
@@ -10685,7 +10783,7 @@ char* id_c_type_list(IdList* pts) {
     i = 0;
     while ((i < id_list_len(pts))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_arg(i), id_concat(id_concat(out, idsq_15), id_c_type((char*)(intptr_t)(id_list_get(pts, i)))));
+        out = (idsq_15 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_15), id_c_type((char*)(intptr_t)(id_list_get(pts, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -10721,7 +10819,7 @@ char* id_sig(int id) {
 char* idsq_17;
 IdList* idsq_14;
 char* idsq_12;
-    s = (idsq_17 = id_c_type(s2_of_v), idsq_14 = ns1, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_17, ID_S(" id_")), idsq_12), ID_S("(")), id_param_str(id)), ID_S(")")));
+    s = (idsq_17 = id_c_type(s2_of_v), idsq_14 = ns1, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_17, ID_S(" id_")), idsq_12, 1), ID_S("("), 1), id_param_str(id), 1), ID_S(")"), 1));
     return s;
 }
 
@@ -10737,7 +10835,7 @@ void id_unit_mark(int id) {
 void id_unit_mark_at(char* uf) {
     if ((strcmp(uf, (char*)(intptr_t)(id_list_get(unitlast, 0))) != 0)) {
         id_sset(unitlast, 0, uf);
-        id_emit_line(id_concat(id_concat(ID_S("/* idc unit: "), uf), ID_S(" */")));
+        id_emit_line(id_concat_f(id_concat(ID_S("/* idc unit: "), uf), ID_S(" */"), 1));
     }
     return;
 }
@@ -10818,7 +10916,7 @@ IdList* idsq_30;
 char* idsq_21;
 char* idsq_17;
 IdList* idsq_13;
-        out = (idsq_21 = id_sep_arg(i), idsq_17 = id_c_type(s1_of_v), idsq_13 = ns2, id_concat(id_concat(id_concat(id_concat(out, idsq_21), idsq_17), ID_S(" ")), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(params, i))))));
+        out = (idsq_21 = id_sep_arg(i), idsq_17 = id_c_type(s1_of_v), idsq_13 = ns2, id_concat_f(id_concat_f(id_concat_f(id_concat(out, idsq_21), idsq_17, 1), ID_S(" "), 1), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(params, i)))), 1));
         i = (i + 1);
     }
     return out;
@@ -10836,7 +10934,7 @@ IdList* idsq_13;
 
 char* id_main_body(int m) {
     char* bd;
-    bd = id_concat(id_concat(ID_S("return "), id_main_call(m)), ID_S(";"));
+    bd = id_concat_f(id_concat(ID_S("return "), id_main_call(m)), ID_S(";"), 1);
     if ((strcmp((char*)(intptr_t)(id_list_get(ns2, m)), ID_S("int")) != 0)) {
         bd = id_concat(id_main_call(m), ID_S("; return 0;"));
     }
@@ -10867,7 +10965,7 @@ int id_find_main(void) {
 void id_wrap_body_tail(int m) {
     char* main_body_v;
     main_body_v = id_main_body(m);
-    id_emit_line(id_concat(id_concat(ID_S("    "), main_body_v), ID_S(" }")));
+    id_emit_line(id_concat_f(id_concat(ID_S("    "), main_body_v), ID_S(" }"), 1));
     return;
 }
 
@@ -10977,7 +11075,7 @@ void id_init_line_emit(char* name) {
     char* s;
     s = id_init_line(name);
     id_emit_line(s);
-    id_emit_line(id_concat(id_concat(ID_S("    id_list_lock("), name), ID_S(");")));
+    id_emit_line(id_concat_f(id_concat(ID_S("    id_list_lock("), name), ID_S(");"), 1));
     return;
 }
 
@@ -10987,7 +11085,7 @@ char* id_init_line(char* name) {
     char* ret_s;
     d = id_const_decl(name);
     i1_of_v = (int)(id_list_get(ni1, d));
-    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("    "), name), ID_S(" = ")), id_emit_expr(i1_of_v)), ID_S(";"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), name), ID_S(" = "), 1), id_emit_expr(i1_of_v), 1), ID_S(";"), 1);
     return ret_s;
 }
 
@@ -11033,7 +11131,7 @@ char* idsq_30;
 char* idsq_29;
 IdList* idsq_26;
 char* idsq_24;
-    s = (idsq_32 = etypes, idsq_30 = (char*)(intptr_t)(id_list_get(idsq_32, i)), idsq_29 = id_c_type(idsq_30), idsq_26 = enames, idsq_24 = (char*)(intptr_t)(id_list_get(idsq_26, i)), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_29, ID_S(" ")), idsq_24), ID_S(";  /* exported by ")), (char*)(intptr_t)(id_list_get(eowners, i))), ID_S("() */")));
+    s = (idsq_32 = etypes, idsq_30 = (char*)(intptr_t)(id_list_get(idsq_32, i)), idsq_29 = id_c_type(idsq_30), idsq_26 = enames, idsq_24 = (char*)(intptr_t)(id_list_get(idsq_26, i)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_29, ID_S(" ")), idsq_24, 1), ID_S(";  /* exported by "), 1), (char*)(intptr_t)(id_list_get(eowners, i)), 1), ID_S("() */"), 1));
     if ((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), ID_S("conf.id")) == 0)) {
         s = id_const_line((char*)(intptr_t)(id_list_get(enames, i)));
     }
@@ -11057,10 +11155,10 @@ char* id_const_line_tail(int d, char* const_ty_name) {
 char* idsq_37;
 IdList* idsq_34;
 char* idsq_32;
-    ret_s = (idsq_37 = id_c_type(const_ty_name), idsq_34 = ns2, idsq_32 = (char*)(intptr_t)(id_list_get(idsq_34, d)), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_37, ID_S(" ")), idsq_32), ID_S(" = ")), id_file_init(id_const_root(i1_of_v))), ID_S(";  /* constant from conf.id */")));
+    ret_s = (idsq_37 = id_c_type(const_ty_name), idsq_34 = ns2, idsq_32 = (char*)(intptr_t)(id_list_get(idsq_34, d)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_37, ID_S(" ")), idsq_32, 1), ID_S(" = "), 1), id_file_init(id_const_root(i1_of_v)), 1), ID_S(";  /* constant from conf.id */"), 1));
     if ((id_ty_is_list(const_ty_name) == 1)) {
 char* idsq_12;
-        ret_s = (idsq_12 = id_c_type(const_ty_name), id_concat(id_concat(id_concat(idsq_12, ID_S(" ")), (char*)(intptr_t)(id_list_get(ns2, d))), ID_S(";  /* constant from conf.id */")));
+        ret_s = (idsq_12 = id_c_type(const_ty_name), id_concat_f(id_concat_f(id_concat(idsq_12, ID_S(" ")), (char*)(intptr_t)(id_list_get(ns2, d)), 1), ID_S(";  /* constant from conf.id */"), 1));
     }
     return ret_s;
 }
@@ -11126,7 +11224,7 @@ void id_emit_export_line_kept(int i) {
 
 void id_emit_set_decl(int i) {
     if (((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), ID_S("conf.id")) != 0) && ((int)(id_list_get(harn, 0)) == 1))) {
-        id_emit_line(id_concat(id_concat(ID_S("char idtc_set_"), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(";")));
+        id_emit_line(id_concat_f(id_concat(ID_S("char idtc_set_"), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(";"), 1));
     }
     return;
 }
@@ -11137,7 +11235,7 @@ char* id_checked_read(char* nm) {
     s = nm;
     ek = id_find_str(enames, nm);
     if (((ek >= 0) && (strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), ID_S("conf.id")) != 0))) {
-        s = id_concat(id_concat(id_concat(id_concat(ID_S("((void)(idtc_set_"), nm), ID_S(" || (id_null_read(), 0)), ")), nm), ID_S(")"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("((void)(idtc_set_"), nm), ID_S(" || (id_null_read(), 0)), "), 1), nm, 1), ID_S(")"), 1);
     }
     return s;
 }
@@ -11166,7 +11264,7 @@ void id_fwd_adopt_one(int id) {
     if (((id_is_native(id) == 1) && ((id_ty_is_list(rt) == 1) || (id_ty_is_struct(rt) == 1)))) {
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("#define id_"), idsq_13), ID_S("(...) id_list_adopt(id_")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("(__VA_ARGS__))"))));
+        (idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("#define id_"), idsq_13), ID_S("(...) id_list_adopt(id_"), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1), ID_S("(__VA_ARGS__))"), 1)));
     }
     return;
 }
@@ -11220,7 +11318,7 @@ void id_emit_arg_line(IdList* ps, IdList* args, int j) {
 IdList* idsq_21;
     pt = (idsq_21 = ns1, (char*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(ps, j)))));
     cv = id_tc_value((int)(id_list_get(args, j)), pt);
-    id_emit_tc_decl(pt, id_concat(ID_S("idtc_a"), id_str_of_int(j)), cv);
+    id_emit_tc_decl(pt, id_concat_f(ID_S("idtc_a"), id_str_of_int(j), 2), cv);
     return;
 }
 
@@ -11258,7 +11356,7 @@ IdList* idsq_52;
     }
     an = id_names_upto(id_list_len(items));
     id_emit_arg_lines(ps, items);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    id_"), nm), ID_S("(")), an), ID_S(");")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    id_"), nm), ID_S("("), 1), an, 1), ID_S(");"), 1));
     if ((id_list_len(items) > 0)) {
         id_emit_line(ID_S("    }"));
     }
@@ -11297,18 +11395,18 @@ void id_emit_then_imp(int ci, int ti, int node) {
     rd = id_then_imp_get(node);
 IdList* idsq_109;
 char* idsq_107;
-    lbl = (idsq_109 = ns1, idsq_107 = (char*)(intptr_t)(id_list_get(idsq_109, node)), id_concat(id_concat(id_concat(ID_S("(import "), idsq_107), ID_S(")")), (char*)(intptr_t)(id_list_get(ns2, node))));
+    lbl = (idsq_109 = ns1, idsq_107 = (char*)(intptr_t)(id_list_get(idsq_109, node)), id_concat_f(id_concat_f(id_concat(ID_S("(import "), idsq_107), ID_S(")"), 1), (char*)(intptr_t)(id_list_get(ns2, node)), 1));
     imp_ix = (IdList*)(intptr_t)(id_list_get(nl2, node));
     items = (IdList*)(intptr_t)(id_list_get(nl1, node));
     if ((id_list_len(imp_ix) == 1)) {
-        rd = id_unbox(id_concat(id_concat(id_concat(id_concat(ID_S("id_list_get("), rd), ID_S(", ")), id_tc_value((int)(id_list_get(imp_ix, 0)), ID_S("int"))), ID_S(")")), vt);
-        lbl = id_concat(id_concat(id_concat(lbl, ID_S("[")), id_lit_text((int)(id_list_get(imp_ix, 0)))), ID_S("]"));
+        rd = id_unbox(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_get("), rd), ID_S(", "), 1), id_tc_value((int)(id_list_get(imp_ix, 0)), ID_S("int")), 1), ID_S(")"), 1), vt);
+        lbl = id_concat_f(id_concat_f(id_concat(lbl, ID_S("[")), id_lit_text((int)(id_list_get(imp_ix, 0))), 1), ID_S("]"), 1);
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, node)), ID_S("thenlen")) == 0)) {
-        rd = id_concat(id_concat(id_then_len_call(node), rd), ID_S(")"));
-        lbl = id_concat(id_concat(ID_S("len("), lbl), ID_S(")"));
+        rd = id_concat_f(id_concat(id_then_len_call(node), rd), ID_S(")"), 1);
+        lbl = id_concat_f(id_concat(ID_S("len("), lbl), ID_S(")"), 1);
     }
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    "), id_c_type(vt)), ID_S(" idtc_chk")), id_str_of_int(ti)), ID_S(" = ")), rd), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), id_c_type(vt)), ID_S(" idtc_chk"), 1), id_str_of_int(ti), 3), ID_S(" = "), 1), rd, 1), ID_S(";"), 1));
     id_emit_then_judge(ci, ti, lbl, vt, items);
     return;
 }
@@ -11316,8 +11414,8 @@ char* idsq_107;
 void id_emit_then_fail(int ci, int ti, char* chk_lbl, char* rt) {
     char* cnd;
     char* shown;
-    cnd = id_tc_compare(id_concat(ID_S("idtc_chk"), id_str_of_int(ti)), id_concat(ID_S("idtc_want"), id_str_of_int(ti)), rt);
-    shown = id_tc_show(id_concat(ID_S("idtc_chk"), id_str_of_int(ti)), rt);
+    cnd = id_tc_compare(id_concat_f(ID_S("idtc_chk"), id_str_of_int(ti), 2), id_concat_f(ID_S("idtc_want"), id_str_of_int(ti), 2), rt);
+    shown = id_tc_show(id_concat_f(ID_S("idtc_chk"), id_str_of_int(ti), 2), rt);
     id_emit_then_lines(ci, ti, chk_lbl, cnd, shown);
     return;
 }
@@ -11325,7 +11423,7 @@ void id_emit_then_fail(int ci, int ti, char* chk_lbl, char* rt) {
 void id_emit_then_lines(int ci, int ti, char* chk_lbl, char* cnd, char* shown) {
     char* tail;
     tail = id_then_tail(ti);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s then ")), chk_lbl), ID_S(" = \", idtc_where[")), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("]);\n        ")), shown), ID_S("\n        fputs(\"")), tail), ID_S("\", stderr);\n        return 3;\n    }")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s then "), 1), chk_lbl, 1), ID_S(" = \", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n        "), 1), shown, 1), ID_S("\n        fputs(\""), 1), tail, 1), ID_S("\", stderr);\n        return 3;\n    }"), 1));
     return;
 }
 
@@ -11336,7 +11434,7 @@ char* id_then_tail(int ti) {
 IdList* idsq_21;
     items = (idsq_21 = nl1, (IdList*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(thennode, ti)))));
     lt = id_lit_text((int)(id_list_get(items, 0)));
-    so = id_c_esc(id_concat(id_concat(ID_S(", expected "), lt), ID_S("\n")));
+    so = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), lt), ID_S("\n"), 1));
     return so;
 }
 
@@ -11351,7 +11449,7 @@ void id_emit_then_got(int ci, int ti, char* chk_nm, int cfn) {
 
 void id_emit_then_want(int ci, int ti, char* chk_nm, char* rt, char* ct) {
     IdList* items;
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    "), ct), ID_S(" idtc_chk")), id_str_of_int(ti)), ID_S(" = id_")), chk_nm), ID_S("();")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), ct), ID_S(" idtc_chk"), 1), id_str_of_int(ti), 3), ID_S(" = id_"), 1), chk_nm, 1), ID_S("();"), 1));
 IdList* idsq_16;
     items = (idsq_16 = nl1, (IdList*)(intptr_t)(id_list_get(idsq_16, (int)(id_list_get(thennode, ti)))));
     id_emit_then_judge(ci, ti, id_concat(chk_nm, ID_S("()")), rt, items);
@@ -11361,7 +11459,7 @@ IdList* idsq_16;
 void id_emit_then_judge(int ci, int ti, char* chk_lbl, char* rt, IdList* items) {
     char* cv;
     cv = id_tc_value((int)(id_list_get(items, 0)), rt);
-    id_emit_tc_decl(rt, id_concat(ID_S("idtc_want"), id_str_of_int(ti)), cv);
+    id_emit_tc_decl(rt, id_concat_f(ID_S("idtc_want"), id_str_of_int(ti), 2), cv);
     id_emit_then_fail(ci, ti, chk_lbl, rt);
     return;
 }
@@ -11400,9 +11498,9 @@ char* id_calls_row_cmp(char* nm, int ti, char* pt, char* fld, int item, char* ou
     char* code;
     char* want;
     char* so;
-    code = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("idtc_rc_"), nm), ID_S("_buf[idtc_j")), id_str_of_int(ti)), ID_S("].")), fld);
+    code = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_rc_"), nm), ID_S("_buf[idtc_j"), 1), id_str_of_int(ti), 3), ID_S("]."), 1), fld, 1);
     want = id_tc_value(item, pt);
-    so = id_concat(id_concat(out, ID_S(" && ")), id_tc_compare(code, want, pt));
+    so = id_concat_f(id_concat(out, ID_S(" && ")), id_tc_compare(code, want, pt), 1);
     return so;
 }
 
@@ -11410,8 +11508,8 @@ void id_emit_calls_args_emit(int ci, int ti, char* nm, char* rowcond, char* rows
     char* et;
     char* extext;
     et = id_items_text(items);
-    extext = id_c_esc(id_concat(id_concat(id_concat(nm, ID_S("(")), et), ID_S(")")));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    int idtc_hit"), id_str_of_int(ti)), ID_S(" = 0;\n    for (int idtc_j")), id_str_of_int(ti)), ID_S(" = 0; idtc_j")), id_str_of_int(ti)), ID_S(" < idtc_rc_")), nm), ID_S("_kept; idtc_j")), id_str_of_int(ti)), ID_S("++) {\n        if (idtc_rc_")), nm), ID_S("_seq[idtc_j")), id_str_of_int(ti)), ID_S("] > idtc_seek && (")), rowcond), ID_S(")) {\n            idtc_hit")), id_str_of_int(ti)), ID_S(" = 1;\n            idtc_seek = idtc_rc_")), nm), ID_S("_seq[idtc_j")), id_str_of_int(ti)), ID_S("];\n            break;\n        }\n    }\n    if (!idtc_hit")), id_str_of_int(ti)), ID_S(") {\n        int idtc_sk")), id_str_of_int(ti)), ID_S(" = idtc_calls_skipped(idtc_rc_")), nm), ID_S("_seq, idtc_rc_")), nm), ID_S("_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to '")), nm), ID_S("'%s\", idtc_where[")), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("], \"")), extext), ID_S("\", idtc_rc_")), nm), ID_S("_kept - idtc_sk")), id_str_of_int(ti)), ID_S(", idtc_sk")), id_str_of_int(ti)), ID_S(" \? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k")), id_str_of_int(ti)), ID_S(" = 0; idtc_k")), id_str_of_int(ti)), ID_S(" < idtc_rc_")), nm), ID_S("_kept; idtc_k")), id_str_of_int(ti)), ID_S("++) {\n            int idtc_j")), id_str_of_int(ti)), ID_S(" = (idtc_k")), id_str_of_int(ti)), ID_S(" + idtc_sk")), id_str_of_int(ti)), ID_S(") % idtc_rc_")), nm), ID_S("_kept;\n            if (idtc_calls_item(idtc_k")), id_str_of_int(ti)), ID_S(", idtc_rc_")), nm), ID_S("_kept, idtc_sk")), id_str_of_int(ti)), ID_S(")) { ")), rowshow), ID_S("fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_")), nm), ID_S("_n, idtc_rc_")), nm), ID_S("_kept);\n        return 3;\n    }")));
+    extext = id_c_esc(id_concat_f(id_concat_f(id_concat(nm, ID_S("(")), et, 1), ID_S(")"), 1));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    int idtc_hit"), id_str_of_int(ti), 2), ID_S(" = 0;\n    for (int idtc_j"), 1), id_str_of_int(ti), 3), ID_S(" = 0; idtc_j"), 1), id_str_of_int(ti), 3), ID_S(" < idtc_rc_"), 1), nm, 1), ID_S("_kept; idtc_j"), 1), id_str_of_int(ti), 3), ID_S("++) {\n        if (idtc_rc_"), 1), nm, 1), ID_S("_seq[idtc_j"), 1), id_str_of_int(ti), 3), ID_S("] > idtc_seek && ("), 1), rowcond, 1), ID_S(")) {\n            idtc_hit"), 1), id_str_of_int(ti), 3), ID_S(" = 1;\n            idtc_seek = idtc_rc_"), 1), nm, 1), ID_S("_seq[idtc_j"), 1), id_str_of_int(ti), 3), ID_S("];\n            break;\n        }\n    }\n    if (!idtc_hit"), 1), id_str_of_int(ti), 3), ID_S(") {\n        int idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(" = idtc_calls_skipped(idtc_rc_"), 1), nm, 1), ID_S("_seq, idtc_rc_"), 1), nm, 1), ID_S("_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to '"), 1), nm, 1), ID_S("'%s\", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("], \""), 1), extext, 1), ID_S("\", idtc_rc_"), 1), nm, 1), ID_S("_kept - idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(", idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(" \? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k"), 1), id_str_of_int(ti), 3), ID_S(" = 0; idtc_k"), 1), id_str_of_int(ti), 3), ID_S(" < idtc_rc_"), 1), nm, 1), ID_S("_kept; idtc_k"), 1), id_str_of_int(ti), 3), ID_S("++) {\n            int idtc_j"), 1), id_str_of_int(ti), 3), ID_S(" = (idtc_k"), 1), id_str_of_int(ti), 3), ID_S(" + idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(") % idtc_rc_"), 1), nm, 1), ID_S("_kept;\n            if (idtc_calls_item(idtc_k"), 1), id_str_of_int(ti), 3), ID_S(", idtc_rc_"), 1), nm, 1), ID_S("_kept, idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(")) { "), 1), rowshow, 1), ID_S("fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_"), 1), nm, 1), ID_S("_n, idtc_rc_"), 1), nm, 1), ID_S("_kept);\n        return 3;\n    }"), 1));
     return;
 }
 
@@ -11422,9 +11520,9 @@ char* id_calls_show_step(char* nm, int ti, IdList* params, char* out, int i) {
 IdList* idsq_36;
     pt = (idsq_36 = ns1, (char*)(intptr_t)(id_list_get(idsq_36, (int)(id_list_get(params, i)))));
 IdList* idsq_21;
-    code = (idsq_21 = ns2, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("idtc_rc_"), nm), ID_S("_buf[idtc_j")), id_str_of_int(ti)), ID_S("].")), (char*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(params, i))))));
+    code = (idsq_21 = ns2, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_rc_"), nm), ID_S("_buf[idtc_j"), 1), id_str_of_int(ti), 3), ID_S("]."), 1), (char*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(params, i)))), 1));
 char* idsq_11;
-    so = (idsq_11 = id_show_sep(i), id_concat(id_concat(id_concat(out, idsq_11), id_tc_show(code, pt)), ID_S(" ")));
+    so = (idsq_11 = id_show_sep(i), id_concat_f(id_concat_f(id_concat(out, idsq_11), id_tc_show(code, pt), 1), ID_S(" "), 1));
     return so;
 }
 
@@ -11463,15 +11561,15 @@ void id_emit_calls_count(int ci, int ti, int node) {
     nm = (char*)(intptr_t)(id_list_get(ns1, node));
     items = (IdList*)(intptr_t)(id_list_get(nl1, node));
     want = id_tc_value((int)(id_list_get(items, 0)), ID_S("int"));
-    cntexpr = id_concat(id_concat(ID_S("idtc_rc_"), nm), ID_S("_n"));
+    cntexpr = id_concat_f(id_concat(ID_S("idtc_rc_"), nm), ID_S("_n"), 1);
     id_emit_calls_count_cond(ci, nm, cntexpr, want);
     return;
 }
 
 void id_emit_calls_count_cond(int ci, char* nm, char* cntexpr, char* want) {
     char* cnd;
-    cnd = id_concat(id_concat(id_concat(id_concat(ID_S("("), cntexpr), ID_S(" == (")), want), ID_S("))"));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    if (!"), cnd), ID_S(") {\n        fprintf(stderr, \"%s: test failed: %s calls ")), nm), ID_S("[%lld], expected %d\\n\", idtc_where[")), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("], ")), cntexpr), ID_S(", ")), want), ID_S(");\n        return 3;\n    }")));
+    cnd = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), cntexpr), ID_S(" == ("), 1), want, 1), ID_S("))"), 1);
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!"), cnd), ID_S(") {\n        fprintf(stderr, \"%s: test failed: %s calls "), 1), nm, 1), ID_S("[%lld], expected %d\\n\", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("], "), 1), cntexpr, 1), ID_S(", "), 1), want, 1), ID_S(");\n        return 3;\n    }"), 1));
     return;
 }
 
@@ -11489,7 +11587,7 @@ void id_emit_then_calls(int ci, int ti, int node) {
 char* id_calls_row_show(char* nm, int ti, IdList* params) {
     char* out;
     int i;
-    out = id_concat(id_concat(ID_S("fputs(\""), nm), ID_S("(\", stderr); "));
+    out = id_concat_f(id_concat(ID_S("fputs(\""), nm), ID_S("(\", stderr); "), 1);
     i = 0;
     while ((i < id_list_len(params))) {
         out = id_calls_show_step(nm, ti, params, out, i);
@@ -11526,7 +11624,7 @@ void id_emit_capture_post2(int ci) {
 void id_emit_err_post(int ci) {
     if ((id_case_has_out(ci, ID_S("theneprints")) == 1)) {
         id_emit_line(ID_S("    fflush(idtc_eprint_target);\n    long idtc_err_len = ftell(idtc_eprint_target);\n    fseek(idtc_eprint_target, 0, SEEK_SET);\n    char* idtc_err_buf = malloc((size_t)idtc_err_len + 1);\n    if (idtc_err_len > 0) { size_t idtc_err_rd = fread(idtc_err_buf, 1, (size_t)idtc_err_len, idtc_eprint_target); (void)idtc_err_rd; }\n    idtc_err_buf[idtc_err_len] = 0;\n    fclose(idtc_eprint_target);\n    idtc_eprint_target = NULL;"));
-        id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    if ((long)strlen(idtc_err_buf) != idtc_err_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which an eprints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where["), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("]);\n        return 3;\n    }")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    if ((long)strlen(idtc_err_buf) != idtc_err_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which an eprints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where["), id_str_of_int(ci), 2), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n        return 3;\n    }"), 1));
     }
     return;
 }
@@ -11547,7 +11645,7 @@ void id_emit_capture_post(int ci) {
 void id_emit_out_post(int ci) {
     if ((id_case_has_out(ci, ID_S("thenprints")) == 1)) {
         id_emit_line(ID_S("    fflush(stdout);\n    dup2(idtc_out_save, 1);\n    close(idtc_out_save);\n    long idtc_out_len = ftell(idtc_out_tmp);\n    fseek(idtc_out_tmp, 0, SEEK_SET);\n    char* idtc_out_buf = malloc((size_t)idtc_out_len + 1);\n    if (idtc_out_len > 0) { size_t idtc_out_rd = fread(idtc_out_buf, 1, (size_t)idtc_out_len, idtc_out_tmp); (void)idtc_out_rd; }\n    idtc_out_buf[idtc_out_len] = 0;\n    fclose(idtc_out_tmp);"));
-        id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    if ((long)strlen(idtc_out_buf) != idtc_out_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which a prints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where["), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("]);\n        return 3;\n    }")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    if ((long)strlen(idtc_out_buf) != idtc_out_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which a prints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where["), id_str_of_int(ci), 2), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n        return 3;\n    }"), 1));
     }
     return;
 }
@@ -11660,8 +11758,8 @@ void id_emit_print_lines(int ci, char* kind, char* cnd, char* shown, int e) {
 
 void id_emit_print_final(int ci, char* lab, char* cnd, char* shown, char* lt) {
     char* tail;
-    tail = id_c_esc(id_concat(id_concat(ID_S(", expected "), lt), ID_S("\n")));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s ")), lab), ID_S(" = \", idtc_where[")), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("]);\n        ")), shown), ID_S("\n        fputs(\"")), tail), ID_S("\", stderr);\n        return 3;\n    }")));
+    tail = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), lt), ID_S("\n"), 1));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s "), 1), lab, 1), ID_S(" = \", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n        "), 1), shown, 1), ID_S("\n        fputs(\""), 1), tail, 1), ID_S("\", stderr);\n        return 3;\n    }"), 1));
     return;
 }
 
@@ -11679,7 +11777,7 @@ IdList* idsq_52;
     while ((pi < id_list_len(steps))) {
 char* idsq_27;
 int idsq_26;
-        rd = (idsq_27 = (char*)(intptr_t)(id_list_get(steps, pi)), idsq_26 = id_sd_fpos(pt, idsq_27), id_unbox(id_concat(id_concat(id_concat(id_concat(ID_S("id_list_get("), rd), ID_S(", ")), id_str_of_int(idsq_26)), ID_S(")")), id_then_path_step(pt, (char*)(intptr_t)(id_list_get(steps, pi)))));
+        rd = (idsq_27 = (char*)(intptr_t)(id_list_get(steps, pi)), idsq_26 = id_sd_fpos(pt, idsq_27), id_unbox(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_get("), rd), ID_S(", "), 1), id_str_of_int(idsq_26), 3), ID_S(")"), 1), id_then_path_step(pt, (char*)(intptr_t)(id_list_get(steps, pi)))));
         pt = id_then_path_step(pt, (char*)(intptr_t)(id_list_get(steps, pi)));
         pi = (pi + 1);
     }
@@ -11708,7 +11806,7 @@ void id_emit_print_cond(int ci, char* kind, char* var, char* want, int e) {
     char* cnd;
     char* shown;
     cnd = id_tc_compare(var, want, ID_S("string"));
-    shown = id_concat(id_concat(ID_S("idtc_show_esc("), var), ID_S(");"));
+    shown = id_concat_f(id_concat(ID_S("idtc_show_esc("), var), ID_S(");"), 1);
     id_emit_print_lines(ci, kind, cnd, shown, e);
     return;
 }
@@ -11789,7 +11887,7 @@ void id_emit_cases(void) {
 }
 
 void id_emit_case_fn(int ci) {
-    id_emit_line(id_concat(id_concat(ID_S("static int idtc_case_"), id_str_of_int(ci)), ID_S("(int idtc_fd) {")));
+    id_emit_line(id_concat_f(id_concat_f(ID_S("static int idtc_case_"), id_str_of_int(ci), 2), ID_S("(int idtc_fd) {"), 1));
     id_emit_case_pre(ci);
     id_emit_line(ID_S("    id_ctr_time = 0; id_ctr_mem = 0;"));
     id_emit_case_call_wrapped(ci);
@@ -11819,7 +11917,7 @@ void id_emit_case_call(int ci) {
     cargs = id_arg_names(fn);
     f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
     if ((strcmp((char*)(intptr_t)(id_list_get(ns2, fn)), ID_S("void")) == 0)) {
-        id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    id_"), f1), ID_S("(")), cargs), ID_S(");")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    id_"), f1), ID_S("("), 1), cargs, 1), ID_S(");"), 1));
     } else {
         rt = (char*)(intptr_t)(id_list_get(ns2, fn));
         id_emit_ret_call(f1, rt, cargs);
@@ -11830,14 +11928,14 @@ void id_emit_case_call(int ci) {
 void id_emit_ret_call(char* f1, char* rt, char* cargs) {
     char* ct;
     ct = id_c_type(rt);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    "), ct), ID_S(" idtc_got = id_")), f1), ID_S("(")), cargs), ID_S(");")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), ct), ID_S(" idtc_got = id_"), 1), f1, 1), ID_S("("), 1), cargs, 1), ID_S(");"), 1));
     return;
 }
 
 void id_emit_tc_decl(char* pt, char* nm, char* cv) {
     char* ct;
     ct = id_c_type(pt);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    "), ct), ID_S(" ")), nm), ID_S(" = ")), cv), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    "), ct), ID_S(" "), 1), nm, 1), ID_S(" = "), 1), cv, 1), ID_S(";"), 1));
     return;
 }
 
@@ -11855,7 +11953,7 @@ char* id_names_upto(int n) {
     out = ID_S("");
     j = 0;
     while ((j < n)) {
-        out = id_concat(id_concat(id_concat(out, id_sep_arg(j)), ID_S("idtc_a")), id_str_of_int(j));
+        out = id_concat_f(id_concat_f(id_concat(out, id_sep_arg(j)), ID_S("idtc_a"), 1), id_str_of_int(j), 3);
         j = (j + 1);
     }
     return out;
@@ -11881,7 +11979,7 @@ void id_emit_case_traps_fail(int ci) {
     char* want;
     tnid = id_case_traps_node(ci);
     want = id_tc_value((int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, tnid)), 0)), ID_S("string"));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    fprintf(stderr, \"%s: test failed: %s \", idtc_where["), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", ")), want), ID_S(");\n    return 3;")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    fprintf(stderr, \"%s: test failed: %s \", idtc_where["), id_str_of_int(ci), 2), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n    fprintf(stderr, \"expected a trap containing %s, but it returned\\n\", "), 1), want, 1), ID_S(");\n    return 3;"), 1));
     return;
 }
 
@@ -11895,10 +11993,10 @@ void id_emit_case_fail(int ci) {
 IdList* idsq_52;
     expd = (idsq_52 = nl2, (IdList*)(intptr_t)(id_list_get(idsq_52, (int)(id_list_get(casenode, ci)))));
     cnd = id_case_cond(fn, expd);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s = \", idtc_where[")), id_str_of_int(ci)), ID_S("], idtc_call[")), id_str_of_int(ci)), ID_S("]);")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s = \", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);"), 1));
     shows = id_show_all(fn, expd);
     tail = id_exp_tail(expd);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("        "), shows), ID_S("\n        fputs(\"")), tail), ID_S("\", stderr);\n        return 3;\n    }")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("        "), shows), ID_S("\n        fputs(\""), 1), tail, 1), ID_S("\", stderr);\n        return 3;\n    }"), 1));
     return;
 }
 
@@ -11918,7 +12016,7 @@ char* id_cond_parts(int fn, IdList* expd) {
     j = 0;
     while ((j < id_list_len(expd))) {
 char* idsq_14;
-        out = (idsq_14 = id_and_sep(j), id_concat(id_concat(out, idsq_14), id_cond_part(fn, j)));
+        out = (idsq_14 = id_and_sep(j), id_concat_f(id_concat(out, idsq_14), id_cond_part(fn, j), 1));
         j = (j + 1);
     }
     return out;
@@ -11930,7 +12028,7 @@ char* id_cond_part(int fn, int j) {
     char* so;
     nm = id_chk_name(fn, j);
     pt = id_chk_type(fn, j);
-    so = id_tc_compare(nm, id_concat(ID_S("idtc_e"), id_str_of_int(j)), pt);
+    so = id_tc_compare(nm, id_concat_f(ID_S("idtc_e"), id_str_of_int(j), 2), pt);
     return so;
 }
 
@@ -11959,9 +12057,9 @@ char* id_exp_tail(IdList* expd) {
     char* so;
     et = id_items_text(expd);
     if ((id_list_len(expd) != 1)) {
-        et = id_concat(id_concat(ID_S("("), et), ID_S(")"));
+        et = id_concat_f(id_concat(ID_S("("), et), ID_S(")"), 1);
     }
-    so = id_c_esc(id_concat(id_concat(ID_S(", expected "), et), ID_S("\n")));
+    so = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), et), ID_S("\n"), 1));
     return so;
 }
 
@@ -11978,7 +12076,7 @@ char* id_show_all(int fn, IdList* expd) {
     char* so;
     so = id_show_parts(fn, expd);
     if ((id_list_len(expd) != 1)) {
-        so = id_concat(id_concat(ID_S("fputs(\"(\", stderr); "), so), ID_S(" fputs(\")\", stderr);"));
+        so = id_concat_f(id_concat(ID_S("fputs(\"(\", stderr); "), so), ID_S(" fputs(\")\", stderr);"), 1);
     }
     return so;
 }
@@ -12000,7 +12098,7 @@ void id_emit_expd_decl(int fn, IdList* expd, int j) {
     char* cv;
     pt = id_chk_type(fn, j);
     cv = id_tc_value((int)(id_list_get(expd, j)), pt);
-    id_emit_tc_decl(pt, id_concat(ID_S("idtc_e"), id_str_of_int(j)), cv);
+    id_emit_tc_decl(pt, id_concat_f(ID_S("idtc_e"), id_str_of_int(j), 2), cv);
     return;
 }
 
@@ -12008,7 +12106,7 @@ char* id_chk_name(int fn, int j) {
     char* nm;
     nm = ID_S("idtc_got");
     if ((strcmp((char*)(intptr_t)(id_list_get(ns2, fn)), ID_S("void")) == 0)) {
-        nm = id_concat(ID_S("idtc_a"), id_str_of_int(j));
+        nm = id_concat_f(ID_S("idtc_a"), id_str_of_int(j), 2);
     }
     return nm;
 }
@@ -12065,7 +12163,7 @@ void id_emit_dir_row(int ci) {
     char* cr;
     cr = id_case_root(ci);
     if ((strcmp(cr, ID_S("")) != 0)) {
-        id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_dir["), id_str_of_int(ci)), ID_S("] = \"")), id_c_esc(cr)), ID_S("\";")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_dir["), id_str_of_int(ci), 2), ID_S("] = \""), 1), id_c_esc(cr), 1), ID_S("\";"), 1));
     }
     return;
 }
@@ -12135,7 +12233,7 @@ void id_emit_claim(int c) {
     gn = id_claim_count(c);
 IdList* idsq_14;
 char* idsq_12;
-    (idsq_14 = conskind, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, c)), id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    bad |= idtc_claim((int[]){"), grp), ID_S("}, ")), id_str_of_int(gn)), ID_S(", \"")), idsq_12), ID_S("\", \"")), (char*)(intptr_t)(id_list_get(consbound, c))), ID_S("\");"))));
+    (idsq_14 = conskind, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, c)), id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    bad |= idtc_claim((int[]){"), grp), ID_S("}, "), 1), id_str_of_int(gn), 3), ID_S(", \""), 1), idsq_12, 1), ID_S("\", \""), 1), (char*)(intptr_t)(id_list_get(consbound, c)), 1), ID_S("\");"), 1)));
     return;
 }
 
@@ -12155,7 +12253,7 @@ char* id_group_item(char* out, int ci, int c) {
     char* so;
     so = ID_S("");
     if ((id_carries(ci, c) > 0)) {
-        so = id_concat(id_group_sep(out), id_str_of_int(ci));
+        so = id_concat_f(id_group_sep(out), id_str_of_int(ci), 2);
     }
     return so;
 }
@@ -12222,7 +12320,7 @@ void id_size_row(int ci) {
     char* sz;
     if ((id_case_claims(ci) > 0)) {
         sz = id_case_size(ci);
-        id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_n["), id_str_of_int(ci)), ID_S("] = ")), sz), ID_S(";")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_n["), id_str_of_int(ci), 2), ID_S("] = "), 1), sz, 1), ID_S(";"), 1));
     }
     return;
 }
@@ -12255,7 +12353,7 @@ char* id_call_c(char* f1, IdList* args) {
     char* it;
     char* so;
     it = id_items_text(args);
-    so = id_c_esc(id_concat(id_concat(id_concat(f1, ID_S("(")), it), ID_S(")")));
+    so = id_c_esc(id_concat_f(id_concat_f(id_concat(f1, ID_S("(")), it, 1), ID_S(")"), 1));
     return so;
 }
 
@@ -12289,11 +12387,11 @@ void id_emit_setup_line(int ci, char* cw, char* cc) {
 IdList* idsq_183;
     f1 = (idsq_183 = ns1, (char*)(intptr_t)(id_list_get(idsq_183, (int)(id_list_get(casefn, ci)))));
     fx = id_case_fidx(ci);
-    fnref = id_concat(ID_S("idtc_case_"), id_str_of_int(ci));
+    fnref = id_concat_f(ID_S("idtc_case_"), id_str_of_int(ci), 2);
     if ((id_case_is_std(ci) == 1)) {
         fnref = ID_S("idtc_case_std_skip");
     }
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_where["), id_str_of_int(ci)), ID_S("] = \"")), cw), ID_S("\"; idtc_call[")), id_str_of_int(ci)), ID_S("] = \"")), cc), ID_S("\"; idtc_fn[")), id_str_of_int(ci)), ID_S("] = \"")), f1), ID_S("\"; idtc_fidx[")), id_str_of_int(ci)), ID_S("] = ")), id_str_of_int(fx)), ID_S("; idtc_case[")), id_str_of_int(ci)), ID_S("] = ")), fnref), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_where["), id_str_of_int(ci), 2), ID_S("] = \""), 1), cw, 1), ID_S("\"; idtc_call["), 1), id_str_of_int(ci), 3), ID_S("] = \""), 1), cc, 1), ID_S("\"; idtc_fn["), 1), id_str_of_int(ci), 3), ID_S("] = \""), 1), f1, 1), ID_S("\"; idtc_fidx["), 1), id_str_of_int(ci), 3), ID_S("] = "), 1), id_str_of_int(fx), 3), ID_S("; idtc_case["), 1), id_str_of_int(ci), 3), ID_S("] = "), 1), fnref, 1), ID_S(";"), 1));
     se = (-1);
     if ((ci < id_list_len(casestdin))) {
         se = (int)(id_list_get(casestdin, ci));
@@ -12302,19 +12400,19 @@ IdList* idsq_183;
     if ((se != (-1))) {
         sv = id_tc_value(se, ID_S("string"));
     }
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_in["), id_str_of_int(ci)), ID_S("] = ")), sv), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_in["), id_str_of_int(ci), 2), ID_S("] = "), 1), sv, 1), ID_S(";"), 1));
     tnid = id_case_traps_node(ci);
     tv = ID_S("NULL");
     if ((tnid != (-1))) {
         tv = id_tc_value((int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, tnid)), 0)), ID_S("string"));
     }
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_traps["), id_str_of_int(ci)), ID_S("] = ")), tv), ID_S(";")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_traps["), id_str_of_int(ci), 2), ID_S("] = "), 1), tv, 1), ID_S(";"), 1));
     secs_v = 0;
     if ((ci < id_list_len(casetimeout))) {
         secs_v = (int)(id_list_get(casetimeout, ci));
     }
     if ((secs_v > 0)) {
-        id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_secs["), id_str_of_int(ci)), ID_S("] = ")), id_str_of_int(secs_v)), ID_S(";")));
+        id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_secs["), id_str_of_int(ci), 2), ID_S("] = "), 1), id_str_of_int(secs_v), 3), ID_S(";"), 1));
     }
     return;
 }
@@ -12404,12 +12502,12 @@ void id_emit_count(char* ind) {
 }
 
 void id_emit_count_prelude(void) {
-    id_emit_line(ID_S("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target \? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic FILE* idtc_eprint_target = NULL;\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\n#define ID_MEM_CHARGE(n) (id_ctr_mem += (long long)(n))\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef strlen\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_concat idtc_rt_concat"));
+    id_emit_line(ID_S("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target \? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic FILE* idtc_eprint_target = NULL;\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\n#define ID_MEM_CHARGE(n) (id_ctr_mem += (long long)(n))\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef strlen\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_concat idtc_rt_concat\n#define id_concat_f idtc_rt_concat_f"));
     return;
 }
 
 void id_emit_count_postlude(void) {
-    id_emit_line(ID_S("#undef id_len\n#undef id_concat\nstatic int id_len(const char* s) { id_ctr_time += (long long)id_slen(s); return (int)id_slen(s); }\nstatic char* id_concat(const char* a, const char* b) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat(a, b);\n}\n#undef ID_MEM_CHARGE\n#undef strlen"));
+    id_emit_line(ID_S("#undef id_len\n#undef id_concat\n#undef id_concat_f\nstatic int id_len(const char* s) { id_ctr_time += (long long)id_slen(s); return (int)id_slen(s); }\nstatic char* id_concat(const char* a, const char* b) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat(a, b);\n}\nstatic char* id_concat_f(char* a, char* b, int m) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat_f(a, b, m);\n}\n#undef ID_MEM_CHARGE\n#undef strlen"));
     return;
 }
 
@@ -12450,19 +12548,19 @@ void id_emit_rec_call_line(int id, char* nm) {
     char* nmlist;
     params = (IdList*)(intptr_t)(id_list_get(nl1, id));
     nmlist = id_rec_param_names(params);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    idtc_rec_"), nm), ID_S("(")), nmlist), ID_S(");")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    idtc_rec_"), nm), ID_S("("), 1), nmlist, 1), ID_S(");"), 1));
     return;
 }
 
 void id_emit_rec_fn(char* nm, char* sigtext, IdList* params) {
     char* assigns;
-    assigns = id_rec_row_assigns(params, id_concat(id_concat(id_concat(id_concat(ID_S("idtc_rc_"), nm), ID_S("_buf[idtc_rc_")), nm), ID_S("_kept]")));
+    assigns = id_rec_row_assigns(params, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_rc_"), nm), ID_S("_buf[idtc_rc_"), 1), nm, 1), ID_S("_kept]"), 1));
     id_emit_rec_fn_body(nm, sigtext, assigns);
     return;
 }
 
 void id_emit_rec_fn_body(char* nm, char* sigtext, char* assigns) {
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("static void idtc_rec_"), nm), ID_S("(")), sigtext), ID_S(") {\n    if (!idtc_rec_on) return;\n    long long idtc_rs = idtc_rec_seq++;\n    idtc_rc_")), nm), ID_S("_n++;\n    if (idtc_rc_")), nm), ID_S("_kept == IDTC_REC_MAX) return;\n    if (idtc_rc_")), nm), ID_S("_kept == idtc_rc_")), nm), ID_S("_cap) {\n        idtc_rc_")), nm), ID_S("_cap = idtc_rc_")), nm), ID_S("_cap \? idtc_rc_")), nm), ID_S("_cap * 2 : 8;\n        idtc_rc_")), nm), ID_S("_buf = idtc_rec_grow(idtc_rc_")), nm), ID_S("_buf, sizeof(idtc_rc_")), nm), ID_S("_t), idtc_rc_")), nm), ID_S("_cap);\n        idtc_rc_")), nm), ID_S("_seq = idtc_rec_grow(idtc_rc_")), nm), ID_S("_seq, sizeof(long long), idtc_rc_")), nm), ID_S("_cap);\n    }\n    ")), assigns), ID_S("\n    idtc_rc_")), nm), ID_S("_seq[idtc_rc_")), nm), ID_S("_kept] = idtc_rs;\n    idtc_rc_")), nm), ID_S("_kept++;\n}")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("static void idtc_rec_"), nm), ID_S("("), 1), sigtext, 1), ID_S(") {\n    if (!idtc_rec_on) return;\n    long long idtc_rs = idtc_rec_seq++;\n    idtc_rc_"), 1), nm, 1), ID_S("_n++;\n    if (idtc_rc_"), 1), nm, 1), ID_S("_kept == IDTC_REC_MAX) return;\n    if (idtc_rc_"), 1), nm, 1), ID_S("_kept == idtc_rc_"), 1), nm, 1), ID_S("_cap) {\n        idtc_rc_"), 1), nm, 1), ID_S("_cap = idtc_rc_"), 1), nm, 1), ID_S("_cap \? idtc_rc_"), 1), nm, 1), ID_S("_cap * 2 : 8;\n        idtc_rc_"), 1), nm, 1), ID_S("_buf = idtc_rec_grow(idtc_rc_"), 1), nm, 1), ID_S("_buf, sizeof(idtc_rc_"), 1), nm, 1), ID_S("_t), idtc_rc_"), 1), nm, 1), ID_S("_cap);\n        idtc_rc_"), 1), nm, 1), ID_S("_seq = idtc_rec_grow(idtc_rc_"), 1), nm, 1), ID_S("_seq, sizeof(long long), idtc_rc_"), 1), nm, 1), ID_S("_cap);\n    }\n    "), 1), assigns, 1), ID_S("\n    idtc_rc_"), 1), nm, 1), ID_S("_seq[idtc_rc_"), 1), nm, 1), ID_S("_kept] = idtc_rs;\n    idtc_rc_"), 1), nm, 1), ID_S("_kept++;\n}"), 1));
     return;
 }
 
@@ -12489,7 +12587,7 @@ char* id_rec_assign_add(IdList* params, char* pfx, char* out, int i) {
     char* so;
 IdList* idsq_21;
     nm = (idsq_21 = ns2, (char*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(params, i)))));
-    so = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(out, pfx), ID_S(".")), nm), ID_S(" = ")), nm), ID_S("; "));
+    so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(out, pfx), ID_S("."), 1), nm, 1), ID_S(" = "), 1), nm, 1), ID_S("; "), 1);
     return so;
 }
 
@@ -12519,7 +12617,7 @@ IdList* idsq_25;
     pt = (idsq_25 = ns1, (char*)(intptr_t)(id_list_get(idsq_25, (int)(id_list_get(params, i)))));
 IdList* idsq_19;
     nm = (idsq_19 = ns2, (char*)(intptr_t)(id_list_get(idsq_19, (int)(id_list_get(params, i)))));
-    so = id_concat(id_concat(id_concat(id_concat(out, id_c_type(pt)), ID_S(" ")), nm), ID_S("; "));
+    so = id_concat_f(id_concat_f(id_concat_f(id_concat(out, id_c_type(pt)), ID_S(" "), 1), nm, 1), ID_S("; "), 1);
     return so;
 }
 
@@ -12537,7 +12635,7 @@ char* id_rec_name_scan(IdList* params, char* out, int i) {
     while ((i < id_list_len(params))) {
 char* idsq_15;
 IdList* idsq_13;
-        out = (idsq_15 = id_sep_arg(i), idsq_13 = ns2, id_concat(id_concat(out, idsq_15), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(params, i))))));
+        out = (idsq_15 = id_sep_arg(i), idsq_13 = ns2, id_concat_f(id_concat(out, idsq_15), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(params, i)))), 1));
         i = (i + 1);
     }
     return out;
@@ -12556,7 +12654,7 @@ void id_emit_rec_def(char* nm, int fn) {
 }
 
 void id_emit_rec_types(char* nm, char* fields) {
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("typedef struct { "), fields), ID_S("int idtc_rc_pad; } idtc_rc_")), nm), ID_S("_t;\nstatic long long idtc_rc_")), nm), ID_S("_n = 0;\nstatic int idtc_rc_")), nm), ID_S("_kept = 0;\nstatic int idtc_rc_")), nm), ID_S("_cap = 0;\nstatic idtc_rc_")), nm), ID_S("_t* idtc_rc_")), nm), ID_S("_buf = NULL;\nstatic long long* idtc_rc_")), nm), ID_S("_seq = NULL;")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("typedef struct { "), fields), ID_S("int idtc_rc_pad; } idtc_rc_"), 1), nm, 1), ID_S("_t;\nstatic long long idtc_rc_"), 1), nm, 1), ID_S("_n = 0;\nstatic int idtc_rc_"), 1), nm, 1), ID_S("_kept = 0;\nstatic int idtc_rc_"), 1), nm, 1), ID_S("_cap = 0;\nstatic idtc_rc_"), 1), nm, 1), ID_S("_t* idtc_rc_"), 1), nm, 1), ID_S("_buf = NULL;\nstatic long long* idtc_rc_"), 1), nm, 1), ID_S("_seq = NULL;"), 1));
     return;
 }
 
@@ -12653,17 +12751,17 @@ void id_emit_tc_graph(void) {
     id_emit_line(ID_S("static void idtc_graph(void) {\n    static const int cc[] = {"));
     tgi = 0;
     while ((tgi < id_list_len(tgc))) {
-        id_emit_line(id_concat(id_concat(ID_S("    "), id_str_of_int((int)(id_list_get(tgc, tgi)))), ID_S(",")));
+        id_emit_line(id_concat_f(id_concat_f(ID_S("    "), id_str_of_int((int)(id_list_get(tgc, tgi))), 2), ID_S(","), 1));
         tgi = (tgi + 1);
     }
     id_emit_line(ID_S("    -1};\n    static const int ce[] = {"));
     tgi = 0;
     while ((tgi < id_list_len(tge))) {
 int idsq_28;
-        (idsq_28 = (int)(id_list_get(tge, tgi)), id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("    "), id_str_of_int(idsq_28)), ID_S(", ")), id_str_of_int((int)(id_list_get(tge, (tgi + 1))))), ID_S(","))));
+        (idsq_28 = (int)(id_list_get(tge, tgi)), id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    "), id_str_of_int(idsq_28), 2), ID_S(", "), 1), id_str_of_int((int)(id_list_get(tge, (tgi + 1)))), 3), ID_S(","), 1)));
         tgi = (tgi + 2);
     }
-    id_emit_line(id_concat(id_concat(ID_S("    -1};\n    idtc_cc = cc;\n    idtc_ce = ce;\n    idtc_nc = "), id_str_of_int(tgn)), ID_S(";\n}")));
+    id_emit_line(id_concat_f(id_concat_f(ID_S("    -1};\n    idtc_cc = cc;\n    idtc_ce = ce;\n    idtc_nc = "), id_str_of_int(tgn), 2), ID_S(";\n}"), 1));
     return;
 }
 
@@ -12689,7 +12787,7 @@ void id_emit_test_tail(void) {
 void id_emit_tc_run(void) {
     int n;
     n = id_list_len(casefn);
-    id_emit_line(id_concat(ID_S("#define IDTC_N "), id_str_of_int(n)));
+    id_emit_line(id_concat_f(ID_S("#define IDTC_N "), id_str_of_int(n), 2));
     id_emit_tc_support();
     return;
 }
@@ -12708,7 +12806,7 @@ char* id_arr_cells(IdList* elems, char* etyp) {
     while ((i < id_list_len(elems))) {
         emit_expr_v = id_emit_expr((int)(id_list_get(elems, i)));
 char* idsq_14;
-        out = (idsq_14 = id_sep_arg(i), id_concat(id_concat(out, idsq_14), id_box(emit_expr_v, etyp)));
+        out = (idsq_14 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_14), id_box(emit_expr_v, etyp), 1));
         i = (i + 1);
     }
     return out;
@@ -12739,7 +12837,7 @@ char* id_arr_lit(IdList* elems, char* etyp) {
     char* cells;
     char* ret_s;
     cells = id_arr_cells(elems, etyp);
-    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("id_list_lit("), id_str_of_int(id_list_len(elems))), ID_S(", ")), cells), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("id_list_lit("), id_str_of_int(id_list_len(elems)), 2), ID_S(", "), 1), cells, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -12775,7 +12873,7 @@ char* id_emit_gcall(int id) {
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
 IdList* idsq_20;
 char* idsq_18;
-    s = (idsq_20 = ns1, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, id)), id_concat(id_concat(id_concat(id_concat(ID_S("id_"), idsq_18), ID_S("(")), id_emit_gcall_args(id, l1_of_v)), ID_S(")")));
+    s = (idsq_20 = ns1, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_"), idsq_18), ID_S("("), 1), id_emit_gcall_args(id, l1_of_v), 1), ID_S(")"), 1));
     ret_s = id_emit_gcall_tail(id, s);
     return ret_s;
 }
@@ -12790,7 +12888,7 @@ char* idsq_25;
 char* idsq_24;
 int idsq_11;
 char* idsq_10;
-    ret_s = (idsq_25 = id_callee_var_type(id), idsq_24 = id_c_clo_ptr(idsq_25), idsq_11 = id_list_len(l1_of_v), idsq_10 = id_sep_arg(idsq_11), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(("), idsq_24), ID_S(")")), nm), ID_S("->fn)(")), nm), idsq_10), id_emit_args(l1_of_v)), ID_S(")")));
+    ret_s = (idsq_25 = id_callee_var_type(id), idsq_24 = id_c_clo_ptr(idsq_25), idsq_11 = id_list_len(l1_of_v), idsq_10 = id_sep_arg(idsq_11), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(("), idsq_24), ID_S(")"), 1), nm, 1), ID_S("->fn)("), 1), nm, 1), idsq_10, 1), id_emit_args(l1_of_v), 1), ID_S(")"), 1));
     return ret_s;
 }
 
@@ -12810,9 +12908,9 @@ char* id_emit_len(int id) {
     int arg;
     char* s;
     arg = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0));
-    s = id_concat(id_concat(ID_S("id_list_len("), id_emit_expr(arg)), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("id_list_len("), id_emit_expr(arg)), ID_S(")"), 1);
     if ((strcmp(id_type_of(arg), ID_S("string")) == 0)) {
-        s = id_concat(id_concat(ID_S("id_len("), id_emit_expr(arg)), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_len("), id_emit_expr(arg)), ID_S(")"), 1);
     }
     return s;
 }
@@ -12841,7 +12939,7 @@ char* id_push_code(IdList* args, char* elem) {
     emit_expr_v = id_emit_expr((int)(id_list_get(args, 1)));
 int idsq_14;
 char* idsq_13;
-    ret_s = (idsq_14 = (int)(id_list_get(args, 0)), idsq_13 = id_emit_expr(idsq_14), id_concat(id_concat(id_concat(id_concat(ID_S("id_list_push("), idsq_13), ID_S(", ")), id_box(emit_expr_v, elem)), ID_S(")")));
+    ret_s = (idsq_14 = (int)(id_list_get(args, 0)), idsq_13 = id_emit_expr(idsq_14), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_push("), idsq_13), ID_S(", "), 1), id_box(emit_expr_v, elem), 1), ID_S(")"), 1));
     return ret_s;
 }
 
@@ -12870,7 +12968,7 @@ char* id_emit_pop_tail(int arg, char* pop_list_type) {
     char* ret_s;
     elem = id_elem_type(pop_list_type);
     emit_expr_v = id_emit_expr(arg);
-    ret_s = id_unbox(id_concat(id_concat(ID_S("id_list_pop("), emit_expr_v), ID_S(")")), elem);
+    ret_s = id_unbox(id_concat_f(id_concat(ID_S("id_list_pop("), emit_expr_v), ID_S(")"), 1), elem);
     return ret_s;
 }
 
@@ -12881,7 +12979,7 @@ char* id_emit_syscall(int id) {
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
 char* idsq_12;
-    ret_s = (idsq_12 = id_sys_helper(s1_of_v), id_concat(id_concat(id_concat(idsq_12, ID_S("(")), id_cast_args(s1_of_v, l1_of_v)), ID_S(")")));
+    ret_s = (idsq_12 = id_sys_helper(s1_of_v), id_concat_f(id_concat_f(id_concat(idsq_12, ID_S("(")), id_cast_args(s1_of_v, l1_of_v), 1), ID_S(")"), 1));
     return ret_s;
 }
 
@@ -12894,7 +12992,7 @@ char* id_cast_args(char* name, IdList* args) {
 char* idsq_24;
 int idsq_18;
 char* idsq_17;
-        out = (idsq_24 = id_sep_arg(i), idsq_18 = (int)(id_list_get(args, i)), idsq_17 = id_arg_cast(name, idsq_18), id_concat(id_concat(id_concat(id_concat(out, idsq_24), idsq_17), id_emit_expr((int)(id_list_get(args, i)))), ID_S(")")));
+        out = (idsq_24 = id_sep_arg(i), idsq_18 = (int)(id_list_get(args, i)), idsq_17 = id_arg_cast(name, idsq_18), id_concat_f(id_concat_f(id_concat_f(id_concat(out, idsq_24), idsq_17, 1), id_emit_expr((int)(id_list_get(args, i))), 1), ID_S(")"), 1));
         i = (i + 1);
     }
     return out;
@@ -12945,7 +13043,7 @@ char* id_tc_cells(IdList* xs, char* et) {
     while ((i < id_list_len(xs))) {
         cv = id_tc_value((int)(id_list_get(xs, i)), et);
 char* idsq_14;
-        out = (idsq_14 = id_sep_arg(i), id_concat(id_concat(out, idsq_14), id_box(cv, et)));
+        out = (idsq_14 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_14), id_box(cv, et), 1));
         i = (i + 1);
     }
     return out;
@@ -12957,7 +13055,7 @@ char* id_tc_scalar(int e) {
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0)) {
         so = id_tc_neg(e);
     } else if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("str")) == 0)) {
-        so = id_concat(id_concat(ID_S("ID_S("), id_c_lit(so)), ID_S(")"));
+        so = id_concat_f(id_concat(ID_S("ID_S("), id_c_lit(so)), ID_S(")"), 1);
     }
     return so;
 }
@@ -12987,7 +13085,7 @@ char* id_tc_cbsets(char* clo0, int fn, IdList* items) {
     s = clo0;
     j = 1;
     while ((j < id_list_len(items))) {
-        s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("id_clo_set("), s), ID_S(", ")), id_str_of_int((j - 1))), ID_S(", ")), id_tc_cbcell(fn, (j - 1), (int)(id_list_get(items, j)))), ID_S(")"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_clo_set("), s), ID_S(", "), 1), id_str_of_int((j - 1)), 3), ID_S(", "), 1), id_tc_cbcell(fn, (j - 1), (int)(id_list_get(items, j))), 1), ID_S(")"), 1);
         j = (j + 1);
     }
     return s;
@@ -13004,17 +13102,17 @@ char* id_tc_cbcell(int fn, int i, int v) {
 char* id_tc_compare(char* ga, char* gb, char* type) {
     char* so;
     char* key;
-    so = id_concat(id_concat(id_concat(id_concat(ID_S("("), ga), ID_S(" == ")), gb), ID_S(")"));
+    so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), ga), ID_S(" == "), 1), gb, 1), ID_S(")"), 1);
     if ((strcmp(type, ID_S("string")) == 0)) {
-        so = id_concat(id_concat(id_concat(id_concat(ID_S("(strcmp("), ga), ID_S(", ")), gb), ID_S(") == 0)"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(strcmp("), ga), ID_S(", "), 1), gb, 1), ID_S(") == 0)"), 1);
     } else if ((id_ty_is_list(type) == 1)) {
         key = id_tc_key(type);
-        so = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("idtc_eq_"), key), ID_S("(")), ga), ID_S(", ")), gb), ID_S(")"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_eq_"), key), ID_S("("), 1), ga, 1), ID_S(", "), 1), gb, 1), ID_S(")"), 1);
     }
     if ((id_ty_is_struct(type) == 1)) {
-        so = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("idtc_eqs_"), type), ID_S("(")), ga), ID_S(", ")), gb), ID_S(")"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_eqs_"), type), ID_S("("), 1), ga, 1), ID_S(", "), 1), gb, 1), ID_S(")"), 1);
     } else if ((id_ty_is_func(type) == 1)) {
-        so = id_concat(id_concat(id_concat(id_concat(ID_S("id_fn_eq("), ga), ID_S(", ")), gb), ID_S(")"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_fn_eq("), ga), ID_S(", "), 1), gb, 1), ID_S(")"), 1);
     }
     return so;
 }
@@ -13025,22 +13123,22 @@ char* id_tc_show(char* code, char* type) {
     so = id_show_scalar(code, type);
     if ((id_ty_is_list(type) == 1)) {
         key = id_tc_key(type);
-        so = id_concat(id_concat(id_concat(id_concat(ID_S("idtc_show_"), key), ID_S("(")), code), ID_S(");"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_show_"), key), ID_S("("), 1), code, 1), ID_S(");"), 1);
     }
     if ((id_ty_is_func(type) == 1)) {
         so = ID_S("fputs(\"a function value\", stderr);");
     }
     if ((id_ty_is_struct(type) == 1)) {
-        so = id_concat(id_concat(id_concat(id_concat(ID_S("idtc_shows_"), type), ID_S("(")), code), ID_S(");"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_shows_"), type), ID_S("("), 1), code, 1), ID_S(");"), 1);
     }
     return so;
 }
 
 char* id_show_scalar(char* code, char* type) {
     char* so;
-    so = id_concat(id_concat(ID_S("fprintf(stderr, \"%d\", "), code), ID_S(");"));
+    so = id_concat_f(id_concat(ID_S("fprintf(stderr, \"%d\", "), code), ID_S(");"), 1);
     if ((strcmp(type, ID_S("string")) == 0)) {
-        so = id_concat(id_concat(ID_S("fprintf(stderr, \"\\\"%s\\\"\", "), code), ID_S(");"));
+        so = id_concat_f(id_concat(ID_S("fprintf(stderr, \"\\\"%s\\\"\", "), code), ID_S(");"), 1);
     } else if (((strcmp(type, ID_S("float")) == 0) || (strcmp(type, ID_S("word")) == 0))) {
         so = id_show_num(code, type);
     }
@@ -13084,7 +13182,7 @@ char* id_tc_size(int e) {
     so = id_size_leaf(e);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("arr")) == 0)) {
         xs = (IdList*)(intptr_t)(id_list_get(nl1, e));
-        so = id_concat(ID_S(""), id_str_of_int(id_list_len(xs)));
+        so = id_concat_f(ID_S(""), id_str_of_int(id_list_len(xs)), 2);
     } else if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0)) {
         so = id_size_neg(e);
     }
@@ -13097,9 +13195,9 @@ char* id_size_leaf(int e) {
     so = ID_S("0");
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("int")) == 0)) {
         int_code_v = id_int_code(e);
-        so = id_concat(id_concat(ID_S("(long long)("), int_code_v), ID_S(")"));
+        so = id_concat_f(id_concat(ID_S("(long long)("), int_code_v), ID_S(")"), 1);
     } else if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("str")) == 0)) {
-        so = id_concat(id_concat(ID_S("(long long)(sizeof("), id_c_lit((char*)(intptr_t)(id_list_get(ns1, e)))), ID_S(") - 1)"));
+        so = id_concat_f(id_concat(ID_S("(long long)(sizeof("), id_c_lit((char*)(intptr_t)(id_list_get(ns1, e)))), ID_S(") - 1)"), 1);
     }
     return so;
 }
@@ -13114,9 +13212,9 @@ char* id_size_neg(int e) {
 
 char* id_show_num(char* code, char* type) {
     char* so;
-    so = id_concat(id_concat(ID_S("fprintf(stderr, \"%lld\", "), code), ID_S(");"));
+    so = id_concat_f(id_concat(ID_S("fprintf(stderr, \"%lld\", "), code), ID_S(");"), 1);
     if ((strcmp(type, ID_S("float")) == 0)) {
-        so = id_concat(id_concat(ID_S("fprintf(stderr, \"%g\", "), code), ID_S(");"));
+        so = id_concat_f(id_concat(ID_S("fprintf(stderr, \"%g\", "), code), ID_S(");"), 1);
     }
     return so;
 }
@@ -13128,7 +13226,7 @@ char* id_size_list(IdList* args) {
     j = 0;
     while ((j < id_list_len(args))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_arg(j), id_concat(id_concat(out, idsq_15), id_tc_size((int)(id_list_get(args, j)))));
+        out = (idsq_15 = id_sep_arg(j), id_concat_f(id_concat(out, idsq_15), id_tc_size((int)(id_list_get(args, j))), 1));
         j = (j + 1);
     }
     return out;
@@ -13138,7 +13236,7 @@ char* id_sizes_c(IdList* args) {
     char* parts;
     char* so;
     parts = id_size_list(args);
-    so = id_concat(id_concat(id_concat(id_concat(ID_S("idtc_max_of((long long[]){"), parts), ID_S("}, ")), id_str_of_int(id_list_len(args))), ID_S(")"));
+    so = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("idtc_max_of((long long[]){"), parts), ID_S("}, "), 1), id_str_of_int(id_list_len(args)), 3), ID_S(")"), 1);
     return so;
 }
 
@@ -13149,7 +13247,7 @@ char* id_tc_fcells(IdList* xs, char* want) {
     sd_k = 0;
     while ((sd_k < id_list_len(xs))) {
 char* idsq_17;
-        out = (idsq_17 = id_sep_arg(sd_k), id_concat(id_concat(out, idsq_17), id_tc_fcell((int)(id_list_get(xs, sd_k)), want, sd_k)));
+        out = (idsq_17 = id_sep_arg(sd_k), id_concat_f(id_concat(out, idsq_17), id_tc_fcell((int)(id_list_get(xs, sd_k)), want, sd_k), 1));
         sd_k = (sd_k + 1);
     }
     return out;
@@ -13191,7 +13289,7 @@ char* id_tc_struct(int e, char* want) {
     char* so;
     xs = (IdList*)(intptr_t)(id_list_get(nl1, e));
     cells = id_tc_fcells(xs, want);
-    so = id_concat(id_concat(id_concat(id_concat(ID_S("id_list_lit("), id_str_of_int(id_list_len(xs))), ID_S(", ")), cells), ID_S(")"));
+    so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("id_list_lit("), id_str_of_int(id_list_len(xs)), 2), ID_S(", "), 1), cells, 1), ID_S(")"), 1);
     return so;
 }
 
@@ -13203,7 +13301,7 @@ char* id_tc_cbind(int e) {
 IdList* idsq_28;
 int idsq_25;
 char* idsq_24;
-    clo0 = (idsq_28 = ns1, idsq_25 = (int)(id_list_get(items, 0)), idsq_24 = (char*)(intptr_t)(id_list_get(idsq_28, idsq_25)), id_concat(id_concat(ID_S("id_clo_new("), id_fv_ref(idsq_24, (id_list_len(items) - 1))), ID_S(")")));
+    clo0 = (idsq_28 = ns1, idsq_25 = (int)(id_list_get(items, 0)), idsq_24 = (char*)(intptr_t)(id_list_get(idsq_28, idsq_25)), id_concat_f(id_concat(ID_S("id_clo_new("), id_fv_ref(idsq_24, (id_list_len(items) - 1))), ID_S(")"), 1));
 IdList* idsq_10;
     so = (idsq_10 = ns1, id_tc_cbsets(clo0, id_fn_node_of((char*)(intptr_t)(id_list_get(idsq_10, (int)(id_list_get(items, 0))))), items));
     return so;
@@ -13237,7 +13335,7 @@ char* id_tc_list_n(IdList* xs, char* et) {
     so = ID_S("id_list_lit(0)");
     if ((id_list_len(xs) > 0)) {
         cells = id_tc_cells(xs, et);
-        so = id_concat(id_concat(id_concat(id_concat(ID_S("id_list_lit("), id_str_of_int(id_list_len(xs))), ID_S(", ")), cells), ID_S(")"));
+        so = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("id_list_lit("), id_str_of_int(id_list_len(xs)), 2), ID_S(", "), 1), cells, 1), ID_S(")"), 1);
     }
     return so;
 }
@@ -13246,16 +13344,16 @@ char* id_box(char* code, char* type) {
     char* s;
     s = id_box2(code, type);
     if (((strcmp(type, ID_S("int")) == 0) || (strcmp(type, ID_S("word")) == 0))) {
-        s = id_concat(id_concat(ID_S("(long long)("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("(long long)("), code), ID_S(")"), 1);
     }
     return s;
 }
 
 char* id_box2(char* code, char* type) {
     char* s;
-    s = id_concat(id_concat(ID_S("(long long)(intptr_t)("), code), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("(long long)(intptr_t)("), code), ID_S(")"), 1);
     if ((strcmp(type, ID_S("float")) == 0)) {
-        s = id_concat(id_concat(ID_S("id_box_f("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_box_f("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -13268,7 +13366,7 @@ char* id_elem_type(char* t) {
     i = 0;
     while ((i < (id_len(t) - 2))) {
         charat_v = id_charat(t, i);
-        out = id_concat(out, id_chr(charat_v));
+        out = id_concat_f(out, id_chr(charat_v), 2);
         i = (i + 1);
     }
     return out;
@@ -13278,7 +13376,7 @@ char* id_unbox(char* code, char* type) {
     char* s;
     s = id_unbox2(code, type);
     if ((strcmp(type, ID_S("int")) == 0)) {
-        s = id_concat(id_concat(ID_S("(int)("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("(int)("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -13287,7 +13385,7 @@ char* id_unbox2(char* code, char* type) {
     char* s;
     s = id_unbox3(code, type);
     if ((strcmp(type, ID_S("string")) == 0)) {
-        s = id_concat(id_concat(ID_S("(char*)(intptr_t)("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("(char*)(intptr_t)("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -13296,16 +13394,16 @@ char* id_unbox3(char* code, char* type) {
     char* s;
     s = id_unbox4(code, type);
     if ((strcmp(type, ID_S("float")) == 0)) {
-        s = id_concat(id_concat(ID_S("id_unbox_f("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_unbox_f("), code), ID_S(")"), 1);
     }
     return s;
 }
 
 char* id_unbox4(char* code, char* type) {
     char* s;
-    s = id_concat(id_concat(ID_S("(IdList*)(intptr_t)("), code), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("(IdList*)(intptr_t)("), code), ID_S(")"), 1);
     if ((strcmp(type, ID_S("word")) == 0)) {
-        s = id_concat(id_concat(ID_S("(long long)("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("(long long)("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -13323,7 +13421,7 @@ char* idsq_18;
 char* idsq_17;
 int idsq_11;
 char* idsq_10;
-    s = (idsq_18 = id_fn_ret(vt), idsq_17 = id_c_type(idsq_18), idsq_11 = id_list_len(pts), idsq_10 = id_sep_arg(idsq_11), id_concat(id_concat(id_concat(id_concat(idsq_17, ID_S(" (*)(IdFn*")), idsq_10), id_c_type_list(pts)), ID_S(")")));
+    s = (idsq_18 = id_fn_ret(vt), idsq_17 = id_c_type(idsq_18), idsq_11 = id_list_len(pts), idsq_10 = id_sep_arg(idsq_11), id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_17, ID_S(" (*)(IdFn*")), idsq_10, 1), id_c_type_list(pts), 1), ID_S(")"), 1));
     return s;
 }
 
@@ -13335,9 +13433,9 @@ IdList* idsq_47;
 char* idsq_45;
 char* idsq_44;
 char* idsq_38;
-    head = (idsq_47 = ns2, idsq_45 = (char*)(intptr_t)(id_list_get(idsq_47, fn)), idsq_44 = id_c_type(idsq_45), idsq_38 = id_fv_key(name, nd), id_concat(id_concat(id_concat(id_concat(id_concat(idsq_44, ID_S(" idfn_a_")), idsq_38), ID_S("(IdFn* c")), id_fv_params(fn, nd)), ID_S(") { ")));
-    call = id_concat(id_concat(id_concat(id_concat(ID_S("id_"), name), ID_S("(")), id_fv_args(fn, nd)), ID_S(");"));
-    s = id_concat(id_concat(id_concat(head, id_fv_ret((char*)(intptr_t)(id_list_get(ns2, fn)))), call), ID_S(" }"));
+    head = (idsq_47 = ns2, idsq_45 = (char*)(intptr_t)(id_list_get(idsq_47, fn)), idsq_44 = id_c_type(idsq_45), idsq_38 = id_fv_key(name, nd), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_44, ID_S(" idfn_a_")), idsq_38, 1), ID_S("(IdFn* c"), 1), id_fv_params(fn, nd), 1), ID_S(") { "), 1));
+    call = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_"), name), ID_S("("), 1), id_fv_args(fn, nd), 1), ID_S(");"), 1);
+    s = id_concat_f(id_concat_f(id_concat(head, id_fv_ret((char*)(intptr_t)(id_list_get(ns2, fn)))), call, 1), ID_S(" }"), 1);
     return s;
 }
 
@@ -13348,7 +13446,7 @@ char* id_fv_params(int fn, int nd) {
     i = nd;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn))))) {
 IdList* idsq_22;
-        out = (idsq_22 = ns1, id_concat(id_concat(id_concat(id_concat(out, ID_S(", ")), id_c_type((char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), i)))))), ID_S(" a")), id_str_of_int((i - nd))));
+        out = (idsq_22 = ns1, id_concat_f(id_concat_f(id_concat_f(id_concat(out, ID_S(", ")), id_c_type((char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), i))))), 1), ID_S(" a"), 1), id_str_of_int((i - nd)), 3));
         i = (i + 1);
     }
     return out;
@@ -13361,7 +13459,7 @@ char* id_fv_args(int fn, int nd) {
     i = 0;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn))))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_arg(i), id_concat(id_concat(out, idsq_15), id_fv_arg(fn, nd, i)));
+        out = (idsq_15 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_15), id_fv_arg(fn, nd, i), 1));
         i = (i + 1);
     }
     return out;
@@ -13372,7 +13470,7 @@ char* id_fv_arg(int fn, int nd, int i) {
     char* s;
 IdList* idsq_24;
     pt = (idsq_24 = ns1, (char*)(intptr_t)(id_list_get(idsq_24, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), i)))));
-    s = id_concat(ID_S("a"), id_str_of_int((i - nd)));
+    s = id_concat_f(ID_S("a"), id_str_of_int((i - nd)), 2);
     if ((i < nd)) {
         s = id_fv_cell(i, pt);
     }
@@ -13382,10 +13480,10 @@ IdList* idsq_24;
 char* id_fv_cell(int i, char* pt) {
     char* code;
     char* s;
-    code = id_concat(id_concat(ID_S("ID_FNC(c)["), id_str_of_int(i)), ID_S("]"));
+    code = id_concat_f(id_concat_f(ID_S("ID_FNC(c)["), id_str_of_int(i), 2), ID_S("]"), 1);
     s = id_unbox(code, pt);
     if ((id_ty_is_func(pt) == 1)) {
-        s = id_concat(id_concat(ID_S("(IdFn*)(intptr_t)("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("(IdFn*)(intptr_t)("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -13434,7 +13532,7 @@ char* id_fv_object(char* name, int nd) {
     char* s;
     key = id_fv_key(name, nd);
     raw = id_fv_raw(name, nd);
-    s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("IdFn idfn_o_"), key), ID_S(" = { (void*)idfn_a_")), key), ID_S(", ")), raw), ID_S(", ")), id_str_of_int(nd)), ID_S(" };"));
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("IdFn idfn_o_"), key), ID_S(" = { (void*)idfn_a_"), 1), key, 1), ID_S(", "), 1), raw, 1), ID_S(", "), 1), id_str_of_int(nd), 3), ID_S(" };"), 1);
     return s;
 }
 
@@ -13452,7 +13550,7 @@ char* id_bind_copy(char* code, char* pt) {
     char* s;
     s = code;
     if ((id_ty_is_list(pt) == 1)) {
-        s = id_concat(id_concat(ID_S("id_clo_copy("), code), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_clo_copy("), code), ID_S(")"), 1);
     }
     return s;
 }
@@ -13480,7 +13578,7 @@ char* id_emit_raw_args(int id, IdList* args) {
     i = 0;
     while ((i < id_list_len(args))) {
 char* idsq_17;
-        out = (idsq_17 = id_sep_arg(i), id_concat(id_concat(out, idsq_17), id_raw_arg(id, i, (int)(id_list_get(args, i)))));
+        out = (idsq_17 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_17), id_raw_arg(id, i, (int)(id_list_get(args, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -13490,7 +13588,7 @@ char* id_raw_arg(int id, int i, int a) {
     char* s;
     s = id_emit_expr(a);
     if ((id_native_fn_param(id, i) == 1)) {
-        s = id_concat(id_concat(ID_S("id_fn_raw("), s), ID_S(")"));
+        s = id_concat_f(id_concat(ID_S("id_fn_raw("), s), ID_S(")"), 1);
     }
     return s;
 }
@@ -13534,7 +13632,7 @@ char* id_bind_new(IdList* args) {
 IdList* idsq_22;
     nm = (idsq_22 = ns1, (char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get(args, 0)))));
     nd = (id_list_len(args) - 1);
-    s = id_concat(id_concat(ID_S("id_clo_new("), id_fv_ref(nm, nd)), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("id_clo_new("), id_fv_ref(nm, nd)), ID_S(")"), 1);
     return s;
 }
 
@@ -13544,7 +13642,7 @@ char* id_bind_sets(char* clo0, int fn, IdList* args) {
     s = clo0;
     i = 1;
     while ((i < id_list_len(args))) {
-        s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("id_clo_set("), s), ID_S(", ")), id_str_of_int((i - 1))), ID_S(", ")), id_bind_cell(fn, (i - 1), id_emit_expr((int)(id_list_get(args, i))))), ID_S(")"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_clo_set("), s), ID_S(", "), 1), id_str_of_int((i - 1)), 3), ID_S(", "), 1), id_bind_cell(fn, (i - 1), id_emit_expr((int)(id_list_get(args, i)))), 1), ID_S(")"), 1);
         i = (i + 1);
     }
     return s;
@@ -13553,7 +13651,7 @@ char* id_bind_sets(char* clo0, int fn, IdList* args) {
 char* id_fv_ref(char* name, int nd) {
     char* s;
     id_fv_note(name, nd);
-    s = id_concat(id_concat(ID_S("ID_FNV("), id_fv_key(name, nd)), ID_S(")"));
+    s = id_concat_f(id_concat(ID_S("ID_FNV("), id_fv_key(name, nd)), ID_S(")"), 1);
     return s;
 }
 
@@ -13601,7 +13699,7 @@ void id_fv_note(char* name, int nd) {
 
 char* id_fv_key(char* name, int nd) {
     char* key;
-    key = id_concat(id_concat(name, ID_S("__")), id_str_of_int(nd));
+    key = id_concat_f(id_concat(name, ID_S("__")), id_str_of_int(nd), 3);
     return key;
 }
 
@@ -13626,7 +13724,7 @@ int idsq_50;
 char* idsq_49;
     sym = (idsq_53 = ns1, idsq_50 = (int)(id_list_get(args, 0)), idsq_49 = (char*)(intptr_t)(id_list_get(idsq_53, idsq_50)), id_fv_sym(idsq_49, (id_list_len(args) - 1)));
     fa = id_ir_leaf(ID_S("global"), ID_S("string"), (0 - 1), (0 - 1), sym);
-    nc = id_ir_leaf(ID_S("const"), ID_S("int"), (0 - 1), (0 - 1), id_concat(ID_S(""), id_str_of_int((id_list_len(args) - 1))));
+    nc = id_ir_leaf(ID_S("const"), ID_S("int"), (0 - 1), (0 - 1), id_concat_f(ID_S(""), id_str_of_int((id_list_len(args) - 1)), 2));
     ret_i = id_lw_callf(ID_S("id_clo_make"), ID_S("string"), id_list_lit(2, (long long)(fa), (long long)(nc)));
     return ret_i;
 }
@@ -13636,7 +13734,7 @@ int id_lw_clo_sets(int o, int fn, IdList* args) {
     int idx;
     i = 1;
     while ((i < id_list_len(args))) {
-        idx = id_ir_leaf(ID_S("const"), ID_S("int"), (0 - 1), (0 - 1), id_concat(ID_S(""), id_str_of_int((i - 1))));
+        idx = id_ir_leaf(ID_S("const"), ID_S("int"), (0 - 1), (0 - 1), id_concat_f(ID_S(""), id_str_of_int((i - 1)), 2));
         id_lw_clo_set(o, fn, idx, (i - 1), (int)(id_list_get(args, i)));
         i = (i + 1);
     }
@@ -13707,7 +13805,7 @@ char* id_fv_ll_adapter(int fn, char* name, int nd) {
     char* s;
     head = id_fv_ll_head(fn, name, nd);
     cells = id_fv_ll_cells(fn, nd);
-    s = id_concat(id_concat(id_concat(id_concat(head, ID_S("\n")), cells), id_fv_ll_call(fn, name, nd)), ID_S("\n}"));
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat(head, ID_S("\n")), cells, 1), id_fv_ll_call(fn, name, nd), 1), ID_S("\n}"), 1);
     return s;
 }
 
@@ -13717,7 +13815,7 @@ char* id_fv_ll_head(int fn, char* name, int nd) {
     rt = (char*)(intptr_t)(id_list_get(ns2, fn));
 char* idsq_20;
 char* idsq_13;
-    s = (idsq_20 = id_ll_ty(rt), idsq_13 = id_fv_key(name, nd), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("define "), idsq_20), ID_S(" @idfn_a_")), idsq_13), ID_S("(ptr %c")), id_fv_ll_params(fn, nd)), ID_S(") {")));
+    s = (idsq_20 = id_ll_ty(rt), idsq_13 = id_fv_key(name, nd), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("define "), idsq_20), ID_S(" @idfn_a_"), 1), idsq_13, 1), ID_S("(ptr %c"), 1), id_fv_ll_params(fn, nd), 1), ID_S(") {"), 1));
     return s;
 }
 
@@ -13728,7 +13826,7 @@ char* id_fv_ll_params(int fn, int nd) {
     i = nd;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn))))) {
 IdList* idsq_22;
-        out = (idsq_22 = ns1, id_concat(id_concat(id_concat(id_concat(out, ID_S(", ")), id_ll_ty((char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), i)))))), ID_S(" %a")), id_str_of_int((i - nd))));
+        out = (idsq_22 = ns1, id_concat_f(id_concat_f(id_concat_f(id_concat(out, ID_S(", ")), id_ll_ty((char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), i))))), 1), ID_S(" %a"), 1), id_str_of_int((i - nd)), 3));
         i = (i + 1);
     }
     return out;
@@ -13740,7 +13838,7 @@ char* id_fv_ll_call(int fn, char* name, int nd) {
     char* s;
     rt = (char*)(intptr_t)(id_list_get(ns2, fn));
 char* idsq_22;
-    call = (idsq_22 = id_ll_ty(rt), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("call "), idsq_22), ID_S(" @id_")), name), ID_S("(")), id_fv_ll_args(fn, nd)), ID_S(")")));
+    call = (idsq_22 = id_ll_ty(rt), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("call "), idsq_22), ID_S(" @id_"), 1), name, 1), ID_S("("), 1), id_fv_ll_args(fn, nd), 1), ID_S(")"), 1));
     s = id_fv_ll_ret(rt, call);
     return s;
 }
@@ -13752,7 +13850,7 @@ char* id_fv_ll_args(int fn, int nd) {
     i = 0;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn))))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_arg(i), id_concat(id_concat(out, idsq_15), id_fv_ll_arg(fn, nd, i)));
+        out = (idsq_15 = id_sep_arg(i), id_concat_f(id_concat(out, idsq_15), id_fv_ll_arg(fn, nd, i), 1));
         i = (i + 1);
     }
     return out;
@@ -13760,9 +13858,9 @@ char* idsq_15;
 
 char* id_fv_ll_ret(char* rt, char* call) {
     char* s;
-    s = id_concat(id_concat(id_concat(id_concat(ID_S("  %r = "), call), ID_S("\n  ret ")), id_ll_ty(rt)), ID_S(" %r"));
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("  %r = "), call), ID_S("\n  ret "), 1), id_ll_ty(rt), 1), ID_S(" %r"), 1);
     if ((strcmp(rt, ID_S("void")) == 0)) {
-        s = id_concat(id_concat(ID_S("  "), call), ID_S("\n  ret void"));
+        s = id_concat_f(id_concat(ID_S("  "), call), ID_S("\n  ret void"), 1);
     }
     return s;
 }
@@ -13772,10 +13870,10 @@ char* id_fv_ll_arg(int fn, int nd, int i) {
     char* s;
 IdList* idsq_34;
     pt = (idsq_34 = ns1, (char*)(intptr_t)(id_list_get(idsq_34, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, fn)), i)))));
-    s = id_concat(id_concat(id_ll_ty(pt), ID_S(" %a")), id_str_of_int((i - nd)));
+    s = id_concat_f(id_concat(id_ll_ty(pt), ID_S(" %a")), id_str_of_int((i - nd)), 3);
     if ((i < nd)) {
 char* idsq_11;
-        s = (idsq_11 = id_ll_ty(pt), id_concat(id_concat(idsq_11, ID_S(" ")), id_fv_ll_val(i, pt)));
+        s = (idsq_11 = id_ll_ty(pt), id_concat_f(id_concat(idsq_11, ID_S(" ")), id_fv_ll_val(i, pt), 1));
     }
     return s;
 }
@@ -13795,7 +13893,7 @@ IdList* idsq_16;
 
 char* id_fv_ll_cell(int i, char* pt) {
     char* s;
-    s = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("  %w"), id_str_of_int(i)), ID_S(" = call i64 @id_clo_cell(ptr %c, i32 ")), id_str_of_int(i)), ID_S(")\n")), id_fv_ll_conv(i, pt));
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("  %w"), id_str_of_int(i), 2), ID_S(" = call i64 @id_clo_cell(ptr %c, i32 "), 1), id_str_of_int(i), 3), ID_S(")\n"), 1), id_fv_ll_conv(i, pt), 1);
     return s;
 }
 
@@ -13803,16 +13901,16 @@ char* id_fv_ll_conv(int i, char* pt) {
     char* s;
     s = id_fv_ll_conv2(i, pt);
     if ((strcmp(pt, ID_S("int")) == 0)) {
-        s = id_concat(id_concat(id_concat(id_concat(ID_S("  %u"), id_str_of_int(i)), ID_S(" = trunc i64 %w")), id_str_of_int(i)), ID_S(" to i32\n"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("  %u"), id_str_of_int(i), 2), ID_S(" = trunc i64 %w"), 1), id_str_of_int(i), 3), ID_S(" to i32\n"), 1);
     } else if ((strcmp(pt, ID_S("float")) == 0)) {
-        s = id_concat(id_concat(id_concat(id_concat(ID_S("  %u"), id_str_of_int(i)), ID_S(" = call double @id_unbox_f(i64 %w")), id_str_of_int(i)), ID_S(")\n"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("  %u"), id_str_of_int(i), 2), ID_S(" = call double @id_unbox_f(i64 %w"), 1), id_str_of_int(i), 3), ID_S(")\n"), 1);
     }
     return s;
 }
 
 char* id_fv_ll_conv2(int i, char* pt) {
     char* s;
-    s = id_concat(id_concat(id_concat(id_concat(ID_S("  %u"), id_str_of_int(i)), ID_S(" = inttoptr i64 %w")), id_str_of_int(i)), ID_S(" to ptr\n"));
+    s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("  %u"), id_str_of_int(i), 2), ID_S(" = inttoptr i64 %w"), 1), id_str_of_int(i), 3), ID_S(" to ptr\n"), 1);
     if ((strcmp(pt, ID_S("word")) == 0)) {
         s = ID_S("");
     }
@@ -13821,9 +13919,9 @@ char* id_fv_ll_conv2(int i, char* pt) {
 
 char* id_fv_ll_val(int i, char* pt) {
     char* s;
-    s = id_concat(ID_S("%u"), id_str_of_int(i));
+    s = id_concat_f(ID_S("%u"), id_str_of_int(i), 2);
     if ((strcmp(pt, ID_S("word")) == 0)) {
-        s = id_concat(ID_S("%w"), id_str_of_int(i));
+        s = id_concat_f(ID_S("%w"), id_str_of_int(i), 2);
     }
     return s;
 }
@@ -13851,12 +13949,12 @@ void id_fv_ll_def(char* name, int nd) {
 }
 
 void id_emit_crt(void) {
-    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nID_TLS IdAllocHdr* id_arena_head = NULL;\nID_TLS int id_arena_hooked = 0;\nID_TLS long id_nfree = 0;\nID_TLS void* id_pool_fl[ID_NCLASS];\nID_TLS char* id_pool_bump = NULL;\nID_TLS size_t id_pool_left = 0;\nID_TLS IdChunk* id_pool_chunks = NULL;\nuintptr_t id_pool_lo = UINTPTR_MAX;\nuintptr_t id_pool_hi = 0;\nvoid id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nvoid id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nvoid id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. The layout is the one prelude.id documents; an LLVM\n   module writes the count itself, in front of each literal's bytes, and\n   builds argv strings with id_str_of_cstr. */\nsize_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nsize_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nsize_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nvoid id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nint id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nvoid* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nvoid* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nvoid* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nvoid* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nvoid id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nvoid* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\nchar* id_str_new(size_t n) {\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nchar* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\nvoid id_str_free(char* s) { id_pool_free(s - sizeof(size_t), id_slen(s) + sizeof(size_t) + 1); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nIdList* id_list_make(int len, int cap) {\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nIdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\nID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\nvoid id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nvoid id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nvoid id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nvoid id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nint id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nlong long id_bits_of_float(double d) { return id_box_f(d); }\ndouble id_float_of_bits(long long x) { return id_unbox_f(x); }\nlong long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\ndouble id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nchar* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nID_TLS unsigned char* id_store = NULL;\nID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nID_TLS long long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nlong long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nlong long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nlong long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nlong long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16u(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32u(long long a) { return id_peek_n(a, 4); }\nvoid id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nint id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
+    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nID_TLS IdAllocHdr* id_arena_head = NULL;\nID_TLS int id_arena_hooked = 0;\nID_TLS long id_nfree = 0;\nID_TLS long id_nfree_s = 0;\nID_TLS void* id_pool_fl[ID_NCLASS];\nID_TLS char* id_pool_bump = NULL;\nID_TLS size_t id_pool_left = 0;\nID_TLS IdChunk* id_pool_chunks = NULL;\nuintptr_t id_pool_lo = UINTPTR_MAX;\nuintptr_t id_pool_hi = 0;\nvoid id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nvoid id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) {\n        fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n        if (id_nfree_s) fprintf(stderr, \"id: freed %ld strings\\n\", id_nfree_s);\n    }\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nvoid id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nvoid id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nvoid id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nsize_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nsize_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. The layout is the one prelude.id documents; an LLVM\n   module writes the count itself, in front of each literal's bytes, and\n   builds argv strings with id_str_of_cstr. */\nsize_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nsize_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nsize_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nvoid id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nint id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nvoid* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nvoid* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nvoid id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nvoid* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nvoid* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nvoid id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nvoid* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\nchar* id_str_new(size_t n) {\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nchar* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nIdList* id_list_make(int len, int cap) {\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nIdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\nID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\n_Noreturn void id_freed_str_trap(void) {\n    fprintf(stderr, \"id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\\n\");\n    exit(1);\n}\nvoid id_str_free(char* s) {\n    size_t n = id_slen(s);\n    id_nfree_s++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (n == SIZE_MAX) id_freed_str_trap();\n        memset(s, 0xDD, n + 1);\n        ((size_t*)(void*)s)[-1] = SIZE_MAX;\n        return;\n    }\n    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);\n}\nvoid id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nvoid id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nvoid id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nvoid id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nvoid id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nvoid id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nlong long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nvoid id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nint id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nlong long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nIdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nIdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nlong long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\ndouble id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nlong long id_bits_of_float(double d) { return id_box_f(d); }\ndouble id_float_of_bits(long long x) { return id_unbox_f(x); }\nlong long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\ndouble id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nint id_to_int(const char* s) { return atoi(s); }\n\nchar* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nchar* id_concat_f(char* a, char* b, int m) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    size_t n = id_add_check(la, lb, \"concat\");\n    char* r;\n    if (m & 1) {\n        size_t hb = id_add_check(n, sizeof(size_t) + 1, \"concat\");\n        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);\n        ((size_t*)(void*)r)[-1] = n;\n    } else {\n        r = id_str_new(n);\n        memcpy(r, a, la);\n    }\n    memcpy(r + la, b, lb);\n    r[n] = '\\0';\n    if (m & 2) id_str_free(b);\n    return r;\n}\nchar* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nchar* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nvoid id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nlong long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nlong long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nint id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nint id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nlong long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nlong long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nlong long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nlong long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nlong long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nlong long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nID_TLS unsigned char* id_store = NULL;\nID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nID_TLS long long id_store_cap = 0;\n\nvoid id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nlong long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nlong long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nunsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nlong long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nvoid id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nlong long id_peek8(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32(long long a) { return id_peek_n(a, 4); }\nlong long id_peek64(long long a) { return id_peek_n(a, 8); }\nvoid id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nvoid id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nvoid id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nvoid id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nlong long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nlong long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nlong long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nlong long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nlong long id_peek16u(long long a) { return id_peek_n(a, 2); }\nlong long id_peek32u(long long a) { return id_peek_n(a, 4); }\nvoid id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nchar* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nlong long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nchar* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nvoid id_print(const char* s) { puts(s); }\nchar* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nchar* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nint id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nint id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nchar* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nvoid id_put(const char* s) { fputs(s, stdout); }\nvoid id_flush(void) { fflush(stdout); }\nstruct termios id_saved_termios;\nint id_raw_active = 0;\nvoid id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nvoid id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nint id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\nvoid id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nint id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
     return;
 }
 
 void id_emit_runtime(void) {
-    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#ifndef __wasi__\n#include <termios.h>\n#endif\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nstatic ID_TLS IdAllocHdr* id_arena_head = NULL;\nstatic ID_TLS int id_arena_hooked = 0;\nstatic ID_TLS long id_nfree = 0;\nstatic ID_TLS void* id_pool_fl[ID_NCLASS];\nstatic ID_TLS char* id_pool_bump = NULL;\nstatic ID_TLS size_t id_pool_left = 0;\nstatic ID_TLS IdChunk* id_pool_chunks = NULL;\nstatic uintptr_t id_pool_lo = UINTPTR_MAX;\nstatic uintptr_t id_pool_hi = 0;\nstatic void id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nstatic void id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nstatic void id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. A string an id program holds is made one of three ways,\n   and each writes that count: id_str_new/id_str_from below (every runtime\n   allocator), ID_S (a literal in emitted code, counted to its first NUL, which\n   is where a strlen stopped), and id_str_of_cstr (a C string from the host,\n   such as argv). A native that only reads a `const char*` is unaffected,\n   because the bytes and their NUL are where they always were; one that\n   returns a string must build it with id_str_from. A NUL never enters a string\n   through any of these but a literal's `\\0`, which ends the literal there. */\nstatic size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nstatic size_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nstatic size_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nstatic void id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nstatic int id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nstatic void* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nstatic void* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nstatic void* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nstatic void* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nstatic void id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nstatic void* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\n/* The one place a heap string is born: n bytes, the count in front, the NUL after. */\nstatic char* id_str_new(size_t n) {\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\nstatic void id_str_free(char* s) { id_pool_free(s - sizeof(size_t), id_slen(s) + sizeof(size_t) + 1); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nstatic IdList* id_list_make(int len, int cap) {\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nstatic IdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\n/* A list the compiler proved unreachable (docs/MEMORY.md) is released by\n   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test\n   harness, nothing goes back to malloc: the cells are filled with 0xDD and the\n   header is marked freed (len -1, cap INT_MIN), so a later use traps here\n   instead of reading whatever reused the block. */\nstatic ID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\nstatic void id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nstatic void id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nstatic void id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nstatic void id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic long long id_bits_of_float(double d) { return id_box_f(d); }\nstatic double id_float_of_bits(long long x) { return id_unbox_f(x); }\nstatic long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\nstatic double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nstatic char* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic ID_TLS unsigned char* id_store = NULL;\nstatic ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nstatic ID_TLS long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nstatic long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nstatic long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nstatic long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nstatic long long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16u(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32u(long long a) { return id_peek_n(a, 4); }\nstatic void id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nstatic int id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\n#ifndef __wasi__\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\n#else\nstatic void id_term_restore(void) {}\nstatic void id_term_raw(void) {}\nstatic int id_getkey(void) { return -1; }\n#endif\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
+    id_print(ID_S("/* generated by idc -- the `id` language compiler */\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#ifndef __wasi__\n#include <termios.h>\n#endif\n#include <unistd.h>\n#include <time.h>\n\n/* ---- allocation pool -------------------------------------------------------\n   Every heap block the runtime allocates (lists, and the strings built by\n   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from\n   id_pool_blk below, and carries no header: the caller says how big the block is\n   when it gives it back (id_pool_free), so the runtime stores no size and links no\n   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size\n   class and taken from that class's free list, or carved from the current\n   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its\n   class's free list and is reused by the next allocation of that class.\n   Chunks are what is released: at process exit (the hook is registered with\n   atexit on the first chunk), and at id_thread_leave for a worker thread, whose\n   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is\n   one malloc with a two-pointer header, linked into one list that is swept at\n   exit; the header is what lets a realloc of it keep its place.\n   id_pool_has says whether an address lies in the span the chunks occupy, so a\n   later step can tell a heap block from a literal in the image by address. A\n   block that is not pool memory (a large block, a string from a native) is\n   not claimed by it.\n   Allocation failure and size overflow abort with a clear message instead of\n   continuing with a NULL pointer or a wrapped-around size. */\ntypedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;\n#ifndef ID_TLS\n#ifdef __wasm__\n#define ID_TLS\n#else\n#define ID_TLS __thread\n#endif\n#endif\n#if !defined(exit) && !defined(__wasm__)\n#define ID_TRAPS 1\n#endif\n#ifdef ID_TRAPS\n#include <setjmp.h>\nstatic ID_TLS jmp_buf* id_trap_jb = NULL;\nstatic ID_TLS char id_trap_msg[512];\nstatic int id_fprintf(FILE* f, const char* fmt, ...) {\n    va_list ap;\n    va_start(ap, fmt);\n    int r = (f == stderr && id_trap_jb) \? vsnprintf(id_trap_msg, sizeof id_trap_msg, fmt, ap) : vfprintf(f, fmt, ap);\n    va_end(ap);\n    return r;\n}\nstatic _Noreturn void id_exit(int code) {\n    if (id_trap_jb) longjmp(*id_trap_jb, 1);\n    (exit)(code);\n}\n#define exit(code) id_exit(code)\n#define fprintf id_fprintf\njmp_buf* id_trap_arm(jmp_buf* jb) { jmp_buf* old = id_trap_jb; id_trap_jb = jb; id_trap_msg[0] = 0; return old; }\nvoid id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }\nconst char* id_trap_text(void) { return id_trap_msg; }\n_Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, \"%s\", msg); exit(1); }\n#endif\n#ifndef ID_MEM_CHARGE\n#define ID_MEM_CHARGE(n) ((void)0)\n#endif\n#ifdef __SANITIZE_ADDRESS__\nvoid __asan_poison_memory_region(void const volatile* a, size_t s);\nvoid __asan_unpoison_memory_region(void const volatile* a, size_t s);\n#define ID_POISON(p, n) __asan_poison_memory_region(p, n)\n#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)\n#else\n#define ID_POISON(p, n) ((void)0)\n#define ID_UNPOISON(p, n) ((void)0)\n#endif\n#define ID_POOL_MAX 16384\n#define ID_POOL_SMALL 512\n#define ID_NCLASS 53\n#define ID_CHUNK 262144\n#define ID_CHUNK_HDR 16\n#define ID_LINK(p) (*(void**)((char*)(p) + 8))\ntypedef struct IdChunk { struct IdChunk* next; } IdChunk;\nstatic ID_TLS IdAllocHdr* id_arena_head = NULL;\nstatic ID_TLS int id_arena_hooked = 0;\nstatic ID_TLS long id_nfree = 0;\nstatic ID_TLS long id_nfree_s = 0;\nstatic ID_TLS void* id_pool_fl[ID_NCLASS];\nstatic ID_TLS char* id_pool_bump = NULL;\nstatic ID_TLS size_t id_pool_left = 0;\nstatic ID_TLS IdChunk* id_pool_chunks = NULL;\nstatic uintptr_t id_pool_lo = UINTPTR_MAX;\nstatic uintptr_t id_pool_hi = 0;\nstatic void id_pool_drop(void) {\n    IdChunk* c = id_pool_chunks;\n    while (c) { IdChunk* nx = c->next; free(c); c = nx; }\n    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;\n    memset(id_pool_fl, 0, sizeof id_pool_fl);\n}\nstatic void id_arena_free_all(void) {\n    if (getenv(\"ID_FREE_STATS\")) {\n        fprintf(stderr, \"id: freed %ld lists\\n\", id_nfree);\n        if (id_nfree_s) fprintf(stderr, \"id: freed %ld strings\\n\", id_nfree_s);\n    }\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL;\n    id_pool_drop();\n}\nstatic void id_arena_hook(void) {\n    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }\n}\nstatic void id_arena_link(IdAllocHdr* h) {\n    h->prev = NULL;\n    h->next = id_arena_head;\n    if (id_arena_head) id_arena_head->prev = h;\n    id_arena_head = h;\n    id_arena_hook();\n}\nstatic void id_arena_unlink(IdAllocHdr* h) {\n    if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;\n    if (h->next) h->next->prev = h->prev;\n}\nstatic size_t id_add_check(size_t a, size_t b, const char* what) {\n    if (a > SIZE_MAX - b) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a + b;\n}\nstatic size_t id_mul_check(size_t a, size_t b, const char* what) {\n    if (a != 0 && b > SIZE_MAX / a) {\n        fprintf(stderr, \"id: allocation size overflow (%s)\\n\", what);\n        exit(1);\n    }\n    return a * b;\n}\n/* String lengths. A `string` is a char* to NUL-terminated bytes, with the byte\n   count stored in the size_t just before them, so id_slen is one load: no\n   strlen and no memo. A string an id program holds is made one of three ways,\n   and each writes that count: id_str_new/id_str_from below (every runtime\n   allocator), ID_S (a literal in emitted code, counted to its first NUL, which\n   is where a strlen stopped), and id_str_of_cstr (a C string from the host,\n   such as argv). A native that only reads a `const char*` is unaffected,\n   because the bytes and their NUL are where they always were; one that\n   returns a string must build it with id_str_from. A NUL never enters a string\n   through any of these but a literal's `\\0`, which ends the literal there. */\nstatic size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }\n#define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })\n#define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_pool_oom(size_t n) {\n    fprintf(stderr, \"id: out of memory (%zu bytes)\\n\", n);\n    exit(1);\n}\nstatic size_t id_pool_class(size_t n) {\n    if (n <= ID_POOL_SMALL) return n \? (n + 15) >> 4 : 1;\n    size_t m = n - 1;\n    int e = 63 - __builtin_clzll(m);\n    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);\n}\nstatic size_t id_pool_class_bytes(size_t k) {\n    if (k <= 32) return k << 4;\n    size_t j = k - 33;\n    int e = 9 + (int)(j >> 2);\n    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));\n}\nstatic void id_pool_span(uintptr_t lo, uintptr_t hi) {\n#ifdef __wasm__\n    if (lo < id_pool_lo) id_pool_lo = lo;\n    if (hi > id_pool_hi) id_pool_hi = hi;\n#else\n    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);\n    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);\n    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}\n#endif\n}\nstatic int id_pool_has(const void* p) {\n    uintptr_t a = (uintptr_t)p;\n    return a >= id_pool_lo && a < id_pool_hi;\n}\nstatic void* id_pool_carve(size_t bytes) {\n    if (id_pool_left < bytes) {\n        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);\n        if (!c) id_pool_oom(bytes);\n        c->next = id_pool_chunks;\n        id_pool_chunks = c;\n        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);\n        id_pool_bump = (char*)c + ID_CHUNK_HDR;\n        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;\n        id_arena_hook();\n    }\n    void* p = id_pool_bump;\n    id_pool_bump += bytes;\n    id_pool_left -= bytes;\n    return p;\n}\nstatic void* id_pool_large_alloc(size_t n) {\n    IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), \"alloc\"));\n    if (!h) id_pool_oom(n);\n    id_arena_link(h);\n    return (void*)(h + 1);\n}\nstatic void id_pool_large_free(void* p) {\n    IdAllocHdr* h = (IdAllocHdr*)p - 1;\n    id_arena_unlink(h);\n    free(h);\n}\nstatic void* id_pool_get(size_t n) {\n    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);\n    size_t k = id_pool_class(n);\n    void* p = id_pool_fl[k];\n    if (!p) return id_pool_carve(id_pool_class_bytes(k));\n    id_pool_fl[k] = ID_LINK(p);\n    ID_UNPOISON(p, id_pool_class_bytes(k));\n    return p;\n}\nstatic void* id_pool_blk(size_t n) {\n    ID_MEM_CHARGE(n);\n    return id_pool_get(n);\n}\nvoid* id_alloc(size_t n) { return id_pool_blk(n); }\nstatic void id_pool_free(void* p, size_t n) {\n    if (!p) return;\n    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }\n    size_t k = id_pool_class(n);\n    ID_LINK(p) = id_pool_fl[k];\n    id_pool_fl[k] = p;\n    ID_POISON(p, 8);\n    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);\n}\nstatic void* id_realloc(void* p, size_t old, size_t n) {\n    ID_MEM_CHARGE(n);\n    if (!p) return id_pool_get(n);\n    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {\n        IdAllocHdr* h = (IdAllocHdr*)p - 1;\n        id_arena_unlink(h);\n        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), \"realloc\"));\n        if (!nh) id_pool_oom(n);\n        id_arena_link(nh);\n        return (void*)(nh + 1);\n    }\n    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;\n    void* q = id_pool_get(n);\n    memcpy(q, p, old < n \? old : n);\n    id_pool_free(p, old);\n    return q;\n}\n/* The one place a heap string is born: n bytes, the count in front, the NUL after. */\nstatic char* id_str_new(size_t n) {\n    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), \"string\"), 1, \"string\"));\n    *(size_t*)(void*)r = n;\n    r += sizeof(size_t);\n    r[n] = '\\0';\n    return r;\n}\nstatic char* id_str_from(const char* p, size_t n) {\n    char* r = id_str_new(n);\n    memcpy(r, p, n);\n    return r;\n}\nchar* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }\n\n/* Growable, heap-allocated, reference-semantic list. Every element is stored\n   in a uniform 8-byte cell; the compiler boxes/unboxes per the static element\n   type. Because a list is a pointer, passing one to a function and mutating it\n   is visible to the caller -- this is how id gets shared mutable state.\n   Every index access is bounds-checked: an out-of-range get/set/pop is a\n   clear, fatal runtime error (never silent corruption or UB), matching id's\n   contract that a bug aborts loudly instead of reading/writing garbage. */\ntypedef struct { int len, cap; long long* data; } IdList;\n/* A list is one block: the header, then its first cells, which `data` points\n   at until the list outgrows them. A list is a reference, so the header never\n   moves; growth takes a separate block for the cells, and the first inline\n   cell then holds the capacity the header block was made with, which is what\n   gives the block back at the right size. */\ntypedef struct { IdList h; long long c[1]; } IdListBlk;\n#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)\n#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))\nstatic IdList* id_list_make(int len, int cap) {\n    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));\n    B->h.len = len; B->h.cap = cap; B->h.data = B->c;\n    return &B->h;\n}\nstatic IdList* id_list_new(void) { return id_list_make(0, 4); }\nIdList* id_list_sized(int n) { return id_list_make(n, n < 4 \? 4 : n); }\n/* An export is a C global, assigned when its declaring function runs, so a\n   read before that finds NULL -- the one memory error in this runtime that\n   was silent, since dereferencing NULL is a segfault with no message.\n   The compile-time dead-export check (mid/names/exports/reach/dead/) already\n   rejects the easy shape: an export whose declaring function nothing calls.\n   What it cannot see is a declarer that IS called, with its export statement\n   inside a branch that is false at run time -- it reasons per function, so\n   the owner counts as reached. That residue lands here.\n   _Noreturn is what makes this free: without it gcc must preserve live\n   registers across the call, and spills in these hot accessors cost several\n   percent on the compiler's own build.\n   Every target shares this runtime -- wasm is this same C recompiled, and the\n   LLVM backend declares these symbols rather than defining them (--target\n   llvm is not self-hosted yet). */\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_null_read(void) {\n    fprintf(stderr, \"id: read of an uninitialised export (its declaring function has not run)\\n\");\n    exit(1);\n}\n/* A list the compiler proved unreachable (docs/MEMORY.md) is released by\n   id_list_free. With ID_FREE_GUARD=1 in the environment, and always in a test\n   harness, nothing goes back to malloc: the cells are filled with 0xDD and the\n   header is marked freed (len -1, cap INT_MIN), so a later use traps here\n   instead of reading whatever reused the block. */\nstatic ID_TLS int id_fguard = -1;\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_trap(void) {\n    fprintf(stderr, \"id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\\n\");\n    exit(1);\n}\n#ifdef __GNUC__\n__attribute__((noinline, cold))\n#endif\nstatic _Noreturn void id_freed_str_trap(void) {\n    fprintf(stderr, \"id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\\n\");\n    exit(1);\n}\n/* A string block the compiler proved dead is given back by id_str_free; with the\n   guard on it is filled with 0xDD and its count becomes SIZE_MAX instead, so a\n   second free traps and a later use fails in the size checks. */\nstatic void id_str_free(char* s) {\n    size_t n = id_slen(s);\n    id_nfree_s++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (n == SIZE_MAX) id_freed_str_trap();\n        memset(s, 0xDD, n + 1);\n        ((size_t*)(void*)s)[-1] = SIZE_MAX;\n        return;\n    }\n    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);\n}\nstatic void id_list_free(IdList* L) {\n    if (!L) return;\n    id_nfree++;\n    if (id_fguard < 0) { const char* e = getenv(\"ID_FREE_GUARD\"); id_fguard = (e && e[0] == '1'); }\n    if (id_fguard) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        int c = L->cap < 0 \? -L->cap : L->cap;\n        memset(L->data, 0xDD, (size_t)c * sizeof(long long));\n        L->len = -1; L->cap = INT_MIN;\n        return;\n    }\n    size_t c = (size_t)(L->cap < 0 \? -L->cap : L->cap);\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }\n    size_t ic = (size_t)inl[0];\n    id_pool_free(L->data, sizeof(long long) * c);\n    id_pool_free(L, ID_LIST_BYTES(ic));\n}\nstatic void id_list_free_deep(IdList* L) {\n    if (!L) return;\n    if (L->cap != INT_MIN) { for (int i = 0; i < L->len; i++) id_list_free((IdList*)(intptr_t)L->data[i]); }\n    id_list_free(L);\n}\nstatic void id_list_lock(IdList* L) { L->cap = 0 - L->cap; }\nstatic void id_list_mut_check(IdList* L) {\n    if (L->cap < 0) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: cannot mutate a constant list\\n\");\n        exit(1);\n    }\n}\nstatic void id_list_grow(IdList* L) {\n    if (L->cap > INT_MAX / 2) {\n        fprintf(stderr, \"id: list capacity overflow\\n\");\n        exit(1);\n    }\n    int ncap = L->cap < 2 \? 4 : L->cap * 2;\n    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, \"list growth\");\n    long long* inl = ID_LIST_CELLS(L);\n    if (L->data == inl) {\n        ID_MEM_CHARGE(nb);\n        long long* nd = (long long*)id_pool_get(nb);\n        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);\n        inl[0] = L->cap;\n        L->data = nd;\n    } else {\n        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);\n    }\n    L->cap = ncap;\n}\nstatic void id_list_push(IdList* L, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);\n    L->data[L->len++] = v;\n}\nstatic long long id_list_get(IdList* L, int i) {\n    if (!L) id_null_read();\n    if (i < 0 || i >= L->len) {\n        if (L->cap == INT_MIN) id_freed_trap();\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    return L->data[i];\n}\nstatic void id_list_set(IdList* L, int i, long long v) {\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (i < 0 || i >= L->len) {\n        fprintf(stderr, \"id: index %d out of bounds (len %d)\\n\", i, L->len);\n        exit(1);\n    }\n    L->data[i] = v;\n}\nstatic int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }\nstatic long long id_list_pop(IdList* L) {   /* remove & return the last cell */\n    if (!L) id_null_read();\n    id_list_mut_check(L); if (L->len <= 0) {\n        fprintf(stderr, \"id: pop from empty list\\n\");\n        exit(1);\n    }\n    return L->data[--L->len];\n}\nstatic IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a list this runtime owns */\n    if (!f) return NULL;\n    if (f->len < 0 || (f->len > 0 && !f->data)) {\n        fprintf(stderr, \"id: a native returned a malformed list (len %d): fill len cells at data, or size the list from id and return a count\\n\", f->len);\n        exit(1);\n    }\n    IdList* L = id_list_new();\n    for (int i = 0; i < f->len; i++) id_list_push(L, f->data[i]);\n    return L;\n}\nstatic IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */\n    IdList* L = id_list_make(n, n < 1 \? 4 : n);\n    va_list ap; va_start(ap, n);\n    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);\n    va_end(ap);\n    return L;\n}\nstatic long long id_box_f(double d) { long long x; memcpy(&x, &d, 8); return x; }\nstatic double id_unbox_f(long long x) { double d; memcpy(&d, &x, 8); return d; }\nstatic long long id_bits_of_float(double d) { return id_box_f(d); }\nstatic double id_float_of_bits(long long x) { return id_unbox_f(x); }\nstatic long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }\nstatic double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }\nstatic int id_to_int(const char* s) { return atoi(s); }\n\nstatic char* id_concat(const char* a, const char* b) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    char* r = id_str_new(id_add_check(la, lb, \"concat\"));\n    memcpy(r, a, la);\n    memcpy(r + la, b, lb);\n    return r;\n}\n/* `+` whose operand is an unnamed temporary (docs/MEMORY.md 3.3). Bit 1 of m: a\n   is fresh, so the result is built in a's block (a pool block grows in place\n   while its size class has room; a large one is realloc'd); bit 2: b is fresh\n   and is given back once copied. */\nstatic char* id_concat_f(char* a, char* b, int m) {\n    size_t la = id_slen(a), lb = id_slen(b);\n    size_t n = id_add_check(la, lb, \"concat\");\n    char* r;\n    if (m & 1) {\n        size_t hb = id_add_check(n, sizeof(size_t) + 1, \"concat\");\n        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);\n        ((size_t*)(void*)r)[-1] = n;\n    } else {\n        r = id_str_new(n);\n        memcpy(r, a, la);\n    }\n    memcpy(r + la, b, lb);\n    r[n] = '\\0';\n    if (m & 2) id_str_free(b);\n    return r;\n}\nstatic char* id_str_of_int(int x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%d\", x); return id_str_from(b, (size_t)n);\n}\nstatic char* id_str_of_word(long long x) {\n    char b[32]; int n = snprintf(b, sizeof b, \"%lld\", x); return id_str_from(b, (size_t)n);\n}\n\n/* ---- word arithmetic with no undefined behaviour ------------------------\n   C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.\n   id gives all three a defined answer -- a loud abort for the first two,\n   which are always bugs, and the obvious result for the third -- on the same\n   principle as bounds-checked list indexing: a mistake stops the program\n   instead of quietly producing nonsense. */\nstatic void id_trap(const char* what) {\n    fprintf(stderr, \"id: %s\\n\", what);\n    exit(1);\n}\nstatic long long id_sdiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == LLONG_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic long long id_smod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\n/* The same two checks for `int`. They used to be word-only, on the grounds\n   that trapping was a new behaviour and `int` division should stay exactly as\n   it was -- but \"exactly as it was\" meant a SIGFPE and a core dump with no\n   message, while the identical mistake on a `word` printed one line and\n   exited 1. Two spellings of one bug do not deserve two failure modes, and\n   gcc folds the check away whenever the divisor is a nonzero constant. */\nstatic int id_idiv(int a, int b) {\n    if (b == 0) id_trap(\"division by zero\");\n    if (b == -1 && a == INT_MIN) id_trap(\"division overflow\");\n    return a / b;\n}\nstatic int id_imod(int a, int b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    if (b == -1) return 0;              /* would overflow; the answer is 0 */\n    return a % b;\n}\nstatic long long id_shl(long long a, long long n) {\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a << n);\n}\nstatic long long id_sar(long long a, long long n) {   /* arithmetic: `>>` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return a < 0 \? -1 : 0;\n    return a >> n;\n}\nstatic long long id_ushr(long long a, long long n) {  /* logical: `ushr` */\n    if (n < 0) id_trap(\"shift by a negative amount\");\n    if (n >= 64) return 0;\n    return (long long)((unsigned long long)a >> n);\n}\nstatic long long id_udiv(long long a, long long b) {\n    if (b == 0) id_trap(\"division by zero\");\n    return (long long)((unsigned long long)a / (unsigned long long)b);\n}\nstatic long long id_umod(long long a, long long b) {\n    if (b == 0) id_trap(\"remainder by zero\");\n    return (long long)((unsigned long long)a % (unsigned long long)b);\n}\nstatic long long id_ult(long long a, long long b) {\n    return (unsigned long long)a < (unsigned long long)b;\n}\n\n/* ---- the flat store -----------------------------------------------------\n   One flat, byte-addressed memory. An address is an ordinary word, so\n   structs become offsets, arrays become strides, and taking the address of\n   something is arithmetic -- none of which the language needs syntax for.\n\n   Address 0 is never handed out, so it can mean \"null\" the way it does\n   everywhere else. Every access is bounds-checked against the high-water\n   mark: the class of mistake that silently corrupts memory in C is a clean\n   abort here, which is the entire reason the store is a primitive rather\n   than a library. The store grows on demand and is freed at exit with the\n   rest of the arena. */\nstatic ID_TLS unsigned char* id_store = NULL;\nstatic ID_TLS long long id_store_used = 1;    /* 0 is reserved for null */\nstatic ID_TLS long long id_store_cap = 0;\n\nstatic void id_store_grow(long long need) {\n    long long cap = id_store_cap \? id_store_cap : 65536;\n    while (cap < need) {\n        if (cap > (long long)1 << 44) id_trap(\"store too large\");\n        cap *= 2;\n    }\n    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);\n    memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));\n    id_store_cap = cap;\n}\nstatic long long id_mem_alloc(long long n) {\n    if (n < 0) id_trap(\"negative allocation size\");\n    /* 8-align every allocation so a 64-bit field is never split awkwardly */\n    long long base = (id_store_used + 7) & ~(long long)7;\n    long long end = base + n;\n    if (end < base) id_trap(\"allocation size overflow\");\n    if (end > id_store_cap) id_store_grow(end);\n    id_store_used = end;\n    return base;\n}\nstatic long long id_mem_size(void) { return id_store_used; }\nvoid id_thread_enter(void) { id_arena_hooked = 1; }\nvoid id_thread_leave(void) {\n    IdAllocHdr* h = id_arena_head;\n    while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }\n    id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;\n    id_pool_drop();\n}\n\n/* Every load and store funnels through this one check. */\nstatic unsigned char* id_at(long long addr, long long width) {\n    if (addr <= 0 || addr + width > id_store_used) {\n        fprintf(stderr, \"id: store address %lld out of range (size %lld)\\n\",\n                addr, id_store_used);\n        exit(1);\n    }\n    return id_store + addr;\n}\n/* The store as a native sees it: n bytes at addr, bounds-checked like every\n   other access. Not static, so separately compiled C can reach it. The\n   pointer is good only until the next alloc, which may move the store. */\nunsigned char* id_store_span(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    return id_at(addr, n);\n}\n/* stderr as a native sees it: n bytes, in order with print and eprint. It goes\n   where eprint goes -- IDTC_EPRINT_TO is the test harness's capture target for\n   an `eprints` clause and plain stderr everywhere else -- and flushes stdout\n   first, as eprint does, so the two streams interleave as written. 0, or -1. */\n#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nint id_err_write(const unsigned char* p, size_t n) {\n    fflush(stdout);\n    return fwrite(p, 1, n, IDTC_EPRINT_TO) == n \? 0 : -1;\n}\n/* Little-endian, byte at a time: the same bytes on every host, and no\n   alignment requirement -- C code casts pointers to odd addresses freely. */\nstatic long long id_peek_n(long long addr, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = 0;\n    for (int i = width - 1; i >= 0; i--) v = (v << 8) | p[i];\n    return (long long)v;\n}\nstatic void id_poke_n(long long addr, long long value, int width) {\n    unsigned char* p = id_at(addr, width);\n    unsigned long long v = (unsigned long long)value;\n    for (int i = 0; i < width; i++) { p[i] = (unsigned char)(v & 0xff); v >>= 8; }\n}\nstatic long long id_peek8(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32(long long a) { return id_peek_n(a, 4); }\nstatic long long id_peek64(long long a) { return id_peek_n(a, 8); }\nstatic void id_poke8(long long a, long long v)  { id_poke_n(a, v, 1); }\nstatic void id_poke16(long long a, long long v) { id_poke_n(a, v, 2); }\nstatic void id_poke32(long long a, long long v) { id_poke_n(a, v, 4); }\nstatic void id_poke64(long long a, long long v) { id_poke_n(a, v, 8); }\nstatic long long id_peek8s(long long a)  { return (long long)(signed char)id_peek_n(a, 1); }\nstatic long long id_peek16s(long long a) { return (long long)(short)id_peek_n(a, 2); }\nstatic long long id_peek32s(long long a) { return (long long)(int)id_peek_n(a, 4); }\nstatic long long id_peek8u(long long a)  { return id_peek_n(a, 1); }\nstatic long long id_peek16u(long long a) { return id_peek_n(a, 2); }\nstatic long long id_peek32u(long long a) { return id_peek_n(a, 4); }\nstatic void id_fail(const char* m) { id_trap(m); }\n\n/* Bridges between the store and id's own strings, so a program working in\n   the store can still print. */\nstatic char* id_str_of_mem(long long addr, long long n) {\n    if (n < 0) id_trap(\"negative length\");\n    unsigned char* p = id_at(addr, n);\n    if (memchr(p, 0, (size_t)n)) id_trap(\"a NUL byte reached a string (str_of_mem): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    return id_str_from((const char*)p, (size_t)n);\n}\nstatic long long id_mem_of_str(const char* s) {\n    size_t n = id_slen(s);\n    long long a = id_mem_alloc((long long)n + 1);\n    memcpy(id_store + a, s, n + 1);\n    return a;\n}\nstatic char* id_str_of_float(double x) {\n    char b[64]; int n = snprintf(b, sizeof b, \"%g\", x); return id_str_from(b, (size_t)n);\n}\nstatic void id_print(const char* s) { puts(s); }\nstatic char* id_input(void) {\n    /* read one line from stdin, drop the trailing newline; \"\" on EOF */\n    char buf[1024];\n    size_t got = 0; int ch;\n    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\\n') break; }\n    buf[got] = '\\0';\n    if (memchr(buf, 0, got)) id_trap(\"a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    if (got == 0) {\n        return id_str_new(0);\n    }\n    size_t n = strlen(buf);\n    if (n > 0 && buf[n - 1] == '\\n') { buf[--n] = '\\0'; }\n    return id_str_from(buf, n);\n}\nstatic char* id_read_all(void) {\n    /* slurp all of stdin into one string (grows as needed); the count goes\n       in the block's first word, so the bytes are read in place after it */\n    size_t cap = 4096, n = 0, h = sizeof(size_t);\n    char* r = (char*)id_pool_blk(cap);\n    for (;;) {\n        if (h + n + 1 >= cap) {\n            if (cap > SIZE_MAX / 2) {\n                fprintf(stderr, \"id: allocation size overflow (read_all)\\n\");\n                exit(1);\n            }\n            r = (char*)id_realloc(r, cap, cap * 2);\n            cap *= 2;\n        }\n        size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);\n        n += got;\n        if (got == 0) break;\n    }\n    r = (char*)id_realloc(r, cap, h + n + 1);\n    r += h;\n    if (memchr(r, 0, n)) id_trap(\"a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data\");\n    ((size_t*)(void*)r)[-1] = n;\n    r[n] = '\\0';\n    return r;\n}\nstatic int id_len(const char* s) { return (int)id_slen(s); }\n/* charat's bounds check is one load of the stored length, so walking a string\n   is O(n) however many strings are walked at once. */\nstatic int id_charat(const char* s, int i) {\n    if (i < 0) return -1;\n    if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */\n    return (unsigned char)s[i];\n}\nstatic char* id_chr(int code) {\n    if ((char)code == 0) id_trap(\"a NUL byte reached a string (chr(0)): a string cannot hold NUL; use the store (poke8) for binary data\");\n    char c = (char)code;\n    return id_str_from(&c, 1);\n}\n\n/* real-time terminal I/O: write without a newline, flush, poll a single key\n   without blocking (raw mode is entered lazily and restored at exit), and\n   sleep. Together these let id drive an animated full-screen frame loop. */\nstatic void id_put(const char* s) { fputs(s, stdout); }\nstatic void id_flush(void) { fflush(stdout); }\n#ifndef __wasi__\nstatic struct termios id_saved_termios;\nstatic int id_raw_active = 0;\nstatic void id_term_restore(void) {\n    if (id_raw_active) {\n        tcsetattr(STDIN_FILENO, TCSANOW, &id_saved_termios);\n        id_raw_active = 0;\n    }\n}\nstatic void id_term_raw(void) {\n    struct termios t;\n    if (id_raw_active) return;\n    if (tcgetattr(STDIN_FILENO, &id_saved_termios) != 0) return;\n    t = id_saved_termios;\n    t.c_lflag &= ~(tcflag_t)(ICANON | ECHO);\n    t.c_cc[VMIN] = 0; t.c_cc[VTIME] = 0;   /* read() returns at once, 0 on no key */\n    tcsetattr(STDIN_FILENO, TCSANOW, &t);\n    id_raw_active = 1;\n    atexit(id_term_restore);\n}\nstatic int id_getkey(void) {\n    unsigned char c;\n    id_term_raw();\n    if (read(STDIN_FILENO, &c, 1) == 1) return (int)c;\n    return -1;   /* no key available this poll */\n}\n#else\nstatic void id_term_restore(void) {}\nstatic void id_term_raw(void) {}\nstatic int id_getkey(void) { return -1; }\n#endif\nstatic void id_sleep_ms(int ms) {\n    struct timespec ts;\n    if (ms < 0) ms = 0;\n    ts.tv_sec = ms / 1000;\n    ts.tv_nsec = (long)(ms % 1000) * 1000000L;\n    nanosleep(&ts, NULL);\n}\nstatic int id_ticks(void) {   /* monotonic milliseconds, for timing and seeding */\n    struct timespec ts;\n    clock_gettime(CLOCK_MONOTONIC, &ts);\n    return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);\n}"));
     return;
 }
 
@@ -13882,7 +13980,7 @@ void id_ll_asm_one(int r) {
     char* par;
     ty = id_ll_ty((char*)(intptr_t)(id_list_get(afret, r)));
     par = id_ll_asm_par(r);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("define "), ty), ID_S(" @id_")), (char*)(intptr_t)(id_list_get(afname, r))), ID_S("(")), par), ID_S(") noinline {")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("define "), ty), ID_S(" @id_"), 1), (char*)(intptr_t)(id_list_get(afname, r)), 1), ID_S("("), 1), par, 1), ID_S(") noinline {"), 1));
     id_ll_asm_body(r);
     id_emit_line(ID_S("}"));
     return;
@@ -13898,7 +13996,7 @@ char* id_ll_asm_par(int r) {
 IdList* idsq_28;
         s1_of_v = (idsq_28 = ns1, (char*)(intptr_t)(id_list_get(idsq_28, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(afparams, r)), i)))));
 char* idsq_17;
-        s = (idsq_17 = id_ll_sep(i), id_concat(id_concat(id_concat(id_concat(s, idsq_17), id_ll_ty(s1_of_v)), ID_S(" %a")), id_str_of_int(i)));
+        s = (idsq_17 = id_ll_sep(i), id_concat_f(id_concat_f(id_concat_f(id_concat(s, idsq_17), id_ll_ty(s1_of_v), 1), ID_S(" %a"), 1), id_str_of_int(i), 3));
         i = (i + 1);
     }
     return s;
@@ -13937,8 +14035,8 @@ void id_ll_asm_body2(int r, char* ty, char* q) {
 void id_ll_asm_body3(int r, char* ty, char* q, char* text, char* cons) {
     char* par;
     par = id_ll_asm_par(r);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("  %r = call "), ty), ID_S(" asm sideeffect ")), q), text), q), ID_S(", ")), q), cons), q), ID_S("(")), par), ID_S(")")));
-    id_emit_line(id_concat(id_concat(ID_S("  ret "), ty), ID_S(" %r")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("  %r = call "), ty), ID_S(" asm sideeffect "), 1), q, 1), text, 1), q, 1), ID_S(", "), 1), q, 1), cons, 1), q, 1), ID_S("("), 1), par, 1), ID_S(")"), 1));
+    id_emit_line(id_concat_f(id_concat(ID_S("  ret "), ty), ID_S(" %r"), 1));
     return;
 }
 
@@ -13949,7 +14047,7 @@ char* id_ll_asm_text(int r) {
     i = 0;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(aflines, r))))) {
 char* idsq_18;
-        out = (idsq_18 = id_ll_asm_sep(i), id_concat(id_concat(out, idsq_18), id_ll_asm_line(r, (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(aflines, r)), i)))));
+        out = (idsq_18 = id_ll_asm_sep(i), id_concat_f(id_concat(out, idsq_18), id_ll_asm_line(r, (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(aflines, r)), i))), 1));
         i = (i + 1);
     }
     return out;
@@ -14050,11 +14148,11 @@ char* id_ll_asm_ref2(int r, char* s, int i) {
     char* out;
     int charat_v;
     nm = id_ll_asm_ref2_nm(s, i);
-    out = id_concat(ID_S("$"), id_str_of_int(id_ll_asm_ix(r, nm)));
+    out = id_concat_f(ID_S("$"), id_str_of_int(id_ll_asm_ix(r, nm)), 2);
     if ((id_charat(s, (i + 1)) != 91)) {
         charat_v = id_charat(s, (i + 1));
 int idsq_13;
-        out = (idsq_13 = id_ll_asm_ix(r, nm), id_concat(id_concat(id_concat(id_concat(ID_S("${"), id_str_of_int(idsq_13)), ID_S(":")), id_chr(charat_v)), ID_S("}")));
+        out = (idsq_13 = id_ll_asm_ix(r, nm), id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("${"), id_str_of_int(idsq_13), 2), ID_S(":"), 1), id_chr(charat_v), 3), ID_S("}"), 1));
     }
     return out;
 }
@@ -14114,7 +14212,7 @@ char* id_ll_pstr_step(char* s, int i, int pn) {
     char* ret_s;
     ty = (char*)(intptr_t)(id_list_get(ity, pn));
 char* idsq_12;
-    ret_s = (idsq_12 = id_ll_sep(i), id_concat(id_concat(id_concat(id_concat(s, idsq_12), id_ll_ty(ty)), ID_S(" %v")), id_str_of_int(pn)));
+    ret_s = (idsq_12 = id_ll_sep(i), id_concat_f(id_concat_f(id_concat_f(id_concat(s, idsq_12), id_ll_ty(ty), 1), ID_S(" %v"), 1), id_str_of_int(pn), 3));
     return ret_s;
 }
 
@@ -14144,7 +14242,7 @@ char* id_ll_sep(int i) {
 void id_ll_block(int b) {
     int i;
     IdList* ins;
-    id_emit_line(id_concat(id_concat(ID_S("b"), id_str_of_int(b)), ID_S(":")));
+    id_emit_line(id_concat_f(id_concat_f(ID_S("b"), id_str_of_int(b), 2), ID_S(":"), 1));
     i = 0;
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(binsn, b))))) {
         ins = (IdList*)(intptr_t)(id_list_get(binsn, b));
@@ -14211,7 +14309,7 @@ void id_ll_func(int f) {
     ty = id_ll_ty(ret);
     name = (char*)(intptr_t)(id_list_get(fnname, f));
     plist = id_ll_pstr(f);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("define "), ty), ID_S(" @id_")), name), ID_S("(")), plist), ID_S(") {")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("define "), ty), ID_S(" @id_"), 1), name, 1), ID_S("("), 1), plist, 1), ID_S(") {"), 1));
     id_ll_blocks(f);
     id_emit_line(ID_S("}"));
     return;
@@ -14227,7 +14325,7 @@ char* id_ll_native_decl(int id) {
     ty = id_ll_ty(s2_of_v);
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
     plist = id_ll_native_pars(l1_of_v);
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("declare "), ty), ID_S(" @id_")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("(")), plist), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("declare "), ty), ID_S(" @id_"), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1), ID_S("("), 1), plist, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -14241,7 +14339,7 @@ char* id_ll_native_pars(IdList* ps) {
 IdList* idsq_22;
         s1_of_v = (idsq_22 = ns1, (char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get(ps, i)))));
 char* idsq_13;
-        out = (idsq_13 = id_ll_sep(i), id_concat(id_concat(out, idsq_13), id_ll_ty(s1_of_v)));
+        out = (idsq_13 = id_ll_sep(i), id_concat_f(id_concat(out, idsq_13), id_ll_ty(s1_of_v), 1));
         i = (i + 1);
     }
     return out;
@@ -14256,7 +14354,7 @@ void id_ll_head(char* triple) {
 }
 
 void id_ll_head_triple(char* triple, char* q) {
-    id_emit_line(id_concat(id_concat(id_concat(ID_S("target triple = "), q), triple), q));
+    id_emit_line(id_concat_f(id_concat_f(id_concat(ID_S("target triple = "), q), triple, 1), q, 1));
     id_emit_line(ID_S(""));
     return;
 }
@@ -14315,7 +14413,7 @@ void id_ll_declares(void) {
 
 void id_ll_decl_block(void) {
     id_ll_decl_cmp();
-    id_emit_line(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare void @id_fail(ptr)"));
+    id_emit_line(ID_S("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare void @id_fail(ptr)"));
     id_emit_line(ID_S(""));
     return;
 }
@@ -14323,7 +14421,7 @@ void id_ll_decl_block(void) {
 void id_ll_decl_cmp(void) {
     char* lw_strcmp_v;
     lw_strcmp_v = id_lw_strcmp();
-    id_emit_line(id_concat(id_concat(ID_S("declare i32 @"), lw_strcmp_v), ID_S("(ptr, ptr)")));
+    id_emit_line(id_concat_f(id_concat(ID_S("declare i32 @"), lw_strcmp_v), ID_S("(ptr, ptr)"), 1));
     return;
 }
 
@@ -14341,7 +14439,7 @@ void id_ll_globals(void) {
 void id_ll_global_at(int i, char* ty) {
     char* init;
     init = id_ll_init(i);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("@"), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(" = global ")), ty), ID_S(" ")), init));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@"), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(" = global "), 1), ty, 1), ID_S(" "), 1), init, 1));
     return;
 }
 
@@ -14400,7 +14498,7 @@ void id_ll_init_one(int i, char* pass) {
 }
 
 void id_ll_init_build(int i) {
-    id_emit_line(id_concat(id_concat(ID_S("  %c"), id_str_of_int(i)), ID_S(" = call ptr @id_list_new()")));
+    id_emit_line(id_concat_f(id_concat_f(ID_S("  %c"), id_str_of_int(i), 2), ID_S(" = call ptr @id_list_new()"), 1));
     id_ll_init_elems(i, ID_S("build"));
     id_ll_init_store(i);
     return;
@@ -14421,7 +14519,7 @@ void id_ll_init_elem(int i, int j, int e, char* pass) {
 void id_ll_init_push(int i, int j, int e, char* t) {
     char* cell;
     cell = id_ll_cell(i, j, e, t);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(ID_S("  call void @id_list_push(ptr %c"), id_str_of_int(i)), ID_S(", i64 ")), cell), ID_S(")")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("  call void @id_list_push(ptr %c"), id_str_of_int(i), 2), ID_S(", i64 "), 1), cell, 1), ID_S(")"), 1));
     return;
 }
 
@@ -14443,12 +14541,12 @@ char* id_ll_cell_load(int i, int j, int e) {
     char* nm;
     char* name;
     char* t;
-    nm = id_concat(id_concat(id_concat(ID_S("%s"), id_str_of_int(i)), ID_S(".")), id_str_of_int(j));
+    nm = id_concat_f(id_concat_f(id_concat_f(ID_S("%s"), id_str_of_int(i), 2), ID_S("."), 1), id_str_of_int(j), 3);
     name = (char*)(intptr_t)(id_list_get(ns1, e));
 IdList* idsq_50;
     t = (idsq_50 = ns1, (char*)(intptr_t)(id_list_get(idsq_50, id_const_decl(name))));
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("  %l"), id_str_of_int(i)), ID_S(".")), id_str_of_int(j)), ID_S(" = load ")), id_ll_ty(t)), ID_S(", ptr @")), name));
-    id_emit_line(id_concat(id_concat(id_concat(ID_S("  "), nm), ID_S(" = ")), id_ll_cell_conv(t, id_concat(id_concat(id_concat(ID_S("%l"), id_str_of_int(i)), ID_S(".")), id_str_of_int(j)))));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("  %l"), id_str_of_int(i), 2), ID_S("."), 1), id_str_of_int(j), 3), ID_S(" = load "), 1), id_ll_ty(t), 1), ID_S(", ptr @"), 1), name, 1));
+    id_emit_line(id_concat_f(id_concat_f(id_concat(ID_S("  "), nm), ID_S(" = "), 1), id_ll_cell_conv(t, id_concat_f(id_concat_f(id_concat_f(ID_S("%l"), id_str_of_int(i), 2), ID_S("."), 1), id_str_of_int(j), 3)), 1));
     return nm;
 }
 
@@ -14456,18 +14554,18 @@ char* id_ll_cell_conv(char* t, char* ll_val_s) {
     char* insn;
     insn = id_ll_cell_conv2(t, ll_val_s);
     if ((strcmp(t, ID_S("float")) == 0)) {
-        insn = id_concat(id_concat(ID_S("call i64 @id_box_f(double "), ll_val_s), ID_S(")"));
+        insn = id_concat_f(id_concat(ID_S("call i64 @id_box_f(double "), ll_val_s), ID_S(")"), 1);
     }
     return insn;
 }
 
 char* id_ll_cell_conv2(char* t, char* ll_val_s) {
     char* insn;
-    insn = id_concat(id_concat(ID_S("add i64 "), ll_val_s), ID_S(", 0"));
+    insn = id_concat_f(id_concat(ID_S("add i64 "), ll_val_s), ID_S(", 0"), 1);
     if ((strcmp(t, ID_S("int")) == 0)) {
-        insn = id_concat(id_concat(ID_S("sext i32 "), ll_val_s), ID_S(" to i64"));
+        insn = id_concat_f(id_concat(ID_S("sext i32 "), ll_val_s), ID_S(" to i64"), 1);
     } else if ((strcmp(t, ID_S("word")) != 0)) {
-        insn = id_concat(id_concat(ID_S("ptrtoint ptr "), ll_val_s), ID_S(" to i64"));
+        insn = id_concat_f(id_concat(ID_S("ptrtoint ptr "), ll_val_s), ID_S(" to i64"), 1);
     }
     return insn;
 }
@@ -14475,24 +14573,24 @@ char* id_ll_cell_conv2(char* t, char* ll_val_s) {
 char* id_ll_cell_named(int i, int j, int e, char* t) {
     char* nm;
     char* insn;
-    nm = id_concat(id_concat(id_concat(ID_S("%s"), id_str_of_int(i)), ID_S(".")), id_str_of_int(j));
+    nm = id_concat_f(id_concat_f(id_concat_f(ID_S("%s"), id_str_of_int(i), 2), ID_S("."), 1), id_str_of_int(j), 3);
     insn = id_ll_cell_line(i, j, e, t);
-    id_emit_line(id_concat(id_concat(id_concat(ID_S("  "), nm), ID_S(" = ")), insn));
+    id_emit_line(id_concat_f(id_concat_f(id_concat(ID_S("  "), nm), ID_S(" = "), 1), insn, 1));
     return nm;
 }
 
 char* id_ll_cell_line(int i, int j, int e, char* t) {
     char* insn;
-    insn = id_concat(id_concat(id_concat(id_concat(ID_S("ptrtoint ptr @.cs."), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(".")), id_str_of_int(j)), ID_S(" to i64"));
+    insn = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("ptrtoint ptr @.cs."), (char*)(intptr_t)(id_list_get(enames, i))), ID_S("."), 1), id_str_of_int(j), 3), ID_S(" to i64"), 1);
     if ((strcmp(t, ID_S("float")) == 0)) {
-        insn = id_concat(id_concat(ID_S("call i64 @id_box_f(double "), id_ll_const_num(e)), ID_S(")"));
+        insn = id_concat_f(id_concat(ID_S("call i64 @id_box_f(double "), id_ll_const_num(e)), ID_S(")"), 1);
     }
     return insn;
 }
 
 void id_ll_init_store(int i) {
-    id_emit_line(id_concat(id_concat(id_concat(ID_S("  store ptr %c"), id_str_of_int(i)), ID_S(", ptr @")), (char*)(intptr_t)(id_list_get(enames, i))));
-    id_emit_line(id_concat(id_concat(ID_S("  call void @id_list_lock(ptr %c"), id_str_of_int(i)), ID_S(")")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(ID_S("  store ptr %c"), id_str_of_int(i), 2), ID_S(", ptr @"), 1), (char*)(intptr_t)(id_list_get(enames, i)), 1));
+    id_emit_line(id_concat_f(id_concat_f(ID_S("  call void @id_list_lock(ptr %c"), id_str_of_int(i), 2), ID_S(")"), 1));
     return;
 }
 
@@ -14520,7 +14618,7 @@ void id_ll_init_elems2(int i, int e, char* pass) {
 void id_ll_elem_bytes(int i, int j, int e) {
     char* spell;
     spell = (char*)(intptr_t)(id_list_get(ns1, e));
-    id_ll_str_bytes(id_concat(id_concat(id_concat(ID_S("@.cs."), (char*)(intptr_t)(id_list_get(enames, i))), ID_S(".")), id_str_of_int(j)), spell);
+    id_ll_str_bytes(id_concat_f(id_concat_f(id_concat(ID_S("@.cs."), (char*)(intptr_t)(id_list_get(enames, i))), ID_S("."), 1), id_str_of_int(j), 3), spell);
     return;
 }
 
@@ -14559,7 +14657,7 @@ char* id_ll_const_num(int e) {
         }
     }
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("~")) == 0))) {
-        s = id_concat(ID_S(""), id_str_of_int(((0 - 1) - id_to_int(id_ll_const_num((int)(id_list_get(ni1, e)))))));
+        s = id_concat_f(ID_S(""), id_str_of_int(((0 - 1) - id_to_int(id_ll_const_num((int)(id_list_get(ni1, e)))))), 2);
     }
     return s;
 }
@@ -14576,7 +14674,7 @@ char* id_ll_const_str(int e, char* name) {
 void id_ll_str_emit(int i) {
     char* s;
     s = (char*)(intptr_t)(id_list_get(istr, i));
-    id_ll_str_bytes(id_concat(ID_S("@.str"), id_str_of_int(i)), s);
+    id_ll_str_bytes(id_concat_f(ID_S("@.str"), id_str_of_int(i), 2), s);
     return;
 }
 
@@ -14594,7 +14692,7 @@ void id_ll_str_emit2(char* gname, char* s, int blen, int zl) {
     char* bytes;
     q = id_chr(34);
     bytes = id_ll_bytes(s);
-    id_emit_line(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(gname, ID_S(".d = private unnamed_addr constant <{ i64, [")), id_str_of_int(blen)), ID_S(" x i8] }> <{ i64 ")), id_str_of_int(zl)), ID_S(", [")), id_str_of_int(blen)), ID_S(" x i8] c")), q), bytes), q), ID_S(" }>, align 8\n")), gname), ID_S(" = private alias i8, getelementptr inbounds (i8, ptr ")), gname), ID_S(".d, i64 8)")));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(gname, ID_S(".d = private unnamed_addr constant <{ i64, [")), id_str_of_int(blen), 3), ID_S(" x i8] }> <{ i64 "), 1), id_str_of_int(zl), 3), ID_S(", ["), 1), id_str_of_int(blen), 3), ID_S(" x i8] c"), 1), q, 1), bytes, 1), q, 1), ID_S(" }>, align 8\n"), 1), gname, 1), ID_S(" = private alias i8, getelementptr inbounds (i8, ptr "), 1), gname, 1), ID_S(".d, i64 8)"), 1));
     return;
 }
 
@@ -14648,12 +14746,12 @@ char* id_ll_t3(int id) {
         ir_ty_v = (char*)(intptr_t)(id_list_get(ity, id));
         ir_a_v = (int)(id_list_get(ia, id));
 char* idsq_37;
-        s = (idsq_37 = id_ll_ty(ir_ty_v), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = load ")), idsq_37), ID_S(", ptr ")), id_ll_val(ir_a_v)));
+        s = (idsq_37 = id_ll_ty(ir_ty_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = load "), 1), idsq_37, 1), ID_S(", ptr "), 1), id_ll_val(ir_a_v), 1));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("store")) == 0)) {
         ir_b_v = (int)(id_list_get(ib, id));
         ir_a_v2 = (int)(id_list_get(ia, id));
 char* idsq_12;
-        s = (idsq_12 = id_ll_op(ir_b_v), id_concat(id_concat(id_concat(ID_S("store "), idsq_12), ID_S(", ptr ")), id_ll_val(ir_a_v2)));
+        s = (idsq_12 = id_ll_op(ir_b_v), id_concat_f(id_concat_f(id_concat(ID_S("store "), idsq_12), ID_S(", ptr "), 1), id_ll_val(ir_a_v2), 1));
     }
     return s;
 }
@@ -14667,7 +14765,7 @@ char* id_ll_t4(int id) {
     } else if ((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("phi")) == 0)) {
         ir_ty_v = (char*)(intptr_t)(id_list_get(ity, id));
 char* idsq_12;
-        s = (idsq_12 = id_ll_ty(ir_ty_v), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = phi ")), idsq_12), ID_S(" ")), id_ll_phis(id)));
+        s = (idsq_12 = id_ll_ty(ir_ty_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = phi "), 1), idsq_12, 1), ID_S(" "), 1), id_ll_phis(id), 1));
     }
     return s;
 }
@@ -14678,9 +14776,9 @@ char* id_ll_call(int id) {
     ir_ty_v = (char*)(intptr_t)(id_list_get(ity, id));
 char* idsq_32;
 char* idsq_26;
-    s = (idsq_32 = id_ll_ty(ir_ty_v), idsq_26 = id_ll_callee(id), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("call "), idsq_32), ID_S(" ")), idsq_26), ID_S("(")), id_ll_args(id)), ID_S(")")));
+    s = (idsq_32 = id_ll_ty(ir_ty_v), idsq_26 = id_ll_callee(id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("call "), idsq_32), ID_S(" "), 1), idsq_26, 1), ID_S("("), 1), id_ll_args(id), 1), ID_S(")"), 1));
     if ((strcmp(id_ll_ty(ir_ty_v), ID_S("void")) != 0)) {
-        s = id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = ")), s);
+        s = id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = "), 1), s, 1);
     }
     return s;
 }
@@ -14703,7 +14801,7 @@ IdList* idsq_25;
 char* idsq_23;
 char* idsq_16;
 char* idsq_10;
-    ret_s = (idsq_25 = iop, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, id)), idsq_16 = id_ll_pred(sym, vty), idsq_10 = id_ll_op(a), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = ")), idsq_23), ID_S(" ")), idsq_16), ID_S(" ")), idsq_10), ID_S(", ")), id_ll_val(b)));
+    ret_s = (idsq_25 = iop, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, id)), idsq_16 = id_ll_pred(sym, vty), idsq_10 = id_ll_op(a), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = "), 1), idsq_23, 1), ID_S(" "), 1), idsq_16, 1), ID_S(" "), 1), idsq_10, 1), ID_S(", "), 1), id_ll_val(b), 1));
     return ret_s;
 }
 
@@ -14716,7 +14814,7 @@ char* id_ll_t6_bin(int id) {
 IdList* idsq_18;
 char* idsq_16;
 char* idsq_10;
-    ret_s = (idsq_18 = iop, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, id)), idsq_10 = id_ll_op(a), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = ")), idsq_16), ID_S(" ")), idsq_10), ID_S(", ")), id_ll_val(b)));
+    ret_s = (idsq_18 = iop, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, id)), idsq_10 = id_ll_op(a), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = "), 1), idsq_16, 1), ID_S(" "), 1), idsq_10, 1), ID_S(", "), 1), id_ll_val(b), 1));
     return ret_s;
 }
 
@@ -14749,7 +14847,7 @@ char* id_ll_phis(int id) {
 char* idsq_27;
 int idsq_20;
 char* idsq_19;
-        s = (idsq_27 = id_ll_sep(i), idsq_20 = (int)(id_list_get(ir_l_v, i)), idsq_19 = id_ll_val(idsq_20), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(s, idsq_27), ID_S("[ ")), idsq_19), ID_S(", %b")), id_str_of_int((int)(id_list_get((IdList*)(intptr_t)(id_list_get(iblk, id)), i)))), ID_S(" ]")));
+        s = (idsq_27 = id_ll_sep(i), idsq_20 = (int)(id_list_get(ir_l_v, i)), idsq_19 = id_ll_val(idsq_20), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(s, idsq_27), ID_S("[ "), 1), idsq_19, 1), ID_S(", %b"), 1), id_str_of_int((int)(id_list_get((IdList*)(intptr_t)(id_list_get(iblk, id)), i))), 3), ID_S(" ]"), 1));
         i = (i + 1);
     }
     return s;
@@ -14823,7 +14921,7 @@ char* id_ll_t5(int id) {
 IdList* idsq_20;
 char* idsq_18;
 char* idsq_12;
-        s = (idsq_20 = iop, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, id)), idsq_12 = id_ll_op(a2), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = ")), idsq_18), ID_S(" ")), idsq_12), ID_S(" to ")), id_ll_ty(ty)));
+        s = (idsq_20 = iop, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, id)), idsq_12 = id_ll_op(a2), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = "), 1), idsq_18, 1), ID_S(" "), 1), idsq_12, 1), ID_S(" to "), 1), id_ll_ty(ty), 1));
     }
     return s;
 }
@@ -14840,10 +14938,10 @@ char* id_ll_t6(int id) {
 char* idsq_45;
 char* idsq_39;
 char* idsq_33;
-        s = (idsq_45 = id_ll_negop(ty), idsq_39 = id_ll_ty(ty), idsq_33 = id_ll_zero(ty), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = ")), idsq_45), ID_S(" ")), idsq_39), ID_S(" ")), idsq_33), ID_S(", ")), id_ll_val(a)));
+        s = (idsq_45 = id_ll_negop(ty), idsq_39 = id_ll_ty(ty), idsq_33 = id_ll_zero(ty), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = "), 1), idsq_45, 1), ID_S(" "), 1), idsq_39, 1), ID_S(" "), 1), idsq_33, 1), ID_S(", "), 1), id_ll_val(a), 1));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("not")) == 0)) {
         a2 = (int)(id_list_get(ia, id));
-        s = id_concat(id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = xor ")), id_ll_op(a2)), ID_S(", -1"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = xor "), 1), id_ll_op(a2), 1), ID_S(", -1"), 1);
     }
     return s;
 }
@@ -14854,7 +14952,7 @@ char* id_ll_text(int id) {
     if ((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("ret")) == 0)) {
         s = id_ll_ret(id);
     } else if ((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("br")) == 0)) {
-        s = id_concat(ID_S("br label %b"), id_str_of_int((int)(id_list_get((IdList*)(intptr_t)(id_list_get(iblk, id)), 0))));
+        s = id_concat_f(ID_S("br label %b"), id_str_of_int((int)(id_list_get((IdList*)(intptr_t)(id_list_get(iblk, id)), 0))), 2);
     }
     return s;
 }
@@ -14881,10 +14979,10 @@ char* idsq_41;
 IdList* idsq_37;
 IdList* idsq_35;
 int idsq_33;
-        s = (idsq_41 = id_ll_val(ir_a_v), idsq_37 = iblk, idsq_35 = (IdList*)(intptr_t)(id_list_get(idsq_37, id)), idsq_33 = (int)(id_list_get(idsq_35, 0)), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("br i1 "), idsq_41), ID_S(", label %b")), id_str_of_int(idsq_33)), ID_S(", label %b")), id_str_of_int((int)(id_list_get((IdList*)(intptr_t)(id_list_get(iblk, id)), 1)))));
+        s = (idsq_41 = id_ll_val(ir_a_v), idsq_37 = iblk, idsq_35 = (IdList*)(intptr_t)(id_list_get(idsq_37, id)), idsq_33 = (int)(id_list_get(idsq_35, 0)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("br i1 "), idsq_41), ID_S(", label %b"), 1), id_str_of_int(idsq_33), 3), ID_S(", label %b"), 1), id_str_of_int((int)(id_list_get((IdList*)(intptr_t)(id_list_get(iblk, id)), 1))), 3));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("alloca")) == 0)) {
         ir_ty_v = (char*)(intptr_t)(id_list_get(ity, id));
-        s = id_concat(id_concat(id_concat(ID_S("%v"), id_str_of_int(id)), ID_S(" = alloca ")), id_ll_ty(ir_ty_v));
+        s = id_concat_f(id_concat_f(id_concat_f(ID_S("%v"), id_str_of_int(id), 2), ID_S(" = alloca "), 1), id_ll_ty(ir_ty_v), 1);
     }
     return s;
 }
@@ -14977,7 +15075,7 @@ int id_ll_blen(char* s) {
 char* id_ll_hex(int c) {
     char* ret_s;
 char* idsq_10;
-    ret_s = (idsq_10 = id_ll_nib(id_idiv(c, 16)), id_concat(id_concat(ID_S("\\"), idsq_10), id_ll_nib(id_imod(c, 16))));
+    ret_s = (idsq_10 = id_ll_nib(id_idiv(c, 16)), id_concat_f(id_concat(ID_S("\\"), idsq_10), id_ll_nib(id_imod(c, 16)), 1));
     return ret_s;
 }
 
@@ -15003,7 +15101,7 @@ char* id_ll_lit(int v) {
     char* s;
     s = (char*)(intptr_t)(id_list_get(istr, v));
     if ((id_ll_isstr(v) == 1)) {
-        s = id_concat(ID_S("@.str"), id_str_of_int(v));
+        s = id_concat_f(ID_S("@.str"), id_str_of_int(v), 2);
     }
     return s;
 }
@@ -15013,7 +15111,7 @@ char* id_ll_op(int v) {
     char* ret_s;
     ll_vty_v = id_ll_vty(v);
 char* idsq_9;
-    ret_s = (idsq_9 = id_ll_ty(ll_vty_v), id_concat(id_concat(idsq_9, ID_S(" ")), id_ll_val(v)));
+    ret_s = (idsq_9 = id_ll_ty(ll_vty_v), id_concat_f(id_concat(idsq_9, ID_S(" ")), id_ll_val(v), 1));
     return ret_s;
 }
 
@@ -15026,7 +15124,7 @@ char* id_ll_args(int id) {
     while ((i < id_list_len((IdList*)(intptr_t)(id_list_get(ilist, id))))) {
         ir_l_v = (IdList*)(intptr_t)(id_list_get(ilist, id));
 char* idsq_15;
-        s = (idsq_15 = id_ll_sep(i), id_concat(id_concat(s, idsq_15), id_ll_op((int)(id_list_get(ir_l_v, i)))));
+        s = (idsq_15 = id_ll_sep(i), id_concat_f(id_concat(s, idsq_15), id_ll_op((int)(id_list_get(ir_l_v, i))), 1));
         i = (i + 1);
     }
     return s;
@@ -15074,7 +15172,7 @@ char* id_ll_val(int v) {
 
 char* id_ll_val2(int v) {
     char* s;
-    s = id_concat(ID_S("%v"), id_str_of_int(v));
+    s = id_concat_f(ID_S("%v"), id_str_of_int(v), 2);
     if ((strcmp((char*)(intptr_t)(id_list_get(iop, v)), ID_S("const")) == 0)) {
         s = id_ll_lit(v);
     } else if ((strcmp((char*)(intptr_t)(id_list_get(iop, v)), ID_S("global")) == 0)) {
@@ -15216,7 +15314,7 @@ char* id_case_fn_name(IdList* pos, char* fn_word) {
         name = id_read_name(pos);
     } else {
         cur_text_v = id_cur_text(pos);
-        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat(ID_S("expected the name of a function after '"), fn_word), ID_S("', found '")), cur_text_v), ID_S("'")));
+        id_syn_err(pos, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("expected the name of a function after '"), fn_word), ID_S("', found '"), 1), cur_text_v, 1), ID_S("'"), 1));
     }
     return name;
 }
@@ -15263,7 +15361,7 @@ void id_case_given(IdList* pos) {
     gs = id_list_lit(0);
     while (((strcmp(id_cur_kind(pos), ID_S("kw")) == 0) && (strcmp(id_cur_text(pos), ID_S("given")) == 0))) {
         setup_one = id_given_name(pos, gs);
-        setup_nm = id_concat(id_concat(setup_nm, setup_one), ID_S(" "));
+        setup_nm = id_concat_f(id_concat(setup_nm, setup_one), ID_S(" "), 1);
     }
     id_list_push(casegiven, (long long)(intptr_t)(setup_nm));
     gargs_n = id_newnode(ID_S("gargs"), 0, 0, ID_S(""), ID_S(""), gs, gs);
@@ -15275,7 +15373,7 @@ void id_case_given(IdList* pos) {
             stdin_e = id_parse_str(pos);
         } else {
             cur_text_v = id_cur_text(pos);
-            id_syn_err(pos, id_concat(id_concat(ID_S("stdin's value must be a string literal, found '"), cur_text_v), ID_S("'")));
+            id_syn_err(pos, id_concat_f(id_concat(ID_S("stdin's value must be a string literal, found '"), cur_text_v), ID_S("'"), 1));
         }
     }
     if (((strcmp(id_cur_kind(pos), ID_S("kw")) == 0) && (strcmp(id_cur_text(pos), ID_S("stdin")) == 0))) {
@@ -15293,7 +15391,7 @@ void id_case_given(IdList* pos) {
         secs_v = id_to_int(secs_txt);
     }
     if (((has_tm == 1) && (secs_v < 1))) {
-        id_syn_err(pos, id_concat(id_concat(ID_S("timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '"), secs_txt), ID_S("'")));
+        id_syn_err(pos, id_concat_f(id_concat(ID_S("timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '"), secs_txt), ID_S("'"), 1));
     }
     if ((secs_v > 0)) {
         id_advance(pos);
@@ -15507,7 +15605,7 @@ int id_then_imp_item(IdList* pos) {
     path = ID_S("");
     while ((strcmp(id_cur_text(pos), ID_S(".")) == 0)) {
         id_advance(pos);
-        path = id_concat(id_concat(path, ID_S(".")), id_read_name(pos));
+        path = id_concat_f(id_concat(path, ID_S(".")), id_read_name(pos), 1);
     }
     id_sset(ns2, e, path);
     return e;
@@ -15697,14 +15795,14 @@ char* id_bound_inner(IdList* pos, char* bt) {
 char* id_bound_close(IdList* pos, char* bt, char* parts) {
     char* so;
     id_eat_close(pos);
-    so = id_concat(id_concat(id_concat(bt, ID_S("(")), parts), ID_S(")"));
+    so = id_concat_f(id_concat_f(id_concat(bt, ID_S("(")), parts, 1), ID_S(")"), 1);
     id_bound_check(pos, so);
     return so;
 }
 
 void id_bound_check(IdList* pos, char* so) {
     if ((id_bound_known(so) == 0)) {
-        id_syn_err(pos, id_concat(id_concat(ID_S("unknown bound '"), so), ID_S("'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2)")));
+        id_syn_err(pos, id_concat_f(id_concat(ID_S("unknown bound '"), so), ID_S("'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2)"), 1));
     }
     return;
 }
@@ -15720,9 +15818,9 @@ int id_bound_known(char* so) {
 
 void id_cons_kind(IdList* pos, char* ck) {
     if ((strcmp(id_cur_kind(pos), ID_S("ident")) != 0)) {
-        id_syn_err(pos, id_concat(id_concat(ID_S("expected 'time' or 'mem', found '"), ck), ID_S("'")));
+        id_syn_err(pos, id_concat_f(id_concat(ID_S("expected 'time' or 'mem', found '"), ck), ID_S("'"), 1));
     } else if (((strcmp(ck, ID_S("time")) != 0) && (strcmp(ck, ID_S("mem")) != 0))) {
-        id_syn_err(pos, id_concat(id_concat(ID_S("unknown constraint '"), ck), ID_S("'; a case constrains 'time' or 'mem'")));
+        id_syn_err(pos, id_concat_f(id_concat(ID_S("unknown constraint '"), ck), ID_S("'; a case constrains 'time' or 'mem'"), 1));
     }
     return;
 }
@@ -15774,7 +15872,7 @@ char* id_bound_step(IdList* pos, char* out) {
     char* t2;
     char* so;
     t2 = id_cur_text(pos);
-    so = id_concat(id_concat(out, id_bound_sep(out, t2)), t2);
+    so = id_concat_f(id_concat(out, id_bound_sep(out, t2)), t2, 1);
     id_advance(pos);
     return so;
 }
@@ -15957,7 +16055,7 @@ void id_chain_add(IdList* body, IdList* seg) {
 
 void id_non_void_export(IdList* pos, char* rt) {
     if ((((strcmp(rt, ID_S("void")) != 0) && (strcmp(id_cur_kind(pos), ID_S("kw")) == 0)) && (strcmp(id_cur_text(pos), ID_S("export")) == 0))) {
-        id_syn_err(pos, id_concat(id_concat(ID_S("only a void function can name the export it initializes: '} return "), rt), ID_S(" export NAME;' gives a value and a variable at once; drop 'export NAME' from the return clause, or make the function void")));
+        id_syn_err(pos, id_concat_f(id_concat(ID_S("only a void function can name the export it initializes: '} return "), rt), ID_S(" export NAME;' gives a value and a variable at once; drop 'export NAME' from the return clause, or make the function void"), 1));
         id_advance(pos);
         id_advance(pos);
     }
@@ -16117,7 +16215,7 @@ void id_no_fn_ret(IdList* pos, char* rb) {
 
 void id_no_void_list(IdList* pos, char* pl, char* rb, char* rt) {
     if (((strcmp(rb, ID_S("void")) == 0) && (strcmp(rt, ID_S("void")) != 0))) {
-        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'func("), pl), ID_S(") return ")), rt), ID_S("': brackets after a function type's return type belong to the return type, and ")), rt), ID_S(" is not a type; a function value cannot be an element of a list")));
+        id_syn_err(pos, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'func("), pl), ID_S(") return "), 1), rt, 1), ID_S("': brackets after a function type's return type belong to the return type, and "), 1), rt, 1), ID_S(" is not a type; a function value cannot be an element of a list"), 1));
     }
     return;
 }
@@ -16127,7 +16225,7 @@ char* id_fn_type_param(IdList* pos, char* out) {
     char* ret_s;
     pt = id_parse_type(pos);
     id_no_param_name(pos, pt);
-    ret_s = id_concat(id_concat(out, id_fn_sep(out)), pt);
+    ret_s = id_concat_f(id_concat(out, id_fn_sep(out)), pt, 1);
     return ret_s;
 }
 
@@ -16135,7 +16233,7 @@ void id_no_param_name(IdList* pos, char* pt) {
     char* nm;
     if ((strcmp(id_cur_kind(pos), ID_S("ident")) == 0)) {
         nm = id_cur_text(pos);
-        id_syn_err(pos, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("a function type lists parameter types only: write '"), pt), ID_S("', not '")), pt), ID_S(" ")), nm), ID_S("'")));
+        id_syn_err(pos, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a function type lists parameter types only: write '"), pt), ID_S("', not '"), 1), pt, 1), ID_S(" "), 1), nm, 1), ID_S("'"), 1));
         id_advance(pos);
     }
     id_skip_comma(pos);
@@ -16173,7 +16271,7 @@ char* id_fn_type_ret3(IdList* pos, char* pl, char* rb) {
     char* t;
     rt = id_parse_type(pos);
     id_no_void_list(pos, pl, rb, rt);
-    t = id_concat(id_concat(id_concat(ID_S("func("), pl), ID_S(") return ")), rt);
+    t = id_concat_f(id_concat_f(id_concat(ID_S("func("), pl), ID_S(") return "), 1), rt, 1);
     return t;
 }
 
@@ -16311,7 +16409,7 @@ char* id_unquote(char* s) {
     i = 1;
     while ((i < (id_len(s) - 1))) {
         charat_v = id_charat(s, i);
-        out = id_concat(out, id_chr(charat_v));
+        out = id_concat_f(out, id_chr(charat_v), 2);
         i = (i + 1);
     }
     return out;
@@ -16631,7 +16729,7 @@ int id_push_asm(IdList* pos) {
     int ret_i;
     cur_file_v = id_cur_file();
     cur_ln_v = id_cur_ln(pos);
-    loc = id_concat(id_concat(cur_file_v, ID_S(":")), id_str_of_int(cur_ln_v));
+    loc = id_concat_f(id_concat(cur_file_v, ID_S(":")), id_str_of_int(cur_ln_v), 3);
     id_list_push(aloc, (long long)(intptr_t)(loc));
     ret_i = id_parse_asm(pos);
     return ret_i;
@@ -16690,9 +16788,9 @@ void id_pure_misplaced(IdList* pos, char* name, char* type) {
     char* msg;
     char* why;
     char* help;
-    msg = id_concat(id_concat(id_concat(ID_S("'pure' belongs before a parameter whose type is a function type, and '"), name), ID_S("' is ")), type);
+    msg = id_concat_f(id_concat_f(id_concat(ID_S("'pure' belongs before a parameter whose type is a function type, and '"), name), ID_S("' is "), 1), type, 1);
     why = id_concat(ID_S("'pure' promises that the function a caller passes writes no export and does no I/O, which says nothing about a value of type "), type);
-    help = id_concat(id_concat(ID_S("write 'pure func(...) return ...' only for a function-typed parameter; remove 'pure' from '"), name), ID_S("', or give it a function type"));
+    help = id_concat_f(id_concat(ID_S("write 'pure func(...) return ...' only for a function-typed parameter; remove 'pure' from '"), name), ID_S("', or give it a function type"), 1);
     id_syn_diag(pos, ID_S("E0807"), msg, name, why, help);
     return;
 }
@@ -17170,7 +17268,7 @@ void id_flt_bad_exp(IdList* pos, char* text) {
     char* flhelp;
     flwhy = ID_S("an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e");
     flhelp = ID_S("write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo");
-    id_syn_diag(pos, ID_S("E0103"), id_concat(id_concat(ID_S("float literal '"), text), ID_S("' has an exponent with no digits")), text, flwhy, flhelp);
+    id_syn_diag(pos, ID_S("E0103"), id_concat_f(id_concat(ID_S("float literal '"), text), ID_S("' has an exponent with no digits"), 1), text, flwhy, flhelp);
     return;
 }
 
@@ -17179,7 +17277,7 @@ void id_flt_bad_big(IdList* pos, char* text) {
     char* flhelp;
     flwhy = ID_S("a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be");
     flhelp = ID_S("write a value no larger than 1.7976931348623157e308, or lower the exponent");
-    id_syn_diag(pos, ID_S("E0104"), id_concat(id_concat(ID_S("float literal '"), text), ID_S("' is too large: it overflows to infinity")), text, flwhy, flhelp);
+    id_syn_diag(pos, ID_S("E0104"), id_concat_f(id_concat(ID_S("float literal '"), text), ID_S("' is too large: it overflows to infinity"), 1), text, flwhy, flhelp);
     return;
 }
 
@@ -17215,7 +17313,7 @@ char* id_flt_norm(char* text) {
     flout = text;
     if (((flk < fln) && (id_str_find(text, ID_S(".")) < 0))) {
 char* idsq_13;
-        flout = (idsq_13 = id_slice(text, 0, flk), id_concat(id_concat(idsq_13, ID_S(".0")), id_slice(text, flk, fln)));
+        flout = (idsq_13 = id_slice(text, 0, flk), id_concat_f(id_concat(idsq_13, ID_S(".0")), id_slice(text, flk, fln), 1));
     }
     return flout;
 }
@@ -17533,7 +17631,7 @@ void id_no_case_word(IdList* pos) {
     char* cur_text_v;
     if ((((((((strcmp(id_cur_text(pos), ID_S("given")) == 0) || (strcmp(id_cur_text(pos), ID_S("then")) == 0)) || (strcmp(id_cur_text(pos), ID_S("prints")) == 0)) || (strcmp(id_cur_text(pos), ID_S("eprints")) == 0)) || (strcmp(id_cur_text(pos), ID_S("calls")) == 0)) || (strcmp(id_cur_text(pos), ID_S("stdin")) == 0)) || (strcmp(id_cur_text(pos), ID_S("timeout")) == 0))) {
         cur_text_v = id_cur_text(pos);
-        id_syn_err(pos, id_concat(id_concat(ID_S("'"), cur_text_v), ID_S("' is a test case keyword (see docs/TESTS.md) and cannot be used as a name")));
+        id_syn_err(pos, id_concat_f(id_concat(ID_S("'"), cur_text_v), ID_S("' is a test case keyword (see docs/TESTS.md) and cannot be used as a name"), 1));
     }
     id_no_func_word(pos);
     return;
@@ -18270,7 +18368,7 @@ void id_no_op_atom(IdList* pos) {
 
 char* id_unexpected_msg(char* t) {
     char* s;
-    s = id_concat(id_concat(ID_S("unexpected token '"), t), ID_S("'"));
+    s = id_concat_f(id_concat(ID_S("unexpected token '"), t), ID_S("'"), 1);
     if ((strcmp(t, ID_S("/*")) == 0)) {
         s = ID_S("block comments are not supported; use // for a line comment");
     }
@@ -18284,7 +18382,7 @@ char* id_unexpected_msg(char* t) {
 }
 
 void id_syn_err_tail(char* err_file, int err_line, char* msg) {
-    id_print(id_concat(id_concat(id_concat(id_concat(err_file, ID_S(":")), id_str_of_int(err_line)), ID_S(": error: ")), msg));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(err_file, ID_S(":")), id_str_of_int(err_line), 3), ID_S(": error: "), 1), msg, 1));
     id_note_failure();
     id_lset(synfail, 0, 1);
     return;
@@ -18773,7 +18871,7 @@ char* id_fwd_help(int i, char* callee_name) {
     char* ret_s;
 IdList* idsq_25;
     fname = (idsq_25 = ns1, (char*)(intptr_t)(id_list_get(idsq_25, (int)(id_list_get(prog, i)))));
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("delete '"), fname), ID_S("' and call '")), callee_name), ID_S("' directly at every site that called it; move any test cases of '")), fname), ID_S("' onto '")), callee_name), ID_S("'"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("delete '"), fname), ID_S("' and call '"), 1), callee_name, 1), ID_S("' directly at every site that called it; move any test cases of '"), 1), fname, 1), ID_S("' onto '"), 1), callee_name, 1), ID_S("'"), 1);
     return ret_s;
 }
 
@@ -18828,14 +18926,14 @@ char* id_fwd_msg(int i, char* callee_name) {
     char* ret_s;
 IdList* idsq_17;
     fname = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(prog, i)))));
-    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("function '"), fname), ID_S("' only forwards to '")), callee_name), ID_S("'"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("function '"), fname), ID_S("' only forwards to '"), 1), callee_name, 1), ID_S("'"), 1);
     return ret_s;
 }
 
 int id_fwd_used_as_value(char* name) {
     char* needle;
     int found;
-    needle = id_concat(id_concat(ID_S("fv("), name), ID_S(")"));
+    needle = id_concat_f(id_concat(ID_S("fv("), name), ID_S(")"), 1);
     found = id_fwd_used_scan(needle, 0);
     return found;
 }
@@ -19163,7 +19261,7 @@ char* id_genname_msg(int i, char* name) {
     char* ret_s;
 IdList* idsq_17;
     fname = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(prog, i)))));
-    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("parameter '"), name), ID_S("' of '")), fname), ID_S("' has a generated name"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("parameter '"), name), ID_S("' of '"), 1), fname, 1), ID_S("' has a generated name"), 1);
     return ret_s;
 }
 
@@ -19206,7 +19304,7 @@ char* id_imp_fp(int imp_id) {
     char* ret_s;
     imp_name = (char*)(intptr_t)(id_list_get(ns1, imp_id));
     imp_at = id_imp_pos(imp_name);
-    ret_s = id_concat(id_concat(ID_S("g("), id_str_of_int(imp_at)), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(ID_S("g("), id_str_of_int(imp_at), 2), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -19234,7 +19332,7 @@ char* id_seg_text(char* seg_sig, IdList* seg_cur) {
     char* ret_s;
     seg_body = id_canon_body(seg_cur);
     seg_vec = id_imp_vec();
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(seg_vec, ID_S("|")), seg_sig), ID_S("{")), seg_body), ID_S("}"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(seg_vec, ID_S("|")), seg_sig, 1), ID_S("{"), 1), seg_body, 1), ID_S("}"), 1);
     return ret_s;
 }
 
@@ -19313,7 +19411,7 @@ void id_imd_set(IdList* imd_out, int imd_slot, char* imd_fp) {
     char* imd_txt;
     imd_txt = id_imd_text(imd_fp);
 char* idsq_19;
-    id_list_set(imd_out, imd_slot, (long long)(intptr_t)((idsq_19 = (char*)(intptr_t)(id_list_get(imd_out, imd_slot)), id_concat(id_concat(id_concat(idsq_19, id_str_of_int(id_len(imd_txt))), ID_S(":")), imd_txt))));
+    id_list_set(imd_out, imd_slot, (long long)(intptr_t)((idsq_19 = (char*)(intptr_t)(id_list_get(imd_out, imd_slot)), id_concat_f(id_concat_f(id_concat_f(idsq_19, id_str_of_int(id_len(imd_txt)), 2), ID_S(":"), 1), imd_txt, 1))));
     id_list_set(imd_out, (imd_slot + 1), (long long)(intptr_t)(id_imd_head(imd_fp)));
     return;
 }
@@ -19373,7 +19471,7 @@ char* id_imd_def(char* imd_nm) {
     char* ret_s;
     imd_ln = id_func_line(imd_nm);
     imd_file = id_func_file(imd_nm);
-    ret_s = id_def_at(imd_nm, id_concat(id_concat(imd_file, ID_S(":")), id_str_of_int(imd_ln)));
+    ret_s = id_def_at(imd_nm, id_concat_f(id_concat(imd_file, ID_S(":")), id_str_of_int(imd_ln), 3));
     return ret_s;
 }
 
@@ -19467,7 +19565,7 @@ IdList* idsq_28;
 char* idsq_26;
 IdList* idsq_14;
 char* idsq_12;
-    ret_s = (idsq_28 = fixd_file, idsq_26 = (char*)(intptr_t)(id_list_get(idsq_28, 0)), idsq_14 = fixe_nm, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, i)), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("@D|"), idsq_26), ID_S("|")), where), ID_S("|")), t), ID_S(" ")), idsq_12), ID_S(" = |")), id_fix_span((int)(id_list_get(fixe_n, i)))));
+    ret_s = (idsq_28 = fixd_file, idsq_26 = (char*)(intptr_t)(id_list_get(idsq_28, 0)), idsq_14 = fixe_nm, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, i)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@D|"), idsq_26), ID_S("|"), 1), where, 1), ID_S("|"), 1), t, 1), ID_S(" "), 1), idsq_12, 1), ID_S(" = |"), 1), id_fix_span((int)(id_list_get(fixe_n, i))), 1));
     return ret_s;
 }
 
@@ -19480,7 +19578,7 @@ char* id_fix_stmt_at(int sn) {
 IdList* idsq_21;
 int idsq_19;
 int idsq_14;
-    ret_s = (idsq_21 = tline, idsq_19 = (int)(id_list_get(idsq_21, t0)), idsq_14 = id_fix_col(t0), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_str_of_int(idsq_19), ID_S("|")), id_str_of_int(idsq_14)), ID_S("|")), id_str_of_int(sq)), ID_S("|")), id_str_of_int((int)(id_list_get(tline, t0)))));
+    ret_s = (idsq_21 = tline, idsq_19 = (int)(id_list_get(idsq_21, t0)), idsq_14 = id_fix_col(t0), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_str_of_int(idsq_19), ID_S("|"), 1), id_str_of_int(idsq_14), 3), ID_S("|"), 1), id_str_of_int(sq), 3), ID_S("|"), 1), id_str_of_int((int)(id_list_get(tline, t0))), 3));
     return ret_s;
 }
 
@@ -19529,7 +19627,7 @@ char* id_fix_sub_at(int i, int j, char* out) {
 IdList* idsq_14;
 int idsq_12;
 char* idsq_11;
-        rs = (idsq_14 = fixe_n, idsq_12 = (int)(id_list_get(idsq_14, j)), idsq_11 = id_fix_span(idsq_12), id_concat(id_concat(id_concat(id_concat(out, ID_S("|")), idsq_11), ID_S("|")), (char*)(intptr_t)(id_list_get(fixe_nm, j))));
+        rs = (idsq_14 = fixe_n, idsq_12 = (int)(id_list_get(idsq_14, j)), idsq_11 = id_fix_span(idsq_12), id_concat_f(id_concat_f(id_concat_f(id_concat(out, ID_S("|")), idsq_11, 1), ID_S("|"), 1), (char*)(intptr_t)(id_list_get(fixe_nm, j)), 1));
     }
     return rs;
 }
@@ -19596,7 +19694,7 @@ char* id_fix_try(char* bstem, char* sfx, char* t) {
     nn = 1;
     while ((id_fix_free(name, t) == 0)) {
         nn = (nn + 1);
-        name = id_concat(id_concat(bstem, sfx), id_str_of_int(nn));
+        name = id_concat_f(id_concat(bstem, sfx), id_str_of_int(nn), 3);
     }
     return name;
 }
@@ -19721,7 +19819,7 @@ char* id_fix_toktext(int tok0, int tok1) {
     s = ID_S("");
     toki = tok0;
     while ((toki <= tok1)) {
-        s = id_concat(id_concat(s, ID_S("|")), (char*)(intptr_t)(id_list_get(ttext, toki)));
+        s = id_concat_f(id_concat(s, ID_S("|")), (char*)(intptr_t)(id_list_get(ttext, toki)), 1);
         toki = (toki + 1);
     }
     return s;
@@ -19781,7 +19879,7 @@ void id_fix_emit_r(int e, char* text) {
     char* spn;
     sq = id_fix_seq();
     spn = id_fix_span(e);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("@R|"), (char*)(intptr_t)(id_list_get(fixd_file, 0))), ID_S("|")), spn), ID_S("|")), id_str_of_int(sq)), ID_S("|")), text));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@R|"), (char*)(intptr_t)(id_list_get(fixd_file, 0))), ID_S("|"), 1), spn, 1), ID_S("|"), 1), id_str_of_int(sq), 3), ID_S("|"), 1), text, 1));
     return;
 }
 
@@ -19825,7 +19923,7 @@ int id_fix_seq(void) {
 void id_fix_emit_pt(char* p, char* text) {
     int sq;
     sq = id_fix_seq();
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("@R|"), (char*)(intptr_t)(id_list_get(fixd_file, 0))), ID_S("|")), p), ID_S("|")), p), ID_S("|")), id_str_of_int(sq)), ID_S("|")), text));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@R|"), (char*)(intptr_t)(id_list_get(fixd_file, 0))), ID_S("|"), 1), p, 1), ID_S("|"), 1), p, 1), ID_S("|"), 1), id_str_of_int(sq), 3), ID_S("|"), 1), text, 1));
     return;
 }
 
@@ -19863,7 +19961,7 @@ void id_fix_ret_decl(int f, int e, char* t, char* name) {
     char* spn;
     where = id_fix_ret_pos(f, e);
     spn = id_fix_span(e);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("@D|"), (char*)(intptr_t)(id_list_get(fixd_file, 0))), ID_S("|")), where), ID_S("|")), t), ID_S(" ")), name), ID_S(" = |")), spn));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@D|"), (char*)(intptr_t)(id_list_get(fixd_file, 0))), ID_S("|"), 1), where, 1), ID_S("|"), 1), t, 1), ID_S(" "), 1), name, 1), ID_S(" = |"), 1), spn, 1));
     return;
 }
 
@@ -19876,7 +19974,7 @@ char* id_fix_ret_pos(int f, int e) {
 IdList* idsq_21;
 int idsq_19;
 int idsq_14;
-    ret_s = (idsq_21 = tline, idsq_19 = (int)(id_list_get(idsq_21, cb)), idsq_14 = id_fix_col(cb), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_str_of_int(idsq_19), ID_S("|")), id_str_of_int(idsq_14)), ID_S("|")), id_str_of_int(sq)), ID_S("|")), id_str_of_int(id_fix_indent_line(f))));
+    ret_s = (idsq_21 = tline, idsq_19 = (int)(id_list_get(idsq_21, cb)), idsq_14 = id_fix_col(cb), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_str_of_int(idsq_19), ID_S("|"), 1), id_str_of_int(idsq_14), 3), ID_S("|"), 1), id_str_of_int(sq), 3), ID_S("|"), 1), id_str_of_int(id_fix_indent_line(f)), 3));
     return ret_s;
 }
 
@@ -20145,7 +20243,7 @@ char* id_fix_at(int t0) {
     char* ret_s;
 IdList* idsq_11;
 int idsq_9;
-    ret_s = (idsq_11 = tline, idsq_9 = (int)(id_list_get(idsq_11, t0)), id_concat(id_concat(id_str_of_int(idsq_9), ID_S("|")), id_str_of_int(id_fix_col(t0))));
+    ret_s = (idsq_11 = tline, idsq_9 = (int)(id_list_get(idsq_11, t0)), id_concat_f(id_concat_f(id_str_of_int(idsq_9), ID_S("|"), 1), id_str_of_int(id_fix_col(t0)), 3));
     return ret_s;
 }
 
@@ -20153,7 +20251,7 @@ char* id_fix_after(int t0) {
     char* ret_s;
 IdList* idsq_11;
 int idsq_9;
-    ret_s = (idsq_11 = tline, idsq_9 = (int)(id_list_get(idsq_11, t0)), id_concat(id_concat(id_str_of_int(idsq_9), ID_S("|")), id_str_of_int(id_fix_endc(t0))));
+    ret_s = (idsq_11 = tline, idsq_9 = (int)(id_list_get(idsq_11, t0)), id_concat_f(id_concat_f(id_str_of_int(idsq_9), ID_S("|"), 1), id_str_of_int(id_fix_endc(t0)), 3));
     return ret_s;
 }
 
@@ -20164,7 +20262,7 @@ char* id_fix_span(int e) {
     b = id_fix_nbeg(e);
     c = id_fix_nend(e);
 char* idsq_9;
-    ret_s = (idsq_9 = id_fix_at(b), id_concat(id_concat(idsq_9, ID_S("|")), id_fix_after(c)));
+    ret_s = (idsq_9 = id_fix_at(b), id_concat_f(id_concat(idsq_9, ID_S("|")), id_fix_after(c), 1));
     return ret_s;
 }
 
@@ -20401,7 +20499,7 @@ void id_fix_refuse(int last, char* why) {
     tkn = (int)(id_list_get(ntok, e));
 IdList* idsq_16;
 char* idsq_14;
-    (idsq_16 = fixd_file, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, 0)), id_print(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("@N|"), idsq_14), ID_S("|")), id_str_of_int((int)(id_list_get(tline, tkn)))), ID_S("|")), why)));
+    (idsq_16 = fixd_file, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, 0)), id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("@N|"), idsq_14), ID_S("|"), 1), id_str_of_int((int)(id_list_get(tline, tkn))), 3), ID_S("|"), 1), why, 1)));
     return;
 }
 
@@ -20609,7 +20707,7 @@ void id_fix_walk_arg(int e, int i, int cd) {
 
 void id_fix_walk_arg2(int e, int i, int a, int cd, char* nt) {
     char* an;
-    an = id_concat(id_concat((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("_a")), id_str_of_int(i));
+    an = id_concat_f(id_concat((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("_a")), id_str_of_int(i), 3);
     id_fix_walk(a, 1, cd, nt, an);
     return;
 }
@@ -21198,7 +21296,7 @@ char* id_ce4(int id) {
         i1_of_v = (int)(id_list_get(ni1, id));
 IdList* idsq_36;
 char* idsq_34;
-        out = (idsq_36 = ns1, idsq_34 = (char*)(intptr_t)(id_list_get(idsq_36, id)), id_concat(id_concat(id_concat(id_concat(ID_S("u"), idsq_34), ID_S("(")), id_canon_expr(i1_of_v)), ID_S(")")));
+        out = (idsq_36 = ns1, idsq_34 = (char*)(intptr_t)(id_list_get(idsq_36, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("u"), idsq_34), ID_S("("), 1), id_canon_expr(i1_of_v), 1), ID_S(")"), 1));
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("index")) == 0)) {
         i1_of_v2 = (int)(id_list_get(ni1, id));
@@ -21211,13 +21309,13 @@ char* idsq_34;
 char* id_ce5(int id) {
     char* out;
     IdList* l1_of_v2;
-    out = id_concat(id_concat(id_concat(ID_S("\?"), (char*)(intptr_t)(id_list_get(nkind, id))), ID_S("#")), id_str_of_int(id));
+    out = id_concat_f(id_concat_f(id_concat(ID_S("\?"), (char*)(intptr_t)(id_list_get(nkind, id))), ID_S("#"), 1), id_str_of_int(id), 3);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("call")) == 0)) {
         out = id_call_fp(id);
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("arr")) == 0)) {
         l1_of_v2 = (IdList*)(intptr_t)(id_list_get(nl1, id));
-        out = id_concat(id_concat(ID_S("ar("), id_canon_args(l1_of_v2)), ID_S(")"));
+        out = id_concat_f(id_concat(ID_S("ar("), id_canon_args(l1_of_v2)), ID_S(")"), 1);
     }
     return out;
 }
@@ -21240,7 +21338,7 @@ char* id_canon_pair(int a, int b) {
     char* ret_s;
     out = id_canon_expr(a);
     val = id_canon_expr(b);
-    ret_s = id_concat(id_concat(id_concat(id_concat(ID_S("("), out), ID_S(",")), val), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), out), ID_S(","), 1), val, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -21251,7 +21349,7 @@ char* id_canon_args(IdList* args) {
     i = 0;
     while ((i < id_list_len(args))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_at(ID_S(","), i), id_concat(id_concat(out, idsq_15), id_canon_expr((int)(id_list_get(args, i)))));
+        out = (idsq_15 = id_sep_at(ID_S(","), i), id_concat_f(id_concat(out, idsq_15), id_canon_expr((int)(id_list_get(args, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -21276,7 +21374,7 @@ char* id_canon_bin(int id) {
     ret_s = simple_s;
     if ((strcmp(simple_s, ID_S("")) == 0)) {
         pair_v = id_bin_pair(id);
-        ret_s = id_concat(id_concat(ID_S("b"), op), pair_v);
+        ret_s = id_concat_f(id_concat(ID_S("b"), op), pair_v, 1);
     }
     return ret_s;
 }
@@ -21332,7 +21430,7 @@ char* id_compute_or(int a, int b) {
     int n;
     char* ret_s;
     n = (a | b);
-    ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+    ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     return ret_s;
 }
 
@@ -21340,7 +21438,7 @@ char* id_compute_xor(int a, int b) {
     int n;
     char* ret_s;
     n = (a ^ b);
-    ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+    ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     return ret_s;
 }
 
@@ -21360,7 +21458,7 @@ char* id_compute_shr(int a, int b) {
     int n;
     char* ret_s;
     n = id_sar(a, b);
-    ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+    ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     return ret_s;
 }
 
@@ -21413,7 +21511,7 @@ char* id_compute_add(int a, int b) {
     ret_s = ID_S("");
     if ((a <= (2147483647 - b))) {
         n = (a + b);
-        ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+        ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     }
     return ret_s;
 }
@@ -21422,7 +21520,7 @@ char* id_compute_sub(int a, int b) {
     int n;
     char* ret_s;
     n = (a - b);
-    ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+    ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     return ret_s;
 }
 
@@ -21452,7 +21550,7 @@ char* id_compute_div(int a, int b) {
     ret_s = ID_S("");
     if ((b != 0)) {
         n = id_idiv(a, b);
-        ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+        ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     }
     return ret_s;
 }
@@ -21475,7 +21573,7 @@ char* id_compute_mod(int a, int b) {
     ret_s = ID_S("");
     if ((b != 0)) {
         n = id_imod(a, b);
-        ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+        ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     }
     return ret_s;
 }
@@ -21484,7 +21582,7 @@ char* id_compute_and(int a, int b) {
     int n;
     char* ret_s;
     n = (a & b);
-    ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+    ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     return ret_s;
 }
 
@@ -21507,7 +21605,7 @@ char* id_fold_word(long long wv) {
     ret_s = ID_S("");
     if ((wv <= 2147483647)) {
         n = wv;
-        ret_s = id_concat(ID_S("I"), id_str_of_int(n));
+        ret_s = id_concat_f(ID_S("I"), id_str_of_int(n), 2);
     }
     return ret_s;
 }
@@ -21519,7 +21617,7 @@ char* id_call_fp(int id) {
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
 char* idsq_39;
-    ret_s = (idsq_39 = id_canon_callee(s1_of_v), id_concat(id_concat(id_concat(id_concat(ID_S("c("), idsq_39), ID_S(":")), id_canon_args(l1_of_v)), ID_S(")")));
+    ret_s = (idsq_39 = id_canon_callee(s1_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("c("), idsq_39), ID_S(":"), 1), id_canon_args(l1_of_v), 1), ID_S(")"), 1));
     if ((((strcmp(s1_of_v, ID_S("ushr")) == 0) && (id_list_len(l1_of_v) == 2)) && (id_lit_is((int)(id_list_get(l1_of_v, 1)), 0) == 1))) {
         ret_s = id_canon_expr((int)(id_list_get(l1_of_v, 0)));
     }
@@ -21596,7 +21694,7 @@ char* id_canon_params(IdList* params) {
     i = 0;
     while ((i < id_list_len(params))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_at(ID_S(","), i), id_concat(id_concat(out, idsq_15), id_canon_param((int)(id_list_get(params, i)))));
+        out = (idsq_15 = id_sep_at(ID_S(","), i), id_concat_f(id_concat(out, idsq_15), id_canon_param((int)(id_list_get(params, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -21608,7 +21706,7 @@ char* id_canon_param(int id) {
     char* ret_s;
     s2_of_v = (char*)(intptr_t)(id_list_get(ns2, id));
     out = id_cn(s2_of_v);
-    ret_s = id_concat(id_concat((char*)(intptr_t)(id_list_get(ns1, id)), ID_S(" ")), out);
+    ret_s = id_concat_f(id_concat((char*)(intptr_t)(id_list_get(ns1, id)), ID_S(" ")), out, 1);
     return ret_s;
 }
 
@@ -21616,7 +21714,7 @@ char* id_canon_native(int id, char* out) {
     char* ret_s;
 IdList* idsq_12;
 char* idsq_10;
-    ret_s = (idsq_12 = ns2, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("("), out), ID_S(")->")), idsq_10), ID_S(" native ")), (char*)(intptr_t)(id_list_get(ns1, id))));
+    ret_s = (idsq_12 = ns2, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), out), ID_S(")->"), 1), idsq_10, 1), ID_S(" native "), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1));
     return ret_s;
 }
 
@@ -21649,7 +21747,7 @@ char* id_canon_logic(int id, char* out) {
     val = id_canon_body(l2_of_v);
 IdList* idsq_16;
 char* idsq_14;
-    ret_s = (idsq_16 = ns2, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, id)), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("("), out), ID_S(")->")), idsq_14), ID_S("{")), val), ID_S("}=>")), id_canon_ret(id)));
+    ret_s = (idsq_16 = ns2, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), out), ID_S(")->"), 1), idsq_14, 1), ID_S("{"), 1), val, 1), ID_S("}=>"), 1), id_canon_ret(id), 1));
     return ret_s;
 }
 
@@ -21677,11 +21775,11 @@ void id_segs_walk(int id, char* sigtext, IdList* segs_out) {
 
 char* id_cst_flow(int id) {
     char* out;
-    out = id_concat(id_concat(id_concat(ID_S("\?"), (char*)(intptr_t)(id_list_get(nkind, id))), ID_S("#")), id_str_of_int(id));
+    out = id_concat_f(id_concat_f(id_concat(ID_S("\?"), (char*)(intptr_t)(id_list_get(nkind, id))), ID_S("#"), 1), id_str_of_int(id), 3);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("break")) == 0)) {
         out = ID_S("brk");
     } else if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("ret")) == 0)) {
-        out = id_concat(id_concat(ID_S("ret("), id_canon_ret(id)), ID_S(")"));
+        out = id_concat_f(id_concat(ID_S("ret("), id_canon_ret(id)), ID_S(")"), 1);
     }
     return out;
 }
@@ -21719,7 +21817,7 @@ char* id_segs_sig2(int id) {
     sigparams = id_canon_params(params);
 IdList* idsq_12;
 char* idsq_10;
-    ret_s = (idsq_12 = ns2, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("("), sigparams), ID_S(")->")), idsq_10), ID_S("=>")), id_canon_ret(id)));
+    ret_s = (idsq_12 = ns2, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), sigparams), ID_S(")->"), 1), idsq_10, 1), ID_S("=>"), 1), id_canon_ret(id), 1));
     return ret_s;
 }
 
@@ -21761,7 +21859,7 @@ char* id_cn(char* name) {
     if ((idx < 0)) {
         idx = id_cn_add(name);
     }
-    ret_s = id_concat(ID_S(""), id_str_of_int(idx));
+    ret_s = id_concat_f(ID_S(""), id_str_of_int(idx), 2);
     return ret_s;
 }
 
@@ -21776,7 +21874,7 @@ char* id_canon_var(int id) {
     char* name;
     char* out;
     name = (char*)(intptr_t)(id_list_get(ns1, id));
-    out = id_concat(id_concat(ID_S("fv("), id_canon_callee(name)), ID_S(")"));
+    out = id_concat_f(id_concat(ID_S("fv("), id_canon_callee(name)), ID_S(")"), 1);
     if ((id_is_fn_value(id) == 0)) {
         out = id_concat(ID_S("v"), id_cn(name));
     }
@@ -21816,7 +21914,7 @@ char* id_canon_else3(IdList* els) {
     char* out;
     out = ID_S("");
     if ((id_list_len(els) > 0)) {
-        out = id_concat(id_concat(ID_S("else{"), id_canon_body(els)), ID_S("}"));
+        out = id_concat_f(id_concat(ID_S("else{"), id_canon_body(els)), ID_S("}"), 1);
     }
     return out;
 }
@@ -21841,7 +21939,7 @@ char* id_canon_stmt(int id) {
         s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
         i1_of_v = (int)(id_list_get(ni1, id));
 char* idsq_11;
-        out = (idsq_11 = id_cn(s1_of_v), id_concat(id_concat(id_concat(ID_S("a:"), idsq_11), ID_S("=")), id_canon_expr(i1_of_v)));
+        out = (idsq_11 = id_cn(s1_of_v), id_concat_f(id_concat_f(id_concat(ID_S("a:"), idsq_11), ID_S("="), 1), id_canon_expr(i1_of_v), 1));
     }
     return out;
 }
@@ -21872,7 +21970,7 @@ char* id_cst3(int id) {
         i1_of_v2 = (int)(id_list_get(ni1, id));
         l1_of_v2 = (IdList*)(intptr_t)(id_list_get(nl1, id));
 char* idsq_13;
-        out = (idsq_13 = id_canon_expr(i1_of_v2), id_concat(id_concat(id_concat(id_concat(ID_S("wh("), idsq_13), ID_S("){")), id_canon_body(l1_of_v2)), ID_S("}")));
+        out = (idsq_13 = id_canon_expr(i1_of_v2), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("wh("), idsq_13), ID_S("){"), 1), id_canon_body(l1_of_v2), 1), ID_S("}"), 1));
     }
     return out;
 }
@@ -21887,7 +21985,7 @@ char* id_canon_decl(int id) {
     i1_of_v = (int)(id_list_get(ni1, id));
 IdList* idsq_17;
 char* idsq_15;
-    ret_s = (idsq_17 = ns1, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, id)), id_concat(id_concat(id_concat(id_concat(id_concat(out, idsq_15), ID_S(" ")), nm), ID_S("=")), id_canon_expr(i1_of_v)));
+    ret_s = (idsq_17 = ns1, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(out, idsq_15), ID_S(" "), 1), nm, 1), ID_S("="), 1), id_canon_expr(i1_of_v), 1));
     return ret_s;
 }
 
@@ -21947,7 +22045,7 @@ char* id_canon_join(IdList* stmts) {
     i = 0;
     while ((i < id_list_len(stmts))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_at(ID_S(";"), i), id_concat(id_concat(out, idsq_15), id_canon_stmt((int)(id_list_get(stmts, i)))));
+        out = (idsq_15 = id_sep_at(ID_S(";"), i), id_concat_f(id_concat(out, idsq_15), id_canon_stmt((int)(id_list_get(stmts, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -21978,7 +22076,7 @@ char* id_iassign_val(int id, char* head, char* key) {
     char* ret_s;
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
     val = id_canon_expr((int)(id_list_get(l1_of_v, 0)));
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("ia:"), head), ID_S("[")), key), ID_S("]=")), val);
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("ia:"), head), ID_S("["), 1), key, 1), ID_S("]="), 1), val, 1);
     return ret_s;
 }
 
@@ -21994,7 +22092,7 @@ char* id_cst_if(int id) {
     i2_of_v = (int)(id_list_get(ni2, id));
 char* idsq_18;
 char* idsq_12;
-    out = (idsq_18 = id_canon_expr(i1_of_v), idsq_12 = id_canon_body(l1_of_v), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("if("), idsq_18), ID_S("){")), idsq_12), ID_S("}")), id_canon_else2(l2_of_v, i2_of_v)));
+    out = (idsq_18 = id_canon_expr(i1_of_v), idsq_12 = id_canon_body(l1_of_v), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("if("), idsq_18), ID_S("){"), 1), idsq_12, 1), ID_S("}"), 1), id_canon_else2(l2_of_v, i2_of_v), 1));
     return out;
 }
 
@@ -22390,7 +22488,7 @@ int idsq_34;
     (idsq_36 = casestart, idsq_34 = (int)(id_list_get(idsq_36, dgc)), id_dg_case_toks(dgacc, idsq_34, (int)(id_list_get(caseend, dgc))));
     dgs = ID_S("-");
     if ((((long long)(id_list_get(dgacc, 1)) & 1) == 0)) {
-        dgs = id_concat(ID_S(""), id_str_of_word((long long)(id_list_get(dgacc, 0))));
+        dgs = id_concat_f(ID_S(""), id_str_of_word((long long)(id_list_get(dgacc, 0))), 2);
         if (((long long)(id_list_get(dgacc, 1)) == 2)) {
             dgs = id_concat(dgs, ID_S(" f"));
         }
@@ -22482,7 +22580,7 @@ void id_dg_emit_keys(void) {
 void id_dg_emit_key(int dgc) {
     char* dgkey;
     dgkey = id_dg_case_key(dgc);
-    id_emit_line(id_concat(id_concat(id_concat(ID_S("// idtc key "), id_str_of_int(dgc)), ID_S(" ")), dgkey));
+    id_emit_line(id_concat_f(id_concat_f(id_concat_f(ID_S("// idtc key "), id_str_of_int(dgc), 2), ID_S(" "), 1), dgkey, 1));
     return;
 }
 
@@ -22665,7 +22763,7 @@ char* id_fp_line(char* name, char* fp) {
     char* ret_s;
     tab = id_chr(9);
 char* idsq_10;
-    ret_s = (idsq_10 = id_func_file(name), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(fp, tab), name), tab), idsq_10), ID_S(":")), id_str_of_int(id_func_line(name))));
+    ret_s = (idsq_10 = id_func_file(name), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(fp, tab), name, 1), tab, 1), idsq_10, 1), ID_S(":"), 1), id_str_of_int(id_func_line(name)), 3));
     return ret_s;
 }
 
@@ -22725,7 +22823,7 @@ IdList* idsq_62;
     }
     if ((id_str_starts(s1_of_v, ID_S("idsq_")) == 1)) {
         prog_loc_v = id_prog_loc(i);
-        id_var_report(id_concat(id_concat(id_concat(prog_loc_v, ID_S("names beginning 'idsq_' are reserved for the C target's temporaries; rename '")), s1_of_v), ID_S("'")));
+        id_var_report(id_concat_f(id_concat_f(id_concat(prog_loc_v, ID_S("names beginning 'idsq_' are reserved for the C target's temporaries; rename '")), s1_of_v, 1), ID_S("'"), 1));
     }
     return;
 }
@@ -22738,8 +22836,8 @@ void id_dupfn_err(int i, int j) {
     dupfn_first = id_diag_prog_loc(j);
 IdList* idsq_33;
     dupfn_name = (idsq_33 = ns1, (char*)(intptr_t)(id_list_get(idsq_33, (int)(id_list_get(prog, i)))));
-    id_diag(ID_S("E0401"), dupfn_where, id_concat(id_concat(id_concat(ID_S("function '"), dupfn_name), ID_S("' already defined at ")), dupfn_first), dupfn_name, ID_S("a function is called by its name alone, so a name can mean only one function"), ID_S("rename this function so each name is its own; if the two do the same thing, keep one and call it from both places"));
-    id_diag_related(dupfn_first, id_concat(id_concat(ID_S("the first definition of '"), dupfn_name), ID_S("'")));
+    id_diag(ID_S("E0401"), dupfn_where, id_concat_f(id_concat_f(id_concat(ID_S("function '"), dupfn_name), ID_S("' already defined at "), 1), dupfn_first, 1), dupfn_name, ID_S("a function is called by its name alone, so a name can mean only one function"), ID_S("rename this function so each name is its own; if the two do the same thing, keep one and call it from both places"));
+    id_diag_related(dupfn_first, id_concat_f(id_concat(ID_S("the first definition of '"), dupfn_name), ID_S("'"), 1));
     return;
 }
 
@@ -22810,7 +22908,7 @@ void id_cw_say(char* name, char* rt, char* lit) {
     char* cw_where;
     char* cw_msg;
     cw_where = id_dup_loc(name);
-    cw_msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), name), ID_S("' only returns the constant ")), lit), ID_S("; declare it in conf.id as '")), rt), ID_S(" ")), name), ID_S(" = ")), lit), ID_S(";' and read it with (import ")), name), ID_S(")"));
+    cw_msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), name), ID_S("' only returns the constant "), 1), lit, 1), ID_S("; declare it in conf.id as '"), 1), rt, 1), ID_S(" "), 1), name, 1), ID_S(" = "), 1), lit, 1), ID_S(";' and read it with (import "), 1), name, 1), ID_S(")"), 1);
     id_diag(ID_S("E0403"), cw_where, cw_msg, name, ID_S("a value that never changes is a constant, and a constant belongs in conf.id where every reader finds it, not behind a function every caller has to open (docs/SPEC.md, section 7.2)"), ID_S(""));
     return;
 }
@@ -22937,7 +23035,7 @@ void id_report_dup(int i, int j) {
     tail_v = id_dup_tail(j);
     dup_there = id_dup_loc_of(j);
 char* idsq_10;
-    (idsq_10 = dupd_why, id_diag(ID_S("E0402"), dup_where, id_concat(id_concat(id_concat(ID_S("function '"), name_i), ID_S("' has the same signature and logic as ")), tail_v), name_i, idsq_10, dupd_help));
+    (idsq_10 = dupd_why, id_diag(ID_S("E0402"), dup_where, id_concat_f(id_concat_f(id_concat(ID_S("function '"), name_i), ID_S("' has the same signature and logic as "), 1), tail_v, 1), name_i, idsq_10, dupd_help));
     id_diag_related(dup_there, ID_S("the function this one repeats"));
     return;
 }
@@ -22967,7 +23065,7 @@ char* id_dup_tail(int j) {
     name_j = id_fname_at(j);
     func_file_v = id_func_file(name_j);
     func_line_v2 = id_func_line(name_j);
-    ret_s = id_def_at(name_j, id_concat(id_concat(func_file_v, ID_S(":")), id_str_of_int(func_line_v2)));
+    ret_s = id_def_at(name_j, id_concat_f(id_concat(func_file_v, ID_S(":")), id_str_of_int(func_line_v2), 3));
     return ret_s;
 }
 
@@ -23025,7 +23123,7 @@ char* id_cw_arr_spell(int id) {
     IdList* els;
     char* out;
     els = (IdList*)(intptr_t)(id_list_get(nl1, id));
-    out = id_concat(id_concat(ID_S("["), id_cw_arr_spell_items(els)), ID_S("]"));
+    out = id_concat_f(id_concat(ID_S("["), id_cw_arr_spell_items(els)), ID_S("]"), 1);
     return out;
 }
 
@@ -23036,7 +23134,7 @@ char* id_cw_arr_spell_items(IdList* els) {
     i = 0;
     while ((i < id_list_len(els))) {
 char* idsq_15;
-        out = (idsq_15 = id_sep_at(ID_S(", "), i), id_concat(id_concat(out, idsq_15), id_cw_elem_spell((int)(id_list_get(els, i)))));
+        out = (idsq_15 = id_sep_at(ID_S(", "), i), id_concat_f(id_concat(out, idsq_15), id_cw_elem_spell((int)(id_list_get(els, i))), 1));
         i = (i + 1);
     }
     return out;
@@ -23048,7 +23146,7 @@ char* id_cw_elem_spell(int e) {
     k = (char*)(intptr_t)(id_list_get(nkind, e));
     out = (char*)(intptr_t)(id_list_get(ns1, e));
     if ((strcmp(k, ID_S("str")) == 0)) {
-        out = id_concat(id_concat(ID_S("\""), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S("\""));
+        out = id_concat_f(id_concat(ID_S("\""), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S("\""), 1);
     }
     return out;
 }
@@ -23068,7 +23166,7 @@ void id_resv_err(int i) {
     prog_loc_v = id_prog_loc(i);
 IdList* idsq_25;
     s1_of_v = (idsq_25 = ns1, (char*)(intptr_t)(id_list_get(idsq_25, (int)(id_list_get(prog, i)))));
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(prog_loc_v, ID_S("function '")), s1_of_v), ID_S("' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_")), s1_of_v), ID_S("'. Choose another name")));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(prog_loc_v, ID_S("function '")), s1_of_v, 1), ID_S("' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_"), 1), s1_of_v, 1), ID_S("'. Choose another name"), 1));
     id_note_failure();
     return;
 }
@@ -23200,7 +23298,7 @@ void id_dupexp_err(int id, char* owner) {
     loc_at_v = id_loc_at(owner, (int)(id_list_get(nline, id)));
     s2_of_v = (char*)(intptr_t)(id_list_get(ns2, id));
     export_owner_v = id_export_owner(s2_of_v);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("'")), s2_of_v), ID_S("' is already an exported global (exported by '")), export_owner_v), ID_S("')")));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(loc_at_v, ID_S("'")), s2_of_v, 1), ID_S("' is already an exported global (exported by '"), 1), export_owner_v, 1), ID_S("')"), 1));
     id_note_failure();
     return;
 }
@@ -23210,7 +23308,7 @@ void id_retexp_err(int id, char* nm) {
     char* re_loc;
     re_fn = (char*)(intptr_t)(id_list_get(ns1, id));
     re_loc = id_loc_at(re_fn, id_func_line(re_fn));
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(re_loc, ID_S("'")), nm), ID_S("' is named by the return clause of '")), re_fn), ID_S("' (return void export ")), nm), ID_S("), but '")), re_fn), ID_S("' does not export it in its own body; add 'export TYPE ")), nm), ID_S(" = VALUE;' to '")), re_fn), ID_S("', or drop 'export ")), nm), ID_S("' from its return clause")));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(re_loc, ID_S("'")), nm, 1), ID_S("' is named by the return clause of '"), 1), re_fn, 1), ID_S("' (return void export "), 1), nm, 1), ID_S("), but '"), 1), re_fn, 1), ID_S("' does not export it in its own body; add 'export TYPE "), 1), nm, 1), ID_S(" = VALUE;' to '"), 1), re_fn, 1), ID_S("', or drop 'export "), 1), nm, 1), ID_S("' from its return clause"), 1));
     id_note_failure();
     return;
 }
@@ -23277,7 +23375,7 @@ char* id_builtin_list(void) {
     s = (char*)(intptr_t)(id_list_get(bnames, 0));
     i = 1;
     while ((i < id_list_len(bnames))) {
-        s = id_concat(id_concat(s, ID_S(", ")), (char*)(intptr_t)(id_list_get(bnames, i)));
+        s = id_concat_f(id_concat(s, ID_S(", ")), (char*)(intptr_t)(id_list_get(bnames, i)), 1);
         i = (i + 1);
     }
     return s;
@@ -23317,8 +23415,8 @@ void id_report_nosuchfn(char* name, char* owner, int ln) {
     char* nofn_help;
     nofn_where = id_diag_fn_loc(owner, ln);
     builtin_list_v = id_builtin_list();
-    nofn_help = id_concat(id_concat(id_concat(id_concat(ID_S("check the spelling of '"), name), ID_S("', or define it as a function; the builtins are: ")), builtin_list_v), ID_S("; a function of the standard library is found only when idstd is (--std DIR or $IDSTD_HOME), and idstd/NAMES.md lists them"));
-    id_diag(ID_S("E0304"), nofn_where, id_concat(id_concat(ID_S("no such function '"), name), ID_S("'")), name, ID_S("a call names a function this program defines, a builtin, or a function of the standard library, and nothing by this name is any of them"), nofn_help);
+    nofn_help = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("check the spelling of '"), name), ID_S("', or define it as a function; the builtins are: "), 1), builtin_list_v, 1), ID_S("; a function of the standard library is found only when idstd is (--std DIR or $IDSTD_HOME), and idstd/NAMES.md lists them"), 1);
+    id_diag(ID_S("E0304"), nofn_where, id_concat_f(id_concat(ID_S("no such function '"), name), ID_S("'"), 1), name, ID_S("a call names a function this program defines, a builtin, or a function of the standard library, and nothing by this name is any of them"), nofn_help);
     return;
 }
 
@@ -23480,7 +23578,7 @@ void id_dead_err(int id) {
     char* export_owner_v;
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     export_owner_v = id_export_owner(s1_of_v);
-    id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), s1_of_v), ID_S("' is exported by '")), export_owner_v), ID_S("', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call '")), export_owner_v), ID_S("' from main's setup chain")));
+    id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), s1_of_v), ID_S("' is exported by '"), 1), export_owner_v, 1), ID_S("', which nothing calls -- an export is initialised when its declaring function runs, so this reads an uninitialised global. Call '"), 1), export_owner_v, 1), ID_S("' from main's setup chain"), 1));
     return;
 }
 
@@ -23650,7 +23748,7 @@ void id_ret_shape_err(int id, int e) {
     char* shape_word_v;
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     shape_word_v = id_shape_word(e);
-    id_tc_err(e, id_concat(id_concat(id_concat(id_concat(ID_S("the return clause of '"), s1_of_v), ID_S("' is ")), shape_word_v), ID_S("; it must be a name or a literal -- name the value in the body and return the name")));
+    id_tc_err(e, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("the return clause of '"), s1_of_v), ID_S("' is "), 1), shape_word_v, 1), ID_S("; it must be a name or a literal -- name the value in the body and return the name"), 1));
     return;
 }
 
@@ -23699,7 +23797,7 @@ int id_chk_flat_at(int id, int i) {
     a = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), i));
     if ((id_has_call(a) > 1)) {
         s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(a, id_concat(id_concat(id_concat(id_concat(ID_S("argument "), id_str_of_int(i)), ID_S(" of '")), s1_of_v), ID_S("' has a call nested inside a call; an argument may hold one level of call, not two -- name the inner call's result and pass the name")));
+        id_tc_err(a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("argument "), id_str_of_int(i), 2), ID_S(" of '"), 1), s1_of_v, 1), ID_S("' has a call nested inside a call; an argument may hold one level of call, not two -- name the inner call's result and pass the name"), 1));
     }
     ret_i = (i + 1);
     return ret_i;
@@ -23758,7 +23856,7 @@ void id_report_actions(char* fname, int n, int ln) {
     char* at_where;
     char* at_msg;
     at_where = id_diag_fn_loc(fname, ln);
-    at_msg = id_concat(id_concat(id_concat(id_concat(ID_S("a block in '"), fname), ID_S("' performs ")), id_str_of_int(n)), ID_S(" actions; the limit is 3 (each statement, if, else, and while is one action; return is free)"));
+    at_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a block in '"), fname), ID_S("' performs "), 1), id_str_of_int(n), 3), ID_S(" actions; the limit is 3 (each statement, if, else, and while is one action; return is free)"), 1);
     id_diag(ID_S("E0201"), at_where, at_msg, ID_S(""), ID_S("a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does"), ID_S("continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function"));
     return;
 }
@@ -23767,7 +23865,7 @@ void id_report_deep(char* fname, int depth, int ln) {
     char* deep_where;
     char* deep_msg;
     deep_where = id_diag_fn_loc(fname, ln);
-    deep_msg = id_concat(id_concat(id_concat(id_concat(ID_S("code in '"), fname), ID_S("' is nested too deeply (")), id_str_of_int(depth)), ID_S(" levels); the maximum is 2"));
+    deep_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("code in '"), fname), ID_S("' is nested too deeply ("), 1), id_str_of_int(depth), 3), ID_S(" levels); the maximum is 2"), 1);
     id_diag(ID_S("E0202"), deep_where, deep_msg, ID_S(""), ID_S("three open conditions or loops at once is more than a reader can hold in mind, so the language caps nesting at two levels"), ID_S("move the innermost block into its own function and call it from here; the new function gets its own two levels and its own test cases"));
     return;
 }
@@ -23827,8 +23925,8 @@ int id_first_of_file(int i) {
 void id_report_funcs(char* name, int n) {
     char* funcs_msg;
     char* funcs_help;
-    funcs_msg = id_concat(id_concat(ID_S("too many functions in this file ("), id_str_of_int(n)), ID_S("); the limit is 3 per file"));
-    funcs_help = id_concat(id_concat(ID_S("move "), id_str_of_int((n - 3))), ID_S(" of its functions into another file in the same directory, named for what those functions do"));
+    funcs_msg = id_concat_f(id_concat_f(ID_S("too many functions in this file ("), id_str_of_int(n), 2), ID_S("); the limit is 3 per file"), 1);
+    funcs_help = id_concat_f(id_concat_f(ID_S("move "), id_str_of_int((n - 3)), 2), ID_S(" of its functions into another file in the same directory, named for what those functions do"), 1);
     id_diag(ID_S("E0203"), id_concat(name, ID_S(":1")), funcs_msg, ID_S(""), ID_S("a file holds at most three functions so that the tree, not the file, carries the structure, and no file grows into a place where unrelated code gathers (docs/PROJECT.md)"), funcs_help);
     return;
 }
@@ -23859,7 +23957,7 @@ char* id_prog_loc(int i) {
     char* ret_s;
 IdList* idsq_13;
 char* idsq_11;
-    ret_s = (idsq_13 = pfile, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, i)), id_concat(id_concat(id_concat(idsq_11, ID_S(":")), id_str_of_int((int)(id_list_get(pline, i)))), ID_S(": error: ")));
+    ret_s = (idsq_13 = pfile, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, i)), id_concat_f(id_concat_f(id_concat(idsq_11, ID_S(":")), id_str_of_int((int)(id_list_get(pline, i))), 3), ID_S(": error: "), 1));
     return ret_s;
 }
 
@@ -23911,13 +24009,13 @@ char* id_asm_case_row(int i) {
     char* loc;
     char* ret_s;
     loc = (char*)(intptr_t)(id_list_get(aloc, i));
-    ret_s = id_concat(id_concat(id_concat((char*)(intptr_t)(id_list_get(afname, i)), ID_S("|")), loc), ID_S("|0"));
+    ret_s = id_concat_f(id_concat_f(id_concat((char*)(intptr_t)(id_list_get(afname, i)), ID_S("|")), loc, 1), ID_S("|0"), 1);
     return ret_s;
 }
 
 char* id_loc_at(char* fname, int ln) {
     char* ret_s;
-    ret_s = id_concat(id_concat(id_concat(id_func_file(fname), ID_S(":")), id_str_of_int(ln)), ID_S(": error: "));
+    ret_s = id_concat_f(id_concat_f(id_concat(id_func_file(fname), ID_S(":")), id_str_of_int(ln), 3), ID_S(": error: "), 1);
     return ret_s;
 }
 
@@ -23925,7 +24023,7 @@ void id_report_short_seg(char* fname, int n, int ln) {
     char* seg_where;
     char* seg_msg;
     seg_where = id_diag_fn_loc(fname, ln);
-    seg_msg = id_concat(id_concat(id_concat(id_concat(ID_S("a segment of '"), fname), ID_S("' performs ")), id_str_of_int(n)), ID_S(" actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions"));
+    seg_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a segment of '"), fname), ID_S("' performs "), 1), id_str_of_int(n), 3), ID_S(" actions and is then continued by a chain; a chain may only follow a segment that used all 3 actions"), 1);
     id_diag(ID_S("E0204"), seg_where, seg_msg, ID_S(""), ID_S("a function has one way to continue past the action limit, so a chain is only for a segment that has run out of room (docs/SPEC.md, section 9)"), ID_S("move the chain's work into this segment instead: a segment that still has room should keep writing rather than starting a new one"));
     return;
 }
@@ -24096,7 +24194,7 @@ void id_check_blank_use(char* fname, int ln, IdList* acc, int at_seam, int nxt) 
 int idsq_25;
     if ((((int)(id_list_get(acc, 1)) > 0) && ((at_seam == 0) || (idsq_25 = (int)(id_list_get(acc, 0)), (nxt <= ((3 - idsq_25) + (int)(id_list_get(acc, 1)))))))) {
         loc_at_v = id_loc_at(fname, ln);
-        id_var_report(id_concat(id_concat(id_concat(loc_at_v, ID_S("a `blank` in '")), fname), ID_S("' fills an action slot that had no need of it; `blank` is only allowed to pad a segment up to 3 actions when a chain follows and the chain's first statement is too large to move up into the segment")));
+        id_var_report(id_concat_f(id_concat_f(id_concat(loc_at_v, ID_S("a `blank` in '")), fname, 1), ID_S("' fills an action slot that had no need of it; `blank` is only allowed to pad a segment up to 3 actions when a chain follows and the chain's first statement is too large to move up into the segment"), 1));
     }
     return;
 }
@@ -24215,9 +24313,9 @@ void id_fit_fn(int i, int e, char* want) {
     nm = (char*)(intptr_t)(id_list_get(ns1, e));
     ft = id_fn_sig_of(nm);
     if ((strcmp(ft, ID_S("")) == 0)) {
-        id_case_err(i, id_concat(id_concat(ID_S("a test case takes literals only (a number, a string, or a list of those); '"), nm), ID_S("' is not a function in this build, which is the only name a case may pass")));
+        id_case_err(i, id_concat_f(id_concat(ID_S("a test case takes literals only (a number, a string, or a list of those); '"), nm), ID_S("' is not a function in this build, which is the only name a case may pass"), 1));
     } else if ((strcmp(ft, want) != 0)) {
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case gives '"), nm), ID_S("', a ")), ft), ID_S(", where a ")), want), ID_S(" is required")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives '"), nm), ID_S("', a "), 1), ft, 1), ID_S(", where a "), 1), want, 1), ID_S(" is required"), 1));
     }
     return;
 }
@@ -24237,9 +24335,9 @@ void id_fit_import(int i, int e, char* want) {
     imp_nm = (char*)(intptr_t)(id_list_get(ns1, e));
     ek = id_find_str(enames, imp_nm);
     if ((strcmp((char*)(intptr_t)(id_list_get(casegiven, i)), ID_S("")) == 0)) {
-        id_case_err(i, id_concat(id_concat(ID_S("(import "), imp_nm), ID_S(") needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it")));
+        id_case_err(i, id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(") needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it"), 1));
     } else if ((ek < 0)) {
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(ID_S("(import "), imp_nm), ID_S("): '")), imp_nm), ID_S("' is not an exported variable")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S("): '"), 1), imp_nm, 1), ID_S("' is not an exported variable"), 1));
     } else {
         id_imp_owner(i, imp_nm, ek, want);
     }
@@ -24248,13 +24346,13 @@ void id_fit_import(int i, int e, char* want) {
 
 void id_imp_owner(int i, char* imp_nm, int ek, char* want) {
     if ((strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), ID_S("conf.id")) == 0)) {
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(ID_S("(import "), imp_nm), ID_S(") is a conf.id constant, and a case names one only as a then check's index, as in then (import tbl)[(import ")), imp_nm), ID_S(")]:(value); write its value here as a literal")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(") is a conf.id constant, and a case names one only as a then check's index, as in then (import tbl)[(import "), 1), imp_nm, 1), ID_S(")]:(value); write its value here as a literal"), 1));
     } else if ((id_setups_miss((char*)(intptr_t)(id_list_get(casegiven, i)), ek) == 1)) {
 IdList* idsq_43;
 char* idsq_41;
-        (idsq_43 = eowners, idsq_41 = (char*)(intptr_t)(id_list_get(idsq_43, ek)), id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(import "), imp_nm), ID_S("): '")), imp_nm), ID_S("' is exported by '")), idsq_41), ID_S("', which the setup '")), id_str_trim((char*)(intptr_t)(id_list_get(casegiven, i)))), ID_S("' does not reach, so nothing sets it before the call"))));
+        (idsq_43 = eowners, idsq_41 = (char*)(intptr_t)(id_list_get(idsq_43, ek)), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S("): '"), 1), imp_nm, 1), ID_S("' is exported by '"), 1), idsq_41, 1), ID_S("', which the setup '"), 1), id_str_trim((char*)(intptr_t)(id_list_get(casegiven, i))), 1), ID_S("' does not reach, so nothing sets it before the call"), 1)));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(etypes, ek)), want) != 0)) {
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case gives (import "), imp_nm), ID_S("), a ")), (char*)(intptr_t)(id_list_get(etypes, ek))), ID_S(", where a ")), want), ID_S(" is required")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives (import "), imp_nm), ID_S("), a "), 1), (char*)(intptr_t)(id_list_get(etypes, ek)), 1), ID_S(", where a "), 1), want, 1), ID_S(" is required"), 1));
     }
     return;
 }
@@ -24415,7 +24513,7 @@ int idsq_52;
     if ((idsq_52 = id_list_len(items), (idsq_52 != id_list_len((IdList*)(intptr_t)(id_list_get(nl1, sfn)))))) {
         nm = (char*)(intptr_t)(id_list_get(ns1, sfn));
         np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, sfn)));
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'given' names '"), nm), ID_S("', which takes ")), id_str_of_int(np)), ID_S(" parameter(s), but this 'given' passes ")), id_str_of_int(id_list_len(items))), ID_S("; a setup is called with one literal per parameter, as in 'given ")), nm), ID_S("(1, 2)', and with none as 'given ")), nm), ID_S("'")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'given' names '"), nm), ID_S("', which takes "), 1), id_str_of_int(np), 3), ID_S(" parameter(s), but this 'given' passes "), 1), id_str_of_int(id_list_len(items)), 3), ID_S("; a setup is called with one literal per parameter, as in 'given "), 1), nm, 1), ID_S("(1, 2)', and with none as 'given "), 1), nm, 1), ID_S("'"), 1));
     } else {
         id_given_fit(i, si, sfn, items);
     }
@@ -24429,7 +24527,7 @@ IdList* idsq_54;
 IdList* idsq_46;
     if ((idsq_46 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_46, (int)(id_list_get(items, j)))), ID_S("cfn")) == 0))) {
 IdList* idsq_36;
-        (idsq_36 = ns1, id_case_err(i, id_concat(id_concat(ID_S("a setup's arguments are literals or (import NAME); '"), (char*)(intptr_t)(id_list_get(idsq_36, (int)(id_list_get(items, j))))), ID_S("' is a function name, which only a case's own arguments may pass"))));
+        (idsq_36 = ns1, id_case_err(i, id_concat_f(id_concat(ID_S("a setup's arguments are literals or (import NAME); '"), (char*)(intptr_t)(id_list_get(idsq_36, (int)(id_list_get(items, j))))), ID_S("' is a function name, which only a case's own arguments may pass"), 1)));
     } else {
         id_lset(setupargs, 0, 1);
         id_fit_value(i, (int)(id_list_get(items, j)), pt);
@@ -24462,7 +24560,7 @@ char* id_given_prefix(int i, int si) {
     giv_out = ID_S("");
     giv_k = 0;
     while ((giv_k < si)) {
-        giv_out = id_concat(id_concat(giv_out, (char*)(intptr_t)(id_list_get(giv_names, giv_k))), ID_S(" "));
+        giv_out = id_concat_f(id_concat(giv_out, (char*)(intptr_t)(id_list_get(giv_names, giv_k))), ID_S(" "), 1);
         giv_k = (giv_k + 1);
     }
     return giv_out;
@@ -24493,10 +24591,10 @@ void id_given_fn(int i, int si, char* setup_nm) {
     char* rt;
     sfn = id_func_node(setup_nm);
     if ((sfn < 0)) {
-        id_case_err(i, id_concat(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which is not a function in this build")));
+        id_case_err(i, id_concat_f(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which is not a function in this build"), 1));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(ns2, sfn)), ID_S("void")) != 0)) {
         rt = (char*)(intptr_t)(id_list_get(ns2, sfn));
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which returns ")), rt), ID_S("; a setup returns void, since the harness has nothing to compare its result with")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which returns "), 1), rt, 1), ID_S("; a setup returns void, since the harness has nothing to compare its result with"), 1));
     } else {
         id_given_args(i, si, sfn);
     }
@@ -24537,7 +24635,7 @@ void id_then_fn(int chk_node, char* chk_nm) {
     ci = (int)(id_list_get(ni1, chk_node));
     chk_nm2 = (char*)(intptr_t)(id_list_get(ns1, chk_node));
     if ((cfn < 0)) {
-        id_case_err(ci, id_concat(id_concat(ID_S("'then' names '"), chk_nm2), ID_S("', which is not a function in this build")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("'then' names '"), chk_nm2), ID_S("', which is not a function in this build"), 1));
     } else {
         id_then_sig(ci, chk_node, cfn, chk_nm2);
     }
@@ -24552,7 +24650,7 @@ void id_fit_then_traps(int chk_node) {
     items = (IdList*)(intptr_t)(id_list_get(nl1, chk_node));
     n = id_list_len(items);
     if ((n != 1)) {
-        id_case_err(ci, id_concat(ID_S("a 'traps' check names exactly one message, not "), id_str_of_int(n)));
+        id_case_err(ci, id_concat_f(ID_S("a 'traps' check names exactly one message, not "), id_str_of_int(n), 2));
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), ID_S("string"));
     }
@@ -24563,9 +24661,9 @@ void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm) {
     int np;
     if ((id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn))) != 0)) {
         np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn)));
-        id_case_err(ci, id_concat(id_concat(id_concat(id_concat(ID_S("'then' names '"), chk_nm), ID_S("', which takes ")), id_str_of_int(np)), ID_S(" parameter(s); a check takes none and returns the value it compares")));
+        id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'then' names '"), chk_nm), ID_S("', which takes "), 1), id_str_of_int(np), 3), ID_S(" parameter(s); a check takes none and returns the value it compares"), 1));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(ns2, cfn)), ID_S("void")) == 0)) {
-        id_case_err(ci, id_concat(id_concat(ID_S("'then' names '"), chk_nm), ID_S("', which returns void; a check takes none and returns the value it compares")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("'then' names '"), chk_nm), ID_S("', which returns void; a check takes none and returns the value it compares"), 1));
     } else {
         id_then_value_fit(ci, chk_node, cfn);
     }
@@ -24589,7 +24687,7 @@ void id_then_value_fit(int ci, int chk_node, int cfn) {
     items = (IdList*)(intptr_t)(id_list_get(nl1, chk_node));
     if ((id_list_len(items) != 1)) {
         ne = id_list_len(items);
-        id_case_err(ci, id_concat(ID_S("a 'then' check compares exactly one value, not "), id_str_of_int(ne)));
+        id_case_err(ci, id_concat_f(ID_S("a 'then' check compares exactly one value, not "), id_str_of_int(ne), 2));
     } else {
         id_then_lit(ci, (int)(id_list_get(items, 0)), cfn);
     }
@@ -24601,7 +24699,7 @@ void id_then_lit(int ci, int e, int cfn) {
     char* rt;
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0)) {
         lt = id_lit_text(e);
-        id_case_err(ci, id_concat(id_concat(ID_S("a 'then' check compares a literal; "), lt), ID_S(" may only be an argument or an expected value")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("a 'then' check compares a literal; "), lt), ID_S(" may only be an argument or an expected value"), 1));
     } else {
         rt = (char*)(intptr_t)(id_list_get(ns2, cfn));
         id_fit_value(ci, e, rt);
@@ -24658,7 +24756,7 @@ int idsq_39;
     if ((idsq_39 = id_list_len(items), (idsq_39 != id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn)))))) {
         na = id_list_len(items);
         np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn)));
-        id_case_err(ci, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case's 'calls "), nm), ID_S("' passes ")), id_str_of_int(na)), ID_S(" argument(s), which takes ")), id_str_of_int(np)));
+        id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case's 'calls "), nm), ID_S("' passes "), 1), id_str_of_int(na), 3), ID_S(" argument(s), which takes "), 1), id_str_of_int(np), 3));
     } else {
         id_fit_items(ci, cfn, items);
     }
@@ -24669,7 +24767,7 @@ void id_fit_calls_count(int ci, IdList* items) {
     int ne;
     if ((id_list_len(items) != 1)) {
         ne = id_list_len(items);
-        id_case_err(ci, id_concat(ID_S("a 'calls NAME:[N]' check takes exactly one count, not "), id_str_of_int(ne)));
+        id_case_err(ci, id_concat_f(ID_S("a 'calls NAME:[N]' check takes exactly one count, not "), id_str_of_int(ne), 2));
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), ID_S("int"));
     }
@@ -24678,9 +24776,9 @@ void id_fit_calls_count(int ci, IdList* items) {
 
 void id_calls_unknown(int ci, char* nm) {
     if ((id_is_builtin(nm) == 1)) {
-        id_case_err(ci, id_concat(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'"), 1));
     } else {
-        id_case_err(ci, id_concat(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is not a function in this build")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is not a function in this build"), 1));
     }
     return;
 }
@@ -24742,7 +24840,7 @@ void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node) {
 
 void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node) {
     if ((id_is_native(cfn) == 1)) {
-        id_case_err(ci, id_concat(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead"), 1));
     } else {
         id_fit_calls_body(kind, ci, nm, cfn, chk_node);
     }
@@ -24762,7 +24860,7 @@ void id_fit_print_items(int ci, IdList* items) {
     int ne;
     if ((id_list_len(items) != 1)) {
         ne = id_list_len(items);
-        id_case_err(ci, id_concat(ID_S("a 'prints' or 'eprints' check compares exactly one value, not "), id_str_of_int(ne)));
+        id_case_err(ci, id_concat_f(ID_S("a 'prints' or 'eprints' check compares exactly one value, not "), id_str_of_int(ne), 2));
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), ID_S("string"));
     }
@@ -24865,19 +24963,19 @@ char* id_then_path_why(int chk_node, char* want) {
     steps = id_str_split((char*)(intptr_t)(id_list_get(ns2, chk_node)), ID_S("."));
     pt = want;
     pi = 1;
-    path_at = id_concat(id_concat(ID_S("(import "), (char*)(intptr_t)(id_list_get(ns1, chk_node))), ID_S(")"));
+    path_at = id_concat_f(id_concat(ID_S("(import "), (char*)(intptr_t)(id_list_get(ns1, chk_node))), ID_S(")"), 1);
     while ((strcmp(id_then_path_step(pt, (char*)(intptr_t)(id_list_get(steps, pi))), ID_S("")) != 0)) {
-        path_at = id_concat(id_concat(path_at, ID_S(".")), (char*)(intptr_t)(id_list_get(steps, pi)));
+        path_at = id_concat_f(id_concat(path_at, ID_S(".")), (char*)(intptr_t)(id_list_get(steps, pi)), 1);
         pt = id_then_path_step(pt, (char*)(intptr_t)(id_list_get(steps, pi)));
         pi = (pi + 1);
     }
     why = ID_S("");
     if ((id_sd_nfields(pt) == 0)) {
 char* idsq_41;
-        why = (idsq_41 = (char*)(intptr_t)(id_list_get(steps, pi)), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(path_at, ID_S(".")), idsq_41), ID_S(": ")), path_at), ID_S(" is a ")), pt), ID_S(", not a struct, so it has no fields; drop '.")), (char*)(intptr_t)(id_list_get(steps, pi))), ID_S("', or name an export that is a struct")));
+        why = (idsq_41 = (char*)(intptr_t)(id_list_get(steps, pi)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(path_at, ID_S(".")), idsq_41, 1), ID_S(": "), 1), path_at, 1), ID_S(" is a "), 1), pt, 1), ID_S(", not a struct, so it has no fields; drop '."), 1), (char*)(intptr_t)(id_list_get(steps, pi)), 1), ID_S("', or name an export that is a struct"), 1));
     } else {
 char* idsq_17;
-        why = (idsq_17 = (char*)(intptr_t)(id_list_get(steps, pi)), id_concat(id_concat(id_concat(id_concat(id_concat(path_at, ID_S(".")), idsq_17), ID_S(": ")), id_sd_nofield(pt, (char*)(intptr_t)(id_list_get(steps, pi)))), ID_S("; name one of them")));
+        why = (idsq_17 = (char*)(intptr_t)(id_list_get(steps, pi)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(path_at, ID_S(".")), idsq_17, 1), ID_S(": "), 1), id_sd_nofield(pt, (char*)(intptr_t)(id_list_get(steps, pi))), 1), ID_S("; name one of them"), 1));
     }
     return why;
 }
@@ -24970,7 +25068,7 @@ void id_case_arity_err(int i, int fn, int na) {
     f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
     np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn)));
     arity_case_sig = id_diag_sig(fn);
-    id_case_diag(i, ID_S("E0503"), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case passes "), id_str_of_int(na)), ID_S(" argument(s) to '")), f1), ID_S("', which takes ")), id_str_of_int(np)), ID_S("a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares"), id_concat(ID_S("write one literal per parameter in the case's first tuple: "), arity_case_sig));
+    id_case_diag(i, ID_S("E0503"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("this case passes "), id_str_of_int(na), 2), ID_S(" argument(s) to '"), 1), f1, 1), ID_S("', which takes "), 1), id_str_of_int(np), 3), ID_S("a case calls the function under test with its arguments, so it must pass exactly the parameters the function declares"), id_concat(ID_S("write one literal per parameter in the case's first tuple: "), arity_case_sig));
     return;
 }
 
@@ -24981,7 +25079,7 @@ void id_case_void_err(int i, int fn, int ne) {
     void_case_sig = id_diag_sig(fn);
     np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn)));
     f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
-    id_case_diag(i, ID_S("E0504"), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case expects "), id_str_of_int(ne)), ID_S(" argument(s) after the call, but '")), f1), ID_S("' takes ")), id_str_of_int(np)), ID_S("the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has"), id_concat(id_concat(ID_S("list at most the parameters of "), void_case_sig), ID_S(" in the expected tuple, or none at all")));
+    id_case_diag(i, ID_S("E0504"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("this case expects "), id_str_of_int(ne), 2), ID_S(" argument(s) after the call, but '"), 1), f1, 1), ID_S("' takes "), 1), id_str_of_int(np), 3), ID_S("the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has"), id_concat_f(id_concat(ID_S("list at most the parameters of "), void_case_sig), ID_S(" in the expected tuple, or none at all"), 1));
     return;
 }
 
@@ -24990,7 +25088,7 @@ void id_case_ret_err(int i, int fn, int ne) {
     char* rt;
     f1 = (char*)(intptr_t)(id_list_get(ns1, fn));
     rt = (char*)(intptr_t)(id_list_get(ns2, fn));
-    id_case_diag(i, ID_S("E0505"), id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), f1), ID_S("' returns ")), rt), ID_S(", so its case expects exactly one value, not ")), id_str_of_int(ne)), ID_S("a function that returns a value is checked against that one value, so the expected tuple holds exactly one"), id_concat(id_concat(ID_S("write the expected tuple as (VALUE), one "), rt), ID_S(" literal")));
+    id_case_diag(i, ID_S("E0505"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), f1), ID_S("' returns "), 1), rt, 1), ID_S(", so its case expects exactly one value, not "), 1), id_str_of_int(ne), 3), ID_S("a function that returns a value is checked against that one value, so the expected tuple holds exactly one"), id_concat_f(id_concat(ID_S("write the expected tuple as (VALUE), one "), rt), ID_S(" literal"), 1));
     return;
 }
 
@@ -25054,7 +25152,7 @@ char* id_items_text(IdList* xs) {
     j = 0;
     while ((j < id_list_len(xs))) {
 char* idsq_15;
-        lt = (idsq_15 = id_sep_arg(j), id_concat(id_concat(lt, idsq_15), id_lit_text((int)(id_list_get(xs, j)))));
+        lt = (idsq_15 = id_sep_arg(j), id_concat_f(id_concat(lt, idsq_15), id_lit_text((int)(id_list_get(xs, j))), 1));
         j = (j + 1);
     }
     return lt;
@@ -25064,10 +25162,10 @@ char* id_leaf_text(int e) {
     char* lt;
     lt = (char*)(intptr_t)(id_list_get(ns1, e));
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0)) {
-        lt = id_concat(id_concat(ID_S("(import "), lt), ID_S(")"));
+        lt = id_concat_f(id_concat(ID_S("(import "), lt), ID_S(")"), 1);
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cctor")) == 0)) {
-        lt = id_concat(id_concat(id_concat(lt, ID_S("(")), id_items_text((IdList*)(intptr_t)(id_list_get(nl1, e)))), ID_S(")"));
+        lt = id_concat_f(id_concat_f(id_concat(lt, ID_S("(")), id_items_text((IdList*)(intptr_t)(id_list_get(nl1, e))), 1), ID_S(")"), 1);
     }
     return lt;
 }
@@ -25095,14 +25193,14 @@ char* id_arr_text(int e) {
     IdList* xs;
     char* lt;
     xs = (IdList*)(intptr_t)(id_list_get(nl1, e));
-    lt = id_concat(id_concat(ID_S("["), id_items_text(xs)), ID_S("]"));
+    lt = id_concat_f(id_concat(ID_S("["), id_items_text(xs)), ID_S("]"), 1);
     return lt;
 }
 
 void id_case_err(int i, char* msg) {
     char* case_loc_v;
     case_loc_v = id_case_loc(i);
-    id_print(id_concat(id_concat(case_loc_v, ID_S(": error: ")), msg));
+    id_print(id_concat_f(id_concat(case_loc_v, ID_S(": error: ")), msg, 1));
     id_note_failure();
     return;
 }
@@ -25113,7 +25211,7 @@ char* id_case_loc(int i) {
 IdList* idsq_17;
     s1_of_v = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(casenode, i)))));
 IdList* idsq_8;
-    ret_s = (idsq_8 = tline, id_concat(id_concat(s1_of_v, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_8, (int)(id_list_get(casestart, i)))))));
+    ret_s = (idsq_8 = tline, id_concat_f(id_concat(s1_of_v, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_8, (int)(id_list_get(casestart, i))))), 3));
     return ret_s;
 }
 
@@ -25143,9 +25241,9 @@ void id_fit_scalar(int i, int e, char* want) {
     char* lt;
     lt = id_case_lit_type(e);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("arr")) == 0)) {
-        id_case_err(i, id_concat(id_concat(ID_S("this case gives a list where a "), want), ID_S(" is required")));
+        id_case_err(i, id_concat_f(id_concat(ID_S("this case gives a list where a "), want), ID_S(" is required"), 1));
     } else if ((id_ty_fits(want, lt) == 0)) {
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(ID_S("this case gives a "), lt), ID_S(" where a ")), want), ID_S(" is required")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives a "), lt), ID_S(" where a "), 1), want, 1), ID_S(" is required"), 1));
     }
     return;
 }
@@ -25177,7 +25275,7 @@ void id_fit_list(int i, int e, char* want) {
         id_fit_elems(i, e, want);
     } else {
         lt = id_lit_text(e);
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(ID_S("this case gives "), lt), ID_S(" where a ")), want), ID_S(" is required")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives "), lt), ID_S(" where a "), 1), want, 1), ID_S(" is required"), 1));
     }
     return;
 }
@@ -25294,7 +25392,7 @@ IdList* idsq_86;
     if (((((((strcmp(oi_f, ID_S("")) != 0) && (oi_ek >= 0)) && ((int)(id_list_get(setupargs, 0)) == 0)) && (id_reaches(oi_f, (char*)(intptr_t)(id_list_get(eowners, oi_ek))) == 1)) && (strcmp(id_fn_ret_export((int)(id_list_get(casefn, i))), oi_x) != 0)) && (id_wr_closure(oi_f, oi_x, (char*)(intptr_t)(id_list_get(eowners, oi_ek))) == 0))) {
 IdList* idsq_28;
 char* idsq_26;
-        (idsq_28 = eowners, idsq_26 = (char*)(intptr_t)(id_list_get(idsq_28, oi_ek)), id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(import "), oi_x), ID_S("): '")), oi_x), ID_S("' is exported by '")), idsq_26), ID_S("', which the function under test, '")), oi_f), ID_S("', is or calls, and nothing in that call writes it after declaring it, so this case would read back a value its own call just made and stay green whatever the body did; check a variable the call changes (such as then (import other)[0]:(value)), or the return value, or, if '")), (char*)(intptr_t)(id_list_get(eowners, oi_ek))), ID_S("' exists to initialize '")), oi_x), ID_S("', say so in its return clause: '} return void export ")), oi_x), ID_S(";'"))));
+        (idsq_28 = eowners, idsq_26 = (char*)(intptr_t)(id_list_get(idsq_28, oi_ek)), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), oi_x), ID_S("): '"), 1), oi_x, 1), ID_S("' is exported by '"), 1), idsq_26, 1), ID_S("', which the function under test, '"), 1), oi_f, 1), ID_S("', is or calls, and nothing in that call writes it after declaring it, so this case would read back a value its own call just made and stay green whatever the body did; check a variable the call changes (such as then (import other)[0]:(value)), or the return value, or, if '"), 1), (char*)(intptr_t)(id_list_get(eowners, oi_ek)), 1), ID_S("' exists to initialize '"), 1), oi_x, 1), ID_S("', say so in its return clause: '} return void export "), 1), oi_x, 1), ID_S(";'"), 1)));
     }
     return;
 }
@@ -25393,17 +25491,17 @@ void id_then_imp_value(int ci, int chk_node, char* want) {
     if (((id_list_len(imp_ix) == 1) && (id_ty_is_list(want) == 0))) {
 IdList* idsq_178;
 char* idsq_176;
-        (idsq_178 = ns2, idsq_176 = (char*)(intptr_t)(id_list_get(idsq_178, chk_node)), id_case_err(ci, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("(import "), imp_nm), ID_S(")")), idsq_176), ID_S("[...] reads one element, but '")), imp_nm), (char*)(intptr_t)(id_list_get(ns2, chk_node))), ID_S("' is a ")), want), ID_S(", not a list; drop the index, or name a list export"))));
+        (idsq_178 = ns2, idsq_176 = (char*)(intptr_t)(id_list_get(idsq_178, chk_node)), id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(")"), 1), idsq_176, 1), ID_S("[...] reads one element, but '"), 1), imp_nm, 1), (char*)(intptr_t)(id_list_get(ns2, chk_node)), 1), ID_S("' is a "), 1), want, 1), ID_S(", not a list; drop the index, or name a list export"), 1)));
     } else if ((id_list_len(imp_ix) == 1)) {
         id_fit_then_ix(ci, (int)(id_list_get(imp_ix, 0)));
     }
 IdList* idsq_124;
     if ((id_list_len(items) != 1)) {
         ne = id_list_len(items);
-        id_case_err(ci, id_concat(ID_S("a 'then' check compares exactly one value, not "), id_str_of_int(ne)));
+        id_case_err(ci, id_concat_f(ID_S("a 'then' check compares exactly one value, not "), id_str_of_int(ne), 2));
     } else if ((idsq_124 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_124, (int)(id_list_get(items, 0)))), ID_S("cimport")) == 0))) {
 IdList* idsq_114;
-        (idsq_114 = ns1, id_case_err(ci, id_concat(id_concat(ID_S("a 'then' check compares a literal; (import "), (char*)(intptr_t)(id_list_get(idsq_114, (int)(id_list_get(items, 0))))), ID_S(") may only be an argument or an expected value"))));
+        (idsq_114 = ns1, id_case_err(ci, id_concat_f(id_concat(ID_S("a 'then' check compares a literal; (import "), (char*)(intptr_t)(id_list_get(idsq_114, (int)(id_list_get(items, 0))))), ID_S(") may only be an argument or an expected value"), 1)));
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), vt);
     }
@@ -25412,13 +25510,13 @@ IdList* idsq_68;
 char* idsq_66;
 IdList* idsq_60;
 char* idsq_58;
-        (idsq_68 = ns2, idsq_66 = (char*)(intptr_t)(id_list_get(idsq_68, chk_node)), idsq_60 = ns2, idsq_58 = (char*)(intptr_t)(id_list_get(idsq_60, chk_node)), id_case_err(ci, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("len((import "), imp_nm), ID_S(")")), idsq_66), ID_S(") measures a list or a string, but '")), imp_nm), idsq_58), ID_S("' is a ")), want), ID_S("; name a list or string export, or compare the value itself with then (import ")), imp_nm), ID_S(")")), (char*)(intptr_t)(id_list_get(ns2, chk_node))), ID_S(":(value)"))));
+        (idsq_68 = ns2, idsq_66 = (char*)(intptr_t)(id_list_get(idsq_68, chk_node)), idsq_60 = ns2, idsq_58 = (char*)(intptr_t)(id_list_get(idsq_60, chk_node)), id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("len((import "), imp_nm), ID_S(")"), 1), idsq_66, 1), ID_S(") measures a list or a string, but '"), 1), imp_nm, 1), idsq_58, 1), ID_S("' is a "), 1), want, 1), ID_S("; name a list or string export, or compare the value itself with then (import "), 1), imp_nm, 1), ID_S(")"), 1), (char*)(intptr_t)(id_list_get(ns2, chk_node)), 1), ID_S(":(value)"), 1)));
     }
     if ((id_fn_import_use((int)(id_list_get(casefn, ci)), imp_nm) == 1)) {
 IdList* idsq_22;
 char* idsq_20;
 IdList* idsq_16;
-        (idsq_22 = ns2, idsq_20 = (char*)(intptr_t)(id_list_get(idsq_22, chk_node)), idsq_16 = ns1, id_case_err(ci, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("then (import "), imp_nm), ID_S(")")), idsq_20), ID_S(": the function under test, '")), (char*)(intptr_t)(id_list_get(idsq_16, (int)(id_list_get(casefn, ci))))), ID_S("', reads (import ")), imp_nm), ID_S(") but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'"))));
+        (idsq_22 = ns2, idsq_20 = (char*)(intptr_t)(id_list_get(idsq_22, chk_node)), idsq_16 = ns1, id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("then (import "), imp_nm), ID_S(")"), 1), idsq_20, 1), ID_S(": the function under test, '"), 1), (char*)(intptr_t)(id_list_get(idsq_16, (int)(id_list_get(casefn, ci)))), 1), ID_S("', reads (import "), 1), imp_nm, 1), ID_S(") but never writes it, so this check would only repeat its own read; check an export the function changes, or write one check function that states the whole expected state and name it in 'then CHECK:(value)'"), 1)));
     }
     return;
 }
@@ -25449,7 +25547,7 @@ void id_ut_case_fn(int ci, char* name) {
     char* ut_why_v;
     if ((id_find_str(utname, name) >= 0)) {
         ut_why_v = id_ut_why(name);
-        id_case_err(ci, id_concat(id_concat(id_concat(id_concat(ID_S("'"), name), ID_S("' ")), ut_why_v), ID_S("; this case would never run, and a function that cannot be tested needs none")));
+        id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), name), ID_S("' "), 1), ut_why_v, 1), ID_S("; this case would never run, and a function that cannot be tested needs none"), 1));
     }
     return;
 }
@@ -25463,13 +25561,13 @@ void id_fit_then_ix(int ci, int ix_node) {
         id_fit_value(ci, ix_node, ID_S("int"));
     }
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, ix_node)), ID_S("cimport")) == 0) && (ek < 0))) {
-        id_case_err(ci, id_concat(id_concat(id_concat(id_concat(ID_S("(import "), ix_nm), ID_S("): '")), ix_nm), ID_S("' is not an exported variable or a conf.id constant")));
+        id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), ix_nm), ID_S("): '"), 1), ix_nm, 1), ID_S("' is not an exported variable or a conf.id constant"), 1));
     }
     if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, ix_node)), ID_S("cimport")) == 0) && (ek >= 0)) && (strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), ID_S("conf.id")) != 0))) {
-        id_case_err(ci, id_concat(id_concat(ID_S("(import "), ix_nm), ID_S(") is an exported variable, and only a conf.id constant may stand in a then check's index: a variable's value is what the check is testing; name a constant, or write the index as a number")));
+        id_case_err(ci, id_concat_f(id_concat(ID_S("(import "), ix_nm), ID_S(") is an exported variable, and only a conf.id constant may stand in a then check's index: a variable's value is what the check is testing; name a constant, or write the index as a number"), 1));
     }
     if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, ix_node)), ID_S("cimport")) == 0) && (ek >= 0)) && (strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), ID_S("conf.id")) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(etypes, ek)), ID_S("int")) != 0))) {
-        id_case_err(ci, id_concat(id_concat(id_concat(id_concat(ID_S("this case gives (import "), ix_nm), ID_S("), a ")), (char*)(intptr_t)(id_list_get(etypes, ek))), ID_S(", where a int is required")));
+        id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives (import "), ix_nm), ID_S("), a "), 1), (char*)(intptr_t)(id_list_get(etypes, ek)), 1), ID_S(", where a int is required"), 1));
     }
     return;
 }
@@ -25554,7 +25652,7 @@ char* id_ut_leaf(char* callee_nm) {
     build_host_v = (char*)(intptr_t)(id_list_get(hostc, 0));
     if (((id_find_str(afname, callee_nm) >= 0) && (id_asm_row(callee_nm, build_host_v) < 0))) {
         asm_triples_v = id_asm_triples(callee_nm);
-        what_s = id_concat(id_concat(id_concat(id_concat(ID_S("asm '"), callee_nm), ID_S("', which has no body for that triple (defined for: ")), asm_triples_v), ID_S(")"));
+        what_s = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("asm '"), callee_nm), ID_S("', which has no body for that triple (defined for: "), 1), asm_triples_v, 1), ID_S(")"), 1);
     }
     return what_s;
 }
@@ -25565,7 +25663,7 @@ char* id_ut_native(char* callee_nm) {
     what_s = ID_S("");
     fn = id_func_node(callee_nm);
     if (((fn >= 0) && (id_is_native(fn) == 1))) {
-        what_s = id_concat(id_concat(ID_S("native '"), callee_nm), ID_S("', which a --freestanding build does not link: whatever the object is linked with provides it"));
+        what_s = id_concat_f(id_concat(ID_S("native '"), callee_nm), ID_S("', which a --freestanding build does not link: whatever the object is linked with provides it"), 1);
     }
     return what_s;
 }
@@ -25628,7 +25726,7 @@ char* id_ut_because_at(char* via_s, char* what_s) {
     if ((strcmp(via_s, ID_S("*")) == 0)) {
         ret_s = id_concat(ID_S("it is "), what_s);
     } else if ((strcmp(via_s, ID_S("")) != 0)) {
-        ret_s = id_concat(id_concat(id_concat(ID_S("it calls '"), via_s), ID_S("', which reaches ")), what_s);
+        ret_s = id_concat_f(id_concat_f(id_concat(ID_S("it calls '"), via_s), ID_S("', which reaches "), 1), what_s, 1);
     }
     return ret_s;
 }
@@ -25650,9 +25748,9 @@ void id_ut_note(int i, char* name) {
     char* ut_why_v;
 IdList* idsq_31;
 char* idsq_29;
-    note_at = (idsq_31 = pfile, idsq_29 = (char*)(intptr_t)(id_list_get(idsq_31, i)), id_concat(id_concat(id_concat(idsq_29, ID_S(":")), id_str_of_int((int)(id_list_get(pline, i)))), ID_S(": note: ")));
+    note_at = (idsq_31 = pfile, idsq_29 = (char*)(intptr_t)(id_list_get(idsq_31, i)), id_concat_f(id_concat_f(id_concat(idsq_29, ID_S(":")), id_str_of_int((int)(id_list_get(pline, i))), 3), ID_S(": note: "), 1));
     ut_why_v = id_ut_why(name);
-    id_list_push(utnote, (long long)(intptr_t)(id_concat(id_concat(id_concat(id_concat(id_concat(note_at, ID_S("function '")), name), ID_S("' ")), ut_why_v), ID_S("; it is exempt from the two-case minimum"))));
+    id_list_push(utnote, (long long)(intptr_t)(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(note_at, ID_S("function '")), name, 1), ID_S("' "), 1), ut_why_v, 1), ID_S("; it is exempt from the two-case minimum"), 1)));
     return;
 }
 
@@ -25662,7 +25760,7 @@ char* id_ut_why(char* name) {
     char* ret_s;
     build_host_v = (char*)(intptr_t)(id_list_get(hostc, 0));
     because = id_ut_because(name);
-    ret_s = id_concat(id_concat(id_concat(ID_S("cannot be tested on the build host ("), build_host_v), ID_S("): ")), because);
+    ret_s = id_concat_f(id_concat_f(id_concat(ID_S("cannot be tested on the build host ("), build_host_v), ID_S("): "), 1), because, 1);
     return ret_s;
 }
 
@@ -25704,7 +25802,7 @@ void id_ut_self_at(int i) {
     if ((((int)(id_list_get(rtc, 0)) == 1) && id_is_reserved_name(i))) {
 IdList* idsq_17;
         s1_of_v = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(prog, i)))));
-        id_ut_add(s1_of_v, id_concat(id_concat(ID_S("the runtime helper '"), s1_of_v), ID_S("', which a harness on the build host takes from its own C runtime instead")), ID_S("*"));
+        id_ut_add(s1_of_v, id_concat_f(id_concat(ID_S("the runtime helper '"), s1_of_v), ID_S("', which a harness on the build host takes from its own C runtime instead"), 1), ID_S("*"));
     }
     return;
 }
@@ -25712,13 +25810,13 @@ IdList* idsq_17;
 void id_ut_named(int ci, char* lead, char* name) {
     char* ut_why_v;
     ut_why_v = id_ut_why(name);
-    id_case_err(ci, id_concat(id_concat(id_concat(lead, name), ID_S("', which ")), ut_why_v));
+    id_case_err(ci, id_concat_f(id_concat_f(id_concat(lead, name), ID_S("', which "), 1), ut_why_v, 1));
     return;
 }
 
 void id_cases_report(char* report_loc, char* report_fn_name, int n) {
     char* report_msg;
-    report_msg = id_concat(id_concat(id_concat(id_concat(ID_S("function '"), report_fn_name), ID_S("' has ")), id_str_of_int(n)), ID_S(" test case(s); --require-tests needs at least 2 (see docs/TESTS.md)"));
+    report_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("function '"), report_fn_name), ID_S("' has "), 1), id_str_of_int(n), 3), ID_S(" test case(s); --require-tests needs at least 2 (see docs/TESTS.md)"), 1);
     id_diag(ID_S("E0501"), report_loc, report_msg, report_fn_name, ID_S("a function is finished when two cases pass: the cases run on every build, so they document the function and cannot drift from it (docs/TESTS.md)"), ID_S("write two cases directly under the function, one per line as (ARGS):(EXPECTED); they must describe two different behaviours, and each must be able to fail if the function is wrong"));
     return;
 }
@@ -25727,9 +25825,9 @@ void id_dup_case_report(char* dup_file, int i, int j) {
     char* dup_where;
     char* dup_first;
 IdList* idsq_35;
-    dup_where = (idsq_35 = tline, id_concat(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_35, (int)(id_list_get(casestart, i)))))));
+    dup_where = (idsq_35 = tline, id_concat_f(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_35, (int)(id_list_get(casestart, i))))), 3));
 IdList* idsq_25;
-    dup_first = (idsq_25 = tline, id_concat(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_25, (int)(id_list_get(casestart, j)))))));
+    dup_first = (idsq_25 = tline, id_concat_f(id_concat(dup_file, ID_S(":")), id_str_of_int((int)(id_list_get(idsq_25, (int)(id_list_get(casestart, j))))), 3));
     id_diag(ID_S("E0502"), dup_where, ID_S("this test case is identical to an earlier one; two cases must describe two behaviours (see docs/TESTS.md)"), ID_S(""), ID_S("a second case that spells the same call proves nothing the first did not; cases are compared as tokens, so changing the spacing does not make one different"), ID_S("change the arguments or the expected value so this case exercises a different behaviour, or delete it; each of a function's two cases must be able to fail on its own"));
     id_diag_related(dup_first, ID_S("the case this one repeats"));
     return;
@@ -25942,8 +26040,8 @@ void id_report_undef_var(char* name, char* owner, int ln) {
     char* undef_where;
     char* undef_help;
     undef_where = id_diag_fn_loc(owner, ln);
-    undef_help = id_concat(id_concat(id_concat(id_concat(ID_S("declare '"), name), ID_S("' before this line, as in `int ")), name), ID_S(" = 0;`, or correct the spelling if it is a typo for a variable that exists"));
-    id_diag(ID_S("E0301"), undef_where, id_concat(id_concat(ID_S("undefined variable '"), name), ID_S("'")), name, ID_S("a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program"), undef_help);
+    undef_help = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("declare '"), name), ID_S("' before this line, as in `int "), 1), name, 1), ID_S(" = 0;`, or correct the spelling if it is a typo for a variable that exists"), 1);
+    id_diag(ID_S("E0301"), undef_where, id_concat_f(id_concat(ID_S("undefined variable '"), name), ID_S("'"), 1), name, ID_S("a variable exists only from its declaration to the end of the block that declares it, and this name is not declared anywhere in the program"), undef_help);
     return;
 }
 
@@ -25968,7 +26066,7 @@ int id_is_unknown_fn(char* name) {
 void id_report_call_var(char* name, char* owner, int ln) {
     char* callvar_where;
     callvar_where = id_diag_fn_loc(owner, ln);
-    id_diag(ID_S("E0306"), callvar_where, id_concat(id_concat(ID_S("'"), name), ID_S("' is a variable, not a function")), name, ID_S("a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called"), ID_S("call a function by its own name, or drop the parentheses if you meant to read the variable"));
+    id_diag(ID_S("E0306"), callvar_where, id_concat_f(id_concat(ID_S("'"), name), ID_S("' is a variable, not a function"), 1), name, ID_S("a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called"), ID_S("call a function by its own name, or drop the parentheses if you meant to read the variable"));
     return;
 }
 
@@ -26006,14 +26104,14 @@ void id_acc_call_var(int id, char* owner, int ln) {
 void id_report_builtin_value(char* name, char* owner, int ln) {
     char* loc_at_v;
     loc_at_v = id_loc_at(owner, ln);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("'")), name), ID_S("' is a builtin, not a function defined in id; only a function written in id can be a value -- write one that calls '")), name), ID_S("' and pass that")));
+    id_var_report(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(loc_at_v, ID_S("'")), name, 1), ID_S("' is a builtin, not a function defined in id; only a function written in id can be a value -- write one that calls '"), 1), name, 1), ID_S("' and pass that"), 1));
     return;
 }
 
 void id_report_no_export(char* name, char* owner, int ln) {
     char* loc_at_v;
     loc_at_v = id_loc_at(owner, ln);
-    id_print(id_concat(id_concat(id_concat(loc_at_v, ID_S("no exported variable named '")), name), ID_S("'")));
+    id_print(id_concat_f(id_concat_f(id_concat(loc_at_v, ID_S("no exported variable named '")), name, 1), ID_S("'"), 1));
     id_note_failure();
     return;
 }
@@ -26023,7 +26121,7 @@ void id_report_not_exported(char* name, char* owner, int ln) {
     char* owner_of_v;
     loc_at_v = id_loc_at(owner, ln);
     owner_of_v = id_owner_of(name);
-    id_var_report(id_concat(id_concat(id_concat(id_concat(id_concat(loc_at_v, ID_S("variable '")), name), ID_S("' (in function '")), owner_of_v), ID_S("') is not exported")));
+    id_var_report(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(loc_at_v, ID_S("variable '")), name, 1), ID_S("' (in function '"), 1), owner_of_v, 1), ID_S("') is not exported"), 1));
     return;
 }
 
@@ -26038,7 +26136,7 @@ void id_report_var_import(char* name, char* owner, int ln) {
     char* owner_of_v;
     imp_where = id_diag_fn_loc(owner, ln);
     owner_of_v = id_owner_of(name);
-    id_diag(ID_S("E0305"), imp_where, id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' belongs to function '")), owner_of_v), ID_S("'")), name, ID_S("a variable is private to the function that declares it, and a function that exports one is how another reads it"), id_concat(id_concat(ID_S("read it with `(import "), name), ID_S(")`")));
+    id_diag(ID_S("E0305"), imp_where, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("variable '"), name), ID_S("' belongs to function '"), 1), owner_of_v, 1), ID_S("'"), 1), name, ID_S("a variable is private to the function that declares it, and a function that exports one is how another reads it"), id_concat_f(id_concat(ID_S("read it with `(import "), name), ID_S(")`"), 1));
     return;
 }
 
@@ -26047,7 +26145,7 @@ void id_report_var_private(char* name, char* owner, int ln) {
     char* owner_of_v;
     priv_where = id_diag_fn_loc(owner, ln);
     owner_of_v = id_owner_of(name);
-    id_diag(ID_S("E0305"), priv_where, id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' belongs to function '")), owner_of_v), ID_S("' and is not exported")), name, ID_S("a variable is private to the function that declares it; variables are only globally accessible if export/import is used"), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("declare it in '"), owner_of_v), ID_S("' as `export TYPE ")), name), ID_S(" = ...;` and read it here with `(import ")), name), ID_S(")`, or pass the value in as an argument")));
+    id_diag(ID_S("E0305"), priv_where, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("variable '"), name), ID_S("' belongs to function '"), 1), owner_of_v, 1), ID_S("' and is not exported"), 1), name, ID_S("a variable is private to the function that declares it; variables are only globally accessible if export/import is used"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("declare it in '"), owner_of_v), ID_S("' as `export TYPE "), 1), name, 1), ID_S(" = ...;` and read it here with `(import "), 1), name, 1), ID_S(")`, or pass the value in as an argument"), 1));
     return;
 }
 
@@ -26165,7 +26263,7 @@ void id_report_scope(char* name, char* owner, int ln) {
     char* scope_msg_v;
     scope_where = id_diag_fn_loc(owner, ln);
     scope_msg_v = id_scope_msg(name, owner, ln);
-    id_diag(ID_S("E0307"), scope_where, id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' is used on line ")), id_str_of_int(ln)), scope_msg_v), name, ID_S("a variable exists only from its declaration to the end of the block that declares it"), ID_S("declare it above this use, in a block that also holds the use, or pass the value in"));
+    id_diag(ID_S("E0307"), scope_where, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("variable '"), name), ID_S("' is used on line "), 1), id_str_of_int(ln), 3), scope_msg_v, 1), name, ID_S("a variable exists only from its declaration to the end of the block that declares it"), ID_S("declare it above this use, in a block that also holds the use, or pass the value in"));
     return;
 }
 
@@ -26173,9 +26271,9 @@ char* id_scope_msg(char* name, char* owner, int ln) {
     int dl;
     char* msg;
     dl = id_decl_line(name, owner);
-    msg = id_concat(ID_S(", before its declaration on line "), id_str_of_int(dl));
+    msg = id_concat_f(ID_S(", before its declaration on line "), id_str_of_int(dl), 2);
     if ((dl < ln)) {
-        msg = id_concat(ID_S(", outside the block that declares it on line "), id_str_of_int(dl));
+        msg = id_concat_f(ID_S(", outside the block that declares it on line "), id_str_of_int(dl), 2);
     }
     return msg;
 }
@@ -26300,7 +26398,7 @@ void id_diag_edit(char* dgn_appl, char* dgn_op, int dgn_at_line, char* dgn_needl
     char* dgn_text_esc;
     dgn_need_esc = id_diag_esc(dgn_needle);
     dgn_text_esc = id_diag_esc(dgn_text);
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("  edit: "), dgn_appl), ID_S("\t")), dgn_op), ID_S("\t")), id_str_of_int(dgn_at_line)), ID_S("\t")), dgn_need_esc), ID_S("\t")), dgn_text_esc));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("  edit: "), dgn_appl), ID_S("\t"), 1), dgn_op, 1), ID_S("\t"), 1), id_str_of_int(dgn_at_line), 3), ID_S("\t"), 1), dgn_need_esc, 1), ID_S("\t"), 1), dgn_text_esc, 1));
     return;
 }
 
@@ -26315,7 +26413,7 @@ char* id_diag_esc(char* dgn_raw) {
 }
 
 void id_diag_related(char* dgn_rel_loc, char* dgn_rel_msg) {
-    id_print(id_concat(id_concat(id_concat(ID_S("  related: "), dgn_rel_loc), ID_S(": note: ")), dgn_rel_msg));
+    id_print(id_concat_f(id_concat_f(id_concat(ID_S("  related: "), dgn_rel_loc), ID_S(": note: "), 1), dgn_rel_msg, 1));
     return;
 }
 
@@ -26323,7 +26421,7 @@ char* id_diag_fn_loc(char* dgn_fn, int dgn_ln) {
     char* dgn_file;
     char* dgn_loc;
     dgn_file = id_func_file(dgn_fn);
-    dgn_loc = id_concat(id_concat(dgn_file, ID_S(":")), id_str_of_int(dgn_ln));
+    dgn_loc = id_concat_f(id_concat(dgn_file, ID_S(":")), id_str_of_int(dgn_ln), 3);
     return dgn_loc;
 }
 
@@ -26331,7 +26429,7 @@ char* id_diag_prog_loc(int dgn_row) {
     char* dgn_loc;
 IdList* idsq_11;
 char* idsq_9;
-    dgn_loc = (idsq_11 = pfile, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, dgn_row)), id_concat(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(pline, dgn_row)))));
+    dgn_loc = (idsq_11 = pfile, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, dgn_row)), id_concat_f(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(pline, dgn_row))), 3));
     return dgn_loc;
 }
 
@@ -26357,11 +26455,11 @@ char* id_case_skeleton_line(int dgn_np, int dgn_j, char* dgn_rt) {
     char* dgn_want;
     char* dgn_one;
     dgn_args = id_case_skeleton_args(dgn_np, dgn_j);
-    dgn_want = id_concat(id_concat(ID_S("(EXPECTED"), id_str_of_int(dgn_j)), ID_S(")"));
+    dgn_want = id_concat_f(id_concat_f(ID_S("(EXPECTED"), id_str_of_int(dgn_j), 2), ID_S(")"), 1);
     if ((strcmp(dgn_rt, ID_S("void")) == 0)) {
         dgn_want = ID_S("() then CHECK:(VALUE)");
     }
-    dgn_one = id_concat(id_concat(id_concat(id_concat(ID_S("("), dgn_args), ID_S("):")), dgn_want), ID_S("\n"));
+    dgn_one = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), dgn_args), ID_S("):"), 1), dgn_want, 1), ID_S("\n"), 1);
     return dgn_one;
 }
 
@@ -26372,7 +26470,7 @@ char* id_case_skeleton_args(int dgn_np, int dgn_j) {
     { IdList* idfe_o = dgn_parts; dgn_parts = id_list_lit(0); id_list_free(idfe_o); }
     dgn_p = 1;
     while ((dgn_p <= dgn_np)) {
-        id_list_push(dgn_parts, (long long)(intptr_t)(id_concat(id_concat(id_concat(ID_S("ARG"), id_str_of_int(dgn_j)), ID_S("_")), id_str_of_int(dgn_p))));
+        id_list_push(dgn_parts, (long long)(intptr_t)(id_concat_f(id_concat_f(id_concat_f(ID_S("ARG"), id_str_of_int(dgn_j), 2), ID_S("_"), 1), id_str_of_int(dgn_p), 3)));
         dgn_p = (dgn_p + 1);
     }
     dgn_joined = id_str_join(dgn_parts, ID_S(", "));
@@ -26429,7 +26527,7 @@ char* id_diag_sig(int dgn_sigfn) {
     }
 IdList* idsq_15;
 char* idsq_13;
-    dgn_sig = (idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, dgn_sigfn)), id_concat(id_concat(id_concat(idsq_13, ID_S("(")), id_str_join(dgn_parts, ID_S(", "))), ID_S(")")));
+    dgn_sig = (idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, dgn_sigfn)), id_concat_f(id_concat_f(id_concat(idsq_13, ID_S("(")), id_str_join(dgn_parts, ID_S(", ")), 1), ID_S(")"), 1));
     { id_list_free(dgn_parts); return dgn_sig; }
 }
 
@@ -26440,7 +26538,7 @@ char* id_diag_param(int dgn_sigfn, int dgn_k) {
     dgn_pname = id_param_name(dgn_sigfn, dgn_k);
 IdList* idsq_15;
     dgn_ptype = (idsq_15 = ns1, (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, dgn_sigfn)), dgn_k)))));
-    dgn_pdecl = id_concat(id_concat(dgn_ptype, ID_S(" ")), dgn_pname);
+    dgn_pdecl = id_concat_f(id_concat(dgn_ptype, ID_S(" ")), dgn_pname, 1);
     return dgn_pdecl;
 }
 
@@ -26450,7 +26548,7 @@ void id_syn_diag(IdList* pos, char* dgn_code, char* dgn_msg, char* dgn_at, char*
     char* dgn_sloc;
     dgn_sfile = id_cur_file();
     dgn_sline = id_cur_ln(pos);
-    dgn_sloc = id_concat(id_concat(dgn_sfile, ID_S(":")), id_str_of_int(dgn_sline));
+    dgn_sloc = id_concat_f(id_concat(dgn_sfile, ID_S(":")), id_str_of_int(dgn_sline), 3);
     id_diag(dgn_code, dgn_sloc, dgn_msg, dgn_at, dgn_why, dgn_help);
     id_lset(synfail, 0, 1);
     return;
@@ -26459,9 +26557,9 @@ void id_syn_diag(IdList* pos, char* dgn_code, char* dgn_msg, char* dgn_at, char*
 void id_syn_expected(IdList* pos, char* dgn_want, char* dgn_found) {
     char* dgn_ewhy;
     char* dgn_ehelp;
-    dgn_ewhy = id_concat(id_concat(ID_S("the grammar needs '"), dgn_want), ID_S("' here to finish what it was reading, so the construct before this point is incomplete or mistyped"));
-    dgn_ehelp = id_concat(id_concat(ID_S("put '"), dgn_want), ID_S("' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late"));
-    id_syn_diag(pos, ID_S("E0101"), id_concat(id_concat(id_concat(id_concat(ID_S("expected '"), dgn_want), ID_S("', found '")), dgn_found), ID_S("'")), dgn_found, dgn_ewhy, dgn_ehelp);
+    dgn_ewhy = id_concat_f(id_concat(ID_S("the grammar needs '"), dgn_want), ID_S("' here to finish what it was reading, so the construct before this point is incomplete or mistyped"), 1);
+    dgn_ehelp = id_concat_f(id_concat(ID_S("put '"), dgn_want), ID_S("' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late"), 1);
+    id_syn_diag(pos, ID_S("E0101"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("expected '"), dgn_want), ID_S("', found '"), 1), dgn_found, 1), ID_S("'"), 1), dgn_found, dgn_ewhy, dgn_ehelp);
     return;
 }
 
@@ -26469,7 +26567,7 @@ void id_syn_unexpected(IdList* pos, char* dgn_tok, char* dgn_umsg) {
     char* dgn_uwhy;
     char* dgn_uhelp;
     dgn_uwhy = ID_S("an operator cannot start an expression or a statement; the parser was looking for a name, a number, a string, a call or a type");
-    dgn_uhelp = id_concat(id_concat(ID_S("write an operand where '"), dgn_tok), ID_S("' is, or remove it; a missing operand just before it is the usual cause"));
+    dgn_uhelp = id_concat_f(id_concat(ID_S("write an operand where '"), dgn_tok), ID_S("' is, or remove it; a missing operand just before it is the usual cause"), 1);
     if ((strcmp(dgn_tok, ID_S("/*")) == 0)) {
         dgn_uwhy = ID_S("id has line comments only, so a comment always ends where its line ends and can never swallow code");
         dgn_uhelp = ID_S("write // at the start of each commented line");
@@ -26495,14 +26593,14 @@ void id_diag(char* dgn_code, char* dgn_loc, char* dgn_msg, char* dgn_at, char* d
 }
 
 void id_diag_head(char* dgn_code, char* dgn_loc, char* dgn_msg) {
-    id_print(id_concat(id_concat(id_concat(id_concat(id_concat(dgn_loc, ID_S(": error: ")), dgn_msg), ID_S(" [")), dgn_code), ID_S("]")));
+    id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(dgn_loc, ID_S(": error: ")), dgn_msg, 1), ID_S(" ["), 1), dgn_code, 1), ID_S("]"), 1));
     id_note_failure();
     return;
 }
 
 void id_diag_line(char* dgn_key, char* dgn_text) {
     if ((strcmp(dgn_text, ID_S("")) != 0)) {
-        id_print(id_concat(id_concat(id_concat(ID_S("  "), dgn_key), ID_S(": ")), dgn_text));
+        id_print(id_concat_f(id_concat_f(id_concat(ID_S("  "), dgn_key), ID_S(": "), 1), dgn_text, 1));
     }
     return;
 }
@@ -26531,7 +26629,7 @@ char* id_ext_where(int xe_k) {
     char* xe_whr;
 IdList* idsq_11;
 char* idsq_9;
-    xe_whr = (idsq_11 = ext_f, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, xe_k)), id_concat(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(ext_l, xe_k)))));
+    xe_whr = (idsq_11 = ext_f, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, xe_k)), id_concat_f(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(ext_l, xe_k))), 3));
     return xe_whr;
 }
 
@@ -26574,7 +26672,7 @@ char* idsq_21;
 IdList* idsq_18;
 int idsq_16;
 char* idsq_12;
-    (idsq_23 = pfile, idsq_21 = (char*)(intptr_t)(id_list_get(idsq_23, xe_i)), idsq_18 = pline, idsq_16 = (int)(id_list_get(idsq_18, xe_i)), idsq_12 = imdd_why, id_diag(ID_S("E0405"), id_concat(id_concat(idsq_21, ID_S(":")), id_str_of_int(idsq_16)), xe_text, xe_nm, idsq_12, imdd_help));
+    (idsq_23 = pfile, idsq_21 = (char*)(intptr_t)(id_list_get(idsq_23, xe_i)), idsq_18 = pline, idsq_16 = (int)(id_list_get(idsq_18, xe_i)), idsq_12 = imdd_why, id_diag(ID_S("E0405"), id_concat_f(id_concat(idsq_21, ID_S(":")), id_str_of_int(idsq_16), 3), xe_text, xe_nm, idsq_12, imdd_help));
     id_diag_related(id_ext_where(xe_k), ID_S("the function this one repeats"));
     return;
 }
@@ -26591,7 +26689,7 @@ char* idsq_60;
     xe_vals = (idsq_62 = ext_inm, idsq_60 = (char*)(intptr_t)(id_list_get(idsq_62, xe_k)), id_imd_vals_of(idsq_60, (char*)(intptr_t)(id_list_get(imd_tab, ((xe_i * 2) + 1)))));
 IdList* idsq_48;
 char* idsq_46;
-    xe_def = (idsq_48 = pfile, idsq_46 = (char*)(intptr_t)(id_list_get(idsq_48, xe_i)), id_def_at(xe_nm, id_concat(id_concat(idsq_46, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_i))))));
+    xe_def = (idsq_48 = pfile, idsq_46 = (char*)(intptr_t)(id_list_get(idsq_48, xe_i)), id_def_at(xe_nm, id_concat_f(id_concat(idsq_46, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_i))), 3)));
     xe_text = id_imd_sentence((char*)(intptr_t)(id_list_get(ext_n, xe_k)), xe_def, xe_vals);
 char* idsq_23;
 IdList* idsq_21;
@@ -26600,7 +26698,7 @@ char* idsq_18;
     (idsq_23 = id_ext_where(xe_k), idsq_21 = ext_n, idsq_19 = (char*)(intptr_t)(id_list_get(idsq_21, xe_k)), idsq_18 = imdd_why, id_diag(ID_S("E0405"), idsq_23, xe_text, idsq_19, idsq_18, imdd_help));
 IdList* idsq_13;
 char* idsq_11;
-    (idsq_13 = pfile, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, xe_i)), id_diag_related(id_concat(id_concat(idsq_11, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_i)))), ID_S("the function this one repeats")));
+    (idsq_13 = pfile, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, xe_i)), id_diag_related(id_concat_f(id_concat(idsq_11, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_i))), 3), ID_S("the function this one repeats")));
     return;
 }
 
@@ -26646,7 +26744,7 @@ char* idsq_22;
 
 char* id_imd_sentence(char* imd_nx, char* imd_ydef, char* imd_vs) {
     char* ret_s;
-    ret_s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("function '"), imd_nx), ID_S("' and ")), imd_ydef), ID_S(" differ only in the imported value they read (")), imd_vs), ID_S(")"));
+    ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("function '"), imd_nx), ID_S("' and "), 1), imd_ydef, 1), ID_S(" differ only in the imported value they read ("), 1), imd_vs, 1), ID_S(")"), 1);
     return ret_s;
 }
 
@@ -26659,7 +26757,7 @@ char* id_imd_vals_of(char* imd_va, char* imd_vb) {
     imd_xb = id_str_split(imd_vb, ID_S(","));
     imd_k = id_imd_first(imd_xa, imd_xb);
 char* idsq_13;
-    ret_s = (idsq_13 = (char*)(intptr_t)(id_list_get(imd_xa, imd_k)), id_concat(id_concat(id_concat(id_concat(ID_S("(import "), idsq_13), ID_S(") in one, (import ")), (char*)(intptr_t)(id_list_get(imd_xb, imd_k))), ID_S(") in the other")));
+    ret_s = (idsq_13 = (char*)(intptr_t)(id_list_get(imd_xa, imd_k)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), idsq_13), ID_S(") in one, (import "), 1), (char*)(intptr_t)(id_list_get(imd_xb, imd_k)), 1), ID_S(") in the other"), 1));
     return ret_s;
 }
 
@@ -26671,12 +26769,12 @@ IdList* idsq_50;
     xe_nm = (idsq_50 = ns1, (char*)(intptr_t)(id_list_get(idsq_50, (int)(id_list_get(prog, xe_fi)))));
 IdList* idsq_44;
 char* idsq_42;
-    xe_mine = (idsq_44 = pfile, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, xe_fi)), id_concat(id_concat(idsq_42, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_fi)))));
+    xe_mine = (idsq_44 = pfile, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, xe_fi)), id_concat_f(id_concat(idsq_42, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_fi))), 3));
 IdList* idsq_33;
 char* idsq_31;
     xe_tail = (idsq_33 = ext_n, idsq_31 = (char*)(intptr_t)(id_list_get(idsq_33, xe_k)), id_def_at(idsq_31, id_ext_where(xe_k)));
 char* idsq_12;
-    (idsq_12 = dupd_why, id_diag(ID_S("E0402"), xe_mine, id_concat(id_concat(id_concat(ID_S("function '"), xe_nm), ID_S("' has the same signature and logic as ")), xe_tail), xe_nm, idsq_12, dupd_help));
+    (idsq_12 = dupd_why, id_diag(ID_S("E0402"), xe_mine, id_concat_f(id_concat_f(id_concat(ID_S("function '"), xe_nm), ID_S("' has the same signature and logic as "), 1), xe_tail, 1), xe_nm, idsq_12, dupd_help));
     id_diag_related(id_ext_where(xe_k), ID_S("the function this one repeats"));
     return;
 }
@@ -26689,7 +26787,7 @@ IdList* idsq_50;
     xe_nm = (idsq_50 = ns1, (char*)(intptr_t)(id_list_get(idsq_50, (int)(id_list_get(prog, xe_fi)))));
 IdList* idsq_44;
 char* idsq_42;
-    xe_mine = (idsq_44 = pfile, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, xe_fi)), id_concat(id_concat(idsq_42, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_fi)))));
+    xe_mine = (idsq_44 = pfile, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, xe_fi)), id_concat_f(id_concat(idsq_42, ID_S(":")), id_str_of_int((int)(id_list_get(pline, xe_fi))), 3));
     xe_tail = id_def_at(xe_nm, xe_mine);
 char* idsq_23;
 IdList* idsq_21;
@@ -26697,14 +26795,14 @@ char* idsq_19;
 IdList* idsq_13;
 char* idsq_11;
 char* idsq_10;
-    (idsq_23 = id_ext_where(xe_k), idsq_21 = ext_n, idsq_19 = (char*)(intptr_t)(id_list_get(idsq_21, xe_k)), idsq_13 = ext_n, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, xe_k)), idsq_10 = dupd_why, id_diag(ID_S("E0402"), idsq_23, id_concat(id_concat(id_concat(ID_S("function '"), idsq_19), ID_S("' has the same signature and logic as ")), xe_tail), idsq_11, idsq_10, dupd_help));
+    (idsq_23 = id_ext_where(xe_k), idsq_21 = ext_n, idsq_19 = (char*)(intptr_t)(id_list_get(idsq_21, xe_k)), idsq_13 = ext_n, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, xe_k)), idsq_10 = dupd_why, id_diag(ID_S("E0402"), idsq_23, id_concat_f(id_concat_f(id_concat(ID_S("function '"), idsq_19), ID_S("' has the same signature and logic as "), 1), xe_tail, 1), idsq_11, idsq_10, dupd_help));
     id_diag_related(xe_mine, ID_S("the function this one repeats"));
     return;
 }
 
 char* id_def_at(char* xe_nm, char* xe_whr) {
     char* xe_msg;
-    xe_msg = id_concat(id_concat(id_concat(id_concat(ID_S("'"), xe_nm), ID_S("' (defined at ")), xe_whr), ID_S(")"));
+    xe_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), xe_nm), ID_S("' (defined at "), 1), xe_whr, 1), ID_S(")"), 1);
     return xe_msg;
 }
 
@@ -26787,7 +26885,7 @@ void id_sv_report(int sv_r, char* sv_ty, char* sv_loc) {
 IdList* idsq_44;
 char* idsq_42;
     sv_here = (idsq_44 = dvfunc, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, sv_r)), id_diag_fn_loc(idsq_42, (int)(id_list_get(dvline, sv_r))));
-    sv_msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), sv_nm), ID_S("' is declared ")), (char*)(intptr_t)(id_list_get(dvtype, sv_r))), ID_S(" here but ")), sv_ty), ID_S(" in the standard library"));
+    sv_msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("variable '"), sv_nm), ID_S("' is declared "), 1), (char*)(intptr_t)(id_list_get(dvtype, sv_r)), 1), ID_S(" here but "), 1), sv_ty, 1), ID_S(" in the standard library"), 1);
 char* idsq_12;
     (idsq_12 = svd_why, id_diag(ID_S("E0303"), sv_here, sv_msg, sv_nm, idsq_12, svd_help));
     id_diag_related(sv_loc, id_concat(ID_S("the standard library's declaration, which is "), sv_ty));
@@ -26831,7 +26929,7 @@ IdList* idsq_15;
 char* idsq_13;
 IdList* idsq_12;
 char* idsq_10;
-        (idsq_15 = ext_vt, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sv_k)), idsq_12 = ext_vf, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, sv_k)), id_sv_report(sv_r, idsq_13, id_concat(id_concat(idsq_10, ID_S(":")), id_str_of_int((int)(id_list_get(ext_vl, sv_k))))));
+        (idsq_15 = ext_vt, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sv_k)), idsq_12 = ext_vf, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, sv_k)), id_sv_report(sv_r, idsq_13, id_concat_f(id_concat(idsq_10, ID_S(":")), id_str_of_int((int)(id_list_get(ext_vl, sv_k))), 3)));
     }
     return;
 }
@@ -26937,7 +27035,7 @@ IdList* idsq_18;
 char* idsq_16;
 IdList* idsq_13;
 int idsq_11;
-    (idsq_18 = ns1, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, ixw_node)), idsq_13 = pline, idsq_11 = (int)(id_list_get(idsq_13, ixw_f)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("F")), (long long)(intptr_t)(idsq_16), (long long)(intptr_t)(ixw_kind), (long long)(intptr_t)(id_concat(ID_S(""), id_str_of_int(idsq_11))), (long long)(intptr_t)(id_concat(ID_S(""), id_str_of_int(id_ixw_end(ixw_f)))))));
+    (idsq_18 = ns1, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, ixw_node)), idsq_13 = pline, idsq_11 = (int)(id_list_get(idsq_13, ixw_f)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("F")), (long long)(intptr_t)(idsq_16), (long long)(intptr_t)(ixw_kind), (long long)(intptr_t)(id_concat_f(ID_S(""), id_str_of_int(idsq_11), 2)), (long long)(intptr_t)(id_concat_f(ID_S(""), id_str_of_int(id_ixw_end(ixw_f)), 2)))));
     return;
 }
 
@@ -27142,7 +27240,7 @@ void id_ixw_struct(int ixw_k) {
     id_ixw_put(id_list_lit(2, (long long)(intptr_t)(ID_S("@")), (long long)(intptr_t)((char*)(intptr_t)(id_list_get(sdfile, ixw_k)))));
 IdList* idsq_24;
 char* idsq_22;
-    (idsq_24 = sdname, idsq_22 = (char*)(intptr_t)(id_list_get(idsq_24, ixw_k)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("F")), (long long)(intptr_t)(idsq_22), (long long)(intptr_t)(ID_S("s")), (long long)(intptr_t)(id_concat(ID_S(""), id_str_of_int((int)(id_list_get(sdline, ixw_k))))), (long long)(intptr_t)(ID_S("0")))));
+    (idsq_24 = sdname, idsq_22 = (char*)(intptr_t)(id_list_get(idsq_24, ixw_k)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("F")), (long long)(intptr_t)(idsq_22), (long long)(intptr_t)(ID_S("s")), (long long)(intptr_t)(id_concat_f(ID_S(""), id_str_of_int((int)(id_list_get(sdline, ixw_k))), 2)), (long long)(intptr_t)(ID_S("0")))));
     ixw_fields = id_ixw_field_types(ixw_k);
     id_ixw_tag(ID_S("D"), ixw_fields);
     return;
@@ -27200,7 +27298,7 @@ IdList* idsq_15;
 char* idsq_13;
 IdList* idsq_12;
 char* idsq_10;
-        (idsq_18 = dvfunc, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, ixw_k)), idsq_15 = dvname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, ixw_k)), idsq_12 = dvtype, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, ixw_k)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("V")), (long long)(intptr_t)(idsq_16), (long long)(intptr_t)(idsq_13), (long long)(intptr_t)(idsq_10), (long long)(intptr_t)(id_concat(ID_S(""), id_str_of_int((int)(id_list_get(dvline, ixw_k))))))));
+        (idsq_18 = dvfunc, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, ixw_k)), idsq_15 = dvname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, ixw_k)), idsq_12 = dvtype, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, ixw_k)), id_ixw_put(id_list_lit(5, (long long)(intptr_t)(ID_S("V")), (long long)(intptr_t)(idsq_16), (long long)(intptr_t)(idsq_13), (long long)(intptr_t)(idsq_10), (long long)(intptr_t)(id_concat_f(ID_S(""), id_str_of_int((int)(id_list_get(dvline, ixw_k))), 2)))));
     }
     return;
 }
@@ -27381,7 +27479,7 @@ char* id_ext_key(char* xe_str) {
     char* xe_key;
     xe_h1 = id_dg_fnv(0, xe_str);
     xe_h2 = id_dg_fnv(1469598103934665603LL, xe_str);
-    xe_key = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S(""), id_str_of_int(id_len(xe_str))), ID_S(":")), id_str_of_word(xe_h1)), ID_S(":")), id_str_of_word(xe_h2));
+    xe_key = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S(""), id_str_of_int(id_len(xe_str)), 2), ID_S(":"), 1), id_str_of_word(xe_h1), 3), ID_S(":"), 1), id_str_of_word(xe_h2), 3);
     return xe_key;
 }
 
@@ -27422,7 +27520,7 @@ void id_report_var_type(char* name, char* type, char* prev, char* owner, int ln)
     char* type_first;
     int type_first_ln;
     type_where = id_diag_fn_loc(owner, ln);
-    type_msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' is declared ")), type), ID_S(" here but ")), prev), ID_S(" elsewhere"));
+    type_msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("variable '"), name), ID_S("' is declared "), 1), type, 1), ID_S(" here but "), 1), prev, 1), ID_S(" elsewhere"), 1);
     id_diag(ID_S("E0303"), type_where, type_msg, name, ID_S("a name must keep one type across the whole program, so that one name always means one kind of value wherever it appears"), ID_S("rename this variable so that it differs from the other one, or declare both with the same type"));
     type_first = id_owner_of(name);
     type_first_ln = id_decl_line(name, type_first);
@@ -27492,7 +27590,7 @@ IdList* idsq_13;
 void id_report_var_is_func(char* name, char* owner, int ln) {
     char* isfn_where;
     isfn_where = id_diag_fn_loc(owner, ln);
-    id_diag(ID_S("E0308"), isfn_where, id_concat(id_concat(ID_S("'"), name), ID_S("' is already the name of a function")), name, ID_S("a function and a variable cannot share a name, because a call and a read of the name would look alike"), ID_S("rename the variable, or the function if the variable's name is the better one"));
+    id_diag(ID_S("E0308"), isfn_where, id_concat_f(id_concat(ID_S("'"), name), ID_S("' is already the name of a function"), 1), name, ID_S("a function and a variable cannot share a name, because a call and a read of the name would look alike"), ID_S("rename the variable, or the function if the variable's name is the better one"));
     return;
 }
 
@@ -27500,8 +27598,8 @@ void id_report_var_twice(char* name, char* owner, int ln) {
     char* twice_where;
     char* twice_msg;
     twice_where = id_diag_fn_loc(owner, ln);
-    twice_msg = id_concat(id_concat(id_concat(id_concat(ID_S("variable '"), name), ID_S("' is declared twice in function '")), owner), ID_S("'"));
-    id_diag(ID_S("E0302"), twice_where, twice_msg, name, ID_S("a name inside a function means one variable, so declaring it twice would make every later use ambiguous"), id_concat(id_concat(ID_S("rename one of the two, or drop the type from the second so that it assigns to the first, as in `"), name), ID_S(" = ...;`")));
+    twice_msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("variable '"), name), ID_S("' is declared twice in function '"), 1), owner, 1), ID_S("'"), 1);
+    id_diag(ID_S("E0302"), twice_where, twice_msg, name, ID_S("a name inside a function means one variable, so declaring it twice would make every later use ambiguous"), id_concat_f(id_concat(ID_S("rename one of the two, or drop the type from the second so that it assigns to the first, as in `"), name), ID_S(" = ...;`"), 1));
     return;
 }
 
@@ -27510,7 +27608,7 @@ void id_report_var_exported(char* name, char* owner, int ln) {
     char* export_owner_v;
     exp_where = id_diag_fn_loc(owner, ln);
     export_owner_v = id_export_owner(name);
-    id_diag(ID_S("E0309"), exp_where, id_concat(id_concat(id_concat(id_concat(ID_S("'"), name), ID_S("' is an exported global (by '")), export_owner_v), ID_S("'); another variable cannot reuse that name")), name, ID_S("an exported global is visible to the whole program through `import`, so a local of the same name would hide it from the reader"), id_concat(id_concat(ID_S("read the global with `(import "), name), ID_S(")`, or give this variable another name")));
+    id_diag(ID_S("E0309"), exp_where, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), name), ID_S("' is an exported global (by '"), 1), export_owner_v, 1), ID_S("'); another variable cannot reuse that name"), 1), name, ID_S("an exported global is visible to the whole program through `import`, so a local of the same name would hide it from the reader"), id_concat_f(id_concat(ID_S("read the global with `(import "), name), ID_S(")`, or give this variable another name"), 1));
     return;
 }
 
@@ -27589,7 +27687,7 @@ void id_reg_var(char* name, char* type, char* owner, int exported, int ln, int u
     id_list_push(dvline, (long long)(ln));
     if ((id_str_starts(name, ID_S("idsq_")) == 1)) {
         loc_at_v = id_loc_at(owner, ln);
-        id_var_report(id_concat(id_concat(id_concat(loc_at_v, ID_S("names beginning 'idsq_' are reserved for the C target's temporaries; rename '")), name), ID_S("'")));
+        id_var_report(id_concat_f(id_concat_f(id_concat(loc_at_v, ID_S("names beginning 'idsq_' are reserved for the C target's temporaries; rename '")), name, 1), ID_S("'"), 1));
     }
     return;
 }
@@ -28001,7 +28099,7 @@ char* id_arg_err_msg2(int id, char* pname, char* pt, char* t) {
     char* callname;
     char* msg;
     callname = (char*)(intptr_t)(id_list_get(ns1, id));
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("argument '"), pname), ID_S("' of '")), callname), ID_S("' expects ")), pt), ID_S(", got ")), t);
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), pname), ID_S("' of '"), 1), callname, 1), ID_S("' expects "), 1), pt, 1), ID_S(", got "), 1), t, 1);
     return msg;
 }
 
@@ -28058,7 +28156,7 @@ IdList* idsq_31;
 IdList* idsq_29;
 int idsq_28;
 IdList* idsq_22;
-    msg = (idsq_31 = nl1, idsq_29 = (IdList*)(intptr_t)(id_list_get(idsq_31, id)), idsq_28 = id_list_len(idsq_29), idsq_22 = ns1, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'bind' gives "), id_str_of_int((idsq_28 - 1))), ID_S(" values to '")), (char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0))))), ID_S("', which takes ")), id_str_of_int(np)), ID_S(" parameter(s); bind fixes the leading parameters, so give at most ")), id_str_of_int(np)));
+    msg = (idsq_31 = nl1, idsq_29 = (IdList*)(intptr_t)(id_list_get(idsq_31, id)), idsq_28 = id_list_len(idsq_29), idsq_22 = ns1, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("'bind' gives "), id_str_of_int((idsq_28 - 1)), 2), ID_S(" values to '"), 1), (char*)(intptr_t)(id_list_get(idsq_22, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0)))), 1), ID_S("', which takes "), 1), id_str_of_int(np), 3), ID_S(" parameter(s); bind fixes the leading parameters, so give at most "), 1), id_str_of_int(np), 3));
     id_tc_err(id, msg);
     return;
 }
@@ -28080,9 +28178,9 @@ char* id_bind_notfn_msg(int a) {
     nm = (char*)(intptr_t)(id_list_get(ns1, a));
     msg = id_bind_kind_msg(t);
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("var")) == 0) && (id_is_builtin(nm) == 1))) {
-        msg = id_concat(id_concat(id_concat(id_concat(ID_S("'bind' cannot bind '"), nm), ID_S("': it is a builtin, not a function defined in id; write a function that calls '")), nm), ID_S("' and bind that"));
+        msg = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'bind' cannot bind '"), nm), ID_S("': it is a builtin, not a function defined in id; write a function that calls '"), 1), nm, 1), ID_S("' and bind that"), 1);
     } else if ((id_ty_is_func(t) == 1)) {
-        msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'bind' takes the name of a function written in id, but '"), nm), ID_S("' is a variable of type ")), t), ID_S("; bind the function by its own name where it is known, or pass '")), nm), ID_S("' on unchanged"));
+        msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'bind' takes the name of a function written in id, but '"), nm), ID_S("' is a variable of type "), 1), t, 1), ID_S("; bind the function by its own name where it is known, or pass '"), 1), nm, 1), ID_S("' on unchanged"), 1);
     }
     return msg;
 }
@@ -28091,7 +28189,7 @@ char* id_bind_kind_msg(char* t) {
     char* msg;
     msg = ID_S("");
     if ((strcmp(t, ID_S("")) != 0)) {
-        msg = id_concat(id_concat(ID_S("'bind' takes the name of a function written in id as its first argument, but it is a "), t), ID_S("; write bind(NAME, value, ...)"));
+        msg = id_concat_f(id_concat(ID_S("'bind' takes the name of a function written in id as its first argument, but it is a "), t), ID_S("; write bind(NAME, value, ...)"), 1);
     }
     return msg;
 }
@@ -28104,9 +28202,9 @@ char* id_bind_val_msg(int id, int i, char* pt, int v) {
     t = id_type_of(v);
     msg = id_bind_cap_msg(who, pt);
     if ((id_bad_store(pt, v) == 1)) {
-        msg = id_concat(id_concat(id_concat(id_concat(who, ID_S(" expects ")), pt), ID_S(", got ")), t);
+        msg = id_concat_f(id_concat_f(id_concat_f(id_concat(who, ID_S(" expects ")), pt, 1), ID_S(", got "), 1), t, 1);
     } else if ((id_ty_narrows(pt, t) == 1)) {
-        msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(who, ID_S(" narrows ")), t), ID_S(" to ")), pt), ID_S("; declare a ")), pt), ID_S(" local and pass that"));
+        msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(who, ID_S(" narrows ")), t, 1), ID_S(" to "), 1), pt, 1), ID_S("; declare a "), 1), pt, 1), ID_S(" local and pass that"), 1);
     }
     return msg;
 }
@@ -28115,9 +28213,9 @@ char* id_bind_cap_msg(char* who, char* pt) {
     char* msg;
     msg = ID_S("");
     if ((id_ty_is_struct(pt) == 1)) {
-        msg = id_concat(id_concat(id_concat(who, ID_S(" cannot be captured: it is a ")), pt), ID_S(", a struct, which is a reference the closure would share with its owner; capture the fields it needs as separate values"));
+        msg = id_concat_f(id_concat_f(id_concat(who, ID_S(" cannot be captured: it is a ")), pt, 1), ID_S(", a struct, which is a reference the closure would share with its owner; capture the fields it needs as separate values"), 1);
     } else if ((id_bind_nested(pt) == 1)) {
-        msg = id_concat(id_concat(id_concat(who, ID_S(" cannot be captured: it is a ")), pt), ID_S(", a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)"));
+        msg = id_concat_f(id_concat_f(id_concat(who, ID_S(" cannot be captured: it is a ")), pt, 1), ID_S(", a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)"), 1);
     }
     return msg;
 }
@@ -28159,7 +28257,7 @@ char* id_bind_who(int id, int i) {
     char* who;
 IdList* idsq_19;
     nm = (idsq_19 = ns1, (char*)(intptr_t)(id_list_get(idsq_19, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0)))));
-    who = id_concat(id_concat(id_concat(id_concat(ID_S("'bind' value "), id_str_of_int(i)), ID_S(" for '")), nm), ID_S("'"));
+    who = id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("'bind' value "), id_str_of_int(i), 2), ID_S(" for '"), 1), nm, 1), ID_S("'"), 1);
     return who;
 }
 
@@ -28182,7 +28280,7 @@ char* id_bind_tail(char* ft, int nd) {
     if (((id_ty_is_func(ft) == 1) && (nd <= id_list_len(id_fn_params(ft))))) {
 IdList* idsq_13;
 char* idsq_11;
-        t = (idsq_13 = id_fn_params(ft), idsq_11 = id_bind_join(idsq_13, nd), id_concat(id_concat(id_concat(ID_S("func("), idsq_11), ID_S(") return ")), id_fn_ret(ft)));
+        t = (idsq_13 = id_fn_params(ft), idsq_11 = id_bind_join(idsq_13, nd), id_concat_f(id_concat_f(id_concat(ID_S("func("), idsq_11), ID_S(") return "), 1), id_fn_ret(ft), 1));
     }
     return t;
 }
@@ -28194,7 +28292,7 @@ char* id_bind_join(IdList* pts, int nd) {
     i = nd;
     while ((i < id_list_len(pts))) {
 char* idsq_13;
-        out = (idsq_13 = id_sep_at(ID_S(", "), (i - nd)), id_concat(id_concat(out, idsq_13), (char*)(intptr_t)(id_list_get(pts, i))));
+        out = (idsq_13 = id_sep_at(ID_S(", "), (i - nd)), id_concat_f(id_concat(out, idsq_13), (char*)(intptr_t)(id_list_get(pts, i)), 1));
         i = (i + 1);
     }
     return out;
@@ -28215,7 +28313,7 @@ char* id_narrow_err_msg2(int id, char* pname, char* pt, char* t) {
     char* callname;
     char* msg;
     callname = (char*)(intptr_t)(id_list_get(ns1, id));
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("argument '"), pname), ID_S("' of '")), callname), ID_S("' narrows ")), t), ID_S(" to ")), pt), ID_S("; declare a ")), pt), ID_S(" local and pass that"));
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), pname), ID_S("' of '"), 1), callname, 1), ID_S("' narrows "), 1), t, 1), ID_S(" to "), 1), pt, 1), ID_S("; declare a "), 1), pt, 1), ID_S(" local and pass that"), 1);
     return msg;
 }
 
@@ -28297,9 +28395,9 @@ void id_chk_bi_arg(int id, int i) {
     }
     nm = (char*)(intptr_t)(id_list_get(ns1, id));
     if (((((strcmp(nm, ID_S("print")) == 0) || (strcmp(nm, ID_S("eprint")) == 0)) || (strcmp(nm, ID_S("put")) == 0)) && (id_ty_is_list(t) == 1))) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), nm), ID_S("' cannot take a list: argument ")), id_str_of_int(i)), ID_S(" is ")), t), ID_S("; a list has no text form -- write its elements one at a time, as in ")), nm), ID_S("(xs[0]) inside a while loop, or build a string from them")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a list: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a list has no text form -- write its elements one at a time, as in "), 1), nm, 1), ID_S("(xs[0]) inside a while loop, or build a string from them"), 1));
     } else if ((((strcmp(nm, ID_S("put")) == 0) && (id_ty_known(t) == 1)) && (strcmp(t, ID_S("string")) != 0))) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("'put' takes a string, but argument "), id_str_of_int(i)), ID_S(" is ")), t), ID_S("; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("'put' takes a string, but argument "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1), ID_S("; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line"), 1));
     }
     return;
 }
@@ -28338,7 +28436,7 @@ void id_fv_bi_arg(int id, int i) {
     t = id_type_of(a);
     if ((id_ty_is_func(t) == 1)) {
         nm = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(a, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), nm), ID_S("' cannot take a function value: argument ")), id_str_of_int(i)), ID_S(" is ")), t), ID_S("; a function value can only be passed to a function written in id, stored or called")));
+        id_tc_err(a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a function value: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a function value can only be passed to a function written in id, stored or called"), 1));
     }
     return;
 }
@@ -28527,7 +28625,7 @@ char* id_bi_other_msg(int id) {
     char* msg;
     name = (char*)(intptr_t)(id_list_get(ns1, id));
     bc = id_bi_count(name);
-    msg = id_concat(id_concat(name, ID_S(" takes ")), bc);
+    msg = id_concat_f(id_concat(name, ID_S(" takes ")), bc, 1);
     return msg;
 }
 
@@ -28547,7 +28645,7 @@ char* id_bi_count_word(char* name) {
     char* s;
     n = id_bi_arity(name);
     plural = id_bi_plural(name);
-    s = id_concat(id_concat(id_str_of_int(n), ID_S(" argument")), plural);
+    s = id_concat_f(id_concat_f(id_str_of_int(n), ID_S(" argument"), 1), plural, 1);
     return s;
 }
 
@@ -28555,7 +28653,7 @@ char* id_bi_sys_msg2(int id, char* name, char* cw) {
     int argn_v;
     char* msg;
     argn_v = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)));
-    msg = id_concat(id_concat(id_concat(id_concat(name, ID_S(" takes exactly ")), cw), ID_S(", got ")), id_str_of_int(argn_v));
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat(name, ID_S(" takes exactly ")), cw, 1), ID_S(", got "), 1), id_str_of_int(argn_v), 3);
     return msg;
 }
 
@@ -28585,11 +28683,11 @@ void id_bi_arg_err3(int id, int i, char* want, char* t) {
     if ((strcmp(want, ID_S("word")) == 0)) {
         l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
         s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err((int)(id_list_get(l1_of_v, i)), id_concat(id_concat(s1_of_v, ID_S(" expects int or word arguments, got ")), t));
+        id_tc_err((int)(id_list_get(l1_of_v, i)), id_concat_f(id_concat(s1_of_v, ID_S(" expects int or word arguments, got ")), t, 1));
     } else {
         s1_of_v2 = (char*)(intptr_t)(id_list_get(ns1, id));
         bi_verb_v = id_bi_verb(want);
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(s1_of_v2, ID_S(" ")), bi_verb_v), ID_S(", got ")), t));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(s1_of_v2, ID_S(" ")), bi_verb_v, 1), ID_S(", got "), 1), t, 1));
     }
     return;
 }
@@ -28673,7 +28771,7 @@ void id_chk_const_mut3(int id, char* name) {
 void id_cml_report(int id, char* name) {
     char* op;
     op = (char*)(intptr_t)(id_list_get(ns1, id));
-    id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("'"), op), ID_S("' cannot mutate '")), name), ID_S("', a list constant; pass it to a function that takes the list as a parameter instead")));
+    id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), op), ID_S("' cannot mutate '"), 1), name, 1), ID_S("', a list constant; pass it to a function that takes the list as a parameter instead"), 1));
     return;
 }
 
@@ -28713,7 +28811,7 @@ void id_arity_err(int id, int fn) {
     name = (char*)(intptr_t)(id_list_get(ns1, id));
     msg = id_arity_err_msg(id, fn, name);
     arity_sig = id_diag_sig(fn);
-    id_tc_diag(id, ID_S("E0605"), msg, name, ID_S("a call passes exactly the arguments the function declares, in order, so that every parameter gets a value"), id_concat(id_concat(ID_S("call it as "), arity_sig), ID_S(", with a value for each parameter")));
+    id_tc_diag(id, ID_S("E0605"), msg, name, ID_S("a call passes exactly the arguments the function declares, in order, so that every parameter gets a value"), id_concat_f(id_concat(ID_S("call it as "), arity_sig), ID_S(", with a value for each parameter"), 1));
     return;
 }
 
@@ -28723,7 +28821,7 @@ char* id_arity_err_msg(int id, int fn, char* name) {
     char* msg;
     need = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn)));
     have = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)));
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("function '"), name), ID_S("' takes ")), id_str_of_int(need)), ID_S(" argument(s), got ")), id_str_of_int(have));
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("function '"), name), ID_S("' takes "), 1), id_str_of_int(need), 3), ID_S(" argument(s), got "), 1), id_str_of_int(have), 3);
     return msg;
 }
 
@@ -28812,21 +28910,21 @@ void id_fcall_arity_err(int id, char* vt, IdList* pts) {
     need = id_list_len(pts);
 IdList* idsq_26;
 char* idsq_24;
-    msg = (idsq_26 = ns1, idsq_24 = (char*)(intptr_t)(id_list_get(idsq_26, id)), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), idsq_24), ID_S("' is a ")), vt), ID_S(", which takes ")), id_str_of_int(need)), ID_S(" argument(s), got ")), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id))))));
+    msg = (idsq_26 = ns1, idsq_24 = (char*)(intptr_t)(id_list_get(idsq_26, id)), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_24), ID_S("' is a "), 1), vt, 1), ID_S(", which takes "), 1), id_str_of_int(need), 3), ID_S(" argument(s), got "), 1), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)))), 3));
     id_tc_err(id, msg);
     return;
 }
 
 void id_fcall_arg_err(int id, char* vt, char* pt, int a, int i, char* t) {
     char* msg;
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("argument "), id_str_of_int(i)), ID_S(" of '")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("' (a ")), vt), ID_S(") expects ")), pt), ID_S(", got ")), t);
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("argument "), id_str_of_int(i), 2), ID_S(" of '"), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1), ID_S("' (a "), 1), vt, 1), ID_S(") expects "), 1), pt, 1), ID_S(", got "), 1), t, 1);
     id_tc_err(a, msg);
     return;
 }
 
 void id_fcall_narrow_err(int id, char* vt, char* pt, int a, int i, char* t) {
     char* msg;
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("argument "), id_str_of_int(i)), ID_S(" of '")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("' (a ")), vt), ID_S(") narrows ")), t), ID_S(" to ")), pt), ID_S("; declare a ")), pt), ID_S(" local and pass that"));
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("argument "), id_str_of_int(i), 2), ID_S(" of '"), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1), ID_S("' (a "), 1), vt, 1), ID_S(") narrows "), 1), t, 1), ID_S(" to "), 1), pt, 1), ID_S("; declare a "), 1), pt, 1), ID_S(" local and pass that"), 1);
     id_tc_err(a, msg);
     return;
 }
@@ -28876,7 +28974,7 @@ void id_chk_index(int id) {
     char* bt;
     bt = id_base_type(id);
     if (((id_ty_known(bt) == 1) && (id_ty_is_list(bt) == 0))) {
-        id_ix_err(id, id_concat(id_concat(ID_S("cannot index a "), bt), id_ix_hint(bt)));
+        id_ix_err(id, id_concat_f(id_concat(ID_S("cannot index a "), bt), id_ix_hint(bt), 1));
     } else {
         id_chk_index2(id);
     }
@@ -28999,7 +29097,7 @@ void id_chk_push2(int id, IdList* args, char* lt) {
     et = id_elem_type(lt);
     if (((id_ty_is_list(lt) == 1) && (id_bad_store(et, (int)(id_list_get(args, 1))) == 1))) {
         type_of_v = id_type_of((int)(id_list_get(args, 1)));
-        id_tc_err(id, id_concat(id_concat(id_concat(ID_S("cannot push a "), type_of_v), ID_S(" onto a ")), lt));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot push a "), type_of_v), ID_S(" onto a "), 1), lt, 1));
     }
     return;
 }
@@ -29177,7 +29275,7 @@ void id_fn_ret_type(int id) {
     rt = (char*)(intptr_t)(id_list_get(ns2, id));
     if ((id_ty_is_func(rt) == 1)) {
         nm = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("'"), nm), ID_S("' returns ")), rt), ID_S("; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' returns "), 1), rt, 1), ID_S("; a function value cannot be a function's return type -- store it in an export, or pass it to the function that calls it"), 1));
     }
     return;
 }
@@ -29206,7 +29304,7 @@ char* id_ret_err_msg(int id, char* t) {
     char* msg;
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     s2_of_v = (char*)(intptr_t)(id_list_get(ns2, id));
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("function '"), s1_of_v), ID_S("' returns ")), s2_of_v), ID_S(" but the expression has type ")), t);
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("function '"), s1_of_v), ID_S("' returns "), 1), s2_of_v, 1), ID_S(" but the expression has type "), 1), t, 1);
     return msg;
 }
 
@@ -29216,7 +29314,7 @@ char* id_ret_narrow_err_msg(int id, char* t) {
     char* msg;
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     s2_of_v = (char*)(intptr_t)(id_list_get(ns2, id));
-    msg = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("the return clause of '"), s1_of_v), ID_S("' narrows ")), t), ID_S(" to ")), s2_of_v), ID_S("; declare a ")), s2_of_v), ID_S(" local, assign it, and return that"));
+    msg = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("the return clause of '"), s1_of_v), ID_S("' narrows "), 1), t, 1), ID_S(" to "), 1), s2_of_v, 1), ID_S("; declare a "), 1), s2_of_v, 1), ID_S(" local, assign it, and return that"), 1);
     return msg;
 }
 
@@ -29232,10 +29330,10 @@ void id_chk_retexpr(int id) {
     ret_fn_nm = (char*)(intptr_t)(id_list_get(ns1, id));
     ret_fn_ty = (char*)(intptr_t)(id_list_get(ns2, id));
     if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("ret")) == 0) && (strcmp(ret_fn_ty, ID_S("void")) == 0)) && (e >= 0))) {
-        id_tc_err(e, id_concat(id_concat(ID_S("'"), ret_fn_nm), ID_S("' returns void, so its 'return' takes no value; write 'return;'")));
+        id_tc_err(e, id_concat_f(id_concat(ID_S("'"), ret_fn_nm), ID_S("' returns void, so its 'return' takes no value; write 'return;'"), 1));
     }
     if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("ret")) == 0) && (strcmp(ret_fn_ty, ID_S("void")) != 0)) && (e < 0))) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("'"), ret_fn_nm), ID_S("' returns ")), ret_fn_ty), ID_S(", so 'return;' needs a value; write 'return NAME;' or 'return LITERAL;'")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), ret_fn_nm), ID_S("' returns "), 1), ret_fn_ty, 1), ID_S(", so 'return;' needs a value; write 'return NAME;' or 'return LITERAL;'"), 1));
     }
     return;
 }
@@ -29262,7 +29360,7 @@ void id_ret_err(int id, char* t) {
     msg = id_ret_err_msg(id, t);
 IdList* idsq_14;
 char* idsq_12;
-    (idsq_14 = ns2, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_tc_diag(i1_of_v, ID_S("E0602"), msg, ID_S(""), ID_S("a function's return clause must have exactly the type the function declares, so that every caller can rely on what it gets back"), id_concat(id_concat(id_concat(id_concat(ID_S("return a value of type "), idsq_12), ID_S(", convert the value before returning it, or change the declared return type of '")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("'"))));
+    (idsq_14 = ns2, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_tc_diag(i1_of_v, ID_S("E0602"), msg, ID_S(""), ID_S("a function's return clause must have exactly the type the function declares, so that every caller can rely on what it gets back"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("return a value of type "), idsq_12), ID_S(", convert the value before returning it, or change the declared return type of '"), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1), ID_S("'"), 1)));
     return;
 }
 
@@ -29288,7 +29386,7 @@ void id_eq_report(int id, char* lt, char* rt) {
     int eq_ok_v;
     eq_ok_v = id_eq_ok(lt, rt);
     if ((id_cmp_bad(lt, rt, eq_ok_v) == 1)) {
-        id_tc_diag(id, ID_S("E0604"), id_concat(id_concat(id_concat(ID_S("cannot compare "), lt), ID_S(" with ")), rt), ID_S(""), ID_S("== and != compare two strings or two numbers, and < <= > >= compare two numbers; id has no ordering on strings and no silent conversion between a string and a number"), ID_S("compare like with like: convert one side first (to_int(s) makes a number of a string, and \"\" + n makes a string of a number), or to order strings use idstd's str_cmp(a, b)"));
+        id_tc_diag(id, ID_S("E0604"), id_concat_f(id_concat_f(id_concat(ID_S("cannot compare "), lt), ID_S(" with "), 1), rt, 1), ID_S(""), ID_S("== and != compare two strings or two numbers, and < <= > >= compare two numbers; id has no ordering on strings and no silent conversion between a string and a number"), ID_S("compare like with like: convert one side first (to_int(s) makes a number of a string, and \"\" + n makes a string of a number), or to order strings use idstd's str_cmp(a, b)"));
     }
     return;
 }
@@ -29324,7 +29422,7 @@ void id_ord_report(int id, char* lt, char* rt) {
     int ord_ok_v;
     ord_ok_v = id_ord_ok(lt, rt);
     if ((id_cmp_bad(lt, rt, ord_ok_v) == 1)) {
-        id_tc_err(id, id_concat(id_concat(id_concat(ID_S("cannot order "), lt), ID_S(" and ")), rt));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot order "), lt), ID_S(" and "), 1), rt, 1));
     }
     return;
 }
@@ -29342,9 +29440,9 @@ void id_cond_kind(int id, char* msg, char* t) {
     if ((strcmp(id_ty_kind(t), ID_S("unit")) == 0)) {
         id_tc_err(id, msg);
     } else if ((strcmp(id_ty_kind(t), ID_S("func")) == 0)) {
-        id_tc_err(id, id_concat(id_concat(ID_S("a condition cannot be a function value ("), t), ID_S("); call it, and test what it returns")));
+        id_tc_err(id, id_concat_f(id_concat(ID_S("a condition cannot be a function value ("), t), ID_S("); call it, and test what it returns"), 1));
     } else if ((strcmp(id_ty_kind(t), ID_S("struct")) == 0)) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("a condition cannot be a struct ("), t), ID_S("); test one of its fields, as in ")), id_sd_cell(sdfname, t, 0)), ID_S(" > 0")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a condition cannot be a struct ("), t), ID_S("); test one of its fields, as in "), 1), id_sd_cell(sdfname, t, 0), 1), ID_S(" > 0"), 1));
     }
     return;
 }
@@ -29380,7 +29478,7 @@ void id_fv_side(int id, int e, char* side) {
     t = id_type_of(e);
     if ((id_ty_is_func(t) == 1)) {
         op = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), op), ID_S("' cannot take a function value: its ")), side), ID_S(" operand is ")), t), ID_S("; a function value can only be passed, stored or called")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), op), ID_S("' cannot take a function value: its "), 1), side, 1), ID_S(" operand is "), 1), t, 1), ID_S("; a function value can only be passed, stored or called"), 1));
     }
     if ((id_ty_is_struct(t) == 1)) {
 IdList* idsq_37;
@@ -29389,7 +29487,7 @@ IdList* idsq_22;
 char* idsq_19;
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_37 = ns1, idsq_35 = (char*)(intptr_t)(id_list_get(idsq_37, id)), idsq_22 = sdfname, idsq_19 = id_sd_cell(idsq_22, t, 0), idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), idsq_35), ID_S("' cannot take a struct: its ")), side), ID_S(" operand is ")), t), ID_S("; a struct is compared and combined by field, as in a.")), idsq_19), ID_S(" ")), idsq_13), ID_S(" b.")), id_sd_cell(sdfname, t, 0))));
+        (idsq_37 = ns1, idsq_35 = (char*)(intptr_t)(id_list_get(idsq_37, id)), idsq_22 = sdfname, idsq_19 = id_sd_cell(idsq_22, t, 0), idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_35), ID_S("' cannot take a struct: its "), 1), side, 1), ID_S(" operand is "), 1), t, 1), ID_S("; a struct is compared and combined by field, as in a."), 1), idsq_19, 1), ID_S(" "), 1), idsq_13, 1), ID_S(" b."), 1), id_sd_cell(sdfname, t, 0), 1)));
     }
     return;
 }
@@ -29471,7 +29569,7 @@ void id_mixed_say(int id, char* words, char* want) {
     int mixed_ln;
     was = id_show_bin(id);
     mixed_ln = id_tc_line(id);
-    id_tc_diag(id, ID_S("E0601"), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), was), ID_S("' mixes ")), words), ID_S("; parenthesize it as the current precedence reads it: '")), want), ID_S("'")), was, ID_S("the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down"), ID_S("write the parentheses the current precedence implies"));
+    id_tc_diag(id, ID_S("E0601"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), was), ID_S("' mixes "), 1), words, 1), ID_S("; parenthesize it as the current precedence reads it: '"), 1), want, 1), ID_S("'"), 1), was, ID_S("the bitwise operators bind tighter than the comparisons in id and looser in C, so a reader who knows the other table reads the line differently; the rule asks for the grouping to be written down"), ID_S("write the parentheses the current precedence implies"));
     id_diag_edit(ID_S("machine"), ID_S("replace"), mixed_ln, was, want);
     return;
 }
@@ -29485,7 +29583,7 @@ char* id_mixed_fix(int id) {
 char* idsq_16;
 IdList* idsq_13;
 char* idsq_11;
-    ret_s = (idsq_16 = id_fix_side(id, i1_of_v), idsq_13 = ns1, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, id)), id_concat(id_concat(id_concat(id_concat(idsq_16, ID_S(" ")), idsq_11), ID_S(" ")), id_fix_side(id, i2_of_v)));
+    ret_s = (idsq_16 = id_fix_side(id, i1_of_v), idsq_13 = ns1, idsq_11 = (char*)(intptr_t)(id_list_get(idsq_13, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_16, ID_S(" ")), idsq_11, 1), ID_S(" "), 1), id_fix_side(id, i2_of_v), 1));
     return ret_s;
 }
 
@@ -29497,7 +29595,7 @@ char* id_show_list(int id) {
         args = (IdList*)(intptr_t)(id_list_get(nl1, id));
 IdList* idsq_14;
 char* idsq_12;
-        out = (idsq_14 = ns1, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_concat(id_concat(id_concat(idsq_12, ID_S("(")), id_show_args(args)), ID_S(")")));
+        out = (idsq_14 = ns1, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, id)), id_concat_f(id_concat_f(id_concat(idsq_12, ID_S("(")), id_show_args(args), 1), ID_S(")"), 1));
     }
     return out;
 }
@@ -29508,7 +29606,7 @@ char* id_show_arr(int id) {
     out = ID_S("...");
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("arr")) == 0)) {
         elems = (IdList*)(intptr_t)(id_list_get(nl1, id));
-        out = id_concat(id_concat(ID_S("["), id_show_args(elems)), ID_S("]"));
+        out = id_concat_f(id_concat(ID_S("["), id_show_args(elems)), ID_S("]"), 1);
     }
     return out;
 }
@@ -29541,7 +29639,7 @@ char* id_show_more(int id) {
         out = id_show_bin(id);
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("import")) == 0)) {
-        out = id_concat(id_concat(ID_S("(import "), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S(")"));
+        out = id_concat_f(id_concat(ID_S("(import "), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S(")"), 1);
     }
     return out;
 }
@@ -29562,7 +29660,7 @@ char* idsq_34;
         i1_of_v2 = (int)(id_list_get(ni1, id));
         i2_of_v = (int)(id_list_get(ni2, id));
 char* idsq_12;
-        out = (idsq_12 = id_show_side(i1_of_v2), id_concat(id_concat(id_concat(idsq_12, ID_S("[")), id_show_expr(i2_of_v)), ID_S("]")));
+        out = (idsq_12 = id_show_side(i1_of_v2), id_concat_f(id_concat_f(id_concat(idsq_12, ID_S("[")), id_show_expr(i2_of_v), 1), ID_S("]"), 1));
     }
     return out;
 }
@@ -29574,7 +29672,7 @@ char* id_show_arg_at(IdList* l, int i, char* out) {
     if ((i > 0)) {
         sep = ID_S(", ");
     }
-    ret_s = id_concat(id_concat(out, sep), id_show_expr((int)(id_list_get(l, i))));
+    ret_s = id_concat_f(id_concat(out, sep), id_show_expr((int)(id_list_get(l, i))), 1);
     return ret_s;
 }
 
@@ -29587,7 +29685,7 @@ char* id_show_bin(int id) {
 char* idsq_15;
 IdList* idsq_12;
 char* idsq_10;
-    ret_s = (idsq_15 = id_show_side(i1_of_v), idsq_12 = ns1, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat(id_concat(id_concat(id_concat(idsq_15, ID_S(" ")), idsq_10), ID_S(" ")), id_show_side(i2_of_v)));
+    ret_s = (idsq_15 = id_show_side(i1_of_v), idsq_12 = ns1, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_15, ID_S(" ")), idsq_10, 1), ID_S(" "), 1), id_show_side(i2_of_v), 1));
     return ret_s;
 }
 
@@ -29595,7 +29693,7 @@ char* id_show_side(int c) {
     char* out;
     out = id_show_expr(c);
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, c)), ID_S("bin")) == 0) && (id_paren_missing(c) == 0))) {
-        out = id_concat(id_concat(ID_S("("), out), ID_S(")"));
+        out = id_concat_f(id_concat(ID_S("("), out), ID_S(")"), 1);
     }
     return out;
 }
@@ -29604,7 +29702,7 @@ char* id_fix_side(int id, int c) {
     char* out;
     out = id_show_side(c);
     if ((id_mixed_side(id, c) == 1)) {
-        out = id_concat(id_concat(ID_S("("), out), ID_S(")"));
+        out = id_concat_f(id_concat(ID_S("("), out), ID_S(")"), 1);
     }
     return out;
 }
@@ -29621,9 +29719,9 @@ char* id_mixed_words(int id, int c) {
 
 char* id_bit_cmp_words(char* po, char* co) {
     char* out;
-    out = id_concat(id_concat(id_concat(id_concat(ID_S("a bitwise '"), co), ID_S("' with a comparison '")), po), ID_S("'"));
+    out = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a bitwise '"), co), ID_S("' with a comparison '"), 1), po, 1), ID_S("'"), 1);
     if ((id_is_bitop(po) == 1)) {
-        out = id_concat(id_concat(id_concat(id_concat(ID_S("a bitwise '"), po), ID_S("' with a comparison '")), co), ID_S("'"));
+        out = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a bitwise '"), po), ID_S("' with a comparison '"), 1), co, 1), ID_S("'"), 1);
     }
     return out;
 }
@@ -29717,10 +29815,10 @@ void id_bits_err(int id, char* lt, char* rt) {
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     if ((id_is_logop(s1_of_v) == 1)) {
         s1_of_v2 = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(id, id_concat(id_concat(ID_S("'"), s1_of_v2), ID_S("' requires int operands")));
+        id_tc_err(id, id_concat_f(id_concat(ID_S("'"), s1_of_v2), ID_S("' requires int operands"), 1));
     } else {
         s1_of_v3 = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), s1_of_v3), ID_S("' requires int or word operands, got ")), lt), ID_S(" and ")), rt));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), s1_of_v3), ID_S("' requires int or word operands, got "), 1), lt, 1), ID_S(" and "), 1), rt, 1));
     }
     return;
 }
@@ -29805,7 +29903,7 @@ void id_chk_un2(int id, char* t) {
         id_tc_err(id, id_concat(ID_S("cannot negate a "), t));
     } else if (((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("-")) != 0) && (id_ty_int(t) == 0))) {
         s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(id, id_concat(id_concat(id_concat(ID_S("cannot apply '"), s1_of_v), ID_S("' to a ")), t));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot apply '"), s1_of_v), ID_S("' to a "), 1), t, 1));
     }
     return;
 }
@@ -29848,7 +29946,7 @@ void id_decl_err(int id, char* t, int e) {
     char* type_of_v;
     s2_of_v = (char*)(intptr_t)(id_list_get(ns2, id));
     type_of_v = id_type_of(e);
-    id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("cannot initialize "), t), ID_S(" '")), s2_of_v), ID_S("' with a ")), type_of_v), ID_S(" value")));
+    id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot initialize "), t), ID_S(" '"), 1), s2_of_v, 1), ID_S("' with a "), 1), type_of_v, 1), ID_S(" value"), 1));
     return;
 }
 
@@ -29857,7 +29955,7 @@ void id_assign_err(int id, char* vt, int e) {
     char* s1_of_v;
     type_of_v = id_type_of(e);
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-    id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("cannot assign a "), type_of_v), ID_S(" value to ")), vt), ID_S(" '")), s1_of_v), ID_S("'")));
+    id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot assign a "), type_of_v), ID_S(" value to "), 1), vt, 1), ID_S(" '"), 1), s1_of_v, 1), ID_S("'"), 1));
     return;
 }
 
@@ -29956,8 +30054,8 @@ void id_pure_err_value(int id, int fn) {
     char* pq_help;
     pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
     pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
-    pq_help = id_concat(id_concat(id_concat(id_concat(ID_S("declare the parameter 'pure func(...) return ... "), pq_callee), ID_S("', so that every caller has to pass a pure function; or remove 'pure' from '")), pq_fn), ID_S("'"));
-    id_diag(ID_S("E0805"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls the function value '")), pq_callee), ID_S("', which is not a pure parameter")), pq_callee, ID_S("a call through a function value runs a function the compiler cannot see from here, so it can only be proved pure if the value is a parameter declared pure"), pq_help);
+    pq_help = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("declare the parameter 'pure func(...) return ... "), pq_callee), ID_S("', so that every caller has to pass a pure function; or remove 'pure' from '"), 1), pq_fn, 1), ID_S("'"), 1);
+    id_diag(ID_S("E0805"), id_tc_at(id), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls the function value '"), 1), pq_callee, 1), ID_S("', which is not a pure parameter"), 1), pq_callee, ID_S("a call through a function value runs a function the compiler cannot see from here, so it can only be proved pure if the value is a parameter declared pure"), pq_help);
     return;
 }
 
@@ -29965,11 +30063,11 @@ char* id_pure_arg_text(int arg) {
     char* pq_text;
     pq_text = ID_S("an expression that is not a function name");
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("var")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("cfn")) == 0))) {
-        pq_text = id_concat(id_concat(ID_S("'"), (char*)(intptr_t)(id_list_get(ns1, arg))), ID_S("'"));
+        pq_text = id_concat_f(id_concat(ID_S("'"), (char*)(intptr_t)(id_list_get(ns1, arg))), ID_S("'"), 1);
     }
     if (((strcmp((char*)(intptr_t)(id_list_get(nkind, arg)), ID_S("call")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, arg)), ID_S("bind")) == 0))) {
 IdList* idsq_13;
-        pq_text = (idsq_13 = ns1, id_concat(id_concat(ID_S("'bind("), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, arg)), 0))))), ID_S(", ...)'")));
+        pq_text = (idsq_13 = ns1, id_concat_f(id_concat(ID_S("'bind("), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, arg)), 0))))), ID_S(", ...)'"), 1));
     }
     return pq_text;
 }
@@ -29984,7 +30082,7 @@ IdList* idsq_45;
     pq_param = (idsq_45 = ns2, (char*)(intptr_t)(id_list_get(idsq_45, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, pq_cn)), j)))));
     pq_text = id_pure_arg_text((int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), j)));
     pq_help = ID_S("pass the name of a function declared pure -- write 'pure' before its definition and fix what that then reports -- or a parameter of your own declared 'pure func(...)'");
-    id_diag(ID_S("E0806"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("parameter '"), pq_param), ID_S("' of '")), pq_callee), ID_S("' is declared pure, but the argument is ")), pq_text), ID_S(", which is not known to be a pure function")), pq_callee, ID_S("'pure' on a parameter is a promise to the callee that whatever it calls through the parameter writes no export and does no I/O, and the compiler can check it only where the function value is a name"), pq_help);
+    id_diag(ID_S("E0806"), id_tc_at(id), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("parameter '"), pq_param), ID_S("' of '"), 1), pq_callee, 1), ID_S("' is declared pure, but the argument is "), 1), pq_text, 1), ID_S(", which is not known to be a pure function"), 1), pq_callee, ID_S("'pure' on a parameter is a promise to the callee that whatever it calls through the parameter writes no export and does no I/O, and the compiler can check it only where the function value is a name"), pq_help);
     return;
 }
 
@@ -29994,8 +30092,8 @@ void id_pure_err_builtin(int id, int fn) {
     char* pq_help;
     pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
     pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
-    pq_help = id_concat(id_concat(id_concat(id_concat(ID_S("do the call in the caller of '"), pq_fn), ID_S("' and pass the result in, or remove 'pure' from '")), pq_fn), ID_S("'; the builtins a pure function may call are listed in docs/SPEC.md, section 1.3"));
-    id_diag(ID_S("E0802"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls the builtin '")), pq_callee), ID_S("', which does I/O or reads state outside its arguments")), pq_callee, ID_S("print, input, the clock and the flat store are effects: two calls with the same arguments can give different results, or leave the world different"), pq_help);
+    pq_help = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("do the call in the caller of '"), pq_fn), ID_S("' and pass the result in, or remove 'pure' from '"), 1), pq_fn, 1), ID_S("'; the builtins a pure function may call are listed in docs/SPEC.md, section 1.3"), 1);
+    id_diag(ID_S("E0802"), id_tc_at(id), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls the builtin '"), 1), pq_callee, 1), ID_S("', which does I/O or reads state outside its arguments"), 1), pq_callee, ID_S("print, input, the clock and the flat store are effects: two calls with the same arguments can give different results, or leave the world different"), pq_help);
     return;
 }
 
@@ -30007,8 +30105,8 @@ void id_pure_err_fn(int id, int fn) {
     pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
     pq_callee = (char*)(intptr_t)(id_list_get(ns1, id));
     pq_what = id_pure_callee_what(pq_callee);
-    pq_help = id_concat(id_concat(id_concat(id_concat(id_concat(id_pure_callee_fix(pq_callee), ID_S(", or stop calling it from '")), pq_fn), ID_S("', or remove 'pure' from '")), pq_fn), ID_S("'"));
-    id_diag(ID_S("E0803"), id_tc_at(id), id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls ")), pq_what), pq_callee, ID_S("a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller"), pq_help);
+    pq_help = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(id_pure_callee_fix(pq_callee), ID_S(", or stop calling it from '")), pq_fn, 1), ID_S("', or remove 'pure' from '"), 1), pq_fn, 1), ID_S("'"), 1);
+    id_diag(ID_S("E0803"), id_tc_at(id), id_concat_f(id_concat_f(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but calls "), 1), pq_what, 1), pq_callee, ID_S("a pure function may call only pure functions, because whatever the callee writes or prints is an effect of the caller"), pq_help);
     return;
 }
 
@@ -30016,9 +30114,9 @@ char* id_pure_callee_what(char* pq_cname) {
     int pq_cn;
     char* pq_what;
     pq_cn = id_fn_node_of(pq_cname);
-    pq_what = id_concat(id_concat(ID_S("'"), pq_cname), ID_S("', which is not pure"));
+    pq_what = id_concat_f(id_concat(ID_S("'"), pq_cname), ID_S("', which is not pure"), 1);
     if (((pq_cn >= 0) && ((int)(id_list_get(ni2, pq_cn)) == 1))) {
-        pq_what = id_concat(id_concat(ID_S("the native '"), pq_cname), ID_S("', which is not declared pure"));
+        pq_what = id_concat_f(id_concat(ID_S("the native '"), pq_cname), ID_S("', which is not declared pure"), 1);
     }
     return pq_what;
 }
@@ -30029,8 +30127,8 @@ void id_pure_err_export(int id, int fn) {
     char* pq_help;
     pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
     pq_name = (char*)(intptr_t)(id_list_get(ns2, id));
-    pq_help = id_concat(id_concat(ID_S("return the value and let the caller store it in an export, or remove 'pure' from '"), pq_fn), ID_S("'"));
-    id_diag(ID_S("E0801"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but writes the export '")), pq_name), ID_S("'")), pq_name, ID_S("a pure function's result depends only on its arguments; an export is state every function can read, so writing one is an effect"), pq_help);
+    pq_help = id_concat_f(id_concat(ID_S("return the value and let the caller store it in an export, or remove 'pure' from '"), pq_fn), ID_S("'"), 1);
+    id_diag(ID_S("E0801"), id_tc_at(id), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but writes the export '"), 1), pq_name, 1), ID_S("'"), 1), pq_name, ID_S("a pure function's result depends only on its arguments; an export is state every function can read, so writing one is an effect"), pq_help);
     return;
 }
 
@@ -30040,8 +30138,8 @@ void id_pure_err_import(int id, int fn) {
     char* pq_help;
     pq_fn = (char*)(intptr_t)(id_list_get(ns1, fn));
     pq_name = (char*)(intptr_t)(id_list_get(ns1, id));
-    pq_help = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("pass '"), pq_name), ID_S("' to '")), pq_fn), ID_S("' as a parameter, or declare it in conf.id, where it is a constant; or remove 'pure' from '")), pq_fn), ID_S("'"));
-    id_diag(ID_S("E0804"), id_tc_at(id), id_concat(id_concat(id_concat(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but reads the export '")), pq_name), ID_S("', which a function writes")), pq_name, ID_S("a pure function may read only its arguments and the constants of conf.id; an export written by a function can change between two calls, so the result would depend on when it ran"), pq_help);
+    pq_help = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("pass '"), pq_name), ID_S("' to '"), 1), pq_fn, 1), ID_S("' as a parameter, or declare it in conf.id, where it is a constant; or remove 'pure' from '"), 1), pq_fn, 1), ID_S("'"), 1);
+    id_diag(ID_S("E0804"), id_tc_at(id), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), pq_fn), ID_S("' is pure but reads the export '"), 1), pq_name, 1), ID_S("', which a function writes"), 1), pq_name, ID_S("a pure function may read only its arguments and the constants of conf.id; an export written by a function can change between two calls, so the result would depend on when it ran"), pq_help);
     return;
 }
 
@@ -30049,9 +30147,9 @@ char* id_pure_callee_fix(char* pq_cname) {
     int pq_cn;
     char* pq_fix;
     pq_cn = id_fn_node_of(pq_cname);
-    pq_fix = id_concat(id_concat(ID_S("write 'pure' before '"), pq_cname), ID_S("' and fix what it then reports"));
+    pq_fix = id_concat_f(id_concat(ID_S("write 'pure' before '"), pq_cname), ID_S("' and fix what it then reports"), 1);
     if (((pq_cn >= 0) && ((int)(id_list_get(ni2, pq_cn)) == 1))) {
-        pq_fix = id_concat(id_concat(ID_S("declare it 'pure native "), pq_cname), ID_S("(...)' if the C it links writes no global state and does no I/O"));
+        pq_fix = id_concat_f(id_concat(ID_S("declare it 'pure native "), pq_cname), ID_S("(...)' if the C it links writes no global state and does no I/O"), 1);
     }
     return pq_fix;
 }
@@ -30161,7 +30259,7 @@ IdList* idsq_46;
 IdList* idsq_37;
     pq_text = (idsq_37 = nl1, id_pure_arg_text((int)(id_list_get((IdList*)(intptr_t)(id_list_get(idsq_37, (int)(id_list_get(casenode, pq_k)))), pq_j))));
     pq_fn = (char*)(intptr_t)(id_list_get(ns1, pq_owner));
-    id_case_diag(pq_k, ID_S("E0806"), id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("parameter '"), pq_param), ID_S("' of '")), pq_fn), ID_S("' is declared pure, but this case passes ")), pq_text), ID_S(", which is not known to be a pure function")), ID_S("'pure' on a parameter is a promise that whatever the function calls through it writes no export and does no I/O, and a test case runs the function at build time"), ID_S("write 'pure' before the definition of the function the case names and fix what that then reports, or name another function"));
+    id_case_diag(pq_k, ID_S("E0806"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("parameter '"), pq_param), ID_S("' of '"), 1), pq_fn, 1), ID_S("' is declared pure, but this case passes "), 1), pq_text, 1), ID_S(", which is not known to be a pure function"), 1), ID_S("'pure' on a parameter is a promise that whatever the function calls through it writes no export and does no I/O, and a test case runs the function at build time"), ID_S("write 'pure' before the definition of the function the case names and fix what that then reports, or name another function"));
     return;
 }
 
@@ -30703,7 +30801,7 @@ char* id_esc_free_decl(int fn, int sn, char* out) {
     char* nm;
     char* line;
     nm = (char*)(intptr_t)(id_list_get(ns2, sn));
-    line = id_concat(id_concat(id_concat(id_esc_free_fn(fn, nm), ID_S("(")), nm), ID_S("); "));
+    line = id_concat_f(id_concat_f(id_concat(id_esc_free_fn(fn, nm), ID_S("(")), nm, 1), ID_S("); "), 1);
     if (((id_esc_own(fn, nm) == 1) && (id_str_find(out, line) < 0))) {
         out = id_concat(out, line);
     }
@@ -30718,9 +30816,9 @@ char* id_esc_free_nest(int fn, int sn, char* out) {
 
 char* id_esc_store_code(char* nm, char* code) {
     char* s;
-    s = id_concat(id_concat(id_concat(nm, ID_S(" = ")), code), ID_S(";"));
+    s = id_concat_f(id_concat_f(id_concat(nm, ID_S(" = ")), code, 1), ID_S(";"), 1);
     if ((id_esc_own(id_esc_cur(), nm) == 1)) {
-        s = id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("{ IdList* idfe_o = "), nm), ID_S("; ")), s), ID_S(" ")), id_esc_free_fn(id_esc_cur(), nm)), ID_S("(idfe_o); }"));
+        s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("{ IdList* idfe_o = "), nm), ID_S("; "), 1), s, 1), ID_S(" "), 1), id_esc_free_fn(id_esc_cur(), nm), 1), ID_S("(idfe_o); }"), 1);
     }
     return s;
 }
@@ -30761,7 +30859,7 @@ char* id_esc_ret_code(char* code) {
     frees = id_esc_frees();
     s = code;
     if ((strcmp(frees, ID_S("")) != 0)) {
-        s = id_concat(id_concat(id_concat(ID_S("{ "), frees), code), ID_S(" }"));
+        s = id_concat_f(id_concat_f(id_concat(ID_S("{ "), frees), code, 1), ID_S(" }"), 1);
     }
     return s;
 }
@@ -30912,7 +31010,7 @@ void id_arr_el_check(char* want, int el, int i) {
         id_fv_elem_err(el, i);
     } else if ((id_bad_store(elem_type_v, el) == 1)) {
         type_of_v = id_type_of(el);
-        id_tc_err(el, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("element "), id_str_of_int(i)), ID_S(" of a ")), want), ID_S(" literal is a ")), type_of_v));
+        id_tc_err(el, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("element "), id_str_of_int(i), 2), ID_S(" of a "), 1), want, 1), ID_S(" literal is a "), 1), type_of_v, 1));
     }
     return;
 }
@@ -30928,7 +31026,7 @@ int id_fv_typed(int e) {
 void id_fv_elem_err(int el, int i) {
     char* t;
     t = id_type_of(el);
-    id_tc_err(el, id_concat(id_concat(id_concat(ID_S("a function value cannot be an element of a list: element "), id_str_of_int(i)), ID_S(" is ")), t));
+    id_tc_err(el, id_concat_f(id_concat_f(id_concat_f(ID_S("a function value cannot be an element of a list: element "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1));
     return;
 }
 
@@ -30956,7 +31054,7 @@ void id_chk_iassign(int id) {
     char* bt;
     bt = id_base_type(id);
     if (((id_ty_known(bt) == 1) && (id_ty_is_list(bt) == 0))) {
-        id_tc_err(id, id_concat(id_concat(ID_S("cannot index a "), bt), id_ix_hint(bt)));
+        id_tc_err(id, id_concat_f(id_concat(ID_S("cannot index a "), bt), id_ix_hint(bt), 1));
     } else {
         id_chk_iassign2(id, bt);
     }
@@ -30982,7 +31080,7 @@ void id_chk_iassign3(int id, char* bt) {
     elem_type_v = id_elem_type(bt);
     if ((id_bad_store(elem_type_v, v) == 1)) {
         type_of_v = id_type_of(v);
-        id_tc_err(id, id_concat(id_concat(id_concat(ID_S("cannot store a "), type_of_v), ID_S(" into a ")), bt));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot store a "), type_of_v), ID_S(" into a "), 1), bt, 1));
     }
     return;
 }
@@ -31071,7 +31169,7 @@ long long idsq_20;
         id_list_set(tkacc, 0, (long long)((idsq_20 = (long long)(id_list_get(tkacc, 0)), id_dg_mix(idsq_20, id_dg_structs()))));
     }
     if (((long long)(id_list_get(tkacc, 1)) == 0)) {
-        tkk = id_concat(ID_S(""), id_str_of_word((long long)(id_list_get(tkacc, 0))));
+        tkk = id_concat_f(ID_S(""), id_str_of_word((long long)(id_list_get(tkacc, 0))), 2);
     }
     { id_list_free(tkacc); return tkk; }
 }
@@ -31102,10 +31200,10 @@ char* id_tk_meaning(char* name, int tkf) {
     char* tkm;
 char* idsq_39;
 char* idsq_34;
-    tkfs = (idsq_39 = id_fn_sig_of(name), idsq_34 = id_lookup_func(name), id_concat(id_concat(id_concat(id_concat(idsq_39, ID_S("|")), idsq_34), ID_S("|")), id_tk_etype(name)));
+    tkfs = (idsq_39 = id_fn_sig_of(name), idsq_34 = id_lookup_func(name), id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_39, ID_S("|")), idsq_34, 1), ID_S("|"), 1), id_tk_etype(name), 1));
     tku = id_tk_units(tkf);
 char* idsq_13;
-    tkm = (idsq_13 = id_lookup_var(name, id_idiv(tku, 65536)), id_concat(id_concat(id_concat(id_concat(tkfs, ID_S("|")), idsq_13), ID_S("|")), id_lookup_var(name, id_imod(tku, 65536))));
+    tkm = (idsq_13 = id_lookup_var(name, id_idiv(tku, 65536)), id_concat_f(id_concat_f(id_concat_f(id_concat(tkfs, ID_S("|")), idsq_13, 1), ID_S("|"), 1), id_lookup_var(name, id_imod(tku, 65536)), 1));
     return tkm;
 }
 
@@ -31416,7 +31514,7 @@ char* id_fn_sig(int fn) {
     char* t;
     ps = (IdList*)(intptr_t)(id_list_get(nl1, fn));
     pl = id_fn_type_list(ps);
-    t = id_concat(id_concat(id_concat(ID_S("func("), pl), ID_S(") return ")), (char*)(intptr_t)(id_list_get(ns2, fn)));
+    t = id_concat_f(id_concat_f(id_concat(ID_S("func("), pl), ID_S(") return "), 1), (char*)(intptr_t)(id_list_get(ns2, fn)), 1);
     return t;
 }
 
@@ -31437,7 +31535,7 @@ char* id_fn_type_list(IdList* ps) {
     while ((i < id_list_len(ps))) {
 char* idsq_15;
 IdList* idsq_13;
-        out = (idsq_15 = id_sep_at(ID_S(", "), i), idsq_13 = ns1, id_concat(id_concat(out, idsq_15), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(ps, i))))));
+        out = (idsq_15 = id_sep_at(ID_S(", "), i), idsq_13 = ns1, id_concat_f(id_concat(out, idsq_15), (char*)(intptr_t)(id_list_get(idsq_13, (int)(id_list_get(ps, i)))), 1));
         i = (i + 1);
     }
     return out;
@@ -31636,7 +31734,7 @@ void id_chk_struct_one(int sd_i) {
 void id_sd_err(int sd_i, char* sd_m) {
 IdList* idsq_18;
 char* idsq_16;
-    (idsq_18 = sdfile, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, sd_i)), id_print(id_concat(id_concat(id_concat(id_concat(idsq_16, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, sd_i)))), ID_S(": error: ")), sd_m)));
+    (idsq_18 = sdfile, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, sd_i)), id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_16, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, sd_i))), 3), ID_S(": error: "), 1), sd_m, 1)));
     id_note_failure();
     return;
 }
@@ -31645,7 +31743,7 @@ void id_sd_cycle(int sd_i) {
     char* sd_nm;
     sd_nm = (char*)(intptr_t)(id_list_get(sdname, sd_i));
     if ((id_sd_contains(sd_nm, sd_nm, id_list_len(sdname)) > 0)) {
-        id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), sd_nm), ID_S("' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('")), sd_nm), ID_S("[] items')")));
+        id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('"), 1), sd_nm, 1), ID_S("[] items')"), 1));
     }
     return;
 }
@@ -31677,11 +31775,11 @@ void id_sd_shape(int sd_i) {
     int sd_n;
     sd_n = id_list_len((IdList*)(intptr_t)(id_list_get(sdfname, sd_i)));
     if ((sd_n == 0)) {
-        id_sd_err(sd_i, id_concat(id_concat(ID_S("struct '"), (char*)(intptr_t)(id_list_get(sdname, sd_i))), ID_S("' has no fields; give it one to three, or use the value on its own")));
+        id_sd_err(sd_i, id_concat_f(id_concat(ID_S("struct '"), (char*)(intptr_t)(id_list_get(sdname, sd_i))), ID_S("' has no fields; give it one to three, or use the value on its own"), 1));
     } else if ((sd_n > 3)) {
 IdList* idsq_20;
 char* idsq_18;
-        (idsq_20 = sdname, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_i)), id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), idsq_18), ID_S("' has ")), id_str_of_int(sd_n)), ID_S(" fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct ")), (char*)(intptr_t)(id_list_get(sdname, sd_i))), ID_S(" { Part p; int a; int b; }'"))));
+        (idsq_20 = sdname, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_i)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_18), ID_S("' has "), 1), id_str_of_int(sd_n), 3), ID_S(" fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct "), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S(" { Part p; int a; int b; }'"), 1)));
     }
     return;
 }
@@ -31702,7 +31800,7 @@ void id_sd_dupat(int sd_i, int sd_k) {
     if ((id_find_str(sd_fs, (char*)(intptr_t)(id_list_get(sd_fs, sd_k))) != sd_k)) {
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), idsq_13), ID_S("' declares field '")), (char*)(intptr_t)(id_list_get(sd_fs, sd_k))), ID_S("' more than once; give each field its own name"))));
+        (idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_13), ID_S("' declares field '"), 1), (char*)(intptr_t)(id_list_get(sd_fs, sd_k)), 1), ID_S("' more than once; give each field its own name"), 1)));
     }
     return;
 }
@@ -31727,7 +31825,7 @@ void id_sd_ftype_chk(int sd_i, int sd_k) {
 IdList* idsq_19;
 IdList* idsq_17;
 char* idsq_15;
-        (idsq_19 = sdfname, idsq_17 = (IdList*)(intptr_t)(id_list_get(idsq_19, sd_i)), idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sd_k)), id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("field '"), idsq_15), ID_S("' of struct '")), (char*)(intptr_t)(id_list_get(sdname, sd_i))), ID_S("'")), sd_why)));
+        (idsq_19 = sdfname, idsq_17 = (IdList*)(intptr_t)(id_list_get(idsq_19, sd_i)), idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sd_k)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("field '"), idsq_15), ID_S("' of struct '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S("'"), 1), sd_why, 1)));
     }
     return;
 }
@@ -31736,7 +31834,7 @@ char* id_sd_ftype_why(char* sd_t) {
     char* sd_w;
     sd_w = id_sd_ftype_why2(sd_t);
     if ((id_ty_is_func(sd_t) == 1)) {
-        sd_w = id_concat(id_concat(ID_S(" is a function value ("), sd_t), ID_S("); a function value cannot be stored in a struct -- store it in an export, or pass it to the function that calls it"));
+        sd_w = id_concat_f(id_concat(ID_S(" is a function value ("), sd_t), ID_S("); a function value cannot be stored in a struct -- store it in an export, or pass it to the function that calls it"), 1);
     }
     return sd_w;
 }
@@ -31745,9 +31843,9 @@ char* id_sd_ftype_why2(char* sd_t) {
     char* sd_w;
     sd_w = ID_S("");
     if ((strcmp(id_ty_base(sd_t), ID_S("void")) == 0)) {
-        sd_w = id_concat(id_concat(ID_S(" has type '"), sd_t), ID_S("'; a field holds a value, so give it int, word, float, string, a struct or a list of one"));
+        sd_w = id_concat_f(id_concat(ID_S(" has type '"), sd_t), ID_S("'; a field holds a value, so give it int, word, float, string, a struct or a list of one"), 1);
     } else if ((id_ty_known(sd_t) == 0)) {
-        sd_w = id_concat(id_concat(ID_S(" has type '"), sd_t), ID_S("', which is not a type; use int, word, float, string, a struct declared in the program, or a list of one of those, as in 'int[]'"));
+        sd_w = id_concat_f(id_concat(ID_S(" has type '"), sd_t), ID_S("', which is not a type; use int, word, float, string, a struct declared in the program, or a list of one of those, as in 'int[]'"), 1);
     }
     return sd_w;
 }
@@ -31770,7 +31868,7 @@ char* idsq_25;
 IdList* idsq_17;
 char* idsq_15;
 IdList* idsq_11;
-        (idsq_17 = sdname, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sd_i)), idsq_11 = ns1, id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), idsq_15), ID_S("' shares its file with function '")), (char*)(intptr_t)(id_list_get(idsq_11, (int)(id_list_get(prog, sd_j))))), ID_S("'; a struct is declared in a file of its own -- move the function to another file"))));
+        (idsq_17 = sdname, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sd_i)), idsq_11 = ns1, id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_15), ID_S("' shares its file with function '"), 1), (char*)(intptr_t)(id_list_get(idsq_11, (int)(id_list_get(prog, sd_j)))), 1), ID_S("'; a struct is declared in a file of its own -- move the function to another file"), 1)));
     }
     return;
 }
@@ -31791,12 +31889,12 @@ void id_sd_names(int sd_i) {
     sd_nm = (char*)(intptr_t)(id_list_get(sdname, sd_i));
     sd_j = id_sd_first_of(sd_nm);
     if ((sd_j < sd_i)) {
-        id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), sd_nm), ID_S("' is already declared at ")), id_sd_where(sd_j)), ID_S("; declare each struct once, in a file of its own, and use that one")));
+        id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' is already declared at "), 1), id_sd_where(sd_j), 1), ID_S("; declare each struct once, in a file of its own, and use that one"), 1));
     }
     if ((id_find_str(fnames, sd_nm) >= 0)) {
-        id_sd_err(sd_i, id_concat(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a function; a call to it would be ambiguous with a struct constructor -- rename the struct or the function")));
+        id_sd_err(sd_i, id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a function; a call to it would be ambiguous with a struct constructor -- rename the struct or the function"), 1));
     } else if ((id_is_builtin(sd_nm) == 1)) {
-        id_sd_err(sd_i, id_concat(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a builtin; rename the struct")));
+        id_sd_err(sd_i, id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a builtin; rename the struct"), 1));
     }
     return;
 }
@@ -31814,7 +31912,7 @@ char* id_sd_where(int sd_j) {
     char* s;
 IdList* idsq_11;
 char* idsq_9;
-    s = (idsq_11 = sdfile, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, sd_j)), id_concat(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, sd_j)))));
+    s = (idsq_11 = sdfile, idsq_9 = (char*)(intptr_t)(id_list_get(idsq_11, sd_j)), id_concat_f(id_concat(idsq_9, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, sd_j))), 3));
     return s;
 }
 
@@ -31828,7 +31926,7 @@ char* idsq_23;
 IdList* idsq_21;
 IdList* idsq_19;
 char* idsq_17;
-        s = (idsq_23 = id_sep_at(ID_S(","), sd_k), idsq_21 = sdfname, idsq_19 = (IdList*)(intptr_t)(id_list_get(idsq_21, sd_i)), idsq_17 = (char*)(intptr_t)(id_list_get(idsq_19, sd_k)), id_concat(id_concat(id_concat(id_concat(s, idsq_23), idsq_17), ID_S(":")), (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(sdftype, sd_i)), sd_k))));
+        s = (idsq_23 = id_sep_at(ID_S(","), sd_k), idsq_21 = sdfname, idsq_19 = (IdList*)(intptr_t)(id_list_get(idsq_21, sd_i)), idsq_17 = (char*)(intptr_t)(id_list_get(idsq_19, sd_k)), id_concat_f(id_concat_f(id_concat_f(id_concat(s, idsq_23), idsq_17, 1), ID_S(":"), 1), (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(sdftype, sd_i)), sd_k)), 1));
         sd_k = (sd_k + 1);
     }
     return s;
@@ -31840,7 +31938,7 @@ char* idsq_23;
     if ((idsq_25 = sdfile, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, sd_j)), (strcmp(idsq_23, (char*)(intptr_t)(id_list_get(sdfile, sd_i))) == 0))) {
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), idsq_13), ID_S("' shares its file with struct '")), (char*)(intptr_t)(id_list_get(sdname, sd_j))), ID_S("'; a struct is declared in a file of its own -- move one of them to another file"))));
+        (idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_13), ID_S("' shares its file with struct '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_j)), 1), ID_S("'; a struct is declared in a file of its own -- move one of them to another file"), 1)));
     }
     return;
 }
@@ -31858,7 +31956,7 @@ char* idsq_25;
 char* idsq_19;
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_33 = sdname, idsq_31 = (char*)(intptr_t)(id_list_get(idsq_33, sd_i)), idsq_27 = sdname, idsq_25 = (char*)(intptr_t)(id_list_get(idsq_27, sd_j)), idsq_19 = id_sd_where(sd_j), idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_j)), id_sd_err(sd_i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), idsq_31), ID_S("' has the same fields as struct '")), idsq_25), ID_S("' (declared at ")), idsq_19), ID_S("); two structs with the same field names and types are one struct -- use '")), idsq_13), ID_S("', or give '")), (char*)(intptr_t)(id_list_get(sdname, sd_i))), ID_S("' a field of another name or type"))));
+        (idsq_33 = sdname, idsq_31 = (char*)(intptr_t)(id_list_get(idsq_33, sd_i)), idsq_27 = sdname, idsq_25 = (char*)(intptr_t)(id_list_get(idsq_27, sd_j)), idsq_19 = id_sd_where(sd_j), idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_j)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_31), ID_S("' has the same fields as struct '"), 1), idsq_25, 1), ID_S("' (declared at "), 1), idsq_19, 1), ID_S("); two structs with the same field names and types are one struct -- use '"), 1), idsq_13, 1), ID_S("', or give '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S("' a field of another name or type"), 1)));
     }
     return;
 }
@@ -31893,7 +31991,7 @@ char* id_sd_fields_text(char* sd_s) {
     s = ID_S("");
     while ((sd_k < id_sd_nfields(sd_s))) {
 char* idsq_15;
-        s = (idsq_15 = id_sep_at(ID_S(", "), sd_k), id_concat(id_concat(s, idsq_15), id_sd_cell(sdfname, sd_s, sd_k)));
+        s = (idsq_15 = id_sep_at(ID_S(", "), sd_k), id_concat_f(id_concat(s, idsq_15), id_sd_cell(sdfname, sd_s, sd_k), 1));
         sd_k = (sd_k + 1);
     }
     return s;
@@ -31929,7 +32027,7 @@ long long id_dg_structs(void) {
     while ((dgi < id_list_len(sdname))) {
 IdList* idsq_17;
 char* idsq_15;
-        dgh = (idsq_17 = sdname, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, dgi)), id_dg_fnv(dgh, id_concat(id_concat(idsq_15, ID_S("|")), id_sd_key(dgi))));
+        dgh = (idsq_17 = sdname, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, dgi)), id_dg_fnv(dgh, id_concat_f(id_concat(idsq_15, ID_S("|")), id_sd_key(dgi), 1)));
         dgi = (dgi + 1);
     }
     return dgh;
@@ -31958,9 +32056,9 @@ void id_ctor_fit(int sd_a, char* sd_nm, int sd_k, char* sd_ft) {
     char* sd_at;
     sd_at = id_type_of(sd_a);
     if ((id_bad_store(sd_ft, sd_a) == 1)) {
-        id_tc_err(sd_a, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '")), sd_nm), ID_S("' expects ")), sd_ft), ID_S(", got ")), sd_at));
+        id_tc_err(sd_a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '"), 1), sd_nm, 1), ID_S("' expects "), 1), sd_ft, 1), ID_S(", got "), 1), sd_at, 1));
     } else if ((id_ty_narrows(sd_ft, sd_at) == 1)) {
-        id_tc_err(sd_a, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '")), sd_nm), ID_S("' narrows ")), sd_at), ID_S(" to ")), sd_ft), ID_S("; declare a ")), sd_ft), ID_S(" local and pass that")));
+        id_tc_err(sd_a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '"), 1), sd_nm, 1), ID_S("' narrows "), 1), sd_at, 1), ID_S(" to "), 1), sd_ft, 1), ID_S("; declare a "), 1), sd_ft, 1), ID_S(" local and pass that"), 1));
     }
     return;
 }
@@ -31993,7 +32091,7 @@ void id_fit_cbval(int i, int v, char* pt) {
 void id_ctor_arity_err(int id, char* sd_nm) {
 int idsq_20;
 char* idsq_14;
-    (idsq_20 = id_sd_nfields(sd_nm), idsq_14 = id_sd_fields_text(sd_nm), id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), sd_nm), ID_S("' takes ")), id_str_of_int(idsq_20)), ID_S(" field(s) (")), idsq_14), ID_S("), got ")), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id))))), ID_S("; pass one value per field, in order"))));
+    (idsq_20 = id_sd_nfields(sd_nm), idsq_14 = id_sd_fields_text(sd_nm), id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' takes "), 1), id_str_of_int(idsq_20), 3), ID_S(" field(s) ("), 1), idsq_14, 1), ID_S("), got "), 1), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)))), 3), ID_S("; pass one value per field, in order"), 1)));
     return;
 }
 
@@ -32046,7 +32144,7 @@ void id_cbind_why(int i, IdList* items, char* got, char* want) {
         id_case_err(i, ID_S("a test case's bind takes the name of a function of this build and at least one value to capture, written bind(NAME, 1, [2, 3]); this one is not that"));
     } else {
 IdList* idsq_15;
-        (idsq_15 = ns1, id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case builds a "), got), ID_S(" with bind(")), (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get(items, 0))))), ID_S(", ...) where a ")), want), ID_S(" is required"))));
+        (idsq_15 = ns1, id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case builds a "), got), ID_S(" with bind("), 1), (char*)(intptr_t)(id_list_get(idsq_15, (int)(id_list_get(items, 0)))), 1), ID_S(", ...) where a "), 1), want, 1), ID_S(" is required"), 1)));
     }
     return;
 }
@@ -32097,7 +32195,7 @@ IdList* idsq_21;
 char* idsq_19;
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_21 = ns1, idsq_19 = (char*)(intptr_t)(id_list_get(idsq_21, id)), idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), idsq_19), ID_S("(...)' builds a struct and can only initialise a declaration, as in '")), idsq_13), ID_S(" p = ")), (char*)(intptr_t)(id_list_get(ns1, id))), ID_S("(...);' -- to change a struct that exists assign its fields ('p.x = 1;'), and to put one in a list or pass it to a function declare it first and use the name"))));
+        (idsq_21 = ns1, idsq_19 = (char*)(intptr_t)(id_list_get(idsq_21, id)), idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_19), ID_S("(...)' builds a struct and can only initialise a declaration, as in '"), 1), idsq_13, 1), ID_S(" p = "), 1), (char*)(intptr_t)(id_list_get(ns1, id)), 1), ID_S("(...);' -- to change a struct that exists assign its fields ('p.x = 1;'), and to put one in a list or pass it to a function declare it first and use the name"), 1)));
     }
     return;
 }
@@ -32109,7 +32207,7 @@ int idsq_37;
     if ((idsq_37 = id_list_len(sd_xs), (idsq_37 != id_sd_nfields(want)))) {
 int idsq_23;
 char* idsq_17;
-        (idsq_23 = id_sd_nfields(want), idsq_17 = id_sd_fields_text(want), id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), want), ID_S("' takes ")), id_str_of_int(idsq_23)), ID_S(" field(s) (")), idsq_17), ID_S("), but this case gives ")), id_str_of_int(id_list_len(sd_xs)))));
+        (idsq_23 = id_sd_nfields(want), idsq_17 = id_sd_fields_text(want), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), want), ID_S("' takes "), 1), id_str_of_int(idsq_23), 3), ID_S(" field(s) ("), 1), idsq_17, 1), ID_S("), but this case gives "), 1), id_str_of_int(id_list_len(sd_xs)), 3)));
     } else {
         id_fit_fvals(i, sd_xs, want);
     }
@@ -32141,7 +32239,7 @@ void id_fit_other(int i, int e, char* want) {
 void id_fit_struct(int i, int e, char* want) {
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cctor")) != 0)) {
 char* idsq_27;
-        (idsq_27 = id_lit_text(e), id_case_err(i, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("this case gives "), idsq_27), ID_S(" where a ")), want), ID_S(" is required; write the struct as ")), want), ID_S("(")), id_sd_fields_text(want)), ID_S(")"))));
+        (idsq_27 = id_lit_text(e), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives "), idsq_27), ID_S(" where a "), 1), want, 1), ID_S(" is required; write the struct as "), 1), want, 1), ID_S("("), 1), id_sd_fields_text(want), 1), ID_S(")"), 1)));
     } else {
         id_fit_ctor(i, e, want);
     }
@@ -32151,9 +32249,9 @@ char* idsq_27;
 void id_fit_ctor(int i, int e, char* want) {
 IdList* idsq_46;
     if ((idsq_46 = sdname, (id_find_str(idsq_46, (char*)(intptr_t)(id_list_get(ns1, e))) < 0))) {
-        id_case_err(i, id_concat(id_concat(ID_S("a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); '"), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S("' is not a struct")));
+        id_case_err(i, id_concat_f(id_concat(ID_S("a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); '"), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S("' is not a struct"), 1));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(ns1, e)), want) != 0)) {
-        id_case_err(i, id_concat(id_concat(id_concat(id_concat(ID_S("this case builds a "), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S(" where a ")), want), ID_S(" is required")));
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case builds a "), (char*)(intptr_t)(id_list_get(ns1, e))), ID_S(" where a "), 1), want, 1), ID_S(" is required"), 1));
     } else {
         id_fit_fields(i, e, want);
     }
@@ -32204,7 +32302,7 @@ IdList* idsq_18;
 
 void id_chk_field_at(int id, char* sd_bt, char* sd_f) {
     if ((id_ty_is_struct(sd_bt) == 0)) {
-        id_ix_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("cannot read field '"), sd_f), ID_S("' of a ")), sd_bt), ID_S("; only a struct has fields (a list's length is len(list))")));
+        id_ix_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot read field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), ID_S("; only a struct has fields (a list's length is len(list))"), 1));
     } else if ((id_sd_fpos(sd_bt, sd_f) < 0)) {
         id_ix_err(id, id_sd_nofield(sd_bt, sd_f));
     }
@@ -32213,7 +32311,7 @@ void id_chk_field_at(int id, char* sd_bt, char* sd_f) {
 
 char* id_sd_nofield(char* sd_bt, char* sd_f) {
     char* sd_m;
-    sd_m = id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("struct '"), sd_bt), ID_S("' has no field '")), sd_f), ID_S("'; its fields are ")), id_sd_fields_text(sd_bt));
+    sd_m = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_bt), ID_S("' has no field '"), 1), sd_f, 1), ID_S("'; its fields are "), 1), id_sd_fields_text(sd_bt), 1);
     return sd_m;
 }
 
@@ -32237,7 +32335,7 @@ char* id_ix_hint(char* sd_bt) {
     if ((id_ty_is_struct(sd_bt) == 1)) {
 IdList* idsq_16;
 char* idsq_13;
-        sd_h = (idsq_16 = sdfname, idsq_13 = id_sd_cell(idsq_16, sd_bt, 0), id_concat(id_concat(id_concat(id_concat(ID_S("; a struct's fields are read by name, as in p."), idsq_13), ID_S(" (its fields are ")), id_sd_fields_text(sd_bt)), ID_S(")")));
+        sd_h = (idsq_16 = sdfname, idsq_13 = id_sd_cell(idsq_16, sd_bt, 0), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("; a struct's fields are read by name, as in p."), idsq_13), ID_S(" (its fields are "), 1), id_sd_fields_text(sd_bt), 1), ID_S(")"), 1));
     }
     return sd_h;
 }
@@ -32254,7 +32352,7 @@ IdList* idsq_18;
 
 void id_chk_fstore_at(int id, char* sd_bt, char* sd_f) {
     if ((id_ty_is_struct(sd_bt) == 0)) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("cannot assign field '"), sd_f), ID_S("' of a ")), sd_bt), ID_S("; only a struct has fields")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot assign field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), ID_S("; only a struct has fields"), 1));
     } else if ((id_sd_fpos(sd_bt, sd_f) < 0)) {
         id_tc_err(id, id_sd_nofield(sd_bt, sd_f));
     } else {
@@ -32270,7 +32368,7 @@ void id_chk_fvalue(int id, char* sd_bt, char* sd_f) {
 IdList* idsq_38;
     sd_ft = (idsq_38 = sdftype, id_sd_cell(idsq_38, sd_bt, id_sd_fpos(sd_bt, sd_f)));
     if ((id_bad_store(sd_ft, sd_v) == 1)) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("cannot store a "), id_type_of(sd_v)), ID_S(" into field '")), sd_f), ID_S("' (")), sd_ft), ID_S(") of struct '")), sd_bt), ID_S("'")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot store a "), id_type_of(sd_v)), ID_S(" into field '"), 1), sd_f, 1), ID_S("' ("), 1), sd_ft, 1), ID_S(") of struct '"), 1), sd_bt, 1), ID_S("'"), 1));
     }
     return;
 }
@@ -32295,7 +32393,7 @@ IdList* idsq_31;
 char* idsq_29;
 IdList* idsq_17;
 char* idsq_15;
-        (idsq_31 = ns1, idsq_29 = (char*)(intptr_t)(id_list_get(idsq_31, id)), idsq_17 = ns1, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, id)), id_tc_err(sd_a, id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("'"), idsq_29), ID_S("' cannot take a struct: argument ")), id_str_of_int(sd_i)), ID_S(" is ")), sd_t), ID_S("; use its fields, as in ")), idsq_15), ID_S("(p.")), id_sd_cell(sdfname, sd_t, 0)), ID_S(")"))));
+        (idsq_31 = ns1, idsq_29 = (char*)(intptr_t)(id_list_get(idsq_31, id)), idsq_17 = ns1, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, id)), id_tc_err(sd_a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_29), ID_S("' cannot take a struct: argument "), 1), id_str_of_int(sd_i), 3), ID_S(" is "), 1), sd_t, 1), ID_S("; use its fields, as in "), 1), idsq_15, 1), ID_S("(p."), 1), id_sd_cell(sdfname, sd_t, 0), 1), ID_S(")"), 1)));
     }
     return;
 }
@@ -32312,7 +32410,7 @@ void id_chk_declared_type(int id) {
 
 void id_chk_type_known(int id, char* sd_t) {
     if ((id_ty_known(sd_t) == 0)) {
-        id_tc_err(id, id_concat(id_concat(id_concat(id_concat(ID_S("unknown type '"), sd_t), ID_S("'; a type is int, word, float, string, a struct declared in a file of its own (structs: ")), id_sd_list_text()), ID_S("), or a list of one of those, as in 'int[]'")));
+        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("unknown type '"), sd_t), ID_S("'; a type is int, word, float, string, a struct declared in a file of its own (structs: "), 1), id_sd_list_text(), 1), ID_S("), or a list of one of those, as in 'int[]'"), 1));
     }
     return;
 }
@@ -32333,7 +32431,7 @@ char* id_sd_join(char* sd_s, int sd_i) {
     char* sd_r;
     sd_r = (char*)(intptr_t)(id_list_get(sdname, sd_i));
     if ((sd_i > 0)) {
-        sd_r = id_concat(id_concat(sd_s, ID_S(", ")), (char*)(intptr_t)(id_list_get(sdname, sd_i)));
+        sd_r = id_concat_f(id_concat(sd_s, ID_S(", ")), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1);
     }
     return sd_r;
 }
@@ -32586,6 +32684,59 @@ int id_is_str_pair(int a, int b) {
     int ok;
     ok = 0;
     if (((strcmp(id_type_of(a), ID_S("string")) == 0) || (strcmp(id_type_of(b), ID_S("string")) == 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_str_fresh(int id) {
+    char* t;
+    int ok;
+    t = id_type_of(id);
+    ok = id_str_fresh_node(id);
+    if ((((strcmp(t, ID_S("int")) == 0) || (strcmp(t, ID_S("float")) == 0)) || (strcmp(t, ID_S("word")) == 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_str_fresh_node(int id) {
+    int ok;
+    ok = 0;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("bin")) == 0)) {
+        ok = 1;
+    } else {
+        ok = id_str_fresh_call(id);
+    }
+    return ok;
+}
+
+int id_str_mask(int id) {
+    int i1_of_v;
+    int i2_of_v;
+    int m;
+    i1_of_v = (int)(id_list_get(ni1, id));
+    i2_of_v = (int)(id_list_get(ni2, id));
+int idsq_9;
+    m = (idsq_9 = id_str_fresh(i1_of_v), (idsq_9 + (2 * id_str_fresh(i2_of_v))));
+    return m;
+}
+
+int id_str_fresh_call(int id) {
+    char* nm;
+    int ok;
+    nm = (char*)(intptr_t)(id_list_get(ns1, id));
+    ok = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, id)), ID_S("call")) == 0) && (id_is_builtin(nm) == 1))) {
+        ok = id_fresh_builtin(nm);
+    }
+    return ok;
+}
+
+int id_fresh_builtin(char* nm) {
+    int ok;
+    ok = 0;
+    if (((((strcmp(nm, ID_S("chr")) == 0) || (strcmp(nm, ID_S("input")) == 0)) || (strcmp(nm, ID_S("read_all")) == 0)) || (strcmp(nm, ID_S("str_of_mem")) == 0))) {
         ok = 1;
     }
     return ok;

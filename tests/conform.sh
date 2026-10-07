@@ -27,8 +27,9 @@
 #                     order the two streams interleave in is what is pinned
 #   NN-name.env       NAME=VALUE words the program runs with, present only when
 #                     the environment is what is under test (free/ sets
-#                     ID_FREE_STATS so each target reports how many lists it
-#                     freed, which docs/MEMORY.md 2a requires to be equal)
+#                     ID_FREE_STATS so each target reports how many lists and
+#                     strings it freed, which docs/MEMORY.md 2a requires to be
+#                     equal)
 #
 # The expected files record what the C target does, because the C target is
 # what `docs/SPEC.md` was written from. A disagreement is therefore always

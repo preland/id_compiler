@@ -1,0 +1,10 @@
+// The builtins that return a new string (input, read_all, str_of_mem) and a float
+// in string context are fresh too. Right-hand ones are freed once copied: the
+// second input, the float, and the second str_of_mem: three.
+pair() {
+  string s = input() + "-" + input();
+} return string s;
+
+rest() {
+  string r = read_all() + "." + 1.5;
+} return string r;

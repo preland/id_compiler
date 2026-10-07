@@ -1,0 +1,26 @@
+// composite_fixture's nodes, the builtin table, and the shapes str_mask
+// tells apart: neither operand fresh, the left one, the right one, both.
+fresh_fixture() {
+  composite_fixture();
+  init_rtc();
+  fresh_calls();
+} chain () {
+  fresh_bins();
+} return void;
+():() then calls composite_fixture:[1]
+():() then init_units:(0)
+
+fresh_calls() {
+  export int fr_chr = node_call("chr", [(import lit_a)]);
+  export int fr_foo = node_call("foo", [(import lit_a)]);
+} return void;
+given composite_fixture ():() then (import chkfail)[0]:(0)
+given composite_fixture ():() then init_units:(0)
+
+fresh_bins() {
+  export int fr_n = node_bin("+", (import lit_str), (import lit_str));
+  export int fr_l = node_bin("+", (import bin_concat), (import lit_str));
+  export int fr_b = node_bin("+", (import bin_concat), (import bin_concat));
+} return void;
+given composite_fixture ():() then (import chkfail)[0]:(0)
+given composite_fixture ():() then init_units:(0)

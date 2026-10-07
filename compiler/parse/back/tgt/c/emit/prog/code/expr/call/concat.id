@@ -3,10 +3,27 @@
 emit_concat(int id) {
   int i1_of_v = (import ni1)[id];
   int i2_of_v = (import ni2)[id];
-  string s = "id_concat(" + arg_str(i1_of_v) + ", " + arg_str(i2_of_v) + ")";
+  int m = str_mask(id);
+} chain (int id) {
+  string cxa = arg_str(i1_of_v);
+  string cxb = arg_str(i2_of_v);
+  string s = concat_text(cxa, cxb, m);
 } return string s;
 given nz_bin_concat_fixture ((import nz_bin_concat)):("id_concat(ID_S(\"hi\"), ID_S(\"yo\"))")
-given nz_bin_add_fixture ((import nz_bin_add)):("id_concat(id_str_of_int(7), id_str_of_int(3))")
+given nz_bin_add_fixture ((import nz_bin_add)):("id_concat_f(id_str_of_int(7), id_str_of_int(3), 3)")
+given nz_bin_nest_fixture ((import nz_nest_l)):("id_concat_f(id_concat(ID_S(\"hi\"), ID_S(\"yo\")), ID_S(\"hi\"), 1)")
+given nz_bin_nest_fixture ((import nz_nest_r)):("id_concat_f(ID_S(\"hi\"), id_concat(ID_S(\"hi\"), ID_S(\"yo\")), 2)")
+
+// A fresh operand (str_mask) is handed to the consuming concat, which builds
+// the result in a fresh left operand and gives a fresh right one back.
+concat_text(string cxa, string cxb, int m) {
+  string s = "id_concat(" + cxa + ", " + cxb + ")";
+  if(m > 0) {
+    s = "id_concat_f(" + cxa + ", " + cxb + ", " + m + ")";
+  }
+} return string s;
+("x", "y", 0):("id_concat(x, y)")
+("x", "y", 2):("id_concat_f(x, y, 2)")
 
 arg_str(int id) {
   string emit_expr_v = emit_expr(id);

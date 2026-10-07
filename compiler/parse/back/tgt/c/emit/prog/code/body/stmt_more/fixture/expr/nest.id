@@ -1,0 +1,10 @@
+// A concat whose left operand is itself a concat, and one whose right operand
+// is: the shapes where an operand is a fresh temporary the outer `+` consumes.
+
+nz_bin_nest_fixture() {
+  nz_bin_streq_fixture();
+  export int nz_nest_l = node_bin("+", (import nz_bin_concat), (import nz_strn));
+  export int nz_nest_r = node_bin("+", (import nz_strn), (import nz_bin_concat));
+} return void;
+():() then calls nz_bin_streq_fixture:[1]
+():() then init_units:(0)

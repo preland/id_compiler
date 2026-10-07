@@ -87,6 +87,7 @@ typedef struct IdChunk { struct IdChunk* next; } IdChunk;
 static ID_TLS IdAllocHdr* id_arena_head = NULL;
 static ID_TLS int id_arena_hooked = 0;
 static ID_TLS long id_nfree = 0;
+static ID_TLS long id_nfree_s = 0;
 static ID_TLS void* id_pool_fl[ID_NCLASS];
 static ID_TLS char* id_pool_bump = NULL;
 static ID_TLS size_t id_pool_left = 0;
@@ -100,7 +101,10 @@ static void id_pool_drop(void) {
     memset(id_pool_fl, 0, sizeof id_pool_fl);
 }
 static void id_arena_free_all(void) {
-    if (getenv("ID_FREE_STATS")) fprintf(stderr, "id: freed %ld lists\n", id_nfree);
+    if (getenv("ID_FREE_STATS")) {
+        fprintf(stderr, "id: freed %ld lists\n", id_nfree);
+        if (id_nfree_s) fprintf(stderr, "id: freed %ld strings\n", id_nfree_s);
+    }
     IdAllocHdr* h = id_arena_head;
     while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
     id_arena_head = NULL;
@@ -262,7 +266,6 @@ static char* id_str_from(const char* p, size_t n) {
     return r;
 }
 char* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }
-static void id_str_free(char* s) { id_pool_free(s - sizeof(size_t), id_slen(s) + sizeof(size_t) + 1); }
 
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
@@ -320,6 +323,28 @@ __attribute__((noinline, cold))
 static _Noreturn void id_freed_trap(void) {
     fprintf(stderr, "id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\n");
     exit(1);
+}
+#ifdef __GNUC__
+__attribute__((noinline, cold))
+#endif
+static _Noreturn void id_freed_str_trap(void) {
+    fprintf(stderr, "id: a string was freed twice (the compiler's escape analysis freed a string that was still reachable)\n");
+    exit(1);
+}
+/* A string block the compiler proved dead is given back by id_str_free; with the
+   guard on it is filled with 0xDD and its count becomes SIZE_MAX instead, so a
+   second free traps and a later use fails in the size checks. */
+static void id_str_free(char* s) {
+    size_t n = id_slen(s);
+    id_nfree_s++;
+    if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
+    if (id_fguard) {
+        if (n == SIZE_MAX) id_freed_str_trap();
+        memset(s, 0xDD, n + 1);
+        ((size_t*)(void*)s)[-1] = SIZE_MAX;
+        return;
+    }
+    id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);
 }
 static void id_list_free(IdList* L) {
     if (!L) return;
@@ -432,6 +457,27 @@ static char* id_concat(const char* a, const char* b) {
     char* r = id_str_new(id_add_check(la, lb, "concat"));
     memcpy(r, a, la);
     memcpy(r + la, b, lb);
+    return r;
+}
+/* `+` whose operand is an unnamed temporary (docs/MEMORY.md 3.3). Bit 1 of m: a
+   is fresh, so the result is built in a's block (a pool block grows in place
+   while its size class has room; a large one is realloc'd); bit 2: b is fresh
+   and is given back once copied. */
+static char* id_concat_f(char* a, char* b, int m) {
+    size_t la = id_slen(a), lb = id_slen(b);
+    size_t n = id_add_check(la, lb, "concat");
+    char* r;
+    if (m & 1) {
+        size_t hb = id_add_check(n, sizeof(size_t) + 1, "concat");
+        r = (char*)id_realloc(a - sizeof(size_t), la + sizeof(size_t) + 1, hb) + sizeof(size_t);
+        ((size_t*)(void*)r)[-1] = n;
+    } else {
+        r = id_str_new(n);
+        memcpy(r, a, la);
+    }
+    memcpy(r + la, b, lb);
+    r[n] = '\0';
+    if (m & 2) id_str_free(b);
     return r;
 }
 static char* id_str_of_int(int x) {
@@ -888,7 +934,7 @@ int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
     idstd_end = (idstd_i + idstd_n);
     idstd_ok = (((idstd_i >= 0) && (idstd_n >= 0)) && ((idstd_n == 0) || (id_charat(idstd_s, (idstd_end - 1)) >= 0)));
     if ((idstd_ok == 0)) {
-        id_fail(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i)), ID_S(" n=")), id_str_of_int(idstd_n)), ID_S(" in a string of length ")), id_str_of_int(id_len(idstd_s))), ID_S("; clamp i and n first (fx_min, fx_max)")));
+        id_fail(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i), 2), ID_S(" n="), 1), id_str_of_int(idstd_n), 3), ID_S(" in a string of length "), 1), id_str_of_int(id_len(idstd_s)), 3), ID_S("; clamp i and n first (fx_min, fx_max)"), 1));
     }
     return idstd_n;
 }
@@ -1080,7 +1126,7 @@ int id_skip_block(char* src, int i) {
 void id_bump_line(void) {
 IdList* idsq_17;
     (idsq_17 = lexline, id_lset(idsq_17, 0, ((int)(id_list_get(lexline, 0)) + 1)));
-    id_print(id_concat(ID_S("line "), id_str_of_int((int)(id_list_get(lexline, 0)))));
+    id_print(id_concat_f(ID_S("line "), id_str_of_int((int)(id_list_get(lexline, 0))), 2));
     return;
 }
 
@@ -1095,7 +1141,7 @@ void id_span_out(char* src, int i, int ni) {
     int b;
     if (((((int)(id_list_get(lexcols, 0)) == 1) && (id_is_lcomment(src, i) == 0)) && (id_is_shebang(src, i) == 0))) {
         b = (int)(id_list_get(lexbol, 0));
-        id_print(id_concat(ID_S("span "), id_str_of_int(((((i - b) * 65536) + ni) - b))));
+        id_print(id_concat_f(ID_S("span "), id_str_of_int(((((i - b) * 65536) + ni) - b)), 2));
     }
     return;
 }
@@ -1275,10 +1321,10 @@ char* id_udec(long long v) {
     char* s;
     long long umod_v;
     hi = id_udiv((long long)(v), (long long)(10000000000LL));
-    s = id_concat(ID_S(""), id_str_of_word(v));
+    s = id_concat_f(ID_S(""), id_str_of_word(v), 2);
     if ((hi != 0)) {
         umod_v = id_umod((long long)(v), (long long)(10000000000LL));
-        s = id_concat(id_concat(ID_S(""), id_str_of_word(hi)), id_pad10(id_concat(ID_S(""), id_str_of_word(umod_v))));
+        s = id_concat_f(id_concat_f(ID_S(""), id_str_of_word(hi), 2), id_pad10(id_concat_f(ID_S(""), id_str_of_word(umod_v), 2)), 1);
     }
     return s;
 }
@@ -1392,7 +1438,7 @@ char* id_two_at(char* src, int i) {
     c1 = id_charat(src, i);
     c2 = id_charat(src, (i + 1));
 char* idsq_7;
-    two = (idsq_7 = id_chr(c1), id_concat(idsq_7, id_chr(c2)));
+    two = (idsq_7 = id_chr(c1), id_concat_f(idsq_7, id_chr(c2), 3));
     return two;
 }
 
@@ -1447,7 +1493,7 @@ int id_scan_op(char* src, int i) {
 void id_scan_ident_out(char* ident) {
     char* kind;
     kind = id_kindof(ident);
-    id_print(id_concat(id_concat(kind, ID_S(" ")), ident));
+    id_print(id_concat_f(id_concat(kind, ID_S(" ")), ident, 1));
     return;
 }
 
@@ -1456,7 +1502,7 @@ void id_scan_num_out(char* src, int i, int e, int fe) {
     char* text;
     kind = id_numkind(e, fe);
     text = id_slice_str(src, i, fe);
-    id_print(id_concat(id_concat(kind, ID_S(" ")), text));
+    id_print(id_concat_f(id_concat(kind, ID_S(" ")), text, 1));
     return;
 }
 
@@ -1465,7 +1511,7 @@ void id_scan_str_out(char* src, int i, int e) {
     char* text;
     q = id_chr(34);
     text = id_slice_str(src, i, e);
-    id_print(id_concat(id_concat(id_concat(ID_S("str "), q), text), q));
+    id_print(id_concat_f(id_concat_f(id_concat(ID_S("str "), q), text, 1), q, 1));
     return;
 }
 
@@ -1536,7 +1582,7 @@ int id_scan_ident(char* src, int i) {
     ident = ID_S("");
     while (id_is_alnum_at(src, i)) {
         charat_v = id_charat(src, i);
-        ident = id_concat(ident, id_chr(charat_v));
+        ident = id_concat_f(ident, id_chr(charat_v), 2);
         i = (i + 1);
     }
     id_scan_ident_out(ident);

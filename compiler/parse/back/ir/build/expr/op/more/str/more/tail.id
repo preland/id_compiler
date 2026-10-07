@@ -21,7 +21,7 @@ given str_fixture2 ((import scmp_node), 3, 4):(5)
 lw_concat_b(int node, int a) {
   int i2_of_v = (import ni2)[node];
   int b = lw_tostr(i2_of_v);
-  int ret_i = lw_callf("id_concat", "string", [a, b]);
+  int ret_i = lw_concat_call(node, a, b);
 } return int ret_i;
 given str_fixture2 ((import concat_node), 3):(4)
 given str_fixture2 ((import concat_node), 5):(4)

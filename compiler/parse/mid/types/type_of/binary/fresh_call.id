@@ -1,0 +1,20 @@
+// The call half of str_fresh: the builtins that make a new string block.
+
+str_fresh_call(int id) {
+  string nm = (import ns1)[id];
+  int ok = 0;
+  if((import nkind)[id] == "call" && is_builtin(nm) == 1) {
+    ok = fresh_builtin(nm);
+  }
+} return int ok;
+given fresh_fixture ((import fr_chr)):(1)
+given fresh_fixture ((import fr_foo)):(0)
+
+fresh_builtin(string nm) {
+  int ok = 0;
+  if(nm == "chr" || nm == "input" || nm == "read_all" || nm == "str_of_mem") {
+    ok = 1;
+  }
+} return int ok;
+("chr"):(1)
+("len"):(0)

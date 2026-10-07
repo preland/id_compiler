@@ -1,0 +1,40 @@
+// Whether a string-context operand is a fresh heap string that nothing else
+// can hold: an unnamed value the operand alone produced, consumed once by the
+// `+` it is an operand of (docs/MEMORY.md, 3.3). Such a value is dead after
+// that `+` has copied it, so the backends may give its block back, or build
+// the result in it. A name, a literal, an index and the result of a user
+// function are never claimed: another name may hold them.
+
+str_fresh(int id) {
+  string t = type_of(id);
+  int ok = str_fresh_node(id);
+  if(t == "int" || t == "float" || t == "word") {
+    ok = 1;
+  }
+} return int ok;
+given fresh_fixture ((import lit_a)):(1)
+given fresh_fixture ((import fr_chr)):(1)
+given fresh_fixture ((import lit_str)):(0)
+
+str_fresh_node(int id) {
+  int ok = 0;
+  if((import nkind)[id] == "bin") {
+    ok = 1;
+  } else {
+    ok = str_fresh_call(id);
+  }
+} return int ok;
+given fresh_fixture ((import fr_n)):(1)
+given fresh_fixture ((import lit_str)):(0)
+
+// The mask a concat node's backends pass to the consuming concat: 1 when the
+// left operand is fresh, 2 when the right one is, 0 when neither is.
+str_mask(int id) {
+  int i1_of_v = (import ni1)[id];
+  int i2_of_v = (import ni2)[id];
+  int m = str_fresh(i1_of_v) + 2 * str_fresh(i2_of_v);
+} return int m;
+given fresh_fixture ((import fr_n)):(0)
+given fresh_fixture ((import fr_l)):(1)
+given fresh_fixture ((import fr_b)):(3)
+given fresh_fixture ((import bin_concat)):(2)

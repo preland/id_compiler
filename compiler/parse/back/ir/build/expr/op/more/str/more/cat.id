@@ -1,0 +1,29 @@
+// A node whose operand is a fresh temporary (str_mask) calls the consuming
+// concat, which the runtime provides on a hosted build; a freestanding build
+// keeps the plain one, because its strings are bump-allocated and cannot be
+// given back.
+lw_concat_call(int node, int a, int b) {
+  int m = str_mask(node);
+  int ret_i = lw_concat_pick(a, b, m);
+} return int ret_i;
+given cat_fixture ((import cat_l), 3, 4):(4) then calls lw_callf:("id_concat_f", "string", [3, 4, 3])
+given cat_fs1 ((import cat_l), 3, 4):(3) then calls lw_callf:("id_concat", "string", [3, 4])
+
+lw_concat_pick(int a, int b, int m) {
+  int ret_i = 0;
+  if(m > 0 && (import fsc)[0] == 0) {
+    ret_i = lw_concat_f(a, b, m);
+  } else {
+    ret_i = lw_callf("id_concat", "string", [a, b]);
+  }
+} return int ret_i;
+given cat_fixture (3, 4, 0):(3) then calls lw_callf:("id_concat", "string", [3, 4])
+given cat_fixture (3, 4, 1):(4) then calls lw_callf:("id_concat_f", "string", [3, 4, 3])
+
+lw_concat_f(int a, int b, int m) {
+  string txt = "" + m;
+  int ckk = lw_const("int", txt);
+  int ret_i = lw_callf("id_concat_f", "string", [a, b, ckk]);
+} return int ret_i;
+given cat_fixture (3, 4, 1):(4) then calls lw_const:("int", "1")
+given cat_fixture (3, 4, 2):(4) then calls lw_callf:("id_concat_f", "string", [3, 4, 3])

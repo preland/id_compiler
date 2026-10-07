@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  string x = grow();
+  print(probe(x));
+} return int 0;

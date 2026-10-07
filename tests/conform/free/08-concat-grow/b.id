@@ -1,0 +1,5 @@
+probe(string s) {
+  int n = len(s);
+  int c = charat(s, n - 1);
+  string r = n + " " + charat(s, 0) + " " + charat(s, 513) + " " + c;
+} return string r;

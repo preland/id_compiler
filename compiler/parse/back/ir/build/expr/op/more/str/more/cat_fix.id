@@ -1,0 +1,16 @@
+// str_fixture2's concat over literals, and one whose left operand is a fresh
+// temporary, with the builtin table ready so fsc can be read (off, then on).
+cat_fixture() {
+  str_fixture2();
+  init_rtc();
+  export int cat_l = node_bin("+", (import concat_node), (import str_node));
+} return void;
+():() then calls str_fixture2:[1]
+():() then init_units:(0)
+
+cat_fs1() {
+  cat_fixture();
+  lset((import fsc), 0, 1);
+} return void;
+():() then calls cat_fixture:[1]
+():() then init_units:(0)

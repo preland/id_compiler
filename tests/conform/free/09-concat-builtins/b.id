@@ -1,0 +1,7 @@
+bytes() {
+  word a = alloc(2);
+  poke8(a, 104);
+  poke8(a + 1, 105);
+} chain () {
+  string b = str_of_mem(a, 2) + str_of_mem(a, 1);
+} return string b;

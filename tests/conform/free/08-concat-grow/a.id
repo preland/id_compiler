@@ -1,0 +1,19 @@
+// A fresh left operand is extended where it is: the one-digit string made from
+// 3 grows past its size class, then past the 16 KB pool limit into a malloc'd
+// block, and keeps its first bytes. The two named strings are never touched.
+// Freed: the digit strings on the right of the first and last `+` in grow, and
+// three of the ones probe makes, five in all.
+rep(string s, int n) {
+  string r = s;
+  int i = 0;
+  while(i < n) {
+    r = r + r;
+    i = i + 1;
+  }
+} return string r;
+
+grow() {
+  string mid = rep("ab", 8);
+  string big = rep("ab", 14);
+  string x = "" + 3 + mid + big + 4;
+} return string x;
