@@ -4901,11 +4901,8 @@ char* id_idstd_str_trim_slice(char* idstd_s, int idstd_i, int idstd_n) {
 }
 
 char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n) {
-    long long idstd_ad;
     char* idstd_ret_s = NULL;
-    idstd_ad = id_mem_alloc((long long)((id_idstd_str_span(idstd_s, idstd_i, idstd_n) + 1)));
-    id_str_blit(idstd_s, idstd_i, idstd_n, idstd_ad);
-    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_n)); id_str_free(idfe_o); }
+    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_sub(idstd_s, idstd_i, idstd_n); id_str_free(idfe_o); }
     return idstd_ret_s;
 }
 
