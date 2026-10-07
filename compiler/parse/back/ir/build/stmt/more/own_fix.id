@@ -1,0 +1,32 @@
+// lw_alloca's slots in fs_acc, the function of esc_sfix whose string `s` the
+// escape analysis owns (lws_s), and in fs_ret, whose string `r` it owns but
+// the function returns (lws_r), so the free hooks have a string to decide
+// about. lws_fixture_in is the same with the cell set that says the store being
+// lowered consumed `s`, and lws_fixture_ret leaves fs_ret as the function whose
+// body is being lowered.
+lws_fixture() {
+  esc_sfix();
+  int r = init_ir();
+  int f = ir_func(0 - 1, "fs_acc", "int");
+} chain () {
+  int o = lw_open(f);
+  export int lws_s = lw_alloca("string", "s");
+  export int lws_ent = (import lwent)[0];
+} return void;
+():() then calls ir_func:(-1, "fs_acc", "int")
+():() then init_units:(0)
+
+lws_fixture_in() {
+  lws_fixture();
+  lset((import esc_cons), 0, (import efs_vs));
+} return void;
+():() then calls lws_fixture:[1]
+():() then init_units:(0)
+
+lws_fixture_ret() {
+  lws_fixture();
+  lset((import sqbase), 0, (import efs_ret));
+  export int lws_r = lw_alloca("string", "r");
+} return void;
+():() then calls lws_fixture:[1]
+():() then init_units:(0)

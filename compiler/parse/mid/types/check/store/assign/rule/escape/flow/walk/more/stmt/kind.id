@@ -1,0 +1,17 @@
+// The bits a store of `e` into a name adds when `e` is not a list literal
+// (esc_fresh, store.id): 0 for a string literal, which a string owner copies to
+// the heap when it stores it; 16 for a fresh string (a concat, or a builtin
+// that makes one), which gives a string name something to free; 2 for anything
+// else, whose value may be held by another name.
+esc_nonlit(int e) {
+  int r = 2;
+  if((import nkind)[e] == "str") {
+    r = 0;
+  } else if(str_fresh_node(e) == 1) {
+    r = 16;
+  }
+} return int r;
+given esc_sfix ((import efs_lit0)):(0)
+given esc_sfix ((import efs_sum)):(16)
+given esc_sfix ((import efs_vn)):(2)
+given esc_sfix ((import efs_cl)):(2)

@@ -6,6 +6,7 @@
 esc_init() {
   export int[] esc_pe = [];
   export int[] purenode = [];
+  export int[] esc_cons = [0 - 1];
 } return void;
 ():() then esc_on:(0)
 given esc_fix ():() then esc_on:(0)

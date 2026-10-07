@@ -1,0 +1,14 @@
+// A string handed to `bind` is shared with the closure, not copied: strings are
+// immutable, so the closure holds the same block (SPEC 1.1.1). The first
+// argument is the function being bound; every later one is a captured value.
+// Lists are copied by `bind` and keep nothing, which arg_ctx already says.
+esc_bindc(string cname, int i, int a) {
+  int c = 0;
+  if(cname == "bind" && i > 0 && type_of(a) == "string") {
+    c = 1;
+  }
+} return int c;
+given esc_sfix ("bind", 1, (import efs_lit0)):(1)
+given esc_sfix ("bind", 0, (import efs_lit0)):(0)
+given esc_sfix ("len", 1, (import efs_lit0)):(0)
+given esc_sfix ("bind", 1, (import efs_one)):(0)

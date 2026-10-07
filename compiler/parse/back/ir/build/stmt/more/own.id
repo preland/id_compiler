@@ -1,0 +1,32 @@
+// The tail of a store into a local, once the value is lowered: an owned string
+// takes a heap copy of a literal (esc_dup), the store frees what it replaces
+// unless it consumed it (lw_store_at asks esc_inplace), and the cell that said
+// which variable may be consumed is put back to -1, exactly as the C emitter's
+// emit_decl_line does.
+
+lw_dup(string nm, int e, int v) {
+  int ret_i = v;
+  if(esc_dup(esc_cur(), nm, e) == 1) {
+    ret_i = lw_callf("id_str_dup", "string", [v]);
+  }
+} return int ret_i;
+given lws_fixture ("s", (import efs_lit0), 7):(3) then calls lw_callf:("id_str_dup", "string", [7])
+given lws_fixture ("s", (import efs_sum), 7):(7) then calls lw_callf:[0]
+
+lw_store_own(string nm, int a, int e, int v) {
+  int lw_dup_v = lw_dup(nm, e, v);
+  lw_store_at(a, lw_dup_v);
+  esc_cons_set(0 - 1);
+} return void;
+given lws_fixture ("s", (import lws_s), (import efs_lit0), 7):() then calls lw_callf:("id_str_dup", "string", [7])
+given lws_fixture ("s", (import lws_s), (import efs_sum), 7):() then calls lw_callf:("id_str_free", "", [3])
+given lws_fixture_in ("s", (import lws_s), (import efs_sum), 7):() then calls lw_callf:[0]
+
+lw_nullty(string t) {
+  string nt = t;
+  if(t == "string") {
+    nt = "int[]";
+  }
+} return string nt;
+("string"):("int[]")
+("int[]"):("int[]")

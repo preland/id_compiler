@@ -1,0 +1,29 @@
+// fs_alias, fs_dbl and the list literal esc_cnt counts into (a.id describes the
+// program).
+
+esc_fs_d() {
+  export int efs_va = node_var("a");
+  export int efs_da = node_decl("string", "a", (import efs_lit0), 0);
+  export int efs_asum = node_bin("+", (import efs_va), (import efs_vn));
+} chain () {
+  export int efs_aa = node_assign("a", (import efs_asum));
+  export int efs_db = node_decl("string", "b", (import efs_va), 0);
+  export int efs_alias = node_func("fs_alias", "int", (import efs_np), [(import efs_da), (import efs_aa), (import efs_db)], (import efs_vn));
+} return void;
+given esc_sfix ():() then (import chkfail)[0]:(0)
+given esc_sfix ():() then init_units:(0)
+
+esc_fs_e() {
+  export int efs_vd = node_var("d");
+  export int efs_dd = node_decl("string", "d", (import efs_lit0), 0);
+  export int efs_dn = node_bin("+", (import efs_vd), (import efs_vn));
+} chain () {
+  export int efs_dt = node_bin("+", (import efs_dn), (import efs_vd));
+  export int efs_ad = node_assign("d", (import efs_dt));
+  export int efs_dbl = node_func("fs_dbl", "int", (import efs_np), [(import efs_dd), (import efs_ad)], (import efs_vn));
+} chain () {
+  export int efs_arr = node_arr([(import efs_vn)]);
+  export int efs_one = node_int("1", 1, 0);
+} return void;
+given esc_sfix ():() then (import chkfail)[0]:(0)
+given esc_sfix ():() then init_units:(0)

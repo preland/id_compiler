@@ -1,0 +1,37 @@
+// What the emitted C names for an owned string: the call that frees it, the C
+// type of the temporary that holds the old value across a store, and the value
+// stored when it is a literal.
+
+esc_free_base(int fn, string nm) {
+  string fname = "id_list_free";
+  if(esc_on() == 1 && esc_decl_type((import nl2)[fn], nm) == "string") {
+    fname = "id_str_free";
+  }
+} return string fname;
+given esc_sfix ((import efs_acc), "s"):("id_str_free")
+given esc_fix ((import efc_fn), "w"):("id_list_free")
+given full_env (-1, "a"):("id_list_free")
+
+esc_c_ty(string nm) {
+  int fn = esc_cur();
+  string cty = "IdList*";
+  if(esc_on() == 1 && esc_decl_type((import nl2)[fn], nm) == "string") {
+    cty = "char*";
+  }
+} return string cty;
+given esc_sfix ("s"):("char*")
+given esc_fix ("w"):("IdList*")
+given full_env ("w"):("IdList*")
+
+// The value a store puts into `nm`: the code of the expression, or a heap copy
+// of it when it is a literal stored into an owned string.
+esc_val_code(string nm, string code, int e) {
+  int fn = esc_cur();
+  string s = code;
+  if(esc_dup(fn, nm, e) == 1) {
+    s = "id_str_dup(" + code + ")";
+  }
+} return string s;
+given esc_sfix ("s", "ID_S(\"\")", (import efs_lit0)):("id_str_dup(ID_S(\"\"))")
+given esc_sfix ("s", "id_concat(s, n)", (import efs_sum)):("id_concat(s, n)")
+given esc_fix ("w", "v", (import efc_y)):("v")

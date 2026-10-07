@@ -16,7 +16,7 @@ esc_args(int[] args, string cname, string nm) {
   int r = esc_pushel(args, cname, nm);
   int i = 0;
   while(i < len(args)) {
-    int c = arg_ctx(cname, i);
+    int c = arg_ctx(cname, i) | esc_bindc(cname, i, args[i]);
     r = r | esc_expr(args[i], nm, c);
     i = i + 1;
   }

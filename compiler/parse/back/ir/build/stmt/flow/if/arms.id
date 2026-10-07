@@ -14,14 +14,19 @@ lw_if_arms2(int node, int alt, int jn) {
 given nest_fixture ((import if_node), 1, 4):(4)
 given loop_fixture ((import while_node), 1, 4):(4)
 
-// Every owned local of the function, freed ahead of a return.
+// Every owned local of the function, freed ahead of a return, except a string
+// the function returns (esc_exit).
 lw_free_all() {
   int i = 0;
   while(i < len((import lwslot))) {
-    lw_drop(lw_old((import lwslot)[i]), (import istr)[((import lwslot)[i])]);
+    if(esc_exit(esc_cur(), (import istr)[((import lwslot)[i])]) == 1) {
+      lw_drop(lw_old((import lwslot)[i]), (import istr)[((import lwslot)[i])]);
+    }
     i = i + 1;
   }
 } return void;
 given lwo_fixture ():() then calls lw_callf:[1]
 given lw_fixture ():() then calls lw_callf:[0]
 given lwd_fixture ():() then calls lw_callf:("id_list_free_deep", "", [3])
+given lws_fixture ():() then calls lw_callf:("id_str_free", "", [3])
+given lws_fixture_ret ():() then calls lw_callf:[0]

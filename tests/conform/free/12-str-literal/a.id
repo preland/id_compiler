@@ -1,0 +1,21 @@
+// A literal is never freed: a name that only ever holds literals owns nothing,
+// and a literal stored into an owned string is copied to the heap first, so the
+// exit frees a block of its own. grow doubles g across the 16 KB limit between
+// pooled blocks and malloc'd ones and frees each old one: 15 passes and the
+// exit, 16. mixed frees the copy of "start" at the exit when n is 0, and the
+// digit string and the extended string when it is not. lit frees nothing.
+grow(int n) {
+  string g = "q";
+  int i = 0;
+  while(i < n) {
+    g = g + g;
+    i = i + 1;
+  }
+} chain (int n) {
+  int l = len(g);
+} return int l;
+
+lit(int n) {
+  string t = "lit";
+  t = "other";
+} return int n;

@@ -3,7 +3,7 @@
 emit_concat(int id) {
   int i1_of_v = (import ni1)[id];
   int i2_of_v = (import ni2)[id];
-  int m = str_mask(id);
+  int m = str_mask(id) + esc_cons_bit(id);
 } chain (int id) {
   string cxa = arg_str(i1_of_v);
   string cxb = arg_str(i2_of_v);
@@ -15,7 +15,9 @@ given nz_bin_nest_fixture ((import nz_nest_l)):("id_concat_f(id_concat(ID_S(\"hi
 given nz_bin_nest_fixture ((import nz_nest_r)):("id_concat_f(ID_S(\"hi\"), id_concat(ID_S(\"hi\"), ID_S(\"yo\")), 2)")
 
 // A fresh operand (str_mask) is handed to the consuming concat, which builds
-// the result in a fresh left operand and gives a fresh right one back.
+// the result in a fresh left operand and gives a fresh right one back. The left
+// operand of `s = s + x` counts as fresh too when `s` is an owned string
+// (esc_cons_bit): the old value is consumed, so the store does not free it.
 concat_text(string cxa, string cxb, int m) {
   string s = "id_concat(" + cxa + ", " + cxb + ")";
   if(m > 0) {

@@ -335,6 +335,7 @@ static _Noreturn void id_freed_str_trap(void) {
    guard on it is filled with 0xDD and its count becomes SIZE_MAX instead, so a
    second free traps and a later use fails in the size checks. */
 static void id_str_free(char* s) {
+    if (!s) return;
     size_t n = id_slen(s);
     id_nfree_s++;
     if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
@@ -346,6 +347,9 @@ static void id_str_free(char* s) {
     }
     id_pool_free(s - sizeof(size_t), n + sizeof(size_t) + 1);
 }
+/* A heap copy of a string, so a literal stored into a local the compiler frees
+   starts as a block of its own. */
+static char* id_str_dup(const char* s) { return id_str_from(s, id_slen(s)); }
 static void id_list_free(IdList* L) {
     if (!L) return;
     id_nfree++;
@@ -907,10 +911,10 @@ int id_str_eol(char* idstd_s, int idstd_i) {
 
 char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n) {
     long long idstd_ad;
-    char* idstd_ret_s;
+    char* idstd_ret_s = NULL;
     idstd_ad = id_mem_alloc((long long)((id_idstd_str_span(idstd_s, idstd_i, idstd_n) + 1)));
     id_str_blit(idstd_s, idstd_i, idstd_n, idstd_ad);
-    idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_n));
+    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_n)); id_str_free(idfe_o); }
     return idstd_ret_s;
 }
 
@@ -1318,13 +1322,13 @@ int id_scan_hex(char* src, int i) {
 
 char* id_udec(long long v) {
     long long hi;
-    char* s;
+    char* s = NULL;
     long long umod_v;
     hi = id_udiv((long long)(v), (long long)(10000000000LL));
-    s = id_concat_f(ID_S(""), id_str_of_word(v), 2);
+    { char* idfe_o = s; s = id_concat_f(ID_S(""), id_str_of_word(v), 2); id_str_free(idfe_o); }
     if ((hi != 0)) {
         umod_v = id_umod((long long)(v), (long long)(10000000000LL));
-        s = id_concat_f(id_concat_f(ID_S(""), id_str_of_word(hi), 2), id_pad10(id_concat_f(ID_S(""), id_str_of_word(umod_v), 2)), 1);
+        { char* idfe_o = s; s = id_concat_f(id_concat_f(ID_S(""), id_str_of_word(hi), 2), id_pad10(id_concat_f(ID_S(""), id_str_of_word(umod_v), 2)), 1); id_str_free(idfe_o); }
     }
     return s;
 }
@@ -1434,19 +1438,19 @@ void id_lex(char* src) {
 char* id_two_at(char* src, int i) {
     int c1;
     int c2;
-    char* two;
+    char* two = NULL;
     c1 = id_charat(src, i);
     c2 = id_charat(src, (i + 1));
 char* idsq_7;
-    two = (idsq_7 = id_chr(c1), id_concat_f(idsq_7, id_chr(c2), 3));
+    { char* idfe_o = two; two = (idsq_7 = id_chr(c1), id_concat_f(idsq_7, id_chr(c2), 3)); id_str_free(idfe_o); }
     return two;
 }
 
 char* id_one_at(char* src, int i) {
     int c;
-    char* one;
+    char* one = NULL;
     c = id_charat(src, i);
-    one = id_chr(c);
+    { char* idfe_o = one; one = id_chr(c); id_str_free(idfe_o); }
     return one;
 }
 
@@ -1507,12 +1511,12 @@ void id_scan_num_out(char* src, int i, int e, int fe) {
 }
 
 void id_scan_str_out(char* src, int i, int e) {
-    char* q;
+    char* q = NULL;
     char* text;
-    q = id_chr(34);
+    { char* idfe_o = q; q = id_chr(34); id_str_free(idfe_o); }
     text = id_slice_str(src, i, e);
     id_print(id_concat_f(id_concat_f(id_concat(ID_S("str "), q), text, 1), q, 1));
-    return;
+    { id_str_free(q); return; }
 }
 
 void id_scan_hash_out(char* src, int i, int e) {
@@ -1577,16 +1581,16 @@ char* id_slice_str(char* src, int a, int b) {
 }
 
 int id_scan_ident(char* src, int i) {
-    char* ident;
+    char* ident = NULL;
     int charat_v;
-    ident = ID_S("");
+    { char* idfe_o = ident; ident = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     while (id_is_alnum_at(src, i)) {
         charat_v = id_charat(src, i);
-        ident = id_concat_f(ident, id_chr(charat_v), 2);
+        ident = id_concat_f(ident, id_chr(charat_v), 3);
         i = (i + 1);
     }
     id_scan_ident_out(ident);
-    return i;
+    { id_str_free(ident); return i; }
 }
 
 int id_scan_number(char* src, int i) {

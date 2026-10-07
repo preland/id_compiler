@@ -1,0 +1,7 @@
+mixed(int n) {
+  string m = "start";
+  if(n > 0) {
+    m = m + n;
+  }
+  int l = len(m);
+} return int l;

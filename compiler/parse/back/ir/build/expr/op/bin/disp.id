@@ -16,7 +16,7 @@ given lw_fix_bin ((import fix_bin_n), "+"):(2)
 // slots and the lowering only ever reads and writes that one.
 lw_old(int addr) {
   int o = 0 - 1;
-  if((import iop)[addr] == "alloca" && lw_slot((import istr)[addr]) == addr && esc_own(esc_cur(), (import istr)[addr]) == 1) {
+  if((import iop)[addr] == "alloca" && lw_slot((import istr)[addr]) == addr && esc_own(esc_cur(), (import istr)[addr]) == 1 && esc_inplace() == 0) {
     o = lw_op("load", (import ity)[addr], addr, 0 - 1, "");
   }
 } return int o;

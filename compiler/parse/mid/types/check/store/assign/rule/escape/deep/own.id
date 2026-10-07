@@ -29,9 +29,10 @@ given esc_dfix ((import efd_leak), "b"):(0)
 given esc_dfix ((import efd_alias), "c"):(0)
 given esc_dfix ((import efd_via), "d"):(0)
 
-// The runtime call that frees the list `nm` of function `fn` when it dies.
+// The runtime call that frees the list or string `nm` of function `fn` when it
+// dies.
 esc_free_fn(int fn, string nm) {
-  string fname = "id_list_free";
+  string fname = esc_free_base(fn, nm);
   if(esc_on() == 1 && esc_deep(fn, nm) == 1) {
     fname = "id_list_free_deep";
   }
@@ -39,3 +40,4 @@ esc_free_fn(int fn, string nm) {
 given esc_dfix ((import efd_good), "a"):("id_list_free_deep")
 given esc_dfix ((import efd_leak), "b"):("id_list_free")
 given full_env (-1, "a"):("id_list_free")
+given esc_sfix ((import efs_acc), "s"):("id_str_free")

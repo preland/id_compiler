@@ -5,7 +5,7 @@
 esc_free_decl(int fn, int sn, string out) {
   string nm = (import ns2)[sn];
   string line = esc_free_fn(fn, nm) + "(" + nm + "); ";
-  if(esc_own(fn, nm) == 1 && str_find(out, line) < 0) {
+  if(esc_exit(fn, nm) == 1 && str_find(out, line) < 0) {
     out = out + line;
   }
 } return string out;
@@ -21,16 +21,21 @@ given esc_fix ((import efc_fn), (import efc_loop), ""):("id_list_free(w); ")
 given esc_fix ((import efc_fn), (import efc_z), "q"):("q")
 given esc_fix ((import efc_fn), (import efc_ife), ""):("id_list_free(w); ")
 
-// `nm = code;`, or for an owned list a block that keeps the old value, stores
-// the new one and frees the old -- after the new is computed, because the new
-// value's expression may read the old list.
-esc_store_code(string nm, string code) {
-  string s = nm + " = " + code + ";";
-  if(esc_own(esc_cur(), nm) == 1) {
-    s = "{ IdList* idfe_o = " + nm + "; " + s + " " + esc_free_fn(esc_cur(), nm) + "(idfe_o); }";
+// `nm = code;`, or for an owned list or string a block that keeps the old value,
+// stores the new one and frees the old -- after the new is computed, because the
+// new value's expression may read the old one. `e` is the node of `code`: a
+// literal stored into an owned string is copied first, and a store that
+// consumed its own target (own/str/cons.id) has no old value left to free.
+esc_store_code(string nm, string code, int e) {
+  string s = nm + " = " + esc_val_code(nm, code, e) + ";";
+  if(esc_own(esc_cur(), nm) == 1 && esc_inplace() == 0) {
+    s = "{ " + esc_c_ty(nm) + " idfe_o = " + nm + "; " + s + " " + esc_free_fn(esc_cur(), nm) + "(idfe_o); }";
   }
 } return string s;
-given esc_fix ("w", "v"):("{ IdList* idfe_o = w; w = v; id_list_free(idfe_o); }")
-given esc_dfix ("a", "v"):("{ IdList* idfe_o = a; a = v; id_list_free_deep(idfe_o); }")
-given esc_fix ("z", "v"):("z = v;")
-given full_env ("w", "v"):("w = v;")
+given esc_fix ("w", "v", (import efc_y)):("{ IdList* idfe_o = w; w = v; id_list_free(idfe_o); }")
+given esc_dfix ("a", "v", (import efc_y)):("{ IdList* idfe_o = a; a = v; id_list_free_deep(idfe_o); }")
+given esc_fix ("z", "v", (import efc_y)):("z = v;")
+given full_env ("w", "v", 0):("w = v;")
+given esc_sfix ("s", "v", (import efs_sum)):("{ char* idfe_o = s; s = v; id_str_free(idfe_o); }")
+given esc_sfix ("s", "ID_S(\"\")", (import efs_lit0)):("{ char* idfe_o = s; s = id_str_dup(ID_S(\"\")); id_str_free(idfe_o); }")
+given esc_sfix_in ("s", "v", (import efs_sum)):("s = v;")

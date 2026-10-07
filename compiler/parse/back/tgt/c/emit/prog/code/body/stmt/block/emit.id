@@ -26,8 +26,11 @@ given stmt_fix (2, ""):() then prints:("z = 5;\n")
 
 // The tail of a decl statement, once its target name and initializer are known.
 emit_decl_line(string decl_target, int decl_init_id, string ind) {
+  esc_pick_set(decl_target, decl_init_id);
   string emit_expr_v = emit_expr(decl_init_id);
-  string esc_c = esc_store_code(decl_target, emit_expr_v);
+  string esc_c = esc_store_code(decl_target, emit_expr_v, decl_init_id);
+} chain (string decl_target, int decl_init_id, string ind) {
+  esc_cons_set(0 - 1);
   emit_line(ind + esc_c);
 } return void;
 given stmt_fix ("y", 0, "  "):() then prints:("  y = 5;\n")

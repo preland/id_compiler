@@ -1,0 +1,19 @@
+// A string something else holds is never freed or extended in place, whatever
+// the function then does to its own name for it. Each function overwrites the
+// name after the other holder has it, and the program prints what the holder
+// sees: a wrong free (the guard poisons it) or a wrong append changes it.
+//   stash  pushed k into a list
+//   alias  named it b
+// Freed: only the digit string of each first `+ n`, one per function, here and
+// in b.id (4 in all).
+stash(string[] box, int n) {
+  string k = "k" + n;
+  push(box, k);
+  k = k + "!";
+} return int n;
+
+alias(int n) {
+  string a = "a" + n;
+  string b = a;
+  a = a + "x";
+} return string b;

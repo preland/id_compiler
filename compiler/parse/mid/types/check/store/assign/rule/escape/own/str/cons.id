@@ -1,0 +1,32 @@
+// A string store that appends to its own target in place. `s = s + x` builds
+// its result in the block `s` holds (the consuming concat of the runtime), so
+// the old value is neither copied nor freed. One cell says which variable node
+// may be consumed: it is set while the right-hand side of such a store is
+// emitted and holds -1 the rest of the time (esc_init makes it, so it exists
+// whether or not the analysis is on, and no store finds anything else there).
+
+esc_cons_set(int leaf) {
+  int ecs_old = (import esc_cons)[0];
+  lset((import esc_cons), 0, leaf);
+} return int ecs_old;
+given esc_sfix (5):(-1)
+given esc_sfix_in (-1):((import efs_vs))
+
+// 1 for the concat node whose left operand is the variable the cell names.
+esc_cons_bit(int node) {
+  int b = 0;
+  if((import esc_cons)[0] >= 0 && (import esc_cons)[0] == (import ni1)[node]) {
+    b = 1;
+  }
+} return int b;
+given esc_sfix_in ((import efs_sum)):(1)
+given esc_sfix_in ((import efs_dt)):(0)
+given esc_sfix ((import efs_sum)):(0)
+
+// Whether the store being emitted consumed its target, so the old value must
+// not be freed after it.
+esc_inplace() {
+  int ipl = (import esc_cons)[0] >= 0;
+} return int ipl;
+given esc_sfix_in ():(1)
+given esc_sfix ():(0)

@@ -3,7 +3,7 @@
 // keeps the plain one, because its strings are bump-allocated and cannot be
 // given back.
 lw_concat_call(int node, int a, int b) {
-  int m = str_mask(node);
+  int m = str_mask(node) + esc_cons_bit(node);
   int ret_i = lw_concat_pick(a, b, m);
 } return int ret_i;
 given cat_fixture ((import cat_l), 3, 4):(4) then calls lw_callf:("id_concat_f", "string", [3, 4, 3])

@@ -7,9 +7,11 @@ given bound_fixture ((import assign_node), 0):() then (import chkfail)[0]:(0)
 given bound_fixture ((import assign_node), 1):() then (import chkfail)[0]:(0)
 
 lw_assign_tail2(int node, int a, int assign_val_id, string assign_ty_name) {
+  esc_pick_set(assign_ty_name, assign_val_id);
   string lw_aty_v = lw_aty(assign_ty_name);
   int lw_as_v = lw_as(assign_val_id, lw_aty_v);
-  lw_store_at(a, lw_as_v);
+} chain (int node, int a, int assign_val_id, string assign_ty_name) {
+  lw_store_own(assign_ty_name, a, assign_val_id, lw_as_v);
 } return void;
 given bound_fixture (0, 0, (import ev_node), "y"):() then (import chkfail)[0]:(0)
 given bound_fixture (0, 1, (import ev_node), "y"):() then (import chkfail)[0]:(0)

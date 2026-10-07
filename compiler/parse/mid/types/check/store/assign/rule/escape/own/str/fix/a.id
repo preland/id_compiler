@@ -1,0 +1,51 @@
+// The program the string-ownership cases run against, on top of esc_fix's.
+// Six functions built node by node, all of them taking `int n`:
+//
+//   fs_acc   { string s = ""; s = s + n; }                  return n   owned, freed at the exit
+//   fs_ret   { string r = ""; r = r + n; }                  return r   owned, returned, so not freed
+//   fs_lit   { string l = "lit"; }                          return l   holds only a literal
+//   fs_call  { string c = fs_str(n); }                      return n   holds a call's result
+//   fs_alias { string a = ""; a = a + n; string b = a; }    return n   a is kept by b
+//   fs_dbl   { string d = ""; d = d + n + d; }              return n   reads d twice
+//
+// Every node a case needs is exported under an `efs` name. Nothing here is
+// registered: the cases pass the function node, which is all the analysis of a
+// local needs. esc_sfix (c.id) builds the whole program.
+
+esc_fs_a() {
+  export int efs_lit0 = node_str("");
+  export int efs_vs = node_var("s");
+  export int efs_vn = node_var("n");
+} chain () {
+  export int efs_d0 = node_decl("string", "s", (import efs_lit0), 0);
+  export int efs_sum = node_bin("+", (import efs_vs), (import efs_vn));
+  export int efs_a1 = node_assign("s", (import efs_sum));
+} chain () {
+  export int[] efs_np = [node_param("param", "int", "n")];
+  export int efs_acc = node_func("fs_acc", "int", (import efs_np), [(import efs_d0), (import efs_a1)], (import efs_vn));
+} return void;
+given esc_sfix ():() then (import chkfail)[0]:(0)
+given esc_sfix ():() then init_units:(0)
+
+esc_fs_b() {
+  export int efs_vr = node_var("r");
+  export int efs_dr = node_decl("string", "r", (import efs_lit0), 0);
+  export int efs_rs = node_bin("+", (import efs_vr), (import efs_vn));
+} chain () {
+  export int efs_ar = node_assign("r", (import efs_rs));
+  export int efs_ret = node_func("fs_ret", "string", (import efs_np), [(import efs_dr), (import efs_ar)], (import efs_vr));
+} return void;
+given esc_sfix ():() then (import chkfail)[0]:(0)
+given esc_sfix ():() then init_units:(0)
+
+esc_fs_c() {
+  export int efs_vl = node_var("l");
+  export int efs_dl = node_decl("string", "l", node_str("lit"), 0);
+  export int efs_lit = node_func("fs_lit", "string", (import efs_np), [(import efs_dl)], (import efs_vl));
+} chain () {
+  export int efs_cl = node_call("fs_str", [(import efs_vn)]);
+  export int efs_dc = node_decl("string", "c", (import efs_cl), 0);
+  export int efs_call = node_func("fs_call", "int", (import efs_np), [(import efs_dc)], (import efs_vn));
+} return void;
+given esc_sfix ():() then (import chkfail)[0]:(0)
+given esc_sfix ():() then init_units:(0)

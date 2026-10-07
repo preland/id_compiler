@@ -1,0 +1,21 @@
+// A string the function builds for itself is freed: the old value when a store
+// replaces it, the last one at the exit unless the function returns it.
+//   build  appends to s in place, so only the digit string on each `+ i` is
+//          freed, once per pass: 200 in all
+//   count  frees the digit string, then t at the exit: 2 per call
+//   over   (b.id) frees the digit string, the old u when `n + u` replaces it, and
+//          u at the exit: 3 per call
+build(int n) {
+  string s = "";
+  int i = 0;
+  while(i < n) {
+    s = s + i + ",";
+    i = i + 1;
+  }
+} return string s;
+
+count(int n) {
+  string t = "a" + n;
+  t = t + "b";
+  int l = len(t);
+} return int l;

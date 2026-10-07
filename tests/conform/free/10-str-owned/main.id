@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  string s = build(200);
+  print(len(s));
+  print(count(7) + over(9));
+} return int 0;

@@ -1,0 +1,11 @@
+show(string p, int q) {
+  string r = p + q;
+} return string r;
+
+mk(int n) {
+  string c = "c" + n;
+  func(int) return string f = bind(show, c);
+  c = c + "z";
+} chain (int n) {
+  string out = f(7);
+} return string out;

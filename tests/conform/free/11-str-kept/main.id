@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  string[] box = [];
+  int n = stash(box, 1);
+  print(box[0] + " " + alias(5) + " " + mk(3));
+} return int 0;

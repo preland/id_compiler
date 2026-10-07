@@ -1,0 +1,40 @@
+// What a function frees on the way out, and what it copies first. Both
+// questions are asked of a name that esc_own already accepted.
+
+// A string the return clause returns is owned (its earlier values are freed as
+// it is overwritten) but is not freed at the exit: its last value is the
+// caller's. Every other owned name, a list included, is freed there.
+esc_exit(int fn, string nm) {
+  int ok = esc_own(fn, nm);
+  if(ok == 1 && esc_retvar(fn) == nm) {
+    ok = 0;
+  }
+} return int ok;
+given esc_sfix ((import efs_acc), "s"):(1)
+given esc_sfix ((import efs_ret), "r"):(0)
+given esc_sfix ((import efs_alias), "a"):(0)
+
+// The name the return clause returns, "" when it returns anything else.
+esc_retvar(int fn) {
+  string erv_nm = "";
+  int e = (import ni1)[fn];
+  if(e >= 0 && (import nkind)[e] == "var") {
+    erv_nm = (import ns1)[e];
+  }
+} return string erv_nm;
+given esc_sfix ((import efs_ret)):("r")
+given esc_sfix ((import efs_acc)):("n")
+given esc_sfix ((import efs_lit)):("l")
+
+// Whether a store of `e` into the owned name `nm` must copy `e` to the heap
+// first: a literal is a static object, and the free the owner will one day
+// make must find a block.
+esc_dup(int fn, string nm, int e) {
+  int d = 0;
+  if(esc_on() == 1 && (import nkind)[e] == "str") {
+    d = esc_own(fn, nm);
+  }
+} return int d;
+given esc_sfix ((import efs_acc), "s", (import efs_lit0)):(1)
+given esc_sfix ((import efs_acc), "s", (import efs_sum)):(0)
+given esc_sfix ((import efs_lit), "l", (import efs_lit0)):(0)

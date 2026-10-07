@@ -14,13 +14,16 @@ given nest_fixture ((import if_node), 5, 0, 1, 4):(4)
 given loop_fixture ((import while_node), 5, 0, 1, 4):(4)
 
 // An owned local starts as null, so a path that never reaches its declaration
-// frees nothing: the same NULL the C target initialises it with.
+// frees nothing: the same NULL the C target initialises it with. The null of a
+// string slot is spelled with a list type (lw_nullty), because a constant of
+// string type is a literal.
 lw_own_init(int ent, int v) {
   if(esc_own(esc_cur(), (import istr)[v]) == 1) {
     int[] none = [];
-    int c = ir_leaf("const", (import ity)[v], 0 - 1, 0 - 1, "null");
+    int c = ir_leaf("const", lw_nullty((import ity)[v]), 0 - 1, 0 - 1, "null");
     ir_add(ent, ir_insn("store", "", v, c, "", none, none));
   }
 } return void;
 given lwo_fixture ((import lwo_ent), (import lwo_w)):() then calls ir_add:[1] then calls ir_leaf:("const", "int[]", -1, -1, "null")
 given lwo_fixture ((import lwo_ent), (import lwo_z)):() then calls ir_add:[0]
+given lws_fixture ((import lws_ent), (import lws_s)):() then calls ir_leaf:("const", "int[]", -1, -1, "null")

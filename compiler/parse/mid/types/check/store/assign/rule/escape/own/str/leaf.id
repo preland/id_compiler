@@ -1,0 +1,36 @@
+// The two questions esc_pick asks of an expression.
+
+// The leftmost operand of a chain of `+`: the node a left-to-right evaluation
+// of the chain reads first.
+esc_leaf(int e) {
+  int x = e;
+  while((import nkind)[x] == "bin" && (import ns1)[x] == "+") {
+    x = (import ni1)[x];
+  }
+} return int x;
+given esc_sfix ((import efs_dt)):((import efs_vd))
+given esc_sfix ((import efs_vn)):((import efs_vn))
+
+// How many times the variable `nm` is read anywhere in the expression `e`.
+esc_cnt(int e, string nm) {
+  int c = 0;
+  if((import nkind)[e] == "var") {
+    c = (import ns1)[e] == nm;
+  } else {
+    c = esc_cnt2(e, nm);
+  }
+} return int c;
+given esc_sfix ((import efs_dt), "d"):(2)
+given esc_sfix ((import efs_sum), "s"):(1)
+given esc_sfix ((import efs_sum), "q"):(0)
+
+esc_cnt2(int e, string nm) {
+  int c = 0;
+  if((import nkind)[e] == "bin" || (import nkind)[e] == "index") {
+    c = esc_cnt((import ni1)[e], nm) + esc_cnt((import ni2)[e], nm);
+  } else {
+    c = esc_cnt3(e, nm);
+  }
+} return int c;
+given esc_sfix ((import efs_dt), "d"):(2)
+given esc_sfix ((import efs_dn), "d"):(1)
