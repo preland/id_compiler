@@ -3164,10 +3164,14 @@ backend_pkg() {
 
 # backend_build DIR -- compile DIR's sources for this platform, once per build.
 # Declarations that cannot serve this build set BE_ERR and return 1, so the
-# caller can say which reached native needed it.
+# caller can say which reached native needed it. A C-target program that links with
+# LTO gets its backends compiled for it too (fat objects, -std=gnu17 -- cc has to
+# see the same language as the units, or it will not inline across them -- and
+# -fwrapv), so a native like sqrt can inline; a --lib, llvm or wasm build, or a
+# clang cc (thin LTO objects do not link without -flto), keeps the plain -O2 object.
 backend_build() {
     local d="$1" sources_line cflags_line link_line pkg_line src src_path obj backend_rc bkey
-    local -a srcs=() cflags=() objs=() pkgs=() links=()
+    local -a srcs=() cflags=() objs=() pkgs=() links=() ltof=()
     local -a PKG_CFLAGS=() PKG_LIBS=()
     BE_ERR=""
     [ -n "${BE_BUILT[$d]:-}" ] && return 0
@@ -3187,16 +3191,17 @@ backend_build() {
         link_line=$(IFS=$'\x1f'; printf '%s' "${links[*]}")
     fi
     [ "$LIB" -eq 1 ] && cflags+=(-fPIC -ffunction-sections -fdata-sections)
+    [ "$LIB" -eq 0 ] && [ "$TARGET" = c ] && [ "$CC_LTO" -eq 1 ] && cc_lto_setup && [ "${CC_LTO_COMPILE[*]}" = -flto ] && ltof=(-std=gnu17 -flto -ffat-lto-objects -fwrapv)
     for src in ${srcs[@]+"${srcs[@]}"}; do
         [ -z "$src" ] && continue
         src_path="$d/$src"
         obj="${src_path%.*}.gen.o"
         bkey=""
-        [ "$CACHE_ON" -eq 1 ] && [ "$CC_EXPLICIT" -eq 0 ] && bkey=$(backend_obj_key "$d" "$src_path" ${cflags[@]+"${cflags[@]}"})
+        [ "$CACHE_ON" -eq 1 ] && [ "$CC_EXPLICIT" -eq 0 ] && bkey=$(backend_obj_key "$d" "$src_path" ${ltof[@]+"${ltof[@]}"} ${cflags[@]+"${cflags[@]}"})
         if [ -n "$bkey" ] && [ -f "$BACKEND_OBJ_DIR/$bkey/o" ] && cp "$BACKEND_OBJ_DIR/$bkey/o" "$obj"; then
             touch "$BACKEND_OBJ_DIR/$bkey"
         else
-            capped "$CC" -O2 -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
+            capped "$CC" -O2 ${ltof[@]+"${ltof[@]}"} -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
             if [ "$backend_rc" -ne 0 ]; then
                 progress_clear
                 if mem_ceiling_hit "$backend_rc"; then
