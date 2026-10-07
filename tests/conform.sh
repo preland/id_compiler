@@ -48,6 +48,11 @@
 # Only FAIL is an error. GAP is the backlog, printed so it cannot be mistaken
 # for coverage.
 #
+# One more check is about speed, not answers: for every case with a loop, the C
+# and the LLVM target must version the same loops (versioned_agree below). The
+# answers are right whether or not a target versions a loop, so a target that
+# silently stops doing it passes everything above.
+#
 # Run from anywhere: tests/conform.sh [AREA...]   (AREAs, e.g. trap, run only
 # those directories under tests/conform/ -- the whole run is over the 60s budget)
 # Needs clang for --target llvm, and the WASI toolchain `nix develop` sets plus
@@ -186,6 +191,26 @@ run_case() {
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+# versioned_agree SRC ID
+# Loop versioning (docs/PERFORMANCE.md) is one analysis with two printers: the C
+# target prints the guard of every loop it versions as a C condition, the LLVM
+# target builds the same guard as IR. A guard of N clauses is N-1 `&&` in the C
+# and N-1 `and i1` in the IR, so the two counts must agree for a program; a
+# token the analysis writes that the LLVM lowering stops understanding leaves
+# its loops unversioned there, and the answers stay right while this count
+# falls. (The agreement is of the whole program, not loop by loop.)
+versioned_agree() {
+    local src="$1" id="$2" cn ln
+    if ! "$BIN_IDC" "$src" --allow-untested --emit-c "$TMP/ver.c" >"$TMP/ver.log" 2>&1 \
+       || ! "$BIN_IDC" "$src" --allow-untested --target llvm --emit-llvm "$TMP/ver.ll" >>"$TMP/ver.log" 2>&1; then
+        bad "versioning  $id  -- emitting C and IR failed: $(head -1 "$TMP/ver.log")"
+        return
+    fi
+    cn=$(grep -E '^ *if \(\(.*\) != NULL && ' "$TMP/ver.c" | grep -o ' && ' | wc -l)
+    ln=$(grep -c ' and i1 ' "$TMP/ver.ll")
+    if [ "$cn" -eq "$ln" ]; then ok; else bad "versioning  $id  -- the C guards join $cn clauses, the LLVM guards $ln"; fi
+}
+
 TARGETS="c"
 if have clang; then TARGETS="$TARGETS llvm"
 else echo "SKIP: --target llvm (needs clang on PATH)"; fi
@@ -209,6 +234,9 @@ for src in conform/$area/*.id conform/$area/*/; do
     for target in $TARGETS; do
         run_case "$target" "$id" "$dir" "$base"
     done
+    if [ -f "$src" ] && [[ " $TARGETS " == *" llvm "* ]] && grep -q 'while' "$src"; then
+        versioned_agree "$src" "$id"
+    fi
 done
 done
 

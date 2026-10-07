@@ -1,0 +1,36 @@
+// A sum, difference or product of the top N values, joined from the left and
+// parenthesised once (lp_rnary), and a comparison's right side without the
+// parentheses of a sum (lp_rbare): C reads `x <= (long long)(v)->len - 1` as
+// it was always written.
+
+lp_rbare(string lr_val, string lr_prev) {
+  string lr_s = lr_val;
+  if(gt_isar(lr_prev) == 1) {
+    lr_s = str_slice(lr_val, 1, len(lr_val) - 2);
+  }
+} return string lr_s;
+("(a - b)", "-:2"):("a - b")
+("(a)", "v:a"):("(a)")
+("(a + b)", "wide"):("(a + b)")
+
+lp_rjoin_op(string[] lr_st, string lr_op, string lr_acc) {
+  string lr_x = pop(lr_st);
+  string lr_s = lr_x + " " + lr_op + " " + lr_acc;
+} return string lr_s;
+(["a", "b"], "+", "c"):("b + c")
+(["a"], "*", "z"):("a * z")
+
+lp_rnary(string[] lr_st, string lr_tok) {
+  int lr_n = gt_arity(lr_tok);
+  string lr_acc = pop(lr_st);
+  int lr_k = 1;
+} chain (string[] lr_st, string lr_tok) {
+  while(lr_k < lr_n) {
+    lr_acc = lp_rjoin_op(lr_st, gt_op(lr_tok), lr_acc);
+    lr_k = lr_k + 1;
+  }
+  push(lr_st, "(" + lr_acc + ")");
+} return void;
+(["a", "b", "c"], "+:3"):(["(a + b + c)"])
+(["x", "a", "b"], "-:2"):(["x", "(a - b)"])
+(["a"], "*:1"):(["(a)"])

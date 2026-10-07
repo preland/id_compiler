@@ -1,0 +1,21 @@
+// The right side of a clause that compares with a list's length: the length in
+// 64 bits (lp_lenw), and the length less a constant with the clause closed by
+// `<=` (lp_fit), as a limit is compared with it.
+
+lp_lenw(string[] lq_tk, int lq_lnode) {
+  lp_leaf(lq_tk, lq_lnode);
+  push(lq_tk, "len");
+  push(lq_tk, "wide");
+} return void;
+given lpf_more ([], (import lpf_na)):(["v:lan", "len", "wide"])
+given lpf_more (["x"], (import lpf_q)):(["x", "v:lpfq", "len", "wide"])
+
+lp_fit(string[] lq_tk, int lq_lnode, int lq_k) {
+  lp_lenw(lq_tk, lq_lnode);
+  push(lq_tk, "k:" + lq_k);
+  push(lq_tk, "-:2");
+} chain (string[] lq_tk, int lq_lnode, int lq_k) {
+  push(lq_tk, "<=");
+} return void;
+given lpf_more (["v:n"], (import lpf_na), 2):(["v:n", "v:lan", "len", "wide", "k:2", "-:2", "<="])
+given lpf_more ([], (import lpf_q), 0):(["v:lpfq", "len", "wide", "k:0", "-:2", "<="])

@@ -1,0 +1,26 @@
+// The operators of one operand and of a comparison, printed on the stack lr_st:
+// the cast to 64 bits, a list's length or capacity read as its field, and a
+// comparison of the two values on top.
+
+lp_rwide(string[] lr_st) {
+  string lr_x = pop(lr_st);
+  push(lr_st, "(long long)" + lr_x);
+} return void;
+(["(a)"]):(["(long long)(a)"])
+(["k", "(b)"]):(["k", "(long long)(b)"])
+
+lp_rfield(string[] lr_st, string lr_tok) {
+  string lr_x = pop(lr_st);
+  push(lr_st, lr_x + "->" + lr_tok);
+} return void;
+(["(a)"], "len"):(["(a)->len"])
+(["k", "(b)"], "cap"):(["k", "(b)->cap"])
+
+lp_rcmp(string[] lr_st, string lr_tok, string lr_prev) {
+  string lr_r = pop(lr_st);
+  string lr_l = pop(lr_st);
+  push(lr_st, lr_l + " " + lr_tok + " " + lp_rbare(lr_r, lr_prev));
+} return void;
+(["(a)", "0"], ">=", "k:0"):(["(a) >= 0"])
+(["(a)", "((b) - 1)"], "<=", "-:2"):(["(a) <= (b) - 1"])
+(["((a) + 1)", "(b)"], "<", "wide"):(["((a) + 1) < (b)"])

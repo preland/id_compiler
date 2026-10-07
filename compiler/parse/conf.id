@@ -82,7 +82,7 @@ string flt_inf_digits = "1797693134862315807937289714053034150799341327100378269
 // the flat store, which holds state that is not an argument. A builtin that is
 // added later is refused until it is listed here.
 string[] pure_builtins = ["len", "push", "pop", "to_int", "charat", "chr", "udiv", "umod", "ult", "ushr", "fail", "bind", "bits_of_float", "float_of_bits", "bits32_of_float", "float_of_bits32", "str_sub"];
-// The tokens of a versioned loop's guard that are longer than one character
-// (back/ir/build/stmt/flow/loop/guard/match.id), longest first where one begins
-// another.
-string[] gd_multi = ["(long long)", "->len", "->cap", "!=", "<=", ">="];
+// The tokens of a versioned loop's guard that stand for themselves, with no
+// operand in their spelling (back/ir/build/stmt/flow/loop/guard/check.id): the
+// others are names and literals, comparisons and sums (back/guard/token.id).
+string[] gd_plain = ["null", "wide", "len", "cap", "|"];

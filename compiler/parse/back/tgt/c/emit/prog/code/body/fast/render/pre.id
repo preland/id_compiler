@@ -1,0 +1,39 @@
+// The guard as one C condition: the tokens of lpg (state.id) printed clause by
+// clause on a stack of C text, each clause's text taken off at its "|" and the
+// clauses joined by `&&`. A value is parenthesised as the C text the emitter
+// has always written, so that the emitted C does not change with the tokens.
+
+lp_pre() {
+  string[] lr_st = [];
+  string lr_s = "";
+  int lr_i = 0;
+} chain () {
+  while(lr_i < len((import lpg))) {
+    lr_s = lp_rfeed(lr_st, lr_i, lr_s);
+    lr_i = lr_i + 1;
+  }
+} return string lr_s;
+given lpf_conds ():("(x) != NULL && (y) >= 0")
+given lpf_conds3 ():("(x) != NULL && (y) >= 0 && (n) <= (long long)(z)->len - 1")
+
+lp_rfeed(string[] lr_st, int lr_i, string lr_out) {
+  string lr_o = lr_out;
+  if((import lpg)[lr_i] == "|") {
+    lr_o = lp_rjoin(lr_out, pop(lr_st));
+  }
+  if((import lpg)[lr_i] != "|") {
+    lp_rstep(lr_st, (import lpg)[lr_i], lp_rprev(lr_i));
+  }
+} return string lr_o;
+given lpf_conds (["(x) != NULL"], 3, ""):("(x) != NULL")
+given lpf_conds (["(y) >= 0"], 7, "(x) != NULL"):("(x) != NULL && (y) >= 0")
+given lpf_conds ([], 0, "kept"):("kept")
+
+lp_rjoin(string lr_out, string lr_clause) {
+  string lr_s = lr_clause;
+  if(lr_out != "") {
+    lr_s = lr_out + " && " + lr_clause;
+  }
+} return string lr_s;
+("", "a"):("a")
+("a", "b"):("a && b")

@@ -1,0 +1,37 @@
+// A sum, difference or product of the top N values of the stack, taken from the
+// left: `a - b - c` is `(a - b) - c`, each step made in 64 bits. The N values
+// go and their result is put back.
+
+gd_run(string gdf_op, int gdf_at, int gdf_n) {
+  int gdf_acc = (import gdstk)[gdf_at];
+  int gdf_k = 1;
+  while(gdf_k < gdf_n) {
+    gdf_acc = gd_wise(gdf_op, gdf_acc, (import gdstk)[gdf_at + gdf_k]);
+    gdf_k = gdf_k + 1;
+  }
+} return int gdf_acc;
+given gd_words given gd_trio ("-", 0, 3):(8) then gd_last:("word sub ")
+given gd_words given gd_trio ("+", 2, 1):(5)
+
+gd_drop(int gdf_n) {
+  int gdf_d = 0;
+  while(gdf_d < gdf_n) {
+    int gdf_x = pop((import gdstk));
+    gdf_d = gdf_d + 1;
+  }
+} return void;
+given gd_words given gd_trio (2):() then len((import gdstk)):(1)
+given gd_words given gd_trio (0):() then len((import gdstk)):(3)
+
+gd_fold(string gdf_tok) {
+  int gdf_n = gt_arity(gdf_tok);
+  string gdf_op = gt_op(gdf_tok);
+  int gdf_at = len((import gdstk)) - gdf_n;
+} chain (string gdf_tok) {
+  int gdf_acc = gd_run(gdf_op, gdf_at, gdf_n);
+  gd_drop(gdf_n);
+  push((import gdstk), gdf_acc);
+} return void;
+given gd_words given gd_trio ("-:3"):() then (import gdstk)[0]:(8)
+given gd_words given gd_trio ("+:1"):() then len((import gdstk)):(3)
+given gd_words given gd_trio ("*:2"):() then (import gdstk)[1]:(7)

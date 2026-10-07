@@ -1,11 +1,21 @@
-// A clause added to the guard once, however many accesses ask for it.
+// A clause added to the guard once, however many accesses ask for it. The
+// clause is the tokens in lq_tk, which lpg takes with the "|" that ends it.
 
-lp_add(string[] lq_set, string lq_cl) {
-  if(find_str(lq_set, lq_cl) < 0) {
-    push(lq_set, lq_cl);
+lp_add(string[] lq_tk) {
+  string lq_key = str_join(lq_tk, " ");
+  if(find_str((import lpcond), lq_key) < 0) {
+    lp_put(lq_tk, lq_key);
   }
 } return void;
-given lpf_conds ((import lpcond), "x"):(["x", "y"], "x")
-given lpf_conds ((import lpcond), "w"):(["x", "y", "w"], "w")
-(["a"], "b"):(["a", "b"], "b")
-([], "c"):(["c"], "c")
+given lpf_conds (["v:x", "null", "!="]):(["v:x", "null", "!="]) then len((import lpg)):(8)
+given lpf_conds (["v:w", "null", "!="]):(["v:w", "null", "!="]) then len((import lpg)):(12)
+given lpf_conds (["v:w", "null", "!="]):(["v:w", "null", "!="]) then (import lpcond)[2]:("v:w null !=")
+
+lp_put(string[] lq_tk, string lq_key) {
+  push((import lpcond), lq_key);
+  lst_str_extend((import lpg), lq_tk);
+  push((import lpg), "|");
+} return void;
+given lpf_conds (["v:w", "k:0"], "v:w k:0"):(["v:w", "k:0"], "v:w k:0") then (import lpcond)[2]:("v:w k:0")
+given lpf_conds (["v:w", "k:0"], "v:w k:0"):(["v:w", "k:0"], "v:w k:0") then len((import lpg)):(11)
+given lpf_conds (["v:w", "k:0"], "v:w k:0"):(["v:w", "k:0"], "v:w k:0") then (import lpg)[10]:("|")

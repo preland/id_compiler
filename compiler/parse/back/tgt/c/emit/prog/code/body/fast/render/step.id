@@ -1,0 +1,54 @@
+// One token of the guard printed on the stack lr_st. A name or a literal of the
+// source is pushed in parentheses and a constant of the analysis as it is; the
+// rest take their operands off the stack (render/op.id, render/more.id). The
+// token before a comparison tells it whether its right side is a sum, which C
+// reads without parentheses there.
+
+lp_rprev(int lr_i) {
+  string lr_p = "";
+  if(lr_i > 0) {
+    lr_p = (import lpg)[lr_i - 1];
+  }
+} return string lr_p;
+given lpf_conds (0):("")
+given lpf_conds (6):("k:0")
+
+lp_rleaf(string[] lr_st, string lr_tok) {
+  if(str_starts(lr_tok, "k:") == 1) {
+    push(lr_st, gt_tail(lr_tok));
+  } else {
+    push(lr_st, "(" + gt_tail(lr_tok) + ")");
+  }
+} return void;
+(["a"], "k:7"):(["a", "7"])
+([], "v:x"):(["(x)"])
+([], "i:3"):(["(3)"])
+
+lp_rstep(string[] lr_st, string lr_tok, string lr_prev) {
+  if(lr_tok == "null") {
+    push(lr_st, "NULL");
+  }
+  if(gt_isval(lr_tok) == 1) {
+    lp_rleaf(lr_st, lr_tok);
+  }
+  if(lr_tok == "wide") {
+    lp_rwide(lr_st);
+  }
+} chain (string[] lr_st, string lr_tok, string lr_prev) {
+  if(lr_tok == "len" || lr_tok == "cap") {
+    lp_rfield(lr_st, lr_tok);
+  }
+  if(gt_iscmp(lr_tok) == 1) {
+    lp_rcmp(lr_st, lr_tok, lr_prev);
+  }
+  if(gt_isar(lr_tok) == 1) {
+    lp_rnary(lr_st, lr_tok);
+  }
+} return void;
+([], "null", ""):(["NULL"])
+([], "v:x", ""):(["(x)"])
+(["a"], "k:2", ""):(["a", "2"])
+(["a"], "wide", ""):(["(long long)a"])
+(["(l)"], "cap", ""):(["(l)->cap"])
+(["a", "b"], "<", ""):(["a < b"])
+(["a", "b", "c"], "+:3", ""):(["(a + b + c)"])

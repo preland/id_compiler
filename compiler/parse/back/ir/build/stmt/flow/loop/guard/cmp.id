@@ -1,0 +1,12 @@
+// A comparison, taken off the stack with its two operands: the clause's value
+// goes back, to be anded into the guard at the "|" that ends the clause.
+
+gd_cmp(string gdb_op) {
+  int gdb_b = pop((import gdstk));
+  int gdb_a = pop((import gdstk));
+  int gdb_out = gd_bin_of(gdb_op, gdb_a, gdb_b);
+} chain (string gdb_op) {
+  push((import gdstk), gdb_out);
+} return void;
+given gd_vals given gd_two ("<"):() then (import gdstk)[0]:(7)
+given gd_vals given gd_two ("<="):() then len((import gdstk)):(1)

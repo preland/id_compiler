@@ -1,0 +1,36 @@
+// The clauses of the guard that ask one thing of one node: that a list exists,
+// that a counter or a term is not negative, that a list is not a constant.
+
+lp_nonnull(int lq_nn) {
+  string[] lq_tk = [];
+  lp_leaf(lq_tk, lq_nn);
+  push(lq_tk, "null");
+} chain (int lq_nn) {
+  push(lq_tk, "!=");
+  lp_add(lq_tk);
+} return void;
+given lpf_more ((import lpf_na)):() then (import lpg):(["v:lan", "null", "!=", "|"])
+given lpf_more ((import lpf_q)):() then (import lpcond):(["v:lpfq null !="])
+
+lp_nneg(int lq_nn) {
+  string[] lq_tk = [];
+  lp_leaf(lq_tk, lq_nn);
+  push(lq_tk, "k:0");
+} chain (int lq_nn) {
+  push(lq_tk, ">=");
+  lp_add(lq_tk);
+} return void;
+given lpf_more ((import lpf_na)):() then (import lpg):(["v:lan", "k:0", ">=", "|"])
+given lpf_more ((import lpf_n0)):() then (import lpcond):(["i:1 k:0 >="])
+
+lp_capok(int lq_nn) {
+  string[] lq_tk = [];
+  lp_leaf(lq_tk, lq_nn);
+  push(lq_tk, "cap");
+} chain (int lq_nn) {
+  push(lq_tk, "k:0");
+  push(lq_tk, ">=");
+  lp_add(lq_tk);
+} return void;
+given lpf_more ((import lpf_q)):() then (import lpg):(["v:lpfq", "cap", "k:0", ">=", "|"])
+given lpf_more ((import lpf_na)):() then (import lpcond):(["v:lan cap k:0 >="])

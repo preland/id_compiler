@@ -1,0 +1,24 @@
+// The parts of a token with a two-character prefix: what follows it, and, for a
+// sum, difference or product, its operator and how many operands it joins.
+
+gt_tail(string gt_tok) {
+  string gt_rest = str_slice(gt_tok, 2, len(gt_tok) - 2);
+} return string gt_rest;
+("v:lan"):("lan")
+("-:12"):("12")
+("k:0"):("0")
+
+gt_arity(string gt_tok) {
+  string gt_n = gt_tail(gt_tok);
+  int gt_cnt = to_int(gt_n);
+} return int gt_cnt;
+("+:2"):(2)
+("-:3"):(3)
+("*:12"):(12)
+
+gt_op(string gt_tok) {
+  string gt_sym = str_slice(gt_tok, 0, 1);
+} return string gt_sym;
+("+:2"):("+")
+("-:3"):("-")
+("*:2"):("*")

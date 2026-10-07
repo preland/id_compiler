@@ -4,25 +4,30 @@
 
 lx_hcl(int lg_e, int lg_k) {
   if(lg_k >= 2 && lg_k <= 4) {
-    lp_add((import lpcond), "(" + emit_expr(lg_e) + ") >= 0");
+    lp_nneg(lg_e);
   }
 } return void;
-given lpq_cs(0) ((import lpq_vc), 2):() then (import lpcond)[0]:("(lsc) >= 0")
+given lpq_cs(0) ((import lpq_vc), 2):() then (import lpcond)[0]:("v:lsc k:0 >=")
 given lpq_cs(0) ((import lpq_l3), 1):() then len((import lpcond)):(0)
-given lpq_cs(2) ((import lpq_vk), 4):() then (import lpcond)[0]:("(lkk) >= 0")
-given lpq_cs(0) ((import lpq_js), 3):() then (import lpcond)[0]:("(lsj) >= 0")
+given lpq_cs(2) ((import lpq_vk), 4):() then (import lpcond)[0]:("v:lkk k:0 >=")
+given lpq_cs(0) ((import lpq_js), 3):() then (import lpcond)[0]:("v:lsj k:0 >=")
 
-lx_hctr(int lg_e) {
+lx_hctr(string[] lg_tk, int lg_e) {
   int lg_nn = (import lpn)[find_str((import lpj), (import ns1)[lg_e])];
   lp_nul(lg_nn);
-  string lg_s = "((long long)" + lp_ntxt(lg_nn) + " - 1)";
-} return string lg_s;
-given lpq_cs(0) ((import lpq_js)):("((long long)(lsn) - 1)")
-given lpf_cs(1) ((import lpf_oj)):("((long long)(long long)(lbv)->len - 1)") then (import lpcond)[0]:("(lbv) != NULL")
+  lp_ntok(lg_tk, lg_nn);
+} chain (string[] lg_tk, int lg_e) {
+  push(lg_tk, "wide");
+  push(lg_tk, "k:1");
+  push(lg_tk, "-:2");
+} return void;
+given lpq_cs(0) ([], (import lpq_js)):(["v:lsn", "wide", "k:1", "-:2"])
+given lpf_cs(1) ([], (import lpf_oj)):(["v:lbv", "len", "wide", "wide", "k:1", "-:2"]) then (import lpcond)[0]:("v:lbv null !=")
 
-lx_hsec(int lg_e) {
-  string lg_s = "((long long)(" + emit_expr(lg_e) + ")";
-  lg_s = lg_s + lx_hlim() + ")";
-} return string lg_s;
-given lpq_cs(2) ((import lpq_vk)):("((long long)(lkk) + ((long long)(lkn) - (long long)(lkj) - 1))")
-given lpq_cs(3) ((import lpq_vm)):("((long long)(lmk) + ((long long)(lmn) - (long long)(lmi) - 1) + ((long long)(lmm) - (long long)(lmj) - 1))")
+lx_hsec(string[] lg_tk, int lg_e) {
+  lp_leaf(lg_tk, lg_e);
+  push(lg_tk, "wide");
+  lx_hlim(lg_tk);
+} return void;
+given lpq_cs(2) ([], (import lpq_vk)):(["v:lkk", "wide", "v:lkn", "wide", "v:lkj", "wide", "k:1", "-:3", "+:2"])
+given lpq_cs(3) ([], (import lpq_vm)):(["v:lmk", "wide", "v:lmn", "wide", "v:lmi", "wide", "k:1", "-:3", "v:lmm", "wide", "v:lmj", "wide", "k:1", "-:3", "+:3"])

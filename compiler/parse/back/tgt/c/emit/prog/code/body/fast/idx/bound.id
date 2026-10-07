@@ -1,49 +1,51 @@
-// The largest value an index takes over the loop, as C text in 64 bits, and
-// the clauses that make it so. A literal is itself; a name the body leaves
-// alone, a counter at entry and a second counter must not be negative (a
-// clause each); a counter reaches its limit less one (its limit must exist, a
-// clause when it is len(xs)); a second counter reaches its entry value plus,
-// for each counter of the condition, the room between the counter and its
-// limit less one; a local is its definition's terms.
+// The largest value an index takes over the loop, as tokens in 64 bits pushed
+// on the end of lg_tk, and the clauses that make it so. A literal is itself; a
+// name the body leaves alone, a counter at entry and a second counter must not
+// be negative (a clause each); a counter reaches its limit less one (its limit
+// must exist, a clause when it is len(xs)); a second counter reaches its entry
+// value plus, for each counter of the condition, the room between the counter
+// and its limit less one; a local is its definition's terms.
 
-lx_hi(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
-  string lg_s = "";
+lx_hi(string[] lg_tk, int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
   if((import nkind)[lg_e] == "bin") {
-    lg_s = lx_hbin(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    lx_hbin(lg_tk, lg_e, lg_id, lg_lo, lg_hi, lg_dp);
   } else {
-    lg_s = lx_hleaf(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
+    lx_hleaf(lg_tk, lg_e, lg_id, lg_lo, lg_hi, lg_dp);
   }
-} return string lg_s;
-given lpq_cs(0) ((import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):("((((long long)(lsn) - 1) * (long long)(3)) + (long long)(lsc))")
-given lpq_cs(1) ((import lpq_uv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):("((((long long)(lvn) - 1) * (long long)(7)) + (long long)(3))")
-given lpq_cs(2) ((import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):("((long long)(lkk) + ((long long)(lkn) - (long long)(lkj) - 1))")
-given lpq_cs(0) ((import lpq_l3), (import lpq_xs), (import lpq_los), (import lpq_his), 0):("(long long)(3)")
+} return void;
+given lpq_cs(0) ([], (import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2", "v:lsc", "wide", "+:2"])
+given lpq_cs(1) ([], (import lpq_uv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):(["v:lvn", "wide", "k:1", "-:2", "i:7", "wide", "*:2", "i:3", "wide", "+:2"])
+given lpq_cs(2) ([], (import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):(["v:lkk", "wide", "v:lkn", "wide", "v:lkj", "wide", "k:1", "-:3", "+:2"])
+given lpq_cs(0) ([], (import lpq_l3), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["i:3", "wide"])
 
-lx_hbin(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
-  string lg_lt = lx_hi((import ni1)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
-  string lg_rt = lx_hi((import ni2)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
-  string lg_s = "(" + lg_lt + " " + (import ns1)[lg_e] + " " + lg_rt + ")";
-} return string lg_s;
-given lpq_cs(0) ((import lpq_ms), (import lpq_xs), (import lpq_los), (import lpq_his), 0):("(((long long)(lsn) - 1) * (long long)(3))")
-given lpq_cs(0) ((import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):("((((long long)(lsn) - 1) * (long long)(3)) + (long long)(lsc))") then len((import lpcond)):(2)
+lx_hbin(string[] lg_tk, int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+  lx_hi(lg_tk, (import ni1)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
+  lx_hi(lg_tk, (import ni2)[lg_e], lg_id, lg_lo, lg_hi, lg_dp);
+  push(lg_tk, (import ns1)[lg_e] + ":2");
+} return void;
+given lpq_cs(0) ([], (import lpq_ms), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2"])
+given lpq_cs(0) ([], (import lpq_us), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2", "i:3", "wide", "*:2", "v:lsc", "wide", "+:2"]) then len((import lpcond)):(2)
 
-lx_hleaf(int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
+lx_hleaf(string[] lg_tk, int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
   int lg_k = lx_kind(lg_e, lg_id, lg_lo, lg_hi, lg_dp);
-  string lg_s = "(long long)(" + emit_expr(lg_e) + ")";
   lx_hcl(lg_e, lg_k);
-} chain (int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
   if(lg_k == 3) {
-    lg_s = lx_hctr(lg_e);
+    lx_hctr(lg_tk, lg_e);
   }
+} chain (string[] lg_tk, int lg_e, int lg_id, int lg_lo, int lg_hi, int lg_dp) {
   if(lg_k == 4) {
-    lg_s = lx_hsec(lg_e);
+    lx_hsec(lg_tk, lg_e);
   }
   if(lg_k == 5) {
-    lg_s = lx_hi(lx_def(lg_e, lg_lo, lg_hi), lg_id, lg_lo, lg_hi, 1);
+    lx_hi(lg_tk, lx_def(lg_e, lg_lo, lg_hi), lg_id, lg_lo, lg_hi, 1);
   }
-} return string lg_s;
-given lpq_cs(0) ((import lpq_js), (import lpq_xs), (import lpq_los), (import lpq_his), 0):("((long long)(lsn) - 1)")
-given lpq_cs(0) ((import lpq_vc), (import lpq_xs), (import lpq_los), (import lpq_his), 0):("(long long)(lsc)")
-given lpq_cs(2) ((import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):("((long long)(lkk) + ((long long)(lkn) - (long long)(lkj) - 1))")
-given lpq_cs(1) ((import lpq_qv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):("(((long long)(lvn) - 1) * (long long)(7))")
-given lpq_cs(8) ((import lpq_gi), (import lpq_xi), (import lpq_loi), (import lpq_hii), 0):("(long long)(lim)") then (import lpcond)[0]:("(lim) >= 0")
+  if(lg_k < 3 || lg_k > 5) {
+    lp_leaf(lg_tk, lg_e);
+    push(lg_tk, "wide");
+  }
+} return void;
+given lpq_cs(0) ([], (import lpq_js), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsn", "wide", "k:1", "-:2"])
+given lpq_cs(0) ([], (import lpq_vc), (import lpq_xs), (import lpq_los), (import lpq_his), 0):(["v:lsc", "wide"])
+given lpq_cs(2) ([], (import lpq_vk), (import lpq_xk), (import lpq_lok), (import lpq_hik), 0):(["v:lkk", "wide", "v:lkn", "wide", "v:lkj", "wide", "k:1", "-:3", "+:2"])
+given lpq_cs(1) ([], (import lpq_qv), (import lpq_xv), (import lpq_lov), (import lpq_hiv), 0):(["v:lvn", "wide", "k:1", "-:2", "i:7", "wide", "*:2"])
+given lpq_cs(8) ([], (import lpq_gi), (import lpq_xi), (import lpq_loi), (import lpq_hii), 0):(["v:lim", "wide"]) then (import lpcond)[0]:("v:lim k:0 >=")

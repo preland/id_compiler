@@ -18,23 +18,25 @@ given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then len((import lpset)
 
 lp_len(int lq_id, int lq_jn, int lq_k) {
   int lq_nn = (import lpn)[find_str((import lpj), (import ns1)[lq_jn])];
-  string lq_ltxt = emit_expr((import ni1)[lq_id]);
-  string lq_room = "(long long)(" + lq_ltxt + ")->len - " + lq_k;
-} chain (int lq_id, int lq_jn, int lq_k) {
-  lp_add((import lpcond), "(" + lq_ltxt + ") != NULL");
+  lp_nonnull((import ni1)[lq_id]);
   lp_nul(lq_nn);
-  lp_add((import lpcond), lp_ntxt(lq_nn) + " <= " + lq_room);
+} chain (int lq_id, int lq_jn, int lq_k) {
+  string[] lq_tk = [];
+  lp_ntok(lq_tk, lq_nn);
+  lp_fit(lq_tk, (import ni1)[lq_id], lq_k);
+} chain (int lq_id, int lq_jn, int lq_k) {
+  lp_add(lq_tk);
 } return void;
-given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[0]:("(lav) != NULL")
-given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[1]:("(lan) <= (long long)(lav)->len - 0")
-given lpf_cs(1) ((import lpf_rb), (import lpf_jb), 2):() then (import lpcond)[1]:("(long long)(lbv)->len <= (long long)(lbv)->len - 2")
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[0]:("v:lav null !=")
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[1]:("v:lan v:lav len wide k:0 -:2 <=")
+given lpf_cs(1) ((import lpf_rb), (import lpf_jb), 2):() then (import lpcond)[1]:("v:lbv len wide v:lbv len wide k:2 -:2 <=")
 
 lp_low(int lq_id, int lq_jn) {
-  lp_add((import lpcond), "(" + emit_expr(lq_jn) + ") >= 0");
+  lp_nneg(lq_jn);
   if((import nkind)[lq_id] == "iassign") {
-    lp_add((import lpcond), "(" + emit_expr((import ni1)[lq_id]) + ")->cap >= 0");
+    lp_capok((import ni1)[lq_id]);
   }
 } return void;
-given lpf_cs(0) ((import lpf_xa), (import lpf_ja)):() then (import lpcond)[0]:("(laj) >= 0")
+given lpf_cs(0) ((import lpf_xa), (import lpf_ja)):() then (import lpcond)[0]:("v:laj k:0 >=")
 given lpf_cs(0) ((import lpf_xa), (import lpf_ja)):() then len((import lpcond)):(1)
-given lpf_cs(1) ((import lpf_sb), (import lpf_oj)):() then (import lpcond)[1]:("(lbv)->cap >= 0")
+given lpf_cs(1) ((import lpf_sb), (import lpf_oj)):() then (import lpcond)[1]:("v:lbv cap k:0 >=")

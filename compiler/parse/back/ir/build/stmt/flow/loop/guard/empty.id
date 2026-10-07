@@ -1,0 +1,8 @@
+// The value stack the IR is built from, made like the rest of the lowering's
+// state: empty, in a function of its own so that its cases can say what it made.
+
+gd_stk_new() {
+  export int[] gdstk = [];
+} return void export gdstk;
+():() then len((import gdstk)):(0)
+():() then (import gdstk):([])

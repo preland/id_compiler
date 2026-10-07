@@ -1,19 +1,33 @@
 // The limit as the guard reads it: a variable or literal as written, and
-// `len(xs)` as xs's length field, after a clause that xs exists (lp_nul).
+// `len(xs)` as xs's length field, after a clause that xs exists (lp_nul). A
+// leaf is the name or the literal of its node; the tokens go on the end of lq_tk.
 
-lp_ntxt(int lq_nn) {
-  string lq_s = "(" + emit_expr(lq_nn) + ")";
-  if((import nkind)[lq_nn] == "call") {
-    lq_s = "(long long)(" + emit_expr((import nl1)[lq_nn][0]) + ")->len";
+lp_leaf(string[] lq_tk, int lq_nn) {
+  string lq_kd = "v:";
+  if((import nkind)[lq_nn] == "int") {
+    lq_kd = "i:";
   }
-} return string lq_s;
-given lpf_more ((import lpf_na)):("(lan)")
-given lpf_more ((import lpf_nb)):("(long long)(lbv)->len")
+  push(lq_tk, lq_kd + emit_expr(lq_nn));
+} return void;
+given lpf_more ([], (import lpf_na)):(["v:lan"])
+given lpf_more (["x"], (import lpf_n0)):(["x", "i:1"])
+
+lp_ntok(string[] lq_tk, int lq_nn) {
+  if((import nkind)[lq_nn] == "call") {
+    lp_leaf(lq_tk, (import nl1)[lq_nn][0]);
+    push(lq_tk, "len");
+    push(lq_tk, "wide");
+  } else {
+    lp_leaf(lq_tk, lq_nn);
+  }
+} return void;
+given lpf_more ([], (import lpf_na)):(["v:lan"])
+given lpf_more ([], (import lpf_nb)):(["v:lbv", "len", "wide"])
 
 lp_nul(int lq_nn) {
   if((import nkind)[lq_nn] == "call") {
-    lp_add((import lpcond), "(" + emit_expr((import nl1)[lq_nn][0]) + ") != NULL");
+    lp_nonnull((import nl1)[lq_nn][0]);
   }
 } return void;
-given lpf_more ((import lpf_nb)):() then (import lpcond)[0]:("(lbv) != NULL")
+given lpf_more ((import lpf_nb)):() then (import lpcond)[0]:("v:lbv null !=")
 given lpf_more ((import lpf_na)):() then len((import lpcond)):(0)

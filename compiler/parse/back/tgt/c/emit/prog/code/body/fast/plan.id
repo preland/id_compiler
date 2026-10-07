@@ -39,14 +39,3 @@ lp_guard(int lq_lo, int lq_hi) {
 given lpf_in(0) given lpf_push1 ((import lpf_loc), (import lpf_hic)):() then lpf_nset:(0)
 given lpf_in(0) given lpf_push1 ((import lpf_loa), (import lpf_hia)):() then lpf_nset:(1)
 given lpf_in(2) given lpf_push1 ((import lpf_loy), (import lpf_hiy)):() then lpf_nset:(0)
-
-lp_pre() {
-  string lq_s = (import lpcond)[0];
-  int lq_i = 1;
-  while(lq_i < len((import lpcond))) {
-    lq_s = lq_s + " && " + (import lpcond)[lq_i];
-    lq_i = lq_i + 1;
-  }
-} return string lq_s;
-given lpf_conds ():("x && y")
-given lpf_conds3 ():("x && y && z")

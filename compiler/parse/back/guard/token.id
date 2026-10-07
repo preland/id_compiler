@@ -1,0 +1,36 @@
+// What the targets share of a loop's guard: the tokens of lpg, whose meaning is
+// in tgt/c/emit/prog/code/body/fast/state.id. The C emitter prints them
+// (fast/render/) and the LLVM lowering builds them (ir/build/stmt/flow/loop/
+// guard/); both ask these functions what a token is, so that a token only one
+// of them knew would be in one place.
+
+gt_iscmp(string gt_tok) {
+  int gt_is = gt_tok == "!=" || gt_tok == "<=" || gt_tok == "<" || gt_tok == ">=";
+} return int gt_is;
+("<="):(1)
+("!="):(1)
+("<"):(1)
+(">="):(1)
+("+:2"):(0)
+
+gt_isar(string gt_tok) {
+  int gt_ch = charat(gt_tok, 0);
+  int gt_is = gt_ch == 43 || gt_ch == 45 || gt_ch == 42;
+} return int gt_is;
+("+:2"):(1)
+("-:3"):(1)
+("*:2"):(1)
+("<="):(0)
+("v:x"):(0)
+("k:1"):(0)
+("wide"):(0)
+
+gt_isval(string gt_tok) {
+  int gt_ch = charat(gt_tok, 0);
+  int gt_is = (gt_ch == 118 || gt_ch == 105 || gt_ch == 107) && charat(gt_tok, 1) == 58;
+} return int gt_is;
+("v:x"):(1)
+("i:3"):(1)
+("k:0"):(1)
+("+:2"):(0)
+("null"):(0)

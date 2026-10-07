@@ -1,5 +1,6 @@
 // The value stack as the cases of the operators find it: two copies of the load
-// of j, or the load of v alone.
+// of j, the load of v alone, or the three widened values of gd_words, the first
+// twice (5, 6, 5).
 
 gd_two() {
   gd_stk_new();
@@ -15,3 +16,13 @@ gd_one_on() {
 } return void;
 given gd_vals ():() then len((import gdstk)):(1)
 given gd_vals ():() then (import gdstk)[0]:(4)
+
+gd_trio() {
+  gd_stk_new();
+  push((import gdstk), (import gdw)[0]);
+  push((import gdstk), (import gdw)[1]);
+} chain () {
+  push((import gdstk), (import gdw)[0]);
+} return void;
+given gd_words ():() then len((import gdstk)):(3)
+given gd_words ():() then (import gdstk)[1]:(6)

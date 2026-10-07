@@ -1,5 +1,5 @@
 // The IR builder's loop fixture with slots for `j` and `v` and the guard of
-// guard/fixture.id read, which is what lowering a loop twice needs.
+// guard/fixture.id set, which is what lowering a loop twice needs.
 
 lv_loop() {
   loop_fixture();
@@ -7,7 +7,6 @@ lv_loop() {
   int lvl_v = lw_alloca("int[]", "v");
 } chain () {
   gd_good();
-  int lvl_ok = gd_check();
 } return void;
-():() then len((import gdrpn)):(8)
+():() then len((import lpg)):(8)
 ():() then (import lwvar)[2]:("v")

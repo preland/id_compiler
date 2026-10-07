@@ -1,15 +1,9 @@
-// A one-clause guard, and the reading of whatever guard is set up.
+// A one-clause guard: that `j` is not negative.
 
 gd_solo() {
   lp_reset();
-  push((import lpcond), "(j) >= 0");
+  string[] gdr_tk = ["v:j", "k:0", ">=", "|"];
+  lst_str_extend((import lpg), gdr_tk);
 } return void;
-():() then len((import lpcond)):(1)
-():() then (import lpcond)[0]:("(j) >= 0")
-
-gd_prep() {
-  int gdr_ok = gd_check();
-  gd_stk_new();
-} return void;
-given gd_fix given gd_solo ():() then len((import gdrpn)):(4)
-given gd_fix given gd_bad ():() then (import gdbad)[0]:(1)
+():() then len((import lpg)):(4)
+():() then (import lpg)[2]:(">=")

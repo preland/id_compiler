@@ -23,12 +23,12 @@ given gd_vals (4):(4) then gd_last:("int[] load ")
 
 gd_raw(string gdv_op, int gdv_list) {
   string gdv_fn = "id_list_len_raw";
-  if(gdv_op == "->cap") {
+  if(gdv_op == "cap") {
     gdv_fn = "id_list_cap_raw";
   }
   int gdv_cell = lw_callf(gdv_fn, "int", [gdv_list]);
 } chain (string gdv_op, int gdv_list) {
   int gdv_out = gd_wide(gdv_cell);
 } return int gdv_out;
-given gd_vals ("->len", 4):(6) then calls lw_callf:("id_list_len_raw", "int", [4])
-given gd_vals ("->cap", 4):(6) then calls lw_callf:("id_list_cap_raw", "int", [4])
+given gd_vals ("len", 4):(6) then calls lw_callf:("id_list_len_raw", "int", [4])
+given gd_vals ("cap", 4):(6) then calls lw_callf:("id_list_cap_raw", "int", [4])

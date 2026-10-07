@@ -1,4 +1,4 @@
-// The guard of a versioned loop as one bool: each clause of gdrpn evaluated in
+// The guard of a versioned loop as one bool: each clause of lpg evaluated in
 // turn and anded with those before it. A clause has no side effect and traps on
 // nothing, so they are all evaluated rather than skipped past the first false
 // one.

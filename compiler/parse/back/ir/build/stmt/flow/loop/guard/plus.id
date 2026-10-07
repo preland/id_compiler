@@ -1,8 +1,0 @@
-// A sum, the first of its products and then the rest.
-
-gd_sum() {
-  gd_prod();
-  gd_more();
-} return void;
-given gd_rpn_new given gd_bad_new given gd_open(["1", "+", "2", "-", "3"]) ():() then len((import gdrpn)):(5)
-given gd_rpn_new given gd_bad_new given gd_open(["1", "-", "2", "*", "3"]) ():() then (import gdrpn)[4]:("-")

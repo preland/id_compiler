@@ -4,15 +4,35 @@
 // the whole range is in bounds, and the checked copy as the fallback -- so
 // every out-of-range access still traps, at the same iteration, with the same
 // message, because the fallback is the unchanged loop. An index that is more
-// than `j` or `j + k` is read by idx/, which reaches lpset and lpcond the same
+// than `j` or `j + k` is read by idx/, which reaches lpset and lpg the same
 // way.
 //
 //   lpset   the index and index-assignment nodes the guard covers
 //   lpon    [1] while the guarded copy is being emitted
-//   lpcond  the guard's clauses, one C condition each
+//   lpg     the guard, in reverse Polish form: each clause is a run of tokens
+//           ended by "|", every clause to hold
+//   lpcond  the tokens of each clause of lpg joined by spaces, so that a clause
+//           asked for twice is added once
 //   lpj     the loop condition's bounds: the counter's name, and in lpn the
 //           node of the limit it is compared with
 //   lpbad   [1] when the condition holds something the guard cannot read
+//
+// The tokens are the contract between the targets, and each target spells them
+// itself: the C emitter's lp_pre prints them as one C condition, and the LLVM
+// lowering (back/ir/build/stmt/flow/loop/guard/) builds them as IR, in 64
+// bits. A token pushes a value or takes its operands off the stack and pushes
+// the result; a clause leaves one truth value.
+//
+//   v:NAME       the variable or import NAME; a list stands for the list
+//   i:TEXT       an integer literal of the source
+//   k:TEXT       a constant of the analysis, an offset or a bound
+//   null         the absence of a list, only ever compared with !=
+//   wide         its operand in 64 bits
+//   len  cap     the length or the capacity of a list; a list that is not
+//                there has neither, and `!= null` asks whether it is
+//   +:N -:N *:N  N operands (at least one) joined from the left by the sum,
+//                difference or product, in 64 bits
+//   < <= >= !=   a comparison of two operands, leaving the clause's truth value
 
 lp_reset() {
   export int[] lpset = [];
@@ -22,6 +42,8 @@ lp_reset() {
   export string[] lpj = [];
   export int[] lpn = [];
   export int[] lpbad = [0];
+} chain () {
+  export string[] lpg = [];
 } return void export lpset;
 given lpf_on ():() then lpf_nset:(0)
 given lpf_on ():() then lpf_flag:(1)

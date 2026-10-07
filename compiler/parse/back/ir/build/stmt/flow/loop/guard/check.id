@@ -1,25 +1,34 @@
-// Reading every clause of a loop's guard. True when all of them were read, and
-// then gdrpn holds the guard; false when the loop must keep its checks.
+// Whether the lowering can build every token of the loop's guard (lpg): a name
+// is one the function has a slot or an export for, of a type the guard can
+// compare, and a sum has operands; a token that is none of the guard's is not
+// built. True when all can be, and false when the loop must keep its checks --
+// which is how a target that does not know a token the analysis now writes
+// stays correct, and why the conformance suite counts the loops it versions.
 
-gd_one(string gdk_clause) {
-  string[] gdk_toks = gd_toks(gdk_clause);
-  gd_open(gdk_toks);
-  gd_clause();
-} return void;
-given gd_begin given gd_fix ("(j) >= 0"):() then (import gdrpn)[0]:("v:j")
-given gd_begin given gd_fix ("(j) >= 0"):() then len((import gdrpn)):(4)
+gd_known(string gdk_tok) {
+  int gdk_ok = find_str((import gd_plain), gdk_tok) >= 0 || gt_iscmp(gdk_tok) == 1 || gt_isval(gdk_tok) == 1;
+  if(gt_isar(gdk_tok) == 1) {
+    gdk_ok = gt_arity(gdk_tok) >= 1;
+  }
+  if(str_starts(gdk_tok, "v:") == 1) {
+    gdk_ok = gd_okname(gt_tail(gdk_tok));
+  }
+} return int gdk_ok;
+given gd_fix ("v:j"):(1)
+given gd_fix ("v:f"):(0)
+given gd_fix ("wide"):(1)
+given gd_fix ("->len"):(0)
+given gd_fix ("-:3"):(1)
+given gd_fix ("-:x"):(0)
 
 gd_check() {
-  gd_begin();
   int gdk_at = 0;
-  int gdk_ok = 0;
-} chain () {
-  while(gdk_at < len((import lpcond)) && (import gdbad)[0] == 0) {
-    gd_one((import lpcond)[gdk_at]);
+  int gdk_ok = 1;
+  while(gdk_at < len((import lpg)) && gdk_ok == 1) {
+    gdk_ok = gd_known((import lpg)[gdk_at]);
     gdk_at = gdk_at + 1;
   }
-  gdk_ok = (import gdbad)[0] == 0;
 } return int gdk_ok;
 given gd_fix given gd_good ():(1)
 given gd_fix given gd_bad ():(0)
-given gd_fix given gd_good ():(1) then len((import gdrpn)):(8)
+given gd_fix given gd_odd ():(0)

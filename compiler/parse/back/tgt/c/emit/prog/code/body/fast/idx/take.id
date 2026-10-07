@@ -6,23 +6,26 @@
 // cannot overflow). A store also needs the list not to be a constant.
 
 lx_take(int lg_id, int lg_e, int lg_lo, int lg_hi) {
-  string lg_ls = emit_expr((import ni1)[lg_id]);
   push((import lpset), lg_id);
-  lp_add((import lpcond), "(" + lg_ls + ") != NULL");
+  lp_nonnull((import ni1)[lg_id]);
+  string[] lg_tk = [];
 } chain (int lg_id, int lg_e, int lg_lo, int lg_hi) {
-  string lg_h = lx_hi(lg_e, lg_id, lg_lo, lg_hi, 0);
-  lp_add((import lpcond), lg_h + " < (long long)(" + lg_ls + ")->len");
-  lx_cap(lg_id, lg_ls);
+  lx_hi(lg_tk, lg_e, lg_id, lg_lo, lg_hi, 0);
+  lp_lenw(lg_tk, (import ni1)[lg_id]);
+  push(lg_tk, "<");
+} chain (int lg_id, int lg_e, int lg_lo, int lg_hi) {
+  lp_add(lg_tk);
+  lx_cap(lg_id);
 } return void;
 given lpq_cs(0) ((import lpq_xs), (import lpq_us), (import lpq_los), (import lpq_his)):() then len((import lpset)):(1)
-given lpq_cs(0) ((import lpq_xs), (import lpq_us), (import lpq_los), (import lpq_his)):() then (import lpcond)[3]:("((((long long)(lsn) - 1) * (long long)(3)) + (long long)(lsc)) < (long long)(lsv)->len")
-given lpq_cs(2) ((import lpq_ak), (import lpq_vk), (import lpq_lok), (import lpq_hik)):() then (import lpcond)[3]:("(lkv)->cap >= 0")
-given lpq_cs(2) ((import lpq_ak), (import lpq_vk), (import lpq_lok), (import lpq_hik)):() then (import lpcond)[0]:("(lkv) != NULL")
+given lpq_cs(0) ((import lpq_xs), (import lpq_us), (import lpq_los), (import lpq_his)):() then (import lpcond)[3]:("v:lsn wide k:1 -:2 i:3 wide *:2 v:lsc wide +:2 v:lsv len wide <")
+given lpq_cs(2) ((import lpq_ak), (import lpq_vk), (import lpq_lok), (import lpq_hik)):() then (import lpcond)[3]:("v:lkv cap k:0 >=")
+given lpq_cs(2) ((import lpq_ak), (import lpq_vk), (import lpq_lok), (import lpq_hik)):() then (import lpcond)[0]:("v:lkv null !=")
 
-lx_cap(int lg_id, string lg_ls) {
+lx_cap(int lg_id) {
   if((import nkind)[lg_id] == "iassign") {
-    lp_add((import lpcond), "(" + lg_ls + ")->cap >= 0");
+    lp_capok((import ni1)[lg_id]);
   }
 } return void;
-given lpq_cs(2) ((import lpq_ak), "lkv"):() then (import lpcond)[0]:("(lkv)->cap >= 0")
-given lpq_cs(0) ((import lpq_xs), "lsv"):() then len((import lpcond)):(0)
+given lpq_cs(2) ((import lpq_ak)):() then (import lpcond)[0]:("v:lkv cap k:0 >=")
+given lpq_cs(0) ((import lpq_xs)):() then len((import lpcond)):(0)
