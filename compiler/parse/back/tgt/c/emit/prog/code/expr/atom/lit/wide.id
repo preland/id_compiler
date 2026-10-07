@@ -1,0 +1,15 @@
+// A literal too wide for a 32-bit int. Up to 18 digits it fits a long long and
+// takes the `LL` suffix. From 19 digits it may be 2^63 or more, which no long
+// long holds: gcc would read the bare digits as a 128-bit constant, so a
+// comparison with a word holding the same bits came out false. It is written
+// as an unsigned 64-bit constant reinterpreted as long long, the wrap SPEC 2.1
+// gives `word` and the LLVM target's i64 already has.
+int_wide(string digits) {
+  string text = digits + "LL";
+  if(len(digits) >= 19) {
+    text = "((long long)" + digits + "ULL)";
+  }
+} return string text;
+("9999999999"):("9999999999LL")
+("9223372036854775808"):("((long long)9223372036854775808ULL)")
+("18446744073709551615"):("((long long)18446744073709551615ULL)")

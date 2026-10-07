@@ -1670,6 +1670,7 @@ char* id_file_init(int id);
 char* id_to_str(char* code, char* type);
 char* id_to_str2(char* code, char* type);
 char* id_to_str3(char* code, char* type);
+char* id_int_wide(char* digits);
 void id_seq_units(int id, IdList* sq_units);
 void id_seq_units_list(IdList* sq_kids, IdList* sq_units);
 void id_seq_clear(IdList* sq_units);
@@ -12054,7 +12055,7 @@ char* id_int_code(int id) {
     char* s;
     s = (char*)(intptr_t)(id_list_get(ns1, id));
     if (((int)(id_list_get(ni2, id)) == 1)) {
-        s = id_concat((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("LL"));
+        s = id_int_wide((char*)(intptr_t)(id_list_get(ns1, id)));
     }
     return s;
 }
@@ -12095,6 +12096,15 @@ char* id_to_str3(char* code, char* type) {
         s = id_concat_f(id_concat(ID_S("id_str_of_word("), code), ID_S(")"), 1);
     }
     return s;
+}
+
+char* id_int_wide(char* digits) {
+    char* text = NULL;
+    { char* idfe_o = text; text = id_concat(digits, ID_S("LL")); id_str_free(idfe_o); }
+    if ((id_len(digits) >= 19)) {
+        { char* idfe_o = text; text = id_concat_f(id_concat(ID_S("((long long)"), digits), ID_S("ULL)"), 1); id_str_free(idfe_o); }
+    }
+    return text;
 }
 
 void id_seq_units(int id, IdList* sq_units) {
@@ -24703,7 +24713,7 @@ long long id_dg_fnv(long long dgh, char* dgs) {
 
 long long id_dg_mix(long long dga, long long dgb) {
     long long dgx;
-    dgx = ((dga * 6364136223846793005LL) ^ dgb);
+    dgx = ((dga * ((long long)6364136223846793005ULL)) ^ dgb);
     dgx = (dgx ^ id_ushr((long long)(dgx), (long long)(unsigned int)(31)));
     dgx = (dgx * 1099511628211LL);
     dgx = (dgx ^ id_ushr((long long)(dgx), (long long)(unsigned int)(29)));
@@ -29832,7 +29842,7 @@ char* id_ext_key(char* xe_str) {
     long long xe_h2;
     char* xe_key = NULL;
     xe_h1 = id_dg_fnv(0, xe_str);
-    xe_h2 = id_dg_fnv(1469598103934665603LL, xe_str);
+    xe_h2 = id_dg_fnv(((long long)1469598103934665603ULL), xe_str);
     { char* idfe_o = xe_key; xe_key = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S(""), id_str_of_int(id_len(xe_str)), 2), ID_S(":"), 1), id_str_of_word(xe_h1), 3), ID_S(":"), 1), id_str_of_word(xe_h2), 3); id_str_free(idfe_o); }
     return xe_key;
 }

@@ -1,6 +1,5 @@
 // An integer literal emits as the digits the source wrote; one too wide for a
-// 32-bit int gets C's `LL` suffix so the constant keeps its value, matching
-// idc.py.
+// 32-bit int goes through int_wide (wide.id) so the constant keeps its value.
 
 // id 23: "dup9(int) return int { int r=9; } => r" -- same shape as dup5
 // (id 22), differing only in the literal. Pushed onto prog at index 0.
@@ -15,7 +14,7 @@ lz_n() {
 int_code(int id) {
   string s = (import ns1)[id];
   if((import ni2)[id] == 1) {
-    s = (import ns1)[id] + "LL";
+    s = int_wide((import ns1)[id]);
   }
 } return string s;
 given nz_env ((import nz_int)):("7")

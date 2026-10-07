@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  word x = 0x8000000000000000;
+  word y = 0xFFFFFFFFFFFFFFFF;
+  print("" + (x == 0x8000000000000000) + " " + (y == 0xFFFFFFFFFFFFFFFF) + " " + x + " " + y);
+} return int 0;
