@@ -15,14 +15,14 @@ lc_env2() {
 ():() then init_units:(0)
 
 lc_reg_int(string name, string text, int nval) {
-  int e = node_int(text, nval, 0);
+  int e = node_txt2("int", text, nval, 0);
   int d = lc_reg("int", name, e);
 } return int d;
 given lc_reg_setup ("qq", "1", 1):(3)
 given lc_reg_setup ("rr", "2", 2):(3)
 
 lc_reg_list1(string name, string text, int nval) {
-  int e = node_int(text, nval, 0);
+  int e = node_txt2("int", text, nval, 0);
   int arr = node_arr([e]);
   int d = lc_reg("int[]", name, arr);
 } return int d;

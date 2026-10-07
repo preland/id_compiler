@@ -32,4 +32,4 @@ reach_func(int f, int lo) {
   int ret_i = (import prog)[f] + 1;
 } return int ret_i;
 given natcall_fixture (0, 0):(2) then calls is_reach:[1]
-given dce_fx_setup (0, 1):(4) then calls reach_range:[1]
+given dce_fx_setup("fx_target") (0, 1):(4) then calls reach_range:[1]

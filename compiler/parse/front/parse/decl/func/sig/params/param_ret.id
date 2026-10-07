@@ -22,7 +22,7 @@ given decl_tokens ([33], "g", [1], [2]):(1)
 
 func_done(int[] pos, string name, int[] params, int[] body, string rt) {
   int rexpr = ret_expr(pos, rt);
-  skip_semi(pos);
+  skip_text(pos, ";");
   int ret_i = node_func(name, rt, params, body, rexpr);
 } chain (int[] pos, string name, int[] params, int[] body, string rt) {
   seal_rets(name, rt);

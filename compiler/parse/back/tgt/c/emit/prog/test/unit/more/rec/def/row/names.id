@@ -11,7 +11,7 @@ given fn_fixture ([]):("")
 
 rec_name_scan(int[] params, string out, int i) {
   while(i < len(params)) {
-    out = out + sep_arg(i) + (import ns2)[(params[i])];
+    out = out + sep_at(", ", i) + (import ns2)[(params[i])];
     i = i + 1;
   }
 } return string out;

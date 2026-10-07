@@ -5,19 +5,10 @@
 // name (reach_seed, ../../../../../mid/names/limits/shape/cases/given/read/
 // reach.id) -- the two things dce_pack/dce_keep read.
 
-dce_fx_setup() {
+dce_fx_setup(string dce_seed) {
   fn_fixture();
   push((import fnames), "main");
-  reach_seed("fx_target");
+  reach_seed(dce_seed);
 } return void;
-():() then calls reach_seed:("fx_target")
-():() then init_units:(0)
-
-dce_fx_setup_unreached() {
-  fn_fixture();
-  push((import fnames), "main");
-  reach_seed("nope");
-} return void;
-():() then calls reach_seed:("nope")
-():() then init_units:(0)
-
+("fx_target"):() then calls reach_seed:("fx_target")
+("nope"):() then calls reach_seed:("nope")

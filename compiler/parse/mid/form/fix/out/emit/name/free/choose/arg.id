@@ -1,22 +1,3 @@
-// A whole argument named because it has a call somewhere inside it
-// (plan/walk/kind/push.id) takes an's text plain, with no _v: <callee>_a0,
-// then <callee>_a02 if that is somehow taken too (fix_try's own numbering,
-// with an empty suffix).
-fix_choose_arg(string an, string t) {
-  string bstem = fix_prefixed(an);
-  string name = fix_choose_base(bstem, "", t);
-} return string name;
-given fix_fixture ("foo_a0", "int"):("foo_a0")
-given fix_choose_arg_taken ("callee_a0", "int"):("callee_a02")
-
-// The stem already taken, as if an earlier argument had claimed it.
-fix_choose_arg_taken() {
-  fix_fixture();
-  push((import fixd_used), "callee_a0");
-} return void;
-():() then calls fix_fixture:[1]
-():() then init_units:(0)
-
 // The call node itself at fixe_n[0] (plan/walk/ev/push/one/ru.id's
 // fix_span_fixture onward), and its own export so a case can pass it by name.
 fix_span_fixture6(int e) {

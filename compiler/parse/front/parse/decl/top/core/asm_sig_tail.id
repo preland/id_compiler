@@ -5,18 +5,18 @@ asm_sig_tail(int[] pos, int[] asm_param_ids) {
   int ret_i = asm_lines(pos);
 } return int ret_i;
 given asm_fix_full ([0], []):(0) then afret_last:("afret int") then afretn_last:("result")
-given asm_fix_full2 ([0], []):(0) then afret_last:("afret word") then afretn_last:("r")
+given toks_env(["op", "str", "op", "kw", "kw", "ident"], ["{", "\"i1\"", "}", "return", "word", "r"]) ([0], []):(0) then afret_last:("afret word") then afretn_last:("r")
 
 // grp_note's two pushes, for its own cases -- it is void and ngrp/ngrpc are
 // imported lists, not arguments a case can read back.
 last_ngrp() {
   string ret_i_t = "ngrp " + (lst_last((import ngrp)));
 } return string ret_i_t;
-given mk_grp7 ():("ngrp 7")
-given mk_grp9 ():("ngrp 9")
+given mk_grp(7, [5]) ():("ngrp 7")
+given mk_grp(9, [2]) ():("ngrp 9")
 
 last_ngrpc() {
   string ret_i_t = "ngrpc " + (lst_last((import ngrpc)));
 } return string ret_i_t;
-given mk_grp7 ():("ngrpc 4")
-given mk_grp9 ():("ngrpc 1")
+given mk_grp(7, [5]) ():("ngrpc 4")
+given mk_grp(9, [2]) ():("ngrpc 1")

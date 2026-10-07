@@ -19,7 +19,7 @@
 lz_a() {
   fwd_env();
   uq_begin("test");
-  export int lz_str = node_str("hi");
+  export int lz_str = node_txt("str", "hi");
 } return void;
 ():() then calls uq_begin:("test")
 ():() then init_units:(0)

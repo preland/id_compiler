@@ -14,20 +14,20 @@ bind_fixture() {
 
 bind_names() {
   int[] none = [];
-  export int bind_fnname = node_var("fx_target");
-  export int bind_cvar = node_var("cv");
+  export int bind_fnname = node_txt("var", "fx_target");
+  export int bind_cvar = node_txt("var", "cv");
 } chain () {
-  export int bind_blt = node_var("len");
-  export int bind_lit = node_int("1", 1, 0);
-  export int bind_unknown = node_var("zz");
+  export int bind_blt = node_txt("var", "len");
+  export int bind_lit = node_txt2("int", "1", 1, 0);
+  export int bind_unknown = node_txt("var", "zz");
 } chain () {
   export int bind_none = node_call("bind", none);
   export int bind_one = node_call("bind", [bind_fnname]);
   export int bind_ok = node_call("bind", [bind_fnname, bind_lit]);
 } chain () {
   export int bind_var = node_call("bind", [bind_cvar, bind_lit]);
-  export int bind_str = node_call("bind", [bind_fnname, node_str("s")]);
-  export int bind_big = node_int("99999999999", 0, 1);
+  export int bind_str = node_call("bind", [bind_fnname, node_txt("str", "s")]);
+  export int bind_big = node_txt2("int", "99999999999", 0, 1);
 } chain () {
   export int bind_word = node_call("bind", [bind_fnname, bind_big]);
   export int bind_toomany = node_call("bind", [bind_fnname, bind_lit, bind_lit]);

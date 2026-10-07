@@ -1,8 +1,11 @@
 // Continues lw_logic: the seed the slot starts at, and storing it, split
 // across two functions so lw_logic itself stays within the action limit.
+// `a && b` starts at 0 and only the right-hand side can raise it; `a || b`
+// starts at 1 and only the right-hand side can lower it. So the two differ in
+// the seed and in which way the branch goes, and in nothing else.
 lw_logic_seed(int node, int slot) {
   string s1_of_v = (import ns1)[node];
-  string lw_ini_v = lw_ini(s1_of_v);
+  string lw_ini_v = str_pick(s1_of_v, "||", "1", "0");
   int ret_i = lw_logic_store(node, slot, lw_ini_v);
 } return int ret_i;
 given logic_fixture ((import and_node), 2):(15)

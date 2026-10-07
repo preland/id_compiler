@@ -18,10 +18,10 @@ given fix_fixture (7, 2, 0, 0, "", ""):() then (import fixe_an)[0]:("") then (im
 // a fixture of their own.
 fix_mark_case_fixture() {
   fix_fixture();
-  export int mfe = node_int("1", 1, 0);
+  export int mfe = node_txt2("int", "1", 1, 0);
   push((import tline), 3);
 } chain () {
   fix_push_rest((import mfe), 0, 3, 1, "", "");
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)

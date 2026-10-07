@@ -1,22 +1,31 @@
 // Argument list body + the integer leaf.
 
-fill_args(int[] pos, int[] args) {
-  while(cur_text(pos) != ")" && cur_text(pos) != ";" && cur_kind(pos) != "eof") {
+// The expressions of a comma-separated list up to its closing token: the
+// arguments of a call (`)`), the elements of an array literal (`]`), or
+// whatever else a caller closes with. A `;` or the end of the file ends it too,
+// so a missing close is reported once, by the caller, not once per token.
+fill_list(int[] pos, int[] items, string close) {
+  while(cur_text(pos) != close && cur_text(pos) != ";" && cur_kind(pos) != "eof") {
     int parse_expr_v = parse_expr(pos);
-    push(args, parse_expr_v);
-    skip_comma(pos);
+    push(items, parse_expr_v);
+    skip_text(pos, ",");
   }
 } return void;
-given atom_tokens ([2], []):([5], [0, 1])
-given atom_tokens ([5], []):([5], [])
+given atom_tokens ([2], [], ")"):([5], [0, 1])
+given atom_tokens ([5], [], ")"):([5], [])
+given atom_tokens ([8], [], "]"):([13], [0, 1, 2])
+given atom_tokens ([35], [], "]"):([36], [0])
 
-skip_comma(int[] pos) {
-  if(cur_text(pos) == ",") {
+// Consumed only when present: a separator the grammar allows to be missing.
+skip_text(int[] pos, string sep) {
+  if(cur_text(pos) == sep) {
     advance(pos);
   }
 } return void;
-given atom_tokens ([3]):([4])
-given atom_tokens ([5]):([5])
+given atom_tokens ([3], ","):([4])
+given atom_tokens ([5], ","):([5])
+given stmt_tokens ([4], ";"):([5])
+given stmt_tokens ([3], ";"):([3])
 
 parse_int(int[] pos) {
   string text = cur_text(pos);

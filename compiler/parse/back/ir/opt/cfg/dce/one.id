@@ -1,25 +1,13 @@
 
 dce_one(int f, int id, int n) {
   string ir_op_v = (import iop)[id];
-  if(dce_pure(ir_op_v) == 1 && dce_used(f, id) == 0) {
+  if(str_in((import irnoeff), ir_op_v) == 0 && dce_used(f, id) == 0) {
     ir_kill(id);
     n = n + 1;
   }
 } return int n;
 given cfg_fixture (0, 0, 0):(1) then iop_state:("ops 1:nop")
 given cfg_fixture (0, 0, 5):(6) then iop_state:("ops 1:nop")
-
-// What may not be removed for having no users. A call is here because nothing
-// tells this compiler which calls are pure -- every builtin that matters is a
-// runtime call, and print's users are the point of it.
-dce_pure(string op) {
-  int r = 1;
-  if(op == "store" || op == "call" || op == "ret" || op == "br" || op == "cbr" || op == "nop" || op == "param") {
-    r = 0;
-  }
-} return int r;
-("add"):(1)
-("call"):(0)
 
 // How many instructions of this function name the value. An SSA value is
 // local to its function, so the whole store need not be scanned -- and at the

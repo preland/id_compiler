@@ -16,9 +16,3 @@ bound_n_fix() {
 ():() then calls toks_push:(["ident", "op", "ident", "op"], ["O", "(", "n", ")"])
 ():() then init_units:(0)
 
-bound_1_fix() {
-  env_init();
-  toks_push(["ident", "op", "int", "op"], ["O", "(", "1", ")"]);
-} return void;
-():() then calls toks_push:(["ident", "op", "int", "op"], ["O", "(", "1", ")"])
-():() then init_units:(0)

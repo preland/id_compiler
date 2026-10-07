@@ -8,5 +8,5 @@ close_bracket(int[] pos, string cb_close, int open_ln) {
     syn_unclosed(pos, cb_close, open_ln);
   }
 } return void;
-given close_fix ([0], ")", 1):([1])
+given toks_env(["op"], [")"]) ([0], ")", 1):([1])
 given mk_two_toks ([0], ")", 1):([0]) then (import chkfail)[0]:(1)

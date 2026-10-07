@@ -6,7 +6,7 @@ tc_cells(int[] xs, string et) {
   int i = 0;
   while(i < len(xs)) {
     string cv = tc_value(xs[i], et);
-    out = out + sep_arg(i) + box(cv, et);
+    out = out + sep_at(", ", i) + box(cv, et);
     i = i + 1;
   }
 } return string out;

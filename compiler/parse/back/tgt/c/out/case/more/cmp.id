@@ -15,7 +15,7 @@ tc_compare(string ga, string gb, string type) {
     so = "idtc_eq_" + key + "(" + ga + ", " + gb + ")";
   }
 } chain (string ga, string gb, string type) {
-  if(ty_is_struct(type) == 1) {
+  if(ty_kind_is(type, "struct") == 1) {
     so = "idtc_eqs_" + type + "(" + ga + ", " + gb + ")";
   } else if(ty_is_func(type) == 1) {
     so = "id_fn_eq(" + ga + ", " + gb + ")";
@@ -37,7 +37,7 @@ tc_show(string code, string type) {
     so = "fputs(\"a function value\", stderr);";
   }
 } chain (string code, string type) {
-  if(ty_is_struct(type) == 1) {
+  if(ty_kind_is(type, "struct") == 1) {
     so = "idtc_shows_" + type + "(" + code + ");";
   }
 } return string so;
@@ -51,7 +51,7 @@ show_scalar(string code, string type) {
   if(type == "string") {
     so = "fprintf(stderr, \"\\\"%s\\\"\", " + code + ");";
   } else if(type == "float" || type == "word") {
-    so = show_num(code, type);
+    so = wrap_by_type(code, type, "float", "fprintf(stderr, \"%lld\", ", ");", "fprintf(stderr, \"%g\", ", ");");
   }
 } return string so;
 ("x", "int"):("fprintf(stderr, \"%d\", x);")

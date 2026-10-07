@@ -28,7 +28,7 @@ given ll_natives_fixture2 ():() then prints:("")
 
 fwd_adopt_one(int id) {
   string rt = (import ns2)[id];
-  if(is_native(id) == 1 && (ty_is_list(rt) == 1 || ty_is_struct(rt) == 1)) {
+  if(is_native(id) == 1 && (ty_is_list(rt) == 1 || ty_kind_is(rt, "struct") == 1)) {
     emit_line("#define id_" + (import ns1)[id] + "(...) id_list_adopt(id_" + (import ns1)[id] + "(__VA_ARGS__))");
   }
 } return void;

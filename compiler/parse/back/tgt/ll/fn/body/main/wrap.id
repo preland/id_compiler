@@ -10,7 +10,7 @@ ll_wrapper(int f) {
 } chain (int f) {
   emit_line(mcall);
   emit_line("  ret i32 %r");
-  ll_close_brace();
+  emit_line("}");
 } return void;
 given ll_main_fixture (0):() then prints:("\ndefine i32 @main(i32 %argc, ptr %argv) {\nw.entry:\n  %args = call ptr @id_list_new()\n  br label %w.test\nw.test:\n  %i = phi i32 [ 0, %w.entry ], [ %i.next, %w.body ]\n  %more = icmp slt i32 %i, %argc\n  br i1 %more, label %w.body, label %w.done\nw.body:\n  %ix = sext i32 %i to i64\n  %slot = getelementptr ptr, ptr %argv, i64 %ix\n  %raw = load ptr, ptr %slot\n  %arg = call ptr @id_str_of_cstr(ptr %raw)\n  %cell = ptrtoint ptr %arg to i64\n  call void @id_list_push(ptr %args, i64 %cell)\n  %i.next = add i32 %i, 1\n  br label %w.test\nw.done:\n  %r = call i32 @id_main(i32 %argc, ptr %args)\n  ret i32 %r\n}\n")
 given ir_rows (0):() then prints:("\ndefine i32 @main(i32 %argc, ptr %argv) {\nw.entry:\n  %args = call ptr @id_list_new()\n  br label %w.test\nw.test:\n  %i = phi i32 [ 0, %w.entry ], [ %i.next, %w.body ]\n  %more = icmp slt i32 %i, %argc\n  br i1 %more, label %w.body, label %w.done\nw.body:\n  %ix = sext i32 %i to i64\n  %slot = getelementptr ptr, ptr %argv, i64 %ix\n  %raw = load ptr, ptr %slot\n  %arg = call ptr @id_str_of_cstr(ptr %raw)\n  %cell = ptrtoint ptr %arg to i64\n  call void @id_list_push(ptr %args, i64 %cell)\n  %i.next = add i32 %i, 1\n  br label %w.test\nw.done:\n  %r = call i32 @id_main()\n  ret i32 %r\n}\n")

@@ -4,14 +4,3 @@ tf_var() {
 given tf_ld("%v7") ():() then (import ld_vslot):([-1, -1, -1, -1, -1, -1, -1, 0])
 given tf_ld("%v7 %v2") given tf_var ():() then (import ld_vslot):([-1, -1, 1, -1, -1, -1, -1, 0])
 
-tf_k() {
-  int k = ld_look("k:c");
-} return int k;
-given lb_boot given lb_seed("k", "a b c") ():(2)
-given lb_boot ():(-1)
-
-tf_a() {
-  int a = ld_look("a");
-} return int a;
-given lb_tables given ld_put("a", 3) ():(3)
-given lb_tables ():(-1)

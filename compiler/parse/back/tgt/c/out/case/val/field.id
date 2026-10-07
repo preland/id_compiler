@@ -5,7 +5,7 @@ tc_fcells(int[] xs, string want) {
   string out = "";
   int sd_k = 0;
   while(sd_k < len(xs)) {
-    out = out + sep_arg(sd_k) + tc_fcell(xs[sd_k], want, sd_k);
+    out = out + sep_at(", ", sd_k) + tc_fcell(xs[sd_k], want, sd_k);
     sd_k = sd_k + 1;
   }
 } return string out;

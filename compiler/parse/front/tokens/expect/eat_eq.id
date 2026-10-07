@@ -1,10 +1,14 @@
-// A declaration must initialise: `int x = 1`, never `int x`.
-eat_eq(int[] pos) {
-  expect_text(pos, "=");
+// A token that has to be there, consumed. A declaration must initialise
+// (`int x = 1`, never `int x`) and a case's tuple must close: the token is the
+// caller's, not a function per token.
+eat_text(int[] pos, string want) {
+  expect_text(pos, want);
   advance(pos);
 } return void;
-given mk_two_toks ([0]):([1])
-given mk_two_toks ([1]):([2]) then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given mk_two_toks ([0], "="):([1])
+given mk_two_toks ([1], "="):([2]) then prints:("<stdin>:1: error: expected '=', found 'return' [E0101]\n  at: return\n  why: the grammar needs '=' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '=' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given toks_env(["op"], [")"]) ([0], ")"):([1])
+given tup1_fix ([2], ")"):([3])
 
 //   chkfail  set by any failing check or syntax error; suppresses emission
 //   curtl    the line of the token most recently consumed, which is the line

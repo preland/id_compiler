@@ -1,19 +1,21 @@
-// What booting the loader seeded its table with: an instruction word, a
-// runtime helper, and a helper that takes a double.
-tf_iadd() {
-  int k = ld_look("i:add");
-} return int k;
-given lb_boot ():(3)
-given lb_tables ():(-1)
+// The key a check looks up in the loader's table, set by tf_key and read back by
+// tf_look: an instruction word ("i:add"), a runtime helper ("b:id_poke64"), a
+// helper that takes a double ("x:id_str_of_float"), or whatever a case seeded.
+tf_key(string tf_kk) {
+  export string[] tf_kv = [tf_kk];
+} return void export tf_kv;
+("i:add"):() then (import tf_kv):(["i:add"])
+("a"):() then len((import tf_kv)):(1)
 
-tf_bpoke() {
-  int k = ld_look("b:id_poke64");
+tf_look() {
+  string[] tf_kp = (import tf_kv);
+  int k = ld_look(tf_kp[0]);
 } return int k;
-given lb_boot ():(45)
-given lb_tables ():(-1)
-
-tf_xstr() {
-  int k = ld_look("x:id_str_of_float");
-} return int k;
-given lb_boot ():(2)
-given lb_tables ():(-1)
+given tf_key("i:add") given lb_boot ():(3)
+given tf_key("i:add") given lb_tables ():(-1)
+given tf_key("b:id_poke64") given lb_boot ():(45)
+given tf_key("x:id_str_of_float") given lb_boot ():(2)
+given tf_key("k:c") given lb_boot given lb_seed("k", "a b c") ():(2)
+given tf_key("k:c") given lb_boot ():(-1)
+given tf_key("a") given lb_tables given ld_put("a", 3) ():(3)
+given tf_key("a") given lb_tables ():(-1)

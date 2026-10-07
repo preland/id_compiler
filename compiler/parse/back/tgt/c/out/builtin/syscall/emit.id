@@ -18,7 +18,7 @@ cast_args(string name, int[] args) {
   string out = "";
   int i = 0;
   while(i < len(args)) {
-    out = out + sep_arg(i) + arg_cast(name, args[i]) + emit_expr(args[i]) + ")";
+    out = out + sep_at(", ", i) + arg_cast(name, args[i]) + emit_expr(args[i]) + ")";
     i = i + 1;
   }
 } return string out;
@@ -27,7 +27,7 @@ given call_args_fixture ("peek8", (import call_args)):("(long long)(5), (long lo
 
 is_syscall(string name) {
   int ok = 0;
-  if(is_wordfn(name) || is_pokefn(name) || name == "ult" || name == "str_of_mem") {
+  if(is_wordfn(name) || str_in((import pokefns), name) || name == "ult" || name == "str_of_mem") {
     ok = 1;
   }
 } return int ok;

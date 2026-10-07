@@ -9,7 +9,7 @@ given ds_test_setup ([0, 1, 2], 0):() then prints:("    fileA.id:10\n    fileB.i
 given ds_test_setup ([0, 1, 2], 3):() then prints:("")
 
 emit_row(int[] grp, int k) {
-  string where = ds_where(grp[k]);
+  string where = ds_col(grp[k], 3);
   print("    " + where);
 } return void;
 given ds_test_setup ([0, 1, 2], 0):() then prints:("    fileA.id:10\n")

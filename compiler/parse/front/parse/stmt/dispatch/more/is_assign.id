@@ -1,28 +1,27 @@
-// `name = ...` is an assignment; anything else starting here is an expression
-// statement. `cur2_text` looks one token ahead.
+// `name = ...` is an assignment, `name[` and `name.` an element or field store;
+// anything else starting here is an expression statement. peek_text looks a
+// number of tokens ahead; ident_then asks whether the identifier at the cursor is
+// followed by a token of a set (nx_eq, nx_index and the others in conf.id).
 
-is_assign(int[] pos) {
+ident_then(int[] pos, string[] nexts) {
   int ok = 0;
-  if(cur_kind(pos) == "ident" && cur2_text(pos) == "=") {
+  string it_next = peek_text(pos, 1);
+  if(cur_kind(pos) == "ident" && str_in(nexts, it_next) == 1) {
     ok = 1;
   }
 } return int ok;
-given stmt_tokens ([16]):(1)
-given stmt_tokens ([9]):(0)
+given stmt_tokens ([16], ["="]):(1)
+given stmt_tokens ([9], ["="]):(0)
+given atom_tokens ([33], ["[", "."]):(1)
+given atom_tokens ([0], ["[", "."]):(0)
 
-cur2_text(int[] pos) {
+peek_text(int[] pos, int ahead) {
   string s = "";
-  if(pos[0] + 1 < len((import ttext))) {
-    s = (import ttext)[pos[0] + 1];
+  if(pos[0] + ahead < len((import ttext))) {
+    s = (import ttext)[pos[0] + ahead];
   }
 } return string s;
-given stmt_tokens ([16]):("=")
-given stmt_tokens ([42]):(";")
-
-skip_semi(int[] pos) {
-  if(cur_text(pos) == ";") {
-    advance(pos);
-  }
-} return void;
-given stmt_tokens ([4]):([5])
-given stmt_tokens ([3]):([3])
+given stmt_tokens ([16], 1):("=")
+given stmt_tokens ([42], 1):(";")
+given sd_stmt_toks ([5], 2):("]")
+given sd_stmt_toks ([0], 2):("=")

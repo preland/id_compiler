@@ -4,17 +4,17 @@
 
 llc_int_setup() {
   env_init();
-  export int llc_int_e = node_int("5", 5, 0);
+  export int llc_int_e = node_txt2("int", "5", 5, 0);
 } return void;
-():() then calls node_int:("5", 5, 0)
+():() then calls node_txt2:("int", "5", 5, 0)
 ():() then init_units:(0)
 
 llc_str_setup() {
   env_init();
   push((import enames), "k");
-  export int llc_str_e = node_str("hi");
+  export int llc_str_e = node_txt("str", "hi");
 } return void;
-():() then calls node_str:("hi")
+():() then calls node_txt:("str", "hi")
 ():() then init_units:(0)
 
 llc_float_setup() {

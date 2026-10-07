@@ -16,10 +16,10 @@ call_env_fixture() {
 
 call_int_fixture() {
   call_env_fixture();
-  export int call_e1 = node_int("5", 5, 0);
-  export int call_e2 = node_int("4", 4, 0);
+  export int call_e1 = node_txt2("int", "5", 5, 0);
+  export int call_e2 = node_txt2("int", "4", 4, 0);
 } return void;
-():() then calls node_int:("5", 5, 0)
+():() then calls node_txt2:("int", "5", 5, 0)
 ():() then init_units:(0)
 
 // call_args_rev is the same two nodes in the other order -- what gives

@@ -27,12 +27,3 @@ ll_piece(string s, int i) {
 ("ab", 1):("\\62")
 ("\\n", 0):("\\0A")
 
-// A backslash escape spells one byte out of two source characters.
-ll_step(string s, int i) {
-  int r = i + 1;
-  if(charat(s, i) == 92) {
-    r = i + 2;
-  }
-} return int r;
-("ab", 0):(1)
-("\\n", 0):(2)

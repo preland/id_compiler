@@ -19,7 +19,7 @@ fn_param_at(string t, int i) {
 
 iafix() {
   idxfix();
-  int iaval = node_int("2", 2, 0);
+  int iaval = node_txt2("int", "2", 2, 0);
   export int ia_node = node_iassign((import rgidx_node), iaval);
 } return void;
 ():() then (import chkfail)[0]:(0)

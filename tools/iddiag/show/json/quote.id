@@ -15,26 +15,6 @@ dg_jq(string dg_jq_s) {
 ("a\\b\nc\td"):("\"a\\\\b\\nc\\td\"")
 (""):("\"\"")
 
-// The applicability an `edit:` line states, in the words a JSON consumer
-// switches on (the same four rustc's suggestions use, less "unspecified").
-dg_jappl(string dg_ja_a) {
-  string dg_ja_r = "unspecified";
-  if(dg_ja_a == "machine") {
-    dg_ja_r = "machine-applicable";
-  }
-  if(dg_ja_a == "maybe") {
-    dg_ja_r = "maybe-incorrect";
-  }
-} chain (string dg_ja_a) {
-  if(dg_ja_a == "placeholder") {
-    dg_ja_r = "has-placeholders";
-  }
-} return string dg_ja_r;
-("machine"):("machine-applicable")
-("maybe"):("maybe-incorrect")
-("placeholder"):("has-placeholders")
-("x"):("unspecified")
-
 // One edit as a JSON object with the span it replaces, or "" when the edit
 // cannot be placed in the file (see dg_span).
 dg_jedit(string dg_je_f, string dg_je_e) {

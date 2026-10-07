@@ -47,10 +47,10 @@ given fn_fixture ((import fixture_params), "g", 2, [0, 0], 0):() then (import ch
 // statement could have been moved up instead of padded around.
 seg_close(string fname, int ln, int[] acc, int at_seam, int nxt) {
   if(acc[0] > 3) {
-    report_actions(fname, acc[0], ln);
+    limit_diag(fname, ln, "E0201", "a block in '" + fname + "' performs " + acc[0] + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free)", (import lim_actions_why), (import lim_actions_help));
   }
   if(at_seam == 1 && acc[0] < 3) {
-    report_short_seg(fname, acc[0], ln);
+    limit_diag(fname, ln, "E0204", "a segment of '" + fname + "' performs " + acc[0] + " actions and is then continued by a chain; a chain may only follow a segment of exactly 3 actions", (import lim_seg_why), (import lim_seg_help));
   }
   check_blank_use(fname, ln, acc, at_seam, nxt);
 } chain (string fname, int ln, int[] acc, int at_seam, int nxt) {

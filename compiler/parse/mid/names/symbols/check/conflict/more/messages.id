@@ -2,12 +2,15 @@
 // so a program rejected by either compiler is rejected with the same
 // explanation.
 
-report_var_is_func(string name, string owner, int ln) {
-  string isfn_where = diag_fn_loc(owner, ln);
-  diag("E0308", isfn_where, "'" + name + "' is already the name of a function", name, "a function and a variable cannot share a name, because a call and a read of the name would look alike", "rename the variable, or the function if the variable's name is the better one");
+// A diagnostic about one name, reported at the function that owns it: the code,
+// the message, and the why and help lines (conf.id, nm_*). One function for the
+// lot, not one per message.
+report_name(string name, string owner, int ln, string rcode, string rmsg, string rwhy, string rhelp) {
+  string rn_where = diag_fn_loc(owner, ln);
+  diag(rcode, rn_where, rmsg, name, rwhy, rhelp);
 } return void;
-given regrow_d ("g", "f", 10):() then prints:("<stdin>:10: error: 'g' is already the name of a function [E0308]\n  at: g\n  why: a function and a variable cannot share a name, because a call and a read of the name would look alike\n  help: rename the variable, or the function if the variable's name is the better one\n") then (import chkfail)[0]:(1)
-given regrow_d ("h", "g", 20):() then prints:("<stdin>:20: error: 'h' is already the name of a function [E0308]\n  at: h\n  why: a function and a variable cannot share a name, because a call and a read of the name would look alike\n  help: rename the variable, or the function if the variable's name is the better one\n") then (import chkfail)[0]:(1)
+given regrow_d ("g", "f", 10, "E0308", "m", "w", "h"):() then prints:("<stdin>:10: error: m [E0308]\n  at: g\n  why: w\n  help: h\n") then (import chkfail)[0]:(1)
+given regrow_d ("h", "g", 20, "E0306", "msg", "why", "help"):() then prints:("<stdin>:20: error: msg [E0306]\n  at: h\n  why: why\n  help: help\n") then (import chkfail)[0]:(1)
 
 report_var_twice(string name, string owner, int ln) {
   string twice_where = diag_fn_loc(owner, ln);

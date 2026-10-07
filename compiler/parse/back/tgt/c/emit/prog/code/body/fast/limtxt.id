@@ -26,7 +26,7 @@ given lpf_more ([], (import lpf_nb)):(["v:lbv", "len", "wide"])
 
 lp_nul(int lq_nn) {
   if((import nkind)[lq_nn] == "call") {
-    lp_nonnull((import nl1)[lq_nn][0]);
+    lp_rel((import nl1)[lq_nn][0], "null", "!=");
   }
 } return void;
 given lpf_more ((import lpf_nb)):() then (import lpcond)[0]:("v:lbv null !=")

@@ -12,15 +12,6 @@ ll_pstr(int f) {
 given ll_main_fixture (0):("i32 %v0, i64 %v1")
 given ir_rows (0):("")
 
-ll_sep(int i) {
-  string s = ", ";
-  if(i == 0) {
-    s = "";
-  }
-} return string s;
-(0):("")
-(1):(", ")
-
 ll_block(int b) {
   emit_line("b" + b + ":");
   int i = 0;

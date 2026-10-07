@@ -17,7 +17,7 @@ parse_primary(int[] pos) {
     node = pp2(pos);
   }
 } return int node;
-given paren_tokens ([0]):(2)
+given ptoks_env(["op", "int", "op", "int", "op", "op", "eof"], ["(", "1", "+", "2", ")", ";", ""]) ([0]):(2)
 given expr_tokens ([0]):(0)
 
 parse_paren(int[] pos) {
@@ -27,5 +27,5 @@ parse_paren(int[] pos) {
 } chain (int[] pos) {
   close_bracket(pos, ")", pp_ln);
 } return int e;
-given paren_tokens ([0]):(2)
+given ptoks_env(["op", "int", "op", "int", "op", "op", "eof"], ["(", "1", "+", "2", ")", ";", ""]) ([0]):(2)
 given decl_tokens ([1]):(0)

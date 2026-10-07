@@ -201,7 +201,7 @@ EOF
     mkdir -p "$TMP/deep/inner"
     printf 'string[] lib_exports = ["inner_triple"];\n' > "$TMP/deep/conf.id"
     printf 'inner_triple(int a) {\n  int b = a * 3;\n} return int b;\n(2):(6)\n(5):(15)\n' > "$TMP/deep/inner/triple.id"
-    printf 'outer_wrap(int a) {\n  int b = a * 5;\n} return int b;\n(1):(5)\n(4):(20)\n' > "$TMP/deep/outer.id"
+    printf 'outer_wrap(int a) {\n  int b = a + 5;\n} return int b;\n(1):(6)\n(4):(9)\n' > "$TMP/deep/outer.id"
     if build deep "$TMP/deep" --no-std && [ "$(exports_of "$TMP/deep.d/libdeep.a" a | tr '\n' ' ')" = "deep_error deep_free deep_inner_triple deep_shutdown deep_strs_free deep_table_free " ]; then
         ok "a listed function in a subdirectory is exported, and an unlisted root function is not"
     else bad "a listed function in a subdirectory is exported, and an unlisted root function is not ($(tail -1 "$TMP/deep.log"); $(exports_of "$TMP/deep.d/libdeep.a" a | tr '\n' ' '))"; fi

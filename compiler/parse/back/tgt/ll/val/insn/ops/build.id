@@ -2,7 +2,7 @@
 // branches that need more than the naming rules allow inline.
 ll_t5_isc(int id) {
   string op = (import iop)[id];
-  int r = ll_iscast(op);
+  int r = str_in((import castops), op);
 } return int r;
 given fixture3 ((import ir_zext)):(1)
 given fixture2 ((import ir_callee_sym)):(0)

@@ -17,7 +17,7 @@ given lw_fixture_pnode (1, 6, 1):() then len((import lwvar)):(1)
 // lw_fixture with a global exported, for a case on lw_addr that needs a
 // non-local name to resolve through lw_vty instead of lw_slot.
 addr_export_fixture() {
-  lw_fixture();
+  lw_fixture(0);
   push((import enames), "g");
   push((import etypes), "int");
 } return void;

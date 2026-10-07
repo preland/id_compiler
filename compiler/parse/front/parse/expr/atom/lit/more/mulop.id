@@ -1,27 +1,12 @@
-// Remaining operator-class predicate, and its lookahead wrapper alongside
-// the additive one -- a call may not sit as an argument to a call, so the
-// while loops that used to test `is_mulop(cur_text(pos))` directly now call
-// these instead.
+// Whether the current token is in an operator set. A call may not sit as an
+// argument to a call, so a `while` condition cannot test
+// `str_in((import mulops), cur_text(pos))` directly; reading the token and
+// asking the set is composed here, once, and each level of the grammar passes
+// its own set from conf.id (mulops, addops, relops, shiftops).
 
-is_mulop(string s) {
-  int ok = 0;
-  if(s == "*" || s == "/" || s == "%") {
-    ok = 1;
-  }
-} return int ok;
-("*"):(1)
-("+"):(0)
-
-mulop_at(int[] pos) {
+op_at(int[] pos, string[] ops) {
   string s = cur_text(pos);
-  int ok = is_mulop(s);
+  int ok = str_in(ops, s);
 } return int ok;
-given expr_tokens ([3]):(1)
-given expr_tokens ([1]):(0)
-
-addop_at(int[] pos) {
-  string s = cur_text(pos);
-  int ok = is_addop(s);
-} return int ok;
-given expr_tokens ([1]):(1)
-given expr_tokens ([3]):(0)
+given expr_tokens ([3], ["*", "/"]):(1)
+given expr_tokens ([3], ["+", "-"]):(0)

@@ -1,7 +1,0 @@
-// A QMP peer whose line contains a literal "error" key, for qmp_cmd's
-// error-reporting branch.
-qmb_qmp_error_ser_empty() {
-  qmb_qmp_peer("oops \"error\" seen");
-} return void;
-():() then qmp_read_line:("oops \"error\" seen")
-():() then qmp_read_response:("oops \"error\" seen")

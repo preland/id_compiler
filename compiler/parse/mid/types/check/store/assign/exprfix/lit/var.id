@@ -1,5 +1,5 @@
 // A registered variable ("vi", type "int"), and the two node kinds that
-// name one, for is_nameref/type_of3 and friends.
+// name one, for the name test/type_of3 and friends.
 varleaf_fixture() {
   varleaf_init();
   varleaf_build();
@@ -9,8 +9,8 @@ varleaf_fixture() {
 
 varleaf_build() {
   add_var("vi", "int", 0);
-  export int var_vi = node_var("vi");
-  export int import_vi = node_import("vi");
+  export int var_vi = node_txt("var", "vi");
+  export int import_vi = node_txt("import", "vi");
 } return void;
 given varleaf_init ():() then (import chkfail)[0]:(0)
 given varleaf_init ():() then init_units:(0)

@@ -1,7 +1,7 @@
 // The rest of `ll_pstr`: one parameter's text.
 ll_pstr_step(string s, int i, int pn) {
   string ty = (import ity)[pn];
-  string ret_s = s + ll_sep(i) + ll_ty(ty) + " %v" + pn;
+  string ret_s = s + sep_at(", ", i) + ll_ty(ty) + " %v" + pn;
 } return string ret_s;
 given ll_main_fixture ("", 0, 0):("i32 %v0")
 given ll_main_fixture ("i32 %v0", 1, 1):("i32 %v0, i64 %v1")

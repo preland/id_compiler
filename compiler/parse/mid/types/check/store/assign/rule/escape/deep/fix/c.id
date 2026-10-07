@@ -14,8 +14,8 @@
 // emitted.
 
 esc_fd_g() {
-  export int efd_vc = node_var("c");
-  export int efd_vw = node_var("w");
+  export int efd_vc = node_txt("var", "c");
+  export int efd_vw = node_txt("var", "w");
   export int efd_dc = node_decl("int[][]", "c", (import efd_lit), 0);
 } chain () {
   export int efd_pwc = node_call("push", [(import efd_vc), (import efd_vw)]);
@@ -24,7 +24,7 @@ esc_fd_g() {
 } chain () {
   export int efd_alias = node_func("fd_alias", "void", (import efd_wp), [(import efd_dc), (import efd_pws)], 0 - 1);
   export int efd_dd = node_decl("int[][]", "d", (import efd_lbl), 0);
-  export int efd_pkc = node_call("fd_peek", [node_var("d")]);
+  export int efd_pkc = node_call("fd_peek", [node_txt("var", "d")]);
 } chain () {
   export int efd_pks = node_exprstmt((import efd_pkc));
   export int efd_via = node_func("fd_via", "void", (import efd_np), [(import efd_dd), (import efd_pks)], 0 - 1);

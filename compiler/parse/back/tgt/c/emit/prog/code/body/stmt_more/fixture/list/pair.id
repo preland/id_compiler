@@ -12,7 +12,7 @@ nz_pair_fixture() {
 // sets when its digits overflow -- int_code's own case for the `LL` suffix.
 nz_int_big_fixture() {
   nz_pair_fixture();
-  export int nz_int_big = node_int("9999999999", 0, 1);
+  export int nz_int_big = node_txt2("int", "9999999999", 0, 1);
 } return void;
-():() then calls node_int:("9999999999", 0, 1)
+():() then calls node_txt2:("int", "9999999999", 0, 1)
 ():() then init_units:(0)

@@ -19,7 +19,7 @@ given leaves_fixture ():() then init_units:(0)
 assign_build() {
   leaves_fixture();
   add_var("xl", "int[]", 0);
-  export int assign_list = node_assign("xl", (import lit_a));
+  export int assign_list = node_txt1("assign", "xl", (import lit_a));
 } return void;
 ():() then calls add_var:("xl", "int[]", 0)
 ():() then init_units:(0)

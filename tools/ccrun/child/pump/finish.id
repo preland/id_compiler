@@ -15,8 +15,8 @@ pump_finish(int timeout_ms) {
   }
   drain_remaining(timeout_ms);
 } return int code;
-given ccrun_fx_run_capped_true given ccrun_fx_live_exit_seven (20):(7) then calls drain_remaining:(20)
-given ccrun_fx_run_capped_true given ccrun_fx_live_exit_zero (500):(0) then calls drain_remaining:(500)
+given ccrun_fx_run_capped_true given ccrun_fx_live_exit("sh\n-c\nsleep 0.1; exit 7\n") (20):(7) then calls drain_remaining:(20)
+given ccrun_fx_run_capped_true given ccrun_fx_live_exit("sh\n-c\nexit 0\n") (500):(0) then calls drain_remaining:(500)
 
 // Keep reading and forwarding stdout/stderr, once the child is confirmed
 // gone, until a single round reads nothing from either. Both reads use

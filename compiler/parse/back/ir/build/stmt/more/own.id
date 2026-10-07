@@ -21,12 +21,3 @@ lw_store_own(string nm, int a, int e, int v) {
 given lws_fixture ("s", (import lws_s), (import efs_lit0), 7):() then calls lw_callf:("id_str_dup", "string", [7])
 given lws_fixture ("s", (import lws_s), (import efs_sum), 7):() then calls lw_callf:("id_str_free", "", [3])
 given lws_fixture_in ("s", (import lws_s), (import efs_sum), 7):() then calls lw_callf:[0]
-
-lw_nullty(string t) {
-  string nt = t;
-  if(t == "string") {
-    nt = "int[]";
-  }
-} return string nt;
-("string"):("int[]")
-("int[]"):("int[]")

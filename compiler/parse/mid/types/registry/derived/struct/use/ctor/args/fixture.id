@@ -8,7 +8,7 @@
 
 sd_ctor_fixture() {
   sd_use_fixture();
-  export int sd_big = node_int("99", 99, 1);
+  export int sd_big = node_txt2("int", "99", 99, 1);
   export int sd_c1 = node_call("P", [(import sd_one)]);
 } chain () {
   export int sd_c3 = node_call("Q", [(import sd_str), (import sd_str), (import sd_str)]);
@@ -19,7 +19,7 @@ sd_ctor_fixture() {
   export int sd_d2 = node_decl("P", "q", (import sd_c2), 0);
   export int sd_neg = 0 - 1;
 } return void;
-():() then calls node_int:("99", 99, 1)
+():() then calls node_txt2:("int", "99", 99, 1)
 ():() then init_units:(0)
 
 // A bind in a test case, bind(fx_target, 1), over fx_target(int x) return int on
@@ -28,9 +28,9 @@ sd_ctor_fixture() {
 cbind_fixture() {
   fn_idx_fixture();
   export int cb_f = newleaf("cfn", 0, 0, "fx_target", "");
-  export int cb_a = node_int("1", 1, 0);
+  export int cb_a = node_txt2("int", "1", 1, 0);
 } chain () {
-  export int cb_s = node_str("s");
+  export int cb_s = node_txt("str", "s");
   export int cb_e = newnode("cctor", 0, 0, "bind", "", [cb_f, cb_a], [cb_f, cb_a]);
 } return void;
 ():() then calls fn_idx_fixture:[1]

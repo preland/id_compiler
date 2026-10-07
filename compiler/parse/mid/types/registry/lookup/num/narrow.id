@@ -16,7 +16,7 @@ given init_tyreg ("int", "int"):(0)
 
 argfn_match_call() {
   argfn_d();
-  int a = node_int("1", 1, 0);
+  int a = node_txt2("int", "1", 1, 0);
   export int argfn_call_match = node_call("g", [a]);
 } return void;
 ():() then (import chkfail)[0]:(0)

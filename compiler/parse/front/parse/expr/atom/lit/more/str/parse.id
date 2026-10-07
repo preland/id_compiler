@@ -9,7 +9,7 @@ parse_str(int[] pos) {
   }
   advance(pos);
 } chain (int[] pos) {
-  int ret_i = node_str(text);
+  int ret_i = node_txt("str", text);
 } return int ret_i;
 given atom_tokens ([15]):(0)
 given atom_tokens ([0]):(0)

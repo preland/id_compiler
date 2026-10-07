@@ -8,9 +8,9 @@
 cwv_setup() {
   env_init();
   cw_begin("t");
-  int e0 = node_int("1", 1, 0);
+  int e0 = node_txt2("int", "1", 1, 0);
 } chain () {
-  int e1 = node_str("hi");
+  int e1 = node_txt("str", "hi");
   int[] none = [];
   export int cwv_arr = node_arr([e0, e1]);
 } chain () {

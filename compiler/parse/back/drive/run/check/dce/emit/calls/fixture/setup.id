@@ -7,18 +7,18 @@
 
 edge_fixture() {
   fn_fixture();
-  edge_fixture_target_loc();
+  edge_loc(7);
   edge_fixture_caller();
 } return void;
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 
-edge_fixture_target_loc() {
+edge_loc(int ln) {
   push((import pfile), "fixture.id");
-  push((import pline), 7);
+  push((import pline), ln);
 } return void;
-given fn_fixture ():() then (import chkfail)[0]:(0)
-given fn_fixture ():() then init_units:(0)
+given fn_fixture (7):() then (import pline)[0]:(7)
+given fn_fixture (20):() then (import pline)[0]:(20)
 
 edge_fixture_caller() {
   edge_fixture_caller_build();

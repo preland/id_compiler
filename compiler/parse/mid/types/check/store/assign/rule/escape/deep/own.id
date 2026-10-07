@@ -12,12 +12,18 @@
 // strings; a struct is freed by its type, all the way down, with a work list
 // of its own (runtime id_free_walk).
 
-esc_deep_ty(string t) {
-  int ok = is_list_ty(t) == 1 && is_list_ty(list_elem(t)) == 1;
+// Whether `t` is a list whose elements are lists (inner 1) or are not (inner
+// 0). A list of lists is a deep-owned local, freed row by row; a list whose
+// elements are not lists is one a constructor may take over from a local,
+// where one stricter proof covers all of them.
+esc_list_of(string t, int esc_inner) {
+  int ok = is_list_ty(t) == 1 && is_list_ty(list_elem(t)) == esc_inner;
 } return int ok;
-("int[][]"):(1)
-("int[]"):(0)
-("func(int) return int[][]"):(0)
+("int[][]", 1):(1)
+("int[]", 1):(0)
+("func(int) return int[][]", 1):(0)
+given esc_ty_fix ("Tr[]", 0):(1)
+given esc_ty_fix ("int[][]", 0):(0)
 
 esc_deep(int fn, string nm) {
   string t = esc_decl_type((import nl2)[fn], nm);

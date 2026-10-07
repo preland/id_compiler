@@ -16,7 +16,7 @@ lw_fix_fnval() {
 lw_fix_fnval_reg() {
   fidx_add("fx_target");
   push((import fnodes), (import lw_fixture_n));
-  export int fix_fnval_n = node_var("fx_target");
+  export int fix_fnval_n = node_txt("var", "fx_target");
 } return void;
 given lw_fix_fnval ():() then (import chkfail)[0]:(0)
 given lw_fix_fnval ():() then init_units:(0)
@@ -26,8 +26,8 @@ given lw_fix_fnval ():() then init_units:(0)
 // them to be distinct nodes.
 lw_fix_bin() {
   lw_env_fixture();
-  int x = node_int("1", 1, 0);
-  export int fix_bin_n = node_bin("+", x, x);
+  int x = node_txt2("int", "1", 1, 0);
+  export int fix_bin_n = node_txt2("bin", "+", x, x);
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)

@@ -3,7 +3,7 @@
 // id 13: "hi" * x, a second "bin" node; id 14: "bar(x)", a second "call".
 lz_i() {
   lz_h();
-  export int lz_bin2 = node_bin("*", (import lz_str), (import lz_var));
+  export int lz_bin2 = node_txt2("bin", "*", (import lz_str), (import lz_var));
   export int lz_call2 = node_call("bar", [(import lz_var)]);
 } return void;
 ():() then calls lz_h:[1]

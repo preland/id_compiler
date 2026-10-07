@@ -14,10 +14,10 @@ esc_fm_a() {
 } chain () {
   add_var("d", "int", 0);
   add_var("n", "int", 0);
-  export int efm_kv = node_var("kids");
+  export int efm_kv = node_txt("var", "kids");
 } chain () {
   export int efm_ds = node_decl("Tr[]", "kids", node_arr((import ef_none)), 0);
-  export int efm_dv = node_var("d");
+  export int efm_dv = node_txt("var", "d");
   export int efm_rc = node_call("fm_ok", [(import efm_dv)]);
 } chain () {
   export int efm_pc = node_call("push", [(import efm_kv), (import efm_rc)]);
@@ -27,7 +27,7 @@ given esc_fm_fix ():() then (import chkfail)[0]:(0)
 given esc_fm_fix ():() then init_units:(0)
 
 esc_fm_b() {
-  export int efm_if = node_if(node_var("d"), [(import efm_ps)], (import ef_none), 0);
+  export int efm_if = node_if(node_txt("var", "d"), [(import efm_ps)], (import ef_none), 0);
   export int efm_cc = node_call("Tr", [(import efm_kv)]);
   export int efm_ct = node_decl("Tr", "t", (import efm_cc), 0);
 } chain () {
@@ -35,9 +35,9 @@ esc_fm_b() {
   export int efm_dn = node_decl("int", "n", node_call("len", [(import efm_kv)]), 0);
   export int[] efm_pd = [node_param("param", "int", "d")];
 } chain () {
-  export int efm_fn = node_func("fm_ok", "Tr", (import efm_pd), (import efm_body), node_var("t"));
+  export int efm_fn = node_func("fm_ok", "Tr", (import efm_pd), (import efm_body), node_txt("var", "t"));
   export int[] efm_bbody = [(import efm_ds), (import efm_ct), (import efm_dn)];
-  export int efm_bad = node_func("fm_bad", "Tr", (import efm_pd), (import efm_bbody), node_var("t"));
+  export int efm_bad = node_func("fm_bad", "Tr", (import efm_pd), (import efm_bbody), node_txt("var", "t"));
 } return void;
 given esc_fm_fix ():() then (import chkfail)[0]:(0)
 given esc_fm_fix ():() then init_units:(0)
@@ -51,9 +51,9 @@ esc_fm_fix() {
   add_func("fm_bad", "Tr", (import efm_bad));
   esc_seed();
 } chain () {
-  export int efm_bif = node_if(node_var("d"), [(import efm_ct)], (import ef_none), 0);
+  export int efm_bif = node_if(node_txt("var", "d"), [(import efm_ct)], (import ef_none), 0);
   export int efm_fl = newleaf("fld", 0, 0, "kids", "");
-  export int efm_ix = node_index(node_var("t"), (import efm_fl));
+  export int efm_ix = node_index(node_txt("var", "t"), (import efm_fl));
 } return void;
 ():() then calls esc_fix:[1]
 ():() then init_units:(0)

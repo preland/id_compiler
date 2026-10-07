@@ -2,7 +2,7 @@
 // Two functions that differ only in which imported value they read are one
 // function written twice, with the value as the parameter it should have
 // been. The error names both functions and the fix: parameterise one and pass
-// the value in. (A literal-only difference, a second differing import, any
+// the value in. (A second differing import, any
 // other difference, and a one-statement accessor are not this: tests_feature.sh
 // checks that they say nothing.)
 use_a(int x) {

@@ -14,8 +14,8 @@ push_pos() {
   push((import ntok), (import curtk)[0]);
   push((import nst), 0 - 1);
 } return void;
-given mk_curtk5 ():() then last_ntok:("ntok 5") then last_nst:("nst -1")
-given mk_curtk9 ():() then last_ntok:("ntok 9") then last_nst:("nst -1")
+given mk_curtk(5) ():() then last_ntok:("ntok 5") then last_nst:("nst -1")
+given mk_curtk(9) ():() then last_ntok:("ntok 9") then last_nst:("nst -1")
 
 // One "shell" leaf's kind pushed to nkind, nothing else -- newnode_tail's own
 // cases need nkind non-empty before they run, the way push_kii's caller

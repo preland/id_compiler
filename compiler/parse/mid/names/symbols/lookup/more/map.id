@@ -1,0 +1,38 @@
+// A string looked up in a table of two parallel lists, the default when the
+// key is not in it. A table of three or more words is a pair of lists in
+// conf.id and this, not a cascade of str_pick2 (pick.id).
+
+str_map(string[] map_keys, string[] map_vals, string map_x, string map_no) {
+  int map_at = find_str(map_keys, map_x);
+  string ret_s = map_no;
+  if(map_at >= 0) {
+    ret_s = map_vals[map_at];
+  }
+} return string ret_s;
+(["a", "b"], ["x", "y"], "b", "n"):("y")
+(["a", "b"], ["x", "y"], "c", "n"):("n")
+
+// 1 when a word is in a set, 0 when it is not. Every "is this an X operator /
+// builtin / type word" is this with the set from conf.id, not a function per
+// set (docs/ERRORS.md, E0407 and E0405).
+str_in(string[] in_set, string in_x) {
+  int ok = 0;
+  if(find_str(in_set, in_x) >= 0) {
+    ok = 1;
+  }
+} return int ok;
+(["a", "b"], "b"):(1)
+(["a", "b"], "c"):(0)
+
+// One of two words by a node's second integer, the parser's flag: for an
+// integer literal it says the value does not fit an int (so the type is `word`,
+// not `int`), for a declaration that it is exported (so the fingerprint tag is
+// "ed:", not "d:"). The words are the caller's.
+ni2_pick(int id, string no_word, string yes_word) {
+  string ret_s = no_word;
+  if((import ni2)[id] == 1) {
+    ret_s = yes_word;
+  }
+} return string ret_s;
+given leaves_fixture ((import lit_a), "int", "word"):("int")
+given leaves_fixture ((import lit_word), "int", "word"):("word")

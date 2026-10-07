@@ -1,0 +1,24 @@
+// A literal in a fingerprint: its kind letter and its value, or, while the
+// literal-insensitive table is being made (cloose, scan/loose.id), the kind
+// letter alone. Two functions whose fingerprints agree only in that table
+// differ in nothing but the values of their literals (E0407).
+
+lit_val(string lit_tag, string lit_spell) {
+  string ret_s = lit_tag + lit_spell;
+  if((import cloose)[0] == 1) {
+    ret_s = lit_tag;
+  }
+} return string ret_s;
+given env_init ("I", "7"):("I7")
+given lit_loose_fixture ("I", "7"):("I")
+given lit_loose_fixture ("S", "hi"):("S")
+given env_init ("F", "1.5"):("F1.5")
+
+// env_init with the literal-insensitive mode switched on, as ul_fill leaves
+// it while the loose table is built.
+lit_loose_fixture() {
+  env_init();
+  lset((import cloose), 0, 1);
+} return void;
+():() then calls env_init:[1]
+():() then (import cloose)[0]:(1)

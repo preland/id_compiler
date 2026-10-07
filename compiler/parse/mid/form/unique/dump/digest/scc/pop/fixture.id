@@ -6,7 +6,7 @@
 // dg_clink's case that an import adds no call edge.
 dg_t_exp_node() {
   dg_t_rows();
-  export int dg_t_imp = node_import("gx");
+  export int dg_t_imp = node_txt("import", "gx");
 } return void;
 ():() then dg_ncout1:(0)
 ():() then len((import dg_comp)):(2)

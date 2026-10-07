@@ -6,21 +6,25 @@
 fit_then_print(int chk_node) {
   int ci = (import ni1)[chk_node];
   int[] items = (import nl1)[chk_node];
-  fit_print_items(ci, items);
+  fit_one(ci, items, "a 'prints' or 'eprints' check compares exactly one value, not ", "string");
 } return void;
 given print_fixture ((import fixture_print_node)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
 given print_fixture ((import fixture_print_empty)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
 
-fit_print_items(int ci, int[] items) {
+// Exactly one value of a type, or the case is refused with `msg` and the count:
+// a prints/eprints check holds one string, a calls count one int.
+fit_one(int ci, int[] items, string fo_msg, string fo_type) {
   if(len(items) != 1) {
     int ne = len(items);
-    case_err(ci, "a 'prints' or 'eprints' check compares exactly one value, not " + ne);
+    case_err(ci, fo_msg + ne);
   } else {
-    fit_value(ci, items[0], "string");
+    fit_value(ci, items[0], fo_type);
   }
 } return void;
-given print_fixture ((import fixture_ci), (import fixture_print_two)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
-given print_fixture ((import fixture_ci), (import fixture_print_none)):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
+given print_fixture ((import fixture_ci), (import fixture_print_two), "a 'prints' or 'eprints' check compares exactly one value, not ", "string"):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
+given print_fixture ((import fixture_ci), (import fixture_print_none), "a 'prints' or 'eprints' check compares exactly one value, not ", "string"):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 0\n")
+given calls_items_fixture ((import fixture_ci), (import fixture_calls_none), "a 'calls NAME:[N]' check takes exactly one count, not ", "int"):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
+given calls_items_fixture ((import fixture_ci), (import fixture_calls_one), "a 'calls NAME:[N]' check takes exactly one count, not ", "int"):() then prints:("")
 
 // A check target mid-check would accept: "chk() return int", niladic where
 // fx_target takes an argument, registered where func_node looks, and its

@@ -9,13 +9,6 @@ sd_toks() {
 ():() then calls push_toks:(["kw", "ident", "op", "kw", "ident", "op", "kw", "ident", "op", "op", "eof"], ["struct", "P", "{", "int", "x", ";", "string", "y", ";", "}", ""])
 ():() then len((import tkind)):(11)
 
-sd_toks_open() {
-  env_init();
-  push_toks(["kw", "ident", "op", "kw", "ident", "op", "eof"], ["struct", "P", "{", "int", "x", ";", ""]);
-} return void;
-():() then calls push_toks:(["kw", "ident", "op", "kw", "ident", "op", "eof"], ["struct", "P", "{", "int", "x", ";", ""])
-():() then len((import tkind)):(7)
-
 sd_last_nf() {
   int sd_i = len((import sdname)) - 1;
   int sd_k = len((import sdfname)[sd_i]);

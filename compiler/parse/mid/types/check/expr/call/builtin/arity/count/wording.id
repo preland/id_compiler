@@ -31,7 +31,7 @@ bi_count(string name) {
 // str_of_mem, which idc.py writes out by hand and words differently.
 is_sysbi(string name) {
   int ok = 0;
-  if(is_wordfn(name) == 1 || is_pokefn(name) == 1 || name == "ult") {
+  if(is_wordfn(name) == 1 || str_in((import pokefns), name) == 1 || name == "ult") {
     ok = 1;
   }
 } return int ok;

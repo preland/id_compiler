@@ -19,14 +19,14 @@ given call_fp_fixture ((import call_ushr)):("I7")
 // spelling this function folds to its left operand alone.
 call_fp_fixture() {
   canon_begun_fixture();
-  int lit3 = node_int("3", 3, 0);
-  int lit0 = node_int("0", 0, 0);
+  int lit3 = node_txt2("int", "3", 3, 0);
+  int lit0 = node_txt2("int", "0", 0, 0);
 } chain () {
   export int call_foo = node_call("foo", [lit3]);
-  int cfx_x = node_int("7", 7, 0);
+  int cfx_x = node_txt2("int", "7", 7, 0);
   export int call_ushr = node_call("ushr", [cfx_x, lit0]);
 } return void;
-():() then calls node_int:("3", 3, 0)
+():() then calls node_txt2:("int", "3", 3, 0)
 ():() then init_units:(0)
 
 // canon_iassign's second case (../../../../stmt/more/decl.id) needs an

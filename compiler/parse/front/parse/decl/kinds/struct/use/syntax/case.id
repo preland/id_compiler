@@ -7,7 +7,7 @@
 
 case_scalar(int[] pos) {
   int v = 0 - 1;
-  if(at_case_ctor(pos) == 1) {
+  if(ident_then(pos, (import nx_call)) == 1) {
     v = case_ctor(pos);
   } else {
     v = parse_expr(pos);
@@ -15,15 +15,6 @@ case_scalar(int[] pos) {
   }
 } return int v;
 given sd_case_toks ([0]):(2)
-given sd_case_toks ([6]):(0)
-
-at_case_ctor(int[] pos) {
-  int ok = 0;
-  if(cur_kind(pos) == "ident" && cur2_text(pos) == "(") {
-    ok = 1;
-  }
-} return int ok;
-given sd_case_toks ([0]):(1)
 given sd_case_toks ([6]):(0)
 
 case_ctor(int[] pos) {

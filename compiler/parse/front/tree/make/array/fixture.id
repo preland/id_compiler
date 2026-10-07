@@ -1,22 +1,8 @@
 // The rest of ../../node/newnode/fixture.id's afret/afretn scenarios, and
 // the readers themselves.
 
-asm_reg_fix1c() {
-  asm_reg_fix0();
-  push((import afret), "word");
-} return void;
-():() then calls asm_reg_fix0:[1]
-():() then init_units:(0)
-
-asm_reg_fix1d() {
-  asm_reg_fix1c();
-  push((import afretn), "r");
-} return void;
-():() then calls asm_reg_fix1c:[1]
-():() then init_units:(0)
-
 afret_last() {
   string s_t = "afret " + ((import afret)[len((import afret)) - 1]);
 } return string s_t;
-given asm_reg_fix1 ():("afret int")
-given asm_reg_fix1c ():("afret word")
+given asm_reg_fix1("int") ():("afret int")
+given asm_reg_fix1("word") ():("afret word")

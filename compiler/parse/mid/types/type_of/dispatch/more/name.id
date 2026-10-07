@@ -1,15 +1,5 @@
 // Name references, and the float-literal case of the type dispatch.
 
-// var and import both name a variable; their type is the variable's type.
-is_nameref(int id) {
-  int ok = 0;
-  if((import nkind)[id] == "var" || (import nkind)[id] == "import") {
-    ok = 1;
-  }
-} return int ok;
-given varleaf_fixture ((import var_vi)):(1)
-given allfix ((import lit_a)):(0)
-
 // Extends the type_of dispatch chain (type_of2 -> here -> type_of3) with the
 // float-literal case.
 type_of_float(int id) {
@@ -23,7 +13,7 @@ given allfix ((import lit_a)):("int")
 
 argfn_badtype_call() {
   argfn_d();
-  int a = node_str("x");
+  int a = node_txt("str", "x");
   export int argfn_call_badtype = node_call("g", [a]);
 } return void;
 ():() then (import chkfail)[0]:(0)

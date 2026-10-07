@@ -14,7 +14,7 @@ bt4(string name) {
 
 bt5(string name) {
   string t = "?";
-  if(is_pokefn(name)) {
+  if(str_in((import pokefns), name)) {
     t = "void";
   } else if(name == "float_of_bits" || name == "float_of_bits32") {
     t = "float";

@@ -29,6 +29,10 @@
 // in the cell; case_unit_fixture (back/tgt/c/emit/prog/test/case/emit.id)
 // gives a second, differently-sourced value so this function's own two
 // cases are not both nat_init's default.
+// cloose: 1 while the literal-insensitive fingerprints are being made
+// (mid/form/unique/scan/loose.id), 0 otherwise; canon_expr reads it
+// (mid/form/unique/canon/expr/more/lit.id), so it has to exist wherever a
+// fingerprint is made, which is everywhere init_units has run.
 init_units() {
   export int[] nunit = [];
   export int[] ucur = [0];
@@ -36,6 +40,7 @@ init_units() {
 } chain () {
   export int[] stdunit = [0 - 1];
   export int[] exclunit = [];
+  export int[] cloose = [0];
 } return int 0;
 given env_init ():(0)
 given env_init ():(0) then (import chkfail)[0]:(0)

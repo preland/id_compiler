@@ -1,6 +1,6 @@
 chk_cmp(int id) {
   string s1_of_v = (import ns1)[id];
-  if(is_eqop(s1_of_v) == 1) {
+  if(str_in((import eqops), s1_of_v) == 1) {
     chk_eq(id);
   } else {
     chk_ord(id);
@@ -27,7 +27,7 @@ fv_side(int id, int e, string side) {
     string op = (import ns1)[id];
     tc_err(id, "'" + op + "' cannot take a function value: its " + side + " operand is " + t + "; a function value can only be passed, stored or called");
   }
-  if(ty_is_struct(t) == 1) {
+  if(ty_kind_is(t, "struct") == 1) {
     tc_err(id, "'" + (import ns1)[id] + "' cannot take a struct: its " + side + " operand is " + t + "; a struct is compared and combined by field, as in a." + sd_cell((import sdfname), t, 0) + " " + (import ns1)[id] + " b." + sd_cell((import sdfname), t, 0));
   }
 } return void;

@@ -10,8 +10,8 @@ sd_case_fixture() {
   sd_note("Q", ["s"], ["string"], "q.id", 5);
 } chain () {
   init_struct_rows();
-  export int sd_ca = node_int("1", 1, 0);
-  export int sd_cs = node_str("s");
+  export int sd_ca = node_txt2("int", "1", 1, 0);
+  export int sd_cs = node_txt("str", "s");
 } chain () {
   int[] sd_ar2 = [(import sd_ca), (import sd_ca)];
   int[] sd_ar1 = [(import sd_ca)];

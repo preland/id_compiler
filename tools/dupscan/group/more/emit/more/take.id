@@ -3,8 +3,8 @@
 // functions are called the same one -- a false positive here is a tool telling
 // someone to delete working code.
 rest_take(int i, int[] grp, int j) {
-  string a = ds_fp(i);
-  string b = ds_fp(j);
+  string a = ds_col(i, 1);
+  string b = ds_col(j, 1);
   take_eq(grp, j, a, b);
 } return void;
 given ds_test_setup (0, [0], 1):(0, [0, 1], 1)

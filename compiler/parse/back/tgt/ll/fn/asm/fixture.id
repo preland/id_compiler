@@ -28,7 +28,7 @@ elems3_fixture() {
 // its quotes, as the parser stores it, because ll_asm_line scans between
 // them.
 llasm_row_fixture() {
-  asm_reg_fix1b();
+  asm_reg_fix1b("int", "result");
   int pnode = node_param("param", "int", "x");
   push((import afparams), [pnode]);
 } chain () {

@@ -3,12 +3,12 @@
 
 lpq_lp() {
   lpq_lu();
-  export int lpq_np = node_var("lpn2");
+  export int lpq_np = node_txt("var", "lpn2");
   export int lpq_kp = lpf_lt("lpj2", lpq_np);
 } chain () {
-  export int lpq_m1 = lpq_mul("lpj2", 3);
-  export int lpq_m2 = lpq_mul("lpj2", 5);
-  export int lpq_up = node_bin("+", lpq_m1, lpq_m2);
+  export int lpq_m1 = lpf_term("*", "lpj2", 3);
+  export int lpq_m2 = lpf_term("*", "lpj2", 5);
+  export int lpq_up = node_txt2("bin", "+", lpq_m1, lpq_m2);
 } chain () {
   export int lpq_xp = lpf_ix("lpv2", lpq_up);
   export int lpq_ap = lpf_acc("lps2", lpq_xp);
@@ -23,11 +23,11 @@ lpq_lp() {
 
 lpq_li() {
   lpq_lp();
-  export int lpq_ni = node_var("lin");
+  export int lpq_ni = node_txt("var", "lin");
   export int lpq_ki = lpf_lt("lij", lpq_ni);
 } chain () {
-  export int lpq_gi = node_import("lim");
-  export int lpq_mi = node_bin("*", node_var("lij"), lpq_gi);
+  export int lpq_gi = node_txt("import", "lim");
+  export int lpq_mi = node_txt2("bin", "*", node_txt("var", "lij"), lpq_gi);
   export int lpq_xi = lpf_ix("liv", lpq_mi);
 } chain () {
   export int lpq_ai = lpf_acc("lis", lpq_xi);
@@ -36,17 +36,17 @@ lpq_li() {
 } chain () {
   export int lpq_loi = (import ni1)[lpq_wi] + 1;
   export int lpq_hii = lpq_wi - 1;
-  export int lpq_gj = node_import("lij");
+  export int lpq_gj = node_txt("import", "lij");
 } return void;
 ():() then calls lpq_lp:[1]
 ():() then init_units:(0)
 
 lpq_lw() {
   lpq_lz();
-  export int lpq_nw = node_var("lwn2");
+  export int lpq_nw = node_txt("var", "lwn2");
   export int lpq_kw = lpf_lt("lwj2", lpq_nw);
 } chain () {
-  export int lpq_dw = node_bin("-", node_var("lwj2"), (import lpf_n0));
+  export int lpq_dw = node_txt2("bin", "-", node_txt("var", "lwj2"), (import lpf_n0));
   export int lpq_xw = lpf_ix("lwv2", lpq_dw);
   export int lpq_aw = lpf_acc("lws2", lpq_xw);
 } chain () {

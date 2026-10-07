@@ -23,7 +23,7 @@ at_elif(int[] pos) {
   if(cur_text(pos) == "else") {
     ok = 2;
   }
-  if(ok == 2 && cur2_text(pos) == "if") {
+  if(ok == 2 && peek_text(pos, 1) == "if") {
     ok = 1;
   }
 } return int ok;

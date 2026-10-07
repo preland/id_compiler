@@ -5,7 +5,7 @@
 // free strings, so a build that owns none (a freestanding one) has neither.
 
 esc_dkind(string t) {
-  int dz_k = esc_deep_ty(t);
+  int dz_k = esc_list_of(t, 1);
   if(dz_k == 0 && esc_hosted() == 1) {
     dz_k = esc_dkind2(t);
   }

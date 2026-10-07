@@ -1,23 +1,18 @@
 // Fixtures for the cases of the results file.
 
-// Setup: writes two result lines and a stray line into the log.
-ms_t_wres() {
-  int ms_n = exec_file_put((import ms_t_log), "killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t3\t9\tdel\t\tx;  =>  \nstray\n", 420);
+// Setup: writes the text given into the log: two result lines and a stray line, or the
+// baseline marker "K" (the log is where a run keeps its marker).
+ms_t_wlog(string ms_t_text) {
+  int ms_n = exec_file_put((import ms_t_log), ms_t_text, 420);
 } return void;
-given ms_t_tree ():() then ms_t_logtxt:("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\n")
-given ms_t_tree ():() then ms_t_ns:(3) then ms_t_logtxt:("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\n")
+given ms_t_tree ("K"):() then ms_t_logtxt:("K")
+given ms_t_tree ("K"):() then ms_t_ns:(3) then ms_t_logtxt:("K")
+given ms_t_tree ("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t3\t9\tdel\t\tx;  =>  \nstray\n"):() then ms_t_logtxt:("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\n")
 
 // What the log file holds.
 ms_t_logtxt() {
   string ms_q = str_replace(fs_read_text((import ms_t_log)), "\t", "|");
 } return string ms_q;
 given ms_t_tree ():("")
-given ms_t_tree given ms_t_wres ():("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\n")
+given ms_t_tree given ms_t_wlog("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t3\t9\tdel\t\tx;  =>  \nstray\n") ():("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\n")
 
-// Setup: writes the baseline marker "K" into the log (the log is where a run
-// keeps its marker).
-ms_t_wmk() {
-  int ms_n = exec_file_put((import ms_t_log), "K", 420);
-} return void;
-given ms_t_tree ():() then ms_t_logtxt:("K")
-given ms_t_tree ():() then ms_t_ns:(3) then ms_t_logtxt:("K")

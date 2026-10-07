@@ -5,7 +5,7 @@
 
 fv_ref(string name, int nd) {
   fv_note(name, nd);
-  string s = "ID_FNV(" + fv_key(name, nd) + ")";
+  string s = "ID_FNV(" + name + (import fv_sep) + nd + ")";
 } return string s;
 given fv_init ("tick", 0):("ID_FNV(tick__0)") then len((import fvname)):(1)
 given fv_init ("pick", 2):("ID_FNV(pick__2)") then (import fvk)[0]:(2)

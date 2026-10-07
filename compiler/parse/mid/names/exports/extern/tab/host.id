@@ -18,7 +18,7 @@ dead_exp_reach_fixture() {
   init_reach();
   add_export("gm", "int", "main");
 } chain () {
-  export int reach_imp_m = node_import("gm");
+  export int reach_imp_m = node_txt("import", "gm");
 } return void;
 ():() then calls add_export:("gm", "int", "main")
 ():() then init_units:(0)

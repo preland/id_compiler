@@ -6,7 +6,7 @@ lv_loop() {
   int lvl_j = lw_alloca("int", "j");
   int lvl_v = lw_alloca("int[]", "v");
 } chain () {
-  gd_good();
+  gd_cond(["v:j", "k:0", ">=", "|", "v:v", "null", "!=", "|"]);
 } return void;
 ():() then len((import lpg)):(8)
 ():() then (import lwvar)[2]:("v")

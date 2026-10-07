@@ -13,7 +13,7 @@ given fn_idx_fixture ():() then len((import fnames)):(2)
 given elif_fixture ():() then len((import fnames)):(0)
 
 sym_one(int id) {
-  if(is_vardecl(id)) {
+  if(str_in((import declkinds), (import nkind)[id])) {
     string s2_of_v = (import ns2)[id];
     string s1_of_v = (import ns1)[id];
     add_var(s2_of_v, s1_of_v, (import nunit)[id]);
@@ -24,11 +24,3 @@ sym_one(int id) {
 given fn_idx_fixture ((import fixture_fn)):() then len((import fnames)):(2)
 given farm_a ((import f_pa)):() then len((import vnames)):(1)
 
-is_vardecl(int id) {
-  int ok = 0;
-  if((import nkind)[id] == "decl" || (import nkind)[id] == "param") {
-    ok = 1;
-  }
-} return int ok;
-given elif_fixture ((import decl_node)):(1)
-given elif_fixture ((import if_node)):(0)

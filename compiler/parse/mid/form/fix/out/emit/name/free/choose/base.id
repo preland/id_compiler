@@ -1,9 +1,15 @@
-fix_choose(string stem, string t) {
+// A stem named with suffix "_v" (<stem>_v), or, for a whole argument named
+// because it has a call somewhere inside it (plan/walk/kind/push.id), with no
+// suffix at all: <callee>_a0, then <callee>_a02 if that is somehow taken too
+// (fix_try's own numbering, with an empty suffix).
+fix_choose(string stem, string sfx, string t) {
   string bstem = fix_prefixed(stem);
-  string name = fix_choose_base(bstem, "_v", t);
+  string name = fix_choose_base(bstem, sfx, t);
 } return string name;
-given fix_fixture ("foo", "int"):("foo_v")
-given fix_fixture ("bar", "string"):("bar_v")
+given fix_fixture ("foo", "_v", "int"):("foo_v")
+given fix_fixture ("bar", "_v", "string"):("bar_v")
+given fix_taken("callee_a0") ("callee_a0", "", "int"):("callee_a02")
+given fix_fixture ("foo_a0", "", "int"):("foo_a0")
 
 fix_choose_base(string bstem, string sfx, string t) {
   string name = fix_try(bstem, sfx, t);

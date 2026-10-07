@@ -1,18 +1,13 @@
-// The three human-facing fields of a line, by index.
-ds_proj(int i) {
-  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 0);
+// The four fields of a line, by column: 0 the project, 1 the fingerprint, 2 the
+// name, 3 where. The column is the caller's, not a function per field.
+ds_col(int i, int ds_k) {
+  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], ds_k);
 } return string ret_s;
-given ds_test_setup (0):("projA")
-given ds_test_setup (3):("projD")
-
-ds_name(int i) {
-  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 2);
-} return string ret_s;
-given ds_test_setup (0):("foo")
-given ds_test_setup (3):("baz")
-
-ds_where(int i) {
-  string ret_s = fld((import ds_lines)[i], (import ds_tab)[0], 3);
-} return string ret_s;
-given ds_test_setup (0):("fileA.id:10")
-given ds_test_setup (3):("fileD.id:40")
+given ds_test_setup (0, 0):("projA")
+given ds_test_setup (3, 0):("projD")
+given ds_test_setup (0, 1):("FPX")
+given ds_test_setup (3, 1):("FPY")
+given ds_test_setup (0, 2):("foo")
+given ds_test_setup (3, 2):("baz")
+given ds_test_setup (0, 3):("fileA.id:10")
+given ds_test_setup (3, 3):("fileD.id:40")

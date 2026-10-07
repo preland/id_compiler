@@ -1,0 +1,5 @@
+// EXPECT: only in the values of its literals
+// The same for a string literal: the text is the one thing that varies, so it
+// is the parameter (E0407).
+greet(string name) { string s = "hello " + name; } return string s;
+bid(string who) { string t = "goodbye " + who; } return string t;

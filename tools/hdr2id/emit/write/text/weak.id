@@ -1,11 +1,2 @@
 // A header declares more than the library it describes always exports: sqlite3.h declares functions that exist only on Windows, or only in a debug build, or only when a feature was enabled. A shim that names one of those would stop the whole backend linking, so every function a shim calls is declared weak: an absent one is a null address, and its shim returns the error value instead of calling it.
 
-// The pragma lines that make each of the functions wr_names weak, one to a line, each ended by a newline; "" when there are none.
-wr_weak(string[] wr_names) {
-  string wr_r = "";
-  if (len(wr_names) > 0) {
-    wr_r = "#pragma weak " + str_join(wr_names, "\n#pragma weak ") + "\n";
-  }
-} return string wr_r;
-(["a", "b"]):("#pragma weak a\n#pragma weak b\n")
-([]):("")

@@ -881,6 +881,10 @@ ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
     if (used < 64) tab[used++] = o;
     return o;
 }
+#ifndef IDTC_EPRINT_TO
+#define IDTC_EPRINT_TO stderr
+#endif
+static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 int id_str_eol(char* idstd_s, int idstd_i);
@@ -964,6 +968,33 @@ IdList* lexline;  /* exported by lex_setup() */
 IdList* lexbol;  /* exported by lex_setup() */
 IdList* lexcols;  /* exported by lex_cols() */
 
+static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
+static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_GuiBd(IdList* p) { id_free_walk(p, "S3S3lsl.l.S3l.lsl.S3l.lsl."); }
+static void idfr_GuiCl(IdList* p) { id_free_walk(p, "S3l.lsl."); }
+static void idfr_GuiHm(IdList* p) { id_free_walk(p, "S3lsl.l."); }
+static void idfr_GuiButton(IdList* p) { id_free_walk(p, "S3l.s."); }
+static void idfr_GuiToggle(IdList* p) { id_free_walk(p, "S3S3l.s..."); }
+static void idfr_GuiColors(IdList* p) { id_free_walk(p, "S3l.l.s"); }
+static void idfr_GuiCombo(IdList* p) { id_free_walk(p, "S3S3S3sS3..l.S2S2lsl.S2lsl.l.sS3lsl..S3lsl.s"); }
+static void idfr_GuiComboSet(IdList* p) { id_free_walk(p, "S3lsl.s"); }
+static void idfr_GuiDialog(IdList* p) { id_free_walk(p, "S3S3slslsl.l."); }
+static void idfr_GuiDialogText(IdList* p) { id_free_walk(p, "S3slsls"); }
+static void idfr_GuiDrop(IdList* p) { id_free_walk(p, "S3S3l.s.lsl."); }
+static void idfr_GuiFiles(IdList* p) { id_free_walk(p, "S3S3S3sS3..l.S2S2lsl.S2lsl.l.sS3lsssl."); }
+static void idfr_GuiFilesList(IdList* p) { id_free_walk(p, "S3lsss"); }
+static void idfr_GuiGallery(IdList* p) { id_free_walk(p, "S3lsl.."); }
+static void idfr_GuiMenu(IdList* p) { id_free_walk(p, "S3lsl.."); }
+static void idfr_GuiPop(IdList* p) { id_free_walk(p, "S1l."); }
+static void idfr_GuiScroll(IdList* p) { id_free_walk(p, "S3l..."); }
+static void idfr_GuiTextBox(IdList* p) { id_free_walk(p, "S3S3sS3..l.S2S2lsl.S2lsl.l.s"); }
+static void idfr_GuiTb(IdList* p) { id_free_walk(p, "S3sS3..l.S2S2lsl.S2lsl."); }
+static void idfr_GuiTbLog(IdList* p) { id_free_walk(p, "S2lsl."); }
+static void idfr_GuiTbSel(IdList* p) { id_free_walk(p, "S3..l."); }
+static void idfr_GuiTbHist(IdList* p) { id_free_walk(p, "S2S2lsl.S2lsl."); }
+static void idfr_GuiTip(IdList* p) { id_free_walk(p, "S2l.s"); }
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
     id_list_set(idstd_xs, idstd_i, (long long)(idstd_v));
     return;

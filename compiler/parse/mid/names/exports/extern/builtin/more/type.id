@@ -10,7 +10,7 @@ bname_end(string src, int i) {
 
 xvarfix() {
   regrow_d();
-  export int xvar_node = node_var("x");
+  export int xvar_node = node_txt("var", "x");
 } return void;
-():() then calls node_var:("x")
+():() then calls node_txt:("var", "x")
 ():() then init_units:(0)

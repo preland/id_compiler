@@ -20,8 +20,8 @@ parse_case_rhs(int[] pos, int[] args) {
   int[] expd = case_tuple(pos);
   int ret_i = case_tail(pos, args, expd);
 } return int ret_i;
-given rhs_fix ([0], []):(1)
-given rhs_fix ([0], [9]):(1)
+given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], []):(1)
+given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], [9]):(1)
 
 case_tail(int[] pos, int[] args, int[] expd) {
   case_rest(pos);

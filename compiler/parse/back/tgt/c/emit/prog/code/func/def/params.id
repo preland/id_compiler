@@ -21,7 +21,7 @@ list_params(int[] params) {
   int i = 0;
   while(i < len(params)) {
     string s1_of_v = (import ns1)[(params[i])];
-    out = out + sep_arg(i) + c_type(s1_of_v) + " " + (import ns2)[(params[i])];
+    out = out + sep_at(", ", i) + c_type(s1_of_v) + " " + (import ns2)[(params[i])];
     i = i + 1;
   }
 } return string out;

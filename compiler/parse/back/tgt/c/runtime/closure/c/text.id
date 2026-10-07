@@ -8,23 +8,12 @@
 
 emit_closure_rt(string linkage) {
   emit_line("#define ID_CLO " + linkage);
-  emit_closure_types();
-  emit_closure_ops();
+  emit_line((import c_clo_types));
+  emit_line((import c_clo_ops));
 } chain (string linkage) {
-  emit_closure_cmp();
+  emit_line((import c_clo_cmp));
   fv_init();
 } return void;
-("static "):() then calls emit_line:("#define ID_CLO static ") then calls emit_closure_ops:[1]
-(""):() then calls emit_line:("#define ID_CLO ") then calls emit_closure_cmp:[1]
+("static "):() then calls emit_line:("#define ID_CLO static ") then calls fv_init:[1]
+(""):() then calls emit_line:("#define ID_CLO ") then calls fv_init:[1]
 
-emit_closure_types() {
-  emit_line("/* closures: every function value is a pointer to one of these (docs/SPEC.md 1.1.1) */\ntypedef struct IdFn { void* fn; void* raw; long long n; } IdFn;\n#define ID_FNC(f) ((long long*)((char*)(f) + sizeof(IdFn)))\n#define ID_FNV(x) ({ extern IdFn idfn_o_##x; &idfn_o_##x; })");
-} return void;
-():() then prints:("/* closures: every function value is a pointer to one of these (docs/SPEC.md 1.1.1) */\ntypedef struct IdFn { void* fn; void* raw; long long n; } IdFn;\n#define ID_FNC(f) ((long long*)((char*)(f) + sizeof(IdFn)))\n#define ID_FNV(x) ({ extern IdFn idfn_o_##x; &idfn_o_##x; })\n")
-():() then calls emit_line:[1]
-
-emit_closure_ops() {
-  emit_line("ID_CLO IdFn* id_clo_make(void* fn, int n) {\n    IdFn* o = (IdFn*)id_alloc(id_add_check(sizeof(IdFn), id_mul_check(sizeof(long long), (size_t)n, \"closure\"), \"closure\"));\n    memset(ID_FNC(o), 0, (size_t)n * sizeof(long long));\n    o->fn = fn; o->raw = 0; o->n = n;\n    return o;\n}\nID_CLO IdFn* id_clo_new(const IdFn* t) { return id_clo_make(t->fn, (int)t->n); }\nID_CLO IdFn* id_clo_set(IdFn* o, int i, long long v) { ID_FNC(o)[i] = v; return o; }\nID_CLO IdList* id_clo_copy(IdList* L) {\n    if (!L) id_null_read();\n    IdList* M = id_list_new();\n    for (int i = 0; i < L->len; i++) id_list_push(M, L->data[i]);\n    id_list_lock(M);\n    return M;\n}");
-} return void;
-():() then calls emit_line:[1]
-():() then prints:("ID_CLO IdFn* id_clo_make(void* fn, int n) {\n    IdFn* o = (IdFn*)id_alloc(id_add_check(sizeof(IdFn), id_mul_check(sizeof(long long), (size_t)n, \"closure\"), \"closure\"));\n    memset(ID_FNC(o), 0, (size_t)n * sizeof(long long));\n    o->fn = fn; o->raw = 0; o->n = n;\n    return o;\n}\nID_CLO IdFn* id_clo_new(const IdFn* t) { return id_clo_make(t->fn, (int)t->n); }\nID_CLO IdFn* id_clo_set(IdFn* o, int i, long long v) { ID_FNC(o)[i] = v; return o; }\nID_CLO IdList* id_clo_copy(IdList* L) {\n    if (!L) id_null_read();\n    IdList* M = id_list_new();\n    for (int i = 0; i < L->len; i++) id_list_push(M, L->data[i]);\n    id_list_lock(M);\n    return M;\n}\n")

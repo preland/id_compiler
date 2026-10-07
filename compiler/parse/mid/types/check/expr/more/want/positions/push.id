@@ -19,7 +19,7 @@ given shapes_fixture ((import call_len)):(0)
 
 argfn_badtype_arg() {
   argfn_d();
-  int a = node_str("x");
+  int a = node_txt("str", "x");
   export int argfn_arg_badtype = a;
 } return void;
 ():() then (import chkfail)[0]:(0)

@@ -27,15 +27,6 @@ given lay_reset ("root", 1, "conf.id", 0):() then lay_report:(0)
 given lay_reset ("d", 0, "util.id", 3):() then lay_report:(1) then (import lay_hit_generic)[0]:("d/util.id:1: error: file 'd/util.id' has a generic name 'util.id' [E0702]\n  why: a name like util.id or helper.id says nothing about what the file is for, so unrelated code collects in it\n  help: name the file for what it holds: the functions in it say what that is")
 given lay_reset ("d", 0, "main.id", 4):() then lay_report:(0)
 
-// Every violation is reported "PATH:1: error: TEXT" -- the same shape
-// bin/idc's seven bash checks already print, kept so a user's build output
-// does not change when the check that produced a line does.
-lay_msg(string path, string text) {
-  string line = path + ":1: error: " + text;
-} return string line;
-("a.id", "x"):("a.id:1: error: x")
-("b/c.id", "y"):("b/c.id:1: error: y")
-
 // A file whose own stem equals the directory holding it (a/loop/loop.id)
 // says nothing about why it exists, the same complaint dir/samename.id makes
 // about a subdirectory. Not applied to a file directly in the collected

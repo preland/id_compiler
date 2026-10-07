@@ -12,19 +12,19 @@ given test_body_fixture ("x86_64-linux-gnu"):() then calls lset:((import harn), 
 given test_body_fixture ("wasm32"):() then calls lset:((import harn), 0, 0) then calls emit_test_tail:[1]
 
 emit_test_head() {
-  emit_count_prelude();
-  emit_runtime();
+  emit_line((import c_cnt_pre));
+  print((import c_prelude_text));
   emit_closure_rt("static ");
 } chain () {
   emit_test_decls();
 } return void;
-given env_init ():() then calls emit_count_prelude:[1] then calls emit_runtime:[1] then calls emit_test_decls:[1]
+given env_init ():() then calls emit_closure_rt:("static ") then calls emit_test_decls:[1]
 given env_init ():() then (import chkfail)[0]:(0)
 
 emit_test_decls() {
-  emit_count_postlude();
+  emit_line((import c_cnt_post));
   emit_rec_prelude();
   emit_decls();
 } return void;
-given env_init ():() then calls emit_count_postlude:[1] then calls emit_rec_prelude:[1] then calls emit_decls:[1]
+given env_init ():() then calls emit_rec_prelude:[1] then calls emit_decls:[1]
 given env_init ():() then (import chkfail)[0]:(0)

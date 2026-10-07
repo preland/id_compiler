@@ -5,19 +5,27 @@
 // (./ident). canon_bin falls back on "" to the plain "op(left,right)" form,
 // which is the only place either operand is canonicalised when a
 // simplification did not fire.
+//
+// Both rewrites read a literal's value, so neither runs while the
+// literal-insensitive table is made (cloose, ../lit.id): `x + 0` and `x + 1`
+// must come out the same there, as the literals they differ in are all that
+// separates them.
 
 bin_simplify(int id, string op) {
   int lid = (import ni1)[id];
   int rid = (import ni2)[id];
   string ret_s = "";
 } chain (int id, string op) {
-  if((import nkind)[lid] == "int" && (import nkind)[rid] == "int") {
+  if((import nkind)[lid] == "int" && (import nkind)[rid] == "int" && (import cloose)[0] == 0) {
     ret_s = bin_fold2(op, lid, rid);
   }
-  if(ret_s == "") {
+  if(ret_s == "" && (import cloose)[0] == 0) {
     ret_s = bin_identity(op, lid, rid);
   }
 } return string ret_s;
 given lz_c ((import lz_binid), "+"):("")
 given arith_fixture ((import bin_node), "+"):("I14")
+given lit_arith_fixture ((import bin_node), "+"):("")
+given lit_zero_base ((import lit_zb), "+"):("v0")
+given lit_zero_fixture ((import lit_zb), "+"):("")
 

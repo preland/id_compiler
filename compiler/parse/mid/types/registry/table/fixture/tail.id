@@ -3,7 +3,7 @@ reg_last_width() {
   int n = widths[len(widths) - 1];
 } return int n;
 given init_tyreg ():(0)
-given tyreg_extra ():(1)
+given tyreg_extra("bool", "int", 1, 1) ():(1)
 
 // The width at row index 5: past the registry's 5 built-in rows, so this
 // reads whatever a test appended right after them -- the interior rows
@@ -13,5 +13,5 @@ reg_width_at5() {
   int[] widths = (import tywidth);
   int n = widths[5];
 } return int n;
-given tyreg_extra ():(1)
-given tyreg_extra2 ():(2)
+given tyreg_extra("bool", "int", 1, 1) ():(1)
+given tyreg_extra("byte", "int", 2, 0) ():(2)

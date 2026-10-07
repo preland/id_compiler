@@ -23,12 +23,3 @@ fv_cell(int i, string pt) {
 } return string s;
 (2, "string"):("(char*)(intptr_t)(ID_FNC(c)[2])")
 (0, "func(int) return int"):("(IdFn*)(intptr_t)(ID_FNC(c)[0])")
-
-fv_ret(string rt) {
-  string s = "return ";
-  if(rt == "void") {
-    s = "";
-  }
-} return string s;
-("int"):("return ")
-("void"):("")

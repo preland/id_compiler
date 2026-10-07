@@ -13,7 +13,7 @@ sr_fixture() {
   sd_note("P", ["x", "y"], ["int", "int"], "p.id", 1);
   init_struct_rows();
 } chain () {
-  export int sr_one = node_int("1", 1, 0);
+  export int sr_one = node_txt2("int", "1", 1, 0);
   export int sr_ic2 = node_call("P", [(import sr_one), (import sr_one)]);
   export int sr_ic1 = node_call("P", [(import sr_one)]);
 } chain () {

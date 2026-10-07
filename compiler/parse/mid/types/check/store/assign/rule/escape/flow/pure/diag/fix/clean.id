@@ -6,7 +6,7 @@
 pure_fix_clean() {
   env_init();
   int[] pcx_none = [];
-  export int pcx_one = node_int("1", 1, 0);
+  export int pcx_one = node_txt2("int", "1", 1, 0);
 } chain () {
   export int pcx_n = newnode("func", 0 - 1, 1, "pcn", "int", pcx_none, pcx_none);
   export int pcx_pp = node_param("param", "func(int) return int", "pf");

@@ -18,7 +18,7 @@ ms_rn_link(string ms_root, string ms_nm, string ms_work) {
   string ms_lk = path_join(ms_work, ms_nm);
   int ms_rc = ms_rn_sh("ln\n-s\n" + ms_tg + "\n" + ms_lk + "\n");
 } return int ms_rc;
-given ms_t_tree ((import ms_t_root), "sib", (import ms_t_work)):(0) then ms_t_sib:("sib\n")
+given ms_t_rel("sib/x.txt") given ms_t_tree ((import ms_t_root), "sib", (import ms_t_work)):(0) then ms_t_file:("sib\n")
 given ms_t_tree ((import ms_t_root), "sib", "/no/such/dir_ms"):(1)
 
 // Links every name of ms_wi (siblings of ms_root) into ms_work. Answers how
@@ -31,6 +31,6 @@ ms_rn_links(string ms_root, string[] ms_wi, string ms_work) {
     ms_i = ms_i + 1;
   }
 } return int ms_bad;
-given ms_t_tree ((import ms_t_root), ["sib"], (import ms_t_work)):(0) then ms_t_sib:("sib\n")
+given ms_t_rel("sib/x.txt") given ms_t_tree ((import ms_t_root), ["sib"], (import ms_t_work)):(0) then ms_t_file:("sib\n")
 given ms_t_tree ((import ms_t_root), ["sib", "no/x"], (import ms_t_work)):(1)
 ("", [], ""):(0)

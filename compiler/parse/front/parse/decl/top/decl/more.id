@@ -40,4 +40,4 @@ push_asm(int[] pos) {
   int ret_i = parse_asm(pos);
 } return int ret_i;
 given asm_decl_fixture ([0]):(0)
-given asm_decl_fixture2 ([0]):(0)
+given toks_env(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"]) ([0]):(0)

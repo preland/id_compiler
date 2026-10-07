@@ -25,7 +25,7 @@ given expr_tokens ([18]):(0)
 // relational / equality: bitor (('=='|'!='|'<'|'>'|'<='|'>=') bitor)*
 parse_rel(int[] pos) {
   int left = parse_bitor(pos);
-  while(relop_at(pos)) {
+  while(op_at(pos, (import relops))) {
     left = fold_rel(pos, left);
   }
 } return int left;

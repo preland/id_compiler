@@ -6,8 +6,8 @@ lw_emit(string op, string ty, int a, int b, string s, int[] l, int[] bl) {
   int v = ir_insn(op, ty, a, b, s, l, bl);
   ir_add((import lwcur)[0], v);
 } return int v;
-given lw_fixture ("sub", "int", 1, 2, "", [], []):(2)
-given lw_fixture2 ("mul", "word", 5, 6, "", [], []):(2)
+given lw_fixture(0) ("sub", "int", 1, 2, "", [], []):(2)
+given lw_fixture(1) ("mul", "word", 5, 6, "", [], []):(2)
 
 lw_reset() {
   while(len((import lwvar)) > 0) {
@@ -16,4 +16,4 @@ lw_reset() {
   }
 } return void;
 given lw_fixture_vars ():() then len((import lwvar)):(0)
-given lw_fixture ():() then len((import lwvar)):(0)
+given lw_fixture(0) ():() then len((import lwvar)):(0)

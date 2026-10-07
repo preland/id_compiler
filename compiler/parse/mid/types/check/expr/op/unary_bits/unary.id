@@ -36,7 +36,7 @@ given composite_fixture ((import un_neg)):() then (import chkfail)[0]:(0)
 chk_un2(int id, string t) {
   if((import ns1)[id] == "-" && ty_num(t) == 0) {
     tc_err(id, "cannot negate a " + t);
-  } else if((import ns1)[id] != "-" && ty_int(t) == 0) {
+  } else if((import ns1)[id] != "-" && ty_kind_is(t, "int") == 0) {
     string s1_of_v = (import ns1)[id];
     tc_err(id, "cannot apply '" + s1_of_v + "' to a " + t);
   }

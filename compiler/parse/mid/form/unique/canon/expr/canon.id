@@ -27,10 +27,11 @@ canon_expr(int id) {
   string out = ce2(id);
   if((import nkind)[id] == "int") {
     string spell = (import ns1)[id];
-    out = "I" + strip_zeros(spell);
+    string zeroless = strip_zeros(spell);
+    out = lit_val("I", zeroless);
   }
   if((import nkind)[id] == "float") {
-    out = "F" + (import ns1)[id];
+    out = lit_val("F", (import ns1)[id]);
   }
 } chain (int id) {
   if((import nkind)[id] == "fld") {
@@ -40,11 +41,13 @@ canon_expr(int id) {
 given un_fixture ((import ev_node)):("I7")
 given un_fixture ((import neg_node)):("u-(I7)")
 given sd_use_fixture ((import sd_lx)):("f.x")
+given lv_un_fixture ((import ev_node)):("I")
+given lv_un_fixture ((import neg_node)):("u-(I)")
 
 ce2(int id) {
   string out = ce3(id);
   if((import nkind)[id] == "str") {
-    out = "S" + (import ns1)[id];
+    out = lit_val("S", (import ns1)[id]);
   }
   if((import nkind)[id] == "var") {
     out = canon_var(id);
@@ -52,6 +55,7 @@ ce2(int id) {
 } return string out;
 given lz_a ((import lz_str)):("Shi")
 given lz_c ((import lz_imp)):("g(0)")
+given lv_str_fixture ((import lz_str)):("S")
 
 // An imported global is its position of first use (imp_fp, decomp/checks/impdup/canon/pos.id),
 // with the names kept beside the text: two functions that differ only by which

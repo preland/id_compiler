@@ -275,7 +275,8 @@ EOF
     mkdir -p "$wide"
     printf 'main(int argc, string[] argv) {\n  int r = argc;\n} return int r;\n' > "$wide/main.id"
     n=0
-    for f in alpha bravo charlie delta echo foxtrot golf hotel india; do n=$((n + 1)); printf 'wide%s(int x) {\n  int y = x + %s;\n} return int y;\n' "$n" "$n" > "$wide/$f.id"; done
+    sum=x
+    for f in alpha bravo charlie delta echo foxtrot golf hotel india; do n=$((n + 1)); sum="$sum + x"; printf 'wide%s(int x) {\n  int y = %s;\n} return int y;\n' "$n" "$sum" > "$wide/$f.id"; done
     if $BIN_IDC "$wide" --allow-untested -o "$wide.bin" > "$wide.log" 2>&1 && [ ! -s "$wide.log" ]; then
         ok "layout: a directory of ten files builds, with nothing reported"
     else

@@ -2,17 +2,8 @@
 // opened. Both are noticed at the token that follows the mistake, so the first
 // names the line the bracket opened on and the second says to delete the stray.
 
-bracket_open(string dgn_close) {
-  string dgn_bopen = "(";
-  if(dgn_close == "]") {
-    dgn_bopen = "[";
-  }
-} return string dgn_bopen;
-(")"):("(")
-("]"):("[")
-
 syn_unclosed(int[] pos, string dgn_close, int dgn_open_ln) {
-  string dgn_uopen = bracket_open(dgn_close);
+  string dgn_uopen = str_pick(dgn_close, "]", "[", "(");
   string dgn_ufound = cur_text(pos);
   string dgn_ufile = cur_file();
 } chain (int[] pos, string dgn_close, int dgn_open_ln) {
@@ -26,7 +17,7 @@ given mk_two_toks ([1], ")", 1):() then prints:("<stdin>:1: error: unclosed '(':
 given mk_two_toks ([0], "]", 7):() then prints:("<stdin>:1: error: unclosed '[': expected ']', found '=' [E0105]\n  at: =\n  why: every '[' needs its ']', and the parser will not supply a missing one at the end of the statement\n  help: add ']' to close the '[' opened on line 7; it usually belongs just before the token named in 'at'\n  related: <stdin>:7: note: the '[' that is not closed was opened here\n") then (import chkfail)[0]:(1)
 
 syn_stray(int[] pos, string dgn_stray) {
-  string dgn_sbopen = bracket_open(dgn_stray);
+  string dgn_sbopen = str_pick(dgn_stray, "]", "[", "(");
   string dgn_swhy = "this '" + dgn_stray + "' closes a '" + dgn_sbopen + "' that was never opened, so the brackets on this statement do not balance";
   string dgn_shelp = "remove this '" + dgn_stray + "', or add the missing '" + dgn_sbopen + "' earlier in the statement";
 } chain (int[] pos, string dgn_stray) {

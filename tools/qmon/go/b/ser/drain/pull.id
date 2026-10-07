@@ -12,19 +12,19 @@ drain_serial() {
   lst_fill(chunk, 4096, 0);
   pull_chunk(chunk);
 } return void;
-given qmb_boot_ser_empty ():() then qmb_buf_probe:(1)
-given qmb_boot_ser_ab ():() then qmb_buf_probe:(3)
+given qmb_boot_ser(": ") ():() then qmb_buf_probe:(1)
+given qmb_boot_ser("printf AB") ():() then qmb_buf_probe:(3)
 
 pull_chunk(int[] chunk) {
   int got = sock_recv((import qm_serh), chunk, 4096, 20);
   handle_chunk(chunk, got);
 } return void;
-given qmb_boot_ser_empty ([0, 0, 0, 0]):([0, 0, 0, 0]) then qmb_buf_probe:(1)
-given qmb_boot_ser_ab ([0, 0, 0, 0]):([65, 66, 0, 0]) then qmb_buf_probe:(3)
+given qmb_boot_ser(": ") ([0, 0, 0, 0]):([0, 0, 0, 0]) then qmb_buf_probe:(1)
+given qmb_boot_ser("printf AB") ([0, 0, 0, 0]):([65, 66, 0, 0]) then qmb_buf_probe:(3)
 
 handle_chunk(int[] chunk, int got) {
   append_bytes(chunk, got);
   more_if_any(got);
 } return void;
 given qmb_buf_boot ([104, 105], 0):() then qmb_buf_probe:(1)
-given qmb_boot_ser_empty ([104, 105], 2):() then qmb_buf_probe:(3)
+given qmb_boot_ser(": ") ([104, 105], 2):() then qmb_buf_probe:(3)

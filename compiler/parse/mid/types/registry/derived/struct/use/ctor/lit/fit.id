@@ -8,7 +8,7 @@
 fit_other(int i, int e, string want) {
   if(ty_is_func(want) == 1 && (import nkind)[e] == "cctor") {
     fit_cbind(i, e, want);
-  } else if(ty_is_struct(want) == 1 || (import nkind)[e] == "cctor") {
+  } else if(ty_kind_is(want, "struct") == 1 || (import nkind)[e] == "cctor") {
     fit_struct(i, e, want);
   } else {
     fit_scalar(i, e, want);

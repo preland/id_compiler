@@ -18,8 +18,8 @@ ut_seed_self() {
     i = i + 1;
   }
 } return void;
-given resv_scan_fixture ():() then calls ut_self_at:(0) then calls ut_self_at:(1)
-given resv_scan_fixture given rt_fixture given ut_mark ():() then calls ut_add:("eprint", "the runtime helper 'eprint', which a harness on the build host takes from its own C runtime instead", "*")
+given dup_prog_fixture("eprint", "plain_name", 3, 9) ():() then calls ut_self_at:(0) then calls ut_self_at:(1)
+given dup_prog_fixture("eprint", "plain_name", 3, 9) given rt_fixture given ut_mark ():() then calls ut_add:("eprint", "the runtime helper 'eprint', which a harness on the build host takes from its own C runtime instead", "*")
 
 // Refused: ut_self_at's own marking branch needs (import rtc)[0]==1 (only
 // rt_fixture, mid/names/exports/extern/note.id, gives that) at the same time
@@ -36,8 +36,8 @@ ut_self_at(int i) {
     ut_add(s1_of_v, "the runtime helper '" + s1_of_v + "', which a harness on the build host takes from its own C runtime instead", "*");
   }
 } return void;
-given resv_scan_fixture given rt_fixture given ut_mark (0):() then calls ut_add:("eprint", "the runtime helper 'eprint', which a harness on the build host takes from its own C runtime instead", "*")
-given resv_scan_fixture given rt_fixture (1):() then calls ut_add:[0]
+given dup_prog_fixture("eprint", "plain_name", 3, 9) given rt_fixture given ut_mark (0):() then calls ut_add:("eprint", "the runtime helper 'eprint', which a harness on the build host takes from its own C runtime instead", "*")
+given dup_prog_fixture("eprint", "plain_name", 3, 9) given rt_fixture (1):() then calls ut_add:[0]
 
 // Refused: same root cause as ut_note (../why/note.id) -- ut_named calls
 // ut_why(name), which traps on a negative utvia index unless `name` is

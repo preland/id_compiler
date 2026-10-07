@@ -13,9 +13,3 @@ is_unknown_fn(string name) {
 given env_init ("nope"):(1)
 given env_init ("push"):(0)
 
-report_call_var(string name, string owner, int ln) {
-  string callvar_where = diag_fn_loc(owner, ln);
-  diag("E0306", callvar_where, "'" + name + "' is a variable, not a function", name, "a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called", "call a function by its own name, or drop the parentheses if you meant to read the variable");
-} return void;
-given regrow_d ("z", "f", 10):() then prints:("<stdin>:10: error: 'z' is a variable, not a function [E0306]\n  at: z\n  why: a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called\n  help: call a function by its own name, or drop the parentheses if you meant to read the variable\n") then (import chkfail)[0]:(1)
-given regrow_d ("y", "g", 20):() then prints:("<stdin>:20: error: 'y' is a variable, not a function [E0306]\n  at: y\n  why: a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called\n  help: call a function by its own name, or drop the parentheses if you meant to read the variable\n") then (import chkfail)[0]:(1)

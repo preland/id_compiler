@@ -2,10 +2,10 @@
 // id 19: "r", the shared return var; id 20: "int r = 5;".
 lz_l() {
   lz_k();
-  export int lz_dv = node_var("r");
+  export int lz_dv = node_txt("var", "r");
   export int lz_decl5 = node_decl("int", "r", (import lz_r5), 0);
 } return void;
-():() then calls node_var:("r")
+():() then calls node_txt:("var", "r")
 ():() then init_units:(0)
 
 es2(int id, string ind) {

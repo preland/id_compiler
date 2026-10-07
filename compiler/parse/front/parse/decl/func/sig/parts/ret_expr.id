@@ -14,16 +14,11 @@ given decl_tokens ([0], "void"):(-1)
 
 // A grouping-paren pair recorded at (7, token 5) and at (9, token 2), for
 // grp_note's own cases and for last_ngrp/last_ngrpc's.
-mk_grp7() {
+mk_grp(int ln, int[] toks) {
   full_env();
-  grp_note(7, [5]);
+  grp_note(ln, toks);
 } return void;
-():() then last_ngrp:("ngrp 7")
-():() then last_ngrpc:("ngrpc 4")
-
-mk_grp9() {
-  full_env();
-  grp_note(9, [2]);
-} return void;
-():() then last_ngrp:("ngrp 9")
-():() then last_ngrpc:("ngrpc 1")
+(7, [5]):() then last_ngrp:("ngrp 7")
+(7, [5]):() then last_ngrpc:("ngrpc 4")
+(9, [2]):() then last_ngrp:("ngrp 9")
+(9, [2]):() then last_ngrpc:("ngrpc 1")

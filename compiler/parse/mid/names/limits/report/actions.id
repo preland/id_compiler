@@ -12,18 +12,12 @@ check_plain_else(int[] els, int depth, string fname, int ln) {
 ([], 0, "f", 5):() then calls check_block:[0]
 given env_init ([7], 2, "f", 5):() then calls check_block:([7], 3, "f", 5)
 
-report_actions(string fname, int n, int ln) {
-  string at_where = diag_fn_loc(fname, ln);
-  string at_msg = "a block in '" + fname + "' performs " + n + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free)";
-  diag("E0201", at_where, at_msg, "", "a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does", "continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function");
+// A limit diagnostic: the code, the message (built by the check, which knows the
+// count or the depth), and the why and help lines (conf.id, lim_*). One function
+// for the three, not one per limit.
+limit_diag(string fname, int ln, string lcode, string lmsg, string lwhy, string lhelp) {
+  string lim_where = diag_fn_loc(fname, ln);
+  diag(lcode, lim_where, lmsg, "", lwhy, lhelp);
 } return void;
-given edge_fixture ("fx_target", 4, 4):() then prints:("fixture.id:4: error: a block in 'fx_target' performs 4 actions; the limit is 3 (each statement, if, else, and while is one action; return is free) [E0201]\n  why: a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does\n  help: continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function\n")
-given edge_fixture ("nosuchfn", 5, 9):() then prints:("<stdin>:9: error: a block in 'nosuchfn' performs 5 actions; the limit is 3 (each statement, if, else, and while is one action; return is free) [E0201]\n  why: a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does\n  help: continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function\n")
-
-report_deep(string fname, int depth, int ln) {
-  string deep_where = diag_fn_loc(fname, ln);
-  string deep_msg = "code in '" + fname + "' is nested too deeply (" + depth + " levels); the maximum is 2";
-  diag("E0202", deep_where, deep_msg, "", "three open conditions or loops at once is more than a reader can hold in mind, so the language caps nesting at two levels", "move the innermost block into its own function and call it from here; the new function gets its own two levels and its own test cases");
-} return void;
-given edge_fixture ("fx_target", 3, 4):() then prints:("fixture.id:4: error: code in 'fx_target' is nested too deeply (3 levels); the maximum is 2 [E0202]\n  why: three open conditions or loops at once is more than a reader can hold in mind, so the language caps nesting at two levels\n  help: move the innermost block into its own function and call it from here; the new function gets its own two levels and its own test cases\n")
-given edge_fixture ("nosuchfn", 4, 9):() then prints:("<stdin>:9: error: code in 'nosuchfn' is nested too deeply (4 levels); the maximum is 2 [E0202]\n  why: three open conditions or loops at once is more than a reader can hold in mind, so the language caps nesting at two levels\n  help: move the innermost block into its own function and call it from here; the new function gets its own two levels and its own test cases\n")
+given edge_fixture ("fx_target", 4, "E0201", "m", "w", "h"):() then prints:("fixture.id:4: error: m [E0201]\n  why: w\n  help: h\n")
+given edge_fixture ("nosuchfn", 9, "E0204", "msg", "why", "help"):() then prints:("<stdin>:9: error: msg [E0204]\n  why: why\n  help: help\n")

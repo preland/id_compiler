@@ -34,8 +34,8 @@ given fix_gcl_fill_fixture ():() then (import chkfail)[0]:(0)
 // to size fixd_gcl against.
 fix_gcl_nodes() {
   env_init();
-  int e1 = node_int("1", 1, 0);
-  int e2 = node_int("2", 2, 0);
+  int e1 = node_txt2("int", "1", 1, 0);
+  int e2 = node_txt2("int", "2", 2, 0);
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)

@@ -4,7 +4,7 @@
 
 lx_hcl(int lg_e, int lg_k) {
   if(lg_k >= 2 && lg_k <= 4) {
-    lp_nneg(lg_e);
+    lp_rel(lg_e, "k:0", ">=");
   }
 } return void;
 given lpq_cs(0) ((import lpq_vc), 2):() then (import lpcond)[0]:("v:lsc k:0 >=")

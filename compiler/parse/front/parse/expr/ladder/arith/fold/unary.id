@@ -18,11 +18,3 @@ fold_unary(int[] pos) {
 given atom_tokens ([24]):(1)
 given atom_tokens ([27]):(1)
 
-is_unop(string s) {
-  int ok = 0;
-  if(s == "-" || s == "!" || s == "~") {
-    ok = 1;
-  }
-} return int ok;
-("!"):(1)
-("+"):(0)

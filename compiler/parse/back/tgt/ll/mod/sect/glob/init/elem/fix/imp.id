@@ -4,8 +4,8 @@
 
 llim_setup() {
   lc_dce_setup();
-  export int llim_e = node_import("b");
-  export int llim_a = node_import("a");
+  export int llim_e = node_txt("import", "b");
+  export int llim_a = node_txt("import", "a");
 } return void;
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

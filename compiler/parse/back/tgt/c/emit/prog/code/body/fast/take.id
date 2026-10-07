@@ -18,7 +18,7 @@ given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then len((import lpset)
 
 lp_len(int lq_id, int lq_jn, int lq_k) {
   int lq_nn = (import lpn)[find_str((import lpj), (import ns1)[lq_jn])];
-  lp_nonnull((import ni1)[lq_id]);
+  lp_rel((import ni1)[lq_id], "null", "!=");
   lp_nul(lq_nn);
 } chain (int lq_id, int lq_jn, int lq_k) {
   string[] lq_tk = [];
@@ -32,7 +32,7 @@ given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then (import lpcond)[1]
 given lpf_cs(1) ((import lpf_rb), (import lpf_jb), 2):() then (import lpcond)[1]:("v:lbv len wide v:lbv len wide k:2 -:2 <=")
 
 lp_low(int lq_id, int lq_jn) {
-  lp_nneg(lq_jn);
+  lp_rel(lq_jn, "k:0", ">=");
   if((import nkind)[lq_id] == "iassign") {
     lp_capok((import ni1)[lq_id]);
   }

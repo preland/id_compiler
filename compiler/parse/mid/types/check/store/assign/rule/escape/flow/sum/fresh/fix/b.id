@@ -4,19 +4,19 @@
 esc_ff_e() {
   export int eff_cmk = node_call("ff_make", [(import eff_vn)]);
   export int eff_dy = node_decl("int[]", "ys", (import eff_cmk), 0);
-  export int eff_cl = node_call("len", [node_var("ys")]);
+  export int eff_cl = node_call("len", [node_txt("var", "ys")]);
 } chain () {
   export int eff_dt = node_decl("int", "t", (import eff_cl), 0);
-  export int eff_use = node_func("ff_use", "int", (import eff_np), [(import eff_dy), (import eff_dt)], node_var("t"));
+  export int eff_use = node_func("ff_use", "int", (import eff_np), [(import eff_dy), (import eff_dt)], node_txt("var", "t"));
   export int[] eff_qp = [node_param("param", "int[]", "q")];
 } chain () {
-  export int eff_cql = node_call("len", [node_var("q")]);
+  export int eff_cql = node_call("len", [node_txt("var", "q")]);
   export int eff_dl = node_decl("int", "l", (import eff_cql), 0);
-  export int eff_len = node_func("ff_len", "int", (import eff_qp), [(import eff_dl)], node_var("l"));
+  export int eff_len = node_func("ff_len", "int", (import eff_qp), [(import eff_dl)], node_txt("var", "l"));
 } chain () {
   export int eff_ctp = node_call("ff_len", [(import eff_cmk)]);
   export int eff_dtp = node_decl("int", "t", (import eff_ctp), 0);
-  export int eff_tmp = node_func("ff_tmp", "int", (import eff_np), [(import eff_dtp)], node_var("t"));
+  export int eff_tmp = node_func("ff_tmp", "int", (import eff_np), [(import eff_dtp)], node_txt("var", "t"));
 } chain () {
   export int eff_exs = node_exprstmt((import eff_cmk));
   export int eff_exl = node_exprstmt((import eff_cl));
@@ -29,13 +29,13 @@ esc_ff_f() {
   export int eff_rtl = newnode("ret", node_arr((import ef_none)), 0, "", "", (import ef_none), (import ef_none));
   export int eff_clp = node_call("len", [(import eff_vp)]);
 } chain () {
-  export int eff_cp3 = node_bin("<", (import eff_clp), node_int("3", 3, 0));
+  export int eff_cp3 = node_txt2("bin", "<", (import eff_clp), node_txt2("int", "3", 3, 0));
   export int eff_ife = node_if((import eff_cp3), [(import eff_rtp)], (import ef_none), 0);
   export int eff_ifl = node_if((import eff_cp3), [(import eff_rtl)], (import ef_none), 0);
 } chain () {
   export int eff_dz = node_decl("int[]", "z", node_arr((import ef_none)), 0);
-  export int eff_early = node_func("ff_early", "int[]", (import eff_pp), [(import eff_ife), (import eff_dz)], node_var("z"));
-  export int eff_elit = node_func("ff_elit", "int[]", (import eff_pp), [(import eff_ifl), (import eff_dz)], node_var("z"));
+  export int eff_early = node_func("ff_early", "int[]", (import eff_pp), [(import eff_ife), (import eff_dz)], node_txt("var", "z"));
+  export int eff_elit = node_func("ff_elit", "int[]", (import eff_pp), [(import eff_ifl), (import eff_dz)], node_txt("var", "z"));
 } return void;
 given esc_ffix ():() then (import chkfail)[0]:(0)
 given esc_ffix ():() then init_units:(0)
@@ -50,7 +50,7 @@ esc_ff_g() {
   export int eff_sown = node_func("ff_sown", "int", (import efs_np), [(import eff_dcs)], (import efs_vn));
 } chain () {
   export int[] eff_sq = [node_param("param", "string", "q")];
-  export int eff_slen = node_func("ff_slen", "int", (import eff_sq), [(import eff_dl)], node_var("l"));
+  export int eff_slen = node_func("ff_slen", "int", (import eff_sq), [(import eff_dl)], node_txt("var", "l"));
   export int eff_csc = node_call("ff_slen", [(import eff_csr)]);
 } return void;
 given esc_ffix ():() then (import chkfail)[0]:(0)

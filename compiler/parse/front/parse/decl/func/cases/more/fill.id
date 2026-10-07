@@ -26,7 +26,7 @@ given tup2_fix ([0], []):([5], [0, 1])
 fill_tuple(int[] pos, int[] items, int open_ln) {
   while(cur_text(pos) != ")" && cur_text(pos) != ":" && cur_kind(pos) != "eof") {
     take_item(pos, items);
-    skip_comma(pos);
+    skip_text(pos, ",");
   }
   close_bracket(pos, ")", open_ln);
 } return void;

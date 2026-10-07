@@ -13,7 +13,7 @@ case_list(int[] pos) {
   int[] items = [];
   while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
     take_item(pos, items);
-    skip_comma(pos);
+    skip_text(pos, ",");
   }
 } chain (int[] pos) {
   expect_text(pos, "]");

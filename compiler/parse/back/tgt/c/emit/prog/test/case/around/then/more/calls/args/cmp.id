@@ -28,7 +28,7 @@ emit_calls_args_emit(int ci, int ti, string nm, string rowcond, string rowshow, 
 calls_show_step(string nm, int ti, int[] params, string out, int i) {
   string pt = (import ns1)[(params[i])];
   string code = "idtc_rc_" + nm + "_buf[idtc_j" + ti + "]." + (import ns2)[(params[i])];
-  string so = out + show_sep(i) + tc_show(code, pt) + " ";
+  string so = out + sep_at("fputs(\", \", stderr); ", i) + tc_show(code, pt) + " ";
 } return string so;
 given calls_items_fixture ("f", 0, (import fixture_params), "", 0):("fprintf(stderr, \"%d\", idtc_rc_f_buf[idtc_j0].x); ")
 given calls_items_fixture ("g", 2, (import fixture_params), "fputs(\"g(\", stderr); ", 0):("fputs(\"g(\", stderr); fprintf(stderr, \"%d\", idtc_rc_g_buf[idtc_j2].x); ")

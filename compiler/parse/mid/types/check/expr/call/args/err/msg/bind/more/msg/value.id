@@ -19,7 +19,7 @@ given bind_fixture ((import bind_str), 0, "int", (import bind_big)):("'bind' val
 
 bind_cap_msg(string who, string pt) {
   string msg = "";
-  if(ty_is_struct(pt) == 1) {
+  if(ty_kind_is(pt, "struct") == 1) {
     msg = who + " cannot be captured: it is a " + pt + ", a struct, which is a reference the closure would share with its owner; capture the fields it needs as separate values";
   } else if(bind_nested(pt) == 1) {
     msg = who + " cannot be captured: it is a " + pt + ", a list whose elements are themselves lists or structs, so a copy would still share them; capture a list of ints, words, floats or strings (one row, or the rows flattened into one list)";
@@ -31,7 +31,7 @@ given bind_fixture ("w", "int[]"):("")
 bind_nested(string pt) {
   string et = elem_type(pt);
   int ok = 0;
-  if(ty_is_list(pt) == 1 && (ty_is_list(et) == 1 || ty_is_struct(et) == 1)) {
+  if(ty_is_list(pt) == 1 && (ty_is_list(et) == 1 || ty_kind_is(et, "struct") == 1)) {
     ok = 1;
   }
 } return int ok;

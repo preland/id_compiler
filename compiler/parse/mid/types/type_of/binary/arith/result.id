@@ -5,23 +5,12 @@
 tb2(int id) {
   string t = "int";
   string s1_of_v = (import ns1)[id];
-  if(is_arith(s1_of_v)) {
+  if(str_in((import arithops), s1_of_v)) {
     t = tb2_arith(id);
   }
 } return string t;
 given composite_fixture ((import bin_plus)):("int")
 given composite_fixture ((import bin_and)):("int")
-
-// The operators whose result type follows their operands. `&& ||` are not
-// here: they are predicates, and their result is always int.
-is_arith(string s) {
-  int ok = 0;
-  if(s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "&" || s == "|" || s == "^" || s == "<<" || s == ">>") {
-    ok = 1;
-  }
-} return int ok;
-("+"):(1)
-("&&"):(0)
 
 // Widening order is int < word < float, so mixing an index with an address
 // gives an address rather than silently truncating it to 32 bits. The order

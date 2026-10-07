@@ -3,7 +3,7 @@
 
 ix_hint(string sd_bt) {
   string sd_h = "";
-  if(ty_is_struct(sd_bt) == 1) {
+  if(ty_kind_is(sd_bt, "struct") == 1) {
     sd_h = "; a struct's fields are read by name, as in p." + sd_cell((import sdfname), sd_bt, 0) + " (its fields are " + sd_fields_text(sd_bt) + ")";
   }
 } return string sd_h;

@@ -28,20 +28,3 @@ emit_count(string ind) {
 given harn_init (" "):() then prints:("")
 given entry_fixture_harn (" "):() then prints:(" id_ctr_time++;\n")
 
-// The harness also says, before anything else, that a case's eprint writes to
-// stdout by default: stderr is the channel its report comes back through
-// (decl/eprint.id). IDTC_EPRINT_TO is a variable, not a bare `stdout`, so an
-// `eprints` clause can swap it for the call under test only
-// (this prelude declares idtc_eprint_target, ahead of the runtime whose
-// id_err_write writes to it; case/around/then/more/capture/ swaps it).
-emit_count_prelude() {
-  emit_line("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target ? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic FILE* idtc_eprint_target = NULL;\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\n#define ID_MEM_CHARGE(n) (id_ctr_mem += (long long)(n))\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef strlen\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_concat idtc_rt_concat\n#define id_concat_f idtc_rt_concat_f");
-} return void;
-():() then prints:("/* test harness (idc) -- the runtime below is counted */\n#define IDTC_EPRINT_TO (idtc_eprint_target ? idtc_eprint_target : stdout)\n#define _POSIX_C_SOURCE 200809L\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <stdarg.h>\n#include <stdint.h>\n#include <limits.h>\n#include <termios.h>\n#include <unistd.h>\n#include <time.h>\n#include <errno.h>\n#include <math.h>\n#include <signal.h>\n#include <sys/types.h>\n#include <sys/wait.h>\n#include <sys/resource.h>\nstatic FILE* idtc_eprint_target = NULL;\nstatic long long id_ctr_time = 0;\nstatic long long id_ctr_mem = 0;\n#define ID_MEM_CHARGE(n) (id_ctr_mem += (long long)(n))\nstatic size_t idtc_strlen(const char* s) { size_t n = strlen(s); id_ctr_time += (long long)n; return n; }\n#undef strlen\n#define strlen(s) idtc_strlen(s)\n#define id_len idtc_rt_len\n#define id_concat idtc_rt_concat\n#define id_concat_f idtc_rt_concat_f\n")
-given env_init ():() then (import chkfail)[0]:(0)
-
-emit_count_postlude() {
-  emit_line("#undef id_len\n#undef id_concat\n#undef id_concat_f\nstatic int id_len(const char* s) { id_ctr_time += (long long)id_slen(s); return (int)id_slen(s); }\nstatic char* id_concat(const char* a, const char* b) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat(a, b);\n}\nstatic char* id_concat_f(char* a, char* b, int m) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat_f(a, b, m);\n}\n#undef ID_MEM_CHARGE\n#undef strlen");
-} return void;
-():() then prints:("#undef id_len\n#undef id_concat\n#undef id_concat_f\nstatic int id_len(const char* s) { id_ctr_time += (long long)id_slen(s); return (int)id_slen(s); }\nstatic char* id_concat(const char* a, const char* b) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat(a, b);\n}\nstatic char* id_concat_f(char* a, char* b, int m) {\n    id_ctr_time += (long long)(id_slen(a) + id_slen(b));\n    return idtc_rt_concat_f(a, b, m);\n}\n#undef ID_MEM_CHARGE\n#undef strlen\n")
-given env_init ():() then (import chkfail)[0]:(0)

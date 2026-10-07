@@ -16,7 +16,7 @@ given decl_tokens ([0]):() then calls parse_decl_top:[1]
 parse_asm(int[] pos) {
   advance(pos);
   string cur_text_v = cur_text(pos);
-  string unquote_v = unquote(cur_text_v);
+  string unquote_v = str_slice(cur_text_v, 1, len(cur_text_v) - 2);
 } chain (int[] pos) {
   push((import aftriple), unquote_v);
   advance(pos);
@@ -29,7 +29,7 @@ parse_asm(int[] pos) {
   int ret_i = asm_sig_tail(pos, parse_params_v);
 } return int ret_i;
 given asm_decl_fixture ([0]):(0) then afname_last:("afname foo") then afretn_last:("r")
-given asm_decl_fixture2 ([0]):(0) then afname_last:("afname bar") then afretn_last:("s")
+given toks_env(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"]) ([0]):(0) then afname_last:("afname bar") then afretn_last:("s")
 
 // A parsed function's token span and node, beside `prog` as parsed (the
 // columns are described with the case columns, func/cases/more/lit/cons/

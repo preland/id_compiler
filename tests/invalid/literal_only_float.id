@@ -1,0 +1,4 @@
+// EXPECT: only in the values of its literals
+// The same for a float literal (E0407).
+half(float x) { float r = x * 0.5; } return float r;
+third(float y) { float q = y * 0.25; } return float q;

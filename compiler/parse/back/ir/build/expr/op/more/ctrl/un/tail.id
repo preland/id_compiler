@@ -2,7 +2,7 @@
 // converted operand it applies to.
 lw_un2_op(int node, string t) {
   string s1_of_v = (import ns1)[node];
-  string lw_unop_v = lw_unop(s1_of_v);
+  string lw_unop_v = str_pick(s1_of_v, "-", "neg", "not");
   int ret_i = lw_un2_apply(node, t, lw_unop_v);
 } return int ret_i;
 given un_fixture ((import neg_node), "int"):(4)

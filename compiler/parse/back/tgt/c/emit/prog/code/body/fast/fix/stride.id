@@ -4,11 +4,11 @@
 
 lpq_ls() {
   lpf_more();
-  export int lpq_ns = node_var("lsn");
+  export int lpq_ns = node_txt("var", "lsn");
   export int lpq_ks = lpf_lt("lsj", lpq_ns);
 } chain () {
-  export int lpq_ms = lpq_mul("lsj", 3);
-  export int lpq_us = node_bin("+", lpq_ms, node_var("lsc"));
+  export int lpq_ms = lpf_term("*", "lsj", 3);
+  export int lpq_us = node_txt2("bin", "+", lpq_ms, node_txt("var", "lsc"));
   export int lpq_xs = lpf_ix("lsv", lpq_us);
 } chain () {
   export int lpq_as = lpf_acc("lss", lpq_xs);
@@ -27,12 +27,12 @@ lpq_ls() {
 
 lpq_lv() {
   lpq_ls();
-  export int lpq_nv = node_var("lvn");
+  export int lpq_nv = node_txt("var", "lvn");
   export int lpq_kv = lpf_lt("lvj", lpq_nv);
 } chain () {
-  export int lpq_mv = lpq_mul("lvj", 7);
+  export int lpq_mv = lpf_term("*", "lvj", 7);
   export int lpq_dv = node_decl("int", "lvq", lpq_mv, 0);
-  export int lpq_uv = lpf_off("lvq", 3);
+  export int lpq_uv = lpf_term("+", "lvq", 3);
 } chain () {
   export int lpq_xv = lpf_ix("lvv", lpq_uv);
   export int lpq_av = lpf_acc("lvs", lpq_xv);
@@ -43,7 +43,7 @@ lpq_lv() {
   export int lpq_hiv = lpq_wv - 1;
 } chain () {
   export int lpq_qv = (import ni1)[lpq_uv];
-  export int lpq_pv = lpq_mul("lvq", 3);
+  export int lpq_pv = lpf_term("*", "lvq", 3);
 } return void;
 ():() then calls lpq_ls:[1]
 ():() then init_units:(0)

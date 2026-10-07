@@ -7,8 +7,8 @@ lb_seed(string kind, string src) {
     i = i + 1;
   }
 } return void;
-given lb_tables ("k", "a b c"):() then tf_k:(2)
-given lb_tables ("k", "c d"):() then tf_k:(0)
+given tf_key("k:c") given lb_tables ("k", "a b c"):() then tf_look:(2)
+given tf_key("k:c") given lb_tables ("k", "c d"):() then tf_look:(0)
 
 // One word starting at a, put in the table; answers where the next starts.
 lb_one(string kind, string src, int a, int i) {
@@ -16,8 +16,8 @@ lb_one(string kind, string src, int a, int i) {
   ld_put(kind + ":" + ld_sub(src, a, e), i);
   int nx = e + 1;
 } return int nx;
-given lb_tables ("k", "ab c", 3, 5):(5) then tf_k:(5)
-given lb_tables ("k", "ab c", 0, 5):(3) then tf_k:(-1)
+given tf_key("k:c") given lb_tables ("k", "ab c", 3, 5):(5) then tf_look:(5)
+given tf_key("k:c") given lb_tables ("k", "ab c", 0, 5):(3) then tf_look:(-1)
 
 lb_end(string src, int e) {
   while (charat(src, e) != 32 && charat(src, e) >= 0) {

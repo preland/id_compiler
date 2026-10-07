@@ -3,7 +3,7 @@
 cat_fixture() {
   str_fixture2();
   init_rtc();
-  export int cat_l = node_bin("+", (import concat_node), (import str_node));
+  export int cat_l = node_txt2("bin", "+", (import concat_node), (import str_node));
 } return void;
 ():() then calls str_fixture2:[1]
 ():() then init_units:(0)

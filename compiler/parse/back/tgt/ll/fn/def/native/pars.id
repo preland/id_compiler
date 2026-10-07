@@ -7,7 +7,7 @@ ll_native_pars(int[] ps) {
   int i = 0;
   while(i < len(ps)) {
     string s1_of_v = (import ns1)[(ps[i])];
-    out = out + ll_sep(i) + ll_ty(s1_of_v);
+    out = out + sep_at(", ", i) + ll_ty(s1_of_v);
     i = i + 1;
   }
 } return string out;

@@ -17,7 +17,7 @@ ty_unbody(string[] ty_t) {
   int ty_i = 0;
 } chain (string[] ty_t) {
   while (ty_i < len(ty_t)) {
-    ty_d = ty_d + sm_delta(ty_t[ty_i]);
+    ty_d = ty_d + sm_delta(ty_t[ty_i], "{", "}");
     if (ty_keep(ty_t[ty_i], ty_d) == 1) {
       push(ty_o, ty_t[ty_i]);
     }

@@ -17,7 +17,7 @@ unit_mark(int id) {
   }
 } return void;
 given unit_t_two ((import unit_t_fb)):() then prints:("/* idc unit: b.id */\n")
-given unit_t_off ((import unit_t_fb)):() then prints:("")
+given unit_t_mark(0, 0) ((import unit_t_fb)):() then prints:("")
 
 unit_mark_at(string uf) {
   if(uf != (import unitlast)[0]) {

@@ -6,10 +6,10 @@
 fix_pick_name2(int i, string t, string an) {
   string name = "";
   if(an != "" && (import fixe_cl)[i] == 3 && (import nkind)[((import fixe_n)[i])] != "call") {
-    name = fix_choose_arg(an, t);
+    name = fix_choose(an, "", t);
   } else {
     string stem = fix_stem((import fixe_n)[i]);
-    name = fix_choose(stem, t);
+    name = fix_choose(stem, "_v", t);
   }
 } return string name;
 given fix_pick_fixture_n (0, "int", ""):("lit_v")
@@ -20,10 +20,10 @@ given fix_pick_fixture_named (0, "int", "myarg"):("myarg")
 // narrows.
 fix_pick_fixture_n() {
   fix_fixture();
-  int n = node_int("0", 0, 0);
+  int n = node_txt2("int", "0", 0, 0);
   push((import fixe_n), n);
 } return void;
-():() then calls node_int:("0", 0, 0)
+():() then calls node_txt2:("int", "0", 0, 0)
 ():() then init_units:(0)
 
 // The same node, forced (fixe_cl 3): the node that has a call inside it, or

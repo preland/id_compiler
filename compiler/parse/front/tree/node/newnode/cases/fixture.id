@@ -9,16 +9,16 @@ asm_reg_fix0() {
 ():() then calls env_init:[1]
 ():() then init_units:(0)
 
-asm_reg_fix1() {
+asm_reg_fix1(string arf_ty) {
   asm_reg_fix0();
-  push((import afret), "int");
+  push((import afret), arf_ty);
 } return void;
-():() then calls asm_reg_fix0:[1]
-():() then init_units:(0)
+("int"):() then calls asm_reg_fix0:[1]
+("word"):() then init_units:(0)
 
-asm_reg_fix1b() {
-  asm_reg_fix1();
-  push((import afretn), "result");
+asm_reg_fix1b(string arf_ty, string arf_name) {
+  asm_reg_fix1(arf_ty);
+  push((import afretn), arf_name);
 } return void;
-():() then calls asm_reg_fix1:[1]
-():() then init_units:(0)
+("int", "result"):() then calls asm_reg_fix1:("int")
+("word", "r"):() then init_units:(0)

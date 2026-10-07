@@ -18,7 +18,7 @@ given bi_flush_setup ((import bi_flush_call)):("flush takes no arguments")
 
 bi_mismatch_setup() {
   call2_setup();
-  int a = node_int("1", 1, 0);
+  int a = node_txt2("int", "1", 1, 0);
   export int bi_mismatch_call = node_call("push", [a]);
 } return void;
 ():() then (import chkfail)[0]:(0)

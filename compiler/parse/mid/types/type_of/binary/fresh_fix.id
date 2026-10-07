@@ -18,9 +18,9 @@ given composite_fixture ():() then (import chkfail)[0]:(0)
 given composite_fixture ():() then init_units:(0)
 
 fresh_bins() {
-  export int fr_n = node_bin("+", (import lit_str), (import lit_str));
-  export int fr_l = node_bin("+", (import bin_concat), (import lit_str));
-  export int fr_b = node_bin("+", (import bin_concat), (import bin_concat));
+  export int fr_n = node_txt2("bin", "+", (import lit_str), (import lit_str));
+  export int fr_l = node_txt2("bin", "+", (import bin_concat), (import lit_str));
+  export int fr_b = node_txt2("bin", "+", (import bin_concat), (import bin_concat));
 } return void;
 given composite_fixture ():() then (import chkfail)[0]:(0)
 given composite_fixture ():() then init_units:(0)

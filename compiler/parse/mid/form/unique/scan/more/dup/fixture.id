@@ -10,29 +10,31 @@ resv_env_setup() {
 ():() then calls env_init:[1]
 ():() then init_units:(0)
 
-// Two functions named "dupe", registered in `prog`/`pfile`/`pline` the way a
-// real duplicate declaration would be (front/parse/decl/top/decl/decl_top.id),
-// for dup_name.id's own cases and for ../../pass/check.id's check_bodies.
-// Built directly through node_func/push rather than parsed, since a program
-// with a real duplicate name is a compile error before this pass would ever
-// see it.
-dupfn_fixture() {
+// Two functions registered in `prog`/`pfile`/`pline` the way a real duplicate
+// declaration would be (front/parse/decl/top/decl/decl_top.id), for dup_name.id's
+// own cases, for ../../pass/check.id's check_bodies and for ../../reserved/
+// check.id's: two named "dupe" at a.id:1 and b.id:5 (dup_prog_fixture("dupe",
+// "dupe", 1, 5)), or "eprint" at a.id:3 and an ordinary name at b.id:9
+// (dup_prog_fixture("eprint", "plain_name", 3, 9)) for resv_err's. Built
+// directly through node_func/push rather than parsed, since a program with a
+// real duplicate name is a compile error before this pass would ever see it.
+dup_prog_fixture(string dpf_n1, string dpf_n2, int dpf_l1, int dpf_l2) {
   resv_env_setup();
   int[] none = [];
-  int dnf1 = node_func("dupe", "void", none, none, 0 - 1);
-} chain () {
+  int dnf1 = node_func(dpf_n1, "void", none, none, 0 - 1);
+} chain (string dpf_n1, string dpf_n2, int dpf_l1, int dpf_l2) {
   push((import prog), dnf1);
   push((import pfile), "a.id");
-  push((import pline), 1);
-} chain () {
-  int dnf2 = node_func("dupe", "void", none, none, 0 - 1);
+  push((import pline), dpf_l1);
+} chain (string dpf_n1, string dpf_n2, int dpf_l1, int dpf_l2) {
+  int dnf2 = node_func(dpf_n2, "void", none, none, 0 - 1);
   push((import prog), dnf2);
   push((import pfile), "b.id");
-} chain () {
-  push((import pline), 5);
+} chain (string dpf_n1, string dpf_n2, int dpf_l1, int dpf_l2) {
+  push((import pline), dpf_l2);
 } return void;
-():() then calls resv_env_setup:[1]
-():() then init_units:(0)
+("dupe", "dupe", 1, 5):() then calls resv_env_setup:[1]
+("eprint", "plain_name", 3, 9):() then init_units:(0)
 
 // A `prog` with no duplicate names, no reserved-name collisions and no
 // constant wrappers -- check_bodies' quiet path. Each function returns a

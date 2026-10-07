@@ -11,13 +11,3 @@ given esc_ty_fix ("string[]"):(1)
 given esc_ty_fix ("Tr[]"):(1)
 given esc_ty_fix ("int[][]"):(0)
 given esc_ty_fix ("string"):(0)
-
-// A list type a constructor may take over from a local: its elements are not
-// lists themselves, so one stricter proof covers all of them.
-esc_mvty(string t) {
-  int ok = is_list_ty(t) == 1 && is_list_ty(list_elem(t)) == 0;
-} return int ok;
-given esc_ty_fix ("Tr[]"):(1)
-given esc_ty_fix ("string[]"):(1)
-given esc_ty_fix ("int[][]"):(0)
-given esc_ty_fix ("Tr"):(0)

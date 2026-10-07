@@ -13,14 +13,14 @@ given fn_fixture ():() then init_units:(0)
 
 edge_fixture_caller_body() {
   export int edge_call_node = newleaf("call", 0, 0, "fx_target", "");
-  export int edge_var_node = node_var("fx_target");
+  export int edge_var_node = node_txt("var", "fx_target");
   export int[] edge_body = [(import edge_call_node), (import edge_var_node)];
 } return void;
 given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)
 
 edge_fixture_caller_node() {
-  int zero_v = node_int("0", 0, 0);
+  int zero_v = node_txt2("int", "0", 0, 0);
   int[] none = [];
   export int edge_caller_fn = node_func("edge_caller", "int", none, (import edge_body), zero_v);
 } return void;

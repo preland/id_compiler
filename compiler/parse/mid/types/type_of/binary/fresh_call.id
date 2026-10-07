@@ -4,7 +4,7 @@
 str_fresh_call(int id) {
   int ok = 0;
   if((import nkind)[id] == "call" && is_builtin((import ns1)[id]) == 1) {
-    ok = fresh_builtin((import ns1)[id]);
+    ok = str_in((import freshfns), (import ns1)[id]);
   } else {
     ok = esc_fresh_call(id);
   }
@@ -14,12 +14,3 @@ given fresh_fixture ((import fr_foo)):(0)
 given esc_ffix ((import eff_csr)):(1)
 given esc_ffix ((import eff_cl)):(0)
 
-fresh_builtin(string nm) {
-  int ok = 0;
-  if(nm == "chr" || nm == "input" || nm == "read_all" || nm == "str_of_mem" || nm == "str_sub") {
-    ok = 1;
-  }
-} return int ok;
-("chr"):(1)
-("str_sub"):(1)
-("len"):(0)

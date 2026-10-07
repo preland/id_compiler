@@ -27,8 +27,8 @@ given arith_fixture ((import div_node), 1, 2, "int", "/"):(3)
 // lw_arith3_op/lw_hcall that needs a real binary-operator node.
 arith_fixture() {
   bound_fixture();
-  export int bin_node = node_bin("+", (import ev_node), (import ev_node));
-  export int div_node = node_bin("/", (import ev_node), (import ev_node));
+  export int bin_node = node_txt2("bin", "+", (import ev_node), (import ev_node));
+  export int div_node = node_txt2("bin", "/", (import ev_node), (import ev_node));
 } return void;
 ():() then calls bound_fixture:[1]
 ():() then init_units:(0)

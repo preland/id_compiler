@@ -4,7 +4,7 @@
 
 cmp_bad(string lt, string rt, int okk) {
   int ok = 0;
-  if(ty_pair_known(lt, rt) == 1 && okk == 0 && ty_is_struct(lt) == 0 && ty_is_struct(rt) == 0) {
+  if(ty_pair_known(lt, rt) == 1 && okk == 0 && ty_kind_is(lt, "struct") == 0 && ty_kind_is(rt, "struct") == 0) {
     ok = 1;
   }
 } return int ok;

@@ -4,9 +4,11 @@
 // function is an ordinary function that does not know it was bound.
 
 fv_adapter(int fn, string name, int nd) {
-  string head = c_type((import ns2)[fn]) + " idfn_a_" + fv_key(name, nd) + "(IdFn* c" + fv_params(fn, nd) + ") { ";
+  string head = c_type((import ns2)[fn]) + " idfn_a_" + name + (import fv_sep) + nd + "(IdFn* c" + fv_params(fn, nd) + ") { ";
   string call = "id_" + name + "(" + fv_args(fn, nd) + ");";
-  string s = head + fv_ret((import ns2)[fn]) + call + " }";
+  string fv_retw = str_pick((import ns2)[fn], "void", "", "return ");
+} chain (int fn, string name, int nd) {
+  string s = head + fv_retw + call + " }";
 } return string s;
 given clo_fixture ((import fixture_fn), "fx_target", 0):("int idfn_a_fx_target__0(IdFn* c, int a0) { return id_fx_target(a0); }")
 given clo_fixture ((import fixture_fn), "fx_target", 1):("int idfn_a_fx_target__1(IdFn* c) { return id_fx_target((int)(ID_FNC(c)[0])); }")
@@ -26,7 +28,7 @@ fv_args(int fn, int nd) {
   string out = "";
   int i = 0;
   while(i < len((import nl1)[fn])) {
-    out = out + sep_arg(i) + fv_arg(fn, nd, i);
+    out = out + sep_at(", ", i) + fv_arg(fn, nd, i);
     i = i + 1;
   }
 } return string out;

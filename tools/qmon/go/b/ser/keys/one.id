@@ -10,20 +10,24 @@ key_or_pause(string[] toks, int i) {
   }
 } return int j;
 (["|", "x"], 0):(1)
-given qmb_qmp_hello_ser_empty (["ret", "x"], 0):(1) then calls send_key_tok:(["ret", "x"], 0)
+given qmb_qmp_peer("hello") (["ret", "x"], 0):(1) then calls send_key_tok:(["ret", "x"], 0)
 
 send_key_tok(string[] toks, int i) {
-  string msg = msg_sendkey(toks[i]);
+  string msg = str_wrap((import qm_key_pre), (import qm_key_post), toks[i]);
   qmp_cmd(msg);
-  int j = after_key(i);
+  int j = after_pause(i, 30);
 } return int j;
-given qmb_qmp_hello_ser_empty (["ret"], 0):(1) then calls qmp_cmd:("{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"ret\"}]}}\n")
-given qmb_qmp_hello_ser_empty (["x", "y", "a"], 2):(3) then calls qmp_cmd:("{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"a\"}]}}\n")
+given qmb_qmp_peer("hello") (["ret"], 0):(1) then calls qmp_cmd:("{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"ret\"}]}}\n")
+given qmb_qmp_peer("hello") (["x", "y", "a"], 2):(3) then calls qmp_cmd:("{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"a\"}]}}\n")
 
-after_key(int i) {
-  sleep_ms(30);
+after_pause(int i, int ms) {
+  sleep_ms(ms);
   drain_serial();
   int j = i + 1;
 } return int j;
-given qmb_qmp_hello_ser_empty (0):(1) then calls drain_serial:[1]
-given qmb_qmp_hello_ser_empty (5):(6) then calls drain_serial:[1]
+given qmb_qmp_peer("hello") (0, 30):(1) then calls drain_serial:[1]
+given qmb_qmp_peer("hello") (5, 30):(6) then calls drain_serial:[1]
+given qmb_qmp_empty_ser_empty (0, 250):(1) then calls drain_serial:[1]
+given qmb_qmp_empty_ser_empty (4, 250):(5) then calls drain_serial:[1]
+given qmb_qmp_peer("hello") (2, 30):() then calls sleep_ms:(30)
+given qmb_qmp_empty_ser_empty (2, 250):() then calls sleep_ms:(250)

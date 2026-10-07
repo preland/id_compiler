@@ -5,8 +5,8 @@
 afretn_last() {
   string s = (import afretn)[len((import afretn)) - 1];
 } return string s;
-given asm_reg_fix1b ():("result")
-given asm_reg_fix1d ():("r")
+given asm_reg_fix1b("int", "result") ():("result")
+given asm_reg_fix1b("word", "r") ():("r")
 
 // The afname reader for decl/top/core/'s parse_asm cases: the function's own
 // name, the first thing parse_asm records, and top.id/more.id are both full.
@@ -21,8 +21,8 @@ given llasm_row_fixture ():("afname portout")
 // deterministic in a fresh case process, so lit_int is 0 and lit_var is 1.
 lit_fix() {
   env_init();
-  export int lit_int = node_int("5", 5, 0);
-  export int lit_var = node_var("x");
+  export int lit_int = node_txt2("int", "5", 5, 0);
+  export int lit_var = node_txt("var", "x");
 } return void;
-():() then calls node_int:("5", 5, 0)
+():() then calls node_txt2:("int", "5", 5, 0)
 ():() then init_units:(0)

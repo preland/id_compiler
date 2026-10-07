@@ -16,7 +16,7 @@ no_param_name(int[] pos, string pt) {
     syn_err(pos, "a function type lists parameter types only: write '" + pt + "', not '" + pt + " " + nm + "'");
     advance(pos);
   }
-  skip_comma(pos);
+  skip_text(pos, ",");
 } return void;
 given decl_tokens ([3], "int"):() then prints:("<stdin>:1: error: a function type lists parameter types only: write 'int', not 'int a'\n")
 given decl_tokens ([7], "int"):() then prints:("")

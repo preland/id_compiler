@@ -15,11 +15,11 @@ sq_fixture() {
   export int sq_one = node_call("pair", [(import nz_call_foo), (import nz_int)]);
 } chain () {
   export int sq_two = node_call("pair", [(import nz_call_foo), (import sq_bar)]);
-  export int sq_and = node_bin("&&", (import nz_call_foo), (import sq_bar));
-  int sq_zero = node_int("0", 0, 0);
+  export int sq_and = node_txt2("bin", "&&", (import nz_call_foo), (import sq_bar));
+  int sq_zero = node_txt2("int", "0", 0, 0);
 } chain () {
-  export int sq_mod = node_bin("%", (import nz_int), sq_zero);
-  export int sq_div3 = node_bin("/", (import nz_int), (import nz_int2));
+  export int sq_mod = node_txt2("bin", "%", (import nz_int), sq_zero);
+  export int sq_div3 = node_txt2("bin", "/", (import nz_int), (import nz_int2));
   int sq_lst = node_arr([(import nz_int)]);
 } chain () {
   export int sq_iset = newnode("iassign", sq_lst, (import nz_call_foo), "", "", [(import sq_bar)], [(import sq_bar)]);
@@ -28,7 +28,7 @@ sq_fixture() {
 } chain () {
   init_tyc();
 } return void;
-():() then calls node_int:("0", 0, 0)
+():() then calls node_txt2:("int", "0", 0, 0)
 ():() then init_units:(0)
 
 // The same nodes, with foo(7) already bound to its temporary.

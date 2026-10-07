@@ -12,19 +12,13 @@ cases_fix() {
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 
-// `(5):(6)`, a whole case's tokens, on top of cases_fix.
-cases_full_fix() {
-  cases_fix();
-  toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]);
-} return void;
-():() then calls toks_push:(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"])
-():() then init_units:(0)
-
-// `(1):(2)`, a second whole case, for cases whose two behaviours can only
+// `(A):(B)`, a whole case's tokens, on top of cases_fix: `(5):(6)` for one, and
+// `(1):(2)` for a second whole case, for cases whose two behaviours can only
 // differ by which `given` they name.
-cases_full_fix2() {
+cases_full_fix(int cff_a, int cff_b) {
   cases_fix();
-  toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "1", ")", ":", "(", "2", ")"]);
+  toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "" + cff_a, ")", ":", "(", "" + cff_b, ")"]);
 } return void;
-():() then calls toks_push:(["op", "int", "op", "op", "op", "int", "op"], ["(", "1", ")", ":", "(", "2", ")"])
-():() then init_units:(0)
+(5, 6):() then calls toks_push:(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"])
+(1, 2):() then calls toks_push:(["op", "int", "op", "op", "op", "int", "op"], ["(", "1", ")", ":", "(", "2", ")"])
+(5, 6):() then init_units:(0)

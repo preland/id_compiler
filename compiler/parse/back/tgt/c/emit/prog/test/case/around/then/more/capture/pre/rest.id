@@ -4,24 +4,12 @@
 // (more/calls/args/ reads and advances idtc_seek).
 
 emit_capture_pre2(int ci) {
-  emit_err_pre(ci);
-  emit_calls_pre(ci);
+  int cap_err_pre = case_has_out(ci, "theneprints");
+  emit_when(cap_err_pre, (import c_cap_err_pre));
+  int cap_calls_pre = case_has_calls(ci);
+} chain (int ci) {
+  emit_when(cap_calls_pre, (import c_cap_calls_pre));
 } return void;
 given case_fixture ((import fixture_ci)):() then prints:("")
 given case_fixture (5):() then prints:("")
-
-emit_err_pre(int ci) {
-  if(case_has_out(ci, "theneprints") == 1) {
-    emit_line("    idtc_eprint_target = tmpfile();");
-  }
-} return void;
-given case_fixture ((import fixture_ci)):() then prints:("")
-given case_fixture (5):() then prints:("")
-
-emit_calls_pre(int ci) {
-  if(case_has_calls(ci) == 1) {
-    emit_line("    idtc_rec_on = 1;\n    long long idtc_seek = -1;");
-  }
-} return void;
-given case_fixture ((import fixture_ci)):() then prints:("")
-given case_fixture (5):() then prints:("")
+given eprints_post_fixture ((import fixture_ci)):() then calls emit_line:[1]

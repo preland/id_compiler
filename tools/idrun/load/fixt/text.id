@@ -13,4 +13,4 @@ tf_ld(string s) {
   tf_text(s);
 } return void;
 ("ab"):() then ld_at:(97)
-("a"):() then tf_iadd:(3)
+given tf_key("i:add") ("a"):() then tf_look:(3)

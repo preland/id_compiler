@@ -43,7 +43,7 @@ given then_imp_fixture ("int", 0, 1) ((import then_imp_node)):("int")
 traps_node_fixture() {
   print_fixture();
   int ci = (import fixture_ci);
-  int[] trap_one = [node_int("1", 1, 0)];
+  int[] trap_one = [node_txt2("int", "1", 1, 0)];
 } chain () {
   export int fixture_traps_node = newnode("thentraps", ci, 0, "", "", (import fixture_print_two), (import fixture_print_two));
   export int fixture_traps_one = newnode("thentraps", ci, 0, "", "", trap_one, trap_one);

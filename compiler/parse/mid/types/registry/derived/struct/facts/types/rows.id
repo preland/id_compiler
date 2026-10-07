@@ -14,15 +14,6 @@ init_struct_rows() {
 given env_init ():() then len((import tyname)):(5)
 given sd_pair ():() then len((import tyname)):(7)
 
-ty_is_struct(string t) {
-  int ok = 0;
-  if(ty_kind(t) == "struct") {
-    ok = 1;
-  }
-} return int ok;
-given sd_reg ("P"):(1)
-given sd_reg ("int"):(0)
-
 // The registry as a program with structs P and Q has it: the scalar rows, then
 // the struct table's, which is the order tc_all gives a real build.
 sd_reg() {

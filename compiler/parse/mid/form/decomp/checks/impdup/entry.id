@@ -32,21 +32,21 @@ lz_o() {
 imd_pair_base() {
   env_init();
   int[] imd_none = [];
-  int imd_one = node_int("1", 1, 0);
+  int imd_one = node_txt2("int", "1", 1, 0);
 } chain () {
   int imd_d1 = node_decl("int", "x", imd_one, 0);
   int imd_d2 = node_decl("int", "y", imd_one, 0);
   int[] imd_two = [imd_d1, imd_d2];
 } chain () {
-  int imd_e1 = node_import("alpha");
+  int imd_e1 = node_txt("import", "alpha");
   int imd_f1 = node_func("ima", "int", imd_none, imd_two, imd_e1);
   push((import prog), imd_f1);
 } chain () {
-  int imd_e2 = node_import("beta");
+  int imd_e2 = node_txt("import", "beta");
   int imd_f2 = node_func("imb", "int", imd_none, imd_two, imd_e2);
   push((import prog), imd_f2);
 } chain () {
   uq_fill();
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)

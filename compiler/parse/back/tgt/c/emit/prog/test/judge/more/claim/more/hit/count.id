@@ -1,14 +1,5 @@
 // Whether case ci belongs to claim c's group, and how many do.
 
-group_sep(string out) {
-  string so = ", ";
-  if(out == "") {
-    so = "";
-  }
-} return string so;
-(""):("")
-("0"):(", ")
-
 claim_count(int c) {
   int n = 0;
   int ci = 0;

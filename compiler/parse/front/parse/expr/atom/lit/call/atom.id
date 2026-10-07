@@ -5,7 +5,7 @@
 // must keep doing so, so the call's line goes in a table of its own; bin/idc
 // names it when a reached native cannot be linked.
 finish_atom(string name, int[] pos) {
-  int node = node_var(name);
+  int node = node_txt("var", name);
   if(cur_text(pos) == "(") {
     int ln = cur_ln(pos);
     node = parse_call(name, pos);
@@ -17,19 +17,9 @@ given atom_tokens ("x", [26]):(0)
 
 parse_call(string name, int[] pos) {
   int[] args = [];
-  scan_args(pos, args);
+  scan_list(pos, args, ")");
   int ret_i = node_call(name, args);
 } return int ret_i;
 given atom_tokens ("foo", [1]):(2)
 given atom_tokens ("g", [19]):(1)
 
-// consume '(' args ')', pushing each argument node id onto `args`
-scan_args(int[] pos, int[] args) {
-  int sa_ln = cur_ln(pos);
-  advance(pos);
-  fill_args(pos, args);
-} chain (int[] pos, int[] args) {
-  close_bracket(pos, ")", sa_ln);
-} return void;
-given atom_tokens ([1], []):([6], [0, 1])
-given atom_tokens ([19], []):([23], [0])

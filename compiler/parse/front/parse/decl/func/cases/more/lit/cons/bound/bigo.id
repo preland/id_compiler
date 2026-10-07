@@ -11,7 +11,7 @@ big_o(int[] pos) {
   string ret_s = bound_body(pos, bt);
 } return string ret_s;
 given bound_n_fix ([0]):("O(n)")
-given bound_1_fix ([0]):("O(1)")
+given toks_env(["ident", "op", "int", "op"], ["O", "(", "1", ")"]) ([0]):("O(1)")
 
 bound_body(int[] pos, string bt) {
   string so = bt;
@@ -21,7 +21,7 @@ bound_body(int[] pos, string bt) {
   }
 } return string so;
 given bound_n_fix ([1], "O"):("O(n)")
-given bound_1_fix ([1], "O"):("O(1)")
+given toks_env(["ident", "op", "int", "op"], ["O", "(", "1", ")"]) ([1], "O"):("O(1)")
 
 bound_inner(int[] pos, string bt) {
   advance(pos);
@@ -29,4 +29,4 @@ bound_inner(int[] pos, string bt) {
   string ret_s = bound_close(pos, bt, parts);
 } return string ret_s;
 given bound_n_fix ([1], "O"):("O(n)")
-given bound_1_fix ([1], "O"):("O(1)")
+given toks_env(["ident", "op", "int", "op"], ["O", "(", "1", ")"]) ([1], "O"):("O(1)")

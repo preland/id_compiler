@@ -1,17 +1,12 @@
 // One more row on top of the full registry, so reg_last_width has a second
 // state to compare against -- ty_row does not export anything, so this adds
-// no exporter of its own to conflict with init_ty_rows's.
-tyreg_extra() {
+// no exporter of its own to conflict with init_ty_rows's. ("bool", "int", 1, 1)
+// is the one the last-width case reads, ("byte", "int", 2, 0) a second such row,
+// so reg_width_at5 has two different values to compare.
+tyreg_extra(string tre_name, string tre_kind, int tre_width, int tre_flag) {
   init_tyreg();
-  ty_row("bool", "int", 1, 1);
+  ty_row(tre_name, tre_kind, tre_width, tre_flag);
 } return void;
-():() then len((import tyname)):(6)
-():() then reg_last_width:(1)
-
-// A second such row, so reg_width_at5 has two different values to compare.
-tyreg_extra2() {
-  init_tyreg();
-  ty_row("byte", "int", 2, 0);
-} return void;
-():() then len((import tyname)):(6)
-():() then reg_width_at5:(2)
+("bool", "int", 1, 1):() then len((import tyname)):(6)
+("bool", "int", 1, 1):() then reg_last_width:(1)
+("byte", "int", 2, 0):() then reg_width_at5:(2)

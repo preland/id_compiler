@@ -3,26 +3,28 @@
 // ab0=2 (the "/" bin node).
 arith_fix() {
   env_init();
-  int ai0 = node_int("6", 6, 0);
+  int ai0 = node_txt2("int", "6", 6, 0);
   arith_fix2(ai0);
 } return void;
-():() then calls node_int:("6", 6, 0)
+():() then calls node_txt2:("int", "6", 6, 0)
 ():() then init_units:(0)
 
 arith_fix2(int ai0) {
-  int ai1 = node_int("3", 3, 0);
+  int ai1 = node_txt2("int", "3", 3, 0);
   int[] none = [];
   int ab0 = newnode("bin", ai0, ai1, "/", "", none, none);
 } return void;
 given arith_fix (0):() then (import chkfail)[0]:(0)
 given arith_fix (0):() then init_units:(0)
 
-// ab1 = "6 << 3", for the shift-helper (rather than division-helper) path.
-// Deterministic id: ab1=3.
-arith_fix3() {
+// A one-node expression over arith_fix's ai0 (and ai1): "-6" for ("un", 0, "-"),
+// the node deterministically id 3; "6 << 3" for ("bin", 1, "<<"), for the
+// shift-helper (rather than division-helper) path, also id 3.
+arith_fix_n(string afn_kind, int afn_b, string afn_op) {
   arith_fix();
   int[] none = [];
-  int ab1 = newnode("bin", 0, 1, "<<", "", none, none);
+  int afn_node = newnode(afn_kind, 0, afn_b, afn_op, "", none, none);
 } return void;
-():() then calls arith_fix:[1]
-():() then init_units:(0)
+("un", 0, "-"):() then calls arith_fix:[1]
+("bin", 1, "<<"):() then calls arith_fix:[1]
+("bin", 1, "<<"):() then init_units:(0)

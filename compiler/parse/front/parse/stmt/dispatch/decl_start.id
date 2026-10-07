@@ -3,7 +3,7 @@
 
 parse_stmt4(int[] pos) {
   int node = 0;
-  if(is_assign(pos)) {
+  if(ident_then(pos, (import nx_eq))) {
     node = parse_assign(pos);
   } else {
     node = parse_stmt5(pos);
@@ -17,7 +17,7 @@ given stmt_tokens ([42]):(1)
 is_decl_start(int[] pos) {
   int ok = 0;
   string cur_text_v = cur_text(pos);
-  if(is_type(cur_text_v)) {
+  if(str_in((import typewords), cur_text_v)) {
     ok = 1;
   }
 } chain (int[] pos) {
@@ -30,11 +30,3 @@ given stmt_tokens ([9]):(0)
 given sd_stmt_toks ([0]):(1)
 given sd_stmt_toks ([12]):(0)
 
-is_type(string w) {
-  int ok = 0;
-  if(w == "int" || w == "float" || w == "string" || w == "void" || w == "word" || w == "export" || w == "func") {
-    ok = 1;
-  }
-} return int ok;
-("int"):(1)
-("foo"):(0)

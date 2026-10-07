@@ -6,7 +6,7 @@
 // a local one.
 
 canon_decl(int id) {
-  string out = decl_tag(id);
+  string out = ni2_pick(id, "d:", "ed:");
   string nm = decl_name(id);
   int i1_of_v = (import ni1)[id];
 } chain (int id) {

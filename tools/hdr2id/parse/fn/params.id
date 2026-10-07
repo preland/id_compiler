@@ -1,19 +1,5 @@
 // The parts of a prototype: its parameters as separate statements, and the words before its name.
 
-// How a token moves the parenthesis depth: 1 for an open one, -1 for a close one, 0 otherwise.
-fn_depth(string fn_tk) {
-  int fn_dd = 0;
-  if (fn_tk == "(") {
-    fn_dd = 1;
-  }
-  if (fn_tk == ")") {
-    fn_dd = 0 - 1;
-  }
-} return int fn_dd;
-("("):(1)
-(")"):(-1)
-("x"):(0)
-
 // The parameters between the parentheses fn_p and fn_q of fn_t, each as its tokens joined by single spaces. A list that is only void has none. A variable argument list is the parameter ...
 fn_params(string[] fn_t, int fn_p, int fn_q) {
   string[] fn_o = [];
@@ -22,7 +8,7 @@ fn_params(string[] fn_t, int fn_p, int fn_q) {
 } chain (string[] fn_t, int fn_p, int fn_q) {
   int fn_d = 0;
   while (fn_j < fn_q) {
-    fn_d = fn_d + fn_depth(fn_t[fn_j]);
+    fn_d = fn_d + sm_delta(fn_t[fn_j], "(", ")");
     if (fn_t[fn_j] == "," && fn_d == 0) {
       push(fn_o, sm_join(fn_t, fn_s, fn_j));
       fn_s = fn_j + 1;

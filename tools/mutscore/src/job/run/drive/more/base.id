@@ -45,5 +45,5 @@ ms_dr_base(string[] ms_cf, string ms_ky, int ms_ms) {
     ms_v = ms_dr_try(ms_cf, ms_ky, ms_mk, ms_ms);
   }
 } return int ms_v;
-given ms_t_tree given ms_t_wmk ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", 20000):(1)
+given ms_t_tree given ms_t_wlog("K") ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", 20000):(1)
 given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nexit 1\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "K", 20000):(0)

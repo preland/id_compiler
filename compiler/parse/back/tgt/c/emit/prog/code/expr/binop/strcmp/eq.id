@@ -2,18 +2,10 @@
 is_strcmp(int id) {
   int ok = 0;
   string s1_of_v = (import ns1)[id];
-  if(is_eqop(s1_of_v) && both_str(id)) {
+  if(str_in((import eqops), s1_of_v) && both_str(id)) {
     ok = 1;
   }
 } return int ok;
 given nz_bin_eq_fixture ((import nz_bin_eq)):(1)
 given nz_bin_add_fixture ((import nz_bin_add)):(0)
 
-is_eqop(string op) {
-  int ok = 0;
-  if(op == "==" || op == "!=" || op == "=") {
-    ok = 1;
-  }
-} return int ok;
-("=="):(1)
-("+"):(0)

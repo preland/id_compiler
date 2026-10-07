@@ -1,7 +1,7 @@
 // The first of the four shapes: whether the operator is a comparison at all.
 lw_bin_op(int node, string op) {
   int v = 0 - 1;
-  if(lw_ispred(op) == 1) {
+  if(str_in((import relops), op) == 1) {
     v = lw_cmp(node);
   } else {
     v = lb2(node);
@@ -31,7 +31,7 @@ lw_drop(int old, string nm) {
     lw_callf(freer, "", [old]);
   }
 } return void;
-given lw_fixture (7, "w"):() then calls lw_callf:("id_list_free", "", [7])
-given lw_fixture (-1, "w"):() then calls lw_callf:[0]
-given lw_fixture (0, "w"):() then calls lw_callf:("id_list_free", "", [0])
+given lw_fixture(0) (7, "w"):() then calls lw_callf:("id_list_free", "", [7])
+given lw_fixture(0) (-1, "w"):() then calls lw_callf:[0]
+given lw_fixture(0) (0, "w"):() then calls lw_callf:("id_list_free", "", [0])
 given lwd_fixture (5, "a"):() then calls lw_callf:("id_list_free_deep", "", [5])

@@ -29,7 +29,7 @@ fix_stem_fixture() {
   int e0 = node_arr(none);
 } chain () {
   int e1 = newleaf("ident", 0, 0, "len", "");
-  int e2 = node_un("-", e1);
+  int e2 = node_txt1("un", "-", e1);
 } return void;
 ():() then calls newleaf:("ident", 0, 0, "len", "")
 ():() then init_units:(0)

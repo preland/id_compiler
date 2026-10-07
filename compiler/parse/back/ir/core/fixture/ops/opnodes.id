@@ -7,22 +7,22 @@
 
 lw_fix_un() {
   lw_env_fixture();
-  int x = node_int("1", 1, 0);
-  export int fix_un_n = node_un("!", x);
+  int x = node_txt2("int", "1", 1, 0);
+  export int fix_un_n = node_txt1("un", "!", x);
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)
 
 lw_fix_index() {
   lw_env_fixture();
-  int b = node_int("1", 1, 0);
+  int b = node_txt2("int", "1", 1, 0);
   lw_fix_index_tail(b);
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)
 
 lw_fix_index_tail(int b) {
-  int i = node_int("0", 0, 0);
+  int i = node_txt2("int", "0", 0, 0);
   export int fix_index_n = node_index(b, i);
 } return void;
 given lw_env_fixture (1):() then (import chkfail)[0]:(0)

@@ -4,14 +4,14 @@
 
 bin_fix() {
   env_init();
-  int e0 = node_int("5", 5, 0);
+  int e0 = node_txt2("int", "5", 5, 0);
   bin_fix2(e0);
 } return void;
-():() then calls node_int:("5", 5, 0)
+():() then calls node_txt2:("int", "5", 5, 0)
 ():() then init_units:(0)
 
 bin_fix2(int e0) {
-  int e1 = node_var("x");
+  int e1 = node_txt("var", "x");
   int[] none = [];
   int e2 = newnode("bin", e0, e1, "+", "", none, none);
 } return void;

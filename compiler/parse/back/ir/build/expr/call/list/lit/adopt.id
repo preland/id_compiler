@@ -27,7 +27,7 @@ lw_nl_fixture() {
 ():() then init_units:(0)
 
 lw_native_list(int f, string ety) {
-  int ok = f >= 0 && is_native(f) == 1 && (ty_is_list(ety) == 1 || ty_is_struct(ety) == 1);
+  int ok = f >= 0 && is_native(f) == 1 && (ty_is_list(ety) == 1 || ty_kind_is(ety, "struct") == 1);
 } return int ok;
 given mk_two_nodes (1, "int[]"):(1)
 given mk_two_nodes (0, "int[]"):(0)

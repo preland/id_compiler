@@ -18,7 +18,7 @@ names_upto(int n) {
   string out = "";
   int j = 0;
   while(j < n) {
-    out = out + sep_arg(j) + "idtc_a" + j;
+    out = out + sep_at(", ", j) + "idtc_a" + j;
     j = j + 1;
   }
 } return string out;

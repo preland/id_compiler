@@ -24,7 +24,7 @@ calls_items_fixture() {
 
 calls_items_build() {
   export int[] fixture_calls_none = [];
-  export int[] fixture_calls_one = [node_int("1", 1, 0)];
+  export int[] fixture_calls_one = [node_txt2("int", "1", 1, 0)];
 } return void;
 given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)

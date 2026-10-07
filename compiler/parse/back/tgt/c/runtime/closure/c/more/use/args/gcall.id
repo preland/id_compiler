@@ -19,7 +19,7 @@ emit_raw_args(int id, int[] args) {
   string out = "";
   int i = 0;
   while(i < len(args)) {
-    out = out + sep_arg(i) + raw_arg(id, i, args[i]);
+    out = out + sep_at(", ", i) + raw_arg(id, i, args[i]);
     i = i + 1;
   }
 } return string out;

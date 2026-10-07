@@ -12,18 +12,22 @@ ty_num(string t) {
 given init_tyreg ("word"):(1)
 given init_tyreg ("string"):(0)
 
-// idc.py's is_integral: the same question with "float" left out, which is
+// Whether a type's kind is the given one. ty_kind_is(t, "int") is idc.py's
+// is_integral: the same question as ty_num with "float" left out, which is
 // what `& | ^ << >> ! ~` and the flat store accept. `word` answers yes
 // because its row says its kind is "int" -- adding a second integer type
-// needed no edit here, which is the point of the registry.
-ty_int(string t) {
+// needed no edit here, which is the point of the registry. ty_kind_is(t,
+// "struct") asks whether a name is a struct.
+ty_kind_is(string t, string kind) {
   int ok = 0;
-  if(ty_kind(t) == "int") {
+  if(ty_kind(t) == kind) {
     ok = 1;
   }
 } return int ok;
-given init_tyreg ("word"):(1)
-given init_tyreg ("float"):(0)
+given init_tyreg ("word", "int"):(1)
+given init_tyreg ("float", "int"):(0)
+given sd_reg ("P", "struct"):(1)
+given sd_reg ("int", "struct"):(0)
 
 // idc.py's compatible(): the same type, or two numbers (which widen into each
 // other). Note the asymmetry it does NOT have -- a narrower value is accepted

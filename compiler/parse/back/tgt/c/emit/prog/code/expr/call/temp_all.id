@@ -32,7 +32,7 @@ given esc_ffix ((import eff_cmk), 0, 1):("n")
 tmp_one2(int id, int i, int tx_kind) {
   string tx_two = tmp_free(id, i);
   if(tx_kind == 1) {
-    tx_two = sep_arg(i) + tmp_arg(id, i);
+    tx_two = sep_at(", ", i) + tmp_arg(id, i);
   }
 } return string tx_two;
 given esc_ffix ((import eff_ctp), 0, 1):("idft0")

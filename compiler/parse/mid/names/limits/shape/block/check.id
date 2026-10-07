@@ -12,12 +12,12 @@
 // the owner is more useful anyway: it names the construct that is too long.
 check_block(int[] body, int depth, string fname, int ln) {
   if(depth > 2) {
-    report_deep(fname, depth, ln);
+    limit_diag(fname, ln, "E0202", "code in '" + fname + "' is nested too deeply (" + depth + " levels); the maximum is 2", (import lim_deep_why), (import lim_deep_help));
   } else {
     check_fits(body, depth, fname, ln);
   }
 } return void;
-given env_init ([], 3, "f", 5):() then calls report_deep:("f", 3, 5)
+given env_init ([], 3, "f", 5):() then calls limit_diag:[1]
 ([], 2, "f", 5):() then calls check_fits:([], 2, "f", 5)
 
 check_fits(int[] body, int depth, string fname, int ln) {
@@ -38,8 +38,8 @@ given edge_fixture ((import edge_body), 0, "f", 5):() then calls check_count:((i
 check_count(int[] body, int depth, string fname, int ln) {
   int n = count_actions(body);
   if(n > 3 && depth > 0) {
-    report_actions(fname, n, ln);
+    limit_diag(fname, ln, "E0201", "a block in '" + fname + "' performs " + n + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free)", (import lim_actions_why), (import lim_actions_help));
   }
 } return void;
-given elif_fixture ((import elif_body), 0, "f", 5):() then calls report_actions:[0]
-given elif_fixture ((import elif_body), 1, "f", 5):() then calls report_actions:[0]
+given elif_fixture ((import elif_body), 0, "f", 5):() then calls limit_diag:[0]
+given elif_fixture ((import elif_body), 1, "f", 5):() then calls limit_diag:[0]

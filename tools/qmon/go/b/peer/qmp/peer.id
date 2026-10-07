@@ -28,12 +28,6 @@ qmb_qmp_peer(string qmp_line) {
 ("hello"):() then read_one_byte:(104)
 ("bye"):() then read_one_byte:(98)
 
-qmb_qmp_hello_ser_empty() {
-  qmb_qmp_peer("hello");
-} return void;
-():() then read_one_byte:(104)
-():() then qmp_read_line:("hello")
-
 qmb_qmp_empty_ser_empty() {
   mk_paths();
   int p1 = proc_spawn("sh\n-c\n: | socat -u - UNIX-LISTEN:" + (import qm_qmp_path) + ",unlink-early,accept-timeout=30");

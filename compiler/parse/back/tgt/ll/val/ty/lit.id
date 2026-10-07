@@ -21,7 +21,7 @@ ll_args(int id) {
   int i = 0;
   while(i < len(((import ilist)[id]))) {
     int[] ir_l_v = (import ilist)[id];
-    s = s + ll_sep(i) + ll_op(ir_l_v[i]);
+    s = s + sep_at(", ", i) + ll_op(ir_l_v[i]);
     i = i + 1;
   }
 } return string s;

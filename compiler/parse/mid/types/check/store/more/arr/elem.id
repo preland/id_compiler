@@ -3,7 +3,7 @@
 // element type in the same way.
 idxquiet() {
   call2_setup();
-  int v = node_var("q");
+  int v = node_txt("var", "q");
   export int idx_node3 = node_index(v, v);
 } return void;
 ():() then (import chkfail)[0]:(0)

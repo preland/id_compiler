@@ -17,7 +17,7 @@
 pure_fix_prog() {
   env_init();
   int[] pfx_none = [];
-  export int pfx_one = node_int("1", 1, 0);
+  export int pfx_one = node_txt2("int", "1", 1, 0);
 } chain () {
   export int pfx_h = node_func("pfh", "int", pfx_none, pfx_none, (import pfx_one));
   export int pfx_g = node_func("pfg", "int", pfx_none, pfx_none, (import pfx_one));
@@ -29,11 +29,11 @@ pure_fix_prog() {
 } chain () {
   export int pfx_pv = node_param("param", "func(int) return int", "pv");
   export int pfx_uv = node_param("param", "func(int) return int", "uv");
-  export int pfx_vh = node_var("pfh");
+  export int pfx_vh = node_txt("var", "pfh");
 } chain () {
-  export int pfx_vg = node_var("pfg");
-  export int pfx_vpv = node_var("pv");
-  export int pfx_vuv = node_var("uv");
+  export int pfx_vg = node_txt("var", "pfg");
+  export int pfx_vpv = node_txt("var", "pv");
+  export int pfx_vuv = node_txt("var", "uv");
 } chain () {
   int[] pfx_a1 = [(import pfx_one)];
   export int pfx_cio = node_call("print", pfx_a1);
@@ -61,9 +61,9 @@ pure_fix_prog() {
 } chain () {
   export int pfx_mi = node_call("pfm", pfx_a7);
   export int pfx_dcl = node_decl("int", "pfgx", (import pfx_one), 1);
-  export int pfx_imp = node_import("pfgx");
+  export int pfx_imp = node_txt("import", "pfgx");
 } chain () {
-  export int pfx_impk = node_import("pfk");
+  export int pfx_impk = node_txt("import", "pfk");
   export int pfx_k = node_decl("int", "pfk", (import pfx_one), 0);
   int[] pfx_ps = [(import pfx_pv), (import pfx_uv)];
 } chain () {

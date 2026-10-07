@@ -1,15 +1,3 @@
-// The flat-store writes. They return nothing, unlike every other systems
-// builtin, so they get their own membership test.
-
-is_pokefn(string name) {
-  int ok = 0;
-  if(name == "poke8" || name == "poke16" || name == "poke32" || name == "poke64") {
-    ok = 1;
-  }
-} return int ok;
-("poke32"):(1)
-("peek32"):(0)
-
 // A call's type once the name has said what it can: pop's is the element type
 // of the list it was handed, and bind's is its first argument's function type
 // less the values it fixes. Neither follows from the name alone.

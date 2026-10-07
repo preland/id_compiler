@@ -13,7 +13,7 @@ given print_fixture ((import fixture_ci), 0, (import fixture_print_node)):() the
 given print_fixture (1, 0, (import fixture_print_node)):() then prints:("    if (!((strcmp(idtc_out_buf, 1) == 0))) {\n        fprintf(stderr, \"%s: test failed: %s prints = \", idtc_where[1], idtc_call[1]);\n        idtc_show_esc(idtc_out_buf);\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 
 emit_print_check(int ci, string kind, int e) {
-  string var = print_var(kind);
+  string var = str_pick(kind, "theneprints", "idtc_err_buf", "idtc_out_buf");
   string want = tc_value(e, "string");
   emit_print_cond(ci, kind, var, want, e);
 } return void;

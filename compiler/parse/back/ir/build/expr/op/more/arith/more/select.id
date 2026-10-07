@@ -14,8 +14,10 @@ given ir_rows ("/", "int"):("id_idiv")
 // does not, because IEEE gives it an answer rather than a signal.
 lw_divfn(string op, string t) {
   string h = "";
-  if(ty_int(t) == 1 && (op == "/" || op == "%")) {
-    h = "id_" + div_pfx(t) + div_sfx(op);
+  if(ty_kind_is(t, "int") == 1 && (op == "/" || op == "%")) {
+    string lw_dpfx = str_pick(t, "word", "s", "i");
+    string lw_dsfx = str_pick(op, "/", "div", "mod");
+    h = "id_" + lw_dpfx + lw_dsfx;
   }
 } return string h;
 given ir_rows ("/", "int"):("id_idiv")

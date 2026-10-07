@@ -1,0 +1,18 @@
+// The fixtures canon_expr and ce2 use (../canon.id) to check that a literal
+// loses its value, and nothing else, while the literal-insensitive table is
+// made: the unary-operator fixture and the one holding a string leaf, each
+// with cloose switched on.
+
+lv_un_fixture() {
+  un_fixture();
+  lset((import cloose), 0, 1);
+} return void;
+():() then calls un_fixture:[1]
+():() then (import cloose)[0]:(1)
+
+lv_str_fixture() {
+  lz_a();
+  lset((import cloose), 0, 1);
+} return void;
+():() then calls lz_a:[1]
+():() then (import cloose)[0]:(1)

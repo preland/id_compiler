@@ -16,9 +16,9 @@ ixn_fx() {
   int[] ixn_none = [];
   export int ixn_call = node_call("foo", ixn_none);
 } chain () {
-  export int ixn_var = node_var("zz");
-  export int ixn_imp = node_import("gx");
-  export int ixn_lit = node_int("7", 7, 0);
+  export int ixn_var = node_txt("var", "zz");
+  export int ixn_imp = node_txt("import", "gx");
+  export int ixn_lit = node_txt2("int", "7", 7, 0);
 } chain () {
   export int ixn_decl = node_decl("Point[]", "pts", (import ixn_lit), 0);
   export int ixn_param = node_param("param", "int", "arg");

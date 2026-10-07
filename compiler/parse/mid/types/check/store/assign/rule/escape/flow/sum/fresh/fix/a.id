@@ -21,16 +21,16 @@
 // Every node a case needs is exported under an `eff` name.
 
 esc_ff_a() {
-  export int eff_vn = node_var("n");
+  export int eff_vn = node_txt("var", "n");
   export int eff_arr = node_arr([(import eff_vn)]);
   export int eff_dr = node_decl("int[]", "r", (import eff_arr), 0);
 } chain () {
   export int[] eff_np = [node_param("param", "int", "n")];
   export int[] eff_pp = [node_param("param", "int[]", "p")];
-  export int eff_make = node_func("ff_make", "int[]", (import eff_np), [(import eff_dr)], node_var("r"));
+  export int eff_make = node_func("ff_make", "int[]", (import eff_np), [(import eff_dr)], node_txt("var", "r"));
 } chain () {
-  export int eff_pass = node_func("ff_pass", "int[]", (import eff_pp), (import ef_none), node_var("p"));
-  export int eff_vr = node_var("r");
+  export int eff_pass = node_func("ff_pass", "int[]", (import eff_pp), (import ef_none), node_txt("var", "p"));
+  export int eff_vr = node_txt("var", "r");
   export int eff_dx = node_decl("int[]", "ffg", (import eff_vr), 1);
 } return void;
 given esc_sfix ():() then (import chkfail)[0]:(0)
@@ -38,11 +38,11 @@ given esc_sfix ():() then init_units:(0)
 
 esc_ff_b() {
   export int eff_glob = node_func("ff_glob", "int[]", (import eff_np), [(import eff_dr), (import eff_dx)], (import eff_vr));
-  export int eff_sub = node_bin("-", (import eff_vn), node_int("1", 1, 0));
+  export int eff_sub = node_txt2("bin", "-", (import eff_vn), node_txt2("int", "1", 1, 0));
   export int eff_crec = node_call("ff_rec", [(import eff_sub)]);
 } chain () {
-  export int eff_asr = node_assign("r", (import eff_crec));
-  export int eff_cond = node_bin(">", (import eff_vn), node_int("0", 0, 0));
+  export int eff_asr = node_txt1("assign", "r", (import eff_crec));
+  export int eff_cond = node_txt2("bin", ">", (import eff_vn), node_txt2("int", "0", 0, 0));
   export int eff_if = node_if((import eff_cond), [(import eff_asr)], (import ef_none), 0);
 } chain () {
   export int eff_d0 = node_decl("int[]", "r", node_arr((import ef_none)), 0);
@@ -53,11 +53,11 @@ given esc_ffix ():() then init_units:(0)
 
 esc_ff_c() {
   export int eff_cpo = node_call("ff_pong", [(import eff_sub)]);
-  export int eff_asp = node_assign("r", (import eff_cpo));
+  export int eff_asp = node_txt1("assign", "r", (import eff_cpo));
   export int eff_ifp = node_if((import eff_cond), [(import eff_asp)], (import ef_none), 0);
 } chain () {
   export int eff_cpi = node_call("ff_ping", [(import eff_sub)]);
-  export int eff_aso = node_assign("r", (import eff_cpi));
+  export int eff_aso = node_txt1("assign", "r", (import eff_cpi));
   export int eff_ifo = node_if((import eff_cond), [(import eff_aso)], (import ef_none), 0);
 } chain () {
   export int eff_ping = node_func("ff_ping", "int[]", (import eff_np), [(import eff_d0), (import eff_ifp)], (import eff_vr));

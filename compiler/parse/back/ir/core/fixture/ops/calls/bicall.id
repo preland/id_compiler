@@ -14,7 +14,7 @@ bicall_fixture() {
 ():() then init_units:(0)
 
 bicall_fixture_reg() {
-  export int[] bicall_args = [node_int("1", 1, 0)];
+  export int[] bicall_args = [node_txt2("int", "1", 1, 0)];
   export int bicall_arg_n = bicall_args[0];
   export int bicall_node = node_call("print", bicall_args);
 } return void;

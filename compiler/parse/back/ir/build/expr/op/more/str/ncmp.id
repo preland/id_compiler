@@ -25,8 +25,8 @@ given strcmp_fs1 ():("id_strcmp")
 // for a case anywhere in str/ that needs a real string expression.
 str_fixture() {
   bound_fixture();
-  export int str_node = node_str("hi");
-  export int scmp_node = node_bin("==", (import str_node), (import str_node));
+  export int str_node = node_txt("str", "hi");
+  export int scmp_node = node_txt2("bin", "==", (import str_node), (import str_node));
 } return void;
-():() then calls node_str:("hi")
+():() then calls node_txt:("str", "hi")
 ():() then init_units:(0)

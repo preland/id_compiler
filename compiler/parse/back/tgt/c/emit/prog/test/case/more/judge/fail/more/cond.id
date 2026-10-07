@@ -14,7 +14,7 @@ cond_parts(int fn, int[] expd) {
   string out = "";
   int j = 0;
   while(j < len(expd)) {
-    out = out + and_sep(j) + cond_part(fn, j);
+    out = out + sep_at(" && ", j) + cond_part(fn, j);
     j = j + 1;
   }
 } return string out;

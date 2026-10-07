@@ -3,3 +3,7 @@
 // conf.id constant is for.
 string qm_msg_capabilities = "{\"execute\": \"qmp_capabilities\"}\n";
 string qm_msg_quit = "{\"execute\": \"quit\"}\n";
+string qm_key_pre = "{\"execute\": \"send-key\", \"arguments\": {\"keys\": [{\"type\": \"qcode\", \"data\": \"";
+string qm_key_post = "\"}]}}\n";
+string qm_dump_pre = "{\"execute\": \"screendump\", \"arguments\": {\"filename\": \"";
+string qm_dump_post = "\"}}\n";

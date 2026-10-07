@@ -1,25 +1,3 @@
-// What a `prints`/`eprints` clause compares against, and what its failure
-// message calls it: `thenprints` reads back stdout (capture/io.id), and
-// `theneprints` reads back eprint's own buffer.
-
-print_var(string kind) {
-  string pv = "idtc_out_buf";
-  if(kind == "theneprints") {
-    pv = "idtc_err_buf";
-  }
-} return string pv;
-("thenprints"):("idtc_out_buf")
-("theneprints"):("idtc_err_buf")
-
-print_label(string kind) {
-  string lab = "prints";
-  if(kind == "theneprints") {
-    lab = "eprints";
-  }
-} return string lab;
-("thenprints"):("prints")
-("theneprints"):("eprints")
-
 // The C call that measures what a `then len((import NAME).a.b)` clause names
 // (check/entry.id): a list's length and a string's are different runtime
 // calls. Filed here because the check/ lane is at the three-function limit.

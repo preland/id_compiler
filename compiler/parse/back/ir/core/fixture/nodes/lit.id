@@ -9,17 +9,17 @@
 
 lw_fix_int() {
   lw_env_fixture();
-  export int fix_int_n = node_int("5", 5, 0);
+  export int fix_int_n = node_txt2("int", "5", 5, 0);
 } return void;
-():() then calls node_int:("5", 5, 0)
+():() then calls node_txt2:("int", "5", 5, 0)
 ():() then init_units:(0)
 
 lw_fix_var() {
   lw_env_fixture();
-  export int fix_var_n = node_var("x");
+  export int fix_var_n = node_txt("var", "x");
   lw_fix_var_ty();
 } return void;
-():() then calls node_var:("x")
+():() then calls node_txt:("var", "x")
 ():() then init_units:(0)
 
 lw_fix_var_ty() {

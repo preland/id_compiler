@@ -1,31 +1,15 @@
-// Comma-separated argument list, the separator helper (shared with params),
-// and operator mapping (id's bare `=` equality becomes C `==`).
+// Comma-separated argument list. The separator is sep_at(", ", i), shared
+// with params; id's bare `=` equality becomes C `==` where an operator is
+// spelled (str_pick(op, "=", "==", op)).
 
 emit_args(int[] args) {
   string out = "";
   int i = 0;
   while(i < len(args)) {
-    out = out + sep_arg(i) + emit_expr(args[i]);
+    out = out + sep_at(", ", i) + emit_expr(args[i]);
     i = i + 1;
   }
 } return string out;
 given nz_pair_fixture ((import nz_pair)):("7, 3")
 given iassign_fixture ((import iassign_vlist)):("7")
 
-sep_arg(int i) {
-  string s = "";
-  if(i > 0) {
-    s = ", ";
-  }
-} return string s;
-(0):("")
-(1):(", ")
-
-map_op(string op) {
-  string ct = op;
-  if(op == "=") {
-    ct = "==";
-  }
-} return string ct;
-("="):("==")
-("<"):("<")

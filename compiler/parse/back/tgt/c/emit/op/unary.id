@@ -12,7 +12,7 @@ ee6(int id) {
     s = fv_ref((import ns1)[id], 0);
   }
 } return string s;
-given un_fix (3):("(-6)")
+given arith_fix_n("un", 0, "-") (3):("(-6)")
 given arith_fix (0):("6")
 given clo_bind_fixture ((import cb_name)):("ID_FNV(fx_target__0)")
 
@@ -20,15 +20,6 @@ emit_un(int id) {
   int i1_of_v = (import ni1)[id];
   string ret_s = "(" + (import ns1)[id] + emit_expr(i1_of_v) + ")";
 } return string ret_s;
-given un_fix (3):("(-6)")
+given arith_fix_n("un", 0, "-") (3):("(-6)")
 given arith_fix (2):("(/6)")
 
-// A "-6" un node, reusing arith_fix's ai0 as the operand. Deterministic id:
-// un0=3.
-un_fix() {
-  arith_fix();
-  int[] none = [];
-  int un0 = newnode("un", 0, 0, "-", "", none, none);
-} return void;
-():() then calls arith_fix:[1]
-():() then init_units:(0)

@@ -13,15 +13,15 @@ leaves_fixture() {
 ():() then init_units:(0)
 
 leaves_build() {
-  export int lit_a = node_int("2", 2, 0);
-  export int lit_b = node_int("5", 5, 0);
-  export int lit_str = node_str("hi");
+  export int lit_a = node_txt2("int", "2", 2, 0);
+  export int lit_b = node_txt2("int", "5", 5, 0);
+  export int lit_str = node_txt("str", "hi");
 } return void;
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
 leaves_build2() {
-  export int lit_word = node_int("99", 99, 1);
+  export int lit_word = node_txt2("int", "99", 99, 1);
   export int lit_float = node_float("1.5");
 } return void;
 given env_init ():() then (import chkfail)[0]:(0)

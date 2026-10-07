@@ -4,12 +4,12 @@
 
 fold_setup() {
   lc_env();
-  export int fold_e = node_int("5", 5, 0);
+  export int fold_e = node_txt2("int", "5", 5, 0);
   export int fold_a = lc_reg("int", "a", (import fold_e));
 } chain () {
-  export int fold_imp = node_import("a");
+  export int fold_imp = node_txt("import", "a");
   export int fold_dep = node_decl("int", "b", (import fold_imp), 1);
-  export int fold_unk = node_import("zz");
+  export int fold_unk = node_txt("import", "zz");
 } chain () {
   export int fold_arr = node_arr([(import fold_e)]);
   export int fold_ls = lc_reg("int[]", "ls", (import fold_arr));

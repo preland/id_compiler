@@ -20,7 +20,7 @@ unbox2(string code, string type) {
 ("x", "float"):("id_unbox_f(x)")
 
 unbox3(string code, string type) {
-  string s = unbox4(code, type);
+  string s = wrap_by_type(code, type, "word", "(IdList*)(intptr_t)(", ")", "(long long)(", ")");
   if(type == "float") {
     s = "id_unbox_f(" + code + ")";
   }

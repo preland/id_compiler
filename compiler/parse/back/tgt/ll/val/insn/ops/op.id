@@ -22,7 +22,7 @@ ll_t6(int id) {
   if((import iop)[id] == "neg") {
     string ty = (import ity)[id];
     int a = (import ia)[id];
-    s = "%v" + id + " = " + ll_negop(ty) + " " + ll_ty(ty) + " " + ll_zero(ty) + ", " + ll_val(a);
+    s = "%v" + id + " = " + ty_float_pick(ty, "fsub", "sub") + " " + ll_ty(ty) + " " + ll_zero(ty) + ", " + ll_val(a);
   } else if((import iop)[id] == "not") {
     int a2 = (import ia)[id];
     s = "%v" + id + " = xor " + ll_op(a2) + ", -1";

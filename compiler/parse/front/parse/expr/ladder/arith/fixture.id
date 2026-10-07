@@ -3,23 +3,3 @@
 // ../../../decl/func/cases/case/given/elem/more/fixture.id for toks_push's other
 // callers.
 
-chkname_fix() {
-  fn_fixture();
-  toks_push(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]);
-} return void;
-():() then calls toks_push:(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"])
-():() then init_units:(0)
-
-close_fix() {
-  env_init();
-  toks_push(["op"], [")"]);
-} return void;
-():() then calls toks_push:(["op"], [")"])
-():() then init_units:(0)
-
-given_fix() {
-  env_init();
-  toks_push(["kw", "ident"], ["given", "mysetup"]);
-} return void;
-():() then calls toks_push:(["kw", "ident"], ["given", "mysetup"])
-():() then init_units:(0)

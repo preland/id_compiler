@@ -6,7 +6,7 @@
 
 pcall_fixture_tail(int f) {
   add_func("gparam", "int", f);
-  export int pcall_arg_n = node_int("9", 9, 0);
+  export int pcall_arg_n = node_txt2("int", "9", 9, 0);
   export int pcall_node = node_call("gparam", [(import pcall_arg_n)]);
 } return void;
 given pcall_fixture (0):() then (import chkfail)[0]:(0)

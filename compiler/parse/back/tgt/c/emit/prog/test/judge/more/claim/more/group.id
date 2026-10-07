@@ -15,7 +15,7 @@ given claim_other_fn_fixture (0):("")
 group_item(string out, int ci, int c) {
   string so = "";
   if(carries(ci, c) > 0) {
-    so = group_sep(out) + ci;
+    so = str_pick(out, "", "", ", ") + ci;
   }
 } return string so;
 given claim_cols_fixture ("", 0, 0):("0")

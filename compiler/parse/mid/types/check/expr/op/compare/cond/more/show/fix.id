@@ -20,7 +20,7 @@ given cmp_fixture ((import bin_bitand), (import bin_mixed)):("a bitwise '&' with
 // The bitwise operator is named first whichever of the two is the operand.
 bit_cmp_words(string po, string co) {
   string out = "a bitwise '" + co + "' with a comparison '" + po + "'";
-  if(is_bitop(po) == 1) {
+  if(str_in((import bitops), po) == 1) {
     out = "a bitwise '" + po + "' with a comparison '" + co + "'";
   }
 } return string out;

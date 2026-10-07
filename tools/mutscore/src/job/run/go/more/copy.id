@@ -8,7 +8,7 @@ ms_rn_prog(string ms_work) {
   string ms_pm = path_join(ms_work, "prog/main.id");
   int ms_n = exec_file_put(ms_pm, "main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n", 420);
 } return int ms_n;
-given ms_t_tree ((import ms_t_work)):(83) then ms_t_pm:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
+given ms_t_rel("prog/main.id") given ms_t_tree ((import ms_t_work)):(83) then ms_t_file:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
 ("/no/such/dir_ms"):(-1)
 
 // Copies the tree ms_root into ms_work (as a directory of the same name),
@@ -25,7 +25,8 @@ ms_rn_prep(string ms_root, string[] ms_wi, int ms_sd, string ms_work) {
   }
 } return int ms_ok;
 given ms_t_tree ((import ms_t_root), [], 0, (import ms_t_work)):(1) then ms_t_cpa:("add(int a, int b) {\n  int s = a + b;\n} return int s;\n(1, 2):(3)\n(0, 0):(0)\n")
-given ms_t_tree ((import ms_t_root), ["sib"], 1, (import ms_t_work)):(1) then ms_t_sib:("sib\n") then ms_t_pm:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
+given ms_t_rel("sib/x.txt") given ms_t_tree ((import ms_t_root), ["sib"], 1, (import ms_t_work)):(1) then ms_t_file:("sib\n")
+given ms_t_rel("prog/main.id") given ms_t_tree ((import ms_t_root), ["sib"], 1, (import ms_t_work)):(1) then ms_t_file:("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")
 given ms_t_tree ("/no/such/root_ms", [], 0, (import ms_t_work)):(0)
 
 // Fills in the fields of the configuration ms_cf that depend on the scratch

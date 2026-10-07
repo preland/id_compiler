@@ -2,8 +2,8 @@
 // reads what `p` holds (flow/sum/alias.id).
 
 esc_fx_e() {
-  export int efe_vq = node_var("q");
-  export int efe_dq = node_decl("int[]", "q", node_var("p"), 0);
+  export int efe_vq = node_txt("var", "q");
+  export int efe_dq = node_decl("int[]", "q", node_txt("var", "p"), 0);
   export int efe_dn = node_decl("int", "n", node_call("len", [(import efe_vq)]), 0);
 } chain () {
   export int[] efe_ps = [node_param("param", "int[]", "p")];

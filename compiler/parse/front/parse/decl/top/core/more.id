@@ -11,13 +11,6 @@ asm_decl_fixture() {
 ():() then calls toks_push:(["ident", "str", "ident", "op", "op", "op", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"abc\"", "foo", "(", ")", "{", "\"i1\"", "}", "return", "int", "r", ";"])
 ():() then init_units:(0)
 
-asm_decl_fixture2() {
-  env_init();
-  toks_push(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"]);
-} return void;
-():() then calls toks_push:(["ident", "str", "ident", "op", "op", "op", "str", "str", "op", "kw", "kw", "ident", "op"], ["asm", "\"xyz\"", "bar", "(", ")", "{", "\"i2\"", "\"i3\"", "}", "return", "word", "s", ";"])
-():() then init_units:(0)
-
 // Two asm declarations back to back, both pushed through push_asm (../decl/
 // more.id) -- for asm_case_row and print_asm_cases (mid/names/limits/
 // report/more/loc/func_line.id and back/drive/run/check/dce/emit/guard/

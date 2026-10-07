@@ -1,14 +1,4 @@
-// The ordering operators, and the one builtin call with an element-type rule.
-
-is_ordop(string op) {
-  int ok = 0;
-  if(op == "<" || op == ">" || op == "<=" || op == ">=") {
-    ok = 1;
-  }
-} return int ok;
-("<"):(1)
-("+"):(0)
-
+// The one builtin call with an element-type rule.
 chk_call(int id) {
   if(is_push2(id) == 1) {
     chk_push(id);

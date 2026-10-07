@@ -1,0 +1,28 @@
+// The fixtures bin_simplify (./dispatch.id) uses to check that neither the
+// fold nor the identity rewrite runs once cloose is on: 7 + 7, which folds to
+// a literal, and `x + 0`, which is x.
+
+lit_arith_fixture() {
+  arith_fixture();
+  lset((import cloose), 0, 1);
+} return void;
+():() then calls arith_fixture:[1]
+():() then (import cloose)[0]:(1)
+
+lit_zero_base() {
+  arith_fixture();
+  uq_begin("f");
+  export int lit_zv = node_txt("var", "x");
+} chain () {
+  export int lit_z0 = node_txt2("int", "0", 0, 0);
+  export int lit_zb = node_txt2("bin", "+", (import lit_zv), (import lit_z0));
+} return void;
+():() then calls arith_fixture:[1]
+():() then calls uq_begin:("f")
+
+lit_zero_fixture() {
+  lit_zero_base();
+  lset((import cloose), 0, 1);
+} return void;
+():() then calls lit_zero_base:[1]
+():() then (import cloose)[0]:(1)

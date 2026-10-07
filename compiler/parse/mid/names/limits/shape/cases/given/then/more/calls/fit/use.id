@@ -66,7 +66,7 @@ given imp_use_fixture ((import imp_use_dcall), "gx", 0):(2)
 // and `push(gx[0], ...)`.
 imp_use_fixture() {
   fn_fixture();
-  export int imp_use_rd = node_import("gx");
+  export int imp_use_rd = node_txt("import", "gx");
   export int imp_use_alias = node_decl("int[]", "al", (import imp_use_rd), 0);
 } chain () {
   int[] imp_use_args = [(import imp_use_rd)];

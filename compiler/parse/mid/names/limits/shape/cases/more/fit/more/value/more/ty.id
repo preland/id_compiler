@@ -1,6 +1,6 @@
 // The type a case literal has on its own, for comparing against a scalar
-// parameter or return type. An integer literal's is lit_type's
-// (mid/types/type_of/call/lit.id): `word` when it does not fit an int.
+// parameter or return type. An integer literal's is ni2_pick's
+// (mid/names/symbols/lookup/more/map.id): `word` when it does not fit an int.
 
 case_lit_type(int e) {
   string lt = leaf_type(e);
@@ -15,7 +15,7 @@ given lw_fix_un ((import fix_un_n)):("int")
 leaf_type(int e) {
   string lt = "string";
   if((import nkind)[e] == "int") {
-    lt = lit_type(e);
+    lt = ni2_pick(e, "int", "word");
   } else if((import nkind)[e] == "float") {
     lt = "float";
   }
@@ -32,8 +32,8 @@ given fn_fixture ((import fixture_fn)):("string")
 // Continued by dupeq_starts (../scalar.id).
 dupeq_fixture() {
   mk_two_toks();
-  export int dupeq_node = node_int("0", 0, 0);
+  export int dupeq_node = node_txt2("int", "0", 0, 0);
   dupeq_starts();
 } return void;
-():() then calls node_int:("0", 0, 0)
+():() then calls node_txt2:("int", "0", 0, 0)
 ():() then init_units:(0)

@@ -29,11 +29,11 @@ given cwv_setup ((import cwv_arr), "y"):(1)
 // ../walk.id's cw_stmts/cw_stmt and ../result/lit.id's cw_named_fixture.
 cw_decl_fixture() {
   cwv_setup();
-  int e = node_int("3", 3, 0);
+  int e = node_txt2("int", "3", 3, 0);
   export int cw_decl_x = node_decl("int", "x", e, 0);
 } chain () {
   export int[] cw_decl_list = [(import cw_decl_x)];
   export int[] cw_func_list = [(import cwv_func)];
 } return void;
-():() then calls node_int:("3", 3, 0)
+():() then calls node_txt2:("int", "3", 3, 0)
 ():() then init_units:(0)

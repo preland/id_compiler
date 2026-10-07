@@ -21,15 +21,15 @@ cl_scalar_setup() {
 // the cycle.
 cl_fwd_setup() {
   lc_env();
-  export int cl_fwd_lit = node_int("4", 4, 0);
-  export int cl_fwd_ie = node_import("fb");
+  export int cl_fwd_lit = node_txt2("int", "4", 4, 0);
+  export int cl_fwd_ie = node_txt("import", "fb");
 } chain () {
   int db = lc_reg("int", "fb", (import cl_fwd_lit));
   int da = lc_reg("int", "fa", (import cl_fwd_ie));
-  export int cl_cyc_ic = node_import("fd");
+  export int cl_cyc_ic = node_txt("import", "fd");
 } chain () {
   int dc = lc_reg("int", "fc", (import cl_cyc_ic));
-  int dd = lc_reg("int", "fd", node_import("fc"));
+  int dd = lc_reg("int", "fd", node_txt("import", "fc"));
 } return void;
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

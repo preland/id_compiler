@@ -21,9 +21,9 @@ pure_mark_param(int[] pos, int pflag, int node) {
   }
   pure_mark_fn(pflag, node);
 } return void;
-given pure_fix_fn_param ([0], 1, 0):() then (import purenode)[0]:(0)
-given pure_fix_fn_param ([0], 0, 0):() then len((import purenode)):(0)
-given pure_fix_int_param ([0], 1, 0):() then (import synfail)[0]:(1)
+given pure_fix_param("func(int) return int") ([0], 1, 0):() then (import purenode)[0]:(0)
+given pure_fix_param("func(int) return int") ([0], 0, 0):() then len((import purenode)):(0)
+given pure_fix_param("int") ([0], 1, 0):() then (import synfail)[0]:(1)
 
 // A `pure` that is not before a function type: E0807.
 pure_misplaced(int[] pos, string name, string type) {

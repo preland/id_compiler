@@ -14,7 +14,7 @@ fwd_env() {
 farm_a() {
   fwd_env();
   export int f_pa = node_param("param", "int", "a");
-  export int f_argv = node_var("a");
+  export int f_argv = node_txt("var", "a");
 } return void;
 ():() then calls node_param:("param", "int", "a")
 ():() then init_units:(0)

@@ -5,10 +5,10 @@
 // since-dropped 3-entry cap).
 fnval_fixture() {
   fn_idx_fixture();
-  export int fnval_hit = node_var("fx_target");
-  export int fnval_push = node_var("push");
+  export int fnval_hit = node_txt("var", "fx_target");
+  export int fnval_push = node_txt("var", "push");
 } return void;
-():() then calls node_var:("fx_target")
+():() then calls node_txt:("var", "fx_target")
 ():() then init_units:(0)
 
 // A variable actually registered with a function type, for is_fcall's "yes"
@@ -17,7 +17,7 @@ fnval_fixture() {
 fnval_call_fixture() {
   fn_idx_fixture();
   add_var("cv", "func(int) return int", 0);
-  export int fnval_call = node_var("cv");
+  export int fnval_call = node_txt("var", "cv");
 } return void;
 ():() then calls add_var:("cv", "func(int) return int", 0)
 ():() then init_units:(0)
@@ -31,7 +31,7 @@ fnval_call_fixture() {
 hidden_call_fixture() {
   fn_idx_fixture();
   export int hc_call = node_call("fx_target", (import fixture_params));
-  export int hc_un = node_un("!", (import hc_call));
+  export int hc_un = node_txt1("un", "!", (import hc_call));
 } return void;
 ():() then calls fn_idx_fixture:[1]
 ():() then init_units:(0)

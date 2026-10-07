@@ -11,20 +11,9 @@ given bound_fixture ((import ev_node)):(4)
 lw_tostr_at(int v, string t) {
   int r = v;
   if(t != "string") {
-    string lw_strfn_v = lw_strfn(t);
+    string lw_strfn_v = str_pick2(t, "int", "id_str_of_int", "float", "id_str_of_float", "id_str_of_word");
     r = lw_callf(lw_strfn_v, "string", [v]);
   }
 } return int r;
 given bound_fixture (3, "string"):(3)
 given bound_fixture (3, "int"):(3)
-
-lw_strfn(string t) {
-  string s = "id_str_of_word";
-  if(t == "int") {
-    s = "id_str_of_int";
-  } else if(t == "float") {
-    s = "id_str_of_float";
-  }
-} return string s;
-given ir_rows ("int"):("id_str_of_int")
-given ir_rows ("word"):("id_str_of_word")

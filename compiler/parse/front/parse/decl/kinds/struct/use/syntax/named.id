@@ -9,7 +9,7 @@ is_named_type_start(int[] pos) {
   int ok = 0;
   if(cur_kind(pos) == "ident" && cur2_kind(pos) == "ident") {
     ok = 1;
-  } else if(cur_kind(pos) == "ident" && cur2_text(pos) == "[" && cur3_text(pos) == "]") {
+  } else if(cur_kind(pos) == "ident" && peek_text(pos, 1) == "[" && peek_text(pos, 2) == "]") {
     ok = 1;
   }
 } return int ok;
@@ -25,11 +25,3 @@ cur2_kind(int[] pos) {
 given sd_stmt_toks ([0]):("ident")
 given sd_stmt_toks ([2]):("int")
 
-cur3_text(int[] pos) {
-  string s = "";
-  if(pos[0] + 2 < len((import ttext))) {
-    s = (import ttext)[pos[0] + 2];
-  }
-} return string s;
-given sd_stmt_toks ([5]):("]")
-given sd_stmt_toks ([0]):("=")

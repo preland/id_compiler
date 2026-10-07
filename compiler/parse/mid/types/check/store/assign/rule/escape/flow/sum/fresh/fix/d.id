@@ -12,10 +12,10 @@ esc_ff_h() {
   export int eff_rl = node_arr([(import eff_row1), (import eff_row2)]);
 } chain () {
   export int eff_ra = node_decl("int[][]", "a", (import eff_rl), 0);
-  export int eff_pa = node_call("push", [node_var("a"), (import eff_row2)]);
+  export int eff_pa = node_call("push", [node_txt("var", "a"), (import eff_row2)]);
   export int eff_pas = node_exprstmt((import eff_pa));
 } chain () {
-  export int eff_rows = node_func("ff_rows", "int[][]", (import eff_np), [(import eff_ra), (import eff_pas)], node_var("a"));
+  export int eff_rows = node_func("ff_rows", "int[][]", (import eff_np), [(import eff_ra), (import eff_pas)], node_txt("var", "a"));
   export int eff_rlb = node_arr([(import eff_row1)]);
   export int eff_rdb = node_decl("int[][]", "b", (import eff_rlb), 0);
 } return void;
@@ -23,9 +23,9 @@ given esc_ffix ():() then (import chkfail)[0]:(0)
 given esc_ffix ():() then init_units:(0)
 
 esc_ff_i() {
-  export int eff_bi = node_index(node_var("b"), node_int("0", 0, 0));
+  export int eff_bi = node_index(node_txt("var", "b"), node_txt2("int", "0", 0, 0));
   export int eff_dbr = node_decl("int[]", "r", (import eff_bi), 0);
-  export int eff_rleak = node_func("ff_rleak", "int[][]", (import eff_np), [(import eff_rdb), (import eff_dbr)], node_var("b"));
+  export int eff_rleak = node_func("ff_rleak", "int[][]", (import eff_np), [(import eff_rdb), (import eff_dbr)], node_txt("var", "b"));
 } chain () {
   export int eff_crows = node_call("ff_rows", [(import eff_vn)]);
   export int eff_ddz = node_decl("int[][]", "z", (import eff_crows), 0);

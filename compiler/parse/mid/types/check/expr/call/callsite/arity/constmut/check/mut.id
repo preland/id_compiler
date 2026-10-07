@@ -16,17 +16,9 @@ is_mut_call(int id) {
   string k = (import nkind)[id];
   if(k == "call") {
     string nm = (import ns1)[id];
-    ok = is_mut_name(nm);
+    ok = str_in((import mutnames), nm);
   }
 } return int ok;
 given cm_setup ((import cm_push_call)):(1)
 given cm_other_setup ((import cm_var_node)):(0)
 
-is_mut_name(string name) {
-  int ok = 0;
-  if(name == "push" || name == "pop") {
-    ok = 1;
-  }
-} return int ok;
-("push"):(1)
-("len"):(0)

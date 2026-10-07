@@ -1,7 +1,7 @@
 // `len(xs)`, and a push call on a list with one argument besides.
 
 lpf_len(string lfs_list) {
-  int lfi_a = node_var(lfs_list);
+  int lfi_a = node_txt("var", lfs_list);
   int[] lfl_args = [lfi_a];
   int lfi_r = node_call("len", lfl_args);
 } return int lfi_r;
@@ -9,7 +9,7 @@ given lpf_env ("v"):(1) then (import ns1)[1]:("len")
 given lpf_env ("w"):(1) then (import ns1)[0]:("w")
 
 lpf_pushx(string lfs_list, int lfi_x) {
-  int lfi_a = node_var(lfs_list);
+  int lfi_a = node_txt("var", lfs_list);
   int[] lfl_args = [lfi_a, lfi_x];
   int lfi_r = node_call("push", lfl_args);
 } return int lfi_r;

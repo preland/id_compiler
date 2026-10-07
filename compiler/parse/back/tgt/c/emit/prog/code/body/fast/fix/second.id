@@ -5,11 +5,11 @@
 
 lpq_lk() {
   lpq_lv();
-  export int lpq_nk = node_var("lkn");
+  export int lpq_nk = node_txt("var", "lkn");
   export int lpq_kk = lpf_lt("lkj", lpq_nk);
 } chain () {
-  export int lpq_xk = lpf_ix("lkv", node_var("lkk"));
-  export int lpq_ak = node_iassign(lpq_xk, node_var("lkz"));
+  export int lpq_xk = lpf_ix("lkv", node_txt("var", "lkk"));
+  export int lpq_ak = node_iassign(lpq_xk, node_txt("var", "lkz"));
   export int lpq_ik = lpf_inc("lkj", 1);
 } chain () {
   export int lpq_jk = lpf_inc("lkk", 1);
@@ -20,26 +20,26 @@ lpq_lk() {
   export int lpq_vk = (import ni2)[lpq_xk];
   export int lpq_bk = (import ni1)[lpq_jk];
 } chain () {
-  export int lpq_pk = lpq_mul("lkk", 5);
+  export int lpq_pk = lpf_term("*", "lkk", 5);
 } return void;
 ():() then calls lpq_lv:[1]
 ():() then init_units:(0)
 
 lpq_lm() {
   lpq_lk();
-  export int lpq_n1 = node_var("lmn");
-  export int lpq_n2 = node_var("lmm");
+  export int lpq_n1 = node_txt("var", "lmn");
+  export int lpq_n2 = node_txt("var", "lmm");
 } chain () {
   export int lpq_k1 = lpf_lt("lmi", lpq_n1);
   export int lpq_k2 = lpf_lt("lmj", lpq_n2);
-  export int lpq_km = node_bin("&&", lpq_k1, lpq_k2);
+  export int lpq_km = node_txt2("bin", "&&", lpq_k1, lpq_k2);
 } chain () {
-  export int lpq_xm = lpf_ix("lmv", node_var("lmk"));
-  export int lpq_am = node_iassign(lpq_xm, node_var("lmz"));
+  export int lpq_xm = lpf_ix("lmv", node_txt("var", "lmk"));
+  export int lpq_am = node_iassign(lpq_xm, node_txt("var", "lmz"));
   export int lpq_i1 = lpf_inc("lmi", 1);
 } chain () {
   export int lpq_i2 = lpf_inc("lmj", 1);
-  export int lpq_fm = node_bin("!=", node_var("lmf"), (import lpf_n0));
+  export int lpq_fm = node_txt2("bin", "!=", node_txt("var", "lmf"), (import lpf_n0));
   export int lpq_qm = lpq_if(lpq_fm, lpq_i1, lpq_i2);
 } chain () {
   export int lpq_jm = lpf_inc("lmk", 1);

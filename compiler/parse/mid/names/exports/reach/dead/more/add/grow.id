@@ -27,8 +27,8 @@ dead_exp_fixture() {
   add_export("gx", "int", "setup_fn");
   add_export("gy", "int", "other_fn");
 } chain () {
-  export int dead_imp_a = node_import("gx");
-  export int dead_imp_b = node_import("gy");
+  export int dead_imp_a = node_txt("import", "gx");
+  export int dead_imp_b = node_txt("import", "gy");
 } return void;
 ():() then calls add_export:("gx", "int", "setup_fn")
 ():() then init_units:(0)

@@ -38,7 +38,7 @@ uninit_fixture() {
   add_export("gx", "int", "setup_fn");
 } chain () {
   add_export("gc", "int", "conf.id");
-  export int uninit_imp = node_import("gx");
+  export int uninit_imp = node_txt("import", "gx");
 } return void;
 ():() then calls add_export:("gx", "int", "setup_fn")
 ():() then (import harn)[0]:(1)

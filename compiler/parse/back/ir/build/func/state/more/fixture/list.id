@@ -9,18 +9,18 @@
 
 lw_fix_iassign() {
   lw_fix_index();
-  int v = node_int("9", 9, 0);
+  int v = node_txt2("int", "9", 9, 0);
   export int fix_iassign_n = node_iassign((import fix_index_n), v);
 } return void;
-():() then calls node_int:("9", 9, 0)
+():() then calls node_txt2:("int", "9", 9, 0)
 ():() then init_units:(0)
 
 lw_fix_arr() {
   lw_env_fixture();
-  int a = node_int("1", 1, 0);
+  int a = node_txt2("int", "1", 1, 0);
   export int fix_arr_n = node_arr([a]);
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)
 
 lw_fix_arr_empty() {

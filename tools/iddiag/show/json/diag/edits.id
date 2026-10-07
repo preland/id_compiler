@@ -41,7 +41,7 @@ dg_japp(string dg_ap_g, string dg_ap_f) {
 } chain (string dg_ap_g, string dg_ap_f) {
   string dg_ap_r = "none";
   if(dg_ap_n > 0) {
-    dg_ap_r = dg_jappl(dg_ef(dg_ap_v[0], 0));
+    dg_ap_r = str_tab3(dg_ef(dg_ap_v[0], 0), "machine", "machine-applicable", "maybe", "maybe-incorrect", "placeholder", "has-placeholders", "unspecified");
   }
   if(dg_ap_k < dg_ap_n) {
     dg_ap_r = "unresolved";

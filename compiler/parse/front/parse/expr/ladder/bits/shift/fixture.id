@@ -3,13 +3,6 @@
 // ../../../../decl/func/cases/case/given/elem/more/fixture.id for toks_push's
 // other callers.
 
-rhs_fix() {
-  env_init();
-  toks_push(["op", "op", "int", "op"], [":", "(", "6", ")"]);
-} return void;
-():() then calls toks_push:(["op", "op", "int", "op"], [":", "(", "6", ")"])
-():() then init_units:(0)
-
 case_min_fix() {
   env_init();
   toks_push(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]);
@@ -17,9 +10,3 @@ case_min_fix() {
 ():() then calls toks_push:(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"])
 ():() then init_units:(0)
 
-import_fix() {
-  env_init();
-  toks_push(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]);
-} return void;
-():() then calls toks_push:(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"])
-():() then init_units:(0)

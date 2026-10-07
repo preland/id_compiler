@@ -32,7 +32,7 @@ given leaves_fixture ((import lit_float)):("float")
 type_of3(int id) {
   string s1_of_v = (import ns1)[id];
   string t = name_type(s1_of_v, (import nunit)[id]);
-  if(is_nameref(id) == 0) {
+  if(str_in((import namekinds), (import nkind)[id]) == 0) {
     t = type_of4(id);
   }
 } return string t;

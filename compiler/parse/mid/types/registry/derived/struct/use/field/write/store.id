@@ -11,7 +11,7 @@ given sd_use_fixture ((import sd_wx), "P"):() then (import chkfail)[0]:(0)
 given sd_use_fixture ((import sd_wn), "int"):() then (import chkfail)[0]:(1)
 
 chk_fstore_at(int id, string sd_bt, string sd_f) {
-  if(ty_is_struct(sd_bt) == 0) {
+  if(ty_kind_is(sd_bt, "struct") == 0) {
     tc_err(id, "cannot assign field '" + sd_f + "' of a " + sd_bt + "; only a struct has fields");
   } else if(sd_fpos(sd_bt, sd_f) < 0) {
     tc_err(id, sd_nofield(sd_bt, sd_f));

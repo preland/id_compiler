@@ -1,0 +1,16 @@
+// Setup: names the file, under the work directory, that ms_t_file reads: prog/main.id (the written program) or sib/x.txt (what the linked sibling reads as, "" while nothing links it there).
+ms_t_rel(string ms_t_r) {
+  export string[] ms_t_relp = [ms_t_r];
+} return void export ms_t_relp;
+("prog/main.id"):() then (import ms_t_relp)[0]:("prog/main.id")
+("sib/x.txt"):() then len((import ms_t_relp)):(1)
+
+// What the file ms_t_rel names reads as in the work directory.
+ms_t_file() {
+  string[] ms_t_rp = (import ms_t_relp);
+  string ms_q = fs_read_text((import ms_t_work) + "/" + ms_t_rp[0]);
+} return string ms_q;
+given ms_t_tree given ms_t_rel("prog/main.id") ():("")
+given ms_t_tree given ms_t_rel("sib/x.txt") ():("")
+given ms_t_tree given ms_t_wsib given ms_t_rel("sib/x.txt") ():("sib\n")
+given ms_t_tree given ms_t_wpg given ms_t_rel("prog/main.id") ():("main(int argc, string[] argv) {\n} return int 0;\n(1, [\"p\"]):(0)\n(2, [\"p\", \"a\"]):(0)\n")

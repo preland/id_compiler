@@ -25,7 +25,7 @@ fill_params(int[] pos, int[] params, string kind) {
   while(cur_text(pos) != ")" && cur_text(pos) != "{" && cur_kind(pos) != "eof") {
     int one_param_v = one_param(pos, kind);
     push(params, one_param_v);
-    skip_comma(pos);
+    skip_text(pos, ",");
   }
 } return void;
 given decl_tokens ([2], [], "param"):([7], [0, 1])

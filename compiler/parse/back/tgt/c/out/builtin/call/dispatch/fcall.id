@@ -16,7 +16,7 @@ lz_empty() {
 emit_fcall(int id) {
   int[] l1_of_v = (import nl1)[id];
   string nm = (import ns1)[id];
-  string ret_s = "((" + c_clo_ptr(callee_var_type(id)) + ")" + nm + "->fn)(" + nm + sep_arg(len(l1_of_v)) + emit_args(l1_of_v) + ")";
+  string ret_s = "((" + c_clo_ptr(callee_var_type(id)) + ")" + nm + "->fn)(" + nm + sep_at(", ", len(l1_of_v)) + emit_args(l1_of_v) + ")";
 } return string ret_s;
 given clo_call_fixture ((import cv_call)):("((int (*)(IdFn*, int))cv->fn)(cv, 5)")
 given clo_call_fixture ((import cw_call)):("((void (*)(IdFn*))cw->fn)(cw)")

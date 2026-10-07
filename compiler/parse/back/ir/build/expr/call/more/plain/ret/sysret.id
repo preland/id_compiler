@@ -2,7 +2,7 @@
 // returns nothing and the two string bridges return what they are named for.
 lw_sysret(string name) {
   string t = "word";
-  if(is_pokefn(name) == 1) {
+  if(str_in((import pokefns), name) == 1) {
     t = "";
   } else if(name == "str_of_mem") {
     t = "string";

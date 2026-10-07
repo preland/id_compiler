@@ -1,14 +1,3 @@
-// icmp or fcmp: which comparison an operand type takes. The predicate itself
-// stays the `id` operator -- the printer maps `<` to `slt` or `olt` from the
-// operand type, so the IR never has to carry two spellings of one comparison.
-lw_cmpop(string t) {
-  string op = "icmp";
-  if(ty_kind(t) == "float") {
-    op = "fcmp";
-  }
-} return string op;
-given ir_rows ("int"):("icmp")
-given ir_rows ("float"):("fcmp")
 
 // The two statements that leave: `break` and an early `return`. They sit here,
 // beside comparisons, only because every directory on the way to a proper

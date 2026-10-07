@@ -2,7 +2,7 @@
 
 decl_rhs(int[] pos, string type, string name, int exported) {
   int expr = parse_expr(pos);
-  skip_semi(pos);
+  skip_text(pos, ";");
   int ret_i = node_decl(type, name, expr, exported);
 } return int ret_i;
 given stmt_tokens ([3], "int", "x", 0):(1)
@@ -20,8 +20,8 @@ given stmt_tokens ([16]):(1)
 
 assign_rhs(int[] pos, string name) {
   int expr = parse_expr(pos);
-  skip_semi(pos);
-  int ret_i = node_assign(name, expr);
+  skip_text(pos, ";");
+  int ret_i = node_txt1("assign", name, expr);
 } return int ret_i;
 given stmt_tokens ([7], "x"):(1)
 given stmt_tokens ([18], "x"):(1)

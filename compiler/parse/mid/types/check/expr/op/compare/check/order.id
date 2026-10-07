@@ -2,7 +2,7 @@
 // arm -- are not typed at all.
 chk_ord(int id) {
   string s1_of_v = (import ns1)[id];
-  if(is_ordop(s1_of_v) == 1) {
+  if(str_in((import ordops), s1_of_v) == 1) {
     chk_ord2(id);
   }
 } return void;

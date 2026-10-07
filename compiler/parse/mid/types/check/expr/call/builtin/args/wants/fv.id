@@ -24,7 +24,7 @@ given call2_setup ((import cm_push_call), 0):() then (import chkfail)[0]:(0)
 given fv_fixture ((import fv_pos_call), 0):() then (import chkfail)[0]:(1)
 
 fv_build() {
-  int a = node_var("f");
+  int a = node_txt("var", "f");
   tcache_set(a, "func(int) return int");
   export int fv_pos_call = node_call("push", [a]);
 } return void;

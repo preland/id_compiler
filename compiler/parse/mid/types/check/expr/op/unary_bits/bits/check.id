@@ -7,7 +7,7 @@
 
 chk_bits(int id) {
   string s1_of_v = (import ns1)[id];
-  if(is_logop(s1_of_v) == 1 || is_bitop(s1_of_v) == 1) {
+  if(str_in((import logops), s1_of_v) == 1 || str_in((import bitops), s1_of_v) == 1) {
     chk_bits2(id);
   } else if((import ns1)[id] == "%") {
     chk_mod(id);
@@ -28,7 +28,7 @@ given composite_fixture ((import bin_concat)):() then (import chkfail)[0]:(1)
 // the operator is for, not about which type it got, and idc.py says so.
 bits_err(int id, string lt, string rt) {
   string s1_of_v = (import ns1)[id];
-  if(is_logop(s1_of_v) == 1) {
+  if(str_in((import logops), s1_of_v) == 1) {
     string s1_of_v2 = (import ns1)[id];
     tc_err(id, "'" + s1_of_v2 + "' requires int operands");
   } else {

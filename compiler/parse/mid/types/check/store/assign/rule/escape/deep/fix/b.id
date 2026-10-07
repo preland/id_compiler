@@ -11,15 +11,15 @@ esc_fd_d() {
   export int efd_lenc = node_call("len", [(import efd_ix)]);
   export int efd_decn = node_decl("int", "n", (import efd_lenc), 0);
 } chain () {
-  export int efd_peek = node_func("fd_peek", "int[]", (import efd_gp), [(import efd_decr)], node_var("r"));
-  export int efd_look = node_func("fd_look", "int", (import efd_gp), [(import efd_decn)], node_var("n"));
-  export int efd_va = node_var("a");
+  export int efd_peek = node_func("fd_peek", "int[]", (import efd_gp), [(import efd_decr)], node_txt("var", "r"));
+  export int efd_look = node_func("fd_look", "int", (import efd_gp), [(import efd_decn)], node_txt("var", "n"));
+  export int efd_va = node_txt("var", "a");
 } return void;
 given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 
 esc_fd_e() {
-  export int efd_ai = node_index((import efd_va), node_int("0", 0, 0));
+  export int efd_ai = node_index((import efd_va), node_txt2("int", "0", 0, 0));
   export int efd_ad = node_decl("int[][]", "a", (import efd_lits), 0);
   export int efd_pc = node_call("push", [(import efd_va), (import efd_lit)]);
 } chain () {
@@ -37,10 +37,10 @@ given esc_dfix ():() then init_units:(0)
 esc_fd_f() {
   export int efd_good = node_func("fd_good", "void", (import efd_np), (import efd_gs), 0 - 1);
   export int efd_lbl = node_arr([(import efd_lit)]);
-  export int efd_vb = node_var("b");
+  export int efd_vb = node_txt("var", "b");
 } chain () {
   export int efd_dlb = node_decl("int[][]", "b", (import efd_lbl), 0);
-  export int efd_bi = node_index((import efd_vb), node_int("0", 0, 0));
+  export int efd_bi = node_index((import efd_vb), node_txt2("int", "0", 0, 0));
   export int efd_dlr = node_decl("int[]", "r", (import efd_bi), 0);
 } chain () {
   export int efd_leak = node_func("fd_leak", "void", (import efd_np), [(import efd_dlb), (import efd_dlr)], 0 - 1);

@@ -1,15 +1,6 @@
 // The first step of canon_iassign, split so that block stays within the
-// action limit. Grouped with decl_tag because decl.id was already at the
+// action limit. Grouped here because decl.id was already at the
 // 3-function limit once these existed.
-
-decl_tag(int id) {
-  string out = "d:";
-  if((import ni2)[id] == 1) {
-    out = "ed:";
-  }
-} return string out;
-given gdecl_fixture ((import decl_node)):("d:")
-given gdecl_fixture ((import gdecl_node)):("ed:")
 
 iassign_tail(int id, string head) {
   int i2_of_v = (import ni2)[id];

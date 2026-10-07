@@ -2,7 +2,7 @@
 
 parse_add(int[] pos) {
   int left = parse_mul(pos);
-  while(addop_at(pos)) {
+  while(op_at(pos, (import addops))) {
     left = fold_add(pos, left);
   }
 } return int left;
@@ -19,7 +19,7 @@ given expr_tokens ([13], 100):(1)
 
 parse_mul(int[] pos) {
   int left = parse_unary(pos);
-  while(mulop_at(pos)) {
+  while(op_at(pos, (import mulops))) {
     left = fold_mul(pos, left);
   }
 } return int left;

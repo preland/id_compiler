@@ -12,7 +12,7 @@ given expr_tokens ([16]):(0)
 fold_and(int[] pos, int left) {
   advance(pos);
   int right = parse_rel(pos);
-  int ret_i = node_bin("&&", left, right);
+  int ret_i = node_txt2("bin", "&&", left, right);
 } return int ret_i;
 given expr_tokens ([15], 100):(1)
 given expr_tokens ([17], 100):(1)

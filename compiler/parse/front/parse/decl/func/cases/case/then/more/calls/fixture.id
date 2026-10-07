@@ -8,13 +8,6 @@ calls_args_fix() {
 ():() then calls toks_push:(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "(", "6", ")"])
 ():() then init_units:(0)
 
-calls_count_fix() {
-  fn_fixture();
-  toks_push(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]);
-} return void;
-():() then calls toks_push:(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"])
-():() then init_units:(0)
-
 // `traps:("...")` (docs/TESTS.md): its own kind, "thentraps", since the
 // harness reads the message from the process a trap kills rather than from a
 // return value (back/tgt/c/emit/prog/test/). Filed here, beside the other
@@ -33,5 +26,5 @@ then_traps_clause(int[] pos) {
 } chain (int[] pos) {
   then_push_kind("thentraps", "", items);
 } return void;
-given traps_fix ([0]):()
-given traps_fix ([0]):() then calls then_push_kind:[1]
+given toks_fn(["kw", "op", "op", "str", "op"], ["traps", ":", "(", "\"hi\"", ")"]) ([0]):()
+given toks_fn(["kw", "op", "op", "str", "op"], ["traps", ":", "(", "\"hi\"", ")"]) ([0]):() then calls then_push_kind:[1]

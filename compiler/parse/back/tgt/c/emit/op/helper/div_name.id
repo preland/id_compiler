@@ -5,26 +5,12 @@
 hop_dw(string op, string t) {
   string h = "";
   if(op == "/" || op == "%") {
-    h = "id_" + div_pfx(t) + div_sfx(op);
+    string hop_dpfx = str_pick(t, "word", "s", "i");
+    string hop_dsfx = str_pick(op, "/", "div", "mod");
+    h = "id_" + hop_dpfx + hop_dsfx;
   }
 } return string h;
 ("/", "word"):("id_sdiv")
 ("%", "int"):("id_imod")
-
-div_pfx(string t) {
-  string h = "i";
-  if(t == "word") {
-    h = "s";
-  }
-} return string h;
-("word"):("s")
-("int"):("i")
-
-div_sfx(string op) {
-  string h = "mod";
-  if(op == "/") {
-    h = "div";
-  }
-} return string h;
-("/"):("div")
-("%"):("mod")
+("/", "int"):("id_idiv")
+("%", "word"):("id_smod")

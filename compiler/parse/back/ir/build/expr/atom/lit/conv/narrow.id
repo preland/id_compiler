@@ -6,9 +6,9 @@
 lz_g() {
   lz_f();
   export int[] lz_body1 = [(import lz_declid), (import lz_exprstmt)];
-  export int lz_retvar = node_var("y");
+  export int lz_retvar = node_txt("var", "y");
 } return void;
-():() then calls node_var:("y")
+():() then calls node_txt:("var", "y")
 ():() then init_units:(0)
 
 lw_narrow(string t, string want) {

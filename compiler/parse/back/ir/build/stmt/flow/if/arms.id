@@ -26,7 +26,7 @@ lw_free_all() {
   }
 } return void;
 given lwo_fixture ():() then calls lw_callf:[1]
-given lw_fixture ():() then calls lw_callf:[0]
+given lw_fixture(0) ():() then calls lw_callf:[0]
 given lwd_fixture ():() then calls lw_callf:("id_list_free_deep", "", [3])
 given lws_fixture ():() then calls lw_callf:("id_str_free", "", [3])
 given lws_fixture_ret ():() then calls lw_callf:[0]

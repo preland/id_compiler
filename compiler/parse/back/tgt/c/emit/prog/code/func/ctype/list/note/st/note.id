@@ -8,7 +8,7 @@
 //   tcsts  every struct type the harness needs helpers for
 
 note_struct(string ty) {
-  if(ty_is_struct(ty) == 1 && find_str((import tcsts), ty) < 0) {
+  if(ty_kind_is(ty, "struct") == 1 && find_str((import tcsts), ty) < 0) {
     push((import tcsts), ty);
     note_sfields(ty);
   }

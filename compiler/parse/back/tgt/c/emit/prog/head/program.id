@@ -17,7 +17,7 @@ given nz_prog_nomain_fixture ("x86_64-linux"):() then calls def_all:()
 // runtime prelude, the closure runtime, then the declarations section
 // (idc.py's layout, with the closure runtime where its blank line was)
 emit_head() {
-  emit_runtime();
+  print((import c_prelude_text));
   emit_closure_rt("static ");
   emit_decls();
 } return void;

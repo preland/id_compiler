@@ -17,18 +17,10 @@ ll_ty2(string t) {
   if(t == "float") {
     s = "double";
   } else if(t == "bool" || t == "" || t == "void") {
-    s = ll_ty3(t);
+    s = str_pick(t, "bool", "i1", "void");
   }
 } return string s;
 ("string"):("ptr")
 ("float"):("double")
-("bool"):("i1")
-
-ll_ty3(string t) {
-  string s = "void";
-  if(t == "bool") {
-    s = "i1";
-  }
-} return string s;
 ("bool"):("i1")
 (""):("void")

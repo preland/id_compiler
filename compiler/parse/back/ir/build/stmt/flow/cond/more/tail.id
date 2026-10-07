@@ -1,5 +1,8 @@
+// icmp or fcmp: which comparison an operand type takes. The predicate itself
+// stays the `id` operator -- the printer maps `<` to `slt` or `olt` from the
+// operand type, so the IR never has to carry two spellings of one comparison.
 lw_truth_tail(int v, string t, int z) {
-  string lw_cmpop_v = lw_cmpop(t);
+  string lw_cmpop_v = ty_float_pick(t, "fcmp", "icmp");
   int ret_i = lw_op(lw_cmpop_v, "bool", v, z, "!=");
 } return int ret_i;
 given bound_fixture (2, "int", 3):(3)

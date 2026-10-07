@@ -31,8 +31,8 @@ resv_err(int i) {
 } chain (int i) {
   note_failure();
 } return void;
-given resv_scan_fixture (0):() then prints:("a.id:3: error: function 'eprint' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_eprint'. Choose another name\n")
-given resv_scan_fixture (1):() then prints:("b.id:9: error: function 'plain_name' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_plain_name'. Choose another name\n")
+given dup_prog_fixture("eprint", "plain_name", 3, 9) (0):() then prints:("a.id:3: error: function 'eprint' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_eprint'. Choose another name\n")
+given dup_prog_fixture("eprint", "plain_name", 3, 9) (1):() then prints:("b.id:9: error: function 'plain_name' collides with a runtime helper: every id function is emitted as 'id_<name>', and the runtime already defines 'id_plain_name'. Choose another name\n")
 
 // resv_names: resv_names is deliberately left uncased, because a regression here is
 // caught louder downstream. --list-untested still reports it, and will keep

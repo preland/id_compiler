@@ -17,10 +17,3 @@ eat_colon(int[] pos) {
 } return void;
 given colon_fix ([0]):([1])
 given tup1_fix ([0]):([0])
-
-eat_close(int[] pos) {
-  expect_text(pos, ")");
-  advance(pos);
-} return void;
-given close_fix ([0]):([1])
-given tup1_fix ([2]):([3])

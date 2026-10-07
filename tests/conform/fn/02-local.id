@@ -5,7 +5,8 @@ tick(int n) {
 (2):(2)
 
 tock(int n) {
-  print("tock " + n);
+  string line = "tock " + n;
+  print(line);
 } return void;
 (3):(3)
 (4):(4)

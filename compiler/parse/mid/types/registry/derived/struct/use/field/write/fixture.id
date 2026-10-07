@@ -16,11 +16,11 @@ sd_use_fixture() {
   add_var("p", "P", 0);
 } chain () {
   add_var("n", "int", 0);
-  export int sd_vp = node_var("p");
-  export int sd_vn = node_var("n");
+  export int sd_vp = node_txt("var", "p");
+  export int sd_vn = node_txt("var", "n");
 } chain () {
-  export int sd_one = node_int("1", 1, 0);
-  export int sd_str = node_str("s");
+  export int sd_one = node_txt2("int", "1", 1, 0);
+  export int sd_str = node_txt("str", "s");
   sd_use_reads();
 } chain () {
   sd_use_writes();
@@ -41,11 +41,11 @@ given sd_use_fixture ():() then (import chkfail)[0]:(0)
 given sd_use_fixture ():() then init_units:(0)
 
 sd_use_writes() {
-  export int sd_vq = node_var("p");
+  export int sd_vq = node_txt("var", "p");
   export int sd_tx = node_index((import sd_vq), newleaf("fld", 0, 0, "x", ""));
   export int sd_tz = node_index((import sd_vq), newleaf("fld", 0, 0, "z", ""));
 } chain () {
-  export int sd_vm = node_var("n");
+  export int sd_vm = node_txt("var", "n");
   export int sd_tn = node_index((import sd_vm), newleaf("fld", 0, 0, "x", ""));
   export int sd_wx = node_iassign((import sd_tx), (import sd_one));
 } chain () {

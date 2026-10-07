@@ -30,11 +30,15 @@ flt_exp_ok(string text) {
 flt_check(int[] pos, string text) {
   int flok = flt_exp_ok(text);
   if(flok == 0) {
-    flt_bad_exp(pos, text);
+    flt_bad(pos, text, "E0103", " has an exponent with no digits", (import flt_exp_why), (import flt_exp_help));
   } else if(flt_over(text) == 1) {
-    flt_bad_big(pos, text);
+    flt_bad(pos, text, "E0104", " is too large: it overflows to infinity", (import flt_big_why), (import flt_big_help));
   }
 } return void;
 given mk_two_toks ([0], "1.5"):() then prints:("")
-given mk_two_toks ([0], "1e"):() then calls flt_bad_exp:[1]
-given mk_two_toks ([0], "1e999"):() then calls flt_bad_big:[1]
+given mk_two_toks ([0], "1e"):() then calls flt_bad:[1]
+given mk_two_toks ([0], "1e999"):() then calls flt_bad:[1]
+given mk_two_toks ([0], "1e+"):() then prints:("<stdin>:1: error: float literal '1e+' has an exponent with no digits [E0103]\n  at: 1e+\n  why: an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e\n  help: write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo\n")
+given mk_two_toks ([0], "2e"):() then prints:("<stdin>:1: error: float literal '2e' has an exponent with no digits [E0103]\n  at: 2e\n  why: an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e\n  help: write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo\n")
+given mk_two_toks ([0], "1e999"):() then prints:("<stdin>:1: error: float literal '1e999' is too large: it overflows to infinity [E0104]\n  at: 1e999\n  why: a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be\n  help: write a value no larger than 1.7976931348623157e308, or lower the exponent\n")
+given mk_two_toks ([0], "2e308"):() then prints:("<stdin>:1: error: float literal '2e308' is too large: it overflows to infinity [E0104]\n  at: 2e308\n  why: a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be\n  help: write a value no larger than 1.7976931348623157e308, or lower the exponent\n")

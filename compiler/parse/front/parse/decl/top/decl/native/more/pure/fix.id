@@ -1,17 +1,11 @@
-// Parameter nodes for pure_mark_param's cases (../kind.id): a function-typed
-// parameter and an int one, each the first node of a fresh environment, so its
-// id is 0.
+// A parameter node for pure_mark_param's cases (../kind.id): a function-typed
+// one (pure_fix_param("func(int) return int")) or an int one
+// (pure_fix_param("int")), the first node of a fresh environment, so its id is 0.
 
-pure_fix_fn_param() {
+pure_fix_param(string pfix_ty) {
   full_env();
-  int pfix_fn = node_param("param", "func(int) return int", "g");
+  int pfix_node = node_param("param", pfix_ty, "g");
 } return void;
-():() then calls node_param:("param", "func(int) return int", "g")
-():() then init_units:(0)
-
-pure_fix_int_param() {
-  full_env();
-  int pfix_int = node_param("param", "int", "g");
-} return void;
-():() then calls node_param:("param", "int", "g")
-():() then init_units:(0)
+("func(int) return int"):() then calls node_param:("param", "func(int) return int", "g")
+("int"):() then calls node_param:("param", "int", "g")
+("int"):() then init_units:(0)

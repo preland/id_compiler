@@ -11,18 +11,11 @@ flt_exp_has(string text, int flj) {
 ("1e+", 2):(0)
 ("1e", 2):(0)
 
-flt_bad_exp(int[] pos, string text) {
-  string flwhy = "an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e";
-  string flhelp = "write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo";
-  syn_diag(pos, "E0103", "float literal '" + text + "' has an exponent with no digits", text, flwhy, flhelp);
+// A refused float literal: the code, what is wrong with it (the words after the
+// literal in the message), and the why and help lines, which are constants
+// (conf.id, flt_exp_* and flt_big_*) since check.id decides which one applies.
+flt_bad(int[] pos, string text, string flcode, string fltail, string flwhy, string flhelp) {
+  syn_diag(pos, flcode, "float literal '" + text + "'" + fltail, text, flwhy, flhelp);
 } return void;
-given mk_two_toks ([0], "1e+"):() then prints:("<stdin>:1: error: float literal '1e+' has an exponent with no digits [E0103]\n  at: 1e+\n  why: an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e\n  help: write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo\n")
-given mk_two_toks ([0], "2e"):() then prints:("<stdin>:1: error: float literal '2e' has an exponent with no digits [E0103]\n  at: 2e\n  why: an exponent is 'e' or 'E', an optional sign and at least one digit, so this text names no number; it is not read as a number followed by a variable called e\n  help: write the digits after the 'e', as in 1e5, 1.5E+3 or 6.02e-23, or delete the 'e' if it was a typo\n")
-
-flt_bad_big(int[] pos, string text) {
-  string flwhy = "a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be";
-  string flhelp = "write a value no larger than 1.7976931348623157e308, or lower the exponent";
-  syn_diag(pos, "E0104", "float literal '" + text + "' is too large: it overflows to infinity", text, flwhy, flhelp);
-} return void;
-given mk_two_toks ([0], "1e999"):() then prints:("<stdin>:1: error: float literal '1e999' is too large: it overflows to infinity [E0104]\n  at: 1e999\n  why: a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be\n  help: write a value no larger than 1.7976931348623157e308, or lower the exponent\n")
-given mk_two_toks ([0], "2e308"):() then prints:("<stdin>:1: error: float literal '2e308' is too large: it overflows to infinity [E0104]\n  at: 2e308\n  why: a float is an IEEE-754 binary64 and its largest finite value is about 1.7976931348623157e308; a literal beyond that rounds to infinity, which a literal cannot be\n  help: write a value no larger than 1.7976931348623157e308, or lower the exponent\n")
+given mk_two_toks ([0], "x", "E0103", " is odd", "w", "h"):() then prints:("<stdin>:1: error: float literal 'x' is odd [E0103]\n  at: x\n  why: w\n  help: h\n")
+given mk_two_toks ([0], "yy", "E0104", " is huge", "why2", "help2"):() then prints:("<stdin>:1: error: float literal 'yy' is huge [E0104]\n  at: yy\n  why: why2\n  help: help2\n")

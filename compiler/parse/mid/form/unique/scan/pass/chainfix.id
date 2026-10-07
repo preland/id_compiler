@@ -7,8 +7,8 @@
 // kind "blank" is erased from the fingerprint, which makes it the plain
 // function with the same two statements.
 chain_fn_make(string cfm_name, int cfm_val, string cfm_kind) {
-  int cfm_lit = node_int("" + cfm_val, cfm_val, 0);
-  int cfm_one = node_int("1", 1, 0);
+  int cfm_lit = node_txt2("int", "" + cfm_val, cfm_val, 0);
+  int cfm_one = node_txt2("int", "1", 1, 0);
   int cfm_d1 = node_decl("int", cfm_name + "a", cfm_lit, 0);
 } chain (string cfm_name, int cfm_val, string cfm_kind) {
   int cfm_d2 = node_decl("int", cfm_name + "b", cfm_one, 0);

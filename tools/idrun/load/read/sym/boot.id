@@ -38,8 +38,9 @@ lb_boot() {
   lb_seed("b", (import bi_names));
   lb_seed("x", (import fbi_names));
 } return void;
-():() then tf_iadd:(3) then tf_bpoke:(45)
-():() then tf_xstr:(2) then tf_bpoke:(45)
+given tf_key("i:add") ():() then tf_look:(3)
+given tf_key("b:id_poke64") ():() then tf_look:(45)
+given tf_key("x:id_str_of_float") ():() then tf_look:(2)
 
 // Test check: the loader's whole parse state, one slot after another -- the
 // readers of a line (ld_word, ld_cstr, ld_line) advance its position and read

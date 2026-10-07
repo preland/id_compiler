@@ -1,0 +1,37 @@
+// Comparing the literal-insensitive fingerprints (../loose.id): the same walk
+// as ./compare.id, reached from uq_at for a function the strict comparison
+// found no twin for. An entry equal to an earlier one while the strict entries
+// differ is a pair that differs in nothing but the values of its literals.
+
+ul_at(int i) {
+  int ul_j = ul_find(i);
+  if(ul_j >= 0) {
+    ul_report(i, ul_j);
+  }
+} return void;
+given lz_o (1):() then calls ul_report:(1, 0)
+given lz_o (0):() then calls ul_report:[0]
+
+ul_find(int i) {
+  int ul_j = 0;
+  int ul_found = 0 - 1;
+  while(ul_j < i && ul_found < 0) {
+    ul_found = ul_probe(i, ul_j);
+    ul_j = ul_j + 1;
+  }
+} return int ul_found;
+given lz_o (1):(0)
+given lz_o (0):(-1)
+given chain_dup_fixture (2):(0)
+given chain_dup_fixture (3):(-1)
+
+ul_probe(int i, int j) {
+  int ul_found = 0 - 1;
+  if((import cfpl)[i] == (import cfpl)[j] && (import cfp)[i] != (import cfp)[j]) {
+    ul_found = j;
+  }
+} return int ul_found;
+given lz_o (1, 0):(0)
+given lz_o (1, 1):(-1)
+given chain_dup_fixture (2, 0):(0)
+given chain_dup_fixture (3, 0):(-1)

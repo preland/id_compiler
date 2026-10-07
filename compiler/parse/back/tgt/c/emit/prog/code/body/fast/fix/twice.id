@@ -3,7 +3,7 @@
 
 lpq_lz() {
   lpq_li();
-  export int lpq_nz = node_var("lzn");
+  export int lpq_nz = node_txt("var", "lzn");
   export int lpq_kz = lpf_lt("lzj", lpq_nz);
 } chain () {
   export int lpq_i1z = lpf_inc("lzj", 1);

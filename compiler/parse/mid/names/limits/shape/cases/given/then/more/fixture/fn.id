@@ -18,7 +18,7 @@ fn_fixture() {
 
 fn_fixture_build() {
   export int[] fixture_params = [node_param("param", "int", "x")];
-  export int fixture_zero = node_int("0", 0, 0);
+  export int fixture_zero = node_txt2("int", "0", 0, 0);
   fn_fixture_node();
 } return void;
 given case_fixture ():() then (import chkfail)[0]:(0)

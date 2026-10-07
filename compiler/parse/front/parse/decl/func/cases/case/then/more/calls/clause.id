@@ -12,7 +12,7 @@ then_calls_clause(int[] pos) {
   then_calls_rest(pos, nm);
 } return void;
 given calls_args_fix ([0]):()
-given calls_count_fix ([0]):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([0]):()
 
 then_calls_rest(int[] pos, string nm) {
   eat_colon(pos);
@@ -23,7 +23,7 @@ then_calls_rest(int[] pos, string nm) {
   }
 } return void;
 given calls_args_fix ([2], "myfn"):()
-given calls_count_fix ([2], "myfn"):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([2], "myfn"):()
 
 then_calls_args(int[] pos, string nm) {
   int[] items = case_tuple(pos);

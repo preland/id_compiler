@@ -25,9 +25,12 @@ unit_t_two() {
 ():() then (import chkfail)[0]:(0)
 ():() then ptok_span:(19)
 
-unit_t_off() {
+// The two-file parse with the unit cursor (unitc) set: (0, 0) leaves it at a.id,
+// (1, 1) at b.id's function, as it is once the first pass over `prog` has
+// passed it.
+unit_t_mark(int utm_at, int utm_val) {
   unit_t_two();
-  lset((import unitc), 0, 0);
+  lset((import unitc), utm_at, utm_val);
 } return void;
-():() then (import chkfail)[0]:(0)
-():() then ptok_span:(19)
+(0, 0):() then (import chkfail)[0]:(0)
+(1, 1):() then ptok_span:(19)

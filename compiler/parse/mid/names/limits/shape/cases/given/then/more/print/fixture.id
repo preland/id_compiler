@@ -12,7 +12,7 @@ print_fixture() {
 ():() then init_units:(0)
 
 print_fixture_items() {
-  export int[] fixture_print_two = [node_int("1", 1, 0), node_int("2", 2, 0)];
+  export int[] fixture_print_two = [node_txt2("int", "1", 1, 0), node_txt2("int", "2", 2, 0)];
   export int[] fixture_print_none = [];
   print_fixture_nodes();
 } return void;

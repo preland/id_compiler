@@ -2,8 +2,8 @@
 lw_go(int b) {
   lset((import lwcur), 0, b);
 } return int b;
-given lw_fixture (99):(99) then (import lwcur)[0]:(99)
-given lw_fixture2 (7):(7) then (import lwcur)[0]:(7)
+given lw_fixture(0) (99):(99) then (import lwcur)[0]:(99)
+given lw_fixture(1) (7):(7) then (import lwcur)[0]:(7)
 
 // Two blocks, not one: the entry block holds nothing but allocas and the
 // branch into the body, so an alloca can be appended to it at any point in the

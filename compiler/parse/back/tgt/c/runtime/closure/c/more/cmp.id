@@ -1,24 +1,10 @@
-// The rest of the closure runtime's text (text.id): what a native boundary, a
-// case's comparison and the LLVM target's calls need. A closure has no function
-// pointer to give a native, so id_fn_raw stops the program there with the fix
-// named; two function values are equal when they are the same object, or the
-// same function holding the same number of cells with the same bits
-// (docs/SPEC.md 1.1.1). The rest are the calls a module the LLVM target prints
-// makes, so that an object is opaque to the module and to idrun: id_clo_fn and
-// id_clo_cell read one, and id_fn_plain answers the object of a plain function
-// (made once per function and kept, because a module cannot define a constant
-// object that every runtime would lay out alike). And the one spelling a call
-// through a function value needs in C: the type of its `fn`.
-
-emit_closure_cmp() {
-  emit_line("ID_CLO void* id_fn_raw(const IdFn* f) {\n    if (!f) id_null_read();\n    if (!f->raw) { fprintf(stderr, \"id: a closure cannot be passed to a native: it takes a plain function pointer; pass the function by name, or give the native the values another way\\n\"); exit(1); }\n    return f->raw;\n}\nID_CLO int id_fn_eq(const IdFn* a, const IdFn* b) {\n    return a == b || (a && b && a->fn == b->fn && a->raw == b->raw && a->n == b->n && memcmp(ID_FNC(a), ID_FNC(b), (size_t)a->n * sizeof(long long)) == 0);\n}\nID_CLO void* id_clo_fn(const IdFn* f) { if (!f) id_null_read(); return f->fn; }\nID_CLO long long id_clo_cell(const IdFn* f, int i) { if (!f) id_null_read(); return ID_FNC(f)[i]; }\nID_CLO IdFn* id_fn_plain(void* fn, void* raw) {\n    static ID_TLS IdFn* tab[64];\n    static ID_TLS int used = 0;\n    for (int i = 0; i < used; i++) if (tab[i]->fn == fn) return tab[i];\n    IdFn* o = id_clo_make(fn, 0);\n    o->raw = raw;\n    if (used < 64) tab[used++] = o;\n    return o;\n}");
-} return void;
-():() then calls emit_line:[1]
-():() then prints:("ID_CLO void* id_fn_raw(const IdFn* f) {\n    if (!f) id_null_read();\n    if (!f->raw) { fprintf(stderr, \"id: a closure cannot be passed to a native: it takes a plain function pointer; pass the function by name, or give the native the values another way\\n\"); exit(1); }\n    return f->raw;\n}\nID_CLO int id_fn_eq(const IdFn* a, const IdFn* b) {\n    return a == b || (a && b && a->fn == b->fn && a->raw == b->raw && a->n == b->n && memcmp(ID_FNC(a), ID_FNC(b), (size_t)a->n * sizeof(long long)) == 0);\n}\nID_CLO void* id_clo_fn(const IdFn* f) { if (!f) id_null_read(); return f->fn; }\nID_CLO long long id_clo_cell(const IdFn* f, int i) { if (!f) id_null_read(); return ID_FNC(f)[i]; }\nID_CLO IdFn* id_fn_plain(void* fn, void* raw) {\n    static ID_TLS IdFn* tab[64];\n    static ID_TLS int used = 0;\n    for (int i = 0; i < used; i++) if (tab[i]->fn == fn) return tab[i];\n    IdFn* o = id_clo_make(fn, 0);\n    o->raw = raw;\n    if (used < 64) tab[used++] = o;\n    return o;\n}\n")
+// The one spelling a call through a function value needs in C: the type of its
+// `fn`. The rest of the closure runtime's text is c_clo_cmp (conf.id), printed
+// by text.id.
 
 c_clo_ptr(string vt) {
   string[] pts = fn_params(vt);
-  string s = c_type(fn_ret(vt)) + " (*)(IdFn*" + sep_arg(len(pts)) + c_type_list(pts) + ")";
+  string s = c_type(fn_ret(vt)) + " (*)(IdFn*" + sep_at(", ", len(pts)) + c_type_list(pts) + ")";
 } return string s;
 given lc_env2 ("func(int) return int"):("int (*)(IdFn*, int)")
 given lc_env2 ("func() return void"):("void (*)(IdFn*)")

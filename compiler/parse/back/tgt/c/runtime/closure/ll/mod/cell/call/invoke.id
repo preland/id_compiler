@@ -15,7 +15,7 @@ fv_ll_args(int fn, int nd) {
   string out = "";
   int i = 0;
   while(i < len((import nl1)[fn])) {
-    out = out + sep_arg(i) + fv_ll_arg(fn, nd, i);
+    out = out + sep_at(", ", i) + fv_ll_arg(fn, nd, i);
     i = i + 1;
   }
 } return string out;

@@ -13,7 +13,7 @@ given clo_fixture ((import fixture_fn), "fx_target", 1):("define i32 @idfn_a_fx_
 
 fv_ll_head(int fn, string name, int nd) {
   string rt = (import ns2)[fn];
-  string s = "define " + ll_ty(rt) + " @idfn_a_" + fv_key(name, nd) + "(ptr %c" + fv_ll_params(fn, nd) + ") {";
+  string s = "define " + ll_ty(rt) + " @idfn_a_" + name + (import fv_sep) + nd + "(ptr %c" + fv_ll_params(fn, nd) + ") {";
 } return string s;
 given clo_fixture ((import fixture_fn), "fx_target", 0):("define i32 @idfn_a_fx_target__0(ptr %c, i32 %a0) {")
 given clo_fixture ((import fixture_fn), "fx_target", 1):("define i32 @idfn_a_fx_target__1(ptr %c) {")

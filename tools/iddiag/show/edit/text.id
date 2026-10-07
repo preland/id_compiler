@@ -4,7 +4,7 @@
 
 dg_edit_text(string dg_et_e, string dg_et_p, int dg_et_on) {
   string dg_et_o = dg_ef(dg_et_e, 1);
-  string dg_et_w = dg_appl_words(dg_ef(dg_et_e, 0));
+  string dg_et_w = str_tab3(dg_ef(dg_et_e, 0), "machine", "machine-applicable", "maybe", "check it before applying", "placeholder", "fill in the placeholders", "unspecified");
   string dg_et_n = dg_ef(dg_et_e, 2);
 } chain (string dg_et_e, string dg_et_p, int dg_et_on) {
   string dg_et_d = dg_need(dg_et_e);
@@ -21,24 +21,6 @@ dg_edit_text(string dg_et_e, string dg_et_p, int dg_et_on) {
 ("machine\treplace\t4\tx\ty", " ", 0):("  = edit: replace `x` with `y` on line 4 (machine-applicable)")
 ("placeholder\tafter-function\t4\t\t(A):(B)\\n(C):(D)\\n", " ", 0):("  = edit: add after the function declared on line 4 (fill in the placeholders):\n  + (A):(B)\n  + (C):(D)")
 ("machine\tmystery\t4\tx\ty", " ", 0):("")
-
-dg_appl_words(string dg_aw_a) {
-  string dg_aw_r = "unspecified";
-  if(dg_aw_a == "machine") {
-    dg_aw_r = "machine-applicable";
-  }
-  if(dg_aw_a == "maybe") {
-    dg_aw_r = "check it before applying";
-  }
-} chain (string dg_aw_a) {
-  if(dg_aw_a == "placeholder") {
-    dg_aw_r = "fill in the placeholders";
-  }
-} return string dg_aw_r;
-("machine"):("machine-applicable")
-("maybe"):("check it before applying")
-("placeholder"):("fill in the placeholders")
-("other"):("unspecified")
 
 // Added text, one line to a line, each behind the gutter and a `+`.
 dg_plus(string dg_pl_t, string dg_pl_p) {

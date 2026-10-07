@@ -4,7 +4,7 @@ qmp_read_response() {
   string line = qmp_read_line();
   string r = check_event(line);
 } return string r;
-given qmb_qmp_hello_ser_empty ():("hello")
+given qmb_qmp_peer("hello") ():("hello")
 given qmb_qmp_empty_ser_empty ():("")
 
 check_event(string line) {

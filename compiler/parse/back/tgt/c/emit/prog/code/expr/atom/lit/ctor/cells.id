@@ -5,7 +5,7 @@ ctor_cells(string sd_nm, int[] sd_as) {
   string out = "";
   int sd_k = 0;
   while(sd_k < len(sd_as)) {
-    out = out + sep_arg(sd_k) + ctor_cell(sd_nm, sd_as[sd_k], sd_k);
+    out = out + sep_at(", ", sd_k) + ctor_cell(sd_nm, sd_as[sd_k], sd_k);
     sd_k = sd_k + 1;
   }
 } return string out;

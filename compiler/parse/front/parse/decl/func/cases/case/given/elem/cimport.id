@@ -17,7 +17,7 @@ case_item(int[] pos) {
     v = case_value(pos);
   }
 } return int v;
-given import_fix ([0]):(0)
+given toks_env(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]) ([0]):(0)
 given tup1_fix ([0]):(0)
 
 case_import(int[] pos) {
@@ -25,13 +25,13 @@ case_import(int[] pos) {
   advance(pos);
   int ret_i = import_rest(pos);
 } return int ret_i;
-given import_fix ([0]):(0)
-given import_fix ([0]):(0) then (import chkfail)[0]:(0)
+given toks_env(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]) ([0]):(0)
+given toks_env(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]) ([0]):(0) then (import chkfail)[0]:(0)
 
 import_rest(int[] pos) {
   string name = read_name(pos);
-  eat_close(pos);
+  eat_text(pos, ")");
   int ret_i = newleaf("cimport", 0, 0, name, "");
 } return int ret_i;
-given import_fix ([2]):(0)
-given import_fix ([2]):(0) then (import chkfail)[0]:(0)
+given toks_env(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]) ([2]):(0)
+given toks_env(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]) ([2]):(0) then (import chkfail)[0]:(0)

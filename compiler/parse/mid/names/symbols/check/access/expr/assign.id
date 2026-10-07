@@ -42,8 +42,8 @@ given assign_build2 ((import assign_ok), "f"):() then calls acc_expr:((import li
 // which is not enough for acc_name's declared_in to read didx.
 regrow_assign() {
   regrow_d();
-  export int regrow_assign_val = node_int("2", 2, 0);
-  export int regrow_assign_node = node_assign("z", (import regrow_assign_val));
+  export int regrow_assign_val = node_txt2("int", "2", 2, 0);
+  export int regrow_assign_node = node_txt1("assign", "z", (import regrow_assign_val));
 } return void;
-():() then calls node_int:("2", 2, 0)
+():() then calls node_txt2:("int", "2", 2, 0)
 ():() then init_units:(0)

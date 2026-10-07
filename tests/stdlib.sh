@@ -305,7 +305,7 @@ libx_a(int a) {
 } return int r;
 
 libx_b(int a) {
-  int r = a + 2;
+  int r = a * 2;
 } return int r;
 EOF
 lib_ok=1
@@ -362,15 +362,15 @@ fi
 
 # -- 20. the reserved-name list has not drifted from the runtime -----------
 # resv_names_src, in compiler/parse/conf.id, and the runtime prelude
-# (compiler/parse/back/tgt/c/runtime/prelude.id) are both hand-maintained now
+# (c_crt_text, c_prelude_text and c_clo_* in the same conf.id) are both hand-maintained now
 # (docs/HACKING.md). If someone adds a helper to the prelude and forgets to add
 # its name to resv_names_src, an id function could be given that name and
 # collide with the runtime in the generated C -- this is what makes forgetting
 # it a test failure, extracting each side with grep/sed rather than a second
 # implementation of either.
-runtime_names=$(grep -ohE 'id_[a-zA-Z_0-9]+\(' "$ROOT/compiler/parse/back/tgt/c/runtime/prelude.id" \
+runtime_names=$( (grep -E '^string (c_crt_text|c_prelude_text|c_clo_)' "$ROOT/compiler/parse/conf.id"; cat \
     "$ROOT/compiler/parse/back/tgt/c/runtime/closure/c/text.id" \
-    "$ROOT/compiler/parse/back/tgt/c/runtime/closure/c/more/cmp.id" \
+    "$ROOT/compiler/parse/back/tgt/c/runtime/closure/c/more/cmp.id") | grep -ohE 'id_[a-zA-Z_0-9]+\(' \
     | sed -E 's/^id_//; s/\($//' | sort -u)
 conf_names=$(grep -oE 'string resv_names_src = "[^"]*"' "$ROOT/compiler/parse/conf.id" \
     | sed -E 's/^string resv_names_src = "//; s/"$//' | tr ' ' '\n' | sort -u)

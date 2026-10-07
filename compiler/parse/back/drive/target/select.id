@@ -23,15 +23,15 @@ given nz_prog_fixture (1, ["prog"]):() then calls emit_target2:("c", 1, ["prog"]
 // written in `id`. The driver asks for it once per build.
 emit_target2(string t, int argc, string[] argv) {
   if(t == "crt") {
-    emit_crt();
+    print((import c_crt_text));
     emit_closure_rt("");
-    emit_crt_eprint();
+    emit_line((import c_crt_eprint));
   } else {
     string arg_triple_v = arg_triple(argc, argv);
     emit_program(arg_triple_v);
   }
 } return void;
-given nz_env ("crt", 1, ["prog"]):() then calls emit_crt:[1] then calls emit_crt_eprint:[1]
+given nz_env ("crt", 1, ["prog"]):() then calls emit_closure_rt:("")
 given nz_prog_fixture ("c", 1, ["prog"]):() then calls emit_program:("x86_64-unknown-linux-gnu")
 
 // `--target NAME`, scanned rather than read at a fixed position: the driver

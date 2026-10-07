@@ -27,7 +27,7 @@ check_bodies() {
     i = i + 1;
   }
 } return void;
-given dupfn_fixture ():() then (import chkfail)[0]:(1)
+given dup_prog_fixture("dupe", "dupe", 1, 5) ():() then (import chkfail)[0]:(1)
 given clean_prog_fixture ():() then (import chkfail)[0]:(0)
 
 // Fingerprint every function once. Comparing is quadratic in the number of
@@ -42,6 +42,11 @@ uq_fill() {
   export string[] cfp = [];
   export int[] cfpfn = [];
   uq_fill_all();
+} chain () {
+  export string[] cfpl = [];
+  ul_fill();
 } return void;
-given dupfn_fixture ():() then len((import cfp)):(2)
+given dup_prog_fixture("dupe", "dupe", 1, 5) ():() then len((import cfp)):(2)
 given fn_fixture ():() then len((import cfp)):(1)
+given dup_prog_fixture("dupe", "dupe", 1, 5) ():() then len((import cfpl)):(2)
+given fn_fixture ():() then len((import cfpl)):(1)

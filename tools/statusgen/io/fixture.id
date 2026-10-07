@@ -29,17 +29,12 @@ sg_t_tree() {
   int sg_t_l = exec_file_put((import sg_t_root) + "/lst.sh", "echo \"0  core\"\n", 420);
   int sg_t_m = exec_file_put((import sg_t_root) + "/bench.md", "### Wall time, ratio to x\n| a |\n|--|\n| b |\n", 420);
 } return void export sg_t_root;
-():() then sg_t_note:("k() {\n")
-():() then sg_t_note:("k() {\n") then prints:("")
-
-sg_t_note() {
-  string sg_t_nt = fs_read_text((import sg_t_root) + "/note.txt");
-} return string sg_t_nt;
-given sg_t_tree ():("k() {\n")
-given sg_t_tree ():("k() {\n") then prints:("")
+():() then calls exec_file_put:[9]
+():() then calls fs_mkdir:[2]
 
 sg_t_text(string sg_t_rel) {
   string sg_t_tx = fs_read_text((import sg_t_root) + "/" + sg_t_rel);
 } return string sg_t_tx;
 given sg_t_tree ("sub/b.id"):("g() {\n} return void;\n")
+given sg_t_tree ("note.txt"):("k() {\n")
 given sg_t_tree ("a.id"):("f(int x) {\n} return int x;\n(1):(1)\n(2):(2)\n")

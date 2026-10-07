@@ -13,5 +13,5 @@ clo_fn(word ko) {
 } return word kf;
 
 fn_raw(word ko) {
-  word kr = clo_word(ko, 1);
+  word kr = ld64(ko + 8);
 } return word kr;

@@ -3,10 +3,10 @@
 
 lpf_lg() {
   lpf_g1();
-  export int lpf_ng = node_var("lgn");
+  export int lpf_ng = node_txt("var", "lgn");
   export int lpf_cg = lpf_lt("lgj", lpf_ng);
 } chain () {
-  export int lpf_xg = lpf_ix("lgv", node_var("lgj"));
+  export int lpf_xg = lpf_ix("lgv", node_txt("var", "lgj"));
   export int lpf_kg = lpf_call1("lpf_leaf", lpf_xg);
   export int lpf_sg = lpf_acc("lgs", lpf_kg);
 } chain () {
@@ -27,14 +27,14 @@ lpf_lg() {
 
 lpf_lh() {
   lpf_lg();
-  export int lpf_nh = node_var("lhn");
+  export int lpf_nh = node_txt("var", "lhn");
   export int lpf_ch = lpf_lt("lhj", lpf_nh);
 } chain () {
-  export int lpf_vh = node_var("lhv");
+  export int lpf_vh = node_txt("var", "lhv");
   export int lpf_kh = lpf_call1("lpf_grow", lpf_vh);
   export int lpf_th = node_exprstmt(lpf_kh);
 } chain () {
-  export int lpf_xh = lpf_ix("lhv", node_var("lhj"));
+  export int lpf_xh = lpf_ix("lhv", node_txt("var", "lhj"));
   export int lpf_sh = lpf_acc("lhs", lpf_xh);
   export int lpf_wy = lpf_wh(lpf_ch, lpf_th, lpf_sh);
 } chain () {

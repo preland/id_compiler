@@ -1,18 +1,22 @@
 // Where a C statement ends in a token stream: at a semicolon outside braces, or at the brace that closes a function body.
 
-// How a token moves the brace depth: 1 for an opening brace, -1 for a closing one, 0 otherwise.
-sm_delta(string sm_tok) {
+// How a token moves a nesting depth: 1 for the opening token, -1 for the closing one, 0
+// otherwise. The pair is the caller's: braces here, parentheses for a prototype's parameters.
+sm_delta(string sm_tok, string sm_open, string sm_close) {
   int sm_d = 0;
-  if (sm_tok == "{") {
+  if (sm_tok == sm_open) {
     sm_d = 1;
   }
-  if (sm_tok == "}") {
+  if (sm_tok == sm_close) {
     sm_d = 0 - 1;
   }
 } return int sm_d;
-("{"):(1)
-("}"):(-1)
-("int"):(0)
+("{", "{", "}"):(1)
+("}", "{", "}"):(-1)
+("int", "{", "}"):(0)
+("(", "(", ")"):(1)
+(")", "(", ")"):(-1)
+("x", "(", ")"):(0)
 
 // 1 when a statement whose first token is sm_t[sm_s] may be a function definition, which ends at its closing brace; 0 when it starts with typedef, struct, union or enum, whose braces are followed by a name or a semicolon.
 sm_body(string[] sm_t, int sm_s) {

@@ -1,10 +1,12 @@
-// Consume a '.', and say whether there was one.
-ld_dot() {
-  int dot = ld_at() == 46;
-  ld_adv(dot);
-} return int dot;
-given tf_ld(".5") ():(1) then (import ld_pr)[(import pr_p)]:(1)
-given tf_ld("5") ():(0) then (import ld_pr)[(import pr_p)]:(0)
+// Consume the byte given if it is next ('.' is 46, '+' is 43), and say whether there was one.
+ld_eat(int ld_ch) {
+  int hit = ld_at() == ld_ch;
+  ld_adv(hit);
+} return int hit;
+given tf_ld(".5") (46):(1) then (import ld_pr)[(import pr_p)]:(1)
+given tf_ld("5") (46):(0) then (import ld_pr)[(import pr_p)]:(0)
+given tf_ld("+5") (43):(1) then (import ld_pr)[(import pr_p)]:(1)
+given tf_ld("5") (43):(0) then (import ld_pr)[(import pr_p)]:(0)
 
 // Ten to the k as a float: exact up to 10^22, so a literal of at most 15
 // digits is the correctly rounded quotient of two exact floats.
@@ -23,7 +25,7 @@ ld_pow10(int k) {
 ld_fnum() {
   int neg = ld_neg();
   word wv = ld_digits(0);
-  int dot = ld_dot();
+  int dot = ld_eat(46);
 } chain () {
   int p0 = (import ld_pr)[(import pr_p)];
   wv = ld_digits(wv);

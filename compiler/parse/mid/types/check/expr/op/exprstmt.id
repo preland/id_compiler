@@ -14,7 +14,7 @@
 chk_exprstmt(int id) {
   int i1_of_v = (import ni1)[id];
   string op = (import ns1)[i1_of_v];
-  if((import nkind)[i1_of_v] == "bin" && is_asgop(op) == 1) {
+  if((import nkind)[i1_of_v] == "bin" && str_in((import asgops), op) == 1) {
     int i1_of_v2 = (import ni1)[id];
     string disc_hint_v = disc_hint(i1_of_v2);
     tc_err(id, "this statement compares instead of assigning: '=' in an expression is equality, so the statement has no effect" + disc_hint_v);
@@ -28,15 +28,6 @@ given cmp_fixture ((import bin_mixed)):() then (import chkfail)[0]:(0)
 // keeps the two agreeing about the same programs. It is the right net anyway --
 // `x == 2;` as a statement is exactly as pointless as the assignment it is
 // usually a typo for. `!=` is left out: nobody mistypes it for an assignment.
-is_asgop(string op) {
-  int ok = 0;
-  if(op == "=" || op == "==") {
-    ok = 1;
-  }
-} return int ok;
-("="):(1)
-("+"):(0)
-
 // Naming the fix is the point of the diagnostic, so an index target -- the
 // case that actually bites -- gets told what to write instead.
 disc_hint(int id) {

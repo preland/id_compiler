@@ -21,7 +21,7 @@ given flow_canon_fixture ((import canon_retv)):("ret(I4)")
 flow_canon_fixture() {
   blank_stmts_fixture();
   export int canon_brk = newleaf("break", 0 - 1, 0, "", "");
-  export int canon_lit = node_int("4", 4, 1);
+  export int canon_lit = node_txt2("int", "4", 4, 1);
 } chain () {
   int[] canon_none = [];
   export int canon_retv = newnode("ret", (import canon_lit), 0, "f", "int", canon_none, canon_none);

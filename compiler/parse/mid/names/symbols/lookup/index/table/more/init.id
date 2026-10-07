@@ -43,10 +43,10 @@ given argfn_d ():() then (import chkfail)[0]:(0)
 // with room.
 elems_fixture() {
   env_init();
-  export int elems_e1 = node_int("1", 1, 0);
-  export int elems_e2 = node_int("2", 2, 0);
+  export int elems_e1 = node_txt2("int", "1", 1, 0);
+  export int elems_e2 = node_txt2("int", "2", 2, 0);
 } chain () {
   export int[] elems_two = [(import elems_e1), (import elems_e2)];
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)

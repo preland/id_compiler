@@ -12,20 +12,3 @@ chk_mod(int id) {
 given cmp_fixture ((import bin_bitand)):() then (import chkfail)[0]:(0)
 given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(0)
 
-is_logop(string s) {
-  int ok = 0;
-  if(s == "&&" || s == "||") {
-    ok = 1;
-  }
-} return int ok;
-("&&"):(1)
-("&"):(0)
-
-is_bitop(string s) {
-  int ok = 0;
-  if(s == "&" || s == "|" || s == "^" || s == "<<" || s == ">>") {
-    ok = 1;
-  }
-} return int ok;
-("&"):(1)
-("&&"):(0)

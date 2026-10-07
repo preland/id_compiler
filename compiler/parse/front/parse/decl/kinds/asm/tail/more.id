@@ -8,14 +8,14 @@ asm_tail_mid(int[] pos, string rt) {
   int ret_i = asm_tail_end(pos, name);
 } return int ret_i;
 given asm_fix_full ([4], "int"):(0) then afret_last:("afret int") then afretn_last:("result")
-given asm_fix_full2 ([5], "word"):(0) then afret_last:("afret word") then afretn_last:("r")
+given toks_env(["op", "str", "op", "kw", "kw", "ident"], ["{", "\"i1\"", "}", "return", "word", "r"]) ([5], "word"):(0) then afret_last:("afret word") then afretn_last:("r")
 
 asm_tail_end(int[] pos, string name) {
   push((import afretn), name);
   int ret_i = asm_fin(pos);
 } return int ret_i;
 given asm_fix_full ([4], "result"):(0) then afretn_last:("result")
-given asm_fix_full2 ([5], "r"):(0) then afretn_last:("r")
+given toks_env(["op", "str", "op", "kw", "kw", "ident"], ["{", "\"i1\"", "}", "return", "word", "r"]) ([5], "r"):(0) then afretn_last:("r")
 
 // aloc: one "file:line" per asm declaration, parallel to afname, pushed by
 // push_asm (front/parse/decl/top/decl/more.id) -- room for the export here

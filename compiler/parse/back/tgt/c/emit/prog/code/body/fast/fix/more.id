@@ -6,14 +6,14 @@
 
 lpf_more() {
   lpf_lx();
-  export int lpf_andn = node_bin("&&", (import lpf_ca), (import lpf_cb));
-  export int lpf_negl = node_bin("<", (import lpf_n0), (import lpf_n0));
+  export int lpf_andn = node_txt2("bin", "&&", (import lpf_ca), (import lpf_cb));
+  export int lpf_negl = node_txt2("bin", "<", (import lpf_n0), (import lpf_n0));
 } chain () {
-  export int lpf_bigr = node_bin("<", (import lpf_q), (import lpf_z1));
-  export int lpf_vvs = node_bin("+", (import lpf_q), (import lpf_q));
-  export int lpf_ngl = node_int("-1", 0 - 1, 0);
+  export int lpf_bigr = node_txt2("bin", "<", (import lpf_q), (import lpf_z1));
+  export int lpf_vvs = node_txt2("bin", "+", (import lpf_q), (import lpf_q));
+  export int lpf_ngl = node_txt2("int", "-1", 0 - 1, 0);
 } chain () {
-  export int lpf_bgl = node_int("9", 9, 1);
+  export int lpf_bgl = node_txt2("int", "9", 9, 1);
   export int lpf_oj = (import ni1)[(import lpf_ob)];
   export int lpf_ea = (import ni1)[(import lpf_ia)];
 } chain () {

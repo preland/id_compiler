@@ -4,20 +4,12 @@
 // `(import NAME)` (cm_push_local_call, for chk_const_mut2's "not import"
 // gate and chk_const_mut3's "not a registered constant" one).
 
-cm_call_var(string name) {
-  int argn = node_var(name);
-  int valn = node_int("9", 9, 0);
-  int d = node_call("push", [argn, valn]);
-} return int d;
-given cm_other_setup ("locallist"):(6)
-given cm_other_setup ("other"):(6)
-
 cm_other_setup() {
   env_init();
-  export int cm_var_node = node_var("x");
-  export int cm_push_local_call = cm_call_var("locallist");
+  export int cm_var_node = node_txt("var", "x");
+  export int cm_push_local_call = cm_call("var", "locallist");
 } return void;
-():() then calls node_var:("x")
+():() then calls node_txt:("var", "x")
 ():() then init_units:(0)
 
 chk_bi_nonbuiltin_setup() {

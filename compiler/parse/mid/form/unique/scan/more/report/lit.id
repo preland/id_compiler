@@ -1,0 +1,26 @@
+// The diagnostic of two functions that differ only in literal values (E0407),
+// laid out as report_dup (./dup.id) lays out E0402: where the later function
+// is, where the earlier one was defined, and a related line on the earlier. Its
+// help names both functions and the fix, since which literal differs is for the
+// reader to see; the why is conf.id's litd_why.
+
+ul_report(int i, int j) {
+  string ulr_name = fname_at(i);
+  string ulr_where = dup_loc(ulr_name);
+  string ulr_tail = dup_tail(j);
+} chain (int i, int j) {
+  string ulr_there = dup_loc_of(j);
+  string ulr_help = ul_help(ulr_name, j);
+  diag("E0407", ulr_where, "function '" + ulr_name + "' differs from " + ulr_tail + " only in the values of its literals", ulr_name, (import litd_why), ulr_help);
+} chain (int i, int j) {
+  diag_related(ulr_there, "the function this one differs from only in literals");
+} return void;
+given lz_o (1, 0):() then prints:("<stdin>:1: error: function 'dup9' differs from 'dup5' (defined at <stdin>:1) only in the values of its literals [E0407]\n  at: dup9\n  why: two functions that differ only in the values of their literals are one function written twice; the values are all that varies, so they belong in parameters\n  help: keep one of 'dup9' and 'dup5': make each literal that differs a parameter, call that one function from both places passing each place's value, and delete the other\n  related: <stdin>:1: note: the function this one differs from only in literals\n") then (import chkfail)[0]:(1)
+given lz_o (0, 1):() then prints:("<stdin>:1: error: function 'dup5' differs from 'dup9' (defined at <stdin>:1) only in the values of its literals [E0407]\n  at: dup5\n  why: two functions that differ only in the values of their literals are one function written twice; the values are all that varies, so they belong in parameters\n  help: keep one of 'dup5' and 'dup9': make each literal that differs a parameter, call that one function from both places passing each place's value, and delete the other\n  related: <stdin>:1: note: the function this one differs from only in literals\n") then (import chkfail)[0]:(1)
+
+ul_help(string ulh_a, int j) {
+  string ulh_b = fname_at(j);
+  string ret_s = "keep one of '" + ulh_a + "' and '" + ulh_b + "': make each literal that differs a parameter, call that one function from both places passing each place's value, and delete the other";
+} return string ret_s;
+given lz_o ("dup9", 0):("keep one of 'dup9' and 'dup5': make each literal that differs a parameter, call that one function from both places passing each place's value, and delete the other")
+given lz_o ("dup5", 1):("keep one of 'dup5' and 'dup9': make each literal that differs a parameter, call that one function from both places passing each place's value, and delete the other")

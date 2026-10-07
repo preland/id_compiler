@@ -6,7 +6,7 @@ c_type_list(string[] pts) {
   string out = "";
   int i = 0;
   while(i < len(pts)) {
-    out = out + sep_arg(i) + c_type(pts[i]);
+    out = out + sep_at(", ", i) + c_type(pts[i]);
     i = i + 1;
   }
 } return string out;
@@ -23,5 +23,5 @@ unit_from(int id) {
     uc = 0;
   }
 } return int uc;
-given unit_t_late ((import unit_t_fb)):(1)
-given unit_t_late ((import unit_t_fa)):(0)
+given unit_t_mark(1, 1) ((import unit_t_fb)):(1)
+given unit_t_mark(1, 1) ((import unit_t_fa)):(0)

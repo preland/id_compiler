@@ -19,11 +19,3 @@ lw_un2(int node, string t) {
 given un_fixture ((import not_node), "int"):(6)
 given un_fixture ((import neg_node), "int"):(4)
 
-lw_unop(string op) {
-  string p = "not";
-  if(op == "-") {
-    p = "neg";
-  }
-} return string p;
-given ir_rows ("-"):("neg")
-given ir_rows ("!"):("not")

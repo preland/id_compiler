@@ -5,10 +5,10 @@
 // id 1: a "var" leaf named "x"; id 2: the int literal "3".
 lz_b() {
   lz_a();
-  export int lz_var = node_var("x");
-  export int lz_i1 = node_int("3", 3, 0);
+  export int lz_var = node_txt("var", "x");
+  export int lz_i1 = node_txt2("int", "3", 3, 0);
 } return void;
-():() then calls node_var:("x")
+():() then calls node_txt:("var", "x")
 ():() then init_units:(0)
 
 // Everything ut_why needs in one setup: the untestable tables seeded, a

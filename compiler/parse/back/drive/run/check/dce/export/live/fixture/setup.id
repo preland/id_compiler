@@ -10,14 +10,14 @@ cvl_setup() {
   init_reach();
 } chain () {
   int cvf_da = lc_reg_int("ca", "1", 1);
-  int cvf_ib = node_var("ca");
+  int cvf_ib = node_txt("var", "ca");
   int cvf_db = lc_reg("int", "cb", cvf_ib);
 } chain () {
   int cvf_dc = lc_reg_int("cc", "3", 3);
   int cvf_dd = lc_reg_int("cd", "4", 4);
-  int cvf_rb = node_import("cb");
+  int cvf_rb = node_txt("import", "cb");
 } chain () {
-  int cvf_rd = node_import("cd");
+  int cvf_rd = node_txt("import", "cd");
   int[] cvf_none = [];
   int[] cvf_body = [cvf_rb];
 } chain () {

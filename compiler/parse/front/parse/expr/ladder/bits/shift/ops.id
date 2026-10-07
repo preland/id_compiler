@@ -4,7 +4,7 @@
 
 parse_shift(int[] pos) {
   int left = parse_add(pos);
-  while(shiftop_at(pos)) {
+  while(op_at(pos, (import shiftops))) {
     left = fold_shift(pos, left);
   }
 } return int left;
@@ -21,11 +21,3 @@ given expr_tokens ([7], 100):(1)
 
 // `>>` is the arithmetic (sign-propagating) shift; the logical one is the
 // `ushr` builtin.
-is_shiftop(string s) {
-  int ok = 0;
-  if(s == "<<" || s == ">>") {
-    ok = 1;
-  }
-} return int ok;
-("<<"):(1)
-("+"):(0)

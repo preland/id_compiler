@@ -15,7 +15,7 @@ lencall_fixture() {
 ():() then init_units:(0)
 
 lencall_fixture_reg() {
-  export int[] lencall_args = [node_int("1", 1, 0)];
+  export int[] lencall_args = [node_txt2("int", "1", 1, 0)];
   export int lencall_node = node_call("len", lencall_args);
 } return void;
 given lencall_fixture ():() then (import chkfail)[0]:(0)

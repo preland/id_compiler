@@ -20,11 +20,3 @@ lw_len(int node) {
 given lencall_fixture ((import lencall_node)):(1)
 given lencall_fixture ((import lencall_node)):(1) then (import chkfail)[0]:(0)
 
-lw_lenfn(string t) {
-  string s = "id_list_len";
-  if(t == "string") {
-    s = "id_len";
-  }
-} return string s;
-("string"):("id_len")
-("int"):("id_list_len")

@@ -3,19 +3,10 @@
 show_part(int fn, int j) {
   string nm = chk_name(fn, j);
   string pt = chk_type(fn, j);
-  string so = show_sep(j) + tc_show(nm, pt);
+  string so = sep_at("fputs(\", \", stderr); ", j) + tc_show(nm, pt);
 } return string so;
 given fn_fixture ((import fixture_fn), 1):("fputs(\", \", stderr); fprintf(stderr, \"%d\", idtc_got);")
 given ret_void_fix (8, 0):("fprintf(stderr, \"%d\", idtc_a0);")
-
-show_sep(int j) {
-  string so = "";
-  if(j > 0) {
-    so = "fputs(\", \", stderr); ";
-  }
-} return string so;
-(0):("")
-(1):("fputs(\", \", stderr); ")
 
 exp_tail(int[] expd) {
   string et = items_text(expd);

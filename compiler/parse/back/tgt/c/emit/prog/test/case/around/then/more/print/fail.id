@@ -3,7 +3,7 @@
 //   FILE:LINE: test failed: f() prints = "actual", expected "expected"
 
 emit_print_lines(int ci, string kind, string cnd, string shown, int e) {
-  string lab = print_label(kind);
+  string lab = str_pick(kind, "theneprints", "eprints", "prints");
   string lt = lit_text(e);
   emit_print_final(ci, lab, cnd, shown, lt);
 } return void;

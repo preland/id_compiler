@@ -12,8 +12,8 @@
 // limit.
 
 esc_fx_a() {
-  export int efa_va = node_var("a");
-  export int efa_vb = node_var("b");
+  export int efa_va = node_txt("var", "a");
+  export int efa_vb = node_txt("var", "b");
   export int[] efa_args = [(import efa_va), (import efa_vb)];
 } return void;
 given full_env ():() then (import chkfail)[0]:(0)

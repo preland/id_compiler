@@ -41,16 +41,3 @@ init_asm2() {
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
-// A string token arrives with its quotes; the triple is compared against a
-// command-line argument, so it is stored without them.
-unquote(string s) {
-  string out = "";
-  int i = 1;
-  while(i < len(s) - 1) {
-    int charat_v = charat(s, i);
-    out = out + chr(charat_v);
-    i = i + 1;
-  }
-} return string out;
-("\"x86_64\""):("x86_64")
-("\"\""):("")

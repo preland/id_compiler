@@ -18,7 +18,7 @@ given sd_bi_fixture ((import sd_pushc)):() then (import chkfail)[0]:(0)
 sd_bi_arg(int id, int sd_i) {
   int sd_a = (import nl1)[id][sd_i];
   string sd_t = type_of(sd_a);
-  if(ty_is_struct(sd_t) == 1 && bi_want_for(id, sd_i) == "" && arg_ctx_b((import ns1)[id], sd_i) == 0) {
+  if(ty_kind_is(sd_t, "struct") == 1 && bi_want_for(id, sd_i) == "" && arg_ctx_b((import ns1)[id], sd_i) == 0) {
     tc_err(sd_a, "'" + (import ns1)[id] + "' cannot take a struct: argument " + sd_i + " is " + sd_t + "; use its fields, as in " + (import ns1)[id] + "(p." + sd_cell((import sdfname), sd_t, 0) + ")");
   }
 } return void;

@@ -1,20 +1,12 @@
-// A number printed the way a case writes it, and a case's `n`: the largest
-// size among its arguments.
-
-show_num(string code, string type) {
-  string so = "fprintf(stderr, \"%lld\", " + code + ");";
-  if(type == "float") {
-    so = "fprintf(stderr, \"%g\", " + code + ");";
-  }
-} return string so;
-("x", "int"):("fprintf(stderr, \"%lld\", x);")
-("x", "float"):("fprintf(stderr, \"%g\", x);")
+// A case's `n`: the largest
+// size among its arguments. (A number is printed the way a case writes it by
+// wrap_by_type, box.id.)
 
 size_list(int[] args) {
   string out = "";
   int j = 0;
   while(j < len(args)) {
-    out = out + sep_arg(j) + tc_size(args[j]);
+    out = out + sep_at(", ", j) + tc_size(args[j]);
     j = j + 1;
   }
 } return string out;

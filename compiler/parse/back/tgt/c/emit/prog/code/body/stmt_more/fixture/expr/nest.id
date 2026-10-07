@@ -3,8 +3,8 @@
 
 nz_bin_nest_fixture() {
   nz_bin_streq_fixture();
-  export int nz_nest_l = node_bin("+", (import nz_bin_concat), (import nz_strn));
-  export int nz_nest_r = node_bin("+", (import nz_strn), (import nz_bin_concat));
+  export int nz_nest_l = node_txt2("bin", "+", (import nz_bin_concat), (import nz_strn));
+  export int nz_nest_r = node_txt2("bin", "+", (import nz_strn), (import nz_bin_concat));
 } return void;
 ():() then calls nz_bin_streq_fixture:[1]
 ():() then init_units:(0)

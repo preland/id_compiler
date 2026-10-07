@@ -28,7 +28,7 @@ given sq_fixture ((import nz_call_foo)):(0)
 is_logic(int id) {
   int ok = 0;
   string s1_of_v = (import ns1)[id];
-  if((import nkind)[id] == "bin" && is_logop(s1_of_v) == 1) {
+  if((import nkind)[id] == "bin" && str_in((import logops), s1_of_v) == 1) {
     ok = 1;
   }
 } return int ok;

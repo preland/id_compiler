@@ -62,7 +62,7 @@ then_imp_fixture(string ty, int reads, int indexed) {
   add_export("gx", ty, "mk");
 } chain (string ty, int reads, int indexed) {
   int[] none = [];
-  export int then_imp_rd = node_import("gx");
+  export int then_imp_rd = node_txt("import", "gx");
   if(reads == 2) {
     node_decl("int[]", "al", (import then_imp_rd), 0);
   }
@@ -81,7 +81,7 @@ then_imp_fixture(string ty, int reads, int indexed) {
   if(indexed == 1) {
     push(ixs, (import fixture_zero));
   } else if(indexed == 2) {
-    push(ixs, node_str("a"));
+    push(ixs, node_txt("str", "a"));
   }
   export int then_imp_node = newnode("thenimp", (import fixture_ci), 0, "gx", "", vals, ixs);
 } chain (string ty, int reads, int indexed) {

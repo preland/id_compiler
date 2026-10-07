@@ -4,15 +4,15 @@
 // name; esc_dfix (b.id) builds them on top of esc_fix's program.
 
 esc_fd_a() {
-  export int efd_g = node_var("g");
-  export int efd_v = node_var("v");
+  export int efd_g = node_txt("var", "g");
+  export int efd_v = node_txt("var", "v");
   export int efd_lit = node_arr((import ef_none));
 } return void;
 given esc_dfix ():() then (import chkfail)[0]:(0)
 given esc_dfix ():() then init_units:(0)
 
 esc_fd_b() {
-  export int efd_ix = node_index((import efd_g), node_int("0", 0, 0));
+  export int efd_ix = node_index((import efd_g), node_txt2("int", "0", 0, 0));
   export int[] efd_elok = [(import efd_lit), node_arr((import ef_none))];
   export int[] efd_elbad = [(import efd_lit), (import efd_v)];
 } return void;

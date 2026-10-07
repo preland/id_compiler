@@ -20,7 +20,7 @@ given decl_tokens ([3], "nm2", []):(0) then prints:("<stdin>:1: error: expected 
 
 // -1 for the return expression, as for `return void`: there is none to check.
 native_node(int[] pos, string name, string rt, int[] params) {
-  skip_semi(pos);
+  skip_text(pos, ";");
   int[] none = [];
   int ret_i = newnode("func", 0 - 1, 1, name, rt, params, none);
 } return int ret_i;

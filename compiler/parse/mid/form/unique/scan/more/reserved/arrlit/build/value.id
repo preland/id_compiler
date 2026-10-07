@@ -21,8 +21,8 @@ given ret_widens_fn ((import widen_f)):("?func#1")
 // fresh rather than reusing its e0/e1.
 cwv_els_fixture() {
   env_init();
-  int e0 = node_int("1", 1, 0);
-  int e1 = node_str("hi");
+  int e0 = node_txt2("int", "1", 1, 0);
+  int e1 = node_txt("str", "hi");
 } chain () {
   export int[] cwv_els = [e0, e1];
   int[] noneP = [];
@@ -30,5 +30,5 @@ cwv_els_fixture() {
 } chain () {
   export int[] cwv_mixed_els = [e0, fn];
 } return void;
-():() then calls node_int:("1", 1, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)

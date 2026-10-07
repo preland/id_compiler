@@ -3,8 +3,8 @@ lw_bind(string name, int v) {
   push((import lwvar), name);
   push((import lwslot), v);
 } return int v;
-given lw_fixture ("x", 5):(5) then len((import lwvar)):(1)
-given lw_fixture2 ("y", 8):(8) then len((import lwvar)):(1)
+given lw_fixture(0) ("x", 5):(5) then len((import lwvar)):(1)
+given lw_fixture(1) ("y", 8):(8) then len((import lwvar)):(1)
 
 lw_slot(string name) {
   int r = find_str((import lwvar), name);

@@ -5,7 +5,7 @@
 
 tc_other(int e, string want) {
   string so = "";
-  if(ty_is_struct(want) == 1) {
+  if(ty_kind_is(want, "struct") == 1) {
     so = tc_struct(e, want);
   } else {
     so = tc_other2(e, want);

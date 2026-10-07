@@ -90,7 +90,7 @@ case_given(int[] pos) {
   }
   push((import casetimeout), secs_v);
 } return void;
-given given_fix ([0]):()
+given toks_env(["kw", "ident"], ["given", "mysetup"]) ([0]):()
 given tup1_fix ([0]):()
 given tmo_fix ([0]):() then tmo_last:(5)
 given tmo_fix ([0]):() then (import chkfail)[0]:(0)
@@ -106,5 +106,5 @@ given_name(int[] pos, int[] gs) {
   string setup_nm = case_fn_name(pos, "given");
   given_call(pos, setup_nm, gs);
 } return string setup_nm;
-given given_fix ([0], []):("mysetup") then calls given_call:[1]
-given given2_fix ([0], []):("othersetup") then calls given_call:[1]
+given toks_env(["kw", "ident"], ["given", "mysetup"]) ([0], []):("mysetup") then calls given_call:[1]
+given toks_env(["kw", "ident"], ["given", "othersetup"]) ([0], []):("othersetup") then calls given_call:[1]

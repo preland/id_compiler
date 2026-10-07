@@ -3,7 +3,7 @@
 
 parse_exprstmt(int[] pos) {
   int expr = parse_expr(pos);
-  skip_semi(pos);
+  skip_text(pos, ";");
   int ret_i = node_exprstmt(expr);
 } return int ret_i;
 given stmt_tokens ([42]):(1)
@@ -30,7 +30,7 @@ parse_ret(int[] pos) {
     ret_e = parse_expr(pos);
   }
 } chain (int[] pos) {
-  skip_semi(pos);
+  skip_text(pos, ";");
   int[] ret_none = [];
   int ret_i = newnode("ret", ret_e, 0, "", "", ret_none, ret_none);
 } chain (int[] pos) {

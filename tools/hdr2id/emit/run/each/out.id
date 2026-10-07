@@ -2,7 +2,7 @@
 
 // Writes pre.c under hd_out: the shim C source of a run that mapped what hd_o holds, for the header hd_hdr: its banner, the shared prelude, one handle table per struct tag, then the shims. Answers the bytes written.
 hd_cfile(string hd_out, string hd_pre, string hd_hdr, string[][] hd_o) {
-  string hd_top = wr_banner(hd_hdr) + str_join((import shim_prelude), "\n") + "\n\n" + wr_weak(hd_o[(import out_nm)]) + "\n";
+  string hd_top = wr_banner(hd_hdr) + str_join((import shim_prelude), "\n") + "\n\n" + pl_lead(hd_o[(import out_nm)], "#pragma weak ") + "\n";
   string hd_tb = wr_tables(hd_o[(import out_tags)]);
   string hd_cc = hd_top + hd_tb + "\n" + str_join(hd_o[(import out_sh)], "\n");
 } chain (string hd_out, string hd_pre, string hd_hdr, string[][] hd_o) {

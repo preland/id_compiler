@@ -1,0 +1,5 @@
+// EXPECT: only in the values of its literals
+// Two functions whose only difference is an integer literal are one function
+// written twice, with the value as the parameter it should have been (E0407).
+add_one(int x) { int r = x + 1; } return int r;
+add_two(int y) { int q = y + 2; } return int q;

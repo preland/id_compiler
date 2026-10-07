@@ -2,11 +2,11 @@
 
 lpf_lf() {
   lpf_le();
-  export int lpf_nf = node_var("lfn");
+  export int lpf_nf = node_txt("var", "lfn");
   export int lpf_cf = lpf_lt("lfj", lpf_nf);
 } chain () {
   export int lpf_ci = lpf_lt("lfk", lpf_nf);
-  export int lpf_xf = lpf_ix("lfv", node_var("lfj"));
+  export int lpf_xf = lpf_ix("lfv", node_txt("var", "lfj"));
   export int lpf_sf = lpf_acc("lfs", lpf_xf);
 } chain () {
   export int lpf_wi = lpf_wh(lpf_ci, lpf_sf, lpf_sf);

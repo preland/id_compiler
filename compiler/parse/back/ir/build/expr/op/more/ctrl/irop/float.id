@@ -2,30 +2,18 @@
 // opcodes rather than a flag on the integer ones, because that is how the
 // printer wants it and how every fold has to read it anyway.
 lw_irop(string op, string t) {
-  string p = lw_iop_int(op);
+  string p = str_map((import irop_ik), (import irop_iv), op, "and");
   if(ty_kind(t) == "float") {
-    p = lw_iop_f(op);
+    p = str_map((import irop_fk), (import irop_fv), op, "fadd");
   }
 } return string p;
 given ir_rows ("+", "int"):("add")
+given ir_rows ("-", "int"):("sub")
+given ir_rows ("*", "int"):("mul")
+given ir_rows ("&", "int"):("and")
+given ir_rows ("|", "int"):("or")
+given ir_rows ("^", "int"):("xor")
 given ir_rows ("-", "float"):("fsub")
-
-lw_iop_f(string op) {
-  string p = lw_iop_f2(op);
-  if(op == "-") {
-    p = "fsub";
-  } else if(op == "*") {
-    p = "fmul";
-  }
-} return string p;
-given ir_rows ("-"):("fsub")
-given ir_rows ("/"):("fdiv")
-
-lw_iop_f2(string op) {
-  string p = "fadd";
-  if(op == "/") {
-    p = "fdiv";
-  }
-} return string p;
-given ir_rows ("/"):("fdiv")
-given ir_rows ("+"):("fadd")
+given ir_rows ("*", "float"):("fmul")
+given ir_rows ("/", "float"):("fdiv")
+given ir_rows ("+", "float"):("fadd")

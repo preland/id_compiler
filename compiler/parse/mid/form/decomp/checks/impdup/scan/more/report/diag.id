@@ -26,15 +26,15 @@ given lz_empty ():("")
 imd_thin_base() {
   env_init();
   int[] imd_none = [];
-  int imd_e1 = node_import("alpha");
+  int imd_e1 = node_txt("import", "alpha");
 } chain () {
   int imd_f1 = node_func("tha", "int", imd_none, imd_none, imd_e1);
   push((import prog), imd_f1);
-  int imd_e2 = node_import("beta");
+  int imd_e2 = node_txt("import", "beta");
 } chain () {
   int imd_f2 = node_func("thb", "int", imd_none, imd_none, imd_e2);
   push((import prog), imd_f2);
   uq_fill();
 } return void;
-():() then calls node_import:("alpha")
+():() then calls node_txt:("import", "alpha")
 ():() then init_units:(0)

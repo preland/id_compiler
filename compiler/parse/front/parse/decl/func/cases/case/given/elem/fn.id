@@ -7,7 +7,7 @@
 
 case_value(int[] pos) {
   int v = 0;
-  if(at_case_fn(pos) == 1) {
+  if(ident_then(pos, (import nx_elem_end)) == 1) {
     v = case_fn(pos);
   } else {
     if(cur_text(pos) == "[") {
@@ -21,20 +21,9 @@ given fnname_fix ([0]):(0)
 given tup1_fix ([0]):(0)
 given sd_case_toks ([0]):(2)
 
-// A bare name, and nothing after it but the end of the element: `f(1)` is a
-// call and `f[0]` an index, neither of which a case may hold.
-at_case_fn(int[] pos) {
-  int ok = 0;
-  if(cur_kind(pos) == "ident" && (cur2_text(pos) == "," || cur2_text(pos) == ")")) {
-    ok = 1;
-  }
-} return int ok;
-given fnname_fix ([0]):(1)
-given tup1_fix ([0]):(0)
-
 case_fn(int[] pos) {
   string name = read_name(pos);
   int ret_i = newleaf("cfn", 0, 0, name, "");
 } return int ret_i;
 given fnname_fix ([0]):(0)
-given chkname_fix ([0]):(4)
+given toks_fn(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]) ([0]):(4)

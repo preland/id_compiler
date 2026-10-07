@@ -17,7 +17,7 @@ given ds_test_setup ([0, 1, 2], 3):() then prints:("3 copies of foo:\n    fileA.
 given ds_test_setup ([3], 1):() then prints:("")
 
 emit_title(int[] grp, int n) {
-  string name = ds_name(grp[0]);
+  string name = ds_col(grp[0], 2);
   string count = fmt_int(n, 0);
   print(count + " copies of " + name + ":");
 } return void;

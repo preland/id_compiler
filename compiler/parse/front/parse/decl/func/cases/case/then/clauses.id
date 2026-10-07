@@ -17,7 +17,7 @@ case_rest(int[] pos) {
   }
 } return void;
 given fn_fixture ([0]):()
-given then_fix ([0]):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([0]):()
 
 case_thens(int[] pos) {
   while(cur_kind(pos) == "kw" && cur_text(pos) == "then") {
@@ -26,7 +26,7 @@ case_thens(int[] pos) {
   }
 } return void;
 given fn_fixture ([0]):()
-given then_fix ([0]):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([0]):()
 
 // `then (import NAME):(value)` and `then (import NAME)[i]:(value)`: the
 // export, or one element of it, read after the call and compared with a
@@ -53,7 +53,7 @@ then_imp_clause(int[] pos) {
     expect_text(pos, "]");
   }
   if(is_len == 1) {
-    eat_close(pos);
+    eat_text(pos, ")");
   }
 } chain (int[] pos) {
   if(len(imp_ix) == 1 && cur_text(pos) == "]") {

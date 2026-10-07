@@ -7,7 +7,7 @@ sm_end(string[] sm_t, int sm_s) {
   int sm_e = 0 - 1;
 } chain (string[] sm_t, int sm_s) {
   while (sm_e < 0 && sm_j < len(sm_t)) {
-    sm_d = sm_d + sm_delta(sm_t[sm_j]);
+    sm_d = sm_d + sm_delta(sm_t[sm_j], "{", "}");
     sm_e = sm_stop(sm_t, sm_s, sm_j, sm_d);
     sm_j = sm_j + 1;
   }

@@ -20,9 +20,9 @@ ut_asm_seeded() {
 // id 3: an "import" leaf reading "cfg"; id 4: "x + 3", a "bin" node.
 lz_c() {
   lz_b();
-  export int lz_imp = node_import("cfg");
-  export int lz_binid = node_bin("+", (import lz_var), (import lz_i1));
+  export int lz_imp = node_txt("import", "cfg");
+  export int lz_binid = node_txt2("bin", "+", (import lz_var), (import lz_i1));
 } return void;
-():() then calls node_import:("cfg")
+():() then calls node_txt:("import", "cfg")
 ():() then init_units:(0)
 

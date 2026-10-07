@@ -17,7 +17,7 @@ given lw_env_fixture ("string", 0):(1)
 // The rest of lw_len, once the counted list's element type is known.
 lw_len_tail(int[] args, string t) {
   int a = lw_expr(args[0]);
-  string lw_lenfn_v = lw_lenfn(t);
+  string lw_lenfn_v = str_pick(t, "string", "id_len", "id_list_len");
   int ret_i = lw_callf(lw_lenfn_v, "int", [a]);
 } return int ret_i;
 given lencall_fixture ((import lencall_args), "int"):(1)

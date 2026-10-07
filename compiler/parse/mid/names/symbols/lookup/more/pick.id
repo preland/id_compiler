@@ -1,0 +1,36 @@
+// A string chosen by comparing another one. Every "this name for that kind,
+// else the default" is one of these with its three words as arguments, not a
+// function of its own per word: two functions that differ only in the words
+// are one function written twice (docs/ERRORS.md, E0407).
+
+str_pick(string pick_x, string pick_key, string pick_yes, string pick_no) {
+  string ret_s = pick_no;
+  if(pick_x == pick_key) {
+    ret_s = pick_yes;
+  }
+} return string ret_s;
+("a", "a", "Y", "N"):("Y")
+("a", "b", "Y", "N"):("N")
+
+// The same for a type: one word for float, another for everything else (icmp
+// or fcmp, "0" or "0.0", sub or fsub).
+ty_float_pick(string pick_t, string pick_float, string pick_other) {
+  string ret_s = pick_other;
+  if(ty_kind(pick_t) == "float") {
+    ret_s = pick_float;
+  }
+} return string ret_s;
+given ir_rows ("float", "F", "O"):("F")
+given ir_rows ("int", "F", "O"):("O")
+
+str_pick2(string pick_x, string pick_k1, string pick_y1, string pick_k2, string pick_y2, string pick_no) {
+  string ret_s = pick_no;
+  if(pick_x == pick_k1) {
+    ret_s = pick_y1;
+  } else if(pick_x == pick_k2) {
+    ret_s = pick_y2;
+  }
+} return string ret_s;
+("a", "a", "Y", "b", "Z", "N"):("Y")
+("b", "a", "Y", "b", "Z", "N"):("Z")
+("c", "a", "Y", "b", "Z", "N"):("N")

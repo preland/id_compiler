@@ -3,7 +3,7 @@
 
 fold_mul_tail(int[] pos, int left, string op) {
   int right = parse_unary(pos);
-  int ret_i = node_bin(op, left, right);
+  int ret_i = node_txt2("bin", op, left, right);
 } return int ret_i;
 given expr_tokens ([4], 100, "*"):(1)
 given expr_tokens ([6], 200, "+"):(1)
@@ -22,5 +22,5 @@ paren_primary(int[] pos) {
   }
   grp_note(e, pos);
 } return int e;
-given paren_tokens ([0]):(2)
+given ptoks_env(["op", "int", "op", "int", "op", "op", "eof"], ["(", "1", "+", "2", ")", ";", ""]) ([0]):(2)
 given decl_tokens ([1]):(0)

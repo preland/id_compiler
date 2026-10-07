@@ -9,7 +9,7 @@
 
 fv_sym(string name, int nd) {
   fv_note(name, nd);
-  string s = "idfn_a_" + fv_key(name, nd);
+  string s = "idfn_a_" + name + (import fv_sep) + nd;
 } return string s;
 given lw_clo_fixture ("tick", 0):("idfn_a_tick__0") then len((import fvname)):(1)
 given lw_clo_fixture ("pick", 2):("idfn_a_pick__2") then (import fvk)[0]:(2)

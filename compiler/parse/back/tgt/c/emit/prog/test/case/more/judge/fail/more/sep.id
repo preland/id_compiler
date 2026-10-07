@@ -1,13 +1,3 @@
-// Between two comparisons.
-and_sep(int j) {
-  string so = "";
-  if(j > 0) {
-    so = " && ";
-  }
-} return string so;
-(0):("")
-(1):(" && ")
-
 // emit_case_fail (../end.id) reads casefn[ci] and casenode[ci], so a case for
 // any row but 0 needs that row to exist. wrap_fixture_push lsets casenode,
 // which cannot create a row, so the second one is pushed here. It is built

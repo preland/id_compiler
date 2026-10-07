@@ -6,12 +6,12 @@
 
 reg_report(string name, string type, string owner, int exported, int ln, int unit) {
   if(find_str((import fnames), name) >= 0) {
-    report_var_is_func(name, owner, ln);
+    report_name(name, owner, ln, "E0308", "'" + name + "' is already the name of a function", (import nm_func_why), (import nm_func_help));
   } else {
     reg_report2(name, type, owner, exported, ln, unit);
   }
 } return void;
-given argfn_d ("g", "int", "f", 0, 10, 0):() then calls report_var_is_func:("g", "f", 10)
+given argfn_d ("g", "int", "f", 0, 10, 0):() then calls report_name:[1]
 given regrow_d ("z", "int", "f", 0, 10, 0):() then calls reg_report2:("z", "int", "f", 0, 10, 0)
 
 reg_report2(string name, string type, string owner, int exported, int ln, int unit) {

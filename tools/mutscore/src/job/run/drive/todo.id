@@ -12,7 +12,7 @@ ms_dr_add(string ms_pa, string ms_tx) {
   fs_close(ms_h);
 } return int ms_n;
 given ms_t_tree ((import ms_t_log), "a\n"):(2) then ms_t_logtxt:("a\n")
-given ms_t_tree given ms_t_wres ((import ms_t_log), "b\n"):(2) then ms_t_logtxt:("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\nb\n")
+given ms_t_tree given ms_t_wlog("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t3\t9\tdel\t\tx;  =>  \nstray\n") ((import ms_t_log), "b\n"):(2) then ms_t_logtxt:("killed|2|a.id|f|3|4|cmp|<=|x  =>  y\nsurvived|5|a.id|f|3|9|del||x;  =>  \nstray\nb\n")
 ("/no/such/dir_ms/r.tsv", "a"):(-1)
 
 // The mutants a results file already has an answer for, as keys.
@@ -28,7 +28,7 @@ ms_dr_done(string ms_pa) {
     ms_i = ms_i + 1;
   }
 } return string[] ms_ks;
-given ms_t_tree given ms_t_wres ((import ms_t_log)):(["a.id\tf\t3\t4\tcmp\t<=", "a.id\tf\t3\t9\tdel\t"])
+given ms_t_tree given ms_t_wlog("killed\t2\ta.id\tf\t3\t4\tcmp\t<=\tx  =>  y\nsurvived\t5\ta.id\tf\t3\t9\tdel\t\tx;  =>  \nstray\n") ((import ms_t_log)):(["a.id\tf\t3\t4\tcmp\t<=", "a.id\tf\t3\t9\tdel\t"])
 ("/no/such/file_ms"):([])
 
 // The indexes, in order, of the mutants of ms_al that shard ms_sh owns and

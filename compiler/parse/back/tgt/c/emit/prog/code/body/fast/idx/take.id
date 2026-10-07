@@ -7,7 +7,7 @@
 
 lx_take(int lg_id, int lg_e, int lg_lo, int lg_hi) {
   push((import lpset), lg_id);
-  lp_nonnull((import ni1)[lg_id]);
+  lp_rel((import ni1)[lg_id], "null", "!=");
   string[] lg_tk = [];
 } chain (int lg_id, int lg_e, int lg_lo, int lg_hi) {
   lx_hi(lg_tk, lg_e, lg_id, lg_lo, lg_hi, 0);

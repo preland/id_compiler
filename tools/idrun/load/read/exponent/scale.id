@@ -6,14 +6,6 @@
 // the power is built by repeated multiplication and the last bits can differ
 // from the compiled targets, which hand the text to a real strtod.
 
-// An optional '+' after the e, consumed, and whether there was one.
-ld_plus() {
-  int pl = ld_at() == 43;
-  ld_adv(pl);
-} return int pl;
-given tf_ld("+5") ():(1) then (import ld_pr)[(import pr_p)]:(1)
-given tf_ld("5") ():(0) then (import ld_pr)[(import pr_p)]:(0)
-
 // The exponent at the cursor: `e` or `E`, an optional sign, digits; 0 if the
 // cursor is not at one.
 ld_exp() {
@@ -21,7 +13,7 @@ ld_exp() {
   int ex = 0;
   if (c == 101 || c == 69) {
     ld_adv(1);
-    int pl = ld_plus();
+    int pl = ld_eat(43);
     ex = ld_num();
   }
 } return int ex;

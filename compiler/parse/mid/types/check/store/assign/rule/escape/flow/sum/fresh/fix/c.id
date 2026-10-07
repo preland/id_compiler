@@ -52,11 +52,11 @@ esc_ffix() {
 ():() then init_units:(0)
 
 esc_ff_d() {
-  export int eff_vp = node_var("p");
-  export int eff_sbp = node_assign("r", (import eff_vp));
+  export int eff_vp = node_txt("var", "p");
+  export int eff_sbp = node_txt1("assign", "r", (import eff_vp));
   export int eff_cbad = node_call("ff_bad", [(import eff_vp), (import eff_sub)]);
 } chain () {
-  export int eff_asb = node_assign("r", (import eff_cbad));
+  export int eff_asb = node_txt1("assign", "r", (import eff_cbad));
   export int eff_ifb = node_if((import eff_cond), [(import eff_asb)], [(import eff_sbp)], 0);
   export int[] eff_bp = [node_param("param", "int[]", "p"), node_param("param", "int", "n")];
 } chain () {

@@ -1,0 +1,33 @@
+// The literal-insensitive table `cfpl`, filled after `cfp` (./fill.id) by the
+// very same canonicalisation with cloose switched on: a literal keeps its kind
+// letter and loses its value, and the constant fold and identity rewrite that
+// read values stay off (../canon/expr/more/const/dispatch.id). Nothing else
+// differs, so two entries are equal exactly when the functions differ in
+// nothing but the values of their literals -- not when they merely look alike.
+// Entry i belongs to the function entry i of `cfp` does (`cfpfn`).
+
+ul_fill() {
+  lset((import cloose), 0, 1);
+  ul_fill_all();
+  lset((import cloose), 0, 0);
+} return void;
+given lz_o ():() then (import cloose)[0]:(0)
+given lz_o ():() then len((import cfpl)):(4)
+
+ul_fill_all() {
+  int ulf_i = 0;
+  while(ulf_i < len((import prog))) {
+    ul_fill_at(ulf_i);
+    ulf_i = ulf_i + 1;
+  }
+} return void;
+given lz_o ():() then calls ul_fill_at:[2]
+given farm_g ():() then calls ul_fill_at:[0]
+
+ul_fill_at(int i) {
+  int ulf_fid = (import prog)[i];
+  string ulf_fp = unit_kind(ulf_fid);
+  push((import cfpl), ulf_fp);
+} return void;
+given lz_o (0):() then calls unit_kind:(22)
+given lz_o (1):() then calls unit_kind:(23)

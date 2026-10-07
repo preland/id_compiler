@@ -16,7 +16,7 @@ given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then len((import fvname)):(0)
 
 fv_note(string name, int nd) {
-  string key = fv_key(name, nd);
+  string key = name + (import fv_sep) + nd;
   if(find_str((import fvkey), key) < 0) {
     fv_add(key, name, nd);
   }
@@ -24,8 +24,3 @@ fv_note(string name, int nd) {
 given fv_init ("tick", 0):() then len((import fvname)):(1)
 given fv_seeded ("tick", 0):() then len((import fvname)):(1)
 
-fv_key(string name, int nd) {
-  string key = name + "__" + nd;
-} return string key;
-("tick", 0):("tick__0")
-("pick", 12):("pick__12")

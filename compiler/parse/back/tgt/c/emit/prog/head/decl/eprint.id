@@ -26,11 +26,3 @@ calls_eprint() {
 given nz_call_eprint_fixture ():(1)
 given nz_env ():(0)
 
-// The LLVM target's C runtime is asked for once per build and without the
-// program, so it cannot know whether eprint is called and always defines it.
-// It has no harness to answer to: the cases of any build run in the C harness.
-emit_crt_eprint() {
-  emit_line("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }");
-} return void;
-given nz_env ():() then prints:("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }\n")
-given iassign_fixture_env ():() then prints:("void id_eprint(const char* s) { fflush(stdout); fprintf(stderr, \"%s\\n\", s); }\n")

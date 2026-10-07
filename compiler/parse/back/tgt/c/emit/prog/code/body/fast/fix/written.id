@@ -3,10 +3,10 @@
 
 lpf_lr() {
   lpf_lh();
-  export int lpf_nr = node_var("lrn");
+  export int lpf_nr = node_txt("var", "lrn");
   export int lpf_cr = lpf_lt("lrj", lpf_nr);
 } chain () {
-  export int lpf_xr = lpf_ix("lrv", node_var("lrj"));
+  export int lpf_xr = lpf_ix("lrv", node_txt("var", "lrj"));
   export int lpf_sr = lpf_acc("lrn", lpf_xr);
   export int lpf_ir = lpf_inc("lrj", 1);
 } chain () {
@@ -19,10 +19,10 @@ lpf_lr() {
 
 lpf_lw() {
   lpf_lr();
-  export int lpf_nw = node_var("lwn");
+  export int lpf_nw = node_txt("var", "lwn");
   export int lpf_cw = lpf_lt("lwj", lpf_nw);
 } chain () {
-  export int lpf_xw = lpf_ix("lwv", node_var("lwj"));
+  export int lpf_xw = lpf_ix("lwv", node_txt("var", "lwj"));
   export int lpf_sw = lpf_acc("lwv", lpf_xw);
   export int lpf_iw = lpf_inc("lwj", 1);
 } chain () {
@@ -35,12 +35,12 @@ lpf_lw() {
 
 lpf_lx() {
   lpf_lw();
-  export int lpf_nx = node_var("lxn");
+  export int lpf_nx = node_txt("var", "lxn");
   export int lpf_c1 = lpf_lt("lxj", lpf_nx);
 } chain () {
-  export int lpf_x0 = node_bin("!=", node_var("lxf"), (import lpf_n0));
-  export int lpf_cx = node_bin("&&", lpf_c1, lpf_x0);
-  export int lpf_xx = lpf_ix("lxv", node_var("lxj"));
+  export int lpf_x0 = node_txt2("bin", "!=", node_txt("var", "lxf"), (import lpf_n0));
+  export int lpf_cx = node_txt2("bin", "&&", lpf_c1, lpf_x0);
+  export int lpf_xx = lpf_ix("lxv", node_txt("var", "lxj"));
 } chain () {
   export int lpf_sx = lpf_acc("lxs", lpf_xx);
   export int lpf_jx = lpf_inc("lxj", 1);

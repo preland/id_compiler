@@ -5,14 +5,14 @@
 
 fold_add_tail(int[] pos, int left, string op) {
   int right = parse_mul(pos);
-  int ret_i = node_bin(op, left, right);
+  int ret_i = node_txt2("bin", op, left, right);
 } return int ret_i;
 given expr_tokens ([2], 100, "+"):(3)
 given expr_tokens ([6], 100, "+"):(1)
 
 unary_or_postfix(int[] pos, string tok_text) {
   int node = 0;
-  if(is_unop(tok_text)) {
+  if(str_in((import unops), tok_text)) {
     node = fold_unary(pos);
   } else {
     node = parse_postfix(pos);
@@ -23,7 +23,7 @@ given atom_tokens ([24], "-"):(1)
 
 fold_unary_tail(int[] pos, string op) {
   int parse_unary_v = parse_unary(pos);
-  int ret_i = node_un(op, parse_unary_v);
+  int ret_i = node_txt1("un", op, parse_unary_v);
 } return int ret_i;
 given atom_tokens ([25], "-"):(1)
 given expr_tokens ([2], "+"):(1)

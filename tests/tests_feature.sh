@@ -1955,7 +1955,8 @@ tick(int n) {
 (2):(2)
 
 tock(int n) {
-  print("tock " + n);
+  string line = "tock " + n;
+  print(line);
 } return void;
 (3):(3)
 (4):(4)
@@ -2664,8 +2665,8 @@ rm -rf "$TMP/fwdval"
 # Two functions that differ only in which imported value they read are one
 # function written twice: a compile error that names both and the fix, however
 # short they are -- a one-statement accessor per global is the same function
-# written once per global. Every other way of differing -- a literal, a second
-# import, more logic -- is quiet: no diagnostic at all, which self_silent
+# written once per global. A difference only in a literal is its own error (E0407, below). Every other way of differing -- a second
+# import, an operator, more logic -- is quiet: no diagnostic at all, which self_silent
 # checks as an empty log.
 self_silent() {   # desc, flags...
     local desc="$1"; shift
@@ -2771,8 +2772,8 @@ EOF
 self_refuse "bin/idc: one-statement accessors of two globals are an error naming both" \
     "p.id:5: error: function 'get_b' and 'get_a' (defined at " --allow-untested --emit-c /dev/null
 
-# Former false positives: a literal-only difference never says anything. Named
-# accessors and fixtures that differ by a constant are how id is written.
+# A literal-only difference is an error (E0407): the logic is the same and the
+# values are all that vary, so they are the parameters.
 cat > "$TMP/p.id" <<'EOF'
 add10(int x) {
   int y = x + 10;
@@ -2790,7 +2791,11 @@ main(int argc, string[] argv) {
   print("" + a + " " + b);
 } return int 0;
 EOF
-self_silent "bin/idc: two functions differing only in a literal are not reported" --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: two functions differing only in a literal are an error naming both (E0407)" \
+    "function 'add16' differs from 'add10' (defined at " --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: ...and its help names the fix" \
+    "make each literal that differs a parameter, call that one function from both places passing each place's value, and delete the other" \
+    --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 slot_x() {
@@ -2809,7 +2814,61 @@ main(int argc, string[] argv) {
   print("" + a + " " + b);
 } return int 0;
 EOF
-self_silent "bin/idc: named accessors differing only in an index literal are not reported" --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: accessors differing only in an index literal are an error (E0407)" \
+    "function 'slot_y' differs from 'slot_x' (defined at " --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+greet_a(string name) {
+  string s = "hello, " + name;
+} return string s;
+
+greet_b(string name) {
+  string s = "goodbye, " + name;
+} return string s;
+
+main(int argc, string[] argv) {
+  string a = greet_a("x");
+  string b = greet_b("x");
+  print(a + b);
+} return int 0;
+EOF
+self_refuse "bin/idc: a string literal alone is an error too (E0407)" \
+    "function 'greet_b' differs from 'greet_a' (defined at " --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+scale_a(float x) {
+  float y = x * 1.5;
+} return float y;
+
+scale_b(float x) {
+  float y = x * 2.5;
+} return float y;
+
+main(int argc, string[] argv) {
+  float a = scale_a(1.0);
+  float b = scale_b(1.0);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_refuse "bin/idc: a float literal alone is an error too (E0407)" \
+    "function 'scale_b' differs from 'scale_a' (defined at " --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+step_a(int x) {
+  int y = x + 1;
+} return int y;
+
+step_b(int x) {
+  int y = x - 1;
+} return int y;
+
+main(int argc, string[] argv) {
+  int a = step_a(3);
+  int b = step_b(3);
+  print("" + a + " " + b);
+} return int 0;
+EOF
+self_silent "bin/idc: functions that differ in an operator, not only in a literal, are not reported" --allow-untested --emit-c /dev/null
 
 # Two functions identical in every way, imports included, are the duplicate-logic
 # error, and only that one.

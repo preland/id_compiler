@@ -11,17 +11,17 @@
 dup_pair_fixture() {
   env_init();
   int[] dpf_none = [];
-  int dpf_e1 = node_int("5", 5, 0);
+  int dpf_e1 = node_txt2("int", "5", 5, 0);
 } chain () {
   int dpf_f1 = node_func("pa", "int", dpf_none, dpf_none, dpf_e1);
   push((import prog), dpf_f1);
-  int dpf_e2 = node_int("5", 5, 0);
+  int dpf_e2 = node_txt2("int", "5", 5, 0);
 } chain () {
   int dpf_f2 = node_func("pb", "int", dpf_none, dpf_none, dpf_e2);
   push((import prog), dpf_f2);
   uq_fill();
 } return void;
-():() then calls node_int:("5", 5, 0)
+():() then calls node_txt2:("int", "5", 5, 0)
 ():() then init_units:(0)
 
 // A "blank" leaf and a literal, in a fresh tree so the pushed value can be
@@ -29,7 +29,7 @@ dup_pair_fixture() {
 blank_push_fixture() {
   env_init();
   export int bp_blank = newleaf("blank", 0, 0, "", "");
-  export int bp_lit = node_int("3", 3, 0);
+  export int bp_lit = node_txt2("int", "3", 3, 0);
 } chain () {
   export int[] bp_kept_after = [bp_lit];
 } return void;

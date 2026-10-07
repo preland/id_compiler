@@ -18,7 +18,7 @@ given cmp_fixture (0, "int", "int"):() then (import chkfail)[0]:(0)
 
 idxfix() {
   call2_setup();
-  int b = node_int("1", 1, 0);
+  int b = node_txt2("int", "1", 1, 0);
   export int rgidx_node = node_index(b, b);
 } return void;
 ():() then (import chkfail)[0]:(0)

@@ -1,0 +1,26 @@
+// A case's token stream, written where the case is: the kinds and the texts of
+// the tokens, after the environment the case needs. One setup per environment
+// and per way of pushing, not one per stream -- a stream is data, and two
+// setups that differ only in the tokens are one setup written twice
+// (docs/ERRORS.md, E0407). A case writes `given toks_env(KINDS, TEXTS) (ARGS)`.
+
+toks_env(string[] kinds, string[] texts) {
+  env_init();
+  toks_push(kinds, texts);
+} return void;
+(["op"], ["{"]):() then len((import ttext)):(1)
+(["op", "str"], ["{", "\"a\""]):() then (import ttext)[1]:("\"a\"")
+
+toks_fn(string[] kinds, string[] texts) {
+  fn_fixture();
+  toks_push(kinds, texts);
+} return void;
+(["op"], ["{"]):() then len((import ttext)):(1)
+(["kw", "ident"], ["calls", "f"]):() then (import ttext)[1]:("f")
+
+ptoks_env(string[] kinds, string[] texts) {
+  env_init();
+  push_toks(kinds, texts);
+} return void;
+(["op"], ["{"]):() then len((import ttext)):(1)
+(["op", "eof"], ["{", ""]):() then len((import tkind)):(2)

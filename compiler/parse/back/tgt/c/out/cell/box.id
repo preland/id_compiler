@@ -6,7 +6,7 @@
 // A `word` boxes exactly like an `int` -- the cast is what widens a narrower
 // value into the 8-byte cell that id_list_lit's varargs read back.
 box(string code, string type) {
-  string s = box2(code, type);
+  string s = wrap_by_type(code, type, "float", "(long long)(intptr_t)(", ")", "id_box_f(", ")");
   if(type == "int" || type == "word") {
     s = "(long long)(" + code + ")";
   }
@@ -14,14 +14,18 @@ box(string code, string type) {
 ("x", "int"):("(long long)(x)")
 ("x", "string"):("(long long)(intptr_t)(x)")
 
-box2(string code, string type) {
-  string s = "(long long)(intptr_t)(" + code + ")";
-  if(type == "float") {
-    s = "id_box_f(" + code + ")";
+// A code string wrapped by its type: `pre code post`, or `pre_alt code post_alt`
+// when the type is the given one. Boxing, unboxing and showing a value are each
+// this with their own wrappers; none is a function of its own.
+wrap_by_type(string code, string type, string key, string pre, string post, string pre_alt, string post_alt) {
+  string s = pre + code + post;
+  if(type == key) {
+    s = pre_alt + code + post_alt;
   }
 } return string s;
-("x", "float"):("id_box_f(x)")
-("x", "string"):("(long long)(intptr_t)(x)")
+("x", "float", "float", "A(", ")", "B(", ")"):("B(x)")
+("x", "int", "float", "A(", ")", "B(", ")"):("A(x)")
+("x", "word", "word", "[", "]", "<", ">"):("<x>")
 
 elem_type(string t) {
   string out = "";

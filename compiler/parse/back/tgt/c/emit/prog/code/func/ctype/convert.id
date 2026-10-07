@@ -17,7 +17,7 @@ c_type(string t) {
   string ct = "IdList*";
   if(ty_is_func(t) == 1) {
     ct = "IdFn*";
-  } else if(ty_is_list(t) == 0 && ty_is_struct(t) == 0) {
+  } else if(ty_is_list(t) == 0 && ty_kind_is(t, "struct") == 0) {
     ct = c_scalar(t);
   }
 } return string ct;

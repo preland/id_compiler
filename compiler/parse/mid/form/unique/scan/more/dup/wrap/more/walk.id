@@ -34,11 +34,11 @@ given cw_decl_fixture ((import cwv_func)):(0)
 // ../val.id's cw_assign.
 cw_assign_fixture() {
   cw_named_fixture();
-  int e2 = node_int("4", 4, 0);
-  export int cw_assign_x = node_assign("x", e2);
+  int e2 = node_txt2("int", "4", 4, 0);
+  export int cw_assign_x = node_txt1("assign", "x", e2);
 } chain () {
-  int e3 = node_int("5", 5, 0);
-  export int cw_assign_y = node_assign("y", e3);
+  int e3 = node_txt2("int", "5", 5, 0);
+  export int cw_assign_y = node_txt1("assign", "y", e3);
 } return void;
-():() then calls node_int:("4", 4, 0)
+():() then calls node_txt2:("int", "4", 4, 0)
 ():() then init_units:(0)

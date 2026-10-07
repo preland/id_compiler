@@ -1,14 +1,6 @@
 // The natives map: one `NATIVE TAB BACKEND TAB JSFILE` row per line, empty lines
 // skipped. When a native appears twice the later row is the one that counts.
 
-jg_field(string jg_rs, int jg_k) {
-  string[] jg_fs = str_split(jg_rs, "\t");
-  string jg_fv = lst_str_get_or(jg_fs, jg_k, "");
-} return string jg_fv;
-("a\tb\tc", 1):("b")
-("a\tb", 2):("")
-("a", 0):("a")
-
 jg_nat_rows(string jg_t) {
   string[] jg_ls = str_split(jg_t, "\n");
   string[] jg_xs = [];
@@ -28,7 +20,7 @@ jg_nat_at(string[] jg_rows, string jg_nm) {
   int jg_at = -1;
   int jg_i = 0;
   while (jg_i < len(jg_rows)) {
-    if (jg_field(jg_rows[jg_i], 0) == jg_nm) {
+    if (str_field(jg_rows[jg_i], "\t", 0) == jg_nm) {
       jg_at = jg_i;
     }
     jg_i = jg_i + 1;
