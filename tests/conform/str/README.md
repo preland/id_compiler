@@ -43,4 +43,6 @@ error: cannot order string and string
 is_numeric(rt)` in `idc.py`'s `gen_binop`).
 - `13-plus-ticks` — `+` with a `ticks()` call on either side of a `string` converts the call's `int` result like any other `int` operand; the case prints `ok` when the text starts and ends with the literals around it (the number itself is not deterministic).
 - `14-trigraph-sequences` — a literal holding `??>`, `??=`, `??(` and the other trigraph sequences prints and measures as the characters written, not as the one character C would read them as.
+- `15-str-sub-in-range` — `str_sub(s, i, n)` is the `n` bytes of `s` from byte `i` as a new string: the head, a tail and a single byte of `"hello world"`, each measured with `len`.
+- `16-str-sub-empty-and-whole` — an empty span (`n` of 0) answers `""` at `i == len(s)` and past the end, and the whole string is answered as a copy; the span traps are `trap/11-str-sub-past-end` and `trap/12-str-sub-negative-count`.
 - A `\0` in a string literal is a compile error (`tests/invalid/nul_in_string.id`): a string never holds a NUL byte, so binary data goes through `stdio_read_mem`, `fs_read_mem` or the store. There is no run-time case here because there is no program to run.

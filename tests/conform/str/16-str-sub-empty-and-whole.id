@@ -1,0 +1,11 @@
+main(int argc, string[] argv) {
+  show_sub("hello", 5, 0);
+  show_sub("hello", 9, 0);
+  show_sub("hello", 0, 5);
+} return int 0;
+
+show_sub(string a, int i, int n) {
+  string b = str_sub(a, i, n);
+  print(b);
+  print(len(b));
+} return void;

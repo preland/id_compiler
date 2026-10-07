@@ -1,0 +1,19 @@
+// The third way a new string comes into existence: n bytes of an existing one.
+//
+// A span that is not inside the string stops the program the way the hosted
+// runtime's id_str_sub does, with the same message. An empty span reads
+// nothing, so it is inside wherever i >= 0. The bytes are copied into arena
+// space of their own, with the count in front and the NUL after.
+
+str_sub(string s, int i, int n) {
+  int sub_n = sub_span(s, i, n);
+  word s2w_v = s2w(s);
+  string ret_s = str_of_mem(s2w_v + i, sub_n);
+} return string ret_s;
+
+sub_span(string s, int i, int n) {
+  int sub_ok = i >= 0 && n >= 0 && (n == 0 || i + n <= len(s));
+  if(sub_ok == 0) {
+    fail("str span out of bounds: i=" + i + " n=" + n + " in a string of length " + len(s) + "; clamp i and n first (fx_min, fx_max)");
+  }
+} return int n;

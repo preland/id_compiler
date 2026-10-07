@@ -9,19 +9,20 @@
 
 bi_wants(string name, int i) {
   string s = bi_wants2(name, i);
-  if(name == "to_int" || name == "mem_of_str" || name == "fail" || name == "charat" && i == 0) {
+  if(name == "to_int" || name == "mem_of_str" || name == "fail" || (name == "charat" || name == "str_sub") && i == 0) {
     s = "string";
   }
 } return string s;
 ("to_int", 0):("string")
 ("push", 0):("list")
 ("fail", 0):("string")
+("str_sub", 0):("string")
 
 // charat's first argument was taken above, so what reaches here is its
 // second: the index, which idc.py words as an index rather than as a type.
 bi_wants2(string name, int i) {
   string s = bi_wants3(name, i);
-  if(name == "chr" || name == "sleep_ms") {
+  if(name == "chr" || name == "sleep_ms" || name == "str_sub") {
     s = "int";
   } else if(name == "charat") {
     s = "index";
@@ -34,6 +35,7 @@ bi_wants2(string name, int i) {
 ("chr", 0):("int")
 ("charat", 1):("index")
 ("bits32_of_float", 0):("float")
+("str_sub", 2):("int")
 
 bi_wants3(string name, int i) {
   string s = bi_wants4(name);

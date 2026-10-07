@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  string s = str_sub("hello", argc + 2, 3);
+  print(len(s));
+} return int 0;

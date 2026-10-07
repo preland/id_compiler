@@ -2,13 +2,14 @@
 
 bt2(string name) {
   string t = "?";
-  if(name == "input" || name == "read_all" || name == "chr" || name == "str_of_mem") {
+  if(name == "input" || name == "read_all" || name == "chr" || name == "str_of_mem" || name == "str_sub") {
     t = "string";
   } else {
     t = bt3(name);
   }
 } return string t;
 ("chr"):("string")
+("str_sub"):("string")
 ("len"):("int")
 
 bt3(string name) {

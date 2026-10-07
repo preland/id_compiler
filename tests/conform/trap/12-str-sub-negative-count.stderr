@@ -1,0 +1,1 @@
+id: str span out of bounds: i=2 n=-1 in a string of length 5; clamp i and n first (fx_min, fx_max)

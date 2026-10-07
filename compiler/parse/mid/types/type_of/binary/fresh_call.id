@@ -16,9 +16,10 @@ given esc_ffix ((import eff_cl)):(0)
 
 fresh_builtin(string nm) {
   int ok = 0;
-  if(nm == "chr" || nm == "input" || nm == "read_all" || nm == "str_of_mem") {
+  if(nm == "chr" || nm == "input" || nm == "read_all" || nm == "str_of_mem" || nm == "str_sub") {
     ok = 1;
   }
 } return int ok;
 ("chr"):(1)
+("str_sub"):(1)
 ("len"):(0)

@@ -16,9 +16,14 @@ bi_count(string name) {
   } else if(bi_arity(name) == 1) {
     s = "exactly one argument";
   }
+} chain (string name) {
+  if(bi_arity(name) == 3) {
+    s = "exactly three arguments";
+  }
 } return string s;
 ("flush"):("no arguments")
 ("push"):("exactly two arguments")
+("str_sub"):("exactly three arguments")
 
 // The flat-store and unsigned-word builtins: idc.py's STORE_BUILTINS and
 // WORD_BUILTINS, which it handles through one shared routine and which

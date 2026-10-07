@@ -782,6 +782,17 @@ static char* id_chr(int code) {
     char c = (char)code;
     return id_str_from(&c, 1);
 }
+/* The n bytes of s from i, as a block of their own: one bounds check, one
+   allocation, one copy. An empty span reads nothing, so it is inside wherever
+   i >= 0. */
+static char* id_str_sub(const char* s, int i, int n) {
+    size_t m = id_slen(s);
+    if (i < 0 || n < 0 || (n > 0 && (size_t)i + (size_t)n > m)) {
+        fprintf(stderr, "id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fx_min, fx_max)\n", i, n, m);
+        exit(1);
+    }
+    return id_str_from(n ? s + i : s, (size_t)n);
+}
 
 /* real-time terminal I/O: write without a newline, flush, poll a single key
    without blocking (raw mode is entered lazily and restored at exit), and

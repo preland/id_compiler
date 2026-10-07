@@ -1,5 +1,5 @@
 // How many arguments each builtin takes. Two is the common case and so the
-// default; the other two are listed.
+// default; the other two are listed, and str_sub is the one builtin of three.
 
 bi_arity(string name) {
   int n = 2;
@@ -8,9 +8,14 @@ bi_arity(string name) {
   } else if(bi_one(name) == 1) {
     n = 1;
   }
+} chain (string name) {
+  if(name == "str_sub") {
+    n = 3;
+  }
 } return int n;
 ("flush"):(0)
 ("push"):(2)
+("str_sub"):(3)
 
 bi_zero(string name) {
   int ok = 0;
