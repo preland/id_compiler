@@ -2,14 +2,13 @@
 
 slice(string src, int a, int b) {
   string out = "";
-  while(a < b) {
-    int charat_v = charat(src, a);
-    out = out + chr(charat_v);
-    a = a + 1;
+  if(a < b) {
+    out = str_slice(src, a, b - a);
   }
 } return string out;
 ("hello world", 0, 5):("hello")
 ("hello world", 6, 11):("world")
+("hi", 2, 1):("")
 
 // A `line N` marker is not a token: it updates the current line and is
 // dropped, so the cursor and everything above it are unchanged, and every

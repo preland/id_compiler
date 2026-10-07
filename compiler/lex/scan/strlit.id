@@ -24,11 +24,10 @@ adv_str(string src, int i) {
 
 slice_str(string src, int a, int b) {
   string out = "";
-  while(a < b) {
-    int charat_v = charat(src, a);
-    out = out + chr(charat_v);
-    a = a + 1;
+  if(a < b) {
+    out = str_slice(src, a, b - a);
   }
 } return string out;
 ("hello", 1, 4):("ell")
 ("hi", 0, 2):("hi")
+("hi", 2, 1):("")

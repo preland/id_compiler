@@ -618,6 +618,9 @@ ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
 /* forward declarations */
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 int id_str_eol(char* idstd_s, int idstd_i);
+char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n);
+void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad);
+int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n);
 int id_is_space_at(char* src, int i);
 int id_is_digit_at(char* src, int i);
 int id_is_alpha_at(char* src, int i);
@@ -707,6 +710,40 @@ int id_str_eol(char* idstd_s, int idstd_i) {
         idstd_i = (idstd_i + 1);
     }
     return idstd_i;
+}
+
+char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n) {
+    long long idstd_ad;
+    char* idstd_ret_s;
+    idstd_ad = id_mem_alloc((long long)((id_idstd_str_span(idstd_s, idstd_i, idstd_n) + 1)));
+    id_str_blit(idstd_s, idstd_i, idstd_n, idstd_ad);
+    idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_n));
+    return idstd_ret_s;
+}
+
+void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad) {
+    int idstd_j;
+    int idstd_m;
+    int idstd_charat_v;
+    idstd_j = 0;
+    idstd_m = id_idstd_str_span(idstd_s, idstd_i, idstd_n);
+    while ((idstd_j < idstd_m)) {
+        idstd_charat_v = id_charat(idstd_s, (idstd_i + idstd_j));
+        id_poke8((long long)((idstd_ad + idstd_j)), (long long)(idstd_charat_v));
+        idstd_j = (idstd_j + 1);
+    }
+    return;
+}
+
+int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
+    int idstd_end;
+    int idstd_ok;
+    idstd_end = (idstd_i + idstd_n);
+    idstd_ok = (((idstd_i >= 0) && (idstd_n >= 0)) && ((idstd_n == 0) || (id_charat(idstd_s, (idstd_end - 1)) >= 0)));
+    if ((idstd_ok == 0)) {
+        id_fail(id_concat(id_concat(id_concat(id_concat(id_concat(id_concat(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i)), ID_S(" n=")), id_str_of_int(idstd_n)), ID_S(" in a string of length ")), id_str_of_int(id_len(idstd_s))), ID_S("; clamp i and n first (fx_min, fx_max)")));
+    }
+    return idstd_n;
 }
 
 int id_is_space_at(char* src, int i) {
@@ -1339,12 +1376,9 @@ int id_adv_str(char* src, int i) {
 
 char* id_slice_str(char* src, int a, int b) {
     char* out;
-    int charat_v;
     out = ID_S("");
-    while ((a < b)) {
-        charat_v = id_charat(src, a);
-        out = id_concat(out, id_chr(charat_v));
-        a = (a + 1);
+    if ((a < b)) {
+        out = id_str_slice(src, a, (b - a));
     }
     return out;
 }

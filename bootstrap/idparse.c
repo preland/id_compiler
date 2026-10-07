@@ -18226,12 +18226,9 @@ void id_grp_note(int e, IdList* pos) {
 
 char* id_slice(char* src, int a, int b) {
     char* out;
-    int charat_v;
     out = ID_S("");
-    while ((a < b)) {
-        charat_v = id_charat(src, a);
-        out = id_concat(out, id_chr(charat_v));
-        a = (a + 1);
+    if ((a < b)) {
+        out = id_str_slice(src, a, (b - a));
     }
     return out;
 }
