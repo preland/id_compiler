@@ -400,7 +400,7 @@ fi
 # server is necessarily listening yet.
 sockpath="$TMP/echo.sock"
 sockdir="$TMP/sock"; mkdir -p "$sockdir/out"
-printf 'import "%s"\n' "$(be_abs sock)" > "$sockdir/conf.id"
+printf 'import "%s"\nimport "%s"\nimport "%s"\n' "$(be_abs sock)" "$(be_abs fs)" "$(be_abs core)" > "$sockdir/conf.id"
 cat > "$sockdir/main.id" <<EOF
 main(int argc, string[] argv) {
   int h = sock_connect("$sockpath", 3000);
