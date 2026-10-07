@@ -12,21 +12,26 @@
 #include <unistd.h>
 #include <time.h>
 
-/* ---- allocation arena -----------------------------------------------------
-   Every heap block the runtime allocates (list headers/cells, and the C
-   strings built by concat/str_of_int/str_of_float/input/read_all/chr) is
-   wrapped with a small intrusive header and linked into one list, so the
-   whole arena can be released in a single pass at process exit (the free-all
-   is registered with atexit on the first allocation). id programs never call
-   free() themselves, so without this a long-running program (e.g. string
-   concatenation in a loop) would leak every intermediate string forever;
-   with it, nothing outlives the process. This bounds *leaks*, not *peak*
-   memory during the run -- a program that builds one huge string still holds
-   every intermediate allocation live until exit, same as before this change.
-   Every allocation in this file goes through id_alloc/id_realloc below, which
-   also check for allocation failure and for size-computation overflow,
-   aborting with a clear message instead of continuing with a NULL pointer or
-   a wrapped-around size. */
+/* ---- allocation pool -------------------------------------------------------
+   Every heap block the runtime allocates (lists, and the strings built by
+   concat/str_of_int/str_of_float/input/read_all/chr, and closures) comes from
+   id_pool_blk below, and carries no header: the caller says how big the block is
+   when it gives it back (id_pool_free), so the runtime stores no size and links no
+   list of blocks. A block of up to ID_POOL_MAX bytes is rounded up to a size
+   class and taken from that class's free list, or carved from the current
+   chunk, a ID_CHUNK-byte page malloc'd whole; a freed block goes back on its
+   class's free list and is reused by the next allocation of that class.
+   Chunks are what is released: at process exit (the hook is registered with
+   atexit on the first chunk), and at id_thread_leave for a worker thread, whose
+   pool is its own (ID_TLS) so no allocation takes a lock. A larger block is
+   one malloc with a two-pointer header, linked into one list that is swept at
+   exit; the header is what lets a realloc of it keep its place.
+   id_pool_has says whether an address lies in the span the chunks occupy, so a
+   later step can tell a heap block from a literal in the image by address. A
+   block that is not pool memory (a large block, a string from a native) is
+   not claimed by it.
+   Allocation failure and size overflow abort with a clear message instead of
+   continuing with a NULL pointer or a wrapped-around size. */
 typedef struct IdAllocHdr { struct IdAllocHdr* prev; struct IdAllocHdr* next; } IdAllocHdr;
 #ifndef ID_TLS
 #ifdef __wasm__
@@ -60,21 +65,56 @@ void id_trap_disarm(jmp_buf* old) { id_trap_jb = old; }
 const char* id_trap_text(void) { return id_trap_msg; }
 _Noreturn void id_trap_raise(const char* msg) { fprintf(stderr, "%s", msg); exit(1); }
 #endif
+#ifndef ID_MEM_CHARGE
+#define ID_MEM_CHARGE(n) ((void)0)
+#endif
+#ifdef __SANITIZE_ADDRESS__
+void __asan_poison_memory_region(void const volatile* a, size_t s);
+void __asan_unpoison_memory_region(void const volatile* a, size_t s);
+#define ID_POISON(p, n) __asan_poison_memory_region(p, n)
+#define ID_UNPOISON(p, n) __asan_unpoison_memory_region(p, n)
+#else
+#define ID_POISON(p, n) ((void)0)
+#define ID_UNPOISON(p, n) ((void)0)
+#endif
+#define ID_POOL_MAX 16384
+#define ID_POOL_SMALL 512
+#define ID_NCLASS 53
+#define ID_CHUNK 262144
+#define ID_CHUNK_HDR 16
+#define ID_LINK(p) (*(void**)((char*)(p) + 8))
+typedef struct IdChunk { struct IdChunk* next; } IdChunk;
 static ID_TLS IdAllocHdr* id_arena_head = NULL;
 static ID_TLS int id_arena_hooked = 0;
 static ID_TLS long id_nfree = 0;
+static ID_TLS void* id_pool_fl[ID_NCLASS];
+static ID_TLS char* id_pool_bump = NULL;
+static ID_TLS size_t id_pool_left = 0;
+static ID_TLS IdChunk* id_pool_chunks = NULL;
+static uintptr_t id_pool_lo = UINTPTR_MAX;
+static uintptr_t id_pool_hi = 0;
+static void id_pool_drop(void) {
+    IdChunk* c = id_pool_chunks;
+    while (c) { IdChunk* nx = c->next; free(c); c = nx; }
+    id_pool_chunks = NULL; id_pool_bump = NULL; id_pool_left = 0;
+    memset(id_pool_fl, 0, sizeof id_pool_fl);
+}
 static void id_arena_free_all(void) {
     if (getenv("ID_FREE_STATS")) fprintf(stderr, "id: freed %ld lists\n", id_nfree);
     IdAllocHdr* h = id_arena_head;
     while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
     id_arena_head = NULL;
+    id_pool_drop();
+}
+static void id_arena_hook(void) {
+    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }
 }
 static void id_arena_link(IdAllocHdr* h) {
     h->prev = NULL;
     h->next = id_arena_head;
     if (id_arena_head) id_arena_head->prev = h;
     id_arena_head = h;
-    if (!id_arena_hooked) { atexit(id_arena_free_all); id_arena_hooked = 1; }
+    id_arena_hook();
 }
 static void id_arena_unlink(IdAllocHdr* h) {
     if (h->prev) h->prev->next = h->next; else id_arena_head = h->next;
@@ -107,24 +147,110 @@ static size_t id_mul_check(size_t a, size_t b, const char* what) {
 static size_t id_slen(const char* s) { return ((const size_t*)(const void*)s)[-1]; }
 #define ID_S(lit) ({ static const struct { size_t n; char s[sizeof(lit)]; } id_l_ = { __builtin_strlen(lit), lit }; (char*)id_l_.s; })
 #define ID_SK(lit) ((char*)((const struct { size_t n; char s[sizeof(lit)]; }){ __builtin_strlen(lit), lit }).s)
-void* id_alloc(size_t n) {
+#ifdef __GNUC__
+__attribute__((noinline, cold))
+#endif
+static _Noreturn void id_pool_oom(size_t n) {
+    fprintf(stderr, "id: out of memory (%zu bytes)\n", n);
+    exit(1);
+}
+static size_t id_pool_class(size_t n) {
+    if (n <= ID_POOL_SMALL) return n ? (n + 15) >> 4 : 1;
+    size_t m = n - 1;
+    int e = 63 - __builtin_clzll(m);
+    return 33 + (size_t)(e - 9) * 4 + ((m >> (e - 2)) & 3);
+}
+static size_t id_pool_class_bytes(size_t k) {
+    if (k <= 32) return k << 4;
+    size_t j = k - 33;
+    int e = 9 + (int)(j >> 2);
+    return ((size_t)1 << e) + ((j & 3) + 1) * ((size_t)1 << (e - 2));
+}
+static void id_pool_span(uintptr_t lo, uintptr_t hi) {
+#ifdef __wasm__
+    if (lo < id_pool_lo) id_pool_lo = lo;
+    if (hi > id_pool_hi) id_pool_hi = hi;
+#else
+    uintptr_t o = __atomic_load_n(&id_pool_lo, __ATOMIC_RELAXED);
+    while (lo < o && !__atomic_compare_exchange_n(&id_pool_lo, &o, lo, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
+    o = __atomic_load_n(&id_pool_hi, __ATOMIC_RELAXED);
+    while (hi > o && !__atomic_compare_exchange_n(&id_pool_hi, &o, hi, 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
+#endif
+}
+static int id_pool_has(const void* p) {
+    uintptr_t a = (uintptr_t)p;
+    return a >= id_pool_lo && a < id_pool_hi;
+}
+static void* id_pool_carve(size_t bytes) {
+    if (id_pool_left < bytes) {
+        IdChunk* c = (IdChunk*)malloc(ID_CHUNK);
+        if (!c) id_pool_oom(bytes);
+        c->next = id_pool_chunks;
+        id_pool_chunks = c;
+        id_pool_span((uintptr_t)c, (uintptr_t)c + ID_CHUNK);
+        id_pool_bump = (char*)c + ID_CHUNK_HDR;
+        id_pool_left = ID_CHUNK - ID_CHUNK_HDR;
+        id_arena_hook();
+    }
+    void* p = id_pool_bump;
+    id_pool_bump += bytes;
+    id_pool_left -= bytes;
+    return p;
+}
+static void* id_pool_large_alloc(size_t n) {
     IdAllocHdr* h = (IdAllocHdr*)malloc(id_add_check(n, sizeof(IdAllocHdr), "alloc"));
-    if (!h) { fprintf(stderr, "id: out of memory (%zu bytes)\n", n); exit(1); }
+    if (!h) id_pool_oom(n);
     id_arena_link(h);
     return (void*)(h + 1);
 }
-static void* id_realloc(void* p, size_t n) {
-    if (!p) return id_alloc(n);
+static void id_pool_large_free(void* p) {
     IdAllocHdr* h = (IdAllocHdr*)p - 1;
     id_arena_unlink(h);
-    IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), "realloc"));
-    if (!nh) { fprintf(stderr, "id: out of memory (%zu bytes)\n", n); exit(1); }
-    id_arena_link(nh);
-    return (void*)(nh + 1);
+    free(h);
+}
+static void* id_pool_get(size_t n) {
+    if (n > ID_POOL_MAX) return id_pool_large_alloc(n);
+    size_t k = id_pool_class(n);
+    void* p = id_pool_fl[k];
+    if (!p) return id_pool_carve(id_pool_class_bytes(k));
+    id_pool_fl[k] = ID_LINK(p);
+    ID_UNPOISON(p, id_pool_class_bytes(k));
+    return p;
+}
+static void* id_pool_blk(size_t n) {
+    ID_MEM_CHARGE(n);
+    return id_pool_get(n);
+}
+void* id_alloc(size_t n) { return id_pool_blk(n); }
+static void id_pool_free(void* p, size_t n) {
+    if (!p) return;
+    if (n > ID_POOL_MAX) { id_pool_large_free(p); return; }
+    size_t k = id_pool_class(n);
+    ID_LINK(p) = id_pool_fl[k];
+    id_pool_fl[k] = p;
+    ID_POISON(p, 8);
+    ID_POISON((char*)p + 16, id_pool_class_bytes(k) - 16);
+}
+static void* id_realloc(void* p, size_t old, size_t n) {
+    ID_MEM_CHARGE(n);
+    if (!p) return id_pool_get(n);
+    if (old > ID_POOL_MAX && n > ID_POOL_MAX) {
+        IdAllocHdr* h = (IdAllocHdr*)p - 1;
+        id_arena_unlink(h);
+        IdAllocHdr* nh = (IdAllocHdr*)realloc(h, id_add_check(n, sizeof(IdAllocHdr), "realloc"));
+        if (!nh) id_pool_oom(n);
+        id_arena_link(nh);
+        return (void*)(nh + 1);
+    }
+    if (old <= ID_POOL_MAX && n <= ID_POOL_MAX && id_pool_class(old) == id_pool_class(n)) return p;
+    void* q = id_pool_get(n);
+    memcpy(q, p, old < n ? old : n);
+    id_pool_free(p, old);
+    return q;
 }
 /* The one place a heap string is born: n bytes, the count in front, the NUL after. */
 static char* id_str_new(size_t n) {
-    char* r = (char*)id_alloc(id_add_check(id_add_check(n, sizeof(size_t), "string"), 1, "string"));
+    char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), "string"), 1, "string"));
     *(size_t*)(void*)r = n;
     r += sizeof(size_t);
     r[n] = '\0';
@@ -136,6 +262,7 @@ static char* id_str_from(const char* p, size_t n) {
     return r;
 }
 char* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }
+static void id_str_free(char* s) { id_pool_free(s - sizeof(size_t), id_slen(s) + sizeof(size_t) + 1); }
 
 /* Growable, heap-allocated, reference-semantic list. Every element is stored
    in a uniform 8-byte cell; the compiler boxes/unboxes per the static element
@@ -145,12 +272,21 @@ char* id_str_of_cstr(const char* p) { return id_str_from(p, strlen(p)); }
    clear, fatal runtime error (never silent corruption or UB), matching id's
    contract that a bug aborts loudly instead of reading/writing garbage. */
 typedef struct { int len, cap; long long* data; } IdList;
-static IdList* id_list_new(void) {
-    IdList* L = (IdList*)id_alloc(sizeof(IdList));
-    L->len = 0; L->cap = 4;
-    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), (size_t)L->cap, "list init"));
-    return L;
+/* A list is one block: the header, then its first cells, which `data` points
+   at until the list outgrows them. A list is a reference, so the header never
+   moves; growth takes a separate block for the cells, and the first inline
+   cell then holds the capacity the header block was made with, which is what
+   gives the block back at the right size. */
+typedef struct { IdList h; long long c[1]; } IdListBlk;
+#define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)
+#define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))
+static IdList* id_list_make(int len, int cap) {
+    IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));
+    B->h.len = len; B->h.cap = cap; B->h.data = B->c;
+    return &B->h;
 }
+static IdList* id_list_new(void) { return id_list_make(0, 4); }
+IdList* id_list_sized(int n) { return id_list_make(n, n < 4 ? 4 : n); }
 /* An export is a C global, assigned when its declaring function runs, so a
    read before that finds NULL -- the one memory error in this runtime that
    was silent, since dereferencing NULL is a segfault with no message.
@@ -185,11 +321,6 @@ static _Noreturn void id_freed_trap(void) {
     fprintf(stderr, "id: use of a freed list (the compiler's escape analysis freed a list that was still reachable)\n");
     exit(1);
 }
-static void id_block_free(void* p) {
-    IdAllocHdr* h = (IdAllocHdr*)p - 1;
-    id_arena_unlink(h);
-    free(h);
-}
 static void id_list_free(IdList* L) {
     if (!L) return;
     id_nfree++;
@@ -201,8 +332,12 @@ static void id_list_free(IdList* L) {
         L->len = -1; L->cap = INT_MIN;
         return;
     }
-    id_block_free(L->data);
-    id_block_free(L);
+    size_t c = (size_t)(L->cap < 0 ? -L->cap : L->cap);
+    long long* inl = ID_LIST_CELLS(L);
+    if (L->data == inl) { id_pool_free(L, ID_LIST_BYTES(c)); return; }
+    size_t ic = (size_t)inl[0];
+    id_pool_free(L->data, sizeof(long long) * c);
+    id_pool_free(L, ID_LIST_BYTES(ic));
 }
 static void id_list_free_deep(IdList* L) {
     if (!L) return;
@@ -217,18 +352,28 @@ static void id_list_mut_check(IdList* L) {
         exit(1);
     }
 }
+static void id_list_grow(IdList* L) {
+    if (L->cap > INT_MAX / 2) {
+        fprintf(stderr, "id: list capacity overflow\n");
+        exit(1);
+    }
+    int ncap = L->cap < 2 ? 4 : L->cap * 2;
+    size_t nb = id_mul_check(sizeof(long long), (size_t)ncap, "list growth");
+    long long* inl = ID_LIST_CELLS(L);
+    if (L->data == inl) {
+        ID_MEM_CHARGE(nb);
+        long long* nd = (long long*)id_pool_get(nb);
+        memcpy(nd, inl, sizeof(long long) * (size_t)L->len);
+        inl[0] = L->cap;
+        L->data = nd;
+    } else {
+        L->data = (long long*)id_realloc(L->data, sizeof(long long) * (size_t)L->cap, nb);
+    }
+    L->cap = ncap;
+}
 static void id_list_push(IdList* L, long long v) {
     if (!L) id_null_read();
-    id_list_mut_check(L); if (L->len >= L->cap) {
-        if (L->cap > INT_MAX / 2) {
-            fprintf(stderr, "id: list capacity overflow\n");
-            exit(1);
-        }
-        int ncap = L->cap * 2;
-        L->data = (long long*)id_realloc(L->data,
-            id_mul_check(sizeof(long long), (size_t)ncap, "list growth"));
-        L->cap = ncap;
-    }
+    id_list_mut_check(L); if (L->len >= L->cap) id_list_grow(L);
     L->data[L->len++] = v;
 }
 static long long id_list_get(IdList* L, int i) {
@@ -268,9 +413,9 @@ static IdList* id_list_adopt(IdList* f) {   /* a list a native returned -> a lis
     return L;
 }
 static IdList* id_list_lit(int n, ...) {   /* elements are pre-boxed to cells */
-    IdList* L = id_list_new();
+    IdList* L = id_list_make(n, n < 1 ? 4 : n);
     va_list ap; va_start(ap, n);
-    for (int k = 0; k < n; k++) id_list_push(L, va_arg(ap, long long));
+    for (int k = 0; k < n; k++) L->data[k] = va_arg(ap, long long);
     va_end(ap);
     return L;
 }
@@ -380,7 +525,7 @@ static void id_store_grow(long long need) {
         if (cap > (long long)1 << 44) id_trap("store too large");
         cap *= 2;
     }
-    id_store = (unsigned char*)id_realloc(id_store, (size_t)cap);
+    id_store = (unsigned char*)id_realloc(id_store, (size_t)id_store_cap, (size_t)cap);
     memset(id_store + id_store_cap, 0, (size_t)(cap - id_store_cap));
     id_store_cap = cap;
 }
@@ -400,6 +545,7 @@ void id_thread_leave(void) {
     IdAllocHdr* h = id_arena_head;
     while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
     id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;
+    id_pool_drop();
 }
 
 /* Every load and store funnels through this one check. */
@@ -494,20 +640,21 @@ static char* id_read_all(void) {
     /* slurp all of stdin into one string (grows as needed); the count goes
        in the block's first word, so the bytes are read in place after it */
     size_t cap = 4096, n = 0, h = sizeof(size_t);
-    char* r = (char*)id_alloc(cap);
+    char* r = (char*)id_pool_blk(cap);
     for (;;) {
         if (h + n + 1 >= cap) {
             if (cap > SIZE_MAX / 2) {
                 fprintf(stderr, "id: allocation size overflow (read_all)\n");
                 exit(1);
             }
+            r = (char*)id_realloc(r, cap, cap * 2);
             cap *= 2;
-            r = (char*)id_realloc(r, cap);
         }
         size_t got = fread(r + h + n, 1, cap - h - n - 1, stdin);
         n += got;
         if (got == 0) break;
     }
+    r = (char*)id_realloc(r, cap, h + n + 1);
     r += h;
     if (memchr(r, 0, n)) id_trap("a NUL byte reached a string (read_all): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
     ((size_t*)(void*)r)[-1] = n;

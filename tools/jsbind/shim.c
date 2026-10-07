@@ -20,13 +20,8 @@ IDW_EXPORT("idw_str") char* idw_str(int n) {
 }
 
 IDW_EXPORT("idw_list") IdList* idw_list(int n) {
-    IdList* L = id_list_new();
-    if (n > L->cap) {
-        L->data = (long long*)id_realloc(L->data, id_mul_check(sizeof(long long), (size_t)n, "list"));
-        L->cap = n;
-    }
-    memset(L->data, 0, sizeof(long long) * (size_t)(n > 0 ? n : 0));
-    L->len = n;
+    IdList* L = id_list_sized(n > 0 ? n : 0);
+    memset(L->data, 0, sizeof(long long) * (size_t)L->len);
     return L;
 }
 
@@ -39,7 +34,7 @@ IDW_EXPORT("idw_flush") void idw_flush(void) {
 }
 
 IDW_EXPORT("idw_release_str") void idw_release_str(char* s) {
-    id_block_free((char*)s - sizeof(size_t));
+    id_str_free(s);
 }
 
 IDW_EXPORT("idw_release_list") void idw_release_list(IdList* L) {

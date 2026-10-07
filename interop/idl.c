@@ -1,15 +1,15 @@
 /* idl.c -- the entry-point machinery of an id library (see idl_pre.h for where
    this sits). It is included after the program's generated C because it
-   reaches the program's own runtime statics: the arena (id_arena_head,
-   IdAllocHdr), the flat store (id_store*), IdList, id_str_from.
+   reaches the program's own runtime statics: the pool (id_pool_chunks, id_pool_fl,
+   id_arena_head, IdAllocHdr), the flat store (id_store*), IdList, id_str_from.
 
    One call into the library is:
 
      lock          the runtime has global state, so calls are serialised
      setjmp        a trap anywhere below comes back here, as an error code
      init (once)   idc_const_init: the conf.id constants a program reads
-     frame         scoped libraries: mark the arena, so what the call
-                   allocates can be freed when it returns
+     frame         scoped libraries: mark the pool's chunks and the large-block
+                   list, so what the call allocates can be freed when it returns
      convert in    host data -> id strings and lists, allocated in the frame
      the id call
      convert out   id result -> malloc'd memory the host owns
@@ -33,6 +33,7 @@ static int idl_inited = 0;
 static int idl_framed = 0;
 static long long idl_store_mark = 1;
 static IdAllocHdr idl_frame;
+static IdChunk* idl_pool_mark = NULL;
 static _Thread_local int idl_code = 0;
 static _Thread_local char idl_msg[512];
 
@@ -85,6 +86,10 @@ static void idl_begin(void) {
     }
     if (IDL_SCOPED) {
         id_arena_link(&idl_frame);
+        idl_pool_mark = id_pool_chunks;
+        memset(id_pool_fl, 0, sizeof id_pool_fl);
+        id_pool_bump = NULL;
+        id_pool_left = 0;
         idl_store_mark = id_store_used;
         idl_framed = 1;
     }
@@ -108,6 +113,14 @@ static void idl_release(void) {
         }
         h = nx;
     }
+    while (id_pool_chunks != idl_pool_mark) {
+        IdChunk* c = id_pool_chunks;
+        id_pool_chunks = c->next;
+        free(c);
+    }
+    memset(id_pool_fl, 0, sizeof id_pool_fl);
+    id_pool_bump = NULL;
+    id_pool_left = 0;
     if (id_store_used > idl_store_mark) {
         memset(id_store + idl_store_mark, 0, (size_t)(id_store_used - idl_store_mark));
         id_store_used = idl_store_mark;
@@ -169,14 +182,8 @@ static char* idl_in_str(const char* p, size_t n) {
 }
 
 static IdList* idl_list_make(size_t n) {
-    IdList* L;
-    size_t cap = n < 4 ? 4 : n;
     if (n > (size_t)INT_MAX / 2) idl_argerr("a list argument is longer than an id list can hold (2^30 elements)");
-    L = (IdList*)id_alloc(sizeof(IdList));
-    L->len = (int)n;
-    L->cap = (int)cap;
-    L->data = (long long*)id_alloc(id_mul_check(sizeof(long long), cap, "list argument"));
-    return L;
+    return id_list_sized((int)n);
 }
 
 static IdList* idl_in_ints(const int32_t* p, size_t n) {
