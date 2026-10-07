@@ -2339,7 +2339,9 @@ tier_native_lines() {
 # pair for every other backend of TIER that declares a native. Each DIR under
 # DEST holds that backend's backend.id and its non-id files (its C, headers and
 # scripts, so a case that calls one of its natives links) and its native
-# declarations as an id file each, named for the native (a file holds at most three functions, and a numbered file is refused).
+# declarations as an id file each, named for the native plus `_decl` (a file holds
+# at most three functions, and a numbered file is refused: `proc_dup2` beside
+# `proc_dup` would be one if the name ended the file name).
 # A backend may call any backend's natives -- a native is
 # a leaf C call, so the id layering above it still holds -- but not another
 # backend's id functions, which are what is left out. A backend's pre-check is
@@ -2355,7 +2357,7 @@ tier_native_shims() {
         (cd "$b" && find . -mindepth 1 \( -type d -name '.*' -prune \) -o \( -type d -path "./$BUILD_DIR" -prune \) \
              -o \( -type f ! -name '*.id' ! -name '*.gen.o' -print0 \) | xargs -0 -r cp --parents -t "$n")
         cp "$b/backend.id" "$n/backend.id"
-        while IFS= read -r l; do d="${l#native }"; printf '%s\n' "$l" > "$n/${d%%(*}.id"; done < <(tier_native_lines "$b")
+        while IFS= read -r l; do d="${l#native }"; printf '%s\n' "$l" > "$n/${d%%(*}_decl.id"; done < <(tier_native_lines "$b")
         TIER_SHIM_ARGS+=(--backend "$n")
     done < <(tier_other_backends "$tier" "$self")
 }
