@@ -2,7 +2,9 @@
 lw_iset(int node, int a, string elem) {
   int i = lw_index_idx(node);
   int v = lw_iset_val(node, elem);
-  lw_callf("id_list_set", "", [a, i, v]);
+  string lv_f = lv_callee(node, "id_list_set", "id_list_cell_set");
+} chain (int node, int a, string elem) {
+  lw_callf(lv_f, "", [a, i, v]);
 } return void;
 given lw_fix_iassign ((import fix_iassign_n), 0, "i"):()
 given lw_fix_iassign ((import fix_iassign_n), 5, "x"):()

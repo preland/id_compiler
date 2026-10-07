@@ -1,0 +1,38 @@
+// The tokens that are not a word. A multi-character one is found by trying each
+// of gd_multi in order at the position; any other character is a token of its
+// own, and what the parser does not know it refuses.
+
+gd_match(string gdm_text, int gdm_at) {
+  string gdm_hit = "";
+  int gdm_k = 0;
+  int gdm_n = len((import gd_multi));
+} chain (string gdm_text, int gdm_at) {
+  while(gdm_k < gdm_n && len(gdm_hit) == 0) {
+    gdm_hit = gd_try(gdm_text, gdm_at, (import gd_multi)[gdm_k]);
+    gdm_k = gdm_k + 1;
+  }
+} return string gdm_hit;
+("(long long)(a)", 0):("(long long)")
+("(a)->len", 3):("->len")
+("a != b", 2):("!=")
+("a + b", 2):("")
+
+gd_other(string gdo_text, int gdo_at, int gdo_ch) {
+  string gdo_tok = gd_match(gdo_text, gdo_at);
+  if(len(gdo_tok) == 0) {
+    gdo_tok = chr(gdo_ch);
+  }
+} return string gdo_tok;
+("a + b", 2, 43):("+")
+("a <= b", 2, 60):("<=")
+
+gd_piece(string gdp_text, int gdp_at) {
+  int gdp_ch = charat(gdp_text, gdp_at);
+  string gdp_tok = gd_other(gdp_text, gdp_at, gdp_ch);
+  if(gd_isword(gdp_ch) == 1) {
+    gdp_tok = str_slice(gdp_text, gdp_at, gd_wend(gdp_text, gdp_at) - gdp_at);
+  }
+} return string gdp_tok;
+("ab+c", 0):("ab")
+("ab+c", 2):("+")
+("a  b", 1):(" ")

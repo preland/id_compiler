@@ -1,0 +1,34 @@
+// A comparison or a sum of two values already widened, and the test that a list
+// exists: its length, as the reader answers it, is not negative.
+
+gd_opname(string gda_op) {
+  string gda_name = "mul";
+  if(gda_op == "+") {
+    gda_name = "add";
+  }
+  if(gda_op == "-") {
+    gda_name = "sub";
+  }
+} return string gda_name;
+("+"):("add")
+("-"):("sub")
+("*"):("mul")
+
+gd_arith(string gda_op, int gda_a, int gda_b) {
+  int gda_out = 0 - 1;
+  if(gd_isop(gda_op) == 1) {
+    gda_out = lw_op("icmp", "bool", gda_a, gda_b, gda_op);
+  } else {
+    gda_out = lw_op(gd_opname(gda_op), "word", gda_a, gda_b, "");
+  }
+} return int gda_out;
+given gd_words ("<=", 5, 6):(7) then gd_last:("bool icmp <=")
+given gd_words ("-", 5, 6):(7) then gd_last:("word sub ")
+
+gd_nn(int gda_list) {
+  int gda_len = gd_raw("->len", gda_list);
+  int gda_zero = lw_const("word", "0");
+  int gda_out = lw_op("icmp", "bool", gda_len, gda_zero, ">=");
+} return int gda_out;
+given gd_vals (4):(8) then gd_last:("bool icmp >=")
+given gd_vals (4):(8) then calls lw_op:("icmp", "bool", 6, 7, ">=")

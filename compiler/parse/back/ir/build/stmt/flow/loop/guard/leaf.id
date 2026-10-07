@@ -1,0 +1,34 @@
+// A name or a number, the last thing a clause is made of. A name is one the
+// function has a slot or an export for, of a type the guard can compare: an
+// int, a word, or a list (whose length it reads). Anything else gives the loop
+// up, which is always safe -- the checked loop is the one that was written.
+
+gd_fix() {
+  lw_env_fixture();
+  int gdf_j = lw_alloca("int", "j");
+  int gdf_v = lw_alloca("int[]", "v");
+} chain () {
+  int gdf_f = lw_alloca("float", "f");
+} return void;
+():() then (import lwvar)[0]:("j")
+():() then (import lwvar)[2]:("f")
+
+gd_nty(string gdy_name) {
+  int gdy_slot = lw_slot(gdy_name);
+  string gdy_ty = lw_vty(gdy_name);
+  if(gdy_slot >= 0) {
+    gdy_ty = (import ity)[gdy_slot];
+  }
+} return string gdy_ty;
+given gd_fix ("j"):("int")
+given gd_fix ("v"):("int[]")
+given gd_fix ("nothing"):("")
+
+gd_okname(string gdy_name) {
+  string gdy_ty = gd_nty(gdy_name);
+  int gdy_ok = gdy_ty == "int" || gdy_ty == "word" || ty_is_list(gdy_ty) == 1;
+} return int gdy_ok;
+given gd_fix ("j"):(1)
+given gd_fix ("v"):(1)
+given gd_fix ("f"):(0)
+given gd_fix ("nothing"):(0)

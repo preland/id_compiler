@@ -48,6 +48,6 @@ init_resv_names() {
     i = take_name((import resv_names_src), i, (import resv_names));
   }
 } return void;
-():() then calls take_name:[125]
+():() then calls take_name:[129]
 ():() then (import resv_names)[124]:("str_dup")
 

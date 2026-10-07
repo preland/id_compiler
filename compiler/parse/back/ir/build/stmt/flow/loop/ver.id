@@ -1,0 +1,45 @@
+// Loop versioning, as the C target does it (tgt/c/emit/prog/code/body/fast/,
+// docs/PERFORMANCE.md): a while loop whose list accesses can be proved in range
+// once, before the loop, is lowered twice behind one guard -- a copy that reads
+// and writes the cells with no check, and the loop as written as the fallback
+// -- so an access out of range still traps, at the same iteration with the same
+// message. Which loops and which accesses is that analysis's answer, asked
+// here unchanged; guard/ turns its guard into IR. A freestanding build keeps
+// its checks: the unchecked cells and the length readers are the C runtime's.
+// So does -O0, whose IR is the plain lowering.
+
+lv_plan(int lv_n) {
+  lset((import sqbase), 0, (import fnnode)[(import lwfn)[0]]);
+  int lv_r = 0;
+  if((import fsc)[0] == 0 && (import lvc)[0] > 0) {
+    lv_r = lp_plan(lv_n);
+  }
+} chain (int lv_n) {
+  if(lv_r == 1) {
+    lv_r = gd_check();
+  }
+} return int lv_r;
+given lv_fix ((import lpf_wa)):(1) then len((import gdrpn)):(16)
+given lv_fix given lset((import fsc), 0, 1) ((import lpf_wa)):(0)
+given lv_fix given lset((import lvc), 0, 0) ((import lpf_wa)):(0)
+
+lv_callee(int lv_n, string lv_plain, string lv_cell) {
+  string lv_f = lv_plain;
+  if(lp_hit(lv_n) == 1) {
+    lv_f = lv_cell;
+  }
+} return string lv_f;
+given lv_hit (7, "id_list_get", "id_list_cell"):("id_list_cell")
+given lv_hit (8, "id_list_get", "id_list_cell"):("id_list_get")
+given lp_reset (7, "id_list_set", "id_list_cell_set"):("id_list_set")
+
+lv_copy(int lv_n, int lv_b, int lv_jn, int lv_on) {
+  lw_go(lv_b);
+  lset((import lpon), 0, lv_on);
+  lw_while(lv_n);
+} chain (int lv_n, int lv_b, int lv_jn, int lv_on) {
+  lset((import lpon), 0, 0);
+  lw_term("br", 0 - 1, [lv_jn]);
+} return void;
+given lv_loop ((import while_node), 0, 0, 1):() then calls lw_while:((import while_node))
+given lv_loop ((import while_node), 0, 0, 1):() then (import lpon)[0]:(0)

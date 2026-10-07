@@ -1,0 +1,29 @@
+// A while loop, versioned when the analysis covers some of its accesses and
+// lowered as it was written when it does not.
+
+lw_loop(int lv_n) {
+  int lv_p = lv_plan(lv_n);
+  if(lv_p == 1) {
+    lw_versioned(lv_n);
+  } else {
+    lw_while(lv_n);
+  }
+} return void;
+given lv_loop ((import while_node)):() then calls lw_while:((import while_node))
+given lv_loop given lset((import fsc), 0, 1) ((import while_node)):() then calls lv_plan:((import while_node))
+
+lw_versioned(int lv_n) {
+  int lv_g = gd_guard();
+  int lv_fn = (import lwfn)[0];
+  int lv_fast = ir_block(lv_fn, "vfast");
+} chain (int lv_n) {
+  int lv_slow = ir_block(lv_fn, "vslow");
+  int lv_jn = ir_block(lv_fn, "vjoin");
+  lw_term("cbr", lv_g, [lv_fast, lv_slow]);
+} chain (int lv_n) {
+  lv_copy(lv_n, lv_fast, lv_jn, 1);
+  lv_copy(lv_n, lv_slow, lv_jn, 0);
+  lw_go(lv_jn);
+} return void;
+given lv_loop ((import while_node)):() then calls lv_copy:[2]
+given lv_loop ((import while_node)):() then calls ir_block:[9]

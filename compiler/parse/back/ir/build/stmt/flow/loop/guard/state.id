@@ -1,0 +1,23 @@
+// The parser's place. gdtok holds the clause's tokens and gdpos[0] the next one;
+// gdrpn collects every clause in reverse Polish order, each ended by "|"; and
+// gdbad[0] is 1 once something was met that the IR cannot build, after which the
+// loop is not versioned. gdstk is the value stack the IR is built from. Each is
+// made by a function of its own so that its cases can say what it made.
+
+gd_rpn_new() {
+  export string[] gdrpn = [];
+} return void export gdrpn;
+():() then len((import gdrpn)):(0)
+():() then (import gdrpn):([])
+
+gd_bad_new() {
+  export int[] gdbad = [0];
+} return void export gdbad;
+():() then (import gdbad)[0]:(0)
+():() then len((import gdbad)):(1)
+
+gd_tok_new(string[] gdn_toks) {
+  export string[] gdtok = gdn_toks;
+} return void export gdtok;
+(["a", "b"]):() then len((import gdtok)):(2)
+([]):() then len((import gdtok)):(0)

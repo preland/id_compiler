@@ -1,0 +1,38 @@
+// A loop's guard, read back. tgt/c/emit/prog/code/body/fast/ decides which loops
+// can be versioned and writes the guard as one C condition per clause (lpcond);
+// this lowering reads those clauses rather than deciding it a second time. A
+// clause is a comparison of sums of names, integer literals, `(long long)` casts
+// and `->len` / `->cap` reads of a list, and a loop whose guard holds anything
+// else keeps its checks.
+//
+// Reading starts with the tokens: a run of letters, digits and underscores is
+// one, and so are the multi-character operators and casts in gd_multi.
+
+gd_isword(int gdc_ch) {
+  int gdc_is = chr_is_alnum(gdc_ch) == 1 || gdc_ch == 95;
+} return int gdc_is;
+(97):(1)
+(95):(1)
+(48):(1)
+(40):(0)
+(-1):(0)
+
+gd_wend(string gdw_text, int gdw_from) {
+  int gdw_end = gdw_from;
+  while(gd_isword(charat(gdw_text, gdw_end)) == 1) {
+    gdw_end = gdw_end + 1;
+  }
+} return int gdw_end;
+("ab+c", 0):(2)
+("ab+c", 3):(4)
+("ab", 2):(2)
+
+gd_try(string gdt_text, int gdt_at, string gdt_tok) {
+  string gdt_hit = "";
+  if(str_eqat(gdt_text, gdt_at, gdt_tok) == 1) {
+    gdt_hit = gdt_tok;
+  }
+} return string gdt_hit;
+("a<=b", 1, "<="):("<=")
+("a<=b", 1, ">="):("")
+("a<=b", 3, "<="):("")

@@ -1,0 +1,33 @@
+// What a leaf token is: NULL, a number, or a name.
+
+gd_leaf(string gdl_tok) {
+  if(gdl_tok == "NULL") {
+    gd_emit("null");
+  } else {
+    gd_leaf_b(gdl_tok);
+  }
+} return void;
+given gd_rpn_new ("NULL"):() then (import gdrpn)[0]:("null")
+given gd_rpn_new given gd_bad_new ("12"):() then (import gdrpn)[0]:("i:12")
+
+gd_leaf_b(string gdl_tok) {
+  int gdl_ch = charat(gdl_tok, 0);
+  if(chr_is_digit(gdl_ch) == 1) {
+    gd_emit("i:" + gdl_tok);
+  } else {
+    gd_name(gdl_tok, gdl_ch);
+  }
+} return void;
+given gd_rpn_new given gd_bad_new ("7"):() then (import gdrpn)[0]:("i:7")
+given gd_rpn_new given gd_bad_new given gd_fix ("j"):() then (import gdrpn)[0]:("v:j")
+
+gd_name(string gdl_tok, int gdl_ch) {
+  if(gd_isword(gdl_ch) == 1 && gd_okname(gdl_tok) == 1) {
+    gd_emit("v:" + gdl_tok);
+  } else {
+    lset((import gdbad), 0, 1);
+  }
+} return void;
+given gd_rpn_new given gd_bad_new given gd_fix ("j", 106):() then (import gdrpn)[0]:("v:j")
+given gd_rpn_new given gd_bad_new given gd_fix ("zz", 122):() then (import gdbad)[0]:(1)
+given gd_rpn_new given gd_bad_new ("(", 40):() then (import gdbad)[0]:(1)

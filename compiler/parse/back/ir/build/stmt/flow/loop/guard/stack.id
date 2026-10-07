@@ -1,0 +1,17 @@
+// The value stack as the cases of the operators find it: two copies of the load
+// of j, or the load of v alone.
+
+gd_two() {
+  gd_stk_new();
+  push((import gdstk), (import gdx)[0]);
+  push((import gdstk), (import gdx)[0]);
+} return void;
+given gd_vals ():() then len((import gdstk)):(2)
+given gd_vals ():() then (import gdstk)[1]:(3)
+
+gd_one_on() {
+  gd_stk_new();
+  push((import gdstk), (import gdx)[1]);
+} return void;
+given gd_vals ():() then len((import gdstk)):(1)
+given gd_vals ():() then (import gdstk)[0]:(4)

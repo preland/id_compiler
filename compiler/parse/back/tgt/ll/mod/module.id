@@ -5,13 +5,15 @@
 
 emit_llvm(string triple, int lvl) {
   fv_init();
+  lset((import lvc), 0, lvl);
   ir_lower();
-  ir_opt(lvl);
 } chain (string triple, int lvl) {
+  ir_opt(lvl);
   ll_emit(triple);
 } return void;
 given ll_env_fixture2 ("x86_64", 0):() then calls ir_lower:[1] then calls ll_emit:("x86_64")
 given ll_env_fixture2 ("wasm32", 2):() then calls ir_opt:(2) then calls ll_emit:("wasm32")
+given ll_env_fixture2 ("x86_64", 0):() then (import lvc)[0]:(0)
 
 ll_emit(string triple) {
   ll_head(triple);

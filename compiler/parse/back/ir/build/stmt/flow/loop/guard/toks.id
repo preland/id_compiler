@@ -1,0 +1,24 @@
+// A clause as its tokens, blanks dropped.
+
+gd_toks(string gdk_text) {
+  string[] gdk_out = [];
+  int gdk_at = 0;
+  int gdk_n = len(gdk_text);
+} chain (string gdk_text) {
+  while(gdk_at < gdk_n) {
+    string gdk_tok = gd_piece(gdk_text, gdk_at);
+    gd_keep(gdk_out, gdk_tok);
+    gdk_at = gdk_at + len(gdk_tok);
+  }
+} return string[] gdk_out;
+("(a) <= (long long)(b)->len - 1"):(["(", "a", ")", "<=", "(long long)", "(", "b", ")", "->len", "-", "1"])
+("(v) != NULL"):(["(", "v", ")", "!=", "NULL"])
+(""):([])
+
+gd_keep(string[] gdk_out, string gdk_tok) {
+  if(gdk_tok != " ") {
+    push(gdk_out, gdk_tok);
+  }
+} return void;
+([], "a"):(["a"])
+(["a"], " "):(["a"])

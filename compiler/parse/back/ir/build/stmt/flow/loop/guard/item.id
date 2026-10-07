@@ -1,0 +1,29 @@
+// One item of the reverse Polish form: a name or a number is pushed, an operator
+// takes its operands off the stack, and "|" ends a clause, leaving its value to
+// be anded into the guard.
+
+gd_push_name(string gdi_item) {
+  string gdi_name = str_slice(gdi_item, 2, len(gdi_item) - 2);
+  int gdi_val = gd_load(gdi_name);
+  push((import gdstk), gdi_val);
+} return void;
+given gd_fix given gd_stk_new ("v:j"):() then (import gdstk)[0]:(3)
+given gd_fix given gd_stk_new ("v:v"):() then gd_last:("int[] load ")
+
+gd_push_lit(string gdi_item) {
+  string gdi_name = str_slice(gdi_item, 2, len(gdi_item) - 2);
+  int gdi_val = lw_const("int", gdi_name);
+  push((import gdstk), gdi_val);
+} return void;
+given gd_fix given gd_stk_new ("i:7"):() then gd_last:("int const 7")
+given gd_fix given gd_stk_new ("i:12"):() then (import gdstk)[0]:(3)
+
+gd_op(string gdi_item) {
+  if(str_starts(gdi_item, "v:") == 1) {
+    gd_push_name(gdi_item);
+  } else {
+    gd_op_b(gdi_item);
+  }
+} return void;
+given gd_vals given gd_two ("v:j"):() then len((import gdstk)):(3)
+given gd_vals given gd_one_on ("->len"):() then (import gdstk)[0]:(6)

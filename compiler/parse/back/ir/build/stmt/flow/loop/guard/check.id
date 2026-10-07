@@ -1,0 +1,25 @@
+// Reading every clause of a loop's guard. True when all of them were read, and
+// then gdrpn holds the guard; false when the loop must keep its checks.
+
+gd_one(string gdk_clause) {
+  string[] gdk_toks = gd_toks(gdk_clause);
+  gd_open(gdk_toks);
+  gd_clause();
+} return void;
+given gd_begin given gd_fix ("(j) >= 0"):() then (import gdrpn)[0]:("v:j")
+given gd_begin given gd_fix ("(j) >= 0"):() then len((import gdrpn)):(4)
+
+gd_check() {
+  gd_begin();
+  int gdk_at = 0;
+  int gdk_ok = 0;
+} chain () {
+  while(gdk_at < len((import lpcond)) && (import gdbad)[0] == 0) {
+    gd_one((import lpcond)[gdk_at]);
+    gdk_at = gdk_at + 1;
+  }
+  gdk_ok = (import gdbad)[0] == 0;
+} return int gdk_ok;
+given gd_fix given gd_good ():(1)
+given gd_fix given gd_bad ():(0)
+given gd_fix given gd_good ():(1) then len((import gdrpn)):(8)

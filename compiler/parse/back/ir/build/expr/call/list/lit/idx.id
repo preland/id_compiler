@@ -19,7 +19,9 @@ given lw_fix_iassign ((import fix_iassign_n)):(3)
 
 lw_index2(int node, int a, int i) {
   string elem = lw_index_elem(node);
-  int c = lw_callf("id_list_get", "word", [a, i]);
+  string lv_f = lv_callee(node, "id_list_get", "id_list_cell");
+  int c = lw_callf(lv_f, "word", [a, i]);
+} chain (int node, int a, int i) {
   int ret_i = lw_unbox(c, elem);
 } return int ret_i;
 given lw_fix_index ((import fix_index_n), 0, 0):(1)

@@ -1,0 +1,37 @@
+// A clause: a sum, then a comparison with another sum, then nothing. A clause
+// the parser cannot read to its end gives the loop up, and each clause read
+// whole is ended in gdrpn by "|".
+
+gd_isop(string gdc_op) {
+  int gdc_is = gdc_op == "!=" || gdc_op == "<=" || gdc_op == "<" || gdc_op == ">=";
+} return int gdc_is;
+("<="):(1)
+("!="):(1)
+("<"):(1)
+(">="):(1)
+("+"):(0)
+
+gd_rest() {
+  string gdc_op = gd_peek();
+  if(gd_isop(gdc_op) == 1) {
+    gd_adv();
+    gd_sum();
+    gd_emit(gdc_op);
+  }
+} return void;
+given gd_rpn_new given gd_bad_new given gd_open(["<=", "2"]) ():() then (import gdrpn)[1]:("<=")
+given gd_rpn_new given gd_bad_new given gd_open(["+", "2"]) ():() then len((import gdrpn)):(0)
+
+gd_clause() {
+  gd_sum();
+  gd_rest();
+  string gdc_end = gd_peek();
+} chain () {
+  if(len(gdc_end) > 0) {
+    lset((import gdbad), 0, 1);
+  }
+  gd_emit("|");
+} return void;
+given gd_rpn_new given gd_bad_new given gd_open(["1", "<", "2"]) ():() then (import gdrpn)[3]:("|")
+given gd_rpn_new given gd_bad_new given gd_open(["1", "<", "2", "3"]) ():() then (import gdbad)[0]:(1)
+given gd_rpn_new given gd_bad_new given gd_open(["1", "<", "2"]) ():() then (import gdbad)[0]:(0)

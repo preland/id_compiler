@@ -1,0 +1,14 @@
+// The guard of a versioned loop: gdrpn read to its end, the bool it comes to.
+
+gd_guard() {
+  gd_stk_new();
+  int gdg_acc = 0 - 1;
+  int gdg_at = 0;
+} chain () {
+  while(gdg_at < len((import gdrpn))) {
+    gdg_acc = gd_item((import gdrpn)[gdg_at], gdg_acc);
+    gdg_at = gdg_at + 1;
+  }
+} return int gdg_acc;
+given gd_fix given gd_solo given gd_prep ():(7) then gd_last:("bool icmp >=")
+given gd_fix given gd_good given gd_prep ():(13) then gd_last:("bool and ")

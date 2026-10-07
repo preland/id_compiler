@@ -1,0 +1,13 @@
+// Stepping past a token, and the one write to the output.
+
+gd_adv() {
+  lset((import gdpos), 0, (import gdpos)[0] + 1);
+} return void;
+given gd_open(["x", "y"]) ():() then (import gdpos)[0]:(1)
+given gd_open(["x", "y", "z"]) given gd_adv ():() then (import gdpos)[0]:(2)
+
+gd_emit(string gdn_item) {
+  push((import gdrpn), gdn_item);
+} return void;
+given gd_rpn_new ("a"):() then len((import gdrpn)):(1)
+given gd_rpn_new ("a"):() then (import gdrpn)[0]:("a")

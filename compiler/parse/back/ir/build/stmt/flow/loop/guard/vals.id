@@ -1,0 +1,23 @@
+// A function with an int slot `j` and a list slot `v`, and the two loads of them:
+// gdx[0] the load of j, gdx[1] the load of v. gd_words adds two widened copies
+// of j. They give the cases of the functions that take values something to take.
+
+gd_vals() {
+  gd_fix();
+  int gdx_j = gd_load("j");
+  int gdx_v = gd_load("v");
+} chain () {
+  export int[] gdx = [gdx_j, gdx_v];
+} return void export gdx;
+():() then (import gdx)[0]:(3)
+():() then (import gdx)[1]:(4)
+
+gd_words() {
+  gd_vals();
+  int gdy_a = gd_wide((import gdx)[0]);
+  int gdy_b = gd_wide((import gdx)[0]);
+} chain () {
+  export int[] gdw = [gdy_a, gdy_b];
+} return void export gdw;
+():() then (import gdw)[0]:(5)
+():() then (import gdw)[1]:(6)

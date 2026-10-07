@@ -1,0 +1,25 @@
+// Beginning a guard and opening a clause, then looking at the next token.
+
+gd_begin() {
+  gd_rpn_new();
+  gd_bad_new();
+  gd_stk_new();
+} return void;
+():() then calls gd_rpn_new:[1]
+():() then calls gd_bad_new:[1]
+
+gd_open(string[] gdn_toks) {
+  gd_tok_new(gdn_toks);
+  gd_pos_new();
+} return void;
+(["a"]):() then calls gd_tok_new:(["a"])
+(["a"]):() then calls gd_pos_new:[1]
+
+gd_peek() {
+  string gdn_tok = "";
+  if((import gdpos)[0] < len((import gdtok))) {
+    gdn_tok = (import gdtok)[(import gdpos)[0]];
+  }
+} return string gdn_tok;
+given gd_open(["x", "y"]) ():("x")
+given gd_open([]) ():("")

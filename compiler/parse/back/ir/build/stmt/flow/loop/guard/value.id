@@ -1,0 +1,34 @@
+// The values of a guard. Every comparison and sum is made in 64 bits, as the C
+// guard does by casting, so a name that is an int is widened first. A list's
+// length and capacity come from the runtime's own readers, which answer -1 for
+// a list that is not there, so no clause of the guard needs the list to exist
+// to be asked.
+
+gd_load(string gdv_name) {
+  int gdv_slot = lw_addr(gdv_name);
+  string gdv_ty = (import ity)[gdv_slot];
+  int gdv_val = lw_load_at(gdv_slot, gdv_ty);
+} return int gdv_val;
+given gd_fix ("j"):(3) then gd_last:("int load ")
+given gd_fix ("v"):(3) then gd_last:("int[] load ")
+
+gd_wide(int gdv_val) {
+  int gdv_out = gdv_val;
+  if((import ity)[gdv_val] == "int") {
+    gdv_out = lw_conv(gdv_val, "int", "word");
+  }
+} return int gdv_out;
+given gd_vals (3):(5) then gd_last:("word sext ")
+given gd_vals (4):(4) then gd_last:("int[] load ")
+
+gd_raw(string gdv_op, int gdv_list) {
+  string gdv_fn = "id_list_len_raw";
+  if(gdv_op == "->cap") {
+    gdv_fn = "id_list_cap_raw";
+  }
+  int gdv_cell = lw_callf(gdv_fn, "int", [gdv_list]);
+} chain (string gdv_op, int gdv_list) {
+  int gdv_out = gd_wide(gdv_cell);
+} return int gdv_out;
+given gd_vals ("->len", 4):(6) then calls lw_callf:("id_list_len_raw", "int", [4])
+given gd_vals ("->cap", 4):(6) then calls lw_callf:("id_list_cap_raw", "int", [4])

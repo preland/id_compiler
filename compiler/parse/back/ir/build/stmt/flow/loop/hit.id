@@ -1,0 +1,29 @@
+// What the cases of loop versioning stand on: lv_hit, the state while a guarded
+// copy is lowered with node 7 covered; lv_fix, a function with the slots of
+// loop LA of the C emitter's fixtures (tgt/c/emit/prog/code/body/fast/fix/) and
+// that loop's tree; and lv_loop, the IR builder's own loop fixture with slots
+// for the guard of guard/fixture.id, read.
+
+lv_hit() {
+  lp_reset();
+  lset((import lpon), 0, 1);
+  push((import lpset), 7);
+} return void;
+():() then (import lpon)[0]:(1)
+():() then (import lpset):([7])
+
+lv_fix() {
+  lpf_la();
+  lw_fixture_node();
+  lv_slots();
+} return void;
+():() then calls lv_slots:[1]
+():() then calls lw_fixture_node:[1]
+
+lv_slots() {
+  int lvf_a = lw_alloca("int[]", "lav");
+  int lvf_b = lw_alloca("int", "lan");
+  int lvf_c = lw_alloca("int", "laj");
+} return void;
+given lw_env_fixture ():() then (import lwvar):(["lav", "lan", "laj"])
+given lw_env_fixture ():() then len((import lwslot)):(3)

@@ -3112,11 +3112,11 @@ BACKEND_OBJ_DIR="$CACHE_DIR/backend_obj"
 # beside them; a backend's own .gen.o is output, not input, and hidden
 # directories and BUILD_DIR are pruned as collect_ids prunes them).
 backend_obj_key() {
-    local d="$1" cc_path
+    local d="$1" cc_path kcc="${BE_CC:-$CC}"
     shift
     {
-        printf '%s\0' "$CC" "$TRIPLE" "$PLATKEY_BUILD" "$@"
-        cc_path="$(command -v "$CC" 2>/dev/null)"
+        printf '%s\0' "$kcc" "$TRIPLE" "$PLATKEY_BUILD" "$@"
+        cc_path="$(command -v "$kcc" 2>/dev/null)"
         [ -n "$cc_path" ] && sha256sum < "$cc_path"
         (cd "$d" && find . -mindepth 1 \
              \( -type d -name '.*' -prune \) -o \
@@ -3170,11 +3170,13 @@ backend_pkg() {
 # -fwrapv), so a native like sqrt can inline; a --lib, llvm or wasm build, or a
 # clang cc (thin LTO objects do not link without -flto), keeps the plain -O2 object.
 backend_build() {
-    local d="$1" sources_line cflags_line link_line pkg_line src src_path obj backend_rc bkey
+    local d="$1" sources_line cflags_line link_line pkg_line src src_path obj backend_rc bkey bcc="$CC" btag=""
     local -a srcs=() cflags=() objs=() pkgs=() links=() ltof=()
     local -a PKG_CFLAGS=() PKG_LIBS=()
     BE_ERR=""
-    [ -n "${BE_BUILT[$d]:-}" ] && return 0
+    [ "${BE_LLVM_LTO:-0}" -eq 1 ] && [ "$LIB" -eq 0 ] && [ "$CC_LTO" -eq 1 ] && command -v clang >/dev/null 2>&1 && { bcc=clang; btag="|llvm"; }
+    BE_TAG="$btag"
+    [ -n "${BE_BUILT[$d$btag]:-}" ] && return 0
     backend_supports "$d" || return 1
     sources_line="${BD[c_${PLATKEY_BUILD}_sources]}"
     cflags_line="${BD[c_${PLATKEY_BUILD}_cflags]:-}"
@@ -3192,6 +3194,8 @@ backend_build() {
     fi
     [ "$LIB" -eq 1 ] && cflags+=(-fPIC -ffunction-sections -fdata-sections)
     [ "$LIB" -eq 0 ] && [ "$TARGET" = c ] && [ "$CC_LTO" -eq 1 ] && cc_lto_setup && [ "${CC_LTO_COMPILE[*]}" = -flto ] && ltof=(-std=gnu17 -flto -ffat-lto-objects -fwrapv)
+    [ -n "$btag" ] && ltof=(-std=gnu17 -flto -ffat-lto-objects -fwrapv)
+    BE_CC="$bcc"
     for src in ${srcs[@]+"${srcs[@]}"}; do
         [ -z "$src" ] && continue
         src_path="$d/$src"
@@ -3201,7 +3205,7 @@ backend_build() {
         if [ -n "$bkey" ] && [ -f "$BACKEND_OBJ_DIR/$bkey/o" ] && cp "$BACKEND_OBJ_DIR/$bkey/o" "$obj"; then
             touch "$BACKEND_OBJ_DIR/$bkey"
         else
-            capped "$CC" -O2 ${ltof[@]+"${ltof[@]}"} -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
+            capped "$bcc" -O2 ${ltof[@]+"${ltof[@]}"} -c "$src_path" -o "$obj" ${cflags[@]+"${cflags[@]}"}; backend_rc=$?
             if [ "$backend_rc" -ne 0 ]; then
                 progress_clear
                 if mem_ceiling_hit "$backend_rc"; then
@@ -3216,9 +3220,9 @@ backend_build() {
         BACKEND_OBJS+=("$obj")
         objs+=("$obj")
     done
-    BE_OBJS[$d]=$(IFS=$'\x1f'; printf '%s' "${objs[*]}")
-    BE_LINK[$d]="$link_line"
-    BE_BUILT[$d]=1
+    BE_OBJS[$d$btag]=$(IFS=$'\x1f'; printf '%s' "${objs[*]}")
+    BE_LINK[$d$btag]="$link_line"
+    BE_BUILT[$d$btag]=1
 }
 
 # backend_supports DIR -- read DIR's backend.id into BD, and return 1 with
@@ -3292,8 +3296,8 @@ backends_for() {
         if [ "$mode" = check ]; then
             backend_supports "$BE_IMPL" && continue
         elif backend_build "$BE_IMPL"; then
-            IFS=$'\x1f' read -ra objs <<< "${BE_OBJS[$BE_IMPL]}"
-            IFS=$'\x1f' read -ra flags <<< "${BE_LINK[$BE_IMPL]}"
+            IFS=$'\x1f' read -ra objs <<< "${BE_OBJS[$BE_IMPL$BE_TAG]}"
+            IFS=$'\x1f' read -ra flags <<< "${BE_LINK[$BE_IMPL$BE_TAG]}"
             LINK_OBJS+=(${objs[@]+"${objs[@]}"})
             LINK_FLAGS+=(${flags[@]+"${flags[@]}"})
             continue
@@ -3320,6 +3324,7 @@ backends_for_program() {
                  "link the backend into the final program" >&2
         fi
     else
+        [ "$TARGET" = llvm ] && BE_LLVM_LTO=1
         backends_for program
     fi
 }
@@ -4093,7 +4098,7 @@ if [ "$TARGET" = llvm ]; then
     # see both. If the toolchain cannot link that way, the build is retried
     # without it rather than failed.
     lto_flag=()
-    [ "$have_main" -eq 1 ] && [ "$CC_LTO" -eq 1 ] && lto_flag=(-flto)
+    [ "$have_main" -eq 1 ] && [ "$CC_LTO" -eq 1 ] && lto_flag=(-flto -Wl,-plugin-opt=-inline-threshold=400)
     cmd=("$LLVM_CC" "-O$CLEVEL" ${lto_flag[@]+"${lto_flag[@]}"} -Wno-override-module)
     [ "$have_main" -eq 0 ] && cmd+=(-c "$LL_OUT") || cmd+=("$RT_C" "$LL_OUT")
     cmd+=(${LINK_OBJS[@]+"${LINK_OBJS[@]}"} -o "$OUT" ${LINK_FLAGS[@]+"${LINK_FLAGS[@]}"})
@@ -4102,7 +4107,7 @@ if [ "$TARGET" = llvm ]; then
     capped "${cmd[@]}" 2>"$WORK/clang.err"; cmd_rc=$?
     if [ "$cmd_rc" -ne 0 ] && [ "${#lto_flag[@]}" -gt 0 ]; then
         nolto=()
-        for a in "${cmd[@]}"; do [ "$a" = -flto ] || nolto+=("$a"); done
+        for a in "${cmd[@]}"; do case "$a" in -flto|-Wl,-plugin-opt=*) ;; *) nolto+=("$a") ;; esac; done
         cmd=("${nolto[@]}")
         capped "${cmd[@]}" 2>"$WORK/clang.err"; cmd_rc=$?
     fi

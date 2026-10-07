@@ -468,6 +468,10 @@ static void id_list_set(IdList* L, int i, long long v) {
     }
     L->data[i] = v;
 }
+static long long id_list_cell(IdList* L, int i) { return L->data[i]; }
+static void id_list_cell_set(IdList* L, int i, long long v) { L->data[i] = v; }
+static int id_list_len_raw(IdList* L) { return L ? L->len : -1; }
+static int id_list_cap_raw(IdList* L) { return L ? L->cap : -1; }
 static int id_list_len(IdList* L) { if (!L) id_null_read(); if (L->len < 0) id_freed_trap(); return L->len; }
 static long long id_list_pop(IdList* L) {   /* remove & return the last cell */
     if (!L) id_null_read();

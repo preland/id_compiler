@@ -1,0 +1,9 @@
+// What the last instruction made is, a case's way of checking what a function
+// that builds IR built: its type, its opcode and its text, in one string.
+
+gd_last() {
+  int gdz_at = len((import ity)) - 1;
+  string gdz_all = (import ity)[gdz_at] + " " + (import iop)[gdz_at] + " " + (import istr)[gdz_at];
+} return string gdz_all;
+given gd_vals ():("int[] load ")
+given gd_words ():("word sext ")

@@ -28,7 +28,7 @@ ls5(int node) {
   if((import nkind)[node] == "if") {
     lw_if(node);
   } else if((import nkind)[node] == "while") {
-    lw_while(node);
+    lw_loop(node);
   } else {
     lw_flow(node);
   }

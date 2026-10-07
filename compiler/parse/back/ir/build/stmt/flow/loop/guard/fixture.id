@@ -1,0 +1,18 @@
+// The guard a loop over `v` up to a limit `j` would carry, and one the parser
+// must refuse.
+
+gd_good() {
+  lp_reset();
+  push((import lpcond), "(j) >= 0");
+  push((import lpcond), "(v) != NULL");
+} return void;
+():() then len((import lpcond)):(2)
+():() then (import lpcond)[1]:("(v) != NULL")
+
+gd_bad() {
+  lp_reset();
+  push((import lpcond), "(j) >= 0");
+  push((import lpcond), "(j)->foo >= 0");
+} return void;
+():() then len((import lpcond)):(2)
+():() then (import lpcond)[1]:("(j)->foo >= 0")
