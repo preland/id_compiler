@@ -48,7 +48,7 @@ and it says so.
 
 **`--check` and `--fix`.** `bin/idc PATH --check` runs the lexer, the parser
 and every rule, prints exactly what a build of `PATH` prints before it emits
-anything, and exits 1 on any diagnostic — no C, no `cc`, no test harness, no
+anything, and exits 1 on any diagnostic. On success it prints one line to stdout, `ok: PATH (N functions, M cases)`, counted over PATH's own files — no C, no `cc`, no test harness, no
 link. `bin/idc PATH --fix` rewrites `PATH`'s own `.id` files — never a
 dependency or the standard library — to resolve what has one mechanical,
 behaviour-preserving repair: a call inside a call's argument, a return clause

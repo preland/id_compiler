@@ -1,0 +1,5 @@
+fb_two(string k) {
+  string r = k + "x";
+} return string r;
+("a"):("ax")
+("b"):("bx")

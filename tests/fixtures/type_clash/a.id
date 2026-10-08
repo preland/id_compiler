@@ -1,0 +1,5 @@
+fa_one(int k) {
+  int r = k + 1;
+} return int r;
+(1):(2)
+(2):(3)

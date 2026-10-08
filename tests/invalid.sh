@@ -68,6 +68,16 @@ for d in invalid/*/; do
     check_one "$name" "${d%/}" "$expect"
 done
 
+# A name used with two types across the program (E0303) must be the FIRST thing
+# reported: the type checker reads the clashing declarations as one type and
+# raises uncoded errors that blame the wrong line, so the precise diagnostic has
+# to come before them or an author fixes the symptom.
+first=$("$BIN_IDC" fixtures/type_clash --allow-untested -o "$TMP/clash" 2>&1 | head -1)
+case "$first" in
+    *"[E0303]") echo "PASS: type clash: the first diagnostic is E0303"; pass=$((pass+1)) ;;
+    *)          echo "FAIL: type clash: the first diagnostic is E0303"; echo "      got: $first"; fail=$((fail+1)) ;;
+esac
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

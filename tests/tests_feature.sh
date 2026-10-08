@@ -3112,6 +3112,40 @@ if [ -s "$TMP/idr_emit" ] && [ -z "$idr_missing" ]; then
 else
     bad "idrun lacks runtime helpers the IR can call:${idr_missing:- (none found: the emitted set came out empty)}; add each to bi_names and a b_ id in tools/idrun/conf.id and dispatch it in exec/run/bi, or list it in IDR_SKIP with the reason"
 fi
+
+# --- the harness declares no libc name a program may use ----------------------
+# The harness is one C translation unit with the program's own global
+# variables, emitted under their own names, so every libc header it includes
+# is a set of names a program cannot use as a global. The teardown's headers
+# (<sys/stat.h>, <dirent.h>, <fcntl.h>, <poll.h>) therefore live in
+# interop/idtc_teardown.c, an object linked in; c2id's `export int[] fstat`
+# stopped building the day they came in. The globals here are the names those
+# headers declare; the functions, which are id_-prefixed in C, carry all seven
+# names the teardown touches. (kill, mkdtemp and setpgid as globals clash with
+# <signal.h>, <stdlib.h> and <unistd.h>, which the harness always included.)
+mkdir -p "$TMP/hg" "$TMP/hf"
+hn_i=0
+for hn_f in fstat poll opendir kill mkdtemp open setpgid; do
+    hn_i=$((hn_i + 1))
+    printf '%s\n' "$hn_f(int a, int b) {" "  int s = a * $hn_i + b;" "} return int s;" "(1, 2):($((hn_i + 2)))" "(0, 0):(0)" > "$TMP/hf/$hn_f.id"
+done
+printf '%s\n' 'main(int argc, string[] argv) {' '  print(fstat(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("2\n")' '(2, ["a", "b"]):(0) then prints:("3\n")' > "$TMP/hf/main.id"
+hn_i=0
+for hn_f in fstat poll opendir open; do
+    hn_i=$((hn_i + 1))
+    printf '%s\n' "sys_$hn_f() {" "  export int[] $hn_f = [];" "} return void export $hn_f;" "():() then len((import $hn_f)):(0)" "given sys_$hn_f ():() then len((import $hn_f)):(0)" > "$TMP/hg/sys_$hn_f.id"
+done
+printf '%s\n' 'main(int argc, string[] argv) {' '  print(argc);' '} return int 0;' '(1, ["a"]):(0) then prints:("1\n")' '(2, ["a", "b"]):(0) then prints:("2\n")' > "$TMP/hg/main.id"
+if ../bin/idc "$TMP/hf" -o "$TMP/hf.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/hf.bin" x)" = "3" ]; then
+    ok "functions named fstat, poll, opendir, kill, mkdtemp, open and setpgid build and pass their cases"
+else
+    bad "functions named like the teardown's libc calls build ($(head -1 "$TMP/log"))"
+fi
+if ../bin/idc "$TMP/hg" -o "$TMP/hg.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/hg.bin" x)" = "2" ]; then
+    ok "globals named fstat, poll, opendir and open build and pass their cases in the harness"
+else
+    bad "globals named like <sys/stat.h>, <poll.h>, <dirent.h> and <fcntl.h> names build ($(head -1 "$TMP/log"))"
+fi
 }
 
 case "${1:-all}" in

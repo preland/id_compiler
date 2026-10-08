@@ -73,7 +73,7 @@ skip() { echo "SKIP: $1"; }
 # again from where it got to rather than from the start.
 #
 # The bodies below are not re-indented for the gate, as in run.sh.
-SECTIONS="fs ipc link demos display galaxy galaxy_run"
+SECTIONS="fs ipc link link_lib link_att link_pkg link_gfx demos display galaxy galaxy_run"
 case "${1:-}" in
     --list) for s in $SECTIONS; do echo "$s"; done; exit 0 ;;
 esac
@@ -594,6 +594,7 @@ fi
 fi
 
 # -- the default output goes to build/ ---------------------------------------
+if want link || want link_lib || want link_att || want link_pkg || want link_gfx; then
 if want link; then
 # `idc PROJECT` names the executable after the project, so building from the
 # directory beside it used to ask cc to write over a directory ("cannot open
@@ -616,6 +617,7 @@ if (cd "$outdir" && $c proj -o proj 2>&1) | grep -q "is a directory"; then
 else
     bad "-o naming a directory is reported"
 fi
+fi
 
 # -- a backend is linked only when one of its natives is reached -------------
 # Attaching a backend used to mean compiling its sources and linking its flags
@@ -632,6 +634,7 @@ needs_lib() { readelf -d "$1" 2>/dev/null | grep -q "NEEDED.*$2"; }
 c7none="$TMP/c7none"; mkdir -p "$c7none"
 printf 'import "%s"\nimport "%s"\nimport "%s"\nimport "%s"\n' "$(be_abs gfx)" "$(be_abs gl)" "$(be_abs fs)" "$(be_abs core)" > "$c7none/conf.id"
 printf 'main(int argc, string[] argv) {\n  print(7);\n} return int 0;\n' > "$c7none/main.id"
+if want link; then
 : > "$TMP/cc.log"
 if $BIN_IDC "$c7none" --cc "$cclog" -o "$TMP/c7none.bin" >"$TMP/c7none.err" 2>&1 \
    && [ "$("$TMP/c7none.bin")" = "7" ] \
@@ -641,7 +644,9 @@ if $BIN_IDC "$c7none" --cc "$cclog" -o "$TMP/c7none.bin" >"$TMP/c7none.err" 2>&1
 else
     bad "three attached backends that nothing calls are neither compiled nor linked: $(grep -m1 -E 'gfx_linux|gl_linux|fs_posix|-lX11' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7none.err")"
 fi
+fi
 
+if want link_lib; then
 # -- a backend directory is a library too: its own cases run in a pre-check,
 # and are excluded from the importing program's harness ------------------
 # A --no-std program (IDC_NO_STD=1 throughout this file) whose conf.id
@@ -697,11 +702,13 @@ if [ "$e1" -ge "$e0" ] && [ "$e2" -eq "$e1" ]; then
 else
     bad "the backend pre-check is cached: a second build creates no new pre-check cache entry (had $e0/$e1, now $e2)"
 fi
+fi
 
 # The same through a library whose conf.id imports every backend.
 c7std="$TMP/c7std"; mkdir -p "$c7std/win" "$TMP/c7hello" "$TMP/c7win"
 cp "$c7none/conf.id" "$c7std/conf.id"
 printf 'c7_width() {\n  int cw = gfx_sys_width() + 0;\n} return int cw;\n' > "$c7std/win/w.id"
+if want link_lib; then
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/c7hello/main.id"
 : > "$TMP/cc.log"
 if $BIN_IDC "$TMP/c7hello" --std "$c7std" --cc "$cclog" -o "$TMP/c7hello.bin" >"$TMP/c7hello.err" 2>&1 \
@@ -712,7 +719,9 @@ if $BIN_IDC "$TMP/c7hello" --std "$c7std" --cc "$cclog" -o "$TMP/c7hello.bin" >"
 else
     bad "a standard library naming gfx, gl and fs costs hello-world no link line: $(grep -m1 -E 'gfx_linux|gl_linux|-lX11' "$TMP/cc.log" | cut -c1-120)$(head -1 "$TMP/c7hello.err")"
 fi
+fi
 
+if want link; then
 # A reached native no attached backend implements is a diagnostic at the call
 # that reaches it, never a linker error about id_twin_a. The program is written
 # here as well as in the ipc section: each section runs in a process of its own.
@@ -753,7 +762,9 @@ if printf '%s\n' "$out" | grep -q "cannot build for 'aarch64-apple-darwin' here"
 else
     bad "an unreached backend's platforms are not a question the build asks: $(printf '%s\n' "$out" | head -1 | cut -c1-160)"
 fi
+fi
 
+if want link_att; then
 # -- a backend is attached by its backend.id, wherever a collected tree has it -
 # A standard library carries its backends inside the modules that wrap them and
 # names none of them in a conf.id: collecting a tree finds every backend.id in
@@ -1027,7 +1038,9 @@ if $BIN_IDC "$two" --cc "$cclog" -o "$TMP/two.bin" >"$TMP/two.err" 2>&1 \
 else
     bad "two attached backends declaring the same names and platform keys do not collide: $(grep -v warning "$TMP/two.err" | head -1 | cut -c1-160)"
 fi
+fi
 
+if want link_pkg; then
 # -- c_PLATFORM_pkg: pkg-config supplies a backend's compile and link flags ---
 # A fixture package, tp.pc, says -DPKG_K=7 and -lm; the backend declares only
 # its source and the package. The source is compiled with the package's
@@ -1051,7 +1064,14 @@ if command -v pkg-config >/dev/null 2>&1; then
     else
         bad "a backend's c_linux_pkg adds the package's --cflags to its sources and --libs to the link: $(grep -v warning "$pkd/p.err" | head -1 | cut -c1-160)"
     fi
+    # A cache dir of its own also moves the compiler's bootstrap, which costs
+    # about 100 s from the checked-in C and has nothing to do with packages, so
+    # the built stages are copied in (mtimes kept) and only the object cache is cold.
     pkc="$pkd/cache"
+    mkdir -p "$pkc"
+    for stage in idlex idlex0 idparse idparse0 ccrun idlayout iddiag; do
+        cp -p "${IDC_CACHE_DIR:-$ABS_ROOT/.idc-cache}/$stage" "$pkc/" 2>/dev/null
+    done
     r1=$(PKG_CONFIG_PATH="$pkd/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" IDC_CACHE_DIR="$pkc" $BIN_IDC "$pkd/prog" -o "$pkd/c1.bin" >"$pkd/c1.err" 2>&1 && "$pkd/c1.bin")
     sed -i 's/PKG_K=7/PKG_K=9/' "$pkd/pc/tp.pc"
     r2=$(PKG_CONFIG_PATH="$pkd/pc${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" IDC_CACHE_DIR="$pkc" $BIN_IDC "$pkd/prog" -o "$pkd/c2.bin" >"$pkd/c2.err" 2>&1 && "$pkd/c2.bin")
@@ -1081,7 +1101,9 @@ if command -v pkg-config >/dev/null 2>&1; then
 else
     skip "c_PLATFORM_pkg checks: pkg-config is not on PATH (run under the devshell)"
 fi
+fi
 
+if want link_gfx; then
 if ! cc -fsyntax-only "$(be_abs gfx)/gfx_linux.c" -I"$(be_abs gfx)" 2>/dev/null; then
     # Only the windowed half of this file needs them; the fs and output-path
     # checks above ran and their tally still counts.
@@ -1198,6 +1220,7 @@ if $BIN_IDC "$dual" -o "$TMP/dual.bin" >"$TMP/dual.err" 2>&1; then
     ok "both backends link into one binary"
 else
     bad "both backends link into one binary ($(grep -m1 -i 'error\|multiple' "$TMP/dual.err" | cut -c1-90))"
+fi
 fi
 fi
 

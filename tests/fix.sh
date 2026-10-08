@@ -67,7 +67,7 @@ for case_dir in fix/*/; do
 
     [ -d "$case_dir/hand" ] || continue
     "$IDC" "$work/tree" --check --allow-untested >"$work/check2.out" 2>"$work/check2.err"; crc=$?
-    if [ "$crc" -eq 0 ] && [ ! -s "$work/check2.out" ] && ! grep -qv '^idc: warning: --allow-untested' "$work/check2.err"; then
+    if [ "$crc" -eq 0 ] && [ "$(grep -cE "^ok: .* \([0-9]+ functions, [0-9]+ cases\)$" "$work/check2.out")" -eq 1 ] && [ "$(wc -l < "$work/check2.out")" -eq 1 ] && ! grep -qv '^idc: warning: --allow-untested' "$work/check2.err"; then
         ok "$name: --check passes the fixed tree"
     else
         bad "$name: --check passes the fixed tree ($(head -2 "$work/check2.err" | tr '\n' ' '))"
@@ -86,10 +86,10 @@ for case_dir in fix/*/; do
     fi
 done
 
-# --check on a tree with no violation says nothing a build would not, and passes.
+# --check on a tree with no violation says nothing a build would not on stderr, and passes with one line on stdout.
 "$IDC" fix/order/hand --check --allow-untested >"$TMP/c.out" 2>"$TMP/c.err"; crc=$?
 "$IDC" fix/order/hand --allow-untested -o "$TMP/h" >"$TMP/b.out" 2>"$TMP/b.err"; brc=$?
-if [ "$crc" -eq 0 ] && [ "$brc" -eq 0 ] && cmp -s "$TMP/c.err" "$TMP/b.err"; then
+if [ "$crc" -eq 0 ] && [ "$brc" -eq 0 ] && cmp -s "$TMP/c.err" "$TMP/b.err" && [ "$(cat "$TMP/c.out")" = "ok: fix/order/hand (16 functions, 0 cases)" ]; then
     ok "--check of a legal program passes and says what its build says"
 else
     bad "--check of a legal program passes and says what its build says (check $crc, build $brc)"

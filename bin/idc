@@ -1005,6 +1005,16 @@ exit_ok() {
     exit 0
 }
 
+# check_ok_line -- the one line --check prints on success: the tree, and how
+# many functions and test cases its own files (not its dependencies or the
+# library) hold. A function ends in exactly one `} return` line and a case is
+# a line that starts in column 0 with `(` or `given `.
+check_ok_line() {
+    local counts
+    counts=$(awk '/^\} return/ { f++ } /^\(|^given / { c++ } END { printf "%d functions, %d cases", f, c }' "${OWN_FILES[@]}")
+    printf 'ok: %s (%s)\n' "$PATH_ARG" "$counts"
+}
+
 stale() { # stale BIN SRC_DIR -- true if BIN is missing or older than any .id under SRC_DIR
     local bin="$1" src="$2"
     [ -x "$bin" ] || return 0
@@ -1211,6 +1221,8 @@ if [ ${#SRC_FILES[@]} -eq 0 ]; then
     echo "idc: no .id files in this project" >&2
     exit 1
 fi
+
+OWN_FILES=("${SRC_FILES[@]}")
 
 # Dependencies from the project's conf.id, resolved TRANSITIVELY: every dir is
 # merged in as additional id source and has its own conf.id read in turn, and
@@ -2890,6 +2902,7 @@ if [ "$CHECK" -eq 1 ]; then
         compiler_bug "idlex or idparse failed on this input"
     fi
     show_diag "$RAW_OUT" "$PARSE_ERR"
+    [ "$STRUCT_VIOLATIONS" -eq 0 ] && check_ok_line
     exit_ok
 fi
 
@@ -3862,6 +3875,21 @@ shard_cases() {
     cat "$WORK"/passed.* > "$WORK/passed"
 }
 
+# teardown_obj -- compile interop/idtc_teardown.c into the harness's link. The
+# harness cleans up after each case (rmtree, pipe drain), and the libc headers
+# that needs are kept out of its translation unit, which also holds the
+# program's global variables under their own names (see that file).
+teardown_obj() {
+    local obj="$WORK/idtc_teardown.o"
+    if ! capped "$CC" -std=c11 -O0 -c "$ROOT/interop/idtc_teardown.c" -o "$obj" 2>"$WORK/teardown.err"; then
+        progress_clear
+        sed 's/^/idc:   /' "$WORK/teardown.err" >&2
+        echo "idc: the test harness's teardown object did not build ($ROOT/interop/idtc_teardown.c)" >&2
+        exit 1
+    fi
+    LINK_OBJS+=("$obj")
+}
+
 # The harness runs every case in a process of its own, with its own time and
 # memory limits, and prints each failure as FILE:LINE. It is built for and run
 # on this machine. A --freestanding build's harness is the same source built
@@ -3895,6 +3923,7 @@ run_cases() {
         return 0
     fi
     backends_for harness
+    teardown_obj
     progress harness "building the test runner"
     # The compile is cached by content (see obj_cache_key); running it is
     # not -- a hit only skips cc, and the cases below always run for real, so

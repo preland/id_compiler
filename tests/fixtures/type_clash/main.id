@@ -1,0 +1,6 @@
+main(int argc, string[] argv) {
+  int z = fa_one(argc);
+  string y = fb_two("q");
+} return int z;
+(1, []):(2)
+(2, []):(3)
