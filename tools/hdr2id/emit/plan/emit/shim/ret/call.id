@@ -2,7 +2,7 @@
 
 // The table name of a handle class H:tag, which is tag.
 pl_tag(string pl_c) {
-  string pl_g = str_slice(pl_c, 2, len(pl_c) - 2);
+  string pl_g = str_sub(pl_c, 2, len(pl_c) - 2);
 } return string pl_g;
 ("H:gzFile_s"):("gzFile_s")
 ("H:x"):("x")

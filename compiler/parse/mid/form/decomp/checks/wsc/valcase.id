@@ -1,0 +1,10 @@
+// A case that passes wsput as a value, added to a fixture that has none.
+wsc_valcase() {
+  export int wx_vput = newleaf("cfn", 0, 0, "wsput", "");
+  export int[] wx_pl = [(import wx_vput)];
+  export int wx_pcase = newnode("case", 0, 0, "", "", (import wx_pl), (import wx_l0));
+} chain () {
+  push((import casenode), (import wx_pcase));
+} return void;
+given wsc_pair ():() then len((import casenode)):(1)
+given wsc_marks ():() then len((import casenode)):(2)

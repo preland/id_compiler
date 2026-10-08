@@ -27,7 +27,7 @@ kb_word_end(string text, int at) {
 kb_word_step(string line, int at, string[] found) {
   int end = kb_word_end(line, at);
   if (end > at) {
-    push(found, str_slice(line, at, end - at));
+    push(found, str_sub(line, at, end - at));
   }
   int next = end + (end == at);
 } return int next;

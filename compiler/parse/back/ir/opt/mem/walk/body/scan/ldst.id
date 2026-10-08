@@ -1,7 +1,7 @@
 
 m2r_load(int f, int id, int i) {
   int ir_a_v = (import ia)[id];
-  int j = m2r_slot(ir_a_v);
+  int j = lst_index_of((import pra), ir_a_v);
   if(j >= 0) {
     m2r_drop(f, id, (import outv)[i][j], 0);
   }
@@ -11,7 +11,7 @@ given m2r_outv_fixture (0, 0, 0):() then chk_op:("op add")
 
 m2r_store(int id, int i) {
   int ir_a_v = (import ia)[id];
-  int j = m2r_slot(ir_a_v);
+  int j = lst_index_of((import pra), ir_a_v);
   if(j >= 0) {
     m2r_kept(id, i, j);
   }

@@ -11,4 +11,3 @@ emit_capture_pre(int ci) {
 } return void;
 given case_fixture ((import fixture_ci)):() then prints:("")
 given case_fixture (5):() then prints:("")
-given print_fixture ((import fixture_ci)):() then calls emit_line:[1]

@@ -31,7 +31,7 @@ iset_seq(int id, string val) {
   string sq_type_v = type_of(i2_of_v);
 } chain (int id, string val) {
   string sq_ctype = c_type(sq_type_v);
-  emit_line(sq_ctype + " " + sq_name(i2_of_v) + ";");
+  print(sq_ctype + " " + sq_name(i2_of_v) + ";");
   seq_mark(i2_of_v, 1);
 } chain (int id, string val) {
   string iset_code_v = iset_code(id, val);

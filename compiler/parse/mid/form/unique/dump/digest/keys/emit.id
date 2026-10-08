@@ -35,7 +35,7 @@ given env_init ():() then calls dg_emit_key:[0]
 
 dg_emit_key(int dgc) {
   string dgkey = dg_case_key(dgc);
-  emit_line("// idtc key " + dgc + " " + dgkey);
+  print("// idtc key " + dgc + " " + dgkey);
 } return void;
 given dg_t_built (0):() then prints:("// idtc key 0 -5465788173469261037\n")
 given dg_t_built (3):() then prints:("// idtc key 3 -26172764691117968\n")

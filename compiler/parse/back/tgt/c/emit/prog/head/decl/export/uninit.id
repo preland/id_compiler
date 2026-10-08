@@ -11,7 +11,7 @@
 
 emit_set_decl(int i) {
   if((import eowners)[i] != "conf.id" && (import harn)[0] == 1) {
-    emit_line("char idtc_set_" + (import enames)[i] + ";");
+    print("char idtc_set_" + (import enames)[i] + ";");
   }
 } return void;
 given uninit_fixture (0):() then prints:("char idtc_set_gx;\n")

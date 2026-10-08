@@ -5,7 +5,7 @@ ms_tk_str(string ms_s, int[] ms_tk, int ms_t) {
   int ms_a = ms_tk_get(ms_tk, ms_t, 1);
   string ms_q = "";
   if(ms_a >= 0) {
-    ms_q = str_slice(ms_s, ms_a, ms_tk_get(ms_tk, ms_t, 2) - ms_a);
+    ms_q = str_sub(ms_s, ms_a, ms_tk_get(ms_tk, ms_t, 2) - ms_a);
   }
 } return string ms_q;
 ("ab cd", [0, 0, 2, 0, 3, 5], 1):("cd")

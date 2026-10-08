@@ -15,7 +15,7 @@ given call_fixture ((import fixture_zero)):() then prints:("")
 emit_rec_call_line(int id, string nm) {
   int[] params = (import nl1)[id];
   string nmlist = rec_param_names(params);
-  emit_line("    idtc_rec_" + nm + "(" + nmlist + ");");
+  print("    idtc_rec_" + nm + "(" + nmlist + ");");
 } return void;
 given fn_fixture ((import fixture_fn), "fx_target"):() then prints:("    idtc_rec_fx_target(x);\n")
 given fn_fixture ((import fixture_fn), "other"):() then prints:("    idtc_rec_other(x);\n")

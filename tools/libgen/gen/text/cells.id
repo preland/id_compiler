@@ -15,7 +15,7 @@ lg_cells(string[] lg_ts, string[] lg_ns, string[] lg_tab) {
   int lg_n = len(lg_ts);
 } chain (string[] lg_ts, string[] lg_ns, string[] lg_tab) {
   while (lg_i < lg_n) {
-    string lg_form = lg_tab[lg_idx(lg_ts[lg_i])];
+    string lg_form = lg_tab[lst_str_index((import lg_tname), lg_ts[lg_i])];
     push(lg_out, lg_sub(lg_form, "$", "in_" + lg_ns[lg_i]));
     lg_i = lg_i + 1;
   }
@@ -27,7 +27,7 @@ lg_cells(string[] lg_ts, string[] lg_ns, string[] lg_tab) {
 // parameters of its result, or `void` when there is neither.
 lg_cparams(string lg_hd, string lg_rt, string lg_lib) {
   string[] lg_ps = lg_cells(lg_cols(lg_hd, 0), lg_cols(lg_hd, 1), (import lg_tparam));
-  string lg_rform = (import lg_tout)[lg_idx(lg_rt)];
+  string lg_rform = (import lg_tout)[lst_str_index((import lg_tname), lg_rt)];
   string lg_o = lg_sub(lg_rform, "@", lg_lib);
 } chain (string lg_hd, string lg_rt, string lg_lib) {
   if (lg_o != "") {

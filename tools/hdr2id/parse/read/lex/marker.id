@@ -8,7 +8,7 @@ hx_marker(string lx_line) {
 } chain (string lx_line) {
   string lx_path = "";
   if (lx_ok == 1 && lx_a >= 0 && lx_b > lx_a) {
-    lx_path = str_slice(lx_line, lx_a + 1, lx_b - lx_a - 1);
+    lx_path = str_sub(lx_line, lx_a + 1, lx_b - lx_a - 1);
   }
 } return string lx_path;
 ("# 37 \"/x/zlib.h\" 2"):("/x/zlib.h")

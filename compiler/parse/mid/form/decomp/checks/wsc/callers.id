@@ -1,0 +1,35 @@
+// The functions that call a name: for every `call` node of that name, the
+// function it sits in. A node belongs to the function whose node is the first
+// function node after it, because a function's node is made once its body has
+// been parsed (front/tree/make/stmt/if_while_func.id). -1 for a node after the
+// last function.
+
+wsc_callers(string wcl_name) {
+  int[] wcl_out = [];
+  int wcl_i = 0;
+  while(wcl_i < len((import nkind))) {
+    wsc_note(wcl_out, wcl_i, wcl_name);
+    wcl_i = wcl_i + 1;
+  }
+} return int[] wcl_out;
+given wsc_world ("foo"):([27, 39])
+given wsc_world ("nobody"):([])
+
+wsc_note(int[] wno_out, int wno_i, string wno_name) {
+  if((import nkind)[wno_i] == "call" && (import ns1)[wno_i] == wno_name) {
+    push(wno_out, wsc_owner(wno_i));
+  }
+} return void;
+given wsc_world ([], (import wx_foo), "foo"):([27])
+given wsc_world ([], (import wx_foo), "bar"):([])
+
+wsc_owner(int wow_n) {
+  int wow_r = 0 - 1;
+  int wow_i = 0;
+  while(wow_i < len((import prog))) {
+    wow_r = wsc_nearer(wow_r, (import prog)[wow_i], wow_n);
+    wow_i = wow_i + 1;
+  }
+} return int wow_r;
+given wsc_world ((import wx_foo)):(27)
+given wsc_world (100000):(-1)

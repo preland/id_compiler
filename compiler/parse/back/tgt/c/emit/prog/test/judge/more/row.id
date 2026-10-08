@@ -23,7 +23,7 @@ emit_setup_line(int ci, string cw, string cc) {
   if(case_is_std(ci) == 1) {
     fnref = "idtc_case_std_skip";
   }
-  emit_line("    idtc_where[" + ci + "] = \"" + cw + "\"; idtc_call[" + ci + "] = \"" + cc + "\"; idtc_fn[" + ci + "] = \"" + f1 + "\"; idtc_fidx[" + ci + "] = " + fx + "; idtc_case[" + ci + "] = " + fnref + ";");
+  print("    idtc_where[" + ci + "] = \"" + cw + "\"; idtc_call[" + ci + "] = \"" + cc + "\"; idtc_fn[" + ci + "] = \"" + f1 + "\"; idtc_fidx[" + ci + "] = " + fx + "; idtc_case[" + ci + "] = " + fnref + ";");
   int se = -1;
 } chain (int ci, string cw, string cc) {
   if(ci < len((import casestdin))) {
@@ -34,21 +34,21 @@ emit_setup_line(int ci, string cw, string cc) {
     sv = tc_value(se, "string");
   }
 } chain (int ci, string cw, string cc) {
-  emit_line("    idtc_in[" + ci + "] = " + sv + ";");
+  print("    idtc_in[" + ci + "] = " + sv + ";");
   int tnid = case_traps_node(ci);
   string tv = "NULL";
 } chain (int ci, string cw, string cc) {
   if(tnid != -1) {
     tv = tc_value((import nl1)[tnid][0], "string");
   }
-  emit_line("    idtc_traps[" + ci + "] = " + tv + ";");
+  print("    idtc_traps[" + ci + "] = " + tv + ";");
   int secs_v = 0;
 } chain (int ci, string cw, string cc) {
   if(ci < len((import casetimeout))) {
     secs_v = (import casetimeout)[ci];
   }
   if(secs_v > 0) {
-    emit_line("    idtc_secs[" + ci + "] = " + secs_v + ";");
+    print("    idtc_secs[" + ci + "] = " + secs_v + ";");
   }
 } return void;
 given wrap_fixture (0, "a.id:1", "foo()"):() then prints:("    idtc_where[0] = \"a.id:1\"; idtc_call[0] = \"foo()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n")

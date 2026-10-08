@@ -14,7 +14,7 @@ given tyc_fix (4):() then calls hoist_list:[0]
 hoist_decl_line(string hoist_ty_name, string hoist_var_name) {
   string c_type_v = c_type(hoist_ty_name);
   string esc_i = esc_init_code(hoist_var_name);
-  emit_line("    " + c_type_v + " " + hoist_var_name + esc_i + ";");
+  print("    " + c_type_v + " " + hoist_var_name + esc_i + ";");
 } return void;
 given tyc_fix ("int", "y"):() then prints:("    int y;\n")
 given esc_fix ("int[]", "w"):() then prints:("    IdList* w = NULL;\n")

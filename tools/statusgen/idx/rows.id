@@ -38,7 +38,7 @@ sg_idx(string[] sgi_rows) {
 // The row number in an entry of sg_idx.
 sg_from(string sgm_e) {
   int sgm_t = str_find(sgm_e, "\t");
-  string sgm_s = str_slice(sgm_e, sgm_t + 1, len(sgm_e) - sgm_t - 1);
+  string sgm_s = str_sub(sgm_e, sgm_t + 1, len(sgm_e) - sgm_t - 1);
   int sgm_v = to_int(sgm_s);
 } return int sgm_v;
 ("a.id\t12"):(12)

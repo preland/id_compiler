@@ -21,7 +21,7 @@ given ixn_fx ("call", (import ixn_call)):("")
 
 ixw_base(string ixw_t) {
   while(str_ends(ixw_t, "[]") == 1) {
-    ixw_t = str_slice(ixw_t, 0, len(ixw_t) - 2);
+    ixw_t = str_sub(ixw_t, 0, len(ixw_t) - 2);
   }
 } return string ixw_t;
 ("int[][]"):("int")

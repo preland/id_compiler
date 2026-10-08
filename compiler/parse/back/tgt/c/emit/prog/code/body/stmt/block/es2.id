@@ -26,7 +26,7 @@ given stmt_fix (5, ""):() then prints:("5;\n")
 emit_decl_mark(int id, string nm, int e, string ind) {
   emit_decl_line(nm, e, ind);
   if(is_export_decl(id) == 1 && (import harn)[0] == 1) {
-    emit_line(ind + "idtc_set_" + nm + " = 1;");
+    print(ind + "idtc_set_" + nm + " = 1;");
   }
 } return void;
 given uninit_fixture ((import lz_edecl), "z", (import lz_i1), "  "):() then prints:("  z = 3;\n  idtc_set_z = 1;\n")

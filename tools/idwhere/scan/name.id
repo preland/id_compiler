@@ -5,7 +5,7 @@ iw_name_of(string iw_oarg) {
   int iw_oat = str_find(iw_oarg, "::");
   string iw_oname = iw_oarg;
   if(iw_oat >= 0) {
-    iw_oname = str_slice(iw_oarg, iw_oat + 2, len(iw_oarg) - iw_oat - 2);
+    iw_oname = str_sub(iw_oarg, iw_oat + 2, len(iw_oarg) - iw_oat - 2);
   }
 } return string iw_oname;
 ("f"):("f")
@@ -15,7 +15,7 @@ iw_file_of(string iw_farg) {
   int iw_fat = str_find(iw_farg, "::");
   string iw_ffile = "";
   if(iw_fat >= 0) {
-    iw_ffile = str_slice(iw_farg, 0, iw_fat);
+    iw_ffile = str_sub(iw_farg, 0, iw_fat);
   }
 } return string iw_ffile;
 ("f"):("")

@@ -37,7 +37,7 @@ iw_show(string iw_hroot, string[] iw_hrows) {
 iw_shown(string iw_nroot, string iw_nrow) {
   string iw_npath = path_join(iw_nroot, iw_nrow);
   if(str_starts(iw_npath, "./") == 1) {
-    iw_npath = str_slice(iw_npath, 2, len(iw_npath) - 2);
+    iw_npath = str_sub(iw_npath, 2, len(iw_npath) - 2);
   }
 } return string iw_npath;
 (".", "a.id:1: f() -> void"):("a.id:1: f() -> void")

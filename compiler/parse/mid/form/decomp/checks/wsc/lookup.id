@@ -1,0 +1,35 @@
+// A local of the function, by name: the initialiser of the declaration that
+// names it, or -1 for a parameter or anything else. Every statement of a hit is
+// a declaration (./shape.id), so a name has at most one.
+
+wsc_local(int wlc_f, string wlc_n) {
+  int[] wlc_body = (import nl2)[wlc_f];
+  int wlc_i = 0;
+  int wlc_r = 0 - 1;
+} chain (int wlc_f, string wlc_n) {
+  while(wlc_i < len(wlc_body)) {
+    wlc_r = wsc_pick(wlc_body[wlc_i], wlc_n, wlc_r);
+    wlc_i = wlc_i + 1;
+  }
+} return int wlc_r;
+given wsc_world ((import wx_fadd), "t"):(14)
+given wsc_world ((import wx_fadd), "a"):(-1)
+
+wsc_pick(int wpk_s, string wpk_n, int wpk_prev) {
+  int wpk_r = wpk_prev;
+  if((import nkind)[wpk_s] == "decl" && (import ns2)[wpk_s] == wpk_n) {
+    wpk_r = (import ni1)[wpk_s];
+  }
+} return int wpk_r;
+given wsc_world ((import wx_dv), "v", -1):(7)
+given wsc_world ((import wx_dv), "w", -1):(-1)
+
+wsc_name(int wnm_f, string wnm_s) {
+  int wnm_i = wsc_local(wnm_f, wnm_s);
+  string wnm_out = wnm_s;
+  if(wnm_i >= 0) {
+    wnm_out = wsc_show(wnm_f, wnm_i);
+  }
+} return string wnm_out;
+given wsc_world ((import wx_fget), "v"):("st[a]")
+given wsc_world ((import wx_fget), "st"):("st")

@@ -23,9 +23,9 @@ given natcall_fixture ():() then calls nat_scan:("program", 1) then (import chkf
 
 nat_print() {
   int i = 0;
-  emit_line("/* ---- natives ---- */");
+  print("/* ---- natives ---- */");
   while(i < len((import natrow))) {
-    emit_line((import natrow)[i]);
+    print((import natrow)[i]);
     i = i + 1;
   }
 } return void;

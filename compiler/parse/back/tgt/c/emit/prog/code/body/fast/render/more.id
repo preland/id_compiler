@@ -6,7 +6,7 @@
 lp_rbare(string lr_val, string lr_prev) {
   string lr_s = lr_val;
   if(gt_isar(lr_prev) == 1) {
-    lr_s = str_slice(lr_val, 1, len(lr_val) - 2);
+    lr_s = str_sub(lr_val, 1, len(lr_val) - 2);
   }
 } return string lr_s;
 ("(a - b)", "-:2"):("a - b")

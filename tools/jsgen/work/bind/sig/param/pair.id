@@ -11,8 +11,8 @@ jg_param_ok(string jg_pm, int jg_a, int jg_w) {
 ("int ", 4, 3):(0)
 
 jg_pair(string jg_pm, int jg_a, int jg_w) {
-  string jg_nm = str_slice(jg_pm, jg_a, len(jg_pm) - jg_a);
-  string jg_ty0 = str_slice(jg_pm, 0, jg_w);
+  string jg_nm = str_sub(jg_pm, jg_a, len(jg_pm) - jg_a);
+  string jg_ty0 = str_sub(jg_pm, 0, jg_w);
   string[] jg_pr = [jg_nm, jg_nows(jg_ty0)];
 } return string[] jg_pr;
 ("int xs", 4, 3):(["xs", "int"])

@@ -18,7 +18,7 @@ given sd_note_fixture ("string"):("(strcmp((char*)(intptr_t)(a->data[i]), (char*
 
 emit_eq_body(string key, string et) {
   string cmp = eq_cond(et);
-  emit_line("static int idtc_eq_" + key + "(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!" + cmp + ") return 0;\n    return 1;\n}");
+  print("static int idtc_eq_" + key + "(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!" + cmp + ") return 0;\n    return 1;\n}");
 } return void;
 given sd_note_fixture ("int", "int"):() then prints:("static int idtc_eq_int(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!((int)(a->data[i]) == (int)(b->data[i]))) return 0;\n    return 1;\n}\n")
 given sd_note_fixture ("str", "string"):() then prints:("static int idtc_eq_str(IdList* a, IdList* b) {\n    if (a->len != b->len) return 0;\n    for (int i = 0; i < a->len; i++)\n        if (!(strcmp((char*)(intptr_t)(a->data[i]), (char*)(intptr_t)(b->data[i])) == 0)) return 0;\n    return 1;\n}\n")

@@ -22,7 +22,7 @@ dg_sev(string dg_vh) {
   string dg_vw = "";
 } chain (string dg_vh) {
   if(dg_vp >= 0) {
-    dg_vw = str_slice(dg_vh, dg_vp + 2, dg_vq - dg_vp - 2);
+    dg_vw = str_sub(dg_vh, dg_vp + 2, dg_vq - dg_vp - 2);
   }
 } return string dg_vw;
 ("a.id:1: error: x"):("error")

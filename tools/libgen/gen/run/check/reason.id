@@ -12,7 +12,7 @@ lg_bad(string lg_ln, string lg_lib) {
     lg_why = "libgen: '" + lg_nm + "' takes a parameter of type '" + lg_badp + "', which has no C form; an exported function may take int, word, float, string, int[], word[], float[] and string[] -- remove '" + lg_nm + "' from lib_exports in conf.id and list a function with those parameters that calls it instead";
   }
 } chain (string lg_ln, string lg_lib) {
-  if (lg_why == "" && lg_idx(lg_ret(lg_ln)) < 0) {
+  if (lg_why == "" && lst_str_index((import lg_tname), lg_ret(lg_ln)) < 0) {
     lg_why = "libgen: '" + lg_nm + "' returns '" + lg_ret(lg_ln) + "', which has no C form; an exported function may return void, string[][] or any type it may take -- return one of those, or remove '" + lg_nm + "' from lib_exports in conf.id and list a function that calls it instead";
   }
 } return string lg_why;

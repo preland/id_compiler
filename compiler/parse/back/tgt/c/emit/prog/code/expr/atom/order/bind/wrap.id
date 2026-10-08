@@ -38,7 +38,7 @@ seq_bind(int u) {
   string sq_type_v = type_of(u);
   string sq_ctype = c_type(sq_type_v);
 } chain (int u) {
-  emit_line(sq_ctype + " " + sq_name(u) + ";");
+  print(sq_ctype + " " + sq_name(u) + ";");
   seq_mark(u, 1);
   string ret_s = sq_name(u) + " = " + sq_code + ", ";
 } return string ret_s;

@@ -5,7 +5,7 @@
 
 lay_strip_id(string name) {
   int n = len(name);
-  string stem = str_slice(name, 0, n - 3);
+  string stem = str_sub(name, 0, n - 3);
 } return string stem;
 ("chunk.id"):("chunk")
 ("a.id"):("a")

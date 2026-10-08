@@ -31,7 +31,7 @@ emit_decl_line(string decl_target, int decl_init_id, string ind) {
   string esc_c = esc_store_code(decl_target, emit_expr_v, decl_init_id);
 } chain (string decl_target, int decl_init_id, string ind) {
   esc_cons_set(0 - 1);
-  emit_line(ind + esc_c);
+  print(ind + esc_c);
 } return void;
 given stmt_fix ("y", 0, "  "):() then prints:("  y = 5;\n")
 given stmt_fix ("z", 0, ""):() then prints:("z = 5;\n")

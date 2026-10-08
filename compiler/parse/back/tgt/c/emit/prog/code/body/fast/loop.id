@@ -16,15 +16,15 @@ given lpf_in(0) ((import lpf_wc), ""):() then prints:("while ((lcj < lcn)) {\n  
 
 emit_loop_fast(int id, string ind) {
   string lq_pre = lp_pre();
-  emit_line(ind + "if (" + lq_pre + ") {");
+  print(ind + "if (" + lq_pre + ") {");
   lset((import lpon), 0, 1);
 } chain (int id, string ind) {
   emit_while(id, ind + "    ");
   lset((import lpon), 0, 0);
-  emit_line(ind + "} else {");
+  print(ind + "} else {");
 } chain (int id, string ind) {
   emit_while(id, ind + "    ");
-  emit_line(ind + "}");
+  print(ind + "}");
 } return void;
 given lpf_in(0) given lpf_planned ((import lpf_wa), ""):() then prints:("if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n        laj = (laj + 1);\n    }\n} else {\n    while ((laj < lan)) {\n        las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n        laj = (laj + 1);\n    }\n}\n")
 given lpf_in(0) given lpf_planned ((import lpf_wa), "  "):() then prints:("  if ((lav) != NULL && (lan) <= (long long)(lav)->len - 0 && (laj) >= 0) {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)((lav)->data[laj]));\n          laj = (laj + 1);\n      }\n  } else {\n      while ((laj < lan)) {\n          las = (las + (IdList*)(intptr_t)(id_list_get(lav, laj)));\n          laj = (laj + 1);\n      }\n  }\n")

@@ -29,7 +29,7 @@ ms_cl_abs(string ms_pt, string ms_wd) {
     ms_ap = path_join(ms_wd, ms_pt);
   }
   if(len(ms_ap) > 1 && str_ends(ms_ap, "/") == 1) {
-    ms_ap = str_slice(ms_ap, 0, len(ms_ap) - 1);
+    ms_ap = str_sub(ms_ap, 0, len(ms_ap) - 1);
   }
 } return string ms_ap;
 ("/a/b", "/w"):("/a/b")

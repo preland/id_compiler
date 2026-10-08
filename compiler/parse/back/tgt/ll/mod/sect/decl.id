@@ -12,13 +12,13 @@ ll_declares() {
   while(i < len((import prog))) {
     if(is_native((import prog)[i]) == 1) {
       string ndecl = ll_native_decl((import prog)[i]);
-      emit_line(ndecl);
+      print(ndecl);
     }
     i = i + 1;
   }
 } return void;
-given ll_natives_fixture2 ():() then calls ll_decl_block:[1] then calls emit_line:("declare i64 @id_getter()")
-given ll_natives_fixture3 ():() then calls ll_decl_block:[0] then calls emit_line:("declare i64 @id_getter()")
+given ll_natives_fixture2 ():() then calls ll_decl_block:[1]
+given ll_natives_fixture3 ():() then calls ll_decl_block:[0] then prints:("declare i64 @id_getter()\n")
 
 // One line is not in the block above, because it is the only symbol whose
 // *name* depends on the build: string comparison is libc's strcmp hosted and
@@ -28,15 +28,15 @@ given ll_natives_fixture3 ():() then calls ll_decl_block:[0] then calls emit_lin
 // target exists to avoid.
 ll_decl_block() {
   ll_decl_cmp();
-  emit_line("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare void @id_fail(ptr)");
-  emit_line("");
+  print("declare ptr @id_list_new()\ndeclare ptr @id_list_adopt(ptr)\ndeclare void @id_list_push(ptr, i64)\ndeclare i64 @id_list_get(ptr, i32)\ndeclare void @id_list_set(ptr, i32, i64)\ndeclare i32 @id_list_len(ptr)\ndeclare i64 @id_list_cell(ptr, i32)\ndeclare void @id_list_cell_set(ptr, i32, i64)\ndeclare i32 @id_list_len_raw(ptr)\ndeclare i32 @id_list_cap_raw(ptr)\ndeclare i64 @id_list_pop(ptr)\ndeclare void @id_list_lock(ptr)\ndeclare void @id_list_free(ptr)\ndeclare void @id_list_free_deep(ptr)\ndeclare void @id_list_free_strs(ptr)\ndeclare void @id_free_walk(ptr, ptr)\ndeclare void @id_str_free(ptr)\ndeclare ptr @id_str_dup(ptr)\ndeclare i64 @id_box_f(double)\ndeclare double @id_unbox_f(i64)\ndeclare i32 @id_to_int(ptr)\ndeclare ptr @id_concat(ptr, ptr)\ndeclare ptr @id_concat_f(ptr, ptr, i32)\ndeclare ptr @id_str_of_int(i32)\ndeclare ptr @id_str_of_word(i64)\ndeclare ptr @id_str_of_float(double)\ndeclare void @id_print(ptr)\ndeclare void @id_eprint(ptr)\ndeclare ptr @id_input()\ndeclare ptr @id_read_all()\ndeclare i32 @id_len(ptr)\ndeclare i32 @id_charat(ptr, i32)\ndeclare ptr @id_chr(i32)\ndeclare ptr @id_str_sub(ptr, i32, i32)\ndeclare ptr @id_str_of_cstr(ptr)\ndeclare void @id_put(ptr)\ndeclare void @id_flush()\ndeclare i32 @id_getkey()\ndeclare void @id_sleep_ms(i32)\ndeclare i32 @id_ticks()\ndeclare i32 @id_idiv(i32, i32)\ndeclare i32 @id_imod(i32, i32)\ndeclare i64 @id_sdiv(i64, i64)\ndeclare i64 @id_smod(i64, i64)\ndeclare i64 @id_shl(i64, i64)\ndeclare i64 @id_sar(i64, i64)\ndeclare i64 @id_ushr(i64, i64)\ndeclare i64 @id_udiv(i64, i64)\ndeclare i64 @id_umod(i64, i64)\ndeclare i64 @id_ult(i64, i64)\ndeclare i64 @id_mem_alloc(i64)\ndeclare i64 @id_mem_size()\ndeclare i64 @id_peek8(i64)\ndeclare i64 @id_peek16(i64)\ndeclare i64 @id_peek32(i64)\ndeclare i64 @id_peek64(i64)\ndeclare void @id_poke8(i64, i64)\ndeclare void @id_poke16(i64, i64)\ndeclare void @id_poke32(i64, i64)\ndeclare void @id_poke64(i64, i64)\ndeclare ptr @id_str_of_mem(i64, i64)\ndeclare i64 @id_mem_of_str(ptr)\ndeclare i64 @id_peek8s(i64)\ndeclare i64 @id_peek16s(i64)\ndeclare i64 @id_peek32s(i64)\ndeclare i64 @id_peek8u(i64)\ndeclare i64 @id_peek16u(i64)\ndeclare i64 @id_peek32u(i64)\ndeclare i64 @id_bits_of_float(double)\ndeclare double @id_float_of_bits(i64)\ndeclare i64 @id_bits32_of_float(double)\ndeclare double @id_float_of_bits32(i64)\ndeclare void @id_fail(ptr)");
+  print("");
 } return void;
 given ll_env_fixture2 ():() then calls ll_decl_cmp:[1]
 given ll_env_fixture2 ():() then (import chkfail)[0]:(0)
 
 ll_decl_cmp() {
   string lw_strcmp_v = lw_strcmp();
-  emit_line("declare i32 @" + lw_strcmp_v + "(ptr, ptr)");
+  print("declare i32 @" + lw_strcmp_v + "(ptr, ptr)");
 } return void;
 given ll_env_fixture1 ():() then prints:("declare i32 @strcmp(ptr, ptr)\n")
 given ll_env_fixture1 ():() then (import chkfail)[0]:(0)

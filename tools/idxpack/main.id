@@ -46,7 +46,7 @@ run(string text, string target) {
   string std_root = "";
   if(std_present == 1) {
     int prefix_n = 9;
-    std_root = str_slice(lines[0], prefix_n, len(lines[0]) - prefix_n);
+    std_root = str_sub(lines[0], prefix_n, len(lines[0]) - prefix_n);
   }
 } chain (string text, string target) {
   std_root_set(std_root, std_present);

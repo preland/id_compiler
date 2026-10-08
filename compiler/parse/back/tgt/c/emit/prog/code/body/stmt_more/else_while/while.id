@@ -10,7 +10,7 @@ given harn_fix (3, ""):() then calls emit_while_head:(3, "", "5")
 given harn_fix (3, "  "):() then calls emit_while_head:(3, "  ", "5")
 
 emit_while_head(int id, string ind, string while_cond_c) {
-  emit_line(ind + "while (" + while_cond_c + ") {");
+  print(ind + "while (" + while_cond_c + ") {");
   emit_while_body(id, ind);
 } return void;
 given harn_fix (3, "", "5"):() then calls emit_while_body:(3, "")

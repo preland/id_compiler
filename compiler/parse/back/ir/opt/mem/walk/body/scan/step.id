@@ -13,12 +13,6 @@ m2r_step(int f, int id, int i) {
 given m2r_ldfx (0, (import ldfx_id), 0):() then calls m2r_load:(0, (import ldfx_id), 0)
 given m2r_ldfx (0, (import ldfx_id2), 0):() then calls m2r_store:((import ldfx_id2), 0)
 
-m2r_slot(int a) {
-  int ret_i = lst_index_of((import pra), a);
-} return int ret_i;
-given m2r_outv_fixture (2):(0)
-given m2r_outv_fixture (99):(-1)
-
 // A "load" and a "store" whose address is the promotable slot m2r_outv_fixture
 // collects, for m2r_load/m2r_store/m2r_step's own cases: neither reads
 // ir_op, so an id built for this needs to be right only in ir_a and ir_b.

@@ -2,7 +2,7 @@
 // The else arm.
 
 emit_else(int id, string ind) {
-  emit_line(ind + "} else {");
+  print(ind + "} else {");
   int[] l2_of_v = (import nl2)[id];
   emit_body_close(l2_of_v, ind);
 } return void;
@@ -14,7 +14,7 @@ given stmt_fix (3, "  "):() then prints:("  } else {\n  }\n")
 // their opening line has already been emitted.
 emit_body_close(int[] close_body_ids, string ind) {
   emit_block(close_body_ids, ind + "    ");
-  emit_line(ind + "}");
+  print(ind + "}");
 } return void;
 given stmt_fix ([], ""):() then prints:("}\n")
 given stmt_fix ([], "  "):() then prints:("  }\n")
@@ -24,10 +24,10 @@ given stmt_fix ([], "  "):() then prints:("  }\n")
 // indent.
 es_flow(int id, string ind) {
   if((import nkind)[id] == "break") {
-    emit_line(ind + "break;");
+    print(ind + "break;");
   } else if((import nkind)[id] == "ret") {
     string ret_code_v = ret_code(id);
-    emit_line(ind + ret_code_v);
+    print(ind + ret_code_v);
   } else {
     es4(id, ind);
   }

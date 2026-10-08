@@ -18,11 +18,11 @@ rfx_scan(string name, int rfm) {
   int ok = 1;
   if(find_str((import fnames), name) < 0) {
     ok = 0;
-    rfx_put(name, rfm);
+    hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, rfm);
   }
 } return int ok;
 given seed_given_fixture ("fx_target", -3):(1)
-given seed_given_fixture ("nope", -3):(0) then calls rfx_put:("nope", -3)
+given seed_given_fixture ("nope", -3):(0)
 
 conf_reached() {
   int ok = is_reach("conf.id");

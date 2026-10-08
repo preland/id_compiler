@@ -4,7 +4,7 @@
 hd_tag1(string hd_cls, string[] hd_tl) {
   string hd_hc = hd_cls;
   if (str_starts(hd_cls, "PH:") == 1) {
-    hd_hc = str_slice(hd_cls, 1, len(hd_cls) - 1);
+    hd_hc = str_sub(hd_cls, 1, len(hd_cls) - 1);
   }
   int hd_h = str_starts(hd_hc, "H:");
 } chain (string hd_cls, string[] hd_tl) {

@@ -11,7 +11,7 @@ ms_dr_step(string[] ms_cf, string ms_ml, int ms_lim, int ms_first) {
     ms_res = "";
   }
   if(str_starts(ms_res, "timeout") == 1) {
-    ms_res = "hang" + str_slice(ms_res, 7, len(ms_res) - 7);
+    ms_res = "hang" + str_sub(ms_res, 7, len(ms_res) - 7);
   }
 } return string ms_res;
 given ms_t_tree ([(import ms_t_root), "", "sh\n-c\nsleep 5\nidc", (import ms_t_work), (import ms_t_work), (import ms_t_root), "", (import ms_t_root)], "src/a.id\tadd\t50\t51\tret0\t0", 100, 1):("hang\t3\tsrc/a.id\tadd\t50\t51\tret0\t0\t} return int s;  =>  } return int 0;")

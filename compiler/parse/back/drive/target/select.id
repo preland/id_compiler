@@ -25,7 +25,7 @@ emit_target2(string t, int argc, string[] argv) {
   if(t == "crt") {
     print((import c_crt_text));
     emit_closure_rt("");
-    emit_line((import c_crt_eprint));
+    print((import c_crt_eprint));
   } else {
     string arg_triple_v = arg_triple(argc, argv);
     emit_program(arg_triple_v);

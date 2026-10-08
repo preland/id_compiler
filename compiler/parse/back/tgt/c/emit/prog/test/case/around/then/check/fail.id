@@ -13,7 +13,7 @@ given chk_fixture (2, 0, "chk()", "int"):() then prints:("    if (!((idtc_chk0 =
 
 emit_then_lines(int ci, int ti, string chk_lbl, string cnd, string shown) {
   string tail = then_tail(ti);
-  emit_line("    if (!(" + cnd + ")) {\n        fprintf(stderr, \"%s: test failed: %s then " + chk_lbl + " = \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n        " + shown + "\n        fputs(\"" + tail + "\", stderr);\n        return 3;\n    }");
+  print("    if (!(" + cnd + ")) {\n        fprintf(stderr, \"%s: test failed: %s then " + chk_lbl + " = \", idtc_where[" + ci + "], idtc_call[" + ci + "]);\n        " + shown + "\n        fputs(\"" + tail + "\", stderr);\n        return 3;\n    }");
 } return void;
 given chk_fixture (0, 0, "chk()", "(a == b)", "show;"):() then prints:("    if (!((a == b))) {\n        fprintf(stderr, \"%s: test failed: %s then chk() = \", idtc_where[0], idtc_call[0]);\n        show;\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")
 given chk_fixture (1, 0, "other()", "(c == d)", "tell;"):() then prints:("    if (!((c == d))) {\n        fprintf(stderr, \"%s: test failed: %s then other() = \", idtc_where[1], idtc_call[1]);\n        tell;\n        fputs(\", expected 1\\n\", stderr);\n        return 3;\n    }\n")

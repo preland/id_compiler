@@ -56,7 +56,7 @@ emit_then_imp(int ci, int ti, int node) {
     rd = then_len_call(node) + rd + ")";
     lbl = "len(" + lbl + ")";
   }
-  emit_line("    " + c_type(vt) + " idtc_chk" + ti + " = " + rd + ";");
+  print("    " + c_type(vt) + " idtc_chk" + ti + " = " + rd + ";");
   emit_then_judge(ci, ti, lbl, vt, items);
 } return void;
 given then_imp_fixture ("int", 0, 0) (0, 0, (import then_imp_node)):() then prints:("    int idtc_chk0 = ((void)(idtc_set_gx || (id_null_read(), 0)), gx);\n    int idtc_want0 = 0;\n    if (!((idtc_chk0 == idtc_want0))) {\n        fprintf(stderr, \"%s: test failed: %s then (import gx) = \", idtc_where[0], idtc_call[0]);\n        fprintf(stderr, \"%d\", idtc_chk0);\n        fputs(\", expected 0\\n\", stderr);\n        return 3;\n    }\n")

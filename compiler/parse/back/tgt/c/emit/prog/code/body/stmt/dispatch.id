@@ -4,7 +4,7 @@ es3(int id, string ind) {
   if((import nkind)[id] == "exprstmt") {
     int i1_of_v = (import ni1)[id];
     string emit_expr_v = esc_discard(i1_of_v, emit_expr(i1_of_v));
-    emit_line(ind + emit_expr_v + ";");
+    print(ind + emit_expr_v + ";");
   } else {
     es3b(id, ind);
   }

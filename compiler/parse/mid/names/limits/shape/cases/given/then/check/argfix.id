@@ -1,0 +1,14 @@
+// A "then" node naming fx_target with the one literal it takes, the arguments
+// of `then fx_target(0):(0)` as the parser records them (front/parse/decl/func/
+// cases/case/then/push.id): its value in the first child list and its
+// arguments in the second (here the same one literal). then_node_fixture's node (../more/print/node.id)
+// has neither, which is the other half of then_sig's cases. Filed here because
+// that file is at the three-function limit.
+
+then_arg_fixture() {
+  then_node_fixture();
+  int[] vals = [(import fixture_zero)];
+  export int fixture_then_arg = newnode("then", (import fixture_ci), 0, "fx_target", "", vals, vals);
+} return void;
+():() then calls then_node_fixture:[1]
+():() then init_units:(0)

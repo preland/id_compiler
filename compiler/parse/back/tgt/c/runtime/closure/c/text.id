@@ -7,13 +7,13 @@
 // n captured cells follow the header, 8 bytes each as a list cell is.
 
 emit_closure_rt(string linkage) {
-  emit_line("#define ID_CLO " + linkage);
-  emit_line((import c_clo_types));
-  emit_line((import c_clo_ops));
+  print("#define ID_CLO " + linkage);
+  print((import c_clo_types));
+  print((import c_clo_ops));
 } chain (string linkage) {
-  emit_line((import c_clo_cmp));
+  print((import c_clo_cmp));
   fv_init();
 } return void;
-("static "):() then calls emit_line:("#define ID_CLO static ") then calls fv_init:[1]
-(""):() then calls emit_line:("#define ID_CLO ") then calls fv_init:[1]
+("static "):() then calls fv_init:[1]
+(""):() then calls fv_init:[1]
 

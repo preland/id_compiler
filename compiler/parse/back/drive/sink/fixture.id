@@ -1,0 +1,8 @@
+// id 5: "x[3]", an "index" node; the one-element arg list [3] for a call.
+lz_d() {
+  lz_c();
+  export int lz_idx = node_index((import lz_var), (import lz_i1));
+  export int[] lz_callargs = [(import lz_i1)];
+} return void;
+():() then calls lz_c:[1]
+():() then init_units:(0)

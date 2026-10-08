@@ -13,7 +13,7 @@ lg_entries(string lg_hd) {
 // An entry's type: everything before its last space (a function type has spaces of its own).
 lg_ptype(string lg_e) {
   int lg_cut = lg_lastsp(lg_e);
-  string lg_ty = str_slice(lg_e, 0, lg_cut);
+  string lg_ty = str_sub(lg_e, 0, lg_cut);
 } return string lg_ty;
 ("int 0"):("int")
 ("func(int) return int 2"):("func(int) return int")
@@ -21,7 +21,7 @@ lg_ptype(string lg_e) {
 // An entry's position: what follows its last space. The C parameter is named after it.
 lg_pname(string lg_e) {
   int lg_cut = lg_lastsp(lg_e);
-  string lg_pn = str_slice(lg_e, lg_cut + 1, len(lg_e) - lg_cut - 1);
+  string lg_pn = str_sub(lg_e, lg_cut + 1, len(lg_e) - lg_cut - 1);
 } return string lg_pn;
 ("int 0"):("0")
 ("string[] 12"):("12")

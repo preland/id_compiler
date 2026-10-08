@@ -21,10 +21,10 @@ ms_st_swap(string ms_s, int[] ms_tk, int ms_t) {
 ms_mu_flt(string ms_q) {
   int ms_p = str_find(ms_q, "e") + str_find(ms_q, "E") + 1;
   int ms_n = len(ms_q);
-  string ms_y = str_slice(ms_q, 0, ms_n - 1) + (charat(ms_q, ms_n - 1) - 47) % 10;
+  string ms_y = str_sub(ms_q, 0, ms_n - 1) + (charat(ms_q, ms_n - 1) - 47) % 10;
 } chain (string ms_q) {
   if(ms_p >= 0) {
-    ms_y = str_slice(ms_q, 0, ms_p + 1) + (to_int(str_slice(ms_q, ms_p + 1, ms_n - ms_p - 1)) + 1);
+    ms_y = str_sub(ms_q, 0, ms_p + 1) + (to_int(str_sub(ms_q, ms_p + 1, ms_n - ms_p - 1)) + 1);
   }
 } return string ms_y;
 ("2.5"):("2.6")

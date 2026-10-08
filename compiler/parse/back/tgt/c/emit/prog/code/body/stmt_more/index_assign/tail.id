@@ -7,7 +7,7 @@ iassign4(int id, string ind, string val) {
   if(iset_hz(id) == 1) {
     iset_code_v = iset_seq(id, val);
   }
-  emit_line(ind + iset_code_v + ";");
+  print(ind + iset_code_v + ";");
 } return void;
 given iassign_fixture ((import iassign_node), "  ", "BOXED"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);\n")
 given iassign_fixture ((import iassign_node), "", "BOXED"):() then prints:("id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);\n")

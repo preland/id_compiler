@@ -35,15 +35,15 @@ emit_setup(int ci, int si, string nm) {
   int[] ps = [];
   if(len(items) > 0) {
     ps = (import nl1)[(func_node(nm))];
-    emit_line("    {");
+    print("    {");
   }
 } chain (int ci, int si, string nm) {
   string an = names_upto(len(items));
   emit_arg_lines(ps, items);
-  emit_line("    id_" + nm + "(" + an + ");");
+  print("    id_" + nm + "(" + an + ");");
 } chain (int ci, int si, string nm) {
   if(len(items) > 0) {
-    emit_line("    }");
+    print("    }");
   }
 } return void;
 given gsetup_fixture (0, 1, "fx_set1"):() then prints:("    {\n    int idtc_a0 = 0;\n    id_fx_set1(idtc_a0);\n    }\n")

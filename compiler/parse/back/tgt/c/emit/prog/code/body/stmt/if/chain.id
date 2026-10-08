@@ -44,14 +44,14 @@ render_chain(int[] if_ids, string[] cond_texts, int lvl, string ind) {
   if(lvl > 0) {
     head = ind + "} else if (";
   }
-  emit_line(head + cond_text + ") {");
+  print(head + cond_text + ") {");
 } chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
   emit_block(l1_of_v, ind + "    ");
   int has_else = (import ni2)[cur_id];
   int next_k = lvl + 1;
 } chain (int[] if_ids, string[] cond_texts, int lvl, string ind) {
   if(has_else == 0) {
-    emit_line(ind + "}");
+    print(ind + "}");
   } else if(has_else == 1) {
     render_chain(if_ids, cond_texts, next_k, ind);
   } else {

@@ -1,0 +1,79 @@
+// prog = [wsget, wsadd, wsdead, wsif, wsput, wsnest, main]: indexes 0 to 6.
+wsc_world() {
+  wsc_exp();
+  push((import prog), (import wx_fget));
+  push((import prog), (import wx_fadd));
+} chain () {
+  push((import prog), (import wx_fdead));
+  push((import prog), (import wx_fif));
+  push((import prog), (import wx_fput));
+} chain () {
+  push((import prog), (import wx_fnest));
+  push((import prog), (import wx_fmain));
+} return void;
+():() then calls wsc_exp:[1]
+():() then init_units:(0)
+
+// wsget is a `given` setup, wsadd a `then` check, wsdead only the subject of a
+// `then calls`, and wsput nothing.
+wsc_marks() {
+  wsc_world();
+  push((import casegiven), "setup_a wsget");
+  int[] wx_noitems = [];
+} chain () {
+  export int wx_vnest = newleaf("cfn", 0, 0, "wsnest", "");
+  export int wx_vget = newleaf("cfn", 0, 0, "wsget", "");
+  export int[] wx_nl = [(import wx_vnest)];
+} chain () {
+  export int[] wx_bl2 = [(import wx_vget)];
+  export int wx_bindcall = node_call("bind", (import wx_bl2));
+  export int[] wx_cargs = [(import wx_bindcall)];
+} chain () {
+  export int wx_case = newnode("case", 0, 0, "", "", (import wx_cargs), (import wx_nl));
+  push((import casenode), (import wx_case));
+  export int wx_then = newnode("then", 0, 0, "wsadd", "", (import wx_nl), wx_noitems);
+} chain () {
+  push((import thennode), (import wx_then));
+  export int wx_thenc = newnode("thencalls", 0, 0, "wsdead", "", wx_noitems, wx_noitems);
+  push((import thennode), (import wx_thenc));
+} return void;
+():() then calls wsc_world:[1]
+():() then init_units:(0)
+
+// Two more functions at indexes 7 and 8, `wsa(int a) { int r = a + 9; } return int r;`
+// and `wsb` with 5 -- the pair E0407 reports -- and the fingerprint table over
+// all nine, whose entry i is prog index i (cfpfn).
+wsc_pair() {
+  wsc_world();
+  export int wx_n9 = node_txt2("int", "9", 9, 0);
+  export int wx_n5 = node_txt2("int", "5", 5, 0);
+} chain () {
+  export int wx_b9 = node_txt2("bin", "+", (import wx_va), (import wx_n9));
+  export int wx_b5 = node_txt2("bin", "+", (import wx_va), (import wx_n5));
+  export int wx_r9 = node_decl("int", "r", (import wx_b9), 0);
+} chain () {
+  export int wx_r5 = node_decl("int", "r", (import wx_b5), 0);
+  export int wx_vr = node_txt("var", "r");
+  export int[] wx_ra = [(import wx_r9)];
+} chain () {
+  export int[] wx_rb = [(import wx_r5)];
+  export int wx_fa = node_func("wsa", "int", (import wx_pa1), (import wx_ra), (import wx_vr));
+  export int wx_fb = node_func("wsb", "int", (import wx_pa1), (import wx_rb), (import wx_vr));
+} chain () {
+  export int wx_vfv = node_txt("var", "wsget");
+  export int wx_dfv = node_decl("int", "r", (import wx_vfv), 0);
+  export int[] wx_fvb = [(import wx_dfv)];
+} chain () {
+  export int wx_fuse = node_func("wsuse", "int", (import wx_pa1), (import wx_fvb), (import wx_vr));
+  push((import prog), (import wx_fa));
+  push((import prog), (import wx_fb));
+} chain () {
+  push((import prog), (import wx_fuse));
+  init_idx();
+  sym_func((import wx_fget));
+} chain () {
+  init_rtc();
+  uq_fill();
+} return void;
+():() then calls wsc_world:[1]
+():() then init_units:(0)

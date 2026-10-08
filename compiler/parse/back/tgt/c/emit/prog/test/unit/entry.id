@@ -33,7 +33,7 @@ emit_tests(string triple) {
     dg_emit_keys();
     emit_test_kept(triple);
   }
-  emit_line("/* ---- end of test harness ---- */");
+  print("/* ---- end of test harness ---- */");
 } return void;
 given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n")
 given env_init ("abc"):() then prints:("/* ---- end of test harness ---- */\n") then (import chkfail)[0]:(0)

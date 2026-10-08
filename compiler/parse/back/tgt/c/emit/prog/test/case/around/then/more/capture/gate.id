@@ -6,7 +6,7 @@
 
 emit_when(int has_it, string cap_text) {
   if(has_it == 1) {
-    emit_line(cap_text);
+    print(cap_text);
   }
 } return void;
 given case_fixture (1, "x"):() then prints:("x\n")
@@ -14,16 +14,16 @@ given case_fixture (0, "x"):() then prints:("")
 
 emit_cap_post(int ci, string cap_kind, string cap_body, string cap_var, string cap_clause) {
   if(case_has_out(ci, cap_kind) == 1) {
-    emit_line(cap_body);
+    print(cap_body);
     emit_cap_nul(ci, cap_var, cap_clause);
   }
 } return void;
-given print_fixture ((import fixture_ci), "thenprints", "B", "out", "a prints"):() then calls emit_cap_nul:((import fixture_ci), "out", "a prints") then calls emit_line:[2]
+given print_fixture ((import fixture_ci), "thenprints", "B", "out", "a prints"):() then calls emit_cap_nul:((import fixture_ci), "out", "a prints")
 given case_fixture ((import fixture_ci), "thenprints", "B", "out", "a prints"):() then calls emit_cap_nul:[0]
 
 emit_cap_nul(int ci, string cap_var, string cap_clause) {
   string cap_head = "    if ((long)strlen(idtc_" + cap_var + "_buf) != idtc_" + cap_var + "_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which " + cap_clause + " clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where[";
-  emit_line(cap_head + ci + "], idtc_call[" + ci + "]);\n        return 3;\n    }");
+  print(cap_head + ci + "], idtc_call[" + ci + "]);\n        return 3;\n    }");
 } return void;
 given case_fixture (0, "out", "a prints"):() then prints:("    if ((long)strlen(idtc_out_buf) != idtc_out_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which a prints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where[0], idtc_call[0]);\n        return 3;\n    }\n")
 given case_fixture (2, "err", "an eprints"):() then prints:("    if ((long)strlen(idtc_err_buf) != idtc_err_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which an eprints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where[2], idtc_call[2]);\n        return 3;\n    }\n")

@@ -26,11 +26,14 @@ given env_init ():() then (import chkfail)[0]:(0)
 given call2_setup ():() then (import chkfail)[0]:(0)
 
 // Both indexes get their buckets in one loop: they are the same size and are
-// built at the same moment, and two loops would be the same loop twice.
+// built at the same moment, and two loops would be the same loop twice. Each `[]`
+// is a fresh list, so no bucket is shared with another.
 push_buckets() {
-  int[] new_bucket_v = new_bucket();
+  int[] new_bucket_v = [];
+  int[] new_bucket_v2 = [];
   push((import vidx), new_bucket_v);
-  push_fbucket();
+} chain () {
+  push((import fidx), new_bucket_v2);
 } return void;
 given call2_setup ():() then (import chkfail)[0]:(0)
 given argfn_d ():() then (import chkfail)[0]:(0)

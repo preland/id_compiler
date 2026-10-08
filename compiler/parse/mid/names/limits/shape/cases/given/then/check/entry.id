@@ -49,7 +49,7 @@ then_fn(int chk_node, string chk_nm) {
     then_sig(ci, chk_node, cfn, chk_nm2);
   }
 } return void;
-given then_node_fixture ((import fixture_then_node), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
+given then_node_fixture ((import fixture_then_node), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s), but this 'then' passes 0; a check is called with one literal per parameter, as in 'then fx_target(1, 2):(value)', and with none as 'then fx_target:(value)'\n")
 given then_node_fixture ((import fixture_then_bad), "nope"):() then prints:("fixture.id:4: error: 'then' names 'nope', which is not a function in this build\n")
 
 // `traps:(...)`: exactly one value, a string -- the message a trap's own

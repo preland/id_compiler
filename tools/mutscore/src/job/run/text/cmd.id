@@ -3,7 +3,7 @@
 
 // ms_s with the bytes from ms_a up to ms_b replaced by ms_rp.
 ms_rn_cut(string ms_s, int ms_a, int ms_b, string ms_rp) {
-  string ms_nw = str_slice(ms_s, 0, ms_a) + ms_rp + str_slice(ms_s, ms_b, len(ms_s) - ms_b);
+  string ms_nw = str_sub(ms_s, 0, ms_a) + ms_rp + str_sub(ms_s, ms_b, len(ms_s) - ms_b);
 } return string ms_nw;
 ("a + b", 2, 3, "-"):("a - b")
 ("a;b", 1, 2, ""):("ab")

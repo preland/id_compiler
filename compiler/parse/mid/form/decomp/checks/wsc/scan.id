@@ -1,0 +1,47 @@
+// E0408: a function that is one operation on its inputs --
+// `fs_st_get(word[] st, int at) { word v = st[at]; } return word v;` is a second
+// spelling of the language's own indexing, and the call site should say
+// `st[at]` itself. It is the family of E0403 (a function returning only a
+// constant), E0406 (a pure forwarder) and E0407, and like them it removes a name
+// a reader has to open to learn it is nothing.
+//
+// The reduction (./shape.id, ./ops.id) substitutes each local into the
+// expression that uses it; an operation is any node that is not a parameter, a
+// literal or an `(import NAME)`. A function is a hit when its reduced expression
+// is exactly one operation whose operands are parameters and imports only (a
+// literal is a value that deserves a name, which a constant in conf.id gives it
+// without a function), when nothing reads it as a function value, and when it is
+// not a test fixture (./fixture.id). A function with control flow, or with a
+// statement that is no part of the one expression, is never a hit.
+//
+// Each hit is reported as VALUE (the function returns the expression) or
+// VOID-CALL (a void function whose one statement is a call).
+
+wsc_scan() {
+  if((import chkfail)[0] == 0) {
+    wsc_loop();
+  }
+} return void;
+given env_init ():() then calls wsc_loop:[1]
+given env_init given lset((import chkfail), 0, 1) ():() then calls wsc_loop:[0]
+
+wsc_loop() {
+  int wlp_i = 0;
+  while(wlp_i < len((import prog))) {
+    wsc_at(wlp_i);
+    wlp_i = wlp_i + 1;
+  }
+} return void;
+given env_init ():() then calls wsc_at:[0]
+given wsc_pair ():() then calls wsc_at:[10]
+
+wsc_at(int wat_i) {
+  int wat_fid = (import prog)[wat_i];
+  if(fwd_should(wat_fid) == 1) {
+    wsc_judge(wat_fid);
+  }
+} return void;
+given wsc_pair (0):() then (import chkfail)[0]:(0)
+given wsc_pair (4):() then (import chkfail)[0]:(1)
+given wsc_pair (1):() then (import chkfail)[0]:(0)
+given wsc_pair (6):() then (import chkfail)[0]:(0)

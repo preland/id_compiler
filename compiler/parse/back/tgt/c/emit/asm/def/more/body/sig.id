@@ -3,10 +3,10 @@
 emit_asm_one(int r) {
   string c_type_v = c_type((import afret)[r]);
   string list_params_v = list_params((import afparams)[r]);
-  emit_line(c_type_v + " id_" + (import afname)[r] + "(" + list_params_v + ") {");
+  print(c_type_v + " id_" + (import afname)[r] + "(" + list_params_v + ") {");
 } chain (int r) {
   string c_type_v2 = c_type((import afret)[r]);
-  emit_line("    " + c_type_v2 + " " + (import afretn)[r] + ";");
+  print("    " + c_type_v2 + " " + (import afretn)[r] + ";");
   asm_stmt(r);
 } return void;
 given casm_row_fixture (0):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")

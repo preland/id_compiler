@@ -14,7 +14,7 @@ fit_body(int i, int fn, int node) {
   }
 } return void;
 given chk_fixture ((import fixture_ci), (import fixture_chk_fn), (import fixture_node)):() then prints:("fixture.id:4: error: 'chk' returns int, so its case expects exactly one value, not 0 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
-given chk_fixture ((import fixture_ci), (import fixture_fn), (import fixture_chk_node)):() then prints:("")
+given then_arg_fixture ((import fixture_ci), (import fixture_fn), (import fixture_then_arg)):() then prints:("")
 
 fit_items(int i, int fn, int[] items) {
   int j = 0;

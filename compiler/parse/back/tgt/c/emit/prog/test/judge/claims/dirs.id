@@ -8,9 +8,9 @@
 // started the harness.
 
 emit_tc_dirs() {
-  emit_line("static void idtc_dirs(void) {");
+  print("static void idtc_dirs(void) {");
   tc_dir_rows(0);
-  emit_line("}");
+  print("}");
 } return void;
 given ur_t ():() then prints:("static void idtc_dirs(void) {\n    idtc_dir[0] = \"/tmp/r0\";\n    idtc_dir[1] = \"/tmp/r0\";\n    idtc_dir[2] = \"/tmp/r0\";\n    idtc_dir[3] = \"/tmp/r0\";\n}\n")
 given dg_t_parsed ():() then prints:("static void idtc_dirs(void) {\n}\n")
@@ -27,7 +27,7 @@ given ur_t (4):() then prints:("")
 emit_dir_row(int ci) {
   string cr = case_root(ci);
   if(cr != "") {
-    emit_line("    idtc_dir[" + ci + "] = \"" + c_esc(cr) + "\";");
+    print("    idtc_dir[" + ci + "] = \"" + c_esc(cr) + "\";");
   }
 } return void;
 given ur_t (2):() then prints:("    idtc_dir[2] = \"/tmp/r0\";\n")

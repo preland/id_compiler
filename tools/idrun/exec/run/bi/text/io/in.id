@@ -10,9 +10,3 @@ vm_b_read_all() {
 } return int h;
 given vb_boot stdin "ab\ncd" ():(1) then (import ex_strs):(["", "ab\ncd"])
 given vb_boot stdin "" ():(1) then (import ex_strs):(["", ""])
-
-vm_b_getkey() {
-  int k = getkey();
-} return int k;
-given vb_boot ():(-1)
-given vb_boot stdin "x" ():(120)

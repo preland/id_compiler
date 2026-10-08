@@ -17,7 +17,7 @@ given lc_dce_setup2 ():() then prints:("@b = global i32 2\n") then calls ll_cons
 
 ll_global_at(int i, string ty) {
   string init = ll_init(i);
-  emit_line("@" + (import enames)[i] + " = global " + ty + " " + init);
+  print("@" + (import enames)[i] + " = global " + ty + " " + init);
 } return void;
 given lc_dce_setup (0, "ptr"):() then prints:("@a = global ptr null\n")
 given lc_dce_setup (1, "i32"):() then prints:("@b = global i32 2\n")

@@ -1,0 +1,41 @@
+// Which functions can be one expression at all, and which node is it. A
+// function that returns a value must have a body of declarations only, each
+// with an initialiser and none exported, and its expression is the return
+// clause. A void function must have exactly one statement, a call. Anything
+// else -- an `if`, a `while`, a `chain`, an assignment, a write through an
+// index, an exported variable -- has work that is no part of one expression and
+// is not a candidate. -1 when it is not.
+
+wsc_root(int wrt_f) {
+  int[] wrt_body = (import nl2)[wrt_f];
+  int wrt_r = 0 - 1;
+  if((import ni1)[wrt_f] >= 0 && wsc_decls(wrt_body) == 1) {
+    wrt_r = (import ni1)[wrt_f];
+  }
+} chain (int wrt_f) {
+  if((import ni1)[wrt_f] < 0 && len(wrt_body) == 1) {
+    wrt_r = wsc_vcall(wrt_body[0]);
+  }
+} return int wrt_r;
+given wsc_world ((import wx_fget)):(9)
+given wsc_world ((import wx_fif)):(-1)
+
+wsc_vcall(int wvc_s) {
+  int wvc_r = 0 - 1;
+  if((import nkind)[wvc_s] == "exprstmt" && (import nkind)[((import ni1)[wvc_s])] == "call") {
+    wvc_r = (import ni1)[wvc_s];
+  }
+} return int wvc_r;
+given wsc_world ((import wx_es)):(25)
+given wsc_world ((import wx_dv)):(-1)
+
+wsc_decls(int[] wds_body) {
+  int wds_ok = 1;
+  int wds_i = 0;
+  while(wds_i < len(wds_body)) {
+    wds_ok = wds_ok * wsc_decl(wds_body[wds_i]);
+    wds_i = wds_i + 1;
+  }
+} return int wds_ok;
+given wsc_world ((import wx_gb)):(1)
+given wsc_world ((import wx_ifb)):(0)

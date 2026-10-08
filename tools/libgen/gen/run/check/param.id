@@ -16,7 +16,7 @@ lg_badparam(string[] lg_ts) {
 // The type to report once one has been: the earlier bad type if there is one,
 // else this type when it has no C form as a parameter, else "".
 lg_pick(string lg_seen, string lg_t) {
-  int lg_row = lg_idx(lg_t);
+  int lg_row = lst_str_index((import lg_tname), lg_t);
   string lg_got = lg_seen;
   if (lg_seen == "" && (lg_row < 0 || (import lg_tparam)[lg_row] == "")) {
     lg_got = lg_t;

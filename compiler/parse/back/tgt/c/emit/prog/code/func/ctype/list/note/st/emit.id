@@ -5,7 +5,7 @@
 emit_st_protos() {
   int sd_i = 0;
   while(sd_i < len((import tcsts))) {
-    emit_line("static int idtc_eqs_" + (import tcsts)[sd_i] + "(IdList* a, IdList* b);\nstatic void idtc_shows_" + (import tcsts)[sd_i] + "(IdList* a);");
+    print("static int idtc_eqs_" + (import tcsts)[sd_i] + "(IdList* a, IdList* b);\nstatic void idtc_shows_" + (import tcsts)[sd_i] + "(IdList* a);");
     sd_i = sd_i + 1;
   }
 } return void;
@@ -25,7 +25,7 @@ given sd_note_fixture given note_struct("Q") ():() then prints:("static int idtc
 emit_st_body(string sd_nm) {
   string sd_cmp = st_eq_expr(sd_nm);
   string sd_sh = st_show_stmts(sd_nm);
-  emit_line("static int idtc_eqs_" + sd_nm + "(IdList* a, IdList* b) {\n    return " + sd_cmp + ";\n}\nstatic void idtc_shows_" + sd_nm + "(IdList* a) {\n    fputs(\"" + sd_nm + "(\", stderr);\n" + sd_sh + "    fputs(\")\", stderr);\n}");
+  print("static int idtc_eqs_" + sd_nm + "(IdList* a, IdList* b) {\n    return " + sd_cmp + ";\n}\nstatic void idtc_shows_" + sd_nm + "(IdList* a) {\n    fputs(\"" + sd_nm + "(\", stderr);\n" + sd_sh + "    fputs(\")\", stderr);\n}");
 } return void;
 given sd_note_fixture ("Q"):() then prints:("static int idtc_eqs_Q(IdList* a, IdList* b) {\n    return (strcmp((char*)(intptr_t)(a->data[0]), (char*)(intptr_t)(b->data[0])) == 0);\n}\nstatic void idtc_shows_Q(IdList* a) {\n    fputs(\"Q(\", stderr);\n    fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[0]));\n    fputs(\")\", stderr);\n}\n")
 given sd_note_fixture ("P"):() then prints:("static int idtc_eqs_P(IdList* a, IdList* b) {\n    return ((int)(a->data[0]) == (int)(b->data[0])) && ((int)(a->data[1]) == (int)(b->data[1]));\n}\nstatic void idtc_shows_P(IdList* a) {\n    fputs(\"P(\", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[0]));\n    fputs(\", \", stderr);\n    fprintf(stderr, \"%d\", (int)(a->data[1]));\n    fputs(\")\", stderr);\n}\n")

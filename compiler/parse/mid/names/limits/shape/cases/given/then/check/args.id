@@ -1,0 +1,34 @@
+// The literals a check is called with, `then CHECK(LIT, ...):(value)`. Each is
+// held to exactly what a case's own argument is held to (fit_value), at the
+// check's parameter type -- except a function's name, which only a case's own
+// arguments may pass, as for a setup's (../../setup/args.id). An `(import NAME)`
+// among them is read after the call under test and the checks before it, like
+// the check's expected value, so it is held to the rule of chk_own_import
+// (../../more/flag/reqtests.id) where a setup's own arguments are exempt.
+// Then the check's value (value.id).
+
+then_args_fit(int ci, int chk_node, int cfn) {
+  int[] targs = (import nl2)[chk_node];
+  int ta_j = 0;
+  while(ta_j < len(targs)) {
+    then_arg(ci, cfn, targs, ta_j);
+    ta_j = ta_j + 1;
+  }
+} chain (int ci, int chk_node, int cfn) {
+  then_value_fit(ci, chk_node, cfn);
+} return void;
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then calls then_value_fit:[1]
+given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn)):() then calls then_arg:[1]
+given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn)):() then calls then_value_fit:[1]
+
+then_arg(int ci, int cfn, int[] targs, int j) {
+  string pt = (import ns1)[((import nl1)[cfn][j])];
+  if((import nkind)[(targs[j])] == "cfn") {
+    case_err(ci, "a check's arguments are literals or (import NAME); '" + (import ns1)[(targs[j])] + "' is a function name, which only a case's own arguments may pass");
+  } else {
+    fit_value(ci, targs[j], pt);
+  }
+} return void;
+given then_arg_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_fn)], 0):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given cfn_fixture ((import fixture_ci), (import fixture_fn), [(import cfn_e)], 0):() then prints:("fixture.id:4: error: a check's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass\n")
+given then_arg_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then prints:("")

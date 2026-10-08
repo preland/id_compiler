@@ -12,15 +12,10 @@ case_fidx(int ci) {
   int n = 0;
   int j = 0;
   while(j < ci) {
-    n = n + case_same(j, ci);
+    n = n + lst_same_at((import casefn), j, ci);
     j = j + 1;
   }
 } return int n;
 given case_fidx_fixture (1):(1)
 given case_fidx_fixture2 (1):(0)
 
-case_same(int j, int ci) {
-  int r = lst_same_at((import casefn), j, ci);
-} return int r;
-given case_fidx_fixture (0, 1):(1)
-given case_fidx_fixture2 (0, 1):(0)

@@ -1,10 +1,5 @@
-vm_b_ult(word wa, word wb) {
-  int r = ult(wa, wb);
-} return int r;
-(1, -1):(1)
-(-1, 1):(0)
-
-// The arithmetic helpers, by id.
+// The arithmetic helpers, by id. A remainder and the two shifts take the host's own operators: a count past
+// the width is zero and a negative count traps, both as they have it.
 vm_ba(int id, word wa, word wb, word wc) {
   word wr = 0;
   if (id == (import b_idiv)) {
@@ -17,36 +12,40 @@ vm_ba(int id, word wa, word wb, word wc) {
   }
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_sdiv)) {
-    wr = vm_b_sdiv(wa, wb);
+    wr = wa / wb;
+
     return wr;
   }
   if (id == (import b_smod)) {
-    wr = vm_b_smod(wa, wb);
+    wr = wa % wb;
+
     return wr;
   }
   if (id == (import b_shl)) {
-    wr = vm_b_shl(wa, wb);
+    wr = wa << wb;
+
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_sar)) {
-    wr = vm_b_sar(wa, wb);
+    wr = wa >> wb;
+
     return wr;
   }
   if (id == (import b_ushr)) {
-    wr = vm_b_ushr(wa, wb);
+    wr = ushr(wa, wb);
     return wr;
   }
   if (id == (import b_udiv)) {
-    wr = vm_b_udiv(wa, wb);
+    wr = udiv(wa, wb);
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_umod)) {
-    wr = vm_b_umod(wa, wb);
+    wr = umod(wa, wb);
     return wr;
   }
-  wr = vm_b_ult(wa, wb);
+  wr = ult(wa, wb);
 } return word wr;
 (26, 7, 2, 0):(3)
 (27, 7, 3, 0):(1)
@@ -55,3 +54,16 @@ vm_ba(int id, word wa, word wb, word wc) {
 (33, -1, 2, 0):(9223372036854775807)
 (34, 100, 7, 0):(2)
 (35, 1, -1, 0):(1)
+(35, -1, 1, 0):(0)
+(28, 5000000000, 2, 0):(2500000000)
+(28, -9, 2, 0):(-4)
+(29, 5000000001, 10, 0):(1)
+(29, -9, 4, 0):(-1)
+(30, 1, 31, 0):(2147483648)
+(30, 1, 70, 0):(0)
+(31, -8, 1, 0):(-4)
+(31, 4, 70, 0):(0)
+(32, -1, 60, 0):(15)
+(32, 256, 4, 0):(16)
+(33, 100, 7, 0):(14)
+(34, -1, 10, 0):(5)

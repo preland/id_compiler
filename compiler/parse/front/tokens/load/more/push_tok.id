@@ -3,7 +3,7 @@
 slice(string src, int a, int b) {
   string out = "";
   if(a < b) {
-    out = str_slice(src, a, b - a);
+    out = str_sub(src, a, b - a);
   }
 } return string out;
 ("hello world", 0, 5):("hello")

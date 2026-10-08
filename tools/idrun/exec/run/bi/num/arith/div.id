@@ -16,9 +16,3 @@ vm_b_imod(word wa, word wb) {
 } return int r;
 (7, 3):(1)
 (-7, 2):(-1)
-
-vm_b_sdiv(word wa, word wb) {
-  word wr = wa / wb;
-} return word wr;
-(5000000000, 2):(2500000000)
-(-9, 2):(-4)

@@ -32,8 +32,8 @@ ms_rn_one(string[] ms_cf, string ms_ml, int ms_ms) {
   exec_file_put(ms_pa, ms_src, 420);
 } chain (string[] ms_cf, string ms_ml, int ms_ms) {
   int ms_nl = str_find(ms_out, "\n");
-  string ms_tx = str_slice(ms_out, ms_nl + 1, len(ms_out) - ms_nl - 1);
-  int ms_rc = to_int(str_slice(ms_out, 0, ms_nl));
+  string ms_tx = str_sub(ms_out, ms_nl + 1, len(ms_out) - ms_nl - 1);
+  int ms_rc = to_int(str_sub(ms_out, 0, ms_nl));
 } chain (string[] ms_cf, string ms_ml, int ms_ms) {
   string ms_st = ms_rn_class(ms_tx, ms_rc);
   string ms_df = str_replace(ms_df_show(ms_src, ms_a, ms_b, ms_fd[5]), "\t", " ");

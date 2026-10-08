@@ -31,10 +31,10 @@ given llasm_row_fixture (0, "x86_64-unknown-none"):() then prints:("define i32 @
 ll_asm_one(int r) {
   string ty = ll_ty((import afret)[r]);
   string par = ll_asm_par(r);
-  emit_line("define " + ty + " @id_" + (import afname)[r] + "(" + par + ") noinline {");
+  print("define " + ty + " @id_" + (import afname)[r] + "(" + par + ") noinline {");
 } chain (int r) {
   ll_asm_body(r);
-  emit_line("}");
+  print("}");
 } return void;
 given llasm_row_fixture (0):() then prints:("define i32 @id_portout(i32 %a0) noinline {\n  %r = call i32 asm sideeffect \"mov $1, $$0\\0A\\09ret\", \"=r,r,~{memory}\"(i32 %a0)\n  ret i32 %r\n}\n")
 given llasm_row2_fixture (1):() then prints:("define ptr @id_barrier() noinline {\n  %r = call ptr asm sideeffect \"nop\", \"=r,~{memory}\"()\n  ret ptr %r\n}\n")

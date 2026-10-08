@@ -16,7 +16,7 @@ ms_cl_or(string ms_val, string ms_dflt) {
 // for --std, the siblings to link, the shard and the budget with their
 // defaults. The slots for the scratch directory stay empty.
 ms_cm_cfg(string[] ms_av, string ms_wd) {
-  string ms_std = str_slice("1", 0, ms_cl_has(ms_av, "--std"));
+  string ms_std = str_sub("1", 0, ms_cl_has(ms_av, "--std"));
   string ms_idc = ms_cl_or(ms_cl_arg(ms_av, "--idc"), "idc");
   string ms_shd = ms_cl_or(ms_cl_arg(ms_av, "--shard"), "0/1");
 } chain (string[] ms_av, string ms_wd) {

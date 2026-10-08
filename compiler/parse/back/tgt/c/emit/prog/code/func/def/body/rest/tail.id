@@ -1,7 +1,7 @@
 
 emit_tail_end(int id) {
   emit_ret(id);
-  emit_line("}");
+  print("}");
 } return void;
 given nz_prog_fixture ((import nz_mainfn)):() then prints:("    return 7;\n}\n")
 given nz_prog_fixture ((import nz_plainfn)):() then prints:("    return;\n}\n")

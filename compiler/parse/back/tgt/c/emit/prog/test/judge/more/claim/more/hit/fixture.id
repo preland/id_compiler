@@ -1,6 +1,6 @@
 // Two synthetic entries in casefn (../../../fidx.id's own column, past
 // case_fixture's one real case, reused from fn_fixture rather than building
-// a node of our own): case_fidx/case_same only compare casefn's values for
+// a node of our own): case_fidx only compare casefn's values for
 // equality, so any two real nodes stand in for "the function this case was
 // written under" -- fixture_fn both times is one function's two cases;
 // fixture_fn then fixture_zero is two different ones. casenode/casestart

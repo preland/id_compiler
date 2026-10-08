@@ -35,10 +35,10 @@
 // names a program's global variables may be called.
 
 emit_tc_support() {
-  emit_line((import c_tc_proc));
-  emit_line((import c_tc_one));
-  emit_line((import c_tc_judge));
+  print((import c_tc_proc));
+  print((import c_tc_one));
+  print((import c_tc_judge));
 } return void;
-():() then calls emit_line:[3]
+given one_casefn_fixture ():() then (import chkfail)[0]:(0)
 given env_init ():() then (import chkfail)[0]:(0)
 

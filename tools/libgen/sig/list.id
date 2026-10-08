@@ -20,14 +20,6 @@ lg_cols(string lg_hd, int lg_w) {
 ("int 0,string[] 1", 1):(["0", "1"])
 ("", 0):([])
 
-// A type's row in every table, or -1 for a type the C interface has no form for.
-lg_idx(string lg_t) {
-  int lg_row = lst_str_index((import lg_tname), lg_t);
-} return int lg_row;
-("int"):(0)
-("func(int)"):(-1)
-("void"):(9)
-
 // Where the last space of a string is, or -1 when it has none.
 lg_lastsp(string lg_s) {
   int lg_at = -1;

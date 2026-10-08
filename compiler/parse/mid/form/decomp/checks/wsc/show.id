@@ -1,0 +1,66 @@
+// The reduced expression as source text, for the diagnostic: each local is
+// replaced by its initialiser, and a binary operation is parenthesised so the
+// grouping is never left to precedence. A field read is an index node whose
+// index is a `fld` leaf (front/parse/decl/kinds/struct/use/post.id) and is
+// written `base.name`.
+
+wsc_show(int wsh_f, int wsh_e) {
+  string wsh_k = (import nkind)[wsh_e];
+  string wsh_s = (import ns1)[wsh_e];
+  string wsh_out = wsh_s + "(" + wsc_args(wsh_f, (import nl1)[wsh_e]) + ")";
+} chain (int wsh_f, int wsh_e) {
+  if(wsh_k == "int" || wsh_k == "float" || wsh_k == "fld" || wsh_k == "str") {
+    wsh_out = wsh_s;
+  }
+  if(wsh_k == "var") {
+    wsh_out = wsc_name(wsh_f, wsh_s);
+  }
+  if(wsh_k == "import") {
+    wsh_out = "(import " + wsh_s + ")";
+  }
+} chain (int wsh_f, int wsh_e) {
+  if(wsh_k == "bin") {
+    wsh_out = "(" + wsc_show(wsh_f, (import ni1)[wsh_e]) + " " + wsh_s + " " + wsc_show(wsh_f, (import ni2)[wsh_e]) + ")";
+  }
+  if(wsh_k == "un") {
+    wsh_out = wsh_s + wsc_show(wsh_f, (import ni1)[wsh_e]);
+  }
+  if(wsh_k == "index") {
+    wsh_out = wsc_index(wsh_f, wsh_e);
+  }
+} chain (int wsh_f, int wsh_e) {
+  if(wsh_k == "arr") {
+    wsh_out = "[" + wsc_args(wsh_f, (import nl1)[wsh_e]) + "]";
+  }
+} return string wsh_out;
+given wsc_world ((import wx_fget), (import wx_rv)):("st[a]")
+given wsc_world ((import wx_fadd), (import wx_vt)):("((a + b) * 2)")
+given wsc_world ((import wx_fget), (import wx_neg)):("-a")
+given wsc_world ((import wx_fget), (import wx_foo2)):("foo(bar(a))")
+given wsc_world ((import wx_fget), (import wx_arr)):("[a, 2]")
+given wsc_world ((import wx_fget), (import wx_str)):("\"hi\"")
+given wsc_world ((import wx_fget), (import wx_imp)):("(import g)")
+given wsc_world ((import wx_fget), (import wx_fld)):("st.len")
+
+wsc_index(int wix_f, int wix_e) {
+  int wix_b = (import ni1)[wix_e];
+  int wix_x = (import ni2)[wix_e];
+  string wix_out = wsc_show(wix_f, wix_b) + "[" + wsc_show(wix_f, wix_x) + "]";
+} chain (int wix_f, int wix_e) {
+  if((import nkind)[wix_x] == "fld") {
+    wix_out = wsc_show(wix_f, wix_b) + "." + (import ns1)[wix_x];
+  }
+} return string wix_out;
+given wsc_world ((import wx_fget), (import wx_idx)):("st[a]")
+given wsc_world ((import wx_fget), (import wx_fld)):("st.len")
+
+wsc_args(int wag_f, int[] wag_l) {
+  string wag_out = "";
+  int wag_i = 0;
+  while(wag_i < len(wag_l)) {
+    wag_out = wag_out + sep_at(", ", wag_i) + wsc_show(wag_f, wag_l[wag_i]);
+    wag_i = wag_i + 1;
+  }
+} return string wag_out;
+given wsc_world ((import wx_fadd), (import wx_l1)):("(a + b), ((a + b) * 2)")
+given wsc_world ((import wx_fget), (import wx_l0)):("")

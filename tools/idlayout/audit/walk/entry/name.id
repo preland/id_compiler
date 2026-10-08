@@ -13,7 +13,7 @@ lay_last_slash(string path) {
 lay_basename(string path) {
   int i = lay_last_slash(path);
   int n = len(path);
-  string name = str_slice(path, i + 1, n - i - 1);
+  string name = str_sub(path, i + 1, n - i - 1);
 } return string name;
 ("a/b"):("b")
 ("abc"):("abc")

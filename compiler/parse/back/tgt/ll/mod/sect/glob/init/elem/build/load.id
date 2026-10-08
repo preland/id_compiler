@@ -12,8 +12,8 @@ ll_cell_load(int i, int j, int e) {
   string name = (import ns1)[e];
   string t = (import ns1)[(const_decl(name))];
 } chain (int i, int j, int e) {
-  emit_line("  %l" + i + "." + j + " = load " + ll_ty(t) + ", ptr @" + name);
-  emit_line("  " + nm + " = " + ll_cell_conv(t, "%l" + i + "." + j));
+  print("  %l" + i + "." + j + " = load " + ll_ty(t) + ", ptr @" + name);
+  print("  " + nm + " = " + ll_cell_conv(t, "%l" + i + "." + j));
 } return string nm;
 given llim_setup (0, 1, (import llim_e)):("%s0.1") then prints:("  %l0.1 = load i32, ptr @b\n  %s0.1 = sext i32 %l0.1 to i64\n")
 given llim_setup (2, 0, (import llim_a)):("%s2.0") then prints:("  %l2.0 = load ptr, ptr @a\n  %s2.0 = ptrtoint ptr %l2.0 to i64\n")

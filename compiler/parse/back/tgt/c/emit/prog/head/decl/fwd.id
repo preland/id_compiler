@@ -1,11 +1,11 @@
 // The forward-declaration section header and the blank line after it.
 
 emit_fwds() {
-  emit_line("/* forward declarations */");
+  print("/* forward declarations */");
   fwd_all();
   fwd_adopts();
 } chain () {
-  emit_line("");
+  print("");
 } return void;
 given nz_prog_fixture ():() then prints:("/* forward declarations */\nint id_main(int argc);\nvoid id_run(void);\n\n")
 given nz_prog_nomain_fixture ():() then prints:("/* forward declarations */\nvoid id_run(void);\n\n")
@@ -29,7 +29,7 @@ given ll_natives_fixture2 ():() then prints:("")
 fwd_adopt_one(int id) {
   string rt = (import ns2)[id];
   if(is_native(id) == 1 && (ty_is_list(rt) == 1 || ty_kind_is(rt, "struct") == 1)) {
-    emit_line("#define id_" + (import ns1)[id] + "(...) id_list_adopt(id_" + (import ns1)[id] + "(__VA_ARGS__))");
+    print("#define id_" + (import ns1)[id] + "(...) id_list_adopt(id_" + (import ns1)[id] + "(__VA_ARGS__))");
   }
 } return void;
 given lw_nl_fixture (1):() then prints:("#define id_nat(...) id_list_adopt(id_nat(__VA_ARGS__))\n")

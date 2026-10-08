@@ -1,0 +1,13 @@
+// The literals a check is called with, `then CHECK(LIT, ...):(value)`: the
+// tuple after the check's name when one opens before the `:`, none otherwise.
+// A check with no parameters is written `then CHECK:(value)`, and `then CHECK():(value)`
+// is the same with the parentheses spelled out (push.id).
+
+then_args(int[] pos) {
+  int[] targs = [];
+  if(cur_text(pos) == "(") {
+    targs = case_tuple(pos);
+  }
+} return int[] targs;
+given toks_fn(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0]):([])
+given toks_fn(["op", "int", "op", "op"], ["(", "5", ")", ":"]) ([0]):([4])

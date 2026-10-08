@@ -3,7 +3,7 @@
 // the piece, depth].
 
 jg_piece(string jg_s, int jg_lo, int jg_hi) {
-  string jg_mid = str_slice(jg_s, jg_lo, jg_hi - jg_lo);
+  string jg_mid = str_sub(jg_s, jg_lo, jg_hi - jg_lo);
   string jg_tr = str_trim(jg_mid);
 } return string jg_tr;
 ("a, b ", 2, 5):("b")

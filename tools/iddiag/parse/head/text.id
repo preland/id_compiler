@@ -8,7 +8,7 @@ dg_rest(string dg_rh) {
 } chain (string dg_rh) {
   int dg_rb = dg_rp + 4 + len(dg_rs);
   if(dg_rp >= 0) {
-    dg_rr = str_slice(dg_rh, dg_rb, len(dg_rh) - dg_rb);
+    dg_rr = str_sub(dg_rh, dg_rb, len(dg_rh) - dg_rb);
   }
 } return string dg_rr;
 ("a.id:1: error: x y [E0001]"):("x y [E0001]")
@@ -23,7 +23,7 @@ dg_code(string dg_ch) {
   string dg_cc = "";
 } chain (string dg_ch) {
   if(dg_cn >= 8 && str_eqat(dg_cr, dg_cn - 8, " [") == 1 && charat(dg_cr, dg_cn - 1) == 93 && chr_in(charat(dg_cr, dg_cn - 6), 65, 90) == 1) {
-    dg_cc = str_slice(dg_cr, dg_cn - 6, 5);
+    dg_cc = str_sub(dg_cr, dg_cn - 6, 5);
   }
 } return string dg_cc;
 ("a.id:1: error: bad [E0012]"):("E0012")
@@ -38,7 +38,7 @@ dg_msg(string dg_mh) {
   string dg_mt = dg_mr;
 } chain (string dg_mh) {
   if(dg_mc != "") {
-    dg_mt = str_slice(dg_mr, 0, len(dg_mr) - 8);
+    dg_mt = str_sub(dg_mr, 0, len(dg_mr) - 8);
   }
 } return string dg_mt;
 ("a.id:1: error: bad thing [E0123]"):("bad thing")

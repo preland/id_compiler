@@ -23,7 +23,7 @@ given notes_setup (2, ["prog", "--untested"]):() then prints:("x.id:1: note: exe
 
 emit_notes() {
   if(len((import utnote)) > 0) {
-    emit_line("/* ---- notes ---- */");
+    print("/* ---- notes ---- */");
     print_notes();
   }
 } return void;

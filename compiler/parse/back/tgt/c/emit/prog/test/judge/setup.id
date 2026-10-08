@@ -3,9 +3,9 @@
 // function's cases, and the C function that runs it.
 
 emit_tc_setup() {
-  emit_line("static void idtc_setup(void) {");
+  print("static void idtc_setup(void) {");
   setup_rows();
-  emit_line("}");
+  print("}");
 } return void;
 given wrap_fixture ():() then prints:("static void idtc_setup(void) {\n    idtc_where[0] = \":4\"; idtc_call[0] = \"fx_target(0)\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n}\n")
 given case_fidx_fixture ():() then prints:("static void idtc_setup(void) {\n    idtc_where[0] = \"fixture.id:4\"; idtc_call[0] = \"fx_target()\"; idtc_fn[0] = \"fx_target\"; idtc_fidx[0] = 0; idtc_case[0] = idtc_case_0;\n    idtc_in[0] = \"\";\n    idtc_traps[0] = NULL;\n}\n")

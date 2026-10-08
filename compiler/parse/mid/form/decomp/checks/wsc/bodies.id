@@ -1,0 +1,50 @@
+// Built through node_func and friends rather than parsed, like imd_pair_base
+// (../impdup/entry.id): a program with these shapes is legal, but the case needs
+// the node ids. The shared parameters and variables are a (id 'int'), b, and the
+// literal 2; then `wsget(word[] st, int a) { word v = st[a]; } return word v;`
+// and `wsadd(int a, int b) { int s = a + b; int t = s * 2; } return int t;`.
+wsc_base() {
+  env_init();
+  export int wx_pa = node_param("param", "int", "a");
+  export int wx_pb = node_param("param", "int", "b");
+} chain () {
+  export int wx_va = node_txt("var", "a");
+  export int wx_vb = node_txt("var", "b");
+  export int wx_two = node_txt2("int", "2", 2, 0);
+} return void;
+():() then calls env_init:[1]
+():() then init_units:(0)
+
+wsc_get() {
+  wsc_base();
+  export int wx_pst = node_param("param", "word[]", "st");
+  export int wx_vst = node_txt("var", "st");
+} chain () {
+  export int wx_idx = node_index((import wx_vst), (import wx_va));
+  export int wx_dv = node_decl("word", "v", (import wx_idx), 0);
+  export int wx_rv = node_txt("var", "v");
+} chain () {
+  export int[] wx_gp = [(import wx_pst), (import wx_pa)];
+  export int[] wx_gb = [(import wx_dv)];
+  export int wx_fget = node_func("wsget", "word", (import wx_gp), (import wx_gb), (import wx_rv));
+} return void;
+():() then calls wsc_base:[1]
+():() then init_units:(0)
+
+wsc_add() {
+  wsc_get();
+  export int wx_sum = node_txt2("bin", "+", (import wx_va), (import wx_vb));
+  export int wx_ds = node_decl("int", "s", (import wx_sum), 0);
+} chain () {
+  export int wx_vs = node_txt("var", "s");
+  export int wx_mul = node_txt2("bin", "*", (import wx_vs), (import wx_two));
+  export int wx_dt = node_decl("int", "t", (import wx_mul), 0);
+} chain () {
+  export int wx_vt = node_txt("var", "t");
+  export int[] wx_ap = [(import wx_pa), (import wx_pb)];
+  export int[] wx_ab = [(import wx_ds), (import wx_dt)];
+} chain () {
+  export int wx_fadd = node_func("wsadd", "int", (import wx_ap), (import wx_ab), (import wx_vt));
+} return void;
+():() then calls wsc_get:[1]
+():() then init_units:(0)

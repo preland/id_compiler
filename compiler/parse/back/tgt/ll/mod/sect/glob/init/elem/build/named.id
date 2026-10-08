@@ -5,7 +5,7 @@
 ll_cell_named(int i, int j, int e, string t) {
   string nm = "%s" + i + "." + j;
   string insn = ll_cell_line(i, j, e, t);
-  emit_line("  " + nm + " = " + insn);
+  print("  " + nm + " = " + insn);
 } return string nm;
 given llc_str_setup (0, 3, (import llc_str_e), "string"):("%s0.3")
 given llc_float_setup (0, 1, (import llc_float_e), "float"):("%s0.1")
@@ -24,8 +24,8 @@ given llc_float_setup (0, 1, (import llc_negf_e), "float"):("call i64 @id_box_f(
 // is a constant of, then locked (glob/init/each.id's ll_init_build), so a
 // mutation through it traps from here on (docs/SPEC.md 8).
 ll_init_store(int i) {
-  emit_line("  store ptr %c" + i + ", ptr @" + (import enames)[i]);
-  emit_line("  call void @id_list_lock(ptr %c" + i + ")");
+  print("  store ptr %c" + i + ", ptr @" + (import enames)[i]);
+  print("  call void @id_list_lock(ptr %c" + i + ")");
 } return void;
 given lc_dce_setup (0):() then prints:("  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n")
 given lc_dce_setup (1):() then prints:("  store ptr %c1, ptr @b\n  call void @id_list_lock(ptr %c1)\n")

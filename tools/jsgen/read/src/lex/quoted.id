@@ -11,7 +11,7 @@ jg_str_end(string jg_t, int jg_i) {
 ("abc", 0):(3)
 
 jg_line(string jg_t, int jg_k) {
-  string jg_head = str_slice(jg_t, 0, jg_k);
+  string jg_head = str_sub(jg_t, 0, jg_k);
   string[] jg_ls = str_split(jg_head, "\n");
   int jg_n = len(jg_ls);
 } return int jg_n;

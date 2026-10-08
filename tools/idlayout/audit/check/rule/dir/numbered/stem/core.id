@@ -40,7 +40,7 @@ lay_stem_base(string stem) {
   int start = lay_suffix_start(stem);
   string base = stem;
   if(start > 0) {
-    base = str_slice(stem, 0, start);
+    base = str_sub(stem, 0, start);
   }
 } return string base;
 ("chunk2"):("chunk")

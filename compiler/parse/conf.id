@@ -62,6 +62,10 @@ string imdd_help = "replace the import with a parameter, call that one function 
 // literals, mid/form/unique/scan/more/report/lit.id); its help names the two
 // functions, so it is built where it is reported.
 string litd_why = "two functions that differ only in the values of their literals are one function written twice; the values are all that varies, so they belong in parameters";
+// The why of E0408 (a function that is one operation on its inputs, mid/form/decomp/
+// checks/wsc/report.id); its help names the expression, so it is built where it is
+// reported.
+string wsc_why = "a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more";
 // The why and help lines of E0303 for a variable the standard library also
 // declares (mid/names/symbols/check/conflict/more/core/ext/check/pass/var/).
 string svd_why = "a name must keep one type across the whole program, the standard library included, so that one name always means one kind of value wherever it appears";
@@ -104,7 +108,7 @@ string[] llrel_k = ["<", ">", "<="];
 string[] llrel_v = ["lt", "gt", "le"];
 // The C text the compiler prints for the runtime and for the test harness. Each
 // is a constant, so it is one here and the code that prints it passes it to
-// emit_line (or print) -- not a function of its own per text, which is the same
+// print -- not a function of its own per text, which is the same
 // function written once per constant (docs/ERRORS.md, E0407).
 // c_prelude_text: the C runtime prelude, printed verbatim so every target that
 // splices C into one translation unit gets the same runtime. Source of truth:

@@ -1,0 +1,34 @@
+// The two further questions of a hit, asked only of a function whose shape
+// already fits, because the fixture question (./fixture.id) walks every node of
+// the program.
+
+wsc_judge(int wju_f) {
+  if(wsc_hit(wju_f, 1, 0) == 1) {
+    wsc_late(wju_f);
+  }
+} return void;
+given wsc_pair ((import wx_fput)):() then (import chkfail)[0]:(1)
+given wsc_pair ((import wx_fadd)):() then (import chkfail)[0]:(0)
+
+wsc_late(int wla_f) {
+  if(fwd_used_as_value((import ns1)[wla_f]) == 0 && wsc_cvalue((import ns1)[wla_f]) == 0 && wsc_fixture(wla_f, 6) == 0) {
+    wsc_report(wla_f);
+  }
+} return void;
+given wsc_pair ((import wx_fput)):() then (import chkfail)[0]:(1)
+given wsc_pair ((import wx_fget)):() then (import chkfail)[0]:(0)
+given wsc_pair given lst_str_extend((import casegiven), ["wsput"]) ((import wx_fput)):() then (import chkfail)[0]:(0)
+given wsc_pair given wsc_valcase ((import wx_fput)):() then (import chkfail)[0]:(0)
+
+wsc_caller_ok(int wco_f, int wco_g, int wco_d) {
+  int wco_ok = 0;
+  if(wco_g == wco_f) {
+    wco_ok = 1;
+  } else if(wco_g >= 0) {
+    wco_ok = wsc_fixture(wco_g, wco_d - 1);
+  }
+} return int wco_ok;
+given wsc_marks ((import wx_ffoo), (import wx_ffoo), 3):(1)
+given wsc_marks ((import wx_ffoo), -1, 3):(0)
+given wsc_marks ((import wx_ffoo), (import wx_fget), 3):(1)
+given wsc_marks ((import wx_ffoo), (import wx_fdead), 3):(0)

@@ -2,7 +2,7 @@
 // sum, difference or product, its operator and how many operands it joins.
 
 gt_tail(string gt_tok) {
-  string gt_rest = str_slice(gt_tok, 2, len(gt_tok) - 2);
+  string gt_rest = str_sub(gt_tok, 2, len(gt_tok) - 2);
 } return string gt_rest;
 ("v:lan"):("lan")
 ("-:12"):("12")
@@ -17,7 +17,7 @@ gt_arity(string gt_tok) {
 ("*:12"):(12)
 
 gt_op(string gt_tok) {
-  string gt_sym = str_slice(gt_tok, 0, 1);
+  string gt_sym = str_sub(gt_tok, 0, 1);
 } return string gt_sym;
 ("+:2"):("+")
 ("-:3"):("-")

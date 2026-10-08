@@ -1,0 +1,58 @@
+// The weight of an expression: its operations, with each local substituted by
+// its initialiser, plus 1000 for every local the substitution went through, plus
+// 1000000 for every literal. The three numbers travel in one int so the walk is
+// one recursion; ./fit.id takes them apart (weight % 1000 operations, weight /
+// 1000 % 1000 locals reached, weight / 1000000 literals). A parameter, an
+// `(import NAME)` and a field name weigh 0; any other node weighs 1 plus its
+// children, a call and a list literal through their argument lists, an operator
+// and an index through their two operands.
+
+wsc_ops(int wop_f, int wop_e) {
+  string wop_k = (import nkind)[wop_e];
+  int wop_w = 1 + wsc_total(wop_f, (import nl1)[wop_e]);
+  if(wop_k == "import" || wop_k == "fld") {
+    wop_w = 0;
+  }
+} chain (int wop_f, int wop_e) {
+  if(wop_k == "int" || wop_k == "float" || wop_k == "str") {
+    wop_w = 1000000;
+  }
+  if(wop_k == "var") {
+    wop_w = wsc_wvar(wop_f, wop_e);
+  }
+  if(wop_k == "bin" || wop_k == "index") {
+    wop_w = 1 + wsc_ops(wop_f, (import ni1)[wop_e]) + wsc_ops(wop_f, (import ni2)[wop_e]);
+  }
+} chain (int wop_f, int wop_e) {
+  if(wop_k == "un") {
+    wop_w = 1 + wsc_ops(wop_f, (import ni1)[wop_e]);
+  }
+} return int wop_w;
+given wsc_world ((import wx_fget), (import wx_va)):(0)
+given wsc_world ((import wx_fget), (import wx_rv)):(1001)
+given wsc_world ((import wx_fadd), (import wx_vt)):(1002002)
+given wsc_world ((import wx_fget), (import wx_neg)):(1)
+given wsc_world ((import wx_fget), (import wx_foo2)):(2)
+given wsc_world ((import wx_fget), (import wx_arr)):(1000001)
+given wsc_world ((import wx_fget), (import wx_str)):(1000000)
+
+wsc_wvar(int wwv_f, int wwv_e) {
+  int wwv_i = wsc_local(wwv_f, (import ns1)[wwv_e]);
+  int wwv_w = 0;
+  if(wwv_i >= 0) {
+    wwv_w = 1000 + wsc_ops(wwv_f, wwv_i);
+  }
+} return int wwv_w;
+given wsc_world ((import wx_fget), (import wx_rv)):(1001)
+given wsc_world ((import wx_fget), (import wx_vst)):(0)
+
+wsc_total(int wto_f, int[] wto_l) {
+  int wto_w = 0;
+  int wto_i = 0;
+  while(wto_i < len(wto_l)) {
+    wto_w = wto_w + wsc_ops(wto_f, wto_l[wto_i]);
+    wto_i = wto_i + 1;
+  }
+} return int wto_w;
+given wsc_world ((import wx_fadd), (import wx_l1)):(1001003)
+given wsc_world ((import wx_fadd), (import wx_l0)):(0)

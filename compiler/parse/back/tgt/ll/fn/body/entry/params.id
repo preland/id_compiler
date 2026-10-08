@@ -13,7 +13,7 @@ given ll_main_fixture (0):("i32 %v0, i64 %v1")
 given ir_rows (0):("")
 
 ll_block(int b) {
-  emit_line("b" + b + ":");
+  print("b" + b + ":");
   int i = 0;
   while(i < len(((import binsn)[b]))) {
     int[] ins = (import binsn)[b];

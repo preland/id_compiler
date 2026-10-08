@@ -1,0 +1,9 @@
+// EXPECT: needs a 'given': an export has no value in a case until a setup has run
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+
+elem(int[] b, int k) {
+  int v = b[k];
+} return int v;
+([4, 5], 1):(5) then elem((import buf), 0):(0)

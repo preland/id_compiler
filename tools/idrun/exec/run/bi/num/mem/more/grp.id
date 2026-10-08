@@ -1,52 +1,47 @@
-vm_b_poke64(word wa, word wb) {
-  poke64(wa, wb);
-} return void;
-given tf_mem8(0) ((import tf_addr), 99):() then tf_pk:(99)
-given tf_mem8(-1) ((import tf_addr), -5):() then tf_pk:(-5)
-
-// The store helpers, by id.
+// The store helpers, by id. The flat store: the program's alloc, peek and poke go straight to the
+// host's, so its addresses, sizes and out-of-range trap are the host's.
 vm_bm(int id, word wa, word wb, word wc) {
   word wr = 0;
   if (id == (import b_mem_alloc)) {
-    wr = vm_b_alloc(wa);
+    wr = alloc(wa);
     return wr;
   }
   if (id == (import b_mem_size)) {
-    wr = vm_b_store_size();
+    wr = store_size();
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_peek8)) {
-    wr = vm_b_peek8(wa);
+    wr = peek8(wa);
     return wr;
   }
   if (id == (import b_peek16)) {
-    wr = vm_b_peek16(wa);
+    wr = peek16(wa);
     return wr;
   }
   if (id == (import b_peek32)) {
-    wr = vm_b_peek32(wa);
+    wr = peek32(wa);
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_peek64)) {
-    wr = vm_b_peek64(wa);
+    wr = peek64(wa);
     return wr;
   }
   if (id == (import b_poke8)) {
-    vm_b_poke8(wa, wb);
+    poke8(wa, wb);
     return wr;
   }
   if (id == (import b_poke16)) {
-    vm_b_poke16(wa, wb);
+    poke16(wa, wb);
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_poke32)) {
-    vm_b_poke32(wa, wb);
+    poke32(wa, wb);
     return wr;
   }
-  vm_b_poke64(wa, wb);
+  poke64(wa, wb);
 } return word wr;
 (36, 8, 0, 0):(8)
 (37, 0, 0, 0):(1)
@@ -54,6 +49,20 @@ given tf_mem8(578437695752307201) (39, (import tf_addr), 0, 0):(513)
 given tf_mem8(578437695752307201) (41, (import tf_addr), 0, 0):(578437695752307201)
 given tf_mem8(0) (42, (import tf_addr), 513, 0):(0) then tf_pk:(1)
 given tf_mem8(0) (45, (import tf_addr), 77, 0):(0) then tf_pk:(77)
+(36, 24, 0, 0):(8)
+given tf_mem("abc") (37, 0, 0, 0):(12)
+given tf_mem8(578437695752307201) (38, (import tf_addr), 0, 0):(1)
+given tf_mem8(-1) (38, (import tf_addr), 0, 0):(255)
+given tf_mem8(-1) (39, (import tf_addr), 0, 0):(65535)
+given tf_mem8(578437695752307201) (40, (import tf_addr), 0, 0):(67305985)
+given tf_mem8(-1) (40, (import tf_addr), 0, 0):(4294967295)
+given tf_mem8(-1) (41, (import tf_addr), 0, 0):(-1)
+given tf_mem8(-1) (42, (import tf_addr), 0, 0):(0) then tf_pk:(-256)
+given tf_mem8(-1) (43, (import tf_addr), 0, 0):(0) then tf_pk:(-65536)
+given tf_mem8(0) (43, (import tf_addr), 65537, 0):(0) then tf_pk:(1)
+given tf_mem8(-1) (44, (import tf_addr), 0, 0):(0) then tf_pk:(-4294967296)
+given tf_mem8(0) (44, (import tf_addr), 4294967299, 0):(0) then tf_pk:(3)
+given tf_mem8(-1) (45, (import tf_addr), -5, 0):(0) then tf_pk:(-5)
 
 // The sign-extending and zero-extending peeks, and fail: ids 46 to 52.
 vm_bn(int id, word wa, word wb, word wc) {

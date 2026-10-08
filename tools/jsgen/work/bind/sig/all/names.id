@@ -10,7 +10,7 @@ jg_wanted(string jg_ex) {
 ("id_str_of_cstr"):(0)
 
 jg_fn_of(string jg_ex) {
-  string jg_fn = str_slice(jg_ex, 3, len(jg_ex) - 3);
+  string jg_fn = str_sub(jg_ex, 3, len(jg_ex) - 3);
 } return string jg_fn;
 ("id_twice"):("twice")
 ("id_a"):("a")

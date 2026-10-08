@@ -1,23 +1,29 @@
 // A check's value, and the check recorded. then_store's leading `kind` is
 // "then" here and a different node kind for the other `then`-family clauses
 // (more/print/store.id), which share this same storage.
+//
+// `then CHECK(LIT, ...):(value)` calls the check with literals, as
+// `given SETUP(LIT, ...)` does a setup (given/elem/more/args.id). They are
+// kept in the node's second child list, which a plain check leaves empty;
+// whether there is one per parameter is the checker's to say
+// (mid/names/limits/shape/cases/given/then/check/sig.id), not the parse's.
 
 then_value(int[] pos, string chk_nm) {
+  int[] targs = then_args(pos);
   eat_colon(pos);
-  int[] items = case_tuple(pos);
-  then_push(chk_nm, items);
+  then_push(chk_nm, case_tuple(pos), targs);
 } return void;
 given fnrhs_fix ([0], "chk"):()
 given fnrhs_fix ([0], "other"):()
+given toks_fn(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], "chk"):() then calls then_push:("chk", [4], [])
+given toks_fn(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]) ([0], "chk"):() then calls then_push:("chk", [5], [4])
 
-// The case being parsed is the last one whose start has been recorded.
-then_push(string chk_nm, int[] items) {
+then_push(string chk_nm, int[] items, int[] targs) {
   int n = len((import casestart));
-  int[] no_items = [];
-  then_store("then", chk_nm, items, n - 1, no_items);
+  then_store("then", chk_nm, items, n - 1, targs);
 } return void;
-given fn_fixture ("chk", []):()
-given fn_fixture ("chk", [1]):()
+given fn_fixture ("chk", [], []):()
+given fn_fixture ("chk", [1], [2]):()
 
 then_store(string kind, string chk_nm, int[] items, int ci, int[] no_items) {
   int node = newnode(kind, ci, 0, chk_nm, "", items, no_items);

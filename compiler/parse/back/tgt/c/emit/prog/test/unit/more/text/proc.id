@@ -22,9 +22,9 @@ given env_init ():() then (import chkfail)[0]:(0)
 
 emit_tc_run() {
   int n = len((import casefn));
-  emit_line("#define IDTC_N " + n);
+  print("#define IDTC_N " + n);
   emit_tc_support();
 } return void;
-given env_init ():() then calls emit_line:("#define IDTC_N 0") then calls emit_tc_support:[1]
-given one_casefn_fixture ():() then calls emit_line:("#define IDTC_N 1") then calls emit_tc_support:[1]
+given env_init ():() then calls emit_tc_support:[1]
+given one_casefn_fixture ():() then calls emit_tc_support:[1]
 

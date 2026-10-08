@@ -1,0 +1,9 @@
+// EXPECT: this case gives a string where a int is required
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+
+elem(int[] b, int k) {
+  int v = b[k];
+} return int v;
+given mk ([4, 5], 1):(5) then elem((import buf), "x"):(0)

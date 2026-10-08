@@ -5,10 +5,10 @@ ll_func(int f) {
   string name = (import fnname)[f];
 } chain (int f) {
   string plist = ll_pstr(f);
-  emit_line("define " + ty + " @id_" + name + "(" + plist + ") {");
+  print("define " + ty + " @id_" + name + "(" + plist + ") {");
   ll_blocks(f);
 } chain (int f) {
-  emit_line("}");
+  print("}");
 } return void;
 given ll_blk_fixture (0):() then prints:("define i32 @id_g() {\nb0:\n  %v2 = add i32 5, 5\n}\n")
 given ir_rows (1):() then prints:("define ptr @id_two() {\nb1:\n}\n")

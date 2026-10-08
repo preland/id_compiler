@@ -48,7 +48,7 @@ pl_decl(string[] pl_s, int pl_j) {
     pl_ln = pl_ct + " " + pl_v + " = (" + pl_ct + ")id_store_span(" + pl_p + ", " + pl_lenx(pl_s, pl_pick(pl_s, pl_j)) + ");";
   }
   if (pl_k == 3) {
-    pl_ln = str_slice(pl_ct, 0, len(pl_ct) - 2) + " o" + pl_j + " = 0;\n    " + pl_ct + " " + pl_v + " = &o" + pl_j + ";";
+    pl_ln = str_sub(pl_ct, 0, len(pl_ct) - 2) + " o" + pl_j + " = 0;\n    " + pl_ct + " " + pl_v + " = &o" + pl_j + ";";
   }
 } return string pl_ln;
 (["f|i4|int", "i4|a|unsigned"], 1):("unsigned a1 = (unsigned)p1;")

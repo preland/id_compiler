@@ -6,7 +6,7 @@ dg_key(string dg_kl) {
   int dg_kp = str_find(dg_kl, ": ");
   string dg_kk = "";
   if(str_starts(dg_kl, "  ") == 1 && dg_kp > 2) {
-    dg_kk = str_slice(dg_kl, 2, dg_kp - 2);
+    dg_kk = str_sub(dg_kl, 2, dg_kp - 2);
   }
 } chain (string dg_kl) {
   int dg_ks = str_find(" why help at edit related follows in ", " " + dg_kk + " ");
@@ -24,7 +24,7 @@ dg_key(string dg_kl) {
 dg_kv(string dg_vl) {
   int dg_vp = str_find(dg_vl, ": ");
   int dg_vn = len(dg_vl) - dg_vp - 2;
-  string dg_vr = str_slice(dg_vl, dg_vp + 2, dg_vn);
+  string dg_vr = str_sub(dg_vl, dg_vp + 2, dg_vn);
 } return string dg_vr;
 ("  why: because: yes"):("because: yes")
 ("  at: x"):("x")

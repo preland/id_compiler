@@ -365,6 +365,52 @@ garg_build ga3
     && ok "changing a setup's argument reruns that case and only that one ($(ms_of ga3)ms)" \
     || bad "changing a setup's argument reruns that case and only that one (rc $(rc_of ga3), $(ms_of ga3)ms): $(head -2 "$TMP/ga3.out")"
 
+# The same for the literals a `then` check is called with: they are tokens of
+# the case's line, so changing one reruns that case and only that one. nap(1500)
+# sleeps 1.5 s inside the check of each case.
+GTHEN="$TMP/gthen"; mkdir -p "$GTHEN"
+cat > "$GTHEN/main.id" <<'EOF2'
+nap(int ms) {
+  sleep_ms(ms);
+  int r = 1;
+} return int r;
+(1):(1)
+(2):(1)
+
+work(int a) {
+  int b = a + 1;
+} return int b;
+(1):(2) then nap(1500):(1)
+(2):(3) then nap(1500):(1)
+
+main(int argc, string[] argv) {
+  print("ok");
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF2
+gthen_build() {
+    local name="$1" t0 t1
+    t0=$(ms_now)
+    $BIN_IDC "$GTHEN" -o "$TMP/$name" --no-std >"$TMP/$name.out" 2>&1
+    echo $? > "$TMP/$name.rc"
+    t1=$(ms_now)
+    echo $((t1 - t0)) > "$TMP/$name.ms"
+}
+gthen_build gt1
+[ "$(rc_of gt1)" -eq 0 ] && [ "$(ms_of gt1)" -ge 3000 ] \
+    && ok "setup: two cases each calling a check with an argument run ($(ms_of gt1)ms)" \
+    || bad "setup: two cases each calling a check with an argument run (rc $(rc_of gt1), $(ms_of gt1)ms): $(head -2 "$TMP/gt1.out")"
+gthen_build gt2
+[ "$(rc_of gt2)" -eq 0 ] && [ "$(ms_of gt2)" -lt 1500 ] \
+    && ok "an identical rebuild runs neither case of a check with arguments ($(ms_of gt2)ms)" \
+    || bad "an identical rebuild runs neither case of a check with arguments (rc $(rc_of gt2), $(ms_of gt2)ms)"
+sed -i '0,/then nap(1500)/s//then nap(1501)/' "$GTHEN/main.id"
+gthen_build gt3
+[ "$(rc_of gt3)" -eq 0 ] && [ "$(ms_of gt3)" -ge 1500 ] && [ "$(ms_of gt3)" -lt 3000 ] \
+    && ok "changing a check's argument reruns that case and only that one ($(ms_of gt3)ms)" \
+    || bad "changing a check's argument reruns that case and only that one (rc $(rc_of gt3), $(ms_of gt3)ms): $(head -2 "$TMP/gt3.out")"
+
 # -- per-unit compilation -----------------------------------------------------
 # The C is compiled as translation units cached one by one (bin/idc's
 # unit_build). With IDC_UNIT_FILES=1 each source file is its own unit, so an

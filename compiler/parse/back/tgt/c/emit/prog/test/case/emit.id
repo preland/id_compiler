@@ -24,7 +24,7 @@
 // instead, emitted once here, unconditionally, so IDTC_N and every index
 // into idtc_case still line up whether or not this build excludes anything.
 emit_cases() {
-  emit_line("static int idtc_case_std_skip(int idtc_fd) {\n    long long idtc_cnt[2] = { 0, 0 };\n    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
+  print("static int idtc_case_std_skip(int idtc_fd) {\n    long long idtc_cnt[2] = { 0, 0 };\n    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
   int ci = 0;
   while(ci < len((import casenode))) {
     if(case_is_std(ci) == 0) {
@@ -37,15 +37,15 @@ given void_call_fixture ():() then calls emit_case_fn:(0) then calls emit_case_f
 given casegiven_fixture ():() then calls emit_case_fn:[1]
 
 emit_case_fn(int ci) {
-  emit_line("static int idtc_case_" + ci + "(int idtc_fd) {");
+  print("static int idtc_case_" + ci + "(int idtc_fd) {");
   emit_case_pre(ci);
-  emit_line("    id_ctr_time = 0; id_ctr_mem = 0;");
+  print("    id_ctr_time = 0; id_ctr_mem = 0;");
 } chain (int ci) {
   emit_case_call_wrapped(ci);
-  emit_line("    long long idtc_cnt[2] = { id_ctr_time, id_ctr_mem };");
+  print("    long long idtc_cnt[2] = { id_ctr_time, id_ctr_mem };");
   emit_case_post(ci);
 } chain (int ci) {
-  emit_line("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
+  print("    if (write(idtc_fd, idtc_cnt, sizeof idtc_cnt) != (ssize_t)sizeof idtc_cnt) return 4;\n    return 0;\n}");
 } return void;
 given void_call_fixture (0):() then calls emit_case_pre:(0) then calls emit_case_call_wrapped:(0)
 given void_call_fixture (1):() then calls emit_case_pre:(1) then calls emit_case_call_wrapped:(1)

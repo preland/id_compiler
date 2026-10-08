@@ -35,10 +35,10 @@
 emit_tc_rest() {
   emit_cases();
   emit_tc_setup();
-  emit_line("static int idtc_claims(void) {\n    int bad = 0;");
+  print("static int idtc_claims(void) {\n    int bad = 0;");
 } chain () {
   claim_body();
-  emit_line("    return bad;\n}");
+  print("    return bad;\n}");
   emit_tc_dirs();
 } chain () {
   emit_tc_graph();
@@ -60,21 +60,21 @@ emit_tc_graph() {
     tge = dg_comp_edges();
     tgn = (import dg_ctr)[1];
   }
-  emit_line("static void idtc_graph(void) {\n    static const int cc[] = {");
+  print("static void idtc_graph(void) {\n    static const int cc[] = {");
   int tgi = 0;
 } chain () {
   while(tgi < len(tgc)) {
-    emit_line("    " + tgc[tgi] + ",");
+    print("    " + tgc[tgi] + ",");
     tgi = tgi + 1;
   }
-  emit_line("    -1};\n    static const int ce[] = {");
+  print("    -1};\n    static const int ce[] = {");
   tgi = 0;
 } chain () {
   while(tgi < len(tge)) {
-    emit_line("    " + tge[tgi] + ", " + tge[tgi + 1] + ",");
+    print("    " + tge[tgi] + ", " + tge[tgi + 1] + ",");
     tgi = tgi + 2;
   }
-  emit_line("    -1};\n    idtc_cc = cc;\n    idtc_ce = ce;\n    idtc_nc = " + tgn + ";\n}");
+  print("    -1};\n    idtc_cc = cc;\n    idtc_ce = ce;\n    idtc_nc = " + tgn + ";\n}");
 } return void;
 given dg_t_built ():() then prints:("static void idtc_graph(void) {\n    static const int cc[] = {\n    0,\n    0,\n    1,\n    1,\n    -1};\n    static const int ce[] = {\n    1, 0,\n    1, 0,\n    -1};\n    idtc_cc = cc;\n    idtc_ce = ce;\n    idtc_nc = 3;\n}\n")
 given dg_t_rows ():() then prints:("static void idtc_graph(void) {\n    static const int cc[] = {\n    -1,\n    -1,\n    -1,\n    -1,\n    -1};\n    static const int ce[] = {\n    -1};\n    idtc_cc = cc;\n    idtc_ce = ce;\n    idtc_nc = 0;\n}\n")

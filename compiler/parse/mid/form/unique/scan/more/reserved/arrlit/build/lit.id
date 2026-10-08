@@ -8,7 +8,7 @@
 // a function that hands back a fresh empty list is the "each caller owns
 // what it got" case docs/SPEC.md 7.2 already carves out -- sharing one `[]`
 // from conf.id would give every caller the *same* list, which is a behaviour
-// change, not a rewrite. `new_bucket() { int[] b = []; } return int[] b;`
+// change, not a rewrite. `fresh() { int[] b = []; } return int[] b;`
 // (compiler/parse/mid/names/symbols/lookup/index/hash/bucket.id) is exactly
 // this: every hash bucket has to be its own list.
 cw_arr_lit(int id) {

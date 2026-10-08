@@ -29,7 +29,7 @@ lg_call(string lg_hd, string lg_nm, int lg_rk) {
 lg_short(string lg_lib, string lg_nm) {
   string lg_sh = lg_nm;
   if (str_starts(lg_nm, lg_lib + "_")) {
-    lg_sh = str_slice(lg_nm, len(lg_lib) + 1, len(lg_nm) - len(lg_lib) - 1);
+    lg_sh = str_sub(lg_nm, len(lg_lib) + 1, len(lg_nm) - len(lg_lib) - 1);
   }
 } return string lg_sh;
 ("csv", "csv_rows"):("rows")

@@ -26,7 +26,7 @@ dg_mark_one(string dg_mo_b, string[] dg_mo_roots) {
   if(dg_mo_n > 0) {
     dg_mo_x = dg_extra(dg_mo_b, dg_mo_h, dg_mo_roots);
   }
-  string dg_mo_t = str_slice(dg_mo_b, len(dg_mo_h), len(dg_mo_b) - len(dg_mo_h));
+  string dg_mo_t = str_sub(dg_mo_b, len(dg_mo_h), len(dg_mo_b) - len(dg_mo_h));
 } chain (string dg_mo_b, string[] dg_mo_roots) {
   if(dg_mo_x != "") {
     dg_mo_r = dg_mo_h + dg_mo_x + dg_mo_t;

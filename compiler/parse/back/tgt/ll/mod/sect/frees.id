@@ -15,8 +15,8 @@ given full_env ():() then prints:("")
 ll_free_one(string nm) {
   string dz_d = esc_desc(nm);
   if(esc_dkind(nm) == 3) {
-    emit_line("@idfrd_" + nm + " = private unnamed_addr constant [" + (len(dz_d) + 1) + " x i8] c\"" + dz_d + "\\00\"");
-    emit_line("define void @idfr_" + nm + "(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_" + nm + ")\n  ret void\n}");
+    print("@idfrd_" + nm + " = private unnamed_addr constant [" + (len(dz_d) + 1) + " x i8] c\"" + dz_d + "\\00\"");
+    print("define void @idfr_" + nm + "(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_" + nm + ")\n  ret void\n}");
   }
 } return void;
 given esc_fm_fix ("Tr"):() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")

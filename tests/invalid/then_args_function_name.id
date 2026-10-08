@@ -1,0 +1,9 @@
+// EXPECT: a check's arguments are literals or (import NAME); 'mk' is a function name
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+
+elem(int[] b, int k) {
+  int v = b[k];
+} return int v;
+given mk ([4, 5], 1):(5) then elem((import buf), mk):(0)

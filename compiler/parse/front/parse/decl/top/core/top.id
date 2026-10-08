@@ -16,7 +16,7 @@ given decl_tokens ([0]):() then calls parse_decl_top:[1]
 parse_asm(int[] pos) {
   advance(pos);
   string cur_text_v = cur_text(pos);
-  string unquote_v = str_slice(cur_text_v, 1, len(cur_text_v) - 2);
+  string unquote_v = str_sub(cur_text_v, 1, len(cur_text_v) - 2);
 } chain (int[] pos) {
   push((import aftriple), unquote_v);
   advance(pos);

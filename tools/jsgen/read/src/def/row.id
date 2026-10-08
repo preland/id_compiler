@@ -3,7 +3,7 @@
 // after the body begins.
 
 jg_def_row(string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int jg_r) {
-  string[] jg_ps = jg_params(str_slice(jg_t, jg_k + 1, jg_cl - jg_k - 2));
+  string[] jg_ps = jg_params(str_sub(jg_t, jg_k + 1, jg_cl - jg_k - 2));
   string jg_ret = jg_ret_of(jg_window(jg_t, jg_r));
   string jg_loc = path_base(jg_path) + ":" + jg_line(jg_t, jg_k);
 } chain (string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int jg_r) {
@@ -15,7 +15,7 @@ jg_def_row(string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int j
 
 jg_def_at(string jg_t, string jg_path, int jg_i, int[] jg_st, string[][] jg_defs) {
   int jg_j = jg_ident_end(jg_t, jg_i);
-  string jg_nm = str_slice(jg_t, jg_i, jg_j - jg_i);
+  string jg_nm = str_sub(jg_t, jg_i, jg_j - jg_i);
   int jg_k = jg_skip_hs(jg_t, jg_j);
 } chain (string jg_t, string jg_path, int jg_i, int[] jg_st, string[][] jg_defs) {
   int jg_cl = jg_close_of(jg_t, jg_nm, jg_k);

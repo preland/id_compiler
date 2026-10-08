@@ -23,7 +23,7 @@ ll_str_bytes(string gname, string s) {
 ll_str_emit2(string gname, string s, int blen, int zl) {
   string q = chr(34);
   string bytes = ll_bytes(s);
-  emit_line(gname + ".d = private unnamed_addr constant <{ i64, [" + blen + " x i8] }> <{ i64 " + zl + ", [" + blen + " x i8] c" + q + bytes + q + " }>, align 8\n" + gname + " = private alias i8, getelementptr inbounds (i8, ptr " + gname + ".d, i64 8)");
+  print(gname + ".d = private unnamed_addr constant <{ i64, [" + blen + " x i8] }> <{ i64 " + zl + ", [" + blen + " x i8] c" + q + bytes + q + " }>, align 8\n" + gname + " = private alias i8, getelementptr inbounds (i8, ptr " + gname + ".d, i64 8)");
 } return void;
 ("@.g", "\"\"", 1, 0):() then prints:("@.g.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.g = private alias i8, getelementptr inbounds (i8, ptr @.g.d, i64 8)\n")
 ("@.g2", "\"a\"", 2, 1):() then prints:("@.g2.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.g2 = private alias i8, getelementptr inbounds (i8, ptr @.g2.d, i64 8)\n")

@@ -7,7 +7,7 @@ ty_wrap(string ty_c, int ty_cf) {
     ty_r = "s";
   }
   if (str_starts(ty_r, "PO:") == 1) {
-    ty_r = "H:" + str_slice(ty_r, 3, len(ty_r) - 3);
+    ty_r = "H:" + str_sub(ty_r, 3, len(ty_r) - 3);
   }
 } return string ty_r;
 ("c1", 1):("s")

@@ -4,8 +4,8 @@
 // the class of ms_rn_class.
 ms_dr_cls(string ms_ot) {
   int ms_nl = str_find(ms_ot, "\n");
-  string ms_tx = str_slice(ms_ot, ms_nl + 1, len(ms_ot) - ms_nl - 1);
-  int ms_rc = to_int(str_slice(ms_ot, 0, ms_nl));
+  string ms_tx = str_sub(ms_ot, ms_nl + 1, len(ms_ot) - ms_nl - 1);
+  int ms_rc = to_int(str_sub(ms_ot, 0, ms_nl));
 } chain (string ms_ot) {
   string ms_st = ms_rn_class(ms_tx, ms_rc);
 } return string ms_st;

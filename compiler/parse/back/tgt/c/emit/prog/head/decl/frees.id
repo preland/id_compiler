@@ -16,7 +16,7 @@ given full_env ():() then prints:("")
 
 emit_free_one(string nm) {
   if(esc_dkind(nm) == 3) {
-    emit_line("static void idfr_" + nm + "(IdList* p) { id_free_walk(p, \"" + esc_desc(nm) + "\"); }");
+    print("static void idfr_" + nm + "(IdList* p) { id_free_walk(p, \"" + esc_desc(nm) + "\"); }");
   }
 } return void;
 given esc_fm_fix ("Tr"):() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")

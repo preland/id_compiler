@@ -3,7 +3,7 @@
 size_row(int ci) {
   if(case_claims(ci) > 0) {
     string sz = case_size(ci);
-    emit_line("    idtc_n[" + ci + "] = " + sz + ";");
+    print("    idtc_n[" + ci + "] = " + sz + ";");
   }
 } return void;
 given claim_conscase_fixture (0):() then prints:("    idtc_n[0] = 0;\n")

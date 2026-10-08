@@ -51,7 +51,7 @@ self_refuse() {   # desc, expected message (fixed string), flags...
 
 tf_chunk_0() {
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
@@ -79,27 +79,27 @@ dup_case() { # desc, source, flags...
     fi
 }
 dup_case "an identical case is rejected" 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (1, 2):(3)
 '
 # Compared by tokens, so spacing cannot smuggle a duplicate past the rule.
 dup_case "whitespace does not hide a duplicate" 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1,2):(3)
 (1, 2) : (3)
 '
 # Same case text under two DIFFERENT functions is not a duplicate.
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
 
 mul(int a, int b) {
-  int p = a * b;
+  int p = a * b + 0;
 } return int p;
 (1, 2):(2)
 (0, 0):(0)
@@ -170,7 +170,7 @@ self_refuse "bin/idc: two cases of the same size cannot compare either" \
 # --- malformed cases ---------------------------------------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2)(3)
 (0, 0):(0)
@@ -184,7 +184,7 @@ self_refuse "bin/idc: a case needs the ':' between its two sides" "expected ':'"
 # exit status, and not stdout, which can be the program's C, and it is
 # silent (id has no warnings: something is allowed or it is not).
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 ' > "$TMP/p.id"
 self_refuse "bin/idc: a function with no cases fails a default build" \
@@ -201,7 +201,7 @@ self_refuse "bin/idc: a function with no cases fails a default build" \
     || bad "bin/idc: --allow-untested prints nothing on stdout"
 
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 ' > "$TMP/p.id"
@@ -213,7 +213,7 @@ self_accept "bin/idc: --allow-untested builds a function with one case" --allow-
     || bad "bin/idc: --allow-untested is silent on a one-case build (log: $(tr '\n' '|' < "$TMP/log"))"
 
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(4)
 (0, 0):(0)
@@ -222,7 +222,7 @@ self_refuse "bin/idc: --allow-untested does not turn a failing case into a build
     "p.id:4: test failed: add(1, 2) = 3, expected 4" --allow-untested --emit-c /dev/null
 
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
@@ -234,7 +234,7 @@ printf '%s' 'add(int a, int b) {
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
@@ -252,7 +252,7 @@ self_accept "bin/idc: passing cases build" --allow-untested -o "$TMP/out"
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(4)
 (0, 0):(0)
@@ -300,13 +300,13 @@ grep -qF "locp/lib/dbl.id:5: test failed: dbl(4) = 8, expected 9" "$TMP/locp.log
 # The cases reach the harness and nothing else: the program's C is the same
 # with them and without them, and carries no counter.
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
 ' > "$TMP/p.id"
 printf '%s' 'add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 ' > "$TMP/q.id"
 ../bin/idc "$TMP/p.id" --emit-c "$TMP/with.c" >/dev/null 2>&1
@@ -377,7 +377,7 @@ sed -i 's/"x??)"/"x??>"/' "$TMP/p.id"
 self_accept "bin/idc: a string case holding trigraph sequences passes" --allow-untested --emit-c /dev/null
 cat > "$TMP/p.id" <<'EOF2'
 measure(string s) {
-  int n = len(s);
+  int n = len(s) + 0;
 } return int n;
 ("abcd"):(4)[time:O(n), mem:O(1)]
 ("abcdefgh??/"):(11)[time:O(n), mem:O(1)]
@@ -387,7 +387,7 @@ self_accept "bin/idc: a scaling claim sizes a literal ending in a trigraph by it
 # --- a case that stops on its own is that case failing -----------------------
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b;
+  int q = a / b + 0;
 } return int q;
 (6, 0):(0)
 (6, 3):(2)
@@ -487,7 +487,7 @@ self_refuse "bin/idc: an independent function's cases still run beside a skipped
 # does `given`/`then`/`prints`/`eprints`/`calls`.
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b;
+  int q = a / b + 0;
 } return int q;
 (6, 0):() then traps:("division by zero")
 (6, 3):(2)
@@ -496,7 +496,7 @@ self_accept "bin/idc: a matching 'traps' check builds" --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b;
+  int q = a / b + 0;
 } return int q;
 (6, 0):() then traps:("out of bounds")
 (6, 3):(2)
@@ -506,7 +506,7 @@ self_refuse "bin/idc: a mismatching 'traps' check fails, showing both sides" \
 
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b;
+  int q = a / b + 0;
 } return int q;
 (6, 3):() then traps:("division by zero")
 (6, 2):(3)
@@ -585,7 +585,7 @@ self_refuse "bin/idc: an int export read before its setup fails the case, not re
 # later address if the first case's allocation were still live.
 cat > "$TMP/p.id" <<'EOF'
 first_addr(word n) {
-  word a = alloc(n);
+  word a = alloc(n) + 0;
 } return word a;
 (8):(8)
 (64):(8)
@@ -667,7 +667,7 @@ self_refuse "bin/idc: a claim carried by one case is rejected" \
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)[time:O(n^3)]
 (0, 0):(0)
@@ -676,7 +676,7 @@ self_refuse "bin/idc: an unknown bound is named" "unknown bound 'O(n^3)'" --emit
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)[cpu:O(n)]
 (0, 0):(0)
@@ -686,7 +686,7 @@ self_refuse "bin/idc: an unknown constraint is named" "unknown constraint 'cpu'"
 # --- cases that fit their function -------------------------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (a, 2):(3)
 (0, 0):(0)
@@ -695,7 +695,7 @@ self_refuse "bin/idc: a case argument must be a literal" "a test case takes lite
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1):(3)
 (0, 0):(0)
@@ -705,7 +705,7 @@ self_refuse "bin/idc: a case with the wrong number of arguments is rejected" \
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 ("x", 2):(3)
 (0, 0):(0)
@@ -829,7 +829,7 @@ mk() {
 } return void;
 
 grow(int k) {
-  push((import cnt), k);
+  push((import cnt), k + 0);
 } return void;
 given mk (0):() then len((import cnt)):(3) then len((import tag)):(2)
 given mk (1):() then len((import cnt)):(3)
@@ -858,7 +858,7 @@ book_grow(Book b, int n) {
 } return void;
 
 book_add(int n) {
-  book_grow((import bk), n);
+  book_grow((import bk), n + 0);
 } return void;
 given book_open (1):() then (import bk).pages.count:(3) then len((import bk).pages.starts):(3)
 given book_open (2):() then (import bk).pages.starts[2]:(2) then (import bk).title:("t") then (import bk).pages.starts:([0, 0, 2])
@@ -911,7 +911,7 @@ pt_set(Pt q, int d) {
 } return void;
 
 pt_move(int d) {
-  pt_set((import pt), d);
+  pt_set((import pt), d + 0);
 } return void;
 given pt_open (1):() then (import pt).y:(2)
 given pt_open (2):() then (import pt).x:(3)
@@ -1156,7 +1156,7 @@ given st (1):(2) then st:(1)
 (0):(1)
 EOF
 self_refuse "bin/idc: a check that returns void is rejected" \
-    "p.id:8: error: 'then' names 'st', which returns void; a check takes none and returns the value it compares" --emit-c /dev/null
+    "p.id:8: error: 'then' names 'st', which returns void; a check returns the value it compares" --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 st() {
@@ -1550,10 +1550,121 @@ given fill(20000)(200):(201)[time:O(1)]
 EOS
 self_accept "bin/idc: a parameterised setup's work is not counted against a constraint, and its spacing decides nothing" --allow-untested --emit-c /dev/null
 
+# --- parameterised checks: then NAME(LIT, ...):(VALUE) -------------------------
+cat > "$TMP/p.id" <<'EOS'
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():()
+():() then prints:("")
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+([0, 0], 1, 7):([0, 8], 1, 7)
+([0, 0], 0, 1):([2, 0], 0, 1)
+
+elem(int[] b, int k) {
+  int v = b[k];
+} return int v;
+([4, 5], 1):(5)
+([4, 5], 0):(4)
+given mk given bump((import buf), 0, 4) ((import buf), 1):(0) then elem((import buf), 0):(5) then elem((import buf), 1):(0)
+given mk given bump((import buf), 1, 6) ((import buf), 1):(7) then elem((import buf), 1):(7) then elem([9, 8], 1):(8)
+EOS
+self_accept "bin/idc: a check is called with literals and with an export the call left, in the order written" --emit-c /dev/null
+self_accept "bin/idc: a parameterised check is run on the llvm target too" --emit-llvm /dev/null
+
+sed -i 's/then elem((import buf), 0):(5)/then elem((import buf), 0):(6)/' "$TMP/p.id"
+self_refuse "bin/idc: a failing parameterised check shows the call with its arguments" \
+    "p.id:18: test failed: elem((import buf), 1) then elem((import buf), 0) = 5, expected 6" --emit-c /dev/null
+
+sed -i 's/then elem((import buf), 0):(6)/then elem((import buf), 0, 1):(5)/' "$TMP/p.id"
+self_refuse "bin/idc: a check passed more literals than it has parameters is refused" \
+    "'then' names 'elem', which takes 2 parameter(s), but this 'then' passes 3" --emit-c /dev/null
+
+sed -i 's/then elem((import buf), 0, 1):(5)/then elem((import buf)):(5)/' "$TMP/p.id"
+self_refuse "bin/idc: a check passed fewer literals than it has parameters is refused" \
+    "'then' names 'elem', which takes 2 parameter(s), but this 'then' passes 1" --emit-c /dev/null
+
+sed -i 's/then elem((import buf)):(5)/then elem((import buf), "x"):(5)/' "$TMP/p.id"
+self_refuse "bin/idc: a check's literal is held to the parameter's type" \
+    "p.id:18: error: this case gives a string where a int is required" --emit-c /dev/null
+
+sed -i 's/then elem((import buf), "x"):(5)/then elem((import buf), bump):(5)/' "$TMP/p.id"
+self_refuse "bin/idc: a check's literal may not be a function's name" \
+    "a check's arguments are literals or (import NAME); 'bump' is a function name" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+mk() {
+  export int[] buf = [0, 0];
+} return void;
+():()
+():() then prints:("")
+
+bump(int[] b, int k, int v) {
+  b[k] = v + 1;
+} return void;
+([0, 0], 1, 7):([0, 8], 1, 7)
+([0, 0], 0, 1):([2, 0], 0, 1)
+
+elem(int[] b, int k) {
+  int v = b[k];
+} return int v;
+([4, 5], 1):(5)
+([4, 5], 0):(4)
+given bump((import buf), 0, 4) ((import buf), 1):(0) then elem((import buf), 0):(5)
+EOS
+self_refuse "bin/idc: a check's (import NAME) needs a 'given' that sets it, as an expected value does" \
+    "needs a 'given': an export has no value in a case until a setup has run" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+mk() {
+  export int[] buf = [5, 6];
+} return void;
+():()
+():() then prints:("")
+
+first() {
+  int n = (import buf)[0];
+} return int n;
+given mk ():(5)
+given mk ():(5) then prints:("")
+
+inc(int a) {
+  int b = a + 1;
+} return int b;
+given mk (1):(2) then first():(5)
+given mk (2):(3) then first:(5)
+EOS
+self_accept "bin/idc: then NAME():(VALUE) is a check with no parameters, as then NAME:(VALUE) is" --emit-c /dev/null
+sed -i 's/then first():(5)/then first():(6)/' "$TMP/p.id"
+self_refuse "bin/idc: a check written with empty parentheses fails like one written without" \
+    "p.id:16: test failed: inc(1) then first() = 5, expected 6" --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOS'
+cell(int[] xs, int i) {
+  int v = xs[i];
+} return int v;
+([4, 5], 1):(5)
+([4, 5], 0):(4)
+EOS
+self_refuse "bin/idc: E0408 refuses a one-operation function nothing names as a fixture" \
+    "[E0408]" --emit-c /dev/null
+cat >> "$TMP/p.id" <<'EOS'
+
+use(int n) {
+  int m = n + 1;
+} return int m;
+(1):(2) then cell([4, 5], 0):(4)
+(2):(3) then cell([4, 5], 1):(5)
+EOS
+self_accept "bin/idc: a function named in then NAME(LIT, ...) is a fixture, exempt from E0408" --emit-c /dev/null
+
 # --- a build whose cases cannot run here says why ----------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
@@ -1571,7 +1682,7 @@ self_accept "bin/idc: a --freestanding build with passing cases builds its objec
     || bad "bin/idc: the --freestanding object exists after its cases passed"
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(4)
 (0, 0):(0)
@@ -1595,7 +1706,7 @@ asm "x86_64-unknown-none" in8(word p) {
 } return word ret;
 
 port_byte(word p) {
-  word v = in8(p);
+  word v = in8(p) + 0;
 } return word v;
 
 kbd_scan() {
@@ -1604,7 +1715,7 @@ kbd_scan() {
 EOF
 cat > "$TMP/fs/add.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b;
+  int s = a + b + b - b;
 } return int s;
 (1, 2):(3)
 (0, 0):(0)
@@ -1685,7 +1796,7 @@ asm "x86_64-unknown-linux-gnu" dbl(word a) {
 } return word ret;
 
 twice(word a) {
-  word r = dbl(a);
+  word r = dbl(a) + 0;
 } return word r;
 (3):(6)
 (0):(1)
@@ -1864,7 +1975,7 @@ self_accept "bin/idc: a function returning a list literal is not a constant wrap
 
 cat > "$TMP/p.id" <<'EOF'
 twice(int a) {
-  int n = a + a;
+  int n = a * 2;
 } return int n;
 
 main(int argc, string[] argv) {
@@ -1932,7 +2043,7 @@ st() {
 } return void;
 
 apply(func(int) return int f, int x) {
-  int r = f(x);
+  int r = f(x) + 0;
 } return int r;
 given st ((import g), 3):(6)
 given st ((import g), 5):(10)
@@ -1962,6 +2073,7 @@ tock(int n) {
 (4):(4)
 
 run(func(int) return void step, int dt) {
+  int pad = dt;
   step(dt);
 } return void;
 (tick, 5):(tick, 5)
@@ -1969,12 +2081,14 @@ run(func(int) return void step, int dt) {
 EOF
 cat > "$TMP/fp/b.id" <<'EOF'
 pass_tick(int dt) {
+  int pad = dt;
   run(tick, dt);
 } return void;
 (7):(7)
 (8):(8)
 
 pass_tock(int dt) {
+  int pad = dt;
   run(tock, dt);
 } return void;
 (7):(7)
@@ -1991,7 +2105,7 @@ else
     bad "bin/idc: functions differing only in the function they pass are distinct ($(head -1 "$TMP/log"))"
 fi
 ../bin/idc "$TMP/fp" --fingerprints >"$TMP/log" 2>&1
-grep -qF "{e:c(run:fv(tick),v0)}" "$TMP/log" && grep -qF "{e:c(v0:v1)}" "$TMP/log" \
+grep -qF "e:c(run:fv(tick),v0)}" "$TMP/log" && grep -qF "e:c(v0:v1)}" "$TMP/log" \
     && ok "bin/idc: a fingerprint keeps a function value's name and numbers a call through a parameter" \
     || bad "bin/idc: a fingerprint keeps a function value's name and numbers a call through a parameter"
 
@@ -2005,7 +2119,7 @@ twice(int n) {
 (0):(0)
 
 apply(func(int) return int f, int x) {
-  int r = f(x);
+  int r = f(x) + 0;
 } return int r;
 (twice, 3):(6)
 (twice, 5):(10)
@@ -2035,7 +2149,7 @@ shout(string s) {
 ("b"):("b")
 
 apply(func(int) return int f, int x) {
-  int r = f(x);
+  int r = f(x) + 0;
 } return int r;
 (shout, 3):(6)
 (nope, 5):(10)
@@ -2082,7 +2196,7 @@ self_refuse "bin/idc: a case's bind must make the function type the position wan
 # --freestanding has no host to run a harness on and builds through LLVM only.
 cat > "$TMP/p.id" <<'EOF'
 run(func(int) return int step, int dt) {
-  int r = step(dt);
+  int r = step(dt) + 0;
 } return int r;
 
 twice(int n) {
@@ -2090,7 +2204,7 @@ twice(int n) {
 } return int r;
 
 use(int n) {
-  int r = run(twice, n);
+  int r = run(twice, n) + 0;
 } return int r;
 EOF
 self_accept "bin/idc: a --freestanding object passes and calls a function value" --allow-untested --freestanding -o "$TMP/lib.o"
@@ -2617,7 +2731,7 @@ self_unflagged "bin/idc: 'main' is excluded from the forwarder error" \
 # parameter add_one has).
 cat > "$TMP/p.id" <<'EOF'
 real_add(int x, int y) {
-  int r = x + y;
+  int r = x + y + 0;
 } return int r;
 
 add_one(int x) {
@@ -2646,7 +2760,7 @@ fwd_used(int x) {
 EOF
 cat > "$TMP/fwdval/apply.id" <<'EOF'
 apply_fn(func(int) return int f, int x) {
-  int r = f(x);
+  int r = f(x) + 0;
 } return int r;
 
 main(int argc, string[] argv) {
@@ -2834,6 +2948,8 @@ main(int argc, string[] argv) {
 EOF
 self_refuse "bin/idc: a string literal alone is an error too (E0407)" \
     "function 'greet_b' differs from 'greet_a' (defined at " --allow-untested --emit-c /dev/null
+self_refuse "bin/idc: ...and when both are one operation on their inputs, its help says to write the expression at each call site (E0407)" \
+    'are each one operation on their inputs: write `("goodbye, " + name)` at each call site of' --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 scale_a(float x) {
@@ -3217,7 +3333,7 @@ esac
 # The line is skipped and its newline is not, so a diagnostic below it keeps the
 # line number the file shows. Anywhere else a `#!` is an error (tests/invalid/).
 SB="$TMP/sb.id"
-printf '%s\n' '#!/usr/bin/env idrun' 'add(int a, int b) {' '  int s = a + b;' '} return int s;' '(1, 2):(3)' '(0, 0):(0)' > "$SB"
+printf '%s\n' '#!/usr/bin/env idrun' 'add(int a, int b) {' '  int s = a + b + b - b;' '} return int s;' '(1, 2):(3)' '(0, 0):(0)' > "$SB"
 printf '%s\n' 'main(int argc, string[] argv) {' '  print(add(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("2\n")' '(2, ["a", "b"]):(0) then prints:("3\n")' >> "$SB"
 if ../bin/idc "$SB" -o "$TMP/sb.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/sb.bin" x)" = "3" ]; then
     ok "a script with a #! first line builds with every rule and runs"

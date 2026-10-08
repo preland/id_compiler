@@ -11,7 +11,7 @@ sg_stem(string sgs_n) {
   string sgs_r = sgs_n;
 } chain (string sgs_n) {
   if(sgs_i > 1 && sgs_i < len(sgs_n) && charat(sgs_n, sgs_i - 1) == 95) {
-    sgs_r = str_slice(sgs_n, 0, sgs_i - 1);
+    sgs_r = str_sub(sgs_n, 0, sgs_i - 1);
   }
 } return string sgs_r;
 ("tmpguard_12"):("tmpguard")

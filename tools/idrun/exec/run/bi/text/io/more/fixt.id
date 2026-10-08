@@ -9,7 +9,7 @@ given vb_boot (8, 4):() then (import ex_lists):([[], [8, 4, 0]])
 // A wall clock has no literal to compare against, so a case stamps ticks()
 // just before the call under test, and expects the same millisecond back.
 tf_clock() {
-  export int tf_t0 = ticks();
+  export word tf_t0 = ticks();
 } return void;
 ():() then tf_clock_ok:(1)
 ():() then tf_clock_ok:(1) then prints:("")

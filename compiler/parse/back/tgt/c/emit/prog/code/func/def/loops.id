@@ -4,7 +4,7 @@ fwd_all() {
   int i = 0;
   while(i < len((import prog))) {
     string sig_v = sig((import prog)[i]);
-    emit_line(sig_v + ";");
+    print(sig_v + ";");
     i = i + 1;
   }
 } return void;
@@ -30,7 +30,7 @@ emit_def_nl(int id) {
   if(is_native(id) == 0) {
     unit_mark(id);
     emit_def(id);
-    emit_line("");
+    print("");
   }
 } return void;
 given nz_prog_fixture ((import nz_mainfn)):() then prints:("int id_main(int argc) {\n    return 7;\n}\n\n")

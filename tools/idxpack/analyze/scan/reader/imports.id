@@ -32,7 +32,7 @@ scan_imports_in_line(string text_line, string[] out_li) {
     int q = str_findat(text_line, ")", p + 8);
     if(q >= 0) {
       int len_n = q - p - 8;
-      name = str_slice(text_line, p + 8, len_n);
+      name = str_sub(text_line, p + 8, len_n);
     }
   }
 } chain (string text_line, string[] out_li) {
@@ -41,7 +41,7 @@ scan_imports_in_line(string text_line, string[] out_li) {
   }
   if(p >= 0) {
     int rest_n = len(text_line) - p - 8;
-    string rest = str_slice(text_line, p + 8, rest_n);
+    string rest = str_sub(text_line, p + 8, rest_n);
     scan_imports_in_line(rest, out_li);
   }
 } return void;

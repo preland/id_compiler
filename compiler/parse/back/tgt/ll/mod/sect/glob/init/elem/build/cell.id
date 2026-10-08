@@ -19,7 +19,7 @@ given elems3_fixture (0, 0, (import llie_child), "bytes"):() then prints:("")
 
 ll_init_push(int i, int j, int e, string t) {
   string cell = ll_cell(i, j, e, t);
-  emit_line("  call void @id_list_push(ptr %c" + i + ", i64 " + cell + ")");
+  print("  call void @id_list_push(ptr %c" + i + ", i64 " + cell + ")");
 } return void;
 given elems3_fixture (0, 0, (import llie_child), "int"):() then prints:("  call void @id_list_push(ptr %c0, i64 1)\n")
 given elems3_fixture (2, 0, (import llie_child), "int"):() then prints:("  call void @id_list_push(ptr %c2, i64 1)\n")

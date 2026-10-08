@@ -1,17 +1,22 @@
-// A check's signature: no parameters, and a value to compare.
+// A check's signature: a value to compare, and one literal per parameter.
+// `then CHECK(LIT, ...):(value)` is called the way `given SETUP(LIT, ...)`
+// calls a setup (../../setup/args.id), so the count is the same rule with the
+// same words; each literal is then held to its parameter (args.id).
 
 then_sig(int ci, int chk_node, int cfn, string chk_nm) {
-  if(len(((import nl1)[cfn])) != 0) {
+  if((import ns2)[cfn] == "void") {
+    case_err(ci, "'then' names '" + chk_nm + "', which returns void; a check returns the value it compares");
+  } else if(len(((import nl2)[chk_node])) != len(((import nl1)[cfn]))) {
     int np = len(((import nl1)[cfn]));
-    case_err(ci, "'then' names '" + chk_nm + "', which takes " + np + " parameter(s); a check takes none and returns the value it compares");
-  } else if((import ns2)[cfn] == "void") {
-    case_err(ci, "'then' names '" + chk_nm + "', which returns void; a check takes none and returns the value it compares");
+    int na = len(((import nl2)[chk_node]));
+    case_err(ci, "'then' names '" + chk_nm + "', which takes " + np + " parameter(s), but this 'then' passes " + na + "; a check is called with one literal per parameter, as in 'then " + chk_nm + "(1, 2):(value)', and with none as 'then " + chk_nm + ":(value)'");
   } else {
-    then_value_fit(ci, chk_node, cfn);
+    then_args_fit(ci, chk_node, cfn);
   }
 } return void;
 given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn), "chk"):() then prints:("")
-given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_fn), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s); a check takes none and returns the value it compares\n")
+given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn), "fx_target"):() then prints:("")
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_fn), "fx_target"):() then prints:("fixture.id:4: error: 'then' names 'fx_target', which takes 1 parameter(s), but this 'then' passes 0; a check is called with one literal per parameter, as in 'then fx_target(1, 2):(value)', and with none as 'then fx_target:(value)'\n")
 
 // The third step of the dup-case-detection fixture (more/dup/), filed here
 // because more/dup/ itself and every directory above it were at the since-dropped 3-entry

@@ -22,7 +22,7 @@
 
 emit_count(string ind) {
   if((import harn)[0] == 1) {
-    emit_line(ind + "id_ctr_time++;");
+    print(ind + "id_ctr_time++;");
   }
 } return void;
 given harn_init (" "):() then prints:("")

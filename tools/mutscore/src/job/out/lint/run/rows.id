@@ -7,7 +7,7 @@
 // and ms_ef 1 when it has a statement that does something.
 ms_lt_row(string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
   int ms_ix = str_find(ms_lc, "\t");
-  string ms_tt = str_slice(ms_lc, ms_ix + 1, len(ms_lc) - ms_ix - 1);
+  string ms_tt = str_sub(ms_lc, ms_ix + 1, len(ms_lc) - ms_ix - 1);
   string[] ms_pcs = ms_lt_parts(ms_tt);
 } chain (string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
   string ms_kd = ms_lt_kind(lst_str_get_or(ms_pcs, 0, ""), lst_str_get_or(ms_pcs, 1, ""), lst_str_get_or(ms_pcs, 2, ""), ms_vd, ms_ef);
@@ -17,7 +17,7 @@ ms_lt_row(string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
   }
 } chain (string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
   if(len(ms_res) > 0) {
-    ms_res = ms_kd + "\t" + ms_res + str_slice(ms_lc, 0, ms_ix) + "\t" + ms_tt;
+    ms_res = ms_kd + "\t" + ms_res + str_sub(ms_lc, 0, ms_ix) + "\t" + ms_tt;
   }
 } return string ms_res;
 ("a.id", "f", 1, 1, "3\t(1):()"):("bare\ta.id\tf\t3\t(1):()")

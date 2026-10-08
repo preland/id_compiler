@@ -16,8 +16,8 @@ given clo_seeded ():() then prints:("int idfn_a_fx_target__0(IdFn* c, int a0) { 
 
 fv_def(string name, int nd) {
   int fn = fn_node_of(name);
-  emit_line(fv_adapter(fn, name, nd));
-  emit_line(fv_object(name, nd));
+  print(fv_adapter(fn, name, nd));
+  print(fv_object(name, nd));
 } return void;
 given clo_fixture ("fx_target", 0):() then prints:("int idfn_a_fx_target__0(IdFn* c, int a0) { return id_fx_target(a0); }\nIdFn idfn_o_fx_target__0 = { (void*)idfn_a_fx_target__0, (void*)id_fx_target, 0 };\n")
 given clo_fixture ("fx_target", 1):() then prints:("int idfn_a_fx_target__1(IdFn* c) { return id_fx_target((int)(ID_FNC(c)[0])); }\nIdFn idfn_o_fx_target__1 = { (void*)idfn_a_fx_target__1, 0, 1 };\n")

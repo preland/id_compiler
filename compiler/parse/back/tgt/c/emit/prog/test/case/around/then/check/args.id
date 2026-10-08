@@ -1,0 +1,34 @@
+// The literals a check is called with, `then CHECK(LIT, ...):(value)`: one C
+// local each, built at the check's own parameter types the way a case's
+// arguments are (around/args.id), named by the check's index so two checks on
+// one case never share a name. They are read where the check is called -- after
+// the call under test and the checks before it -- so an `(import NAME)` among
+// them is the value the export holds by then, as in a check's expected value.
+
+emit_then_args(int ti, string chk_nm, int[] targs) {
+  int[] ps = (import nl1)[(func_node(chk_nm))];
+  string an = "";
+  int j = 0;
+} chain (int ti, string chk_nm, int[] targs) {
+  while(j < len(targs)) {
+    then_arg_decl(ti, ps, targs, j);
+    an = an + sep_at(", ", j) + "idtc_t" + ti + "a" + j;
+    j = j + 1;
+  }
+} return string an;
+given chk_fixture (0, "chk", []):("")
+given then_arg_fixture (0, "fx_target", [(import fixture_zero)]):("idtc_t0a0") then prints:("    int idtc_t0a0 = 0;\n")
+
+then_arg_decl(int ti, int[] ps, int[] targs, int j) {
+  string pt = (import ns1)[(ps[j])];
+  string cv = tc_value(targs[j], pt);
+  emit_tc_decl(pt, "idtc_t" + ti + "a" + j, cv);
+} return void;
+given calls_items_fixture (3, (import fixture_params), (import fixture_calls_one), 0):() then prints:("    int idtc_t3a0 = 1;\n")
+given calls_items_fixture (0, (import fixture_params), (import fixture_calls_one), 0):() then calls tc_value:[1]
+
+then_label(string chk_nm, int[] targs) {
+  string so = str_replace(call_c(chk_nm, targs), "%", "%%");
+} return string so;
+("chk", []):("chk()")
+given fn_fixture ("chk", [(import fixture_zero)]):("chk(0)")

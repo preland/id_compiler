@@ -1,0 +1,35 @@
+// The diagnostic of a hit, laid out as E0407's and E0403's: where the function
+// is, what it is and its reduced expression, then the fix, which is to write the
+// expression where the function is called. A literal in it that deserves a name
+// is a conf.id constant, not a reason to keep the function. The why is conf.id's
+// wsc_why.
+
+wsc_report(int wrp_f) {
+  string wrp_name = (import ns1)[wrp_f];
+  string wrp_expr = wsc_expr(wrp_f);
+  string wrp_where = dup_loc(wrp_name);
+} chain (int wrp_f) {
+  string wrp_tag = wsc_tag(wrp_f);
+  string wrp_msg = "function '" + wrp_name + "' is only `" + wrp_expr + "` [" + wrp_tag + "]";
+  string wrp_help = "write `" + wrp_expr + "` at each call site; if a literal in it needs a name, make it a conf.id constant";
+} chain (int wrp_f) {
+  diag("E0408", wrp_where, wrp_msg, wrp_name, (import wsc_why), wrp_help);
+} return void;
+given wsc_world ((import wx_fget)):() then prints:("<stdin>:1: error: function 'wsget' is only `st[a]` [VALUE] [E0408]\n  at: wsget\n  why: a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more\n  help: write `st[a]` at each call site; if a literal in it needs a name, make it a conf.id constant\n") then (import chkfail)[0]:(1)
+given wsc_world ((import wx_fput)):() then prints:("<stdin>:1: error: function 'wsput' is only `foo(a)` [VOID-CALL] [E0408]\n  at: wsput\n  why: a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more\n  help: write `foo(a)` at each call site; if a literal in it needs a name, make it a conf.id constant\n") then (import chkfail)[0]:(1)
+
+wsc_tag(int wtg_f) {
+  string wtg_tag = "VALUE";
+  if((import ni1)[wtg_f] < 0) {
+    wtg_tag = "VOID-CALL";
+  }
+} return string wtg_tag;
+given wsc_world ((import wx_fget)):("VALUE")
+given wsc_world ((import wx_fput)):("VOID-CALL")
+
+wsc_expr(int wex_f) {
+  int wex_root = wsc_root(wex_f);
+  string wex_text = wsc_show(wex_f, wex_root);
+} return string wex_text;
+given wsc_world ((import wx_fget)):("st[a]")
+given wsc_world ((import wx_fput)):("foo(a)")

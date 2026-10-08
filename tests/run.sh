@@ -406,7 +406,7 @@ guard_accept "an argument that widens" 'main(int argc, string[] argv) {
 } return int 0;
 
 take(word a) {
-  print(a);
+  print(a + 1);
 } return void;'
 
 guard_reject "action limit" 'main(int argc, string[] argv) {

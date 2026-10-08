@@ -7,7 +7,7 @@ fh_sig(string fh_hl) {
   int fh_e = str_ends(fh_r, "{");
 } chain (string fh_hl) {
   if(fh_e == 1) {
-    string fh_cut = str_slice(fh_r, 0, fh_n);
+    string fh_cut = str_sub(fh_r, 0, fh_n);
     fh_r = str_trim(fh_cut);
   }
 } return string fh_r;

@@ -19,8 +19,8 @@ jg_be_text(string jg_bk, string jg_js, string jg_src) {
   int jg_cut = jg_skip_ws(jg_src, jg_at + 23) + 1;
   string jg_hd = "\n// ---- backend " + jg_bk + " (" + path_base(jg_js) + ") ----\n";
 } chain (string jg_bk, string jg_js, string jg_src) {
-  string jg_pre = str_slice(jg_src, 0, jg_at);
-  string jg_post = str_slice(jg_src, jg_cut, len(jg_src) - jg_cut);
+  string jg_pre = str_sub(jg_src, 0, jg_at);
+  string jg_post = str_sub(jg_src, jg_cut, len(jg_src) - jg_cut);
   string jg_tx = jg_hd + jg_pre + "function idw_be_" + jg_ident(jg_bk) + "(" + jg_post;
 } return string jg_tx;
 ("fs", "d/fs.mjs", "export default function (host) { return {}; }"):("\n// ---- backend fs (fs.mjs) ----\nfunction idw_be_fs(host) { return {}; }")

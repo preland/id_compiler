@@ -22,7 +22,7 @@ given unit_t_mark(0, 0) ((import unit_t_fb)):() then prints:("")
 unit_mark_at(string uf) {
   if(uf != (import unitlast)[0]) {
     sset((import unitlast), 0, uf);
-    emit_line("/* idc unit: " + uf + " */");
+    print("/* idc unit: " + uf + " */");
   }
 } return void;
 given unit_t_two ("a.id"):() then prints:("/* idc unit: a.id */\n")

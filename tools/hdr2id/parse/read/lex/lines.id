@@ -29,7 +29,7 @@ hx_line(string lx_line, string[] lx_toks) {
   while (lx_i < lx_n) {
     int lx_j = hx_end(lx_line, lx_i);
     if (charat(lx_line, lx_i) > 32) {
-      push(lx_toks, str_slice(lx_line, lx_i, lx_j - lx_i));
+      push(lx_toks, str_sub(lx_line, lx_i, lx_j - lx_i));
     }
     lx_i = lx_j;
   }

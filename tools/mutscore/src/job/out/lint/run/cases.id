@@ -17,7 +17,7 @@ given ms_t_lex("f() {\n} return void;\n(1):()\ng() {\n} return void;") ("f() {\n
 ms_lt_cases(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
   int ms_a = ms_tk_get(ms_tk, ms_fs[4 * ms_k + 3], 2);
   int ms_zz = ms_lt_end(ms_s, ms_tk, ms_fs, ms_k);
-  string[] ms_lns = str_split(str_slice(ms_s, ms_a, ms_zz - ms_a), "\n");
+  string[] ms_lns = str_split(str_sub(ms_s, ms_a, ms_zz - ms_a), "\n");
 } chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
   int ms_ln0 = ms_df_ln(ms_s, ms_a - 1);
   string[] ms_o = [];

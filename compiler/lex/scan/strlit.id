@@ -25,7 +25,7 @@ adv_str(string src, int i) {
 slice_str(string src, int a, int b) {
   string out = "";
   if(a < b) {
-    out = str_slice(src, a, b - a);
+    out = str_sub(src, a, b - a);
   }
 } return string out;
 ("hello", 1, 4):("ell")

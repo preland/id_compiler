@@ -3,7 +3,7 @@
 // around every path.
 fx_marker_path(string cur) {
   int n = len(cur);
-  string mid = str_slice(cur, 5, n - 8);
+  string mid = str_sub(cur, 5, n - 8);
 } return string mid;
 ("===F:a.id==="):("a.id")
 ("===F:x/y.id==="):("x/y.id")
@@ -33,7 +33,7 @@ ix_scan_export_line(string export_src_line, int fn_idx) {
   string name = "";
 } chain (string export_src_line, int fn_idx) {
   if(p >= 0) {
-    string rest = str_slice(export_src_line, p + 7, rest_n);
+    string rest = str_sub(export_src_line, p + 7, rest_n);
     string[] parts = str_split(rest, " ");
     name = parts[1];
   }

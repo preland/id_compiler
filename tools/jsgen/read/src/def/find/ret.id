@@ -23,7 +23,7 @@ jg_ret_of(string jg_win) {
   int jg_e = jg_type_end(jg_win, jg_p);
 } chain (string jg_win) {
   if (str_starts(jg_win, "return") == 1 && jg_ws(charat(jg_win, 6)) == 1 && jg_e > jg_p) {
-    jg_ty = str_slice(jg_win, jg_p, jg_e - jg_p);
+    jg_ty = str_sub(jg_win, jg_p, jg_e - jg_p);
   }
 } return string jg_ty;
 ("return int x;"):("int")
@@ -42,7 +42,7 @@ jg_window(string jg_t, int jg_r) {
   }
 } chain (string jg_t, int jg_r) {
   if (jg_r >= 0) {
-    jg_win = str_slice(jg_t, jg_r, jg_n);
+    jg_win = str_sub(jg_t, jg_r, jg_n);
   }
 } return string jg_win;
 ("abcdef", 2):("cdef")

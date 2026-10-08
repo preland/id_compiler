@@ -27,15 +27,10 @@ given rfnfx_setup ():() then conf_reached:(1)
 rfn_reindex() {
   int rfi = 0;
   while(rfi < len((import rfn))) {
-    rfx_put((import rfn)[rfi], rfi);
+    hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), (import rfn)[rfi], rfi);
     rfi = rfi + 1;
   }
 } return void;
 given rfn_hand ():() then conf_reached:(1)
 given init_reach ():() then conf_reached:(1)
 
-rfx_put(string name, int rfpos) {
-  hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, rfpos);
-} return void;
-given init_reach ("conf.id", 0):() then conf_reached:(0)
-given init_reach ("conf.id", 1):() then conf_reached:(1)

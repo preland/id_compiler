@@ -4,7 +4,7 @@ dg_prefix(string dg_xh) {
   int dg_xp = dg_sevpos(dg_xh);
   string dg_xr = "";
   if(dg_xp >= 0) {
-    dg_xr = str_slice(dg_xh, 0, dg_xp);
+    dg_xr = str_sub(dg_xh, 0, dg_xp);
   }
 } return string dg_xr;
 ("a.id:7: error: x"):("a.id:7")
@@ -38,7 +38,7 @@ dg_file(string dg_wh) {
 } chain (string dg_wh) {
   string dg_wr = "";
   if(dg_wn >= 0) {
-    dg_wr = str_slice(dg_wx, 0, dg_wn);
+    dg_wr = str_sub(dg_wx, 0, dg_wn);
   }
 } return string dg_wr;
 ("a.id:7: error: x"):("a.id")

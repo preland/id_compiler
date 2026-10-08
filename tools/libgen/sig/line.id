@@ -18,7 +18,7 @@ lg_name(string lg_ln) {
 lg_header(string lg_ln) {
   int lg_to = str_find(lg_ln, ")->");
   int lg_from = str_find(lg_ln, "|(") + 2;
-  string lg_hd = str_slice(lg_ln, lg_from, lg_to - lg_from);
+  string lg_hd = str_sub(lg_ln, lg_from, lg_to - lg_from);
 } return string lg_hd;
 ("|(int[] 0,int 1)->int=>x\tf\tf.id:1"):("int[] 0,int 1")
 ("|()->void=>x\tg\tf.id:2"):("")
@@ -28,7 +28,7 @@ lg_header(string lg_ln) {
 lg_ret(string lg_ln) {
   int lg_from = str_find(lg_ln, ")->") + 3;
   int lg_to = str_find(lg_ln, "=>");
-  string lg_rt = str_slice(lg_ln, lg_from, lg_to - lg_from);
+  string lg_rt = str_sub(lg_ln, lg_from, lg_to - lg_from);
 } return string lg_rt;
 ("|(int 0)->string[][]=>x\tf\tf.id:1"):("string[][]")
 ("|()->void=>x\tg\tf.id:2"):("void")

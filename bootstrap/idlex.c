@@ -888,7 +888,6 @@ static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "
 /* forward declarations */
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 int id_str_eol(char* idstd_s, int idstd_i);
-char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n);
 int id_is_space_at(char* src, int i);
 int id_is_digit_at(char* src, int i);
 int id_is_alpha_at(char* src, int i);
@@ -1005,12 +1004,6 @@ int id_str_eol(char* idstd_s, int idstd_i) {
         idstd_i = (idstd_i + 1);
     }
     return idstd_i;
-}
-
-char* id_str_slice(char* idstd_s, int idstd_i, int idstd_n) {
-    char* idstd_ret_s = NULL;
-    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_sub(idstd_s, idstd_i, idstd_n); id_str_free(idfe_o); }
-    return idstd_ret_s;
 }
 
 int id_is_space_at(char* src, int i) {
@@ -1645,7 +1638,7 @@ char* id_slice_str(char* src, int a, int b) {
     char* out = NULL;
     { char* idfe_o = out; out = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((a < b)) {
-        { char* idfe_o = out; out = id_str_slice(src, a, (b - a)); id_str_free(idfe_o); }
+        { char* idfe_o = out; out = id_str_sub(src, a, (b - a)); id_str_free(idfe_o); }
     }
     return out;
 }

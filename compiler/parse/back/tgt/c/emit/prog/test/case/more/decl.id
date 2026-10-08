@@ -2,7 +2,7 @@
 
 emit_tc_decl(string pt, string nm, string cv) {
   string ct = c_type(pt);
-  emit_line("    " + ct + " " + nm + " = " + cv + ";");
+  print("    " + ct + " " + nm + " = " + cv + ";");
 } return void;
 given lc_env2 ("int", "idtc_a0", "5"):() then prints:("    int idtc_a0 = 5;\n")
 given lc_env2 ("string", "idtc_a1", "\"hi\""):() then prints:("    char* idtc_a1 = \"hi\";\n")

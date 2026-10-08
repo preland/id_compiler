@@ -5,7 +5,7 @@
 
 tk_emit_keys() {
   if((import tkout)[0] == 1) {
-    emit_line("/* ---- tc keys ---- */");
+    print("/* ---- tc keys ---- */");
     tk_emit_one(0);
   }
 } return void;
@@ -15,7 +15,7 @@ given tk_t_prep0 ():() then prints:("")
 tk_emit_one(int tkf) {
   while(tkf < len((import tkkey))) {
     if((import tkkey)[tkf] != "" && (import tkbad)[tkf] == 0) {
-      emit_line((import tkkey)[tkf]);
+      print((import tkkey)[tkf]);
     }
     tkf = tkf + 1;
   }

@@ -8,7 +8,7 @@ ms_lt_sl(string ms_ln, int[] ms_tk, int ms_a, int ms_b) {
   int ms_f = ms_tk_get(ms_tk, ms_a, 2);
   int ms_g = ms_e + (ms_e < 0) * (len(ms_ln) + 1);
 } chain (string ms_ln, int[] ms_tk, int ms_a, int ms_b) {
-  string ms_q = str_trim(str_slice(ms_ln, ms_f, ms_g - ms_f));
+  string ms_q = str_trim(str_sub(ms_ln, ms_f, ms_g - ms_f));
 } return string ms_q;
 given ms_t_lex("(1):(2) then x") ("(1):(2) then x", (import ms_t_tk), 0, 2):("1")
 given ms_t_lex("(1):(2) then x") ("(1):(2) then x", (import ms_t_tk), 6, 9):("then x")

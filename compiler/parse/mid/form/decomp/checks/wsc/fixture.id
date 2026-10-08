@@ -1,0 +1,41 @@
+// Whether a function is a test fixture: one a case uses as a `given` or a
+// `then` (./used.id), or a helper that only fixtures call -- the setups of this
+// compiler are built of setups, and each is called by the next. A function with
+// no callers is not a helper of anything. `depth` bounds the walk up the callers,
+// so a cycle of helpers ends.
+
+wsc_fixture(int wfx_f, int wfx_d) {
+  int wfx_r = wsc_used((import ns1)[wfx_f]);
+  if(wfx_r == 0 && wfx_d > 0) {
+    wfx_r = wsc_helper(wfx_f, wfx_d);
+  }
+} return int wfx_r;
+given wsc_marks ((import wx_fget), 3):(1)
+given wsc_marks ((import wx_fdead), 3):(0)
+given wsc_marks given lst_str_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 3):(1)
+given wsc_marks given lst_str_extend((import casegiven), ["wsput"]) ((import wx_ffoo), 3):(0)
+given wsc_marks given lst_str_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 0):(0)
+
+wsc_helper(int whl_f, int whl_d) {
+  int[] whl_cs = wsc_callers((import ns1)[whl_f]);
+  int whl_ok = len(whl_cs) > 0;
+  int whl_i = 0;
+} chain (int whl_f, int whl_d) {
+  while(whl_i < len(whl_cs) && whl_ok == 1) {
+    whl_ok = wsc_caller_ok(whl_f, whl_cs[whl_i], whl_d);
+    whl_i = whl_i + 1;
+  }
+} return int whl_ok;
+given wsc_marks given lst_str_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 3):(1)
+given wsc_marks ((import wx_fget), 3):(0)
+
+wsc_nearer(int wnr_best, int wnr_fid, int wnr_n) {
+  int wnr_r = wnr_best;
+  if(wnr_fid > wnr_n && (wnr_best < 0 || wnr_fid < wnr_best)) {
+    wnr_r = wnr_fid;
+  }
+} return int wnr_r;
+(-1, 10, 5):(10)
+(8, 10, 5):(8)
+(-1, 3, 5):(-1)
+(8, 6, 5):(6)

@@ -2,7 +2,7 @@
 
 emit_ty_proto(string ty) {
   string key = tc_key(ty);
-  emit_line("static int idtc_eq_" + key + "(IdList* a, IdList* b);\nstatic void idtc_show_" + key + "(IdList* a);");
+  print("static int idtc_eq_" + key + "(IdList* a, IdList* b);\nstatic void idtc_show_" + key + "(IdList* a);");
 } return void;
 ("int[]"):() then prints:("static int idtc_eq_int(IdList* a, IdList* b);\nstatic void idtc_show_int(IdList* a);\n")
 ("string[]"):() then prints:("static int idtc_eq_string(IdList* a, IdList* b);\nstatic void idtc_show_string(IdList* a);\n")
