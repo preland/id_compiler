@@ -1,0 +1,40 @@
+// The table rows of a markdown file, as the same (start, end, line) triples
+// that scan/spans.id gives for source.
+
+// The names in backticks in one row, which runs from start to end.
+rename_markdown_row(string rename_source, int rename_start, int rename_end, int rename_line, int[] rename_spans) {
+  int[] rename_cells = [0];
+  int rename_index = rename_start;
+  while(rename_index < rename_end) {
+    rename_index = rename_markdown_step(rename_source, rename_index, rename_cells, rename_line, rename_spans);
+  }
+} return void;
+("| `ab` c |", 0, 9, 4, []):("| `ab` c |", 0, 9, 4, [3, 5, 4])
+("| ab `c` |", 0, 10, 1, []):("| ab `c` |", 0, 10, 1, [6, 7, 1])
+("| `a` `b` |", 0, 11, 1, []):("| `a` `b` |", 0, 11, 1, [3, 4, 1, 7, 8, 1])
+
+// One line: its names when it is a table row. Answers where the next line starts.
+rename_markdown_line(string rename_source, int rename_start, int rename_line, int[] rename_spans) {
+  int rename_end = str_eol(rename_source, rename_start);
+  if(charat(rename_source, rename_start) == 124) {
+    rename_markdown_row(rename_source, rename_start, rename_end, rename_line, rename_spans);
+  }
+  int rename_next_start = rename_end + 1;
+} return int rename_next_start;
+("| `a` |\nx", 0, 1, []):(8)
+("x `a`\ny", 0, 1, []):(6)
+("x", 0, 1, []):(2)
+
+// The names in backticks in the table rows of a markdown text, as triples.
+rename_markdown_spans(string rename_source) {
+  int[] rename_spans = [];
+  int rename_index = 0;
+  int rename_line = 1;
+} chain (string rename_source) {
+  while(rename_index < len(rename_source)) {
+    rename_index = rename_markdown_line(rename_source, rename_index, rename_line, rename_spans);
+    rename_line = rename_line + 1;
+  }
+} return int[] rename_spans;
+("| `a` |\nprose `b`\n| `c` x |"):([3, 4, 1, 21, 22, 3])
+("no table `x`"):([])

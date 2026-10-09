@@ -1,0 +1,15 @@
+// Every problem in a whole map.
+
+// The problems of a map's pairs, in the order of the map; empty when the map
+// may be applied.
+rename_map_problems(string[] rename_old_names, string[] rename_news, string[] rename_word_keys, int[] rename_word_used) {
+  string[] rename_problems = [];
+  int rename_at = 0;
+  while(rename_at < len(rename_old_names)) {
+    rename_index_problems(rename_old_names, rename_news, rename_at, rename_word_keys, rename_word_used, rename_problems);
+    rename_at = rename_at + 1;
+  }
+} return string[] rename_problems;
+given rename_test_words_filled (["x", "y"], ["alpha", "beta"], (import rename_test_word_keys), (import rename_test_word_used)):([])
+given rename_test_words_filled (["x", "y"], ["alpha", "gamma"], (import rename_test_word_keys), (import rename_test_word_used)):(["y -> gamma: the new name is not spelled in words (E0311): gamma"])
+given rename_test_words_filled ([], [], (import rename_test_word_keys), (import rename_test_word_used)):([])

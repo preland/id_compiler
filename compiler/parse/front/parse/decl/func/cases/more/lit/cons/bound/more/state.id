@@ -95,6 +95,7 @@ init_cases2() {
 } chain () {
   export string[] retexp = [];
   export string[] retexp_pend = [];
+  vocab_init();
 } return void export consbound;
 ():() then len((import consbound)):(0)
 given claim_cols_fixture ():() then len((import consbound)):(0)

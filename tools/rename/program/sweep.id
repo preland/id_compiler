@@ -1,0 +1,36 @@
+// The whole program swept for the new names, and the pairs that would collide.
+
+// Counts the new names in every file of a list.
+rename_count_files(string[] rename_files, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used, int[] rename_count_count) {
+  int rename_at = 0;
+  while(rename_at < len(rename_files)) {
+    rename_count_file(rename_files[rename_at], rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
+    rename_at = rename_at + 1;
+  }
+} return void;
+given rename_test_seeded given rename_test_scratch("x.id", "alpha beta alpha", "y.id", "beta") (["x.id", "y.id"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["x.id", "y.id"]) then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "beta", -1):(2)
+given rename_test_seeded ([], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):([]) then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "beta", -1):(0)
+
+// The refusal for one pair whose new name the program already uses: "" when
+// it does not.
+rename_clash_one(string rename_old, string rename_new, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used) {
+  int rename_uses = hmap_get(rename_count_keys, rename_count_values, rename_count_used, rename_new, 0);
+  string rename_problem = "";
+  if(rename_uses > 0) {
+    rename_problem = rename_old + " -> " + rename_new + ": the new name is already used " + rename_uses + " time(s) in the program";
+  }
+} return string rename_problem;
+given rename_test_clashing ("q", "alpha", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used)):("q -> alpha: the new name is already used 2 time(s) in the program")
+given rename_test_seeded ("q", "gamma", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used)):("")
+
+// The refusals for a map: every pair whose new name is already in the program.
+rename_clash_problems(string[] rename_old_names, string[] rename_news, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used) {
+  string[] rename_problems = [];
+  int rename_at = 0;
+  while(rename_at < len(rename_old_names)) {
+    rename_note(rename_problems, rename_clash_one(rename_old_names[rename_at], rename_news[rename_at], rename_count_keys, rename_count_values, rename_count_used));
+    rename_at = rename_at + 1;
+  }
+} return string[] rename_problems;
+given rename_test_clashing (["p", "q", "r"], ["alpha", "gamma", "beta"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used)):(["p -> alpha: the new name is already used 2 time(s) in the program", "r -> beta: the new name is already used 1 time(s) in the program"])
+given rename_test_seeded ([], [], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used)):([])

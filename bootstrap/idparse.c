@@ -922,6 +922,8 @@ int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
 int id_fx_min(int idstd_a, int idstd_b);
 int id_fx_max(int idstd_a, int idstd_b);
 int id_fx_sign(int idstd_a);
+int id_chr_lower(int idstd_c);
+int id_chr_in(int idstd_c, int idstd_lo, int idstd_hi);
 int id_chr_is_space(int idstd_c);
 int id_str_adv(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_adv_by);
 int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size);
@@ -947,8 +949,12 @@ char* id_str_trim(char* idstd_s);
 int id_idstd_str_trim_end(char* idstd_s);
 char* id_idstd_str_trim_slice(char* idstd_s, int idstd_i, int idstd_n);
 void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad);
+char* id_str_lower(char* idstd_s);
+long long id_idstd_str_lower_alloc(char* idstd_s, int idstd_n);
+void id_idstd_str_lower_blit(char* idstd_s, long long idstd_ad, int idstd_i);
 char* id_str_repeat(char* idstd_s, int idstd_n);
 int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n);
+void id_idstd_str_lower_step(char* idstd_s, long long idstd_ad, int idstd_i);
 int id_idstd_str_ws_start(char* idstd_s, int idstd_i);
 int id_idstd_str_ws_end(char* idstd_s, int idstd_n);
 int id_idstd_chr_is_space_at(char* idstd_s, int idstd_i);
@@ -2457,6 +2463,7 @@ void id_push_tok(char* kind, char* text);
 void id_push_real(char* kind, char* text);
 int id_src_line(void);
 void id_push_line(void);
+void id_push_tok3(char* kind, char* text);
 void id_proc_line(char* src, int i, int e);
 int id_find_space(char* src, int i, int e);
 void id_init_rest(void);
@@ -2988,6 +2995,28 @@ int id_find_dup(int i);
 void id_ul_at(int i);
 int id_ul_find(int i);
 int id_ul_probe(int i, int j);
+char* id_vocab_bad(char* vocab_name);
+void id_vocab_judge(char* vocab_name, int vocab_kind, int vocab_row);
+char* id_vocab_loc(int vocab_kind, int vocab_row, char* vocab_name);
+char* id_vocab_loc_var(int vocab_kind, int vocab_row, char* vocab_name);
+char* id_vocab_loc_rest(int vocab_kind, int vocab_row, char* vocab_name);
+int id_vocab_ok(char* vocab_piece);
+char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece);
+char* id_vocab_join(char* vocab_head, char* vocab_tail);
+void id_vocab_report(char* vocab_name, int vocab_kind, int vocab_row, char* vocab_failed);
+char* id_vocab_first(char* vocab_list);
+char* id_vocab_export_loc(int vocab_row, char* vocab_name);
+void id_word_scan(void);
+void id_vocab_run(void);
+void id_vocab_name_check(char* vocab_name, int vocab_kind, int vocab_row);
+void id_vocab_init(void);
+void id_vocab_init_seen(void);
+void id_vocab_scan_structs(int vocab_i);
+void id_vocab_scan_fields(int vocab_row, int vocab_k);
+void id_vocab_summary(void);
+void id_vocab_scan_fns(int vocab_i);
+void id_vocab_scan_vars(int vocab_i);
+void id_vocab_scan_exports(int vocab_i);
 void id_exp_one(int id, char* owner);
 int id_is_export_decl(int id);
 void id_add_export(char* name, char* type, char* owner);
@@ -4100,6 +4129,8 @@ char* nm_func_help = ID_SK("rename the variable, or the function if the variable
 char* nm_callvar_why = ID_SK("a call runs a function by its name; a variable holds a value, and only a variable of a function type (`func(...) return T`) can be called");  /* constant from conf.id */
 char* nm_callvar_help = ID_SK("call a function by its own name, or drop the parentheses if you meant to read the variable");  /* constant from conf.id */
 char* fv_sep = ID_SK("__");  /* constant from conf.id */
+char* vocab_why = ID_SK("a name is read by people who did not write it, so each part of it has to be a word they already know; an abbreviation means one thing to its author and another to everyone else");  /* constant from conf.id */
+IdList* vocab_labels;  /* constant from conf.id */
 IdList* hostc;  /* exported by arg_flags4() */
 IdList* natc;  /* exported by nat_init() */
 IdList* natkey;  /* exported by nat_lists() */
@@ -4287,6 +4318,15 @@ IdList* resv_names;  /* exported by init_resv_names() */
 IdList* cfp;  /* exported by uq_fill() */
 IdList* cfpfn;  /* exported by uq_fill() */
 IdList* cfpl;  /* exported by uq_fill() */
+IdList* vocab_keys;  /* exported by vocab_init() */
+IdList* vocab_vals;  /* exported by vocab_init() */
+IdList* vocab_used;  /* exported by vocab_init() */
+IdList* vocab_count;  /* exported by vocab_init() */
+IdList* vocab_seen_keys;  /* exported by vocab_init_seen() */
+IdList* vocab_seen_vals;  /* exported by vocab_init_seen() */
+IdList* vocab_seen_used;  /* exported by vocab_init_seen() */
+IdList* vocab_seen_count;  /* exported by vocab_init_seen() */
+IdList* vocab_totals;  /* exported by vocab_init_seen() */
 IdList* bnames;  /* exported by init_bnames() */
 IdList* rtc;  /* exported by init_rtc() */
 IdList* fsc;  /* exported by init_rtc() */
@@ -4443,6 +4483,8 @@ static void idc_const_init(void) {
     id_list_lock(nx_call);
     nx_elem_end = id_list_lit(2, (long long)(intptr_t)(ID_S(",")), (long long)(intptr_t)(ID_S(")")));
     id_list_lock(nx_elem_end);
+    vocab_labels = id_list_lit(5, (long long)(intptr_t)(ID_S("function")), (long long)(intptr_t)(ID_S("variable")), (long long)(intptr_t)(ID_S("exported name")), (long long)(intptr_t)(ID_S("struct")), (long long)(intptr_t)(ID_S("struct field")));
+    id_list_lock(vocab_labels);
 }
 static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
@@ -4798,6 +4840,21 @@ int id_fx_sign(int idstd_a) {
     return idstd_ret_i;
 }
 
+int id_chr_lower(int idstd_c) {
+    int idstd_v;
+    idstd_v = idstd_c;
+    if ((id_chr_in(idstd_c, 65, 90) == 1)) {
+        idstd_v = (idstd_c + 32);
+    }
+    return idstd_v;
+}
+
+int id_chr_in(int idstd_c, int idstd_lo, int idstd_hi) {
+    int idstd_ret_i;
+    idstd_ret_i = ((idstd_c >= idstd_lo) && (idstd_c <= idstd_hi));
+    return idstd_ret_i;
+}
+
 int id_chr_is_space(int idstd_c) {
     int idstd_ret_i;
     idstd_ret_i = ((((idstd_c == 32) || (idstd_c == 9)) || (idstd_c == 10)) || (idstd_c == 13));
@@ -5032,6 +5089,31 @@ void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad) {
     return;
 }
 
+char* id_str_lower(char* idstd_s) {
+    int idstd_n;
+    long long idstd_ad;
+    char* idstd_ret_s = NULL;
+    idstd_n = id_len(idstd_s);
+    idstd_ad = id_idstd_str_lower_alloc(idstd_s, idstd_n);
+    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_n)); id_str_free(idfe_o); }
+    return idstd_ret_s;
+}
+
+long long id_idstd_str_lower_alloc(char* idstd_s, int idstd_n) {
+    long long idstd_ad;
+    idstd_ad = id_mem_alloc((long long)((idstd_n + 1)));
+    id_idstd_str_lower_blit(idstd_s, idstd_ad, 0);
+    return idstd_ad;
+}
+
+void id_idstd_str_lower_blit(char* idstd_s, long long idstd_ad, int idstd_i) {
+    while ((id_charat(idstd_s, idstd_i) >= 0)) {
+        id_idstd_str_lower_step(idstd_s, idstd_ad, idstd_i);
+        idstd_i = (idstd_i + 1);
+    }
+    return;
+}
+
 char* id_str_repeat(char* idstd_s, int idstd_n) {
     char* idstd_ret_s = NULL;
     { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
@@ -5054,6 +5136,15 @@ int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
         id_fail(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i), 2), ID_S(" n="), 1), id_str_of_int(idstd_n), 3), ID_S(" in a string of length "), 1), id_str_of_int(id_len(idstd_s)), 3), ID_S("; clamp i and n first (fx_min, fx_max)"), 1));
     }
     return idstd_n;
+}
+
+void id_idstd_str_lower_step(char* idstd_s, long long idstd_ad, int idstd_i) {
+    int idstd_charat_v;
+    int idstd_chr_lower_v;
+    idstd_charat_v = id_charat(idstd_s, idstd_i);
+    idstd_chr_lower_v = id_chr_lower(idstd_charat_v);
+    id_poke8((long long)((idstd_ad + idstd_i)), (long long)(idstd_chr_lower_v));
+    return;
 }
 
 int id_idstd_str_ws_start(char* idstd_s, int idstd_i) {
@@ -17832,6 +17923,7 @@ void id_init_cases2(void) {
     wrdone = id_list_lit(1, (long long)(0));
     retexp = id_list_lit(0);
     retexp_pend = id_list_lit(0);
+    id_vocab_init();
     return;
 }
 
@@ -20193,7 +20285,7 @@ void id_push_tok2(char* kind, char* text) {
     } else if ((strcmp(kind, ID_S("ext")) == 0)) {
         id_ext_line(text);
     } else {
-        id_push_real(kind, text);
+        id_push_tok3(kind, text);
     }
     return;
 }
@@ -20367,6 +20459,18 @@ void id_push_line(void) {
     int src_line_v;
     src_line_v = id_src_line();
     id_list_push(tline, (long long)(src_line_v));
+    return;
+}
+
+void id_push_tok3(char* kind, char* text) {
+    if ((strcmp(kind, ID_S("wrd")) == 0)) {
+IdList* idsq_13;
+IdList* idsq_12;
+IdList* idsq_11;
+        (idsq_13 = vocab_keys, idsq_12 = vocab_vals, idsq_11 = vocab_used, id_hset_add(idsq_13, idsq_12, idsq_11, vocab_count, text));
+    } else {
+        id_push_real(kind, text);
+    }
     return;
 }
 
@@ -22279,6 +22383,7 @@ void id_check_program_tail2(void) {
     id_ext_check();
     id_wsc_scan();
     id_noop_scan();
+    id_word_scan();
     return;
 }
 
@@ -25997,6 +26102,247 @@ char* idsq_10;
         ul_found = j;
     }
     return ul_found;
+}
+
+char* id_vocab_bad(char* vocab_name) {
+    IdList* vocab_pieces = NULL;
+    char* vocab_acc;
+    int vocab_i;
+    { IdList* idfe_o = vocab_pieces; vocab_pieces = id_str_split(vocab_name, ID_S("_")); id_list_free(idfe_o); }
+    vocab_acc = ID_S("");
+    vocab_i = 0;
+    while ((vocab_i < id_list_len(vocab_pieces))) {
+        vocab_acc = id_vocab_bad_add(vocab_acc, (char*)(intptr_t)(id_list_get(vocab_pieces, vocab_i)));
+        vocab_i = (vocab_i + 1);
+    }
+    { id_list_free(vocab_pieces); return vocab_acc; }
+}
+
+void id_vocab_judge(char* vocab_name, int vocab_kind, int vocab_row) {
+    char* vocab_failed;
+IdList* idsq_36;
+IdList* idsq_35;
+IdList* idsq_34;
+    (idsq_36 = vocab_seen_keys, idsq_35 = vocab_seen_vals, idsq_34 = vocab_seen_used, id_hset_add(idsq_36, idsq_35, idsq_34, vocab_seen_count, vocab_name));
+IdList* idsq_28;
+    (idsq_28 = vocab_totals, id_lset(idsq_28, 0, ((int)(id_list_get(vocab_totals, 0)) + 1)));
+    vocab_failed = id_vocab_bad(vocab_name);
+    if ((strcmp(vocab_failed, ID_S("")) != 0)) {
+        id_vocab_report(vocab_name, vocab_kind, vocab_row, vocab_failed);
+    }
+    return;
+}
+
+char* id_vocab_loc(int vocab_kind, int vocab_row, char* vocab_name) {
+    char* vocab_where = NULL;
+    { char* idfe_o = vocab_where; vocab_where = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((vocab_kind == 0)) {
+        { char* idfe_o = vocab_where; vocab_where = id_diag_prog_loc(vocab_row); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = vocab_where; vocab_where = id_vocab_loc_var(vocab_kind, vocab_row, vocab_name); id_str_free(idfe_o); }
+    }
+    return vocab_where;
+}
+
+char* id_vocab_loc_var(int vocab_kind, int vocab_row, char* vocab_name) {
+    char* vocab_where = NULL;
+    { char* idfe_o = vocab_where; vocab_where = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((vocab_kind == 1)) {
+IdList* idsq_16;
+char* idsq_14;
+        { char* idfe_o = vocab_where; vocab_where = (idsq_16 = dvfunc, idsq_14 = (char*)(intptr_t)(id_list_get(idsq_16, vocab_row)), id_diag_fn_loc(idsq_14, (int)(id_list_get(dvline, vocab_row)))); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = vocab_where; vocab_where = id_vocab_loc_rest(vocab_kind, vocab_row, vocab_name); id_str_free(idfe_o); }
+    }
+    return vocab_where;
+}
+
+char* id_vocab_loc_rest(int vocab_kind, int vocab_row, char* vocab_name) {
+    char* vocab_where = NULL;
+    { char* idfe_o = vocab_where; vocab_where = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((vocab_kind == 2)) {
+        { char* idfe_o = vocab_where; vocab_where = id_vocab_export_loc(vocab_row, vocab_name); id_str_free(idfe_o); }
+    } else {
+IdList* idsq_12;
+char* idsq_10;
+        { char* idfe_o = vocab_where; vocab_where = (idsq_12 = sdfile, idsq_10 = (char*)(intptr_t)(id_list_get(idsq_12, vocab_row)), id_concat_f(id_concat(idsq_10, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, vocab_row))), 3)); id_str_free(idfe_o); }
+    }
+    return vocab_where;
+}
+
+int id_vocab_ok(char* vocab_piece) {
+    char* vocab_lower = NULL;
+    int vocab_hit;
+    { char* idfe_o = vocab_lower; vocab_lower = id_str_lower(vocab_piece); id_str_free(idfe_o); }
+IdList* idsq_6;
+    vocab_hit = (idsq_6 = vocab_keys, id_hmap_has(idsq_6, vocab_used, vocab_lower));
+    { id_str_free(vocab_lower); return vocab_hit; }
+}
+
+char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece) {
+    int vocab_fine;
+    char* vocab_next;
+    vocab_fine = id_vocab_ok(vocab_piece);
+    vocab_next = vocab_acc;
+    if ((vocab_fine == 0)) {
+        vocab_next = id_vocab_join(vocab_acc, vocab_piece);
+    }
+    return vocab_next;
+}
+
+char* id_vocab_join(char* vocab_head, char* vocab_tail) {
+    char* vocab_item;
+    char* vocab_both;
+    vocab_item = vocab_tail;
+    if ((strcmp(vocab_tail, ID_S("")) == 0)) {
+        vocab_item = ID_S("(empty)");
+    }
+    vocab_both = vocab_item;
+    if ((strcmp(vocab_head, ID_S("")) != 0)) {
+        vocab_both = id_concat_f(id_concat(vocab_head, ID_S(", ")), vocab_item, 1);
+    }
+    return vocab_both;
+}
+
+void id_vocab_report(char* vocab_name, int vocab_kind, int vocab_row, char* vocab_failed) {
+    char* vocab_where = NULL;
+    char* vocab_msg = NULL;
+    char* vocab_first_bad;
+    char* vocab_help = NULL;
+IdList* idsq_51;
+    (idsq_51 = vocab_totals, id_lset(idsq_51, 1, ((int)(id_list_get(vocab_totals, 1)) + 1)));
+    { char* idfe_o = vocab_where; vocab_where = id_vocab_loc(vocab_kind, vocab_row, vocab_name); id_str_free(idfe_o); }
+    { char* idfe_o = vocab_msg; vocab_msg = id_concat_f(id_concat_f(id_concat_f(id_concat((char*)(intptr_t)(id_list_get(vocab_labels, vocab_kind)), ID_S(" '")), vocab_name, 1), ID_S("' is not spelled in words: "), 1), vocab_failed, 1); id_str_free(idfe_o); }
+    vocab_first_bad = id_vocab_first(vocab_failed);
+    { char* idfe_o = vocab_help; vocab_help = id_concat_f(id_concat(ID_S("spell out '"), vocab_first_bad), ID_S("' as a word, or add it to idc/data/words/allowed.txt if it is a real term"), 1); id_str_free(idfe_o); }
+    id_diag(ID_S("E0311"), vocab_where, vocab_msg, vocab_name, vocab_why, vocab_help);
+    { id_str_free(vocab_where); id_str_free(vocab_msg); id_str_free(vocab_help); return; }
+}
+
+char* id_vocab_first(char* vocab_list) {
+    int vocab_cut;
+    char* vocab_head;
+    vocab_cut = id_str_find(vocab_list, ID_S(", "));
+    vocab_head = vocab_list;
+    if ((vocab_cut >= 0)) {
+        vocab_head = id_str_sub(vocab_list, 0, vocab_cut);
+    }
+    return vocab_head;
+}
+
+char* id_vocab_export_loc(int vocab_row, char* vocab_name) {
+    char* vocab_owner;
+    int vocab_at;
+    char* vocab_where = NULL;
+    vocab_owner = (char*)(intptr_t)(id_list_get(eowners, vocab_row));
+    vocab_at = id_decl_line(vocab_name, vocab_owner);
+    { char* idfe_o = vocab_where; vocab_where = id_diag_fn_loc(vocab_owner, vocab_at); id_str_free(idfe_o); }
+    return vocab_where;
+}
+
+void id_word_scan(void) {
+    if (((int)(id_list_get(vocab_count, 0)) > 0)) {
+        id_vocab_run();
+    }
+    return;
+}
+
+void id_vocab_run(void) {
+    id_vocab_scan_fns(0);
+    id_vocab_scan_vars(0);
+    id_vocab_scan_exports(0);
+    id_vocab_scan_structs(0);
+    id_vocab_summary();
+    return;
+}
+
+void id_vocab_name_check(char* vocab_name, int vocab_kind, int vocab_row) {
+    int vocab_known;
+IdList* idsq_15;
+    vocab_known = (idsq_15 = vocab_seen_keys, id_hmap_has(idsq_15, vocab_seen_used, vocab_name));
+    if ((vocab_known == 0)) {
+        id_vocab_judge(vocab_name, vocab_kind, vocab_row);
+    }
+    return;
+}
+
+void id_vocab_init(void) {
+    vocab_keys = id_list_lit(0);
+    vocab_vals = id_list_lit(0);
+    vocab_used = id_list_lit(0);
+    vocab_count = id_list_lit(0);
+IdList* idsq_10;
+IdList* idsq_9;
+IdList* idsq_8;
+    (idsq_10 = vocab_keys, idsq_9 = vocab_vals, idsq_8 = vocab_used, id_hmap_init(idsq_10, idsq_9, idsq_8, vocab_count));
+    id_vocab_init_seen();
+    return;
+}
+
+void id_vocab_init_seen(void) {
+    vocab_seen_keys = id_list_lit(0);
+    vocab_seen_vals = id_list_lit(0);
+    vocab_seen_used = id_list_lit(0);
+    vocab_seen_count = id_list_lit(0);
+    vocab_totals = id_list_lit(2, (long long)(0), (long long)(0));
+IdList* idsq_7;
+IdList* idsq_6;
+IdList* idsq_5;
+    (idsq_7 = vocab_seen_keys, idsq_6 = vocab_seen_vals, idsq_5 = vocab_seen_used, id_hmap_init(idsq_7, idsq_6, idsq_5, vocab_seen_count));
+    return;
+}
+
+void id_vocab_scan_structs(int vocab_i) {
+    while ((vocab_i < id_list_len(sdname))) {
+        id_vocab_name_check((char*)(intptr_t)(id_list_get(sdname, vocab_i)), 3, vocab_i);
+        id_vocab_scan_fields(vocab_i, 0);
+        vocab_i = (vocab_i + 1);
+    }
+    return;
+}
+
+void id_vocab_scan_fields(int vocab_row, int vocab_k) {
+    IdList* vocab_fields;
+    vocab_fields = (IdList*)(intptr_t)(id_list_get(sdfname, vocab_row));
+    while ((vocab_k < id_list_len(vocab_fields))) {
+        id_vocab_name_check((char*)(intptr_t)(id_list_get(vocab_fields, vocab_k)), 4, vocab_row);
+        vocab_k = (vocab_k + 1);
+    }
+    return;
+}
+
+void id_vocab_summary(void) {
+    char* vocab_head = NULL;
+    { char* idfe_o = vocab_head; vocab_head = id_concat_f(id_concat_f(ID_S("word-scan: "), id_str_of_int((int)(id_list_get(vocab_totals, 0))), 2), ID_S(" distinct names, "), 1); id_str_free(idfe_o); }
+    id_print(id_concat_f(id_concat_f(vocab_head, id_str_of_int((int)(id_list_get(vocab_totals, 1))), 2), ID_S(" not spelled in words"), 1));
+    { id_str_free(vocab_head); return; }
+}
+
+void id_vocab_scan_fns(int vocab_i) {
+    char* vocab_fn;
+    while ((vocab_i < id_list_len(prog))) {
+IdList* idsq_17;
+        vocab_fn = (idsq_17 = ns1, (char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(prog, vocab_i)))));
+        id_vocab_name_check(vocab_fn, 0, vocab_i);
+        vocab_i = (vocab_i + 1);
+    }
+    return;
+}
+
+void id_vocab_scan_vars(int vocab_i) {
+    while ((vocab_i < id_list_len(dvname))) {
+        id_vocab_name_check((char*)(intptr_t)(id_list_get(dvname, vocab_i)), 1, vocab_i);
+        vocab_i = (vocab_i + 1);
+    }
+    return;
+}
+
+void id_vocab_scan_exports(int vocab_i) {
+    while ((vocab_i < id_list_len(enames))) {
+        id_vocab_name_check((char*)(intptr_t)(id_list_get(enames, vocab_i)), 2, vocab_i);
+        vocab_i = (vocab_i + 1);
+    }
+    return;
 }
 
 void id_exp_one(int id, char* owner) {

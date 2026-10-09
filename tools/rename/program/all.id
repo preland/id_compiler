@@ -1,0 +1,35 @@
+// All the files of a rename, one at a time.
+
+// The source files and registries under every root, root by root.
+rename_gather(string[] rename_roots) {
+  string[] rename_files = [];
+  int rename_at = 0;
+  while(rename_at < len(rename_roots)) {
+    lst_str_extend(rename_files, rename_walk(rename_roots[rename_at]));
+    rename_at = rename_at + 1;
+  }
+} return string[] rename_files;
+given rename_test_tree ([".", "sub"]):(["./NAMES.md", "./a.id", "./sub/NOTES.md", "./sub/b.id", "sub/NOTES.md", "sub/b.id"])
+([]):([])
+
+// Renames in every file of a list.
+rename_apply_files(string[] rename_files, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, int[] rename_totals) {
+  int rename_at = 0;
+  while(rename_at < len(rename_files)) {
+    rename_in_file(rename_files[rename_at], rename_table_keys, rename_table_values, rename_table_used, rename_table_news, rename_dry, rename_totals);
+    rename_at = rename_at + 1;
+  }
+} return void;
+given rename_test_table given rename_test_scratch("a.id", "old_a x", "NAMES.md", "| `old_b` |\nold_a") (["a.id", "NAMES.md"], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, [0, 0, 0]):(["a.id", "NAMES.md"]) then fs_read_text("NAMES.md"):("| `new_b` |\nold_a") then prints:("a.id:1: old_a -> new_a\nNAMES.md:1: old_b -> new_b\n")
+given rename_test_table ([], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, [0, 0, 0]):([])
+
+// The line that ends a run: how many names changed, in how many files, and
+// whether nothing was written.
+rename_summary(int[] rename_totals, int rename_dry) {
+  string rename_line_out = rename_totals[0] + " name(s) renamed in " + rename_totals[1] + " file(s)";
+  if(rename_dry == 1) {
+    rename_line_out = rename_line_out + " (dry run, nothing written)";
+  }
+} return string rename_line_out;
+([3, 2, 0], 0):("3 name(s) renamed in 2 file(s)")
+([3, 2, 0], 1):("3 name(s) renamed in 2 file(s) (dry run, nothing written)")

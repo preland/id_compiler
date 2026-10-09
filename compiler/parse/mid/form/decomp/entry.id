@@ -26,6 +26,7 @@ check_program_tail2() {
   wsc_scan();
 } chain () {
   noop_scan();
+  word_scan();
 } return void;
 given lz_empty given init_reg ():() then calls check_genname:() then calls check_fwd:() then calls check_imp_dup:()
 given lz_o given init_reg ():() then calls check_genname:() then calls check_fwd:() then calls check_imp_dup:()
@@ -33,3 +34,4 @@ given lz_empty given init_reg ():() then calls std_var_pass:[1]
 given lz_empty given init_reg ():() then calls ext_check:[1]
 given lz_empty given init_reg ():() then calls wsc_scan:[1]
 given lz_empty given init_reg ():() then calls noop_scan:[1]
+given lz_empty given init_reg ():() then calls word_scan:[1]

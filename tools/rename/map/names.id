@@ -1,0 +1,28 @@
+// What makes a name something a rename may start from or end at.
+
+// Whether a name is one of the language's reserved words. The lexer's list; the
+// lexer is a separate program and cannot be called from here.
+rename_is_keyword(string rename_name) {
+  int rename_is_reserved = 0;
+  if(rename_name == "int" || rename_name == "float" || rename_name == "string" || rename_name == "void" || rename_name == "if" || rename_name == "else" || rename_name == "while" || rename_name == "return" || rename_name == "export" || rename_name == "import" || rename_name == "word" || rename_name == "asm" || rename_name == "native" || rename_name == "given" || rename_name == "then" || rename_name == "func" || rename_name == "prints" || rename_name == "eprints" || rename_name == "calls" || rename_name == "chain" || rename_name == "blank" || rename_name == "break" || rename_name == "stdin" || rename_name == "traps" || rename_name == "timeout" || rename_name == "struct" || rename_name == "pure") {
+    rename_is_reserved = 1;
+  }
+} return int rename_is_reserved;
+("while"):(1)
+("pure"):(1)
+("whilex"):(0)
+("While"):(0)
+
+// Whether a text is one identifier: a letter or underscore, then letters,
+// digits and underscores, to the end.
+rename_valid_name(string rename_name) {
+  int rename_valid = 0;
+  if(len(rename_name) > 0 && (chr_is_alpha(charat(rename_name, 0)) || charat(rename_name, 0) == 95)) {
+    rename_valid = rename_run_end(rename_name, 0) == len(rename_name);
+  }
+} return int rename_valid;
+("a_1"):(1)
+("_a"):(1)
+("1a"):(0)
+("a-b"):(0)
+(""):(0)

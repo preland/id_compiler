@@ -1,0 +1,19 @@
+// Test fixture: a scratch directory the process moves into, holding a small
+// project to rename in. src/a.id and src/NAMES.md use the name oldname, src/b.id
+// holds the text given, map.txt maps oldname to alpha, and words/ is a
+// vocabulary of one word, alpha.
+rename_test_project(string rename_second_text) {
+  string rename_here = fs_enter(fs_mktemp("rename_t_", 1));
+  int rename_made_source = fs_mkdir_p("src");
+  int rename_made_words = fs_mkdir_p("words");
+} chain (string rename_second_text) {
+  int rename_wrote_source_file = rename_write("src/a.id", "oldname() oldname // oldname \"oldname\"\n");
+  int rename_wrote_names = rename_write("src/NAMES.md", "| `oldname` | prose oldname |\nplain `oldname`\n");
+  int rename_wrote_deep_file = rename_write("src/b.id", rename_second_text);
+} chain (string rename_second_text) {
+  int rename_wrote_map = rename_write("map.txt", "oldname alpha\n");
+  int rename_wrote_vocabulary_file = rename_write("words/english.txt", "alpha\n");
+  int rename_wrote_allowed = rename_write("words/allowed.txt", "");
+} return void;
+(""):() then fs_read_text("map.txt"):("oldname alpha\n")
+("zz"):() then fs_read_text("src/b.id"):("zz")

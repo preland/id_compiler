@@ -1,0 +1,22 @@
+// regrow_e (names/symbols/check/access/report/more/callvar/check.id) exports one
+// name, "g", with a type but no owner; the word scan reports an export at its
+// owner's place, so this adds the owner the cases of whatever reads the export
+// table (walk.id, loc.id) need.
+
+vocab_export_row() {
+  regrow_e();
+  push((import eowners), "f");
+} return void;
+():() then len((import eowners)):(1)
+():() then (import enames)[0]:("g")
+
+vocab_world() {
+  vocab_export_row();
+  fn_fixture_build();
+  edge_loc(7);
+} chain () {
+  edge_fixture_caller();
+  vocab_words();
+} return void;
+():() then len((import prog)):(2)
+():() then len((import dvname)):(1)

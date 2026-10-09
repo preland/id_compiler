@@ -1,0 +1,25 @@
+// The report of a rename: one row per renamed name, `LINE: old -> new`, in the
+// order the names appear.
+
+// Appends the row for one name, unless it keeps its name.
+rename_row(string[] rename_listed, string rename_old, string rename_new, int rename_line) {
+  if(rename_new != "") {
+    push(rename_listed, rename_line + ": " + rename_old + " -> " + rename_new);
+  }
+} return void;
+([], "ab", "x", 3):(["3: ab -> x"], "ab", "x", 3)
+(["r"], "ab", "", 3):(["r"], "ab", "", 3)
+
+// The rows for every name in a list of triples with its picked replacement.
+rename_rows(string rename_source, int[] rename_spans, string[] rename_picked) {
+  string[] rename_listed = [];
+  int rename_at = 0;
+  while(rename_at < len(rename_spans)) {
+    string rename_old = str_sub(rename_source, rename_spans[rename_at], rename_spans[rename_at + 1] - rename_spans[rename_at]);
+    rename_row(rename_listed, rename_old, rename_picked[rename_at / 3], rename_spans[rename_at + 2]);
+    rename_at = rename_at + 3;
+  }
+} return string[] rename_listed;
+("ab = cd;", [0, 2, 1, 5, 7, 2], ["x", ""]):(["1: ab -> x"])
+("ab = cd;", [0, 2, 1, 5, 7, 2], ["x", "yz"]):(["1: ab -> x", "2: cd -> yz"])
+("ab", [], []):([])

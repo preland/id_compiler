@@ -1,0 +1,39 @@
+// E0311: a name whose pieces are not all words. `fb_w` says nothing to a reader
+// who did not write it; `framebuffer_width` does. Every identifier the program
+// declares is split on `_` and each piece looked up in the vocabulary (./state.id),
+// which bin/idc loads from data/words/ only under --word-scan: with no
+// vocabulary loaded the scan does nothing, so no ordinary build is affected.
+//
+// It covers functions, parameters and locals, exported names and conf.id
+// constants, struct names and their fields. File and directory names are not
+// in scope. A name is judged once however many functions declare it, and the
+// scan ends with one line of totals (names judged, names not spelled in words).
+
+word_scan() {
+  if((import vocab_count)[0] > 0) {
+    vocab_run();
+  }
+} return void;
+given full_env ():() then calls vocab_run:[0]
+given vocab_world ():() then calls vocab_run:[1]
+
+vocab_run() {
+  vocab_scan_fns(0);
+  vocab_scan_vars(0);
+  vocab_scan_exports(0);
+} chain () {
+  vocab_scan_structs(0);
+  vocab_summary();
+} return void;
+given vocab_world ():() then calls vocab_scan_fns:(0)
+given vocab_world ():() then calls vocab_summary:()
+
+vocab_name_check(string vocab_name, int vocab_kind, int vocab_row) {
+  int vocab_known = hmap_has((import vocab_seen_keys), (import vocab_seen_used), vocab_name);
+  if(vocab_known == 0) {
+    vocab_judge(vocab_name, vocab_kind, vocab_row);
+  }
+} return void;
+given edge_fixture given vocab_words ("fb", 0, 0):() then (import vocab_totals)[0]:(1)
+given edge_fixture given vocab_words ("fb", 0, 0):() then (import vocab_seen_count)[0]:(1)
+given edge_fixture given vocab_words given vocab_judge("buffer", 0, 0) ("buffer", 0, 0):() then (import vocab_totals)[0]:(1)

@@ -1,0 +1,18 @@
+// Test fixture: a rename table that maps old_a to new_a and old_b to new_b, in
+// the four lists the standard library's hash table is, plus the list of new
+// names its values index. Left in the exports rename_t_keys, rename_t_vals,
+// rename_t_used, rename_t_count and rename_t_news for the cases that need a table.
+rename_test_table() {
+  export string[] rename_test_keys = [];
+  export int[] rename_test_values = [];
+  export int[] rename_test_used = [];
+} chain () {
+  export int[] rename_test_count = [];
+  export string[] rename_test_news = ["new_a", "new_b"];
+  hmap_init(rename_test_keys, rename_test_values, rename_test_used, rename_test_count);
+} chain () {
+  hmap_put(rename_test_keys, rename_test_values, rename_test_used, rename_test_count, "old_a", 0);
+  hmap_put(rename_test_keys, rename_test_values, rename_test_used, rename_test_count, "old_b", 1);
+} return void export rename_test_keys;
+given rename_test_table ():() then hmap_count((import rename_test_count)):(2)
+given rename_test_table ():() then hmap_get((import rename_test_keys), (import rename_test_values), (import rename_test_used), "old_b", -1):(1)

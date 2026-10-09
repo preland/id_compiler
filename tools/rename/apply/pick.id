@@ -1,0 +1,30 @@
+// Which names a rename changes, and what to. The map is a hash table of old
+// names (the standard library's four lists) whose values index the list of new
+// names, so one lookup per name costs the same however long the map is.
+
+// The new name for a name, or "" when the map does not mention it.
+rename_pick(string rename_name, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news) {
+  int rename_slot = hmap_get(rename_table_keys, rename_table_values, rename_table_used, rename_name, -1);
+  string rename_chosen = "";
+  if(rename_slot >= 0) {
+    rename_chosen = rename_table_news[rename_slot];
+  }
+} return string rename_chosen;
+given rename_test_table ("old_b", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news)):("new_b")
+given rename_test_table ("old_a", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news)):("new_a")
+given rename_test_table ("other", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news)):("")
+
+// The new name for every name in a list of triples, "" where it keeps its name;
+// element k belongs to the triple that starts at 3k.
+rename_pick_all(string rename_source, int[] rename_spans, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news) {
+  string[] rename_picked = [];
+  int rename_at = 0;
+  while(rename_at < len(rename_spans)) {
+    string rename_name = str_sub(rename_source, rename_spans[rename_at], rename_spans[rename_at + 1] - rename_spans[rename_at]);
+    push(rename_picked, rename_pick(rename_name, rename_table_keys, rename_table_values, rename_table_used, rename_table_news));
+    rename_at = rename_at + 3;
+  }
+} return string[] rename_picked;
+given rename_test_table ("old_c x", [0, 5, 1, 6, 7, 1], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news)):(["", ""])
+given rename_test_table ("old_a x old_b", [0, 5, 1, 6, 7, 1, 8, 13, 1], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news)):(["new_a", "", "new_b"])
+("", [], [], [], [], []):([])

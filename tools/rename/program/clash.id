@@ -1,0 +1,38 @@
+// Whether a new name is already in use. A rename that gave a name to something
+// else's name would make two things one, and the compiler would either reject
+// the program or, when the types agree, accept a program that does something
+// different. Every name in the program, declared or only used, counts: a name
+// that is used is declared somewhere, in the program, the library or the
+// compiler's builtins.
+
+// Counts the name at an index of the spans, when it is one of the new names.
+rename_count_one(string rename_source, int[] rename_spans, int rename_at, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used, int[] rename_count_count) {
+  string rename_name = str_sub(rename_source, rename_spans[rename_at], rename_spans[rename_at + 1] - rename_spans[rename_at]);
+  if(hmap_has(rename_count_keys, rename_count_used, rename_name) == 1) {
+    hmap_bump(rename_count_keys, rename_count_values, rename_count_used, rename_count_count, rename_name);
+  }
+} return void;
+given rename_test_seeded ("alpha x", [0, 5, 1, 6, 7, 1], 0, (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("alpha x", [0, 5, 1, 6, 7, 1], 0) then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(1)
+given rename_test_seeded ("alpha x", [0, 5, 1, 6, 7, 1], 3, (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("alpha x", [0, 5, 1, 6, 7, 1], 3) then hmap_count((import rename_test_word_count)):(2)
+
+// Counts every name in a source text that is one of the new names.
+rename_count_names(string rename_source, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used, int[] rename_count_count) {
+  int[] rename_spans = rename_name_spans(rename_source);
+  int rename_at = 0;
+  while(rename_at < len(rename_spans)) {
+    rename_count_one(rename_source, rename_spans, rename_at, rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
+    rename_at = rename_at + 3;
+  }
+} return void;
+given rename_test_seeded ("alpha(beta) // alpha\n\"beta\" alpha", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("alpha(beta) // alpha\n\"beta\" alpha") then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(2)
+given rename_test_seeded ("alpha(beta) // alpha\n\"beta\" alpha", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("alpha(beta) // alpha\n\"beta\" alpha") then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "beta", -1):(1)
+
+// Counts the new names in one file: only a source file is read, because a name in
+// a registry's table is a copy of one declared in source.
+rename_count_file(string rename_file, string[] rename_count_keys, int[] rename_count_values, int[] rename_count_used, int[] rename_count_count) {
+  if(str_ends(rename_file, ".id") == 1) {
+    rename_count_names(fs_read_text(rename_file), rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
+  }
+} return void;
+given rename_test_seeded given rename_test_scratch("x.id", "alpha", "x.md", "alpha") ("x.id", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("x.id") then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(1)
+given rename_test_seeded given rename_test_scratch("x.id", "alpha", "x.md", "alpha") ("x.md", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("x.md") then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(0)

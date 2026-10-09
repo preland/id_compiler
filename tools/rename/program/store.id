@@ -1,0 +1,30 @@
+// Writing a renamed file back, and counting what was done.
+
+// Adds one file to the totals: the names changed, the files changed, and the
+// files that could not be written (a write answers a negative number).
+rename_tally(int[] rename_totals, int rename_changed, int rename_put) {
+  rename_totals[0] = rename_totals[0] + rename_changed;
+  rename_totals[1] = rename_totals[1] + (rename_changed > 0);
+  rename_totals[2] = rename_totals[2] + (rename_put < 0);
+} return void;
+([0, 0, 0], 3, 5):([3, 1, 0], 3, 5)
+([2, 1, 1], 0, 0):([2, 1, 1], 0, 0)
+([0, 0, 0], 1, -1):([1, 1, 1], 1, -1)
+
+// Writes the text over the file when it changed and this is not a dry run, and
+// counts it. A file that cannot be written is named on standard error.
+rename_store(string rename_file, string rename_text, int rename_changed, int rename_dry, int[] rename_totals) {
+  int rename_put = 0;
+  if(rename_changed > 0 && rename_dry == 0) {
+    rename_put = rename_write(rename_file, rename_text);
+  }
+  rename_tally(rename_totals, rename_changed, rename_put);
+} chain (string rename_file, string rename_text, int rename_changed, int rename_dry, int[] rename_totals) {
+  if(rename_put < 0) {
+    eprint("cannot write " + rename_file);
+  }
+} return void;
+given rename_test_scratch("a", "1", "b", "2") ("a", "9", 1, 0, [0, 0, 0]):("a", "9", 1, 0) then fs_read_text("a"):("9")
+given rename_test_scratch("a", "1", "b", "2") ("a", "9", 1, 1, [0, 0, 0]):("a", "9", 1, 1) then fs_read_text("a"):("1")
+given rename_test_scratch("a", "1", "b", "2") ("a", "9", 0, 0, [0, 0, 0]):("a", "9", 0, 0) then fs_read_text("a"):("1")
+("/nonexistent/rename_store/a", "9", 1, 0, [0, 0, 0]):("/nonexistent/rename_store/a", "9", 1, 0, [1, 1, 1]) then eprints:("cannot write /nonexistent/rename_store/a\n")

@@ -37,7 +37,7 @@ push_tok2(string kind, string text) {
   } else if(kind == "ext") {
     ext_line(text);
   } else {
-    push_real(kind, text);
+    push_tok3(kind, text);
   }
 } return void;
 given full_env ("tcc", "123"):() then len((import tkind)):(0)

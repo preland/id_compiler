@@ -1,0 +1,44 @@
+// Writing a text over a file, and the scratch tree the file cases walk.
+
+// Replaces a file's content with a text. Answers the bytes written, -1 when
+// the file will not open.
+rename_write(string rename_path, string rename_text) {
+  word rename_bytes = mem_of_str(rename_text);
+  int rename_put = fs_save(rename_path, rename_bytes, len(rename_text));
+} return int rename_put;
+given rename_test_tree ((import rename_test_text), "hello"):(5) then fs_read_text((import rename_test_text)):("hello")
+given rename_test_tree ((import rename_test_text), ""):(0) then fs_read_text((import rename_test_text)):("")
+("/nonexistent/rename_write/x", "hello"):(-1)
+
+// Test fixture: a scratch directory the process moves into, holding a.id,
+// NAMES.md and x.txt, sub/b.id and sub/NOTES.md, and .git/c.id, which a walk
+// must not enter. Every file holds "a". The cases name the tree as ".", so
+// their expected paths do not depend on where the scratch directory is.
+rename_test_tree() {
+  string rename_here = fs_enter(fs_mktemp("rename_t_", 1));
+  int rename_made_sub = fs_mkdir_p("sub");
+  int rename_made_git = fs_mkdir_p(".git");
+} chain () {
+  export string rename_test_text = "x.txt";
+  int rename_wrote_source_file = rename_write("a.id", "a");
+  int rename_wrote_names = rename_write("NAMES.md", "a");
+} chain () {
+  export string rename_test_deep = "sub/b.id";
+  int rename_wrote_text_file = rename_write(rename_test_text, "a");
+  int rename_wrote_deep_file = rename_write(rename_test_deep, "a");
+} chain () {
+  int rename_wrote_hidden_file = rename_write(".git/c.id", "a");
+  int rename_wrote_notes = rename_write("sub/NOTES.md", "a");
+} return void;
+given rename_test_tree ():() then fs_read_text((import rename_test_text)):("a")
+given rename_test_tree ():() then fs_read_text((import rename_test_deep)):("a")
+
+// Test fixture: a scratch directory the process moves into, holding two files
+// with the names and texts given.
+rename_test_scratch(string rename_file_one, string rename_text_one, string rename_file_two, string rename_text_two) {
+  string rename_here = fs_enter(fs_mktemp("rename_t_", 1));
+  int rename_wrote_one = rename_write(rename_file_one, rename_text_one);
+  int rename_wrote_two = rename_write(rename_file_two, rename_text_two);
+} return void;
+("a", "1", "b", "2"):("a", "1", "b", "2") then fs_read_text("b"):("2")
+("a", "1", "b", "2"):("a", "1", "b", "2") then fs_read_text("a"):("1")

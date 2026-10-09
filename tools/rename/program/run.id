@@ -1,0 +1,43 @@
+// The whole run: check everything, then change nothing or change it all.
+
+// The refusals for a map against the whole program: every new name that is
+// already in use in the roots or in the reserved directories (which are read
+// for this and never changed).
+rename_collisions(string[] rename_old_names, string[] rename_news, string[] rename_files, string[] rename_reserved) {
+  string[] rename_count_keys = [];
+  int[] rename_count_values = [];
+  int[] rename_count_used = [];
+} chain (string[] rename_old_names, string[] rename_news, string[] rename_files, string[] rename_reserved) {
+  int[] rename_count_count = [];
+  rename_seed_counts(rename_news, rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
+  rename_count_files(rename_files, rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
+} chain (string[] rename_old_names, string[] rename_news, string[] rename_files, string[] rename_reserved) {
+  string[] rename_extra = rename_gather(rename_reserved);
+  rename_count_files(rename_extra, rename_count_keys, rename_count_values, rename_count_used, rename_count_count);
+  string[] rename_clashes = rename_clash_problems(rename_old_names, rename_news, rename_count_keys, rename_count_values, rename_count_used);
+} return string[] rename_clashes;
+given rename_test_project("alpha") (["oldname"], ["alpha"], ["src/b.id"], []):(["oldname -> alpha: the new name is already used 1 time(s) in the program"])
+given rename_test_project("alpha") (["oldname"], ["alpha"], ["src/a.id"], []):([])
+given rename_test_project("alpha") (["oldname"], ["alpha"], ["src/a.id"], ["src/b.id"]):(["oldname -> alpha: the new name is already used 1 time(s) in the program"])
+
+// The roots that do not exist.
+rename_root_problems(string[] rename_roots) {
+  string[] rename_problems = [];
+  int rename_at = 0;
+  while(rename_at < len(rename_roots)) {
+    rename_note(rename_problems, rename_root_missing(rename_roots[rename_at]));
+    rename_at = rename_at + 1;
+  }
+} return string[] rename_problems;
+given rename_test_project("") (["src", "src/a.id"]):([])
+given rename_test_project("") (["src", "nowhere"]):(["nowhere does not exist"])
+
+// "" for a root that exists, or says it does not.
+rename_root_missing(string rename_root) {
+  string rename_problem = "";
+  if(fs_kind(rename_root) < 1) {
+    rename_problem = rename_root + " does not exist";
+  }
+} return string rename_problem;
+given rename_test_project("") ("src"):("")
+("nowhere"):("nowhere does not exist")

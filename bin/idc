@@ -62,7 +62,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O 0|1|2|3|s] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--fix] [--print-std] [--exports list|all] [--no-js]" >&2
+    echo "usage: idc PATH [-o OUTPUT] [--target c|llvm|wasm] [--freestanding] [--runtime] [-O 0|1|2|3|s] [--emit-c FILE] [--emit-llvm FILE] [--lib | --lib-state] [--keep-c] [--cc CC] [--backend DIR]... [--triple TRIPLE] [--require-tests] [--allow-untested] [--list-untested] [--fingerprints] [--calls] [--check] [--word-scan] [--fix] [--print-std] [--exports list|all] [--no-js]" >&2
     echo "       idc PATH [--diagnostics human|json|plain] [--color auto|always|never]    how diagnostics are printed (docs/DIAGNOSTICS.md)" >&2
     echo "       idc --explain CODE                                                       the long explanation of an error code, e.g. E0501" >&2
     echo "       idc --where NAME [PATH]                                                  FILE:LINE and signature of a function, in PATH or idstd; NAME or FILE::NAME" >&2
@@ -91,6 +91,7 @@ EMIT_SOURCES=0
 FINGERPRINTS=0
 CALLS=0
 CHECK=0
+WORD_SCAN=0
 FIX=0
 PRINT_STD=0
 WEXPORT_SCOPE=list
@@ -149,6 +150,8 @@ while [ $# -gt 0 ]; do
             CALLS=1; shift ;;
         --check)
             CHECK=1; shift ;;
+        --word-scan)
+            WORD_SCAN=1; shift ;;
         --fix)
             FIX=1; shift ;;
         --print-std)
@@ -760,9 +763,10 @@ run_lex_parse() {
     progress lex "$(plural "${#SRC_FILES[@]}" file)"
     capped_from "$src" "$IDLEX" "$@" 2>"$LEX_ERR" > "$lex_out"
     lex_rc=$?
-    if [ -n "$EXT_HEAD" ] || { [ -n "${TC_FILE:-}" ] && [ -s "$TC_FILE" ]; }; then
+    if [ -n "$EXT_HEAD" ] || [ -n "${WORD_HEAD:-}" ] || { [ -n "${TC_FILE:-}" ] && [ -s "$TC_FILE" ]; }; then
         {
             [ -z "$EXT_HEAD" ] || cat "$EXT_HEAD" "$EXT_STREAM"
+            [ -z "${WORD_HEAD:-}" ] || cat "$WORD_HEAD"
             [ -z "${TC_FILE:-}" ] || [ ! -s "$TC_FILE" ] || sed 's/^/tcc /' "$TC_FILE"
             cat "$lex_out"
         } > "$lex_out.tc" && lex_out="$lex_out.tc"
@@ -1950,6 +1954,7 @@ fi
 # which for a --freestanding build is not the program's triple. It is also what
 # decides which functions cannot be tested here (see --list-untested, below).
 PARSE_ARGS+=(--host-triple "$(host_triple)")
+[ "$WORD_SCAN" -eq 1 ] && PARSE_ARGS+=(--word-scan)
 if [ "$FINGERPRINTS" -eq 1 ]; then
     PARSE_ARGS+=(--fingerprints)
 elif [ "$CALLS" -eq 1 ]; then
@@ -2159,6 +2164,20 @@ obj_cache_put() {
 phase collected
 progress read "$(plural "${#SRC_FILES[@]}" file)"
 FE_HIT=0
+# --word-scan hands idparse the vocabulary as `wrd WORD` lines ahead of the
+# tokens, the way the type-check keys travel: data/words/english.txt is the
+# dictionary and data/words/allowed.txt the names that are valid but not in it
+# (a line starting with # is a comment). idparse checks every declared name
+# against both (E0311). Only under the flag: no other build reads either file.
+WORD_HEAD=""
+if [ "$WORD_SCAN" -eq 1 ]; then
+    for wf in english allowed; do
+        [ -f "$ROOT/data/words/$wf.txt" ] || { echo "idc: --word-scan reads $ROOT/data/words/$wf.txt, which does not exist" >&2; exit 1; }
+    done
+    WORD_HEAD="$WORK/words.head"
+    cat "$ROOT/data/words/english.txt" "$ROOT/data/words/allowed.txt" \
+        | awk '/^#/ || NF == 0 { next } { print "wrd " $1 }' > "$WORD_HEAD"
+fi
 # Materialised unconditionally, cache on or off: capped_from (see capped(),
 # above) needs a real path for idlex's input regardless, since ccrun no
 # longer touches its own stdin at all (see its own comments) -- and the
@@ -2184,6 +2203,7 @@ if [ "$CACHE_ON" -eq 1 ]; then
           cc_path="$(command -v "$CC" 2>/dev/null)"
           [ -n "$cc_path" ] && sha256sum "$cc_path"
           [ -z "$EXT_HEAD" ] || { printf 'EXT=%s\0' "$EXT_ID"; cat "$EXT_HEAD"; }
+          [ -z "$WORD_HEAD" ] || { printf 'WORDS\0'; cat "$WORD_HEAD"; }
           if [ "$STD_LAZY" -eq 1 ]; then printf 'STDPLAN=%s\0' "$STD_PKEY"; else cat "$SOURCES_TMP"; fi
         } | sha256sum | cut -d' ' -f1
     )

@@ -1,0 +1,58 @@
+// Why a pair in the map is refused. Each answers "" when there is nothing wrong.
+
+// What is wrong with a name the program already has and is to lose: it must be
+// a name, and not a reserved word, or it is not a thing a program declares.
+rename_old_problem(string rename_name) {
+  string rename_why = "";
+  if(rename_is_keyword(rename_name) == 1) {
+    rename_why = "is a reserved word";
+  }
+  if(rename_valid_name(rename_name) == 0) {
+    rename_why = "is not a name";
+  }
+} return string rename_why;
+("while"):("is a reserved word")
+("1a"):("is not a name")
+("fb_w"):("")
+
+// What is wrong with a name the program is to gain: it must be a name, not a
+// reserved word, and every piece of it a word (E0311).
+rename_name_problem(string rename_name, string[] rename_word_keys, int[] rename_word_used) {
+  string rename_why = "";
+  string rename_misspelled = rename_bad_pieces(rename_name, rename_word_keys, rename_word_used);
+  if(rename_misspelled != "") {
+    rename_why = "is not spelled in words (E0311): " + rename_misspelled;
+  }
+} chain (string rename_name, string[] rename_word_keys, int[] rename_word_used) {
+  if(rename_is_keyword(rename_name) == 1) {
+    rename_why = "is a reserved word";
+  }
+  if(rename_valid_name(rename_name) == 0) {
+    rename_why = "is not a name";
+  }
+} return string rename_why;
+given rename_test_words_filled ("alpha_beta", (import rename_test_word_keys), (import rename_test_word_used)):("")
+given rename_test_words_filled ("alpha_x", (import rename_test_word_keys), (import rename_test_word_used)):("is not spelled in words (E0311): x")
+given rename_test_words_filled ("while", (import rename_test_word_keys), (import rename_test_word_used)):("is a reserved word")
+given rename_test_words_filled ("alpha-beta", (import rename_test_word_keys), (import rename_test_word_used)):("is not a name")
+
+// The problem with one pair, naming it; "" when the pair is good.
+rename_pair_problem(string rename_old, string rename_new, string[] rename_word_keys, int[] rename_word_used) {
+  string rename_why_old = rename_old_problem(rename_old);
+  string rename_why_new = rename_name_problem(rename_new, rename_word_keys, rename_word_used);
+  string rename_problem = "";
+} chain (string rename_old, string rename_new, string[] rename_word_keys, int[] rename_word_used) {
+  if(rename_why_new != "") {
+    rename_problem = rename_old + " -> " + rename_new + ": the new name " + rename_why_new;
+  }
+  if(rename_why_old != "") {
+    rename_problem = rename_old + " -> " + rename_new + ": the old name " + rename_why_old;
+  }
+  if(rename_old == rename_new) {
+    rename_problem = rename_old + " -> " + rename_new + ": the name does not change";
+  }
+} return string rename_problem;
+given rename_test_words_filled ("x", "alpha", (import rename_test_word_keys), (import rename_test_word_used)):("")
+given rename_test_words_filled ("x", "y", (import rename_test_word_keys), (import rename_test_word_used)):("x -> y: the new name is not spelled in words (E0311): y")
+given rename_test_words_filled ("int", "alpha", (import rename_test_word_keys), (import rename_test_word_used)):("int -> alpha: the old name is a reserved word")
+given rename_test_words_filled ("alpha", "alpha", (import rename_test_word_keys), (import rename_test_word_used)):("alpha -> alpha: the name does not change")

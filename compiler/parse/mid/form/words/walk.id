@@ -1,0 +1,31 @@
+// The tables the word scan reads, one loop each: every function of the program,
+// every declared parameter and local, every export (conf.id constants included).
+// The first row to carry a name is the one a report points at.
+
+vocab_scan_fns(int vocab_i) {
+  while(vocab_i < len((import prog))) {
+    string vocab_fn = (import ns1)[(import prog)[vocab_i]];
+    vocab_name_check(vocab_fn, 0, vocab_i);
+    vocab_i = vocab_i + 1;
+  }
+} return void;
+given edge_fixture given vocab_words (0):() then (import vocab_totals)[0]:(2)
+given edge_fixture given vocab_words (2):() then (import vocab_totals)[0]:(0)
+
+vocab_scan_vars(int vocab_i) {
+  while(vocab_i < len((import dvname))) {
+    vocab_name_check((import dvname)[vocab_i], 1, vocab_i);
+    vocab_i = vocab_i + 1;
+  }
+} return void;
+given regrow_d given vocab_words (0):() then (import vocab_totals)[0]:(1)
+given regrow_d given vocab_words (1):() then (import vocab_totals)[0]:(0)
+
+vocab_scan_exports(int vocab_i) {
+  while(vocab_i < len((import enames))) {
+    vocab_name_check((import enames)[vocab_i], 2, vocab_i);
+    vocab_i = vocab_i + 1;
+  }
+} return void;
+given vocab_export_row given vocab_words (0):() then (import vocab_totals)[0]:(1)
+given vocab_export_row given vocab_words (1):() then (import vocab_totals)[0]:(0)

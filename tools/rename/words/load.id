@@ -1,0 +1,40 @@
+// The vocabulary a new name is checked against: the compiler's own word lists
+// (idc/data/words/english.txt and allowed.txt, the lists `idc --word-scan`
+// reads), so a name this tool accepts is one E0311 accepts.
+
+// Adds one line of a word list to the table. A blank line and a `#` comment line
+// add nothing.
+rename_put_word(string rename_entry, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
+  string rename_word = str_lower(str_trim(rename_entry));
+  if(rename_word != "" && charat(rename_word, 0) != 35) {
+    hmap_put(rename_word_keys, rename_word_values, rename_word_used, rename_word_count, rename_word, 1);
+  }
+} return void;
+given rename_test_words_empty (" Ab ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(" Ab ") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "ab"):(1)
+given rename_test_words_empty ("# ab", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("# ab") then hmap_count((import rename_test_word_count)):(0)
+given rename_test_words_empty ("  ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("  ") then hmap_count((import rename_test_word_count)):(0)
+
+// Adds every line of a word list to the table.
+rename_put_words(string rename_text, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
+  string[] rename_lines = str_lines(rename_text);
+  int rename_at = 0;
+  while(rename_at < len(rename_lines)) {
+    rename_put_word(rename_lines[rename_at], rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+    rename_at = rename_at + 1;
+  }
+} return void;
+given rename_test_words_empty ("a1\nb2\n", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("a1\nb2\n") then hmap_count((import rename_test_word_count)):(2)
+given rename_test_words_empty ("", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("") then hmap_count((import rename_test_word_count)):(0)
+
+// Fills the table from the two list files in a directory.
+rename_load_words(string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
+  hmap_init(rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+  string rename_vocabulary_words = fs_read_text(path_join(rename_words_directory, "english.txt"));
+  string rename_allowed = fs_read_text(path_join(rename_words_directory, "allowed.txt"));
+} chain (string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
+  rename_put_words(rename_vocabulary_words, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+  rename_put_words(rename_allowed, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+} return void;
+given rename_test_words_empty given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "# why\nidstd\n") (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "alpha"):(1)
+given rename_test_words_empty given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "# why\nidstd\n") (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "idstd"):(1)
+given rename_test_words_empty ("/nonexistent/rename_words", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("/nonexistent/rename_words") then hmap_count((import rename_test_word_count)):(0)

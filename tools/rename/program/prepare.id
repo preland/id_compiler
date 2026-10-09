@@ -1,0 +1,45 @@
+// Everything a rename checks before it touches a file.
+
+// Reads the map: the pairs onto the two lists, and the problems with the file or
+// its lines. A map with no pairs is a problem too, since a rename of nothing is
+// a command mistyped.
+rename_prepare(string rename_map_path, string[] rename_old_names, string[] rename_news) {
+  string rename_map_text = fs_read_text(rename_map_path);
+  string[] rename_problems = [];
+  rename_parse_map(rename_map_text, rename_old_names, rename_news, rename_problems);
+} chain (string rename_map_path, string[] rename_old_names, string[] rename_news) {
+  if(len(rename_old_names) == 0 && len(rename_problems) == 0) {
+    push(rename_problems, "the map " + rename_map_path + " is missing, unreadable or holds no pairs");
+  }
+} return string[] rename_problems;
+given rename_test_scratch("m", "a b\n# c\n", "n", "") ("m", [], []):([])
+given rename_test_scratch("m", "a b\n# c\n", "n", "") ("n", [], []):(["the map n is missing, unreadable or holds no pairs"])
+("/nonexistent/rename_prepare", [], []):(["the map /nonexistent/rename_prepare is missing, unreadable or holds no pairs"])
+given rename_test_scratch("m", "a\n", "n", "") ("m", [], []):(["line 1: expected `old new`, found 1 word(s)"])
+
+// The problems with the pairs of a map against the vocabulary read from a
+// directory of word lists; a directory with no words is a problem too, since
+// every name would be refused.
+rename_vocab_problems(string[] rename_old_names, string[] rename_news, string rename_words_directory, string[] rename_problems) {
+  string[] rename_word_keys = [];
+  int[] rename_word_values = [];
+  int[] rename_word_used = [];
+} chain (string[] rename_old_names, string[] rename_news, string rename_words_directory, string[] rename_problems) {
+  int[] rename_word_count = [];
+  rename_load_words(rename_words_directory, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+  rename_vocab_note(rename_problems, rename_word_count, rename_words_directory);
+} chain (string[] rename_old_names, string[] rename_news, string rename_words_directory, string[] rename_problems) {
+  lst_str_extend(rename_problems, rename_map_problems(rename_old_names, rename_news, rename_word_keys, rename_word_used));
+} return void;
+given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "") (["x"], ["alpha"], ".", []):(["x"], ["alpha"], ".", [])
+given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "") (["x"], ["gamma"], ".", []):(["x"], ["gamma"], ".", ["x -> gamma: the new name is not spelled in words (E0311): gamma"])
+(["x"], ["alpha"], "/nonexistent/rename_words", []):(["x"], ["alpha"], "/nonexistent/rename_words", ["no words could be read from /nonexistent/rename_words (english.txt, allowed.txt)", "x -> alpha: the new name is not spelled in words (E0311): alpha"])
+
+// Notes that the vocabulary is empty, which means its two files could not be read.
+rename_vocab_note(string[] rename_problems, int[] rename_word_count, string rename_words_directory) {
+  if(hmap_count(rename_word_count) == 0) {
+    push(rename_problems, "no words could be read from " + rename_words_directory + " (english.txt, allowed.txt)");
+  }
+} return void;
+([], [0], "d"):(["no words could be read from d (english.txt, allowed.txt)"], [0], "d")
+(["p"], [3], "d"):(["p"], [3], "d")

@@ -1,0 +1,104 @@
+# Names that are valid in an identifier but are not in english.txt: brands,
+# obscure coding terms, and the one-letter or digit-bearing pieces (utf8, json,
+# wayland, ttf). One lowercase piece per line, no spaces. A line starting with
+# '#' and a blank line are comments. A name is split on '_' and every piece must
+# be in english.txt or here (idc --word-scan; docs/ERRORS.md, E0311).
+
+# The standard library's own name; every function it exports and every internal helper starts with it.
+idstd
+
+# Data formats, hashes and encodings whose standard name is the short spelling
+# (digits or an acronym nobody writes out); a reader searches for exactly this.
+utf8
+sha256
+crc32
+json
+csv
+xml
+pdf
+bom
+ttf
+wav
+odt
+odp
+fodt
+rgb
+hsv
+
+# Network protocols and addresses, named by their acronym in every specification.
+http
+url
+tcp
+udp
+crlf
+
+# Build targets and language terms: wasm is the target's name, asm is an id
+# keyword, and these C words are what c2id represents when it translates C.
+wasm
+asm
+sizeof
+typedef
+uint
+
+# The Wayland protocol's own object and interface names; the generated names
+# have to match the protocol XML, so they cannot be respelled.
+xdg
+wl
+shm
+toplevel
+positioner
+subcompositor
+viewporter
+viewport
+subpixel
+fullscreen
+keymap
+
+# POSIX and operating-system terms, named after the call, field or device that
+# a function wraps; the manual page is one search away.
+lf
+eof
+nul
+tty
+pty
+cpu
+pci
+gl
+fd
+pid
+pgid
+gid
+errno
+epoll
+mkdir
+mktemp
+umask
+mtime
+fifo
+unix
+
+# Names of id builtins; a local holding the builtin's result is named after it
+# (the idstd convention is <call>_v).
+charat
+peek8
+ushr
+udiv
+alloc
+eprint
+
+# Established computer-science and graphics terms that the size-60 dictionary
+# lacks, not abbreviations.
+arity
+callee
+radix
+postfix
+textbox
+
+# Universally read short forms whose long spelling is worse: the toolkit's own
+# name (gui_), the module name os_, and the two commonest result and interface
+# words. Contestable; kept because the short form is the name.
+gui
+cli
+os
+ui
+ok

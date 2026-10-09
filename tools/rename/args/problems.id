@@ -1,0 +1,48 @@
+// The mistakes in a command line, all of them.
+
+// The mistakes in the arguments of a command line: an unknown option, an option
+// without its value, no root, no map, or more than one map or word list.
+rename_argument_problems(string[] rename_argument_values) {
+  string[] rename_problems = [];
+  int rename_at = 1;
+  while(rename_at < len(rename_argument_values)) {
+    rename_note(rename_problems, rename_flag_problem(rename_argument_values, rename_at));
+    rename_at = rename_argument_next(rename_argument_values, rename_at);
+  }
+} chain (string[] rename_argument_values) {
+  rename_note(rename_problems, rename_count_problem(rename_argument_values, "--map", 1));
+  rename_note(rename_problems, rename_count_problem(rename_argument_values, "--words", 0));
+  rename_note(rename_problems, rename_root_problem(rename_argument_values));
+} return string[] rename_problems;
+(["p", "src", "--map", "m"]):([])
+(["p", "--map", "m", "--bogus"]):(["unknown option --bogus", "no root given"])
+(["p", "src"]):(["--map is required"])
+(["p", "src", "--map", "a", "--map", "b", "--words"]):(["--words needs a value", "--map given twice"])
+
+// Whether an option appears the wrong number of times: more than once, or, when
+// it is required, not at all.
+rename_count_problem(string[] rename_argument_values, string rename_flag, int rename_required) {
+  int rename_times = len(rename_flag_values(rename_argument_values, rename_flag));
+  string rename_problem = "";
+  if(rename_times > 1) {
+    rename_problem = rename_flag + " given twice";
+  }
+} chain (string[] rename_argument_values, string rename_flag, int rename_required) {
+  if(rename_times == 0 && rename_required == 1) {
+    rename_problem = rename_flag + " is required";
+  }
+} return string rename_problem;
+(["p", "--map", "m"], "--map", 1):("")
+(["p"], "--map", 1):("--map is required")
+(["p"], "--words", 0):("")
+(["p", "--words", "a", "--words", "b"], "--words", 0):("--words given twice")
+
+// Whether there is no root.
+rename_root_problem(string[] rename_argument_values) {
+  string rename_problem = "";
+  if(len(rename_positional_arguments(rename_argument_values)) == 0) {
+    rename_problem = "no root given";
+  }
+} return string rename_problem;
+(["p", "--map", "m"]):("no root given")
+(["p", "src"]):("")

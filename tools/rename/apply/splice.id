@@ -1,0 +1,37 @@
+// Rewriting a text: the source, the names found in it, and what each is to
+// become. Everything between two renamed names is copied as it stands.
+
+// Copies the text before one renamed name and then its new spelling onto the
+// parts, and moves the cursor to the end of the old name. A name that keeps its
+// name adds nothing: its text is part of the next stretch copied.
+rename_cut(string rename_source, int[] rename_spans, string[] rename_picked, int rename_at, string[] rename_parts, int[] rename_cursor) {
+  string rename_new = rename_picked[rename_at / 3];
+  if(rename_new != "") {
+    push(rename_parts, str_sub(rename_source, rename_cursor[0], rename_spans[rename_at] - rename_cursor[0]));
+    push(rename_parts, rename_new);
+    rename_cursor[0] = rename_spans[rename_at + 1];
+  }
+} return void;
+("ab cd", [3, 5, 1], ["xyz"], 0, [], [0]):("ab cd", [3, 5, 1], ["xyz"], 0, ["ab ", "xyz"], [5])
+("ab cd", [3, 5, 1], [""], 0, [], [0]):("ab cd", [3, 5, 1], [""], 0, [], [0])
+
+// The text with every picked name replaced.
+rename_splice(string rename_source, int[] rename_spans, string[] rename_picked) {
+  string[] rename_parts = [];
+  int[] rename_cursor = [0];
+  int rename_at = 0;
+} chain (string rename_source, int[] rename_spans, string[] rename_picked) {
+  while(rename_at < len(rename_spans)) {
+    rename_cut(rename_source, rename_spans, rename_picked, rename_at, rename_parts, rename_cursor);
+    rename_at = rename_at + 3;
+  }
+  int rename_rest = len(rename_source) - rename_cursor[0];
+  push(rename_parts, str_sub(rename_source, rename_cursor[0], rename_rest));
+} chain (string rename_source, int[] rename_spans, string[] rename_picked) {
+  string rename_text = str_join(rename_parts, "");
+} return string rename_text;
+("ab = cd;", [0, 2, 1, 5, 7, 1], ["x", "yz"]):("x = yz;")
+("ab = cd;", [0, 2, 1, 5, 7, 1], ["", "yz"]):("ab = yz;")
+("ab = cd;", [0, 2, 1, 5, 7, 1], ["", ""]):("ab = cd;")
+("", [], []):("")
+

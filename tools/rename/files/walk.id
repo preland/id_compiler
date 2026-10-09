@@ -1,0 +1,34 @@
+// Every source file under a root, found by visiting directories from a list of
+// those still to visit, so that no directory is read twice and the depth of a
+// tree costs nothing.
+
+// The source files under a root, a directory's own files before the files of
+// its subdirectories, the last subdirectory first. A root that is a file, or
+// that does not exist, is answered as the one path itself: the read that
+// follows says whether it can be opened.
+rename_walk(string rename_root) {
+  string[] rename_found = [rename_root];
+  string[] rename_pending = [];
+  if(fs_kind(rename_root) == 2) {
+    pop(rename_found);
+    push(rename_pending, rename_root);
+  }
+} chain (string rename_root) {
+  while(len(rename_pending) > 0) {
+    rename_visit(rename_found, rename_pending);
+  }
+} return string[] rename_found;
+given rename_test_tree ("."):(["./NAMES.md", "./a.id", "./sub/NOTES.md", "./sub/b.id"])
+given rename_test_tree ("sub"):(["sub/NOTES.md", "sub/b.id"])
+given rename_test_tree ("a.id"):(["a.id"])
+("/nonexistent/rename_walk"):(["/nonexistent/rename_walk"])
+
+// Takes the next directory off the list still to visit, and adds its files to
+// the found list and its subdirectories to the list.
+rename_visit(string[] rename_found, string[] rename_pending) {
+  string rename_directory = pop(rename_pending);
+  lst_str_extend(rename_found, rename_directory_files(rename_directory));
+  lst_str_extend(rename_pending, rename_directory_children(rename_directory));
+} return void;
+given rename_test_tree ([], ["."]):(["./NAMES.md", "./a.id"], ["./sub"])
+given rename_test_tree (["x"], ["sub"]):(["x", "sub/NOTES.md", "sub/b.id"], [])

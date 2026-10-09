@@ -1,0 +1,21 @@
+// The values given to an option, in order, wherever it appears.
+rename_flag_values(string[] rename_argument_values, string rename_flag) {
+  string[] rename_values = [];
+  int rename_at = 1;
+  while(rename_at + 1 < len(rename_argument_values)) {
+    rename_collect_value(rename_values, rename_argument_values, rename_at, rename_flag);
+    rename_at = rename_argument_next(rename_argument_values, rename_at);
+  }
+} return string[] rename_values;
+(["p", "--map", "m", "src", "--map", "n"], "--map"):(["m", "n"])
+(["p", "a", "--words", "w"], "--map"):([])
+(["p", "--map"], "--map"):([])
+
+// Appends the argument after the one at an index when that one is the option.
+rename_collect_value(string[] rename_values, string[] rename_argument_values, int rename_at, string rename_flag) {
+  if(rename_argument_values[rename_at] == rename_flag) {
+    push(rename_values, rename_argument_values[rename_at + 1]);
+  }
+} return void;
+([], ["p", "--map", "m"], 1, "--map"):(["m"])
+(["x"], ["p", "--map", "m"], 1, "--words"):(["x"])

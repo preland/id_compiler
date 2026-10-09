@@ -1,0 +1,21 @@
+// The pieces of a name that are not words, in the order they occur, as the text
+// the diagnostic prints ("fb, w"); "" when every piece is one. The scan splits
+// on `_` exactly as the rule says, so `__` makes an empty piece and a name with
+// no `_` is its own single piece.
+
+vocab_bad(string vocab_name) {
+  string[] vocab_pieces = str_split(vocab_name, "_");
+  string vocab_acc = "";
+  int vocab_i = 0;
+} chain (string vocab_name) {
+  while(vocab_i < len(vocab_pieces)) {
+    vocab_acc = vocab_bad_add(vocab_acc, vocab_pieces[vocab_i]);
+    vocab_i = vocab_i + 1;
+  }
+} return string vocab_acc;
+given full_env given vocab_words ("buffer_width"):("")
+given full_env given vocab_words ("fb_w"):("fb, w")
+given full_env given vocab_words ("fb_width"):("fb")
+given full_env given vocab_words ("UTF8_BUFFER"):("")
+given full_env given vocab_words ("buffer__width"):("(empty)")
+given full_env given vocab_words ("fb"):("fb")

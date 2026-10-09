@@ -1,0 +1,15 @@
+// One name, judged the first time it is met: recorded as seen, counted, and
+// reported if any piece of it is not a word.
+
+vocab_judge(string vocab_name, int vocab_kind, int vocab_row) {
+  hset_add((import vocab_seen_keys), (import vocab_seen_vals), (import vocab_seen_used), (import vocab_seen_count), vocab_name);
+  lset((import vocab_totals), 0, (import vocab_totals)[0] + 1);
+  string vocab_failed = vocab_bad(vocab_name);
+} chain (string vocab_name, int vocab_kind, int vocab_row) {
+  if(vocab_failed != "") {
+    vocab_report(vocab_name, vocab_kind, vocab_row, vocab_failed);
+  }
+} return void;
+given edge_fixture given vocab_words ("fb_w", 0, 0):() then (import vocab_totals)[1]:(1)
+given edge_fixture given vocab_words ("buffer_width", 0, 0):() then (import vocab_totals)[1]:(0)
+given edge_fixture given vocab_words ("buffer_width", 0, 0):() then prints:("")

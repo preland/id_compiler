@@ -1,0 +1,43 @@
+// Every name in a source text, found the way the compiler would see it: as a
+// flat list of triples (start, end, line), start inclusive and end exclusive,
+// line counted from 1. Comments and string literals contribute none. Test cases
+// are not comments, so their names are in the list, which is what lets a rename
+// reach `given`, `then` and `(import NAME)`.
+
+// Where the token at an index ends. A name, a number and a run of other
+// characters are told apart by the caller; this only has to find the end.
+rename_token_end(string rename_source, int rename_index) {
+  int rename_end = rename_run_end(rename_source, rename_index);
+  if(rename_end == rename_index) {
+    rename_end = rename_other_end(rename_source, rename_index);
+  }
+} return int rename_end;
+("ab_1 x", 0):(4)
+("// c\nx", 0):(4)
+("\"s\" x", 0):(3)
+("+", 0):(1)
+
+// Steps over one token, recording it when it is a name: a letter or underscore
+// starts one, a digit starts a number. Answers the index to continue from.
+rename_next(string rename_source, int rename_index, int[] rename_spans, int[] rename_cells) {
+  int rename_end = rename_token_end(rename_source, rename_index);
+  if(chr_is_alpha(charat(rename_source, rename_index)) || charat(rename_source, rename_index) == 95) {
+    rename_mark(rename_source, rename_index, rename_end, rename_spans, rename_cells);
+  }
+} return int rename_end;
+("ab 1", 0, [], [0, 1]):(2)
+("1b", 0, [], [0, 1]):(2)
+
+// The names of a source text as (start, end, line) triples.
+rename_name_spans(string rename_source) {
+  int[] rename_spans = [];
+  int[] rename_cells = [0, 1];
+  int rename_index = 0;
+} chain (string rename_source) {
+  while(rename_index < len(rename_source)) {
+    rename_index = rename_next(rename_source, rename_index, rename_spans, rename_cells);
+  }
+} return int[] rename_spans;
+("ab = cd;"):([0, 2, 1, 5, 7, 1])
+("x // y\n\"z\" w1\n3e5 q"):([0, 1, 1, 11, 13, 2, 18, 19, 3])
+(""):([])

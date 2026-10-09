@@ -1,0 +1,15 @@
+// The last branch of the token loader's dispatch (push_tok2, ../../expect/
+// syn_err.id, is at its depth): a `wrd WORD` line is no token either, it is one
+// word of the vocabulary the word scan checks names against (mid/form/words/),
+// kept in the set vocab_keys; every other kind is a real token.
+
+push_tok3(string kind, string text) {
+  if(kind == "wrd") {
+    hset_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), text);
+  } else {
+    push_real(kind, text);
+  }
+} return void;
+given full_env ("wrd", "buffer"):() then (import vocab_count)[0]:(1)
+given full_env ("kw", "if"):() then (import vocab_count)[0]:(0)
+given full_env ("kw", "if"):() then len((import tkind)):(1)

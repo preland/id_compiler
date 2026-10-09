@@ -1,0 +1,48 @@
+// The map file: one `old new` pair per line, a blank line or a `#` line ignored.
+
+// Appends a line's pair to the two lists when it has exactly two words; the
+// problem, or "" when it has.
+rename_take_pair(string[] rename_old_names, string[] rename_news, string[] rename_pair, int rename_number) {
+  string rename_problem = "";
+  if(len(rename_pair) == 2) {
+    push(rename_old_names, rename_pair[0]);
+    push(rename_news, rename_pair[1]);
+  } else {
+    rename_problem = "line " + rename_number + ": expected `old new`, found " + len(rename_pair) + " word(s)";
+  }
+} return string rename_problem;
+(["x"], ["y"], ["a", "b"], 3):("")
+(["x"], ["y"], ["a"], 4):("line 4: expected `old new`, found 1 word(s)")
+(["x"], ["y"], ["a", "b", "c"], 5):("line 5: expected `old new`, found 3 word(s)")
+
+// One line of the map: its pair appended to the two lists, or the problem with
+// it appended to the third; a line that is blank or a comment adds nothing.
+rename_parse_line(string rename_entry, string[] rename_old_names, string[] rename_news, string[] rename_problems, int rename_number) {
+  string rename_text = str_trim(rename_entry);
+  string[] rename_pair = str_words(rename_text);
+  string rename_problem = "";
+} chain (string rename_entry, string[] rename_old_names, string[] rename_news, string[] rename_problems, int rename_number) {
+  if(rename_text != "" && charat(rename_text, 0) != 35) {
+    rename_problem = rename_take_pair(rename_old_names, rename_news, rename_pair, rename_number);
+  }
+  if(rename_problem != "") {
+    push(rename_problems, rename_problem);
+  }
+} return void;
+("a b", [], [], [], 1):("a b", ["a"], ["b"], [])
+("# a b c", [], [], [], 1):("# a b c", [], [], [])
+("   ", [], [], [], 1):("   ", [], [], [])
+("a", [], [], [], 2):("a", [], [], ["line 2: expected `old new`, found 1 word(s)"])
+
+// Every pair in a map text onto the two lists, and the problems found in it onto
+// the third.
+rename_parse_map(string rename_text, string[] rename_old_names, string[] rename_news, string[] rename_problems) {
+  string[] rename_entries = str_split(rename_text, "\n");
+  int rename_at = 0;
+  while(rename_at < len(rename_entries)) {
+    rename_parse_line(rename_entries[rename_at], rename_old_names, rename_news, rename_problems, rename_at + 1);
+    rename_at = rename_at + 1;
+  }
+} return void;
+("a b\n# c\nd e\n", [], [], []):("a b\n# c\nd e\n", ["a", "d"], ["b", "e"], [])
+("a b\nc\n", [], [], []):("a b\nc\n", ["a"], ["b"], ["line 2: expected `old new`, found 1 word(s)"])

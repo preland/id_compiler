@@ -1,0 +1,37 @@
+// E0311, as a question about one name: which of its `_`-separated pieces are not
+// words. The compiler answers it for the whole program under --word-scan; a
+// rename has to answer it for a name that is not in the program yet.
+
+// Appends a piece to the list when the table does not hold it. The lookup
+// ignores case, as the compiler's does. An empty piece (a leading, trailing or
+// doubled underscore) is listed as "(empty)".
+rename_note_piece(string[] rename_failing, string rename_piece, string[] rename_word_keys, int[] rename_word_used) {
+  string rename_shown = rename_piece;
+  if(rename_piece == "") {
+    rename_shown = "(empty)";
+  }
+  if(hmap_has(rename_word_keys, rename_word_used, str_lower(rename_piece)) == 0) {
+    push(rename_failing, rename_shown);
+  }
+} return void;
+given rename_test_words_filled ([], "alpha", (import rename_test_word_keys), (import rename_test_word_used)):([])
+given rename_test_words_filled ([], "ALPHA", (import rename_test_word_keys), (import rename_test_word_used)):([])
+given rename_test_words_filled ([], "x", (import rename_test_word_keys), (import rename_test_word_used)):(["x"])
+given rename_test_words_filled ([], "", (import rename_test_word_keys), (import rename_test_word_used)):(["(empty)"])
+
+// The pieces of a name that are not words, as `a, b`; "" when every piece is.
+rename_bad_pieces(string rename_name, string[] rename_word_keys, int[] rename_word_used) {
+  string[] rename_pieces = str_split(rename_name, "_");
+  string[] rename_bad = [];
+  int rename_at = 0;
+} chain (string rename_name, string[] rename_word_keys, int[] rename_word_used) {
+  while(rename_at < len(rename_pieces)) {
+    rename_note_piece(rename_bad, rename_pieces[rename_at], rename_word_keys, rename_word_used);
+    rename_at = rename_at + 1;
+  }
+  string rename_listed_pieces = str_join(rename_bad, ", ");
+} return string rename_listed_pieces;
+given rename_test_words_filled ("alpha_beta", (import rename_test_word_keys), (import rename_test_word_used)):("")
+given rename_test_words_filled ("alpha_x_gamma_beta", (import rename_test_word_keys), (import rename_test_word_used)):("x, gamma")
+given rename_test_words_filled ("_alpha", (import rename_test_word_keys), (import rename_test_word_used)):("(empty)")
+given rename_test_words_filled ("idstd_v2", (import rename_test_word_keys), (import rename_test_word_used)):("v2")

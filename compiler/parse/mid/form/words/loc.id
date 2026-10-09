@@ -1,0 +1,40 @@
+// Where a name the word scan reports is declared. The scan visits a hundred
+// thousand declarations and reports a few hundred names, so the place is made
+// here, from the kind of table the name came from and its row in that table, and
+// only for a name that is reported: a function's place is a row of prog, a
+// variable's the function and line its declaration was registered with, an
+// export's the function that owns it, a struct's or a field's the struct's.
+
+vocab_loc(int vocab_kind, int vocab_row, string vocab_name) {
+  string vocab_where = "";
+  if(vocab_kind == 0) {
+    vocab_where = diag_prog_loc(vocab_row);
+  } else {
+    vocab_where = vocab_loc_var(vocab_kind, vocab_row, vocab_name);
+  }
+} return string vocab_where;
+given vocab_world (0, 0, "x"):("fixture.id:7")
+given vocab_world (1, 0, "x"):("<stdin>:10")
+given vocab_world (2, 0, "g"):("<stdin>:0")
+
+vocab_loc_var(int vocab_kind, int vocab_row, string vocab_name) {
+  string vocab_where = "";
+  if(vocab_kind == 1) {
+    vocab_where = diag_fn_loc((import dvfunc)[vocab_row], (import dvline)[vocab_row]);
+  } else {
+    vocab_where = vocab_loc_rest(vocab_kind, vocab_row, vocab_name);
+  }
+} return string vocab_where;
+given vocab_world (1, 0, "x"):("<stdin>:10")
+given vocab_world (2, 0, "g"):("<stdin>:0")
+
+vocab_loc_rest(int vocab_kind, int vocab_row, string vocab_name) {
+  string vocab_where = "";
+  if(vocab_kind == 2) {
+    vocab_where = vocab_export_loc(vocab_row, vocab_name);
+  } else {
+    vocab_where = (import sdfile)[vocab_row] + ":" + (import sdline)[vocab_row];
+  }
+} return string vocab_where;
+given vocab_world (2, 0, "x"):("<stdin>:10")
+given sd_pair (3, 1, "Q"):("q.id:5")

@@ -1,0 +1,39 @@
+// The arguments that are roots, and the arguments that are mistakes.
+
+// The roots: every argument that is neither an option nor an option's value.
+rename_positional_arguments(string[] rename_argument_values) {
+  string[] rename_roots = [];
+  int rename_at = 1;
+  while(rename_at < len(rename_argument_values)) {
+    rename_keep_root(rename_roots, rename_argument_values[rename_at]);
+    rename_at = rename_argument_next(rename_argument_values, rename_at);
+  }
+} return string[] rename_roots;
+(["p", "a", "--map", "m", "b/c", "--dry-run"]):(["a", "b/c"])
+(["p", "--map", "--dry-run"]):([])
+(["p"]):([])
+
+// Appends an argument to the roots unless it is an option.
+rename_keep_root(string[] rename_roots, string rename_argument) {
+  if(str_starts(rename_argument, "--") == 0) {
+    push(rename_roots, rename_argument);
+  }
+} return void;
+([], "a"):(["a"], "a")
+(["a"], "--x"):(["a"], "--x")
+
+// What is wrong with the argument at an index, or "": an option that does not
+// exist, or one that takes a value with none after it.
+rename_flag_problem(string[] rename_argument_values, int rename_at) {
+  string rename_problem = "";
+  if(str_starts(rename_argument_values[rename_at], "--") == 1 && rename_argument_values[rename_at] != "--dry-run" && rename_value_flag(rename_argument_values[rename_at]) == 0) {
+    rename_problem = "unknown option " + rename_argument_values[rename_at];
+  }
+  if(rename_value_flag(rename_argument_values[rename_at]) == 1 && rename_at + 1 >= len(rename_argument_values)) {
+    rename_problem = rename_argument_values[rename_at] + " needs a value";
+  }
+} return string rename_problem;
+(["p", "--bogus"], 1):("unknown option --bogus")
+(["p", "--map"], 1):("--map needs a value")
+(["p", "--map", "m"], 1):("")
+(["p", "--dry-run"], 1):("")

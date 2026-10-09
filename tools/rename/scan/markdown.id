@@ -1,0 +1,56 @@
+// The registries (idstd/NAMES.md and the per-tree NAMES.md and NOTES.md) list
+// declared names in the rows of markdown tables, so a rename has to follow the
+// names into them. Only a name inside backticks in a row that starts with `|` is
+// taken: prose in a row is English (`a`, `n`, `t` as words), and a name in
+// backticks is code.
+//
+// A name touching a `/` or a `.` is a path (`core/text/str/lines.id`), not an
+// identifier, and a directory called `str` is not the variable `str`.
+
+// Whether the name at start..end is part of a path: the character before it or
+// the one after it is a slash or a dot.
+rename_path_like(string rename_source, int rename_start, int rename_end) {
+  int rename_before = charat(rename_source, rename_start - 1);
+  int rename_after = charat(rename_source, rename_end);
+  int rename_is_path = rename_before == 47 || rename_before == 46 || rename_after == 47 || rename_after == 46;
+} return int rename_is_path;
+("a/b.id", 2, 3):(1)
+("a/b.id", 0, 1):(1)
+("x b y", 2, 3):(0)
+("b", 0, 1):(0)
+
+// The end of the name to take at an index, or the index itself when none is
+// there: a name must start there, inside backticks, and not be part of a path.
+rename_markdown_name(string rename_source, int rename_index, int rename_inside) {
+  int rename_end = rename_index;
+  if(rename_inside == 1 && (chr_is_alpha(charat(rename_source, rename_index)) || charat(rename_source, rename_index) == 95)) {
+    rename_end = rename_run_end(rename_source, rename_index);
+  }
+  if(rename_path_like(rename_source, rename_index, rename_end) == 1) {
+    rename_end = rename_index;
+  }
+} return int rename_end;
+("`ab` c", 1, 1):(3)
+("`ab` c", 1, 0):(1)
+("`a/b`", 1, 1):(1)
+("`1b`", 1, 1):(1)
+
+// Steps one character of a row: a backtick flips whether the cell is inside
+// code; a name inside code is recorded. Answers the index to continue from.
+rename_markdown_step(string rename_source, int rename_index, int[] rename_cells, int rename_line, int[] rename_spans) {
+  int rename_char = charat(rename_source, rename_index);
+  int rename_end = rename_index + 1;
+  if(rename_char == 96) {
+    rename_cells[0] = 1 - rename_cells[0];
+  }
+} chain (string rename_source, int rename_index, int[] rename_cells, int rename_line, int[] rename_spans) {
+  int rename_stop = rename_markdown_name(rename_source, rename_index, rename_cells[0]);
+  if(rename_stop > rename_index) {
+    lst_extend(rename_spans, [rename_index, rename_stop, rename_line]);
+    rename_end = rename_stop;
+  }
+} return int rename_end;
+("`ab`", 0, [0], 3, []):(1)
+("`ab`", 1, [1], 3, []):(3)
+("`ab`", 3, [1], 3, []):(4)
+("ab", 0, [0], 3, []):(1)

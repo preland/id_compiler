@@ -1,0 +1,22 @@
+// Which files a rename reads, and which directories it never enters.
+
+// Whether a file name is source or a registry: a `.id` file, or one of the two
+// markdown files that list a tree's names in tables (NAMES.md, NOTES.md).
+rename_wanted(string rename_file) {
+  int rename_yes = str_ends(rename_file, ".id") == 1 || rename_file == "NAMES.md" || rename_file == "NOTES.md";
+} return int rename_yes;
+("a.id"):(1)
+("NAMES.md"):(1)
+("NOTES.md"):(1)
+("README.md"):(0)
+("a.idx"):(0)
+
+// Whether a directory is not part of a tree's source: the repository's own
+// records and the compiler's build cache.
+rename_hidden(string rename_directory) {
+  int rename_no = rename_directory == ".git" || rename_directory == ".idc-cache";
+} return int rename_no;
+(".git"):(1)
+(".idc-cache"):(1)
+(".tests"):(0)
+("src"):(0)

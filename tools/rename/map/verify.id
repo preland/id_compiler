@@ -1,0 +1,32 @@
+// Checking the pairs of a map against each other and against the vocabulary.
+
+// Appends a problem unless it is empty.
+rename_note(string[] rename_problems, string rename_problem) {
+  if(rename_problem != "") {
+    push(rename_problems, rename_problem);
+  }
+} return void;
+([], "p"):(["p"], "p")
+(["q"], ""):(["q"], "")
+
+// Whether the name at an index appeared earlier in the same column of the map: a
+// name renamed twice is ambiguous, and two names renamed to one are merged.
+rename_repeat_problem(string[] rename_names, int rename_at, string rename_role) {
+  string rename_problem = "";
+  if(lst_str_index(rename_names, rename_names[rename_at]) != rename_at) {
+    rename_problem = rename_names[rename_at] + " appears twice in the " + rename_role + " column";
+  }
+} return string rename_problem;
+(["a", "b", "a"], 2, "old"):("a appears twice in the old column")
+(["a", "b", "a"], 1, "new"):("")
+(["a"], 0, "new"):("")
+
+// Every problem with the pair at an index, appended to the list.
+rename_index_problems(string[] rename_old_names, string[] rename_news, int rename_at, string[] rename_word_keys, int[] rename_word_used, string[] rename_problems) {
+  rename_note(rename_problems, rename_pair_problem(rename_old_names[rename_at], rename_news[rename_at], rename_word_keys, rename_word_used));
+  rename_note(rename_problems, rename_repeat_problem(rename_old_names, rename_at, "old"));
+  rename_note(rename_problems, rename_repeat_problem(rename_news, rename_at, "new"));
+} return void;
+given rename_test_words_filled (["x", "x"], ["alpha", "beta"], 1, (import rename_test_word_keys), (import rename_test_word_used), []):(["x", "x"], ["alpha", "beta"], 1, (import rename_test_word_keys), (import rename_test_word_used), ["x appears twice in the old column"])
+given rename_test_words_filled (["x", "y"], ["alpha", "beta"], 1, (import rename_test_word_keys), (import rename_test_word_used), []):(["x", "y"], ["alpha", "beta"], 1, (import rename_test_word_keys), (import rename_test_word_used), [])
+given rename_test_words_filled (["x", "y"], ["beta", "beta"], 1, (import rename_test_word_keys), (import rename_test_word_used), []):(["x", "y"], ["beta", "beta"], 1, (import rename_test_word_keys), (import rename_test_word_used), ["beta appears twice in the new column"])

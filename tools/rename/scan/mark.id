@@ -1,0 +1,27 @@
+// Recording a name, and the line it is on.
+
+// The line of an index, counted from the cell's position: the cell holds the
+// index counted up to and the line there, so the newlines are counted once for a
+// whole file however many names it has.
+rename_line_at(string rename_source, int[] rename_cells, int rename_at) {
+  int rename_line = rename_cells[1];
+  int rename_index = rename_cells[0];
+  while(rename_index < rename_at) {
+    rename_line = rename_line + (charat(rename_source, rename_index) == 10);
+    rename_index = rename_index + 1;
+  }
+} chain (string rename_source, int[] rename_cells, int rename_at) {
+  rename_cells[0] = rename_at;
+  rename_cells[1] = rename_line;
+} return int rename_line;
+("a\nb\nc", [0, 1], 4):(3)
+("a\nb\nc", [2, 2], 4):(3)
+("a\nb\nc", [0, 1], 0):(1)
+
+// Appends the triple for one name.
+rename_mark(string rename_source, int rename_start, int rename_end, int[] rename_spans, int[] rename_cells) {
+  int rename_line = rename_line_at(rename_source, rename_cells, rename_start);
+  lst_extend(rename_spans, [rename_start, rename_end, rename_line]);
+} return void;
+("a\nb", 2, 3, [], [0, 1]):("a\nb", 2, 3, [2, 3, 2], [2, 2])
+("ab", 0, 2, [7], [0, 1]):("ab", 0, 2, [7, 0, 2, 1], [0, 1])

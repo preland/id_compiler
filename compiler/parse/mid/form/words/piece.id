@@ -1,0 +1,46 @@
+// What the word scan asks of one name: is every `_`-separated piece of it in the
+// vocabulary (./state.id)? The lookup ignores case, so a constant's FRAME_WIDTH
+// is read as frame_width. A piece with a digit in it, a one-letter piece and an
+// abbreviation are in the vocabulary only if data/words/allowed.txt names them
+// (english.txt holds no one-letter entry), and an empty piece -- a leading,
+// trailing or doubled `_` -- is never a word.
+
+vocab_ok(string vocab_piece) {
+  string vocab_lower = str_lower(vocab_piece);
+  int vocab_hit = hmap_has((import vocab_keys), (import vocab_used), vocab_lower);
+} return int vocab_hit;
+given full_env given vocab_words ("buffer"):(1)
+given full_env given vocab_words ("WIDTH"):(1)
+given full_env given vocab_words ("utf8"):(1)
+given full_env given vocab_words ("fb"):(0)
+given full_env given vocab_words (""):(0)
+
+vocab_bad_add(string vocab_acc, string vocab_piece) {
+  int vocab_fine = vocab_ok(vocab_piece);
+  string vocab_next = vocab_acc;
+  if(vocab_fine == 0) {
+    vocab_next = vocab_join(vocab_acc, vocab_piece);
+  }
+} return string vocab_next;
+given full_env given vocab_words ("", "buffer"):("")
+given full_env given vocab_words ("", "fb"):("fb")
+given full_env given vocab_words ("fb", "w"):("fb, w")
+given full_env given vocab_words ("fb", "width"):("fb")
+given full_env given vocab_words ("", ""):("(empty)")
+
+vocab_join(string vocab_head, string vocab_tail) {
+  string vocab_item = vocab_tail;
+  if(vocab_tail == "") {
+    vocab_item = "(empty)";
+  }
+  string vocab_both = vocab_item;
+} chain (string vocab_head, string vocab_tail) {
+  if(vocab_head != "") {
+    vocab_both = vocab_head + ", " + vocab_item;
+  }
+} return string vocab_both;
+("", "fb"):("fb")
+("fb", "w"):("fb, w")
+("fb, w", "x"):("fb, w, x")
+("", ""):("(empty)")
+("fb", ""):("fb, (empty)")

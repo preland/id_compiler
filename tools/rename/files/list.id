@@ -1,0 +1,41 @@
+// One directory of a walk: its source files and its subdirectories.
+
+// The path of each wanted file directly inside a directory, in name order.
+rename_directory_files(string rename_directory) {
+  string[] rename_names = str_lines(fs_list_kind(rename_directory, 1));
+  string[] rename_paths = [];
+  int rename_at = 0;
+} chain (string rename_directory) {
+  while(rename_at < len(rename_names)) {
+    rename_keep(rename_paths, rename_directory, rename_names[rename_at], rename_wanted(rename_names[rename_at]));
+    rename_at = rename_at + 1;
+  }
+} return string[] rename_paths;
+given rename_test_tree ("."):(["./NAMES.md", "./a.id"])
+given rename_test_tree ("sub"):(["sub/NOTES.md", "sub/b.id"])
+("/nonexistent/rename_dir_files"):([])
+
+// The path of each subdirectory of a directory that is part of the tree's
+// source, in name order.
+rename_directory_children(string rename_directory) {
+  string[] rename_names = str_lines(fs_list_kind(rename_directory, 2));
+  string[] rename_paths = [];
+  int rename_at = 0;
+} chain (string rename_directory) {
+  while(rename_at < len(rename_names)) {
+    rename_keep(rename_paths, rename_directory, rename_names[rename_at], 1 - rename_hidden(rename_names[rename_at]));
+    rename_at = rename_at + 1;
+  }
+} return string[] rename_paths;
+given rename_test_tree ("."):(["./sub"])
+given rename_test_tree ("sub"):([])
+("/nonexistent/rename_dir_subdirs"):([])
+
+// Appends the path of a name inside a directory when the flag is 1.
+rename_keep(string[] rename_paths, string rename_directory, string rename_name, int rename_include) {
+  if(rename_include == 1) {
+    push(rename_paths, path_join(rename_directory, rename_name));
+  }
+} return void;
+([], "d", "n", 1):(["d/n"], "d", "n", 1)
+(["x"], "d", "n", 0):(["x"], "d", "n", 0)

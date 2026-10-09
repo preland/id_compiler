@@ -1,0 +1,23 @@
+// The run itself: everything is checked before the first file is touched, and
+// every problem is reported together so that one pass over the map fixes them all.
+
+// Renames the names of a map in the files under the roots. The reserved
+// directories are read for collisions only. Answers the exit status: 0 done,
+// 1 refused or a file could not be written.
+rename_run(string[] rename_roots, string[] rename_reserved, string rename_map_path, string rename_words_directory, int rename_dry) {
+  string[] rename_old_names = [];
+  string[] rename_news = [];
+  string[] rename_problems = rename_prepare(rename_map_path, rename_old_names, rename_news);
+} chain (string[] rename_roots, string[] rename_reserved, string rename_map_path, string rename_words_directory, int rename_dry) {
+  rename_vocab_problems(rename_old_names, rename_news, rename_words_directory, rename_problems);
+  string[] rename_files = rename_gather(rename_roots);
+  lst_str_extend(rename_problems, rename_collisions(rename_old_names, rename_news, rename_files, rename_reserved));
+} chain (string[] rename_roots, string[] rename_reserved, string rename_map_path, string rename_words_directory, int rename_dry) {
+  lst_str_extend(rename_problems, rename_root_problems(rename_roots));
+  int rename_code = rename_finish(rename_old_names, rename_news, rename_files, rename_dry, rename_problems);
+} return int rename_code;
+given rename_test_project("") (["src"], [], "map.txt", "words", 1):(0) then prints:("src/NAMES.md:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n3 name(s) renamed in 2 file(s) (dry run, nothing written)\n") then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")
+given rename_test_project("") (["src"], [], "map.txt", "words", 0):(0) then fs_read_text("src/NAMES.md"):("| `alpha` | prose oldname |\nplain `oldname`\n")
+given rename_test_project("alpha") (["src"], [], "map.txt", "words", 0):(1) then eprints:("rename: oldname -> alpha: the new name is already used 1 time(s) in the program\nrename: refused; no file was changed\n") then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")
+given rename_test_project("alpha") (["src/a.id"], ["src/b.id"], "map.txt", "words", 0):(1) then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")
+given rename_test_project("") (["src"], [], "nomap.txt", "words", 0):(1) then eprints:("rename: the map nomap.txt is missing, unreadable or holds no pairs\nrename: refused; no file was changed\n")
