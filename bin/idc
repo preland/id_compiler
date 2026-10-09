@@ -3400,23 +3400,30 @@ split_harness() {
 # the harness, `// idtc key N KEY` (compiler/parse/mid/form/unique/dump/
 # digest/keys/emit.id): a hash of the case's own tokens and of every function
 # it can reach -- the conf.id constants it reads, directly or through another
-# constant's initialiser, included -- `-` for a case that must run on every
-# build (it reaches a volatile native or builtin, or carries a scaling claim),
-# `KEY f` for one whose natives only read files or are marked when they do
-# anything else (see "Files a case reads", below), or `std` for a library case
-# the program's harness never runs. What
+# constant's initialiser, included -- `KEY f` for a case that reaches natives
+# which only read files or are marked when they do anything else (see "Files a
+# case reads", below), or `std` for a library case the program's harness never
+# runs. Every other case, a scaling claim's or one that reaches the clock, has
+# a plain KEY; `-` is left only for a harness without keys. What
 # the source cannot say is hashed here, once per build, into the name of the
 # pass list the keys are looked up in: the two compiler stages (which also
 # write the runtime and the harness), cc, and the host. A case whose key is on
 # that list is not run; when no case is left, the harness is neither compiled
 # nor run. A key joins the list only when the harness itself reports its case
-# as passed, so a failing case is never taken for a pass.
+# as passed, so a failing case is never taken for a pass. Each entry carries
+# the time it was recorded, and one older than IDC_CASE_MAX_AGE_DAYS (default
+# 7; 0 reruns everything) is run again, which is what keeps a case that no
+# hash can invalidate (a clock, a device) honest. The cases of a scaling claim
+# are skipped together or run together, since the claim compares their counts.
 #
 # IDC_NO_CACHE=1 turns this off with the other caches: every case runs.
+# IDC_FRESH_CASES=PATH runs every case whose function belongs to the source
+# tree at PATH, and caches the rest as usual (idc/tools/tmpguard uses it).
 # IDC_CASE_STATS=1 prints `idc: cases: N total, H already passed, T to run`
 # on stderr once the plan is made, which tests/cache.sh counts reruns by.
 CASE_CACHE_DIR="$CACHE_DIR/cases"
 CASE_KEEP="${IDC_CASE_KEYS:-200000}"
+CASE_MAX_AGE_DAYS="${IDC_CASE_MAX_AGE_DAYS:-7}"
 
 # case_cache_global -- the build's part of every case key: see above.
 case_cache_global() {
@@ -3424,7 +3431,7 @@ case_cache_global() {
     {
         sha256sum < "$IDLEX"
         sha256sum < "$IDPARSE"
-        printf '%s\0' "$CC" "$(host_triple)"
+        printf '%s\0' "$CC" "$(host_triple)" "pass list v2: timestamped"
         cc_path="$(command -v "$CC" 2>/dev/null)"
         [ -n "$cc_path" ] && sha256sum < "$cc_path"
     } | sha256sum | cut -d' ' -f1
@@ -3440,7 +3447,7 @@ case_cache_global() {
 # (kind, hash, path) the case read, as one tab-separated line of the pass
 # list:
 #
-#   KEY/BACKENDHASH TAB kind TAB hash TAB path [TAB kind TAB hash TAB path]...
+#   KEY/BACKENDHASH TAB epoch [TAB kind TAB hash TAB path]...
 #
 # and case_plan skips the case only when KEY/BACKENDHASH is on the list and
 # every path still hashes as recorded, each distinct path hashed once per
@@ -3512,7 +3519,7 @@ reads_probe() {
                 else if (k == "r") h = (T[p] !~ /^regular/) ? "x" : (PI[kp] == id) ? PH[kp] : (p in S) ? S[p] : "?"
                 else if (k == "l") h = (T[p] != "directory") ? "-" : (PI[kp] == id) ? PH[kp] : (p in D) ? D[p] : "?"
             } else if (k == "e") { h = "0"; id = h }
-            if (k == "l" && T[p] != "directory") id = "-"
+            if (k == "l" && (!(p in T) || T[p] != "directory")) id = "-"
             printf "%s\t%s\t%s\t%s\n", k, p, h, id
         }' "$want" > "$out"
 }
@@ -3520,37 +3527,68 @@ reads_probe() {
 # case_plan_awk TOTAL HAVE -- case_plan's awk. Without HAVE (a file of
 # reads_probe's output) a case whose recorded files cannot be judged yet counts
 # as one to run and its (kind, path) pairs are written to rd.want; with it they
-# are judged.
+# are judged. A case runs when its key is not on the pass list, when its entry
+# is older than CASE_MAX_AGE_SECONDS, when it lives in the tree IDC_FRESH_CASES
+# names, or when it shares a scaling claim with a case that runs (the claim
+# compares their counts, so a group is all skipped or none).
 case_plan_awk() {
-    awk -v n="$1" -v list="$CASE_FILE" -v have="$2" -v bh="$CASE_BH" -v want="$WORK/rd.want" '
+    awk -v n="$1" -v list="$CASE_FILE" -v have="$2" -v bh="$CASE_BH" -v want="$WORK/rd.want" \
+        -v now="$CASE_NOW" -v maxage="$CASE_MAX_AGE_SECONDS" -v fresh="$CASE_FRESH" -v cdir="$CASE_DEFAULT_DIR" '
+        function fresh_case(k,   d) {
+            d = (k in D) ? D[k] : cdir
+            return fresh != "" && (d == fresh || index(d, fresh "/") == 1)
+        }
         BEGIN {
             while ((getline line < list) > 0) { k = line; sub(/\t.*/, "", k); ok[k] = line }
             if (have != "") while ((getline line < have) > 0) { c = split(line, f, "\t"); H[f[1] "\t" f[2]] = f[3] }
         }
-        /^\/\/ idtc key / {
-            if ($5 == "std") { skip[$4] = 1 }
-            else if ($5 == "-") { todo++ }
-            else {
-                lk = ($6 == "f") ? $5 "/" bh : $5
-                if (!(lk in ok)) { todo++ }
-                else if ($6 != "f") { skip[$4] = 1; hits++ }
-                else {
-                    c = split(ok[lk], f, "\t"); good = 1
-                    for (i = 2; i + 2 <= c; i += 3) {
-                        q = f[i] "\t" f[i + 2]
-                        if (have == "") {
-                            if (!(q in asked)) { asked[q] = 1; print q > want }
-                            good = 0
-                        } else if (!(q in H) || H[q] != f[i + 1]) good = 0
-                    }
-                    if (good) { skip[$4] = 1; hits++ } else { todo++ }
-                }
-            }
+        /^\/\/ idtc key / { K[$4] = $5; F[$4] = $6; next }
+        /^    idtc_dir\[[0-9]+\] = "/ {
+            t = $0; sub(/^    idtc_dir\[/, "", t); i = t; sub(/\].*$/, "", i)
+            sub(/^[^"]*"/, "", t); sub(/";.*$/, "", t); D[i] = t
+        }
+        /idtc_claim\(\(int\[\]\)\{/ {
+            t = $0; sub(/^[^{]*\{/, "", t); sub(/\}.*$/, "", t)
+            groups[++ng] = t
         }
         END {
-            s = ""
-            for (i = 0; i < n; i++) s = s ((i in skip) ? "1" : "0")
-            print hits + 0, todo + 0, s
+            for (k = 0; k < n; k++) {
+                if (!(k in K)) continue
+                key = K[k]
+                if (key == "std") { skip[k] = 1; continue }
+                if (key == "-" || fresh_case(k)) continue
+                lk = (F[k] == "f") ? key "/" bh : key
+                if (!(lk in ok)) continue
+                c = split(ok[lk], f, "\t")
+                if (maxage >= 0 && now - f[2] >= maxage) continue
+                if (F[k] != "f") { skip[k] = 1; hit[k] = 1; continue }
+                good = 1
+                for (i = 3; i + 2 <= c; i += 3) {
+                    q = f[i] "\t" f[i + 2]
+                    if (have == "") {
+                        if (!(q in asked)) { asked[q] = 1; print q > want }
+                        good = 0
+                    } else if (!(q in H) || H[q] != f[i + 1]) good = 0
+                }
+                if (good) { skip[k] = 1; hit[k] = 1 }
+            }
+            do {
+                changed = 0
+                for (g = 1; g <= ng; g++) {
+                    c = split(groups[g], a, ", ")
+                    all = 1
+                    for (i = 1; i <= c; i++) if (!(a[i] in skip)) all = 0
+                    if (all) continue
+                    for (i = 1; i <= c; i++) if (a[i] in hit) { delete skip[a[i]]; delete hit[a[i]]; changed = 1 }
+                }
+            } while (changed)
+            s = ""; hits = 0; todo = 0
+            for (k = 0; k < n; k++) {
+                s = s ((k in skip) ? "1" : "0")
+                if (k in hit) hits++
+                else if ((k in K) && !(k in skip)) todo++
+            }
+            print hits, todo, s
         }' "$HARNESS_C"
 }
 
@@ -3567,6 +3605,16 @@ case_plan() {
     CASE_FILE="$CASE_CACHE_DIR/$(case_cache_global)"
     local total plan
     total=$(sed -n 's/^#define IDTC_N //p' "$HARNESS_C")
+    CASE_NOW=$(date +%s)
+    case "$CASE_MAX_AGE_DAYS" in
+        ''|*[!0-9]*) CASE_MAX_AGE_SECONDS=$((7 * 86400)) ;;
+        *) CASE_MAX_AGE_SECONDS=$((CASE_MAX_AGE_DAYS * 86400)) ;;
+    esac
+    CASE_DEFAULT_DIR="$PATH_ARG"
+    [ -d "$CASE_DEFAULT_DIR" ] || CASE_DEFAULT_DIR=$(dirname "$CASE_DEFAULT_DIR")
+    CASE_DEFAULT_DIR=$(realpath -m "$CASE_DEFAULT_DIR")
+    CASE_FRESH=""
+    [ -z "${IDC_FRESH_CASES:-}" ] || CASE_FRESH=$(realpath -m "$IDC_FRESH_CASES")
     if grep -q '^// idtc key [0-9]* [^ ]* f$' "$HARNESS_C"; then
         CASE_TRACK=1
         CASE_BH=$(case_backend_key)
@@ -3583,11 +3631,14 @@ case_plan() {
 }
 
 # case_record_reads -- the pass-list lines of the cases that passed and read
-# files (see "Files a case reads", above), on stdout. A case is left out when
-# its log has a T line, when two of its lines disagree about a path, when a
-# path no longer has the stamp the case saw (it changed while the case ran: the
-# hash taken now would not be what the case read), or when another case with
-# the same key was left out for any of these.
+# files (see "Files a case reads", above), on stdout. A case that wrote outside the
+# trees it made (a T line in its log) is recorded all the same: what it reads
+# from a path that changed while it ran is left out of its entries, since its
+# own writes made it change, and the weekly expiry covers what no read shows. A
+# case is left out when two of its lines disagree about a path, when a path no
+# longer has the stamp the case saw and the case wrote nothing (it changed
+# while the case ran: the hash taken now would not be what the case read), or
+# when another case with the same key was left out for any of these.
 case_record_reads() {
     local rec="$WORK/rd.rec" want="$WORK/rd.rwant" have="$WORK/rd.rhave"
     : > "$rec"
@@ -3608,20 +3659,21 @@ case_record_reads() {
     [ -s "$rec" ] || return 0
     : > "$have"
     [ -s "$want" ] && { reads_probe "$want" "$have" "$WORK/rd.have" || return 0; }
-    awk -F'\t' -v have="$have" '
+    awk -F'\t' -v have="$have" -v now="$now" '
         BEGIN {
             while ((getline line < have) > 0) { split(line, f, "\t"); H[f[1] "\t" f[2]] = f[3]; I[f[1] "\t" f[2]] = f[4] }
         }
         {
+            if (FNR == NR) { if ($2 == "BAD") wrote[$1] = 1; next }
             lk = $1
             if (!(lk in seen)) { seen[lk] = 1; order[++m] = lk }
-            if ($2 == "BAD") { bad[lk] = 1; next }
+            if ($2 == "BAD") next
             if ($2 == "") next
             q = $2 "\t" $4
-            if (H[q] == "?" || (($2 == "r" || $2 == "l") ? I[q] != $3 : H[q] != $3)) { bad[lk] = 1; next }
+            if (H[q] == "?" || (($2 == "r" || $2 == "l") ? I[q] != $3 : H[q] != $3)) { if (!(lk in wrote)) bad[lk] = 1; next }
             if (!((lk, q) in got)) { got[lk, q] = 1; ln[lk] = ln[lk] "\t" $2 "\t" H[q] "\t" $4 }
         }
-        END { for (i = 1; i <= m; i++) if (!(order[i] in bad)) print order[i] ln[order[i]] }' "$rec"
+        END { for (i = 1; i <= m; i++) if (!(order[i] in bad)) print order[i] "\t" now ln[order[i]] }' "$rec" "$rec"
 }
 
 # case_record -- add the key of every case the harness reported as passed
@@ -3633,11 +3685,17 @@ case_record_reads() {
 case_record() {
     [ -n "$CASE_FILE" ] && [ -s "$WORK/passed" ] || return 0
     mkdir -p "$CASE_CACHE_DIR" || return 0
-    local tmp="$CASE_FILE.$$.tmp"
+    local tmp="$CASE_FILE.$$.tmp" now
+    now=$(date +%s)
+    if [ "${CASE_RC:-0}" -ne 0 ]; then
+        awk 'FNR == NR { p[$1] = 1; next }
+            /idtc_claim\(\(int\[\]\)\{/ { t = $0; sub(/^[^{]*\{/, "", t); sub(/\}.*$/, "", t); c = split(t, a, ", "); for (i = 1; i <= c; i++) drop[a[i]] = 1 }
+            END { for (k in p) if (!(k in drop)) print k }' "$WORK/passed" "$HARNESS_C" > "$WORK/passed.kept" && mv -f "$WORK/passed.kept" "$WORK/passed"
+    fi
     {
         [ -f "$CASE_FILE" ] && cat "$CASE_FILE"
-        awk 'FNR == NR { p[$1] = 1; next }
-             /^\/\/ idtc key / && ($4 in p) && $5 != "-" && $5 != "std" && $6 != "f" { print $5 }' \
+        awk -v now="$now" 'FNR == NR { p[$1] = 1; next }
+             /^\/\/ idtc key / && ($4 in p) && $5 != "-" && $5 != "std" && $6 != "f" { print $5 "\t" now }' \
             "$WORK/passed" "$HARNESS_C"
         [ "$CASE_TRACK" -eq 1 ] && case_record_reads
     } | tac | awk -F'\t' '!seen[$1]++' | head -n "$CASE_KEEP" | tac > "$tmp" && mv -f "$tmp" "$CASE_FILE"
@@ -3846,7 +3904,7 @@ shard_cases() {
             for (k = 0; k < length(mask); k++) {
                 sh = -1
                 if (substr(mask, k + 1, 1) == "0") {
-                    if (!(k in alw)) sh = 0
+                    if (!(k in alw) && !(k in par)) sh = 0
                     else if (k in par) {
                         r = find(k)
                         if (!(r in gs)) gs[r] = (rr++ % n) + 1
@@ -3976,6 +4034,7 @@ run_cases() {
     progress_stop_ticker
     unset IDTC_TICK IDTC_READS
     PROG_NOTE="$PROG_RAN run, $PROG_CACHED cached"
+    CASE_RC=$hrc
     case_record
     [ "$hrc" -eq 0 ] && return 0
     progress_clear

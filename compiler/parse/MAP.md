@@ -1101,15 +1101,15 @@ this compiler uses a construct on itself.
 | `dg_case_tok` | `compiler/parse/mid/form/unique/dump/digest/keys/case/tok.id` | One token of a case: its text, and -- when it names a function of the |
 | `dg_case_ref` | `compiler/parse/mid/form/unique/dump/digest/keys/case/tok.id` | One token of a case: its text, and -- when it names a function of the |
 | `dg_deep_last` | `compiler/parse/mid/form/unique/dump/digest/keys/case/tok.id` | The hash of the component sealed last, for dg_seal's own cases (../../scc/ |
-| `dg_case_word` | `compiler/parse/mid/form/unique/dump/digest/keys/case/word.id` | One case's key, or "-" when it must run every build (../emit.id says which |
-| `dg_case_fn` | `compiler/parse/mid/form/unique/dump/digest/keys/case/word.id` | The row of the case's function, or -1 when the case cannot have a key: it |
-| `dg_fn_named` | `compiler/parse/mid/form/unique/dump/digest/keys/case/word.id` | One case's key, or "-" when it must run every build (../emit.id says which |
+| `dg_case_word` | `compiler/parse/mid/form/unique/dump/digest/keys/case/word.id` | One case's key, or "-" when the case has no token range (only a hand-built |
+| `dg_case_fn` | `compiler/parse/mid/form/unique/dump/digest/keys/case/word.id` | The row of the case's function, or -1 when the case has no token range |
+| `dg_fn_named` | `compiler/parse/mid/form/unique/dump/digest/keys/case/word.id` | One case's key, or "-" when the case has no token range (only a hand-built |
 | `dg_emit_keys` | `compiler/parse/mid/form/unique/dump/digest/keys/emit.id` | Case keys: one line per case, in the harness's own case order (the index |
 | `dg_emit_key` | `compiler/parse/mid/form/unique/dump/digest/keys/emit.id` | Case keys: one line per case, in the harness's own case order (the index |
 | `dg_case_key` | `compiler/parse/mid/form/unique/dump/digest/keys/emit.id` | Case keys: one line per case, in the harness's own case order (the index |
-| `dg_t_claim` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/claim.id` | The parsed pair's first case given a scaling claim, which keeps it off the |
-| `dg_t_std` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/claim.id` | The parsed pair's first case given a scaling claim, which keeps it off the |
-| `dg_dirty_last` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/claim.id` | The parsed pair's first case given a scaling claim, which keeps it off the |
+| `dg_t_claim` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/claim.id` | The parsed pair's first case given a scaling claim, which is keyed like any |
+| `dg_t_std` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/claim.id` | The parsed pair's first case given a scaling claim, which is keyed like any |
+| `dg_dirty_last` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/claim.id` | The parsed pair's first case given a scaling claim, which is keyed like any |
 | `dg_t_exp` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/exp.id` | Two exports over the parsed pair: gx declared by fa, a function of the |
 | `dg_nexp` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/exp.id` | Two exports over the parsed pair: gx declared by fa, a function of the |
 | `dg_t_rows0` | `compiler/parse/mid/form/unique/dump/digest/keys/fixture/rows.id` | ../../graph/state/parsed.id's parse with the digest part-built: rows0 has |

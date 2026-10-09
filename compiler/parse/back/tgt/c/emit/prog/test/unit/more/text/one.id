@@ -20,7 +20,8 @@
 // default (judge/more/row.id).
 //
 // Teardown is the harness's, so a case writes none. Before the fork the parent
-// makes an empty /tmp/idcase_XXXXXX; the child gets it as $TMPDIR (where
+// makes an empty idcase_XXXXXX under $TMPDIR (when that is an absolute path,
+// else under /tmp); the child gets it as $TMPDIR (where
 // fs_mktemp puts every scratch name), leads a process group of its own, and
 // once the child has ended -- passed, failed, trapped, killed by its time
 // limit -- the parent kills (kill(-pid)) that whole group, so nothing the case started

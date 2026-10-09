@@ -30,3 +30,19 @@ tg_new(string[] tg_before, string[] tg_after) {
 (["a", "b/"], ["a", "b/", "c", "tmpguard_x/", "d/"]):(["c", "d/"])
 (["a", "b"], ["b"]):([])
 (["a"], ["a", "tmpguard_s/"]):([])
+(["a"], ["a", "tmp.Zq1/", "ccAb.s", "kept"]):(["tmp.Zq1/", "ccAb.s", "kept"])
+
+// tg_fresh with the entries of the build's private TMPDIR added, each named
+// TMPDIR/entry: nothing but the build under test writes there.
+tg_extend(string[] tg_fresh, string[] tg_priv) {
+  int tg_i = 0;
+  while (tg_i < len(tg_priv)) {
+    if (len(tg_priv[tg_i]) > 0) {
+      push(tg_fresh, "TMPDIR/" + tg_priv[tg_i]);
+    }
+    tg_i = tg_i + 1;
+  }
+} return void;
+(["x"], ["a", "b/"]):(["x", "TMPDIR/a", "TMPDIR/b/"], ["a", "b/"])
+([], []):([], [])
+(["x"], ["", "a"]):(["x", "TMPDIR/a"], ["", "a"])

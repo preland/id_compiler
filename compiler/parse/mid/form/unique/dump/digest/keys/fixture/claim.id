@@ -1,6 +1,7 @@
-// The parsed pair's first case given a scaling claim, which keeps it off the
-// cache; and the whole pair made standard-library cases (the library unit
-// starting at unit 0), which the harness never runs here.
+// The parsed pair's first case given a scaling claim, which is keyed like any
+// other case (bin/idc judges the claim's whole group together); and the whole
+// pair made standard-library cases (the library unit starting at unit 0), which
+// the harness never runs here.
 
 dg_t_claim() {
   dg_t_built();

@@ -2,13 +2,14 @@
 
 // The command that builds tree under tg_idc_root into tg_out, with IDC_NO_STD
 // removed from its environment so the standard library and its cases are part
-// of the build, and the compiler's cache switched off so every case runs.
+// of the build, and every case of the tree itself run fresh (IDC_FRESH_CASES)
+// while the library's cases and every object stay cached.
 tg_argv(string tg_idc_root, string tg_tree_path, string tg_out) {
-  string tg_head = "env\n-u\nIDC_NO_STD\nIDC_NO_CACHE=1\n" + tg_idc_root + "/bin/idc\n" + tg_tree_path;
-  string tg_lines = tg_head + "\n--allow-untested\n-o\n" + tg_out + "\n";
+  string tg_head = "env\n-u\nIDC_NO_STD\nIDC_FRESH_CASES=" + tg_tree_path + "\nTMPDIR=" + tg_out + "/tmp\n" + tg_idc_root + "/bin/idc\n" + tg_tree_path;
+  string tg_lines = tg_head + "\n--allow-untested\n-o\n" + tg_out + "/bin\n";
 } return string tg_lines;
-("/r", "t", "/tmp/x"):("env\n-u\nIDC_NO_STD\nIDC_NO_CACHE=1\n/r/bin/idc\nt\n--allow-untested\n-o\n/tmp/x\n")
-("/idc", "demos/hello", "/tmp/b/o"):("env\n-u\nIDC_NO_STD\nIDC_NO_CACHE=1\n/idc/bin/idc\ndemos/hello\n--allow-untested\n-o\n/tmp/b/o\n")
+("/r", "t", "/tmp/x"):("env\n-u\nIDC_NO_STD\nIDC_FRESH_CASES=t\nTMPDIR=/tmp/x/tmp\n/r/bin/idc\nt\n--allow-untested\n-o\n/tmp/x/bin\n")
+("/idc", "demos/hello", "/tmp/b/o"):("env\n-u\nIDC_NO_STD\nIDC_FRESH_CASES=demos/hello\nTMPDIR=/tmp/b/o/tmp\n/idc/bin/idc\ndemos/hello\n--allow-untested\n-o\n/tmp/b/o/bin\n")
 
 // Builds tg_tree_path, keeping the compiler's output and showing it on stderr
 // only when the build fails. Answers the build's status.

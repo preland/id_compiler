@@ -196,6 +196,116 @@ csf_build cf2
 if [ "$(rc_of cf2)" -eq 0 ] && [ "$(cst_runs cf2)" = 2 ]; then ok "a folded constant: editing the constant it was initialised from reruns the cases that read it"; else bad "a folded constant: edit of its source (rc $(rc_of cf2), stats '$(cat "$TMP/cf2.st")'): $(head -2 "$TMP/cf2.out")"; fi
 
 
+# Every case is cached, a scaling claim's and one that reads the clock
+# included, and a pass is trusted for IDC_CASE_MAX_AGE_DAYS (7) days: the
+# pass list stamps each entry, and an older one reruns. IDC_FRESH_CASES=PATH
+# reruns the cases of the tree at PATH and nothing else. The fixture has eight
+# cases: plain (2), stamped (2, reads the clock), linear (2, one scaling
+# claim) and main (2).
+CSA="$TMP/csa"; mkdir -p "$CSA"
+cat > "$CSA/main.id" <<'EOF2'
+age_double(int a) {
+  int b = a * 2;
+} return int b;
+(1):(2)
+(3):(6)
+
+main(int argc, string[] argv) {
+  print("age");
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF2
+cat > "$CSA/more.id" <<'EOF2'
+stamped(int a) {
+  int t = ticks();
+  int b = a;
+  if(t < 0) {
+    b = 0 - 1;
+  }
+} return int b;
+(1):(1)
+(2):(2)
+
+linear(int[] xs) {
+  int s = 0;
+  int i = 0;
+  while(i < len(xs)) {
+    s = s + xs[i];
+    i = i + 1;
+  }
+} return int s;
+([1, 2, 3, 4]):(10)[time:O(n), mem:O(1)]
+([1, 2, 3, 4, 5, 6, 7, 8]):(36)[time:O(n), mem:O(1)]
+EOF2
+csa_build() {
+    IDC_CASE_STATS=1 $BIN_IDC "${2:-$CSA}" -o "$TMP/$1" --no-std >"$TMP/$1.out" 2>&1
+    echo $? > "$TMP/$1.rc"
+    sed -n 's/^idc: cases: \([0-9]*\) total, \([0-9]*\) already passed, \([0-9]*\) to run$/\1 \2 \3/p' "$TMP/$1.out" > "$TMP/$1.st"
+}
+csa_expect() {
+    if [ "$(rc_of "$1")" -eq 0 ] && [ "$(cst_total "$1")" = 8 ] && [ "$(cst_runs "$1")" = "$2" ]; then ok "$3: $2 of 8 cases run"; else bad "$3 (rc $(rc_of "$1"), stats '$(cat "$TMP/$1.st")'): $(head -2 "$TMP/$1.out")"; fi
+}
+csa_age() {
+    local list then
+    then=$(( $(date +%s) - $1 * 86400 ))
+    for list in "$CACHE"/cases/*; do
+        awk -F'\t' -v OFS='\t' -v t="$then" '{ $2 = t; print }' "$list" > "$list.aged" && mv -f "$list.aged" "$list"
+    done
+}
+csa_build ca1
+csa_expect ca1 8 "a cold build runs the claim's cases and the clock's with the rest"
+csa_build ca2
+csa_expect ca2 0 "a rebuild runs none of them, the claim's and the clock's included"
+csa_age 6
+csa_build ca3
+csa_expect ca3 0 "entries six days old are still trusted"
+csa_age 8
+csa_build ca4
+csa_expect ca4 8 "entries eight days old run again"
+csa_build ca5
+csa_expect ca5 0 "and the rerun stamps them afresh"
+IDC_CASE_MAX_AGE_DAYS=0 csa_build ca6
+csa_expect ca6 8 "a limit of zero days runs every case"
+IDC_FRESH_CASES="$CSA" csa_build ca7
+csa_expect ca7 8 "IDC_FRESH_CASES naming the tree runs all its cases"
+IDC_FRESH_CASES="$TMP/elsewhere" csa_build ca8
+csa_expect ca8 0 "IDC_FRESH_CASES naming another tree runs none"
+IDC_FRESH_CASES="$CSA" csa_build ca9
+csa_expect ca9 8 "IDC_FRESH_CASES runs them again, not once"
+sed -i 's/s = s + xs\[i\]/s = xs[i] + s/' "$CSA/more.id"
+csa_build ca10
+csa_expect ca10 2 "editing the claim's function runs its two cases and no others"
+sed -i 's/a \* 2/2 * a/' "$CSA/main.id"
+csa_build ca11
+csa_expect ca11 2 "editing a function runs its own cases and no others"
+
+# A claim that does not hold must not be cached as a pass: its cases pass one
+# by one, and only the judging of the group says otherwise.
+CSB="$TMP/csb"; mkdir -p "$CSB"
+big=$(seq -s ', ' 1 64)
+cat > "$CSB/main.id" <<EOF2
+linear(int[] xs) {
+  int s = 0;
+  int i = 0;
+  while(i < len(xs)) {
+    s = s + xs[i];
+    i = i + 1;
+  }
+} return int s;
+([1, 2, 3, 4]):(10)[time:O(1)]
+([$big]):(2080)[time:O(1)]
+
+main(int argc, string[] argv) {
+  print("claim");
+} return int 0;
+(1, ["p"]):(0)
+(2, ["p", "q"]):(0)
+EOF2
+csa_build cb1 "$CSB"
+csa_build cb2 "$CSB"
+if [ "$(rc_of cb1)" -ne 0 ] && [ "$(rc_of cb2)" -ne 0 ] && grep -q 'does not hold' "$TMP/cb2.out" && [ "$(awk '{print $3}' "$TMP/cb2.st")" = 2 ]; then ok "a claim that fails is judged again on the next build, and its cases are not taken for a pass"; else bad "failing claim (rc $(rc_of cb1)/$(rc_of cb2), stats '$(cat "$TMP/cb2.st")'): $(head -2 "$TMP/cb2.out")"; fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]

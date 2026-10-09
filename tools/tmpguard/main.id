@@ -3,8 +3,8 @@
 //   tmpguard IDC_ROOT TREE...
 //
 // IDC_ROOT is the idc directory (the one holding bin/idc). Each TREE is built
-// with IDC_NO_CACHE=1 and the standard library, so the test cases of the tree
-// and of idstd really run, and /tmp is listed before and after. Every entry
+// with the standard library, IDC_FRESH_CASES=TREE and a private TMPDIR, so every test case of the
+// tree really runs (idstd's stay cached), and /tmp is listed before and after. Every entry
 // the build added is named, and the exit status is 1 when any build failed or
 // left an entry, 2 for a usage error, 0 otherwise. Other programs writing to
 // /tmp while it runs show up as entries too, so run it on a quiet machine.

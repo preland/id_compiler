@@ -15,9 +15,9 @@
 #   rd_ex             whether data/none.txt (case 1) and data/font.bin (case 2) exist
 #   rd_dir            the names in data/d (case 1) and in data/nodir, not there (case 2)
 #   rd_size           the size of data/size.txt (case 1) and of data/none2.txt (case 2)
-#   vol               calls ticks(): never cached
-#   wr                opens a file for writing and calls fs_close: never cached
-#   envr              calls env_get: never cached (the case is marked in the read log)
+#   vol               calls ticks(): cached all the same, and rerun weekly
+#   wr                opens a file for writing and calls fs_close: cached too (its write is in no read set)
+#   envr              calls env_get: cached too (the case is marked in the read log, which no longer stops it)
 #   env_if            reaches env_has, but only for an argument the cases do not give
 #                     it: cached
 #   wr_if             reaches the same write, but only for an argument the cases
@@ -64,7 +64,7 @@ export IDC_CACHE_DIR="$CACHE"
 
 CF="$TMP/cf"
 mkdir -p "$CF/be/fs" "$CF/be/env" "$CF/code" "$CF/data/d"
-cp "$STD/host/io/fs/fs_posix.c" "$STD/host/io/fs/fs.h" "$STD/host/io/fs/backend.id" "$CF/be/fs/"
+cp "$STD/host/io/fs/fs_posix.c" "$STD/host/io/fs/fs_internal.h" "$STD/host/io/fs/fs_fd.c" "$STD/host/io/fs/fs_tree.c" "$STD/host/io/fs/fs.h" "$STD/host/io/fs/backend.id" "$CF/be/fs/"
 cp "$STD/host/os/env/env_posix.c" "$STD/host/os/env/env.h" "$STD/host/os/env/backend.id" "$CF/be/env/"
 cat > "$CF/be/fs/handle.id" <<'EOF'
 native fs_open(string path, string mode) return int;
@@ -196,42 +196,42 @@ cf_expect() {
 cf_build cf1
 cf_expect cf1 22 "a cold build runs every case"
 cf_build cf2
-cf_expect cf2 6 "an identical rebuild reruns only vol (calls ticks), wr (writes) and envr (reads the environment), whose cases are never cached"
+cf_expect cf2 0 "an identical rebuild reruns nothing: vol (calls ticks), wr (writes) and envr (reads the environment) are cached too"
 printf 'ab13cdef' > "$CF/data/font.bin"
 cf_build cf3
-cf_expect cf3 7 "editing a byte of a file a case read reruns that case, not the case that only asked whether it exists"
+cf_expect cf3 1 "editing a byte of a file a case read reruns that case, not the case that only asked whether it exists"
 printf 'y' > "$CF/data/unrelated.txt"
 cf_build cf4
-cf_expect cf4 6 "editing a file no case reads reruns nothing more"
+cf_expect cf4 0 "editing a file no case reads reruns nothing more"
 printf 'wxyz' > "$CF/data/size.txt"
 cf_build cf5
-cf_expect cf5 6 "rewriting a file with the same size reruns nothing more: the case asked only its size"
+cf_expect cf5 0 "rewriting a file with the same size reruns nothing more: the case asked only its size"
 printf 'abcdef' > "$CF/data/size.txt"
 cf_build cf6
-cf_expect cf6 7 "changing the size of a file a case asked the size of"
+cf_expect cf6 1 "changing the size of a file a case asked the size of"
 printf 'q' > "$CF/data/none.txt"
 cf_build cf7
-cf_expect cf7 7 "creating a file a case probed as missing (exists)"
+cf_expect cf7 1 "creating a file a case probed as missing (exists)"
 : > "$CF/data/missing.bin"
 cf_build cf8
-cf_expect cf8 7 "creating a file a case tried to open and did not find"
+cf_expect cf8 1 "creating a file a case tried to open and did not find"
 printf 'x' > "$CF/data/d/two.txt"
 cf_build cf9
-cf_expect cf9 7 "adding a file to a directory a case listed"
+cf_expect cf9 1 "adding a file to a directory a case listed"
 mkdir "$CF/data/nodir"
 cf_build cf10
-cf_expect cf10 7 "creating a directory a case tried to list and did not find"
+cf_expect cf10 1 "creating a directory a case tried to list and did not find"
 rm "$CF/data/size.txt"
 cf_build cf11
-cf_expect cf11 7 "deleting a file a case asked the size of"
+cf_expect cf11 1 "deleting a file a case asked the size of"
 rm "$CF/data/d/one.txt"
 cf_build cf12
-cf_expect cf12 7 "removing a file from a directory a case listed"
+cf_expect cf12 1 "removing a file from a directory a case listed"
 cf_build cf13
-cf_expect cf13 6 "a rebuild after all of those"
+cf_expect cf13 0 "a rebuild after all of those"
 sed -i 's/h = 0 - 1;/h = 0 - 2;/; s/(1):(-1)/(1):(-2)/; s/(2):(-1)/(2):(-2)/' "$CF/code/main.id"
 cf_build cf14
-cf_expect cf14 8 "editing a function reruns its own cases (and the two never cached)"
+cf_expect cf14 2 "editing a function reruns its own cases and no others"
 
 echo
 echo "$pass passed, $fail failed"

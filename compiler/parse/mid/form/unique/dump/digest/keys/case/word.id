@@ -1,5 +1,6 @@
-// One case's key, or "-" when it must run every build (../emit.id says which
-// cases those are and why).
+// One case's key, or "-" when the case has no token range (only a hand-built
+// fixture's case lacks one; every real case, scaling claim and volatile
+// native included, has a key: ../emit.id).
 
 dg_case_word(int dgc) {
   int dgf = dg_case_fn(dgc);
@@ -9,19 +10,20 @@ dg_case_word(int dgc) {
   }
 } return string dgs;
 given dg_t_built (0):("-5465788173469261037")
-given dg_t_claim (0):("-")
+given dg_t_claim (0):("-5465788173469261037")
+given dg_t_built (99):("-")
 
-// The row of the case's function, or -1 when the case cannot have a key: it
-// carries a scaling claim, or it was never given a token range (only a
-// hand-built fixture's case is).
+// The row of the case's function, or -1 when the case has no token range
+// (only a hand-built fixture's case is without one).
 dg_case_fn(int dgc) {
   int dgf = 0 - 1;
-  if(dgc < len((import caseend)) && lst_index_of((import conscase), dgc) < 0) {
+  if(dgc < len((import caseend))) {
     dgf = dg_fn_named((import ns1)[((import casefn)[dgc])]);
   }
 } return int dgf;
 given dg_t_built (2):(1)
-given dg_t_claim (0):(-1)
+given dg_t_claim (0):(0)
+given dg_t_built (99):(-1)
 
 dg_fn_named(string dgnm) {
   int dgf = hmap_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, 0 - 1);
