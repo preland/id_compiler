@@ -37,6 +37,11 @@ bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 
 unset IDC_NO_STD
 
+# tests/idstd_real.sh PART PARTS checks every PARTS-th project starting at PART,
+# so run.sh can hold the checks in sections each under a minute; no arguments
+# checks every project.
+PART="${1:-}" PARTS="${2:-1}"
+
 # Locate the library the same way the compilers do, so a checkout without one
 # skips rather than reporting every project as broken.
 STD="${IDSTD_HOME:-}"
@@ -96,7 +101,10 @@ while read -r name _; do
     [ -d "$(path_of "$name")" ] && projects="$projects $name"
 done < "$LEDGER"
 
+index=-1
 for p in $projects; do
+    index=$((index+1))
+    [ -n "$PART" ] && [ $((index % PARTS)) -ne "$PART" ] && continue
     name=${p%/}
     path=$(path_of "$name")
     case "$name" in demos/*) name=${name#demos/} ;; esac

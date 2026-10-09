@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel_build kernel_boot kernel_kfree editor mutscore statusgen)
+SECTIONS=(core core_parse core_guard core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real_0 idstd_real_1 idstd_real_2 kernel_build kernel_boot kernel_kfree editor mutscore statusgen)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq idc/tools/statusgen)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -96,9 +96,12 @@ expect_output() { # name, expected, actual
     if [ "$2" = "$3" ]; then ok "$1"; else bad "$1 (expected '$2', got '$3')"; fi
 }
 
-# core is three sections, because one was over a minute: core builds the lexer
-# and the parser into $TMP and tests them, core_self runs the compiler over its
-# own source, core_rest is the rest. A part run alone builds the two it needs.
+# core is five sections, because one was over a minute once the compiler cache
+# had been evicted: core builds and runs the demos, the lexer and the calculator;
+# core_parse builds the parser and tests it end to end; core_guard holds the
+# self-hosted rejection guards and the systems builds; core_self runs the
+# compiler over its own source; core_rest is the rest. A part run alone builds
+# the lexer and parser it needs.
 core_tools() {
     [ -x "$TMP/idlex" ] || env -u IDC_NO_STD $BIN_IDC ../compiler/lex -o "$TMP/idlex" 2>/dev/null || bad "idc-in-id lexer compiles"
     [ -x "$TMP/idparse" ] || env -u IDC_NO_STD $BIN_IDC ../compiler/parse -o "$TMP/idparse" 2>/dev/null || bad "idc-in-id parser compiles"
@@ -213,7 +216,13 @@ expect_output "calc precedence/parens/unary/%" "= 13" \
 # --- idc-in-id stage 2b/3: the function/statement parser + C emitter (written
 #     in id), fed by the lexer. `idparse ast` prints the AST as an S-expression;
 #     `idparse` (no arg) emits C.
-env -u IDC_NO_STD $BIN_IDC ../compiler/parse -o "$TMP/idparse" 2>/dev/null || bad "idc-in-id parser compiles"
+echo
+echo "$pass passed, $fail failed"
+[ "$fail" -eq 0 ] && mark_done core
+fi
+
+if want core_parse; then
+core_tools
 cat > "$TMP/p_fn.id" <<'EOF'
 add(int x, int y) {
   int sum = x * 2 + y;
@@ -323,6 +332,13 @@ if grep -qF '} else if ((n == 1)) {' "$TMP/elif_id.c" \
 else
     bad "else if is spliced flat, and else { if } nests a block"
 fi
+echo
+echo "$pass passed, $fail failed"
+[ "$fail" -eq 0 ] && mark_done core_parse
+fi
+
+if want core_guard; then
+core_tools
 # The self-hosted compiler must actually REJECT rule violations, not merely be
 # capable of noticing them. Each check family gets a guard here: the hook in
 # check_program() is a single shared block with room for three actions, so a
@@ -552,7 +568,7 @@ $BIN_IDC "$TMP/g_hex" -o "$TMP/g_hex.bin" 2>/dev/null || bad "wide hex literals 
 expect_output "wide hex literals" "-1 9223372036854775807 255" "$("$TMP/g_hex.bin")"
 echo
 echo "$pass passed, $fail failed"
-[ "$fail" -eq 0 ] && mark_done core
+[ "$fail" -eq 0 ] && mark_done core_guard
 fi
 
 if want core_self; then
@@ -1209,11 +1225,13 @@ fi
 echo
 echo "--- the real standard library (tests/idstd_expect.txt) ---"
 real=0
-if want idstd_real; then
-    ./idstd_real.sh
-    real=$?
-    [ "$real" -eq 0 ] && mark_done idstd_real
-fi
+for real_part in 0 1 2; do
+    if want idstd_real_$real_part; then
+        ./idstd_real.sh $real_part 3
+        real=$?
+        [ "$real" -eq 0 ] && mark_done idstd_real_$real_part
+    fi
+done
 
 # --- the kernel. Last because it is the only section that runs a whole machine,
 #     and because everything it exercises has already been checked hosted --
