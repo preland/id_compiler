@@ -11,7 +11,10 @@
 # longer built against here; the markers are left in place rather than edited
 # out of the 44 files that carry them, and are simply unused by this script.
 #
-# Run from anywhere: tests/invalid.sh
+# Run from anywhere: tests/invalid.sh [K N]
+# K N runs shard K of N: the checks whose position in this file's order, counting
+# from 1, is K mod N. run.sh calls it as invalid_1of4 .. invalid_4of4, so each
+# stays under the minute.
 set -u
 # Hermetic: these checks assert on exact diagnostics, exact emitted C, or the
 # compiler's own bootstrap, none of which may change because a standard library
@@ -46,7 +49,15 @@ check_one() {
     fi
 }
 
+shard=${1:-1} shards=${2:-1}
+index=0
+mine() {
+    index=$((index+1))
+    [ $(( index % shards )) -eq $(( shard % shards )) ]
+}
+
 for f in invalid/*.id; do
+    mine || continue
     name=$(basename "$f" .id)
     expect=$(sed -n 's@^// EXPECT: @@p' "$f" | head -1)
     if [ -z "$expect" ]; then
@@ -60,6 +71,7 @@ done
 # `// EXPECT:` line is in whichever of its files carries it.
 for d in invalid/*/; do
     [ -d "$d" ] || continue
+    mine || continue
     name=$(basename "$d")
     expect=$(sed -n 's@^// EXPECT: @@p' "$d"*.id | head -1)
     if [ -z "$expect" ]; then
@@ -72,11 +84,13 @@ done
 # reported: the type checker reads the clashing declarations as one type and
 # raises uncoded errors that blame the wrong line, so the precise diagnostic has
 # to come before them or an author fixes the symptom.
+if mine; then
 first=$("$BIN_IDC" fixtures/type_clash --allow-untested -o "$TMP/clash" 2>&1 | head -1)
 case "$first" in
     *"[E0303]") echo "PASS: type clash: the first diagnostic is E0303"; pass=$((pass+1)) ;;
     *)          echo "FAIL: type clash: the first diagnostic is E0303"; echo "      got: $first"; fail=$((fail+1)) ;;
 esac
+fi
 
 echo
 echo "$pass passed, $fail failed"

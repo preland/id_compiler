@@ -31,6 +31,23 @@ for tool in clang ld.lld qemu-system-x86_64; do
     fi
 done
 
+# The whole file is over the 60 second budget, so it runs by part, and run.sh
+# calls each as a section of its own. Every part builds the two tools and the
+# kernel first (cached, so it is quick after the first), then checks its own
+# share: build is the image and the runtime's symbols, boot is the serial port,
+# the screen and the hosted comparison, kfree is the runtime giving lists back.
+#
+#   tests/kernel.sh            everything
+#   tests/kernel.sh boot       just that part
+#
+# The bodies below are not re-indented for the gate, as in run.sh.
+PART="${1:-}"
+case "$PART" in
+    ""|build|boot|kfree) ;;
+    *) echo "kernel.sh: no such part: $PART (build, boot or kfree)" >&2; exit 2 ;;
+esac
+want() { [ -z "$PART" ] || [ "$PART" = "$1" ]; }
+
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 ELF="$TMP/kernel.elf"
 IDCROOT=$(cd "$ROOT" && pwd)
@@ -46,8 +63,9 @@ if ! "$TMP/kbuild" "$IDCROOT" "$ELF" >"$TMP/build.log" 2>&1; then
     bad "the kernel builds ($(grep -v 'warning:\|cc-wrapper\|un-wrapped' "$TMP/build.log" | head -1))"
     echo; echo "$pass passed, $fail failed"; exit 1
 fi
-ok "the kernel builds"
+want build && ok "the kernel builds"
 
+if want build; then
 # An `asm` declaration (docs/ASM.md) gets its own fn row in `--calls`, the
 # same as an ordinary function -- otherwise it appears only as a callee in
 # the edges above, with no row naming the file it lives in, and
@@ -104,7 +122,9 @@ if command -v llvm-nm >/dev/null 2>&1; then
         bad "the runtime defines fail"
     fi
 fi
+fi
 
+if want boot; then
 # -- boot, then drive the shell over the serial port ------------------------
 # The shell reads the keyboard and the serial port through one function, so a
 # test types at it the same way a person does.
@@ -191,7 +211,9 @@ if "$ROOT/bin/idc" "$HOST" --no-std --allow-untested -o "$TMP/host.bin" >"$TMP/h
 else
     bad "the kernel's demonstrations build hosted ($(head -1 "$TMP/host.log"))"
 fi
+fi
 
+if want kfree; then
 # -- the runtime gives lists back --------------------------------------------
 # docs/MEMORY.md 2a: every target frees the same allocations, and here that is
 # the runtime's free lists. fixtures/kfree builds a thousand lists the compiler
@@ -220,6 +242,7 @@ if "$ROOT/bin/idc" "$ROOT/tests/fixtures/kfree" --no-std --freestanding --allow-
     esac
 else
     bad "the runtime gives lists back (fixtures/kfree did not build: $(head -1 "$KFREE/build.log"))"
+fi
 fi
 
 echo

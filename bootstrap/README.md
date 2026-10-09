@@ -46,7 +46,15 @@ diff is the whole file.
 ```sh
 tools/regen_bootstrap.sh          # rewrite both files from the working tree
 tools/regen_bootstrap.sh --check  # fail if they are not what the tree emits
+tools/regen_bootstrap.sh lex      # one step: stages, lex, parse-front, emit or compare
 ```
+
+Cold, the whole run is minutes, so it is five steps that each print one result
+line and skip themselves when their inputs have not changed: `stages` builds the
+compiler from `bootstrap/*.c`, `lex` and `emit` write the C the tree emits for
+`compiler/lex` and `compiler/parse` under the compiler cache, `parse-front` fills
+the front-end cache for the second, and `compare` writes (or with `--check`
+compares) the two files.
 
 ## What is guaranteed about these files
 

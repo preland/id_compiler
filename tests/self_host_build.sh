@@ -51,6 +51,26 @@ check_self() {
     fi
 }
 
+# The whole file is over the 60 second budget, so it runs by group, and run.sh
+# calls each as a section of its own:
+#
+#   tests/self_host_build.sh                 everything
+#   tests/self_host_build.sh --list          the groups
+#   tests/self_host_build.sh demos link      just those
+#
+# Each group builds what it needs itself; none reads another's files. The bodies
+# below are not re-indented for the gate, as in run.sh.
+GROUPS_ALL="demos link project_1 project_2 project_3 stage0 boot_cold expr"
+case "${1:-}" in
+    --list) for g in $GROUPS_ALL; do echo "$g"; done; exit 0 ;;
+esac
+for g in "$@"; do
+    case " $GROUPS_ALL " in *" $g "*) ;; *) echo "self_host_build.sh: no such group: $g (see --list)" >&2; exit 2 ;; esac
+done
+WANTED=("$@")
+want() { [ "${#WANTED[@]}" -eq 0 ] && return 0; case " ${WANTED[*]} " in *" $1 "*) return 0 ;; esac; return 1; }
+
+if want demos; then
 # Every demo project, discovered rather than listed. A demo added to demos/
 # is covered from the moment it exists, with no script to remember to edit --
 # which is the failure this replaced: the list here named four demos while
@@ -104,7 +124,9 @@ if env -u IDC_NO_STD $BIN_IDC "$TMP/nomain" -o "$TMP/nomain_self.o" >/dev/null 2
 else
     bad "a no-main project (-> .o) builds via bin/idc"
 fi
+fi
 
+if want link; then
 # -- link-time-resolved calls (native backends) ------------------------------
 # A call no input file defines is a typo when nothing could resolve it, and a
 # link-time symbol when a backend is attached. Both halves are checked, since
@@ -143,7 +165,9 @@ for prog in ../../demos/gfxdemo; do
         bad "backend calls are emitted as prototypes via bin/idc ($prog)"
     fi
 done
+fi
 
+if want project_1; then
 # -- the driver's own reading of what a project IS ---------------------------
 # These are filesystem questions, answered in bash rather than in id, so they
 # are the ones most likely to be gotten wrong. Each one was, once.
@@ -346,7 +370,11 @@ if [ -n "${IDC_WASI_CLANG:-}" ] && command -v wasmtime >/dev/null 2>&1; then
 else
     echo "SKIP: conf.id constant pruning on --target wasm (needs the WASI toolchain and wasmtime)"
 fi
+fi
 
+if want project_2; then
+proj="$TMP/consts"
+mkdir -p "$proj"
 # (b2-list) a conf.id constant may be a list (docs/PROJECT.md 5): read by
 #           index and by len in a built program, and the same program's own
 #           test cases -- each case a process of its own, so the constant has
@@ -553,7 +581,9 @@ if ! sub_app 'import "../lib/one"' '  int x = lib_one(1);
 else
     bad "conf.id: a nested conf.id under an imported subdirectory is still rejected ($(head -1 "$TMP/sub.err"))"
 fi
+fi
 
+if want project_3; then
 # (c) --triple reaches idparse, which is what selects among asm overloads.
 cat > "$TMP/asm.id" <<'EOF'
 main(int argc, string[] argv) {
@@ -721,7 +751,9 @@ if [ -s "$TMP/cases_self.c" ] && ! grep -q '\[time:' "$TMP/cases_self.c" \
 else
     bad "a program with test cases builds, passes its cases, and leaves no trace in the C"
 fi
+fi
 
+if want stage0 || want boot_cold; then
 # -- stage 0 is C ------------------------------------------------------------
 #
 # bootstrap/*.c is the compiler as C (bootstrap/README.md). Two things have to
@@ -741,6 +773,7 @@ STD_REAL=""
 for cand in "${IDSTD_HOME:-}" "$REAL_ROOT/../idstd" "$REAL_ROOT/../../idstd"; do
     [ -n "$cand" ] && [ -d "$cand" ] && { STD_REAL=$(cd "$cand" && pwd); break; }
 done
+if want stage0; then
 if [ -z "$STD_REAL" ]; then
     echo "SKIP: bootstrap/*.c currency (no idstd checkout to build the compiler against)"
 elif IDSTD_HOME="$STD_REAL" ../tools/regen_bootstrap.sh --check >"$TMP/regen.out" 2>&1; then
@@ -748,7 +781,9 @@ elif IDSTD_HOME="$STD_REAL" ../tools/regen_bootstrap.sh --check >"$TMP/regen.out
 else
     bad "bootstrap/*.c is stale (run tools/regen_bootstrap.sh): $(head -1 "$TMP/regen.out")"
 fi
+fi
 
+if want boot_cold; then
 BOOTROOT="$TMP/bootroot"
 mkdir -p "$BOOTROOT"
 for e in "$REAL_ROOT"/*; do
@@ -775,7 +810,10 @@ if [ -n "$STD_REAL" ]; then
         bad "a cold bootstrap says nothing about --allow-untested (boot.err: $(tr '\n' '|' < "$TMP/boot.err"))"
     fi
 fi
+fi
+fi
 
+if want expr; then
 # -- expression compilation is linear, not exponential ----------------------
 # A left-leaning `+` chain used to double the work at every level of the
 # tree: type_of and emit_bin each answered "is this concat/strcmp/a helper
@@ -855,6 +893,7 @@ if printf '%s\n' "$inh_out" | grep -q "exceeded the memory limit idc was started
     ok "an inherited memory limit is reported as the caller's, not as IDC_MEM_LIMIT"
 else
     bad "an inherited memory limit is reported as the caller's, not as IDC_MEM_LIMIT: $(printf '%s\n' "$inh_out" | head -1)"
+fi
 fi
 
 echo

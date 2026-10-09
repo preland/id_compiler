@@ -3,7 +3,7 @@
 #
 #   tests/run.sh                 everything (over the 60s budget: run it by section)
 #   tests/run.sh --list          the sections, with their indices
-#   tests/run.sh core conform_1  just those, by name or index
+#   tests/run.sh core conform_fn just those, by name or index
 #   tests/run.sh --from 4        section 4 onward
 #   tests/run.sh --resume        continue after the last section that passed
 #
@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_self core_rest invalid diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build backends_fs backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib wasm wasm_js wasm_js_std lib lib_csv opt conform_1 conform_2 conform_3 tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel editor mutscore statusgen)
+SECTIONS=(core core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real kernel_build kernel_boot kernel_kfree editor mutscore statusgen)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word wordcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq idc/tools/statusgen)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1015,11 +1015,13 @@ fi
 echo
 echo "--- negative tests (tests/invalid/) ---"
 neg=0
-if want invalid; then
-    ./invalid.sh
-    neg=$?
-    [ "$neg" -eq 0 ] && mark_done invalid
-fi
+for ik in 1 2 3 4; do
+    if want "invalid_${ik}of4"; then
+        ./invalid.sh "$ik" 4
+        irc=$?
+        if [ "$irc" -eq 0 ]; then mark_done "invalid_${ik}of4"; else neg=$irc; fi
+    fi
+done
 
 # --- the diagnostic record and what reads it: the renderers, --explain, the code
 #     registry, and the examples of docs/ERRORS.md (tests/diagnostics.sh). The
@@ -1057,11 +1059,13 @@ fi
 echo
 echo "--- self-hosted driver build (bin/idc) ---"
 shneg=0
-if want self_host_build; then
-    ./self_host_build.sh
-    shneg=$?
-    [ "$shneg" -eq 0 ] && mark_done self_host_build
-fi
+for sg in demos link project_1 project_2 project_3 stage0 boot_cold expr; do
+    if want "self_host_build_$sg"; then
+        ./self_host_build.sh "$sg"
+        shrc=$?
+        if [ "$shrc" -eq 0 ]; then mark_done "self_host_build_$sg"; else shneg=$shrc; fi
+    fi
+done
 
 # --- native backends: both backends compile and coexist in one binary, the
 #     graphics demos build at byte parity, and no windowed demo hangs when
@@ -1069,7 +1073,7 @@ fi
 echo
 echo "--- native backends (idstd's host/io/fs, host/dev/win/gfx, host/dev/win/gl) ---"
 bend=0
-for bs in fs ipc link link_lib link_att link_pkg link_gfx demos display galaxy galaxy_run; do
+for bs in fs fs_list ipc link link_lib link_att link_pkg link_gfx demos display galaxy galaxy_run; do
     if want "backends_$bs"; then
         ./backends.sh "$bs"
         brc=$?
@@ -1084,11 +1088,13 @@ done
 echo
 echo "--- standard library (implicit import) ---"
 std=0
-if want stdlib; then
-    ./stdlib.sh
-    std=$?
-    [ "$std" -eq 0 ] && mark_done stdlib
-fi
+for sp in "import 1" "dce 2" "precheck 3"; do
+    if want "stdlib_${sp%% *}"; then
+        ./stdlib.sh "${sp#* }"
+        stdrc=$?
+        if [ "$stdrc" -eq 0 ]; then mark_done "stdlib_${sp%% *}"; else std=$stdrc; fi
+    fi
+done
 
 # --- `--target wasm`: the C target's own C, recompiled for wasm32-wasi and
 #     linked as a WASI reactor (docs/TODO.md 9b). Skips itself when the
@@ -1159,7 +1165,9 @@ fi
 echo
 echo "--- conformance across targets (docs/SPEC.md) ---"
 conf=0
-for cp in "1 eprint float flow fn free" "2 int list order" "3 store str struct trap closure"; do
+for cp in "eprint eprint" "float float" "flow flow" "fn fn" "free free" "int int" \
+          "list_1of2 list:1/2" "list_2of2 list:2/2" "order order" "store store" "str str" \
+          "struct struct" "trap trap" "closure closure" "const const"; do
     if want "conform_${cp%% *}"; then
         ./conform.sh ${cp#* }
         crc=$?
@@ -1213,11 +1221,13 @@ fi
 echo
 echo "--- the kernel (docs/KERNEL.md) ---"
 kern=0
-if want kernel; then
-    ./kernel.sh
-    kern=$?
-    [ "$kern" -eq 0 ] && mark_done kernel
-fi
+for kp in build boot kfree; do
+    if want "kernel_$kp"; then
+        ./kernel.sh "$kp"
+        krc=$?
+        if [ "$krc" -eq 0 ]; then mark_done "kernel_$kp"; else kern=$krc; fi
+    fi
+done
 
 # --- the document editor. Last with the kernel, because the two of them are
 #     what the language was stretched against: everything above this line is

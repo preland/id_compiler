@@ -54,7 +54,9 @@
 # silently stops doing it passes everything above.
 #
 # Run from anywhere: tests/conform.sh [AREA...]   (AREAs, e.g. trap, run only
-# those directories under tests/conform/ -- the whole run is over the 60s budget)
+# those directories under tests/conform/ -- the whole run is over the 60s budget;
+# AREA:K/N runs the cases whose file number mod N is K mod N, so list:1/2 and
+# list:2/2 are the two halves of list)
 # Needs clang for --target llvm, and the WASI toolchain `nix develop` sets plus
 # wasmtime for --target wasm;
 # a missing toolchain skips that target with a message rather than passing.
@@ -219,12 +221,18 @@ else echo "SKIP: --target wasm (needs the WASI toolchain nix develop sets, and w
 
 cases=0
 areas=("$@"); [ "${#areas[@]}" -eq 0 ] && areas=("*")
-for area in "${areas[@]}"; do
+for spec in "${areas[@]}"; do
+area=${spec%%:*}
+part=1 parts=1
+case "$spec" in *:*/*) part=${spec#*:}; parts=${part#*/}; part=${part%/*} ;; esac
 for src in conform/$area/*.id conform/$area/*/; do
     [ -e "$src" ] || continue
     src=${src%/}
     dir=$(dirname "$src")
     base=$(basename "$src" .id)
+    number=${base%%-*}
+    [[ "$number" =~ ^[0-9]+$ ]] || number=0
+    [ $(( 10#$number % parts )) -eq $(( part % parts )) ] || continue
     id="$(basename "$dir")/$base"
     if [ ! -f "$dir/$base.expected" ]; then
         bad "c  $id  -- no .expected file beside it"

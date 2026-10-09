@@ -47,6 +47,22 @@ run_one() {
     fi
 }
 
+# The whole file is over the 60 second budget, so it runs by part, and run.sh
+# calls each as a section of its own: part 1 is checks 1-16, part 2 checks 17-27,
+# part 3 checks 28 on. A part builds what it needs itself.
+#
+#   tests/stdlib.sh            everything
+#   tests/stdlib.sh 2          just part 2
+#
+# The bodies below are not re-indented for the gate, as in run.sh.
+case "${1:-}" in
+    ""|1|2|3) ;;
+    *) echo "stdlib.sh: no such part: $1 (1, 2 or 3)" >&2; exit 2 ;;
+esac
+PART="${1:-}"
+want() { [ -z "$PART" ] || [ "$PART" = "$1" ]; }
+
+if want 1; then
 # -- 1. a program calls the stdlib with no conf.id at all -----------------
 rm -rf "$TMP/proj"; mkdir -p "$TMP/proj"
 cat > "$TMP/proj/main.id" <<'EOF'
@@ -273,7 +289,9 @@ if ! $BIN_IDC --allow-untested --std "$TMP/num" "$TMP/proj16" -o "$TMP/x" >"$TMP
 else
     bad "a numbered sibling file (chunk.id, chunk2.id) is rejected"
 fi
+fi
 
+if want 2; then
 # -- 17. dead-code elimination: an unused stdlib function is not emitted -----
 # This is what makes an always-imported library affordable. Before it existed,
 # a 729-function library cost hello-world 0.75 s and a 75 KB binary against
@@ -536,7 +554,9 @@ if printf '%s\n' "$out" | grep -qF "test failed: proj_add_one(2) = 3, expected 9
 else
     bad "a failing case in the program is reported as the program's, with idstd fine: $(printf '%s\n' "$out" | head -2 | tr '\n' ' ')"
 fi
+fi
 
+if want 3; then
 # -- 28. the pre-check is cached: a second, identical build against the same
 # library creates no new pre-check cache entry -------------------------------
 rm -rf "$TMP/proj" "$TMP/idstd_cachetest"; mkdir -p "$TMP/proj"
@@ -860,6 +880,7 @@ for fmt in plain json human; do
     fi
 done
 LZ_FLAGS=""
+fi
 
 echo
 echo "$pass passed, $fail failed"

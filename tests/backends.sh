@@ -73,7 +73,7 @@ skip() { echo "SKIP: $1"; }
 # again from where it got to rather than from the start.
 #
 # The bodies below are not re-indented for the gate, as in run.sh.
-SECTIONS="fs ipc link link_lib link_att link_pkg link_gfx demos display galaxy galaxy_run"
+SECTIONS="fs fs_list ipc link link_lib link_att link_pkg link_gfx demos display galaxy galaxy_run"
 case "${1:-}" in
     --list) for s in $SECTIONS; do echo "$s"; done; exit 0 ;;
 esac
@@ -92,12 +92,14 @@ demo_list() { # SECTION GALAXY_SECTION
 }
 
 # -- fs: files, and no system libraries at all -------------------------------
-if want fs; then
+if want fs || want fs_list; then
 # Deliberately above the X11 gate below. This backend is stdio and stat, so it
 # builds and runs on any machine with a C compiler, and the checks that used to
 # be impossible without a display budget -- does a backend link, does the
 # extern block resolve, do both compilers agree -- are all answerable here.
 fsout="$TMP/fs"
+fi
+if want fs; then
 if cc -O2 -c "$(be_abs fs)/fs_posix.c" -I"$(be_abs fs)" -o "$TMP/fs.o" 2>"$TMP/fs.err"; then
     ok "host/io/fs/fs_posix.c compiles"
 else
@@ -145,6 +147,8 @@ for c in "$BIN_IDC"; do
     fi
 done
 
+fi
+if want fs_list; then
 # fs_list: a directory's entries, sorted, directories marked, and a buffer too
 # small still told what it would take. This is the call bin/idc has to have
 # before it can be an `id` program rather than a shell script, so it is checked
