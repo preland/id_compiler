@@ -1,0 +1,31 @@
+// Every keyword is a whole word the lexer cuts as a "kw" token, so a name that
+// is one (`int int = 3;`, a parameter called `while`) reads as syntax to
+// anyone scanning the source, and without this check it went on to the C
+// backend, whose own `int int;` is the first thing to complain. A keyword that
+// is only one `_` piece of a longer name (`int_total`) is one ident and never
+// reaches this.
+//
+// These are the keywords no_case_word and the checks it calls already name,
+// each with a message of its own; they are left to those so a name is
+// reported once.
+
+keyword_reported(string candidate) {
+  int reported = 0;
+  if(candidate == "given" || candidate == "then" || candidate == "prints" || candidate == "eprints" || candidate == "calls" || candidate == "stdin" || candidate == "timeout" || candidate == "func" || candidate == "struct") {
+    reported = 1;
+  }
+} return int reported;
+("func"):(1)
+("while"):(0)
+("timeout"):(1)
+
+no_keyword_word(int[] pos) {
+  string keyword = cur_text(pos);
+  if(cur_kind(pos) == "kw" && keyword_reported(keyword) == 0) {
+    syn_diag(pos, "E0312", "'" + keyword + "' is a keyword and cannot be used as a name", keyword, "a keyword begins a type, a statement or a clause (int, float, string, word, void, if, else, while, return, break, export, import, chain, pure and the like), so a name spelled that way cannot be told from it", "choose another name; a keyword is fine as one piece of a longer name, as in int_total");
+  }
+} return void;
+given toks_env(["kw"], ["while"]) ([0]):() then (import chkfail)[0]:(1)
+given toks_env(["kw"], ["int"]) ([0]):() then prints:("<stdin>:1: error: 'int' is a keyword and cannot be used as a name [E0312]\n  at: int\n  why: a keyword begins a type, a statement or a clause (int, float, string, word, void, if, else, while, return, break, export, import, chain, pure and the like), so a name spelled that way cannot be told from it\n  help: choose another name; a keyword is fine as one piece of a longer name, as in int_total\n")
+given toks_env(["ident"], ["int_total"]) ([0]):() then (import chkfail)[0]:(0)
+given toks_env(["kw"], ["func"]) ([0]):() then (import chkfail)[0]:(0)

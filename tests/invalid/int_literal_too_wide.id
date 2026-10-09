@@ -1,0 +1,6 @@
+// EXPECT: [E0608]
+// a literal outside the int range is a word, and a declaration may not drop its upper bits silently
+main(int argc, string[] argv) {
+  int big = 3000000000;
+  print(big);
+} return int 0;

@@ -19,7 +19,9 @@ c_lit(string raw) {
 ("a"):("a")
 ("a?b"):("a\\?b")
 
-// How many `?` the literal holds that no backslash already escapes.
+// How many bytes the literal gains: one for each `?` that no backslash already
+// escapes, and two for each `\xHH`, which gets an empty string literal after
+// it (hex.id).
 lit_qcount(string raw) {
   int n = 0;
   int i = 0;
@@ -27,18 +29,27 @@ lit_qcount(string raw) {
     if(charat(raw, i) == 63) {
       n = n + 1;
     }
+    n = n + 2 * hex_escape_at(raw, i);
     i = i + lit_width(raw, i);
   }
 } return int n;
 ("ab"):(0)
 ("a?b?"):(2)
+("a\\x41b"):(2)
+("\\x01\\x02?"):(5)
 
-// 92 is a backslash: it and the character after it are one unit.
+// 92 is a backslash: it and the character after it are one unit; so is a whole
+// `\xHH`, four characters, because C reads a hex escape for as many digits as
+// follow it and the digits after the second must not be part of it.
 lit_width(string raw, int i) {
   int lit_adv = 1;
   if(charat(raw, i) == 92) {
     lit_adv = 2;
   }
+  if(hex_escape_at(raw, i) == 1) {
+    lit_adv = 4;
+  }
 } return int lit_adv;
 ("ab", 0):(1)
 ("a\\?", 1):(2)
+("a\\x41b", 1):(4)

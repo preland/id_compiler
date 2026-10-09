@@ -1,0 +1,15 @@
+// The E0608 check, called by chk_decl and chk_assign (assign.id) after they
+// have judged the value's type: want is the written type of the slot and e the
+// value. Only an int slot can lose bits to a literal; a word slot holds any
+// literal the parser accepted.
+
+chk_literal_fit(int id, string want, int e) {
+  if(want == "int" && int_too_wide(e) == 1) {
+    string spelling = literal_spelling(e);
+    tc_diag(id, "E0608", "the integer literal " + spelling + " does not fit an int", spelling, "an int is 32 bits, from -2147483648 to 2147483647, and a literal outside that range is a word; storing it in an int would silently keep only its low 32 bits", "declare the variable as a word if the value is meant, or write a value inside the int range");
+  }
+} return void;
+given wide_literal_fixture ((import declaration_wide), "int", (import literal_huge)):() then (import chkfail)[0]:(1)
+given wide_literal_fixture ((import declaration_wide), "word", (import literal_huge)):() then (import chkfail)[0]:(0)
+given wide_literal_fixture ((import declaration_wide), "int", (import negated_edge)):() then (import chkfail)[0]:(0)
+given wide_literal_fixture ((import declaration_wide), "int", (import negated_past)):() then prints:("<stdin>:1: error: the integer literal -2147483649 does not fit an int [E0608]\n  at: -2147483649\n  why: an int is 32 bits, from -2147483648 to 2147483647, and a literal outside that range is a word; storing it in an int would silently keep only its low 32 bits\n  help: declare the variable as a word if the value is meant, or write a value inside the int range\n")

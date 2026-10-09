@@ -1,0 +1,7 @@
+// EXPECT: [E0608]
+// the same literal assigned later is refused just as it is in a declaration
+main(int argc, string[] argv) {
+  int big = 1;
+  big = -2147483649;
+  print(big);
+} return int 0;

@@ -1,0 +1,6 @@
+// EXPECT: a string literal may not contain \0
+// \x00 is the NUL byte spelled in hex, and a string never holds one
+main(int argc, string[] argv) {
+  string s = "a\x00b";
+  print(s);
+} return int 0;

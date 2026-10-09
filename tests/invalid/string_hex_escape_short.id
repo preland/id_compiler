@@ -1,0 +1,6 @@
+// EXPECT: [E0108]
+// \x takes exactly two hex digits; "\x4" used to leave C to decide where the escape ended
+main(int argc, string[] argv) {
+  string s = "a\x4";
+  print(s);
+} return int 0;

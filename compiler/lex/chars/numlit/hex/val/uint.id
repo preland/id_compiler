@@ -11,3 +11,29 @@ print_uint(word v) {
 } return void;
 (5):() then prints:("int 5\n")
 (255):() then prints:("int 255\n")
+
+// The index of the first digit of src[from, e) that is not a '0'.
+zero_end(string src, int from, int e) {
+  while(from < e && charat(src, from) == 48) {
+    from = from + 1;
+  }
+} return int from;
+("0012", 0, 4):(2)
+("000", 0, 3):(3)
+
+// A literal of more than limit significant digits (16 in hex, 64 in binary)
+// does not fit a word, and v would hold only its low 64 bits. The lexer can
+// only print a number, so it prints such a literal as written and the parser
+// reports it (E0107, expr/atom/lit/int/wide.id); every other one is printed
+// as the unsigned decimal it is worth.
+print_number(string src, int i, int e, word v, int limit) {
+  int first = zero_end(src, i + 2, e);
+  if(e - first > limit) {
+    print("int " + str_sub(src, i, e - i));
+  } else {
+    print_uint(v);
+  }
+} return void;
+("0xff", 0, 4, 255, 16):() then prints:("int 255\n")
+("0x00ff", 0, 6, 255, 16):() then prints:("int 255\n")
+("0x1ff", 0, 5, 511, 2):() then prints:("int 0x1ff\n")

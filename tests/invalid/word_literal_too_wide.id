@@ -1,0 +1,6 @@
+// EXPECT: [E0107]
+// 18446744073709551616 is 2^64, one more than the largest 64-bit literal
+main(int argc, string[] argv) {
+  word huge = 18446744073709551616;
+  print(huge);
+} return int 0;

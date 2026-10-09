@@ -1,0 +1,41 @@
+// An integer literal larger than a word holds. A 64-bit word reaches
+// 18446744073709551615 when it is written as 0xffffffffffffffff, so that is
+// the largest literal; one digit more used to wrap around without a word of
+// warning, so `word w = 18446744073709551616;` stored 0. The lexer keeps a
+// hex or binary literal that needs more than 64 bits in its own spelling
+// (compiler/lex/chars/numlit), because it can only print a number, and the
+// letter in the second place of that text is what marks it here.
+
+first_difference(string digits, string limit) {
+  int diff_at = 0;
+  while(diff_at < len(digits) && charat(digits, diff_at) == charat(limit, diff_at)) {
+    diff_at = diff_at + 1;
+  }
+} return int diff_at;
+("123", "129"):(2)
+("55", "55"):(2)
+
+digits_exceed(string digits, string limit) {
+  int diff_at = first_difference(digits, limit);
+  int exceeds = 0;
+  if(diff_at < len(digits) && charat(digits, diff_at) > charat(limit, diff_at)) {
+    exceeds = 1;
+  }
+} return int exceeds;
+("129", "123"):(1)
+("123", "129"):(0)
+("123", "123"):(0)
+
+exceeds_word(string text) {
+  string significant = strip_zeros(text);
+  int exceeds = len(significant) > 20 || charat(text, 1) > 57;
+  if(len(significant) == 20) {
+    exceeds = digits_exceed(significant, "18446744073709551615");
+  }
+} return int exceeds;
+("18446744073709551615"):(0)
+("18446744073709551616"):(1)
+("000018446744073709551615"):(0)
+("123456789012345678901"):(1)
+("0x1ffffffffffffffff"):(1)
+("0"):(0)

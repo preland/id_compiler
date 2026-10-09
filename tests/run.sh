@@ -308,26 +308,26 @@ main(int argc, string[] argv) {
   print(msg);
 } return int 0;
 
-chain(int n) {
+choose(int n) {
   string s = "z";
   if(n == 0) { s = "a"; } else if(n == 1) { s = "b"; }
 } return string s;
 
 nested(int n) {
   string s = "-";
-  if(n > 5) { s = "big"; } else { s = chain(n); }
+  if(n > 5) { s = "big"; } else { s = choose(n); }
 } return string s;
 EOF
 cat > "$TMP/g_elif/more.id" <<'EOF'
 build_msg() {
-  string a = chain(0) + chain(1) + chain(2);
+  string a = choose(0) + choose(1) + choose(2);
   string b = nested(0);
   string msg = a + b;
 } return string msg;
 EOF
 $BIN_IDC "$TMP/g_elif" --emit-c "$TMP/elif_id.c" >/dev/null 2>&1
 if grep -qF '} else if ((n == 1)) {' "$TMP/elif_id.c" \
-   && grep -A1 -F '} else {' "$TMP/elif_id.c" | grep -q 'id_chain(n)'; then
+   && grep -A1 -F '} else {' "$TMP/elif_id.c" | grep -q 'id_choose(n)'; then
     ok "else if is spliced flat, and else { if } nests a block"
 else
     bad "else if is spliced flat, and else { if } nests a block"

@@ -29,7 +29,9 @@ given stmt_tokens ([3], ";"):([3])
 
 parse_int(int[] pos) {
   string text = cur_text(pos);
+  int_check(pos, text);
   advance(pos);
+} chain (int[] pos) {
   int ret_i = finish_int(text);
 } return int ret_i;
 given atom_tokens ([2]):(0)

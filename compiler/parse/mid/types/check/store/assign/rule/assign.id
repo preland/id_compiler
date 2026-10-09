@@ -8,6 +8,8 @@ chk_decl(int id) {
   if(bad_store(s1_of_v, i1_of_v) == 1) {
     decl_err(id, s1_of_v, i1_of_v);
   }
+} chain (int id) {
+  chk_literal_fit(id, s1_of_v, i1_of_v);
 } return void;
 given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
 given decltype_fixture ((import decl_scalar)):() then (import chkfail)[0]:(0)
@@ -18,6 +20,8 @@ chk_assign(int id) {
   if(bad_store(vt, i1_of_v) == 1) {
     assign_err(id, vt, i1_of_v);
   }
+} chain (int id) {
+  chk_literal_fit(id, vt, i1_of_v);
 } return void;
 given assign_build ((import assign_list)):() then (import chkfail)[0]:(1)
 given assign_build2 ((import assign_ok)):() then (import chkfail)[0]:(0)

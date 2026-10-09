@@ -1,0 +1,29 @@
+// The `\xHH` escape of a string literal: a backslash, an x and exactly two hex
+// digits, one byte. It is two digits and no more on every target; C reads as
+// many digits as follow, so "\x01aaaa" would be one character there, and the
+// C emitter (back/tgt/c/emit/.../quote/hex.id) and the LLVM one
+// (back/tgt/ll/val/str) both lean on these two to read it the same way. The
+// parser refuses a `\x` that is not followed by two digits (hexcheck.id).
+
+hex_escape_at(string text, int at) {
+  int hex_high = url_hexval(charat(text, at + 2));
+  int hex_low = url_hexval(charat(text, at + 3));
+  int hex_ok = 0;
+} chain (string text, int at) {
+  if(charat(text, at) == 92 && charat(text, at + 1) == 120 && hex_high >= 0 && hex_low >= 0) {
+    hex_ok = 1;
+  }
+} return int hex_ok;
+("\\x41", 0):(1)
+("a\\xfF", 1):(1)
+("\\x4", 0):(0)
+("\\xg1", 0):(0)
+("\\\\x41", 0):(0)
+
+hex_escape_byte(string text, int at) {
+  int hex_high = url_hexval(charat(text, at + 2));
+  int hex_low = url_hexval(charat(text, at + 3));
+  int hex_byte = hex_high * 16 + hex_low;
+} return int hex_byte;
+("\\x41", 0):(65)
+("a\\xfF", 1):(255)

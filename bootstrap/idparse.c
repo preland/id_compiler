@@ -919,6 +919,7 @@ void id_lst_set_all(IdList* idstd_xs, int idstd_n, int idstd_v);
 void id_lst_extend(IdList* idstd_xs, IdList* idstd_ys);
 void id_lst_str_extend(IdList* idstd_ls_sx, IdList* idstd_ls_sy);
 int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit);
+int id_url_hexval(int idstd_uh_c);
 int id_fx_min(int idstd_a, int idstd_b);
 int id_fx_max(int idstd_a, int idstd_b);
 int id_fx_sign(int idstd_a);
@@ -1640,6 +1641,9 @@ char* id_ctor_lit(char* sd_nm, IdList* sd_as);
 char* id_lit_fill(char* raw, int n);
 int id_lit_run(char* raw, long long ad);
 int id_lit_emit(char* raw, int i, long long ad, int j);
+int id_lit_put(char* raw, int i, long long ad, int j);
+int id_lit_copy(char* raw, int i, long long ad, int j);
+int id_lit_hex_char(char* raw, int i, int copy_index);
 char* id_c_lit(char* raw);
 int id_lit_qcount(char* raw);
 int id_lit_width(char* raw, int i);
@@ -2127,6 +2131,7 @@ char* id_ll_bytes_acc(char* s);
 int id_ll_zlen(char* s);
 char* id_ll_bytes(char* s);
 char* id_ll_piece(char* s, int i);
+int id_ll_step(char* s, int i);
 int id_ll_escbyte(int c);
 int id_ll_escbyte2(int c);
 int id_ll_blen(char* s);
@@ -2356,16 +2361,26 @@ int id_finish_int(char* text);
 long long id_dec_val(char* s);
 long long id_dec_step(long long dv, int c);
 int id_over_max(char* s);
+void id_int_check(IdList* pos, char* text);
 int id_is_bigdec(char* s);
 int id_wide_dec(char* s);
 char* id_strip_zeros(char* s);
+int id_first_difference(char* digits, char* limit);
+int id_digits_exceed(char* digits, char* limit);
+int id_exceeds_word(char* text);
 char* id_zeros_tail(char* s, int i);
 int id_parse_arr(IdList* pos);
 void id_scan_list(IdList* pos, IdList* items, char* close);
 int id_op_at(IdList* pos, IdList* ops);
+int id_hex_escape_at(char* text, int at);
+int id_hex_escape_byte(char* text, int at);
+int id_str_bad_hex(char* text);
+void id_str_hex_check(IdList* pos, char* text);
 int id_str_has_nul(char* text);
 int id_nul_tail(char* text, int nul_at);
 int id_parse_str(IdList* pos);
+int id_keyword_reported(char* candidate);
+void id_no_keyword_word(IdList* pos);
 int id_fold_mul_tail(IdList* pos, int left, char* op);
 int id_paren_primary(IdList* pos);
 int id_fold_mul(IdList* pos, int left);
@@ -3846,6 +3861,10 @@ char* id_esc_type_nest(int sn, char* nm);
 int id_esc_own2(int fn, char* nm);
 int id_is_list_ty(char* t);
 char* id_esc_decl_type(IdList* stmts, char* nm);
+int id_minus_operand(int e);
+int id_int_too_wide(int e);
+char* id_literal_spelling(int e);
+void id_chk_literal_fit(int id, char* want, int e);
 int id_bad_init(char* want, char* got);
 int id_ty_known(char* t);
 int id_ty_pair_known(char* lt, char* rt);
@@ -4814,6 +4833,20 @@ int id_lst_pick(int idstd_at, int idstd_i, int idstd_hit) {
         idstd_v = idstd_i;
     }
     return idstd_v;
+}
+
+int id_url_hexval(int idstd_uh_c) {
+    int idstd_uh_l;
+    int idstd_uh_r;
+    idstd_uh_l = id_chr_lower(idstd_uh_c);
+    idstd_uh_r = (0 - 1);
+    if (((idstd_uh_c >= 48) && (idstd_uh_c <= 57))) {
+        idstd_uh_r = (idstd_uh_c - 48);
+    }
+    if (((idstd_uh_l >= 97) && (idstd_uh_l <= 102))) {
+        idstd_uh_r = (idstd_uh_l - 87);
+    }
+    return idstd_uh_r;
 }
 
 int id_fx_min(int idstd_a, int idstd_b) {
@@ -12001,7 +12034,7 @@ int id_lit_run(char* raw, long long ad) {
     i = 0;
     j = 0;
     while ((i < id_len(raw))) {
-        j = id_lit_emit(raw, i, ad, j);
+        j = id_lit_put(raw, i, ad, j);
         i = (i + id_lit_width(raw, i));
     }
     return j;
@@ -12020,6 +12053,37 @@ int id_lit_emit(char* raw, int i, long long ad, int j) {
         j = (j + 1);
     }
     return j;
+}
+
+int id_lit_put(char* raw, int i, long long ad, int j) {
+    int next;
+    next = j;
+    if ((id_hex_escape_at(raw, i) == 1)) {
+        next = id_lit_copy(raw, i, ad, j);
+    } else {
+        next = id_lit_emit(raw, i, ad, j);
+    }
+    return next;
+}
+
+int id_lit_copy(char* raw, int i, long long ad, int j) {
+    int copy_index;
+    copy_index = 0;
+    while ((copy_index < 6)) {
+        id_poke8((long long)(((ad + j) + copy_index)), (long long)(id_lit_hex_char(raw, i, copy_index)));
+        copy_index = (copy_index + 1);
+    }
+    j = (j + 6);
+    return j;
+}
+
+int id_lit_hex_char(char* raw, int i, int copy_index) {
+    int hex_char;
+    hex_char = 34;
+    if ((copy_index < 4)) {
+        hex_char = id_charat(raw, (i + copy_index));
+    }
+    return hex_char;
 }
 
 char* id_c_lit(char* raw) {
@@ -12042,6 +12106,7 @@ int id_lit_qcount(char* raw) {
         if ((id_charat(raw, i) == 63)) {
             n = (n + 1);
         }
+        n = (n + (2 * id_hex_escape_at(raw, i)));
         i = (i + id_lit_width(raw, i));
     }
     return n;
@@ -12052,6 +12117,9 @@ int id_lit_width(char* raw, int i) {
     lit_adv = 1;
     if ((id_charat(raw, i) == 92)) {
         lit_adv = 2;
+    }
+    if ((id_hex_escape_at(raw, i) == 1)) {
+        lit_adv = 4;
     }
     return lit_adv;
 }
@@ -17094,7 +17162,7 @@ char* id_ll_bytes_acc(char* s) {
     i = 1;
     while ((i < (id_len(s) - 1))) {
         out = id_concat_f(out, id_ll_piece(s, i), 3);
-        i = id_str_adv(s, i, 92, 2);
+        i = id_ll_step(s, i);
     }
     return out;
 }
@@ -17123,6 +17191,7 @@ char* id_ll_piece(char* s, int i) {
     char* out = NULL;
     int charat_v2;
     int ll_escbyte_v;
+    int hex_escape_v;
     charat_v = id_charat(s, i);
     { char* idfe_o = out; out = id_ll_hex(charat_v); id_str_free(idfe_o); }
     if ((id_charat(s, i) == 92)) {
@@ -17130,7 +17199,20 @@ char* id_ll_piece(char* s, int i) {
         ll_escbyte_v = id_ll_escbyte(charat_v2);
         { char* idfe_o = out; out = id_ll_hex(ll_escbyte_v); id_str_free(idfe_o); }
     }
+    if ((id_hex_escape_at(s, i) == 1)) {
+        hex_escape_v = id_hex_escape_byte(s, i);
+        { char* idfe_o = out; out = id_ll_hex(hex_escape_v); id_str_free(idfe_o); }
+    }
     return out;
+}
+
+int id_ll_step(char* s, int i) {
+    int next;
+    next = id_str_adv(s, i, 92, 2);
+    if ((id_hex_escape_at(s, i) == 1)) {
+        next = (i + 4);
+    }
+    return next;
 }
 
 int id_ll_escbyte(int c) {
@@ -18654,6 +18736,7 @@ void id_no_struct_word(IdList* pos) {
     if ((strcmp(id_cur_text(pos), ID_S("struct")) == 0)) {
         id_syn_err(pos, ID_S("'struct' is a keyword (it declares a type, at the top level of a file of its own; see docs/SPEC.md, structs) and cannot be used as a name or inside a function"));
     }
+    id_no_keyword_word(pos);
     return;
 }
 
@@ -19377,6 +19460,7 @@ int id_parse_int(IdList* pos) {
     char* text;
     int ret_i;
     text = id_cur_text(pos);
+    id_int_check(pos, text);
     id_advance(pos);
     ret_i = id_finish_int(text);
     return ret_i;
@@ -19442,6 +19526,13 @@ int id_over_max(char* s) {
     return ok;
 }
 
+void id_int_check(IdList* pos, char* text) {
+    if ((id_exceeds_word(text) == 1)) {
+        id_syn_diag(pos, ID_S("E0107"), id_concat_f(id_concat(ID_S("integer literal '"), text), ID_S("' does not fit in 64 bits"), 1), text, ID_S("an int is 32 bits and a word is 64, so the largest literal is 18446744073709551615 (0xffffffffffffffff); a larger one would wrap around and store a different number than the one written"), ID_S("write a value no larger than 18446744073709551615, or build the number from smaller parts"));
+    }
+    return;
+}
+
 int id_is_bigdec(char* s) {
     char* strip_zeros_v = NULL;
     int ret_i;
@@ -19468,6 +19559,39 @@ char* id_strip_zeros(char* s) {
     }
     { char* idfe_o = ret_s; ret_s = id_zeros_tail(s, i); id_str_free(idfe_o); }
     return ret_s;
+}
+
+int id_first_difference(char* digits, char* limit) {
+    int diff_at;
+    diff_at = 0;
+int idsq_13;
+    while (((diff_at < id_len(digits)) && (idsq_13 = id_charat(digits, diff_at), (idsq_13 == id_charat(limit, diff_at))))) {
+        diff_at = (diff_at + 1);
+    }
+    return diff_at;
+}
+
+int id_digits_exceed(char* digits, char* limit) {
+    int diff_at;
+    int exceeds;
+    diff_at = id_first_difference(digits, limit);
+    exceeds = 0;
+int idsq_11;
+    if (((diff_at < id_len(digits)) && (idsq_11 = id_charat(digits, diff_at), (idsq_11 > id_charat(limit, diff_at))))) {
+        exceeds = 1;
+    }
+    return exceeds;
+}
+
+int id_exceeds_word(char* text) {
+    char* significant = NULL;
+    int exceeds;
+    { char* idfe_o = significant; significant = id_strip_zeros(text); id_str_free(idfe_o); }
+    exceeds = ((id_len(significant) > 20) || (id_charat(text, 1) > 57));
+    if ((id_len(significant) == 20)) {
+        exceeds = id_digits_exceed(significant, ID_S("18446744073709551615"));
+    }
+    { id_str_free(significant); return exceeds; }
 }
 
 char* id_zeros_tail(char* s, int i) {
@@ -19504,13 +19628,60 @@ int id_op_at(IdList* pos, IdList* ops) {
     return ok;
 }
 
+int id_hex_escape_at(char* text, int at) {
+    int hex_high;
+    int hex_low;
+    int hex_ok;
+    hex_high = id_url_hexval(id_charat(text, (at + 2)));
+    hex_low = id_url_hexval(id_charat(text, (at + 3)));
+    hex_ok = 0;
+    if (((((id_charat(text, at) == 92) && (id_charat(text, (at + 1)) == 120)) && (hex_high >= 0)) && (hex_low >= 0))) {
+        hex_ok = 1;
+    }
+    return hex_ok;
+}
+
+int id_hex_escape_byte(char* text, int at) {
+    int hex_high;
+    int hex_low;
+    int hex_byte;
+    hex_high = id_url_hexval(id_charat(text, (at + 2)));
+    hex_low = id_url_hexval(id_charat(text, (at + 3)));
+    hex_byte = ((hex_high * 16) + hex_low);
+    return hex_byte;
+}
+
+int id_str_bad_hex(char* text) {
+    int bad_at;
+    int bad_found;
+    bad_at = 0;
+    bad_found = 0;
+    while ((bad_at < id_len(text))) {
+        if ((((id_charat(text, bad_at) == 92) && (id_charat(text, (bad_at + 1)) == 120)) && (id_hex_escape_at(text, bad_at) == 0))) {
+            bad_found = 1;
+        }
+        if ((id_charat(text, bad_at) == 92)) {
+            bad_at = (bad_at + 1);
+        }
+        bad_at = (bad_at + 1);
+    }
+    return bad_found;
+}
+
+void id_str_hex_check(IdList* pos, char* text) {
+    if ((id_str_bad_hex(text) == 1)) {
+        id_syn_diag(pos, ID_S("E0108"), id_concat_f(id_concat(ID_S("string literal "), text), ID_S(" has a \\x escape without two hex digits"), 1), text, ID_S("\\x is followed by exactly two hex digits and denotes the one byte they spell, as in \"\\x1b\" for ESC; on every target, whatever comes after those two digits is ordinary text"), ID_S("write both digits (\\x0a rather than \\xa), or spell the byte with \\n or \\t if it is a newline or a tab"));
+    }
+    return;
+}
+
 int id_str_has_nul(char* text) {
     int nul_i;
     int nul_found;
     nul_i = 0;
     nul_found = 0;
     while ((nul_i < id_len(text))) {
-        if ((((id_charat(text, nul_i) == 92) && (id_charat(text, (nul_i + 1)) == 48)) && (id_nul_tail(text, (nul_i + 2)) == 1))) {
+        if (((id_charat(text, nul_i) == 92) && (((id_charat(text, (nul_i + 1)) == 48) && (id_nul_tail(text, (nul_i + 2)) == 1)) || ((id_hex_escape_byte(text, nul_i) == 0) && (id_hex_escape_at(text, nul_i) == 1))))) {
             nul_found = 1;
         }
         if ((id_charat(text, nul_i) == 92)) {
@@ -19545,8 +19716,27 @@ int id_parse_str(IdList* pos) {
         id_syn_err(pos, ID_S("a string literal may not contain \\0: a string never holds a NUL byte, so keep binary data in stdio_read_mem, fs_read_mem or the store and not in a string"));
     }
     id_advance(pos);
+    id_str_hex_check(pos, text);
     ret_i = id_node_txt(ID_S("str"), text);
     return ret_i;
+}
+
+int id_keyword_reported(char* candidate) {
+    int reported;
+    reported = 0;
+    if ((((((((((strcmp(candidate, ID_S("given")) == 0) || (strcmp(candidate, ID_S("then")) == 0)) || (strcmp(candidate, ID_S("prints")) == 0)) || (strcmp(candidate, ID_S("eprints")) == 0)) || (strcmp(candidate, ID_S("calls")) == 0)) || (strcmp(candidate, ID_S("stdin")) == 0)) || (strcmp(candidate, ID_S("timeout")) == 0)) || (strcmp(candidate, ID_S("func")) == 0)) || (strcmp(candidate, ID_S("struct")) == 0))) {
+        reported = 1;
+    }
+    return reported;
+}
+
+void id_no_keyword_word(IdList* pos) {
+    char* keyword;
+    keyword = id_cur_text(pos);
+    if (((strcmp(id_cur_kind(pos), ID_S("kw")) == 0) && (id_keyword_reported(keyword) == 0))) {
+        id_syn_diag(pos, ID_S("E0312"), id_concat_f(id_concat(ID_S("'"), keyword), ID_S("' is a keyword and cannot be used as a name"), 1), keyword, ID_S("a keyword begins a type, a statement or a clause (int, float, string, word, void, if, else, while, return, break, export, import, chain, pure and the like), so a name spelled that way cannot be told from it"), ID_S("choose another name; a keyword is fine as one piece of a longer name, as in int_total"));
+    }
+    return;
 }
 
 int id_fold_mul_tail(IdList* pos, int left, char* op) {
@@ -33084,6 +33274,7 @@ void id_chk_decl(int id) {
     if ((id_bad_store(s1_of_v, i1_of_v) == 1)) {
         id_decl_err(id, s1_of_v, i1_of_v);
     }
+    id_chk_literal_fit(id, s1_of_v, i1_of_v);
     return;
 }
 
@@ -33095,6 +33286,7 @@ void id_chk_assign(int id) {
     if ((id_bad_store(vt, i1_of_v) == 1)) {
         id_assign_err(id, vt, i1_of_v);
     }
+    id_chk_literal_fit(id, vt, i1_of_v);
     return;
 }
 
@@ -35281,6 +35473,49 @@ char* id_esc_decl_type(IdList* stmts, char* nm) {
         i = (i + 1);
     }
     return t;
+}
+
+int id_minus_operand(int e) {
+    int operand_node;
+    operand_node = e;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("un")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("-")) == 0))) {
+        operand_node = (int)(id_list_get(ni1, e));
+    }
+    return operand_node;
+}
+
+int id_int_too_wide(int e) {
+    int operand_node;
+    int too_wide;
+    operand_node = id_minus_operand(e);
+    too_wide = 0;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, operand_node)), ID_S("int")) == 0) && ((int)(id_list_get(ni2, operand_node)) == 1))) {
+        too_wide = 1;
+    }
+    if ((((too_wide == 1) && (operand_node != e)) && (id_dec_val((char*)(intptr_t)(id_list_get(ns1, operand_node))) == 2147483648LL))) {
+        too_wide = 0;
+    }
+    return too_wide;
+}
+
+char* id_literal_spelling(int e) {
+    int operand_node;
+    char* spelling;
+    operand_node = id_minus_operand(e);
+    spelling = (char*)(intptr_t)(id_list_get(ns1, operand_node));
+    if ((operand_node != e)) {
+        spelling = id_concat(ID_S("-"), spelling);
+    }
+    return spelling;
+}
+
+void id_chk_literal_fit(int id, char* want, int e) {
+    char* spelling;
+    if (((strcmp(want, ID_S("int")) == 0) && (id_int_too_wide(e) == 1))) {
+        spelling = id_literal_spelling(e);
+        id_tc_diag(id, ID_S("E0608"), id_concat_f(id_concat(ID_S("the integer literal "), spelling), ID_S(" does not fit an int"), 1), spelling, ID_S("an int is 32 bits, from -2147483648 to 2147483647, and a literal outside that range is a word; storing it in an int would silently keep only its low 32 bits"), ID_S("declare the variable as a word if the value is meant, or write a value inside the int range"));
+    }
+    return;
 }
 
 int id_bad_init(char* want, char* got) {

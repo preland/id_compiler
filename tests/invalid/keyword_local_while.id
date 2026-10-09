@@ -1,0 +1,6 @@
+// EXPECT: [E0312]
+// a statement keyword as a whole local name is refused where it is declared
+main(int argc, string[] argv) {
+  int while = 3;
+  print(while);
+} return int 0;

@@ -1,0 +1,42 @@
+// A declaration or an assignment may narrow a word to an int because the type
+// is written on the line (docs/SPEC.md, section 1). A literal is not worth
+// that allowance: `int big = 3000000000;` names a value no int holds, and
+// storing it would keep only the low 32 bits without a word of warning. The
+// one literal that is wide and still fits is 2147483648 under a minus sign,
+// which is -2147483648, the lowest int.
+
+minus_operand(int e) {
+  int operand_node = e;
+  if((import nkind)[e] == "un" && (import ns1)[e] == "-") {
+    operand_node = (import ni1)[e];
+  }
+} return int operand_node;
+given wide_literal_fixture ((import negated_edge)):((import literal_edge))
+given wide_literal_fixture ((import literal_huge)):((import literal_huge))
+
+int_too_wide(int e) {
+  int operand_node = minus_operand(e);
+  int too_wide = 0;
+  if((import nkind)[operand_node] == "int" && (import ni2)[operand_node] == 1) {
+    too_wide = 1;
+  }
+} chain (int e) {
+  if(too_wide == 1 && operand_node != e && dec_val((import ns1)[operand_node]) == 2147483648) {
+    too_wide = 0;
+  }
+} return int too_wide;
+given wide_literal_fixture ((import literal_huge)):(1)
+given wide_literal_fixture ((import negated_edge)):(0)
+given wide_literal_fixture ((import negated_past)):(1)
+given wide_literal_fixture ((import literal_edge)):(1)
+given wide_literal_fixture ((import lit_a)):(0)
+
+literal_spelling(int e) {
+  int operand_node = minus_operand(e);
+  string spelling = (import ns1)[operand_node];
+  if(operand_node != e) {
+    spelling = "-" + spelling;
+  }
+} return string spelling;
+given wide_literal_fixture ((import negated_edge)):("-2147483648")
+given wide_literal_fixture ((import literal_huge)):("3000000000")

@@ -1,0 +1,25 @@
+// Integer literals outside the int range, as fixtures for the E0608 check
+// (../../../rule/fit.id): a plain one, and the two sides of the edge a leading
+// minus moves (2147483648 is -2^31 once negated, 2147483649 is not). The
+// negated forms and a declaration that stores the first are in negated.id.
+wide_literal_fixture() {
+  wide_literal_setup();
+  wide_literal_build2();
+} return void;
+():() then calls wide_literal_setup:[1]
+():() then init_units:(0)
+
+wide_literal_setup() {
+  leaves_fixture();
+  wide_literal_build();
+} return void;
+():() then calls leaves_fixture:[1]
+():() then init_units:(0)
+
+wide_literal_build() {
+  export int literal_huge = node_txt2("int", "3000000000", 0, 1);
+  export int literal_edge = node_txt2("int", "2147483648", 0, 1);
+  export int literal_past = node_txt2("int", "2147483649", 0, 1);
+} return void;
+given env_init ():() then (import chkfail)[0]:(0)
+given env_init ():() then init_units:(0)

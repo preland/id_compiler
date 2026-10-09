@@ -1,0 +1,30 @@
+// A string literal whose `\x` is not followed by two hex digits (E0108). The
+// walk steps over a backslash and the character after it as one unit, as
+// nul.id does, so the second backslash of `\\x4` is not mistaken for the start
+// of an escape.
+
+str_bad_hex(string text) {
+  int bad_at = 0;
+  int bad_found = 0;
+  while(bad_at < len(text)) {
+    if(charat(text, bad_at) == 92 && charat(text, bad_at + 1) == 120 && hex_escape_at(text, bad_at) == 0) {
+      bad_found = 1;
+    }
+    if(charat(text, bad_at) == 92) {
+      bad_at = bad_at + 1;
+    }
+    bad_at = bad_at + 1;
+  }
+} return int bad_found;
+("\"a\\x4\""):(1)
+("\"\\xzz\""):(1)
+("\"a\\x41b\""):(0)
+("\"\\\\x4\""):(0)
+
+str_hex_check(int[] pos, string text) {
+  if(str_bad_hex(text) == 1) {
+    syn_diag(pos, "E0108", "string literal " + text + " has a \\x escape without two hex digits", text, "\\x is followed by exactly two hex digits and denotes the one byte they spell, as in \"\\x1b\" for ESC; on every target, whatever comes after those two digits is ordinary text", "write both digits (\\x0a rather than \\xa), or spell the byte with \\n or \\t if it is a newline or a tab");
+  }
+} return void;
+given mk_two_toks ([0], "\"ok\""):() then (import chkfail)[0]:(0)
+given mk_two_toks ([0], "\"\\x4\""):() then (import chkfail)[0]:(1)

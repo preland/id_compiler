@@ -1,0 +1,38 @@
+// A `\xHH` in a string literal, written for C. C ends a hex escape only at a
+// character that is not a hex digit, so "\x01aaaa" is one character there and
+// the rest of the word is swallowed. The two digits id means are followed by
+// `""` -- two string literals side by side are one string in C, joined after
+// the escapes are read -- so the next character starts a fresh piece. The
+// literal is still a plain C string literal, which is all every caller wants.
+
+lit_put(string raw, int i, word ad, int j) {
+  int next = j;
+  if(hex_escape_at(raw, i) == 1) {
+    next = lit_copy(raw, i, ad, j);
+  } else {
+    next = lit_emit(raw, i, ad, j);
+  }
+} return int next;
+given lit_buf ("ab", 0, (import lit_ad), 0):(1)
+given lit_buf ("a\\x41", 1, (import lit_ad), 0):(6)
+
+lit_copy(string raw, int i, word ad, int j) {
+  int copy_index = 0;
+  while(copy_index < 6) {
+    poke8(ad + j + copy_index, lit_hex_char(raw, i, copy_index));
+    copy_index = copy_index + 1;
+  }
+  j = j + 6;
+} return int j;
+given lit_buf ("\\x41", 0, (import lit_ad), 2):(8)
+given lit_buf ("\\x41", 0, (import lit_ad), 0):(6)
+
+lit_hex_char(string raw, int i, int copy_index) {
+  int hex_char = 34;
+  if(copy_index < 4) {
+    hex_char = charat(raw, i + copy_index);
+  }
+} return int hex_char;
+("\\x41", 0, 1):(120)
+("\\x41", 0, 3):(49)
+("\\x41", 0, 4):(34)

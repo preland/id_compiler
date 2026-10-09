@@ -1,0 +1,9 @@
+// EXPECT: [E0312]
+// a parameter is a name too: `return` cannot be one
+twice(int return) {
+  int doubled = return * 2;
+} return int doubled;
+
+main(int argc, string[] argv) {
+  int answer = twice(2);
+} return int answer;

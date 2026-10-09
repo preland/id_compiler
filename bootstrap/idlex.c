@@ -932,6 +932,8 @@ int id_scan_hex(char* src, int i);
 char* id_udec(long long v);
 char* id_pad10(char* s);
 void id_print_uint(long long v);
+int id_zero_end(char* src, int from, int e);
+void id_print_number(char* src, int i, int e, long long v, int limit);
 int id_is_hex(int c);
 int id_hex_digit(int c);
 int id_hex_alpha(int c);
@@ -1259,7 +1261,7 @@ int id_scan_bin(char* src, int i) {
     long long v;
     e = id_bin_end(src, (i + 2));
     v = id_bin_val(src, (i + 2), e);
-    id_print_uint(v);
+    id_print_number(src, i, e, v, 64);
     return e;
 }
 
@@ -1379,7 +1381,7 @@ int id_scan_hex(char* src, int i) {
     long long v;
     e = id_hex_end(src, (i + 2));
     v = id_hex_val(src, (i + 2), e);
-    id_print_uint(v);
+    id_print_number(src, i, e, v, 16);
     return e;
 }
 
@@ -1408,6 +1410,24 @@ void id_print_uint(long long v) {
     { char* idfe_o = text; text = id_udec(v); id_str_free(idfe_o); }
     id_print(id_concat(ID_S("int "), text));
     { id_str_free(text); return; }
+}
+
+int id_zero_end(char* src, int from, int e) {
+    while (((from < e) && (id_charat(src, from) == 48))) {
+        from = (from + 1);
+    }
+    return from;
+}
+
+void id_print_number(char* src, int i, int e, long long v, int limit) {
+    int first;
+    first = id_zero_end(src, (i + 2), e);
+    if (((e - first) > limit)) {
+        id_print(id_concat_f(ID_S("int "), id_str_sub(src, i, (e - i)), 2));
+    } else {
+        id_print_uint(v);
+    }
+    return;
 }
 
 int id_is_hex(int c) {

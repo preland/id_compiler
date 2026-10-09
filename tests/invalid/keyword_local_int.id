@@ -1,0 +1,6 @@
+// EXPECT: [E0312]
+// a type keyword used as a whole local name used to reach the C backend as `int int;`
+main(int argc, string[] argv) {
+  int int = 3;
+  print(int);
+} return int 0;

@@ -9,6 +9,7 @@ parse_str(int[] pos) {
   }
   advance(pos);
 } chain (int[] pos) {
+  str_hex_check(pos, text);
   int ret_i = node_txt("str", text);
 } return int ret_i;
 given atom_tokens ([15]):(0)

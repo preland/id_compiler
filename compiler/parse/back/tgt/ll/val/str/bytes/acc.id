@@ -7,7 +7,7 @@ ll_bytes_acc(string s) {
   int i = 1;
   while(i < len(s) - 1) {
     out = out + ll_piece(s, i);
-    i = str_adv(s, i, 92, 2);
+    i = ll_step(s, i);
   }
 } return string out;
 ("\"\""):("")

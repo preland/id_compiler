@@ -1,5 +1,6 @@
 // c_lit's output, written into one store: the literal's length plus one byte
-// for each `?` that gains a backslash.
+// for each `?` that gains a backslash and two for each `\xHH` that gains a
+// closing and an opening quote (hex.id).
 
 lit_fill(string raw, int n) {
   word ad = alloc(len(raw) + n + 1);
@@ -8,17 +9,19 @@ lit_fill(string raw, int n) {
 } return string out;
 ("a?b", 1):("a\\?b")
 ("??", 2):("\\?\\?")
+("\\x41b", 2):("\\x41\"\"b")
 
 lit_run(string raw, word ad) {
   int i = 0;
   int j = 0;
   while(i < len(raw)) {
-    j = lit_emit(raw, i, ad, j);
+    j = lit_put(raw, i, ad, j);
     i = i + lit_width(raw, i);
   }
 } return int j;
 given lit_buf ("ab", (import lit_ad)):(2)
 given lit_buf ("a?", (import lit_ad)):(3)
+given lit_buf ("a\\x41", (import lit_ad)):(7)
 
 // One unit of the literal written at j; the new j. A backslash pair is two
 // bytes as written, a `?` is the two bytes `\?`, anything else is itself.

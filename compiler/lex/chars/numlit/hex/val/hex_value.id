@@ -2,7 +2,7 @@
 scan_hex(string src, int i) {
   int e = hex_end(src, i + 2);
   word v = hex_val(src, i + 2, e);
-  print_uint(v);
+  print_number(src, i, e, v, 16);
 } return int e;
 ("0xff", 0):(4) then prints:("int 255\n")
 ("0x10", 0):(4) then prints:("int 16\n")
