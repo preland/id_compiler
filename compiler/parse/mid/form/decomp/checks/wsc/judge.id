@@ -11,7 +11,7 @@ given wsc_pair ((import wx_fput)):() then (import chkfail)[0]:(1)
 given wsc_pair ((import wx_fadd)):() then (import chkfail)[0]:(0)
 
 wsc_late(int wla_f) {
-  if(fwd_used_as_value((import ns1)[wla_f]) == 0 && wsc_cvalue((import ns1)[wla_f]) == 0 && wsc_fixture(wla_f, 6) == 0) {
+  if(fwd_used_as_value((import ns1)[wla_f]) == 0 && wsc_cvalue((import ns1)[wla_f]) == 0 && wsc_fixture(wla_f, 6) == 0 && wsc_rtname((import ns1)[wla_f]) == 0) {
     wsc_report(wla_f);
   }
 } return void;
@@ -19,6 +19,7 @@ given wsc_pair ((import wx_fput)):() then (import chkfail)[0]:(1)
 given wsc_pair ((import wx_fget)):() then (import chkfail)[0]:(0)
 given wsc_pair given lst_str_extend((import casegiven), ["wsput"]) ((import wx_fput)):() then (import chkfail)[0]:(0)
 given wsc_pair given wsc_valcase ((import wx_fput)):() then (import chkfail)[0]:(0)
+given wsc_pair given lst_str_extend((import resv_names), ["wsput"]) ((import wx_fput)):() then (import chkfail)[0]:(0)
 
 wsc_caller_ok(int wco_f, int wco_g, int wco_d) {
   int wco_ok = 0;

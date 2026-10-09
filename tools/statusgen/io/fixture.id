@@ -30,7 +30,7 @@ sg_t_tree() {
   int sg_t_m = exec_file_put((import sg_t_root) + "/bench.md", "### Wall time, ratio to x\n| a |\n|--|\n| b |\n", 420);
 } return void export sg_t_root;
 ():() then calls exec_file_put:[9]
-():() then calls fs_mkdir:[2]
+():() then sg_t_text(".hid/d.id"):("i() {\n} return void;\n") then sg_t_text("build/e.id"):("j() {\n} return void;\n")
 
 sg_t_text(string sg_t_rel) {
   string sg_t_tx = fs_read_text((import sg_t_root) + "/" + sg_t_rel);

@@ -1,0 +1,38 @@
+// The diagnostics of E0409 and E0410, laid out as E0408's (../wsc/report.id): the
+// function the node sits in, the expression or the local, then the fix. The
+// expression is shown the way E0408 shows one (../wsc/show.id): each local
+// replaced by its initialiser and every operation parenthesised. The whys and
+// helps are conf.id's noop_why, noop_help, unread_why and unread_help. A node
+// after the last function, which no function owns, has nowhere to point and is
+// not reported.
+
+noop_report(int nzb_node, string nzb_reason) {
+  int nzb_owner = noop_owner(nzb_node);
+  if(nzb_owner >= 0) {
+    noop_say(nzb_node, nzb_owner, nzb_reason);
+  }
+} return void;
+given noop_world ((import nfx_plus_zero), "r"):() then (import chkfail)[0]:(1)
+given noop_world (100000, "r"):() then (import chkfail)[0]:(0)
+
+noop_say(int nzg_node, int nzg_owner, string nzg_reason) {
+  string nzg_name = (import ns1)[nzg_owner];
+  string nzg_shown = wsc_show(nzg_owner, nzg_node);
+  string nzg_loc = dup_loc(nzg_name);
+} chain (int nzg_node, int nzg_owner, string nzg_reason) {
+  string nzg_msg = "`" + nzg_shown + "` is an operation that cannot change its value: " + nzg_reason;
+  diag("E0409", nzg_loc, nzg_msg, nzg_name, (import noop_why), (import noop_help));
+} return void;
+given noop_world ((import nfx_plus_zero), (import nfx_fpad), "`e + 0` is just `e`"):() then prints:("<stdin>:1: error: `(a + 0)` is an operation that cannot change its value: `e + 0` is just `e` [E0409]\n  at: nxpad\n  why: an operation that cannot change its value is padding: it looks like work, hides the real expression from the reader, and leaves the code doing exactly what it did without it\n  help: remove it; if a rule made you add it, that rule needs a different fix -- report it\n") then (import chkfail)[0]:(1)
+given noop_world ((import nfx_cancel), (import nfx_fpad), "x"):() then (import chkfail)[0]:(1)
+
+noop_unread_report(int nzk_decl, int nzk_owner) {
+  string nzk_name = (import ns1)[nzk_owner];
+  string nzk_local = (import ns2)[nzk_decl];
+  string nzk_loc = dup_loc(nzk_name);
+} chain (int nzk_decl, int nzk_owner) {
+  string nzk_msg = "local '" + nzk_local + "' of '" + nzk_name + "' is declared and never read";
+  diag("E0410", nzk_loc, nzk_msg, nzk_name, (import unread_why), (import unread_help));
+} return void;
+given noop_world ((import nfx_dpad), (import nfx_fpad)):() then prints:("<stdin>:1: error: local 'pad' of 'nxpad' is declared and never read [E0410]\n  at: nxpad\n  why: a local that is declared and never read is dead weight: every reader has to find out that nothing uses it, and it can be added only to satisfy a rule on paper\n  help: remove the declaration; if a rule made you add it, that rule needs a different fix -- report it\n") then (import chkfail)[0]:(1)
+given noop_world ((import nfx_dused), (import nfx_fused)):() then (import chkfail)[0]:(1)

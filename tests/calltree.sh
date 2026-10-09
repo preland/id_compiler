@@ -57,7 +57,7 @@ countdown(int n) {
 } return int r;
 
 holder() {
-  func(int) return int g = countdown;
+  export func(int) return int held = countdown;
 } return void;
 EOF
 cat > "$PROJ/main.id" <<'EOF'

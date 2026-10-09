@@ -1,0 +1,22 @@
+// A product with a literal 0 for a factor. It is always 0 whatever the other
+// factor is, so the other factor is padding: written to look as if it were used
+// (`x + 0 * (y)`), it is never what the result depends on. An `int` literal only,
+// as for the identities (./unit.id).
+
+noop_zero(int nzz_node) {
+  string nzz_op = (import ns1)[nzz_node];
+  int nzz_left = noop_lit((import ni1)[nzz_node], 0);
+  int nzz_right = noop_lit((import ni2)[nzz_node], 0);
+} chain (int nzz_node) {
+  string nzz_text = "";
+  if(nzz_op == "*" && nzz_right == 1) {
+    nzz_text = "`e * 0` is just `0`";
+  }
+  if(nzz_op == "*" && nzz_left == 1) {
+    nzz_text = "`0 * e` is just `0`";
+  }
+} return string nzz_text;
+given noop_world ((import nfx_times_zero)):("`e * 0` is just `0`")
+given noop_world ((import nfx_zero_times)):("`0 * e` is just `0`")
+given noop_world ((import nfx_plus_zero)):("")
+given noop_world ((import nfx_times_one)):("")

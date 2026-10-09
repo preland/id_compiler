@@ -1,0 +1,5 @@
+// EXPECT: is an operation that cannot change its value: a term added and subtracted again cancels out [E0409]
+main(int argc, string[] argv) {
+  int m = argc * 2;
+  int n = argc + m + m - m;
+} return int n;

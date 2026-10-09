@@ -11,7 +11,7 @@ fix_rcache_find_at_fixture() {
 fix_tokline_fixture3() {
   fix_fixture();
   push((import tline), 9);
-  push((import tspan), 1 * 65536 + 4);
+  push((import tspan), 65536 + 4);
 } return void;
 ():() then calls fix_fixture:[1]
 ():() then init_units:(0)

@@ -103,7 +103,7 @@ IDEOF
 cat > "$P/show/more/print.id" <<'IDEOF'
 show_r_line(int r) {
   string style = (import odt_stys)[r];
-  string text = odt_run_text(r);
+  string text = (import odt_txts)[r];
   print("r" + r + " " + style + " |" + text + "|");
 } return void;
 

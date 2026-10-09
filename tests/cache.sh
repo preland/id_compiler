@@ -58,10 +58,10 @@ PROJ="$TMP/proj"
 mkdir -p "$PROJ"
 cat > "$PROJ/main.id" <<'EOF'
 cache_add(int a, int b) {
-  int c = a + b;
+  int c = a * 2 + b;
 } return int c;
-(2, 3):(5)
-(10, 5):(15)
+(2, 3):(7)
+(10, 5):(25)
 
 main(int argc, string[] argv) {
   print("ok");
@@ -279,7 +279,7 @@ slow_build sc2
     && ok "an identical rebuild runs none of its already-passed cases ($(ms_of sc2)ms)" \
     || bad "an identical rebuild runs none of its already-passed cases (rc $(rc_of sc2), $(ms_of sc2)ms)"
 
-sed -i 's/a \* 2/a + a/' "$SLOW/main.id"
+sed -i 's/a \* 2/2 * a/' "$SLOW/main.id"
 slow_build sc3
 [ "$(rc_of sc3)" -eq 0 ] && [ "$(ms_of sc3)" -lt 3000 ] \
     && ok "editing an unrelated function does not rerun a cached case ($(ms_of sc3)ms)" \
@@ -418,22 +418,34 @@ gthen_build gt3
 # program unit, its harness unit, and the harness's case table) and reuse the
 # rest; and the program must behave exactly as the one-file build does.
 UNITS="$TMP/units"; mkdir -p "$UNITS/parts"
-for n in 1 2 3; do
-cat > "$UNITS/parts/part$n.id" <<EOF
-unit_fn$n(int a) {
-  int b = a + $n;
+cat > "$UNITS/parts/alpha.id" <<'EOF2'
+unit_fn1(int a) {
+  int b = a + 1;
 } return int b;
-(1):($((1 + n)))
-(2):($((2 + n)))
-EOF
-done
+(1):(2)
+(2):(3)
+EOF2
+cat > "$UNITS/parts/beta.id" <<'EOF2'
+unit_fn2(int a) {
+  int b = a * 3;
+} return int b;
+(1):(3)
+(2):(6)
+EOF2
+cat > "$UNITS/parts/gamma.id" <<'EOF2'
+unit_fn3(int a) {
+  int b = a * a + a;
+} return int b;
+(1):(2)
+(2):(6)
+EOF2
 cat > "$UNITS/main.id" <<'EOF'
 main(int argc, string[] argv) {
   int s = unit_fn1(argc) + unit_fn2(argc) + unit_fn3(argc);
   print("sum " + s);
 } return int 0;
-(1, ["p"]):(0) then prints:("sum 9\n")
-(2, ["p", "q"]):(0) then prints:("sum 12\n")
+(1, ["p"]):(0) then prints:("sum 7\n")
+(2, ["p", "q"]):(0) then prints:("sum 15\n")
 EOF
 unit_entries() { find "$CACHE/units" -mindepth 1 -maxdepth 1 -name '*.o' 2>/dev/null | wc -l | tr -d ' '; }
 ub() { local name="$1"; shift
@@ -442,7 +454,7 @@ ub() { local name="$1"; shift
 u0=$(unit_entries)
 ub un1
 u1=$(unit_entries)
-[ "$(rc_of un1)" -eq 0 ] && [ "$("$TMP/un1")" = "sum 9" ] && [ "$u1" -ge $((u0 + 8)) ] \
+[ "$(rc_of un1)" -eq 0 ] && [ "$("$TMP/un1")" = "sum 7" ] && [ "$u1" -ge $((u0 + 8)) ] \
     && ok "setup: a four-file program builds from its units ($((u1 - u0)) unit objects)" \
     || bad "setup: a four-file program builds from its units (rc $(rc_of un1), $((u1 - u0)) objects): $(head -1 "$TMP/un1.out")"
 
@@ -453,20 +465,20 @@ else
     bad "IDC_UNITS=0 builds the same program as one file, and touches no unit (rc $(rc_of un2))"
 fi
 
-sed -i 's/a + 2;/2 + a;/' "$UNITS/parts/part2.id"
+sed -i 's/a \* 3;/3 * a;/' "$UNITS/parts/beta.id"
 ub un3
 u3=$(unit_entries)
-if [ "$(rc_of un3)" -eq 0 ] && [ "$("$TMP/un3")" = "sum 9" ] && [ "$u3" -gt "$u1" ] && [ "$u3" -le $((u1 + 3)) ]; then
+if [ "$(rc_of un3)" -eq 0 ] && [ "$("$TMP/un3")" = "sum 7" ] && [ "$u3" -gt "$u1" ] && [ "$u3" -le $((u1 + 3)) ]; then
     ok "editing one function compiles only its own file's units ($((u3 - u1)) new objects)"
 else
     bad "editing one function compiles only its own file's units (rc $(rc_of un3), $((u3 - u1)) new objects)"
 fi
 
-sed -i 's/2 + a;/a + 20;/' "$UNITS/parts/part2.id"
-sed -i 's/(1):(3)/(1):(21)/; s/(2):(4)/(2):(22)/' "$UNITS/parts/part2.id"
-sed -i 's/sum 9/sum 27/; s/sum 12/sum 30/' "$UNITS/main.id"
+sed -i 's/3 \* a;/a * 10;/' "$UNITS/parts/beta.id"
+sed -i 's/(1):(3)/(1):(10)/; s/(2):(6)/(2):(20)/' "$UNITS/parts/beta.id"
+sed -i 's/sum 15/sum 29/; s/sum 7/sum 14/' "$UNITS/main.id"
 ub un4
-[ "$(rc_of un4)" -eq 0 ] && [ "$("$TMP/un4")" = "sum 27" ] \
+[ "$(rc_of un4)" -eq 0 ] && [ "$("$TMP/un4")" = "sum 14" ] \
     && ok "a changed unit is linked in, not a stale object: the program sees the edit" \
     || bad "a changed unit is linked in, not a stale object: the program sees the edit (rc $(rc_of un4), prints '$("$TMP/un4" 2>/dev/null)')"
 
@@ -487,15 +499,15 @@ cat > "$TCP/parts/a_use.id" <<'EOF'
 lib_use(int a) {
   int d = lib_add(a, 1);
 } return int d;
-(1):(2)
-(5):(6)
+(1):(3)
+(5):(11)
 EOF
 cat > "$TCP/parts/lib.id" <<'EOF'
 lib_add(int a, int b) {
-  int c = a + b;
+  int c = a * 2 + b;
 } return int c;
-(1, 2):(3)
-(2, 2):(4)
+(1, 2):(4)
+(2, 2):(6)
 EOF
 cat > "$TCP/parts/exp.id" <<'EOF'
 exp_setup() {
@@ -515,8 +527,8 @@ main(int argc, string[] argv) {
   int u = lib_use(argc);
   print("u " + u);
 } return int 0;
-(1, ["p"]):(0) then prints:("u 2\n")
-(2, ["p", "q"]):(0) then prints:("u 3\n")
+(1, ["p"]):(0) then prints:("u 3\n")
+(2, ["p", "q"]):(0) then prints:("u 5\n")
 EOF
 cp "$TCP/parts/lib.id" "$TMP/tc_lib.orig"; cp "$TCP/parts/exp.id" "$TMP/tc_exp.orig"
 tc_lists() { cat "$CACHE"/tc/* 2>/dev/null | wc -l | tr -d ' '; }
@@ -544,11 +556,11 @@ tc_case() { # tc_case LABEL SED_EXPR FILE -- warm the cache on the original, edi
         bad "type check cache: after $label, a warm build equals a cold one (warm rc $(rc_of tcw), cold rc $(rc_of tcc), $k0 keys): $(diff "$TMP/tcw.out" "$TMP/tcc.out" | head -3)"
     fi
 }
-tc_case "a body edit" 's/a + b;/b + a;/' lib.id
+tc_case "a body edit" 's/a \* 2 + b;/b + a * 2;/' lib.id
 [ "$TC_K1" -eq $((TC_K0 + 1)) ] \
     && ok "a body edit gives exactly one function a new key: the edited one" \
     || bad "a body edit gives exactly one function a new key: the edited one ($TC_K0 -> $TC_K1 keys)"
-tc_case "a signature change" 's/^lib_add(int a, int b) {/lib_add(int a, string b) {/; s/  int c = a + b;/  int c = a + to_int(b);/; s/^(1, 2):(3)/(1, "2"):(3)/; s/^(2, 2):(4)/(2, "2"):(4)/' lib.id
+tc_case "a signature change" 's/^lib_add(int a, int b) {/lib_add(int a, string b) {/; s/  int c = a \* 2 + b;/  int c = a * 2 + to_int(b);/; s/^(1, 2):(4)/(1, "2"):(4)/; s/^(2, 2):(6)/(2, "2"):(6)/' lib.id
 tc_case "an export-type change" 's/export int ex_val = 3;/export string ex_val = "3";/' exp.id
 tc_case "a rename" 's/^lib_add(/lib_sum(/' lib.id
 tc_case "a deleted callee" '1,5d' lib.id

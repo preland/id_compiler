@@ -707,7 +707,7 @@ fi
 # The same through a library whose conf.id imports every backend.
 c7std="$TMP/c7std"; mkdir -p "$c7std/win" "$TMP/c7hello" "$TMP/c7win"
 cp "$c7none/conf.id" "$c7std/conf.id"
-printf 'c7_width() {\n  int cw = gfx_sys_width() + 0;\n} return int cw;\n' > "$c7std/win/w.id"
+printf 'c7_width() {\n  int cw = gfx_sys_width() * 2;\n} return int cw;\n' > "$c7std/win/w.id"
 if want link_lib; then
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/c7hello/main.id"
 : > "$TMP/cc.log"
@@ -776,7 +776,7 @@ printf 'string name = "tick";\nstring[] c_linux_sources = ["lin.c"];\nstring[] c
 printf 'int id_tick_now(void) { return 41; }\n' > "$dstd/io/tick/lin.c"
 printf 'int id_tick_now(void) { return 42; }\n' > "$dstd/io/tick/mac.c"
 printf 'native tick_now() return int;\n' > "$dstd/io/tick/now.id"
-printf 'dstd_now() {\n  int t = tick_now() + 0;\n} return int t;\n' > "$dstd/io/now.id"
+printf 'dstd_now() {\n  int t = tick_now() * 2;\n} return int t;\n' > "$dstd/io/now.id"
 dstd=$(cd "$dstd" && pwd -P)
 printf 'main(int argc, string[] argv) {\n  print("hi");\n} return int 0;\n' > "$TMP/dhello/main.id"
 printf 'main(int argc, string[] argv) {\n  int t = dstd_now();\n  print(t);\n} return int 0;\n' > "$TMP/dcall/main.id"
@@ -785,7 +785,7 @@ if $BIN_IDC "$TMP/dhello" --std "$dstd" --cc "$cclog" -o "$TMP/dhello.bin" >"$TM
    && [ "$("$TMP/dhello.bin")" = "hi" ] && ! grep -qE 'lin\.c|mac\.c' "$TMP/cc.log"; then
     : > "$TMP/cc.log"
     if $BIN_IDC "$TMP/dcall" --std "$dstd" --cc "$cclog" -o "$TMP/dcall.bin" >"$TMP/dcall.err" 2>&1 \
-       && [ "$("$TMP/dcall.bin")" = "41" ] && grep -q 'io/tick/lin\.c' "$TMP/cc.log" && ! grep -q 'mac\.c' "$TMP/cc.log"; then
+       && [ "$("$TMP/dcall.bin")" = "82" ] && grep -q 'io/tick/lin\.c' "$TMP/cc.log" && ! grep -q 'mac\.c' "$TMP/cc.log"; then
         ok "a backend.id inside a library attaches its backend with no conf.id, linked only where its native is reached"
     else
         bad "a backend.id inside a library attaches its backend with no conf.id, linked only where its native is reached: $(grep -v warning "$TMP/dcall.err" | head -1 | cut -c1-200)"
@@ -798,7 +798,7 @@ fi
 # says the compiler is the user's, so the build goes ahead on this machine.
 : > "$TMP/cc.log"
 if $BIN_IDC "$TMP/dcall" --std "$dstd" --triple x86_64-apple-darwin --cc "$cclog" -o "$TMP/dmac.bin" >"$TMP/dmac.err" 2>&1 \
-   && grep -q 'io/tick/mac\.c' "$TMP/cc.log" && ! grep -q 'lin\.c' "$TMP/cc.log" && [ "$("$TMP/dmac.bin")" = "42" ]; then
+   && grep -q 'io/tick/mac\.c' "$TMP/cc.log" && ! grep -q 'lin\.c' "$TMP/cc.log" && [ "$("$TMP/dmac.bin")" = "84" ]; then
     ok "the triple's platform picks which sources of a library's backend are compiled"
 else
     bad "the triple's platform picks which sources of a library's backend are compiled: $(grep -v warning "$TMP/dmac.err" | head -1 | cut -c1-200)"
@@ -1136,10 +1136,10 @@ main(int argc, string[] argv) {
 } return int 0;
 
 probe(string path) {
-  int found = fs_exists(path) + 0;
-} return int found;
-("/nonexistent-c7-a"):(0)
-("/nonexistent-c7-b"):(0)
+  int missing = 1 - fs_exists(path);
+} return int missing;
+("/nonexistent-c7-a"):(1)
+("/nonexistent-c7-b"):(1)
 EOF
 : > "$TMP/cc.log"
 if $BIN_IDC "$c7h" --cc "$cclog" -o "$TMP/c7harn.bin" >"$TMP/c7harn.err" 2>&1 \

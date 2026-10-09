@@ -1,4 +1,4 @@
 float k_neg = -2.5;
 float k_zero = -0.0;
-float k_dbl = -(-4.5);
-float[] k_list = [-1.5, 2.0, -(-4.5), -0.25];
+float k_pos = 4.5;
+float[] k_list = [-1.5, 2.0, 4.5, -0.25];

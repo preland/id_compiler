@@ -1,0 +1,55 @@
+// Whether a local is dead weight: nothing reads or assigns it (./unread.id), it is not an
+// export or a conf.id constant (a constant is a declaration node too, and its name is in
+// cdecl; it is read from other functions as `(import NAME)`), and what it was
+// given is an expression that does nothing -- operators over variables and
+// literals. A local given a call, or an index (which traps out of range), is the
+// way a value-returning function is run for its effect: dropping the declaration
+// would drop the effect, so that is not reported.
+
+noop_dead(int nzf_decl, int nzf_owner, int nzf_left) {
+  int nzf_dead = 0;
+  if((import ni2)[nzf_decl] != 1 && nzf_owner >= 0 && nzf_left == 0 && noop_const((import ns2)[nzf_decl]) == 0 && (import ni1)[nzf_decl] >= 0) {
+    nzf_dead = noop_pure((import ni1)[nzf_decl]);
+  }
+} return int nzf_dead;
+given noop_world ((import nfx_dpad), (import nfx_fpad), 0):(1)
+given noop_world ((import nfx_dpad), (import nfx_fpad), 1):(0)
+given noop_world ((import nfx_dexport), (import nfx_fexport), 0):(0)
+given noop_world ((import nfx_dcall), (import nfx_fcall), 0):(0)
+given noop_constant ((import nfx_dpad), (import nfx_fpad), 0):(0)
+given noop_world ((import nfx_dpad), -1, 0):(0)
+
+noop_pure(int nzv_node) {
+  string nzv_kind = (import nkind)[nzv_node];
+  int nzv_ok = 0;
+  if(nzv_kind == "var" || nzv_kind == "import" || nzv_kind == "int" || nzv_kind == "float" || nzv_kind == "str") {
+    nzv_ok = 1;
+  }
+} chain (int nzv_node) {
+  if(nzv_kind == "bin") {
+    nzv_ok = noop_pure((import ni1)[nzv_node]) * noop_pure((import ni2)[nzv_node]);
+  }
+  if(nzv_kind == "un") {
+    nzv_ok = noop_pure((import ni1)[nzv_node]);
+  }
+} return int nzv_ok;
+given noop_world ((import wx_va)):(1)
+given noop_world ((import wx_sum)):(1)
+given noop_world ((import wx_neg)):(1)
+given noop_world ((import wx_foo)):(0)
+given noop_world ((import nfx_afoo)):(0)
+given noop_world ((import wx_idx)):(0)
+
+noop_const(string nzh_name) {
+  int nzh_i = 0;
+  int nzh_hit = 0;
+  while(nzh_i < len((import cdecl))) {
+    if((import ns2)[((import cdecl)[nzh_i])] == nzh_name) {
+      nzh_hit = 1;
+    }
+    nzh_i = nzh_i + 1;
+  }
+} return int nzh_hit;
+given noop_constant ("pad"):(1)
+given noop_world ("pad"):(0)
+given noop_constant ("used"):(0)

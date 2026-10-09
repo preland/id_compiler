@@ -1,0 +1,4 @@
+// EXPECT: argument 'y' of 'Point' is a call; a constructor takes values that are already named, not calls [E0607]
+main(int argc, string[] argv) {
+  Point p = Point(1, len(argv));
+} return int 0;

@@ -8,5 +8,5 @@ inf_pow2(int n) {
 } return int r;
 
 combine(int a, int b) {
-  int s = a + b;
+  int s = a * 2 + b;
 } return int s;

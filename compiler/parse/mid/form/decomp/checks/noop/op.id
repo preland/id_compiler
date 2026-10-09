@@ -1,0 +1,62 @@
+// E0409 for one operator node: which of the no-op shapes it is, as the phrase the
+// diagnostic ends with, or "" when it changes a value. An identity (./unit.id) is
+// a literal 0 beside `+` or `-`, a literal 1 beside `*` or `/`; a product with a
+// literal 0 (./zero.id) is another no-op. The literal must be an `int` literal,
+// because a float `x + 0.0` turns -0.0 into 0.0.
+
+noop_op(int nzo_node) {
+  string nzo_text = noop_reason(nzo_node);
+  if(nzo_text != "") {
+    noop_report(nzo_node, nzo_text);
+  }
+} return void;
+given noop_world ((import nfx_plus_zero)):() then (import chkfail)[0]:(1)
+given noop_world ((import wx_sum)):() then (import chkfail)[0]:(0)
+
+noop_reason(int nzr_node) {
+  string nzr_kind = (import nkind)[nzr_node];
+  string nzr_text = "";
+  if(nzr_kind == "bin" && noop_concat(nzr_node) == 0) {
+    nzr_text = noop_ident(nzr_node);
+  }
+} chain (int nzr_node) {
+  if(nzr_kind == "bin" && noop_concat(nzr_node) == 0 && nzr_text == "") {
+    nzr_text = noop_cancel(nzr_node);
+  }
+  if(nzr_kind == "bin" && noop_concat(nzr_node) == 0 && nzr_text == "") {
+    nzr_text = noop_zero(nzr_node);
+  }
+  if(nzr_kind == "un") {
+    nzr_text = noop_negneg(nzr_node);
+  }
+} return string nzr_text;
+given noop_world ((import nfx_plus_zero)):("`e + 0` is just `e`")
+given noop_world ((import nfx_cancel)):("a term added and subtracted again cancels out")
+given noop_world ((import nfx_negneg)):("`- (- e)` is just `e`")
+given noop_world ((import nfx_times_zero)):("`e * 0` is just `0`")
+given noop_world ((import wx_sum)):("")
+given noop_world ((import nfx_cat_zero)):("")
+
+noop_ident(int nzi_node) {
+  string nzi_op = (import ns1)[nzi_node];
+  int nzi_unit = noop_unit(nzi_op);
+  int nzi_left = noop_lit((import ni1)[nzi_node], nzi_unit);
+} chain (int nzi_node) {
+  int nzi_right = noop_lit((import ni2)[nzi_node], nzi_unit);
+  string nzi_text = "";
+  if(nzi_right == 1) {
+    nzi_text = "`e " + nzi_op + " " + nzi_unit + "` is just `e`";
+  }
+} chain (int nzi_node) {
+  if(nzi_left == 1 && (nzi_op == "+" || nzi_op == "*")) {
+    nzi_text = "`" + nzi_unit + " " + nzi_op + " e` is just `e`";
+  }
+} return string nzi_text;
+given noop_world ((import nfx_plus_zero)):("`e + 0` is just `e`")
+given noop_world ((import nfx_zero_plus)):("`0 + e` is just `e`")
+given noop_world ((import nfx_minus_zero)):("`e - 0` is just `e`")
+given noop_world ((import nfx_zero_minus)):("")
+given noop_world ((import nfx_times_one)):("`e * 1` is just `e`")
+given noop_world ((import nfx_one_times)):("`1 * e` is just `e`")
+given noop_world ((import nfx_div_one)):("`e / 1` is just `e`")
+given noop_world ((import nfx_one_div)):("")

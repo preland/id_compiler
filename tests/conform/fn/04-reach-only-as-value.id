@@ -3,6 +3,7 @@ boot() {
 } return void;
 
 run(func() return void f) {
+  print("start");
   f();
 } return void;
 

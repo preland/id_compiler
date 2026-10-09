@@ -6,6 +6,6 @@ main(int argc, string[] argv) {
 
 show(word p) {
   int a = peek32(p);
-  string h = "" + a + " " + (peek32(p) + 0) + " " + peek32u(p) + " " + peek32s(p);
-  print(h + " " + (peek32s(p) + 0));
+  string h = "" + a + " " + (peek32(p) / 2) + " " + peek32u(p) + " " + peek32s(p);
+  print(h + " " + (peek32s(p) / 2));
 } return void;

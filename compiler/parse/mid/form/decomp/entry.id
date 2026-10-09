@@ -4,8 +4,10 @@
 // The decomposition checks (docs/PROJECT.md, "Decomposition errors") run
 // last: they read the whole parsed program, same as the checks above. Each is
 // an error through diag: a generated parameter name (E0310, checks/genname/), a
-// pure forwarder (E0406, checks/fwd/) and two functions that differ only in an
-// imported value (E0405, checks/impdup/).
+// pure forwarder (E0406, checks/fwd/), two functions that differ only in an
+// imported value (E0405, checks/impdup/), a function that is one operation
+// (E0408, checks/wsc/) and padding: an operation that cannot change its value
+// (E0409) and a local nothing reads (E0410), both in checks/noop/.
 check_program_tail() {
   chk_dead();
   check_pure();
@@ -22,9 +24,12 @@ check_program_tail2() {
   std_var_pass();
   ext_check();
   wsc_scan();
+} chain () {
+  noop_scan();
 } return void;
 given lz_empty given init_reg ():() then calls check_genname:() then calls check_fwd:() then calls check_imp_dup:()
 given lz_o given init_reg ():() then calls check_genname:() then calls check_fwd:() then calls check_imp_dup:()
 given lz_empty given init_reg ():() then calls std_var_pass:[1]
 given lz_empty given init_reg ():() then calls ext_check:[1]
 given lz_empty given init_reg ():() then calls wsc_scan:[1]
+given lz_empty given init_reg ():() then calls noop_scan:[1]

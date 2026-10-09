@@ -1,6 +1,6 @@
 lsn(string lpath) {
   string[] lnames = exec_ls(lpath);
-  int lcount = len(lnames) + 0;
+  int lcount = len(lnames);
 } return int lcount;
 ("/nonexistent/x"):(1)
 ("/nonexistent/y"):(1)
@@ -16,7 +16,7 @@ scratch(string sbody) {
 ("bb"):(["f.txt", ""])
 
 lsof(string opath) {
-  string[] oe = exec_ls(opath + "");
+  string[] oe = exec_ls(opath + "/");
 } return string[] oe;
 ("/nonexistent/x"):([""])
 ("/nonexistent/y"):([""])

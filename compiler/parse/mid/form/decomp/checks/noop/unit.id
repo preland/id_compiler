@@ -1,0 +1,42 @@
+// The identity element of an operator, and the questions the no-op shapes ask of
+// a node: 0 for `+` and `-`, 1 for `*` and `/`, -1 for an operator that has none
+// here (a comparison, `%`, `&&`).
+
+noop_unit(string nzu_op) {
+  int nzu_value = 0 - 1;
+  if(nzu_op == "+" || nzu_op == "-") {
+    nzu_value = 0;
+  }
+  if(nzu_op == "*" || nzu_op == "/") {
+    nzu_value = 1;
+  }
+} return int nzu_value;
+("+"):(0)
+("/"):(1)
+("%"):(-1)
+("<"):(-1)
+
+// Whether a node is the `int` literal with this value. A literal too wide for an
+// int (its second field is 1) and a negative value are never a match.
+noop_lit(int nzt_node, int nzt_value) {
+  int nzt_hit = 0;
+  if((import nkind)[nzt_node] == "int" && (import ni1)[nzt_node] == nzt_value && (import ni2)[nzt_node] == 0 && nzt_value >= 0) {
+    nzt_hit = 1;
+  }
+} return int nzt_hit;
+given noop_world ((import nfx_zero), 0):(1)
+given noop_world ((import nfx_zero), 1):(0)
+given noop_world ((import nfx_one), 1):(1)
+given noop_world ((import wx_va), 0):(0)
+given noop_world ((import nfx_zero), -1):(0)
+
+// `- (- e)`: a unary minus whose operand is a unary minus.
+noop_negneg(int nzn_node) {
+  int nzn_inner = (import ni1)[nzn_node];
+  string nzn_text = "";
+  if((import ns1)[nzn_node] == "-" && (import nkind)[nzn_inner] == "un" && (import ns1)[nzn_inner] == "-") {
+    nzn_text = "`- (- e)` is just `e`";
+  }
+} return string nzn_text;
+given noop_world ((import nfx_negneg)):("`- (- e)` is just `e`")
+given noop_world ((import wx_neg)):("")

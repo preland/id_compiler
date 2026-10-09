@@ -1,0 +1,51 @@
+// E0409 and E0410: padding. Two things that make code longer without making it do
+// more, and that exist to satisfy a rule on paper while the code stays what it
+// was -- E0408 refused a function that is one operation on its inputs, and the
+// way round it was `x + y + 0`, `a + b + b - b` or an `int pad = dt;` nothing
+// reads. Neither changes a value or an effect, so neither belongs in a program.
+//
+// E0409 is an operation that cannot change its value: `e + 0`, `0 + e`, `e - 0`,
+// `e * 1`, `1 * e`, `e / 1`, `- (- e)`, and a sum in which a term is added and
+// subtracted again (`a + b + b - b`: the terms of the sum, flattened through its
+// `+` and `-`, hold `b` twice with opposite signs). E0410 is a local that is
+// declared and never read afterwards, given an expression that does nothing (a
+// local given a call is how a function is run for its effect, ./dead.id).
+//
+// The scan reads every node once (as ../wsc/callers.id does) instead of walking
+// each function, because both questions are about one node and its neighbours:
+// an operator node and its operands, a declaration and the nodes between it and
+// the end of its function. A function's node is made once its body has been
+// parsed, so the first `func` node after a node is the function it sits in
+// (./unread.id). It runs after the other decomposition checks, and only when
+// nothing has failed, as E0408's does.
+
+noop_scan() {
+  if((import chkfail)[0] == 0) {
+    noop_loop();
+  }
+} return void;
+given env_init ():() then calls noop_loop:[1]
+given env_init given lset((import chkfail), 0, 1) ():() then calls noop_loop:[0]
+
+noop_loop() {
+  int nzl_i = 0;
+  while(nzl_i < len((import nkind))) {
+    noop_at(nzl_i);
+    nzl_i = nzl_i + 1;
+  }
+} return void;
+given env_init ():() then calls noop_at:[0]
+given noop_world ():() then calls noop_at:[75]
+
+noop_at(int nza_node) {
+  string nza_kind = (import nkind)[nza_node];
+  if(nza_kind == "bin" || nza_kind == "un") {
+    noop_op(nza_node);
+  }
+  if(nza_kind == "decl") {
+    noop_unread(nza_node);
+  }
+} return void;
+given noop_world ((import nfx_plus_zero)):() then calls noop_op:[1]
+given noop_world ((import nfx_dpad)):() then calls noop_unread:[1]
+given noop_world ((import wx_va)):() then calls noop_op:[0]

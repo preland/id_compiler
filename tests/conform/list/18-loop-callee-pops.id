@@ -1,5 +1,6 @@
 shrink(int[] xs) {
   pop(xs);
+  pop(xs);
 } return void;
 
 drain(int[] xs, int n) {

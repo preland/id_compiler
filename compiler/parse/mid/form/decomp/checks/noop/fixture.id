@@ -1,0 +1,68 @@
+// The nodes the cases of this directory read, built through node_txt2 and
+// friends on top of ../wsc/world.id's (wx_va is `a`, wx_vb is `b`, wx_sum is
+// `a + b`, wx_neg is `-a`, wx_foo is `foo(a)`): every no-op shape beside a
+// shape it must not be mistaken for, then four functions after them, so that
+// each node has an owner -- nfx_fpad owns the operations and the declaration
+// nothing reads, nfx_fused one that is read, nfx_fexport one that is exported.
+noop_world() {
+  wsc_world();
+  export int nfx_zero = node_txt2("int", "0", 0, 0);
+  export int nfx_one = node_txt2("int", "1", 1, 0);
+} chain () {
+  export int nfx_plus_zero = node_txt2("bin", "+", (import wx_va), (import nfx_zero));
+  export int nfx_zero_plus = node_txt2("bin", "+", (import nfx_zero), (import wx_va));
+  export int nfx_minus_zero = node_txt2("bin", "-", (import wx_va), (import nfx_zero));
+} chain () {
+  export int nfx_zero_minus = node_txt2("bin", "-", (import nfx_zero), (import wx_va));
+  export int nfx_times_one = node_txt2("bin", "*", (import wx_va), (import nfx_one));
+  export int nfx_one_times = node_txt2("bin", "*", (import nfx_one), (import wx_va));
+} chain () {
+  export int nfx_div_one = node_txt2("bin", "/", (import wx_va), (import nfx_one));
+  export int nfx_one_div = node_txt2("bin", "/", (import nfx_one), (import wx_va));
+  export int nfx_negneg = node_txt1("un", "-", (import wx_neg));
+} chain () {
+  export int nfx_sum_b = node_txt2("bin", "+", (import wx_sum), (import wx_vb));
+  export int nfx_cancel = node_txt2("bin", "-", (import nfx_sum_b), (import wx_vb));
+  export int nfx_ab_b = node_txt2("bin", "-", (import wx_sum), (import wx_vb));
+} chain () {
+  export int nfx_ba = node_txt2("bin", "+", (import wx_vb), (import wx_va));
+  export int nfx_afoo = node_txt2("bin", "+", (import wx_va), (import wx_foo));
+  export int nfx_impure = node_txt2("bin", "-", (import nfx_afoo), (import wx_foo));
+} chain () {
+  export int nfx_dpad = node_decl("int", "pad", (import wx_va), 0);
+  export int[] nfx_padbody = [(import nfx_dpad)];
+  export int nfx_fpad = node_func("nxpad", "void", (import wx_pa1), (import nfx_padbody), 0 - 1);
+} chain () {
+  export int nfx_dused = node_decl("int", "used", (import wx_va), 0);
+  export int nfx_vused = node_txt("var", "used");
+  export int[] nfx_usedbody = [(import nfx_dused)];
+} chain () {
+  export int nfx_fused = node_func("nxused", "int", (import wx_pa1), (import nfx_usedbody), (import nfx_vused));
+  export int nfx_dexport = node_decl("int", "kept", (import wx_va), 1);
+  export int[] nfx_exportbody = [(import nfx_dexport)];
+} chain () {
+  export int nfx_fexport = node_func("nxexport", "void", (import wx_pa1), (import nfx_exportbody), 0 - 1);
+  export int nfx_dcall = node_decl("int", "res", (import wx_foo), 0);
+  export int[] nfx_callbody = [(import nfx_dcall)];
+} chain () {
+  export int nfx_fcall = node_func("nxcall", "void", (import wx_pa1), (import nfx_callbody), 0 - 1);
+  export int nfx_dasg = node_decl("int", "asg", (import wx_va), 0);
+  export int nfx_asg = node_txt1("assign", "asg", (import wx_vb));
+} chain () {
+  export int[] nfx_asgbody = [(import nfx_dasg), (import nfx_asg)];
+  export int nfx_fasg = node_func("nxasg", "void", (import wx_pa1), (import nfx_asgbody), 0 - 1);
+  export int nfx_strcat = node_txt2("bin", "+", (import wx_str), (import wx_va));
+} chain () {
+  export int nfx_cat_zero = node_txt2("bin", "+", (import nfx_strcat), (import nfx_zero));
+  export int nfx_times_zero = node_txt2("bin", "*", (import wx_va), (import nfx_zero));
+  export int nfx_zero_times = node_txt2("bin", "*", (import nfx_zero), (import wx_va));
+} return void;
+():() then calls wsc_world:[1]
+():() then init_units:(0)
+
+noop_constant() {
+  noop_world();
+  push((import cdecl), (import nfx_dpad));
+} return void;
+():() then calls noop_world:[1]
+():() then len((import cdecl)):(1)

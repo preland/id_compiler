@@ -1,5 +1,5 @@
 width(string qs) {
-  int l = len(qs);
+  int l = len(qs) * 2;
 } return int l;
 
 hold(int[] q) {

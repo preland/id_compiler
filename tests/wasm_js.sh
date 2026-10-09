@@ -150,7 +150,7 @@ refuse wbadname 'string[] lib_exports = ["twice", "twicce"];' "a lib_exports nam
 refuse wdupname 'string[] lib_exports = ["twice", "twice"];' "a duplicate lib_exports entry is refused, naming it and the fix" "lists 'twice' twice; remove one"
 refuse wmainname 'string[] lib_exports = ["twice", "main"];' "listing main is refused, naming the fix" "lists 'main', which cannot be exported"
 mkdir -p "$TMP/wnomarsh"
-printf 'grid(int[][] gx) {\n  int gn = len(gx);\n} return int gn;\n([[1]]):(1)\n([[1], [2]]):(2)\n' > "$TMP/wnomarsh/grid.id"
+printf 'grid(int[][] gx) {\n  int gn = len(gx) + len(gx[0]);\n} return int gn;\n([[1]]):(2)\n([[1], [2]]):(3)\n' > "$TMP/wnomarsh/grid.id"
 printf 'string[] lib_exports = ["grid"];\n' > "$TMP/wnomarsh/conf.id"
 if build wnomarsh "$TMP/wnomarsh"; then bad "an unmarshallable listed function is refused (built)"
 elif grep -q "lists 'grid'" "$TMP/wnomarsh.err" && grep -q 'does not cross the boundary' "$TMP/wnomarsh.err" && grep -q 'remove the entry' "$TMP/wnomarsh.err"; then ok "an unmarshallable listed function is refused, naming it and the fix"

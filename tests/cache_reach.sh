@@ -153,7 +153,7 @@ cst_expect ct4 2 "editing a constant one function's two cases read"
 sed -i 's/^int ua = 3;/int ua = 4;/' "$CST/conf.id"
 cst_build ct5
 cst_expect ct5 4 "editing a constant a function reads, and a list constant's initialiser reads"
-sed -i 's/a \* 2/a + a/' "$CST/main.id"
+sed -i 's/a \* 2/2 * a/' "$CST/main.id"
 cst_build ct6
 cst_expect ct6 4 "editing a function reruns its own cases and its caller's, and nothing else"
 sed -i 's/export int ex_v = 5;/export int ex_v = 6;/' "$CST/ex/e.id"
@@ -173,10 +173,10 @@ int fb = (import fa);
 EOF2
 cat > "$CSF/main.id" <<'EOF2'
 rd_fb(int a) {
-  int b = a + (import fb);
+  int b = a * 2 + (import fb);
 } return int b;
-(1):(4)
-(2):(5)
+(1):(5)
+(2):(7)
 
 main(int argc, string[] argv) {
   print("fold");
@@ -191,7 +191,7 @@ csf_build() {
 }
 csf_build cf1
 if [ "$(rc_of cf1)" -eq 0 ] && [ "$(cst_runs cf1)" = 4 ]; then ok "a folded constant: a cold build runs every case"; else bad "a folded constant: cold build (rc $(rc_of cf1), stats '$(cat "$TMP/cf1.st")'): $(head -2 "$TMP/cf1.out")"; fi
-sed -i 's/^int fa = 3;/int fa = 5;/; s/(1):(4)/(1):(6)/; s/(2):(5)/(2):(7)/' "$CSF/conf.id" "$CSF/main.id"
+sed -i 's/^int fa = 3;/int fa = 5;/; s/(1):(5)/(1):(7)/; s/(2):(7)/(2):(9)/' "$CSF/conf.id" "$CSF/main.id"
 csf_build cf2
 if [ "$(rc_of cf2)" -eq 0 ] && [ "$(cst_runs cf2)" = 2 ]; then ok "a folded constant: editing the constant it was initialised from reruns the cases that read it"; else bad "a folded constant: edit of its source (rc $(rc_of cf2), stats '$(cat "$TMP/cf2.st")'): $(head -2 "$TMP/cf2.out")"; fi
 

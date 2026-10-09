@@ -21,6 +21,9 @@ ctor_arg(int id, string sd_nm, int sd_k) {
   int sd_a = (import nl1)[id][sd_k];
   string sd_ft = sd_cell((import sdftype), sd_nm, sd_k);
   ctor_fit(sd_a, sd_nm, sd_k, sd_ft);
+} chain (int id, string sd_nm, int sd_k) {
+  ctor_nested(sd_a, sd_nm, sd_k);
 } return void;
 given sd_ctor_fixture ((import sd_c2), "P", 0):() then (import chkfail)[0]:(0)
 given sd_ctor_fixture ((import sd_cb), "P", 1):() then (import chkfail)[0]:(1)
+given sd_ctor_fixture ((import sd_cd), "P", 0):() then prints:("<stdin>:1: error: argument 'x' of 'P' is a call; a constructor takes values that are already named, not calls [E0607]\n  at: P\n  why: a struct is built on a line of its own, where the next line can see what it is, so a constructor's arguments are names and values, not calls\n  help: name the value on its own line first, then pass the name\n") then (import chkfail)[0]:(1)

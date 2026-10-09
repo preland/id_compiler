@@ -1,0 +1,20 @@
+// A constructor builds a struct on a line of its own, so its arguments are
+// values already named: a call in one is a second action hiding inside the
+// first, and the reader of the next line cannot see what the struct was built
+// from. Any call counts, a builtin as much as a function (docs/ERRORS.md, E0607).
+
+ctor_nested(int nested_value, string nested_struct, int nested_index) {
+  if(has_call(nested_value) > 0) {
+    ctor_nested_err(nested_value, nested_struct, nested_index);
+  }
+} return void;
+given sd_ctor_fixture ((import sd_one), "P", 0):() then (import chkfail)[0]:(0)
+given sd_ctor_fixture ((import sd_cf), "P", 0):() then (import chkfail)[0]:(1)
+
+ctor_nested_err(int nested_value, string nested_struct, int nested_index) {
+  string nested_field = sd_cell((import sdfname), nested_struct, nested_index);
+  string nested_message = "argument '" + nested_field + "' of '" + nested_struct + "' is a call; a constructor takes values that are already named, not calls";
+  tc_diag(nested_value, "E0607", nested_message, nested_struct, "a struct is built on a line of its own, where the next line can see what it is, so a constructor's arguments are names and values, not calls", "name the value on its own line first, then pass the name");
+} return void;
+given sd_ctor_fixture ((import sd_cf), "P", 0):() then prints:("<stdin>:1: error: argument 'x' of 'P' is a call; a constructor takes values that are already named, not calls [E0607]\n  at: P\n  why: a struct is built on a line of its own, where the next line can see what it is, so a constructor's arguments are names and values, not calls\n  help: name the value on its own line first, then pass the name\n") then (import chkfail)[0]:(1)
+given sd_ctor_fixture ((import sd_cf), "P", 1):() then prints:("<stdin>:1: error: argument 'y' of 'P' is a call; a constructor takes values that are already named, not calls [E0607]\n  at: P\n  why: a struct is built on a line of its own, where the next line can see what it is, so a constructor's arguments are names and values, not calls\n  help: name the value on its own line first, then pass the name\n") then (import chkfail)[0]:(1)

@@ -1,0 +1,44 @@
+// Whether two expression nodes are the same expression: same kind and text, and
+// the same operands. A call is never the same as anything -- `f(x) + b - f(x)` may
+// not be `b` if `f` has an effect -- and neither is a list literal, so those are
+// not terms that cancel. A field read is an index node whose second operand is a
+// `fld` leaf (docs/ERRORS.md, E0408), so it is compared like any index. Whether a
+// node is string concatenation (./op.id leaves those alone, because `"n=" + x + 0`
+// appends "0" and `"a" + (b - c)` is not one sum) is asked at the end of this file.
+
+noop_same(int nzq_a, int nzq_b) {
+  string nzq_kind = (import nkind)[nzq_a];
+  int nzq_eq = nzq_kind == (import nkind)[nzq_b] && (import ns1)[nzq_a] == (import ns1)[nzq_b];
+  int nzq_hit = 0;
+} chain (int nzq_a, int nzq_b) {
+  if(nzq_eq == 1 && (nzq_kind == "var" || nzq_kind == "import" || nzq_kind == "int" || nzq_kind == "float" || nzq_kind == "str" || nzq_kind == "fld")) {
+    nzq_hit = 1;
+  }
+  if(nzq_eq == 1 && (nzq_kind == "bin" || nzq_kind == "index")) {
+    nzq_hit = noop_same((import ni1)[nzq_a], (import ni1)[nzq_b]) * noop_same((import ni2)[nzq_a], (import ni2)[nzq_b]);
+  }
+  if(nzq_eq == 1 && nzq_kind == "un") {
+    nzq_hit = noop_same((import ni1)[nzq_a], (import ni1)[nzq_b]);
+  }
+} return int nzq_hit;
+given noop_world ((import wx_va), (import wx_va)):(1)
+given noop_world ((import wx_va), (import wx_vb)):(0)
+given noop_world ((import wx_sum), (import wx_sum)):(1)
+given noop_world ((import wx_sum), (import nfx_ba)):(0)
+given noop_world ((import wx_foo), (import wx_foo)):(0)
+given noop_world ((import wx_neg), (import wx_neg)):(1)
+
+noop_concat(int nzj_node) {
+  int nzj_hit = 0;
+  if((import nkind)[nzj_node] == "str") {
+    nzj_hit = 1;
+  }
+  if((import nkind)[nzj_node] == "bin" && (import ns1)[nzj_node] == "+" && noop_concat((import ni1)[nzj_node]) + noop_concat((import ni2)[nzj_node]) > 0) {
+    nzj_hit = 1;
+  }
+} return int nzj_hit;
+given noop_world ((import wx_str)):(1)
+given noop_world ((import wx_va)):(0)
+given noop_world ((import nfx_strcat)):(1)
+given noop_world ((import nfx_cat_zero)):(1)
+given noop_world ((import nfx_plus_zero)):(0)

@@ -1,0 +1,5 @@
+// EXPECT: is an operation that cannot change its value: `0 * e` is just `0` [E0409]
+main(int argc, string[] argv) {
+  int m = argc * 2;
+  int n = argc + 0 * (m + argc);
+} return int n;

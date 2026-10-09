@@ -1,7 +1,7 @@
 int k_neg = -5;
-int k_dbl = -(-5);
+int k_dbl = -(3 - 8);
 int k_exp = -(2 * 3);
 int k_sub = 3 - 5;
 int k_cpl = ~5;
 int k_hex = -0x10;
-int[] k_list = [-1, 2, -(-3), 3 - 5, ~0];
+int[] k_list = [-1, 2, -(2 - 5), 3 - 5, ~0];

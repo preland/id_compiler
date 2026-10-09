@@ -1,0 +1,50 @@
+// E0410: a local that is declared and never read afterwards. Everything a
+// function reads sits between its declaration and the function's own node: the
+// condition of an `if`, an argument, the right side of an assignment and the
+// return clause are all made before the function node is. A name that appears as
+// a `var` node nowhere in that stretch is read nowhere. An assignment to the name
+// (`x = f(y)`) counts as a use too: it is how a call's result is taken and
+// ignored, and the call is the point. An exported local is read by other
+// functions as `(import NAME)`, so it is never reported.
+
+noop_unread(int nzx_decl) {
+  string nzx_name = (import ns2)[nzx_decl];
+  int nzx_owner = noop_owner(nzx_decl);
+  int nzx_left = noop_reads(nzx_name, nzx_decl + 1, nzx_owner);
+} chain (int nzx_decl) {
+  if(noop_dead(nzx_decl, nzx_owner, nzx_left) == 1) {
+    noop_unread_report(nzx_decl, nzx_owner);
+  }
+} return void;
+given noop_world ((import nfx_dpad)):() then (import chkfail)[0]:(1)
+given noop_world ((import nfx_dused)):() then (import chkfail)[0]:(0)
+given noop_world ((import nfx_dexport)):() then (import chkfail)[0]:(0)
+given noop_world ((import nfx_dasg)):() then (import chkfail)[0]:(0)
+
+noop_reads(string nzy_name, int nzy_from, int nzy_to) {
+  int nzy_i = nzy_from;
+  int nzy_n = 0;
+  while(nzy_i < nzy_to) {
+    if(((import nkind)[nzy_i] == "var" || (import nkind)[nzy_i] == "assign") && (import ns1)[nzy_i] == nzy_name) {
+      nzy_n = nzy_n + 1;
+    }
+    nzy_i = nzy_i + 1;
+  }
+} return int nzy_n;
+given noop_world ("used", (import nfx_dused), (import nfx_fused)):(1)
+given noop_world ("pad", (import nfx_dpad), (import nfx_fpad)):(0)
+given noop_world ("a", 5, 5):(0)
+given noop_world ("asg", (import nfx_dasg), (import nfx_fasg)):(1)
+
+noop_owner(int nzz_node) {
+  int nzz_at = nzz_node + 1;
+  int nzz_found = 0 - 1;
+  while(nzz_at < len((import nkind)) && nzz_found < 0) {
+    if((import nkind)[nzz_at] == "func") {
+      nzz_found = nzz_at;
+    }
+    nzz_at = nzz_at + 1;
+  }
+} return int nzz_found;
+given noop_world ((import nfx_plus_zero)):((import nfx_fpad))
+given noop_world (100000):(-1)

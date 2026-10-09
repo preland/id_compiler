@@ -1,0 +1,13 @@
+// A function whose name is one the runtime provides is the builtin itself, not a
+// second spelling of an operation: idc/runtime implements `poke8(word a, word v)
+// { st8(a, v); }` for freestanding builds, and generated code calls it by that
+// fixed name, so there is no call site to write the expression at. The names are
+// the reserved ones (conf.id resv_names_src) plus `eprint`, which that list
+// leaves out.
+
+wsc_rtname(string wrn_name) {
+  int wrn_r = find_str((import resv_names), wrn_name) >= 0 || wrn_name == "eprint";
+} return int wrn_r;
+given init_rtc ("poke8"):(1)
+given init_rtc ("eprint"):(1)
+given init_rtc ("wsput"):(0)

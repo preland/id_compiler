@@ -6,8 +6,8 @@
 ccrun_fx_live_exit(string ccrun_fx_le_cmd) {
   int ccrun_fx_le_h = proc_spawn_limited(ccrun_fx_le_cmd, 0, 0);
 } return void;
-("sh\n-c\nsleep 0.1; exit 7\n"):() then calls proc_spawn_limited:("sh\n-c\nsleep 0.1; exit 7\n", 0, 0)
-("sh\n-c\nexit 0\n"):() then calls proc_spawn_limited:("sh\n-c\nexit 0\n", 0, 0)
+given ccrun_fx_run_capped_true ("sh\n-c\nsleep 0.1; exit 7\n"):() then ccrun_fx_wait_value:(7)
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ("sh\n-c\nexit 0\n"):() then ccrun_fx_wait_value:(0)
 
 // What cr_h's child exits with, waited on for up to two seconds.
 ccrun_fx_wait_value() {

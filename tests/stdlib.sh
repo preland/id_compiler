@@ -67,7 +67,7 @@ main(int argc, string[] argv) {
     print(r);
 } return int 0;
 EOF
-run_one "the whole stdlib tree is merged, not just its root" "abab"
+run_one "the whole stdlib tree is merged, not just its root" "ab,ab"
 
 # -- 3. a single FILE gets the stdlib too ----------------------------------
 # The tutorial path (`idc prog.id`) is the one that most needs fx_max to
@@ -667,10 +667,10 @@ fi
 rm -rf "$TMP/p35"; mkdir -p "$TMP/p35"
 cat > "$TMP/p35/main.id" <<'EOF'
 mine_twice(string x) {
-  string y = x + x;
+  string y = x + "," + x;
 } return string y;
-("a"):("aa")
-("b"):("bb")
+("a"):("a,a")
+("b"):("b,b")
 
 main(int argc, string[] argv) {
   string s = mine_twice("c");
@@ -741,16 +741,16 @@ rm -rf "$TMP/libc"; mkdir -p "$TMP/libc/num"
 printf 'int lc_k = 5;\nint lc_unused = 9;\n' > "$TMP/libc/conf.id"
 cat > "$TMP/libc/num/get.id" <<'EOF'
 lc_get(int a) {
-  int b = a + (import lc_k);
+  int b = a * 2 + (import lc_k);
 } return int b;
-(1):(6)
-(2):(7)
+(1):(7)
+(2):(9)
 EOF
 rm -rf "$TMP/p38"; mkdir -p "$TMP/p38"
 printf 'main(int argc, string[] argv) {\n  int r = lc_get(3);\n  print(r);\n} return int 0;\n' > "$TMP/p38/main.id"
 if $BIN_IDC --std "$TMP/libc" "$TMP/p38" -o "$TMP/out38" --emit-c "$TMP/c38.c" >"$TMP/o38.err" 2>&1 \
    && grep -q "lc_k" "$TMP/c38.c" && ! grep -q "lc_unused" "$TMP/c38.c" \
-   && $BIN_IDC --std "$TMP/libc" "$TMP/p38" -o "$TMP/out38" >/dev/null 2>&1 && [ "$("$TMP/out38")" = "8" ]; then
+   && $BIN_IDC --std "$TMP/libc" "$TMP/p38" -o "$TMP/out38" >/dev/null 2>&1 && [ "$("$TMP/out38")" = "11" ]; then
     ok "a library constant a reached function reads is loaded, and one nothing reads is not"
 else
     bad "a library constant a reached function reads is loaded, and one nothing reads is not: $(head -2 "$TMP/o38.err" | tr '\n' ' ')"
@@ -770,7 +770,7 @@ fi
 # enclosing root (idstd/.tests/tool/names is built this way) ------------------
 rm -rf "$TMP/libc/app"; mkdir -p "$TMP/libc/app"
 cp "$TMP/p38/main.id" "$TMP/libc/app/main.id"
-if $BIN_IDC --std "$TMP/libc" "$TMP/libc/app" -o "$TMP/out39" >"$TMP/o39.err" 2>&1 && [ "$("$TMP/out39")" = "8" ]; then
+if $BIN_IDC --std "$TMP/libc" "$TMP/libc/app" -o "$TMP/out39" >"$TMP/o39.err" 2>&1 && [ "$("$TMP/out39")" = "11" ]; then
     ok "a program inside the library's tree builds, and reads the library's constants once"
 else
     bad "a program inside the library's tree builds, and reads the library's constants once: $(head -2 "$TMP/o39.err" | tr '\n' ' ')"

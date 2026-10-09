@@ -1,0 +1,50 @@
+// A sum in which a term is added and subtracted again. The sum is flattened
+// through its `+` and `-` into its terms, each with a sign (`a - (b - c)` has
+// a, -b and +c); any two terms with opposite signs that are the same
+// expression (./same.id) cancel, whatever order they were written in. Only a
+// `+` or `-` node can be such a sum; any other node is a single term and
+// cancels with nothing.
+
+noop_cancel(int nzc_node) {
+  int[] nzc_terms = [];
+  int[] nzc_signs = [];
+  string nzc_text = "";
+} chain (int nzc_node) {
+  noop_terms(nzc_node, 1, nzc_terms, nzc_signs);
+  if(noop_pair(nzc_terms, nzc_signs) == 1) {
+    nzc_text = "a term added and subtracted again cancels out";
+  }
+} return string nzc_text;
+given noop_world ((import nfx_cancel)):("a term added and subtracted again cancels out")
+given noop_world ((import nfx_ab_b)):("a term added and subtracted again cancels out")
+given noop_world ((import wx_sum)):("")
+given noop_world ((import nfx_impure)):("")
+given noop_world ((import nfx_times_one)):("")
+
+noop_terms(int nzm_node, int nzm_sign, int[] nzm_terms, int[] nzm_signs) {
+  string nzm_op = (import ns1)[nzm_node];
+  int nzm_sum = (import nkind)[nzm_node] == "bin" && (nzm_op == "+" || nzm_op == "-");
+  if(nzm_sum == 0) {
+    push(nzm_terms, nzm_node);
+    push(nzm_signs, nzm_sign);
+  }
+} chain (int nzm_node, int nzm_sign, int[] nzm_terms, int[] nzm_signs) {
+  if(nzm_sum == 1) {
+    noop_split(nzm_node, nzm_sign, nzm_terms, nzm_signs);
+  }
+} return void;
+given noop_world ((import wx_va), 1, [], []):((import wx_va), 1, [(import wx_va)], [1])
+given noop_world ((import wx_sum), -1, [], []):((import wx_sum), -1, [(import wx_va), (import wx_vb)], [-1, -1])
+given noop_world ((import nfx_ab_b), 1, [], []):((import nfx_ab_b), 1, [(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1])
+
+noop_split(int nzs_node, int nzs_sign, int[] nzs_terms, int[] nzs_signs) {
+  int nzs_right = nzs_sign;
+  if((import ns1)[nzs_node] == "-") {
+    nzs_right = 0 - nzs_sign;
+  }
+  noop_terms((import ni1)[nzs_node], nzs_sign, nzs_terms, nzs_signs);
+} chain (int nzs_node, int nzs_sign, int[] nzs_terms, int[] nzs_signs) {
+  noop_terms((import ni2)[nzs_node], nzs_right, nzs_terms, nzs_signs);
+} return void;
+given noop_world ((import nfx_ab_b), 1, [], []):((import nfx_ab_b), 1, [(import wx_va), (import wx_vb), (import wx_vb)], [1, 1, -1])
+given noop_world ((import wx_sum), 1, [], []):((import wx_sum), 1, [(import wx_va), (import wx_vb)], [1, 1])

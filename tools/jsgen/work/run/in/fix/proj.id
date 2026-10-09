@@ -31,5 +31,13 @@ jg_t_proj() {
   int jg_p3 = exec_file_put((import jg_t_jsx), "export default function (host) {\n  return { jsx_ping() { return 1; } };\n}\n", 420);
   int jg_p4 = exec_file_put((import jg_t_map), (import jg_t_row), 420);
 } return void export jg_t_dir;
-():() then len((import jg_t_dir)):(16)
+():() then jg_t_dleaf:(11)
 ():() then jg_t_nlines:(7)
+
+// The length of the scratch directory's own name (jg_t_ and six characters), which does not depend on where the
+// harness put it.
+jg_t_dleaf() {
+  int jg_dl = len(path_base((import jg_t_dir)));
+} return int jg_dl;
+given jg_t_proj ():(11)
+given jg_t_proj ():(11) then jg_t_nlines:(7)

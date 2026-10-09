@@ -51,9 +51,9 @@ self_refuse() {   # desc, expected message (fixed string), flags...
 
 tf_chunk_0() {
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 ' > "$TMP/p.id"
 if ../bin/idc "$TMP/p.id" --require-tests --emit-c /dev/null >/dev/null 2>&1; then
@@ -79,29 +79,29 @@ dup_case() { # desc, source, flags...
     fi
 }
 dup_case "an identical case is rejected" 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (1, 2):(3)
 (1, 2):(3)
 '
 # Compared by tokens, so spacing cannot smuggle a duplicate past the rule.
 dup_case "whitespace does not hide a duplicate" 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (1,2):(3)
 (1, 2) : (3)
 '
 # Same case text under two DIFFERENT functions is not a duplicate.
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 
 mul(int a, int b) {
-  int p = a * b + 0;
+  int p = a * b * 2;
 } return int p;
-(1, 2):(2)
+(1, 2):(4)
 (0, 0):(0)
 ' > "$TMP/p.id"
 if ../bin/idc "$TMP/p.id" --require-tests --emit-c /dev/null >/dev/null 2>&1; then
@@ -170,7 +170,7 @@ self_refuse "bin/idc: two cases of the same size cannot compare either" \
 # --- malformed cases ---------------------------------------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (1, 2)(3)
 (0, 0):(0)
@@ -184,7 +184,7 @@ self_refuse "bin/idc: a case needs the ':' between its two sides" "expected ':'"
 # exit status, and not stdout, which can be the program's C, and it is
 # silent (id has no warnings: something is allowed or it is not).
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
 ' > "$TMP/p.id"
 self_refuse "bin/idc: a function with no cases fails a default build" \
@@ -201,9 +201,9 @@ self_refuse "bin/idc: a function with no cases fails a default build" \
     || bad "bin/idc: --allow-untested prints nothing on stdout"
 
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 ' > "$TMP/p.id"
 self_refuse "bin/idc: a function with one case fails a default build" \
     "function 'add' has 1 test case(s); --require-tests needs at least 2 (see docs/TESTS.md)" --emit-c /dev/null
@@ -213,18 +213,18 @@ self_accept "bin/idc: --allow-untested builds a function with one case" --allow-
     || bad "bin/idc: --allow-untested is silent on a one-case build (log: $(tr '\n' '|' < "$TMP/log"))"
 
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(4)
+(1, 2):(5)
 (0, 0):(0)
 ' > "$TMP/p.id"
 self_refuse "bin/idc: --allow-untested does not turn a failing case into a build" \
-    "p.id:4: test failed: add(1, 2) = 3, expected 4" --allow-untested --emit-c /dev/null
+    "p.id:4: test failed: add(1, 2) = 4, expected 5" --allow-untested --emit-c /dev/null
 
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 ' > "$TMP/p.id"
 ../bin/idc "$TMP/p.id" --emit-c /dev/null >"$TMP/stdout" 2>"$TMP/stderr"
@@ -234,9 +234,9 @@ printf '%s' 'add(int a, int b) {
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 
 main(int argc, string[] argv) {
@@ -246,17 +246,17 @@ main(int argc, string[] argv) {
 EOF
 rm -f "$TMP/out"
 self_accept "bin/idc: passing cases build" --allow-untested -o "$TMP/out"
-[ "$("$TMP/out" 2>&1)" = "sum 5" ] \
+[ "$("$TMP/out" 2>&1)" = "sum 7" ] \
     && ok "bin/idc: a program whose cases pass runs" \
     || bad "bin/idc: a program whose cases pass runs"
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(4)
+(1, 2):(5)
 (0, 0):(0)
-(2, 2):(5)
+(2, 2):(7)
 
 main(int argc, string[] argv) {
   int r = add(2, 3);
@@ -265,8 +265,8 @@ main(int argc, string[] argv) {
 EOF
 rm -f "$TMP/out"
 self_refuse "bin/idc: a false case fails the build" \
-    "p.id:4: test failed: add(1, 2) = 3, expected 4" --allow-untested -o "$TMP/out"
-grep -qF "p.id:6: test failed: add(2, 2) = 4, expected 5" "$TMP/log" \
+    "p.id:4: test failed: add(1, 2) = 4, expected 5" --allow-untested -o "$TMP/out"
+grep -qF "p.id:6: test failed: add(2, 2) = 6, expected 7" "$TMP/log" \
     && ok "bin/idc: every failing case is reported, not only the first" \
     || bad "bin/idc: every failing case is reported, not only the first"
 [ ! -e "$TMP/out" ] \
@@ -300,13 +300,13 @@ grep -qF "locp/lib/dbl.id:5: test failed: dbl(4) = 8, expected 9" "$TMP/locp.log
 # The cases reach the harness and nothing else: the program's C is the same
 # with them and without them, and carries no counter.
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 ' > "$TMP/p.id"
 printf '%s' 'add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
 ' > "$TMP/q.id"
 ../bin/idc "$TMP/p.id" --emit-c "$TMP/with.c" >/dev/null 2>&1
@@ -377,20 +377,20 @@ sed -i 's/"x??)"/"x??>"/' "$TMP/p.id"
 self_accept "bin/idc: a string case holding trigraph sequences passes" --allow-untested --emit-c /dev/null
 cat > "$TMP/p.id" <<'EOF2'
 measure(string s) {
-  int n = len(s) + 0;
+  int n = len(s) * 2;
 } return int n;
-("abcd"):(4)[time:O(n), mem:O(1)]
-("abcdefgh??/"):(11)[time:O(n), mem:O(1)]
+("abcd"):(8)[time:O(n), mem:O(1)]
+("abcdefgh??/"):(22)[time:O(n), mem:O(1)]
 EOF2
 self_accept "bin/idc: a scaling claim sizes a literal ending in a trigraph by its bytes" --emit-c /dev/null
 
 # --- a case that stops on its own is that case failing -----------------------
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b + 0;
+  int q = a / b + a % b;
 } return int q;
 (6, 0):(0)
-(6, 3):(2)
+(7, 3):(3)
 (7, 0):(1)
 EOF
 self_refuse "bin/idc: a trapping case is reported at its line" \
@@ -414,18 +414,16 @@ self_refuse "bin/idc: a crashing case is reported with its signal" \
 # the callers first. leaf's `traps` case passes and its second case fails.
 cat > "$TMP/p.id" <<'EOF'
 top(int a) {
-  int t = mid(a);
-  t = t + 0;
+  int t = mid(a) * 3;
 } return int t;
-(1):(6)
-(2):(3)
+(1):(36)
+(2):(18)
 
 mid(int a) {
-  int m = leaf(a);
-  m = m + 0;
+  int m = leaf(a) * 2;
 } return int m;
-(1):(6)
-(3):(2)
+(1):(12)
+(3):(4)
 
 leaf(int a) {
   int q = 6 / a;
@@ -435,21 +433,21 @@ leaf(int a) {
 EOF
 export IDC_SHOW_NOT_RUN=1
 self_refuse "bin/idc: a caller of a function whose case failed is reported not run (IDC_SHOW_NOT_RUN lists each)" \
-    "p.id:12: not run: mid(1) depends on leaf, whose case at $TMP/p.id:19 failed" --emit-c /dev/null
-grep -qF "p.id:5: not run: top(1) depends on leaf, whose case at $TMP/p.id:19 failed" "$TMP/log" \
-    && grep -qF "p.id:6: not run: top(2) depends on leaf" "$TMP/log" \
+    "p.id:10: not run: mid(1) depends on leaf, whose case at $TMP/p.id:17 failed" --emit-c /dev/null
+grep -qF "p.id:4: not run: top(1) depends on leaf, whose case at $TMP/p.id:17 failed" "$TMP/log" \
+    && grep -qF "p.id:5: not run: top(2) depends on leaf" "$TMP/log" \
     && ! grep -q 'test failed: \(top\|mid\)' "$TMP/log" \
-    && ! grep -q 'p.id:18' "$TMP/log" \
+    && ! grep -q 'p.id:16' "$TMP/log" \
     && ok "bin/idc: a failure skips every transitive caller's cases, and none of them runs" \
     || bad "bin/idc: a failure skips every transitive caller's cases, and none of them runs ($(cat "$TMP/log"))"
-leaf_at=$(grep -n 'p.id:19: test failed' "$TMP/log" | cut -d: -f1)
-top_at=$(grep -n 'p.id:5: not run' "$TMP/log" | cut -d: -f1)
+leaf_at=$(grep -n 'p.id:17: test failed' "$TMP/log" | cut -d: -f1)
+top_at=$(grep -n 'p.id:4: not run' "$TMP/log" | cut -d: -f1)
 [ -n "$leaf_at" ] && [ -n "$top_at" ] && [ "$leaf_at" -lt "$top_at" ] \
     && ok "bin/idc: a callee's cases run before its callers', whatever the file order" \
     || bad "bin/idc: a callee's cases run before its callers', whatever the file order ($(cat "$TMP/log"))"
 unset IDC_SHOW_NOT_RUN
 self_refuse "bin/idc: without IDC_SHOW_NOT_RUN the cases not run are one summary line, not one line each" \
-    "idc: 1 case(s) failed; 4 more not run, because a function they call failed a case (the first failure was a case of 'leaf' at $TMP/p.id:19; set IDC_SHOW_NOT_RUN=1 to list each case not run)" --emit-c /dev/null
+    "idc: 1 case(s) failed; 4 more not run, because a function they call failed a case (the first failure was a case of 'leaf' at $TMP/p.id:17; set IDC_SHOW_NOT_RUN=1 to list each case not run)" --emit-c /dev/null
 ! grep -q 'not run:' "$TMP/log" \
     && ok "bin/idc: a failing case is followed by one summary line, not a line for each case that depended on it" \
     || bad "bin/idc: a failing case is followed by one summary line, not a line for each case that depended on it ($(cat "$TMP/log"))"
@@ -457,11 +455,10 @@ self_refuse "bin/idc: without IDC_SHOW_NOT_RUN the cases not run are one summary
 # other is independent of caller and leaf, and fails on its own.
 cat > "$TMP/p.id" <<'EOF'
 caller(int a) {
-  int c = leaf(a);
-  c = c + 0;
+  int c = leaf(a) * 2;
 } return int c;
-(1):(6)
-(3):(2)
+(1):(12)
+(3):(4)
 
 other(int a) {
   int o = a * 2;
@@ -476,9 +473,9 @@ leaf(int a) {
 (3):(3)
 EOF
 self_refuse "bin/idc: an independent function's cases still run beside a skipped caller" \
-    "p.id:11: test failed: other(1) = 2, expected 3" --emit-c /dev/null
+    "p.id:10: test failed: other(1) = 2, expected 3" --emit-c /dev/null
 ! grep -q 'not run:' "$TMP/log" \
-    && grep -qF "idc: 2 case(s) failed; 2 more not run, because a function they call failed a case (the first failure was a case of 'leaf' at $TMP/p.id:18" "$TMP/log" \
+    && grep -qF "idc: 2 case(s) failed; 2 more not run, because a function they call failed a case (the first failure was a case of 'leaf' at $TMP/p.id:17" "$TMP/log" \
     && ok "bin/idc: the summary counts the failed cases and the ones not run" \
     || bad "bin/idc: the summary counts the failed cases and the ones not run ($(cat "$TMP/log"))"
 
@@ -487,32 +484,32 @@ self_refuse "bin/idc: an independent function's cases still run beside a skipped
 # does `given`/`then`/`prints`/`eprints`/`calls`.
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b + 0;
+  int q = a / b + a % b;
 } return int q;
 (6, 0):() then traps:("division by zero")
-(6, 3):(2)
+(7, 3):(3)
 EOF
 self_accept "bin/idc: a matching 'traps' check builds" --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b + 0;
+  int q = a / b + a % b;
 } return int q;
 (6, 0):() then traps:("out of bounds")
-(6, 3):(2)
+(7, 3):(3)
 EOF
 self_refuse "bin/idc: a mismatching 'traps' check fails, showing both sides" \
     "p.id:4: test failed: quot(6, 0) trapped: id: division by zero, expected a trap containing out of bounds" --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 quot(int a, int b) {
-  int q = a / b + 0;
+  int q = a / b + a % b;
 } return int q;
-(6, 3):() then traps:("division by zero")
-(6, 2):(3)
+(7, 3):() then traps:("division by zero")
+(7, 2):(4)
 EOF
 self_refuse "bin/idc: a function that returns instead of trapping fails 'traps'" \
-    "p.id:4: test failed: quot(6, 3) expected a trap containing division by zero, but it returned" --emit-c /dev/null
+    "p.id:4: test failed: quot(7, 3) expected a trap containing division by zero, but it returned" --emit-c /dev/null
 
 # A signal death (docs/TESTS.md's "was killed by signal") counts as a trap
 # too, matched against the same text idtc_report would otherwise print.
@@ -585,10 +582,10 @@ self_refuse "bin/idc: an int export read before its setup fails the case, not re
 # later address if the first case's allocation were still live.
 cat > "$TMP/p.id" <<'EOF'
 first_addr(word n) {
-  word a = alloc(n) + 0;
+  word a = alloc(n) + n;
 } return word a;
-(8):(8)
-(64):(8)
+(8):(16)
+(64):(72)
 EOF
 self_accept "bin/idc: each case sees the flat store as if it ran alone" --emit-c /dev/null
 
@@ -667,7 +664,7 @@ self_refuse "bin/idc: a claim carried by one case is rejected" \
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (1, 2):(3)[time:O(n^3)]
 (0, 0):(0)
@@ -676,7 +673,7 @@ self_refuse "bin/idc: an unknown bound is named" "unknown bound 'O(n^3)'" --emit
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (1, 2):(3)[cpu:O(n)]
 (0, 0):(0)
@@ -686,7 +683,7 @@ self_refuse "bin/idc: an unknown constraint is named" "unknown constraint 'cpu'"
 # --- cases that fit their function -------------------------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (a, 2):(3)
 (0, 0):(0)
@@ -695,7 +692,7 @@ self_refuse "bin/idc: a case argument must be a literal" "a test case takes lite
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 (1):(3)
 (0, 0):(0)
@@ -705,7 +702,7 @@ self_refuse "bin/idc: a case with the wrong number of arguments is rejected" \
 
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a + b;
 } return int s;
 ("x", 2):(3)
 (0, 0):(0)
@@ -775,20 +772,21 @@ bump(int k) {
 } return void;
 
 wrap(int k) {
-  bump(k + 0);
+  bump(k);
+  bump(k);
 } return void;
-given mk (0):() then (import cnt)[0]:(1) then (import cnt)[1]:(5) then (import tag):("a") then (import cnt):([1, 5])
-given mk (1):() then (import cnt)[1]:(6)
+given mk (0):() then (import cnt)[0]:(2) then (import cnt)[1]:(5) then (import tag):("a") then (import cnt):([2, 5])
+given mk (1):() then (import cnt)[1]:(7)
 EOF
 self_accept "bin/idc: a check reads an export, an element of it, or the whole list" --allow-untested --emit-c /dev/null
 
-sed -i 's/then (import cnt)\[1\]:(6)$/then (import cnt)[1]:(7)/' "$TMP/p.id"
+sed -i 's/then (import cnt)\[1\]:(7)$/then (import cnt)[1]:(8)/' "$TMP/p.id"
 self_refuse "bin/idc: an element check that does not hold fails the case, naming the element" \
-    "p.id:15: test failed: wrap(1) then (import cnt)[1] = 6, expected 7" --allow-untested --emit-c /dev/null
+    "p.id:16: test failed: wrap(1) then (import cnt)[1] = 7, expected 8" --allow-untested --emit-c /dev/null
 
-sed -i 's/then (import cnt)\[1\]:(7)$/then (import cnt)[1]:(6) then (import cnt):([0, 7])/' "$TMP/p.id"
+sed -i 's/then (import cnt)\[1\]:(8)$/then (import cnt)[1]:(7) then (import cnt):([0, 8])/' "$TMP/p.id"
 self_refuse "bin/idc: a whole-export check that does not hold fails the case, showing the list" \
-    "p.id:15: test failed: wrap(1) then (import cnt) = [0, 6], expected [0, 7]" --allow-untested --emit-c /dev/null
+    "p.id:16: test failed: wrap(1) then (import cnt) = [0, 7], expected [0, 8]" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 mk() {
@@ -829,16 +827,17 @@ mk() {
 } return void;
 
 grow(int k) {
-  push((import cnt), k + 0);
+  push((import cnt), k);
+  push((import cnt), k * 2);
 } return void;
-given mk (0):() then len((import cnt)):(3) then len((import tag)):(2)
-given mk (1):() then len((import cnt)):(3)
+given mk (0):() then len((import cnt)):(4) then len((import tag)):(2)
+given mk (1):() then len((import cnt)):(4)
 EOF
 self_accept "bin/idc: then len((import NAME)) measures a list or a string export" --allow-untested --emit-c /dev/null
 
-sed -i 's/then len((import cnt)):(3)$/then len((import cnt)):(2)/' "$TMP/p.id"
+sed -i 's/then len((import cnt)):(4)$/then len((import cnt)):(2)/' "$TMP/p.id"
 self_refuse "bin/idc: a len check that does not hold fails the case, naming the length" \
-    "p.id:10: test failed: grow(1) then len((import cnt)) = 3, expected 2" --allow-untested --emit-c /dev/null
+    "p.id:11: test failed: grow(1) then len((import cnt)) = 4, expected 2" --allow-untested --emit-c /dev/null
 
 # A check may read a field of a struct export, nested fields, an element of a
 # list field and the length of one, and the value is held to the field's type.
@@ -858,17 +857,19 @@ book_grow(Book b, int n) {
 } return void;
 
 book_add(int n) {
-  book_grow((import bk), n + 0);
+  book_grow((import bk), n);
+  book_grow((import bk), n);
 } return void;
-given book_open (1):() then (import bk).pages.count:(3) then len((import bk).pages.starts):(3)
-given book_open (2):() then (import bk).pages.starts[2]:(2) then (import bk).title:("t") then (import bk).pages.starts:([0, 0, 2])
+given book_open (1):() then (import bk).pages.count:(4) then len((import bk).pages.starts):(4)
+given book_open (2):() then (import bk).pages.starts[2]:(2) then (import bk).title:("t") then (import bk).pages.starts:([0, 0, 2, 2])
 EOF2
 cat > "$FLDIR/run.id" <<'EOF2'
 book_push(int n) {
   push((import bk).pages.starts, n);
+  push((import bk).pages.starts, n * 2);
 } return void;
-given book_open (7):() then (import bk).pages.starts[2]:(7) then len((import bk).pages.starts):(3)
-given book_open (8):() then (import bk).pages.starts:([0, 0, 8])
+given book_open (7):() then (import bk).pages.starts[2]:(7) then len((import bk).pages.starts):(4)
+given book_open (8):() then (import bk).pages.starts:([0, 0, 8, 16])
 
 main(int argc, string[] argv) {
 } return int 0;
@@ -878,18 +879,18 @@ if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; the
 else
     bad "bin/idc: a check reads a field, a nested field, an element and the length of a list field ($(grep -v warning "$TMP/log" | head -1))"
 fi
-sed -i 's/then (import bk).pages.count:(3)/then (import bk).pages.count:(4)/' "$FLDIR/main.id"
+sed -i 's/then (import bk).pages.count:(4)/then (import bk).pages.count:(5)/' "$FLDIR/main.id"
 if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     bad "bin/idc: a field check that does not hold fails the case (built; it should not have)"
-elif grep -qF "main.id:14: test failed: book_add(1) then (import bk).pages.count = 3, expected 4" "$TMP/log"; then
+elif grep -qF "main.id:15: test failed: book_add(1) then (import bk).pages.count = 4, expected 5" "$TMP/log"; then
     ok "bin/idc: a field check that does not hold fails the case, naming the path"
 else
     bad "bin/idc: a field check that does not hold fails the case, naming the path ($(grep -v warning "$TMP/log" | head -1))"
 fi
-sed -i 's/then (import bk).pages.count:(4)/then (import bk).pages.count:(3)/; s/then (import bk).title:("t")/then (import bk).title:(5)/' "$FLDIR/main.id"
+sed -i 's/then (import bk).pages.count:(5)/then (import bk).pages.count:(4)/; s/then (import bk).title:("t")/then (import bk).title:(5)/' "$FLDIR/main.id"
 if ../bin/idc "$FLDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     bad "bin/idc: a field check holds its value to the field's type (built; it should not have)"
-elif grep -qF "main.id:15: error: this case gives a int where a string is required" "$TMP/log"; then
+elif grep -qF "main.id:16: error: this case gives a int where a string is required" "$TMP/log"; then
     ok "bin/idc: a field check holds its value to the field's type"
 else
     bad "bin/idc: a field check holds its value to the field's type ($(grep -v warning "$TMP/log" | head -1))"
@@ -911,10 +912,11 @@ pt_set(Pt q, int d) {
 } return void;
 
 pt_move(int d) {
-  pt_set((import pt), d + 0);
+  pt_set((import pt), d);
+  pt_set((import pt), d);
 } return void;
 given pt_open (1):() then (import pt).y:(2)
-given pt_open (2):() then (import pt).x:(3)
+given pt_open (2):() then (import pt).x:(5)
 EOF2
 cat > "$CKDIR/run.id" <<'EOF2'
 main(int argc, string[] argv) {
@@ -928,7 +930,7 @@ fi
 printf 'struct Pt {\n  int y;\n  int x;\n}\n' > "$CKDIR/types/pt.id"
 if ../bin/idc "$CKDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     bad "bin/idc: reordering a struct's fields re-runs a field check (built; it should not have)"
-elif grep -qF "main.id:13: test failed: pt_move(1) then (import pt).y = 1, expected 2" "$TMP/log"; then
+elif grep -qF "main.id:14: test failed: pt_move(1) then (import pt).y = 1, expected 2" "$TMP/log"; then
     ok "bin/idc: reordering a struct's fields re-runs a field check"
 else
     bad "bin/idc: reordering a struct's fields re-runs a field check ($(grep -v warning "$TMP/log" | head -1))"
@@ -1029,10 +1031,11 @@ bump(int k) {
 } return void;
 
 wrap(int k) {
-  bump(k + 0);
+  bump(k);
+  bump(k);
 } return void;
 given mk (0):() then (import cnt)[(import slot)]:(5)
-given mk (1):() then (import cnt)[(import slot)]:(6)
+given mk (1):() then (import cnt)[(import slot)]:(7)
 EOF2
 cat > "$IXDIR/run.id" <<'EOF2'
 main(int argc, string[] argv) {
@@ -1046,7 +1049,7 @@ fi
 printf 'int slot = 0;\n' > "$IXDIR/conf.id"
 if ../bin/idc "$IXDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
     bad "bin/idc: a changed index constant re-runs the case (built; it should not have)"
-elif grep -qF "main.id:13: test failed: wrap(0) then (import cnt)[(import slot)] = 1, expected 5" "$TMP/log"; then
+elif grep -qF "main.id:14: test failed: wrap(0) then (import cnt)[(import slot)] = 2, expected 5" "$TMP/log"; then
     ok "bin/idc: a changed index constant re-runs the case"
 else
     bad "bin/idc: a changed index constant re-runs the case ($(grep -v warning "$TMP/log" | head -1))"
@@ -1664,9 +1667,9 @@ self_accept "bin/idc: a function named in then NAME(LIT, ...) is a fixture, exem
 # --- a build whose cases cannot run here says why ----------------------------
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 EOF
 self_refuse "bin/idc: a build for another platform with cases is refused" \
@@ -1682,14 +1685,14 @@ self_accept "bin/idc: a --freestanding build with passing cases builds its objec
     || bad "bin/idc: the --freestanding object exists after its cases passed"
 cat > "$TMP/p.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(4)
+(1, 2):(5)
 (0, 0):(0)
 EOF
 rm -f "$TMP/fs2.o"
 self_refuse "bin/idc: a failing case fails a --freestanding build, naming the case" \
-    "p.id:4: test failed: add(1, 2) = 3, expected 4" --freestanding -o "$TMP/fs2.o"
+    "p.id:4: test failed: add(1, 2) = 4, expected 5" --freestanding -o "$TMP/fs2.o"
 [ ! -e "$TMP/fs2.o" ] \
     && ok "bin/idc: a --freestanding build whose case fails writes no object" \
     || bad "bin/idc: a --freestanding build whose case fails writes no object"
@@ -1706,7 +1709,7 @@ asm "x86_64-unknown-none" in8(word p) {
 } return word ret;
 
 port_byte(word p) {
-  word v = in8(p) + 0;
+  word v = in8(p) % 256;
 } return word v;
 
 kbd_scan() {
@@ -1715,9 +1718,9 @@ kbd_scan() {
 EOF
 cat > "$TMP/fs/add.id" <<'EOF'
 add(int a, int b) {
-  int s = a + b + b - b;
+  int s = a * 2 + b;
 } return int s;
-(1, 2):(3)
+(1, 2):(4)
 (0, 0):(0)
 EOF
 ../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs3.o" >"$TMP/log" 2>&1
@@ -1795,14 +1798,15 @@ asm "x86_64-unknown-linux-gnu" dbl(word a) {
   "add %[ret], %[ret]"
 } return word ret;
 
-twice(word a) {
-  word r = dbl(a) + 0;
+quad(word a) {
+  word h = dbl(a);
+  word r = dbl(h);
 } return word r;
-(3):(6)
+(3):(12)
 (0):(1)
 EOF
     ../bin/idc "$TMP/fs" --freestanding -o "$TMP/fs6.o" >"$TMP/log" 2>&1
-    grep -qF "io.id:15: test failed: twice(0) = 0, expected 1" "$TMP/log" \
+    grep -qF "io.id:16: test failed: quad(0) = 0, expected 1" "$TMP/log" \
         && ok "bin/idc: an asm function with a row for the build host runs in a --freestanding build's harness" \
         || bad "bin/idc: an asm function with a row for the build host runs in a --freestanding build's harness ($(head -1 "$TMP/log"))"
 fi
@@ -2043,16 +2047,16 @@ st() {
 } return void;
 
 apply(func(int) return int f, int x) {
-  int r = f(x) + 0;
+  int r = f(x) * 2;
 } return int r;
-given st ((import g), 3):(6)
-given st ((import g), 5):(10)
+given st ((import g), 3):(12)
+given st ((import g), 5):(20)
 EOF
 self_accept "bin/idc: a case passes a function value in through (import NAME)" --allow-untested --emit-c /dev/null
 
-sed -i 's/:(10)$/:(11)/' "$TMP/p.id"
+sed -i 's/:(20)$/:(21)/' "$TMP/p.id"
 self_refuse "bin/idc: a false case that calls through a function value fails the build" \
-    "p.id:15: test failed: apply((import g), 5) = 10, expected 11" --allow-untested --emit-c /dev/null
+    "p.id:15: test failed: apply((import g), 5) = 20, expected 21" --allow-untested --emit-c /dev/null
 
 # Two functions that differ only in which function they pass are two
 # functions: a function named as a value keeps its name in the fingerprint,
@@ -2066,30 +2070,29 @@ tick(int n) {
 (2):(2)
 
 tock(int n) {
-  string line = "tock " + n;
-  print(line);
+  print("tock " + n * 2);
 } return void;
 (3):(3)
 (4):(4)
 
 run(func(int) return void step, int dt) {
-  int pad = dt;
   step(dt);
+  step(dt * 2);
 } return void;
 (tick, 5):(tick, 5)
 (tock, 6):(tock, 6)
 EOF
 cat > "$TMP/fp/b.id" <<'EOF'
 pass_tick(int dt) {
-  int pad = dt;
   run(tick, dt);
+  print("passed " + dt);
 } return void;
 (7):(7)
 (8):(8)
 
 pass_tock(int dt) {
-  int pad = dt;
   run(tock, dt);
+  print("passed " + dt);
 } return void;
 (7):(7)
 (8):(8)
@@ -2099,13 +2102,13 @@ main(int argc, string[] argv) {
   pass_tock(2);
 } return int 0;
 EOF
-if ../bin/idc "$TMP/fp" --allow-untested -o "$TMP/fpbin" >"$TMP/log" 2>&1 && [ "$("$TMP/fpbin")" = "$(printf 'tick 1\ntock 2')" ]; then
+if ../bin/idc "$TMP/fp" --allow-untested -o "$TMP/fpbin" >"$TMP/log" 2>&1 && [ "$("$TMP/fpbin")" = "$(printf 'tick 1\ntick 2\npassed 1\ntock 4\ntock 8\npassed 2')" ]; then
     ok "bin/idc: functions differing only in the function they pass are distinct"
 else
     bad "bin/idc: functions differing only in the function they pass are distinct ($(head -1 "$TMP/log"))"
 fi
 ../bin/idc "$TMP/fp" --fingerprints >"$TMP/log" 2>&1
-grep -qF "e:c(run:fv(tick),v0)}" "$TMP/log" && grep -qF "e:c(v0:v1)}" "$TMP/log" \
+grep -qF "e:c(run:fv(tick),v0);" "$TMP/log" && grep -qF "{e:c(v0:v1);e:c(v0:b*(v1,I2))}" "$TMP/log" \
     && ok "bin/idc: a fingerprint keeps a function value's name and numbers a call through a parameter" \
     || bad "bin/idc: a fingerprint keeps a function value's name and numbers a call through a parameter"
 
@@ -2119,10 +2122,10 @@ twice(int n) {
 (0):(0)
 
 apply(func(int) return int f, int x) {
-  int r = f(x) + 0;
+  int r = f(x) * 2;
 } return int r;
-(twice, 3):(6)
-(twice, 5):(10)
+(twice, 3):(12)
+(twice, 5):(20)
 
 apply_into(func(int) return int f, int[] xs) {
   int v = f(xs[0]);
@@ -2133,11 +2136,11 @@ apply_into(func(int) return int f, int[] xs) {
 EOF
 self_accept "bin/idc: a case passes a function by name" --emit-c /dev/null
 
-sed -i 's/^(twice, 5):(10)$/(twice, 5):(11)/' "$TMP/p.id"
+sed -i 's/^(twice, 5):(20)$/(twice, 5):(21)/' "$TMP/p.id"
 self_refuse "bin/idc: a false case with a function argument fails the build" \
-    "p.id:11: test failed: apply(twice, 5) = 10, expected 11" --emit-c /dev/null
+    "p.id:11: test failed: apply(twice, 5) = 20, expected 21" --emit-c /dev/null
 
-sed -i 's/^(twice, 5):(11)$/(twice, 5):(10)/; s/^(twice, \[0\]):(twice, \[0, 0\])$/(twice, [0]):(twice, [0, 1])/' "$TMP/p.id"
+sed -i 's/^(twice, 5):(21)$/(twice, 5):(20)/; s/^(twice, \[0\]):(twice, \[0, 0\])$/(twice, [0]):(twice, [0, 1])/' "$TMP/p.id"
 self_refuse "bin/idc: a false case comparing a list after a function argument fails the build" \
     "p.id:18: test failed" --emit-c /dev/null
 
@@ -2149,7 +2152,7 @@ shout(string s) {
 ("b"):("b")
 
 apply(func(int) return int f, int x) {
-  int r = f(x) + 0;
+  int r = f(x) * 2;
 } return int r;
 (shout, 3):(6)
 (nope, 5):(10)
@@ -2196,7 +2199,7 @@ self_refuse "bin/idc: a case's bind must make the function type the position wan
 # --freestanding has no host to run a harness on and builds through LLVM only.
 cat > "$TMP/p.id" <<'EOF'
 run(func(int) return int step, int dt) {
-  int r = step(dt) + 0;
+  int r = step(dt) * 2;
 } return int r;
 
 twice(int n) {
@@ -2204,7 +2207,8 @@ twice(int n) {
 } return int r;
 
 use(int n) {
-  int r = run(twice, n) + 0;
+  int m = n * 3;
+  int r = run(twice, m);
 } return int r;
 EOF
 self_accept "bin/idc: a --freestanding object passes and calls a function value" --allow-untested --freestanding -o "$TMP/lib.o"
@@ -2369,10 +2373,10 @@ helper(int x) {
 (5):(6)
 
 runner(int n) {
-  int h = helper(n + 0);
+  int h = helper(n * 2);
 } return int h;
-(1):(2) then calls helper:(1)
-(2):(3) then calls helper:(2)
+(1):(3) then calls helper:(2)
+(2):(5) then calls helper:(4)
 EOF
 self_accept "bin/idc: a matching 'calls NAME:(ARGS)' clause builds" --emit-c /dev/null
 
@@ -2384,13 +2388,13 @@ helper(int x) {
 (5):(6)
 
 runner(int n) {
-  int h = helper(n + 0);
+  int h = helper(n * 2);
 } return int h;
-(1):(2) then calls helper:(99)
-(2):(3) then calls helper:(2)
+(1):(3) then calls helper:(99)
+(2):(5) then calls helper:(4)
 EOF
 self_refuse "bin/idc: 'calls NAME:(ARGS)' with the wrong arguments fails" \
-    "p.id:10: test failed: runner(1) calls helper(99) did not match any of the 1 recorded call(s) to 'helper': helper(1)" \
+    "p.id:10: test failed: runner(1) calls helper(99) did not match any of the 1 recorded call(s) to 'helper': helper(2)" \
     --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
@@ -2488,16 +2492,16 @@ helper(int x) {
 (5):(6)
 
 mid(int x) {
-  int y = helper(x + 0);
+  int y = helper(x * 2);
 } return int y;
-(1):(2)
-(5):(6)
+(1):(3)
+(5):(11)
 
 runner(int n) {
-  int h = mid(n + 0);
+  int h = mid(n * 2);
 } return int h;
-(1):(2) then calls helper:(1)
-(2):(3) then calls helper:(2)
+(1):(5) then calls helper:(4)
+(2):(9) then calls helper:(8)
 EOF
 self_accept "bin/idc: a transitive call (two levels down) is recorded" --emit-c /dev/null
 
@@ -2731,7 +2735,7 @@ self_unflagged "bin/idc: 'main' is excluded from the forwarder error" \
 # parameter add_one has).
 cat > "$TMP/p.id" <<'EOF'
 real_add(int x, int y) {
-  int r = x + y + 0;
+  int r = x * 2 + y;
 } return int r;
 
 add_one(int x) {
@@ -2760,7 +2764,7 @@ fwd_used(int x) {
 EOF
 cat > "$TMP/fwdval/apply.id" <<'EOF'
 apply_fn(func(int) return int f, int x) {
-  int r = f(x) + 0;
+  int r = f(x) * 2;
 } return int r;
 
 main(int argc, string[] argv) {
@@ -3024,7 +3028,7 @@ fa(int ia, int ib) {
   int y = ib;
   int w = ia;
 } chain (int ia, int ib) {
-  int r = x + y;
+  int r = x + y + w;
 } return int r;
 
 fb(int ia, int ib) {
@@ -3032,7 +3036,7 @@ fb(int ia, int ib) {
   int y = ib;
   int w = ia;
 } chain (int ia, int ib) {
-  int r = x + y;
+  int r = x + y + w;
 } return int r;
 
 main(int argc, string[] argv) {
@@ -3111,7 +3115,7 @@ g(int x) {
   int a3 = a2;
 } chain (int x) {
   int a4 = a3;
-} return void;
+} return int a4;
 EOF
 self_accept "bin/idc: a chain segment after a builtin call elsewhere does not misname 'alloc'" \
     --allow-untested --emit-c /dev/null
@@ -3299,19 +3303,21 @@ fi
 # names the teardown touches. (kill, mkdtemp and setpgid as globals clash with
 # <signal.h>, <stdlib.h> and <unistd.h>, which the harness always included.)
 mkdir -p "$TMP/hg" "$TMP/hf"
+hn_bodies=("a * 2 + b" "a - b * 2" "a * b + a" "a * a + b" "b * 2 - a" "a + b + b" "(a + b) * b")
+hn_wants=(4 -3 3 3 3 5 6)
 hn_i=0
 for hn_f in fstat poll opendir kill mkdtemp open setpgid; do
+    printf '%s\n' "$hn_f(int a, int b) {" "  int s = ${hn_bodies[$hn_i]};" "} return int s;" "(1, 2):(${hn_wants[$hn_i]})" "(0, 0):(0)" > "$TMP/hf/$hn_f.id"
     hn_i=$((hn_i + 1))
-    printf '%s\n' "$hn_f(int a, int b) {" "  int s = a * $hn_i + b;" "} return int s;" "(1, 2):($((hn_i + 2)))" "(0, 0):(0)" > "$TMP/hf/$hn_f.id"
 done
-printf '%s\n' 'main(int argc, string[] argv) {' '  print(fstat(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("2\n")' '(2, ["a", "b"]):(0) then prints:("3\n")' > "$TMP/hf/main.id"
+printf '%s\n' 'main(int argc, string[] argv) {' '  print(fstat(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("3\n")' '(2, ["a", "b"]):(0) then prints:("5\n")' > "$TMP/hf/main.id"
 hn_i=0
 for hn_f in fstat poll opendir open; do
     hn_i=$((hn_i + 1))
     printf '%s\n' "sys_$hn_f() {" "  export int[] $hn_f = [];" "} return void export $hn_f;" "():() then len((import $hn_f)):(0)" "given sys_$hn_f ():() then len((import $hn_f)):(0)" > "$TMP/hg/sys_$hn_f.id"
 done
 printf '%s\n' 'main(int argc, string[] argv) {' '  print(argc);' '} return int 0;' '(1, ["a"]):(0) then prints:("1\n")' '(2, ["a", "b"]):(0) then prints:("2\n")' > "$TMP/hg/main.id"
-if ../bin/idc "$TMP/hf" -o "$TMP/hf.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/hf.bin" x)" = "3" ]; then
+if ../bin/idc "$TMP/hf" -o "$TMP/hf.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/hf.bin" x)" = "5" ]; then
     ok "functions named fstat, poll, opendir, kill, mkdtemp, open and setpgid build and pass their cases"
 else
     bad "functions named like the teardown's libc calls build ($(head -1 "$TMP/log"))"
@@ -3333,9 +3339,9 @@ esac
 # The line is skipped and its newline is not, so a diagnostic below it keeps the
 # line number the file shows. Anywhere else a `#!` is an error (tests/invalid/).
 SB="$TMP/sb.id"
-printf '%s\n' '#!/usr/bin/env idrun' 'add(int a, int b) {' '  int s = a + b + b - b;' '} return int s;' '(1, 2):(3)' '(0, 0):(0)' > "$SB"
-printf '%s\n' 'main(int argc, string[] argv) {' '  print(add(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("2\n")' '(2, ["a", "b"]):(0) then prints:("3\n")' >> "$SB"
-if ../bin/idc "$SB" -o "$TMP/sb.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/sb.bin" x)" = "3" ]; then
+printf '%s\n' '#!/usr/bin/env idrun' 'add(int a, int b) {' '  int s = a * 2 + b;' '} return int s;' '(1, 2):(4)' '(0, 0):(0)' > "$SB"
+printf '%s\n' 'main(int argc, string[] argv) {' '  print(add(argc, 1));' '} return int 0;' '(1, ["a"]):(0) then prints:("3\n")' '(2, ["a", "b"]):(0) then prints:("5\n")' >> "$SB"
+if ../bin/idc "$SB" -o "$TMP/sb.bin" >"$TMP/log" 2>&1 && [ "$("$TMP/sb.bin" x)" = "5" ]; then
     ok "a script with a #! first line builds with every rule and runs"
 else
     bad "a script with a #! first line builds and runs ($(head -1 "$TMP/log"))"

@@ -1,5 +1,6 @@
 kidsof(Node nd) {
   Node[] k = nd.kids;
+  print(len(k));
 } return Node[] k;
 
 via(int n) {

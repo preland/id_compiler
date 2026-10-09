@@ -1,13 +1,18 @@
 // Fixtures that look for scratch directories buildrun left behind: a directory
-// the work function should have removed shows up as an entry of /tmp that starts
-// with the probe prefix its case gave it.
+// the work function should have removed shows up as an entry of the scratch root
+// ($TMPDIR, which a test case has to itself, or /tmp when it is unset) that
+// starts with the probe prefix its case gave it.
 
-// How many entries of /tmp start with "buildrun_probe_".
+// How many entries of the scratch root start with "buildrun_probe_".
 br_t_leaked() {
-  string[] names = exec_ls("/tmp");
+  string tmp_root = env_text("TMPDIR");
+  if (len(tmp_root) == 0) {
+    tmp_root = "/tmp";
+  }
+  string[] names = exec_ls(tmp_root);
+} chain () {
   int n = 0;
   int i = 0;
-} chain () {
   while (i < len(names)) {
     n = n + str_starts(names[i], "buildrun_probe_");
     i = i + 1;

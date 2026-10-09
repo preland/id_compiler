@@ -5,6 +5,8 @@
 //   sd_c1  P(1)         sd_c3  Q("s", "s", "s")
 //   sd_cb  P(1, "s")    sd_cx  P(1, 1) with no declaration after it
 //   sd_big a literal that is a word, for the narrowing rule
+//   sd_cf  f(1), a call, for the rule that an argument is not one
+//   sd_cd  P(f(1), 1)
 
 sd_ctor_fixture() {
   sd_use_fixture();
@@ -18,6 +20,9 @@ sd_ctor_fixture() {
   export int sd_c2 = node_call("P", [(import sd_one), (import sd_one)]);
   export int sd_d2 = node_decl("P", "q", (import sd_c2), 0);
   export int sd_neg = 0 - 1;
+} chain () {
+  export int sd_cf = node_call("f", [(import sd_one)]);
+  export int sd_cd = node_call("P", [(import sd_cf), (import sd_one)]);
 } return void;
 ():() then calls node_txt2:("int", "99", 99, 1)
 ():() then init_units:(0)

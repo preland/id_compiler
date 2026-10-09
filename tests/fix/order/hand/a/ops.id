@@ -4,7 +4,7 @@ bump(int[] c) {
 } return int n;
 
 diff(int a, int b) {
-  int d = a - b;
+  int d = a * 2 - b;
 } return int d;
 
 twice(int n) {

@@ -1,0 +1,5 @@
+// EXPECT: local 'pad' of 'main' is declared and never read [E0410]
+main(int argc, string[] argv) {
+  int pad = argc;
+  int n = argc + 1;
+} return int n;

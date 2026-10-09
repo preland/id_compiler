@@ -290,10 +290,10 @@ string[] dce_list = ["l"];
 EOF
 cat > "$dce/main.id" <<'EOF'
 dead_fn(int k) {
-  int n = (import dce_dead) + k;
+  int n = (import dce_dead) * 2 + k;
 } return int n;
-(0):(11)
-(1):(12)
+(0):(22)
+(1):(23)
 
 main(int argc, string[] argv) {
   print((import dce_used) + (import dce_top)[0] + (import dce_top)[1]);
@@ -356,10 +356,10 @@ string[] names = ["a", "b", "c"];
 EOF
 cat > "$proj/main.id" <<'EOF'
 name_at(int i) {
-  string s = (import names)[i];
+  string s = (import names)[i] + (import names)[0];
 } return string s;
-(0):("a")
-(2):("c")
+(0):("aa")
+(2):("ca")
 
 count_plus(int extra) {
   int n = len((import names)) + extra;
@@ -468,12 +468,12 @@ int lib_k = 7;
 EOF
 cat > "$sub/lib/one/add.id" <<'EOF'
 lib_one(int a) {
-  int r = a + (import lib_k);
+  int r = a * 2 + (import lib_k);
 } return int r;
 EOF
 cat > "$sub/lib/two/mul.id" <<'EOF'
 lib_two(int a) {
-  int r = a * (import lib_k);
+  int r = (a + 1) * (import lib_k);
 } return int r;
 EOF
 cat > "$sub/extra/extra.id" <<'EOF'
@@ -493,7 +493,7 @@ sub_app() {
 }
 
 if sub_app 'import "../lib/one"' '  int x = lib_one(1);
-  print(x);' && [ "$("$TMP/sub.bin")" = 8 ]; then
+  print(x);' && [ "$("$TMP/sub.bin")" = 9 ]; then
     ok "conf.id: a subdirectory imported on its own reads its root's constant"
 else
     bad "conf.id: a subdirectory imported on its own reads its root's constant ($(head -1 "$TMP/sub.err"))"
@@ -508,7 +508,7 @@ fi
 
 if sub_app 'import "../lib"' '  int x = lib_one(1);
   int y = extra_f(x);
-  print(y);' && [ "$("$TMP/sub.bin")" = 7 ]; then
+  print(y);' && [ "$("$TMP/sub.bin")" = 8 ]; then
     ok "conf.id: importing the whole root still reads its constants and imports"
 else
     bad "conf.id: importing the whole root still reads its constants and imports ($(head -1 "$TMP/sub.err"))"
@@ -517,7 +517,7 @@ fi
 if sub_app 'import "../lib/one"
 import "../lib/two"' '  int x = lib_one(1);
   int y = lib_two(x);
-  print(y);' && [ "$("$TMP/sub.bin")" = 56 ]; then
+  print(y);' && [ "$("$TMP/sub.bin")" = 70 ]; then
     ok "conf.id: two subdirectories of one root share its constant once"
 else
     bad "conf.id: two subdirectories of one root share its constant once ($(head -1 "$TMP/sub.err"))"
@@ -525,7 +525,7 @@ fi
 
 if sub_app 'import "../lib/two"
 import "../lib"' '  int x = lib_two(2);
-  print(x);' && [ "$("$TMP/sub.bin")" = 14 ]; then
+  print(x);' && [ "$("$TMP/sub.bin")" = 21 ]; then
     ok "conf.id: a subdirectory and its whole root share its constant once"
 else
     bad "conf.id: a subdirectory and its whole root share its constant once ($(head -1 "$TMP/sub.err"))"
@@ -703,9 +703,9 @@ fi
 # emitted C -- a scaling claim has to be on two cases of different sizes.
 cat > "$TMP/cases.id" <<'EOF'
 add(int a, int b) {
-  int sum = a + b;
+  int sum = a * 2 + b;
 } return int sum;
-(1, 2):(3)[time:O(1)]
+(1, 2):(4)[time:O(1)]
 (0, 0):(0)[time:O(1)]
 
 main(int argc, string[] argv) {
@@ -716,7 +716,7 @@ EOF
 $BIN_IDC "$TMP/cases.id" --emit-c "$TMP/cases_self.c" >/dev/null 2>&1
 if [ -s "$TMP/cases_self.c" ] && ! grep -q '\[time:' "$TMP/cases_self.c" \
    && $BIN_IDC "$TMP/cases.id" -o "$TMP/cases.bin" >/dev/null 2>&1 \
-   && [ "$("$TMP/cases.bin")" = "5" ]; then
+   && [ "$("$TMP/cases.bin")" = "7" ]; then
     ok "a program with test cases builds, passes its cases, and leaves no trace in the C"
 else
     bad "a program with test cases builds, passes its cases, and leaves no trace in the C"

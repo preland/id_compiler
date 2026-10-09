@@ -9,5 +9,12 @@ jg_t_file(string jg_nm, string jg_text) {
 } chain (string jg_nm, string jg_text) {
   int jg_wr = exec_file_put((import jg_t_path), jg_text, 420);
 } return void export jg_t_path;
-("jg_fix.id", "x"):() then len((import jg_t_path)):(26)
-("a.id", "yy"):() then len((import jg_t_path)):(21)
+("jg_fix.id", "x"):() then jg_t_leaf:("jg_fix.id")
+("a.id", "yy"):() then jg_t_leaf:("a.id")
+
+// The file name in jg_t_path, which does not depend on where the harness put the scratch directory.
+jg_t_leaf() {
+  string jg_lf = path_base((import jg_t_path));
+} return string jg_lf;
+given jg_t_file("b.id", "z") ():("b.id")
+given jg_t_file("jg_fix.id", "x") ():("jg_fix.id")

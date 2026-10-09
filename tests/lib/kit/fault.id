@@ -1,18 +1,19 @@
 // Functions that fail, and one that returns nothing.
 
-// The element at an index. An index outside the list traps.
+// The element at an index, as its distance from the first element. An index
+// outside the list traps.
 kit_nth(int[] kt_list, int kt_at) {
-  int kt_got = kt_list[kt_at];
+  int kt_got = kt_list[kt_at] - kt_list[0];
 } return int kt_got;
-([5, 6], 1):(6)
-([7], 0):(7)
+([5, 6], 1):(1)
+([9, 4, 12], 2):(3)
 
-// Integer division; a zero divisor traps.
+// Integer division rounded up, for positive operands; a zero divisor traps.
 kit_div(int kt_p, int kt_q) {
-  int kt_r = kt_p / kt_q;
+  int kt_r = (kt_p + kt_q - 1) / kt_q;
 } return int kt_r;
-(7, 2):(3)
-(-9, 3):(-3)
+(7, 2):(4)
+(9, 3):(3)
 
 // A function with no result that writes n words to the flat store: the host
 // gets only the status, and the store's high-water mark has to come back down.

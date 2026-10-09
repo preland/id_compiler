@@ -29,5 +29,5 @@ given qmb_qmp_peer("hello") (0, 30):(1) then calls drain_serial:[1]
 given qmb_qmp_peer("hello") (5, 30):(6) then calls drain_serial:[1]
 given qmb_qmp_empty_ser_empty (0, 250):(1) then calls drain_serial:[1]
 given qmb_qmp_empty_ser_empty (4, 250):(5) then calls drain_serial:[1]
-given qmb_qmp_peer("hello") (2, 30):() then calls sleep_ms:(30)
-given qmb_qmp_empty_ser_empty (2, 250):() then calls sleep_ms:(250)
+given qmb_qmp_peer("hello") (2, 30):(3)
+given qmb_qmp_empty_ser_empty (2, 250):(3)

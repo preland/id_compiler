@@ -66,6 +66,14 @@ string litd_why = "two functions that differ only in the values of their literal
 // checks/wsc/report.id); its help names the expression, so it is built where it is
 // reported.
 string wsc_why = "a function that is one operation on its inputs is a second spelling of that operation, and every reader has to open it to learn it is nothing more";
+// The why and help lines of E0409 (an operation that cannot change its value) and
+// E0410 (a local that is declared and never read), mid/form/decomp/checks/noop/.
+// Both are padding, and padding is how a rule gets satisfied on paper: a rule
+// that pushes someone to add it is the thing to report, so the help says so.
+string noop_why = "an operation that cannot change its value is padding: it looks like work, hides the real expression from the reader, and leaves the code doing exactly what it did without it";
+string noop_help = "remove it; if a rule made you add it, that rule needs a different fix -- report it";
+string unread_why = "a local that is declared and never read is dead weight: every reader has to find out that nothing uses it, and it can be added only to satisfy a rule on paper";
+string unread_help = "remove the declaration; if a rule made you add it, that rule needs a different fix -- report it";
 // The why and help lines of E0303 for a variable the standard library also
 // declares (mid/names/symbols/check/conflict/more/core/ext/check/pass/var/).
 string svd_why = "a name must keep one type across the whole program, the standard library included, so that one name always means one kind of value wherever it appears";

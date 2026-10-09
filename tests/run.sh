@@ -216,11 +216,11 @@ expect_output "calc precedence/parens/unary/%" "= 13" \
 env -u IDC_NO_STD $BIN_IDC ../compiler/parse -o "$TMP/idparse" 2>/dev/null || bad "idc-in-id parser compiles"
 cat > "$TMP/p_fn.id" <<'EOF'
 add(int x, int y) {
-  int sum = x + y;
+  int sum = x * 2 + y;
 } return int sum;
 EOF
 expect_output "parser: function/params/decl" \
-    "(func add (params (param int x) (param int y)) int (body (decl int sum (+ x y))) (return sum))" \
+    "(func add (params (param int x) (param int y)) int (body (decl int sum (+ (* x 2) y))) (return sum))" \
     "$("$TMP/idlex" < "$TMP/p_fn.id" | "$TMP/idparse" ast)"
 cat > "$TMP/p_ctrl.id" <<'EOF'
 countdown(int n) {
@@ -260,17 +260,17 @@ expect_output "parser: ast of a chain function shows the seam" \
 # --- stage 3 end to end: id source -> (id lexer) -> (id parser+codegen) -> C,
 #     then compiled by cc and run. The whole front+middle is written in id.
 cat > "$TMP/g_sq.id" <<'EOF'
-square(int n) {
-  int r = n * n;
+twice_square(int n) {
+  int r = n * n * 2;
 } return int r;
 
 main(int argc, string[] argv) {
-  int a = square(6);
+  int a = twice_square(6);
 } return int a;
 EOF
 "$TMP/idlex" < "$TMP/g_sq.id" | "$TMP/idparse" > "$TMP/g_sq.c"
-cc -std=c11 "$TMP/g_sq.c" -o "$TMP/g_sq" 2>/dev/null || bad "emitted C (square) compiles"
-"$TMP/g_sq"; expect_output "codegen: square(6) exit code" "36" "$?"
+cc -std=c11 "$TMP/g_sq.c" -o "$TMP/g_sq" 2>/dev/null || bad "emitted C (twice_square) compiles"
+"$TMP/g_sq"; expect_output "codegen: twice_square(6) exit code" "72" "$?"
 cat > "$TMP/g_sum.id" <<'EOF'
 sumto(int n) {
   int s = 0;
@@ -406,7 +406,8 @@ guard_accept "an argument that widens" 'main(int argc, string[] argv) {
 } return int 0;
 
 take(word a) {
-  print(a + 1);
+  word b = a * 2;
+  print(b);
 } return void;'
 
 guard_reject "action limit" 'main(int argc, string[] argv) {
@@ -1231,9 +1232,9 @@ if want editor; then
 fi
 
 # --- the mutation score. tools/mutscore (an `id` program) breaks a scratch COPY
-#     of fixtures/mutscore one function at a time. The fixture has four
-#     mutants and is built so that exactly one survives: three killed and one
-#     survived is 75.0, and the survivor is the `>` that became `>=`. The
+#     of fixtures/mutscore one function at a time. The fixture has seven
+#     mutants and is built so that exactly one survives: six killed and one
+#     survived is 85.7, and the survivor is the `>` that became `>=`. The
 #     section also proves the source tree's bytes are the same afterwards.
 #     Under a minute: the fixture builds without the standard library, and
 #     each run stops itself before the minute is up and is resumable.
@@ -1250,9 +1251,9 @@ if want mutscore; then
             grep -q ', 0 left\|is complete' "$TMP/ms_run.out" && break
         done
         tsv=$("$TMP/mutscore" report "$TMP/ms_out" --tsv 2>&1)
-        expect_output "mutscore scores the fixture 3 killed, 1 survived" $'tree\t\t\t3\t1\t0\t0\t75.0' "$(printf '%s\n' "$tsv" | grep '^tree')"
-        expect_output "mutscore names the survivor" $'mutant\tcheck.id\tbig\tcmp\t7\tsurvived\tint r = n > 9;  =>  int r = n >= 9;' "$(printf '%s\n' "$tsv" | grep $'\tsurvived\t')"
-        expect_output "mutscore counts three kills" "3" "$(printf '%s\n' "$tsv" | grep -c $'\tkilled\t')"
+        expect_output "mutscore scores the fixture 6 killed, 1 survived" $'tree\t\t\t6\t1\t0\t0\t85.7' "$(printf '%s\n' "$tsv" | grep '^tree')"
+        expect_output "mutscore names the survivor" $'mutant\tcheck.id\tbig\tcmp\t9\tsurvived\tint r = n > 9;  =>  int r = n >= 9;' "$(printf '%s\n' "$tsv" | grep $'\tsurvived\t')"
+        expect_output "mutscore counts six kills" "6" "$(printf '%s\n' "$tsv" | grep -c $'\tkilled\t')"
         if diff -r "$MS_FIX" "$TMP/ms_before" >/dev/null; then ok "mutscore left the source tree's bytes unchanged"; else bad "mutscore changed the source tree"; fi
         [ "$fail" -eq 0 ] && mark_done mutscore
     fi

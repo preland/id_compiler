@@ -5,6 +5,7 @@
 // freed: freeing either string would be a trap under the guard.
 stash(string[] sink, string s) {
   push(sink, s);
+  print(len(sink));
 } return void;
 
 split2(string[] sink, int n) {

@@ -135,7 +135,7 @@ EOF
 
     # --- what stops a library --------------------------------------------------
     cp -R lib/kit "$TMP/badcase"
-    sed -i 's/^(7, 2):(3)$/(7, 2):(4)/' "$TMP/badcase/fault.id"
+    sed -i 's/^(7, 2):(4)$/(7, 2):(5)/' "$TMP/badcase/fault.id"
     if build badcase "$TMP/badcase" --no-std; then bad "a library whose case fails is not built (built)"
     elif ls "$TMP/badcase.d" | grep -q 'libbadcase'; then bad "a library whose case fails leaves no library behind"
     elif grep -q 'test failed' "$TMP/badcase.log"; then ok "a library whose case fails is not built, and leaves nothing"
@@ -148,7 +148,7 @@ EOF
     else bad "a project with a main is refused ($(tail -1 "$TMP/hasmain.log"))"; fi
 
     mkdir "$TMP/hasfunc"
-    printf 'apply(func(int) return int fn, int v) {\n  int out_v = fn(v);\n} return int out_v;\n' > "$TMP/hasfunc/apply.id"
+    printf 'apply(func(int) return int fn, int v) {\n  int out_v = fn(v) * 2;\n} return int out_v;\n' > "$TMP/hasfunc/apply.id"
     printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/hasfunc/twice.id"
     printf 'string[] lib_exports = ["apply", "twice"];\n' > "$TMP/hasfunc/conf.id"
     if build hasfunc "$TMP/hasfunc" --no-std --allow-untested; then bad "an exported function taking a function value is refused (built)"

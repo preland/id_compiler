@@ -2,7 +2,7 @@
 // every target. Each check compares the literal with a value built by exact
 // arithmetic (scaling by a power of two never rounds, down to the smallest
 // subnormal), so a target that rounds a literal wrongly, flushes a subnormal to
-// zero or breaks a tie the wrong way prints 0 where the others print 1. The
+// zero or breaks a tie the wrong way prints fail where the others print pass. The
 // reference side is built from 1.0 and from 9007199254740991.0, which is 2^53-1
 // and exactly representable.
 scale(float x, int n) {
@@ -17,7 +17,11 @@ scale(float x, int n) {
 } return float x;
 
 check(int ok) {
-  print(ok);
+  string verdict = "pass";
+  if(ok == 0) {
+    verdict = "fail";
+  }
+  print(verdict);
 } return void;
 
 main(int argc, string[] argv) {
