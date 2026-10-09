@@ -57,7 +57,7 @@ KEY=$({ find bin compiler runtime driver interop ${STD_ROOT:+"$STD_ROOT"} -type 
 BOOT_KEY=$(cat bootstrap/idlex.c bootstrap/idparse.c | md5sum | cut -d' ' -f1)
 
 step_key() {
-    if [ "$1" = stages ]; then printf '%s' "$KEY$BOOT_KEY"; else printf '%s' "$KEY"; fi
+    printf '%s' "$KEY$BOOT_KEY"
 }
 
 current() {
