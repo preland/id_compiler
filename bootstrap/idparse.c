@@ -924,7 +924,7 @@ int id_fx_max(int idstd_a, int idstd_b);
 int id_fx_sign(int idstd_a);
 int id_chr_is_space(int idstd_c);
 int id_str_adv(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_adv_by);
-int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i);
+int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size);
 void id_idstd_str_split_push(IdList* idstd_strs, char* idstd_s, int idstd_i, int idstd_n);
 char* id_str_join(IdList* idstd_strs, char* idstd_sep);
 int id_idstd_str_join_len(IdList* idstd_strs, char* idstd_sep);
@@ -936,7 +936,7 @@ int id_idstd_str_split_cut(int idstd_at, int idstd_n);
 int id_str_eol(char* idstd_s, int idstd_i);
 IdList* id_str_split(char* idstd_s, char* idstd_sep);
 void id_idstd_str_split_loop(IdList* idstd_strs, char* idstd_s, char* idstd_sep, int idstd_i);
-int id_idstd_str_split_one(IdList* idstd_strs, char* idstd_s, char* idstd_sep, int idstd_i);
+int id_idstd_str_split_one(IdList* idstd_strs, char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size);
 int id_str_find(char* idstd_s, char* idstd_txt);
 int id_str_findat(char* idstd_s, char* idstd_txt, int idstd_i);
 int id_idstd_str_find_run(char* idstd_s, char* idstd_txt, int idstd_i);
@@ -947,9 +947,6 @@ char* id_str_trim(char* idstd_s);
 int id_idstd_str_trim_end(char* idstd_s);
 char* id_idstd_str_trim_slice(char* idstd_s, int idstd_i, int idstd_n);
 void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad);
-int id_idstd_str_rep_width(char* idstd_s, int idstd_n);
-char* id_idstd_str_rep_build(char* idstd_s, long long idstd_ad, int idstd_m, int idstd_n);
-void id_idstd_str_rep_loop(char* idstd_s, long long idstd_ad, int idstd_n);
 char* id_str_repeat(char* idstd_s, int idstd_n);
 int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n);
 int id_idstd_str_ws_start(char* idstd_s, int idstd_i);
@@ -4816,13 +4813,11 @@ int id_str_adv(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_
     return idstd_adv_n;
 }
 
-int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i) {
+int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size) {
     int idstd_str_findat_v;
-    int idstd_len_v;
     int idstd_ret_i;
     idstd_str_findat_v = id_str_findat(idstd_s, idstd_sep, idstd_i);
-    idstd_len_v = id_len(idstd_s);
-    idstd_ret_i = id_idstd_str_split_cut(idstd_str_findat_v, idstd_len_v);
+    idstd_ret_i = id_idstd_str_split_cut(idstd_str_findat_v, idstd_size);
     return idstd_ret_i;
 }
 
@@ -4929,15 +4924,15 @@ void id_idstd_str_split_loop(IdList* idstd_strs, char* idstd_s, char* idstd_sep,
     int idstd_n;
     idstd_n = id_len(idstd_s);
     while ((idstd_i <= idstd_n)) {
-        idstd_i = id_idstd_str_split_one(idstd_strs, idstd_s, idstd_sep, idstd_i);
+        idstd_i = id_idstd_str_split_one(idstd_strs, idstd_s, idstd_sep, idstd_i, idstd_n);
     }
     return;
 }
 
-int id_idstd_str_split_one(IdList* idstd_strs, char* idstd_s, char* idstd_sep, int idstd_i) {
+int id_idstd_str_split_one(IdList* idstd_strs, char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size) {
     int idstd_n;
     int idstd_ret_i;
-    idstd_n = id_idstd_str_split_bound(idstd_s, idstd_sep, idstd_i);
+    idstd_n = id_idstd_str_split_bound(idstd_s, idstd_sep, idstd_i, idstd_size);
     id_idstd_str_split_push(idstd_strs, idstd_s, idstd_i, idstd_n);
     idstd_ret_i = (idstd_n + id_len(idstd_sep));
     return idstd_ret_i;
@@ -5037,40 +5032,16 @@ void id_str_blit(char* idstd_s, int idstd_i, int idstd_n, long long idstd_ad) {
     return;
 }
 
-int id_idstd_str_rep_width(char* idstd_s, int idstd_n) {
-    int idstd_len_v;
-    int idstd_ret_i;
-    idstd_len_v = id_len(idstd_s);
-    idstd_ret_i = id_fx_max((idstd_len_v * idstd_n), 0);
-    return idstd_ret_i;
-}
-
-char* id_idstd_str_rep_build(char* idstd_s, long long idstd_ad, int idstd_m, int idstd_n) {
-    char* idstd_ret_s = NULL;
-    id_idstd_str_rep_loop(idstd_s, idstd_ad, idstd_n);
-    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_of_mem((long long)(idstd_ad), (long long)(idstd_m)); id_str_free(idfe_o); }
-    return idstd_ret_s;
-}
-
-void id_idstd_str_rep_loop(char* idstd_s, long long idstd_ad, int idstd_n) {
-    int idstd_i;
-    int idstd_len_v;
-    idstd_i = 0;
-    while ((idstd_i < idstd_n)) {
-        idstd_len_v = id_len(idstd_s);
-        id_str_blit(idstd_s, 0, idstd_len_v, (idstd_ad + (idstd_i * idstd_len_v)));
-        idstd_i = (idstd_i + 1);
-    }
-    return;
-}
-
 char* id_str_repeat(char* idstd_s, int idstd_n) {
-    int idstd_m;
-    long long idstd_ad;
     char* idstd_ret_s = NULL;
-    idstd_m = id_idstd_str_rep_width(idstd_s, idstd_n);
-    idstd_ad = id_mem_alloc((long long)((idstd_m + 1)));
-    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_idstd_str_rep_build(idstd_s, idstd_ad, idstd_m, idstd_n); id_str_free(idfe_o); }
+    { char* idfe_o = idstd_ret_s; idstd_ret_s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    while ((idstd_n > 0)) {
+        if ((id_imod(idstd_n, 2) == 1)) {
+            idstd_ret_s = id_concat_f(idstd_ret_s, idstd_s, 1);
+        }
+        idstd_s = id_concat(idstd_s, idstd_s);
+        idstd_n = id_idiv(idstd_n, 2);
+    }
     return idstd_ret_s;
 }
 
@@ -5137,13 +5108,15 @@ int id_idstd_str_join_put(char* idstd_s, long long idstd_ad, int idstd_p) {
 
 int id_str_eqat(char* idstd_s, int idstd_i, char* idstd_txt) {
     int idstd_j;
+    int idstd_m;
     int idstd_ret_i;
     idstd_j = 0;
-int idsq_19;
-    while (((idstd_j < id_len(idstd_txt)) && (idsq_19 = id_charat(idstd_s, (idstd_i + idstd_j)), (idsq_19 == id_charat(idstd_txt, idstd_j))))) {
+    idstd_m = id_len(idstd_txt);
+int idsq_21;
+    while (((idstd_j < idstd_m) && (idsq_21 = id_charat(idstd_s, (idstd_i + idstd_j)), (idsq_21 == id_charat(idstd_txt, idstd_j))))) {
         idstd_j = (idstd_j + 1);
     }
-    idstd_ret_i = (idstd_j == id_len(idstd_txt));
+    idstd_ret_i = (idstd_j == idstd_m);
     return idstd_ret_i;
 }
 
