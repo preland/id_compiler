@@ -11,7 +11,7 @@ lz_i() {
 
 lw_iset_val(int node, string elem) {
   int[] els = (import nl1)[node];
-  int v = lw_expr(els[0]);
+  int v = lw_as(els[0], elem);
   int boxed = lw_box(v, elem);
 } return int boxed;
 given lw_fix_iassign ((import fix_iassign_n), "i"):(1)
