@@ -1,0 +1,24 @@
+// Test fixtures for the denied, short and allowed word lists.
+
+// The table the denied words are read into, holding idx.
+rename_test_denied() {
+  export string[] rename_test_denied_keys = [];
+  export int[] rename_test_denied_values = [];
+  export int[] rename_test_denied_used = [];
+} chain () {
+  export int[] rename_test_denied_count = [];
+  hmap_init(rename_test_denied_keys, rename_test_denied_values, rename_test_denied_used, rename_test_denied_count);
+  rename_put_words("idx\n", rename_test_denied_keys, rename_test_denied_values, rename_test_denied_used, rename_test_denied_count);
+} return void;
+given rename_test_denied ():() then hmap_has((import rename_test_denied_keys), (import rename_test_denied_used), "idx"):(1)
+given rename_test_denied ():() then hmap_count((import rename_test_denied_count)):(1)
+
+// A scratch directory holding all four word lists: alpha, beta, gamma and delta
+// in english.txt, beta and gamma denied, an in short.txt, idstd and gamma allowed.
+rename_test_four_lists() {
+  rename_test_scratch("english.txt", "alpha\nbeta\ngamma\ndelta\n", "allowed.txt", "# why\nidstd\ngamma\n");
+  int rename_wrote_denied = rename_write("denied.txt", "# why\nbeta\ngamma\n");
+  int rename_wrote_short = rename_write("short.txt", "# why\nan\n");
+} return void;
+():() then fs_read_text("short.txt"):("# why\nan\n")
+():() then fs_read_text("denied.txt"):("# why\nbeta\ngamma\n")

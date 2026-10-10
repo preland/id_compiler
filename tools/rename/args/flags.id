@@ -1,13 +1,14 @@
-// The command line: `rename ROOT... --map FILE [--words DIR] [--reserve DIR]...
-// [--dry-run]`. The options that take a value are --map, --words and --reserve;
+// The command line: `rename ROOT... --map FILE [--words DIR] [--reserve DIR]... [--in FUNCTION]
+// [--dry-run]`. The options that take a value are --map, --words, --reserve and --in;
 // everything else that does not start with `--` is a root.
 
 // Whether an argument is an option that takes the next argument as its value.
 rename_value_flag(string rename_argument) {
-  int rename_takes = rename_argument == "--map" || rename_argument == "--words" || rename_argument == "--reserve";
+  int rename_takes = rename_argument == "--map" || rename_argument == "--words" || rename_argument == "--reserve" || rename_argument == "--in";
 } return int rename_takes;
 ("--map"):(1)
 ("--reserve"):(1)
+("--in"):(1)
 ("--dry-run"):(0)
 ("src"):(0)
 

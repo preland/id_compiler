@@ -1,6 +1,6 @@
 // rename -- rename declared names across a tree, token by token.
 //
-//   rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--dry-run]
+//   rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--in FUNCTION] [--dry-run]
 //
 // MAP.txt holds one `old new` pair per line (a blank line or a `#` line is
 // skipped). Every ROOT is walked for `.id` files, where a name is renamed only as
@@ -14,7 +14,11 @@
 // lists in DIR, `idc/data/words` by default), not already used anywhere in the
 // roots or in the --reserve directories (read, never changed: pass the standard
 // library so a new name cannot collide with it), and not the new name of another
-// pair. --dry-run prints every change as `FILE:LINE: old -> new` and the count,
+// pair. `--in FUNCTION` keeps a rename inside that function (its body, return
+// clause and test cases, up to the first blank line) so a name that means two
+// things can be renamed twice; registries (NAMES.md, NOTES.md) are left alone
+// then, and the run is refused when no file declares the function. --dry-run
+// prints every change as `FILE:LINE: old -> new` and the count,
 // and writes nothing; without it the same lines are printed and the files are
 // written. Exit status 0 done, 1 refused or a file could not be written, 2 the
 // command line.
@@ -22,13 +26,13 @@ main(int argument_count, string[] argument_values) {
   string[] rename_problems = rename_argument_problems(argument_values);
   int rename_status = 2;
   if(len(rename_problems) > 0) {
-    rename_report(rename_problems, "usage: rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--dry-run]");
+    rename_report(rename_problems, "usage: rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--in FUNCTION] [--dry-run]");
   }
 } chain (int argument_count, string[] argument_values) {
   if(len(rename_problems) == 0) {
     rename_status = rename_from_arguments(argument_values);
   }
 } return int rename_status;
-(1, ["rename"]):(2) then eprints:("rename: --map is required\nrename: no root given\nusage: rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--dry-run]\n")
-(2, ["rename", "--bogus"]):(2) then eprints:("rename: unknown option --bogus\nrename: --map is required\nrename: no root given\nusage: rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--dry-run]\n")
+(1, ["rename"]):(2) then eprints:("rename: --map is required\nrename: no root given\nusage: rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--in FUNCTION] [--dry-run]\n")
+(2, ["rename", "--bogus"]):(2) then eprints:("rename: unknown option --bogus\nrename: --map is required\nrename: no root given\nusage: rename ROOT... --map MAP.txt [--words DIR] [--reserve DIR]... [--in FUNCTION] [--dry-run]\n")
 given rename_test_project("") (6, ["rename", "src", "--map", "map.txt", "--words", "words"]):(0) then fs_read_text("src/a.id"):("alpha() alpha // oldname \"oldname\"\n")

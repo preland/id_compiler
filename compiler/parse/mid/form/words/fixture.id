@@ -20,3 +20,18 @@ vocab_world() {
 } return void;
 ():() then len((import prog)):(2)
 ():() then len((import dvname)):(1)
+
+// The export table with one conf.id constant of the given name in it: the
+// owner the parser gives a constant (reg_const) is "conf.id", not a function,
+// and the scan must judge it like any other export.
+vocab_const_row(string vocab_const_name) {
+  vocab_export_row();
+  lst_str_delete((import enames), 0);
+  push((import enames), vocab_const_name);
+} chain (string vocab_const_name) {
+  lst_str_delete((import eowners), 0);
+  push((import eowners), "conf.id");
+  vocab_words();
+} return void;
+("bt_min"):("bt_min") then (import enames)[0]:("bt_min")
+("buffer_width"):("buffer_width") then (import eowners)[0]:("conf.id")

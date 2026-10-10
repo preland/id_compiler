@@ -13,15 +13,16 @@ given rename_test_tree ([".", "sub"]):(["./NAMES.md", "./a.id", "./sub/NOTES.md"
 ([]):([])
 
 // Renames in every file of a list.
-rename_apply_files(string[] rename_files, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, int[] rename_totals) {
+rename_apply_files(string[] rename_files, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, string rename_scope, int[] rename_totals) {
   int rename_at = 0;
   while(rename_at < len(rename_files)) {
-    rename_in_file(rename_files[rename_at], rename_table_keys, rename_table_values, rename_table_used, rename_table_news, rename_dry, rename_totals);
+    rename_in_file(rename_files[rename_at], rename_table_keys, rename_table_values, rename_table_used, rename_table_news, rename_dry, rename_scope, rename_totals);
     rename_at = rename_at + 1;
   }
 } return void;
-given rename_test_table given rename_test_scratch("a.id", "old_a x", "NAMES.md", "| `old_b` |\nold_a") (["a.id", "NAMES.md"], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, [0, 0, 0]):(["a.id", "NAMES.md"]) then fs_read_text("NAMES.md"):("| `new_b` |\nold_a") then prints:("a.id:1: old_a -> new_a\nNAMES.md:1: old_b -> new_b\n")
-given rename_test_table ([], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, [0, 0, 0]):([])
+given rename_test_table given rename_test_scratch("a.id", "old_a x", "NAMES.md", "| `old_b` |\nold_a") (["a.id", "NAMES.md"], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, "", [0, 0, 0]):(["a.id", "NAMES.md"]) then fs_read_text("NAMES.md"):("| `new_b` |\nold_a") then prints:("a.id:1: old_a -> new_a\nNAMES.md:1: old_b -> new_b\n")
+given rename_test_table ([], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, "", [0, 0, 0]):([])
+given rename_test_table given rename_test_scratch("a.id", "f(old_a) {\n}\n\ng(old_a) {\n}", "b.id", "g(old_a) {\n}") (["a.id", "b.id"], (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, "f", [0, 0, 0]):(["a.id", "b.id"]) then fs_read_text("a.id"):("f(new_a) {\n}\n\ng(old_a) {\n}") then fs_read_text("b.id"):("g(old_a) {\n}")
 
 // The line that ends a run: how many names changed, in how many files, and
 // whether nothing was written.

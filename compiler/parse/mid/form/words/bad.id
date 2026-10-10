@@ -9,7 +9,7 @@ vocab_bad(string vocab_name) {
   int vocab_i = 0;
 } chain (string vocab_name) {
   while(vocab_i < len(vocab_pieces)) {
-    vocab_acc = vocab_bad_add(vocab_acc, vocab_pieces[vocab_i]);
+    vocab_acc = vocab_bad_add(vocab_acc, vocab_pieces[vocab_i], len(vocab_pieces));
     vocab_i = vocab_i + 1;
   }
 } return string vocab_acc;
@@ -19,3 +19,6 @@ given full_env given vocab_words ("fb_width"):("fb")
 given full_env given vocab_words ("UTF8_BUFFER"):("")
 given full_env given vocab_words ("buffer__width"):("(empty)")
 given full_env given vocab_words ("fb"):("fb")
+given full_env given vocab_words ("buffer_x"):("")
+given full_env given vocab_words ("BUFFER_Y"):("")
+given full_env given vocab_words ("z"):("z")

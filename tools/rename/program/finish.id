@@ -2,22 +2,23 @@
 
 // Renames in every file and prints the totals. Answers 0, or 1 when a file could
 // not be written.
-rename_perform(string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry) {
+rename_perform(string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry, string rename_scope) {
   string[] rename_table_keys = [];
   int[] rename_table_values = [];
   int[] rename_table_used = [];
-} chain (string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry) {
+} chain (string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry, string rename_scope) {
   int[] rename_table_count = [];
   int[] rename_totals = [0, 0, 0];
   rename_index_table(rename_old_names, rename_table_keys, rename_table_values, rename_table_used, rename_table_count);
-} chain (string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry) {
-  rename_apply_files(rename_files, rename_table_keys, rename_table_values, rename_table_used, rename_news, rename_dry, rename_totals);
+} chain (string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry, string rename_scope) {
+  rename_apply_files(rename_files, rename_table_keys, rename_table_values, rename_table_used, rename_news, rename_dry, rename_scope, rename_totals);
   print(rename_summary(rename_totals, rename_dry));
   int rename_failed = rename_totals[2] > 0;
 } return int rename_failed;
-given rename_test_project("") (["oldname"], ["alpha"], ["src/b.id", "src/a.id"], 0):(0) then prints:("src/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n2 name(s) renamed in 1 file(s)\n") then fs_read_text("src/a.id"):("alpha() alpha // oldname \"oldname\"\n")
-given rename_test_project("") (["oldname"], ["alpha"], ["src/a.id"], 1):(0) then prints:("src/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n2 name(s) renamed in 1 file(s) (dry run, nothing written)\n") then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")
-(["x"], ["y"], ["/nonexistent/rename_perform/a.id"], 0):(0) then prints:("0 name(s) renamed in 0 file(s)\n")
+given rename_test_project("") (["oldname"], ["alpha"], ["src/b.id", "src/a.id"], 0, ""):(0) then prints:("src/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n2 name(s) renamed in 1 file(s)\n") then fs_read_text("src/a.id"):("alpha() alpha // oldname \"oldname\"\n")
+given rename_test_project("") (["oldname"], ["alpha"], ["src/a.id"], 1, ""):(0) then prints:("src/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n2 name(s) renamed in 1 file(s) (dry run, nothing written)\n") then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")
+(["x"], ["y"], ["/nonexistent/rename_perform/a.id"], 0, ""):(0) then prints:("0 name(s) renamed in 0 file(s)\n")
+given rename_test_project("") (["oldname"], ["alpha"], ["src/a.id"], 0, "other"):(0) then prints:("0 name(s) renamed in 0 file(s)\n") then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")
 
 // Every problem on standard error, then a closing line. The same for a command
 // line that is wrong (the closing line is the usage) and a map that is refused
@@ -36,13 +37,13 @@ rename_report(string[] rename_problems, string rename_closing) {
 
 // Refuses when there are problems, otherwise renames. Answers the exit status:
 // 0, or 1 when refused or when a file could not be written.
-rename_finish(string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry, string[] rename_problems) {
+rename_finish(string[] rename_old_names, string[] rename_news, string[] rename_files, int rename_dry, string rename_scope, string[] rename_problems) {
   int rename_code = 1;
   if(len(rename_problems) == 0) {
-    rename_code = rename_perform(rename_old_names, rename_news, rename_files, rename_dry);
+    rename_code = rename_perform(rename_old_names, rename_news, rename_files, rename_dry, rename_scope);
   } else {
     rename_report(rename_problems, "rename: refused; no file was changed");
   }
 } return int rename_code;
-given rename_test_project("") (["oldname"], ["alpha"], ["src/a.id"], 1, []):(0) then prints:("src/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n2 name(s) renamed in 1 file(s) (dry run, nothing written)\n")
-(["oldname"], ["alpha"], ["src/a.id"], 1, ["nope"]):(1) then eprints:("rename: nope\nrename: refused; no file was changed\n")
+given rename_test_project("") (["oldname"], ["alpha"], ["src/a.id"], 1, "", []):(0) then prints:("src/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n2 name(s) renamed in 1 file(s) (dry run, nothing written)\n")
+(["oldname"], ["alpha"], ["src/a.id"], 1, "", ["nope"]):(1) then eprints:("rename: nope\nrename: refused; no file was changed\n")

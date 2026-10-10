@@ -29,3 +29,5 @@ vocab_scan_exports(int vocab_i) {
 } return void;
 given vocab_export_row given vocab_words (0):() then (import vocab_totals)[0]:(1)
 given vocab_export_row given vocab_words (1):() then (import vocab_totals)[0]:(0)
+given vocab_const_row("bt_min") (0):() then (import vocab_totals)[1]:(1)
+given vocab_const_row("buffer_width") (0):() then (import vocab_totals)[1]:(0)

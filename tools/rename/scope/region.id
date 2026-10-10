@@ -1,0 +1,37 @@
+// Where a function is in a source file, for `--in FUNCTION`. A function starts
+// on a line that begins with its name and `(`, and runs to the first blank
+// line: its body, its return clause and the test cases under it. A call, a
+// `given` or a `then` never starts a line with the name, so the line is the
+// header and nothing else.
+
+// The start and end of the function in a text, as a list of those two indexes
+// (end exclusive); the empty list when no line starts with the function's name.
+rename_function_region(string rename_source, string rename_function) {
+  int[] rename_region = [];
+  string rename_padded = "\n" + rename_source;
+  int rename_hit = str_find(rename_padded, "\n" + rename_function + "(");
+} chain (string rename_source, string rename_function) {
+  int rename_stop = str_findat(rename_padded, "\n\n", rename_hit + 1);
+  if(rename_hit >= 0 && rename_stop < 0) {
+    rename_stop = len(rename_padded);
+  }
+  if(rename_hit >= 0) {
+    push(rename_region, rename_hit);
+    push(rename_region, rename_stop - 1);
+  }
+} return int[] rename_region;
+("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "b"):([22, 39])
+("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "a"):([0, 20])
+("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "c"):([41, 48])
+("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "d"):([])
+("x b(r)\nb2(r) {\n}", "b"):([])
+
+// The same for a file: only a source file has functions, so a registry has none.
+rename_file_region(string rename_file, string rename_source, string rename_function) {
+  int[] rename_region = [];
+  if(str_ends(rename_file, ".id") == 1) {
+    rename_region = rename_function_region(rename_source, rename_function);
+  }
+} return int[] rename_region;
+("a.id", "b() {\n}", "b"):([0, 7])
+("NAMES.md", "b() {\n}", "b"):([])

@@ -1,0 +1,31 @@
+// A scoped rename that names a function no file declares is a mistake worth
+// refusing: it would otherwise change nothing and say so only in the totals.
+
+// Whether a file declares the function: 1 or 0.
+rename_scope_in_file(string rename_file, string rename_scope) {
+  string rename_source = fs_read_text(rename_file);
+  int[] rename_region = rename_file_region(rename_file, rename_source, rename_scope);
+  int rename_declared = len(rename_region) > 0;
+} return int rename_declared;
+given rename_test_scratch("a.id", "f() {\n}", "NAMES.md", "f() {\n}") ("a.id", "f"):(1)
+given rename_test_scratch("a.id", "f() {\n}", "NAMES.md", "f() {\n}") ("a.id", "g"):(0)
+given rename_test_scratch("a.id", "f() {\n}", "NAMES.md", "f() {\n}") ("NAMES.md", "f"):(0)
+
+// The refusal for a scope no file under the roots declares; none when there is
+// no scope.
+rename_scope_problems(string rename_scope, string[] rename_files) {
+  string[] rename_problems = [];
+  int rename_scope_found = rename_scope == "";
+  int rename_at = 0;
+} chain (string rename_scope, string[] rename_files) {
+  while(rename_at < len(rename_files) && rename_scope_found == 0) {
+    rename_scope_found = rename_scope_in_file(rename_files[rename_at], rename_scope);
+    rename_at = rename_at + 1;
+  }
+  if(rename_scope_found == 0) {
+    push(rename_problems, "--in " + rename_scope + ": no function of that name is declared in the roots");
+  }
+} return string[] rename_problems;
+given rename_test_scratch("a.id", "f() {\n}", "b.id", "g() {\n}") ("g", ["a.id", "b.id"]):([])
+given rename_test_scratch("a.id", "f() {\n}", "b.id", "g() {\n}") ("h", ["a.id", "b.id"]):(["--in h: no function of that name is declared in the roots"])
+("", []):([])

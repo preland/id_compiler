@@ -3016,13 +3016,14 @@ int id_find_dup(int i);
 void id_ul_at(int i);
 int id_ul_find(int i);
 int id_ul_probe(int i, int j);
+int id_vocab_axis(char* vocab_piece, int vocab_parts);
 char* id_vocab_bad(char* vocab_name);
 void id_vocab_judge(char* vocab_name, int vocab_kind, int vocab_row);
 char* id_vocab_loc(int vocab_kind, int vocab_row, char* vocab_name);
 char* id_vocab_loc_var(int vocab_kind, int vocab_row, char* vocab_name);
 char* id_vocab_loc_rest(int vocab_kind, int vocab_row, char* vocab_name);
-int id_vocab_ok(char* vocab_piece);
-char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece);
+int id_vocab_ok(char* vocab_piece, int vocab_parts);
+char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece, int vocab_parts);
 char* id_vocab_join(char* vocab_head, char* vocab_tail);
 void id_vocab_report(char* vocab_name, int vocab_kind, int vocab_row, char* vocab_failed);
 char* id_vocab_first(char* vocab_list);
@@ -26377,6 +26378,15 @@ char* idsq_10;
     return ul_found;
 }
 
+int id_vocab_axis(char* vocab_piece, int vocab_parts) {
+    int vocab_is_axis;
+    vocab_is_axis = 0;
+    if (((vocab_parts > 1) && (((strcmp(vocab_piece, ID_S("x")) == 0) || (strcmp(vocab_piece, ID_S("y")) == 0)) || (strcmp(vocab_piece, ID_S("z")) == 0)))) {
+        vocab_is_axis = 1;
+    }
+    return vocab_is_axis;
+}
+
 char* id_vocab_bad(char* vocab_name) {
     IdList* vocab_pieces = NULL;
     char* vocab_acc;
@@ -26385,7 +26395,8 @@ char* id_vocab_bad(char* vocab_name) {
     vocab_acc = ID_S("");
     vocab_i = 0;
     while ((vocab_i < id_list_len(vocab_pieces))) {
-        vocab_acc = id_vocab_bad_add(vocab_acc, (char*)(intptr_t)(id_list_get(vocab_pieces, vocab_i)));
+char* idsq_13;
+        vocab_acc = (idsq_13 = (char*)(intptr_t)(id_list_get(vocab_pieces, vocab_i)), id_vocab_bad_add(vocab_acc, idsq_13, id_list_len(vocab_pieces)));
         vocab_i = (vocab_i + 1);
     }
     { id_list_free(vocab_pieces); return vocab_acc; }
@@ -26443,19 +26454,24 @@ char* idsq_10;
     return vocab_where;
 }
 
-int id_vocab_ok(char* vocab_piece) {
+int id_vocab_ok(char* vocab_piece, int vocab_parts) {
     char* vocab_lower = NULL;
     int vocab_hit;
+    int vocab_axis_hit;
     { char* idfe_o = vocab_lower; vocab_lower = id_str_lower(vocab_piece); id_str_free(idfe_o); }
-IdList* idsq_6;
-    vocab_hit = (idsq_6 = vocab_keys, id_hmap_has(idsq_6, vocab_used, vocab_lower));
+IdList* idsq_20;
+    vocab_hit = (idsq_20 = vocab_keys, id_hmap_has(idsq_20, vocab_used, vocab_lower));
+    vocab_axis_hit = id_vocab_axis(vocab_lower, vocab_parts);
+    if ((vocab_axis_hit == 1)) {
+        vocab_hit = 1;
+    }
     { id_str_free(vocab_lower); return vocab_hit; }
 }
 
-char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece) {
+char* id_vocab_bad_add(char* vocab_acc, char* vocab_piece, int vocab_parts) {
     int vocab_fine;
     char* vocab_next;
-    vocab_fine = id_vocab_ok(vocab_piece);
+    vocab_fine = id_vocab_ok(vocab_piece, vocab_parts);
     vocab_next = vocab_acc;
     if ((vocab_fine == 0)) {
         vocab_next = id_vocab_join(vocab_acc, vocab_piece);

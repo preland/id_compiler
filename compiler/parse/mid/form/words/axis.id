@@ -1,0 +1,16 @@
+// The axis letters x, y and z are the one-letter pieces the word scan accepts:
+// as one piece of a longer name (`delta_x`, `point_y`), where they say which axis,
+// never as a whole name, where `x` says nothing. Every other one-letter piece
+// still has to be in allowed.txt.
+
+vocab_axis(string vocab_piece, int vocab_parts) {
+  int vocab_is_axis = 0;
+  if(vocab_parts > 1 && (vocab_piece == "x" || vocab_piece == "y" || vocab_piece == "z")) {
+    vocab_is_axis = 1;
+  }
+} return int vocab_is_axis;
+("x", 2):(1)
+("z", 3):(1)
+("x", 1):(0)
+("w", 2):(0)
+("xy", 3):(0)

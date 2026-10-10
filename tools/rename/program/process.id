@@ -27,14 +27,18 @@ rename_print_rows(string rename_file, string[] rename_listed) {
 
 // Renames in one file, prints what it changes and, unless this is a dry run,
 // writes the file back. The totals are counted in rename_totals.
-rename_in_file(string rename_file, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, int[] rename_totals) {
+rename_in_file(string rename_file, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, string rename_scope, int[] rename_totals) {
   string rename_source = fs_read_text(rename_file);
   int[] rename_spans = rename_file_spans(rename_file, rename_source);
   string[] rename_picked = rename_pick_all(rename_source, rename_spans, rename_table_keys, rename_table_values, rename_table_used, rename_table_news);
-} chain (string rename_file, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, int[] rename_totals) {
+} chain (string rename_file, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, string rename_scope, int[] rename_totals) {
+  rename_scoped_picked(rename_file, rename_source, rename_spans, rename_picked, rename_scope);
   string[] rename_listed = rename_rows(rename_source, rename_spans, rename_picked);
   rename_print_rows(rename_file, rename_listed);
+} chain (string rename_file, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news, int rename_dry, string rename_scope, int[] rename_totals) {
   rename_store(rename_file, rename_splice(rename_source, rename_spans, rename_picked), len(rename_listed), rename_dry, rename_totals);
 } return void;
-given rename_test_table given rename_test_scratch("a.id", "old_a x old_b", "b.id", "") ("a.id", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 1, [0, 0, 0]):("a.id") then prints:("a.id:1: old_a -> new_a\na.id:1: old_b -> new_b\n") then fs_read_text("a.id"):("old_a x old_b")
-given rename_test_table given rename_test_scratch("a.id", "old_a x old_b", "b.id", "") ("a.id", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, [0, 0, 0]):("a.id") then fs_read_text("a.id"):("new_a x new_b")
+given rename_test_table given rename_test_scratch("a.id", "old_a x old_b", "b.id", "") ("a.id", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 1, "", [0, 0, 0]):("a.id") then prints:("a.id:1: old_a -> new_a\na.id:1: old_b -> new_b\n") then fs_read_text("a.id"):("old_a x old_b")
+given rename_test_table given rename_test_scratch("a.id", "f(old_a) {\n}\n\ng(old_a) {\n}", "b.id", "") ("a.id", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, "g", [0, 0, 0]):("a.id") then fs_read_text("a.id"):("f(old_a) {\n}\n\ng(new_a) {\n}")
+given rename_test_table given rename_test_scratch("a.id", "f(old_a) {\n}\n\ng(old_a) {\n}", "b.id", "") ("a.id", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, "h", [0, 0, 0]):("a.id") then fs_read_text("a.id"):("f(old_a) {\n}\n\ng(old_a) {\n}")
+given rename_test_table given rename_test_scratch("a.id", "old_a x old_b", "b.id", "") ("a.id", (import rename_test_keys), (import rename_test_values), (import rename_test_used), (import rename_test_news), 0, "", [0, 0, 0]):("a.id") then fs_read_text("a.id"):("new_a x new_b")

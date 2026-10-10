@@ -3,30 +3,41 @@
 // is read as frame_width. A piece with a digit in it, a one-letter piece and an
 // abbreviation are in the vocabulary only if data/words/allowed.txt names them
 // (english.txt holds no one-letter entry), and an empty piece -- a leading,
-// trailing or doubled `_` -- is never a word.
+// trailing or doubled `_` -- is never a word. The axis letters x, y and z are
+// the one exception: a piece of a name with more than one piece (`delta_x`) is
+// a word, a whole name that is only `x` is not.
 
-vocab_ok(string vocab_piece) {
+vocab_ok(string vocab_piece, int vocab_parts) {
   string vocab_lower = str_lower(vocab_piece);
   int vocab_hit = hmap_has((import vocab_keys), (import vocab_used), vocab_lower);
+  int vocab_axis_hit = vocab_axis(vocab_lower, vocab_parts);
+} chain (string vocab_piece, int vocab_parts) {
+  if(vocab_axis_hit == 1) {
+    vocab_hit = 1;
+  }
 } return int vocab_hit;
-given full_env given vocab_words ("buffer"):(1)
-given full_env given vocab_words ("WIDTH"):(1)
-given full_env given vocab_words ("utf8"):(1)
-given full_env given vocab_words ("fb"):(0)
-given full_env given vocab_words (""):(0)
+given full_env given vocab_words ("buffer", 1):(1)
+given full_env given vocab_words ("WIDTH", 1):(1)
+given full_env given vocab_words ("utf8", 1):(1)
+given full_env given vocab_words ("fb", 2):(0)
+given full_env given vocab_words ("", 1):(0)
+given full_env given vocab_words ("x", 2):(1)
+given full_env given vocab_words ("x", 1):(0)
 
-vocab_bad_add(string vocab_acc, string vocab_piece) {
-  int vocab_fine = vocab_ok(vocab_piece);
+vocab_bad_add(string vocab_acc, string vocab_piece, int vocab_parts) {
+  int vocab_fine = vocab_ok(vocab_piece, vocab_parts);
   string vocab_next = vocab_acc;
   if(vocab_fine == 0) {
     vocab_next = vocab_join(vocab_acc, vocab_piece);
   }
 } return string vocab_next;
-given full_env given vocab_words ("", "buffer"):("")
-given full_env given vocab_words ("", "fb"):("fb")
-given full_env given vocab_words ("fb", "w"):("fb, w")
-given full_env given vocab_words ("fb", "width"):("fb")
-given full_env given vocab_words ("", ""):("(empty)")
+given full_env given vocab_words ("", "buffer", 1):("")
+given full_env given vocab_words ("", "fb", 1):("fb")
+given full_env given vocab_words ("fb", "w", 2):("fb, w")
+given full_env given vocab_words ("fb", "width", 2):("fb")
+given full_env given vocab_words ("", "", 1):("(empty)")
+given full_env given vocab_words ("", "x", 2):("")
+given full_env given vocab_words ("", "x", 1):("x")
 
 vocab_join(string vocab_head, string vocab_tail) {
   string vocab_item = vocab_tail;

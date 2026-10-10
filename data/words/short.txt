@@ -1,0 +1,33 @@
+# The one- and two-letter words that are real English, and the only ones accepted:
+# the dictionary is filtered of every entry shorter than three
+# letters (SCOWL lists letters and abbreviations such as dz, ix, bx, ks, cs, mi, ll
+# as "words"), then these are read in beside it. One lowercase word per line; a line
+# starting with # and a blank line are comments (idc --word-scan; docs/ERRORS.md,
+# E0311). The letters x, y and z are not listed: the scan itself accepts them as
+# one piece of a longer name (delta_x), never as a whole name.
+am
+an
+as
+at
+be
+by
+do
+go
+he
+hi
+if
+in
+is
+it
+me
+my
+no
+of
+on
+or
+ox
+so
+to
+up
+us
+we

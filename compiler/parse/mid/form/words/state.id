@@ -1,7 +1,7 @@
 // The vocabulary the word scan (./scan.id, E0311) checks names against, and the
 // record of which names it has already judged. bin/idc hands the vocabulary in
-// as `wrd WORD` lines ahead of the tokens, one per word of data/words/
-// english.txt and data/words/allowed.txt, only under --word-scan; this file
+// as `wrd WORD` lines ahead of the tokens, one per word of data/words/english.txt
+// (less denied.txt), short.txt and data/words/allowed.txt, only under --word-scan; this file
 // holds the tables those lines fill (front/tokens/load/more/wrd.id).
 //
 //   vocab_keys/vals/used/count        every word of the vocabulary, as a set

@@ -32,7 +32,9 @@ rename_name_problem(string rename_name, string[] rename_word_keys, int[] rename_
   }
 } return string rename_why;
 given rename_test_words_filled ("alpha_beta", (import rename_test_word_keys), (import rename_test_word_used)):("")
-given rename_test_words_filled ("alpha_x", (import rename_test_word_keys), (import rename_test_word_used)):("is not spelled in words (E0311): x")
+given rename_test_words_filled ("alpha_q", (import rename_test_word_keys), (import rename_test_word_used)):("is not spelled in words (E0311): q")
+given rename_test_words_filled ("alpha_x", (import rename_test_word_keys), (import rename_test_word_used)):("")
+given rename_test_words_filled ("x", (import rename_test_word_keys), (import rename_test_word_used)):("is not spelled in words (E0311): x")
 given rename_test_words_filled ("while", (import rename_test_word_keys), (import rename_test_word_used)):("is a reserved word")
 given rename_test_words_filled ("alpha-beta", (import rename_test_word_keys), (import rename_test_word_used)):("is not a name")
 

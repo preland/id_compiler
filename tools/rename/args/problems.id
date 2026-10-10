@@ -13,10 +13,13 @@ rename_argument_problems(string[] rename_argument_values) {
   rename_note(rename_problems, rename_count_problem(rename_argument_values, "--map", 1));
   rename_note(rename_problems, rename_count_problem(rename_argument_values, "--words", 0));
   rename_note(rename_problems, rename_root_problem(rename_argument_values));
+} chain (string[] rename_argument_values) {
+  rename_note(rename_problems, rename_count_problem(rename_argument_values, "--in", 0));
 } return string[] rename_problems;
 (["p", "src", "--map", "m"]):([])
 (["p", "--map", "m", "--bogus"]):(["unknown option --bogus", "no root given"])
 (["p", "src"]):(["--map is required"])
+(["p", "src", "--map", "m", "--in", "f", "--in", "g"]):(["--in given twice"])
 (["p", "src", "--map", "a", "--map", "b", "--words"]):(["--words needs a value", "--map given twice"])
 
 // Whether an option appears the wrong number of times: more than once, or, when

@@ -1,0 +1,46 @@
+// `--in FUNCTION`: the names a rename picked, kept only where they lie inside the
+// function, so `r` can be red in one function and rotation in another.
+
+// Takes back the pick for the name at index at (a multiple of 3) of a list of
+// triples when the name starts before the low index or at the high one.
+rename_blank_outside(string[] rename_picked, int[] rename_spans, int rename_at, int rename_low, int rename_high) {
+  if(rename_spans[rename_at] < rename_low || rename_spans[rename_at] >= rename_high) {
+    rename_picked[rename_at / 3] = "";
+  }
+} return void;
+(["n"], [5, 6, 1], 0, 0, 5):([""], [5, 6, 1], 0, 0, 5)
+(["n"], [5, 6, 1], 0, 6, 9):([""], [5, 6, 1], 0, 6, 9)
+(["n"], [5, 6, 1], 0, 0, 6):(["n"], [5, 6, 1], 0, 0, 6)
+(["n"], [5, 6, 1], 0, 5, 6):(["n"], [5, 6, 1], 0, 5, 6)
+
+// Takes back every pick that lies outside a region (a start and an end index);
+// with no region, which is a file that does not hold the function, every pick.
+rename_restrict(string[] rename_picked, int[] rename_spans, int[] rename_region) {
+  int rename_low = 0;
+  int rename_high = 0;
+  int rename_at = 0;
+} chain (string[] rename_picked, int[] rename_spans, int[] rename_region) {
+  if(len(rename_region) == 2) {
+    rename_low = rename_region[0];
+    rename_high = rename_region[1];
+  }
+  while(rename_at < len(rename_spans)) {
+    rename_blank_outside(rename_picked, rename_spans, rename_at, rename_low, rename_high);
+    rename_at = rename_at + 3;
+  }
+} return void;
+(["a", "b", "c"], [0, 1, 1, 4, 5, 1, 8, 9, 1], [4, 8]):(["", "b", ""], [0, 1, 1, 4, 5, 1, 8, 9, 1], [4, 8])
+(["a", "b"], [0, 1, 1, 4, 5, 1], []):(["", ""], [0, 1, 1, 4, 5, 1], [])
+([], [], [0, 9]):([], [], [0, 9])
+
+// The picks of one file, kept only inside the function when a rename is
+// scoped to one; every pick stays when the scope is empty.
+rename_scoped_picked(string rename_file, string rename_source, int[] rename_spans, string[] rename_picked, string rename_scope) {
+  int[] rename_region = rename_file_region(rename_file, rename_source, rename_scope);
+  if(rename_scope != "") {
+    rename_restrict(rename_picked, rename_spans, rename_region);
+  }
+} return void;
+("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], ""):("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], "")
+("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], "g"):("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["", "x"], "g")
+("NAMES.md", "f(r) {\n}", [2, 3, 1], ["x"], "f"):("NAMES.md", "f(r) {\n}", [2, 3, 1], [""], "f")

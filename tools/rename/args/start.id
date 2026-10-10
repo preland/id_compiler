@@ -12,6 +12,13 @@ rename_words_choice(string[] rename_argument_values) {
 (["p", "--words", "w"]):("w")
 (["p", "src"]):("idc/data/words")
 
+// The function a rename is restricted to (--in), or "" for the whole program.
+rename_scope_choice(string[] rename_argument_values) {
+  string rename_chosen_scope = lst_str_get_or(rename_flag_values(rename_argument_values, "--in"), 0, "");
+} return string rename_chosen_scope;
+(["p", "--in", "f"]):("f")
+(["p", "src"]):("")
+
 // Runs the rename an already checked command line asks for.
 rename_from_arguments(string[] rename_argument_values) {
   string[] rename_roots = rename_positional_arguments(rename_argument_values);
@@ -20,7 +27,9 @@ rename_from_arguments(string[] rename_argument_values) {
 } chain (string[] rename_argument_values) {
   string[] rename_maps = rename_flag_values(rename_argument_values, "--map");
   int rename_dry = lst_str_index(rename_argument_values, "--dry-run") >= 0;
-  int rename_code = rename_run(rename_roots, rename_reserved, rename_maps[0], rename_words_directory, rename_dry);
+  string rename_scope = rename_scope_choice(rename_argument_values);
+} chain (string[] rename_argument_values) {
+  int rename_code = rename_run(rename_roots, rename_reserved, rename_maps[0], rename_words_directory, rename_dry, rename_scope);
 } return int rename_code;
 given rename_test_project("") (["p", "src", "--map", "map.txt", "--words", "words", "--dry-run"]):(0) then prints:("src/NAMES.md:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n3 name(s) renamed in 2 file(s) (dry run, nothing written)\n")
 given rename_test_project("") (["p", "src", "--map", "map.txt"]):(1) then eprints:("rename: no words could be read from idc/data/words (english.txt, allowed.txt)\nrename: oldname -> alpha: the new name is not spelled in words (E0311): alpha\nrename: refused; no file was changed\n")

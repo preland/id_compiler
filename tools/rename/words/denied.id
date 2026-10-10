@@ -1,0 +1,36 @@
+// The word lists beyond english.txt: the abbreviations denied.txt takes out of it,
+// and the real short words and the allowed terms that are read in beside it.
+
+// Adds one line of english.txt to the table unless denied.txt names the word.
+rename_put_unless(string rename_entry, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count, string[] rename_denied_keys, int[] rename_denied_used) {
+  string rename_lowered = str_lower(str_trim(rename_entry));
+  if(hmap_has(rename_denied_keys, rename_denied_used, rename_lowered) == 0) {
+    rename_put_word(rename_entry, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+  }
+} return void;
+given rename_test_words_empty given rename_test_denied ("alpha", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count), (import rename_test_denied_keys), (import rename_test_denied_used)):("alpha") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "alpha"):(1)
+given rename_test_words_empty given rename_test_denied (" IDX ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count), (import rename_test_denied_keys), (import rename_test_denied_used)):(" IDX ") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "idx"):(0)
+
+// Adds every line of english.txt to the table except the denied words.
+rename_put_words_except(string rename_text, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count, string[] rename_denied_keys, int[] rename_denied_used) {
+  string[] rename_lines = str_lines(rename_text);
+  int rename_at = 0;
+  while(rename_at < len(rename_lines)) {
+    rename_put_unless(rename_lines[rename_at], rename_word_keys, rename_word_values, rename_word_used, rename_word_count, rename_denied_keys, rename_denied_used);
+    rename_at = rename_at + 1;
+  }
+} return void;
+given rename_test_words_empty given rename_test_denied ("alpha\nidx\nbeta\n", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count), (import rename_test_denied_keys), (import rename_test_denied_used)):("alpha\nidx\nbeta\n") then hmap_count((import rename_test_word_count)):(2)
+given rename_test_words_empty given rename_test_denied ("", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count), (import rename_test_denied_keys), (import rename_test_denied_used)):("") then hmap_count((import rename_test_word_count)):(0)
+
+// Adds short.txt and allowed.txt of a directory to the table: they are accepted
+// whether or not denied.txt names the word.
+rename_load_extra(string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
+  string rename_short_text = fs_read_text(path_join(rename_words_directory, "short.txt"));
+  string rename_allowed = fs_read_text(path_join(rename_words_directory, "allowed.txt"));
+  rename_put_words(rename_short_text, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+} chain (string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
+  rename_put_words(rename_allowed, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+} return void;
+given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "idstd"):(1)
+given rename_test_words_empty ("/nonexistent/rename_words", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("/nonexistent/rename_words") then hmap_count((import rename_test_word_count)):(0)
