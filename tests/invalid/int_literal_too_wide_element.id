@@ -1,0 +1,7 @@
+// EXPECT: [E0608]
+// writing the literal into a list element drops its upper bits just as an assignment does
+main(int argc, string[] argv) {
+  int[] xs = [1];
+  xs[0] = 3000000000;
+  print(xs[0]);
+} return int 0;

@@ -1,0 +1,13 @@
+// The wide literal (wide.id) in the places a list holds an int: an index
+// assignment and a push of 3000000000, for the E0608 check those two make
+// (../../../../more/index_assign.id, ../../../../../expr/more/push/check.id).
+wide_list_fixture() {
+  idx_build();
+  wide_literal_build();
+  export int[] args_wide = [(import arr_ints), (import literal_huge)];
+} chain () {
+  export int iassign_wide = node_iassign((import idx_fix), (import literal_huge));
+  export int push_wide = node_call("push", (import args_wide));
+} return void;
+():() then calls idx_build:[1]
+():() then init_units:(0)

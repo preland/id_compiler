@@ -28,21 +28,37 @@ ll_piece(string s, int i) {
     int hex_escape_v = hex_escape_byte(s, i);
     out = ll_hex(hex_escape_v);
   }
+  int octal_digits = octal_escape_length(s, i);
+  if(octal_digits > 0) {
+    int octal_v = octal_escape_byte(s, i, octal_digits);
+    out = ll_hex(octal_v);
+  }
 } return string out;
 ("ab", 1):("\\62")
 ("\\n", 0):("\\0A")
 ("a\\x41", 1):("\\41")
 ("\\x7a", 0):("\\7A")
+("\\033", 0):("\\1B")
+("a\\101", 1):("\\41")
+("\\0", 0):("\\00")
 
 // Where the next piece starts: past a backslash and the character after it, or
-// past the four characters of a `\xHH`, which is one byte whatever follows it.
+// past the four characters of a `\xHH`, which is one byte whatever follows it,
+// or past a backslash and its one to three octal digits.
 ll_step(string s, int i) {
   int next = str_adv(s, i, 92, 2);
   if(hex_escape_at(s, i) == 1) {
     next = i + 4;
   }
+  int octal_digits = octal_escape_length(s, i);
+} chain (string s, int i) {
+  if(octal_digits > 0) {
+    next = i + 1 + octal_digits;
+  }
 } return int next;
 ("ab", 0):(1)
 ("\\n", 0):(2)
 ("\\x41b", 0):(4)
+("\\0331", 0):(4)
+("\\7a", 0):(2)
 

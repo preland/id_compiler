@@ -1,0 +1,11 @@
+// A literal outside the int range is refused as an int list element but is a
+// word element, and the largest and smallest ints are elements too.
+main(int argc, string[] argv) {
+  word[] wide = [3000000000];
+  int[] edge = [-2147483647, 2147483647];
+  push(wide, 4294967296);
+} chain (int argc, string[] argv) {
+  edge[0] = -2147483647;
+  push(edge, 2147483647);
+  print("" + wide[0] + " " + wide[1] + " " + edge[0] + " " + edge[1] + " " + edge[2]);
+} return int 0;

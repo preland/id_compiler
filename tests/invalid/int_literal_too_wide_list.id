@@ -1,0 +1,6 @@
+// EXPECT: [E0608]
+// an element of a list literal is stored in an int just as a declaration stores its value
+main(int argc, string[] argv) {
+  int[] xs = [1, 3000000000];
+  print(xs[0]);
+} return int 0;

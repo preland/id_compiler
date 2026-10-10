@@ -1,0 +1,11 @@
+// A backslash and one to three octal digits is one byte, as in C: \033 is ESC
+// (27), \101 is A, \1 is byte 1, and a fourth digit is an ordinary character,
+// so \0121 is a newline then 1. The first line of the output is the lengths and
+// the bytes at the starts of the literals.
+main(int argc, string[] argv) {
+  string esc = "\033[0m";
+  string mix = "\1011\7\0121";
+  print(len(esc) + " " + charat(esc, 0) + " " + charat(esc, 1) + " " + len(mix) + " " + charat(mix, 0));
+} chain (int argc, string[] argv) {
+  print(charat(mix, 1) + " " + charat(mix, 2) + " " + charat(mix, 3) + " " + charat(mix, 4));
+} return int 0;

@@ -1,0 +1,7 @@
+// EXPECT: [E0608]
+// a push stores into an int list, so the literal is refused there as well
+main(int argc, string[] argv) {
+  int[] xs = [1];
+  push(xs, 3000000000);
+  print(xs[0]);
+} return int 0;

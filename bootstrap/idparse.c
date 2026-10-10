@@ -1691,7 +1691,7 @@ char* id_emit_print(int id);
 char* id_tmp_all(int id, int tx_kind);
 char* id_tmp_one(int id, int i, int tx_kind);
 char* id_tmp_one2(int id, int i, int tx_kind);
-char* id_tmp_wrap(int id, char* s);
+char* id_tmp_wrap(int id);
 char* id_tmp_text(int id);
 char* id_tmp_join(char* tx_rt, char* tx_pre, char* tx_cl, char* tx_fr);
 char* id_tmp_decl(int id, int i);
@@ -1942,8 +1942,12 @@ char* id_ec2(int id);
 char* id_ec3(int id);
 char* id_emit_gcall(int id);
 char* id_emit_fcall(int id);
-char* id_emit_gcall_tail(int id, char* s);
+char* id_emit_call_struct(int id);
+char* id_emit_call_bound(int id);
+char* id_emit_gcall_tail(int id);
+char* id_emit_gcall_named(int id);
 char* id_emit_len(int id);
+char* id_emit_len_form(int arg, char* len_list_type);
 char* id_emit_push(int id);
 char* id_emit_push_tail(IdList* args, char* push_list_type);
 char* id_push_code(IdList* args, char* elem);
@@ -2378,6 +2382,8 @@ int id_str_bad_hex(char* text);
 void id_str_hex_check(IdList* pos, char* text);
 int id_str_has_nul(char* text);
 int id_nul_tail(char* text, int nul_at);
+int id_octal_escape_length(char* text, int octal_at);
+int id_octal_escape_byte(char* text, int octal_at, int octal_count);
 int id_parse_str(IdList* pos);
 int id_keyword_reported(char* candidate);
 void id_no_keyword_word(IdList* pos);
@@ -12556,9 +12562,11 @@ char* id_arg_str(int id) {
 
 char* id_emit_call(int id) {
     char* s;
-    s = id_ec2(id);
+    s = ID_S("");
     if (((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("print")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("eprint")) == 0))) {
         s = id_emit_print(id);
+    } else {
+        s = id_ec2(id);
     }
     return s;
 }
@@ -12608,11 +12616,13 @@ char* idsq_9;
     return tx_two;
 }
 
-char* id_tmp_wrap(int id, char* s) {
-    char* tx_w;
-    tx_w = s;
+char* id_tmp_wrap(int id) {
+    char* tx_w = NULL;
+    { char* idfe_o = tx_w; tx_w = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((id_esc_tmp_any(id) == 1)) {
-        tx_w = id_tmp_text(id);
+        { char* idfe_o = tx_w; tx_w = id_tmp_text(id); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = tx_w; tx_w = id_emit_gcall(id); id_str_free(idfe_o); }
     }
     return tx_w;
 }
@@ -15109,39 +15119,35 @@ char* id_arr_lit(IdList* elems, char* etyp) {
 
 char* id_ec2(int id) {
     char* s;
-    s = id_ec3(id);
+    s = ID_S("");
     if ((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("len")) == 0)) {
         s = id_emit_len(id);
-    }
-IdList* idsq_13;
-    if ((idsq_13 = sdname, (id_find_str(idsq_13, (char*)(intptr_t)(id_list_get(ns1, id))) >= 0))) {
-        s = id_emit_ctor(id);
+    } else {
+        s = id_emit_call_struct(id);
     }
     return s;
 }
 
 char* id_ec3(int id) {
     char* s;
-    s = id_ec4(id);
+    s = ID_S("");
     if ((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("push")) == 0)) {
         s = id_emit_push(id);
-    }
-    if ((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("bind")) == 0)) {
-        s = id_emit_bind(id);
+    } else {
+        s = id_emit_call_bound(id);
     }
     return s;
 }
 
 char* id_emit_gcall(int id) {
-    IdList* l1_of_v;
-    char* s;
-    char* ret_s;
-    l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
-IdList* idsq_20;
-char* idsq_18;
-    s = (idsq_20 = ns1, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_"), idsq_18), ID_S("("), 1), id_emit_gcall_args(id, l1_of_v), 3), ID_S(")"), 1));
-    ret_s = id_emit_gcall_tail(id, s);
-    return ret_s;
+    char* s = NULL;
+    { char* idfe_o = s; s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if (id_is_syscall((char*)(intptr_t)(id_list_get(ns1, id)))) {
+        { char* idfe_o = s; s = id_emit_syscall(id); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = s; s = id_emit_gcall_tail(id); id_str_free(idfe_o); }
+    }
+    return s;
 }
 
 char* id_emit_fcall(int id) {
@@ -15158,25 +15164,67 @@ char* idsq_10;
     return ret_s;
 }
 
-char* id_emit_gcall_tail(int id, char* s) {
-    char* s1_of_v;
-    s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-    if (id_is_syscall(s1_of_v)) {
-        s = id_emit_syscall(id);
+char* id_emit_call_struct(int id) {
+    char* s;
+    s = ID_S("");
+IdList* idsq_17;
+    if ((idsq_17 = sdname, (id_find_str(idsq_17, (char*)(intptr_t)(id_list_get(ns1, id))) >= 0))) {
+        s = id_emit_ctor(id);
+    } else {
+        s = id_ec3(id);
     }
+    return s;
+}
+
+char* id_emit_call_bound(int id) {
+    char* s;
+    s = ID_S("");
+    if ((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("bind")) == 0)) {
+        s = id_emit_bind(id);
+    } else {
+        s = id_ec4(id);
+    }
+    return s;
+}
+
+char* id_emit_gcall_tail(int id) {
+    char* s = NULL;
+    { char* idfe_o = s; s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((id_is_fcall(id) == 1)) {
-        s = id_emit_fcall(id);
+        { char* idfe_o = s; s = id_emit_fcall(id); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = s; s = id_emit_gcall_named(id); id_str_free(idfe_o); }
     }
+    return s;
+}
+
+char* id_emit_gcall_named(int id) {
+    IdList* l1_of_v;
+    char* s = NULL;
+    l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
+IdList* idsq_15;
+char* idsq_13;
+    { char* idfe_o = s; s = (idsq_15 = ns1, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, id)), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_"), idsq_13), ID_S("("), 1), id_emit_gcall_args(id, l1_of_v), 3), ID_S(")"), 1)); id_str_free(idfe_o); }
     return s;
 }
 
 char* id_emit_len(int id) {
     int arg;
+    char* type_of_v;
     char* s = NULL;
     arg = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0));
-    { char* idfe_o = s; s = id_concat_f(id_concat(ID_S("id_list_len("), id_emit_expr(arg)), ID_S(")"), 1); id_str_free(idfe_o); }
-    if ((strcmp(id_type_of(arg), ID_S("string")) == 0)) {
+    type_of_v = id_type_of(arg);
+    { char* idfe_o = s; s = id_emit_len_form(arg, type_of_v); id_str_free(idfe_o); }
+    return s;
+}
+
+char* id_emit_len_form(int arg, char* len_list_type) {
+    char* s = NULL;
+    { char* idfe_o = s; s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((strcmp(len_list_type, ID_S("string")) == 0)) {
         { char* idfe_o = s; s = id_concat_f(id_concat(ID_S("id_len("), id_emit_expr(arg)), ID_S(")"), 1); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = s; s = id_concat_f(id_concat(ID_S("id_list_len("), id_emit_expr(arg)), ID_S(")"), 1); id_str_free(idfe_o); }
     }
     return s;
 }
@@ -15210,11 +15258,12 @@ char* idsq_13;
 }
 
 char* id_ec4(int id) {
-    char* s;
-    s = id_emit_gcall(id);
-    s = id_tmp_wrap(id, s);
+    char* s = NULL;
+    { char* idfe_o = s; s = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((strcmp((char*)(intptr_t)(id_list_get(ns1, id)), ID_S("pop")) == 0)) {
-        s = id_emit_pop(id);
+        { char* idfe_o = s; s = id_emit_pop(id); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = s; s = id_tmp_wrap(id); id_str_free(idfe_o); }
     }
     return s;
 }
@@ -17192,6 +17241,8 @@ char* id_ll_piece(char* s, int i) {
     int charat_v2;
     int ll_escbyte_v;
     int hex_escape_v;
+    int octal_digits;
+    int octal_v;
     charat_v = id_charat(s, i);
     { char* idfe_o = out; out = id_ll_hex(charat_v); id_str_free(idfe_o); }
     if ((id_charat(s, i) == 92)) {
@@ -17203,14 +17254,24 @@ char* id_ll_piece(char* s, int i) {
         hex_escape_v = id_hex_escape_byte(s, i);
         { char* idfe_o = out; out = id_ll_hex(hex_escape_v); id_str_free(idfe_o); }
     }
+    octal_digits = id_octal_escape_length(s, i);
+    if ((octal_digits > 0)) {
+        octal_v = id_octal_escape_byte(s, i, octal_digits);
+        { char* idfe_o = out; out = id_ll_hex(octal_v); id_str_free(idfe_o); }
+    }
     return out;
 }
 
 int id_ll_step(char* s, int i) {
     int next;
+    int octal_digits;
     next = id_str_adv(s, i, 92, 2);
     if ((id_hex_escape_at(s, i) == 1)) {
         next = (i + 4);
+    }
+    octal_digits = id_octal_escape_length(s, i);
+    if ((octal_digits > 0)) {
+        next = ((i + 1) + octal_digits);
     }
     return next;
 }
@@ -19706,6 +19767,28 @@ int id_nul_tail(char* text, int nul_at) {
         nul_z = 0;
     }
     return nul_z;
+}
+
+int id_octal_escape_length(char* text, int octal_at) {
+    int octal_count;
+    octal_count = 0;
+    while (((((id_charat(text, octal_at) == 92) && (octal_count < 3)) && (id_charat(text, ((octal_at + 1) + octal_count)) >= 48)) && (id_charat(text, ((octal_at + 1) + octal_count)) <= 55))) {
+        octal_count = (octal_count + 1);
+    }
+    return octal_count;
+}
+
+int id_octal_escape_byte(char* text, int octal_at, int octal_count) {
+    int octal_value;
+    int octal_index;
+    octal_value = 0;
+    octal_index = 1;
+    while ((octal_index <= octal_count)) {
+        octal_value = (((octal_value * 8) + id_charat(text, (octal_at + octal_index))) - 48);
+        octal_index = (octal_index + 1);
+    }
+    octal_value = id_imod(octal_value, 256);
+    return octal_value;
 }
 
 int id_parse_str(IdList* pos) {
@@ -32484,6 +32567,7 @@ void id_chk_push2(int id, IdList* args, char* lt) {
         type_of_v = id_type_of((int)(id_list_get(args, 1)));
         id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot push a "), type_of_v), ID_S(" onto a "), 1), lt, 1));
     }
+    id_chk_literal_fit(id, et, (int)(id_list_get(args, 1)));
     return;
 }
 
@@ -35566,6 +35650,7 @@ void id_arr_el_check(char* want, int el, int i) {
         type_of_v = id_type_of(el);
         id_tc_err(el, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("element "), id_str_of_int(i), 2), ID_S(" of a "), 1), want, 1), ID_S(" literal is a "), 1), type_of_v, 1));
     }
+    id_chk_literal_fit(el, elem_type_v, el);
     return;
 }
 
@@ -35636,6 +35721,7 @@ void id_chk_iassign3(int id, char* bt) {
         type_of_v = id_type_of(v);
         id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot store a "), type_of_v), ID_S(" into a "), 1), bt, 1));
     }
+    id_chk_literal_fit(id, elem_type_v, v);
     return;
 }
 

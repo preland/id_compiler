@@ -1,0 +1,32 @@
+// The octal escape of a string literal: a backslash and one to three octal
+// digits, one byte, as C reads it (`\033` is ESC, `\1` is byte 1, `\0121` is a
+// newline and a 1). C passes the escape through untouched, so only the LLVM
+// emitter (back/tgt/ll/val/str) has to decode it, and it leans on these two.
+
+octal_escape_length(string text, int octal_at) {
+  int octal_count = 0;
+  while(charat(text, octal_at) == 92 && octal_count < 3 && charat(text, octal_at + 1 + octal_count) >= 48 && charat(text, octal_at + 1 + octal_count) <= 55) {
+    octal_count = octal_count + 1;
+  }
+} return int octal_count;
+("\\033", 0):(3)
+("\\1011", 0):(3)
+("\\7x", 0):(1)
+("\\x41", 0):(0)
+("a\\0", 1):(1)
+("033", 0):(0)
+
+octal_escape_byte(string text, int octal_at, int octal_count) {
+  int octal_value = 0;
+  int octal_index = 1;
+  while(octal_index <= octal_count) {
+    octal_value = octal_value * 8 + charat(text, octal_at + octal_index) - 48;
+    octal_index = octal_index + 1;
+  }
+} chain (string text, int octal_at, int octal_count) {
+  octal_value = octal_value % 256;
+} return int octal_value;
+("\\033", 0, 3):(27)
+("\\101", 0, 3):(65)
+("a\\7", 1, 1):(7)
+("\\777", 0, 3):(255)

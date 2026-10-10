@@ -1,0 +1,23 @@
+// A short-circuit argument whose right operand binds two ordered reads (a list
+// index and an imported constant) declares a temporary for the index. The
+// call it is an argument of is emitted once, so the temporary is declared
+// once: push, print, len and a call through a function value are each
+// checked, and a call that emitted its argument twice would declare the
+// temporary twice and the C would not compile.
+main(int argc, string[] argv) {
+  int[] xs = [5, 7, 9];
+  int[] marks = [];
+  push(marks, xs[0] > 1 && 2 <= xs[1] + (import span));
+} chain (int argc, string[] argv) {
+  print(xs[0] > 1 && 2 <= xs[1] + (import span));
+  print(marks[0]);
+  print(apply(identity, xs));
+} chain (int argc, string[] argv) {
+  int size = len(label(xs[0] > 1 && 2 <= xs[1] + (import span)));
+  print(size);
+  print(label(xs[0] > 1 && 2 <= xs[1] + (import span)));
+} return int 0;
+
+apply(func(int) return int step, int[] xs) {
+  int ret_i = step(xs[0] > 1 && 2 <= xs[1] + (import span));
+} return int ret_i;

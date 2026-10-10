@@ -8,10 +8,11 @@
 // with cc and quietly fell back to idc.py whenever it failed.
 
 ec4(int id) {
-  string s = emit_gcall(id);
-  s = tmp_wrap(id, s);
+  string s = "";
   if((import ns1)[id] == "pop") {
     s = emit_pop(id);
+  } else {
+    s = tmp_wrap(id);
   }
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")

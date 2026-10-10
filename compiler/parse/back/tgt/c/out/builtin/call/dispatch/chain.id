@@ -8,12 +8,11 @@
 //   ordinary user calls all take this generic form, matching idc.py)
 
 ec2(int id) {
-  string s = ec3(id);
+  string s = "";
   if((import ns1)[id] == "len") {
     s = emit_len(id);
-  }
-  if(find_str((import sdname), ((import ns1)[id])) >= 0) {
-    s = emit_ctor(id);
+  } else {
+    s = emit_call_struct(id);
   }
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
@@ -21,12 +20,11 @@ given call_names_fixture ((import call_e_len)):("id_list_len(5)")
 given sd_ctor_fixture ((import sd_c2)):("id_list_lit(2, (long long)(1), (long long)(1))")
 
 ec3(int id) {
-  string s = ec4(id);
+  string s = "";
   if((import ns1)[id] == "push") {
     s = emit_push(id);
-  }
-  if((import ns1)[id] == "bind") {
-    s = emit_bind(id);
+  } else {
+    s = emit_call_bound(id);
   }
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
@@ -34,9 +32,13 @@ given call_names_fixture2 ((import call_e_push)):("id_list_push(5, (long long)(i
 given clo_bind_fixture ((import cb_call)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
 
 emit_gcall(int id) {
-  int[] l1_of_v = (import nl1)[id];
-  string s = "id_" + (import ns1)[id] + "(" + emit_gcall_args(id, l1_of_v) + ")";
-  string ret_s = emit_gcall_tail(id, s);
-} return string ret_s;
+  string s = "";
+  if(is_syscall((import ns1)[id])) {
+    s = emit_syscall(id);
+  } else {
+    s = emit_gcall_tail(id);
+  }
+} return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
 given call_names_fixture ((import call_e_len)):("id_len(5, 4)")
+given call_sys_fixture ((import call_e_sys)):("id_peek8((long long)(5), (long long)(4))")

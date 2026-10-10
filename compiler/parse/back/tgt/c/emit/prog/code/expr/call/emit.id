@@ -2,9 +2,11 @@
 // single argument to string context, matching idc.py's id_print(to_string(...)).
 
 emit_call(int id) {
-  string s = ec2(id);
+  string s = "";
   if((import ns1)[id] == "print" || (import ns1)[id] == "eprint") {
     s = emit_print(id);
+  } else {
+    s = ec2(id);
   }
 } return string s;
 given nz_call_eprint_fixture ((import nz_call_eprint)):("id_eprint(id_str_of_int(7))")

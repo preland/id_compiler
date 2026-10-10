@@ -25,6 +25,10 @@ arr_el_check(string want, int el, int i) {
     string type_of_v = type_of(el);
     tc_err(el, "element " + i + " of a " + want + " literal is a " + type_of_v);
   }
+} chain (string want, int el, int i) {
+  chk_literal_fit(el, elem_type_v, el);
 } return void;
 given fnval_call_fixture ("int[]", (import fnval_call), 0):() then (import chkfail)[0]:(1)
 given leaves_fixture ("int[]", (import lit_a), 0):() then (import chkfail)[0]:(0)
+given wide_list_fixture ("int[]", (import literal_huge), 0):() then (import chkfail)[0]:(1)
+given wide_list_fixture ("word[]", (import literal_huge), 0):() then (import chkfail)[0]:(0)

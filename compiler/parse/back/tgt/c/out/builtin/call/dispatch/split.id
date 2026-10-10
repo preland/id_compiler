@@ -1,0 +1,27 @@
+// The branches of the call dispatch (chain.id, pop.id) that follow the len
+// and push checks. Each level tests its own name and passes on only when it
+// is not that one, because emit_expr prints the declaration of every
+// temporary an argument binds: a level that emitted its default form first
+// and replaced it would emit the arguments twice, and declare twice.
+
+emit_call_struct(int id) {
+  string s = "";
+  if(find_str((import sdname), ((import ns1)[id])) >= 0) {
+    s = emit_ctor(id);
+  } else {
+    s = ec3(id);
+  }
+} return string s;
+given sd_ctor_fixture ((import sd_c2)):("id_list_lit(2, (long long)(1), (long long)(1))")
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+
+emit_call_bound(int id) {
+  string s = "";
+  if((import ns1)[id] == "bind") {
+    s = emit_bind(id);
+  } else {
+    s = ec4(id);
+  }
+} return string s;
+given clo_bind_fixture ((import cb_call)):("id_clo_set(id_clo_new(ID_FNV(fx_target__1)), 0, (long long)(7))")
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")

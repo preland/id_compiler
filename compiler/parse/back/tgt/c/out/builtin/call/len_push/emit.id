@@ -4,13 +4,22 @@
 
 emit_len(int id) {
   int arg = (import nl1)[id][0];
-  string s = "id_list_len(" + emit_expr(arg) + ")";
-  if(type_of(arg) == "string") {
-    s = "id_len(" + emit_expr(arg) + ")";
-  }
+  string type_of_v = type_of(arg);
+  string s = emit_len_form(arg, type_of_v);
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_list_len(5)")
 given call_names_fixture2 ((import call_e_pop)):("id_list_len(4)")
+
+emit_len_form(int arg, string len_list_type) {
+  string s = "";
+  if(len_list_type == "string") {
+    s = "id_len(" + emit_expr(arg) + ")";
+  } else {
+    s = "id_list_len(" + emit_expr(arg) + ")";
+  }
+} return string s;
+given call_int_fixture ((import call_e1), "string"):("id_len(5)")
+given call_int_fixture ((import call_e2), "int[]"):("id_list_len(4)")
 
 emit_push(int id) {
   int[] args = (import nl1)[id];

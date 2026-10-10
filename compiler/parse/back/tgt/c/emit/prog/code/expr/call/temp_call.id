@@ -4,14 +4,16 @@
 // keep their order: each temporary is evaluated first, in argument order, and
 // every other argument at the call.
 
-tmp_wrap(int id, string s) {
-  string tx_w = s;
+tmp_wrap(int id) {
+  string tx_w = "";
   if(esc_tmp_any(id) == 1) {
     tx_w = tmp_text(id);
+  } else {
+    tx_w = emit_gcall(id);
   }
 } return string tx_w;
-given esc_ffix ((import eff_ctp), "id_ff_len(x)"):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
-given esc_ffix ((import eff_cmk), "id_ff_make(n)"):("id_ff_make(n)")
+given esc_ffix ((import eff_ctp)):("({ IdList* idft0 = id_ff_make(n); int idfr = id_ff_len(idft0); id_list_free(idft0); idfr; })")
+given esc_ffix ((import eff_cmk)):("id_ff_make(n)")
 
 tmp_text(int id) {
   string tx_call = "id_" + (import ns1)[id] + "(" + tmp_all(id, 1) + ")";

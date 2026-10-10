@@ -16,9 +16,12 @@ chk_push2(int id, int[] args, string lt) {
     string type_of_v = type_of(args[1]);
     tc_err(id, "cannot push a " + type_of_v + " onto a " + lt);
   }
+  chk_literal_fit(id, et, args[1]);
 } return void;
 given argsfix ((import cm_push_call), (import args2), "int"):() then (import chkfail)[0]:(0)
 given argsfix ((import cm_push_call), (import args2), "string"):() then (import chkfail)[0]:(0)
+given wide_list_fixture ((import push_wide), (import args_wide), "int[]"):() then (import chkfail)[0]:(1)
+given wide_list_fixture ((import push_wide), (import args_wide), "word[]"):() then (import chkfail)[0]:(0)
 
 // `[]` carries no element type, so it is only meaningful where something else
 // supplies one. arr_ok asks whether any node in the program uses this literal

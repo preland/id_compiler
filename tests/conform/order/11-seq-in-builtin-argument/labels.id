@@ -1,0 +1,9 @@
+identity(int value) {
+} return int value;
+
+label(int on) {
+  string text = "off";
+  if (on == 1) {
+    text = "enabled";
+  }
+} return string text;

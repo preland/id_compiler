@@ -1,15 +1,24 @@
 
-// The tail of emit_gcall: the generic id_NAME(args) form, overridden with a
-// runtime-helper call when the callee is a syscall, and with a call through
-// the variable when the callee is a variable of function type.
-emit_gcall_tail(int id, string s) {
-  string s1_of_v = (import ns1)[id];
-  if(is_syscall(s1_of_v)) {
-    s = emit_syscall(id);
-  }
+// The tail of emit_gcall, for a callee that is not a syscall: a call through
+// the variable when the callee is a variable of function type, the generic
+// id_NAME(args) form otherwise. Each branch writes the arguments itself and
+// only the branch taken runs, so an argument is emitted once (emit_expr
+// prints the declaration of any temporary it binds, and a second emission
+// would declare it again).
+emit_gcall_tail(int id) {
+  string s = "";
   if(is_fcall(id) == 1) {
     s = emit_fcall(id);
+  } else {
+    s = emit_gcall_named(id);
   }
 } return string s;
-given call_names_fixture ((import call_e_foo), "id_foo(5, 4)"):("id_foo(5, 4)")
-given call_sys_fixture ((import call_e_sys), "ignored"):("id_peek8((long long)(5), (long long)(4))")
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+given clo_call_fixture ((import cv_call)):("((int (*)(IdFn*, int))cv->fn)(cv, 5)")
+
+emit_gcall_named(int id) {
+  int[] l1_of_v = (import nl1)[id];
+  string s = "id_" + (import ns1)[id] + "(" + emit_gcall_args(id, l1_of_v) + ")";
+} return string s;
+given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")
+given call_names_fixture ((import call_e_len)):("id_len(5, 4)")

@@ -37,6 +37,10 @@ chk_iassign3(int id, string bt) {
     string type_of_v = type_of(v);
     tc_err(id, "cannot store a " + type_of_v + " into a " + bt);
   }
+} chain (int id, string bt) {
+  chk_literal_fit(id, elem_type_v, v);
 } return void;
 given iassign_build ((import idx_iassign_node), "int[]"):() then (import chkfail)[0]:(0)
 given iassign_build ((import idx_iassign_node), "string[]"):() then (import chkfail)[0]:(1)
+given wide_list_fixture ((import iassign_wide), "int[]"):() then (import chkfail)[0]:(1)
+given wide_list_fixture ((import iassign_wide), "word[]"):() then (import chkfail)[0]:(0)
