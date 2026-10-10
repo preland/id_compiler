@@ -53,7 +53,7 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 STD_ROOT=$(env -u IDC_NO_STD bin/idc compiler/lex --print-std 2>/dev/null)
 KEY=$({ find bin compiler runtime driver interop ${STD_ROOT:+"$STD_ROOT"} -type f \
             \( -name '*.id' -o -name '*.c' -o -name '*.h' -o -name idc \) \
-            -not -path '*/build/*' -print0 | sort -z | xargs -0 md5sum; } | md5sum | cut -d' ' -f1)
+            -not -path "$STD_ROOT/build/*" -print0 | sort -z | xargs -0 md5sum; } | md5sum | cut -d' ' -f1)
 BOOT_KEY=$(cat bootstrap/idlex.c bootstrap/idparse.c | md5sum | cut -d' ' -f1)
 
 step_key() {
