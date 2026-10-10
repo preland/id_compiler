@@ -102,3 +102,9 @@ cli
 os
 ui
 ok
+
+# Names of published learning algorithms and their own terms (idstd core/learn): FSRS (Free Spaced
+# Repetition Scheduler), Elo (Arpad Elo's rating system), retrievability (FSRS's R(t,S)).
+elo
+fsrs
+retrievability
