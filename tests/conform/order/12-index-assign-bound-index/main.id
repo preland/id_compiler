@@ -1,0 +1,13 @@
+// An index assignment whose index holds a call, an imported constant and a
+// list read, and whose value is a list read, binds the index to a temporary.
+// The index is emitted once, so each temporary it binds is declared once;
+// emitting it before choosing the bound form declared them twice and the C
+// did not compile.
+main(int argc, string[] argv) {
+  string[] texts = ["a", "b", "c", "d"];
+  string[] result = ["x", "y", "z", "w", "u", "2"];
+  texts[(import rung) + to_int(result[5]) - 1] = result[2];
+} chain (int argc, string[] argv) {
+  texts[0] = result[1];
+  print(texts[0] + texts[1] + texts[2] + texts[3]);
+} return int 0;

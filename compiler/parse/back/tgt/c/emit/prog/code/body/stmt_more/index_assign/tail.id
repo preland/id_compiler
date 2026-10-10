@@ -3,10 +3,13 @@
 // iassign node out of the statement chain.
 
 iassign4(int id, string ind, string val) {
-  string iset_code_v = iset_code(id, val);
+  string iset_code_v = "";
   if(iset_hz(id) == 1) {
     iset_code_v = iset_seq(id, val);
+  } else {
+    iset_code_v = iset_code(id, val);
   }
+} chain (int id, string ind, string val) {
   print(ind + iset_code_v + ";");
 } return void;
 given iassign_fixture ((import iassign_node), "  ", "BOXED"):() then prints:("  id_list_set(id_list_lit(1, (long long)(1)), 0, BOXED);\n")
