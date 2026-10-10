@@ -10,7 +10,7 @@ rename_note_piece(string[] rename_failing, string rename_piece, int rename_piece
   if(rename_piece == "") {
     rename_shown = "(empty)";
   }
-  if(hmap_has(rename_word_keys, rename_word_used, str_lower(rename_piece)) == 0 && rename_axis_piece(str_lower(rename_piece), rename_piece_count) == 0) {
+  if(hmap_has(rename_word_keys, rename_word_used, str_lower(rename_piece)) == 0 && str_is_axis_piece(str_lower(rename_piece), rename_piece_count) == 0) {
     push(rename_failing, rename_shown);
   }
 } return void;

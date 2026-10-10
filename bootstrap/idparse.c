@@ -927,6 +927,7 @@ int id_chr_lower(int idstd_c);
 int id_chr_in(int idstd_c, int idstd_lo, int idstd_hi);
 int id_chr_is_space(int idstd_c);
 int id_str_adv(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_adv_by);
+int id_str_is_axis_piece(char* idstd_axis_piece, int idstd_axis_parts);
 int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size);
 void id_idstd_str_split_push(IdList* idstd_strs, char* idstd_s, int idstd_i, int idstd_n);
 char* id_str_join(IdList* idstd_strs, char* idstd_sep);
@@ -3016,7 +3017,6 @@ int id_find_dup(int i);
 void id_ul_at(int i);
 int id_ul_find(int i);
 int id_ul_probe(int i, int j);
-int id_vocab_axis(char* vocab_piece, int vocab_parts);
 char* id_vocab_bad(char* vocab_name);
 void id_vocab_judge(char* vocab_name, int vocab_kind, int vocab_row);
 char* id_vocab_loc(int vocab_kind, int vocab_row, char* vocab_name);
@@ -4910,6 +4910,15 @@ int id_str_adv(char* idstd_adv_s, int idstd_adv_i, int idstd_adv_esc, int idstd_
     return idstd_adv_n;
 }
 
+int id_str_is_axis_piece(char* idstd_axis_piece, int idstd_axis_parts) {
+    int idstd_ret_i;
+    idstd_ret_i = 0;
+    if (((idstd_axis_parts > 1) && (((strcmp(idstd_axis_piece, ID_S("x")) == 0) || (strcmp(idstd_axis_piece, ID_S("y")) == 0)) || (strcmp(idstd_axis_piece, ID_S("z")) == 0)))) {
+        idstd_ret_i = 1;
+    }
+    return idstd_ret_i;
+}
+
 int id_idstd_str_split_bound(char* idstd_s, char* idstd_sep, int idstd_i, int idstd_size) {
     int idstd_str_findat_v;
     int idstd_ret_i;
@@ -6675,7 +6684,7 @@ int id_lw_iset_val(int node, char* elem) {
     int v;
     int boxed;
     els = (IdList*)(intptr_t)(id_list_get(nl1, node));
-    v = id_lw_expr((int)(id_list_get(els, 0)));
+    v = id_lw_as((int)(id_list_get(els, 0)), elem);
     boxed = id_lw_box(v, elem);
     return boxed;
 }
@@ -11928,9 +11937,11 @@ void id_iassign3(int id, char* ind, char* elem, IdList* ia_arg_ids) {
 
 void id_iassign4(int id, char* ind, char* val) {
     char* iset_code_v = NULL;
-    { char* idfe_o = iset_code_v; iset_code_v = id_iset_code(id, val); id_str_free(idfe_o); }
+    { char* idfe_o = iset_code_v; iset_code_v = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     if ((id_iset_hz(id) == 1)) {
         { char* idfe_o = iset_code_v; iset_code_v = id_iset_seq(id, val); id_str_free(idfe_o); }
+    } else {
+        { char* idfe_o = iset_code_v; iset_code_v = id_iset_code(id, val); id_str_free(idfe_o); }
     }
     id_print(id_concat_f(id_concat(ind, iset_code_v), ID_S(";"), 1));
     { id_str_free(iset_code_v); return; }
@@ -26378,15 +26389,6 @@ char* idsq_10;
     return ul_found;
 }
 
-int id_vocab_axis(char* vocab_piece, int vocab_parts) {
-    int vocab_is_axis;
-    vocab_is_axis = 0;
-    if (((vocab_parts > 1) && (((strcmp(vocab_piece, ID_S("x")) == 0) || (strcmp(vocab_piece, ID_S("y")) == 0)) || (strcmp(vocab_piece, ID_S("z")) == 0)))) {
-        vocab_is_axis = 1;
-    }
-    return vocab_is_axis;
-}
-
 char* id_vocab_bad(char* vocab_name) {
     IdList* vocab_pieces = NULL;
     char* vocab_acc;
@@ -26461,7 +26463,7 @@ int id_vocab_ok(char* vocab_piece, int vocab_parts) {
     { char* idfe_o = vocab_lower; vocab_lower = id_str_lower(vocab_piece); id_str_free(idfe_o); }
 IdList* idsq_20;
     vocab_hit = (idsq_20 = vocab_keys, id_hmap_has(idsq_20, vocab_used, vocab_lower));
-    vocab_axis_hit = id_vocab_axis(vocab_lower, vocab_parts);
+    vocab_axis_hit = id_str_is_axis_piece(vocab_lower, vocab_parts);
     if ((vocab_axis_hit == 1)) {
         vocab_hit = 1;
     }
