@@ -1,15 +1,11 @@
-setat(int[] xs, int i, int v) {
-  xs[i] = v;
-} return void;
-
 // bump writes into c through an index-assignment, and a call is judged only
 // by whether it can write at all, not by what -- so the import moves ahead
 // of it exactly as it would ahead of a call that ran tab_init.
 keep(int[] c) {
-  setat((import tab), 0, twice(twice(bump(c))));
-} return void;
+  int r = (import tab)[0] + twice(twice(bump(c)));
+} return int r;
 
 // again runs tab_init, so the list is read ahead of it, as it was.
 move(int[] c) {
-  setat((import tab), 1, twice(twice(again(c))));
-} return void;
+  int r = (import tab)[1] + twice(twice(again(c)));
+} return int r;

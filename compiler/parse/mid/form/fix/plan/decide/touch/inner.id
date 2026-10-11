@@ -1,0 +1,31 @@
+// Whether a moved read after event i, up to last, contains event i. That outer
+// read is declared on its own and holds the inner one in its text, so the inner
+// read needs no declaration of its own: xs[c[0]] is one name, not two.
+fix_inner(int i, int last) {
+  int j = i + 1;
+  int ok = 0;
+  while(j <= last) {
+    ok = fix_inner_at(i, j, ok);
+    j = j + 1;
+  }
+} return int ok;
+given fix_inner_fixture (0, 1):(1)
+given fix_late_fixture (0, 1):(0)
+
+fix_inner_at(int i, int j, int ok) {
+  int r = ok;
+  if((import fixe_mv)[j] == 1 && (import fixe_lo)[j] <= i && ((import fixe_cl)[j] == 2 || (import fixe_cl)[j] == 4)) {
+    r = 1;
+  }
+} return int r;
+given fix_inner_fixture (0, 1, 0):(1)
+given fix_late_fixture (0, 1, 0):(0)
+
+// fix_late_fixture with event 1 an index read instead of a call, so event 0
+// sits inside a moved read.
+fix_inner_fixture() {
+  fix_late_fixture();
+  lset((import fixe_cl), 1, 2);
+} return void;
+():() then calls fix_late_fixture:[1]
+():() then (import fixe_cl)[1]:(2)

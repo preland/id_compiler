@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  int[] xs = [10, 20, 30];
+  print(guard([0], xs));
+  print(popper([0, 1], xs));
+} chain (int argc, string[] argv) {
+  print(quiet([0, 1], xs));
+} return int 0;

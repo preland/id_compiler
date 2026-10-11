@@ -1,5 +1,6 @@
-// Whether a call that moves could run a function that declares an export,
-// which is the only way an import read's value can change (docs/SPEC.md 9).
+// Whether a call that moves could write memory an earlier read sees: run a
+// function that declares an export or writes through a list, or be a writing
+// builtin (docs/SPEC.md 5, 6, 9).
 fix_touches(int last) {
   int i = 0;
   int ok = 0;
@@ -20,8 +21,9 @@ fix_touch_at(int i, int ok) {
 given fix_touch_fixture (1, 0):(1)
 given fix_touch_fixture (0, 0):(0)
 
-// A builtin runs no id code. A call through a function value, or to a name
-// that is no function, could run anything.
+// A builtin runs no id code, but push, pop, lset and the pokes write memory
+// a read may have seen. A call through a function value, or to a name that is
+// no function, could run anything.
 fix_call_touch(int e) {
   string s1_of_v = (import ns1)[e];
   int ci = fix_fnix(s1_of_v);
@@ -30,8 +32,9 @@ fix_call_touch(int e) {
   if(ci >= 0) {
     ok = (import fixd_wm)[ci];
   } else if(is_builtin(s1_of_v) == 1) {
-    ok = 0;
+    ok = fix_wmut(s1_of_v);
   }
 } return int ok;
 given fix_touch_fixture ((import ft_call)):(1)
 given fix_touch_fixture ((import ft_bcall)):(0)
+given fix_wcall_fixture ((import ft_wcall)):(1)

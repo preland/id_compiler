@@ -3,10 +3,11 @@ again(int[] c) {
   int n = bump(c);
 } return int n;
 
-// bump cannot run tab_init and touches no export, so xs[c[0]] is read where
-// it stands -- only the nested call has to move.
+// bump cannot run tab_init, but it writes c[0] through its list parameter, and
+// the call that moves runs it: xs[c[0]] is read first, as the language reads
+// operands left to right (docs/SPEC.md 7), then the nested call is named.
 guard(int[] c, int[] xs) {
+  int xs_v = xs[c[0]];
   int twice_v = twice(bump(c));
-  int print_a0 = xs[c[0]] + twice(twice_v);
-  print(print_a0);
-} return void;
+  int r = xs_v + twice(twice_v);
+} return int r;

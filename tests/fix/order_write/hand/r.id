@@ -1,0 +1,16 @@
+guard(int[] c, int[] xs) {
+  int a = xs[c[0]];
+  int t = twice(bump(c));
+  int r = a + twice(t);
+} return int r;
+
+popper(int[] c, int[] xs) {
+  int a = xs[c[1]];
+  int t = twice(pop(c));
+  int r = a + twice(t);
+} return int r;
+
+quiet(int[] c, int[] xs) {
+  int t = twice(twice(c[1]));
+  int r = xs[c[0]] + twice(t);
+} return int r;

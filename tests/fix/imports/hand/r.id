@@ -1,0 +1,10 @@
+again(int[] c) {
+  tab_init();
+  int n = bump(c);
+} return int n;
+
+guard(int[] c, int[] xs) {
+  int a = xs[c[0]];
+  int t = twice(bump(c));
+  int r = a + twice(t);
+} return int r;

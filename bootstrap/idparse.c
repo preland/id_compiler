@@ -2814,6 +2814,10 @@ void id_fix_mark_cls(int last, int wcl);
 int id_fix_anc(IdList* fl, int i, int hi);
 int id_fix_anc_at(IdList* fl, int i, int j, int ok);
 char* id_fix_evtype(int i);
+int id_fix_inner(int i, int last);
+int id_fix_inner_at(int i, int j, int ok);
+int id_fix_late(int i, int last);
+int id_fix_carried(int i, int last);
 int id_fix_touches(int last);
 int id_fix_touch_at(int i, int ok);
 int id_fix_call_touch(int e);
@@ -24250,6 +24254,50 @@ char* id_fix_evtype(int i) {
     return t;
 }
 
+int id_fix_inner(int i, int last) {
+    int j;
+    int ok;
+    j = (i + 1);
+    ok = 0;
+    while ((j <= last)) {
+        ok = id_fix_inner_at(i, j, ok);
+        j = (j + 1);
+    }
+    return ok;
+}
+
+int id_fix_inner_at(int i, int j, int ok) {
+    int r;
+    r = ok;
+    if (((((int)(id_list_get(fixe_mv, j)) == 1) && ((int)(id_list_get(fixe_lo, j)) <= i)) && (((int)(id_list_get(fixe_cl, j)) == 2) || ((int)(id_list_get(fixe_cl, j)) == 4)))) {
+        r = 1;
+    }
+    return r;
+}
+
+int id_fix_late(int i, int last) {
+    int ok;
+    ok = 0;
+    if (((((((int)(id_list_get(fixe_cl, i)) == 2) || ((int)(id_list_get(fixe_cl, i)) == 4)) && (id_fix_carried(i, last) == 1)) && (id_fix_touches(last) == 1)) && (id_fix_inner(i, last) == 0))) {
+        ok = 1;
+    }
+    return ok;
+}
+
+int id_fix_carried(int i, int last) {
+    int j;
+    int ok;
+    j = (i + 1);
+    ok = 0;
+    while ((j <= last)) {
+        if (((((int)(id_list_get(fixe_mv, j)) == 1) && ((int)(id_list_get(fixe_lo, j)) <= i)) && (((int)(id_list_get(fixe_cl, j)) == 1) || ((int)(id_list_get(fixe_cl, j)) == 3)))) {
+            ok = 1;
+        }
+        j = (j + 1);
+    }
+    return ok;
+}
+
 int id_fix_touches(int last) {
     int i;
     int ok;
@@ -24282,7 +24330,7 @@ int id_fix_call_touch(int e) {
     if ((ci >= 0)) {
         ok = (int)(id_list_get(fixd_wm, ci));
     } else if ((id_is_builtin(s1_of_v) == 1)) {
-        ok = 0;
+        ok = id_fix_wmut(s1_of_v);
     }
     return ok;
 }
@@ -24298,7 +24346,7 @@ void id_fix_mark_sep(int last) {
 }
 
 void id_fix_sep_at(int i, int last) {
-    if ((((int)(id_list_get(fixe_mv, i)) == 1) && (((int)(id_list_get(fixe_cl, i)) == 3) || (id_fix_anc(fixe_mv, i, last) == 0)))) {
+    if ((((int)(id_list_get(fixe_mv, i)) == 1) && ((((int)(id_list_get(fixe_cl, i)) == 3) || (id_fix_anc(fixe_mv, i, last) == 0)) || (id_fix_late(i, last) == 1)))) {
         id_lset(fixe_sep, i, 1);
     }
     return;

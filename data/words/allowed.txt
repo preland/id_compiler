@@ -24,6 +24,7 @@ odp
 fodt
 rgb
 hsv
+iso
 
 # Network protocols and addresses, named by their acronym in every specification.
 http
@@ -76,6 +77,7 @@ umask
 mtime
 fifo
 unix
+fs
 
 # Names of id builtins; a local holding the builtin's result is named after it
 # (the idstd convention is <call>_v).

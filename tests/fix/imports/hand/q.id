@@ -1,0 +1,11 @@
+keep(int[] c) {
+  int a = (import tab)[0];
+  int t = twice(bump(c));
+  int r = a + twice(t);
+} return int r;
+
+move(int[] c) {
+  int a = (import tab)[1];
+  int t = twice(again(c));
+  int r = a + twice(t);
+} return int r;

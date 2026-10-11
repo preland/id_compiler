@@ -6,7 +6,11 @@
 // calls do. A trapping read (an index, or an operator that can trap) and an
 // import read move only when some call ahead of them that also moves could
 // write -- the only way either could see a different value
-// (docs/PROJECT.md, --fix).
+// (docs/PROJECT.md, --fix). A call writes when its callee reaches an export
+// declaration, an index assignment or a writing builtin (fixd_wm), or is one.
+// A read that a later moved call or value carries inside its text is still
+// declared on its own when a call writes (fix_late, ../touch/late.id): its
+// carrier is declared after the writing call.
 fix_mark_moves(int last) {
   fix_mark_cls(last, 1);
   fix_mark_cls(last, 3);
@@ -33,4 +37,15 @@ fix_sep_fixture() {
   push((import fixe_sep), 0);
 } return void;
 ():() then fixe_sep_count:("sep 0")
+():() then calls fix_touch_fixture:[1]
+
+// fix_touch_fixture plus a call node to the writing builtin lset, for
+// fix_call_touch's builtin case. Filed here because ../touch/ is at the
+// three-function cap.
+fix_wcall_fixture() {
+  fix_touch_fixture();
+  int[] wnone = [];
+  export int ft_wcall = node_call("lset", wnone);
+} return void;
+():() then len((import fixe_n)):(2)
 ():() then calls fix_touch_fixture:[1]

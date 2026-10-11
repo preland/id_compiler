@@ -1,0 +1,22 @@
+// The index read in front of the hoisted call is evaluated first (docs/SPEC.md
+// 7), so it must be named before the call that writes c, wherever that call
+// sits in the argument.
+guard(int[] c, int[] xs) {
+  int xs_v = xs[c[0]];
+  int twice_v = twice(bump(c));
+  int r = xs_v + twice(twice_v);
+} return int r;
+
+// pop is the writer, called directly in the argument: it shortens c, and c[1]
+// read afterwards would trap.
+popper(int[] c, int[] xs) {
+  int xs_v = xs[c[1]];
+  int twice_v = twice(pop(c));
+  int r = xs_v + twice(twice_v);
+} return int r;
+
+// Nothing in the hoisted call can write, so xs[c[0]] stays where it stands.
+quiet(int[] c, int[] xs) {
+  int twice_v = twice(twice(c[1]));
+  int r = xs[c[0]] + twice(twice_v);
+} return int r;

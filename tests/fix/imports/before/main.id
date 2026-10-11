@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  int[] c = [0];
+  int[] xs = [10, 20, 30];
+  print(guard(c, xs));
+} return int 0;

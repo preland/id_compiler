@@ -1,0 +1,39 @@
+// Whether a moved read must be declared on its own. A moved call or value that
+// contains the read carries it inside its text, but that carrier is declared
+// where it falls in the order, after any writing call declared ahead of it, so
+// the read would see what the call wrote. Evaluation goes left to right
+// (docs/SPEC.md 7): the read is named first whenever a moved call can write.
+fix_late(int i, int last) {
+  int ok = 0;
+  if(((import fixe_cl)[i] == 2 || (import fixe_cl)[i] == 4) && fix_carried(i, last) == 1 && fix_touches(last) == 1 && fix_inner(i, last) == 0) {
+    ok = 1;
+  }
+} return int ok;
+given fix_late_fixture (0, 1):(1)
+given fix_late_fixture (0, 0):(0)
+given fix_inner_fixture (0, 1):(0)
+
+// Whether a moved call or a value that must be named, after event i and up to
+// last, contains event i.
+fix_carried(int i, int last) {
+  int j = i + 1;
+  int ok = 0;
+  while(j <= last) {
+    if((import fixe_mv)[j] == 1 && (import fixe_lo)[j] <= i && ((import fixe_cl)[j] == 1 || (import fixe_cl)[j] == 3)) {
+      ok = 1;
+    }
+    j = j + 1;
+  }
+} return int ok;
+given fix_sep_fixture (0, 1):(1)
+given fix_sep_fixture (0, 0):(0)
+
+// fix_sep_fixture with event 0 a moved index read, so the carried event 1
+// (a moved call to an unregistered name) has a read to leave ahead of it.
+fix_late_fixture() {
+  fix_sep_fixture();
+  lset((import fixe_cl), 0, 2);
+  lset((import fixe_mv), 0, 1);
+} return void;
+():() then calls fix_sep_fixture:[1]
+():() then len((import fixe_cl)):(2)
