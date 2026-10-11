@@ -30,7 +30,7 @@ fix_xemit(int xef2, int xelo2, int xea, int xeb) {
   string xehead = xename + "(" + fix_xjoin(0) + ") {";
 } chain (int xef2, int xelo2, int xea, int xeb) {
   string xechain = "} chain (" + fix_xjoin(0) + ") {";
-  string xecall = fix_xcall(xename);
+  string xecall = fix_xcall(xename, xelo2, xef2);
   string xetail = fix_xtail(xelo2, xef2);
 } chain (int xef2, int xelo2, int xea, int xeb) {
   string xeline = "@X|" + (import fixd_file)[0] + "|" + fix_at(xea) + "|" + fix_after(xeb) + "|" + fix_seq() + "|" + xename + "|" + xecall + "|" + xehead + "|" + xechain + "|" + xetail + "|" + (import ns1)[xef2] + fix_xcutstr();

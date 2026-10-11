@@ -5,6 +5,7 @@ fix_xreset4() {
 } chain () {
   export int[] fixx_skip = [0];
   export int[] fixx_again = [0];
+  export string[] fixx_val = [];
 } return void export fixx_loop;
 ():() then (import fixx_loop):([0])
 

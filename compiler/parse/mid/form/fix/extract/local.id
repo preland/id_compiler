@@ -1,7 +1,7 @@
 fix_xlocal() {
   string xlname = fix_xshare((import fixx_dc), (import fixx_out));
   string xlwhy = "";
-  if(xlname != "") {
+  if(xlname != "" && find_str((import fixx_val), xlname) < 0) {
     xlwhy = "the local '" + xlname + "' is declared in the block and used after it";
   }
 } return string xlwhy;

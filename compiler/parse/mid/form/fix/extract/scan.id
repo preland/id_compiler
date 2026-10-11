@@ -5,8 +5,8 @@
 
 fix_xscan(int xsf, int xsa, int xsb) {
   fix_xrange(xsa, xsb, 0);
-  fix_xrange(xsb + 1, (import ntok)[xsf], 1);
-  if((import fixx_loop)[0] == 1) {
+  fix_xrange(xsb + 1, fix_xreach(xsf, xsb), 1);
+  if((import fixx_loop)[0] == 1 && len((import fixx_val)) == 0) {
     fix_xrange(fix_xbody(xsf), xsa - 1, 1);
   }
 } return void;

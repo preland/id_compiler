@@ -1,0 +1,34 @@
+// A block that ends in `return NAME;` right after `TYPE NAME = EXPR;` is pulled
+// out without its return: the helper declares NAME and returns it, and the
+// block keeps the return and takes NAME from the call. Nothing after such a
+// block runs, so only the return reads what the block leaves behind.
+
+fix_xvalue() {
+  string xvname = fix_xvname(len((import fixx_hit)));
+  if(xvname != "") {
+    push((import fixx_val), xvname);
+    push((import fixx_ret), xvname);
+  }
+} return void;
+given fix_xvalued ():() then (import fixx_val):(["a"])
+given fix_xplanned ():() then (import fixx_val):([])
+
+fix_xvname(int xnn) {
+  string xnname = "";
+  if(xnn >= 2) {
+    xnname = fix_xvpair((import fixx_hit)[xnn - 2], (import fixx_hit)[xnn - 1]);
+  }
+} return string xnname;
+given fix_xvalued (2):("a")
+given fix_xvalued (1):("")
+
+fix_xvpair(int xpd, int xpr) {
+  string xpname = fix_xtext((import nst)[xpr] + 1);
+  string xpok = "";
+  if((import nkind)[xpd] == "decl" && (import ns2)[xpd] == xpname && (import nkind)[xpr] == "ret" && fix_xtext((import nst)[xpr] + 2) == ";") {
+    xpok = xpname;
+  }
+} return string xpok;
+given fix_xvalued (11, 14):("a")
+given fix_xvalued (12, 14):("")
+given fix_xvalued (1, 14):("")

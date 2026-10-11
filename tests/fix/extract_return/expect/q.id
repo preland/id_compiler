@@ -1,0 +1,7 @@
+main(int argc, string[] argv) {
+  int a = argc;
+  if(argc > 0) {
+    int r = main_part(a);
+    return r;
+  }
+} return int a;

@@ -1,0 +1,29 @@
+// Where the block ends and how far the code around it matters, for a block
+// whose return stays behind (value.id): it ends at the declaration, and only
+// the three tokens of `return NAME;` after it are read.
+
+fix_xend() {
+  fix_xvalue();
+  int xeidx = len((import fixx_hit)) - 1 - len((import fixx_val));
+  int xeend = fix_xlast((import fixx_hit)[xeidx]);
+} return int xeend;
+given fix_xplanned ():(6)
+given fix_xvalued ():(11)
+
+fix_xreach(int xrf, int xrb) {
+  int xrend = (import ntok)[xrf];
+  if(len((import fixx_val)) > 0) {
+    xrend = xrb + 3;
+  }
+} return int xrend;
+given fix_xplanned (7, 6):(16)
+given fix_xheld (7, 11):(14)
+
+fix_xdeclare(string xdname, int xdlo, int xdf) {
+  string xdtype = "";
+  if(find_str((import fixx_val), xdname) >= 0) {
+    xdtype = fix_xtype(xdname, xdlo, xdf) + " ";
+  }
+} return string xdtype;
+given fix_xheld ("a", 0, 12):("int ")
+given fix_xplanned ("a", 0, 12):("")

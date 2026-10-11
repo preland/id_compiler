@@ -1,13 +1,13 @@
 // The call that replaces the block and the clause that ends the helper.
 
-fix_xcall(string xcname2) {
+fix_xcall(string xcname2, int xclo, int xcf) {
   string xccall = xcname2 + "(" + fix_xjoin(1) + ");";
   if(len((import fixx_ret)) > 0) {
-    xccall = (import fixx_ret)[0] + " = " + xccall;
+    xccall = fix_xdeclare((import fixx_ret)[0], xclo, xcf) + (import fixx_ret)[0] + " = " + xccall;
   }
 } return string xccall;
-given fix_xparamed ("hp"):("hp(a, b);")
-given fix_xreturned ("hp"):("b = hp(a, b);")
+given fix_xparamed ("hp", 0, 12):("hp(a, b);")
+given fix_xreturned ("hp", 0, 12):("b = hp(a, b);")
 
 fix_xtail(int xtlo2, int xtf2) {
   string xttail = "} return void;";

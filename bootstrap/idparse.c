@@ -2702,6 +2702,9 @@ void id_fix_xplan(int xpf, int xplo);
 int id_fix_xlast(int xls);
 void id_fix_xsort(int xst, int xmode);
 void id_fix_xrange(int xfrom, int xto, int xmode);
+int id_fix_xend(void);
+int id_fix_xreach(int xrf, int xrb);
+char* id_fix_xdeclare(char* xdname, int xdlo, int xdf);
 void id_fix_xreset4(void);
 void id_fix_xrecord(IdList* xblock, int xinloop);
 void id_fix_xmark(void);
@@ -2717,8 +2720,11 @@ int id_fix_xassign(char* xbefore);
 void id_fix_xadd(IdList* xlist, char* xname);
 IdList* id_fix_xpick(int xrole);
 void id_fix_xadopt(IdList* xblock, int xinloop);
-char* id_fix_xcall(char* xcname2);
+char* id_fix_xcall(char* xcname2, int xclo, int xcf);
 char* id_fix_xtail(int xtlo2, int xtf2);
+void id_fix_xvalue(void);
+char* id_fix_xvname(int xnn);
+char* id_fix_xvpair(int xpd, int xpr);
 char* id_fix_xwhy(int xwa, int xwb);
 char* id_fix_xshare(IdList* xla, IdList* xlb);
 char* id_fix_xcommon(char* xcname, IdList* xclist);
@@ -4361,6 +4367,7 @@ IdList* fixx_acc;  /* exported by fix_xreset4() */
 IdList* fixx_cuts;  /* exported by fix_xreset4() */
 IdList* fixx_skip;  /* exported by fix_xreset4() */
 IdList* fixx_again;  /* exported by fix_xreset4() */
+IdList* fixx_val;  /* exported by fix_xreset4() */
 IdList* fixx_mark;  /* exported by fix_xmark() */
 IdList* fixd_rk;  /* exported by fix_rcache_reset() */
 IdList* fixd_rn;  /* exported by fix_rcache_reset() */
@@ -22873,7 +22880,7 @@ void id_fix_xemit(int xef2, int xelo2, int xea, int xeb) {
     xename = id_fix_xname(xef2);
     { char* idfe_o = xehead; xehead = id_concat_f(id_concat_f(id_concat(xename, ID_S("(")), id_fix_xjoin(0), 3), ID_S(") {"), 1); id_str_free(idfe_o); }
     { char* idfe_o = xechain; xechain = id_concat_f(id_concat_f(ID_S("} chain ("), id_fix_xjoin(0), 2), ID_S(") {"), 1); id_str_free(idfe_o); }
-    { char* idfe_o = xecall; xecall = id_fix_xcall(xename); id_str_free(idfe_o); }
+    { char* idfe_o = xecall; xecall = id_fix_xcall(xename, xelo2, xef2); id_str_free(idfe_o); }
     { char* idfe_o = xetail; xetail = id_fix_xtail(xelo2, xef2); id_str_free(idfe_o); }
 IdList* idsq_56;
 char* idsq_54;
@@ -22987,10 +22994,10 @@ char* id_fix_xjump(int xja, int xjb) {
 char* id_fix_xlocal(void) {
     char* xlname;
     char* xlwhy = NULL;
-IdList* idsq_17;
-    xlname = (idsq_17 = fixx_dc, id_fix_xshare(idsq_17, fixx_out));
+IdList* idsq_24;
+    xlname = (idsq_24 = fixx_dc, id_fix_xshare(idsq_24, fixx_out));
     { char* idfe_o = xlwhy; xlwhy = id_str_dup(ID_S("")); id_str_free(idfe_o); }
-    if ((strcmp(xlname, ID_S("")) != 0)) {
+    if (((strcmp(xlname, ID_S("")) != 0) && (id_find_str(fixx_val, xlname) < 0))) {
         { char* idfe_o = xlwhy; xlwhy = id_concat_f(id_concat(ID_S("the local '"), xlname), ID_S("' is declared in the block and used after it"), 1); id_str_free(idfe_o); }
     }
     return xlwhy;
@@ -23087,10 +23094,9 @@ void id_fix_xplan(int xpf, int xplo) {
     int xpa;
     int xpb;
     char* xpwhy;
-IdList* idsq_38;
-    xpa = (idsq_38 = nst, (int)(id_list_get(idsq_38, (int)(id_list_get(fixx_hit, 0)))));
 IdList* idsq_31;
-    xpb = (idsq_31 = fixx_hit, id_fix_xlast((int)(id_list_get(idsq_31, (id_list_len(fixx_hit) - 1)))));
+    xpa = (idsq_31 = nst, (int)(id_list_get(idsq_31, (int)(id_list_get(fixx_hit, 0)))));
+    xpb = id_fix_xend();
     id_fix_xscan(xpf, xpa, xpb);
     xpwhy = id_fix_xwhy(xpa, xpb);
     id_fix_xjudge(xpf, xplo, xpa, xpb, xpwhy);
@@ -23129,12 +23135,42 @@ void id_fix_xrange(int xfrom, int xto, int xmode) {
     return;
 }
 
+int id_fix_xend(void) {
+    int xeidx;
+    int xeend;
+    id_fix_xvalue();
+IdList* idsq_16;
+int idsq_15;
+    xeidx = (idsq_16 = fixx_hit, idsq_15 = id_list_len(idsq_16), ((idsq_15 - 1) - id_list_len(fixx_val)));
+    xeend = id_fix_xlast((int)(id_list_get(fixx_hit, xeidx)));
+    return xeend;
+}
+
+int id_fix_xreach(int xrf, int xrb) {
+    int xrend;
+    xrend = (int)(id_list_get(ntok, xrf));
+    if ((id_list_len(fixx_val) > 0)) {
+        xrend = (xrb + 3);
+    }
+    return xrend;
+}
+
+char* id_fix_xdeclare(char* xdname, int xdlo, int xdf) {
+    char* xdtype = NULL;
+    { char* idfe_o = xdtype; xdtype = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if ((id_find_str(fixx_val, xdname) >= 0)) {
+        { char* idfe_o = xdtype; xdtype = id_concat(id_fix_xtype(xdname, xdlo, xdf), ID_S(" ")); id_str_free(idfe_o); }
+    }
+    return xdtype;
+}
+
 void id_fix_xreset4(void) {
     fixx_loop = id_list_lit(1, (long long)(0));
     fixx_acc = id_list_lit(1, (long long)(0));
     fixx_cuts = id_list_lit(0);
     fixx_skip = id_list_lit(1, (long long)(0));
     fixx_again = id_list_lit(1, (long long)(0));
+    fixx_val = id_list_lit(0);
     return;
 }
 
@@ -23207,8 +23243,8 @@ int id_fix_xkind(char* xnext, char* xprev) {
 
 void id_fix_xscan(int xsf, int xsa, int xsb) {
     id_fix_xrange(xsa, xsb, 0);
-    id_fix_xrange((xsb + 1), (int)(id_list_get(ntok, xsf)), 1);
-    if (((int)(id_list_get(fixx_loop, 0)) == 1)) {
+    id_fix_xrange((xsb + 1), id_fix_xreach(xsf, xsb), 1);
+    if ((((int)(id_list_get(fixx_loop, 0)) == 1) && (id_list_len(fixx_val) == 0))) {
         id_fix_xrange(id_fix_xbody(xsf), (xsa - 1), 1);
     }
     return;
@@ -23274,11 +23310,14 @@ IdList* idsq_17;
     return;
 }
 
-char* id_fix_xcall(char* xcname2) {
+char* id_fix_xcall(char* xcname2, int xclo, int xcf) {
     char* xccall = NULL;
     { char* idfe_o = xccall; xccall = id_concat_f(id_concat_f(id_concat(xcname2, ID_S("(")), id_fix_xjoin(1), 3), ID_S(");"), 1); id_str_free(idfe_o); }
     if ((id_list_len(fixx_ret) > 0)) {
-        { char* idfe_o = xccall; xccall = id_concat_f(id_concat((char*)(intptr_t)(id_list_get(fixx_ret, 0)), ID_S(" = ")), xccall, 1); id_str_free(idfe_o); }
+IdList* idsq_17;
+char* idsq_15;
+char* idsq_12;
+        { char* idfe_o = xccall; xccall = (idsq_17 = fixx_ret, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, 0)), idsq_12 = id_fix_xdeclare(idsq_15, xclo, xcf), id_concat_f(id_concat_f(id_concat_f(idsq_12, (char*)(intptr_t)(id_list_get(fixx_ret, 0)), 1), ID_S(" = "), 1), xccall, 1)); id_str_free(idfe_o); }
     }
     return xccall;
 }
@@ -23293,6 +23332,38 @@ char* idsq_13;
         { char* idfe_o = xttail; xttail = (idsq_18 = fixx_ret, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, 0)), idsq_13 = id_fix_xtype(idsq_16, xtlo2, xtf2), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("} return "), idsq_13), ID_S(" "), 1), (char*)(intptr_t)(id_list_get(fixx_ret, 0)), 1), ID_S(";"), 1)); id_str_free(idfe_o); }
     }
     return xttail;
+}
+
+void id_fix_xvalue(void) {
+    char* xvname;
+    xvname = id_fix_xvname(id_list_len(fixx_hit));
+    if ((strcmp(xvname, ID_S("")) != 0)) {
+        id_list_push(fixx_val, (long long)(intptr_t)(xvname));
+        id_list_push(fixx_ret, (long long)(intptr_t)(xvname));
+    }
+    return;
+}
+
+char* id_fix_xvname(int xnn) {
+    char* xnname;
+    xnname = ID_S("");
+    if ((xnn >= 2)) {
+IdList* idsq_14;
+int idsq_10;
+        xnname = (idsq_14 = fixx_hit, idsq_10 = (int)(id_list_get(idsq_14, (xnn - 2))), id_fix_xvpair(idsq_10, (int)(id_list_get(fixx_hit, (xnn - 1)))));
+    }
+    return xnname;
+}
+
+char* id_fix_xvpair(int xpd, int xpr) {
+    char* xpname;
+    char* xpok;
+    xpname = id_fix_xtext(((int)(id_list_get(nst, xpr)) + 1));
+    xpok = ID_S("");
+    if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, xpd)), ID_S("decl")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns2, xpd)), xpname) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(nkind, xpr)), ID_S("ret")) == 0)) && (strcmp(id_fix_xtext(((int)(id_list_get(nst, xpr)) + 2)), ID_S(";")) == 0))) {
+        xpok = xpname;
+    }
+    return xpok;
 }
 
 char* id_fix_xwhy(int xwa, int xwb) {

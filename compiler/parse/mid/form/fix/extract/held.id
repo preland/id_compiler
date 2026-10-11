@@ -1,0 +1,26 @@
+// Fixtures for value.id. fix_xvalued is fix_xnodes plus the tokens
+// `return a ;` (17-19), a return statement (node 14) and a hit of the
+// declaration of a (node 11, ending at token 10) and that return; fix_xheld
+// has also found the returned name.
+
+fix_xvalued() {
+  fix_xnodes();
+  toks_push(["kw", "ident", "op"], ["return", "a", ";"]);
+  int[] xvnone = [];
+} chain () {
+  int xvr = newnode("ret", 0, 0, "", "", xvnone, xvnone);
+  lset((import nst), xvr, 17);
+  lset((import ntok), 11, 10);
+} chain () {
+  push((import fixx_hit), 11);
+  push((import fixx_hit), xvr);
+} return void;
+():() then (import fixx_hit):([11, 14])
+():() then (import nkind)[14]:("ret")
+
+fix_xheld() {
+  fix_xvalued();
+  fix_xvalue();
+} return void;
+():() then (import fixx_val):(["a"])
+():() then (import fixx_ret):(["a"])

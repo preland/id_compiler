@@ -20,7 +20,7 @@ given fix_xplanned (7, 0):() then calls fix_xattempt:[1]
 
 fix_xplan(int xpf, int xplo) {
   int xpa = (import nst)[(import fixx_hit)[0]];
-  int xpb = fix_xlast((import fixx_hit)[len((import fixx_hit)) - 1]);
+  int xpb = fix_xend();
   fix_xscan(xpf, xpa, xpb);
 } chain (int xpf, int xplo) {
   string xpwhy = fix_xwhy(xpa, xpb);
