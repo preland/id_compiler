@@ -80,6 +80,10 @@ export IDC_NO_STD=1
 # takes no slot while this is set; a suite run is the unit that gets throttled.
 export IDC_NO_SLOTS=1
 
+# The thousands of throwaway programs the suite builds stay out of the build
+# record the launcher lists.
+export IDC_RECORD=0
+
 # Nothing this file builds with bin/idc has two cases per function -- not the
 # compiler, not the demos -- so every such build passes --allow-untested.
 # docs/TESTS.md, "Enforcement, and the migration"; the check near the end of

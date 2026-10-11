@@ -4134,6 +4134,23 @@ choose_output() {
     fi
 }
 
+# Every executable built for the user is one line of the build record the
+# launcher lists: absolute output, absolute source, target, build time in
+# milliseconds. The compiler's own tools (under CACHE_DIR) and IDC_RECORD=0
+# runs (the test suites) are left out; a record that cannot be written never
+# fails the build.
+record_built() {
+    [ "$have_main" -eq 1 ] && [ "${IDC_RECORD:-1}" != 0 ] || return 0
+    local out_abs src_abs record_dir
+    out_abs=$(realpath -- "$OUT" 2>/dev/null) || return 0
+    case "$out_abs" in "$(realpath -- "$CACHE_DIR" 2>/dev/null)"/*) return 0 ;; esac
+    src_abs=$(realpath -- "$PATH_ARG" 2>/dev/null) || return 0
+    record_dir="${XDG_STATE_HOME:-$HOME/.local/state}/id"
+    mkdir -p "$record_dir" 2>/dev/null || return 0
+    printf '%s\t%s\t%s\t%s\n' "$out_abs" "$src_abs" "$1" "$(date +%s%3N)" >> "$record_dir/built.tsv" 2>/dev/null
+    return 0
+}
+
 # ---------------------------------------------------------------------------
 # --target llvm: the emitted text is LLVM IR, not C, so everything below --
 # the C syntax gate, the cc link, --emit-c -- is the wrong tool. The IR is
@@ -4235,6 +4252,7 @@ if [ "$TARGET" = llvm ]; then
         fi
         exit 1
     fi
+    record_built llvm
     progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file"))"
     exit_ok
 fi
@@ -4662,5 +4680,6 @@ fi
 UNIT_NOTE=""
 [ $((UNIT_BUILT + UNIT_HITS)) -gt 0 ] && UNIT_NOTE=", $UNIT_BUILT of $((UNIT_BUILT + UNIT_HITS)) units compiled"
 phase linked
+record_built c
 progress_done "built $OUT ($(wc -c < "$OUT" | tr -d " ") bytes, $(plural "${#SRC_FILES[@]}" "source file")$UNIT_NOTE)"
 exit_ok
