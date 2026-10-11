@@ -4,7 +4,7 @@
 // last code rather than at a whole chunk.
 mf_chunk_hex(int[] d, int[] g, int i) {
   int lo = g[3] + i * g[5];
-  int hi = fx_min(lo + g[5], g[4] + 1);
+  int hi = fixed_point_minimum(lo + g[5], g[4] + 1);
   string hex = mf_glyphs(d, g, lo, hi);
 } return string hex;
 ([10, 11, 12], [0, 1, 1, 0, 2, 2], 0):("0a0b")

@@ -13,8 +13,8 @@ fb_screen(int[] d, int[] font, int[] hd, int base) {
 
 // Only whole cells are read, and never more than the console has.
 fb_geom(int[] hd, int base) {
-  int ncol = fx_min(hd[0] / (import fb_cw), (import fb_ncols));
-  int nrow = fx_min(hd[1] / (import fb_ch), (import fb_nrows));
+  int ncol = fixed_point_minimum(hd[0] / (import fb_cw), (import fb_ncols));
+  int nrow = fixed_point_minimum(hd[1] / (import fb_ch), (import fb_nrows));
   int[] g = [hd[0], base, ncol, nrow, (import fb_cw), (import fb_ch)];
 } return int[] g;
 ([640, 480, 255], 15):([640, 15, 80, 30, 8, 16])

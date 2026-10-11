@@ -731,18 +731,30 @@ static char* id_str_of_float(double x) {
 }
 static void id_print(const char* s) { puts(s); }
 static char* id_input(void) {
-    /* read one line from stdin, drop the trailing newline; "" on EOF */
-    char buf[1024];
-    size_t got = 0; int ch;
-    while (got < sizeof(buf) - 1 && (ch = getc(stdin)) != EOF) { buf[got++] = (char)ch; if (ch == '\n') break; }
-    buf[got] = '\0';
-    if (memchr(buf, 0, got)) id_trap("a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
-    if (got == 0) {
-        return id_str_new(0);
+    /* read one whole line from stdin, drop the trailing newline; "" on EOF.
+       The block doubles as the line grows (like read_all), so a line of any
+       length comes back whole and reading stays linear in its length */
+    size_t cap = 64, n = 0, h = sizeof(size_t);
+    char* r = (char*)id_pool_blk(cap);
+    int ch;
+    while ((ch = getc(stdin)) != EOF && ch != '\n') {
+        if (h + n + 1 >= cap) {
+            if (cap > SIZE_MAX / 2) {
+                fprintf(stderr, "id: allocation size overflow (input)\n");
+                exit(1);
+            }
+            r = (char*)id_realloc(r, cap, cap * 2);
+            cap *= 2;
+        }
+        r[h + n] = (char)ch;
+        n++;
     }
-    size_t n = strlen(buf);
-    if (n > 0 && buf[n - 1] == '\n') { buf[--n] = '\0'; }
-    return id_str_from(buf, n);
+    r = (char*)id_realloc(r, cap, h + n + 1);
+    r += h;
+    if (memchr(r, 0, n)) id_trap("a NUL byte reached a string (input): use idstd stdio_slurp or stdio_read_mem, or the store (fs_read_mem), for binary data");
+    ((size_t*)(void*)r)[-1] = n;
+    r[n] = '\0';
+    return r;
 }
 static char* id_read_all(void) {
     /* slurp all of stdin into one string (grows as needed); the count goes
@@ -788,7 +800,7 @@ static char* id_chr(int code) {
 static char* id_str_sub(const char* s, int i, int n) {
     size_t m = id_slen(s);
     if (i < 0 || n < 0 || (n > 0 && (size_t)i + (size_t)n > m)) {
-        fprintf(stderr, "id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fx_min, fx_max)\n", i, n, m);
+        fprintf(stderr, "id: str span out of bounds: i=%d n=%d in a string of length %zu; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\n", i, n, m);
         exit(1);
     }
     return id_str_from(n ? s + i : s, (size_t)n);

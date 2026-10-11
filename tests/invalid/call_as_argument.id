@@ -1,4 +1,4 @@
-// EXPECT: argument 0 of 'sq' has a call nested inside a call; an argument may hold one level of call, not two -- name the inner call's result and pass the name
+// EXPECT: argument 0 of 'sq' has a call nested inside a call [E0205]
 // IDCPY-ACCEPTS
 dbl(int a) {
   int r = a + a;

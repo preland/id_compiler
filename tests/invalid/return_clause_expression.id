@@ -1,4 +1,4 @@
-// EXPECT: the return clause of 'bump' is an expression; it must be a name or a literal
+// EXPECT: the return clause of 'bump' is an expression; it must be a name or a literal [E0206]
 // IDCPY-ACCEPTS
 bump(int i) {
   int j = i;

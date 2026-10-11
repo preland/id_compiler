@@ -1,4 +1,4 @@
-// EXPECT: the return clause of 'twice' is a call; it must be a name or a literal
+// EXPECT: the return clause of 'twice' is a call; it must be a name or a literal [E0206]
 // IDCPY-ACCEPTS
 dbl(int a) {
   int r = a + a;

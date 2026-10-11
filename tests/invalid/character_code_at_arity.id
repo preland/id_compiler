@@ -1,0 +1,4 @@
+// EXPECT: charat takes exactly two arguments
+main(int argc, string[] argv) {
+  int c = character_code_at("hi");
+} return int 0;

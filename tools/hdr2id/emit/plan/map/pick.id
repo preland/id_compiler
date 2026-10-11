@@ -5,7 +5,7 @@ pl_top(string[] pl_s, int pl_b) {
   int pl_j = 1;
   int pl_mx = 0 - 1;
   while (pl_j < len(pl_s)) {
-    pl_mx = fx_max(pl_mx, pl_score(pl_s, pl_b, pl_j));
+    pl_mx = fixed_point_maximum(pl_mx, pl_score(pl_s, pl_b, pl_j));
     pl_j = pl_j + 1;
   }
 } return int pl_mx;

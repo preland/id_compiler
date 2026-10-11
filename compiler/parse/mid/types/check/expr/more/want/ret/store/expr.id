@@ -23,11 +23,11 @@ chk_retexpr(int id) {
   string ret_fn_nm = (import ns1)[id];
   string ret_fn_ty = (import ns2)[id];
   if((import nkind)[id] == "ret" && ret_fn_ty == "void" && e >= 0) {
-    tc_err(e, "'" + ret_fn_nm + "' returns void, so its 'return' takes no value; write 'return;'");
+    tc_diag(e, "E0610", "'" + ret_fn_nm + "' returns void, so its 'return' takes no value", ret_fn_nm, "a void function hands nothing back, so a value after 'return' has nowhere to go", "write 'return;', or give the function a return type");
   }
 } chain (int id) {
   if((import nkind)[id] == "ret" && ret_fn_ty != "void" && e < 0) {
-    tc_err(id, "'" + ret_fn_nm + "' returns " + ret_fn_ty + ", so 'return;' needs a value; write 'return NAME;' or 'return LITERAL;'");
+    tc_diag(id, "E0611", "'" + ret_fn_nm + "' returns " + ret_fn_ty + ", so 'return;' needs a value", ret_fn_nm, "the caller expects a " + ret_fn_ty + " back, and a bare 'return;' gives it none", "write 'return NAME;' or 'return LITERAL;', or declare the function void");
   }
 } return void;
 given chkret_fixture ((import fixture_fn)):() then (import chkfail)[0]:(0)

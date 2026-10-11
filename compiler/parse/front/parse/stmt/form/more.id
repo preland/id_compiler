@@ -17,7 +17,7 @@
 parse_blank(int[] pos) {
   string bare_kw = cur_text(pos);
   if(bare_kw == "break" && (import loopd)[0] == 0) {
-    syn_err(pos, "'break' is not inside a 'while': it leaves the innermost enclosing loop, so it can only appear in a while body");
+    syn_diag(pos, "E0109", "'break' is not inside a 'while'", "break", "break leaves the innermost enclosing loop, so with no loop around it there is nothing to leave", "delete the 'break', or move it into the body of the 'while' it should leave");
   }
   advance(pos);
 } chain (int[] pos) {

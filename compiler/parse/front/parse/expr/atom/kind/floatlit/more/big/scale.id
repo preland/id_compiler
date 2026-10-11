@@ -29,7 +29,7 @@ flt_scale(string text, string flraw, string flds) {
 // The digits as exactly flw digits: padded with zeros when short, cut when long.
 flt_head(string flds, int flw) {
   int fln = len(flds);
-  int flmin = fx_min(fln, flw);
+  int flmin = fixed_point_minimum(fln, flw);
   string flz = str_repeat("0", flw - flmin);
 } chain (string flds, int flw) {
   string flh = str_sub(flds, 0, flmin) + flz;

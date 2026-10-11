@@ -15,12 +15,12 @@ given vb_boot given tf_sput("hello") (1, 5, 0):(2) then vm_strs_text:("strs 3:|h
 vm_str_sub_at(string sss, int ssi, int ssn) {
   int h = 0;
   if (ssi < 0 || ssn < 0 || ssn > 0 && ssi + ssn > len(sss)) {
-    vm_trap("str span out of bounds: i=" + ssi + " n=" + ssn + " in a string of length " + len(sss) + "; clamp i and n first (fx_min, fx_max)");
+    vm_trap("str span out of bounds: i=" + ssi + " n=" + ssn + " in a string of length " + len(sss) + "; clamp i and n first (fixed_point_minimum, fixed_point_maximum)");
   } else {
     h = vm_sput(str_sub(sss, ssi, ssn));
   }
 } return int h;
 given vb_boot ("hello", 1, 3):(1) then (import ex_strs):(["", "ell"])
-given vb_boot ("hello", 3, 3):(0) then eprints:("id: str span out of bounds: i=3 n=3 in a string of length 5; clamp i and n first (fx_min, fx_max)\n")
-given vb_boot ("hello", 2, -1):(0) then eprints:("id: str span out of bounds: i=2 n=-1 in a string of length 5; clamp i and n first (fx_min, fx_max)\n")
+given vb_boot ("hello", 3, 3):(0) then eprints:("id: str span out of bounds: i=3 n=3 in a string of length 5; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\n")
+given vb_boot ("hello", 2, -1):(0) then eprints:("id: str span out of bounds: i=2 n=-1 in a string of length 5; clamp i and n first (fixed_point_minimum, fixed_point_maximum)\n")
 given vb_boot ("hello", 9, 0):(1) then (import ex_strs):(["", ""])

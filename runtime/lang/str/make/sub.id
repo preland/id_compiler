@@ -14,6 +14,6 @@ str_sub(string s, int i, int n) {
 sub_span(string s, int i, int n) {
   int sub_ok = i >= 0 && n >= 0 && (n == 0 || i + n <= len(s));
   if(sub_ok == 0) {
-    fail("str span out of bounds: i=" + i + " n=" + n + " in a string of length " + len(s) + "; clamp i and n first (fx_min, fx_max)");
+    fail("str span out of bounds: i=" + i + " n=" + n + " in a string of length " + len(s) + "; clamp i and n first (fixed_point_minimum, fixed_point_maximum)");
   }
 } return int n;

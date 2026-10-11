@@ -1,1 +1,1 @@
-id: str span out of bounds: i=3 n=3 in a string of length 5; clamp i and n first (fx_min, fx_max)
+id: str span out of bounds: i=3 n=3 in a string of length 5; clamp i and n first (fixed_point_minimum, fixed_point_maximum)

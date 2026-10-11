@@ -1,4 +1,4 @@
-// EXPECT: returns void, so its 'return' takes no value
+// EXPECT: returns void, so its 'return' takes no value [E0610]
 // a void function's early return carries no value
 say(int x) {
   return x;

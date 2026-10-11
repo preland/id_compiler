@@ -21,7 +21,7 @@ chk_flat_at(int id, int i) {
   int a = (import nl1)[id][i];
   if(has_call(a) > 1) {
     string s1_of_v = (import ns1)[id];
-    tc_err(a, "argument " + i + " of '" + s1_of_v + "' has a call nested inside a call; an argument may hold one level of call, not two -- name the inner call's result and pass the name");
+    tc_diag(a, "E0205", "argument " + i + " of '" + s1_of_v + "' has a call nested inside a call", s1_of_v, "an argument may hold one level of call, not two, so each line shows one step of what is computed", "name the inner call's result on its own line and pass the name");
   }
   int ret_i = i + 1;
 } return int ret_i;

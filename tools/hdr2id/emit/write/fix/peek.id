@@ -3,7 +3,7 @@
 // The first 40 characters of the file (import wr_t_rel) under (import wr_t_out), or all of it when it is shorter.
 wr_t_top() {
   string wr_tx = fs_read_text((import wr_t_out) + "/" + (import wr_t_rel));
-  int wr_tn = fx_min(40, len(wr_tx));
+  int wr_tn = fixed_point_minimum(40, len(wr_tx));
   string wr_tt = str_sub(wr_tx, 0, wr_tn);
 } return string wr_tt;
 given wr_t_dir("a") given wr_t_fill("0123456789012345678901234567890123456789ABC") ():("0123456789012345678901234567890123456789")
@@ -12,7 +12,7 @@ given wr_t_dir("a") given wr_t_fill("hi") ():("hi")
 // The last 30 characters of the file (import wr_t_rel) under (import wr_t_out), or all of it when it is shorter.
 wr_t_end() {
   string wr_tx = fs_read_text((import wr_t_out) + "/" + (import wr_t_rel));
-  int wr_tn = fx_min(30, len(wr_tx));
+  int wr_tn = fixed_point_minimum(30, len(wr_tx));
   string wr_te = str_sub(wr_tx, len(wr_tx) - wr_tn, wr_tn);
 } return string wr_te;
 given wr_t_dir("a") given wr_t_fill("0123456789012345678901234567890123456789ABC") ():("345678901234567890123456789ABC")

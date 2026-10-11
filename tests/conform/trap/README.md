@@ -17,5 +17,5 @@ match `NN-name.stderr` exactly.
 - `07-read-all-nul` — `read_all` on stdin that contains a NUL (fed from `07-read-all-nul.stdin`) traps instead of returning the text before it.
 - `08-input-nul` — `input` on a line that contains a NUL (fed from `08-input-nul.stdin`) traps instead of returning the text before it.
 - `09-chr-zero` — `chr(0)` traps instead of returning an empty string.
-- `11-str-sub-past-end` — `str_sub` with `i + n` past the end of the string traps with `id: str span out of bounds: i=I n=N in a string of length M; clamp i and n first (fx_min, fx_max)` instead of copying bytes that are not the string's.
+- `11-str-sub-past-end` — `str_sub` with `i + n` past the end of the string traps with `id: str span out of bounds: i=I n=N in a string of length M; clamp i and n first (fixed_point_minimum, fixed_point_maximum)` instead of copying bytes that are not the string's.
 - `12-str-sub-negative-count` — `str_sub` with a negative `n` traps with the same message instead of passing a huge unsigned count to the copy.

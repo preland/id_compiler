@@ -1,4 +1,4 @@
-// EXPECT: must be a name or a literal
+// EXPECT: must be a name or a literal [E0206]
 // an early return takes the same shape as the return clause: a name or a literal
 main(int argc, string[] argv) {
   int a = 1;

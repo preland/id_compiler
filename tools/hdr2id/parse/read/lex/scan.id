@@ -31,7 +31,7 @@ hx_quote(string lx_s, int lx_i, int lx_q) {
   while (charat(lx_s, lx_i) >= 0 && charat(lx_s, lx_i) != lx_q) {
     lx_i = lx_i + 1 + (charat(lx_s, lx_i) == 92);
   }
-  int lx_e = fx_min(lx_i + 1, len(lx_s));
+  int lx_e = fixed_point_minimum(lx_i + 1, len(lx_s));
 } return int lx_e;
 ("abc\" x", 0, 34):(4)
 ("a\\\"b\" z", 0, 34):(5)
