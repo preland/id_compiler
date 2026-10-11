@@ -1,0 +1,36 @@
+// A conf.id constant among a check's arguments. fit_import (../../read/
+// impcheck.id) words that refusal for a case's own arguments, where the
+// constant is named as a then check's index; a check's argument is not that
+// position, so it is told here what is true of it: the constant is accepted
+// as an index only, and its value is written as a literal.
+
+then_arg_value(int ci, int e, string pt) {
+  int is_conf = then_arg_conf(e);
+  if(is_conf == 1) {
+    case_err(ci, "(import " + (import ns1)[e] + ") is a conf.id constant, and a check's argument cannot name one: a conf.id constant is accepted only as a then check's index, as in then (import tbl)[(import " + (import ns1)[e] + ")]:(value); write its value as a literal, as in then f(5):(value)");
+  } else {
+    fit_value(ci, e, pt);
+  }
+} return void;
+given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "int"):() then prints:("fixture.id:4: error: (import x) is a conf.id constant, and a check's argument cannot name one: a conf.id constant is accepted only as a then check's index, as in then (import tbl)[(import x)]:(value); write its value as a literal, as in then f(5):(value)\n")
+given then_arg_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
+
+then_arg_conf(int e) {
+  int is_conf = 0;
+  int ek = find_str((import enames), (import ns1)[e]);
+  if((import nkind)[e] == "cimport" && ek >= 0) {
+    if((import eowners)[ek] == "conf.id") {
+      is_conf = 1;
+    }
+  }
+} return int is_conf;
+given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_conf_arg)):(1)
+given arg_conf_fixture ((import fixture_conf_arg)):(0)
+
+arg_conf_fixture() {
+  impcase_empty();
+  push((import enames), "x");
+  export int fixture_conf_arg = newleaf("cimport", 0, 0, "x", "");
+} return void;
+():() then calls impcase_empty:[1]
+():() then init_units:(0)

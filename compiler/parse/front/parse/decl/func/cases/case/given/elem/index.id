@@ -1,0 +1,27 @@
+// What follows `(import NAME)` in a case tuple. A `[` straight after it would
+// be read as the start of a second element, so `pick((import cnt)[1])` was
+// reported as a check passing two arguments, which says nothing about the
+// real mistake. An indexed export is not an argument (docs/TESTS.md); the
+// element form is `then (import NAME)[i]:(value)`, parsed elsewhere
+// (../../then/more/dispatch.id). The index is skipped so nothing else is
+// reported for it.
+
+import_index(int[] pos, string name) {
+  if(cur_text(pos) == "[") {
+    syn_err(pos, "an indexed export, (import " + name + ")[...], is not accepted as an argument of a case or of a check; an argument is a literal or (import " + name + ") whole, and to check one element write 'then (import " + name + ")[i]:(value)'");
+    skip_index(pos);
+  }
+} return void;
+given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], "cnt"):([0])
+given toks_env(["op", "op", "int", "op"], ["[", "1", "]", ":"]) ([0], "cnt"):([3]) then prints:("<stdin>:1: error: an indexed export, (import cnt)[...], is not accepted as an argument of a case or of a check; an argument is a literal or (import cnt) whole, and to check one element write 'then (import cnt)[i]:(value)'\n")
+
+skip_index(int[] pos) {
+  while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {
+    advance(pos);
+  }
+  if(cur_text(pos) == "]") {
+    advance(pos);
+  }
+} return void;
+given toks_env(["op", "int", "op", "op"], ["[", "1", "]", ":"]) ([0]):([3])
+given toks_env(["op", "int", "op", "op"], ["[", "1", "]", ":"]) ([1]):([3])

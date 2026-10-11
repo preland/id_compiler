@@ -164,7 +164,23 @@ total(int[] xs) {
 ([4, 5, 6]):(15)[time:O(n)]
 EOF
 self_refuse "bin/idc: two cases of the same size cannot compare either" \
-    "[time:O(n)] needs a second case with a different input size to compare against" \
+    "p.id:9: error: [time:O(n)] has 2 cases but they all give n = 3, so there is no second input size to compare" \
+    --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+total(int[] xs, int cap) {
+  int t = 0;
+  int i = 0;
+  while(i < len(xs)) {
+    t = t + xs[i];
+    i = i + 1;
+  }
+} return int t;
+([1, 2, 3], 1000):(6)[time:O(n)]
+([1, 2, 3, 4, 5, 6, 7, 8, 9], 1000):(45)[time:O(n)]
+EOF
+self_refuse "bin/idc: cases whose size comes from one large integer argument say what n is" \
+    "p.id:9: error: [time:O(n)] has 2 cases but they all give n = 1000, so there is no second input size to compare; n is the largest of every list length, string length and integer value among a case's arguments" \
     --emit-c /dev/null
 
 # --- malformed cases ---------------------------------------------------------
@@ -2159,7 +2175,7 @@ apply(func(int) return int f, int x) {
 EOF
 self_refuse "bin/idc: a case naming a function of the wrong signature is rejected" \
     "p.id:10: error: this case gives 'shout', a func(string) return void, where a func(int) return int is required" --emit-c /dev/null
-grep -qF "p.id:11: error: a test case takes literals only (a number, a string, or a list of those); 'nope' is not a function in this build" "$TMP/log" \
+grep -qF "p.id:11: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); 'nope' is not a function in this build" "$TMP/log" \
     && ok "bin/idc: a case naming no function is rejected" \
     || bad "bin/idc: a case naming no function is rejected ($(head -1 "$TMP/log"))"
 

@@ -26,7 +26,7 @@ then_arg(int ci, int cfn, int[] targs, int j) {
   if((import nkind)[(targs[j])] == "cfn") {
     case_err(ci, "a check's arguments are literals or (import NAME); '" + (import ns1)[(targs[j])] + "' is a function name, which only a case's own arguments may pass");
   } else {
-    fit_value(ci, targs[j], pt);
+    then_arg_value(ci, targs[j], pt);
   }
 } return void;
 given then_arg_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_fn)], 0):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")

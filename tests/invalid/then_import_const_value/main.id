@@ -1,4 +1,4 @@
-// EXPECT: a 'then' check compares a literal; (import slot) may only be an argument or an expected value
+// EXPECT: a 'then' check compares a literal; (import slot) is not one, so write the value as a literal (for a conf.id constant, the constant's value)
 mk() {
   export int[] cnt = [0, 5];
 } return void;

@@ -22,7 +22,7 @@ fit_fn(int i, int e, string want) {
   blank;
 } chain (int i, int e, string want) {
   if(ft == "") {
-    case_err(i, "a test case takes literals only (a number, a string, or a list of those); '" + nm + "' is not a function in this build, which is the only name a case may pass");
+    case_err(i, "a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)); '" + nm + "' is not a function in this build, which is the only name a case may pass");
   } else if(ft != want) {
     case_err(i, "this case gives '" + nm + "', a " + ft + ", where a " + want + " is required");
   }

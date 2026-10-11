@@ -1,4 +1,4 @@
-// EXPECT: a test case takes literals only
+// EXPECT: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))
 mk() {
   export int[] buf = [0, 0];
 } return void;

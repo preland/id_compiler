@@ -18,7 +18,7 @@ given then_node_fixture ((import fixture_ci), (import fixture_then_node), (impor
 then_lit(int ci, int e, int cfn) {
   if((import nkind)[e] == "cimport") {
     string lt = lit_text(e);
-    case_err(ci, "a 'then' check compares a literal; " + lt + " may only be an argument or an expected value");
+    case_err(ci, "a 'then' check compares a literal; " + lt + " is not one, so write the value as a literal (for a conf.id constant, the constant's value)");
   } else {
     string rt = (import ns2)[cfn];
     fit_value(ci, e, rt);

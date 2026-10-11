@@ -59,7 +59,7 @@ then_imp_value(int ci, int chk_node, string want) {
     int ne = len(items);
     case_err(ci, "a 'then' check compares exactly one value, not " + ne);
   } else if((import nkind)[(items[0])] == "cimport") {
-    case_err(ci, "a 'then' check compares a literal; (import " + (import ns1)[(items[0])] + ") may only be an argument or an expected value");
+    case_err(ci, "a 'then' check compares a literal; (import " + (import ns1)[(items[0])] + ") is not one, so write the value as a literal (for a conf.id constant, the constant's value)");
   } else {
     fit_value(ci, items[0], vt);
   }
