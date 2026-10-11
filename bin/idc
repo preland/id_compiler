@@ -1026,6 +1026,82 @@ stale() { # stale BIN SRC_DIR -- true if BIN is missing or older than any .id un
     return 1
 }
 
+# The bootstrap binaries are judged by what went into them, not by file times:
+# a stamp beside each holds the sha256 of its inputs (every .id file of a source
+# directory with its own hash, or the one .c file, plus the stage-0 binary for
+# stage 1), so a workspace refreshed by unpacking identical sources rebuilds
+# nothing. The stamp's second line is a signature of the inputs' sizes and
+# times, the fast path that skips the hashing; it is compared for equality, not
+# for "newer", because a file restored with its old time (cp -p, tar, git) is
+# changed content that no -newer test can see.
+stamp_sig() { # stamp_sig SRC [EXTRA] -- the inputs' names, sizes and times
+    {
+        if [ -d "$1" ]; then
+            (cd "$1" && find . -type f -name '*.id' -printf '%p %s %T@\n' | LC_ALL=C sort)
+        else
+            stat -c '%s %Y' "$1"
+        fi
+        if [ -n "${2:-}" ]; then stat -c '%s %Y' "$2"; fi
+    } | sha256sum | cut -d' ' -f1
+}
+
+stamp_value() { # stamp_value SRC [EXTRA] -- the inputs' hash; SRC is a directory of .id or one file
+    {
+        if [ -d "$1" ]; then
+            (cd "$1" && find . -type f -name '*.id' -print0 | LC_ALL=C sort -z | xargs -0 -r sha256sum)
+        else
+            sha256sum < "$1"
+        fi
+        if [ -n "${2:-}" ]; then sha256sum < "$2"; fi
+    } | sha256sum | cut -d' ' -f1
+}
+
+stamp_write() { # stamp_write BIN SRC [EXTRA] -- record the inputs of a binary that was just built
+    printf '%s\n%s\n' "$(stamp_value "$2" "${3:-}")" "$(stamp_sig "$2" "${3:-}")" > "$1.stamp"
+}
+
+stamp_stale() { # stamp_stale BIN SRC [EXTRA] -- true unless BIN exists with a stamp equal to its inputs' hash
+    local bin="$1" src="$2" extra="${3:-}" stamp="$1.stamp"
+    [ -x "$bin" ] || return 0
+    [ -f "$stamp" ] || return 0
+    local want_sig
+    want_sig=$(stamp_sig "$src" "$extra")
+    [ "$(sed -n 2p "$stamp")" = "$want_sig" ] && return 1
+    if [ "$(stamp_value "$src" "$extra")" = "$(sed -n 1p "$stamp")" ]; then
+        printf '%s\n%s\n' "$(sed -n 1p "$stamp")" "$want_sig" > "$stamp"
+        return 1
+    fi
+    return 0
+}
+
+boot_stage0() { # boot_stage0 NAME BIN -- compile bootstrap/NAME.c with cc into BIN
+    local name="$1" bin="$2" err="$CACHE_DIR/boot.$1.err" rc
+    rm -f "$bin.stamp"
+    progress bootstrap "${name}0 (from bootstrap/$name.c)"
+    capped "$CC" -std=c11 -O2 -o "$bin" "$BOOT_DIR/$name.c" 2>"$err"; rc=$?
+    if [ "$rc" -ne 0 ]; then
+        progress_clear
+        if mem_ceiling_hit "$rc" "$err"; then
+            mem_ceiling_error "cc (compiling $BOOT_DIR/$name.c)"
+        else
+            cat "$err" >&2
+            echo "idc: failed to compile $BOOT_DIR/$name.c" >&2
+        fi
+        return 1
+    fi
+    stamp_write "$bin" "$BOOT_DIR/$name.c"
+}
+
+boot_stage1() { # boot_stage1 NAME SRC BIN STAGE0 -- rebuild a compiler stage from source through stage 0
+    local name="$1" src="$2" bin="$3" stage0="$4"
+    rm -f "$bin.stamp"
+    progress bootstrap "$name (from source, via stage 0)"
+    env -u IDC_NO_STD IDC_STAGE_LEX="$STAGE0_LEX" IDC_STAGE_PARSE="$STAGE0_PARSE" \
+        "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" --allow-untested "$src" -o "$bin" >&2 \
+        || { progress_clear; echo "idc: failed to bootstrap $name (needs idstd -- see --std)" >&2; return 1; }
+    stamp_write "$bin" "$src" "$stage0"
+}
+
 # idc --where NAME [PATH] -- where a function is defined: `FILE:LINE: SIGNATURE ->
 # TYPE` for NAME in PATH (a project directory, default the current one), and in
 # the standard library when PATH has none. NAME may be FILE::NAME to pick one of
@@ -1078,47 +1154,26 @@ fi
 # than through a second copy of that logic. IDC_STAGE_LEX/PARSE at the top of
 # the file is where the recursion stops.
 if [ -z "${IDC_STAGE_LEX:-}" ]; then
-    BOOT_ERR="$CACHE_DIR/boot.err"
-    if [ ! -x "$STAGE0_LEX" ] || [ "$BOOT_DIR/idlex.c" -nt "$STAGE0_LEX" ]; then
-        progress bootstrap "idlex0 (from bootstrap/idlex.c)"
-        capped "$CC" -std=c11 -O2 -o "$STAGE0_LEX" "$BOOT_DIR/idlex.c" 2>"$BOOT_ERR"; boot_rc=$?
-        if [ "$boot_rc" -ne 0 ]; then
-            progress_clear
-            if mem_ceiling_hit "$boot_rc" "$BOOT_ERR"; then
-                mem_ceiling_error "cc (compiling $BOOT_DIR/idlex.c)"
-            else
-                cat "$BOOT_ERR" >&2
-                echo "idc: failed to compile $BOOT_DIR/idlex.c" >&2
-            fi
-            exit 1
-        fi
+    boot_pid_lex=""; boot_pid_parse=""; boot_failed=0
+    if stamp_stale "$STAGE0_LEX" "$BOOT_DIR/idlex.c"; then
+        boot_stage0 idlex "$STAGE0_LEX" & boot_pid_lex=$!
     fi
-    if [ ! -x "$STAGE0_PARSE" ] || [ "$BOOT_DIR/idparse.c" -nt "$STAGE0_PARSE" ]; then
-        progress bootstrap "idparse0 (from bootstrap/idparse.c)"
-        capped "$CC" -std=c11 -O2 -o "$STAGE0_PARSE" "$BOOT_DIR/idparse.c" 2>"$BOOT_ERR"; boot_rc=$?
-        if [ "$boot_rc" -ne 0 ]; then
-            progress_clear
-            if mem_ceiling_hit "$boot_rc" "$BOOT_ERR"; then
-                mem_ceiling_error "cc (compiling $BOOT_DIR/idparse.c)"
-            else
-                cat "$BOOT_ERR" >&2
-                echo "idc: failed to compile $BOOT_DIR/idparse.c" >&2
-            fi
-            exit 1
-        fi
+    if stamp_stale "$STAGE0_PARSE" "$BOOT_DIR/idparse.c"; then
+        boot_stage0 idparse "$STAGE0_PARSE" & boot_pid_parse=$!
     fi
-    if stale "$IDLEX" "$ROOT/compiler/lex" || [ "$STAGE0_LEX" -nt "$IDLEX" ]; then
-        progress bootstrap "idlex (from source, via stage 0)"
-        env -u IDC_NO_STD IDC_STAGE_LEX="$STAGE0_LEX" IDC_STAGE_PARSE="$STAGE0_PARSE" \
-            "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" --allow-untested "$ROOT/compiler/lex" -o "$IDLEX" >&2 \
-            || { progress_clear; echo "idc: failed to bootstrap idlex (needs idstd -- see --std)" >&2; exit 1; }
+    [ -z "$boot_pid_lex" ] || wait "$boot_pid_lex" || boot_failed=1
+    [ -z "$boot_pid_parse" ] || wait "$boot_pid_parse" || boot_failed=1
+    [ "$boot_failed" -eq 0 ] || exit 1
+    boot_pid_lex=""; boot_pid_parse=""
+    if stamp_stale "$IDLEX" "$ROOT/compiler/lex" "$STAGE0_LEX"; then
+        boot_stage1 idlex "$ROOT/compiler/lex" "$IDLEX" "$STAGE0_LEX" & boot_pid_lex=$!
     fi
-    if stale "$IDPARSE" "$ROOT/compiler/parse" || [ "$STAGE0_PARSE" -nt "$IDPARSE" ]; then
-        progress bootstrap "idparse (from source, via stage 0)"
-        env -u IDC_NO_STD IDC_STAGE_LEX="$STAGE0_LEX" IDC_STAGE_PARSE="$STAGE0_PARSE" \
-            "$SCRIPT_DIR/idc" --cc "$CC" "${STD_ARGS[@]}" --allow-untested "$ROOT/compiler/parse" -o "$IDPARSE" >&2 \
-            || { progress_clear; echo "idc: failed to bootstrap idparse (needs idstd -- see --std)" >&2; exit 1; }
+    if stamp_stale "$IDPARSE" "$ROOT/compiler/parse" "$STAGE0_PARSE"; then
+        boot_stage1 idparse "$ROOT/compiler/parse" "$IDPARSE" "$STAGE0_PARSE" & boot_pid_parse=$!
     fi
+    [ -z "$boot_pid_lex" ] || wait "$boot_pid_lex" || boot_failed=1
+    [ -z "$boot_pid_parse" ] || wait "$boot_pid_parse" || boot_failed=1
+    [ "$boot_failed" -eq 0 ] || exit 1
 else
     IDLEX="$IDC_STAGE_LEX"
     IDPARSE="$IDC_STAGE_PARSE"
@@ -1638,7 +1693,7 @@ std_index_assemble() {
 # merges it whole.
 std_index_ensure() {
     local cid base tmp map files conf key sig rc=0
-    cid=$(stat -c '%s %Y %Z' "$IDLEX" "$IDPARSE" | sha256sum | cut -c1-16)
+    cid=$({ sha256sum < "$IDLEX"; sha256sum < "$IDPARSE"; } | sha256sum | cut -c1-16)
     base="$STD_IDX_BASE/$cid"
     mkdir -p "$base/shards" "$base/idx" "$base/bad" "$base/stat" 2>/dev/null || return 1
     sig=$({ find "$STDLIB" -mindepth 1 \
