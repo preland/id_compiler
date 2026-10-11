@@ -1,10 +1,10 @@
 // Adding to the table of names read (kb_tables).
 
-// Adds word to the table, with 0, unless it is there already. 1 when it was added.
-kb_note(string word) {
+// Adds name to the table, with 0, unless it is there already. 1 when it was added.
+kb_note(string name) {
   int fresh = 0;
-  if (hmap_has((import kb_tk), (import kb_tu), word) == 0) {
-    hmap_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), word, 0);
+  if (hmap_has((import kb_tk), (import kb_tu), name) == 0) {
+    hmap_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), name, 0);
     fresh = 1;
   }
 } return int fresh;
