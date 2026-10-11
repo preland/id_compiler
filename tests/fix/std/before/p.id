@@ -10,5 +10,5 @@ twice(int idstd_n) {
 } return int idstd_m;
 
 go(int[] idstd_c) {
-  int idstd_x = twice(bump(idstd_c));
+  int idstd_x = twice(twice(bump(idstd_c)));
 } return int idstd_x + 1;

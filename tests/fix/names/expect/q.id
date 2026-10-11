@@ -1,17 +1,18 @@
-// bump_v is already declared in this function.
+// twice_v is a string in this unit, so the repair cannot use it for an int;
+// twice_v3 is already declared in this function.
 go(int[] c) {
-  int bump_v = 3;
-  int bump_v3 = bump(c);
-  int x = twice(bump_v3) + bump_v;
+  int twice_v3 = 3;
+  int twice_v4 = twice(bump(c));
+  int x = twice(twice_v4) + twice_v3;
 } return int x;
 
-// bump_v2 is a function, so it is not free either.
-bump_v2(int k) {
+// twice_v2 is a function, so it is not free either.
+twice_v2(int k) {
   int j = k + 1;
 } return int j;
 
 run(int[] c) {
-  int bump_v = bump(c);
-  int twice_v2 = twice(bump_v);
-  print(twice_v2);
+  int twice_v3 = twice(bump(c));
+  int twice_v4 = twice(twice_v3);
+  print(twice_v4);
 } return void;

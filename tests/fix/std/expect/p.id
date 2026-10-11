@@ -10,7 +10,7 @@ twice(int idstd_n) {
 } return int idstd_m;
 
 go(int[] idstd_c) {
-  int idstd_bump_v = bump(idstd_c);
-  int idstd_x = twice(idstd_bump_v);
+  int idstd_twice_v = twice(bump(idstd_c));
+  int idstd_x = twice(idstd_twice_v);
   int idstd_ret_i = idstd_x + 1;
 } return int idstd_ret_i;

@@ -8,6 +8,9 @@
 #            what --fix does: both must build and print the same thing, which
 #            is what shows a fix kept the program's behaviour
 #   want     (optional) lines that must appear in --fix's output
+#   legal    (optional, empty) marks a case whose before/ is already legal: its
+#            --check and build must pass, --fix must make 0 edits, and the tree
+#            must stay equal to before/ (expect/ is then a copy of before/)
 #
 # For every case: --fix turns before/ into expect/; a second --fix on the result
 # makes no edit; and --check prints what a build of before/ prints before it
@@ -59,7 +62,13 @@ for case_dir in fix/*/; do
 
     "$IDC" "$case_dir/before" --check --allow-untested >"$work/check.out" 2>"$work/check.err"; crc=$?
     "$IDC" "$case_dir/before" --allow-untested -o "$work/bin" >"$work/build.out" 2>"$work/build.err"; brc=$?
-    if [ "$crc" -ne 0 ] && [ "$brc" -ne 0 ] && cmp -s "$work/check.err" "$work/build.err" && [ ! -s "$work/check.out" ]; then
+    if [ -f "$case_dir/legal" ]; then
+        if [ "$crc" -eq 0 ] && [ "$brc" -eq 0 ] && grep -q '^idc --fix: 0 edit(s) in 0 files' "$work/fix.out" && diff -r "$case_dir/before" "$work/tree" >/dev/null 2>&1; then
+            ok "$name: --check of before/ passes, and --fix makes no edit"
+        else
+            bad "$name: --check of before/ passes, and --fix makes no edit (check $crc, build $brc, $(grep '^idc --fix' "$work/fix.out"))"
+        fi
+    elif [ "$crc" -ne 0 ] && [ "$brc" -ne 0 ] && cmp -s "$work/check.err" "$work/build.err" && [ ! -s "$work/check.out" ]; then
         ok "$name: --check of before/ says what its build says, and fails"
     else
         bad "$name: --check of before/ says what its build says, and fails (check $crc, build $brc)"

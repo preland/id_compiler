@@ -1,8 +1,8 @@
 // A return clause that is a call with a call in its arguments: named in one
-// run, and its argument in the next.
+// run, and the call nested in its argument is named ahead of it.
 nested(int[] c) {
   int m = bump(c);
-} return int diff(bump(c), m);
+} return int diff(twice(bump(c)), m);
 
 flags(int f) {
   int ok = f & 4 == 4;
@@ -11,5 +11,5 @@ flags(int f) {
 
 // An argument that narrows a word to an int, and is a call inside a call.
 narrow(int[] c) {
-  take(big(c[0]));
+  take(big(twice(c[0])));
 } return void;

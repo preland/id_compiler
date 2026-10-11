@@ -6,9 +6,7 @@ g(int x) {
   int y = x * 2;
 } return int y;
 
-// Two calls in one argument: one local for the whole argument, not one per
-// call.
+// Two calls in one argument, one level each: legal, so --fix edits nothing.
 use1(int x) {
-  string print_a0 = "a" + f(x) + " " + g(x);
-  print(print_a0);
+  print("a" + f(x) + " " + g(x));
 } return void;

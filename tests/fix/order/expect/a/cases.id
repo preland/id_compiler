@@ -2,15 +2,15 @@
 // first, so it has to be named first too.
 mix(int[] c) {
   int bump_v = bump(c);
-  int bump_v2 = bump(c);
-  int n = bump_v * 10 + twice(bump_v2);
+  int twice_v = twice(bump(c));
+  int n = bump_v * 10 + twice(twice_v);
 } return int n;
 
 // Two calls in one argument list.
 pairs(int[] c) {
   int bump_v = bump(c);
-  int bump_v2 = bump(c);
-  int s = diff(bump_v, bump_v2);
+  int twice_v = twice(bump(c));
+  int s = diff(bump_v, twice_v);
 } return int s;
 
 // A return clause that is an expression with a call in it.

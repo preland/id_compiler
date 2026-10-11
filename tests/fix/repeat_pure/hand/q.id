@@ -1,10 +1,9 @@
 use1(int log) {
-  int inf_pow2_v = inf_pow2(log);
+  int inf_pow2_v = inf_pow2(inf_pow2(log));
   int r = combine(inf_pow2_v, inf_pow2_v);
 } return int r;
 
 deep(int log) {
-  int inf_pow2_v = inf_pow2(log);
-  int inf_pow2_v2 = inf_pow2(inf_pow2_v);
-  int d = combine(inf_pow2_v2, 1);
+  int inf_pow2_v = inf_pow2(inf_pow2(log));
+  int d = combine(inf_pow2_v, 1);
 } return int d;

@@ -3,17 +3,15 @@ combine(int a, int b) {
 } return int s;
 
 // cur_next writes into the exported cursor, so the two calls must never
-// share one name or one evaluation, however identical their text. `deep` is
-// the only violation the rule still has here; --fix names use1's calls
-// although one level of nesting is allowed.
+// share one name or one evaluation, however identical their text. `deep` is a
+// second, single violation beside it.
 use1() {
-  int cur_next_v = cur_next();
-  int cur_next_v2 = cur_next();
-  int r = combine(cur_next_v, cur_next_v2);
+  int combine_v = combine(cur_next(), 1);
+  int combine_v2 = combine(cur_next(), 1);
+  int r = combine(combine_v, combine_v2);
 } return int r;
 
 deep() {
-  int cur_next_v = cur_next();
-  int combine_v = combine(cur_next_v, 1);
+  int combine_v = combine(cur_next(), 1);
   int d = combine(combine_v, 2);
 } return int d;

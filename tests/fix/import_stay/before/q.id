@@ -3,7 +3,7 @@ combo(int a, int b) {
 } return int c;
 
 // pure_add cannot write anything, so (import tab)[i] is read where it
-// stands; only pure_add(i), the call, has to move.
+// stands; only the call nested in pure_add's argument has to move.
 use1(int i) {
-  print(combo((import tab)[i], pure_add(i)));
+  print(combo((import tab)[i], pure_add(pure_add(i))));
 } return void;

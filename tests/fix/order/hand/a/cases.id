@@ -3,13 +3,13 @@
 mix(int[] c) {
   int first = bump(c);
   int second = bump(c);
-  int n = first * 10 + twice(second);
+  int n = first * 10 + twice(twice(second));
 } return int n;
 
 pairs(int[] c) {
   int left = bump(c);
   int right = bump(c);
-  int s = diff(left, right);
+  int s = diff(left, twice(right));
 } return int s;
 
 last(int[] c) {

@@ -2852,8 +2852,6 @@ void id_fix_walk_arr(int e, int cd);
 void id_fix_push3(int e, int lo, int cl);
 void id_fix_push_rest(int e, int lo, int cl, int cd, char* nt, char* an);
 void id_fix_rcache_taint(int e);
-int id_fix_any_call(int lo);
-int id_fix_any_call_at(int i, int ok);
 int id_fix_class3(int e);
 int id_fix_traps(int e);
 int id_fix_unsafe_rhs(int e);
@@ -24617,27 +24615,6 @@ void id_fix_rcache_taint(int e) {
     return;
 }
 
-int id_fix_any_call(int lo) {
-    int i;
-    int ok;
-    i = lo;
-    ok = 0;
-    while ((i < id_list_len(fixe_cl))) {
-        ok = id_fix_any_call_at(i, ok);
-        i = (i + 1);
-    }
-    return ok;
-}
-
-int id_fix_any_call_at(int i, int ok) {
-    int r;
-    r = ok;
-    if (((int)(id_list_get(fixe_cl, i)) == 1)) {
-        r = 1;
-    }
-    return r;
-}
-
 int id_fix_class3(int e) {
     int cl;
     cl = 0;
@@ -24830,9 +24807,7 @@ void id_fix_walk(int e, int ca, int cd, char* nt, char* an) {
     } else if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("index")) == 0)) {
         cl = 2;
     }
-    if (((strcmp(nt, ID_S("")) != 0) || ((cl == 1) && (ca == 1)))) {
-        cl = 3;
-    } else if ((((ca == 1) && (cl != 1)) && (id_fix_any_call(lo) == 1))) {
+    if (((strcmp(nt, ID_S("")) != 0) || ((ca == 1) && (id_has_call(e) > 1)))) {
         cl = 3;
     }
     id_fix_push_rest(e, lo, cl, cd, nt, an);

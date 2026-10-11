@@ -1,5 +1,6 @@
-// `deep` is the only violation here: --fix still names the legal call in
-// p.id's use1, which the rule allows one level of nesting for.
+// `deep` is the only violation here: its argument is not a call but holds
+// f(f(x)), so the whole argument is named once. --fix leaves p.id's use1
+// alone, since one level of nesting is legal.
 deep(int x) {
   print("b" + f(f(x)));
 } return void;

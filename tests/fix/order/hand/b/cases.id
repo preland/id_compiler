@@ -1,7 +1,7 @@
 nested(int[] c) {
   int m = bump(c);
   int k = bump(c);
-  int r = diff(k, m);
+  int r = diff(twice(k), m);
 } return int r;
 
 flags(int f) {
@@ -10,6 +10,6 @@ flags(int f) {
 } return void;
 
 narrow(int[] c) {
-  int n = big(c[0]);
+  int n = big(twice(c[0]));
   take(n);
 } return void;

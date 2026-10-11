@@ -2,12 +2,12 @@ pair(int a, int b) {
   int s = a + b;
 } return int s;
 
-// The first argument is a whole non-call expression with a call inside it;
-// the second is a call on its own. step must still run before mark. --fix
-// names both although the rule allows one level of nesting: the only
-// violation in this file is `deep`, which gives --check something to report.
+// The first argument is a whole non-call expression with a call inside it,
+// legal on its own; the second is a call with a call inside it, which is the
+// violation. step must still run before mark, so --fix names step(c) as well,
+// ahead of the repair it was asked for.
 use1(int[] c, int x) {
-  int r = pair(step(c) + 1, mark(x));
+  int r = pair(step(c) + 1, mark(mark(x)));
 } return int r;
 
 deep(int x) {

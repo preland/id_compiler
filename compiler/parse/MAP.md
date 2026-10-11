@@ -905,9 +905,6 @@ this compiler uses a construct on itself.
 | `fix_rcache_taint` | `compiler/parse/mid/form/fix/plan/walk/ev/push/one/taint.id` | Every call in the function passes through here as the walk reaches it, |
 | `fix_rcache_taint_fixture` | `compiler/parse/mid/form/fix/plan/walk/ev/push/one/taint.id` | A call to a name that is no function of this build (an unregistered |
 | `fix_rcache_taint_fixture2` | `compiler/parse/mid/form/fix/plan/walk/ev/push/one/taint.id` | Every call in the function passes through here as the walk reaches it, |
-| `fix_any_call` | `compiler/parse/mid/form/fix/plan/walk/kind/class/any.id` | Whether the events pushed while walking a subtree, starting at lo, include |
-| `fix_any_call_at` | `compiler/parse/mid/form/fix/plan/walk/kind/class/any.id` | Whether the events pushed while walking a subtree, starting at lo, include |
-| `fix_any_call_setup` | `compiler/parse/mid/form/fix/plan/walk/kind/class/any.id` | fixe_cl = [0 (not a call), 1 (a call)], so a range starting at 0 has one |
 | `fix_class3` | `compiler/parse/mid/form/fix/plan/walk/kind/class/kind.id` | An import read is judged apart: it gives the same value after a call unless |
 | `fix_class3_setup` | `compiler/parse/mid/form/fix/plan/walk/kind/class/kind.id` | An import read is judged apart: it gives the same value after a call unless |
 | `ck_import_check` | `compiler/parse/mid/form/fix/plan/walk/kind/class/kind.id` | An import read is judged apart: it gives the same value after a call unless |

@@ -4,7 +4,7 @@ again(int[] c) {
 } return int n;
 
 // bump cannot run tab_init and touches no export, so xs[c[0]] is read where
-// it stands -- only the call nested in twice's argument has to move.
+// it stands -- only the nested call has to move.
 guard(int[] c, int[] xs) {
-  print(xs[c[0]] + twice(bump(c)));
+  print(xs[c[0]] + twice(twice(bump(c))));
 } return void;

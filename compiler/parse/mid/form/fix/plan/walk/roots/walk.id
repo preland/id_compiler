@@ -26,15 +26,11 @@ fix_walk(int e, int ca, int cd, string nt, string an) {
   } else if((import nkind)[e] == "index") {
     cl = 2;
   }
-  blank;
-} chain (int e, int ca, int cd, string nt, string an) {
-  if(nt != "" || cl == 1 && ca == 1) {
-    cl = 3;
-  } else if(ca == 1 && cl != 1 && fix_any_call(lo) == 1) {
+  if(nt != "" || ca == 1 && has_call(e) > 1) {
     cl = 3;
   }
-  fix_push_rest(e, lo, cl, cd, nt, an);
 } chain (int e, int ca, int cd, string nt, string an) {
+  fix_push_rest(e, lo, cl, cd, nt, an);
   fix_rcache_taint(e);
 } return void;
 given fix_tokline_node_fixture (0, 0, 0, "", ""):() then calls fix_walk_kids:(0, 0) then calls fix_rcache_taint:(0)

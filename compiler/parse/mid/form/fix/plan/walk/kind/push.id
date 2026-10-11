@@ -9,11 +9,11 @@ fix_push4(int cd, string nt) {
 given fix_fixture (0, "int"):() then len((import fixe_cd)):(1)
 given fix_touch_fixture (0, "int"):() then len((import fixe_nt)):(3)
 
-// A call inside another call's argument must be named; so must an argument
-// that narrows, whatever it is; so must an argument that is not itself a call
-// but has one somewhere inside it -- named whole, rather than naming the call
-// alone, since naming the call alone would still leave it inside the
-// argument of the call this argument belongs to. Anything else is named only
+// An argument the checker rejects must be named: one with a call nested two
+// levels deep (has_call, mid/names/limits/expr/nest.id, above 1) -- a call
+// argument by its callee's name, any other whole. An argument with one level
+// of call is legal and left alone. So must an argument that narrows, whatever
+// it is. Anything else is named only
 // if something evaluated after it moves (plan/decide/). This used to be its
 // own function, fix_class, called exactly once as the last action of
 // fix_walk (../roots/walk.id); it now chains there directly.
