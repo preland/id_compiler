@@ -4134,19 +4134,37 @@ choose_output() {
     fi
 }
 
+# stamp_build_info OUT SOURCE -- make an ELF executable say which source built
+# it: `idc-build-info<TAB>SOURCE<NUL>` is appended after the last section, where
+# the loader never looks and `grep -a idc-build-info` finds it, so the launcher
+# can list a binary built before the record existed together with its source.
+# Appended after the link and after obj_cache_put, never into the object cache:
+# a cached program reused for another source path therefore cannot carry the
+# wrong path. Best-effort; non-ELF outputs are left alone.
+stamp_build_info() {
+    [ "$(head -c 4 -- "$1" 2>/dev/null | od -An -c | tr -d ' ')" = '177ELF' ] || return 0
+    printf 'idc-build-info\t%s\0' "$2" >> "$1" 2>/dev/null
+    return 0
+}
+
 # Every executable built for the user is one line of the build record the
 # launcher lists: absolute output, absolute source, target, build time in
 # milliseconds. The compiler's own tools (under CACHE_DIR) and IDC_RECORD=0
-# runs (the test suites) and programs whose sources sit under /tmp (throwaway
+# runs (the test suites), programs whose sources sit under /tmp and outputs in
+# /tmp or /run/user (throwaway
 # workspaces) are left out; a record that cannot be written never
-# fails the build.
+# fails the build. Every such executable, recorded or not, is also stamped
+# with its source (stamp_build_info).
 record_built() {
-    [ "$have_main" -eq 1 ] && [ "${IDC_RECORD:-1}" != 0 ] || return 0
+    [ "$have_main" -eq 1 ] || return 0
     local out_abs src_abs record_dir
     out_abs=$(realpath -- "$OUT" 2>/dev/null) || return 0
     case "$out_abs" in "$(realpath -- "$CACHE_DIR" 2>/dev/null)"/*) return 0 ;; esac
     src_abs=$(realpath -- "$PATH_ARG" 2>/dev/null) || return 0
+    stamp_build_info "$out_abs" "$src_abs"
+    [ "${IDC_RECORD:-1}" != 0 ] || return 0
     case "$src_abs" in /tmp/*) return 0 ;; esac
+    case "$out_abs" in /tmp/*|/run/user/*) return 0 ;; esac
     record_dir="${XDG_STATE_HOME:-$HOME/.local/state}/id"
     mkdir -p "$record_dir" 2>/dev/null || return 0
     printf '%s\t%s\t%s\t%s\n' "$out_abs" "$src_abs" "$1" "$(date +%s%3N)" >> "$record_dir/built.tsv" 2>/dev/null
