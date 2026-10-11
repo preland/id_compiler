@@ -1,0 +1,32 @@
+// The parameters as text: mode 0 declares them, `int a, string b`; mode 1
+// passes them, `a, b`.
+
+fix_xjoin(int xjmode) {
+  string xjout = "";
+  int xjj = 0;
+  while(xjj < len((import fixx_par))) {
+    xjout = fix_xjoinat(xjout, xjmode, xjj);
+    xjj = xjj + 1;
+  }
+} return string xjout;
+given fix_xparamed (0):("int a, string b")
+given fix_xparamed (1):("a, b")
+
+fix_xjoinat(string xjaout, int xjamode, int xjai) {
+  string xjasep = "";
+  if(xjai > 0) {
+    xjasep = ", ";
+  }
+  string xjares = xjaout + xjasep + fix_xitem(xjamode, xjai);
+} return string xjares;
+given fix_xparamed ("int a", 0, 1):("int a, string b")
+given fix_xparamed ("", 1, 0):("a")
+
+fix_xitem(int xiimode, int xiii) {
+  string xiitem = (import fixx_par)[xiii];
+  if(xiimode == 0) {
+    xiitem = (import fixx_pty)[xiii] + " " + xiitem;
+  }
+} return string xiitem;
+given fix_xparamed (0, 1):("string b")
+given fix_xparamed (1, 1):("b")

@@ -1,0 +1,28 @@
+// A `return` or `break` in the block would end the helper, not the function or
+// the loop around the call, so such a block is never pulled out.
+
+fix_xjumps(string xjtext) {
+  int xjone = 0;
+  if(xjtext == "return" || xjtext == "break") {
+    xjone = 1;
+  }
+} return int xjone;
+(""):(0)
+("return"):(1)
+("break"):(1)
+
+fix_xjumpy() {
+  fix_xfixture();
+  toks_push(["kw", "kw"], ["return", "x"]);
+} return void;
+():() then len((import tkind)):(19)
+():() then (import ttext)[17]:("return")
+
+fix_xjump(int xja, int xjb) {
+  string xjwhy = "";
+  if(fix_xhasjump(xja, xjb) > 0) {
+    xjwhy = "the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand";
+  }
+} return string xjwhy;
+given fix_xjumpy (17, 18):("the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand")
+given fix_xjumpy (1, 16):("")

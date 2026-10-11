@@ -1,0 +1,35 @@
+// The two arms of a compound statement. An else written `else if` holds one if
+// node, which is a statement of the enclosing block rather than a block of its
+// own, so it is searched and not counted.
+
+fix_xarms(int xcs, int xinloop) {
+  int xloopy = fix_xin(xcs, xinloop);
+  int[] xthen = (import nl1)[xcs];
+  fix_xblock(xthen, xloopy);
+} chain (int xcs, int xinloop) {
+  int[] xelse = (import nl2)[xcs];
+  fix_xelse(xcs, xelse, xloopy);
+} return void;
+given fix_xnodes (5, 0):() then calls fix_xblock:([1, 2, 3, 4], 0)
+given fix_xnodes (6, 0):() then calls fix_xblock:([1, 2, 3, 4], 1)
+given fix_xnodes (9, 0):() then calls fix_xrecord:[0]
+
+fix_xin(int xcs, int xinloop) {
+  int xloopy = xinloop;
+  if((import nkind)[xcs] == "while") {
+    xloopy = 1;
+  }
+} return int xloopy;
+given fix_xnodes (6, 0):(1)
+given fix_xnodes (5, 0):(0)
+given fix_xnodes (5, 1):(1)
+
+fix_xelse(int xcs, int[] xelse, int xinloop) {
+  if((import ni2)[xcs] == 1) {
+    fix_xfind(xelse, xinloop);
+  } else {
+    fix_xblock(xelse, xinloop);
+  }
+} return void;
+given fix_xnodes (5, [1, 2, 3, 4], 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
+given fix_xnodes (5, [1, 2], 0):() then calls fix_xrecord:[0]

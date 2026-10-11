@@ -1,0 +1,34 @@
+// The locals the block assigns that must survive it: declared outside it, and
+// read after it -- or, in a loop, read anywhere around it or inside it, since
+// the next round reads them.
+
+fix_xrets() {
+  int xri = 0;
+  while(xri < len((import fixx_wr))) {
+    fix_xlive((import fixx_wr)[xri]);
+    xri = xri + 1;
+  }
+} return void;
+given fix_xtwice ():() then (import fixx_ret):(["a", "b"])
+given fix_xfilled ():() then (import fixx_ret):([])
+
+fix_xlive(string xlname) {
+  int xlalive = find_str((import fixx_out), xlname) >= 0 || ((import fixx_loop)[0] == 1 && find_str((import fixx_rd), xlname) >= 0);
+  if(xlalive == 1 && find_str((import fixx_dc), xlname) < 0) {
+    push((import fixx_ret), xlname);
+  }
+} return void;
+given fix_xtwice ("a"):() then (import fixx_ret):(["a"])
+given fix_xfilled ("w"):() then (import fixx_ret):([])
+given fix_xlooped ("a"):() then (import fixx_ret):(["a"])
+
+fix_xtwice() {
+  fix_xreset();
+  push((import fixx_wr), "a");
+  push((import fixx_wr), "b");
+} chain () {
+  push((import fixx_out), "a");
+  push((import fixx_out), "b");
+} return void;
+():() then (import fixx_wr):(["a", "b"])
+():() then (import fixx_out):(["a", "b"])

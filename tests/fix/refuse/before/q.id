@@ -4,7 +4,7 @@ both(int[] c, int k) {
   }
 } return void;
 
-chain(int[] c, int k) {
+climb(int[] c, int k) {
   if(k > 0) {
     print("first");
   } else if(twice(twice(bump(c))) > 2) {

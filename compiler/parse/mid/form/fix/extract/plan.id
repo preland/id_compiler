@@ -1,0 +1,39 @@
+// Pulling an overlong block into a helper function (E0201). One block per
+// function per round, outermost first, and only in a function that no other
+// repair touched in this round: both would edit the same text. The helper is a
+// new file next to the function's own; the locals the block reads become its
+// parameters, and the one local it assigns that is read after it is its
+// result. A block that cannot be pulled out soundly is reported with the
+// reason (fix_xwhy) and left alone, and the next overlong block is tried.
+
+fix_extract(int xef, int xelo) {
+  int xtry = 0;
+  fix_xattempt(xef, xelo, xtry);
+  while((import fixx_again)[0] == 1 && xtry < len((import nst))) {
+    xtry = xtry + 1;
+    fix_xattempt(xef, xelo, xtry);
+  }
+} return void;
+given fix_xplanned (7, 0):() then calls fix_xplan:(7, 0)
+given fix_xplanned (10, 0):() then calls fix_xplan:[0]
+given fix_xplanned (7, 0):() then calls fix_xattempt:[1]
+
+fix_xplan(int xpf, int xplo) {
+  int xpa = (import nst)[(import fixx_hit)[0]];
+  int xpb = fix_xlast((import fixx_hit)[len((import fixx_hit)) - 1]);
+  fix_xscan(xpf, xpa, xpb);
+} chain (int xpf, int xplo) {
+  string xpwhy = fix_xwhy(xpa, xpb);
+  fix_xjudge(xpf, xplo, xpa, xpb, xpwhy);
+} return void;
+given fix_xplanned (7, 0):() then calls fix_xjudge:(7, 0, 1, 6, "")
+given fix_xplanned (8, 0):() then calls fix_xjudge:(8, 0, 1, 6, "")
+
+fix_xlast(int xls) {
+  int xlend = (import ntok)[xls];
+  if(fix_xtext(xlend) != ";" && fix_xtext(xlend + 1) == ";") {
+    xlend = xlend + 1;
+  }
+} return int xlend;
+given fix_xplanned (4):(6)
+given fix_xplanned (2):(6)

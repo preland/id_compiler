@@ -1,0 +1,10 @@
+main(int argc, string[] argv) {
+  int a = argc;
+  while(a < 10) {
+    a = a + 1;
+    a = a + 2;
+    a = a + 4;
+    a = a + 3;
+    break;
+  }
+} return int a;

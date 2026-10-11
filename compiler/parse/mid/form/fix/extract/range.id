@@ -1,0 +1,26 @@
+fix_xsort(int xst, int xmode) {
+  int xrole = fix_xrole(xst);
+  if(xrole > 0 && xmode == 0) {
+    fix_xadd(fix_xpick(xrole), (import ttext)[xst]);
+  } else if(xrole == 1) {
+    fix_xadd((import fixx_out), (import ttext)[xst]);
+  }
+} return void;
+given fix_xfixture (1, 0):() then (import fixx_wr):(["a"])
+given fix_xfixture (3, 0):() then (import fixx_rd):(["a"])
+given fix_xfixture (8, 0):() then (import fixx_dc):(["b"])
+given fix_xfixture (3, 1):() then (import fixx_out):(["a"])
+given fix_xfixture (1, 1):() then (import fixx_wr):([])
+
+fix_xrange(int xfrom, int xto, int xmode) {
+  int xwalk = xfrom;
+  while(xwalk <= xto) {
+    fix_xsort(xwalk, xmode);
+    xwalk = xwalk + 1;
+  }
+} return void;
+given fix_xfixture (0, 16, 0):() then (import fixx_rd):(["a", "b"])
+given fix_xfixture (0, 16, 0):() then (import fixx_wr):(["a"])
+given fix_xfixture (0, 16, 1):() then (import fixx_out):(["a", "b"])
+given fix_xfixture (4, 6, 0):() then (import fixx_rd):([])
+given fix_xfixture (16, 2, 0):() then (import fixx_wr):([])

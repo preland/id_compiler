@@ -1,0 +1,1 @@
+not fixed: the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand

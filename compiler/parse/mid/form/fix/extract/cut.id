@@ -1,0 +1,31 @@
+// Where the helper's body must be cut. A chain may only follow a segment of
+// exactly three actions, so the statements are counted off in threes; a
+// statement that straddles a multiple of three (an if with an else, 2, after
+// two others) leaves no legal cut and the block is refused.
+
+fix_xcutwhy() {
+  fix_xcutscan();
+  string xcwhy = "";
+  if((import fixx_acc)[0] > 3) {
+    xcwhy = "the block's statements cannot be split into segments of exactly 3 actions for a chained helper";
+  }
+} return string xcwhy;
+given fix_xplanned ():("")
+given fix_xcrooked ():("the block's statements cannot be split into segments of exactly 3 actions for a chained helper")
+
+fix_xcutscan() {
+  lset((import fixx_acc), 0, 0);
+  fix_xcutloop();
+} return void;
+given fix_xplanned ():() then (import fixx_cuts):(["7|7"])
+given fix_xplanned ():() then (import fixx_acc):([1])
+
+fix_xcutloop() {
+  int xcki = 0;
+  while(xcki < len((import fixx_hit))) {
+    fix_xcutat(xcki);
+    xcki = xcki + 1;
+  }
+} return void;
+given fix_xplanned ():() then (import fixx_acc):([1])
+given fix_xfixture ():() then (import fixx_acc):([0])

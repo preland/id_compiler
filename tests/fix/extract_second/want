@@ -1,0 +1,3 @@
+main_part.id: created, holds the block pulled out of an overlong one
+q.id:4: not fixed: the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand
+idc --fix: 1 edit(s) in 1 file, 2 run(s)

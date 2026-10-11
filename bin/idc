@@ -2706,6 +2706,7 @@ fi
 FIX_MAX_ROUNDS=16
 declare -A FIX_SNAP=()
 FIX_ORDER=()
+FIX_NEW=()
 
 fix_stage_ok() {
     if [ "$lex_rc" -ne 0 ] || { [ "$parse_rc" -ne 0 ] && [ "$parse_rc" -ne 1 ]; }; then
@@ -2758,6 +2759,13 @@ fix_report_edits() {
 
 # What was not fixed: each refusal with its reason, then every diagnostic left,
 # counted by kind -- the message with its names and numbers taken out.
+fix_report_created() {
+    local f
+    for f in ${FIX_NEW[@]+"${FIX_NEW[@]}"}; do echo "$f: created, holds the block pulled out of an overlong one"; done
+    [ "${#FIX_NEW[@]}" -gt 0 ] && echo "note: the created function(s) have no test cases yet; the build reports each until two are added"
+    return 0
+}
+
 fix_report_rest() {
     local nedits=0 f
     for f in ${FIX_ORDER[@]+"${FIX_ORDER[@]}"}; do
@@ -2778,7 +2786,11 @@ run_fix() {
     local round=0 rc
     while :; do
         fix_stage_ok
-        grep -E '^@[RD]\|' "$RAW_OUT" > "$WORK/edits"
+        if [ ! -d "$PATH_ARG" ]; then
+            awk -F'|' '$1 == "@X" { print "@N|" $2 "|" $3 "|the block has more than 3 actions; extracting it into a helper needs a project directory, because the helper goes in a new file; run --fix on the directory, or shorten the block by hand"; next } { print }' "$RAW_OUT" > "$WORK/raw.single"
+            cat "$WORK/raw.single" > "$RAW_OUT"
+        fi
+        grep -E '^@[RDX]\|' "$RAW_OUT" > "$WORK/edits"
         [ -s "$WORK/edits" ] || break
         round=$((round + 1))
         if [ "$round" -gt "$FIX_MAX_ROUNDS" ]; then
@@ -2789,12 +2801,14 @@ run_fix() {
         fi
         cut -d'|' -f2 "$WORK/edits" | LC_ALL=C sort -u > "$WORK/files"
         while IFS= read -r f; do fix_file "$f"; done < "$WORK/files"
+        while IFS= read -r f; do SRC_FILES+=("$f"); FIX_NEW+=("$f"); done < <(awk -F"|" '$1 == "@X" { d = $2; sub(/[^\/]*$/, "", d); print d $8 ".id" }' "$WORK/edits")
         progress fix "run $((round + 1))"
         emit_sources > "$SOURCES_TMP"
         run_lex_parse "$SOURCES_TMP" --cols
     done
     progress_clear
     fix_report_edits
+    fix_report_created
     fix_report_rest "$((round + 1))"
     grep -v '^@' "$RAW_OUT" > "$WORK/left_diag"
     show_diag "$WORK/left_diag" "$PARSE_ERR"

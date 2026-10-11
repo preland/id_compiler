@@ -1,0 +1,40 @@
+// Fixtures for the extraction's own cases. fix_xfixture is the token stream of
+//   { a = a + 1 ; int b = a ; f ( b ) ;
+// over a function whose locals are a and b, one line and one column per token;
+// fix_xfilled has one name in each list; fix_xnodes has statements 1-4
+// (assignments), an if (5) and a while (6) holding all four, then a function
+// over each (7, 8), then an if (9) with two statements and a function (10).
+
+fix_xfixture() {
+  fix_fixture();
+  toks_push(["op", "ident", "op", "ident", "op", "int", "op", "kw", "ident", "op", "ident", "op", "ident", "op", "ident", "op", "op"], ["{", "a", "=", "a", "+", "1", ";", "int", "b", "=", "a", ";", "f", "(", "b", ")", ";"]);
+  push((import fixd_used), "a");
+} chain () {
+  push((import fixd_used), "b");
+  fix_xreset();
+  fix_xtokpos(0);
+} return void;
+():() then len((import tkind)):(17)
+():() then (import fixd_used):(["a", "b"])
+
+fix_xtokpos(int xcol) {
+  int xtp = xcol;
+  while(xtp < 17) {
+    push((import tline), 7);
+    push((import tspan), xtp * 65536 + xtp + 1);
+    xtp = xtp + 1;
+  }
+} return void;
+given fix_xfixture (0):() then len((import tspan)):(34)
+given fix_xfixture (0):() then (import tspan)[2]:(131075)
+
+fix_xfilled() {
+  fix_xreset();
+  push((import fixx_rd), "r");
+  push((import fixx_wr), "w");
+} chain () {
+  push((import fixx_dc), "d");
+  push((import fixx_out), "o");
+} return void;
+():() then (import fixx_dc):(["d"])
+():() then (import fixx_out):(["o"])

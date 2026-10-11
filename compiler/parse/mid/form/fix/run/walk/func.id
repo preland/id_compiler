@@ -32,6 +32,7 @@ fix_func(int i, int f, int lo) {
   fix_ret(f);
 } chain (int i, int f, int lo) {
   fix_parens(lo, f);
+  fix_extract(f, lo);
 } return void;
 given fix_ret_fixture (0, 2, 0):() then prints:("@D|a.id|10|5|1|5|int ret_i = |10|5|10|8\n@R|a.id|10|5|10|8|2|ret_i\n")
 given fix_ret_fixture (1, 3, 0):() then (import fixd_file)[0]:("b.id")

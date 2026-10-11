@@ -1,0 +1,17 @@
+fix_xcutstr() {
+  string xcsout = "";
+  int xcsi = 0;
+  while(xcsi < len((import fixx_cuts))) {
+    xcsout = xcsout + "|" + (import fixx_cuts)[xcsi];
+    xcsi = xcsi + 1;
+  }
+} return string xcsout;
+given fix_xplanned ():("")
+given fix_xcutted ():("|7|7")
+
+fix_xcutted() {
+  fix_xplanned();
+  push((import fixx_cuts), "7|7");
+} return void;
+():() then (import fixx_cuts):(["7|7"])
+():() then (import fixx_hit):([1, 2, 3, 4])

@@ -1,0 +1,41 @@
+// What a token does to a local of the function being fixed, read from the
+// token stream rather than the tree: a name followed by `(` is a call, one
+// after `import` is a global, one followed by `=` is a write when it starts a
+// statement and a declaration otherwise, and every other mention is a read.
+// Roles: 0 not a local, 1 read, 2 write, 3 declaration. The extraction of an
+// overlong block into a helper (find.id, plan.id) needs exactly this to turn
+// the locals the block touches into the helper's parameters and result.
+
+fix_xtext(int xtx) {
+  string xtxt = "";
+  if(xtx >= 0 && xtx < len((import ttext))) {
+    xtxt = (import ttext)[xtx];
+  }
+} return string xtxt;
+given fix_xfixture (1):("a")
+given fix_xfixture (99):("")
+
+fix_xrole(int xrl) {
+  int xrole = 0;
+  if((import tkind)[xrl] == "ident" && find_str((import fixd_used), (import ttext)[xrl]) >= 0) {
+    xrole = fix_xkind(fix_xtext(xrl + 1), fix_xtext(xrl - 1));
+  }
+} return int xrole;
+given fix_xfixture (1):(2)
+given fix_xfixture (3):(1)
+given fix_xfixture (8):(3)
+given fix_xfixture (12):(0)
+
+fix_xkind(string xnext, string xprev) {
+  int xknd = 1;
+  if(xnext == "(" || xprev == "import") {
+    xknd = 0;
+  } else if(xnext == "=") {
+    xknd = fix_xassign(xprev);
+  }
+} return int xknd;
+given fix_xfixture ("(", "{"):(0)
+given fix_xfixture (";", "import"):(0)
+given fix_xfixture ("=", ";"):(2)
+given fix_xfixture ("=", "int"):(3)
+given fix_xfixture ("+", "="):(1)

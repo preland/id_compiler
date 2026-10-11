@@ -1,0 +1,33 @@
+// The state of one extraction, rebuilt for every function (fix_extract):
+//   fixx_hit   the statements of the first block that is over the action limit
+//   fixx_loop  1 when that block sits inside a while, whose later rounds read
+//              what the block left behind
+//   fixx_rd, fixx_wr, fixx_dc  the locals the block reads, assigns, declares
+//   fixx_out   the locals read in the code around the block
+//   fixx_ret   the locals the block assigns that must survive it
+//   fixx_acc, fixx_cuts  the running action count of the helper's segments, and
+//              where each full segment of three ends
+
+fix_xreset() {
+  export int[] fixx_hit = [];
+  export string[] fixx_rd = [];
+  fix_xreset2();
+} return void;
+():() then calls fix_xreset2:[1]
+given fix_fixture ():() then calls fix_xreset2:[1]
+
+fix_xreset2() {
+  export string[] fixx_wr = [];
+  export string[] fixx_dc = [];
+  fix_xreset3();
+} return void;
+():() then calls fix_xreset3:[1]
+given fix_fixture ():() then calls fix_xreset3:[1]
+
+fix_xreset3() {
+  export string[] fixx_out = [];
+  export string[] fixx_ret = [];
+  fix_xreset4();
+} return void;
+():() then calls fix_xreset4:[1]
+given fix_fixture ():() then calls fix_xreset4:[1]

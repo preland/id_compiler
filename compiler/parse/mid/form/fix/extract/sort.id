@@ -1,0 +1,35 @@
+// Sorting the mentions of a token range into the lists the extraction reads:
+// fixx_rd reads, fixx_wr writes, fixx_dc declarations. Mode 1 is for the code
+// around the block: only its reads matter there, and they go to fixx_out, the
+// names that must survive the block.
+
+fix_xassign(string xbefore) {
+  int xasg = 3;
+  if(xbefore == ";" || xbefore == "{" || xbefore == "}") {
+    xasg = 2;
+  }
+} return int xasg;
+given fix_xfixture (";"):(2)
+given fix_xfixture ("}"):(2)
+given fix_xfixture ("int"):(3)
+given fix_xfixture ("]"):(3)
+
+fix_xadd(string[] xlist, string xname) {
+  if(find_str(xlist, xname) < 0) {
+    push(xlist, xname);
+  }
+} return void;
+(["a"], "b"):(["a", "b"])
+(["a", "b"], "b"):(["a", "b"])
+
+fix_xpick(int xrole) {
+  string[] xpicked = (import fixx_rd);
+  if(xrole == 2) {
+    xpicked = (import fixx_wr);
+  } else if(xrole == 3) {
+    xpicked = (import fixx_dc);
+  }
+} return string[] xpicked;
+given fix_xfilled (1):(["r"])
+given fix_xfilled (2):(["w"])
+given fix_xfilled (3):(["d"])

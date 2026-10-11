@@ -1,0 +1,51 @@
+fix_xnodes() {
+  fix_xfixture();
+  int xfc = newleaf("int", 1, 0, "1", "");
+  int xfs1 = node_txt1("assign", "a", xfc);
+} chain () {
+  int xfs2 = node_txt1("assign", "a", xfc);
+  int xfs3 = node_txt1("assign", "a", xfc);
+  int xfs4 = node_txt1("assign", "a", xfc);
+} chain () {
+  int[] xfall = [xfs1, xfs2, xfs3, xfs4];
+  int[] xfnone = [];
+  int xfif = node_if(xfc, xfall, xfnone, 0);
+} chain () {
+  int xfwh = node_while(xfc, xfall);
+  int[] xfb1 = [xfif];
+  int xfna = node_func("xa", "int", xfnone, xfb1, 0 - 1);
+} chain () {
+  int[] xfb2 = [xfwh];
+  int xfnb = node_func("xb", "int", xfnone, xfb2, 0 - 1);
+  int[] xftwo = [xfs1, xfs2];
+} chain () {
+  int xfif2 = node_if(xfc, xftwo, xfnone, 0);
+  int[] xfb3 = [xfif2];
+  int xfnc = node_func("xc", "int", xfnone, xfb3, 0 - 1);
+} chain () {
+  int xfda = node_decl("int", "a", xfc, 0);
+  int xfdb = node_decl("string", "b", xfc, 0);
+  int xfnd = node_func("xd", "int", xfnone, xfb3, 0 - 1);
+} chain () {
+  fix_xmark();
+} return void;
+():() then len((import nkind)):(14)
+():() then (import nkind)[5]:("if")
+():() then (import nkind)[6]:("while")
+():() then (import nl2)[10]:([9])
+
+fix_xplanned() {
+  fix_xnodes();
+  fix_xrecord([1, 2, 3, 4], 0);
+  lset((import nst), 1, 1);
+} chain () {
+  lset((import ntok), 2, 5);
+  lset((import ntok), 3, 6);
+  lset((import ntok), 4, 6);
+} chain () {
+  lset((import ntok), 7, 16);
+  lset((import nst), 5, 1);
+  lset((import ntok), 8, 2);
+} return void;
+():() then (import fixx_hit):([1, 2, 3, 4])
+():() then (import ntok)[7]:(16)

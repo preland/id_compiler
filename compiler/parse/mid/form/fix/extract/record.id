@@ -1,0 +1,29 @@
+fix_xreset4() {
+  export int[] fixx_loop = [0];
+  export int[] fixx_acc = [0];
+  export string[] fixx_cuts = [];
+} chain () {
+  export int[] fixx_skip = [0];
+  export int[] fixx_again = [0];
+} return void export fixx_loop;
+():() then (import fixx_loop):([0])
+
+fix_xrecord(int[] xblock, int xinloop) {
+  if((import fixx_skip)[0] > 0) {
+    lset((import fixx_skip), 0, (import fixx_skip)[0] - 1);
+  } else {
+    fix_xadopt(xblock, xinloop);
+  }
+} return void;
+given fix_xfixture ([7, 8], 1):() then (import fixx_hit):([7, 8])
+given fix_xfixture ([7, 8], 1):() then (import fixx_loop):([1])
+given fix_xfixture ([], 0):() then (import fixx_hit):([])
+given fix_xskipping ([7, 8], 0):() then (import fixx_hit):([])
+given fix_xskipping ([7, 8], 0):() then (import fixx_skip):([0])
+
+fix_xmark() {
+  export int[] fixx_mark = [0];
+  lset((import fixx_mark), 0, (import fixd_seq)[0]);
+} return void;
+given fix_seq_once ():() then (import fixx_mark):([1])
+given fix_fixture ():() then (import fixx_mark)[0]:(0)

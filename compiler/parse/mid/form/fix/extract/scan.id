@@ -1,0 +1,35 @@
+// Reading the block and the code around it. The block's own mentions fill
+// fixx_rd, fixx_wr and fixx_dc; what follows it in the function fills fixx_out,
+// and so does what precedes it when the block is in a loop, whose next round
+// reads what this one wrote.
+
+fix_xscan(int xsf, int xsa, int xsb) {
+  fix_xrange(xsa, xsb, 0);
+  fix_xrange(xsb + 1, (import ntok)[xsf], 1);
+  if((import fixx_loop)[0] == 1) {
+    fix_xrange(fix_xbody(xsf), xsa - 1, 1);
+  }
+} return void;
+given fix_xplanned (7, 7, 11):() then (import fixx_out):(["b"])
+given fix_xplanned (7, 7, 11):() then (import fixx_dc):(["b"])
+given fix_xplanned (7, 7, 11):() then (import fixx_rd):(["a"])
+
+fix_xbody(int xbf) {
+  int[] xbbody = (import nl2)[xbf];
+  int xbfirst = (import nst)[xbbody[0]];
+} return int xbfirst;
+given fix_xplanned (7):(1)
+given fix_xplanned (8):(-1)
+
+fix_xhasjump(int xja, int xjb) {
+  int xjhit = 0;
+  int xjk = xja;
+  while(xjk <= xjb) {
+    xjhit = xjhit + fix_xjumps(fix_xtext(xjk));
+    xjk = xjk + 1;
+  }
+} return int xjhit;
+given fix_xfixture (0, 16):(0)
+given fix_xjumpy (17, 18):(1)
+given fix_xjumpy (18, 18):(0)
+

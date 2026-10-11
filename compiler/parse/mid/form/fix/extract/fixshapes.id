@@ -1,0 +1,28 @@
+fix_xcrooked() {
+  fix_xplanned();
+  int[] xkelse = [9];
+  int[] xkthen = [1, 2];
+} chain () {
+  int xkif = node_if(0, xkthen, xkelse, 1);
+  fix_xreset();
+  fix_xrecord([xkif, xkif, xkif], 0);
+} return void;
+():() then (import fixx_hit):([14, 14, 14])
+():() then (import ni2)[14]:(1)
+
+fix_xacctwo() {
+  fix_xplanned();
+  lset((import fixx_acc), 0, 2);
+} return void;
+():() then (import fixx_acc):([2])
+():() then (import fixx_hit):([1, 2, 3, 4])
+
+fix_xlooped() {
+  fix_xreset();
+  push((import fixx_wr), "a");
+  push((import fixx_rd), "a");
+} chain () {
+  lset((import fixx_loop), 0, 1);
+} return void;
+():() then (import fixx_loop):([1])
+():() then (import fixx_rd):(["a"])

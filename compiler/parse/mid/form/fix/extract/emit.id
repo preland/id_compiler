@@ -1,0 +1,40 @@
+// `@X|FILE|L0|C0|L1|C1|SEQ|NAME|CALL|HEAD|CHAIN|TAIL|ORIGIN[|L|C]...`: the span
+// from L0:C0 to L1:C1 moves into a new function NAME in a new file beside FILE
+// (tools/fixapply.awk), and CALL takes its place. HEAD opens the helper, CHAIN
+// is the seam between its segments of three actions, which are cut at every
+// L|C, and TAIL closes it. The helper has no test cases; bin/idc says so once, in its report,
+// not once per edit.
+
+fix_xjudge(int xjf, int xjlo, int xja, int xjb, string xjwhy) {
+  if(xjwhy == "") {
+    fix_xemit(xjf, xjlo, xja, xjb);
+  } else {
+    fix_xrefuse(xja, xjwhy);
+  }
+} return void;
+given fix_xplanned (7, 0, 1, 6, "bad"):() then prints:("@N||7|bad\n")
+given fix_xplanned (7, 0, 1, 6, ""):() then calls fix_xemit:(7, 0, 1, 6)
+
+fix_xrefuse(int xrt, string xrwhy) {
+  string xrline = "@N|" + (import fixd_file)[0] + "|" + (import tline)[xrt] + "|" + xrwhy;
+  print(xrline);
+  lset((import fixx_again), 0, 1);
+} return void;
+given fix_xplanned (1, "why"):() then prints:("@N||7|why\n")
+given fix_xplanned (2, "no"):() then prints:("@N||7|no\n")
+given fix_xplanned (2, "no"):() then (import fixx_again)[0]:(1)
+
+fix_xemit(int xef2, int xelo2, int xea, int xeb) {
+  fix_xparams(xelo2, xef2);
+  string xename = fix_xname(xef2);
+  string xehead = xename + "(" + fix_xjoin(0) + ") {";
+} chain (int xef2, int xelo2, int xea, int xeb) {
+  string xechain = "} chain (" + fix_xjoin(0) + ") {";
+  string xecall = fix_xcall(xename);
+  string xetail = fix_xtail(xelo2, xef2);
+} chain (int xef2, int xelo2, int xea, int xeb) {
+  string xeline = "@X|" + (import fixd_file)[0] + "|" + fix_at(xea) + "|" + fix_after(xeb) + "|" + fix_seq() + "|" + xename + "|" + xecall + "|" + xehead + "|" + xechain + "|" + xetail + "|" + (import ns1)[xef2] + fix_xcutstr();
+  print(xeline);
+} return void;
+given fix_xplanned (7, 0, 1, 6):() then prints:("@X||7|1|7|7|1|xa_part|xa_part();|xa_part() {|} chain () {|} return void;|xa\n")
+given fix_xreturned (13, 0, 1, 6):() then prints:("@X||7|1|7|7|1|xd_part|b = xd_part(a, b);|xd_part(int a, string b) {|} chain (int a, string b) {|} return string b;|xd\n")

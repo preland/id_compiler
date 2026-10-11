@@ -12,6 +12,7 @@ given fix_ret_fixture (1, 1, 0):() then (import fixd_file)[0]:("b.id")
 fix_setfile(int i) {
   pop((import fixd_file));
   push((import fixd_file), (import pfile)[i]);
+  fix_xmark();
 } return void;
 given fix_ret_fixture (0):() then (import fixd_file)[0]:("a.id")
 given fix_ret_fixture (1):() then (import fixd_file)[0]:("b.id")

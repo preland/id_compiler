@@ -1,0 +1,16 @@
+// One try at pulling a block out of a function: the SKIP first overlong blocks
+// are passed over, because they were refused on the tries before.
+
+fix_xattempt(int xaf, int xalo, int xaskip) {
+  fix_xreset();
+  lset((import fixx_skip), 0, xaskip);
+  fix_xfind((import nl2)[xaf], 0);
+} chain (int xaf, int xalo, int xaskip) {
+  if(len((import fixx_hit)) > 0 && (import fixx_mark)[0] == (import fixd_seq)[0]) {
+    fix_xplan(xaf, xalo);
+  }
+} return void;
+given fix_xplanned (7, 0, 0):() then calls fix_xplan:(7, 0)
+given fix_xplanned (10, 0, 0):() then calls fix_xplan:[0]
+given fix_xplanned (7, 0, 1):() then calls fix_xplan:[0]
+given fix_xplanned (8, 0, 1):() then calls fix_xplan:[0]

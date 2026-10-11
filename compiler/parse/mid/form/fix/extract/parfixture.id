@@ -1,0 +1,9 @@
+fix_xparamed() {
+  fix_xnodes();
+  push((import fixx_rd), "a");
+  push((import fixx_wr), "b");
+} chain () {
+  fix_xparams(0, 12);
+} return void;
+():() then (import fixx_par):(["a", "b"])
+():() then (import fixx_pty):(["int", "string"])

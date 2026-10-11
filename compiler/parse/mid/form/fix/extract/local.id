@@ -1,0 +1,26 @@
+fix_xlocal() {
+  string xlname = fix_xshare((import fixx_dc), (import fixx_out));
+  string xlwhy = "";
+  if(xlname != "") {
+    xlwhy = "the local '" + xlname + "' is declared in the block and used after it";
+  }
+} return string xlwhy;
+given fix_xfilled ():("")
+given fix_xdeclared ():("the local 'd' is declared in the block and used after it")
+
+fix_xdeclared() {
+  fix_xfilled();
+  push((import fixx_out), "d");
+} return void;
+():() then (import fixx_out):(["o", "d"])
+():() then (import fixx_dc):(["d"])
+
+fix_xmany() {
+  fix_xrets();
+  string xmwhy = "";
+  if(len((import fixx_ret)) > 1) {
+    xmwhy = "the block assigns '" + (import fixx_ret)[0] + "' and '" + (import fixx_ret)[1] + "', both used after it, and a helper returns one value";
+  }
+} return string xmwhy;
+given fix_xfilled ():("")
+given fix_xtwice ():("the block assigns 'a' and 'b', both used after it, and a helper returns one value")

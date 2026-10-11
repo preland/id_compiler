@@ -1,0 +1,37 @@
+// A local's type, from the declaration or parameter that introduces it, and the
+// helper's name: the function's own, then a word, the first that no function,
+// export or builtin already has.
+
+fix_xtype(string xtname, int xtlo, int xtf) {
+  string xtty = "";
+  int xtk = xtlo;
+  while(xtk <= xtf) {
+    xtty = fix_xtypeat(xtk, xtname, xtty);
+    xtk = xtk + 1;
+  }
+} return string xtty;
+given fix_xnodes ("a", 0, 12):("int")
+given fix_xnodes ("b", 0, 12):("string")
+given fix_xnodes ("zz", 0, 12):("")
+
+fix_xtypeat(int xtai, string xtaname, string xtaso) {
+  string xtares = xtaso;
+  if(((import nkind)[xtai] == "decl" || (import nkind)[xtai] == "param") && (import ns2)[xtai] == xtaname) {
+    xtares = (import ns1)[xtai];
+  }
+} return string xtares;
+given fix_xnodes (11, "a", "old"):("int")
+given fix_xnodes (11, "b", "old"):("old")
+
+fix_xname(int xnf) {
+  string[] xnwords = ["part", "piece", "step", "stage", "section", "portion", "chunk", "segment"];
+  int xnwi = 0;
+  string xncand = (import ns1)[xnf] + "_part";
+} chain (int xnf) {
+  while(fix_free_fn(xncand) == 0 && xnwi < 7) {
+    xnwi = xnwi + 1;
+    xncand = (import ns1)[xnf] + "_" + xnwords[xnwi];
+  }
+} return string xncand;
+given fix_xnodes (7):("xa_part")
+given fix_xnodes (8):("xb_part")

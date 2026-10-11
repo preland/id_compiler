@@ -1,0 +1,40 @@
+// Whether the block can be pulled out soundly: "" when it can, else the
+// reason, which --fix prints as a refusal. The checks run in order and the
+// first reason wins.
+
+fix_xwhy(int xwa, int xwb) {
+  string xwwhy = fix_xjump(xwa, xwb);
+  if(xwwhy == "") {
+    xwwhy = fix_xlocal();
+  }
+  if(xwwhy == "") {
+    xwwhy = fix_xmany();
+  }
+} chain (int xwa, int xwb) {
+  if(xwwhy == "") {
+    xwwhy = fix_xcutwhy();
+  }
+} return string xwwhy;
+given fix_xplanned (1, 6):("")
+given fix_xjumpy (17, 18):("the block contains a return or break, which would end the helper instead; move it out of the block, or shorten the block by hand")
+
+fix_xshare(string[] xla, string[] xlb) {
+  string xcommon = "";
+  int xsi = 0;
+  while(xsi < len(xla) && xcommon == "") {
+    xcommon = fix_xcommon(xla[xsi], xlb);
+    xsi = xsi + 1;
+  }
+} return string xcommon;
+(["a", "b"], ["c", "b"]):("b")
+(["a"], ["c"]):("")
+([], ["c"]):("")
+
+fix_xcommon(string xcname, string[] xclist) {
+  string xcfound = "";
+  if(find_str(xclist, xcname) >= 0) {
+    xcfound = xcname;
+  }
+} return string xcfound;
+("a", ["a"]):("a")
+("a", ["b"]):("")
