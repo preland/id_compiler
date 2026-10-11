@@ -4137,7 +4137,8 @@ choose_output() {
 # Every executable built for the user is one line of the build record the
 # launcher lists: absolute output, absolute source, target, build time in
 # milliseconds. The compiler's own tools (under CACHE_DIR) and IDC_RECORD=0
-# runs (the test suites) are left out; a record that cannot be written never
+# runs (the test suites) and programs whose sources sit under /tmp (throwaway
+# workspaces) are left out; a record that cannot be written never
 # fails the build.
 record_built() {
     [ "$have_main" -eq 1 ] && [ "${IDC_RECORD:-1}" != 0 ] || return 0
@@ -4145,6 +4146,7 @@ record_built() {
     out_abs=$(realpath -- "$OUT" 2>/dev/null) || return 0
     case "$out_abs" in "$(realpath -- "$CACHE_DIR" 2>/dev/null)"/*) return 0 ;; esac
     src_abs=$(realpath -- "$PATH_ARG" 2>/dev/null) || return 0
+    case "$src_abs" in /tmp/*) return 0 ;; esac
     record_dir="${XDG_STATE_HOME:-$HOME/.local/state}/id"
     mkdir -p "$record_dir" 2>/dev/null || return 0
     printf '%s\t%s\t%s\t%s\n' "$out_abs" "$src_abs" "$1" "$(date +%s%3N)" >> "$record_dir/built.tsv" 2>/dev/null
