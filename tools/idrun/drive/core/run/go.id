@@ -37,5 +37,5 @@ dr_go(string[] argv, int at, int[] fl) {
   }
 } return int code;
 given tf_file("define i32 @id_main(i32 %v1, ptr %v2) {\nb0:\n  ret i32 7\n}\n") (["idrun", "--ll", (import tf_path)], 2, [1, 0]):(7) then tf_rm:(0)
-given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("main(int argc, string[] argv) {\n} return int 5;\n") (["idrun", (import tf_path)], 1, [0, 1]):(5) then tf_rm:(0)
-given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("#!/usr/bin/env idrun\nmain(int argc, string[] argv) {\n} return int 6;\n") (["idrun", (import tf_path)], 1, [0, 1]):(6) then tf_rm:(0)
+given environment_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("main(int argc, string[] argv) {\n} return int 5;\n") (["idrun", (import tf_path)], 1, [0, 1]):(5) then tf_rm:(0)
+given environment_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_file("#!/usr/bin/env idrun\nmain(int argc, string[] argv) {\n} return int 6;\n") (["idrun", (import tf_path)], 1, [0, 1]):(6) then tf_rm:(0)

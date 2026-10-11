@@ -16,8 +16,8 @@ dr_src(string[] argv, int at, int[] fl, string stem) {
 } chain (string[] argv, int at, int[] fl, string stem) {
   dr_clean(dir);
 } return int code;
-given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem given tf_file("main(int argc, string[] argv) {\n  print(\"x\");\n} return int 3;\n") (["idrun", (import tf_path)], 1, [0, 1], (import tf_stm)):(3) then prints:("x\n") then tf_nod0:("tf_nod0 1") then tf_rmstem:(0) then tf_rm:(0)
-given env_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem (["idrun", "/nonexistent/idrun-src"], 1, [0, 1], (import tf_stm)):(1) then eprints:("idrun: no such file or directory: /nonexistent/idrun-src\n") then tf_nod0:("tf_nod0 1") then tf_rmstem:(0)
+given environment_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem given tf_file("main(int argc, string[] argv) {\n  print(\"x\");\n} return int 3;\n") (["idrun", (import tf_path)], 1, [0, 1], (import tf_stm)):(3) then prints:("x\n") then tf_nod0:("tf_nod0 1") then tf_rmstem:(0) then tf_rm:(0)
+given environment_put("IDC_CACHE_DIR", "../../.idc-cache") given tf_stem (["idrun", "/nonexistent/idrun-src"], 1, [0, 1], (import tf_stm)):(1) then eprints:("idrun: no such file or directory: /nonexistent/idrun-src\n") then tf_nod0:("tf_nod0 1") then tf_rmstem:(0)
 
 // Prints what the failed compile left in the IR file, without the trailing
 // newline eprint would double; nothing when the file is empty or missing.

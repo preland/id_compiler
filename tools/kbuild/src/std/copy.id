@@ -7,13 +7,13 @@
 // Where idstd is: $IDSTD_HOME, else the idstd directory beside the checkout that
 // holds root (the idc directory), as the compiler looks for it.
 kb_std_home(string root) {
-  string home = env_text("IDSTD_HOME");
+  string home = environment_text("IDSTD_HOME");
   if (home == "") {
     home = root + "/../../idstd";
   }
 } return string home;
-given env_put("IDSTD_HOME", "/h") ("/r"):("/h")
-given env_put("IDSTD_HOME", "") ("/r"):("/r/../../idstd")
+given environment_put("IDSTD_HOME", "/h") ("/r"):("/h")
+given environment_put("IDSTD_HOME", "") ("/r"):("/r/../../idstd")
 
 // Copies the file src to dst, making dst's directory, and answers the text copied.
 kb_copy(string src, string dst) {

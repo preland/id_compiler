@@ -6,7 +6,7 @@ slurp(string path) {
 
 envlen(string name) {
   int[] ebuf = [0, 0, 0, 0, 0, 0, 0, 0];
-  int en = env_get(name, ebuf, 8);
+  int en = environment_get(name, ebuf, 8);
 } return int en;
 ("NOPE_NOT_SET_X"):(-1)
 ("NOPE_NOT_SET_Y"):(-1)

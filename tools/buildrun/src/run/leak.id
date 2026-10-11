@@ -5,7 +5,7 @@
 
 // How many entries of the scratch root start with "buildrun_probe_".
 br_t_leaked() {
-  string tmp_root = env_text("TMPDIR");
+  string tmp_root = environment_text("TMPDIR");
   if (len(tmp_root) == 0) {
     tmp_root = "/tmp";
   }

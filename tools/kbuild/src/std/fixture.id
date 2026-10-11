@@ -19,7 +19,7 @@ kb_t_std(int rc) {
   export string kb_t_src = kb_t_home + "/core/a.id";
   export string kb_t_dst = (import kb_t_root) + "/out/core/a.id";
 } chain (int rc) {
-  env_put("IDSTD_HOME", kb_t_home);
+  environment_put("IDSTD_HOME", kb_t_home);
 } return void export kb_t_home;
 (0):() then kb_t_done:("done 1")
 (5):() then kb_t_staged:("|0,0,0,0") then kb_t_done:("done 1")

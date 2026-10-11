@@ -2,7 +2,7 @@
 // (functions, cases, untested functions, depth, mutation score, benchmark ratios)
 // live. It replaces tools/statusgen.sh. See sg_usage in conf.id for the options.
 main(int argc, string[] argv) {
-  int sgm_main_rc = sg_run(argv, env_text("PWD"));
+  int sgm_main_rc = sg_run(argv, environment_text("PWD"));
 } return int sgm_main_rc;
 (2, ["statusgen", "--bogus"]):(2) then eprints:("statusgen: unknown option '--bogus'\nusage: statusgen [--write | --check | --untested [TREE]] [--root DIR] [--mut DIR]\n  (none)       print the status page to stdout\n  --write      write DIR/docs/STATUS.md\n  --check      exit 1 when DIR/docs/STATUS.md is not what would be printed now\n  --untested   list each function with fewer than two cases (TREE: a row label such as idc/tools)\n  --root DIR   the checkout root (default: the working directory)\n  --mut DIR    mutscore results (default: ROOT/bench/results/mutscore)\n")
 (2, ["statusgen", "--help"]):(0) then prints:("usage: statusgen [--write | --check | --untested [TREE]] [--root DIR] [--mut DIR]\n  (none)       print the status page to stdout\n  --write      write DIR/docs/STATUS.md\n  --check      exit 1 when DIR/docs/STATUS.md is not what would be printed now\n  --untested   list each function with fewer than two cases (TREE: a row label such as idc/tools)\n  --root DIR   the checkout root (default: the working directory)\n  --mut DIR    mutscore results (default: ROOT/bench/results/mutscore)\n")

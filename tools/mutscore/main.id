@@ -25,7 +25,7 @@ main(int argc, string[] argv) {
 // status.
 ms_cm_run(string[] ms_av) {
   int ms_t0 = ticks();
-  string[] ms_cf = ms_cm_cfg(ms_av, env_text("PWD"));
+  string[] ms_cf = ms_cm_cfg(ms_av, environment_text("PWD"));
   int[] ms_sh = ms_dr_sh(ms_cf[(import ms_cf_shard)]);
 } chain (string[] ms_av) {
   string[] ms_al = ms_en_all(ms_cf[(import ms_cf_root)], ms_cf[(import ms_cf_area)]);

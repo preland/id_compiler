@@ -24,4 +24,4 @@ kb_image(string root, string out) {
   }
 } return int rc;
 given kb_t_std(7) ((import kb_t_root), "/x/k.elf"):(7) then kb_t_staged:("int K1 = 1;\nint K2 = K4;\nint K4 = 4;\n|1,1,0,0") then kb_t_done:("done 1")
-given env_put("IDSTD_HOME", "/no/such/idstd") ("/no/such/idc", "/o"):(1) then eprints:("kbuild: no .id files under /no/such/idstd/core; set IDSTD_HOME to the idstd checkout\n")
+given environment_put("IDSTD_HOME", "/no/such/idstd") ("/no/such/idc", "/o"):(1) then eprints:("kbuild: no .id files under /no/such/idstd/core; set IDSTD_HOME to the idstd checkout\n")
