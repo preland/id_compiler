@@ -13,7 +13,7 @@ jg_json_esc(int jg_c) {
     jg_es = "\\" + chr(jg_c);
   }
   if (jg_c < 32 && jg_at < 0) {
-    jg_es = "\\u" + fmt_hex4(jg_c);
+    jg_es = "\\u" + format_hex_at_least_four_digits(jg_c);
   }
 } return string jg_es;
 (97):("a")

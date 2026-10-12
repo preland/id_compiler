@@ -23,7 +23,7 @@ ppm_spaces(int[] d, int[] pos) {
 
 ppm_is_space(int[] d, int i) {
   int c = ppm_byte_at(d, i);
-  int ok = chr_is_space(c);
+  int ok = character_is_space(c);
 } return int ok;
 ([32], 0):(1)
 ([49], 0):(0)

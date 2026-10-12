@@ -2,7 +2,7 @@
 
 // 1 for a byte that may continue a name: a letter, a digit or an underscore.
 ms_lx_idc(int ms_c) {
-  int ms_ok = chr_is_alnum(ms_c) == 1 || ms_c == 95;
+  int ms_ok = character_is_alphanumeric(ms_c) == 1 || ms_c == 95;
 } return int ms_ok;
 (95):(1)
 (45):(0)

@@ -34,11 +34,11 @@ dg_edge(string dg_es, string dg_em, int dg_ei) {
 } chain (string dg_es, string dg_em, int dg_ei) {
   int dg_ef0 = character_code_at(dg_em, 0);
   int dg_efn = character_code_at(dg_em, len(dg_em) - 1);
-  if(chr_is_alnum(dg_ef0) == 1 && chr_is_alnum(dg_el) == 1) {
+  if(character_is_alphanumeric(dg_ef0) == 1 && character_is_alphanumeric(dg_el) == 1) {
     dg_ek = 0;
   }
 } chain (string dg_es, string dg_em, int dg_ei) {
-  if(chr_is_alnum(dg_efn) == 1 && chr_is_alnum(dg_er) == 1) {
+  if(character_is_alphanumeric(dg_efn) == 1 && character_is_alphanumeric(dg_er) == 1) {
     dg_ek = 0;
   }
 } return int dg_ek;

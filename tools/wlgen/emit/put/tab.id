@@ -17,7 +17,7 @@ wg_quote(string[] vz_xs) {
   string[] vz_out = [];
   int vi_i = 0;
   while (vi_i < len(vz_xs)) {
-    push(vz_out, str_quote(vz_xs[vi_i]));
+    push(vz_out, string_quote(vz_xs[vi_i]));
     vi_i = vi_i + 1;
   }
 } return string[] vz_out;

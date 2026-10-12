@@ -23,7 +23,7 @@ rename_path_like(string rename_source, int rename_start, int rename_end) {
 // there: a name must start there, inside backticks, and not be part of a path.
 rename_markdown_name(string rename_source, int rename_index, int rename_inside) {
   int rename_end = rename_index;
-  if(rename_inside == 1 && (chr_is_alpha(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95)) {
+  if(rename_inside == 1 && (character_is_alpha(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95)) {
     rename_end = rename_run_end(rename_source, rename_index);
   }
   if(rename_path_like(rename_source, rename_index, rename_end) == 1) {

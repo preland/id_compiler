@@ -4,7 +4,7 @@
 // 1 when c is a character an identifier is made of: a letter, a digit or an underscore.
 kb_ident(int c) {
   int ok = 0;
-  if (chr_is_alnum(c) == 1 || c == 95) {
+  if (character_is_alphanumeric(c) == 1 || c == 95) {
     ok = 1;
   }
 } return int ok;

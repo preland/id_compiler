@@ -11,7 +11,7 @@
 // number is a run too (`0xff`, `1e5`), so a letter inside a number is never
 // taken for the start of a name.
 rename_run_end(string rename_source, int rename_index) {
-  while(chr_is_alnum(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95) {
+  while(character_is_alphanumeric(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95) {
     rename_index = rename_index + 1;
   }
 } return int rename_index;

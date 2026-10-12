@@ -30,7 +30,7 @@ ms_rp_fig(int[] ms_cn, int ms_ix) {
 ms_rp_say(int[] ms_cn, int ms_ix) {
   int ms_b = 4 * ms_ix;
   string ms_pc = ms_rp_pct(ms_cn[ms_b], ms_cn[ms_b + 1]);
-  string ms_fg = fmt_pad(ms_pc + "%", 7) + " killed " + ms_cn[ms_b] + ", survived " + ms_cn[ms_b + 1] + ", invalid " + ms_cn[ms_b + 2] + ", other " + ms_cn[ms_b + 3];
+  string ms_fg = format_pad(ms_pc + "%", 7) + " killed " + ms_cn[ms_b] + ", survived " + ms_cn[ms_b + 1] + ", invalid " + ms_cn[ms_b + 2] + ", other " + ms_cn[ms_b + 3];
 } return string ms_fg;
 ([2, 1, 0, 0, 1, 1, 4, 5], 0):("  66.6% killed 2, survived 1, invalid 0, other 0")
 ([2, 1, 0, 0, 1, 1, 4, 5], 1):("  50.0% killed 1, survived 1, invalid 4, other 5")

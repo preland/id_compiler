@@ -10,7 +10,7 @@
 lay_suffix_start(string s) {
   int i = len(s) - 1;
   int last_digit = -1;
-  while(i >= 0 && chr_is_digit(character_code_at(s, i)) == 1) {
+  while(i >= 0 && character_is_digit(character_code_at(s, i)) == 1) {
     last_digit = i;
     i = i - 1;
   }

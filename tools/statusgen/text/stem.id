@@ -5,7 +5,7 @@
 // A section's name without a trailing "_" and number.
 sg_stem(string sgs_n) {
   int sgs_i = len(sgs_n);
-  while(sgs_i > 0 && chr_is_digit(character_code_at(sgs_n, sgs_i - 1)) == 1) {
+  while(sgs_i > 0 && character_is_digit(character_code_at(sgs_n, sgs_i - 1)) == 1) {
     sgs_i = sgs_i - 1;
   }
   string sgs_r = sgs_n;

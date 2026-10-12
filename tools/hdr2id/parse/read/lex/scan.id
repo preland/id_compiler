@@ -2,7 +2,7 @@
 
 // 1 for a character that can be in an identifier or a number, 2 for a quote of either kind, 3 for a dot, 0 for anything else.
 hx_kind(int lx_c) {
-  int lx_k = chr_is_alnum(lx_c) || lx_c == 95;
+  int lx_k = character_is_alphanumeric(lx_c) || lx_c == 95;
   if (lx_c == 34 || lx_c == 39) {
     lx_k = 2;
   }

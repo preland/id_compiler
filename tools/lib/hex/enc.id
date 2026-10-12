@@ -30,7 +30,7 @@ hex_parts(string[] strs, int[] xs, int at, int n) {
 
 // The low byte of v as two digits: the last two of fmt_hex's eight.
 hex2(int v) {
-  string h8 = fmt_hex(v);
+  string h8 = format_hex(v);
   string two = str_sub(h8, 6, 2);
 } return string two;
 (171):("ab")

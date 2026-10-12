@@ -12,7 +12,7 @@ ppm_digits(int[] d, int[] pos) {
 
 ppm_is_digit(int[] d, int i) {
   int c = ppm_byte_at(d, i);
-  int ok = chr_is_digit(c);
+  int ok = character_is_digit(c);
 } return int ok;
 ([48], 0):(1)
 ([48], 1):(0)

@@ -2,7 +2,7 @@
 // answers (-1 past the end, which none of them is).
 
 jg_ws(int jg_c) {
-  int jg_r = chr_is_space(jg_c) == 1 || jg_c == (import jg_vtab) || jg_c == (import jg_ffeed);
+  int jg_r = character_is_space(jg_c) == 1 || jg_c == (import jg_vtab) || jg_c == (import jg_ffeed);
 } return int jg_r;
 (32):(1)
 (12):(1)
@@ -10,14 +10,14 @@ jg_ws(int jg_c) {
 (-1):(0)
 
 jg_isid(int jg_c) {
-  int jg_r = chr_is_alnum(jg_c) == 1 || jg_c == (import jg_under);
+  int jg_r = character_is_alphanumeric(jg_c) == 1 || jg_c == (import jg_under);
 } return int jg_r;
 (95):(1)
 (55):(1)
 (45):(0)
 
 jg_isstart(int jg_c) {
-  int jg_r = chr_is_alpha(jg_c) == 1 || jg_c == (import jg_under);
+  int jg_r = character_is_alpha(jg_c) == 1 || jg_c == (import jg_under);
 } return int jg_r;
 (95):(1)
 (65):(1)

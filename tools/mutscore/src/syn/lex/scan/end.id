@@ -16,14 +16,14 @@ ms_lx_two(string ms_s, int ms_i) {
 ms_lx_kind(string ms_s, int ms_i) {
   int ms_c = character_code_at(ms_s, ms_i);
   int ms_k = (import ms_k_op);
-  if(chr_is_digit(ms_c) == 1) {
+  if(character_is_digit(ms_c) == 1) {
     ms_k = (import ms_k_int) + (ms_lx_real(ms_s, ms_i) > ms_lx_digits(ms_s, ms_i));
   }
 } chain (string ms_s, int ms_i) {
   if(ms_c == 34) {
     ms_k = (import ms_k_str);
   }
-  if(chr_is_alpha(ms_c) == 1 || ms_c == 95) {
+  if(character_is_alpha(ms_c) == 1 || ms_c == 95) {
     ms_k = (import ms_k_id);
   }
 } return int ms_k;
