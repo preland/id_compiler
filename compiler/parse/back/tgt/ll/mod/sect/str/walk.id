@@ -20,13 +20,15 @@ ll_strs() {
     i = i + 1;
   }
 } return void;
-given ir_fixture3 ():() then prints:("")
 given ll_str_fixture ():() then prints:("@.str0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str0 = private alias i8, getelementptr inbounds (i8, ptr @.str0.d, i64 8)\n@.str1.d = private unnamed_addr constant <{ i64, [2 x i8] }> <{ i64 1, [2 x i8] c\"\\61\\00\" }>, align 8\n@.str1 = private alias i8, getelementptr inbounds (i8, ptr @.str1.d, i64 8)\n")
+given ir_fix2 ():() then prints:("@.str1.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str1 = private alias i8, getelementptr inbounds (i8, ptr @.str1.d, i64 8)\n")
+given ir_fixture3 ():() then prints:("")
 
 ll_str_at(int i) {
   if(ll_isstr(i) == 1) {
     ll_str_emit(i);
   }
 } return void;
-given ir_fixture3 ((import ir_retvoid)):() then prints:("")
 given ll_str_fixture ((import ir_str_const)):() then prints:("@.str0.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str0 = private alias i8, getelementptr inbounds (i8, ptr @.str0.d, i64 8)\n")
+given ir_fix2 ((import irf_n1)):() then prints:("@.str1.d = private unnamed_addr constant <{ i64, [1 x i8] }> <{ i64 0, [1 x i8] c\"\\00\" }>, align 8\n@.str1 = private alias i8, getelementptr inbounds (i8, ptr @.str1.d, i64 8)\n")
+given ir_fixture3 ((import ir_retvoid)):() then prints:("")

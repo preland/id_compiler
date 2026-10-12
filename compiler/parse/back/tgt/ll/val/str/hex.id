@@ -27,5 +27,7 @@ ll_isstr(int v) {
     r = 1;
   }
 } return int r;
+given ll_str_fixture (0):(1)
+given ir_fix2 (2):(0)
 given ir_fix1 (0):(0)
 given ir_fix2 (1):(1)

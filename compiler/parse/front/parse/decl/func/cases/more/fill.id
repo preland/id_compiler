@@ -9,7 +9,7 @@ case_tuple(int[] pos) {
   int[] items = [];
   scan_tuple(pos, items);
 } return int[] items;
-given tup1_fix ([0]):([0])
+given tup1_fix ([0]):([0]) then (import ns1)[0]:("5")
 given tup2_fix ([0]):([0, 1])
 
 scan_tuple(int[] pos, int[] items) {

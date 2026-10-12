@@ -8,20 +8,20 @@ then_calls_count(int[] pos, string nm) {
   int v = case_value(pos);
   then_calls_count_rest(pos, nm, v);
 } return void;
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([3], "myfn"):()
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([3], "other"):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([3], "myfn"):() then calls then_calls_count_push:("myfn", 4)
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([3], "other"):() then calls then_calls_count_push:("other", 4)
 
 then_calls_count_rest(int[] pos, string nm, int v) {
   expect_text(pos, "]");
   advance(pos);
   then_calls_count_push(nm, v);
 } return void;
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([5], "myfn", 2):()
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([5], "other", 3):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([5], "myfn", 2):() then calls then_calls_count_push:("myfn", 2)
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["calls", "myfn", ":", "[", "2", "]"]) ([5], "other", 3):() then calls then_calls_count_push:("other", 3)
 
 then_calls_count_push(string nm, int v) {
   int[] items = [v];
   then_push_kind("thencallsn", nm, items);
 } return void;
-given fn_fixture ("myfn", 2):()
-given fn_fixture ("other", 3):()
+given fn_fixture ("myfn", 2):() then calls then_push_kind:("thencallsn", "myfn", [2])
+given fn_fixture ("other", 3):() then calls then_push_kind:("thencallsn", "other", [3])

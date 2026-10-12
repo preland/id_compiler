@@ -23,8 +23,8 @@ then_dispatch(int[] pos) {
     then_traps_or_check(pos);
   }
 } return void;
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1]):()
-given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([1]):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1]):() then calls then_traps_or_check:[1]
+given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([1]):() then calls then_print_dispatch:[1]
 
 then_check_clause(int[] pos) {
   if(at_case_import(pos) == 1 || cur_text(pos) == "len") {
@@ -34,8 +34,8 @@ then_check_clause(int[] pos) {
     then_value(pos, chk_nm);
   }
 } return void;
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1]):()
-given toks_fn(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]) ([0]):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1]):() then calls then_value:[1]
+given toks_fn(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]) ([0]):() then calls then_value:[1]
 given toks_env(["op", "kw", "ident", "op"], ["(", "import", "zz", ")"]) ([0]):() then calls then_imp_clause:[1]
 given env_init given toks_push(["ident", "op", "op", "kw", "ident", "op", "op", "op", "op", "int", "op"], ["len", "(", "(", "import", "zz", ")", ")", ":", "(", "5", ")"]) ([0]):() then calls then_imp_clause:[1]
 
@@ -50,5 +50,5 @@ then_traps_or_check(int[] pos) {
     then_check_clause(pos);
   }
 } return void;
-given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1]):()
-given toks_fn(["kw", "op", "op", "str", "op"], ["traps", ":", "(", "\"hi\"", ")"]) ([0]):()
+given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1]):() then calls then_check_clause:[1]
+given toks_fn(["kw", "op", "op", "str", "op"], ["traps", ":", "(", "\"hi\"", ")"]) ([0]):() then calls then_traps_clause:[1]

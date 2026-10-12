@@ -12,20 +12,20 @@ then_print_dispatch(int[] pos) {
     then_print_clause(pos, "theneprints");
   }
 } return void;
-given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([1]):()
-given eprints_fix ([0]):()
+given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([1]):() then calls then_push_kind:("thenprints", "", [4])
+given eprints_fix ([0]):() then calls then_push_kind:("theneprints", "", [4])
 
 then_print_clause(int[] pos, string kind) {
   advance(pos);
   then_print_value(pos, kind);
 } return void;
-given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([1], "thenprints"):()
-given eprints_fix ([0], "theneprints"):()
+given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([1], "thenprints"):() then calls then_push_kind:("thenprints", "", [4])
+given eprints_fix ([0], "theneprints"):() then calls then_push_kind:("theneprints", "", [4])
 
 then_print_value(int[] pos, string kind) {
   eat_colon(pos);
   int[] items = case_tuple(pos);
   then_push_kind(kind, "", items);
 } return void;
-given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([2], "thenprints"):()
-given eprints_fix ([1], "theneprints"):()
+given toks_fn(["kw", "kw", "op", "op", "str", "op"], ["then", "prints", ":", "(", "\"hi\"", ")"]) ([2], "thenprints"):() then calls then_push_kind:("thenprints", "", [4])
+given eprints_fix ([1], "theneprints"):() then calls then_push_kind:("theneprints", "", [4])

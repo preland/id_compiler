@@ -16,4 +16,5 @@ eat_colon(int[] pos) {
   }
 } return void;
 given colon_fix ([0]):([1])
+given toks_env(["op", "int"], [":", "5"]) ([0]):([1])
 given tup1_fix ([0]):([0])

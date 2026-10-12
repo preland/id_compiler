@@ -19,6 +19,7 @@ ll_escbyte2(int c) {
   }
 } return int r;
 (114):(13)
+(48):(0)
 (120):(120)
 
 // The count of bytes the constant holds, which is what the array type needs.

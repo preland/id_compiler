@@ -13,21 +13,21 @@ then_value(int[] pos, string chk_nm) {
   eat_colon(pos);
   then_push(chk_nm, case_tuple(pos), targs);
 } return void;
-given fnrhs_fix ([0], "chk"):()
-given fnrhs_fix ([0], "other"):()
 given toks_fn(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], "chk"):() then calls then_push:("chk", [4], [])
 given toks_fn(["op", "int", "op", "op", "op", "int", "op"], ["(", "5", ")", ":", "(", "6", ")"]) ([0], "chk"):() then calls then_push:("chk", [5], [4])
+given fnrhs_fix ([0], "chk"):()
+given fnrhs_fix ([0], "other"):()
 
 then_push(string chk_nm, int[] items, int[] targs) {
   int n = len((import casestart));
   then_store("then", chk_nm, items, n - 1, targs);
 } return void;
-given fn_fixture ("chk", [], []):()
-given fn_fixture ("chk", [1], [2]):()
+given fn_fixture ("chk", [], []):() then calls then_store:("then", "chk", [], 0, [])
+given fn_fixture ("chk", [1], [2]):() then calls then_store:("then", "chk", [1], 0, [2])
 
 then_store(string kind, string chk_nm, int[] items, int ci, int[] no_items) {
   int node = newnode(kind, ci, 0, chk_nm, "", items, no_items);
   push((import thennode), node);
 } return void;
-given fn_fixture ("then", "chk", [], 0, []):()
-given fn_fixture ("thenprints", "", [], 0, []):()
+given fn_fixture ("then", "chk", [], 0, []):() then calls newnode:("then", 0, 0, "chk", "", [], []) then len((import thennode)):(1)
+given fn_fixture ("thenprints", "", [], 0, []):() then calls newnode:("thenprints", 0, 0, "", "", [], []) then len((import thennode)):(1)

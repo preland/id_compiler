@@ -7,8 +7,8 @@ then_push_kind(string kind, string s1v, int[] items) {
   int[] no_items = [];
   then_store(kind, s1v, items, n - 1, no_items);
 } return void;
-given fn_fixture ("thenprints", "", []):()
-given fn_fixture ("theneprints", "", [1]):()
+given fn_fixture ("thenprints", "", []):() then calls then_store:("thenprints", "", [], 0, [])
+given fn_fixture ("theneprints", "", [1]):() then calls then_store:("theneprints", "", [1], 0, [])
 
 
 // `(import NAME)` and the fields after it, `.a.b`, of a `then (import NAME).a.b:(value)` check (../../clauses.id). The

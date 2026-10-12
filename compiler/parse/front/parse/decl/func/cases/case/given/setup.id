@@ -90,10 +90,10 @@ case_given(int[] pos) {
   }
   push((import casetimeout), secs_v);
 } return void;
-given toks_env(["kw", "ident"], ["given", "mysetup"]) ([0]):()
-given tup1_fix ([0]):()
 given tmo_fix ([0]):() then tmo_last:(5)
 given tmo_fix ([0]):() then (import chkfail)[0]:(0)
+given toks_env(["kw", "ident"], ["given", "mysetup"]) ([0]):()
+given tup1_fix ([0]):()
 given tmo_fix ([3]):() then (import chkfail)[0]:(1)
 given tmo_fix ([5]):() then (import chkfail)[0]:(1)
 given tmo_fix ([7]):() then (import chkfail)[0]:(1)
