@@ -20,8 +20,9 @@ fix_rcache_find_hit() {
   push((import fixd_rk), "|len|(|)");
   push((import fixd_rn), "cachedname");
 } return void;
-():() then calls fix_span_fixture:[1]
+():() then (import fixd_rn):(["cachedname"])
 ():() then init_units:(0)
+():() then calls fix_span_fixture:[1]
 
 // plan/walk/ev/push/one/ru.id's fix_span_fixture, past the curtk stamp: the
 // node itself, and the rest of its span (fixd_gcl onward).

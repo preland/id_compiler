@@ -2,8 +2,9 @@ fix_rcache_find_at_fixture() {
   fix_fixture();
   push((import fixd_rn), "cached");
 } return void;
-():() then calls fix_fixture:[1]
+():() then (import fixd_rn):(["cached"])
 ():() then init_units:(0)
+():() then calls fix_fixture:[1]
 
 // A second, independent token position (line 9, columns 1-4), for a
 // out/span/beg/text.id fix_span case that needs a value different from
@@ -13,5 +14,6 @@ fix_tokline_fixture3() {
   push((import tline), 9);
   push((import tspan), 65536 + 4);
 } return void;
-():() then calls fix_fixture:[1]
+():() then (import tline):([9])
 ():() then init_units:(0)
+():() then calls fix_fixture:[1]

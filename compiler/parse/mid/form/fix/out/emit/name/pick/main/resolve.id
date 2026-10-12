@@ -32,5 +32,6 @@ fix_pick_fixture_named() {
   fix_pick_fixture_n();
   push((import fixe_cl), 3);
 } return void;
-():() then calls fix_pick_fixture_n:[1]
+():() then (import fixe_cl):([3])
 ():() then init_units:(0)
+():() then calls fix_pick_fixture_n:[1]

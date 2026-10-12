@@ -15,6 +15,7 @@ fix_extract(int xef, int xelo) {
   }
 } return void;
 given fix_xplanned (7, 0):() then calls fix_xplan:(7, 0)
+given fix_xplanned (10, 0):() then calls fix_xattempt:(10, 0, 0)
 given fix_xplanned (10, 0):() then calls fix_xplan:[0]
 given fix_xplanned (7, 0):() then calls fix_xattempt:[1]
 

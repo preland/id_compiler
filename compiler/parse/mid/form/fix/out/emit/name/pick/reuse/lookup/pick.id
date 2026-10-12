@@ -24,8 +24,9 @@ fix_name_pick_miss_fixture() {
   push((import fixe_nt), "int");
   fix_name_pick_miss_fixture2();
 } return void;
-():() then calls fix_pick_fixture_n:[1]
+():() then (import fixe_nt):(["int"])
 ():() then init_units:(0)
+():() then calls fix_pick_fixture_n:[1]
 
 fix_name_pick_miss_fixture2() {
   push((import fixe_an), "");

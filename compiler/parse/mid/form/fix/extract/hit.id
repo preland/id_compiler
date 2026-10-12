@@ -13,6 +13,8 @@ fix_xreset() {
   export string[] fixx_rd = [];
   fix_xreset2();
 } return void;
+given fix_xfilled ():() then (import fixx_rd):([])
+given fix_xplanned ():() then (import fixx_hit):([])
 ():() then calls fix_xreset2:[1]
 given fix_fixture ():() then calls fix_xreset2:[1]
 
@@ -21,6 +23,8 @@ fix_xreset2() {
   export string[] fixx_dc = [];
   fix_xreset3();
 } return void;
+given fix_xfilled ():() then (import fixx_wr):([])
+given fix_xtwice ():() then (import fixx_wr):([])
 ():() then calls fix_xreset3:[1]
 given fix_fixture ():() then calls fix_xreset3:[1]
 
@@ -29,5 +33,7 @@ fix_xreset3() {
   export string[] fixx_ret = [];
   fix_xreset4();
 } return void;
+given fix_xfilled ():() then (import fixx_out):([])
+given fix_xreturned ():() then (import fixx_ret):([])
 ():() then calls fix_xreset4:[1]
 given fix_fixture ():() then calls fix_xreset4:[1]

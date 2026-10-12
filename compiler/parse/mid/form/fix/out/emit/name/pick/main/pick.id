@@ -32,4 +32,5 @@ fix_nameat_fixture() {
   push((import fixe_sep), 0);
 } return void;
 ():() then fixe_nm_named:(0)
+():() then (import fixe_sep):([1, 0])
 ():() then calls fix_name_pick_miss_fixture:[1]

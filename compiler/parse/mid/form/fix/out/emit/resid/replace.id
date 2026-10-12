@@ -4,6 +4,7 @@ fix_resid_at(int i, int last) {
   }
 } return void;
 given fix_decl_fixture (0, 0):() then prints:("@R||3|2|3|5|1|myname\n")
+given fix_decl_fixture (1, 1):() then prints:("@R||7|1|7|4|1|othername\n")
 given fix_decl_fixture (0, 1):() then calls fix_replace:[0]
 
 fix_replace(int e, string name) {

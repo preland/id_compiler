@@ -11,8 +11,9 @@ wsc_world() {
   push((import prog), (import wx_fnest));
   push((import prog), (import wx_fmain));
 } return void;
-():() then calls wsc_exp:[1]
+():() then (import prog)[6]:(28)
 ():() then init_units:(0)
+():() then calls wsc_exp:[1]
 
 // wsget is a `given` setup, wsadd a `then` check, wsdead only the subject of a
 // `then calls`, and wsput nothing.
@@ -37,8 +38,9 @@ wsc_marks() {
   export int wx_thenc = newnode("thencalls", 0, 0, "wsdead", "", wx_noitems, wx_noitems);
   push((import thennode), (import wx_thenc));
 } return void;
-():() then calls wsc_world:[1]
+():() then (import casegiven)[0]:("setup_a wsget")
 ():() then init_units:(0)
+():() then calls wsc_world:[1]
 
 // Two more functions at indexes 7 and 8, `wsa(int a) { int r = a + 9; } return int r;`
 // and `wsb` with 5 -- the pair E0407 reports -- and the fingerprint table over
@@ -75,5 +77,6 @@ wsc_pair() {
   init_rtc();
   uq_fill();
 } return void;
-():() then calls wsc_world:[1]
+():() then (import prog)[9]:(53)
 ():() then init_units:(0)
+():() then calls wsc_world:[1]

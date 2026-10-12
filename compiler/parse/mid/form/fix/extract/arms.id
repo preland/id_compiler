@@ -32,4 +32,4 @@ fix_xelse(int xcs, int[] xelse, int xinloop) {
   }
 } return void;
 given fix_xnodes (5, [1, 2, 3, 4], 0):() then calls fix_xrecord:([1, 2, 3, 4], 0)
-given fix_xnodes (5, [1, 2], 0):() then calls fix_xrecord:[0]
+given fix_xnodes (5, [1, 2], 0):() then calls fix_xrecord:[0] then calls fix_xblock:([1, 2], 0)

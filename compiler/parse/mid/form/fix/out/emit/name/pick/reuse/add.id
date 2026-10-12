@@ -12,6 +12,8 @@ fix_rcache_add(int i, string name) {
     push((import fixd_rn), name);
   }
 } return void;
+given fix_span_fixture (0, "x"):() then (import fixd_rk):(["|len|(|)"]) then (import fixd_rn):(["x"])
+given fix_pick_fixture_n (0, "x"):() then (import fixd_rk):([])
 given fix_pick_fixture_n (0, "x"):() then calls fix_rkey:[0]
 given fix_span_fixture (0, "x"):() then calls fix_rkey:[1]
 

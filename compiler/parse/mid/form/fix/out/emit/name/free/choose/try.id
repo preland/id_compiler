@@ -17,6 +17,8 @@ fix_taken(string fx_used) {
   fix_fixture();
   push((import fixd_used), fx_used);
 } return void;
+("bar"):() then (import fixd_used):(["bar"])
+("callee_a0"):() then (import fixd_used):(["callee_a0"])
 ("bar"):() then calls fix_fixture:[1]
 ("callee_a0"):() then init_units:(0)
 

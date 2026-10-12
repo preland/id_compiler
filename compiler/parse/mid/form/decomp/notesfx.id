@@ -9,15 +9,17 @@ notes_base() {
   init_rtc();
   ut_mark();
 } return void;
-():() then calls env_init:[1]
+():() then (import utnote):([])
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 notes_setup() {
   notes_base();
   notes_push();
 } return void;
-():() then calls notes_base:[1]
+():() then (import utnote):(["x.id:1: note: exempt"])
 ():() then init_units:(0)
+():() then calls notes_base:[1]
 
 notes_push() {
   push((import utnote), "x.id:1: note: exempt");

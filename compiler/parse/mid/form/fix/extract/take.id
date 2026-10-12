@@ -18,4 +18,5 @@ fix_xskipping() {
   lset((import fixx_skip), 0, 1);
 } return void;
 ():() then (import fixx_skip):([1])
+():() then len((import tkind)):(17)
 ():() then calls fix_xfixture:[1]

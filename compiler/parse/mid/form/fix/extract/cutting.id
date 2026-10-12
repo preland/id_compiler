@@ -5,8 +5,9 @@ fix_xcutat(int xcai) {
     fix_xcutmark(xcai);
   }
 } return void;
-given fix_xacctwo (3):() then calls fix_xcutmark:[0]
+given fix_xacctwo (3):() then (import fixx_acc):([3])
 given fix_xacctwo (2):() then calls fix_xcutmark:(2)
+given fix_xacctwo (3):() then calls fix_xcutmark:[0]
 
 fix_xcutmark(int xcmi) {
   string xcmat = fix_after(fix_xlast((import fixx_hit)[xcmi]));
