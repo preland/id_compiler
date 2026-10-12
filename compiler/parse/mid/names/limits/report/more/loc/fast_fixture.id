@@ -1,0 +1,11 @@
+// edge_fixture (back/drive/run/check/dce/emit/calls/fixture/setup.id) with the
+// one thing it leaves out: fx_target's row in the fidx hash index. The fixture
+// pushes straight onto fnames, so fast_line's index lookup would miss it; this
+// adds the row number the real fidx_add would have recorded.
+
+fast_line_fixture() {
+  edge_fixture();
+  push((import fidx)[name_bucket("fx_target")], 0);
+} return void;
+():() then len((import fnames)):(2)
+():() then len((import pline)):(2)

@@ -3190,6 +3190,9 @@ int id_count_file(char* name);
 int id_file_hit(int i, char* name);
 int id_first_of_file(int i);
 void id_report_funcs(char* name, int n);
+int id_fast_line(char* fname);
+int id_line_if_same(int ix);
+int id_line_scan(int hit, char* fname);
 int id_first_fn(char* fname);
 int id_first_fn_at(int i, char* fname, int n);
 char* id_prog_loc(int i);
@@ -28181,6 +28184,45 @@ void id_report_funcs(char* name, int n) {
     { id_str_free(funcs_msg); id_str_free(funcs_help); return; }
 }
 
+int id_fast_line(char* fname) {
+    int slot_v;
+    int ix;
+    int hit;
+    slot_v = id_name_bucket(fname);
+IdList* idsq_12;
+    ix = (idsq_12 = fnames, id_find_ix(idsq_12, (IdList*)(intptr_t)(id_list_get(fidx, slot_v)), fname));
+    hit = id_line_if_same(ix);
+    return hit;
+}
+
+int id_line_if_same(int ix) {
+    int r;
+    r = (0 - 1);
+    if (((((ix >= 0) && (ix < id_list_len(prog))) && (ix < id_list_len(pline))) && (ix < id_list_len(fnodes)))) {
+IdList* idsq_14;
+int idsq_12;
+        if ((idsq_14 = prog, idsq_12 = (int)(id_list_get(idsq_14, ix)), (idsq_12 == (int)(id_list_get(fnodes, ix))))) {
+            r = (int)(id_list_get(pline, ix));
+        }
+    }
+    return r;
+}
+
+int id_line_scan(int hit, char* fname) {
+    int n;
+    int i;
+    n = hit;
+    i = 0;
+    if ((hit < 0)) {
+        n = 1;
+        while ((i < id_list_len(prog))) {
+            n = id_func_line_at(i, fname, n);
+            i = (i + 1);
+        }
+    }
+    return n;
+}
+
 int id_first_fn(char* fname) {
     int i;
     int n;
@@ -28234,14 +28276,10 @@ IdList* idsq_19;
 }
 
 int id_func_line(char* fname) {
-    int i;
+    int hit;
     int n;
-    i = 0;
-    n = 1;
-    while ((i < id_list_len(prog))) {
-        n = id_func_line_at(i, fname, n);
-        i = (i + 1);
-    }
+    hit = id_fast_line(fname);
+    n = id_line_scan(hit, fname);
     return n;
 }
 

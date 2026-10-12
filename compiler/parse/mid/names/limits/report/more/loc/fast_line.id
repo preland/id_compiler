@@ -1,0 +1,41 @@
+// func_line without the walk over the whole program: the name goes through the
+// fidx hash index to its row in fnames, and the row is trusted only while
+// fnames/fnodes/prog/pline still line up there (prog[ix] is the node fnodes[ix]
+// names). Every other case -- a name the index does not hold, a table that was
+// filled without the index -- falls back to func_line_at's scan, so the answer
+// is the one the scan always gave.
+
+fast_line(string fname) {
+  int slot_v = name_bucket(fname);
+  int ix = find_ix((import fnames), (import fidx)[slot_v], fname);
+  int hit = line_if_same(ix);
+} return int hit;
+given fast_line_fixture ("fx_target"):(7)
+given fast_line_fixture ("nosuchfn"):(-1)
+
+line_if_same(int ix) {
+  int r = 0 - 1;
+  if(ix >= 0 && ix < len((import prog)) && ix < len((import pline)) && ix < len((import fnodes))) {
+    if((import prog)[ix] == (import fnodes)[ix]) {
+      r = (import pline)[ix];
+    }
+  }
+} return int r;
+given edge_fixture (0):(7)
+given edge_fixture (5):(-1)
+given edge_fixture (-1):(-1)
+
+line_scan(int hit, string fname) {
+  int n = hit;
+  int i = 0;
+  if(hit < 0) {
+    n = 1;
+    while(i < len((import prog))) {
+      n = func_line_at(i, fname, n);
+      i = i + 1;
+    }
+  }
+} return int n;
+given edge_fixture (7, "nosuchfn"):(7)
+given edge_fixture (-1, "fx_target"):(7)
+given edge_fixture (-1, "nosuchfn"):(1)

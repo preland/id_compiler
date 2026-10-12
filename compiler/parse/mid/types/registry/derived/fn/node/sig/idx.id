@@ -9,7 +9,7 @@ fn_idx_fixture() {
   fn_fixture();
   fnreg_index();
 } return void;
-():() then calls init_idx:[1]
+():() then calls init_idx:[2]
 ():() then init_units:(0)
 
 fnreg_index() {
@@ -26,5 +26,5 @@ fn_fixture_init_idx() {
   init_idx();
   fn_fixture();
 } return void;
-():() then calls init_idx:[1]
+():() then calls init_idx:[2]
 ():() then init_units:(0)

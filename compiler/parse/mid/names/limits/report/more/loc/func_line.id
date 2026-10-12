@@ -1,14 +1,10 @@
 // The line a function was declared on, from the parallel `pline` list.
 func_line(string fname) {
-  int i = 0;
-  int n = 1;
-  while(i < len((import prog))) {
-    n = func_line_at(i, fname, n);
-    i = i + 1;
-  }
+  int hit = fast_line(fname);
+  int n = line_scan(hit, fname);
 } return int n;
-given edge_fixture ("fx_target"):(7)
-given edge_fixture ("nosuchfn"):(1)
+given fast_line_fixture ("fx_target"):(7)
+given fast_line_fixture ("nosuchfn"):(1)
 
 func_line_at(int i, string fname, int n) {
   int r = n;
