@@ -17,7 +17,7 @@ ret_widens_fn() {
   int[] none = [];
   export int widen_f = node_func("f", "word", none, none, (import widen_e));
 } return void;
-():() then calls ret_widens_val:[1]
+given ret_widens_val ():() then calls ret_widens_val:[1] then calls node_func:("f", "word", [], [], (import widen_e))
 ():() then init_units:(0)
 
 ret_nonplain_fn() {

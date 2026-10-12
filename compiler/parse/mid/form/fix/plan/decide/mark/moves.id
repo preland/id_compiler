@@ -19,8 +19,8 @@ fix_mark_moves(int last) {
     fix_mark_cls(last, 4);
   }
 } return void;
-given fix_sep_fixture (0):() then calls fix_mark_cls:[2]
-given fix_sep_fixture (1):() then calls fix_mark_cls:[4]
+given fix_sep_fixture (0):() then calls fix_mark_cls:[2] then calls fix_mark_cls:(0, 3)
+given fix_sep_fixture (1):() then calls fix_mark_cls:[4] then calls fix_mark_cls:(1, 4)
 
 // fix_sep_at (../touch/sep.id) reads fixe_cl and writes fixe_sep, and
 // fix_touch_fixture leaves both empty, so an index into either traps. Event 1
@@ -37,7 +37,7 @@ fix_sep_fixture() {
   push((import fixe_sep), 0);
 } return void;
 ():() then fixe_sep_count:("sep 0")
-():() then calls fix_touch_fixture:[1]
+():() then calls fix_touch_fixture:[1] then (import fixe_cl)[1]:(3)
 
 // fix_touch_fixture plus a call node to the writing builtin lset, for
 // fix_call_touch's builtin case. Filed here because ../touch/ is at the
@@ -48,4 +48,4 @@ fix_wcall_fixture() {
   export int ft_wcall = node_call("lset", wnone);
 } return void;
 ():() then len((import fixe_n)):(2)
-():() then calls fix_touch_fixture:[1]
+():() then calls fix_touch_fixture:[1] then calls node_call:("lset", [])

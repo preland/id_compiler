@@ -13,8 +13,8 @@ fix_decide2(int sn, int md, int last) {
     fix_mark(sn, last);
   }
 } return void;
-given fix_mark_case_fixture (0, 1, 0):() then calls fix_refuse_md:[1]
-given fix_mark_case_fixture (0, 0, 0):() then calls fix_mark:[1]
+given fix_mark_case_fixture (0, 1, 0):() then calls fix_refuse_md:[1] then calls fix_refuse_md:(1, 0)
+given fix_mark_case_fixture (0, 0, 0):() then calls fix_mark:[1] then calls fix_mark:(0, 0)
 
 fix_mark(int sn, int last) {
   fix_mark_moves(last);

@@ -17,5 +17,5 @@ ret_narrows_fn() {
   int[] none = [];
   export int narrow_f = node_func("f", "int", none, none, (import narrow_e));
 } return void;
-():() then calls ret_narrows_val:[1]
+given ret_narrows_val ():() then calls ret_narrows_val:[1] then calls node_func:("f", "int", [], [], (import narrow_e))
 ():() then init_units:(0)

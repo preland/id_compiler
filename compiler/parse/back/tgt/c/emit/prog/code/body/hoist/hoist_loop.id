@@ -7,6 +7,7 @@ hoist_loop(int id) {
   }
 } return void;
 given tyc_fix (3):() then calls hoist_list:[1] then calls hoist_list:([])
+given stmt_fix (3):() then calls hoist_list:([])
 given tyc_fix (4):() then calls hoist_list:[0] then prints:("")
 
 // The tail of hoist_decl: the C type is derived from the declared type only

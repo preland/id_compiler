@@ -8,7 +8,7 @@ fix_wfill_fixture() {
   push((import fnames), "main");
   fix_winit();
 } return void;
-():() then calls full_env:[1]
+():() then calls full_env:[1] then (import fnames)[0]:("main")
 ():() then init_units:(0)
 
 fix_wrow() {
@@ -25,4 +25,5 @@ fix_wedges(int f, int lo) {
   }
 } return void;
 given fix_wbuild_fixture (0, 1):() then calls fix_wfunc:(0, 1)
+given fix_wbuild_fixture (0, 5):() then calls fix_wfunc:(0, 5)
 given fix_wbuild_fixture (1, 1):() then calls fix_wfunc:[0]

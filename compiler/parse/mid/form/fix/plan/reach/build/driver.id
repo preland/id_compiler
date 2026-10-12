@@ -15,6 +15,7 @@ fix_wbuild() {
   }
 } return void;
 given fix_wbuild_fixture ():() then calls fix_wprop:(0)
+given fix_wbuild_fixture ():() then (import fixd_wm)[0]:(1)
 given full_env ():() then calls fix_wprop:[0]
 
 //   fixd_wadj  for each function, the functions that call or name it
@@ -29,8 +30,8 @@ fix_winit() {
   export int[][] fixd_wadj = [];
   fix_winit2();
 } return void;
-given fix_fixture ():() then calls fix_winit2:[1]
-given fix_touch_fixture ():() then calls fix_winit2:[1]
+given fix_fixture ():() then calls fix_winit2:[1] then len((import fixd_wm)):(0) then len((import fixd_wadj)):(0)
+given fix_touch_fixture ():() then calls fix_winit2:[1] then (import fixd_wadj):([])
 
 fix_winit2() {
   export int[] fixd_wq = [];

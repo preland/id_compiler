@@ -9,6 +9,7 @@ fix_ret(int f) {
   }
 } return void;
 given fix_ret_fixture (2):() then calls fix_ret_at:(2, 0)
+given fix_ret_fixture (3):() then calls fix_ret_at:(3, 0)
 given fix_ret_fixture (4):() then calls fix_ret_at:[0]
 
 fix_ret_at(int f, int e) {
@@ -18,6 +19,7 @@ fix_ret_at(int f, int e) {
   }
 } return void;
 given fix_ret_fixture (2, 0):() then prints:("@D||10|5|1|5|int ret_i = |10|5|10|8\n@R||10|5|10|8|2|ret_i\n")
+given fix_ret_fixture (3, 0):() then calls fix_ret_emit:(3, 0, "int")
 given fix_ret_fixture (2, 5):() then calls fix_ret_emit:[0]
 
 fix_ret_ok(int e) {
