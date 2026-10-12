@@ -10,5 +10,6 @@ many_file_fixture() {
   push((import pfile), "over.id");
   push((import fseen), "over.id");
 } return void;
-():() then calls full_env:[1]
+():() then len((import pfile)):(4)
 ():() then init_units:(0)
+():() then calls full_env:[1]

@@ -17,6 +17,7 @@ tmo_fix() {
   toks_push(["kw", "int", "op", "kw", "int", "kw", "str", "kw", "int", "kw", "int", "kw", "int", "kw", "kw", "int", "kw", "int", "ident"], ["timeout", "5", "(", "timeout", "0", "timeout", "\"x\"", "timeout", "3", "timeout", "4", "timeout", "2", "stdin", "timeout", "99999999999", "timeout", "6", "y"]);
 } return void;
 ():() then init_units:(0)
+():() then len((import ttext)):(19)
 ():() then calls env_init:[1]
 
 // A casetimeout holding the one entry 7, for tmo_last to be checked against.
@@ -25,6 +26,7 @@ tmo_one_fix() {
   push((import casetimeout), 7);
 } return void;
 ():() then tmo_last:(7)
+():() then len((import casetimeout)):(1)
 ():() then calls env_init:[1]
 
 // The `timeout` entry the last case parsed pushed to casetimeout, or -1 with

@@ -10,7 +10,7 @@ parse_top(int[] pos) {
   }
 } return void;
 given decl_tokens ([0]):([37])
-given decl_tokens ([0]):() then calls parse_decl_top:[1]
+given decl_tokens ([0]):() then calls parse_decl_top:([37])
 
 // asm "triple" name(params) { "insn" ... } return TYPE name;
 parse_asm(int[] pos) {

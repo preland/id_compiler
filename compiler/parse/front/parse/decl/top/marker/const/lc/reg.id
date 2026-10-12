@@ -11,8 +11,9 @@ lc_env2() {
   init_rtc();
   init_tyc();
 } return void;
-():() then calls env_init:[1]
+():() then (import rtc)[0]:(0)
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 lc_reg_int(string name, string text, int nval) {
   int e = node_txt2("int", text, nval, 0);

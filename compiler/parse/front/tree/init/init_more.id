@@ -6,8 +6,9 @@ init_rest() {
   init_d();
   init_sym();
 } return void;
-given full_env ():() then calls init_c:[1]
+given full_env ():() then len((import nl1)):(0)
 given full_env ():() then init_units:(0)
+given full_env ():() then calls init_c:[1]
 
 init_c() {
   export string[] ns2 = [];

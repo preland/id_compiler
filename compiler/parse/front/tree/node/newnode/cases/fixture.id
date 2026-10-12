@@ -6,15 +6,17 @@ asm_reg_fix0() {
   init_asm();
   init_asm2();
 } return void;
-():() then calls env_init:[1]
+():() then len((import afret)):(0)
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 asm_reg_fix1(string arf_ty) {
   asm_reg_fix0();
   push((import afret), arf_ty);
 } return void;
-("int"):() then calls asm_reg_fix0:[1]
+("int"):() then len((import afret)):(1)
 ("word"):() then init_units:(0)
+("int"):() then calls asm_reg_fix0:[1]
 
 asm_reg_fix1b(string arf_ty, string arf_name) {
   asm_reg_fix1(arf_ty);

@@ -34,5 +34,6 @@ init_files2() {
   export int[] lnseen = [];
   init_lines2();
 } return void;
-():() then calls init_lines2:[1]
+():() then len((import tline)):(0)
 ():() then init_units:(0)
+():() then calls init_lines2:[1]

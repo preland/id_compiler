@@ -50,8 +50,9 @@ init_cases() {
   export int[] casenode = [];
   init_cases2();
 } return void;
-():() then calls init_cases2:[1]
+():() then len((import caseend)):(0)
 ():() then calls init_cases2:()
+():() then calls init_cases2:[1]
 
 // casegiven: casegiven[0] as it stands, for given_fit's cases: a check takes no
 // arguments, and what it must show is that the cut-down list was put back.

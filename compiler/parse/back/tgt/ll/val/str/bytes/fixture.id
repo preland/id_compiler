@@ -16,6 +16,7 @@ fixture1() {
   export int ir_retval = ir_insn("ret", "", ir_c, 0 - 1, "", [9], [9]);
 } return void;
 ():() then init_units:(0)
+():() then calls ir_insn:("const", "int", -1, -1, "5", [9], [9])
 ():() then calls ir_insn:[2]
 
 fixture2() {
@@ -24,6 +25,7 @@ fixture2() {
   export int ir_callee_sym = ir_insn("call", "void", 0 - 1, 0 - 1, "myfunc", ir_empty_call, ir_empty_call);
 } return void;
 ():() then init_units:(0)
+():() then calls ir_insn:("call", "void", -1, -1, "myfunc", [], [])
 ():() then calls ir_insn:[3]
 
 fixture3() {
@@ -32,4 +34,5 @@ fixture3() {
   export int ir_zext = ir_insn("zext", "int", 0 - 1, 0 - 1, "", [9], [9]);
 } return void;
 ():() then init_units:(0)
+():() then calls ir_insn:("zext", "int", -1, -1, "", [9], [9])
 ():() then calls ir_insn:[5]
