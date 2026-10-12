@@ -7,8 +7,9 @@ emit_test_body(string triple) {
   emit_test_tail();
 } chain (string triple) {
   fv_flush();
+  kept_lists_reset();
 } return void;
-given test_body_fixture ("x86_64-linux-gnu"):() then calls lset:((import harn), 0, 0) then calls emit_test_tail:[1]
+given test_body_fixture ("x86_64-linux-gnu"):() then calls lset:((import harn), 0, 0) then calls emit_test_tail:[1] then calls kept_lists_reset:[1]
 given test_body_fixture ("wasm32"):() then calls lset:((import harn), 0, 0) then calls emit_test_tail:[1]
 
 emit_test_head() {
@@ -17,8 +18,9 @@ emit_test_head() {
   emit_closure_rt("static ");
 } chain () {
   emit_test_decls();
+  kept_lists_reset();
 } return void;
-given env_init ():() then calls emit_closure_rt:("static ") then calls emit_test_decls:[1]
+given env_init ():() then calls emit_closure_rt:("static ") then calls emit_test_decls:[1] then calls kept_lists_reset:[1]
 given env_init ():() then (import chkfail)[0]:(0)
 
 emit_test_decls() {

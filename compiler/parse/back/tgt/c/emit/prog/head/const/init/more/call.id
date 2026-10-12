@@ -10,9 +10,25 @@ given nz_prog_fixture ((import nz_mainfn)):() then calls emit_init_call:[1]
 given nz_prog_fixture ((import nz_plainfn)):() then calls emit_init_call:[0]
 
 emit_init_call() {
-  if(list_consts_kept() > 0) {
+  if(list_consts_cached() > 0) {
     print("    idc_const_init();");
   }
 } return void;
 given lc_dce_setup ():() then prints:("    idc_const_init();\n")
 given lc_dce_setup2 ():() then prints:("")
+
+// list_consts_kept for emit_init_call, which asks once per test case: the
+// answer is fixed while a unit is emitted, and recomputing it was most of the
+// parser's time on the compiler's own source. kept_lists_reset (test/unit/
+// flag.id) clears it where the unit changes.
+list_consts_cached() {
+  int kept_n = (import kept_lists)[0];
+  if(kept_n < 0) {
+    kept_n = list_consts_kept();
+    lset((import kept_lists), 0, kept_n);
+  }
+} return int kept_n;
+given lc_dce_setup ():(1) then (import kept_lists)[0]:(1)
+given lc_dce_setup2 ():(0) then (import kept_lists)[0]:(0)
+given lc_dce_setup given lset((import kept_lists), 0, 4) ():(4)
+given lc_dce_setup2 given lset((import kept_lists), 0, 6) ():(6)

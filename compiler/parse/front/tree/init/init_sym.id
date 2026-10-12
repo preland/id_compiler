@@ -38,10 +38,16 @@ given full_env ():() then init_units:(0)
 // enames and eowners. add_export returns void and the table it builds is what
 // the later checks read, so only a reader of one of its columns can see the
 // push happen; dead_exp_fixture (../../reach/dead/more/add.id) adds two.
+// kept_lists: list_consts_kept's answer for the unit being emitted, -1 until
+// asked (list_consts_cached, back/tgt/c/emit/prog/head/const/init/more/call.id);
+// it lives beside the export table it is computed from, which every fixture
+// that asks already builds.
 init_sym_b() {
   export string[] etypes = [];
   export string[] eowners = [];
   export int[] fnodes = [];
+} chain () {
+  export int[] kept_lists = [0 - 1];
 } return void;
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
