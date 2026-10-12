@@ -13,8 +13,9 @@ lay_reset() {
   export string[] lay_hit_numbered = [];
   export string[] lay_hit_samefile = [];
 } return void;
-():() then prints:("")
+given lay_fixture_two_hits ():() then lay_report:(0)
 ():() then lay_report:(0)
+():() then prints:("")
 
 // A violation with the record's extra lines (docs/DIAGNOSTICS.md): the head line
 // carries the code, and the why and help follow it, indented, for tools/iddiag.

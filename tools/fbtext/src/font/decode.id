@@ -22,6 +22,7 @@ font_parts(string[] strs, string text) {
   }
 } return void;
 ([], "\nstring font_rom0 = \"ab\";"):(["ab"], "\nstring font_rom0 = \"ab\";")
+([], "\nstring font_rom0 = \"ab\";\nstring font_rom1 = \"cd\";"):(["ab", "cd"], "\nstring font_rom0 = \"ab\";\nstring font_rom1 = \"cd\";")
 ([], "\nnothing"):([], "\nnothing")
 
 // The digits of font_rom<k>, or "" when conf.id declares no such constant.

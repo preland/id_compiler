@@ -7,5 +7,6 @@ lay_fixture_two_hits() {
   push((import lay_hit_legacy), "a.id:1: error: x");
   push((import lay_hit_generic), "b.id:1: error: y");
 } return void;
-():() then prints:("")
+():() then (import lay_hit_legacy)[0]:("a.id:1: error: x") then (import lay_hit_generic)[0]:("b.id:1: error: y")
 ():() then lay_report:(2)
+():() then prints:("")

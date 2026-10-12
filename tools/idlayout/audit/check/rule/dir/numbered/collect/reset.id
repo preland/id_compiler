@@ -8,6 +8,7 @@ lay_ns_scratch_reset() {
   export string[] lay_ns_dirs = [];
   export string[] lay_ns_files = [];
 } return void export lay_ns_dirs;
-():() then prints:("")
+given lay_ns_scratch_reset given lay_ns_collect_dir([115, 114, 99], 0, 3, "build", 1) ():() then len((import lay_ns_dirs)):(0)
 given lay_ns_scratch_reset ():() then len((import lay_ns_dirs)):(0)
+():() then prints:("")
 

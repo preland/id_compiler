@@ -44,5 +44,5 @@ lay_stem_base(string stem) {
   }
 } return string base;
 ("chunk2"):("chunk")
-("chunk"):("chunk")
 ("x_2"):("x")
+("chunk"):("chunk")

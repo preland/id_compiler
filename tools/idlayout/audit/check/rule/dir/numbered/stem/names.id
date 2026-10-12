@@ -18,5 +18,6 @@ lay_ns_file_stems(string[] names) {
     i = i + 1;
   }
 } return string[] stems;
-([]):([])
+(["chunk.id", "q.id", "zz.id"]):(["chunk", "q", "zz"])
 (["a.id", "b.id"]):(["a", "b"])
+([]):([])

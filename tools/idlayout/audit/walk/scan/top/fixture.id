@@ -11,12 +11,14 @@ lay_walk_fixture_bad() {
   fs_drop_exit(lay_wfb);
   lay_reset();
 } return void;
-():() then prints:("")
+given lay_fixture_two_hits ():() then lay_report:(0)
 ():() then lay_report:(0)
+():() then prints:("")
 
 lay_walk_listed_fixture() {
   lay_walk_fixture_bad();
   export int lay_wl_size = lay_list_size((import lay_wfb));
 } return void;
-():() then prints:("")
+given lay_fixture_two_hits ():() then lay_report:(0)
 ():() then lay_report:(0)
+():() then prints:("")

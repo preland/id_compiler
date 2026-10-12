@@ -7,8 +7,9 @@ lay_poke_setup() {
   poke8(lay_pb, 122);
   poke8(lay_pb + 1, 122);
 } return void;
-():() then prints:("")
+():() then lay_poke_read:("zz")
 ():() then prints:("") then lay_poke_read:("zz")
+():() then prints:("")
 
 lay_poke_read() {
   string s = str_of_mem((import lay_pb), 2);

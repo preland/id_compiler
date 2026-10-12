@@ -17,6 +17,7 @@ mf_names(string[] strs, int n) {
   }
 } return void;
 (["q"], 1):(["q", "(import font_rom0)"], 1)
+([], 2):(["(import font_rom0)", "(import font_rom1)"], 2)
 ([], 0):([], 0)
 
 // Chunks needed for this many glyphs, the last one holding the remainder.

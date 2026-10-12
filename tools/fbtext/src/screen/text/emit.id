@@ -5,6 +5,8 @@ fb_print(string[] strs) {
   int last = fb_last(strs);
   fb_emit(strs, last);
 } return void;
+(["a", "", "b", ""]):(["a", "", "b", ""]) then prints:("a\n\nb\n")
+(["", ""]):(["", ""]) then prints:("\n")
 (["a", ""]):(["a", ""])
 ([]):([])
 
@@ -18,5 +20,7 @@ fb_emit(string[] strs, int last) {
     print("");
   }
 } return void;
+(["a", "b"], 1):(["a", "b"], 1) then prints:("a\nb\n")
+(["a", "b"], 0):(["a", "b"], 0) then prints:("a\n")
 (["a"], 0):(["a"], 0)
 ([""], -1):([""], -1)

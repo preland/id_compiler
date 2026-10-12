@@ -16,5 +16,5 @@ lay_basename(string path) {
   string name = str_sub(path, i + 1, n - i - 1);
 } return string name;
 ("a/b"):("b")
-("abc"):("abc")
 ("a/b/c"):("c")
+("abc"):("abc")
