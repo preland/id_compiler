@@ -3862,6 +3862,8 @@ unit_split() { # unit_split C_FILE DIR MASK
         st == "exp" { print extern_of($0) > h; print > (dir "/u0.c"); next }
         st == "fwd" && $0 !~ /^\/\* idc unit: / && $0 !~ /^[A-Za-z_].*\) *\{$/ { print > h; next }
         st == "fwd" { st = "defs" }
+        st == "defs" && /^static void idfr_[A-Za-z0-9_]+\(IdList\* p\) \{ id_free_walk\(p, .*\); \}$/ {
+            d = $0; sub(/^static /, "static inline ", d); print d > h; next }
         st == "defs" && indef == 0 && /^static [A-Za-z_].*\) *\{$/ {
             d = $0; sub(/^static /, "", d); proto = d; sub(/ *\{$/, ";", proto); print proto > h
             print declname(substr(proto, 1, index(proto, "(") - 1)) > (dir "/syms")
