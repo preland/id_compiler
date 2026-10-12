@@ -1,3 +1,3 @@
-// EXPECT: has the same name as a function
+// EXPECT: has the same name as a function; a call to it would be ambiguous with a struct constructor -- rename the struct or the function [E0619]
 main(int argc, string[] argv) {
 } return int 0;

@@ -1,3 +1,3 @@
-// EXPECT: declares field 'x' more than once
+// EXPECT: declares field 'x' more than once; give each field its own name [E0621]
 main(int argc, string[] argv) {
 } return int 0;

@@ -1,4 +1,4 @@
-// EXPECT: argument 'y' of 'Point' expects int, got string
+// EXPECT: argument 'y' of 'Point' expects int, got string [E0623]
 main(int argc, string[] argv) {
   Point p = Point(1, "s");
 } return int 0;

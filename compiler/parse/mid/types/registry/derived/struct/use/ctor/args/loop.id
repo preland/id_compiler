@@ -2,10 +2,10 @@
 // against its field, at the argument's own line (fit.id).
 
 ctor_arity_err(int id, string sd_nm) {
-  tc_err(id, "struct '" + sd_nm + "' takes " + sd_nfields(sd_nm) + " field(s) (" + sd_fields_text(sd_nm) + "), got " + len(((import nl1)[id])) + "; pass one value per field, in order");
+  tc_diag(id, "E0622", "struct '" + sd_nm + "' takes " + sd_nfields(sd_nm) + " field(s) (" + sd_fields_text(sd_nm) + "), got " + len(((import nl1)[id])) + "; pass one value per field, in order", sd_nm, "a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields", "pass one value per field, in the order the struct declares them");
 } return void;
-given sd_ctor_fixture ((import sd_c1), "P"):() then prints:("<stdin>:1: error: struct 'P' takes 2 field(s) (x, y), got 1; pass one value per field, in order\n")
-given sd_ctor_fixture ((import sd_c3), "Q"):() then prints:("<stdin>:1: error: struct 'Q' takes 1 field(s) (s), got 3; pass one value per field, in order\n")
+given sd_ctor_fixture ((import sd_c1), "P"):() then prints:("<stdin>:1: error: struct 'P' takes 2 field(s) (x, y), got 1; pass one value per field, in order [E0622]\n  at: P\n  why: a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields\n  help: pass one value per field, in the order the struct declares them\n")
+given sd_ctor_fixture ((import sd_c3), "Q"):() then prints:("<stdin>:1: error: struct 'Q' takes 1 field(s) (s), got 3; pass one value per field, in order [E0622]\n  at: Q\n  why: a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields\n  help: pass one value per field, in the order the struct declares them\n")
 
 ctor_args(int id, string sd_nm) {
   int sd_k = 0;

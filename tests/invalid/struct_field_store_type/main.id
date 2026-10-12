@@ -1,4 +1,4 @@
-// EXPECT: cannot store a string into field 'x' (int) of struct 'Point'
+// EXPECT: cannot store a string into field 'x' (int) of struct 'Point' [E0624]
 main(int argc, string[] argv) {
   Point p = Point(1, 2);
   p.x = "s";

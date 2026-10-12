@@ -4055,6 +4055,7 @@ void id_sd_ftypes(int sd_i);
 void id_sd_ftype_chk(int sd_i, int sd_k);
 char* id_sd_ftype_why(char* sd_t);
 char* id_sd_ftype_why2(char* sd_t);
+void id_sd_diag(int sd_i, char* sd_code, char* sd_m, char* sd_at, char* sd_why, char* sd_help);
 void id_sd_alone(int sd_i);
 void id_sd_sharef(int sd_i, int sd_j);
 void id_sd_sharest(int sd_i);
@@ -37474,11 +37475,15 @@ void id_sd_shape(int sd_i) {
     int sd_n;
     sd_n = id_list_len((IdList*)(intptr_t)(id_list_get(sdfname, sd_i)));
     if ((sd_n == 0)) {
-        id_sd_err(sd_i, id_concat_f(id_concat(ID_S("struct '"), (char*)(intptr_t)(id_list_get(sdname, sd_i))), ID_S("' has no fields; give it one to three, or use the value on its own"), 1));
+IdList* idsq_45;
+char* idsq_43;
+        (idsq_45 = sdname, idsq_43 = (char*)(intptr_t)(id_list_get(idsq_45, sd_i)), id_sd_diag(sd_i, ID_S("E0620"), id_concat_f(id_concat(ID_S("struct '"), idsq_43), ID_S("' has no fields; give it one to three, or use the value on its own"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), ID_S("a struct is a record of one to three named fields, and one with none holds nothing"), ID_S("give the struct one to three fields, or use the value on its own")));
     } else if ((sd_n > 3)) {
-IdList* idsq_20;
-char* idsq_18;
-        (idsq_20 = sdname, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_i)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_18), ID_S("' has "), 1), id_str_of_int(sd_n), 3), ID_S(" fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct "), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S(" { Part p; int a; int b; }'"), 1)));
+IdList* idsq_25;
+char* idsq_23;
+IdList* idsq_15;
+char* idsq_13;
+        (idsq_25 = sdname, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, sd_i)), idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_diag(sd_i, ID_S("E0620"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_23), ID_S("' has "), 1), id_str_of_int(sd_n), 3), ID_S(" fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct "), 1), idsq_13, 1), ID_S(" { Part p; int a; int b; }'"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), ID_S("a struct is a record of one to three named fields, the same limit of three every other part of id has"), ID_S("group related fields into a second struct and nest it")));
     }
     return;
 }
@@ -37497,9 +37502,10 @@ void id_sd_dupat(int sd_i, int sd_k) {
     IdList* sd_fs;
     sd_fs = (IdList*)(intptr_t)(id_list_get(sdfname, sd_i));
     if ((id_find_str(sd_fs, (char*)(intptr_t)(id_list_get(sd_fs, sd_k))) != sd_k)) {
-IdList* idsq_15;
-char* idsq_13;
-        (idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_13), ID_S("' declares field '"), 1), (char*)(intptr_t)(id_list_get(sd_fs, sd_k)), 1), ID_S("' more than once; give each field its own name"), 1)));
+IdList* idsq_20;
+char* idsq_18;
+char* idsq_12;
+        (idsq_20 = sdname, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_i)), idsq_12 = (char*)(intptr_t)(id_list_get(sd_fs, sd_k)), id_sd_diag(sd_i, ID_S("E0621"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_18), ID_S("' declares field '"), 1), idsq_12, 1), ID_S("' more than once; give each field its own name"), 1), (char*)(intptr_t)(id_list_get(sd_fs, sd_k)), ID_S("a field is read and written by its name, so two fields of one name could not be told apart"), ID_S("give each field its own name")));
     }
     return;
 }
@@ -37549,6 +37555,16 @@ char* id_sd_ftype_why2(char* sd_t) {
     return sd_w;
 }
 
+void id_sd_diag(int sd_i, char* sd_code, char* sd_m, char* sd_at, char* sd_why, char* sd_help) {
+    char* sd_loc = NULL;
+IdList* idsq_22;
+char* idsq_20;
+    { char* idfe_o = sd_loc; sd_loc = (idsq_22 = sdfile, idsq_20 = (char*)(intptr_t)(id_list_get(idsq_22, sd_i)), id_concat_f(id_concat(idsq_20, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, sd_i))), 3)); id_str_free(idfe_o); }
+    id_diag(sd_code, sd_loc, sd_m, sd_at, sd_why, sd_help);
+    id_note_failure();
+    { id_str_free(sd_loc); return; }
+}
+
 void id_sd_alone(int sd_i) {
     int sd_j;
     sd_j = 0;
@@ -37588,12 +37604,12 @@ void id_sd_names(int sd_i) {
     sd_nm = (char*)(intptr_t)(id_list_get(sdname, sd_i));
     sd_j = id_sd_first_of(sd_nm);
     if ((sd_j < sd_i)) {
-        id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' is already declared at "), 1), id_sd_where(sd_j), 3), ID_S("; declare each struct once, in a file of its own, and use that one"), 1));
+        id_sd_diag(sd_i, ID_S("E0618"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' is already declared at "), 1), id_sd_where(sd_j), 3), ID_S("; declare each struct once, in a file of its own, and use that one"), 1), sd_nm, ID_S("two structs of one name would give every use of the name two meanings"), ID_S("delete the second declaration and use the first, or give one of them another name"));
     }
     if ((id_find_str(fnames, sd_nm) >= 0)) {
-        id_sd_err(sd_i, id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a function; a call to it would be ambiguous with a struct constructor -- rename the struct or the function"), 1));
+        id_sd_diag(sd_i, ID_S("E0619"), id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a function; a call to it would be ambiguous with a struct constructor -- rename the struct or the function"), 1), sd_nm, ID_S("Point(1, 2) builds a struct and point(1, 2) calls a function, and the compiler tells them apart only by looking the name up, so a name in both places has two meanings"), ID_S("rename the struct or the function"));
     } else if ((id_is_builtin(sd_nm) == 1)) {
-        id_sd_err(sd_i, id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a builtin; rename the struct"), 1));
+        id_sd_diag(sd_i, ID_S("E0619"), id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' has the same name as a builtin; rename the struct"), 1), sd_nm, ID_S("Point(1, 2) builds a struct and a builtin is called the same way, and the compiler tells them apart only by looking the name up, so a name in both places has two meanings"), ID_S("rename the struct to a name no builtin has"));
     }
     return;
 }
@@ -37746,9 +37762,9 @@ void id_ctor_fit(int sd_a, char* sd_nm, int sd_k, char* sd_ft) {
     char* sd_at;
     sd_at = id_type_of(sd_a);
     if ((id_bad_store(sd_ft, sd_a) == 1)) {
-        id_tc_err(sd_a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '"), 1), sd_nm, 1), ID_S("' expects "), 1), sd_ft, 1), ID_S(", got "), 1), sd_at, 1));
+        id_tc_diag(sd_a, ID_S("E0623"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '"), 1), sd_nm, 1), ID_S("' expects "), 1), sd_ft, 1), ID_S(", got "), 1), sd_at, 1), sd_nm, ID_S("a constructor stores each argument in the field of that position, and a field holds only values of its own type"), id_concat_f(id_concat(ID_S("pass a "), sd_ft), ID_S(" for this field, or change the field's type in the struct"), 1));
     } else if ((id_ty_narrows(sd_ft, sd_at) == 1)) {
-        id_tc_err(sd_a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '"), 1), sd_nm, 1), ID_S("' narrows "), 1), sd_at, 1), ID_S(" to "), 1), sd_ft, 1), ID_S("; declare a "), 1), sd_ft, 1), ID_S(" local and pass that"), 1));
+        id_tc_diag(sd_a, ID_S("E0623"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("argument '"), id_sd_cell(sdfname, sd_nm, sd_k)), ID_S("' of '"), 1), sd_nm, 1), ID_S("' narrows "), 1), sd_at, 1), ID_S(" to "), 1), sd_ft, 1), ID_S("; declare a "), 1), sd_ft, 1), ID_S(" local and pass that"), 1), sd_nm, ID_S("a constructor stores each argument in the field of that position, and a wider value is not squeezed into a narrower field without a line that does it"), id_concat_f(id_concat(ID_S("declare a "), sd_ft), ID_S(" local with the narrowed value and pass that"), 1));
     }
     return;
 }
@@ -37779,9 +37795,9 @@ void id_fit_cbval(int i, int v, char* pt) {
 }
 
 void id_ctor_arity_err(int id, char* sd_nm) {
-int idsq_20;
-char* idsq_14;
-    (idsq_20 = id_sd_nfields(sd_nm), idsq_14 = id_sd_fields_text(sd_nm), id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' takes "), 1), id_str_of_int(idsq_20), 3), ID_S(" field(s) ("), 1), idsq_14, 3), ID_S("), got "), 1), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)))), 3), ID_S("; pass one value per field, in order"), 1)));
+int idsq_23;
+char* idsq_17;
+    (idsq_23 = id_sd_nfields(sd_nm), idsq_17 = id_sd_fields_text(sd_nm), id_tc_diag(id, ID_S("E0622"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' takes "), 1), id_str_of_int(idsq_23), 3), ID_S(" field(s) ("), 1), idsq_17, 3), ID_S("), got "), 1), id_str_of_int(id_list_len((IdList*)(intptr_t)(id_list_get(nl1, id)))), 3), ID_S("; pass one value per field, in order"), 1), sd_nm, ID_S("a constructor sets every field of the struct it builds, one value for each, so the count of values must be the count of fields"), ID_S("pass one value per field, in the order the struct declares them")));
     return;
 }
 
@@ -38072,10 +38088,10 @@ void id_chk_fvalue(int id, char* sd_bt, char* sd_f) {
     int sd_v;
     char* sd_ft;
     sd_v = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), 0));
-IdList* idsq_38;
-    sd_ft = (idsq_38 = sdftype, id_sd_cell(idsq_38, sd_bt, id_sd_fpos(sd_bt, sd_f)));
+IdList* idsq_46;
+    sd_ft = (idsq_46 = sdftype, id_sd_cell(idsq_46, sd_bt, id_sd_fpos(sd_bt, sd_f)));
     if ((id_bad_store(sd_ft, sd_v) == 1)) {
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot store a "), id_type_of(sd_v)), ID_S(" into field '"), 1), sd_f, 1), ID_S("' ("), 1), sd_ft, 1), ID_S(") of struct '"), 1), sd_bt, 1), ID_S("'"), 1));
+        id_tc_diag(id, ID_S("E0624"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot store a "), id_type_of(sd_v)), ID_S(" into field '"), 1), sd_f, 1), ID_S("' ("), 1), sd_ft, 1), ID_S(") of struct '"), 1), sd_bt, 1), ID_S("'"), 1), sd_f, ID_S("a field holds only values of the type it was declared with"), id_concat_f(id_concat(ID_S("store a "), sd_ft), ID_S(" in this field, or change the field's type in the struct"), 1));
     }
     return;
 }

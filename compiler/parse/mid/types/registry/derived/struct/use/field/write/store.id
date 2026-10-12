@@ -26,8 +26,8 @@ chk_fvalue(int id, string sd_bt, string sd_f) {
   int sd_v = (import nl1)[id][0];
   string sd_ft = sd_cell((import sdftype), sd_bt, (sd_fpos(sd_bt, sd_f)));
   if(bad_store(sd_ft, sd_v) == 1) {
-    tc_err(id, "cannot store a " + type_of(sd_v) + " into field '" + sd_f + "' (" + sd_ft + ") of struct '" + sd_bt + "'");
+    tc_diag(id, "E0624", "cannot store a " + type_of(sd_v) + " into field '" + sd_f + "' (" + sd_ft + ") of struct '" + sd_bt + "'", sd_f, "a field holds only values of the type it was declared with", "store a " + sd_ft + " in this field, or change the field's type in the struct");
   }
 } return void;
 given sd_use_fixture ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_ws), "P", "x"):() then prints:("<stdin>:1: error: cannot store a string into field 'x' (int) of struct 'P'\n")
+given sd_use_fixture ((import sd_ws), "P", "x"):() then prints:("<stdin>:1: error: cannot store a string into field 'x' (int) of struct 'P' [E0624]\n  at: x\n  why: a field holds only values of the type it was declared with\n  help: store a int in this field, or change the field's type in the struct\n")

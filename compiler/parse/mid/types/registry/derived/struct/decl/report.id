@@ -1,0 +1,11 @@
+// A struct declaration's diagnostic: its message and code at the line of the
+// declaration it is about, with the three lines every coded diagnostic carries
+// (what it is at, why the rule exists, how to fix it).
+
+sd_diag(int sd_i, string sd_code, string sd_m, string sd_at, string sd_why, string sd_help) {
+  string sd_loc = (import sdfile)[sd_i] + ":" + (import sdline)[sd_i];
+  diag(sd_code, sd_loc, sd_m, sd_at, sd_why, sd_help);
+  note_failure();
+} return void;
+given sd_pair (0, "E0099", "boom", "x", "because", "do this"):() then prints:("p.id:1: error: boom [E0099]\n  at: x\n  why: because\n  help: do this\n") then (import chkfail)[0]:(1)
+given sd_pair (1, "E0098", "bang", "", "", ""):() then prints:("q.id:5: error: bang [E0098]\n") then (import chkfail)[0]:(1)

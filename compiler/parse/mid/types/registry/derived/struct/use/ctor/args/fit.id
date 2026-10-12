@@ -5,14 +5,14 @@
 ctor_fit(int sd_a, string sd_nm, int sd_k, string sd_ft) {
   string sd_at = type_of(sd_a);
   if(bad_store(sd_ft, sd_a) == 1) {
-    tc_err(sd_a, "argument '" + sd_cell((import sdfname), sd_nm, sd_k) + "' of '" + sd_nm + "' expects " + sd_ft + ", got " + sd_at);
+    tc_diag(sd_a, "E0623", "argument '" + sd_cell((import sdfname), sd_nm, sd_k) + "' of '" + sd_nm + "' expects " + sd_ft + ", got " + sd_at, sd_nm, "a constructor stores each argument in the field of that position, and a field holds only values of its own type", "pass a " + sd_ft + " for this field, or change the field's type in the struct");
   } else if(ty_narrows(sd_ft, sd_at) == 1) {
-    tc_err(sd_a, "argument '" + sd_cell((import sdfname), sd_nm, sd_k) + "' of '" + sd_nm + "' narrows " + sd_at + " to " + sd_ft + "; declare a " + sd_ft + " local and pass that");
+    tc_diag(sd_a, "E0623", "argument '" + sd_cell((import sdfname), sd_nm, sd_k) + "' of '" + sd_nm + "' narrows " + sd_at + " to " + sd_ft + "; declare a " + sd_ft + " local and pass that", sd_nm, "a constructor stores each argument in the field of that position, and a wider value is not squeezed into a narrower field without a line that does it", "declare a " + sd_ft + " local with the narrowed value and pass that");
   }
 } return void;
 given sd_ctor_fixture ((import sd_one), "P", 0, "int"):() then (import chkfail)[0]:(0)
-given sd_ctor_fixture ((import sd_str), "P", 1, "int"):() then prints:("<stdin>:1: error: argument 'y' of 'P' expects int, got string\n")
-given sd_ctor_fixture ((import sd_big), "P", 0, "int"):() then prints:("<stdin>:1: error: argument 'x' of 'P' narrows word to int; declare a int local and pass that\n")
+given sd_ctor_fixture ((import sd_str), "P", 1, "int"):() then prints:("<stdin>:1: error: argument 'y' of 'P' expects int, got string [E0623]\n  at: P\n  why: a constructor stores each argument in the field of that position, and a field holds only values of its own type\n  help: pass a int for this field, or change the field's type in the struct\n")
+given sd_ctor_fixture ((import sd_big), "P", 0, "int"):() then prints:("<stdin>:1: error: argument 'x' of 'P' narrows word to int; declare a int local and pass that [E0623]\n  at: P\n  why: a constructor stores each argument in the field of that position, and a wider value is not squeezed into a narrower field without a line that does it\n  help: declare a int local with the narrowed value and pass that\n")
 
 // The values of a bind in a test case (../call/bind.id), each against the
 // parameter it fixes: it must be something a closure can capture, and then it

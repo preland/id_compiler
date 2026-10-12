@@ -1,3 +1,3 @@
-// EXPECT: struct 'Wide' has 4 fields; the limit is 3
+// EXPECT: has 4 fields; the limit is 3 -- group related fields into a second struct and nest it, as in 'struct Wide { Part p; int a; int b; }' [E0620]
 main(int argc, string[] argv) {
 } return int 0;
