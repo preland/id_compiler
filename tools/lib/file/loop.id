@@ -9,6 +9,8 @@ file_loop(int h, int[] buf, int[] out) {
     got = fs_read(h, buf, n);
   }
 } return void;
+given file_t_open("/proc/sys/kernel/ostype") ((import file_t_h), [0, 0, 0, 0], []):((import file_t_h), [120, 10, 110, 117], [76, 105, 110, 117, 120, 10])
+given file_t_open("/proc/sys/kernel/ostype") ((import file_t_h), [0, 0], [9]):((import file_t_h), [120, 10], [9, 76, 105, 110, 117, 120, 10])
 (-1, [0], []):(-1, [0], [])
 (-3, [0, 0], [9]):(-3, [0, 0], [9])
 

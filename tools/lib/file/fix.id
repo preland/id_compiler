@@ -1,0 +1,18 @@
+// An open read handle for the cases of file_loop and file_pump, which take a handle and so cannot be given one as a literal.
+
+// Opens path for reading and names the handle in (import file_t_h). The handle goes when the case's process exits.
+file_t_open(string path) {
+  export int file_t_h = fs_open(path, "r");
+} return void;
+("/proc/sys/kernel/ostype"):() then file_t_ok:(1)
+("/nonexistent/file_t_open"):() then file_t_ok:(0)
+
+// 1 when file_t_open left a handle that opened, 0 when it left -1.
+file_t_ok() {
+  int file_t_g = 0;
+  if ((import file_t_h) >= 0) {
+    file_t_g = 1;
+  }
+} return int file_t_g;
+given file_t_open("/proc/sys/kernel/ostype") ():(1)
+given file_t_open("/nonexistent/file_t_open") ():(0)

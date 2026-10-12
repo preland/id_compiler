@@ -14,8 +14,9 @@ dg_mark(string[] dg_mk_b) {
     dg_mk_i = dg_mk_i + 1;
   }
 } return string[] dg_mk_o;
-(["a.id:1: error: x [E0101]", "plain"]):(["a.id:1: error: x [E0101]", "plain"])
+(["parse/head/where.id:4: error: x", "plain"]):(["parse/head/where.id:4: error: x\n  in: dg_prefix", "plain"])
 (["/nonexistent/a.id:1: error: x [E0101]", "/nonexistent/a.id:1: error: y [E0301]"]):(["/nonexistent/a.id:1: error: x [E0101]", "/nonexistent/a.id:1: error: y [E0301]\n  follows: /nonexistent/a.id:1: error: x [E0101]"])
+(["a.id:1: error: x [E0101]", "plain"]):(["a.id:1: error: x [E0101]", "plain"])
 
 dg_mark_one(string dg_mo_b, string[] dg_mo_roots) {
   string dg_mo_h = dg_head(dg_mo_b);

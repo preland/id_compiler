@@ -23,6 +23,7 @@ rp_line(string[] rp_rows, int rp_i, string[] rp_ls) {
   }
 } return void;
 (["U a struct parameter s"], 2, []):(["U a struct parameter s"], 2, ["  struct by value: 1\n"])
+(["U a callback parameter x", "U b callback parameter y"], 1, []):(["U a callback parameter x", "U b callback parameter y"], 1, ["  callback: 2\n"])
 (["U a struct parameter s"], 0, []):(["U a struct parameter s"], 0, [])
 
 // The summary of a report whose rows are rp_rows: how many functions there were and how many of them were mapped exactly (H), mapped on an inferred length or a one-scalar out-parameter (HH), and left out (U) with the reasons.

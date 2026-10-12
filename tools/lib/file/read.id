@@ -25,8 +25,9 @@ file_into(string path, int[] out) {
     fs_close(h);
   }
 } return void;
-("/nonexistent/file_into", []):("/nonexistent/file_into", [])
 ("/proc/sys/kernel/ostype", []):("/proc/sys/kernel/ostype", [76, 105, 110, 117, 120, 10])
+("/proc/sys/kernel/ostype", [1]):("/proc/sys/kernel/ostype", [1, 76, 105, 110, 117, 120, 10])
+("/nonexistent/file_into", []):("/nonexistent/file_into", [])
 
 // One buffer for the whole read, so a read costs one chunk of cells however
 // many times fs_read is called.
@@ -35,5 +36,7 @@ file_pump(int h, int[] out) {
   list_fill(buf, (import file_chunk), 0);
   file_loop(h, buf, out);
 } return void;
+given file_t_open("/proc/sys/kernel/ostype") ((import file_t_h), []):((import file_t_h), [76, 105, 110, 117, 120, 10])
+given file_t_open("/proc/sys/kernel/ostype") ((import file_t_h), [7]):((import file_t_h), [7, 76, 105, 110, 117, 120, 10])
 (-1, []):(-1, [])
 (-2, [7]):(-2, [7])

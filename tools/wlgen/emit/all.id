@@ -28,4 +28,5 @@ wg_enums() {
   }
 } return void;
 given wg_t_load ():() then prints:("int idstd_wl_n_b_e_x = 0x1;\n")
+given wg_init given wg_iface("a", "1") given wg_enum("e") given wg_entry("x", "1") given wg_entry("y", "0x10") ():() then prints:("int idstd_wl_n_a_e_x = 1;\nint idstd_wl_n_a_e_y = 0x10;\n")
 given wg_init ():() then prints:("")

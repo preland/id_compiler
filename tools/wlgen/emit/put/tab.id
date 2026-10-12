@@ -22,4 +22,5 @@ wg_quote(string[] vz_xs) {
   }
 } return string[] vz_out;
 (["a", "b"]):(["\"a\"", "\"b\""])
+(["a\"b"]):(["\"a\\\"b\""])
 ([]):([])

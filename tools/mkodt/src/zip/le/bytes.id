@@ -10,6 +10,7 @@ zw_str(int[] out, string s) {
   }
 } return void;
 ([], "ab"):([97, 98], "ab")
+([5], "A"):([5, 65], "A")
 ([1], ""):([1], "")
 
 // The end record's last two fields: where the central directory starts, and

@@ -33,6 +33,7 @@ sg_idx(string[] sgi_rows) {
   }
 } return string[] sgi_e;
 (["#x", "case\ta.id\tf\t1\tc", "case\ta.id\tg\t2\tc", "silent\tb.id\tf\t1\tc", "summary\t3\t2\t0\t0\t0"]):(["a.id\t1", "b.id\t3"])
+(["case\ta.id\tf\t1\tc", "case\tb.id\tf\t1\tc", "case\ta.id\tg\t2\tc"]):(["a.id\t0", "b.id\t1", "a.id\t2"])
 ([]):([])
 
 // The row number in an entry of sg_idx.

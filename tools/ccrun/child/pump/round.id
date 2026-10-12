@@ -33,5 +33,6 @@ maybe_pump_in(int timeout_ms) {
     pump_in(timeout_ms);
   }
 } return void;
-given ccrun_fx_run_capped_true (5):(5)
 given ccrun_fx_setup_input_main (200):(200) then (import cr_pending_n)[0]:(2902)
+given ccrun_fx_setup_input_main (150):(150) then (import cr_pending_n)[0]:(2902)
+given ccrun_fx_run_capped_true (5):(5)

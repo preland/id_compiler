@@ -8,6 +8,7 @@ kb_line_words(string line, string[] found) {
   }
 } return void;
 ("a + b_2", []):("a + b_2", ["a", "b_2"])
+("x", []):("x", ["x"])
 ("  ", []):("  ", [])
 
 // kb_line_words, except that a line whose first non-blank characters are // says
@@ -18,6 +19,7 @@ kb_text_line(string line, string[] found) {
   }
 } return void;
 ("x = y", []):("x = y", ["x", "y"])
+("  x = y", []):("  x = y", ["x", "y"])
 ("  // x = y", []):("  // x = y", [])
 
 // The identifiers of every line of text that is not a comment, in order.

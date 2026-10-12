@@ -12,4 +12,5 @@ fh_sig(string fh_hl) {
   }
 } return string fh_r;
 ("add(int a, int b) {"):("add(int a, int b)")
+("  add(int a)  {  "):("add(int a)")
 ("add(int a)"):("add(int a)")

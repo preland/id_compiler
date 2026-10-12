@@ -19,7 +19,8 @@ hd_go(string hd_pre, string hd_hdr, string hd_lib, string hd_out, string hd_text
 main(int argc, string[] argv) {
   int hd_status = 2;
   if (argc == 5) {
-    hd_status = hd_go(argv[1], argv[2], argv[3], argv[4], read_all()) * 0;
+    hd_go(argv[1], argv[2], argv[3], argv[4], read_all());
+    hd_status = 0;
   } else {
     eprint("usage: hdr2id PREFIX HEADER LIB OUTDIR < preprocessed.i   (OUTDIR - for the report alone)");
   }

@@ -8,6 +8,7 @@ lg_line(string lg_s) {
   }
 } return string lg_ln;
 ("*out = r;"):("    *out = r;\n")
+("}"):("    }\n")
 (""):("")
 
 // What a function of the program does when the host calls the wrapper: the id

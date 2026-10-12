@@ -15,10 +15,10 @@ sg_stem(string sgs_n) {
   }
 } return string sgs_r;
 ("tmpguard_12"):("tmpguard")
-("core_rest"):("core_rest")
 ("diagnostics_docs_2"):("diagnostics_docs")
 ("_3"):("_3")
 ("lib2"):("lib2")
+("core_rest"):("core_rest")
 
 // Counts sgad_stem into sgad_out, a list of `STEM TAB COUNT`: one more for the last
 // entry when it is the same stem, a new entry otherwise.

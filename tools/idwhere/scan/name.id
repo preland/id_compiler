@@ -8,8 +8,9 @@ iw_name_of(string iw_oarg) {
     iw_oname = str_sub(iw_oarg, iw_oat + 2, len(iw_oarg) - iw_oat - 2);
   }
 } return string iw_oname;
-("f"):("f")
 ("dir/a.id::f"):("f")
+("b.id::name"):("name")
+("f"):("f")
 
 iw_file_of(string iw_farg) {
   int iw_fat = str_find(iw_farg, "::");

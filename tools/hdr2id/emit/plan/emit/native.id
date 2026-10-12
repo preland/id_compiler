@@ -7,9 +7,9 @@ pl_pname(string pl_nm) {
     pl_r = pl_nm + "_";
   }
 } return string pl_r;
-("len"):("len")
 ("string"):("string_")
 ("func"):("func_")
+("len"):("len")
 
 // The parameters of the signature pl_s as a native declares them: id type then name, separated by commas.
 pl_params(string[] pl_s) {

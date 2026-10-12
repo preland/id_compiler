@@ -25,6 +25,7 @@ dg_codes(string[] dg_cd_b) {
   }
 } return string[] dg_cd_o;
 (["a.id:1: error: x [E0002]", "b.id:2: error: y [E0001]", "c.id:3: error: z [E0002]", "d.id:4: error: no code"]):(["E0002", "E0001"])
+(["a.id:1: error: x [E0003]", "b.id:2: error: y [E0003]", "c.id:3: error: z [E0004]"]):(["E0003", "E0004"])
 ([]):([])
 
 dg_code_add(string[] dg_ca_o, string dg_ca_h) {

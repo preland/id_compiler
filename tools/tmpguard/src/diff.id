@@ -44,5 +44,5 @@ tg_extend(string[] tg_fresh, string[] tg_priv) {
   }
 } return void;
 (["x"], ["a", "b/"]):(["x", "TMPDIR/a", "TMPDIR/b/"], ["a", "b/"])
-([], []):([], [])
 (["x"], ["", "a"]):(["x", "TMPDIR/a"], ["", "a"])
+([], []):([], [])

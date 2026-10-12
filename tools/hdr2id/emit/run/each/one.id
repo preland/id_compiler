@@ -24,6 +24,7 @@ hd_emit(string hd_pre, string[] hd_sigs, string[][] hd_o) {
   }
 } return void;
 ("zh", ["f|i4|int\ni4|a|int"], [[], [], [], [], []]):("zh", ["f|i4|int\ni4|a|int"], [["native zh_f(int a) return int;"], ["f"], ["int id_zh_f(int p1) {\n    int a1 = (int)p1;\n    if (!f) return -1;\n    int r = f(a1);\n    return (int)r;\n}\n"], ["H f"], []])
+("zh", ["f|i4|int\nF|cb|cb", "g|i4|int\nF|cb|cb"], [[], [], [], [], []]):("zh", ["f|i4|int\nF|cb|cb", "g|i4|int\nF|cb|cb"], [[], [], [], ["U f callback parameter 'cb': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim", "U g callback parameter 'cb': a native can take a func value only when its parameters are scalars, and C callbacks that take pointers or user data need a trampoline shim"], []])
 ("zh", [], [[], [], [], [], []]):("zh", [], [[], [], [], [], []])
 
 // A list of hd_n new empty string lists, which is how a run starts its results: lists to fill, and no way to write them as one literal that says what they hold.

@@ -16,6 +16,7 @@ dg_head(string dg_hb) {
   string dg_hr = dg_hl[0];
 } return string dg_hr;
 ("a.id:1: error: x\n  why: y"):("a.id:1: error: x")
+("one\ntwo\nthree"):("one")
 ("plain"):("plain")
 
 // The first value for a key, or "" when the block has none.

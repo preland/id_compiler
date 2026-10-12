@@ -36,5 +36,6 @@ dg_note_root(string[] dg_nr_roots, string dg_nr_h, string dg_nr_f) {
   }
 } return void;
 ([], "a.id:1: error: x [E0101]", ""):(["a.id:1: error: x [E0101]"], "a.id:1: error: x [E0101]", "")
+(["r"], "a.id:1: error: x [E0101]", ""):(["r", "a.id:1: error: x [E0101]"], "a.id:1: error: x [E0101]", "")
 ([], "a.id:1: error: x [E0102]", "a.id:1: error: y [E0101]"):([], "a.id:1: error: x [E0102]", "a.id:1: error: y [E0101]")
 ([], "a.id:1: error: x [E0301]", ""):([], "a.id:1: error: x [E0301]", "")

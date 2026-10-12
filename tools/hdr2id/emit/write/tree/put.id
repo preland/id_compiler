@@ -19,6 +19,7 @@ wr_leaves(string[] wr_names) {
   }
 } return string[] wr_lf;
 (["a", "b", "c", "d"]):(["a", "d"])
+(["a", "b", "c", "d", "e", "f", "g"]):(["a", "d", "g"])
 (["a"]):(["a"])
 ([]):([])
 

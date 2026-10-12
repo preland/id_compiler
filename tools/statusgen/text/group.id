@@ -28,4 +28,5 @@ sg_sections(string sgc_listing) {
   string sgc_r = str_join(sgc_t, ", ");
 } return string sgc_r;
 ("0  a\n1  b_0\n2  b_1\n3  b_2\n"):("`a`, `b` (3 parts)")
+("0  a\n1  b\n"):("`a`, `b`")
 (""):("")

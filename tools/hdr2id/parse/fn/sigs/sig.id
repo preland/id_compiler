@@ -19,6 +19,7 @@ fn_sigtail(string[] fn_t, int fn_p, string[] fn_tn, string[] fn_tc, string[] fn_
   }
 } return void;
 (["int", "g", "(", "int", "a", ",", "...", ")", ";"], 2, [], [], []):(["int", "g", "(", "int", "a", ",", "...", ")", ";"], 2, [], [], ["i4|a|int", "...|a1|..."])
+(["int", "g", "(", "int", "a", ")", ";"], 2, [], [], []):(["int", "g", "(", "int", "a", ")", ";"], 2, [], [], ["i4|a|int"])
 (["int", "g", "(", "void", ")", ";"], 2, [], [], []):(["int", "g", "(", "void", ")", ";"], 2, [], [], [])
 
 // The signature of the statement fn_st, its tokens joined by single spaces, read against the type table: a list whose first element is name|return class|return type and whose others are the parameters' cls|name|type records; an empty list when fn_st does not declare a function.

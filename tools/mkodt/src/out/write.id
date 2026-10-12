@@ -26,5 +26,7 @@ mo_say(int rc, string path, int[] out) {
     print("mkodt: cannot write " + path);
   }
 } return void;
+(0, "z.odt", [1, 2]):(0, "z.odt", [1, 2]) then prints:("wrote z.odt (2 bytes)\n")
+(2, "w.odt", []):(2, "w.odt", []) then prints:("mkodt: cannot write w.odt\n")
 (0, "x.odt", [1]):(0, "x.odt", [1])
 (1, "y.odt", []):(1, "y.odt", [])

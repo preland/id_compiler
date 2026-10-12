@@ -25,6 +25,7 @@ ty_unbody(string[] ty_t) {
   }
 } return string[] ty_o;
 (["typedef", "struct", "a", "{", "int", "x", ";", "}", "n", ";"]):(["typedef", "struct", "a", "{", "n", ";"])
+(["struct", "{", "struct", "{", "int", "}", ";", "}", "n"]):(["struct", "{", "n"])
 (["int", "x", ";"]):(["int", "x", ";"])
 
 // The tag of the first struct or union in ty_t: the word after it, or "" when it has no tag (a brace follows) or there is none.

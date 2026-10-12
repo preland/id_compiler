@@ -35,8 +35,8 @@ hx_line(string lx_line, string[] lx_toks) {
   }
 } return void;
 ("int  *p;", []):("int  *p;", ["int", "*", "p", ";"])
-("  ", ["a"]):("  ", ["a"])
 ("f(\"a b\")", []):("f(\"a b\")", ["f", "(", "\"a b\"", ")"])
+("  ", ["a"]):("  ", ["a"])
 
 // Tokenizes the whole preprocessed text lx_text into lx_toks, with an @in or @out token wherever the file the lines come from changes, @in being the header that ends with lx_suffix.
 hx_all(string lx_text, string lx_suffix, string[] lx_toks) {
@@ -48,4 +48,5 @@ hx_all(string lx_text, string lx_suffix, string[] lx_toks) {
   }
 } return void;
 ("# 1 \"a/h.h\"\nint x;\n# 2 \"b.h\"\nint y;\n", "h.h", []):("# 1 \"a/h.h\"\nint x;\n# 2 \"b.h\"\nint y;\n", "h.h", ["@in", "int", "x", ";", "@out", "int", "y", ";"])
+("# 1 \"h.h\"\nint x;\nint y;\n", "h.h", []):("# 1 \"h.h\"\nint x;\nint y;\n", "h.h", ["@in", "int", "x", ";", "int", "y", ";"])
 ("", "h.h", []):("", "h.h", [])
