@@ -8,6 +8,8 @@ print_fixture() {
   fn_fixture();
   print_fixture_items();
 } return void;
+():() then calls node_txt2:("int", "2", 2, 0)
+given case_fixture ():() then len((import thennode)):(1)
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 

@@ -18,6 +18,7 @@ given_fit(int i, int si, int sfn, int[] items) {
   sset((import casegiven), i, giv_all);
 } return void;
 given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then (import chkfail)[0]:(0) then (import casegiven)[0]:("fx_set1 fx_set1 ")
+given cfn_fixture ((import fixture_ci), 0, (import fixture_fn), [(import cfn_e)]):() then prints:("fixture.id:4: error: a setup's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass [E0516]\n  why: a setup runs before the case, with values only; a function can be passed as an argument of the function under test, not of a 'given'\n  help: write a literal, or (import NAME) for an exported variable, in place of fx_target\n")
 given gsetup_fixture (0, 1, (import fixture_set1), [(import fixture_zero)]):() then calls given_arg:[1]
 
 given_prefix(int i, int si) {
@@ -42,5 +43,7 @@ fit_case_import(int i, int e, string want) {
   chk_own_import(i, e);
   fit_import(i, e, want);
 } return void;
+given impcase_empty ((import fixture_ci), (import fixture_zero), "int"):() then prints:("fixture.id:4: error: (import 0) needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it\n")
+given impcase_given ((import fixture_ci), (import fixture_zero), "int"):() then prints:("fixture.id:4: error: (import 0): '0' is not an exported variable\n")
 given then_imp_fixture ("int", 0, 0) given sset((import eowners), 0, "fx_target") ((import fixture_ci), (import then_imp_cix), "int"):() then calls chk_own_import:[1]
 given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_cix), "int"):() then calls fit_import:[1]

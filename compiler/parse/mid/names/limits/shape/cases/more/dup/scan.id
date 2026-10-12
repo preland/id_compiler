@@ -22,6 +22,8 @@ check_dup_cases() {
     i = i + 1;
   }
 } return void;
+given dupeq_fixture ():() then calls dup_scan:(1)
+given dupeq_fixture ():() then calls dup_scan:(0)
 given dupeq_fixture ():() then calls dup_scan:[2]
 given case_fixture ():() then calls dup_scan:[0]
 
@@ -34,6 +36,8 @@ dup_scan(int i) {
     j = j + 1;
   }
 } return void;
+given dupeq_fixture (1):() then calls dup_hit:(1, 0)
+given dupeq_fixture (1):() then (import chkfail)[0]:(0)
 given dupeq_fixture (0):() then calls dup_hit:[0]
 given dupeq_fixture (1):() then calls dup_hit:[1]
 

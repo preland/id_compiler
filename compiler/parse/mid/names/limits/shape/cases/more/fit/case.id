@@ -75,5 +75,7 @@ impcase_empty() {
 } chain () {
   push((import eowners), "own");
 } return void;
+given case_fixture ():() then (import eowners)[0]:("own")
+given case_fixture ():() then (import etypes)[0]:("int")
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)

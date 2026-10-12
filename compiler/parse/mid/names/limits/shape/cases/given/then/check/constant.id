@@ -37,5 +37,7 @@ arg_conf_fixture() {
   push((import enames), "x");
   export int fixture_conf_arg = newleaf("cimport", 0, 0, "x", "");
 } return void;
+():() then calls newleaf:("cimport", 0, 0, "x", "")
+given impcase_empty ():() then (import enames)[0]:("x")
 ():() then calls impcase_empty:[1]
 ():() then init_units:(0)

@@ -69,4 +69,5 @@ fit_then_traps(int chk_node) {
   }
 } return void;
 given traps_node_fixture ((import fixture_traps_node)):() then prints:("fixture.id:4: error: a 'traps' check names exactly one message, not 2\n")
+given traps_node_fixture ((import fixture_traps_one)):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
 given traps_node_fixture ((import fixture_traps_one)):() then calls fit_value:[1]

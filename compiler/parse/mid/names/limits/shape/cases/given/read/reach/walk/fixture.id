@@ -6,8 +6,9 @@ rc_t_ready() {
   dg_t_parsed();
   rc_ready();
 } return void;
-():() then calls dg_t_parsed:[1]
+given dg_t_parsed ():() then (import rcon)[0]:(1)
 ():() then len((import dg_comp)):(3)
+():() then calls dg_t_parsed:[1]
 rc_t_one() {
   rc_t_ready();
   int rcfirst = rc_of("fb");

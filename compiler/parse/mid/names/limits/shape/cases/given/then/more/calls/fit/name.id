@@ -19,6 +19,8 @@ calls_items_fixture() {
   fn_fixture();
   calls_items_build();
 } return void;
+():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_param:("param", "int", "x")
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 

@@ -17,8 +17,8 @@ then_args_fit(int ci, int chk_node, int cfn) {
 } chain (int ci, int chk_node, int cfn) {
   then_value_fit(ci, chk_node, cfn);
 } return void;
-given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then calls then_value_fit:[1]
-given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn)):() then calls then_arg:[1]
+given chk_fixture ((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn)):() then calls then_value_fit:((import fixture_ci), (import fixture_chk_node), (import fixture_chk_fn))
+given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn)):() then calls then_arg:((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0)
 given then_arg_fixture ((import fixture_ci), (import fixture_then_arg), (import fixture_fn)):() then calls then_value_fit:[1]
 
 then_arg(int ci, int cfn, int[] targs, int j) {

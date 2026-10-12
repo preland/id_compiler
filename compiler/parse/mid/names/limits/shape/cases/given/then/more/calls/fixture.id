@@ -8,6 +8,8 @@ calls_node_fixture() {
   calls_items_fixture();
   calls_node_build();
 } return void;
+given case_fixture ():() then calls newnode:("thencalls", (import fixture_ci), 0, "nope", "", [], [])
+given case_fixture ():() then len((import thennode)):(1)
 ():() then calls calls_items_fixture:[1]
 ():() then init_units:(0)
 

@@ -48,5 +48,7 @@ chk_fixture() {
 } chain () {
   export int[] fixture_chk_zero = [(import fixture_zero)];
 } return void;
+given case_fixture ():() then (import fnames)[1]:("chk")
+given case_fixture ():() then len((import thennode)):(1)
 ():() then calls fixture_one_fx:[1]
 ():() then init_units:(0)

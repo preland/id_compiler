@@ -46,4 +46,4 @@ then_imp_field(int ci, int chk_node, string want) {
   }
 } return void;
 given then_imp_fixture ("int", 0, 0) given sset((import ns2), (import then_imp_node), ".z") ((import fixture_ci), (import then_imp_node), "int"):() then prints:("fixture.id:4: error: (import gx).z: (import gx) is a int, not a struct, so it has no fields; drop '.z', or name an export that is a struct\n")
-given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_node), "int"):() then calls then_imp_value:[1]
+given then_imp_fixture ("int", 0, 0) ((import fixture_ci), (import then_imp_node), "int"):() then calls then_imp_value:((import fixture_ci), (import then_imp_node), "int")

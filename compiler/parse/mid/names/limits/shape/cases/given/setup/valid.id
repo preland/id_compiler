@@ -16,8 +16,9 @@ fit_given(int i) {
     si = si + 1;
   }
 } return void;
-given impcase_empty (0):() then calls given_fn:[0]
+given gsetup_fixture (0):() then prints:("fixture.id:4: error: 'given' names 'fx_set1', which takes 1 parameter(s), but this 'given' passes 0; a setup is called with one literal per parameter, as in 'given fx_set1(1, 2)', and with none as 'given fx_set1' [E0515]\n  why: the harness calls the setup with the literals written after its name, so their number must equal the setup's parameters\n  help: write one literal per parameter: fx_set1(int x)\n")
 given impcase_given (0):() then calls given_fn:(0, 0, "fx_setup")
+given impcase_empty (0):() then calls given_fn:[0]
 
 given_fn(int i, int si, string setup_nm) {
   int sfn = func_node(setup_nm);
@@ -59,5 +60,7 @@ gsetup_fixture() {
   int ga_n = newnode("gargs", 0, 0, "", "", gl, gl);
   push((import casegargs), ga_n);
 } return void;
+given case_fixture ():() then (import casegiven)[0]:("fx_set1 fx_set1 ")
+():() then calls newnode:("gsetup", 0, 0, "fx_set1", "", [], [])
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)

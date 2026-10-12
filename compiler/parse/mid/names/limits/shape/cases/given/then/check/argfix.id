@@ -10,5 +10,7 @@ then_arg_fixture() {
   int[] vals = [(import fixture_zero)];
   export int fixture_then_arg = newnode("then", (import fixture_ci), 0, "fx_target", "", vals, vals);
 } return void;
+given case_fixture ():() then calls newnode:("then", (import fixture_ci), 0, "fx_target", "", [], [])
+given fn_fixture ():() then calls newnode:("then", (import fixture_ci), 0, "fx_target", "", [(import fixture_zero)], [(import fixture_zero)])
 ():() then calls then_node_fixture:[1]
 ():() then init_units:(0)

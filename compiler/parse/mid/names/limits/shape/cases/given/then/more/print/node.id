@@ -10,6 +10,8 @@ then_node_fixture() {
   then_node_build();
   then_node_bad();
 } return void;
+given case_fixture ():() then calls newnode:("then", (import fixture_ci), 0, "fx_target", "", [], [])
+given case_fixture ():() then calls newnode:("then", (import fixture_ci), 0, "nope", "", [], [])
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 

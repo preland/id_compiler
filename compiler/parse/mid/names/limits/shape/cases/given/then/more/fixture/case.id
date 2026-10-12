@@ -13,6 +13,8 @@ case_fixture() {
   case_fixture_init();
   case_fixture_line();
 } return void;
+():() then calls newleaf:("case", 0, 0, "fixture.id", "")
+given case_fixture_init ():() then len((import casenode)):(1)
 ():() then calls env_init:[1]
 ():() then init_units:(0)
 

@@ -5,5 +5,6 @@ index_arg_fixture() {
   export int fixture_ix_lit = newleaf("cimport", (import fixture_zero) + 1, 0, "x", "");
   export int fixture_ix_imp = newleaf("cimport", (import fixture_conf_arg) + 1, 0, "x", "");
 } return void;
-():() then calls arg_conf_fixture:[1]
+():() then calls newleaf:("cimport", 3, 0, "x", "")
 ():() then len((import nkind)):(7)
+():() then calls arg_conf_fixture:[1]

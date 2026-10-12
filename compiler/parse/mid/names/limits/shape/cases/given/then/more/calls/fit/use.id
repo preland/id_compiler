@@ -84,5 +84,7 @@ imp_use_fixture() {
   int[] imp_use_dargs = [(import imp_use_deep)];
   export int imp_use_dcall = node_call("lset", imp_use_dargs);
 } return void;
+():() then calls node_txt:("import", "gx")
+():() then calls node_param:("param", "int", "x")
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)

@@ -13,7 +13,7 @@ fit_void(int i, int fn, int[] expd) {
   }
 } return void;
 given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: this case expects 2 argument(s) after the call, but 'fx_target' takes 1 [E0504]\n  why: the expected tuple of a case lists the parameters' values after the call, left to right; it may stop early, but it cannot name more of them than the function has\n  help: list at most the parameters of fx_target(int x) in the expected tuple, or none at all\n")
-given print_fixture (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:[1]
+given print_fixture (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:(0, (import fixture_fn), (import fixture_print_none))
 
 fit_ret(int i, int fn, int[] expd) {
   imp_side(1);
@@ -26,6 +26,7 @@ fit_ret(int i, int fn, int[] expd) {
   }
 } return void;
 given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then prints:("fixture.id:4: error: 'fx_target' returns int, so its case expects exactly one value, not 2 [E0505]\n  why: a function that returns a value is checked against that one value, so the expected tuple holds exactly one\n  help: write the expected tuple as (VALUE), one int literal\n")
+given calls_node_fixture given lset((import fixture_calls_one), 0, (import fixture_fn)) (0, (import fixture_fn), (import fixture_calls_one)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
 given calls_node_fixture (0, (import fixture_fn), (import fixture_calls_one)):() then calls fit_value:[1]
 
 // wrap_fixture's own case (../../../../back/.../capture/pre/fixture.id)
@@ -41,5 +42,7 @@ traps_case_fixture() {
 } chain () {
   push((import thennode), (import fixture_traps_case_node));
 } return void;
+given case_fixture ():() then len((import thennode)):(1)
+given case_fixture ():() then len((import casefn)):(1)
 ():() then calls wrap_fixture:[1]
 ():() then init_units:(0)
