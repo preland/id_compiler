@@ -7,11 +7,11 @@
 sd_cycle(int sd_i) {
   string sd_nm = (import sdname)[sd_i];
   if(sd_contains(sd_nm, sd_nm, len((import sdname))) > 0) {
-    sd_err(sd_i, "struct '" + sd_nm + "' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('" + sd_nm + "[] items')");
+    sd_diag(sd_i, "E0627", "struct '" + sd_nm + "' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('" + sd_nm + "[] items')", sd_nm, "the value would have to exist before it could be made, and a list can be empty where a struct field cannot", "hold a list of it instead ('" + sd_nm + "[] items')");
   }
 } return void;
 given sd_reg (0):() then (import chkfail)[0]:(0)
-given sd_reg given sd_note("N", ["next"], ["N"], "n.id", 6) (2):() then prints:("n.id:6: error: struct 'N' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('N[] items')\n")
+given sd_reg given sd_note("N", ["next"], ["N"], "n.id", 6) (2):() then prints:("n.id:6: error: struct 'N' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('N[] items') [E0627]\n  at: N\n  why: the value would have to exist before it could be made, and a list can be empty where a struct field cannot\n  help: hold a list of it instead ('N[] items')\n")
 
 // How many fields of a struct hold `sd_t`, directly or through the structs in
 // them, looking `sd_d` levels deep (as many as there are structs, so every

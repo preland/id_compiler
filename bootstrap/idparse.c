@@ -4044,7 +4044,6 @@ void id_fn_step(char* t, int i, IdList* st, IdList* pts);
 void id_fn_cut(char* t, int i, IdList* st, IdList* pts);
 void id_chk_structs(void);
 void id_chk_struct_one(int sd_i);
-void id_sd_err(int sd_i, char* sd_m);
 void id_sd_cycle(int sd_i);
 int id_sd_contains(char* sd_s, char* sd_t, int sd_d);
 int id_sd_holds(char* sd_ft, char* sd_t, int sd_d);
@@ -4096,6 +4095,8 @@ void id_fit_ctor(int i, int e, char* want);
 int id_is_fld_idx(int id);
 void id_chk_access(int id);
 void id_chk_iasg(int id);
+void id_sd_nofield_diag(int id, char* sd_bt, char* sd_f);
+void id_sd_nofield_read(int id, char* sd_bt, char* sd_f);
 void id_chk_field(int id, char* sd_bt);
 void id_chk_field_at(int id, char* sd_bt, char* sd_f);
 char* id_sd_nofield(char* sd_bt, char* sd_f);
@@ -37431,19 +37432,11 @@ void id_chk_struct_one(int sd_i) {
     return;
 }
 
-void id_sd_err(int sd_i, char* sd_m) {
-IdList* idsq_18;
-char* idsq_16;
-    (idsq_18 = sdfile, idsq_16 = (char*)(intptr_t)(id_list_get(idsq_18, sd_i)), id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(idsq_16, ID_S(":")), id_str_of_int((int)(id_list_get(sdline, sd_i))), 3), ID_S(": error: "), 1), sd_m, 1)));
-    id_note_failure();
-    return;
-}
-
 void id_sd_cycle(int sd_i) {
     char* sd_nm;
     sd_nm = (char*)(intptr_t)(id_list_get(sdname, sd_i));
     if ((id_sd_contains(sd_nm, sd_nm, id_list_len(sdname)) > 0)) {
-        id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('"), 1), sd_nm, 1), ID_S("[] items')"), 1));
+        id_sd_diag(sd_i, ID_S("E0627"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), sd_nm), ID_S("' contains itself, directly or through another struct, so no value of it could ever be built; hold a list of it instead ('"), 1), sd_nm, 1), ID_S("[] items')"), 1), sd_nm, ID_S("the value would have to exist before it could be made, and a list can be empty where a struct field cannot"), id_concat_f(id_concat(ID_S("hold a list of it instead ('"), sd_nm), ID_S("[] items')"), 1));
     }
     return;
 }
@@ -37527,10 +37520,10 @@ void id_sd_ftype_chk(int sd_i, int sd_k) {
     sd_t = (char*)(intptr_t)(id_list_get((IdList*)(intptr_t)(id_list_get(sdftype, sd_i)), sd_k));
     { char* idfe_o = sd_why; sd_why = id_sd_ftype_why(sd_t); id_str_free(idfe_o); }
     if ((strcmp(sd_why, ID_S("")) != 0)) {
-IdList* idsq_19;
-IdList* idsq_17;
-char* idsq_15;
-        (idsq_19 = sdfname, idsq_17 = (IdList*)(intptr_t)(id_list_get(idsq_19, sd_i)), idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sd_k)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("field '"), idsq_15), ID_S("' of struct '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S("'"), 1), sd_why, 1)));
+IdList* idsq_22;
+IdList* idsq_20;
+char* idsq_18;
+        (idsq_22 = sdfname, idsq_20 = (IdList*)(intptr_t)(id_list_get(idsq_22, sd_i)), idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_k)), id_sd_diag(sd_i, ID_S("E0628"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("field '"), idsq_18), ID_S("' of struct '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S("'"), 1), sd_why, 1), sd_t, ID_S("a field holds a value that is kept and passed around, so it is an int, word, float, string, a struct or a list of one"), ID_S("give the field int, word, float, string, a struct declared in the program or a list of one")));
     }
     { id_str_free(sd_why); return; }
 }
@@ -37577,13 +37570,16 @@ void id_sd_alone(int sd_i) {
 }
 
 void id_sd_sharef(int sd_i, int sd_j) {
-IdList* idsq_27;
-char* idsq_25;
-    if ((idsq_27 = pfile, idsq_25 = (char*)(intptr_t)(id_list_get(idsq_27, sd_j)), (strcmp(idsq_25, (char*)(intptr_t)(id_list_get(sdfile, sd_i))) == 0))) {
-IdList* idsq_17;
-char* idsq_15;
-IdList* idsq_11;
-        (idsq_17 = sdname, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, sd_i)), idsq_11 = ns1, id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_15), ID_S("' shares its file with function '"), 1), (char*)(intptr_t)(id_list_get(idsq_11, (int)(id_list_get(prog, sd_j)))), 1), ID_S("'; a struct is declared in a file of its own -- move the function to another file"), 1)));
+IdList* idsq_33;
+char* idsq_31;
+    if ((idsq_33 = pfile, idsq_31 = (char*)(intptr_t)(id_list_get(idsq_33, sd_j)), (strcmp(idsq_31, (char*)(intptr_t)(id_list_get(sdfile, sd_i))) == 0))) {
+IdList* idsq_22;
+char* idsq_20;
+IdList* idsq_16;
+IdList* idsq_15;
+int idsq_13;
+char* idsq_12;
+        (idsq_22 = sdname, idsq_20 = (char*)(intptr_t)(id_list_get(idsq_22, sd_i)), idsq_16 = ns1, idsq_15 = prog, idsq_13 = (int)(id_list_get(idsq_15, sd_j)), idsq_12 = (char*)(intptr_t)(id_list_get(idsq_16, idsq_13)), id_sd_diag(sd_i, ID_S("E0625"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_20), ID_S("' shares its file with function '"), 1), idsq_12, 1), ID_S("'; a struct is declared in a file of its own -- move the function to another file"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), ID_S("a struct is a thing and a function is what the program does with it, and id files each in a file of its own"), ID_S("move the function to another file")));
     }
     return;
 }
@@ -37648,12 +37644,14 @@ char* idsq_17;
 }
 
 void id_sd_sharepair(int sd_i, int sd_j) {
-IdList* idsq_25;
-char* idsq_23;
-    if ((idsq_25 = sdfile, idsq_23 = (char*)(intptr_t)(id_list_get(idsq_25, sd_j)), (strcmp(idsq_23, (char*)(intptr_t)(id_list_get(sdfile, sd_i))) == 0))) {
-IdList* idsq_15;
-char* idsq_13;
-        (idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_i)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_13), ID_S("' shares its file with struct '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_j)), 1), ID_S("'; a struct is declared in a file of its own -- move one of them to another file"), 1)));
+IdList* idsq_31;
+char* idsq_29;
+    if ((idsq_31 = sdfile, idsq_29 = (char*)(intptr_t)(id_list_get(idsq_31, sd_j)), (strcmp(idsq_29, (char*)(intptr_t)(id_list_get(sdfile, sd_i))) == 0))) {
+IdList* idsq_20;
+char* idsq_18;
+IdList* idsq_14;
+char* idsq_12;
+        (idsq_20 = sdname, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_i)), idsq_14 = sdname, idsq_12 = (char*)(intptr_t)(id_list_get(idsq_14, sd_j)), id_sd_diag(sd_i, ID_S("E0625"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_18), ID_S("' shares its file with struct '"), 1), idsq_12, 1), ID_S("'; a struct is declared in a file of its own -- move one of them to another file"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), ID_S("a struct is a thing and a function is what the program does with it, and id files each in a file of its own"), ID_S("move one of the structs to another file")));
     }
     return;
 }
@@ -37661,17 +37659,23 @@ char* idsq_13;
 void id_sd_same(int sd_i) {
     int sd_j;
     sd_j = id_sd_twin(sd_i);
+IdList* idsq_62;
+char* idsq_60;
+    if (((sd_j >= 0) && (idsq_62 = sdname, idsq_60 = (char*)(intptr_t)(id_list_get(idsq_62, sd_j)), (strcmp(idsq_60, (char*)(intptr_t)(id_list_get(sdname, sd_i))) != 0)))) {
+IdList* idsq_50;
+char* idsq_48;
 IdList* idsq_44;
 char* idsq_42;
-    if (((sd_j >= 0) && (idsq_44 = sdname, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, sd_j)), (strcmp(idsq_42, (char*)(intptr_t)(id_list_get(sdname, sd_i))) != 0)))) {
-IdList* idsq_33;
-char* idsq_31;
-IdList* idsq_27;
-char* idsq_25;
-char* idsq_19;
+char* idsq_36;
+IdList* idsq_32;
+char* idsq_30;
+IdList* idsq_26;
+char* idsq_24;
+IdList* idsq_20;
+char* idsq_18;
 IdList* idsq_15;
 char* idsq_13;
-        (idsq_33 = sdname, idsq_31 = (char*)(intptr_t)(id_list_get(idsq_33, sd_i)), idsq_27 = sdname, idsq_25 = (char*)(intptr_t)(id_list_get(idsq_27, sd_j)), idsq_19 = id_sd_where(sd_j), idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_j)), id_sd_err(sd_i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_31), ID_S("' has the same fields as struct '"), 1), idsq_25, 1), ID_S("' (declared at "), 1), idsq_19, 3), ID_S("); two structs with the same field names and types are one struct -- use '"), 1), idsq_13, 1), ID_S("', or give '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S("' a field of another name or type"), 1)));
+        (idsq_50 = sdname, idsq_48 = (char*)(intptr_t)(id_list_get(idsq_50, sd_i)), idsq_44 = sdname, idsq_42 = (char*)(intptr_t)(id_list_get(idsq_44, sd_j)), idsq_36 = id_sd_where(sd_j), idsq_32 = sdname, idsq_30 = (char*)(intptr_t)(id_list_get(idsq_32, sd_j)), idsq_26 = sdname, idsq_24 = (char*)(intptr_t)(id_list_get(idsq_26, sd_i)), idsq_20 = sdname, idsq_18 = (char*)(intptr_t)(id_list_get(idsq_20, sd_i)), idsq_15 = sdname, idsq_13 = (char*)(intptr_t)(id_list_get(idsq_15, sd_j)), id_sd_diag(sd_i, ID_S("E0626"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), idsq_48), ID_S("' has the same fields as struct '"), 1), idsq_42, 1), ID_S("' (declared at "), 1), idsq_36, 3), ID_S("); two structs with the same field names and types are one struct -- use '"), 1), idsq_30, 1), ID_S("', or give '"), 1), idsq_24, 1), ID_S("' a field of another name or type"), 1), idsq_18, ID_S("two structs with the same field names and types are one struct declared twice, the same rule two functions with the same body obey"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("use '"), idsq_13), ID_S("', or give '"), 1), (char*)(intptr_t)(id_list_get(sdname, sd_i)), 1), ID_S("' a field of another name or type"), 1)));
     }
     return;
 }
@@ -37926,11 +37930,12 @@ char* idsq_13;
 void id_fit_fields(int i, int e, char* want) {
     IdList* sd_xs;
     sd_xs = (IdList*)(intptr_t)(id_list_get(nl1, e));
-int idsq_37;
-    if ((idsq_37 = id_list_len(sd_xs), (idsq_37 != id_sd_nfields(want)))) {
+int idsq_50;
+    if ((idsq_50 = id_list_len(sd_xs), (idsq_50 != id_sd_nfields(want)))) {
+int idsq_35;
+char* idsq_29;
 int idsq_23;
-char* idsq_17;
-        (idsq_23 = id_sd_nfields(want), idsq_17 = id_sd_fields_text(want), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), want), ID_S("' takes "), 1), id_str_of_int(idsq_23), 3), ID_S(" field(s) ("), 1), idsq_17, 3), ID_S("), but this case gives "), 1), id_str_of_int(id_list_len(sd_xs)), 3)));
+        (idsq_35 = id_sd_nfields(want), idsq_29 = id_sd_fields_text(want), idsq_23 = id_list_len(sd_xs), id_case_diag(i, ID_S("E0632"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("struct '"), want), ID_S("' takes "), 1), id_str_of_int(idsq_35), 3), ID_S(" field(s) ("), 1), idsq_29, 3), ID_S("), but this case gives "), 1), id_str_of_int(idsq_23), 3), ID_S("a struct in a case is built like a constructor call, with one value for each field in order"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("give one value for each field: "), want), ID_S("("), 1), id_sd_fields_text(want), 3), ID_S(")"), 1)));
     } else {
         id_fit_fvals(i, sd_xs, want);
     }
@@ -37961,8 +37966,9 @@ void id_fit_other(int i, int e, char* want) {
 
 void id_fit_struct(int i, int e, char* want) {
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cctor")) != 0)) {
-char* idsq_27;
-        (idsq_27 = id_lit_text(e), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives "), idsq_27), ID_S(" where a "), 1), want, 1), ID_S(" is required; write the struct as "), 1), want, 1), ID_S("("), 1), id_sd_fields_text(want), 3), ID_S(")"), 1)));
+char* idsq_39;
+char* idsq_25;
+        (idsq_39 = id_lit_text(e), idsq_25 = id_sd_fields_text(want), id_case_diag(i, ID_S("E0631"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case gives "), idsq_39), ID_S(" where a "), 1), want, 1), ID_S(" is required; write the struct as "), 1), want, 1), ID_S("("), 1), idsq_25, 3), ID_S(")"), 1), ID_S("a struct is written in a case the way it is built, with its name and one value for each field"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("write the struct as "), want), ID_S("("), 1), id_sd_fields_text(want), 3), ID_S(")"), 1)));
     } else {
         id_fit_ctor(i, e, want);
     }
@@ -38013,6 +38019,19 @@ void id_chk_iasg(int id) {
     return;
 }
 
+void id_sd_nofield_diag(int id, char* sd_bt, char* sd_f) {
+char* idsq_16;
+    (idsq_16 = id_sd_nofield(sd_bt, sd_f), ({ char* idft2 = idsq_16; id_tc_diag(id, ID_S("E0629"), idft2, sd_f, ID_S("a struct is read and written only through the fields its declaration gives it"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("use one of its fields ("), id_sd_fields_text(sd_bt), 2), ID_S("), or add '"), 1), sd_f, 1), ID_S("' to the struct"), 1)); id_str_free(idft2); }));
+    return;
+}
+
+void id_sd_nofield_read(int id, char* sd_bt, char* sd_f) {
+    if ((id_is_ia_target(id) == 0)) {
+        id_sd_nofield_diag(id, sd_bt, sd_f);
+    }
+    return;
+}
+
 void id_chk_field(int id, char* sd_bt) {
     char* sd_f;
 IdList* idsq_18;
@@ -38027,7 +38046,7 @@ void id_chk_field_at(int id, char* sd_bt, char* sd_f) {
     if ((id_ty_kind_is(sd_bt, ID_S("struct")) == 0)) {
         id_tc_diag(id, ID_S("E0615"), id_concat_f(id_concat_f(id_concat(ID_S("cannot read field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), sd_f, ID_S("only a struct has fields"), ID_S("read a struct's field, or use len(list) for a list's length"));
     } else if ((id_sd_fpos(sd_bt, sd_f) < 0)) {
-        id_ix_err(id, id_sd_nofield(sd_bt, sd_f));
+        id_sd_nofield_read(id, sd_bt, sd_f);
     }
     return;
 }
@@ -38077,7 +38096,7 @@ void id_chk_fstore_at(int id, char* sd_bt, char* sd_f) {
     if ((id_ty_kind_is(sd_bt, ID_S("struct")) == 0)) {
         id_tc_diag(id, ID_S("E0615"), id_concat_f(id_concat_f(id_concat(ID_S("cannot assign field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), sd_f, ID_S("only a struct has fields"), ID_S("assign a struct's field, or declare the variable as a struct"));
     } else if ((id_sd_fpos(sd_bt, sd_f) < 0)) {
-        ({ char* idft1 = id_sd_nofield(sd_bt, sd_f); id_tc_err(id, idft1); id_str_free(idft1); });
+        id_sd_nofield_diag(id, sd_bt, sd_f);
     } else {
         id_chk_fvalue(id, sd_bt, sd_f);
     }
@@ -38112,11 +38131,17 @@ void id_sd_bi_arg(int id, int sd_i) {
     sd_a = (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, id)), sd_i));
     sd_t = id_type_of(sd_a);
     if ((((id_ty_kind_is(sd_t, ID_S("struct")) == 1) && (strcmp(id_bi_want_for(id, sd_i), ID_S("")) == 0)) && (id_arg_ctx_b((char*)(intptr_t)(id_list_get(ns1, id)), sd_i) == 0))) {
-IdList* idsq_31;
-char* idsq_29;
+IdList* idsq_50;
+char* idsq_48;
+IdList* idsq_36;
+char* idsq_34;
+IdList* idsq_29;
+char* idsq_26;
+IdList* idsq_22;
+char* idsq_20;
 IdList* idsq_17;
 char* idsq_15;
-        (idsq_31 = ns1, idsq_29 = (char*)(intptr_t)(id_list_get(idsq_31, id)), idsq_17 = ns1, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, id)), id_tc_err(sd_a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_29), ID_S("' cannot take a struct: argument "), 1), id_str_of_int(sd_i), 3), ID_S(" is "), 1), sd_t, 1), ID_S("; use its fields, as in "), 1), idsq_15, 1), ID_S("(p."), 1), id_sd_cell(sdfname, sd_t, 0), 1), ID_S(")"), 1)));
+        (idsq_50 = ns1, idsq_48 = (char*)(intptr_t)(id_list_get(idsq_50, id)), idsq_36 = ns1, idsq_34 = (char*)(intptr_t)(id_list_get(idsq_36, id)), idsq_29 = sdfname, idsq_26 = id_sd_cell(idsq_29, sd_t, 0), idsq_22 = ns1, idsq_20 = (char*)(intptr_t)(id_list_get(idsq_22, id)), idsq_17 = ns1, idsq_15 = (char*)(intptr_t)(id_list_get(idsq_17, id)), id_tc_diag(sd_a, ID_S("E0630"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), idsq_48), ID_S("' cannot take a struct: argument "), 1), id_str_of_int(sd_i), 3), ID_S(" is "), 1), sd_t, 1), ID_S("; use its fields, as in "), 1), idsq_34, 1), ID_S("(p."), 1), idsq_26, 1), ID_S(")"), 1), idsq_20, ID_S("a builtin works on text, numbers and lists, and a struct is none of them"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("pass the struct's fields, as in "), idsq_15), ID_S("(p."), 1), id_sd_cell(sdfname, sd_t, 0), 1), ID_S(")"), 1)));
     }
     return;
 }

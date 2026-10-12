@@ -18,8 +18,8 @@ sd_ftype_chk(int sd_i, int sd_k) {
   string sd_t = (import sdftype)[sd_i][sd_k];
   string sd_why = sd_ftype_why(sd_t);
   if(sd_why != "") {
-    sd_err(sd_i, "field '" + (import sdfname)[sd_i][sd_k] + "' of struct '" + (import sdname)[sd_i] + "'" + sd_why);
+    sd_diag(sd_i, "E0628", "field '" + (import sdfname)[sd_i][sd_k] + "' of struct '" + (import sdname)[sd_i] + "'" + sd_why, sd_t, "a field holds a value that is kept and passed around, so it is an int, word, float, string, a struct or a list of one", "give the field int, word, float, string, a struct declared in the program or a list of one");
   }
 } return void;
 given sd_reg (0, 0):() then (import chkfail)[0]:(0)
-given sd_reg given sd_note("B", ["v"], ["void"], "b.id", 3) (2, 0):() then prints:("b.id:3: error: field 'v' of struct 'B' has type 'void'; a field holds a value, so give it int, word, float, string, a struct or a list of one\n")
+given sd_reg given sd_note("B", ["v"], ["void"], "b.id", 3) (2, 0):() then prints:("b.id:3: error: field 'v' of struct 'B' has type 'void'; a field holds a value, so give it int, word, float, string, a struct or a list of one [E0628]\n  at: void\n  why: a field holds a value that is kept and passed around, so it is an int, word, float, string, a struct or a list of one\n  help: give the field int, word, float, string, a struct declared in the program or a list of one\n")

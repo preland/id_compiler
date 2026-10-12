@@ -1,0 +1,5 @@
+// EXPECT: struct 'Point' has no field 'z'; its fields are x, y [E0629]
+main(int argc, string[] argv) {
+  Point p = Point(1, 2);
+  p.z = 3;
+} return int 0;

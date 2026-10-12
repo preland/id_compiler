@@ -1,3 +1,3 @@
-// EXPECT: shares its file with function
+// EXPECT: shares its file with function 'help'; a struct is declared in a file of its own -- move the function to another file [E0625]
 main(int argc, string[] argv) {
 } return int 0;

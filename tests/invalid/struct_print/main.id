@@ -1,4 +1,4 @@
-// EXPECT: 'print' cannot take a struct
+// EXPECT: 'print' cannot take a struct: argument 0 is Point; use its fields, as in print(p.x) [E0630]
 main(int argc, string[] argv) {
   Point p = Point(1, 2);
   print(p);

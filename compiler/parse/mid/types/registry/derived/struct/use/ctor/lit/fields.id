@@ -4,12 +4,12 @@
 fit_fields(int i, int e, string want) {
   int[] sd_xs = (import nl1)[e];
   if(len(sd_xs) != sd_nfields(want)) {
-    case_err(i, "struct '" + want + "' takes " + sd_nfields(want) + " field(s) (" + sd_fields_text(want) + "), but this case gives " + len(sd_xs));
+    case_diag(i, "E0632", "struct '" + want + "' takes " + sd_nfields(want) + " field(s) (" + sd_fields_text(want) + "), but this case gives " + len(sd_xs), "a struct in a case is built like a constructor call, with one value for each field in order", "give one value for each field: " + want + "(" + sd_fields_text(want) + ")");
   } else {
     fit_fvals(i, sd_xs, want);
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), (import sd_cl), "P"):() then prints:("fixture.id:4: error: struct 'P' takes 2 field(s) (x, y), but this case gives 1\n")
+given sd_case_fixture ((import fixture_ci), (import sd_cl), "P"):() then prints:("fixture.id:4: error: struct 'P' takes 2 field(s) (x, y), but this case gives 1 [E0632]\n  why: a struct in a case is built like a constructor call, with one value for each field in order\n  help: give one value for each field: P(x, y)\n")
 given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
 
 fit_fvals(int i, int[] sd_xs, string want) {

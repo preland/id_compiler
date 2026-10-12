@@ -20,12 +20,12 @@ given cbind_fixture ((import fixture_ci), (import cb_e), "func() return int"):()
 
 fit_struct(int i, int e, string want) {
   if((import nkind)[e] != "cctor") {
-    case_err(i, "this case gives " + lit_text(e) + " where a " + want + " is required; write the struct as " + want + "(" + sd_fields_text(want) + ")");
+    case_diag(i, "E0631", "this case gives " + lit_text(e) + " where a " + want + " is required; write the struct as " + want + "(" + sd_fields_text(want) + ")", "a struct is written in a case the way it is built, with its name and one value for each field", "write the struct as " + want + "(" + sd_fields_text(want) + ")");
   } else {
     fit_ctor(i, e, want);
   }
 } return void;
-given sd_case_fixture ((import fixture_ci), (import sd_ca), "P"):() then prints:("fixture.id:4: error: this case gives 1 where a P is required; write the struct as P(x, y)\n")
+given sd_case_fixture ((import fixture_ci), (import sd_ca), "P"):() then prints:("fixture.id:4: error: this case gives 1 where a P is required; write the struct as P(x, y) [E0631]\n  why: a struct is written in a case the way it is built, with its name and one value for each field\n  help: write the struct as P(x, y)\n")
 given sd_case_fixture ((import fixture_ci), (import sd_ce), "P"):() then (import chkfail)[0]:(0)
 
 fit_ctor(int i, int e, string want) {

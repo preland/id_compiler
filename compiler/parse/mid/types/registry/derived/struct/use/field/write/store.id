@@ -14,13 +14,13 @@ chk_fstore_at(int id, string sd_bt, string sd_f) {
   if(ty_kind_is(sd_bt, "struct") == 0) {
     tc_diag(id, "E0615", "cannot assign field '" + sd_f + "' of a " + sd_bt, sd_f, "only a struct has fields", "assign a struct's field, or declare the variable as a struct");
   } else if(sd_fpos(sd_bt, sd_f) < 0) {
-    tc_err(id, sd_nofield(sd_bt, sd_f));
+    sd_nofield_diag(id, sd_bt, sd_f);
   } else {
     chk_fvalue(id, sd_bt, sd_f);
   }
 } return void;
 given sd_use_fixture ((import sd_wx), "P", "x"):() then (import chkfail)[0]:(0)
-given sd_use_fixture ((import sd_wz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y\n")
+given sd_use_fixture ((import sd_wz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y [E0629]\n  at: z\n  why: a struct is read and written only through the fields its declaration gives it\n  help: use one of its fields (x, y), or add 'z' to the struct\n")
 
 chk_fvalue(int id, string sd_bt, string sd_f) {
   int sd_v = (import nl1)[id][0];
