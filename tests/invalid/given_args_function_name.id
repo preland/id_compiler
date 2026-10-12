@@ -1,4 +1,4 @@
-// EXPECT: is a function name, which only a case's own arguments may pass
+// EXPECT: a setup's arguments are literals or (import NAME); 'mk' is a function name, which only a case's own arguments may pass [E0516]
 mk() {
   export int[] buf = [0, 0];
 } return void;

@@ -25,10 +25,10 @@ given_fn(int i, int si, string setup_nm) {
   blank;
 } chain (int i, int si, string setup_nm) {
   if(sfn < 0) {
-    case_err(i, "'given' names '" + setup_nm + "', which is not a function in this build");
+    case_diag(i, "E0514", "'given' names '" + setup_nm + "', which is not a function in this build", "a 'given' runs a function of the program before the case, so the name must be one this build defines", "name a function the build defines and that returns void, as in 'given " + setup_nm + "', or define " + setup_nm + "(...) with a void return");
   } else if((import ns2)[sfn] != "void") {
     string rt = (import ns2)[sfn];
-    case_err(i, "'given' names '" + setup_nm + "', which returns " + rt + "; a setup returns void, since the harness has nothing to compare its result with");
+    case_diag(i, "E0514", "'given' names '" + setup_nm + "', which returns " + rt + "; a setup returns void, since the harness has nothing to compare its result with", "a 'given' is a setup that runs before the case, and only a function that returns void is one", "name a function that returns void in the 'given', and call " + setup_nm + " as the function under test, or give it a void return");
   } else {
     given_args(i, si, sfn);
   }

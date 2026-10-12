@@ -1,4 +1,4 @@
-// EXPECT: 'calls' names 'nope', which is not a function in this build
+// EXPECT: 'calls' names 'nope', which is not a function in this build [E0517]
 speak(int x) {
   print("hi");
 } return int x;

@@ -1,4 +1,4 @@
-// EXPECT: this case's 'calls speak' passes 2 argument(s), which takes 1
+// EXPECT: this case's 'calls speak' passes 2 argument(s), which takes 1 [E0519]
 speak(int x) {
   print("hi");
 } return int x;

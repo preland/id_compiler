@@ -27,7 +27,7 @@ given_args(int i, int si, int sfn) {
   if(len(items) != len(((import nl1)[sfn]))) {
     string nm = (import ns1)[sfn];
     int np = len(((import nl1)[sfn]));
-    case_err(i, "'given' names '" + nm + "', which takes " + np + " parameter(s), but this 'given' passes " + len(items) + "; a setup is called with one literal per parameter, as in 'given " + nm + "(1, 2)', and with none as 'given " + nm + "'");
+    case_diag(i, "E0515", "'given' names '" + nm + "', which takes " + np + " parameter(s), but this 'given' passes " + len(items) + "; a setup is called with one literal per parameter, as in 'given " + nm + "(1, 2)', and with none as 'given " + nm + "'", "the harness calls the setup with the literals written after its name, so their number must equal the setup's parameters", "write one literal per parameter: " + diag_sig(sfn));
   } else {
     given_fit(i, si, sfn, items);
   }
@@ -38,7 +38,7 @@ given gsetup_fixture (0, 0, (import fixture_set1)):() then (import chkfail)[0]:(
 given_arg(int i, int sfn, int[] items, int j) {
   string pt = (import ns1)[((import nl1)[sfn][j])];
   if((import nkind)[(items[j])] == "cfn") {
-    case_err(i, "a setup's arguments are literals or (import NAME); '" + (import ns1)[(items[j])] + "' is a function name, which only a case's own arguments may pass");
+    case_diag(i, "E0516", "a setup's arguments are literals or (import NAME); '" + (import ns1)[(items[j])] + "' is a function name, which only a case's own arguments may pass", "a setup runs before the case, with values only; a function can be passed as an argument of the function under test, not of a 'given'", "write a literal, or (import NAME) for an exported variable, in place of " + (import ns1)[(items[j])]);
   } else {
     lset((import setupargs), 0, 1);
     fit_value(i, items[j], pt);
@@ -47,4 +47,4 @@ given_arg(int i, int sfn, int[] items, int j) {
   lset((import setupargs), 0, 0);
 } return void;
 given fn_fixture ((import fixture_ci), (import fixture_fn), [(import fixture_zero)], 0):() then (import chkfail)[0]:(0) then (import setupargs)[0]:(0)
-given cfn_fixture ((import fixture_ci), (import fixture_fn), [(import cfn_e)], 0):() then prints:("fixture.id:4: error: a setup's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass\n")
+given cfn_fixture ((import fixture_ci), (import fixture_fn), [(import cfn_e)], 0):() then prints:("fixture.id:4: error: a setup's arguments are literals or (import NAME); 'fx_target' is a function name, which only a case's own arguments may pass [E0516]\n  why: a setup runs before the case, with values only; a function can be passed as an argument of the function under test, not of a 'given'\n  help: write a literal, or (import NAME) for an exported variable, in place of fx_target\n")

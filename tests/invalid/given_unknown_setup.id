@@ -1,0 +1,5 @@
+// EXPECT: 'given' names 'nope', which is not a function in this build [E0514]
+use(int[] xs) {
+  int a = len(xs);
+} return int[] xs;
+given nope ([0]):([0])

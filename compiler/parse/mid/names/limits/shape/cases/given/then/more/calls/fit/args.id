@@ -17,11 +17,11 @@ fit_calls_args(int ci, string nm, int cfn, int[] items) {
   if(len(items) != len(((import nl1)[cfn]))) {
     int na = len(items);
     int np = len(((import nl1)[cfn]));
-    case_err(ci, "this case's 'calls " + nm + "' passes " + na + " argument(s), which takes " + np);
+    case_diag(ci, "E0519", "this case's 'calls " + nm + "' passes " + na + " argument(s), which takes " + np, "'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters", "write one literal per parameter: " + diag_sig(cfn));
   } else {
     fit_items(ci, cfn, items);
   }
 } return void;
-given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_none)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1\n")
+given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_none)):() then prints:("fixture.id:4: error: this case's 'calls fx_target' passes 0 argument(s), which takes 1 [E0519]\n  why: 'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters\n  help: write one literal per parameter: fx_target(int x)\n")
 given calls_items_fixture ((import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_one)):() then prints:("")
 

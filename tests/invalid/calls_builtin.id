@@ -1,4 +1,4 @@
-// EXPECT: 'calls' names 'print', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'
+// EXPECT: 'calls' names 'print', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls' [E0518]
 speak(int x) {
   print("hi");
 } return int x;

@@ -4,13 +4,13 @@
 
 calls_unknown(int ci, string nm) {
   if(is_builtin(nm) == 1) {
-    case_err(ci, "'calls' names '" + nm + "', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'");
+    case_diag(ci, "E0518", "'calls' names '" + nm + "', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'", "'calls' counts how often the function under test calls a function whose body the harness can record into, and a builtin has no such body", "check what " + nm + " does with 'then prints:(TEXT)' or 'then eprints:(TEXT)'");
   } else {
-    case_err(ci, "'calls' names '" + nm + "', which is not a function in this build");
+    case_diag(ci, "E0517", "'calls' names '" + nm + "', which is not a function in this build", "'calls' counts calls to a function the program defines, so the name must be one of them", "name a function this build defines, or define " + nm + "(...) in the program");
   }
 } return void;
-given case_fixture ((import fixture_ci), "nope"):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build\n")
-given case_fixture ((import fixture_ci), "print"):() then prints:("fixture.id:4: error: 'calls' names 'print', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'\n")
+given case_fixture ((import fixture_ci), "nope"):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
+given case_fixture ((import fixture_ci), "print"):() then prints:("fixture.id:4: error: 'calls' names 'print', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls' [E0518]\n  why: 'calls' counts how often the function under test calls a function whose body the harness can record into, and a builtin has no such body\n  help: check what print does with 'then prints:(TEXT)' or 'then eprints:(TEXT)'\n")
 
 // An empty argument list and a one-int list, for fit_calls_args/
 // fit_calls_count (args.id) to check against fx_target's one int parameter

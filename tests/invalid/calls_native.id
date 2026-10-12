@@ -1,0 +1,6 @@
+// EXPECT: 'calls' names 'fs_open', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead [E0518]
+native fs_open(string path, string mode) return int;
+speak(int x) {
+  print("hi");
+} return int x;
+(1):(1) then calls fs_open:("a", "b")

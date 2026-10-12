@@ -1,4 +1,4 @@
-// EXPECT: a setup returns void
+// EXPECT: 'given' names 'use', which returns int[]; a setup returns void, since the harness has nothing to compare its result with [E0514]
 mk() {
   export int[] buf = [0, 0];
 } return void;

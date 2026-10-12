@@ -1,4 +1,4 @@
-// EXPECT: which takes 3 parameter(s), but this 'given' passes 2
+// EXPECT: 'given' names 'bump', which takes 3 parameter(s), but this 'given' passes 2; a setup is called with one literal per parameter, as in 'given bump(1, 2)', and with none as 'given bump' [E0515]
 mk() {
   export int[] buf = [0, 0];
 } return void;
