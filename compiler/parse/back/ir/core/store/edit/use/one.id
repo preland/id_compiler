@@ -25,5 +25,5 @@ ir_rows_lst() {
   lset2((import ilist), 0, ([5, 7, 5]));
 } return void;
 ():() then chk_l:([5, 7, 5])
-():() then calls ir_rows:[1]
 ():() then init_units:(0)
+():() then calls ir_rows:[1]

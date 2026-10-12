@@ -13,8 +13,8 @@ ir_rows() {
   ir_rows_fn0();
 } return void;
 ():() then entry_count(0):(1)
-():() then calls env_init:[1]
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 ir_rows_fn0() {
   int f0 = ir_func(0 - 1, "one", "int");

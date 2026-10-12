@@ -21,8 +21,8 @@ lws_fixture_in() {
   lset((import esc_cons), 0, (import efs_vs));
 } return void;
 ():() then (import esc_cons)[0]:(50)
-():() then calls lws_fixture:[1]
 ():() then init_units:(0)
+():() then calls lws_fixture:[1]
 
 lws_fixture_ret() {
   lws_fixture();
@@ -30,5 +30,5 @@ lws_fixture_ret() {
   export int lws_r = lw_alloca("string", "r");
 } return void;
 ():() then (import sqbase)[0]:(61)
-():() then calls lws_fixture:[1]
 ():() then init_units:(0)
+():() then calls lws_fixture:[1]

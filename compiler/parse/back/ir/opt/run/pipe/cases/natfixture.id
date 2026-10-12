@@ -16,5 +16,5 @@ nat_row_setup() {
   nat_add("harness", (import natcall_node), "nat_target");
 } return void;
 given natcall_fixture ():() then calls nat_add:("harness", (import natcall_node), "nat_target")
-():() then calls natcall_fixture:[1]
 ():() then len((import natrow)):(1)
+():() then calls natcall_fixture:[1]

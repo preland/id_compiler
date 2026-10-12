@@ -22,5 +22,5 @@ casm_row_fixture() {
   init_tyc();
 } return void;
 ():() then calls init_tyc:()
-():() then calls llasm_row_fixture:[1]
 ():() then init_units:(0)
+():() then calls llasm_row_fixture:[1]

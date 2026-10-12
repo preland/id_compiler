@@ -14,8 +14,8 @@ keep_export_fixture() {
   harn_init();
 } return void;
 ():() then (import harn)[0]:(0)
-():() then calls env_init:[1]
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 // init_rtc() is only needed on this path: (import fsc)[0] (nat_all_live)
 // is short-circuited away entirely when (import harn)[0] is true.
@@ -25,8 +25,8 @@ keep_export_fixture_reg() {
   keep_export_fixture_mid();
 } return void;
 ():() then calls add_func:("main", "void", -1)
-():() then calls keep_export_fixture:[1]
 ():() then init_units:(0)
+():() then calls keep_export_fixture:[1]
 
 keep_export_fixture_mid() {
   add_func("main", "void", 0 - 1);

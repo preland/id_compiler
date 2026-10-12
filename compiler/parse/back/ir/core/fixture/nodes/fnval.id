@@ -11,8 +11,8 @@ lw_fix_fnval() {
   lw_fix_fnval_reg();
 } return void;
 ():() then (import fix_fnval_n):(1)
-():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
+():() then calls lw_env_fixture:[1]
 
 lw_fix_fnval_reg() {
   fidx_add("fx_target");

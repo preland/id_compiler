@@ -11,8 +11,8 @@ bicall_fixture() {
   bicall_fixture_reg();
 } return void;
 ():() then (import bicall_node):(2)
-():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
+():() then calls lw_env_fixture:[1]
 
 bicall_fixture_reg() {
   export int[] bicall_args = [node_txt2("int", "1", 1, 0)];

@@ -9,8 +9,8 @@ fcallv_fixture() {
   fcallv_fixture_reg();
 } return void;
 ():() then (import fcallv_node):(1)
-():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
+():() then calls lw_env_fixture:[1]
 
 // "gfunc" declared as a variable of function type (add_var, unlike
 // ocall_fixture_reg's add_func), so callee_var_type resolves it and

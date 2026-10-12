@@ -5,5 +5,5 @@ ir_rows_chk1() {
   lset((import chk_id), 0, 1);
 } return void;
 ():() then (import chk_id)[0]:(1)
-():() then calls ir_rows:[1]
 ():() then init_units:(0)
+():() then calls ir_rows:[1]
