@@ -41,6 +41,6 @@ rename_scoped_picked(string rename_file, string rename_source, int[] rename_span
     rename_restrict(rename_picked, rename_spans, rename_region);
   }
 } return void;
-("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], ""):("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], "")
 ("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], "g"):("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["", "x"], "g")
 ("NAMES.md", "f(r) {\n}", [2, 3, 1], ["x"], "f"):("NAMES.md", "f(r) {\n}", [2, 3, 1], [""], "f")
+("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], ""):("a.id", "f(r) {\n}\n\ng(r) {\n}", [2, 3, 1, 12, 13, 4], ["x", "x"], "")

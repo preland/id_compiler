@@ -31,5 +31,5 @@ jg_def_at(string jg_t, string jg_path, int jg_i, int[] jg_st, string[][] jg_defs
   }
 } return void;
 ("f(int a) {\n} return int a;", "d/f.id", 0, [1, 0], []):("f(int a) {\n} return int a;", "d/f.id", 0, [13, 0], [["f", "int", "f.id:1", "int a"]])
-("g(x) y", "g.id", 0, [1, 0], []):("g(x) y", "g.id", 0, [1, 0], [])
 ("chain (a) {\n} return int a;", "g.id", 0, [1, 0], []):("chain (a) {\n} return int a;", "g.id", 0, [5, 0], [])
+("g(x) y", "g.id", 0, [1, 0], []):("g(x) y", "g.id", 0, [1, 0], [])

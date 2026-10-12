@@ -8,6 +8,7 @@ rename_row(string[] rename_listed, string rename_old, string rename_new, int ren
   }
 } return void;
 ([], "ab", "x", 3):(["3: ab -> x"], "ab", "x", 3)
+(["r"], "ab", "x", 3):(["r", "3: ab -> x"], "ab", "x", 3)
 (["r"], "ab", "", 3):(["r"], "ab", "", 3)
 
 // The rows for every name in a list of triples with its picked replacement.

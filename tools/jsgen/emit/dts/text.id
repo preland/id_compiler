@@ -18,6 +18,7 @@ jg_dts_sigs(string[][] jg_sigs, string[] jg_ls) {
   }
 } return void;
 ([["f", "int", "x:1", "a", "int"]], ["top"]):([["f", "int", "x:1", "a", "int"]], ["top", "  /** f (x:1) */\n  f(a: number): number;"])
+([["f", "int", "x:1", "a", "int"], ["g", "int", "x:2", "b", "int"]], ["top"]):([["f", "int", "x:1", "a", "int"], ["g", "int", "x:2", "b", "int"]], ["top", "  /** f (x:1) */\n  f(a: number): number;", "  /** g (x:2) */\n  g(b: number): number;"])
 ([], ["top"]):([], ["top"])
 
 jg_dts_skips(string[][] jg_skips, string[] jg_ls) {
@@ -28,4 +29,5 @@ jg_dts_skips(string[][] jg_skips, string[] jg_ls) {
   }
 } return void;
 ([["g", "why"]], ["top"]):([["g", "why"]], ["top", "// not bound: g -- why (still callable as raw.id_g)"])
+([["g", "why"], ["h", "no"]], ["top"]):([["g", "why"], ["h", "no"]], ["top", "// not bound: g -- why (still callable as raw.id_g)", "// not bound: h -- no (still callable as raw.id_h)"])
 ([], ["top"]):([], ["top"])

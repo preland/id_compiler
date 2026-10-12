@@ -52,6 +52,7 @@ jg_ident(string jg_s) {
     jg_i = jg_i + 1;
   }
 } return string jg_o;
-("jsx"):("jsx")
 ("a-b.c"):("a_b_c")
+("a b"):("a_b")
+("jsx"):("jsx")
 (""):("")

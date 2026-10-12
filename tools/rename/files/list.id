@@ -38,4 +38,5 @@ rename_keep(string[] rename_paths, string rename_directory, string rename_name, 
   }
 } return void;
 ([], "d", "n", 1):(["d/n"], "d", "n", 1)
+(["x"], "d", "n", 1):(["x", "d/n"], "d", "n", 1)
 (["x"], "d", "n", 0):(["x"], "d", "n", 0)

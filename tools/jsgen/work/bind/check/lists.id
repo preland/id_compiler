@@ -6,6 +6,7 @@ jg_note_missing(string jg_nm, string[] jg_exps, string[] jg_ms) {
   }
 } return void;
 ("a", ["id_b"], []):("a", ["id_b"], ["a"])
+("a", ["id_b"], ["x"]):("a", ["id_b"], ["x", "a"])
 ("b", ["id_b"], ["x"]):("b", ["id_b"], ["x"])
 ("", ["id_b"], []):("", ["id_b"], [])
 

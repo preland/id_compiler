@@ -10,6 +10,7 @@ rename_gather(string[] rename_roots) {
   }
 } return string[] rename_files;
 given rename_test_tree ([".", "sub"]):(["./NAMES.md", "./a.id", "./sub/NOTES.md", "./sub/b.id", "sub/NOTES.md", "sub/b.id"])
+given rename_test_tree (["sub"]):(["sub/NOTES.md", "sub/b.id"])
 ([]):([])
 
 // Renames in every file of a list.

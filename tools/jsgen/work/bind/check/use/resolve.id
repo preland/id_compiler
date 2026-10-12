@@ -24,10 +24,10 @@ jg_import_take(string jg_mod, string jg_nm, string[] jg_rows, string[][] jg_ub, 
     jg_import_note(jg_nm, jg_rows, jg_ub);
   }
 } return void;
-("wasi_snapshot_preview1", "fd_write", [], [[], [], [], []], []):("wasi_snapshot_preview1", "fd_write", [], [[], [], [], []], [])
 ("env", "id_x", ["x\tb\tb.mjs"], [[], [], [], []], []):("env", "id_x", ["x\tb\tb.mjs"], [["x"], ["b"], ["b"], ["b.mjs"]], [])
 ("env", "id_x", [], [[], [], [], []], []):("env", "id_x", [], [[], [], [], []], ["the module imports env.id_x (native 'x') but no backend with a wasm_js module declares it; add `string wasm_js = \"FILE.mjs\";` to that backend's backend.id (docs/INTEROP.md, \"id and JavaScript\")"])
 ("host", "id_x", ["x\tb\tb.mjs"], [[], [], [], []], []):("host", "id_x", ["x\tb\tb.mjs"], [[], [], [], []], ["the module imports host.id_x, which nothing here can answer"])
+("wasi_snapshot_preview1", "fd_write", [], [[], [], [], []], []):("wasi_snapshot_preview1", "fd_write", [], [[], [], [], []], [])
 
 jg_imports_all(string[] jg_mods, string[] jg_names, string[] jg_rows, string[][] jg_ub, string[] jg_errs) {
   int jg_i = 0;

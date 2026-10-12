@@ -19,5 +19,6 @@ jg_be_all(string[] jg_bks, string[] jg_jss, string[] jg_bodies, string[] jg_errs
     jg_i = jg_i + 1;
   }
 } return void;
-([], [], [], []):([], [], [], [])
 (["fs"], ["/nonexistent/jg_be.mjs"], [], []):(["fs"], ["/nonexistent/jg_be.mjs"], [], ["/nonexistent/jg_be.mjs must contain `export default function (host) { ... }` returning an object of natives"])
+(["fs", "gs"], ["/nonexistent/jg_be.mjs", "/nonexistent/jg_bf.mjs"], [], []):(["fs", "gs"], ["/nonexistent/jg_be.mjs", "/nonexistent/jg_bf.mjs"], [], ["/nonexistent/jg_be.mjs must contain `export default function (host) { ... }` returning an object of natives"])
+([], [], [], []):([], [], [], [])

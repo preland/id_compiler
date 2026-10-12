@@ -20,6 +20,7 @@ rename_keep_root(string[] rename_roots, string rename_argument) {
   }
 } return void;
 ([], "a"):(["a"], "a")
+(["a"], "b"):(["a", "b"], "b")
 (["a"], "--x"):(["a"], "--x")
 
 // What is wrong with the argument at an index, or "": an option that does not

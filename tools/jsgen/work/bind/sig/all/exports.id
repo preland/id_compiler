@@ -22,4 +22,5 @@ jg_derive(string[][] jg_defs, string[] jg_exps, string[][] jg_sigs, string[][] j
   }
 } return void;
 ([["f", "int", "x:1"], ["g", "void", "x:2", "string s"]], ["id_alloc", "id_g", "memory", "id_f", "id_zz"], [], []):([["f", "int", "x:1"], ["g", "void", "x:2", "string s"]], ["id_alloc", "id_g", "memory", "id_f", "id_zz"], [["g", "void", "x:2", "s", "string"], ["f", "int", "x:1"]], [["zz", "no definition of it was found in the project's source files"]])
+([], ["id_g"], [], []):([], ["id_g"], [], [["g", "no definition of it was found in the project's source files"]])
 ([], ["id_alloc"], [], []):([], ["id_alloc"], [], [])

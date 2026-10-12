@@ -40,5 +40,6 @@ jg_read_nat(string[] jg_cf, string[][] jg_in, string[] jg_errs) {
   }
 } return void;
 given jg_t_proj (["", "", (import jg_t_map), "", "", ""], [[], [], [], []], []):(["", "", (import jg_t_map), "", "", ""], [[], [], [], [(import jg_t_row)]], [])
+given jg_t_proj (["", "", (import jg_t_map), "", "", ""], [[], [], [], ["pre"]], []):(["", "", (import jg_t_map), "", "", ""], [[], [], [], ["pre", (import jg_t_row)]], [])
 (["", "", "/nonexistent/jg.map", "", "", ""], [[], [], [], []], []):(["", "", "/nonexistent/jg.map", "", "", ""], [[], [], [], []], [])
 (["", "", "", "", "", ""], [[], [], [], []], []):(["", "", "", "", "", ""], [[], [], [], []], [])

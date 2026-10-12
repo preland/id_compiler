@@ -7,9 +7,9 @@ jg_usage_err(string[] jg_cf, string[] jg_errs) {
     push(jg_errs, (import jg_usage));
   }
 } return void;
-(["a.wasm", "g.mjs", "", "", "", ""], []):(["a.wasm", "g.mjs", "", "", "", ""], [])
 (["", "g.mjs", "", "", "", ""], []):(["", "g.mjs", "", "", "", ""], ["usage: jsgen --wasm FILE --glue glue.mjs [--natives MAP] [--out PREFIX] [--strict 1] [--names A,B] --src FILE..."])
 (["a.wasm", "", "", "", "", ""], ["x"]):(["a.wasm", "", "", "", "", ""], ["x", "usage: jsgen --wasm FILE --glue glue.mjs [--natives MAP] [--out PREFIX] [--strict 1] [--names A,B] --src FILE..."])
+(["a.wasm", "g.mjs", "", "", "", ""], []):(["a.wasm", "g.mjs", "", "", "", ""], [])
 
 jg_read_src(string[] jg_sl, string[][] jg_defs, string[] jg_errs) {
   string jg_unr = "";

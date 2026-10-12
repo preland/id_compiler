@@ -31,9 +31,9 @@ rename_vocab_problems(string[] rename_old_names, string[] rename_news, string re
 } chain (string[] rename_old_names, string[] rename_news, string rename_words_directory, string[] rename_problems) {
   list_string_extend(rename_problems, rename_map_problems(rename_old_names, rename_news, rename_word_keys, rename_word_used));
 } return void;
-given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "") (["x"], ["alpha"], ".", []):(["x"], ["alpha"], ".", [])
 given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "") (["x"], ["gamma"], ".", []):(["x"], ["gamma"], ".", ["x -> gamma: the new name is not spelled in words (E0311): gamma"])
 (["x"], ["alpha"], "/nonexistent/rename_words", []):(["x"], ["alpha"], "/nonexistent/rename_words", ["no words could be read from /nonexistent/rename_words (english.txt, allowed.txt)", "x -> alpha: the new name is not spelled in words (E0311): alpha"])
+given rename_test_scratch("english.txt", "alpha\nbeta\n", "allowed.txt", "") (["x"], ["alpha"], ".", []):(["x"], ["alpha"], ".", [])
 
 // Notes that the vocabulary is empty, which means its two files could not be read.
 rename_vocab_note(string[] rename_problems, int[] rename_word_count, string rename_words_directory) {
@@ -42,4 +42,5 @@ rename_vocab_note(string[] rename_problems, int[] rename_word_count, string rena
   }
 } return void;
 ([], [0], "d"):(["no words could be read from d (english.txt, allowed.txt)"], [0], "d")
+(["p"], [0], "d"):(["p", "no words could be read from d (english.txt, allowed.txt)"], [0], "d")
 (["p"], [3], "d"):(["p"], [3], "d")
