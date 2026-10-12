@@ -9,8 +9,9 @@ c_esc(string t) {
     i = i + 1;
   }
 } return string out;
-("hi"):("hi")
+("x?y"):("x\\?y")
 ("a\"b"):("a\\\"b")
+("hi"):("hi")
 
 esc_at(string t, int i) {
   int ch = character_code_at(t, i);

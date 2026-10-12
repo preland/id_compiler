@@ -10,5 +10,7 @@ emit_capture_pre2(int ci) {
 } chain (int ci) {
   emit_when(cap_calls_pre, (import c_cap_calls_pre));
 } return void;
+given print_fixture ((import fixture_ci)):() then calls emit_when:[2]
+given eprints_post_fixture ((import fixture_ci)):() then prints:("    idtc_eprint_target = tmpfile();\n")
 given case_fixture ((import fixture_ci)):() then prints:("")
 given case_fixture (5):() then prints:("")

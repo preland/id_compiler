@@ -5,9 +5,10 @@ emit_capture_post(int ci) {
   emit_cap_post(ci, "thenprints", (import c_cap_out_post), "out", "a prints");
   emit_capture_post2(ci);
 } return void;
+given print_fixture ((import fixture_ci)):() then calls emit_capture_post2:[1]
+given print_fixture ((import fixture_ci)):() then prints:("    fflush(stdout);\n    dup2(idtc_out_save, 1);\n    close(idtc_out_save);\n    long idtc_out_len = ftell(idtc_out_tmp);\n    fseek(idtc_out_tmp, 0, SEEK_SET);\n    char* idtc_out_buf = malloc((size_t)idtc_out_len + 1);\n    if (idtc_out_len > 0) { size_t idtc_out_rd = fread(idtc_out_buf, 1, (size_t)idtc_out_len, idtc_out_tmp); (void)idtc_out_rd; }\n    idtc_out_buf[idtc_out_len] = 0;\n    fclose(idtc_out_tmp);\n    if ((long)strlen(idtc_out_buf) != idtc_out_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which a prints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where[0], idtc_call[0]);\n        return 3;\n    }\n")
 given case_fixture ((import fixture_ci)):() then prints:("")
 given case_fixture (5):() then prints:("")
-given print_fixture ((import fixture_ci)):() then prints:("    fflush(stdout);\n    dup2(idtc_out_save, 1);\n    close(idtc_out_save);\n    long idtc_out_len = ftell(idtc_out_tmp);\n    fseek(idtc_out_tmp, 0, SEEK_SET);\n    char* idtc_out_buf = malloc((size_t)idtc_out_len + 1);\n    if (idtc_out_len > 0) { size_t idtc_out_rd = fread(idtc_out_buf, 1, (size_t)idtc_out_len, idtc_out_tmp); (void)idtc_out_rd; }\n    idtc_out_buf[idtc_out_len] = 0;\n    fclose(idtc_out_tmp);\n    if ((long)strlen(idtc_out_buf) != idtc_out_len) {\n        fprintf(stderr, \"%s: test failed: %s wrote a NUL byte, which a prints clause cannot match: it compares string literals, and a string cannot hold one; check the bytes with a then check function instead\\n\", idtc_where[0], idtc_call[0]);\n        return 3;\n    }\n")
 
 
 // print_fixture's thenprints node plus a theneprints one on the same case, for

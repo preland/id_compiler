@@ -6,6 +6,8 @@ emit_rec_defs() {
   int i = 0;
   emit_rec_scan(i);
 } return void;
+given calls_node_fixture ():() then calls emit_rec_scan:[1]
+given fn_fixture ():() then calls emit_rec_scan:[1]
 given fn_fixture ():() then prints:("")
 given calls_node_fixture ():() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic long long idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_kept = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\nstatic void idtc_rec_fx_target(int x) {\n    if (!idtc_rec_on) return;\n    long long idtc_rs = idtc_rec_seq++;\n    idtc_rc_fx_target_n++;\n    if (idtc_rc_fx_target_kept == IDTC_REC_MAX) return;\n    if (idtc_rc_fx_target_kept == idtc_rc_fx_target_cap) {\n        idtc_rc_fx_target_cap = idtc_rc_fx_target_cap ? idtc_rc_fx_target_cap * 2 : 8;\n        idtc_rc_fx_target_buf = idtc_rec_grow(idtc_rc_fx_target_buf, sizeof(idtc_rc_fx_target_t), idtc_rc_fx_target_cap);\n        idtc_rc_fx_target_seq = idtc_rec_grow(idtc_rc_fx_target_seq, sizeof(long long), idtc_rc_fx_target_cap);\n    }\n    idtc_rc_fx_target_buf[idtc_rc_fx_target_kept].x = x; \n    idtc_rc_fx_target_seq[idtc_rc_fx_target_kept] = idtc_rs;\n    idtc_rc_fx_target_kept++;\n}\n")
 
@@ -15,6 +17,8 @@ emit_rec_scan(int i) {
     i = i + 1;
   }
 } return void;
+given calls_node_fixture (0):() then calls emit_rec_at:[1]
+given calls_node_fixture (1):() then calls emit_rec_at:[0]
 given fn_fixture (0):() then prints:("")
 given fn_fixture (1):() then prints:("")
 
@@ -25,5 +29,7 @@ emit_rec_at(int i) {
     emit_rec_def(nm, fn);
   }
 } return void;
+given calls_node_fixture (0):() then calls emit_rec_def:[1]
+given calls_node_fixture (0):() then calls is_rec_target:[1]
 given fn_fixture (0):() then prints:("")
 given calls_node_fixture (0):() then prints:("typedef struct { int x; int idtc_rc_pad; } idtc_rc_fx_target_t;\nstatic long long idtc_rc_fx_target_n = 0;\nstatic int idtc_rc_fx_target_kept = 0;\nstatic int idtc_rc_fx_target_cap = 0;\nstatic idtc_rc_fx_target_t* idtc_rc_fx_target_buf = NULL;\nstatic long long* idtc_rc_fx_target_seq = NULL;\nstatic void idtc_rec_fx_target(int x) {\n    if (!idtc_rec_on) return;\n    long long idtc_rs = idtc_rec_seq++;\n    idtc_rc_fx_target_n++;\n    if (idtc_rc_fx_target_kept == IDTC_REC_MAX) return;\n    if (idtc_rc_fx_target_kept == idtc_rc_fx_target_cap) {\n        idtc_rc_fx_target_cap = idtc_rc_fx_target_cap ? idtc_rc_fx_target_cap * 2 : 8;\n        idtc_rc_fx_target_buf = idtc_rec_grow(idtc_rc_fx_target_buf, sizeof(idtc_rc_fx_target_t), idtc_rc_fx_target_cap);\n        idtc_rc_fx_target_seq = idtc_rec_grow(idtc_rc_fx_target_seq, sizeof(long long), idtc_rc_fx_target_cap);\n    }\n    idtc_rc_fx_target_buf[idtc_rc_fx_target_kept].x = x; \n    idtc_rc_fx_target_seq[idtc_rc_fx_target_kept] = idtc_rs;\n    idtc_rc_fx_target_kept++;\n}\n")

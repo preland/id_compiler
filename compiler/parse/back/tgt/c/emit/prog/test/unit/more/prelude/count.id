@@ -25,6 +25,7 @@ emit_count(string ind) {
     print(ind + "id_ctr_time++;");
   }
 } return void;
-given harn_init (" "):() then prints:("")
 given entry_fixture_harn (" "):() then prints:(" id_ctr_time++;\n")
+given entry_fixture_harn ("    "):() then prints:("    id_ctr_time++;\n")
+given harn_init (" "):() then prints:("")
 

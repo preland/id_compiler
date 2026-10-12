@@ -9,5 +9,7 @@ emit_capture_pre(int ci) {
   emit_when(cap_out_pre, (import c_cap_out_pre));
   emit_capture_pre2(ci);
 } return void;
+given print_fixture ((import fixture_ci)):() then calls emit_when:[3]
+given print_fixture ((import fixture_ci)):() then calls emit_capture_pre2:[1]
 given case_fixture ((import fixture_ci)):() then prints:("")
 given case_fixture (5):() then prints:("")

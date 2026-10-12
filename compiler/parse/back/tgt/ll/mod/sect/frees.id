@@ -10,6 +10,7 @@ ll_frees() {
   }
 } return void;
 given esc_fm_fix ():() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")
+given esc_fm_fix ():() then calls ll_free_one:[1]
 given full_env ():() then prints:("")
 
 ll_free_one(string nm) {
@@ -20,4 +21,5 @@ ll_free_one(string nm) {
   }
 } return void;
 given esc_fm_fix ("Tr"):() then prints:("@idfrd_Tr = private unnamed_addr constant [7 x i8] c\"S1l@0;\\00\"\ndefine void @idfr_Tr(ptr %p) {\n  call void @id_free_walk(ptr %p, ptr @idfrd_Tr)\n  ret void\n}\n")
+given esc_fm_fix ("Tr"):() then calls esc_desc:[1]
 given esc_fm_fix ("int"):() then prints:("")

@@ -10,6 +10,7 @@ emit_when(int has_it, string cap_text) {
   }
 } return void;
 given case_fixture (1, "x"):() then prints:("x\n")
+given case_fixture (1, "line two"):() then prints:("line two\n")
 given case_fixture (0, "x"):() then prints:("")
 
 emit_cap_post(int ci, string cap_kind, string cap_body, string cap_var, string cap_clause) {

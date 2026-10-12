@@ -22,8 +22,9 @@ emit_case_given(int ci) {
     i = i + 1;
   }
 } return void;
-given casegiven_fixture (0):() then prints:("")
 given casegiven_fixture (1):() then prints:("    id_extra_setup();\n")
+given casegiven_fixture (1):() then calls emit_setup:[1]
+given casegiven_fixture (0):() then prints:("")
 
 // One setup of a case's `given`: `id_NAME();`, or -- when it was written with
 // arguments, `given NAME(LIT, ...)` -- its arguments built at the setup's own

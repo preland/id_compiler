@@ -16,6 +16,7 @@ case_fidx(int ci) {
     j = j + 1;
   }
 } return int n;
-given case_fidx_fixture (1):(1)
 given case_fidx_fixture2 (1):(0)
+given case_fidx_fixture given lset((import casefn), 0, (import fixture_zero)) (1):(0)
+given case_fidx_fixture (1):(1)
 

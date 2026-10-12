@@ -7,6 +7,7 @@ claim_at(int c) {
   }
 } return void;
 given claim_cols_fixture (0):() then prints:("    bad |= idtc_claim((int[]){0}, 1, \"time\", \"O(n)\");\n")
+given claim_dup_fixture (0):() then calls emit_claim:[1]
 given claim_dup_fixture (1):() then prints:("")
 
 // The last of claim_cols_fixture (../more/hit/has.id): the second claim's

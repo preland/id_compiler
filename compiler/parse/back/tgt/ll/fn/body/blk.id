@@ -19,6 +19,7 @@ ll_insn(int id) {
   }
 } return void;
 given ir_fix2 ((import irf_n3)):() then prints:("  %v2 = add i32 5, 5\n")
+given ir_fix2 ((import irf_n3)):() then calls ll_text:[1]
 given ll_main_fixture (0):() then prints:("")
 
 // A block and a function large enough to reach ll_block/ll_insn without

@@ -7,6 +7,7 @@ size_row(int ci) {
   }
 } return void;
 given claim_conscase_fixture (0):() then prints:("    idtc_n[0] = 0;\n")
+given claim_conscase_fixture (0):() then calls case_size:[1]
 given case_fixture (0):() then prints:("")
 
 case_size(int ci) {
@@ -27,5 +28,6 @@ case_claims(int ci) {
     j = j + 1;
   }
 } return int r;
-given case_fixture (0):(0)
 given claim_conscase_fixture (0):(1)
+given claim_cols_fixture (0):(2)
+given case_fixture (0):(0)

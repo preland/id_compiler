@@ -12,6 +12,7 @@ emit_case_expd(int ci) {
   }
 } return void;
 given wrap_fixture (0):() then prints:("    int idtc_e0 = 0;\n")
+given wrap_fixture (0):() then calls emit_expd_decl:[1]
 given void_call_fixture (1):() then prints:("")
 
 // A `traps` case's whole point is that the call does not return, so if this

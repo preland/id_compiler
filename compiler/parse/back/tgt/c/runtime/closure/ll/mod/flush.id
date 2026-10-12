@@ -16,8 +16,9 @@ fv_ll_flush() {
     i = i + 1;
   }
 } return void;
-given clo_fixture ():() then prints:("")
+given clo_seeded ():() then calls fv_ll_def:[1]
 given clo_seeded ():() then prints:("declare ptr @id_fn_plain(ptr, ptr)\ndeclare ptr @id_clo_make(ptr, i32)\ndeclare ptr @id_clo_set(ptr, i32, i64)\ndeclare ptr @id_clo_copy(ptr)\ndeclare ptr @id_fn_raw(ptr)\ndeclare ptr @id_clo_fn(ptr)\ndeclare i64 @id_clo_cell(ptr, i32)\ndefine i32 @idfn_a_fx_target__0(ptr %c, i32 %a0) {\n  %r = call i32 @id_fx_target(i32 %a0)\n  ret i32 %r\n}\n")
+given clo_fixture ():() then prints:("")
 
 fv_ll_def(string name, int nd) {
   int fn = fn_node_of(name);
