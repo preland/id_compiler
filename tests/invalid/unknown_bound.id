@@ -1,0 +1,6 @@
+// EXPECT: unknown bound 'O(n^3)'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2) [E0507]
+twice(int x) {
+  int y = x * 2;
+} return int y;
+(1):(2)[time:O(n^3)]
+(2):(4)

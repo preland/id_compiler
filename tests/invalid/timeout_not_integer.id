@@ -1,4 +1,4 @@
-// EXPECT: timeout's value must be a positive integer literal
+// EXPECT: timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '"5"' [E0511]
 grab() {
   string s = read_all();
 } return string s;

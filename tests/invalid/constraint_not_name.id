@@ -1,0 +1,6 @@
+// EXPECT: expected 'time' or 'mem', found '5' [E0508]
+twice(int x) {
+  int y = x * 2;
+} return int y;
+(1):(2)[5:O(n)]
+(2):(4)

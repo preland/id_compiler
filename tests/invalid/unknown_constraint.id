@@ -1,0 +1,6 @@
+// EXPECT: unknown constraint 'cpu'; a case constrains 'time' or 'mem' [E0508]
+twice(int x) {
+  int y = x * 2;
+} return int y;
+(1):(2)[cpu:O(n)]
+(2):(4)

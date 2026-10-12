@@ -1,4 +1,4 @@
-// EXPECT: 'timeout N' comes after every 'given' and 'stdin' of a case
+// EXPECT: 'timeout N' comes after every 'given' and 'stdin' of a case and just before its argument tuple; move it to follow them [E0512]
 grab() {
   string s = read_all();
 } return string s;

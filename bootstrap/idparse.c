@@ -17786,11 +17786,11 @@ void id_case_given(IdList* pos) {
             stdin_e = id_parse_str(pos);
         } else {
             cur_text_v = id_cur_text(pos);
-            id_syn_err(pos, id_concat_f(id_concat(ID_S("stdin's value must be a string literal, found '"), cur_text_v), ID_S("'"), 1));
+            id_syn_diag(pos, ID_S("E0509"), id_concat_f(id_concat(ID_S("stdin's value must be a string literal, found '"), cur_text_v), ID_S("'"), 1), cur_text_v, ID_S("stdin is handed to the program as bytes before the call, so a case writes it out as a string in place"), ID_S("write the input as a string literal, as in: stdin \"hello\" ():(\"hello\")"));
         }
     }
     if (((strcmp(id_cur_kind(pos), ID_S("kw")) == 0) && (strcmp(id_cur_text(pos), ID_S("stdin")) == 0))) {
-        id_syn_err(pos, ID_S("a case may have at most one 'stdin' clause"));
+        id_syn_diag(pos, ID_S("E0510"), ID_S("a case may have at most one 'stdin' clause"), ID_S("stdin"), ID_S("a case feeds its program one input, and a second clause would have to replace the first or be ignored"), ID_S("join the two inputs into one string, or split the case in two"));
     }
     id_list_push(casestdin, (long long)(stdin_e));
     has_tm = 0;
@@ -17804,19 +17804,19 @@ void id_case_given(IdList* pos) {
         secs_v = id_to_int(secs_txt);
     }
     if (((has_tm == 1) && (secs_v < 1))) {
-        id_syn_err(pos, id_concat_f(id_concat(ID_S("timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '"), secs_txt), ID_S("'"), 1));
+        id_syn_diag(pos, ID_S("E0511"), id_concat_f(id_concat(ID_S("timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '"), secs_txt), ID_S("'"), 1), secs_txt, ID_S("the limit counts whole seconds, and zero, a negative number or a non-number would leave the case no time to run"), ID_S("write a positive whole number of seconds, as in 'timeout 90'"));
     }
     if ((secs_v > 0)) {
         id_advance(pos);
     }
     if (((strcmp(id_cur_kind(pos), ID_S("kw")) == 0) && (strcmp(id_cur_text(pos), ID_S("timeout")) == 0))) {
-        id_syn_err(pos, ID_S("a case may have at most one 'timeout' clause; keep the one number of seconds it needs and delete the other"));
+        id_syn_diag(pos, ID_S("E0510"), ID_S("a case may have at most one 'timeout' clause; keep the one number of seconds it needs and delete the other"), ID_S("timeout"), ID_S("a case has one time limit, and a second clause would have to replace the first or be ignored"), ID_S("keep the one number of seconds the case needs and delete the other clause"));
     }
     if ((((has_tm == 1) && (strcmp(id_cur_kind(pos), ID_S("kw")) == 0)) && ((strcmp(id_cur_text(pos), ID_S("given")) == 0) || (strcmp(id_cur_text(pos), ID_S("stdin")) == 0)))) {
-        id_syn_err(pos, ID_S("'timeout N' comes after every 'given' and 'stdin' of a case and just before its argument tuple; move it to follow them"));
+        id_syn_diag(pos, ID_S("E0512"), ID_S("'timeout N' comes after every 'given' and 'stdin' of a case and just before its argument tuple; move it to follow them"), id_cur_text(pos), ID_S("a case reads its clauses in a fixed order, setup first and the limit last, so the limit sits directly before the arguments"), ID_S("move 'timeout N' after the 'given' and 'stdin' clauses, directly before the '(' of the arguments"));
     }
     if ((((secs_v > 0) && (strcmp(id_cur_kind(pos), ID_S("kw")) != 0)) && (strcmp(id_cur_text(pos), ID_S("(")) != 0))) {
-        id_syn_err(pos, ID_S("'timeout N' must be followed by the case's argument tuple, as in 'timeout 90 (1):(2)'; write it before the '(' that opens the arguments, not after the expected values"));
+        id_syn_diag(pos, ID_S("E0513"), ID_S("'timeout N' must be followed by the case's argument tuple, as in 'timeout 90 (1):(2)'; write it before the '(' that opens the arguments, not after the expected values"), id_cur_text(pos), ID_S("the limit belongs to the case it precedes, and a case begins at its argument tuple, so a limit with no tuple after it limits nothing"), ID_S("write 'timeout N' before the '(' that opens the arguments, as in 'timeout 90 (1):(2)'"));
     }
     id_list_push(casetimeout, (long long)(secs_v));
     return;
@@ -18163,14 +18163,14 @@ void id_eat_colon(IdList* pos) {
 }
 
 void id_check_lit(int e) {
-    char* cur_file_v;
-    int ln;
+    char* lit_loc = NULL;
     if ((id_is_lit(e) == 0)) {
-        cur_file_v = id_cur_file();
-        ln = (int)(id_list_get(nline, e));
-        id_syn_err_tail(cur_file_v, ln, ID_S("a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))"));
+char* idsq_24;
+        { char* idfe_o = lit_loc; lit_loc = (idsq_24 = id_cur_file(), id_concat_f(id_concat(idsq_24, ID_S(":")), id_str_of_int((int)(id_list_get(nline, e))), 3)); id_str_free(idfe_o); }
+        id_diag(ID_S("E0506"), lit_loc, ID_S("a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))"), ID_S(""), ID_S("a case is checked before any variable or call exists, so each value in it must be written out in full"), ID_S("write the value itself, as in (3, \"a\"):(7), or build it in a function named by 'given'"));
+        id_lset(synfail, 0, 1);
     }
-    return;
+    { id_str_free(lit_loc); return; }
 }
 
 int id_is_lit(int e) {
@@ -18220,16 +18220,16 @@ char* id_bound_close(IdList* pos, char* bt, char* parts) {
 
 void id_bound_check(IdList* pos, char* so) {
     if ((id_str_in(bigo_words, so) == 0)) {
-        id_syn_err(pos, id_concat_f(id_concat(ID_S("unknown bound '"), so), ID_S("'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2)"), 1));
+        id_syn_diag(pos, ID_S("E0507"), id_concat_f(id_concat(ID_S("unknown bound '"), so), ID_S("'; the bounds a case may claim are O(1), O(log n), O(n), O(n log n), O(n^2)"), 1), so, ID_S("a bound is checked by counting steps at two input sizes, and only these five growth rates have a counted check"), ID_S("claim the nearest bound from the list, as in [time:O(n)]"));
     }
     return;
 }
 
 void id_cons_kind(IdList* pos, char* ck) {
     if ((strcmp(id_cur_kind(pos), ID_S("ident")) != 0)) {
-        id_syn_err(pos, id_concat_f(id_concat(ID_S("expected 'time' or 'mem', found '"), ck), ID_S("'"), 1));
+        id_syn_diag(pos, ID_S("E0508"), id_concat_f(id_concat(ID_S("expected 'time' or 'mem', found '"), ck), ID_S("'"), 1), ck, ID_S("a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')"), ID_S("write [time:O(n)] or [mem:O(1)]; separate two claims with a comma"));
     } else if (((strcmp(ck, ID_S("time")) != 0) && (strcmp(ck, ID_S("mem")) != 0))) {
-        id_syn_err(pos, id_concat_f(id_concat(ID_S("unknown constraint '"), ck), ID_S("'; a case constrains 'time' or 'mem'"), 1));
+        id_syn_diag(pos, ID_S("E0508"), id_concat_f(id_concat(ID_S("unknown constraint '"), ck), ID_S("'; a case constrains 'time' or 'mem'"), 1), ck, ID_S("a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')"), ID_S("write [time:O(n)] or [mem:O(1)]; separate two claims with a comma"));
     }
     return;
 }

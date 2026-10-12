@@ -1,13 +1,13 @@
 // A claim is about `time` or `mem`. idc.py's wording for both mistakes.
 cons_kind(int[] pos, string ck) {
   if(cur_kind(pos) != "ident") {
-    syn_err(pos, "expected 'time' or 'mem', found '" + ck + "'");
+    syn_diag(pos, "E0508", "expected 'time' or 'mem', found '" + ck + "'", ck, "a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')", "write [time:O(n)] or [mem:O(1)]; separate two claims with a comma");
   } else if(ck != "time" && ck != "mem") {
-    syn_err(pos, "unknown constraint '" + ck + "'; a case constrains 'time' or 'mem'");
+    syn_diag(pos, "E0508", "unknown constraint '" + ck + "'; a case constrains 'time' or 'mem'", ck, "a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')", "write [time:O(n)] or [mem:O(1)]; separate two claims with a comma");
   }
 } return void;
 given toks_env(["ident"], ["time"]) ([0], "time"):() then prints:("")
-given toks_env(["ident"], ["time"]) ([0], "bogus"):() then prints:("<stdin>:1: error: unknown constraint 'bogus'; a case constrains 'time' or 'mem'\n")
+given toks_env(["ident"], ["time"]) ([0], "bogus"):() then prints:("<stdin>:1: error: unknown constraint 'bogus'; a case constrains 'time' or 'mem' [E0508]\n  at: bogus\n  why: a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')\n  help: write [time:O(n)] or [mem:O(1)]; separate two claims with a comma\n")
 
 // One literal int leaf (id 0), for cases/more/lit/kinds.id's leaf_lit
 // true case.

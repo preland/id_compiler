@@ -52,11 +52,11 @@ case_given(int[] pos) {
       stdin_e = parse_str(pos);
     } else {
       string cur_text_v = cur_text(pos);
-      syn_err(pos, "stdin's value must be a string literal, found '" + cur_text_v + "'");
+      syn_diag(pos, "E0509", "stdin's value must be a string literal, found '" + cur_text_v + "'", cur_text_v, "stdin is handed to the program as bytes before the call, so a case writes it out as a string in place", "write the input as a string literal, as in: stdin \"hello\" ():(\"hello\")");
     }
   }
   if(cur_kind(pos) == "kw" && cur_text(pos) == "stdin") {
-    syn_err(pos, "a case may have at most one 'stdin' clause");
+    syn_diag(pos, "E0510", "a case may have at most one 'stdin' clause", "stdin", "a case feeds its program one input, and a second clause would have to replace the first or be ignored", "join the two inputs into one string, or split the case in two");
   }
 } chain (int[] pos) {
   push((import casestdin), stdin_e);
@@ -73,20 +73,20 @@ case_given(int[] pos) {
   }
 } chain (int[] pos) {
   if(has_tm == 1 && secs_v < 1) {
-    syn_err(pos, "timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '" + secs_txt + "'");
+    syn_diag(pos, "E0511", "timeout's value must be a positive integer literal, the case's limit in seconds (as in 'timeout 90'), found '" + secs_txt + "'", secs_txt, "the limit counts whole seconds, and zero, a negative number or a non-number would leave the case no time to run", "write a positive whole number of seconds, as in 'timeout 90'");
   }
   if(secs_v > 0) {
     advance(pos);
   }
   if(cur_kind(pos) == "kw" && cur_text(pos) == "timeout") {
-    syn_err(pos, "a case may have at most one 'timeout' clause; keep the one number of seconds it needs and delete the other");
+    syn_diag(pos, "E0510", "a case may have at most one 'timeout' clause; keep the one number of seconds it needs and delete the other", "timeout", "a case has one time limit, and a second clause would have to replace the first or be ignored", "keep the one number of seconds the case needs and delete the other clause");
   }
 } chain (int[] pos) {
   if(has_tm == 1 && cur_kind(pos) == "kw" && (cur_text(pos) == "given" || cur_text(pos) == "stdin")) {
-    syn_err(pos, "'timeout N' comes after every 'given' and 'stdin' of a case and just before its argument tuple; move it to follow them");
+    syn_diag(pos, "E0512", "'timeout N' comes after every 'given' and 'stdin' of a case and just before its argument tuple; move it to follow them", cur_text(pos), "a case reads its clauses in a fixed order, setup first and the limit last, so the limit sits directly before the arguments", "move 'timeout N' after the 'given' and 'stdin' clauses, directly before the '(' of the arguments");
   }
   if(secs_v > 0 && cur_kind(pos) != "kw" && cur_text(pos) != "(") {
-    syn_err(pos, "'timeout N' must be followed by the case's argument tuple, as in 'timeout 90 (1):(2)'; write it before the '(' that opens the arguments, not after the expected values");
+    syn_diag(pos, "E0513", "'timeout N' must be followed by the case's argument tuple, as in 'timeout 90 (1):(2)'; write it before the '(' that opens the arguments, not after the expected values", cur_text(pos), "the limit belongs to the case it precedes, and a case begins at its argument tuple, so a limit with no tuple after it limits nothing", "write 'timeout N' before the '(' that opens the arguments, as in 'timeout 90 (1):(2)'");
   }
   push((import casetimeout), secs_v);
 } return void;

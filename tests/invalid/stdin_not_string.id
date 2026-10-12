@@ -1,4 +1,4 @@
-// EXPECT: stdin's value must be a string literal, found '5'
+// EXPECT: stdin's value must be a string literal, found '5' [E0509]
 grab() {
   string s = read_all();
 } return string s;

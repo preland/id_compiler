@@ -8,13 +8,13 @@
 
 check_lit(int e) {
   if(is_lit(e) == 0) {
-    string cur_file_v = cur_file();
-    int ln = (import nline)[e];
-    syn_err_tail(cur_file_v, ln, "a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))");
+    string lit_loc = cur_file() + ":" + (import nline)[e];
+    diag("E0506", lit_loc, "a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))", "", "a case is checked before any variable or call exists, so each value in it must be written out in full", "write the value itself, as in (3, \"a\"):(7), or build it in a function named by 'given'");
+    lset((import synfail), 0, 1);
   }
 } return void;
 given lit_fix (0):() then prints:("")
-given lit_fix (1):() then prints:("<stdin>:0: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2))\n")
+given lit_fix (1):() then prints:("<stdin>:0: error: a test case takes literals only (a number, a string, a list of those, or a struct written as P(1, 2)) [E0506]\n  why: a case is checked before any variable or call exists, so each value in it must be written out in full\n  help: write the value itself, as in (3, \"a\"):(7), or build it in a function named by 'given'\n")
 
 is_lit(int e) {
   int r = leaf_lit(e);

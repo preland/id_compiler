@@ -1,4 +1,4 @@
-// EXPECT: a case may have at most one 'timeout' clause
+// EXPECT: a case may have at most one 'timeout' clause; keep the one number of seconds it needs and delete the other [E0510]
 grab() {
   string s = read_all();
 } return string s;
