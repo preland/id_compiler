@@ -1990,6 +1990,7 @@ char* id_size_leaf(int e);
 char* id_size_neg(int e);
 char* id_size_list(IdList* args);
 char* id_sizes_c(IdList* args);
+char* id_tc_import(int e, char* want);
 char* id_tc_fcells(IdList* xs, char* want);
 char* id_tc_fcell(int e, char* want, int sd_k);
 char* id_tc_other2(int e, char* want);
@@ -2174,6 +2175,7 @@ int id_paren_end(IdList* pos);
 int id_given_has_args(IdList* pos);
 void id_given_call(IdList* pos, char* name, IdList* gs);
 int id_case_list(IdList* pos);
+void id_index_take(IdList* pos, int v);
 char* id_case_fn_name(IdList* pos, char* fn_word);
 int id_at_case_import(IdList* pos);
 int id_next_is_import(IdList* pos);
@@ -3221,6 +3223,7 @@ void id_report_main(void);
 void id_seg_walk(IdList* body, char* fname, int ln, IdList* acc);
 void id_seg_step(IdList* body, char* fname, int ln, IdList* acc, int i);
 void id_seg_close(char* fname, int ln, IdList* acc, int at_seam, int nxt);
+int id_imp_conf(int ek);
 void id_fit_named(int i, int e, char* want);
 void id_fit_fn(int i, int e, char* want);
 int id_miss_seen(char* nm, int seen);
@@ -3253,6 +3256,9 @@ int id_then_arg_conf(int e);
 void id_fit_then_imp(int chk_node);
 void id_then_fn(int chk_node, char* chk_nm);
 void id_fit_then_traps(int chk_node);
+char* id_then_arg_want(int e, char* pt);
+void id_then_arg_index(int ci, int e);
+void id_then_arg_ix(int ci, int ix);
 void id_then_sig(int ci, int chk_node, int cfn, char* chk_nm);
 void id_then_imp_field(int ci, int chk_node, char* want);
 void id_then_value_fit(int ci, int chk_node, int cfn);
@@ -3290,6 +3296,7 @@ void id_fit_void(int i, int fn, IdList* expd);
 void id_fit_ret(int i, int fn, IdList* expd);
 char* id_list_elem(char* t);
 char* id_then_imp_type(int chk_node);
+char* id_index_text(int e);
 char* id_items_text(IdList* xs);
 char* id_leaf_text(int e);
 char* id_lit_text(int e);
@@ -4311,6 +4318,7 @@ IdList* setupargs;  /* exported by init_cases2() */
 IdList* wrdone;  /* exported by init_cases2() */
 IdList* retexp;  /* exported by init_cases2() */
 IdList* retexp_pend;  /* exported by init_cases2() */
+IdList* ixargs;  /* exported by init_cases2() */
 IdList* afname;  /* exported by init_asm() */
 IdList* aftriple;  /* exported by init_asm() */
 IdList* afparams;  /* exported by init_asm() */
@@ -15656,6 +15664,17 @@ char* id_sizes_c(IdList* args) {
     { id_str_free(parts); return so; }
 }
 
+char* id_tc_import(int e, char* want) {
+    char* so;
+    char* ixc;
+    so = (char*)(intptr_t)(id_list_get(ns1, e));
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0) && ((int)(id_list_get(ni1, e)) > 0))) {
+        ixc = id_tc_value(((int)(id_list_get(ni1, e)) - 1), ID_S("int"));
+        so = id_unbox(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_get("), so), ID_S(", "), 1), ixc, 1), ID_S(")"), 1), want);
+    }
+    return so;
+}
+
 char* id_tc_fcells(IdList* xs, char* want) {
     char* out = NULL;
     int sd_k;
@@ -15725,7 +15744,7 @@ IdList* idsq_10;
 
 char* id_tc_value(int e, char* want) {
     char* so;
-    so = (char*)(intptr_t)(id_list_get(ns1, e));
+    so = id_tc_import(e, want);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) != 0)) {
         so = id_tc_lit(e, want);
     }
@@ -17529,6 +17548,7 @@ int id_case_item(IdList* pos) {
     v = 0;
     if ((id_at_case_import(pos) == 1)) {
         v = id_case_import(pos);
+        id_index_take(pos, v);
         id_import_index(pos, (char*)(intptr_t)(id_list_get(ns1, v)));
     } else {
         v = id_case_value(pos);
@@ -17577,8 +17597,8 @@ int id_case_fn(IdList* pos) {
 }
 
 void id_import_index(IdList* pos, char* name) {
-    if ((strcmp(id_cur_text(pos), ID_S("[")) == 0)) {
-        id_syn_err(pos, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("an indexed export, (import "), name), ID_S(")[...], is not accepted as an argument of a case or of a check; an argument is a literal or (import "), 1), name, 1), ID_S(") whole, and to check one element write 'then (import "), 1), name, 1), ID_S(")[i]:(value)'"), 1));
+    if (((strcmp(id_cur_text(pos), ID_S("[")) == 0) && ((int)(id_list_get(ixargs, 0)) == 0))) {
+        id_syn_err(pos, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("an indexed export, (import "), name), ID_S(")[...], is accepted only as an argument of a then check, as in 'then f((import "), 1), name, 1), ID_S(")[1]):(value)'; a case or a given setup takes (import "), 1), name, 1), ID_S(") whole, and to check one element write 'then (import "), 1), name, 1), ID_S(")[i]:(value)'"), 1));
         id_skip_index(pos);
     }
     return;
@@ -17648,6 +17668,16 @@ int id_case_list(IdList* pos) {
     id_advance(pos);
     ret_i = id_node_arr(items);
     return ret_i;
+}
+
+void id_index_take(IdList* pos, int v) {
+    if (((strcmp(id_cur_text(pos), ID_S("[")) == 0) && ((int)(id_list_get(ixargs, 0)) == 1))) {
+        id_advance(pos);
+IdList* idsq_15;
+        (idsq_15 = ni1, id_lset(idsq_15, v, (id_case_item(pos) + 1)));
+        id_eat_text(pos, ID_S("]"));
+    }
+    return;
 }
 
 char* id_case_fn_name(IdList* pos, char* fn_word) {
@@ -17765,7 +17795,9 @@ IdList* id_then_args(IdList* pos) {
     IdList* targs = NULL;
     { IdList* idfe_o = targs; targs = id_list_lit(0); id_list_free(idfe_o); }
     if ((strcmp(id_cur_text(pos), ID_S("(")) == 0)) {
+        id_lset(ixargs, 0, 1);
         { IdList* idfe_o = targs; targs = id_case_tuple(pos); id_list_free(idfe_o); }
+        id_lset(ixargs, 0, 0);
     }
     return targs;
 }
@@ -18195,6 +18227,7 @@ void id_init_cases2(void) {
     retexp = id_list_lit(0);
     retexp_pend = id_list_lit(0);
     id_vocab_init();
+    ixargs = id_list_lit(1, (long long)(0));
     return;
 }
 
@@ -28492,6 +28525,17 @@ char* idsq_31;
     return;
 }
 
+int id_imp_conf(int ek) {
+    int is_conf;
+    is_conf = 0;
+    if ((ek >= 0)) {
+        if ((strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), ID_S("conf.id")) == 0)) {
+            is_conf = 1;
+        }
+    }
+    return is_conf;
+}
+
 void id_fit_named(int i, int e, char* want) {
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cfn")) == 0)) {
         id_fit_fn(i, e, want);
@@ -28528,7 +28572,7 @@ void id_fit_import(int i, int e, char* want) {
     int ek;
     imp_nm = (char*)(intptr_t)(id_list_get(ns1, e));
     ek = id_find_str(enames, imp_nm);
-    if ((strcmp((char*)(intptr_t)(id_list_get(casegiven, i)), ID_S("")) == 0)) {
+    if (((strcmp((char*)(intptr_t)(id_list_get(casegiven, i)), ID_S("")) == 0) && (id_imp_conf(ek) == 0))) {
         id_case_err(i, id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(") needs a 'given': an export has no value in a case until a setup has run; a setup's own arguments are read before it runs, so an (import NAME) there needs an earlier 'given' that sets it"), 1));
     } else if ((ek < 0)) {
         id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S("): '"), 1), imp_nm, 1), ID_S("' is not an exported variable"), 1));
@@ -28539,9 +28583,9 @@ void id_fit_import(int i, int e, char* want) {
 }
 
 void id_imp_owner(int i, char* imp_nm, int ek, char* want) {
-    if ((strcmp((char*)(intptr_t)(id_list_get(eowners, ek)), ID_S("conf.id")) == 0)) {
-        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(") is a conf.id constant, and a case names one only as a then check's index, as in then (import tbl)[(import "), 1), imp_nm, 1), ID_S(")]:(value); write its value here as a literal"), 1));
-    } else if ((id_setups_miss((char*)(intptr_t)(id_list_get(casegiven, i)), ek) == 1)) {
+    if (((id_imp_conf(ek) == 1) && ((int)(id_list_get(setupargs, 0)) == 0))) {
+        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S(") is a conf.id constant, and a case's own argument or expected value cannot name one: a conf.id constant is accepted as an argument of a given setup, as in given f((import "), 1), imp_nm, 1), ID_S(")), as an argument of a then check, as in then g((import "), 1), imp_nm, 1), ID_S(")):(value), and as a then check's index; write its value here as a literal"), 1));
+    } else if (((id_imp_conf(ek) == 0) && (id_setups_miss((char*)(intptr_t)(id_list_get(casegiven, i)), ek) == 1))) {
 IdList* idsq_43;
 char* idsq_41;
         (idsq_43 = eowners, idsq_41 = (char*)(intptr_t)(id_list_get(idsq_43, ek)), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), imp_nm), ID_S("): '"), 1), imp_nm, 1), ID_S("' is exported by '"), 1), idsq_41, 1), ID_S("', which the setup '"), 1), id_str_trim((char*)(intptr_t)(id_list_get(casegiven, i))), 3), ID_S("' does not reach, so nothing sets it before the call"), 1)));
@@ -28832,12 +28876,11 @@ IdList* idsq_19;
 void id_then_arg_value(int ci, int e, char* pt) {
     int is_conf;
     is_conf = id_then_arg_conf(e);
-    if ((is_conf == 1)) {
-IdList* idsq_21;
-char* idsq_19;
-        (idsq_21 = ns1, idsq_19 = (char*)(intptr_t)(id_list_get(idsq_21, e)), id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), idsq_19), ID_S(") is a conf.id constant, and a check's argument cannot name one: a conf.id constant is accepted only as a then check's index, as in then (import tbl)[(import "), 1), (char*)(intptr_t)(id_list_get(ns1, e)), 1), ID_S(")]:(value); write its value as a literal, as in then f(5):(value)"), 1)));
-    } else {
-        id_fit_value(ci, e, pt);
+    id_lset(setupargs, 0, (2 * is_conf));
+    id_fit_value(ci, e, id_then_arg_want(e, pt));
+    id_lset(setupargs, 0, 0);
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0)) {
+        id_then_arg_index(ci, e);
     }
     return;
 }
@@ -28909,6 +28952,33 @@ void id_fit_then_traps(int chk_node) {
     } else {
         id_fit_value(ci, (int)(id_list_get(items, 0)), ID_S("string"));
     }
+    return;
+}
+
+char* id_then_arg_want(int e, char* pt) {
+    char* want;
+    want = pt;
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0) && ((int)(id_list_get(ni1, e)) > 0))) {
+        want = id_concat(pt, ID_S("[]"));
+    }
+    return want;
+}
+
+void id_then_arg_index(int ci, int e) {
+    int ix;
+    ix = ((int)(id_list_get(ni1, e)) - 1);
+    if ((((ix >= 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, ix)), ID_S("cimport")) == 0)) && (id_then_arg_conf(ix) == 0))) {
+        id_case_err(ci, id_concat_f(id_concat(ID_S("the index of an indexed export in a check is a literal or a conf.id constant, and "), id_lit_text(ix)), ID_S(" is neither; write the index as a literal, as in then f((import NAME)[1]):(value), or name a conf.id constant"), 1));
+    } else if ((ix >= 0)) {
+        id_then_arg_ix(ci, ix);
+    }
+    return;
+}
+
+void id_then_arg_ix(int ci, int ix) {
+    id_lset(setupargs, 0, 2);
+    id_fit_value(ci, ix, ID_S("int"));
+    id_lset(setupargs, 0, 0);
     return;
 }
 
@@ -29398,6 +29468,15 @@ char* idsq_36;
     return vt;
 }
 
+char* id_index_text(int e) {
+    char* ixt = NULL;
+    { char* idfe_o = ixt; ixt = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0) && ((int)(id_list_get(ni1, e)) > 0))) {
+        { char* idfe_o = ixt; ixt = id_concat_f(id_concat(ID_S("["), id_lit_text(((int)(id_list_get(ni1, e)) - 1))), ID_S("]"), 1); id_str_free(idfe_o); }
+    }
+    return ixt;
+}
+
 char* id_items_text(IdList* xs) {
     char* lt = NULL;
     int j;
@@ -29415,7 +29494,7 @@ char* id_leaf_text(int e) {
     char* lt;
     lt = (char*)(intptr_t)(id_list_get(ns1, e));
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cimport")) == 0)) {
-        lt = id_concat_f(id_concat(ID_S("(import "), lt), ID_S(")"), 1);
+        lt = id_concat_f(id_concat_f(id_concat(ID_S("(import "), lt), ID_S(")"), 1), id_index_text(e), 3);
     }
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("cctor")) == 0)) {
         lt = id_concat_f(id_concat_f(id_concat(lt, ID_S("(")), id_items_text((IdList*)(intptr_t)(id_list_get(nl1, e))), 3), ID_S(")"), 1);
@@ -33311,7 +33390,7 @@ void id_chk_index2(int id) {
     i2_of_v = (int)(id_list_get(ni2, id));
     it = id_type_of(i2_of_v);
     if (((id_ty_known(it) == 1) && (strcmp(it, ID_S("int")) != 0))) {
-        id_ix_err(id, id_concat(ID_S("array index must be int, got "), it));
+        id_tc_diag(id, ID_S("E0614"), id_concat(ID_S("list index must be int, got "), it), it, ID_S("an index counts elements, so only an int can say which one"), ID_S("use an int index, or convert it first, as in to_int(x)"));
     }
     return;
 }
@@ -33412,7 +33491,7 @@ void id_chk_push2(int id, IdList* args, char* lt) {
     et = id_elem_type(lt);
     if (((id_ty_is_list(lt) == 1) && (id_bad_store(et, (int)(id_list_get(args, 1))) == 1))) {
         type_of_v = id_type_of((int)(id_list_get(args, 1)));
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat(ID_S("cannot push a "), type_of_v), ID_S(" onto a "), 1), lt, 1));
+        id_tc_diag(id, ID_S("E0617"), id_concat_f(id_concat_f(id_concat(ID_S("cannot push a "), type_of_v), ID_S(" onto a "), 1), lt, 1), lt, ID_S("a list holds one element type, and id converts nothing silently"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("push a "), et), ID_S(" value, or declare the list as "), 1), type_of_v, 1), ID_S("[]"), 1));
     }
     id_chk_literal_fit(id, et, (int)(id_list_get(args, 1)));
     return;
@@ -33756,9 +33835,9 @@ void id_cond_kind(int id, char* msg, char* t) {
     if ((strcmp(id_ty_kind(t), ID_S("unit")) == 0)) {
         id_tc_err(id, msg);
     } else if ((strcmp(id_ty_kind(t), ID_S("func")) == 0)) {
-        id_tc_err(id, id_concat_f(id_concat(ID_S("a condition cannot be a function value ("), t), ID_S("); call it, and test what it returns"), 1));
+        id_tc_diag(id, ID_S("E0616"), id_concat_f(id_concat(ID_S("a condition cannot be a function value ("), t), ID_S(")"), 1), t, ID_S("a function value is an address, never zero, so the condition would always hold"), ID_S("call it, and test what it returns"));
     } else if ((strcmp(id_ty_kind(t), ID_S("struct")) == 0)) {
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("a condition cannot be a struct ("), t), ID_S("); test one of its fields, as in "), 1), id_sd_cell(sdfname, t, 0), 1), ID_S(" > 0"), 1));
+        id_tc_diag(id, ID_S("E0616"), id_concat_f(id_concat(ID_S("a condition cannot be a struct ("), t), ID_S(")"), 1), t, ID_S("a struct is a bundle of fields, not a truth"), id_concat_f(id_concat(ID_S("test one of its fields, as in "), id_sd_cell(sdfname, t, 0)), ID_S(" > 0"), 1));
     }
     return;
 }
@@ -36551,7 +36630,7 @@ void id_chk_iassign2(int id, char* bt) {
     char* it;
     it = id_type_of((int)(id_list_get(ni2, id)));
     if (((id_ty_known(it) == 1) && (strcmp(it, ID_S("int")) != 0))) {
-        id_tc_err(id, id_concat(ID_S("list index must be int, got "), it));
+        id_tc_diag(id, ID_S("E0614"), id_concat(ID_S("list index must be int, got "), it), it, ID_S("an index counts elements, so only an int can say which one"), ID_S("use an int index, or convert it first, as in to_int(x)"));
     } else {
         id_chk_iassign3(id, bt);
     }
@@ -37806,7 +37885,7 @@ IdList* idsq_18;
 
 void id_chk_field_at(int id, char* sd_bt, char* sd_f) {
     if ((id_ty_kind_is(sd_bt, ID_S("struct")) == 0)) {
-        id_ix_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot read field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), ID_S("; only a struct has fields (a list's length is len(list))"), 1));
+        id_tc_diag(id, ID_S("E0615"), id_concat_f(id_concat_f(id_concat(ID_S("cannot read field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), sd_f, ID_S("only a struct has fields"), ID_S("read a struct's field, or use len(list) for a list's length"));
     } else if ((id_sd_fpos(sd_bt, sd_f) < 0)) {
         id_ix_err(id, id_sd_nofield(sd_bt, sd_f));
     }
@@ -37856,7 +37935,7 @@ IdList* idsq_18;
 
 void id_chk_fstore_at(int id, char* sd_bt, char* sd_f) {
     if ((id_ty_kind_is(sd_bt, ID_S("struct")) == 0)) {
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot assign field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), ID_S("; only a struct has fields"), 1));
+        id_tc_diag(id, ID_S("E0615"), id_concat_f(id_concat_f(id_concat(ID_S("cannot assign field '"), sd_f), ID_S("' of a "), 1), sd_bt, 1), sd_f, ID_S("only a struct has fields"), ID_S("assign a struct's field, or declare the variable as a struct"));
     } else if ((id_sd_fpos(sd_bt, sd_f) < 0)) {
         ({ char* idft1 = id_sd_nofield(sd_bt, sd_f); id_tc_err(id, idft1); id_str_free(idft1); });
     } else {
@@ -37914,7 +37993,7 @@ void id_chk_declared_type(int id) {
 
 void id_chk_type_known(int id, char* sd_t) {
     if ((id_ty_known(sd_t) == 0)) {
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("unknown type '"), sd_t), ID_S("'; a type is int, word, float, string, a struct declared in a file of its own (structs: "), 1), id_sd_list_text(), 1), ID_S("), or a list of one of those, as in 'int[]'"), 1));
+        id_tc_diag(id, ID_S("E0612"), id_concat_f(id_concat(ID_S("unknown type '"), sd_t), ID_S("'"), 1), sd_t, ID_S("a type is int, word, float, string, a struct declared in a file of its own, or a list of one of those"), id_concat_f(id_concat(ID_S("write one of them (structs: "), id_sd_list_text()), ID_S("), as in 'int[]'"), 1));
     }
     return;
 }
