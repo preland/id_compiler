@@ -1,0 +1,25 @@
+// Three case ranges for in_case / case_first_after: two that share a function
+// node, the way two cases written under one function do, and one later
+// function's. They are (10, 20), (10, 30) and (40, 50).
+
+case_ranges_fixture() {
+  incase_init();
+  case_ranges_rows();
+} return void;
+():() then calls incase_init:[1]
+():() then init_units:(0)
+
+case_ranges_rows() {
+  case_ranges_row(10, 20);
+  case_ranges_row(10, 30);
+  case_ranges_row(40, 50);
+} return void;
+given incase_init ():() then len((import casenode)):(3)
+given incase_init ():() then (import casenode)[2]:(50)
+
+case_ranges_row(int crr_fn, int crr_node) {
+  push((import casefn), crr_fn);
+  push((import casenode), crr_node);
+} return void;
+given incase_init (7, 9):() then (import casefn)[0]:(7)
+given incase_init (7, 9):() then (import casenode)[0]:(9)

@@ -1,0 +1,30 @@
+// in_case (case.id) is asked once per list-literal node, and a program with
+// thousands of cases has tens of thousands of ranges, so it cannot scan them
+// all. casenode is pushed in node order (front/parse/decl/func/cases/collect.id
+// pushes one per case as the parser reaches it, and node ids only grow), and
+// casefn never decreases either, so the one range that can hold a node is the
+// first whose casenode is past it: any later range has a casenode and a casefn
+// at least as large as that range's, so it could only reach the node if the
+// first one did too.
+
+case_first_after(int id) {
+  int cfa_lo = 0;
+  int cfa_hi = len((import casenode));
+  while(cfa_lo < cfa_hi) {
+    if((import casenode)[(cfa_lo + cfa_hi) / 2] > id) {
+      cfa_hi = (cfa_lo + cfa_hi) / 2;
+    } else {
+      cfa_lo = (cfa_lo + cfa_hi) / 2 + 1;
+    }
+  }
+} return int cfa_lo;
+given case_ranges_fixture (5):(0)
+given case_ranges_fixture (19):(0)
+given case_ranges_fixture (20):(1)
+given case_ranges_fixture (29):(1)
+given case_ranges_fixture (30):(2)
+given case_ranges_fixture (49):(2)
+given case_ranges_fixture (50):(3)
+given case_ranges_fixture (100000):(3)
+given incase_fixture (999):(0)
+given incase_fixture (1000):(1)

@@ -19,15 +19,24 @@ given incase_fixture ((import lit_a)):() then (import chkfail)[0]:(0)
 given decltype_fixture ((import decl_list)):() then (import chkfail)[0]:(1)
 
 in_case(int id) {
-  int i = 0;
+  int i = case_first_after(id);
   int ok = 0;
-  while(i < len((import casenode))) {
-    ok = in_case_at(i, id, ok);
-    i = i + 1;
+  if(i < len((import casenode))) {
+    ok = in_case_at(i, id, 0);
   }
 } return int ok;
 given incase_fixture ((import lit_a)):(1)
 given incase_fixture (100000):(0)
+given case_ranges_fixture (5):(0)
+given case_ranges_fixture (10):(0)
+given case_ranges_fixture (11):(1)
+given case_ranges_fixture (19):(1)
+given case_ranges_fixture (20):(1)
+given case_ranges_fixture (29):(1)
+given case_ranges_fixture (30):(0)
+given case_ranges_fixture (40):(0)
+given case_ranges_fixture (45):(1)
+given case_ranges_fixture (50):(0)
 
 in_case_at(int i, int id, int ok) {
   int r = ok;
