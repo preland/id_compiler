@@ -1,4 +1,4 @@
-// EXPECT: 'print' cannot take a list: argument 0 is int[]
+// EXPECT: or build a string from them [E0634]
 main(int argc, string[] argv) {
   int[] xs = [1, 2];
   print(xs);

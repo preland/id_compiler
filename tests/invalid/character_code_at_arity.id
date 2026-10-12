@@ -1,4 +1,4 @@
-// EXPECT: character_code_at takes exactly two arguments
+// EXPECT: character_code_at takes exactly two arguments [E0640]
 main(int argc, string[] argv) {
   int c = character_code_at("hi");
 } return int 0;

@@ -1,4 +1,4 @@
-// EXPECT: 'bind' takes the name of a function and at least one value to capture
+// EXPECT: NAME alone is already a function value [E0639]
 add_to(int n, int x) {
   int r = n + x;
 } return int r;

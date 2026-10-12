@@ -1,4 +1,4 @@
-// EXPECT: 'put' takes a string, but argument 0 is int; write put("" + x)
+// EXPECT: or use print(x), which takes any value and ends the line [E0635]
 main(int argc, string[] argv) {
   put(5);
 } return int 0;

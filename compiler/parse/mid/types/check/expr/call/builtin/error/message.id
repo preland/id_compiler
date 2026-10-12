@@ -4,7 +4,7 @@
 
 bi_arg_err(int id, int i, string want, string t) {
   if(want == "index") {
-    tc_err(id, "character_code_at index must be int, got " + t);
+    tc_diag(id, "E0636", "character_code_at index must be int, got " + t, "character_code_at", "a position in a string is a whole number", "pass an int index, as in character_code_at(s, 0)");
   } else {
     bi_arg_err2(id, i, want, t);
   }
@@ -16,7 +16,7 @@ given bi_mismatch_setup ((import bi_mismatch_call), 0, "list", "int"):() then ca
 // are addresses-or-lengths, and idc.py says so once.
 bi_arg_err2(int id, int i, string want, string t) {
   if(want == "addr") {
-    tc_err(id, "str_of_mem takes an address and a length");
+    tc_diag(id, "E0637", "str_of_mem takes an address and a length, both int: argument " + i + " is " + t, "str_of_mem", "an address and a length are whole numbers, and a string or a list is neither", "pass the address and the length as ints, as in str_of_mem(address, 5)");
   } else {
     bi_arg_err3(id, i, want, t);
   }
@@ -32,7 +32,7 @@ bi_arg_err3(int id, int i, string want, string t) {
   if(want == "word") {
     int[] l1_of_v = (import nl1)[id];
     string s1_of_v = (import ns1)[id];
-    tc_err(l1_of_v[i], s1_of_v + " expects int or word arguments, got " + t);
+    tc_diag(l1_of_v[i], "E0638", s1_of_v + " expects int or word arguments, got " + t, s1_of_v, "it works on whole numbers and unsigned words, and argument " + i + " is " + t, "pass an int or word for argument " + i + ", converting it first if it is text or a float");
   } else {
     string s1_of_v2 = (import ns1)[id];
     string bi_verb_v = bi_verb(want);

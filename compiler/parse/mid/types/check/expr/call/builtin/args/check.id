@@ -20,9 +20,9 @@ chk_bi_arg(int id, int i) {
 } chain (int id, int i) {
   string nm = (import ns1)[id];
   if((nm == "print" || nm == "eprint" || nm == "put") && ty_is_list(t) == 1) {
-    tc_err(id, "'" + nm + "' cannot take a list: argument " + i + " is " + t + "; a list has no text form -- write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them");
+    tc_diag(id, "E0634", "'" + nm + "' cannot take a list: argument " + i + " is " + t + "; a list has no text form -- write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them", nm, "a list has no text form, so there is nothing for " + nm + " to write", "write its elements one at a time, as in " + nm + "(xs[0]) inside a while loop, or build a string from them");
   } else if(nm == "put" && ty_known(t) == 1 && t != "string") {
-    tc_err(id, "'put' takes a string, but argument " + i + " is " + t + "; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line");
+    tc_diag(id, "E0635", "'put' takes a string, but argument " + i + " is " + t + "; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line", "put", "put writes text exactly as given and does not convert", "write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line");
   }
 } return void;
 given call2_setup ((import cm_push_call), 1):() then (import chkfail)[0]:(0)

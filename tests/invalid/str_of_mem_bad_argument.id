@@ -1,0 +1,4 @@
+// EXPECT: str_of_mem takes an address and a length, both int: argument 0 is string [E0637]
+main(int argc, string[] argv) {
+  string s = str_of_mem("no", 2);
+} return int 0;

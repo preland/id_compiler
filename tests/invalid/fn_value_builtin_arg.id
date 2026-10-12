@@ -1,4 +1,4 @@
-// EXPECT: 'print' cannot take a function value: argument 0 is func(int) return void
+// EXPECT: argument 0 is func(int) return void; a function value can only be passed to a function written in id, stored or called [E0633]
 // EXPECT-IDCPY: undefined variable 'tick'
 tick(int n) {
   print(n);

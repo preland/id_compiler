@@ -42,10 +42,10 @@ bi_arity_err(int id) {
   string s1_of_v = (import ns1)[id];
   if(is_sysbi(s1_of_v) == 1) {
     string msg = bi_sys_msg(id);
-    tc_err(id, msg);
+    tc_diag(id, "E0640", msg, s1_of_v, "a builtin takes a fixed number of arguments", "write " + s1_of_v + " with exactly the arguments it takes, no more and no fewer");
   } else {
     string msg2 = bi_other_msg(id);
-    tc_err(id, msg2);
+    tc_diag(id, "E0640", msg2, s1_of_v, "a builtin takes a fixed number of arguments", "write " + s1_of_v + " with exactly the arguments it takes, no more and no fewer");
   }
 } return void;
 given bi_mismatch_setup ((import bi_mismatch_call)):() then calls bi_other_msg:((import bi_mismatch_call))
