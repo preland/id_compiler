@@ -921,8 +921,8 @@ void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s);
 int id_list_get_or(IdList* idstd_xs, int idstd_i, int idstd_default_value);
 char* id_list_string_get_or(IdList* idstd_string_list, int idstd_i, char* idstd_default_string);
 int id_list_is_at(IdList* idstd_xs, int idstd_i, int idstd_v);
-int id_list_same_at(IdList* idstd_xs, int idstd_i, int idstd_j);
-int id_list_string_same_at(IdList* idstd_string_list, int idstd_i, int idstd_j);
+int id_list_same_at(IdList* idstd_list_same_at_list, int idstd_list_same_at_first, int idstd_list_same_at_second);
+int id_list_string_same_at(IdList* idstd_string_list, int idstd_list_string_same_at_first, int idstd_list_string_same_at_second);
 int id_list_index_of(IdList* idstd_xs, int idstd_v);
 int id_list_find(IdList* idstd_xs, int idstd_v);
 int id_list_string_index(IdList* idstd_string_list, char* idstd_search_string);
@@ -3321,6 +3321,8 @@ void id_check_case_runs(void);
 void id_check_cases(void);
 void id_check_cases_at(int i);
 int id_count_cases(int node);
+void id_imp_side(int is_s);
+int id_case_rank(int i);
 void id_reqtests_init(void);
 int id_wr_closure(char* wc_src, char* wc_nm, char* wc_owner);
 void id_chk_own_import(int i, int e);
@@ -4837,12 +4839,12 @@ int id_list_get_or(IdList* idstd_xs, int idstd_i, int idstd_default_value) {
 }
 
 char* id_list_string_get_or(IdList* idstd_string_list, int idstd_i, char* idstd_default_string) {
-    char* idstd_ret_s;
-    idstd_ret_s = idstd_default_string;
+    char* idstd_get_or_result;
+    idstd_get_or_result = idstd_default_string;
     if (((idstd_i >= 0) && (idstd_i < id_list_len(idstd_string_list)))) {
-        idstd_ret_s = (char*)(intptr_t)(id_list_get(idstd_string_list, idstd_i));
+        idstd_get_or_result = (char*)(intptr_t)(id_list_get(idstd_string_list, idstd_i));
     }
-    return idstd_ret_s;
+    return idstd_get_or_result;
 }
 
 int id_list_is_at(IdList* idstd_xs, int idstd_i, int idstd_v) {
@@ -4851,18 +4853,18 @@ int id_list_is_at(IdList* idstd_xs, int idstd_i, int idstd_v) {
     return idstd_ret_i;
 }
 
-int id_list_same_at(IdList* idstd_xs, int idstd_i, int idstd_j) {
-    int idstd_ret_i;
+int id_list_same_at(IdList* idstd_list_same_at_list, int idstd_list_same_at_first, int idstd_list_same_at_second) {
+    int idstd_list_same_at_equal;
 int idsq_7;
-    idstd_ret_i = (idsq_7 = (int)(id_list_get(idstd_xs, idstd_i)), (idsq_7 == (int)(id_list_get(idstd_xs, idstd_j))));
-    return idstd_ret_i;
+    idstd_list_same_at_equal = (idsq_7 = (int)(id_list_get(idstd_list_same_at_list, idstd_list_same_at_first)), (idsq_7 == (int)(id_list_get(idstd_list_same_at_list, idstd_list_same_at_second))));
+    return idstd_list_same_at_equal;
 }
 
-int id_list_string_same_at(IdList* idstd_string_list, int idstd_i, int idstd_j) {
-    int idstd_ret_i;
+int id_list_string_same_at(IdList* idstd_string_list, int idstd_list_string_same_at_first, int idstd_list_string_same_at_second) {
+    int idstd_list_string_same_at_equal;
 char* idsq_7;
-    idstd_ret_i = (idsq_7 = (char*)(intptr_t)(id_list_get(idstd_string_list, idstd_i)), (strcmp(idsq_7, (char*)(intptr_t)(id_list_get(idstd_string_list, idstd_j))) == 0));
-    return idstd_ret_i;
+    idstd_list_string_same_at_equal = (idsq_7 = (char*)(intptr_t)(id_list_get(idstd_string_list, idstd_list_string_same_at_first)), (strcmp(idsq_7, (char*)(intptr_t)(id_list_get(idstd_string_list, idstd_list_string_same_at_second))) == 0));
+    return idstd_list_string_same_at_equal;
 }
 
 int id_list_index_of(IdList* idstd_xs, int idstd_v) {
@@ -29379,6 +29381,7 @@ void id_fit_body(int i, int fn, int node) {
     IdList* args;
     IdList* expd;
     args = (IdList*)(intptr_t)(id_list_get(nl1, node));
+    id_imp_side(0);
     id_fit_items(i, fn, args);
     expd = (IdList*)(intptr_t)(id_list_get(nl2, node));
     if ((strcmp((char*)(intptr_t)(id_list_get(ns2, fn)), ID_S("void")) == 0)) {
@@ -29386,6 +29389,7 @@ void id_fit_body(int i, int fn, int node) {
     } else {
         id_fit_ret(i, fn, expd);
     }
+    id_imp_side(2);
     return;
 }
 
@@ -29489,6 +29493,7 @@ void id_case_ret_err(int i, int fn, int ne) {
 
 void id_fit_void(int i, int fn, IdList* expd) {
     int ne;
+    id_imp_side(1);
 int idsq_24;
     if ((idsq_24 = id_list_len(expd), (idsq_24 > id_list_len((IdList*)(intptr_t)(id_list_get(nl1, fn)))))) {
         ne = id_list_len(expd);
@@ -29502,6 +29507,7 @@ int idsq_24;
 void id_fit_ret(int i, int fn, IdList* expd) {
     int ne;
     char* rt;
+    id_imp_side(1);
     if ((id_list_len(expd) != 1)) {
         ne = id_list_len(expd);
         id_case_ret_err(i, fn, ne);
@@ -29758,8 +29764,32 @@ int id_count_cases(int node) {
     return n;
 }
 
+void id_imp_side(int is_s) {
+    id_lset(reqc, 2, is_s);
+    if ((is_s == 0)) {
+        id_lset(reqc, 1, 0);
+    }
+    return;
+}
+
+int id_case_rank(int i) {
+    int cr_n;
+    int cr_j;
+    cr_n = 0;
+    cr_j = 0;
+    while ((cr_j < i)) {
+IdList* idsq_18;
+int idsq_16;
+        if ((idsq_18 = casefn, idsq_16 = (int)(id_list_get(idsq_18, cr_j)), (idsq_16 == (int)(id_list_get(casefn, i))))) {
+            cr_n = (cr_n + 1);
+        }
+        cr_j = (cr_j + 1);
+    }
+    return cr_n;
+}
+
 void id_reqtests_init(void) {
-    reqc = id_list_lit(1, (long long)(0));
+    reqc = id_list_lit(3, (long long)(0), (long long)(0), (long long)(2));
     return;
 }
 
@@ -29790,13 +29820,16 @@ void id_chk_own_import(int i, int e) {
     oi_ek = id_find_str(enames, oi_x);
     oi_f = ID_S("");
     if ((i < id_list_len(casefn))) {
-IdList* idsq_86;
-        oi_f = (idsq_86 = ns1, (char*)(intptr_t)(id_list_get(idsq_86, (int)(id_list_get(casefn, i)))));
+IdList* idsq_130;
+        oi_f = (idsq_130 = ns1, (char*)(intptr_t)(id_list_get(idsq_130, (int)(id_list_get(casefn, i)))));
     }
-    if (((((((strcmp(oi_f, ID_S("")) != 0) && (oi_ek >= 0)) && ((int)(id_list_get(setupargs, 0)) == 0)) && (id_reaches(oi_f, (char*)(intptr_t)(id_list_get(eowners, oi_ek))) == 1)) && (strcmp(id_fn_ret_export((int)(id_list_get(casefn, i))), oi_x) != 0)) && (id_wr_closure(oi_f, oi_x, (char*)(intptr_t)(id_list_get(eowners, oi_ek))) == 0))) {
-IdList* idsq_28;
-char* idsq_26;
-        (idsq_28 = eowners, idsq_26 = (char*)(intptr_t)(id_list_get(idsq_28, oi_ek)), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), oi_x), ID_S("): '"), 1), oi_x, 1), ID_S("' is exported by '"), 1), idsq_26, 1), ID_S("', which the function under test, '"), 1), oi_f, 1), ID_S("', is or calls, and nothing in that call writes it after declaring it, so this case would read back a value its own call just made and stay green whatever the body did; check a variable the call changes (such as then (import other)[0]:(value)), or the return value, or, if '"), 1), (char*)(intptr_t)(id_list_get(eowners, oi_ek)), 1), ID_S("' exists to initialize '"), 1), oi_x, 1), ID_S("', say so in its return clause: '} return void export "), 1), oi_x, 1), ID_S(";'"), 1)));
+    if ((((oi_ek >= 0) && ((int)(id_list_get(setupargs, 0)) == 0)) && ((int)(id_list_get(reqc, 2)) == 0))) {
+        id_lset(reqc, 1, 1);
+    }
+    if ((((((((((strcmp(oi_f, ID_S("")) != 0) && (oi_ek >= 0)) && ((int)(id_list_get(setupargs, 0)) == 0)) && ((int)(id_list_get(reqc, 2)) == 1)) && ((int)(id_list_get(reqc, 1)) == 1)) && (id_case_rank(i) < 2)) && (id_reaches(oi_f, (char*)(intptr_t)(id_list_get(eowners, oi_ek))) == 1)) && (strcmp(id_fn_ret_export((int)(id_list_get(casefn, i))), oi_x) != 0)) && (id_wr_closure(oi_f, oi_x, (char*)(intptr_t)(id_list_get(eowners, oi_ek))) == 0))) {
+IdList* idsq_32;
+char* idsq_30;
+        (idsq_32 = eowners, idsq_30 = (char*)(intptr_t)(id_list_get(idsq_32, oi_ek)), id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("(import "), oi_x), ID_S("): this case compares one import against another, and '"), 1), oi_x, 1), ID_S("' is exported by '"), 1), idsq_30, 1), ID_S("', which the function under test, '"), 1), oi_f, 1), ID_S("', is or calls with nothing in that call writing it after declaring it; the first two cases of a function are its core cases and may not compare one import against another, because both values would come from the same call and agree whatever the body did; compare '"), 1), oi_x, 1), ID_S("' against a literal, or move this case after the first two, or, if '"), 1), (char*)(intptr_t)(id_list_get(eowners, oi_ek)), 1), ID_S("' exists to initialize '"), 1), oi_x, 1), ID_S("', say so in its return clause: '} return void export "), 1), oi_x, 1), ID_S(";'"), 1)));
     }
     return;
 }
