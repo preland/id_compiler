@@ -23,9 +23,9 @@ vocab_first(string vocab_list) {
   }
 } return string vocab_head;
 ("fb, w"):("fb")
-("utf"):("utf")
 ("a, b, c"):("a")
 ("(empty), x"):("(empty)")
+("utf"):("utf")
 
 vocab_export_loc(int vocab_row, string vocab_name) {
   string vocab_owner = (import eowners)[vocab_row];

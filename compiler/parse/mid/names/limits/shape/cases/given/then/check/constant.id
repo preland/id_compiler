@@ -15,8 +15,9 @@ then_arg_value(int ci, int e, string pt) {
     then_arg_index(ci, e);
   }
 } return void;
-given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "int"):() then prints:("")
 given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
+given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "int"):() then (import setupargs)[0]:(0)
+given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "int"):() then prints:("")
 given then_arg_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
 
 then_arg_conf(int e) {

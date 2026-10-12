@@ -52,6 +52,7 @@ imp_root(int nd) {
   }
 } return int imp_rt;
 given imp_use_fixture ((import imp_use_deep)):((import imp_use_rd))
+given imp_use_fixture given lset((import ni1), (import imp_use_deep), (import imp_use_rd)) ((import imp_use_deep)):((import imp_use_rd))
 given imp_use_fixture ((import imp_use_rd)):((import imp_use_rd))
 
 // Whether a declaration binds a name to a list or a struct reached from the

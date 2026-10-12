@@ -9,8 +9,9 @@ fit_scalar(int i, int e, string want) {
     case_err(i, "this case gives a " + lt + " where a " + want + " is required");
   }
 } return void;
-given fn_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
 given fn_fixture ((import fixture_ci), (import fixture_fn), "int"):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given fn_fixture ((import fixture_ci), (import fixture_zero), "string"):() then prints:("fixture.id:4: error: this case gives a int where a string is required\n")
+given fn_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
 
 // The second step of the dup-case fixture (more/dup/): casestart, two rows
 // (0 and 1) over mk_two_toks's two tokens. Continues dupeq_fixture

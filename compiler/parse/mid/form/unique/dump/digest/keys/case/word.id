@@ -22,8 +22,8 @@ dg_case_fn(int dgc) {
   }
 } return int dgf;
 given dg_t_built (2):(1)
-given dg_t_claim (0):(0)
 given dg_t_built (99):(-1)
+given dg_t_claim (0):(0)
 
 dg_fn_named(string dgnm) {
   int dgf = hash_map_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, 0 - 1);

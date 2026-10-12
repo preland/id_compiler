@@ -35,9 +35,9 @@ imp_owner(int i, string imp_nm, int ek, string want) {
     case_err(i, "this case gives (import " + imp_nm + "), a " + (import etypes)[ek] + ", where a " + want + " is required");
   }
 } return void;
-given impcase_empty ((import fixture_ci), "x", 0, "int"):() then prints:("")
 given impcase_empty ((import fixture_ci), "x", 0, "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
 given impcase_empty given sset((import eowners), 0, "conf.id") ((import fixture_ci), "x", 0, "int"):() then prints:("fixture.id:4: error: (import x) is a conf.id constant, and a case's own argument or expected value cannot name one: a conf.id constant is accepted as an argument of a given setup, as in given f((import x)), as an argument of a then check, as in then g((import x)):(value), and as a then check's index; write its value here as a literal\n")
+given impcase_empty ((import fixture_ci), "x", 0, "int"):() then prints:("")
 given impcase_empty given sset((import eowners), 0, "conf.id") given lset((import setupargs), 0, 1) ((import fixture_ci), "x", 0, "int"):() then prints:("")
 given impcase_empty given sset((import eowners), 0, "conf.id") given lset((import setupargs), 0, 2) ((import fixture_ci), "x", 0, "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
 

@@ -11,6 +11,7 @@ fit_then(int ti) {
   fit_then_kind(kind, chk_node);
 } return void;
 given print_fixture (0):() then prints:("fixture.id:4: error: a 'prints' or 'eprints' check compares exactly one value, not 2\n")
+given calls_node_fixture given lset((import thennode), 0, (import fixture_calls_bad)) (0):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
 given calls_node_fixture (0):() then prints:("")
 
 fit_then_kind(string kind, int chk_node) {

@@ -8,8 +8,9 @@ fit_then_calls(string kind, int chk_node) {
   string nm = (import ns1)[chk_node];
   fit_calls_name(kind, ci, nm, chk_node);
 } return void;
-given calls_node_fixture ("thencalls", (import fixture_calls_node)):() then prints:("")
 given calls_node_fixture ("thencalls", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
+given calls_node_fixture given sset((import ns1), (import fixture_calls_node), "nope") ("thencalls", (import fixture_calls_node)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
+given calls_node_fixture ("thencalls", (import fixture_calls_node)):() then prints:("")
 
 fit_calls_name(string kind, int ci, string nm, int chk_node) {
   int cfn = func_node(nm);
@@ -19,8 +20,9 @@ fit_calls_name(string kind, int ci, string nm, int chk_node) {
     fit_calls_native(kind, ci, nm, cfn, chk_node);
   }
 } return void;
-given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_calls_node)):() then prints:("")
 given calls_node_fixture ("thencalls", (import fixture_ci), "nope", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: 'calls' names 'nope', which is not a function in this build [E0517]\n  why: 'calls' counts calls to a function the program defines, so the name must be one of them\n  help: name a function this build defines, or define nope(...) in the program\n")
+given calls_node_fixture ("thencallsn", (import fixture_ci), "fx_target", (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
+given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_calls_node)):() then prints:("")
 
 fit_calls_native(string kind, int ci, string nm, int cfn, int chk_node) {
   if(is_native(cfn) == 1) {
@@ -29,5 +31,6 @@ fit_calls_native(string kind, int ci, string nm, int cfn, int chk_node) {
     fit_calls_body(kind, ci, nm, cfn, chk_node);
   }
 } return void;
-given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("")
+given calls_node_fixture given lset((import ni2), (import fixture_fn), 1) ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("fixture.id:4: error: 'calls' names 'fx_target', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead [E0518]\n  why: 'calls' counts how often the function under test calls a function whose body the harness can record into, and a native function's body belongs to a backend\n  help: check what fx_target does with 'then prints:(TEXT)' or 'then eprints:(TEXT)'\n")
 given calls_node_fixture ("thencallsn", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_bad)):() then prints:("fixture.id:4: error: a 'calls NAME:[N]' check takes exactly one count, not 0\n")
+given calls_node_fixture ("thencalls", (import fixture_ci), "fx_target", (import fixture_fn), (import fixture_calls_node)):() then prints:("")

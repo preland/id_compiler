@@ -4,6 +4,7 @@ fix_std_row(int i, int[] cnt) {
   }
 } return void;
 given fix_std_row_fixture (0, [0, 0]):(0, [1, 0])
+given fix_std_row_fixture (0, [0, 5]):(0, [1, 5])
 given fix_std_row_fixture (1, [0, 0]):(1, [0, 0])
 
 fix_std_count(int i, int[] cnt) {

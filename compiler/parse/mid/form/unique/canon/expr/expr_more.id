@@ -53,4 +53,5 @@ canon_callee(string name) {
   }
 } return string out;
 given lz_a ("test"):("self")
+given cn_seeded_fixture ("already"):("v0")
 given lz_a ("nobody"):("nobody")

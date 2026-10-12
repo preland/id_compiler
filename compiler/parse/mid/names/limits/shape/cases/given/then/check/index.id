@@ -22,8 +22,9 @@ then_arg_index(int ci, int e) {
     then_arg_ix(ci, ix);
   }
 } return void;
-given index_arg_fixture ((import fixture_ci), (import fixture_ix_lit)):() then prints:("")
 given index_arg_fixture ((import fixture_ci), (import fixture_ix_imp)):() then prints:("fixture.id:4: error: the index of an indexed export in a check is a literal or a conf.id constant, and (import x) is neither; write the index as a literal, as in then f((import NAME)[1]):(value), or name a conf.id constant\n")
+given index_arg_fixture given lset((import setupargs), 0, 1) ((import fixture_ci), (import fixture_ix_lit)):() then (import setupargs)[0]:(0)
+given index_arg_fixture ((import fixture_ci), (import fixture_ix_lit)):() then prints:("")
 
 then_arg_ix(int ci, int ix) {
   lset((import setupargs), 0, 2);
@@ -31,4 +32,5 @@ then_arg_ix(int ci, int ix) {
   lset((import setupargs), 0, 0);
 } return void;
 given then_arg_fixture ((import fixture_ci), (import fixture_fn)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given then_arg_fixture given lset((import setupargs), 0, 1) ((import fixture_ci), (import fixture_zero)):() then (import setupargs)[0]:(0)
 given then_arg_fixture ((import fixture_ci), (import fixture_zero)):() then prints:("")

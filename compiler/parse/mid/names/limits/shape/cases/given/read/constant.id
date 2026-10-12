@@ -12,5 +12,5 @@ imp_conf(int ek) {
   }
 } return int is_conf;
 given impcase_empty given sset((import eowners), 0, "conf.id") (0):(1)
-given impcase_empty given sset((import eowners), 0, "fx_target") (0):(0)
 (-1):(0)
+given impcase_empty given sset((import eowners), 0, "fx_target") (0):(0)
