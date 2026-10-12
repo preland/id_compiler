@@ -3,5 +3,16 @@ vm_b_sleep_ms(word wa) {
   int n = wa;
   sleep_ms(n);
 } return void;
+given vb_boot given tf_clock (20):() then clock_elapsed_within(20, 1000):(1)
+given vb_boot given tf_clock (2):() then clock_elapsed_within(2, 1000):(1)
 given vb_boot (0):()
 given vb_boot (1):()
+
+// 1 when the milliseconds since tf_clock stamped ticks() are at least `clock_least` and fewer than `clock_most`: the lower bound catches a sleep that does nothing, the upper bound a sleep that counts seconds as milliseconds.
+clock_elapsed_within(int clock_least, int clock_most) {
+  int clock_elapsed = ticks() - (import tf_t0);
+  int clock_inside = (clock_elapsed >= clock_least) * (clock_elapsed < clock_most);
+} return int clock_inside;
+given tf_clock (0, 1000):(1)
+given tf_clock (0, 0):(0)
+given tf_clock (5000, 9000):(0)
