@@ -96,6 +96,13 @@ postfix
 textbox
 atan2
 
+# Bit widths, read as numbers (cyclic_redundancy_check_32, a 64-bit count).
+8
+16
+32
+64
+128
+
 # Universally read short forms whose long spelling is worse: the toolkit's own
 # name (gui_), the module name os_, and the two commonest result and interface
 # words. Contestable; kept because the short form is the name.
