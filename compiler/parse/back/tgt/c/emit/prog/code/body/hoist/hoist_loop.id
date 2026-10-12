@@ -6,8 +6,8 @@ hoist_loop(int id) {
     hoist_list(l1_of_v);
   }
 } return void;
-given tyc_fix (3):() then calls hoist_list:[1]
-given tyc_fix (4):() then calls hoist_list:[0]
+given tyc_fix (3):() then calls hoist_list:[1] then calls hoist_list:([])
+given tyc_fix (4):() then calls hoist_list:[0] then prints:("")
 
 // The tail of hoist_decl: the C type is derived from the declared type only
 // once its export flag has already gated whether to emit at all.

@@ -22,7 +22,7 @@ lpq_lk() {
 } chain () {
   export int lpq_pk = lpf_term("*", "lkk", 5);
 } return void;
-():() then calls lpq_lv:[1]
+():() then calls lpq_lv:[1] then (import lpq_pk):(246)
 ():() then init_units:(0)
 
 lpq_lm() {
@@ -53,5 +53,5 @@ lpq_lm() {
   export int[] lpq_tm = (import nl1)[lpq_qm];
   export int[] lpq_em = (import nl2)[lpq_qm];
 } return void;
-():() then calls lpq_lk:[1]
+():() then calls lpq_lk:[1] then (import lpq_vm):(254)
 ():() then init_units:(0)

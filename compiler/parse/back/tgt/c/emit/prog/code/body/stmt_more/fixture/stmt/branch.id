@@ -6,7 +6,7 @@ nz_if_fixture() {
   int[] none = [];
   export int nz_ifn = node_if((import nz_int), none, none, 0);
 } return void;
-():() then calls nz_call_print_fixture:[1]
+():() then calls nz_call_print_fixture:[1] then (import nz_ifn):(8)
 ():() then init_units:(0)
 
 nz_while_fixture() {
@@ -14,7 +14,7 @@ nz_while_fixture() {
   int[] none = [];
   export int nz_whilen = node_while((import nz_int), none);
 } return void;
-():() then calls nz_if_fixture:[1]
+():() then calls nz_if_fixture:[1] then (import nz_whilen):(9)
 ():() then init_units:(0)
 
 // init_tyc gives c_type/c_scalar (func/ctype/convert.id) their C-spelling
@@ -23,5 +23,5 @@ nz_tyc_fixture() {
   nz_while_fixture();
   init_tyc();
 } return void;
-():() then calls nz_while_fixture:[1]
+():() then calls nz_while_fixture:[1] then (import tyc)[0]:("int")
 ():() then init_units:(0)

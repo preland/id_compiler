@@ -22,7 +22,7 @@ lpq_ls() {
   export int lpq_l3 = (import ni2)[lpq_ms];
   export int lpq_vc = (import ni2)[lpq_us];
 } return void;
-():() then calls lpf_more:[1]
+():() then calls lpf_more:[1] then (import lpq_vc):(192)
 ():() then init_units:(0)
 
 lpq_lv() {
@@ -45,5 +45,5 @@ lpq_lv() {
   export int lpq_qv = (import ni1)[lpq_uv];
   export int lpq_pv = lpf_term("*", "lvq", 3);
 } return void;
-():() then calls lpq_ls:[1]
+():() then calls lpq_ls:[1] then (import lpq_pv):(226)
 ():() then init_units:(0)

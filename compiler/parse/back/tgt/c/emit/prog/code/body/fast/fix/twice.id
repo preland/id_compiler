@@ -13,5 +13,5 @@ lpq_lz() {
   export int lpq_loz = (import ni1)[lpq_wz] + 1;
   export int lpq_hiz = lpq_wz - 1;
 } return void;
-():() then calls lpq_li:[1]
+():() then calls lpq_li:[1] then (import lpq_hiz):(376)
 ():() then init_units:(0)

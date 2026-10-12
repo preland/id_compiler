@@ -14,7 +14,7 @@ lpf_lr() {
   export int lpf_lor = (import ni1)[lpf_wr] + 1;
   export int lpf_hir = lpf_wr - 1;
 } return void;
-():() then calls lpf_lh:[1]
+():() then calls lpf_lh:[1] then (import lpf_hir):(147)
 ():() then init_units:(0)
 
 lpf_lw() {
@@ -30,7 +30,7 @@ lpf_lw() {
   export int lpf_low = (import ni1)[lpf_ww] + 1;
   export int lpf_hiw = lpf_ww - 1;
 } return void;
-():() then calls lpf_lr:[1]
+():() then calls lpf_lr:[1] then (import lpf_hiw):(161)
 ():() then init_units:(0)
 
 lpf_lx() {
@@ -49,5 +49,5 @@ lpf_lx() {
   export int lpf_lox = (import ni1)[lpf_wx] + 1;
   export int lpf_hix = lpf_wx - 1;
 } return void;
-():() then calls lpf_lw:[1]
+():() then calls lpf_lw:[1] then (import lpf_hix):(178)
 ():() then init_units:(0)

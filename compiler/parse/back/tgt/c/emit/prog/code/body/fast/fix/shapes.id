@@ -18,7 +18,7 @@ lpq_lp() {
   export int lpq_lop = (import ni1)[lpq_wp] + 1;
   export int lpq_hip = lpq_wp - 1;
 } return void;
-():() then calls lpq_lu:[1]
+():() then calls lpq_lu:[1] then (import lpq_hip):(347)
 ():() then init_units:(0)
 
 lpq_li() {
@@ -38,7 +38,7 @@ lpq_li() {
   export int lpq_hii = lpq_wi - 1;
   export int lpq_gj = node_txt("import", "lij");
 } return void;
-():() then calls lpq_lp:[1]
+():() then calls lpq_lp:[1] then (import lpq_gj):(365)
 ():() then init_units:(0)
 
 lpq_lw() {
@@ -57,5 +57,5 @@ lpq_lw() {
   export int lpq_hiw = lpq_ww - 1;
   export int[] lpq_cl = [(import lpq_ks), (import lpq_kv), (import lpq_kk), (import lpq_km), (import lpq_kn), (import lpq_kt), (import lpq_ku), (import lpq_kp), (import lpq_ki), (import lpq_kw), (import lpq_kz)];
 } return void;
-():() then calls lpq_lz:[1]
+():() then calls lpq_lz:[1] then (import lpq_hiw):(391)
 ():() then init_units:(0)

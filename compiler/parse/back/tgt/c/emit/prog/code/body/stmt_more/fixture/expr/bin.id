@@ -12,12 +12,12 @@ nz_bin_add_fixture() {
   nz_str2_fixture();
   export int nz_bin_add = node_txt2("bin", "+", (import nz_int), (import nz_int2));
 } return void;
-():() then calls nz_str2_fixture:[1]
+():() then calls nz_str2_fixture:[1] then (import nz_bin_add):(4)
 ():() then init_units:(0)
 
 nz_bin_concat_fixture() {
   nz_bin_add_fixture();
   export int nz_bin_concat = node_txt2("bin", "+", (import nz_strn), (import nz_strn2));
 } return void;
-():() then calls nz_bin_add_fixture:[1]
+():() then calls nz_bin_add_fixture:[1] then (import nz_bin_concat):(5)
 ():() then init_units:(0)
