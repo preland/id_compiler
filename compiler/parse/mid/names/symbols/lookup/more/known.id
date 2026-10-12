@@ -1,0 +1,29 @@
+// Whether a function of that name exists, without the scan over every function
+// name that reg_report made for each declaration it registered. The name goes
+// through the fidx hash index; a hit is exact, because find_ix compares the
+// name itself. A miss is believed only while the index is in step with fnames
+// (sync.id): every real push goes through fidx_add, so the index is complete or
+// empty. A fixture that fills fnames without the index fails that test and gets
+// the scan's answer instead, as fast_line does.
+
+fn_index(string name) {
+  int slot_v = name_bucket(name);
+  int ix = find_ix((import fnames), (import fidx)[slot_v], name);
+  if(ix < 0) {
+    ix = fn_miss(name);
+  }
+} return int ix;
+given argfn_d ("g"):(0)
+given argfn_d ("nope"):(-1)
+given edge_fixture ("fx_target"):(0)
+given edge_fixture ("nosuchfn"):(-1)
+
+fn_miss(string name) {
+  int at = 0 - 1;
+  if(fidx_synced() == 0) {
+    at = find_str((import fnames), name);
+  }
+} return int at;
+given argfn_d ("g"):(-1)
+given edge_fixture ("fx_target"):(0)
+given edge_fixture ("nosuchfn"):(-1)

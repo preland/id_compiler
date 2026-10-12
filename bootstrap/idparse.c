@@ -3563,6 +3563,8 @@ void id_push_buckets(void);
 void id_vidx_push(int bucket_slot, int didx_len, char* name);
 void id_fidx_push(int bucket_slot, int didx_len, char* name);
 void id_didx_push(int bucket_slot, int didx_len, char* name);
+int id_fn_index(char* name);
+int id_fn_miss(char* name);
 char* id_lookup_var(char* name, int unit);
 char* id_lookup_func(char* name);
 int id_find_str(IdList* names, char* name);
@@ -3574,6 +3576,8 @@ char* id_ty_float_pick(char* pick_t, char* pick_float, char* pick_other);
 char* id_str_pick2(char* pick_x, char* pick_k1, char* pick_y1, char* pick_k2, char* pick_y2, char* pick_no);
 int id_case_is_std(int ci);
 int id_unit_excluded(int ci);
+int id_fidx_synced(void);
+int id_fidx_row_is(char* name, int fn_row);
 void id_init_reg2(void);
 int id_declared_in(char* name, char* owner);
 int id_dv_hit(int i, char* name, char* owner);
@@ -30743,7 +30747,7 @@ void id_acc_if(int id, char* owner) {
 }
 
 void id_reg_report(char* name, char* type, char* owner, int exported, int ln, int unit) {
-    if ((id_find_str(fnames, name) >= 0)) {
+    if ((id_fn_index(name) >= 0)) {
 char* idsq_14;
         (idsq_14 = nm_func_why, id_report_name(name, owner, ln, ID_S("E0308"), id_concat_f(id_concat(ID_S("'"), name), ID_S("' is already the name of a function"), 1), idsq_14, nm_func_help));
     } else {
@@ -32380,6 +32384,27 @@ void id_didx_push(int bucket_slot, int didx_len, char* name) {
     return;
 }
 
+int id_fn_index(char* name) {
+    int slot_v;
+    int ix;
+    slot_v = id_name_bucket(name);
+IdList* idsq_16;
+    ix = (idsq_16 = fnames, id_find_ix(idsq_16, (IdList*)(intptr_t)(id_list_get(fidx, slot_v)), name));
+    if ((ix < 0)) {
+        ix = id_fn_miss(name);
+    }
+    return ix;
+}
+
+int id_fn_miss(char* name) {
+    int at;
+    at = (0 - 1);
+    if ((id_fidx_synced() == 0)) {
+        at = id_find_str(fnames, name);
+    }
+    return at;
+}
+
 char* id_lookup_var(char* name, int unit) {
     int name_bucket_v;
     int idx;
@@ -32495,6 +32520,29 @@ IdList* idsq_13;
         r = 1;
     }
     return r;
+}
+
+int id_fidx_synced(void) {
+    int fn_total;
+    char* last_v;
+    int same;
+    fn_total = id_list_len(fnames);
+    last_v = id_list_string_get_or(fnames, (fn_total - 1), ID_S(""));
+    same = id_fidx_row_is(last_v, (fn_total - 1));
+    return same;
+}
+
+int id_fidx_row_is(char* name, int fn_row) {
+    int ix;
+    int same;
+IdList* idsq_18;
+IdList* idsq_17;
+    ix = (idsq_18 = fnames, idsq_17 = fidx, id_find_ix(idsq_18, (IdList*)(intptr_t)(id_list_get(idsq_17, id_name_bucket(name))), name));
+    same = 0;
+    if ((ix == fn_row)) {
+        same = 1;
+    }
+    return same;
 }
 
 void id_init_reg2(void) {

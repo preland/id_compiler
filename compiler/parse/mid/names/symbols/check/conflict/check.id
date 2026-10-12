@@ -5,7 +5,7 @@
 // against one compiler must not then be told something different by the other.
 
 reg_report(string name, string type, string owner, int exported, int ln, int unit) {
-  if(find_str((import fnames), name) >= 0) {
+  if(fn_index(name) >= 0) {
     report_name(name, owner, ln, "E0308", "'" + name + "' is already the name of a function", (import nm_func_why), (import nm_func_help));
   } else {
     reg_report2(name, type, owner, exported, ln, unit);

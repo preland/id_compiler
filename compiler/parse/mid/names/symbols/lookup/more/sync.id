@@ -1,0 +1,24 @@
+// Whether the fidx index covers the whole of fnames. Tables only ever grow at
+// the end, so the last fn_row being indexed means the earlier ones were too; an
+// empty table has no last fn_row, and list_string_get_or's "" finds nothing at
+// fn_row -1, which agrees. Split from known.id to keep each file within the limit.
+
+fidx_synced() {
+  int fn_total = len((import fnames));
+  string last_v = list_string_get_or((import fnames), fn_total - 1, "");
+  int same = fidx_row_is(last_v, fn_total - 1);
+} return int same;
+given call2_setup ():(1)
+given argfn_d ():(1)
+given edge_fixture ():(0)
+
+fidx_row_is(string name, int fn_row) {
+  int ix = find_ix((import fnames), (import fidx)[name_bucket(name)], name);
+  int same = 0;
+  if(ix == fn_row) {
+    same = 1;
+  }
+} return int same;
+given argfn_d ("g", 0):(1)
+given argfn_d ("g", 3):(0)
+given argfn_d ("nope", -1):(1)
