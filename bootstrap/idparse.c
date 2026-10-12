@@ -13857,7 +13857,7 @@ IdList* idsq_25;
 
 char* id_then_label(char* chk_nm, IdList* targs) {
     char* so = NULL;
-    { char* idfe_o = so; so = ({ char* idft0 = id_call_c(chk_nm, targs); char* idfr = id_str_replace(idft0, ID_S("%"), ID_S("%%")); id_str_free(idft0); idfr; }); id_str_free(idfe_o); }
+    { char* idfe_o = so; so = id_str_replace(id_call_c(chk_nm, targs), ID_S("%"), ID_S("%%")); id_str_free(idfe_o); }
     return so;
 }
 
@@ -13919,20 +13919,20 @@ void id_emit_then_fail(int ci, int ti, char* chk_lbl, char* rt) {
 }
 
 void id_emit_then_lines(int ci, int ti, char* chk_lbl, char* cnd, char* shown) {
-    char* tail = NULL;
-    { char* idfe_o = tail; tail = id_then_tail(ti); id_str_free(idfe_o); }
+    char* tail;
+    tail = id_then_tail(ti);
     id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s then "), 1), chk_lbl, 1), ID_S(" = \", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n        "), 1), shown, 1), ID_S("\n        fputs(\""), 1), tail, 1), ID_S("\", stderr);\n        return 3;\n    }"), 1));
-    { id_str_free(tail); return; }
+    return;
 }
 
 char* id_then_tail(int ti) {
     IdList* items;
     char* lt;
-    char* so = NULL;
+    char* so;
 IdList* idsq_21;
     items = (idsq_21 = nl1, (IdList*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(thennode, ti)))));
     lt = id_lit_text((int)(id_list_get(items, 0)));
-    { char* idfe_o = so; so = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), lt), ID_S("\n"), 1)); id_str_free(idfe_o); }
+    so = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), lt), ID_S("\n"), 1));
     return so;
 }
 
@@ -14009,11 +14009,11 @@ char* id_calls_row_cmp(char* nm, int ti, char* pt, char* fld, int item, char* ou
 
 void id_emit_calls_args_emit(int ci, int ti, char* nm, char* rowcond, char* rowshow, IdList* items) {
     char* et = NULL;
-    char* extext = NULL;
+    char* extext;
     { char* idfe_o = et; et = id_items_text(items); id_str_free(idfe_o); }
-    { char* idfe_o = extext; extext = id_c_esc(id_concat_f(id_concat_f(id_concat(nm, ID_S("(")), et, 1), ID_S(")"), 1)); id_str_free(idfe_o); }
+    extext = id_c_esc(id_concat_f(id_concat_f(id_concat(nm, ID_S("(")), et, 1), ID_S(")"), 1));
     id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    int idtc_hit"), id_str_of_int(ti), 2), ID_S(" = 0;\n    for (int idtc_j"), 1), id_str_of_int(ti), 3), ID_S(" = 0; idtc_j"), 1), id_str_of_int(ti), 3), ID_S(" < idtc_rc_"), 1), nm, 1), ID_S("_kept; idtc_j"), 1), id_str_of_int(ti), 3), ID_S("++) {\n        if (idtc_rc_"), 1), nm, 1), ID_S("_seq[idtc_j"), 1), id_str_of_int(ti), 3), ID_S("] > idtc_seek && ("), 1), rowcond, 1), ID_S(")) {\n            idtc_hit"), 1), id_str_of_int(ti), 3), ID_S(" = 1;\n            idtc_seek = idtc_rc_"), 1), nm, 1), ID_S("_seq[idtc_j"), 1), id_str_of_int(ti), 3), ID_S("];\n            break;\n        }\n    }\n    if (!idtc_hit"), 1), id_str_of_int(ti), 3), ID_S(") {\n        int idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(" = idtc_calls_skipped(idtc_rc_"), 1), nm, 1), ID_S("_seq, idtc_rc_"), 1), nm, 1), ID_S("_kept, idtc_seek);\n        fprintf(stderr, \"%s: test failed: %s calls %s did not match any of the %d recorded call(s) to '"), 1), nm, 1), ID_S("'%s\", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("], \""), 1), extext, 1), ID_S("\", idtc_rc_"), 1), nm, 1), ID_S("_kept - idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(", idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(" \? \" after the previous clause's match\" : \"\");\n        idtc_show_cap = 16;\n        idtc_show_listed = 0;\n        for (int idtc_k"), 1), id_str_of_int(ti), 3), ID_S(" = 0; idtc_k"), 1), id_str_of_int(ti), 3), ID_S(" < idtc_rc_"), 1), nm, 1), ID_S("_kept; idtc_k"), 1), id_str_of_int(ti), 3), ID_S("++) {\n            int idtc_j"), 1), id_str_of_int(ti), 3), ID_S(" = (idtc_k"), 1), id_str_of_int(ti), 3), ID_S(" + idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(") % idtc_rc_"), 1), nm, 1), ID_S("_kept;\n            if (idtc_calls_item(idtc_k"), 1), id_str_of_int(ti), 3), ID_S(", idtc_rc_"), 1), nm, 1), ID_S("_kept, idtc_sk"), 1), id_str_of_int(ti), 3), ID_S(")) { "), 1), rowshow, 1), ID_S("fputs(\")\", stderr); }\n        }\n        idtc_calls_end(idtc_rc_"), 1), nm, 1), ID_S("_n, idtc_rc_"), 1), nm, 1), ID_S("_kept);\n        return 3;\n    }"), 1));
-    { id_str_free(et); id_str_free(extext); return; }
+    { id_str_free(et); return; }
 }
 
 char* id_calls_show_step(char* nm, int ti, IdList* params, char* out, int i) {
@@ -14246,10 +14246,10 @@ void id_emit_print_lines(int ci, char* kind, char* cnd, char* shown, int e) {
 }
 
 void id_emit_print_final(int ci, char* lab, char* cnd, char* shown, char* lt) {
-    char* tail = NULL;
-    { char* idfe_o = tail; tail = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), lt), ID_S("\n"), 1)); id_str_free(idfe_o); }
+    char* tail;
+    tail = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), lt), ID_S("\n"), 1));
     id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s "), 1), lab, 1), ID_S(" = \", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);\n        "), 1), shown, 1), ID_S("\n        fputs(\""), 1), tail, 1), ID_S("\", stderr);\n        return 3;\n    }"), 1));
-    { id_str_free(tail); return; }
+    return;
 }
 
 char* id_then_imp_get(int node) {
@@ -14459,16 +14459,16 @@ void id_emit_case_fail(int ci) {
     IdList* expd;
     char* cnd = NULL;
     char* shows = NULL;
-    char* tail = NULL;
+    char* tail;
     fn = (int)(id_list_get(casefn, ci));
 IdList* idsq_52;
     expd = (idsq_52 = nl2, (IdList*)(intptr_t)(id_list_get(idsq_52, (int)(id_list_get(casenode, ci)))));
     { char* idfe_o = cnd; cnd = id_case_cond(fn, expd); id_str_free(idfe_o); }
     id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("    if (!("), cnd), ID_S(")) {\n        fprintf(stderr, \"%s: test failed: %s = \", idtc_where["), 1), id_str_of_int(ci), 3), ID_S("], idtc_call["), 1), id_str_of_int(ci), 3), ID_S("]);"), 1));
     { char* idfe_o = shows; shows = id_show_all(fn, expd); id_str_free(idfe_o); }
-    { char* idfe_o = tail; tail = id_exp_tail(expd); id_str_free(idfe_o); }
+    tail = id_exp_tail(expd);
     id_print(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("        "), shows), ID_S("\n        fputs(\""), 1), tail, 1), ID_S("\", stderr);\n        return 3;\n    }"), 1));
-    { id_str_free(cnd); id_str_free(shows); id_str_free(tail); return; }
+    { id_str_free(cnd); id_str_free(shows); return; }
 }
 
 char* id_case_cond(int fn, IdList* expd) {
@@ -14516,12 +14516,12 @@ char* idsq_8;
 
 char* id_exp_tail(IdList* expd) {
     char* et = NULL;
-    char* so = NULL;
+    char* so;
     { char* idfe_o = et; et = id_items_text(expd); id_str_free(idfe_o); }
     if ((id_list_len(expd) != 1)) {
         { char* idfe_o = et; et = id_concat_f(id_concat(ID_S("("), et), ID_S(")"), 1); id_str_free(idfe_o); }
     }
-    { char* idfe_o = so; so = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), et), ID_S("\n"), 1)); id_str_free(idfe_o); }
+    so = id_c_esc(id_concat_f(id_concat(ID_S(", expected "), et), ID_S("\n"), 1));
     { id_str_free(et); return so; }
 }
 
@@ -14616,7 +14616,7 @@ void id_emit_dir_row(int ci) {
     char* cr;
     cr = id_case_root(ci);
     if ((strcmp(cr, ID_S("")) != 0)) {
-        id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_dir["), id_str_of_int(ci), 2), ID_S("] = \""), 1), id_c_esc(cr), 3), ID_S("\";"), 1));
+        id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_dir["), id_str_of_int(ci), 2), ID_S("] = \""), 1), id_c_esc(cr), 1), ID_S("\";"), 1));
     }
     return;
 }
@@ -14761,12 +14761,12 @@ char* idsq_10;
 }
 
 void id_size_row(int ci) {
-    char* sz = NULL;
+    char* sz;
     if ((id_case_claims(ci) > 0)) {
-        { char* idfe_o = sz; sz = id_case_size(ci); id_str_free(idfe_o); }
+        sz = id_case_size(ci);
         id_print(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("    idtc_n["), id_str_of_int(ci), 2), ID_S("] = "), 1), sz, 1), ID_S(";"), 1));
     }
-    { id_str_free(sz); return; }
+    return;
 }
 
 char* id_case_size(int ci) {
@@ -14795,9 +14795,9 @@ int id_case_claims(int ci) {
 
 char* id_call_c(char* f1, IdList* args) {
     char* it = NULL;
-    char* so = NULL;
+    char* so;
     { char* idfe_o = it; it = id_items_text(args); id_str_free(idfe_o); }
-    { char* idfe_o = so; so = id_c_esc(id_concat_f(id_concat_f(id_concat(f1, ID_S("(")), it, 1), ID_S(")"), 1)); id_str_free(idfe_o); }
+    so = id_c_esc(id_concat_f(id_concat_f(id_concat(f1, ID_S("(")), it, 1), ID_S(")"), 1));
     { id_str_free(it); return so; }
 }
 
@@ -14856,22 +14856,22 @@ IdList* idsq_183;
 }
 
 char* id_case_where_c(int ci) {
-    char* case_loc_v = NULL;
-    char* so = NULL;
-    { char* idfe_o = case_loc_v; case_loc_v = id_case_loc(ci); id_str_free(idfe_o); }
-    { char* idfe_o = so; so = id_c_esc(case_loc_v); id_str_free(idfe_o); }
-    { id_str_free(case_loc_v); return so; }
+    char* case_loc_v;
+    char* so;
+    case_loc_v = id_case_loc(ci);
+    so = id_c_esc(case_loc_v);
+    return so;
 }
 
 char* id_case_call_c(int ci) {
     char* f1;
     IdList* args;
-    char* so = NULL;
+    char* so;
 IdList* idsq_18;
     f1 = (idsq_18 = ns1, (char*)(intptr_t)(id_list_get(idsq_18, (int)(id_list_get(casefn, ci)))));
 IdList* idsq_12;
     args = (idsq_12 = nl1, (IdList*)(intptr_t)(id_list_get(idsq_12, (int)(id_list_get(casenode, ci)))));
-    { char* idfe_o = so; so = id_call_c(f1, args); id_str_free(idfe_o); }
+    so = id_call_c(f1, args);
     return so;
 }
 
@@ -14893,12 +14893,12 @@ void id_setup_rows(void) {
 }
 
 void id_setup_row(int ci) {
-    char* cw = NULL;
-    char* cc = NULL;
-    { char* idfe_o = cw; cw = id_case_where_c(ci); id_str_free(idfe_o); }
-    { char* idfe_o = cc; cc = id_case_call_c(ci); id_str_free(idfe_o); }
+    char* cw;
+    char* cc;
+    cw = id_case_where_c(ci);
+    cc = id_case_call_c(ci);
     id_emit_setup_line(ci, cw, cc);
-    { id_str_free(cw); id_str_free(cc); return; }
+    return;
 }
 
 void id_emit_tests_maybe(int argc, IdList* argv) {
@@ -16621,12 +16621,12 @@ void id_ll_blocks(int f) {
 }
 
 void id_ll_insn(int id) {
-    char* ll_text_v = NULL;
+    char* ll_text_v;
     if (((strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("nop")) != 0) && (strcmp((char*)(intptr_t)(id_list_get(iop, id)), ID_S("param")) != 0))) {
-        { char* idfe_o = ll_text_v; ll_text_v = id_ll_text(id); id_str_free(idfe_o); }
+        ll_text_v = id_ll_text(id);
         id_print(id_concat(ID_S("  "), ll_text_v));
     }
-    { id_str_free(ll_text_v); return; }
+    return;
 }
 
 char* id_ll_pstr_step(char* s, int i, int pn) {
@@ -16935,15 +16935,15 @@ void id_ll_init_build(int i) {
 }
 
 void id_ll_init_elem(int i, int j, int e, char* pass) {
-    char* t = NULL;
-    { char* idfe_o = t; t = id_elem_type((char*)(intptr_t)(id_list_get(etypes, i))); id_str_free(idfe_o); }
+    char* t;
+    t = id_elem_type((char*)(intptr_t)(id_list_get(etypes, i)));
     if ((((strcmp(pass, ID_S("bytes")) == 0) && (strcmp(t, ID_S("string")) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("import")) != 0))) {
         id_ll_elem_bytes(i, j, e);
     }
     if ((strcmp(pass, ID_S("build")) == 0)) {
         id_ll_init_push(i, j, e, t);
     }
-    { id_str_free(t); return; }
+    return;
 }
 
 void id_ll_init_push(int i, int j, int e, char* t) {
