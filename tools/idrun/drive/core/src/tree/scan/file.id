@@ -2,7 +2,7 @@
 // the project's own root.
 dr_sub(string dir, string name, int root) {
   string frag = "";
-  if (charat(name, 0) != 46 && (root == 0 || name != "build/")) {
+  if (character_code_at(name, 0) != 46 && (root == 0 || name != "build/")) {
     string sub = dir + "/" + ld_sub(name, 0, len(name) - 1);
     frag = dr_walk(sub, 0);
   }
@@ -30,7 +30,7 @@ dr_q(string s) {
   string q = "'";
   int i = 0;
   while (i < len(s)) {
-    q = q + dr_qc(charat(s, i));
+    q = q + dr_qc(character_code_at(s, i));
     i = i + 1;
   }
 } chain (string s) {

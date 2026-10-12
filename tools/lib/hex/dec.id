@@ -4,7 +4,7 @@
 hex_bytes(string s) {
   int[] xs = [];
   int i = 0;
-  while(charat(s, i) >= 0) {
+  while(character_code_at(s, i) >= 0) {
     int v = hex_at(s, i);
     push(xs, v);
     i = i + 2;
@@ -25,7 +25,7 @@ hex_at(string s, int i) {
 // One digit. Lowercase only, because the generators write only lowercase and
 // accepting more would be accepting input nothing produces.
 hex_nib_at(string s, int i) {
-  int c = charat(s, i);
+  int c = character_code_at(s, i);
   int v = c - 48;
   if(c >= 97) {
     v = c - 87;

@@ -30,7 +30,7 @@ given tf_tree given tf_want ((import tf_root), 0):((import tf_wwb)) then tf_rmtr
 
 dr_entry(string dir, string name, int root) {
   string frag = "";
-  if (charat(name, len(name) - 1) == 47) {
+  if (character_code_at(name, len(name) - 1) == 47) {
     frag = dr_sub(dir, name, root);
   } else {
     frag = dr_file(dir, name);

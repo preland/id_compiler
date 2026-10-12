@@ -10,12 +10,12 @@
 
 strcmp(string s, string r) {
   int n = 0;
-  while(charat(s, n) == charat(r, n) && charat(s, n) != 0 - 1) {
+  while(character_code_at(s, n) == character_code_at(r, n) && character_code_at(s, n) != 0 - 1) {
     n = n + 1;
   }
   int ret_i = strcmp_at(s, r, n);
 } return int ret_i;
 
 strcmp_at(string s, string r, int n) {
-  int ret_i = charat(s, n) - charat(r, n);
+  int ret_i = character_code_at(s, n) - character_code_at(r, n);
 } return int ret_i;

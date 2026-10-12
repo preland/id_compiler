@@ -15,7 +15,7 @@ kb_ident(int c) {
 // The index just past the identifier that starts at at, or at itself when none does.
 kb_word_end(string text, int at) {
   int end = at;
-  while (end < len(text) && kb_ident(charat(text, end)) == 1) {
+  while (end < len(text) && kb_ident(character_code_at(text, end)) == 1) {
     end = end + 1;
   }
 } return int end;

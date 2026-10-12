@@ -7,7 +7,7 @@
 
 lay_ns_collect_dir(int[] buf, int lo, int hi, string build, int is_root) {
   string name = lay_name_of(buf, lo, hi);
-  int kept = charat(name, 0) != 46 && (is_root != 1 || name != build);
+  int kept = character_code_at(name, 0) != 46 && (is_root != 1 || name != build);
   if(kept == 1) {
     push((import lay_ns_dirs), name);
   }

@@ -4,10 +4,10 @@
 
 jg_scan_step(string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
   int jg_i = jg_st[0];
-  int jg_c = charat(jg_t, jg_i);
+  int jg_c = character_code_at(jg_t, jg_i);
   int jg_nx = jg_i + 1;
 } chain (string jg_t, string jg_path, int[] jg_st, string[][] jg_defs) {
-  if (jg_c == (import jg_slash) && charat(jg_t, jg_i + 1) == (import jg_slash)) {
+  if (jg_c == (import jg_slash) && character_code_at(jg_t, jg_i + 1) == (import jg_slash)) {
     jg_nx = str_eol(jg_t, jg_i);
   } else if (jg_c == (import jg_quote)) {
     jg_nx = jg_str_end(jg_t, jg_i + 1) + 1;

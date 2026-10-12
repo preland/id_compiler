@@ -9,7 +9,7 @@
 
 scan_block(string src, int i) {
   int ni = 0;
-  if(charat(src, i) == 47 && charat(src, i + 1) == 42) {
+  if(character_code_at(src, i) == 47 && character_code_at(src, i + 1) == 42) {
     ni = block_tok(src, i);
   } else {
     ni = scan_hashop(src, i);
@@ -29,7 +29,7 @@ block_tok(string src, int i) {
 // advances by a character and bumps the line counter on a newline, which is
 // what keeps the lines after a multi-line comment reported correctly.
 skip_block(string src, int i) {
-  while(charat(src, i) != -1 && (charat(src, i) != 42 || charat(src, i + 1) != 47)) {
+  while(character_code_at(src, i) != -1 && (character_code_at(src, i) != 42 || character_code_at(src, i + 1) != 47)) {
     i = eat_space(src, i);
   }
   int ret_i = i + 2;

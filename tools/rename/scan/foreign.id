@@ -14,8 +14,8 @@
 // identifier when bare is 1. Answers the index to continue from.
 rename_foreign_next(string rename_source, int rename_index, int[] rename_spans, int[] rename_cells, int rename_bare) {
   int rename_end = rename_run_end(rename_source, rename_index);
-  int rename_name_start = rename_index + 3 * (charat(rename_source, rename_index) == 105 && charat(rename_source, rename_index + 1) == 100 && charat(rename_source, rename_index + 2) == 95 && rename_end > rename_index + 3);
-  int rename_takes = (chr_is_alpha(charat(rename_source, rename_index)) || charat(rename_source, rename_index) == 95) && (rename_name_start > rename_index || rename_bare == 1);
+  int rename_name_start = rename_index + 3 * (character_code_at(rename_source, rename_index) == 105 && character_code_at(rename_source, rename_index + 1) == 100 && character_code_at(rename_source, rename_index + 2) == 95 && rename_end > rename_index + 3);
+  int rename_takes = (chr_is_alpha(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95) && (rename_name_start > rename_index || rename_bare == 1);
 } chain (string rename_source, int rename_index, int[] rename_spans, int[] rename_cells, int rename_bare) {
   if(rename_takes == 1) {
     rename_mark(rename_source, rename_name_start, rename_end, rename_spans, rename_cells);

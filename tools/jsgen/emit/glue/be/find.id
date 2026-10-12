@@ -4,7 +4,7 @@
 
 jg_exp_find(string jg_src) {
   int jg_at = str_find(jg_src, "export default function");
-  while (jg_at >= 0 && charat(jg_src, jg_skip_ws(jg_src, jg_at + 23)) != (import jg_lparen)) {
+  while (jg_at >= 0 && character_code_at(jg_src, jg_skip_ws(jg_src, jg_at + 23)) != (import jg_lparen)) {
     jg_at = str_findat(jg_src, "export default function", jg_at + 1);
   }
 } return int jg_at;

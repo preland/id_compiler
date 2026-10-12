@@ -7,10 +7,10 @@ str_bad_hex(string text) {
   int bad_at = 0;
   int bad_found = 0;
   while(bad_at < len(text)) {
-    if(charat(text, bad_at) == 92 && charat(text, bad_at + 1) == 120 && hex_escape_at(text, bad_at) == 0) {
+    if(character_code_at(text, bad_at) == 92 && character_code_at(text, bad_at + 1) == 120 && hex_escape_at(text, bad_at) == 0) {
       bad_found = 1;
     }
-    if(charat(text, bad_at) == 92) {
+    if(character_code_at(text, bad_at) == 92) {
       bad_at = bad_at + 1;
     }
     bad_at = bad_at + 1;

@@ -18,7 +18,7 @@ is_bin(int c) {
 // starting with b from being mistaken for a literal.
 bin_start(string src, int i) {
   int ok = 0;
-  if(charat(src, i) == 48 && (charat(src, i + 1) == 98 || charat(src, i + 1) == 66) && is_bin_at(src, i + 2)) {
+  if(character_code_at(src, i) == 48 && (character_code_at(src, i + 1) == 98 || character_code_at(src, i + 1) == 66) && is_bin_at(src, i + 2)) {
     ok = 1;
   }
 } return int ok;

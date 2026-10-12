@@ -10,7 +10,7 @@ jg_piece(string jg_s, int jg_lo, int jg_hi) {
 ("abc", 0, 2):("ab")
 
 jg_par_step(string jg_s, int jg_i, int[] jg_st, string[] jg_xs) {
-  int jg_c = charat(jg_s, jg_i);
+  int jg_c = character_code_at(jg_s, jg_i);
   jg_st[1] = jg_st[1] + (jg_c == (import jg_lparen) || jg_c == (import jg_lbrack)) - (jg_c == (import jg_rparen) || jg_c == (import jg_rbrack));
   if (jg_c == (import jg_comma) && jg_st[1] == 0) {
     push(jg_xs, jg_piece(jg_s, jg_st[0], jg_i));

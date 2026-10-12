@@ -17,7 +17,7 @@ scan_numop(string src, int i) {
 // string literal (pass the index past the opening quote), else an operator
 scan_strop(string src, int i) {
   int ni = 0;
-  if(charat(src, i) == 34) {
+  if(character_code_at(src, i) == 34) {
     ni = scan_string(src, i + 1);
   } else {
     ni = scan_op(src, i);

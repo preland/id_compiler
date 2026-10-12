@@ -11,7 +11,7 @@
 // number is a run too (`0xff`, `1e5`), so a letter inside a number is never
 // taken for the start of a name.
 rename_run_end(string rename_source, int rename_index) {
-  while(chr_is_alnum(charat(rename_source, rename_index)) || charat(rename_source, rename_index) == 95) {
+  while(chr_is_alnum(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95) {
     rename_index = rename_index + 1;
   }
 } return int rename_index;
@@ -25,10 +25,10 @@ rename_run_end(string rename_source, int rename_index) {
 // literal with no closing quote runs to the end of the text.
 rename_string_end(string rename_source, int rename_index) {
   int rename_at = rename_index + 1;
-  while(charat(rename_source, rename_at) != 34 && charat(rename_source, rename_at) != -1) {
-    rename_at = rename_at + 1 + (charat(rename_source, rename_at) == 92);
+  while(character_code_at(rename_source, rename_at) != 34 && character_code_at(rename_source, rename_at) != -1) {
+    rename_at = rename_at + 1 + (character_code_at(rename_source, rename_at) == 92);
   }
-  int rename_end = rename_at + (charat(rename_source, rename_at) == 34);
+  int rename_end = rename_at + (character_code_at(rename_source, rename_at) == 34);
 } return int rename_end;
 ("\"ab\" x", 0):(4)
 ("\"a\\\"b\" x", 0):(6)
@@ -38,10 +38,10 @@ rename_string_end(string rename_source, int rename_index) {
 // of its line, a string literal, or a single character of anything else.
 rename_other_end(string rename_source, int rename_index) {
   int rename_end = rename_index + 1;
-  if(charat(rename_source, rename_index) == 47 && charat(rename_source, rename_index + 1) == 47) {
+  if(character_code_at(rename_source, rename_index) == 47 && character_code_at(rename_source, rename_index + 1) == 47) {
     rename_end = str_eol(rename_source, rename_index);
   }
-  if(charat(rename_source, rename_index) == 34) {
+  if(character_code_at(rename_source, rename_index) == 34) {
     rename_end = rename_string_end(rename_source, rename_index);
   }
 } return int rename_end;

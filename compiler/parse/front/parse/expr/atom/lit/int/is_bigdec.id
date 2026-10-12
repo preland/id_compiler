@@ -24,7 +24,7 @@ wide_dec(string s) {
 // The last digit is always kept, so "000" strips to "0" rather than "".
 strip_zeros(string s) {
   int i = 0;
-  while(i + 1 < len(s) && charat(s, i) == 48) {
+  while(i + 1 < len(s) && character_code_at(s, i) == 48) {
     i = i + 1;
   }
   string ret_s = zeros_tail(s, i);

@@ -21,7 +21,7 @@ given tf_ld("hello") (2, 2):("")
 ld_sub(string src, int a, int e) {
   string s = "";
   while (a < e) {
-    s = s + chr(charat(src, a));
+    s = s + chr(character_code_at(src, a));
     a = a + 1;
   }
 } return string s;

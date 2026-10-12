@@ -5,10 +5,10 @@ str_has_nul(string text) {
   int nul_i = 0;
   int nul_found = 0;
   while(nul_i < len(text)) {
-    if(charat(text, nul_i) == 92 && (charat(text, nul_i + 1) == 48 && nul_tail(text, nul_i + 2) == 1 || hex_escape_byte(text, nul_i) == 0 && hex_escape_at(text, nul_i) == 1)) {
+    if(character_code_at(text, nul_i) == 92 && (character_code_at(text, nul_i + 1) == 48 && nul_tail(text, nul_i + 2) == 1 || hex_escape_byte(text, nul_i) == 0 && hex_escape_at(text, nul_i) == 1)) {
       nul_found = 1;
     }
-    if(charat(text, nul_i) == 92) {
+    if(character_code_at(text, nul_i) == 92) {
       nul_i = nul_i + 1;
     }
     nul_i = nul_i + 1;
@@ -21,8 +21,8 @@ str_has_nul(string text) {
 ("\"a\\x01b\""):(0)
 
 nul_tail(string text, int nul_at) {
-  int nul_d1 = charat(text, nul_at);
-  int nul_d2 = charat(text, nul_at + 1);
+  int nul_d1 = character_code_at(text, nul_at);
+  int nul_d2 = character_code_at(text, nul_at + 1);
   int nul_z = 1;
 } chain (string text, int nul_at) {
   if(nul_d1 >= 49 && nul_d1 <= 55) {

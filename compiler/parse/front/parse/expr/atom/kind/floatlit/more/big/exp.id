@@ -18,7 +18,7 @@ flt_lit_exp(string text) {
 ("1e+7"):(7)
 
 flt_exp_of(string fles) {
-  int flsg = charat(fles, 0);
+  int flsg = character_code_at(fles, 0);
   int fla = flsg == 43 || flsg == 45;
   int fln = len(fles);
 } chain (string fles) {

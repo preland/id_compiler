@@ -28,12 +28,12 @@ dg_find_word(string dg_ws, string dg_wm, int dg_wf) {
 // digit is not allowed to be the inside of a longer one, so `x` is not found in
 // `max`.
 dg_edge(string dg_es, string dg_em, int dg_ei) {
-  int dg_el = charat(dg_es, dg_ei - 1);
-  int dg_er = charat(dg_es, dg_ei + len(dg_em));
+  int dg_el = character_code_at(dg_es, dg_ei - 1);
+  int dg_er = character_code_at(dg_es, dg_ei + len(dg_em));
   int dg_ek = 1;
 } chain (string dg_es, string dg_em, int dg_ei) {
-  int dg_ef0 = charat(dg_em, 0);
-  int dg_efn = charat(dg_em, len(dg_em) - 1);
+  int dg_ef0 = character_code_at(dg_em, 0);
+  int dg_efn = character_code_at(dg_em, len(dg_em) - 1);
   if(chr_is_alnum(dg_ef0) == 1 && chr_is_alnum(dg_el) == 1) {
     dg_ek = 0;
   }

@@ -2,7 +2,7 @@
 // which is no type that crosses the boundary.
 
 jg_param_ok(string jg_pm, int jg_a, int jg_w) {
-  int jg_ok = jg_a < len(jg_pm) && jg_w > 0 && jg_w < jg_a && jg_isstart(charat(jg_pm, jg_a)) == 1;
+  int jg_ok = jg_a < len(jg_pm) && jg_w > 0 && jg_w < jg_a && jg_isstart(character_code_at(jg_pm, jg_a)) == 1;
 } return int jg_ok;
 ("int xs", 4, 3):(1)
 ("int 9a", 4, 3):(0)

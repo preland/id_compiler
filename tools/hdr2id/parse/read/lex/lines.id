@@ -2,7 +2,7 @@
 
 // The index just past the token that starts at lx_i: an identifier or number, a quoted literal, the three dots of a variable argument list, or one character.
 hx_end(string lx_line, int lx_i) {
-  int lx_c = charat(lx_line, lx_i);
+  int lx_c = character_code_at(lx_line, lx_i);
   int lx_j = lx_i + 1;
   int lx_k = hx_kind(lx_c);
 } chain (string lx_line, int lx_i) {
@@ -28,7 +28,7 @@ hx_line(string lx_line, string[] lx_toks) {
   int lx_n = len(lx_line);
   while (lx_i < lx_n) {
     int lx_j = hx_end(lx_line, lx_i);
-    if (charat(lx_line, lx_i) > 32) {
+    if (character_code_at(lx_line, lx_i) > 32) {
       push(lx_toks, str_sub(lx_line, lx_i, lx_j - lx_i));
     }
     lx_i = lx_j;

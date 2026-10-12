@@ -150,7 +150,7 @@ main(int argc, string[] argv) {
   string s = "aZ9";
   int i = 0;
   while(i < len(s)) {
-    int c = charat(s, i);
+    int c = character_code_at(s, i);
     show_char(i, c);
     i = i + 1;
   }

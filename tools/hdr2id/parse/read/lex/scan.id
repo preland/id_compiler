@@ -18,7 +18,7 @@ hx_kind(int lx_c) {
 
 // The index where the run of identifier characters in lx_s that reaches lx_i stops.
 hx_run(string lx_s, int lx_i) {
-  while (hx_kind(charat(lx_s, lx_i)) == 1) {
+  while (hx_kind(character_code_at(lx_s, lx_i)) == 1) {
     lx_i = lx_i + 1;
   }
 } return int lx_i;
@@ -28,8 +28,8 @@ hx_run(string lx_s, int lx_i) {
 
 // The index just past the literal that began before lx_i and closes with the quote lx_q, skipping a backslash and the character after it. A literal the line ends inside stops at the end of the line.
 hx_quote(string lx_s, int lx_i, int lx_q) {
-  while (charat(lx_s, lx_i) >= 0 && charat(lx_s, lx_i) != lx_q) {
-    lx_i = lx_i + 1 + (charat(lx_s, lx_i) == 92);
+  while (character_code_at(lx_s, lx_i) >= 0 && character_code_at(lx_s, lx_i) != lx_q) {
+    lx_i = lx_i + 1 + (character_code_at(lx_s, lx_i) == 92);
   }
   int lx_e = fixed_point_minimum(lx_i + 1, len(lx_s));
 } return int lx_e;

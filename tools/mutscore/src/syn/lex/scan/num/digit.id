@@ -3,7 +3,7 @@
 
 // The end of the run of decimal digits that starts at ms_i.
 ms_lx_digits(string ms_s, int ms_i) {
-  while(chr_is_digit(charat(ms_s, ms_i)) == 1) {
+  while(chr_is_digit(character_code_at(ms_s, ms_i)) == 1) {
     ms_i = ms_i + 1;
   }
 } return int ms_i;
@@ -12,8 +12,8 @@ ms_lx_digits(string ms_s, int ms_i) {
 
 // 1 when the number at ms_i is spelt 0x.. or 0b.. (either case).
 ms_lx_radix(string ms_s, int ms_i) {
-  int ms_c = charat(ms_s, ms_i + 1);
-  int ms_r = charat(ms_s, ms_i) == 48 && (ms_c == 120 || ms_c == 88 || ms_c == 98 || ms_c == 66);
+  int ms_c = character_code_at(ms_s, ms_i + 1);
+  int ms_r = character_code_at(ms_s, ms_i) == 48 && (ms_c == 120 || ms_c == 88 || ms_c == 98 || ms_c == 66);
 } return int ms_r;
 ("0x1f", 0):(1)
 ("0B1", 0):(1)
@@ -24,7 +24,7 @@ ms_lx_radix(string ms_s, int ms_i) {
 // ms_e when there is none.
 ms_lx_frac(string ms_s, int ms_e) {
   int ms_f = ms_e;
-  if(charat(ms_s, ms_e) == 46 && chr_is_digit(charat(ms_s, ms_e + 1)) == 1) {
+  if(character_code_at(ms_s, ms_e) == 46 && chr_is_digit(character_code_at(ms_s, ms_e + 1)) == 1) {
     ms_f = ms_lx_digits(ms_s, ms_e + 1);
   }
 } return int ms_f;

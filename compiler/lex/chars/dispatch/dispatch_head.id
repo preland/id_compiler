@@ -19,7 +19,7 @@ given lex_fix_setup ("x", 0):(1) then prints:("ident x\n")
 // `//` line comment, or hand off
 scan_word(string src, int i) {
   int ni = 0;
-  if(charat(src, i) == 47 && charat(src, i + 1) == 47) {
+  if(character_code_at(src, i) == 47 && character_code_at(src, i + 1) == 47) {
     ni = str_eol(src, i);
   } else {
     ni = scan_block(src, i);

@@ -8,7 +8,7 @@
 
 first_difference(string digits, string limit) {
   int diff_at = 0;
-  while(diff_at < len(digits) && charat(digits, diff_at) == charat(limit, diff_at)) {
+  while(diff_at < len(digits) && character_code_at(digits, diff_at) == character_code_at(limit, diff_at)) {
     diff_at = diff_at + 1;
   }
 } return int diff_at;
@@ -18,7 +18,7 @@ first_difference(string digits, string limit) {
 digits_exceed(string digits, string limit) {
   int diff_at = first_difference(digits, limit);
   int exceeds = 0;
-  if(diff_at < len(digits) && charat(digits, diff_at) > charat(limit, diff_at)) {
+  if(diff_at < len(digits) && character_code_at(digits, diff_at) > character_code_at(limit, diff_at)) {
     exceeds = 1;
   }
 } return int exceeds;
@@ -28,7 +28,7 @@ digits_exceed(string digits, string limit) {
 
 exceeds_word(string text) {
   string significant = strip_zeros(text);
-  int exceeds = len(significant) > 20 || charat(text, 1) > 57;
+  int exceeds = len(significant) > 20 || character_code_at(text, 1) > 57;
   if(len(significant) == 20) {
     exceeds = digits_exceed(significant, "18446744073709551615");
   }

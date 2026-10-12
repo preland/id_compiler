@@ -5,21 +5,21 @@
 // about what can see it.
 
 is_alnum_at(string src, int i) {
-  int c = charat(src, i);
+  int c = character_code_at(src, i);
   int ok = is_alnum(c);
 } return int ok;
 ("a", 0):(1)
 (" ", 0):(0)
 
 is_hex_at(string src, int i) {
-  int c = charat(src, i);
+  int c = character_code_at(src, i);
   int ok = is_hex(c);
 } return int ok;
 ("f", 0):(1)
 ("g", 0):(0)
 
 is_bin_at(string src, int i) {
-  int c = charat(src, i);
+  int c = character_code_at(src, i);
   int ok = is_bin(c);
 } return int ok;
 ("1", 0):(1)

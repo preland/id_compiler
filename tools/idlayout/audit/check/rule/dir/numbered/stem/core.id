@@ -10,13 +10,13 @@
 lay_suffix_start(string s) {
   int i = len(s) - 1;
   int last_digit = -1;
-  while(i >= 0 && chr_is_digit(charat(s, i)) == 1) {
+  while(i >= 0 && chr_is_digit(character_code_at(s, i)) == 1) {
     last_digit = i;
     i = i - 1;
   }
 } chain (string s) {
   int start = last_digit;
-  if(last_digit > 0 && charat(s, last_digit - 1) == 95) {
+  if(last_digit > 0 && character_code_at(s, last_digit - 1) == 95) {
     start = last_digit - 1;
   }
 } return int start;

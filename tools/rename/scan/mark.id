@@ -7,7 +7,7 @@ rename_line_at(string rename_source, int[] rename_cells, int rename_at) {
   int rename_line = rename_cells[1];
   int rename_index = rename_cells[0];
   while(rename_index < rename_at) {
-    rename_line = rename_line + (charat(rename_source, rename_index) == 10);
+    rename_line = rename_line + (character_code_at(rename_source, rename_index) == 10);
     rename_index = rename_index + 1;
   }
 } chain (string rename_source, int[] rename_cells, int rename_at) {

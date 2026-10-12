@@ -2,8 +2,8 @@
 
 // 1 when the two bytes at ms_i spell an operator of two characters.
 ms_lx_two(string ms_s, int ms_i) {
-  int ms_a = charat(ms_s, ms_i);
-  int ms_b = charat(ms_s, ms_i + 1);
+  int ms_a = character_code_at(ms_s, ms_i);
+  int ms_b = character_code_at(ms_s, ms_i + 1);
   int ms_t = (ms_b == 61 && (ms_a == 61 || ms_a == 33 || ms_a == 60 || ms_a == 62)) || (ms_a == ms_b && (ms_a == 38 || ms_a == 124 || ms_a == 60 || ms_a == 62));
 } return int ms_t;
 ("<=", 0):(1)
@@ -14,7 +14,7 @@ ms_lx_two(string ms_s, int ms_i) {
 
 // The kind (ms_k_id and its neighbours in conf.id) of the token at ms_i.
 ms_lx_kind(string ms_s, int ms_i) {
-  int ms_c = charat(ms_s, ms_i);
+  int ms_c = character_code_at(ms_s, ms_i);
   int ms_k = (import ms_k_op);
   if(chr_is_digit(ms_c) == 1) {
     ms_k = (import ms_k_int) + (ms_lx_real(ms_s, ms_i) > ms_lx_digits(ms_s, ms_i));

@@ -20,7 +20,7 @@ given tf_key("k:c") given lb_tables ("k", "ab c", 3, 5):(5) then tf_look:(5)
 given tf_key("k:c") given lb_tables ("k", "ab c", 0, 5):(3) then tf_look:(-1)
 
 lb_end(string src, int e) {
-  while (charat(src, e) != 32 && charat(src, e) >= 0) {
+  while (character_code_at(src, e) != 32 && character_code_at(src, e) >= 0) {
     e = e + 1;
   }
 } return int e;

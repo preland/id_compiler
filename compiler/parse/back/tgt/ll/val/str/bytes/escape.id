@@ -16,10 +16,10 @@ ll_bytes(string s) {
 ("\"a\""):("\\61\\00")
 
 ll_piece(string s, int i) {
-  int charat_v = charat(s, i);
+  int charat_v = character_code_at(s, i);
   string out = ll_hex(charat_v);
-  if(charat(s, i) == 92) {
-    int charat_v2 = charat(s, i + 1);
+  if(character_code_at(s, i) == 92) {
+    int charat_v2 = character_code_at(s, i + 1);
     int ll_escbyte_v = ll_escbyte(charat_v2);
     out = ll_hex(ll_escbyte_v);
   }

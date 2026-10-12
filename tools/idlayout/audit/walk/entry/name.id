@@ -3,7 +3,7 @@
 
 lay_last_slash(string path) {
   int i = len(path) - 1;
-  while(i >= 0 && charat(path, i) != 47) {
+  while(i >= 0 && character_code_at(path, i) != 47) {
     i = i - 1;
   }
 } return int i;

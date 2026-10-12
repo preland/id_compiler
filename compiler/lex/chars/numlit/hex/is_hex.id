@@ -3,7 +3,7 @@
 // identifier starting with x from being mistaken for one.
 hex_start(string src, int i) {
   int ok = 0;
-  if(charat(src, i) == 48 && (charat(src, i + 1) == 120 || charat(src, i + 1) == 88) && is_hex_at(src, i + 2)) {
+  if(character_code_at(src, i) == 48 && (character_code_at(src, i + 1) == 120 || character_code_at(src, i + 1) == 88) && is_hex_at(src, i + 2)) {
     ok = 1;
   }
 } return int ok;
@@ -22,7 +22,7 @@ hex_end(string src, int i) {
 hex_val(string src, int i, int e) {
   word v = 0;
   while(i < e) {
-    int charat_v = charat(src, i);
+    int charat_v = character_code_at(src, i);
     v = v * 16 + hex_digit(charat_v);
     i = i + 1;
   }

@@ -11,7 +11,7 @@ fb_rstrip(string s) {
 // The length of s without its trailing spaces.
 fb_end(string s) {
   int n = len(s);
-  while(n > 0 && charat(s, n - 1) == 32) {
+  while(n > 0 && character_code_at(s, n - 1) == 32) {
     n = n - 1;
   }
 } return int n;

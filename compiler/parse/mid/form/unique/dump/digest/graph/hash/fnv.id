@@ -9,8 +9,8 @@
 
 dg_fnv(word dgh, string dgs) {
   int dgi = 0;
-  while(charat(dgs, dgi) >= 0) {
-    dgh = (dgh ^ charat(dgs, dgi)) * 1099511628211;
+  while(character_code_at(dgs, dgi) >= 0) {
+    dgh = (dgh ^ character_code_at(dgs, dgi)) * 1099511628211;
     dgi = dgi + 1;
   }
 } return word dgh;

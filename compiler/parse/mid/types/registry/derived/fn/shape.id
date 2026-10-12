@@ -8,7 +8,7 @@
 // 102 is `f` and 40 is `(`: no other type has a parenthesis after four letters.
 ty_is_func(string t) {
   int ok = 0;
-  if(charat(t, 0) == 102 && charat(t, 4) == 40) {
+  if(character_code_at(t, 0) == 102 && character_code_at(t, 4) == 40) {
     ok = 1;
   }
 } return int ok;
@@ -20,7 +20,7 @@ fn_close(string t) {
   int i = 5;
   int d = 1;
   while(d > 0 && i < len(t)) {
-    int c = charat(t, i);
+    int c = character_code_at(t, i);
     d = d + fn_depth(c);
     i = i + 1;
   }

@@ -5,6 +5,6 @@ main(int argc, string[] argv) {
 } return int 0;
 
 show_code(string a) {
-  int c = charat(a, 0);
+  int c = character_code_at(a, 0);
   print(c);
 } return void;

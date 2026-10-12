@@ -4,7 +4,7 @@
 
 jg_type_end(string jg_win, int jg_p) {
   int jg_e = jg_p;
-  if (jg_isstart(charat(jg_win, jg_p)) == 1) {
+  if (jg_isstart(character_code_at(jg_win, jg_p)) == 1) {
     jg_e = jg_ident_end(jg_win, jg_p);
   }
   while (jg_e > jg_p && str_eqat(jg_win, jg_e, "[]") == 1) {
@@ -22,7 +22,7 @@ jg_ret_of(string jg_win) {
   int jg_p = jg_skip_ws(jg_win, 6);
   int jg_e = jg_type_end(jg_win, jg_p);
 } chain (string jg_win) {
-  if (str_starts(jg_win, "return") == 1 && jg_ws(charat(jg_win, 6)) == 1 && jg_e > jg_p) {
+  if (str_starts(jg_win, "return") == 1 && jg_ws(character_code_at(jg_win, 6)) == 1 && jg_e > jg_p) {
     jg_ty = str_sub(jg_win, jg_p, jg_e - jg_p);
   }
 } return string jg_ty;

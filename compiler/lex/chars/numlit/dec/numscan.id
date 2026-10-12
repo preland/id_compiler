@@ -13,7 +13,7 @@ digit_run_end(string src, int i) {
 
 has_frac(string src, int e) {
   int ok = 0;
-  if(charat(src, e) == 46 && is_digit_at(src, e + 1)) {
+  if(character_code_at(src, e) == 46 && is_digit_at(src, e + 1)) {
     ok = 1;
   }
 } return int ok;
@@ -25,10 +25,10 @@ has_frac(string src, int e) {
 // there: the parser reports it by name (E0103) instead of the lexer leaving a
 // stray `e` identifier behind to be misread as a variable.
 exp_end(string src, int fe) {
-  int c = charat(src, fe);
+  int c = character_code_at(src, fe);
   int ee = fe;
   if(c == 101 || c == 69) {
-    int sg = charat(src, fe + 1);
+    int sg = character_code_at(src, fe + 1);
     ee = digit_run_end(src, fe + 1 + (sg == 43 || sg == 45));
   }
 } return int ee;

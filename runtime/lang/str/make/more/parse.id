@@ -7,7 +7,7 @@
 
 to_int(string s) {
   int n = 0;
-  if(charat(s, 0) == 45) {
+  if(character_code_at(s, 0) == 45) {
     n = 1;
   }
   int ret_i = to_int_at(s, n);
@@ -21,8 +21,8 @@ to_int_at(string s, int n) {
 } return int c;
 
 to_digits(string s, int n, int c) {
-  while(charat(s, n) >= 48 && charat(s, n) <= 57) {
-    c = c * 10 + charat(s, n) - 48;
+  while(character_code_at(s, n) >= 48 && character_code_at(s, n) <= 57) {
+    c = c * 10 + character_code_at(s, n) - 48;
     n = n + 1;
   }
 } return int c;

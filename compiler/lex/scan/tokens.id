@@ -6,7 +6,7 @@
 scan_ident(string src, int i) {
   string ident = "";
   while(is_alnum_at(src, i)) {
-    int charat_v = charat(src, i);
+    int charat_v = character_code_at(src, i);
     ident = ident + chr(charat_v);
     i = i + 1;
   }

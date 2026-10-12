@@ -15,7 +15,7 @@ ms_lx_one(int[] ms_tk, string ms_s, int ms_i) {
 ms_lex(string ms_s) {
   int[] ms_tk = [];
   int ms_i = ms_lx_skip(ms_s, 0);
-  while(charat(ms_s, ms_i) != -1) {
+  while(character_code_at(ms_s, ms_i) != -1) {
     ms_i = ms_lx_one(ms_tk, ms_s, ms_i);
   }
 } return int[] ms_tk;

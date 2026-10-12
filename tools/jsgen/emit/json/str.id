@@ -28,7 +28,7 @@ jg_json(string jg_s) {
   string[] jg_ps = ["\""];
   int jg_i = 0;
   while (jg_i < len(jg_s)) {
-    int jg_c = charat(jg_s, jg_i);
+    int jg_c = character_code_at(jg_s, jg_i);
     push(jg_ps, jg_json_esc(jg_c));
     jg_i = jg_i + 1;
   }
@@ -44,8 +44,8 @@ jg_ident(string jg_s) {
   string jg_o = "";
   int jg_i = 0;
   while (jg_i < len(jg_s)) {
-    if (jg_isid(charat(jg_s, jg_i)) == 1) {
-      jg_o = jg_o + chr(charat(jg_s, jg_i));
+    if (jg_isid(character_code_at(jg_s, jg_i)) == 1) {
+      jg_o = jg_o + chr(character_code_at(jg_s, jg_i));
     } else {
       jg_o = jg_o + "_";
     }

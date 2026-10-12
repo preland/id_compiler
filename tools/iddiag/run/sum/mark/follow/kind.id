@@ -19,7 +19,7 @@ dg_artefact(string dg_ar_h) {
   int dg_ar_r = 0;
 } chain (string dg_ar_h) {
   if(dg_ar_q >= 0 && dg_ar_q + 1 < len(dg_ar_m)) {
-    int dg_ar_c = charat(dg_ar_m, dg_ar_q + 1);
+    int dg_ar_c = character_code_at(dg_ar_m, dg_ar_q + 1);
     dg_ar_r = chr_is_alpha(dg_ar_c) == 0 && dg_ar_c != 95;
   }
 } return int dg_ar_r;

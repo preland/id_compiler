@@ -2978,12 +2978,12 @@ self_refuse "bin/idc: ...and its help names the fix" \
 
 cat > "$TMP/p.id" <<'EOF'
 slot_x() {
-  int c = charat("abc", 0);
+  int c = character_code_at("abc", 0);
   int r = c + 1;
 } return int r;
 
 slot_y() {
-  int c = charat("abc", 1);
+  int c = character_code_at("abc", 1);
   int r = c + 1;
 } return int r;
 

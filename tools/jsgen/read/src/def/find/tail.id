@@ -4,7 +4,7 @@
 jg_chain_open(string jg_t, int jg_cl) {
   int jg_at = jg_skip_ws(jg_t, jg_cl);
   int jg_e = -1;
-  if (charat(jg_t, jg_at) == (import jg_lbrace)) {
+  if (character_code_at(jg_t, jg_at) == (import jg_lbrace)) {
     jg_e = jg_match_close(jg_t, jg_at, (import jg_lbrace), (import jg_rbrace));
   }
 } return int jg_e;

@@ -7,7 +7,7 @@
 
 flt_e_at(string text) {
   int flk = 0;
-  while(flk < len(text) && charat(text, flk) != 101 && charat(text, flk) != 69) {
+  while(flk < len(text) && character_code_at(text, flk) != 101 && character_code_at(text, flk) != 69) {
     flk = flk + 1;
   }
 } return int flk;

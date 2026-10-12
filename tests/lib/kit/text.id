@@ -24,13 +24,13 @@ kit_split(string kt_text, string kt_cut) {
   int kt_p = 0;
 } chain (string kt_text, string kt_cut) {
   int kt_end = len(kt_text);
-  int kt_sepc = charat(kt_cut, 0);
+  int kt_sepc = character_code_at(kt_cut, 0);
   while (kt_p < kt_end) {
-    if (charat(kt_text, kt_p) == kt_sepc) {
+    if (character_code_at(kt_text, kt_p) == kt_sepc) {
       push(kt_pieces, kt_cur);
       kt_cur = "";
     } else {
-      kt_cur = kt_cur + chr(charat(kt_text, kt_p));
+      kt_cur = kt_cur + chr(character_code_at(kt_text, kt_p));
     }
     kt_p = kt_p + 1;
   }

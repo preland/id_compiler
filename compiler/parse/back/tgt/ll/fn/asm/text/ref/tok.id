@@ -2,7 +2,7 @@
 // round -- so an AT&T immediate `$0` becomes `$$0`, an operand reference
 // `%[name]` becomes `$N`, and a literal percent `%%` becomes `%`.
 ll_asm_tok(int r, string s, int i) {
-  int c = charat(s, i);
+  int c = character_code_at(s, i);
   string out = ll_asm_tok_sel(r, s, i, c);
 } return string out;
 given llasm_row_fixture (0, "$0", 0):("$$")
@@ -10,7 +10,7 @@ given llasm_row_fixture (0, "%[x]", 0):("$1")
 
 ll_asm_ref(int r, string s, int i) {
   string out = "%";
-  if(charat(s, i + 1) != 37) {
+  if(character_code_at(s, i + 1) != 37) {
     out = ll_asm_ref2(r, s, i);
   }
 } return string out;
@@ -23,8 +23,8 @@ given llasm_row_fixture (0, "%%y", 0):("%")
 ll_asm_ref2(int r, string s, int i) {
   string nm = ll_asm_ref2_nm(s, i);
   string out = "$" + ll_asm_ix(r, nm);
-  if(charat(s, i + 1) != 91) {
-    int charat_v = charat(s, i + 1);
+  if(character_code_at(s, i + 1) != 91) {
+    int charat_v = character_code_at(s, i + 1);
     out = "${" + ll_asm_ix(r, nm) + ":" + chr(charat_v) + "}";
   }
 } return string out;

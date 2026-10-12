@@ -7,7 +7,7 @@
 
 is_shebang(string src, int i) {
   int ok = 0;
-  if(charat(src, i) == 35 && charat(src, i + 1) == 33 && i == (import lexbol)[0] && (import lexline)[0] == 1) {
+  if(character_code_at(src, i) == 35 && character_code_at(src, i + 1) == 33 && i == (import lexbol)[0] && (import lexline)[0] == 1) {
     ok = 1;
   }
 } return int ok;
@@ -19,7 +19,7 @@ given lex_fix_setup ("x!", 0):(0)
 // A `#`: `#!` is a shebang or an error, any other `#word` is a driver marker.
 scan_bang(string src, int i) {
   int e = 0;
-  if(charat(src, i + 1) == 33) {
+  if(character_code_at(src, i + 1) == 33) {
     e = scan_shebang(src, i);
   } else {
     e = scan_hash(src, i);

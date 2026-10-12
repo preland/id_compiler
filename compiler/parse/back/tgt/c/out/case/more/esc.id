@@ -13,7 +13,7 @@ c_esc(string t) {
 ("a\"b"):("a\\\"b")
 
 esc_at(string t, int i) {
-  int ch = charat(t, i);
+  int ch = character_code_at(t, i);
   string so = esc_code(ch);
 } return string so;
 ("ab", 0):("a")

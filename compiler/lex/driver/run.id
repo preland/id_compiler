@@ -37,7 +37,7 @@ main(int argc, string[] argv) {
 // newline -- the whitespace branch of scan_one -- which is why tracking costs
 // one function rather than a parameter threaded through the dispatch chain.
 eat_space(string src, int i) {
-  if(charat(src, i) == 10) {
+  if(character_code_at(src, i) == 10) {
     bump_line();
     lset((import lexbol), 0, i + 1);
   }

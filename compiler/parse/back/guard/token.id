@@ -14,7 +14,7 @@ gt_iscmp(string gt_tok) {
 ("+:2"):(0)
 
 gt_isar(string gt_tok) {
-  int gt_ch = charat(gt_tok, 0);
+  int gt_ch = character_code_at(gt_tok, 0);
   int gt_is = gt_ch == 43 || gt_ch == 45 || gt_ch == 42;
 } return int gt_is;
 ("+:2"):(1)
@@ -26,8 +26,8 @@ gt_isar(string gt_tok) {
 ("wide"):(0)
 
 gt_isval(string gt_tok) {
-  int gt_ch = charat(gt_tok, 0);
-  int gt_is = (gt_ch == 118 || gt_ch == 105 || gt_ch == 107) && charat(gt_tok, 1) == 58;
+  int gt_ch = character_code_at(gt_tok, 0);
+  int gt_is = (gt_ch == 118 || gt_ch == 105 || gt_ch == 107) && character_code_at(gt_tok, 1) == 58;
 } return int gt_is;
 ("v:x"):(1)
 ("i:3"):(1)

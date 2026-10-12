@@ -2,7 +2,7 @@
 // of the first that is not of it.
 
 jg_skip_hs(string jg_t, int jg_i) {
-  while (charat(jg_t, jg_i) == (import jg_space) || charat(jg_t, jg_i) == (import jg_tab)) {
+  while (character_code_at(jg_t, jg_i) == (import jg_space) || character_code_at(jg_t, jg_i) == (import jg_tab)) {
     jg_i = jg_i + 1;
   }
 } return int jg_i;
@@ -10,7 +10,7 @@ jg_skip_hs(string jg_t, int jg_i) {
 ("a\nb", 1):(1)
 
 jg_skip_ws(string jg_t, int jg_i) {
-  while (jg_ws(charat(jg_t, jg_i)) == 1) {
+  while (jg_ws(character_code_at(jg_t, jg_i)) == 1) {
     jg_i = jg_i + 1;
   }
 } return int jg_i;
@@ -19,7 +19,7 @@ jg_skip_ws(string jg_t, int jg_i) {
 ("a ", 1):(2)
 
 jg_ident_end(string jg_t, int jg_i) {
-  while (jg_isid(charat(jg_t, jg_i)) == 1) {
+  while (jg_isid(character_code_at(jg_t, jg_i)) == 1) {
     jg_i = jg_i + 1;
   }
 } return int jg_i;

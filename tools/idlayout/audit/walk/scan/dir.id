@@ -25,7 +25,7 @@ given lay_reset ("d", "r", "build", 0, "loop", "loop"):() then calls lay_check_s
 
 lay_handle_dir(int[] buf, int lo, int hi, string dir, string root, string build, int is_root, string self) {
   string name = lay_name_of(buf, lo, hi);
-  int hidden = charat(name, 0) == 46;
+  int hidden = character_code_at(name, 0) == 46;
   int pruned = is_root == 1 && name == build;
 } chain (int[] buf, int lo, int hi, string dir, string root, string build, int is_root, string self) {
   if(hidden == 0 && pruned == 0) {

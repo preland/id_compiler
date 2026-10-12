@@ -4,7 +4,7 @@
 // shifted.
 km_row(int[] lo, int[] hi, int first, string low, string high) {
   int i = 0;
-  while(charat(low, i) >= 0) {
+  while(character_code_at(low, i) >= 0) {
     km_put(lo, first + i, low, i);
     km_put(hi, first + i, high, i);
     i = i + 1;
@@ -14,7 +14,7 @@ km_row(int[] lo, int[] hi, int first, string low, string high) {
 ([5], [6], 0, "", ""):([5], [6], 0, "", "")
 
 km_put(int[] xs, int code, string s, int i) {
-  int c = charat(s, i);
+  int c = character_code_at(s, i);
   xs[code] = c;
 } return void;
 ([0, 0], 1, "xy", 1):([0, 121], 1, "xy", 1)

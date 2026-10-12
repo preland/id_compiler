@@ -25,7 +25,7 @@ scan_decop(string src, int i) {
 // one `#` the source itself may hold is `#!` on its first line (scan_bang).
 scan_hashop(string src, int i) {
   int ni = 0;
-  if(charat(src, i) == 35) {
+  if(character_code_at(src, i) == 35) {
     ni = scan_bang(src, i);
   } else {
     ni = scan_token(src, i);

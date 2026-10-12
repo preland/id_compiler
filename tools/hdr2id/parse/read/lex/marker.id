@@ -2,7 +2,7 @@
 
 // The path a linemarker line names, or "" for any line that is not one. A linemarker is # then a space then a line number.
 hx_marker(string lx_line) {
-  int lx_ok = str_starts(lx_line, "# ") && chr_is_digit(charat(lx_line, 2));
+  int lx_ok = str_starts(lx_line, "# ") && chr_is_digit(character_code_at(lx_line, 2));
   int lx_a = str_find(lx_line, "\"");
   int lx_b = str_findat(lx_line, "\"", lx_a + 1);
 } chain (string lx_line) {

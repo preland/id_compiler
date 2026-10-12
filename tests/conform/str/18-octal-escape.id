@@ -5,7 +5,7 @@
 main(int argc, string[] argv) {
   string esc = "\033[0m";
   string mix = "\1011\7\0121";
-  print(len(esc) + " " + charat(esc, 0) + " " + charat(esc, 1) + " " + len(mix) + " " + charat(mix, 0));
+  print(len(esc) + " " + character_code_at(esc, 0) + " " + character_code_at(esc, 1) + " " + len(mix) + " " + character_code_at(mix, 0));
 } chain (int argc, string[] argv) {
-  print(charat(mix, 1) + " " + charat(mix, 2) + " " + charat(mix, 3) + " " + charat(mix, 4));
+  print(character_code_at(mix, 1) + " " + character_code_at(mix, 2) + " " + character_code_at(mix, 3) + " " + character_code_at(mix, 4));
 } return int 0;

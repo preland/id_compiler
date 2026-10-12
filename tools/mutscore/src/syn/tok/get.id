@@ -19,7 +19,7 @@ ms_tk_ch(string ms_s, int[] ms_tk, int ms_t) {
   int ms_a = ms_tk_get(ms_tk, ms_t, 1);
   int ms_c = -1;
   if(ms_a >= 0) {
-    ms_c = charat(ms_s, ms_a);
+    ms_c = character_code_at(ms_s, ms_a);
   }
 } return int ms_c;
 ("a;", [0, 0, 1, 4, 1, 2], 1):(59)

@@ -16,7 +16,7 @@ fill_bytes(int[] out, string s, int n, int i) {
 ([200], "abc", 3, 1):([200, 98, 99])
 
 push_one_byte(int[] out, string s, int i) {
-  int c = charat(s, i);
+  int c = character_code_at(s, i);
   push(out, c);
   int j = i + 1;
 } return int j;

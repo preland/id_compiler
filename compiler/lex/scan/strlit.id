@@ -4,7 +4,7 @@
 // which keeps the original source spelling of a string literal.
 
 str_end(string src, int i) {
-  while(charat(src, i) != 34 && charat(src, i) != -1) {
+  while(character_code_at(src, i) != 34 && character_code_at(src, i) != -1) {
     i = adv_str(src, i);
   }
 } return int i;
@@ -15,7 +15,7 @@ str_end(string src, int i) {
 // escaped char, so an escaped quote is not mistaken for the terminator)
 adv_str(string src, int i) {
   int n = i + 1;
-  if(charat(src, i) == 92) {
+  if(character_code_at(src, i) == 92) {
     n = i + 2;
   }
 } return int n;

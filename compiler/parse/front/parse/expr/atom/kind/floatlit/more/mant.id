@@ -14,7 +14,7 @@ flt_lit_mant(string text) {
 // is zero, which can overflow nothing).
 flt_lstrip(string flraw) {
   int fli = 0;
-  while(charat(flraw, fli) == 48) {
+  while(character_code_at(flraw, fli) == 48) {
     fli = fli + 1;
   }
   int fln = len(flraw);

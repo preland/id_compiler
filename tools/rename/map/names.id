@@ -17,7 +17,7 @@ rename_is_keyword(string rename_name) {
 // digits and underscores, to the end.
 rename_valid_name(string rename_name) {
   int rename_valid = 0;
-  if(len(rename_name) > 0 && (chr_is_alpha(charat(rename_name, 0)) || charat(rename_name, 0) == 95)) {
+  if(len(rename_name) > 0 && (chr_is_alpha(character_code_at(rename_name, 0)) || character_code_at(rename_name, 0) == 95)) {
     rename_valid = rename_run_end(rename_name, 0) == len(rename_name);
   }
 } return int rename_valid;

@@ -12,7 +12,7 @@ fn_walk(string t, int hi, int[] st, string[] pts) {
 ("func()", 5, [5, 0], []):("func()", 5, [5, 0], [])
 
 fn_step(string t, int i, int[] st, string[] pts) {
-  int c = charat(t, i);
+  int c = character_code_at(t, i);
   if(c == 44 && st[1] == 0) {
     fn_cut(t, i, st, pts);
   } else {

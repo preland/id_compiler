@@ -14,7 +14,7 @@ print_uint(word v) {
 
 // The index of the first digit of src[from, e) that is not a '0'.
 zero_end(string src, int from, int e) {
-  while(from < e && charat(src, from) == 48) {
+  while(from < e && character_code_at(src, from) == 48) {
     from = from + 1;
   }
 } return int from;

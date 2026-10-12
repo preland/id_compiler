@@ -31,7 +31,7 @@ elem_type(string t) {
   string out = "";
   int i = 0;
   while(i < len(t) - 2) {
-    int charat_v = charat(t, i);
+    int charat_v = character_code_at(t, i);
     out = out + chr(charat_v);
     i = i + 1;
   }

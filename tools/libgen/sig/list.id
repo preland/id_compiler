@@ -27,7 +27,7 @@ lg_lastsp(string lg_s) {
   int lg_n = len(lg_s);
 } chain (string lg_s) {
   while (lg_i < lg_n) {
-    if (charat(lg_s, lg_i) == 32) {
+    if (character_code_at(lg_s, lg_i) == 32) {
       lg_at = lg_i;
     }
     lg_i = lg_i + 1;

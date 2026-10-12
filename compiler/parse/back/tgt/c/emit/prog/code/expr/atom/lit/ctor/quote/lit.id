@@ -26,7 +26,7 @@ lit_qcount(string raw) {
   int n = 0;
   int i = 0;
   while(i < len(raw)) {
-    if(charat(raw, i) == 63) {
+    if(character_code_at(raw, i) == 63) {
       n = n + 1;
     }
     n = n + 2 * hex_escape_at(raw, i);
@@ -43,7 +43,7 @@ lit_qcount(string raw) {
 // follow it and the digits after the second must not be part of it.
 lit_width(string raw, int i) {
   int lit_adv = 1;
-  if(charat(raw, i) == 92) {
+  if(character_code_at(raw, i) == 92) {
     lit_adv = 2;
   }
   if(hex_escape_at(raw, i) == 1) {

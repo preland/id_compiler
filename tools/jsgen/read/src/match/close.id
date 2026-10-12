@@ -5,10 +5,10 @@
 
 jg_mc_step(string jg_t, int[] jg_st, int jg_open, int jg_close) {
   int jg_i = jg_st[0];
-  int jg_c = charat(jg_t, jg_i);
+  int jg_c = character_code_at(jg_t, jg_i);
   jg_st[0] = jg_i + 1;
 } chain (string jg_t, int[] jg_st, int jg_open, int jg_close) {
-  if (jg_c == (import jg_slash) && charat(jg_t, jg_i + 1) == (import jg_slash)) {
+  if (jg_c == (import jg_slash) && character_code_at(jg_t, jg_i + 1) == (import jg_slash)) {
     jg_st[0] = str_eol(jg_t, jg_i) + 1;
   } else if (jg_c == (import jg_quote)) {
     jg_st[0] = jg_str_end(jg_t, jg_i + 1) + 1;

@@ -6,7 +6,7 @@
 // a fourth, 'A', that canon_expr itself never produces. 73, 70, 83 and 65 are
 // those letters.
 cw_is_lit(string fp) {
-  int tag = charat(fp, 0);
+  int tag = character_code_at(fp, 0);
   int ok = tag == 73 || tag == 70 || tag == 83 || tag == 65;
 } return int ok;
 ("A[1, 2]"):(1)
@@ -18,7 +18,7 @@ cw_is_lit(string fp) {
 // not reduce, so it is spelled as the subtraction that does. 45 is '-'.
 cw_spell(string val) {
   string lit = zeros_tail(val, 1);
-  if(charat(lit, 0) == 45) {
+  if(character_code_at(lit, 0) == 45) {
     string mag = zeros_tail(lit, 1);
     lit = "0 - " + mag;
   }

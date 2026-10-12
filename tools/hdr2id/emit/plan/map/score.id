@@ -24,7 +24,7 @@ pl_prefix(string pl_x, string pl_y) {
   string pl_ly = str_lower(pl_y);
   int pl_i = 0;
 } chain (string pl_x, string pl_y) {
-  while (pl_i < len(pl_lx) && pl_i < len(pl_ly) && charat(pl_lx, pl_i) == charat(pl_ly, pl_i)) {
+  while (pl_i < len(pl_lx) && pl_i < len(pl_ly) && character_code_at(pl_lx, pl_i) == character_code_at(pl_ly, pl_i)) {
     pl_i = pl_i + 1;
   }
 } return int pl_i;

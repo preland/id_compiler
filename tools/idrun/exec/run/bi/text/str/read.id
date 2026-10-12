@@ -2,7 +2,7 @@
 vm_b_charat(word wa, word wb) {
   int ia = wa;
   int i = wb;
-  int c = charat((import ex_strs)[ia], i);
+  int c = character_code_at((import ex_strs)[ia], i);
 } return int c;
 given vb_boot given tf_sput("abc") (1, 1):(98)
 given vb_boot given tf_sput("abc") (1, 3):(-1)

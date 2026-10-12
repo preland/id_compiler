@@ -13,7 +13,7 @@ len(string s) {
   int ret_i = ld64(s2w_v - 8);
 } return int ret_i;
 
-charat(string s, int i) {
+character_code_at(string s, int i) {
   int c = 0 - 1;
   if(i >= 0 && i < len(s)) {
     word s2w_v = s2w(s);

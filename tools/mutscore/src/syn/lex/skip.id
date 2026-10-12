@@ -3,9 +3,9 @@
 // Where the one blank or comment starting at ms_i ends; ms_i itself when a
 // token starts there (or the text has ended).
 ms_lx_gap(string ms_s, int ms_i) {
-  int ms_c = charat(ms_s, ms_i);
+  int ms_c = character_code_at(ms_s, ms_i);
   int ms_j = ms_i + chr_is_space(ms_c);
-  if(ms_c == 47 && charat(ms_s, ms_i + 1) == 47) {
+  if(ms_c == 47 && character_code_at(ms_s, ms_i + 1) == 47) {
     ms_j = str_eol(ms_s, ms_i);
   }
 } return int ms_j;

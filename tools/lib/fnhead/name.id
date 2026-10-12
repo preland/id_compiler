@@ -29,7 +29,7 @@ fh_is_name(string fh_s) {
   int fh_i = 0;
   int fh_ok = len(fh_s) > 0;
   while(fh_i < len(fh_s) && fh_ok == 1) {
-    int fh_c = charat(fh_s, fh_i);
+    int fh_c = character_code_at(fh_s, fh_i);
     fh_ok = fh_c == 95 || chr_is_alpha(fh_c) == 1 || (fh_i > 0 && chr_is_digit(fh_c) == 1);
     fh_i = fh_i + 1;
   }

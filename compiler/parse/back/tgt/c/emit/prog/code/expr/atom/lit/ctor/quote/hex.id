@@ -30,7 +30,7 @@ given lit_buf ("\\x41", 0, (import lit_ad), 0):(6)
 lit_hex_char(string raw, int i, int copy_index) {
   int hex_char = 34;
   if(copy_index < 4) {
-    hex_char = charat(raw, i + copy_index);
+    hex_char = character_code_at(raw, i + copy_index);
   }
 } return int hex_char;
 ("\\x41", 0, 1):(120)

@@ -14,7 +14,7 @@ given init_tyreg (3, 0):() then reg_last_width:(3)
 ty_is_list(string t) {
   int ok = 0;
   int n = len(t);
-  if(n > 2 && charat(t, n - 1) == 93 && ty_is_func(t) == 0) {
+  if(n > 2 && character_code_at(t, n - 1) == 93 && ty_is_func(t) == 0) {
     ok = 1;
   }
 } return int ok;

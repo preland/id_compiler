@@ -2,7 +2,7 @@
 // running value cannot overflow an int on the multiply.
 hash_loop(string s, int i, int hv) {
   while(i < len(s)) {
-    int charat_v = charat(s, i);
+    int charat_v = character_code_at(s, i);
     hv = hash_step(hv, charat_v);
     i = i + 1;
   }

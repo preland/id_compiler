@@ -13,7 +13,7 @@ farm_c() {
 ():() then init_units:(0)
 
 tdig_step(string name, int dstart) {
-  int ch = charat(name, dstart - 1);
+  int ch = character_code_at(name, dstart - 1);
   int ok = is_digit_c(ch);
 } return int ok;
 ("v2", 2):(1)

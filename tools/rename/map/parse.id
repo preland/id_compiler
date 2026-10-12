@@ -22,7 +22,7 @@ rename_parse_line(string rename_entry, string[] rename_old_names, string[] renam
   string[] rename_pair = str_words(rename_text);
   string rename_problem = "";
 } chain (string rename_entry, string[] rename_old_names, string[] rename_news, string[] rename_problems, int rename_number) {
-  if(rename_text != "" && charat(rename_text, 0) != 35) {
+  if(rename_text != "" && character_code_at(rename_text, 0) != 35) {
     rename_problem = rename_take_pair(rename_old_names, rename_news, rename_pair, rename_number);
   }
   if(rename_problem != "") {

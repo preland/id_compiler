@@ -20,7 +20,7 @@ given bound_n_fix ([2], "prefix"):("prefix n")
 bound_sep(string out, string t2) {
   string gap = " ";
   int n = len(out);
-  if(n == 0 || t2 == "^" || charat(out, n - 1) == 94) {
+  if(n == 0 || t2 == "^" || character_code_at(out, n - 1) == 94) {
     gap = "";
   }
 } return string gap;

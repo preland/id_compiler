@@ -26,16 +26,16 @@ given lit_buf ("a\\x41", (import lit_ad)):(7)
 // One unit of the literal written at j; the new j. A backslash pair is two
 // bytes as written, a `?` is the two bytes `\?`, anything else is itself.
 lit_emit(string raw, int i, word ad, int j) {
-  poke8(ad + j, charat(raw, i));
-  if(charat(raw, i) == 92) {
-    poke8(ad + j + 1, charat(raw, i + 1));
-  } else if(charat(raw, i) == 63) {
+  poke8(ad + j, character_code_at(raw, i));
+  if(character_code_at(raw, i) == 92) {
+    poke8(ad + j + 1, character_code_at(raw, i + 1));
+  } else if(character_code_at(raw, i) == 63) {
     poke8(ad + j, 92);
     poke8(ad + j + 1, 63);
   }
 } chain (string raw, int i, word ad, int j) {
   j = j + lit_width(raw, i);
-  if(charat(raw, i) == 63) {
+  if(character_code_at(raw, i) == 63) {
     j = j + 1;
   }
 } return int j;

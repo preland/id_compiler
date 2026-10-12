@@ -7,7 +7,7 @@
 put(string s) {
   int i = 0;
   while(i < len(s)) {
-    int charat_v = charat(s, i);
+    int charat_v = character_code_at(s, i);
     com1_out(charat_v);
     i = i + 1;
   }

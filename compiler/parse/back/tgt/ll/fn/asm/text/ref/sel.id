@@ -1,9 +1,9 @@
 // The rest of `ll_asm_tok`: which of the three token shapes this one is.
 ll_asm_tok_sel(int r, string s, int i, int c) {
   string out = chr(c);
-  if(charat(s, i) == 36) {
+  if(character_code_at(s, i) == 36) {
     out = "$$";
-  } else if(charat(s, i) == 37) {
+  } else if(character_code_at(s, i) == 37) {
     out = ll_asm_ref(r, s, i);
   }
 } return string out;

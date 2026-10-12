@@ -21,7 +21,7 @@ rename_token_end(string rename_source, int rename_index) {
 // starts one, a digit starts a number. Answers the index to continue from.
 rename_next(string rename_source, int rename_index, int[] rename_spans, int[] rename_cells) {
   int rename_end = rename_token_end(rename_source, rename_index);
-  if(chr_is_alpha(charat(rename_source, rename_index)) || charat(rename_source, rename_index) == 95) {
+  if(chr_is_alpha(character_code_at(rename_source, rename_index)) || character_code_at(rename_source, rename_index) == 95) {
     rename_mark(rename_source, rename_index, rename_end, rename_spans, rename_cells);
   }
 } return int rename_end;

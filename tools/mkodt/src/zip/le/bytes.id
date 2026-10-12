@@ -3,8 +3,8 @@
 // The bytes of s, one cell each: a name in a header, or an entry's text.
 zw_str(int[] out, string s) {
   int i = 0;
-  while(charat(s, i) >= 0) {
-    int c = charat(s, i);
+  while(character_code_at(s, i) >= 0) {
+    int c = character_code_at(s, i);
     push(out, c);
     i = i + 1;
   }

@@ -2,8 +2,8 @@
 // test for the first: does the exponent that starts at index flj have a digit?
 
 flt_exp_has(string text, int flj) {
-  int flc = charat(text, flj);
-  int fldg = charat(text, flj + (flc == 43 || flc == 45));
+  int flc = character_code_at(text, flj);
+  int fldg = character_code_at(text, flj + (flc == 43 || flc == 45));
   int flok = fldg >= 48 && fldg <= 57;
 } return int flok;
 ("1e5", 2):(1)

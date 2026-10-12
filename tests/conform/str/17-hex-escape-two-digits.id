@@ -1,4 +1,4 @@
 main(int argc, string[] argv) {
   string s = "\x01aaaa\x41B";
-  print(len(s) + " " + charat(s, 0) + " " + charat(s, 1) + " " + charat(s, 5) + " " + charat(s, 6));
+  print(len(s) + " " + character_code_at(s, 0) + " " + character_code_at(s, 1) + " " + character_code_at(s, 5) + " " + character_code_at(s, 6));
 } return int 0;

@@ -20,7 +20,7 @@ ll_bytes_acc(string s) {
 ll_zlen(string s) {
   string zbytes = ll_bytes(s);
   int i = 0;
-  while(charat(zbytes, i * 3 + 1) != 48 || charat(zbytes, i * 3 + 2) != 48) {
+  while(character_code_at(zbytes, i * 3 + 1) != 48 || character_code_at(zbytes, i * 3 + 2) != 48) {
     i = i + 1;
   }
 } return int i;

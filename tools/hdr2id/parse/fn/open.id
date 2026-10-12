@@ -4,7 +4,7 @@
 fn_decl(string[] fn_t, int fn_p) {
   int fn_bad = list_string_index(fn_t, "typedef") >= 0 || list_string_index(fn_t, "static") >= 0 || list_string_index(fn_t, "{") >= 0;
   int fn_eq = list_string_index(fn_t, "=") >= 0 || fn_t[fn_p + 1] == "*";
-  int fn_id = hx_kind(charat(fn_t[fn_p - 1], 0)) == 1;
+  int fn_id = hx_kind(character_code_at(fn_t[fn_p - 1], 0)) == 1;
 } chain (string[] fn_t, int fn_p) {
   int fn_ok = fn_bad == 0 && fn_eq == 0 && fn_id == 1;
 } return int fn_ok;

@@ -17,7 +17,7 @@ sg_digits(string sgg_s) {
   int sgg_ok = len(sgg_s) > 0;
   int sgg_i = 0;
   while(sgg_i < len(sgg_s)) {
-    int sgg_c = charat(sgg_s, sgg_i);
+    int sgg_c = character_code_at(sgg_s, sgg_i);
     sgg_ok = sgg_ok * chr_is_digit(sgg_c);
     sgg_i = sgg_i + 1;
   }

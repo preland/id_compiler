@@ -3,10 +3,10 @@
 // The end of an exponent (e or E, an optional sign, digits) starting at ms_e,
 // or ms_e when there is none.
 ms_lx_exp(string ms_s, int ms_e) {
-  int ms_c = charat(ms_s, ms_e);
+  int ms_c = character_code_at(ms_s, ms_e);
   int ms_x = ms_e;
   if(ms_c == 101 || ms_c == 69) {
-    int ms_g = charat(ms_s, ms_e + 1);
+    int ms_g = character_code_at(ms_s, ms_e + 1);
     ms_x = ms_lx_digits(ms_s, ms_e + 1 + (ms_g == 43 || ms_g == 45));
   }
 } return int ms_x;

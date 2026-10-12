@@ -26,14 +26,14 @@ given lit_str_fixture ((import lit_str_e), "x"):("@.cs.x")
 ll_const_num(int e) {
   string s = (import ns1)[e];
   string fp = canon_expr(e);
-  if(charat(fp, 0) == 73) {
+  if(character_code_at(fp, 0) == 73) {
     s = zeros_tail(fp, 1);
   }
 } chain (int e) {
   if((import nkind)[e] == "un" && (import ns1)[e] == "-") {
     string inner = ll_const_num((import ni1)[e]);
     s = "-" + inner;
-    if(charat(inner, 0) == 45) {
+    if(character_code_at(inner, 0) == 45) {
       s = zeros_tail(inner, 1);
     }
   }

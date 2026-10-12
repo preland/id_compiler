@@ -19,7 +19,7 @@ given lb_boot given tf_ns (1):(1) then (import ld_vslot):([-1, 1])
 // The number in a name that is ch followed by digits (%v12, b7), or -1.
 ld_pnum(string w, int ch) {
   int n = 0 - 1;
-  if (charat(w, 0) == ch && chr_is_digit(charat(w, 1)) == 1) {
+  if (character_code_at(w, 0) == ch && chr_is_digit(character_code_at(w, 1)) == 1) {
     n = ld_dsum(w, 1, 0);
   }
 } return int n;
@@ -30,8 +30,8 @@ ld_pnum(string w, int ch) {
 
 // The decimal digits of w from i, added onto n.
 ld_dsum(string w, int i, int n) {
-  while (chr_is_digit(charat(w, i)) == 1) {
-    n = n * 10 + charat(w, i) - 48;
+  while (chr_is_digit(character_code_at(w, i)) == 1) {
+    n = n * 10 + character_code_at(w, i) - 48;
     i = i + 1;
   }
 } return int n;

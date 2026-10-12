@@ -4,7 +4,7 @@
 
 jg_close_of(string jg_t, string jg_nm, int jg_k) {
   int jg_cl = -1;
-  if (charat(jg_t, jg_k) == (import jg_lparen) && list_string_index((import jg_kw), jg_nm) < 0) {
+  if (character_code_at(jg_t, jg_k) == (import jg_lparen) && list_string_index((import jg_kw), jg_nm) < 0) {
     jg_cl = jg_match_close(jg_t, jg_k, (import jg_lparen), (import jg_rparen));
   }
 } return int jg_cl;
@@ -16,7 +16,7 @@ jg_close_of(string jg_t, string jg_nm, int jg_k) {
 jg_open_at(string jg_t, int jg_cl) {
   int jg_q = -1;
   int jg_at = jg_skip_ws(jg_t, jg_cl);
-  if (jg_cl >= 0 && charat(jg_t, jg_at) == (import jg_lbrace)) {
+  if (jg_cl >= 0 && character_code_at(jg_t, jg_at) == (import jg_lbrace)) {
     jg_q = jg_at;
   }
 } return int jg_q;
