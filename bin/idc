@@ -3829,7 +3829,7 @@ case_record() {
 # in link order; `syms` names what was `static` state, which a relocatable
 # object (a program with no main) makes local again after linking.
 unit_split() { # unit_split C_FILE DIR MASK
-    awk -v dir="$2" -v mask="$3" -v g="${IDC_UNIT_FILES:-16}" '
+    awk -v dir="$2" -v mask="$3" -v g="${IDC_UNIT_FILES:-16}" -v ucases="${IDC_CASE_UNITS:-6}" '
         function emit(line) { print line > (dir "/" cur) }
         function begin_unit(name) {
             cur = name; print "#include \"idc.h\"" > (dir "/" cur); print cur > (dir "/list") }
@@ -3878,9 +3878,25 @@ unit_split() { # unit_split C_FILE DIR MASK
             if (nu == 0) { nu = 1; begin_unit("u1.c") }
             emit($0); next }
         st == "tail" && skipping { if ($0 == "}") skipping = 0; next }
+        st == "tail" && incase { print > (dir "/" cfile); if ($0 == "}") incase = 0; next }
+        st == "tail" && /^#define IDTC_N [0-9]+$/ {
+            shared = shared $0 "\n"; csz = int(($3 + ucases - 1) / ucases); if (csz < 1) csz = 1 }
+        st == "tail" && /^static .*\[IDTC_N\];$/ {
+            shared = shared extern_of($0) "\n"; sub(/^static /, ""); emit($0); next }
+        st == "tail" && /^static (int|void) idtc_(eq|show)[A-Za-z0-9_]*\(IdList\* a(, IdList\* b)?\)(;| \{)$/ {
+            sub(/^static /, "")
+            if ($0 ~ /;$/) shared = shared $0 "\n"
+            emit($0); next }
         st == "tail" && match($0, /^static int idtc_case_[0-9]+\(int idtc_fd\) \{$/) {
             k = $0; sub(/^static int idtc_case_/, "", k); sub(/\(.*$/, "", k)
-            if (substr(mask, k + 1, 1) == "1") { skipping = 1; next } }
+            if (substr(mask, k + 1, 1) == "1") { skipping = 1; next }
+            if (ucases > 1 && csz > 0) {
+                ci = int(k / csz) + 1; cfile = "ut" ci ".c"
+                if (!(ci in made)) {
+                    made[ci] = 1; print "#include \"idc.h\"" > (dir "/" cfile); print cfile > (dir "/list")
+                    printf "%s", shared > (dir "/" cfile) }
+                sub(/^static /, ""); print > (dir "/" cfile)
+                $0 = $0; sub(/ \{$/, ";"); emit($0); incase = 1; next } }
         st == "tail" && $0 == "static void idtc_setup(void) {" { insetup = 1 }
         st == "tail" && insetup && $0 == "}" { insetup = 0 }
         st == "tail" && insetup && /^    idtc_where\[[0-9]+\] = .* idtc_case\[[0-9]+\] = idtc_case_[0-9]+;$/ {
