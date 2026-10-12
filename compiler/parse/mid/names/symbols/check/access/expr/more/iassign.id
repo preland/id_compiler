@@ -9,5 +9,7 @@ acc_iassign(int id, string owner) {
   int[] l1_of_v = (import nl1)[id];
   acc_elems(l1_of_v, owner, (import nline)[id]);
 } return void;
+given iassign_build ((import idx_iassign_node), "f"):() then calls acc_expr:((import arr_ints), "f", 0) then calls acc_expr:((import lit_a), "f", 0) then calls acc_elems:([(import lit_b)], "f", 0)
+given iassign_build ((import idx_iassign_node), "g"):() then calls acc_expr:((import arr_ints), "g", 0) then calls acc_expr:((import lit_a), "g", 0) then calls acc_elems:([(import lit_b)], "g", 0)
 given iassign_build ((import idx_iassign_node), "f"):() then calls acc_expr:[5] then calls acc_elems:[6]
 given iafix ((import ia_node), "g"):() then calls acc_expr:[3] then calls acc_elems:[4]

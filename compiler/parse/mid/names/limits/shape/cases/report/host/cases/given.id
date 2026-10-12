@@ -16,6 +16,8 @@ ut_case_val(int ci, int e) {
     }
   }
 } return void;
+given ut_host_seeded given cfn_fixture given ut_add("fx_target", "asm 'in8'", "*") (0, (import cfn_e)):() then calls ut_named:(0, "this case passes '", "fx_target")
+given ut_seeded given cfn_fixture (0, (import cfn_e)):() then calls find_str:((import utname), "fx_target")
 given fn_fixture (0, (import fixture_zero)):() then calls ut_named:[0]
 given fn_fixture (0, (import fixture_fn)):() then calls ut_named:[0]
 
@@ -88,5 +90,7 @@ then_imp_fixture(string ty, int reads, int indexed) {
   push((import thennode), (import then_imp_node));
   export int then_imp_cix = newleaf("cimport", 0, 0, "gx", "");
 } return void;
+("int", 1, 0):() then calls add_export:("gx", "int", "mk")
+given then_imp_fixture ("int[]", 2, 1) ("int[]", 2, 1):() then calls node_decl:("int[]", "al", (import then_imp_rd), 0)
 ("int", 1, 0):() then calls add_export:[1]
 ("int[]", 0, 1):() then calls node_func:[2]

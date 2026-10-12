@@ -6,8 +6,9 @@ acc_elems(int[] elems, string owner, int ln) {
     i = i + 1;
   }
 } return void;
-([], "f", 10):() then calls acc_expr:[0]
 given elems_fixture ((import elems_two), "f", 10):() then calls acc_expr:((import elems_e1), "f", 10) then calls acc_expr:((import elems_e2), "f", 10)
+given elems_fixture ((import elems_two), "g", 20):() then calls acc_expr:((import elems_e1), "g", 20) then calls acc_expr:((import elems_e2), "g", 20)
+([], "f", 10):() then calls acc_expr:[0]
 
 // Expression dispatch. Only two kinds name anything: `var` reads a variable of
 // the enclosing function or names a function as a value, `import` reads an

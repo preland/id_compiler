@@ -48,5 +48,7 @@ traps_node_fixture() {
   export int fixture_traps_node = newnode("thentraps", ci, 0, "", "", (import fixture_print_two), (import fixture_print_two));
   export int fixture_traps_one = newnode("thentraps", ci, 0, "", "", trap_one, trap_one);
 } return void;
+given print_fixture ():() then calls newnode:("thentraps", (import fixture_ci), 0, "", "", (import fixture_print_two), (import fixture_print_two))
+():() then (import fixture_traps_one):(10)
 ():() then calls print_fixture:[1]
 ():() then init_units:(0)

@@ -27,5 +27,7 @@ regrow_e() {
   push((import enames), "g");
   push((import etypes), "int");
 } return void;
+():() then (import enames)[0]:("g")
+():() then (import etypes)[0]:("int")
 ():() then calls regrow_d:[1]
 ():() then init_units:(0)

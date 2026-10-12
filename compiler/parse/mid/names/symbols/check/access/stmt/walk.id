@@ -10,7 +10,8 @@ acc_list(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
-given scnames_fix ((import rgdeclist), "f"):() then calls acc_stmt:[1]
+given scnames_fix ((import rgdeclist), "f"):() then calls acc_stmt:((import rgdecl_node), "f")
+given scnames_fix ([(import rgif_node)], "f"):() then calls acc_stmt:((import rgif_node), "f")
 given scnames_fix ([], "f"):() then calls acc_stmt:[0]
 
 acc_stmt(int id, string owner) {

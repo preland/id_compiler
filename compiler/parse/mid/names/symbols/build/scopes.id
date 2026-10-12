@@ -52,6 +52,8 @@ check_names() {
   build_reg();
   check_access();
 } return void;
+given case_fixture ():() then len((import dvname)):(0)
+given case_fixture ():() then len((import dvtype)):(0)
 given case_fixture ():() then calls build_reg:[1]
 given case_fixture ():() then calls check_access:[1]
 
@@ -68,4 +70,5 @@ init_reg() {
   init_reg2();
 } return void export dvname;
 given regrow_d ():() then len((import dvname)):(0)
+given regrow_d ():() then len((import dvtype)):(0)
 given regrow_d ():() then calls init_reg2:[1]

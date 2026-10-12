@@ -41,6 +41,8 @@ ut_case_fn(int ci, string name) {
     case_err(ci, "'" + name + "' " + ut_why_v + "; this case would never run, and a function that cannot be tested needs none");
   }
 } return void;
+given ut_host_seeded given case_fixture given ut_add("fx_target", "asm 'in8'", "*") (0, "fx_target"):() then (import chkfail)[0]:(1)
+given ut_host_seeded given case_fixture given ut_add("bare", "asm 'in8'", "*") (0, "bare"):() then (import chkfail)[0]:(1)
 given notes_base (0, "fx_target"):() then calls find_str:[1]
 given notes_base (0, "fx_target"):() then (import chkfail)[0]:(0)
 

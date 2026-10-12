@@ -21,7 +21,8 @@ check_cases() {
     i = i + 1;
   }
 } return void;
-given natcall_fixture ():() then calls check_cases_at:[1]
+given natcall_fixture ():() then calls check_cases_at:(0)
+given case_fidx_fixture ():() then calls check_cases_at:(0)
 given case_fixture ():() then calls check_cases_at:[0]
 
 // cases_short itself reads ut_at (../../report/host/why/note.id), which
@@ -37,6 +38,8 @@ check_cases_at(int i) {
     cases_short(i, n);
   }
 } return void;
+given notes_base given edge_fixture (0):() then calls cases_short:(0, 0)
+given case_fidx_fixture (0):() then calls count_cases:((import fixture_fn))
 given case_fidx_fixture (0):() then calls cases_short:[0]
 given natcall_fixture (0):() then calls cases_short:[0]
 

@@ -44,4 +44,5 @@ rank_fixture() {
   push((import casefn), (import fixture_fn));
 } return void;
 ():() then len((import casefn)):(4)
+():() then (import casefn)[1]:(2)
 ():() then calls fn_fixture:[1]

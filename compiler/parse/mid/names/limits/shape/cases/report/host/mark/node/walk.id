@@ -23,8 +23,8 @@ ut_range(string fname, int lo, int hi) {
     lo = lo + 1;
   }
 } return void;
-given fn_fixture ("f", 0, 0):() then calls ut_node:[1]
-given fn_fixture ("f", 0, 2):() then calls ut_node:[3]
+given fn_fixture ("f", 0, 0):() then calls ut_node:("f", 0)
+given fn_fixture ("f", 0, 2):() then calls ut_node:("f", 2)
 
 // A call, or a function named as a value: the two ways scan_reach reaches a
 // function (mid/names/exports/reach/dead/more/scan.id), since a value may be
@@ -43,5 +43,6 @@ ut_node(string fname, int id) {
     ut_callee(fname, s1_of_v);
   }
 } return void;
-given fn_fixture ("f", (import fixture_zero)):() then calls ut_callee:[0]
+given ut_host_seeded given fnval_fixture given init_asm ("otherfn", (import fnval_hit)):() then calls ut_callee:("otherfn", "fx_target")
 given ut_host_seeded given fnval_fixture given init_asm ("somefn", (import fnval_hit)):() then calls ut_callee:("somefn", "fx_target")
+given fn_fixture ("f", (import fixture_zero)):() then calls ut_callee:[0]

@@ -37,6 +37,7 @@ ut_self_at(int i) {
   }
 } return void;
 given dup_prog_fixture("eprint", "plain_name", 3, 9) given rt_fixture given ut_mark (0):() then calls ut_add:("eprint", "the runtime helper 'eprint', which a harness on the build host takes from its own C runtime instead", "*")
+given dup_prog_fixture("eprint", "plain_name", 3, 9) given rt_fixture given ut_mark (1):() then len((import utname)):(0)
 given dup_prog_fixture("eprint", "plain_name", 3, 9) given rt_fixture (1):() then calls ut_add:[0]
 
 // Refused: same root cause as ut_note (../why/note.id) -- ut_named calls

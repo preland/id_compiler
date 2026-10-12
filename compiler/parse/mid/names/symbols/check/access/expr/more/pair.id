@@ -10,6 +10,8 @@ regrow_b() {
   push((import dvline), 10);
   push((import dvtype), "int");
 } return void;
+():() then (import dvline)[0]:(10)
+():() then (import dvtype)[0]:("int")
 ():() then calls regrow_a:[1]
 ():() then init_units:(0)
 

@@ -35,4 +35,5 @@ wr_ready() {
   }
 } return void;
 given then_imp_fixture ("int[]", 2, 0) ():() then (import wrx):(["i:gx"])
+given then_imp_fixture ("int[]", 2, 0) ():() then (import wrf):(["rd"])
 given then_imp_fixture ("int[]", 2, 0) given wr_build ():() then calls wr_build:[0]

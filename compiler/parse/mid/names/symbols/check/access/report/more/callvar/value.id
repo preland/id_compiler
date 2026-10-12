@@ -27,8 +27,8 @@ acc_call_var(int id, string owner, int ln) {
     report_name(s1_of_v, owner, ln, "E0306", "'" + s1_of_v + "' is a variable, not a function", (import nm_callvar_why), (import nm_callvar_help));
   }
 } return void;
-given pushfix ((import cm_push_call), "f", 10):() then calls report_name:[1]
-given pushfix ((import cm_push_call), "g", 20):() then calls report_name:[1]
+given pushfix ((import cm_push_call), "f", 10):() then calls report_name:[1] then (import chkfail)[0]:(1)
+given pushfix ((import cm_push_call), "g", 20):() then calls report_name:[1] then (import chkfail)[0]:(1)
 
 report_builtin_value(string name, string owner, int ln) {
   string loc_at_v = loc_at(owner, ln);

@@ -25,6 +25,8 @@ ut_loop() {
     n = ut_sweep();
   }
 } return void;
+given notes_base ():() then calls ut_sweep:()
+given ut_seeded ():() then calls ut_sweep:()
 given notes_base ():() then calls ut_sweep:[1]
 given ut_seeded ():() then calls ut_sweep:[1]
 
