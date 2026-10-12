@@ -3,19 +3,19 @@
 // The cells of a tally for table sgv_kind: 1 counts (files, functions, cases,
 // functions short of two cases, exempt from the minimum), 2 the distribution of
 // cases per function, 3 shape (filler directories, deepest and median depth,
-// then the vacuous cases mutscore lint found).
+// then the vacuous cases mutscore lint found, the count-only ones last).
 sg_vals(int[] sgv_t, int sgv_kind) {
   int[] sgv_r = [sgv_t[(import sg_k_files)], sgv_t[(import sg_k_fn)], sgv_t[(import sg_k_cases)], sgv_t[(import sg_k_z)] + sgv_t[(import sg_k_one)] - sgv_t[(import sg_k_ex)], sgv_t[(import sg_k_ex)]];
   if(sgv_kind == 2) {
     sgv_r = [sgv_t[(import sg_k_z)], sgv_t[(import sg_k_one)], sgv_t[(import sg_k_two)], sgv_t[(import sg_k_few)], sgv_t[(import sg_k_many)]];
   }
   if(sgv_kind == 3) {
-    sgv_r = [sgv_t[(import sg_k_fill)], sg_hmax(sgv_t), sg_hmed(sgv_t), sgv_t[(import sg_k_sil)], sgv_t[(import sg_k_ech)], sgv_t[(import sg_k_bar)]];
+    sgv_r = [sgv_t[(import sg_k_fill)], sg_hmax(sgv_t), sg_hmed(sgv_t), sgv_t[(import sg_k_sil)], sgv_t[(import sg_k_ech)], sgv_t[(import sg_k_bar)], sgv_t[(import sg_k_cnt)]];
   }
 } return int[] sgv_r;
-([4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1):([4, 10, 14, 2, 1])
-([4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 2):([2, 1, 7, 0, 0])
-([4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 3):([3, 2, 0, 1, 2, 0])
+([4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 1):([4, 10, 14, 2, 1])
+([4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 2):([2, 1, 7, 0, 0])
+([4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5], 3):([3, 2, 0, 1, 2, 0, 5])
 
 // A markdown row: the label, then each value.
 sg_line(string sgl_label, int[] sgl_vals) {
@@ -43,6 +43,6 @@ sg_sum(string[] sgu_labels, int[][] sgu_ts, string sgu_pre) {
     sgu_i = sgu_i + 1;
   }
 } return int[] sgu_s;
-(["a", "idstd/b"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], ""):([6, 13, 17, 3, 1, 9, 0, 0, 3, 1, 1, 2, 0, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-(["a", "idstd/b"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], "idstd/"):([2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-(["a"], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], ""):([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+(["a", "idstd/b"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], ""):([6, 13, 17, 3, 1, 9, 0, 0, 3, 1, 1, 2, 0, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+(["a", "idstd/b"], [[4, 10, 14, 2, 1, 7, 0, 0, 3, 1, 1, 2, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], "idstd/"):([2, 3, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+(["a"], [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], ""):([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])

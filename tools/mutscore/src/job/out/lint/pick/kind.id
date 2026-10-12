@@ -1,11 +1,14 @@
-// Which test cases prove nothing. Three shapes are flagged:
+// Which test cases prove nothing. Four shapes are flagged:
 //   silent  the case asserts only that nothing is printed (`prints:("")`),
 //           so it pins no result;
 //   echo    the expected values are the arguments, written again, and no
 //           `then` clause checks anything else;
 //   bare    the expected values are empty and there is no `then` clause, so
 //           the case only shows the call does not trap, for a function that
-//           returns a value or does something.
+//           returns a value or does something;
+//   count   the only assertions are call counts (`then calls F:[n]`, with
+//           the silent prints allowed), so the case shows a callee ran and
+//           not what the function did.
 
 // 1 when the clauses ms_rs (after the expected values) are nothing but
 // `then prints:("")` and `then eprints:("")`, and there is at least one.
@@ -51,9 +54,17 @@ ms_lt_kind(string ms_ag, string ms_ex, string ms_rs, int ms_vd, int ms_ef) {
   if(len(ms_ex) == 0 && len(ms_rs) == 0 && (ms_vd == 0 || ms_ef == 1)) {
     ms_kd = "bare";
   }
+  if(ms_kd == "case" && ms_lt_counted(ms_rs) == 1 && (len(ms_ex) == 0 || ms_lt_flat(ms_ag) == ms_lt_flat(ms_ex))) {
+    ms_kd = "count";
+  }
 } return string ms_kd;
 ("1", "", "then prints:(\"\")", 1, 1):("silent")
-("1", "", "then prints:(\"\") then calls g:[1]", 1, 1):("case")
+("1", "", "then prints:(\"\") then calls g:[1]", 1, 1):("count")
+("1", "", "then calls g:[1] then calls h:[2]", 1, 1):("count")
+("1", "1", "then calls g:[1]", 0, 1):("count")
+("1", "2", "then calls g:[1]", 0, 1):("case")
+("1", "", "then calls g:(1)", 1, 1):("case")
+("1", "", "then calls g:[1] then prints:(\"x\")", 1, 1):("case")
 ("1, 2", "1,2", "", 0, 1):("echo")
 ("1", "2", "", 0, 1):("case")
 ("", "", "", 1, 1):("bare")

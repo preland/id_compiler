@@ -66,6 +66,6 @@ ms_cl_cmd(string[] ms_av, string ms_cm) {
 (["m", "bogus", "x"], "bogus"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
 (["m", "run", "/r"], "run"):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
 given ms_t_tree (["m", "list", (import ms_t_root)], "list"):(0) then prints:("mutscore: 3 mutants\n  cmp 0\n  arith 1\n  logic 0\n  lit 0\n  idx 0\n  del 0\n  ret0 1\n  ret1 1\n")
-given ms_t_tree (["m", "lint", (import ms_t_root)], "lint"):(0) then prints:("lint: 2 cases in 1 functions; silent 0, echo 0, bare 0\n")
+given ms_t_tree (["m", "lint", (import ms_t_root)], "lint"):(0) then prints:("lint: 2 cases in 1 functions; silent 0, echo 0, bare 0, count 0\n")
 (["m", "report", "/no/such/dir_ms"], "report"):(1) then eprints:("mutscore: no results in /no/such/dir_ms; run 'mutscore run ROOT --out /no/such/dir_ms --idc IDC' first\n")
 given ms_t_tree (["m", "run", (import ms_t_root), "--out", (import ms_t_work), "--idc", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && echo \"t.id:1: test failed: x\"; exit 0\nidc", "--shard", "0/2"], "run"):(0) then prints:("mutscore: shard 0/2: built 2 of 2 mutants, 0 left\n")

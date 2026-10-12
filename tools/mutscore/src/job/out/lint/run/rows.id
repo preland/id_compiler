@@ -1,4 +1,4 @@
-// A lint row for each test case: its shape (silent, echo, bare, or case for
+// A lint row for each test case: its shape (silent, echo, bare, count, or case for
 // one that proves something), the file, the function, the line and the
 // case's text, tab-separated.
 
@@ -24,6 +24,7 @@ ms_lt_row(string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
 ("a.id", "f", 0, 1, "4\t(1):(2)"):("case\ta.id\tf\t4\t(1):(2)")
 ("a.id", "f", 1, 1, "5\tnot a case"):("")
 ("a.id", "f", 1, 1, "6\t(1):() then prints:(\"\")"):("silent\ta.id\tf\t6\t(1):() then prints:(\"\")")
+("a.id", "f", 1, 1, "7\t(1):() then calls g:[1]"):("count\ta.id\tf\t7\t(1):() then calls g:[1]")
 
 // The rows, one per line, for every case under function ms_k of ms_fs in the
 // file ms_rel.

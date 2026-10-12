@@ -33,5 +33,5 @@ sg_all(int[][] sgal_ts, string sgal_mut, string sgal_idc, string sgal_root, stri
     sgal_i = sgal_i + 1;
   }
 } return void;
-given sg_t_tree ([], "sh\n-c\nprintf 'summary\\t0\\t0\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", ["sub"]):([[2, 2, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+given sg_t_tree ([], "sh\n-c\nprintf 'summary\\t0\\t0\\t0\\t0\\t0\\n'\nsh", "idc", (import sg_t_root), "/nonexistent_sg_root", ["sub"]):([[2, 2, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 ([], "false", "idc", "/r", "/s", []):([])
