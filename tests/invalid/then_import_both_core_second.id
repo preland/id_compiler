@@ -1,0 +1,15 @@
+// EXPECT: (import made): this case compares one import against another, and 'made' is exported by 'make', which the function under test, 'outer', is or calls
+make() {
+  export int made = 2;
+} return void;
+
+outer(int k) {
+  make();
+  int r = k + 1;
+} return int r;
+(1):(2)
+given make ((import made)):((import made))
+(5):(6)
+
+main(int argc, string[] argv) {
+} return int 0;

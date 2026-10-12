@@ -4,6 +4,7 @@
 // A void function is judged by what it left in its arguments, positionally. It
 // may stop early: only the arguments the case names are checked.
 fit_void(int i, int fn, int[] expd) {
+  imp_side(1);
   if(len(expd) > len(((import nl1)[fn]))) {
     int ne = len(expd);
     case_void_err(i, fn, ne);
@@ -15,6 +16,7 @@ given print_fixture (0, (import fixture_fn), (import fixture_print_two)):() then
 given print_fixture (0, (import fixture_fn), (import fixture_print_none)):() then calls fit_items:[1]
 
 fit_ret(int i, int fn, int[] expd) {
+  imp_side(1);
   if(len(expd) != 1) {
     int ne = len(expd);
     case_ret_err(i, fn, ne);

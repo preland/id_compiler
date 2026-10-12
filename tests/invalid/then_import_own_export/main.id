@@ -1,9 +1,15 @@
-// EXPECT: (import made): 'made' is exported by 'make', which the function under test, 'make', is or calls
-make() {
-  export int made = 2;
+// EXPECT: (import made): this case compares one import against another, and 'made' is exported by 'make', which the function under test, 'make', is or calls
+make(int k) {
+  export int made = k;
+  int r = k + 1;
+} return int r;
+given prep ((import made)):((import made))
+(1):(2)
+(5):(6)
+
+prep() {
+  make(1);
 } return void;
-given make ():() then (import made):(2)
-():() then (import made):(2)
 
 main(int argc, string[] argv) {
 } return int 0;

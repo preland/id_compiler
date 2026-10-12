@@ -973,14 +973,19 @@ mk(int k) {
   int[] b = [k];
   export int[] box = b;
 } return int[] b;
-given mk(1) (3):((import box))
 (5):([5])
-EOF
-self_refuse "bin/idc: an expected value may not be an export the function under test declares" \
-    "'box' is exported by 'mk', which the function under test, 'mk', is or calls" --allow-untested --emit-c /dev/null
+given prep (1):((import box))
 
-# A variable something in the call writes after declaring it may be checked: the
-# case sees an effect. One that the call only declares may not, unless the
+prep() {
+  mk(1);
+} return void;
+EOF
+self_accept "bin/idc: an expected value may be an export the function under test declares when the arguments hold no import" --allow-untested --emit-c /dev/null
+# A variable the function under test declares may be checked against a literal,
+# or against another value the call computed. Two imports in one case are held
+# apart only in a function's first two cases (the core cases), and then only
+# when the function under test declares the export and nothing in the call
+# writes it afterwards; a return clause `} return void export NAME;` exempts it.
 # function exists to initialize it, which its return clause says.
 cat > "$TMP/p.id" <<'EOF'
 mk() {
@@ -999,8 +1004,55 @@ init_tab() {
 given init_tab ():() then (import tab)[2]:(7)
 given init_tab ():() then len((import tab)):(3)
 EOF
-self_refuse "bin/idc: a variable the call only declares may not be read back" \
-    "nothing in that call writes it after declaring it" --allow-untested --emit-c /dev/null
+self_accept "bin/idc: a variable the call only declares may be checked against a literal" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk(int k) {
+  export int ba = 1;
+  export int bb = 2;
+  int r = k + 1;
+} return int r;
+(1):(2)
+(5):(6)
+given prep ((import ba)):((import bb))
+
+prep() {
+  mk(1);
+} return void;
+EOF
+self_accept "bin/idc: an export the function declares may be compared with another export in a case after the first two" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk(int k) {
+  export int ba = 1;
+  export int bb = 2;
+  int r = k + 1;
+} return int r;
+(1):(2)
+given prep ((import ba)):((import bb))
+(5):(6)
+
+prep() {
+  mk(1);
+} return void;
+EOF
+self_refuse "bin/idc: ... but not in one of the first two cases, its core cases" \
+    "the first two cases of a function are its core cases and may not compare one import against another" --allow-untested --emit-c /dev/null
+
+cat > "$TMP/p.id" <<'EOF'
+mk(int k) {
+  export int ba = 1;
+  export int bb = 2;
+  int r = k + 1;
+} return int r;
+given prep ((import ba)):(2)
+given prep (0):((import ba))
+
+prep() {
+  mk(1);
+} return void;
+EOF
+self_accept "bin/idc: an import on one side of a core case is allowed" --allow-untested --emit-c /dev/null
 
 cat > "$TMP/p.id" <<'EOF'
 init_tab() {
@@ -1020,14 +1072,14 @@ init_tab() {
   export int[] tab = [0, 0, 7];
 } return void export tab;
 
-use() {
+use(int k) {
   init_tab();
-} return void;
-():() then (import tab)[2]:(7)
-():() then len((import tab)):(3)
+  int u = k + 1;
+} return int u;
+(1):(2) then (import tab)[2]:(7)
+(2):(3) then len((import tab)):(3)
 EOF
-self_refuse "bin/idc: the cases of a caller are still held to the rule for NAME" \
-    "'tab' is exported by 'init_tab', which the function under test, 'use', is or calls" --allow-untested --emit-c /dev/null
+self_accept "bin/idc: the cases of a caller may check NAME against a literal" --allow-untested --emit-c /dev/null
 
 
 # A conf.id constant may stand in a check's index: it says where to look, and

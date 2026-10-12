@@ -1,0 +1,47 @@
+// The state chk_own_import (./reqtests.id) needs to tell a case that compares an
+// import against an import from one that has an import on a single side, and
+// to tell a function's core cases from its later ones.
+//
+// reqc[1] is raised when the arguments of the case being fitted held an
+// `(import NAME)`; reqc[2] is the side being fitted -- 0 the arguments, 1 the
+// expected side, 2 neither (a setup's arguments, a `then` check) -- which
+// fit_body (../fit/body.id) moves as it goes.
+
+imp_side(int is_s) {
+  lset((import reqc), 2, is_s);
+  if(is_s == 0) {
+    lset((import reqc), 1, 0);
+  }
+} return void;
+given reqtests_init (0):() then (import reqc)[2]:(0)
+given reqtests_init (1):() then (import reqc)[2]:(1)
+given reqtests_init given lset((import reqc), 1, 1) (0):() then (import reqc)[1]:(0)
+given reqtests_init given lset((import reqc), 1, 1) (1):() then (import reqc)[1]:(1)
+
+// How many cases of the function that case `i` is written under come before it:
+// 0 and 1 are the function's two core cases (docs/TESTS.md).
+case_rank(int i) {
+  int cr_n = 0;
+  int cr_j = 0;
+  while(cr_j < i) {
+    if((import casefn)[cr_j] == (import casefn)[i]) {
+      cr_n = cr_n + 1;
+    }
+    cr_j = cr_j + 1;
+  }
+} return int cr_n;
+given rank_fixture (2):(1)
+given rank_fixture (3):(2)
+
+// Four cases written under two functions, in the order f g f f, so the ranks
+// of cases 0 to 3 are 0 0 1 2.
+rank_fixture() {
+  fn_fixture();
+  push((import casefn), (import fixture_fn));
+  push((import casefn), (import fixture_zero));
+} chain () {
+  push((import casefn), (import fixture_fn));
+  push((import casefn), (import fixture_fn));
+} return void;
+():() then len((import casefn)):(4)
+():() then calls fn_fixture:[1]

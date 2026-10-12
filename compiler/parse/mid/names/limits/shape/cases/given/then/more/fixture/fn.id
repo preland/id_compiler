@@ -12,6 +12,7 @@
 fn_fixture() {
   case_fixture();
   fn_fixture_build();
+  reqtests_init();
 } return void;
 ():() then calls case_fixture:[1]
 ():() then init_units:(0)
