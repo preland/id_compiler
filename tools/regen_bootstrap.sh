@@ -17,11 +17,14 @@
 # point of running it.
 #
 # Why steps: warm the whole thing is two seconds, cold it is minutes, and no
-# command may run for a minute. The cold cost is four separate pieces, so each
-# is a step that prints one result line and fits in a minute on its own:
+# command may run for a minute. The cold cost is separate pieces, so each
+# is a step that prints one result line and fits in a minute on its own (lex is
+# two of them, lex-1 and lex-2):
 #
 #   stages       build stage 0 from bootstrap/*.c and stage 1 from compiler/
-#   lex          emit C for compiler/lex (this carries the library's pre-check)
+#   lex-1        check compiler/lex, which fills the front-end cache
+#   lex-2        emit C for compiler/lex (this carries the library's pre-check)
+#   lex          lex-1 and lex-2 in that order
 #   parse-front  check compiler/parse, which fills the front-end cache
 #   emit         emit C for compiler/parse, from that cache
 #   compare      put the two emitted files beside bootstrap/ (or, with --check,
@@ -40,11 +43,12 @@ STEPS=()
 for arg in "$@"; do
     case "$arg" in
         --check) CHECK=1 ;;
-        stages|lex|parse-front|emit|compare) STEPS+=("$arg") ;;
-        *) echo "regen_bootstrap: unknown argument '$arg' (steps: stages lex parse-front emit compare; or --check)" >&2; exit 2 ;;
+        lex) STEPS+=(lex-1 lex-2) ;;
+        stages|lex-1|lex-2|parse-front|emit|compare) STEPS+=("$arg") ;;
+        *) echo "regen_bootstrap: unknown argument '$arg' (steps: stages lex lex-1 lex-2 parse-front emit compare; or --check)" >&2; exit 2 ;;
     esac
 done
-[ "${#STEPS[@]}" -eq 0 ] && STEPS=(stages lex parse-front emit compare)
+[ "${#STEPS[@]}" -eq 0 ] && STEPS=(stages lex-1 lex-2 parse-front emit compare)
 
 STATE="${IDC_CACHE_DIR:-$PWD/.idc-cache}/regen"
 mkdir -p "$STATE" || exit 1
@@ -73,7 +77,11 @@ step_stages() {
     env -u IDC_NO_STD bin/idc "$STATE/stages.id" --allow-untested --check >"$TMP/step.out" 2>&1
 }
 
-step_lex() { emit_c lex; }
+step_lex_1() {
+    env -u IDC_NO_STD bin/idc compiler/lex --allow-untested --check >"$TMP/step.out" 2>&1
+}
+
+step_lex_2() { emit_c lex; }
 
 step_parse_front() {
     env -u IDC_NO_STD bin/idc compiler/parse --allow-untested --check >"$TMP/step.out" 2>&1
@@ -105,7 +113,7 @@ step_compare() {
 run_step() {
     local name="$1" fn="step_${1//-/_}" output="" started=$SECONDS
     case "$name" in
-        lex) output=idlex.c ;;
+        lex-2) output=idlex.c ;;
         emit) output=idparse.c ;;
     esac
     if [ "$name" != compare ] && current "$name" "$output"; then

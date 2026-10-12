@@ -2253,7 +2253,7 @@ if [ "$CACHE_ON" -eq 1 ]; then
     # way as the object cache's, below, and so the two never need to
     # disagree about what "the same build" means.
     FE_KEY=$(
-        { sha256sum "$IDLEX" "$IDPARSE"
+        { sha256sum < "$IDLEX"; sha256sum < "$IDPARSE"
           printf '%s\0' "${LEX_ARGS[@]+"${LEX_ARGS[@]}"}" "${PARSE_ARGS[@]}"
           printf 'IDSTD_HOME=%s\0IDC_NO_STD=%s\0STDLIB=%s\0IDC_MEM_LIMIT=%s\0CC=%s\0' \
               "${IDSTD_HOME:-}" "${IDC_NO_STD:-}" "$STDLIB" "${IDC_MEM_LIMIT:-}" "$CC"
@@ -2368,10 +2368,10 @@ lib_precheck_key() {
         # prints are relative: ROOT's own path is not part of what determines
         # this answer (a checkout at a different path, or backends.sh's own
         # fresh mktemp directory every run, must hit the same entry), while a
-        # file's name and place in the tree are. $IDLEX/$IDPARSE are exempt:
-        # their path is $CACHE_DIR, fixed for the whole build, so it costs
-        # nothing to include and matches obj_cache_key's own style above.
-        sha256sum "$IDLEX" "$IDPARSE"
+        # file's name and place in the tree are. $IDLEX/$IDPARSE are hashed
+        # from stdin, content only: their path is $CACHE_DIR, and a copied
+        # compiler tree must hit the entries its source tree wrote.
+        sha256sum < "$IDLEX"; sha256sum < "$IDPARSE"
         cc_path="$(command -v "$LIB_PRECHECK_CC" 2>/dev/null)"
         [ -n "$cc_path" ] && sha256sum < "$cc_path"
         # A pre-check of only what a program reaches (LIB_PRECHECK_PLAN) is
