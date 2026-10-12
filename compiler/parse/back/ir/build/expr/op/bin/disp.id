@@ -32,6 +32,6 @@ lw_drop(int old, string nm) {
   }
 } return void;
 given lw_fixture(0) (7, "w"):() then calls lw_callf:("id_list_free", "", [7])
-given lw_fixture(0) (-1, "w"):() then calls lw_callf:[0]
 given lw_fixture(0) (0, "w"):() then calls lw_callf:("id_list_free", "", [0])
+given lw_fixture(0) (-1, "w"):() then calls lw_callf:[0]
 given lwd_fixture (5, "a"):() then calls lw_callf:("id_list_free_deep", "", [5])

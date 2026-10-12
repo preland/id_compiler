@@ -23,7 +23,7 @@ nat_scan(string kind, int all) {
     f = f + 1;
   }
 } return void;
-given natcall_fixture ("program", 1):() then calls nat_func:[1]
+given natcall_fixture ("program", 1):() then calls nat_func:("program", 1, 0, 0)
 given natcall_fixture ("program", 1):() then len((import natrow)):(0)
 
 // One function's nodes, the same range reach_func walks, when the build asked

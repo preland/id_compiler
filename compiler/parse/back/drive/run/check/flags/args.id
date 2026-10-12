@@ -28,5 +28,5 @@ flags_setup() {
   init_rtc();
   reqtests_init();
 } return void;
-():() then calls env_init:[1]
+():() then calls env_init:[1] then (import reqc)[2]:(2)
 ():() then init_units:(0)

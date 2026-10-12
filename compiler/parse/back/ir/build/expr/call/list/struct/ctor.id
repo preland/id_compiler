@@ -18,6 +18,8 @@ lw_ctor_els(int node, int a) {
     i = lw_ctor_one(node, i, a);
   }
 } return void;
+given sr_fixture ((import sr_ic2), 0):() then calls lw_ctor_one:((import sr_ic2), 0, 0)
+given sr_fixture ((import sr_ic1), 5):() then calls lw_ctor_one:((import sr_ic1), 0, 5)
 given sr_fixture ((import sr_ic2), 0):() then calls lw_ctor_one:[2]
 given sr_fixture ((import sr_ic1), 0):() then calls lw_ctor_one:[1]
 

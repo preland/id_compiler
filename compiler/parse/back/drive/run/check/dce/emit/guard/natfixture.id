@@ -19,7 +19,7 @@ natcall_fixture() {
   init_bnames();
   natcall_fixture_reg();
 } return void;
-():() then calls lw_env_fixture:[1]
+():() then calls lw_env_fixture:[1] then (import natc)[0]:(1)
 ():() then init_units:(0)
 
 natcall_fixture_reg() {

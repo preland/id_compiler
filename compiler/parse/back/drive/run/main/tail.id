@@ -13,7 +13,7 @@ ut_asm_seeded() {
   ut_host_seeded();
   asmfx_push();
 } return void;
-():() then calls ut_host_seeded:[1]
+():() then calls ut_host_seeded:[1] then (import afname)[0]:("foo")
 ():() then init_units:(0)
 
 // The tail of main, once setup and load have already run.

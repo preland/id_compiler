@@ -10,7 +10,7 @@ edge_fixture() {
   edge_loc(7);
   edge_fixture_caller();
 } return void;
-():() then calls fn_fixture:[1]
+():() then calls fn_fixture:[1] then (import pline)[0]:(7)
 ():() then init_units:(0)
 
 edge_loc(int ln) {

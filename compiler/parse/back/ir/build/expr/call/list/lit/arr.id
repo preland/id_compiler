@@ -14,6 +14,8 @@ lw_arr_els(int node, int a, string elem) {
     i = lw_arr_one(node, i, a, elem);
   }
 } return void;
+given lw_fix_arr ((import fix_arr_n), 0, ""):() then calls lw_arr_one:((import fix_arr_n), 0, 0, "")
+given lw_fix_arr ((import fix_arr_n), 5, "word"):() then calls lw_arr_one:((import fix_arr_n), 0, 5, "word")
 given lw_fix_arr ((import fix_arr_n), 0, ""):() then calls lw_arr_one:[1]
 given lw_fix_arr_empty ((import fix_arr_empty_n), 0, ""):() then calls lw_arr_one:[0]
 

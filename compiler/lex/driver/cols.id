@@ -9,8 +9,8 @@ lex_setup(int argc, string[] argv) {
   export int[] lexbol = [0];
   lex_cols(argc, argv);
 } return void;
-(1, ["prog"]):() then calls lex_cols:[1]
-(2, ["prog", "--cols"]):() then calls lex_cols:[1]
+(1, ["prog"]):() then calls lex_cols:[1] then (import lexline)[0]:(1)
+(2, ["prog", "--cols"]):() then calls lex_cols:[1] then (import lexbol)[0]:(0)
 
 lex_cols(int argc, string[] argv) {
   int on = 0;

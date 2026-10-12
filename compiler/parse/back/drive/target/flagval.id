@@ -12,7 +12,7 @@ lz_e() {
   export int lz_callid = node_call("foo", (import lz_callargs));
   export int lz_declid = node_decl("int", "y", (import lz_i1), 0);
 } return void;
-():() then calls lz_d:[1]
+():() then calls lz_d:[1] then (import lz_callid):(6)
 ():() then init_units:(0)
 
 // A casegiven entry naming no function in the build, for given.id's own
@@ -24,7 +24,7 @@ seed_given_fixture_bad() {
   init_reach();
   push((import casegiven), "nope");
 } return void;
-():() then calls env_init:[1]
+():() then calls env_init:[1] then (import casegiven)[0]:("nope")
 ():() then len((import rfn)):(2)
 
 arg_flag_val(int argc, string[] argv, int i, string name, string dflt) {

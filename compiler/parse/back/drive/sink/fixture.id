@@ -4,5 +4,5 @@ lz_d() {
   export int lz_idx = node_index((import lz_var), (import lz_i1));
   export int[] lz_callargs = [(import lz_i1)];
 } return void;
-():() then calls lz_c:[1]
+():() then calls lz_c:[1] then (import lz_idx):(5)
 ():() then init_units:(0)

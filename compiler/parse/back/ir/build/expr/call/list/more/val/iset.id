@@ -6,7 +6,7 @@ lz_i() {
   export int lz_bin2 = node_txt2("bin", "*", (import lz_str), (import lz_var));
   export int lz_call2 = node_call("bar", [(import lz_var)]);
 } return void;
-():() then calls lz_h:[1]
+():() then calls lz_h:[1] then (import lz_call2):(14)
 ():() then init_units:(0)
 
 lw_iset_val(int node, string elem) {

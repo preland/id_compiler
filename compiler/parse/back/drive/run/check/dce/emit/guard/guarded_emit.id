@@ -42,8 +42,8 @@ emit_all(int argc, string[] argv) {
   emit_notes();
   tk_emit_keys();
 } return void;
-given emit_all_fixture_off (1, ["prog"]):() then calls nat_print:[0] then calls emit_notes:[1] then calls tk_emit_keys:[1]
-given emit_all_fixture_on (2, ["prog", "--natives"]):() then calls nat_print:[1] then calls emit_notes:[1]
+given emit_all_fixture_off (1, ["prog"]):() then calls nat_print:[0] then calls emit_target:(1, ["prog"]) then calls emit_notes:[1] then calls tk_emit_keys:[1]
+given emit_all_fixture_on (2, ["prog", "--natives"]):() then calls nat_print:[1] then calls emit_target:(2, ["prog", "--natives"]) then calls emit_notes:[1]
 
 // --calls' asm rows: one per asm declaration, printed after print_call_cases
 // (driver.id's print_calls calls both). Filed here rather than beside

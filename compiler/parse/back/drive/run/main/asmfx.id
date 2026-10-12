@@ -9,7 +9,7 @@ asmfx_setup() {
   init_idx();
   asmfx_push();
 } return void;
-():() then calls env_init:[1]
+():() then calls env_init:[1] then (import afname)[0]:("foo")
 ():() then init_units:(0)
 
 asmfx_push() {

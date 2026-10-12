@@ -57,5 +57,5 @@ seed_given_fixture() {
   init_reach();
   push((import casegiven), "fx_target");
 } return void;
-():() then calls fn_fixture:[1]
+():() then calls fn_fixture:[1] then (import casegiven)[0]:("fx_target")
 ():() then len((import rfn)):(2)

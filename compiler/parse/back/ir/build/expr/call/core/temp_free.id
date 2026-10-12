@@ -11,6 +11,7 @@ lw_tmp_free(int node, int[] vals) {
   }
 } return void;
 given lwt_fixture ((import eff_ctp), [7]):() then calls lw_callf:("id_list_free", "", [7])
+given lwt_fixture ((import eff_csc), [9]):() then calls lw_callf:("id_str_free", "", [9])
 given lwt_fixture ((import eff_cmk), [7]):() then calls lw_callf:[0]
 
 lw_tmp_one(int node, int i, int[] vals) {
@@ -20,8 +21,8 @@ lw_tmp_one(int node, int i, int[] vals) {
   }
 } return void;
 given lwt_fixture ((import eff_ctp), 0, [7]):() then calls lw_callf:("id_list_free", "", [7])
-given lwt_fixture ((import eff_ctp), 1, [7, 8]):() then calls lw_callf:[0]
 given lwt_fixture ((import eff_csc), 0, [9]):() then calls lw_callf:("id_str_free", "", [9])
+given lwt_fixture ((import eff_ctp), 1, [7, 8]):() then calls lw_callf:[0]
 
 lwt_fixture() {
   esc_ffix();

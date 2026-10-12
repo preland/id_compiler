@@ -33,5 +33,5 @@ seed_bind_fixture() {
   seed_cfn_fixture();
   export int bindid = newnode("cctor", 0, 0, "bind", "", [(import cfnid)], [(import cfnid)]);
 } return void;
-():() then calls seed_cfn_fixture:[1]
+():() then calls seed_cfn_fixture:[1] then (import bindid):(6)
 ():() then init_units:(0)

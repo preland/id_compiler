@@ -8,7 +8,7 @@ lc_dce_init() {
   lc_env();
   harn_init();
 } return void;
-():() then calls lc_env:[1]
+():() then calls lc_env:[1] then (import harn)[0]:(0)
 ():() then init_units:(0)
 
 // One list constant ("a") and one scalar constant ("b"), at export indices 0
