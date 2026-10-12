@@ -10,6 +10,8 @@ check_main() {
     check_main_at((import fnodes)[fi]);
   }
 } return void;
+given cvl_setup ():() then calls check_main_at:((import cvf_main))
+given cvl_setup ():() then prints:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status\n")
 given env_init ():() then calls check_main_at:[0]
 given fn_fixture ():() then calls check_main_at:[0]
 
@@ -21,8 +23,8 @@ check_main_at(int m) {
     report_main();
   }
 } return void;
-given fn_fixture ((import fixture_fn)):() then calls report_main:[1]
-given ll_native_fixture ((import nat_id)):() then calls report_main:[1]
+given fn_fixture ((import fixture_fn)):() then calls report_main:[1] then prints:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status\n")
+given ll_native_fixture ((import nat_id)):() then calls report_main:[1] then prints:("<stdin>:1: error: 'main' must be declared as main(int argc, string[] argv) and return int: it is the program's entry point, and its int is the exit status\n")
 
 report_main() {
   int func_line_v = func_line("main");

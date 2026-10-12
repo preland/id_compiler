@@ -8,6 +8,8 @@ collect_exports() {
     i = i + 1;
   }
 } return void;
+given fn_fixture ():() then calls scan_func_exports:((import fixture_fn))
+given cvl_setup ():() then calls scan_func_exports:((import cvf_main))
 given fn_fixture ():() then calls scan_func_exports:[1]
 given env_init ():() then calls scan_func_exports:[0]
 
@@ -18,8 +20,8 @@ scan_func_exports(int id) {
 } chain (int id) {
   chk_retexp(id);
 } return void;
-given lz_j ((import lz_func2)):() then calls exp_one:[1]
-given ifwhilefix ((import rgif_node)):() then calls exp_one:[1]
+given lz_j ((import lz_func2)):() then calls exp_one:[1] then calls chk_retexp:((import lz_func2))
+given ifwhilefix ((import rgif_node)):() then calls exp_one:[1] then calls chk_retexp:((import rgif_node))
 
 exp_list(int[] stmts, string owner) {
   int i = 0;
@@ -28,5 +30,6 @@ exp_list(int[] stmts, string owner) {
     i = i + 1;
   }
 } return void;
-given ifwhilefix ((import rgdeclist), "owner"):() then calls exp_one:[1]
+given ifwhilefix ((import rgdeclist), "owner"):() then calls exp_one:[1] then calls exp_one:((import rgdecl_node), "owner")
+given ifwhilefix ((import rgdeclist), "second"):() then calls exp_one:((import rgdecl_node), "second")
 given ifwhilefix ([], "owner"):() then calls exp_one:[0]

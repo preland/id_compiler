@@ -18,6 +18,8 @@ regrow_fn() {
   regrow_param();
   export int regrow_fn_node = node_func("g2", "int", (import regrow_plist), (import regrow_plist), 0);
 } return void;
+():() then calls node_func:("g2", "int", [0], [0], 0)
+():() then (import regrow_fn_node):(1)
 ():() then calls regrow_param:[1]
 ():() then init_units:(0)
 

@@ -10,14 +10,16 @@ dupexp_err(int id, string owner) {
   print(loc_at_v + "'" + s2_of_v + "' is already an exported global (exported by '" + export_owner_v + "')");
   note_failure();
 } return void;
-given cm_setup (2, "fn1"):() then calls note_failure:[1]
-given pushfix (2, "fn2"):() then calls note_failure:[1]
+given cm_setup (2, "fn1"):() then calls note_failure:[1] then prints:("<stdin>:0: error: 'clist' is already an exported global (exported by 'conf.id')\n")
+given pushfix (2, "fn2"):() then calls note_failure:[1] then prints:("<stdin>:0: error: 'clist' is already an exported global (exported by 'conf.id')\n")
 
 ifwhilefix() {
   declfix();
   export int[] rgdeclist = [(import rgdecl_node)];
   export int rgif_node = node_if(0, rgdeclist, rgdeclist, 0);
 } return void;
+():() then calls node_if:(0, [1], [1], 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then calls declfix:[1]
 ():() then init_units:(0)
 
@@ -31,5 +33,5 @@ retexp_err(int id, string nm) {
 } chain (int id, string nm) {
   note_failure();
 } return void;
-given fn_fixture ((import fixture_fn), "gx"):() then calls note_failure:[1]
+given fn_fixture ((import fixture_fn), "gx"):() then calls note_failure:[1] then prints:("<stdin>:1: error: 'gx' is named by the return clause of 'fx_target' (return void export gx), but 'fx_target' does not export it in its own body; add 'export TYPE gx = VALUE;' to 'fx_target', or drop 'export gx' from its return clause\n")
 given fn_fixture ((import fixture_fn), "gx"):() then (import chkfail)[0]:(1)

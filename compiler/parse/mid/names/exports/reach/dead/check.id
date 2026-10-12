@@ -68,5 +68,7 @@ reach_mark() {
     n = reach_pass();
   }
 } return void;
+given natcall_fixture given reach_add("nat_target") ():() then reach_pass:(3)
+given rfnfx_setup ():() then reach_pass:(2)
 given seed_given_fixture_bad ():() then calls reach_pass:[1]
 given rfnfx_setup ():() then calls reach_pass:[1]

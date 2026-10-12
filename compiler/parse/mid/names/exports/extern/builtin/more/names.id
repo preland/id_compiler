@@ -22,5 +22,7 @@ unresolved_call_fixture() {
   pushfix();
   call_fixture_extern();
 } return void;
+():() then calls node_call:("unknown", [])
+():() then (import unresolved_call):(6)
 ():() then (import chkfail)[0]:(0)
 ():() then calls pushfix:[1]

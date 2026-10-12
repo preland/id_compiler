@@ -27,5 +27,7 @@ whilefix() {
   int[] declist2 = [(import rgdecl_node)];
   export int rgwhile_node = node_while(0, declist2);
 } return void;
+():() then calls node_while:(0, [1])
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then calls ifwhilefix:[1]
 ():() then init_units:(0)

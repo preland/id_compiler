@@ -23,6 +23,8 @@ elif_fixture() {
   export int else_node = node_if((import ev_node), [(import decl_node)], [(import decl_node)], 2);
   elif_fixture2();
 } return void;
+():() then (import else_node):(5)
+():() then (import elif_node):(6)
 ():() then calls nest_fixture:[1]
 ():() then init_units:(0)
 

@@ -17,7 +17,7 @@ check_block(int[] body, int depth, string fname, int ln) {
     check_fits(body, depth, fname, ln);
   }
 } return void;
-given env_init ([], 3, "f", 5):() then calls limit_diag:[1]
+given env_init ([], 3, "f", 5):() then calls limit_diag:[1] then prints:("<stdin>:5: error: code in 'f' is nested too deeply (3 levels); the maximum is 2 [E0202]\n  why: three open conditions or loops at once is more than a reader can hold in mind, so the language caps nesting at two levels\n  help: move the innermost block into its own function and call it from here; the new function gets its own two levels and its own test cases\n")
 ([], 2, "f", 5):() then calls check_fits:([], 2, "f", 5)
 
 check_fits(int[] body, int depth, string fname, int ln) {
@@ -41,5 +41,7 @@ check_count(int[] body, int depth, string fname, int ln) {
     limit_diag(fname, ln, "E0201", "a block in '" + fname + "' performs " + n + " actions; the limit is 3 (each statement, if, else, and while is one action; return is free)", (import lim_actions_why), (import lim_actions_help));
   }
 } return void;
+given elif_fixture ([1, 1, 1, 1], 1, "f", 5):() then prints:("<stdin>:5: error: a block in 'f' performs 4 actions; the limit is 3 (each statement, if, else, and while is one action; return is free) [E0201]\n  why: a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does\n  help: continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function\n")
+given elif_fixture ([1, 1, 1, 1, 1], 2, "g", 9):() then prints:("<stdin>:9: error: a block in 'g' performs 5 actions; the limit is 3 (each statement, if, else, and while is one action; return is free) [E0201]\n  why: a block that does more than three things is hard to read and to test at a glance, so the language caps it; a chain is the one way to continue a function past the cap without hiding that it does\n  help: continue the function into a chain: end this segment with `} chain (same parameters) {` and write the remaining statements after it (docs/SPEC.md, section 9), or move part of the block into its own function\n")
 given elif_fixture ((import elif_body), 0, "f", 5):() then calls limit_diag:[0]
 given elif_fixture ((import elif_body), 1, "f", 5):() then calls limit_diag:[0]

@@ -13,8 +13,9 @@ check_files() {
     i = i + 1;
   }
 } return void;
+given edge_fixture ():() then calls check_file_at:[2] then calls check_file_at:(0) then calls check_file_at:(1)
+given many_file_fixture ():() then calls check_file_at:(0) then calls check_file_at:(3)
 given full_env ():() then calls check_file_at:[0]
-given edge_fixture ():() then calls check_file_at:[2]
 
 // Reported once per file rather than once per function over the limit.
 //

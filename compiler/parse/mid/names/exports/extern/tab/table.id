@@ -28,5 +28,6 @@ init_rtc() {
   export int[] lvc = [1];
 } return void export rtc;
 ():() then (import rtc)[0]:(0)
+():() then (import lvc)[0]:(1)
 ():() then calls init_bnames:[1]
 

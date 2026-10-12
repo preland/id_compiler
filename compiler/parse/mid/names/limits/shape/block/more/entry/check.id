@@ -28,8 +28,9 @@ check_funcs() {
     i = i + 1;
   }
 } return void;
+given fn_fixture ():() then calls check_main:[1] then calls check_func_body:[1] then calls check_func_body:((import fixture_fn))
+given edge_fixture ():() then calls check_func_body:((import fixture_fn))
 given env_init ():() then calls check_main:[1] then calls check_func_body:[0]
-given fn_fixture ():() then calls check_main:[1] then calls check_func_body:[1]
 
 // A function's own body is the outermost block, at depth 0. Its name labels
 // every diagnostic found anywhere inside it, as in idc.py.

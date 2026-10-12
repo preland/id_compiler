@@ -27,5 +27,7 @@ regrow_c() {
   push((import dvexp), 0);
   push((import dvunit), 0);
 } return void;
+():() then len((import dvexp)):(1)
+():() then len((import dvunit)):(1)
 ():() then calls regrow_b:[1]
 ():() then init_units:(0)

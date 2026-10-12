@@ -21,7 +21,8 @@ reach_funcs(int f, int lo) {
     f = f + 1;
   }
 } return void;
-given natcall_fixture (0, 0):() then calls reach_func:[1]
+given natcall_fixture (0, 0):() then calls reach_func:[1] then calls reach_func:(0, 0)
+given natcall_fixture (0, 3):() then calls reach_func:(0, 3)
 given natcall_fixture (1, 0):() then calls reach_func:[0]
 
 reach_func(int f, int lo) {

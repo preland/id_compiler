@@ -21,8 +21,9 @@ check_shape() {
     i = i + 1;
   }
 } return void;
-given env_init ():() then calls shape_node:[0]
+given nest_fixture ():() then calls shape_node:(4)
 given fn_fixture ():() then calls shape_node:(0)
+given env_init ():() then calls shape_node:[0]
 
 shape_node(int id) {
   if((import nkind)[id] == "call") {
@@ -42,5 +43,6 @@ chk_ret_name(int id) {
     ret_shape_err(id, e);
   }
 } return void;
-given fn_fixture ((import fixture_fn)):() then calls ret_shape_err:[0]
+given fn_fixture ((import fixture_fn)):() then calls is_plain:((import fixture_zero))
 given hidden_call_fixture ((import hc_un)):() then calls ret_shape_err:((import hc_un), (import hc_call))
+given fn_fixture ((import fixture_fn)):() then calls ret_shape_err:[0]

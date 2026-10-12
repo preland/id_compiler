@@ -9,8 +9,9 @@ check_plain_else(int[] els, int depth, string fname, int ln) {
     check_block(els, depth + 1, fname, ln);
   }
 } return void;
-([], 0, "f", 5):() then calls check_block:[0]
+given env_init ([8, 9], 2, "g", 6):() then calls check_block:([8, 9], 3, "g", 6)
 given env_init ([7], 2, "f", 5):() then calls check_block:([7], 3, "f", 5)
+([], 0, "f", 5):() then calls check_block:[0]
 
 // A limit diagnostic: the code, the message (built by the check, which knows the
 // count or the depth), and the why and help lines (conf.id, lim_*). One function
