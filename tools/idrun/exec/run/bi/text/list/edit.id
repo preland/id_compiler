@@ -8,8 +8,9 @@ vm_mut(int hl) {
     ok = 0;
   }
 } return int ok;
-given vb_boot given tf_lnew (1):(1)
+given vb_boot given tf_lnew given tf_lnew (2):(1)
 given vb_boot given tf_lnew given vm_b_list_lock(1) (1):(0) then eprints:("id: cannot mutate a constant list\n") then (import ex_rg):([0, 1, 1])
+given vb_boot given tf_lnew (1):(1)
 
 // The list writes. Each asks vm_mut first, so a locked list is a trap and not
 // a change.

@@ -29,4 +29,5 @@ dr_diag(string path) {
   }
 } return void;
 given tf_file("x.id:1: error: bad\n") ((import tf_path)):() then eprints:("x.id:1: error: bad\n")
+given tf_file("x.id:2: error: worse\n\n\n") ((import tf_path)):() then eprints:("x.id:2: error: worse\n")
 ("/nonexistent/idrun-diag"):() then eprints:("")

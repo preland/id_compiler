@@ -9,6 +9,7 @@ group_all() {
   }
 } return void;
 given ds_test_setup ():() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup given group_head(2, []) ():() then prints:("2 copies of foo:\n    fileA.id:10\n    fileB.id:20\n")
 given ds_test_setup given group_all ():() then prints:("")
 
 group_at(int i) {
@@ -18,6 +19,7 @@ group_at(int i) {
   }
 } return void;
 given ds_test_setup (0):() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup (1):() then prints:("2 copies of foo:\n    fileB.id:20\n    fileC.id:30\n")
 given ds_test_setup (4):() then prints:("")
 
 group_head(int i, int[] grp) {

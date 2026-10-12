@@ -21,5 +21,6 @@ more_if_any(int got) {
     drain_serial();
   }
 } return void;
-(0):()
 given qmb_qmp_empty_ser_empty (1):() then calls drain_serial:[1]
+given qmb_qmp_empty_ser_empty (0):() then calls drain_serial:[0]
+(0):()

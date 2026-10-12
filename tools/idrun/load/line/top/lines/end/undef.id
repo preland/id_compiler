@@ -9,6 +9,7 @@ ld_undef() {
   }
 } return void;
 given tf_ld("") given tf_get("f", "id_a") given tf_get("f", "id_b") ():() then eprints:("idrun: 'id_a' is called but not defined: it is a native or comes from the standard library, which idrun cannot run yet (docs/INTERPRETER.md, milestone 2); compile this program with idc\nidrun: 'id_b' is called but not defined: it is a native or comes from the standard library, which idrun cannot run yet (docs/INTERPRETER.md, milestone 2); compile this program with idc\n")
+given tf_ld("") given tf_get("f", "id_a") ():() then eprints:("idrun: 'id_a' is called but not defined: it is a native or comes from the standard library, which idrun cannot run yet (docs/INTERPRETER.md, milestone 2); compile this program with idc\n")
 given tf_ld("") ():() then eprints:("")
 
 ld_undef1(int i) {
@@ -17,4 +18,5 @@ ld_undef1(int i) {
   }
 } return void;
 given tf_ld("") given tf_get("f", "id_a") (0):() then eprints:("idrun: 'id_a' is called but not defined: it is a native or comes from the standard library, which idrun cannot run yet (docs/INTERPRETER.md, milestone 2); compile this program with idc\n")
+given tf_ld("") given tf_get("f", "id_a") given tf_get("f", "id_b") (1):() then eprints:("idrun: 'id_b' is called but not defined: it is a native or comes from the standard library, which idrun cannot run yet (docs/INTERPRETER.md, milestone 2); compile this program with idc\n")
 given tf_ld("") given tf_get("f", "id_a") given ld_ftset(0, 0, 5) (0):() then eprints:("")

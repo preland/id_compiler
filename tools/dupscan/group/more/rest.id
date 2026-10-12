@@ -24,4 +24,5 @@ rest_at(int i, int[] grp, int j) {
   }
 } return void;
 given ds_test_setup (0, [0], 1):(0, [0, 1], 1)
+given ds_test_setup (0, [0, 1], 2):(0, [0, 1, 2], 2)
 given ds_test_setup (0, [0], 3):(0, [0], 3)

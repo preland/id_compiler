@@ -34,8 +34,9 @@ runnable_mask_step(int[] offs, int[] flat, int fcount, int[] ok, int i) {
     runnable_mask_apply(offs, flat, fcount, ok, i, req);
   }
 } return void;
-given rev_edge_fixture ([0, 0, 1], [0], 2, [1, 1], 0):([0, 0, 1], [0], 2, [1, 1], 0)
 given unmet_req_fixture ([0, 0, 1, 1], [0], 3, [1, 1, 1], 1):([0, 0, 1, 1], [0], 3, [0, 0, 1], 1)
+given unmet_req_fixture ([0, 0, 1, 1], [0], 3, [1, 1, 0], 1):([0, 0, 1, 1], [0], 3, [0, 0, 0], 1)
+given rev_edge_fixture ([0, 0, 1], [0], 2, [1, 1], 0):([0, 0, 1], [0], 2, [1, 1], 0)
 
 // Zeroes `ok` for every function that can reach reader `i` but cannot
 // reach at least one of `req` -- rbfs_run for "reaches i", rev_reach_all
@@ -53,5 +54,6 @@ runnable_mask_apply(int[] offs, int[] flat, int fcount, int[] ok, int i, string[
     j = j + 1;
   }
 } return void;
-given rev_edge_fixture ([0, 0, 1], [0], 2, [1, 1], 0, []):([0, 0, 1], [0], 2, [1, 1], 0, [])
 given unmet_req_fixture ([0, 0, 1, 1], [0], 3, [1, 1, 1], 1, ["d"]):([0, 0, 1, 1], [0], 3, [0, 0, 1], 1, ["d"])
+given unmet_req_fixture ([0, 0, 1, 1], [0], 3, [1, 1, 0], 1, ["d"]):([0, 0, 1, 1], [0], 3, [0, 0, 0], 1, ["d"])
+given rev_edge_fixture ([0, 0, 1], [0], 2, [1, 1], 0, []):([0, 0, 1], [0], 2, [1, 1], 0, [])

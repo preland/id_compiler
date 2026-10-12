@@ -27,6 +27,7 @@ scan_text(string text, string tab) {
   scan_lines(lines, tab);
 } return void;
 ("projA\tFPX\tfoo\tfileA.id:10\nprojB\tFPX\tfoo\tfileB.id:20", "\t"):() then prints:("2 copies of foo:\n    fileA.id:10\n    fileB.id:20\n")
+("projA\tFPX\tfoo\tfileA.id:10\nprojB\tFPX\tfoo\tfileB.id:20\nprojC\tFPX\tfoo\tfileC.id:30", "\t"):() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
 ("projA\tFPX\tfoo\tfileA.id:10", "\t"):() then prints:("")
 
 scan_lines(string[] lines, string tab) {
@@ -34,4 +35,5 @@ scan_lines(string[] lines, string tab) {
   group_all();
 } return void;
 (["projA\tFPX\tfoo\tfileA.id:10", "projB\tFPX\tfoo\tfileB.id:20"], "\t"):() then prints:("2 copies of foo:\n    fileA.id:10\n    fileB.id:20\n")
+(["projA\tFPX\tfoo\tfileA.id:10", "projB\tFPX\tfoo\tfileB.id:20", "projC\tFPX\tfoo\tfileC.id:30"], "\t"):() then prints:("3 copies of foo:\n    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
 (["projA\tFPX\tfoo\tfileA.id:10"], "\t"):() then prints:("")

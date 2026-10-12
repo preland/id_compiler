@@ -18,4 +18,5 @@ vm_b_put(word wa) {
   put((import ex_strs)[ia]);
 } return void;
 given vb_boot given tf_sput("hi") (1):() then prints:("hi")
+given vb_boot given tf_sput("a") given tf_sput("b") (2):() then prints:("b")
 given vb_boot given tf_sput("") (1):() then prints:("")

@@ -22,8 +22,9 @@ scan_imports_in(string[] body, string[] out_li) {
     i = i + 1;
   }
 } return void;
-(["x"], []):(["x"], [])
 (["int c = (import err_n)[0];"], []):(["int c = (import err_n)[0];"], ["err_n"])
+(["f((import a), (import b));", "g((import b), (import c));"], []):(["f((import a), (import b));", "g((import b), (import c));"], ["a", "b", "c"])
+(["x"], []):(["x"], [])
 
 scan_imports_in_line(string text_line, string[] out_li) {
   int p = str_find(text_line, "(import ");
@@ -45,6 +46,6 @@ scan_imports_in_line(string text_line, string[] out_li) {
     scan_imports_in_line(rest, out_li);
   }
 } return void;
-("plain line", []):("plain line", [])
 ("int c = (import err_n)[0];", []):("int c = (import err_n)[0];", ["err_n"])
 ("f((import a), (import b));", []):("f((import a), (import b));", ["a", "b"])
+("plain line", []):("plain line", [])

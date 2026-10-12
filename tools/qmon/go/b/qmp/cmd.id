@@ -6,13 +6,16 @@ qmp_cmd(string msg) {
   string r = qmp_read_response();
   check_error(r);
 } return void;
-given qmb_qmp_peer("hello") ("ping"):() then eprints:("")
 given qmb_qmp_peer("oops \"error\" seen") ("ping"):() then eprints:("qmon: oops \"error\" seen\n")
+given qmb_qmp_peer("again \"error\" here") ("ping"):() then eprints:("qmon: again \"error\" here\n")
+given qmb_qmp_peer("hello") ("ping"):() then eprints:("")
 
 check_error(string r) {
   int idx = str_find(r, "\"error\"");
   report_if_error(idx, r);
 } return void;
+("{\"error\": {\"desc\": \"bad\"}}"):() then eprints:("qmon: {\"error\": {\"desc\": \"bad\"}}\n")
+("x \"error\" y"):() then eprints:("qmon: x \"error\" y\n")
 ("{\"return\": {}}"):("{\"return\": {}}")
 ("{\"error\": {\"desc\": \"bad\"}}"):("{\"error\": {\"desc\": \"bad\"}}")
 
@@ -21,5 +24,7 @@ report_if_error(int idx, string r) {
     eprint("qmon: " + r);
   }
 } return void;
+(0, "bad"):() then eprints:("qmon: bad\n")
+(5, "worse"):() then eprints:("qmon: worse\n")
 (-1, "ok"):(-1, "ok")
 (0, "bad"):(0, "bad")

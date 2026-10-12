@@ -32,9 +32,9 @@ find_givens(string[] required) {
     oi = oi + 1;
   }
 } return string[] out_li;
-given ix_export_fixture (["setter"]):(["setter"])
 given ix_export_fixture (["nope"]):([])
 given rev_edge_fixture (["q"]):(["p", "q"])
+given ix_export_fixture (["setter"]):(["setter"])
 given rev_edge_fixture (["p"]):(["p"])
 given unmet_req_fixture ([]):(["d"])
 given unmet_req_fixture (["b"]):([])

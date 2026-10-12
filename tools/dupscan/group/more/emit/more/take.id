@@ -8,6 +8,7 @@ rest_take(int i, int[] grp, int j) {
   take_eq(grp, j, a, b);
 } return void;
 given ds_test_setup (0, [0], 1):(0, [0, 1], 1)
+given ds_test_setup (0, [0, 1], 2):(0, [0, 1, 2], 2) then (import ds_seen)[2]:(1)
 given ds_test_setup (0, [0], 3):(0, [0], 3)
 
 take_eq(int[] grp, int j, string a, string b) {
@@ -26,4 +27,5 @@ take_new(int[] grp, int j) {
   }
 } return void;
 given ds_test_setup ([0], 1):([0, 1], 1)
+given ds_test_setup ([0, 1], 2):([0, 1, 2], 2)
 given ds_test_setup ([0], 0):([0], 0)

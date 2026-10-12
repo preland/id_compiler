@@ -6,6 +6,7 @@ emit_rows(int[] grp, int k) {
   }
 } return void;
 given ds_test_setup ([0, 1, 2], 0):() then prints:("    fileA.id:10\n    fileB.id:20\n    fileC.id:30\n")
+given ds_test_setup ([0, 1, 2], 1):() then prints:("    fileB.id:20\n    fileC.id:30\n")
 given ds_test_setup ([0, 1, 2], 3):() then prints:("")
 
 emit_row(int[] grp, int k) {

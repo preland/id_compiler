@@ -36,6 +36,7 @@ reader_own_required_step(string path, string imp_name, string[] out_li) {
   }
 } return void;
 given unit_fixture ("/proj/x.id", "gv", []):("/proj/x.id", "gv", ["a"])
+given unit_fixture ("/proj/x.id", "gv", ["z"]):("/proj/x.id", "gv", ["z", "a"])
 given unit_fixture ("/proj/x.id", "nope", []):("/proj/x.id", "nope", [])
 
 // The required declarers for a whole set of readers (main.id's `reached`),
@@ -52,4 +53,5 @@ run_gather_required(string[] reached, string reader, string[] needed) {
   }
 } return void;
 given unmet_req_fixture (["b"], "b", []):(["b"], "b", ["d"])
+given unmet_req_fixture (["b"], "b", ["z"]):(["b"], "b", ["z", "d"])
 given unmet_req_fixture (["b", "d"], "b", []):(["b", "d"], "b", [])
