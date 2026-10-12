@@ -43,5 +43,5 @@ ix_scan_export_line(string export_src_line, int fn_idx) {
     push((import ix_efn), fn_idx);
   }
 } return void;
-given ix_export_fixture ("  export int gv = 0;", 0):() then calls hash_map_put:[1]
-given ix_export_fixture ("plain line", 0):() then calls hash_map_put:[0]
+given ix_export_fixture ("  export int gv = 0;", 0):() then calls hash_map_put:[1] then len((import ix_ename)):(2)
+given ix_export_fixture ("plain line", 0):() then calls hash_map_put:[0] then len((import ix_ename)):(1)

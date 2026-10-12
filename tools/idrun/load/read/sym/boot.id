@@ -27,7 +27,7 @@ lb_tables() {
   hash_map_initialize((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn));
 } return void export ld_pr;
 ():() then (import ld_pr):([0, 0, 0, 0, 0, 0, 0, 0])
-():() then calls hash_map_initialize:[1]
+given lb_tables ():() then calls hash_map_initialize:((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn))
 
 lb_boot() {
   lb_tables();

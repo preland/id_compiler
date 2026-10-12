@@ -51,5 +51,5 @@ close_all() {
 } chain () {
   int cp = proc_close((import cr_h));
 } return void;
-given ccrun_fx_run_capped_true ():() then calls close_input_if_any:[1]
-given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then calls close_input_if_any:[1]
+given ccrun_fx_run_capped_true ():() then calls close_input_if_any:()
+given ccrun_fx_run_capped_true given ccrun_fx_setup_input_main ():() then calls close_input_if_any:()

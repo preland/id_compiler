@@ -54,13 +54,14 @@ open_input_if_any(string input) {
     int closed = proc_close_in((import cr_h));
   }
 } return void;
-given ccrun_fx_run_capped_true ("-"):("-") then calls open_input:[0]
 ("main.id"):("main.id") then calls open_input:("main.id")
+("child/setup.id"):("child/setup.id") then calls open_input:("child/setup.id")
+given ccrun_fx_run_capped_true ("-"):("-") then calls open_input:[0]
 
 open_input(string input) {
   export int cr_in = fs_open(input, "r");
   export int[] cr_pending = [];
   list_fill((import cr_pending), 4096, 0);
 } return void;
-("main.id"):("main.id") then calls list_fill:[1]
-("child/setup.id"):("child/setup.id") then calls list_fill:[1]
+("main.id"):("main.id") then calls list_fill:[1] then (import cr_pending)[4095]:(0)
+("child/setup.id"):("child/setup.id") then calls list_fill:[1] then (import cr_pending)[0]:(0)
