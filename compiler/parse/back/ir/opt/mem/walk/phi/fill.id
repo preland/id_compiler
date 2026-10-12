@@ -9,6 +9,7 @@ m2r_fill(int f, int i) {
   }
 } return void;
 given m2r_outv_fixture (0, 0):() then calls m2r_fill_b:(0, 0)
+given m2r_outv_fixture (1, 0):() then calls m2r_fill_b:(1, 0)
 given m2r_outv_fixture (0, 1):() then calls m2r_fill_b:[0]
 
 m2r_fill_b(int f, int i) {
@@ -18,6 +19,7 @@ m2r_fill_b(int f, int i) {
   }
 } return void;
 given m2r_outv_fixture (0, 0):() then calls m2r_fill_one:(0, 0, 0)
+given m2r_outv_fixture (1, 0):() then calls m2r_fill_one:(1, 0, 0)
 given m2r_row_fixture (0, 0):() then calls m2r_fill_one:[0]
 
 m2r_fill_one(int f, int i, int j) {

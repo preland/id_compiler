@@ -10,6 +10,7 @@ lw_fix_fnval() {
   init_idx();
   lw_fix_fnval_reg();
 } return void;
+():() then (import fix_fnval_n):(1)
 ():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
 

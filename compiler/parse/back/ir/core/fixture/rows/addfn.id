@@ -12,6 +12,7 @@ ir_rows() {
   int ret_i = init_ir();
   ir_rows_fn0();
 } return void;
+():() then entry_count(0):(1)
 ():() then calls env_init:[1]
 ():() then init_units:(0)
 

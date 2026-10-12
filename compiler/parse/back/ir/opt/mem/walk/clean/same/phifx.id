@@ -6,8 +6,9 @@ m2rphi_setup() {
   ir_rows();
   m2rphi_make();
 } return void;
-():() then calls ir_rows:[1]
+():() then chk_op:("op phi")
 ():() then (import m2rphi_id):(2)
+():() then calls ir_rows:[1]
 
 m2rphi_make() {
   int[] bl = [];

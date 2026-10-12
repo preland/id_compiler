@@ -6,8 +6,9 @@ keep_export_fixture_harn_on() {
   lset((import harn), 0, 1);
   keep_export_fixture_tail();
 } return void;
-():() then calls keep_export_fixture:[1]
+():() then (import harn)[0]:(1)
 ():() then init_units:(0)
+():() then calls keep_export_fixture:[1]
 
 // The rest of keep_export_fixture_reg's chain: main reachable and two
 // exported names, one unreached, one reached.
@@ -26,5 +27,6 @@ keep_export_fixture_all() {
   keep_export_fixture_reg();
   keep_export_fixture_tail();
 } return void;
-():() then calls keep_export_fixture_reg:[1]
+():() then len((import eowners)):(4)
 ():() then init_units:(0)
+():() then calls keep_export_fixture_reg:[1]

@@ -5,8 +5,9 @@ m2r_incs(int f, int b, int ph, int j) {
     i = m2r_inc(f, b, ph, j, i);
   }
 } return void;
-given cfg_fixture (0, 0, 0, 0):() then calls m2r_inc:[0]
 given m2r_predfx (0, 1, 0, 0):() then calls m2r_inc:(0, 1, 0, 0, 0)
+given m2r_predfx (0, 1, 1, 0):() then calls m2r_inc:(0, 1, 1, 0, 0)
+given cfg_fixture (0, 0, 0, 0):() then calls m2r_inc:[0]
 
 m2r_inc(int f, int b, int ph, int j, int i) {
   int pb = m2r_pre_at(b, i);

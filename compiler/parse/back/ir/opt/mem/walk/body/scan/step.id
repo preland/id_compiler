@@ -24,5 +24,6 @@ m2r_ldfx() {
   export int ldfx_id2 = ir_insn("store", "int", (import pra)[0], 42, "", none, none);
   lset((import chk_id), 0, ldfx_id);
 } return void;
-():() then calls m2r_outv_fixture:[1]
+():() then (import ldfx_id2):(4)
 ():() then chk_op:("op load")
+():() then calls m2r_outv_fixture:[1]

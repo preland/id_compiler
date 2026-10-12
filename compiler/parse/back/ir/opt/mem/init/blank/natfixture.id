@@ -10,6 +10,7 @@ natinit_fixture_off() {
   nat_init(1, ["prog"]);
 } return void;
 ():() then calls nat_init:(1, ["prog"])
+():() then (import natc)[0]:(0)
 ():() then calls env_init:[1]
 
 natinit_fixture_on() {
@@ -17,4 +18,5 @@ natinit_fixture_on() {
   nat_init(2, ["prog", "--natives"]);
 } return void;
 ():() then calls nat_init:(2, ["prog", "--natives"])
+():() then (import natc)[0]:(1)
 ():() then calls env_init:[1]

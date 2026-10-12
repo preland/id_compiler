@@ -7,5 +7,6 @@ prefx2_setup() {
   int[] blk_pre_v = (import bpred)[1];
   push(blk_pre_v, 9);
 } return void;
-():() then calls br_fixture_p:[1]
 ():() then (import bpred)[1]:([0, 9])
+():() then (import bpred)[0]:([])
+():() then calls br_fixture_p:[1]

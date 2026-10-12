@@ -8,6 +8,7 @@ fcallv_fixture() {
   init_bnames();
   fcallv_fixture_reg();
 } return void;
+():() then (import fcallv_node):(1)
 ():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
 

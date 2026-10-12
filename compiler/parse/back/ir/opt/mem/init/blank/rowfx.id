@@ -8,8 +8,9 @@ m2r_row_fixture() {
   optfx_setup();
   m2r_row();
 } return void;
-():() then calls optfx_setup:[1]
 ():() then len((import phiof)):(1)
+():() then len((import outv)):(1)
+():() then calls optfx_setup:[1]
 
 // outv is written in place: m2r_kept (../../walk/body/scan/ldst.id),
 // m2r_seed1 and m2r_phi_make each lset a cell of a row m2r_row already

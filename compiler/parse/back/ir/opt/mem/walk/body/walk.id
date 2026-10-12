@@ -6,6 +6,7 @@ m2r_walk(int f, int i) {
   }
 } return void;
 given m2r_2blk_fixture (0, 0):() then calls m2r_blk:(0, 0) then calls m2r_blk:(0, 1)
+given m2r_2blk_fixture (0, 1):() then calls m2r_blk:(0, 1)
 given ir_rows (1, 1):() then calls m2r_blk:[0]
 
 m2r_blk(int f, int i) {

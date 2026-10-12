@@ -22,5 +22,6 @@ decl_fixture2() {
   decl_fixture();
   export int expr_node = node_exprstmt((import ev_node));
 } return void;
+():() then (import expr_node):(2)
 ():() then calls decl_fixture:[1]
 ():() then init_units:(0)

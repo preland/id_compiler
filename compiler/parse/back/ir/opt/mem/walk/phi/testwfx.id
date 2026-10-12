@@ -7,6 +7,7 @@ rfnfx_setup() {
   lw_env_fixture();
   init_reach();
 } return void;
-():() then calls lw_env_fixture:[1]
+():() then (import rfn)[0]:("main")
 ():() then len((import rfn)):(2)
+():() then calls lw_env_fixture:[1]
 

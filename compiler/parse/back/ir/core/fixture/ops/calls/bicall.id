@@ -10,6 +10,7 @@ bicall_fixture() {
   init_bnames();
   bicall_fixture_reg();
 } return void;
+():() then (import bicall_node):(2)
 ():() then calls lw_env_fixture:[1]
 ():() then init_units:(0)
 

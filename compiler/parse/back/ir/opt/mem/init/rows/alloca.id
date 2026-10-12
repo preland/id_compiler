@@ -12,6 +12,7 @@ m2r_alloca_fixture() {
   ir_add(0, v);
 } return void;
 ():() then calls ir_leaf:("alloca", "int", -1, -1, "x")
+():() then entry_count(0):(2)
 ():() then calls ir_add:[2]
 
 // A row with a cell in it. m2r_row fills each row to len(pra), so outv's
