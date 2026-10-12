@@ -6,8 +6,9 @@ fwd_env() {
   init_idx();
   export int[] f_none = [];
 } return void;
-():() then calls env_init:[1]
+():() then (import f_none):([])
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 // param "a":int and the var "a" that reads it -- id 0 and 1 of every fwd/
 // case fixture below.

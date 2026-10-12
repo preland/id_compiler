@@ -12,6 +12,7 @@ check_genname() {
   }
 } return void;
 given farm_j ():() then calls genname_fn:(0) then calls genname_fn:(1)
+given farm_k ():() then calls genname_fn:(2)
 given farm_g ():() then calls genname_fn:[0]
 
 genname_fn(int i) {
@@ -29,4 +30,5 @@ genname_loop(int i, int[] params) {
   }
 } return void;
 given gn_env (0, (import f_pgen_list)):() then calls genname_check:(0, (import f_pgen_list), 0)
+given gn_env (0, (import f_pgen_list)):() then calls genname_param:(0, (import f_pgen))
 given env_init (0, []):() then calls genname_check:[0]

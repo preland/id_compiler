@@ -16,13 +16,15 @@ imp_seed_fixture() {
   string[] imp_have = (import cimps);
   push(imp_have, "first");
 } return void;
-():() then calls lz_c:[1]
+():() then (import cimps)[0]:("first")
 ():() then init_units:(0)
+():() then calls lz_c:[1]
 
 // lz_c, then `int q = (import cfg);` as a node.
 imp_decl_fixture() {
   lz_c();
   export int imp_decl = node_decl("int", "q", (import lz_imp), 0);
 } return void;
-():() then calls lz_c:[1]
+given lz_c ():() then calls node_decl:("int", "q", (import lz_imp), 0)
 ():() then init_units:(0)
+():() then calls lz_c:[1]

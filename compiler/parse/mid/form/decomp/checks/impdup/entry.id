@@ -22,8 +22,9 @@ lz_o() {
   push((import prog), (import lz_fn9));
   uq_fill();
 } return void;
-():() then calls lz_n:[1]
+():() then (import prog)[1]:(23)
 ():() then init_units:(0)
+():() then calls lz_n:[1]
 
 // prog = [ima, imb]: no parameters, two statements each, each returning a
 // different import, so their strict fingerprints differ only in the import

@@ -6,6 +6,7 @@ fwd_stmt_tail(int i, int fid, int callid) {
   }
 } return void;
 given farm_k (0, 6, 2):() then calls fwd_verify:(0, 6, 2)
+given farm_k (0, 12, 2):() then calls fwd_verify:(0, 12, 2)
 given farm_k (0, 6, -1):() then calls fwd_verify:[0]
 
 // The non-void forwarder shape: the declared local is exactly `return` and

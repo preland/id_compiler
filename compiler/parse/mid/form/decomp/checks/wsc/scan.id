@@ -22,6 +22,8 @@ wsc_scan() {
     wsc_loop();
   }
 } return void;
+given wsc_pair ():() then calls wsc_at:(9)
+given wsc_pair ():() then calls wsc_at:(0)
 given env_init ():() then calls wsc_loop:[1]
 given env_init given lset((import chkfail), 0, 1) ():() then calls wsc_loop:[0]
 
@@ -32,6 +34,8 @@ wsc_loop() {
     wlp_i = wlp_i + 1;
   }
 } return void;
+given wsc_pair ():() then calls wsc_at:(9)
+given wsc_pair ():() then calls wsc_at:(0)
 given env_init ():() then calls wsc_at:[0]
 given wsc_pair ():() then calls wsc_at:[10]
 

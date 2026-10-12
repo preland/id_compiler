@@ -10,8 +10,9 @@ farm_d() {
   export int f_fwd1 = node_func("fwd1", "int", [(import f_pa)], [(import f_decl)], (import f_ret));
   sym_func((import f_target));
 } return void;
-():() then calls farm_c:[1]
+given farm_c ():() then calls sym_func:((import f_target))
 ():() then init_units:(0)
+():() then calls farm_c:[1]
 
 retstyle_check(string rem) {
   int dstart = tdig_start(rem);

@@ -57,12 +57,14 @@ noop_world() {
   export int nfx_times_zero = node_txt2("bin", "*", (import wx_va), (import nfx_zero));
   export int nfx_zero_times = node_txt2("bin", "*", (import nfx_zero), (import wx_va));
 } return void;
-():() then calls wsc_world:[1]
+():() then calls node_txt2:("int", "0", 0, 0)
 ():() then init_units:(0)
+():() then calls wsc_world:[1]
 
 noop_constant() {
   noop_world();
   push((import cdecl), (import nfx_dpad));
 } return void;
-():() then calls noop_world:[1]
 ():() then len((import cdecl)):(1)
+():() then (import cdecl)[0]:(59)
+():() then calls noop_world:[1]
