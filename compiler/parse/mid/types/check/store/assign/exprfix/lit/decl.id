@@ -4,6 +4,8 @@ decltype_fixture() {
   leaves_fixture();
   decl_build();
 } return void;
+given leaves_fixture ():() then calls node_decl:("int[]", "xs", (import lit_a), 0)
+given leaves_fixture ():() then calls node_decl:("int", "x", (import lit_a), 0)
 ():() then calls leaves_fixture:[1]
 ():() then init_units:(0)
 

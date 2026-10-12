@@ -6,6 +6,8 @@ composite_fixture() {
   composite_build();
   un_call_build();
 } return void;
+given leaves_fixture ():() then calls node_txt2:("bin", "+", (import lit_a), (import lit_b))
+given leaves_fixture ():() then calls node_txt1:("un", "!", (import lit_a))
 ():() then calls leaves_fixture:[1]
 ():() then init_units:(0)
 

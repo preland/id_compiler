@@ -14,6 +14,8 @@ esc_sfix() {
 } chain () {
   lset((import sqbase), 0, (import efs_acc));
 } return void;
+given esc_sfix ():() then calls lset:((import sqbase), 0, (import efs_acc))
+():() then calls node_txt:("str", "")
 ():() then calls esc_fix:[1]
 ():() then init_units:(0)
 
@@ -21,6 +23,8 @@ esc_sfix_in() {
   esc_sfix();
   lset((import esc_cons), 0, (import efs_vs));
 } return void;
+given esc_sfix_in ():() then calls lset:((import esc_cons), 0, (import efs_vs))
+():() then calls node_txt:("var", "s")
 ():() then calls esc_sfix:[1]
 ():() then init_units:(0)
 
@@ -28,5 +32,7 @@ esc_sfix_fs() {
   esc_sfix();
   lset((import fsc), 0, 1);
 } return void;
+given esc_sfix_fs ():() then calls lset:((import fsc), 0, 1)
+():() then calls node_txt:("var", "n")
 ():() then calls esc_sfix:[1]
 ():() then init_units:(0)

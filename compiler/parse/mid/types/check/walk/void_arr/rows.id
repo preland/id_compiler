@@ -6,6 +6,8 @@ case_ranges_fixture() {
   incase_init();
   case_ranges_rows();
 } return void;
+():() then calls case_ranges_row:(10, 20)
+():() then calls case_ranges_row:(40, 50)
 ():() then calls incase_init:[1]
 ():() then init_units:(0)
 

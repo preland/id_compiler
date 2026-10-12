@@ -48,6 +48,8 @@ esc_ffix() {
   init_tyc();
   lset((import sqbase), 0, (import eff_use));
 } return void;
+given esc_ffix ():() then calls node_call:("ff_bad", [(import eff_vp), (import eff_sub)])
+given esc_ffix ():() then calls lset:((import sqbase), 0, (import eff_use))
 ():() then calls esc_sfix:[1]
 ():() then init_units:(0)
 

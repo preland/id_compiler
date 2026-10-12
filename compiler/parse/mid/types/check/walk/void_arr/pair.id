@@ -6,6 +6,8 @@ farm_j4() {
   export int f_user = node_func("user", "void", (import f_none), [(import f_ustmt)], 0 - 1);
   push((import prog), (import f_user));
 } return void;
+given farm_j3 ():() then calls node_func:("user", "void", (import f_none), [(import f_ustmt)], -1)
+given farm_j3 ():() then calls node_exprstmt:((import f_uvar))
 ():() then calls farm_j3:[1]
 ():() then init_units:(0)
 

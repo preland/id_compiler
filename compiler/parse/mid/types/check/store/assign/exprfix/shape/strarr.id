@@ -4,6 +4,8 @@ strarr_fixture() {
   shapes_fixture();
   strarr_build();
 } return void;
+given strarr_fixture ():() then calls node_arr:((import str_elems))
+given strarr_fixture ():() then calls node_call:("pop", [(import arr_strs)])
 ():() then calls shapes_fixture:[1]
 ():() then init_units:(0)
 

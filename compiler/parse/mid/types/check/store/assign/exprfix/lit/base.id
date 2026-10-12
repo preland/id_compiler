@@ -9,6 +9,8 @@ leaves_fixture() {
   leaves_build();
   leaves_build2();
 } return void;
+():() then calls node_txt2:("int", "2", 2, 0)
+():() then calls node_float:("1.5")
 ():() then calls varleaf_init:[1]
 ():() then init_units:(0)
 

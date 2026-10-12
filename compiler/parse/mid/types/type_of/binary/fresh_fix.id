@@ -7,6 +7,8 @@ fresh_fixture() {
 } chain () {
   fresh_bins();
 } return void;
+given fresh_fixture ():() then calls node_call:("chr", [(import lit_a)])
+given fresh_fixture ():() then calls node_txt2:("bin", "+", (import lit_str), (import lit_str))
 ():() then calls composite_fixture:[1]
 ():() then init_units:(0)
 

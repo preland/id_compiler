@@ -55,5 +55,7 @@ esc_fm_fix() {
   export int efm_fl = newleaf("fld", 0, 0, "kids", "");
   export int efm_ix = node_index(node_txt("var", "t"), (import efm_fl));
 } return void;
+given esc_fm_fix ():() then calls add_func:("fm_ok", "Tr", (import efm_fn))
+given esc_fm_fix ():() then calls add_func:("fm_bad", "Tr", (import efm_bad))
 ():() then calls esc_fix:[1]
 ():() then init_units:(0)

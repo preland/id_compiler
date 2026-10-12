@@ -9,6 +9,8 @@ cases_fix() {
   init_files();
   push((import pfile), "fixture.id");
 } return void;
+():() then (import pfile)[0]:("fixture.id")
+():() then calls node_param:("param", "int", "x")
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 

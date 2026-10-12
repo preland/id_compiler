@@ -33,5 +33,7 @@ hidden_call_fixture() {
   export int hc_call = node_call("fx_target", (import fixture_params));
   export int hc_un = node_txt1("un", "!", (import hc_call));
 } return void;
+given hidden_call_fixture ():() then calls node_call:("fx_target", (import fixture_params))
+given hidden_call_fixture ():() then calls node_txt1:("un", "!", (import hc_call))
 ():() then calls fn_idx_fixture:[1]
 ():() then init_units:(0)

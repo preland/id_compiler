@@ -7,6 +7,8 @@ chkret_fixture() {
   fn_fixture();
   leaves_build();
 } return void;
+():() then calls node_param:("param", "int", "x")
+():() then calls node_txt:("str", "hi")
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)
 
@@ -17,6 +19,8 @@ badexpr_fixture() {
   chkret_fixture();
   badexpr_build();
 } return void;
+given chkret_fixture ():() then calls node_func:("badexpr", "int", [], [], (import lit_str))
+():() then calls node_param:("param", "int", "x")
 ():() then calls chkret_fixture:[1]
 ():() then init_units:(0)
 

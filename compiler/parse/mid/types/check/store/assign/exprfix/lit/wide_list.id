@@ -9,5 +9,7 @@ wide_list_fixture() {
   export int iassign_wide = node_iassign((import idx_fix), (import literal_huge));
   export int push_wide = node_call("push", (import args_wide));
 } return void;
+given wide_list_fixture ():() then calls node_iassign:((import idx_fix), (import literal_huge))
+given wide_list_fixture ():() then calls node_call:("push", (import args_wide))
 ():() then calls idx_build:[1]
 ():() then init_units:(0)

@@ -57,5 +57,7 @@ esc_dfix() {
 } chain () {
   esc_fd_h();
 } return void;
+given esc_dfix ():() then calls add_func:("fd_peek", "int[]", (import efd_peek))
+():() then calls node_txt:("var", "w")
 ():() then calls esc_fix:[1]
 ():() then init_units:(0)

@@ -38,5 +38,7 @@ cbind_fixture() {
   export int cb_s = node_txt("str", "s");
   export int cb_e = newnode("cctor", 0, 0, "bind", "", [cb_f, cb_a], [cb_f, cb_a]);
 } return void;
+():() then calls newleaf:("cfn", 0, 0, "fx_target", "")
+():() then calls node_txt:("str", "s")
 ():() then calls fn_idx_fixture:[1]
 ():() then init_units:(0)

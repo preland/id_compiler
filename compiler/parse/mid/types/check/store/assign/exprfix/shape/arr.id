@@ -4,6 +4,8 @@ shapes_fixture() {
   leaves_fixture();
   shapes_build();
 } return void;
+given shapes_fixture ():() then calls node_arr:((import arr_elems))
+given shapes_fixture ():() then calls node_call:("len", [(import lit_str)])
 ():() then calls leaves_fixture:[1]
 ():() then init_units:(0)
 
@@ -24,5 +26,7 @@ idx_build() {
   export int idx_fix = node_index((import arr_ints), (import lit_a));
   export int call_pop = node_call("pop", [(import arr_ints)]);
 } return void;
+given shapes_fixture ():() then calls node_index:((import arr_ints), (import lit_a))
+given shapes_fixture ():() then calls node_call:("pop", [(import arr_ints)])
 ():() then calls shapes_fixture:[1]
 ():() then init_units:(0)

@@ -5,6 +5,8 @@ allfix() {
   varleaf_fixture();
   leaves_build();
 } return void;
+():() then calls add_var:("vi", "int", 0)
+():() then calls node_txt:("str", "hi")
 ():() then calls varleaf_fixture:[1]
 ():() then init_units:(0)
 

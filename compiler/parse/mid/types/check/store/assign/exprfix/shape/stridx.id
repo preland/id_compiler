@@ -4,5 +4,7 @@ stridx_build() {
   strarr_fixture();
   export int idx_str = node_index((import arr_strs), (import lit_a));
 } return void;
+given strarr_fixture ():() then calls node_index:((import arr_strs), (import lit_a))
+given strarr_fixture ():() then calls node_call:("pop", [(import arr_strs)])
 ():() then calls strarr_fixture:[1]
 ():() then init_units:(0)

@@ -45,5 +45,7 @@ esc_fix() {
   esc_seed();
   lset((import sqbase), 0, (import efc_fn));
 } return void;
+given esc_fix ():() then calls add_func:("fa_loc", "int[]", (import efb_fn))
+given esc_fix ():() then calls add_func:("fa_nest", "int[]", (import efc_fn))
 ():() then calls full_env:[1]
 ():() then init_units:(0)

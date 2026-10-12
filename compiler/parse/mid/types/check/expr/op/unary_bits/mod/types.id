@@ -3,6 +3,8 @@ farm_j3() {
   farm_j2();
   export int f_ustmt = node_exprstmt((import f_uvar));
 } return void;
+given farm_j2 ():() then calls node_exprstmt:((import f_uvar))
+():() then calls node_txt:("var", "target")
 ():() then calls farm_j2:[1]
 ():() then init_units:(0)
 

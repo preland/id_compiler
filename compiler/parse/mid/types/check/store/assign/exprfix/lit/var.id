@@ -4,6 +4,8 @@ varleaf_fixture() {
   varleaf_init();
   varleaf_build();
 } return void;
+():() then calls add_var:("vi", "int", 0)
+():() then calls node_txt:("import", "vi")
 ():() then calls varleaf_init:[1]
 ():() then init_units:(0)
 
@@ -23,5 +25,7 @@ varleaf_init() {
   init_idx();
   init_bnames();
 } return void;
+():() then (import bnames)[0]:("print")
+():() then len((import tyname)):(5)
 ():() then calls env_init:[1]
 ():() then init_units:(0)
