@@ -10,6 +10,7 @@ idstd
 # Data formats, hashes and encodings whose standard name is the short spelling
 # (digits or an acronym nobody writes out); a reader searches for exactly this.
 utf8
+ascii
 sha256
 crc32
 json
