@@ -2524,6 +2524,7 @@ run_lib_precheck() {
     for f in idlex0 idparse0 ccrun idlayout idlex idparse; do
         if [ -x "$CACHE_DIR/$f" ]; then
             cp "$CACHE_DIR/$f" "$inner_cache/$f" 2>/dev/null && chmod +x "$inner_cache/$f"
+            cp "$CACHE_DIR/$f.stamp" "$inner_cache/$f.stamp" 2>/dev/null || true
         fi
     done
 
