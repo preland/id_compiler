@@ -1,0 +1,16 @@
+// Whether the export at index ek is a conf.id constant. A constant has a value
+// before any setup has run, so unlike an export it needs no `given`, and the
+// positions it may stand in (a setup's or a check's argument, a check's index)
+// are decided from the state fit_import's callers raise, not from its owner.
+
+imp_conf(int ek) {
+  int is_conf = 0;
+  if(ek >= 0) {
+    if((import eowners)[ek] == "conf.id") {
+      is_conf = 1;
+    }
+  }
+} return int is_conf;
+given impcase_empty given sset((import eowners), 0, "conf.id") (0):(1)
+given impcase_empty given sset((import eowners), 0, "fx_target") (0):(0)
+(-1):(0)

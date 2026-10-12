@@ -13,6 +13,7 @@ case_item(int[] pos) {
   int v = 0;
   if(at_case_import(pos) == 1) {
     v = case_import(pos);
+    index_take(pos, v);
     import_index(pos, (import ns1)[v]);
   } else {
     v = case_value(pos);

@@ -7,7 +7,7 @@
 // needs no conversion.
 
 tc_value(int e, string want) {
-  string so = (import ns1)[e];
+  string so = tc_import(e, want);
   if((import nkind)[e] != "cimport") {
     so = tc_lit(e, want);
   }

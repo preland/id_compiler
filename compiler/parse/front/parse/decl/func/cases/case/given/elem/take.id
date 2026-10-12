@@ -1,0 +1,24 @@
+// `(import NAME)[i]` among the arguments of a `then` check: the element of an
+// export, read after the call under test like `(import NAME)` whole. The node
+// is the export's "cimport" with the index's node plus one in its first int
+// field (0 is the whole export); everywhere else the `[` stays the mistake
+// import_index (index.id) reports. ixargs is raised by then_args
+// (../../then/args.id) for exactly the check's own arguments.
+
+index_take(int[] pos, int v) {
+  if(cur_text(pos) == "[" && (import ixargs)[0] == 1) {
+    advance(pos);
+    lset((import ni1), v, case_item(pos) + 1);
+    eat_text(pos, "]");
+  }
+} return void;
+given index_fix (["op", "int", "op"], ["[", "2", "]"], 1) ([0], 0):([3]) then (import ni1)[0]:(2)
+given index_fix (["op", "int", "op"], ["[", "2", "]"], 0) ([0], 0):([0]) then (import ni1)[0]:(0)
+
+index_fix(string[] kinds, string[] texts, int raised) {
+  toks_env(kinds, texts);
+  newleaf("cimport", 0, 0, "zz", "");
+  lset((import ixargs), 0, raised);
+} return void;
+(["op"], ["["], 1):() then len((import ni1)):(1)
+(["op"], ["["], 0):() then (import ixargs)[0]:(0)

@@ -1,0 +1,21 @@
+// `(import NAME)` as C: the export's global, or -- for the element form a
+// check's argument may take (front/parse/decl/func/cases/case/given/elem/
+// take.id) -- the list's element at the index, unboxed to the type wanted. Both
+// are read where the value is built, after the call under test.
+
+tc_import(int e, string want) {
+  string so = (import ns1)[e];
+  if((import nkind)[e] == "cimport" && (import ni1)[e] > 0) {
+    string ixc = tc_value((import ni1)[e] - 1, "int");
+    so = unbox("id_list_get(" + so + ", " + ixc + ")", want);
+  }
+} return string so;
+given lit_import_fixture ((import lit_cimport_e), "int"):("gb")
+given import_ix_fixture ((import ix_import_e), "int"):("(int)(id_list_get(gb, 5))")
+
+import_ix_fixture() {
+  lit_int_fixture();
+  export int ix_import_e = newleaf("cimport", (import lit_e) + 1, 0, "gb", "");
+} return void export ix_import_e;
+():() then calls lit_int_fixture:[1]
+():() then init_units:(0)

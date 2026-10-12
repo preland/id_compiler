@@ -1,0 +1,13 @@
+// EXPECT: a case's own argument or expected value cannot name one
+mk() {
+  export int[] cnt = [0, 5];
+} return void;
+
+pick(int v) {
+  int w = v + 1;
+} return int w;
+((import slot)):(6)
+(1):(2)
+
+main(int argc, string[] argv) {
+} return int 0;

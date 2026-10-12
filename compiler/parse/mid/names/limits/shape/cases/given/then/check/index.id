@@ -1,0 +1,34 @@
+// `(import NAME)[i]` among a check's arguments (front/parse/decl/func/cases/
+// case/given/elem/take.id): the element is what the call is made with, so the
+// export is held to what `(import NAME)` whole is, at the list type of the
+// parameter, and the index is a literal or a conf.id constant -- an export's
+// own value as an index would be read after the call and could agree with the
+// case by construction.
+
+then_arg_want(int e, string pt) {
+  string want = pt;
+  if((import nkind)[e] == "cimport" && (import ni1)[e] > 0) {
+    want = pt + "[]";
+  }
+} return string want;
+given arg_conf_fixture ((import fixture_conf_arg), "int"):("int")
+given arg_conf_fixture given lset((import ni1), (import fixture_conf_arg), 3) ((import fixture_conf_arg), "int"):("int[]")
+
+then_arg_index(int ci, int e) {
+  int ix = (import ni1)[e] - 1;
+  if(ix >= 0 && (import nkind)[ix] == "cimport" && then_arg_conf(ix) == 0) {
+    case_err(ci, "the index of an indexed export in a check is a literal or a conf.id constant, and " + lit_text(ix) + " is neither; write the index as a literal, as in then f((import NAME)[1]):(value), or name a conf.id constant");
+  } else if(ix >= 0) {
+    then_arg_ix(ci, ix);
+  }
+} return void;
+given index_arg_fixture ((import fixture_ci), (import fixture_ix_lit)):() then prints:("")
+given index_arg_fixture ((import fixture_ci), (import fixture_ix_imp)):() then prints:("fixture.id:4: error: the index of an indexed export in a check is a literal or a conf.id constant, and (import x) is neither; write the index as a literal, as in then f((import NAME)[1]):(value), or name a conf.id constant\n")
+
+then_arg_ix(int ci, int ix) {
+  lset((import setupargs), 0, 2);
+  fit_value(ci, ix, "int");
+  lset((import setupargs), 0, 0);
+} return void;
+given then_arg_fixture ((import fixture_ci), (import fixture_fn)):() then prints:("fixture.id:4: error: this case gives a string where a int is required\n")
+given then_arg_fixture ((import fixture_ci), (import fixture_zero)):() then prints:("")

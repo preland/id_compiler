@@ -1,18 +1,22 @@
-// A conf.id constant among a check's arguments. fit_import (../../read/
-// impcheck.id) words that refusal for a case's own arguments, where the
-// constant is named as a then check's index; a check's argument is not that
-// position, so it is told here what is true of it: the constant is accepted
-// as an index only, and its value is written as a literal.
+// A conf.id constant among a check's arguments. It says what to call the
+// check with, and the value compared with stays a literal, so the case cannot
+// agree with itself. fit_import (../../read/impcheck.id) refuses a constant
+// unless setupargs is raised, as for a setup's arguments; it is raised here to
+// 2 for a constant only, so that every other (import NAME) in a check's
+// argument keeps being held to chk_own_import (../../more/flag/reqtests.id).
 
 then_arg_value(int ci, int e, string pt) {
   int is_conf = then_arg_conf(e);
-  if(is_conf == 1) {
-    case_err(ci, "(import " + (import ns1)[e] + ") is a conf.id constant, and a check's argument cannot name one: a conf.id constant is accepted only as a then check's index, as in then (import tbl)[(import " + (import ns1)[e] + ")]:(value); write its value as a literal, as in then f(5):(value)");
-  } else {
-    fit_value(ci, e, pt);
+  lset((import setupargs), 0, 2 * is_conf);
+  fit_value(ci, e, then_arg_want(e, pt));
+} chain (int ci, int e, string pt) {
+  lset((import setupargs), 0, 0);
+  if((import nkind)[e] == "cimport") {
+    then_arg_index(ci, e);
   }
 } return void;
-given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "int"):() then prints:("fixture.id:4: error: (import x) is a conf.id constant, and a check's argument cannot name one: a conf.id constant is accepted only as a then check's index, as in then (import tbl)[(import x)]:(value); write its value as a literal, as in then f(5):(value)\n")
+given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "int"):() then prints:("")
+given arg_conf_fixture given sset((import eowners), 0, "conf.id") ((import fixture_ci), (import fixture_conf_arg), "string"):() then prints:("fixture.id:4: error: this case gives (import x), a int, where a string is required\n")
 given then_arg_fixture ((import fixture_ci), (import fixture_zero), "int"):() then prints:("")
 
 then_arg_conf(int e) {

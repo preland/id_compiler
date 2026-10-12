@@ -1,4 +1,4 @@
-// EXPECT: (import slot) is a conf.id constant, and a case names one only as a then check's index
+// EXPECT: (import slot) is a conf.id constant, and a case's own argument or expected value cannot name one
 mk() {
   export int[] cnt = [0, 5];
 } return void;

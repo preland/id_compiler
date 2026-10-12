@@ -1070,6 +1070,51 @@ elif grep -qF "main.id:14: test failed: wrap(0) then (import cnt)[(import slot)]
 else
     bad "bin/idc: a changed index constant re-runs the case ($(grep -v warning "$TMP/log" | head -1))"
 fi
+
+# A conf.id constant may be an argument of a given setup and of a check, and a
+# check may be called with one element of an exported list: all three are read
+# after the call, so a changed constant must change the case's cache key.
+ARGDIR="$TMP/argdir"; mkdir -p "$ARGDIR"
+printf 'int slot = 1;\n' > "$ARGDIR/conf.id"
+cat > "$ARGDIR/main.id" <<'EOF2'
+mk(int s) {
+  export int[] cnt = [0, 0];
+  int[] c = (import cnt);
+  c[s] = 5;
+} return void;
+
+pick(int v) {
+  int w = v + 1;
+} return int w;
+(1):(2)
+(2):(3)
+
+wrap(int k) {
+  int[] c = (import cnt);
+  c[k] = c[k] + 1;
+} return void;
+given mk((import slot)) (0):() then pick((import cnt)[1]):(6)
+given mk((import slot)) (1):() then pick((import cnt)[(import slot)]):(7)
+given mk(0) (1):() then pick((import slot)):(2)
+EOF2
+cat > "$ARGDIR/run.id" <<'EOF2'
+main(int argc, string[] argv) {
+} return int 0;
+EOF2
+if ../bin/idc "$ARGDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    ok "bin/idc: a constant in a setup or check, and an indexed export in a check, are accepted"
+else
+    bad "bin/idc: a constant in a setup or check, and an indexed export in a check, are accepted ($(grep -v warning "$TMP/log" | head -1))"
+fi
+printf 'int slot = 0;\n' > "$ARGDIR/conf.id"
+if ../bin/idc "$ARGDIR" --allow-untested --emit-c /dev/null >"$TMP/log" 2>&1; then
+    bad "bin/idc: a changed setup or check constant re-runs the case (built; it should not have)"
+elif grep -qF "main.id:17: test failed: wrap(0) then pick((import cnt)[1]) = 1, expected 6" "$TMP/log" \
+    && grep -qF "main.id:19: test failed: wrap(1) then pick((import slot)) = 1, expected 2" "$TMP/log"; then
+    ok "bin/idc: a changed setup or check constant re-runs the case"
+else
+    bad "bin/idc: a changed setup or check constant re-runs the case ($(grep -v warning "$TMP/log" | head -1))"
+fi
 cat > "$TMP/p.id" <<'EOF'
 mk() {
   export int[] cnt = [0, 5];

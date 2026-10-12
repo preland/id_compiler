@@ -7,13 +7,13 @@
 // reported for it.
 
 import_index(int[] pos, string name) {
-  if(cur_text(pos) == "[") {
-    syn_err(pos, "an indexed export, (import " + name + ")[...], is not accepted as an argument of a case or of a check; an argument is a literal or (import " + name + ") whole, and to check one element write 'then (import " + name + ")[i]:(value)'");
+  if(cur_text(pos) == "[" && (import ixargs)[0] == 0) {
+    syn_err(pos, "an indexed export, (import " + name + ")[...], is accepted only as an argument of a then check, as in 'then f((import " + name + ")[1]):(value)'; a case or a given setup takes (import " + name + ") whole, and to check one element write 'then (import " + name + ")[i]:(value)'");
     skip_index(pos);
   }
 } return void;
 given toks_env(["op", "op", "int", "op"], [":", "(", "6", ")"]) ([0], "cnt"):([0])
-given toks_env(["op", "op", "int", "op"], ["[", "1", "]", ":"]) ([0], "cnt"):([3]) then prints:("<stdin>:1: error: an indexed export, (import cnt)[...], is not accepted as an argument of a case or of a check; an argument is a literal or (import cnt) whole, and to check one element write 'then (import cnt)[i]:(value)'\n")
+given toks_env(["op", "op", "int", "op"], ["[", "1", "]", ":"]) ([0], "cnt"):([3]) then prints:("<stdin>:1: error: an indexed export, (import cnt)[...], is accepted only as an argument of a then check, as in 'then f((import cnt)[1]):(value)'; a case or a given setup takes (import cnt) whole, and to check one element write 'then (import cnt)[i]:(value)'\n")
 
 skip_index(int[] pos) {
   while(cur_text(pos) != "]" && cur_kind(pos) != "eof") {

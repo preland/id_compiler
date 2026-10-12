@@ -15,7 +15,7 @@ given calls_node_fixture ((import fixture_calls_one)):("1")
 leaf_text(int e) {
   string lt = (import ns1)[e];
   if((import nkind)[e] == "cimport") {
-    lt = "(import " + lt + ")";
+    lt = "(import " + lt + ")" + index_text(e);
   }
   if((import nkind)[e] == "cctor") {
     lt = lt + "(" + items_text((import nl1)[e]) + ")";

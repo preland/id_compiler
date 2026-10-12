@@ -1,0 +1,9 @@
+// Nodes for index.id's cases: a check's argument indexed by a literal and by an export.
+
+index_arg_fixture() {
+  arg_conf_fixture();
+  export int fixture_ix_lit = newleaf("cimport", (import fixture_zero) + 1, 0, "x", "");
+  export int fixture_ix_imp = newleaf("cimport", (import fixture_conf_arg) + 1, 0, "x", "");
+} return void;
+():() then calls arg_conf_fixture:[1]
+():() then len((import nkind)):(7)

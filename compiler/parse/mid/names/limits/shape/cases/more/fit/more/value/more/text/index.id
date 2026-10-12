@@ -1,0 +1,11 @@
+// The `[i]` after an `(import NAME)` that a check's argument carries, as
+// written; nothing when the import is whole.
+
+index_text(int e) {
+  string ixt = "";
+  if((import nkind)[e] == "cimport" && (import ni1)[e] > 0) {
+    ixt = "[" + lit_text((import ni1)[e] - 1) + "]";
+  }
+} return string ixt;
+given import_ix_fixture ((import ix_import_e)):("[5]")
+given lit_import_fixture ((import lit_cimport_e)):("")

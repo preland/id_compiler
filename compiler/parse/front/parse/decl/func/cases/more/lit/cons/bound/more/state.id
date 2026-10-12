@@ -12,6 +12,7 @@
 //              holding the literals a setup is called with (cases/case/given/)
 //   setupargs  [1 while a `given` setup's own arguments are being checked
 //              (mid/names/limits/shape/cases/given/setup/args.id)]
+//   ixargs     [1 while a `then` check's own arguments are being read, where an indexed export is accepted (cases/case/given/elem/index.id)]
 //   wrdone     [1 once the write table (wrx, wrf) is built, mid/names/limits/shape/cases/report/diagnostics.id]
 //   retexp     the names `} return void export NAME;` clauses gave, in order;
 //              a func node's second int field is 2 plus its position here
@@ -96,6 +97,8 @@ init_cases2() {
   export string[] retexp = [];
   export string[] retexp_pend = [];
   vocab_init();
+} chain () {
+  export int[] ixargs = [0];
 } return void export consbound;
 ():() then len((import consbound)):(0)
 given claim_cols_fixture ():() then len((import consbound)):(0)

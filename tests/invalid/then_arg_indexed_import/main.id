@@ -1,4 +1,4 @@
-// EXPECT: an indexed export, (import cnt)[...], is not accepted as an argument of a case or of a check
+// EXPECT: an indexed export, (import cnt)[...], is accepted only as an argument of a then check, as in 'then f((import cnt)[1]):(value)'
 mk() {
   export int[] cnt = [0, 5];
 } return void;
@@ -10,10 +10,7 @@ pick(int v) {
 (2):(3)
 
 wrap(int k) {
-  int a = k + 1;
+  int a = k * 3;
 } return int a;
-given mk (0):(1) then pick((import cnt)[1]):(6)
-given mk (1):(2) then pick((import cnt)[1]):(6)
-
-main(int argc, string[] argv) {
-} return int 0;
+given mk ((import cnt)[1]):(15)
+given mk (1):(3)
