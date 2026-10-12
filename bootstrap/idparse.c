@@ -1788,6 +1788,7 @@ void id_init_line_emit(char* name);
 char* id_init_line(char* name);
 void id_emit_main_init(int id);
 void id_emit_init_call(void);
+int id_list_consts_cached(void);
 int id_const_root(int e);
 int id_const_hop(int e);
 char* id_export_line(int i);
@@ -1918,6 +1919,7 @@ void id_emit_tests_maybe(int argc, IdList* argv);
 void id_emit_tests(char* triple);
 void id_emit_test_unit(char* triple);
 void id_harn_init(void);
+void id_kept_lists_reset(void);
 void id_emit_count(char* ind);
 void id_emit_test_body(char* triple);
 void id_emit_test_head(void);
@@ -4007,6 +4009,7 @@ int id_in_case_at(int i, int id, int ok);
 void id_tc_g3(int id);
 void id_chk_voidarr(int id);
 void id_void_arr_type(int id, char* t);
+int id_case_first_after(int id);
 void id_void_arr_pair(int id, char* t1, char* t2);
 char* id_sd_cell(IdList* sd_tab, char* sd_s, int sd_k);
 int id_fn_node_of(char* name);
@@ -4373,6 +4376,7 @@ IdList* enames;  /* exported by init_sym_a() */
 IdList* etypes;  /* exported by init_sym_b() */
 IdList* eowners;  /* exported by init_sym_b() */
 IdList* fnodes;  /* exported by init_sym_b() */
+IdList* kept_lists;  /* exported by init_sym_b() */
 IdList* tkind;  /* exported by init_a() */
 IdList* ttext;  /* exported by init_a() */
 IdList* nkind;  /* exported by init_a() */
@@ -13523,10 +13527,20 @@ void id_emit_main_init(int id) {
 }
 
 void id_emit_init_call(void) {
-    if ((id_list_consts_kept() > 0)) {
+    if ((id_list_consts_cached() > 0)) {
         id_print(ID_S("    idc_const_init();"));
     }
     return;
+}
+
+int id_list_consts_cached(void) {
+    int kept_n;
+    kept_n = (int)(id_list_get(kept_lists, 0));
+    if ((kept_n < 0)) {
+        kept_n = id_list_consts_kept();
+        id_lset(kept_lists, 0, kept_n);
+    }
+    return kept_n;
 }
 
 int id_const_root(int e) {
@@ -14905,6 +14919,11 @@ void id_harn_init(void) {
     return;
 }
 
+void id_kept_lists_reset(void) {
+    id_lset(kept_lists, 0, (0 - 1));
+    return;
+}
+
 void id_emit_count(char* ind) {
     if (((int)(id_list_get(harn, 0)) == 1)) {
         id_print(id_concat(ind, ID_S("id_ctr_time++;")));
@@ -14917,6 +14936,7 @@ void id_emit_test_body(char* triple) {
     id_lset(harn, 0, 0);
     id_emit_test_tail();
     id_fv_flush();
+    id_kept_lists_reset();
     return;
 }
 
@@ -14925,6 +14945,7 @@ void id_emit_test_head(void) {
     id_print(c_prelude_text);
     id_emit_closure_rt(ID_S("static "));
     id_emit_test_decls();
+    id_kept_lists_reset();
     return;
 }
 
@@ -20979,6 +21000,7 @@ void id_init_sym_b(void) {
     etypes = id_list_lit(0);
     eowners = id_list_lit(0);
     fnodes = id_list_lit(0);
+    kept_lists = id_list_lit(1, (long long)((0 - 1)));
     return;
 }
 
@@ -36982,11 +37004,10 @@ void id_tc_node_at(int id) {
 int id_in_case(int id) {
     int i;
     int ok;
-    i = 0;
+    i = id_case_first_after(id);
     ok = 0;
-    while ((i < id_list_len(casenode))) {
-        ok = id_in_case_at(i, id, ok);
-        i = (i + 1);
+    if ((i < id_list_len(casenode))) {
+        ok = id_in_case_at(i, id, 0);
     }
     return ok;
 }
@@ -37025,6 +37046,21 @@ void id_void_arr_type(int id, char* t) {
         id_tc_err(id, ID_S("'void[]' is not a valid type"));
     }
     return;
+}
+
+int id_case_first_after(int id) {
+    int cfa_lo;
+    int cfa_hi;
+    cfa_lo = 0;
+    cfa_hi = id_list_len(casenode);
+    while ((cfa_lo < cfa_hi)) {
+        if (((int)(id_list_get(casenode, id_idiv((cfa_lo + cfa_hi), 2))) > id)) {
+            cfa_hi = id_idiv((cfa_lo + cfa_hi), 2);
+        } else {
+            cfa_lo = (id_idiv((cfa_lo + cfa_hi), 2) + 1);
+        }
+    }
+    return cfa_lo;
 }
 
 void id_void_arr_pair(int id, char* t1, char* t2) {
