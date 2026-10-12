@@ -12,7 +12,7 @@ given m2r_row_fixture ():() then len((import outv)):(2)
 m2r_blank() {
   int[] row = [];
   int len_v = len((import pra));
-  lst_fill(row, len_v, 0 - 1);
+  list_fill(row, len_v, 0 - 1);
 } return int[] row;
 given optfx_setup ():([])
 given m2r_outv_fixture ():([-1])

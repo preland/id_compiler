@@ -1,7 +1,7 @@
 // The names a refusal lists, quoted and joined.
 
 jg_note_missing(string jg_nm, string[] jg_exps, string[] jg_ms) {
-  if (jg_nm != "" && lst_str_index(jg_exps, "id_" + jg_nm) < 0) {
+  if (jg_nm != "" && list_string_index(jg_exps, "id_" + jg_nm) < 0) {
     push(jg_ms, jg_nm);
   }
 } return void;

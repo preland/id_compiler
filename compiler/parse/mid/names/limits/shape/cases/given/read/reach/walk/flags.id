@@ -5,7 +5,7 @@
 rc_new(string src) {
   int ri = len((import rcsets));
   push((import rcsets), rc_flags(src));
-  hmap_put((import rck), (import rcv), (import rcu), (import rcc), src, ri);
+  hash_map_put((import rck), (import rcv), (import rcu), (import rcc), src, ri);
 } return int ri;
 given rc_t_ready ("fb"):(0) then len((import rcsets)):(1)
 given rc_t_one ("fa"):(1) then len((import rcsets)):(2)
@@ -15,7 +15,7 @@ given rc_t_one ("fa"):(1) then len((import rcsets)):(2)
 // function of the build reaches nothing.
 rc_flags(string src) {
   int[] rcfl = [];
-  lst_fill(rcfl, len((import dg_cout)), 0);
+  list_fill(rcfl, len((import dg_cout)), 0);
   int[] rctodo = [];
 } chain (string src) {
   int rcst = dg_fn_named(src);

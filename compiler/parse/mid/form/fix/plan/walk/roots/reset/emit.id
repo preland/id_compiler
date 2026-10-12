@@ -39,7 +39,7 @@ given fix_fixture ():() then init_units:(0)
 // observed through a reader of it -- fix_sep_at and fix_mark_sep
 // (../../../decide/touch/sep.id) are what this one is for.
 fixe_sep_count() {
-  string n_t = "sep " + (lst_sum((import fixe_sep)));
+  string n_t = "sep " + (list_sum((import fixe_sep)));
 } return string n_t;
 given fix_fixture ():("sep 0")
 given fix_touch_fixture ():("sep 0")

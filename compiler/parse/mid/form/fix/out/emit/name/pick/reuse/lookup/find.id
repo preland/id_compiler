@@ -6,7 +6,7 @@ fix_rcache_find(int i) {
   if((import nkind)[e] == "call") {
     string key = fix_rkey(e);
     int ix = find_str((import fixd_rk), key);
-    name = lst_str_get_or((import fixd_rn), ix, "");
+    name = list_string_get_or((import fixd_rn), ix, "");
   }
 } return string name;
 given fix_pick_fixture_n (0):("")

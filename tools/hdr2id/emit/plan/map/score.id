@@ -36,7 +36,7 @@ pl_prefix(string pl_x, string pl_y) {
 pl_score(string[] pl_s, int pl_b, int pl_j) {
   string pl_cj = pl_field(pl_s[pl_j], 0);
   string pl_nj = pl_field(pl_s[pl_j], 1);
-  int pl_ok = pl_b != pl_j && lst_str_index(["i4", "i8", "Pi4", "Pi8"], pl_cj) >= 0 && pl_lenish(pl_nj) == 1;
+  int pl_ok = pl_b != pl_j && list_string_index(["i4", "i8", "Pi4", "Pi8"], pl_cj) >= 0 && pl_lenish(pl_nj) == 1;
 } chain (string[] pl_s, int pl_b, int pl_j) {
   int pl_sc = 0 - 1;
   if (pl_ok == 1) {

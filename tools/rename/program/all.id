@@ -5,7 +5,7 @@ rename_gather(string[] rename_roots) {
   string[] rename_files = [];
   int rename_at = 0;
   while(rename_at < len(rename_roots)) {
-    lst_str_extend(rename_files, rename_walk(rename_roots[rename_at]));
+    list_string_extend(rename_files, rename_walk(rename_roots[rename_at]));
     rename_at = rename_at + 1;
   }
 } return string[] rename_files;

@@ -20,7 +20,7 @@ pure_kind_b(string name) {
   string pq_kb = "";
   if(is_builtin(name) == 1) {
     pq_kb = "builtin";
-    if(lst_str_index((import pure_builtins), name) >= 0) {
+    if(list_string_index((import pure_builtins), name) >= 0) {
       pq_kb = "ok";
     }
   }

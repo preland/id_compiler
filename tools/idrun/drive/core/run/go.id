@@ -30,7 +30,7 @@ given tf_fl ("prog", (import tf_flags)):(0) then (import tf_flags):([0, 0])
 dr_go(string[] argv, int at, int[] fl) {
   int code = 1;
   if (fl[0] == 1) {
-    code = dr_exec(fs_read_bytes(argv[at]), lst_str_tail(argv, at));
+    code = dr_exec(fs_read_bytes(argv[at]), list_string_tail(argv, at));
   } else {
     int t = ticks();
     code = dr_src(argv, at, fl, "/tmp/idrun-" + t + "-");

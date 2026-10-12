@@ -35,7 +35,7 @@ ms_en_file(string ms_root, string ms_rel) {
   string[] ms_o = [];
   int ms_k = 0;
   while(4 * ms_k < len(ms_fs)) {
-    lst_str_extend(ms_o, ms_en_rec(ms_s, ms_tk, ms_fs, ms_k, ms_rel));
+    list_string_extend(ms_o, ms_en_rec(ms_s, ms_tk, ms_fs, ms_k, ms_rel));
     ms_k = ms_k + 1;
   }
 } return string[] ms_o;

@@ -29,8 +29,8 @@ given sg_t_tree ((import sg_t_root), "note.txt", "other"):(1) then eprints:("sta
 // The page as the command line asks: --write writes it, --check compares it,
 // neither prints it.
 sg_emit(string[] sge_argv, string sge_root, string sge_rel, string sge_page) {
-  int sge_w = lst_str_index(sge_argv, "--write") >= 0;
-  int sge_c = lst_str_index(sge_argv, "--check") >= 0;
+  int sge_w = list_string_index(sge_argv, "--write") >= 0;
+  int sge_c = list_string_index(sge_argv, "--check") >= 0;
   int sge_rc = 0;
 } chain (string[] sge_argv, string sge_root, string sge_rel, string sge_page) {
   if(sge_w == 1) {

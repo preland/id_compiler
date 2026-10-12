@@ -16,7 +16,7 @@ given km_tset ():() then km_tlow:(0)
 // Both tables together.
 km_tsum() {
   int lsum = km_tlow();
-  int hsum = lst_sum((import km_t2));
+  int hsum = list_sum((import km_t2));
   int total = lsum + hsum;
 } return int total;
 given km_tset ():(0)
@@ -24,7 +24,7 @@ given km_tset ():(0) then km_tlow:(0)
 
 // The unshifted table alone, so a swap between the tables is caught.
 km_tlow() {
-  int lsum = lst_sum((import km_t1));
+  int lsum = list_sum((import km_t1));
 } return int lsum;
 given km_tset ():(0)
 given km_tset ():(0) then km_tsum:(0)

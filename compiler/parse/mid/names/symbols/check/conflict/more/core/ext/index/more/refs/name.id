@@ -11,7 +11,7 @@ given ixn_fx ([], (import ixn_call)):([])
 
 ixw_ref(string[] ixw_out, string[] ixw_own, int ixw_id) {
   string ixw_nm = ixw_name_of(ixw_id);
-  if(ixw_nm != "" && lst_str_index(ixw_own, ixw_nm) < 0 && lst_str_index(ixw_out, ixw_nm) < 0) {
+  if(ixw_nm != "" && list_string_index(ixw_own, ixw_nm) < 0 && list_string_index(ixw_out, ixw_nm) < 0) {
     push(ixw_out, ixw_nm);
   }
 } return void;

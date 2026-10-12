@@ -16,7 +16,7 @@ iw_usage() {
 
 main(int argc, string[] argv) {
   int iw_code = 1;
-  string[] iw_rootl = lst_str_tail(argv, 2);
+  string[] iw_rootl = list_string_tail(argv, 2);
   if(argc < 3) {
     iw_usage();
   }

@@ -4,7 +4,7 @@
 // where the next token starts.
 ms_lx_one(int[] ms_tk, string ms_s, int ms_i) {
   int ms_e = ms_lx_end(ms_s, ms_i);
-  lst_extend(ms_tk, [ms_lx_kind(ms_s, ms_i), ms_i, ms_e]);
+  list_extend(ms_tk, [ms_lx_kind(ms_s, ms_i), ms_i, ms_e]);
   int ms_n = ms_lx_skip(ms_s, ms_e);
 } return int ms_n;
 ([], "ab cd", 0):(3)

@@ -95,6 +95,7 @@ callee
 radix
 postfix
 textbox
+atan2
 
 # Universally read short forms whose long spelling is worse: the toolkit's own
 # name (gui_), the module name os_, and the two commonest result and interface

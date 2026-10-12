@@ -19,7 +19,7 @@ ty_wrap(string ty_c, int ty_cf) {
 // The class of the type ty_w names, stars included: char *, const char *, void **, uLongf * and gzFile each come out as the class a shim treats them as.
 ty_class(string[] ty_w, string[] ty_tn, string[] ty_tc) {
   string ty_c = ty_base(ty_w, ty_tn, ty_tc);
-  int ty_cf = lst_str_index(ty_w, "const") >= 0;
+  int ty_cf = list_string_index(ty_w, "const") >= 0;
   int ty_i = ty_stars(ty_w);
 } chain (string[] ty_w, string[] ty_tn, string[] ty_tc) {
   while (ty_i > 0) {
@@ -37,7 +37,7 @@ ty_class(string[] ty_w, string[] ty_tn, string[] ty_tc) {
 
 // The class a typedef statement ty_t gives its name at ty_a: F for a function pointer, written ( * name ), otherwise the class of the type's words (ty_g names the struct when it has no tag of its own).
 ty_kind(string[] ty_t, int ty_a, string ty_g, string[] ty_tn, string[] ty_tc) {
-  int ty_p = lst_str_index(ty_t, "(");
+  int ty_p = list_string_index(ty_t, "(");
   string ty_c = "F";
   if (ty_p < 0 || ty_t[ty_p + 1] != "*") {
     ty_c = ty_class(ty_words(ty_t, ty_a, ty_g), ty_tn, ty_tc);

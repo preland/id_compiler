@@ -23,7 +23,7 @@ case_claims(int ci) {
   int r = 0;
   int j = 0;
   while(j < len((import conscase))) {
-    r = r + lst_is_at((import conscase), j, ci);
+    r = r + list_is_at((import conscase), j, ci);
     j = j + 1;
   }
 } return int r;

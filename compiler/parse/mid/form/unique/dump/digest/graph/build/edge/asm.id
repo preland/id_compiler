@@ -13,7 +13,7 @@ given dg_t_built ():() then len((import dg_comp)):(4)
 
 dg_asm_names(int dgr, int dgi) {
   while(dgi < len((import afname))) {
-    hmap_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), (import afname)[dgi], dgr);
+    hash_map_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), (import afname)[dgi], dgr);
     dgi = dgi + 1;
   }
 } return void;

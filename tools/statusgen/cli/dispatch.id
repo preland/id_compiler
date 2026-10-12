@@ -1,7 +1,7 @@
 // The command line: help, an option that is not known, or the work (sg_go).
 sg_run(string[] sgr_argv, string sgr_pwd) {
   string sgr_bad = sg_unknown(sgr_argv);
-  int sgr_help = lst_str_index(sgr_argv, "--help") >= 0 || lst_str_index(sgr_argv, "-h") >= 0;
+  int sgr_help = list_string_index(sgr_argv, "--help") >= 0 || list_string_index(sgr_argv, "-h") >= 0;
   int sgr_rc = 0;
 } chain (string[] sgr_argv, string sgr_pwd) {
   if(sgr_help == 1) {

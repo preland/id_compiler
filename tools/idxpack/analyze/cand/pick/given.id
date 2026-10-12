@@ -51,7 +51,7 @@ given_reaches(string candidate, string[] required) {
 } chain (string candidate, string[] required) {
   int[] flat = rev_flat(offs, fcount);
   int[] reach_ok = rev_reach_all(required, offs, flat, fcount);
-  int cidx = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), candidate, -1);
+  int cidx = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), candidate, -1);
 } chain (string candidate, string[] required) {
   int out_i = 0;
   if(cidx >= 0 && reach_ok[cidx] == 1) {

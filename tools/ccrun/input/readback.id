@@ -26,7 +26,7 @@ given ccrun_fx_empty_input ():() then calls fs_mktemp:("ccrun_empty_", 0)
 // flag list. maybe_close_in (close.id) reads the flag to decide whether to
 // close, so a check of the flag alone would repeat its own read.
 cr_in_text() {
-  string cr_in_t = lst_text((import cr_in_done), ",");
+  string cr_in_t = list_text((import cr_in_done), ",");
   string cr_in_s = "input " + len((import cr_in_done)) + ":" + cr_in_t;
 } return string cr_in_s;
 given ccrun_fx_setup_input_main ():("input 1:0")

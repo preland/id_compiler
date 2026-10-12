@@ -10,7 +10,7 @@ ms_lt_row(string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
   string ms_tt = str_sub(ms_lc, ms_ix + 1, len(ms_lc) - ms_ix - 1);
   string[] ms_pcs = ms_lt_parts(ms_tt);
 } chain (string ms_rel, string ms_nm, int ms_vd, int ms_ef, string ms_lc) {
-  string ms_kd = ms_lt_kind(lst_str_get_or(ms_pcs, 0, ""), lst_str_get_or(ms_pcs, 1, ""), lst_str_get_or(ms_pcs, 2, ""), ms_vd, ms_ef);
+  string ms_kd = ms_lt_kind(list_string_get_or(ms_pcs, 0, ""), list_string_get_or(ms_pcs, 1, ""), list_string_get_or(ms_pcs, 2, ""), ms_vd, ms_ef);
   string ms_res = "";
   if(len(ms_pcs) == 3) {
     ms_res = ms_rel + "\t" + ms_nm + "\t";

@@ -14,7 +14,7 @@ given ir_rows ():("")
 given ir_rows_chk1 ():("hi")
 
 chk_bl() {
-  string ret_li_t = "bl " + (lst_text((import iblk)[((import chk_id)[0])], ","));
+  string ret_li_t = "bl " + (list_text((import iblk)[((import chk_id)[0])], ","));
 } return string ret_li_t;
 given ir_rows ():("bl ")
 given ir_rows_chk1 ():("bl ")

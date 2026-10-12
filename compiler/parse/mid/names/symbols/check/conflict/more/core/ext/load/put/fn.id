@@ -14,15 +14,15 @@ given env_init (["F", "foo", "s", "3"]):() then (import ext_l)[0]:(3)
 
 ext_put_row(string xe_name) {
   int xe_row = len((import ext_n)) - 1;
-  int xe_skip = hmap_get((import ext_mk), (import ext_mv), (import ext_mu), "l:" + xe_name, 0);
+  int xe_skip = hash_map_get((import ext_mk), (import ext_mv), (import ext_mu), "l:" + xe_name, 0);
   push((import ext_s), xe_skip);
 } chain (string xe_name) {
-  hmap_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "n:" + xe_name, xe_row);
+  hash_map_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "n:" + xe_name, xe_row);
   lset((import ext_cur), 0, xe_row);
   push((import ext_inm), "");
 } return void;
-given env_init given ext_line("L\tgone") given lst_str_extend((import ext_n), ["gone"]) ("gone"):() then (import ext_s)[0]:(1)
-given env_init given lst_str_extend((import ext_n), ["kept"]) ("kept"):() then (import ext_s)[0]:(0)
+given env_init given ext_line("L\tgone") given list_string_extend((import ext_n), ["gone"]) ("gone"):() then (import ext_s)[0]:(1)
+given env_init given list_string_extend((import ext_n), ["kept"]) ("kept"):() then (import ext_s)[0]:(0)
 
 ext_put_fp(string[] xe_f) {
   int xe_at = (import ext_cur)[0];
@@ -30,7 +30,7 @@ ext_put_fp(string[] xe_f) {
   push((import ext_cfp), xe_f[1]);
 } chain (string[] xe_f) {
   push((import ext_cfe), xe_at);
-  hmap_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "f:" + xe_f[1], xe_fp_row);
+  hash_map_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "f:" + xe_f[1], xe_fp_row);
 } return void;
 given env_init given ext_line("F\tfoo\tf\t3") (["P", "k1"]):() then (import ext_cfp)[0]:("k1")
 given env_init given ext_line("F\tfoo\tf\t3") given ext_line("F\tbar\tf\t4") (["P", "k2"]):() then (import ext_cfe)[0]:(1)

@@ -2,7 +2,7 @@
 
 // Signature 0x04034b50, the fields both headers share, then the name.
 zw_local(int[] out, string name, int[] body, word crc) {
-  lst_extend(out, [80, 75, 3, 4]);
+  list_extend(out, [80, 75, 3, 4]);
   zw_fields(out, name, body, crc);
   zw_str(out, name);
 } return void;
@@ -12,7 +12,7 @@ zw_local(int[] out, string name, int[] body, word crc) {
 // Signature 0x02014b50 and "made by" version 2.0 on Unix (3), as zipfile
 // writes it, then the shared fields.
 zw_central(int[] cd, string name, int[] body, word crc, int at) {
-  lst_extend(cd, [80, 75, 1, 2, 20, 3]);
+  list_extend(cd, [80, 75, 1, 2, 20, 3]);
   zw_fields(cd, name, body, crc);
   zw_tail(cd, name, at);
 } return void;
@@ -24,7 +24,7 @@ zw_central(int[] cd, string name, int[] body, word crc, int at) {
 // was handed as text -- then where the entry's local header starts, and the
 // name.
 zw_tail(int[] cd, string name, int at) {
-  lst_extend(cd, [0, 0, 0, 0, 0, 0, 0, 0, 128, 1]);
+  list_extend(cd, [0, 0, 0, 0, 0, 0, 0, 0, 128, 1]);
   zw_u32(cd, at);
   zw_str(cd, name);
 } return void;

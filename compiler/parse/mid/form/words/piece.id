@@ -9,7 +9,7 @@
 
 vocab_ok(string vocab_piece, int vocab_parts) {
   string vocab_lower = str_lower(vocab_piece);
-  int vocab_hit = hmap_has((import vocab_keys), (import vocab_used), vocab_lower);
+  int vocab_hit = hash_map_has((import vocab_keys), (import vocab_used), vocab_lower);
   int vocab_axis_hit = str_is_axis_piece(vocab_lower, vocab_parts);
 } chain (string vocab_piece, int vocab_parts) {
   if(vocab_axis_hit == 1) {

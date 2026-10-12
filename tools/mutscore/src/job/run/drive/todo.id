@@ -37,7 +37,7 @@ ms_dr_todo(string[] ms_al, int[] ms_sh, string[] ms_ks) {
   int[] ms_td = [];
   int ms_i = 0;
   while(ms_i < len(ms_al)) {
-    if(ms_dr_mine(ms_i, ms_sh) == 1 && lst_str_index(ms_ks, ms_al[ms_i]) < 0) {
+    if(ms_dr_mine(ms_i, ms_sh) == 1 && list_string_index(ms_ks, ms_al[ms_i]) < 0) {
       push(ms_td, ms_i);
     }
     ms_i = ms_i + 1;

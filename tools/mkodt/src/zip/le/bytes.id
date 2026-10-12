@@ -16,7 +16,7 @@ zw_str(int[] out, string s) {
 // an archive comment of no bytes.
 zw_last(int[] out, int at) {
   zw_u32(out, at);
-  lst_extend(out, [0, 0]);
+  list_extend(out, [0, 0]);
 } return void;
 ([], 1):([1, 0, 0, 0, 0, 0], 1)
 ([4], 65536):([4, 0, 0, 1, 0, 0, 0], 65536)

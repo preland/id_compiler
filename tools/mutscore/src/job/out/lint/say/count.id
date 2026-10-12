@@ -18,7 +18,7 @@ ms_lt_count(string[] ms_lr, string ms_kd) {
 ms_lt_seen(string[] ms_ks, string ms_rw) {
   string[] ms_fd = str_split(ms_rw, "\t");
   string ms_ky = ms_fd[1] + "\t" + ms_fd[2];
-  if(lst_str_index(ms_ks, ms_ky) < 0) {
+  if(list_string_index(ms_ks, ms_ky) < 0) {
     push(ms_ks, ms_ky);
   }
 } return void;

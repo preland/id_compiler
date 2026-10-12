@@ -34,5 +34,5 @@ retexp_bind(int fnode) {
     lset((import ni2), fnode, len((import retexp)) + 1);
   }
 } return void;
-given fn_fixture given lst_str_extend((import retexp_pend), ["gx"]) ((import fixture_fn)):() then len((import retexp)):(1) then len((import retexp_pend)):(0)
+given fn_fixture given list_string_extend((import retexp_pend), ["gx"]) ((import fixture_fn)):() then len((import retexp)):(1) then len((import retexp_pend)):(0)
 given fn_fixture ((import fixture_fn)):() then len((import retexp)):(0)

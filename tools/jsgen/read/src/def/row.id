@@ -8,7 +8,7 @@ jg_def_row(string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int j
   string jg_loc = path_base(jg_path) + ":" + jg_line(jg_t, jg_k);
 } chain (string jg_t, string jg_path, string jg_nm, int jg_k, int jg_cl, int jg_r) {
   string[] jg_rw = [jg_nm, jg_ret, jg_loc];
-  lst_str_extend(jg_rw, jg_ps);
+  list_string_extend(jg_rw, jg_ps);
 } return string[] jg_rw;
 ("f(int a) {\n} return int a;", "d/f.id", "f", 1, 8, 13):(["f", "int", "f.id:1", "int a"])
 ("\nk() {\n} chain () {} return string[] s;", "k.id", "k", 2, 4, 21):(["k", "string[]", "k.id:2"])

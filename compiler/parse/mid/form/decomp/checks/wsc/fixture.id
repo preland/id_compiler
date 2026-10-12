@@ -12,9 +12,9 @@ wsc_fixture(int wfx_f, int wfx_d) {
 } return int wfx_r;
 given wsc_marks ((import wx_fget), 3):(1)
 given wsc_marks ((import wx_fdead), 3):(0)
-given wsc_marks given lst_str_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 3):(1)
-given wsc_marks given lst_str_extend((import casegiven), ["wsput"]) ((import wx_ffoo), 3):(0)
-given wsc_marks given lst_str_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 0):(0)
+given wsc_marks given list_string_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 3):(1)
+given wsc_marks given list_string_extend((import casegiven), ["wsput"]) ((import wx_ffoo), 3):(0)
+given wsc_marks given list_string_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 0):(0)
 
 wsc_helper(int whl_f, int whl_d) {
   int[] whl_cs = wsc_callers((import ns1)[whl_f]);
@@ -26,7 +26,7 @@ wsc_helper(int whl_f, int whl_d) {
     whl_i = whl_i + 1;
   }
 } return int whl_ok;
-given wsc_marks given lst_str_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 3):(1)
+given wsc_marks given list_string_extend((import casegiven), ["wsput wsnest"]) ((import wx_ffoo), 3):(1)
 given wsc_marks ((import wx_fget), 3):(0)
 
 wsc_nearer(int wnr_best, int wnr_fid, int wnr_n) {

@@ -13,7 +13,7 @@ given lpf_conds (["v:w", "null", "!="]):(["v:w", "null", "!="]) then (import lpc
 
 lp_put(string[] lq_tk, string lq_key) {
   push((import lpcond), lq_key);
-  lst_str_extend((import lpg), lq_tk);
+  list_string_extend((import lpg), lq_tk);
   push((import lpg), "|");
 } return void;
 given lpf_conds (["v:w", "k:0"], "v:w k:0"):(["v:w", "k:0"], "v:w k:0") then (import lpcond)[2]:("v:w k:0")

@@ -2,7 +2,7 @@
 
 // The class the table gives ty_key, or "" when it is not there.
 ty_get(string[] ty_tn, string[] ty_tc, string ty_key) {
-  int ty_a = lst_str_index(ty_tn, ty_key);
+  int ty_a = list_string_index(ty_tn, ty_key);
   string ty_r = "";
   if (ty_a >= 0) {
     ty_r = ty_tc[ty_a];
@@ -19,12 +19,12 @@ ty_kw(string[] ty_w) {
 } chain (string[] ty_w) {
   string[] ty_cs = (import kw_class);
   while (ty_i < len(ty_ws) && ty_r == "") {
-    if (lst_str_index(ty_w, ty_ws[ty_i]) >= 0) {
+    if (list_string_index(ty_w, ty_ws[ty_i]) >= 0) {
       ty_r = ty_cs[ty_i];
     }
     ty_i = ty_i + 1;
   }
-  if (ty_r == "c1" && lst_str_index(ty_w, "unsigned") >= 0) {
+  if (ty_r == "c1" && list_string_index(ty_w, "unsigned") >= 0) {
     ty_r = "i1";
   }
 } return string ty_r;
@@ -37,8 +37,8 @@ ty_kw(string[] ty_w) {
 
 // The class of a type written struct tag or union tag: what the table holds for it, else O:tag, an incomplete struct. "" when ty_w has neither word.
 ty_tagged(string[] ty_w, string[] ty_tn, string[] ty_tc) {
-  int ty_b = lst_str_index(ty_w, "struct");
-  int ty_j = lst_str_index(ty_w, "union");
+  int ty_b = list_string_index(ty_w, "struct");
+  int ty_j = list_string_index(ty_w, "union");
   string ty_r = "";
 } chain (string[] ty_w, string[] ty_tn, string[] ty_tc) {
   if (ty_b < 0) {

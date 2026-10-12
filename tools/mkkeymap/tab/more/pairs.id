@@ -19,7 +19,7 @@ km_both(int[] lo, int[] hi, int code, int v) {
 
 km_zeros(int n) {
   int[] xs = [];
-  lst_fill(xs, n, 0);
+  list_fill(xs, n, 0);
 } return int[] xs;
 (3):([0, 0, 0])
 (0):([])

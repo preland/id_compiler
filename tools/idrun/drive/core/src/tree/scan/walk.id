@@ -3,7 +3,7 @@
 dr_ents(string dir) {
   int[] buf = [];
   int n = fs_list(dir, buf, 0);
-  lst_fill(buf, n, 0);
+  list_fill(buf, n, 0);
 } chain (string dir) {
   int got = fs_list(dir, buf, n);
   string[] ents = dr_lines(buf);

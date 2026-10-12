@@ -17,7 +17,7 @@ given decl_tokens ([35], [], [], []):() then (import chkfail)[0]:(1)
 chain_add(int[] body, int[] seg) {
   int mark = newleaf("chain", 0 - 1, 0, "", "");
   push(body, mark);
-  lst_extend(body, seg);
+  list_extend(body, seg);
 } return void;
 given full_env ([], []):() then (import chkfail)[0]:(0)
 given full_env ([1], [2]):() then (import chkfail)[0]:(0)

@@ -5,7 +5,7 @@
 reach_add(string name) {
   if(is_reach(name) == 0 && rfx_fn(name) == 1) {
     push((import rfn), name);
-    hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, len((import rfn)) - 1);
+    hash_map_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, len((import rfn)) - 1);
   }
 } return void;
 given seed_given_fixture ("main"):() then reach_pass:(2)

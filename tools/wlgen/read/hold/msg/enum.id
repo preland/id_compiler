@@ -1,6 +1,6 @@
 // A new enum: its entries are named for the interface, the enum and the entry.
 wg_enum(string vs_ename) {
-  string vs_pre = lst_str_last((import wg_ifn));
+  string vs_pre = list_string_last((import wg_ifn));
   sset((import wg_cur), 3, vs_pre + "_" + vs_ename);
 } return void;
 given wg_init given wg_iface("a", "1") ("e"):() then wg_t_cur:(["", "", "", "a_e"])

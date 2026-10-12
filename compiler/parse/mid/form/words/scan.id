@@ -29,7 +29,7 @@ given vocab_world ():() then calls vocab_scan_fns:(0)
 given vocab_world ():() then calls vocab_summary:()
 
 vocab_name_check(string vocab_name, int vocab_kind, int vocab_row) {
-  int vocab_known = hmap_has((import vocab_seen_keys), (import vocab_seen_used), vocab_name);
+  int vocab_known = hash_map_has((import vocab_seen_keys), (import vocab_seen_used), vocab_name);
   if(vocab_known == 0) {
     vocab_judge(vocab_name, vocab_kind, vocab_row);
   }

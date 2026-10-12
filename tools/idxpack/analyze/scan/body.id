@@ -3,7 +3,7 @@
 // idc/tools/casework.sh's `fn_end`, but from the table instead of an awk
 // scan, since --calls already gave every function's start line.
 func_end_line(string file, int line, string[] all_lines) {
-  int bucket = hmap_get((import ix_fkeys), (import ix_fvals), (import ix_fused), file, -1);
+  int bucket = hash_map_get((import ix_fkeys), (import ix_fvals), (import ix_fused), file, -1);
   int best = len(all_lines);
   int gi = 0;
 } chain (string file, int line, string[] all_lines) {
@@ -35,7 +35,7 @@ given ix_test_setup_empty ("f.id", 1, ["a", "b", "c"]):(3)
 // before the next function in the same file (func_end_line above). A name
 // this build never declared (not found in ix_fn) has no body -- returns [].
 func_body_lines(string name) {
-  int fi = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), name, -1);
+  int fi = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), name, -1);
   string[] ret_li = [];
   if(fi >= 0) {
     ret_li = func_body_lines_at((import ix_file)[fi], (import ix_line)[fi]);

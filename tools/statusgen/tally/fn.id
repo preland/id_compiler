@@ -14,7 +14,7 @@ sg_tfn(int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {
   sgf_t[(import sg_k_cases)] = sgf_t[(import sg_k_cases)] + sgf_n;
 } chain (int[] sgf_t, string sgf_r, string[] sgf_ex, string sgf_root) {
   sgf_t[sgf_b] = sgf_t[sgf_b] + 1;
-  if(sgf_n < 2 && lst_str_index(sgf_ex, sgf_key) >= 0) {
+  if(sgf_n < 2 && list_string_index(sgf_ex, sgf_key) >= 0) {
     sgf_t[(import sg_k_ex)] = sgf_t[(import sg_k_ex)] + 1;
   }
 } return void;

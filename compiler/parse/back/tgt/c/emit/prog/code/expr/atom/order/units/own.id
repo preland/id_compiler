@@ -14,7 +14,7 @@
 
 seqk(int id) {
   int sk = 0;
-  if(lst_get_or((import seqt), id, 0) == 0) {
+  if(list_get_or((import seqt), id, 0) == 0) {
     int[] sq_kids = seq_kids(id);
     sk = seq_fold(sq_kids);
     sk = seq_own(id, sk);

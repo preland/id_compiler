@@ -27,7 +27,7 @@ given pure_fix_cases (1):() then (import chkfail)[0]:(0)
 
 pure_case_arg(int pq_k, int pq_owner, int pq_j) {
   int pq_arg = (((import nl1)[((import casenode)[pq_k])])[pq_j]);
-  if(lst_find((import purenode), (((import nl1)[pq_owner])[pq_j])) == 1 && (import nkind)[pq_arg] == "cfn" && pure_fn_named((import ns1)[pq_arg]) == 0) {
+  if(list_find((import purenode), (((import nl1)[pq_owner])[pq_j])) == 1 && (import nkind)[pq_arg] == "cfn" && pure_fn_named((import ns1)[pq_arg]) == 0) {
     pure_err_case(pq_k, pq_owner, pq_j);
   }
 } return void;

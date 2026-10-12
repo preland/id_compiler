@@ -1,12 +1,12 @@
 // The id a key was given, or -1.
 ld_look(string key) {
-  int id = hmap_get((import ld_sk), (import ld_sv), (import ld_su), key, 0 - 1);
+  int id = hash_map_get((import ld_sk), (import ld_sv), (import ld_su), key, 0 - 1);
 } return int id;
 given lb_tables ("x"):(-1)
 given lb_tables given ld_put("x", 7) ("x"):(7)
 
 ld_put(string key, int v) {
-  hmap_put((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn), key, v);
+  hash_map_put((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn), key, v);
 } return void;
 given tf_key("a") given lb_tables ("a", 3):() then tf_look:(3)
 given tf_key("a") given lb_tables ("b", 3):() then tf_look:(-1)

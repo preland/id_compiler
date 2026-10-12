@@ -1,7 +1,7 @@
 // A new message of the current interface: its name, with no arguments yet.
 wg_begin(string vs_mname) {
   string[] vz_cur = (import wg_cur);
-  string vs_pre = lst_str_last((import wg_ifn));
+  string vs_pre = list_string_last((import wg_ifn));
   sset(vz_cur, 0, vs_pre + "_" + vs_mname);
 } chain (string vs_mname) {
   sset(vz_cur, 1, "");

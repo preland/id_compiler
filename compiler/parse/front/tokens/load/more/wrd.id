@@ -5,7 +5,7 @@
 
 push_tok3(string kind, string text) {
   if(kind == "wrd") {
-    hset_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), text);
+    hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), text);
   } else {
     push_real(kind, text);
   }

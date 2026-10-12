@@ -18,7 +18,7 @@ given dg_t_built ([0, 0], 19):([-8617499241897732819, 0])
 dg_case_ref(word[] dgacc, string dgnm) {
   int dgg = dg_fn_named(dgnm);
   if(dgg < 0) {
-    dgg = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgg);
+    dgg = hash_map_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgg);
   }
   if(dgg >= 0) {
     dgacc[0] = dg_mix(dgacc[0], dg_deep_fn(dgg));

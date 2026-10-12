@@ -10,8 +10,8 @@ ty_put(string[] ty_tn, string[] ty_tc, string ty_nm, string ty_c) {
 
 // 1 when the statement ty_t defines the fields of a struct or union: it has a body and the word struct or union.
 ty_struct(string[] ty_t) {
-  int ty_b = lst_str_index(ty_t, "{") >= 0;
-  int ty_j = lst_str_index(ty_t, "struct") >= 0 || lst_str_index(ty_t, "union") >= 0;
+  int ty_b = list_string_index(ty_t, "{") >= 0;
+  int ty_j = list_string_index(ty_t, "struct") >= 0 || list_string_index(ty_t, "union") >= 0;
   int ty_s = ty_b && ty_j;
 } return int ty_s;
 (["struct", "a", "{", ";"]):(1)

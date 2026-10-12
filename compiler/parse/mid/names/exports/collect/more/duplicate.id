@@ -32,5 +32,5 @@ chk_retexp(int id) {
     retexp_err(id, cr_nm);
   }
 } return void;
-given fn_fixture given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[1]
-given fn_fixture given add_export("gx", "int", "fx_target") given lst_str_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[0]
+given fn_fixture given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[1]
+given fn_fixture given add_export("gx", "int", "fx_target") given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[0]

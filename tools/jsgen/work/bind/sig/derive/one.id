@@ -4,7 +4,7 @@
 
 jg_sig_row(string[] jg_dr, string[] jg_fl) {
   string[] jg_sr = [jg_dr[0], jg_dr[1], jg_dr[2]];
-  lst_str_extend(jg_sr, jg_fl);
+  list_string_extend(jg_sr, jg_fl);
 } return string[] jg_sr;
 (["f", "int", "x:1", "int a"], ["a", "int"]):(["f", "int", "x:1", "a", "int"])
 (["g", "void", "y:2"], []):(["g", "void", "y:2"])

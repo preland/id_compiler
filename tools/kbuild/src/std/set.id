@@ -3,8 +3,8 @@
 // Adds name to the table, with 0, unless it is there already. 1 when it was added.
 kb_note(string name) {
   int fresh = 0;
-  if (hmap_has((import kb_tk), (import kb_tu), name) == 0) {
-    hmap_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), name, 0);
+  if (hash_map_has((import kb_tk), (import kb_tu), name) == 0) {
+    hash_map_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), name, 0);
     fresh = 1;
   }
 } return int fresh;
@@ -26,10 +26,10 @@ given kb_tables ([]):() then (import kb_tn)[0]:(0)
 // not: the line's own identifiers are read in turn, and the name is marked with 1.
 // 1 when that was done.
 kb_adopt(string name, string line) {
-  int seen = hmap_get((import kb_tk), (import kb_tv), (import kb_tu), name, 0 - 1);
+  int seen = hash_map_get((import kb_tk), (import kb_tv), (import kb_tu), name, 0 - 1);
   int got = 0;
   if (seen == 0) {
-    hmap_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), name, 1);
+    hash_map_put((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn), name, 1);
     kb_notes(kb_words(line));
     got = 1;
   }

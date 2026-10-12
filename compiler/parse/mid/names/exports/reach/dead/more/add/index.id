@@ -18,7 +18,7 @@ rfx_init() {
   export int[] rfxu = [];
 } chain () {
   export int[] rfxc = [];
-  hmap_init((import rfxk), (import rfxv), (import rfxu), (import rfxc));
+  hash_map_initialize((import rfxk), (import rfxv), (import rfxu), (import rfxc));
   rfn_reindex();
 } return void;
 given init_reach ():() then conf_reached:(1)
@@ -27,7 +27,7 @@ given rfnfx_setup ():() then conf_reached:(1)
 rfn_reindex() {
   int rfi = 0;
   while(rfi < len((import rfn))) {
-    hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), (import rfn)[rfi], rfi);
+    hash_map_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), (import rfn)[rfi], rfi);
     rfi = rfi + 1;
   }
 } return void;

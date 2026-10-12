@@ -14,11 +14,11 @@ dg_target(int dgid) {
   int dgw = 0 - 1;
 } chain (int dgid) {
   if(dgkd == "call" || dgkd == "var") {
-    dgw = hmap_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, dgw);
+    dgw = hash_map_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, dgw);
   } else if(dgkd == "import") {
-    dgw = hmap_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgw);
+    dgw = hash_map_get((import dg_ek), (import dg_ev), (import dg_eu), dgnm, dgw);
   }
-  if(dgw < 0 && dgkd == "call" && lst_str_index((import cache_volatile_builtins), dgnm) >= 0) {
+  if(dgw < 0 && dgkd == "call" && list_string_index((import cache_volatile_builtins), dgnm) >= 0) {
     dgw = len((import prog));
   }
 } return int dgw;

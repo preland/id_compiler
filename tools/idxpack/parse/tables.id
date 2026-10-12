@@ -25,11 +25,11 @@ ix_init(string[] edge_lines, string[] fn_lines) {
   export int[] ix_nused = [];
 } chain (string[] edge_lines, string[] fn_lines) {
   export int[] ix_ncnt = [];
-  hmap_init((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ncnt));
+  hash_map_initialize((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ncnt));
   int i = 0;
 } chain (string[] edge_lines, string[] fn_lines) {
   while(i < len((import ix_fn))) {
-    hmap_put((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ncnt), (import ix_fn)[i], i);
+    hash_map_put((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ncnt), (import ix_fn)[i], i);
     i = i + 1;
   }
   export string[] ix_fkeys = [];
@@ -37,7 +37,7 @@ ix_init(string[] edge_lines, string[] fn_lines) {
 } chain (string[] edge_lines, string[] fn_lines) {
   export int[] ix_fused = [];
   export int[] ix_fcnt = [];
-  hmap_init((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_fcnt));
+  hash_map_initialize((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_fcnt));
 } chain (string[] edge_lines, string[] fn_lines) {
   export int[] ix_fbucket = [];
   int bi = 0;
@@ -47,7 +47,7 @@ ix_init(string[] edge_lines, string[] fn_lines) {
   }
 } chain (string[] edge_lines, string[] fn_lines) {
   export int[] ix_fgstart = [];
-  int nb = hmap_count((import ix_fcnt));
+  int nb = hash_map_count((import ix_fcnt));
   int fcount_all = len((import ix_fn));
 } chain (string[] edge_lines, string[] fn_lines) {
   int[] fgcounts = ix_fg_counts(nb, fcount_all);
@@ -75,10 +75,10 @@ ix_init(string[] edge_lines, string[] fn_lines) {
 // gets the next sequential one -- func_end_line's CSR (ix_fgstart/
 // ix_fgflat) groups by this id instead of rescanning every function.
 ix_file_bucket_step(int i) {
-  int b = hmap_get((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_file)[i], -1);
+  int b = hash_map_get((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_file)[i], -1);
   if(b < 0) {
-    b = hmap_count((import ix_fcnt));
-    hmap_put((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_fcnt), (import ix_file)[i], b);
+    b = hash_map_count((import ix_fcnt));
+    hash_map_put((import ix_fkeys), (import ix_fvals), (import ix_fused), (import ix_fcnt), (import ix_file)[i], b);
   }
   push((import ix_fbucket), b);
 } return void;
@@ -104,7 +104,7 @@ fx_init(string[] file_lines) {
   export int[] ix_eused = [];
 } chain (string[] file_lines) {
   export int[] ix_ecnt = [];
-  hmap_init((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt));
+  hash_map_initialize((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt));
   export string[] ix_ename = [];
 } chain (string[] file_lines) {
   export int[] ix_efn = [];

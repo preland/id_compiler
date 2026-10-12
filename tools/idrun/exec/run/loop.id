@@ -185,7 +185,7 @@ given vb_boot given ld_emit(34, 3, 1, 0, 0) given tf_setf(1, 1.0) (0, 0):(5) the
 // on every instruction, so a check of one register alone would repeat part of
 // its own read.
 vm_rg_text() {
-  string vm_rg_t = lst_text((import ex_rg), ",");
+  string vm_rg_t = list_text((import ex_rg), ",");
   string vm_rg_s = "regs " + len((import ex_rg)) + ":" + vm_rg_t;
 } return string vm_rg_s;
 given vb_boot ():("regs 3:0,0,0")

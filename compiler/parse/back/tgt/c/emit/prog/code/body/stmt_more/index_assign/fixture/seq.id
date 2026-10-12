@@ -40,7 +40,7 @@ sq_marked() {
 ():() then sq_foo_seqd:(1)
 
 sq_foo_seqd() {
-  int ok = lst_get_or((import seqt), (import nz_call_foo), 0);
+  int ok = list_get_or((import seqt), (import nz_call_foo), 0);
 } return int ok;
 given sq_fixture ():(0)
 given sq_marked ():(1)

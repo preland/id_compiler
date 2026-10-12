@@ -15,7 +15,7 @@
 // DIR into scores and the list of survivors; `lint` flags cases that prove
 // nothing. docs/TESTS.md, "Mutation score", has the rest.
 main(int argc, string[] argv) {
-  int ms_rc = ms_cl_cmd(argv, lst_str_get_or(argv, 1, ""));
+  int ms_rc = ms_cl_cmd(argv, list_string_get_or(argv, 1, ""));
 } return int ms_rc;
 (1, ["mutscore"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")
 (3, ["mutscore", "run", "/r"]):(2) then eprints:("usage: mutscore list ROOT [--area SUB]\n       mutscore run ROOT --out DIR [--idc IDC] [--shard I/N] [--area SUB] [--with A,B] [--std] [--budget SECONDS]\n       mutscore report DIR [--tsv]\n       mutscore lint ROOT [--area SUB] [--tsv]\n")

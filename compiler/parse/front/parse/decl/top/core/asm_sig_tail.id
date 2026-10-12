@@ -10,13 +10,13 @@ given toks_env(["op", "str", "op", "kw", "kw", "ident"], ["{", "\"i1\"", "}", "r
 // grp_note's two pushes, for its own cases -- it is void and ngrp/ngrpc are
 // imported lists, not arguments a case can read back.
 last_ngrp() {
-  string ret_i_t = "ngrp " + (lst_last((import ngrp)));
+  string ret_i_t = "ngrp " + (list_last((import ngrp)));
 } return string ret_i_t;
 given mk_grp(7, [5]) ():("ngrp 7")
 given mk_grp(9, [2]) ():("ngrp 9")
 
 last_ngrpc() {
-  string ret_i_t = "ngrpc " + (lst_last((import ngrpc)));
+  string ret_i_t = "ngrpc " + (list_last((import ngrpc)));
 } return string ret_i_t;
 given mk_grp(7, [5]) ():("ngrpc 4")
 given mk_grp(9, [2]) ():("ngrpc 1")

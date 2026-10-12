@@ -29,8 +29,8 @@ ty_unbody(string[] ty_t) {
 
 // The tag of the first struct or union in ty_t: the word after it, or "" when it has no tag (a brace follows) or there is none.
 ty_tag(string[] ty_t) {
-  int ty_b = lst_str_index(ty_t, "struct");
-  int ty_j = lst_str_index(ty_t, "union");
+  int ty_b = list_string_index(ty_t, "struct");
+  int ty_j = list_string_index(ty_t, "union");
   string ty_g = "";
 } chain (string[] ty_t) {
   if (ty_b < 0) {

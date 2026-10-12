@@ -38,10 +38,10 @@ ix_scan_export_line(string export_src_line, int fn_idx) {
     name = parts[1];
   }
   if(str_cmp(name, "") != 0) {
-    hmap_put((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt), name, fn_idx);
+    hash_map_put((import ix_ekeys), (import ix_evals), (import ix_eused), (import ix_ecnt), name, fn_idx);
     push((import ix_ename), name);
     push((import ix_efn), fn_idx);
   }
 } return void;
-given ix_export_fixture ("  export int gv = 0;", 0):() then calls hmap_put:[1]
-given ix_export_fixture ("plain line", 0):() then calls hmap_put:[0]
+given ix_export_fixture ("  export int gv = 0;", 0):() then calls hash_map_put:[1]
+given ix_export_fixture ("plain line", 0):() then calls hash_map_put:[0]

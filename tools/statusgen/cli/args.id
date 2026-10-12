@@ -2,10 +2,10 @@
 
 // The word after sga_name in sga_argv, "" when sga_name is absent or last.
 sg_arg(string[] sga_argv, string sga_name) {
-  int sga_at = lst_str_index(sga_argv, sga_name);
+  int sga_at = list_string_index(sga_argv, sga_name);
   string sga_v = "";
   if(sga_at >= 0) {
-    sga_v = lst_str_get_or(sga_argv, sga_at + 1, "");
+    sga_v = list_string_get_or(sga_argv, sga_at + 1, "");
   }
 } return string sga_v;
 (["s", "--root", "/x"], "--root"):("/x")

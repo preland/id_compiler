@@ -5,7 +5,7 @@
 // between two calls, so a read of it makes the result depend on when it ran.
 
 pure_decl(int id, int fn) {
-  if((import ni2)[id] == 1 && lst_find((import cdecl), id) == 0 && lst_find((import purenode), fn) == 1) {
+  if((import ni2)[id] == 1 && list_find((import cdecl), id) == 0 && list_find((import purenode), fn) == 1) {
     pure_err_export(id, fn);
   }
 } return void;
@@ -14,7 +14,7 @@ given pure_fix_prog ((import pfx_dcl), (import pfx_fb)):() then (import chkfail)
 given pure_fix_prog ((import pfx_k), (import pfx_fa)):() then (import chkfail)[0]:(0)
 
 pure_import(int id, int fn) {
-  if(lst_find((import purenode), fn) == 1 && pure_mutable((import ns1)[id]) == 1) {
+  if(list_find((import purenode), fn) == 1 && pure_mutable((import ns1)[id]) == 1) {
     pure_err_import(id, fn);
   }
 } return void;

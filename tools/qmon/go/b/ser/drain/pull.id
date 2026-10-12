@@ -9,7 +9,7 @@
 // with nothing in between.
 drain_serial() {
   int[] chunk = [];
-  lst_fill(chunk, 4096, 0);
+  list_fill(chunk, 4096, 0);
   pull_chunk(chunk);
 } return void;
 given qmb_boot_ser(": ") ():() then qmb_buf_probe:(1)

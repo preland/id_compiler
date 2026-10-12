@@ -4,7 +4,7 @@
 lg_wrap(string lg_ln, string lg_lib) {
   string lg_hd = lg_header(lg_ln);
   string lg_nm = lg_name(lg_ln);
-  int lg_rk = lst_str_index((import lg_tname), lg_ret(lg_ln));
+  int lg_rk = list_string_index((import lg_tname), lg_ret(lg_ln));
 } chain (string lg_ln, string lg_lib) {
   string lg_sigl = "IDL_API int " + lg_lib + "_" + lg_short(lg_lib, lg_nm) + "(" + lg_cparams(lg_hd, lg_ret(lg_ln), lg_lib) + ") {\n";
   string lg_zero = lg_line((import lg_tzero)[lg_rk]);

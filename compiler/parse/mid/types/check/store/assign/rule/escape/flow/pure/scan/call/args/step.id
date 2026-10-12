@@ -23,7 +23,7 @@ given pure_fix_prog ((import pfx_mg), (import pfx_fb), (import pfx_pm)):() then 
 given pure_fix_prog ((import pfx_mh), (import pfx_fb), (import pfx_pm)):() then (import chkfail)[0]:(0)
 
 pure_arg(int id, int fn, int pq_cn, int j) {
-  if(lst_find((import purenode), (((import nl1)[pq_cn])[j])) == 1) {
+  if(list_find((import purenode), (((import nl1)[pq_cn])[j])) == 1) {
     pure_arg_check(id, fn, pq_cn, j);
   }
 } return void;

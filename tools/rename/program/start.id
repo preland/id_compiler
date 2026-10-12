@@ -11,10 +11,10 @@ rename_run(string[] rename_roots, string[] rename_reserved, string rename_map_pa
 } chain (string[] rename_roots, string[] rename_reserved, string rename_map_path, string rename_words_directory, int rename_dry, string rename_scope) {
   rename_vocab_problems(rename_old_names, rename_news, rename_words_directory, rename_problems);
   string[] rename_files = rename_gather(rename_roots);
-  lst_str_extend(rename_problems, rename_collisions(rename_old_names, rename_news, rename_files, rename_reserved));
+  list_string_extend(rename_problems, rename_collisions(rename_old_names, rename_news, rename_files, rename_reserved));
 } chain (string[] rename_roots, string[] rename_reserved, string rename_map_path, string rename_words_directory, int rename_dry, string rename_scope) {
-  lst_str_extend(rename_problems, rename_root_problems(rename_roots));
-  lst_str_extend(rename_problems, rename_scope_problems(rename_scope, rename_files));
+  list_string_extend(rename_problems, rename_root_problems(rename_roots));
+  list_string_extend(rename_problems, rename_scope_problems(rename_scope, rename_files));
   int rename_code = rename_finish(rename_old_names, rename_news, rename_files, rename_dry, rename_scope, rename_problems);
 } return int rename_code;
 given rename_test_project("") (["src"], [], "map.txt", "words", 1, ""):(0) then prints:("src/NAMES.md:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\nsrc/a.id:1: oldname -> alpha\n3 name(s) renamed in 2 file(s) (dry run, nothing written)\n") then fs_read_text("src/a.id"):("oldname() oldname // oldname \"oldname\"\n")

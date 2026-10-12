@@ -11,7 +11,7 @@ ms_rg_ord(int[] ms_cn, int ms_n) {
     ms_i = ms_i + 1;
   }
 } chain (int[] ms_cn, int ms_n) {
-  int[] ms_ordr = ord_ints(ms_sk);
+  int[] ms_ordr = order_integers(ms_sk);
 } return int[] ms_ordr;
 ([3, 1, 0, 0, 1, 3, 0, 0, 0, 0, 5, 0], 3):([1, 0, 2])
 ([], 0):([])

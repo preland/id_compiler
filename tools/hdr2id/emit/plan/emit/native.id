@@ -3,7 +3,7 @@
 // The parameter name pl_nm as a native may spell it: one that is a word id reads as syntax gets an underscore after it.
 pl_pname(string pl_nm) {
   string pl_r = pl_nm;
-  if (lst_str_index((import id_keywords), pl_nm) >= 0) {
+  if (list_string_index((import id_keywords), pl_nm) >= 0) {
     pl_r = pl_nm + "_";
   }
 } return string pl_r;

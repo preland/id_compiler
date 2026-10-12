@@ -13,7 +13,7 @@ rename_note(string[] rename_problems, string rename_problem) {
 // name renamed twice is ambiguous, and two names renamed to one are merged.
 rename_repeat_problem(string[] rename_names, int rename_at, string rename_role) {
   string rename_problem = "";
-  if(lst_str_index(rename_names, rename_names[rename_at]) != rename_at) {
+  if(list_string_index(rename_names, rename_names[rename_at]) != rename_at) {
     rename_problem = rename_names[rename_at] + " appears twice in the " + rename_role + " column";
   }
 } return string rename_problem;

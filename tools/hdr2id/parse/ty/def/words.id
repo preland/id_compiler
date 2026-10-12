@@ -2,7 +2,7 @@
 
 // The index of the name a typedef statement ty_t declares: the identifier after the star in a function pointer, written ( * name ), and otherwise the token before the closing semicolon.
 ty_declname(string[] ty_t) {
-  int ty_p = lst_str_index(ty_t, "(");
+  int ty_p = list_string_index(ty_t, "(");
   int ty_a = len(ty_t) - 2;
   if (ty_p >= 0 && ty_p + 2 < len(ty_t) && ty_t[ty_p + 1] == "*") {
     ty_a = ty_p + 2;

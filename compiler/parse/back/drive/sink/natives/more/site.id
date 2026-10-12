@@ -25,7 +25,7 @@ given natcall_fixture ((import natcall_node)):("<stdin>:1") then (import chkfail
 // only there so that a node the table somehow lacks is still placed.
 call_line(int id) {
   int n = tc_line(id);
-  int at = lst_index_of((import cnode), id);
+  int at = list_index_of((import cnode), id);
   if(at >= 0) {
     n = (import cline)[at];
   }

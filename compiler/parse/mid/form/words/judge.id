@@ -2,7 +2,7 @@
 // reported if any piece of it is not a word.
 
 vocab_judge(string vocab_name, int vocab_kind, int vocab_row) {
-  hset_add((import vocab_seen_keys), (import vocab_seen_vals), (import vocab_seen_used), (import vocab_seen_count), vocab_name);
+  hash_set_add((import vocab_seen_keys), (import vocab_seen_vals), (import vocab_seen_used), (import vocab_seen_count), vocab_name);
   lset((import vocab_totals), 0, (import vocab_totals)[0] + 1);
   string vocab_failed = vocab_bad(vocab_name);
 } chain (string vocab_name, int vocab_kind, int vocab_row) {

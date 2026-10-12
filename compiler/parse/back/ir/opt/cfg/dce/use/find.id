@@ -1,10 +1,10 @@
 // Whether `id` appears among an instruction's auxiliary values -- a call's
 // arguments, a phi's incoming values. Composed so `ir_l`, a call, does not
-// sit inside `lst_find`'s own argument list, which is the third arm of an
+// sit inside `list_find`'s own argument list, which is the third arm of an
 // `||` and must only run when the first two arms miss.
 dce_lists(int at, int id) {
   int[] l = (import ilist)[at];
-  int r = lst_find(l, id);
+  int r = list_find(l, id);
 } return int r;
 given dce_fixture (0, 5):(1)
 given dce_fixture (0, 99):(0)

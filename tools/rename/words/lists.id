@@ -7,11 +7,11 @@ rename_test_denied() {
   export int[] rename_test_denied_used = [];
 } chain () {
   export int[] rename_test_denied_count = [];
-  hmap_init(rename_test_denied_keys, rename_test_denied_values, rename_test_denied_used, rename_test_denied_count);
+  hash_map_initialize(rename_test_denied_keys, rename_test_denied_values, rename_test_denied_used, rename_test_denied_count);
   rename_put_words("idx\n", rename_test_denied_keys, rename_test_denied_values, rename_test_denied_used, rename_test_denied_count);
 } return void;
-given rename_test_denied ():() then hmap_has((import rename_test_denied_keys), (import rename_test_denied_used), "idx"):(1)
-given rename_test_denied ():() then hmap_count((import rename_test_denied_count)):(1)
+given rename_test_denied ():() then hash_map_has((import rename_test_denied_keys), (import rename_test_denied_used), "idx"):(1)
+given rename_test_denied ():() then hash_map_count((import rename_test_denied_count)):(1)
 
 // A scratch directory holding all four word lists: alpha, beta, gamma and delta
 // in english.txt, beta and gamma denied, an in short.txt, idstd and gamma allowed.

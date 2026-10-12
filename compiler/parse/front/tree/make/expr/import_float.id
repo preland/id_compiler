@@ -13,7 +13,7 @@ given full_env ("2e10"):(0) then calls newleaf:("float", 0, 0, "2.0e10", "")
 // and split_line.id's proc_line -- none of them return or mutate an argument
 // a case can read directly.
 last_tkind() {
-  string ret_s_t = "tkind " + (lst_str_last((import tkind)));
+  string ret_s_t = "tkind " + (list_string_last((import tkind)));
 } return string ret_s_t;
 given mk_two_toks ():("tkind kw")
 given mk_three_toks ():("tkind ident")

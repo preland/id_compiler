@@ -4,7 +4,7 @@
 // The name most recently taken by fix_take, for its own cases -- it is void
 // and fixd_nm is an imported list.
 last_fixd_nm() {
-  string ret_s = lst_str_last((import fixd_nm));
+  string ret_s = list_string_last((import fixd_nm));
 } return string ret_s;
 given fix_env2 ():("foo")
 given fix_env4 ():("baz_v")

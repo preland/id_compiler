@@ -30,7 +30,7 @@ dg_t_built() {
 
 // How many function names the digest registered.
 dg_nfn() {
-  int dgn = hmap_count((import dg_fc));
+  int dgn = hash_map_count((import dg_fc));
 } return int dgn;
 given dg_t_built ():(2)
 given dg_t_graph ():(0)

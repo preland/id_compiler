@@ -5,7 +5,7 @@
 lp_hit(int lq_id) {
   int lq_r = 0;
   if((import lpon)[0] == 1) {
-    lq_r = lst_find((import lpset), lq_id);
+    lq_r = list_find((import lpset), lq_id);
   }
 } return int lq_r;
 given lpf_on ((import lpf_xa)):(1)

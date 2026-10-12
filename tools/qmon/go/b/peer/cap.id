@@ -26,7 +26,7 @@ qmb_cap_read() {
   int h = fs_open((import qmb_cap_path), "r");
 } chain () {
   int[] buf = [];
-  lst_fill(buf, 64, 0);
+  list_fill(buf, 64, 0);
   int got = fs_read(h, buf, 64);
 } chain () {
   string s = bytes_str(buf, got);

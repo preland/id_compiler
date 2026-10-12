@@ -14,7 +14,7 @@ given dupeq_fixture (0, 1):(0)
 case_eq_run(int i, int off, int stop) {
   int r = 1;
   while(i < stop) {
-    r = r * lst_str_same_at((import ttext), i, i + off);
+    r = r * list_string_same_at((import ttext), i, i + off);
     i = i + 1;
   }
 } return int r;

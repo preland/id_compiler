@@ -9,7 +9,7 @@ lpf_conds() {
   push((import lpcond), "v:y k:0 >=");
 } chain () {
   string[] lfc_a = ["v:x", "null", "!=", "|", "v:y", "k:0", ">=", "|"];
-  lst_str_extend((import lpg), lfc_a);
+  list_string_extend((import lpg), lfc_a);
 } return void;
 ():() then len((import lpcond)):(2)
 ():() then len((import lpg)):(8)
@@ -19,7 +19,7 @@ lpf_conds3() {
   push((import lpcond), "v:n v:z len wide k:1 -:2 <=");
   string[] lfc_b = ["v:n", "v:z", "len", "wide", "k:1", "-:2", "<=", "|"];
 } chain () {
-  lst_str_extend((import lpg), lfc_b);
+  list_string_extend((import lpg), lfc_b);
 } return void;
 ():() then len((import lpcond)):(3)
 ():() then (import lpg)[14]:("<=")

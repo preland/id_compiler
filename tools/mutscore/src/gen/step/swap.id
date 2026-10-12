@@ -5,7 +5,7 @@
 // ms_sw tables, when it has one.
 ms_st_swap(string ms_s, int[] ms_tk, int ms_t) {
   string[] ms_o = [];
-  int ms_i = lst_str_index((import ms_sw_from), ms_tk_str(ms_s, ms_tk, ms_t));
+  int ms_i = list_string_index((import ms_sw_from), ms_tk_str(ms_s, ms_tk, ms_t));
   if(ms_i >= 0) {
     push(ms_o, ms_mu_row(ms_s, ms_tk, ms_t, ms_t, (import ms_sw_op)[ms_i], (import ms_sw_to)[ms_i]));
   }

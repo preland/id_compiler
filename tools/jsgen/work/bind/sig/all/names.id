@@ -2,7 +2,7 @@
 // except the three the runtime itself exports.
 
 jg_wanted(string jg_ex) {
-  int jg_yes = str_starts(jg_ex, "id_") == 1 && lst_str_index((import jg_skip_exports), jg_ex) < 0;
+  int jg_yes = str_starts(jg_ex, "id_") == 1 && list_string_index((import jg_skip_exports), jg_ex) < 0;
 } return int jg_yes;
 ("id_twice"):(1)
 ("id_alloc"):(0)

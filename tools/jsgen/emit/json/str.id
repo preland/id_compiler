@@ -4,7 +4,7 @@
 
 jg_json_esc(int jg_c) {
   string jg_es = chr(jg_c);
-  int jg_at = lst_index_of((import jg_ctl_codes), jg_c);
+  int jg_at = list_index_of((import jg_ctl_codes), jg_c);
   if (jg_at >= 0) {
     jg_es = (import jg_ctl_text)[jg_at];
   }

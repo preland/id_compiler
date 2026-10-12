@@ -8,15 +8,15 @@ rename_test_words_empty() {
   export int[] rename_test_word_used = [];
 } chain () {
   export int[] rename_test_word_count = [];
-  hmap_init(rename_test_word_keys, rename_test_word_values, rename_test_word_used, rename_test_word_count);
+  hash_map_initialize(rename_test_word_keys, rename_test_word_values, rename_test_word_used, rename_test_word_count);
 } return void;
-given rename_test_words_empty ():() then hmap_count((import rename_test_word_count)):(0)
-given rename_test_words_empty ():() then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "alpha"):(0)
+given rename_test_words_empty ():() then hash_map_count((import rename_test_word_count)):(0)
+given rename_test_words_empty ():() then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "alpha"):(0)
 
 // The same four, holding alpha, beta and idstd.
 rename_test_words_filled() {
   rename_test_words_empty();
   rename_put_words("alpha\nbeta\n# note\n\nidstd\n", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count));
 } return void;
-given rename_test_words_filled ():() then hmap_count((import rename_test_word_count)):(3)
-given rename_test_words_filled ():() then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "idstd"):(1)
+given rename_test_words_filled ():() then hash_map_count((import rename_test_word_count)):(3)
+given rename_test_words_filled ():() then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "idstd"):(1)

@@ -59,9 +59,9 @@ dg_init_maps() {
 } chain () {
   export int[] dg_eu = [];
   export int[] dg_ec = [];
-  hmap_init((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc));
+  hash_map_initialize((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc));
 } chain () {
-  hmap_init((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec));
+  hash_map_initialize((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec));
 } return void;
 ():() then dg_nfn:(0)
 given dg_t_built ():() then dg_nfn:(0)

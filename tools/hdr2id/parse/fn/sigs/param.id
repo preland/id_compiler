@@ -8,8 +8,8 @@ fn_pname(string[] fn_pw, string[] fn_tn) {
     fn_nm = fn_pw[fn_n - 1];
   }
 } chain (string[] fn_pw, string[] fn_tn) {
-  int fn_ty = lst_str_index(fn_tn, fn_nm) >= 0 || lst_str_index((import kw_words), fn_nm) >= 0 || fn_nm == "const";
-  int fn_tag = fn_n >= 2 && lst_str_index(["struct", "union", "enum"], fn_pw[fn_n - 2]) >= 0;
+  int fn_ty = list_string_index(fn_tn, fn_nm) >= 0 || list_string_index((import kw_words), fn_nm) >= 0 || fn_nm == "const";
+  int fn_tag = fn_n >= 2 && list_string_index(["struct", "union", "enum"], fn_pw[fn_n - 2]) >= 0;
   int fn_idn = hx_kind(charat(fn_nm, 0)) == 1;
 } chain (string[] fn_pw, string[] fn_tn) {
   if (fn_ty == 1 || fn_tag == 1 || fn_idn == 0) {
@@ -48,14 +48,14 @@ fn_rec(string fn_ps, int fn_ix, string[] fn_tn, string[] fn_tc) {
   if (fn_ps == "...") {
     fn_cl = "...";
   }
-  if (lst_str_index(fn_pw, "[") >= 0) {
+  if (list_string_index(fn_pw, "[") >= 0) {
     fn_cl = "A";
   }
 } chain (string fn_ps, int fn_ix, string[] fn_tn, string[] fn_tc) {
   if (fn_nm == "") {
     fn_nm = "a" + fn_ix;
   }
-  if (lst_str_index(fn_pw, "(") >= 0) {
+  if (list_string_index(fn_pw, "(") >= 0) {
     fn_cl = "F";
   }
   string fn_rc = fn_cl + "|" + fn_nm + "|" + fn_ct;

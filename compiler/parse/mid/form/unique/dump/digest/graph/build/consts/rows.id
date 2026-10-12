@@ -32,7 +32,7 @@ dg_const_row(int dgi) {
   }
   dg_add(dgo, dgn);
 } chain (int dgi) {
-  hmap_put((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec), dgnm, dgr);
+  hash_map_put((import dg_ek), (import dg_ev), (import dg_eu), (import dg_ec), dgnm, dgr);
 } return void;
 given dg_t_crows (1):() then len((import dg_comp)):(1) then (import dg_nat)[0]:(0)
 given dg_t_cdirty (3):() then (import dg_nat)[0]:(1)

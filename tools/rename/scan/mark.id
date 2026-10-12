@@ -21,7 +21,7 @@ rename_line_at(string rename_source, int[] rename_cells, int rename_at) {
 // Appends the triple for one name.
 rename_mark(string rename_source, int rename_start, int rename_end, int[] rename_spans, int[] rename_cells) {
   int rename_line = rename_line_at(rename_source, rename_cells, rename_start);
-  lst_extend(rename_spans, [rename_start, rename_end, rename_line]);
+  list_extend(rename_spans, [rename_start, rename_end, rename_line]);
 } return void;
 ("a\nb", 2, 3, [], [0, 1]):("a\nb", 2, 3, [2, 3, 2], [2, 2])
 ("ab", 0, 2, [7], [0, 1]):("ab", 0, 2, [7, 0, 2, 1], [0, 1])

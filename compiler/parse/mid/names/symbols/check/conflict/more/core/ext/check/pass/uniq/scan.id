@@ -16,7 +16,7 @@ given ixw_fx stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\n
 
 ext_uniq_at(int xe_r) {
   string xe_fk = ext_key((import cfp)[xe_r]);
-  int xe_x = hmap_get((import ext_mk), (import ext_mv), (import ext_mu), "f:" + xe_fk, 0 - 1);
+  int xe_x = hash_map_get((import ext_mk), (import ext_mv), (import ext_mu), "f:" + xe_fk, 0 - 1);
   if(xe_x >= 0) {
     ext_uniq_hit(xe_r, (import ext_cfe)[xe_x]);
   }

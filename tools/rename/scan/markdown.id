@@ -46,7 +46,7 @@ rename_markdown_step(string rename_source, int rename_index, int[] rename_cells,
 } chain (string rename_source, int rename_index, int[] rename_cells, int rename_line, int[] rename_spans) {
   int rename_stop = rename_markdown_name(rename_source, rename_index, rename_cells[0]);
   if(rename_stop > rename_index) {
-    lst_extend(rename_spans, [rename_index, rename_stop, rename_line]);
+    list_extend(rename_spans, [rename_index, rename_stop, rename_line]);
     rename_end = rename_stop;
   }
 } return int rename_end;

@@ -4,7 +4,7 @@
 // pads: a word of ms_dl, or a struct type (a name, or a name and `[]`, then a
 // name).
 ms_mu_decl(string ms_s, int[] ms_tk, int ms_h) {
-  int ms_w = lst_str_index((import ms_dl), ms_tk_str(ms_s, ms_tk, ms_h));
+  int ms_w = list_string_index((import ms_dl), ms_tk_str(ms_s, ms_tk, ms_h));
   int ms_n = ms_tk_get(ms_tk, ms_h, 0) == (import ms_k_id) && (ms_tk_get(ms_tk, ms_h + 1, 0) == (import ms_k_id) || (ms_tk_ch(ms_s, ms_tk, ms_h + 1) == 91 && ms_tk_ch(ms_s, ms_tk, ms_h + 2) == 93));
   int ms_d = ms_w >= 0 || ms_n;
 } return int ms_d;

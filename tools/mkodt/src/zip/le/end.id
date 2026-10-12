@@ -3,7 +3,7 @@
 // count is the number of entries the central directory holds.
 zw_end(int[] out, int[] cd, int count) {
   int at = len(out);
-  lst_extend(out, cd);
+  list_extend(out, cd);
   zw_eocd(out, cd, count, at);
 } return void;
 ([], [], 0):([80, 75, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [], 0)
@@ -12,7 +12,7 @@ zw_end(int[] out, int[] cd, int count) {
 // Signature 0x06054b50, then this disk and the directory's disk, both 0, and
 // the entry count twice: on this disk, and in all.
 zw_eocd(int[] out, int[] cd, int count, int at) {
-  lst_extend(out, [80, 75, 5, 6, 0, 0, 0, 0]);
+  list_extend(out, [80, 75, 5, 6, 0, 0, 0, 0]);
   zw_pair(out, count, count);
   zw_eocd2(out, cd, at);
 } return void;

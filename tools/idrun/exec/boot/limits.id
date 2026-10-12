@@ -30,7 +30,7 @@ given vb_boot ("x y"):() then eprints:("id: x y\n") then (import ex_rg):([0, 1, 
 // length to know where the next instruction goes, so a check of one cell
 // alone would repeat their own read.
 vm_cd_text() {
-  string vm_cd_t = lst_text((import ex_cd), ",");
+  string vm_cd_t = list_text((import ex_cd), ",");
   string vm_cd_s = "code " + len((import ex_cd)) + ":" + vm_cd_t;
 } return string vm_cd_s;
 given vb_boot ():("code 0:")

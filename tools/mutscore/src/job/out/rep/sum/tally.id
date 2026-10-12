@@ -5,7 +5,7 @@
 // The count slot of the answer ms_st: its place in ms_st_names, 3 for any
 // other answer. A hang is an other answer: it is not scored.
 ms_rp_cls(string ms_st) {
-  int ms_c = lst_str_index((import ms_st_names), ms_st);
+  int ms_c = list_string_index((import ms_st_names), ms_st);
   if(ms_c < 0) {
     ms_c = 3;
   }
@@ -36,7 +36,7 @@ ms_rp_key(string[] ms_fd, int ms_lv) {
 ms_rp_note(string[] ms_ks, string ms_rw, int ms_lv) {
   string[] ms_fd = str_split(ms_rw, "\t");
   string ms_ky = ms_rp_key(ms_fd, ms_lv);
-  if(lst_str_index(ms_ks, ms_ky) < 0) {
+  if(list_string_index(ms_ks, ms_ky) < 0) {
     push(ms_ks, ms_ky);
   }
 } return void;

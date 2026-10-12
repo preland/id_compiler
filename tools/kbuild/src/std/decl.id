@@ -35,7 +35,7 @@ kb_tables() {
   export int[] kb_tu = [];
 } chain () {
   export int[] kb_tn = [];
-  hmap_init((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn));
+  hash_map_initialize((import kb_tk), (import kb_tv), (import kb_tu), (import kb_tn));
 } return void export kb_tk;
 ():() then (import kb_tn):([0])
 ():() then len((import kb_tk)):(8)

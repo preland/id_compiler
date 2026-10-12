@@ -14,7 +14,7 @@ ms_rp_files(string ms_out) {
     }
     ms_i = ms_i + 1;
   }
-  string[] ms_so = ord_by_strs(ms_fl, ord_strs(ms_fl));
+  string[] ms_so = order_by_strings(ms_fl, order_strings(ms_fl));
 } return string[] ms_so;
 given ms_t_tree given ms_t_wrs ((import ms_t_work)):(["r-0-of-2.tsv", "r-1-of-2.tsv"])
 ("/no/such/dir_ms"):([])
@@ -24,7 +24,7 @@ given ms_t_tree given ms_t_wrs ((import ms_t_work)):(["r-0-of-2.tsv", "r-1-of-2.
 // result is dropped.
 ms_rp_one(string[] ms_rows, string[] ms_ks, string ms_rl) {
   string ms_ky = ms_dr_key(ms_rl);
-  int ms_at = lst_str_index(ms_ks, ms_ky);
+  int ms_at = list_string_index(ms_ks, ms_ky);
   if(len(ms_ky) > 0 && ms_at < 0) {
     push(ms_ks, ms_ky);
     push(ms_rows, ms_rl);

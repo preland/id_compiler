@@ -17,7 +17,7 @@ given pure_fix_prog ("uv", (import pfx_fa), "fn"):("fn")
 pure_fn_named(string name) {
   int pq_cn = fn_node_of(name);
   int pq_named = 0;
-  if(pq_cn >= 0 && lst_find((import purenode), pq_cn) == 1) {
+  if(pq_cn >= 0 && list_find((import purenode), pq_cn) == 1) {
     pq_named = 1;
   }
 } return int pq_named;
@@ -29,7 +29,7 @@ pure_param(string name, int fn) {
   int pq_j = 0;
   int pq_found = 0;
   while(pq_j < len(((import nl1)[fn]))) {
-    if((import ns2)[(((import nl1)[fn])[pq_j])] == name && lst_find((import purenode), (((import nl1)[fn])[pq_j])) == 1) {
+    if((import ns2)[(((import nl1)[fn])[pq_j])] == name && list_find((import purenode), (((import nl1)[fn])[pq_j])) == 1) {
       pq_found = 1;
     }
     pq_j = pq_j + 1;

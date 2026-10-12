@@ -20,7 +20,7 @@ given mk_line9 ():() then last_tline:("tline 9")
 // The line most recently pushed onto tline, for push_line's own cases and
 // take_line/load_at's -- all three are void and tline is an imported list.
 last_tline() {
-  string ret_i_t = "tline " + (lst_last((import tline)));
+  string ret_i_t = "tline " + (list_last((import tline)));
 } return string ret_i_t;
 given mk_two_toks ():("tline 1")
 given mk_three_toks ():("tline 1")

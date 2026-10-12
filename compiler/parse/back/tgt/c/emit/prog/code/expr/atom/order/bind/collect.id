@@ -5,11 +5,11 @@
 // collected never clears a binding made outside this expression.
 
 seq_units(int id, int[] sq_units) {
-  if(is_logic(id) == 0 && lst_get_or((import seqt), id, 0) == 0) {
+  if(is_logic(id) == 0 && list_get_or((import seqt), id, 0) == 0) {
     int[] sq_kids = seq_kids(id);
     seq_units_list(sq_kids, sq_units);
   }
-  if(is_unit(id) == 1 && lst_get_or((import seqt), id, 0) == 0) {
+  if(is_unit(id) == 1 && list_get_or((import seqt), id, 0) == 0) {
     push(sq_units, id);
   }
 } return void;

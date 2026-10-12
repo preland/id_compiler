@@ -26,7 +26,7 @@ wg_col_n(int[] vl_rows) {
   int[] vl_out = [];
   int vi_k = 0;
   while (vi_k < len(vl_rows)) {
-    push(vl_out, lst_str_index((import wg_ifn), (import wg_mw)[vl_rows[vi_k]]));
+    push(vl_out, list_string_index((import wg_ifn), (import wg_mw)[vl_rows[vi_k]]));
     vi_k = vi_k + 1;
   }
 } return int[] vl_out;

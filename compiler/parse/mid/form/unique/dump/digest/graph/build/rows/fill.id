@@ -26,7 +26,7 @@ given env_init ():() then dg_nfn:(0) then (import dg_ctr)[1]:(1)
 // not see an edit to it, so no case reaching it may be cached.
 dg_fill_one(int dgf) {
   string dgnm = (import ns1)[((import prog)[dgf])];
-  hmap_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), dgnm, dgf);
+  hash_map_put((import dg_fk), (import dg_fv), (import dg_fu), (import dg_fc), dgnm, dgf);
   word dgo = dg_own_of(dgf, dgnm);
 } chain (int dgf) {
   int dgn = dg_nat_class(dgf, (import ns1)[((import prog)[dgf])]);

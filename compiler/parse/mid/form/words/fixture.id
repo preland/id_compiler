@@ -26,10 +26,10 @@ vocab_world() {
 // and the scan must judge it like any other export.
 vocab_const_row(string vocab_const_name) {
   vocab_export_row();
-  lst_str_delete((import enames), 0);
+  list_string_delete((import enames), 0);
   push((import enames), vocab_const_name);
 } chain (string vocab_const_name) {
-  lst_str_delete((import eowners), 0);
+  list_string_delete((import eowners), 0);
   push((import eowners), "conf.id");
   vocab_words();
 } return void;

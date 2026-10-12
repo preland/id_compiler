@@ -2,7 +2,7 @@
 
 // A cell with no pixel lit is a space without a search.
 fb_match(int[] rows, int[] font) {
-  int sum = lst_sum(rows);
+  int sum = list_sum(rows);
   int ch = 32;
   if(sum > 0) {
     ch = fb_best(rows, font);

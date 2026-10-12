@@ -3,7 +3,7 @@
 // name with no declaring function (hmap miss) reaches nothing, so it zeroes
 // every candidate rather than being silently skipped.
 rev_reach_merge(string[] required, int[] offs, int[] flat, int fcount, int[] reach_ok, int r) {
-  int d_idx = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), required[r], -1);
+  int d_idx = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), required[r], -1);
   int[] visited = [];
   int i = 0;
 } chain (string[] required, int[] offs, int[] flat, int fcount, int[] reach_ok, int r) {
@@ -51,8 +51,8 @@ given rev_edge_fixture ([], [0, 0, 1], [0], 2):([1, 1])
 // out of rev_flat's own loop -- ci, cj, the combined guard and the cursor
 // write were already four actions, one over a while body's own limit.
 rev_flat_step(int[] flat, int[] cursor, int ei) {
-  int ci = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
-  int cj = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecaller)[ei], -1);
+  int ci = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
+  int cj = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecaller)[ei], -1);
   if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0 && cj >= 0) {
     flat[cursor[ci]] = cj;
     cursor[ci] = cursor[ci] + 1;

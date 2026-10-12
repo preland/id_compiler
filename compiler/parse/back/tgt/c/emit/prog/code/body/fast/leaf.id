@@ -14,7 +14,7 @@ given lpf_more ((import lpf_grow)):(1)
 given lpf_more ((import lpf_f1)):(1)
 
 lp_lo(int lq_fn) {
-  int lq_k = lst_index_of((import prog), lq_fn);
+  int lq_k = list_index_of((import prog), lq_fn);
   int lq_lo = 0;
   if(lq_k > 0) {
     lq_lo = (import prog)[lq_k - 1] + 1;

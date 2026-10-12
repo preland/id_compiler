@@ -12,9 +12,9 @@
 
 ee_seq(int id) {
   string s = sq_name(id);
-  if(lst_get_or((import seqt), id, 0) == 0 && seqk(id) == 2) {
+  if(list_get_or((import seqt), id, 0) == 0 && seqk(id) == 2) {
     s = emit_seq(id);
-  } else if(lst_get_or((import seqt), id, 0) == 0) {
+  } else if(list_get_or((import seqt), id, 0) == 0) {
     s = ee2(id);
   }
 } return string s;

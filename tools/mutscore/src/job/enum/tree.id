@@ -26,7 +26,7 @@ ms_en_all(string ms_root, string ms_ar) {
 } chain (string ms_root, string ms_ar) {
   while(ms_i < len(ms_fl)) {
     if(ms_en_ok(ms_fl[ms_i], ms_ar) == 1) {
-      lst_str_extend(ms_o, ms_en_file(ms_root, ms_fl[ms_i]));
+      list_string_extend(ms_o, ms_en_file(ms_root, ms_fl[ms_i]));
     }
     ms_i = ms_i + 1;
   }

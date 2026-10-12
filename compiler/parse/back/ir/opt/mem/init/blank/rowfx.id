@@ -22,7 +22,7 @@ outv_sum() {
   int n = 0;
   int i = 0;
   while(i < len((import outv))) {
-    n = n + lst_sum((import outv)[i]);
+    n = n + list_sum((import outv)[i]);
     i = i + 1;
   }
 } chain () {

@@ -16,7 +16,7 @@ vocab_init() {
   export int[] vocab_used = [];
 } chain () {
   export int[] vocab_count = [];
-  hmap_init((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count));
+  hash_map_initialize((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count));
   vocab_init_seen();
 } return void export vocab_count;
 ():() then (import vocab_count)[0]:(0)
@@ -29,15 +29,15 @@ vocab_init_seen() {
 } chain () {
   export int[] vocab_seen_count = [];
   export int[] vocab_totals = [0, 0];
-  hmap_init((import vocab_seen_keys), (import vocab_seen_vals), (import vocab_seen_used), (import vocab_seen_count));
+  hash_map_initialize((import vocab_seen_keys), (import vocab_seen_vals), (import vocab_seen_used), (import vocab_seen_count));
 } return void export vocab_totals;
 ():() then (import vocab_seen_count)[0]:(0)
 ():() then (import vocab_totals)[1]:(0)
 
 vocab_words() {
-  hset_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "buffer");
-  hset_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "width");
-  hset_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "utf8");
+  hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "buffer");
+  hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "width");
+  hash_set_add((import vocab_keys), (import vocab_vals), (import vocab_used), (import vocab_count), "utf8");
 } return void;
 given full_env ():() then (import vocab_count)[0]:(3)
 given full_env ():() then (import chkfail)[0]:(0)

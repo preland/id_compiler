@@ -14,9 +14,9 @@ pl_field(string pl_rec, int pl_k) {
 
 // How id can pass a parameter of class pl_c: 0 as a scalar, string or handle, 1 as the address of a buffer in the store, 2 as the address of one scalar to be filled in, 3 as the address of four bytes the shim fills with a new handle (a pointer to a pointer to an opaque struct), -1 not at all.
 pl_pk(string pl_c) {
-  int pl_d = lst_str_index((import cls_direct), pl_c) >= 0 || str_starts(pl_c, "H:") == 1;
-  int pl_b = lst_str_index((import cls_buffer), pl_c) >= 0;
-  int pl_so = lst_str_index((import cls_scalar_out), pl_c) >= 0;
+  int pl_d = list_string_index((import cls_direct), pl_c) >= 0 || str_starts(pl_c, "H:") == 1;
+  int pl_b = list_string_index((import cls_buffer), pl_c) >= 0;
+  int pl_so = list_string_index((import cls_scalar_out), pl_c) >= 0;
 } chain (string pl_c) {
   int pl_ho = str_starts(pl_c, "PH:");
   int pl_k = 0 - 1;

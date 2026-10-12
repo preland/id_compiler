@@ -4,7 +4,7 @@
 // underscore after it (the list it is looked up in is the second argument).
 
 jg_ts(string jg_ty) {
-  int jg_at = lst_str_index((import jg_ts_from), jg_ty);
+  int jg_at = list_string_index((import jg_ts_from), jg_ty);
   string jg_tt = "";
   if (jg_at >= 0) {
     jg_tt = (import jg_ts_to)[jg_at];
@@ -18,7 +18,7 @@ jg_ts(string jg_ty) {
 
 jg_us(string jg_nm, string[] jg_res) {
   string jg_un = jg_nm;
-  if (lst_str_index(jg_res, jg_nm) >= 0) {
+  if (list_string_index(jg_res, jg_nm) >= 0) {
     jg_un = jg_nm + "_";
   }
 } return string jg_un;

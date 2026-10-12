@@ -14,7 +14,7 @@ rename_words_choice(string[] rename_argument_values) {
 
 // The function a rename is restricted to (--in), or "" for the whole program.
 rename_scope_choice(string[] rename_argument_values) {
-  string rename_chosen_scope = lst_str_get_or(rename_flag_values(rename_argument_values, "--in"), 0, "");
+  string rename_chosen_scope = list_string_get_or(rename_flag_values(rename_argument_values, "--in"), 0, "");
 } return string rename_chosen_scope;
 (["p", "--in", "f"]):("f")
 (["p", "src"]):("")
@@ -26,7 +26,7 @@ rename_from_arguments(string[] rename_argument_values) {
   string rename_words_directory = rename_words_choice(rename_argument_values);
 } chain (string[] rename_argument_values) {
   string[] rename_maps = rename_flag_values(rename_argument_values, "--map");
-  int rename_dry = lst_str_index(rename_argument_values, "--dry-run") >= 0;
+  int rename_dry = list_string_index(rename_argument_values, "--dry-run") >= 0;
   string rename_scope = rename_scope_choice(rename_argument_values);
 } chain (string[] rename_argument_values) {
   int rename_code = rename_run(rename_roots, rename_reserved, rename_maps[0], rename_words_directory, rename_dry, rename_scope);

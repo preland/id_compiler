@@ -3,7 +3,7 @@
 
 ixw_is_ref(string ixw_kd) {
   string[] ixw_kinds = ["call", "var", "import", "cimport", "cctor", "gsetup", "cfn", "then", "thencalls", "thencallsn", "thenimp"];
-  int ixw_hit = lst_str_index(ixw_kinds, ixw_kd) >= 0;
+  int ixw_hit = list_string_index(ixw_kinds, ixw_kd) >= 0;
 } return int ixw_hit;
 ("thencallsn"):(1)
 ("decl"):(0)

@@ -2,19 +2,19 @@
 // cases: how many functions have a key, are skipped, raised a diagnostic.
 
 tk_nkeys() {
-  string tkn_t = "keys " + (lst_str_filled((import tkkey)));
+  string tkn_t = "keys " + (list_string_filled((import tkkey)));
 } return string tkn_t;
 given tk_t_prep ():("keys 2")
 given tk_t_prep0 ():("keys 0")
 
 tk_nskip() {
-  string tkn_t = "skip " + (lst_sum((import tkskip)));
+  string tkn_t = "skip " + (list_sum((import tkskip)));
 } return string tkn_t;
 given tk_t_warm ():("skip 1")
 given tk_t_prep ():("skip 0")
 
 tk_nbad() {
-  string tkn_t = "bad " + (lst_sum((import tkbad)));
+  string tkn_t = "bad " + (list_sum((import tkbad)));
 } return string tkn_t;
 given tk_t_bad ():("bad 0")
 given tk_t_bad2 ():("bad 1")

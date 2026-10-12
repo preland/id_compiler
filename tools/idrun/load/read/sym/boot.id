@@ -24,10 +24,10 @@ lb_tables() {
 } chain () {
   export int[] ld_sn = [];
   export string[] ld_fn = [];
-  hmap_init((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn));
+  hash_map_initialize((import ld_sk), (import ld_sv), (import ld_su), (import ld_sn));
 } return void export ld_pr;
 ():() then (import ld_pr):([0, 0, 0, 0, 0, 0, 0, 0])
-():() then calls hmap_init:[1]
+():() then calls hash_map_initialize:[1]
 
 lb_boot() {
   lb_tables();
@@ -47,7 +47,7 @@ given tf_key("x:id_str_of_float") ():() then tf_look:(2)
 // the rest of it, so a case about one of them states every slot rather than
 // the one it happens to read.
 ld_pr_text() {
-  string ld_pr_t = lst_text((import ld_pr), ",");
+  string ld_pr_t = list_text((import ld_pr), ",");
   string ld_pr_s = "parse " + len((import ld_pr)) + ":" + ld_pr_t;
 } return string ld_pr_s;
 given lb_boot ():("parse 8:0,0,0,0,0,0,0,0")

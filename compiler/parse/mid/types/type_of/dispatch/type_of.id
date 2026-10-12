@@ -11,7 +11,7 @@
 
 type_of(int id) {
   string t = "";
-  if(lst_get_or((import tcache_ok), id, 0) == 1) {
+  if(list_get_or((import tcache_ok), id, 0) == 1) {
     t = (import tcache)[id];
   } else {
     t = type_of_miss(id);

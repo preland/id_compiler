@@ -29,7 +29,7 @@ given sg_t_tree (["s"], "false", "idc", (import sg_t_root), "/nonexistent_sg_roo
 sg_mode(string[] sgm_argv, string sgm_mut, string sgm_root, string sgm_std) {
   string sgm_idc = path_join(sgm_root, "idc/bin/idc");
   string sgm_res = sg_or(sg_arg(sgm_argv, "--mut"), path_join(sgm_root, "bench/results/mutscore"));
-  int sgm_un = lst_str_index(sgm_argv, "--untested") >= 0;
+  int sgm_un = list_string_index(sgm_argv, "--untested") >= 0;
 } chain (string[] sgm_argv, string sgm_mut, string sgm_root, string sgm_std) {
   int sgm_rc = 0;
   if(sgm_un == 1) {

@@ -4,7 +4,7 @@
 // "" if none declares it, which the packet reports honestly rather than
 // guessing at one.
 find_declaring_fn(string name) {
-  int idx = hmap_get((import ix_ekeys), (import ix_evals), (import ix_eused), name, -1);
+  int idx = hash_map_get((import ix_ekeys), (import ix_evals), (import ix_eused), name, -1);
   string out_s = "";
   if(idx >= 0) {
     out_s = (import ix_fn)[idx];

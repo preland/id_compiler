@@ -20,7 +20,7 @@ given ms_t_tree given ms_t_wrs ((import ms_t_work)):(["killed\t2\ta.id\tf\t3\t4\
 // a row that gets no line.
 ms_rg_m1(string ms_rw, int ms_tab) {
   string[] ms_fd = str_split(ms_rw, "\t");
-  string ms_df = lst_str_get_or(ms_fd, 8, "");
+  string ms_df = list_string_get_or(ms_fd, 8, "");
   string ms_ln = "";
 } chain (string ms_rw, int ms_tab) {
   if(ms_tab == 1) {

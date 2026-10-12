@@ -3,7 +3,7 @@
 // The word after ms_nm (such as "--out") in ms_av, "" when ms_nm is not there
 // or is the last word.
 ms_cl_arg(string[] ms_av, string ms_nm) {
-  int ms_at = lst_str_index(ms_av, ms_nm);
+  int ms_at = list_string_index(ms_av, ms_nm);
   string ms_val = "";
   if(ms_at >= 0 && ms_at + 1 < len(ms_av)) {
     ms_val = ms_av[ms_at + 1];
@@ -16,7 +16,7 @@ ms_cl_arg(string[] ms_av, string ms_nm) {
 
 // 1 when the word ms_nm (a flag such as "--tsv") is among ms_av.
 ms_cl_has(string[] ms_av, string ms_nm) {
-  int ms_h = lst_str_index(ms_av, ms_nm) >= 0;
+  int ms_h = list_string_index(ms_av, ms_nm) >= 0;
 } return int ms_h;
 (["m", "--tsv"], "--tsv"):(1)
 (["m", "report"], "--tsv"):(0)

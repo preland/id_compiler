@@ -1,7 +1,7 @@
 // Readers of the type check cache's tables, for `then` checks.
 
 tk_nin() {
-  string tkn_t = "in " + (hmap_count((import tkic)));
+  string tkn_t = "in " + (hash_map_count((import tkic)));
 } return string tkn_t;
 given tk_t_warm ():("in 1")
 given tk_t_prep ():("in 0")

@@ -7,7 +7,7 @@
 dg_show_human(string dg_sh_b, int dg_sh_on, string[] dg_sh_seen) {
   string dg_sh_c = dg_code(dg_head(dg_sh_b));
   string dg_sh_s = dg_sh_b;
-  int dg_sh_again = dg_sh_c != "" && lst_str_index(dg_sh_seen, dg_sh_c) >= 0;
+  int dg_sh_again = dg_sh_c != "" && list_string_index(dg_sh_seen, dg_sh_c) >= 0;
 } chain (string dg_sh_b, int dg_sh_on, string[] dg_sh_seen) {
   if(dg_sh_again == 1) {
     dg_sh_s = dg_brief(dg_sh_b, dg_sh_c);

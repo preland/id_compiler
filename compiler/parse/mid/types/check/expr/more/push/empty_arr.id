@@ -24,8 +24,8 @@ given idxfix ((import rgidx_node)):(0)
 
 // Rebuilds arrmark for the store as it stands.
 arr_marks() {
-  lst_set_all((import arrmark), len((import arrmark)), 0);
-  lst_fill((import arrmark), len((import nkind)) - len((import arrmark)), 0);
+  list_set_all((import arrmark), len((import arrmark)), 0);
+  list_fill((import arrmark), len((import nkind)) - len((import arrmark)), 0);
   int i = 0;
 } chain () {
   while(i < len((import nkind))) {

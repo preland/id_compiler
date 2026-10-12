@@ -27,7 +27,7 @@ rc_build() {
   export int[] rcc = [];
   export int[][] rcsets = [];
 } chain () {
-  hmap_init((import rck), (import rcv), (import rcu), (import rcc));
+  hash_map_initialize((import rck), (import rcv), (import rcu), (import rcc));
   lset((import rcon), 0, 1);
 } return void export rcsets;
 given dg_t_parsed ():() then len((import rcsets)):(0) then dg_nfn:(2)
@@ -35,7 +35,7 @@ given env_init ():() then len((import rcsets)):(0) then dg_nfn:(0)
 
 // The index of src's set, walking the graph the first time src is asked for.
 rc_of(string src) {
-  int ri = hmap_get((import rck), (import rcv), (import rcu), src, 0 - 1);
+  int ri = hash_map_get((import rck), (import rcv), (import rcu), src, 0 - 1);
   if(ri < 0) {
     ri = rc_new(src);
   }

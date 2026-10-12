@@ -30,5 +30,5 @@ ix_scan_exports_in(string[] body, int fn_idx) {
     i = i + 1;
   }
 } return void;
-given ix_export_fixture (["export int zz = 1;", "plain line"], 0):() then calls hmap_put:[1]
-given ix_test_setup (["a", "b"], 5):() then calls hmap_put:[0]
+given ix_export_fixture (["export int zz = 1;", "plain line"], 0):() then calls hash_map_put:[1]
+given ix_test_setup (["a", "b"], 5):() then calls hash_map_put:[0]

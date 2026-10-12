@@ -12,7 +12,7 @@ case_fidx(int ci) {
   int n = 0;
   int j = 0;
   while(j < ci) {
-    n = n + lst_same_at((import casefn), j, ci);
+    n = n + list_same_at((import casefn), j, ci);
     j = j + 1;
   }
 } return int n;

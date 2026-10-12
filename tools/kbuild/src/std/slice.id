@@ -7,7 +7,7 @@
 kb_kept_line(string line) {
   string name = kb_decl_name(line);
   string kept = "";
-  if (name != "" && hmap_has((import kb_tk), (import kb_tu), name) == 1) {
+  if (name != "" && hash_map_has((import kb_tk), (import kb_tu), name) == 1) {
     kept = line + "\n";
   }
 } return string kept;

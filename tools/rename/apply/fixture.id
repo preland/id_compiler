@@ -9,10 +9,10 @@ rename_test_table() {
 } chain () {
   export int[] rename_test_count = [];
   export string[] rename_test_news = ["new_a", "new_b"];
-  hmap_init(rename_test_keys, rename_test_values, rename_test_used, rename_test_count);
+  hash_map_initialize(rename_test_keys, rename_test_values, rename_test_used, rename_test_count);
 } chain () {
-  hmap_put(rename_test_keys, rename_test_values, rename_test_used, rename_test_count, "old_a", 0);
-  hmap_put(rename_test_keys, rename_test_values, rename_test_used, rename_test_count, "old_b", 1);
+  hash_map_put(rename_test_keys, rename_test_values, rename_test_used, rename_test_count, "old_a", 0);
+  hash_map_put(rename_test_keys, rename_test_values, rename_test_used, rename_test_count, "old_b", 1);
 } return void export rename_test_keys;
-given rename_test_table ():() then hmap_count((import rename_test_count)):(2)
-given rename_test_table ():() then hmap_get((import rename_test_keys), (import rename_test_values), (import rename_test_used), "old_b", -1):(1)
+given rename_test_table ():() then hash_map_count((import rename_test_count)):(2)
+given rename_test_table ():() then hash_map_get((import rename_test_keys), (import rename_test_values), (import rename_test_used), "old_b", -1):(1)

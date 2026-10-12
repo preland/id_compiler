@@ -230,9 +230,9 @@ else
     fi
     mkdir "$TMP/stdname"
     printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/stdname/twice.id"
-    printf 'string[] lib_exports = ["twice", "lst_str_index"];\n' > "$TMP/stdname/conf.id"
+    printf 'string[] lib_exports = ["twice", "list_string_index"];\n' > "$TMP/stdname/conf.id"
     if build stdname "$TMP/stdname"; then bad "a lib_exports name that is an idstd function is refused (built)"
-    elif grep -q "'lst_str_index', a function of the standard library" "$TMP/stdname.log" && grep -q 'define a function of your own that calls it' "$TMP/stdname.log"; then ok "a lib_exports name that is an idstd function is refused, naming it and the fix"
+    elif grep -q "'list_string_index', a function of the standard library" "$TMP/stdname.log" && grep -q 'define a function of your own that calls it' "$TMP/stdname.log"; then ok "a lib_exports name that is an idstd function is refused, naming it and the fix"
     else bad "a lib_exports name that is an idstd function is refused ($(tail -1 "$TMP/stdname.log"))"; fi
     for mode in static shared; do
         if host csv lib/csv_host.c "$mode"; then

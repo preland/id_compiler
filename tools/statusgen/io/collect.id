@@ -5,7 +5,7 @@
 sg_cone(string[] sgo_fr, string sgo_root, string sgo_ent, string[] sgo_rows, string[] sgo_idx) {
   if(str_ends(sgo_ent, ".id") == 1) {
     string sgo_text = fs_read_text(path_join(sgo_root, sgo_ent));
-    lst_str_extend(sgo_fr, sg_funcs(sgo_ent, sgo_text, sgo_rows, sgo_idx));
+    list_string_extend(sgo_fr, sg_funcs(sgo_ent, sgo_text, sgo_rows, sgo_idx));
   }
 } return void;
 given sg_t_tree ([], (import sg_t_root), "a.id", ["case\ta.id\tf\t3\tc", "case\ta.id\tf\t4\tc"], ["a.id\t0"]):(["a.id\t1\tf\t2"])

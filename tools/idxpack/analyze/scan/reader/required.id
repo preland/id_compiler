@@ -6,7 +6,7 @@
 // met -- callers (run_gather_required below, runnable.id) do that part
 // against their own closure, not this reader's.
 reader_own_required(string name) {
-  int idx = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), name, -1);
+  int idx = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), name, -1);
   string[] out_li = [];
   string path = "";
 } chain (string name) {

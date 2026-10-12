@@ -42,8 +42,8 @@ given ms_t_tree ([(import ms_t_root), "", "sh\n-c\ngrep -rq \"a - b\" \"$1\" && 
 // usage error or a run that could not start, 3 or 4 for a baseline that is
 // red or still building.
 ms_cl_cmd(string[] ms_av, string ms_cm) {
-  int ms_ok = lst_str_index((import ms_cmds), ms_cm) >= 0 && len(ms_av) >= 3 && (ms_cm != "run" || len(ms_cl_arg(ms_av, "--out")) > 0);
-  string ms_pt = ms_cl_abs(lst_str_get_or(ms_av, 2, ""), environment_text("PWD"));
+  int ms_ok = list_string_index((import ms_cmds), ms_cm) >= 0 && len(ms_av) >= 3 && (ms_cm != "run" || len(ms_cl_arg(ms_av, "--out")) > 0);
+  string ms_pt = ms_cl_abs(list_string_get_or(ms_av, 2, ""), environment_text("PWD"));
   int ms_rc = 2;
 } chain (string[] ms_av, string ms_cm) {
   if(ms_ok == 0) {

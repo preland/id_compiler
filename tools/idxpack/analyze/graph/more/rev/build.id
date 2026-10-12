@@ -8,11 +8,11 @@
 // the CSR build.
 rev_counts(int fcount) {
   int[] counts = [];
-  lst_fill(counts, fcount, 0);
+  list_fill(counts, fcount, 0);
   int ei = 0;
 } chain (int fcount) {
   while(ei < len((import ix_ekind))) {
-    int ci = hmap_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
+    int ci = hash_map_get((import ix_nkeys), (import ix_nvals), (import ix_nused), (import ix_ecallee)[ei], -1);
     if(str_cmp((import ix_ekind)[ei], "call") == 0 && ci >= 0) {
       counts[ci] = counts[ci] + 1;
     }
@@ -43,9 +43,9 @@ rev_prefix(int[] counts, int fcount) {
 rev_flat(int[] offs, int fcount) {
   int total = offs[fcount];
   int[] flat = [];
-  lst_fill(flat, total, 0);
+  list_fill(flat, total, 0);
 } chain (int[] offs, int fcount) {
-  int[] cursor = lst_copy(offs);
+  int[] cursor = list_copy(offs);
   int ei = 0;
   while(ei < len((import ix_ekind))) {
     rev_flat_step(flat, cursor, ei);

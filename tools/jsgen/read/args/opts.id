@@ -7,7 +7,7 @@ jg_opt(string[] jg_av, string jg_nm) {
   int jg_i = 1;
   while (jg_i < len(jg_av)) {
     if (str_lstrip(jg_av[jg_i], "--") == jg_nm) {
-      jg_val = lst_str_get_or(jg_av, jg_i + 1, "");
+      jg_val = list_string_get_or(jg_av, jg_i + 1, "");
     }
     jg_i = jg_i + 2;
   }
@@ -22,7 +22,7 @@ jg_srcs(string[] jg_av) {
   int jg_i = 1;
   while (jg_i < len(jg_av)) {
     if (str_lstrip(jg_av[jg_i], "--") == "src") {
-      push(jg_xs, lst_str_get_or(jg_av, jg_i + 1, ""));
+      push(jg_xs, list_string_get_or(jg_av, jg_i + 1, ""));
     }
     jg_i = jg_i + 2;
   }

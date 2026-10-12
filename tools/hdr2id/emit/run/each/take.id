@@ -10,7 +10,7 @@ hd_tag1(string hd_cls, string[] hd_tl) {
 } chain (string hd_cls, string[] hd_tl) {
   if (hd_h == 1) {
     string hd_tg = pl_tag(hd_hc);
-    if (lst_str_index(hd_tl, hd_tg) < 0) {
+    if (list_string_index(hd_tl, hd_tg) < 0) {
       push(hd_tl, hd_tg);
     }
   }

@@ -27,8 +27,8 @@ given rename_test_tree ("a.id"):(["a.id"])
 // the found list and its subdirectories to the list.
 rename_visit(string[] rename_found, string[] rename_pending) {
   string rename_directory = pop(rename_pending);
-  lst_str_extend(rename_found, rename_directory_files(rename_directory));
-  lst_str_extend(rename_pending, rename_directory_children(rename_directory));
+  list_string_extend(rename_found, rename_directory_files(rename_directory));
+  list_string_extend(rename_pending, rename_directory_children(rename_directory));
 } return void;
 given rename_test_tree ([], ["."]):(["./NAMES.md", "./a.id"], ["./sub"])
 given rename_test_tree (["x"], ["sub"]):(["x", "sub/NOTES.md", "sub/b.id"], [])

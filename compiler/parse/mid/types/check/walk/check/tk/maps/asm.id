@@ -5,7 +5,7 @@
 
 tk_fill_asm(int tki) {
   while(tki < len((import afname))) {
-    hmap_put((import tkfk), (import tkfv), (import tkfu), (import tkfc), (import afname)[tki], 0 - 2);
+    hash_map_put((import tkfk), (import tkfv), (import tkfu), (import tkfc), (import afname)[tki], 0 - 2);
     tki = tki + 1;
   }
 } return void;
@@ -14,7 +14,7 @@ given tk_t_asm_late (1):() then tk_asm_foo:(0)
 
 tk_is_asm(string name) {
   int tka = 0;
-  if(hmap_get((import tkfk), (import tkfv), (import tkfu), name, 0 - 1) == 0 - 2) {
+  if(hash_map_get((import tkfk), (import tkfv), (import tkfu), name, 0 - 1) == 0 - 2) {
     tka = 1;
   }
 } return int tka;
@@ -23,7 +23,7 @@ given tk_t_asm ("fa"):(0)
 
 // The type an export by this name has, or "".
 tk_etype(string name) {
-  int tke = hmap_get((import tkfk), (import tkfv), (import tkfu), name, 0 - 1);
+  int tke = hash_map_get((import tkfk), (import tkfv), (import tkfu), name, 0 - 1);
   string tkt = "";
   if(tke >= 0) {
     tkt = (import etypes)[tke];

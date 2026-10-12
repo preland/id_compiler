@@ -26,7 +26,7 @@ given dg_t_claim (0):(0)
 given dg_t_built (99):(-1)
 
 dg_fn_named(string dgnm) {
-  int dgf = hmap_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, 0 - 1);
+  int dgf = hash_map_get((import dg_fk), (import dg_fv), (import dg_fu), dgnm, 0 - 1);
 } return int dgf;
 given dg_t_built ("fb"):(1)
 given dg_t_built ("print"):(-1)

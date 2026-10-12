@@ -11,7 +11,7 @@ dg_t_exp() {
 ():() then dg_nfn:(2)
 
 dg_nexp() {
-  string dgn_t = "exp " + (hmap_count((import dg_ec)));
+  string dgn_t = "exp " + (hash_map_count((import dg_ec)));
 } return string dgn_t;
 given dg_t_exp ():("exp 0")
 given dg_t_built ():("exp 0")

@@ -27,7 +27,7 @@ given tk_t_bad2 (0):() then prints:("-8648083975898962277\n")
 tk_row(int tkf) {
   string tkk = tk_key(tkf);
   push((import tkkey), tkk);
-  int tkhit = tkk != "" && hmap_has((import tkik), (import tkiu), tkk) == 1;
+  int tkhit = tkk != "" && hash_map_has((import tkik), (import tkiu), tkk) == 1;
 } chain (int tkf) {
   push((import tkskip), tkhit);
   push((import tkbad), 0);

@@ -9,8 +9,8 @@
 // error it follows from (run/sum/mark).
 
 main(int argc, string[] argv) {
-  int dg_mn_j = lst_str_index(argv, "--format=json") >= 0;
-  int dg_mn_c = lst_str_index(argv, "--color=always") >= 0;
+  int dg_mn_j = list_string_index(argv, "--format=json") >= 0;
+  int dg_mn_c = list_string_index(argv, "--color=always") >= 0;
   string dg_mn_t = read_all();
 } chain (int argc, string[] argv) {
   dg_run(dg_mn_t, dg_mn_j, dg_mn_c);

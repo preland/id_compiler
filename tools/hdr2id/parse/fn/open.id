@@ -2,8 +2,8 @@
 
 // 1 when the statement fn_t, whose first open parenthesis is token fn_p, declares a function: it is not a typedef, a static function, a definition or an initialisation, the token before the parenthesis is a name, and the parenthesis is not the start of a function pointer declarator.
 fn_decl(string[] fn_t, int fn_p) {
-  int fn_bad = lst_str_index(fn_t, "typedef") >= 0 || lst_str_index(fn_t, "static") >= 0 || lst_str_index(fn_t, "{") >= 0;
-  int fn_eq = lst_str_index(fn_t, "=") >= 0 || fn_t[fn_p + 1] == "*";
+  int fn_bad = list_string_index(fn_t, "typedef") >= 0 || list_string_index(fn_t, "static") >= 0 || list_string_index(fn_t, "{") >= 0;
+  int fn_eq = list_string_index(fn_t, "=") >= 0 || fn_t[fn_p + 1] == "*";
   int fn_id = hx_kind(charat(fn_t[fn_p - 1], 0)) == 1;
 } chain (string[] fn_t, int fn_p) {
   int fn_ok = fn_bad == 0 && fn_eq == 0 && fn_id == 1;
@@ -16,7 +16,7 @@ fn_decl(string[] fn_t, int fn_p) {
 
 // The index of the open parenthesis of the parameter list of the statement fn_t when it declares a function, else -1.
 fn_open(string[] fn_t) {
-  int fn_p = lst_str_index(fn_t, "(");
+  int fn_p = list_string_index(fn_t, "(");
   int fn_r = 0 - 1;
   if (fn_p >= 1 && len(fn_t) > fn_p + 2 && fn_t[len(fn_t) - 1] == ";" && fn_decl(fn_t, fn_p) == 1) {
     fn_r = fn_p;

@@ -14,7 +14,7 @@ lay_list_size(string path) {
 
 lay_list_read(string path, int n) {
   int[] buf = [];
-  lst_fill(buf, n, 0);
+  list_fill(buf, n, 0);
   int got = fs_list(path, buf, n);
 } return int[] buf;
 ("does-not-exist-xyz-idlayout-test", 0):([])

@@ -7,12 +7,12 @@
 rename_put_word(string rename_entry, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
   string rename_word = str_lower(str_trim(rename_entry));
   if(rename_word != "" && charat(rename_word, 0) != 35) {
-    hmap_put(rename_word_keys, rename_word_values, rename_word_used, rename_word_count, rename_word, 1);
+    hash_map_put(rename_word_keys, rename_word_values, rename_word_used, rename_word_count, rename_word, 1);
   }
 } return void;
-given rename_test_words_empty (" Ab ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(" Ab ") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "ab"):(1)
-given rename_test_words_empty ("# ab", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("# ab") then hmap_count((import rename_test_word_count)):(0)
-given rename_test_words_empty ("  ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("  ") then hmap_count((import rename_test_word_count)):(0)
+given rename_test_words_empty (" Ab ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(" Ab ") then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "ab"):(1)
+given rename_test_words_empty ("# ab", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("# ab") then hash_map_count((import rename_test_word_count)):(0)
+given rename_test_words_empty ("  ", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("  ") then hash_map_count((import rename_test_word_count)):(0)
 
 // Adds every line of a word list to the table.
 rename_put_words(string rename_text, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
@@ -23,20 +23,20 @@ rename_put_words(string rename_text, string[] rename_word_keys, int[] rename_wor
     rename_at = rename_at + 1;
   }
 } return void;
-given rename_test_words_empty ("a1\nb2\n", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("a1\nb2\n") then hmap_count((import rename_test_word_count)):(2)
-given rename_test_words_empty ("", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("") then hmap_count((import rename_test_word_count)):(0)
+given rename_test_words_empty ("a1\nb2\n", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("a1\nb2\n") then hash_map_count((import rename_test_word_count)):(2)
+given rename_test_words_empty ("", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("") then hash_map_count((import rename_test_word_count)):(0)
 
 // Fills the table from the word lists in a directory, as `idc --word-scan` reads
 // them: english.txt without the words denied.txt names, then short.txt and
 // allowed.txt, which are accepted whether or not denied.txt names them.
 rename_load_words(string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
-  hmap_init(rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
+  hash_map_initialize(rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
   string[] rename_denied_keys = [];
   int[] rename_denied_values = [];
 } chain (string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
   int[] rename_denied_used = [];
   int[] rename_denied_count = [];
-  hmap_init(rename_denied_keys, rename_denied_values, rename_denied_used, rename_denied_count);
+  hash_map_initialize(rename_denied_keys, rename_denied_values, rename_denied_used, rename_denied_count);
 } chain (string rename_words_directory, string[] rename_word_keys, int[] rename_word_values, int[] rename_word_used, int[] rename_word_count) {
   string rename_denied_text = fs_read_text(path_join(rename_words_directory, "denied.txt"));
   string rename_vocabulary_words = fs_read_text(path_join(rename_words_directory, "english.txt"));
@@ -45,8 +45,8 @@ rename_load_words(string rename_words_directory, string[] rename_word_keys, int[
   rename_put_words_except(rename_vocabulary_words, rename_word_keys, rename_word_values, rename_word_used, rename_word_count, rename_denied_keys, rename_denied_used);
   rename_load_extra(rename_words_directory, rename_word_keys, rename_word_values, rename_word_used, rename_word_count);
 } return void;
-given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "alpha"):(1)
-given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "beta"):(0)
-given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "gamma"):(1)
-given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hmap_has((import rename_test_word_keys), (import rename_test_word_used), "an"):(1)
-given rename_test_words_empty ("/nonexistent/rename_words", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("/nonexistent/rename_words") then hmap_count((import rename_test_word_count)):(0)
+given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "alpha"):(1)
+given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "beta"):(0)
+given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "gamma"):(1)
+given rename_test_words_empty given rename_test_four_lists (".", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(".") then hash_map_has((import rename_test_word_keys), (import rename_test_word_used), "an"):(1)
+given rename_test_words_empty ("/nonexistent/rename_words", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):("/nonexistent/rename_words") then hash_map_count((import rename_test_word_count)):(0)

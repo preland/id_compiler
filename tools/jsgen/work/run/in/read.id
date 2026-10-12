@@ -36,7 +36,7 @@ given jg_t_proj ([(import jg_t_wasm), "", "", "", "", ""], [[], [], [], []], [])
 jg_read_nat(string[] jg_cf, string[][] jg_in, string[] jg_errs) {
   if (len(jg_errs) == 0 && jg_cf[(import jg_c_nat)] != "" && fs_exists(jg_cf[(import jg_c_nat)]) == 1) {
     string jg_tx = fs_read_text(jg_cf[(import jg_c_nat)]);
-    lst_str_extend(jg_in[3], jg_nat_rows(jg_tx));
+    list_string_extend(jg_in[3], jg_nat_rows(jg_tx));
   }
 } return void;
 given jg_t_proj (["", "", (import jg_t_map), "", "", ""], [[], [], [], []], []):(["", "", (import jg_t_map), "", "", ""], [[], [], [], [(import jg_t_row)]], [])

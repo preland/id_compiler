@@ -24,7 +24,7 @@ ms_lt_cases(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
   int ms_i = 0;
 } chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
   while(ms_i < len(ms_lns)) {
-    lst_str_extend(ms_o, ms_lt_pick(ms_lns[ms_i], ms_ln0 + ms_i));
+    list_string_extend(ms_o, ms_lt_pick(ms_lns[ms_i], ms_ln0 + ms_i));
     ms_i = ms_i + 1;
   }
 } return string[] ms_o;

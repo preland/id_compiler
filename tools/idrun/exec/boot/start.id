@@ -24,8 +24,8 @@ given vb_pools ():() then (import ex_llock):([0])
 // ld_call and ld_calld read where the arguments of a call end, so a check of
 // one entry alone would repeat their own read.
 vm_argp_text() {
-  string vm_argp_t = lst_text((import ex_argp), ",");
+  string vm_argp_t = list_text((import ex_argp), ",");
   string vm_argp_s = "args " + len((import ex_argp)) + ":" + vm_argp_t;
 } return string vm_argp_s;
 given vb_boot ():("args 0:")
-given vb_boot given lst_extend((import ex_argp), [5]) ():("args 1:5")
+given vb_boot given list_extend((import ex_argp), [5]) ():("args 1:5")

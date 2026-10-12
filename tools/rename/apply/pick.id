@@ -4,7 +4,7 @@
 
 // The new name for a name, or "" when the map does not mention it.
 rename_pick(string rename_name, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, string[] rename_table_news) {
-  int rename_slot = hmap_get(rename_table_keys, rename_table_values, rename_table_used, rename_name, -1);
+  int rename_slot = hash_map_get(rename_table_keys, rename_table_values, rename_table_used, rename_name, -1);
   string rename_chosen = "";
   if(rename_slot >= 0) {
     rename_chosen = rename_table_news[rename_slot];

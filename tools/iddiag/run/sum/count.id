@@ -29,7 +29,7 @@ dg_codes(string[] dg_cd_b) {
 
 dg_code_add(string[] dg_ca_o, string dg_ca_h) {
   string dg_ca_c = dg_code(dg_ca_h);
-  if(dg_ca_c != "" && lst_str_index(dg_ca_o, dg_ca_c) < 0) {
+  if(dg_ca_c != "" && list_string_index(dg_ca_o, dg_ca_c) < 0) {
     push(dg_ca_o, dg_ca_c);
   }
 } return void;

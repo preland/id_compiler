@@ -5,24 +5,24 @@
 
 // Fills an empty table with the names of a list, each with its position.
 rename_index_table(string[] rename_names, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, int[] rename_table_count) {
-  hmap_init(rename_table_keys, rename_table_values, rename_table_used, rename_table_count);
+  hash_map_initialize(rename_table_keys, rename_table_values, rename_table_used, rename_table_count);
   int rename_at = 0;
   while(rename_at < len(rename_names)) {
-    hmap_put(rename_table_keys, rename_table_values, rename_table_used, rename_table_count, rename_names[rename_at], rename_at);
+    hash_map_put(rename_table_keys, rename_table_values, rename_table_used, rename_table_count, rename_names[rename_at], rename_at);
     rename_at = rename_at + 1;
   }
 } return void;
-given rename_test_words_empty (["a", "b"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["a", "b"]) then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "b", -1):(1)
-given rename_test_words_empty ([], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):([]) then hmap_count((import rename_test_word_count)):(0)
+given rename_test_words_empty (["a", "b"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["a", "b"]) then hash_map_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "b", -1):(1)
+given rename_test_words_empty ([], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):([]) then hash_map_count((import rename_test_word_count)):(0)
 
 // Fills an empty table with the names of a list, each counted zero times.
 rename_seed_counts(string[] rename_names, string[] rename_table_keys, int[] rename_table_values, int[] rename_table_used, int[] rename_table_count) {
-  hmap_init(rename_table_keys, rename_table_values, rename_table_used, rename_table_count);
+  hash_map_initialize(rename_table_keys, rename_table_values, rename_table_used, rename_table_count);
   int rename_at = 0;
   while(rename_at < len(rename_names)) {
-    hmap_put(rename_table_keys, rename_table_values, rename_table_used, rename_table_count, rename_names[rename_at], 0);
+    hash_map_put(rename_table_keys, rename_table_values, rename_table_used, rename_table_count, rename_names[rename_at], 0);
     rename_at = rename_at + 1;
   }
 } return void;
-given rename_test_words_empty (["a", "b"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["a", "b"]) then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "b", -1):(0)
-given rename_test_words_empty (["a", "a"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["a", "a"]) then hmap_count((import rename_test_word_count)):(1)
+given rename_test_words_empty (["a", "b"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["a", "b"]) then hash_map_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "b", -1):(0)
+given rename_test_words_empty (["a", "a"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count)):(["a", "a"]) then hash_map_count((import rename_test_word_count)):(1)

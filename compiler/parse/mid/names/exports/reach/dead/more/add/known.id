@@ -7,7 +7,7 @@
 rfx_fn(string name) {
   int rfm = 0 - 2 - len((import fnames));
   int ok = 0;
-  if(hmap_get((import rfxk), (import rfxv), (import rfxu), name, 0 - 1) != rfm) {
+  if(hash_map_get((import rfxk), (import rfxv), (import rfxu), name, 0 - 1) != rfm) {
     ok = rfx_scan(name, rfm);
   }
 } return int ok;
@@ -18,7 +18,7 @@ rfx_scan(string name, int rfm) {
   int ok = 1;
   if(find_str((import fnames), name) < 0) {
     ok = 0;
-    hmap_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, rfm);
+    hash_map_put((import rfxk), (import rfxv), (import rfxu), (import rfxc), name, rfm);
   }
 } return int ok;
 given seed_given_fixture ("fx_target", -3):(1)

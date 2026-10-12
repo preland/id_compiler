@@ -20,7 +20,7 @@ sm_delta(string sm_tok, string sm_open, string sm_close) {
 
 // 1 when a statement whose first token is sm_t[sm_s] may be a function definition, which ends at its closing brace; 0 when it starts with typedef, struct, union or enum, whose braces are followed by a name or a semicolon.
 sm_body(string[] sm_t, int sm_s) {
-  int sm_b = lst_str_index(["typedef", "struct", "union", "enum"], sm_t[sm_s]) < 0;
+  int sm_b = list_string_index(["typedef", "struct", "union", "enum"], sm_t[sm_s]) < 0;
 } return int sm_b;
 (["int", "f"], 0):(1)
 (["x", "typedef"], 1):(0)

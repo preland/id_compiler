@@ -18,7 +18,7 @@ dg_t_std() {
 ():() then len((import dg_comp)):(3)
 
 dg_dirty_last() {
-  string dgn_t = "dirty " + (lst_last((import dg_dirty)));
+  string dgn_t = "dirty " + (list_last((import dg_dirty)));
 } return string dgn_t;
 given dg_t_scc ():("dirty 1")
 given dg_t_built ():("dirty 1")

@@ -5,13 +5,13 @@ rename_test_seeded() {
   rename_test_words_empty();
   rename_seed_counts(["alpha", "beta"], (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count));
 } return void;
-given rename_test_seeded ():() then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(0)
-given rename_test_seeded ():() then hmap_count((import rename_test_word_count)):(2)
+given rename_test_seeded ():() then hash_map_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(0)
+given rename_test_seeded ():() then hash_map_count((import rename_test_word_count)):(2)
 
 // The same table after counting the text `alpha beta alpha`: alpha twice, beta once.
 rename_test_clashing() {
   rename_test_seeded();
   rename_count_names("alpha beta alpha", (import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), (import rename_test_word_count));
 } return void;
-given rename_test_clashing ():() then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(2)
-given rename_test_clashing ():() then hmap_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "beta", -1):(1)
+given rename_test_clashing ():() then hash_map_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "alpha", -1):(2)
+given rename_test_clashing ():() then hash_map_get((import rename_test_word_keys), (import rename_test_word_values), (import rename_test_word_used), "beta", -1):(1)

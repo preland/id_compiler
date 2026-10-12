@@ -2,7 +2,7 @@
 // it first had, and a later value replaces the earlier one.
 
 jg_put(string[] jg_ks, string[] jg_vs, string jg_kk, string jg_vv) {
-  int jg_at = lst_str_index(jg_ks, jg_kk);
+  int jg_at = list_string_index(jg_ks, jg_kk);
   if (jg_at >= 0) {
     jg_vs[jg_at] = jg_vv;
   } else {

@@ -28,7 +28,7 @@ full_env() {
 // span_pad's own cases -- both are void and tspan is an imported list, not an
 // argument a case can read back.
 last_tspan() {
-  string ret_i_t = "tspan " + (lst_last((import tspan)));
+  string ret_i_t = "tspan " + (list_last((import tspan)));
 } return string ret_i_t;
 given mk_span("5") ():("tspan 5")
 given mk_span("9") ():("tspan 9")

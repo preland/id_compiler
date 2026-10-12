@@ -41,7 +41,7 @@ given case_unit_fixture (1):(1)
 // casefn unconditionally.
 unit_excluded(int ci) {
   int r = 0;
-  if(len((import exclunit)) > 0 && lst_find((import exclunit), (import nunit)[(import casefn)[ci]]) == 1) {
+  if(len((import exclunit)) > 0 && list_find((import exclunit), (import nunit)[(import casefn)[ci]]) == 1) {
     r = 1;
   }
 } return int r;

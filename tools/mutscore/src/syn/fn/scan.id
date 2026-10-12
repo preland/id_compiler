@@ -10,7 +10,7 @@ ms_fn_take(string ms_s, int[] ms_tk, int ms_t, int ms_h, int[] ms_fs) {
 } chain (string ms_s, int[] ms_tk, int ms_t, int ms_h, int[] ms_fs) {
   if(ms_r >= 0) {
     ms_e = ms_fn_semi(ms_s, ms_tk, ms_r);
-    lst_extend(ms_fs, [ms_t, ms_h + 1, ms_r, ms_e]);
+    list_extend(ms_fs, [ms_t, ms_h + 1, ms_r, ms_e]);
   }
 } return int ms_e;
 given ms_t_lex("f() {} return int 0;") ("f() {} return int 0;", (import ms_t_tk), 0, 4, []):(8)

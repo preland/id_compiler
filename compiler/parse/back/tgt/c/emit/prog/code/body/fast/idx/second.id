@@ -19,7 +19,7 @@ given lpq_cs(6) ((import lpq_ju), (import lpq_xu), (import lpq_lou), (import lpq
 lx_dec(int lg_f, int lg_id, int lg_lo, int lg_hi) {
   int lg_r = 0;
   if(lg_f < lg_id && (import ns1)[lg_f] == "int" && (import ni2)[lg_f] == 0) {
-    lg_r = lst_find((import nl1)[lg_hi + 1], lg_f);
+    lg_r = list_find((import nl1)[lg_hi + 1], lg_f);
   }
 } return int lg_r;
 given lpq_cs(1) ((import lpq_dv), (import lpq_xv), (import lpq_lov), (import lpq_hiv)):(1)

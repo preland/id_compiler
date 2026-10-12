@@ -9,13 +9,13 @@ given mk_two_nodes (1):(1)
 // The token index push_pos stamps a new node with, and the -1 it always
 // gives the node's first-token slot (only a statement fills that in).
 last_ntok() {
-  string ret_i_t = "ntok " + (lst_last((import ntok)));
+  string ret_i_t = "ntok " + (list_last((import ntok)));
 } return string ret_i_t;
 given mk_curtk(5) ():("ntok 5")
 given mk_curtk(9) ():("ntok 9")
 
 last_nst() {
-  string ret_i_t = "nst " + (lst_last((import nst)));
+  string ret_i_t = "nst " + (list_last((import nst)));
 } return string ret_i_t;
 given mk_curtk(5) ():("nst -1")
 given mk_curtk(9) ():("nst -1")

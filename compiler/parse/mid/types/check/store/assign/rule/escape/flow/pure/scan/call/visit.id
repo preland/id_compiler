@@ -11,7 +11,7 @@ given pure_fix_prog ((import pfx_cg), (import pfx_fa)):() then (import chkfail)[
 given pure_fix_prog ((import pfx_ch), (import pfx_fa)):() then (import chkfail)[0]:(0)
 
 pure_callee(int id, int fn) {
-  if(lst_find((import purenode), fn) == 1) {
+  if(list_find((import purenode), fn) == 1) {
     pure_report(id, fn, pure_kind((import ns1)[id], fn));
   }
 } return void;

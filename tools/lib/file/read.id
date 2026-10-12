@@ -32,7 +32,7 @@ file_into(string path, int[] out) {
 // many times fs_read is called.
 file_pump(int h, int[] out) {
   int[] buf = [];
-  lst_fill(buf, (import file_chunk), 0);
+  list_fill(buf, (import file_chunk), 0);
   file_loop(h, buf, out);
 } return void;
 (-1, []):(-1, [])

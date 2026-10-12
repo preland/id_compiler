@@ -13,7 +13,7 @@ dg_nat_class(int dgf, string dgnm) {
     dgc = 1;
   } else if(is_native((import prog)[dgf]) == 1) {
     dgc = 1;
-    if(lst_str_index((import cache_file_natives), dgnm) >= 0 || lst_str_index((import cache_taint_natives), dgnm) >= 0) {
+    if(list_string_index((import cache_file_natives), dgnm) >= 0 || list_string_index((import cache_taint_natives), dgnm) >= 0) {
       dgc = 2;
     }
   }
