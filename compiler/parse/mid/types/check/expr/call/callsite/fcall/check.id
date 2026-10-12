@@ -32,5 +32,7 @@ fcall_args(int id, string vt, string[] pts) {
     i = i + 1;
   }
 } return void;
+given argfn_narrow_call ((import argfn_call_narrow), "func(int) return int", ["int"]):() then (import chkfail)[0]:(1)
+given h_call_match ((import h_call_1), "func(int) return int", ["int"]):() then calls fcall_arg_at:((import h_call_1), "func(int) return int", ["int"], 0)
 given h_call_match ((import h_call_1), "func(int) return int", ["int"]):() then calls fcall_arg_at:[1]
 given h_call_mismatch ((import h_call_0), "func() return int", []):() then calls fcall_arg_at:[0]

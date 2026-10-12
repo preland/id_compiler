@@ -27,5 +27,7 @@ farm_h() {
   push((import prog), (import f_fwd1));
   push((import pfile), "test.id");
 } return void;
+():() then (import pfile)[0]:("test.id")
+():() then len((import prog)):(1)
 ():() then calls farm_g:[1]
 ():() then init_units:(0)

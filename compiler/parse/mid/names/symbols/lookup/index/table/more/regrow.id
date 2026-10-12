@@ -3,6 +3,8 @@ regrow_a() {
   init_reg();
   push((import dvfunc), "f");
 } return void;
+():() then (import dvfunc)[0]:("f")
+():() then len((import dvfunc)):(1)
 ():() then calls env_init:[1]
 ():() then init_units:(0)
 

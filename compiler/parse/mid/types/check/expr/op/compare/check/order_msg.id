@@ -5,6 +5,8 @@ farm_j() {
   export int f_main = node_func("main", "int", (import f_none), (import f_none), 0 - 1);
   push((import prog), (import f_main));
 } return void;
+given farm_i ():() then calls node_func:("main", "int", (import f_none), (import f_none), -1)
+():() then len((import prog)):(2)
 ():() then calls farm_i:[1]
 ():() then init_units:(0)
 
@@ -17,6 +19,8 @@ farm_k() {
   farm_j4();
   uq_fill();
 } return void;
+():() then len((import cfp)):(3)
+():() then (import cfp)[0]:("|(int 0)->int=>v1{d:int 1=c(target:v0)}")
 ():() then calls farm_j4:[1]
 ():() then init_units:(0)
 

@@ -18,6 +18,7 @@ sv_loaded(int sv_r, int sv_j) {
   }
 } return void;
 given sv_fx("string") (0, 1):() then calls sv_report:(0, "string", "<stdin>:20")
+given sv_fx("string") (1, 0):() then calls sv_report:(1, "int", "<stdin>:10")
 given sv_fx("int") (0, 1):() then calls sv_report:[0]
 
 sv_ext(int sv_r) {
@@ -27,4 +28,5 @@ sv_ext(int sv_r) {
   }
 } return void;
 given sv_xfx("string") (0):() then calls sv_report:(0, "string", "lib.id:7")
+given sv_xfx("float") (0):() then calls sv_report:(0, "float", "lib.id:7")
 given sv_xfx("int") (0):() then calls sv_report:[0]

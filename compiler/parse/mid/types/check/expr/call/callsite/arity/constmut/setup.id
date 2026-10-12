@@ -16,5 +16,7 @@ chk_bi_nonbuiltin_setup() {
   cm_other_setup();
   init_rtc();
 } return void;
+():() then (import lvc)[0]:(1)
+():() then calls node_txt:("var", "x")
 ():() then calls cm_other_setup:[1]
 ():() then init_units:(0)

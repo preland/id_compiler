@@ -5,6 +5,8 @@ chk_bi_args(int id) {
     i = i + 1;
   }
 } return void;
+given bi_mismatch_setup ((import bi_mismatch_call)):() then calls bi_arg_err:((import bi_mismatch_call), 0, "list", "int")
+given call2_setup ((import cm_push_call)):() then calls chk_bi_arg:((import cm_push_call), 1)
 given call2_setup ((import cm_push_call)):() then calls chk_bi_arg:[2]
 given bi_mismatch_setup ((import bi_mismatch_call)):() then calls chk_bi_arg:[1]
 

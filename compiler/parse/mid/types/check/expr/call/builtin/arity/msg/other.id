@@ -5,6 +5,8 @@ farm_e() {
   sym_func((import f_fwd1));
   export int f_if = node_if((import f_argv), (import f_none), (import f_none), 0);
 } return void;
+given farm_d ():() then calls node_if:((import f_argv), (import f_none), (import f_none), 0)
+given farm_d ():() then calls sym_func:((import f_fwd1))
 ():() then calls farm_d:[1]
 ():() then init_units:(0)
 

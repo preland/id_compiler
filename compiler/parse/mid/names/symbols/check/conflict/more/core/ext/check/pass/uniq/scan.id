@@ -11,7 +11,7 @@ ext_uniq_pass() {
     xe_r = xe_r + 1;
   }
 } return void;
-given ixw_fx stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 2\nop )\nop :\nop (\nint 3\nop )\nline 6\nline 7\nident fb\nop (\nkw int\nident b\nop )\nop {\nline 8\nkw int\nident t\nop =\nident fa\nop (\nident b\nop )\nop ;\nline 9\nkw int\nident u\nop =\nident t\nop +\nop (\nkw import\nident gx\nop )\nop ;\nline 10\nop }\nkw return\nkw int\nident u\nop ;\nline 11\nkw given\nident fa_setup\nop (\nint 1\nop )\nop :\nop (\nint 4\nop )\nline 12\nline 13\nident fa_setup\nop (\nop )\nop {\nline 14\nkw export\nkw int\nident gx\nop =\nint 3\nop ;\nline 15\nop }\nkw return\nkw void\nop ;\nline 16\neof\n" ():() then calls ext_uniq_at:[3]
+given ixw_fx stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\nop (\nint 1\nop )\nop :\nop (\nint 2\nop )\nline 5\nop (\nint 2\nop )\nop :\nop (\nint 3\nop )\nline 6\nline 7\nident fb\nop (\nkw int\nident b\nop )\nop {\nline 8\nkw int\nident t\nop =\nident fa\nop (\nident b\nop )\nop ;\nline 9\nkw int\nident u\nop =\nident t\nop +\nop (\nkw import\nident gx\nop )\nop ;\nline 10\nop }\nkw return\nkw int\nident u\nop ;\nline 11\nkw given\nident fa_setup\nop (\nint 1\nop )\nop :\nop (\nint 4\nop )\nline 12\nline 13\nident fa_setup\nop (\nop )\nop {\nline 14\nkw export\nkw int\nident gx\nop =\nint 3\nop ;\nline 15\nop }\nkw return\nkw void\nop ;\nline 16\neof\n" ():() then calls ext_uniq_at:[3] then calls ext_uniq_at:(2)
 given ixw_fx stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" ():() then calls ext_uniq_at:(0)
 
 ext_uniq_at(int xe_r) {
@@ -21,6 +21,7 @@ ext_uniq_at(int xe_r) {
     ext_uniq_hit(xe_r, (import ext_cfe)[xe_x]);
   }
 } return void;
+given ixw_fx given ext_line("F\tlib\tg\t8") given ext_line("P\tother") given ext_line("F\tlib\tf\t7") given ext_line("P\t36:-26173762752150447:4987494224040662966") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0):() then calls ext_uniq_hit:(0, 1)
 given ixw_fx given ext_line("F\tlib\tf\t7") given ext_line("P\t36:-26173762752150447:4987494224040662966") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0):() then calls ext_uniq_hit:(0, 0)
 given ixw_fx given ext_line("F\tlib\tf\t7") given ext_line("P\tother") stdin "file 0|x.id\nline 1\nident fa\nop (\nkw int\nident a\nop )\nop {\nline 2\nkw int\nident s\nop =\nident a\nop +\nint 1\nop ;\nline 3\nop }\nkw return\nkw int\nident s\nop ;\nline 4\neof\n" (0):() then calls ext_uniq_hit:[0]
 

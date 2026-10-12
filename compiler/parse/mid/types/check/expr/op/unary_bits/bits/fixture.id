@@ -6,6 +6,8 @@ iassign_build() {
   idx_build();
   export int idx_iassign_node = node_iassign((import idx_fix), (import lit_b));
 } return void;
+given idx_build ():() then calls node_iassign:((import idx_fix), (import lit_b))
+given idx_build ():() then calls node_index:((import arr_ints), (import lit_a))
 ():() then calls idx_build:[1]
 ():() then init_units:(0)
 
@@ -13,6 +15,8 @@ push_build() {
   idx_build();
   export int push_call = node_call("push", [(import arr_ints), (import lit_a)]);
 } return void;
+given idx_build ():() then calls node_call:("push", [(import arr_ints), (import lit_a)])
+given idx_build ():() then calls node_call:("pop", [(import arr_ints)])
 ():() then calls idx_build:[1]
 ():() then init_units:(0)
 

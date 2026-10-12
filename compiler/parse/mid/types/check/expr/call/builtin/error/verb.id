@@ -8,6 +8,8 @@ farm_f() {
   export int f_weird = node_func("weird", "int", [(import f_pa)], [(import f_if)], 0 - 1);
   export int f_exprstmt = node_exprstmt((import f_call));
 } return void;
+given farm_e ():() then calls node_func:("weird", "int", [(import f_pa)], [(import f_if)], -1)
+given farm_e ():() then calls node_exprstmt:((import f_call))
 ():() then calls farm_e:[1]
 ():() then init_units:(0)
 

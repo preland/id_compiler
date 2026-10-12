@@ -9,6 +9,8 @@ bind_fixture() {
 } chain () {
   bind_names();
 } return void;
+():() then calls add_var:("cv", "func(int) return int", 0)
+():() then calls node_txt:("var", "fx_target")
 ():() then calls fn_idx_fixture:[1]
 ():() then init_units:(0)
 

@@ -7,6 +7,8 @@ cmp_fixture() {
   cmp_build();
   cmp_build2();
 } return void;
+given composite_fixture ():() then calls node_txt2:("bin", "==", (import lit_a), (import lit_b))
+given composite_fixture ():() then calls node_txt2:("bin", "&", (import lit_a), (import lit_b))
 ():() then calls composite_fixture:[1]
 ():() then init_units:(0)
 

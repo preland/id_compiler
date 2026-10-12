@@ -9,6 +9,8 @@ farm_i() {
   push((import pline), 7);
   export int f_other = node_func("other", "int", [(import f_pb)], (import f_none), 0 - 1);
 } return void;
+():() then (import pline)[0]:(7)
+given farm_h ():() then calls node_func:("other", "int", [(import f_pb)], (import f_none), -1)
 ():() then calls farm_h:[1]
 ():() then init_units:(0)
 
@@ -29,5 +31,7 @@ fnret_fixture() {
   int[] none = [];
   export int fnret_bad = node_func("badret", "func(int) return int", none, none, (import fixture_zero));
 } return void;
+given fn_fixture ():() then calls node_func:("badret", "func(int) return int", [], [], (import fixture_zero))
+():() then calls fn_fixture:()
 ():() then calls fn_fixture:[1]
 ():() then init_units:(0)

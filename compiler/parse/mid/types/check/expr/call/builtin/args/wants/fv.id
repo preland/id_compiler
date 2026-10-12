@@ -9,6 +9,8 @@ fv_bi_args(int id) {
     i = i + 1;
   }
 } return void;
+given fv_fixture ((import fv_pos_call)):() then (import chkfail)[0]:(1)
+given call2_setup ((import cm_push_call)):() then calls fv_bi_arg:((import cm_push_call), 1)
 given call2_setup ((import cm_push_call)):() then calls fv_bi_arg:[2]
 given fv_fixture ((import fv_pos_call)):() then calls fv_bi_arg:[1]
 

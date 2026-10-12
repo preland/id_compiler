@@ -18,7 +18,7 @@ ext_put_imd(string[] xe_f) {
   hash_map_put((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "i:" + xe_f[1], xe_at);
 } return void;
 given env_init given ext_line("F\tfoo\tf\t3") (["I", "kk", "g"]):() then (import ext_inm)[0]:("g")
-given env_init given ext_line("F\tfoo\tf\t3") (["I", "kk", "g"]):() then calls hash_map_put:[1]
+given env_init given ext_line("F\tfoo\tf\t3") (["I", "kk", "g"]):() then calls hash_map_put:[1] then calls hash_map_put:((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "i:kk", 0)
 
 ext_put_loaded(string[] xe_f) {
   string[] xe_names = str_split(xe_f[1], " ");
@@ -28,5 +28,5 @@ ext_put_loaded(string[] xe_f) {
     xe_j = xe_j + 1;
   }
 } return void;
-given env_init (["L", "a b"]):() then calls hash_map_put:[2]
-given env_init (["L", "a"]):() then calls hash_map_put:[1]
+given env_init (["L", "a b"]):() then calls hash_map_put:[2] then calls hash_map_put:((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "l:b", 1)
+given env_init (["L", "a"]):() then calls hash_map_put:[1] then calls hash_map_put:((import ext_mk), (import ext_mv), (import ext_mu), (import ext_mc), "l:a", 1)

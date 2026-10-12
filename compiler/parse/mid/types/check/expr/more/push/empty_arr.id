@@ -36,6 +36,8 @@ arr_marks() {
     i = i + 1;
   }
 } return void;
+given decltype_fixture ():() then calls lset:((import arrmark), (import lit_a), 1)
+given decltype_fixture ():() then len((import arrmark)):(7)
 given decltype_fixture ():() then calls lset:[1]
 given leaves_fixture ():() then calls lset:[0]
 

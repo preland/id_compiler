@@ -22,5 +22,7 @@ scopes_fixture() {
   init_rtc();
   ut_mark();
 } return void;
+():() then (import pline)[0]:(7)
+():() then (import lvc)[0]:(1)
 ():() then calls edge_fixture:[1]
 ():() then init_units:(0)

@@ -13,6 +13,8 @@ chk_argtypes(int id, int fn) {
     i = i + 1;
   }
 } return void;
+given argfn_narrow_call ((import argfn_call_narrow), (import argfn_fn)):() then (import chkfail)[0]:(1)
+given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then calls chk_arg_at:((import argfn_call_match), (import argfn_fn), 0)
 given argfn_match_call ((import argfn_call_match), (import argfn_fn)):() then calls chk_arg_at:[1]
 given argfn_mismatch_call ((import argfn_call_mismatch), (import argfn_fn)):() then calls chk_arg_at:[0]
 

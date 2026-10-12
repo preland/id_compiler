@@ -25,6 +25,7 @@ sv_row(int sv_r) {
   }
 } return void;
 given sv_fx("string") (0):() then calls sv_find:(0)
+given sv_xfx("string") (0):() then calls sv_find:(0)
 given sv_fx("string") (1):() then calls sv_find:[0]
 
 sv_mine(int sv_r) {
