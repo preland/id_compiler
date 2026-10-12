@@ -10,7 +10,7 @@ emit_rec_call(int id) {
   }
 } return void;
 given call_fixture ((import fixture_fn)):() then prints:("    idtc_rec_fx_target(x);\n")
-given call_fixture ((import fixture_fn)):() then calls emit_rec_call_line:[1]
+given call_fixture ((import fixture_fn)):() then calls emit_rec_call_line:((import fixture_fn), "fx_target")
 given call_fixture ((import fixture_zero)):() then prints:("")
 
 emit_rec_call_line(int id, string nm) {
@@ -28,5 +28,6 @@ call_fixture() {
   harn_init();
   lset((import harn), 0, 1);
 } return void;
-():() then calls calls_node_fixture:[1]
+():() then (import harn)[0]:(1)
 ():() then init_units:(0)
+():() then calls calls_node_fixture:[1]

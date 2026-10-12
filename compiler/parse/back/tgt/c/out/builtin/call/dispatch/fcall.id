@@ -10,8 +10,9 @@ lz_empty() {
   uq_fill();
   imd_fill();
 } return void;
-():() then calls fwd_env:[1]
+():() then len((import imd_tab)):(0)
 ():() then init_units:(0)
+():() then calls fwd_env:[1]
 
 emit_fcall(int id) {
   int[] l1_of_v = (import nl1)[id];

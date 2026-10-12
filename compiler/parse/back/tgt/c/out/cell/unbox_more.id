@@ -9,8 +9,9 @@ fix_env2() {
   push((import fixd_nm), "foo");
   push((import fixd_ty), "string");
 } return void;
-():() then calls fix_fixture:[1]
+():() then (import fixd_nm)[0]:("foo")
 ():() then init_units:(0)
+():() then calls fix_fixture:[1]
 
 // A second asm row sharing asmfx_setup's own name "foo", for asm_first's
 // (../../emit/asm/def/first_row.id) duplicate-row case -- no existing asm
@@ -21,6 +22,7 @@ asmfx_dup_fixture() {
   asmfx_setup();
   asmfx_push();
 } return void;
-():() then calls asmfx_setup:[1]
+():() then (import afname)[1]:("foo")
 ():() then init_units:(0)
+():() then calls asmfx_setup:[1]
 

@@ -11,8 +11,9 @@ call_env_fixture() {
   init_bnames();
   init_idx();
 } return void;
-():() then calls env_init:[1]
+():() then (import bnames)[0]:("print")
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 call_int_fixture() {
   call_env_fixture();
@@ -30,5 +31,6 @@ call_args_fixture() {
   export int[] call_args = [(import call_e1), (import call_e2)];
   export int[] call_args_rev = [(import call_e2), (import call_e1)];
 } return void;
-():() then calls call_int_fixture:[1]
+():() then len((import call_args)):(2)
 ():() then init_units:(0)
+():() then calls call_int_fixture:[1]

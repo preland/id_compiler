@@ -43,7 +43,7 @@ emit_tc_rest() {
 } chain () {
   emit_tc_graph();
 } return void;
-given env_init ():() then calls emit_tc_setup:[1] then calls claim_body:[1] then calls emit_tc_graph:[1]
+given env_init ():() then calls emit_tc_setup:() then calls claim_body:() then calls emit_tc_graph:()
 given env_init ():() then (import chkfail)[0]:(0)
 
 // idtc_graph, which the entry point calls first: each case's component and

@@ -22,6 +22,8 @@ emit_tests_maybe(int argc, string[] argv) {
     emit_tests(build_host_v);
   }
 } return void;
+given env_init (1, ["prog"]):() then (import harn)[0]:(0)
+given env_init given build_host_fixture2 (2, ["prog", "--harness"]):() then calls emit_tests:("wasm32-unknown-unknown")
 given env_init (1, ["prog"]):() then calls harn_init:[1] then calls emit_tests:[0]
 given env_init (3, ["prog", "a", "b"]):() then calls harn_init:[1] then calls emit_tests:[0]
 

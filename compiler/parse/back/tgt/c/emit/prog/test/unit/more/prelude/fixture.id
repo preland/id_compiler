@@ -8,8 +8,9 @@ one_casefn_fixture() {
   env_init();
   push((import casefn), 0);
 } return void;
-():() then calls env_init:[1]
+():() then (import casefn)[0]:(0)
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 // What ../head.id's emit_test_body needs beyond env_init: the asm tables
 // (init_asm_all), empty, so emit_asm_then_main's two loops -- over asm
@@ -20,8 +21,9 @@ test_body_fixture() {
   init_asm_all();
   harn_init();
 } return void;
-():() then calls env_init:[1]
+():() then (import harn)[0]:(0)
 ():() then init_units:(0)
+():() then calls env_init:[1]
 
 // One casefn entry at unit 0 (fn_lo) and one at unit 5 (fn_hi). The boundary
 // is set to 6 (past fn_hi's own unit) and --exclude-units names fn_hi's

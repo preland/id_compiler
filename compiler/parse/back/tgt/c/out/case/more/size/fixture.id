@@ -7,15 +7,17 @@ lit_arr_fixture() {
   int[] xs = [(import lit_e), (import lit_e2)];
   export int lit_arr_e = newnode("arr", 0, 0, "", "", xs, xs);
 } return void;
-():() then calls lit_int_fixture:[1]
+given lit_int_fixture ():() then calls newnode:("arr", 0, 0, "", "", [(import lit_e), (import lit_e2)], [(import lit_e), (import lit_e2)])
 ():() then init_units:(0)
+():() then calls lit_int_fixture:[1]
 
 lit_cells_fixture() {
   lit_int_fixture();
   export int[] lit_cells_xs = [(import lit_e), (import lit_e2)];
 } return void;
-():() then calls lit_int_fixture:[1]
+():() then len((import lit_cells_xs)):(2)
 ():() then init_units:(0)
+():() then calls lit_int_fixture:[1]
 
 // A `(import NAME)` case argument, as the node the parser builds for it
 // (front/parse/decl/func/cases/case/given/elem/cimport.id): a "cimport" leaf

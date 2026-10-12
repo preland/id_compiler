@@ -18,8 +18,9 @@ lit_un_fixture() {
   export int lit_un_dbl = newleaf("un", (import lit_un_e), 0, "-", "");
   export int lit_un_cpl = newleaf("un", (import lit_e), 0, "~", "");
 } return void;
-():() then calls lit_int_fixture:[1]
+given lit_int_fixture ():() then calls newleaf:("un", (import lit_e), 0, "~", "")
 ():() then init_units:(0)
+():() then calls lit_int_fixture:[1]
 
 // A string leaf, for the emitters that read a "str" node's text rather than
 // a number.
