@@ -23,5 +23,6 @@ call_fix() {
   int[] args = [0, 1];
   int e3 = newnode("call", 0, 0, "foo", "", args, args);
 } return void;
+():() then calls newnode:("call", 0, 0, "foo", "", [0, 1], [0, 1])
 ():() then calls bin_fix:[1]
 ():() then init_units:(0)

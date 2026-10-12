@@ -32,6 +32,7 @@ lpf_base() {
 } chain () {
   sym_func(lpf_grow);
 } return void;
+():() then calls node_param:("param", "int", "lpfq")
 ():() then calls lpf_two:[1]
 ():() then init_units:(0)
 
@@ -48,6 +49,7 @@ lpf_la() {
   export int lpf_loa = (import ni1)[lpf_wa] + 1;
   export int lpf_hia = lpf_wa - 1;
 } return void;
+():() then calls lpf_inc:("laj", 1)
 ():() then calls lpf_base:[1]
 ():() then init_units:(0)
 
@@ -67,5 +69,6 @@ lpf_lb() {
   export int lpf_lob = (import ni1)[lpf_wb] + 1;
   export int lpf_hib = lpf_wb - 1;
 } return void;
+():() then calls lpf_term:("+", "lbj", 1)
 ():() then calls lpf_la:[1]
 ():() then init_units:(0)

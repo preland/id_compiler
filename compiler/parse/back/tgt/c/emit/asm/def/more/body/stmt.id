@@ -7,6 +7,8 @@ asm_stmt(int r) {
   string chr_v = chr(34);
   asm_stmt2(r, asm_text_v, chr_v);
 } return void;
+given llasm_row_fixture (0):() then prints:("    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+given casm_row2_fixture (1):() then prints:("    __asm__ __volatile__(\"nop\" : [out] \"=r\" (out) :  : \"memory\");\n    return out;\n}\n")
 given llasm_row_fixture (0):() then calls asm_stmt2:[1]
 given llasm_row2_fixture (0):() then calls asm_stmt2:[1]
 
@@ -15,6 +17,8 @@ asm_stmt2(int r, string asm_body_text, string asm_quote1) {
   string asm_in_text = asm_in_ops((import afparams)[r]);
   asm_stmt3(r, asm_body_text, asm_quote1, asm_quote2, asm_in_text);
 } return void;
+given llasm_row_fixture (0, "T", "Q"):() then prints:("    __asm__ __volatile__(T : [result] Q=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+given llasm_row_fixture (0, "U", "Z"):() then prints:("    __asm__ __volatile__(U : [result] Z=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
 given llasm_row_fixture (0, "T", "Q"):() then calls asm_stmt3:[1]
 given llasm_row_fixture (0, "U", "Z"):() then calls asm_stmt3:[1]
 

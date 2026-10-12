@@ -31,6 +31,7 @@ fold_blk(int f, int b) {
   }
 } return void;
 given cfg_fixture (0, 0):() then calls fold_one:(0, 0)
+given fold_cmp_fixture given ir_add(0, (import fcmp_row)) (0, 0):() then calls fold_one:(0, (import fcmp_row))
 given cfg_fixture (0, 1):() then calls fold_one:[0]
 
 fold_one(int f, int id) {
@@ -39,4 +40,5 @@ fold_one(int f, int id) {
   }
 } return void;
 given fold_cmp_fixture (0, (import fcmp_row)):() then calls fold_cmp:(0, (import fcmp_row))
+given fold_cmp_fixture (0, (import fmix_id)):() then calls fold_cmp:(0, (import fmix_id))
 given fold_cmp_fixture (0, (import fq_id)):() then calls fold_cmp:[0]

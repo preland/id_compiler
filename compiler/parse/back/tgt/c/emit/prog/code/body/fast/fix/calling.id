@@ -22,6 +22,7 @@ lpf_lg() {
   push((import prog), lpf_f2);
   sym_func(lpf_f2);
 } return void;
+():() then calls node_txt:("var", "lgn")
 ():() then calls lpf_g1:[1]
 ():() then init_units:(0)
 
@@ -48,5 +49,6 @@ lpf_lh() {
 } chain () {
   sym_func(lpf_f3);
 } return void;
+():() then calls node_txt:("var", "lhn")
 ():() then calls lpf_lg:[1]
 ():() then init_units:(0)

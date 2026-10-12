@@ -31,5 +31,7 @@ fold_true_setup() {
   export int ft_id = ir_insn("add", "int", c0, c0, "", none, none);
   export int fz_id = ir_insn("zext", "int", c0, 0, "", none, none);
 } return void;
+():() then (import ft_id):(1)
+():() then (import fz_id):(2)
 ():() then calls env_init:[1]
 ():() then init_units:(0)

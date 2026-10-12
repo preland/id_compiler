@@ -10,4 +10,5 @@ emit_asm_one(int r) {
   asm_stmt(r);
 } return void;
 given casm_row_fixture (0):() then prints:("int id_portout(int x) {\n    int result;\n    __asm__ __volatile__(\"mov %[x], $0\" \"\\n\\t\" \"ret\" : [result] \"=r\" (result) : [x] \"r\" (x) : \"memory\");\n    return result;\n}\n")
+given casm_row2_fixture (1):() then prints:("char* id_barrier() {\n    char* out;\n    __asm__ __volatile__(\"nop\" : [out] \"=r\" (out) :  : \"memory\");\n    return out;\n}\n")
 given casm_row2_fixture (1):() then calls asm_stmt:[1]

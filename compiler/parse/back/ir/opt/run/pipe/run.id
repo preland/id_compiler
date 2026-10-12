@@ -15,6 +15,7 @@ ir_opt(int lvl) {
   }
 } return void;
 given m2r_predfx (2):() then calls opt_func:(0, 2)
+given m2r_predfx (1):() then calls opt_func:(0, 1)
 given optfx_setup (3):() then calls opt_func:[0]
 
 opt_func(int f, int lvl) {
@@ -23,6 +24,7 @@ opt_func(int f, int lvl) {
   }
 } return void;
 given m2r_alloca_fixture (0, 1):() then calls opt_round:(0)
+given m2r_alloca_fixture (0, 2):() then calls opt_round:(0)
 given ir_rows (0, 0):() then calls opt_round:[0]
 
 opt_round(int f) {

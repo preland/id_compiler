@@ -17,6 +17,7 @@ lpf_lc() {
 } chain () {
   export int lpf_hic = lpf_wc - 1;
 } return void;
+():() then calls node_txt:("var", "lcn")
 ():() then calls lpf_lb:[1]
 ():() then init_units:(0)
 
@@ -33,6 +34,7 @@ lpf_ld() {
   export int lpf_lod = (import ni1)[lpf_wd] + 1;
   export int lpf_hid = lpf_wd - 1;
 } return void;
+():() then calls node_txt:("var", "ldn")
 ():() then calls lpf_lc:[1]
 ():() then init_units:(0)
 
@@ -49,5 +51,6 @@ lpf_le() {
   export int lpf_loe = (import ni1)[lpf_we] + 1;
   export int lpf_hie = lpf_we - 1;
 } return void;
+():() then calls node_txt:("var", "len2")
 ():() then calls lpf_ld:[1]
 ():() then init_units:(0)
