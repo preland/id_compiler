@@ -13,7 +13,7 @@
 //   * a string carries its length, so no runtime helper measures one any more
 //     and nothing is left to hook: `concat` charges both operands and `len`
 //     the string, as they always were, by being renamed out of the way before
-//     the runtime and redefined after it with the charge added. `charat` is
+//     the runtime and redefined after it with the charge added. `character_code_at` is
 //     one load and is not charged;
 //   * strlen is still hooked, for the one helper that reads a C buffer (input).
 //

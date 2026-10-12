@@ -5,7 +5,7 @@
 // writes that count (make/, store/arena/bridge.id), and the NUL stays after the
 // bytes for code that wants one.
 //
-// Which makes `len` one load, and `charat` O(1) however many strings are being
+// Which makes `len` one load, and `character_code_at` O(1) however many strings are being
 // walked at once: there is no memo to outgrow.
 
 len(string s) {

@@ -1,4 +1,4 @@
-// EXPECT: charat index must be int, got string
+// EXPECT: character_code_at index must be int, got string
 main(int argc, string[] argv) {
   string s = "hi";
   int c = character_code_at(s, "no");

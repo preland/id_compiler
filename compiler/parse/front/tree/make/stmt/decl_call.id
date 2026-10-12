@@ -14,9 +14,8 @@ given full_env ("param", "string", "b"):(0) then calls newleaf:("param", 0, 0, "
 
 node_call(string name, int[] args) {
   int[] none = [];
-  string alias_target = builtin_alias(name);
-  int ret_i = newnode("call", 0, 0, alias_target, "", args, none);
+  int ret_i = newnode("call", 0, 0, name, "", args, none);
 } return int ret_i;
-given full_env ("character_code_at", [1, 2]):(0) then calls newnode:("call", 0, 0, "charat", "", [1, 2], [])
+given full_env ("character_code_at", [1, 2]):(0) then calls newnode:("call", 0, 0, "character_code_at", "", [1, 2], [])
 given full_env ("f", [1, 2]):(0) then calls newnode:("call", 0, 0, "f", "", [1, 2], [])
 given full_env ("g", []):(0) then calls newnode:("call", 0, 0, "g", "", [], [])

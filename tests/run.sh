@@ -144,7 +144,7 @@ expect_output "adventure path 2,1,2" "ENDING 6" \
 expect_output "adventure invalid choice" ">> You freeze with indecision and your torch gutters out. THE END." \
     "$(printf 'x\n' | "$TMP/adv" | grep '>>')"
 
-# --- while loop + string builtins (len/charat/chr)
+# --- while loop + string builtins (len/character_code_at/chr)
 cat > "$TMP/scan.id" <<'EOF'
 main(int argc, string[] argv) {
   string s = "aZ9";
@@ -161,7 +161,7 @@ show_char(int i, int c) {
   print(i + ":" + c + ":" + ch);
 } return void;
 EOF
-$BIN_IDC "$TMP/scan.id" -o "$TMP/scan" 2>/dev/null || bad "while/len/charat/chr compiles"
+$BIN_IDC "$TMP/scan.id" -o "$TMP/scan" 2>/dev/null || bad "while/len/character_code_at/chr compiles"
 expect_output "string builtins walk" "0:97:a 1:90:Z 2:57:9" "$("$TMP/scan" | tr '\n' ' ' | sed 's/ $//')"
 
 # --- growable lists: empty literal, push across a call (reference semantics),

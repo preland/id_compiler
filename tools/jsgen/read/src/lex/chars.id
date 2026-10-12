@@ -1,4 +1,4 @@
-// The character classes of the signature scanner, over the byte codes charat
+// The character classes of the signature scanner, over the byte codes character_code_at
 // answers (-1 past the end, which none of them is).
 
 jg_ws(int jg_c) {

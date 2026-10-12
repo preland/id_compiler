@@ -1,4 +1,4 @@
-// Character-class predicates over byte codes (charat returns a byte code, or
+// Character-class predicates over byte codes (character_code_at returns a byte code, or
 // -1 past the end). Each returns 1/0. The parameter is `c` in every one, and
 // the int flag is `ok` -- names recur freely now that they keep one type.
 

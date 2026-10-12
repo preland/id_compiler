@@ -9,8 +9,8 @@ builtin_list() {
     i = i + 1;
   }
 } return string s;
-given init_rtc ():("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail, bind, str_sub, character_code_at")
-given init_bnames ():("print, input, read_all, len, push, pop, to_int, charat, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail, bind, str_sub, character_code_at")
+given init_rtc ():("print, input, read_all, len, push, pop, to_int, character_code_at, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail, bind, str_sub, character_code_at")
+given init_bnames ():("print, input, read_all, len, push, pop, to_int, character_code_at, chr, put, flush, getkey, sleep_ms, ticks, alloc, store_size, peek8, peek16, peek32, peek64, poke8, poke16, poke32, poke64, udiv, umod, ult, ushr, str_of_mem, mem_of_str, eprint, peek8s, peek16s, peek32s, peek8u, peek16u, peek32u, bits_of_float, float_of_bits, bits32_of_float, float_of_bits32, fail, bind, str_sub, character_code_at")
 
 call_fixture_extern() {
   init_rtc();

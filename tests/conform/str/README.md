@@ -9,9 +9,9 @@ case here exits 0 (no `.exit` file).
 - `02-plus-int-both-sides` — `+` with an `int` operand on either side of a `string` converts the `int` and concatenates (`"lucky " + 7` and `7 + " lucky"` both work).
 - `03-plus-float` — `+` with a `float` operand converts it via the same `%g` formatting `print` uses (`"pi is " + 3.5` → `"pi is 3.5"`).
 - `04-len-empty-and-nonempty` — `len("")` is `0` and `len("hello")` is `5`; empty and non-empty strings both measure correctly.
-- `05-charat-in-range-and-zero` — `charat` at index `0` and at a middle index return the byte's ASCII code (`'h'` → `104`, `'l'` → `108`), not the character itself.
-- `06-charat-past-end-and-negative` — `charat` past the end of the string (index `5` on a 2-byte string) and at a negative index (`0 - 1`) both return `-1` rather than trapping.
-- `07-chr-roundtrip` — `chr(65)` builds `"A"`, and `charat` on that string recovers `65`: `chr`/`charat` round-trip.
+- `05-character_code_at-in-range-and-zero` — `character_code_at` at index `0` and at a middle index return the byte's ASCII code (`'h'` → `104`, `'l'` → `108`), not the character itself.
+- `06-character_code_at-past-end-and-negative` — `character_code_at` past the end of the string (index `5` on a 2-byte string) and at a negative index (`0 - 1`) both return `-1` rather than trapping.
+- `07-chr-roundtrip` — `chr(65)` builds `"A"`, and `character_code_at` on that string recovers `65`: `chr`/`character_code_at` round-trip.
 - `08-to-int-numeric` — `to_int` parses an ordinary positive number (`"42"` → `42`) and a negative one (`"-7"` → `-7`).
 - `09-to-int-non-numeric` — `to_int` on a non-numeric string (`"banana"`) and on `""` both give `0` (it's `atoi` underneath: no error, just `0` on anything with no leading digits).
 - `10-equality` — `==` on two strings with equal contents (distinct literals, same characters) is true.

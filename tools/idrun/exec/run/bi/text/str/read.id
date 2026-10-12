@@ -1,5 +1,5 @@
 // Reading a string: one byte, its length, and a word as text.
-vm_b_charat(word wa, word wb) {
+vm_b_character_code_at(word wa, word wb) {
   int ia = wa;
   int i = wb;
   int c = character_code_at((import ex_strs)[ia], i);

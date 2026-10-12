@@ -782,9 +782,9 @@ static char* id_read_all(void) {
     return r;
 }
 static int id_len(const char* s) { return (int)id_slen(s); }
-/* charat's bounds check is one load of the stored length, so walking a string
+/* character_code_at's bounds check is one load of the stored length, so walking a string
    is O(n) however many strings are walked at once. */
-static int id_charat(const char* s, int i) {
+static int id_character_code_at(const char* s, int i) {
     if (i < 0) return -1;
     if ((size_t)i >= id_slen(s)) return -1;        /* out of range -> -1 */
     return (unsigned char)s[i];
@@ -1014,7 +1014,7 @@ void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
 }
 
 int id_str_eol(char* idstd_s, int idstd_i) {
-    while (((id_charat(idstd_s, idstd_i) != 10) && (id_charat(idstd_s, idstd_i) != (-1)))) {
+    while (((id_character_code_at(idstd_s, idstd_i) != 10) && (id_character_code_at(idstd_s, idstd_i) != (-1)))) {
         idstd_i = (idstd_i + 1);
     }
     return idstd_i;
@@ -1023,7 +1023,7 @@ int id_str_eol(char* idstd_s, int idstd_i) {
 int id_is_space_at(char* src, int i) {
     int c;
     int ok;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     ok = id_is_space(c);
     return ok;
 }
@@ -1031,7 +1031,7 @@ int id_is_space_at(char* src, int i) {
 int id_is_digit_at(char* src, int i) {
     int c;
     int ok;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     ok = id_is_digit(c);
     return ok;
 }
@@ -1039,7 +1039,7 @@ int id_is_digit_at(char* src, int i) {
 int id_is_alpha_at(char* src, int i) {
     int c;
     int ok;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     ok = id_is_alpha(c);
     return ok;
 }
@@ -1047,7 +1047,7 @@ int id_is_alpha_at(char* src, int i) {
 int id_is_alnum_at(char* src, int i) {
     int c;
     int ok;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     ok = id_is_alnum(c);
     return ok;
 }
@@ -1055,7 +1055,7 @@ int id_is_alnum_at(char* src, int i) {
 int id_is_hex_at(char* src, int i) {
     int c;
     int ok;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     ok = id_is_hex(c);
     return ok;
 }
@@ -1063,7 +1063,7 @@ int id_is_hex_at(char* src, int i) {
 int id_is_bin_at(char* src, int i) {
     int c;
     int ok;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     ok = id_is_bin(c);
     return ok;
 }
@@ -1136,7 +1136,7 @@ int id_scan_one(char* src, int i) {
 int id_scan_word(char* src, int i) {
     int ni;
     ni = 0;
-    if (((id_charat(src, i) == 47) && (id_charat(src, (i + 1)) == 47))) {
+    if (((id_character_code_at(src, i) == 47) && (id_character_code_at(src, (i + 1)) == 47))) {
         ni = id_str_eol(src, i);
     } else {
         ni = id_scan_block(src, i);
@@ -1169,7 +1169,7 @@ int id_scan_numop(char* src, int i) {
 int id_scan_strop(char* src, int i) {
     int ni;
     ni = 0;
-    if ((id_charat(src, i) == 34)) {
+    if ((id_character_code_at(src, i) == 34)) {
         ni = id_scan_string(src, (i + 1));
     } else {
         ni = id_scan_op(src, i);
@@ -1180,7 +1180,7 @@ int id_scan_strop(char* src, int i) {
 int id_scan_block(char* src, int i) {
     int ni;
     ni = 0;
-    if (((id_charat(src, i) == 47) && (id_charat(src, (i + 1)) == 42))) {
+    if (((id_character_code_at(src, i) == 47) && (id_character_code_at(src, (i + 1)) == 42))) {
         ni = id_block_tok(src, i);
     } else {
         ni = id_scan_hashop(src, i);
@@ -1197,7 +1197,7 @@ int id_block_tok(char* src, int i) {
 
 int id_skip_block(char* src, int i) {
     int ret_i;
-    while (((id_charat(src, i) != (-1)) && ((id_charat(src, i) != 42) || (id_charat(src, (i + 1)) != 47)))) {
+    while (((id_character_code_at(src, i) != (-1)) && ((id_character_code_at(src, i) != 42) || (id_character_code_at(src, (i + 1)) != 47)))) {
         i = id_eat_space(src, i);
     }
     ret_i = (i + 2);
@@ -1241,7 +1241,7 @@ int id_scan_decop(char* src, int i) {
 int id_scan_hashop(char* src, int i) {
     int ni;
     ni = 0;
-    if ((id_charat(src, i) == 35)) {
+    if ((id_character_code_at(src, i) == 35)) {
         ni = id_scan_bang(src, i);
     } else {
         ni = id_scan_token(src, i);
@@ -1281,7 +1281,7 @@ long long id_bin_val(char* src, int i, int e) {
     long long v;
     v = 0;
     while ((i < e)) {
-        v = (((v * 2) + id_charat(src, i)) - 48);
+        v = (((v * 2) + id_character_code_at(src, i)) - 48);
         i = (i + 1);
     }
     return v;
@@ -1299,7 +1299,7 @@ int id_is_bin(int c) {
 int id_bin_start(char* src, int i) {
     int ok;
     ok = 0;
-    if ((((id_charat(src, i) == 48) && ((id_charat(src, (i + 1)) == 98) || (id_charat(src, (i + 1)) == 66))) && id_is_bin_at(src, (i + 2)))) {
+    if ((((id_character_code_at(src, i) == 48) && ((id_character_code_at(src, (i + 1)) == 98) || (id_character_code_at(src, (i + 1)) == 66))) && id_is_bin_at(src, (i + 2)))) {
         ok = 1;
     }
     return ok;
@@ -1341,7 +1341,7 @@ int id_digit_run_end(char* src, int i) {
 int id_has_frac(char* src, int e) {
     int ok;
     ok = 0;
-    if (((id_charat(src, e) == 46) && id_is_digit_at(src, (e + 1)))) {
+    if (((id_character_code_at(src, e) == 46) && id_is_digit_at(src, (e + 1)))) {
         ok = 1;
     }
     return ok;
@@ -1351,10 +1351,10 @@ int id_exp_end(char* src, int fe) {
     int c;
     int ee;
     int sg;
-    c = id_charat(src, fe);
+    c = id_character_code_at(src, fe);
     ee = fe;
     if (((c == 101) || (c == 69))) {
-        sg = id_charat(src, (fe + 1));
+        sg = id_character_code_at(src, (fe + 1));
         ee = id_digit_run_end(src, ((fe + 1) + ((sg == 43) || (sg == 45))));
     }
     return ee;
@@ -1363,7 +1363,7 @@ int id_exp_end(char* src, int fe) {
 int id_hex_start(char* src, int i) {
     int ok;
     ok = 0;
-    if ((((id_charat(src, i) == 48) && ((id_charat(src, (i + 1)) == 120) || (id_charat(src, (i + 1)) == 88))) && id_is_hex_at(src, (i + 2)))) {
+    if ((((id_character_code_at(src, i) == 48) && ((id_character_code_at(src, (i + 1)) == 120) || (id_character_code_at(src, (i + 1)) == 88))) && id_is_hex_at(src, (i + 2)))) {
         ok = 1;
     }
     return ok;
@@ -1381,7 +1381,7 @@ long long id_hex_val(char* src, int i, int e) {
     int charat_v;
     v = 0;
     while ((i < e)) {
-        charat_v = id_charat(src, i);
+        charat_v = id_character_code_at(src, i);
         v = ((v * 16) + id_hex_digit(charat_v));
         i = (i + 1);
     }
@@ -1425,7 +1425,7 @@ void id_print_uint(long long v) {
 }
 
 int id_zero_end(char* src, int from, int e) {
-    while (((from < e) && (id_charat(src, from) == 48))) {
+    while (((from < e) && (id_character_code_at(src, from) == 48))) {
         from = (from + 1);
     }
     return from;
@@ -1496,7 +1496,7 @@ void id_lex_cols(int argc, IdList* argv) {
 int id_is_lcomment(char* src, int i) {
     int ok;
     ok = 0;
-    if (((id_charat(src, i) == 47) && (id_charat(src, (i + 1)) == 47))) {
+    if (((id_character_code_at(src, i) == 47) && (id_character_code_at(src, (i + 1)) == 47))) {
         ok = 1;
     }
     return ok;
@@ -1511,7 +1511,7 @@ int id_main(int argc, IdList* argv) {
 
 int id_eat_space(char* src, int i) {
     int ret_i;
-    if ((id_charat(src, i) == 10)) {
+    if ((id_character_code_at(src, i) == 10)) {
         id_bump_line();
         id_lset(lexbol, 0, (i + 1));
     }
@@ -1534,8 +1534,8 @@ char* id_two_at(char* src, int i) {
     int c1;
     int c2;
     char* two = NULL;
-    c1 = id_charat(src, i);
-    c2 = id_charat(src, (i + 1));
+    c1 = id_character_code_at(src, i);
+    c2 = id_character_code_at(src, (i + 1));
 char* idsq_7;
     { char* idfe_o = two; two = (idsq_7 = id_chr(c1), id_concat_f(idsq_7, id_chr(c2), 3)); id_str_free(idfe_o); }
     return two;
@@ -1544,7 +1544,7 @@ char* idsq_7;
 char* id_one_at(char* src, int i) {
     int c;
     char* one = NULL;
-    c = id_charat(src, i);
+    c = id_character_code_at(src, i);
     { char* idfe_o = one; one = id_chr(c); id_str_free(idfe_o); }
     return one;
 }
@@ -1624,7 +1624,7 @@ void id_scan_hash_out(char* src, int i, int e) {
 int id_is_shebang(char* src, int i) {
     int ok;
     ok = 0;
-    if (((((id_charat(src, i) == 35) && (id_charat(src, (i + 1)) == 33)) && (i == (int)(id_list_get(lexbol, 0)))) && ((int)(id_list_get(lexline, 0)) == 1))) {
+    if (((((id_character_code_at(src, i) == 35) && (id_character_code_at(src, (i + 1)) == 33)) && (i == (int)(id_list_get(lexbol, 0)))) && ((int)(id_list_get(lexline, 0)) == 1))) {
         ok = 1;
     }
     return ok;
@@ -1633,7 +1633,7 @@ int id_is_shebang(char* src, int i) {
 int id_scan_bang(char* src, int i) {
     int e;
     e = 0;
-    if ((id_charat(src, (i + 1)) == 33)) {
+    if ((id_character_code_at(src, (i + 1)) == 33)) {
         e = id_scan_shebang(src, i);
     } else {
         e = id_scan_hash(src, i);
@@ -1651,7 +1651,7 @@ int id_scan_shebang(char* src, int i) {
 }
 
 int id_str_end(char* src, int i) {
-    while (((id_charat(src, i) != 34) && (id_charat(src, i) != (-1)))) {
+    while (((id_character_code_at(src, i) != 34) && (id_character_code_at(src, i) != (-1)))) {
         i = id_adv_str(src, i);
     }
     return i;
@@ -1660,7 +1660,7 @@ int id_str_end(char* src, int i) {
 int id_adv_str(char* src, int i) {
     int n;
     n = (i + 1);
-    if ((id_charat(src, i) == 92)) {
+    if ((id_character_code_at(src, i) == 92)) {
         n = (i + 2);
     }
     return n;
@@ -1680,7 +1680,7 @@ int id_scan_ident(char* src, int i) {
     int charat_v;
     { char* idfe_o = ident; ident = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     while (id_is_alnum_at(src, i)) {
-        charat_v = id_charat(src, i);
+        charat_v = id_character_code_at(src, i);
         ident = id_concat_f(ident, id_chr(charat_v), 3);
         i = (i + 1);
     }

@@ -81,7 +81,6 @@ fs
 
 # Names of id builtins; a local holding the builtin's result is named after it
 # (the idstd convention is <call>_v).
-charat
 peek8
 ushr
 udiv

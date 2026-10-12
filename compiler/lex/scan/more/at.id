@@ -20,7 +20,7 @@ one_at(string src, int i) {
 ("+x", 0):("+")
 ("abc", 1):("b")
 
-// `one` is built whether or not it is printed. charat is a read of a byte
+// `one` is built whether or not it is printed. character_code_at is a read of a byte
 // that is already in memory, so the branch would cost more than the read.
 scan_op_out(string src, int i, string two) {
   string one = one_at(src, i);

@@ -14,7 +14,7 @@ bt2(string name) {
 
 bt3(string name) {
   string t = bt4(name);
-  if(name == "to_int" || name == "len" || name == "charat" || name == "ult" || name == "ticks" || name == "getkey") {
+  if(name == "to_int" || name == "len" || name == "character_code_at" || name == "ult" || name == "ticks" || name == "getkey") {
     t = "int";
   }
 } return string t;

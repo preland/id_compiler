@@ -2,7 +2,7 @@
 //
 // `while(is_digit(character_code_at(src, i)))` says what it means and is no longer
 // legal: a call may not be an argument to a call (docs/SPEC.md 7.1), and the
-// obvious repair -- naming charat's value before the loop -- would compute it
+// obvious repair -- naming character_code_at's value before the loop -- would compute it
 // once where the loop needs it every iteration. So the composition becomes a
 // function, which is what a loop condition wanted to be anyway.
 

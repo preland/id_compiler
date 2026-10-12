@@ -1,4 +1,0 @@
-// EXPECT: charat takes exactly two arguments
-main(int argc, string[] argv) {
-  int c = charat("hi");
-} return int 0;

@@ -14,9 +14,9 @@ lw_bpty2(string name, int i) {
 
 lw_bpty3(string name, int i) {
   string t = "";
-  if(name == "to_int" || name == "mem_of_str" || name == "put" || name == "fail" || name == "charat" && i == 0) {
+  if(name == "to_int" || name == "mem_of_str" || name == "put" || name == "fail" || name == "character_code_at" && i == 0) {
     t = "string";
-  } else if(name == "chr" || name == "sleep_ms" || name == "charat") {
+  } else if(name == "chr" || name == "sleep_ms" || name == "character_code_at") {
     t = "int";
   }
 } chain (string name, int i) {

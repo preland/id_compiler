@@ -4,7 +4,7 @@
 
 bi_arg_err(int id, int i, string want, string t) {
   if(want == "index") {
-    tc_err(id, "charat index must be int, got " + t);
+    tc_err(id, "character_code_at index must be int, got " + t);
   } else {
     bi_arg_err2(id, i, want, t);
   }

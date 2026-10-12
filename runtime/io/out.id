@@ -1,6 +1,6 @@
 // print and put, over the serial port.
 //
-// A string is a pointer to bytes ending in a NUL, which is what `charat`
+// A string is a pointer to bytes ending in a NUL, which is what `character_code_at`
 // answers -1 past. So writing one is a loop over its bytes, and print is put
 // with a newline after it.
 

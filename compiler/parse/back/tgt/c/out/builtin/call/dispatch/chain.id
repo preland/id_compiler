@@ -4,7 +4,7 @@
 //   len   -> id_len (string) or id_list_len (list)
 //   push  -> id_list_push with the value boxed
 //   pop   -> id_list_pop unboxed to the element type (in pop.id)
-//   everything else -> id_NAME(args)  (charat/chr/to_int/input/read_all and
+//   everything else -> id_NAME(args)  (character_code_at/chr/to_int/input/read_all and
 //   ordinary user calls all take this generic form, matching idc.py)
 
 ec2(int id) {

@@ -25,8 +25,8 @@ vm_bs(int id, word wa, word wb, word wc) {
     return wr;
   }
 } chain (int id, word wa, word wb, word wc) {
-  if (id == (import b_charat)) {
-    wr = vm_b_charat(wa, wb);
+  if (id == (import b_character_code_at)) {
+    wr = vm_b_character_code_at(wa, wb);
     return wr;
   }
   if (id == (import b_len)) {
