@@ -5279,7 +5279,7 @@ int id_idstd_str_span(char* idstd_s, int idstd_i, int idstd_n) {
     idstd_end = (idstd_i + idstd_n);
     idstd_ok = (((idstd_i >= 0) && (idstd_n >= 0)) && ((idstd_n == 0) || (id_charat(idstd_s, (idstd_end - 1)) >= 0)));
     if ((idstd_ok == 0)) {
-        id_fail(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i), 2), ID_S(" n="), 1), id_str_of_int(idstd_n), 3), ID_S(" in a string of length "), 1), id_str_of_int(id_len(idstd_s)), 3), ID_S("; clamp i and n first (fx_min, fx_max)"), 1));
+        id_fail(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("str span out of bounds: i="), id_str_of_int(idstd_i), 2), ID_S(" n="), 1), id_str_of_int(idstd_n), 3), ID_S(" in a string of length "), 1), id_str_of_int(id_len(idstd_s)), 3), ID_S("; clamp i and n first (fixed_point_minimum, fixed_point_maximum)"), 1));
     }
     return idstd_n;
 }
