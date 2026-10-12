@@ -4,5 +4,5 @@ lit_buf() {
   env_init();
   export word lit_ad = alloc(64);
 } return void;
-():() then calls env_init:[1]
+():() then calls env_init:()
 ():() then init_units:(0)

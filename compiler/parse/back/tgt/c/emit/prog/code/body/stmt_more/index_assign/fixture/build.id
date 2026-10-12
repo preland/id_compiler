@@ -25,5 +25,5 @@ iassign_fixture() {
   export int[] iassign_vlist = [(import iassign_valn)];
   export int iassign_node = newnode("iassign", (import iassign_lst), (import iassign_idx), "", "", (import iassign_vlist), (import iassign_vlist));
 } return void;
-():() then calls iassign_fixture_idxval:[1]
+given iassign_fixture ():() then calls newnode:("iassign", (import iassign_lst), (import iassign_idx), "", "", (import iassign_vlist), (import iassign_vlist))
 ():() then init_units:(0)

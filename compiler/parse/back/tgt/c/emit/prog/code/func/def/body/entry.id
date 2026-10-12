@@ -19,7 +19,7 @@ entry_fixture() {
   fn_fixture();
   entry_fixture_harn();
 } return void;
-given fn_fixture ():() then calls fn_fixture:[1]
+given fn_fixture ():() then (import harn)[0]:(1)
 given fn_fixture ():() then init_units:(0)
 
 entry_fixture_harn() {

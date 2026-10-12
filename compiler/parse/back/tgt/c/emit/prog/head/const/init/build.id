@@ -8,6 +8,7 @@ emit_const_init() {
   }
 } return void;
 given lc_dce_setup ():() then prints:("static void idc_const_init(void) {\n    a = id_list_lit(1, (long long)(1));\n    id_list_lock(a);\n}\n")
+given lc_dce_setup ():() then calls emit_init_fn:()
 given lc_dce_setup2 ():() then calls emit_init_fn:[0]
 given lc_dce_setup2 ():() then prints:("")
 

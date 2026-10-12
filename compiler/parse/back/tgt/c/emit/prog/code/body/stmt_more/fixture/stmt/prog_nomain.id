@@ -6,12 +6,12 @@ nz_main_parts() {
   nz_tyc_fixture();
   export int[] nz_mainparams = [node_param("param", "int", "argc")];
 } return void;
-():() then calls nz_tyc_fixture:[1]
+():() then calls node_param:("param", "int", "argc")
 ():() then init_units:(0)
 
 nz_prog_nomain_fixture() {
   nz_plain_fixture();
   push((import prog), (import nz_plainfn));
 } return void;
-():() then calls nz_plain_fixture:[1]
+():() then len((import prog)):(1)
 ():() then init_units:(0)

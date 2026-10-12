@@ -6,6 +6,7 @@ emit_case_args(int ci) {
   emit_arg_lines(ps, args);
 } return void;
 given wrap_fixture (0):() then prints:("    int idtc_a0 = 0;\n")
+given wrap_fixture (0):() then calls emit_tc_decl:("int", "idtc_a0", "0")
 given wrap_fixture (0):() then calls emit_tc_decl:[1]
 
 emit_arg_lines(int[] ps, int[] args) {
@@ -16,6 +17,7 @@ emit_arg_lines(int[] ps, int[] args) {
   }
 } return void;
 given calls_items_fixture ((import fixture_params), (import fixture_calls_one)):() then prints:("    int idtc_a0 = 1;\n")
+given calls_items_fixture ((import fixture_params), (import fixture_calls_one)):() then calls emit_arg_line:((import fixture_params), (import fixture_calls_one), 0)
 given calls_items_fixture ((import fixture_params), (import fixture_calls_one)):() then calls emit_arg_line:[1]
 given calls_items_fixture ((import fixture_params), (import fixture_calls_none)):() then prints:("")
 
@@ -25,4 +27,5 @@ emit_arg_line(int[] ps, int[] args, int j) {
   emit_tc_decl(pt, "idtc_a" + j, cv);
 } return void;
 given calls_items_fixture ((import fixture_params), (import fixture_calls_one), 0):() then prints:("    int idtc_a0 = 1;\n")
+given calls_items_fixture ((import fixture_params), (import fixture_calls_one), 0):() then calls emit_tc_decl:("int", "idtc_a0", "1")
 given calls_items_fixture ((import fixture_params), (import fixture_calls_one), 0):() then calls tc_value:[1]

@@ -23,6 +23,8 @@ fwd_adopts() {
     i = i + 1;
   }
 } return void;
+given nz_prog_fixture ():() then calls fwd_adopt_one:((import nz_plainfn))
+given ll_natives_fixture2 ():() then calls fwd_adopt_one:(3)
 given nz_prog_fixture ():() then calls fwd_adopt_one:[2]
 given ll_natives_fixture2 ():() then calls fwd_adopt_one:[1]
 given nz_prog_fixture ():() then prints:("")

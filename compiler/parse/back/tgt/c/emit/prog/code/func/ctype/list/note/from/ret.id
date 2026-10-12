@@ -7,6 +7,8 @@ note_fn_ret(int cfn) {
     note_ty(rt);
   }
 } return void;
+given fn_fixture ((import fixture_fn)):() then calls note_ty:("int")
+given fn_fixture given tc_types_init (-1):() then len((import tctys)):(0)
 given fn_fixture ((import fixture_fn)):() then calls note_ty:[1]
 given fn_fixture (-1):() then calls note_ty:[0]
 given fn_fixture ((import fixture_fn)):()

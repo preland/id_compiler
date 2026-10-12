@@ -7,7 +7,7 @@ lz_p() {
   lz_o();
   imd_fill();
 } return void;
-():() then calls lz_o:[1]
+():() then calls imd_fill:()
 ():() then init_units:(0)
 
 main_at(int i, int m) {

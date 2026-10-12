@@ -36,7 +36,7 @@ sq_marked() {
   sq_fixture();
   seq_mark((import nz_call_foo), 1);
 } return void;
-():() then calls sq_fixture:[1]
+given sq_fixture ():() then calls seq_mark:((import nz_call_foo), 1)
 ():() then sq_foo_seqd:(1)
 
 sq_foo_seqd() {
