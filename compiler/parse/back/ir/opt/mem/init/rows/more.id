@@ -6,6 +6,8 @@ entry_of(int f) {
   int[] irf_blk_v = (import fnblk)[f];
   int b = irf_blk_v[0];
 } return int b;
+given ir_rows (0):(0) then (import fnblk)[0]:([0])
+given ir_rows (1):(1) then (import fnblk)[1]:([1])
 given ir_rows (0):(0)
 given ir_rows (1):(1)
 

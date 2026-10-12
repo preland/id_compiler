@@ -17,8 +17,9 @@ fold_iszext(int v) {
     r = 1;
   }
 } return int r;
-given ir_rows (0):(0)
+given ir_rows (1):(0)
 given fold_true_setup ((import fz_id)):(1)
+given ir_rows (0):(0)
 
 // br_fixture_p plus pra/phiof/outv, for m2r_incs/m2r_inc/ir_opt/opt_round
 // cases that need a function whose blocks are actually terminated: unlike

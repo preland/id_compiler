@@ -55,5 +55,6 @@ lex(string src) {
     i = scan_one(src, i);
   }
 } return void;
-(""):() then prints:("")
 given lex_fix_setup ("x"):() then prints:("ident x\n")
+given lex_fix_setup ("a b"):() then prints:("ident a\nident b\n")
+(""):() then prints:("")

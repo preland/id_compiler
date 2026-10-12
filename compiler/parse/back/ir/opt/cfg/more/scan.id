@@ -5,6 +5,7 @@ pred_wipe(int[] l) {
   }
 } return void;
 ([1, 2, 3]):([])
+([7]):([])
 ([]):([])
 
 // A block's successors are the blocks its terminator names, and its terminator

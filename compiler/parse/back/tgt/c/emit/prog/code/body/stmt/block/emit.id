@@ -10,6 +10,7 @@ emit_block(int[] stmts, string ind) {
   }
 } return void;
 given stmt_fix ([1, 2], ""):() then prints:("y = 5;\nz = 5;\n")
+given stmt_fix ([1], "  "):() then prints:("  y = 5;\n")
 given stmt_fix ([], ""):() then prints:("")
 
 emit_stmt(int id, string ind) {

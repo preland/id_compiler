@@ -18,8 +18,9 @@ emit_or_notes(int argc, string[] argv) {
     print_notes();
   }
 } return void;
-given notes_base (2, ["prog", "--untested"]):() then prints:("")
 given notes_setup (2, ["prog", "--untested"]):() then prints:("x.id:1: note: exempt\n")
+given notes_setup (2, ["prog", "--check"]):() then prints:("x.id:1: note: exempt\n")
+given notes_base (2, ["prog", "--untested"]):() then prints:("")
 
 emit_notes() {
   if(len((import utnote)) > 0) {
@@ -27,8 +28,9 @@ emit_notes() {
     print_notes();
   }
 } return void;
-given notes_base ():() then prints:("")
 given notes_setup ():() then prints:("/* ---- notes ---- */\nx.id:1: note: exempt\n")
+given notes_setup given notes_push ():() then prints:("/* ---- notes ---- */\nx.id:1: note: exempt\nx.id:1: note: exempt\n")
+given notes_base ():() then prints:("")
 
 print_notes() {
   int i = 0;
@@ -37,5 +39,6 @@ print_notes() {
     i = i + 1;
   }
 } return void;
-given notes_base ():() then prints:("")
 given notes_setup ():() then prints:("x.id:1: note: exempt\n")
+given notes_setup given notes_push ():() then prints:("x.id:1: note: exempt\nx.id:1: note: exempt\n")
+given notes_base ():() then prints:("")

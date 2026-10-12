@@ -9,6 +9,7 @@ lex_fix_setup() {
   lex_setup(1, argv);
 } return void;
 ():() then calls lex_setup:[1]
+():() then (import lexline)[0]:(1)
 ():() then prints:("")
 
 lex_fix_setup_cols() {
@@ -16,5 +17,6 @@ lex_fix_setup_cols() {
   lex_setup(2, argv);
 } return void;
 ():() then calls lex_setup:[1]
+():() then (import lexcols)[0]:(1)
 ():() then prints:("")
 

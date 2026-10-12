@@ -4,5 +4,7 @@
 ir_isconst(int id) {
   int ret_i = (import iop)[id] == "const";
 } return int ret_i;
+given fold_true_setup (1):(0)
+given fold_true_setup (0):(1)
 given ir_rows (0):(0)
 given ir_rows (1):(1)

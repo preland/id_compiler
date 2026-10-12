@@ -5,6 +5,7 @@ m2r_wipe(int[][] rows) {
   }
 } return void;
 ([[1, 2], [3]]):([])
+([[4]]):([])
 ([]):([])
 
 // The slots, in the order they were allocated -- which is the entry block, in

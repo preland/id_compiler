@@ -20,6 +20,8 @@ ir_col1(string op, string ty, int a) {
   push((import ity), ty);
   push((import ia), a);
 } return void;
+given env_init ("mul", "word", 7):("mul", "word", 7) then (import iop)[0]:("mul") then (import ity)[0]:("word")
+given env_init ("div", "", 9):("div", "", 9) then (import ia)[0]:(9)
 given env_init ("add", "int", 3):("add", "int", 3)
 given env_init ("const", "", 5):("const", "", 5)
 
@@ -28,5 +30,7 @@ ir_col2(int b, string s, int[] l) {
   push((import istr), s);
   push((import ilist), l);
 } return void;
+given env_init (6, "y", [3]):(6, "y", [3]) then (import ib)[0]:(6) then (import istr)[0]:("y")
+given env_init (4, "w", []):(4, "w", []) then (import ilist)[0]:([])
 given env_init (2, "x", [1, 2]):(2, "x", [1, 2])
 given env_init (0, "", []):(0, "", [])

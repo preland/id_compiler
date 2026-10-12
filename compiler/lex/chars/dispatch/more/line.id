@@ -31,6 +31,7 @@ span_out(string src, int i, int ni) {
     print("span " + ((i - b) * 65536 + ni - b));
   }
 } return void;
-given lex_fix_setup ("x", 0, 1):() then prints:("")
+given lex_fix_setup_cols ("x", 0, 1):() then prints:("span 1\n")
 given lex_fix_bol1 ("abcdef", 3, 5):() then prints:("span 131076\n")
+given lex_fix_setup ("x", 0, 1):() then prints:("")
 given lex_fix_setup_cols ("#!x", 0, 3):() then prints:("")

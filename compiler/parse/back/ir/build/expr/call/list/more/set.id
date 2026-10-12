@@ -6,8 +6,8 @@ lw_iset(int node, int a, string elem) {
 } chain (int node, int a, string elem) {
   lw_callf(lv_f, "", [a, i, v]);
 } return void;
-given lw_fix_iassign ((import fix_iassign_n), 0, "i"):()
-given lw_fix_iassign ((import fix_iassign_n), 5, "x"):()
+given lw_fix_iassign ((import fix_iassign_n), 0, "i"):() then calls lw_callf:("id_list_set", "", [0, 0, 2])
+given lw_fix_iassign ((import fix_iassign_n), 5, "x"):() then calls lw_callf:("id_list_set", "", [5, 0, 2])
 
 // A fresh list. Its own function because the runtime call takes no arguments
 // and an empty list literal needs a typed context, which an argument position

@@ -7,6 +7,7 @@ hoist(int id) {
   hoist_list(l2_of_v);
 } return void;
 given tyc_fix (7):() then prints:("    int y;\n")
+given tyc_fix (7):() then calls hoist_list:([1, 2])
 given tyc_fix (4):() then prints:("")
 
 hoist_list(int[] stmts) {
@@ -17,6 +18,7 @@ hoist_list(int[] stmts) {
   }
 } return void;
 given tyc_fix ([1]):() then prints:("    int y;\n")
+given tyc_fix ([1, 1]):() then prints:("    int y;\n    int y;\n")
 given tyc_fix ([]):() then prints:("")
 
 hoist_one(int id) {
@@ -27,4 +29,5 @@ hoist_one(int id) {
   }
 } return void;
 given tyc_fix (1):() then prints:("    int y;\n")
+given tyc_fix (3):() then calls hoist_nested:(3)
 given tyc_fix (3):() then prints:("")

@@ -28,4 +28,5 @@ clear_strs(string[] names) {
   }
 } return void;
 (["a", "b"]):([])
+(["x", "y", "z"]):([])
 ([]):([])

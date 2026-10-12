@@ -9,5 +9,6 @@ blk_count(int f) {
   int n = len(blks);
 } return int n;
 given ir_rows (0):(1)
+given cfg_fixture (0):(2)
 given ir_rows (1):(1)
 
