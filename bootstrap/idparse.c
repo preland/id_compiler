@@ -28815,11 +28815,12 @@ void id_given_args(int i, int si, int sfn) {
     char* nm;
     int np;
     items = id_given_items(i, si);
-int idsq_52;
-    if ((idsq_52 = id_list_len(items), (idsq_52 != id_list_len((IdList*)(intptr_t)(id_list_get(nl1, sfn)))))) {
+int idsq_59;
+    if ((idsq_59 = id_list_len(items), (idsq_59 != id_list_len((IdList*)(intptr_t)(id_list_get(nl1, sfn)))))) {
         nm = (char*)(intptr_t)(id_list_get(ns1, sfn));
         np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, sfn)));
-        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'given' names '"), nm), ID_S("', which takes "), 1), id_str_of_int(np), 3), ID_S(" parameter(s), but this 'given' passes "), 1), id_str_of_int(id_list_len(items)), 3), ID_S("; a setup is called with one literal per parameter, as in 'given "), 1), nm, 1), ID_S("(1, 2)', and with none as 'given "), 1), nm, 1), ID_S("'"), 1));
+int idsq_28;
+        (idsq_28 = id_list_len(items), id_case_diag(i, ID_S("E0515"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'given' names '"), nm), ID_S("', which takes "), 1), id_str_of_int(np), 3), ID_S(" parameter(s), but this 'given' passes "), 1), id_str_of_int(idsq_28), 3), ID_S("; a setup is called with one literal per parameter, as in 'given "), 1), nm, 1), ID_S("(1, 2)', and with none as 'given "), 1), nm, 1), ID_S("'"), 1), ID_S("the harness calls the setup with the literals written after its name, so their number must equal the setup's parameters"), id_concat_f(ID_S("write one literal per parameter: "), id_diag_sig(sfn), 2)));
     } else {
         id_given_fit(i, si, sfn, items);
     }
@@ -28828,12 +28829,15 @@ int idsq_52;
 
 void id_given_arg(int i, int sfn, IdList* items, int j) {
     char* pt;
-IdList* idsq_54;
-    pt = (idsq_54 = ns1, (char*)(intptr_t)(id_list_get(idsq_54, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, sfn)), j)))));
-IdList* idsq_46;
-    if ((idsq_46 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_46, (int)(id_list_get(items, j)))), ID_S("cfn")) == 0))) {
-IdList* idsq_36;
-        (idsq_36 = ns1, id_case_err(i, id_concat_f(id_concat(ID_S("a setup's arguments are literals or (import NAME); '"), (char*)(intptr_t)(id_list_get(idsq_36, (int)(id_list_get(items, j))))), ID_S("' is a function name, which only a case's own arguments may pass"), 1)));
+IdList* idsq_63;
+    pt = (idsq_63 = ns1, (char*)(intptr_t)(id_list_get(idsq_63, (int)(id_list_get((IdList*)(intptr_t)(id_list_get(nl1, sfn)), j)))));
+IdList* idsq_55;
+    if ((idsq_55 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_55, (int)(id_list_get(items, j)))), ID_S("cfn")) == 0))) {
+IdList* idsq_44;
+int idsq_41;
+char* idsq_40;
+IdList* idsq_34;
+        (idsq_44 = ns1, idsq_41 = (int)(id_list_get(items, j)), idsq_40 = (char*)(intptr_t)(id_list_get(idsq_44, idsq_41)), idsq_34 = ns1, id_case_diag(i, ID_S("E0516"), id_concat_f(id_concat(ID_S("a setup's arguments are literals or (import NAME); '"), idsq_40), ID_S("' is a function name, which only a case's own arguments may pass"), 1), ID_S("a setup runs before the case, with values only; a function can be passed as an argument of the function under test, not of a 'given'"), id_concat(ID_S("write a literal, or (import NAME) for an exported variable, in place of "), (char*)(intptr_t)(id_list_get(idsq_34, (int)(id_list_get(items, j)))))));
     } else {
         id_lset(setupargs, 0, 1);
         id_fit_value(i, (int)(id_list_get(items, j)), pt);
@@ -28904,10 +28908,10 @@ void id_given_fn(int i, int si, char* setup_nm) {
     char* rt;
     sfn = id_func_node(setup_nm);
     if ((sfn < 0)) {
-        id_case_err(i, id_concat_f(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which is not a function in this build"), 1));
+        id_case_diag(i, ID_S("E0514"), id_concat_f(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which is not a function in this build"), 1), ID_S("a 'given' runs a function of the program before the case, so the name must be one this build defines"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("name a function the build defines and that returns void, as in 'given "), setup_nm), ID_S("', or define "), 1), setup_nm, 1), ID_S("(...) with a void return"), 1));
     } else if ((strcmp((char*)(intptr_t)(id_list_get(ns2, sfn)), ID_S("void")) != 0)) {
         rt = (char*)(intptr_t)(id_list_get(ns2, sfn));
-        id_case_err(i, id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which returns "), 1), rt, 1), ID_S("; a setup returns void, since the harness has nothing to compare its result with"), 1));
+        id_case_diag(i, ID_S("E0514"), id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'given' names '"), setup_nm), ID_S("', which returns "), 1), rt, 1), ID_S("; a setup returns void, since the harness has nothing to compare its result with"), 1), ID_S("a 'given' is a setup that runs before the case, and only a function that returns void is one"), id_concat_f(id_concat(ID_S("name a function that returns void in the 'given', and call "), setup_nm), ID_S(" as the function under test, or give it a void return"), 1));
     } else {
         id_given_args(i, si, sfn);
     }
@@ -29150,11 +29154,11 @@ void id_fit_calls_body(char* kind, int ci, char* nm, int cfn, int chk_node) {
 void id_fit_calls_args(int ci, char* nm, int cfn, IdList* items) {
     int na;
     int np;
-int idsq_39;
-    if ((idsq_39 = id_list_len(items), (idsq_39 != id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn)))))) {
+int idsq_46;
+    if ((idsq_46 = id_list_len(items), (idsq_46 != id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn)))))) {
         na = id_list_len(items);
         np = id_list_len((IdList*)(intptr_t)(id_list_get(nl1, cfn)));
-        id_case_err(ci, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case's 'calls "), nm), ID_S("' passes "), 1), id_str_of_int(na), 3), ID_S(" argument(s), which takes "), 1), id_str_of_int(np), 3));
+        id_case_diag(ci, ID_S("E0519"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("this case's 'calls "), nm), ID_S("' passes "), 1), id_str_of_int(na), 3), ID_S(" argument(s), which takes "), 1), id_str_of_int(np), 3), ID_S("'calls NAME:(ARGS)' matches the arguments of one call to NAME, so it lists one literal for each of NAME's parameters"), id_concat_f(ID_S("write one literal per parameter: "), id_diag_sig(cfn), 2));
     } else {
         id_fit_items(ci, cfn, items);
     }
@@ -29163,9 +29167,9 @@ int idsq_39;
 
 void id_calls_unknown(int ci, char* nm) {
     if ((id_is_builtin(nm) == 1)) {
-        id_case_err(ci, id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'"), 1));
+        id_case_diag(ci, ID_S("E0518"), id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a builtin; a builtin's effect is checked with 'prints' or 'eprints', not 'calls'"), 1), ID_S("'calls' counts how often the function under test calls a function whose body the harness can record into, and a builtin has no such body"), id_concat_f(id_concat(ID_S("check what "), nm), ID_S(" does with 'then prints:(TEXT)' or 'then eprints:(TEXT)'"), 1));
     } else {
-        id_case_err(ci, id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is not a function in this build"), 1));
+        id_case_diag(ci, ID_S("E0517"), id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is not a function in this build"), 1), ID_S("'calls' counts calls to a function the program defines, so the name must be one of them"), id_concat_f(id_concat(ID_S("name a function this build defines, or define "), nm), ID_S("(...) in the program"), 1));
     }
     return;
 }
@@ -29237,7 +29241,7 @@ void id_fit_calls_name(char* kind, int ci, char* nm, int chk_node) {
 
 void id_fit_calls_native(char* kind, int ci, char* nm, int cfn, int chk_node) {
     if ((id_is_native(cfn) == 1)) {
-        id_case_err(ci, id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead"), 1));
+        id_case_diag(ci, ID_S("E0518"), id_concat_f(id_concat(ID_S("'calls' names '"), nm), ID_S("', which is a native function with no id body to record calls into; check its effect with 'prints' or 'eprints' instead"), 1), ID_S("'calls' counts how often the function under test calls a function whose body the harness can record into, and a native function's body belongs to a backend"), id_concat_f(id_concat(ID_S("check what "), nm), ID_S(" does with 'then prints:(TEXT)' or 'then eprints:(TEXT)'"), 1));
     } else {
         id_fit_calls_body(kind, ci, nm, cfn, chk_node);
     }
@@ -32634,7 +32638,7 @@ void id_chk_bind(int id) {
 }
 
 void id_bind_few(int id) {
-    id_tc_err(id, ID_S("'bind' takes the name of a function and at least one value to capture: write bind(NAME, value, ...); with no value to capture, NAME alone is already a function value"));
+    id_tc_diag(id, ID_S("E0639"), ID_S("'bind' takes the name of a function and at least one value to capture: write bind(NAME, value, ...); with no value to capture, NAME alone is already a function value"), ID_S("bind"), ID_S("bind captures values into a new function value, and with nothing to capture there is nothing to bind"), ID_S("write bind(NAME, value, ...), or use NAME alone as the function value"));
     return;
 }
 
@@ -32913,9 +32917,9 @@ void id_chk_bi_arg(int id, int i) {
     }
     nm = (char*)(intptr_t)(id_list_get(ns1, id));
     if (((((strcmp(nm, ID_S("print")) == 0) || (strcmp(nm, ID_S("eprint")) == 0)) || (strcmp(nm, ID_S("put")) == 0)) && (id_ty_is_list(t) == 1))) {
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a list: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a list has no text form -- write its elements one at a time, as in "), 1), nm, 1), ID_S("(xs[0]) inside a while loop, or build a string from them"), 1));
+        id_tc_diag(id, ID_S("E0634"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a list: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a list has no text form -- write its elements one at a time, as in "), 1), nm, 1), ID_S("(xs[0]) inside a while loop, or build a string from them"), 1), nm, id_concat_f(id_concat(ID_S("a list has no text form, so there is nothing for "), nm), ID_S(" to write"), 1), id_concat_f(id_concat(ID_S("write its elements one at a time, as in "), nm), ID_S("(xs[0]) inside a while loop, or build a string from them"), 1));
     } else if ((((strcmp(nm, ID_S("put")) == 0) && (id_ty_known(t) == 1)) && (strcmp(t, ID_S("string")) != 0))) {
-        id_tc_err(id, id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("'put' takes a string, but argument "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1), ID_S("; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line"), 1));
+        id_tc_diag(id, ID_S("E0635"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("'put' takes a string, but argument "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1), ID_S("; write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line"), 1), ID_S("put"), ID_S("put writes text exactly as given and does not convert"), ID_S("write put(\"\" + x) to print it as text, or use print(x), which takes any value and ends the line"));
     }
     return;
 }
@@ -32954,7 +32958,7 @@ void id_fv_bi_arg(int id, int i) {
     t = id_type_of(a);
     if ((id_ty_is_func(t) == 1)) {
         nm = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err(a, id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a function value: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a function value can only be passed to a function written in id, stored or called"), 1));
+        id_tc_diag(a, ID_S("E0633"), id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("'"), nm), ID_S("' cannot take a function value: argument "), 1), id_str_of_int(i), 3), ID_S(" is "), 1), t, 1), ID_S("; a function value can only be passed to a function written in id, stored or called"), 1), nm, ID_S("a builtin is not a function written in id, and what it would do with a function value is never what was meant"), id_concat_f(id_concat(ID_S("call the function and pass its result, as in "), nm), ID_S("(f(...)), or pass the value to a function written in id"), 1));
     }
     return;
 }
@@ -33052,10 +33056,10 @@ void id_bi_arity_err(int id) {
     s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
     if ((id_is_sysbi(s1_of_v) == 1)) {
         msg = id_bi_sys_msg(id);
-        id_tc_err(id, msg);
+        id_tc_diag(id, ID_S("E0640"), msg, s1_of_v, ID_S("a builtin takes a fixed number of arguments"), id_concat_f(id_concat(ID_S("write "), s1_of_v), ID_S(" with exactly the arguments it takes, no more and no fewer"), 1));
     } else {
         msg2 = id_bi_other_msg(id);
-        id_tc_err(id, msg2);
+        id_tc_diag(id, ID_S("E0640"), msg2, s1_of_v, ID_S("a builtin takes a fixed number of arguments"), id_concat_f(id_concat(ID_S("write "), s1_of_v), ID_S(" with exactly the arguments it takes, no more and no fewer"), 1));
     }
     return;
 }
@@ -33183,7 +33187,7 @@ char* id_bi_sys_msg2(int id, char* name, char* cw) {
 
 void id_bi_arg_err(int id, int i, char* want, char* t) {
     if ((strcmp(want, ID_S("index")) == 0)) {
-        id_tc_err(id, id_concat(ID_S("character_code_at index must be int, got "), t));
+        id_tc_diag(id, ID_S("E0636"), id_concat(ID_S("character_code_at index must be int, got "), t), ID_S("character_code_at"), ID_S("a position in a string is a whole number"), ID_S("pass an int index, as in character_code_at(s, 0)"));
     } else {
         id_bi_arg_err2(id, i, want, t);
     }
@@ -33192,7 +33196,7 @@ void id_bi_arg_err(int id, int i, char* want, char* t) {
 
 void id_bi_arg_err2(int id, int i, char* want, char* t) {
     if ((strcmp(want, ID_S("addr")) == 0)) {
-        id_tc_err(id, ID_S("str_of_mem takes an address and a length"));
+        id_tc_diag(id, ID_S("E0637"), id_concat_f(id_concat_f(id_concat_f(ID_S("str_of_mem takes an address and a length, both int: argument "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1), ID_S("str_of_mem"), ID_S("an address and a length are whole numbers, and a string or a list is neither"), ID_S("pass the address and the length as ints, as in str_of_mem(address, 5)"));
     } else {
         id_bi_arg_err3(id, i, want, t);
     }
@@ -33207,7 +33211,7 @@ void id_bi_arg_err3(int id, int i, char* want, char* t) {
     if ((strcmp(want, ID_S("word")) == 0)) {
         l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, id));
         s1_of_v = (char*)(intptr_t)(id_list_get(ns1, id));
-        id_tc_err((int)(id_list_get(l1_of_v, i)), id_concat_f(id_concat(s1_of_v, ID_S(" expects int or word arguments, got ")), t, 1));
+        id_tc_diag((int)(id_list_get(l1_of_v, i)), ID_S("E0638"), id_concat_f(id_concat(s1_of_v, ID_S(" expects int or word arguments, got ")), t, 1), s1_of_v, id_concat_f(id_concat_f(id_concat_f(ID_S("it works on whole numbers and unsigned words, and argument "), id_str_of_int(i), 2), ID_S(" is "), 1), t, 1), id_concat_f(id_concat_f(ID_S("pass an int or word for argument "), id_str_of_int(i), 2), ID_S(", converting it first if it is text or a float"), 1));
     } else {
         s1_of_v2 = (char*)(intptr_t)(id_list_get(ns1, id));
         bi_verb_v = id_bi_verb(want);
