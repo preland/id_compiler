@@ -1,0 +1,21 @@
+// keep_export's answer for a build that prunes, split out so keep_export asks
+// nat_all_live once. nat_all_live scans every function name for `main`, and
+// keep_export used to ask it twice for each of the library's list constants
+// on each pass over them; the scan was most of the parser's time on the
+// compiler's own source.
+
+keep_pruned_export(int i) {
+  int ok = 1;
+  if((import harn)[0] == 0) {
+    ok = is_reach((import eowners)[i]);
+  }
+  if((import eowners)[i] == "conf.id") {
+    int const_at = find_str((import clive), (import enames)[i]);
+    ok = const_at >= 0;
+  }
+} return int ok;
+given keep_export_fixture_harn_on (0):(1)
+given keep_export_fixture_reg (0):(0)
+given keep_export_fixture_reg (1):(1)
+given cvl_setup given const_mark(0) (0):(1)
+given cvl_setup given const_mark(0) (2):(0)

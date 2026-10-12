@@ -1012,6 +1012,7 @@ int id_const_one(int cv_k, int cv_lo);
 void id_const_range(int cv_lo, int cv_hi);
 void id_const_take(int cv_id);
 void id_const_add(char* cv_name);
+int id_keep_pruned_export(int i);
 void id_dce_prune(void);
 int id_dce_pack(int i, int n);
 int id_dce_keep(int i, int n);
@@ -5597,15 +5598,9 @@ int id_list_consts_kept(void) {
 
 int id_keep_export(int i) {
     int ok;
-    int const_at;
     ok = 1;
-    if ((((int)(id_list_get(harn, 0)) == 0) && (id_nat_all_live() == 0))) {
-        ok = id_is_reach((char*)(intptr_t)(id_list_get(eowners, i)));
-    }
-    if (((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), ID_S("conf.id")) == 0) && (id_nat_all_live() == 0))) {
-IdList* idsq_12;
-        const_at = (idsq_12 = clive, id_find_str(idsq_12, (char*)(intptr_t)(id_list_get(enames, i))));
-        ok = (const_at >= 0);
+    if (((((int)(id_list_get(harn, 0)) == 0) || (strcmp((char*)(intptr_t)(id_list_get(eowners, i)), ID_S("conf.id")) == 0)) && (id_nat_all_live() == 0))) {
+        ok = id_keep_pruned_export(i);
     }
     return ok;
 }
@@ -5732,6 +5727,21 @@ void id_const_add(char* cv_name) {
         id_list_push(clive, (long long)(intptr_t)(cv_name));
     }
     return;
+}
+
+int id_keep_pruned_export(int i) {
+    int ok;
+    int const_at;
+    ok = 1;
+    if (((int)(id_list_get(harn, 0)) == 0)) {
+        ok = id_is_reach((char*)(intptr_t)(id_list_get(eowners, i)));
+    }
+    if ((strcmp((char*)(intptr_t)(id_list_get(eowners, i)), ID_S("conf.id")) == 0)) {
+IdList* idsq_12;
+        const_at = (idsq_12 = clive, id_find_str(idsq_12, (char*)(intptr_t)(id_list_get(enames, i))));
+        ok = (const_at >= 0);
+    }
+    return ok;
 }
 
 void id_dce_prune(void) {

@@ -39,12 +39,8 @@ given fn_fixture ([1]):() then (import chkfail)[0]:(0)
 
 keep_export(int i) {
   int ok = 1;
-  if((import harn)[0] == 0 && nat_all_live() == 0) {
-    ok = is_reach((import eowners)[i]);
-  }
-  if((import eowners)[i] == "conf.id" && nat_all_live() == 0) {
-    int const_at = find_str((import clive), (import enames)[i]);
-    ok = const_at >= 0;
+  if(((import harn)[0] == 0 || (import eowners)[i] == "conf.id") && nat_all_live() == 0) {
+    ok = keep_pruned_export(i);
   }
 } return int ok;
 given keep_export_fixture_harn_on (0):(1)
