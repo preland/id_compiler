@@ -1,4 +1,4 @@
-// EXPECT: array index must be int
+// EXPECT: list index must be int, got string [E0614]
 main(int argc, string[] argv) {
   string[] xs = ["a", "b"];
   string first = xs["zero"];

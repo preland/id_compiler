@@ -14,12 +14,12 @@ given sd_use_fixture ((import sd_in), "int"):() then (import chkfail)[0]:(1)
 
 chk_field_at(int id, string sd_bt, string sd_f) {
   if(ty_kind_is(sd_bt, "struct") == 0) {
-    ix_err(id, "cannot read field '" + sd_f + "' of a " + sd_bt + "; only a struct has fields (a list's length is len(list))");
+    tc_diag(id, "E0615", "cannot read field '" + sd_f + "' of a " + sd_bt, sd_f, "only a struct has fields", "read a struct's field, or use len(list) for a list's length");
   } else if(sd_fpos(sd_bt, sd_f) < 0) {
     ix_err(id, sd_nofield(sd_bt, sd_f));
   }
 } return void;
-given sd_use_fixture ((import sd_in), "int", "x"):() then prints:("<stdin>:1: error: cannot read field 'x' of a int; only a struct has fields (a list's length is len(list))\n")
+given sd_use_fixture ((import sd_in), "int", "x"):() then prints:("<stdin>:1: error: cannot read field 'x' of a int [E0615]\n  at: x\n  why: only a struct has fields\n  help: read a struct's field, or use len(list) for a list's length\n")
 given sd_use_fixture ((import sd_iz), "P", "z"):() then prints:("<stdin>:1: error: struct 'P' has no field 'z'; its fields are x, y\n")
 
 sd_nofield(string sd_bt, string sd_f) {

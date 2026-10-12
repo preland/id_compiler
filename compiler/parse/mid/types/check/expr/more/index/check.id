@@ -36,7 +36,7 @@ chk_index2(int id) {
   int i2_of_v = (import ni2)[id];
   string it = type_of(i2_of_v);
   if(ty_known(it) == 1 && it != "int") {
-    ix_err(id, "array index must be int, got " + it);
+    tc_diag(id, "E0614", "list index must be int, got " + it, it, "an index counts elements, so only an int can say which one", "use an int index, or convert it first, as in to_int(x)");
   }
 } return void;
 given idxfix ((import rgidx_node)):() then (import chkfail)[0]:(0)

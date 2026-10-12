@@ -12,7 +12,7 @@ given sd_use_fixture ((import sd_wn), "int"):() then (import chkfail)[0]:(1)
 
 chk_fstore_at(int id, string sd_bt, string sd_f) {
   if(ty_kind_is(sd_bt, "struct") == 0) {
-    tc_err(id, "cannot assign field '" + sd_f + "' of a " + sd_bt + "; only a struct has fields");
+    tc_diag(id, "E0615", "cannot assign field '" + sd_f + "' of a " + sd_bt, sd_f, "only a struct has fields", "assign a struct's field, or declare the variable as a struct");
   } else if(sd_fpos(sd_bt, sd_f) < 0) {
     tc_err(id, sd_nofield(sd_bt, sd_f));
   } else {

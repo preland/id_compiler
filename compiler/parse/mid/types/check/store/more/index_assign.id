@@ -22,7 +22,7 @@ given cmp_fixture ((import bin_eq)):() then (import chkfail)[0]:(1)
 chk_iassign2(int id, string bt) {
   string it = type_of(((import ni2)[id]));
   if(ty_known(it) == 1 && it != "int") {
-    tc_err(id, "list index must be int, got " + it);
+    tc_diag(id, "E0614", "list index must be int, got " + it, it, "an index counts elements, so only an int can say which one", "use an int index, or convert it first, as in to_int(x)");
   } else {
     chk_iassign3(id, bt);
   }

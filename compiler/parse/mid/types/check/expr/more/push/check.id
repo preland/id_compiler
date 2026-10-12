@@ -14,7 +14,7 @@ chk_push2(int id, int[] args, string lt) {
   string et = elem_type(lt);
   if(ty_is_list(lt) == 1 && bad_store(et, args[1]) == 1) {
     string type_of_v = type_of(args[1]);
-    tc_err(id, "cannot push a " + type_of_v + " onto a " + lt);
+    tc_diag(id, "E0617", "cannot push a " + type_of_v + " onto a " + lt, lt, "a list holds one element type, and id converts nothing silently", "push a " + et + " value, or declare the list as " + type_of_v + "[]");
   }
   chk_literal_fit(id, et, args[1]);
 } return void;

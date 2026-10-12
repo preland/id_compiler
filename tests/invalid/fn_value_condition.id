@@ -1,4 +1,4 @@
-// EXPECT: a condition cannot be a function value (func(int) return void)
+// EXPECT: a condition cannot be a function value (func(int) return void) [E0616]
 // EXPECT-IDCPY: expected a type (int, string, void, or a T[] array type), found 'func'
 tick(int n) {
   print(n);

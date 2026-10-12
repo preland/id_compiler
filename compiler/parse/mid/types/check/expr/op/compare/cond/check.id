@@ -17,14 +17,14 @@ cond_kind(int id, string msg, string t) {
   if(ty_kind(t) == "unit") {
     tc_err(id, msg);
   } else if(ty_kind(t) == "func") {
-    tc_err(id, "a condition cannot be a function value (" + t + "); call it, and test what it returns");
+    tc_diag(id, "E0616", "a condition cannot be a function value (" + t + ")", t, "a function value is an address, never zero, so the condition would always hold", "call it, and test what it returns");
   } else if(ty_kind(t) == "struct") {
-    tc_err(id, "a condition cannot be a struct (" + t + "); test one of its fields, as in " + sd_cell((import sdfname), t, 0) + " > 0");
+    tc_diag(id, "E0616", "a condition cannot be a struct (" + t + ")", t, "a struct is a bundle of fields, not a truth", "test one of its fields, as in " + sd_cell((import sdfname), t, 0) + " > 0");
   }
 } return void;
 given cmp_fixture (0, "bad cond", "void"):() then (import chkfail)[0]:(1)
 given cmp_fixture (0, "bad cond", "int"):() then (import chkfail)[0]:(0)
-given sd_bi_fixture ((import sd_if), "bad cond", "P"):() then prints:("<stdin>:1: error: a condition cannot be a struct (P); test one of its fields, as in x > 0\n")
+given sd_bi_fixture ((import sd_if), "bad cond", "P"):() then prints:("<stdin>:1: error: a condition cannot be a struct (P) [E0616]\n  at: P\n  why: a struct is a bundle of fields, not a truth\n  help: test one of its fields, as in x > 0\n")
 
 // `==`, `!=` and id's bare `=` compare; `< <= > >=` order. is_eqop already
 // exists (in back/, for string equality's strcmp) and says exactly this --

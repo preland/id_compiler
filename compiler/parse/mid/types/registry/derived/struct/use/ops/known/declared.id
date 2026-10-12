@@ -17,11 +17,11 @@ given sd_decl_fixture ((import sd_dbad)):() then (import chkfail)[0]:(1)
 
 chk_type_known(int id, string sd_t) {
   if(ty_known(sd_t) == 0) {
-    tc_err(id, "unknown type '" + sd_t + "'; a type is int, word, float, string, a struct declared in a file of its own (structs: " + sd_list_text() + "), or a list of one of those, as in 'int[]'");
+    tc_diag(id, "E0612", "unknown type '" + sd_t + "'", sd_t, "a type is int, word, float, string, a struct declared in a file of its own, or a list of one of those", "write one of them (structs: " + sd_list_text() + "), as in 'int[]'");
   }
 } return void;
 given sd_decl_fixture ((import sd_dk), "int"):() then (import chkfail)[0]:(0)
-given sd_decl_fixture ((import sd_dbad), "Pnt"):() then prints:("<stdin>:1: error: unknown type 'Pnt'; a type is int, word, float, string, a struct declared in a file of its own (structs: P, Q), or a list of one of those, as in 'int[]'\n")
+given sd_decl_fixture ((import sd_dbad), "Pnt"):() then prints:("<stdin>:1: error: unknown type 'Pnt' [E0612]\n  at: Pnt\n  why: a type is int, word, float, string, a struct declared in a file of its own, or a list of one of those\n  help: write one of them (structs: P, Q), as in 'int[]'\n")
 
 // "P, Q": the structs there are, for a message about a type that is not one.
 sd_list_text() {

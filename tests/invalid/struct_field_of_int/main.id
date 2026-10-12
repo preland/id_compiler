@@ -1,4 +1,4 @@
-// EXPECT: only a struct has fields
+// EXPECT: cannot read field 'x' of a int [E0615]
 main(int argc, string[] argv) {
   int n = 3;
   int m = n.x;
