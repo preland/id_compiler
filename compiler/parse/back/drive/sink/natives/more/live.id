@@ -62,7 +62,8 @@ given env_init ():() then (import chkfail)[0]:(0)
 // guarded_emit.id), so there every function is live and every native any of
 // them calls is one the object needs.
 nat_all_live() {
-  int all = (import fsc)[0] == 1 || find_str((import fnames), "main") < 0;
+  int all = (import fsc)[0] == 1 || fn_index("main") < 0;
 } return int all;
 given flags_setup ():(1)
 given fs_on_fixture ():(1)
+given keep_export_fixture_reg ():(0)

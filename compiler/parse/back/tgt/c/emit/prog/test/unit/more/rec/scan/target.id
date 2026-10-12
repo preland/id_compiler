@@ -1,28 +1,34 @@
-// Whether some `calls` clause, of either form, names this function.
+// Whether some `calls` clause, of either form, names this function. The old
+// answer walked every `then` node for each function asked about; the names
+// the clauses target are now read once into rectarget (state.id, reset with
+// thennode), from where rectseen left off, so the tables stay exact when
+// clauses are added between two questions.
 
 is_rec_target(string nm) {
-  int ti = 0;
-  int r = 0;
-  int ret_i = rec_target_loop(nm, ti, r);
+  int ti = (import rectseen)[0];
+  rec_target_loop(ti);
+  int ret_i = find_str((import rectarget), nm) >= 0;
 } return int ret_i;
 given calls_node_fixture ("fx_target"):(1)
 given calls_node_fixture ("nope"):(0)
 
-rec_target_loop(string nm, int ti, int r) {
+rec_target_loop(int ti) {
   while(ti < len((import thennode))) {
-    r = rec_target_step(nm, ti, r);
+    rec_target_step(ti);
     ti = ti + 1;
   }
-} return int r;
-given calls_node_fixture ("fx_target", 0, 0):(1)
-given case_fixture ("fx_target", 0, 0):(0)
+  lset((import rectseen), 0, ti);
+} return void;
+given calls_node_fixture (0):() then len((import rectarget)):(1)
+given calls_node_fixture (1):() then (import rectseen)[0]:(1)
+given print_fixture (0):() then len((import rectarget)):(0)
 
-rec_target_step(string nm, int ti, int r) {
+rec_target_step(int ti) {
   int node = (import thennode)[ti];
-  string kind = (import nkind)[node];
-  if((kind == "thencalls" || kind == "thencallsn") && (import ns1)[node] == nm) {
-    r = 1;
+  string nm = (import ns1)[node];
+  if(((import nkind)[node] == "thencalls" || (import nkind)[node] == "thencallsn") && find_str((import rectarget), nm) < 0) {
+    push((import rectarget), nm);
   }
-} return int r;
-given calls_node_fixture ("fx_target", 0, 0):(1)
-given calls_node_fixture ("nope", 0, 0):(0)
+} return void;
+given calls_node_fixture (0):() then (import rectarget)[0]:("fx_target")
+given print_fixture (0):() then len((import rectarget)):(0)

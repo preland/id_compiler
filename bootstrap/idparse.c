@@ -1943,8 +1943,8 @@ void id_emit_rec_scan(int i);
 void id_emit_rec_at(int i);
 void id_emit_rec_prelude(void);
 int id_is_rec_target(char* nm);
-int id_rec_target_loop(char* nm, int ti, int r);
-int id_rec_target_step(char* nm, int ti, int r);
+void id_rec_target_loop(int ti);
+void id_rec_target_step(int ti);
 void id_emit_tc_rest(void);
 void id_emit_tc_graph(void);
 void id_emit_tc_support(void);
@@ -4329,6 +4329,8 @@ IdList* wrdone;  /* exported by init_cases2() */
 IdList* retexp;  /* exported by init_cases2() */
 IdList* retexp_pend;  /* exported by init_cases2() */
 IdList* ixargs;  /* exported by init_cases2() */
+IdList* rectarget;  /* exported by init_cases2() */
+IdList* rectseen;  /* exported by init_cases2() */
 IdList* afname;  /* exported by init_asm() */
 IdList* aftriple;  /* exported by init_asm() */
 IdList* afparams;  /* exported by init_asm() */
@@ -5958,7 +5960,7 @@ void id_nat_lists(void) {
 
 int id_nat_all_live(void) {
     int all;
-    all = (((int)(id_list_get(fsc, 0)) == 1) || (id_find_str(fnames, ID_S("main")) < 0));
+    all = (((int)(id_list_get(fsc, 0)) == 1) || (id_fn_index(ID_S("main")) < 0));
     return all;
 }
 
@@ -15131,31 +15133,31 @@ void id_emit_rec_prelude(void) {
 
 int id_is_rec_target(char* nm) {
     int ti;
-    int r;
     int ret_i;
-    ti = 0;
-    r = 0;
-    ret_i = id_rec_target_loop(nm, ti, r);
+    ti = (int)(id_list_get(rectseen, 0));
+    id_rec_target_loop(ti);
+    ret_i = (id_find_str(rectarget, nm) >= 0);
     return ret_i;
 }
 
-int id_rec_target_loop(char* nm, int ti, int r) {
+void id_rec_target_loop(int ti) {
     while ((ti < id_list_len(thennode))) {
-        r = id_rec_target_step(nm, ti, r);
+        id_rec_target_step(ti);
         ti = (ti + 1);
     }
-    return r;
+    id_lset(rectseen, 0, ti);
+    return;
 }
 
-int id_rec_target_step(char* nm, int ti, int r) {
+void id_rec_target_step(int ti) {
     int node;
-    char* kind;
+    char* nm;
     node = (int)(id_list_get(thennode, ti));
-    kind = (char*)(intptr_t)(id_list_get(nkind, node));
-    if ((((strcmp(kind, ID_S("thencalls")) == 0) || (strcmp(kind, ID_S("thencallsn")) == 0)) && (strcmp((char*)(intptr_t)(id_list_get(ns1, node)), nm) == 0))) {
-        r = 1;
+    nm = (char*)(intptr_t)(id_list_get(ns1, node));
+    if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, node)), ID_S("thencalls")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(nkind, node)), ID_S("thencallsn")) == 0)) && (id_find_str(rectarget, nm) < 0))) {
+        id_list_push(rectarget, (long long)(intptr_t)(nm));
     }
-    return r;
+    return;
 }
 
 void id_emit_tc_rest(void) {
@@ -18265,6 +18267,8 @@ void id_init_cases2(void) {
     retexp_pend = id_list_lit(0);
     id_vocab_init();
     ixargs = id_list_lit(1, (long long)(0));
+    rectarget = id_list_lit(0);
+    rectseen = id_list_lit(1, (long long)(0));
     return;
 }
 

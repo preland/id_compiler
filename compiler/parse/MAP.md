@@ -3938,9 +3938,9 @@ this compiler uses a construct on itself.
 | `emit_rec_scan` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/defs.id` | A recorder for every function targeted by a `calls` clause (target.id), |
 | `emit_rec_at` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/defs.id` | A recorder for every function targeted by a `calls` clause (target.id), |
 | `emit_rec_prelude` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/prelude.id` | Global state for `calls`-clause recording (docs/TESTS.md): idtc_rec_on is |
-| `is_rec_target` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/target.id` | Whether some `calls` clause, of either form, names this function. |
-| `rec_target_loop` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/target.id` | Whether some `calls` clause, of either form, names this function. |
-| `rec_target_step` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/target.id` | Whether some `calls` clause, of either form, names this function. |
+| `is_rec_target` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/target.id` | Whether some `calls` clause, of either form, names this function. The old |
+| `rec_target_loop` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/target.id` | Whether some `calls` clause, of either form, names this function. The old |
+| `rec_target_step` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/rec/scan/target.id` | Whether some `calls` clause, of either form, names this function. The old |
 | `emit_tc_rest` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/text/judge.id` | Judging a scaling claim, and the entry point. |
 | `emit_tc_graph` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/text/judge.id` | idtc_graph, which the entry point calls first: each case's component and |
 | `emit_tc_support` | `compiler/parse/back/tgt/c/emit/prog/test/unit/more/text/one.id` | Running one case: fork, run it in the child with its limits, and read back |

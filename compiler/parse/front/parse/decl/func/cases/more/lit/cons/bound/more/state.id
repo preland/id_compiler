@@ -13,6 +13,11 @@
 //   setupargs  [1 while a `given` setup's own arguments are being checked
 //              (mid/names/limits/shape/cases/given/setup/args.id)]
 //   ixargs     [1 while a `then` check's own arguments are being read, where an indexed export is accepted (cases/case/given/elem/index.id)]
+//   rectarget  the names some `calls` clause targets, each once, in the order
+//              thennode first showed them (back/tgt/c/emit/prog/test/unit/
+//              more/rec/scan/target.id)
+//   rectseen   [how many thennode entries rectarget has already read]; kept
+//              beside thennode so a fixture that resets one resets both
 //   wrdone     [1 once the write table (wrx, wrf) is built, mid/names/limits/shape/cases/report/diagnostics.id]
 //   retexp     the names `} return void export NAME;` clauses gave, in order;
 //              a func node's second int field is 2 plus its position here
@@ -99,6 +104,8 @@ init_cases2() {
   vocab_init();
 } chain () {
   export int[] ixargs = [0];
+  export string[] rectarget = [];
+  export int[] rectseen = [0];
 } return void export consbound;
 ():() then len((import consbound)):(0)
 given claim_cols_fixture ():() then len((import consbound)):(0)
