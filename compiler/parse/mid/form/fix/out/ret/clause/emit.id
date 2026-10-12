@@ -7,8 +7,9 @@ fix_close(int e) {
   }
   int cb = t0 - 1;
 } return int cb;
-given fix_ret_fixture (0):(0)
 given fix_ret_fixture (5):(-1)
+given fix_ret_fixture (1):(0)
+given fix_ret_fixture (0):(0)
 
 fix_ret_emit(int f, int e, string t) {
   string name = fix_ret_name(t);

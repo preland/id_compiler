@@ -25,4 +25,5 @@ fill_asm(int[] pos, string[] alines) {
   }
 } return void;
 given toks_env(["op", "str", "str", "op"], ["{", "\"i1\"", "\"i2\"", "}"]) ([1], []):([3], ["\"i1\"", "\"i2\""])
+given toks_env(["op", "str", "op"], ["{", "\"i1\"", "}"]) ([1], []):([2], ["\"i1\""])
 given env_init ([0], []):([0], [])

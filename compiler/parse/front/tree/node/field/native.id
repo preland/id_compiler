@@ -3,6 +3,8 @@
 is_native(int id) {
   int ok = (import ni2)[id] == 1;
 } return int ok;
+given mk_list_nodes (1):(0)
+given mk_two_nodes (1):(1) then last_kind:("kind func")
 given mk_two_nodes (0):(0)
 given mk_two_nodes (1):(1)
 

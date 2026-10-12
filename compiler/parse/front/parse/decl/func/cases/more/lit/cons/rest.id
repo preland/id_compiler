@@ -13,8 +13,9 @@ cons_bound(int[] pos, string ck) {
   int n = len((import casestart));
   cons_push(n, ck, bt);
 } return void;
-given bound_n_fix ([0], "foo"):() then prints:("")
+given bound_n_fix ([0], "foo"):() then (import conskind)[0]:("foo") then (import consbound)[0]:("O(n)")
 given toks_fn(["kw", "ident", "op", "op", "int", "op"], ["then", "myfn", ":", "(", "6", ")"]) ([1], "bar"):() then prints:("<stdin>:1: error: expected '(', found ':' [E0101]\n  at: :\n  why: the grammar needs '(' here to finish what it was reading, so the construct before this point is incomplete or mistyped\n  help: put '(' where it belongs; if it looks right, check the line before for a missing ';', ')' or '}', because those are noticed one token late\n")
+given bound_n_fix ([0], "foo"):() then prints:("")
 
 // The case being parsed is the last one whose start has been recorded.
 cons_push(int n, string ck, string bt) {

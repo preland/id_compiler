@@ -32,6 +32,7 @@ sd_fields(int[] pos, string[] sd_fns, string[] sd_fts) {
   }
 } return void;
 given sd_toks ([3], [], []):([9], ["x", "y"], ["int", "string"])
+given sd_toks ([6], [], []):([9], ["y"], ["string"])
 given sd_toks ([9], [], []):([9], [], [])
 
 sd_field(int[] pos, string[] sd_fns, string[] sd_fts) {

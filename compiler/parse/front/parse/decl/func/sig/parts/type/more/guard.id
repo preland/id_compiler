@@ -14,6 +14,7 @@ no_fn_ret(int[] pos, string rb) {
   }
 } return void;
 given decl_tokens ([33], "func"):() then prints:("<stdin>:1: error: a function type cannot return a function value; pass the function, or store it in a local or an export\n")
+given decl_tokens ([6], "func"):() then prints:("<stdin>:1: error: a function type cannot return a function value; pass the function, or store it in a local or an export\n")
 given decl_tokens ([33], "int"):() then prints:("")
 
 no_void_list(int[] pos, string pl, string rb, string rt) {
@@ -22,4 +23,5 @@ no_void_list(int[] pos, string pl, string rb, string rt) {
   }
 } return void;
 given decl_tokens ([33], "int, int", "void", "int"):() then prints:("<stdin>:1: error: 'func(int, int) return int': brackets after a function type's return type belong to the return type, and int is not a type; a function value cannot be an element of a list\n")
+given decl_tokens ([33], "string", "void", "string"):() then prints:("<stdin>:1: error: 'func(string) return string': brackets after a function type's return type belong to the return type, and string is not a type; a function value cannot be an element of a list\n")
 given decl_tokens ([33], "int, int", "int", "string"):() then prints:("")

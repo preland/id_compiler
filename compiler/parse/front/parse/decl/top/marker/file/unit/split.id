@@ -40,4 +40,5 @@ file_path(string s) {
   }
 } return string fpath;
 ("1|foo"):("foo")
+("2|a|b"):("a|b")
 ("foo"):("foo")

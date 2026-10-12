@@ -6,8 +6,9 @@ cons_kind(int[] pos, string ck) {
     syn_diag(pos, "E0508", "unknown constraint '" + ck + "'; a case constrains 'time' or 'mem'", ck, "a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')", "write [time:O(n)] or [mem:O(1)]; separate two claims with a comma");
   }
 } return void;
-given toks_env(["ident"], ["time"]) ([0], "time"):() then prints:("")
+given toks_env(["int"], ["5"]) ([0], "5"):() then prints:("<stdin>:1: error: expected 'time' or 'mem', found '5' [E0508]\n  at: 5\n  why: a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')\n  help: write [time:O(n)] or [mem:O(1)]; separate two claims with a comma\n")
 given toks_env(["ident"], ["time"]) ([0], "bogus"):() then prints:("<stdin>:1: error: unknown constraint 'bogus'; a case constrains 'time' or 'mem' [E0508]\n  at: bogus\n  why: a counted constraint limits either the steps a case takes ('time') or the memory it holds ('mem')\n  help: write [time:O(n)] or [mem:O(1)]; separate two claims with a comma\n")
+given toks_env(["ident"], ["time"]) ([0], "time"):() then prints:("")
 
 // One literal int leaf (id 0), for cases/more/lit/kinds.id's leaf_lit
 // true case.

@@ -7,8 +7,8 @@ flt_lit_mant(string text) {
   string flraw = str_replace(flm, ".", "");
 } return string flraw;
 ("0.0125e3"):("00125")
-("42"):("42")
 ("6.02e23"):("602")
+("42"):("42")
 
 // Without its leading zeros: "00125" is "125", and all zeros is "" (the value
 // is zero, which can overflow nothing).
@@ -38,6 +38,6 @@ flt_norm(string text) {
   }
 } return string flout;
 ("2e10"):("2.0e10")
+("1e-30"):("1.0e-30")
 ("1.5E+3"):("1.5E+3")
 ("0.8"):("0.8")
-("1e-30"):("1.0e-30")

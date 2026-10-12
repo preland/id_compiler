@@ -19,6 +19,7 @@ skip_pure(int[] pos) {
   }
 } return void;
 given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([0]):([1])
+given full_env given push_toks(["kw", "kw", "ident"], ["pure", "pure", "f"]) ([0]):([1])
 given full_env given push_toks(["kw", "ident"], ["pure", "f"]) ([1]):([1])
 
 pure_mark_fn(int pflag, int node) {

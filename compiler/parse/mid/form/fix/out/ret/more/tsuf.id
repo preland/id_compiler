@@ -14,6 +14,7 @@ fix_tstrip(string[] fixt_st) {
   }
 } return void;
 (["int[]", ""]):(["int", "l"])
+(["int[][]", ""]):(["int", "ll"])
 (["int", ""]):(["int", ""])
 
 fix_tstep(string[] fixt_st) {

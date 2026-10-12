@@ -12,8 +12,9 @@ fix_prefixed(string stem) {
     s = "idstd_" + stem;
   }
 } return string s;
-given fix_fixture ("foo"):("foo")
+given fix_env_std ("bar"):("idstd_bar")
 given fix_env_std ("foo"):("idstd_foo")
+given fix_fixture ("foo"):("foo")
 
 // Free: not a builtin, a function or an export anywhere in the program; not
 // declared anywhere in this function; and in the unit either unused or already

@@ -19,6 +19,7 @@ no_param_name(int[] pos, string pt) {
   skip_text(pos, ",");
 } return void;
 given decl_tokens ([3], "int"):() then prints:("<stdin>:1: error: a function type lists parameter types only: write 'int', not 'int a'\n")
+given decl_tokens ([6], "string"):() then prints:("<stdin>:1: error: a function type lists parameter types only: write 'string', not 'string b'\n")
 given decl_tokens ([7], "int"):() then prints:("")
 
 // The separator before the next parameter type: none before the first.
@@ -28,5 +29,6 @@ fn_sep(string out) {
     s = ", ";
   }
 } return string s;
-(""):("")
 ("int"):(", ")
+("int, int"):(", ")
+(""):("")

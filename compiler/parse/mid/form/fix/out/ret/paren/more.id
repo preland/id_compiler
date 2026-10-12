@@ -24,5 +24,6 @@ fix_in_moved(int c) {
     i = i + 1;
   }
 } return int ok;
-given fix_moved_fixture (0):(0)
 given fix_moved_fixture (5):(1)
+given fix_moved_fixture (1):(0)
+given fix_moved_fixture (0):(0)

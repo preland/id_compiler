@@ -20,6 +20,7 @@ fold_const(int d) {
   }
 } return int fold_out;
 given fold_setup ((import fold_dep)):(7) then calls node_decl:("int", "b", (import fold_e), 1)
+given fold_setup ((import fold_a)):((import fold_a)) then len((import nkind)):(7)
 given fold_setup ((import fold_a)):((import fold_a))
 
 const_src(int e) {

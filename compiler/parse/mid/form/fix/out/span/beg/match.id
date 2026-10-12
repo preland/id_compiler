@@ -8,6 +8,7 @@ fix_ibeg4(int e) {
   }
 } return int t0;
 given fix_span_fixture ((import sp_e)):(2)
+given fix_gcl_nodes (1):(0)
 given fix_gcl_nodes (0):(0)
 
 // Back from the closing token c to the opening one that matches it.
