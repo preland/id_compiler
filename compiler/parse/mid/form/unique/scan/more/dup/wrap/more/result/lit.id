@@ -33,5 +33,7 @@ cw_named_fixture() {
   cw_decl_fixture();
   int ok = cw_put((import cw_decl_x), "x");
 } return void;
+():() then (import cw_names)[0]:("x")
+():() then len((import cw_vals)):(1)
 ():() then calls cw_decl_fixture:[1]
 ():() then init_units:(0)

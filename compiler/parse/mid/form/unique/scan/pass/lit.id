@@ -10,6 +10,7 @@ ul_at(int i) {
   }
 } return void;
 given lz_o (1):() then calls ul_report:(1, 0)
+given chain_dup_fixture (2):() then calls ul_report:(2, 0)
 given lz_o (0):() then calls ul_report:[0]
 
 ul_find(int i) {

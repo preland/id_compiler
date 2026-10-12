@@ -8,6 +8,8 @@ full_check_fixture() {
   full_env();
   cmp_fixture();
 } return void;
+():() then len((import tline)):(0)
+():() then (import bin_eq):(11)
 ():() then calls full_env:[1]
 ():() then init_units:(0)
 
@@ -15,6 +17,8 @@ clean_check_fixture() {
   full_env();
   leaves_fixture();
 } return void;
+():() then len((import tline)):(0)
+():() then calls node_txt2:("int", "2", 2, 0)
 ():() then calls full_env:[1]
 ():() then init_units:(0)
 
@@ -23,5 +27,7 @@ voidarr_build() {
   leaves_fixture();
   export int decl_voidarr = node_decl("void[]", "y", (import lit_a), 0);
 } return void;
+():() then (import decl_voidarr):(5)
+():() then calls node_txt2:("int", "2", 2, 0)
 ():() then calls leaves_fixture:[1]
 ():() then init_units:(0)

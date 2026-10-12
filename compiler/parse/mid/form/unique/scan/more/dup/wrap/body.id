@@ -37,5 +37,8 @@ cw_begin(string name) {
   export string[] cw_names = [];
   export string[] cw_vals = [];
 } return void;
+("foo"):() then calls uq_begin:("foo")
+("bar"):() then calls uq_begin:("bar")
+("foo"):() then len((import cw_names)):(0)
 ("foo"):() then calls uq_begin:[1]
 ("bar"):() then calls uq_begin:[1]

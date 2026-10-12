@@ -20,5 +20,6 @@ lit_loose_fixture() {
   env_init();
   lset((import cloose), 0, 1);
 } return void;
-():() then calls env_init:[1]
+():() then len((import tyname)):(5)
 ():() then (import cloose)[0]:(1)
+():() then calls env_init:[1]

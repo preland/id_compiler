@@ -34,5 +34,7 @@ chain_dup_fixture() {
   chain_fn_make("cd", 1, "blank");
   uq_fill();
 } return void;
+():() then len((import prog)):(4)
+():() then len((import cfp)):(4)
 ():() then calls chain_fn_make:[4]
 ():() then init_units:(0)

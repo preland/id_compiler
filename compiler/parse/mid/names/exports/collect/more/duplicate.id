@@ -10,6 +10,8 @@ add_export2(int id, string owner) {
 } chain (int id, string owner) {
   add_export(s2_of_v, s1_of_v, owner);
 } return void;
+given lz_j ((import lz_edecl), "fn1"):() then find_str((import eowners), "fn1"):(0)
+given dead_exp_fixture ((import dead_imp_a), "fn2"):() then find_str((import eowners), "fn2"):(2)
 given lz_j ((import lz_edecl), "fn1"):() then calls chk_dupexp:[1]
 given dead_exp_fixture ((import dead_imp_a), "fn2"):() then calls find_str:[1]
 
@@ -19,6 +21,8 @@ chk_dupexp(int id, string owner) {
     dupexp_err(id, owner);
   }
 } return void;
+given lz_j_dup ((import lz_edecl), "fn2"):() then prints:("<stdin>:0: error: 'z' is already an exported global (exported by 'fn1')\n")
+given lz_j_dup ((import lz_edecl), "fn3"):() then prints:("<stdin>:0: error: 'z' is already an exported global (exported by 'fn1')\n")
 given lz_j_dup ((import lz_edecl), "fn2"):() then calls dupexp_err:[1]
 given lz_j ((import lz_edecl), "fn2"):() then calls dupexp_err:[0]
 
@@ -32,5 +36,7 @@ chk_retexp(int id) {
     retexp_err(id, cr_nm);
   }
 } return void;
+given fn_fixture given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:((import fixture_fn), "gx")
+given fn_fixture given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then prints:("<stdin>:1: error: 'gx' is named by the return clause of 'fx_target' (return void export gx), but 'fx_target' does not export it in its own body; add 'export TYPE gx = VALUE;' to 'fx_target', or drop 'export gx' from its return clause\n")
 given fn_fixture given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[1]
 given fn_fixture given add_export("gx", "int", "fx_target") given list_string_extend((import retexp), ["gx"]) given lset((import ni2), (import fixture_fn), 2) ((import fixture_fn)):() then calls retexp_err:[0]

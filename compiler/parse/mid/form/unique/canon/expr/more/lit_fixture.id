@@ -7,12 +7,14 @@ lv_un_fixture() {
   un_fixture();
   lset((import cloose), 0, 1);
 } return void;
-():() then calls un_fixture:[1]
+():() then (import neg_node):(3)
 ():() then (import cloose)[0]:(1)
+():() then calls un_fixture:[1]
 
 lv_str_fixture() {
   lz_a();
   lset((import cloose), 0, 1);
 } return void;
-():() then calls lz_a:[1]
+():() then calls uq_begin:("test")
 ():() then (import cloose)[0]:(1)
+():() then calls lz_a:[1]

@@ -14,6 +14,8 @@ word_scan() {
     vocab_run();
   }
 } return void;
+given vocab_world ():() then (import vocab_totals)[0]:(4)
+given vocab_world ():() then (import vocab_seen_count)[0]:(4)
 given full_env ():() then calls vocab_run:[0]
 given vocab_world ():() then calls vocab_run:[1]
 

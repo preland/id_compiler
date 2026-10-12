@@ -8,6 +8,8 @@ dg_t_crows() {
   dg_t_cparsed();
   dg_init();
 } return void;
+():() then ctok_span:(5)
+():() then len((import dg_comp)):(0)
 ():() then calls dg_t_cparsed:[1]
 ():() then dg_nexp:("exp 0")
 

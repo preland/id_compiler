@@ -15,8 +15,9 @@ print_fingerprints() {
     i = i + 1;
   }
 } return void;
-given lz_o ():() then calls print_fp_line:[2]
 given lz_o ():() then calls print_fp_line:(0) then calls print_fp_line:(1)
+given lz_o ():() then prints:("|()->int=>v0{d:int 0=I5}\tdup5\t<stdin>:1\n|()->int=>v0{d:int 0=I9}\tdup9\t<stdin>:1\n")
+given lz_o ():() then calls print_fp_line:[2]
 
 // `i` indexes the fingerprints; the function it belongs to is resolved by
 // fname_at (../scan/more/report/dup.id), the checker's one place for that

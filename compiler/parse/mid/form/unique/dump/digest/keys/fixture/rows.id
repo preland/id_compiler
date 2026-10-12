@@ -5,6 +5,8 @@ dg_t_rows0() {
   dg_t_parsed();
   dg_init();
 } return void;
+():() then ptok_span:(19)
+():() then len((import dg_comp)):(0)
 ():() then calls dg_t_parsed:[1]
 ():() then dg_nfn:(0)
 

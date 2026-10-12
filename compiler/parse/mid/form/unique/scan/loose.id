@@ -21,6 +21,8 @@ ul_fill_all() {
     ulf_i = ulf_i + 1;
   }
 } return void;
+given lz_o ():() then len((import cfpl)):(4)
+given lz_o ():() then calls unit_kind:(22) then calls unit_kind:(23)
 given lz_o ():() then calls ul_fill_at:[2]
 given farm_g ():() then calls ul_fill_at:[0]
 

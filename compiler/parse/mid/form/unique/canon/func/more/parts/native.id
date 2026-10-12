@@ -10,6 +10,8 @@ cn_seeded_fixture() {
   canon_begun_fixture();
   push((import cnames), "already");
 } return void;
+():() then (import cnames)[0]:("already")
+():() then len((import cnames)):(1)
 ():() then calls canon_begun_fixture:[1]
 ():() then init_units:(0)
 

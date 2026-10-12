@@ -17,6 +17,7 @@ chk_dupfn() {
   }
 } return void;
 given dup_prog_fixture("dupe", "dupe", 1, 5) ():() then calls dupfn_err:(1, 0)
+given dup_prog_fixture("twin", "twin", 2, 7) ():() then prints:("b.id:7: error: function 'twin' already defined at a.id:2 [E0401]\n  at: twin\n  why: a function is called by its name alone, so a name can mean only one function\n  help: rename this function so each name is its own; if the two do the same thing, keep one and call it from both places\n  related: a.id:2: note: the first definition of 'twin'\n")
 given clean_prog_fixture ():() then calls dupfn_err:[0]
 
 // Reported against every definition after the first, so three functions of
@@ -43,8 +44,9 @@ dupfn_at(int i) {
     var_report(prog_loc_v + "names beginning 'idsq_' are reserved for the C target's temporaries; rename '" + s1_of_v + "'");
   }
 } return void;
-given dup_prog_fixture("dupe", "dupe", 1, 5) (0):() then calls dupfn_err:[0]
 given dup_prog_fixture("dupe", "dupe", 1, 5) (1):() then calls dupfn_err:(1, 0)
+given dup_prog_fixture("twin", "twin", 2, 7) (1):() then prints:("b.id:7: error: function 'twin' already defined at a.id:2 [E0401]\n  at: twin\n  why: a function is called by its name alone, so a name can mean only one function\n  help: rename this function so each name is its own; if the two do the same thing, keep one and call it from both places\n  related: a.id:2: note: the first definition of 'twin'\n")
+given dup_prog_fixture("dupe", "dupe", 1, 5) (0):() then calls dupfn_err:[0]
 
 dupfn_err(int i, int j) {
   string dupfn_where = diag_prog_loc(i);

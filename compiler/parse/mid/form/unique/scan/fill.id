@@ -18,6 +18,8 @@ uq_fill_all() {
     i = i + 1;
   }
 } return void;
+given lz_o ():() then len((import cfp)):(4)
+given lz_o ():() then calls unit_kind:(22) then calls unit_kind:(23)
 given lz_o ():() then calls uq_fill_at:[2]
 given farm_g ():() then calls uq_fill_at:[0]
 
