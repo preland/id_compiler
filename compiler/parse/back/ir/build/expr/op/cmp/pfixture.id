@@ -16,8 +16,9 @@ pcall_fixture() {
   init_bnames();
   pcall_fixture_reg();
 } return void;
-():() then calls lw_env_fixture:[1]
+():() then (import pcall_fn):(2)
 ():() then init_units:(0)
+():() then calls lw_env_fixture:[1]
 
 pcall_fixture_reg() {
   int[] none = [];

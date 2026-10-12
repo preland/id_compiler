@@ -28,5 +28,6 @@ lw_fix_arr_empty() {
   int[] none = [];
   export int fix_arr_empty_n = node_arr(none);
 } return void;
-():() then calls lw_env_fixture:[1]
+():() then (import fix_arr_empty_n):(1)
 ():() then init_units:(0)
+():() then calls lw_env_fixture:[1]

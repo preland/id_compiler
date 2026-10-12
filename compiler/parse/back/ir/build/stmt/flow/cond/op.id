@@ -10,6 +10,8 @@ lw_flow(int node) {
     lw_early_ret(node);
   }
 } return void;
+given flow_ir_fixture ((import flow_ir_brk)):() then calls lw_term:("br", -1, [2])
+given flow_ir_fixture ((import flow_ir_ret)):() then calls lw_ret_val:((import flow_ir_ret), "int")
 given flow_ir_fixture ((import flow_ir_brk)):() then calls lw_break:[1]
 given flow_ir_fixture ((import flow_ir_ret)):() then calls lw_early_ret:[1]
 
@@ -22,4 +24,5 @@ lw_break() {
   lw_dead();
 } return void;
 given flow_ir_fixture ():() then calls lw_term:("br", -1, [2])
+given flow_ir_fixture ():() then chk_last_blk_lbl:("dead")
 given flow_ir_fixture ():() then calls lw_dead:[1]

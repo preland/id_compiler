@@ -18,6 +18,7 @@ lw_early_ret(int node) {
   lw_dead();
 } return void;
 given flow_ir_fixture ((import flow_ir_ret)):() then calls lw_ret_val:((import flow_ir_ret), "int")
+given flow_ir_fixture ((import flow_ir_ret)):() then chk_last_blk_lbl:("dead")
 given flow_ir_fixture ((import flow_ir_ret)):() then calls lw_dead:[1]
 
 // Start a new block and lower into it: after a `br` or `ret` the block that
@@ -27,5 +28,7 @@ lw_dead() {
   int lw_dead_b = ir_block(lw_dead_fn, "dead");
   lw_go(lw_dead_b);
 } return void;
+given flow_ir_fixture ():() then chk_last_blk_lbl:("dead")
+given flow_ir_fixture ():() then calls lw_go:(2)
 given flow_ir_fixture ():() then calls ir_block:[1]
 given flow_ir_fixture ():() then calls lw_go:[1]

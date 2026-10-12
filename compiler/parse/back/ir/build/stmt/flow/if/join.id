@@ -25,5 +25,5 @@ lw_own_init(int ent, int v) {
   }
 } return void;
 given lwo_fixture ((import lwo_ent), (import lwo_w)):() then calls ir_add:[1] then calls ir_leaf:("const", "int[]", -1, -1, "null")
-given lwo_fixture ((import lwo_ent), (import lwo_z)):() then calls ir_add:[0]
 given lws_fixture ((import lws_ent), (import lws_s)):() then calls ir_leaf:("const", "int[]", -1, -1, "null")
+given lwo_fixture ((import lwo_ent), (import lwo_z)):() then calls ir_add:[0]

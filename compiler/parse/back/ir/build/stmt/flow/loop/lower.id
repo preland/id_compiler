@@ -25,5 +25,7 @@ lw_versioned(int lv_n) {
   lv_copy(lv_n, lv_slow, lv_jn, 0);
   lw_go(lv_jn);
 } return void;
+given lv_loop ((import while_node)):() then chk_last_blk_lbl:("exit")
+given lv_loop ((import while_node)):() then calls lw_term:("cbr", 15, [2, 3])
 given lv_loop ((import while_node)):() then calls lv_copy:[2]
 given lv_loop ((import while_node)):() then calls ir_block:[9]

@@ -24,5 +24,6 @@ logic_fixture() {
   export int and_node = node_txt2("bin", "&&", (import ev_node), (import ev_node));
   export int or_node = node_txt2("bin", "||", (import ev_node), (import ev_node));
 } return void;
-():() then calls bound_fixture:[1]
+():() then (import and_node):(3)
 ():() then init_units:(0)
+():() then calls bound_fixture:[1]

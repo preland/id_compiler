@@ -14,8 +14,9 @@ pushcall_fixture() {
   init_bnames();
   pushcall_fixture_reg();
 } return void;
-():() then calls lw_env_fixture:[1]
+():() then (import pushcall_node):(3)
 ():() then init_units:(0)
+():() then calls lw_env_fixture:[1]
 
 pushcall_fixture_reg() {
   export int[] pushcall_args = [node_txt2("int", "1", 1, 0)];

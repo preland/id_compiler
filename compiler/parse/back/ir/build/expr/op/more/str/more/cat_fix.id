@@ -5,12 +5,14 @@ cat_fixture() {
   init_rtc();
   export int cat_l = node_txt2("bin", "+", (import concat_node), (import str_node));
 } return void;
-():() then calls str_fixture2:[1]
+():() then (import cat_l):(7)
 ():() then init_units:(0)
+():() then calls str_fixture2:[1]
 
 cat_fs1() {
   cat_fixture();
   lset((import fsc), 0, 1);
 } return void;
-():() then calls cat_fixture:[1]
+():() then (import fsc)[0]:(1)
 ():() then init_units:(0)
+():() then calls cat_fixture:[1]

@@ -5,5 +5,6 @@ str_fixture2() {
   export int concat_node = node_txt2("bin", "+", (import str_node), (import str_node));
   export int cmp_node = node_txt2("bin", "<", (import ev_node), (import ev_node));
 } return void;
-():() then calls str_fixture:[1]
+():() then (import concat_node):(5)
 ():() then init_units:(0)
+():() then calls str_fixture:[1]

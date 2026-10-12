@@ -17,6 +17,8 @@ lv_fix() {
   lw_fixture_node();
   lv_slots();
 } return void;
+():() then len((import lwvar)):(3)
+():() then (import lw_fixture_n):(27)
 ():() then calls lv_slots:[1]
 ():() then calls lw_fixture_node:[1]
 

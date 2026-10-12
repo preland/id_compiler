@@ -7,5 +7,5 @@ lw_discard(int e, int v) {
   }
 } return void;
 given lwt_fixture ((import eff_cmk), 7):() then calls lw_callf:("id_list_free", "", [7])
-given lwt_fixture ((import eff_cl), 7):() then calls lw_callf:[0]
 given lwt_fixture ((import eff_csr), 7):() then calls lw_callf:("id_str_free", "", [7])
+given lwt_fixture ((import eff_cl), 7):() then calls lw_callf:[0]

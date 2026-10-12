@@ -18,8 +18,9 @@ bound_fixture2() {
   push((import enames), "g");
   push((import etypes), "int");
 } return void;
-():() then calls bound_fixture:[1]
+():() then len((import enames)):(1)
 ():() then init_units:(0)
+():() then calls bound_fixture:[1]
 
 // bound_fixture2 plus a "decl" node for the exported "g" and an "assign"
 // node targeting it.
@@ -28,5 +29,6 @@ gdecl_fixture() {
   export int gdecl_node = node_decl("int", "g", (import ev_node), 1);
   export int gassign_node = node_txt1("assign", "g", (import ev_node));
 } return void;
-():() then calls bound_fixture2:[1]
+():() then (import gdecl_node):(3)
 ():() then init_units:(0)
+():() then calls bound_fixture2:[1]

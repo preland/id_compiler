@@ -25,5 +25,6 @@ lw_func_fixture() {
   int[] none = [];
   export int g_fnnode = node_func("g", "int", none, [(import decl_node)], (import ev_node));
 } return void;
-():() then calls bound_fixture:[1]
+():() then (import g_fnnode):(3)
 ():() then init_units:(0)
+():() then calls bound_fixture:[1]
