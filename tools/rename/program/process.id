@@ -1,16 +1,19 @@
 // Renaming in one file.
 
 // The triples for a file's names: source files are read as source, the
-// registries as markdown tables.
+// registries as markdown tables, and the C and JavaScript files that bind a
+// native by name as plain text (scan/foreign.id).
 rename_file_spans(string rename_file, string rename_source) {
-  int[] rename_spans = [];
+  int[] rename_spans = rename_native_file_spans(rename_file, rename_source);
   if(str_ends(rename_file, ".id") == 1) {
     rename_spans = rename_name_spans(rename_source);
-  } else {
+  }
+  if(str_ends(rename_file, ".md") == 1) {
     rename_spans = rename_markdown_spans(rename_source);
   }
 } return int[] rename_spans;
 ("a.id", "x // y"):([0, 1, 1])
+("a.mjs", "id_y z"):([3, 4, 1, 5, 6, 1])
 ("NAMES.md", "x `y`"):([])
 ("NAMES.md", "| `y` |"):([3, 4, 1])
 

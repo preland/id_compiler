@@ -9,7 +9,7 @@
 rename_function_region(string rename_source, string rename_function) {
   int[] rename_region = [];
   string rename_padded = "\n" + rename_source;
-  int rename_hit = str_find(rename_padded, "\n" + rename_function + "(");
+  int rename_hit = rename_function_header(rename_padded, rename_function);
 } chain (string rename_source, string rename_function) {
   int rename_stop = str_findat(rename_padded, "\n\n", rename_hit + 1);
   if(rename_hit >= 0 && rename_stop < 0) {
@@ -23,6 +23,8 @@ rename_function_region(string rename_source, string rename_function) {
 ("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "b"):([22, 39])
 ("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "a"):([0, 20])
 ("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "c"):([41, 48])
+("pure a() {\n} return void;\n\nb() {\n}", "a"):([0, 25])
+("x\n\npure native a(int n) return int;\n\nb() {\n}", "a"):([3, 35])
 ("a() {\n} return void;\n\nb(r) {\n  r = 1;\n}\n\nc() {\n}", "d"):([])
 ("x b(r)\nb2(r) {\n}", "b"):([])
 

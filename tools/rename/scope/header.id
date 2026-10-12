@@ -1,0 +1,31 @@
+// Where a function's header is in a source text. A declaration may begin with
+// `pure`, with `native`, or with `pure native` (docs/SPEC.md sections 1.3 and 3),
+// so a lookup that only knew the bare form could not find `pure fx_clamp(`.
+
+// The earlier of two positions, where -1 means "not found" and loses to any
+// real position.
+rename_earlier(int rename_first, int rename_second) {
+  int rename_best = rename_first;
+  if(rename_first < 0 || (rename_second >= 0 && rename_second < rename_first)) {
+    rename_best = rename_second;
+  }
+} return int rename_best;
+(-1, 5):(5)
+(3, -1):(3)
+(3, 5):(3)
+(5, 3):(3)
+(-1, -1):(-1)
+
+// The index of the newline that precedes a function's header line, in a text
+// that starts with a newline: the bare header, `pure NAME(`, `native NAME(` or
+// `pure native NAME(`, whichever comes first; -1 when the text declares none.
+rename_function_header(string rename_padded, string rename_function) {
+  int rename_hit = rename_earlier(str_find(rename_padded, "\n" + rename_function + "("), str_find(rename_padded, "\npure " + rename_function + "("));
+  rename_hit = rename_earlier(rename_hit, str_find(rename_padded, "\nnative " + rename_function + "("));
+  rename_hit = rename_earlier(rename_hit, str_find(rename_padded, "\npure native " + rename_function + "("));
+} return int rename_hit;
+("\npure f(int x) {\n}", "f"):(0)
+("\nx\nnative f(int x) return int;", "f"):(2)
+("\nx\npure native f(int x) return int;", "f"):(2)
+("\nx\ng(int x) {\n}\nf() {\n}", "f"):(15)
+("\npure fx(int x) {\n}", "f"):(-1)

@@ -7,7 +7,11 @@
 // a name: never inside a string literal or a comment, but in test cases, `given`
 // and `then` clauses and `(import NAME)`; and for NAMES.md and NOTES.md, the
 // registries, where a name in backticks in a table row is renamed unless it is
-// part of a path.
+// part of a path. A function backed by a native is bound by name beside its
+// declaration, so `.h`, `.c` and `.mjs` files under the roots are renamed too, as
+// whole identifiers: the C symbol `id_NAME` (C and headers) and the bare key NAME
+// (JavaScript modules only). `--in` finds a function declared with `pure`,
+// `native` or `pure native` as well as the bare form.
 //
 // Nothing is written until every pair has been checked: a new name must be a
 // name, not a reserved word, spelled in words (the E0311 rule, against the word
