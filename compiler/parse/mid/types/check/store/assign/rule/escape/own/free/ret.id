@@ -11,6 +11,7 @@ esc_ret_code(string code) {
   }
 } return string s;
 given esc_fix ("return z;"):("{ id_list_free(w); return z; }")
+given esc_fix ("return w;"):("{ id_list_free(w); return w; }")
 given full_env ("return z;"):("return z;")
 
 // The function whose body is being emitted: emit_def (code/func/def/body/def.id)

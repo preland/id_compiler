@@ -40,4 +40,5 @@ diag_line(string dgn_key, string dgn_text) {
   }
 } return void;
 ("why", "because"):() then prints:("  why: because\n")
+("help", "do this"):() then prints:("  help: do this\n")
 ("why", ""):() then prints:("")

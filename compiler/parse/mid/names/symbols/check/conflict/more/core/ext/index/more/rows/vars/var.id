@@ -6,6 +6,7 @@ ixw_var(int ixw_k) {
   }
 } return void;
 given regrow_d (0):() then prints:("V\tf\tx\tint\t10\n")
+given regrow_d given reg_push("y", "string", "h", 0, 0) given list_extend((import dvline), [20, 30]) (1):() then prints:("V\th\ty\tstring\t20\n")
 given regrow_d given reg_push("e", "int", "g", 1, 0) (1):() then prints:("")
 
 // One node of each kind the walk tells apart, numbered from 0: a call, a

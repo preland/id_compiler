@@ -34,4 +34,5 @@ bind_kind_msg(string t) {
   }
 } return string msg;
 ("int"):("'bind' takes the name of a function written in id as its first argument, but it is a int; write bind(NAME, value, ...)")
+("float[]"):("'bind' takes the name of a function written in id as its first argument, but it is a float[]; write bind(NAME, value, ...)")
 (""):("")

@@ -12,6 +12,7 @@ minus_operand(int e) {
   }
 } return int operand_node;
 given wide_literal_fixture ((import negated_edge)):((import literal_edge))
+given wide_literal_fixture ((import negated_past)):((import literal_past))
 given wide_literal_fixture ((import literal_huge)):((import literal_huge))
 
 int_too_wide(int e) {

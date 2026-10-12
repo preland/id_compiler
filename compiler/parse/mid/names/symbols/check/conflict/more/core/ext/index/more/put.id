@@ -15,6 +15,7 @@ ixw_tag(string ixw_tag_name, string ixw_text) {
   }
 } return void;
 ("D", "a b"):() then prints:("D\ta b\n")
+("V", "x int"):() then prints:("V\tx int\n")
 ("D", ""):() then prints:("")
 
 // What main does up to its checks, over the token text on the case's stdin:

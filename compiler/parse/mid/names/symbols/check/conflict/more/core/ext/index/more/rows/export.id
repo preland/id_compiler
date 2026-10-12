@@ -10,6 +10,7 @@ ixw_exports() {
   }
 } return void;
 given env_init given add_export("gx", "int", "o1") given add_export("gy", "string", "o2") ():() then prints:("X\to1\tgx\tint\nX\to2\tgy\tstring\n")
+given env_init given add_export("gx", "int", "o1") ():() then prints:("X\to1\tgx\tint\n")
 given env_init ():() then prints:("")
 
 ixw_export(int ixw_k) {
@@ -18,6 +19,7 @@ ixw_export(int ixw_k) {
   }
 } return void;
 given env_init given add_export("gx", "int", "o1") (0):() then prints:("X\to1\tgx\tint\n")
+given env_init given add_export("gz", "string", "o3") (0):() then prints:("X\to3\tgz\tstring\n")
 given env_init given add_export("cc", "int", "conf.id") (0):() then prints:("")
 
 ixw_vars() {

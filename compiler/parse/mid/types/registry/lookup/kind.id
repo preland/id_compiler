@@ -8,6 +8,7 @@ ty_base(string t) {
   }
 } return string t;
 ("int[][]"):("int")
+("string[]"):("string")
 ("string"):("string")
 
 // The kind of a type: "int", "float", "ref", "unit" from the registry, "list"
@@ -23,8 +24,9 @@ ty_kind(string t) {
     s = "func";
   }
 } return string s;
-given init_tyreg ("int"):("int")
 given init_tyreg ("int[]"):("list")
+given init_tyreg ("func(int) return int"):("func")
+given init_tyreg ("int"):("int")
 
 ty_row_kind(string t) {
   int r = find_str((import tyname), t);

@@ -33,5 +33,6 @@ sd_named(string sd_s) {
     t = sd_s;
   }
 } return string t;
-given sd_pair ("Q"):("Q")
 given sd_pair ("len"):("")
+given sd_pair ("q"):("")
+given sd_pair ("Q"):("Q")

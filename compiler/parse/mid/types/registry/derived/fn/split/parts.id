@@ -25,4 +25,5 @@ fn_split(string t, int hi, string[] pts) {
   fn_last(t, hi, st, pts);
 } return void;
 ("func(int, string) return void", 16, []):("func(int, string) return void", 16, ["int", "string"])
+("func(int) return void", 8, []):("func(int) return void", 8, ["int"])
 ("func() return void", 5, []):("func() return void", 5, [])

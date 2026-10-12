@@ -7,6 +7,7 @@ fn_last(string t, int hi, int[] st, string[] pts) {
   }
 } return void;
 ("func(int) return int", 8, [5, 0], []):("func(int) return int", 8, [5, 0], ["int"])
+("func(a, b) return void", 9, [8, 0], ["a"]):("func(a, b) return void", 9, [8, 0], ["a", "b"])
 ("func() return void", 5, [5, 0], []):("func() return void", 5, [5, 0], [])
 
 // Parameter i's type. Asked only once the arity has been checked.

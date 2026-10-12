@@ -22,8 +22,9 @@ tk_from(int tkf) {
     tkfrom = (import ptoke)[tkf - 1];
   }
 } return int tkfrom;
-given tk_t_prep (0):(0)
 given tk_t_prep (1):(18)
+given tk_t_prep (2):(51)
+given tk_t_prep (0):(0)
 
 // The unit of the function before this one (the first's own) times 65536,
 // plus this function's unit.
@@ -36,5 +37,6 @@ tk_units(int tkf) {
 } chain (int tkf) {
   int tkuv = tkup * 65536 + tkun;
 } return int tkuv;
-given tk_t_prep (0):(0)
+given tk_t_prep given lset((import nunit), 6, 3) given lset((import nunit), 21, 2) (1):(196610)
 given tk_t_prep (1):(0)
+given tk_t_prep (0):(0)

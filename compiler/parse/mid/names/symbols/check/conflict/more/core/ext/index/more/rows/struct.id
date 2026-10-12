@@ -9,6 +9,7 @@ ixw_structs() {
   }
 } return void;
 given sd_pair ():() then prints:("@\tp.id\nF\tP\ts\t1\t0\nD\tint int\n@\tq.id\nF\tQ\ts\t5\t0\nD\tstring\n")
+given sd_pair given sd_note("R", ["a"], ["Pt[]"], "r.id", 9) ():() then prints:("@\tp.id\nF\tP\ts\t1\t0\nD\tint int\n@\tq.id\nF\tQ\ts\t5\t0\nD\tstring\n@\tr.id\nF\tR\ts\t9\t0\nD\tPt\n")
 given env_init ():() then prints:("")
 
 ixw_struct(int ixw_k) {

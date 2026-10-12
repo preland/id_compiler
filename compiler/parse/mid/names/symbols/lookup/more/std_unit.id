@@ -27,6 +27,8 @@ case_is_std(int ci) {
     r = 1;
   }
 } return int r;
+given case_unit_fixture given lset((import stdunit), 0, 0) (0):(1)
+given case_unit_fixture given lset((import stdunit), 0, 9) given lset((import exclunit), 0, 0) (1):(0)
 given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
 
@@ -45,6 +47,8 @@ unit_excluded(int ci) {
     r = 1;
   }
 } return int r;
+given case_unit_fixture given lset((import exclunit), 0, 0) (0):(1)
+given case_unit_fixture given lset((import exclunit), 0, 0) (1):(0)
 given case_unit_fixture (0):(0)
 given case_unit_fixture (1):(1)
 

@@ -25,4 +25,5 @@ ixw_base(string ixw_t) {
   }
 } return string ixw_t;
 ("int[][]"):("int")
+("string[]"):("string")
 ("Point"):("Point")

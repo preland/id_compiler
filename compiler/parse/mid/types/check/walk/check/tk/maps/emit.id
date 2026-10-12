@@ -10,6 +10,7 @@ tk_emit_keys() {
   }
 } return void;
 given tk_t_prep ():() then prints:("/* ---- tc keys ---- */\n4208351378666089285\n-8648083975898962277\n")
+given tk_t_bad2 ():() then prints:("/* ---- tc keys ---- */\n-8648083975898962277\n")
 given tk_t_prep0 ():() then prints:("")
 
 tk_emit_one(int tkf) {

@@ -9,6 +9,7 @@ fn_walk(string t, int hi, int[] st, string[] pts) {
   }
 } return void;
 ("func(a,b)", 8, [5, 0], []):("func(a,b)", 8, [8, 0], ["a"])
+("func(a, b, c)", 12, [5, 0], []):("func(a, b, c)", 12, [11, 0], ["a", "b"])
 ("func()", 5, [5, 0], []):("func()", 5, [5, 0], [])
 
 fn_step(string t, int i, int[] st, string[] pts) {

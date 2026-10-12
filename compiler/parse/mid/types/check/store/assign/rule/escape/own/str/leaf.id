@@ -9,6 +9,7 @@ esc_leaf(int e) {
   }
 } return int x;
 given esc_sfix ((import efs_dt)):((import efs_vd))
+given esc_sfix ((import efs_sum)):((import efs_vs))
 given esc_sfix ((import efs_vn)):((import efs_vn))
 
 // How many times the variable `nm` is read anywhere in the expression `e`.
