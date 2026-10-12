@@ -10,6 +10,8 @@ fix_walk_bin(int e, int cd) {
   int c2 = fix_condop(e, cd);
   fix_walk(b, 0, c2, "", "");
 } return void;
+given fix_traps_setup ((import tr_safe), 0):() then calls fix_walk:(1, 0, 0, "", "")
+given fix_traps_setup ((import tr_unsafe), 1):() then calls fix_walk:(2, 0, 1, "", "")
 given fix_traps_setup ((import tr_safe), 0):() then calls fix_walk:[2]
 given fix_traps_setup ((import tr_unsafe), 1):() then calls fix_walk:[2]
 

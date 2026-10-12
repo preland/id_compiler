@@ -35,5 +35,7 @@ fix_state2() {
   export string[] fixd_file = [""];
   fix_state3();
 } return void;
+given fix_fixture given lset((import fixd_std), 0, 1) ():() then (import fixd_std)[0]:(0)
+given fix_ret_fixture given fix_setfile(1) ():() then (import fixd_file)[0]:("")
 given fix_fixture ():() then calls fix_state3:[1]
 given fix_touch_fixture ():() then calls fix_state3:[1]

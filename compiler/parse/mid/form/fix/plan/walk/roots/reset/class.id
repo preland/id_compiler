@@ -13,6 +13,8 @@ fix_ev_reset2() {
   export int[] fixe_cd = [];
   fix_ev_reset3();
 } return void;
+given fix_push4_fixture ():() then len((import fixe_cd)):(0)
+given fix_fixture given fix_push3(7, 0, 1) ():() then len((import fixe_cl)):(0)
 given fix_fixture ():() then calls fix_ev_reset3:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset3:[1]
 

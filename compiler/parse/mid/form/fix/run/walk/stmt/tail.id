@@ -3,6 +3,7 @@ fix_then(int sn) {
   fix_block(l1_of_v);
 } return void;
 given fix_if_fixture (1):() then calls fix_block:([])
+given fix_if_fixture (2):() then calls fix_block:([])
 given fix_if_fixture (2):() then calls fix_block:[1]
 
 fix_while(int sn) {
@@ -25,5 +26,7 @@ fix_if_fixture() {
 } chain () {
   int wn = node_while(0, none);
 } return void;
+():() then calls node_if:(0, [], [], 0)
+():() then calls node_while:(0, [])
 ():() then calls fix_tokline_node_fixture:[1]
 ():() then init_units:(0)

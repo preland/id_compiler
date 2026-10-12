@@ -10,6 +10,7 @@ fix_wseed(int ow) {
   }
 } return void;
 given fix_wseed_fixture (0):() then calls lset:((import fixd_wm), 0, 1)
+given fix_wseed_fixture (-1):() then (import fixd_wm)[0]:(0)
 given fix_wseed_fixture (-1):() then calls lset:[0]
 
 // fixd_wm seeded with one unmarked entry directly, bypassing fix_wfill's
@@ -23,6 +24,8 @@ fix_wseed_fixture() {
   fix_winit();
   push((import fixd_wm), 0);
 } return void;
+():() then len((import fixd_wm)):(1)
+():() then (import fixd_wm)[0]:(0)
 ():() then calls full_env:[1]
 ():() then init_units:(0)
 

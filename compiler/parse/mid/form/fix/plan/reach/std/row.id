@@ -33,5 +33,7 @@ fix_std_row_fixture() {
 } chain () {
   push((import dvexp), 1);
 } return void;
+():() then len((import dvname)):(2)
+():() then (import dvname)[1]:("other_name")
 ():() then calls fix_std_fixture:[1]
 ():() then init_units:(0)

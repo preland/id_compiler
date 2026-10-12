@@ -9,6 +9,8 @@ fix_wref_fixture() {
 } chain () {
   push((import fixd_wm), 0);
 } return void;
+():() then len((import fixd_wm)):(2)
+():() then (import fixe_nt)[1]:("word")
 ():() then calls fix_touch_fixture:[1]
 ():() then init_units:(0)
 

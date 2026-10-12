@@ -7,6 +7,7 @@ fix_walk_args(int e, int cd) {
   }
 } return void;
 given fix_walk_arg2_fixture ((import wa2_e1), 0):() then calls fix_walk_arg:((import wa2_e1), 0, 0)
+given fix_walk_arg2_fixture ((import wa2_e1), 1):() then calls fix_walk_arg:((import wa2_e1), 0, 1)
 given fix_walk_arg2_fixture ((import wa2_e2), 0):() then calls fix_walk_arg:[0]
 
 // Two call nodes, so fix_walk_arg2's cases (kids/arg.id) can prove the
@@ -17,6 +18,8 @@ fix_walk_arg2_fixture() {
   int[] none = [];
   fix_walk_arg2_fixture1(none);
 } return void;
+():() then calls node_call:("other", [])
+():() then (import wa2_e1):(1)
 ():() then calls fix_fixture:[1]
 ():() then init_units:(0)
 

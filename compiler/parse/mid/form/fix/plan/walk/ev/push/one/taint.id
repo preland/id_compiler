@@ -9,6 +9,8 @@ fix_rcache_taint(int e) {
     fix_rcache_reset();
   }
 } return void;
+given fix_span_fixture given fix_rcache_add(0, "x") given sset((import ns1), 0, "unknownfn") (0):() then len((import fixd_rk)):(0)
+given fix_span_fixture given fix_rcache_add(0, "x") (0):() then len((import fixd_rk)):(1)
 given fix_rcache_taint_fixture ((import rt_e1)):() then calls fix_rcache_reset:[1]
 given fix_rcache_taint_fixture ((import rt_e2)):() then calls fix_rcache_reset:[0]
 

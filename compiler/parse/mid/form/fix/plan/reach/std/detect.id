@@ -34,5 +34,7 @@ fix_std_fixture() {
   fix_fixture();
   init_reg();
 } return void;
+():() then len((import dvname)):(0)
+():() then (import fixd_seq)[0]:(0)
 ():() then calls fix_fixture:[1]
 ():() then calls init_reg:[1]

@@ -16,4 +16,5 @@ fix_block(int[] stmts) {
   }
 } return void;
 given fix_if_fixture ([0]):() then calls fix_stmt:(0, 0)
+given fix_if_fixture ([2]):() then calls fix_while:(2)
 given fix_if_fixture ([]):() then calls fix_stmt:[0]

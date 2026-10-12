@@ -12,6 +12,8 @@ fix_ev_reset4() {
   export string[] fixe_nm = [];
   fix_ev_reset5();
 } return void;
+given fix_push4_fixture ():() then len((import fixe_sep)):(0)
+given fix_push4_fixture ():() then len((import fixe_nm)):(0)
 given fix_fixture ():() then calls fix_ev_reset5:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset5:[1]
 

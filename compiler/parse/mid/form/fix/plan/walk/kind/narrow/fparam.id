@@ -34,5 +34,7 @@ fix_type_ok_fixture() {
   push((import fixe_n), 0);
   push((import fixe_nt), "void");
 } return void;
+():() then (import fixe_nt)[1]:("void")
+():() then (import fixe_nt)[0]:("int")
 ():() then calls fix_ret_fixture:[1]
 ():() then init_units:(0)

@@ -34,5 +34,7 @@ fix_plan(int sn, int[] roots, int md) {
     fix_decide2(sn, md, last);
   }
 } return void;
+given fix_simple_fixture ((import sim_ia), (import sim_roots), 0):() then calls fix_walk_roots:((import sim_roots))
+given fix_simple_fixture ((import sim_ia2), (import sim_roots2), 0):() then len((import fixe_n)):(3)
 given fix_fixture (0, [], 0):() then calls fix_decide2:[0]
 given fix_tokline_node_fixture (0, [0], 0):() then calls fix_decide2:[0]

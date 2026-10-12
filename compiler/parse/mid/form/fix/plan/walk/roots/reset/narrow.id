@@ -11,6 +11,8 @@ fix_ev_reset3() {
   export int[] fixe_mv = [];
   fix_ev_reset4();
 } return void;
+given fix_touch_fixture ():() then len((import fixe_nt)):(0)
+given fix_touch_fixture ():() then len((import fixe_mv)):(0)
 given fix_fixture ():() then calls fix_ev_reset4:[1]
 given fix_touch_fixture ():() then calls fix_ev_reset4:[1]
 

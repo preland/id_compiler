@@ -27,6 +27,7 @@ fix_if(int sn, int md) {
   }
 } return void;
 given fix_if_fixture (1, 0):() then calls fix_cond:(1, 0)
+given fix_if_fixture (1, 1):() then calls fix_plan:(1, [0], 1)
 given fix_if_fixture (1, 0):() then calls fix_block:[2]
 
 // A declaration, an assignment and an expression statement keep their one

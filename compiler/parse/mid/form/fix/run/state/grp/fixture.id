@@ -10,6 +10,8 @@ fix_fixture() {
   fix_state();
   fix_fixture2();
 } return void;
+():() then (import fixd_seq)[0]:(0)
+():() then len((import fixe_n)):(0)
 ():() then calls env_init:[1]
 ():() then init_units:(0)
 
