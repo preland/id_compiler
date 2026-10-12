@@ -10,6 +10,7 @@ emit_st_protos() {
   }
 } return void;
 given sd_note_fixture given note_struct("Q") ():() then prints:("static int idtc_eqs_Q(IdList* a, IdList* b);\nstatic void idtc_shows_Q(IdList* a);\n")
+given sd_note_fixture given note_struct("P") ():() then prints:("static int idtc_eqs_P(IdList* a, IdList* b);\nstatic void idtc_shows_P(IdList* a);\n")
 given sd_note_fixture ():() then prints:("")
 
 emit_st_bodies() {
@@ -19,8 +20,9 @@ emit_st_bodies() {
     sd_i = sd_i + 1;
   }
 } return void;
-given sd_note_fixture ():() then prints:("")
+given sd_note_fixture given note_struct("P") ():() then calls emit_st_body:("P")
 given sd_note_fixture given note_struct("Q") ():() then prints:("static int idtc_eqs_Q(IdList* a, IdList* b) {\n    return (strcmp((char*)(intptr_t)(a->data[0]), (char*)(intptr_t)(b->data[0])) == 0);\n}\nstatic void idtc_shows_Q(IdList* a) {\n    fputs(\"Q(\", stderr);\n    fprintf(stderr, \"\\\"%s\\\"\", (char*)(intptr_t)(a->data[0]));\n    fputs(\")\", stderr);\n}\n")
+given sd_note_fixture ():() then prints:("")
 
 emit_st_body(string sd_nm) {
   string sd_cmp = st_eq_expr(sd_nm);

@@ -12,6 +12,7 @@ emit_frees() {
   }
 } return void;
 given esc_fm_fix ():() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")
+given esc_fm_fix ():() then calls emit_free_one:("Tr")
 given full_env ():() then prints:("")
 
 emit_free_one(string nm) {
@@ -20,4 +21,5 @@ emit_free_one(string nm) {
   }
 } return void;
 given esc_fm_fix ("Tr"):() then prints:("static void idfr_Tr(IdList* p) { id_free_walk(p, \"S1l@0;\"); }\n")
+given esc_fm_fix ("Tr"):() then calls esc_desc:("Tr")
 given esc_fm_fix ("int"):() then prints:("")

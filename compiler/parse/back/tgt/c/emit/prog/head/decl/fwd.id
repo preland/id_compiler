@@ -23,6 +23,8 @@ fwd_adopts() {
     i = i + 1;
   }
 } return void;
+given nz_prog_fixture ():() then calls fwd_adopt_one:[2]
+given ll_natives_fixture2 ():() then calls fwd_adopt_one:[1]
 given nz_prog_fixture ():() then prints:("")
 given ll_natives_fixture2 ():() then prints:("")
 
@@ -33,4 +35,5 @@ fwd_adopt_one(int id) {
   }
 } return void;
 given lw_nl_fixture (1):() then prints:("#define id_nat(...) id_list_adopt(id_nat(__VA_ARGS__))\n")
+given lw_nl_fixture (1):() then calls is_native:(1)
 given lw_nl_fixture (0):() then prints:("")

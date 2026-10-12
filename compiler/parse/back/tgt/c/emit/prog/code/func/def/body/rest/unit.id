@@ -17,6 +17,7 @@ unit_mark(int id) {
   }
 } return void;
 given unit_t_two ((import unit_t_fb)):() then prints:("/* idc unit: b.id */\n")
+given unit_t_two ((import unit_t_fb)):() then calls unit_mark_at:("b.id")
 given unit_t_mark(0, 0) ((import unit_t_fb)):() then prints:("")
 
 unit_mark_at(string uf) {
@@ -26,6 +27,7 @@ unit_mark_at(string uf) {
   }
 } return void;
 given unit_t_two ("a.id"):() then prints:("/* idc unit: a.id */\n")
+given unit_t_two ("b.id"):() then prints:("/* idc unit: b.id */\n")
 given unit_t_two (""):() then prints:("")
 
 // The file of function node id, by walking pnodes forward from where the last

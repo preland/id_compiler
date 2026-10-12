@@ -16,8 +16,9 @@ c_lit(string raw) {
     out = lit_fill(raw, n);
   }
 } return string out;
-("a"):("a")
 ("a?b"):("a\\?b")
+("??"):("\\?\\?")
+("a"):("a")
 
 // How many bytes the literal gains: one for each `?` that no backslash already
 // escapes, and two for each `\xHH`, which gets an empty string literal after

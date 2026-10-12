@@ -15,6 +15,7 @@ emit_set_decl(int i) {
   }
 } return void;
 given uninit_fixture (0):() then prints:("char idtc_set_gx;\n")
+given uninit_fixture given add_export("gy", "int", "other_fn") (2):() then prints:("char idtc_set_gy;\n")
 given uninit_fixture (1):() then prints:("")
 given lc_dce_setup (0):() then prints:("")
 
@@ -26,6 +27,7 @@ checked_read(string nm) {
   }
 } return string s;
 given uninit_fixture ("gx"):("((void)(idtc_set_gx || (id_null_read(), 0)), gx)")
+given uninit_fixture given add_export("gy", "int", "other_fn") ("gy"):("((void)(idtc_set_gy || (id_null_read(), 0)), gy)")
 given uninit_fixture ("gc"):("gc")
 given uninit_fixture ("zz"):("zz")
 

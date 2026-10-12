@@ -26,5 +26,6 @@ key_text(string t) {
     i = i + 1;
   }
 } return string out;
-("int"):("int")
 ("int[]"):("int_l")
+("int[][]"):("int_l_l")
+("int"):("int")

@@ -15,6 +15,7 @@ emit_init_call() {
   }
 } return void;
 given lc_dce_setup ():() then prints:("    idc_const_init();\n")
+given lc_dce_setup2 ():() then (import kept_lists)[0]:(0)
 given lc_dce_setup2 ():() then prints:("")
 
 // list_consts_kept for emit_init_call, which asks once per test case: the

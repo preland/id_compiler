@@ -13,6 +13,7 @@ emit_eprint_def() {
   }
 } return void;
 given nz_call_eprint_fixture ():() then prints:("#ifndef IDTC_EPRINT_TO\n#define IDTC_EPRINT_TO stderr\n#endif\nstatic void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, \"%s\\n\", s); }\n")
+given nz_call_eprint_fixture ():() then calls calls_eprint:[1]
 given nz_env ():() then prints:("")
 
 calls_eprint() {

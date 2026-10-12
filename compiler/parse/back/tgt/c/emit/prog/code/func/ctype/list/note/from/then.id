@@ -29,9 +29,10 @@ note_check(int ti) {
     note_calls(node);
   }
 } return void;
+given calls_node_fixture (0):() then calls note_calls:[1]
+given print_fixture (0):() then calls note_calls:[0]
 given print_fixture (0):() then prints:("")
 given calls_node_fixture (0):() then prints:("")
-given calls_node_fixture (0):() then calls note_calls:[1]
 
 note_check_then(int node) {
   string chk_nm = (import ns1)[node];
@@ -41,6 +42,7 @@ note_check_then(int node) {
     note_fn_ret(func_node(chk_nm));
   }
 } return void;
+given then_imp_fixture ("int[]", 0, 0) given tc_types_init ((import then_imp_node)):() then calls note_ty:("int[]")
+given then_node_fixture ((import fixture_then_node)):() then calls note_fn_ret:[1]
 given then_node_fixture ((import fixture_then_node)):() then prints:("")
 given then_node_fixture ((import fixture_then_bad)):() then prints:("")
-given then_imp_fixture ("int[]", 0, 0) given tc_types_init ((import then_imp_node)):() then calls note_ty:("int[]")

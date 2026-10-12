@@ -28,6 +28,7 @@ seq_conds(int[] if_ids) {
   }
 } return string[] cond_texts;
 given stmt_fix ([4]):(["5"])
+given stmt_fix ([3, 4]):(["5", "5"])
 given stmt_fix ([]):([])
 
 // Render one level of the chain, using its precomputed condition text rather
