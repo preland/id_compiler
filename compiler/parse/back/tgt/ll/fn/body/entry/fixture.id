@@ -20,8 +20,9 @@ phi_fixture() {
   ll_cmp_fixture();
   export int ir_phi = ir_insn("phi", "int", 0 - 1, 0 - 1, "", [(import ir_cmp)], [7]);
 } return void;
-():() then calls ll_cmp_fixture:[1]
+():() then calls ir_insn:("phi", "int", -1, -1, "", [0], [7])
 ():() then init_units:(0)
+():() then calls ll_cmp_fixture:[1]
 
 // The empty phi (0 incoming edges) needs a genuinely, typed-empty l/bl --
 // unlike every other instruction here, ll_phis actually reads them.
@@ -30,5 +31,6 @@ phi_empty_fixture() {
   export int[] ir_empty_phi = [];
   export int ir_phi_empty = ir_insn("phi", "int", 0 - 1, 0 - 1, "", ir_empty_phi, ir_empty_phi);
 } return void;
-():() then calls phi_fixture:[1]
+():() then calls ir_insn:("phi", "int", -1, -1, "", [], [])
 ():() then init_units:(0)
+():() then calls phi_fixture:[1]

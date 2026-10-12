@@ -19,12 +19,14 @@ clo_fixture() {
   init_tyc();
   init_rtc();
 } return void;
-():() then calls fn_idx_fixture:[1]
+():() then (import fnames)[0]:("fx_target")
 ():() then init_units:(0)
+():() then calls fn_idx_fixture:[1]
 
 clo_seeded() {
   clo_fixture();
   fv_add("fx_target__0", "fx_target", 0);
 } return void;
-():() then calls clo_fixture:[1]
 ():() then len((import fvname)):(1)
+():() then (import fvkey)[0]:("fx_target__0")
+():() then calls clo_fixture:[1]

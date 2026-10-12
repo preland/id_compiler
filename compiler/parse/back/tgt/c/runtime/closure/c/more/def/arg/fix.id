@@ -15,8 +15,10 @@ clo_bind_fixture() {
 } chain () {
   export int clo_cfn = newleaf("cfn", 0, 0, "fx_target", "");
 } return void;
-():() then calls clo_fixture:[1]
+():() then calls node_txt:("var", "fx_target")
+():() then calls node_txt2:("int", "7", 7, 0)
 ():() then init_units:(0)
+():() then calls clo_fixture:[1]
 
 clo_call_fixture() {
   clo_fixture();
@@ -27,8 +29,10 @@ clo_call_fixture() {
   export int cv_call = node_call("cv", [node_txt2("int", "5", 5, 0)]);
   export int cw_call = node_call("cw", none);
 } return void;
-():() then calls clo_fixture:[1]
+():() then calls add_var:("cv", "func(int) return int", 0)
+():() then calls add_var:("cw", "func() return void", 0)
 ():() then init_units:(0)
+():() then calls clo_fixture:[1]
 
 // A bind in a test case (a "cctor" named bind, mid/types/registry/derived/struct/
 // use/ctor/call/bind.id): cc_e is bind(fx_target, 7), cc_f is bind(fx_target)
@@ -41,5 +45,6 @@ clo_case_fixture() {
 } chain () {
   export int cc_f = newnode("cctor", 0, 0, "bind", "", [(import clo_cfn)], [(import clo_cfn)]);
 } return void;
-():() then calls clo_bind_fixture:[1]
+():() then calls node_txt2:("int", "9", 9, 0)
 ():() then init_units:(0)
+():() then calls clo_bind_fixture:[1]

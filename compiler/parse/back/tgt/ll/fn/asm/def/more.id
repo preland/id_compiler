@@ -20,8 +20,10 @@ llasm_row2_fixture() {
   push((import afret), "string");
   push((import afparams), []);
 } return void;
-():() then calls llasm_row_fixture:[1]
+():() then (import afname)[1]:("barrier")
+():() then (import afret)[1]:("string")
 ():() then init_units:(0)
+():() then calls llasm_row_fixture:[1]
 
 // The rest of `ll_asm_body`: the text and constraint string, then the two
 // lines of the block.

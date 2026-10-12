@@ -12,8 +12,9 @@ ll_globals() {
 } chain () {
   ll_frees();
 } return void;
-given lc_dce_init ():() then prints:("") then calls ll_const_init:[1]
 given lc_dce_setup2 ():() then prints:("@b = global i32 2\n") then calls ll_const_init:[1]
+given lc_dce_setup ():() then prints:("@a = global ptr null\n@b = global i32 2\ndefine internal void @idc_const_init() {\nentry:\n  %c0 = call ptr @id_list_new()\n  call void @id_list_push(ptr %c0, i64 1)\n  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n  ret void\n}\n")
+given lc_dce_init ():() then prints:("") then calls ll_const_init:[1]
 
 ll_global_at(int i, string ty) {
   string init = ll_init(i);

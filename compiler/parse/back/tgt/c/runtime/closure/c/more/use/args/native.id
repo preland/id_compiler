@@ -34,5 +34,7 @@ clo_native_fixture() {
   export int[] cn_args = [(import cb_name), (import cb_lit)];
   export int cn_call = node_call("cn_take", cn_args);
 } return void;
-():() then calls clo_bind_fixture:[1]
+():() then calls node_param:("param", "func(int) return int", "f")
+():() then calls node_param:("param", "int", "n")
 ():() then init_units:(0)
+():() then calls clo_bind_fixture:[1]

@@ -22,5 +22,6 @@ fv_seeded() {
   fv_init();
   fv_add("tick__0", "tick", 0);
 } return void;
-():() then calls fv_init:[1]
 ():() then len((import fvname)):(1)
+():() then (import fvname)[0]:("tick")
+():() then calls fv_init:[1]

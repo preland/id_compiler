@@ -10,6 +10,8 @@ ll_const_init() {
     ll_init_fn();
   }
 } return void;
+given lc_dce_setup ():() then prints:("define internal void @idc_const_init() {\nentry:\n  %c0 = call ptr @id_list_new()\n  call void @id_list_push(ptr %c0, i64 1)\n  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n  ret void\n}\n")
+given lc_dce_setup ():() then calls ll_init_each:("build")
 given lc_dce_setup ():() then calls ll_init_fn:[1]
 given lc_dce_setup2 ():() then calls ll_init_fn:[0]
 

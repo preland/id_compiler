@@ -6,7 +6,7 @@ ll_init_elems(int i, string pass) {
   ll_init_elems2(i, e, pass);
 } return void;
 given lc_dce_setup (0, "build"):() then prints:("  call void @id_list_push(ptr %c0, i64 1)\n")
-given lc_dce_setup (0, "build"):() then calls ll_init_elems2:[1]
+given lc_dce_setup (0, "build"):() then calls ll_init_elems2:(0, 1, "build")
 given lc_dce_setup (0, "bytes"):() then prints:("")
 
 ll_init_elems2(int i, int e, string pass) {
@@ -18,7 +18,7 @@ ll_init_elems2(int i, int e, string pass) {
   }
 } return void;
 given elems2_fixture (0, (import llie_e), "build"):() then prints:("  call void @id_list_push(ptr %c0, i64 1)\n")
-given elems2_fixture (0, (import llie_e), "build"):() then calls ll_init_elem:[1]
+given elems3_fixture (0, (import llie_e), "build"):() then calls ll_init_elem:(0, 0, (import llie_child), "build")
 given elems2_fixture (0, (import llie_e), "bytes"):() then prints:("")
 
 // A string element's bytes, named for the constant and the position.

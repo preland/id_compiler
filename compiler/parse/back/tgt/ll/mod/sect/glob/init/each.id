@@ -20,6 +20,7 @@ ll_init_one(int i, string pass) {
   }
 } return void;
 given lc_dce_setup (0, "bytes"):() then calls ll_init_elems:(0, "bytes")
+given lc_dce_setup (0, "build"):() then prints:("  %c0 = call ptr @id_list_new()\n  call void @id_list_push(ptr %c0, i64 1)\n  store ptr %c0, ptr @a\n  call void @id_list_lock(ptr %c0)\n")
 given lc_dce_setup (1, "bytes"):() then calls ll_init_elems:[0]
 
 ll_init_build(int i) {

@@ -31,5 +31,6 @@ ll_body() {
     ll_wrapper(f);
   }
 } return void;
-given ll_env_fixture2 ():() then calls ll_declares:[1] then calls ll_globals:[1] then calls ll_strs:[1]
 given ll_env_fixture2 ():() then (import chkfail)[0]:(0)
+given ll_env_fixture3 ():() then prints:("\n")
+given ll_env_fixture2 ():() then calls ll_declares:[1] then calls ll_globals:[1] then calls ll_strs:[1]

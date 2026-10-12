@@ -6,8 +6,10 @@ ll_natives_fixture2() {
   ll_native_fixture();
   push((import prog), (import nat_id0));
 } return void;
-():() then calls ll_env_fixture2:[1]
+():() then len((import prog)):(1)
+():() then (import rtc)[0]:(0)
 ():() then init_units:(0)
+():() then calls ll_env_fixture2:[1]
 
 // The `--runtime` side of the same fixture: rtc set, so ll_decl_block does
 // not run, and ll_declares' folded natives loop is the only source of output.
@@ -16,8 +18,10 @@ ll_natives_fixture3() {
   ll_native_fixture();
   push((import prog), (import nat_id0));
 } return void;
-():() then calls ll_env_fixture3:[1]
+():() then len((import prog)):(1)
+():() then (import rtc)[0]:(1)
 ():() then init_units:(0)
+():() then calls ll_env_fixture3:[1]
 
 ll_native_decl(int id) {
   string s2_of_v = (import ns2)[id];
