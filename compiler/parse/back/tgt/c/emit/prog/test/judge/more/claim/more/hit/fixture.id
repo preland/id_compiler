@@ -12,16 +12,18 @@ case_fidx_fixture() {
   push((import casefn), (import fixture_fn));
   push((import casefn), (import fixture_fn));
 } return void;
-():() then calls fn_fixture:[1]
+():() then (import casefn)[1]:(3)
 ():() then init_units:(0)
+():() then calls fn_fixture:[1]
 
 case_fidx_fixture2() {
   fn_fixture();
   push((import casefn), (import fixture_fn));
   push((import casefn), (import fixture_zero));
 } return void;
-():() then calls fn_fixture:[1]
+():() then (import casefn)[1]:(2)
 ():() then init_units:(0)
+():() then calls fn_fixture:[1]
 
 // One claim, written on case_fixture's own case (ci 0): ../size.id's
 // case_claims only compares conscase's values against a case index, so it
@@ -30,5 +32,6 @@ claim_conscase_fixture() {
   case_fixture();
   push((import conscase), (import fixture_ci));
 } return void;
-():() then calls case_fixture:[1]
+():() then (import conscase)[0]:(0)
 ():() then init_units:(0)
+():() then calls case_fixture:[1]

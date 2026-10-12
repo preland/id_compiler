@@ -41,4 +41,5 @@ note_calls(int node) {
   }
 } return void;
 given calls_node_fixture ((import fixture_calls_node)):() then calls note_ty:("int")
+given calls_node_fixture ((import fixture_calls_node)):() then calls func_node:("fx_target")
 given calls_node_fixture ((import fixture_calls_node)):() then calls note_ty:[1]

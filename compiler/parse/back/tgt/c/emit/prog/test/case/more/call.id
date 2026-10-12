@@ -35,8 +35,9 @@ void_call_fixture() {
   push((import casegiven), "");
   push((import casegiven), "");
 } return void;
-():() then calls wrap_fixture:[1]
+():() then calls node_func:("bare", "void", [], [], -1)
 ():() then init_units:(0)
+():() then calls wrap_fixture:[1]
 
 emit_ret_call(string f1, string rt, string cargs) {
   string ct = c_type(rt);

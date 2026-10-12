@@ -7,8 +7,9 @@ wrap_fixture() {
   fn_fixture();
   wrap_fixture_case();
 } return void;
-():() then calls fn_fixture:[1]
+():() then (import casefn)[0]:(3)
 ():() then init_units:(0)
+():() then calls fn_fixture:[1]
 
 wrap_fixture_case() {
   int ci = (import fixture_ci);

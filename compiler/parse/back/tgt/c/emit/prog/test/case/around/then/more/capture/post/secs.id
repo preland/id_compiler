@@ -7,8 +7,9 @@ secs_case_fixture() {
   wrap_fixture();
   push((import casetimeout), 7);
 } return void;
-():() then calls wrap_fixture:[1]
+():() then (import casetimeout)[0]:(7)
 ():() then init_units:(0)
+():() then calls wrap_fixture:[1]
 
 // wrap_fixture's casenode/casefn (test/case/around/then/more/capture/pre/
 // fixture.id, pre-existing) plus a two-entry casegiven -- "" at 0 (a case
@@ -19,5 +20,6 @@ casegiven_fixture() {
   push((import casegiven), "");
   push((import casegiven), "extra_setup");
 } return void;
-():() then calls wrap_fixture:[1]
+():() then (import casegiven)[1]:("extra_setup")
 ():() then init_units:(0)
+():() then calls wrap_fixture:[1]

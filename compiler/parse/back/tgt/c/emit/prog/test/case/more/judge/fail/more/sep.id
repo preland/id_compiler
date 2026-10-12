@@ -12,5 +12,6 @@ wrap_row2_fixture() {
   push((import casefn), (import fixture_fn));
   push((import casenode), node);
 } return void;
-():() then calls wrap_fixture:[1]
+():() then (import casefn)[1]:(3)
 ():() then init_units:(0)
+():() then calls wrap_fixture:[1]

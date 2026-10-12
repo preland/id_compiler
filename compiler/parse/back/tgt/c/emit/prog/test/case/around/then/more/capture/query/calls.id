@@ -16,5 +16,6 @@ query_node_fixture() {
   fn_fixture();
   push((import thennode), (import fixture_fn));
 } return void;
-given fn_fixture ():() then calls fn_fixture:[1]
+given fn_fixture ():() then (import thennode)[0]:(3)
 given fn_fixture ():() then init_units:(0)
+given fn_fixture ():() then calls fn_fixture:[1]

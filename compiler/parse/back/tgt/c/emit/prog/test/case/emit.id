@@ -34,7 +34,7 @@ emit_cases() {
   }
 } return void;
 given void_call_fixture ():() then calls emit_case_fn:(0) then calls emit_case_fn:(1)
-given casegiven_fixture ():() then calls emit_case_fn:[1]
+given casegiven_fixture ():() then calls emit_case_fn:(0)
 
 emit_case_fn(int ci) {
   print("static int idtc_case_" + ci + "(int idtc_fd) {");
@@ -66,5 +66,5 @@ emit_case_post(int ci) {
     emit_case_thens(ci);
   }
 } return void;
-given void_call_fixture (0):() then calls emit_case_expd:[1]
-given traps_case_fixture ((import fixture_ci)):() then calls emit_case_traps_fail:[1]
+given void_call_fixture (0):() then calls emit_case_expd:(0)
+given traps_case_fixture ((import fixture_ci)):() then calls emit_case_traps_fail:((import fixture_ci))
