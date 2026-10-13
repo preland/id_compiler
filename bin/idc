@@ -555,7 +555,8 @@ ensure_idlayout() {
         resolve_tool_std
         progress bootstrap "idlayout (from tools/idlayout)"
         IDC_BUILDING_IDLAYOUT=1 \
-            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idlayout" -o "$IDLAYOUT" >&2 \
+            "$SCRIPT_DIR/idc" --cc "$CC" "${TOOL_STD_ARGS[@]}" --allow-untested "$ROOT/tools/idlayout" -o "$IDLAYOUT.tmp.$$" >&2 \
+            && mv -f "$IDLAYOUT.tmp.$$" "$IDLAYOUT" \
             || { progress_clear; echo "idc: failed to build tools/idlayout; see the errors above" >&2; exit 1; }
     fi
 }
