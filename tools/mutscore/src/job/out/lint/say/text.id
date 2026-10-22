@@ -34,13 +34,14 @@ ms_lt_say(string ms_tx, int ms_tab) {
   string ms_rp = "";
 } chain (string ms_tx, int ms_tab) {
   if(ms_tab == 0) {
-    ms_rp = ms_lt_flag(ms_lr) + "lint: " + ms_sm[0] + " cases in " + ms_sm[1] + " functions; silent " + ms_sm[2] + ", echo " + ms_sm[3] + ", bare " + ms_sm[4] + ", count " + ms_sm[5] + "\n";
+    ms_rp = ms_lt_flag(ms_lr) + "lint: " + ms_sm[0] + " cases in " + ms_sm[1] + " functions; silent " + ms_sm[2] + ", echo " + ms_sm[3] + ", bare " + ms_sm[4] + ", count " + ms_sm[5] + ", constant " + ms_sm[6] + "\n";
   }
   if(ms_tab == 1) {
-    ms_rp = "#lint: shape file fn line case\n#summary: cases functions silent echo bare count\n" + ms_tx + "summary\t" + ms_sm[0] + "\t" + ms_sm[1] + "\t" + ms_sm[2] + "\t" + ms_sm[3] + "\t" + ms_sm[4] + "\t" + ms_sm[5] + "\n";
+    ms_rp = "#lint: shape file fn line case\n#summary: cases functions silent echo bare count constant\n" + ms_tx + "summary\t" + ms_sm[0] + "\t" + ms_sm[1] + "\t" + ms_sm[2] + "\t" + ms_sm[3] + "\t" + ms_sm[4] + "\t" + ms_sm[5] + "\t" + ms_sm[6] + "\n";
   }
 } return string ms_rp;
-("bare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\n", 0):("a.id:4: f: bare: (1):()\nlint: 2 cases in 1 functions; silent 0, echo 0, bare 1, count 0\n")
-("bare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\n", 1):("#lint: shape file fn line case\n#summary: cases functions silent echo bare count\nbare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\nsummary\t2\t1\t0\t0\t1\t0\n")
-("", 0):("lint: 0 cases in 0 functions; silent 0, echo 0, bare 0, count 0\n")
-("count\ta.id\tf\t4\t(1):() then calls g:[1]\n", 0):("a.id:4: f: count: (1):() then calls g:[1]\nlint: 1 cases in 1 functions; silent 0, echo 0, bare 0, count 1\n")
+("bare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\n", 0):("a.id:4: f: bare: (1):()\nlint: 2 cases in 1 functions; silent 0, echo 0, bare 1, count 0, constant 0\n")
+("bare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\n", 1):("#lint: shape file fn line case\n#summary: cases functions silent echo bare count constant\nbare\ta.id\tf\t4\t(1):()\ncase\ta.id\tf\t5\t(2):(3)\nsummary\t2\t1\t0\t0\t1\t0\t0\n")
+("", 0):("lint: 0 cases in 0 functions; silent 0, echo 0, bare 0, count 0, constant 0\n")
+("count\ta.id\tf\t4\t(1):() then calls g:[1]\n", 0):("a.id:4: f: count: (1):() then calls g:[1]\nlint: 1 cases in 1 functions; silent 0, echo 0, bare 0, count 1, constant 0\n")
+("constant\ta.id\tf\t4\t():() then g:(0)\ncase\ta.id\tg\t5\t(1):(2)\n", 0):("a.id:4: f: constant: ():() then g:(0)\nlint: 2 cases in 2 functions; silent 0, echo 0, bare 0, count 0, constant 1\n")

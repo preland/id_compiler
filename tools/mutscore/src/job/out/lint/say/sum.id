@@ -16,9 +16,9 @@ ms_lt_split(string ms_tx) {
 ("a\n\nb\n"):(["a", "b"])
 (""):([])
 
-// [cases, functions, silent, echo, bare, count] for the rows ms_lr.
+// [cases, functions, silent, echo, bare, count, constant] for the rows ms_lr.
 ms_lt_sum(string[] ms_lr) {
-  int[] ms_sm = [len(ms_lr), ms_lt_fns(ms_lr), ms_lt_count(ms_lr, "silent"), ms_lt_count(ms_lr, "echo"), ms_lt_count(ms_lr, "bare"), ms_lt_count(ms_lr, "count")];
+  int[] ms_sm = [len(ms_lr), ms_lt_fns(ms_lr), ms_lt_count(ms_lr, "silent"), ms_lt_count(ms_lr, "echo"), ms_lt_count(ms_lr, "bare"), ms_lt_count(ms_lr, "count"), ms_lt_count(ms_lr, "constant")];
 } return int[] ms_sm;
-(["bare\ta\tf\t1\tx", "echo\ta\tf\t2\ty", "case\ta\tg\t3\tz", "count\ta\tg\t4\tw", "count\ta\tg\t5\tv"]):([5, 2, 0, 1, 1, 2])
-([]):([0, 0, 0, 0, 0, 0])
+(["bare\ta\tf\t1\tx", "echo\ta\tf\t2\ty", "case\ta\tg\t3\tz", "count\ta\tg\t4\tw", "count\ta\tg\t5\tv", "constant\ta\tg\t6\tu"]):([6, 2, 0, 1, 1, 2, 1])
+([]):([0, 0, 0, 0, 0, 0, 0])

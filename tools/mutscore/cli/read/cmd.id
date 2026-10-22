@@ -24,11 +24,11 @@ ms_cm_report(string ms_out, int ms_tab) {
 // Prints the lint of the test cases under ms_root (the area ms_ar), to read or
 // (ms_tab 1) in tabs. Answers 0.
 ms_cm_lint(string ms_root, string ms_ar, int ms_tab) {
-  string ms_lx = ms_lt_tree(ms_root, ms_ar);
+  string ms_lx = ms_lt_mark(ms_lt_tree(ms_root, ms_ar), ms_lt_consts(ms_root, ms_ar));
   put(ms_lt_say(ms_lx, ms_tab));
 } return int 0;
-given ms_t_tree ((import ms_t_root), "", 0):(0) then prints:("lint: 2 cases in 1 functions; silent 0, echo 0, bare 0, count 0\n")
-given ms_t_tree ((import ms_t_root), "lib/", 1):(0) then prints:("#lint: shape file fn line case\n#summary: cases functions silent echo bare count\nsummary\t0\t0\t0\t0\t0\t0\n")
+given ms_t_tree ((import ms_t_root), "", 0):(0) then prints:("lint: 2 cases in 1 functions; silent 0, echo 0, bare 0, count 0, constant 0\n")
+given ms_t_tree ((import ms_t_root), "lib/", 1):(0) then prints:("#lint: shape file fn line case\n#summary: cases functions silent echo bare count constant\nsummary\t0\t0\t0\t0\t0\t0\t0\n")
 
 // Prints how many mutants ms_root (the area ms_ar) has, in all and for each
 // operator. Answers 0.

@@ -1,4 +1,4 @@
-// Which test cases prove nothing. Four shapes are flagged:
+// Which test cases prove nothing. Five shapes are flagged:
 //   silent  the case asserts only that nothing is printed (`prints:("")`),
 //           so it pins no result;
 //   echo    the expected values are the arguments, written again, and no
@@ -8,7 +8,11 @@
 //           returns a value or does something;
 //   count   the only assertions are call counts (`then calls F:[n]`, with
 //           the silent prints allowed), so the case shows a callee ran and
-//           not what the function did.
+//           not what the function did;
+//   constant the only assertions are `then F:(value)` for functions F that
+//           return a literal (pick/constant.id), which answer the same
+//           whatever ran, so the case cannot go red. Found by a second pass
+//           over the rows (run/mark.id), because it needs the whole tree.
 
 // 1 when the clauses ms_rs (after the expected values) are nothing but
 // `then prints:("")` and `then eprints:("")`, and there is at least one.

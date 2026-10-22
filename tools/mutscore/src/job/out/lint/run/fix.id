@@ -1,0 +1,26 @@
+// A real directory under fs_mktemp for the cases of the constant-function
+// scan: ms_t_cdir holds k.id, with one function that returns a literal and
+// one that returns a computed value. It goes when the case's process does.
+
+// Makes the directory and exports it as ms_t_cdir.
+ms_t_const() {
+  export string ms_t_cdir = fs_mktemp("ms_c_", 1);
+  fs_drop_exit(ms_t_cdir);
+  exec_file_put(ms_t_cdir + "/k.id", "k() {\n} return int 0;\nm(int a) {\n  int s = a + 1;\n} return int s;\n", 420);
+} return void export ms_t_cdir;
+():() then ms_t_cl:(66)
+():() then ms_t_cl:(66) then ms_t_cx:("k() {\n} return int 0;\nm(int a) {\n  int s = a + 1;\n} return int s;\n")
+
+// Test check: how long k.id is.
+ms_t_cl() {
+  int ms_cln = len(fs_read_text((import ms_t_cdir) + "/k.id"));
+} return int ms_cln;
+given ms_t_const ():(66)
+given ms_t_const ():(66) then ms_t_cx:("k() {\n} return int 0;\nm(int a) {\n  int s = a + 1;\n} return int s;\n")
+
+// Test check: what k.id holds.
+ms_t_cx() {
+  string ms_cx = fs_read_text((import ms_t_cdir) + "/k.id");
+} return string ms_cx;
+given ms_t_const ():("k() {\n} return int 0;\nm(int a) {\n  int s = a + 1;\n} return int s;\n")
+given ms_t_const ():("k() {\n} return int 0;\nm(int a) {\n  int s = a + 1;\n} return int s;\n") then ms_t_cl:(66)

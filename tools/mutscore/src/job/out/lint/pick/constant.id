@@ -1,0 +1,70 @@
+// The fifth weak shape, `constant`: a case whose only assertions are
+// `then F:(value)` clauses where F is a function whose return clause is a
+// literal. F answers the same whatever ran before, so the clause cannot go
+// red for the function the case is attached to. Only a literal return clause
+// counts (`return int 0;`); a function that returns a name which happens to
+// hold one literal on every path is not recognised.
+
+// The line "NAME" and a newline when function ms_k of ms_fs returns a literal
+// (`return TYPE LITERAL;`, an int, float or string), "" otherwise.
+ms_lt_literal(string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
+  int ms_czr = ms_fs[4 * ms_k + 2];
+  int ms_czw = ms_tk_get(ms_tk, ms_czr + 2, 0);
+  string ms_czo = "";
+} chain (string ms_s, int[] ms_tk, int[] ms_fs, int ms_k) {
+  if(ms_fs[4 * ms_k + 3] == ms_czr + 3 && ms_czw >= (import ms_k_int) && ms_czw <= (import ms_k_str)) {
+    ms_czo = ms_tk_str(ms_s, ms_tk, ms_fs[4 * ms_k]) + "\n";
+  }
+} return string ms_czo;
+given ms_t_lex("f() {} return int 0;") ("f() {} return int 0;", (import ms_t_tk), [0, 4, 5, 8], 0):("f\n")
+given ms_t_lex("f(int a) {} return int a;") ("f(int a) {} return int a;", (import ms_t_tk), [0, 6, 7, 10], 0):("")
+given ms_t_lex("f() {} return string \"x\";") ("f() {} return string \"x\";", (import ms_t_tk), [0, 4, 5, 8], 0):("f\n")
+given ms_t_lex("f() {} return void;") ("f() {} return void;", (import ms_t_tk), [0, 4, 5, 7], 0):("")
+given ms_t_lex("f() {} return int -1;") ("f() {} return int -1;", (import ms_t_tk), [0, 4, 5, 9], 0):("")
+
+// What the clause text ms_cq (one `then` clause without the word) weighs when
+// ms_kx is the set of constant function names, each between newlines: 0 when
+// it is empty or the silent `prints:("")` / `eprints:("")`, 1 when it is
+// `F:(value)` for a name F in the set, 1000 for anything else, call counts
+// included.
+ms_lt_cpart(string ms_cq, string ms_kx) {
+  string ms_cqq = str_trim(ms_cq);
+  int ms_cqz = ms_lt_part(ms_cqq) == 0;
+  int ms_cqi = str_find(ms_cqq, ":(");
+} chain (string ms_cq, string ms_kx) {
+  int ms_cqw = 1000;
+  if(ms_cqz == 1) {
+    ms_cqw = 0;
+  }
+  if(ms_cqz == 0 && ms_cqi > 0 && str_ends(ms_cqq, ")") == 1 && str_find(ms_kx, "\n" + str_sub(ms_cqq, 0, ms_cqi) + "\n") >= 0) {
+    ms_cqw = 1;
+  }
+} return int ms_cqw;
+("init_units:(0) ", "\ninit_units\n"):(1)
+("other:(0)", "\ninit_units\n"):(1000)
+("calls init_units:[1]", "\ninit_units\n"):(1000)
+("prints:(\"\")", "\ninit_units\n"):(0)
+("", "\n"):(0)
+("init_units:(0) x", "\ninit_units\n"):(1000)
+("init_units", "\ninit_units\n"):(1000)
+
+// 1 when the clauses ms_rs of a case are at least one `then F:(value)` for a
+// constant function F of the set ms_kx and nothing else but the silent prints.
+ms_lt_constant(string ms_rs, string ms_kx) {
+  string[] ms_czl = str_split(ms_rs, "then ");
+  int ms_czn = 0;
+  int ms_czj = 0;
+} chain (string ms_rs, string ms_kx) {
+  while(ms_czj < len(ms_czl)) {
+    ms_czn = ms_czn + ms_lt_cpart(ms_czl[ms_czj], ms_kx);
+    ms_czj = ms_czj + 1;
+  }
+  int ms_czy = ms_czn >= 1 && ms_czn < 1000;
+} return int ms_czy;
+("then init_units:(0)", "\ninit_units\n"):(1)
+("then init_units:(0) then prints:(\"\")", "\ninit_units\n"):(1)
+("then other:(0)", "\ninit_units\n"):(0)
+("then init_units:(0) then other:(1)", "\ninit_units\n"):(0)
+("then init_units:(0) then calls g:[1]", "\ninit_units\n"):(0)
+("then prints:(\"\")", "\ninit_units\n"):(0)
+("", "\n"):(0)

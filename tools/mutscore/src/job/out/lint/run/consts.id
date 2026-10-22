@@ -1,0 +1,38 @@
+// The functions that return a literal, found in the source, so that lint can
+// tell a `then F:(value)` that checks nothing from one that does.
+
+// The names, one per line, of the functions of the source text ms_s whose
+// return clause is a literal.
+ms_lt_consts_text(string ms_s) {
+  int[] ms_ctk = ms_lex(ms_s);
+  int[] ms_cfs = ms_fn_scan(ms_s, ms_ctk);
+  string ms_cto = "";
+} chain (string ms_s) {
+  int ms_ck = 0;
+  while(4 * ms_ck < len(ms_cfs)) {
+    ms_cto = ms_cto + ms_lt_literal(ms_s, ms_ctk, ms_cfs, ms_ck);
+    ms_ck = ms_ck + 1;
+  }
+} return string ms_cto;
+("f() {\n} return int 0;\ng(int a) {\n  int b = a + 1;\n} return int b;\nh() {\n} return string \"x\";"):("f\nh\n")
+("g(int a) {\n  int b = a + 1;\n} return int b;"):("")
+(""):("")
+
+// The set of constant function names under ms_root (the area ms_ar), each
+// between newlines, so that a name is found with "\n" + name + "\n".
+ms_lt_consts(string ms_root, string ms_ar) {
+  string[] ms_cfl = path_files(ms_root);
+  string ms_cst = "\n";
+  int ms_cfi = 0;
+} chain (string ms_root, string ms_ar) {
+  while(ms_cfi < len(ms_cfl)) {
+    if(ms_en_ok(ms_cfl[ms_cfi], ms_ar) == 1) {
+      string ms_cft = fs_read_text(path_join(ms_root, ms_cfl[ms_cfi]));
+      ms_cst = ms_cst + ms_lt_consts_text(ms_cft);
+    }
+    ms_cfi = ms_cfi + 1;
+  }
+} return string ms_cst;
+given ms_t_const ((import ms_t_cdir), ""):("\nk\n")
+given ms_t_const ((import ms_t_cdir), "lib/"):("\n")
+given ms_t_tree ((import ms_t_root), ""):("\n")

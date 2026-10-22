@@ -1,0 +1,39 @@
+// Relabelling the lint rows once the constant functions are known: a row that
+// proves something may still be a case that only checks constants.
+
+// The row ms_rw with its shape `constant` when it is a `case` row whose
+// assertions are all `then F:(value)` for a name F in the set ms_kx, and the
+// case has no expected value of its own (or one that is only its arguments).
+ms_lt_mark_row(string ms_rw, string ms_kx) {
+  string[] ms_mfd = str_split(ms_rw, "\t");
+  string ms_mre = ms_rw;
+  string[] ms_mpc = [];
+} chain (string ms_rw, string ms_kx) {
+  if(len(ms_mfd) >= 5 && ms_mfd[0] == "case") {
+    ms_mpc = ms_lt_parts(ms_mfd[4]);
+  }
+  if(len(ms_mpc) == 3 && (len(ms_mpc[1]) == 0 || ms_lt_flat(ms_mpc[0]) == ms_lt_flat(ms_mpc[1])) && ms_lt_constant(ms_mpc[2], ms_kx) == 1) {
+    ms_mre = "constant" + str_sub(ms_rw, 4, len(ms_rw) - 4);
+  }
+} return string ms_mre;
+("case\ta.id\tf\t4\t():() then g:(0)", "\ng\n"):("constant\ta.id\tf\t4\t():() then g:(0)")
+("case\ta.id\tf\t4\t():() then h:(0)", "\ng\n"):("case\ta.id\tf\t4\t():() then h:(0)")
+("case\ta.id\tf\t4\t(1):(2) then g:(0)", "\ng\n"):("case\ta.id\tf\t4\t(1):(2) then g:(0)")
+("case\ta.id\tf\t4\t(1):(1) then g:(0)", "\ng\n"):("constant\ta.id\tf\t4\t(1):(1) then g:(0)")
+("bare\ta.id\tf\t4\t():()", "\ng\n"):("bare\ta.id\tf\t4\t():()")
+("junk", "\ng\n"):("junk")
+
+// The rows ms_tx (one per line) with the `constant` shape given to the cases
+// that only check the constant functions of the set ms_kx.
+ms_lt_mark(string ms_tx, string ms_kx) {
+  string[] ms_mlr = ms_lt_split(ms_tx);
+  string ms_mou = "";
+  int ms_mi = 0;
+} chain (string ms_tx, string ms_kx) {
+  while(ms_mi < len(ms_mlr)) {
+    ms_mou = ms_mou + ms_lt_mark_row(ms_mlr[ms_mi], ms_kx) + "\n";
+    ms_mi = ms_mi + 1;
+  }
+} return string ms_mou;
+("case\ta.id\tf\t4\t():() then g:(0)\ncase\ta.id\tf\t5\t(1):(2)\n", "\ng\n"):("constant\ta.id\tf\t4\t():() then g:(0)\ncase\ta.id\tf\t5\t(1):(2)\n")
+("", "\ng\n"):("")
