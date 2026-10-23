@@ -1,0 +1,14 @@
+// A string concatenation passed straight to a function, `g(a + b)`: the `+`
+// builds a new block that nothing names, so it is a fresh argument like a
+// fresh call. The binary node also covers int arithmetic, which makes no block,
+// so the node only counts when is_concat says one operand is a string.
+
+esc_tmp_bin(int a) {
+  int ok = 0;
+  if((import nkind)[a] == "bin") {
+    ok = is_concat(a);
+  }
+} return int ok;
+given fresh_fixture ((import bin_concat)):(1)
+given fresh_fixture ((import bin_plus)):(0)
+given fresh_fixture ((import fr_chr)):(0)

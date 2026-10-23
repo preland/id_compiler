@@ -1,8 +1,8 @@
 // A fresh block passed straight to a function that does not keep it, as in
 // `g(f(x))`: nothing names it, so once the call returns it is dead and the
 // caller gives it back. Both questions are the summaries' (flow/sum/): the
-// argument is a fresh call, a builtin that makes a string (str_fresh_call) or a
-// constructor (esc_fresh_node), and the callee is
+// argument is a fresh call, a builtin that makes a string (str_fresh_call), a
+// string concatenation (esc_tmp_bin) or a constructor (esc_fresh_node), and the callee is
 // a function of the program whose bit for that parameter is clear. A builtin,
 // a native, a call through a function value and a constructor all keep, or are
 // not asked. When the result owns what it holds (esc_deepcall) and the callee
@@ -23,7 +23,7 @@ given esc_ffix ((import eff_cbad), 0):(0)
 
 esc_tmp_arg(int etc_node, int a, int i) {
   int m = esc_mask((import ns1)[etc_node]);
-  int ok = esc_bit(m, i) == 0 && esc_fresh_node(a) + str_fresh_call(a) > 0;
+  int ok = esc_bit(m, i) == 0 && esc_fresh_node(a) + str_fresh_call(a) + esc_tmp_bin(a) > 0;
 } return int ok;
 given esc_ffix ((import eff_ctp), (import eff_cmk), 0):(1)
 given esc_ffix ((import eff_ctp), (import eff_vn), 0):(0)

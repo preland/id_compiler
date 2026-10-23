@@ -1,0 +1,17 @@
+// The same direct call, but the callee pushes its parameter into a list that
+// outlives the call: the concatenation is then held by the list, so the caller
+// must not free it after the call. The list frees its strings with itself at
+// the exit.
+shelve(string[] pool, string t) {
+  push(pool, t);
+  int c = len(pool);
+} return int c;
+
+main(int argc, string[] argv) {
+  string[] pool = [];
+  string s = "abcdef";
+  int a = shelve(pool, s + "gh");
+} chain (int argc, string[] argv) {
+  int b = shelve(pool, s + "ghi");
+  print(a + b + len(pool[0]) + len(pool[1]));
+} return int 0;

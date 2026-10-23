@@ -1,0 +1,17 @@
+// A concatenation a call receives directly, `weigh(s + "gh")`, has no name, so
+// once `weigh` returns it nothing can reach it. `weigh` only reads its
+// parameter, so the caller gives the block back after each call: three
+// concatenations are made and three are freed.
+weigh(string t) {
+  int w = len(t) * 2;
+} return int w;
+
+run(string s) {
+  int a = weigh(s + "gh");
+  int b = weigh(s + "ghi");
+  int c = weigh(s + "ghij") + a + b;
+} return int c;
+
+main(int argc, string[] argv) {
+  print(run("abcdef"));
+} return int 0;
