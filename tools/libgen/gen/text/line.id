@@ -23,7 +23,8 @@ lg_call(string lg_hd, string lg_nm, int lg_rk) {
   }
 } return string lg_ex;
 ("int 0,string 1", "f", 0):("int r = id_f(in_0, idl_in_str(in_1, in_1_len));")
-("", "g", 9):("id_g();")
+("bytes 0", "f", 4):("IdBytes* r = id_f(idl_in_bytes(in_0, in_0_len));")
+("", "g", 10):("id_g();")
 
 // A function's name as the library exports it, without the library's own
 // prefix: `csv_rows` in the library `csv` is csv_rows, not csv_csv_rows.

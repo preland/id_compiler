@@ -92,6 +92,7 @@ build lib wasm_js/lib       || { bad "lib builds ($(head -2 "$TMP/lib.err" | tr 
 build liball wasm_js/lib --exports all || { bad "lib builds with --exports all ($(head -2 "$TMP/liball.err" | tr '\n' ' '))"; echo "$pass passed, $fail failed"; exit 1; }
 build nobe wasm_js/nobe --backend wasm_js/lib/jsx || { bad "nobe builds ($(head -2 "$TMP/nobe.err" | tr '\n' ' '))"; echo "$pass passed, $fail failed"; exit 1; }
 build cmd wasm_js/cmd       || { bad "cmd builds ($(head -2 "$TMP/cmd.err" | tr '\n' ' '))"; echo "$pass passed, $fail failed"; exit 1; }
+build bytes wasm_js/bytes || { bad "bytes builds ($(head -2 "$TMP/bytes.err" | tr '\n' ' '))"; echo "$pass passed, $fail failed"; exit 1; }
 ok "the four fixtures build to .wasm, .mjs and .d.ts"
 
 for f in lib.mjs lib.d.ts liball.mjs nobe.mjs cmd.mjs; do
@@ -121,6 +122,13 @@ else
     fail=$((fail + $(grep -c '^FAIL' "$TMP/check.out")))
     [ "$(grep -c '^FAIL' "$TMP/check.out")" -eq 0 ] && bad "check.mjs exited non-zero with no FAIL line ($(tail -3 "$TMP/check.out" | tr '\n' ' '))"
 fi
+
+mkdir -p "$TMP/wbytesgrid"
+printf 'pack(bytes[] pk) {\n  int pn = len(pk) * 2;\n} return int pn;\n([]):(0)\n([[1]]):(2)\n' > "$TMP/wbytesgrid/pack.id"
+printf 'string[] lib_exports = ["pack"];\n' > "$TMP/wbytesgrid/conf.id"
+if build wbytesgrid "$TMP/wbytesgrid"; then bad "a bytes[] listed function is refused (built)"
+elif grep -q "lists 'pack'" "$TMP/wbytesgrid.err" && grep -q "type bytes\[\]" "$TMP/wbytesgrid.err" && grep -q "string, bytes" "$TMP/wbytesgrid.err"; then ok "a bytes[] listed function is refused, naming bytes as the supported form"
+else bad "a bytes[] listed function is refused ($(head -2 "$TMP/wbytesgrid.err" | tr '\n' ' '))"; fi
 
 if build nowasm wasm_js/nowasm; then
     bad "a native whose backend has no wasm implementation is refused"

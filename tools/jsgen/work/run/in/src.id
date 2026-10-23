@@ -40,5 +40,5 @@ jg_check(string[] jg_cf, string[] jg_exps, string[][] jg_skips, string[] jg_errs
   }
 } return void;
 (["w", "g", "", "", "", "a,b"], ["id_a"], [], []):(["w", "g", "", "", "", "a,b"], ["id_a"], [], ["conf.id's lib_exports lists 'b', which the module does not contain: a program with a main keeps only the functions main reaches; call it from main, or build the project without a main to keep every function"])
-(["w", "g", "", "", "1", ""], ["id_a"], [["a", "why a"]], []):(["w", "g", "", "", "1", ""], ["id_a"], [["a", "why a"]], ["conf.id's lib_exports lists 'a' (why a); remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)"])
+(["w", "g", "", "", "1", ""], ["id_a"], [["a", "why a"]], []):(["w", "g", "", "", "1", ""], ["id_a"], [["a", "why a"]], ["conf.id's lib_exports lists 'a' (why a); remove the entry, or list a function whose parameters and result are int, float, word, string, bytes or a list of int, float or string (a function of your own that calls it will do)"])
 (["w", "g", "", "", "", ""], ["id_a"], [["a", "why a"]], []):(["w", "g", "", "", "", ""], ["id_a"], [["a", "why a"]], [])

@@ -75,7 +75,7 @@ host() { # name, host.c, static|shared, extra libs... : compile, run, report
 if [ "$which" = fixtures ]; then
     # --- kit: every type, the traps, the memory ------------------------------
     if build kit lib/kit --no-std; then ok "kit builds as a library"; else bad "kit builds as a library ($(grep -v '^idc:   ' "$TMP/kit.log" | tail -1))"; fi
-    want_syms="kit_div kit_dot kit_error kit_free kit_grid kit_join kit_nth kit_scale kit_stash kit_shutdown kit_split kit_strs_free kit_table_free kit_wsum"
+    want_syms="kit_div kit_dot kit_error kit_free kit_grid kit_join kit_nth kit_reverse kit_scale kit_stash kit_shutdown kit_split kit_strs_free kit_table_free kit_wsum"
     for kind in so a; do
         file="$TMP/kit.d/libkit.$kind"
         got=$(exports_of "$file" "$kind" | tr '\n' ' ' | sed 's/ $//')
@@ -154,6 +154,14 @@ EOF
     if build hasfunc "$TMP/hasfunc" --no-std --allow-untested; then bad "an exported function taking a function value is refused (built)"
     elif grep -q "has no C form" "$TMP/hasfunc.log" && grep -q "remove 'apply' from lib_exports" "$TMP/hasfunc.log"; then ok "an exported function taking a function value is refused, naming the type and the fix"
     else bad "an exported function taking a function value is refused ($(tail -1 "$TMP/hasfunc.log"))"; fi
+
+    mkdir "$TMP/hasbytes"
+    printf 'pack(bytes[] pk) {\n  int pn = len(pk) * 2;\n} return int pn;\n' > "$TMP/hasbytes/pack.id"
+    printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/hasbytes/twice.id"
+    printf 'string[] lib_exports = ["pack", "twice"];\n' > "$TMP/hasbytes/conf.id"
+    if build hasbytes "$TMP/hasbytes" --no-std --allow-untested; then bad "an exported function taking bytes[] is refused (built)"
+    elif grep -q "has no C form" "$TMP/hasbytes.log" && grep -q "string, bytes, int\[\]" "$TMP/hasbytes.log"; then ok "an exported function taking bytes[] is refused, naming bytes as the supported form"
+    else bad "an exported function taking bytes[] is refused ($(tail -1 "$TMP/hasbytes.log"))"; fi
 
     mkdir "$TMP/nolist"
     printf 'twice(int a) {\n  int b = a * 2;\n} return int b;\n(2):(4)\n(5):(10)\n' > "$TMP/nolist/twice.id"

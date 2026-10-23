@@ -2,10 +2,10 @@
 // error say them.
 
 jg_why_param(string[] jg_fl, int jg_at) {
-  string jg_wy = "parameter '" + jg_fl[jg_at] + "' has type " + jg_fl[jg_at + 1] + ", which does not cross the boundary (int, float, word, string and lists of int, float or string do)";
+  string jg_wy = "parameter '" + jg_fl[jg_at] + "' has type " + jg_fl[jg_at + 1] + ", which does not cross the boundary (int, float, word, string, bytes and lists of int, float or string do)";
 } return string jg_wy;
-(["a", "int", "s", "string[][]"], 2):("parameter 's' has type string[][], which does not cross the boundary (int, float, word, string and lists of int, float or string do)")
-(["z", "?"], 0):("parameter 'z' has type ?, which does not cross the boundary (int, float, word, string and lists of int, float or string do)")
+(["a", "int", "s", "string[][]"], 2):("parameter 's' has type string[][], which does not cross the boundary (int, float, word, string, bytes and lists of int, float or string do)")
+(["z", "?"], 0):("parameter 'z' has type ?, which does not cross the boundary (int, float, word, string, bytes and lists of int, float or string do)")
 
 jg_why_ret(string jg_ty) {
   string jg_shown = jg_ty;

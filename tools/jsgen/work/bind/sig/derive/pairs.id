@@ -1,6 +1,6 @@
 // A definition's parameters as one flat list, [name, type, name, type, ...], and
 // the first whose type is not one that crosses the boundary: int, float, word,
-// string, or a list of int, float or string.
+// string, bytes, or a list of int, float or string.
 
 jg_pairs(string[] jg_dr) {
   string[] jg_fl = [];
@@ -25,6 +25,8 @@ jg_bad_at(string[] jg_fl) {
   }
 } return int jg_at;
 (["a", "int", "s", "string[]"]):(-1)
+(["a", "int", "b", "bytes"]):(-1)
+(["a", "int", "b", "bytes[]"]):(2)
 (["a", "int", "s", "string[][]"]):(2)
 (["z", "?"]):(0)
 ([]):(-1)
@@ -33,6 +35,8 @@ jg_ret_bad(string jg_ty) {
   int jg_bad = jg_ty == "" || (jg_ty != "void" && list_string_index((import jg_supported), jg_ty) < 0);
 } return int jg_bad;
 ("int[]"):(0)
+("bytes"):(0)
+("bytes[]"):(1)
 ("void"):(0)
 (""):(1)
 ("string[][]"):(1)

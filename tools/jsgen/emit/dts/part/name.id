@@ -13,6 +13,8 @@ jg_ts(string jg_ty) {
 ("int"):("number")
 ("word"):("bigint")
 ("string[]"):("string[]")
+("bytes"):("Uint8Array")
+("bytes[]"):("")
 ("void"):("void")
 ("Point"):("")
 

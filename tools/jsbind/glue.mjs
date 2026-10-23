@@ -402,6 +402,8 @@ function lowerer(type, fname, pname, h) {
       };
     case "string":
       return (v) => h.lowerString(v, fname, pname);
+    case "bytes":
+      return (v) => h.lowerBytes(v, fname, pname);
     case "int[]":
     case "float[]":
     case "string[]":
@@ -422,6 +424,8 @@ function lifter(type, h) {
       return () => undefined;
     case "string":
       return (p) => h.liftString(p);
+    case "bytes":
+      return (p) => h.liftBytes(p);
     case "int[]":
     case "float[]":
     case "string[]":
@@ -499,6 +503,7 @@ export async function load(source, options) {
     span: (addr, n) => exps.idw_span(BigInt(addr), BigInt(n)),
     release: (type, p) => {
       if (type === "string") exps.idw_release_str(p);
+      else if (type === "bytes") exps.idw_release_bytes(p);
       else {
         if (type === "string[]") {
           const l = h.listSpan(p);
@@ -525,6 +530,18 @@ export async function load(source, options) {
       view();
       u8.set(b, q);
       return q;
+    },
+    lowerBytes: (v, fname, pname) => {
+      if (!(v instanceof Uint8Array)) throw new TypeError(fname + ": argument '" + pname + "' must be a Uint8Array, got " + typeof v);
+      const p = exps.idw_bytes(v.length);
+      view();
+      u8.set(v, dvNow.getUint32(p + 8, true));
+      return p;
+    },
+    liftBytes: (p) => {
+      view();
+      const at = dvNow.getUint32(p + 8, true);
+      return u8.slice(at, at + dvNow.getInt32(p, true));
     },
     liftString: (p) => {
       if (p === 0) return "";
@@ -647,7 +664,7 @@ export async function load(source, options) {
     const lift = lifter(sig.ret, h);
     const n = lows.length;
     const freeArgs = opts.freeArgs === true || (Array.isArray(opts.freeArgs) && opts.freeArgs.includes(name));
-    const owned = sig.params.map((p, i) => i).filter((i) => /^(string|int\[\]|float\[\]|string\[\])$/.test(sig.params[i][1]));
+    const owned = sig.params.map((p, i) => i).filter((i) => /^(string|bytes|int\[\]|float\[\]|string\[\])$/.test(sig.params[i][1]));
     const dead = () => new Error("id: the instance is dead (an earlier call trapped or exited, or dispose() ran); load a new one");
     const arity = () => new TypeError(name + " takes " + n + " argument(s)");
     const finish = (a, r) => {

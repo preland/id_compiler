@@ -9,7 +9,7 @@ lg_bad(string lg_ln, string lg_lib) {
   if (list_string_index((import lg_reserved), lg_short(lg_lib, lg_nm)) >= 0) {
     lg_why = "libgen: '" + lg_nm + "' would be exported as " + lg_lib + "_" + lg_short(lg_lib, lg_nm) + ", the name of one of the library's own entry points; rename the function";
   } else if (lg_badp != "") {
-    lg_why = "libgen: '" + lg_nm + "' takes a parameter of type '" + lg_badp + "', which has no C form; an exported function may take int, word, float, string, int[], word[], float[] and string[] -- remove '" + lg_nm + "' from lib_exports in conf.id and list a function with those parameters that calls it instead";
+    lg_why = "libgen: '" + lg_nm + "' takes a parameter of type '" + lg_badp + "', which has no C form; an exported function may take int, word, float, string, bytes, int[], word[], float[] and string[] -- remove '" + lg_nm + "' from lib_exports in conf.id and list a function with those parameters that calls it instead";
   }
 } chain (string lg_ln, string lg_lib) {
   if (lg_why == "" && list_string_index((import lg_tname), lg_ret(lg_ln)) < 0) {
@@ -18,7 +18,7 @@ lg_bad(string lg_ln, string lg_lib) {
 } return string lg_why;
 ("|(int 0)->int=>b\tadd\tf.id:1", "m"):("")
 ("|()->void=>b\tfree\tf.id:1", "m"):("libgen: 'free' would be exported as m_free, the name of one of the library's own entry points; rename the function")
-("|(func(int) return int 0)->void=>b\tf\tf.id:1", "m"):("libgen: 'f' takes a parameter of type 'func(int) return int', which has no C form; an exported function may take int, word, float, string, int[], word[], float[] and string[] -- remove 'f' from lib_exports in conf.id and list a function with those parameters that calls it instead")
+("|(func(int) return int 0)->void=>b\tf\tf.id:1", "m"):("libgen: 'f' takes a parameter of type 'func(int) return int', which has no C form; an exported function may take int, word, float, string, bytes, int[], word[], float[] and string[] -- remove 'f' from lib_exports in conf.id and list a function with those parameters that calls it instead")
 ("|()->int[][]=>b\tg\tf.id:1", "m"):("libgen: 'g' returns 'int[][]', which has no C form; an exported function may return void, string[][] or any type it may take -- return one of those, or remove 'g' from lib_exports in conf.id and list a function that calls it instead")
 
 ("|()->void=>b\tm_free\tf.id:1", "m"):("libgen: 'm_free' would be exported as m_free, the name of one of the library's own entry points; rename the function")

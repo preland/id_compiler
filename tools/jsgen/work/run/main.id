@@ -41,7 +41,7 @@ jg_run(string[] jg_cf, string[] jg_sl) {
 (["", "", "", "", "", ""], []):(1) then eprints:("idc: jsbind: usage: jsgen --wasm FILE --glue glue.mjs [--natives MAP] [--out PREFIX] [--strict 1] [--names A,B] --src FILE...\n")
 (["/nonexistent/jg.wasm", "g.mjs", "", "", "", ""], []):(1) then eprints:("idc: jsbind: cannot read /nonexistent/jg.wasm\n")
 given jg_t_proj ([(import jg_t_wasm), (import jg_t_glue), (import jg_t_map), (import jg_t_pre), "", ""], [(import jg_t_src)]):(0) then prints:("idc: jsbind: wrote a.mjs, .d.mts and .d.ts (1 functions, backends jsx, 1 not bound)\n") then jg_t_same:(1)
-given jg_t_proj ([(import jg_t_wasm), (import jg_t_glue), (import jg_t_map), (import jg_t_pre), "1", ""], [(import jg_t_src)]):(1) then eprints:("idc: jsbind: conf.id's lib_exports lists 'bad' (parameter 'g' has type string[][], which does not cross the boundary (int, float, word, string and lists of int, float or string do)); remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)\n")
+given jg_t_proj ([(import jg_t_wasm), (import jg_t_glue), (import jg_t_map), (import jg_t_pre), "1", ""], [(import jg_t_src)]):(1) then eprints:("idc: jsbind: conf.id's lib_exports lists 'bad' (parameter 'g' has type string[][], which does not cross the boundary (int, float, word, string, bytes and lists of int, float or string do)); remove the entry, or list a function whose parameters and result are int, float, word, string, bytes or a list of int, float or string (a function of your own that calls it will do)\n")
 
 main(int argc, string[] argv) {
   string[] jg_cf = jg_cfg_of(argv);

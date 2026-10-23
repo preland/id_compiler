@@ -174,4 +174,19 @@ await check("a library module refuses run(), and a command module has no bound f
   assert.throws(() => m.run(), /library/);
 });
 
+const bytesLib = await mod("bytes");
+
+await check("a bytes argument and result cross as a copied Uint8Array, a 0 and a 255 included", async () => {
+  const m = await bytesLib.load();
+  const sent = new Uint8Array([0, 7, 255]);
+  const got = m.frame(sent);
+  assert.ok(got instanceof Uint8Array);
+  assert.deepEqual(Array.from(got), [0, 7, 255, 255, 0]);
+  assert.deepEqual(Array.from(sent), [0, 7, 255]);
+  assert.notEqual(got.buffer, m.raw.memory.buffer);
+  assert.equal(m.weight(new Uint8Array([0, 255, 0, 255])), 510);
+  assert.deepEqual(Array.from(m.frame(new Uint8Array(0))), [255, 0]);
+  assert.throws(() => m.frame([1, 2]), /Uint8Array/);
+});
+
 process.exit(failed ? 1 : 0);

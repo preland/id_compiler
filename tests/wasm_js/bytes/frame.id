@@ -1,0 +1,18 @@
+frame(bytes fb) {
+  bytes fo = bytes_sub(fb, 0, len(fb));
+  push(fo, 255);
+  push(fo, 0);
+} return bytes fo;
+([1, 2]):([1, 2, 255, 0])
+([]):([255, 0])
+
+weight(bytes wb) {
+  int wi = 0;
+  int wn = 0;
+  while (wi < len(wb)) {
+    wn = wn + wb[wi];
+    wi = wi + 1;
+  }
+} return int wn;
+([0, 255, 0]):(255)
+([]):(0)

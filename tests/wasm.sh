@@ -71,7 +71,7 @@ fi
 ok "the program builds"
 
 exports=$(wasm-objdump -x -j Export "$TMP/prog.wasm" 2>/dev/null | grep -oE '"[a-zA-Z_0-9]+"' | tr -d '"' | sort)
-want=$(printf '%s\n' memory id_alloc id_str_of_cstr _initialize id_greet id_sum3 idw_abi idw_str idw_list idw_span idw_flush idw_release_str idw_release_list | sort)
+want=$(printf '%s\n' memory id_alloc id_str_of_cstr _initialize id_greet id_sum3 idw_abi idw_str idw_list idw_span idw_flush idw_release_str idw_release_list idw_bytes idw_release_bytes | sort)
 if [ "$exports" = "$want" ]; then
     ok "exports are exactly memory/id_alloc/id_str_of_cstr/_initialize/the idw_* binding shim/id_greet/id_sum3 (no fixture idstd)"
 else

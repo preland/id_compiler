@@ -19,6 +19,10 @@ IDW_EXPORT("idw_str") char* idw_str(int n) {
     return id_str_new((size_t)n);
 }
 
+IDW_EXPORT("idw_bytes") IdBytes* idw_bytes(int n) {
+    return id_bytes_new(n > 0 ? n : 0);
+}
+
 IDW_EXPORT("idw_list") IdList* idw_list(int n) {
     IdList* L = id_list_sized(n > 0 ? n : 0);
     memset(L->data, 0, sizeof(long long) * (size_t)L->len);
@@ -35,6 +39,10 @@ IDW_EXPORT("idw_flush") void idw_flush(void) {
 
 IDW_EXPORT("idw_release_str") void idw_release_str(char* s) {
     id_str_free(s);
+}
+
+IDW_EXPORT("idw_release_bytes") void idw_release_bytes(IdBytes* B) {
+    id_bytes_free(B);
 }
 
 IDW_EXPORT("idw_release_list") void idw_release_list(IdList* L) {

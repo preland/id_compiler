@@ -36,9 +36,9 @@ int jg_sec_export = 7;
 int jg_ret_window = 200;
 
 string[] jg_kw = ["chain", "given", "then", "native", "stdin", "timeout", "asm"];
-string[] jg_supported = ["int", "float", "word", "string", "int[]", "float[]", "string[]"];
-string[] jg_ts_from = ["int", "float", "word", "string", "void", "int[]", "float[]", "string[]"];
-string[] jg_ts_to = ["number", "number", "bigint", "string", "void", "number[]", "number[]", "string[]"];
+string[] jg_supported = ["int", "float", "word", "string", "bytes", "int[]", "float[]", "string[]"];
+string[] jg_ts_from = ["int", "float", "word", "string", "bytes", "void", "int[]", "float[]", "string[]"];
+string[] jg_ts_to = ["number", "number", "bigint", "string", "Uint8Array", "void", "number[]", "number[]", "string[]"];
 string[] jg_ts_reserved = ["break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "false", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "null", "return", "super", "switch", "this", "throw", "true", "try", "typeof", "var", "void", "while", "with", "yield", "let", "static", "implements", "interface", "package", "private", "protected", "public", "await", "async"];
 string[] jg_api_reserved = ["raw", "memory", "alive", "dispose", "run"];
 string[] jg_skip_exports = ["id_alloc", "id_str_of_cstr", "id_store_span"];

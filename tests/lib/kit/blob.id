@@ -1,0 +1,15 @@
+// Bytes in, bytes out: a NUL and a 255 are ordinary members of a bytes value.
+
+// The bytes in the opposite order, then a 255.
+kit_reverse(bytes kb_src) {
+  bytes kb_out = bytes_new(0);
+  int kb_i = len(kb_src) - 1;
+  while (kb_i >= 0) {
+    push(kb_out, kb_src[kb_i]);
+    kb_i = kb_i - 1;
+  }
+} chain (bytes kb_src) {
+  push(kb_out, 255);
+} return bytes kb_out;
+([0, 1, 255]):([255, 1, 0, 255])
+([]):([255])

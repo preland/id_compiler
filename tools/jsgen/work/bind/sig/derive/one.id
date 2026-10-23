@@ -24,6 +24,6 @@ jg_derive_one(string[] jg_dr, string[][] jg_sigs, string[][] jg_skips) {
   }
 } return void;
 (["f", "int", "x:1", "int a"], [], []):(["f", "int", "x:1", "int a"], [["f", "int", "x:1", "a", "int"]], [])
-(["f", "int", "x:1", "Point p"], [], []):(["f", "int", "x:1", "Point p"], [], [["f", "parameter 'p' has type Point, which does not cross the boundary (int, float, word, string and lists of int, float or string do)"]])
+(["f", "int", "x:1", "Point p"], [], []):(["f", "int", "x:1", "Point p"], [], [["f", "parameter 'p' has type Point, which does not cross the boundary (int, float, word, string, bytes and lists of int, float or string do)"]])
 (["f", "", "x:1", "int a"], [], []):(["f", "", "x:1", "int a"], [], [["f", "it returns null, which does not cross the boundary"]])
-(["f", "string[][]", "x:1", "Point p"], [], []):(["f", "string[][]", "x:1", "Point p"], [], [["f", "parameter 'p' has type Point, which does not cross the boundary (int, float, word, string and lists of int, float or string do)"]])
+(["f", "string[][]", "x:1", "Point p"], [], []):(["f", "string[][]", "x:1", "Point p"], [], [["f", "parameter 'p' has type Point, which does not cross the boundary (int, float, word, string, bytes and lists of int, float or string do)"]])

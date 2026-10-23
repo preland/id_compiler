@@ -29,9 +29,9 @@ jg_skip_list(string[][] jg_skips) {
 jg_strict_err(string jg_strict, string[][] jg_skips) {
   string jg_er = "";
   if (jg_strict != "" && len(jg_skips) > 0) {
-    jg_er = "conf.id's lib_exports lists " + jg_skip_list(jg_skips) + "; remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)";
+    jg_er = "conf.id's lib_exports lists " + jg_skip_list(jg_skips) + "; remove the entry, or list a function whose parameters and result are int, float, word, string, bytes or a list of int, float or string (a function of your own that calls it will do)";
   }
 } return string jg_er;
-("1", [["a", "why a"]]):("conf.id's lib_exports lists 'a' (why a); remove the entry, or list a function whose parameters and result are int, float, word, string or a list of int, float or string (a function of your own that calls it will do)")
+("1", [["a", "why a"]]):("conf.id's lib_exports lists 'a' (why a); remove the entry, or list a function whose parameters and result are int, float, word, string, bytes or a list of int, float or string (a function of your own that calls it will do)")
 ("", [["a", "why a"]]):("")
 ("1", []):("")

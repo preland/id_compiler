@@ -181,6 +181,15 @@ static char* idl_in_str(const char* p, size_t n) {
     return id_str_from(p ? p : "", n);
 }
 
+static IdBytes* idl_in_bytes(const uint8_t* p, size_t n) {
+    IdBytes* B;
+    if (n && !p) idl_argerr("a bytes argument is NULL but its length is not zero");
+    if (n > (size_t)INT_MAX) idl_argerr("a bytes argument is longer than an id bytes value can hold (2^31 - 1 bytes)");
+    B = id_bytes_new((int)n);
+    if (n) memcpy(B->data, p, n);
+    return B;
+}
+
 static IdList* idl_list_make(size_t n) {
     if (n > (size_t)INT_MAX / 2) idl_argerr("a list argument is longer than an id list can hold (2^30 elements)");
     return id_list_sized((int)n);
@@ -228,6 +237,15 @@ static void idl_out_str(char** out, size_t* out_len, const char* s) {
     if (!r) idl_oom();
     memcpy(r, s, n);
     r[n] = '\0';
+    *out = r;
+    *out_len = n;
+}
+
+static void idl_out_bytes(uint8_t** out, size_t* out_len, IdBytes* B) {
+    size_t n = (size_t)id_bytes_len(B);
+    uint8_t* r = (uint8_t*)malloc(n ? n : 1);
+    if (!r) idl_oom();
+    if (n) memcpy(r, B->data, n);
     *out = r;
     *out_len = n;
 }

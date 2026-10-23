@@ -21,6 +21,8 @@ int main(void) {
     char* s = NULL;
     size_t n = 0;
     double* fs = NULL;
+    uint8_t* bout = NULL;
+    const uint8_t blob[] = {0, 1, 255};
     kit_strs strs;
     kit_table tab;
     int32_t a[] = {1, 2, 3}, b[] = {4, 5, 6}, c[] = {1, 2};
@@ -51,6 +53,9 @@ int main(void) {
     CHECK("a success clears the message", kit_error()[0] == '\0');
     CHECK("a NUL in a string is status 2", kit_split("a\0b", 3, ",", 1, &strs) == 2 && strstr(kit_error(), "NUL") != NULL);
     CHECK("a failed call leaves list outs empty", strs.count == 0 && strs.items == NULL);
+    CHECK("bytes in, bytes out: a 0 and a 255 survive both ways", kit_reverse(blob, 3, &bout, &n) == 0 && n == 4 && bout[0] == 255 && bout[1] == 1 && bout[2] == 0 && bout[3] == 255);
+    CHECK("empty bytes in", kit_reverse(NULL, 0, &bout, &n) == 0 && n == 1 && bout[0] == 255);
+    CHECK("a NULL bytes pointer with a length is status 2", kit_reverse(NULL, 3, &bout, &n) == 2 && bout == NULL && n == 0);
 
     {
         long before, after;

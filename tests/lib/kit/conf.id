@@ -1,1 +1,1 @@
-string[] lib_exports = ["kit_dot", "kit_scale", "kit_wsum", "kit_nth", "kit_div", "kit_stash", "kit_join", "kit_split", "kit_grid"];
+string[] lib_exports = ["kit_dot", "kit_scale", "kit_wsum", "kit_nth", "kit_div", "kit_stash", "kit_join", "kit_split", "kit_grid", "kit_reverse"];
