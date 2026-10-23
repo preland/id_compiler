@@ -4517,6 +4517,8 @@ int id_fv_typed(int e);
 void id_fv_elem_err(int el, int i);
 int id_bad_arr(char* want, int e);
 int id_arr_els(char* want, int e);
+void id_chk_float_elem(int id, char* lt, int v, char* verb);
+void id_chk_push_float(int id);
 void id_chk_iassign(int id);
 void id_chk_iassign2(int id, char* bt);
 void id_chk_iassign3(int id, char* bt);
@@ -35211,6 +35213,7 @@ int id_tc_line(int id) {
 void id_chk_call(int id) {
     if ((id_is_push2(id) == 1)) {
         id_chk_push(id);
+        id_chk_push_float(id);
     }
     id_chk_call2(id);
     return;
@@ -38932,6 +38935,22 @@ int id_arr_els(char* want, int e) {
     return 0;
 }
 
+void id_chk_float_elem(int id, char* lt, int v, char* verb) {
+    if (((((id_ty_is_list(lt) == 1) || (strcmp(lt, ID_S("bytes")) == 0)) && (strcmp(id_elem_type(lt), ID_S("int")) == 0)) && (strcmp(id_type_of(v), ID_S("float")) == 0))) {
+        ({ char* idft2 = id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("cannot "), verb), ID_S(" "), 1), lt, 1), ID_S(": a float would drop its fraction"), 1); id_tc_diag(id, ID_S("E0645"), idft2, lt, ID_S("a float stored in an int element silently drops its fraction, and id converts nothing silently"), ID_S("declare an int local first, as in `int n = f;`, and store that")); id_str_free(idft2); });
+    }
+    return;
+}
+
+void id_chk_push_float(int id) {
+    IdList* args;
+    char* lt;
+    args = (IdList*)(intptr_t)(id_list_get(nl1, id));
+    lt = id_type_of((int)(id_list_get(args, 0)));
+    id_chk_float_elem(id, lt, (int)(id_list_get(args, 1)), ID_S("push a float onto a"));
+    return;
+}
+
 void id_chk_iassign(int id) {
     char* bt;
     bt = id_base_type(id);
@@ -38965,6 +38984,7 @@ void id_chk_iassign3(int id, char* bt) {
         ({ char* idft1 = id_concat_f(id_concat_f(id_concat(ID_S("cannot store a "), type_of_v), ID_S(" into a "), 1), bt, 1); id_tc_err(id, idft1); id_str_free(idft1); });
     }
     id_chk_literal_fit(id, elem_type_v, v);
+    id_chk_float_elem(id, bt, v, ID_S("store a float into a"));
     return;
 }
 

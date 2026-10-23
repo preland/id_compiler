@@ -1,0 +1,5 @@
+// EXPECT: cannot store a float into a int[]: a float would drop its fraction [E0645]
+main(int argc, string[] argv) {
+  int[] xs = [1];
+  xs[0] = 2.5;
+} return int 0;

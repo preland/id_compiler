@@ -1,0 +1,13 @@
+// A float pushed onto, and stored into, an int list: the input for the E0645
+// check (../../../more/float_elem.id).
+float_list_fixture() {
+  idx_build();
+  export int[] args_float = [(import arr_ints), (import lit_float)];
+  export int iassign_float = node_iassign((import idx_fix), (import lit_float));
+} chain () {
+  export int push_float = node_call("push", (import args_float));
+} return void;
+given float_list_fixture ():() then calls node_iassign:((import idx_fix), (import lit_float))
+given float_list_fixture ():() then calls node_call:("push", (import args_float))
+():() then calls idx_build:[1]
+():() then init_units:(0)

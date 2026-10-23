@@ -1,0 +1,23 @@
+// A float stored into an int list or a bytes element drops its fraction, so
+// it is written down: `int n = f;` names the narrowing on a line of its own,
+// and the store then holds an int. A declaration may narrow (narrow.id), an
+// element store may not, for the reason an argument may not -- the reader of
+// the store cannot see the type that is being dropped.
+
+chk_float_elem(int id, string lt, int v, string verb) {
+  if((ty_is_list(lt) == 1 || lt == "bytes") && elem_type(lt) == "int" && type_of(v) == "float") {
+    tc_diag(id, "E0645", "cannot " + verb + " " + lt + ": a float would drop its fraction", lt, "a float stored in an int element silently drops its fraction, and id converts nothing silently", "declare an int local first, as in `int n = f;`, and store that");
+  }
+} return void;
+given float_list_fixture ((import push_float), "int[]", (import lit_float), "push a float onto a"):() then (import chkfail)[0]:(1)
+given float_list_fixture ((import push_float), "float[]", (import lit_float), "push a float onto a"):() then (import chkfail)[0]:(0)
+given float_list_fixture ((import push_float), "bytes", (import lit_float), "store a float into a"):() then (import chkfail)[0]:(1)
+given float_list_fixture ((import push_float), "int[]", (import lit_a), "push a float onto a"):() then (import chkfail)[0]:(0)
+
+chk_push_float(int id) {
+  int[] args = (import nl1)[id];
+  string lt = type_of(args[0]);
+  chk_float_elem(id, lt, args[1], "push a float onto a");
+} return void;
+given float_list_fixture ((import push_float)):() then (import chkfail)[0]:(1)
+given call2_setup ((import cm_push_call)):() then (import chkfail)[0]:(0)

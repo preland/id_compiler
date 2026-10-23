@@ -1,0 +1,5 @@
+// EXPECT: cannot push a float onto a int[]: a float would drop its fraction [E0645]
+main(int argc, string[] argv) {
+  int[] xs = [1];
+  push(xs, 2.5);
+} return int 0;

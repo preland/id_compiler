@@ -39,6 +39,7 @@ chk_iassign3(int id, string bt) {
   }
 } chain (int id, string bt) {
   chk_literal_fit(id, elem_type_v, v);
+  chk_float_elem(id, bt, v, "store a float into a");
 } return void;
 given iassign_build ((import idx_iassign_node), "int[]"):() then (import chkfail)[0]:(0)
 given iassign_build ((import idx_iassign_node), "string[]"):() then (import chkfail)[0]:(1)

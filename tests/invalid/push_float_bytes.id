@@ -1,0 +1,5 @@
+// EXPECT: cannot push a float onto a bytes: a float would drop its fraction [E0645]
+main(int argc, string[] argv) {
+  bytes b = bytes_new(1);
+  push(b, 2.5);
+} return int 0;

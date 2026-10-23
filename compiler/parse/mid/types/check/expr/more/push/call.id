@@ -2,6 +2,7 @@
 chk_call(int id) {
   if(is_push2(id) == 1) {
     chk_push(id);
+    chk_push_float(id);
   }
   chk_call2(id);
 } return void;
