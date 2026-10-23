@@ -3392,7 +3392,7 @@ done
 IDR_DECL=../compiler/parse/back/tgt/ll/mod/sect/decl.id
 IDR_CONF=../tools/idrun/conf.id
 IDR_SKIP=" id_list_cell id_list_cell_set id_list_len_raw id_list_cap_raw id_list_adopt id_str_of_cstr "
-{ grep -F 'declare ptr @id_list_new()' "$IDR_DECL" | grep -o '@id_[a-z0-9_]*' | tr -d '@'; grep -rhoE 'lw_callf\("id_[a-z0-9_]+"' ../compiler/parse/back/ir/build | grep -o 'id_[a-z0-9_]*'; } | sort -u > "$TMP/idr_emit"
+{ grep -v '^given ' "$IDR_DECL" | grep -F 'declare ptr @id_list_new()' | grep -o '@id_[a-z0-9_]*' | tr -d '@'; grep -rhoE 'lw_callf\("id_[a-z0-9_]+"' ../compiler/parse/back/ir/build | grep -o 'id_[a-z0-9_]*'; } | sort -u > "$TMP/idr_emit"
 grep -E '^string f?bi_names' "$IDR_CONF" | grep -o 'id_[a-z0-9_]*' | sort -u > "$TMP/idr_have"
 idr_missing=""
 while read -r idr_name; do
