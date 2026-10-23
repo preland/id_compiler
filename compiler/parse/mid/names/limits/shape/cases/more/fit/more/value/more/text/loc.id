@@ -29,4 +29,5 @@ cfn_fixture() {
   push((import casegiven), "");
 } return void;
 ():() then calls newleaf:("cfn", 0, 0, "fx_target", "")
+():() then len((import casegiven)):(1)
 ():() then init_units:(0)

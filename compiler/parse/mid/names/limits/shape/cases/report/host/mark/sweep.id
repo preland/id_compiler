@@ -13,6 +13,7 @@ ut_seeded() {
   ut_add("port_byte", "asm 'in8'", "*");
 } return void;
 ():() then calls ut_add:("port_byte", "asm 'in8'", "*")
+():() then (import utname)[0]:("port_byte")
 ():() then init_units:(0)
 
 // ut_loop and ut_sweep both read utname (../../why/reason.id's ut_at does too),

@@ -16,6 +16,7 @@ regrow_d() {
   didx_add("x");
 } return void;
 ():() then calls didx_add:("x")
+():() then len((import dvexp)):(1)
 ():() then init_units:(0)
 
 // regrow_d plus "g" exported, for report_owned_var's own cases (check/access/

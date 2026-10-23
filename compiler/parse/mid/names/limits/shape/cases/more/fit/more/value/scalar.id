@@ -23,6 +23,8 @@ dupeq_starts() {
   push((import casestart), 1);
   dupeq_ends();
 } return void;
+given dupeq_fixture ():() then (import casestart)[2]:(0)
+given dupeq_fixture ():() then (import casestart)[3]:(1)
 given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)
 

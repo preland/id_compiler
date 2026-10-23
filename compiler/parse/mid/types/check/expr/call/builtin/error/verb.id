@@ -34,5 +34,7 @@ bi_flush_setup() {
   int[] none = [];
   export int bi_flush_call = node_call("flush", none);
 } return void;
+():() then calls node_call:("flush", [])
+():() then calls lc_reg_list1:("clist", "1", 1)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

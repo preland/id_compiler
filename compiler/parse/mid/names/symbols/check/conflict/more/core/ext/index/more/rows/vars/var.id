@@ -25,6 +25,8 @@ ixn_fx() {
   export int ixn_param = node_param("param", "int", "arg");
 } return void;
 ():() then calls node_call:("foo", [])
+():() then calls node_txt2:("int", "7", 7, 0)
+():() then calls node_param:("param", "int", "arg")
 ():() then init_units:(0)
 
 // The walk positioned at function ixw_f, as ixw_func would have it: begun, the

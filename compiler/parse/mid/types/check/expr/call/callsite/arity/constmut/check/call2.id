@@ -18,6 +18,7 @@ farm_g() {
   export int f_pb = node_param("param", "string", "b");
 } return void;
 ():() then calls node_param:("param", "string", "b")
+given farm_f ():() then calls node_func:("vfwd", "void", [(import f_pa)], [(import f_exprstmt)], -1)
 ():() then init_units:(0)
 
 // prog and pfile carry one entry, fwd1 (id 6) from "test.id" -- for

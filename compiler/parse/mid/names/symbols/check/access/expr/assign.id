@@ -46,4 +46,5 @@ regrow_assign() {
   export int regrow_assign_node = node_txt1("assign", "z", (import regrow_assign_val));
 } return void;
 ():() then calls node_txt2:("int", "2", 2, 0)
+():() then calls node_txt1:("assign", "z", 0)
 ():() then init_units:(0)

@@ -36,4 +36,5 @@ dupeq_fixture() {
   dupeq_starts();
 } return void;
 ():() then calls node_txt2:("int", "0", 0, 0)
+():() then len((import casestart)):(2)
 ():() then init_units:(0)

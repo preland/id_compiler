@@ -17,6 +17,8 @@ cmp_build() {
   export int bin_lt = node_txt2("bin", "<", (import lit_a), (import lit_b));
   export int bin_bitand = node_txt2("bin", "&", (import lit_a), (import lit_b));
 } return void;
+given composite_fixture ():() then calls node_txt2:("bin", "<", (import lit_a), (import lit_b))
+given composite_fixture ():() then calls node_txt2:("bin", "==", (import lit_a), (import lit_b))
 given composite_fixture ():() then (import chkfail)[0]:(0)
 given composite_fixture ():() then init_units:(0)
 
@@ -30,5 +32,7 @@ cmp_build2() {
   export int print_call = node_call("print", [(import lit_str)]);
   export int exprstmt_bin = node_exprstmt((import bin_eq));
 } return void;
+given cmp_fixture ():() then calls node_txt2:("bin", "<", (import bin_bitand), (import lit_a))
+given cmp_fixture ():() then calls node_exprstmt:((import bin_eq))
 given cmp_fixture ():() then (import chkfail)[0]:(0)
 given cmp_fixture ():() then init_units:(0)
