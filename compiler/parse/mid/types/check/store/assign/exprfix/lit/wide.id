@@ -25,5 +25,7 @@ wide_literal_build() {
   export int literal_edge = node_txt2("int", "2147483648", 0, 1);
   export int literal_past = node_txt2("int", "2147483649", 0, 1);
 } return void;
+given env_init ():() then calls node_txt2:("int", "3000000000", 0, 1)
+given env_init ():() then calls node_txt2:("int", "2147483649", 0, 1)
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)

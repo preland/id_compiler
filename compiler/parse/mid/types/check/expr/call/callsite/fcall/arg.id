@@ -25,5 +25,7 @@ argfn_narrow_call() {
   int a = node_txt2("int", "99999", 99999, 1);
   export int argfn_call_narrow = node_call("g", [a]);
 } return void;
+():() then calls node_txt2:("int", "99999", 99999, 1)
+():() then calls fidx_add:("g")
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

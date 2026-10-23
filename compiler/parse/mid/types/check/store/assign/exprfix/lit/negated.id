@@ -5,5 +5,7 @@ wide_literal_build2() {
   export int negated_past = node_txt1("un", "-", (import literal_past));
   export int declaration_wide = node_decl("int", "x", (import literal_huge), 0);
 } return void;
+given wide_literal_setup ():() then calls node_txt1:("un", "-", (import literal_edge))
+given wide_literal_setup ():() then calls node_decl:("int", "x", (import literal_huge), 0)
 given wide_literal_setup ():() then (import chkfail)[0]:(0)
 given wide_literal_setup ():() then init_units:(0)

@@ -23,5 +23,6 @@ lwd_fixture() {
   int o = lw_open(f);
   export int lwd_a = lw_alloca("int[][]", "a");
 } return void;
+():() then calls lw_alloca:("int[][]", "a")
 ():() then calls ir_func:(-1, "fd_good", "void")
 ():() then init_units:(0)

@@ -14,6 +14,8 @@ shapes_build() {
   export int arr_ints = node_arr((import arr_elems));
   export int call_len = node_call("len", [(import lit_str)]);
 } return void;
+given shapes_fixture ():() then calls node_call:("len", [(import lit_str)])
+given shapes_fixture ():() then calls node_arr:((import arr_elems))
 given leaves_fixture ():() then (import chkfail)[0]:(0)
 given leaves_fixture ():() then init_units:(0)
 

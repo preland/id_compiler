@@ -14,6 +14,8 @@ varleaf_build() {
   export int var_vi = node_txt("var", "vi");
   export int import_vi = node_txt("import", "vi");
 } return void;
+given varleaf_init ():() then calls add_var:("vi", "int", 0)
+given varleaf_init ():() then calls node_txt:("import", "vi")
 given varleaf_init ():() then (import chkfail)[0]:(0)
 given varleaf_init ():() then init_units:(0)
 

@@ -13,6 +13,8 @@ decl_build() {
   export int decl_list = node_decl("int[]", "xs", (import lit_a), 0);
   export int decl_scalar = node_decl("int", "x", (import lit_a), 0);
 } return void;
+given leaves_fixture ():() then calls node_decl:("int[]", "xs", (import lit_a), 0)
+given leaves_fixture ():() then calls node_decl:("int", "x", (import lit_a), 0)
 given leaves_fixture ():() then (import chkfail)[0]:(0)
 given leaves_fixture ():() then init_units:(0)
 
@@ -24,4 +26,5 @@ assign_build() {
   export int assign_list = node_txt1("assign", "xl", (import lit_a));
 } return void;
 ():() then calls add_var:("xl", "int[]", 0)
+given leaves_fixture ():() then calls node_txt1:("assign", "xl", (import lit_a))
 ():() then init_units:(0)

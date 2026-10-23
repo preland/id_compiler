@@ -10,6 +10,7 @@ cm_other_setup() {
   export int cm_push_local_call = cm_call("var", "locallist");
 } return void;
 ():() then calls node_txt:("var", "x")
+():() then calls cm_call:("var", "locallist")
 ():() then init_units:(0)
 
 chk_bi_nonbuiltin_setup() {

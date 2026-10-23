@@ -5,6 +5,7 @@ farm_j2() {
   export int f_uvar = node_txt("var", "target");
 } return void;
 ():() then calls node_txt:("var", "target")
+given farm_i ():() then calls node_func:("main", "int", (import f_none), (import f_none), -1)
 ():() then init_units:(0)
 
 bits_types(int id, int a, int b) {
@@ -21,5 +22,7 @@ fcall_reg_a() {
   call2_setup();
   push((import vtypes), "func(int) return int");
 } return void;
+():() then len((import vtypes)):(1)
+():() then (import vtypes)[0]:("func(int) return int")
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
