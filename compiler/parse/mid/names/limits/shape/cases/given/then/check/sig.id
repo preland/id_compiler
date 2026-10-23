@@ -28,6 +28,8 @@ dupeq_ends() {
   push((import caseend), 2);
   dupeq_fns();
 } return void;
+given dupeq_fixture ():() then len((import caseend)):(4)
+given dupeq_fixture ():() then (import caseend)[3]:(2)
 given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)
 

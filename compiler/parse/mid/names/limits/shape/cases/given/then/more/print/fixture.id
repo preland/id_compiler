@@ -18,6 +18,8 @@ print_fixture_items() {
   export int[] fixture_print_none = [];
   print_fixture_nodes();
 } return void;
+given fn_fixture ():() then calls node_txt2:("int", "1", 1, 0)
+given fn_fixture ():() then calls node_txt2:("int", "2", 2, 0)
 given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)
 
@@ -30,5 +32,7 @@ print_fixture_nodes() {
   export int fixture_print_empty = newnode("thenprints", (import fixture_ci), 0, "", "", (import fixture_print_none), (import fixture_print_none));
   push((import thennode), (import fixture_print_node));
 } return void;
+given print_fixture ():() then calls newnode:("thenprints", 0, 0, "", "", [4, 5], [4, 5])
+given print_fixture ():() then calls newnode:("thenprints", 0, 0, "", "", [], [])
 given print_fixture ():() then (import chkfail)[0]:(0)
 given print_fixture ():() then init_units:(0)

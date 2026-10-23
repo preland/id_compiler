@@ -24,6 +24,8 @@ elif_fixture2() {
   export int[] elif_body = [(import elif_node)];
   elif_lists();
 } return void;
+given elif_fixture ():() then calls node_if:(0, [1], [5], 1)
+given elif_fixture ():() then (import elif_body):([7])
 given elif_fixture ():() then (import chkfail)[0]:(0)
 given elif_fixture ():() then init_units:(0)
 

@@ -38,5 +38,7 @@ dupeq_fns() {
   push((import casefn), (import dupeq_node));
   push((import casefn), (import dupeq_node));
 } return void;
+given dupeq_fixture ():() then len((import casefn)):(4)
+given dupeq_fixture ():() then (import casefn)[3]:(0)
 given dupeq_fixture ():() then (import chkfail)[0]:(0)
 given dupeq_fixture ():() then init_units:(0)

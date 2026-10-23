@@ -18,6 +18,8 @@ calls_node_build() {
   export int fixture_calls_node = newnode("thencalls", ci, 0, "fx_target", "", (import fixture_calls_one), (import fixture_calls_one));
   calls_node_unknown();
 } return void;
+given calls_items_fixture ():() then calls newnode:("thencalls", 0, 0, "fx_target", "", [4], [4])
+given calls_items_fixture ():() then calls newnode:("thencalls", 0, 0, "nope", "", [], [])
 given calls_items_fixture ():() then (import chkfail)[0]:(0)
 given calls_items_fixture ():() then init_units:(0)
 
@@ -28,5 +30,7 @@ calls_node_unknown() {
   export int fixture_calls_bad = newnode("thencalls", ci, 0, "nope", "", (import fixture_calls_none), (import fixture_calls_none));
   push((import thennode), (import fixture_calls_node));
 } return void;
+given calls_node_fixture ():() then calls newnode:("thencalls", 0, 0, "nope", "", [], [])
+given calls_node_fixture ():() then len((import thennode)):(2)
 given calls_node_fixture ():() then (import chkfail)[0]:(0)
 given calls_node_fixture ():() then init_units:(0)

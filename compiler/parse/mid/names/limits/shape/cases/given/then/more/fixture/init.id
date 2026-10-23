@@ -9,6 +9,8 @@ case_fixture_init() {
   init_bnames();
   init_tyc();
 } return void;
+given case_fixture ():() then len((import casenode)):(0)
+given calls_node_fixture ():() then len((import thennode)):(0)
 given case_fixture ():() then (import chkfail)[0]:(0)
 given case_fixture ():() then init_units:(0)
 
@@ -21,6 +23,7 @@ fixture_one_fx() {
   export int fixture_one = node_txt2("int", "1", 1, 0);
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_param:("param", "int", "x")
 ():() then init_units:(0)
 
 // fn.id's last step: fx_target registered where func_node/find_str look.
@@ -29,5 +32,7 @@ fn_fixture_reg() {
   push((import fnodes), (import fixture_fn));
   push((import prog), (import fixture_fn));
 } return void;
+given fn_fixture ():() then (import fnames)[1]:("fx_target")
+given fn_fixture ():() then len((import fnodes)):(2)
 given fn_fixture ():() then (import chkfail)[0]:(0)
 given fn_fixture ():() then init_units:(0)

@@ -13,4 +13,5 @@ xvarfix() {
   export int xvar_node = node_txt("var", "x");
 } return void;
 ():() then calls node_txt:("var", "x")
+():() then calls didx_add:("x")
 ():() then init_units:(0)

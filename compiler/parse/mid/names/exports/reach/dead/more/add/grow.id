@@ -33,4 +33,5 @@ dead_exp_fixture() {
   export int dead_imp_b = node_txt("import", "gy");
 } return void;
 ():() then calls add_export:("gx", "int", "setup_fn")
+():() then calls add_export:("gy", "int", "other_fn")
 ():() then init_units:(0)

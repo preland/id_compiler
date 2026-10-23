@@ -8,4 +8,5 @@ regrow_param() {
   export int[] regrow_plist = [regrow_p];
 } return void;
 ():() then calls node_param:("param", "int", "p2")
+():() then (import regrow_plist):([0])
 ():() then init_units:(0)

@@ -21,4 +21,5 @@ dead_exp_reach_fixture() {
   export int reach_imp_m = node_txt("import", "gm");
 } return void;
 ():() then calls add_export:("gm", "int", "main")
+():() then calls node_txt:("import", "gm")
 ():() then init_units:(0)

@@ -26,6 +26,8 @@ case_fixture_line() {
   export int fixture_node = newleaf("case", 0, 0, "fixture.id", "");
   case_fixture_add();
 } return void;
+given case_fixture ():() then calls newleaf:("case", 0, 0, "fixture.id", "")
+given case_fixture ():() then len((import tline)):(2)
 given case_fixture ():() then (import chkfail)[0]:(0)
 given case_fixture ():() then init_units:(0)
 
@@ -34,5 +36,7 @@ case_fixture_add() {
   push((import casestart), 0);
   export int fixture_ci = 0;
 } return void;
+given case_fixture ():() then len((import casenode)):(2)
+given case_fixture ():() then (import casenode)[1]:(0)
 given case_fixture ():() then (import chkfail)[0]:(0)
 given case_fixture ():() then init_units:(0)

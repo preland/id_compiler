@@ -19,6 +19,8 @@ elif_lists() {
   export int[] else_stmts = [(import else_node)];
   export int[] no_stmts = [];
 } return void;
+given elif_fixture ():() then (import else_stmts):([5])
+given elif_fixture ():() then len((import no_stmts)):(0)
 given elif_fixture ():() then (import chkfail)[0]:(0)
 given elif_fixture ():() then init_units:(0)
 
