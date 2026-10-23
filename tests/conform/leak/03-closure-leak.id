@@ -1,0 +1,23 @@
+// KNOWN LEAK, pinned as it is today: id_clo_make has no free, so the closure a
+// bind makes on every pass is never given back, and the copy of the list it
+// captured goes with it. P1.1b step 4 (id_clo_free for a local assigned only
+// from bind) flips this case: allocated lists must then equal freed ones plus
+// argv, and this expectation is rewritten.
+pick_at(int[] xs, int i) {
+  int r = xs[i];
+} return int r;
+
+spin(int[] xs, int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    func(int) return int f = bind(pick_at, xs);
+    t = t + f(1);
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = spin([3, 4], 5);
+  print(r);
+} return int 0;

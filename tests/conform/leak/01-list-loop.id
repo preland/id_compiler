@@ -1,0 +1,18 @@
+// A list built and dropped on every pass of a loop is freed on every pass, so
+// the count allocated equals the count freed: this is the shape a leak would
+// break, because each missed free adds one to allocated and none to freed.
+// The one list allocated and not freed is main's argv, whatever N is.
+fill(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    int[] ys = [i, i, i];
+    t = t + ys[1];
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = fill(50);
+  print(r);
+} return int 0;

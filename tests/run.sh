@@ -15,7 +15,7 @@
 set -u
 cd "$(dirname "$0")"
 
-SECTIONS=(core core_parse core_guard core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real_0 idstd_real_1 idstd_real_2 kernel_build kernel_boot kernel_kfree editor mutscore statusgen)
+SECTIONS=(core core_parse core_guard core_self core_rest invalid_1of4 invalid_2of4 invalid_3of4 invalid_4of4 diagnostics diagnostics_docs_0 diagnostics_docs_1 diagnostics_docs_2 runtime_invalid self_host_build_demos self_host_build_link self_host_build_project_1 self_host_build_project_2 self_host_build_project_3 self_host_build_stage0 self_host_build_boot_cold self_host_build_expr backends_fs backends_fs_list backends_ipc backends_link backends_link_lib backends_link_att backends_link_pkg backends_link_gfx backends_demos backends_display backends_galaxy backends_galaxy_run stdlib_import stdlib_dce stdlib_precheck wasm wasm_js wasm_js_std lib lib_csv opt conform_eprint conform_float conform_flow conform_fn conform_free conform_int conform_list_1of2 conform_list_2of2 conform_order conform_store conform_str conform_struct conform_trap conform_closure conform_const conform_leak tests_feature_0 tests_feature_1 tests_feature_2 tests_feature_3 tests_feature_4 fix idstd_real_0 idstd_real_1 idstd_real_2 kernel_build kernel_boot kernel_kfree editor mutscore statusgen)
 TMPGUARD_TREES=(../idstd/.tests/hello idc/tools/buildrun idc/tools/ccrun idc/tools/iddiag idc/tools/idlayout idc/tools/idrun idc/tools/kbuild idc/tools/qmon idc/tools/mkodt editor word quillcheck uicheck iconcheck trials/csvq trials/httpd trials/jsontool trials/kv demos/fsdemo idc/tools/idwhere trials/sqlq idc/tools/statusgen)
 for i in "${!TMPGUARD_TREES[@]}"; do SECTIONS+=("tmpguard_$i"); done
 STATE=../.idc-cache/run-state
@@ -1187,7 +1187,7 @@ echo "--- conformance across targets (docs/SPEC.md) ---"
 conf=0
 for cp in "eprint eprint" "float float" "flow flow" "fn fn" "free free" "int int" \
           "list_1of2 list:1/2" "list_2of2 list:2/2" "order order" "store store" "str str" \
-          "struct struct" "trap trap" "closure closure" "const const"; do
+          "struct struct" "trap trap" "closure closure" "const const" "leak leak"; do
     if want "conform_${cp%% *}"; then
         ./conform.sh ${cp#* }
         crc=$?

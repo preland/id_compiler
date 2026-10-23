@@ -1,0 +1,16 @@
+// A string temporary made on every pass of a loop is given back on every pass,
+// so allocated strings equal freed strings.
+width(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    string s = "k" + i + "v";
+    t = t + len(s);
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = width(50);
+  print(r);
+} return int 0;

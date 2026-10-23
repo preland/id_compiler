@@ -88,6 +88,8 @@ static ID_TLS IdAllocHdr* id_arena_head = NULL;
 static ID_TLS int id_arena_hooked = 0;
 static ID_TLS long id_nfree = 0;
 static ID_TLS long id_nfree_s = 0;
+static ID_TLS long id_nalloc = 0;
+static ID_TLS long id_nalloc_s = 0;
 static ID_TLS void* id_pool_fl[ID_NCLASS];
 static ID_TLS char* id_pool_bump = NULL;
 static ID_TLS size_t id_pool_left = 0;
@@ -101,6 +103,10 @@ static void id_pool_drop(void) {
     memset(id_pool_fl, 0, sizeof id_pool_fl);
 }
 static void id_arena_free_all(void) {
+    if (getenv("ID_ALLOC_STATS")) {
+        fprintf(stderr, "id: allocated %ld lists\n", id_nalloc);
+        fprintf(stderr, "id: allocated %ld strings\n", id_nalloc_s);
+    }
     if (getenv("ID_FREE_STATS")) {
         fprintf(stderr, "id: freed %ld lists\n", id_nfree);
         if (id_nfree_s) fprintf(stderr, "id: freed %ld strings\n", id_nfree_s);
@@ -254,6 +260,7 @@ static void* id_realloc(void* p, size_t old, size_t n) {
 }
 /* The one place a heap string is born: n bytes, the count in front, the NUL after. */
 static char* id_str_new(size_t n) {
+    id_nalloc_s++;
     char* r = (char*)id_pool_blk(id_add_check(id_add_check(n, sizeof(size_t), "string"), 1, "string"));
     *(size_t*)(void*)r = n;
     r += sizeof(size_t);
@@ -284,6 +291,7 @@ typedef struct { IdList h; long long c[1]; } IdListBlk;
 #define ID_LIST_CELLS(L) (((IdListBlk*)(void*)(L))->c)
 #define ID_LIST_BYTES(n) (__builtin_offsetof(IdListBlk, c) + sizeof(long long) * (size_t)(n))
 static IdList* id_list_make(int len, int cap) {
+    id_nalloc++;
     IdListBlk* B = (IdListBlk*)id_pool_blk(ID_LIST_BYTES(cap));
     B->h.len = len; B->h.cap = cap; B->h.data = B->c;
     return &B->h;
@@ -735,6 +743,7 @@ static char* id_input(void) {
        The block doubles as the line grows (like read_all), so a line of any
        length comes back whole and reading stays linear in its length */
     size_t cap = 64, n = 0, h = sizeof(size_t);
+    id_nalloc_s++;
     char* r = (char*)id_pool_blk(cap);
     int ch;
     while ((ch = getc(stdin)) != EOF && ch != '\n') {
@@ -760,6 +769,7 @@ static char* id_read_all(void) {
     /* slurp all of stdin into one string (grows as needed); the count goes
        in the block's first word, so the bytes are read in place after it */
     size_t cap = 4096, n = 0, h = sizeof(size_t);
+    id_nalloc_s++;
     char* r = (char*)id_pool_blk(cap);
     for (;;) {
         if (h + n + 1 >= cap) {
