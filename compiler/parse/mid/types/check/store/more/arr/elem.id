@@ -6,6 +6,8 @@ idxquiet() {
   int v = node_txt("var", "q");
   export int idx_node3 = node_index(v, v);
 } return void;
+():() then calls node_txt:("var", "q")
+():() then (import idx_node3):(7)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 

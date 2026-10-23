@@ -5,6 +5,8 @@
 esc_fx_a4() {
   export int efa_fn = node_func("fa_sink", "void", (import efa_ps), [(import efa_es)], 0 - 1);
 } return void;
+given esc_fix ():() then calls node_func:("fa_sink", "void", (import efa_ps), [(import efa_es)], -1)
+given esc_fix ():() then (import efa_fn):(49)
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)
 
@@ -13,6 +15,8 @@ esc_reg() {
   add_func("fa_loc", "int[]", (import efb_fn));
   add_func("fa_nest", "int[]", (import efc_fn));
 } return void;
+given esc_fix ():() then calls add_func:("fa_sink", "void", (import efa_fn))
+given esc_fix ():() then calls add_func:("fa_nest", "int[]", (import efc_fn))
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)
 

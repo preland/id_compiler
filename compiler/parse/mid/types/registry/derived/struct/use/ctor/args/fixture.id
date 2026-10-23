@@ -25,6 +25,7 @@ sd_ctor_fixture() {
   export int sd_cd = node_call("P", [(import sd_cf), (import sd_one)]);
 } return void;
 ():() then calls node_txt2:("int", "99", 99, 1)
+given sd_use_fixture ():() then calls node_call:("P", [(import sd_one)])
 ():() then init_units:(0)
 
 // A bind in a test case, bind(fx_target, 1), over fx_target(int x) return int on

@@ -17,4 +17,5 @@ sd_decl_fixture() {
   export int sd_dbad = node_decl("Pnt", "q", 0, 0);
 } return void;
 ():() then calls node_decl:("P", "q", 0, 0)
+():() then calls node_decl:("Pnt", "q", 0, 0)
 ():() then init_units:(0)

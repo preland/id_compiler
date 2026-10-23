@@ -10,6 +10,8 @@ esc_fx_e() {
   export int efe_fn = node_func("fa_ro", "void", (import efe_ps), [(import efe_dq), (import efe_dn)], 0 - 1);
   esc_fx_v();
 } return void;
+given esc_fix ():() then calls node_txt:("var", "q")
+given esc_fix ():() then calls node_call:("len", [(import efe_vq)])
 given esc_fix ():() then (import chkfail)[0]:(0)
 given esc_fix ():() then init_units:(0)
 

@@ -26,6 +26,7 @@ sd_use_fixture() {
   sd_use_writes();
 } return void;
 ():() then calls add_var:("p", "P", 0)
+():() then calls add_var:("n", "int", 0)
 ():() then init_units:(0)
 
 sd_use_reads() {
@@ -37,6 +38,8 @@ sd_use_reads() {
   export int sd_ii = node_index((import sd_vp), (import sd_one));
   export int sd_iy = node_index((import sd_vp), newleaf("fld", 0, 0, "y", ""));
 } return void;
+given sd_use_fixture ():() then calls newleaf:("fld", 0, 0, "z", "")
+given sd_use_fixture ():() then calls newleaf:("fld", 0, 0, "y", "")
 given sd_use_fixture ():() then (import chkfail)[0]:(0)
 given sd_use_fixture ():() then init_units:(0)
 
@@ -53,5 +56,7 @@ sd_use_writes() {
   export int sd_wn = node_iassign((import sd_tn), (import sd_one));
   export int sd_ws = node_iassign((import sd_tx), (import sd_str));
 } return void;
+given sd_use_fixture ():() then calls node_iassign:((import sd_tx), (import sd_str))
+given sd_use_fixture ():() then calls node_iassign:((import sd_tz), (import sd_one))
 given sd_use_fixture ():() then (import chkfail)[0]:(0)
 given sd_use_fixture ():() then init_units:(0)

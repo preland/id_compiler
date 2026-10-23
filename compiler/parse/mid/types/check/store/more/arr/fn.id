@@ -21,5 +21,7 @@ argsfix() {
   call2_setup();
   export int[] args2 = [(import cm_push_call), (import cm_push_call)];
 } return void;
+():() then (import args2)[0]:(5)
+():() then (import args2)[1]:(5)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

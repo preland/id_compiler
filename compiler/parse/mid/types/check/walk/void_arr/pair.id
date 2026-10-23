@@ -23,5 +23,7 @@ idxfix() {
   int b = node_txt2("int", "1", 1, 0);
   export int rgidx_node = node_index(b, b);
 } return void;
+():() then calls node_txt2:("int", "1", 1, 0)
+():() then (import rgidx_node):(7)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

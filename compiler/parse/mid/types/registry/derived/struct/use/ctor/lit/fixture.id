@@ -21,4 +21,5 @@ sd_case_fixture() {
   export int sd_cn = newnode("cctor", 0, 0, "nope", "", sd_ar2, sd_ar2);
 } return void;
 ():() then calls sd_note:("P", ["x", "y"], ["int", "int"], "p.id", 1)
+():() then calls sd_note:("Q", ["s"], ["string"], "q.id", 5)
 ():() then init_units:(0)

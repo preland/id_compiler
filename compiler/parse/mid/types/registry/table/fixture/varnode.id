@@ -9,6 +9,7 @@ fnval_fixture() {
   export int fnval_push = node_txt("var", "push");
 } return void;
 ():() then calls node_txt:("var", "fx_target")
+():() then calls node_txt:("var", "push")
 ():() then init_units:(0)
 
 // A variable actually registered with a function type, for is_fcall's "yes"
@@ -20,6 +21,7 @@ fnval_call_fixture() {
   export int fnval_call = node_txt("var", "cv");
 } return void;
 ():() then calls add_var:("cv", "func(int) return int", 0)
+():() then calls node_txt:("var", "cv")
 ():() then init_units:(0)
 
 // A call one level down inside a unary node, for has_call's recursive

@@ -15,6 +15,7 @@ sd_bi_fixture() {
   export int sd_if = node_if((import sd_vp), sd_none, sd_none, 0);
 } return void;
 ():() then calls add_var:("ps", "P[]", 0)
+given sd_use_fixture ():() then calls node_call:("print", [(import sd_vp)])
 ():() then init_units:(0)
 
 // The escape analysis's fixtures with a struct Box { int[] xs; int n; } in the
@@ -34,4 +35,5 @@ esc_sd_fix() {
   export int esd_set = node_iassign((import esd_tgt), (import esd_ys));
 } return void;
 ():() then calls sd_note:("Box", ["xs", "n"], ["int[]", "int"], "box.id", 1)
+():() then calls node_txt:("var", "ys")
 ():() then init_units:(0)
