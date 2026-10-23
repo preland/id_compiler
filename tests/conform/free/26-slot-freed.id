@@ -1,0 +1,16 @@
+// The element a store into a deep-owned list replaces is freed with it: the
+// list holds only literals built for it and nothing read one out, so no name
+// can still reach the old row. Two stores, two rows freed, and the list itself
+// with the rows now in it at the function's exit.
+swap(int n) {
+  int[][] g = [[n], [n, n]];
+  g[0] = [n + 1];
+  g[1] = [n + 2, n + 3];
+} chain (int n) {
+  int s = g[0][0] + g[1][1];
+} return int s;
+
+main(int argc, string[] argv) {
+  int a = swap(2);
+  print(a);
+} return int 0;

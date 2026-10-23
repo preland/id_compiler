@@ -1,0 +1,15 @@
+// A row read into a name is an alias, so the list is not deep-owned and the
+// store does not free the row it replaces: held still reads it afterwards. A
+// free here would be caught by ID_FREE_GUARD as a use of a freed list.
+keep(int n) {
+  int[][] g = [[n], [n, n]];
+  int[] held = g[0];
+  g[0] = [n + 1];
+} chain (int n) {
+  int s = held[0] + g[0][0];
+} return int s;
+
+main(int argc, string[] argv) {
+  int a = keep(2);
+  print(a);
+} return int 0;

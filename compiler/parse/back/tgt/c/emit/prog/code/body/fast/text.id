@@ -26,6 +26,7 @@ lp_set(int lq_id, string lq_btxt, string lq_xtxt, string lq_vtxt) {
   if(lp_hit(lq_id) == 1) {
     lq_s = "(" + lq_btxt + ")->data[" + lq_xtxt + "] = " + lq_vtxt;
   }
+  lq_s = esc_slot_code(lq_id, lq_btxt, lq_xtxt, lq_vtxt, lq_s);
 } return string lq_s;
 given lpf_on ((import lpf_xa), "v", "j", "7"):("(v)->data[j] = 7")
 given lpf_more ((import lpf_xa), "w", "k", "8"):("id_list_set(w, k, 8)")

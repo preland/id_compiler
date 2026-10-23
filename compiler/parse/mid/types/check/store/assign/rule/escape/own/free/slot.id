@@ -1,0 +1,42 @@
+// The element `xs[i] = v` replaces, given back when nothing else can hold it
+// (docs/MEMORY.md 3.2). A deep-owned `xs` was built only from blocks made for
+// it and has had no element read out where something keeps it, so the element
+// leaving its cell has no other holder. Its type says how to free it: the rows
+// of a list of lists shallowly, the pieces of a list of strings as strings.
+
+esc_slot_of(string slot_ty) {
+  string slot_f = "";
+  if(esc_dkind(slot_ty) == 1) {
+    slot_f = "id_list_free";
+  } else if(esc_dkind(slot_ty) == 2) {
+    slot_f = "id_str_free";
+  }
+} return string slot_f;
+given esc_ty_fix ("int[][]"):("id_list_free")
+given esc_ty_fix ("string[]"):("id_str_free")
+given esc_ty_fix ("int[]"):("")
+given esc_ty_fix ("Tr"):("")
+
+// The runtime call that frees what the index assignment `slot_n` replaces, or
+// "" when its list is not deep-owned and the old element stays unfreed.
+esc_slot_fn(int slot_fn, int slot_n) {
+  int slot_b = (import ni1)[slot_n];
+  string slot_f = "";
+  if(slot_fn >= 0 && esc_on() == 1 && (import nkind)[slot_b] == "var") {
+    slot_f = esc_slot_deep(slot_fn, (import ns1)[slot_b]);
+  }
+} return string slot_f;
+given esc_dfix (-1, (import efd_ia)):("")
+given esc_dfix ((import efd_good), (import efd_ia)):("id_list_free")
+given esc_dfix ((import efd_leak), (import efd_ia)):("")
+given esc_dfix ((import efd_good), (import efd_setl)):("")
+
+esc_slot_deep(int slot_fn, string slot_nm) {
+  string slot_f = "";
+  if(esc_deep(slot_fn, slot_nm) == 1) {
+    slot_f = esc_slot_of(esc_decl_type((import nl2)[slot_fn], slot_nm));
+  }
+} return string slot_f;
+given esc_dfix ((import efd_good), "a"):("id_list_free")
+given esc_dfix ((import efd_leak), "b"):("")
+given esc_dfix ((import efd_good), "zz"):("")

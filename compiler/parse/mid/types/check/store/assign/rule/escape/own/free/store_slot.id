@@ -1,0 +1,31 @@
+// The C of an index assignment whose old element is freed (slot.id says when).
+// One statement expression, so it stands wherever the plain call did, bound
+// index or not: the index is computed once, the old element is read before the
+// store (the value may read it too) and given back after.
+
+esc_slot_cty(string cty_f) {
+  string cty_t = "IdList*";
+  if(cty_f == "id_str_free") {
+    cty_t = "char*";
+  }
+} return string cty_t;
+given esc_dfix ("id_str_free"):("char*")
+given esc_dfix ("id_list_free"):("IdList*")
+
+esc_slot_block(string blk_f, string blk_b, string blk_i, string blk_val) {
+  string blk_t = esc_slot_cty(blk_f);
+  string blk_g = "id_list_get(" + blk_b + ", idfe_i)";
+  string blk_s = "({ int idfe_i = " + blk_i + "; " + blk_t + " idfe_o = (" + blk_t + ")(intptr_t)" + blk_g + "; id_list_set(" + blk_b + ", idfe_i, " + blk_val + "); " + blk_f + "(idfe_o); })";
+} return string blk_s;
+given esc_dfix ("id_list_free", "a", "k", "7"):("({ int idfe_i = k; IdList* idfe_o = (IdList*)(intptr_t)id_list_get(a, idfe_i); id_list_set(a, idfe_i, 7); id_list_free(idfe_o); })")
+given esc_dfix ("id_str_free", "s", "0", "v"):("({ int idfe_i = 0; char* idfe_o = (char*)(intptr_t)id_list_get(s, idfe_i); id_list_set(s, idfe_i, v); id_str_free(idfe_o); })")
+
+esc_slot_code(int code_n, string code_b, string code_i, string code_val, string code_plain) {
+  string code_f = esc_slot_fn(esc_cur(), code_n);
+  string code_s = code_plain;
+  if(code_f != "") {
+    code_s = esc_slot_block(code_f, code_b, code_i, code_val);
+  }
+} return string code_s;
+given esc_dfix ((import efd_ia), "a", "k", "7", "P"):("({ int idfe_i = k; IdList* idfe_o = (IdList*)(intptr_t)id_list_get(a, idfe_i); id_list_set(a, idfe_i, 7); id_list_free(idfe_o); })")
+given esc_dfix ((import efd_setl), "g", "k", "7", "P"):("P")

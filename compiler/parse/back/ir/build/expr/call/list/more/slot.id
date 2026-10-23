@@ -1,0 +1,22 @@
+// The IR half of the element an index assignment replaces (esc_slot_fn, the C
+// target's half is esc_slot_code): the old cell is read before the store, since
+// the value may read it too, and given back after. -1 when nothing is freed.
+
+lw_slot_old(int slot_n, int slot_a, int slot_i, string slot_t) {
+  int slot_o = 0 - 1;
+  if(esc_slot_fn(esc_cur(), slot_n) != "") {
+    int slot_c = lw_callf("id_list_get", "word", [slot_a, slot_i]);
+    slot_o = lw_unbox(slot_c, slot_t);
+  }
+} return int slot_o;
+given lwd_fixture ((import efd_ia), 5, 6, "int[]"):(4) then calls lw_callf:("id_list_get", "word", [5, 6])
+given lw_fix_iassign ((import fix_iassign_n), 5, 6, "int[]"):(-1)
+
+lw_slot_free(int slot_n, int slot_o) {
+  string slot_f = esc_slot_fn(esc_cur(), slot_n);
+  if(slot_o >= 0) {
+    lw_callf(slot_f, "", [slot_o]);
+  }
+} return void;
+given lwd_fixture ((import efd_ia), 7):() then calls lw_callf:("id_list_free", "", [7])
+given lwd_fixture ((import efd_ia), -1):() then calls lw_callf:[0]

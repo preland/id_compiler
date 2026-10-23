@@ -1,0 +1,17 @@
+// A list of strings built only from fresh strings frees the string a store
+// replaces: the concatenation that replaced it is as fresh as the one it
+// displaced, and no piece was read out where something keeps it.
+relabel(string s) {
+  string[] xs = [];
+  push(xs, s + "1");
+  push(xs, s + "2");
+} chain (string s) {
+  xs[0] = s + "3";
+  xs[1] = s + "44";
+  int n = len(xs[0]) + len(xs[1]);
+} return int n;
+
+main(int argc, string[] argv) {
+  int a = relabel("ab");
+  print(a);
+} return int 0;

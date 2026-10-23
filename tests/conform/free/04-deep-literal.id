@@ -1,8 +1,8 @@
 // A list of lists whose every element is a list literal built for it owns them,
 // so freeing it frees them too: the elements it was built with, the ones pushed
-// and the one an assignment put in place of another. The one replaced is not
-// freed (nothing proves it unreachable once it left the list), and a list
-// declared in a loop frees its whole value once per pass.
+// and the one an assignment put in place of another. The one replaced is freed
+// by the assignment (26-slot-freed), and a list declared in a loop frees its
+// whole value once per pass.
 tally(int n) {
   int[][] g = [[n], [n, n]];
   push(g, [n + 1]);

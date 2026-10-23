@@ -1,0 +1,19 @@
+// A deep-owned list whose elements are replaced in a loop gives back each
+// element it replaces: the element can have no other holder, because none was
+// ever read out into a position that keeps it. Each pass allocates one list and
+// frees the one it displaces, so allocated minus freed does not grow with N.
+fill(int n) {
+  int[][] g = [[0], [1]];
+  int i = 0;
+  while(i < n) {
+    g[i % 2] = [i, i];
+    i = i + 1;
+  }
+} chain (int n) {
+  int t = g[0][1] + g[1][1];
+} return int t;
+
+main(int argc, string[] argv) {
+  int r = fill(50);
+  print(r);
+} return int 0;

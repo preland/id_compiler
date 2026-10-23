@@ -1139,6 +1139,8 @@ int id_lw_index_idx(int node);
 char* id_lw_index_elem(int node);
 void id_lw_iset(int node, int a, char* elem);
 int id_lw_new(char* ty);
+int id_lw_slot_old(int slot_n, int slot_a, int slot_i, char* slot_t);
+void id_lw_slot_free(int slot_n, int slot_o);
 int id_lw_arr_new(int node);
 char* id_lw_arr_elem(int node);
 int id_lw_iset_val(int node, char* elem);
@@ -3958,6 +3960,12 @@ char* id_esc_free_one(int fn, int sn, char* out);
 char* id_esc_ret_code(char* code);
 int id_esc_cur(void);
 char* id_esc_init_code(char* nm);
+char* id_esc_slot_of(char* slot_ty);
+char* id_esc_slot_fn(int slot_fn, int slot_n);
+char* id_esc_slot_deep(int slot_fn, char* slot_nm);
+char* id_esc_slot_cty(char* cty_f);
+char* id_esc_slot_block(char* blk_f, char* blk_b, char* blk_i, char* blk_val);
+char* id_esc_slot_code(int code_n, char* code_b, char* code_i, char* code_val, char* code_plain);
 int id_esc_func(int fn, char* nm);
 int id_esc_on(void);
 int id_esc_own(int fn, char* nm);
@@ -6807,10 +6815,13 @@ void id_lw_iset(int node, int a, char* elem) {
     int i;
     int v;
     char* lv_f;
+    int lv_old;
     i = id_lw_index_idx(node);
     v = id_lw_iset_val(node, elem);
     lv_f = id_lv_callee(node, ID_S("id_list_set"), ID_S("id_list_cell_set"));
+    lv_old = id_lw_slot_old(node, a, i, elem);
     id_lw_callf(lv_f, ID_S(""), id_list_lit(3, (long long)(a), (long long)(i), (long long)(v)));
+    id_lw_slot_free(node, lv_old);
     return;
 }
 
@@ -6820,6 +6831,26 @@ int id_lw_new(char* ty) {
     none = id_list_lit(0);
     ret_i = id_lw_callf(ID_S("id_list_new"), ty, none);
     return ret_i;
+}
+
+int id_lw_slot_old(int slot_n, int slot_a, int slot_i, char* slot_t) {
+    int slot_o;
+    int slot_c;
+    slot_o = (0 - 1);
+    if ((strcmp(id_esc_slot_fn(id_esc_cur(), slot_n), ID_S("")) != 0)) {
+        slot_c = id_lw_callf(ID_S("id_list_get"), ID_S("word"), id_list_lit(2, (long long)(slot_a), (long long)(slot_i)));
+        slot_o = id_lw_unbox(slot_c, slot_t);
+    }
+    return slot_o;
+}
+
+void id_lw_slot_free(int slot_n, int slot_o) {
+    char* slot_f;
+    slot_f = id_esc_slot_fn(id_esc_cur(), slot_n);
+    if ((slot_o >= 0)) {
+        id_lw_callf(slot_f, ID_S(""), id_list_lit(1, (long long)(slot_o)));
+    }
+    return;
 }
 
 int id_lw_arr_new(int node) {
@@ -11709,11 +11740,12 @@ char* id_lp_get(int lq_id, char* lq_btxt, char* lq_xtxt) {
 }
 
 char* id_lp_set(int lq_id, char* lq_btxt, char* lq_xtxt, char* lq_vtxt) {
-    char* lq_s = NULL;
-    { char* idfe_o = lq_s; lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_set("), lq_btxt), ID_S(", "), 1), lq_xtxt, 1), ID_S(", "), 1), lq_vtxt, 1), ID_S(")"), 1); id_str_free(idfe_o); }
+    char* lq_s;
+    lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("id_list_set("), lq_btxt), ID_S(", "), 1), lq_xtxt, 1), ID_S(", "), 1), lq_vtxt, 1), ID_S(")"), 1);
     if ((id_lp_hit(lq_id) == 1)) {
-        { char* idfe_o = lq_s; lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), lq_btxt), ID_S(")->data["), 1), lq_xtxt, 1), ID_S("] = "), 1), lq_vtxt, 1); id_str_free(idfe_o); }
+        lq_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("("), lq_btxt), ID_S(")->data["), 1), lq_xtxt, 1), ID_S("] = "), 1), lq_vtxt, 1);
     }
+    lq_s = id_esc_slot_code(lq_id, lq_btxt, lq_xtxt, lq_vtxt, lq_s);
     return lq_s;
 }
 
@@ -12095,26 +12127,26 @@ void id_iassign3(int id, char* ind, char* elem, IdList* ia_arg_ids) {
 }
 
 void id_iassign4(int id, char* ind, char* val) {
-    char* iset_code_v = NULL;
-    { char* idfe_o = iset_code_v; iset_code_v = id_str_dup(ID_S("")); id_str_free(idfe_o); }
+    char* iset_code_v;
+    iset_code_v = ID_S("");
     if ((id_iset_hz(id) == 1)) {
-        { char* idfe_o = iset_code_v; iset_code_v = id_iset_seq(id, val); id_str_free(idfe_o); }
+        iset_code_v = id_iset_seq(id, val);
     } else {
-        { char* idfe_o = iset_code_v; iset_code_v = id_iset_code(id, val); id_str_free(idfe_o); }
+        iset_code_v = id_iset_code(id, val);
     }
     id_print(id_concat_f(id_concat(ind, iset_code_v), ID_S(";"), 1));
-    { id_str_free(iset_code_v); return; }
+    return;
 }
 
 char* id_iset_code(int id, char* val) {
     int i1_of_v;
     char* sd_ixc;
     char* lp_base;
-    char* ret_s = NULL;
+    char* ret_s;
     i1_of_v = (int)(id_list_get(ni1, id));
     sd_ixc = id_emit_idx(id);
     lp_base = id_emit_expr(i1_of_v);
-    { char* idfe_o = ret_s; ret_s = id_lp_set(id, lp_base, sd_ixc, val); id_str_free(idfe_o); }
+    ret_s = id_lp_set(id, lp_base, sd_ixc, val);
     return ret_s;
 }
 
@@ -12472,7 +12504,7 @@ char* id_iset_seq(int id, char* val) {
     char* sq_code;
     char* sq_type_v;
     char* sq_ctype;
-    char* iset_code_v = NULL;
+    char* iset_code_v;
     char* ret_s = NULL;
     i2_of_v = (int)(id_list_get(ni2, id));
     sq_code = id_emit_expr(i2_of_v);
@@ -12480,10 +12512,10 @@ char* id_iset_seq(int id, char* val) {
     sq_ctype = id_c_type(sq_type_v);
     id_print(id_concat_f(id_concat_f(id_concat(sq_ctype, ID_S(" ")), id_sq_name(i2_of_v), 3), ID_S(";"), 1));
     id_seq_mark(i2_of_v, 1);
-    { char* idfe_o = iset_code_v; iset_code_v = id_iset_code(id, val); id_str_free(idfe_o); }
+    iset_code_v = id_iset_code(id, val);
     id_seq_mark(i2_of_v, 0);
     { char* idfe_o = ret_s; ret_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(ID_S("("), id_sq_name(i2_of_v), 2), ID_S(" = "), 1), sq_code, 1), ID_S(", "), 1), iset_code_v, 1), ID_S(")"), 1); id_str_free(idfe_o); }
-    { id_str_free(iset_code_v); return ret_s; }
+    return ret_s;
 }
 
 IdList* id_seq_kids(int id) {
@@ -36325,6 +36357,67 @@ char* id_esc_init_code(char* nm) {
         s = ID_S(" = NULL");
     }
     return s;
+}
+
+char* id_esc_slot_of(char* slot_ty) {
+    char* slot_f;
+    slot_f = ID_S("");
+    if ((id_esc_dkind(slot_ty) == 1)) {
+        slot_f = ID_S("id_list_free");
+    } else if ((id_esc_dkind(slot_ty) == 2)) {
+        slot_f = ID_S("id_str_free");
+    }
+    return slot_f;
+}
+
+char* id_esc_slot_fn(int slot_fn, int slot_n) {
+    int slot_b;
+    char* slot_f;
+    slot_b = (int)(id_list_get(ni1, slot_n));
+    slot_f = ID_S("");
+    if ((((slot_fn >= 0) && (id_esc_on() == 1)) && (strcmp((char*)(intptr_t)(id_list_get(nkind, slot_b)), ID_S("var")) == 0))) {
+        slot_f = id_esc_slot_deep(slot_fn, (char*)(intptr_t)(id_list_get(ns1, slot_b)));
+    }
+    return slot_f;
+}
+
+char* id_esc_slot_deep(int slot_fn, char* slot_nm) {
+    char* slot_f;
+    slot_f = ID_S("");
+    if ((id_esc_deep(slot_fn, slot_nm) == 1)) {
+        slot_f = id_esc_slot_of(id_esc_decl_type((IdList*)(intptr_t)(id_list_get(nl2, slot_fn)), slot_nm));
+    }
+    return slot_f;
+}
+
+char* id_esc_slot_cty(char* cty_f) {
+    char* cty_t;
+    cty_t = ID_S("IdList*");
+    if ((strcmp(cty_f, ID_S("id_str_free")) == 0)) {
+        cty_t = ID_S("char*");
+    }
+    return cty_t;
+}
+
+char* id_esc_slot_block(char* blk_f, char* blk_b, char* blk_i, char* blk_val) {
+    char* blk_t;
+    char* blk_g = NULL;
+    char* blk_s = NULL;
+    blk_t = id_esc_slot_cty(blk_f);
+    { char* idfe_o = blk_g; blk_g = id_concat_f(id_concat(ID_S("id_list_get("), blk_b), ID_S(", idfe_i)"), 1); id_str_free(idfe_o); }
+    { char* idfe_o = blk_s; blk_s = id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat_f(id_concat(ID_S("({ int idfe_i = "), blk_i), ID_S("; "), 1), blk_t, 1), ID_S(" idfe_o = ("), 1), blk_t, 1), ID_S(")(intptr_t)"), 1), blk_g, 1), ID_S("; id_list_set("), 1), blk_b, 1), ID_S(", idfe_i, "), 1), blk_val, 1), ID_S("); "), 1), blk_f, 1), ID_S("(idfe_o); })"), 1); id_str_free(idfe_o); }
+    { id_str_free(blk_g); return blk_s; }
+}
+
+char* id_esc_slot_code(int code_n, char* code_b, char* code_i, char* code_val, char* code_plain) {
+    char* code_f;
+    char* code_s;
+    code_f = id_esc_slot_fn(id_esc_cur(), code_n);
+    code_s = code_plain;
+    if ((strcmp(code_f, ID_S("")) != 0)) {
+        code_s = id_esc_slot_block(code_f, code_b, code_i, code_val);
+    }
+    return code_s;
 }
 
 int id_esc_func(int fn, char* nm) {
