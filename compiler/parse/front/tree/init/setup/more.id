@@ -9,6 +9,7 @@ setup_rest() {
 } chain () {
   ext_init();
 } return int ret_i;
+given ptoks_env(["op", "int", "op", "int", "op", "op", "eof"], ["(", "1", "+", "2", ")", ";", ""]) given fill_list([0], [], ";") ():(0) then len((import nparen)):(0)
 given full_env ():(0) then calls init_rest:[1]
 given full_env ():(0) then init_units:(0)
 given full_env ():(0) then calls ext_init:[1]

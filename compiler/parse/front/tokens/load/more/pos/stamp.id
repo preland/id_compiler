@@ -36,5 +36,6 @@ stamp_tok(int[] pos) {
   lset((import curtl), 0, cur_ln_v);
   lset((import curtk), 0, pos[0]);
 } return void;
+given mk_line9 given push_real("kw", "if") ([0]):() then calls lset:((import curtl), 0, 9)
 given mk_two_toks ([0]):() then calls lset:((import curtl), 0, 1) then calls lset:((import curtk), 0, 0)
 given mk_two_toks ([1]):() then calls lset:((import curtl), 0, 1) then calls lset:((import curtk), 0, 1)

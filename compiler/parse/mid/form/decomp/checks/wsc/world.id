@@ -11,6 +11,8 @@ wsc_world() {
   push((import prog), (import wx_fnest));
   push((import prog), (import wx_fmain));
 } return void;
+():() then (import prog)[0]:(10)
+():() then (import prog)[3]:(24)
 ():() then (import prog)[6]:(28)
 ():() then len((import prog)):(7)
 ():() then init_units:(0)
@@ -79,6 +81,8 @@ wsc_pair() {
   init_rtc();
   uq_fill();
 } return void;
+():() then (import prog)[7]:(49)
+():() then (import prog)[8]:(50)
 ():() then (import prog)[9]:(53)
 ():() then len((import prog)):(10)
 ():() then init_units:(0)
