@@ -1,1 +1,1 @@
-string[] lib_exports = ["slurp", "envlen", "roundtrip", "lsn", "scratch", "lsof"];
+string[] lib_exports = ["slurp", "envlen", "roundtrip", "lsn", "scratch", "lsof", "bytesrt"];

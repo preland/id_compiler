@@ -43,6 +43,13 @@ await check("a file written and read back by id, on the real disk, in /tmp", asy
   m.dispose();
 });
 
+await check("fs_load_bytes and fs_save_bytes carry 0 and 255 through the fs backend", async () => {
+  const m = await std.load();
+  assert.deepEqual(Array.from(m.bytesrt(Uint8Array.from([0, 255, 0, 7, 128]))), [0, 255, 0, 7, 128]);
+  assert.equal(m.bytesrt(new Uint8Array(0)).length, 0);
+  m.dispose();
+});
+
 await check("fs_drop_exit paths are gone after dispose()", async () => {
   const before = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith("idw")).length;
   const m = await std.load();

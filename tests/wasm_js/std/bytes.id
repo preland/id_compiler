@@ -1,0 +1,9 @@
+bytesrt(bytes wbr_in) {
+  string wbr_path = fs_mktemp("idw", 0);
+  int wbr_drop = fs_drop_exit(wbr_path);
+  int wbr_put = fs_save_bytes(wbr_path, wbr_in);
+} chain (bytes wbr_in) {
+  bytes wbr_out = fs_load_bytes(wbr_path);
+} return bytes wbr_out;
+([0, 255, 0, 7]):([0, 255, 0, 7])
+([]):([])
