@@ -13,6 +13,7 @@ wsc_base() {
   export int wx_two = node_txt2("int", "2", 2, 0);
 } return void;
 ():() then calls node_txt2:("int", "2", 2, 0)
+():() then calls node_param:("param", "int", "b")
 ():() then init_units:(0)
 ():() then calls env_init:[1]
 
@@ -30,6 +31,7 @@ wsc_get() {
   export int wx_fget = node_func("wsget", "word", (import wx_gp), (import wx_gb), (import wx_rv));
 } return void;
 ():() then calls node_param:("param", "word[]", "st")
+():() then calls node_txt:("var", "v")
 ():() then init_units:(0)
 ():() then calls wsc_base:[1]
 
@@ -49,5 +51,6 @@ wsc_add() {
   export int wx_fadd = node_func("wsadd", "int", (import wx_ap), (import wx_ab), (import wx_vt));
 } return void;
 ():() then calls node_txt:("var", "t")
+():() then calls node_txt:("var", "s")
 ():() then init_units:(0)
 ():() then calls wsc_get:[1]

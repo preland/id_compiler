@@ -3,6 +3,7 @@ fix_rcache_find_at_fixture() {
   push((import fixd_rn), "cached");
 } return void;
 ():() then (import fixd_rn):(["cached"])
+():() then len((import fixd_rn)):(1)
 ():() then init_units:(0)
 ():() then calls fix_fixture:[1]
 
@@ -15,5 +16,6 @@ fix_tokline_fixture3() {
   push((import tspan), 65536 + 4);
 } return void;
 ():() then (import tline):([9])
+():() then (import tspan):([65540])
 ():() then init_units:(0)
 ():() then calls fix_fixture:[1]

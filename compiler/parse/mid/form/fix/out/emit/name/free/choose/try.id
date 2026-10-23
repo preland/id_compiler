@@ -31,4 +31,5 @@ fix_moved_fixture() {
   fix_note_tok(1, 2);
 } return void;
 ():() then calls fix_note_tok:(1, 2)
+():() then (import fixd_hi)[0]:(2)
 ():() then init_units:(0)

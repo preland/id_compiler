@@ -14,6 +14,7 @@ wsc_dead() {
   export int wx_fdead = node_func("wsdead", "int", (import wx_ap), (import wx_db), (import wx_vw));
 } return void;
 ():() then calls node_txt:("var", "w")
+given wsc_base ():() then calls node_txt2:("bin", "-", (import wx_va), (import wx_vb))
 ():() then init_units:(0)
 ():() then calls wsc_add:[1]
 
@@ -35,6 +36,7 @@ wsc_ctl() {
   export int wx_fmain = node_func("main", "void", wx_none, (import wx_esb), 0 - 1);
 } return void;
 given wsc_dead ():() then calls node_if:((import wx_va), [], [], 0)
+given wsc_ctl ():() then calls node_func:("main", "void", [], (import wx_esb), -1)
 ():() then init_units:(0)
 ():() then calls wsc_dead:[1]
 
@@ -66,5 +68,6 @@ wsc_exp() {
   export int wx_dcopy = node_decl("word", "aw", (import wx_va), 0);
 } return void;
 ():() then calls newleaf:("fld", 0, 0, "len", "")
+():() then calls node_txt:("import", "g")
 ():() then init_units:(0)
 ():() then calls wsc_ctl:[1]

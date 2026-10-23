@@ -37,4 +37,6 @@ imd_thin_base() {
   uq_fill();
 } return void;
 ():() then calls node_txt:("import", "alpha")
+():() then len((import prog)):(2)
+():() then calls node_txt:("import", "beta")
 ():() then init_units:(0)

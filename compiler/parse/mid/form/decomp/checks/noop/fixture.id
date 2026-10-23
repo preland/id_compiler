@@ -58,6 +58,7 @@ noop_world() {
   export int nfx_zero_times = node_txt2("bin", "*", (import nfx_zero), (import wx_va));
 } return void;
 ():() then calls node_txt2:("int", "0", 0, 0)
+():() then calls node_txt2:("int", "1", 1, 0)
 ():() then init_units:(0)
 ():() then calls wsc_world:[1]
 

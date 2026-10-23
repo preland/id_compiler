@@ -11,6 +11,7 @@ fix_pick_fixture_an0() {
   push((import fixe_an), "");
 } return void;
 ():() then (import fixe_an):([""])
+():() then calls node_txt2:("int", "0", 0, 0)
 ():() then init_units:(0)
 ():() then calls fix_pick_fixture_n:[1]
 
@@ -21,5 +22,6 @@ fix_pick_fixture_an_named() {
   push((import fixe_an), "myarg");
 } return void;
 ():() then (import fixe_an):(["myarg"])
+():() then (import fixe_cl):([3])
 ():() then init_units:(0)
 ():() then calls fix_pick_fixture_named:[1]

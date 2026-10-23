@@ -19,6 +19,7 @@ fix_tokline_node_fixture() {
   fix_span_fixture2(e);
 } return void;
 given fix_tokline_fixture2 ():() then calls newleaf:("ident", 0, 0, "len", "")
+given fix_tokline_fixture2 ():() then (import fixd_gcl)[0]:(-1)
 given fix_tokline_fixture2 ():() then init_units:(0)
 
 // Two events for out/emit/decl/{decl,head}.id's own cases: event 0 at token
@@ -53,4 +54,5 @@ fix_decl_fixture() {
   push((import fixe_an), "");
 } return void;
 ():() then calls newleaf:("ident", 0, 0, "n", "")
+():() then (import fixe_nm):(["myname", "othername"])
 ():() then init_units:(0)

@@ -25,6 +25,8 @@ fix_rcache_reset() {
   export string[] fixd_rk = [];
   export string[] fixd_rn = [];
 } return void;
+given fix_rcache_find_at_fixture ():() then (import fixd_rn):([])
+given fix_span_fixture given fix_rcache_add(0, "x") ():() then (import fixd_rk):([])
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)
 
@@ -37,5 +39,7 @@ fix_span_fixture3(int e) {
   push((import tkind), "op");
   fix_span_fixture4(e);
 } return void;
+given fix_span_fixture (0):() then calls fix_span_fixture4:(0)
+given fix_span_fixture (0):() then len((import tkind)):(6)
 given fix_span_fixture (0):() then (import chkfail)[0]:(0)
 given fix_span_fixture (0):() then init_units:(0)

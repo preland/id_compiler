@@ -23,5 +23,6 @@ fix_toktext_fixture() {
   push((import ttext), "b");
 } return void;
 ():() then (import ttext):(["a", "b"])
+():() then (import ttext)[1]:("b")
 ():() then init_units:(0)
 ():() then calls env_init:[1]
