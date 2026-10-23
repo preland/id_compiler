@@ -10,6 +10,7 @@ fix_env2() {
   push((import fixd_ty), "string");
 } return void;
 ():() then (import fixd_nm)[0]:("foo")
+():() then (import fixd_ty)[0]:("string") then len((import fixd_ty)):(1)
 ():() then init_units:(0)
 ():() then calls fix_fixture:[1]
 
@@ -23,6 +24,7 @@ asmfx_dup_fixture() {
   asmfx_push();
 } return void;
 ():() then (import afname)[1]:("foo")
+():() then (import aftriple)[1]:("x86_64-unknown-linux-gnu") then len((import afname)):(2)
 ():() then init_units:(0)
 ():() then calls asmfx_setup:[1]
 

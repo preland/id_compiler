@@ -15,12 +15,15 @@ ret_void_fix() {
   push((import prog), fv0);
 } return void;
 ():() then calls node_func:("g", "void", [6], [1, 2], -1)
+():() then len((import prog)):(2)
 ():() then init_units:(0)
 
 // p0 = param "int p". Deterministic id: p0=6.
 stmt_fix5(int e0) {
   int p0 = node_param("param", "int", "p");
 } return void;
+given stmt_fix (0):() then calls node_param:("param", "int", "p")
+given stmt_fix (0):() then (import ns1)[6]:("int") then (import ns2)[6]:("p")
 given stmt_fix (0):() then (import chkfail)[0]:(0)
 given stmt_fix (0):() then init_units:(0)
 

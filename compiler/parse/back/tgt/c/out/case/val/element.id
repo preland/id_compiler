@@ -18,5 +18,6 @@ import_ix_fixture() {
   export int ix_import_e = newleaf("cimport", (import lit_e) + 1, 0, "gb", "");
 } return void export ix_import_e;
 ():() then calls newleaf:("cimport", 1, 0, "gb", "")
+():() then (import nkind)[2]:("cimport") then (import ni1)[2]:(1)
 ():() then init_units:(0)
 ():() then calls lit_int_fixture:[1]

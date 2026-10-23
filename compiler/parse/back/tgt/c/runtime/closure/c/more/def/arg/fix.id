@@ -46,5 +46,6 @@ clo_case_fixture() {
   export int cc_f = newnode("cctor", 0, 0, "bind", "", [(import clo_cfn)], [(import clo_cfn)]);
 } return void;
 ():() then calls node_txt2:("int", "9", 9, 0)
+given clo_bind_fixture ():() then calls newnode:("cctor", 0, 0, "bind", "", [(import clo_cfn)], [(import clo_cfn)])
 ():() then init_units:(0)
 ():() then calls clo_bind_fixture:[1]

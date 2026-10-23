@@ -14,6 +14,7 @@ ll_cmp_fixture() {
   export int ir_cmp = ir_insn("icmp", "int", 0 - 1, 0 - 1, "", [9], [9]);
 } return void;
 ():() then calls ir_insn:("icmp", "int", -1, -1, "", [9], [9])
+():() then (import ity)[0]:("int") then len((import iop)):(1)
 ():() then init_units:(0)
 
 phi_fixture() {
@@ -21,6 +22,7 @@ phi_fixture() {
   export int ir_phi = ir_insn("phi", "int", 0 - 1, 0 - 1, "", [(import ir_cmp)], [7]);
 } return void;
 ():() then calls ir_insn:("phi", "int", -1, -1, "", [0], [7])
+():() then (import iop)[1]:("phi") then len((import iop)):(2)
 ():() then init_units:(0)
 ():() then calls ll_cmp_fixture:[1]
 
@@ -32,5 +34,6 @@ phi_empty_fixture() {
   export int ir_phi_empty = ir_insn("phi", "int", 0 - 1, 0 - 1, "", ir_empty_phi, ir_empty_phi);
 } return void;
 ():() then calls ir_insn:("phi", "int", -1, -1, "", [], [])
+():() then (import iop)[2]:("phi") then len((import iop)):(3)
 ():() then init_units:(0)
 ():() then calls phi_fixture:[1]

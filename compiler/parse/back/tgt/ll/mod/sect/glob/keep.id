@@ -7,6 +7,7 @@ fix_env_std() {
   lset((import fixd_std), 0, 1);
 } return void;
 ():() then (import fixd_std)[0]:(1)
+():() then len((import fixe_n)):(0) then (import fixd_seq)[0]:(0)
 ():() then init_units:(0)
 ():() then calls fix_fixture:[1]
 

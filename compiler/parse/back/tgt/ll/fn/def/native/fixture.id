@@ -10,5 +10,6 @@ ll_str_fixture() {
   export int ir_str_const2 = ir_insn("const", "string", 0 - 1, 0 - 1, "\"a\"", [9], [9]);
 } return void;
 ():() then calls ir_insn:("const", "string", -1, -1, "\"a\"", [9], [9])
+():() then calls ir_insn:("const", "string", -1, -1, "\"\"", [9], [9])
 ():() then init_units:(0)
 ():() then calls ir_insn:[2]

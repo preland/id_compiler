@@ -19,5 +19,7 @@ ll_main_fixture() {
   push((import fnpar)[f], mfx_argc);
   push((import fnpar)[f], mfx_args);
 } return void;
+():() then calls ir_func:(-1, "main", "int")
+():() then calls ir_leaf:("param", "word", 1, -1, "args")
 ():() then init_opt:(0)
 ():() then init_units:(0)

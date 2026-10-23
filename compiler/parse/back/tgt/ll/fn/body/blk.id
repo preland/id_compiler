@@ -35,5 +35,7 @@ ll_blk_fixture() {
 } chain () {
   ir_add(blkf_blk, (import irf_n3));
 } return void;
+():() then calls ir_func:(-1, "g", "int")
+():() then calls ir_block:(0, "entry")
 ():() then init_opt:(0)
 ():() then init_units:(0)

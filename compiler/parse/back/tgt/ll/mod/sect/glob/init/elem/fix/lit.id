@@ -7,6 +7,7 @@ llc_int_setup() {
   export int llc_int_e = node_txt2("int", "5", 5, 0);
 } return void;
 ():() then calls node_txt2:("int", "5", 5, 0)
+():() then (import nkind)[0]:("int") then (import ni1)[0]:(5)
 ():() then init_units:(0)
 
 llc_str_setup() {
@@ -15,6 +16,7 @@ llc_str_setup() {
   export int llc_str_e = node_txt("str", "hi");
 } return void;
 ():() then calls node_txt:("str", "hi")
+():() then (import enames)[0]:("k") then len((import enames)):(1)
 ():() then init_units:(0)
 
 llc_float_setup() {
@@ -25,4 +27,5 @@ llc_float_setup() {
   export int llc_negf_e = newleaf("un", (import llc_float_e), 0, "-", "");
 } return void;
 ():() then calls node_float:("1.5")
+():() then (import enames)[0]:("m") then (import nkind)[1]:("un")
 ():() then init_units:(0)

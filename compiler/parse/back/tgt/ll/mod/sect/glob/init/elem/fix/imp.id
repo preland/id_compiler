@@ -7,5 +7,7 @@ llim_setup() {
   export int llim_e = node_txt("import", "b");
   export int llim_a = node_txt("import", "a");
 } return void;
+():() then calls node_txt:("import", "b")
+():() then calls node_txt:("import", "a")
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)

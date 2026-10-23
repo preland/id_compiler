@@ -16,8 +16,9 @@ ir_fixture1() {
   export int ir_retvoid = ir_insn("ret", "", 0 - 1, 0 - 1, "", [9], [9]);
   export int ir_br = ir_insn("br", "", 0 - 1, 0 - 1, "", [9], [3]);
 } return void;
-():() then init_units:(0)
+():() then calls ir_insn:("ret", "", -1, -1, "", [9], [9])
 ():() then calls ir_insn:("br", "", -1, -1, "", [9], [3])
+():() then init_units:(0)
 ():() then calls ir_insn:[2]
 
 ir_fixture2() {
@@ -25,8 +26,9 @@ ir_fixture2() {
   export int ir_cbr = ir_insn("cbr", "", 0 - 1, 0 - 1, "", [9], [1, 2]);
   export int ir_alloca = ir_insn("alloca", "int", 0 - 1, 0 - 1, "", [9], [9]);
 } return void;
-():() then init_units:(0)
+():() then calls ir_insn:("cbr", "", -1, -1, "", [9], [1, 2])
 ():() then calls ir_insn:("alloca", "int", -1, -1, "", [9], [9])
+():() then init_units:(0)
 ():() then calls ir_insn:[4]
 
 ir_fixture3() {
@@ -34,6 +36,7 @@ ir_fixture3() {
   export int ir_load = ir_insn("load", "int", 0 - 1, 0 - 1, "", [9], [9]);
   export int ir_store = ir_insn("store", "", 0 - 1, 0 - 1, "", [9], [9]);
 } return void;
-():() then init_units:(0)
+():() then calls ir_insn:("load", "int", -1, -1, "", [9], [9])
 ():() then calls ir_insn:("store", "", -1, -1, "", [9], [9])
+():() then init_units:(0)
 ():() then calls ir_insn:[6]

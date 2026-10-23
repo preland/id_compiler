@@ -10,6 +10,8 @@ elems2_fixture() {
   int d = const_decl("a");
   export int llie_e = (import ni1)[d];
 } return void;
+():() then calls const_decl:("a")
+():() then (import llie_e):(1)
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
@@ -17,6 +19,8 @@ elems3_fixture() {
   elems2_fixture();
   export int llie_child = (import nl1)[(import llie_e)][0];
 } return void;
+():() then (import llie_child):(0)
+():() then calls const_decl:("a")
 ():() then (import chkfail)[0]:(0)
 ():() then init_units:(0)
 
@@ -37,4 +41,5 @@ llasm_row_fixture() {
   push((import aftriple), "x86_64-unknown-none");
 } return void;
 ():() then calls node_param:("param", "int", "x")
+():() then len((import afparams)):(1) then len((import aflines)):(1)
 ():() then init_units:(0)

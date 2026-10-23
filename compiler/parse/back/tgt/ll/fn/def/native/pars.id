@@ -32,4 +32,5 @@ ll_native_fixture() {
   export int nat_id0 = newnode("func", 0 - 1, 1, "getter", "word", none2, none2);
 } return void;
 ():() then calls node_param:("param", "int", "a")
+():() then calls node_param:("param", "word", "b")
 ():() then init_units:(0)
