@@ -8,6 +8,7 @@ farm_b() {
   export int f_ret = node_txt("var", "ret");
 } return void;
 ():() then calls node_txt:("var", "ret")
+given farm_a ():() then calls node_call:("target", [(import f_argv)])
 ():() then init_units:(0)
 
 ends_v(string name) {

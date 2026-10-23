@@ -26,5 +26,6 @@ fs_fixture() {
   fs_build2();
 } return void;
 ():() then calls node_func:("main", "int", [], [], -1)
+():() then calls fs_build:("plain")
 ():() then init_units:(0)
 ():() then calls env_init:[1]

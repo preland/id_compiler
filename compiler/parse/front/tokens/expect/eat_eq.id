@@ -18,6 +18,8 @@ init_lines3() {
   export int[] curtl = [0];
   init_lines4();
 } return void export chkfail;
+given full_env given lset((import chkfail), 0, 1) ():() then (import chkfail)[0]:(0)
+given full_env given lset((import curtl), 0, 7) ():() then (import curtl)[0]:(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
@@ -33,5 +35,8 @@ init_lines4() {
   export int[] casestart = [];
   init_cases();
 } return void;
+given full_env given kept_natoff_fixture() ():() then len((import casestart)):(0)
+given cvl_setup given cvl_case() ():() then len((import casefn)):(0)
+given cvl_setup given cvl_case() ():() then len((import casenode)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

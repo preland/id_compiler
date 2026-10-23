@@ -17,6 +17,7 @@ imp_seed_fixture() {
   push(imp_have, "first");
 } return void;
 ():() then (import cimps)[0]:("first")
+():() then len((import cimps)):(1)
 ():() then init_units:(0)
 ():() then calls lz_c:[1]
 
@@ -26,5 +27,6 @@ imp_decl_fixture() {
   export int imp_decl = node_decl("int", "q", (import lz_imp), 0);
 } return void;
 given lz_c ():() then calls node_decl:("int", "q", (import lz_imp), 0)
+():() then len((import nkind)):(6)
 ():() then init_units:(0)
 ():() then calls lz_c:[1]

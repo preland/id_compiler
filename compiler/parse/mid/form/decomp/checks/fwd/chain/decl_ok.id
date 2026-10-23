@@ -25,5 +25,7 @@ fs_build2() {
   export int fwd_fid_plain = fs_build("plain");
   export int fwd_fid_main = fs_build("main");
 } return void;
+given env_init ():() then calls fs_build:("plain")
+given env_init ():() then calls fs_build:("main")
 given env_init ():() then (import chkfail)[0]:(0)
 given env_init ():() then init_units:(0)

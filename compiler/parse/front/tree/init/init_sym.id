@@ -17,6 +17,8 @@ init_sym() {
   init_structs();
   lp_reset();
 } return void;
+given full_env given add_func("f", "int", 0) ():() then len((import fnames)):(0)
+given full_env given add_export("g", "int", "o") ():() then len((import enames)):(0)
 given full_env ():() then len((import fnames)):(0)
 given full_env ():() then init_units:(0)
 given full_env ():() then calls init_sym_a:[1]
@@ -28,6 +30,8 @@ init_sym_a() {
   export string[] frets = [];
   export string[] enames = [];
 } return void;
+given full_env given add_func("f", "int", 0) ():() then len((import frets)):(0)
+given full_env given add_export("g", "int", "o") ():() then len((import enames)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
@@ -50,5 +54,7 @@ init_sym_b() {
 } chain () {
   export int[] kept_lists = [0 - 1];
 } return void;
+given full_env given add_export("g", "int", "o") ():() then len((import eowners)):(0)
+given full_env given lset((import kept_lists), 0, 3) ():() then (import kept_lists)[0]:(-1)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

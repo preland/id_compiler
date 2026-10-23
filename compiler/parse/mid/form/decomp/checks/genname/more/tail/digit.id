@@ -10,6 +10,7 @@ farm_c() {
   export int f_target = node_func("target", "int", [(import f_pa)], (import f_none), 0 - 1);
 } return void;
 given farm_b ():() then calls node_decl:("int", "ret", (import f_call), 0)
+given farm_b ():() then calls node_func:("target", "int", [(import f_pa)], (import f_none), -1)
 ():() then init_units:(0)
 ():() then calls farm_b:[1]
 

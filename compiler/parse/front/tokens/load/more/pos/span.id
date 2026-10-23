@@ -13,6 +13,8 @@ init_pos() {
   export int[] curtk = [0];
   init_pos2();
 } return void;
+given full_env given set_span("12") ():() then len((import tspan)):(0)
+given full_env given lset((import curtk), 0, 4) ():() then (import curtk)[0]:(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 

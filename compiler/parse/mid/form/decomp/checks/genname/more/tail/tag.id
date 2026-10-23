@@ -11,6 +11,7 @@ farm_d() {
   sym_func((import f_target));
 } return void;
 given farm_c ():() then calls sym_func:((import f_target))
+given farm_c ():() then calls node_func:("fwd1", "int", [(import f_pa)], [(import f_decl)], (import f_ret))
 ():() then init_units:(0)
 ():() then calls farm_c:[1]
 

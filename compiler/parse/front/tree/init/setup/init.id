@@ -34,6 +34,8 @@ init_a() {
   export string[] ttext = [];
   export string[] nkind = [];
 } return void;
+given full_env given toks_push(["kw"], ["x"]) ():() then len((import ttext)):(0)
+given full_env given push_kii("shell", 9, 9) ():() then len((import nkind)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
@@ -42,5 +44,7 @@ init_b() {
   export int[] ni2 = [];
   export string[] ns1 = [];
 } return void;
+given full_env given push_kii("shell", 9, 9) ():() then len((import ni1)):(0)
+given full_env given push_ss("a", "b") ():() then len((import ns1)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)

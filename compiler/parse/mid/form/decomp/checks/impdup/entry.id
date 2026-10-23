@@ -23,6 +23,7 @@ lz_o() {
   uq_fill();
 } return void;
 ():() then (import prog)[1]:(23)
+():() then len((import cfp)):(2)
 ():() then init_units:(0)
 ():() then calls lz_n:[1]
 
@@ -50,4 +51,5 @@ imd_pair_base() {
   uq_fill();
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then calls node_txt:("import", "beta")
 ():() then init_units:(0)

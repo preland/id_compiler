@@ -15,6 +15,8 @@ init_pos2() {
   export int[] ngrp = [];
   init_pos3();
 } return void;
+given full_env given push_pos() ():() then len((import ntok)):(0)
+given full_env given grp_note(7, [5]) ():() then len((import ngrp)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 
@@ -23,6 +25,8 @@ init_pos3() {
   export int[] nst = [];
   export int[] synfail = [0];
 } return void;
+given full_env given grp_note(7, [5]) ():() then len((import ngrpc)):(0)
+given full_env given push_pos() ():() then len((import nst)):(0)
 given full_env ():() then (import chkfail)[0]:(0)
 given full_env ():() then init_units:(0)
 

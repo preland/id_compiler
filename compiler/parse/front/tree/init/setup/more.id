@@ -21,7 +21,9 @@ full_env() {
   env_init();
   init_files();
 } return void;
+given tmo_fix ():() then len((import ttext)):(0)
 ():() then len((import tline)):(0)
+():() then len((import fseen)):(0)
 ():() then init_units:(0)
 ():() then calls env_init:[1]
 

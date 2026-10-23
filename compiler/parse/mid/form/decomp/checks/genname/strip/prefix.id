@@ -7,6 +7,7 @@ fwd_env() {
   export int[] f_none = [];
 } return void;
 ():() then (import f_none):([])
+():() then len((import vidx)):(251)
 ():() then init_units:(0)
 ():() then calls env_init:[1]
 
@@ -18,6 +19,7 @@ farm_a() {
   export int f_argv = node_txt("var", "a");
 } return void;
 ():() then calls node_param:("param", "int", "a")
+():() then calls node_txt:("var", "a")
 ():() then init_units:(0)
 
 strip_idstd_prefix(string name) {
