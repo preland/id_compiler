@@ -10,6 +10,7 @@ ret_widens_val() {
   export int widen_e = e;
 } return void;
 ():() then calls newleaf:("int", 5, 0, "5", "")
+():() then (import ns1)[0]:("5")
 ():() then init_units:(0)
 
 ret_widens_fn() {
@@ -18,6 +19,7 @@ ret_widens_fn() {
   export int widen_f = node_func("f", "word", none, none, (import widen_e));
 } return void;
 given ret_widens_val ():() then calls ret_widens_val:[1] then calls node_func:("f", "word", [], [], (import widen_e))
+():() then (import ns2)[1]:("word")
 ():() then init_units:(0)
 
 ret_nonplain_fn() {
@@ -25,4 +27,5 @@ ret_nonplain_fn() {
   export int nonplain_e = newleaf("bin", 0, 0, "", "");
 } return void;
 ():() then calls newleaf:("bin", 0, 0, "", "")
+():() then (import nkind)[2]:("bin")
 ():() then init_units:(0)

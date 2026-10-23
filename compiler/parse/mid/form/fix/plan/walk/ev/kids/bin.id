@@ -19,5 +19,7 @@ fix_walk_arg2_fixture2(int e1, int e2) {
   export int wa2_e1 = e1;
   export int wa2_e2 = e2;
 } return void;
+given fix_walk_arg2_fixture (5, 6):() then (import wa2_e1):(5) then (import wa2_e2):(6)
+given fix_walk_arg2_fixture (9, 4):() then (import wa2_e1):(9) then (import wa2_e2):(4)
 given fix_walk_arg2_fixture (0, 0):() then (import chkfail)[0]:(0)
 given fix_walk_arg2_fixture (0, 0):() then init_units:(0)

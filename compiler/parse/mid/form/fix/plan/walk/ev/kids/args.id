@@ -28,5 +28,7 @@ fix_walk_arg2_fixture1(int[] none) {
   int e1 = node_call("caller", [e2]);
   fix_walk_arg2_fixture2(e1, e2);
 } return void;
+given fix_walk_arg2_fixture ([]):() then calls node_call:("other", [])
+given fix_walk_arg2_fixture ([]):() then calls fix_walk_arg2_fixture2:(3, 2)
 given fix_walk_arg2_fixture ([]):() then (import chkfail)[0]:(0)
 given fix_walk_arg2_fixture ([]):() then init_units:(0)

@@ -24,4 +24,6 @@ fix_mark_case_fixture() {
   fix_push_rest((import mfe), 0, 3, 1, "", "");
 } return void;
 ():() then calls node_txt2:("int", "1", 1, 0)
+():() then (import tline):([3])
+():() then (import fixe_cl):([3]) then (import fixe_cd):([1])
 ():() then init_units:(0)

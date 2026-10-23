@@ -16,6 +16,7 @@ fix_seq_once() {
   fix_seq();
 } return void;
 ():() then calls fix_fixture:[1] then (import fixd_seq)[0]:(1)
+given fix_seq_once ():() then (import fixd_seq):([1])
 ():() then init_units:(0)
 
 // A real return-clause value (e, an "ident" so is_plain leaves fix_ret_needs
@@ -86,4 +87,5 @@ fix_ret_fixture() {
   int dcl = node_decl("int", "myvar", e, 0);
 } return void;
 ():() then calls newleaf:("ident", 0, 0, "x", "")
+():() then calls node_func:("h", "void", [], [], -1) then (import pfile):(["a.id", "b.id"])
 ():() then init_units:(0)

@@ -43,4 +43,5 @@ fix_gcl_fixture() {
   push((import ngrpc), 99);
 } return void;
 ():() then calls env_init:[1] then (import fixd_gcl)[0]:(10) then (import ngrpc)[1]:(99)
+():() then (import ngrp):([0, 0]) then (import ngrpc):([5, 99])
 ():() then init_units:(0)

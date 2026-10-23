@@ -27,4 +27,5 @@ fix_walk_more_fixture() {
   export int wm_arr = node_arr([a]);
 } return void;
 ():() then calls newleaf:("int", 1, 0, "1", "")
+():() then calls newleaf:("un", 0, 0, "-", "") then calls node_arr:([0])
 ():() then init_units:(0)

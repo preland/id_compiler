@@ -25,4 +25,5 @@ fix_rkey_fixture_leaf() {
   fix_rkey_fixture_leaf2(e);
 } return void;
 ():() then calls node_txt2:("int", "7", 7, 0)
+():() then (import ns1)[0]:("7") then (import ni1)[0]:(7)
 ():() then init_units:(0)

@@ -25,11 +25,14 @@ fix_name_pick_miss_fixture() {
   fix_name_pick_miss_fixture2();
 } return void;
 ():() then (import fixe_nt):(["int"])
+():() then (import fixe_an):([""])
 ():() then init_units:(0)
 ():() then calls fix_pick_fixture_n:[1]
 
 fix_name_pick_miss_fixture2() {
   push((import fixe_an), "");
 } return void;
+given fix_pick_fixture_n ():() then (import fixe_an):([""])
+given fix_name_pick_miss_fixture ():() then len((import fixe_an)):(2)
 given fix_name_pick_miss_fixture ():() then (import chkfail)[0]:(0)
 given fix_name_pick_miss_fixture ():() then init_units:(0)

@@ -9,6 +9,7 @@ fix_wfill_fixture() {
   fix_winit();
 } return void;
 ():() then calls full_env:[1] then (import fnames)[0]:("main")
+():() then len((import fixd_wm)):(1)
 ():() then init_units:(0)
 
 fix_wrow() {

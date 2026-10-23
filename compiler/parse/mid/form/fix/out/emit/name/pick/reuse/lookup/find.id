@@ -21,6 +21,7 @@ fix_rcache_find_hit() {
   push((import fixd_rn), "cachedname");
 } return void;
 ():() then (import fixd_rn):(["cachedname"])
+():() then (import fixd_rk):(["|len|(|)"])
 ():() then init_units:(0)
 ():() then calls fix_span_fixture:[1]
 
@@ -30,5 +31,7 @@ fix_span_fixture1() {
   int e = node_call("len", [0 - 1]);
   fix_span_fixture2(e);
 } return void;
+given fix_span_fixture ():() then calls node_call:("len", [-1])
+given fix_span_fixture ():() then calls fix_span_fixture2:(1)
 given fix_span_fixture ():() then (import chkfail)[0]:(0)
 given fix_span_fixture ():() then init_units:(0)
