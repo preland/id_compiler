@@ -1,0 +1,21 @@
+// The 2N run of the scratch-loop slope: the same program as 14 with twice the
+// passes, so allocated store bytes and the high-water mark double while the
+// freed lines stay 0. Until L5 lands that is the leak this case documents.
+scratch(int k) {
+  word a = alloc(64);
+  poke8(a, k);
+  int r = peek8(a);
+} return int r;
+
+fill(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    t = t + scratch(i);
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  print(fill(100));
+} return int 0;

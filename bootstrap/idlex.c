@@ -93,6 +93,11 @@ static ID_TLS long id_nfree = 0;
 static ID_TLS long id_nfree_s = 0;
 static ID_TLS long id_nalloc = 0;
 static ID_TLS long id_nalloc_s = 0;
+static ID_TLS long id_nalloc_m = 0;
+static ID_TLS long id_nbytes_m = 0;
+static ID_TLS long id_nfree_m = 0;
+static ID_TLS long id_nbytes_free_m = 0;
+static ID_TLS long id_hwm_m = 0;
 static ID_TLS void* id_pool_fl[ID_NCLASS];
 static ID_TLS char* id_pool_bump = NULL;
 static ID_TLS size_t id_pool_left = 0;
@@ -109,10 +114,15 @@ static void id_arena_free_all(void) {
     if (getenv("ID_ALLOC_STATS")) {
         fprintf(stderr, "id: allocated %ld lists\n", id_nalloc);
         fprintf(stderr, "id: allocated %ld strings\n", id_nalloc_s);
+        if (id_nalloc_m) fprintf(stderr, "id: allocated %ld store blocks\n", id_nalloc_m);
+        if (id_nalloc_m) fprintf(stderr, "id: allocated %ld store bytes\n", id_nbytes_m);
+        if (id_nalloc_m) fprintf(stderr, "id: store high-water %ld bytes\n", id_hwm_m);
     }
     if (getenv("ID_FREE_STATS")) {
         fprintf(stderr, "id: freed %ld lists\n", id_nfree);
         if (id_nfree_s) fprintf(stderr, "id: freed %ld strings\n", id_nfree_s);
+        if (id_nfree_m) fprintf(stderr, "id: freed %ld store blocks\n", id_nfree_m);
+        if (id_nfree_m) fprintf(stderr, "id: freed %ld store bytes\n", id_nbytes_free_m);
     }
     IdAllocHdr* h = id_arena_head;
     while (h) { IdAllocHdr* nx = h->next; free(h); h = nx; }
@@ -741,6 +751,9 @@ static long long id_mem_alloc(long long n) {
     if (end < base) id_trap("allocation size overflow");
     if (end > id_store_cap) id_store_grow(end);
     id_store_used = end;
+    id_nalloc_m++;
+    id_nbytes_m += (long)n;
+    if (end > id_hwm_m) id_hwm_m = (long)end;
     return base;
 }
 static long long id_mem_size(void) { return id_store_used; }

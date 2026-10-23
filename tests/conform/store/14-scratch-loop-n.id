@@ -1,0 +1,24 @@
+// A scratch address allocated on every pass of a loop and never kept: the
+// shape of idstd's str_pad and clock_why. The flat store has no release path,
+// so each pass adds one block and 64 bytes to what ID_ALLOC_STATS reports and
+// nothing to what ID_FREE_STATS reports. This is the N run of the 1N, 2N, 4N
+// slope (14, 15, 16); L5 (store free lists) flips the freed lines to equal the
+// allocated ones and the high-water line to a constant.
+scratch(int k) {
+  word a = alloc(64);
+  poke8(a, k);
+  int r = peek8(a);
+} return int r;
+
+fill(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    t = t + scratch(i);
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  print(fill(50));
+} return int 0;

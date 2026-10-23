@@ -1,0 +1,6 @@
+id: allocated 1 lists
+id: allocated 2 strings
+id: allocated 50 store blocks
+id: allocated 3200 store bytes
+id: store high-water 3208 bytes
+id: freed 0 lists

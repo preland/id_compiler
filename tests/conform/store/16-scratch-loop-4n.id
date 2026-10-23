@@ -1,0 +1,21 @@
+// The 4N run of the scratch-loop slope: four times the passes of 14. With 14
+// and 15 it fixes the line allocated = 64 * N, freed = 0, the control that a
+// freeing store must flatten.
+scratch(int k) {
+  word a = alloc(64);
+  poke8(a, k);
+  int r = peek8(a);
+} return int r;
+
+fill(int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    t = t + scratch(i);
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  print(fill(200));
+} return int 0;
