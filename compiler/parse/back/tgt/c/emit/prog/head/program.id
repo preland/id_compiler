@@ -35,3 +35,4 @@ emit_decls() {
 } return void;
 given nz_prog_fixture ():() then prints:("/* forward declarations */\nint id_main(int argc);\nvoid id_run(void);\n\n")
 given nz_prog_nomain_fixture ():() then prints:("/* forward declarations */\nvoid id_run(void);\n\n")
+given esc_fm_fix ():() then calls emit_free_one:("Tr")

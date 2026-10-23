@@ -27,3 +27,4 @@ case_fn(int[] pos) {
 } return int ret_i;
 given fnname_fix ([0]):(0)
 given toks_fn(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]) ([0]):(4)
+given toks_fn(["ident", "op", "op", "int", "op"], ["otherfn", ":", "(", "6", ")"]) ([0]):(4) then calls newleaf:("cfn", 0, 0, "otherfn", "")

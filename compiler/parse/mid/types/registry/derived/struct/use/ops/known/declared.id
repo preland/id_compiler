@@ -14,6 +14,7 @@ chk_declared_type(int id) {
 } return void;
 given sd_decl_fixture ((import sd_dk)):() then (import chkfail)[0]:(0)
 given sd_decl_fixture ((import sd_dbad)):() then (import chkfail)[0]:(1)
+given sd_decl_fixture given sset((import nkind), (import sd_dbad), "param") ((import sd_dbad)):() then (import chkfail)[0]:(1)
 
 chk_type_known(int id, string sd_t) {
   if(ty_known(sd_t) == 0) {

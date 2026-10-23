@@ -23,6 +23,7 @@ fix_func_at(int i, int lo) {
 } return int ret_i;
 given fix_ret_fixture (0, 0):(3) then prints:("@D|a.id|10|5|1|5|int ret_i = |10|5|10|8\n@R|a.id|10|5|10|8|2|ret_i\n")
 given fix_ret_fixture (1, 0):(4) then prints:("@D|b.id|10|5|1|0|int ret_i = |10|5|10|8\n@R|b.id|10|5|10|8|2|ret_i\n")
+given fix_ret_fixture given lset((import nunit), 2, 1) (0, 0):(3) then prints:("")
 
 // Statements first, then the return clause, then parentheses: the last has to
 // know every range the first two replace.

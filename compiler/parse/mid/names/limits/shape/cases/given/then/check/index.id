@@ -25,6 +25,7 @@ then_arg_index(int ci, int e) {
 given index_arg_fixture ((import fixture_ci), (import fixture_ix_imp)):() then prints:("fixture.id:4: error: the index of an indexed export in a check is a literal or a conf.id constant, and (import x) is neither; write the index as a literal, as in then f((import NAME)[1]):(value), or name a conf.id constant\n")
 given index_arg_fixture given lset((import setupargs), 0, 1) ((import fixture_ci), (import fixture_ix_lit)):() then (import setupargs)[0]:(0)
 given index_arg_fixture ((import fixture_ci), (import fixture_ix_lit)):() then prints:("")
+given index_arg_fixture given sset((import nkind), 0, "cimport") given lset((import ni1), (import fixture_ix_lit), 1) ((import fixture_ci), (import fixture_ix_lit)):() then prints:("fixture.id:4: error: the index of an indexed export in a check is a literal or a conf.id constant, and (import fixture.id) is neither; write the index as a literal, as in then f((import NAME)[1]):(value), or name a conf.id constant\n")
 
 then_arg_ix(int ci, int ix) {
   lset((import setupargs), 0, 2);

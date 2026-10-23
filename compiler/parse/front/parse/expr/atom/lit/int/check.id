@@ -8,3 +8,4 @@ int_check(int[] pos, string text) {
 } return void;
 given mk_two_toks ([0], "123"):() then (import chkfail)[0]:(0)
 given mk_two_toks ([0], "18446744073709551616"):() then (import chkfail)[0]:(1)
+given mk_two_toks ([0], "18446744073709551616"):() then prints:("<stdin>:1: error: integer literal '18446744073709551616' does not fit in 64 bits [E0107]\n  at: 18446744073709551616\n  why: an int is 32 bits and a word is 64, so the largest literal is 18446744073709551615 (0xffffffffffffffff); a larger one would wrap around and store a different number than the one written\n  help: write a value no larger than 18446744073709551615, or build the number from smaller parts\n")

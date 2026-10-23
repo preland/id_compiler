@@ -58,6 +58,7 @@ init_reach() {
 } return void;
 given env_init ():() then reach_pass:(2)
 given full_env ():() then reach_pass:(2)
+():() then (import dphase)[0]:(0)
 
 // Fixpoint: sweep until a sweep adds nothing. The number of sweeps is the
 // depth of the call graph, which in `id` is large but the sweep is linear, and
