@@ -1,0 +1,9 @@
+// The channel natives of the runtime prelude (idc/compiler/parse/conf.id, c_prelude_text), reached through
+// one-line wrappers: a native is emitted as id_<name>, and the reserved id_chan_* / id_thr_* names are the
+// runtime's own, so the case names its natives ch_* / th_* and ch.c forwards them.
+string name = "ch";
+string c_header = "ch.h";
+
+string[] c_linux_sources = ["ch.c"];
+string[] c_linux_cflags = [];
+string[] c_linux_link = ["-pthread"];

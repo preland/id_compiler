@@ -94,12 +94,14 @@ is_enumerated_gap() {
 # how the fix gets noticed.
 known_apart() {
     case "$1:$2" in
+    wasm:chan) return 0 ;;
     esac
     return 1
 }
 
 apart_why() {
     case "$1:$2" in
+    wasm:chan) echo "channels are refused on wasm (.handoff/p15/DESIGN.md F13); the refusal itself lands with P1.5a step 5" ;;
     esac
 }
 

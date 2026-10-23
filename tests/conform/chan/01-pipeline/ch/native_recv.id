@@ -1,0 +1,5 @@
+native ch_wait(int rx) return int;
+
+native ch_take(int rx) return int;
+
+native ch_close(int h) return void;

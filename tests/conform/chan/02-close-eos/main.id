@@ -1,0 +1,32 @@
+// Closing the sender is end of stream: the receiver still gets every queued message, then
+// ch_wait answers 0, and keeps answering 0. A send to a receiver that is gone answers 0.
+fill(int tx) {
+  ch_send(tx, 10);
+  ch_send(tx, 20);
+  ch_send(tx, 30);
+} chain (int tx) {
+  ch_close(tx);
+} return int 0;
+drain(int rx) {
+  int t = 0;
+  while(ch_wait(rx)) {
+    t = t + ch_take(rx);
+  }
+} return int t;
+main(int argc, string[] argv) {
+  int rx = ch_new(8);
+  int tx = ch_sender(rx);
+  fill(tx);
+} chain (int argc, string[] argv) {
+  int total = drain(rx);
+  int e1 = ch_wait(rx);
+  int e2 = ch_wait(rx);
+} chain (int argc, string[] argv) {
+  print("drained " + total + " then " + e1 + " " + e2);
+  int back = ch_new(2);
+  int out = ch_sender(back);
+} chain (int argc, string[] argv) {
+  ch_close(back);
+  int sent = ch_send(out, 5);
+  print("receiver gone " + sent);
+} return int 0;

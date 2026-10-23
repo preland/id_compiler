@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#ifndef __wasm__
+#include <pthread.h>
+#endif
 #include <stdint.h>
 #include <limits.h>
 #ifndef __wasi__
@@ -748,6 +751,104 @@ void id_thread_leave(void) {
     id_arena_head = NULL; id_store = NULL; id_store_used = 1; id_store_cap = 0;
     id_pool_drop();
 }
+#ifndef __wasm__
+typedef struct { pthread_mutex_t mu; pthread_cond_t ne, nf; long long* q; int head, count, cap, sopen, ropen, taken, used; } IdChan;
+typedef struct { int (*f)(int); int arg, res, used; pthread_t t; } IdThr;
+static IdChan id_chans[256];
+static IdThr id_thrs[256];
+static pthread_mutex_t id_chan_tab = PTHREAD_MUTEX_INITIALIZER;
+static IdChan* id_chan_of(int h) {
+    if (h < 2 || h / 2 >= 256 || !id_chans[h / 2].used) id_trap("chan: not an open channel end");
+    return &id_chans[h / 2];
+}
+int id_chan_new(int cap) {
+    if (cap < 1) id_trap("chan_new: capacity must be at least 1");
+    pthread_mutex_lock(&id_chan_tab);
+    int i = 1;
+    while (i < 256 && id_chans[i].used) i++;
+    if (i == 256) { pthread_mutex_unlock(&id_chan_tab); id_trap("chan_new: too many open channels"); }
+    IdChan* c = &id_chans[i];
+    c->q = (long long*)malloc(sizeof(long long) * (size_t)cap);
+    if (!c->q) { pthread_mutex_unlock(&id_chan_tab); id_trap("out of memory (channel)"); }
+    pthread_mutex_init(&c->mu, NULL); pthread_cond_init(&c->ne, NULL); pthread_cond_init(&c->nf, NULL);
+    c->head = 0; c->count = 0; c->cap = cap; c->sopen = 1; c->ropen = 1; c->taken = 0; c->used = 1;
+    pthread_mutex_unlock(&id_chan_tab);
+    return i * 2;
+}
+int id_chan_sender(int rx) {
+    IdChan* c = id_chan_of(rx);
+    pthread_mutex_lock(&c->mu);
+    int again = c->taken;
+    c->taken = 1;
+    pthread_mutex_unlock(&c->mu);
+    if (again) id_trap("this channel already has a sender (a channel has one sender; make a second channel)");
+    return rx + 1;
+}
+int id_chan_send(int tx, int v) {
+    IdChan* c = id_chan_of(tx);
+    pthread_mutex_lock(&c->mu);
+    while (c->count == c->cap && c->ropen) pthread_cond_wait(&c->nf, &c->mu);
+    int ok = c->ropen;
+    if (ok) { c->q[(c->head + c->count) % c->cap] = v; c->count++; pthread_cond_signal(&c->ne); }
+    pthread_mutex_unlock(&c->mu);
+    return ok;
+}
+int id_chan_wait(int rx) {
+    IdChan* c = id_chan_of(rx);
+    pthread_mutex_lock(&c->mu);
+    while (c->count == 0 && c->sopen) pthread_cond_wait(&c->ne, &c->mu);
+    int ok = c->count > 0;
+    pthread_mutex_unlock(&c->mu);
+    return ok;
+}
+int id_chan_take(int rx) {
+    IdChan* c = id_chan_of(rx);
+    pthread_mutex_lock(&c->mu);
+    if (c->count == 0) { pthread_mutex_unlock(&c->mu); id_trap("chan_take on an empty channel: call chan_wait first and take only when it returns 1"); }
+    int v = (int)c->q[c->head];
+    c->head = (c->head + 1) % c->cap; c->count--;
+    pthread_cond_signal(&c->nf);
+    pthread_mutex_unlock(&c->mu);
+    return v;
+}
+void id_chan_close(int h) {
+    IdChan* c = id_chan_of(h);
+    pthread_mutex_lock(&c->mu);
+    if (h & 1) { c->sopen = 0; pthread_cond_broadcast(&c->ne); } else { c->ropen = 0; pthread_cond_broadcast(&c->nf); }
+    int last = !c->sopen && !c->ropen;
+    pthread_mutex_unlock(&c->mu);
+    if (!last) return;
+    pthread_mutex_lock(&id_chan_tab);
+    free(c->q); c->q = NULL; c->used = 0;
+    pthread_mutex_unlock(&id_chan_tab);
+}
+static void* id_thr_main(void* p) {
+    IdThr* t = (IdThr*)p;
+    id_thread_enter();
+    t->res = t->f(t->arg);
+    id_thread_leave();
+    return NULL;
+}
+int id_thr_spawn(int (*f)(int), int arg) {
+    pthread_mutex_lock(&id_chan_tab);
+    int i = 1;
+    while (i < 256 && id_thrs[i].used) i++;
+    if (i == 256) { pthread_mutex_unlock(&id_chan_tab); id_trap("thr_spawn: too many running threads"); }
+    id_thrs[i].used = 1; id_thrs[i].f = f; id_thrs[i].arg = arg;
+    int bad = pthread_create(&id_thrs[i].t, NULL, id_thr_main, &id_thrs[i]);
+    if (bad) id_thrs[i].used = 0;
+    pthread_mutex_unlock(&id_chan_tab);
+    if (bad) id_trap("thr_spawn: cannot start a thread");
+    return i;
+}
+int id_thr_join(int h) {
+    if (h < 1 || h >= 256 || !id_thrs[h].used) id_trap("thr_join: not a running thread");
+    pthread_join(id_thrs[h].t, NULL);
+    int r = id_thrs[h].res;
+    id_thrs[h].used = 0;
+    return r;
+}
+#endif
 
 /* Every load and store funnels through this one check. */
 static unsigned char* id_at(long long addr, long long width) {

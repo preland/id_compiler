@@ -1,0 +1,25 @@
+// Backpressure: a producer thread feeds 1..1000 through a channel of capacity 1 to the main thread, which sums
+// what arrives until end of stream; the thread's own count comes back from the join.
+producer(int tx) {
+  int i = 0;
+  while(i < 1000) {
+    i = i + 1;
+    ch_send(tx, i);
+  }
+  ch_close(tx);
+} return int i;
+drain(int rx) {
+  int t = 0;
+  while(ch_wait(rx)) {
+    t = t + ch_take(rx);
+  }
+} return int t;
+main(int argc, string[] argv) {
+  int rx = ch_new(1);
+  int tx = ch_sender(rx);
+  int th = th_spawn(producer, tx);
+} chain (int argc, string[] argv) {
+  int total = drain(rx);
+  int count = th_join(th);
+  print("sum " + total + " count " + count);
+} return int 0;

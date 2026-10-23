@@ -1,0 +1,5 @@
+native ch_new(int cap) return int;
+
+native ch_sender(int rx) return int;
+
+native ch_send(int tx, int v) return int;
