@@ -3,8 +3,12 @@ mk() {
   export int[] cnt = [0, 5];
 } return void;
 
+viamk() {
+  mk();
+} return void;
+
 wrap(int k) {
   int a = (import cnt)[k];
 } return void;
-given mk (0):() then (import cnt)[0]:(0)
-given mk (1):() then (import cnt)[1]:(5)
+given viamk (0):() then (import cnt)[0]:(0)
+given viamk (1):() then (import cnt)[1]:(5)
