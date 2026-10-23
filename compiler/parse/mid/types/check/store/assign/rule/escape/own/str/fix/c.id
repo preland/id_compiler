@@ -12,6 +12,7 @@ esc_sfix() {
   esc_fs_d();
   esc_fs_e();
 } chain () {
+  esc_fs_f();
   lset((import sqbase), 0, (import efs_acc));
 } return void;
 given esc_sfix ():() then calls lset:((import sqbase), 0, (import efs_acc))

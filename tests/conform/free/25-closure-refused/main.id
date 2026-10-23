@@ -1,0 +1,12 @@
+main(int argc, string[] argv) {
+  stash([5, 6]);
+  hand([7, 8]);
+  nest([9, 10]);
+} chain (int argc, string[] argv) {
+  func(int) return int a = (import held);
+  func(int) return int b = (import kept);
+  func(int) return int c = (import nested);
+} chain (int argc, string[] argv) {
+  int d = tally(4);
+  print(a(1) + b(0) + c(1) + d);
+} return int 0;

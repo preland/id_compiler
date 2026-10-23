@@ -1,0 +1,18 @@
+// The closure half of the ownership fixture (a.id describes the rest):
+//
+//   fs_clo   { func(int) return int k = bind(fs_acc, n); }   return n   owned, freed at the exit
+//   fs_cnone { func(int) return int k = fs_acc; }            return n   holds a named function, not owned
+
+esc_fs_f() {
+  export int efs_vf = node_txt("var", "fs_acc");
+  export int efs_bn = node_call("bind", [(import efs_vf), (import efs_vn)]);
+  export int efs_dk = node_decl("func(int) return int", "k", (import efs_bn), 0);
+} chain () {
+  export int efs_clo = node_func("fs_clo", "int", (import efs_np), [(import efs_dk)], (import efs_vn));
+  export int efs_dq = node_decl("func(int) return int", "k", (import efs_vf), 0);
+  export int efs_cnone = node_func("fs_cnone", "int", (import efs_np), [(import efs_dq)], (import efs_vn));
+} return void;
+given esc_sfix ():() then calls node_txt:("var", "fs_acc") then calls node_call:("bind", [(import efs_vf), (import efs_vn)]) then calls node_decl:("func(int) return int", "k", (import efs_bn), 0)
+given esc_sfix ():() then calls node_func:("fs_clo", "int", (import efs_np), [(import efs_dk)], (import efs_vn)) then calls node_decl:("func(int) return int", "k", (import efs_vf), 0) then calls node_func:("fs_cnone", "int", (import efs_np), [(import efs_dq)], (import efs_vn))
+given esc_sfix ():() then (import chkfail)[0]:(0)
+given esc_sfix ():() then init_units:(0)

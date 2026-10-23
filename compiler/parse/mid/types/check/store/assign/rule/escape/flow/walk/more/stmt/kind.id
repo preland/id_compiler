@@ -20,7 +20,7 @@ esc_nonlit2(int e) {
   int r = 2;
   if(esc_fresh_node(e) == 1) {
     r = 16 + esc_fbad(e);
-  } else if(str_fresh_node(e) == 1) {
+  } else if(esc_fresh_obj(e) == 1) {
     r = 16;
   }
 } return int r;

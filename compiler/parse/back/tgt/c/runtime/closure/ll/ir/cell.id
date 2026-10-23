@@ -6,7 +6,7 @@
 lw_clo_set(int o, int fn, int idx, int i, int a) {
   string pt = (import ns1)[(import nl1)[fn][i]];
   int cellv = lw_clo_cell(a, pt);
-  lw_callf("id_clo_set", "string", [o, idx, cellv]);
+  lw_callf(clo_setter(pt), "string", [o, idx, cellv]);
 } return void;
 given lw_clo_fixture (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[0]:("7")
 given lw_clo_fixture (5, (import lb_fn), 6, 0, (import lb_lit)):() then (import istr)[2]:("id_clo_set")

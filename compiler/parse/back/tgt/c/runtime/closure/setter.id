@@ -1,0 +1,15 @@
+// The runtime call that stores one captured value into a closure's cell. A cell
+// that holds a list is stored with id_clo_setl, which records in the closure
+// that the cell is a list the closure alone owns (the copy bind made), so
+// id_clo_free can give it back with the object; every other cell is plain
+// id_clo_set. Both targets spell the call from the type of the parameter the
+// value fixes.
+
+clo_setter(string pt) {
+  string s = "id_clo_set";
+  if(ty_is_list(pt) == 1) {
+    s = "id_clo_setl";
+  }
+} return string s;
+("int[]"):("id_clo_setl")
+("string"):("id_clo_set")

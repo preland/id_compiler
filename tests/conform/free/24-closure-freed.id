@@ -1,0 +1,21 @@
+// A closure held only by a local, assigned only from bind and never kept, is
+// freed with the list it copied when its scope ends: a pass of the loop frees
+// the closure of the pass before, and the last one is freed at the exit. Under
+// the guard a free of a closure that was still called is a trap.
+pick_at(int[] xs, int i) {
+  int r = xs[i];
+} return int r;
+
+total(int[] xs, int n) {
+  int t = 0;
+  int i = 0;
+  while(i < n) {
+    func(int) return int f = bind(pick_at, xs);
+    t = t + f(i);
+    i = i + 1;
+  }
+} return int t;
+
+main(int argc, string[] argv) {
+  print(total([3, 4], 2));
+} return int 0;

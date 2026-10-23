@@ -20,11 +20,13 @@
 
 esc_sown(int fn, string nm, string t) {
   int ok = 0;
-  if(t == "string" && esc_hosted() == 1) {
+  if((t == "string" || ty_is_func(t) == 1) && esc_hosted() == 1) {
     ok = esc_sflags(fn, nm);
   }
 } return int ok;
 given esc_sfix ((import efs_acc), "s", "string"):(1)
+given esc_sfix ((import efs_clo), "k", "func(int) return int"):(1)
+given esc_sfix ((import efs_cnone), "k", "func(int) return int"):(0)
 given esc_sfix ((import efs_acc), "s", "int[]"):(0)
 given esc_sfix_fs ((import efs_acc), "s", "string"):(0)
 

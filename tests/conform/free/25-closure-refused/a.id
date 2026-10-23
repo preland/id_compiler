@@ -1,0 +1,16 @@
+// A closure that outlives its function is never freed. Each function here makes
+// a closure over a list copy and lets it escape one way; main calls all three
+// after they have returned, and under the guard a free of any list copy is a
+// trap. tally's closure is held by nothing, so it alone is freed.
+pick_at(int[] xs, int i) {
+  int r = xs[i];
+} return int r;
+
+twice(func(int) return int h, int x) {
+  int r = h(x) + h(x);
+} return int r;
+
+stash(int[] xs) {
+  func(int) return int f = bind(pick_at, xs);
+  export func(int) return int held = f;
+} return void;

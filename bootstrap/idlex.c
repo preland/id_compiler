@@ -870,13 +870,28 @@ typedef struct IdFn { void* fn; void* raw; long long n; } IdFn;
 #define ID_FNC(f) ((long long*)((char*)(f) + sizeof(IdFn)))
 #define ID_FNV(x) ({ extern IdFn idfn_o_##x; &idfn_o_##x; })
 ID_CLO IdFn* id_clo_make(void* fn, int n) {
-    IdFn* o = (IdFn*)id_alloc(id_add_check(sizeof(IdFn), id_mul_check(sizeof(long long), (size_t)n, "closure"), "closure"));
-    memset(ID_FNC(o), 0, (size_t)n * sizeof(long long));
+    IdFn* o = (IdFn*)id_alloc(id_add_check(sizeof(IdFn), id_mul_check(sizeof(long long), (size_t)n + 1, "closure"), "closure"));
+    memset(ID_FNC(o), 0, ((size_t)n + 1) * sizeof(long long));
     o->fn = fn; o->raw = 0; o->n = n;
     return o;
 }
 ID_CLO IdFn* id_clo_new(const IdFn* t) { return id_clo_make(t->fn, (int)t->n); }
 ID_CLO IdFn* id_clo_set(IdFn* o, int i, long long v) { ID_FNC(o)[i] = v; return o; }
+ID_CLO IdFn* id_clo_setl(IdFn* o, int i, long long v) {
+    ID_FNC(o)[i] = v;
+    if (i < 63) ID_FNC(o)[o->n] |= 1LL << i;
+    return o;
+}
+ID_CLO void id_clo_free(IdFn* o) {
+    if (!o) return;
+    if (id_fguard < 0) { const char* e = getenv("ID_FREE_GUARD"); id_fguard = (e && e[0] == '1'); }
+    if (o->n < 0) id_freed_trap();
+    long long m = ID_FNC(o)[o->n];
+    for (int i = 0; i < 63 && i < o->n; i++) if ((m >> i) & 1) id_list_free((IdList*)(intptr_t)ID_FNC(o)[i]);
+    size_t cells = (size_t)o->n + 1;
+    if (id_fguard) { memset(ID_FNC(o), 0xDD, cells * sizeof(long long)); o->n = -1; return; }
+    id_pool_free(o, sizeof(IdFn) + cells * sizeof(long long));
+}
 ID_CLO IdList* id_clo_copy(IdList* L) {
     if (!L) id_null_read();
     IdList* M = id_list_new();

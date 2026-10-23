@@ -4,11 +4,12 @@
 // Lists are copied by `bind` and keep nothing, which arg_ctx already says.
 esc_bindc(string cname, int i, int a) {
   int c = 0;
-  if(cname == "bind" && i > 0 && type_of(a) == "string") {
+  if(cname == "bind" && i > 0 && (type_of(a) == "string" || str_starts(type_of(a), "func") == 1)) {
     c = 1;
   }
 } return int c;
 given esc_sfix ("bind", 1, (import efs_lit0)):(1)
+given esc_sfix given tcache_set((import efs_bn), "func(int) return int") ("bind", 1, (import efs_bn)):(1)
 given esc_sfix ("bind", 0, (import efs_lit0)):(0)
 given esc_sfix ("len", 1, (import efs_lit0)):(0)
 given esc_sfix ("bind", 1, (import efs_one)):(0)

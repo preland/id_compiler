@@ -1,0 +1,14 @@
+// Whether a store's value is a block made at this very expression that nothing
+// else names: a fresh string (str_fresh_node), or the closure a `bind` makes
+// (docs/MEMORY.md 3.5), whose object and the lists it copied belong to it alone.
+// Bit 16 of the store walk (kind.id) is what lets a name own it.
+
+esc_fresh_obj(int e) {
+  int ok = str_fresh_node(e);
+  if((import nkind)[e] == "call" && (import ns1)[e] == "bind") {
+    ok = 1;
+  }
+} return int ok;
+given esc_sfix ((import efs_sum)):(1)
+given esc_sfix ((import efs_bn)):(1)
+given esc_sfix ((import efs_cl)):(0)

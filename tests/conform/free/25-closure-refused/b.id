@@ -1,0 +1,14 @@
+keep(func(int) return int h) {
+  export func(int) return int kept = h;
+} return void;
+
+hand(int[] xs) {
+  func(int) return int f = bind(pick_at, xs);
+  keep(f);
+} return void;
+
+nest(int[] xs) {
+  func(int) return int f = bind(pick_at, xs);
+  func(int) return int g = bind(twice, f);
+  export func(int) return int nested = g;
+} return void;

@@ -1,0 +1,4 @@
+tally(int n) {
+  func(int) return int t = bind(pick_at, [n, n]);
+  int r = t(1);
+} return int r;

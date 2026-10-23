@@ -13,8 +13,12 @@ vm_bg(int id, word wa, word wb, word wc) {
 } chain (int id, word wa, word wb, word wc) {
   if (id == (import b_str_dup)) {
     wr = wa;
+  } else if (id == (import b_clo_setl)) {
+    wr = vm_bk((import b_clo_set), wa, wb, wc);
   }
 } return word wr;
+given vb_boot given tf_lnew given vm_b_list_push(1, 7) given vm_b_list_push(1, 0) given vm_b_list_push(1, 2) given vm_b_list_push(1, 0) given vm_b_list_push(1, 0) (68, 1, 1, 9):(0) then (import ex_lists):([[], [7, 0, 2, 0, 9]])
+given vb_boot (69, 1, 0, 0):(0)
 given vb_boot given tf_sput("hello") (62, 1, 1, 3):(2) then (import ex_strs):(["", "hello", "ell"])
 given vb_boot given tf_sput("ab") given tf_sput("cd") (63, 1, 2, 3):(3) then (import ex_strs):(["", "ab", "cd", "abcd"])
 given vb_boot given tf_sput("ab") given tf_sput("cd") (63, 1, 2, 0):(3) then (import ex_strs):(["", "ab", "cd", "abcd"])

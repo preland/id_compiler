@@ -1,8 +1,7 @@
-// KNOWN LEAK, pinned as it is today: id_clo_make has no free, so the closure a
-// bind makes on every pass is never given back, and the copy of the list it
-// captured goes with it. P1.1b step 4 (id_clo_free for a local assigned only
-// from bind) flips this case: allocated lists must then equal freed ones plus
-// argv, and this expectation is rewritten.
+// The closure a bind makes on every pass is a local assigned only from bind and
+// never kept, so id_clo_free gives it back with the copy of the list it
+// captured: one freed list per pass. What stays allocated is argv and the list
+// literal handed to spin, which main does not own.
 pick_at(int[] xs, int i) {
   int r = xs[i];
 } return int r;
