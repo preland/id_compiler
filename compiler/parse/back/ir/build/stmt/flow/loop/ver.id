@@ -36,8 +36,9 @@ given lp_reset (7, "id_list_set", "id_list_cell_set"):("id_list_set")
 lv_copy(int lv_n, int lv_b, int lv_jn, int lv_on) {
   lw_go(lv_b);
   lset((import lpon), 0, lv_on);
-  lw_while(lv_n);
+  lh_hoist(lv_n, lv_on);
 } chain (int lv_n, int lv_b, int lv_jn, int lv_on) {
+  lw_while(lv_n);
   lset((import lpon), 0, 0);
   lw_term("br", 0 - 1, [lv_jn]);
 } return void;

@@ -1202,8 +1202,6 @@ ID_CLO IdFn* id_fn_plain(void* fn, void* raw) {
 #endif
 static void id_eprint(const char* s) { fflush(stdout); fprintf(IDTC_EPRINT_TO, "%s\n", s); }
 /* forward declarations */
-void id_idstd_hash_map_copy_new(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, IdList* idstd_new_keys, IdList* idstd_new_values, IdList* idstd_new_used, int idstd_i);
-void id_idstd_hash_map_copy_new_one(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, IdList* idstd_new_keys, IdList* idstd_new_values, IdList* idstd_new_used, int idstd_i);
 int id_hash_map_get(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, char* idstd_key, int idstd_default);
 int id_hash_map_has(IdList* idstd_keys, IdList* idstd_used, char* idstd_key);
 void id_hash_map_initialize(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, IdList* idstd_count_cell);
@@ -1220,6 +1218,8 @@ void id_idstd_hash_map_rehash_slot(IdList* idstd_keys, IdList* idstd_values, IdL
 int id_idstd_hash_map_probe(IdList* idstd_keys, IdList* idstd_used, char* idstd_key, int idstd_i);
 int id_idstd_hash_map_slot(IdList* idstd_keys, IdList* idstd_used, char* idstd_key);
 int id_idstd_hash_map_full(IdList* idstd_used, IdList* idstd_count_cell);
+void id_idstd_hash_map_clear(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, int idstd_i, int idstd_cap);
+void id_idstd_hash_map_clear_one(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, int idstd_i);
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v);
 void id_sset(IdList* idstd_strs, int idstd_i, char* idstd_s);
 int id_list_get_or(IdList* idstd_xs, int idstd_i, int idstd_default_value);
@@ -1453,6 +1453,7 @@ int id_lb_b2(int node);
 int id_lb_b3(int node);
 int id_lb_b4(int node);
 int id_lw_len(int node);
+int id_lh_len(IdList* lh_args, char* lh_t);
 int id_lw_push(int node);
 int id_lw_push2(int node, int a, char* elem);
 int id_lw_pop(int node);
@@ -1650,6 +1651,9 @@ int id_gd_load(char* gdv_name);
 int id_gd_wide(int gdv_val);
 int id_gd_raw(char* gdv_op, int gdv_list);
 int id_gd_guard(void);
+void id_lh_hoist(int lh_w, int lh_on);
+void id_lh_take(int lh_n, int lh_lo, int lh_hi);
+int id_lh_pick(int lh_a);
 void id_lw_loop(int lv_n);
 void id_lw_versioned(int lv_n);
 int id_lv_plan(int lv_n);
@@ -4733,6 +4737,7 @@ IdList* lpbad;  /* exported by lp_reset() */
 IdList* lpg;  /* exported by lp_reset() */
 IdList* lph;  /* exported by lp_reset() */
 IdList* lphn;  /* exported by lp_reset() */
+IdList* lphv;  /* exported by lp_reset() */
 IdList* tctys;  /* exported by tc_types_init() */
 IdList* tcsts;  /* exported by tc_types_init() */
 IdList* tyc;  /* exported by init_tyc() */
@@ -5168,21 +5173,6 @@ static void idfs_GuiTbHist(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L)
 static void idfr_GuiTbHist(IdList* p) { id_frs_run(p, idfs_GuiTbHist); }
 static void idfs_GuiTip(void* p, IdFrSt* s) { IdList* L = p; (void)s; if (!L) return; if (L->cap != INT_MIN) { id_list_free((void*)(intptr_t)L->data[0]); id_str_free((void*)(intptr_t)L->data[1]); } id_list_free(L); }
 static void idfr_GuiTip(IdList* p) { id_frs_run(p, idfs_GuiTip); }
-void id_idstd_hash_map_copy_new(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, IdList* idstd_new_keys, IdList* idstd_new_values, IdList* idstd_new_used, int idstd_i) {
-    while ((idstd_i < id_list_len(idstd_new_keys))) {
-        id_idstd_hash_map_copy_new_one(idstd_keys, idstd_values, idstd_used, idstd_new_keys, idstd_new_values, idstd_new_used, idstd_i);
-        idstd_i = (idstd_i + 1);
-    }
-    return;
-}
-
-void id_idstd_hash_map_copy_new_one(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, IdList* idstd_new_keys, IdList* idstd_new_values, IdList* idstd_new_used, int idstd_i) {
-    id_list_push(idstd_keys, (long long)(intptr_t)((char*)(intptr_t)(id_list_get(idstd_new_keys, idstd_i))));
-    id_list_push(idstd_values, (long long)((int)(id_list_get(idstd_new_values, idstd_i))));
-    id_list_push(idstd_used, (long long)((int)(id_list_get(idstd_new_used, idstd_i))));
-    return;
-}
-
 int id_hash_map_get(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, char* idstd_key, int idstd_default) {
     int idstd_slot;
     int idstd_ret_i;
@@ -5277,11 +5267,12 @@ void id_idstd_hash_map_grow(IdList* idstd_keys, IdList* idstd_values, IdList* id
     { IdList* idfe_o = idstd_new_values; idstd_new_values = id_list_lit(0); id_list_free(idfe_o); }
     { IdList* idfe_o = idstd_new_used; idstd_new_used = id_list_lit(0); id_list_free(idfe_o); }
     idstd_old_capacity = id_list_len(idstd_keys);
-    idstd_new_capacity = (idstd_old_capacity * 2);
-    id_idstd_hash_map_fill(idstd_new_keys, idstd_new_values, idstd_new_used, idstd_new_capacity);
-    id_idstd_hash_map_rehash(idstd_keys, idstd_values, idstd_used, idstd_new_keys, idstd_new_values, idstd_new_used, 0);
-    id_idstd_hash_map_copy_old(idstd_keys, idstd_values, idstd_used, idstd_new_keys, idstd_new_values, idstd_new_used, 0, idstd_old_capacity);
-    id_idstd_hash_map_copy_new(idstd_keys, idstd_values, idstd_used, idstd_new_keys, idstd_new_values, idstd_new_used, idstd_old_capacity);
+    idstd_new_capacity = (idstd_old_capacity * 4);
+    id_idstd_hash_map_fill(idstd_new_keys, idstd_new_values, idstd_new_used, idstd_old_capacity);
+    id_idstd_hash_map_fill(idstd_keys, idstd_values, idstd_used, (idstd_new_capacity - idstd_old_capacity));
+    id_idstd_hash_map_copy_old(idstd_new_keys, idstd_new_values, idstd_new_used, idstd_keys, idstd_values, idstd_used, 0, idstd_old_capacity);
+    id_idstd_hash_map_clear(idstd_keys, idstd_values, idstd_used, 0, idstd_old_capacity);
+    id_idstd_hash_map_rehash(idstd_new_keys, idstd_new_values, idstd_new_used, idstd_keys, idstd_values, idstd_used, 0);
     { id_list_free(idstd_new_keys); id_list_free(idstd_new_values); id_list_free(idstd_new_used); return; }
 }
 
@@ -5324,6 +5315,21 @@ int id_idstd_hash_map_full(IdList* idstd_used, IdList* idstd_count_cell) {
 int idsq_11;
     idstd_ret_i = (idsq_11 = (int)(id_list_get(idstd_count_cell, 0)), (((idsq_11 + 1) * 2) > id_list_len(idstd_used)));
     return idstd_ret_i;
+}
+
+void id_idstd_hash_map_clear(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, int idstd_i, int idstd_cap) {
+    while ((idstd_i < idstd_cap)) {
+        id_idstd_hash_map_clear_one(idstd_keys, idstd_values, idstd_used, idstd_i);
+        idstd_i = (idstd_i + 1);
+    }
+    return;
+}
+
+void id_idstd_hash_map_clear_one(IdList* idstd_keys, IdList* idstd_values, IdList* idstd_used, int idstd_i) {
+    id_list_set(idstd_keys, idstd_i, (long long)(intptr_t)(ID_S("")));
+    id_list_set(idstd_values, idstd_i, (long long)(0));
+    id_list_set(idstd_used, idstd_i, (long long)(0));
+    return;
 }
 
 void id_lset(IdList* idstd_xs, int idstd_i, int idstd_v) {
@@ -7671,8 +7677,20 @@ int id_lw_len(int node) {
     int ret_i;
     l1_of_v = (IdList*)(intptr_t)(id_list_get(nl1, node));
     t = id_lw_ety((int)(id_list_get(l1_of_v, 0)));
-    ret_i = id_lw_len_tail(l1_of_v, t);
+    ret_i = id_lh_len(l1_of_v, t);
     return ret_i;
+}
+
+int id_lh_len(IdList* lh_args, char* lh_t) {
+    int lh_r;
+    lh_r = (0 - 1);
+    if ((strcmp(lh_t, ID_S("string")) != 0)) {
+        lh_r = id_lh_pick((int)(id_list_get(lh_args, 0)));
+    }
+    if ((lh_r < 0)) {
+        lh_r = id_lw_len_tail(lh_args, lh_t);
+    }
+    return lh_r;
 }
 
 int id_lw_push(int node) {
@@ -9602,6 +9620,44 @@ int id_gd_guard(void) {
     return gdg_acc;
 }
 
+void id_lh_hoist(int lh_w, int lh_on) {
+    int lh_lo;
+    int lh_hi;
+    int lh_k;
+    lh_lo = ((int)(id_list_get(ni1, lh_w)) + 1);
+    lh_hi = (lh_w - 1);
+    lh_k = 0;
+    while (((lh_on == 1) && (lh_k < id_list_len(lpn)))) {
+        id_lh_take((int)(id_list_get(lpn, lh_k)), lh_lo, lh_hi);
+        lh_k = (lh_k + 1);
+    }
+    return;
+}
+
+void id_lh_take(int lh_n, int lh_lo, int lh_hi) {
+    char* lh_nm;
+    int lh_v;
+    lh_nm = id_lp_lname(lh_n);
+    if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, lh_n)), ID_S("call")) == 0) && (id_find_str(lphn, lh_nm) < 0)) && (id_lp_cnt(lh_lo, lh_hi, lh_nm, 0) == 0))) {
+        lh_v = id_lw_expr(lh_n);
+        id_list_push(lphn, (long long)(intptr_t)(lh_nm));
+        id_list_push(lphv, (long long)(lh_v));
+    }
+    return;
+}
+
+int id_lh_pick(int lh_a) {
+    int lh_r;
+    lh_r = (0 - 1);
+IdList* idsq_19;
+    if (((((int)(id_list_get(lpon, 0)) == 1) && (strcmp((char*)(intptr_t)(id_list_get(nkind, lh_a)), ID_S("var")) == 0)) && (idsq_19 = lphn, (id_find_str(idsq_19, (char*)(intptr_t)(id_list_get(ns1, lh_a))) >= 0)))) {
+IdList* idsq_11;
+IdList* idsq_9;
+        lh_r = (idsq_11 = lphv, idsq_9 = lphn, (int)(id_list_get(idsq_11, id_find_str(idsq_9, (char*)(intptr_t)(id_list_get(ns1, lh_a))))));
+    }
+    return lh_r;
+}
+
 void id_lw_loop(int lv_n) {
     int lv_p;
     lv_p = id_lv_plan(lv_n);
@@ -9658,6 +9714,7 @@ char* id_lv_callee(int lv_n, char* lv_plain, char* lv_cell) {
 void id_lv_copy(int lv_n, int lv_b, int lv_jn, int lv_on) {
     id_lw_go(lv_b);
     id_lset(lpon, 0, lv_on);
+    id_lh_hoist(lv_n, lv_on);
     id_lw_while(lv_n);
     id_lset(lpon, 0, 0);
     id_lw_term(ID_S("br"), (0 - 1), id_list_lit(1, (long long)(lv_jn)));
@@ -12517,6 +12574,7 @@ void id_lp_reset(void) {
     lpg = id_list_lit(0);
     lph = id_list_lit(0);
     lphn = id_list_lit(0);
+    lphv = id_list_lit(0);
     return;
 }
 

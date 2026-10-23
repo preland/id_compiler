@@ -1,0 +1,43 @@
+// The counterpart of the C target's tgt/c/emit/prog/code/body/fast/hoist_len.id.
+// A limit `len(xs)` of a versioned loop is lowered once, in the block that
+// enters the guarded copy, and every `len(xs)` that copy asks for afterwards is
+// that value. The copy exists only when the body cannot push or pop (lp_clean)
+// and does not reassign xs (lp_held, lp_lim), so the length is the same on every
+// iteration; read inside the loop, id_list_len's trap exits made the loop
+// uncountable and clang would not vectorise it. The read is still the checked
+// one, so a list that is not there still traps, at the entry the first test
+// would have trapped at. The fallback copy keeps its read per iteration.
+
+lh_hoist(int lh_w, int lh_on) {
+  int lh_lo = (import ni1)[lh_w] + 1;
+  int lh_hi = lh_w - 1;
+  int lh_k = 0;
+} chain (int lh_w, int lh_on) {
+  while(lh_on == 1 && lh_k < len((import lpn))) {
+    lh_take((import lpn)[lh_k], lh_lo, lh_hi);
+    lh_k = lh_k + 1;
+  }
+} return void;
+given lv_fix given lv_hit ((import lpf_wa), 1):() then len((import lphv)):(0)
+given lv_fix given lv_hit ((import lpf_wa), 0):() then len((import lphn)):(0)
+
+lh_take(int lh_n, int lh_lo, int lh_hi) {
+  string lh_nm = lp_lname(lh_n);
+  if((import nkind)[lh_n] == "call" && find_str((import lphn), lh_nm) < 0 && lp_cnt(lh_lo, lh_hi, lh_nm, 0) == 0) {
+    int lh_v = lw_expr(lh_n);
+    push((import lphn), lh_nm);
+    push((import lphv), lh_v);
+  }
+} return void;
+given lv_fix given lv_hit ((import lpf_na), 0, 0):() then len((import lphn)):(0)
+given lv_fix given lv_hit ((import lpf_wa), 0, 0):() then len((import lphv)):(0)
+
+lh_pick(int lh_a) {
+  int lh_r = 0 - 1;
+  if((import lpon)[0] == 1 && (import nkind)[lh_a] == "var" && find_str((import lphn), (import ns1)[lh_a]) >= 0) {
+    lh_r = (import lphv)[find_str((import lphn), (import ns1)[lh_a])];
+  }
+} return int lh_r;
+given lv_fix given lv_hit ((import lpf_na)):(-1)
+given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) ((import lpf_na)):(9)
+given lv_fix given lv_hit given list_string_extend((import lphn), ["lan"]) given list_extend((import lphv), [9]) given lset((import lpon), 0, 0) ((import lpf_na)):(-1)
