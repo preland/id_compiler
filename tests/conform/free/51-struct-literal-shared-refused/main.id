@@ -1,0 +1,5 @@
+main(int argc, string[] argv) {
+  string s = "k" + argc;
+  int a = build(s);
+  print(a + len(s));
+} return int 0;

@@ -6,7 +6,8 @@
 // constructor is fresh and so are its arguments when they are; a call of a
 // function that returns fresh with fields of its own is fresh (the summary's two
 // bits, flow/sum/fresh/); a concatenation or a builtin that makes a string is.
-// A string literal is not, and neither is a name or a field read.
+// A string literal is not, and neither is a name or a field read; the one
+// place a literal is accepted is a constructor's argument (esc_okc).
 
 esc_ownv(int e) {
   int dz_o = 0;
@@ -23,7 +24,7 @@ given esc_dfix ((import efd_lbl)):(1)
 esc_ownc(int e) {
   int dz_o = str_fresh_node(e);
   if(esc_ctor(e) == 1) {
-    dz_o = esc_okl((import nl1)[e]);
+    dz_o = esc_okc((import nl1)[e]);
   } else if(esc_fresh_call(e) == 1) {
     dz_o = esc_ndf(e) == 0;
   }

@@ -1,0 +1,8 @@
+// The literal is copied only when every argument of the constructor is a block
+// the struct can own. Here the name is the caller's string, which the caller
+// reads after the struct is gone, so the struct stays shallow: it alone is
+// freed, and the string is neither freed nor copied.
+build(string s) {
+  Tag t = Tag("fixed", s, 1);
+  int r = len(t.kind) + len(t.name);
+} return int r;

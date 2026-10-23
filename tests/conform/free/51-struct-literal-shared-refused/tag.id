@@ -1,0 +1,5 @@
+struct Tag {
+  string kind;
+  string name;
+  int n;
+}

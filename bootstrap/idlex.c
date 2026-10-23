@@ -1253,6 +1253,7 @@ static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
 static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_ZstdLoop(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
 static void idfr_ZstdDecoded(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }

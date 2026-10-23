@@ -1,0 +1,17 @@
+// The argument list of a constructor, as esc_okl asks it of a list literal's
+// elements, except that a string literal is accepted: the emitters give the
+// field a heap copy of it (esc_cdup), which the struct's free then finds.
+
+esc_okc(int[] els) {
+  int ok = 1;
+  int i = 0;
+  while(i < len(els)) {
+    if(esc_heap_ty(type_of(els[i])) == 1 && esc_ownv(els[i]) == 0 && (import nkind)[els[i]] != "str") {
+      ok = 0;
+    }
+    i = i + 1;
+  }
+} return int ok;
+given esc_ms_fix ([(import ems_lit), (import ems_cat)]):(1)
+given esc_ms_fix ([(import ems_lit), (import ems_sv)]):(0)
+given esc_ms_fix ([]):(1)

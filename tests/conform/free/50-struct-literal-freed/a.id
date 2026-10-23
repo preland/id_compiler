@@ -1,0 +1,8 @@
+// A string literal in a constructor is copied to the heap, so the struct that
+// holds it is freed by type with its other string: one struct (a list) and
+// three strings, the copy of "fixed", the concatenation and the text of n that
+// the concatenation made on the way.
+build(int n) {
+  Tag t = Tag("fixed", "k" + n, n);
+  int r = len(t.kind) + len(t.name);
+} return int r;

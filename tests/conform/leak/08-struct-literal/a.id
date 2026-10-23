@@ -1,0 +1,18 @@
+// A string literal in a constructor is a static object, so a struct holding one
+// used to count as shallow and its other strings were never given back. The
+// constructor now copies the literal to the heap, so the struct is freed by
+// type with all three: allocated minus freed does not grow with the number of
+// passes.
+build(int n) {
+  Tag t = Tag("fixed", "k" + n, n);
+  int r = len(t.kind) + len(t.name);
+} return int r;
+
+run(int n) {
+  int i = 0;
+  int s = 0;
+  while(i < n) {
+    s = s + build(i);
+    i = i + 1;
+  }
+} return int s;

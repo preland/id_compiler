@@ -1389,6 +1389,7 @@ char* id_lw_arr_elem(int node);
 int id_lw_iset_val(int node, char* elem);
 void id_lw_arr_push(int node, int i, int a, char* elem);
 void id_lw_arr_push2(int a, int v, char* elem);
+void id_lw_ctor_cell(int node, int i, int a, char* elem);
 int id_lw_ctor(int node);
 void id_lw_ctor_els(int node, int a);
 int id_lw_ctor_one(int node, int i, int a);
@@ -1930,7 +1931,7 @@ char* id_emit_expr(int id);
 char* id_ee2(int id);
 char* id_ee3(int id);
 char* id_ctor_cells(char* sd_nm, IdList* sd_as);
-char* id_ctor_cell(char* sd_nm, int sd_a, int sd_k);
+char* id_ctor_cell(char* sd_nm, IdList* sd_as, int sd_k);
 char* id_emit_ctor(int id);
 char* id_ctor_lit(char* sd_nm, IdList* sd_as);
 char* id_lit_fill(char* raw, int n);
@@ -4055,6 +4056,7 @@ int id_esc_litels(IdList* els);
 int id_esc_tdep(int b, char* nm);
 int id_esc_elbad2(int b, int v, int dz_dp);
 int id_esc_vbad(char* t, int v, int dz_dp);
+int id_esc_okc(IdList* els);
 int id_esc_ownv(int e);
 int id_esc_ownc(int e);
 int id_esc_okl(IdList* els);
@@ -4076,7 +4078,10 @@ int id_esc_cnts(IdList* stmts, char* nm);
 int id_esc_cntr(IdList* stmts, int lo, int hi, char* nm);
 int id_esc_cntf(int fn, char* nm);
 int id_esc_cbad(int e);
+int id_esc_abads(IdList* dz_as);
 int id_esc_abad(int a);
+int id_esc_cdup(char* sd, IdList* dz_as, int cdup_k);
+char* id_esc_ctor_code(char* sd, IdList* dz_as, int cdup_k, char* code);
 char* id_esc_stgt(int sn);
 int id_esc_mvnest(int fn, int sn, char* nm);
 int id_esc_mvctor(int fn, IdList* stmts, int i, int e);
@@ -4966,6 +4971,7 @@ static void idfr_XmlR(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_XmlW(IdList* p) { id_free_walk(p, "S3l.ls."); }
 static void idfr_Zip(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
 static void idfr_ZipW(IdList* p) { id_free_walk(p, "S3l.l.ls"); }
+static void idfr_ZstdLoop(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdBlock(IdList* p) { id_free_walk(p, "S3..S3..."); }
 static void idfr_ZstdDecoded(IdList* p) { id_free_walk(p, "S3S3...S3...."); }
 static void idfr_ZstdOffset(IdList* p) { id_free_walk(p, "S2.S3..."); }
@@ -7199,6 +7205,18 @@ void id_lw_arr_push2(int a, int v, char* elem) {
     return;
 }
 
+void id_lw_ctor_cell(int node, int i, int a, char* elem) {
+    IdList* els;
+    int v;
+    els = (IdList*)(intptr_t)(id_list_get(nl1, node));
+    v = id_lw_as((int)(id_list_get(els, i)), elem);
+    if ((id_esc_cdup((char*)(intptr_t)(id_list_get(ns1, node)), els, i) == 1)) {
+        v = id_lw_callf(ID_S("id_str_dup"), ID_S("string"), id_list_lit(1, (long long)(v)));
+    }
+    id_lw_arr_push2(a, v, elem);
+    return;
+}
+
 int id_lw_ctor(int node) {
     char* ty;
     int a;
@@ -7222,7 +7240,7 @@ int id_lw_ctor_one(int node, int i, int a) {
     int ret_i;
 IdList* idsq_19;
     sd_ft = (idsq_19 = sdftype, id_sd_cell(idsq_19, (char*)(intptr_t)(id_list_get(ns1, node)), i));
-    id_lw_arr_push(node, i, a, sd_ft);
+    id_lw_ctor_cell(node, i, a, sd_ft);
     ret_i = (i + 1);
     return ret_i;
 }
@@ -12599,18 +12617,18 @@ char* id_ctor_cells(char* sd_nm, IdList* sd_as) {
     { char* idfe_o = out; out = id_str_dup(ID_S("")); id_str_free(idfe_o); }
     sd_k = 0;
     while ((sd_k < id_list_len(sd_as))) {
-char* idsq_17;
-        out = (idsq_17 = id_sep_at(ID_S(", "), sd_k), id_concat_f(id_concat_f(out, idsq_17, 1), id_ctor_cell(sd_nm, (int)(id_list_get(sd_as, sd_k)), sd_k), 3));
+char* idsq_15;
+        out = (idsq_15 = id_sep_at(ID_S(", "), sd_k), id_concat_f(id_concat_f(out, idsq_15, 1), id_ctor_cell(sd_nm, sd_as, sd_k), 3));
         sd_k = (sd_k + 1);
     }
     return out;
 }
 
-char* id_ctor_cell(char* sd_nm, int sd_a, int sd_k) {
+char* id_ctor_cell(char* sd_nm, IdList* sd_as, int sd_k) {
     char* sd_code;
     char* sd_ft;
     char* ret_s = NULL;
-    sd_code = id_emit_expr(sd_a);
+    sd_code = id_esc_ctor_code(sd_nm, sd_as, sd_k, id_emit_expr((int)(id_list_get(sd_as, sd_k))));
     sd_ft = id_sd_cell(sdftype, sd_nm, sd_k);
     { char* idfe_o = ret_s; ret_s = id_box(sd_code, sd_ft); id_str_free(idfe_o); }
     return ret_s;
@@ -35163,6 +35181,21 @@ int id_esc_vbad(char* t, int v, int dz_dp) {
     return r;
 }
 
+int id_esc_okc(IdList* els) {
+    int ok;
+    int i;
+    ok = 1;
+    i = 0;
+    while ((i < id_list_len(els))) {
+IdList* idsq_17;
+        if ((((id_esc_heap_ty(id_type_of((int)(id_list_get(els, i)))) == 1) && (id_esc_ownv((int)(id_list_get(els, i))) == 0)) && (idsq_17 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_17, (int)(id_list_get(els, i)))), ID_S("str")) != 0)))) {
+            ok = 0;
+        }
+        i = (i + 1);
+    }
+    return ok;
+}
+
 int id_esc_ownv(int e) {
     int dz_o;
     dz_o = 0;
@@ -35178,7 +35211,7 @@ int id_esc_ownc(int e) {
     int dz_o;
     dz_o = id_str_fresh_node(e);
     if ((id_esc_ctor(e) == 1)) {
-        dz_o = id_esc_okl((IdList*)(intptr_t)(id_list_get(nl1, e)));
+        dz_o = id_esc_okc((IdList*)(intptr_t)(id_list_get(nl1, e)));
     } else if ((id_esc_fresh_call(e) == 1)) {
         dz_o = (id_esc_ndf(e) == 0);
     }
@@ -35413,11 +35446,15 @@ int id_esc_cntf(int fn, char* nm) {
 
 int id_esc_cbad(int e) {
     int r;
+    r = id_esc_abads((IdList*)(intptr_t)(id_list_get(nl1, e)));
+    return r;
+}
+
+int id_esc_abads(IdList* dz_as) {
+    int r;
     int i;
-    IdList* dz_as;
     r = 0;
     i = 0;
-    dz_as = (IdList*)(intptr_t)(id_list_get(nl1, e));
     while (((i < id_list_len(dz_as)) && (r == 0))) {
         r = id_esc_abad((int)(id_list_get(dz_as, i)));
         i = (i + 1);
@@ -35429,9 +35466,28 @@ int id_esc_abad(int a) {
     int r;
     r = 0;
     if (((id_esc_heap_ty(id_type_of(a)) == 1) && (id_esc_ownv(a) == 0))) {
-        r = ((strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("var")) != 0) || (id_esc_list_of(id_type_of(a), 0) == 0));
+        r = ((strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("str")) != 0) && ((strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("var")) != 0) || (id_esc_list_of(id_type_of(a), 0) == 0)));
     }
     return r;
+}
+
+int id_esc_cdup(char* sd, IdList* dz_as, int cdup_k) {
+    int d;
+    d = 0;
+IdList* idsq_21;
+    if (((idsq_21 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_21, (int)(id_list_get(dz_as, cdup_k)))), ID_S("str")) == 0)) && (id_esc_dkind(sd) == 3))) {
+        d = (id_esc_abads(dz_as) == 0);
+    }
+    return d;
+}
+
+char* id_esc_ctor_code(char* sd, IdList* dz_as, int cdup_k, char* code) {
+    char* s;
+    s = code;
+    if ((id_esc_cdup(sd, dz_as, cdup_k) == 1)) {
+        s = id_concat_f(id_concat(ID_S("id_str_dup("), code), ID_S(")"), 1);
+    }
+    return s;
 }
 
 char* id_esc_stgt(int sn) {

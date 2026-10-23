@@ -24,6 +24,7 @@ sd_use_fixture() {
   sd_use_reads();
 } chain () {
   sd_use_writes();
+  init_rtc();
 } return void;
 ():() then calls add_var:("p", "P", 0)
 ():() then calls add_var:("n", "int", 0)
