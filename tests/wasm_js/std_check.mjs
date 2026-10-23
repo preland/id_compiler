@@ -51,19 +51,23 @@ await check("fs_load_bytes and fs_save_bytes carry 0 and 255 through the fs back
 });
 
 await check("fs_drop_exit paths are gone after dispose()", async () => {
-  const before = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith("idw")).length;
-  const m = await std.load();
-  m.roundtrip("x");
-  m.scratch("y");
-  const during = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith("idw")).length;
-  assert.ok(during >= before + 2, "created " + (during - before));
-  m.dispose();
-  assert.equal(fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith("idw")).length, before);
+  const own = fs.mkdtempSync("/tmp/idwo");
+  try {
+    const mine = () => fs.readdirSync(own).length;
+    const m = await std.load(undefined, { env: { ...process.env, TMPDIR: own } });
+    m.roundtrip("x");
+    m.scratch("y");
+    assert.equal(mine(), 2, "created " + mine());
+    m.dispose();
+    assert.equal(mine(), 0);
+  } finally {
+    fs.rmSync(own, { recursive: true, force: true });
+  }
 });
 
 await check("the same program on an in-memory file system never touches the disk", async () => {
   const files = std.createMemFs({ "/data/in.txt": "memory text" });
-  const m = await std.load(undefined, { fs: files });
+  const m = await std.load(undefined, { fs: files, env: { ...process.env, TMPDIR: "/tmp" } });
   assert.equal(m.slurp("/data/in.txt"), "memory text");
   assert.equal(m.roundtrip("virtual"), "virtual7");
   assert.deepEqual(m.scratch("zz"), ["f.txt", ""]);
