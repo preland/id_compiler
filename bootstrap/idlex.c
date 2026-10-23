@@ -512,7 +512,18 @@ static long long id_bits_of_float(double d) { return id_box_f(d); }
 static double id_float_of_bits(long long x) { return id_unbox_f(x); }
 static long long id_bits32_of_float(double d) { float f = (float)d; unsigned int u; memcpy(&u, &f, 4); return (long long)u; }
 static double id_float_of_bits32(long long x) { unsigned int u = (unsigned int)x; float f; memcpy(&f, &u, 4); return (double)f; }
-static int id_to_int(const char* s) { return atoi(s); }
+static int id_to_int(const char* s) {
+    while (*s == 32 || (*s >= 9 && *s <= 13)) s++;
+    int neg = *s == '-';
+    if (*s == '-' || *s == '+') s++;
+    unsigned long long lim = neg ? 9223372036854775808ULL : 9223372036854775807ULL, u = 0;
+    for (; *s >= '0' && *s <= '9'; s++) {
+        unsigned int d = (unsigned int)(*s - '0');
+        if (u > (lim - d) / 10) { u = lim; break; }
+        u = u * 10 + d;
+    }
+    return (int)(unsigned int)(neg ? 0ULL - u : u);
+}
 
 static char* id_concat(const char* a, const char* b) {
     size_t la = id_slen(a), lb = id_slen(b);
