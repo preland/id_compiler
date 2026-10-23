@@ -7,6 +7,7 @@ arith_fix() {
   arith_fix2(ai0);
 } return void;
 ():() then calls node_txt2:("int", "6", 6, 0)
+():() then calls node_txt2:("int", "3", 3, 0)
 ():() then init_units:(0)
 
 arith_fix2(int ai0) {
@@ -14,6 +15,8 @@ arith_fix2(int ai0) {
   int[] none = [];
   int ab0 = newnode("bin", ai0, ai1, "/", "", none, none);
 } return void;
+given arith_fix (0):() then calls node_txt2:("int", "3", 3, 0)
+given arith_fix (0):() then calls newnode:("bin", 0, 3, "/", "", [], [])
 given arith_fix (0):() then (import chkfail)[0]:(0)
 given arith_fix (0):() then init_units:(0)
 

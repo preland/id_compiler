@@ -36,5 +36,6 @@ lpf_more() {
   export int[] lpf_fl = [(import lpf_f1), (import lpf_f2), (import lpf_f3)];
 } return void;
 ():() then calls node_txt2:("int", "9", 9, 1)
+():() then calls node_txt2:("int", "-1", -1, 0)
 ():() then init_units:(0)
 ():() then calls lpf_lx:[1]

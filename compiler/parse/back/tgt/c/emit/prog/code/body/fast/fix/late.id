@@ -24,6 +24,7 @@ lpq_ln() {
   export int[] lpq_en = (import nl2)[lpq_qn];
 } return void;
 ():() then calls node_txt:("var", "lnn")
+():() then calls lpf_inc:("lnk", 1)
 ():() then init_units:(0)
 ():() then calls lpq_lm:[1]
 
@@ -44,6 +45,7 @@ lpq_lt() {
   export int lpq_vt = (import ni2)[lpq_xt];
 } return void;
 ():() then calls node_txt:("var", "ltn")
+():() then calls lpf_inc:("ltk", 1)
 ():() then init_units:(0)
 ():() then calls lpq_ln:[1]
 
@@ -64,5 +66,6 @@ lpq_lu() {
   export int lpq_vu = (import ni2)[lpq_xu];
 } return void;
 ():() then calls node_txt:("var", "lun")
+():() then calls lpf_inc:("luk", 2)
 ():() then init_units:(0)
 ():() then calls lpq_lt:[1]

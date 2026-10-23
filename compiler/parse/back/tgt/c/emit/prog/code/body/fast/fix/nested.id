@@ -17,6 +17,7 @@ lpf_lf() {
   export int lpf_hif = lpf_wf - 1;
 } return void;
 ():() then calls node_txt:("var", "lfn")
+():() then calls lpf_inc:("lfj", 1)
 ():() then init_units:(0)
 ():() then calls lpf_le:[1]
 
@@ -30,5 +31,6 @@ lpf_g1() {
   sym_func(lpf_f1);
 } return void;
 given lpf_lf ():() then calls node_func:("lpf_g1", "void", [], [(import lpf_wa), (import lpf_wb), (import lpf_wc), (import lpf_wd), (import lpf_we), (import lpf_wf)], -1)
+():() then len((import prog)):(3)
 ():() then init_units:(0)
 ():() then calls lpf_lf:[1]

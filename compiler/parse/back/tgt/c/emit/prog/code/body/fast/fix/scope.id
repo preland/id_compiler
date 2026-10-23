@@ -8,4 +8,5 @@ lpf_in(int lfi_k) {
   lset((import sqbase), 0, (import lpf_fl)[lfi_k]);
 } return void;
 (0):() then calls lpf_more:[1] then (import sqbase)[0]:(104)
+(1):() then (import sqbase)[0]:(120)
 (1):() then init_units:(0)
