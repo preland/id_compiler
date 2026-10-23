@@ -1656,9 +1656,16 @@ int id_scan_bin(char* src, int i) {
 long long id_bin_val(char* src, int i, int e) {
     long long v;
     v = 0;
-    while ((i < e)) {
-        v = (((v * 2) + id_character_code_at(src, i)) - 48);
-        i = (i + 1);
+    if ((src) != NULL && (e) <= (long long)id_slen((src)) - 0 && (i) >= 0) {
+        while ((i < e)) {
+            v = (((v * 2) + ((int)(unsigned char)(src)[i])) - 48);
+            i = (i + 1);
+        }
+    } else {
+        while ((i < e)) {
+            v = (((v * 2) + id_character_code_at(src, i)) - 48);
+            i = (i + 1);
+        }
     }
     return v;
 }

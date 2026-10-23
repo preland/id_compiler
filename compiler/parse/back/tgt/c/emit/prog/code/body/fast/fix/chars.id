@@ -1,0 +1,32 @@
+// A loop over a string: LS adds the codes of `lsv`, which is a string, with
+// character_code_at, and LY reads it at an index the guard cannot cover.
+// lpf_lsc runs the loop's condition, as lpf_cs does for the list loops.
+
+lpf_ls() {
+  lpf_more();
+  add_var("lsv", "string", 0);
+  export int lpf_hn = lpf_len("lsv");
+} chain () {
+  export int lpf_hc = lpf_lt("lsj", lpf_hn);
+  export int lpf_hx = node_call("character_code_at", [node_txt("var", "lsv"), node_txt("var", "lsj")]);
+  export int lpf_hy = node_call("character_code_at", [node_txt("var", "lsv"), (import lpf_vvs)]);
+} chain () {
+  export int lpf_hs = lpf_acc("lss", lpf_hx);
+  export int lpf_hi = lpf_inc("lsj", 1);
+  export int lpf_hw = lpf_wh(lpf_hc, lpf_hs, lpf_hi);
+} chain () {
+  export int lpf_hlo = (import ni1)[lpf_hw] + 1;
+  export int lpf_hhi = lpf_hw - 1;
+  export int lpf_ba = (import ni1)[(import lpf_xa)];
+} chain () {
+  export int lpf_hb = (import nl1)[lpf_hx][0];
+} return void;
+():() then init_units:(0)
+():() then calls lpf_more:[1]
+
+lpf_lsc() {
+  lpf_ls();
+  lp_cond((import lpf_hc));
+} return void;
+():() then (import lpj)[0]:("lsj")
+():() then len((import lpn)):(1)

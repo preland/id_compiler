@@ -1,0 +1,21 @@
+// The length of a string in the guard of a versioned loop: the runtime reads it
+// from the count stored in front of the bytes, the same load the C target's
+// id_slen is, and the guard compares it in 64 bits like a list's.
+
+gd_slen(int gds_str) {
+  int gds_cell = lw_callf("id_len", "int", [gds_str]);
+  int gds_out = gd_wide(gds_cell);
+} return int gds_out;
+given gd_vals (4):(6) then calls lw_callf:("id_len", "int", [4])
+given gd_vals (4):(6) then gd_last:("word sext ")
+
+gd_lenof(string gds_op, int gds_val) {
+  int gds_out = 0 - 1;
+  if(gds_op == "slen") {
+    gds_out = gd_slen(gds_val);
+  } else {
+    gds_out = gd_raw(gds_op, gds_val);
+  }
+} return int gds_out;
+given gd_vals ("slen", 4):(6) then calls lw_callf:("id_len", "int", [4])
+given gd_vals ("len", 4):(6) then calls lw_callf:("id_list_len_raw", "int", [4])

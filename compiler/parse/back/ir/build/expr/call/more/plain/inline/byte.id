@@ -1,0 +1,36 @@
+// character_code_at in the guarded copy of a versioned loop. The guard has
+// already proved 0 <= i < len(s), so the read is the byte at s+i with no call
+// and no range test, the load the C target's fast loop spells (s)[i]. Anything
+// the guard does not cover keeps the checked helper (lw_expand).
+
+lw_byte_at(int[] by_args) {
+  int by_base = lw_op("ptrtoint", "word", by_args[0], 0 - 1, "");
+  int by_off = lw_op("sext", "word", by_args[1], 0 - 1, "");
+  int by_sum = lw_op("add", "word", by_base, by_off, "");
+} chain (int[] by_args) {
+  int by_ptr = lw_op("inttoptr", "string", by_sum, 0 - 1, "");
+  int by_raw = lw_op("load", "byte", by_ptr, 0 - 1, "");
+  int ret_i = lw_op("zext", "int", by_raw, 0 - 1, "");
+} return int ret_i;
+given lw_env_fixture ([0, 1]):(5) then (import iop)[2]:("add")
+given lw_env_fixture ([0, 1]):(5) then (import iop)[4]:("load")
+
+lw_byte_hit(int by_node) {
+  int by_r = 0;
+  if(lp_hit(by_node) == 1 && (import ns1)[by_node] == "character_code_at") {
+    by_r = 1;
+  }
+} return int by_r;
+given lw_env_fixture (0):(0)
+given lw_env_fixture given lset((import lpon), 0, 1) given list_extend((import lpset), [0]) (0):(0)
+
+lw_expand_at(int by_node, string by_helper, string by_ret, int[] by_args) {
+  int ret_i = 0 - 1;
+  if(lw_byte_hit(by_node) == 1) {
+    ret_i = lw_byte_at(by_args);
+  } else {
+    ret_i = lw_expand(by_helper, by_ret, by_args);
+  }
+} return int ret_i;
+given lw_env_fixture (0, "id_ult", "word", [0, 1]):(1)
+given lw_env_fixture (0, "id_x", "word", [0, 1]):(0)

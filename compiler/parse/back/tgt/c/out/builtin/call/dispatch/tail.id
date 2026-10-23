@@ -10,7 +10,7 @@ emit_gcall_tail(int id) {
   if(is_fcall(id) == 1) {
     s = emit_fcall(id);
   } else {
-    s = emit_gcall_named(id);
+    s = emit_gcall_cell(id);
   }
 } return string s;
 given call_names_fixture ((import call_e_foo)):("id_foo(5, 4)")

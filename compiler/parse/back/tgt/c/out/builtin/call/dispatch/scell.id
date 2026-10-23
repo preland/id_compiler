@@ -1,0 +1,25 @@
+// A character_code_at call the loop guard covers (lp_hit) is the byte itself:
+// its string is not reassigned, its index is at least zero and below the
+// string's length on every iteration, so the check id_character_code_at makes
+// on each call is the guard's, made once. Any other call keeps it.
+
+emit_gcall_cell(int id) {
+  string s = "";
+  if((import ns1)[id] == "character_code_at" && lp_hit(id) == 1) {
+    s = emit_scell(id);
+  } else {
+    s = emit_gcall_named(id);
+  }
+} return string s;
+given lpf_lsn ((import lpf_hx)):("((int)(unsigned char)(lsv)[lsj])")
+given lpf_lsc ((import lpf_hx)):("id_character_code_at(lsv, lsj)")
+
+emit_scell(int id) {
+  int[] l1_of_v = (import nl1)[id];
+  string lq_sb = emit_expr(l1_of_v[0]);
+  string lq_sx = emit_expr(l1_of_v[1]);
+} chain (int id) {
+  string s = "((int)(unsigned char)(" + lq_sb + ")[" + lq_sx + "])";
+} return string s;
+given lpf_lsc ((import lpf_hx)):("((int)(unsigned char)(lsv)[lsj])")
+given lpf_lsc ((import lpf_hy)):("((int)(unsigned char)(lsv)[(lpfq + lpfq)])")

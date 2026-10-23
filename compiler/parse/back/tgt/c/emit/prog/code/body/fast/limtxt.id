@@ -14,9 +14,7 @@ given lpf_more (["x"], (import lpf_n0)):(["x", "i:1"])
 
 lp_ntok(string[] lq_tk, int lq_nn) {
   if((import nkind)[lq_nn] == "call") {
-    lp_leaf(lq_tk, (import nl1)[lq_nn][0]);
-    push(lq_tk, "len");
-    push(lq_tk, "wide");
+    lp_lenw(lq_tk, (import nl1)[lq_nn][0]);
   } else {
     lp_leaf(lq_tk, lq_nn);
   }

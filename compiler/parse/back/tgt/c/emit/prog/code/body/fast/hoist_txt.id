@@ -1,7 +1,8 @@
 // The text of a list base in the guarded copy: the local copy of its header
 // lp_hbase made, for a covered access of a list that has one, and otherwise
 // the base as written. lp_hty names the struct a base points to; a bytes
-// buffer has its own header.
+// buffer has its own header, and a string has none: it is read through its own
+// pointer.
 
 lp_hb(string lq_btxt, int lq_id) {
   string lq_ht = lq_btxt;
@@ -17,7 +18,11 @@ lp_hty(string lq_t) {
   if(cell_ns(lq_t) == "id_bytes_") {
     lq_ht = "IdBytes";
   }
+  if(lq_t == "string") {
+    lq_ht = "";
+  }
 } return string lq_ht;
 ("bytes"):("IdBytes")
 ("int[]"):("IdList")
 ("string[]"):("IdList")
+("string"):("")

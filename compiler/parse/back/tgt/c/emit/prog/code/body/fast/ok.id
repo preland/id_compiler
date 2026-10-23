@@ -10,7 +10,7 @@
 lp_ok(int lq_id, int lq_jn, int lq_lo, int lq_hi) {
   int lq_bx = find_str((import lpj), (import ns1)[lq_jn]);
   int lq_r = 0;
-  if(lq_bx >= 0 && (import nkind)[((import ni1)[lq_id])] == "var") {
+  if(lq_bx >= 0 && (import nkind)[lp_bnode(lq_id)] == "var") {
     lq_r = lp_stable(lq_id, lq_bx, lq_lo, lq_hi);
   }
 } return int lq_r;

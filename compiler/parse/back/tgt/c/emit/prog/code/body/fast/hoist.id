@@ -29,11 +29,11 @@ given lpf_in(0) given lpf_planned (""):() then (import lph)[0]:("lav")
 given lpf_in(0) given lpf_planb (""):() then len((import lph)):(1)
 
 lp_hbase(int lq_id, string lq_ind) {
-  int lq_b = (import ni1)[lq_id];
+  int lq_b = lp_bnode(lq_id);
   string lq_nm = emit_expr(lq_b);
   string lq_ty = lp_hty(type_of(lq_b));
 } chain (int lq_id, string lq_ind) {
-  if((import nkind)[lq_b] == "var" && find_str((import lph), lq_nm) < 0) {
+  if((import nkind)[lq_b] == "var" && lq_ty != "" && find_str((import lph), lq_nm) < 0) {
     push((import lph), lq_nm);
     print(lq_ind + lq_ty + " idh_c_" + lq_nm + " = *(" + lq_nm + "); " + lq_ty + "* idh_" + lq_nm + " = &idh_c_" + lq_nm + ";");
   }

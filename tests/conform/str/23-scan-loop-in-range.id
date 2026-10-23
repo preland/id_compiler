@@ -1,0 +1,13 @@
+main(int argc, string[] argv) {
+  string s = ",a,bc,,d,";
+  print(commas(s));
+} return int 0;
+
+commas(string s) {
+  int n = 0;
+  int i = 0;
+  while (i < len(s)) {
+    n = n + (character_code_at(s, i) == 44);
+    i = i + 1;
+  }
+} return int n;

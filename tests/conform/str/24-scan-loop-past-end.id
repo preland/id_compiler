@@ -1,0 +1,14 @@
+main(int argc, string[] argv) {
+  string s = "ab";
+  int stop = len(s) + 2;
+  print(codes_past(s, stop));
+} return int 0;
+
+codes_past(string s, int stop) {
+  int total = 0;
+  int i = 0;
+  while (i < stop) {
+    total = total + character_code_at(s, i);
+    i = i + 1;
+  }
+} return int total;

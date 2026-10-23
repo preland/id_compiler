@@ -22,7 +22,7 @@ given gd_stk_new ("null"):() then (import gdstk)[0]:(-1)
 given gd_vals given gd_two ("wide"):() then (import gdstk)[1]:(5)
 
 gd_op_d(string gdi_item) {
-  if(gdi_item == "wide" || gdi_item == "len" || gdi_item == "cap") {
+  if(gdi_item == "wide" || gdi_item == "len" || gdi_item == "cap" || gdi_item == "slen") {
     gd_un(gdi_item);
   } else {
     gd_bin(gdi_item);

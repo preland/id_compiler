@@ -1,0 +1,15 @@
+// A character_code_at(s, j) or character_code_at(s, j + k) of a loop body the
+// guard can cover. A string cannot be pushed to or written, only reassigned,
+// and lp_ok already asks that it is not; then its length is the same on every
+// iteration and the guard's one comparison of the limit with it covers every
+// read. An index of any other shape keeps the checked call.
+
+lp_sacc(int lq_id, int lq_lo, int lq_hi) {
+  int lq_x = (import nl1)[lq_id][1];
+  int lq_jn = lp_ixnode(lq_x);
+  if(lq_jn >= 0 && lp_ok(lq_id, lq_jn, lq_lo, lq_hi) == 1) {
+    lp_take(lq_id, lq_jn, lp_ixoff(lq_x));
+  }
+} return void;
+given lpf_lsc ((import lpf_hx), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(1)
+given lpf_lsc ((import lpf_hy), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(0)

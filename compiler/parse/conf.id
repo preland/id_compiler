@@ -101,7 +101,7 @@ string[] pure_builtins = ["len", "push", "pop", "to_int", "character_code_at", "
 // The tokens of a versioned loop's guard that stand for themselves, with no
 // operand in their spelling (back/ir/build/stmt/flow/loop/guard/check.id): the
 // others are names and literals, comparisons and sums (back/guard/token.id).
-string[] gd_plain = ["null", "wide", "len", "cap", "|"];
+string[] gd_plain = ["null", "wide", "len", "cap", "slen", "|"];
 // The IR opcode of an operator, looked up with str_map
 // (mid/names/symbols/lookup/more/pick.id) in back/ir/build/expr/op/more/ctrl/
 // irop/float.id: the integer table and the float one, each with the opcode of

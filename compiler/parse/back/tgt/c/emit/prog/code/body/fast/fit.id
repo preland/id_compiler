@@ -3,12 +3,26 @@
 // `<=` (lp_fit), as a limit is compared with it.
 
 lp_lenw(string[] lq_tk, int lq_lnode) {
+  string lq_op = lp_lenop(type_of(lq_lnode));
   lp_leaf(lq_tk, lq_lnode);
-  push(lq_tk, "len");
+  push(lq_tk, lq_op);
+} chain (string[] lq_tk, int lq_lnode) {
   push(lq_tk, "wide");
 } return void;
 given lpf_more ([], (import lpf_na)):(["v:lan", "len", "wide"])
 given lpf_more (["x"], (import lpf_q)):(["x", "v:lpfq", "len", "wide"])
+
+lp_lenop(string lq_t) {
+  string lq_op = "";
+  if(lq_t == "string") {
+    lq_op = "slen";
+  } else {
+    lq_op = "len";
+  }
+} return string lq_op;
+("string"):("slen")
+("int[]"):("len")
+("bytes"):("len")
 
 lp_fit(string[] lq_tk, int lq_lnode, int lq_k) {
   lp_lenw(lq_tk, lq_lnode);

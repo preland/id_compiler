@@ -2,7 +2,7 @@
 // the access.
 
 lp_held(int lq_id, int lq_bx, int lq_lo, int lq_hi) {
-  string lq_ls = (import ns1)[((import ni1)[lq_id])];
+  string lq_ls = (import ns1)[lp_bnode(lq_id)];
   int lq_r = lp_cnt(lq_lo, lq_hi, lq_ls, 0) == 0;
   if(lq_r == 1) {
     lq_r = lp_steps(lq_id, (import lpj)[lq_bx], lq_lo, lq_hi);

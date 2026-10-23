@@ -1,0 +1,13 @@
+// The node of the sequence an access reads: the list of an index or index
+// assignment, and the string of a character_code_at call, whose first argument
+// it is. A string never changes length, so the guard that proves a list access
+// in range proves a string access in range the same way.
+
+lp_bnode(int lq_id) {
+  int lq_b = (import ni1)[lq_id];
+  if((import nkind)[lq_id] == "call") {
+    lq_b = (import nl1)[lq_id][0];
+  }
+} return int lq_b;
+given lpf_lsc ((import lpf_xa)):((import lpf_ba))
+given lpf_lsc ((import lpf_hx)):((import lpf_hb))

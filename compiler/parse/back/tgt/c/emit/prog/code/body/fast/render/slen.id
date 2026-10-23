@@ -1,0 +1,9 @@
+// A string's length as the runtime reads it, one load of the stored count, for
+// the guard of a loop that reads the string with character_code_at.
+
+lp_rslen(string[] lr_st) {
+  string lr_x = pop(lr_st);
+  push(lr_st, "id_slen(" + lr_x + ")");
+} return void;
+(["(a)"]):(["id_slen((a))"])
+(["k", "(b)"]):(["k", "id_slen((b))"])

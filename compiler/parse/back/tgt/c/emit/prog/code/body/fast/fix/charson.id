@@ -1,0 +1,9 @@
+// LS with the guarded copy on and its one read covered, as lpf_on does for LA.
+
+lpf_lsn() {
+  lpf_lsc();
+  lset((import lpon), 0, 1);
+  push((import lpset), (import lpf_hx));
+} return void;
+():() then (import lpon)[0]:(1)
+():() then len((import lpset)):(1)

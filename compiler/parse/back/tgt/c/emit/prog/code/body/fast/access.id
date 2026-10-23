@@ -18,10 +18,15 @@ lp_node(int lq_id, int lq_lo, int lq_hi) {
   if((import nkind)[lq_id] == "index" || (import nkind)[lq_id] == "iassign") {
     lp_acc(lq_id, lq_lo, lq_hi);
   }
+  if((import nkind)[lq_id] == "call" && (import ns1)[lq_id] == "character_code_at") {
+    lp_sacc(lq_id, lq_lo, lq_hi);
+  }
 } return void;
 given lpf_cs(0) ((import lpf_xa), (import lpf_loa), (import lpf_hia)):() then len((import lpset)):(1)
 given lpf_cs(0) ((import lpf_q), (import lpf_loa), (import lpf_hia)):() then len((import lpset)):(0)
 given lpf_cs(1) ((import lpf_sb), (import lpf_lob), (import lpf_hib)):() then len((import lpset)):(1)
+given lpf_lsc ((import lpf_hx), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(1)
+given lpf_lsc ((import lpf_hn), (import lpf_hlo), (import lpf_hhi)):() then len((import lpset)):(0)
 
 lp_acc(int lq_id, int lq_lo, int lq_hi) {
   int lq_jn = lp_ixnode((import ni2)[lq_id]);

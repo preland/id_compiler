@@ -26,7 +26,7 @@ given gd_fix ("nothing"):("")
 
 gd_okname(string gdy_name) {
   string gdy_ty = gd_nty(gdy_name);
-  int gdy_ok = gdy_ty == "int" || gdy_ty == "word" || gdy_ty == "bytes" || ty_is_list(gdy_ty) == 1;
+  int gdy_ok = gdy_ty == "int" || gdy_ty == "word" || gdy_ty == "bytes" || gdy_ty == "string" || ty_is_list(gdy_ty) == 1;
 } return int gdy_ok;
 given gd_fix ("j"):(1)
 given gd_fix ("v"):(1)

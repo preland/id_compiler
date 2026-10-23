@@ -44,11 +44,16 @@ lp_rstep(string[] lr_st, string lr_tok, string lr_prev) {
   if(gt_isar(lr_tok) == 1) {
     lp_rnary(lr_st, lr_tok);
   }
+} chain (string[] lr_st, string lr_tok, string lr_prev) {
+  if(lr_tok == "slen") {
+    lp_rslen(lr_st);
+  }
 } return void;
 ([], "null", ""):(["NULL"])
 ([], "v:x", ""):(["(x)"])
 (["a"], "k:2", ""):(["a", "2"])
 (["a"], "wide", ""):(["(long long)a"])
 (["(l)"], "cap", ""):(["(l)->cap"])
+(["(s)"], "slen", ""):(["id_slen((s))"])
 (["a", "b"], "<", ""):(["a < b"])
 (["a", "b", "c"], "+:3", ""):(["(a + b + c)"])

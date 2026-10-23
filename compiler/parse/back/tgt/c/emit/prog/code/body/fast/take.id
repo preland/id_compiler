@@ -18,12 +18,12 @@ given lpf_cs(0) ((import lpf_xa), (import lpf_ja), 0):() then len((import lpset)
 
 lp_len(int lq_id, int lq_jn, int lq_k) {
   int lq_nn = (import lpn)[find_str((import lpj), (import ns1)[lq_jn])];
-  lp_rel((import ni1)[lq_id], "null", "!=");
+  lp_rel(lp_bnode(lq_id), "null", "!=");
   lp_nul(lq_nn);
 } chain (int lq_id, int lq_jn, int lq_k) {
   string[] lq_tk = [];
   lp_ntok(lq_tk, lq_nn);
-  lp_fit(lq_tk, (import ni1)[lq_id], lq_k);
+  lp_fit(lq_tk, lp_bnode(lq_id), lq_k);
 } chain (int lq_id, int lq_jn, int lq_k) {
   lp_add(lq_tk);
 } return void;
