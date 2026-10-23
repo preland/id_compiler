@@ -4013,6 +4013,11 @@ int id_esc_abad(int a);
 char* id_esc_stgt(int sn);
 int id_esc_mvnest(int fn, int sn, char* nm);
 int id_esc_mvctor(int fn, IdList* stmts, int i, int e);
+int id_esc_mvel(int b, int v);
+int id_esc_mvmask(int sn);
+int id_esc_pushat(int fn, IdList* stmts, int i, char* nm);
+int id_esc_pushof(int sn, char* nm);
+int id_esc_pushto(int e, char* nm);
 int id_esc_mvok(int fn, char* nm);
 int id_esc_mvin(int fn, IdList* stmts, char* nm);
 int id_esc_mvone(int fn, IdList* stmts, int i, char* nm);
@@ -4129,6 +4134,7 @@ int id_esc_node(int e, char* nm);
 int id_esc_iassign(int sn, char* nm);
 int id_esc_bindc(char* cname, int i, int a);
 int id_esc_actx(char* cname, int i, int a);
+int id_esc_mvbit(char* cname, int i);
 int id_esc_block(IdList* stmts, char* nm);
 int id_esc_if(int sn, char* nm);
 int id_esc_while(int sn, char* nm);
@@ -35094,8 +35100,12 @@ int id_esc_pushel(IdList* args, char* cname, char* nm) {
     int r;
     r = 0;
     if ((strcmp(cname, ID_S("push")) == 0)) {
-int idsq_9;
-        r = (idsq_9 = (int)(id_list_get(args, 0)), id_esc_elbad(idsq_9, (int)(id_list_get(args, 1)), nm));
+int idsq_26;
+        r = (idsq_26 = (int)(id_list_get(args, 0)), id_esc_elbad(idsq_26, (int)(id_list_get(args, 1)), nm));
+    }
+int idsq_12;
+    if (((r == 8) && (idsq_12 = (int)(id_list_get(args, 0)), (id_esc_mvel(idsq_12, (int)(id_list_get(args, 1))) == 1)))) {
+        r = 256;
     }
     return r;
 }
@@ -35135,10 +35145,13 @@ int id_esc_movable(int fn, IdList* stmts, int i, char* kn) {
     int ok;
     dz_j = id_esc_declat(stmts, i, kn);
     ok = 0;
-IdList* idsq_35;
-    if (((dz_j >= 0) && (idsq_35 = ni1, (id_esc_cnt((int)(id_list_get(idsq_35, (int)(id_list_get(stmts, i)))), kn) == 1)))) {
-int idsq_20;
-        ok = ((idsq_20 = id_esc_cntr(stmts, dz_j, i, kn), (idsq_20 == id_esc_cntf(fn, kn))) && ((id_esc_block((IdList*)(intptr_t)(id_list_get(nl2, fn)), kn) & 47) == 0));
+IdList* idsq_39;
+    if (((dz_j >= 0) && (idsq_39 = ni1, (id_esc_cnt((int)(id_list_get(idsq_39, (int)(id_list_get(stmts, i)))), kn) == 1)))) {
+int idsq_24;
+IdList* idsq_17;
+IdList* idsq_15;
+int idsq_13;
+        ok = ((idsq_24 = id_esc_cntr(stmts, dz_j, i, kn), (idsq_24 == id_esc_cntf(fn, kn))) && (idsq_17 = nl2, idsq_15 = (IdList*)(intptr_t)(id_list_get(idsq_17, fn)), idsq_13 = id_esc_block(idsq_15, kn), ((idsq_13 & id_esc_mvmask((int)(id_list_get(stmts, i)))) == 0)));
     }
     return ok;
 }
@@ -35305,6 +35318,54 @@ int id_esc_mvctor(int fn, IdList* stmts, int i, int e) {
     return ok;
 }
 
+int id_esc_mvel(int b, int v) {
+    char* pm_ty;
+    int ok;
+    pm_ty = id_type_of(id_imp_root(b));
+    ok = (((strcmp((char*)(intptr_t)(id_list_get(nkind, v)), ID_S("var")) == 0) && (id_is_list_ty(id_type_of(v)) == 1)) && (id_esc_strong(pm_ty) == 0));
+    return ok;
+}
+
+int id_esc_mvmask(int sn) {
+    int pm_msk;
+    pm_msk = 559;
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("exprstmt")) == 0)) {
+        pm_msk = 67;
+    }
+    return pm_msk;
+}
+
+int id_esc_pushat(int fn, IdList* stmts, int i, char* nm) {
+    int ok;
+    int pm_arg;
+    ok = 1;
+    pm_arg = id_esc_pushof((int)(id_list_get(stmts, i)), nm);
+    if ((pm_arg >= 0)) {
+        ok = id_esc_mvarg(fn, stmts, i, pm_arg);
+    }
+    return ok;
+}
+
+int id_esc_pushof(int sn, char* nm) {
+    int pm_arg;
+    pm_arg = (0 - 1);
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("exprstmt")) == 0)) {
+        pm_arg = id_esc_pushto((int)(id_list_get(ni1, sn)), nm);
+    }
+    return pm_arg;
+}
+
+int id_esc_pushto(int e, char* nm) {
+    int pm_arg;
+    IdList* pm_args;
+    pm_arg = (0 - 1);
+    pm_args = (IdList*)(intptr_t)(id_list_get(nl1, e));
+    if ((((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("call")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, e)), ID_S("push")) == 0)) && (id_esc_isvar((int)(id_list_get(pm_args, 0)), nm) == 1))) {
+        pm_arg = (int)(id_list_get(pm_args, 1));
+    }
+    return pm_arg;
+}
+
 int id_esc_mvok(int fn, char* nm) {
     int ok;
     ok = id_esc_mvin(fn, (IdList*)(intptr_t)(id_list_get(nl2, fn)), nm);
@@ -35331,6 +35392,7 @@ int id_esc_mvone(int fn, IdList* stmts, int i, char* nm) {
     if (((strcmp(id_esc_stgt(sn), nm) == 0) && (id_esc_ctor((int)(id_list_get(ni1, sn))) == 1))) {
         ok = id_esc_mvctor(fn, stmts, i, (int)(id_list_get(ni1, sn)));
     }
+    ok = (ok & id_esc_pushat(fn, stmts, i, nm));
     return ok;
 }
 
@@ -35341,6 +35403,9 @@ int id_esc_deepk(int fn, char* nm, int dz_k) {
     ok = ((f & 12) == 0);
     if ((dz_k == 3)) {
         ok = (((f & 172) == 0) && (id_esc_mvok(fn, nm) == 1));
+    }
+    if (((ok == 1) && ((f & 256) != 0))) {
+        ok = id_esc_mvok(fn, nm);
     }
     return ok;
 }
@@ -36241,13 +36306,13 @@ int id_esc_pbit(int fn, int pn, int i) {
     int b;
     nm = (char*)(intptr_t)(id_list_get(ns2, pn));
     f = id_esc_pflags(fn, nm);
-    b = (id_shl(((f & 65) != 0), i) | id_shl(((f & 44) != 0), (15 + i)));
+    b = (id_shl(((f & 577) != 0), i) | id_shl(((f & 300) != 0), (15 + i)));
     return b;
 }
 
 int id_esc_ro(int fn, char* nm) {
     int ok;
-    ok = ((id_esc_func(fn, nm) & 109) == 0);
+    ok = ((id_esc_func(fn, nm) & 621) == 0);
     return ok;
 }
 
@@ -36457,11 +36522,19 @@ int id_esc_bindc(char* cname, int i, int a) {
 
 int id_esc_actx(char* cname, int i, int a) {
     int c;
-int idsq_24;
-    c = (idsq_24 = id_arg_ctx(cname, i), (idsq_24 | id_esc_bindc(cname, i, a)));
-    if (((id_find_str(sdname, cname) >= 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("var")) == 0))) {
-        c = 64;
+int idsq_27;
+    c = (idsq_27 = id_arg_ctx(cname, i), (idsq_27 | id_esc_bindc(cname, i, a)));
+    if (((id_esc_mvbit(cname, i) > 0) && (strcmp((char*)(intptr_t)(id_list_get(nkind, a)), ID_S("var")) == 0))) {
+        c = id_esc_mvbit(cname, i);
     }
+    return c;
+}
+
+int id_esc_mvbit(char* cname, int i) {
+    int c;
+IdList* idsq_18;
+int idsq_16;
+    c = (idsq_18 = sdname, idsq_16 = id_find_str(idsq_18, cname), ((64 * (idsq_16 >= 0)) + (512 * ((strcmp(cname, ID_S("push")) == 0) && (i == 1)))));
     return c;
 }
 
@@ -36990,7 +37063,7 @@ int id_esc_sflags(int fn, char* nm) {
     int f;
     int ok;
     f = id_esc_block((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm);
-    ok = (((f & 67) == 0) && ((f & 16) != 0));
+    ok = (((f & 579) == 0) && ((f & 16) != 0));
     return ok;
 }
 
@@ -37147,7 +37220,7 @@ int id_esc_own2(int fn, char* nm) {
     t = id_esc_decl_type((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm);
     ok = id_esc_sown(fn, nm, t);
     if ((id_esc_heap_list(t) == 1)) {
-        ok = ((id_esc_block((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm) & 67) == 0);
+        ok = ((id_esc_block((IdList*)(intptr_t)(id_list_get(nl2, fn)), nm) & 579) == 0);
     }
     return ok;
 }

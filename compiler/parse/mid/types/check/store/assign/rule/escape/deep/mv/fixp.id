@@ -1,0 +1,57 @@
+// The programs the push move's cases run against, on top of esc_fix's:
+//
+//   mp_ok(int mn)  { int[][] mrows = []; int[] mrow = [mn]; push(mrows, mrow); }  returns mn
+//   mp_bad(int mn) { ... the same, then int mm = len(mrow); }                       returns mn
+//
+// mp_ok is the shape of a builder whose list takes over the row it filled;
+// mp_bad reads the row after the list has it.
+
+esc_mp_a() {
+  add_var("mrows", "int[][]", 0);
+  add_var("mrow", "int[]", 0);
+  add_var("mn", "int", 0);
+} chain () {
+  add_var("mm", "int", 0);
+  export int emp_rv = node_txt("var", "mrows");
+  export int emp_wv = node_txt("var", "mrow");
+} chain () {
+  export int emp_nv = node_txt("var", "mn");
+  export int emp_rd = node_decl("int[][]", "mrows", node_arr((import ef_none)), 0);
+  export int emp_wd = node_decl("int[]", "mrow", node_arr([(import emp_nv)]), 0);
+} chain () {
+  export int emp_pc = node_call("push", [(import emp_rv), (import emp_wv)]);
+} return void;
+given esc_mp_fix ():() then calls add_var:("mrows", "int[][]", 0) then calls add_var:("mrow", "int[]", 0)
+given esc_mp_fix ():() then calls add_var:("mm", "int", 0) then calls node_txt:("var", "mrows")
+given esc_mp_fix ():() then (import chkfail)[0]:(0)
+given esc_mp_fix ():() then init_units:(0)
+
+esc_mp_b() {
+  export int emp_ps = node_exprstmt((import emp_pc));
+  export int emp_dm = node_decl("int", "mm", node_call("len", [(import emp_wv)]), 0);
+  export int[] emp_body = [(import emp_rd), (import emp_wd), (import emp_ps)];
+} chain () {
+  export int[] emp_bbody = [(import emp_rd), (import emp_wd), (import emp_ps), (import emp_dm)];
+  export int[] emp_pd = [node_param("param", "int", "mn")];
+  export int emp_fn = node_func("mp_ok", "int", (import emp_pd), (import emp_body), node_txt("var", "mn"));
+} chain () {
+  export int emp_bad = node_func("mp_bad", "int", (import emp_pd), (import emp_bbody), node_txt("var", "mn"));
+} return void;
+given esc_mp_fix ():() then calls node_exprstmt:((import emp_pc)) then calls node_call:("len", [(import emp_wv)])
+given esc_mp_fix ():() then calls node_param:("param", "int", "mn") then calls node_txt:("var", "mn")
+given esc_mp_fix ():() then (import chkfail)[0]:(0)
+given esc_mp_fix ():() then init_units:(0)
+
+esc_mp_fix() {
+  esc_fix();
+  esc_mp_a();
+  esc_mp_b();
+} chain () {
+  add_func("mp_ok", "int", (import emp_fn));
+  add_func("mp_bad", "int", (import emp_bad));
+  esc_seed();
+} return void;
+given esc_mp_fix ():() then calls add_func:("mp_ok", "int", (import emp_fn))
+given esc_mp_fix ():() then calls add_func:("mp_bad", "int", (import emp_bad))
+():() then calls esc_fix:[1]
+():() then init_units:(0)

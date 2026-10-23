@@ -12,6 +12,10 @@ esc_deepk(int fn, string nm, int dz_k) {
   if(dz_k == 3) {
     ok = (f & 172) == 0 && esc_mvok(fn, nm) == 1;
   }
+} chain (int fn, string nm, int dz_k) {
+  if(ok == 1 && (f & 256) != 0) {
+    ok = esc_mvok(fn, nm);
+  }
 } return int ok;
 given esc_dfix ((import efd_good), "a", 1):(1)
 given esc_dfix ((import efd_leak), "b", 1):(0)

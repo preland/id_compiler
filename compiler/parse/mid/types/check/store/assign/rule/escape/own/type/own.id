@@ -12,7 +12,7 @@ esc_own2(int fn, string nm) {
   string t = esc_decl_type((import nl2)[fn], nm);
   int ok = esc_sown(fn, nm, t);
   if(esc_heap_list(t) == 1) {
-    ok = (esc_block((import nl2)[fn], nm) & 67) == 0;
+    ok = (esc_block((import nl2)[fn], nm) & 579) == 0;
   }
 } return int ok;
 given esc_fix ((import efc_fn), "w"):(1)

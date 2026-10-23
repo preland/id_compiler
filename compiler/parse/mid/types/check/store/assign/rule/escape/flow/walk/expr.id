@@ -35,8 +35,8 @@ esc_node(int e, string nm) {
     r = esc_node2(e, nm);
   }
 } return int r;
-given esc_fix ((import efa_push), "b"):(1)
-given esc_fix ((import efa_push), "a"):(8)
+given esc_fix ((import efa_push), "b"):(512)
+given esc_fix ((import efa_push), "a"):(256)
 
 // `xs[i] = v`: the node carries the indexed list and the index, and the value
 // in its first child list. The list and the index are read; the value is kept.

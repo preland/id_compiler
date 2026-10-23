@@ -1,0 +1,20 @@
+// A row built in a loop body and pushed once into a list of lists is moved, not
+// shared: it is declared in the same block as the push, mentioned nowhere else
+// and read by nobody afterwards, so the list owns it and frees it with itself.
+// Three rows are moved in, and the list is freed with them at the exit.
+build(int n) {
+  int[][] rows = [];
+  int i = 0;
+  while(i < n) {
+    int[] row = [i, i + 1];
+    push(rows, row);
+    i = i + 1;
+  }
+} chain (int n) {
+  int t = len(rows) + rows[2][1];
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

@@ -1,0 +1,18 @@
+// The name is declared outside the loop that pushes it, so one block would be
+// pushed on every pass: the list would hold it three times. Not a move.
+build(int n) {
+  int[][] rows = [];
+  int[] row = [n];
+  int i = 0;
+} chain (int n) {
+  while(i < n) {
+    push(rows, row);
+    i = i + 1;
+  }
+  int t = len(rows) + rows[2][0];
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

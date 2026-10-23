@@ -18,11 +18,12 @@ given esc_fm_fix ((import efm_fn), (import efm_body), 2, (import efm_if)):(1)
 // mentioned nowhere in the function outside statements `j` to `i`; and the walk
 // finds no keeping use, no store that is not fresh, no element read out and no
 // element that something else holds (bit 64, the constructor itself, aside).
+// A push (deep/mv/push.id) is judged by esc_mvmask instead.
 esc_movable(int fn, int[] stmts, int i, string kn) {
   int dz_j = esc_declat(stmts, i, kn);
   int ok = 0;
   if(dz_j >= 0 && esc_cnt((import ni1)[(stmts[i])], kn) == 1) {
-    ok = esc_cntr(stmts, dz_j, i, kn) == esc_cntf(fn, kn) && (esc_block((import nl2)[fn], kn) & 47) == 0;
+    ok = esc_cntr(stmts, dz_j, i, kn) == esc_cntf(fn, kn) && (esc_block((import nl2)[fn], kn) & esc_mvmask(stmts[i])) == 0;
   }
 } return int ok;
 given esc_fm_fix ((import efm_fn), (import efm_body), 2, "kids"):(1)

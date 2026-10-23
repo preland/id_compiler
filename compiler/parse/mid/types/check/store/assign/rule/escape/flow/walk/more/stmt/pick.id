@@ -24,8 +24,8 @@ esc_stmt2(int sn, string nm) {
     r = esc_stmt3(sn, nm);
   }
 } return int r;
-given esc_fix ((import efa_es), "b"):(1)
-given esc_fix ((import efa_es), "a"):(8)
+given esc_fix ((import efa_es), "b"):(512)
+given esc_fix ((import efa_es), "a"):(256)
 
 esc_stmt3(int sn, string nm) {
   int r = 0;

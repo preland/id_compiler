@@ -25,7 +25,7 @@ given esc_fix ((import efb_fn), (import efb_ps)):(1)
 esc_pbit(int fn, int pn, int i) {
   string nm = (import ns2)[pn];
   int f = esc_pflags(fn, nm);
-  int b = (((f & 65) != 0) << i) | (((f & 44) != 0) << (15 + i));
+  int b = (((f & 577) != 0) << i) | (((f & 300) != 0) << (15 + i));
 } return int b;
 given esc_fix ((import efa_fn), (import efa_pb), 1):(2)
 given esc_fix ((import efa_fn), (import efa_pa), 0):(32768)

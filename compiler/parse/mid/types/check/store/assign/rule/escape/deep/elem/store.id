@@ -12,8 +12,11 @@ esc_pushel(int[] args, string cname, string nm) {
   if(cname == "push") {
     r = esc_elbad(args[0], args[1], nm);
   }
+  if(r == 8 && esc_mvel(args[0], args[1]) == 1) {
+    r = 256;
+  }
 } return int r;
-given esc_dfix ((import efd_pa), "push", "g"):(8)
+given esc_dfix ((import efd_pa), "push", "g"):(256)
 given esc_dfix ((import efd_pb), "push", "g"):(0)
 given esc_dfix ((import efd_pa), "push", "v"):(0)
 given esc_dfix ((import efd_pa), "len", "g"):(0)
