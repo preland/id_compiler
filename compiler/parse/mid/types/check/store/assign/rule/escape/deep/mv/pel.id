@@ -29,7 +29,11 @@ esc_mvmask(int sn) {
   if((import nkind)[sn] == "exprstmt") {
     pm_msk = 67;
   }
+  if(pm_msk == 559 && (import ni1)[sn] >= 0 && (import nkind)[(import ni1)[sn]] == "call" && esc_ctor((import ni1)[sn]) == 0) {
+    pm_msk = 67;
+  }
 } return int pm_msk;
+given esc_cm_fix ((import ecm_dc)):(67)
 given esc_mp_fix ((import emp_ps)):(67)
 given esc_mp_fix ((import emp_wd)):(559)
 

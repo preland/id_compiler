@@ -1,0 +1,27 @@
+// The statement half of moves through a callee (cmv.id).
+
+// The parameter index that the statement `cmv_sn` pushes the name `cmv_kn` into,
+// or -1: an expression statement `push(pj, pk)` whose second argument is `cmv_kn`
+// and whose first is a parameter mentioned once in the whole function.
+esc_cmvat(int cmv_fn, int cmv_sn, string cmv_kn) {
+  int cmv_j = 0 - 1;
+  if((import nkind)[cmv_sn] == "exprstmt") {
+    cmv_j = esc_cmvcall(cmv_fn, (import ni1)[cmv_sn], cmv_kn);
+  }
+} return int cmv_j;
+given esc_cm_fix ((import ecm_fn), (import emp_ps), "mrow"):(0)
+given esc_cm_fix ((import ecm_fn), (import emp_ps), "mn"):(-1)
+given esc_cm_fix ((import ecm_bad), (import emp_ps), "mrows"):(-1)
+
+// The index among the parameters of `cmv_fn` of the name node `cmv_a`, when it
+// is a name mentioned once in the function, else -1.
+esc_cmvtgt(int cmv_fn, int cmv_a) {
+  int cmv_j = 0 - 1;
+  if((import nkind)[cmv_a] == "var" && esc_cntf(cmv_fn, (import ns1)[cmv_a]) == 1) {
+    cmv_j = esc_cmvpix((import nl1)[cmv_fn], (import ns1)[cmv_a]);
+  }
+} return int cmv_j;
+given esc_cm_fix ((import ecm_fn), (import emp_rv)):(0)
+given esc_cm_fix ((import ecm_fn), (import emp_nv)):(2)
+given esc_cm_fix ((import ecm_bad), (import emp_wv)):(-1)
+

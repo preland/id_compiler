@@ -5,8 +5,8 @@ esc_call(int e, string nm) {
   int[] args = (import nl1)[e];
   int r = esc_args(args, cname, nm);
 } return int r;
-given esc_fix ((import efb_call), "p"):(1)
-given esc_fix ((import efb_call), "t"):(8)
+given esc_fix ((import efb_call), "p"):(512)
+given esc_fix ((import efb_call), "t"):(256)
 given esc_sd_fix ((import esd_ctor), "xs"):(64)
 given esc_sd_fix ((import esd_ctor), "other"):(0)
 
@@ -16,13 +16,13 @@ esc_args(int[] args, string cname, string nm) {
   int r = esc_pushel(args, cname, nm);
   int i = 0;
   while(i < len(args)) {
-    int c = esc_actx(cname, i, args[i]);
+    int c = esc_cmctx(args, cname, i, esc_actx(cname, i, args[i]));
     r = r | esc_expr(args[i], nm, c);
     i = i + 1;
   }
 } return int r;
-given esc_fix ((import efb_args), "fa_sink", "p"):(1)
-given esc_fix ((import efb_args), "fa_sink", "t"):(8)
+given esc_fix ((import efb_args), "fa_sink", "p"):(512)
+given esc_fix ((import efb_args), "fa_sink", "t"):(256)
 given esc_fix ((import efa_args), "len", "b"):(0)
 
 // An element of a list literal is kept by the list.

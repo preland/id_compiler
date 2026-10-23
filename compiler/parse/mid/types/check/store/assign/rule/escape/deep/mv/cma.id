@@ -1,0 +1,41 @@
+// A call that moves a name into the list `nm` through its callee (cmv.id): the
+// push proof of deep/mv/push.id then judges it like `push(nm, row)`.
+
+// The argument node that statement `sn` hands to a callee that takes it into
+// the list `nm`, or -1.
+esc_cmarg(int sn, string nm) {
+  int cmv_r = 0 - 1;
+  if(((import nkind)[sn] == "exprstmt" || (import nkind)[sn] == "decl" || (import nkind)[sn] == "assign") && (import ni1)[sn] >= 0) {
+    cmv_r = esc_cmcall((import ni1)[sn], nm);
+  }
+} return int cmv_r;
+given esc_cm_fix ((import ecm_ps), "mrows"):(50)
+given esc_cm_fix ((import ecm_ps), "mrow"):(-1)
+given esc_cm_fix ((import ecm_dc), "mrows"):(50)
+given esc_cm_fix ((import emp_dm), "mrows"):(-1)
+
+// The same for the expression `e`: a call whose callee takes one of the
+// arguments into the argument that is the name `nm`.
+esc_cmcall(int e, string nm) {
+  int cmv_r = 0 - 1;
+  if((import nkind)[e] == "call" && esc_cnt(e, nm) == 1) {
+    cmv_r = esc_cmfind((import nl1)[e], (import ns1)[e], nm);
+  }
+} return int cmv_r;
+given esc_cm_fix ((import ecm_call), "mrows"):(50)
+given esc_cm_fix ((import ecm_call), "mn"):(-1)
+given esc_cm_fix ((import emp_pc), "mrows"):(-1)
+
+// The first argument node whose parameter `cname` takes into the argument that
+// is the name `nm`, or -1.
+esc_cmfind(int[] cmv_as, string cname, string nm) {
+  int cmv_r = 0 - 1;
+  int cmv_k = 0;
+  while(cmv_k < len(cmv_as) && cmv_r < 0) {
+    cmv_r = esc_cmpick(cmv_as, esc_cmvto(cname, cmv_k), cmv_k, nm);
+    cmv_k = cmv_k + 1;
+  }
+} return int cmv_r;
+given esc_cm_fix ((import ecm_as), "cm_ok", "mrows"):(50)
+given esc_cm_fix ((import ecm_as), "cm_bad", "mrows"):(-1)
+given esc_cm_fix ((import ecm_as), "cm_ok", "mn"):(-1)

@@ -1,0 +1,45 @@
+// Moves through a callee (docs/MEMORY.md 3.2): the index of the parameter that
+// the callee `cname` takes its parameter `cmv_k` into, or -1. The callee takes
+// it when its body, at the top level, is a `push(pj, pk)` of two of its own
+// parameters and mentions each of them nowhere else: pk then reaches nothing
+// but the element list pj, once, and pj is neither read, stored nor returned.
+// The summary alone (flow/sum/mask.id) cannot say this: it only says pk is
+// kept, and that pj has a non-literal element stored into it.
+esc_cmvto(string cname, int cmv_k) {
+  int cmv_j = 0 - 1;
+  int cmv_fn = fn_node_of(cname);
+  if(esc_opaque(cmv_fn, cname) == 0) {
+    cmv_j = esc_cmvscan(cmv_fn, cmv_k);
+  }
+} return int cmv_j;
+given esc_cm_fix ("cm_ok", 1):(0)
+given esc_cm_fix ("cm_bad", 1):(-1)
+given esc_cm_fix ("cm_ok", 2):(-1)
+given esc_cm_fix ("nosuch", 0):(-1)
+
+// The same for the function node `cmv_fn`.
+esc_cmvscan(int cmv_fn, int cmv_k) {
+  int[] cmv_ps = (import nl1)[cmv_fn];
+  int cmv_j = 0 - 1;
+  if(cmv_k < len(cmv_ps) && esc_cntf(cmv_fn, (import ns2)[(cmv_ps[cmv_k])]) == 1) {
+    cmv_j = esc_cmvstmts(cmv_fn, (import nl2)[cmv_fn], (import ns2)[(cmv_ps[cmv_k])]);
+  }
+} return int cmv_j;
+given esc_cm_fix ((import ecm_fn), 1):(0)
+given esc_cm_fix ((import ecm_fn), 0):(-1)
+given esc_cm_fix ((import ecm_bad), 1):(-1)
+
+// The parameter the top-level `push` of the name `cmv_kn` in `cmv_ss` fills, or
+// -1. The name is mentioned once in the whole function, so at most one
+// statement matches.
+esc_cmvstmts(int cmv_fn, int[] cmv_ss, string cmv_kn) {
+  int cmv_j = 0 - 1;
+  int cmv_i = 0;
+  while(cmv_i < len(cmv_ss)) {
+    cmv_j = cmv_j + (esc_cmvat(cmv_fn, cmv_ss[cmv_i], cmv_kn) + 1);
+    cmv_i = cmv_i + 1;
+  }
+} return int cmv_j;
+given esc_cm_fix ((import ecm_fn), (import ecm_ok), "mrow"):(0)
+given esc_cm_fix ((import ecm_fn), (import ecm_ok), "mn"):(-1)
+given esc_cm_fix ((import ecm_bad), (import ecm_badbody), "mn"):(-1)

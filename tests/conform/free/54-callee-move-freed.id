@@ -1,0 +1,26 @@
+// A row built in a loop body and handed to a callee that only pushes it into
+// the list of lists it was given is moved through the callee: the callee's
+// parameter is stored as an element of another parameter and nothing else, so
+// the caller's list owns the row and frees it with itself. Three rows are
+// moved in, and the list is freed with them at the exit.
+shelve(int[][] rows, int[] row, int n) {
+  push(rows, row);
+  int c = n + 1;
+} return int c;
+
+build(int n) {
+  int[][] rows = [];
+  int i = 0;
+  while(i < n) {
+    int[] row = [i, i + 1];
+    int c = shelve(rows, row, i);
+    i = i + 1;
+  }
+} chain (int n) {
+  int t = len(rows) + rows[2][1];
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

@@ -1,0 +1,29 @@
+// The expression half of moves through a callee (cmv.id, cmp.id).
+
+// The parameter index that the call `cmv_e` pushes the name `cmv_kn` into, or
+// -1: `push(pj, pk)` with `cmv_kn` as the second argument.
+esc_cmvcall(int cmv_fn, int cmv_e, string cmv_kn) {
+  int cmv_j = 0 - 1;
+  int[] cmv_as = (import nl1)[cmv_e];
+  if((import nkind)[cmv_e] == "call" && (import ns1)[cmv_e] == "push" && len(cmv_as) == 2 && esc_isvar(cmv_as[1], cmv_kn) == 1) {
+    cmv_j = esc_cmvtgt(cmv_fn, cmv_as[0]);
+  }
+} return int cmv_j;
+given esc_cm_fix ((import ecm_fn), (import emp_pc), "mrow"):(0)
+given esc_cm_fix ((import ecm_fn), (import emp_pc), "mrows"):(-1)
+given esc_cm_fix ((import ecm_fn), (import emp_nv), "mrow"):(-1)
+
+// The index of the parameter node named `cmv_n` in `cmv_ps`, or -1.
+esc_cmvpix(int[] cmv_ps, string cmv_n) {
+  int cmv_j = 0 - 1;
+  int cmv_i = 0;
+  while(cmv_i < len(cmv_ps) && cmv_j < 0) {
+    if((import ns2)[(cmv_ps[cmv_i])] == cmv_n) {
+      cmv_j = cmv_i;
+    }
+    cmv_i = cmv_i + 1;
+  }
+} return int cmv_j;
+given esc_cm_fix ((import ecm_pd), "mrow"):(1)
+given esc_cm_fix ((import ecm_pd), "mn"):(2)
+given esc_cm_fix ((import ecm_pd), "zz"):(-1)

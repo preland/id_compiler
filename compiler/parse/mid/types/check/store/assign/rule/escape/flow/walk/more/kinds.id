@@ -10,8 +10,8 @@ esc_node2(int e, string nm) {
     r = esc_node3(e, nm);
   }
 } return int r;
-given esc_fix ((import efb_bin), "p"):(1)
-given esc_fix ((import efb_bin), "t"):(8)
+given esc_fix ((import efb_bin), "p"):(512)
+given esc_fix ((import efb_bin), "t"):(256)
 
 esc_node3(int e, string nm) {
   int r = 0;
@@ -21,7 +21,7 @@ esc_node3(int e, string nm) {
     r = esc_list((import nl1)[e], nm, 1);
   }
 } return int r;
-given esc_fix ((import efb_un), "p"):(1)
+given esc_fix ((import efb_un), "p"):(512)
 given esc_fix ((import efb_arr), "t"):(1)
 given esc_fix ((import efb_bin), "p"):(0)
 
@@ -30,5 +30,5 @@ esc_two(int e, string nm) {
   int b = esc_expr((import ni2)[e], nm, 0);
   r = r | b;
 } return int r;
-given esc_fix ((import efb_bin), "p"):(1)
-given esc_fix ((import efb_bin), "t"):(8)
+given esc_fix ((import efb_bin), "p"):(512)
+given esc_fix ((import efb_bin), "t"):(256)

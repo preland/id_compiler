@@ -1,0 +1,47 @@
+// The walk half of moves through a callee (cmv.id): the flag a call's argument
+// gets when the callee takes one argument into another.
+
+// The argument node `cmv_k`, a name, when `cmv_j` is the index of another argument
+// that is the name `nm`; else -1.
+esc_cmpick(int[] cmv_as, int cmv_j, int cmv_k, string nm) {
+  int cmv_r = 0 - 1;
+  if(cmv_j >= 0 && cmv_j < len(cmv_as) && esc_isvar(cmv_as[cmv_j], nm) == 1 && (import nkind)[(cmv_as[cmv_k])] == "var") {
+    cmv_r = cmv_as[cmv_k];
+  }
+} return int cmv_r;
+given esc_cm_fix ((import ecm_as), 0, 1, "mrows"):(50)
+given esc_cm_fix ((import ecm_as), 0, 1, "mn"):(-1)
+given esc_cm_fix ((import ecm_as), 7, 1, "mrows"):(-1)
+
+// The context of argument `cmv_i` of a call to `cname` when the summary said
+// `cmv_c`: 512 (a keeper that a list of lists may take over, as for push) when
+// the callee takes the name into another parameter, 256 (a non-literal pushed
+// onto it, which the push proof judges) for the parameter it takes it into.
+esc_cmctx(int[] cmv_as, string cname, int cmv_i, int cmv_c) {
+  int cmv_r = cmv_c;
+  if(cmv_c == 1 && (import nkind)[(cmv_as[cmv_i])] == "var" && esc_cmvto(cname, cmv_i) >= 0) {
+    cmv_r = 512;
+  }
+  if(cmv_c == 8 && esc_cmsrc(cmv_as, cname, cmv_i) >= 0) {
+    cmv_r = 256;
+  }
+} return int cmv_r;
+given esc_cm_fix ((import ecm_as), "cm_ok", 1, 1):(512)
+given esc_cm_fix ((import ecm_as), "cm_ok", 0, 8):(256)
+given esc_cm_fix ((import ecm_as), "cm_bad", 1, 1):(1)
+given esc_cm_fix ((import ecm_as), "cm_bad", 0, 8):(8)
+
+// The index of an argument that the callee takes into argument `cmv_i`, or -1.
+esc_cmsrc(int[] cmv_as, string cname, int cmv_i) {
+  int cmv_r = 0 - 1;
+  int cmv_k = 0;
+  while(cmv_k < len(cmv_as) && cmv_r < 0) {
+    if(esc_cmvto(cname, cmv_k) == cmv_i && esc_mvel(cmv_as[cmv_i], cmv_as[cmv_k]) == 1) {
+      cmv_r = cmv_k;
+    }
+    cmv_k = cmv_k + 1;
+  }
+} return int cmv_r;
+given esc_cm_fix ((import ecm_as), "cm_ok", 0):(1)
+given esc_cm_fix ((import ecm_as), "cm_ok", 1):(-1)
+given esc_cm_fix ((import ecm_as), "cm_bad", 0):(-1)

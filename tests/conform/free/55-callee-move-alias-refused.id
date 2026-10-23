@@ -1,0 +1,26 @@
+// The callee pushes its parameter into the list of lists and into a second
+// list as well, so the row has two holders. The caller must not free it with
+// either, or the other dangles; ID_FREE_GUARD catches a use of a freed list.
+shelve(int[][] rows, int[][] spare, int[] row) {
+  push(rows, row);
+  push(spare, row);
+  int c = len(rows);
+} return int c;
+
+build(int n) {
+  int[][] rows = [];
+  int[][] spare = [];
+  int i = 0;
+} chain (int n) {
+  while(i < n) {
+    int[] row = [i, i + 1];
+    int c = shelve(rows, spare, row);
+    i = i + 1;
+  }
+  int t = len(rows) + spare[2][1];
+} return int t;
+
+main(int argc, string[] argv) {
+  int a = build(3);
+  print(a);
+} return int 0;

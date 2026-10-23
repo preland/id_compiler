@@ -4080,6 +4080,19 @@ int id_esc_elbad(int b, int v, char* nm);
 int id_esc_mvarg(int fn, IdList* stmts, int i, int a);
 int id_esc_movable(int fn, IdList* stmts, int i, char* kn);
 int id_esc_declat(IdList* stmts, int i, char* kn);
+int id_esc_cmarg(int sn, char* nm);
+int id_esc_cmcall(int e, char* nm);
+int id_esc_cmfind(IdList* cmv_as, char* cname, char* nm);
+int id_esc_cmvat(int cmv_fn, int cmv_sn, char* cmv_kn);
+int id_esc_cmvtgt(int cmv_fn, int cmv_a);
+int id_esc_cmvcall(int cmv_fn, int cmv_e, char* cmv_kn);
+int id_esc_cmvpix(IdList* cmv_ps, char* cmv_n);
+int id_esc_cmvto(char* cname, int cmv_k);
+int id_esc_cmvscan(int cmv_fn, int cmv_k);
+int id_esc_cmvstmts(int cmv_fn, IdList* cmv_ss, char* cmv_kn);
+int id_esc_cmpick(IdList* cmv_as, int cmv_j, int cmv_k, char* nm);
+int id_esc_cmctx(IdList* cmv_as, char* cname, int cmv_i, int cmv_c);
+int id_esc_cmsrc(IdList* cmv_as, char* cname, int cmv_i);
 int id_esc_cnt1(int sn, char* nm);
 int id_esc_cnt2s(int sn, char* nm);
 int id_esc_cnt3s(int sn, char* nm);
@@ -35482,6 +35495,170 @@ IdList* idsq_17;
     return dz_j;
 }
 
+int id_esc_cmarg(int sn, char* nm) {
+    int cmv_r;
+    cmv_r = (0 - 1);
+    if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("exprstmt")) == 0) || (strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("decl")) == 0)) || (strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("assign")) == 0)) && ((int)(id_list_get(ni1, sn)) >= 0))) {
+        cmv_r = id_esc_cmcall((int)(id_list_get(ni1, sn)), nm);
+    }
+    return cmv_r;
+}
+
+int id_esc_cmcall(int e, char* nm) {
+    int cmv_r;
+    cmv_r = (0 - 1);
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, e)), ID_S("call")) == 0) && (id_esc_cnt(e, nm) == 1))) {
+IdList* idsq_11;
+IdList* idsq_9;
+        cmv_r = (idsq_11 = nl1, idsq_9 = (IdList*)(intptr_t)(id_list_get(idsq_11, e)), id_esc_cmfind(idsq_9, (char*)(intptr_t)(id_list_get(ns1, e)), nm));
+    }
+    return cmv_r;
+}
+
+int id_esc_cmfind(IdList* cmv_as, char* cname, char* nm) {
+    int cmv_r;
+    int cmv_k;
+    cmv_r = (0 - 1);
+    cmv_k = 0;
+    while (((cmv_k < id_list_len(cmv_as)) && (cmv_r < 0))) {
+        cmv_r = id_esc_cmpick(cmv_as, id_esc_cmvto(cname, cmv_k), cmv_k, nm);
+        cmv_k = (cmv_k + 1);
+    }
+    return cmv_r;
+}
+
+int id_esc_cmvat(int cmv_fn, int cmv_sn, char* cmv_kn) {
+    int cmv_j;
+    cmv_j = (0 - 1);
+    if ((strcmp((char*)(intptr_t)(id_list_get(nkind, cmv_sn)), ID_S("exprstmt")) == 0)) {
+        cmv_j = id_esc_cmvcall(cmv_fn, (int)(id_list_get(ni1, cmv_sn)), cmv_kn);
+    }
+    return cmv_j;
+}
+
+int id_esc_cmvtgt(int cmv_fn, int cmv_a) {
+    int cmv_j;
+    cmv_j = (0 - 1);
+    if (((strcmp((char*)(intptr_t)(id_list_get(nkind, cmv_a)), ID_S("var")) == 0) && (id_esc_cntf(cmv_fn, (char*)(intptr_t)(id_list_get(ns1, cmv_a))) == 1))) {
+IdList* idsq_10;
+IdList* idsq_8;
+        cmv_j = (idsq_10 = nl1, idsq_8 = (IdList*)(intptr_t)(id_list_get(idsq_10, cmv_fn)), id_esc_cmvpix(idsq_8, (char*)(intptr_t)(id_list_get(ns1, cmv_a))));
+    }
+    return cmv_j;
+}
+
+int id_esc_cmvcall(int cmv_fn, int cmv_e, char* cmv_kn) {
+    int cmv_j;
+    IdList* cmv_as;
+    cmv_j = (0 - 1);
+    cmv_as = (IdList*)(intptr_t)(id_list_get(nl1, cmv_e));
+    if (((((strcmp((char*)(intptr_t)(id_list_get(nkind, cmv_e)), ID_S("call")) == 0) && (strcmp((char*)(intptr_t)(id_list_get(ns1, cmv_e)), ID_S("push")) == 0)) && (id_list_len(cmv_as) == 2)) && (id_esc_isvar((int)(id_list_get(cmv_as, 1)), cmv_kn) == 1))) {
+        cmv_j = id_esc_cmvtgt(cmv_fn, (int)(id_list_get(cmv_as, 0)));
+    }
+    return cmv_j;
+}
+
+int id_esc_cmvpix(IdList* cmv_ps, char* cmv_n) {
+    int cmv_j;
+    int cmv_i;
+    cmv_j = (0 - 1);
+    cmv_i = 0;
+    if ((cmv_ps) != NULL && (long long)(cmv_ps)->len <= (long long)(cmv_ps)->len - 0 && (cmv_i) >= 0) {
+        while (((cmv_i < id_list_len(cmv_ps)) && (cmv_j < 0))) {
+IdList* idsq_16;
+            if ((idsq_16 = ns2, (strcmp((char*)(intptr_t)(id_list_get(idsq_16, (int)((cmv_ps)->data[cmv_i]))), cmv_n) == 0))) {
+                cmv_j = cmv_i;
+            }
+            cmv_i = (cmv_i + 1);
+        }
+    } else {
+        while (((cmv_i < id_list_len(cmv_ps)) && (cmv_j < 0))) {
+IdList* idsq_16;
+            if ((idsq_16 = ns2, (strcmp((char*)(intptr_t)(id_list_get(idsq_16, (int)(id_list_get(cmv_ps, cmv_i)))), cmv_n) == 0))) {
+                cmv_j = cmv_i;
+            }
+            cmv_i = (cmv_i + 1);
+        }
+    }
+    return cmv_j;
+}
+
+int id_esc_cmvto(char* cname, int cmv_k) {
+    int cmv_j;
+    int cmv_fn;
+    cmv_j = (0 - 1);
+    cmv_fn = id_fn_node_of(cname);
+    if ((id_esc_opaque(cmv_fn, cname) == 0)) {
+        cmv_j = id_esc_cmvscan(cmv_fn, cmv_k);
+    }
+    return cmv_j;
+}
+
+int id_esc_cmvscan(int cmv_fn, int cmv_k) {
+    IdList* cmv_ps;
+    int cmv_j;
+    cmv_ps = (IdList*)(intptr_t)(id_list_get(nl1, cmv_fn));
+    cmv_j = (0 - 1);
+IdList* idsq_23;
+    if (((cmv_k < id_list_len(cmv_ps)) && (idsq_23 = ns2, (id_esc_cntf(cmv_fn, (char*)(intptr_t)(id_list_get(idsq_23, (int)(id_list_get(cmv_ps, cmv_k))))) == 1)))) {
+IdList* idsq_12;
+IdList* idsq_10;
+IdList* idsq_9;
+        cmv_j = (idsq_12 = nl2, idsq_10 = (IdList*)(intptr_t)(id_list_get(idsq_12, cmv_fn)), idsq_9 = ns2, id_esc_cmvstmts(cmv_fn, idsq_10, (char*)(intptr_t)(id_list_get(idsq_9, (int)(id_list_get(cmv_ps, cmv_k))))));
+    }
+    return cmv_j;
+}
+
+int id_esc_cmvstmts(int cmv_fn, IdList* cmv_ss, char* cmv_kn) {
+    int cmv_j;
+    int cmv_i;
+    cmv_j = (0 - 1);
+    cmv_i = 0;
+    while ((cmv_i < id_list_len(cmv_ss))) {
+        cmv_j = (cmv_j + (id_esc_cmvat(cmv_fn, (int)(id_list_get(cmv_ss, cmv_i)), cmv_kn) + 1));
+        cmv_i = (cmv_i + 1);
+    }
+    return cmv_j;
+}
+
+int id_esc_cmpick(IdList* cmv_as, int cmv_j, int cmv_k, char* nm) {
+    int cmv_r;
+    cmv_r = (0 - 1);
+IdList* idsq_14;
+    if (((((cmv_j >= 0) && (cmv_j < id_list_len(cmv_as))) && (id_esc_isvar((int)(id_list_get(cmv_as, cmv_j)), nm) == 1)) && (idsq_14 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_14, (int)(id_list_get(cmv_as, cmv_k)))), ID_S("var")) == 0)))) {
+        cmv_r = (int)(id_list_get(cmv_as, cmv_k));
+    }
+    return cmv_r;
+}
+
+int id_esc_cmctx(IdList* cmv_as, char* cname, int cmv_i, int cmv_c) {
+    int cmv_r;
+    cmv_r = cmv_c;
+IdList* idsq_33;
+    if ((((cmv_c == 1) && (idsq_33 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_33, (int)(id_list_get(cmv_as, cmv_i)))), ID_S("var")) == 0))) && (id_esc_cmvto(cname, cmv_i) >= 0))) {
+        cmv_r = 512;
+    }
+    if (((cmv_c == 8) && (id_esc_cmsrc(cmv_as, cname, cmv_i) >= 0))) {
+        cmv_r = 256;
+    }
+    return cmv_r;
+}
+
+int id_esc_cmsrc(IdList* cmv_as, char* cname, int cmv_i) {
+    int cmv_r;
+    int cmv_k;
+    cmv_r = (0 - 1);
+    cmv_k = 0;
+    while (((cmv_k < id_list_len(cmv_as)) && (cmv_r < 0))) {
+int idsq_17;
+        if (((id_esc_cmvto(cname, cmv_k) == cmv_i) && (idsq_17 = (int)(id_list_get(cmv_as, cmv_i)), (id_esc_mvel(idsq_17, (int)(id_list_get(cmv_as, cmv_k))) == 1)))) {
+            cmv_r = cmv_k;
+        }
+        cmv_k = (cmv_k + 1);
+    }
+    return cmv_r;
+}
+
 int id_esc_cnt1(int sn, char* nm) {
     int r;
     r = id_esc_cnt2s(sn, nm);
@@ -35666,6 +35843,10 @@ int id_esc_mvmask(int sn) {
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("exprstmt")) == 0)) {
         pm_msk = 67;
     }
+IdList* idsq_20;
+    if (((((pm_msk == 559) && ((int)(id_list_get(ni1, sn)) >= 0)) && (idsq_20 = nkind, (strcmp((char*)(intptr_t)(id_list_get(idsq_20, (int)(id_list_get(ni1, sn)))), ID_S("call")) == 0))) && (id_esc_ctor((int)(id_list_get(ni1, sn))) == 0))) {
+        pm_msk = 67;
+    }
     return pm_msk;
 }
 
@@ -35691,6 +35872,9 @@ int id_esc_pushof(int sn, char* nm) {
     pm_arg = (0 - 1);
     if ((strcmp((char*)(intptr_t)(id_list_get(nkind, sn)), ID_S("exprstmt")) == 0)) {
         pm_arg = id_esc_pushto((int)(id_list_get(ni1, sn)), nm);
+    }
+    if ((pm_arg < 0)) {
+        pm_arg = id_esc_cmarg(sn, nm);
     }
     return pm_arg;
 }
@@ -36845,7 +37029,7 @@ int id_esc_args(IdList* args, char* cname, char* nm) {
     r = id_esc_pushel(args, cname, nm);
     i = 0;
     while ((i < id_list_len(args))) {
-        c = id_esc_actx(cname, i, (int)(id_list_get(args, i)));
+        c = id_esc_cmctx(args, cname, i, id_esc_actx(cname, i, (int)(id_list_get(args, i))));
         r = (r | id_esc_expr((int)(id_list_get(args, i)), nm, c));
         i = (i + 1);
     }

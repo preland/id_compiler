@@ -1,0 +1,41 @@
+// The programs the callee move's cases run against, on top of esc_mp_fix's
+// nodes (fixp.id):
+//
+//   cm_ok(int[][] mrows, int[] mrow, int mn)   { push(mrows, mrow); }       returns mn
+//   cm_bad(int[][] mrows, int[] mrow, int mn)  { push(mrows, mrow); int mm = len(mrow); } returns mn
+//
+// cm_ok hands its second parameter to the first and mentions neither again;
+// cm_bad reads mrow after the push, so the list is not the only one to see it.
+
+esc_cm_a() {
+  export int[] ecm_pd = [node_param("param", "int[][]", "mrows"), node_param("param", "int[]", "mrow"), node_param("param", "int", "mn")];
+  export int[] ecm_ok = [(import emp_ps)];
+  export int[] ecm_badbody = [(import emp_ps), (import emp_dm)];
+} chain () {
+  export int ecm_fn = node_func("cm_ok", "int", (import ecm_pd), (import ecm_ok), node_txt("var", "mn"));
+  export int ecm_bad = node_func("cm_bad", "int", (import ecm_pd), (import ecm_badbody), node_txt("var", "mn"));
+  export int[] ecm_as = [(import emp_rv), (import emp_wv), (import emp_nv)];
+} chain () {
+  export int ecm_call = node_call("cm_ok", (import ecm_as));
+  export int ecm_ps = node_exprstmt((import ecm_call));
+  export int ecm_dc = node_decl("int", "mc", (import ecm_call), 0);
+} return void;
+given esc_cm_fix ():() then calls node_param:("param", "int[][]", "mrows") then calls node_param:("param", "int[]", "mrow")
+given esc_cm_fix ():() then calls node_call:("cm_ok", (import ecm_as)) then calls node_exprstmt:((import ecm_call))
+given esc_cm_fix ():() then (import chkfail)[0]:(0)
+given esc_cm_fix ():() then init_units:(0)
+
+esc_cm_fix() {
+  esc_fix();
+  esc_mp_a();
+  esc_mp_b();
+} chain () {
+  esc_cm_a();
+  add_func("cm_ok", "int", (import ecm_fn));
+  add_func("cm_bad", "int", (import ecm_bad));
+} chain () {
+  esc_seed();
+} return void;
+given esc_cm_fix ():() then calls add_func:("cm_ok", "int", (import ecm_fn)) then calls add_func:("cm_bad", "int", (import ecm_bad))
+given esc_cm_fix ():() then (import chkfail)[0]:(0)
+given esc_cm_fix ():() then init_units:(0)

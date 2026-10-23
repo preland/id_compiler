@@ -19,8 +19,8 @@ esc_func(int fn, string nm) {
     r = r | esc_expr((import ni1)[fn], nm, 1);
   }
 } return int r;
-given esc_fix ((import efb_fn), "p"):(1)
-given esc_fix ((import efb_fn), "t"):(8)
+given esc_fix ((import efb_fn), "p"):(513)
+given esc_fix ((import efb_fn), "t"):(256)
 given esc_fix ((import efb_fn), "v"):(3)
 
 esc_on() {
