@@ -542,12 +542,14 @@ static char* id_concat_f(char* a, char* b, int m) {
     if (m & 2) id_str_free(b);
     return r;
 }
-static char* id_str_of_int(int x) {
-    char b[32]; int n = snprintf(b, sizeof b, "%d", x); return id_str_from(b, (size_t)n);
-}
 static char* id_str_of_word(long long x) {
-    char b[32]; int n = snprintf(b, sizeof b, "%lld", x); return id_str_from(b, (size_t)n);
+    char b[24]; int i = 24;
+    unsigned long long u = x < 0 ? 0ULL - (unsigned long long)x : (unsigned long long)x;
+    do { b[--i] = (char)('0' + u % 10); u /= 10; } while (u);
+    if (x < 0) b[--i] = '-';
+    return id_str_from(b + i, (size_t)(24 - i));
 }
+static char* id_str_of_int(int x) { return id_str_of_word(x); }
 
 /* ---- word arithmetic with no undefined behaviour ------------------------
    C leaves division by zero, INT_MIN/-1, and shifts by 64-or-more undefined.
