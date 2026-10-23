@@ -29,5 +29,6 @@ call_fixture() {
   lset((import harn), 0, 1);
 } return void;
 ():() then (import harn)[0]:(1)
+():() then len((import thennode)):(1)
 ():() then init_units:(0)
 ():() then calls calls_node_fixture:[1]

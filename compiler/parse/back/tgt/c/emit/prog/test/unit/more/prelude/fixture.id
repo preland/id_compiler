@@ -9,6 +9,7 @@ one_casefn_fixture() {
   push((import casefn), 0);
 } return void;
 ():() then (import casefn)[0]:(0)
+():() then len((import casefn)):(1)
 ():() then init_units:(0)
 ():() then calls env_init:[1]
 
@@ -22,6 +23,7 @@ test_body_fixture() {
   harn_init();
 } return void;
 ():() then (import harn)[0]:(0)
+():() then len((import afname)):(0)
 ():() then init_units:(0)
 ():() then calls env_init:[1]
 
@@ -51,4 +53,5 @@ case_unit_fixture() {
   nat_init(5, ["prog", "--std-unit", "6", "--exclude-units", "5"]);
 } return void;
 ():() then calls nat_init:(5, ["prog", "--std-unit", "6", "--exclude-units", "5"])
+():() then calls node_func:("cu_lo", "void", [], [], -1)
 ():() then init_units:(0)

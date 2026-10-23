@@ -6,6 +6,7 @@ harn_init() {
   export int[] harn = [0];
 } return void export harn;
 ():() then (import harn)[0]:(0)
+():() then len((import harn)):(1)
 ():() then init_units:(0)
 
 // Forget the cached list_consts_kept answer (back/tgt/c/emit/prog/head/const/

@@ -13,6 +13,7 @@ case_fidx_fixture() {
   push((import casefn), (import fixture_fn));
 } return void;
 ():() then (import casefn)[1]:(3)
+():() then (import casefn)[0]:(3)
 ():() then init_units:(0)
 ():() then calls fn_fixture:[1]
 
@@ -22,6 +23,7 @@ case_fidx_fixture2() {
   push((import casefn), (import fixture_zero));
 } return void;
 ():() then (import casefn)[1]:(2)
+():() then (import casefn)[0]:(3)
 ():() then init_units:(0)
 ():() then calls fn_fixture:[1]
 
@@ -33,5 +35,6 @@ claim_conscase_fixture() {
   push((import conscase), (import fixture_ci));
 } return void;
 ():() then (import conscase)[0]:(0)
+():() then len((import conscase)):(1)
 ():() then init_units:(0)
 ():() then calls case_fixture:[1]

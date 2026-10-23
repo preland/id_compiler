@@ -31,6 +31,7 @@ claim_cols_fixture() {
   push((import conscase), 0);
   claim_cols_rest();
 } return void;
+():() then (import conskind)[1]:("mem")
 ():() then (import conscase)[1]:(0)
 ():() then init_units:(0)
 ():() then calls case_fidx_fixture:[1]

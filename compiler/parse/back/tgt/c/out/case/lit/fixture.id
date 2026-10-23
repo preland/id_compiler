@@ -8,6 +8,7 @@ lit_int_fixture() {
   export int lit_e2 = node_txt2("int", "4", 4, 0);
 } return void;
 ():() then calls node_txt2:("int", "5", 5, 0)
+():() then calls node_txt2:("int", "4", 4, 0)
 ():() then init_units:(0)
 
 lit_un_fixture() {
@@ -19,6 +20,7 @@ lit_un_fixture() {
   export int lit_un_cpl = newleaf("un", (import lit_e), 0, "~", "");
 } return void;
 given lit_int_fixture ():() then calls newleaf:("un", (import lit_e), 0, "~", "")
+given lit_int_fixture ():() then calls newleaf:("un", (import lit_e2), 0, "-", "")
 ():() then init_units:(0)
 ():() then calls lit_int_fixture:[1]
 
@@ -29,4 +31,5 @@ lit_str_fixture() {
   export int lit_str_e = newleaf("str", 0, 0, "hi", "");
 } return void;
 ():() then calls newleaf:("str", 0, 0, "hi", "")
+():() then (import ns1)[0]:("hi")
 ():() then init_units:(0)

@@ -11,6 +11,7 @@ call_names_fixture() {
   export int call_e_len = newnode("call", 0, 0, "len", "", (import call_args), (import call_args));
 } return void;
 given call_args_fixture ():() then calls newnode:("call", 0, 0, "foo", "", (import call_args), (import call_args))
+given call_args_fixture ():() then calls newnode:("call", 0, 0, "len", "", (import call_args), (import call_args))
 ():() then init_units:(0)
 ():() then calls call_args_fixture:[1]
 
@@ -20,6 +21,7 @@ call_names_fixture2() {
   export int call_e_pop = newnode("call", 0, 0, "pop", "", (import call_args_rev), (import call_args_rev));
 } return void;
 given call_args_fixture ():() then calls newnode:("call", 0, 0, "pop", "", (import call_args_rev), (import call_args_rev))
+given call_args_fixture ():() then calls newnode:("call", 0, 0, "push", "", (import call_args), (import call_args))
 ():() then init_units:(0)
 ():() then calls call_args_fixture:[1]
 
@@ -32,5 +34,6 @@ call_sys_fixture() {
   export int call_e_sys2 = newnode("call", 0, 0, "alloc", "", (import call_args), (import call_args));
 } return void;
 given call_args_fixture ():() then calls newnode:("call", 0, 0, "alloc", "", (import call_args), (import call_args))
+given call_args_fixture ():() then calls newnode:("call", 0, 0, "peek8", "", (import call_args), (import call_args))
 ():() then init_units:(0)
 ():() then calls call_args_fixture:[1]

@@ -8,6 +8,7 @@ lit_arr_fixture() {
   export int lit_arr_e = newnode("arr", 0, 0, "", "", xs, xs);
 } return void;
 given lit_int_fixture ():() then calls newnode:("arr", 0, 0, "", "", [(import lit_e), (import lit_e2)], [(import lit_e), (import lit_e2)])
+():() then (import lit_arr_e):(2)
 ():() then init_units:(0)
 ():() then calls lit_int_fixture:[1]
 
@@ -16,6 +17,7 @@ lit_cells_fixture() {
   export int[] lit_cells_xs = [(import lit_e), (import lit_e2)];
 } return void;
 ():() then len((import lit_cells_xs)):(2)
+():() then (import lit_cells_xs)[1]:(1)
 ():() then init_units:(0)
 ():() then calls lit_int_fixture:[1]
 
@@ -27,4 +29,5 @@ lit_import_fixture() {
   export int lit_cimport_e = newleaf("cimport", 0, 0, "gb", "");
 } return void;
 ():() then calls newleaf:("cimport", 0, 0, "gb", "")
+():() then (import ns1)[0]:("gb")
 ():() then init_units:(0)

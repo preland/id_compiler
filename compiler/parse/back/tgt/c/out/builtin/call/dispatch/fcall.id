@@ -11,6 +11,7 @@ lz_empty() {
   imd_fill();
 } return void;
 ():() then len((import imd_tab)):(0)
+():() then len((import cfp)):(0)
 ():() then init_units:(0)
 ():() then calls fwd_env:[1]
 
