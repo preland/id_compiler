@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  int m = 65536 * argc;
+  print(mul_checked(m, m));
+} return int 0;

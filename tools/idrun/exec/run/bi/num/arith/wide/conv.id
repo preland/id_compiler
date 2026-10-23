@@ -1,0 +1,27 @@
+// The helpers whose int forms need an int in hand: the host's `rotl`,
+// `uword_of_int` and `add_checked` pick their width from the operand's type,
+// and a word read from the VM's value slots has no width until it is narrowed
+// to an int here.
+vm_b_rotl32(word wa, word wb) {
+  int x = wa;
+  int r = rotl(x, wb);
+} return int r;
+(1, 1):(2)
+(-2147483648, 1):(1)
+(1, 31):(-2147483648)
+
+vm_b_uword_of_int(word wa) {
+  int x = wa;
+  word rw = uword_of_int(x);
+} return word rw;
+(-1):(4294967295)
+(7):(7)
+
+vm_b_add32(word wa, word wb) {
+  int x = wa;
+  int y = wb;
+  int r = add_checked(x, y);
+} return int r;
+(1, 2):(3)
+(2147483646, 1):(2147483647)
+(-2147483647, -1):(-2147483648)

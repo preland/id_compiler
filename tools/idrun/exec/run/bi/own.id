@@ -16,7 +16,12 @@ vm_bg(int id, word wa, word wb, word wc) {
   } else if (id == (import b_clo_setl)) {
     wr = vm_bk((import b_clo_set), wa, wb, wc);
   }
+  if (id >= (import b_wide0)) {
+    wr = vm_bw(id, wa, wb, wc);
+  }
 } return word wr;
+given vb_boot (70, 4294967296, 4294967296, 0):(1)
+given vb_boot (74, 1, 2, 0):(3)
 given vb_boot given tf_lnew given vm_b_list_push(1, 7) given vm_b_list_push(1, 0) given vm_b_list_push(1, 2) given vm_b_list_push(1, 0) given vm_b_list_push(1, 0) (68, 1, 1, 9):(0) then (import ex_lists):([[], [7, 0, 2, 0, 9]])
 given vb_boot (69, 1, 0, 0):(0)
 given vb_boot given tf_sput("hello") (62, 1, 1, 3):(2) then (import ex_strs):(["", "hello", "ell"])

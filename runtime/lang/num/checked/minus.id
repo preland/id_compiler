@@ -1,0 +1,17 @@
+// `sub_checked` at both widths, judged the way `add_checked` is: a 64-bit
+// difference wrapped exactly when the operands differ in sign and the result
+// differs in sign from the minuend.
+
+sub_checked(word a, word v) {
+  word ck_d = a - v;
+  if(((a ^ v) & (a ^ ck_d)) < 0) {
+    fail("integer overflow");
+  }
+} return word ck_d;
+
+sub_checked32(word a, word v) {
+  word ck_d = a - v;
+  if(ck_d > 2147483647 || ck_d < 0 - 2147483648) {
+    fail("integer overflow");
+  }
+} return word ck_d;

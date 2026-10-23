@@ -1,0 +1,21 @@
+// `add_checked` at both widths: the sum is taken with the wrapping `+` and then
+// judged, because the wrapped sum is what tells whether it wrapped.
+//
+// A 64-bit sum wrapped exactly when both operands differ in sign from it. The
+// 32-bit form receives sign-extended operands, so their sum cannot wrap the
+// machine word and is judged by whether it still fits an int. Both stop with
+// the same message the hosted runtime prints, through `fail`.
+
+add_checked(word a, word v) {
+  word ck_s = a + v;
+  if(((a ^ ck_s) & (v ^ ck_s)) < 0) {
+    fail("integer overflow");
+  }
+} return word ck_s;
+
+add_checked32(word a, word v) {
+  word ck_s = a + v;
+  if(ck_s > 2147483647 || ck_s < 0 - 2147483648) {
+    fail("integer overflow");
+  }
+} return word ck_s;

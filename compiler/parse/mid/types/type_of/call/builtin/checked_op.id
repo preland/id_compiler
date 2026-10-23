@@ -1,0 +1,10 @@
+// The three builtins that trap on signed overflow. They are the only ones whose
+// width depends on both operands, so the type check and the C backend each ask
+// this one question before treating a call as a plain word builtin.
+is_checked_op(string name) {
+  int ok = str_in(["add_checked", "sub_checked", "mul_checked"], name);
+} return int ok;
+("add_checked"):(1)
+("sub_checked"):(1)
+("mul_checked"):(1)
+("add"):(0)

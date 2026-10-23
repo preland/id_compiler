@@ -13,6 +13,9 @@ call_shaped(int id, string t) {
   if((import ns1)[id] == "rotl") {
     ret_s = rotl_type(id);
   }
+  if(is_checked_op((import ns1)[id]) == 1) {
+    ret_s = checked_type(id);
+  }
 } return string ret_s;
 given idx_build ((import call_pop), "?"):("int")
 given bind_fixture ((import bind_ok), "func"):("func() return int")

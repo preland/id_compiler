@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  int m = 0 - 2147483647 - argc;
+  print(sub_checked(m, argc));
+} return int 0;

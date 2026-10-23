@@ -1,0 +1,16 @@
+main(int argc, string[] argv) {
+  int imax = 2147483647 + argc - 1;
+  int imin = 0 - 2147483647 - argc;
+  word wmax = 9223372036854775807 + argc - 1;
+} chain (int argc, string[] argv) {
+  word wmin = 0 - 9223372036854775807 - argc;
+  word big = 3037000499;
+  string l1 = "" + add_checked(imax - 1, argc) + " " + add_checked(imin + 1, 0 - argc) + " " + sub_checked(imin + 1, argc) + " " + sub_checked(imax, 0) + " " + mul_checked(46340, 46340) + " " + mul_checked(imin, argc) + " " + mul_checked(imax, 0 - argc);
+} chain (int argc, string[] argv) {
+  string l2 = "" + add_checked(wmax - 1, argc) + " " + add_checked(wmin + 1, 0 - argc) + " " + sub_checked(wmin + 1, argc) + " " + sub_checked(wmax, 0) + " " + mul_checked(big, big) + " " + mul_checked(wmin, argc) + " " + mul_checked(wmax, 0 - argc);
+  string l3 = "" + add_checked(argc, wmax - 1) + " " + sub_checked(wmin + argc, argc) + " " + mul_checked(argc, wmin) + " " + add_checked(imax, 0 - 1) + " " + sub_checked(wmin + 1, 0 - 1) + " " + mul_checked(0, wmin);
+  print(l1);
+} chain (int argc, string[] argv) {
+  print(l2);
+  print(l3);
+} return int 0;

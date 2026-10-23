@@ -1,0 +1,21 @@
+// `umul_hi` and `uword_of_int`, the two builtins that read a word as 64
+// unsigned bits.
+//
+// The high half of a 64-by-64 product is built from four 32-by-32 partial
+// products, each of which fits an unsigned word and so survives the signed
+// multiply's wrap unchanged. The carry out of the middle column is the one
+// thing the partial products do not give directly, so it is added from the
+// column sum. This is the same arithmetic the hosted runtime uses where it has
+// no 128-bit type.
+
+umul_hi(word a, word v) {
+  word wh_lh = (a & 4294967295) * ushr(v, 32);
+  word wh_hl = ushr(a, 32) * (v & 4294967295);
+  word wh_mid = ushr((a & 4294967295) * (v & 4294967295), 32) + (wh_lh & 4294967295) + (wh_hl & 4294967295);
+} chain (word a, word v) {
+  word ret_w = ushr(a, 32) * ushr(v, 32) + ushr(wh_lh, 32) + ushr(wh_hl, 32) + ushr(wh_mid, 32);
+} return word ret_w;
+
+uword_of_int(word a) {
+  word ret_w = a & 4294967295;
+} return word ret_w;

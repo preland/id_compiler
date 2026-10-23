@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  word m = 4294967296 * argc;
+  print(mul_checked(m, m));
+} return int 0;

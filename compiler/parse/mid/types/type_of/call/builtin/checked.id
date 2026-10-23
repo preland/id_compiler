@@ -1,0 +1,28 @@
+// add_checked, sub_checked and mul_checked work at the width + would: both
+// operands int gives an int, and a word on either side widens the result to a
+// word. Unlike rotl, the second operand counts, because the operation reads it.
+checked_type(int id) {
+  int[] chk_args = (import nl1)[id];
+  string chk_t = "int";
+  if(len(chk_args) == 2 && (type_of(chk_args[0]) == "word" || type_of(chk_args[1]) == "word")) {
+    chk_t = "word";
+  }
+} return string chk_t;
+given checked_ints ((import chk_ii)):("int")
+given checked_words ((import chk_iw)):("word")
+given checked_words ((import chk_wi)):("word")
+
+checked_ints() {
+  rotl_fixture();
+  export int chk_ii = node_call("add_checked", [(import lit_a), (import lit_a)]);
+} return void;
+given rotl_fixture ():() then calls node_call:("add_checked", [(import lit_a), (import lit_a)])
+():() then calls rotl_fixture:[1]
+
+checked_words() {
+  checked_ints();
+  export int chk_iw = node_call("sub_checked", [(import lit_a), (import rot_wide)]);
+  export int chk_wi = node_call("mul_checked", [(import rot_wide), (import lit_a)]);
+} return void;
+():() then calls checked_ints:[1]
+given checked_ints ():() then calls node_call:("sub_checked", [(import lit_a), (import rot_wide)])

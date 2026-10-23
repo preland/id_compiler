@@ -638,6 +638,36 @@ static long long id_rotl(long long x, long long n) {
 static long long id_uword_of_int(long long a) {
     return (long long)(unsigned int)a;
 }
+static long long id_add_checked32(long long a, long long b) {
+    int r;
+    if (__builtin_add_overflow((int)a, (int)b, &r)) id_trap("integer overflow");
+    return r;
+}
+static long long id_add_checked(long long a, long long b) {
+    long long r;
+    if (__builtin_add_overflow(a, b, &r)) id_trap("integer overflow");
+    return r;
+}
+static long long id_sub_checked32(long long a, long long b) {
+    int r;
+    if (__builtin_sub_overflow((int)a, (int)b, &r)) id_trap("integer overflow");
+    return r;
+}
+static long long id_sub_checked(long long a, long long b) {
+    long long r;
+    if (__builtin_sub_overflow(a, b, &r)) id_trap("integer overflow");
+    return r;
+}
+static long long id_mul_checked32(long long a, long long b) {
+    int r;
+    if (__builtin_mul_overflow((int)a, (int)b, &r)) id_trap("integer overflow");
+    return r;
+}
+static long long id_mul_checked(long long a, long long b) {
+    long long r;
+    if (__builtin_mul_overflow(a, b, &r)) id_trap("integer overflow");
+    return r;
+}
 
 /* ---- the flat store -----------------------------------------------------
    One flat, byte-addressed memory. An address is an ordinary word, so

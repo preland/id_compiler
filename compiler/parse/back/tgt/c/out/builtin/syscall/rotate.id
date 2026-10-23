@@ -8,17 +8,27 @@ sys_helper_at(int id) {
   if(sha_h == "id_rotl" && type_of(sha_args[0]) == "int") {
     sha_h = "id_rotl32";
   }
+} chain (int id) {
+  if(is_checked_op((import ns1)[id]) == 1 && type_of(sha_args[0]) == "int" && type_of(sha_args[1]) == "int") {
+    sha_h = sha_h + "32";
+  }
 } return string sha_h;
 given call_rotl_fixture ((import call_e_rotl)):("id_rotl32")
 given call_rotl_fixture ((import call_e_rotlw)):("id_rotl")
 given call_rotl_fixture ((import call_e_sys)):("id_peek8")
+given call_rotl_fixture ((import call_e_addi)):("id_add_checked32")
+given call_rotl_fixture ((import call_e_addw)):("id_add_checked")
+given call_rotl_fixture ((import call_e_addm)):("id_add_checked")
 
 sys_narrow(int id, string text) {
   string sha_r = text;
-  if(sys_helper_at(id) == "id_rotl32") {
+  string sha_n = sys_helper_at(id);
+  if(sha_n == "id_rotl32" || sha_n == "id_add_checked32" || sha_n == "id_sub_checked32" || sha_n == "id_mul_checked32") {
     sha_r = "(int)(" + text + ")";
   }
 } return string sha_r;
+given call_rotl_fixture ((import call_e_addi), "X"):("(int)(X)")
+given call_rotl_fixture ((import call_e_addm), "X"):("X")
 given call_rotl_fixture ((import call_e_rotl), "X"):("(int)(X)")
 given call_rotl_fixture ((import call_e_rotlw), "X"):("X")
 given call_rotl_fixture ((import call_e_sys), "X"):("X")
@@ -27,6 +37,10 @@ call_rotl_fixture() {
   call_sys_fixture();
   export int call_e_rotl = newnode("call", 0, 0, "rotl", "", (import call_args), (import call_args));
   export int call_e_rotlw = newnode("call", 0, 0, "rotl", "", [(import call_e_sys2), (import call_e_sys2)], [(import call_e_sys2), (import call_e_sys2)]);
+} chain () {
+  export int call_e_addi = newnode("call", 0, 0, "add_checked", "", (import call_args), (import call_args));
+  export int call_e_addw = newnode("call", 0, 0, "add_checked", "", [(import call_e_sys2), (import call_e_sys2)], [(import call_e_sys2), (import call_e_sys2)]);
+  export int call_e_addm = newnode("call", 0, 0, "add_checked", "", [(import call_e1), (import call_e_sys2)], [(import call_e1), (import call_e_sys2)]);
 } return void;
 given call_sys_fixture ():() then calls newnode:("call", 0, 0, "rotl", "", (import call_args), (import call_args))
 ():() then init_units:(0)

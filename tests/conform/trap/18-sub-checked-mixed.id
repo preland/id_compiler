@@ -1,0 +1,4 @@
+main(int argc, string[] argv) {
+  word w = 0 - 9223372036854775807 - argc;
+  print(sub_checked(w, argc));
+} return int 0;
