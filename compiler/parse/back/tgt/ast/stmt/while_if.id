@@ -24,4 +24,5 @@ func_fix() {
   push((import prog), f0);
 } return void;
 ():() then calls node_func:("f", "int", [6], [1, 2], 0)
+():() then calls node_decl:("int", "y", 0, 0) then len((import prog)):(1)
 ():() then init_units:(0)

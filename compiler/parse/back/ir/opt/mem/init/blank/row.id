@@ -33,4 +33,5 @@ fix_wbuild_fixture() {
   fidx_add("foo");
 } return void;
 ():() then calls node_decl:("int", "x", 0, 1)
+():() then calls node_func:("foo", "void", [], [], -1) then calls fidx_add:("foo")
 ():() then init_units:(0)

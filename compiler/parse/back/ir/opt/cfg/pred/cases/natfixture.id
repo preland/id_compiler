@@ -7,6 +7,7 @@ fs_on_fixture() {
   arg_flags4(2, ["prog", "--freestanding"]);
 } return void;
 ():() then calls arg_flags4:(2, ["prog", "--freestanding"])
+():() then (import fsc)[0]:(1)
 ():() then init_units:(0)
 
 // A second, distinct --host-triple from ut_host_seeded's (xok.id), for
@@ -19,4 +20,5 @@ build_host_fixture2() {
   arg_flags4(3, ["prog", "--host-triple", "wasm32-unknown-unknown"]);
 } return void;
 ():() then calls arg_flags4:(3, ["prog", "--host-triple", "wasm32-unknown-unknown"])
+():() then (import hostc)[0]:("wasm32-unknown-unknown")
 ():() then init_units:(0)

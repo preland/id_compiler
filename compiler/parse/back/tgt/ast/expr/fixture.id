@@ -8,6 +8,7 @@ bin_fix() {
   bin_fix2(e0);
 } return void;
 ():() then calls node_txt2:("int", "5", 5, 0)
+():() then calls node_txt:("var", "x") then calls newnode:("bin", 0, 1, "+", "", [], [])
 ():() then init_units:(0)
 
 bin_fix2(int e0) {
@@ -15,6 +16,8 @@ bin_fix2(int e0) {
   int[] none = [];
   int e2 = newnode("bin", e0, e1, "+", "", none, none);
 } return void;
+given bin_fix (0):() then calls node_txt:("var", "x") then calls newnode:("bin", 0, 3, "+", "", [], [])
+given bin_fix (1):() then calls newnode:("bin", 1, 3, "+", "", [], [])
 given bin_fix (0):() then (import chkfail)[0]:(0)
 given bin_fix (0):() then init_units:(0)
 
@@ -24,5 +27,6 @@ call_fix() {
   int e3 = newnode("call", 0, 0, "foo", "", args, args);
 } return void;
 ():() then calls newnode:("call", 0, 0, "foo", "", [0, 1], [0, 1])
+():() then calls newnode:("bin", 0, 1, "+", "", [], []) then calls newnode:("call", 0, 0, "foo", "", [0, 1], [0, 1])
 ():() then init_units:(0)
 ():() then calls bin_fix:[1]

@@ -13,6 +13,7 @@ ir_rows() {
   ir_rows_fn0();
 } return void;
 ():() then entry_count(0):(1)
+():() then (import fnname)[0]:("one") then (import fnname)[1]:("two")
 ():() then init_units:(0)
 ():() then calls env_init:[1]
 
@@ -21,6 +22,8 @@ ir_rows_fn0() {
   int b0 = ir_block(f0, "entry");
   ir_rows_fn0_insn();
 } return void;
+given ir_rows ():() then calls ir_func:(-1, "one", "int") then calls ir_block:(2, "entry")
+given ir_rows ():() then (import fnname)[2]:("one") then (import fnname)[3]:("two")
 given ir_rows ():() then (import chkfail)[0]:(0)
 given ir_rows ():() then init_units:(0)
 
@@ -29,5 +32,7 @@ ir_rows_fn0_insn() {
   ir_add(0, v0);
   ir_rows_fn1();
 } return void;
+given ir_rows ():() then calls ir_leaf:("add", "int", 3, 4, "") then calls ir_add:(0, 2)
+given ir_rows ():() then (import ia)[2]:(3) then (import ihome)[2]:(0)
 given ir_rows ():() then (import chkfail)[0]:(0)
 given ir_rows ():() then init_units:(0)

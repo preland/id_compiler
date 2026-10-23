@@ -7,6 +7,7 @@ keep_export_fixture_harn_on() {
   keep_export_fixture_tail();
 } return void;
 ():() then (import harn)[0]:(1)
+():() then len((import eowners)):(2) then (import eowners)[1]:("main")
 ():() then init_units:(0)
 ():() then calls keep_export_fixture:[1]
 
@@ -17,6 +18,8 @@ keep_export_fixture_tail() {
   push((import eowners), "nat_target");
   push((import eowners), "main");
 } return void;
+given keep_export_fixture_reg ():() then len((import eowners)):(4)
+given keep_export_fixture_reg ():() then (import eowners)[2]:("nat_target") then (import eowners)[3]:("main")
 given keep_export_fixture_reg ():() then (import chkfail)[0]:(0)
 given keep_export_fixture_reg ():() then init_units:(0)
 
@@ -28,5 +31,6 @@ keep_export_fixture_all() {
   keep_export_fixture_tail();
 } return void;
 ():() then len((import eowners)):(4)
+():() then (import fnames)[0]:("main") then (import eowners)[3]:("main")
 ():() then init_units:(0)
 ():() then calls keep_export_fixture_reg:[1]

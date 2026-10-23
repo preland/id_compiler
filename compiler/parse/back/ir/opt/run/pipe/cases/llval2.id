@@ -8,6 +8,8 @@ ir_fix4() {
   export int irf_n6 = ir_leaf("neg", "int", (import irf_n0), 0 - 1, "");
   export int irf_n7 = ir_leaf("not", "int", (import irf_n0), 0 - 1, "");
 } return void;
+():() then calls ir_leaf:("neg", "int", 0, -1, "")
+():() then calls ir_leaf:("not", "int", 0, -1, "")
 ():() then init_units:(0)
 ():() then init_opt:(0)
 
@@ -16,6 +18,8 @@ ir_fix5() {
   export int irf_n8 = ir_call_node();
   export int irf_n9 = ir_leaf("zext", "int", (import irf_n0), 0 - 1, "");
 } return void;
+():() then calls ir_leaf:("zext", "int", 0, -1, "")
+():() then calls ir_insn:("call", "int", -1, -1, "f", [0], [])
 ():() then init_units:(0)
 ():() then init_opt:(0)
 
