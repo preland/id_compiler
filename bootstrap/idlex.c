@@ -402,7 +402,7 @@ static void id_free_walk(IdList* root, const char* base) {
         n--;
         void* p = stk[n].p;
         const char* d = stk[n].d;
-        while (*d == '@') d = base + atoi(d + 1);
+        while (*d == '@') { int o = 0; const char* q = d + 1; while (*q != ';') o = o * 10 + (*q++ - '0'); d = base + o; }
         if (!p || *d == '.') continue;
         if (*d == 's') { id_str_free((char*)p); continue; }
         IdList* L = (IdList*)p;
