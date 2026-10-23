@@ -264,7 +264,7 @@ fi
 #
 #   0  nothing is inlined: every id function is a call. Quickest build.
 #   1  -O1 per unit; what a unit can see of the others is only its prototypes.
-#   2  -O2 plus whole-program inlining at link time (LTO). The default.
+#   2  -O2 -ftree-vectorize plus whole-program inlining at link time (LTO). The default.
 #   3  -O3 plus whole-program inlining and a larger inline budget.
 #   s  -Os plus whole-program inlining: the smallest binary.
 case "$OPT" in
@@ -278,7 +278,8 @@ CC_OFLAGS=("-O$CLEVEL" -fwrapv)
 CC_INLINE=()
 CC_LTO=0
 case "$CLEVEL" in
-    2|s) CC_LTO=1 ;;
+    2) CC_LTO=1; CC_OFLAGS+=(-ftree-vectorize) ;;
+    s) CC_LTO=1 ;;
     3) CC_LTO=1; CC_INLINE=(--param max-inline-insns-auto=60 --param inline-unit-growth=80) ;;
 esac
 IR_OPT="$OPT"
